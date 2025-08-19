@@ -70,7 +70,7 @@ bool ConnectivityManagerImplWiFi::_IsWiFiStationApplicationControlled(void)
 
 bool ConnectivityManagerImplWiFi::_IsWiFiStationConnected(void)
 {
-    return (WiFiManager::StationStatus::CONNECTED == WiFiManager::Instance().GetStationStatus());
+    return (WiFiManager::StationStatus::FULLY_PROVISIONED == WiFiManager::Instance().GetStationStatus());
 }
 
 System::Clock::Timeout ConnectivityManagerImplWiFi::_GetWiFiStationReconnectInterval(void)
@@ -100,13 +100,6 @@ void ConnectivityManagerImplWiFi::_ClearWiFiStationProvision(void)
             ChipLogError(DeviceLayer, "Cannot clear WiFi station provisioning data");
         }
     }
-}
-
-bool ConnectivityManagerImplWiFi::_CanStartWiFiScan()
-{
-    return (WiFiManager::StationStatus::DISABLED != WiFiManager::Instance().GetStationStatus() &&
-            WiFiManager::StationStatus::SCANNING != WiFiManager::Instance().GetStationStatus() &&
-            WiFiManager::StationStatus::CONNECTING != WiFiManager::Instance().GetStationStatus());
 }
 
 void ConnectivityManagerImplWiFi::_OnWiFiStationProvisionChange()

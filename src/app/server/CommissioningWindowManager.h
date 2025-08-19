@@ -58,16 +58,7 @@ public:
         return CHIP_NO_ERROR;
     }
 
-    static constexpr System::Clock::Seconds32 MaxCommissioningTimeout()
-    {
-#if CHIP_DEVICE_CONFIG_BLE_EXT_ADVERTISING
-        // Specification section 2.3.1 - Extended Announcement Duration up to 48h
-        return System::Clock::Seconds32(60 * 60 * 48);
-#else
-        // Specification section 5.4.2.3. Announcement Duration says 15 minutes.
-        return System::Clock::Seconds32(15 * 60);
-#endif
-    }
+    System::Clock::Seconds32 MaxCommissioningTimeout() const;
 
     System::Clock::Seconds32 MinCommissioningTimeout() const
     {
@@ -96,6 +87,12 @@ public:
     CHIP_ERROR OpenEnhancedCommissioningWindow(System::Clock::Seconds32 commissioningTimeout, uint16_t discriminator,
                                                Crypto::Spake2pVerifier & verifier, uint32_t iterations, chip::ByteSpan salt,
                                                FabricIndex fabricIndex, VendorId vendorId);
+
+#if CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
+    CHIP_ERROR OpenJointCommissioningWindow(System::Clock::Seconds32 commissioningTimeout, uint16_t discriminator,
+                                            Crypto::Spake2pVerifier & verifier, uint32_t iterations, ByteSpan salt,
+                                            FabricIndex fabricIndex, VendorId vendorId);
+#endif // CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
 
     void CloseCommissioningWindow();
 
@@ -199,6 +196,11 @@ private:
         app::Clusters::AdministratorCommissioning::CommissioningWindowStatusEnum::kWindowNotOpen;
 
     bool mIsBLE = true;
+
+#if CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
+    // Boolean that tracks whether we are currently in a Joint Commissioning Mode.
+    bool mJCM = false;
+#endif // CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
 
     PASESession mPairingSession;
 

@@ -1,7 +1,7 @@
 /*
  *
  *    Copyright (c) 2021 Project CHIP Authors
- *    Copyright 2023 NXP
+ *    Copyright 2023, 2025 NXP
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -27,16 +27,6 @@
 
 #include <platform/DiagnosticDataProvider.h>
 
-/**
- * DiagnosticDataProviderImpl::ResetWiFiNetworkDiagnosticsCounts() is
- * currently not supported due to missing reset feature from SDK's wifi driver.
- * For this reason, the PKTCNT (beaconRxCount, packetMulticastRxCount,
- * packetMulticastTxCount, packetUnicastRxCount, packetUnicastTxCount)
- * and ERRCNT (beaconLostCount, overrunCount) features of DGWIFI cluster
- * are currently not supported.
- */
-#define DGWIFI_RESET_COUNTS_SUPPORTED 0
-
 namespace chip {
 namespace DeviceLayer {
 
@@ -50,6 +40,13 @@ public:
 
     // ===== Methods that implement the PlatformManager abstract interface.
 
+    bool SupportsWatermarks() override { return true; }
+    CHIP_ERROR GetCurrentHeapFree(uint64_t & currentHeapFree) override;
+    CHIP_ERROR GetCurrentHeapUsed(uint64_t & currentHeapUsed) override;
+    CHIP_ERROR GetCurrentHeapHighWatermark(uint64_t & currentHeapHighWatermark) override;
+    CHIP_ERROR ResetWatermarks() override;
+    CHIP_ERROR GetThreadMetrics(ThreadMetrics ** threadMetricsOut) override;
+    void ReleaseThreadMetrics(ThreadMetrics * threadMetrics) override;
     CHIP_ERROR GetRebootCount(uint16_t & rebootCount) override;
     CHIP_ERROR GetUpTime(uint64_t & upTime) override;
     CHIP_ERROR GetTotalOperationalHours(uint32_t & totalOperationalHours) override;
@@ -64,19 +61,29 @@ public:
     CHIP_ERROR GetWiFiVersion(app::Clusters::WiFiNetworkDiagnostics::WiFiVersionEnum & wifiVersion) override;
     CHIP_ERROR GetWiFiChannelNumber(uint16_t & channelNumber) override;
     CHIP_ERROR GetWiFiRssi(int8_t & rssi) override;
-#if DGWIFI_RESET_COUNTS_SUPPORTED
     CHIP_ERROR GetWiFiBeaconLostCount(uint32_t & beaconLostCount) override;
     CHIP_ERROR GetWiFiBeaconRxCount(uint32_t & beaconRxCount) override;
     CHIP_ERROR GetWiFiPacketMulticastRxCount(uint32_t & packetMulticastRxCount) override;
     CHIP_ERROR GetWiFiPacketMulticastTxCount(uint32_t & packetMulticastTxCount) override;
     CHIP_ERROR GetWiFiPacketUnicastTxCount(uint32_t & packetUnicastTxCount) override;
-    /**
-     * TODO : This should reset BeaconLostCount, BeaconRxCount, PacketMulticastRxCount,
-     * PacketMulticastTxCount, PacketUnicastRxCount, PacketUnicastTxCount
-     */
-    // CHIP_ERROR ResetWiFiNetworkDiagnosticsCounts() override;
-#endif /* DGWIFI_RESET_COUNTS_SUPPORTED */
+    CHIP_ERROR ResetWiFiNetworkDiagnosticsCounts() override;
+    CHIP_ERROR GetWiFiOverrunCount(uint64_t & overrunCount) override;
+    CHIP_ERROR GetWiFiPacketUnicastRxCount(uint32_t & packetUnicastTxCount) override;
 #endif /* CHIP_DEVICE_CONFIG_ENABLE_WPA */
+#if CONFIG_CHIP_ETHERNET
+    /**
+     * Ethernet network diagnostics methods
+     */
+    CHIP_ERROR GetEthPHYRate(app::Clusters::EthernetNetworkDiagnostics::PHYRateEnum & pHYRate) override;
+    CHIP_ERROR GetEthFullDuplex(bool & fullDuplex) override;
+    CHIP_ERROR GetEthTimeSinceReset(uint64_t & timeSinceReset) override;
+    CHIP_ERROR GetEthPacketRxCount(uint64_t & packetRxCount) override;
+    CHIP_ERROR GetEthPacketTxCount(uint64_t & packetTxCount) override;
+    CHIP_ERROR GetEthTxErrCount(uint64_t & txErrCount) override;
+    CHIP_ERROR GetEthCollisionCount(uint64_t & collisionCount) override;
+    CHIP_ERROR GetEthOverrunCount(uint64_t & overrunCount) override;
+    CHIP_ERROR ResetEthNetworkDiagnosticsCounts() override;
+#endif
 };
 
 /**

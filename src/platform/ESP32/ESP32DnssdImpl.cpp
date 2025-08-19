@@ -177,6 +177,12 @@ CHIP_ERROR EspDnssdPublishService(const DnssdService * service, DnssdPublishCall
         }
     }
 
+    // Remove service before adding it
+    if (mdns_service_exists_with_instance(service->mName, service->mType, GetProtocolString(service->mProtocol), nullptr))
+    {
+        mdns_service_remove_for_host(service->mName, service->mType, GetProtocolString(service->mProtocol), nullptr);
+    }
+
     espError = mdns_service_add(service->mName, service->mType, GetProtocolString(service->mProtocol), service->mPort, items,
                                 service->mTextEntrySize);
     // The mdns_service_add will return error if we try to add an existing service
@@ -205,9 +211,19 @@ exit:
 
 CHIP_ERROR EspDnssdRemoveServices()
 {
-    mdns_service_remove("_matter", "_tcp");
-    mdns_service_remove("_matterc", "_udp");
-    mdns_service_remove("_matterd", "_udp");
+    /* Calling ‘mdns_service_remove’ once may remove only a single matching service instance */
+    while (mdns_service_exists("_matter", "_tcp", nullptr))
+    {
+        ReturnMappedErrorOnFailure(mdns_service_remove("_matter", "_tcp"));
+    }
+    while (mdns_service_exists("_matterc", "_udp", nullptr))
+    {
+        ReturnMappedErrorOnFailure(mdns_service_remove("_matterc", "_udp"));
+    }
+    while (mdns_service_exists("_matterd", "_udp", nullptr))
+    {
+        ReturnMappedErrorOnFailure(mdns_service_remove("_matterd", "_udp"));
+    }
     return CHIP_NO_ERROR;
 }
 

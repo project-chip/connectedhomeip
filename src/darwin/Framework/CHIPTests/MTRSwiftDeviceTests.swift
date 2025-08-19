@@ -1,16 +1,13 @@
 import Matter
-import XCTest
 
 // This should eventually grow into a Swift copy of MTRDeviceTests
-
-// Fixture: chip-all-clusters-app --KVS "$(mktemp -t chip-test-kvs)" --interface-id -1
 
 struct DeviceConstants {
     static let testVendorID = 0xFFF1
     static let onboardingPayload = "MT:-24J0AFN00KA0648G00"
     static let deviceID = 0x12344321
     static let timeoutInSeconds : Double = 3
-    static let pairingTimeoutInSeconds : Double = 10
+    static let pairingTimeoutInSeconds : Double = 30
 }
 
 var sConnectedDevice: MTRBaseDevice? = nil
@@ -102,11 +99,14 @@ class MTRSwiftDeviceTestDelegate : NSObject, MTRDeviceDelegate {
     }
 }
 
-class MTRSwiftDeviceTests : XCTestCase {
+class MTRSwiftDeviceTests : MTRTestCase {
     static override func setUp()
     {
         super.setUp()
-
+        
+        let started = self.startApp(withName: "all-clusters", arguments: [], payload: PairingConstants.onboardingPayload)
+        XCTAssertTrue(started);
+        
         let factory = MTRDeviceControllerFactory.sharedInstance()
         
         let storage = MTRTestStorage()
@@ -163,8 +163,7 @@ class MTRSwiftDeviceTests : XCTestCase {
     }
     
     static override func tearDown() {
-        ResetCommissionee(sConnectedDevice, DispatchQueue.main, nil, UInt16(DeviceConstants.timeoutInSeconds))
-
+        XCTAssertNotNil(sConnectedDevice)
         let controller = sController
         XCTAssertNotNil(controller)
         controller!.shutdown()
@@ -414,12 +413,8 @@ class MTRSwiftDeviceTests : XCTestCase {
         
         wait(for: [ resubscriptionReachableExpectation, resubscriptionGotReportsExpectation ], timeout:60)
         
-        // Now make sure we ignore later tests.  Ideally we would just unsubscribe
-        // or remove the delegate, but there's no good way to do that.
-        delegate.onReachable = { () -> Void in }
-        delegate.onNotReachable = nil
-        delegate.onAttributeDataReceived = nil
-        delegate.onEventDataReceived = nil
+        // Now make sure we ignore later tests.
+        device.remove(_: delegate)
         
         // Make sure we got no updated reports (because we had a cluster state cache
         // with data versions) during the resubscribe.

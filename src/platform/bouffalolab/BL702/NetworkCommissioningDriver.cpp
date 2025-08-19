@@ -187,8 +187,7 @@ void BLWiFiDriver::ConnectNetwork(ByteSpan networkId, ConnectCallback * callback
 
     VerifyOrExit(NetworkMatch(mStagingNetwork, networkId), networkingStatus = Status::kNetworkIDNotFound);
     VerifyOrExit(mpConnectCallback == nullptr, networkingStatus = Status::kUnknownError);
-    ChipLogProgress(NetworkProvisioning, "BL NetworkCommissioningDelegate: SSID: %.*s", static_cast<int>(networkId.size()),
-                    networkId.data());
+    ChipLogProgress(NetworkProvisioning, "BL NetworkCommissioningDelegate: SSID: %s", NullTerminated(networkId).c_str());
 
     err               = ConnectWiFiNetwork(reinterpret_cast<const char *>(mStagingNetwork.ssid), mStagingNetwork.ssidLen,
                                            reinterpret_cast<const char *>(mStagingNetwork.credentials), mStagingNetwork.credentialsLen);
@@ -201,7 +200,7 @@ exit:
     }
     if (networkingStatus != Status::kSuccess)
     {
-        ChipLogError(NetworkProvisioning, "Failed to connect to WiFi network:%s", chip::ErrorStr(err));
+        ChipLogError(NetworkProvisioning, "Failed to connect to WiFi network: %" CHIP_ERROR_FORMAT, err.Format());
         mpConnectCallback = nullptr;
         callback->OnResult(networkingStatus, CharSpan(), 0);
     }
@@ -211,15 +210,15 @@ void BLWiFiDriver::ScanNetworks(ByteSpan ssid, WiFiDriver::ScanCallback * callba
 {
     if (callback != nullptr)
     {
-        ChipLogError(NetworkProvisioning, "ssid.data(): %s", ssid.data());
-
         if (ssid.data())
         {
             memset(mScanSSID, 0, sizeof(mScanSSID));
             memcpy(mScanSSID, ssid.data(), ssid.size());
             mScanSpecific = true;
         }
-        mpScanCallback = callback;
+
+        mScanResponseNum = 0;
+        mpScanCallback   = callback;
         wifiInterface_startScan();
     }
 }
@@ -229,20 +228,90 @@ void BLWiFiDriver::OnScanWiFiNetworkDone(void * opaque)
     netbus_wifi_mgmr_msg_cmd_t * pkg_data = (netbus_wifi_mgmr_msg_cmd_t *) ((struct pkg_protocol *) opaque)->payload;
     netbus_fs_scan_ind_cmd_msg_t * pmsg   = (netbus_fs_scan_ind_cmd_msg_t *) ((netbus_fs_scan_ind_cmd_msg_t *) pkg_data);
 
-    size_t i = 0, ap_num = 0;
+    size_t i = 0, ap_num = 0, ap_cnt = 0;
     WiFiScanResponse *pScanResponse, *p;
 
-    for (i = 0; i < pmsg->num; i++)
+    ChipLogProgress(DeviceLayer, "expected ssid %s. get %d in total, %d", mScanSSID, pmsg->num, mScanSpecific);
+
+    if (mScanSpecific)
     {
-        ChipLogProgress(DeviceLayer, "OnScanWiFiNetworkDone %s", pmsg->records[i].ssid);
-        if (mScanSpecific && !strcmp(mScanSSID, (char *) (pmsg->records[i].ssid)))
+        for (i = 0; i < pmsg->num; i++)
         {
-            ap_num = 1;
-            break;
+            if (mScanSpecific && !strcmp(mScanSSID, (char *) (pmsg->records[i].ssid)))
+            {
+                ap_num = 1;
+                break;
+            }
+        }
+    }
+    else
+    {
+        ap_num = pmsg->num;
+    }
+
+    if (ap_num)
+    {
+        p = mScanResponse = (WiFiScanResponse *) malloc(sizeof(WiFiScanResponse) * ap_num);
+        if (mScanResponse == nullptr)
+        {
+            return;
+        }
+
+        for (i = 0; i < pmsg->num; i++)
+        {
+            if (mScanSpecific && strcmp(mScanSSID, (char *) (pmsg->records[i].ssid)))
+            {
+                continue;
+            }
+
+            p->security.SetRaw(pmsg->records[i].auth_mode);
+            strncpy((char *) p->ssid, (const char *) pmsg->records[i].ssid, kMaxWiFiSSIDLength);
+            p->ssidLen  = strlen((char *) pmsg->records[i].ssid);
+            p->channel  = pmsg->records[i].channel;
+            p->wiFiBand = chip::DeviceLayer::NetworkCommissioning::WiFiBand::k2g4;
+            p->rssi     = pmsg->records[i].rssi;
+            memcpy(p->bssid, pmsg->records[i].bssid, 6);
+
+            p++;
+            ap_cnt++;
+
+            if (ap_cnt >= ap_num)
+            {
+                break;
+            }
         }
     }
 
-    if (0 == pmsg->num || (mScanSpecific && 0 == ap_num))
+    mScanResponseNum = ap_cnt;
+}
+
+void BLWiFiDriver::OnScanWiFiNetworkDone(void)
+{
+    size_t ap_cnt                    = mScanResponseNum;
+    WiFiScanResponse * pScanResponse = mScanResponse;
+
+    if (mScanResponse)
+    {
+        if (CHIP_NO_ERROR == DeviceLayer::SystemLayer().ScheduleLambda([ap_cnt, pScanResponse]() {
+                BLScanResponseIterator iter(ap_cnt, pScanResponse);
+                if (GetInstance().mpScanCallback)
+                {
+                    GetInstance().mpScanCallback->OnFinished(Status::kSuccess, CharSpan(), &iter);
+                    GetInstance().mpScanCallback = nullptr;
+                }
+                else
+                {
+                    ChipLogError(DeviceLayer, "can't find the ScanCallback function");
+                }
+            }))
+        {
+            ChipLogProgress(DeviceLayer, "ScheduleLambda OK");
+        }
+
+        free(mScanResponse);
+        mScanResponse = nullptr;
+    }
+    else
     {
         ChipLogProgress(DeviceLayer, "No AP found");
         if (mpScanCallback != nullptr)
@@ -250,60 +319,9 @@ void BLWiFiDriver::OnScanWiFiNetworkDone(void * opaque)
             mpScanCallback->OnFinished(Status::kSuccess, CharSpan(), nullptr);
             mpScanCallback = nullptr;
         }
-        return;
     }
 
-    if (ap_num)
-    {
-        p = pScanResponse = (WiFiScanResponse *) malloc(sizeof(WiFiScanResponse) * ap_num);
-    }
-    else
-    {
-        p = pScanResponse = (WiFiScanResponse *) malloc(sizeof(WiFiScanResponse) * pmsg->num);
-        ap_num            = pmsg->num;
-    }
-    for (i = 0; i < pmsg->num; i++)
-    {
-        if (mScanSpecific && strcmp(mScanSSID, (char *) (pmsg->records[i].ssid)))
-        {
-            continue;
-        }
-
-        p->security.SetRaw(pmsg->records[i].auth_mode);
-        p->ssidLen  = strlen((char *) pmsg->records[i].ssid) < chip::DeviceLayer::Internal::kMaxWiFiSSIDLength
-             ? strlen((char *) pmsg->records[i].ssid)
-             : chip::DeviceLayer::Internal::kMaxWiFiSSIDLength;
-        p->channel  = pmsg->records[i].channel;
-        p->wiFiBand = chip::DeviceLayer::NetworkCommissioning::WiFiBand::k2g4;
-        p->rssi     = pmsg->records[i].rssi;
-        memcpy(p->ssid, pmsg->records[i].ssid, p->ssidLen);
-        memcpy(p->bssid, pmsg->records[i].bssid, 6);
-
-        if (mScanSpecific)
-        {
-            break;
-        }
-
-        p++;
-    }
-
-    if (CHIP_NO_ERROR == DeviceLayer::SystemLayer().ScheduleLambda([ap_num, pScanResponse]() {
-            BLScanResponseIterator iter(ap_num, pScanResponse);
-            if (GetInstance().mpScanCallback)
-            {
-                GetInstance().mpScanCallback->OnFinished(Status::kSuccess, CharSpan(), &iter);
-                GetInstance().mpScanCallback = nullptr;
-            }
-            else
-            {
-                ChipLogError(DeviceLayer, "can't find the ScanCallback function");
-            }
-        }))
-    {
-        ChipLogProgress(DeviceLayer, "ScheduleLambda OK");
-    }
-
-    free(pScanResponse);
+    mScanResponseNum = 0;
 }
 
 CHIP_ERROR GetConfiguredNetwork(Network & network)

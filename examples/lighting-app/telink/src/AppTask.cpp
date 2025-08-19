@@ -20,7 +20,13 @@
 #include <app/server/Server.h>
 
 #include "ColorFormat.h"
+#include "LEDManager.h"
 #include "PWMManager.h"
+
+#ifdef CONFIG_TFLM_FEATURE
+#include "tflm/audio/app_audio.h"
+#include "tflm/audio/app_codec.h"
+#endif
 
 #include <app-common/zap-generated/attributes/Accessors.h>
 
@@ -34,6 +40,14 @@ XyColor_t sXY;
 HsvColor_t sHSV;
 CtColor_t sCT;
 RgbColor_t sLedRgb;
+
+#ifdef CONFIG_TFLM_FEATURE
+k_timer sAudioProcessUpdateTimer;
+// Ensure the timer starts only after the commissioning
+// or reconnection process is finished.
+constexpr uint16_t kInitialAudioProcessUpdateTimerPeriodMs = 15000;
+constexpr uint16_t kAudioProcessUpdateTimerPeriodMs        = 500; // 500ms timer period
+#endif
 } // namespace
 
 AppTask AppTask::sAppTask;
@@ -79,9 +93,70 @@ CHIP_ERROR AppTask::Init(void)
         // Set actual state to stored before reboot
         SetInitiateAction(storedValue ? ON_ACTION : OFF_ACTION, static_cast<int32_t>(AppEvent::kEventType_DeviceAction), nullptr);
     }
+#ifdef CONFIG_TFLM_FEATURE
+    app_codec_init();
+#endif
 
     return CHIP_NO_ERROR;
 }
+
+#ifdef CONFIG_TFLM_FEATURE
+void AppTask::AudioProcessUpdateTimerTimeoutCallback(k_timer * timer)
+{
+    if (!timer)
+    {
+        return;
+    }
+
+    AppEvent event;
+    event.Type    = AppEvent::kEventType_Timer;
+    event.Handler = AudioProcessUpdateTimerEventHandler;
+    sAppTask.PostEvent(&event);
+}
+
+void AppTask::AudioProcessUpdateTimerEventHandler(AppEvent * aEvent)
+{
+    int32_t result = 0;
+    bool onoff_value;
+
+    if (aEvent->Type != AppEvent::kEventType_Timer)
+    {
+        return;
+    }
+
+    tflite_micro_micro_speech_process_action(&result);
+
+    LOG_INF("result is %d", result);
+
+    if (result == 2)
+    {
+        onoff_value = 1;
+        PlatformMgr().LockChipStack();
+        Clusters::OnOff::Attributes::OnOff::Set(1, onoff_value);
+        PlatformMgr().UnlockChipStack();
+    }
+    else if (result == 3)
+    {
+        onoff_value = 0;
+        PlatformMgr().LockChipStack();
+        Clusters::OnOff::Attributes::OnOff::Set(1, onoff_value);
+        PlatformMgr().UnlockChipStack();
+    }
+}
+
+void AppTask::MicroSpeechProcessStart()
+{
+    k_timer_init(&sAudioProcessUpdateTimer, &AppTask::AudioProcessUpdateTimerTimeoutCallback, nullptr);
+    k_timer_user_data_set(&sAudioProcessUpdateTimer, &sAppTask);
+    k_timer_start(&sAudioProcessUpdateTimer, K_MSEC(kInitialAudioProcessUpdateTimerPeriodMs),
+                  K_MSEC(kAudioProcessUpdateTimerPeriodMs));
+}
+
+void AppTask::MicroSpeechProcessStop()
+{
+    k_timer_stop(&sAudioProcessUpdateTimer);
+}
+#endif
 
 void AppTask::LightingActionEventHandler(AppEvent * aEvent)
 {
@@ -130,16 +205,24 @@ void AppTask::SetInitiateAction(Fixture_Action aAction, int32_t aActor, uint8_t 
         if (aAction == ON_ACTION)
         {
             sfixture_on = true;
+#ifdef CONFIG_PWM
             PwmManager::getInstance().setPwm(PwmManager::EAppPwm_Red, (((uint32_t) sLedRgb.r * 1000) / UINT8_MAX));
             PwmManager::getInstance().setPwm(PwmManager::EAppPwm_Green, (((uint32_t) sLedRgb.g * 1000) / UINT8_MAX));
             PwmManager::getInstance().setPwm(PwmManager::EAppPwm_Blue, (((uint32_t) sLedRgb.b * 1000) / UINT8_MAX));
+#else
+            LedManager::getInstance().setLed(LedManager::EAppLed_App0, true);
+#endif
         }
         else
         {
             sfixture_on = false;
+#ifdef CONFIG_PWM
             PwmManager::getInstance().setPwm(PwmManager::EAppPwm_Red, false);
             PwmManager::getInstance().setPwm(PwmManager::EAppPwm_Green, false);
             PwmManager::getInstance().setPwm(PwmManager::EAppPwm_Blue, false);
+#else
+            LedManager::getInstance().setLed(LedManager::EAppLed_App0, false);
+#endif
         }
     }
     else if (aAction == LEVEL_ACTION)
@@ -217,6 +300,9 @@ void AppTask::PowerOnFactoryResetEventHandler(AppEvent * aEvent)
     PwmManager::getInstance().setPwm(PwmManager::EAppPwm_Red, (bool) (sPowerOnFactoryResetTimerCnt % 2));
     PwmManager::getInstance().setPwm(PwmManager::EAppPwm_Green, (bool) (sPowerOnFactoryResetTimerCnt % 2));
     PwmManager::getInstance().setPwm(PwmManager::EAppPwm_Blue, (bool) (sPowerOnFactoryResetTimerCnt % 2));
+#if !CONFIG_PWM
+    LedManager::getInstance().setLed(LedManager::EAppLed_App0, (bool) (sPowerOnFactoryResetTimerCnt % 2));
+#endif
     k_timer_init(&sPowerOnFactoryResetTimer, PowerOnFactoryResetTimerEvent, nullptr);
     k_timer_start(&sPowerOnFactoryResetTimer, K_MSEC(kPowerOnFactoryResetIndicationTimeMs),
                   K_MSEC(kPowerOnFactoryResetIndicationTimeMs));
@@ -237,3 +323,14 @@ void AppTask::PowerOnFactoryResetTimerEvent(struct k_timer * timer)
     }
 }
 #endif /* CONFIG_CHIP_ENABLE_POWER_ON_FACTORY_RESET */
+
+void AppTask::LinkLeds(LedManager & ledManager)
+{
+#if CONFIG_CHIP_ENABLE_APPLICATION_STATUS_LED
+    ledManager.linkLed(LedManager::EAppLed_Status, 0);
+#endif
+
+#if !CONFIG_PWM
+    ledManager.linkLed(LedManager::EAppLed_App0, 1);
+#endif /* !CONFIG_PWM */
+}

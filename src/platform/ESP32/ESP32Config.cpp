@@ -81,6 +81,7 @@ const ESP32Config::Key ESP32Config::kConfigKey_ProductFinish         = { kConfig
 const ESP32Config::Key ESP32Config::kConfigKey_ProductColor          = { kConfigNamespace_ChipFactory, "product-color" };
 const ESP32Config::Key ESP32Config::kConfigKey_PartNumber            = { kConfigNamespace_ChipFactory, "part-number" };
 const ESP32Config::Key ESP32Config::kConfigKey_LocationCapability    = { kConfigNamespace_ChipFactory, "loc-capability" };
+const ESP32Config::Key ESP32Config::kConfigKey_PrimaryDeviceType     = { kConfigNamespace_ChipFactory, "device-type" };
 
 // Keys stored in the chip-config namespace
 const ESP32Config::Key ESP32Config::kConfigKey_ServiceConfig      = { kConfigNamespace_ChipConfig, "service-config" };
@@ -216,7 +217,7 @@ CHIP_ERROR ESP32Config::ReadConfigValueStr(Key key, char * buf, size_t bufSize, 
         {
             return CHIP_ERROR_BUFFER_TOO_SMALL;
         }
-        ReturnErrorCodeIf(buf[outLen - 1] != 0, CHIP_ERROR_INVALID_STRING_LENGTH);
+        VerifyOrReturnError(buf[outLen - 1] == 0, CHIP_ERROR_INVALID_STRING_LENGTH);
         ReturnMappedErrorOnFailure(err);
     }
 

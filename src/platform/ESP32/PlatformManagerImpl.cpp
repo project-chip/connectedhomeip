@@ -28,7 +28,6 @@
 #include <crypto/CHIPCryptoPAL.h>
 #include <platform/ESP32/DiagnosticDataProviderImpl.h>
 #include <platform/ESP32/ESP32Utils.h>
-#include <platform/ESP32/SystemTimeSupport.h>
 #include <platform/PlatformManager.h>
 #include <platform/internal/GenericPlatformManagerImpl_FreeRTOS.ipp>
 
@@ -84,30 +83,20 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack()
     // to finish the initialization process.
     ReturnErrorOnFailure(Internal::GenericPlatformManagerImpl_FreeRTOS<PlatformManagerImpl>::_InitChipStack());
 
-    ReturnErrorOnFailure(System::Clock::InitClock_RealTime());
     return CHIP_NO_ERROR;
 }
 
 void PlatformManagerImpl::_Shutdown()
 {
-    uint64_t upTime = 0;
+    uint32_t totalOperationalHours = 0;
 
-    if (GetDiagnosticDataProvider().GetUpTime(upTime) == CHIP_NO_ERROR)
+    if (ConfigurationMgr().GetTotalOperationalHours(totalOperationalHours) == CHIP_NO_ERROR)
     {
-        uint32_t totalOperationalHours = 0;
-
-        if (ConfigurationMgr().GetTotalOperationalHours(totalOperationalHours) == CHIP_NO_ERROR)
-        {
-            ConfigurationMgr().StoreTotalOperationalHours(totalOperationalHours + static_cast<uint32_t>(upTime / 3600));
-        }
-        else
-        {
-            ChipLogError(DeviceLayer, "Failed to get total operational hours of the Node");
-        }
+        ConfigurationMgr().StoreTotalOperationalHours(totalOperationalHours);
     }
     else
     {
-        ChipLogError(DeviceLayer, "Failed to get current uptime since the Node’s last reboot");
+        ChipLogError(DeviceLayer, "Failed to get total operational hours of the Node");
     }
 
     Internal::GenericPlatformManagerImpl_FreeRTOS<PlatformManagerImpl>::_Shutdown();

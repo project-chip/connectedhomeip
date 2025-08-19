@@ -68,12 +68,14 @@ void CastingPlayer::VerifyOrEstablishConnection(ConnectionCallbacks connectionCa
         // Set the callback for handling CommissionerDeclaration messages.
         matter::casting::core::CommissionerDeclarationHandler::GetInstance()->SetCommissionerDeclarationCallback(
             connectionCallbacks.mCommissionerDeclarationCallback);
+        mClientProvidedCommissionerDeclarationCallback = true;
     }
     else
     {
         ChipLogProgress(
             AppServer,
             "CastingPlayer::VerifyOrEstablishConnection() CommissionerDeclarationCallback not provided in ConnectionCallbacks");
+        mClientProvidedCommissionerDeclarationCallback = false;
     }
 
     ChipLogProgress(AppServer, "CastingPlayer::VerifyOrEstablishConnection() verifying User Directed Commissioning (UDC) state");
@@ -100,19 +102,23 @@ void CastingPlayer::VerifyOrEstablishConnection(ConnectionCallbacks connectionCa
     // as per IdentificationDeclarationOptions.mTargetAppInfos, simply Find or Re-establish the CASE session and return early.
     if (cachedCastingPlayers.size() != 0)
     {
-        ChipLogProgress(AppServer, "CastingPlayer::VerifyOrEstablishConnection() Re-establishing CASE with cached CastingPlayer");
+        ChipLogProgress(AppServer,
+                        "CastingPlayer::VerifyOrEstablishConnection() Checking cached CastingPlayer(s) for *this* CastingPlayer");
         it = std::find_if(cachedCastingPlayers.begin(), cachedCastingPlayers.end(),
                           [this](const core::CastingPlayer & castingPlayerParam) { return castingPlayerParam == *this; });
 
         // found the CastingPlayer in cache
         if (it != cachedCastingPlayers.end())
         {
+            ChipLogProgress(
+                AppServer,
+                "CastingPlayer::VerifyOrEstablishConnection() *this* CastingPlayer found in cache; checking for TargetApp(s)");
             unsigned index = (unsigned int) std::distance(cachedCastingPlayers.begin(), it);
             if (ContainsDesiredTargetApp(&cachedCastingPlayers[index], idOptions.getTargetAppInfoList()))
             {
                 ChipLogProgress(
                     AppServer,
-                    "CastingPlayer::VerifyOrEstablishConnection() calling FindOrEstablishSession on cached CastingPlayer");
+                    "CastingPlayer::VerifyOrEstablishConnection() Attempting to Re-establish CASE with cached CastingPlayer");
                 *this                          = cachedCastingPlayers[index];
                 mConnectionState               = CASTING_PLAYER_CONNECTING;
                 mOnCompleted                   = connectionCallbacks.mOnConnectionComplete;
@@ -225,16 +231,19 @@ exit:
 
 CHIP_ERROR CastingPlayer::StopConnecting()
 {
+    // Calling the internal StopConnecting() API with the shouldSendIdentificationDeclarationMessage set to true to notify the
+    // CastingPlayer/Commissioner that the commissioning session was cancelled by the Casting Client/Commissionee user. This will
+    // result in the Casting Client/Commissionee sending a CancelPasscode IdentificationDeclaration message to the CastingPlayer.
+    // shouldSendIdentificationDeclarationMessage is true when StopConnecting() is called by the Client.
+    return this->StopConnecting(true);
+}
+
+CHIP_ERROR CastingPlayer::StopConnecting(bool shouldSendIdentificationDeclarationMessage)
+{
     ChipLogProgress(AppServer, "CastingPlayer::StopConnecting() called, while ChipDeviceEventHandler.sUdcInProgress: %s",
                     support::ChipDeviceEventHandler::isUdcInProgress() ? "true" : "false");
     VerifyOrReturnValue(mConnectionState == CASTING_PLAYER_CONNECTING, CHIP_ERROR_INCORRECT_STATE,
                         ChipLogError(AppServer, "CastingPlayer::StopConnecting() called while not in connecting state"););
-    VerifyOrReturnValue(
-        mIdOptions.mCommissionerPasscode, CHIP_ERROR_INCORRECT_STATE,
-        ChipLogError(AppServer,
-                     "CastingPlayer::StopConnecting() mIdOptions.mCommissionerPasscode == false, ContinueConnecting() should only "
-                     "be called when the CastingPlayer/Commissioner-Generated passcode commissioning flow is in progress."););
-
     CHIP_ERROR err = CHIP_NO_ERROR;
     mIdOptions.resetState();
     mIdOptions.mCancelPasscode     = true;
@@ -242,6 +251,16 @@ CHIP_ERROR CastingPlayer::StopConnecting()
     mCommissioningWindowTimeoutSec = kCommissioningWindowTimeoutSec;
     mTargetCastingPlayer.reset();
     CastingPlayerDiscovery::GetInstance()->ClearCastingPlayersInternal();
+
+    if (!shouldSendIdentificationDeclarationMessage)
+    {
+        ChipLogProgress(AppServer,
+                        "CastingPlayer::StopConnecting() shouldSendIdentificationDeclarationMessage: %d, User Directed "
+                        "Commissioning aborted by the CastingPlayer/Commissioner user.",
+                        shouldSendIdentificationDeclarationMessage);
+        resetState(CHIP_ERROR_CONNECTION_ABORTED);
+        return err;
+    }
 
     // If a CastingPlayer::ContinueConnecting() error occurs, StopConnecting() can be called while sUdcInProgress == true.
     // sUdcInProgress should be set to false before sending the CancelPasscode IdentificationDeclaration message to the
@@ -251,9 +270,9 @@ CHIP_ERROR CastingPlayer::StopConnecting()
         support::ChipDeviceEventHandler::SetUdcStatus(false);
     }
 
-    ChipLogProgress(
-        AppServer,
-        "CastingPlayer::StopConnecting() calling SendUserDirectedCommissioningRequest() to indicate user canceled passcode entry");
+    ChipLogProgress(AppServer,
+                    "CastingPlayer::StopConnecting() calling SendUserDirectedCommissioningRequest() to indicate "
+                    "Client/Commissionee user canceled passcode entry");
 #if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT
     err = SendUserDirectedCommissioningRequest();
     if (err != CHIP_NO_ERROR)
@@ -298,6 +317,8 @@ void CastingPlayer::Disconnect()
 
 void CastingPlayer::RegisterEndpoint(const memory::Strong<Endpoint> endpoint)
 {
+    ChipLogProgress(AppServer, "CastingPlayer::RegisterEndpoint() EndpointID: %d, VendorID: %d, ProductID: %d", endpoint->GetId(),
+                    endpoint->GetVendorId(), endpoint->GetProductId());
     auto it = std::find_if(mEndpoints.begin(), mEndpoints.end(), [endpoint](const memory::Strong<Endpoint> & _endpoint) {
         return _endpoint->GetId() == endpoint->GetId();
     });
@@ -359,10 +380,10 @@ chip::Inet::IPAddress * CastingPlayer::GetIpAddressForUDCRequest()
 void CastingPlayer::FindOrEstablishSession(void * clientContext, chip::OnDeviceConnected onDeviceConnected,
                                            chip::OnDeviceConnectionFailure onDeviceConnectionFailure)
 {
-    ChipLogProgress(AppServer, "CastingPlayer.FindOrEstablishSession called on nodeId=0x" ChipLogFormatX64 " fabricIndex=%d",
+    ChipLogProgress(AppServer, "CastingPlayer::FindOrEstablishSession() called on nodeId=0x" ChipLogFormatX64 " fabricIndex=%d",
                     ChipLogValueX64(mAttributes.nodeId), mAttributes.fabricIndex);
     VerifyOrReturn(mAttributes.nodeId != 0 && mAttributes.fabricIndex != 0,
-                   ChipLogError(AppServer, "CastingPlayer.FindOrEstablishSession called on invalid nodeId/fabricIndex"));
+                   ChipLogError(AppServer, "CastingPlayer::FindOrEstablishSession() called on invalid nodeId/fabricIndex"));
 
     ConnectionContext * connectionContext =
         new ConnectionContext(clientContext, this, onDeviceConnected, onDeviceConnectionFailure);
@@ -387,12 +408,13 @@ bool CastingPlayer::ContainsDesiredTargetApp(
                 match && (desiredTargetApps[i].productId == 0 || cachedEndpoint->GetProductId() == desiredTargetApps[i].productId);
             if (match)
             {
-                ChipLogProgress(AppServer, "CastingPlayer::ContainsDesiredTargetApp() matching cached CastingPlayer found");
+                ChipLogProgress(AppServer,
+                                "CastingPlayer::ContainsDesiredTargetApp() CastingPlayer's Endpoint(s) match Target App(s)");
                 return true;
             }
         }
     }
-    ChipLogProgress(AppServer, "CastingPlayer::ContainsDesiredTargetApp() matching cached CastingPlayer not found");
+    ChipLogError(AppServer, "CastingPlayer::ContainsDesiredTargetApp() CastingPlayer's Endpoints DO NOT match Target App(s)");
     return false;
 }
 

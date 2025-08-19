@@ -557,9 +557,9 @@ void DoorLockServer::getUserCommandHandler(chip::app::CommandHandler * commandOb
     {
         ChipLogProgress(Zcl,
                         "Found user in storage: "
-                        "[userIndex=%d,userName=\"%.*s\",userStatus=%u,userType=%u"
+                        "[userIndex=%d,userName=\"%s\",userStatus=%u,userType=%u"
                         ",credentialRule=%u,createdBy=%u,modifiedBy=%u]",
-                        userIndex, static_cast<int>(user.userName.size()), user.userName.data(), to_underlying(user.userStatus),
+                        userIndex, NullTerminated(user.userName).c_str(), to_underlying(user.userStatus),
                         to_underlying(user.userType), to_underlying(user.credentialRule), user.createdBy, user.lastModifiedBy);
 
         response.userName.SetNonNull(user.userName);
@@ -726,6 +726,17 @@ void DoorLockServer::setCredentialCommandHandler(
     // appclusters, 5.2.4.41.1: we should return DUPLICATE in the response if we're trying to create duplicated credential entry
     for (uint16_t i = 1; CredentialTypeEnum::kProgrammingPIN != credentialType && (i <= maxNumberOfCredentials); ++i)
     {
+        // Ignore the slot we are trying to set, because setting a credential to
+        // the same value as it already has should be just fine.
+        //
+        // This is not clearly defined in the spec;
+        // https://github.com/CHIP-Specifications/connectedhomeip-spec/issues/11707
+        // tracks that.
+        if (i == credentialIndex)
+        {
+            continue;
+        }
+
         EmberAfPluginDoorLockCredentialInfo currentCredential;
         if (!emberAfPluginDoorLockGetCredential(commandPath.mEndpointId, i, credentialType, currentCredential))
         {
@@ -860,10 +871,27 @@ void DoorLockServer::getCredentialStatusCommandHandler(chip::app::CommandHandler
         return;
     }
 
+    // Our response will need to include the index of the next occupied credential slot
+    // after credentialIndex, if there is one.
+    //
+    // We want to figure this out before we call emberAfPluginDoorLockGetCredential, because to do
+    // so we will also need to call emberAfPluginDoorLockGetCredential, and the
+    // EmberAfPluginDoorLockCredentialInfo we get might be pointing into some application-static
+    // buffers (for its credential data and whatnot).
+    DataModel::Nullable<uint16_t> nextCredentialIndex;
+    {
+        uint16_t foundNextCredentialIndex;
+        if (findOccupiedCredentialSlot(commandPath.mEndpointId, credentialType, static_cast<uint16_t>(credentialIndex + 1),
+                                       foundNextCredentialIndex))
+        {
+            nextCredentialIndex.SetNonNull(foundNextCredentialIndex);
+        }
+    }
+
     uint16_t maxNumberOfCredentials = 0;
     if (!credentialIndexValid(commandPath.mEndpointId, credentialType, credentialIndex, maxNumberOfCredentials))
     {
-        sendGetCredentialResponse(commandObj, commandPath, credentialType, credentialIndex, 0, nullptr, false);
+        sendGetCredentialResponse(commandObj, commandPath, credentialType, credentialIndex, nextCredentialIndex, 0, nullptr, false);
         return;
     }
 
@@ -896,16 +924,34 @@ void DoorLockServer::getCredentialStatusCommandHandler(chip::app::CommandHandler
         }
     }
 
-    sendGetCredentialResponse(commandObj, commandPath, credentialType, credentialIndex, userIndexWithCredential, &credentialInfo,
-                              credentialExists);
+    sendGetCredentialResponse(commandObj, commandPath, credentialType, credentialIndex, nextCredentialIndex,
+                              userIndexWithCredential, &credentialInfo, credentialExists);
 }
+
+namespace {
+bool IsAliroCredentialType(CredentialTypeEnum credentialType)
+{
+    switch (credentialType)
+    {
+    case CredentialTypeEnum::kAliroCredentialIssuerKey:
+    case CredentialTypeEnum::kAliroEvictableEndpointKey:
+    case CredentialTypeEnum::kAliroNonEvictableEndpointKey:
+        return true;
+    default:
+        return false;
+    }
+}
+} // anonymous namespace
 
 void DoorLockServer::sendGetCredentialResponse(chip::app::CommandHandler * commandObj,
                                                const chip::app::ConcreteCommandPath & commandPath,
                                                CredentialTypeEnum credentialType, uint16_t credentialIndex,
-                                               uint16_t userIndexWithCredential,
+                                               DataModel::Nullable<uint16_t> nextCredentialIndex, uint16_t userIndexWithCredential,
                                                EmberAfPluginDoorLockCredentialInfo * credentialInfo, bool credentialExists)
 {
+    // Important: We have to make sure nothing in this function calls
+    // emberAfPluginDoorLockGetCredential, because that might stomp on the data
+    // pointed to by credentialInfo.
     Commands::GetCredentialStatusResponse::Type response{ .credentialExists = credentialExists };
     if (credentialExists && !(nullptr == credentialInfo))
     {
@@ -921,24 +967,27 @@ void DoorLockServer::sendGetCredentialResponse(chip::app::CommandHandler * comma
         {
             response.lastModifiedFabricIndex.SetNonNull(credentialInfo->lastModifiedBy);
         }
+        if (IsAliroCredentialType(credentialType))
+        {
+            response.credentialData.Emplace(credentialInfo->credentialData);
+        }
     }
     else
     {
         response.userIndex.SetNull();
+        if (IsAliroCredentialType(credentialType))
+        {
+            response.credentialData.Emplace(NullNullable);
+        }
     }
-    uint16_t nextCredentialIndex = 0;
-    if (findOccupiedCredentialSlot(commandPath.mEndpointId, credentialType, static_cast<uint16_t>(credentialIndex + 1),
-                                   nextCredentialIndex))
-    {
-        response.nextCredentialIndex.SetNonNull(nextCredentialIndex);
-    }
+    response.nextCredentialIndex = nextCredentialIndex;
     commandObj->AddResponse(commandPath, response);
 
     ChipLogProgress(Zcl,
                     "[GetCredentialStatus] Prepared credential status "
                     "[endpointId=%d,credentialType=%u,credentialIndex=%d,userIndex=%d,nextCredentialIndex=%d]",
                     commandPath.mEndpointId, to_underlying(credentialType), credentialIndex, userIndexWithCredential,
-                    nextCredentialIndex);
+                    nextCredentialIndex.ValueOr(0));
 }
 
 void DoorLockServer::clearCredentialCommandHandler(
@@ -1947,22 +1996,21 @@ ClusterStatusCode DoorLockServer::createUser(chip::EndpointId endpointId, chip::
     {
         ChipLogProgress(Zcl,
                         "[createUser] Unable to create user: app error "
-                        "[endpointId=%d,creatorFabricId=%d,userIndex=%d,userName=\"%.*s\",userUniqueId=0x%" PRIx32 ",userStatus=%u,"
+                        "[endpointId=%d,creatorFabricId=%d,userIndex=%d,userName=\"%s\",userUniqueId=0x%" PRIx32 ",userStatus=%u,"
                         "userType=%u,credentialRule=%u,totalCredentials=%u]",
-                        endpointId, creatorFabricIdx, userIndex, static_cast<int>(newUserName.size()), newUserName.data(),
-                        newUserUniqueId, to_underlying(newUserStatus), to_underlying(newUserType), to_underlying(newCredentialRule),
+                        endpointId, creatorFabricIdx, userIndex, NullTerminated(newUserName).c_str(), newUserUniqueId,
+                        to_underlying(newUserStatus), to_underlying(newUserType), to_underlying(newCredentialRule),
                         static_cast<unsigned int>(newTotalCredentials));
         return ClusterStatusCode(Status::Failure);
     }
 
     ChipLogProgress(Zcl,
                     "[createUser] User created "
-                    "[endpointId=%d,creatorFabricId=%d,userIndex=%d,userName=\"%.*s\",userUniqueId=0x%" PRIx32 ",userStatus=%u,"
+                    "[endpointId=%d,creatorFabricId=%d,userIndex=%d,userName=\"%s\",userUniqueId=0x%" PRIx32 ",userStatus=%u,"
                     "userType=%u,credentialRule=%u,totalCredentials=%u]",
-                    endpointId, creatorFabricIdx, userIndex, static_cast<int>(newUserName.size()), newUserName.data(),
-                    newUserUniqueId, to_underlying(newUserStatus), to_underlying(newUserType), to_underlying(newCredentialRule),
+                    endpointId, creatorFabricIdx, userIndex, NullTerminated(newUserName).c_str(), newUserUniqueId,
+                    to_underlying(newUserStatus), to_underlying(newUserType), to_underlying(newCredentialRule),
                     static_cast<unsigned int>(newTotalCredentials));
-
     sendRemoteLockUserChange(endpointId, LockDataTypeEnum::kUserIndex, DataOperationTypeEnum::kAdd, sourceNodeId, creatorFabricIdx,
                              userIndex, userIndex);
 
@@ -2021,20 +2069,19 @@ Status DoorLockServer::modifyUser(chip::EndpointId endpointId, chip::FabricIndex
     {
         ChipLogError(Zcl,
                      "[modifyUser] Unable to modify the user: app error "
-                     "[endpointId=%d,modifierFabric=%d,userIndex=%d,userName=\"%.*s\",userUniqueId=0x%" PRIx32 ",userStatus=%u"
+                     "[endpointId=%d,modifierFabric=%d,userIndex=%d,userName=\"%s\",userUniqueId=0x%" PRIx32 ",userStatus=%u"
                      ",userType=%u,credentialRule=%u]",
-                     endpointId, modifierFabricIndex, userIndex, static_cast<int>(newUserName.size()), newUserName.data(),
-                     newUserUniqueId, to_underlying(newUserStatus), to_underlying(newUserType), to_underlying(newCredentialRule));
+                     endpointId, modifierFabricIndex, userIndex, NullTerminated(newUserName).c_str(), newUserUniqueId,
+                     to_underlying(newUserStatus), to_underlying(newUserType), to_underlying(newCredentialRule));
         return Status::Failure;
     }
 
     ChipLogProgress(Zcl,
                     "[modifyUser] User modified "
-                    "[endpointId=%d,modifierFabric=%d,userIndex=%d,userName=\"%.*s\",userUniqueId=0x%" PRIx32
+                    "[endpointId=%d,modifierFabric=%d,userIndex=%d,userName=\"%s\",userUniqueId=0x%" PRIx32
                     ",userStatus=%u,userType=%u,credentialRule=%u]",
-                    endpointId, modifierFabricIndex, userIndex, static_cast<int>(newUserName.size()), newUserName.data(),
-                    newUserUniqueId, to_underlying(newUserStatus), to_underlying(newUserType), to_underlying(newCredentialRule));
-
+                    endpointId, modifierFabricIndex, userIndex, NullTerminated(newUserName).c_str(), newUserUniqueId,
+                    to_underlying(newUserStatus), to_underlying(newUserType), to_underlying(newCredentialRule));
     sendRemoteLockUserChange(endpointId, LockDataTypeEnum::kUserIndex, DataOperationTypeEnum::kModify, sourceNodeId,
                              modifierFabricIndex, userIndex, userIndex);
 
@@ -2172,8 +2219,7 @@ DlStatus DoorLockServer::createNewCredentialAndUser(chip::EndpointId endpointId,
                         "[SetCredential] Unable to create new user for credential: internal error "
                         "[endpointId=%d,credentialIndex=%d,userIndex=%d,status=%d]",
                         endpointId, credential.credentialIndex, availableUserIndex,
-                        status.HasClusterSpecificCode() ? status.GetClusterSpecificCode().Value()
-                                                        : (to_underlying(status.GetStatus())));
+                        status.GetClusterSpecificCode().value_or(to_underlying(status.GetStatus())));
         return DlStatus::kFailure;
     }
 
@@ -3537,9 +3583,9 @@ void DoorLockServer::sendClusterResponse(chip::app::CommandHandler * commandObj,
 {
     VerifyOrDie(nullptr != commandObj);
 
-    if (status.HasClusterSpecificCode())
+    if (const auto clusterStatus = status.GetClusterSpecificCode(); clusterStatus.has_value())
     {
-        VerifyOrDie(commandObj->AddClusterSpecificFailure(commandPath, status.GetClusterSpecificCode().Value()) == CHIP_NO_ERROR);
+        VerifyOrDie(commandObj->AddClusterSpecificFailure(commandPath, *clusterStatus) == CHIP_NO_ERROR);
     }
     else
     {
@@ -4271,6 +4317,14 @@ void MatterDoorLockPluginServerInitCallback()
     AttributeAccessInterfaceRegistry::Instance().Register(&DoorLockServer::Instance());
 }
 
+void MatterDoorLockPluginServerShutdownCallback()
+{
+    ChipLogProgress(Zcl, "Door Lock server shutdown");
+    Server::GetInstance().GetFabricTable().RemoveFabricDelegate(&gFabricDelegate);
+
+    AttributeAccessInterfaceRegistry::Instance().Unregister(&DoorLockServer::Instance());
+}
+
 void MatterDoorLockClusterServerAttributeChangedCallback(const app::ConcreteAttributePath & attributePath) {}
 
 void MatterDoorLockClusterServerShutdownCallback(EndpointId endpoint)
@@ -4407,16 +4461,19 @@ CHIP_ERROR DoorLockServer::Read(const ConcreteReadAttributePath & aPath, Attribu
         return ReadAliroSupportedBLEUWBProtocolVersions(aEncoder, delegate);
     }
     case AliroBLEAdvertisingVersion::Id: {
+        VerifyOrReturnError(delegate != nullptr, CHIP_ERROR_INCORRECT_STATE, ChipLogError(Zcl, "Delegate is null"));
         uint8_t bleAdvertisingVersion = delegate->GetAliroBLEAdvertisingVersion();
         ReturnErrorOnFailure(aEncoder.Encode(bleAdvertisingVersion));
         return CHIP_NO_ERROR;
     }
     case NumberOfAliroCredentialIssuerKeysSupported::Id: {
+        VerifyOrReturnError(delegate != nullptr, CHIP_ERROR_INCORRECT_STATE, ChipLogError(Zcl, "Delegate is null"));
         uint16_t numberOfCredentialIssuerKeysSupported = delegate->GetNumberOfAliroCredentialIssuerKeysSupported();
         ReturnErrorOnFailure(aEncoder.Encode(numberOfCredentialIssuerKeysSupported));
         return CHIP_NO_ERROR;
     }
     case NumberOfAliroEndpointKeysSupported::Id: {
+        VerifyOrReturnError(delegate != nullptr, CHIP_ERROR_INCORRECT_STATE, ChipLogError(Zcl, "Delegate is null"));
         uint16_t numberOfEndpointKeysSupported = delegate->GetNumberOfAliroEndpointKeysSupported();
         ReturnErrorOnFailure(aEncoder.Encode(numberOfEndpointKeysSupported));
         return CHIP_NO_ERROR;

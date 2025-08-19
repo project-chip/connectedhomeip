@@ -390,14 +390,14 @@ TEST(TestBytesToHex, TestLogBufferAsHex)
 
     const TestCase kTestCases[] = {
         // Basic cases
-        { "", ByteSpan(buffer), kExpectedText1, ArraySize(kExpectedText1) },
-        { nullptr, ByteSpan(buffer), kExpectedText1, ArraySize(kExpectedText1) },
-        { "label", ByteSpan(buffer), kExpectedText2, ArraySize(kExpectedText2) },
+        { "", ByteSpan(buffer), kExpectedText1, MATTER_ARRAY_SIZE(kExpectedText1) },
+        { nullptr, ByteSpan(buffer), kExpectedText1, MATTER_ARRAY_SIZE(kExpectedText1) },
+        { "label", ByteSpan(buffer), kExpectedText2, MATTER_ARRAY_SIZE(kExpectedText2) },
 
         // Empty buffer leads to a single label
-        { "label", ByteSpan(), kExpectedText3, ArraySize(kExpectedText3) },
+        { "label", ByteSpan(), kExpectedText3, MATTER_ARRAY_SIZE(kExpectedText3) },
         // Less than full single line works
-        { "label", ByteSpan(&buffer[0], 3), kExpectedText4, ArraySize(kExpectedText4) },
+        { "label", ByteSpan(&buffer[0], 3), kExpectedText4, MATTER_ARRAY_SIZE(kExpectedText4) },
     };
 
     for (auto testCase : kTestCases)

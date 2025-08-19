@@ -21,8 +21,8 @@
 
 #include "DataModelFixtures.h"
 
-#include "app-common/zap-generated/ids/Clusters.h"
 #include <app-common/zap-generated/cluster-objects.h>
+#include <app-common/zap-generated/ids/Clusters.h>
 #include <app/AttributeValueDecoder.h>
 #include <app/InteractionModelEngine.h>
 #include <app/WriteClient.h>
@@ -39,8 +39,71 @@ using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::UnitTesting;
 using namespace chip::app::DataModelTests;
 using namespace chip::Protocols;
+using namespace chip::Test;
 
 namespace {
+
+const MockNodeConfig & TestMockNodeConfig()
+{
+    using namespace Clusters::Globals::Attributes;
+
+    // clang-format off
+    static const MockNodeConfig config({
+        MockEndpointConfig(kRootEndpointId, {
+            MockClusterConfig(Clusters::IcdManagement::Id, {
+                ClusterRevision::Id, FeatureMap::Id,
+                Clusters::IcdManagement::Attributes::OperatingMode::Id,
+            }),
+        }),
+        MockEndpointConfig(kTestEndpointId, {
+            MockClusterConfig(Clusters::UnitTesting::Id, {
+                ClusterRevision::Id, FeatureMap::Id,
+                Clusters::UnitTesting::Attributes::Boolean::Id,
+                Clusters::UnitTesting::Attributes::Int16u::Id,
+                Clusters::UnitTesting::Attributes::Int8u::Id,
+                Clusters::UnitTesting::Attributes::ListFabricScoped::Id,
+                Clusters::UnitTesting::Attributes::ListStructOctetString::Id,
+            }),
+        }),
+        MockEndpointConfig(kMockEndpoint1, {
+            MockClusterConfig(MockClusterId(1), {
+                ClusterRevision::Id, FeatureMap::Id,
+            }, {
+                MockEventId(1), MockEventId(2),
+            }),
+            MockClusterConfig(MockClusterId(2), {
+                ClusterRevision::Id, FeatureMap::Id, MockAttributeId(1),
+            }),
+        }),
+        MockEndpointConfig(kMockEndpoint2, {
+            MockClusterConfig(MockClusterId(1), {
+                ClusterRevision::Id, FeatureMap::Id,
+            }),
+            MockClusterConfig(MockClusterId(2), {
+                ClusterRevision::Id, FeatureMap::Id, MockAttributeId(1), MockAttributeId(2),
+            }),
+            MockClusterConfig(MockClusterId(3), {
+                ClusterRevision::Id, FeatureMap::Id, MockAttributeId(1), MockAttributeId(2), MockAttributeId(3),
+            }),
+        }),
+        MockEndpointConfig(kMockEndpoint3, {
+            MockClusterConfig(MockClusterId(1), {
+                ClusterRevision::Id, FeatureMap::Id, MockAttributeId(1),
+            }),
+            MockClusterConfig(MockClusterId(2), {
+                ClusterRevision::Id, FeatureMap::Id, MockAttributeId(1), MockAttributeId(2), MockAttributeId(3), MockAttributeId(4),
+            }),
+            MockClusterConfig(MockClusterId(3), {
+                ClusterRevision::Id, FeatureMap::Id,
+            }),
+            MockClusterConfig(MockClusterId(4), {
+                ClusterRevision::Id, FeatureMap::Id,
+            }),
+        }),
+    });
+    // clang-format on
+    return config;
+}
 
 class SingleWriteCallback : public WriteClient::Callback
 {
@@ -85,6 +148,21 @@ private:
 class TestWrite : public chip::Test::AppContext
 {
 public:
+    void SetUp() override
+    {
+        chip::Test::AppContext::SetUp();
+        mOldProvider = InteractionModelEngine::GetInstance()->SetDataModelProvider(&CustomDataModel::Instance());
+        chip::Test::SetMockNodeConfig(TestMockNodeConfig());
+    }
+
+    // Performs teardown for each individual test in the test suite
+    void TearDown() override
+    {
+        chip::Test::ResetMockNodeConfig();
+        InteractionModelEngine::GetInstance()->SetDataModelProvider(mOldProvider);
+        chip::Test::AppContext::TearDown();
+    }
+
     void ResetCallback() { mSingleWriteCallback.reset(); }
 
     void PrepareWriteCallback(ConcreteAttributePath path) { mSingleWriteCallback = std::make_unique<SingleWriteCallback>(path); }
@@ -93,6 +171,7 @@ public:
 
 protected:
     std::unique_ptr<SingleWriteCallback> mSingleWriteCallback;
+    chip::app::DataModel::Provider * mOldProvider = nullptr;
 };
 
 TEST_F(TestWrite, TestDataResponse)
@@ -128,7 +207,8 @@ TEST_F(TestWrite, TestDataResponse)
 
     DrainAndServiceIO();
 
-    EXPECT_TRUE(onSuccessCbInvoked && !onFailureCbInvoked);
+    EXPECT_TRUE(onSuccessCbInvoked);
+    EXPECT_FALSE(onFailureCbInvoked);
     EXPECT_EQ(chip::app::InteractionModelEngine::GetInstance()->GetNumActiveWriteHandlers(), 0u);
     EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 0u);
 }
@@ -163,6 +243,7 @@ TEST_F(TestWrite, TestDataResponseWithAcceptedDataVersion)
 
     chip::Optional<chip::DataVersion> dataVersion;
     dataVersion.SetValue(kAcceptedDataVersion);
+    chip::Test::SetVersionTo(kAcceptedDataVersion);
     chip::Controller::WriteAttribute<Clusters::UnitTesting::Attributes::ListStructOctetString::TypeInfo>(
         sessionHandle, kTestEndpointId, value, onSuccessCb, onFailureCb, nullptr, dataVersion);
 
@@ -202,6 +283,9 @@ TEST_F(TestWrite, TestDataResponseWithRejectedDataVersion)
     };
 
     chip::Optional<chip::DataVersion> dataVersion(kRejectedDataVersion);
+    chip::Test::SetVersionTo(kAcceptedDataVersion);
+    static_assert(kAcceptedDataVersion != kRejectedDataVersion);
+
     chip::Controller::WriteAttribute<Clusters::UnitTesting::Attributes::ListStructOctetString::TypeInfo>(
         sessionHandle, kTestEndpointId, value, onSuccessCb, onFailureCb, nullptr, dataVersion);
 
@@ -371,8 +455,8 @@ TEST_F(TestWrite, TestWriteClusterSpecificStatuses)
 
         StatusIB pathStatus = writeCb->GetPathStatus();
         EXPECT_EQ(pathStatus.mStatus, Protocols::InteractionModel::Status::Success);
-        ASSERT_TRUE(pathStatus.mClusterStatus.HasValue());
-        EXPECT_EQ(pathStatus.mClusterStatus.Value(), kExampleClusterSpecificSuccess);
+        ASSERT_TRUE(pathStatus.mClusterStatus.has_value());
+        EXPECT_EQ(*pathStatus.mClusterStatus, kExampleClusterSpecificSuccess); // NOLINT(bugprone-unchecked-optional-access)
 
         EXPECT_EQ(chip::app::InteractionModelEngine::GetInstance()->GetNumActiveWriteHandlers(), 0u);
         EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 0u);
@@ -404,8 +488,8 @@ TEST_F(TestWrite, TestWriteClusterSpecificStatuses)
 
         StatusIB pathStatus = writeCb->GetPathStatus();
         EXPECT_EQ(pathStatus.mStatus, Protocols::InteractionModel::Status::Failure);
-        ASSERT_TRUE(pathStatus.mClusterStatus.HasValue());
-        EXPECT_EQ(pathStatus.mClusterStatus.Value(), kExampleClusterSpecificFailure);
+        ASSERT_TRUE(pathStatus.mClusterStatus.has_value());
+        EXPECT_EQ(*pathStatus.mClusterStatus, kExampleClusterSpecificFailure); // NOLINT(bugprone-unchecked-optional-access)
 
         EXPECT_EQ(chip::app::InteractionModelEngine::GetInstance()->GetNumActiveWriteHandlers(), 0u);
         EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 0u);

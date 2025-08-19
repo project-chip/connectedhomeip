@@ -37,14 +37,18 @@ OT_SIMULATION_CACHE="$CIRQUE_CACHE_PATH/ot-simulation-cmake.tgz"
 OT_SIMULATION_CACHE_STAMP_FILE="$CIRQUE_CACHE_PATH/ot-simulation.commit"
 
 # Append test name here to add more tests for run_all_tests
+#
+# NOTE:
+#   "InteractionModelTest" is currently disabled due to it overriding
+#   internal data model methods (for example it says "CommandExists" for
+#   paths where endpoint/cluster do not)
 CIRQUE_TESTS=(
     "EchoTest"
     "EchoOverTcpTest"
     "FailsafeTest"
     "MobileDeviceTest"
     "CommissioningTest"
-    "InteractionModelTest"
-    "IcdWaitForActiveTest"
+    "IcdDeviceTest"
     "SplitCommissioningTest"
     "CommissioningFailureTest"
     "CommissioningFailureOnReportTest"

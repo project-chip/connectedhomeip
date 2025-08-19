@@ -62,7 +62,10 @@ struct ActiveTCPConnectionState
 
     void Free()
     {
-        mEndPoint->Free();
+        if (mEndPoint)
+        {
+            mEndPoint->Free();
+        }
         mPeerAddr = PeerAddress::Uninitialized();
         mEndPoint = nullptr;
         mReceived = nullptr;

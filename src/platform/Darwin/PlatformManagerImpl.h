@@ -25,10 +25,16 @@
 
 #include <lib/core/Global.h>
 #include <platform/Darwin/BleScannerDelegate.h>
+
+#if CHIP_SYSTEM_CONFIG_USE_DISPATCH
 #include <platform/internal/GenericPlatformManagerImpl.h>
+#else
+#include <platform/internal/GenericPlatformManagerImpl_POSIX.h>
+#endif // CHIP_SYSTEM_CONFIG_USE_DISPATCH
 
 #include <atomic>
 #include <dispatch/dispatch.h>
+#include <map>
 
 namespace chip {
 namespace DeviceLayer {
@@ -38,7 +44,12 @@ class BleScannerDelegate;
 /**
  * Concrete implementation of the PlatformManager singleton object for Darwin platforms.
  */
-class PlatformManagerImpl final : public PlatformManager, public Internal::GenericPlatformManagerImpl<PlatformManagerImpl>
+class PlatformManagerImpl final : public PlatformManager,
+#if CHIP_SYSTEM_CONFIG_USE_DISPATCH
+                                  public Internal::GenericPlatformManagerImpl<PlatformManagerImpl>
+#else
+                                  public Internal::GenericPlatformManagerImpl_POSIX<PlatformManagerImpl>
+#endif // CHIP_SYSTEM_CONFIG_USE_DISPATCH
 {
     // Allow the PlatformManager interface class to delegate method calls to
     // the implementation methods provided by this class.
@@ -53,13 +64,17 @@ public:
     CHIP_ERROR StartBleScan(BleScannerDelegate * delegate, BleScanMode mode = BleScanMode::kDefault);
     CHIP_ERROR StopBleScan();
 
+    bool RegisterSignalHandler(int sig, dispatch_block_t block);
+    bool UnregisterSignalHandler(int sig);
+    void UnregisterAllSignalHandlers();
+
     System::Clock::Timestamp GetStartTime() { return mStartTime; }
 
 private:
     // ===== Methods that implement the PlatformManager abstract interface.
     CHIP_ERROR _InitChipStack();
-    void _Shutdown();
 
+#if CHIP_SYSTEM_CONFIG_USE_DISPATCH
     CHIP_ERROR _StartChipTimer(System::Clock::Timeout delay) { return CHIP_ERROR_NOT_IMPLEMENTED; };
     CHIP_ERROR _StartEventLoopTask();
     CHIP_ERROR _StopEventLoopTask();
@@ -69,6 +84,7 @@ private:
     bool _TryLockChipStack() { return false; };
     void _UnlockChipStack(){};
     CHIP_ERROR _PostEvent(const ChipDeviceEvent * event);
+#endif // CHIP_SYSTEM_CONFIG_USE_DISPATCH
 
 #if CHIP_STACK_LOCK_TRACKING_ENABLED
     bool _IsChipStackLockedByCurrentThread() const;
@@ -86,7 +102,7 @@ private:
 
     System::Clock::Timestamp mStartTime = System::Clock::kZero;
 
-    dispatch_queue_t mWorkQueue;
+    dispatch_queue_t mWorkQueue = nullptr;
 
     enum class WorkQueueState
     {
@@ -98,7 +114,10 @@ private:
     std::atomic<WorkQueueState> mWorkQueueState = WorkQueueState::kSuspended;
 
     // Semaphore used to implement blocking behavior in _RunEventLoop.
-    dispatch_semaphore_t mRunLoopSem;
+    dispatch_semaphore_t mRunLoopSem = nullptr;
+
+    dispatch_queue_t mSignalQueue = nullptr;
+    std::map<int, dispatch_source_t> mSignalSources;
 };
 
 /**

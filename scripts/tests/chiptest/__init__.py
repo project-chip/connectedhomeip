@@ -38,7 +38,6 @@ class ManualTest:
 
 
 INVALID_TESTS = {
-    "tests.yaml",  # certification/tests.yaml is not a real test
     "PICS.yaml",  # certification/PICS.yaml is not a real test
 
     # The items below are examples and will never work (likely)
@@ -196,7 +195,6 @@ def _GetDarwinFrameworkToolUnsupportedTests() -> Set[str]:
         "Test_TC_ACL_2_6",  # darwin-framework-tool does not currently support reading or subscribing to Events
         "Test_TC_ACL_2_7",  # darwin-framework-tool does not currently support reading or subscribing to Events
         "Test_TC_ACL_2_8",  # darwin-framework-tool does not currently support reading or subscribing to Events
-        "Test_TC_ACL_2_9",  # darwin-framework-tool does not currently support reading or subscribing to Events
         "Test_TC_ACL_2_10",  # darwin-framework-tool does not currently support reading or subscribing to Events
         "Test_TC_BINFO_2_1",  # darwin-framework-tool does not support writing readonly attributes by name
         "Test_TC_BINFO_2_2",  # darwin-framework-tool does not currently support reading or subscribing to Events
@@ -208,7 +206,6 @@ def _GetDarwinFrameworkToolUnsupportedTests() -> Set[str]:
         "Test_TC_DGTHREAD_2_2",  # Thread Network Diagnostics is not implemented under darwin.
         "Test_TC_DGTHREAD_2_3",  # Thread Network Diagnostics is not implemented under darwin.
         "Test_TC_DGTHREAD_2_4",  # Thread Network Diagnostics is not implemented under darwin.
-        "Test_TC_FLABEL_2_1",  # darwin-framework-tool does not support writing readonly attributes by name
         "Test_TC_GRPKEY_2_1",  # darwin-framework-tool does not support writing readonly attributes by name
         "Test_TC_LCFG_2_1",  # darwin-framework-tool does not support writing readonly attributes by name
         "Test_TC_OPCREDS_3_7",  # darwin-framework-tool does not support the GetCommissionerRootCertificate command.
@@ -220,7 +217,9 @@ def _GetDarwinFrameworkToolUnsupportedTests() -> Set[str]:
         "Test_TC_SC_4_1",  # darwin-framework-tool does not support dns-sd commands.
         "Test_TC_SC_5_2",  # darwin-framework-tool does not support group commands.
         "Test_TC_S_2_3",  # darwin-framework-tool does not support group commands.
-        "Test_TC_THNETDIR_2_2",  # darwin-framework-tool does not support negative timed-invoke tests
+        "Test_TC_THNETDIR_2_2",  # darwin-framework-tool does not support negative timed-invoke tests (#39673)
+        "Test_TC_TBRM_2_2",  # darwin-framework-tool does not support negative timed-invoke tests (#39673)
+        "Test_TC_TBRM_2_3",  # darwin-framework-tool does not support negative timed-invoke tests (#39673)
     }
 
 
@@ -236,6 +235,7 @@ def _GetChipReplUnsupportedTests() -> Set[str]:
         "TestReadNoneSubscribeNone.yaml",    # chip-repl does not support AnyCommands (07/27/2023)
         "Test_TC_IDM_1_2.yaml",              # chip-repl does not support AnyCommands (19/07/2023)
         "Test_TC_BRBINFO_2_1.yaml",          # chip-repl does not support AnyCommands (24/07/2024)
+        "TestThermostat.yaml",               # chip-repl does not support AnyCommands (14/10/2024)
         "TestIcdManagementCluster.yaml",   # TODO(#30430): add ICD registration support in chip-repl
         "Test_TC_ICDM_3_4.yaml",           # chip-repl does not support ICD registration
         # chip-repl and chip-tool disagree on what the YAML here should look like: https://github.com/project-chip/connectedhomeip/issues/29110
@@ -293,6 +293,13 @@ def target_for_name(name: str):
         return TestTarget.RVC
     if name.startswith("Test_TC_TBRM_") or name.startswith("Test_TC_THNETDIR_") or name.startswith("Test_TC_WIFINM_"):
         return TestTarget.NETWORK_MANAGER
+    if name.startswith("Test_TC_MTRID_"):
+        return TestTarget.ENERGY_GATEWAY
+    if (name.startswith("Test_TC_DEM_") or name.startswith("Test_TC_DEMM_") or
+            name.startswith("Test_TC_EEVSE_") or name.startswith("Test_TC_EEVSEM_")):
+        return TestTarget.ENERGY_MANAGEMENT
+    if name.startswith("Test_TC_CLCTRL_") or name.startswith("Test_TC_CLDIM_"):
+        return TestTarget.CLOSURE
     return TestTarget.ALL_CLUSTERS
 
 

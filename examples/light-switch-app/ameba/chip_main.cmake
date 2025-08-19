@@ -173,7 +173,6 @@ add_library(
 )
 
 chip_configure_data_model(chip_main
-    INCLUDE_SERVER
     ZAP_FILE ${matter_example_path}/../light-switch-common/light-switch-app.zap
 )
 
@@ -202,6 +201,7 @@ target_include_directories(
     ${chip_dir}/zzz_generated/app-common
     ${chip_dir}/examples/light-switch-app/ameba/main/include
     ${chip_dir}/examples/platform/ameba
+    ${chip_dir}/examples/platform/ameba/observer
     ${chip_dir}/examples/providers
     ${chip_dir_output}/gen/include
     ${chip_dir}/src/include/

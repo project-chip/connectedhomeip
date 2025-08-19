@@ -1001,7 +1001,7 @@ CHIP_ERROR BLEEndPoint::HandleCapabilitiesRequestReceived(PacketBufferHandle && 
     if (mtu > 0) // If one or both device knows connection's MTU...
     {
         resp.mFragmentSize =
-            chip::min(static_cast<uint16_t>(mtu - 3), BtpEngine::sMaxFragmentSize); // Reserve 3 bytes of MTU for ATT header.
+            std::min(static_cast<uint16_t>(mtu - 3), BtpEngine::sMaxFragmentSize); // Reserve 3 bytes of MTU for ATT header.
     }
     else // Else, if neither device knows MTU...
     {
@@ -1012,7 +1012,7 @@ CHIP_ERROR BLEEndPoint::HandleCapabilitiesRequestReceived(PacketBufferHandle && 
     // Select local and remote max receive window size based on local resources available for both incoming writes AND
     // GATT confirmations.
     mRemoteReceiveWindowSize = mLocalReceiveWindowSize = mReceiveWindowMaxSize =
-        chip::min(req.mWindowSize, static_cast<uint8_t>(BLE_MAX_RECEIVE_WINDOW_SIZE));
+        std::min(req.mWindowSize, static_cast<uint8_t>(BLE_MAX_RECEIVE_WINDOW_SIZE));
     resp.mWindowSize = mReceiveWindowMaxSize;
 
     ChipLogProgress(Ble, "local and remote recv window sizes = %u", resp.mWindowSize);
@@ -1068,7 +1068,7 @@ CHIP_ERROR BLEEndPoint::HandleCapabilitiesResponseReceived(PacketBufferHandle &&
     }
 
     // Set fragment size as minimum of (reported ATT MTU, BTP characteristic size)
-    resp.mFragmentSize = chip::min(resp.mFragmentSize, BtpEngine::sMaxFragmentSize);
+    resp.mFragmentSize = std::min(resp.mFragmentSize, BtpEngine::sMaxFragmentSize);
 
     mBtpEngine.SetRxFragmentSize(resp.mFragmentSize);
     mBtpEngine.SetTxFragmentSize(resp.mFragmentSize);

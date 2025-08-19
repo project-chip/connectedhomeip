@@ -784,7 +784,7 @@ public:
      *  @param[in]  aSize   Maximum number of octects to write into the packet buffer.
      */
     PacketBufferWriterBase(System::PacketBufferHandle && aPacket, size_t aSize) :
-        Writer(aPacket->Start() + aPacket->DataLength(), chip::min(aSize, static_cast<size_t>(aPacket->AvailableDataLength())))
+        Writer(aPacket->Start() + aPacket->DataLength(), std::min(aSize, static_cast<size_t>(aPacket->AvailableDataLength())))
     {
         mPacket = std::move(aPacket);
     }

@@ -70,7 +70,7 @@ private:
 
     static void OnConnected(
         void * context, chip::Messaging::ExchangeManager & exchangeMgr, const chip::SessionHandle & sessionHandle);
-    static void OnConnectionFailure(void * context, const chip::OperationalSessionSetup::ConnnectionFailureInfo & failureInfo);
+    static void OnConnectionFailure(void * context, const chip::OperationalSessionSetup::ConnectionFailureInfo & failureInfo);
 };
 
 NS_ASSUME_NONNULL_END

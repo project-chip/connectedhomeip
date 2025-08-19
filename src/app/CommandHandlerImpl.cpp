@@ -18,10 +18,11 @@
 #include <app/CommandHandlerImpl.h>
 
 #include <access/AccessControl.h>
+#include <access/SubjectDescriptor.h>
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/MessageDef/StatusIB.h>
-#include <app/RequiredPrivilege.h>
 #include <app/StatusResponse.h>
+#include <app/data-model-provider/OperationTypes.h>
 #include <app/util/MatterCallbacks.h>
 #include <credentials/GroupDataProvider.h>
 #include <lib/core/CHIPConfig.h>
@@ -69,8 +70,15 @@ CHIP_ERROR CommandHandlerImpl::AllocateBuffer()
 
         const size_t commandBufferMaxSize = mpResponder->GetCommandResponseMaxBufferSize();
         auto commandPacket                = System::PacketBufferHandle::New(commandBufferMaxSize);
-
         VerifyOrReturnError(!commandPacket.IsNull(), CHIP_ERROR_NO_MEMORY);
+        // On some platforms we can get more available length in the packet than what we requested.
+        // It is vital that we only use up to commandBufferMaxSize for the entire packet and
+        // nothing more.
+        uint32_t reservedSize = 0;
+        if (commandPacket->AvailableDataLength() > commandBufferMaxSize)
+        {
+            reservedSize = static_cast<uint32_t>(commandPacket->AvailableDataLength() - commandBufferMaxSize);
+        }
 
         mCommandMessageWriter.Init(std::move(commandPacket));
         ReturnErrorOnFailure(mInvokeResponseBuilder.InitWithEndBufferReserved(&mCommandMessageWriter));
@@ -79,6 +87,10 @@ CHIP_ERROR CommandHandlerImpl::AllocateBuffer()
         {
             ReturnErrorOnFailure(mInvokeResponseBuilder.ReserveSpaceForMoreChunkedMessages());
         }
+
+        // Reserving space for MIC at the end.
+        ReturnErrorOnFailure(
+            mInvokeResponseBuilder.GetWriter()->ReserveBuffer(reservedSize + Crypto::CHIP_CRYPTO_AEAD_MIC_LENGTH_BYTES));
 
         // Sending an InvokeResponse to an InvokeResponse is going to be removed from the spec soon.
         // It was never implemented in the SDK, and there are no command responses that expect a
@@ -133,7 +145,30 @@ CHIP_ERROR CommandHandlerImpl::TryAddResponseData(const ConcreteCommandPath & aR
 
     TLV::TLVWriter * writer = GetCommandDataIBTLVWriter();
     VerifyOrReturnError(writer != nullptr, CHIP_ERROR_INCORRECT_STATE);
-    ReturnErrorOnFailure(aEncodable.EncodeTo(*writer, TLV::ContextTag(CommandDataIB::Tag::kFields)));
+
+    auto context = GetExchangeContext();
+    // If we have no exchange or it has no session, we won't be able to send a
+    // response anyway, so it doesn't matter how we encode it, but we have unit
+    // tests that have a kinda-broken CommandHandler with no session... just use
+    // kUndefinedFabricIndex in those cases.
+    //
+    // Note that just calling GetAccessingFabricIndex() here is not OK, because
+    // we may have gone async already and our exchange/session may be gone, so
+    // that would crash.  Which is one of the reasons GetAccessingFabricIndex()
+    // is not allowed to be called once we have gone async.
+    FabricIndex accessingFabricIndex;
+    if (context && context->HasSessionHandle())
+    {
+        accessingFabricIndex = context->GetSessionHandle()->GetFabricIndex();
+    }
+    else
+    {
+        accessingFabricIndex = kUndefinedFabricIndex;
+    }
+
+    DataModel::FabricAwareTLVWriter responseWriter(*writer, accessingFabricIndex);
+
+    ReturnErrorOnFailure(aEncodable.EncodeTo(responseWriter, TLV::ContextTag(CommandDataIB::Tag::kFields)));
     return FinishCommand(/* aEndDataStruct = */ false);
 }
 
@@ -390,55 +425,17 @@ Status CommandHandlerImpl::ProcessCommandDataIB(CommandDataIB::Parser & aCommand
     VerifyOrReturnError(err == CHIP_NO_ERROR, Status::InvalidAction);
 
     {
-        Status commandExists = mpCallback->CommandExists(concretePath);
-        if (commandExists != Status::Success)
-        {
-            ChipLogDetail(DataManagement, "No command " ChipLogFormatMEI " in Cluster " ChipLogFormatMEI " on Endpoint 0x%x",
-                          ChipLogValueMEI(concretePath.mCommandId), ChipLogValueMEI(concretePath.mClusterId),
-                          concretePath.mEndpointId);
-            return FallibleAddStatus(concretePath, commandExists) != CHIP_NO_ERROR ? Status::Failure : Status::Success;
-        }
-    }
-
-    {
         Access::SubjectDescriptor subjectDescriptor = GetSubjectDescriptor();
-        Access::RequestPath requestPath{ .cluster     = concretePath.mClusterId,
-                                         .endpoint    = concretePath.mEndpointId,
-                                         .requestType = Access::RequestType::kCommandInvokeRequest,
-                                         .entityId    = concretePath.mCommandId };
-        Access::Privilege requestPrivilege = RequiredPrivilege::ForInvokeCommand(concretePath);
-        err                                = Access::GetAccessControl().Check(subjectDescriptor, requestPath, requestPrivilege);
-        if (err != CHIP_NO_ERROR)
+        DataModel::InvokeRequest request;
+
+        request.path              = concretePath;
+        request.subjectDescriptor = &subjectDescriptor;
+        request.invokeFlags.Set(DataModel::InvokeFlags::kTimed, IsTimedInvoke());
+
+        Status preCheckStatus = mpCallback->ValidateCommandCanBeDispatched(request);
+        if (preCheckStatus != Status::Success)
         {
-            if ((err != CHIP_ERROR_ACCESS_DENIED) && (err != CHIP_ERROR_ACCESS_RESTRICTED_BY_ARL))
-            {
-                return FallibleAddStatus(concretePath, Status::Failure) != CHIP_NO_ERROR ? Status::Failure : Status::Success;
-            }
-            // TODO: when wildcard invokes are supported, handle them to discard rather than fail with status
-            Status status = err == CHIP_ERROR_ACCESS_DENIED ? Status::UnsupportedAccess : Status::AccessRestricted;
-            return FallibleAddStatus(concretePath, status) != CHIP_NO_ERROR ? Status::Failure : Status::Success;
-        }
-    }
-
-    if (CommandNeedsTimedInvoke(concretePath.mClusterId, concretePath.mCommandId) && !IsTimedInvoke())
-    {
-        // TODO: when wildcard invokes are supported, discard a
-        // wildcard-expanded path instead of returning a status.
-        return FallibleAddStatus(concretePath, Status::NeedsTimedInteraction) != CHIP_NO_ERROR ? Status::Failure : Status::Success;
-    }
-
-    if (CommandIsFabricScoped(concretePath.mClusterId, concretePath.mCommandId))
-    {
-        // SPEC: Else if the command in the path is fabric-scoped and there is no accessing fabric,
-        // a CommandStatusIB SHALL be generated with the UNSUPPORTED_ACCESS Status Code.
-
-        // Fabric-scoped commands are not allowed before a specific accessing fabric is available.
-        // This is mostly just during a PASE session before AddNOC.
-        if (GetAccessingFabricIndex() == kUndefinedFabricIndex)
-        {
-            // TODO: when wildcard invokes are supported, discard a
-            // wildcard-expanded path instead of returning a status.
-            return FallibleAddStatus(concretePath, Status::UnsupportedAccess) != CHIP_NO_ERROR ? Status::Failure : Status::Success;
+            return FallibleAddStatus(concretePath, preCheckStatus) != CHIP_NO_ERROR ? Status::Failure : Status::Success;
         }
     }
 
@@ -511,17 +508,6 @@ Status CommandHandlerImpl::ProcessGroupCommandDataIB(CommandDataIB::Parser & aCo
     }
     VerifyOrReturnError(err == CHIP_NO_ERROR, Status::Failure);
 
-    // Per spec, we do the "is this a timed command?" check for every path, but
-    // since all paths that fail it just get silently discarded we can do it
-    // once up front and discard all the paths at once.  Ordering with respect
-    // to ACL and command presence checks does not matter, because the behavior
-    // is the same for all of them: ignore the path.
-    if (CommandNeedsTimedInvoke(clusterId, commandId))
-    {
-        // Group commands are never timed.
-        return Status::Success;
-    }
-
     // No check for `CommandIsFabricScoped` unlike in `ProcessCommandDataIB()` since group commands
     // always have an accessing fabric, by definition.
 
@@ -542,30 +528,27 @@ Status CommandHandlerImpl::ProcessGroupCommandDataIB(CommandDataIB::Parser & aCo
 
         const ConcreteCommandPath concretePath(mapping.endpoint_id, clusterId, commandId);
 
-        if (mpCallback->CommandExists(concretePath) != Status::Success)
-        {
-            ChipLogDetail(DataManagement, "No command " ChipLogFormatMEI " in Cluster " ChipLogFormatMEI " on Endpoint 0x%x",
-                          ChipLogValueMEI(commandId), ChipLogValueMEI(clusterId), mapping.endpoint_id);
-
-            continue;
-        }
-
         {
             Access::SubjectDescriptor subjectDescriptor = GetSubjectDescriptor();
-            Access::RequestPath requestPath{ .cluster     = concretePath.mClusterId,
-                                             .endpoint    = concretePath.mEndpointId,
-                                             .requestType = Access::RequestType::kCommandInvokeRequest,
-                                             .entityId    = concretePath.mCommandId };
-            Access::Privilege requestPrivilege = RequiredPrivilege::ForInvokeCommand(concretePath);
-            err                                = Access::GetAccessControl().Check(subjectDescriptor, requestPath, requestPrivilege);
-            if (err != CHIP_NO_ERROR)
+            DataModel::InvokeRequest request;
+
+            request.path              = concretePath;
+            request.subjectDescriptor = &subjectDescriptor;
+            request.invokeFlags.Set(DataModel::InvokeFlags::kTimed, IsTimedInvoke());
+
+            // SPEC-DIVERGENCE: The spec mandates only one ACL check after the existence check for non-concrete paths (Group
+            // Commands). However, calling ValidateCommandCanBeDispatched here introduces an additional ACL check before the
+            // existence check, because that function also performs an early access check (it is shared with the concrete path
+            // case). This results in two ACL checks for group commands. In practice, this divergence is not observable if all
+            // commands require at least Operate privilege.
+            Status preCheckStatus = mpCallback->ValidateCommandCanBeDispatched(request);
+            if (preCheckStatus != Status::Success)
             {
-                // NOTE: an expected error is CHIP_ERROR_ACCESS_DENIED, but there could be other unexpected errors;
-                // therefore, keep processing subsequent commands, and if any errors continue, those subsequent
-                // commands will likewise fail.
+                // Command failed for a specific path, but keep trying the rest of the paths.
                 continue;
             }
         }
+
         if ((err = DataModelCallbacks::GetInstance()->PreCommandReceived(concretePath, GetSubjectDescriptor())) == CHIP_NO_ERROR)
         {
             TLV::TLVReader dataReader(commandDataReader);
@@ -633,14 +616,13 @@ CHIP_ERROR CommandHandlerImpl::FallibleAddStatus(const ConcreteCommandPath & pat
             context = "no additional context";
         }
 
-        if (status.HasClusterSpecificCode())
+        if (const auto clusterStatus = status.GetClusterSpecificCode(); clusterStatus.has_value())
         {
             ChipLogError(DataManagement,
                          "Endpoint=%u Cluster=" ChipLogFormatMEI " Command=" ChipLogFormatMEI " status " ChipLogFormatIMStatus
                          " ClusterSpecificCode=%u (%s)",
                          path.mEndpointId, ChipLogValueMEI(path.mClusterId), ChipLogValueMEI(path.mCommandId),
-                         ChipLogValueIMStatus(status.GetStatus()), static_cast<unsigned>(status.GetClusterSpecificCode().Value()),
-                         context);
+                         ChipLogValueIMStatus(status.GetStatus()), static_cast<unsigned>(*clusterStatus), context);
         }
         else
         {

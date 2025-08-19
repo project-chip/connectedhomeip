@@ -34,3 +34,6 @@ uint16_t emberAfGetClusterServerEndpointIndex(chip::EndpointId endpoint, chip::C
     }
     return endpoint;
 }
+
+// Mock function for linking
+void InitDataModelHandler() {}

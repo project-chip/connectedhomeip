@@ -1,0 +1,124 @@
+<?xml version="1.0"?>
+<!--
+Copyright (C) Connectivity Standards Alliance (2021). All rights reserved.
+The information within this document is the property of the Connectivity
+Standards Alliance and its use and disclosure are restricted, except as
+expressly set forth herein.
+
+Connectivity Standards Alliance hereby grants you a fully-paid, non-exclusive,
+nontransferable, worldwide, limited and revocable license (without the right to
+sublicense), under Connectivity Standards Alliance's applicable copyright
+rights, to view, download, save, reproduce and use the document solely for your
+own internal purposes and in accordance with the terms of the license set forth
+herein. This license does not authorize you to, and you expressly warrant that
+you shall not: (a) permit others (outside your organization) to use this
+document; (b) post or publish this document; (c) modify, adapt, translate, or
+otherwise change this document in any manner or create any derivative work
+based on this document; (d) remove or modify any notice or label on this
+document, including this Copyright Notice, License and Disclaimer. The
+Connectivity Standards Alliance does not grant you any license hereunder other
+than as expressly stated herein.
+
+Elements of this document may be subject to third party intellectual property
+rights, including without limitation, patent, copyright or trademark rights,
+and any such third party may or may not be a member of the Connectivity
+Standards Alliance. Connectivity Standards Alliance members grant other
+Connectivity Standards Alliance members certain intellectual property rights as
+set forth in the Connectivity Standards Alliance IPR Policy. Connectivity
+Standards Alliance members do not grant you any rights under this license. The
+Connectivity Standards Alliance is not responsible for, and shall not be held
+responsible in any manner for, identifying or failing to identify any or all
+such third party intellectual property rights. Please visit www.csa-iot.org for
+more information on how to become a member of the Connectivity Standards
+Alliance.
+
+This document and the information contained herein are provided on an “AS IS”
+basis and the Connectivity Standards Alliance DISCLAIMS ALL WARRANTIES EXPRESS
+OR IMPLIED, INCLUDING BUT NOT LIMITED TO (A) ANY WARRANTY THAT THE USE OF THE
+INFORMATION HEREIN WILL NOT INFRINGE ANY RIGHTS OF THIRD PARTIES (INCLUDING
+WITHOUT LIMITATION ANY INTELLECTUAL PROPERTY RIGHTS INCLUDING PATENT, COPYRIGHT
+OR TRADEMARK RIGHTS); OR (B) ANY IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS
+FOR A PARTICULAR PURPOSE, TITLE OR NONINFRINGEMENT. IN NO EVENT WILL THE
+CONNECTIVITY STANDARDS ALLIANCE BE LIABLE FOR ANY LOSS OF PROFITS, LOSS OF
+BUSINESS, LOSS OF USE OF DATA, INTERRUPTION OF BUSINESS, OR FOR ANY OTHER
+DIRECT, INDIRECT, SPECIAL OR EXEMPLARY, INCIDENTAL, PUNITIVE OR CONSEQUENTIAL
+DAMAGES OF ANY KIND, IN CONTRACT OR IN TORT, IN CONNECTION WITH THIS DOCUMENT
+OR THE INFORMATION CONTAINED HEREIN, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
+LOSS OR DAMAGE.
+
+All company, brand and product names in this document may be trademarks that
+are the sole property of their respective owners.
+
+This notice and disclaimer must be included on all copies of this document.
+
+Connectivity Standards Alliance
+508 Second Street, Suite 206
+Davis, CA 95616, USA
+
+:xrefstyle: basic
+-->
+<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0204" name="Thermostat User Interface Configuration Cluster" revision="2">
+  <revisionHistory>
+    <revision revision="1" summary="Mandatory global ClusterRevision attribute added"/>
+    <revision revision="2" summary="New data model format and notation, added &quot;Conversion of Temperature Values for Display&quot; section"/>
+  </revisionHistory>
+  <clusterIds>
+    <clusterId id="0x0204" name="Thermostat User Interface Configuration"/>
+  </clusterIds>
+  <classification hierarchy="base" role="application" picsCode="TSUIC" scope="Endpoint"/>
+  <dataTypes>
+    <enum name="KeypadLockoutEnum">
+      <item value="0" name="NoLockout" summary="All functionality available to the user">
+        <mandatoryConform/>
+      </item>
+      <item value="1" name="Lockout1" summary="Level 1 reduced functionality">
+        <mandatoryConform/>
+      </item>
+      <item value="2" name="Lockout2" summary="Level 2 reduced functionality">
+        <mandatoryConform/>
+      </item>
+      <item value="3" name="Lockout3" summary="Level 3 reduced functionality">
+        <mandatoryConform/>
+      </item>
+      <item value="4" name="Lockout4" summary="Level 4 reduced functionality">
+        <mandatoryConform/>
+      </item>
+      <item value="5" name="Lockout5" summary="Least functionality available to the user">
+        <mandatoryConform/>
+      </item>
+    </enum>
+    <enum name="ScheduleProgrammingVisibilityEnum">
+      <item value="0" name="ScheduleProgrammingPermitted" summary="Local schedule programming functionality is enabled at the thermostat">
+        <mandatoryConform/>
+      </item>
+      <item value="1" name="ScheduleProgrammingDenied" summary="Local schedule programming functionality is disabled at the thermostat">
+        <mandatoryConform/>
+      </item>
+    </enum>
+    <enum name="TemperatureDisplayModeEnum">
+      <item value="0" name="Celsius" summary="Temperature displayed in °C">
+        <mandatoryConform/>
+      </item>
+      <item value="1" name="Fahrenheit" summary="Temperature displayed in °F">
+        <mandatoryConform/>
+      </item>
+    </enum>
+  </dataTypes>
+  <attributes>
+    <attribute id="0x0000" name="TemperatureDisplayMode" type="TemperatureDisplayModeEnum">
+      <enum default="Celsius"/>
+      <access read="true" write="true" readPrivilege="view" writePrivilege="operate"/>
+      <mandatoryConform/>
+    </attribute>
+    <attribute id="0x0001" name="KeypadLockout" type="KeypadLockoutEnum">
+      <enum default="NoLockout"/>
+      <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
+      <mandatoryConform/>
+    </attribute>
+    <attribute id="0x0002" name="ScheduleProgrammingVisibility" type="ScheduleProgrammingVisibilityEnum">
+      <enum default="ScheduleProgrammingPermitted"/>
+      <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
+      <optionalConform/>
+    </attribute>
+  </attributes>
+</cluster>

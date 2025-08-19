@@ -138,4 +138,4 @@ commands. These power cycle the BlueTooth hardware and disable BR/EDR mode.
 
 For the description of Software Update process with infineon PSoC6 example
 applications see
-[Infineon PSoC6 OTA Software Update](../../../../docs/guides/infineon_psoc6_software_update.md)
+[Infineon PSoC6 OTA Software Update](../../../../docs/platforms/infineon/infineon_psoc6_software_update.md)

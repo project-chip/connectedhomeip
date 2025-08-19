@@ -29,7 +29,8 @@
 #include <platform/CHIPDeviceConfig.h>
 
 #if CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
-#include <app/app-platform/ContentAppPlatform.h>
+#include <app/app-platform/ContentAppPlatform.h> // nogncheck
+
 #endif // CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
 
 #include <list>
@@ -287,4 +288,9 @@ exit:
 void MatterContentLauncherPluginServerInitCallback()
 {
     AttributeAccessInterfaceRegistry::Instance().Register(&gContentLauncherAttrAccess);
+}
+
+void MatterContentLauncherPluginServerShutdownCallback()
+{
+    AttributeAccessInterfaceRegistry::Instance().Unregister(&gContentLauncherAttrAccess);
 }

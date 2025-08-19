@@ -3,10 +3,27 @@
 This example demonstrates the Matter Lighting application on ESP platforms.
 
 Please
-[setup ESP-IDF and CHIP Environment](../../../docs/guides/esp32/setup_idf_chip.md)
+[setup ESP-IDF and CHIP Environment](../../../docs/platforms/esp32/setup_idf_chip.md)
 and refer
-[building and commissioning](../../../docs/guides/esp32/build_app_and_commission.md)
+[building and commissioning](../../../docs/platforms/esp32/build_app_and_commission.md)
 guides to get started.
+
+### Building example for Target ESP32-C6
+
+ESP32-C6 supports both Wi-Fi and Thread transport protocols.
+
+-   To build for Matter Over Wi-Fi
+
+    ```
+    idf.py set-target esp32c6 build
+    ```
+
+-   To build for Matter Over Thread, use custom configuration file
+
+
+    ```
+    idf.py -DSDKCONFIG_DEFAULTS="sdkconfig.defaults;sdkconfig.defaults.esp32c6_thread" set-target esp32c6 build
+    ```
 
 ### Enabling ESP-Insights:
 
@@ -47,4 +64,4 @@ cp /path/to/auth/key.txt path/to/connectedhomeip/examples/lighting-app/esp32/mai
 ### Matter OTA
 
 For Matter OTA please take a look at
-[Matter OTA guide](../../../docs/guides/esp32/ota.md).
+[Matter OTA guide](../../../docs/platforms/esp32/ota.md).

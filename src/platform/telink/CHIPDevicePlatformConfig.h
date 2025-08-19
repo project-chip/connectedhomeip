@@ -103,6 +103,17 @@
 #define CHIP_DEVICE_CONFIG_ENABLE_WIFI_AP 0
 #endif
 
+// telink platform does not support ethernet yet, but we need this config defined as we share the Zephyr platform
+#ifndef CHIP_DEVICE_CONFIG_ENABLE_ETHERNET
+#define CHIP_DEVICE_CONFIG_ENABLE_ETHERNET 0
+#endif // CHIP_DEVICE_CONFIG_ENABLE_ETHERNET
+
+#if defined(CONFIG_SOC_RISCV_TELINK_TL321X) || defined(CONFIG_SOC_SERIES_RISCV_TELINK_B9X_RETENTION)
+#define CHIP_DEVICE_CONFIG_EVENT_LOGGING_CRIT_BUFFER_SIZE (256)
+#define CHIP_DEVICE_CONFIG_EVENT_LOGGING_INFO_BUFFER_SIZE (256)
+#define CHIP_DEVICE_CONFIG_EVENT_LOGGING_DEBUG_BUFFER_SIZE (256)
+#endif
+
 #ifdef CONFIG_BT
 #define CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE CONFIG_BT
 #else
@@ -134,6 +145,8 @@
 #if !defined(CONFIG_CHIP_MALLOC_SYS_HEAP) && defined(CONFIG_NEWLIB_LIBC)
 /// Use mallinfo() to obtain the heap usage statistics exposed by SoftwareDiagnostics cluster attributes.
 #define CHIP_DEVICE_CONFIG_HEAP_STATISTICS_MALLINFO 1
+#else
+#define CHIP_DEVICE_CONFIG_HEAP_STATISTICS_MALLINFO 0
 #endif // !defined(CONFIG_CHIP_MALLOC_SYS_HEAP) && defined(CONFIG_NEWLIB_LIBC)
 #endif // CHIP_DEVICE_CONFIG_HEAP_STATISTICS_MALLINFO
 

@@ -1,6 +1,6 @@
 /**
  *
- *    Copyright (c) 2022-2023 Project CHIP Authors
+ *    Copyright (c) 2022-2025 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -16,7 +16,10 @@
  */
 
 #import <Foundation/Foundation.h>
+#import <Matter/MTRAttributeValueWaiter.h>
+#import <Matter/MTRBaseClusters.h>
 #import <Matter/MTRBaseDevice.h>
+#import <Matter/MTRCommandWithRequiredResponse.h>
 #import <Matter/MTRDefines.h>
 
 NS_ASSUME_NONNULL_BEGIN
@@ -108,6 +111,25 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @property (nonatomic, readonly, nullable, copy) NSNumber * estimatedSubscriptionLatency MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6));
 
 /**
+ * The Vendor Identifier associated with the device.
+ *
+ * A non-nil value if the vendor identifier has been determined from the device, nil if unknown.
+ */
+@property (nonatomic, readonly, nullable, copy) NSNumber * vendorID MTR_AVAILABLE(ios(18.3), macos(15.3), watchos(11.3), tvos(18.3));
+
+/**
+ * The Product Identifier associated with the device.
+ *
+ * A non-nil value if the product identifier has been determined from the device, nil if unknown.
+ */
+@property (nonatomic, readonly, nullable, copy) NSNumber * productID MTR_AVAILABLE(ios(18.3), macos(15.3), watchos(11.3), tvos(18.3));
+
+/**
+ * Network commissioning features supported by the device.
+ */
+@property (nonatomic, readonly) MTRNetworkCommissioningFeature networkCommissioningFeatures MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4));
+
+/**
  * Set the delegate to receive asynchronous callbacks about the device.
  *
  * The delegate will be called on the provided queue, for attribute reports, event reports, and device state changes.
@@ -187,6 +209,29 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
                    timedWriteTimeout:(NSNumber * _Nullable)timeout;
 
 /**
+ * Read the attributes identified by the provided attribute paths.  The paths
+ * can include wildcards.
+ *
+ * Paths that do not correspond to any existing attributes, or that the
+ * MTRDevice does not have attribute values for, will not be present in the
+ * return value from this function.
+ *
+ * @return an array of response-value dictionaries as described in the
+ *         documentation for MTRDeviceResponseHandler.  Each one will have an
+ *         MTRAttributePathKey and an MTRDataKey.
+ */
+- (NSArray<NSDictionary<NSString *, id> *> *)readAttributePaths:(NSArray<MTRAttributeRequestPath *> *)attributePaths MTR_AVAILABLE(ios(18.2), macos(15.2), watchos(11.2), tvos(18.2));
+
+/**
+ * Read all known attributes from descriptor clusters on all known endpoints.
+ *
+ * @return A dictionary with the paths of the attributes as keys and the
+ *         data-values (as described in the documentation for
+ *         MTRDeviceResponseHandler) as values.
+ */
+- (NSDictionary<MTRAttributePath *, NSDictionary<NSString *, id> *> *)descriptorClusters MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4));
+
+/**
  * Invoke a command with a designated command path
  *
  * @param commandFields command fields object. If not nil, the object must be a data-value
@@ -251,6 +296,31 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
     MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 
 /**
+ * Invoke one or more groups of commands.
+ *
+ * For any given group, if any command in any preceding group failed, the group
+ * will be skipped.  If all commands in all preceding groups succeeded, the
+ * commands within the group will be invoked, with no ordering guarantees within
+ * that group.
+ *
+ * Results from all commands that were invoked will be passed to the provided
+ * completion as an array of response-value dictionaries.  Each of these will
+ * have the command path of the command (see MTRCommandPathKey) and one of three
+ * things:
+ *
+ * 1) No other fields, indicating that the command invoke returned a succcess
+ *    status.
+ * 2) A field for MTRErrorKey, indicating that the invoke returned a failure
+ *    status (which is the value of the field).
+ * 3) A field for MTRDataKey, indicating that the invoke returned a data
+ *    response.  In this case the data-value representing the response will be
+ *    the value of this field.
+ */
+- (void)invokeCommands:(NSArray<NSArray<MTRCommandWithRequiredResponse *> *> *)commands
+                 queue:(dispatch_queue_t)queue
+            completion:(MTRDeviceResponseHandler)completion MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4));
+
+/**
  * Open a commissioning window on the device.
  *
  * On success, completion will be called on queue with the MTRSetupPayload that
@@ -289,90 +359,6 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
     MTR_AVAILABLE(ios(17.0), macos(14.0), watchos(10.0), tvos(17.0));
 
 /**
- *
- * This set of functions allows clients to store metadata for either an entire device or for a specific endpoint.
- *
- * Notes:
- *   • Client data will be removed automatically when devices are deleted from the fabric
- *   • Supported client data object types are currently only:
- *         NSData, NSString, NSArray, NSDictionary, NSNumber
- */
-
-/**
- *
- * List of all client data types supported
- *
- */
-- (NSArray *)supportedClientDataClasses MTR_UNSTABLE_API;
-
-/**
- *
- * List of all client data keys stored
- *
- */
-- (NSArray * _Nullable)clientDataKeys MTR_UNSTABLE_API;
-
-/**
- *
- * Retrieve client metadata for a key, returns nil if no value is set
- *
- * @param key           NSString * for the key to store the value as
- */
-- (id<NSSecureCoding> _Nullable)clientDataForKey:(NSString *)key MTR_UNSTABLE_API;
-
-/**
- *
- * Set client metadata for a key. The value must conform to NSSecureCoding
- *
- * @param key           NSString * for the key to store the value as
- * @param value         id <NSSecureCoding> for the value to store
- */
-- (void)setClientDataForKey:(NSString *)key value:(id<NSSecureCoding>)value MTR_UNSTABLE_API;
-
-/**
- *
- * Remove client metadata for a key.
- *
- * @param key           NSString * for the key to store the value as
- */
-- (void)removeClientDataForKey:(NSString *)key MTR_UNSTABLE_API;
-
-/**
- *
- * List of all client data keys stored
- *
- */
-- (NSArray * _Nullable)clientDataKeysForEndpointID:(NSNumber *)endpointID MTR_UNSTABLE_API;
-
-/**
- *
- * Retrieve client metadata for a key, returns nil if no value is set
- *
- * @param key           NSString * for the key to store the value as
- * @param endpointID    NSNumber * for the endpoint to associate the metadata with
- */
-- (id<NSSecureCoding> _Nullable)clientDataForKey:(NSString *)key endpointID:(NSNumber *)endpointID MTR_UNSTABLE_API;
-
-/**
- *
- * Set client metadata for a key. The value must conform to NSSecureCoding.
- *
- * @param key           NSString * for the key to store the value as.
- * @param endpointID    NSNumber * for the endpoint to associate the metadata with
- * @param value         id <NSSecureCoding> for the value to store
- */
-- (void)setClientDataForKey:(NSString *)key endpointID:(NSNumber *)endpointID value:(id<NSSecureCoding>)value MTR_UNSTABLE_API;
-
-/**
- *
- * Remove client metadata for a key.
- *
- * @param key           NSString * for the key to store the value as
- * @param endpointID    NSNumber * for the endpoint to associate the metadata with
- */
-- (void)removeClientDataForKey:(NSString *)key endpointID:(NSNumber *)endpointID MTR_UNSTABLE_API;
-
-/**
  * Download log of the desired type from the device.
  *
  * Note: The consumer of this API should move the file that the url points to or open it for reading before the
@@ -393,6 +379,26 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
                     queue:(dispatch_queue_t)queue
                completion:(void (^)(NSURL * _Nullable url, NSError * _Nullable error))completion
     MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6));
+
+/**
+ * Sets up the provided completion to be called when any of the following
+ * happens:
+ *
+ * 1) A set of attributes reaches certain values: completion called with nil.
+ * 2) The provided timeout expires: completion called with MTRErrorCodeTimeout error.
+ * 3) The wait is canceled: completion called with MTRErrorCodeCancelled error.
+ *
+ * If the MTRAttributeValueWaiter is destroyed before the
+ * completion is called, that is treated the same as canceling the waiter.
+ *
+ * The attributes and values to wait for are represented as a dictionary which
+ * has the attribute paths as keys and the expected data-values as values.
+ */
+- (MTRAttributeValueWaiter *)waitForAttributeValues:(NSDictionary<MTRAttributePath *, NSDictionary<NSString *, id> *> *)values
+                                            timeout:(NSTimeInterval)timeout
+                                              queue:(dispatch_queue_t)queue
+                                         completion:(void (^)(NSError * _Nullable error))completion MTR_AVAILABLE(ios(18.3), macos(15.3), watchos(11.3), tvos(18.3));
+
 @end
 
 MTR_EXTERN NSString * const MTRPreviousDataKey MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6));

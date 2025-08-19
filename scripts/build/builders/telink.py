@@ -118,8 +118,13 @@ class TelinkBoard(Enum):
     TLSR9518ADK80D = auto()
     TLSR9528A = auto()
     TLSR9528A_RETENTION = auto()
-    TLSR9258A = auto()
-    TLSR9258A_RETENTION = auto()
+    TL3218X = auto()
+    TL3218X_ML3M = auto()
+    TL3218X_RETENTION = auto()
+    TL7218X = auto()
+    TL7218X_ML7G = auto()
+    TL7218X_ML7M = auto()
+    TL7218X_RETENTION = auto()
 
     def GnArgName(self):
         if self == TelinkBoard.TLRS9118BDK40D:
@@ -130,10 +135,20 @@ class TelinkBoard(Enum):
             return 'tlsr9528a'
         elif self == TelinkBoard.TLSR9528A_RETENTION:
             return 'tlsr9528a_retention'
-        elif self == TelinkBoard.TLSR9258A:
-            return 'tlsr9258a'
-        elif self == TelinkBoard.TLSR9258A_RETENTION:
-            return 'tlsr9258a_retention'
+        elif self == TelinkBoard.TL3218X:
+            return 'tl3218x'
+        elif self == TelinkBoard.TL3218X_ML3M:
+            return 'tl3218x_ml3m'
+        elif self == TelinkBoard.TL3218X_RETENTION:
+            return 'tl3218x_retention'
+        elif self == TelinkBoard.TL7218X:
+            return 'tl7218x'
+        elif self == TelinkBoard.TL7218X_ML7G:
+            return 'tl7218x_ml7g'
+        elif self == TelinkBoard.TL7218X_ML7M:
+            return 'tl7218x_ml7m'
+        elif self == TelinkBoard.TL7218X_RETENTION:
+            return 'tl7218x_retention'
         else:
             raise Exception('Unknown board type: %r' % self)
 
@@ -152,7 +167,12 @@ class TelinkBuilder(Builder):
                  enable_factory_data: bool = False,
                  enable_4mb_flash: bool = False,
                  mars_board_config: bool = False,
-                 usb_board_config: bool = False):
+                 usb_board_config: bool = False,
+                 compress_lzma_config: bool = False,
+                 thread_analyzer_config: bool = False,
+                 precompiled_ot_config: bool = False,
+                 tflm_config: bool = False,
+                 ):
         super(TelinkBuilder, self).__init__(root, runner)
         self.app = app
         self.board = board
@@ -164,6 +184,10 @@ class TelinkBuilder(Builder):
         self.enable_4mb_flash = enable_4mb_flash
         self.mars_board_config = mars_board_config
         self.usb_board_config = usb_board_config
+        self.compress_lzma_config = compress_lzma_config
+        self.thread_analyzer_config = thread_analyzer_config
+        self.precompiled_ot_config = precompiled_ot_config
+        self.tflm_config = tflm_config
 
     def get_cmd_prefixes(self):
         if not self._runner.dry_run:
@@ -208,16 +232,27 @@ class TelinkBuilder(Builder):
         if self.usb_board_config:
             flags.append("-DTLNK_USB_DONGLE=y")
 
+        if self.compress_lzma_config:
+            flags.append("-DCONFIG_COMPRESS_LZMA=y")
+
+        if self.thread_analyzer_config:
+            flags.append("-DCONFIG_THREAD_ANALYZER=y")
+
+        if self.precompiled_ot_config:
+            flags.append("-DCONFIG_OPENTHREAD_TELINK_LIBRARY=y -DCONFIG_LOG_MODE_DEFERRED=y")
+
+        if self.tflm_config:
+            flags.append("-DCONFIG_TFLM_FEATURE=y")
+
         if self.options.pregen_dir:
             flags.append(f"-DCHIP_CODEGEN_PREGEN_DIR={shlex.quote(self.options.pregen_dir)}")
 
         build_flags = " -- " + " ".join(flags) if len(flags) > 0 else ""
 
         cmd = self.get_cmd_prefixes()
-        cmd += '''
-source "$ZEPHYR_BASE/zephyr-env.sh";
-west build --cmake-only -d {outdir} -b {board} {sourcedir}{build_flags}
-        '''.format(
+        cmd += '\nsource "$ZEPHYR_BASE/zephyr-env.sh";'
+
+        cmd += '\nwest build --cmake-only -d {outdir} -b {board} {sourcedir}{build_flags}\n'.format(
             outdir=shlex.quote(self.output_dir),
             board=self.board.GnArgName(),
             sourcedir=shlex.quote(os.path.join(self.root, 'examples', self.app.ExampleName(), 'telink')),
@@ -230,6 +265,9 @@ west build --cmake-only -d {outdir} -b {board} {sourcedir}{build_flags}
         logging.info('Compiling Telink at %s', self.output_dir)
 
         cmd = self.get_cmd_prefixes() + ("ninja -C %s" % self.output_dir)
+
+        if self.ninja_jobs is not None:
+            cmd += " -j%s" % str(self.ninja_jobs)
 
         self._Execute(['bash', '-c', cmd], title='Building ' + self.identifier)
 

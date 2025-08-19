@@ -22,39 +22,62 @@ import android.util.Log;
 public class CommissionerDeclaration {
   static final String TAG = CommissionerDeclaration.class.getSimpleName();
 
-  /** The allowed values for the ErrorCode field are the following */
+  /**
+   * The allowed values for the ErrorCode field are the following. Indicates errors incurred during
+   * commissioning.
+   */
   public enum CdError {
-    kNoError(0),
-    kCommissionableDiscoveryFailed(1),
-    kPaseConnectionFailed(2),
-    kPaseAuthFailed(3),
-    kDacValidationFailed(4),
-    kAlreadyOnFabric(5),
-    kOperationalDiscoveryFailed(6),
-    kCaseConnectionFailed(7),
-    kCaseAuthFailed(8),
-    kConfigurationFailed(9),
-    kBindingConfigurationFailed(10),
-    kCommissionerPasscodeNotSupported(11),
-    kInvalidIdentificationDeclarationParams(12),
-    kAppInstallConsentPending(13),
-    kAppInstalling(14),
-    kAppInstallFailed(15),
-    kAppInstalledRetryNeeded(16),
-    kCommissionerPasscodeDisabled(17),
-    kUnexpectedCommissionerPasscodeReady(18);
+    noError(0, "No error"),
+    commissionableDiscoveryFailed(1, "Commissionable Node discovery failed"),
+    paseConnectionFailed(2, "PASE connection failed"),
+    paseAuthFailed(3, "PASE authentication failed (bad Passcode)"),
+    dacValidationFailed(4, "DAC validation failed"),
+    alreadyOnFabric(5, "Already on fabric"),
+    operationalDiscoveryFailed(6, "Operational Node discovery failed"),
+    caseConnectionFailed(7, "CASE connection failed"),
+    caseAuthFailed(8, "CASE authentication failed"),
+    configurationFailed(9, "Configuration failed"),
+    bindingConfigurationFailed(10, "Binding Configuration failed"),
+    commissionerPasscodeNotSupported(11, "Commissioner Passcode not supported"),
+    invalidIdentificationDeclarationParams(12, "Invalid UDC Identification Declaration parameters"),
+    appInstallConsentPending(13, "App Install Consent Pending"),
+    appInstalling(14, "App Installing"),
+    appInstallFailed(15, "App Install Failed"),
+    appInstalledRetryNeeded(16, "App Installed, Retry Needed"),
+    commissionerPasscodeDisabled(17, "Commissioner Passcode disabled"),
+    unexpectedCommissionerPasscodeReady(18, "Unexpected Commissioner Passcode ready");
+
     private final int value;
+    private final String description;
+
+    private CdError(int value, String description) {
+      this.value = value;
+      this.description = description;
+    }
+
+    private static String getDefaultDescription(int value) {
+      for (CdError error : CdError.values()) {
+        if (error.value == value) {
+          return error.name();
+        }
+      }
+      return "Unknown Error";
+    }
 
     CdError(int value) {
-      this.value = value;
+      this(value, getDefaultDescription(value));
     }
 
     public int getValue() {
       return value;
     }
+
+    public String getDescription() {
+      return description;
+    }
   }
   /** Feature: All - Indicates errors incurred during commissioning. */
-  private CdError errorCode = CdError.kNoError;
+  private CdError errorCode = CdError.noError;
   /**
    * Feature: Coordinate PIN Dialogs - When NoPasscode field set to true, and the Commissioner
    * determines that a Passcode code will be needed for commissioning.
@@ -81,6 +104,11 @@ public class CommissionerDeclaration {
    * also displays a QR code.
    */
   private boolean qRCodeDisplayed = false;
+  /**
+   * Feature: Commissioner-Generated Passcode - Flag to indicate when the CastingplAYER/Commissioner
+   * user has decided to exit the commissioning process.
+   */
+  private boolean cancelPasscode = false;
 
   public CommissionerDeclaration(
       int errorCode,
@@ -88,13 +116,15 @@ public class CommissionerDeclaration {
       boolean noAppsFound,
       boolean passcodeDialogDisplayed,
       boolean commissionerPasscode,
-      boolean qRCodeDisplayed) {
+      boolean qRCodeDisplayed,
+      boolean cancelPasscode) {
     this.errorCode = CdError.values()[errorCode];
     this.needsPasscode = needsPasscode;
     this.noAppsFound = noAppsFound;
     this.passcodeDialogDisplayed = passcodeDialogDisplayed;
     this.commissionerPasscode = commissionerPasscode;
     this.qRCodeDisplayed = qRCodeDisplayed;
+    this.cancelPasscode = cancelPasscode;
   }
 
   public void setErrorCode(CdError errorCode) {
@@ -145,6 +175,10 @@ public class CommissionerDeclaration {
     return this.qRCodeDisplayed;
   }
 
+  public boolean getCancelPasscode() {
+    return this.cancelPasscode;
+  }
+
   @Override
   public String toString() {
     return "CommissionerDeclaration::errorCode:               "
@@ -163,7 +197,10 @@ public class CommissionerDeclaration {
         + commissionerPasscode
         + "\n"
         + "CommissionerDeclaration::qRCodeDisplayed:         "
-        + qRCodeDisplayed;
+        + qRCodeDisplayed
+        + "\n"
+        + "CommissionerDeclaration::cancelPasscode:          "
+        + cancelPasscode;
   }
 
   public void logDetail() {

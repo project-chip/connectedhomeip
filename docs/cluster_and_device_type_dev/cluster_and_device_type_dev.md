@@ -1,4 +1,4 @@
-# New Clusters & Device Types
+# Implementing New Clusters & Device Types
 
 The goal of new cluster and device type development is to
 
@@ -48,11 +48,11 @@ Note that the output should also be verified against the spec using the
 -   Goal: get zap to understand the new cluster so it can be used on devices
     (XML and glue)
 
-![](../getting_started/img/zap_compiler.png)
+![](../zap_and_codegen/img/zap_compiler.png)
 
 ### Cluster definitions and ZAP
 
-Please see [ZAP](../getting_started/zap.md) for an introduction to ZAP.
+Please see [ZAP](../zap_and_codegen/zap_intro.md) for an introduction to ZAP.
 
 After implementing the changes outlined in the wiki article, your cluster and
 device type should show up in zap. you can check this by running zaptool with
@@ -64,17 +64,17 @@ To ensure the cluster and device type are correctly implemented for ZAP, open
 the endpoint configuration and ensure the device type appears in the device type
 list.
 
-![](../getting_started/img/zap3.png)
+![](../zap_and_codegen/img/zap3.png)
 
 Next, check your cluster. The "domain" parameter in the XML controls which group
 the cluster is in. It should have all the expected attributes, commands and
 events.
 
-![](../getting_started/img/zap4.png)
+![](../zap_and_codegen/img/zap4.png)
 
 Last, ensure that your attributes have the storage option set appropriately.
 
-![](../getting_started/img/zap5.png)
+![](../zap_and_codegen/img/zap5.png)
 
 ### Cluster implementation - Ember and overrides
 

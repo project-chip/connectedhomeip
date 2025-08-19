@@ -8,7 +8,7 @@
             # to kUnknownEnumValue. This is a helper enum value that should only
             # be used by code to process how it handles receiving an unknown
             # enum value. This specific value should never be transmitted.
-            kUnknownEnumValue = {{first_unused_enum_value mode="first_unused"}},
+            kUnknownEnumValue = {{first_unused_enum_value mode="first_unused"}}
 {{else}}
             # kUnknownEnumValue intentionally not defined. This enum never goes
             # through DataModel::Decode, likely because it is a part of a derived

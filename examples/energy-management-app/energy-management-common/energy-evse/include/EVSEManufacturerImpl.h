@@ -117,7 +117,7 @@ public:
     /**
      * @brief   Called at start up to apply hardware settings
      */
-    CHIP_ERROR Init();
+    CHIP_ERROR Init(chip::EndpointId powerSourceEndpointId);
 
     /**
      * @brief   Called at shutdown
@@ -129,6 +129,15 @@ public:
      */
     static void ApplicationCallbackHandler(const EVSECbInfo * cb, intptr_t arg);
 
+    /**
+     * @brief   Helper functions used by ComputeChargingSchedule
+     */
+    CHIP_ERROR DetermineRequiredEnergy(EnergyEvseDelegate * dg, int64_t & requiredEnergy_mWh,
+                                       DataModel::Nullable<Percent> & targetSoC,
+                                       DataModel::Nullable<int64_t> & targetAddedEnergy_mWh);
+
+    CHIP_ERROR ComputeStartTime(EnergyEvseDelegate * dg, DataModel::Nullable<uint32_t> & startTime_epoch_s,
+                                uint32_t targetTime_epoch_s, uint32_t now_epoch_s, int64_t requiredEnergy_mWh);
     /**
      * @brief   Simple example to demonstrate how an EVSE can compute the start time
      *          and duration of a charging schedule
@@ -143,7 +152,7 @@ public:
     /**
      * @brief   Allows a client application to initialise the PowerSource cluster
      */
-    CHIP_ERROR InitializePowerSourceCluster();
+    CHIP_ERROR InitializePowerSourceCluster(chip::EndpointId endpointId);
 
     /**
      * @brief   Allows a client application to send in power readings into the system
@@ -153,7 +162,7 @@ public:
      * @param[in]  aVoltage_mV       - Voltage measured in milli-volts
      * @param[in]  aActiveCurrent_mA - ActiveCurrent measured in milli-amps
      */
-    CHIP_ERROR SendPowerReading(EndpointId aEndpointId, int64_t aActivePower_mW, int64_t aVoltage_mV, int64_t aCurrent_mA);
+    CHIP_ERROR SendPowerReading(EndpointId aEndpointId, int64_t aActivePower_mW, int64_t aVoltage_mV, int64_t aCurrent_mA) override;
 
     /**
      * @brief   Allows a client application to send cumulative energy readings into the system
@@ -164,7 +173,7 @@ public:
      * @param[in]  aCumulativeEnergyExported -total energy exported in milli-watthours
      */
     CHIP_ERROR SendCumulativeEnergyReading(EndpointId aEndpointId, int64_t aCumulativeEnergyImported,
-                                           int64_t aCumulativeEnergyExported);
+                                           int64_t aCumulativeEnergyExported) override;
 
     /**
      * @brief   Allows a client application to send periodic energy readings into the system
@@ -175,7 +184,7 @@ public:
      * @param[in]  aPeriodicEnergyExported - energy exported in milli-watthours in last period
      */
     CHIP_ERROR SendPeriodicEnergyReading(EndpointId aEndpointId, int64_t aCumulativeEnergyImported,
-                                         int64_t aCumulativeEnergyExported);
+                                         int64_t aCumulativeEnergyExported) override;
 
     /**  Fake Meter data generation - used for testing EPM/EEM clusters */
     /**
@@ -212,6 +221,13 @@ public:
      * @brief   Timer expiry callback to handle fake load
      */
     static void FakeReadingsTimerExpiry(System::Layer * systemLayer, void * manufacturer);
+
+    /*
+     * @brief   Updates the parameters used to generate fake power and energy readings
+     *
+     * @param   maximumChargeCurrent   Maximum Charge current in mA
+     */
+    void UpdateEVFakeReadings(const Amperage_mA maximumChargeCurrent);
 
 private:
     EnergyEvseManager * mEvseInstance;

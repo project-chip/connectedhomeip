@@ -18,22 +18,38 @@
 # for details about the block below.
 #
 # === BEGIN CI TEST ARGUMENTS ===
-# test-runner-runs: run1
-# test-runner-run/run1/app: ${ENERGY_MANAGEMENT_APP}
-# test-runner-run/run1/factoryreset: True
-# test-runner-run/run1/quiet: True
-# test-runner-run/run1/app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json --enable-key 000102030405060708090a0b0c0d0e0f --featureSet 0xa --application evse
-# test-runner-run/run1/script-args: --storage-path admin_storage.json --commissioning-method on-network --discriminator 1234 --passcode 20202021 --hex-arg enableKey:000102030405060708090a0b0c0d0e0f --endpoint 1 --trace-to json:${TRACE_TEST_JSON}.json --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+# test-runner-runs:
+#   run1:
+#     app: ${ENERGY_MANAGEMENT_APP}
+#     app-args: >
+#       --discriminator 1234
+#       --KVS kvs1
+#       --trace-to json:${TRACE_APP}.json
+#       --enable-key 000102030405060708090a0b0c0d0e0f
+#       --featureSet 0xa
+#       --application evse
+#     script-args: >
+#       --storage-path admin_storage.json
+#       --commissioning-method on-network
+#       --discriminator 1234
+#       --passcode 20202021
+#       --hex-arg enableKey:000102030405060708090a0b0c0d0e0f
+#       --endpoint 1
+#       --trace-to json:${TRACE_TEST_JSON}.json
+#       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+#     factory-reset: true
+#     quiet: true
 # === END CI TEST ARGUMENTS ===
 
 import logging
 
-import chip.clusters as Clusters
-from chip.clusters.Types import NullValue
-from chip.interaction_model import Status
-from matter_testing_support import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from mobly import asserts
 from TC_DEMTestBase import DEMTestBase
+
+import matter.clusters as Clusters
+from matter.clusters.Types import NullValue
+from matter.interaction_model import Status
+from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 
 logger = logging.getLogger(__name__)
 
@@ -54,7 +70,8 @@ class TC_DEM_2_3(MatterBaseTest, DEMTestBase):
 
     def steps_TC_DEM_2_3(self) -> list[TestStep]:
         steps = [
-            TestStep("1", "Commission DUT to TH (can be skipped if done in a preceding test)"),
+            TestStep("1", "Commission DUT to TH (can be skipped if done in a preceding test)",
+                     is_commissioning=True),
             TestStep("2", "TH reads from the DUT the _FeatureMap_ attribute",
                      "Verify that the DUT response contains the _FeatureMap_ attribute. Verify StartTimeAdjustment feature is supported on the cluster. Verify PowerForecastReporting or StateForecastReporting feature is supported on the cluster."),
             TestStep("3", "TH reads TestEventTriggersEnabled attribute from General Diagnostics Cluster",

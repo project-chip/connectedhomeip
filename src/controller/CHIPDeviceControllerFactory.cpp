@@ -24,6 +24,7 @@
 
 #include <controller/CHIPDeviceControllerFactory.h>
 
+#include <app/InteractionModelEngine.h>
 #include <app/OperationalSessionSetup.h>
 #include <app/TimerDelegates.h>
 #include <app/reporting/ReportSchedulerImpl.h>
@@ -100,6 +101,10 @@ CHIP_ERROR DeviceControllerFactory::ReinitSystemStateIfNecessary()
     params.certificateValidityPolicy = mCertificateValidityPolicy;
     params.sessionResumptionStorage  = mSessionResumptionStorage;
 
+    // re-initialization keeps any previously initialized values. The only place where
+    // a provider exists is in the InteractionModelEngine, so just say "keep it as is".
+    params.dataModelProvider = app::InteractionModelEngine::GetInstance()->GetDataModelProvider();
+
     return InitSystemState(params);
 }
 
@@ -127,13 +132,27 @@ CHIP_ERROR DeviceControllerFactory::InitSystemState(FactoryInitParams params)
     ChipLogError(Controller, "Warning: Device Controller Factory should be with a CHIP Device Layer...");
 #endif // CONFIG_DEVICE_LAYER
 
+#if INET_CONFIG_ENABLE_TCP_ENDPOINT
+    auto tcpListenParams = Transport::TcpListenParameters(stateParams.tcpEndPointManager)
+                               .SetAddressType(IPAddressType::kIPv6)
+                               .SetListenPort(params.listenPort)
+                               .SetServerListenEnabled(false); // Initialize as a TCP Client
+#endif
+
+    if (params.dataModelProvider == nullptr)
+    {
+        ChipLogError(AppServer, "Device Controller Factory requires a `dataModelProvider` value.");
+        ChipLogError(AppServer, "For backwards compatibility, you likely can use `CodegenDataModelProviderInstance(...)`");
+    }
+
+    VerifyOrReturnError(params.dataModelProvider != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(stateParams.systemLayer != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(stateParams.udpEndPointManager != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
     // OperationalCertificateStore needs to be provided to init the fabric table if fabric table is
     // not provided wholesale.
-    ReturnErrorCodeIf((params.fabricTable == nullptr) && (params.opCertStore == nullptr), CHIP_ERROR_INVALID_ARGUMENT);
-    ReturnErrorCodeIf(params.sessionKeystore == nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError((params.fabricTable != nullptr) || (params.opCertStore != nullptr), CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(params.sessionKeystore != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
 #if CONFIG_NETWORK_LAYER_BLE
 #if CONFIG_DEVICE_LAYER
@@ -150,13 +169,18 @@ CHIP_ERROR DeviceControllerFactory::InitSystemState(FactoryInitParams params)
     stateParams.transportMgr = chip::Platform::New<DeviceTransportMgr>();
 
     //
-    // The logic below expects IPv6 to be at index 0 of this tuple. Please do not alter that.
+    // The logic below expects IPv6 to be at index 0 of this tuple. Keep that logic in sync with
+    // this code.
     //
     ReturnErrorOnFailure(stateParams.transportMgr->Init(Transport::UdpListenParameters(stateParams.udpEndPointManager)
                                                             .SetAddressType(Inet::IPAddressType::kIPv6)
                                                             .SetListenPort(params.listenPort)
 #if INET_CONFIG_ENABLE_IPV4
                                                             ,
+                                                        //
+                                                        // The logic below expects IPv4 to be at index 1 of this tuple,
+                                                        // if it's enabled. Keep that logic in sync with this code.
+                                                        //
                                                         Transport::UdpListenParameters(stateParams.udpEndPointManager)
                                                             .SetAddressType(Inet::IPAddressType::kIPv4)
                                                             .SetListenPort(params.listenPort)
@@ -167,13 +191,15 @@ CHIP_ERROR DeviceControllerFactory::InitSystemState(FactoryInitParams params)
 #endif
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
                                                             ,
-                                                        Transport::TcpListenParameters(stateParams.tcpEndPointManager)
-                                                            .SetAddressType(IPAddressType::kIPv6)
-                                                            .SetListenPort(params.listenPort)
+                                                        tcpListenParams
 #endif
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
-                                                            ,
+                                                        ,
                                                         Transport::WiFiPAFListenParameters()
+#endif
+#if CHIP_DEVICE_CONFIG_ENABLE_NFC_BASED_COMMISSIONING
+                                                            ,
+                                                        Transport::NfcListenParameters(nullptr)
 #endif
                                                             ));
 
@@ -197,7 +223,7 @@ CHIP_ERROR DeviceControllerFactory::InitSystemState(FactoryInitParams params)
     {
         // TODO(#16231): Previously (and still) the objects new-ed in this entire method seem expected to last forever...
         auto newFabricTable = Platform::MakeUnique<FabricTable>();
-        ReturnErrorCodeIf(!newFabricTable, CHIP_ERROR_NO_MEMORY);
+        VerifyOrReturnError(newFabricTable, CHIP_ERROR_NO_MEMORY);
 
         FabricTable::InitParams fabricTableInitParams;
         fabricTableInitParams.storage             = params.fabricIndependentStorage;
@@ -238,7 +264,11 @@ CHIP_ERROR DeviceControllerFactory::InitSystemState(FactoryInitParams params)
     ReturnErrorOnFailure(stateParams.unsolicitedStatusHandler->Init(stateParams.exchangeMgr));
     ReturnErrorOnFailure(stateParams.bdxTransferServer->Init(stateParams.systemLayer, stateParams.exchangeMgr));
 
-    InitDataModelHandler();
+    chip::app::InteractionModelEngine * interactionModelEngine = chip::app::InteractionModelEngine::GetInstance();
+
+    // Initialize the data model now that everything cluster implementations might
+    // depend on is initalized.
+    interactionModelEngine->SetDataModelProvider(params.dataModelProvider);
 
     ReturnErrorOnFailure(Dnssd::Resolver::Instance().Init(stateParams.udpEndPointManager));
 
@@ -251,13 +281,15 @@ CHIP_ERROR DeviceControllerFactory::InitSystemState(FactoryInitParams params)
             stateParams.exchangeMgr, stateParams.sessionMgr, stateParams.fabricTable, sessionResumptionStorage,
             stateParams.certificateValidityPolicy, stateParams.groupDataProvider));
 
-        //
-        // We need to advertise the port that we're listening to for unsolicited messages over UDP. However, we have both a IPv4
-        // and IPv6 endpoint to pick from. Given that the listen port passed in may be set to 0 (which then has the kernel select
-        // a valid port at bind time), that will result in two possible ports being provided back from the resultant endpoint
-        // initializations. Since IPv6 is POR for Matter, let's go ahead and pick that port.
-        //
-        app::DnssdServer::Instance().SetSecuredPort(stateParams.transportMgr->GetTransport().GetImplAtIndex<0>().GetBoundPort());
+        // Our IPv6 transport is at index 0.
+        app::DnssdServer::Instance().SetSecuredIPv6Port(
+            stateParams.transportMgr->GetTransport().GetImplAtIndex<0>().GetBoundPort());
+
+#if INET_CONFIG_ENABLE_IPV4
+        // If enabled, our IPv4 transport is at index 1.
+        app::DnssdServer::Instance().SetSecuredIPv4Port(
+            stateParams.transportMgr->GetTransport().GetImplAtIndex<1>().GetBoundPort());
+#endif // INET_CONFIG_ENABLE_IPV4
 
         //
         // TODO: This is a hack to workaround the fact that we have a bi-polar stack that has controller and server modalities that
@@ -268,6 +300,11 @@ CHIP_ERROR DeviceControllerFactory::InitSystemState(FactoryInitParams params)
         // Consequently, reach in set the fabric table pointer to point to the right version.
         //
         app::DnssdServer::Instance().SetFabricTable(stateParams.fabricTable);
+
+#if INET_CONFIG_ENABLE_TCP_ENDPOINT
+        // Disable the TCP Server based on the TCPListenParameters setting.
+        app::DnssdServer::Instance().SetTCPServerEnabled(tcpListenParams.IsServerListenEnabled());
+#endif
     }
 
     stateParams.sessionSetupPool = Platform::New<DeviceControllerSystemStateParams::SessionSetupPool>();
@@ -295,8 +332,8 @@ CHIP_ERROR DeviceControllerFactory::InitSystemState(FactoryInitParams params)
     stateParams.caseSessionManager = Platform::New<CASESessionManager>();
     ReturnErrorOnFailure(stateParams.caseSessionManager->Init(stateParams.systemLayer, sessionManagerConfig));
 
-    ReturnErrorOnFailure(chip::app::InteractionModelEngine::GetInstance()->Init(
-        stateParams.exchangeMgr, stateParams.fabricTable, stateParams.reportScheduler, stateParams.caseSessionManager));
+    ReturnErrorOnFailure(interactionModelEngine->Init(stateParams.exchangeMgr, stateParams.fabricTable, stateParams.reportScheduler,
+                                                      stateParams.caseSessionManager));
 
     // store the system state
     mSystemState = chip::Platform::New<DeviceControllerSystemState>(std::move(stateParams));

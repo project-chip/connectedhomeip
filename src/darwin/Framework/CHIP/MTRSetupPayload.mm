@@ -186,6 +186,10 @@ static NSString * MTRDiscoveryCapabilitiesAsString(MTRDiscoveryCapabilities valu
         [capabilities appendString:@"|OnNetwork"];
         value &= ~MTRDiscoveryCapabilitiesOnNetwork;
     }
+    if (value & MTRDiscoveryCapabilitiesNFC) {
+        [capabilities appendString:@"|NFC"];
+        value &= ~MTRDiscoveryCapabilitiesNFC;
+    }
     if (value != 0) {
         [capabilities appendFormat:@"|0x%llx", (unsigned long long) value];
     }
@@ -476,6 +480,17 @@ MTR_DIRECT_MEMBERS
     return [self qrCodeStringSkippingValidation:NO];
 }
 
++ (BOOL)isValidSetupPasscode:(NSNumber *)setupPasscode
+{
+    using namespace chip;
+
+    uint64_t passCode = setupPasscode.unsignedLongLongValue;
+    if (!CanCastTo<uint32_t>(passCode)) {
+        return NO;
+    }
+    return SetupPayload::IsValidSetupPIN(static_cast<uint32_t>(passCode));
+}
+
 - (nullable NSString *)qrCodeStringSkippingValidation:(BOOL)allowInvalid
 {
     chip::QRCodeSetupPayloadGenerator generator(_payload);
@@ -485,8 +500,9 @@ MTR_DIRECT_MEMBERS
     if (allowInvalid) {
         // Encoding should always work if invalid payloads are allowed
         VerifyOrDieWithMsg(err == CHIP_NO_ERROR, NotSpecified, "Internal error: %" CHIP_ERROR_FORMAT, err.Format());
-    } else {
-        VerifyOrReturnValue(err == CHIP_NO_ERROR, nil);
+    } else if (err != CHIP_NO_ERROR) {
+        MTR_LOG_ERROR("Failed to generate QR code string for payload: %" CHIP_ERROR_FORMAT, err.Format());
+        return nil;
     }
     return [NSString stringWithUTF8String:result.c_str()];
 }
@@ -607,7 +623,7 @@ static NSString * const MTRSetupPayloadCodingKeyQRCode = @"qr";
             return setupPIN;
         }
 
-        // We got pretty unlikely with our random number generation.  Just try
+        // We got pretty unlucky with our random number generation.  Just try
         // again.  The chance that this loop does not terminate in a reasonable
         // amount of time is astronomically low, assuming arc4random_uniform is not
         // broken.

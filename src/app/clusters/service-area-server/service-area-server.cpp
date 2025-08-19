@@ -378,12 +378,19 @@ void Instance::HandleSkipAreaCmd(HandlerContext & ctx, const Commands::SkipArea:
         ctx.mCommandHandler.AddResponse(ctx.mRequestPath, response);
     };
 
-    // The SkippedArea field SHALL match an entry in the SupportedAreas list.
-    // If the Status field is set to InvalidAreaList, the StatusText field SHALL be an empty string.
+    // If the SelectedAreas attribute is empty, the SkipAreaResponse command’s Status field SHALL indicate InvalidAreaList.
+    if (GetNumberOfSelectedAreas() == 0)
+    {
+        exitResponse(SkipAreaStatus::kInvalidAreaList, ""_span);
+        return;
+    }
+
+    // If the SkippedArea field does not match an entry in the SupportedAreas attribute, the SkipAreaResponse command’s Status field
+    // SHALL indicate InvalidSkippedArea.
     if (!mStorageDelegate->IsSupportedArea(req.skippedArea))
     {
         ChipLogError(Zcl, "SkippedArea (%" PRIu32 ") is not in the SupportedAreas attribute.", req.skippedArea);
-        exitResponse(SkipAreaStatus::kInvalidAreaList, ""_span);
+        exitResponse(SkipAreaStatus::kInvalidSkippedArea, ""_span);
         return;
     }
 
@@ -826,8 +833,8 @@ bool Instance::AddSupportedMap(uint32_t aMapId, const CharSpan & aMapName)
         // the name cannot be the same as an existing map
         if (entry.IsNameEqual(aMapName))
         {
-            ChipLogError(Zcl, "AddSupportedMapRaw %" PRIu32 " - A map already exists with same name '%.*s'", aMapId,
-                         static_cast<int>(entry.GetName().size()), entry.GetName().data());
+            ChipLogError(Zcl, "AddSupportedMapRaw %" PRIu32 " - A map already exists with same name '%s'", aMapId,
+                         NullTerminated(entry.GetName()).c_str());
             return false;
         }
 
@@ -889,8 +896,8 @@ bool Instance::RenameSupportedMap(uint32_t aMapId, const CharSpan & newMapName)
 
         if (entry.IsNameEqual(newMapName))
         {
-            ChipLogError(Zcl, "RenameSupportedMap %" PRIu32 " - map already exists with same name '%.*s'", aMapId,
-                         static_cast<int>(entry.GetName().size()), entry.GetName().data());
+            ChipLogError(Zcl, "RenameSupportedMap %" PRIu32 " - map already exists with same name '%s'", aMapId,
+                         NullTerminated(entry.GetName()).c_str());
             return false;
         }
 
@@ -1016,8 +1023,7 @@ bool Instance::AddSelectedArea(uint32_t & aSelectedArea)
 
     if (!mDelegate->IsSetSelectedAreasAllowed(locationStatusText))
     {
-        ChipLogError(Zcl, "AddSelectedAreaRaw %" PRIu32 " - %.*s", aSelectedArea, static_cast<int>(locationStatusText.size()),
-                     locationStatusText.data());
+        ChipLogError(Zcl, "AddSelectedAreaRaw %" PRIu32 " - %s", aSelectedArea, NullTerminated(locationStatusText).c_str());
         return false;
     }
 

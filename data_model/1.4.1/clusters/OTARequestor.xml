@@ -1,0 +1,244 @@
+<?xml version="1.0"?>
+<!--
+Copyright (C) Connectivity Standards Alliance (2021). All rights reserved.
+The information within this document is the property of the Connectivity
+Standards Alliance and its use and disclosure are restricted, except as
+expressly set forth herein.
+
+Connectivity Standards Alliance hereby grants you a fully-paid, non-exclusive,
+nontransferable, worldwide, limited and revocable license (without the right to
+sublicense), under Connectivity Standards Alliance's applicable copyright
+rights, to view, download, save, reproduce and use the document solely for your
+own internal purposes and in accordance with the terms of the license set forth
+herein. This license does not authorize you to, and you expressly warrant that
+you shall not: (a) permit others (outside your organization) to use this
+document; (b) post or publish this document; (c) modify, adapt, translate, or
+otherwise change this document in any manner or create any derivative work
+based on this document; (d) remove or modify any notice or label on this
+document, including this Copyright Notice, License and Disclaimer. The
+Connectivity Standards Alliance does not grant you any license hereunder other
+than as expressly stated herein.
+
+Elements of this document may be subject to third party intellectual property
+rights, including without limitation, patent, copyright or trademark rights,
+and any such third party may or may not be a member of the Connectivity
+Standards Alliance. Connectivity Standards Alliance members grant other
+Connectivity Standards Alliance members certain intellectual property rights as
+set forth in the Connectivity Standards Alliance IPR Policy. Connectivity
+Standards Alliance members do not grant you any rights under this license. The
+Connectivity Standards Alliance is not responsible for, and shall not be held
+responsible in any manner for, identifying or failing to identify any or all
+such third party intellectual property rights. Please visit www.csa-iot.org for
+more information on how to become a member of the Connectivity Standards
+Alliance.
+
+This document and the information contained herein are provided on an “AS IS”
+basis and the Connectivity Standards Alliance DISCLAIMS ALL WARRANTIES EXPRESS
+OR IMPLIED, INCLUDING BUT NOT LIMITED TO (A) ANY WARRANTY THAT THE USE OF THE
+INFORMATION HEREIN WILL NOT INFRINGE ANY RIGHTS OF THIRD PARTIES (INCLUDING
+WITHOUT LIMITATION ANY INTELLECTUAL PROPERTY RIGHTS INCLUDING PATENT, COPYRIGHT
+OR TRADEMARK RIGHTS); OR (B) ANY IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS
+FOR A PARTICULAR PURPOSE, TITLE OR NONINFRINGEMENT. IN NO EVENT WILL THE
+CONNECTIVITY STANDARDS ALLIANCE BE LIABLE FOR ANY LOSS OF PROFITS, LOSS OF
+BUSINESS, LOSS OF USE OF DATA, INTERRUPTION OF BUSINESS, OR FOR ANY OTHER
+DIRECT, INDIRECT, SPECIAL OR EXEMPLARY, INCIDENTAL, PUNITIVE OR CONSEQUENTIAL
+DAMAGES OF ANY KIND, IN CONTRACT OR IN TORT, IN CONNECTION WITH THIS DOCUMENT
+OR THE INFORMATION CONTAINED HEREIN, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
+LOSS OR DAMAGE.
+
+All company, brand and product names in this document may be trademarks that
+are the sole property of their respective owners.
+
+This notice and disclaimer must be included on all copies of this document.
+
+Connectivity Standards Alliance
+508 Second Street, Suite 206
+Davis, CA 95616, USA
+
+:xrefstyle: basic
+-->
+<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x002A" name="OTA Software Update Requestor Cluster" revision="1">
+  <revisionHistory>
+    <revision revision="1" summary="Initial revision"/>
+  </revisionHistory>
+  <clusterIds>
+    <clusterId id="0x002A" name="OTA Software Update Requestor"/>
+  </clusterIds>
+  <classification hierarchy="base" role="utility" picsCode="OTAR" scope="Node"/>
+  <dataTypes>
+    <enum name="AnnouncementReasonEnum">
+      <item value="0" name="SimpleAnnouncement" summary="An OTA Provider is announcing its presence.">
+        <mandatoryConform/>
+      </item>
+      <item value="1" name="UpdateAvailable" summary="An OTA Provider is announcing, either to a single Node or to a group of Nodes, that a new Software Image MAY be available.">
+        <mandatoryConform/>
+      </item>
+      <item value="2" name="UrgentUpdateAvailable" summary="An OTA Provider is announcing, either to a single Node or to a group of Nodes, that a new Software Image MAY be available, which contains an update that needs to be applied urgently.">
+        <mandatoryConform/>
+      </item>
+    </enum>
+    <enum name="ChangeReasonEnum">
+      <item value="0" name="Unknown" summary="The reason for a state change is unknown.">
+        <mandatoryConform/>
+      </item>
+      <item value="1" name="Success" summary="The reason for a state change is the success of a prior operation.">
+        <mandatoryConform/>
+      </item>
+      <item value="2" name="Failure" summary="The reason for a state change is the failure of a prior operation.">
+        <mandatoryConform/>
+      </item>
+      <item value="3" name="TimeOut" summary="The reason for a state change is a time-out.">
+        <mandatoryConform/>
+      </item>
+      <item value="4" name="DelayByProvider" summary="The reason for a state change is a request by the OTA Provider to wait.">
+        <optionalConform/>
+      </item>
+    </enum>
+    <enum name="UpdateStateEnum">
+      <item value="0" name="Unknown" summary="Current state is not yet determined.">
+        <mandatoryConform/>
+      </item>
+      <item value="1" name="Idle" summary="Indicate a Node not yet in the process of software update.">
+        <mandatoryConform/>
+      </item>
+      <item value="2" name="Querying" summary="Indicate a Node in the process of querying an OTA Provider.">
+        <mandatoryConform/>
+      </item>
+      <item value="3" name="DelayedOnQuery" summary="Indicate a Node waiting after a Busy response.">
+        <mandatoryConform/>
+      </item>
+      <item value="4" name="Downloading" summary="Indicate a Node currently in the process of downloading a software update.">
+        <mandatoryConform/>
+      </item>
+      <item value="5" name="Applying" summary="Indicate a Node currently in the process of verifying and applying a software update.">
+        <mandatoryConform/>
+      </item>
+      <item value="6" name="DelayedOnApply" summary="Indicate a Node waiting caused by AwaitNextAction response.">
+        <mandatoryConform/>
+      </item>
+      <item value="7" name="RollingBack" summary="Indicate a Node in the process of recovering to a previous version.">
+        <mandatoryConform/>
+      </item>
+      <item value="8" name="DelayedOnUserConsent" summary="Indicate a Node is capable of user consent.">
+        <mandatoryConform/>
+      </item>
+    </enum>
+    <struct name="ProviderLocation">
+      <field id="1" name="ProviderNodeID" type="node-id">
+        <mandatoryConform/>
+      </field>
+      <field id="2" name="Endpoint" type="endpoint-no">
+        <mandatoryConform/>
+      </field>
+      <access fabricScoped="true"/>
+    </struct>
+  </dataTypes>
+  <attributes>
+    <attribute id="0x0000" name="DefaultOTAProviders" type="list" default="empty">
+      <entry type="ProviderLocation"/>
+      <access read="true" write="true" readPrivilege="view" writePrivilege="admin" fabricScoped="true"/>
+      <quality persistence="nonVolatile"/>
+      <mandatoryConform/>
+      <constraint>
+        <desc/>
+      </constraint>
+    </attribute>
+    <attribute id="0x0001" name="UpdatePossible" type="bool" default="true">
+      <access read="true" readPrivilege="view"/>
+      <mandatoryConform/>
+    </attribute>
+    <attribute id="0x0002" name="UpdateState" type="UpdateStateEnum">
+      <enum default="Unknown"/>
+      <access read="true" readPrivilege="view"/>
+      <mandatoryConform/>
+    </attribute>
+    <attribute id="0x0003" name="UpdateStateProgress" type="uint8" default="null">
+      <access read="true" readPrivilege="view"/>
+      <quality nullable="true"/>
+      <mandatoryConform/>
+      <constraint>
+        <between>
+          <from value="0"/>
+          <to value="100"/>
+        </between>
+      </constraint>
+    </attribute>
+  </attributes>
+  <commands>
+    <command id="0x00" name="AnnounceOTAProvider" direction="commandToServer" response="Y">
+      <access invokePrivilege="admin"/>
+      <optionalConform/>
+      <field id="0" name="ProviderNodeID" type="node-id">
+        <mandatoryConform/>
+      </field>
+      <field id="1" name="VendorID" type="vendor-id">
+        <mandatoryConform/>
+      </field>
+      <field id="2" name="AnnouncementReason" type="AnnouncementReasonEnum">
+        <mandatoryConform/>
+      </field>
+      <field id="3" name="MetadataForNode" type="octstr">
+        <optionalConform/>
+        <constraint>
+          <maxLength value="512"/>
+        </constraint>
+      </field>
+      <field id="4" name="Endpoint" type="endpoint-no">
+        <mandatoryConform/>
+      </field>
+    </command>
+  </commands>
+  <events>
+    <event id="0x00" name="StateTransition" priority="info">
+      <access readPrivilege="view"/>
+      <mandatoryConform/>
+      <field id="0" name="PreviousState" type="UpdateStateEnum" default="Unknown">
+        <mandatoryConform/>
+      </field>
+      <field id="1" name="NewState" type="UpdateStateEnum">
+        <mandatoryConform/>
+      </field>
+      <field id="2" name="Reason" type="ChangeReasonEnum">
+        <mandatoryConform/>
+      </field>
+      <field id="3" name="TargetSoftwareVersion" type="uint32" default="null">
+        <quality nullable="true"/>
+        <mandatoryConform/>
+      </field>
+    </event>
+    <event id="0x01" name="VersionApplied" priority="critical">
+      <access readPrivilege="view"/>
+      <mandatoryConform/>
+      <field id="0" name="SoftwareVersion" type="uint32">
+        <mandatoryConform/>
+      </field>
+      <field id="1" name="ProductID" type="uint16">
+        <mandatoryConform/>
+      </field>
+    </event>
+    <event id="0x02" name="DownloadError" priority="info">
+      <access readPrivilege="view"/>
+      <mandatoryConform/>
+      <field id="0" name="SoftwareVersion" type="uint32">
+        <mandatoryConform/>
+      </field>
+      <field id="1" name="BytesDownloaded" type="uint64">
+        <mandatoryConform/>
+      </field>
+      <field id="2" name="ProgressPercent" type="uint8" default="null">
+        <quality nullable="true"/>
+        <mandatoryConform/>
+        <constraint>
+          <between>
+            <from value="0"/>
+            <to value="100"/>
+          </between>
+        </constraint>
+      </field>
+      <field id="3" name="PlatformCode" type="int64" default="null">
+        <quality nullable="true"/>
+        <mandatoryConform/>
+      </field>
+    </event>
+  </events>
+</cluster>

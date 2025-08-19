@@ -19,12 +19,19 @@
 # for details about the block below.
 #
 # === BEGIN CI TEST ARGUMENTS ===
-# test-runner-runs: run1
-# test-runner-run/run1/app: ${ALL_CLUSTERS_APP}
-# test-runner-run/run1/factoryreset: True
-# test-runner-run/run1/quiet: True
-# test-runner-run/run1/app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
-# test-runner-run/run1/script-args: --storage-path admin_storage.json --commissioning-method on-network --discriminator 1234 --passcode 20202021 --trace-to json:${TRACE_TEST_JSON}.json --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+# test-runner-runs:
+#   run1:
+#     app: ${ALL_CLUSTERS_APP}
+#     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
+#     script-args: >
+#       --storage-path admin_storage.json
+#       --commissioning-method on-network
+#       --discriminator 1234
+#       --passcode 20202021
+#       --trace-to json:${TRACE_TEST_JSON}.json
+#       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+#     factory-reset: true
+#     quiet: true
 # === END CI TEST ARGUMENTS ===
 
 import inspect
@@ -32,13 +39,14 @@ import logging
 import random
 from dataclasses import dataclass
 
-import chip.clusters as Clusters
-import chip.discovery as Discovery
-from chip import ChipUtility
-from chip.exceptions import ChipStackError
-from chip.interaction_model import InteractionModelError, Status
-from matter_testing_support import MatterBaseTest, async_test_body, default_matter_test_main, type_matches
 from mobly import asserts
+
+import matter.clusters as Clusters
+import matter.discovery as Discovery
+from matter import ChipUtility
+from matter.exceptions import ChipStackError
+from matter.interaction_model import InteractionModelError, Status
+from matter.testing.matter_testing import MatterBaseTest, async_test_body, default_matter_test_main, type_matches
 
 
 def get_all_cmds_for_cluster_id(cid: int) -> list[Clusters.ClusterObjects.ClusterCommand]:
@@ -216,7 +224,7 @@ class TC_IDM_1_2(MatterBaseTest):
                 await TH2.EstablishPASESessionIP(ipaddr=a, setupPinCode=params.setupPinCode,
                                                  nodeid=self.dut_node_id+1, port=device.port)
                 break
-            except ChipStackError:
+            except ChipStackError:  # chipstack-ok: This disables ChipStackError linter check. Some device IPs may fail, it tries all addresses until one works
                 continue
 
         try:
@@ -251,7 +259,7 @@ class TC_IDM_1_2(MatterBaseTest):
         try:
             await self.default_controller.SendCommand(nodeid=self.dut_node_id, endpoint=0, payload=cmd, suppressResponse=True)
             # TODO: Once the above issue is resolved, this needs a check to ensure that (always) no response was received.
-        except ChipStackError:
+        except ChipStackError:  # chipstack-ok: Using try/except to validate DUT behavior without failing the test on expected errors, assert_raises would fail the test
             logging.info("DUT correctly supressed the response")
 
         # Verify that the command had the correct side effect even if a response was sent

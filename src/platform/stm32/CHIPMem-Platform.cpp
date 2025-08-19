@@ -67,8 +67,6 @@ extern "C" void memMonitoringTrackFree(void * ptr, size_t size);
 
 #define USE_FREERTOS
 
-using namespace std;
-
 // Define the new operator for C++ to use the freeRTOS memory management
 // functions.
 //

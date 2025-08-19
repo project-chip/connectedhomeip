@@ -128,9 +128,9 @@ endif (matter_enable_ota_requestor)
 list(
     APPEND ${list_chip_main_sources}
 
-    ${chip_dir}/examples/all-clusters-minimal-app/all-clusters-common/src/bridged-actions-stub.cpp
-    ${chip_dir}/examples/all-clusters-minimal-app/all-clusters-common/src/smco-stub.cpp
-    ${chip_dir}/examples/all-clusters-minimal-app/all-clusters-common/src/static-supported-modes-manager.cpp
+    ${chip_dir}/examples/all-clusters-app/all-clusters-common/src/bridged-actions-stub.cpp
+    ${chip_dir}/examples/all-clusters-app/all-clusters-common/src/smco-stub.cpp
+    ${chip_dir}/examples/all-clusters-app/all-clusters-common/src/static-supported-modes-manager.cpp
 
     ${chip_dir}/examples/all-clusters-minimal-app/ameba/main/chipinterface.cpp
     ${chip_dir}/examples/all-clusters-minimal-app/ameba/main/DeviceCallbacks.cpp
@@ -147,7 +147,6 @@ add_library(
 )
 
 chip_configure_data_model(chip_main
-    INCLUDE_SERVER
     ZAP_FILE ${matter_example_path}/../all-clusters-common/all-clusters-minimal-app.zap
 )
 
@@ -177,6 +176,7 @@ target_include_directories(
     ${chip_dir}/examples/all-clusters-app/all-clusters-common
     ${chip_dir}/examples/all-clusters-app/all-clusters-common/include
     ${chip_dir}/examples/all-clusters-minimal-app/ameba/main/include
+    ${chip_dir}/examples/platform/ameba/observer
     ${chip_dir_output}/gen/include
     ${chip_dir}/src/include/
     ${chip_dir}/src/lib/

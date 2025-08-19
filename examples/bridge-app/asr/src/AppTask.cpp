@@ -24,12 +24,13 @@
 #include "init_Matter.h"
 #include "qrcodegen.h"
 #include <app/clusters/network-commissioning/network-commissioning.h>
-#include <app/server/OnboardingCodesUtil.h>
 #include <app/util/attribute-storage.h>
 #include <app/util/endpoint-config-api.h>
 #include <assert.h>
+#include <bridged-actions-stub.h>
 #include <platform/ASR/NetworkCommissioningDriver.h>
 #include <platform/CHIPDeviceLayer.h>
+#include <setup_payload/OnboardingCodesUtil.h>
 #include <setup_payload/QRCodeSetupPayloadGenerator.h>
 #include <setup_payload/SetupPayload.h>
 
@@ -52,6 +53,9 @@ constexpr EndpointId kNetworkCommissioningEndpointSecondary = 0xFFFE;
 app::Clusters::NetworkCommissioning::Instance
     sWiFiNetworkCommissioningInstance(kNetworkCommissioningEndpointMain /* Endpoint Id */,
                                       &(NetworkCommissioning::ASRWiFiDriver::GetInstance()));
+
+std::unique_ptr<app::Clusters::Actions::ActionsDelegateImpl> sActionsDelegateImpl;
+std::unique_ptr<app::Clusters::Actions::ActionsServer> sActionsServer;
 } // namespace
 
 void NetWorkCommissioningInstInit()
@@ -60,6 +64,20 @@ void NetWorkCommissioningInstInit()
 
     // We only have network commissioning on endpoint 0.
     emberAfEndpointEnableDisable(kNetworkCommissioningEndpointSecondary, false);
+}
+
+void emberAfActionsClusterInitCallback(EndpointId endpoint)
+{
+    VerifyOrReturn(endpoint == 1,
+                   ChipLogError(Zcl, "Actions cluster delegate is not implemented for endpoint with id %d.", endpoint));
+    VerifyOrReturn(emberAfContainsServer(endpoint, app::Clusters::Actions::Id) == true,
+                   ChipLogError(Zcl, "Endpoint %d does not support Actions cluster.", endpoint));
+    VerifyOrReturn(!sActionsDelegateImpl && !sActionsServer);
+
+    sActionsDelegateImpl = std::make_unique<app::Clusters::Actions::ActionsDelegateImpl>();
+    sActionsServer       = std::make_unique<app::Clusters::Actions::ActionsServer>(endpoint, *sActionsDelegateImpl.get());
+
+    sActionsServer->Init();
 }
 
 static DeviceCallbacks EchoCallbacks;

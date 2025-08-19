@@ -45,7 +45,7 @@ CHIP_ERROR OTAFactoryDataProcessor::ProcessInternal(ByteSpan & block)
     CHIP_ERROR error = CHIP_NO_ERROR;
 
     ReturnErrorOnFailure(mAccumulator.Accumulate(block));
-#if OTA_ENCRYPTION_ENABLE
+#ifdef SL_MATTER_ENABLE_OTA_ENCRYPTION
     MutableByteSpan mBlock = MutableByteSpan(mAccumulator.data(), mAccumulator.GetThreshold());
     OTATlvProcessor::vOtaProcessInternalEncryption(mBlock);
 #endif
@@ -79,7 +79,7 @@ CHIP_ERROR OTAFactoryDataProcessor::ApplyAction()
 exit:
     if (error != CHIP_NO_ERROR)
     {
-        ChipLogError(SoftwareUpdate, "Failed to update factory data. Error: %s", ErrorStr(error));
+        ChipLogError(SoftwareUpdate, "Failed to update factory data. Error: %" CHIP_ERROR_FORMAT, error.Format());
     }
     else
     {

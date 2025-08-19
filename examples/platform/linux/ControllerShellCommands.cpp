@@ -19,9 +19,9 @@
  * @file Contains shell commands for for performing discovery (eg. of commissionable nodes) related to commissioning.
  */
 
-#include <AppMain.h>
-#include <ControllerShellCommands.h>
-#include <inttypes.h>
+#include "ControllerShellCommands.h"
+#include "CommissionerMain.h"
+
 #include <lib/core/CHIPCore.h>
 #include <lib/shell/Commands.h>
 #include <lib/shell/Engine.h>
@@ -32,6 +32,8 @@
 #include <platform/CHIPDeviceLayer.h>
 #include <protocols/secure_channel/RendezvousParameters.h>
 #include <protocols/user_directed_commissioning/UserDirectedCommissioning.h>
+
+#include <inttypes.h>
 
 namespace chip {
 namespace Shell {

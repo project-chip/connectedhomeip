@@ -406,6 +406,7 @@ CHIP_ERROR ChipCertificateSet::ValidateCert(const ChipCertificateData * cert, Va
     err = FindValidCert(cert->mIssuerDN, cert->mAuthKeyId, context, static_cast<uint8_t>(depth + 1), &caCert);
     if (err != CHIP_NO_ERROR)
     {
+        ChipLogError(SecureChannel, "Failed to find valid cert during chain traversal: %" CHIP_ERROR_FORMAT, err.Format());
         ExitNow(err = CHIP_ERROR_CA_CERT_NOT_FOUND);
     }
 
@@ -632,6 +633,12 @@ CHIP_ERROR ChipDN::GetCertType(CertType & certType) const
 
             lCertType = CertType::kICA;
         }
+        else if (rdn[i].mAttrOID == kOID_AttributeType_MatterVidVerificationSignerId)
+        {
+            VerifyOrReturnError(lCertType == CertType::kNotSpecified, CHIP_ERROR_WRONG_CERT_DN);
+
+            lCertType = CertType::kVidVerificationSigner;
+        }
         else if (rdn[i].mAttrOID == kOID_AttributeType_MatterNodeId)
         {
             VerifyOrReturnError(lCertType == CertType::kNotSpecified, CHIP_ERROR_WRONG_CERT_DN);
@@ -668,6 +675,12 @@ CHIP_ERROR ChipDN::GetCertType(CertType & certType) const
         VerifyOrReturnError(!catsPresent, CHIP_ERROR_WRONG_CERT_DN);
     }
 
+    if (lCertType == CertType::kVidVerificationSigner)
+    {
+        VerifyOrReturnError(!fabricIdPresent, CHIP_ERROR_WRONG_CERT_DN);
+        // Lack of NodeID already checked since presence of NodeID will be detected as CertType::kNode.
+    }
+
     certType = lCertType;
 
     return CHIP_NO_ERROR;
@@ -688,6 +701,7 @@ CHIP_ERROR ChipDN::GetCertChipId(uint64_t & chipId) const
         case kOID_AttributeType_MatterICACId:
         case kOID_AttributeType_MatterNodeId:
         case kOID_AttributeType_MatterFirmwareSigningId:
+        case kOID_AttributeType_MatterVidVerificationSignerId:
             VerifyOrReturnError(!foundId, CHIP_ERROR_WRONG_CERT_DN);
 
             chipId  = rdn[i].mChipVal;
@@ -989,7 +1003,7 @@ CHIP_ERROR ChipDN::DecodeFromASN1(ASN1Reader & reader)
 
                 // Only one AttributeTypeAndValue allowed per RDN.
                 err = reader.Next();
-                ReturnErrorCodeIf(err == CHIP_NO_ERROR, ASN1_ERROR_UNSUPPORTED_ENCODING);
+                VerifyOrReturnError(err != CHIP_NO_ERROR, ASN1_ERROR_UNSUPPORTED_ENCODING);
                 VerifyOrReturnError(err == ASN1_END, err);
             }
             ASN1_EXIT_SET;
@@ -1245,7 +1259,7 @@ CHIP_ERROR ExtractNodeIdFabricIdFromOpCert(const ChipCertificateData & opcert, N
 {
     // Since we assume the cert is pre-validated, we are going to assume that
     // its subject in fact has both a node id and a fabric id.
-    ReturnErrorCodeIf(outNodeId == nullptr || outFabricId == nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(outNodeId != nullptr && outFabricId != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     NodeId nodeId      = 0;
     FabricId fabricId  = kUndefinedFabricId;
     bool foundNodeId   = false;
@@ -1341,7 +1355,7 @@ CHIP_ERROR ExtractCATsFromOpCert(const ChipCertificateData & opcert, CATValues &
             // This error should never happen in practice because valid NOC cannot have more
             // than kMaxSubjectCATAttributeCount CATs in its subject. The check that it is
             // valid NOC was done above.
-            ReturnErrorCodeIf(catCount == cats.size(), CHIP_ERROR_BUFFER_TOO_SMALL);
+            VerifyOrReturnError(catCount != cats.size(), CHIP_ERROR_BUFFER_TOO_SMALL);
             VerifyOrReturnError(CanCastTo<CASEAuthTag>(rdn.mChipVal), CHIP_ERROR_INVALID_ARGUMENT);
             cats.values[catCount++] = static_cast<CASEAuthTag>(rdn.mChipVal);
         }

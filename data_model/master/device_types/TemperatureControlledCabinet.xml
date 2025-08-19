@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <!--
-Copyright (C) Connectivity Standards Alliance (2023). All rights reserved.
+Copyright (C) Connectivity Standards Alliance (2025). All rights reserved.
 The information within this document is the property of the Connectivity
 Standards Alliance and its use and disclosure are restricted, except as
 expressly set forth herein.
@@ -51,34 +51,47 @@ are the sole property of their respective owners.
 
 This notice and disclaimer must be included on all copies of this document.
 
-Connectivity Standards Alliance +
-508 Second Street, Suite 206 +
+Connectivity Standards Alliance
+508 Second Street, Suite 206
 Davis, CA 95616, USA
+
+:xrefstyle: basic
 -->
-<deviceType xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd devicetype devicetype.xsd" id="0x0071" name="Temperature Controlled Cabinet" revision="3">
+<deviceType xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd devicetype devicetype.xsd" id="0x0071" name="Temperature Controlled Cabinet" revision="5">
   <revisionHistory>
     <revision revision="1" summary="Initial revision"/>
     <revision revision="2" summary="Extension to heating cabinets"/>
     <revision revision="3" summary="Added exclusivity for conditions"/>
+    <revision revision="4" summary="Mandate OperationCompletion Event for Oven Cavity Operational State cluster"/>
+    <revision revision="5" summary="Made TemperatureNumber (TN) the only valid temperature control mode"/>
   </revisionHistory>
   <classification class="simple" scope="endpoint"/>
+  <conditions>
+    <condition name="Cooler" summary="The device has cooling functionality."/>
+    <condition name="Heater" summary="The device has heating functionality."/>
+  </conditions>
   <clusters>
     <cluster id="0x0048" name="Oven Cavity Operational State" side="server">
       <optionalConform>
-        <attribute name="Heater"/>
+        <condition name="Heater"/>
       </optionalConform>
       <commands>
-        <command id="" name="Pause">
+        <command id="0x0000" name="Pause">
           <disallowConform/>
         </command>
-        <command id="" name="Resume">
+        <command id="0x0003" name="Resume">
           <disallowConform/>
         </command>
       </commands>
+      <events>
+        <event name="OperationCompletion">
+          <mandatoryConform/>
+        </event>
+      </events>
     </cluster>
     <cluster id="0x0049" name="Oven Mode" side="server">
       <optionalConform>
-        <attribute name="Heater"/>
+        <condition name="Heater"/>
       </optionalConform>
       <features>
         <feature code="" name="OnOff">
@@ -86,14 +99,14 @@ Davis, CA 95616, USA
         </feature>
       </features>
       <attributes>
-        <attribute code="" name="StartUpMode">
+        <attribute code="0x0002" name="StartUpMode">
           <disallowConform/>
         </attribute>
       </attributes>
     </cluster>
     <cluster id="0x0052" name="Refrigerator and Temperature Controlled Cabinet Mode" side="server">
       <optionalConform>
-        <attribute name="Cooler"/>
+        <condition name="Cooler"/>
       </optionalConform>
       <features>
         <feature code="" name="OnOff">
@@ -101,13 +114,21 @@ Davis, CA 95616, USA
         </feature>
       </features>
       <attributes>
-        <attribute code="" name="StartUpMode">
+        <attribute code="0x0002" name="StartUpMode">
           <disallowConform/>
         </attribute>
       </attributes>
     </cluster>
     <cluster id="0x0056" name="Temperature Control" side="server">
       <mandatoryConform/>
+      <features>
+        <feature code="" name="TemperatureNumber">
+          <mandatoryConform/>
+        </feature>
+        <feature code="" name="TemperatureLevel">
+          <disallowConform/>
+        </feature>
+      </features>
     </cluster>
     <cluster id="0x0402" name="Temperature Measurement" side="server">
       <optionalConform/>

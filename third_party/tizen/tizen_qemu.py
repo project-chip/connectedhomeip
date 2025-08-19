@@ -19,11 +19,20 @@ import logging
 import os
 import re
 import shlex
+import shutil
 import subprocess
 import sys
 
+log = logging.getLogger(__name__)
+
 # Absolute path to Tizen Studio CLI tool.
-tizen_sdk_root = os.environ["TIZEN_SDK_ROOT"]
+tizen_sdk_root = os.environ.get("TIZEN_SDK_ROOT", "")
+
+# Pigweed installation directory.
+pw_install_dir = os.environ.get("PW_PIGWEED_CIPD_INSTALL_DIR", "")
+
+# Absolute path to default qemu-system-arm binary.
+qemu_system_arm = shutil.which("qemu-system-arm")
 
 # Setup basic logging capabilities.
 logging.basicConfig(level=logging.DEBUG)
@@ -35,10 +44,10 @@ parser.add_argument(
     help="run QEMU in interactive mode (no output redirection, no runner)")
 parser.add_argument(
     '--smp', metavar='NUM', type=int, default=2,
-    help=("the number of CPUs available in QEMU; default: %(default)s"))
+    help="the number of CPUs available in QEMU; default: %(default)s")
 parser.add_argument(
     '--memory', metavar='SIZE', type=int, default=512,
-    help=("the size of RAM assigned to QEMU; default: %(default)s"))
+    help="the size of RAM assigned to QEMU; default: %(default)s")
 parser.add_argument(
     '--virtio-net', action='store_true',
     help="enable external network access via virtio-net")
@@ -58,18 +67,46 @@ parser.add_argument(
     help=("path to the system data image; "
           "default: $TIZEN_SDK_ROOT/iot-sysdata.img"))
 parser.add_argument(
-    '--image-iso', metavar='IMAGE',
-    help=("path to the ISO image with the runner script; the ISO image "
-          "should have 'CHIP' label and a file named 'runner.sh' at the "
-          "root directory"))
+    '--share', type=str,
+    help="host directory to share with the guest")
+parser.add_argument(
+    '--runner', type=str,
+    help=("path to the runner script which will be executed after boot; "
+          "it should be relative to the shared directory"))
 parser.add_argument(
     '--output', metavar='FILE', default="/dev/null",
     help="store the QEMU output in a FILE")
 
 args = parser.parse_args()
 
+
+def whereis(binary_name):
+    # Get the PATH environment variable.
+    path_dirs = os.environ.get('PATH', '').split(os.pathsep)
+
+    # List to store found paths.
+    found_paths = []
+
+    # Search for the binary in each directory.
+    for directory in path_dirs:
+        if found := shutil.which(binary_name, path=directory):
+            found_paths.append(found)
+
+    return found_paths
+
+
+# If qemu-system-arm binary is from Pigweed prefer the next one in PATH if there is one.
+if pw_install_dir != "" and qemu_system_arm.startswith(pw_install_dir):
+    binaries = whereis("qemu-system-arm")
+    if len(binaries) > 1:
+        qemu_system_arm = binaries[1]
+    else:
+        log.warning(f"The only qemu-system-arm we have is from Pigweed '{pw_install_dir}'")
+        log.warning('This is unexpected and is likely to lead to trouble.')
+        log.warning('Please install qemu-system-arm from Debian using `sudo apt install qemu-system-arm`')
+
 qemu_args = [
-    'qemu-system-arm',
+    qemu_system_arm,
     '-monitor', 'null',
     '-serial', 'stdio',
     '-display', 'none',
@@ -78,6 +115,13 @@ qemu_args = [
     '-m', str(args.memory),
 ]
 
+if args.share:
+    # Add directory sharing.
+    qemu_args += [
+        '-virtfs',
+        f'local,path={args.share},mount_tag=host0,security_model=mapped-xattr'
+    ]
+
 if args.virtio_net:
     # Add network support.
     qemu_args += [
@@ -85,27 +129,26 @@ if args.virtio_net:
         '-netdev', 'user,id=virtio-net',
     ]
 
-if args.image_iso:
-    # Add a block device for the runner ISO image.
-    qemu_args += [
-        '-device', 'virtio-blk-device,drive=virtio-blk3',
-        '-drive', 'file=%s,id=virtio-blk3,if=none,format=raw' % args.image_iso,
-    ]
-
 # Add Tizen image block devices.
 qemu_args += [
     '-device', 'virtio-blk-device,drive=virtio-blk2',
-    '-drive', 'file=%s,id=virtio-blk2,if=none,format=raw,readonly=on' % args.image_data,
+    '-drive', f'file={args.image_data},id=virtio-blk2,if=none,format=raw,readonly=on',
     # XXX: Device for the root image has to be added as the last one so we can
     #      use /dev/vda as the root device in the kernel command line arguments.
     '-device', 'virtio-blk-device,drive=virtio-blk1',
-    '-drive', 'file=%s,id=virtio-blk1,if=none,format=raw,readonly=on' % args.image_root,
+    '-drive', f'file={args.image_root},id=virtio-blk1,if=none,format=raw,readonly=on',
 ]
 
 kernel_args = "console=ttyAMA0 earlyprintk earlycon root=/dev/vda"
+# For some reason memory cgroup is not enabled by default in Tizen kernel,
+# but it is required by resourced system service on Tizen >= 9.0.
+kernel_args += " cgroup_enable=memory"
 if args.interactive:
     # Run root shell instead of the runner script.
     kernel_args += " rootshell"
+
+if args.runner:
+    kernel_args += f' runner=/mnt/chip/{args.runner}'
 
 qemu_args += [
     '-kernel', args.kernel,
@@ -119,12 +162,12 @@ if args.interactive:
 status = 0
 # Run QEMU.
 with open(args.output, "wb") as output:
-    logging.info("run: %s", " ".join(map(shlex.quote, qemu_args)))
+    log.info("run: %s", " ".join(map(shlex.quote, qemu_args)))
     with subprocess.Popen(qemu_args, stdout=subprocess.PIPE, stderr=subprocess.STDOUT) as proc:
         for line in iter(proc.stdout.readline, b''):
 
             # Forward the output to the stdout and the log file.
-            sys.stdout.write(line.decode(sys.stdout.encoding))
+            sys.stdout.write(line.decode(sys.stdout.encoding, errors='ignore'))
             sys.stdout.flush()
             output.write(line)
 

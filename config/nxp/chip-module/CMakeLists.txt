@@ -115,16 +115,16 @@ endif()
 
 if (CONFIG_NET_L2_OPENTHREAD)
     matter_add_gn_arg_string("chip_mdns" "platform")
-elseif(CONFIG_WIFI_NXP)
+elseif(CONFIG_WIFI_NXP OR CONFIG_CHIP_ETHERNET)
     matter_add_gn_arg_string("chip_mdns" "minimal")
 else()
     matter_add_gn_arg_string("chip_mdns" "none")
 endif()
 
 
-# if (BOARD STREQUAL "native_posix")
+# if (BOARD STREQUAL "native_sim")
 #     matter_add_gn_arg_string("target_cpu" "x86")
-# elseif (BOARD STREQUAL "native_posix_64")
+# elseif (BOARD STREQUAL "native_sim/native/64")
 #     matter_add_gn_arg_string("target_cpu" "x64")
 # endif()
 
@@ -174,14 +174,7 @@ endif()
 # ==============================================================================
 # Define 'chip-ota-image' target for building CHIP OTA image
 # ==============================================================================
-if(EXISTS "${CHIP_ROOT}/src/platform/nxp/zephyr/boards/${BOARD}/${BOARD}.overlay")
-  set(DTC_BOARD_OVERLAY "${CHIP_ROOT}/src/platform/nxp/zephyr/boards/${BOARD}/${BOARD}.overlay")
-else()
-  set(DTC_BOARD_OVERLAY "")
-  message(STATUS "No board overlay found")
-endif()
-
-if (CONFIG_CHIP_OTA_REQUESTOR)
+if(CONFIG_CHIP_OTA_REQUESTOR)
     if(CONFIG_MCUBOOT_SIGNATURE_KEY_FILE STREQUAL "")
         set(ZEPHYR_OUTPUT_NAME "zephyr")
     else()
@@ -193,7 +186,8 @@ if (CONFIG_CHIP_OTA_REQUESTOR)
     add_custom_target(build_mcuboot ALL
         COMMAND
         west build -b ${BOARD} -d build_mcuboot ${ZEPHYR_BASE}/../bootloader/mcuboot/boot/zephyr
-            -- -DOVERLAY_CONFIG=${GLOBAL_BOOTLOADER_CONF_OVERLAY_FILE} -DEXTRA_DTC_OVERLAY_FILE=${DTC_BOARD_OVERLAY}
+            -- -DOVERLAY_CONFIG=${GLOBAL_BOOTLOADER_CONF_OVERLAY_FILE}
+            -DEXTRA_DTC_OVERLAY_FILE="${DTC_OVERLAY_FILE};${EXTRA_DTC_OVERLAY_FILE}"
         COMMAND
         cp ${PROJECT_BINARY_DIR}/../modules/connectedhomeip/build_mcuboot/zephyr/zephyr.bin ${PROJECT_BINARY_DIR}/zephyr.mcuboot.bin
     )

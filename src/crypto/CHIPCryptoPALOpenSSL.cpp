@@ -433,36 +433,72 @@ CHIP_ERROR Hash_SHA1(const uint8_t * data, const size_t data_length, uint8_t * o
     return CHIP_NO_ERROR;
 }
 
-Hash_SHA256_stream::Hash_SHA256_stream() {}
+// For OpenSSL, we store a pointer to the digest context (EVP_MD_CTX) since EVP_MD_CTX is Opaque.
+static_assert(kMAX_Hash_SHA256_Context_Size >= sizeof(void *),
+              "kMAX_Hash_SHA256_Context_Size needs to at least be able to store a pointer");
+
+// Storing a pointer to EVP_MD_CTX in HashSHA256OpaqueContext instead of the actual EVP_MD_CTX structure, as EVP_MD_CTX was made
+// opaque by OpenSSL and is dynamically allocated.
+static inline void set_inner_hash_evp_md_ctx(HashSHA256OpaqueContext * context, EVP_MD_CTX * evp_ctx)
+{
+    *SafePointerCast<EVP_MD_CTX **>(context) = evp_ctx;
+}
+
+static inline EVP_MD_CTX * to_inner_hash_evp_md_ctx(HashSHA256OpaqueContext * context)
+{
+    return *SafePointerCast<EVP_MD_CTX **>(context);
+}
+
+Hash_SHA256_stream::Hash_SHA256_stream()
+{
+    set_inner_hash_evp_md_ctx(&mContext, nullptr);
+}
 
 Hash_SHA256_stream::~Hash_SHA256_stream()
 {
     Clear();
 }
 
-static_assert(kMAX_Hash_SHA256_Context_Size >= sizeof(SHA256_CTX),
-              "kMAX_Hash_SHA256_Context_Size is too small for the size of underlying SHA256_CTX");
-
-static inline SHA256_CTX * to_inner_hash_sha256_context(HashSHA256OpaqueContext * context)
-{
-    return SafePointerCast<SHA256_CTX *>(context);
-}
-
 CHIP_ERROR Hash_SHA256_stream::Begin()
 {
-    SHA256_CTX * const context = to_inner_hash_sha256_context(&mContext);
 
-    const int result = SHA256_Init(context);
+    EVP_MD_CTX * mdctx = EVP_MD_CTX_new();
+    VerifyOrReturnError(mdctx != nullptr, CHIP_ERROR_INTERNAL);
+
+    set_inner_hash_evp_md_ctx(&mContext, mdctx);
+
+    const int result = EVP_DigestInit_ex(mdctx, _digestForType(DigestType::SHA256), nullptr);
+
     VerifyOrReturnError(result == 1, CHIP_ERROR_INTERNAL);
 
     return CHIP_NO_ERROR;
 }
 
+bool Hash_SHA256_stream::IsInitialized()
+{
+    EVP_MD_CTX * mdctx = to_inner_hash_evp_md_ctx(&mContext);
+    VerifyOrReturnValue(mdctx != nullptr, false);
+
+// Verify that the EVP_MD_CTX is initialized to SHA256 (ensures that EVP_DigestInit_ex was successfully called).
+// The legacy API EVP_MD_CTX_md() to check SHA256 initialization is deprecated in OpenSSL 3.0
+// and was replaced by EVP_MD_CTX_get0_md().
+// OpenSSL 1.1.1, which BoringSSL also uses at the time of this comment, does not support the newer replacement API.
+#if CHIP_CRYPTO_BORINGSSL || (defined(OPENSSL_VERSION_NUMBER) && OPENSSL_VERSION_NUMBER < 0x30000000L)
+    return EVP_MD_CTX_md(mdctx) == _digestForType(DigestType::SHA256);
+#else
+    return EVP_MD_CTX_get0_md(mdctx) == _digestForType(DigestType::SHA256);
+#endif
+}
+
 CHIP_ERROR Hash_SHA256_stream::AddData(const ByteSpan data)
 {
-    SHA256_CTX * const context = to_inner_hash_sha256_context(&mContext);
+    VerifyOrReturnError(IsInitialized(), CHIP_ERROR_UNINITIALIZED, Clear());
 
-    const int result = SHA256_Update(context, Uint8::to_const_uchar(data.data()), data.size());
+    EVP_MD_CTX * mdctx = to_inner_hash_evp_md_ctx(&mContext);
+    VerifyOrReturnError(mdctx != nullptr, CHIP_ERROR_INTERNAL);
+
+    const int result = EVP_DigestUpdate(mdctx, data.data(), data.size());
+
     VerifyOrReturnError(result == 1, CHIP_ERROR_INTERNAL);
 
     return CHIP_NO_ERROR;
@@ -470,27 +506,43 @@ CHIP_ERROR Hash_SHA256_stream::AddData(const ByteSpan data)
 
 CHIP_ERROR Hash_SHA256_stream::GetDigest(MutableByteSpan & out_buffer)
 {
-    SHA256_CTX * context = to_inner_hash_sha256_context(&mContext);
 
-    // Back-up context as we are about to finalize the hash to extract digest.
-    SHA256_CTX previous_ctx = *context;
+    VerifyOrReturnError(IsInitialized(), CHIP_ERROR_UNINITIALIZED, Clear());
+
+    EVP_MD_CTX * mdctx = to_inner_hash_evp_md_ctx(&mContext);
+
+    // Back-up the context as we are about to finalize the hash to extract digest.
+    EVP_MD_CTX * previous_mdctx = EVP_MD_CTX_new();
+    VerifyOrReturnError(previous_mdctx != nullptr, CHIP_ERROR_INTERNAL);
+    const int copy_result = EVP_MD_CTX_copy_ex(previous_mdctx, mdctx);
+    VerifyOrReturnError(copy_result == 1, CHIP_ERROR_INTERNAL);
 
     // Pad + compute digest, then finalize context. It is restored next line to continue.
     CHIP_ERROR result = Finish(out_buffer);
 
-    // Restore context prior to finalization.
-    *context = previous_ctx;
+    // free the finalized context.
+    EVP_MD_CTX_free(mdctx);
+
+    // Restore the backed up context, to be able to get intermediate digest again if needed
+    set_inner_hash_evp_md_ctx(&mContext, previous_mdctx);
 
     return result;
 }
 
 CHIP_ERROR Hash_SHA256_stream::Finish(MutableByteSpan & out_buffer)
 {
-    VerifyOrReturnError(out_buffer.size() >= kSHA256_Hash_Length, CHIP_ERROR_BUFFER_TOO_SMALL);
+    unsigned int size;
 
-    SHA256_CTX * const context = to_inner_hash_sha256_context(&mContext);
-    const int result           = SHA256_Final(Uint8::to_uchar(out_buffer.data()), context);
+    VerifyOrReturnError(out_buffer.size() >= kSHA256_Hash_Length, CHIP_ERROR_BUFFER_TOO_SMALL);
+    VerifyOrReturnError(IsInitialized(), CHIP_ERROR_UNINITIALIZED, Clear());
+
+    EVP_MD_CTX * mdctx = to_inner_hash_evp_md_ctx(&mContext);
+
+    const int result = EVP_DigestFinal_ex(mdctx, out_buffer.data(), &size);
+
     VerifyOrReturnError(result == 1, CHIP_ERROR_INTERNAL);
+    VerifyOrReturnError(size == kSHA256_Hash_Length, CHIP_ERROR_INTERNAL);
+
     out_buffer = out_buffer.SubSpan(0, kSHA256_Hash_Length);
 
     return CHIP_NO_ERROR;
@@ -498,6 +550,12 @@ CHIP_ERROR Hash_SHA256_stream::Finish(MutableByteSpan & out_buffer)
 
 void Hash_SHA256_stream::Clear()
 {
+    EVP_MD_CTX * mdctx = to_inner_hash_evp_md_ctx(&mContext);
+
+    // EVP_MD_CTX_free does nothing if a nullptr is passed to it
+    EVP_MD_CTX_free(mdctx);
+    set_inner_hash_evp_md_ctx(&mContext, nullptr);
+
     OPENSSL_cleanse(this, sizeof(*this));
 }
 
@@ -1405,6 +1463,8 @@ void Spake2p_P256_SHA256_HKDF_HMAC::Clear()
         BN_CTX_free(context->bn_ctx);
     }
 
+    sha256_hash_ctx.Clear();
+
     free_point(M);
     free_point(N);
     free_point(X);
@@ -1562,7 +1622,7 @@ CHIP_ERROR Spake2p_P256_SHA256_HKDF_HMAC::PointCofactorMul(void * R)
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR Spake2p_P256_SHA256_HKDF_HMAC::ComputeL(uint8_t * Lout, size_t * L_len, const uint8_t * w1in, size_t w1in_len)
+CHIP_ERROR Spake2p_P256_SHA256_HKDF_HMAC::ComputeL(uint8_t * Lout, size_t * L_len, const uint8_t * w1sin, size_t w1sin_len)
 {
     CHIP_ERROR error      = CHIP_ERROR_INTERNAL;
     int error_openssl     = 0;
@@ -1577,8 +1637,8 @@ CHIP_ERROR Spake2p_P256_SHA256_HKDF_HMAC::ComputeL(uint8_t * Lout, size_t * L_le
     Lout_point = EC_POINT_new(context->curve);
     VerifyOrExit(Lout_point != nullptr, error = CHIP_ERROR_INTERNAL);
 
-    VerifyOrExit(CanCastTo<boringssl_size_t_openssl_int>(w1in_len), error = CHIP_ERROR_INTERNAL);
-    BN_bin2bn(Uint8::to_const_uchar(w1in), static_cast<boringssl_size_t_openssl_int>(w1in_len), w1_bn);
+    VerifyOrExit(CanCastTo<boringssl_size_t_openssl_int>(w1sin_len), error = CHIP_ERROR_INTERNAL);
+    BN_bin2bn(Uint8::to_const_uchar(w1sin), static_cast<boringssl_size_t_openssl_int>(w1sin_len), w1_bn);
     error_openssl = BN_mod(w1_bn, w1_bn, (BIGNUM *) order, context->bn_ctx);
     VerifyOrExit(error_openssl == 1, error = CHIP_ERROR_INTERNAL);
 
@@ -1626,8 +1686,8 @@ CHIP_ERROR VerifyAttestationCertificateFormat(const ByteSpan & cert, Attestation
     VerifyOrExit(X509_get_serialNumber(x509Cert) != nullptr, err = CHIP_ERROR_INTERNAL);
     VerifyOrExit(X509_get_signature_nid(x509Cert) == NID_ecdsa_with_SHA256, err = CHIP_ERROR_INTERNAL);
     VerifyOrExit(X509_get_issuer_name(x509Cert) != nullptr, err = CHIP_ERROR_INTERNAL);
-    VerifyOrExit(X509_get_notBefore(x509Cert) != nullptr, err = CHIP_ERROR_INTERNAL);
-    VerifyOrExit(X509_get_notAfter(x509Cert) != nullptr, err = CHIP_ERROR_INTERNAL);
+    VerifyOrExit(X509_getm_notBefore(x509Cert) != nullptr, err = CHIP_ERROR_INTERNAL);
+    VerifyOrExit(X509_getm_notAfter(x509Cert) != nullptr, err = CHIP_ERROR_INTERNAL);
     VerifyOrExit(X509_get_subject_name(x509Cert) != nullptr, err = CHIP_ERROR_INTERNAL);
 
     // Verify public key presence and format.
@@ -1685,16 +1745,20 @@ CHIP_ERROR VerifyAttestationCertificateFormat(const ByteSpan & cert, Attestation
                 }
             }
             break;
-        case NID_subject_key_identifier:
+        case NID_subject_key_identifier: {
             VerifyOrExit(!isCritical && !extSKIDPresent, err = CHIP_ERROR_INTERNAL);
-            VerifyOrExit(X509_get0_subject_key_id(x509Cert)->length == kSubjectKeyIdentifierLength, err = CHIP_ERROR_INTERNAL);
+            const ASN1_OCTET_STRING * pSKID = X509_get0_subject_key_id(x509Cert);
+            VerifyOrExit(pSKID != nullptr && pSKID->length == kSubjectKeyIdentifierLength, err = CHIP_ERROR_INTERNAL);
             extSKIDPresent = true;
             break;
-        case NID_authority_key_identifier:
+        }
+        case NID_authority_key_identifier: {
             VerifyOrExit(!isCritical && !extAKIDPresent, err = CHIP_ERROR_INTERNAL);
-            VerifyOrExit(X509_get0_authority_key_id(x509Cert)->length == kAuthorityKeyIdentifierLength, err = CHIP_ERROR_INTERNAL);
+            const ASN1_OCTET_STRING * pAKID = X509_get0_authority_key_id(x509Cert);
+            VerifyOrExit(pAKID != nullptr && pAKID->length == kAuthorityKeyIdentifierLength, err = CHIP_ERROR_INTERNAL);
             extAKIDPresent = true;
             break;
+        }
         default:
             break;
         }
@@ -1779,12 +1843,16 @@ CHIP_ERROR ValidateCertificateChain(const uint8_t * rootCertificate, size_t root
     {
         X509_VERIFY_PARAM * param = X509_STORE_CTX_get0_param(verifyCtx);
         chip::ASN1::ASN1UniversalTime asn1Time;
-        char * asn1TimeStr = reinterpret_cast<char *>(X509_get_notBefore(x509LeafCertificate)->data);
         uint32_t unixEpoch;
 
         VerifyOrExit(param != nullptr, (result = CertificateChainValidationResult::kNoMemory, err = CHIP_ERROR_NO_MEMORY));
 
-        VerifyOrExit(CHIP_NO_ERROR == asn1Time.ImportFrom_ASN1_TIME_string(CharSpan(asn1TimeStr, strlen(asn1TimeStr))),
+        ASN1_TIME * pNotBefore = X509_getm_notBefore(x509LeafCertificate);
+        VerifyOrExit(pNotBefore != nullptr,
+                     (result = CertificateChainValidationResult::kLeafFormatInvalid, err = CHIP_ERROR_INTERNAL));
+        CharSpan asn1TimeSpan(reinterpret_cast<char *>(pNotBefore->data), static_cast<size_t>(pNotBefore->length));
+
+        VerifyOrExit(CHIP_NO_ERROR == asn1Time.ImportFrom_ASN1_TIME_string(asn1TimeSpan),
                      (result = CertificateChainValidationResult::kLeafFormatInvalid, err = CHIP_ERROR_INTERNAL));
 
         VerifyOrExit(asn1Time.ExportTo_UnixTime(unixEpoch),
@@ -1837,9 +1905,9 @@ CHIP_ERROR IsCertificateValidAtIssuance(const ByteSpan & candidateCertificate, c
     x509issuerCertificate = d2i_X509(nullptr, &pIssuerCertificate, static_cast<long>(issuerCertificate.size()));
     VerifyOrExit(x509issuerCertificate != nullptr, error = CHIP_ERROR_NO_MEMORY);
 
-    candidateNotBeforeTime = X509_get_notBefore(x509CandidateCertificate);
-    issuerNotBeforeTime    = X509_get_notBefore(x509issuerCertificate);
-    issuerNotAfterTime     = X509_get_notAfter(x509issuerCertificate);
+    candidateNotBeforeTime = X509_getm_notBefore(x509CandidateCertificate);
+    issuerNotBeforeTime    = X509_getm_notBefore(x509issuerCertificate);
+    issuerNotAfterTime     = X509_getm_notAfter(x509issuerCertificate);
     VerifyOrExit(candidateNotBeforeTime && issuerNotBeforeTime && issuerNotAfterTime, error = CHIP_ERROR_INTERNAL);
 
     result = ASN1_TIME_diff(&days, &seconds, issuerNotBeforeTime, candidateNotBeforeTime);
@@ -1876,14 +1944,14 @@ CHIP_ERROR IsCertificateValidAtCurrentTime(const ByteSpan & certificate)
     x509Certificate = d2i_X509(nullptr, &pCertificate, static_cast<long>(certificate.size()));
     VerifyOrExit(x509Certificate != nullptr, error = CHIP_ERROR_NO_MEMORY);
 
-    time = X509_get_notBefore(x509Certificate);
+    time = X509_getm_notBefore(x509Certificate);
     VerifyOrExit(time, error = CHIP_ERROR_INTERNAL);
 
     result = X509_cmp_current_time(time);
     // check if certificate's notBefore timestamp is earlier than or equal to current time.
     VerifyOrExit(result == -1, error = CHIP_ERROR_CERT_EXPIRED);
 
-    time = X509_get_notAfter(x509Certificate);
+    time = X509_getm_notAfter(x509Certificate);
     VerifyOrExit(time, error = CHIP_ERROR_INTERNAL);
 
     result = X509_cmp_current_time(time);
@@ -2211,11 +2279,32 @@ CHIP_ERROR ExtractIssuerFromX509Cert(const ByteSpan & certificate, MutableByteSp
     return ExtractRawDNFromX509Cert(false, certificate, issuer);
 }
 
+class ScopedASN1Object
+{
+public:
+    ScopedASN1Object(const char * string, int no_name) : obj(OBJ_txt2obj(string, no_name)) {}
+    ~ScopedASN1Object() { ASN1_OBJECT_free(obj); }
+
+    explicit operator bool() const { return obj != nullptr; }
+    ASN1_OBJECT * Get() const { return obj; }
+
+    ScopedASN1Object(const ScopedASN1Object &)             = delete;
+    ScopedASN1Object & operator=(const ScopedASN1Object &) = delete;
+
+private:
+    ASN1_OBJECT * obj = nullptr;
+};
+
 CHIP_ERROR ExtractVIDPIDFromX509Cert(const ByteSpan & certificate, AttestationCertVidPid & vidpid)
 {
-    ASN1_OBJECT * commonNameObj = OBJ_txt2obj("2.5.4.3", 1);
-    ASN1_OBJECT * matterVidObj  = OBJ_txt2obj("1.3.6.1.4.1.37244.2.1", 1); // Matter VID OID - taken from Spec
-    ASN1_OBJECT * matterPidObj  = OBJ_txt2obj("1.3.6.1.4.1.37244.2.2", 1); // Matter PID OID - taken from Spec
+    ScopedASN1Object commonNameObj("2.5.4.3", 1);
+    VerifyOrReturnError(commonNameObj, CHIP_ERROR_NO_MEMORY);
+
+    ScopedASN1Object matterVidObj("1.3.6.1.4.1.37244.2.1", 1); // Matter VID OID - taken from Spec
+    VerifyOrReturnError(matterVidObj, CHIP_ERROR_NO_MEMORY);
+
+    ScopedASN1Object matterPidObj("1.3.6.1.4.1.37244.2.2", 1); // Matter PID OID - taken from Spec
+    VerifyOrReturnError(matterPidObj, CHIP_ERROR_NO_MEMORY);
 
     CHIP_ERROR err                     = CHIP_NO_ERROR;
     X509 * x509certificate             = nullptr;
@@ -2224,7 +2313,7 @@ CHIP_ERROR ExtractVIDPIDFromX509Cert(const ByteSpan & certificate, AttestationCe
     int x509EntryCountIdx              = 0;
     AttestationCertVidPid vidpidFromCN;
 
-    VerifyOrReturnError(!certificate.empty() && CanCastTo<long>(certificate.size()), CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(!certificate.empty() && CanCastTo<long>(certificate.size()), err = CHIP_ERROR_INVALID_ARGUMENT);
 
     x509certificate = d2i_X509(nullptr, &pCertificate, static_cast<long>(certificate.size()));
     VerifyOrExit(x509certificate != nullptr, err = CHIP_ERROR_NO_MEMORY);
@@ -2240,15 +2329,15 @@ CHIP_ERROR ExtractVIDPIDFromX509Cert(const ByteSpan & certificate, AttestationCe
         VerifyOrExit(object != nullptr, err = CHIP_ERROR_INTERNAL);
 
         DNAttrType attrType = DNAttrType::kUnspecified;
-        if (OBJ_cmp(object, commonNameObj) == 0)
+        if (OBJ_cmp(object, commonNameObj.Get()) == 0)
         {
             attrType = DNAttrType::kCommonName;
         }
-        else if (OBJ_cmp(object, matterVidObj) == 0)
+        else if (OBJ_cmp(object, matterVidObj.Get()) == 0)
         {
             attrType = DNAttrType::kMatterVID;
         }
-        else if (OBJ_cmp(object, matterPidObj) == 0)
+        else if (OBJ_cmp(object, matterPidObj.Get()) == 0)
         {
             attrType = DNAttrType::kMatterPID;
         }
@@ -2275,9 +2364,6 @@ CHIP_ERROR ExtractVIDPIDFromX509Cert(const ByteSpan & certificate, AttestationCe
     }
 
 exit:
-    ASN1_OBJECT_free(commonNameObj);
-    ASN1_OBJECT_free(matterVidObj);
-    ASN1_OBJECT_free(matterPidObj);
     X509_free(x509certificate);
 
     return err;
@@ -2297,11 +2383,11 @@ CHIP_ERROR ReplaceCertIfResignedCertFound(const ByteSpan & referenceCertificate,
     MutableByteSpan referenceSKID(referenceSKIDBuf);
     MutableByteSpan candidateSKID(candidateSKIDBuf);
 
-    ReturnErrorCodeIf(referenceCertificate.empty(), CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(!referenceCertificate.empty(), CHIP_ERROR_INVALID_ARGUMENT);
 
     outCertificate = referenceCertificate;
 
-    ReturnErrorCodeIf(candidateCertificates == nullptr || candidateCertificatesCount == 0, CHIP_NO_ERROR);
+    VerifyOrReturnError(candidateCertificates != nullptr && candidateCertificatesCount != 0, CHIP_NO_ERROR);
 
     ReturnErrorOnFailure(ExtractSKIDFromX509Cert(referenceCertificate, referenceSKID));
 

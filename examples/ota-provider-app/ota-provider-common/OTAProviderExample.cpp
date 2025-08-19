@@ -54,14 +54,14 @@ constexpr uint8_t kUpdateTokenStrLen = kUpdateTokenLen * 2 + 1; // Hex string ne
 constexpr size_t kOtaHeaderMaxSize   = 1024;
 
 // Arbitrary BDX Transfer Params
-constexpr uint32_t kMaxBdxBlockSize                = 1024;
+constexpr uint16_t kMaxBdxBlockSize                = 1024;
 constexpr chip::System::Clock::Timeout kBdxTimeout = chip::System::Clock::Seconds16(5 * 60); // OTA Spec mandates >= 5 minutes
 constexpr uint32_t kBdxServerPollIntervalMillis    = 50;                                     // poll every 50ms by default
 
 void GetUpdateTokenString(const chip::ByteSpan & token, char * buf, size_t bufSize)
 {
     const uint8_t * tokenData = static_cast<const uint8_t *>(token.data());
-    size_t minLength          = chip::min(token.size(), bufSize);
+    size_t minLength          = std::min(token.size(), bufSize);
     for (size_t i = 0; i < (minLength / 2) - 1; ++i)
     {
         snprintf(&buf[i * 2], bufSize, "%02X", tokenData[i]);
@@ -89,6 +89,7 @@ OTAProviderExample::OTAProviderExample()
     mUserConsentDelegate       = nullptr;
     mUserConsentNeeded         = false;
     mPollInterval              = kBdxServerPollIntervalMillis;
+    mMaxBDXBlockSize           = kMaxBdxBlockSize;
     mCandidates.clear();
 }
 
@@ -275,7 +276,7 @@ void OTAProviderExample::SendQueryImageResponse(app::CommandHandler * commandObj
         {
             CHIP_ERROR error =
                 mBdxOtaSender.PrepareForTransfer(&chip::DeviceLayer::SystemLayer(), chip::bdx::TransferRole::kSender, bdxFlags,
-                                                 kMaxBdxBlockSize, kBdxTimeout, chip::System::Clock::Milliseconds32(mPollInterval));
+                                                 mMaxBDXBlockSize, kBdxTimeout, chip::System::Clock::Milliseconds32(mPollInterval));
             if (error != CHIP_NO_ERROR)
             {
                 ChipLogError(SoftwareUpdate, "Cannot prepare for transfer: %" CHIP_ERROR_FORMAT, error.Format());

@@ -20,7 +20,6 @@
 
 #include <algorithm>
 #include <limits>
-#include <nlassert.h>
 #include <string.h>
 
 #include <lib/support/CodeUtils.h>

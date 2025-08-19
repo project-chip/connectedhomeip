@@ -212,7 +212,7 @@ Put the CYW30739 in to the recovery mode before running the flash script.
 
 -   It is assumed here that you already have an OpenThread border router
     configured and running. If not see the following guide
-    [Openthread_border_router](https://github.com/project-chip/connectedhomeip/blob/master/docs/guides/openthread_border_router_pi.md)
+    [Openthread_border_router](https://github.com/project-chip/connectedhomeip/blob/master/docs/platforms/openthread/openthread_border_router_pi.md)
     for more information on how to setup a border router on a raspberryPi.
 
 -   You can provision and control the device using the Python controller REPL,

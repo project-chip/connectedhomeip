@@ -17,7 +17,10 @@
 
 #pragma once
 
+#include <app-common/zap-generated/cluster-enums.h>
+#include <app/icd/server/ICDServerConfig.h>
 #include <lib/core/Optional.h>
+#include <lib/support/BitFlags.h>
 #include <lib/support/TimeUtils.h>
 #include <platform/CHIPDeviceConfig.h>
 #include <protocols/secure_channel/CheckInCounter.h>
@@ -76,15 +79,14 @@ public:
 
     System::Clock::Seconds32 GetMaximumCheckInBackoff() { return mMaximumCheckInBackOff; }
 
+    BitFlags<app::Clusters::IcdManagement::Feature> GetFeatureMap() { return mFeatureMap; }
+
     /**
-     * If ICD_ENFORCE_SIT_SLOW_POLL_LIMIT is set to 0, function will always return the configured Slow Polling interval
-     * (CHIP_DEVICE_CONFIG_ICD_SLOW_POLL_INTERVAL).
-     *
-     * If ICD_ENFORCE_SIT_SLOW_POLL_LIMIT is set to 1, the returned value will depend on the devices operating mode.
+     * The returned value will depend on the devices operating mode.
      * If ICDMode == SIT && the configured slow poll interval is superior to the maximum threshold (15s), the function will return
-     * the threshold (15s). If ICDMode == SIT but the configured slow poll interval is equal or inferior to the threshold, the
-     * function will the return the configured slow poll interval. If ICDMode == LIT, the function will return the configured slow
-     * poll interval.
+     * the threshold kSITPollingThreshold (<= 15s). If ICDMode == SIT but the configured slow poll interval is equal or inferior to
+     * the threshold, the function will the return the configured slow poll interval. If ICDMode == LIT, the function will return
+     * the configured slow poll interval.
      *
      * @return System::Clock::Milliseconds32
      */
@@ -94,7 +96,22 @@ public:
 
 private:
     // Singleton Object
-    ICDConfigurationData() = default;
+    ICDConfigurationData()
+    {
+        // Initialize feature map
+#if CHIP_CONFIG_ENABLE_ICD_CIP
+        mFeatureMap.Set(app::Clusters::IcdManagement::Feature::kCheckInProtocolSupport);
+#endif // CHIP_CONFIG_ENABLE_ICD_CIP
+#if CHIP_CONFIG_ENABLE_ICD_UAT
+        mFeatureMap.Set(app::Clusters::IcdManagement::Feature::kUserActiveModeTrigger);
+#endif // CHIP_CONFIG_ENABLE_ICD_UAT
+#if CHIP_CONFIG_ENABLE_ICD_LIT
+        mFeatureMap.Set(app::Clusters::IcdManagement::Feature::kLongIdleTimeSupport);
+#if CHIP_CONFIG_ENABLE_ICD_DSLS
+        mFeatureMap.Set(app::Clusters::IcdManagement::Feature::kDynamicSitLitSupport);
+#endif // CHIP_CONFIG_ENABLE_ICD_DSLS
+#endif // CHIP_CONFIG_ENABLE_ICD_LIT
+    }
     static ICDConfigurationData instance;
 
     // ICD related information is managed by the ICDManager but stored in the ICDConfigurationData to enable consummers to access it
@@ -106,8 +123,33 @@ private:
     friend class chip::Test::ICDConfigurationDataTestAccess;
 
     void SetICDMode(ICDMode mode) { mICDMode = mode; };
-    void SetSlowPollingInterval(System::Clock::Milliseconds32 slowPollInterval) { mSlowPollingInterval = slowPollInterval; };
     void SetFastPollingInterval(System::Clock::Milliseconds32 fastPollInterval) { mFastPollingInterval = fastPollInterval; };
+
+    /**
+     * @brief Sets the slow polling interval for the ICD.
+     *
+     * If LIT support is not enabled, the interval cannot be set higher than the SIT polling threshold.
+     * If LIT support is enabled, any value is accepted.
+     *
+     * @param[in] slowPollInterval The slow polling interval in milliseconds.
+     * @return CHIP_ERROR CHIP_NO_ERROR on success, CHIP_ERROR_INVALID_ARGUMENT if the value is invalid.
+     */
+    CHIP_ERROR SetSlowPollingInterval(System::Clock::Milliseconds32 slowPollInterval);
+
+    /**
+     * @brief Sets the SIT Idle polling interval.
+     *
+     * This function sets the slow/idle polling interval, which is used when the configured
+     * slow polling interval exceeds the allowed threshold for SIT mode. The provided value must
+     * be less than, or equal to the SIT polling threshold (kSITPollingThreshold).
+     *
+     * This SIT Slow Polling configuration allows ICD LIT device to configure a longer SlowPollingInterval
+     * when operating as LIT, but use a faster SlowPollingInterval when the device must operate in SIT mode
+     *
+     * @param[in] pollingInterval The SIT slow polling interval in milliseconds.
+     * @return CHIP_ERROR CHIP_NO_ERROR on success, CHIP_ERROR_INVALID_ARGUMENT if the value is invalid.
+     */
+    CHIP_ERROR SetSITPollingInterval(System::Clock::Milliseconds32 pollingInterval);
 
     static constexpr System::Clock::Milliseconds16 kMinLitActiveModeThreshold = System::Clock::Milliseconds16(5000);
 
@@ -126,6 +168,8 @@ private:
      */
     CHIP_ERROR SetModeDurations(Optional<System::Clock::Milliseconds32> activeModeDuration,
                                 Optional<System::Clock::Milliseconds32> idleModeDuration);
+
+    void SetFeatureMap(BitFlags<app::Clusters::IcdManagement::Feature> featureMap) { mFeatureMap = featureMap; }
 
     static constexpr System::Clock::Seconds32 kMaxIdleModeDuration = System::Clock::Seconds32(18 * kSecondsPerHour);
     static constexpr System::Clock::Seconds32 kMinIdleModeDuration = System::Clock::Seconds32(1);
@@ -158,12 +202,28 @@ private:
                   "Spec requires the MaximumCheckInBackOff to be equal or superior to the IdleModeDuration");
     System::Clock::Seconds32 mMaximumCheckInBackOff = System::Clock::Seconds32(CHIP_CONFIG_ICD_MAXIMUM_CHECK_IN_BACKOFF_SEC);
 
-    // SIT ICDs should have a SlowPollingThreshold shorter than or equal to 15s (spec 9.16.1.5)
-    static_assert((CHIP_DEVICE_CONFIG_ICD_SIT_SLOW_POLL_LIMIT).count() <= 15000,
+    // SIT ICDs SHALL have a SlowPollingThreshold shorter than or equal to 15s (spec 9.16.1.5)
+    static constexpr System::Clock::Milliseconds32 kSitIcdSlowPollMaximum = System::Clock::Milliseconds32(15000);
+    static_assert((CHIP_DEVICE_CONFIG_ICD_SIT_SLOW_POLL_LIMIT).count() <= kSitIcdSlowPollMaximum.count(),
                   "Spec requires the maximum slow poll interval for the SIT device to be smaller or equal than 15 s.");
     static constexpr System::Clock::Milliseconds32 kSITPollingThreshold = CHIP_DEVICE_CONFIG_ICD_SIT_SLOW_POLL_LIMIT;
-    System::Clock::Milliseconds32 mSlowPollingInterval                  = CHIP_DEVICE_CONFIG_ICD_SLOW_POLL_INTERVAL;
-    System::Clock::Milliseconds32 mFastPollingInterval                  = CHIP_DEVICE_CONFIG_ICD_FAST_POLL_INTERVAL;
+
+#if CHIP_CONFIG_ENABLE_ICD_LIT == 0
+    static_assert((CHIP_DEVICE_CONFIG_ICD_SLOW_POLL_INTERVAL <= kSitIcdSlowPollMaximum),
+                  "LIT support is required for slow polling intervals superior to 15 seconds");
+#endif
+    // The Polling interval used in Idle mode
+    System::Clock::Milliseconds32 mLITPollingInterval = CHIP_DEVICE_CONFIG_ICD_SLOW_POLL_INTERVAL;
+    // The Polling interval used in Active mode
+    System::Clock::Milliseconds32 mFastPollingInterval = CHIP_DEVICE_CONFIG_ICD_FAST_POLL_INTERVAL;
+
+    static_assert((CHIP_DEVICE_CONFIG_ICD_SIT_POLLING_INTERVAL <= kSitIcdSlowPollMaximum),
+                  "The SIT polling intervals must not exceed 15 seconds");
+    // The Polling interval used in Idle mode when a LIT capable device operates in SIT mode and that is mLITPollingInterval is
+    // greater than mSITPollingInterval
+    System::Clock::Milliseconds32 mSITPollingInterval = CHIP_DEVICE_CONFIG_ICD_SIT_POLLING_INTERVAL;
+
+    BitFlags<app::Clusters::IcdManagement::Feature> mFeatureMap;
 
     ICDMode mICDMode = ICDMode::SIT;
 };

@@ -115,7 +115,7 @@ tests:
       command: "readAttribute"
       attribute: "FeatureMap"
       response:
-          value: 0x07
+          value: 0x0F
 
     - label: "Read IdleModeDuration"
       command: "readAttribute"

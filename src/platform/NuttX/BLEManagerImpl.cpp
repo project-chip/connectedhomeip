@@ -35,7 +35,7 @@
 #include <type_traits>
 #include <utility>
 
-#include <ble/CHIPBleServiceData.h>
+#include <ble/Ble.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/SafeInt.h>
 #include <platform/CHIPDeviceLayer.h>
@@ -60,7 +60,7 @@ static constexpr System::Clock::Timeout kNewConnectionScanTimeout = System::Cloc
 static constexpr System::Clock::Timeout kConnectTimeout           = System::Clock::Seconds16(20);
 static constexpr System::Clock::Timeout kFastAdvertiseTimeout =
     System::Clock::Milliseconds32(CHIP_DEVICE_CONFIG_BLE_ADVERTISING_INTERVAL_CHANGE_TIME);
-#if CHIP_DEVICE_CONFIG_BLE_EXT_ADVERTISING
+#if CHIP_DEVICE_CONFIG_EXT_ADVERTISING
 // The CHIP_DEVICE_CONFIG_BLE_EXT_ADVERTISING_INTERVAL_CHANGE_TIME_MS specifies the transition time
 // starting from advertisement commencement. Since the extended advertisement timer is started after
 // the fast-to-slow transition, we have to subtract the time spent in fast advertising.
@@ -197,9 +197,8 @@ uint16_t BLEManagerImpl::_NumConnections()
 
 CHIP_ERROR BLEManagerImpl::ConfigureBle(uint32_t aAdapterId, bool aIsCentral)
 {
-    mAdapterId   = aAdapterId;
-    mIsCentral   = aIsCentral;
-    mpBLEAdvUUID = "0xFFF6";
+    mAdapterId = aAdapterId;
+    mIsCentral = aIsCentral;
     return CHIP_NO_ERROR;
 }
 
@@ -322,7 +321,7 @@ void BLEManagerImpl::HandlePlatformSpecificBLEEvent(const ChipDeviceEvent * apEv
 exit:
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(DeviceLayer, "Disabling CHIPoBLE service due to error: %s", ErrorStr(err));
+        ChipLogError(DeviceLayer, "Disabling CHIPoBLE service due to error: %" CHIP_ERROR_FORMAT, err.Format());
         mServiceMode = ConnectivityManager::kCHIPoBLEServiceMode_Disabled;
         DeviceLayer::SystemLayer().CancelTimer(HandleAdvertisingTimer, this);
         sInstance.mFlags.Clear(Flags::kControlOpInProgress);
@@ -478,7 +477,7 @@ void BLEManagerImpl::HandleTXCharChanged(BLE_CONNECTION_OBJECT conId, const uint
 
 exit:
     if (err != CHIP_NO_ERROR)
-        ChipLogError(DeviceLayer, "HandleTXCharChanged() failed: %s", ErrorStr(err));
+        ChipLogError(DeviceLayer, "HandleTXCharChanged() failed: %" CHIP_ERROR_FORMAT, err.Format());
 }
 
 void BLEManagerImpl::HandleRXCharWrite(BLE_CONNECTION_OBJECT conId, const uint8_t * value, size_t len)
@@ -503,7 +502,7 @@ void BLEManagerImpl::HandleRXCharWrite(BLE_CONNECTION_OBJECT conId, const uint8_
 exit:
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(DeviceLayer, "HandleRXCharWrite() failed: %s", ErrorStr(err));
+        ChipLogError(DeviceLayer, "HandleRXCharWrite() failed: %" CHIP_ERROR_FORMAT, err.Format());
     }
 }
 
@@ -587,13 +586,13 @@ void BLEManagerImpl::DriveBLEState()
             // Configure advertising data if it hasn't been done yet.
             if (!mFlags.Has(Flags::kAdvertisingConfigured))
             {
-                SuccessOrExit(err = mBLEAdvertisement.Init(mEndpoint, mpBLEAdvUUID, mDeviceName));
+                SuccessOrExit(err = mBLEAdvertisement.Init(mEndpoint, Ble::CHIP_BLE_SERVICE_SHORT_UUID_STR, mDeviceName));
                 mFlags.Set(Flags::kAdvertisingConfigured);
             }
 
             // Setup service data for advertising.
             auto serviceDataFlags = BluezAdvertisement::kServiceDataNone;
-#if CHIP_DEVICE_CONFIG_BLE_EXT_ADVERTISING
+#if CHIP_DEVICE_CONFIG_EXT_ADVERTISING
             if (mFlags.Has(Flags::kExtAdvertisingEnabled))
                 serviceDataFlags |= BluezAdvertisement::kServiceDataExtendedAnnouncement;
 #endif
@@ -628,7 +627,7 @@ void BLEManagerImpl::DriveBLEState()
 exit:
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(DeviceLayer, "Disabling CHIPoBLE service due to error: %s", ErrorStr(err));
+        ChipLogError(DeviceLayer, "Disabling CHIPoBLE service due to error: %" CHIP_ERROR_FORMAT, err.Format());
         DeviceLayer::SystemLayer().CancelTimer(HandleAdvertisingTimer, this);
         mServiceMode = ConnectivityManager::kCHIPoBLEServiceMode_Disabled;
     }
@@ -662,7 +661,7 @@ BluezAdvertisement::AdvertisingIntervals BLEManagerImpl::GetAdvertisingIntervals
 {
     if (mFlags.Has(Flags::kFastAdvertisingEnabled))
         return { CHIP_DEVICE_CONFIG_BLE_FAST_ADVERTISING_INTERVAL_MIN, CHIP_DEVICE_CONFIG_BLE_FAST_ADVERTISING_INTERVAL_MAX };
-#if CHIP_DEVICE_CONFIG_BLE_EXT_ADVERTISING
+#if CHIP_DEVICE_CONFIG_EXT_ADVERTISING
     if (mFlags.Has(Flags::kExtAdvertisingEnabled))
         return { CHIP_DEVICE_CONFIG_BLE_EXT_ADVERTISING_INTERVAL_MIN, CHIP_DEVICE_CONFIG_BLE_EXT_ADVERTISING_INTERVAL_MAX };
 #endif
@@ -677,7 +676,7 @@ void BLEManagerImpl::HandleAdvertisingTimer(chip::System::Layer *, void * appSta
     {
         ChipLogDetail(DeviceLayer, "bleAdv Timeout : Start slow advertisement");
         self->_SetAdvertisingMode(BLEAdvertisingMode::kSlowAdvertising);
-#if CHIP_DEVICE_CONFIG_BLE_EXT_ADVERTISING
+#if CHIP_DEVICE_CONFIG_EXT_ADVERTISING
         self->mFlags.Clear(Flags::kExtAdvertisingEnabled);
         DeviceLayer::SystemLayer().StartTimer(kSlowAdvertiseTimeout, HandleAdvertisingTimer, self);
     }
@@ -731,7 +730,7 @@ void BLEManagerImpl::InitiateScan(BleScanState scanType)
     if (err != CHIP_NO_ERROR)
     {
         mBLEScanConfig.mBleScanState = BleScanState::kNotScanning;
-        ChipLogError(Ble, "Failed to start a BLE can: %s", chip::ErrorStr(err));
+        ChipLogError(Ble, "Failed to start a BLE can: %" CHIP_ERROR_FORMAT, err.Format());
         BleConnectionDelegate::OnConnectionError(mBLEScanConfig.mAppState, err);
         return;
     }

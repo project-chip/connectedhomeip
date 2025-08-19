@@ -140,6 +140,17 @@ public:
     virtual CHIP_ERROR DeriveSessionKeys(const HkdfKeyHandle & secretKey, const ByteSpan & salt, const ByteSpan & info,
                                          Aes128KeyHandle & i2rKey, Aes128KeyHandle & r2iKey,
                                          AttestationChallenge & attestationChallenge) = 0;
+
+    /**
+     * @brief Persistently store an ICD key.
+     *
+     * If input is already a persistent key handle, the function is a no-op and the original handle is returned.
+     * If input is a volatile key handle, key is persisted and the handle may be updated.
+     *
+     * If the method returns no error, the application is responsible for destroying the handle
+     * using the DestroyKey() method when the key is no longer needed.
+     */
+    virtual CHIP_ERROR PersistICDKey(Symmetric128BitsKeyHandle & key) { return CHIP_NO_ERROR; }
 };
 
 /**

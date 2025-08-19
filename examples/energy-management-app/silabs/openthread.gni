@@ -23,6 +23,7 @@ app_data_model =
 chip_enable_ota_requestor = false
 chip_enable_openthread = true
 disable_lcd = true
+sl_enable_test_event_trigger = true
 
 openthread_external_platform =
     "${chip_root}/third_party/openthread/platforms/efr32:libopenthread-efr32"

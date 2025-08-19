@@ -26,6 +26,7 @@
 #include <app/util/attribute-storage.h>
 #include <app/util/mock/Constants.h>
 #include <app/util/mock/Functions.h>
+#include <data-model-providers/codegen/CodegenDataModelProvider.h>
 
 /**
  * Helper macro we can use to pretend we got a reply from the server in cases
@@ -67,11 +68,15 @@
 namespace chip {
 namespace Test {
 
-constexpr chip::ClusterId kTestDeniedClusterId1  = 1000;
-constexpr chip::ClusterId kTestDeniedClusterId2  = 3;
-constexpr chip::ClusterId kTestClusterId         = 6;
+constexpr EndpointId kTestEndpointId            = 1;
+constexpr EndpointId kTestDeniedEndpointId      = 66;
+constexpr EndpointId kTestUnsupportedEndpointId = 77;
+
+constexpr ClusterId kTestDeniedClusterId2     = 3;
+constexpr ClusterId kTestUnsupportedClusterId = 77;
+constexpr ClusterId kTestClusterId            = 6;
+
 constexpr uint8_t kTestFieldValue1               = 1;
-constexpr chip::EndpointId kTestEndpointId       = 1;
 constexpr chip::DataVersion kTestDataVersion1    = 3;
 constexpr chip::DataVersion kRejectedDataVersion = 1;
 
@@ -81,25 +86,10 @@ extern size_t attributeDataTLVLen;
 } // namespace Test
 namespace app {
 
-CHIP_ERROR ReadSingleClusterData(const Access::SubjectDescriptor & aSubjectDescriptor, bool aIsFabricFiltered,
-                                 const ConcreteReadAttributePath & aPath, AttributeReportIBs::Builder & aAttributeReports,
-                                 AttributeEncodeState * apEncoderState);
-
 bool IsClusterDataVersionEqual(const ConcreteClusterPath & aConcreteClusterPath, DataVersion aRequiredVersion);
-
-CHIP_ERROR WriteSingleClusterData(const Access::SubjectDescriptor & aSubjectDescriptor, const ConcreteDataAttributePath & aPath,
-                                  TLV::TLVReader & aReader, WriteHandler * aWriteHandler);
-const EmberAfAttributeMetadata * GetAttributeMetadata(const ConcreteAttributePath & aConcreteClusterPath);
-
-bool ConcreteAttributePathExists(const ConcreteAttributePath & aPath);
-Protocols::InteractionModel::Status CheckEventSupportStatus(const ConcreteEventPath & aPath);
-
-Protocols::InteractionModel::Status ServerClusterCommandExists(const ConcreteCommandPath & aRequestCommandPath);
 
 void DispatchSingleClusterCommand(const ConcreteCommandPath & aRequestCommandPath, chip::TLV::TLVReader & aReader,
                                   CommandHandler * apCommandObj);
-
-bool IsDeviceTypeOnEndpoint(DeviceTypeId deviceType, EndpointId endpoint);
 
 /// A customized class for read/write/invoke that matches functionality
 /// with the ember-compatibility-functions functionality here.
@@ -111,7 +101,7 @@ bool IsDeviceTypeOnEndpoint(DeviceTypeId deviceType, EndpointId endpoint);
 /// TODO items for above:
 ///      - once IM only supports DataModel
 ///      - break ember-overrides in this h/cpp file
-class TestImCustomDataModel : public DataModel::Provider
+class TestImCustomDataModel : public CodegenDataModelProvider
 {
 public:
     static TestImCustomDataModel & Instance();
@@ -122,22 +112,9 @@ public:
                                                 AttributeValueEncoder & encoder) override;
     DataModel::ActionReturnStatus WriteAttribute(const DataModel::WriteAttributeRequest & request,
                                                  AttributeValueDecoder & decoder) override;
-    DataModel::ActionReturnStatus Invoke(const DataModel::InvokeRequest & request, chip::TLV::TLVReader & input_arguments,
-                                         CommandHandler * handler) override;
-
-    EndpointId FirstEndpoint() override;
-    EndpointId NextEndpoint(EndpointId before) override;
-    DataModel::ClusterEntry FirstCluster(EndpointId endpoint) override;
-    DataModel::ClusterEntry NextCluster(const ConcreteClusterPath & before) override;
-    std::optional<DataModel::ClusterInfo> GetClusterInfo(const ConcreteClusterPath & path) override;
-    DataModel::AttributeEntry FirstAttribute(const ConcreteClusterPath & cluster) override;
-    DataModel::AttributeEntry NextAttribute(const ConcreteAttributePath & before) override;
-    std::optional<DataModel::AttributeInfo> GetAttributeInfo(const ConcreteAttributePath & path) override;
-    DataModel::CommandEntry FirstAcceptedCommand(const ConcreteClusterPath & cluster) override;
-    DataModel::CommandEntry NextAcceptedCommand(const ConcreteCommandPath & before) override;
-    std::optional<DataModel::CommandInfo> GetAcceptedCommandInfo(const ConcreteCommandPath & path) override;
-    ConcreteCommandPath FirstGeneratedCommand(const ConcreteClusterPath & cluster) override;
-    ConcreteCommandPath NextGeneratedCommand(const ConcreteCommandPath & before) override;
+    std::optional<DataModel::ActionReturnStatus> InvokeCommand(const DataModel::InvokeRequest & request,
+                                                               chip::TLV::TLVReader & input_arguments,
+                                                               CommandHandler * handler) override;
 };
 
 } // namespace app

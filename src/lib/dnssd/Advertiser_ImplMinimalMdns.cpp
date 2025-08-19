@@ -558,7 +558,7 @@ CHIP_ERROR AdvertiserMinMdns::Advertise(const OperationalAdvertisingParameters &
                        DiscoveryFilter(DiscoveryFilterType::kCompressedFabricId, params.GetPeerId().GetCompressedFabricId()));
     FullQName compressedFabricIdSubtype = operationalAllocator->AllocateQName(
         nameBuffer, kSubtypeServiceNamePart, kOperationalServiceName, kOperationalProtocol, kLocalDomain);
-    ReturnErrorCodeIf(compressedFabricIdSubtype.nameCount == 0, CHIP_ERROR_NO_MEMORY);
+    VerifyOrReturnError(compressedFabricIdSubtype.nameCount != 0, CHIP_ERROR_NO_MEMORY);
 
     if (!operationalAllocator->AddResponder<PtrResponder>(compressedFabricIdSubtype, instanceName)
              .SetReportAdditional(instanceName)
@@ -676,7 +676,7 @@ CHIP_ERROR AdvertiserMinMdns::Advertise(const CommissionAdvertisingParameters & 
         MakeServiceSubtype(nameBuffer, sizeof(nameBuffer), DiscoveryFilter(DiscoveryFilterType::kVendorId, *vendorId));
         FullQName vendorServiceName =
             allocator->AllocateQName(nameBuffer, kSubtypeServiceNamePart, serviceType, kCommissionProtocol, kLocalDomain);
-        ReturnErrorCodeIf(vendorServiceName.nameCount == 0, CHIP_ERROR_NO_MEMORY);
+        VerifyOrReturnError(vendorServiceName.nameCount != 0, CHIP_ERROR_NO_MEMORY);
 
         if (!allocator->AddResponder<PtrResponder>(vendorServiceName, instanceName)
                  .SetReportAdditional(instanceName)
@@ -693,7 +693,7 @@ CHIP_ERROR AdvertiserMinMdns::Advertise(const CommissionAdvertisingParameters & 
         MakeServiceSubtype(nameBuffer, sizeof(nameBuffer), DiscoveryFilter(DiscoveryFilterType::kDeviceType, *deviceType));
         FullQName vendorServiceName =
             allocator->AllocateQName(nameBuffer, kSubtypeServiceNamePart, serviceType, kCommissionProtocol, kLocalDomain);
-        ReturnErrorCodeIf(vendorServiceName.nameCount == 0, CHIP_ERROR_NO_MEMORY);
+        VerifyOrReturnError(vendorServiceName.nameCount != 0, CHIP_ERROR_NO_MEMORY);
 
         if (!allocator->AddResponder<PtrResponder>(vendorServiceName, instanceName)
                  .SetReportAdditional(instanceName)
@@ -713,7 +713,7 @@ CHIP_ERROR AdvertiserMinMdns::Advertise(const CommissionAdvertisingParameters & 
                                DiscoveryFilter(DiscoveryFilterType::kShortDiscriminator, params.GetShortDiscriminator()));
             FullQName shortServiceName =
                 allocator->AllocateQName(nameBuffer, kSubtypeServiceNamePart, serviceType, kCommissionProtocol, kLocalDomain);
-            ReturnErrorCodeIf(shortServiceName.nameCount == 0, CHIP_ERROR_NO_MEMORY);
+            VerifyOrReturnError(shortServiceName.nameCount != 0, CHIP_ERROR_NO_MEMORY);
 
             if (!allocator->AddResponder<PtrResponder>(shortServiceName, instanceName)
                      .SetReportAdditional(instanceName)
@@ -730,7 +730,7 @@ CHIP_ERROR AdvertiserMinMdns::Advertise(const CommissionAdvertisingParameters & 
                                DiscoveryFilter(DiscoveryFilterType::kLongDiscriminator, params.GetLongDiscriminator()));
             FullQName longServiceName =
                 allocator->AllocateQName(nameBuffer, kSubtypeServiceNamePart, serviceType, kCommissionProtocol, kLocalDomain);
-            ReturnErrorCodeIf(longServiceName.nameCount == 0, CHIP_ERROR_NO_MEMORY);
+            VerifyOrReturnError(longServiceName.nameCount != 0, CHIP_ERROR_NO_MEMORY);
             if (!allocator->AddResponder<PtrResponder>(longServiceName, instanceName)
                      .SetReportAdditional(instanceName)
                      .SetReportInServiceListing(true)
@@ -746,7 +746,7 @@ CHIP_ERROR AdvertiserMinMdns::Advertise(const CommissionAdvertisingParameters & 
             MakeServiceSubtype(nameBuffer, sizeof(nameBuffer), DiscoveryFilter(DiscoveryFilterType::kCommissioningMode));
             FullQName longServiceName =
                 allocator->AllocateQName(nameBuffer, kSubtypeServiceNamePart, serviceType, kCommissionProtocol, kLocalDomain);
-            ReturnErrorCodeIf(longServiceName.nameCount == 0, CHIP_ERROR_NO_MEMORY);
+            VerifyOrReturnError(longServiceName.nameCount != 0, CHIP_ERROR_NO_MEMORY);
             if (!allocator->AddResponder<PtrResponder>(longServiceName, instanceName)
                      .SetReportAdditional(instanceName)
                      .SetReportInServiceListing(true)
@@ -848,6 +848,9 @@ FullQName AdvertiserMinMdns::GetCommissioningTxtEntries(const CommissionAdvertis
     char txtRotatingDeviceId[chip::Dnssd::kKeyRotatingDeviceIdMaxLength + 4];
     char txtPairingHint[chip::Dnssd::kKeyPairingInstructionMaxLength + 4];
     char txtPairingInstr[chip::Dnssd::kKeyPairingInstructionMaxLength + 4];
+#if CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
+    char txtJointFabricMode[chip::Dnssd::kKeyJointFabricModeMaxLength + 4];
+#endif // CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
 
     // the following sub types only apply to commissioner discovery advertisements
     char txtCommissionerPasscode[chip::Dnssd::kKeyCommissionerPasscodeMaxLength + 4];
@@ -878,6 +881,14 @@ FullQName AdvertiserMinMdns::GetCommissioningTxtEntries(const CommissionAdvertis
             snprintf(txtPairingInstr, sizeof(txtPairingInstr), "PI=%s", *pairingInstruction);
             txtFields[numTxtFields++] = txtPairingInstr;
         }
+
+#if CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
+        if (const auto & jointFabricMode = params.GetJointFabricMode(); jointFabricMode.HasAny())
+        {
+            snprintf(txtJointFabricMode, sizeof(txtJointFabricMode), "JF=%d", static_cast<int>(jointFabricMode.Raw()));
+            txtFields[numTxtFields++] = txtJointFabricMode;
+        }
+#endif // CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
     }
     else
     {

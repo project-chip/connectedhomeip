@@ -20,15 +20,12 @@
 
 #include "AppMain.h"
 
-#include <app/tests/suites/credentials/TestHarnessDACProvider.h>
-
 #include <string>
 
 class AppOptions
 {
 public:
     static chip::ArgParser::OptionSet * GetOptions();
-    static chip::Credentials::DeviceAttestationCredentialsProvider * GetDACProvider();
     static chip::Optional<std::string> GetEndUserSupportLogFilePath();
     static chip::Optional<std::string> GetNetworkDiagnosticsLogFilePath();
     static chip::Optional<std::string> GetCrashLogFilePath();

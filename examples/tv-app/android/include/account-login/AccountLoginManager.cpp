@@ -23,7 +23,6 @@
 #include <json/json.h>
 #include <lib/core/DataModelTypes.h>
 
-using namespace std;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::AccountLogin;
 using Status = chip::Protocols::InteractionModel::Status;
@@ -31,12 +30,12 @@ using Status = chip::Protocols::InteractionModel::Status;
 namespace {
 
 const auto loginTempAccountIdentifierFieldId =
-    to_string(chip::to_underlying(AccountLogin::Commands::Login::Fields::kTempAccountIdentifier));
-const auto loginSetupPINFieldId = to_string(chip::to_underlying(AccountLogin::Commands::Login::Fields::kSetupPIN));
-const auto loginNodeFieldId     = to_string(chip::to_underlying(AccountLogin::Commands::Login::Fields::kNode));
-const auto logoutNodeFieldId    = to_string(chip::to_underlying(AccountLogin::Commands::Logout::Fields::kNode));
+    std::to_string(chip::to_underlying(AccountLogin::Commands::Login::Fields::kTempAccountIdentifier));
+const auto loginSetupPINFieldId = std::to_string(chip::to_underlying(AccountLogin::Commands::Login::Fields::kSetupPIN));
+const auto loginNodeFieldId     = std::to_string(chip::to_underlying(AccountLogin::Commands::Login::Fields::kNode));
+const auto logoutNodeFieldId    = std::to_string(chip::to_underlying(AccountLogin::Commands::Logout::Fields::kNode));
 
-string charSpanToString(const CharSpan & charSpan)
+std::string charSpanToString(const CharSpan & charSpan)
 {
     return { charSpan.data(), charSpan.size() };
 }
@@ -45,12 +44,12 @@ std::string serializeLoginCommand(AccountLogin::Commands::Login::Type cmd)
 {
     return R"({")" + loginTempAccountIdentifierFieldId + R"(":")" + charSpanToString(cmd.tempAccountIdentifier) + R"(",)" + R"(")" +
         loginSetupPINFieldId + R"(":")" + charSpanToString(cmd.setupPIN) + R"(",)" + R"(")" + loginNodeFieldId + R"(":")" +
-        to_string(cmd.node.Value()) + R"("})";
+        std::to_string(cmd.node.Value()) + R"("})";
 }
 
 std::string serializeLogoutCommand(AccountLogin::Commands::Logout::Type cmd)
 {
-    return R"({")" + logoutNodeFieldId + R"(":")" + to_string(cmd.node.Value()) + R"("})";
+    return R"({")" + logoutNodeFieldId + R"(":")" + std::to_string(cmd.node.Value()) + R"("})";
 }
 
 } // namespace
@@ -128,7 +127,7 @@ bool AccountLoginManager::HandleLogout(const chip::Optional<chip::NodeId> & node
 void AccountLoginManager::HandleGetSetupPin(CommandResponseHelper<GetSetupPINResponse> & helper,
                                             const CharSpan & tempAccountIdentifier)
 {
-    string tempAccountIdentifierString(tempAccountIdentifier.data(), tempAccountIdentifier.size());
+    std::string tempAccountIdentifierString(tempAccountIdentifier.data(), tempAccountIdentifier.size());
 
     GetSetupPINResponse response;
     ChipLogProgress(Zcl, "temporary account id: %s returning pin: %s", tempAccountIdentifierString.c_str(), mSetupPin);
@@ -144,7 +143,7 @@ void AccountLoginManager::GetSetupPin(char * setupPin, size_t setupPinSize, cons
     // Other methods in this class do not need to be changed beecause those will get routed to java layer
     // upstream.
     ChipLogProgress(DeviceLayer, "AccountLoginManager::GetSetupPin called for endpoint %d", mEndpointId);
-    string tempAccountIdentifierString(tempAccountIdentifier.data(), tempAccountIdentifier.size());
+    std::string tempAccountIdentifierString(tempAccountIdentifier.data(), tempAccountIdentifier.size());
     if (mCommandDelegate == nullptr)
     {
         // For the dummy content apps to work.

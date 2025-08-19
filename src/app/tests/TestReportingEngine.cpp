@@ -28,11 +28,11 @@
 
 #include <app/ConcreteAttributePath.h>
 #include <app/InteractionModelEngine.h>
-#include <app/codegen-data-model-provider/Instance.h>
 #include <app/reporting/Engine.h>
 #include <app/reporting/tests/MockReportScheduler.h>
 #include <app/tests/AppTestContext.h>
 #include <app/tests/test-interaction-model-api.h>
+#include <data-model-providers/codegen/Instance.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/core/ErrorStr.h>
 #include <lib/core/StringBuilderAdapters.h>
@@ -50,6 +50,27 @@ constexpr EndpointId kTestEndpointId      = 1;
 constexpr chip::AttributeId kTestFieldId1 = 1;
 constexpr chip::AttributeId kTestFieldId2 = 2;
 
+using namespace chip;
+using namespace chip::Access;
+
+const Test::MockNodeConfig & TestMockNodeConfig()
+{
+    using namespace chip::app;
+    using namespace chip::app::Clusters::Globals::Attributes;
+
+    // clang-format off
+    static const Test::MockNodeConfig config({
+        Test::MockEndpointConfig(kTestEndpointId, {
+            Test::MockClusterConfig(kTestClusterId, {
+                ClusterRevision::Id, FeatureMap::Id,
+                kTestFieldId1, kTestFieldId2,
+            }),
+        }),
+    });
+    // clang-format on
+    return config;
+}
+
 namespace app {
 namespace reporting {
 
@@ -60,10 +81,12 @@ public:
     {
         chip::Test::AppContext::SetUp();
         mOldProvider = InteractionModelEngine::GetInstance()->SetDataModelProvider(&TestImCustomDataModel::Instance());
+        chip::Test::SetMockNodeConfig(TestMockNodeConfig());
     }
 
     void TearDown() override
     {
+        chip::Test::ResetMockNodeConfig();
         InteractionModelEngine::GetInstance()->SetDataModelProvider(mOldProvider);
         chip::Test::AppContext::TearDown();
     }
@@ -186,7 +209,7 @@ TEST_F_FROM_FIXTURE(TestReportingEngine, TestBuildAndSendSingleReportData)
     EXPECT_EQ(readRequestBuilder.GetError(), CHIP_NO_ERROR);
     EXPECT_EQ(writer.Finalize(&readRequestbuf), CHIP_NO_ERROR);
     app::ReadHandler readHandler(dummy, exchangeCtx, chip::app::ReadHandler::InteractionType::Read,
-                                 app::reporting::GetDefaultReportScheduler(), CodegenDataModelProviderInstance());
+                                 app::reporting::GetDefaultReportScheduler());
     readHandler.OnInitialRequest(std::move(readRequestbuf));
 
     EXPECT_EQ(InteractionModelEngine::GetInstance()->GetReportingEngine().BuildAndSendSingleReportData(&readHandler),

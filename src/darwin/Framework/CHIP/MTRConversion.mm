@@ -92,7 +92,7 @@ bool DateToMatterEpochMilliseconds(NSDate * date, uint64_t & matterEpochMillisec
 
 bool DateToMatterEpochMicroseconds(NSDate * date, uint64_t & matterEpochMicroseconds)
 {
-    uint64_t timeSinceUnixEpoch = static_cast<uint64_t>(date.timeIntervalSince1970 * chip::kMicrosecondsPerSecond);
+    uint64_t timeSinceUnixEpoch = static_cast<uint64_t>(date.timeIntervalSince1970 * static_cast<double>(chip::kMicrosecondsPerSecond));
     if (timeSinceUnixEpoch < chip::kChipEpochUsSinceUnixEpoch) {
         // This is a pre-Matter-epoch time, and cannot be represented as an epoch time value.
         return false;

@@ -20,12 +20,13 @@
 #include <LEDWidget.h>
 
 #include <app/server/Dnssd.h>
-#include <app/server/OnboardingCodesUtil.h>
 #include <app/server/Server.h>
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
+#include <data-model-providers/codegen/Instance.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/CHIPDeviceLayer.h>
+#include <setup_payload/OnboardingCodesUtil.h>
 
 // mbed-os headers
 #include "drivers/Timeout.h"
@@ -106,6 +107,7 @@ int AppTask::Init()
     // Init ZCL Data Model and start server
     static chip::CommonCaseDeviceServerInitParams initParams;
     (void) initParams.InitializeStaticResourcesBeforeServerInit();
+    initParams.dataModelProvider = app::CodegenDataModelProviderInstance(initParams.persistentStorageDelegate);
 
     error = Server::GetInstance().Init(initParams);
     if (error != CHIP_NO_ERROR)
@@ -468,9 +470,8 @@ void AppTask::FunctionTimerEventHandler(AppEvent * aEvent)
 bool AppTask::OnUpdateAvailableHandler(void * context, uint32_t softwareVersion, chip::CharSpan softwareVersionString)
 {
     AppTask * appTask = reinterpret_cast<AppTask *>(context);
-    ChipLogProgress(NotSpecified, "\tNew update available: \t %.*s [%d]", static_cast<int>(softwareVersionString.size()),
-                    softwareVersionString.data(), softwareVersion);
-
+    ChipLogProgress(NotSpecified, "\tNew update available: \t %s [%d]", NullTerminated(softwareVersionString).c_str(),
+                    softwareVersion);
     ChipLogProgress(NotSpecified, "\tDo you want to download new update?");
     ChipLogProgress(NotSpecified, "\tRespond by pressing the button");
     ChipLogProgress(NotSpecified, "\t%10s%10s", "BUTTON0", "BUTTON1");

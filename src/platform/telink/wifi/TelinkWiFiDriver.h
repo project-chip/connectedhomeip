@@ -94,7 +94,11 @@ public:
         return sInstance;
     }
 
+#if defined(CONFIG_ZEPHYR_VERSION_3_3)
     void OnNetworkStatusChanged(Status status);
+#else
+    void OnNetworkConnStatusChanged(const wifi_conn_status & connStatus);
+#endif
     void OnScanWiFiNetworkResult(const WiFiScanResponse & result);
     void OnScanWiFiNetworkDone(const WiFiManager::ScanDoneStatus & status);
 

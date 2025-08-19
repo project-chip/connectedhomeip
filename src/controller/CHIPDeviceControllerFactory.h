@@ -146,7 +146,7 @@ struct FactoryInitParams
     Ble::BleLayer * bleLayer = nullptr;
 #endif
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
-    Transport::WiFiPAFLayer * wifipaf_layer = nullptr;
+    WiFiPAF::WiFiPAFLayer * wifipaf_layer = nullptr;
 #endif
 
     //
@@ -160,6 +160,11 @@ struct FactoryInitParams
     /* The port used for operational communication to listen for and send messages over UDP/TCP.
      * The default value of `0` will pick any available port. */
     uint16_t listenPort = 0;
+
+    // MUST NOT be null during initialization: every application must define the
+    // data model it wants to use. Backwards-compatibility can use `CodegenDataModelProviderInstance`
+    // for ember/zap-generated models.
+    chip::app::DataModel::Provider * dataModelProvider = nullptr;
 };
 
 class DeviceControllerFactory

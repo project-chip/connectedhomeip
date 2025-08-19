@@ -1,9 +1,8 @@
 import Matter
-import XCTest
 
 // This more or less parallels the "no delegate" case in MTRPairingTests, but uses the "normal"
 // all-clusters-app, since it does not do any of the "interesting" VID/PID notification so far.  If
-// it ever starts needing to do that, we should figure out a way to use MTRTestServerAppRunner from
+// it ever starts needing to do that, we should figure out a way to use MTRTestCase+ServerAppRunner from
 // here.
 
 struct PairingConstants {
@@ -12,6 +11,7 @@ struct PairingConstants {
     static let onboardingPayload = "MT:-24J0AFN00KA0648G00"
     static let deviceID = 0x12344321
     static let timeoutInSeconds : UInt16 = 3
+    static let pairingTimeoutInSeconds : UInt16 = 60
 }
 
 class MTRSwiftPairingTestControllerDelegate : NSObject, MTRDeviceControllerDelegate {
@@ -44,8 +44,11 @@ class MTRSwiftPairingTestControllerDelegate : NSObject, MTRDeviceControllerDeleg
     }
 }
 
-class MTRSwiftPairingTests : XCTestCase {
+class MTRSwiftPairingTests : MTRTestCase {
     func test001_BasicPairing() {
+        let started = self.startApp(withName: "all-clusters", arguments: [], payload: PairingConstants.onboardingPayload)
+        XCTAssertTrue(started);
+        
         let factory = MTRDeviceControllerFactory.sharedInstance()
 
         let storage = MTRTestStorage()
@@ -96,9 +99,7 @@ class MTRSwiftPairingTests : XCTestCase {
             return
         }
 
-        wait(for: [expectation], timeout: TimeInterval(PairingConstants.timeoutInSeconds))
-
-        ResetCommissionee(MTRBaseDevice(nodeID: PairingConstants.deviceID as NSNumber, controller: controller), DispatchQueue.main, self, PairingConstants.timeoutInSeconds)
+        wait(for: [expectation], timeout: TimeInterval(PairingConstants.pairingTimeoutInSeconds))
 
         controller.shutdown()
         XCTAssertFalse(controller.isRunning)

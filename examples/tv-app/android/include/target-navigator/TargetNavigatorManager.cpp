@@ -23,7 +23,6 @@
 #include <list>
 #include <string>
 
-using namespace std;
 using namespace chip::app;
 using namespace chip::app::Clusters::TargetNavigator;
 using ContentAppAttributeDelegate = chip::AppPlatform::ContentAppAttributeDelegate;
@@ -53,16 +52,15 @@ CHIP_ERROR TargetNavigatorManager::HandleGetTargetList(AttributeValueEncoder & a
             Json::Value value;
             if (reader.parse(resStr, value))
             {
-                std::string attrId = to_string(chip::app::Clusters::TargetNavigator::Attributes::TargetList::Id);
+                std::string attrId = std::to_string(chip::app::Clusters::TargetNavigator::Attributes::TargetList::Id);
                 ChipLogProgress(Zcl, "TargetNavigatorManager::HandleNavigateTarget response parsing done. reading attr %s",
                                 attrId.c_str());
                 if (value[attrId].isArray())
                 {
                     return aEncoder.EncodeList([&](const auto & encoder) -> CHIP_ERROR {
-                        int i                  = 0;
-                        std::string targetId   = to_string(static_cast<uint32_t>(
+                        std::string targetId   = std::to_string(static_cast<uint32_t>(
                             chip::app::Clusters::TargetNavigator::Structs::TargetInfoStruct::Fields::kIdentifier));
-                        std::string targetName = to_string(
+                        std::string targetName = std::to_string(
                             static_cast<uint32_t>(chip::app::Clusters::TargetNavigator::Structs::TargetInfoStruct::Fields::kName));
                         for (Json::Value & entry : value[attrId])
                         {
@@ -70,14 +68,12 @@ CHIP_ERROR TargetNavigatorManager::HandleGetTargetList(AttributeValueEncoder & a
                             {
                                 // invalid target ID. Ignore.
                                 ChipLogError(Zcl, "TargetNavigatorManager::HandleNavigateTarget invalid target ignored");
-                                i++;
                                 continue;
                             }
                             Structs::TargetInfoStruct::Type outputInfo;
                             outputInfo.identifier = static_cast<uint8_t>(entry[targetId].asUInt());
                             outputInfo.name       = CharSpan::fromCharString(entry[targetName].asCString());
                             ReturnErrorOnFailure(encoder.Encode(outputInfo));
-                            i++;
                         }
                         return CHIP_NO_ERROR;
                     });
@@ -118,7 +114,7 @@ uint8_t TargetNavigatorManager::HandleGetCurrentTarget()
             Json::Value value;
             if (reader.parse(resStr, value))
             {
-                std::string attrId = to_string(chip::app::Clusters::TargetNavigator::Attributes::CurrentTarget::Id);
+                std::string attrId = std::to_string(chip::app::Clusters::TargetNavigator::Attributes::CurrentTarget::Id);
                 ChipLogProgress(Zcl, "TargetNavigatorManager::HandleGetCurrentTarget response parsing done. reading attr %s",
                                 attrId.c_str());
                 if (value[attrId].isUInt() && value[attrId].asUInt() < 256)

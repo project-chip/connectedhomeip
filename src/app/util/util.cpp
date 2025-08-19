@@ -88,14 +88,12 @@ void emberAfInit()
 // them in.
 void MatterBallastConfigurationPluginServerInitCallback() {}
 void MatterBooleanStatePluginServerInitCallback() {}
-void MatterElectricalMeasurementPluginServerInitCallback() {}
 void MatterRelativeHumidityMeasurementPluginServerInitCallback() {}
 void MatterIlluminanceMeasurementPluginServerInitCallback() {}
 void MatterBinaryInputBasicPluginServerInitCallback() {}
 void MatterPressureMeasurementPluginServerInitCallback() {}
 void MatterTemperatureMeasurementPluginServerInitCallback() {}
 void MatterFlowMeasurementPluginServerInitCallback() {}
-void MatterOnOffSwitchConfigurationPluginServerInitCallback() {}
 void MatterThermostatUserInterfaceConfigurationPluginServerInitCallback() {}
 void MatterBridgedDeviceBasicInformationPluginServerInitCallback() {}
 void MatterPowerConfigurationPluginServerInitCallback() {}
@@ -105,7 +103,6 @@ void MatterAlarmsPluginServerInitCallback() {}
 void MatterTimePluginServerInitCallback() {}
 void MatterAclPluginServerInitCallback() {}
 void MatterPollControlPluginServerInitCallback() {}
-void MatterUnitLocalizationPluginServerInitCallback() {}
 void MatterProxyValidPluginServerInitCallback() {}
 void MatterProxyDiscoveryPluginServerInitCallback() {}
 void MatterProxyConfigurationPluginServerInitCallback() {}
@@ -142,6 +139,10 @@ void MatterElectricalPowerMeasurementPluginServerInitCallback() {}
 void MatterServiceAreaPluginServerInitCallback() {}
 void MatterWaterHeaterManagementPluginServerInitCallback() {}
 void MatterWaterHeaterModePluginServerInitCallback() {}
+void MatterCommodityPricePluginServerInitCallback() {}
+void MatterCommodityTariffPluginServerInitCallback() {}
+void MatterElectricalGridConditionsPluginServerInitCallback() {}
+void MatterSoilMeasurementPluginServerInitCallback() {}
 
 bool emberAfContainsAttribute(chip::EndpointId endpoint, chip::ClusterId clusterId, chip::AttributeId attributeId)
 {

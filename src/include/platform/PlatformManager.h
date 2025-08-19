@@ -47,11 +47,14 @@ class TraitManager;
 class ThreadStackManagerImpl;
 
 namespace Internal {
+class NFCCommissioningManagerImpl;
 class BLEManagerImpl;
 template <class>
 class GenericConfigurationManagerImpl;
 template <class>
 class GenericPlatformManagerImpl;
+template <class>
+class GenericPlatformManagerImpl_CMSISOS;
 template <class>
 class GenericPlatformManagerImpl_FreeRTOS;
 template <class>
@@ -257,9 +260,12 @@ private:
     friend class FailSafeContext;
     friend class TraitManager;
     friend class ThreadStackManagerImpl;
+    friend class Internal::NFCCommissioningManagerImpl;
     friend class Internal::BLEManagerImpl;
     template <class>
     friend class Internal::GenericPlatformManagerImpl;
+    template <class>
+    friend class Internal::GenericPlatformManagerImpl_CMSISOS;
     template <class>
     friend class Internal::GenericPlatformManagerImpl_FreeRTOS;
     template <class>

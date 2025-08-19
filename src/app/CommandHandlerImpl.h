@@ -18,9 +18,12 @@
 
 #include <app/CommandHandler.h>
 
+#include <app/CommandHandlerExchangeInterface.h>
+#include <app/CommandHandlerInterface.h>
 #include <app/CommandPathRegistry.h>
 #include <app/MessageDef/InvokeRequestMessage.h>
 #include <app/MessageDef/InvokeResponseMessage.h>
+#include <app/data-model-provider/OperationTypes.h>
 #include <lib/core/TLV.h>
 #include <lib/core/TLVDebug.h>
 #include <lib/support/BitFlags.h>
@@ -50,21 +53,29 @@ public:
          */
         virtual void OnDone(CommandHandlerImpl & apCommandObj) = 0;
 
+        /**
+         * Perform pre-validation that the command dispatch can be performed. In particular:
+         *   - check command existence/validity
+         *   - validate ACL
+         *   - validate timed-invoke and fabric-scoped requirements
+         *
+         * Returns Status::Success if the command can be dispatched, otherwise it will
+         * return the status to be forwarded to the client on failure.
+         *
+         * Possible error return codes:
+         *   - UnsupportedEndpoint/UnsupportedCluster/UnsupportedCommand if the command path is invalid
+         *   - NeedsTimedInteraction
+         *   - UnsupportedAccess  (ACL failure or fabric scoped without a valid fabric index)
+         *   - AccessRestricted
+         */
+        virtual Protocols::InteractionModel::Status ValidateCommandCanBeDispatched(const DataModel::InvokeRequest & request) = 0;
+
         /*
          * Upon processing of a CommandDataIB, this method is invoked to dispatch the command
          * to the right server-side handler provided by the application.
          */
         virtual void DispatchCommand(CommandHandlerImpl & apCommandObj, const ConcreteCommandPath & aCommandPath,
                                      TLV::TLVReader & apPayload) = 0;
-
-        /*
-         * Check to see if a command implementation exists for a specific
-         * concrete command path.  If it does, Success will be returned.  If
-         * not, one of UnsupportedEndpoint, UnsupportedCluster, or
-         * UnsupportedCommand will be returned, depending on how the command
-         * fails to exist.
-         */
-        virtual Protocols::InteractionModel::Status CommandExists(const ConcreteCommandPath & aCommandPath) = 0;
     };
 
     struct InvokeResponseParameters
@@ -425,7 +436,7 @@ private:
      */
     bool IsGroupRequest() { return mGroupRequest; }
 
-    bool ResponsesAccepted() { return !(mGroupRequest || mpResponder == nullptr); }
+    bool ResponsesAccepted() { return mpResponder != nullptr && !mGroupRequest; }
 
     /**
      * Sets the state flag to keep the information that request we are handling is targeted to a group.

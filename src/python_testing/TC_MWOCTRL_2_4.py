@@ -19,20 +19,29 @@
 # for details about the block below.
 #
 # === BEGIN CI TEST ARGUMENTS ===
-# test-runner-runs: run1
-# test-runner-run/run1/app: ${CHIP_MICROWAVE_OVEN_APP}
-# test-runner-run/run1/factoryreset: True
-# test-runner-run/run1/quiet: True
-# test-runner-run/run1/app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
-# test-runner-run/run1/script-args: --storage-path admin_storage.json --commissioning-method on-network --discriminator 1234 --passcode 20202021 --PICS src/app/tests/suites/certification/ci-pics-values --trace-to json:${TRACE_TEST_JSON}.json --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+# test-runner-runs:
+#   run1:
+#     app: ${CHIP_MICROWAVE_OVEN_APP}
+#     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
+#     script-args: >
+#       --storage-path admin_storage.json
+#       --commissioning-method on-network
+#       --discriminator 1234
+#       --passcode 20202021
+#       --PICS src/app/tests/suites/certification/ci-pics-values
+#       --trace-to json:${TRACE_TEST_JSON}.json
+#       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+#     factory-reset: true
+#     quiet: true
 # === END CI TEST ARGUMENTS ===
 
 import logging
 
-import chip.clusters as Clusters
-from chip.interaction_model import InteractionModelError, Status
-from matter_testing_support import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from mobly import asserts
+
+import matter.clusters as Clusters
+from matter.interaction_model import InteractionModelError, Status
+from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 
 # This test requires several additional command line arguments
 # run with
@@ -67,7 +76,7 @@ class TC_MWOCTRL_2_4(MatterBaseTest):
     @async_test_body
     async def test_TC_MWOCTRL_2_4(self):
 
-        endpoint = self.user_params.get("endpoint", 1)
+        endpoint = self.get_endpoint(default=1)
 
         self.step(1)
         attributes = Clusters.MicrowaveOvenControl.Attributes
@@ -81,7 +90,7 @@ class TC_MWOCTRL_2_4(MatterBaseTest):
 
         if not only_watts_supported:
             logging.info("PowerInWatts is not supported so skipping the rest of the tests.")
-            self.skip_all_remaining_steps(2)
+            self.mark_all_remaining_steps_skipped(2)
             return
 
         self.step(2)

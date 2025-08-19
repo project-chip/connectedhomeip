@@ -23,12 +23,15 @@
 
 #include "SetupPayload.h"
 
+#include <crypto/CHIPCryptoPAL.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/core/CHIPVendorIdentifiers.hpp>
 #include <lib/core/TLV.h>
 #include <lib/core/TLVData.h>
 #include <lib/core/TLVUtilities.h>
 #include <lib/support/CodeUtils.h>
+#include <setup_payload/ManualSetupPayloadParser.h>
+#include <setup_payload/QRCodeSetupPayloadParser.h>
 #include <utility>
 
 namespace chip {
@@ -62,7 +65,8 @@ bool PayloadContents::isValidQRCodePayload(ValidationMode mode) const
     if (mode == ValidationMode::kProduce)
     {
         chip::RendezvousInformationFlags valid(RendezvousInformationFlag::kBLE, RendezvousInformationFlag::kOnNetwork,
-                                               RendezvousInformationFlag::kSoftAP, RendezvousInformationFlag::kWiFiPAF);
+                                               RendezvousInformationFlag::kSoftAP, RendezvousInformationFlag::kWiFiPAF,
+                                               RendezvousInformationFlag::kNFC);
         VerifyOrReturnValue(rendezvousInformation.Value().HasOnly(valid), false);
     }
 
@@ -207,6 +211,34 @@ CHIP_ERROR SetupPayload::removeSerialNumber()
     return CHIP_NO_ERROR;
 }
 
+CHIP_ERROR SetupPayload::generateRandomSetupPin(uint32_t & setupPINCode)
+{
+    uint8_t retries          = 0;
+    const uint8_t maxRetries = 10;
+
+    do
+    {
+        ReturnErrorOnFailure(Crypto::DRBG_get_bytes(reinterpret_cast<uint8_t *>(&setupPINCode), sizeof(setupPINCode)));
+
+        // Passcodes shall be restricted to the values 00000001 to 99999998 in decimal, see 5.1.1.6
+        // TODO: Consider revising this method to ensure uniform distribution of setup PIN codes
+        setupPINCode = (setupPINCode % kSetupPINCodeMaximumValue) + 1;
+
+        // Make sure that the Generated Setup Pin code is not one of the invalid passcodes/pin codes defined in the
+        // specification.
+        if (IsValidSetupPIN(setupPINCode))
+        {
+            return CHIP_NO_ERROR;
+        }
+
+        retries++;
+        // We got pretty unlucky with the random number generator, Just try again.
+        // This shouldn't take many retries assuming DRBG_get_bytes is not broken.
+    } while (retries < maxRetries);
+
+    return CHIP_ERROR_INTERNAL;
+}
+
 CHIP_ERROR SetupPayload::addOptionalVendorData(const OptionalQRCodeInfo & info)
 {
     VerifyOrReturnError(IsVendorTag(info.tag), CHIP_ERROR_INVALID_ARGUMENT);
@@ -303,6 +335,32 @@ bool SetupPayload::operator==(const SetupPayload & input) const
     }
 
     return true;
+}
+
+CHIP_ERROR SetupPayload::FromStringRepresentation(std::string stringRepresentation, std::vector<SetupPayload> & outPayloads)
+{
+    // We're going to assume that in practice all these allocations are small
+    // enough that allocation failure will not happen.  If that ever turns out
+    // to not be the case, we may need to figure out how to handle that.
+
+    // std::string::starts_with is C++20, sadly.
+    bool isQRCode = (stringRepresentation.rfind(kQRCodePrefix, 0) == 0);
+    if (!isQRCode)
+    {
+        outPayloads.clear();
+        auto & payload = outPayloads.emplace_back();
+        ReturnErrorOnFailure(ManualSetupPayloadParser(stringRepresentation).populatePayload(payload));
+        VerifyOrReturnError(payload.isValidManualCode(), CHIP_ERROR_INVALID_ARGUMENT);
+        return CHIP_NO_ERROR;
+    }
+
+    ReturnErrorOnFailure(QRCodeSetupPayloadParser(stringRepresentation).populatePayloads(outPayloads));
+
+    for (auto & entry : outPayloads)
+    {
+        VerifyOrReturnError(entry.isValidQRCodePayload(), CHIP_ERROR_INVALID_ARGUMENT);
+    }
+    return CHIP_NO_ERROR;
 }
 
 } // namespace chip

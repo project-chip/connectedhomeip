@@ -38,8 +38,8 @@ void ExampleMicrowaveOvenDevice::MicrowaveOvenInit()
     // set default value for attribute SelectedWattIndex and WattRating
     if (mMicrowaveOvenControlInstance.HasFeature(MicrowaveOvenControl::Feature::kPowerInWatts))
     {
-        static_assert(ArraySize(mWattSettingList) > 0, "Watt setting list is empty!");
-        mSelectedWattIndex = ArraySize(mWattSettingList) - 1;
+        static_assert(MATTER_ARRAY_SIZE(mWattSettingList) > 0, "Watt setting list is empty!");
+        mSelectedWattIndex = MATTER_ARRAY_SIZE(mWattSettingList) - 1;
         mWattRating        = mWattSettingList[mSelectedWattIndex];
     }
     else
@@ -99,7 +99,7 @@ Protocols::InteractionModel::Status ExampleMicrowaveOvenDevice::HandleModifyCook
 
 CHIP_ERROR ExampleMicrowaveOvenDevice::GetWattSettingByIndex(uint8_t index, uint16_t & wattSetting)
 {
-    VerifyOrReturnError(index < ArraySize(mWattSettingList), CHIP_ERROR_NOT_FOUND);
+    VerifyOrReturnError(index < MATTER_ARRAY_SIZE(mWattSettingList), CHIP_ERROR_NOT_FOUND);
 
     wattSetting = mWattSettingList[index];
     return CHIP_NO_ERROR;
@@ -205,7 +205,7 @@ void ExampleMicrowaveOvenDevice::HandleChangeToMode(uint8_t NewMode, ModeBase::C
 
 CHIP_ERROR ExampleMicrowaveOvenDevice::GetModeLabelByIndex(uint8_t modeIndex, chip::MutableCharSpan & label)
 {
-    if (modeIndex >= ArraySize(kModeOptions))
+    if (modeIndex >= MATTER_ARRAY_SIZE(kModeOptions))
     {
         return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED;
     }
@@ -214,7 +214,7 @@ CHIP_ERROR ExampleMicrowaveOvenDevice::GetModeLabelByIndex(uint8_t modeIndex, ch
 
 CHIP_ERROR ExampleMicrowaveOvenDevice::GetModeValueByIndex(uint8_t modeIndex, uint8_t & value)
 {
-    if (modeIndex >= ArraySize(kModeOptions))
+    if (modeIndex >= MATTER_ARRAY_SIZE(kModeOptions))
     {
         return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED;
     }
@@ -224,7 +224,7 @@ CHIP_ERROR ExampleMicrowaveOvenDevice::GetModeValueByIndex(uint8_t modeIndex, ui
 
 CHIP_ERROR ExampleMicrowaveOvenDevice::GetModeTagsByIndex(uint8_t modeIndex, List<ModeTagStructType> & tags)
 {
-    if (modeIndex >= ArraySize(kModeOptions))
+    if (modeIndex >= MATTER_ARRAY_SIZE(kModeOptions))
     {
         return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED;
     }

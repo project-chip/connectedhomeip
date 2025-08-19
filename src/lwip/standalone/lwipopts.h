@@ -28,10 +28,6 @@
 #ifndef __LWIPOPTS_H__
 #define __LWIPOPTS_H__
 
-#if CHIP_HAVE_CONFIG_H
-#include <lwip/lwip_buildconfig.h>
-#endif
-
 #include <stdlib.h>
 
 /**
@@ -137,11 +133,12 @@
  * PBUF_POOL_BUFSIZE: the size of each pbuf in the pbuf pool. The default is
  * designed to accommodate single full size link-layer frame in one pbuf, including
  * the link-layer header and any link-layer encapsulation header, and the pbuf
- * structure itself.
+ * structure itself. pbuf struct consists of 2 pointers, 2 u16_t, 4 u8_t.
  */
 
 #define PBUF_POOL_BUFSIZE                                                                                                          \
-    LWIP_MEM_ALIGN_SIZE(PAYLOAD_MTU + PBUF_LINK_ENCAPSULATION_HLEN + PBUF_LINK_HLEN) + LWIP_MEM_ALIGN_SIZE(sizeof(struct pbuf) + 1)
+    LWIP_MEM_ALIGN_SIZE(PAYLOAD_MTU + PBUF_LINK_ENCAPSULATION_HLEN + PBUF_LINK_HLEN) +                                             \
+        LWIP_MEM_ALIGN_SIZE(2 * __SIZEOF_POINTER__ + (2 * 2) + (4 * 1) + 1)
 
 /**
  * TCP_SND_BUF: TCP sender buffer space (bytes).
@@ -413,14 +410,6 @@ extern unsigned char gLwIP_DebugFlags;
 #define LWIP_DBG_TYPES_ON gLwIP_DebugFlags
 
 #endif
-
-/**
- * The WICED definition of PBUF_POOL_BUFSIZE includes a number of
- * sizeof() instantiations which causes the C preprocessor to
- * fail. Disable TCP configuration constant sanity checks to work
- * around this.
- */
-#define LWIP_DISABLE_TCP_SANITY_CHECKS (1)
 
 /**
  * LwIP defaults the size of most mailboxes (i.e. message queues) to

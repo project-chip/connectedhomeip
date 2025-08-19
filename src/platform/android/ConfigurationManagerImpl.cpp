@@ -169,7 +169,7 @@ CHIP_ERROR ConfigurationManagerImpl::GetSoftwareVersionString(char * buf, size_t
 
     if (err == CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND)
     {
-        ReturnErrorCodeIf(bufSize < sizeof(CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING), CHIP_ERROR_BUFFER_TOO_SMALL);
+        VerifyOrReturnError(bufSize >= sizeof(CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING), CHIP_ERROR_BUFFER_TOO_SMALL);
         strcpy(buf, CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING);
     }
 
@@ -208,7 +208,7 @@ CHIP_ERROR ConfigurationManagerImpl::GetCommissionableDeviceName(char * buf, siz
 
     if (err == CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND)
     {
-        ReturnErrorCodeIf(bufSize < sizeof(CHIP_DEVICE_CONFIG_DEVICE_NAME), CHIP_ERROR_BUFFER_TOO_SMALL);
+        VerifyOrReturnError(bufSize >= sizeof(CHIP_DEVICE_CONFIG_DEVICE_NAME), CHIP_ERROR_BUFFER_TOO_SMALL);
         strcpy(buf, CHIP_DEVICE_CONFIG_DEVICE_NAME);
     }
 

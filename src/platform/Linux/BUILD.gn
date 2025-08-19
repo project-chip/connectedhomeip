@@ -20,15 +20,19 @@ import("${build_root}/config/linux/pkg_config.gni")
 import("${chip_root}/src/lib/core/core.gni")
 import("${chip_root}/src/platform/device.gni")
 
-assert(chip_device_platform == "linux")
+import("${chip_root}/src/crypto/crypto.gni")
 
-if (chip_use_pw_logging) {
-  import("//build_overrides/pigweed.gni")
-}
+assert(chip_device_platform == "linux")
 
 if (chip_enable_openthread) {
   import("//build_overrides/openthread.gni")
   import("//build_overrides/ot_br_posix.gni")
+}
+
+if (chip_enable_nfc_based_commissioning) {
+  pkg_config("nfc_commissioning_config") {
+    packages = [ "libpcsclite" ]
+  }
 }
 
 if (chip_mdns == "platform") {
@@ -74,6 +78,9 @@ static_library("Linux") {
   ]
 
   deps = [
+    "${chip_root}/src/app:app_config",
+    "${chip_root}/src/app/common:ids",
+    "${chip_root}/src/app/common:metadata",
     "${chip_root}/src/app/icd/server:icd-server-config",
     "${chip_root}/src/credentials:credentials_header",
     "${chip_root}/src/setup_payload",
@@ -106,6 +113,13 @@ static_library("Linux") {
     ]
   }
 
+  if (chip_with_trusty_os) {
+    sources += [
+      "DeviceAttestationCredsTrusty.cpp",
+      "DeviceAttestationCredsTrusty.h",
+    ]
+  }
+
   public_deps = [
     "${chip_root}/src/app/common:cluster-objects",
     "${chip_root}/src/platform:platform_base",
@@ -113,6 +127,14 @@ static_library("Linux") {
   ]
 
   public_configs = []
+
+  if (chip_enable_nfc_based_commissioning) {
+    sources += [
+      "NFCCommissioningManagerImpl.cpp",
+      "NFCCommissioningManagerImpl.h",
+    ]
+    public_configs += [ ":nfc_commissioning_config" ]
+  }
 
   if (chip_mdns == "platform") {
     sources += [
@@ -138,11 +160,8 @@ static_library("Linux") {
       "ThreadStackManagerImpl.h",
     ]
 
+    deps += [ "${chip_root}/src/app:app_config" ]
     public_deps += [ "dbus/openthread" ]
-  }
-
-  if (chip_use_pw_logging) {
-    deps += [ "$dir_pw_log" ]
   }
 
   if (chip_enable_wifi) {
@@ -154,17 +173,12 @@ static_library("Linux") {
   if (chip_enable_ble) {
     public_deps += [ "dbus/bluez" ]
   }
-}
 
-source_set("logging") {
-  deps = [
-    "${chip_root}/src/platform:platform_base",
-    "${chip_root}/src/platform/logging:headers",
-  ]
-
-  if (chip_use_pw_logging) {
-    deps += [ "$dir_pw_log" ]
+  if (chip_with_trusty_os) {
+    public_deps += [ "${chip_root}/third_party/libtrustymatter" ]
   }
 
-  sources = [ "Logging.cpp" ]
+  if (chip_device_config_enable_wifipaf) {
+    public_deps += [ "${chip_root}/src/wifipaf" ]
+  }
 }

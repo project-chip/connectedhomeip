@@ -22,7 +22,6 @@
 #ifdef MATTER_DM_PLUGIN_MEDIA_INPUT_SERVER
 #include "MediaInputManager.h"
 
-using namespace std;
 using namespace chip;
 using namespace chip::app::Clusters::MediaInput;
 using Protocols::InteractionModel::Status;

@@ -30,13 +30,16 @@
 #include <platform/ConfigurationManager.h>
 #include <platform/ESP32/ESP32Config.h>
 #include <platform/ESP32/ESP32Utils.h>
+#include <platform/ESP32/ScopedNvsHandle.h>
 #include <platform/internal/GenericConfigurationManagerImpl.ipp>
 
 #if CHIP_DEVICE_CONFIG_ENABLE_ETHERNET
 #include "esp_mac.h"
 #endif
 #include "esp_ota_ops.h"
+#ifndef CONFIG_IDF_TARGET_ESP32P4
 #include "esp_phy_init.h"
+#endif
 #include "esp_wifi.h"
 #include "nvs.h"
 #include "nvs_flash.h"
@@ -45,12 +48,19 @@ namespace DeviceLayer {
 
 using namespace ::chip::DeviceLayer::Internal;
 
-// TODO: Define a Singleton instance of CHIP Group Key Store here (#1266)
-
 ConfigurationManagerImpl & ConfigurationManagerImpl::GetDefaultInstance()
 {
     static ConfigurationManagerImpl sInstance;
     return sInstance;
+}
+
+uint32_t ConfigurationManagerImpl::mTotalOperationalHours = 0;
+
+void ConfigurationManagerImpl::TotalOperationalHoursTimerCallback(TimerHandle_t timer)
+{
+    // This function is called from the FreeRTOS timer task. Since the task stack is limited,
+    // we avoid logging error messages here to prevent stack overflows.
+    (void) ConfigurationMgrImpl().StoreTotalOperationalHours(++mTotalOperationalHours);
 }
 
 CHIP_ERROR ConfigurationManagerImpl::Init()
@@ -161,17 +171,36 @@ CHIP_ERROR ConfigurationManagerImpl::Init()
         SuccessOrExit(err);
     }
 
-    if (!ESP32Config::ConfigValueExists(ESP32Config::kCounterKey_TotalOperationalHours))
+    if (CHIP_NO_ERROR != GetTotalOperationalHours(mTotalOperationalHours))
     {
-        err = StoreTotalOperationalHours(0);
+        err = StoreTotalOperationalHours(mTotalOperationalHours);
         SuccessOrExit(err);
+    }
+
+    {
+        // The total-operational-hours is critical information. It intentionally uses the FreeRTOS timer
+        // to increment the value, this ensures it is not affected by PostEvent failures.
+
+        // Start a timer which reloads every one hour and bumps the total operational hours
+        TickType_t reloadPeriod   = (1000 * 60 * 60) / portTICK_PERIOD_MS;
+        TimerHandle_t timerHandle = xTimerCreate("tOpHrs", reloadPeriod, pdPASS, nullptr, TotalOperationalHoursTimerCallback);
+        if (timerHandle == nullptr)
+        {
+            err = CHIP_ERROR_NO_MEMORY;
+            ExitNow(ChipLogError(DeviceLayer, "total operational hours Timer creation failed"));
+        }
+
+        BaseType_t timerStartStatus = xTimerStart(timerHandle, 0);
+        if (timerStartStatus == pdFAIL)
+        {
+            err = CHIP_ERROR_INTERNAL;
+            ExitNow(ChipLogError(DeviceLayer, "total operational hours Timer start failed"));
+        }
     }
 
     // Initialize the generic implementation base class.
     err = Internal::GenericConfigurationManagerImpl<ESP32Config>::Init();
     SuccessOrExit(err);
-
-    // TODO: Initialize the global GroupKeyStore object here (#1266)
 
     err = CHIP_NO_ERROR;
 
@@ -196,7 +225,13 @@ CHIP_ERROR ConfigurationManagerImpl::GetTotalOperationalHours(uint32_t & totalOp
 
 CHIP_ERROR ConfigurationManagerImpl::StoreTotalOperationalHours(uint32_t totalOperationalHours)
 {
-    return WriteConfigValue(ESP32Config::kCounterKey_TotalOperationalHours, totalOperationalHours);
+    ScopedNvsHandle handle;
+    ESP32Config::Key key = ESP32Config::kCounterKey_TotalOperationalHours;
+
+    ReturnErrorOnFailure(handle.Open(key.Namespace, NVS_READWRITE, ESP32Config::GetPartitionLabelByNamespace(key.Namespace)));
+    ReturnMappedErrorOnFailure(nvs_set_u32(handle, key.Name, totalOperationalHours));
+    ReturnMappedErrorOnFailure(nvs_commit(handle));
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR ConfigurationManagerImpl::GetSoftwareVersionString(char * buf, size_t bufSize)
@@ -210,8 +245,9 @@ CHIP_ERROR ConfigurationManagerImpl::GetSoftwareVersionString(char * buf, size_t
     appDescription = esp_ota_get_app_description();
 #endif
 
-    ReturnErrorCodeIf(bufSize < sizeof(appDescription->version), CHIP_ERROR_BUFFER_TOO_SMALL);
-    ReturnErrorCodeIf(sizeof(appDescription->version) > ConfigurationManager::kMaxSoftwareVersionStringLength, CHIP_ERROR_INTERNAL);
+    VerifyOrReturnError(bufSize >= sizeof(appDescription->version), CHIP_ERROR_BUFFER_TOO_SMALL);
+    VerifyOrReturnError(sizeof(appDescription->version) <= ConfigurationManager::kMaxSoftwareVersionStringLength,
+                        CHIP_ERROR_INTERNAL);
     strcpy(buf, appDescription->version);
     return CHIP_NO_ERROR;
 }
@@ -241,6 +277,23 @@ CHIP_ERROR ConfigurationManagerImpl::GetLocationCapability(uint8_t & location)
 #endif // CONFIG_ENABLE_ESP32_LOCATIONCAPABILITY
 }
 
+CHIP_ERROR ConfigurationManagerImpl::GetDeviceTypeId(uint32_t & deviceType)
+{
+    uint32_t value = 0;
+    CHIP_ERROR err = ReadConfigValue(ESP32Config::kConfigKey_PrimaryDeviceType, value);
+
+    if (err == CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND)
+    {
+        deviceType = CHIP_DEVICE_CONFIG_DEVICE_TYPE;
+    }
+    else
+    {
+        deviceType = value;
+    }
+
+    return CHIP_NO_ERROR;
+}
+
 CHIP_ERROR ConfigurationManagerImpl::StoreCountryCode(const char * code, size_t codeLen)
 {
     // As per spec, codeLen has to be 2
@@ -259,7 +312,7 @@ CHIP_ERROR ConfigurationManagerImpl::StoreCountryCode(const char * code, size_t 
 
 #if CHIP_DEVICE_CONFIG_ENABLE_ETHERNET
 
-CHIP_ERROR ConfigurationManagerImpl::GetPrimaryMACAddress(MutableByteSpan buf)
+CHIP_ERROR ConfigurationManagerImpl::GetPrimaryMACAddress(MutableByteSpan & buf)
 {
     if (GetPrimaryEthernetMACAddress(buf) == CHIP_NO_ERROR)
     {
@@ -269,7 +322,7 @@ CHIP_ERROR ConfigurationManagerImpl::GetPrimaryMACAddress(MutableByteSpan buf)
     return CHIP_ERROR_NOT_FOUND;
 }
 
-CHIP_ERROR ConfigurationManagerImpl::GetPrimaryEthernetMACAddress(MutableByteSpan buf)
+CHIP_ERROR ConfigurationManagerImpl::GetPrimaryEthernetMACAddress(MutableByteSpan & buf)
 {
     if (buf.size() < ConfigurationManager::kPrimaryMACAddressLength)
         return CHIP_ERROR_BUFFER_TOO_SMALL;
@@ -427,14 +480,14 @@ void ConfigurationManagerImpl::DoFactoryReset(intptr_t arg)
     err = ESP32Config::ClearNamespace(ESP32Config::kConfigNamespace_ChipConfig);
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(DeviceLayer, "ClearNamespace(ChipConfig) failed: %s", chip::ErrorStr(err));
+        ChipLogError(DeviceLayer, "ClearNamespace(ChipConfig) failed: %" CHIP_ERROR_FORMAT, err.Format());
     }
 
     // Erase all values in the chip-counters NVS namespace.
     err = ESP32Config::ClearNamespace(ESP32Config::kConfigNamespace_ChipCounters);
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(DeviceLayer, "ClearNamespace(ChipCounters) failed: %s", chip::ErrorStr(err));
+        ChipLogError(DeviceLayer, "ClearNamespace(ChipCounters) failed: %" CHIP_ERROR_FORMAT, err.Format());
     }
 
     // Restore WiFi persistent settings to default values.

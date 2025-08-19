@@ -142,7 +142,7 @@ void PwmManager::linkBackend(PwmBackend & backend)
     }
 }
 
-#if CONFIG_WS2812_STRIP
+#if CONFIG_WS2812_STRIP_GPIO_TELINK
 
 #include <zephyr_ws2812.h>
 
@@ -200,7 +200,7 @@ void Ws2812Strip::setPwmHWBreath(size_t pwm, size_t breathMs)
     LOG_WRN("WS2812 LED setPwmHWBreath not supported");
 }
 
-#else
+#elif CONFIG_PWM
 
 #include <zephyr_pwm_pool.h>
 
@@ -261,4 +261,40 @@ void PwmPool::setPwmHWBreath(size_t pwm, size_t breathMs)
     }
 }
 
-#endif // CONFIG_WS2812_STRIP
+#else
+// Dummy implementation
+PwmDummy & PwmDummy::getInstance()
+{
+    static PwmDummy instance;
+
+    return instance;
+}
+
+bool PwmDummy::linkHW()
+{
+    LOG_INF("PWM Dummy inited");
+
+    return true;
+}
+
+void PwmDummy::setPwmHW(size_t pwm, bool state)
+{
+    LOG_INF("PWM Dummy %u turn %s", pwm, state ? "on" : "off");
+}
+
+void PwmDummy::setPwmHW(size_t pwm, uint32_t permille)
+{
+    LOG_INF("PWM Dummy %u set %u", pwm, permille);
+}
+
+void PwmDummy::setPwmHWBlink(size_t pwm, size_t onMs, size_t offMs)
+{
+    LOG_WRN("PWM Dummy setPwmHWBlink not supported");
+}
+
+void PwmDummy::setPwmHWBreath(size_t pwm, size_t breathMs)
+{
+    LOG_WRN("PWM Dummy setPwmHWBreath not supported");
+}
+
+#endif // CONFIG_WS2812_STRIP_GPIO_TELINK

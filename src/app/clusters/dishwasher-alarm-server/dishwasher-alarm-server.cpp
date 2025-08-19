@@ -33,7 +33,6 @@ using namespace chip::app::Clusters::DishwasherAlarm;
 using namespace chip::app::Clusters::DishwasherAlarm::Attributes;
 using namespace chip::DeviceLayer;
 using chip::Protocols::InteractionModel::Status;
-using namespace std;
 
 static constexpr size_t kDishwasherAlarmDelegateTableSize =
     MATTER_DM_DISHWASHER_ALARM_CLUSTER_SERVER_ENDPOINT_COUNT + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT;

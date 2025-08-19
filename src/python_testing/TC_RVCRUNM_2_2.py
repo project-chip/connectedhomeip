@@ -19,23 +19,36 @@
 # for details about the block below.
 #
 # === BEGIN CI TEST ARGUMENTS ===
-# test-runner-runs: run1
-# test-runner-run/run1/app: ${CHIP_RVC_APP}
-# test-runner-run/run1/factoryreset: True
-# test-runner-run/run1/quiet: True
-# test-runner-run/run1/app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
-# test-runner-run/run1/script-args: --storage-path admin_storage.json --commissioning-method on-network --discriminator 1234 --passcode 20202021 --PICS examples/rvc-app/rvc-common/pics/rvc-app-pics-values --endpoint 1 --trace-to json:${TRACE_TEST_JSON}.json --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto --int-arg PIXIT.RVCRUNM.MODE_A:1 PIXIT.RVCRUNM.MODE_B:2
+# test-runner-runs:
+#   run1:
+#     app: ${CHIP_RVC_APP}
+#     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json --app-pipe /tmp/rvcrunm_2_2_fifo
+#     script-args: >
+#       --PICS examples/rvc-app/rvc-common/pics/rvc-app-pics-values
+#       --storage-path admin_storage.json
+#       --commissioning-method on-network
+#       --discriminator 1234
+#       --passcode 20202021
+#       --endpoint 1
+#       --app-pipe /tmp/rvcrunm_2_2_fifo
+#       --int-arg PIXIT.RVCRUNM.MODE_A:1
+#       --int-arg PIXIT.RVCRUNM.MODE_B:2
+#       --trace-to json:${TRACE_TEST_JSON}.json
+#       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+#     factory-reset: true
+#     quiet: true
 # === END CI TEST ARGUMENTS ===
 
 import enum
 
-import chip.clusters as Clusters
-from matter_testing_support import MatterBaseTest, async_test_body, default_matter_test_main
 from mobly import asserts
+
+import matter.clusters as Clusters
+from matter.testing.matter_testing import MatterBaseTest, async_test_body, default_matter_test_main
 
 # This test requires several additional command line arguments.
 # Run the test with
-# --int-arg PIXIT.RVCRUNM.MODE_A:<mode id> PIXIT.RVCRUNM.MODE_B:<mode id>
+# --int-arg PIXIT.RVCRUNM.MODE_A:<mode id> --int-arg PIXIT.RVCRUNM.MODE_B:<mode id>
 
 
 class RvcStatusEnum(enum.IntEnum):
@@ -73,7 +86,6 @@ class TC_RVCRUNM_2_2(MatterBaseTest):
         self.supported_run_modes_dut = []
         self.idle_mode_dut = 0
         self.is_ci = False
-        self.app_pipe = "/tmp/chip_rvc_fifo_"
 
     async def read_mod_attribute_expect_success(self, cluster, attribute):
         return await self.read_single_attribute_check_success(
@@ -123,15 +135,10 @@ class TC_RVCRUNM_2_2(MatterBaseTest):
                          "PIXIT.RVCRUNM.MODE_B:<mode id>")
 
         self.directmodech_bit_mask = Clusters.RvcRunMode.Bitmaps.Feature.kDirectModeChange
-        self.endpoint = self.matter_test_config.endpoint
+        self.endpoint = self.get_endpoint()
         self.is_ci = self.check_pics("PICS_SDK_CI_ONLY")
         self.mode_a = self.matter_test_config.global_test_params['PIXIT.RVCRUNM.MODE_A']
         self.mode_b = self.matter_test_config.global_test_params['PIXIT.RVCRUNM.MODE_B']
-        if self.is_ci:
-            app_pid = self.matter_test_config.app_pid
-            if app_pid == 0:
-                asserts.fail("The --app-pid flag must be set when PICS_SDK_CI_ONLY is set.c")
-            self.app_pipe = self.app_pipe + str(app_pid)
 
         asserts.assert_true(self.check_pics("RVCRUNM.S"), "RVCRUNM.S must be supported")
         # I think that the following PICS should be listed in the preconditions section in the test plan as if either

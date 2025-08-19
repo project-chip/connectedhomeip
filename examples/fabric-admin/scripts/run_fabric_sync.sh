@@ -14,7 +14,9 @@ DEFAULT_BRIDGE_CHOICES=(
     "./fabric-bridge-app"
     "out/debug/standalone/fabric-bridge-app"
     "out/linux-x64-fabric-bridge-rpc/fabric-bridge-app"
+    "out/linux-x64-fabric-bridge-rpc-no-ble/fabric-bridge-app"
     "out/darwin-arm64-fabric-bridge-rpc/fabric-bridge-app"
+    "out/darwin-arm64-fabric-bridge-rpc-no-ble/fabric-bridge-app"
 )
 FABRIC_ADMIN_LOG="/tmp/fabric_admin.log"
 FABRIC_BRIDGE_APP_LOG="/tmp/fabric_bridge_app.log"
@@ -101,6 +103,11 @@ else
     echo >&2 "Could not find the stop_fabric_sync.sh script"
     exit 1
 fi
+
+# Remove previous log files
+rm /tmp/fabric_admin.log
+rm /tmp/fabric_bridge_app.log
+echo "Removed fabric sync log files."
 
 # Start fabric-bridge-app if available and redirect its output to /dev/null
 if [ -f "$FABRIC_BRIDGE_APP_PATH" ]; then

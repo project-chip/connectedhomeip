@@ -18,8 +18,8 @@ import("//build_overrides/efr32_sdk.gni")
 import("//build_overrides/pigweed.gni")
 
 import("${build_root}/config/defaults.gni")
-import("${efr32_sdk_build_root}/efr32_sdk.gni")
-import("${efr32_sdk_build_root}/silabs_executable.gni")
+import("${silabs_sdk_build_root}/efr32_sdk.gni")
+import("${silabs_sdk_build_root}/silabs_executable.gni")
 
 import("${chip_root}/examples/common/pigweed/pigweed_rpcs.gni")
 import("${chip_root}/src/platform/device.gni")
@@ -101,6 +101,7 @@ silabs_executable("chef_app") {
   if (chip_enable_pw_rpc) {
     defines += [
       "PW_RPC_ENABLED",
+      "PW_RPC_ACTIONS_SERVICE=1",
       "PW_RPC_ATTRIBUTE_SERVICE=1",
       "PW_RPC_BUTTON_SERVICE=1",
       "PW_RPC_DESCRIPTOR_SERVICE=1",

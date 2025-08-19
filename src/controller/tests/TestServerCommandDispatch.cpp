@@ -15,13 +15,6 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-
-/**
- *    @file
- *      This file implements unit tests for CHIP Interaction Model Command Interaction
- *
- */
-
 #include <pw_unit_test/framework.h>
 
 #include <app-common/zap-generated/cluster-objects.h>
@@ -32,8 +25,13 @@
 #include <app/InteractionModelEngine.h>
 #include <app/tests/AppTestContext.h>
 #include <app/util/attribute-storage.h>
+#include <clusters/UnitTesting/Metadata.h>
 #include <controller/InvokeInteraction.h>
 #include <controller/ReadInteraction.h>
+#include <data-model-providers/codegen/CodegenDataModelProvider.h>
+#include <data-model-providers/codegen/Instance.h>
+#include <lib/core/CHIPError.h>
+#include <lib/core/DataModelTypes.h>
 #include <lib/core/ErrorStr.h>
 #include <lib/core/StringBuilderAdapters.h>
 #include <lib/support/logging/CHIPLogging.h>
@@ -72,7 +70,8 @@ public:
 
 private:
     void InvokeCommand(chip::app::CommandHandlerInterface::HandlerContext & handlerContext) final;
-    CHIP_ERROR EnumerateAcceptedCommands(const ConcreteClusterPath & cluster, CommandIdCallback callback, void * context) final;
+    CHIP_ERROR RetrieveAcceptedCommands(const ConcreteClusterPath & cluster,
+                                        ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder) final;
 
     bool mOverrideAcceptedCommands = false;
     bool mClaimNoCommands          = false;
@@ -107,8 +106,8 @@ void TestClusterCommandHandler::InvokeCommand(chip::app::CommandHandlerInterface
         });
 }
 
-CHIP_ERROR TestClusterCommandHandler::EnumerateAcceptedCommands(const ConcreteClusterPath & cluster,
-                                                                CommandHandlerInterface::CommandIdCallback callback, void * context)
+CHIP_ERROR TestClusterCommandHandler::RetrieveAcceptedCommands(const ConcreteClusterPath & cluster,
+                                                               ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder)
 {
     if (!mOverrideAcceptedCommands)
     {
@@ -121,7 +120,8 @@ CHIP_ERROR TestClusterCommandHandler::EnumerateAcceptedCommands(const ConcreteCl
     }
 
     // We just have one command id.
-    callback(Clusters::UnitTesting::Commands::TestSimpleArgumentRequest::Id, context);
+    ReturnErrorOnFailure(builder.EnsureAppendCapacity(1));
+    ReturnErrorOnFailure(builder.Append(Clusters::UnitTesting::Commands::TestSimpleArgumentRequest::kMetadataEntry));
     return CHIP_NO_ERROR;
 }
 
@@ -129,9 +129,51 @@ CHIP_ERROR TestClusterCommandHandler::EnumerateAcceptedCommands(const ConcreteCl
 
 namespace {
 
+// TODO:(#36837) implementing its own provider instead of using "CodegenDataModelProvider"
+// TestServerCommandDispatch should provide its own dedicated data model provider rather than using CodegenDataModelProvider
+// provider. This class exists solely for one specific test scenario, on a temporary basis.
+class DispatchTestDataModel : public CodegenDataModelProvider
+{
+public:
+    static DispatchTestDataModel & Instance()
+    {
+        static DispatchTestDataModel instance;
+        return instance;
+    }
+
+    // The Startup method initializes the data model provider with a given context.
+    // This approach ensures that the test relies on a more controlled and explicit data model provider
+    // rather than depending on the code-generated one with undefined modifications.
+    CHIP_ERROR Startup(DataModel::InteractionModelContext context) override
+    {
+        ReturnErrorOnFailure(CodegenDataModelProvider::Startup(context));
+        return CHIP_NO_ERROR;
+    }
+
+protected:
+    // Since the current unit tests do not involve any cluster implementations, we override InitDataModelForTesting
+    // to do nothing, thereby preventing calls to the Ember-specific InitDataModelHandler.
+    void InitDataModelForTesting() override {}
+};
+
 class TestServerCommandDispatch : public chip::Test::AppContext
 {
+public:
+    void SetUp()
+    {
+        AppContext::SetUp();
+        mOldProvider = InteractionModelEngine::GetInstance()->SetDataModelProvider(&DispatchTestDataModel::Instance());
+    }
+
+    void TearDown()
+    {
+        InteractionModelEngine::GetInstance()->SetDataModelProvider(mOldProvider);
+        AppContext::TearDown();
+    }
+
 protected:
+    chip::app::DataModel::Provider * mOldProvider = nullptr;
+
     void TestDataResponseHelper(const EmberAfEndpointType * aEndpoint, bool aExpectSuccess);
 };
 
@@ -176,7 +218,8 @@ TEST_F(TestServerCommandDispatch, TestNoHandler)
     EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 0u);
 }
 
-static const int kDescriptorAttributeArraySize = 254;
+// Use 8 so that we don't exceed the size of ATTRIBUTE_LARGEST defined by ZAP
+static const int kDescriptorAttributeArraySize = 8;
 
 // Declare Descriptor cluster attributes
 DECLARE_DYNAMIC_ATTRIBUTE_LIST_BEGIN(descriptorAttrs)
@@ -240,7 +283,7 @@ void TestServerCommandDispatch::TestDataResponseHelper(const EmberAfEndpointType
     //
     // All our endpoints have the same number of clusters, so just pick one.
     //
-    DataVersion dataVersionStorage[ArraySize(testEndpointClusters1)];
+    DataVersion dataVersionStorage[MATTER_ARRAY_SIZE(testEndpointClusters1)];
     emberAfSetDynamicEndpoint(0, kTestEndpointId, aEndpoint, Span<DataVersion>(dataVersionStorage));
 
     // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's

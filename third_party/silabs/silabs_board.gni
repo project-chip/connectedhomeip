@@ -12,9 +12,20 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import("//build_overrides/chip.gni")
+import("${chip_root}/src/platform/silabs/tests/args.gni")
+
 declare_args() {
-  # EFR32 board used
+  # Silabs wireless starter kit plug-in boards featuring specific mcu family and mcu model.
+  # Find more information at https://www.silabs.com/development-tools/wireless.
+  # A board tailored for specific mcu family and mcu model can be created with "CUSTOM".
   silabs_board = ""
+
+  # Silabs mcu family used
+  silabs_family = ""
+
+  # Silabs mcu model used
+  silabs_mcu = ""
 
   # LCD is enabled by default
   # Boards BRD4166A, BRD2601B, BRD2703A and BRD4319A do not have a LCD so they disable it explicitly
@@ -43,11 +54,14 @@ declare_args() {
   # Disable AWS SDK OTA by default
   aws_sdk_ota = false
 
-  # Disable UART log forwarding by default
-  sl_uart_log_output = false
+  # Temperature Sensor support
+  sl_enable_si70xx_sensor = false
 
-  # Self-provision enabled
-  use_provision_channel = false
+  # RGB LED support
+  sl_enable_rgb_led = false
+
+  #Si917Y boards
+  is_si917y_mcu = false
 }
 
 declare_args() {
@@ -58,17 +72,65 @@ declare_args() {
   chip_enable_ble_rs911x = use_rs9116 || use_SiWx917
 }
 
+# TODO - This needs to be removed once multiplexing issues resolved
+if (use_SiWx917 || use_rs9116) {
+  disable_lcd = true
+  show_qr_code = false
+  use_external_flash = false
+}
+
 if (silabs_board == "") {
   silabs_board = getenv("SILABS_BOARD")
+}
+
+# Workaround to enable unit-tests when depending on files that import this gni
+if (silabs_board == "" && sl_build_unit_tests) {
+  if (!chip_build_all_platform_tests) {
+    # We can't print to the console when running our tests in the CSA CI otherwise CI fails.
+    print("Building the unit test configuration since silabs_board is not set.")
+    print("If you are building the efr32 test_driver, a board is required.")
+  }
+  silabs_board = "unit-test"
+  silabs_family = "unit-test"
+  silabs_mcu = "unit-test"
 }
 
 assert(silabs_board != "", "silabs_board must be specified")
 
 # Si917 WIFI board ----------
-if (silabs_board == "BRD4338A") {
+si917_wifi_boards = [
+  "BRD4338A",
+  "BRD2605A",
+  "BRD4343A",
+  "BRD4342A",
+  "BRD2708A",
+  "BRD2911A",
+]
+
+# Check if silabs_board is a Si917 board
+is_si917_board = false
+foreach(board, si917_wifi_boards) {
+  if (silabs_board == board) {
+    is_si917_board = true
+  }
+}
+
+if (is_si917_board) {
+  if (silabs_board == "BRD2605A") {
+    sl_enable_rgb_led = true
+  }
   silabs_family = "SiWx917-common"
-  silabs_mcu = "SiWG917M111MGTBA"
   wifi_soc = true
+
+  if (silabs_board == "BRD2708A" || silabs_board == "BRD2911A") {
+    is_si917y_mcu = true
+    silabs_mcu = "SIWG917Y111MGABA"
+  } else {
+    silabs_mcu = "SiWG917M111MGTBA"
+  }
+
+  assert(!sl_enable_si70xx_sensor,
+         "${silabs_board} does not support the si90xx sensor!")
 
   # EFR32 MG24 series ----------
 } else if (silabs_board == "BRD4186A" || silabs_board == "BRD4187A") {
@@ -99,6 +161,9 @@ if (silabs_board == "BRD4338A") {
   show_qr_code = false
   disable_lcd = true
 
+  assert(!sl_enable_si70xx_sensor,
+         "${silabs_board} does not support the si90xx sensor!")
+
   # EFR32 MG24 Modules series ----------
 } else if (silabs_board == "BRD4316A") {
   silabs_family = "mgm24"
@@ -123,6 +188,9 @@ if (silabs_board == "BRD4338A") {
   use_external_flash = false
   show_qr_code = false
   disable_lcd = true
+
+  assert(!sl_enable_si70xx_sensor,
+         "${silabs_board} does not support the si90xx sensor!")
 } else if (silabs_board == "BRD2704A") {
   silabs_family = "mgm24"
   silabs_mcu = "MGM240PB32VNA"
@@ -132,6 +200,9 @@ if (silabs_board == "BRD4338A") {
   use_external_flash = false
   show_qr_code = false
   disable_lcd = true
+
+  assert(!sl_enable_si70xx_sensor,
+         "${silabs_board} does not support the si90xx sensor!")
 } else if (silabs_board == "BRD4318A") {
   silabs_family = "mgm24"
   silabs_mcu = "MGM240SD22VNA"
@@ -153,6 +224,14 @@ if (silabs_board == "BRD4338A") {
   # ThunderBoards don't have a LCD,
   show_qr_code = false
   disable_lcd = true
+
+  # Custom Board ----------
+} else if (silabs_board == "CUSTOM") {
+  print("Using custom board configuration")
+  print("silabs_family:", silabs_family)
+  print("silabs_mcu:", silabs_mcu)
+} else if (silabs_board == "unit-test") {
+  # Do nothing
 } else {
   assert(
       false,
@@ -165,7 +244,15 @@ declare_args() {
   # User can set this arg to false to skip the rps creation for WiFi SoCs.
   # e.g. for CI
   use_rps_extension = wifi_soc
+
+  # UART log forwarding
+  # Default true for the wifi soc and false for EFR32 boards
+  sl_uart_log_output = wifi_soc
 }
+
+# Silabs mcu family and mcu model must be specified
+assert(silabs_family != "", "Must specify silabs_family")
+assert(silabs_mcu != "", "Must specify silabs_mcu")
 
 # qr code cannot be true if lcd is disabled
 assert(!(disable_lcd && show_qr_code))

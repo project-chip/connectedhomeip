@@ -17,8 +17,13 @@
 
 #pragma once
 
-#include <app-common/zap-generated/ids/Attributes.h>
 #include <app/AppConfig.h>
+#include <app/AttributeValueEncoder.h>
+#include <app/ConcreteAttributePath.h>
+#include <app/data-model-provider/ActionReturnStatus.h>
+#include <app/data-model-provider/Provider.h>
+#include <clusters/shared/GlobalIds.h>
+#include <lib/core/DataModelTypes.h>
 #include <lib/support/CodeUtils.h>
 
 namespace chip {
@@ -32,26 +37,22 @@ namespace app {
 constexpr AttributeId GlobalAttributesNotInMetadata[] = {
     Clusters::Globals::Attributes::GeneratedCommandList::Id,
     Clusters::Globals::Attributes::AcceptedCommandList::Id,
-#if CHIP_CONFIG_ENABLE_EVENTLIST_ATTRIBUTE
-    Clusters::Globals::Attributes::EventList::Id,
-#endif // CHIP_CONFIG_ENABLE_EVENTLIST_ATTRIBUTE
     Clusters::Globals::Attributes::AttributeList::Id,
 };
 
 static_assert(ArrayIsSorted(GlobalAttributesNotInMetadata), "Array of global attribute ids must be sorted");
 
-inline bool IsSupportedGlobalAttributeNotInMetadata(AttributeId attributeId)
-{
-    for (auto & attr : GlobalAttributesNotInMetadata)
-    {
-        if (attr == attributeId)
-        {
-            return true;
-        }
-    }
+bool IsSupportedGlobalAttributeNotInMetadata(AttributeId attributeId);
 
-    return false;
-}
+/**
+ * Reads a `IsSupportedGlobalAttributeNotInMetadata` attribute into `encoder`.
+ *
+ * Preconditions:
+ *   - `path` MUST be a valid cluster path inside `provider` and its mAttributeID
+ *     MUST be `IsSupportedGlobalAttributeNotInMetadata`
+ */
+DataModel::ActionReturnStatus ReadGlobalAttributeFromMetadata(DataModel::Provider * provider, const ConcreteAttributePath & path,
+                                                              AttributeValueEncoder & encoder);
 
 } // namespace app
 } // namespace chip

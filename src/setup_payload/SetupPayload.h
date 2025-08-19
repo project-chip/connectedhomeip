@@ -102,6 +102,7 @@ enum class RendezvousInformationFlag : uint8_t
     kBLE       = 1 << 1, ///< Device supports BLE
     kOnNetwork = 1 << 2, ///< Device supports Setup on network
     kWiFiPAF   = 1 << 3, ///< Device supports Wi-Fi Public Action Frame for discovery
+    kNFC       = 1 << 4, ///< Device supports NFC-based Commissioning
 };
 using RendezvousInformationFlags = chip::BitFlags<RendezvousInformationFlag, uint8_t>;
 
@@ -258,6 +259,32 @@ public:
      * @return Returns True if the tag is Vendor-specific
      **/
     static bool IsVendorTag(uint8_t tag) { return !IsCommonTag(tag); }
+
+    /** @brief Generate a Random Setup Pin Code (Passcode)
+     *
+     * This function generates a random passcode within the defined limits (00000001 to 99999998)
+     * It also checks that the generated passcode is not equal to any invalid passcode values as defined in 5.1.7.1.
+     *
+     * @param[out] setupPINCode The generated random setup PIN code.
+     * @return Returns a CHIP_ERROR_INTERNAL if unable to generate a valid passcode within a reasonable number of attempts,
+     * CHIP_NO_ERROR otherwise
+     **/
+    static CHIP_ERROR generateRandomSetupPin(uint32_t & setupPINCode);
+
+    /**
+     * @brief Get a list of setup payloads from a string representation.
+     *
+     * @param[in] stringRepresentation The string representing the payloads.
+
+     * @param[out] outPayloads On success, the contents of this vector will be
+     *                         replaces with the list of parsed payloads.  The
+     *                         result may have only one entry, or multiple
+     *                         entries if concatenated QR codes are used.
+     *
+     *                         On failure, the value of the out param should not
+     *                         be relied on to be anything in particular.
+     */
+    static CHIP_ERROR FromStringRepresentation(std::string stringRepresentation, std::vector<SetupPayload> & outPayloads);
 
 private:
     std::map<uint8_t, OptionalQRCodeInfo> optionalVendorData;

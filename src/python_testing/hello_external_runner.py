@@ -24,10 +24,12 @@ from multiprocessing import Process
 from multiprocessing.managers import BaseManager
 
 from hello_test import HelloTest
-from matter_testing_support import MatterTestConfig, get_test_info, run_tests
+
+from matter.testing.matter_test_config import MatterTestConfig
+from matter.testing.matter_testing import get_test_info, run_tests
 
 try:
-    from matter_yamltests.hooks import TestRunnerHooks
+    from matter.yamltests.hooks import TestRunnerHooks
 except ImportError:
     class TestRunnerHooks:
         pass

@@ -11,30 +11,32 @@ RUN set -x \
 # Setup toolchain
 WORKDIR /opt/telink
 RUN set -x \
-    && curl --location https://github.com/zephyrproject-rtos/sdk-ng/releases/download/v0.16.1/zephyr-sdk-0.16.1_linux-x86_64_minimal.tar.xz --output zephyr-sdk-0.16.1_linux-x86_64_minimal.tar.xz \
-    && tar xvf zephyr-sdk-0.16.1_linux-x86_64_minimal.tar.xz \
-    && rm -rf zephyr-sdk-0.16.1_linux-x86_64_minimal.tar.xz \
-    && zephyr-sdk-0.16.1/setup.sh -t riscv64-zephyr-elf \
+    && curl --location https://github.com/zephyrproject-rtos/sdk-ng/releases/download/v0.17.0/zephyr-sdk-0.17.0_linux-x86_64_minimal.tar.xz --output zephyr-sdk-0.17.0_linux-x86_64_minimal.tar.xz \
+    && tar xvf zephyr-sdk-0.17.0_linux-x86_64_minimal.tar.xz \
+    && rm -rf zephyr-sdk-0.17.0_linux-x86_64_minimal.tar.xz \
+    && zephyr-sdk-0.17.0/setup.sh -t riscv64-zephyr-elf \
     && : # last line
 
-# Setup Zephyr
-ARG ZEPHYR_REVISION=446337fb7b31cd9751720a57d0add62da89c962a
+# Setup Zephyr version: 4.1.0; branch: develop
+ARG ZEPHYR_REVISION=0769202d4e2e02947a9d7e70db72d5a3c67b97f4
+ARG N22_BIN_REVISION=a75790f16043dd42deb0801a5d0ff83711e3a26a
 WORKDIR /opt/telink/zephyrproject
 RUN set -x \
     && python3 -m pip install --break-system-packages -U --no-cache-dir west \
-    && git clone https://github.com/telink-semi/zephyr \
+    && git init zephyr \
     && cd zephyr \
+    && git remote add origin https://github.com/telink-semi/zephyr \
+    && git fetch --depth=1 origin ${ZEPHYR_REVISION} \
     && git reset ${ZEPHYR_REVISION} --hard \
     && west init -l \
-    && cd .. \
     && west update -o=--depth=1 -n -f smart \
     && west blobs fetch hal_telink \
-    && west zephyr-export \
+    && scripts/utils/telink_w91_post_build $PWD ${N22_BIN_REVISION} 1 \
     && : # last line
 
 FROM ghcr.io/project-chip/chip-build:${VERSION}
 
-COPY --from=build /opt/telink/zephyr-sdk-0.16.1/ /opt/telink/zephyr-sdk-0.16.1/
+COPY --from=build /opt/telink/zephyr-sdk-0.17.0/ /opt/telink/zephyr-sdk-0.17.0/
 COPY --from=build /opt/telink/zephyrproject/ /opt/telink/zephyrproject/
 
 RUN set -x \
@@ -45,4 +47,4 @@ RUN set -x \
     && : # last line
 
 ENV TELINK_ZEPHYR_BASE=/opt/telink/zephyrproject/zephyr
-ENV TELINK_ZEPHYR_SDK_DIR=/opt/telink/zephyr-sdk-0.16.1
+ENV TELINK_ZEPHYR_SDK_DIR=/opt/telink/zephyr-sdk-0.17.0

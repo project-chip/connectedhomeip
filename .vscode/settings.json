@@ -50,6 +50,7 @@
         "editor.defaultFormatter": "esbenp.prettier-vscode"
     },
     "files.associations": {
+        ".gitmodules": "ini",
         "*.mm": "cpp",
         "iostream": "cpp",
         "array": "cpp",
@@ -138,6 +139,9 @@
         "list": "cpp",
         "unordered_set": "cpp"
     },
+    "[ini]": {
+        "editor.formatOnSave": false
+    },
     // Configure paths or glob patterns to exclude from file watching.
     "files.watcherExclude": {
         "**/.git/objects/**": true,
@@ -189,6 +193,7 @@
     "files.trimFinalNewlines": true,
     "C_Cpp.default.cppStandard": "gnu++17",
     "C_Cpp.default.cStandard": "gnu11",
+    "shellformat.flag": "-i 4 -ci",
     "cmake.configureOnOpen": false,
     "search.followSymlinks": false,
     "[python]": {

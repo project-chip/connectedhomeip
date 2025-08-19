@@ -20,20 +20,31 @@
 # for details about the block below.
 #
 # === BEGIN CI TEST ARGUMENTS ===
-# test-runner-runs: run1
-# test-runner-run/run1/app: ${CHIP_RVC_APP}
-# test-runner-run/run1/factoryreset: True
-# test-runner-run/run1/quiet: True
-# test-runner-run/run1/app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
-# test-runner-run/run1/script-args: --storage-path admin_storage.json --commissioning-method on-network --discriminator 1234 --passcode 20202021 --PICS examples/rvc-app/rvc-common/pics/rvc-app-pics-values --endpoint 1 --trace-to json:${TRACE_TEST_JSON}.json --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+# test-runner-runs:
+#   run1:
+#     app: ${CHIP_RVC_APP}
+#     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json --app-pipe /tmp/sear_1_5_fifo
+#     script-args: >
+#       --storage-path admin_storage.json
+#       --commissioning-method on-network
+#       --discriminator 1234
+#       --passcode 20202021
+#       --PICS examples/rvc-app/rvc-common/pics/rvc-app-pics-values
+#       --endpoint 1
+#       --app-pipe /tmp/sear_1_5_fifo
+#       --trace-to json:${TRACE_TEST_JSON}.json
+#       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+#     factory-reset: true
+#     quiet: true
 # === END CI TEST ARGUMENTS ===
 
 import logging
 
-import chip.clusters as Clusters
-from chip.clusters.Types import NullValue
-from matter_testing_support import MatterBaseTest, async_test_body, default_matter_test_main
 from mobly import asserts
+
+import matter.clusters as Clusters
+from matter.clusters.Types import NullValue
+from matter.testing.matter_testing import MatterBaseTest, async_test_body, default_matter_test_main
 
 
 class TC_SEAR_1_5(MatterBaseTest):
@@ -41,7 +52,6 @@ class TC_SEAR_1_5(MatterBaseTest):
         super().__init__(*args)
         self.endpoint = None
         self.is_ci = False
-        self.app_pipe = "/tmp/chip_rvc_fifo_"
 
     async def read_sear_attribute_expect_success(self, endpoint, attribute):
         cluster = Clusters.Objects.ServiceArea
@@ -93,14 +103,9 @@ class TC_SEAR_1_5(MatterBaseTest):
 
     @async_test_body
     async def test_TC_SEAR_1_5(self):
-        self.endpoint = self.matter_test_config.endpoint
+        self.endpoint = self.get_endpoint()
         asserts.assert_false(self.endpoint is None, "--endpoint <endpoint> must be included on the command line in.")
         self.is_ci = self.check_pics("PICS_SDK_CI_ONLY")
-        if self.is_ci:
-            app_pid = self.matter_test_config.app_pid
-            if app_pid == 0:
-                asserts.fail("The --app-pid flag must be set when PICS_SDK_CI_ONLY is set")
-            self.app_pipe = self.app_pipe + str(app_pid)
 
         self.print_step(1, "Commissioning, already done")
 
@@ -115,26 +120,30 @@ class TC_SEAR_1_5(MatterBaseTest):
 
         if self.check_pics("SEAR.S.M.INVALID_STATE_FOR_SKIP") and self.check_pics("SEAR.S.M.HAS_MANUAL_SKIP_STATE_CONTROL"):
             test_step = "Manually intervene to put the device in a state that prevents it from executing the SkipArea command \
-                  (e.g. set CurrentArea to null or make it not operate, i.e. be in the idle state)"
+                  (e.g. set CurrentArea to null or make it not operate, i.e. be in the idle state). Ensure that SelectedArea is not empty."
             self.print_step("3", test_step)
-            if not self.is_ci:
+            if self.is_ci:
+                await self.send_single_cmd(cmd=Clusters.Objects.ServiceArea.Commands.SelectAreas(newAreas=[7]),
+                                           endpoint=self.endpoint)
+            else:
                 self.wait_for_user_input(prompt_msg=f"{test_step}, and press Enter when done.\n")
 
-                await self.send_cmd_skip_area_expect_response(step=4, skipped_area=valid_area_id,
-                                                              expected_response=Clusters.ServiceArea.Enums.SkipAreaStatus.kInvalidInMode)
+            await self.send_cmd_skip_area_expect_response(step=4, skipped_area=valid_area_id,
+                                                          expected_response=Clusters.ServiceArea.Enums.SkipAreaStatus.kInvalidInMode)
 
         if self.check_pics("SEAR.S.M.NO_SELAREA_FOR_SKIP") and self.check_pics("SEAR.S.M.HAS_MANUAL_SKIP_STATE_CONTROL"):
             test_step = "Manually intervene to put the device in a state where the state would allow it to execute the SkipArea command, \
                 if SelectedAreas wasn't empty, and SelectedAreas is empty"
             self.print_step("5", test_step)
             if self.is_ci:
+                self.write_to_app_pipe({"Name": "Reset"})
                 await self.send_single_cmd(cmd=Clusters.Objects.RvcRunMode.Commands.ChangeToMode(newMode=1),
                                            endpoint=self.endpoint)
             else:
                 self.wait_for_user_input(prompt_msg=f"{test_step}, and press Enter when done.\n")
 
-                await self.send_cmd_skip_area_expect_response(step=6, skipped_area=valid_area_id,
-                                                              expected_response=Clusters.ServiceArea.Enums.SkipAreaStatus.kInvalidAreaList)
+            await self.send_cmd_skip_area_expect_response(step=6, skipped_area=valid_area_id,
+                                                          expected_response=Clusters.ServiceArea.Enums.SkipAreaStatus.kInvalidAreaList)
 
         if self.check_pics("SEAR.S.M.VALID_STATE_FOR_SKIP") and self.check_pics("SEAR.S.M.HAS_MANUAL_SKIP_STATE_CONTROL"):
             test_step = "Manually intervene to put the device in a state that allows it to execute the SkipArea command"
@@ -148,8 +157,8 @@ class TC_SEAR_1_5(MatterBaseTest):
             else:
                 self.wait_for_user_input(prompt_msg=f"{test_step}, and press Enter when done.\n")
 
-                await self.send_cmd_skip_area_expect_response(step=8, skipped_area=invalid_area_id,
-                                                              expected_response=Clusters.ServiceArea.Enums.SkipAreaStatus.kInvalidSkippedArea)
+            await self.send_cmd_skip_area_expect_response(step=8, skipped_area=invalid_area_id,
+                                                          expected_response=Clusters.ServiceArea.Enums.SkipAreaStatus.kInvalidSkippedArea)
 
         if not self.check_pics("SEAR.S.M.VALID_STATE_FOR_SKIP"):
             return

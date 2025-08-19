@@ -23,7 +23,9 @@
  *
  **/
 #include "CommonDeviceCallbacks.h"
+#include "AppTaskBase.h"
 
+#include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app/server/Dnssd.h>
@@ -73,11 +75,20 @@ void chip::NXP::App::CommonDeviceCallbacks::DeviceEventCallback(const ChipDevice
         OnInterfaceIpAddressChanged(event);
         break;
 
-#if CHIP_ENABLE_OPENTHREAD && CHIP_DEVICE_CONFIG_CHIPOBLE_DISABLE_ADVERTISING_WHEN_PROVISIONED
+#if CHIP_ENABLE_OPENTHREAD
     case DeviceEventType::kCommissioningComplete:
         CommonDeviceCallbacks::OnComissioningComplete(event);
         break;
-#endif
+#if CHIP_DEVICE_CONFIG_ENABLE_WPA
+    case DeviceEventType::kThreadConnectivityChange:
+        if (!ConnectivityMgr().IsWiFiStationConnected() && (event->ThreadConnectivityChange.Result == kConnectivity_Established))
+        {
+            // Restart DnsSd service when operating as Matter over Thread
+            chip::app::DnssdServer::Instance().StartServer();
+        }
+        break;
+#endif // CHIP_DEVICE_CONFIG_ENABLE_WPA
+#endif // CHIP_ENABLE_OPENTHREAD
     case DeviceLayer::DeviceEventType::kDnssdInitialized:
         ChipLogProgress(DeviceLayer, "kDnssdInitialized");
 #if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
@@ -122,6 +133,12 @@ void chip::NXP::App::CommonDeviceCallbacks::OnInternetConnectivityChange(const C
         ChipLogProgress(DeviceLayer, "IPv6 Server ready at: [%s]:%d", ip_addr, CHIP_PORT);
 
         chip::app::DnssdServer::Instance().StartServer();
+
+#if CHIP_DEVICE_CONFIG_ENABLE_TBR
+        // Start the TBRM cluster after we are connected to local network. At this point the Open Thread
+        // Border Router management is up and running and the Border Router Service Name is created.
+        GetAppTask().EnableTbrManagementCluster();
+#endif
     }
     else if (event->InternetConnectivityChange.IPv6 == kConnectivity_Lost)
     {
@@ -153,9 +170,10 @@ void chip::NXP::App::CommonDeviceCallbacks::OnSessionEstablished(chip::DeviceLay
     /* Empty */
 }
 
-#if CHIP_ENABLE_OPENTHREAD && CHIP_DEVICE_CONFIG_CHIPOBLE_DISABLE_ADVERTISING_WHEN_PROVISIONED
+#if CHIP_ENABLE_OPENTHREAD
 void chip::NXP::App::CommonDeviceCallbacks::OnComissioningComplete(const chip::DeviceLayer::ChipDeviceEvent * event)
 {
+#if CHIP_DEVICE_CONFIG_CHIPOBLE_DISABLE_ADVERTISING_WHEN_PROVISIONED
     /*
      * If a transceiver supporting a multiprotocol scenario is used, a check of the provisioning state is required,
      * so that we can inform the transceiver to stop BLE to give the priority to another protocol.
@@ -171,5 +189,6 @@ void chip::NXP::App::CommonDeviceCallbacks::OnComissioningComplete(const chip::D
         PlatformMgrImpl().StopBLEConnectivity();
         ThreadStackMgrImpl().UnlockThreadStack();
     }
+#endif
 }
 #endif

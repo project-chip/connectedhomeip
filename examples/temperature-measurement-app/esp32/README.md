@@ -3,9 +3,9 @@
 This example is meant to represent a minimal-sized application.
 
 Please
-[setup ESP-IDF and CHIP Environment](../../../docs/guides/esp32/setup_idf_chip.md)
+[setup ESP-IDF and CHIP Environment](../../../docs/platforms/esp32/setup_idf_chip.md)
 and refer
-[building and commissioning](../../../docs/guides/esp32/build_app_and_commission.md)
+[building and commissioning](../../../docs/platforms/esp32/build_app_and_commission.md)
 guides to get started.
 
 ---
@@ -39,6 +39,21 @@ main/diagnostic_logs
 ```
 
 These files contain dummy data.
+
+#### To use diagnostic tracing
+
+Open menuconfig
+
+```
+ idf.py menuconfig
+```
+
+Enable `ENABLE_ESP_DIAGNOSTICS_TRACE` option from menuconfig
+
+Set diagnostic storage buffer size from `Platform Diagnostics` menu
+
+-   End user buffer default size 4096
+-   Retrieval buffer default size 4096
 
 #### To test the diagnostic logs cluster
 

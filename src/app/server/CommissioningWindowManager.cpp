@@ -73,10 +73,8 @@ void CommissioningWindowManager::OnPlatformEvent(const DeviceLayer::ChipDeviceEv
         mServer->GetBleLayerObject()->CloseAllBleConnections();
 #endif
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
-        DeviceLayer::ConnectivityManager::WiFiPAFAdvertiseParam args;
-        args.enable  = false;
-        args.ExtCmds = nullptr;
-        DeviceLayer::ConnectivityMgr().SetWiFiPAFAdvertisingEnabled(args);
+        chip::WiFiPAF::WiFiPAFLayer::GetWiFiPAFLayer().Shutdown(
+            [](uint32_t id, WiFiPAF::WiFiPafRole role) { DeviceLayer::ConnectivityMgr().WiFiPAFShutdown(id, role); });
 #endif
     }
     else if (event->Type == DeviceLayer::DeviceEventType::kFailSafeTimerExpired)
@@ -111,6 +109,8 @@ void CommissioningWindowManager::OnPlatformEvent(const DeviceLayer::ChipDeviceEv
 
 void CommissioningWindowManager::Shutdown()
 {
+    VerifyOrReturn(nullptr != mServer);
+
     StopAdvertisement(/* aShuttingDown = */ true);
 
     ResetState();
@@ -119,6 +119,9 @@ void CommissioningWindowManager::Shutdown()
 void CommissioningWindowManager::ResetState()
 {
     mUseECM = false;
+#if CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
+    mJCM = false;
+#endif // CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
 
     mECMDiscriminator = 0;
     mECMIterations    = 0;
@@ -302,6 +305,20 @@ CHIP_ERROR CommissioningWindowManager::AdvertiseAndListenForPASE()
     return CHIP_NO_ERROR;
 }
 
+System::Clock::Seconds32 CommissioningWindowManager::MaxCommissioningTimeout() const
+{
+#if CHIP_DEVICE_CONFIG_EXT_ADVERTISING
+    /* Allow for extended announcement only if the device is uncomissioned. */
+    if (mServer->GetFabricTable().FabricCount() == 0)
+    {
+        // Specification section 2.3.1 - Extended Announcement Duration up to 48h
+        return System::Clock::Seconds32(60 * 60 * 48);
+    }
+#endif
+    // Specification section 5.4.2.3. Announcement Duration says 15 minutes.
+    return System::Clock::Seconds32(15 * 60);
+}
+
 CHIP_ERROR CommissioningWindowManager::OpenBasicCommissioningWindow(Seconds32 commissioningTimeout,
                                                                     CommissioningWindowAdvertisement advertisementMode)
 {
@@ -376,6 +393,16 @@ CHIP_ERROR CommissioningWindowManager::OpenEnhancedCommissioningWindow(Seconds32
     return err;
 }
 
+#if CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
+CHIP_ERROR CommissioningWindowManager::OpenJointCommissioningWindow(Seconds32 commissioningTimeout, uint16_t discriminator,
+                                                                    Spake2pVerifier & verifier, uint32_t iterations, ByteSpan salt,
+                                                                    FabricIndex fabricIndex, VendorId vendorId)
+{
+    mJCM = true;
+    return OpenEnhancedCommissioningWindow(commissioningTimeout, discriminator, verifier, iterations, salt, fabricIndex, vendorId);
+}
+#endif // CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
+
 void CommissioningWindowManager::CloseCommissioningWindow()
 {
     if (IsCommissioningWindowOpen())
@@ -436,7 +463,11 @@ Dnssd::CommissioningMode CommissioningWindowManager::GetCommissioningMode() cons
     switch (mWindowStatus)
     {
     case CommissioningWindowStatusEnum::kEnhancedWindowOpen:
+#if CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
+        return mJCM ? Dnssd::CommissioningMode::kEnabledJointFabric : Dnssd::CommissioningMode::kEnabledEnhanced;
+#else
         return Dnssd::CommissioningMode::kEnabledEnhanced;
+#endif // CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
     case CommissioningWindowStatusEnum::kBasicWindowOpen:
         return Dnssd::CommissioningMode::kEnabledBasic;
     default:

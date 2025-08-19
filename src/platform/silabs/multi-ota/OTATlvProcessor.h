@@ -25,7 +25,7 @@
 namespace chip {
 
 #define CHIP_ERROR_TLV_PROCESSOR(e)                                                                                                \
-    ChipError(ChipError::Range::kLastRange, ((uint8_t) ChipError::Range::kLastRange << 3) | e, __FILE__, __LINE__)
+    CHIP_GENERIC_ERROR(ChipError::Range::kLastRange, ((uint8_t) ChipError::Range::kLastRange << 3) | e)
 
 #define CHIP_OTA_TLV_CONTINUE_PROCESSING CHIP_ERROR_TLV_PROCESSOR(0x01)
 #define CHIP_OTA_CHANGE_PROCESSOR CHIP_ERROR_TLV_PROCESSOR(0x02)
@@ -99,7 +99,7 @@ public:
     void SetLength(uint32_t length) { mLength = length; }
     void SetWasSelected(bool selected) { mWasSelected = selected; }
     bool WasSelected() { return mWasSelected; }
-#if OTA_ENCRYPTION_ENABLE
+#ifdef SL_MATTER_ENABLE_OTA_ENCRYPTION
     CHIP_ERROR vOtaProcessInternalEncryption(MutableByteSpan & block);
 #endif
 
@@ -133,7 +133,7 @@ protected:
 
     bool IsError(CHIP_ERROR & status);
 
-#if OTA_ENCRYPTION_ENABLE
+#ifdef SL_MATTER_ENABLE_OTA_ENCRYPTION
     /*ota decryption*/
     uint32_t mIVOffset = 0;
     /* Expected byte size of the OTAEncryptionKeyLength */

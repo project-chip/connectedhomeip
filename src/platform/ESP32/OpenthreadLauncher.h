@@ -29,4 +29,6 @@ esp_err_t openthread_init_br_rcp(const esp_rcp_update_config_t * update_config);
 esp_err_t set_openthread_platform_config(esp_openthread_platform_config_t * config);
 esp_err_t openthread_init_stack(void);
 esp_err_t openthread_launch_task(void);
+esp_err_t openthread_deinit_stack(void);
+void openthread_delete_task(void);
 CHIP_ERROR cli_transmit_task_post(std::unique_ptr<char[]> && cli_str);

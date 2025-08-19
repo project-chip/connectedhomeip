@@ -80,11 +80,11 @@ CHIP_ERROR KeyValueStoreManagerImpl::_Get(const char * key, void * value, size_t
                                           size_t offset_bytes)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-    ReturnErrorCodeIf(!mKeyValueStoreManagerObject.HasValidObjectRef(), CHIP_ERROR_INCORRECT_STATE);
-    ReturnErrorCodeIf(mGetMethod == nullptr, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(mKeyValueStoreManagerObject.HasValidObjectRef(), CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(mGetMethod != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
     JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
-    ReturnErrorCodeIf(env == nullptr, CHIP_JNI_ERROR_NO_ENV);
+    VerifyOrReturnError(env != nullptr, CHIP_JNI_ERROR_NO_ENV);
 
     chip::UtfString javaKey(env, key);
 
@@ -118,7 +118,7 @@ CHIP_ERROR KeyValueStoreManagerImpl::_Get(const char * key, void * value, size_t
         ChipLogError(DeviceLayer, "KeyValueStoreManager base64 decoding failed");
         return CHIP_ERROR_INTEGRITY_CHECK_FAILED;
     }
-    ReturnErrorCodeIf(offset_bytes != 0 && offset_bytes >= decodedLength, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(offset_bytes == 0 || offset_bytes < decodedLength, CHIP_ERROR_INVALID_ARGUMENT);
     size_t read_size = std::min<size_t>(value_size, decodedLength - offset_bytes);
     if (value_size + offset_bytes < decodedLength)
     {
@@ -140,12 +140,12 @@ CHIP_ERROR KeyValueStoreManagerImpl::_Get(const char * key, void * value, size_t
 
 CHIP_ERROR KeyValueStoreManagerImpl::_Put(const char * key, const void * value, size_t value_size)
 {
-    ReturnErrorCodeIf(!mKeyValueStoreManagerObject.HasValidObjectRef(), CHIP_ERROR_INCORRECT_STATE);
-    ReturnErrorCodeIf(mSetMethod == nullptr, CHIP_ERROR_INCORRECT_STATE);
-    ReturnErrorCodeIf(value_size > kMaxKvsValueBytes, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(mKeyValueStoreManagerObject.HasValidObjectRef(), CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(mSetMethod != nullptr, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(value_size <= kMaxKvsValueBytes, CHIP_ERROR_INVALID_ARGUMENT);
 
     JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
-    ReturnErrorCodeIf(env == nullptr, CHIP_ERROR_INTERNAL);
+    VerifyOrReturnError(env != nullptr, CHIP_ERROR_INTERNAL);
 
     std::unique_ptr<char[]> buffer(new char[BASE64_ENCODED_LEN(value_size) + 1]);
 
@@ -170,11 +170,11 @@ CHIP_ERROR KeyValueStoreManagerImpl::_Put(const char * key, const void * value, 
 
 CHIP_ERROR KeyValueStoreManagerImpl::_Delete(const char * key)
 {
-    ReturnErrorCodeIf(!mKeyValueStoreManagerObject.HasValidObjectRef(), CHIP_ERROR_INCORRECT_STATE);
-    ReturnErrorCodeIf(mDeleteMethod == nullptr, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(mKeyValueStoreManagerObject.HasValidObjectRef(), CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(mDeleteMethod != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
     JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
-    ReturnErrorCodeIf(env == nullptr, CHIP_ERROR_INTERNAL);
+    VerifyOrReturnError(env != nullptr, CHIP_ERROR_INTERNAL);
 
     UtfString javaKey(env, key);
 

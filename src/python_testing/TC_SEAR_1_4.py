@@ -20,19 +20,29 @@
 # for details about the block below.
 #
 # === BEGIN CI TEST ARGUMENTS ===
-# test-runner-runs: run1
-# test-runner-run/run1/app: ${CHIP_RVC_APP}
-# test-runner-run/run1/factoryreset: True
-# test-runner-run/run1/quiet: True
-# test-runner-run/run1/app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
-# test-runner-run/run1/script-args: --storage-path admin_storage.json --commissioning-method on-network --discriminator 1234 --passcode 20202021 --PICS examples/rvc-app/rvc-common/pics/rvc-app-pics-values --endpoint 1 --trace-to json:${TRACE_TEST_JSON}.json --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+# test-runner-runs:
+#   run1:
+#     app: ${CHIP_RVC_APP}
+#     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
+#     script-args: >
+#       --storage-path admin_storage.json
+#       --commissioning-method on-network
+#       --discriminator 1234
+#       --passcode 20202021
+#       --PICS examples/rvc-app/rvc-common/pics/rvc-app-pics-values
+#       --endpoint 1
+#       --trace-to json:${TRACE_TEST_JSON}.json
+#       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+#     factory-reset: true
+#     quiet: true
 # === END CI TEST ARGUMENTS ===
 
 import logging
 
-import chip.clusters as Clusters
-from matter_testing_support import MatterBaseTest, async_test_body, default_matter_test_main
 from mobly import asserts
+
+import matter.clusters as Clusters
+from matter.testing.matter_testing import MatterBaseTest, async_test_body, default_matter_test_main
 
 
 class TC_SEAR_1_4(MatterBaseTest):
@@ -40,7 +50,6 @@ class TC_SEAR_1_4(MatterBaseTest):
         super().__init__(*args)
         self.endpoint = None
         self.is_ci = False
-        self.app_pipe = "/tmp/chip_rvc_fifo_"
 
     async def read_sear_attribute_expect_success(self, endpoint, attribute):
         cluster = Clusters.Objects.ServiceArea
@@ -51,14 +60,9 @@ class TC_SEAR_1_4(MatterBaseTest):
 
     @async_test_body
     async def test_TC_SEAR_1_4(self):
-        self.endpoint = self.matter_test_config.endpoint
+        self.endpoint = self.get_endpoint()
         asserts.assert_false(self.endpoint is None, "--endpoint <endpoint> must be included on the command line in.")
         self.is_ci = self.check_pics("PICS_SDK_CI_ONLY")
-        if self.is_ci:
-            app_pid = self.matter_test_config.app_pid
-            if app_pid == 0:
-                asserts.fail("The --app-pid flag must be set when PICS_SDK_CI_ONLY is set")
-            self.app_pipe = self.app_pipe + str(app_pid)
 
         self.print_step(1, "Commissioning, already done")
 

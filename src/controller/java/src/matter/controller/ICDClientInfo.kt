@@ -28,5 +28,6 @@ data class ICDClientInfo(
   val icdAesKey: ByteArray,
   val icdHmacKey: ByteArray
 ) {
-  override fun toString(): String = "$peerNodeId/$checkInNodeId/$startCounter/$offset/$monitoredSubject"
+  override fun toString(): String =
+    "$peerNodeId/$checkInNodeId/$startCounter/$offset/$monitoredSubject"
 }

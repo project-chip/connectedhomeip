@@ -29,7 +29,7 @@
 class Commands
 {
 public:
-    using CommandsVector = ::std::vector<std::unique_ptr<Command>>;
+    using CommandsVector = std::vector<std::unique_ptr<Command>>;
 
     void RegisterCluster(const char * clusterName, commands_list commandsList)
     {
@@ -44,6 +44,17 @@ public:
     }
     int Run(int argc, char ** argv);
     int RunInteractive(const char * command, const chip::Optional<char *> & storageDirectory, bool advertiseOperational);
+
+    void UpdateCommandSet(const char * commandSetName, commands_list commandsList)
+    {
+        auto it = mCommandSets.find(commandSetName);
+        VerifyOrReturn(it != mCommandSets.end(), ChipLogError(chipTool, "Command set '%s' not found", commandSetName));
+
+        for (auto & command : commandsList)
+        {
+            it->second.commands.push_back(std::move(command));
+        }
+    }
 
 private:
     struct CommandSet

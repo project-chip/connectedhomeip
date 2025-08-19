@@ -22,6 +22,20 @@
 namespace chip {
 namespace DeviceLayer {
 
+// !!!!!!!!!!!!!!!!!!!!!!!! WARNING WARNING WARNING !!!!!!!!!!!!!!!!!!!!
+// WARNING: DO NOT USE THESE DEFAULT IMPLEMENTATIONS WITH DEFAULT VALUES
+// IN PRODUCTION PRODUCTS WITHOUT AUDITING THEM! See
+// `AllClustersExampleDeviceInforProviderImpl.h` for an example provider
+// that has constant values. Here, all providers have empty implementations
+// to force empty lists which prevent bad values from leaking into products
+// like happened before Matter 1.5. If you really are using these clusters,
+// then please re-implement the provider as needed.
+//
+// The FixedLabel, LocalizationConfigurationand and Time Format localization
+// clusters, if used, should have values that have been vetted
+// for correctness in the product !!! DO NOT USE SAMPLE DEFAULTS IN PRODUCTS.
+// !!!!!!!!!!!!!!!!!!!!!!!! WARNING WARNING WARNING !!!!!!!!!!!!!!!!!!!!
+
 class DeviceInfoProviderImpl : public DeviceInfoProvider
 {
 public:
@@ -37,21 +51,6 @@ public:
     static DeviceInfoProviderImpl & GetDefaultInstance();
 
 protected:
-    class FixedLabelIteratorImpl : public FixedLabelIterator
-    {
-    public:
-        FixedLabelIteratorImpl(EndpointId endpoint);
-        size_t Count() override;
-        bool Next(FixedLabelType & output) override;
-        void Release() override { chip::Platform::Delete(this); }
-
-    private:
-        EndpointId mEndpoint = 0;
-        size_t mIndex        = 0;
-        char mFixedLabelNameBuf[kMaxLabelNameLength + 1];
-        char mFixedLabelValueBuf[kMaxLabelValueLength + 1];
-    };
-
     class UserLabelIteratorImpl : public UserLabelIterator
     {
     public:
@@ -78,8 +77,8 @@ protected:
         void Release() override { chip::Platform::Delete(this); }
 
     private:
-        size_t mIndex = 0;
-        char mActiveLocaleBuf[kMaxActiveLocaleLength + 1];
+        static constexpr size_t kNumSupportedLocales = 1;
+        size_t mIndex                                = 0;
     };
 
     class SupportedCalendarTypesIteratorImpl : public SupportedCalendarTypesIterator
@@ -91,7 +90,8 @@ protected:
         void Release() override { chip::Platform::Delete(this); }
 
     private:
-        size_t mIndex = 0;
+        static constexpr size_t kNumSupportedCalendarTypes = 1;
+        size_t mIndex                                      = 0;
     };
 
     CHIP_ERROR SetUserLabelLength(EndpointId endpoint, size_t val) override;

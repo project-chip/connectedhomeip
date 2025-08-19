@@ -69,7 +69,13 @@ CHIP_ERROR NXPWiFiDriver::Init(NetworkStatusChangeCallback * networkStatusChange
     if (err != CHIP_NO_ERROR)
     {
         ChipLogProgress(DeviceLayer, "WiFi network SSID not retrieved from persisted storage: %" CHIP_ERROR_FORMAT, err.Format());
-        return err;
+        if (err != CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND)
+        {
+            return err;
+        }
+        /* AP ssid has not been set. It's possible after factory-reset.
+        Do not return an error as it will cancel the cluster registration */
+        return CHIP_NO_ERROR;
     }
 
     err = PersistedStorage::KeyValueStoreMgr().Get(kWiFiCredentialsKeyName, mSavedNetwork.credentials,
@@ -112,6 +118,17 @@ CHIP_ERROR NXPWiFiDriver::CommitConfiguration()
 
 CHIP_ERROR NXPWiFiDriver::RevertConfiguration()
 {
+    struct wlan_network searchedNetwork = { 0 };
+
+    /* If network was added we have to remove it (as the connection failed) from wifi driver to be able
+    to connect to another network next commissioning */
+    if (wlan_get_network_byname(mStagingNetwork.ssid, &searchedNetwork) == WM_SUCCESS)
+    {
+        if (wlan_remove_network(mStagingNetwork.ssid) != WM_SUCCESS)
+        {
+            return CHIP_ERROR_INTERNAL;
+        }
+    }
     mStagingNetwork = mSavedNetwork;
 
     return CHIP_NO_ERROR;
@@ -142,38 +159,12 @@ Status NXPWiFiDriver::AddOrUpdateNetwork(ByteSpan ssid, ByteSpan credentials, Mu
 
 Status NXPWiFiDriver::RemoveNetwork(ByteSpan networkId, MutableCharSpan & outDebugText, uint8_t & outNetworkIndex)
 {
-    int err_code = 0;
-
     outDebugText.reduce_size(0);
     outNetworkIndex = 0;
     VerifyOrReturnError(NetworkMatch(mStagingNetwork, networkId), Status::kNetworkIDNotFound);
 
-    err_code = wlan_remove_network((char *) networkId.data());
-
-    switch (err_code)
-    {
-    case -WM_E_INVAL:
-        ChipLogError(DeviceLayer, "Error: Network not found");
-        break;
-
-    case WM_SUCCESS:
-        /* Use empty ssid for representing invalid network */
-        mStagingNetwork.ssidLen = 0;
-        memset(mStagingNetwork.ssid, 0, DeviceLayer::Internal::kMaxWiFiSSIDLength);
-        memset(mStagingNetwork.credentials, 0, DeviceLayer::Internal::kMaxWiFiKeyLength);
-        /* Save to persistent memory */
-        CommitConfiguration();
-        ChipLogProgress(DeviceLayer, "Successfully removed network");
-        break;
-
-    case WLAN_ERROR_STATE:
-        ChipLogError(DeviceLayer, "Error: Can't remove network in this state");
-        break;
-
-    default:
-        ChipLogError(DeviceLayer, "Error: Unable to remove network");
-        break;
-    }
+    // Use empty ssid for representing invalid network
+    mStagingNetwork.ssidLen = 0;
 
     return Status::kSuccess;
 }
@@ -218,7 +209,11 @@ CHIP_ERROR NXPWiFiDriver::ConnectWiFiNetwork(const char * ssid, uint8_t ssidLen,
 
 void NXPWiFiDriver::OnConnectWiFiNetwork(Status commissioningError, CharSpan debugText, int32_t connectStatus)
 {
-    CommitConfiguration();
+    /* Commit wifi network credentials in flash only if the connection succeeded */
+    if (commissioningError == NetworkCommissioning::Status::kSuccess)
+    {
+        CommitConfiguration();
+    }
 
     if (mpConnectCallback != nullptr)
     {
@@ -232,8 +227,7 @@ void NXPWiFiDriver::ConnectNetwork(ByteSpan networkId, ConnectCallback * callbac
     CHIP_ERROR err          = CHIP_NO_ERROR;
     Status networkingStatus = Status::kSuccess;
 
-    ChipLogProgress(NetworkProvisioning, "Connecting to WiFi network: SSID: %.*s", static_cast<int>(networkId.size()),
-                    networkId.data());
+    ChipLogProgress(NetworkProvisioning, "Connecting to WiFi network: SSID: %s", NullTerminated(networkId).c_str());
 
     VerifyOrExit(NetworkMatch(mStagingNetwork, networkId), networkingStatus = Status::kNetworkIDNotFound);
     VerifyOrExit(mpConnectCallback == nullptr, networkingStatus = Status::kUnknownError);
@@ -485,7 +479,10 @@ bool NXPWiFiDriver::WiFiNetworkIterator::Next(Network & item)
         if (connectedNetwork.networkIDLen == item.networkIDLen &&
             memcmp(connectedNetwork.networkID, item.networkID, item.networkIDLen) == 0)
         {
-            item.connected = true;
+            if (ConnectivityMgr().IsWiFiStationConnected())
+            {
+                item.connected = true;
+            }
         }
     }
 

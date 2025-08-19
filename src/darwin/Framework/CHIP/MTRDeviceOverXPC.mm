@@ -194,13 +194,13 @@ typedef void (^MTRFetchProxyHandleCompletion)(MTRDeviceControllerXPCProxyHandle 
     }
 }
 
-- (void)writeAttributeWithEndpointID:(NSNumber *)endpointID
-                           clusterID:(NSNumber *)clusterID
-                         attributeID:(NSNumber *)attributeID
-                               value:(id)value
-                   timedWriteTimeout:(NSNumber * _Nullable)timeoutMs
-                               queue:(dispatch_queue_t)queue
-                          completion:(MTRDeviceResponseHandler)completion
+- (void)_writeAttributeWithEndpointID:(NSNumber *)endpointID
+                            clusterID:(NSNumber *)clusterID
+                          attributeID:(NSNumber *)attributeID
+                                value:(id)value
+                    timedWriteTimeout:(NSNumber * _Nullable)timeoutMs
+                                queue:(dispatch_queue_t)queue
+                           completion:(MTRDeviceResponseHandler)completion
 {
     MTR_LOG_DEBUG("Writing attribute ...");
 
@@ -276,6 +276,7 @@ typedef void (^MTRFetchProxyHandleCompletion)(MTRDeviceControllerXPCProxyHandle 
                        commandFields:(id)commandFields
                   timedInvokeTimeout:(NSNumber * _Nullable)timeoutMs
          serverSideProcessingTimeout:(NSNumber * _Nullable)serverSideProcessingTimeout
+                             logCall:(BOOL)logCall
                                queue:(dispatch_queue_t)queue
                           completion:(MTRDeviceResponseHandler)completion
 {

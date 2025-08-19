@@ -18,8 +18,9 @@ import("//build_overrides/efr32_sdk.gni")
 import("//build_overrides/pigweed.gni")
 
 import("${build_root}/config/defaults.gni")
-import("${efr32_sdk_build_root}/efr32_sdk.gni")
-import("${efr32_sdk_build_root}/silabs_executable.gni")
+import("${silabs_sdk_build_root}/efr32_sdk.gni")
+
+import("${matter_support_root}/provision/args.gni")
 
 import("${chip_root}/examples/common/pigweed/pigweed_rpcs.gni")
 import("${chip_root}/src/platform/device.gni")
@@ -54,17 +55,22 @@ efr32_sdk("sdk") {
     "${examples_common_plat_dir}",
   ]
 
-  defines = [
-    "PW_RPC_ENABLED",
+  defines = [ "PW_RPC_ENABLED" ]
+}
 
-    # Thread is built but test driver do not have the NETWORK_COMMISSIONING cluster or zap config.
-    "_NO_GENERIC_THREAD_NETWORK_COMMISSIONING_DRIVER_",
+config("efr32_ldflags") {
+  _ldscript =
+      "${chip_root}/examples/platform/silabs/ldscripts/${silabs_family}.ld"
+
+  ldflags = [
+    "-T" + rebase_path(_ldscript, root_build_dir),
+    "-Wl,--no-warn-rwx-segment",
+    "-fno-lto",
   ]
 }
 
-silabs_executable("efr32_device_tests") {
-  output_name = "matter-silabs-device_tests.out"
-
+# This is the test runner.  `pw_test` will dep this for each `silabs_executable` target.
+source_set("efr32_test_main") {
   defines = [ "PW_RPC_ENABLED" ]
   sources = [
     "${chip_root}/examples/common/pigweed/RpcService.cpp",
@@ -83,11 +89,10 @@ silabs_executable("efr32_device_tests") {
     "$dir_pw_unit_test:rpc_service",
     "${chip_root}/config/efr32/lib/pw_rpc:pw_rpc",
     "${chip_root}/examples/common/pigweed:system_rpc_server",
-    "${chip_root}/src:tests",
     "${chip_root}/src/lib",
     "${chip_root}/src/lib/support:pw_tests_wrapper",
-    "${chip_root}/src/platform/silabs/provision:provision-headers",
     "${examples_common_plat_dir}/pw_sys_io:pw_sys_io_silabs",
+    "${sl_provision_root}:headers",
   ]
 
   # OpenThread Settings
@@ -95,38 +100,30 @@ silabs_executable("efr32_device_tests") {
     deps += [
       "${chip_root}/third_party/openthread:openthread",
       "${chip_root}/third_party/openthread:openthread-platform",
-      "${examples_plat_dir}:efr-matter-shell",
+      "${examples_plat_dir}:matter-shell",
     ]
   }
 
   deps += pw_build_LINK_DEPS
 
   libs = [
-    "${sdk_support_root}/matter/provision/lib/libProvision_${silabs_family}.a",
+    "${matter_support_root}/provision/libs/libProvision_${silabs_family}.a",
   ]
 
   include_dirs = [ "${chip_root}/examples/common/pigweed/efr32" ]
-
-  ldscript = "${examples_common_plat_dir}/ldscripts/${silabs_family}.ld"
-
-  inputs = [ ldscript ]
-
-  ldflags = [
-    "-T" + rebase_path(ldscript, root_build_dir),
-    "-Wl,--no-warn-rwx-segment",
-  ]
-
-  output_dir = root_out_dir
+  public_configs = [ ":efr32_ldflags" ]
 }
 
+# This target is referred to by BuildRoot in scripts/build/builders/efr32.py, as well as the example in README.md.
+# It builds the root target "src:tests", which builds the chip_test_suite target in each test directory, which builds a pw_test target for each test source file, which builds a silabs_executable, which includes the "efr32_test_main" target defined above.
 group("efr32") {
-  deps = [ ":efr32_device_tests" ]
+  deps = [ "${chip_root}/src:tests" ]
 }
 
 group("runner") {
   deps = [
-    "${efr32_project_dir}/py:nl_test_runner.install",
-    "${efr32_project_dir}/py:nl_test_runner_wheel",
+    "${efr32_project_dir}/py:pw_test_runner.install",
+    "${efr32_project_dir}/py:pw_test_runner_wheel",
   ]
 }
 

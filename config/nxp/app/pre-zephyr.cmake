@@ -13,9 +13,3 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 #
-
-# Automatically find overlays defined at platform level
-# Those are usually used to change FLASH and RAM layouts
-if (EXISTS ${CHIP_ROOT}/src/platform/nxp/zephyr/boards/${BOARD}/${BOARD}.overlay)
-	list(APPEND EXTRA_DTC_OVERLAY_FILE ${CHIP_ROOT}/src/platform/nxp/zephyr/boards/${BOARD}/${BOARD}.overlay)
-endif()

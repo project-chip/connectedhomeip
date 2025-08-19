@@ -36,7 +36,7 @@ uint32_t SizeOfStatusIB(const StatusIB & aStatus)
     // 1 byte: end of container.
     uint32_t size = 5;
 
-    if (aStatus.mClusterStatus.HasValue())
+    if (aStatus.mClusterStatus.has_value())
     {
         // 1 byte: control byte for uint8 value.
         // 1 byte: context-specific tag for uint8 value.
@@ -626,15 +626,7 @@ CHIP_ERROR ClusterStateCacheT<CanEnableDataCaching>::OnUpdateDataVersionFilterLi
             continue;
         }
 
-        DataVersionFilterIB::Builder & filterIB = aDataVersionFilterIBsBuilder.CreateDataVersionFilter();
-        SuccessOrExit(err = aDataVersionFilterIBsBuilder.GetError());
-        ClusterPathIB::Builder & filterPath = filterIB.CreatePath();
-        SuccessOrExit(err = filterIB.GetError());
-        SuccessOrExit(err = filterPath.Endpoint(filter.first.mEndpointId).Cluster(filter.first.mClusterId).EndOfClusterPathIB());
-        SuccessOrExit(err = filterIB.DataVersion(filter.first.mDataVersion.Value()).EndOfDataVersionFilterIB());
-        ChipLogProgress(DataManagement, "Update DataVersionFilter: Endpoint=%u Cluster=" ChipLogFormatMEI " Version=%" PRIu32,
-                        filter.first.mEndpointId, ChipLogValueMEI(filter.first.mClusterId), filter.first.mDataVersion.Value());
-
+        SuccessOrExit(err = aDataVersionFilterIBsBuilder.EncodeDataVersionFilterIB(filter.first));
         aEncodedDataVersionList = true;
     }
 

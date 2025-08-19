@@ -49,11 +49,14 @@ class ConfigurationManagerImpl;
 class DeviceControlServer;
 
 namespace Internal {
+class NFCCommissioningManagerImpl;
 class BLEManagerImpl;
 template <class>
 class GenericPlatformManagerImpl;
 template <class>
 class GenericConfigurationManagerImpl;
+template <class>
+class GenericPlatformManagerImpl_CMSISOS;
 template <class>
 class GenericPlatformManagerImpl_FreeRTOS;
 template <class>
@@ -160,6 +163,9 @@ private:
     friend class PlatformManagerImpl;
     friend class ConfigurationManagerImpl;
     friend class DeviceControlServer;
+#if CHIP_DEVICE_CONFIG_ENABLE_NFC_BASED_COMMISSIONING
+    friend class Internal::NFCCommissioningManagerImpl;
+#endif
 #if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
     friend class Internal::BLEManagerImpl;
 #endif
@@ -167,6 +173,8 @@ private:
     friend class Internal::GenericPlatformManagerImpl;
     template <class>
     friend class Internal::GenericConfigurationManagerImpl;
+    template <class>
+    friend class Internal::GenericPlatformManagerImpl_CMSISOS;
     template <class>
     friend class Internal::GenericPlatformManagerImpl_FreeRTOS;
     template <class>

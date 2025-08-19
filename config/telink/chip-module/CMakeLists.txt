@@ -56,6 +56,7 @@ endif()
 matter_add_flags(-DNL_ASSERT_USE_FLAGS_DEFAULT=1)
 
 zephyr_include_directories(${CHIP_ROOT}/src/platform/telink/)
+zephyr_include_directories(${CHIP_ROOT}/src/platform/telink/wifi/${ZEPHYR_VERSION_STRING})
 
 zephyr_get_compile_flags(ZEPHYR_CFLAGS_C C)
 matter_add_cflags("${ZEPHYR_CFLAGS_C}")
@@ -64,12 +65,17 @@ matter_add_cxxflags("${ZEPHYR_CFLAGS_CC}")
 zephyr_get_gnu_cpp_standard(ZEPHYR_GNU_CPP_STD)
 matter_add_cxxflags(${ZEPHYR_GNU_CPP_STD})
 
-matter_add_flags(-DMBEDTLS_USER_CONFIG_FILE=<telink-mbedtls-config.h>)
+matter_add_flags(-DMBEDTLS_USER_CONFIG_FILE=<${CONFIG_MBEDTLS_CFG_FILE}>)
 
 # Set up custom OpenThread configuration
 
+if (CONFIG_OPENTHREAD_TELINK_LIBRARY)
+    set(ZEPHYR_OPENTHREAD_MODULE_DIR ${ZEPHYR_BASE}/../modules/lib/openthread_telink_lib CACHE STRING INTERNAL)
+	message(STATUS "OpenThread used as precompiled Telink library, path: ${ZEPHYR_OPENTHREAD_MODULE_DIR}")
+endif()
+
 if (CONFIG_CHIP_OPENTHREAD_CONFIG)
-    get_filename_component(CHIP_OPENTHREAD_CONFIG 
+    get_filename_component(CHIP_OPENTHREAD_CONFIG
         ${CONFIG_CHIP_OPENTHREAD_CONFIG}
         REALPATH
         BASE_DIR ${CMAKE_SOURCE_DIR}
@@ -96,7 +102,7 @@ matter_add_gn_arg_bool  ("chip_enable_openthread"                 CONFIG_NET_L2_
 matter_add_gn_arg_bool  ("chip_openthread_ftd"                    CONFIG_OPENTHREAD_FTD)
 matter_add_gn_arg_bool  ("chip_config_network_layer_ble"          CONFIG_BT)
 matter_add_gn_arg_bool  ("chip_inet_config_enable_ipv4"           CONFIG_CHIP_IPV4)
-matter_add_gn_arg_bool  ("chip_enable_nfc"                        CONFIG_CHIP_NFC_COMMISSIONING)
+matter_add_gn_arg_bool  ("chip_enable_nfc_onboarding_payload"     CONFIG_CHIP_NFC_ONBOARDING_PAYLOAD)
 matter_add_gn_arg_bool  ("chip_enable_ota_requestor"              CONFIG_CHIP_OTA_REQUESTOR)
 matter_add_gn_arg_bool  ("chip_inet_config_enable_tcp_endpoint"   FALSE)
 matter_add_gn_arg_bool  ("chip_error_logging"                     CONFIG_MATTER_LOG_LEVEL GREATER_EQUAL 1)
@@ -145,6 +151,7 @@ matter_generate_args_tmp_file()
 # ==============================================================================
 # Build chip library
 # ==============================================================================
+
 matter_build(chip
     LIB_SHELL   ${CONFIG_CHIP_LIB_SHELL}
     DEVICE_INFO_EXAMPLE_PROVIDER ${CONFIG_CHIP_EXAMPLE_DEVICE_INFO_PROVIDER}
@@ -152,60 +159,56 @@ matter_build(chip
 )
 set_property(GLOBAL APPEND PROPERTY ZEPHYR_INTERFACE_LIBS chip)
 
-# ==============================================================================
-# Define 'chip-ota-image' target for building CHIP OTA image
-# ==============================================================================
-
 include(${TELINK_COMMON}/common.cmake)
 
-set(BLOCK_SIZE "1024")
+if (CONFIG_CHIP_APP_LOG_LEVEL GREATER_EQUAL 4)
+    include(${TELINK_COMMON}/build_info.cmake)
+endif()
 
-if (CONFIG_BOOTLOADER_MCUBOOT)
-    dt_nodelabel(dts_partition_path NODELABEL "boot_partition")
-    dt_reg_size(mcuboot_size PATH ${dts_partition_path})
-    math(EXPR boot_blocks "${mcuboot_size} / ${BLOCK_SIZE}" OUTPUT_FORMAT DECIMAL)
+# ==============================================================================
+# Define 'process_binaries' target for collecting final binary to flash
+# ==============================================================================
 
+add_custom_target(
+    process_binaries ALL
+    COMMAND ${Python3_EXECUTABLE} ${CHIP_ROOT}/scripts/tools/telink/process_binaries.py
+    WORKING_DIRECTORY ${PROJECT_BINARY_DIR}
+)
+add_dependencies(process_binaries ${ZEPHYR_FINAL_EXECUTABLE})
+
+# ==============================================================================
+# Define 'build_mcuboot' target for building the MCUBoot bootloader
+# ==============================================================================
+
+if (CONFIG_BOOTLOADER_MCUBOOT AND (CONFIG_SOC_RISCV_TELINK_B9X OR CONFIG_SOC_RISCV_TELINK_TLX))
     add_custom_target(build_mcuboot ALL
         COMMAND
         west build -b ${BASE_BOARD} -d build_mcuboot ${ZEPHYR_BASE}/../bootloader/mcuboot/boot/zephyr
             -- -DOVERLAY_CONFIG=${GLOBAL_BOOT_CONF_OVERLAY_FILE} -DDTC_OVERLAY_FILE="${GLOBAL_BOOT_DTC_OVERLAY_FILE};${FLASH_DTC_OVERLAY_FILE};${USB_BOOT_DTC_OVERLAY_FILE};${MARS_BOOT_DTC_OVERLAY_FILE}"
         COMMAND
-        cp ${PROJECT_BINARY_DIR}/../modules/chip-module/build_mcuboot/zephyr/zephyr.bin ${PROJECT_BINARY_DIR}/zephyr.mcuboot.bin
+        cp ${PROJECT_BINARY_DIR}/../modules/chip-module/build_mcuboot/zephyr/zephyr.bin ${PROJECT_BINARY_DIR}/mcuboot.bin
     )
-
-    add_custom_target(merge_mcuboot ALL
-        COMMAND
-        dd if=${PROJECT_BINARY_DIR}/zephyr.mcuboot.bin of=${PROJECT_BINARY_DIR}/zephyr.bin
-        COMMAND
-        dd if=${PROJECT_BINARY_DIR}/zephyr.signed.bin of=${PROJECT_BINARY_DIR}/zephyr.bin bs=${BLOCK_SIZE} seek=${boot_blocks}
-    )
-
-    add_dependencies(merge_mcuboot ${ZEPHYR_FINAL_EXECUTABLE})
-
-    if (CONFIG_CHIP_OTA_IMAGE_BUILD)
-        chip_ota_image(chip-ota-image
-            INPUT_FILES ${PROJECT_BINARY_DIR}/zephyr.signed.bin
-            OUTPUT_FILE ${PROJECT_BINARY_DIR}/zephyr-ota.bin
-        )
-
-        add_dependencies(chip-ota-image ${ZEPHYR_FINAL_EXECUTABLE})
-    endif()
 endif()
 
-if (CONFIG_CHIP_FACTORY_DATA_MERGE_WITH_FIRMWARE)
-    dt_nodelabel(dts_partition_path NODELABEL "factory_partition")
-    dt_reg_addr(factory_size PATH ${dts_partition_path})
-    math(EXPR factory_blocks "${factory_size} / ${BLOCK_SIZE}" OUTPUT_FORMAT DECIMAL)
+# ==============================================================================
+# Define 'chip-ota-image' target for building CHIP OTA image
+# ==============================================================================
 
-    add_custom_target(merge_factory_data ALL
-        COMMAND
-        dd if=${PROJECT_BINARY_DIR}/factory/factory_data.bin of=${PROJECT_BINARY_DIR}/zephyr.bin bs=${BLOCK_SIZE} seek=${factory_blocks}
-    )
-    if (CONFIG_CHIP_OTA_IMAGE_BUILD)
-        add_dependencies(merge_factory_data merge_mcuboot)
-    else()
-        add_dependencies(merge_factory_data ${ZEPHYR_FINAL_EXECUTABLE})
+if (CONFIG_CHIP_OTA_IMAGE_BUILD)
+    if (CONFIG_COMPRESS_LZMA)
+        add_custom_command(
+            OUTPUT ${PROJECT_BINARY_DIR}/${CONFIG_SIGNED_OTA_IMAGE_FILE_NAME}
+            COMMAND ${CMAKE_COMMAND} -E true
+            COMMENT "Fake command, ${CONFIG_SIGNED_OTA_IMAGE_FILE_NAME} file created in process_binaries target"
+            DEPENDS ${ZEPHYR_FINAL_EXECUTABLE}
+        )
     endif()
+
+    chip_ota_image(chip-ota-image
+        INPUT_FILES ${PROJECT_BINARY_DIR}/${CONFIG_SIGNED_OTA_IMAGE_FILE_NAME}
+        OUTPUT_FILE ${PROJECT_BINARY_DIR}/${CONFIG_CHIP_OTA_IMAGE_FILE_NAME}
+    )
+    add_dependencies(chip-ota-image process_binaries)
 endif()
 
 # ==============================================================================
@@ -214,29 +217,6 @@ endif()
 
 if (CONFIG_CHIP_FACTORY_DATA_BUILD)
     telink_generate_factory_data()
-endif()
-
-if (CONFIG_SOC_SERIES_RISCV_TELINK_W91 AND CONFIG_TELINK_W91_FETCH_N22_BIN)
-    dt_nodelabel(flash_path NODELABEL "flash")
-    dt_reg_size(flash_size PATH ${flash_path})
-    math(EXPR flash_blocks "${flash_size} / ${BLOCK_SIZE}" OUTPUT_FORMAT DECIMAL)
-
-    add_custom_target(merge_n22 ALL
-        COMMAND
-        [ -f ${PROJECT_BINARY_DIR}/n22.bin ] && (
-            dd if=/dev/zero bs=${BLOCK_SIZE} count=${flash_blocks} | tr '\\000' '\\377' > ${PROJECT_BINARY_DIR}/merged.bin &&
-            dd if=${PROJECT_BINARY_DIR}/zephyr.bin of=${PROJECT_BINARY_DIR}/merged.bin conv=notrunc &&
-            dd if=${PROJECT_BINARY_DIR}/n22.bin of=${PROJECT_BINARY_DIR}/merged.bin bs=${BLOCK_SIZE} seek=${flash_blocks} conv=notrunc
-        ) || true
-    )
-
-    if (CONFIG_CHIP_FACTORY_DATA_MERGE_WITH_FIRMWARE)
-        add_dependencies(merge_n22 merge_factory_data)
-    elseif (CONFIG_CHIP_OTA_IMAGE_BUILD)
-        add_dependencies(merge_n22 merge_mcuboot)
-    else()
-        add_dependencies(merge_n22 ${ZEPHYR_FINAL_EXECUTABLE})
-    endif()
 endif()
 
 endif() # CONFIG_CHIP

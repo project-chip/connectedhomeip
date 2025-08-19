@@ -187,11 +187,11 @@ CHIP_ERROR MdnsContexts::GetRegisterContextOfType(const char * type, RegisterCon
 MdnsContexts::~MdnsContexts()
 {
     std::vector<GenericContext *>::const_iterator iter = mContexts.cbegin();
-    while (iter != mContexts.cend())
+    for (auto context : mContexts)
     {
-        Delete(*iter);
-        mContexts.erase(iter);
+        Delete(context);
     }
+    mContexts.clear();
 }
 
 CHIP_ERROR MdnsContexts::Add(GenericContext * context, DNSServiceRef sdRef)
@@ -451,7 +451,7 @@ void ResolveContext::OnNewInterface(uint32_t interfaceId, const char * fullname,
         size_t len = *txtRecordIter;
         ++txtRecordIter;
         --remainingLen;
-        len = min(len, remainingLen);
+        len = std::min(len, remainingLen);
         chip::Span<const unsigned char> bytes(txtRecordIter, len);
         if (txtString.size() > 0)
         {

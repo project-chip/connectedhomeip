@@ -37,9 +37,9 @@ public final class GetConnectedDeviceCallbackForTestJni {
 
   private native void onDeviceConnected(long callbackHandle, long messagingContextHandle);
 
-  public void onDeviceConnectionFailure(GetConnectedDeviceCallbackJni callback, int errorCode) {
+  public void onDeviceConnectionFailure(GetConnectedDeviceCallbackJni callback, long errorCode) {
     onDeviceConnectionFailure(callback.getCallbackHandle(), errorCode);
   }
 
-  private native void onDeviceConnectionFailure(long callbackHandle, int errorCode);
+  private native void onDeviceConnectionFailure(long callbackHandle, long errorCode);
 }

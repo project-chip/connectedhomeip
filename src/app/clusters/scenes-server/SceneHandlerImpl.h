@@ -38,8 +38,8 @@ class DefaultSceneHandlerImpl : public scenes::SceneHandler
 
     using AttributeValuePairType          = app::Clusters::ScenesManagement::Structs::AttributeValuePairStruct::Type;
     using AttributeValuePairDecodableType = app::Clusters::ScenesManagement::Structs::AttributeValuePairStruct::DecodableType;
-    using ExtensionFieldSetDecodableType  = app::Clusters::ScenesManagement::Structs::ExtensionFieldSet::DecodableType;
-    using ExtensionFieldSetType           = app::Clusters::ScenesManagement::Structs::ExtensionFieldSet::Type;
+    using ExtensionFieldSetDecodableType  = app::Clusters::ScenesManagement::Structs::ExtensionFieldSetStruct::DecodableType;
+    using ExtensionFieldSetType           = app::Clusters::ScenesManagement::Structs::ExtensionFieldSetStruct::Type;
 
 public:
     /// @brief Struct meant to map the state of a cluster to a specific endpoint. Meant to be used to apply scenes using a timer for

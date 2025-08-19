@@ -195,6 +195,16 @@ void ExchangeManager::OnMessageReceived(const PacketHeader & packetHeader, const
     auto * protocolName = Protocols::GetProtocolName(payloadHeader.GetProtocolID());
     auto * msgTypeName  = Protocols::GetMessageTypeName(payloadHeader.GetProtocolID(), payloadHeader.GetMessageType());
 
+    auto destination = kUndefinedNodeId;
+    if (packetHeader.GetDestinationNodeId().HasValue())
+    {
+        destination = packetHeader.GetDestinationNodeId().Value();
+    }
+    else if (session->IsSecureSession())
+    {
+        destination = session->AsSecureSession()->GetLocalNodeId();
+    }
+
     //
     // 32-bit value maximum = 10 chars + text preamble (6) + trailer (1) + null (1) + 2 buffer = 20
     //
@@ -220,18 +230,25 @@ void ExchangeManager::OnMessageReceived(const PacketHeader & packetHeader, const
     char typeStr[4 + 1 + 2 + 1];
     snprintf(typeStr, sizeof(typeStr), "%04X:%02X", payloadHeader.GetProtocolID().GetProtocolId(), payloadHeader.GetMessageType());
 
+    // More work around pigweed not allowing more than 14 format args in a log
+    // message when using tokenized logs.
+    // text(5) + fabricIndex (uint16_t, at most 5 chars) + text (1) + source (16) + text (2) + compressed fabric id (4) + text (5) +
+    // destination + null-terminator
+    char sourceDestinationStr[5 + 5 + 1 + 16 + 2 + 4 + 5 + 16 + 1];
+    snprintf(sourceDestinationStr, sizeof(sourceDestinationStr), "from %u:" ChipLogFormatX64 " [%04X] to " ChipLogFormatX64,
+             session->GetFabricIndex(), ChipLogValueX64(session->GetPeer().GetNodeId()), static_cast<uint16_t>(compressedFabricId),
+             ChipLogValueX64(destination));
+
     //
     // Legend that can be used to decode this log line can be found in README.md
     //
-    ChipLogProgress(ExchangeManager,
-                    ">>> [E:" ChipLogFormatExchangeId " S:%u M:" ChipLogFormatMessageCounter
-                    "%s] (%s) Msg RX from %u:" ChipLogFormatX64 " [%04X] --- Type %s (%s:%s) (B:%u)",
-                    ChipLogValueExchangeIdFromReceivedHeader(payloadHeader), session->SessionIdForLogging(),
-                    packetHeader.GetMessageCounter(), ackBuf, Transport::GetSessionTypeString(session), session->GetFabricIndex(),
-                    ChipLogValueX64(session->GetPeer().GetNodeId()), static_cast<uint16_t>(compressedFabricId), typeStr,
-                    protocolName, msgTypeName,
-                    static_cast<unsigned>(msgBuf->TotalLength() + packetHeader.EncodeSizeBytes() + packetHeader.MICTagLength() +
-                                          payloadHeader.EncodeSizeBytes()));
+    ChipLogProgress(
+        ExchangeManager,
+        ">>> [E:" ChipLogFormatExchangeId " S:%u M:" ChipLogFormatMessageCounter "%s] (%s) Msg RX %s --- Type %s (%s:%s) (B:%u)",
+        ChipLogValueExchangeIdFromReceivedHeader(payloadHeader), session->SessionIdForLogging(), packetHeader.GetMessageCounter(),
+        ackBuf, Transport::GetSessionTypeString(session), sourceDestinationStr, typeStr, protocolName, msgTypeName,
+        static_cast<unsigned>(msgBuf->TotalLength() + packetHeader.EncodeSizeBytes() + packetHeader.MICTagLength() +
+                              payloadHeader.EncodeSizeBytes()));
 #endif
 
     MessageFlags msgFlags;
@@ -267,8 +284,15 @@ void ExchangeManager::OnMessageReceived(const PacketHeader & packetHeader, const
     }
     else
     {
-        ChipLogProgress(ExchangeManager, "Received Groupcast Message with GroupId 0x%04X (%d)",
-                        packetHeader.GetDestinationGroupId().Value(), packetHeader.GetDestinationGroupId().Value());
+        if (packetHeader.GetDestinationGroupId().HasValue())
+        {
+            ChipLogProgress(ExchangeManager, "Received Groupcast Message with GroupId 0x%04X (%d)",
+                            packetHeader.GetDestinationGroupId().Value(), packetHeader.GetDestinationGroupId().Value());
+        }
+        else
+        {
+            ChipLogProgress(ExchangeManager, "Received Groupcast Message without GroupId");
+        }
     }
 
     // Do not handle messages that don't match an existing exchange on an

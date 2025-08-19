@@ -49,7 +49,7 @@ CHIP_ERROR OpenCommissioningWindowCommand::RunCommand()
 }
 
 void OpenCommissioningWindowCommand::OnOpenCommissioningWindowResponse(void * context, NodeId remoteId, CHIP_ERROR err,
-                                                                       chip::SetupPayload payload)
+                                                                       SetupPayload payload)
 {
     LogErrorOnFailure(err);
 

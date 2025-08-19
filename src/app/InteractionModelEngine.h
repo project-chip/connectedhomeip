@@ -25,9 +25,6 @@
 
 #pragma once
 
-// TODO(#32628): Remove the CHIPCore.h header when the esp32 build is correctly fixed
-#include <lib/core/CHIPCore.h>
-
 #include <access/AccessControl.h>
 #include <app/AppConfig.h>
 #include <app/AttributePathParams.h>
@@ -49,6 +46,8 @@
 #include <app/TimedHandler.h>
 #include <app/WriteClient.h>
 #include <app/WriteHandler.h>
+#include <app/data-model-provider/MetadataTypes.h>
+#include <app/data-model-provider/OperationTypes.h>
 #include <app/data-model-provider/Provider.h>
 #include <app/icd/server/ICDServerConfig.h>
 #include <app/reporting/Engine.h>
@@ -86,6 +85,7 @@ namespace app {
  */
 class InteractionModelEngine : public Messaging::UnsolicitedMessageHandler,
                                public Messaging::ExchangeDelegate,
+                               private DataModel::ActionContext,
                                public CommandResponseSender::Callback,
                                public CommandHandlerImpl::Callback,
                                public ReadHandler::ManagementCallback,
@@ -124,11 +124,13 @@ public:
      *  @param[in]    apExchangeMgr    A pointer to the ExchangeManager object.
      *  @param[in]    apFabricTable    A pointer to the FabricTable object.
      *  @param[in]    apCASESessionMgr An optional pointer to a CASESessionManager (used for re-subscriptions).
+     *  @parma[in]    eventManagement  An optional pointer to a EventManagement. If null, the global instance will be used.
      *
      */
     CHIP_ERROR Init(Messaging::ExchangeManager * apExchangeMgr, FabricTable * apFabricTable,
                     reporting::ReportScheduler * reportScheduler, CASESessionManager * apCASESessionMgr = nullptr,
-                    SubscriptionResumptionStorage * subscriptionResumptionStorage = nullptr);
+                    SubscriptionResumptionStorage * subscriptionResumptionStorage = nullptr,
+                    EventManagement * eventManagement                             = nullptr);
 
     void Shutdown();
 
@@ -167,7 +169,13 @@ public:
      * Tears down all active subscriptions.
      */
     void ShutdownAllSubscriptions();
+
 #endif // CHIP_CONFIG_ENABLE_READ_CLIENT
+
+    /**
+     * Tears down all subscription handlers.
+     */
+    void ShutdownAllSubscriptionHandlers();
 
     uint32_t GetNumActiveReadHandlers() const;
     uint32_t GetNumActiveReadHandlers(ReadHandler::InteractionType type) const;
@@ -232,12 +240,12 @@ public:
 
 #if CHIP_CONFIG_ENABLE_READ_CLIENT
     /**
-     *  Activate the idle subscriptions.
      *
-     *  When subscribing to ICD and liveness timeout reached, the read client will move to `InactiveICDSubscription` state and
-     * resubscription can be triggered via OnActiveModeNotification().
+     *  Notification that aPeer has sent a check-in message because aMonitoredSubject does
+     *  not have a subscription to it.
+     *
      */
-    void OnActiveModeNotification(ScopedNodeId aPeer);
+    void OnActiveModeNotification(ScopedNodeId aPeer, uint64_t aMonitoredSubject);
 
     /**
      *  Used to notify when a peer becomes LIT ICD or vice versa.
@@ -313,13 +321,23 @@ public:
 
     bool SubjectHasPersistedSubscription(FabricIndex aFabricIndex, NodeId subjectID) override;
 
+    bool FabricHasAtLeastOneActiveSubscription(FabricIndex aFabricIndex) override;
+
 #if CHIP_CONFIG_PERSIST_SUBSCRIPTIONS
     /**
      * @brief Function decrements the number of subscriptions to resume counter - mNumOfSubscriptionsToResume.
      *        This should be called after we have completed a re-subscribe attempt on a persisted subscription wether the attempt
-     *        was succesful or not.
+     *        was successful or not.
      */
     void DecrementNumSubscriptionsToResume();
+#if CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION
+    /**
+     * @brief Function resets the number of retries of subscriptions resumption - mNumSubscriptionResumptionRetries.
+     *        This should be called after we have completed a re-subscribe attempt successfully on a persisted subscription,
+     *        or when the subscription resumption gets terminated.
+     */
+    void ResetNumSubscriptionsRetries();
+#endif // CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION
 #endif // CHIP_CONFIG_PERSIST_SUBSCRIPTIONS
 
 #if CONFIG_BUILD_FOR_HOST_UNIT_TEST
@@ -412,6 +430,9 @@ public:
     DataModel::Provider * SetDataModelProvider(DataModel::Provider * model);
 
 private:
+    /* DataModel::ActionContext implementation */
+    Messaging::ExchangeContext * CurrentExchange() override { return mCurrentExchange; }
+
     friend class reporting::Engine;
     friend class TestCommandInteraction;
     friend class TestInteractionModelEngine;
@@ -463,9 +484,8 @@ private:
      *
      * aRequestedEventPathCount will be updated to reflect the number of event paths in the request.
      */
-    static CHIP_ERROR ParseEventPaths(const Access::SubjectDescriptor & aSubjectDescriptor,
-                                      EventPathIBs::Parser & aEventPathListParser, bool & aHasValidEventPath,
-                                      size_t & aRequestedEventPathCount);
+    CHIP_ERROR ParseEventPaths(const Access::SubjectDescriptor & aSubjectDescriptor, EventPathIBs::Parser & aEventPathListParser,
+                               bool & aHasValidEventPath, size_t & aRequestedEventPathCount);
 
     /**
      * Called when Interaction Model receives a Read Request message.  Errors processing
@@ -501,7 +521,8 @@ private:
 
     void DispatchCommand(CommandHandlerImpl & apCommandObj, const ConcreteCommandPath & aCommandPath,
                          TLV::TLVReader & apPayload) override;
-    Protocols::InteractionModel::Status CommandExists(const ConcreteCommandPath & aCommandPath) override;
+
+    Protocols::InteractionModel::Status ValidateCommandCanBeDispatched(const DataModel::InvokeRequest & request) override;
 
     bool HasActiveRead();
 
@@ -605,6 +626,18 @@ private:
     void ShutdownMatchingSubscriptions(const Optional<FabricIndex> & aFabricIndex = NullOptional,
                                        const Optional<NodeId> & aPeerNodeId       = NullOptional);
 
+    /**
+     * Validates that the command exists and on success returns the data for the command in `entry`.
+     */
+    Status CheckCommandExistence(const ConcreteCommandPath & aCommandPath, DataModel::AcceptedCommandEntry & entry);
+    Status CheckCommandAccess(const DataModel::InvokeRequest & aRequest, const Access::Privilege aRequiredPrivilege);
+    Status CheckCommandFlags(const DataModel::InvokeRequest & aRequest, const DataModel::AcceptedCommandEntry & entry);
+
+    /**
+     * Find the AttributeEntry that corresponds to the given attribute, if there is one.
+     */
+    std::optional<DataModel::AttributeEntry> FindAttributeEntry(const ConcreteAttributePath & path);
+
     static void ResumeSubscriptionsTimerCallback(System::Layer * apSystemLayer, void * apAppState);
 
     template <typename T, size_t N>
@@ -692,13 +725,37 @@ private:
 #endif // CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION
 #endif // CHIP_CONFIG_PERSIST_SUBSCRIPTIONS
 
-    FabricTable * mpFabricTable;
+    FabricTable * mpFabricTable = nullptr;
 
     CASESessionManager * mpCASESessionMgr = nullptr;
 
     SubscriptionResumptionStorage * mpSubscriptionResumptionStorage = nullptr;
 
-    DataModel::Provider * mDataModelProvider = nullptr;
+    DataModel::Provider * mDataModelProvider      = nullptr;
+    Messaging::ExchangeContext * mCurrentExchange = nullptr;
+
+    enum class State : uint8_t
+    {
+        kUninitialized, // The object has not been initialized.
+        kInitializing,  // Initial setup is in progress (e.g. setting up mpExchangeMgr).
+        kInitialized    // The object has been fully initialized and is ready for use.
+    };
+    State mState = State::kUninitialized;
+
+    // Changes the current exchange context of a InteractionModelEngine to a given context
+    class CurrentExchangeValueScope
+    {
+    public:
+        CurrentExchangeValueScope(InteractionModelEngine & engine, Messaging::ExchangeContext * context) : mEngine(engine)
+        {
+            mEngine.mCurrentExchange = context;
+        }
+
+        ~CurrentExchangeValueScope() { mEngine.mCurrentExchange = nullptr; }
+
+    private:
+        InteractionModelEngine & mEngine;
+    };
 };
 
 } // namespace app

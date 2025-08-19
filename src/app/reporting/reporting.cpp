@@ -18,31 +18,12 @@
 
 #include <app/AttributePathParams.h>
 #include <app/InteractionModelEngine.h>
-#include <app/util/attribute-storage.h>
+#include <app/data-model-provider/Provider.h>
+#include <lib/support/CodeUtils.h>
 #include <platform/LockTracker.h>
 
 using namespace chip;
 using namespace chip::app;
-
-namespace {
-
-void IncreaseClusterDataVersion(const ConcreteClusterPath & aConcreteClusterPath)
-{
-    DataVersion * version = emberAfDataVersionStorage(aConcreteClusterPath);
-    if (version == nullptr)
-    {
-        ChipLogError(DataManagement, "Endpoint %x, Cluster " ChipLogFormatMEI " not found in IncreaseClusterDataVersion!",
-                     aConcreteClusterPath.mEndpointId, ChipLogValueMEI(aConcreteClusterPath.mClusterId));
-    }
-    else
-    {
-        (*(version))++;
-        ChipLogDetail(DataManagement, "Endpoint %x, Cluster " ChipLogFormatMEI " update version to %" PRIx32,
-                      aConcreteClusterPath.mEndpointId, ChipLogValueMEI(aConcreteClusterPath.mClusterId), *(version));
-    }
-}
-
-} // namespace
 
 void MatterReportingAttributeChangeCallback(EndpointId endpoint, ClusterId clusterId, AttributeId attributeId)
 {
@@ -50,18 +31,22 @@ void MatterReportingAttributeChangeCallback(EndpointId endpoint, ClusterId clust
     // applications notifying about changes from their end.
     assertChipStackLockedByCurrentThread();
 
-    AttributePathParams info;
-    info.mClusterId   = clusterId;
-    info.mAttributeId = attributeId;
-    info.mEndpointId  = endpoint;
+    DataModel::Provider * provider = InteractionModelEngine::GetInstance()->GetDataModelProvider();
+    VerifyOrReturn(provider != nullptr);
 
-    IncreaseClusterDataVersion(ConcreteClusterPath(endpoint, clusterId));
-    InteractionModelEngine::GetInstance()->GetReportingEngine().SetDirty(info);
+    provider->Temporary_ReportAttributeChanged(AttributePathParams(endpoint, clusterId, attributeId));
 }
 
 void MatterReportingAttributeChangeCallback(const ConcreteAttributePath & aPath)
 {
-    return MatterReportingAttributeChangeCallback(aPath.mEndpointId, aPath.mClusterId, aPath.mAttributeId);
+    // Attribute writes have asserted this already, but this assert should catch
+    // applications notifying about changes from their end.
+    assertChipStackLockedByCurrentThread();
+
+    DataModel::Provider * provider = InteractionModelEngine::GetInstance()->GetDataModelProvider();
+    VerifyOrReturn(provider != nullptr);
+
+    provider->Temporary_ReportAttributeChanged(AttributePathParams(aPath.mEndpointId, aPath.mClusterId, aPath.mAttributeId));
 }
 
 void MatterReportingAttributeChangeCallback(EndpointId endpoint)
@@ -70,10 +55,8 @@ void MatterReportingAttributeChangeCallback(EndpointId endpoint)
     // applications notifying about changes from their end.
     assertChipStackLockedByCurrentThread();
 
-    AttributePathParams info;
-    info.mEndpointId = endpoint;
+    DataModel::Provider * provider = InteractionModelEngine::GetInstance()->GetDataModelProvider();
+    VerifyOrReturn(provider != nullptr);
 
-    // We are adding or enabling a whole endpoint, in this case, we do not touch the cluster data version.
-
-    InteractionModelEngine::GetInstance()->GetReportingEngine().SetDirty(info);
+    provider->Temporary_ReportAttributeChanged(AttributePathParams(endpoint));
 }

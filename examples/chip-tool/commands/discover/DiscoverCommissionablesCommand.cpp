@@ -23,8 +23,13 @@
 
 using namespace ::chip;
 
-void DiscoverCommissionablesCommandBase::OnDiscoveredDevice(const chip::Dnssd::CommissionNodeData & nodeData)
+void DiscoverCommissionablesCommandBase::OnDiscoveredDevice(const Dnssd::CommissionNodeData & nodeData)
 {
+    if (mCommissioningMode.HasValue() && nodeData.commissioningMode != mCommissioningMode.Value())
+    {
+        return; // Skip nodes that do not match the commissioning mode filter.
+    }
+
     nodeData.LogDetail();
     LogErrorOnFailure(RemoteDataModelLogger::LogDiscoveredNodeData(nodeData));
 
@@ -120,5 +125,13 @@ CHIP_ERROR DiscoverCommissionableByDeviceTypeCommand::RunCommand()
     mCommissioner = &CurrentCommissioner();
     mCommissioner->RegisterDeviceDiscoveryDelegate(this);
     chip::Dnssd::DiscoveryFilter filter(chip::Dnssd::DiscoveryFilterType::kDeviceType, mDeviceType);
+    return mCommissioner->DiscoverCommissionableNodes(filter);
+}
+
+CHIP_ERROR DiscoverCommissionableByInstanceNameCommand::RunCommand()
+{
+    mCommissioner = &CurrentCommissioner();
+    mCommissioner->RegisterDeviceDiscoveryDelegate(this);
+    chip::Dnssd::DiscoveryFilter filter(chip::Dnssd::DiscoveryFilterType::kInstanceName, mInstanceName);
     return mCommissioner->DiscoverCommissionableNodes(filter);
 }

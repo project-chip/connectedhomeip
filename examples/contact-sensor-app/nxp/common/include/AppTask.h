@@ -28,12 +28,13 @@ namespace ContactSensorApp {
 class AppTask : public chip::NXP::App::AppTaskFreeRTOS
 {
 public:
+    // AppTaskBase virtual methods
+    bool CheckStateClusterHandler(void) override;
+    CHIP_ERROR ProcessSetStateClusterHandler(void) override;
+
     // AppTaskFreeRTOS virtual methods
     void PreInitMatterStack() override;
-#if CONFIG_LOW_POWER
-    void AppMatter_DisallowDeviceToSleep() override;
-    void AppMatter_AllowDeviceToSleep() override;
-#endif
+    void PostInitMatterStack() override;
 
     // This returns an instance of this class.
     static AppTask & GetDefaultInstance();

@@ -84,7 +84,7 @@ enum class IntrusiveMode
 class IntrusiveListNodePrivateBase
 {
 public:
-    IntrusiveListNodePrivateBase() : mPrev(nullptr), mNext(nullptr) {}
+    constexpr IntrusiveListNodePrivateBase() : mPrev(nullptr), mNext(nullptr) {}
     ~IntrusiveListNodePrivateBase() { VerifyOrDie(!IsInList()); }
 
     // Note: The copy construct/assignment is not provided because the list node state is not copyable.
@@ -98,7 +98,7 @@ public:
 
 private:
     friend class IntrusiveListBase;
-    IntrusiveListNodePrivateBase(IntrusiveListNodePrivateBase * prev, IntrusiveListNodePrivateBase * next) :
+    constexpr IntrusiveListNodePrivateBase(IntrusiveListNodePrivateBase * prev, IntrusiveListNodePrivateBase * next) :
         mPrev(prev), mNext(next)
     {}
 
@@ -284,7 +284,7 @@ protected:
     //   ^                                           |
     //    \------------------------------------------/
     //
-    IntrusiveListBase() : mNode(&mNode, &mNode) {}
+    constexpr IntrusiveListBase() : mNode(&mNode, &mNode) {}
     ~IntrusiveListBase()
     {
         VerifyOrDie(Empty());
@@ -399,7 +399,7 @@ template <typename T, IntrusiveMode Mode = IntrusiveMode::Strict, typename Hook 
 class IntrusiveList : public IntrusiveListBase
 {
 public:
-    IntrusiveList() : IntrusiveListBase() {}
+    constexpr IntrusiveList() : IntrusiveListBase() {}
 
     IntrusiveList(IntrusiveList &&)             = default;
     IntrusiveList & operator=(IntrusiveList &&) = default;
@@ -414,6 +414,11 @@ public:
         ConstIterator(IntrusiveListBase::ConstIteratorBase && base) : IntrusiveListBase::ConstIteratorBase(std::move(base)) {}
         const T * operator->() { return Hook::ToObject(mCurrent); }
         const T & operator*() { return *Hook::ToObject(mCurrent); }
+
+        ConstIterator & operator++() { return static_cast<ConstIterator &>(IntrusiveListBase::ConstIteratorBase::operator++()); }
+        ConstIterator operator++(int) { return IntrusiveListBase::ConstIteratorBase::operator++(1); }
+        ConstIterator & operator--() { return static_cast<ConstIterator &>(IntrusiveListBase::ConstIteratorBase::operator--()); }
+        ConstIterator operator--(int) { return IntrusiveListBase::ConstIteratorBase::operator--(1); }
     };
 
     class Iterator : public IntrusiveListBase::IteratorBase
@@ -426,6 +431,11 @@ public:
         Iterator(IntrusiveListBase::IteratorBase && base) : IntrusiveListBase::IteratorBase(std::move(base)) {}
         T * operator->() { return Hook::ToObject(mCurrent); }
         T & operator*() { return *Hook::ToObject(mCurrent); }
+
+        Iterator & operator++() { return static_cast<Iterator &>(IntrusiveListBase::IteratorBase::operator++()); }
+        Iterator operator++(int) { return IntrusiveListBase::IteratorBase::operator++(1); }
+        Iterator & operator--() { return static_cast<Iterator &>(IntrusiveListBase::IteratorBase::operator--()); }
+        Iterator operator--(int) { return IntrusiveListBase::IteratorBase::operator--(1); }
     };
 
     ConstIterator begin() const { return IntrusiveListBase::begin(); }

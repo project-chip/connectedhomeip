@@ -32,7 +32,7 @@ extern "C" void pw_sys_io_Init()
 
 #ifdef CONFIG_USB
     err = usb_enable(nullptr);
-    assert(err == 0);
+    assert(err == 0 || err == (-EALREADY));
 #endif
 
     err = console_init();
@@ -58,7 +58,7 @@ Status WriteByte(std::byte b)
 }
 
 // Writes a string using pw::sys_io, and add newline characters at the end.
-StatusWithSize WriteLine(const std::string_view & s)
+StatusWithSize WriteLine(std::string_view s)
 {
     size_t chars_written  = 0;
     StatusWithSize result = WriteBytes(pw::as_bytes(pw::span(s)));

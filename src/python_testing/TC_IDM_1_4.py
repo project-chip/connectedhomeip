@@ -19,21 +19,34 @@
 # for details about the block below.
 #
 # === BEGIN CI TEST ARGUMENTS ===
-# test-runner-runs: run1
-# test-runner-run/run1/app: ${ALL_CLUSTERS_APP}
-# test-runner-run/run1/factoryreset: True
-# test-runner-run/run1/quiet: True
-# test-runner-run/run1/app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json --enable-key 000102030405060708090a0b0c0d0e0f
-# test-runner-run/run1/script-args: --hex-arg PIXIT.DGGEN.TEST_EVENT_TRIGGER_KEY:000102030405060708090a0b0c0d0e0f --storage-path admin_storage.json --commissioning-method on-network --discriminator 1234 --passcode 20202021 --trace-to json:${TRACE_TEST_JSON}.json --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+# test-runner-runs:
+#   run1:
+#     app: ${ALL_CLUSTERS_APP}
+#     app-args: >
+#       --discriminator 1234
+#       --KVS kvs1
+#       --trace-to json:${TRACE_APP}.json
+#       --enable-key 000102030405060708090a0b0c0d0e0f
+#     script-args: >
+#       --hex-arg PIXIT.DGGEN.TEST_EVENT_TRIGGER_KEY:000102030405060708090a0b0c0d0e0f
+#       --storage-path admin_storage.json
+#       --commissioning-method on-network
+#       --discriminator 1234
+#       --passcode 20202021
+#       --trace-to json:${TRACE_TEST_JSON}.json
+#       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+#     factory-reset: true
+#     quiet: true
 # === END CI TEST ARGUMENTS ===
 
 import logging
 
-import chip.clusters as Clusters
-from chip.exceptions import ChipStackError
-from chip.interaction_model import InteractionModelError, Status
-from matter_testing_support import MatterBaseTest, TestStep, async_test_body, default_matter_test_main, type_matches
 from mobly import asserts
+
+import matter.clusters as Clusters
+from matter.exceptions import ChipStackError
+from matter.interaction_model import InteractionModelError, Status
+from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main, type_matches
 
 # If DUT supports `MaxPathsPerInvoke > 1`, additional command line argument
 # run with
@@ -120,7 +133,8 @@ class TC_IDM_1_4(MatterBaseTest):
             asserts.assert_equal(e.status, Status.InvalidAction,
                                  "DUT sent back an unexpected error, we were expecting InvalidAction")
             logging.info("DUT successfully failed to process `MaxPathsPerInvoke + 1` InvokeRequests")
-        except ChipStackError as e:
+        except ChipStackError as e:  # chipstack-ok: Multiple error types are expected depending on DUT capability
+            # assert_raises is not used here because we validate error types
             chip_error_no_memory = 0x0b
             asserts.assert_equal(e.err, chip_error_no_memory, "Unexpected error while trying to send InvokeRequest")
             # TODO it is possible we want to confirm DUT can handle up to MTU max. But that is not in test plan as of right now.
@@ -129,7 +143,8 @@ class TC_IDM_1_4(MatterBaseTest):
             logging.info("DUTs reported MaxPathsPerInvoke + 1 is larger than what fits into MTU. Test step is skipped")
 
         if max_paths_per_invoke == 1:
-            self.skip_all_remaining_steps(3)
+            self.mark_all_remaining_steps_skipped(3)
+            return
         else:
             asserts.assert_true('PIXIT.DGGEN.TEST_EVENT_TRIGGER_KEY' in self.matter_test_config.global_test_params,
                                 "PIXIT.DGGEN.TEST_EVENT_TRIGGER_KEY must be included on the command line in "

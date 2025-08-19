@@ -24,6 +24,9 @@
 #include <cstdint>
 #include <utility>
 
+// Including the Metadata from a concrete implementation
+#include <clusters/ActivatedCarbonFilterMonitoring/Metadata.h>
+
 namespace chip {
 namespace app {
 namespace Clusters {
@@ -229,14 +232,6 @@ struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::Typ
 };
 } // namespace AcceptedCommandList
 
-namespace EventList {
-static constexpr AttributeId Id = Globals::Attributes::EventList::Id;
-
-struct TypeInfo : public Clusters::Globals::Attributes::EventList::TypeInfo
-{
-};
-} // namespace EventList
-
 namespace AttributeList {
 static constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;
 struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
@@ -263,7 +258,10 @@ struct TypeInfo : public Clusters::Globals::Attributes::ClusterRevision::TypeInf
 
 namespace Commands {
 namespace ResetCondition {
-static constexpr CommandId Id = 0x00000000;
+// Getting these from a concrete implementation, Less error-prone if XML ever changes
+static constexpr CommandId Id = ActivatedCarbonFilterMonitoring::Commands::ResetCondition::Id;
+static constexpr DataModel::AcceptedCommandEntry kMetadataEntry =
+    ActivatedCarbonFilterMonitoring::Commands::ResetCondition::kMetadataEntry;
 
 struct DecodableType
 {

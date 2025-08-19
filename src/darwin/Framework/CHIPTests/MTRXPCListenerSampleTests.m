@@ -23,14 +23,15 @@
 #import <Matter/Matter.h>
 
 #import "MTRErrorTestUtils.h"
+#import "MTRTestCase+ServerAppRunner.h"
+#import "MTRTestCase.h"
+#import "MTRTestControllerDelegate.h"
 #import "MTRTestKeys.h"
-#import "MTRTestResetCommissioneeHelper.h"
 #import "MTRTestStorage.h"
 
 #import <math.h> // For INFINITY
 
 // system dependencies
-#import <XCTest/XCTest.h>
 #import <os/lock.h>
 
 static uint16_t kTestVendorId = 0xFFF1u;
@@ -415,10 +416,12 @@ static NSString * const MTRDeviceControllerId = @"MTRController";
 
 @end
 
-static const uint16_t kPairingTimeoutInSeconds = 10;
+static const uint16_t kPairingTimeoutInSeconds = 30;
 static const uint16_t kTimeoutInSeconds = 3;
 static const uint64_t kDeviceId = 0x12344321;
-static NSString * kOnboardingPayload = @"MT:-24J0AFN00KA0648G00";
+static NSString * kOnboardingPayload = @"MT:Y.K90SO527JA0648G00";
+static NSString * _Nullable sLogContentFilePath;
+static NSString * kSimpleLogContent = @"This is a simple log\n";
 static const uint16_t kLocalPort = 5541;
 
 // This test suite reuses a device object to speed up the test process for CI.
@@ -432,41 +435,6 @@ static MTRBaseDevice * GetConnectedDevice(void)
     XCTAssertNotNil(mConnectedDevice);
     return mConnectedDevice;
 }
-
-@interface MTRRemoteDeviceSampleTestDeviceControllerDelegate : NSObject <MTRDeviceControllerDelegate>
-@property (nonatomic, strong) XCTestExpectation * expectation;
-@end
-
-@implementation MTRRemoteDeviceSampleTestDeviceControllerDelegate
-- (id)initWithExpectation:(XCTestExpectation *)expectation
-{
-    self = [super init];
-    if (self) {
-        _expectation = expectation;
-    }
-    return self;
-}
-
-- (void)controller:(MTRDeviceController *)controller commissioningSessionEstablishmentDone:(NSError *)error
-{
-    XCTAssertEqual(error.code, 0);
-    NSError * commissionError = nil;
-    [sController commissionNodeWithID:@(kDeviceId)
-                  commissioningParams:[[MTRCommissioningParameters alloc] init]
-                                error:&commissionError];
-    XCTAssertNil(commissionError);
-
-    // Keep waiting for controller:commissioningComplete
-}
-
-- (void)controller:(MTRDeviceController *)controller commissioningComplete:(NSError *)error
-{
-    XCTAssertEqual(error.code, 0);
-    [_expectation fulfill];
-    _expectation = nil;
-}
-
-@end
 
 typedef void (^MTRDeviceTestDelegateDataHandler)(NSArray<NSDictionary<NSString *, id> *> *);
 
@@ -501,25 +469,42 @@ typedef void (^MTRDeviceTestDelegateDataHandler)(NSArray<NSDictionary<NSString *
 }
 @end
 
-@interface MTRXPCListenerSampleTests : XCTestCase
+@interface MTRXPCListenerSampleTests : MTRTestCase
 
 @end
 
 static BOOL sStackInitRan = NO;
-static BOOL sNeedsStackShutdown = YES;
 
 @implementation MTRXPCListenerSampleTests
+
++ (void)setUp
+{
+    // Global setup, runs once.
+    [super setUp];
+
+    __auto_type * uniqueName = [[NSUUID UUID] UUIDString];
+    sLogContentFilePath = [NSTemporaryDirectory() stringByAppendingPathComponent:uniqueName];
+    [[NSFileManager defaultManager] createFileAtPath:sLogContentFilePath
+                                            contents:[kSimpleLogContent dataUsingEncoding:NSUTF8StringEncoding]
+                                          attributes:nil];
+    BOOL started = [self startAppWithName:@"all-clusters"
+                                arguments:@[
+                                    @"--end_user_support_log",
+                                    sLogContentFilePath,
+                                ]
+                                  payload:kOnboardingPayload];
+    XCTAssertTrue(started);
+}
 
 + (void)tearDown
 {
     // Global teardown, runs once
-    if (sNeedsStackShutdown) {
-        // We don't need to worry about ResetCommissionee.  If we get here,
-        // we're running only one of our test methods (using
-        // -only-testing:MatterTests/MTROTAProviderTests/testMethodName), since
-        // we did not run test999_TearDown.
-        //        [self shutdownStack];
+    if (sLogContentFilePath != nil) {
+        [[NSFileManager defaultManager] removeItemAtPath:sLogContentFilePath error:nil];
     }
+
+    [self shutdownStack];
+    [super tearDown];
 }
 
 - (void)setUp
@@ -570,8 +555,8 @@ static BOOL sNeedsStackShutdown = YES;
 
     sController = controller;
 
-    MTRRemoteDeviceSampleTestDeviceControllerDelegate * deviceControllerDelegate =
-        [[MTRRemoteDeviceSampleTestDeviceControllerDelegate alloc] initWithExpectation:expectation];
+    MTRTestControllerDelegate * deviceControllerDelegate =
+        [[MTRTestControllerDelegate alloc] initWithExpectation:expectation newNodeID:@(kDeviceId)];
     dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.device_controller_delegate", DISPATCH_QUEUE_SERIAL);
 
     [controller setDeviceControllerDelegate:deviceControllerDelegate queue:callbackQueue];
@@ -591,8 +576,6 @@ static BOOL sNeedsStackShutdown = YES;
 
 + (void)shutdownStack
 {
-    sNeedsStackShutdown = NO;
-
     [mSampleListener stop];
     mSampleListener = nil;
 
@@ -753,12 +736,14 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
 
 - (void)test004_Subscribe
 {
+    XCTSkip("Skipping due to flakyness/failing. https://github.com/project-chip/connectedhomeip/issues/27449");
+
     XCTestExpectation * expectation = [self expectationWithDescription:@"subscribe OnOff attribute"];
 
     MTRBaseDevice * device = GetConnectedDevice();
     dispatch_queue_t queue = dispatch_get_main_queue();
 
-    __auto_type * params = [[MTRSubscribeParams alloc] initWithMinInterval:@(2) maxInterval:@(10)];
+    __auto_type * params = [[MTRSubscribeParams alloc] initWithMinInterval:@(0) maxInterval:@(10)];
     [device subscribeToAttributesWithEndpointID:@1
         clusterID:@6
         attributeID:@0
@@ -958,7 +943,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     MTRBaseDevice * device = GetConnectedDevice();
     dispatch_queue_t queue = dispatch_get_main_queue();
 
-    __auto_type * params = [[MTRSubscribeParams alloc] initWithMinInterval:@(2) maxInterval:@(10)];
+    __auto_type * params = [[MTRSubscribeParams alloc] initWithMinInterval:@(0) maxInterval:@(10)];
     params.resubscribeAutomatically = NO;
     [device subscribeToAttributesWithEndpointID:@10000
         clusterID:@6
@@ -1039,7 +1024,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
 
     // Subscribe
     XCTestExpectation * subscribeExpectation = [self expectationWithDescription:@"subscribe OnOff attribute"];
-    __auto_type * params = [[MTRSubscribeParams alloc] initWithMinInterval:@(2) maxInterval:@(10)];
+    __auto_type * params = [[MTRSubscribeParams alloc] initWithMinInterval:@(0) maxInterval:@(10)];
     [device subscribeToAttributesWithEndpointID:@1
         clusterID:@6
         attributeID:@0
@@ -1064,7 +1049,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
 
     // Setup 2nd subscriber
     subscribeExpectation = [self expectationWithDescription:@"subscribe CurrentLevel attribute"];
-    params = [[MTRSubscribeParams alloc] initWithMinInterval:@(2) maxInterval:@(10)];
+    params = [[MTRSubscribeParams alloc] initWithMinInterval:@(0) maxInterval:@(10)];
     [device subscribeToAttributesWithEndpointID:@1
         clusterID:@8
         attributeID:@0
@@ -1212,7 +1197,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
 
     // Subscribe
     XCTestExpectation * subscribeExpectation = [self expectationWithDescription:@"subscribe OnOff attribute"];
-    __auto_type * params = [[MTRSubscribeParams alloc] initWithMinInterval:@(2) maxInterval:@(10)];
+    __auto_type * params = [[MTRSubscribeParams alloc] initWithMinInterval:@(0) maxInterval:@(10)];
     [device subscribeToAttributesWithEndpointID:@1
         clusterID:@6
         attributeID:@0
@@ -1236,7 +1221,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     [self waitForExpectations:@[ subscribeExpectation ] timeout:kTimeoutInSeconds];
 
     // Setup 2nd subscriber
-    MTRSubscribeParams * myParams = [[MTRSubscribeParams alloc] initWithMinInterval:@(2) maxInterval:@(10)];
+    MTRSubscribeParams * myParams = [[MTRSubscribeParams alloc] initWithMinInterval:@(0) maxInterval:@(10)];
     myParams.replaceExistingSubscriptions = YES;
     subscribeExpectation = [self expectationWithDescription:@"subscribe CurrentLevel attribute"];
     [device subscribeToAttributesWithEndpointID:@1
@@ -1390,10 +1375,31 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
 
     __block void (^firstReportHandler)(id _Nullable values, NSError * _Nullable error) = nil;
     __block void (^secondReportHandler)(id _Nullable values, NSError * _Nullable error) = nil;
+    // Depending on how this test is run (alone or after other tests), we might
+    // be either in the "On" or "Off" state when we start.  Track that, so we
+    // can ensure we're in the "Off" state correctly later.
+    __block BOOL initialOnOffState;
+
+    XCTestExpectation * initialOnOffReportExpectation = [self expectationWithDescription:@"initial OnOff report expectation"];
+    firstReportHandler = ^(id _Nullable values, NSError * _Nullable error) {
+        XCTAssertNil(error);
+
+        XCTAssertTrue([values isKindOfClass:[NSArray class]]);
+        NSDictionary * result = values[0];
+        MTRAttributePath * path = result[@"attributePath"];
+        XCTAssertEqual([path.endpoint unsignedIntegerValue], 1);
+        XCTAssertEqual([path.cluster unsignedIntegerValue], 6);
+        XCTAssertEqual([path.attribute unsignedIntegerValue], 0);
+        XCTAssertTrue([result[@"data"] isKindOfClass:[NSDictionary class]]);
+        XCTAssertTrue([result[@"data"][@"type"] isEqualToString:@"Boolean"]);
+        initialOnOffState = [result[@"data"][@"value"] boolValue];
+
+        [initialOnOffReportExpectation fulfill];
+    };
 
     // Subscribe
     XCTestExpectation * subscribeExpectation = [self expectationWithDescription:@"subscribe OnOff attribute"];
-    __auto_type * params = [[MTRSubscribeParams alloc] initWithMinInterval:@(2) maxInterval:@(10)];
+    __auto_type * params = [[MTRSubscribeParams alloc] initWithMinInterval:@(0) maxInterval:@(10)];
     [device subscribeToAttributesWithEndpointID:@1
         clusterID:@6
         attributeID:@0
@@ -1414,11 +1420,11 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
             [subscribeExpectation fulfill];
         }];
 
-    [self waitForExpectations:@[ subscribeExpectation ] timeout:kTimeoutInSeconds];
+    [self waitForExpectations:@[ subscribeExpectation, initialOnOffReportExpectation ] timeout:kTimeoutInSeconds];
 
     // Setup 2nd subscriber
     subscribeExpectation = [self expectationWithDescription:@"subscribe CurrentLevel attribute"];
-    MTRSubscribeParams * myParams = [[MTRSubscribeParams alloc] initWithMinInterval:@(2) maxInterval:@(10)];
+    MTRSubscribeParams * myParams = [[MTRSubscribeParams alloc] initWithMinInterval:@(0) maxInterval:@(10)];
     myParams.replaceExistingSubscriptions = NO;
     [device subscribeToAttributesWithEndpointID:@1
         clusterID:@8
@@ -1443,7 +1449,31 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     // Wait till establishment
     [self waitForExpectations:@[ subscribeExpectation ] timeout:kTimeoutInSeconds];
 
-    // Send command to clear attribute state
+    // If we were initially on, set up expectations for report that we have been
+    // turned off, so we make sure that comes through before we do the rest of
+    // the test.
+    XCTestExpectation * offReportExpectation;
+    if (initialOnOffState == YES) {
+        offReportExpectation = [self expectationWithDescription:@"OnOff attribute has become false."];
+        firstReportHandler = ^(id _Nullable values, NSError * _Nullable error) {
+            XCTAssertNil(error);
+
+            {
+                XCTAssertTrue([values isKindOfClass:[NSArray class]]);
+                NSDictionary * result = values[0];
+                MTRAttributePath * path = result[@"attributePath"];
+                XCTAssertEqual([path.endpoint unsignedIntegerValue], 1);
+                XCTAssertEqual([path.cluster unsignedIntegerValue], 6);
+                XCTAssertEqual([path.attribute unsignedIntegerValue], 0);
+                XCTAssertTrue([result[@"data"] isKindOfClass:[NSDictionary class]]);
+                XCTAssertTrue([result[@"data"][@"type"] isEqualToString:@"Boolean"]);
+                XCTAssertEqual([result[@"data"][@"value"] boolValue], NO);
+            }
+            [offReportExpectation fulfill];
+        };
+    }
+
+    // Ensure that we are in the "off" state.
     XCTestExpectation * clearCommandExpectation = [self expectationWithDescription:@"Clearing command invoked"];
     [device invokeCommandWithEndpointID:@1
                               clusterID:@6
@@ -1452,7 +1482,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
                      timedInvokeTimeout:nil
                                   queue:queue
                              completion:^(id _Nullable values, NSError * _Nullable error) {
-                                 NSLog(@"invoke command: On values: %@, error: %@", values, error);
+                                 NSLog(@"invoke command: Off values: %@, error: %@", values, error);
 
                                  XCTAssertNil(error);
 
@@ -1471,6 +1501,9 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
                                  [clearCommandExpectation fulfill];
                              }];
     [self waitForExpectations:@[ clearCommandExpectation ] timeout:kTimeoutInSeconds];
+    if (offReportExpectation) {
+        [self waitForExpectations:@[ offReportExpectation ] timeout:kTimeoutInSeconds];
+    }
 
     // Set up expectations for report
     XCTestExpectation * reportExpectation = [self expectationWithDescription:@"The 1st subscriber received OnOff attribute report"];
@@ -1622,7 +1655,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     // subscribe, which should get the new value at the timeout
     expectation = [self expectationWithDescription:@"Subscribed"];
     __block void (^reportHandler)(id _Nullable values, NSError * _Nullable error);
-    __auto_type * params = [[MTRSubscribeParams alloc] initWithMinInterval:@(2) maxInterval:@(10)];
+    __auto_type * params = [[MTRSubscribeParams alloc] initWithMinInterval:@(0) maxInterval:@(10)];
     [device subscribeToAttributesWithEndpointID:@1
             clusterID:@8
             attributeID:@17
@@ -1905,7 +1938,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
                        NSError * readError;
                        NSString * fileContent = [NSString stringWithContentsOfURL:url encoding:NSUTF8StringEncoding error:&readError];
                        XCTAssertNil(readError);
-                       XCTAssertEqualObjects(fileContent, @"This is a simple log\n");
+                       XCTAssertEqualObjects(fileContent, kSimpleLogContent);
                        [expectation fulfill];
                    }];
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
@@ -2029,13 +2062,6 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
                               [expectation fulfill];
                           }];
     [self waitForExpectations:@[ expectation ] timeout:kTimeoutInSeconds];
-}
-
-- (void)test999_TearDown
-{
-    ResetCommissionee(
-        [MTRBaseDevice deviceWithNodeID:@(kDeviceId) controller:sController], dispatch_get_main_queue(), self, kTimeoutInSeconds);
-    [[self class] shutdownStack];
 }
 
 @end

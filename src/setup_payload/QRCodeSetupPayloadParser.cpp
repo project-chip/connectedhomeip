@@ -24,6 +24,7 @@
 #include "QRCodeSetupPayloadParser.h"
 #include "Base38Decode.h"
 
+#include <algorithm>
 #include <string.h>
 #include <vector>
 
@@ -267,10 +268,10 @@ CHIP_ERROR QRCodeSetupPayloadParser::populateTLV(SetupPayload & outPayload, cons
     size_t tlvBytesLength = (bitsLeftToRead + 7) / 8; // ceil(bitsLeftToRead/8)
     chip::Platform::ScopedMemoryBuffer<uint8_t> tlvArray;
 
-    ReturnErrorCodeIf(tlvBytesLength == 0, CHIP_NO_ERROR);
+    VerifyOrReturnError(tlvBytesLength != 0, CHIP_NO_ERROR);
 
     tlvArray.Alloc(tlvBytesLength);
-    ReturnErrorCodeIf(!tlvArray, CHIP_ERROR_NO_MEMORY);
+    VerifyOrReturnError(tlvArray, CHIP_ERROR_NO_MEMORY);
 
     for (size_t i = 0; i < tlvBytesLength; i++)
     {
@@ -323,12 +324,17 @@ std::string QRCodeSetupPayloadParser::ExtractPayload(std::string inString)
 
 CHIP_ERROR QRCodeSetupPayloadParser::populatePayload(SetupPayload & outPayload)
 {
+    std::string payload = ExtractPayload(mBase38Representation);
+    VerifyOrReturnError(payload.length() != 0, CHIP_ERROR_INVALID_ARGUMENT);
+
+    return populatePayloadFromBase38Data(std::move(payload), outPayload);
+}
+
+CHIP_ERROR QRCodeSetupPayloadParser::populatePayloadFromBase38Data(std::string payload, SetupPayload & outPayload)
+{
     std::vector<uint8_t> buf;
     size_t indexToReadFrom = 0;
     uint64_t dest;
-
-    std::string payload = ExtractPayload(mBase38Representation);
-    VerifyOrReturnError(payload.length() != 0, CHIP_ERROR_INVALID_ARGUMENT);
 
     ReturnErrorOnFailure(base38Decode(payload, buf));
 
@@ -371,6 +377,44 @@ CHIP_ERROR QRCodeSetupPayloadParser::populatePayload(SetupPayload & outPayload)
     }
 
     return populateTLV(outPayload, buf, indexToReadFrom);
+}
+
+CHIP_ERROR QRCodeSetupPayloadParser::populatePayloads(std::vector<SetupPayload> & outPayloads) const
+{
+    constexpr char kPayloadDelimiter = '*';
+
+    std::string payload = ExtractPayload(mBase38Representation);
+    VerifyOrReturnError(payload.length() != 0, CHIP_ERROR_INVALID_ARGUMENT);
+
+    auto chunkCount = std::count(payload.begin(), payload.end(), kPayloadDelimiter) + 1;
+
+    outPayloads.clear();
+    outPayloads.reserve(static_cast<std::vector<SetupPayload>::size_type>(chunkCount));
+
+    std::string::size_type chunkStart = 0;
+    do
+    {
+        auto chunkEnd = payload.find(kPayloadDelimiter, chunkStart);
+        std::string chunk;
+        if (chunkEnd == std::string::npos)
+        {
+            chunk      = payload.substr(chunkStart);
+            chunkStart = std::string::npos;
+        }
+        else
+        {
+            chunk = payload.substr(chunkStart, chunkEnd - chunkStart);
+
+            // Next chunk will start after the delimiter.
+            chunkStart = chunkEnd + 1;
+        }
+
+        auto & nextItem = outPayloads.emplace_back();
+        ReturnErrorOnFailure(populatePayloadFromBase38Data(chunk, nextItem));
+
+    } while (chunkStart != std::string::npos);
+
+    return CHIP_NO_ERROR;
 }
 
 } // namespace chip

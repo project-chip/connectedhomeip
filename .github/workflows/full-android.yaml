@@ -16,8 +16,9 @@ name: Full builds - Android
 
 on:
     push:
-        branches-ignore:
-            - 'dependabot/**'
+        branches:
+            - master
+            - 'v*-branch'
     workflow_dispatch:
 
 concurrency:
@@ -26,24 +27,21 @@ concurrency:
 
 env:
     CHIP_NO_LOG_TIMESTAMPS: true
-    
+
 jobs:
     full_android:
         name: Run
-
-        env:
-            JAVA_HOME: /usr/lib/jvm/java-8-openjdk-amd64/
 
         runs-on: ubuntu-latest
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: ghcr.io/project-chip/chip-build-android:74
+            image: ghcr.io/project-chip/chip-build-android:162
             volumes:
                 - "/tmp/log_output:/tmp/test_logs"
 
         steps:
-            - uses: actions/checkout@v4
+            - uses: actions/checkout@v5
               name: Checkout
               with:
                 token: ${{ github.token }}
@@ -53,7 +51,7 @@ jobs:
             # Note you likely still need to have non submodules setup for the
             # local machine, like:
             #   git submodule deinit --all
-            - uses: actions/checkout@v4
+            - uses: actions/checkout@v5
               if: ${{ env.ACT }}
               name: Checkout (ACT for local build)
             - name: Checkout submodules & Bootstrap

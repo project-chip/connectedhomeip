@@ -63,11 +63,22 @@ else:
     # If no gsdk path is set in the environment, use the standard path to the submodule
     sisdk_root = os.path.join(root_path, "third_party/silabs/simplicity_sdk/")
 
-# make sure we have a configured and trusted gsdk in slc
-subprocess.run(["slc", "configuration", "--sdk", sisdk_root], check=True)
-subprocess.run(["slc", "signature", "trust", "--sdk", sisdk_root], check=True)
+# SLC needs to run the system python, so we force PATH to have /usr/bin in front
+# This is a workaround for CI builds failing with an odd `jinja2` module error when
+# leaving the default paths enabled
+cmds = f"""
+set -ex
 
-subprocess.run(["slc", "generate", slcp_file_path, "-d", output_path, "--with", slc_arguments], check=True)
+export PATH="/usr/bin:$PATH"
+
+slc configuration --sdk '{sisdk_root}'
+slc signature trust --sdk '{sisdk_root}'
+slc generate '{slcp_file_path}' -d '{output_path}' --with '{slc_arguments}'
+""".strip()
+
+
+# make sure we have a configured and trusted gsdk in slc
+subprocess.run(["bash", "-c", cmds], check=True)
 
 # cleanup of unwanted files
 fileList = glob.glob(os.path.join(output_path, "matter-platform.*"))

@@ -50,6 +50,8 @@ private:
     static void HandleApply(intptr_t context);
     static void HandleAbort(intptr_t context);
     static void HandleProcessBlock(intptr_t context);
+    static void LockRadioProcessing();
+    static void UnlockRadioProcessing();
     CHIP_ERROR ProcessHeader(ByteSpan & block);
 
     /**

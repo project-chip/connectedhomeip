@@ -23,6 +23,7 @@
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app/reporting/reporting.h>
 #include <app/util/endpoint-config-api.h>
+#include <bridged-actions-stub.h>
 #include <lib/support/ZclString.h>
 
 LOG_MODULE_DECLARE(app, CONFIG_CHIP_APP_LOG_LEVEL);
@@ -30,7 +31,24 @@ LOG_MODULE_DECLARE(app, CONFIG_CHIP_APP_LOG_LEVEL);
 namespace {
 bool sTurnedOn;
 uint8_t sLevel;
+
+std::unique_ptr<chip::app::Clusters::Actions::ActionsDelegateImpl> sActionsDelegateImpl;
+std::unique_ptr<chip::app::Clusters::Actions::ActionsServer> sActionsServer;
 } // namespace
+
+void emberAfActionsClusterInitCallback(chip::EndpointId endpoint)
+{
+    VerifyOrReturn(endpoint == 1,
+                   ChipLogError(Zcl, "Actions cluster delegate is not implemented for endpoint with id %d.", endpoint));
+    VerifyOrReturn(emberAfContainsServer(endpoint, chip::app::Clusters::Actions::Id) == true,
+                   ChipLogError(Zcl, "Endpoint %d does not support Actions cluster.", endpoint));
+    VerifyOrReturn(!sActionsDelegateImpl && !sActionsServer);
+
+    sActionsDelegateImpl = std::make_unique<chip::app::Clusters::Actions::ActionsDelegateImpl>();
+    sActionsServer       = std::make_unique<chip::app::Clusters::Actions::ActionsServer>(endpoint, *sActionsDelegateImpl.get());
+
+    sActionsServer->Init();
+}
 
 AppTask AppTask::sAppTask;
 #include <app/InteractionModelEngine.h>
@@ -163,16 +181,16 @@ DECLARE_DYNAMIC_CLUSTER(Clusters::TemperatureMeasurement::Id, tempSensorAttrs, Z
 
 // Declare Bridged Light endpoint
 DECLARE_DYNAMIC_ENDPOINT(bridgedTempSensorEndpoint, bridgedTempSensorClusters);
-DataVersion gTempSensor1DataVersions[ArraySize(bridgedTempSensorClusters)];
+DataVersion gTempSensor1DataVersions[MATTER_ARRAY_SIZE(bridgedTempSensorClusters)];
 
 // Declare Bridged Light endpoint
 DECLARE_DYNAMIC_ENDPOINT(bridgedLightEndpoint, bridgedLightClusters);
 
-DataVersion gLight1DataVersions[ArraySize(bridgedLightClusters)];
-DataVersion gLight2DataVersions[ArraySize(bridgedLightClusters)];
-DataVersion gLight3DataVersions[ArraySize(bridgedLightClusters)];
-DataVersion gLight4DataVersions[ArraySize(bridgedLightClusters)];
-// DataVersion gThermostatDataVersions[ArraySize(thermostatAttrs)];
+DataVersion gLight1DataVersions[MATTER_ARRAY_SIZE(bridgedLightClusters)];
+DataVersion gLight2DataVersions[MATTER_ARRAY_SIZE(bridgedLightClusters)];
+DataVersion gLight3DataVersions[MATTER_ARRAY_SIZE(bridgedLightClusters)];
+DataVersion gLight4DataVersions[MATTER_ARRAY_SIZE(bridgedLightClusters)];
+// DataVersion gThermostatDataVersions[MATTER_ARRAY_SIZE(thermostatAttrs)];
 
 const EmberAfDeviceType gRootDeviceTypes[]          = { { DEVICE_TYPE_ROOT_NODE, DEVICE_VERSION_DEFAULT } };
 const EmberAfDeviceType gAggregateNodeDeviceTypes[] = { { DEVICE_TYPE_BRIDGE, DEVICE_VERSION_DEFAULT } };
@@ -298,8 +316,8 @@ Protocols::InteractionModel::Status HandleWriteOnOffAttribute(Device * dev, chip
 {
     ChipLogProgress(DeviceLayer, "HandleWriteOnOffAttribute: attrId=%" PRIu32, attributeId);
 
-    ReturnErrorCodeIf((attributeId != Clusters::OnOff::Attributes::OnOff::Id) || (!dev->IsReachable()),
-                      Protocols::InteractionModel::Status::Failure);
+    VerifyOrReturnError((attributeId == Clusters::OnOff::Attributes::OnOff::Id) && dev->IsReachable(),
+                        Protocols::InteractionModel::Status::Failure);
     dev->SetOnOff(*buffer == 1);
     return Protocols::InteractionModel::Status::Success;
 }
@@ -385,14 +403,6 @@ void HandleDeviceStatusChanged(Device * dev, Device::Changed_t itemChangedMask)
     {
         ScheduleReportingCallback(dev, BridgedDeviceBasicInformation::Id, BridgedDeviceBasicInformation::Attributes::NodeLabel::Id);
     }
-}
-
-bool emberAfActionsClusterInstantActionCallback(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
-                                                const Clusters::Actions::Commands::InstantAction::DecodableType & commandData)
-{
-    // No actions are implemented, just return status NotFound.
-    commandObj->AddStatus(commandPath, Protocols::InteractionModel::Status::NotFound);
-    return true;
 }
 
 CHIP_ERROR AppTask::Init(void)

@@ -31,11 +31,12 @@
 # files, then add the extra dependencies. From the root:
 #
 # . scripts/activate.sh
-# ./scripts/build_python.sh -i py
-# source py/bin/activate
+# ./scripts/build_python.sh -i out/python_env
+# source out/python_env/bin/activate
 # pip install opencv-python requests click_option_group
 # python src/python_testing/post_certification_tests/production_device_checks.py
 
+import asyncio
 import base64
 import hashlib
 import importlib
@@ -50,24 +51,27 @@ from dataclasses import dataclass
 from enum import Enum, auto
 from pathlib import Path
 
-import chip.clusters as Clusters
 import cv2
 import requests
 from mobly import asserts
+
+import matter.clusters as Clusters
 
 DEFAULT_CHIP_ROOT = os.path.abspath(
     os.path.join(os.path.dirname(__file__), '..', '..', '..'))
 
 try:
-    from basic_composition_support import BasicCompositionTests
-    from matter_testing_support import (MatterBaseTest, MatterStackState, MatterTestConfig, TestStep, async_test_body,
-                                        run_tests_no_exit)
+    from matter.testing.basic_composition import BasicCompositionTests
+    from matter.testing.matter_stack_state import MatterStackState
+    from matter.testing.matter_test_config import MatterTestConfig
+    from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, run_tests_no_exit
 except ImportError:
     sys.path.append(os.path.abspath(
         os.path.join(os.path.dirname(__file__), '..')))
-    from basic_composition_support import BasicCompositionTests
-    from matter_testing_support import (MatterBaseTest, MatterStackState, MatterTestConfig, TestStep, async_test_body,
-                                        run_tests_no_exit)
+    from matter.testing.basic_composition import BasicCompositionTests
+    from matter.testing.matter_stack_state import MatterStackState
+    from matter.testing.matter_test_config import MatterTestConfig
+    from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, run_tests_no_exit
 
 try:
     import fetch_paa_certs_from_dcl
@@ -75,6 +79,8 @@ except ImportError:
     sys.path.append(os.path.abspath(
         os.path.join(DEFAULT_CHIP_ROOT, 'credentials')))
     import fetch_paa_certs_from_dcl
+
+sys.path.append(os.path.abspath(os.path.join(DEFAULT_CHIP_ROOT, 'src', 'python_testing')))
 
 
 @dataclass
@@ -95,7 +101,7 @@ class Hooks():
     def stop(self, duration: int):
         pass
 
-    def test_start(self, filename: str, name: str, count: int):
+    def test_start(self, filename: str, name: str, count: int, steps: list[str] = []):
         self.current_test = name
         pass
 
@@ -126,7 +132,8 @@ class Hooks():
 class TestEventTriggersCheck(MatterBaseTest, BasicCompositionTests):
     @async_test_body
     async def test_TestEventTriggersCheck(self):
-        self.connect_over_pase(self.default_controller)
+        setupCode = self.matter_test_config.qr_code_content or self.matter_test_config.manual_code
+        await self.default_controller.FindOrEstablishPASESession(setupCode[0], self.dut_node_id)
         gd = Clusters.GeneralDiagnostics
         ret = await self.read_single_attribute_check_success(cluster=gd, attribute=gd.Attributes.TestEventTriggersEnabled)
         asserts.assert_equal(ret, 0, "TestEventTriggers are still on")
@@ -135,7 +142,8 @@ class TestEventTriggersCheck(MatterBaseTest, BasicCompositionTests):
 class DclCheck(MatterBaseTest, BasicCompositionTests):
     @async_test_body
     async def setup_class(self):
-        self.connect_over_pase(self.default_controller)
+        setupCode = self.matter_test_config.qr_code_content or self.matter_test_config.manual_code
+        await self.default_controller.FindOrEstablishPASESession(setupCode[0], self.dut_node_id)
         bi = Clusters.BasicInformation
         self.vid = await self.read_single_attribute_check_success(cluster=bi, attribute=bi.Attributes.VendorID)
         self.pid = await self.read_single_attribute_check_success(cluster=bi, attribute=bi.Attributes.ProductID)
@@ -390,9 +398,9 @@ def run_test(test_class: MatterBaseTest, tests: typing.List[str], test_config: T
     stack = test_config.get_stack()
     controller = test_config.get_controller()
     matter_config = test_config.get_config(tests)
-    ok = run_tests_no_exit(test_class, matter_config, hooks, controller, stack)
-    if not ok:
-        print(f"Test failure. Failed on step: {hooks.get_failures()}")
+    with asyncio.Runner() as runner:
+        if not run_tests_no_exit(test_class, matter_config, runner.get_loop(), hooks, controller, stack):
+            print(f"Test failure. Failed on step: {hooks.get_failures()}")
     return hooks.get_failures()
 
 

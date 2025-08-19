@@ -48,7 +48,7 @@ This example is running on the nRF Connect platform, which is based on Nordic
 Semiconductor's
 [nRF Connect SDK](https://developer.nordicsemi.com/nRF_Connect_SDK/doc/latest/nrf/index.html)
 and [Zephyr RTOS](https://zephyrproject.org/). Visit Matter's
-[nRF Connect platform overview](../../../docs/guides/nrfconnect_platform_overview.md)
+[nRF Connect platform overview](../../../docs/platforms/nrf/nrfconnect_platform_overview.md)
 to read more about the platform structure and dependencies.
 
 By default, the Matter accessory device has IPv6 networking disabled. You must
@@ -236,9 +236,10 @@ development kits:
 
 -   [Lighting Example Application](../../lighting-app/nrfconnect/README.md)
 
-Read the [CHIP Tool user guide](../../../docs/guides/chip_tool_guide.md) to
-learn how to commission the lighting device to the same Matter network using the
-CHIP Tool.
+Read the
+[CHIP Tool user guide](../../../docs/development_controllers/chip-tool/chip_tool_guide.md)
+to learn how to commission the lighting device to the same Matter network using
+the CHIP Tool.
 
 <hr>
 
@@ -342,7 +343,7 @@ platform image.
 
 **SEGGER J-Link USB port** can be used to get logs from the device or
 communicate with it using the
-[command line interface](../../../docs/guides/nrfconnect_examples_cli.md).
+[command line interface](../../../docs/platforms/nrf/nrfconnect_examples_cli.md).
 
 **NFC port with antenna attached** can be used to start the
 [rendezvous](#bluetooth-le-rendezvous) by providing the commissioning
@@ -375,7 +376,8 @@ the Light Switch Example application by using the Matter CLI:
     uart:~$ switch groups onoff off    : sends multicast Off command to  all bound devices in a group
     uart:~$ switch groups onoff toggle : sends multicast Toggle command to all bound devices in a group
 
-Check the [CLI user guide](../../../docs/guides/nrfconnect_examples_cli.md) to
+Check the
+[CLI user guide](../../../docs/platforms/nrf/nrfconnect_examples_cli.md) to
 learn how to use other CLI commands of the application.
 
 <hr>
@@ -570,7 +572,7 @@ depending on the selected board:
     the necessary application functionalities to optimize its performance.
 
 For more information, see the
-[Configuring nRF Connect SDK examples](../../../docs/guides/nrfconnect_examples_configuration.md)
+[Configuring nRF Connect SDK examples](../../../docs/platforms/nrf/nrfconnect_examples_configuration.md)
 page.
 
 <hr>
@@ -602,7 +604,8 @@ process, and add Access Control Lists (ACLs).
 ### Commissioning the lighting device
 
 To commission the Lighting Example Application to the same Matter network, read
-the [CHIP Tool user guide](../../../docs/guides/chip_tool_guide.md).
+the
+[CHIP Tool user guide](../../../docs/development_controllers/chip-tool/chip_tool_guide.md).
 
 ### Binding cluster and endpoints
 
@@ -617,7 +620,7 @@ example, you can use the
 The ACL should contain information about all clusters that can be called by the
 light switch application. See the section about interacting with ZCL clusters in
 the
-[CHIP Tool's user guide](../../../docs/guides/chip_tool_guide.md#interacting-with-data-model-clusters)
+[CHIP Tool's user guide](../../../docs/development_controllers/chip-tool/chip_tool_guide.md#interacting-with-data-model-clusters)
 for more information about ACLs.
 
 You can perform the binding process to a single remote endpoint (unicast
@@ -635,7 +638,7 @@ same Matter network.
 To perform the unicast binding process, complete the following steps:
 
 1.  Build the CHIP Tool according to the steps from the
-    [CHIP Tool user guide](../../../docs/guides/chip_tool_guide.md#building-and-running-the-chip-tool).
+    [CHIP Tool user guide](../../../docs/development_controllers/chip-tool/chip_tool_guide.md#building-from-source).
 2.  Go to the CHIP Tool build directory.
 3.  Add an ACL to the development kit that is programmed with the
     [Lighting Application Example](../../lighting-app/nrfconnect/README.md) by
@@ -647,7 +650,7 @@ To perform the unicast binding process, complete the following steps:
 
     -   `{"fabricIndex": 1, "privilege": 5, "authMode": 2, "subjects": [112233], "targets": null}`
         is an ACL for the communication with the CHIP Tool.
-    -   `{"fabricIndex": 1, "privilege": 5, "authMode": 2, "subjects": [2], "targets": [{"cluster": 6, "endpoint": 1, "deviceType": null}, {"cluster": 8, "endpoint": 1, "deviceType": null}]}`
+    -   `{"fabricIndex": 1, "privilege": 3, "authMode": 2, "subjects": [2], "targets": [{"cluster": 6, "endpoint": 1, "deviceType": null}, {"cluster": 8, "endpoint": 1, "deviceType": null}]}`
         is an ACL for binding (cluster no. 6 is the On/Off cluster and the
         cluster no. 8 is the Level Control cluster).
 
@@ -687,7 +690,7 @@ same Matter network.
 To perform the unicast binding process, complete the following steps:
 
 1.  Build the CHIP Tool according to the steps from the
-    [CHIP Tool user guide](../../../docs/guides/chip_tool_guide.md#building-and-running-the-chip-tool).
+    [CHIP Tool user guide](../../../docs/development_controllers/chip-tool/chip_tool_guide.md#building-from-source).
 2.  Go to the CHIP Tool build directory.
 
 3.  Add the light switch device to the multicast group by running the following
@@ -734,5 +737,5 @@ switch subscribe-event short-release 1 20 <node_id> 2 --is-urgent true --keepSub
 ### Testing Device Firmware Upgrade
 
 Read the
-[DFU tutorial](../../../docs/guides/nrfconnect_examples_software_update.md) to
-see how to upgrade your device firmware.
+[DFU tutorial](../../../docs/platforms/nrf/nrfconnect_examples_software_update.md)
+to see how to upgrade your device firmware.

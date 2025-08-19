@@ -15,17 +15,19 @@
  */
 
 #import "MTRDeviceControllerXPCParameters.h"
-
-@implementation MTRDeviceControllerXPCParameters
-
-+ (BOOL)supportsSecureCoding
-{
-    return YES;
-}
-
-@end
+#import "MTRDeviceControllerStartupParams_Internal.h"
 
 @implementation MTRDeviceControllerMachServiceXPCParameters
+
+- (nullable instancetype)initWithUniqueIdentifier:(NSUUID *)uniqueIdentifier
+{
+    if (!(self = [super _initInternal])) {
+        return nil;
+    }
+
+    _uniqueIdentifier = uniqueIdentifier;
+    return self;
+}
 
 + (BOOL)supportsSecureCoding
 {

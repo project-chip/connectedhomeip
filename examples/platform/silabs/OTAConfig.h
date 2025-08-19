@@ -29,7 +29,7 @@
 #include <platform/silabs/OTAImageProcessorImpl.h>
 #endif
 
-#if (SL_MATTER_GN_BUILD == 0)
+#if (SL_MATTER_GN_BUILD == 0) && defined(SILABS_OTA_ENABLED)
 #include "sl_matter_ota_config.h"
 #endif
 

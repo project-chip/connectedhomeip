@@ -16,25 +16,29 @@
 #    limitations under the License.
 #
 
+import asyncio
 import base64
 import os
-import pathlib
 import sys
 import typing
+from pathlib import Path
 
-import chip.clusters as Clusters
 import click
-from chip import ChipDeviceCtrl
-from chip.clusters import Attribute
-from chip.interaction_model import InteractionModelError, Status
-from MockTestRunner import AsyncMock, MockTestRunner
+
+import matter.clusters as Clusters
+from matter import ChipDeviceCtrl
+from matter.clusters import Attribute
+from matter.interaction_model import InteractionModelError, Status
+from matter.testing.runner import AsyncMock, MockTestRunner
 
 try:
-    from matter_testing_support import MatterTestConfig, get_default_paa_trust_store, run_tests_no_exit
+    from matter.testing.matter_test_config import MatterTestConfig
+    from matter.testing.matter_testing import get_default_paa_trust_store, run_tests_no_exit
 except ImportError:
     sys.path.append(os.path.abspath(
         os.path.join(os.path.dirname(__file__), '..')))
-    from matter_testing_support import MatterTestConfig, get_default_paa_trust_store, run_tests_no_exit
+    from matter.testing.matter_test_config import MatterTestConfig
+    from matter.testing.matter_testing import get_default_paa_trust_store, run_tests_no_exit
 
 invoke_call_count = 0
 event_call_count = 0
@@ -72,7 +76,7 @@ def dynamic_event_return(*args, **argv):
         header = Attribute.EventHeader(EndpointId=0, ClusterId=Clusters.CommissionerControl.id,
                                        EventId=Clusters.CommissionerControl.Events.CommissioningRequestResult.event_id, EventNumber=1)
         data = Clusters.CommissionerControl.Events.CommissioningRequestResult(
-            requestId=0x1234567812345678, clientNodeId=112233, statusCode=0)
+            requestID=0x1234567812345678, clientNodeID=112233, statusCode=0)
         result = Attribute.EventReadResult(Header=header, Status=Status.Success, Data=data)
         return [result]
     else:
@@ -137,19 +141,22 @@ class MyMock(MockTestRunner):
         self.default_controller.FindOrEstablishPASESession = AsyncMock(return_value=None)
         self.default_controller.ReadEvent = AsyncMock(return_value=[], side_effect=dynamic_event_return)
 
-        return run_tests_no_exit(self.test_class, self.config, hooks, self.default_controller, self.stack)
+        with asyncio.Runner() as runner:
+            return run_tests_no_exit(self.test_class, self.config, runner.get_loop(),
+                                     hooks, self.default_controller, self.stack)
 
 
 @click.command()
 @click.argument('th_server_app', type=click.Path(exists=True))
 def main(th_server_app: str):
-    root = os.path.abspath(os.path.join(pathlib.Path(__file__).resolve().parent, '..', '..', '..'))
+    root = os.path.abspath(os.path.join(Path(__file__).resolve().parent, '..', '..', '..'))
     print(f'root = {root}')
     paa_path = get_default_paa_trust_store(root)
     print(f'paa = {paa_path}')
 
     pics = {"PICS_SDK_CI_ONLY": True}
-    test_runner = MyMock('TC_MCORE_FS_1_1', 'TC_MCORE_FS_1_1', 'test_TC_MCORE_FS_1_1', paa_trust_store_path=paa_path, pics=pics)
+    test_runner = MyMock(Path(__file__).parent / '../TC_MCORE_FS_1_1.py',
+                         'TC_MCORE_FS_1_1', 'test_TC_MCORE_FS_1_1', paa_trust_store_path=paa_path, pics=pics)
     config = MatterTestConfig()
     config.user_params = {'th_server_app_path': th_server_app}
     test_runner.set_test_config(config)

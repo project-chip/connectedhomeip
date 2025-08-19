@@ -77,7 +77,6 @@ target_sources(app PRIVATE
 message(STATUS ${CHEF}/devices/${SAMPLE_NAME}.zap)
 
 chip_configure_data_model(app
-    INCLUDE_SERVER
     ZAP_FILE ${CHEF}/devices/${SAMPLE_NAME}.zap
 )
 

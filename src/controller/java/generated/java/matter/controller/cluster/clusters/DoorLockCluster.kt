@@ -99,6 +99,7 @@ class DoorLockCluster(private val controller: MatterController, private val endp
     val creatorFabricIndex: UByte?,
     val lastModifiedFabricIndex: UByte?,
     val nextCredentialIndex: UShort?,
+    val credentialData: ByteArray?,
   )
 
   class LockStateAttribute(val value: UByte?)
@@ -199,16 +200,6 @@ class DoorLockCluster(private val controller: MatterController, private val endp
     data class Error(val exception: Exception) : AcceptedCommandListAttributeSubscriptionState()
 
     object SubscriptionEstablished : AcceptedCommandListAttributeSubscriptionState()
-  }
-
-  class EventListAttribute(val value: List<UInt>)
-
-  sealed class EventListAttributeSubscriptionState {
-    data class Success(val value: List<UInt>) : EventListAttributeSubscriptionState()
-
-    data class Error(val exception: Exception) : EventListAttributeSubscriptionState()
-
-    object SubscriptionEstablished : EventListAttributeSubscriptionState()
   }
 
   class AttributeListAttribute(val value: List<UInt>)
@@ -1320,6 +1311,9 @@ class DoorLockCluster(private val controller: MatterController, private val endp
     val TAG_NEXT_CREDENTIAL_INDEX: Int = 4
     var nextCredentialIndex_decoded: UShort? = null
 
+    val TAG_CREDENTIAL_DATA: Int = 5
+    var credentialData_decoded: ByteArray? = null
+
     while (!tlvReader.isEndOfContainer()) {
       val tag = tlvReader.peekElement().tag
 
@@ -1385,6 +1379,25 @@ class DoorLockCluster(private val controller: MatterController, private val endp
               null
             }
           }
+      }
+
+      if (tag == ContextSpecificTag(TAG_CREDENTIAL_DATA)) {
+        credentialData_decoded =
+          if (tlvReader.isNull()) {
+            tlvReader.getNull(tag)
+            null
+          } else {
+            if (!tlvReader.isNull()) {
+              if (tlvReader.isNextTag(tag)) {
+                tlvReader.getByteArray(tag)
+              } else {
+                null
+              }
+            } else {
+              tlvReader.getNull(tag)
+              null
+            }
+          }
       } else {
         tlvReader.skipElement()
       }
@@ -1402,6 +1415,7 @@ class DoorLockCluster(private val controller: MatterController, private val endp
       creatorFabricIndex_decoded,
       lastModifiedFabricIndex_decoded,
       nextCredentialIndex_decoded,
+      credentialData_decoded,
     )
   }
 
@@ -6671,101 +6685,6 @@ class DoorLockCluster(private val controller: MatterController, private val endp
         }
         SubscriptionState.SubscriptionEstablished -> {
           emit(AcceptedCommandListAttributeSubscriptionState.SubscriptionEstablished)
-        }
-      }
-    }
-  }
-
-  suspend fun readEventListAttribute(): EventListAttribute {
-    val ATTRIBUTE_ID: UInt = 65530u
-
-    val attributePath =
-      AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
-
-    val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
-
-    val response = controller.read(readRequest)
-
-    if (response.successes.isEmpty()) {
-      logger.log(Level.WARNING, "Read command failed")
-      throw IllegalStateException("Read command failed with failures: ${response.failures}")
-    }
-
-    logger.log(Level.FINE, "Read command succeeded")
-
-    val attributeData =
-      response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
-        it.path.attributeId == ATTRIBUTE_ID
-      }
-
-    requireNotNull(attributeData) { "Eventlist attribute not found in response" }
-
-    // Decode the TLV data into the appropriate type
-    val tlvReader = TlvReader(attributeData.data)
-    val decodedValue: List<UInt> =
-      buildList<UInt> {
-        tlvReader.enterArray(AnonymousTag)
-        while (!tlvReader.isEndOfContainer()) {
-          add(tlvReader.getUInt(AnonymousTag))
-        }
-        tlvReader.exitContainer()
-      }
-
-    return EventListAttribute(decodedValue)
-  }
-
-  suspend fun subscribeEventListAttribute(
-    minInterval: Int,
-    maxInterval: Int,
-  ): Flow<EventListAttributeSubscriptionState> {
-    val ATTRIBUTE_ID: UInt = 65530u
-    val attributePaths =
-      listOf(
-        AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
-      )
-
-    val subscribeRequest: SubscribeRequest =
-      SubscribeRequest(
-        eventPaths = emptyList(),
-        attributePaths = attributePaths,
-        minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
-      )
-
-    return controller.subscribe(subscribeRequest).transform { subscriptionState ->
-      when (subscriptionState) {
-        is SubscriptionState.SubscriptionErrorNotification -> {
-          emit(
-            EventListAttributeSubscriptionState.Error(
-              Exception(
-                "Subscription terminated with error code: ${subscriptionState.terminationCause}"
-              )
-            )
-          )
-        }
-        is SubscriptionState.NodeStateUpdate -> {
-          val attributeData =
-            subscriptionState.updateState.successes
-              .filterIsInstance<ReadData.Attribute>()
-              .firstOrNull { it.path.attributeId == ATTRIBUTE_ID }
-
-          requireNotNull(attributeData) { "Eventlist attribute not found in Node State update" }
-
-          // Decode the TLV data into the appropriate type
-          val tlvReader = TlvReader(attributeData.data)
-          val decodedValue: List<UInt> =
-            buildList<UInt> {
-              tlvReader.enterArray(AnonymousTag)
-              while (!tlvReader.isEndOfContainer()) {
-                add(tlvReader.getUInt(AnonymousTag))
-              }
-              tlvReader.exitContainer()
-            }
-
-          emit(EventListAttributeSubscriptionState.Success(decodedValue))
-        }
-        SubscriptionState.SubscriptionEstablished -> {
-          emit(EventListAttributeSubscriptionState.SubscriptionEstablished)
         }
       }
     }

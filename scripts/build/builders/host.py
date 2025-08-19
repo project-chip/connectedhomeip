@@ -13,6 +13,7 @@
 # limitations under the License.
 
 import os
+import shlex
 from enum import Enum, auto
 from platform import uname
 from typing import Optional
@@ -72,6 +73,7 @@ class HostApp(Enum):
     BRIDGE = auto()
     FABRIC_ADMIN = auto()
     FABRIC_BRIDGE = auto()
+    FABRIC_SYNC = auto()
     JAVA_MATTER_CONTROLLER = auto()
     KOTLIN_MATTER_CONTROLLER = auto()
     CONTACT_SENSOR = auto()
@@ -83,7 +85,15 @@ class HostApp(Enum):
     LIT_ICD = auto()
     AIR_QUALITY_SENSOR = auto()
     NETWORK_MANAGER = auto()
+    ENERGY_GATEWAY = auto()
     ENERGY_MANAGEMENT = auto()
+    WATER_LEAK_DETECTOR = auto()
+    TERMS_AND_CONDITIONS = auto()
+    CAMERA = auto()
+    CAMERA_CONTROLLER = auto()
+    JF_CONTROL = auto()
+    JF_ADMIN = auto()
+    CLOSURE = auto()
 
     def ExamplePath(self):
         if self == HostApp.ALL_CLUSTERS:
@@ -130,6 +140,8 @@ class HostApp(Enum):
             return 'fabric-admin'
         elif self == HostApp.FABRIC_BRIDGE:
             return 'fabric-bridge-app/linux'
+        elif self == HostApp.FABRIC_SYNC:
+            return 'fabric-sync'
         elif self == HostApp.JAVA_MATTER_CONTROLLER:
             return 'java-matter-controller'
         elif self == HostApp.KOTLIN_MATTER_CONTROLLER:
@@ -152,8 +164,24 @@ class HostApp(Enum):
             return 'air-quality-sensor-app/linux'
         elif self == HostApp.NETWORK_MANAGER:
             return 'network-manager-app/linux'
+        elif self == HostApp.ENERGY_GATEWAY:
+            return 'energy-gateway-app/linux'
         elif self == HostApp.ENERGY_MANAGEMENT:
             return 'energy-management-app/linux'
+        elif self == HostApp.WATER_LEAK_DETECTOR:
+            return 'water-leak-detector-app/linux'
+        elif self == HostApp.TERMS_AND_CONDITIONS:
+            return 'terms-and-conditions-app/linux'
+        elif self == HostApp.CAMERA:
+            return 'camera-app/linux'
+        elif self == HostApp.CAMERA_CONTROLLER:
+            return 'camera-controller'
+        elif self == HostApp.JF_CONTROL:
+            return 'jf-control-app'
+        elif self == HostApp.JF_ADMIN:
+            return 'jf-admin-app/linux'
+        elif self == HostApp.CLOSURE:
+            return 'closure-app/linux'
         else:
             raise Exception('Unknown app type: %r' % self)
 
@@ -220,7 +248,7 @@ class HostApp(Enum):
         elif self == HostApp.PYTHON_BINDINGS:
             yield 'controller/python'  # Directory containing WHL files
         elif self == HostApp.EFR32_TEST_RUNNER:
-            yield 'chip_nl_test_runner_wheels'
+            yield 'chip_pw_test_runner_wheels'
         elif self == HostApp.TV_CASTING:
             yield 'chip-tv-casting-app'
             yield 'chip-tv-casting-app.map'
@@ -233,6 +261,9 @@ class HostApp(Enum):
         elif self == HostApp.FABRIC_BRIDGE:
             yield 'fabric-bridge-app'
             yield 'fabric-bridge-app.map'
+        elif self == HostApp.FABRIC_SYNC:
+            yield 'fabric-sync'
+            yield 'fabric-sync.map'
         elif self == HostApp.JAVA_MATTER_CONTROLLER:
             yield 'java-matter-controller'
             yield 'java-matter-controller.map'
@@ -255,17 +286,39 @@ class HostApp(Enum):
             yield 'chip-rvc-app'
             yield 'chip-rvc-app.map'
         elif self == HostApp.AIR_PURIFIER:
-            yield 'air-purifier-app'
-            yield 'air-purifier-app.map'
+            yield 'chip-air-purifier-app'
+            yield 'chip-air-purifier-app.map'
         elif self == HostApp.LIT_ICD:
             yield 'lit-icd-app'
             yield 'lit-icd-app.map'
         elif self == HostApp.NETWORK_MANAGER:
             yield 'matter-network-manager-app'
             yield 'matter-network-manager-app.map'
+        elif self == HostApp.ENERGY_GATEWAY:
+            yield 'chip-energy-gateway-app'
+            yield 'chip-energy-gateway-app.map'
         elif self == HostApp.ENERGY_MANAGEMENT:
             yield 'chip-energy-management-app'
             yield 'chip-energy-management-app.map'
+        elif self == HostApp.WATER_LEAK_DETECTOR:
+            yield 'water-leak-detector-app'
+            yield 'water-leak-detector-app.map'
+        elif self == HostApp.TERMS_AND_CONDITIONS:
+            yield 'chip-terms-and-conditions-app'
+            yield 'chip-terms-and-conditions-app.map'
+        elif self == HostApp.CAMERA:
+            yield 'chip-camera-app'
+            yield 'chip-camera-app.map'
+        elif self == HostApp.CAMERA_CONTROLLER:
+            yield 'chip-camera-controller'
+            yield 'chip-camera-controller.map'
+        elif self == HostApp.JF_CONTROL:
+            yield 'jfc-app'
+        elif self == HostApp.JF_ADMIN:
+            yield 'jfa-app'
+        elif self == HostApp.CLOSURE:
+            yield 'closure-app'
+            yield 'closure-app.map'
         else:
             raise Exception('Unknown app type: %r' % self)
 
@@ -313,7 +366,7 @@ class HostBoard(Enum):
 class HostBuilder(GnBuilder):
 
     def __init__(self, root, runner, app: HostApp, board=HostBoard.NATIVE,
-                 enable_ipv4=True, enable_ble=True, enable_wifi=True,
+                 enable_ipv4=True, enable_ble=True, enable_wifi=True, enable_wifipaf=True,
                  enable_thread=True, use_tsan=False, use_asan=False, use_ubsan=False,
                  separate_event_loop=True, fuzzing_type: HostFuzzingType = HostFuzzingType.NONE, use_clang=False,
                  interactive_mode=True, extra_tests=False, use_nl_fault_injection=False, use_platform_mdns=False, enable_rpcs=False,
@@ -322,7 +375,10 @@ class HostBuilder(GnBuilder):
                  enable_test_event_triggers=None,
                  enable_dnssd_tests: Optional[bool] = None,
                  chip_casting_simplified: Optional[bool] = None,
-                 data_model_interface: Optional[bool] = None,
+                 disable_shell=False,
+                 use_googletest=False,
+                 enable_webrtc=False,
+                 terms_and_conditions_required: Optional[bool] = None, chip_enable_nfc_based_commissioning=None,
                  ):
         super(HostBuilder, self).__init__(
             root=os.path.join(root, 'examples', app.ExamplePath()),
@@ -332,6 +388,7 @@ class HostBuilder(GnBuilder):
         self.board = board
         self.extra_gn_options = []
         self.build_env = {}
+        self.fuzzing_type = fuzzing_type
 
         if enable_rpcs:
             self.extra_gn_options.append('import("//with_pw_rpc.gni")')
@@ -341,12 +398,19 @@ class HostBuilder(GnBuilder):
 
         if not enable_ble:
             self.extra_gn_options.append('chip_config_network_layer_ble=false')
+            self.extra_gn_options.append('chip_enable_ble=false')
+
+        if not enable_wifipaf:
+            self.extra_gn_options.append('chip_device_config_enable_wifipaf=false')
 
         if not enable_wifi:
             self.extra_gn_options.append('chip_enable_wifi=false')
 
         if not enable_thread:
             self.extra_gn_options.append('chip_enable_openthread=false')
+
+        if disable_shell:
+            self.extra_gn_options.append('chip_build_libshell=false')
 
         if use_tsan:
             self.extra_gn_options.append('is_tsan=true')
@@ -356,9 +420,6 @@ class HostBuilder(GnBuilder):
 
         if use_ubsan:
             self.extra_gn_options.append('is_ubsan=true')
-
-        if data_model_interface is not None:
-            self.extra_gn_options.append(f'chip_use_data_model_interface="{data_model_interface}"')
 
         if use_dmalloc:
             self.extra_gn_options.append('chip_config_memory_debug_checks=true')
@@ -390,6 +451,7 @@ class HostBuilder(GnBuilder):
         if use_coverage:
             self.extra_gn_options.append('use_coverage=true')
 
+        self.use_clang = use_clang  # for usage in other commands
         if use_clang:
             self.extra_gn_options.append('is_clang=true')
 
@@ -419,7 +481,6 @@ class HostBuilder(GnBuilder):
 
         if app == HostApp.TESTS:
             self.extra_gn_options.append('chip_build_tests=true')
-            self.extra_gn_options.append('chip_data_model_check_die_on_failure=true')
             self.build_command = 'check'
 
         if app == HostApp.EFR32_TEST_RUNNER:
@@ -443,8 +504,23 @@ class HostBuilder(GnBuilder):
             else:
                 self.extra_gn_options.append('chip_enable_dnssd_tests=false')
 
+        if chip_enable_nfc_based_commissioning is not None:
+            if chip_enable_nfc_based_commissioning:
+                self.extra_gn_options.append('chip_enable_nfc_based_commissioning=true')
+            else:
+                self.extra_gn_options.append('chip_enable_nfc_based_commissioning=false')
+
         if chip_casting_simplified is not None:
             self.extra_gn_options.append(f'chip_casting_simplified={str(chip_casting_simplified).lower()}')
+
+        if enable_webrtc:
+            self.extra_gn_options.append('chip_support_webrtc_python_bindings=true')
+
+        if terms_and_conditions_required is not None:
+            if terms_and_conditions_required:
+                self.extra_gn_options.append('chip_terms_and_conditions_required=true')
+            else:
+                self.extra_gn_options.append('chip_terms_and_conditions_required=false')
 
         if self.board == HostBoard.ARM64:
             if not use_clang:
@@ -473,6 +549,13 @@ class HostBuilder(GnBuilder):
 
         if self.app == HostApp.TESTS and fuzzing_type == HostFuzzingType.PW_FUZZTEST:
             self.build_command = 'pw_fuzz_tests'
+
+        if self.app == HostApp.TESTS and use_googletest:
+            self.extra_gn_options.append('import("//build_overrides/pigweed.gni")')
+            self.extra_gn_options.append('import("//build_overrides/googletest.gni")')
+            self.extra_gn_options.append('pw_unit_test_BACKEND="$dir_pw_unit_test:googletest"')
+            self.extra_gn_options.append('dir_pw_third_party_googletest="$dir_googletest"')
+            self.extra_gn_options.append('chip_build_tests_googletest=true')
 
     def GnBuildArgs(self):
         if self.board == HostBoard.NATIVE:
@@ -513,6 +596,13 @@ class HostBuilder(GnBuilder):
         if self.board == HostBoard.ARM64:
             self.build_env['PKG_CONFIG_PATH'] = os.path.join(
                 self.SysRootPath('SYSROOT_AARCH64'), 'lib/aarch64-linux-gnu/pkgconfig')
+        if self.app == HostApp.TESTS and self.use_coverage and self.use_clang and self.fuzzing_type == HostFuzzingType.NONE:
+            # Every test is expected to have a distinct build ID, so `%m` will be
+            # distinct.
+            #
+            # Output is relative to "oputput_dir" since that is where GN executs
+            self.build_env['LLVM_PROFILE_FILE'] = os.path.join("coverage", "profiles", "run_%b.profraw")
+
         return self.build_env
 
     def SysRootPath(self, name):
@@ -522,7 +612,7 @@ class HostBuilder(GnBuilder):
 
     def generate(self):
         super(HostBuilder, self).generate()
-        if 'JAVA_PATH' in os.environ:
+        if 'JAVA_HOME' in os.environ:
             self._Execute(
                 ["third_party/java_deps/set_up_java_deps.sh"],
                 title="Setting up Java deps",
@@ -553,8 +643,15 @@ class HostBuilder(GnBuilder):
             self._Execute(['mkdir', '-p', self.coverage_dir], title="Create coverage output location")
 
     def PreBuildCommand(self):
-        if self.app == HostApp.TESTS and self.use_coverage:
-            self._Execute(['ninja', '-C', self.output_dir, 'default'], title="Build-only")
+        if self.app == HostApp.TESTS and self.use_coverage and not self.use_clang:
+            cmd = ['ninja', '-C', self.output_dir]
+
+            if self.ninja_jobs is not None:
+                cmd.append('-j' + str(self.ninja_jobs))
+
+            cmd.append('default')
+
+            self._Execute(cmd, title="Build-only")
             self._Execute(['lcov', '--initial', '--capture', '--directory', os.path.join(self.output_dir, 'obj'),
                            '--exclude', os.path.join(self.chip_dir, '**/tests/*'),
                            '--exclude', os.path.join(self.chip_dir, 'zzz_generated/*'),
@@ -564,7 +661,8 @@ class HostBuilder(GnBuilder):
                            '--output-file', os.path.join(self.coverage_dir, 'lcov_base.info')], title="Initial coverage baseline")
 
     def PostBuildCommand(self):
-        if self.app == HostApp.TESTS and self.use_coverage:
+        # TODO: CLANG coverage is not yet implemented, requires different tooling
+        if self.app == HostApp.TESTS and self.use_coverage and not self.use_clang:
             self._Execute(['lcov', '--capture', '--directory', os.path.join(self.output_dir, 'obj'),
                            '--exclude', os.path.join(self.chip_dir, '**/tests/*'),
                            '--exclude', os.path.join(self.chip_dir, 'zzz_generated/*'),
@@ -578,6 +676,60 @@ class HostBuilder(GnBuilder):
                            ], title="Final coverage info")
             self._Execute(['genhtml', os.path.join(self.coverage_dir, 'lcov_final.info'), '--output-directory',
                            os.path.join(self.coverage_dir, 'html')], title="HTML coverage")
+
+        # coverage for clang works by having perfdata for every test run, which are in "*.profraw" files
+        if self.app == HostApp.TESTS and self.use_coverage and self.use_clang and self.fuzzing_type == HostFuzzingType.NONE:
+            # Clang coverage config generates "coverage/{name}.profraw" for each test indivdually
+            # Here we are merging ALL raw profiles into a single indexed file
+
+            _indexed_instrumentation = shlex.quote(os.path.join(self.coverage_dir, "merged.profdata"))
+
+            self._Execute([
+                "bash",
+                "-c",
+                f'find {shlex.quote(self.coverage_dir)} -name "*.profraw"'
+                + f' | xargs -n 10240 llvm-profdata merge -sparse -o {_indexed_instrumentation}'
+            ],
+                title="Generating merged coverage data")
+
+            _lcov_data = os.path.join(self.coverage_dir, "merged.lcov")
+
+            self._Execute([
+                "bash",
+                "-c",
+                f'find {shlex.quote(self.coverage_dir)} -name "*.profraw"'
+                + ' | xargs -n1 basename | sed "s/\\.profraw//" '
+                + f' | xargs -I @ echo -object {shlex.quote(os.path.join(self.output_dir, "tests", "@"))}'
+                + f' | xargs -n 10240 llvm-cov export -format=lcov --instr-profile {_indexed_instrumentation} '
+                # only care about SDK code. third_party is not considered sdk
+                + ' --ignore-filename-regex "/third_party/"'
+                # about 75K lines with almost 0% coverage
+                + ' --ignore-filename-regex "/zzz_generated/"'
+                # generated interface files. about 8K lines with little coverage
+                + ' --ignore-filename-regex "/out/.*/Linux/dbus/"'
+                # 100% coverage for 1K lines, but not relevant (test code)
+                + ' --ignore-filename-regex "/out/.*/clang_static_coverage_config/"'
+                # Tests are likely 100% or close to, want to see only "functionality tested"
+                + ' --ignore-filename-regex "/tests/"'
+                # Ignore system includes
+                + ' --ignore-filename-regex "/usr/include/"'
+                + ' --ignore-filename-regex "/usr/lib/"'
+                + f' | cat >{shlex.quote(_lcov_data)}'
+            ],
+                title="Generating lcov data")
+
+            self._Execute([
+                "genhtml",
+                "--ignore-errors",
+                "inconsistent",
+                "--ignore-errors",
+                "range",
+                # "--hierarchical" <- this may be interesting
+                "--output",
+                os.path.join(self.output_dir, "html"),
+                os.path.join(self.coverage_dir, "merged.lcov"),
+            ],
+                title="Generating HTML coverage report")
 
         if self.app == HostApp.JAVA_MATTER_CONTROLLER:
             self.createJavaExecutable("java-matter-controller")

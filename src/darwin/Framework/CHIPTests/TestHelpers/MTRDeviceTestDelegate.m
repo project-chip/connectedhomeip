@@ -26,6 +26,13 @@
     }
 }
 
+- (void)_deviceInternalStateChanged:(MTRDevice *)device
+{
+    if (self.onInternalStateChanged != nil) {
+        self.onInternalStateChanged();
+    }
+}
+
 - (void)device:(MTRDevice *)device receivedAttributeReport:(NSArray<NSDictionary<NSString *, id> *> *)attributeReport
 {
     if (self.onAttributeDataReceived != nil) {
@@ -40,6 +47,13 @@
     }
 }
 
+- (void)unitTestReportBeginForDevice:(MTRDevice *)device
+{
+    if (self.onReportBegin != nil) {
+        self.onReportBegin();
+    }
+}
+
 - (void)unitTestReportEndForDevice:(MTRDevice *)device
 {
     if (self.onReportEnd != nil) {
@@ -49,6 +63,10 @@
 
 - (NSNumber *)unitTestMaxIntervalOverrideForSubscription:(MTRDevice *)device
 {
+    if (self.subscriptionMaxIntervalOverride) {
+        return self.subscriptionMaxIntervalOverride;
+    }
+
     // Make sure our subscriptions time out in finite time.
     return @(2); // seconds
 }
@@ -110,6 +128,37 @@
     // unconditionally for now.  If we ever add tests that try to exercise that
     // codepath, we can make this configurable.
     return YES;
+}
+
+- (void)unitTestSubscriptionCallbackDeleteForDevice:(MTRDevice *)device
+{
+    if (self.onSubscriptionCallbackDelete != nil) {
+        self.onSubscriptionCallbackDelete();
+    }
+}
+
+- (void)unitTestSubscriptionResetForDevice:(MTRDevice *)device
+{
+    if (self.onSubscriptionReset != nil) {
+        self.onSubscriptionReset();
+    }
+}
+
+- (void)unitTestSetUTCTimeInvokedForDevice:(MTRDevice *)device error:(NSError * _Nullable)error
+{
+    if (self.onUTCTimeSet != nil) {
+        self.onUTCTimeSet(error);
+    }
+}
+
+- (BOOL)unitTestTimeUpdateShortDelayIsZero:(MTRDevice *)device
+{
+    return self.forceTimeUpdateShortDelayToZero;
+}
+
+- (BOOL)unitTestTimeSynchronizationLossDetectionCadenceIsZero:(MTRDevice *)device
+{
+    return self.forceTimeSynchronizationLossDetectionCadenceToZero;
 }
 
 @end

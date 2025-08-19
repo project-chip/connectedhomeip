@@ -9,6 +9,8 @@ An example showing the use of CHIP on the Silicon Labs EFR32 MG12 and MG24.
     -   [Building](#building)
     -   [Flashing the Application](#flashing-the-application)
     -   [Viewing Logging Output](#viewing-logging-output)
+        -   [SeggerRTT](#segger-rtt)
+        -   [Serial Console](#console-log)
     -   [Running the Complete Example](#running-the-complete-example)
         -   [Notes](#notes)
     -   [Running RPC console](#running-rpc-console)
@@ -33,8 +35,8 @@ An example showing the use of CHIP on the Silicon Labs EFR32 MG12 and MG24.
 ## Introduction
 
 The EFR32 Energy Management example provides a baseline demonstration of a EVSE
-device, built using Matter and the Silicon Labs gecko SDK. It can be controlled
-by a Chip controller over an Openthread or Wifi network..
+or Water Heater device, built using Matter and the Silicon Labs gecko SDK. It
+can be controlled by a Chip controller over an Openthread or Wifi network.
 
 The EFR32 device can be commissioned over Bluetooth Low Energy where the device
 and the Chip controller will exchange security information with the Rendez-vous
@@ -45,9 +47,9 @@ If the LCD is enabled, the LCD on the Silabs WSTK shows a QR Code containing the
 needed commissioning information for the BLE connection and starting the
 Rendez-vous procedure.
 
-The EVSE example is intended to serve both as a means to explore the workings of
-Matter as well as a template for creating real products based on the Silicon
-Labs platform.
+The EVSE and Water Heater examples are intended to serve both as a means to
+explore the workings of Matter Energy Management as well as a template for
+creating real products based on the Silicon Labs platform.
 
 ## Building
 
@@ -99,7 +101,23 @@ Labs platform.
           $ git submodule update --init
           $ source third_party/connectedhomeip/scripts/activate.sh
           $ export SILABS_BOARD=BRD4187C
+
+    To build the EVSE example
+
           $ gn gen out/debug
+          $ ninja -C out/debug
+
+    To build the Water Heater example you can change the args to gn gen (see
+    BUILD.gn for arg options)
+
+          $ gn gen out/debug --args='sl_enable_example_evse_device=false sl_enable_example_water_heater_device=true'
+          $ ninja -C out/debug
+
+    To change Device Energy Management feature support (e.g. Power forecast or
+    State forecast reporting), you can change the args to gn gen (see BUILD.gn
+    for arg options)
+
+          $ gn gen out/debug --args='sl_dem_support_state_forecast_reporting=true sl_dem_support_power_forecast_reporting=false'
           $ ninja -C out/debug
 
 -   To delete generated executable, libraries and object files use:
@@ -110,10 +128,6 @@ Labs platform.
 *   Build the example as Intermittently Connected Device (ICD)
 
           $ ./scripts/examples/gn_silabs_example.sh ./examples/energy-management-app/silabs/ ./out/energy-management-app_ICD BRD4187C --icd
-
-    or use gn as previously mentioned but adding the following arguments:
-
-          $ gn gen out/debug '--args=SILABS_BOARD="BRD4187C" enable_sleepy_device=true chip_openthread_ftd=false'
 
 *   Build the example with pigweed RPC
 
@@ -150,6 +164,8 @@ Releases page on
 [Silabs Matter Github](https://github.com/SiliconLabs/matter/releases) .
 
 ## Viewing Logging Output
+
+### SEGGER RTT
 
 The example application is built to use the SEGGER Real Time Transfer (RTT)
 facility for log output. RTT is a feature built-in to the J-Link Interface MCU
@@ -197,6 +213,25 @@ combination with JLinkRTTClient as follows:
 
           $ JLinkRTTClient
 
+### Console Log
+
+If the binary was built with this option or if you're using the Siwx917 WiFi
+SoC, the logs and the CLI (if enabled) will be available on the serial console.
+This console required a baudrate of **921600** with CTS/RTS.
+
+#### Configuring the VCOM
+
+-   Using (Simplicity
+    Studio)[https://community.silabs.com/s/article/wstk-virtual-com-port-baudrate-setting?language=en_US]
+-   Using commander-cli
+    ```
+    commander vcom config --baudrate 921600 --handshake none
+    ```
+
+### Using the console
+
+With any serial terminal application such as screen, putty, minicom etc.
+
 ## Running the Complete Example
 
 -   It is assumed here that you already have an OpenThread border router
@@ -241,6 +276,7 @@ combination with JLinkRTTClient as follows:
         -   _Press and Release_ : Start, or restart, BLE advertisement in fast mode. It will advertise in this mode
             for 30 seconds. The device will then switch to a slower interval advertisement.
             After 15 minutes, the advertisement stops.
+            Additionally, it will cycle through the QR code, application status screen and device status screen, respectively.
 
         -   _Pressed and hold for 6 s_ : Initiates the factory reset of the device.
             Releasing the button within the 6-second window cancels the factory reset
@@ -319,7 +355,7 @@ tracking code inside the `trackAlloc` and `trackFree` function
 
 For the description of Software Update process with EFR32 example applications
 see
-[EFR32 OTA Software Update](../../../docs/guides/silabs_efr32_software_update.md)
+[EFR32 OTA Software Update](../../../docs/platforms/silabs/silabs_efr32_software_update.md)
 
 ## Group Communication (Multicast)
 
