@@ -142,7 +142,7 @@ tests:
           number between minTemp and maxTemp inclusive, saved as setTemp"
       command: "SetTemperature"
       PICS:
-          TCTL.S.C00.Rsp && PICS_USER_PROMPT && TCTL.S.M.SupportsInvalidInState
+           PICS_USER_PROMPT && TCTL.S.M.SupportsInvalidInState
       arguments:
           values:
               - name: "TargetTemperature"
@@ -159,7 +159,7 @@ tests:
                 value: 5000
 
     - label: "Step 11: TH reads from the DUT the TemperatureSetpoint attribute"
-      PICS: TCTL.S.A0000 && TCTL.S.M.SupportsInvalidInState
+      PICS: TCTL.S.M.SupportsInvalidInState
       command: "readAttribute"
       attribute: "TemperatureSetpoint"
       response:
