@@ -83,18 +83,6 @@ static bool HasDuplicateIDs(const DataModel::List<const uint32_t> & IDs, std::un
 }
 }; // namespace CommonUtilities
 
-/*
-CHIP_ERROR StartDateDataClass::Validate(const ValueType & aValue) const
-{
-    if (!aValue.IsNull() && aValue.Value() != 0)
-    {
-        VerifyOrReturnError((static_cast<TariffUpdateCtx *>(aCtx)->TariffUpdateTimestamp <= aValue.Value()),
-            CHIP_ERROR_INVALID_ARGUMENT);
-    }
-
-    return CHIP_NO_ERROR;
-}*/
-
 namespace DayEntriesDataClass_Utils {
 
 static CHIP_ERROR ValidateListEntry(const DayEntryStruct::Type & entryNewValue, TariffUpdateCtx * aCtx)
@@ -309,19 +297,28 @@ using namespace CommodityTariffConsts;
 using namespace chip::app::Clusters::CommodityTariff::Structs;
 
 template <>
-CHIP_ERROR Validate<DataModel::Nullable<TariffUnitEnum>>(const DataModel::Nullable<TariffUnitEnum> & aValue, void * aCtx)
+CHIP_ERROR Validate<DataModel::Nullable<TariffUnitEnum>>(const DataModel::Nullable<TariffUnitEnum> & aValue, AttributeId aAttrId, void * aCtx)
 {
     return CHIP_NO_ERROR;
 }
 
 template <>
-CHIP_ERROR Validate<DataModel::Nullable<uint32_t>>(const DataModel::Nullable<uint32_t> & aValue, void * aCtx)
+CHIP_ERROR Validate<DataModel::Nullable<uint32_t>>(const DataModel::Nullable<uint32_t> & aValue, AttributeId aAttrId, void * aCtx)
 {
+    if (aAttrId == Clusters::CommodityTariff::Attributes::StartDate::Id)
+    {
+        if (!aValue.IsNull() && aValue.Value() != 0)
+        {
+            VerifyOrReturnError((static_cast<TariffUpdateCtx *>(aCtx)->TariffUpdateTimestamp <= aValue.Value()),
+                CHIP_ERROR_INVALID_ARGUMENT);
+        }
+    }
+
     return CHIP_NO_ERROR;
 }
 
 template <>
-CHIP_ERROR Validate<DataModel::Nullable<int16_t>>(const DataModel::Nullable<int16_t> & aValue, void * aCtx)
+CHIP_ERROR Validate<DataModel::Nullable<int16_t>>(const DataModel::Nullable<int16_t> & aValue, AttributeId aAttrId, void * aCtx)
 {
     return CHIP_NO_ERROR;
 }
@@ -329,7 +326,7 @@ CHIP_ERROR Validate<DataModel::Nullable<int16_t>>(const DataModel::Nullable<int1
 template <>
 CHIP_ERROR
 Validate<DataModel::Nullable<DayEntryRandomizationTypeEnum>>(const DataModel::Nullable<DayEntryRandomizationTypeEnum> & aValue,
-                                                             void * aCtx)
+                                                             AttributeId aAttrId, void * aCtx)
 {
     return CHIP_NO_ERROR;
 }
@@ -337,7 +334,7 @@ Validate<DataModel::Nullable<DayEntryRandomizationTypeEnum>>(const DataModel::Nu
 template <>
 CHIP_ERROR
 Validate<DataModel::Nullable<TariffInformationStruct::Type>>(const DataModel::Nullable<TariffInformationStruct::Type> & aValue,
-                                                             void * aCtx)
+                                                             AttributeId aAttrId, void * aCtx)
 {
     // The tariff info is always required (cannot be null)
     if (aValue.IsNull())
@@ -389,7 +386,7 @@ Validate<DataModel::Nullable<TariffInformationStruct::Type>>(const DataModel::Nu
 
 template <>
 CHIP_ERROR Validate<DataModel::Nullable<DataModel::List<DayEntryStruct::Type>>>(
-    const DataModel::Nullable<DataModel::List<DayEntryStruct::Type>> & aValue, void * aCtx)
+    const DataModel::Nullable<DataModel::List<DayEntryStruct::Type>> & aValue, AttributeId aAttrId, void * aCtx)
 {
     // Required field check
     if (aValue.IsNull())
@@ -430,7 +427,7 @@ CHIP_ERROR Validate<DataModel::Nullable<DataModel::List<DayEntryStruct::Type>>>(
 
 template <>
 CHIP_ERROR Validate<DataModel::Nullable<DataModel::List<DayPatternStruct::Type>>>(
-    const DataModel::Nullable<DataModel::List<DayPatternStruct::Type>> & aValue, void * aCtx)
+    const DataModel::Nullable<DataModel::List<DayPatternStruct::Type>> & aValue, AttributeId aAttrId, void * aCtx)
 {
     if (aValue.IsNull())
     {
@@ -481,7 +478,7 @@ CHIP_ERROR Validate<DataModel::Nullable<DataModel::List<DayPatternStruct::Type>>
 
 template <>
 CHIP_ERROR Validate<DataModel::Nullable<DataModel::List<TariffComponentStruct::Type>>>(
-    const DataModel::Nullable<DataModel::List<TariffComponentStruct::Type>> & aValue, void * aCtx)
+    const DataModel::Nullable<DataModel::List<TariffComponentStruct::Type>> & aValue, AttributeId aAttrId, void * aCtx)
 {
     // Required field check
     if (aValue.IsNull())
@@ -519,7 +516,7 @@ CHIP_ERROR Validate<DataModel::Nullable<DataModel::List<TariffComponentStruct::T
 
 template <>
 CHIP_ERROR Validate<DataModel::Nullable<DataModel::List<TariffPeriodStruct::Type>>>(
-    const DataModel::Nullable<DataModel::List<TariffPeriodStruct::Type>> & aValue, void * aCtx)
+    const DataModel::Nullable<DataModel::List<TariffPeriodStruct::Type>> & aValue, AttributeId aAttrId, void * aCtx)
 {
     // Required field check
     if (aValue.IsNull())
@@ -555,7 +552,7 @@ CHIP_ERROR Validate<DataModel::Nullable<DataModel::List<TariffPeriodStruct::Type
 
 template <>
 CHIP_ERROR Validate<DataModel::Nullable<DataModel::List<DayStruct::Type>>>(
-    const DataModel::Nullable<DataModel::List<DayStruct::Type>> & aValue, void * aCtx)
+    const DataModel::Nullable<DataModel::List<DayStruct::Type>> & aValue, AttributeId aAttrId, void * aCtx)
 {
     // Early return for null case (valid)
     if (aValue.IsNull())
@@ -611,7 +608,7 @@ CHIP_ERROR Validate<DataModel::Nullable<DataModel::List<DayStruct::Type>>>(
 
 template <>
 CHIP_ERROR Validate<DataModel::Nullable<DataModel::List<CalendarPeriodStruct::Type>>>(
-    const DataModel::Nullable<DataModel::List<CalendarPeriodStruct::Type>> & aValue, void * aCtx)
+    const DataModel::Nullable<DataModel::List<CalendarPeriodStruct::Type>> & aValue, AttributeId aAttrId, void * aCtx)
 {
     // If calendar is null, it's always valid
     if (aValue.IsNull())

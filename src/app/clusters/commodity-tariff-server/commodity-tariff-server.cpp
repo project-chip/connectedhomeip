@@ -16,8 +16,6 @@
 
 #include "commodity-tariff-server.h"
 
-#include "CommodityTariffAttrsDataMgmt.h"
-#include "CommodityTariffConsts.h"
 #include <app/AttributeAccessInterface.h>
 #include <app/AttributeAccessInterfaceRegistry.h>
 #include <app/CommandHandlerInterfaceRegistry.h>
@@ -287,7 +285,6 @@ void Instance::TariffDataUpdatedCb(bool is_erased, std::vector<AttributeId> & aU
     if (!is_erased)
     {
         InitCurrentAttrs();
-        ;
     }
 }
 

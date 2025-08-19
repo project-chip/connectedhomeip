@@ -21,9 +21,6 @@ source_set("commodity-tariff-server") {
     "CommodityTariffConsts.h",
   ]
 
-  public_deps = [
-    "${chip_root}/src/lib/support:span",
-    "${chip_root}/src/system",
-    "${chip_root}/zzz_generated/app-common/clusters/CommodityTariff",
-  ]
+  public_deps =
+      [ "${chip_root}/zzz_generated/app-common/clusters/CommodityTariff" ]
 }

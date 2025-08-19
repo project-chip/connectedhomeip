@@ -442,11 +442,11 @@ COMPLEX_ATTRIBUTES
 #undef X
 
 template <typename T>
-CHIP_ERROR Validate(const T & aValue, void * aCtx);
+CHIP_ERROR Validate(const T & aValue, AttributeId aAttrId, void * aCtx);
 
 #define X(attrType)                                                                                                                \
     template <>                                                                                                                    \
-    CHIP_ERROR Validate<DataModel::Nullable<attrType>>(const DataModel::Nullable<attrType> & aValue, void * aCtx);
+    CHIP_ERROR Validate<DataModel::Nullable<attrType>>(const DataModel::Nullable<attrType> & aValue, AttributeId aAttrId, void * aCtx);
 ALL_ATTRIBUTES
 #undef X
 
@@ -835,11 +835,12 @@ public:
 
             if (CHIP_NO_ERROR == err)
             {
-                NonNullableType tmpValue = newValue;
-                err                      = CopyData<NonNullableType>(newValue, tmpValue);
-                if (err == CHIP_NO_ERROR)
+                GetNewValueRef().SetNonNull(NonNullableType()); // Default construct in place
+                err = CopyData<NonNullableType>(newValue, GetNewValueRef().Value());
+                if (err != CHIP_NO_ERROR)
                 {
-                    GetNewValueRef().SetNonNull(tmpValue);
+                    // Revert on copy failure to maintain consistent state
+                    GetNewValueRef().SetNull();
                 }
             }
         }
@@ -1042,7 +1043,7 @@ private:
      * @brief Validates the new value using type-specific validation
      * @return CHIP_ERROR Validation result
      */
-    CHIP_ERROR ValidateNewValue() { return Validate<ValueType>(GetNewValueRef(), mAuxData); }
+    CHIP_ERROR ValidateNewValue() { return Validate<ValueType>(GetNewValueRef(), mAttrId,  mAuxData); }
 
     /**
      * @brief Compares two lists for equality
