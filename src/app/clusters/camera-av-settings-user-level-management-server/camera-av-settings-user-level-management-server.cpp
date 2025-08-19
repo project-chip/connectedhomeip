@@ -879,7 +879,7 @@ void CameraAvSettingsUserLevelMgmtServer::HandleMPTZSetPosition(HandlerContext &
 
     SetMovementState(PhysicalMovementEnum::kMoving);
 
-    mDelegate.MPTZSetPosition(pan, tilt, zoom, this);
+    ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);
 }
 
 void CameraAvSettingsUserLevelMgmtServer::HandleMPTZRelativeMove(HandlerContext & ctx,
@@ -1052,7 +1052,7 @@ void CameraAvSettingsUserLevelMgmtServer::HandleMPTZRelativeMove(HandlerContext 
     mTargetZoom    = newZoom;
     mMovementState = PhysicalMovementEnum::kMoving;
 
-    mDelegate.MPTZRelativeMove(newPan, newTilt, newZoom, this);
+    ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);
 }
 
 void CameraAvSettingsUserLevelMgmtServer::HandleMPTZMoveToPreset(HandlerContext & ctx,
@@ -1111,6 +1111,7 @@ void CameraAvSettingsUserLevelMgmtServer::HandleMPTZMoveToPreset(HandlerContext 
 
     auto presetValues = it->GetMptzPosition();
 
+    // Inform the delegate that the device is requested to move to PTZ values given by the selected preset id
     Status status = mDelegate.MPTZMoveToPreset(preset, presetValues.pan, presetValues.tilt, presetValues.zoom, this);
 
     if (status != Status::Success)
@@ -1127,8 +1128,7 @@ void CameraAvSettingsUserLevelMgmtServer::HandleMPTZMoveToPreset(HandlerContext 
     mTargetZoom    = presetValues.zoom;
     mMovementState = PhysicalMovementEnum::kMoving;
 
-    // Inform the delegate that the device is requested to move to PTZ values given by the selected preset id
-    mDelegate.MPTZMoveToPreset(preset, presetValues.pan, presetValues.tilt, presetValues.zoom, this);
+    ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);
 }
 
 void CameraAvSettingsUserLevelMgmtServer::HandleMPTZSavePreset(HandlerContext & ctx,
