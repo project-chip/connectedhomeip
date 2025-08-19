@@ -27,6 +27,28 @@
 namespace chip {
 namespace app {
 
+namespace datastore {
+
+struct AccessControlEntryStruct
+{
+    Clusters::JointFabricDatastore::DatastoreAccessControlEntryPrivilegeEnum privilege =
+        static_cast<Clusters::JointFabricDatastore::DatastoreAccessControlEntryPrivilegeEnum>(0);
+    Clusters::JointFabricDatastore::DatastoreAccessControlEntryAuthModeEnum authMode =
+        static_cast<Clusters::JointFabricDatastore::DatastoreAccessControlEntryAuthModeEnum>(0);
+    std::vector<uint64_t> subjects;
+    std::vector<Clusters::JointFabricDatastore::Structs::DatastoreAccessControlTargetStruct::Type> targets;
+};
+
+struct ACLEntryStruct
+{
+    chip::NodeId nodeID = static_cast<chip::NodeId>(0);
+    uint16_t listID     = static_cast<uint16_t>(0);
+    AccessControlEntryStruct ACLEntry;
+    Clusters::JointFabricDatastore::Structs::DatastoreStatusEntryStruct::Type statusEntry;
+};
+
+} // namespace datastore
+
 /**
  * A struct which extends the DatastoreNodeInformationEntry type with FriendlyName buffer reservation.
  */
@@ -144,7 +166,7 @@ public:
         return mNodeKeySetEntries;
     }
 
-    std::vector<Clusters::JointFabricDatastore::Structs::DatastoreACLEntryStruct::Type> & GetNodeACLList() { return mACLEntries; }
+    std::vector<datastore::ACLEntryStruct> & GetNodeACLList() { return mACLEntries; }
 
     std::vector<Clusters::JointFabricDatastore::Structs::DatastoreEndpointEntryStruct::Type> & GetNodeEndpointList()
     {
@@ -255,7 +277,7 @@ private:
     std::vector<Clusters::JointFabricDatastore::Structs::DatastoreEndpointGroupIDEntryStruct::Type> mEndpointGroupIDEntries;
     std::vector<Clusters::JointFabricDatastore::Structs::DatastoreEndpointBindingEntryStruct::Type> mEndpointBindingEntries;
     std::vector<Clusters::JointFabricDatastore::Structs::DatastoreNodeKeySetEntryStruct::Type> mNodeKeySetEntries;
-    std::vector<Clusters::JointFabricDatastore::Structs::DatastoreACLEntryStruct::Type> mACLEntries;
+    std::vector<datastore::ACLEntryStruct> mACLEntries;
     std::vector<Clusters::JointFabricDatastore::Structs::DatastoreEndpointEntryStruct::Type> mEndpointEntries;
 
     Listener * mListeners = nullptr;
@@ -270,7 +292,7 @@ private:
     CHIP_ERROR IsNodeIdAndEndpointInEndpointInformationEntries(NodeId nodeId, EndpointId endpointId, size_t & index);
 
     CHIP_ERROR
-    UpdateACLEntry(Clusters::JointFabricDatastore::Structs::DatastoreACLEntryStruct::Type & entryToUpdate,
+    UpdateACLEntry(datastore::ACLEntryStruct & entryToUpdate,
                    const Clusters::JointFabricDatastore::Structs::DatastoreAccessControlEntryStruct::DecodableType & aclEntry);
 };
 
