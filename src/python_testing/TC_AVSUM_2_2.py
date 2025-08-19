@@ -46,6 +46,7 @@ from matter.interaction_model import Status
 from matter.testing.event_attribute_reporting import AttributeSubscriptionHandler
 from matter.testing.matter_testing import AttributeMatcher, MatterBaseTest, TestStep, default_matter_test_main, has_cluster, run_if_endpoint_matches
 
+
 class TC_AVSUM_2_2(MatterBaseTest, AVSUMTestBase):
     has_feature_mpan = False
     has_feature_mtilt = False
@@ -164,7 +165,7 @@ class TC_AVSUM_2_2(MatterBaseTest, AVSUMTestBase):
 
             self.step(9)
             # Once the MovementState has reset to Idle, read the attribute back and make sure it was set
-            sub_handler.await_all_expected_report_matches([movement_state_match],timeout_sec=10)
+            sub_handler.await_all_expected_report_matches([movement_state_match], timeout_sec=10)
             newpan_mptzposition_dut = await self.read_avsum_attribute_expect_success(endpoint, attributes.MPTZPosition)
             asserts.assert_equal(newpan_mptzposition_dut.pan, newPan, "Received Pan does not match set Pan")
 
@@ -233,7 +234,7 @@ class TC_AVSUM_2_2(MatterBaseTest, AVSUMTestBase):
 
             self.step(19)
             # Once the MovementState has reset to Idle, read the attribute back and make sure it was set
-            sub_handler.await_all_expected_report_matches([movement_state_match],timeout_sec=self.default_timeout)
+            sub_handler.await_all_expected_report_matches([movement_state_match], timeout_sec=self.default_timeout)
             newtilt_mptzposition_dut = await self.read_avsum_attribute_expect_success(endpoint, attributes.MPTZPosition)
             asserts.assert_equal(newtilt_mptzposition_dut.tilt, newTilt, "Received Tilt does not match set Tilt")
 
@@ -280,7 +281,7 @@ class TC_AVSUM_2_2(MatterBaseTest, AVSUMTestBase):
 
             self.step(26)
             # Once the MovementState has reset to Idle, read the attribute back and make sure it was set
-            sub_handler.await_all_expected_report_matches([movement_state_match],timeout_sec=self.default_timeout)
+            sub_handler.await_all_expected_report_matches([movement_state_match], timeout_sec=self.default_timeout)
             newzoom_mptzposition_dut = await self.read_avsum_attribute_expect_success(endpoint, attributes.MPTZPosition)
             asserts.assert_equal(newzoom_mptzposition_dut.zoom, newZoom, "Received Zoom does not match set Zoom")
 

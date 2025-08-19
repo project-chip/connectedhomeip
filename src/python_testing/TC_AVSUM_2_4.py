@@ -169,7 +169,7 @@ class TC_AVSUM_2_4(MatterBaseTest, AVSUMTestBase):
                 await self.send_move_to_preset_command(endpoint, mptzpreset.presetID)
 
                 # Once the MovementState has reset to Idle, read the attribute back and make sure it was set
-                sub_handler.await_all_expected_report_matches([movement_state_match],timeout_sec=10)
+                sub_handler.await_all_expected_report_matches([movement_state_match], timeout_sec=10)
                 mptzposition_dut = await self.read_avsum_attribute_expect_success(endpoint, attributes.MPTZPosition)
                 self.verify_preset_matches(mptzpreset, mptzposition_dut)
 
@@ -214,14 +214,14 @@ class TC_AVSUM_2_4(MatterBaseTest, AVSUMTestBase):
             await self.send_mptz_set_position_command(endpoint, newPan, newTilt, newZoom)
 
             # Once the MovementState has reset to Idle, proceed with the move to preset
-            sub_handler.await_all_expected_report_matches([movement_state_match],timeout_sec=10)
+            sub_handler.await_all_expected_report_matches([movement_state_match], timeout_sec=10)
 
             self.step(16)
             sub_handler.reset()
             await self.send_move_to_preset_command(endpoint, max_presets_dut)
 
             # Once the MovementState has reset to Idle, read the attribute back and make sure it was set to the preset
-            sub_handler.await_all_expected_report_matches([movement_state_match],timeout_sec=10)
+            sub_handler.await_all_expected_report_matches([movement_state_match], timeout_sec=10)
             mptzposition_dut = await self.read_avsum_attribute_expect_success(endpoint, attributes.MPTZPosition)
 
             self.step(17)

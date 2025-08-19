@@ -158,10 +158,10 @@ class TC_AVSUM_2_1(MatterBaseTest, AVSUMTestBase):
 
             self.step(9)
             asserts.assert_in(attributes.MovementState.attribute_id, attribute_list,
-                              "MovementState attribute is mandatory if one of MPAN, MTILT, or MZOOM.")          
+                              "MovementState attribute is mandatory if one of MPAN, MTILT, or MZOOM.")
             movementstate_dut = await self.read_avsum_attribute_expect_success(endpoint, attributes.MovementState)
             asserts.assert_less(movementstate_dut, cluster.Enums.PhysicalMovementEnum.kUnknownEnumValue,
-                                          "MovementState attribute value is invalid.")            
+                                "MovementState attribute value is invalid.")
         else:
             self.skip_step(8)
             self.skip_step(9)
@@ -225,6 +225,7 @@ class TC_AVSUM_2_1(MatterBaseTest, AVSUMTestBase):
             self.skip_step(12)
             self.skip_step(12)
             self.skip_step(14)
+
 
 if __name__ == "__main__":
     default_matter_test_main()
