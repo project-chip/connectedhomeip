@@ -50,6 +50,7 @@
 
 - (void)handleBDXTransferSessionEndForNodeID:(NSNumber * _Nonnull)nodeID
                                   controller:(MTRDeviceController * _Nonnull)controller
+                                     metrics:(MTRMetrics * _Nonnull)metrics
                                        error:(NSError * _Nullable)error
 {
 }
