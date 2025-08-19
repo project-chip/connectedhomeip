@@ -425,7 +425,7 @@ class MatterBaseTest(base_test.BaseTestClass):
         return global_stash.unstash_globally(self.user_params.get("matter_stack"))
 
     @property
-    def certificate_authority_manager(self) -> chip.CertificateAuthority.CertificateAuthorityManager:
+    def certificate_authority_manager(self) -> matter.CertificateAuthority.CertificateAuthorityManager:
         """Accesses the Certificate Authority Manager."""
         return global_stash.unstash_globally(self.user_params.get("certificate_authority_manager"))
 
@@ -447,7 +447,7 @@ class MatterBaseTest(base_test.BaseTestClass):
         """Gets the target endpoint ID from config, with a fallback default."""
         return self.matter_test_config.endpoint if self.matter_test_config.endpoint is not None else default
 
-    def get_wifi_ssid(self, default: Optional[str] = 0) -> str:
+    def get_wifi_ssid(self, default: str = "") -> str:
         ''' Get WiFi SSID
 
             Get the WiFi networks name provided with flags
@@ -455,7 +455,7 @@ class MatterBaseTest(base_test.BaseTestClass):
         '''
         return self.matter_test_config.wifi_ssid if self.matter_test_config.wifi_ssid is not None else default
 
-    def get_credentials(self, default: Optional[str] = 0) -> str:
+    def get_credentials(self, default: str = "") -> str:
         ''' Get WiFi passphrase
 
             Get the WiFi credentials provided with flags
@@ -1000,7 +1000,7 @@ class MatterBaseTest(base_test.BaseTestClass):
                 app_pipe_fp.write(json.dumps(command_dict) + "\n")
             # TODO(#31239): remove the need for sleep
             # This was tested with matter.js as being reliable enough
-            sleep(0.05)
+            time.sleep(0.05)
         else:
             logging.info(f"Using DUT IP address: {dut_ip}")
 
