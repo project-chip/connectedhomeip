@@ -97,7 +97,7 @@ class TC_ACL_2_10(MatterBaseTest):
                      "Result is SUCCESS, value is list of AccessControlEntryStruct containing 2 elements, and MUST NOT contain an element with FabricIndex `F2`"),
             TestStep(16, "TH1 reads DUT Endpoint 0 AccessControl cluster Extension attribute",
                      "Result is SUCCESS, value is list of AccessControlExtensionStruct containing 1 element; MUST NOT contain an element with FabricIndex `F2` or Data `D_OK_SINGLE`"),
-            TestStep(17, "TH1 writes DUT Endpoint 0 AccessControl cluster ACL attribute value is acl_original",
+            TestStep(17, "TH1 writes DUT Endpoint 0 AccessControl cluster back to admin-only ACL entry",
                      "Result is SUCCESS"),
         ]
         return steps
