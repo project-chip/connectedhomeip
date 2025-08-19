@@ -74,8 +74,11 @@ class AppServerSubprocess(Subprocess):
 
     def __init__(self, app: str, storage_dir: str, discriminator: int,
                  passcode: int, port: int = 5540, extra_args: list[str] = []):
-        # Create KVS file using context manager for automatic cleanup
-        with create_kvs_file(storage_dir) as kvs_path:
+        # Open a KVS file and keep it alive for the lifetime of this subprocess.
+        # We manually enter the context here and exit it in terminate().
+        self._kvs_context = create_kvs_file(storage_dir)
+        kvs_path = self._kvs_context.__enter__()
+        try:
             # Build the command list
             command = [app]
             if extra_args:
@@ -91,6 +94,21 @@ class AppServerSubprocess(Subprocess):
             # Start the server application
             super().__init__(*command,  # Pass the constructed command list
                              output_cb=lambda line, is_stderr: self.PREFIX + line)
+        except Exception:
+            # If initialization fails, ensure we clean up the KVS file immediately
+            self._kvs_context.__exit__(None, None, None)
+            self._kvs_context = None
+            raise
+
+    def terminate(self):
+        # Terminate the server application and then clean up the KVS file
+        super().terminate()
+        kvs_ctx = getattr(self, "_kvs_context", None)
+        if kvs_ctx is not None:
+            try:
+                kvs_ctx.__exit__(None, None, None)
+            finally:
+                self._kvs_context = None
 
 
 class IcdAppServerSubprocess(AppServerSubprocess):
