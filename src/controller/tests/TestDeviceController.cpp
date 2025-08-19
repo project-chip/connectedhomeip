@@ -28,6 +28,10 @@
 #include <credentials/GroupDataProviderImpl.h>
 #include <lib/support/TestPersistentStorageDelegate.h>
 
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+#include <wifipaf/WiFiPAFLayer.h>
+#endif
+
 using DeviceControllerFactory = chip::Controller::DeviceControllerFactory;
 using TestSessionKeystoreImpl = chip::Crypto::DefaultSessionKeystore;
 
