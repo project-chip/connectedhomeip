@@ -27,6 +27,7 @@ from .json_serializable import JsonSerializable
 
 from dataclasses import dataclass
 
+
 @dataclass
 class AddressTypeInfo:
     """

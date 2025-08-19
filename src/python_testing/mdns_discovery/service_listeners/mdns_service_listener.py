@@ -23,6 +23,7 @@ from asyncio import Event, TimeoutError, wait_for
 
 logger = logging.getLogger(__name__)
 
+
 class MdnsServiceListener(ServiceListener):
     """
     A service listener used during mDNS service discovery.
@@ -47,7 +48,7 @@ class MdnsServiceListener(ServiceListener):
 
     def remove_service(self, zeroconf: Zeroconf, service_type: str, name: str) -> None:
         pass
-    
+
     async def wait_for_service_update(self, service_name: str, rec_types: str, timeout: float) -> None:
         """
         Wait until a service add/update event occurs or timeout is reached.
