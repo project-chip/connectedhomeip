@@ -197,7 +197,7 @@ controller.
 
 The Push AV Server runs in the background, waiting for authenticated devices to
 push video content to it. The key piece of information it provides is its ingest
-URL, which looks like this: `https://localhost:1234/streams/1`
+URL, which, for example, looks like this: `https://localhost:1234/streams/1`
 
 Think of this server as a secure, private YouTube or Dropbox, but just for your
 camera's video clips.
