@@ -16,10 +16,9 @@
 #
 
 import logging
-from asyncio import Event
+from asyncio import Event, TimeoutError, wait_for
 
 from zeroconf import ServiceListener, Zeroconf
-from asyncio import Event, TimeoutError, wait_for
 
 logger = logging.getLogger(__name__)
 
