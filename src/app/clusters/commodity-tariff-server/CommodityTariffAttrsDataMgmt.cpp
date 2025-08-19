@@ -297,7 +297,8 @@ using namespace CommodityTariffConsts;
 using namespace chip::app::Clusters::CommodityTariff::Structs;
 
 template <>
-CHIP_ERROR Validate<DataModel::Nullable<TariffUnitEnum>>(const DataModel::Nullable<TariffUnitEnum> & aValue, AttributeId aAttrId, void * aCtx)
+CHIP_ERROR Validate<DataModel::Nullable<TariffUnitEnum>>(const DataModel::Nullable<TariffUnitEnum> & aValue, AttributeId aAttrId,
+                                                         void * aCtx)
 {
     return CHIP_NO_ERROR;
 }
@@ -310,7 +311,7 @@ CHIP_ERROR Validate<DataModel::Nullable<uint32_t>>(const DataModel::Nullable<uin
         if (!aValue.IsNull() && aValue.Value() != 0)
         {
             VerifyOrReturnError((static_cast<TariffUpdateCtx *>(aCtx)->TariffUpdateTimestamp <= aValue.Value()),
-                CHIP_ERROR_INVALID_ARGUMENT);
+                                CHIP_ERROR_INVALID_ARGUMENT);
         }
     }
 
@@ -637,7 +638,8 @@ CHIP_ERROR Validate<DataModel::Nullable<DataModel::List<CalendarPeriodStruct::Ty
         // Validate dayPatternIDs count
         if (item.dayPatternIDs.empty() || item.dayPatternIDs.size() > kCalendarPeriodItemMaxDayPatternIDs)
         {
-            ChipLogError(NotSpecified, "DayPatternIDs count must be between 1 and %" PRIu32, (uint32_t) kCalendarPeriodItemMaxDayPatternIDs);
+            ChipLogError(NotSpecified, "DayPatternIDs count must be between 1 and %" PRIu32,
+                         (uint32_t) kCalendarPeriodItemMaxDayPatternIDs);
             return CHIP_ERROR_INVALID_ARGUMENT;
         }
 
