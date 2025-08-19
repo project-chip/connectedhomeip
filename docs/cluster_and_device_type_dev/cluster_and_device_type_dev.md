@@ -175,7 +175,7 @@ persistence
 -   This can be done by using GetAttributePersistenceProvider()
 -   This provides a useful API for Reading & Writing values of any type to the
     default Persistence Store
-    -   [src/app/AttributePersistenceProvider.h](https://github.com/project-chip/connectedhomeip/blob/master/src/app/AttributePersistenceProvider.h)
+    -   [src/app/persistence/AttributePersistenceProvider.h](https://github.com/project-chip/connectedhomeip/blob/master/src/app/persistence/AttributePersistenceProvider.h)
 
 #### Ember layer read / write
 
