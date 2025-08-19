@@ -58,7 +58,7 @@ jobs:
             DISABLE_CCACHE: ${{ (github.event_name == 'workflow_dispatch' && inputs.disable_ccache == 'true') && 'true' || (contains(github.event.head_commit.message, '[no-ccache]') && 'true') || 'false' }}
             CCACHE_KEY_SUFFIX: ${{ github.event_name == 'workflow_dispatch' && inputs.cache_suffix || '' }}
 
-        if: github.actor != 'restyled-io[bot]'
+        if: github.actor != 'restyled-io[bot]' && steps.changed_paths.outputs.non_markdown_changes == 'true'
         runs-on: ubuntu-latest
 
         container:
@@ -79,6 +79,14 @@ jobs:
             - uses: actions/checkout@v5
               if: ${{ env.ACT }}
               name: Checkout (ACT for local build)
+            - name: Detect changed paths
+              uses: dorny/paths-filter@v3
+              id: changed_paths
+              with:
+                filters: |
+                  non_markdown_changes:
+                    # returns true if at least one non-markdown file is present
+                    - '!**/*.md'
             - name: Checkout submodules & Bootstrap
               uses: ./.github/actions/checkout-submodules-and-bootstrap
               with:
@@ -443,12 +451,20 @@ jobs:
             TSAN_OPTIONS: "halt_on_error=1"
             LSAN_OPTIONS: detect_leaks=1 suppressions=scripts/tests/chiptest/lsan-mac-suppressions.txt
 
-        if: github.actor != 'restyled-io[bot]'
+        if: github.actor != 'restyled-io[bot]' && steps.changed_paths.outputs.non_markdown_changes == 'true'
         runs-on: macos-13
 
         steps:
             - name: Checkout
               uses: actions/checkout@v5
+            - name: Detect changed paths
+              uses: dorny/paths-filter@v3
+              id: changed_paths
+              with:
+                filters: |
+                  non_markdown_changes:
+                    # returns true if at least one non-markdown file is present
+                    - '!**/*.md'
             - name: Setup Environment
               # coreutils for stdbuf
               run: brew install coreutils
@@ -550,7 +566,7 @@ jobs:
     repl_tests_linux:
         name: REPL Tests - Linux
 
-        if: github.actor != 'restyled-io[bot]'
+        if: github.actor != 'restyled-io[bot]' && steps.changed_paths.outputs.non_markdown_changes == 'true'
 
         strategy:
             matrix:
@@ -573,6 +589,14 @@ jobs:
         steps:
             - name: Checkout
               uses: actions/checkout@v5
+            - name: Detect changed paths
+              uses: dorny/paths-filter@v3
+              id: changed_paths
+              with:
+                filters: |
+                  non_markdown_changes:
+                    # returns true if at least one non-markdown file is present
+                    - '!**/*.md'
             - name: Checkout submodules & Bootstrap
               uses: ./.github/actions/checkout-submodules-and-bootstrap
               with:
@@ -902,12 +926,20 @@ jobs:
             BUILD_VARIANT: ${{matrix.build_variant}}
             TSAN_OPTIONS: "halt_on_error=1"
 
-        if: github.actor != 'restyled-io[bot]'
+        if: github.actor != 'restyled-io[bot]' && steps.changed_paths.outputs.non_markdown_changes == 'true'
         runs-on: macos-13
 
         steps:
             - name: Checkout
               uses: actions/checkout@v5
+            - name: Detect changed paths
+              uses: dorny/paths-filter@v3
+              id: changed_paths
+              with:
+                filters: |
+                  non_markdown_changes:
+                    # returns true if at least one non-markdown file is present
+                    - '!**/*.md'
             - name: Setup Environment
               # coreutils for stdbuf
               run: brew install coreutils
