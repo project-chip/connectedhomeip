@@ -63,7 +63,7 @@ downloaded.
        30
     2. Apply
 5. Install Emulator:
-    1. Tools -> Device Manager -> Create device -> Pixel 5 -> Android S API 31
+    1. Tools -> Device Manager -> Create device -> Pixel 5 -> Android S API 34
        -> Download
 
 ### Linux
