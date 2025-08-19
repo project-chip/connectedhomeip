@@ -90,7 +90,7 @@ public:
     {
         alignas(BLEEndPoint) static std::byte sStorage[sizeof(BLEEndPoint) * BLE_LAYER_NUM_BLE_ENDPOINTS];
         VerifyOrReturnValue(i < BLE_LAYER_NUM_BLE_ENDPOINTS, nullptr);
-        return reinterpret_cast<BLEEndPoint *>(&sStorage[i]);
+        return reinterpret_cast<BLEEndPoint *>(sStorage) + i;
     }
 
     BLEEndPoint * Find(BLE_CONNECTION_OBJECT c) const
