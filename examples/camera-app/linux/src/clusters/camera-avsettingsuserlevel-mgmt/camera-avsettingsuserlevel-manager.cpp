@@ -60,7 +60,7 @@ void CameraAVSettingsUserLevelManager::DefaultViewportUpdated(Globals::Structs::
 }
 
 Status CameraAVSettingsUserLevelManager::MPTZSetPosition(Optional<int16_t> aPan, Optional<int16_t> aTilt, Optional<uint8_t> aZoom,
-                                                       PhysicalPTZCallback * callback)
+                                                         PhysicalPTZCallback * callback)
 {
     mCallback = callback;
 
@@ -78,7 +78,7 @@ Status CameraAVSettingsUserLevelManager::MPTZSetPosition(Optional<int16_t> aPan,
 }
 
 Status CameraAVSettingsUserLevelManager::MPTZRelativeMove(Optional<int16_t> aPan, Optional<int16_t> aTilt, Optional<uint8_t> aZoom,
-                                                        PhysicalPTZCallback * callback)
+                                                          PhysicalPTZCallback * callback)
 {
     mCallback = callback;
 
@@ -93,11 +93,10 @@ Status CameraAVSettingsUserLevelManager::MPTZRelativeMove(Optional<int16_t> aPan
     //
     DeviceLayer::SystemLayer().StartTimer(System::Clock::Seconds16(2), onTimerExpiry, this);
     return Status::Success;
-
 }
 
 Status CameraAVSettingsUserLevelManager::MPTZMoveToPreset(uint8_t aPreset, Optional<int16_t> aPan, Optional<int16_t> aTilt,
-                                                        Optional<uint8_t> aZoom, PhysicalPTZCallback * callback)
+                                                          Optional<uint8_t> aZoom, PhysicalPTZCallback * callback)
 {
     mCallback = callback;
 

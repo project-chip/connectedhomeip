@@ -870,11 +870,12 @@ void CameraAvSettingsUserLevelMgmtServer::HandleMPTZSetPosition(HandlerContext &
         return;
     }
 
-    // We don't update the server persisted attributes until the delegate confirms via callback that the physical device movement is complete
+    // We don't update the server persisted attributes until the delegate confirms via callback that the physical device movement is
+    // complete
     //
-    mTargetPan     = pan;
-    mTargetTilt    = tilt;
-    mTargetZoom    = zoom;
+    mTargetPan  = pan;
+    mTargetTilt = tilt;
+    mTargetZoom = zoom;
 
     SetMovementState(PhysicalMovementEnum::kMoving);
 
@@ -1043,11 +1044,12 @@ void CameraAvSettingsUserLevelMgmtServer::HandleMPTZRelativeMove(HandlerContext 
         return;
     }
 
-    // We don't update the server persisted attributes until the delegate confirms via callback that the physical device movement is complete
+    // We don't update the server persisted attributes until the delegate confirms via callback that the physical device movement is
+    // complete
     //
-    mTargetPan           = newPan;
-    mTargetTilt          = newTilt;
-    mTargetZoom          = newZoom;
+    mTargetPan     = newPan;
+    mTargetTilt    = newTilt;
+    mTargetZoom    = newZoom;
     mMovementState = PhysicalMovementEnum::kMoving;
 
     ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);
@@ -1117,7 +1119,8 @@ void CameraAvSettingsUserLevelMgmtServer::HandleMPTZMoveToPreset(HandlerContext 
         return;
     }
 
-    // We don't update the server persisted attributes until the delegate confirms via callback that the physical device movement is complete
+    // We don't update the server persisted attributes until the delegate confirms via callback that the physical device movement is
+    // complete
     //
     mTargetPan     = presetValues.pan;
     mTargetTilt    = presetValues.tilt;

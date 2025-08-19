@@ -127,8 +127,8 @@ public:
      * @param aZoom The validated value of the zoom that is to be set
      * @param callback The callback to be invoked once the physical movement of the camera has completed
      */
-    virtual Protocols::InteractionModel::Status MPTZSetPosition(Optional<int16_t> aPan, Optional<int16_t> aTilt, Optional<uint8_t> aZoom,
-                                 PhysicalPTZCallback * callback) = 0;
+    virtual Protocols::InteractionModel::Status MPTZSetPosition(Optional<int16_t> aPan, Optional<int16_t> aTilt,
+                                                                Optional<uint8_t> aZoom, PhysicalPTZCallback * callback) = 0;
 
     /**
      * Allows any needed app handling given provided and already validated pan, tilt, and zoom values that are to be set based on
@@ -140,8 +140,8 @@ public:
      * @param aZoom The validated value of the zoom that is to be set
      * @param callback The callback to be invoked once the physical movement of the camera has completed
      */
-    virtual Protocols::InteractionModel::Status MPTZRelativeMove(Optional<int16_t> aPan, Optional<int16_t> aTilt, Optional<uint8_t> aZoom,
-                                  PhysicalPTZCallback * callback) = 0;
+    virtual Protocols::InteractionModel::Status MPTZRelativeMove(Optional<int16_t> aPan, Optional<int16_t> aTilt,
+                                                                 Optional<uint8_t> aZoom, PhysicalPTZCallback * callback) = 0;
 
     /**
      * Allows any needed app handling given provided and already validated pan, tilt, and zoom values that are to be set based on
@@ -154,8 +154,8 @@ public:
      * @param aZoom   The value for Zoom associated with the preset
      * @param callback The callback to be invoked once the physical movement of the camera has completed
      */
-    virtual Protocols::InteractionModel::Status MPTZMoveToPreset(uint8_t aPreset, Optional<int16_t> aPan, Optional<int16_t> aTilt, Optional<uint8_t> aZoom,
-                                  PhysicalPTZCallback * callback) = 0;
+    virtual Protocols::InteractionModel::Status MPTZMoveToPreset(uint8_t aPreset, Optional<int16_t> aPan, Optional<int16_t> aTilt,
+                                                                 Optional<uint8_t> aZoom, PhysicalPTZCallback * callback) = 0;
 
     /**
      * Informs the delegate that a request has been made to save the current PTZ values in a new (or updated) preset ID.
