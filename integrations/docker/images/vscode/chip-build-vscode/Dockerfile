@@ -9,6 +9,7 @@ FROM ghcr.io/project-chip/chip-build-infineon:${VERSION} AS psoc6
 FROM ghcr.io/project-chip/chip-build-tizen-qemu:${VERSION} AS tizen
 FROM ghcr.io/project-chip/chip-build-crosscompile:${VERSION} AS crosscompile
 FROM ghcr.io/project-chip/chip-build-ameba:${VERSION} AS ameba
+FROM ghcr.io/project-chip/chip-build-realtek-zephyr:${VERSION} AS realtekzephyr
 FROM ghcr.io/project-chip/chip-build-nxp:${VERSION} AS nxp
 FROM ghcr.io/project-chip/chip-build-nxp-zephyr:${VERSION} AS nxpzephyr
 FROM ghcr.io/project-chip/chip-build-imx:${VERSION} AS imx
@@ -44,6 +45,9 @@ COPY --from=tizen /opt/tizen-sdk /opt/tizen-sdk
 COPY --from=crosscompile /opt/ubuntu-24.04-aarch64-sysroot /opt/ubuntu-24.04-aarch64-sysroot
 
 COPY --from=ameba /opt/ameba /opt/ameba
+
+COPY --from=realtekzephyr /opt/realtek-zephyr/zephyr-sdk-0.16.8/ /opt/realtek-zephyr/zephyr-sdk-0.16.8/
+COPY --from=realtekzephyr /opt/realtek-zephyr/zephyr-rtk-project/ /opt/realtek-zephyr/zephyr-rtk-project/
 
 COPY --from=nxp /opt/nxp /opt/nxp
 
