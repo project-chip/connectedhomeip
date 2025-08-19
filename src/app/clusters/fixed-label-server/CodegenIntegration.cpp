@@ -68,7 +68,7 @@ void emberAfFixedLabelClusterServerInitCallback(EndpointId endpointId)
     }
 }
 
-void emberAfFixedLabelClusterServerShutdownCallback(EndpointId endpointId)
+void MatterFixedLabelClusterServerShutdownCallback(EndpointId endpointId)
 {
     uint16_t arrayIndex = 0;
     if (!FindEndpointWithLog(endpointId, arrayIndex))
@@ -85,10 +85,4 @@ void emberAfFixedLabelClusterServerShutdownCallback(EndpointId endpointId)
     gServers[arrayIndex].Destroy();
 }
 
-void MatterFixedLabelClusterServerInitCallback(EndpointId endpointId) {}
-
-void MatterFixedLabelClusterServerShutdownCallback(EndpointId endpointId) {}
-
 void MatterFixedLabelPluginServerInitCallback() {}
-
-void MatterFixedLabelPluginServerShutdownCallback() {}
