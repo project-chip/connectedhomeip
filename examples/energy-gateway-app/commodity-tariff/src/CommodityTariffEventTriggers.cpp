@@ -20,72 +20,98 @@
 #include <CommodityTariffSamples.h>
 #include <app/clusters/commodity-tariff-server/CommodityTariffTestEventTriggerHandler.h>
 
-#include <fstream>
-
 using namespace chip;
 using namespace chip::app;
 using namespace chip::app::DataModel;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::CommodityTariff;
 using namespace chip::app::Clusters::CommodityTariff::Structs;
+using namespace chip::app::Clusters::CommodityTariff::TariffDataSamples;
 
 static constexpr uint32_t kSecondsPer4hr = 14400; // 4 hours in seconds
 
-uint8_t presetIndex = 0;
+static uint8_t presetIndex = 0;
 
-static uint8_t days_ctr    = 0;
-static uint8_t entries_ctr = 0;
-bool first_start           = true;
-namespace TariffPresets {
 // Number of presets (compile-time constant)
-static constexpr size_t kCount = 2;
-
-// Array of all presets
-static constexpr std::array<const char *, kCount> kAllPresets = { TariffPresets::tariff_sample_1, TariffPresets::tariff_sample_2 };
 
 // Safe accessor function
-static constexpr const char * GetPreset(size_t index)
+static const TariffDataSet & GetNextPreset()
 {
-    if (index == kCount - 1)
-    {
-        presetIndex = 0;
-    }
-
-    return kAllPresets[index];
+    const TariffDataSet & preset = kTariffPresets[presetIndex];
+    presetIndex                  = (presetIndex + 1) % kCount;
+    return preset;
 }
-} // namespace TariffPresets
+
+#define COMMODITY_TARIFF_ATTRIBUTES_REQ                                                                                            \
+    X(TariffUnit)                                                                                                                  \
+    X(StartDate)                                                                                                                   \
+    X(TariffInfo)                                                                                                                  \
+    X(DayEntries)                                                                                                                  \
+    X(TariffComponents)                                                                                                            \
+    X(TariffPeriods)
+
+#define COMMODITY_TARIFF_ATTRIBUTES_OPT                                                                                            \
+    X(DefaultRandomizationOffset)                                                                                                  \
+    X(DefaultRandomizationType)                                                                                                    \
+    X(DayPatterns)                                                                                                                 \
+    X(IndividualDays)                                                                                                              \
+    X(CalendarPeriods)
 
 void SetTestEventTrigger_TariffDataUpdated()
 {
-    CommodityTariffDelegate * dg = GetCommodityTariffDelegate();
+    const TariffDataSet & tariff_preset = GetNextPreset();
+    CommodityTariffDelegate * dg        = GetCommodityTariffDelegate();
+    CommodityTariffInstance * instance  = GetCommodityTariffInstance();
+    CHIP_ERROR err                      = CHIP_NO_ERROR;
 
-    if (const char * preset = TariffPresets::GetPreset(presetIndex++))
-    {
-        LoadTariffFromJSONString(preset, dg);
+    auto process_attribute = [&](auto & mgmt_obj, const auto & preset_value, const char * name, bool is_required) {
+        if (!preset_value.IsNull())
+        {
+            err = mgmt_obj.SetNewValue(preset_value);
+            if (err != CHIP_NO_ERROR)
+            {
+                ChipLogError(NotSpecified, "Unable to load tariff data for the \"%s\" field", name);
+                return false;
+            }
+        }
+        else if (is_required)
+        {
+            ChipLogError(NotSpecified, "Invalid tariff data: the mandatory field \"%s\" is not present", name);
+            err = CHIP_ERROR_INVALID_ARGUMENT;
+            return false;
+        }
+        return true;
+    };
+
+#define X(attrName)                                                                                                                \
+    if (!process_attribute(dg->Get##attrName##_MgmtObj(), tariff_preset.attrName, #attrName, true))                                \
+    {                                                                                                                              \
+        return;                                                                                                                    \
     }
-    else
-    {
-        ChipLogProgress(NotSpecified, "Tariff data erasing");
-        dg->CleanupTariffData();
-        presetIndex = 0;
+    COMMODITY_TARIFF_ATTRIBUTES_REQ
+#undef X
+
+#define X(attrName)                                                                                                                \
+    if (!process_attribute(dg->Get##attrName##_MgmtObj(), tariff_preset.attrName, #attrName, false))                               \
+    {                                                                                                                              \
+        return;                                                                                                                    \
     }
+    COMMODITY_TARIFF_ATTRIBUTES_OPT
+#undef X
+
+    instance->ActivateTariffTimeTracking(tariff_preset.TariffTestTimestamp);
+
+    dg->TariffDataUpdate(tariff_preset.TariffTestTimestamp);
 }
+
+#undef COMMODITY_TARIFF_ATTRIBUTES_REQ
+#undef COMMODITY_TARIFF_ATTRIBUTES_OPT
 
 void SetTestEventTrigger_TariffDataClear()
 {
     CommodityTariffDelegate * dg = GetCommodityTariffDelegate();
 
     dg->CleanupTariffData();
-}
-
-static uint32_t GetCurrentTimestamp(void)
-{
-    System::Clock::Microseconds64 utcTimeUnix;
-    uint64_t chipEpochTime;
-    System::SystemClock().GetClock_RealTime(utcTimeUnix);
-    UnixEpochToChipEpochMicros(utcTimeUnix.count(), chipEpochTime);
-
-    return static_cast<uint32_t>(chipEpochTime / chip::kMicrosecondsPerSecond);
 }
 
 /*
@@ -98,12 +124,8 @@ void SetTestEventTrigger_TimeShift24h()
 
     if (instance)
     {
-        const uint32_t now                  = GetCurrentTimestamp();
-        const uint32_t secondsSinceMidnight = now % kSecondsPerDay;
-        const uint32_t delay                = (now - secondsSinceMidnight) + (days_ctr++) * kSecondsPerDay;
-
-        entries_ctr = 0;
-        instance->SetupTimeShiftOffset(delay);
+        instance->TariffTimeTrackingSetOffset(kSecondsPerDay);
+        instance->TariffTimeAttrsSync();
     }
 }
 
@@ -117,38 +139,19 @@ void SetTestEventTrigger_TimeShift4h()
 
     if (instance)
     {
-        const uint32_t now                  = GetCurrentTimestamp();
-        const uint32_t secondsSinceMidnight = now % kSecondsPerDay;
-        uint32_t delay                      = (now - secondsSinceMidnight);
-
-        if (first_start)
-        {
-            entries_ctr = static_cast<uint8_t>(secondsSinceMidnight / kSecondsPer4hr);
-            first_start = false;
-        }
-
-        delay += ++entries_ctr * kSecondsPer4hr;
-
-        ChipLogDetail(NotSpecified, "ForceDayEntriesAttrsUpdate: entry upd delay: %d", delay);
-
-        if (delay % kSecondsPerDay == 0)
-        {
-            SetTestEventTrigger_TimeShift24h();
-        }
-        else
-        {
-            // Move to next 4-hour interval for next call
-            delay += days_ctr * kSecondsPerDay;
-            instance->SetupTimeShiftOffset(delay);
-        }
+        instance->TariffTimeTrackingSetOffset(kSecondsPer4hr);
+        instance->TariffTimeAttrsSync();
     }
 }
 
 void SetTestEventTrigger_TimeShiftDisable()
 {
-    days_ctr    = 0;
-    entries_ctr = 0;
-    first_start = true;
+    CommodityTariffInstance * instance = GetCommodityTariffInstance();
+
+    if (instance)
+    {
+        instance->TariffTimeTrackingSetOffset(0);
+    }
 }
 
 bool HandleCommodityTariffTestEventTrigger(uint64_t eventTrigger)

@@ -17,7 +17,7 @@
  */
 
 #include <CommodityTariffMain.h>
-#include <fstream>
+
 
 /*
  *  @brief  Creates a Delegate and Instance for Commodity Tariff cluster
@@ -49,46 +49,6 @@ CommodityTariffDelegate * CommodityTariff::GetCommodityTariffDelegate()
     VerifyOrDieWithMsg(dg != nullptr, AppServer, "CommodityTariffInstance is null");
 
     return dg;
-}
-
-static bool parseFromConstant(const char * aJsonString, Json::Value & aRoot, std::string & aErrorMsg)
-{
-    Json::CharReaderBuilder builder;
-    JSONCPP_STRING errs;
-
-    if (aJsonString == nullptr)
-    {
-        aErrorMsg = "Null JSON string provided";
-        return false;
-    }
-
-    std::istringstream jsonStream(aJsonString);
-    bool success = Json::parseFromStream(builder, jsonStream, &aRoot, &errs);
-    if (!success)
-    {
-        aErrorMsg = "Failed to parse JSON: " + errs;
-    }
-
-    return success;
-}
-
-void LoadTariffFromJSONString(const char * aJsonStringPreset, CommodityTariffDelegate * dg)
-{
-    Json::Value json_root;
-    std::string errs;
-    if (parseFromConstant(aJsonStringPreset, json_root, errs))
-    {
-        ChipLogProgress(NotSpecified, "The tariff data loaded successfully. Tariff name: %s",
-                        json_root["TariffInfo"]["TariffLabel"].asString().c_str());
-        if (CHIP_NO_ERROR == dg->LoadTariffData(json_root))
-        {
-            dg->TariffDataUpdate();
-        }
-    }
-    else
-    {
-        ChipLogError(NotSpecified, "Unable to load tariff data, err: %s", errs.c_str());
-    }
 }
 
 CHIP_ERROR CommodityTariffInit(EndpointId endpointId)

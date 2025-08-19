@@ -17,18 +17,14 @@
  */
 #pragma once
 
-#include <json/json.h>
-
-#include <app/clusters/commodity-tariff-server/CommodityTariffAttrsDataMgmt.h>
+#include <CommodityTariffSamples.h>
 #include <app/clusters/commodity-tariff-server/commodity-tariff-server.h>
-#include <app/util/af-types.h>
-#include <lib/core/CHIPError.h>
 
 namespace chip {
 namespace app {
 namespace Clusters {
 namespace CommodityTariff {
-
+static constexpr uint32_t kTimerPollIntervalInSec = 30;
 using chip::Protocols::InteractionModel::Status;
 
 class CommodityTariffDelegate : public CommodityTariff::Delegate
@@ -36,8 +32,6 @@ class CommodityTariffDelegate : public CommodityTariff::Delegate
 public:
     CommodityTariffDelegate();
     ~CommodityTariffDelegate() = default;
-
-    CHIP_ERROR LoadTariffData(const Json::Value & value);
 
     bool TariffDataUpd_CrossValidator(TariffUpdateCtx & UpdCtx) override;
 };
@@ -62,8 +56,19 @@ public:
 
     CommodityTariffDelegate * GetDelegate() { return mDelegate; };
 
+    void ActivateTariffTimeTracking(uint32_t timestamp);
+    void TariffTimeTrackingSetOffset(uint32_t offset);
+
 private:
     CommodityTariffDelegate * mDelegate;
+    uint32_t TimestampNow    = 0;
+    uint32_t TestTimeOverlay = 0;
+
+    void ScheduleTariffTimeUpdate();
+    void TariffTimeUpdCb();
+
+protected:
+    uint32_t GetCurrentTimestamp() override;
 };
 
 } // namespace CommodityTariff
