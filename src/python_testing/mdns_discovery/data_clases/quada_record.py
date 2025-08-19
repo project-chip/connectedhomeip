@@ -25,25 +25,69 @@ from zeroconf._utils.ipaddress import ZeroconfIPv6Address
 from .json_serializable import JsonSerializable
 
 
+from dataclasses import dataclass
+
 @dataclass
 class AddressTypeInfo:
+    """
+    Represents general classification flags for an IP address.
+    Each flag indicates whether the address belongs to a specific
+    address category defined in IPv4/IPv6 standards.
+    """
+    # True if the address is globally routable on the Internet
+    # (e.g., IPv6 2000::/3 or IPv4 public ranges).
     is_global: bool
+
+    # True if the address is link-local (usable only on the local link/segment).
+    # IPv6: fe80::/10, IPv4: 169.254.0.0/16.
     is_link_local: bool
+
+    # True if the address is a loopback address.
+    # IPv6: ::1/128, IPv4: 127.0.0.0/8 (commonly 127.0.0.1).
     is_loopback: bool
+
+    # True if the address is multicast.
+    # IPv6: ff00::/8, IPv4: 224.0.0.0/4.
     is_multicast: bool
 
 
 @dataclass
 class SpecialAddressTypes:
+    """
+    Represents special categories of IPv6 addresses that can be derived
+    from or mapped to IPv4. Used to identify and annotate IPv6 addresses
+    with special handling or semantics.
+    """
+    # IPv6 address derived from a Teredo tunnel (2001::/32 range).
+    # Used for NAT traversal — wraps IPv4 inside IPv6.
     teredo: Optional[str]
+
+    # IPv6 address derived from 6to4 tunneling (2002::/16 range).
+    # Automatically maps an IPv4 into an IPv6 address.
     sixtofour: Optional[str]
+
+    # Whether the address falls into a reserved IPv6 block
+    # (e.g., ::/128, ::1/128, ::ffff:0:0/96, etc.).
     is_reserved: bool
+
+    # An IPv6 address that is explicitly mapped to an IPv4 address
+    # (::ffff:0:0/96 prefix). Example: ::ffff:192.0.2.128
     ipv4_mapped: Optional[str]
 
 
 @dataclass
 class AddressMeta:
+    """
+    Metadata about an IP address, capturing low-level details useful
+    for classification, serialization, or storage.
+    """
+    # The maximum number of bits in the address prefix.
+    # IPv4 = 32, IPv6 = 128.
     max_prefixlen: int
+
+    # Binary representation of the address, stored as a string.
+    # Typically corresponds to the output of ipaddress.packed,
+    # which gives the raw bytes of the address.
     packed: str
 
 
