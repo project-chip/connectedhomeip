@@ -248,14 +248,6 @@ list(
     -DCHIP_HAVE_CONFIG_H
 )
 
-if (matter_enable_ram_reduce)
-list(
-    APPEND chip_main_flags 
-
-    -DCONFIG_ENABLE_RAM_REDUCE=1
-)
-endif (matter_enable_ram_reduce)
-
 if (matter_enable_persistentstorage_audit)
 list(
     APPEND chip_main_flags
