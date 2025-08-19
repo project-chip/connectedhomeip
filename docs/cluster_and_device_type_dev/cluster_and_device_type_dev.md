@@ -172,10 +172,10 @@ persistence
 
 -   When using AttributeAccessInterface, you need to manage any Attributes that
     require Persistence.
--   This can be done by using GetSafeAttributePersistenceProvider()
+-   This can be done by using GetAttributePersistenceProvider()
 -   This provides a useful API for Reading & Writing values of any type to the
     default Persistence Store
-    -   [src/app/SafeAttributePersistenceProvider.h](https://github.com/project-chip/connectedhomeip/blob/master/src/app/SafeAttributePersistenceProvider.h)
+    -   [src/app/AttributePersistenceProvider.h](https://github.com/project-chip/connectedhomeip/blob/master/src/app/AttributePersistenceProvider.h)
 
 #### Ember layer read / write
 
