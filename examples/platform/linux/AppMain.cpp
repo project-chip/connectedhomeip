@@ -110,6 +110,9 @@
 #if CHIP_DEVICE_CONFIG_ENABLE_DEVICE_ENERGY_MANAGEMENT_TRIGGER
 #include <app/clusters/device-energy-management-server/DeviceEnergyManagementTestEventTriggerHandler.h>
 #endif
+#if CHIP_DEVICE_CONFIG_ENABLE_COMMODITY_METERING_TRIGGER
+#include <app/clusters/commodity-metering-server/CommodityMeteringTestEventTriggerHandler.h>
+#endif
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
 #include <app/icd/server/ICDManager.h> // nogncheck
 #endif
@@ -505,19 +508,6 @@ public:
         return mDefaultProvider->GetHardwareVersionString(buf, bufSize);
     }
 
-    CHIP_ERROR GetSoftwareVersionString(char * buf, size_t bufSize) override
-    {
-        // Check if it was set from the command line or fall back to default provider.
-        if (mSoftwareVersionString.has_value())
-        {
-            VerifyOrReturnError(CanFitInNullTerminatedString(mSoftwareVersionString.value(), bufSize), CHIP_ERROR_BUFFER_TOO_SMALL);
-            CopyString(buf, bufSize, mSoftwareVersionString.value().c_str());
-            return CHIP_NO_ERROR;
-        }
-
-        return mDefaultProvider->GetSoftwareVersionString(buf, bufSize);
-    }
-
     CHIP_ERROR GetRotatingDeviceIdUniqueId(MutableByteSpan & uniqueIdSpan) override
     {
         return mDefaultProvider->GetRotatingDeviceIdUniqueId(uniqueIdSpan);
@@ -546,7 +536,6 @@ public:
     void SetProductName(const std::string & buf) { mProductName = buf; }
     void SetSerialNumber(const std::string & buf) { mSerialNumber = buf; }
     void SetHardwareVersionString(const std::string & buf) { mHardwareVersionString = buf; }
-    void SetSoftwareVersionString(const std::string & buf) { mSoftwareVersionString = buf; }
 
 private:
     DeviceInstanceInfoProvider * mDefaultProvider;
@@ -558,7 +547,6 @@ private:
     std::optional<std::string> mProductName;
     std::optional<std::string> mSerialNumber;
     std::optional<std::string> mHardwareVersionString;
-    std::optional<std::string> mSoftwareVersionString;
 
     static inline bool CanFitInNullTerminatedString(const std::string & candidate, size_t bufSizeIncludingNull)
     {
@@ -768,10 +756,6 @@ int ChipLinuxAppInit(int argc, char * const argv[], OptionSet * customOptions,
     if (LinuxDeviceOptions::GetInstance().serialNumber.HasValue())
         gExampleDeviceInstanceInfoProvider.SetSerialNumber(LinuxDeviceOptions::GetInstance().serialNumber.Value());
 
-    if (LinuxDeviceOptions::GetInstance().softwareVersionString.HasValue())
-        gExampleDeviceInstanceInfoProvider.SetSoftwareVersionString(
-            LinuxDeviceOptions::GetInstance().softwareVersionString.Value());
-
     if (LinuxDeviceOptions::GetInstance().hardwareVersionString.HasValue())
         gExampleDeviceInstanceInfoProvider.SetHardwareVersionString(
             LinuxDeviceOptions::GetInstance().hardwareVersionString.Value());
@@ -903,6 +887,10 @@ void ChipLinuxAppMainLoop(AppMainLoopImplementation * impl)
 #if CHIP_DEVICE_CONFIG_ENABLE_DEVICE_ENERGY_MANAGEMENT_TRIGGER
     static DeviceEnergyManagementTestEventTriggerHandler sDeviceEnergyManagementTestEventTriggerHandler;
     sTestEventTriggerDelegate.AddHandler(&sDeviceEnergyManagementTestEventTriggerHandler);
+#endif
+#if CHIP_DEVICE_CONFIG_ENABLE_COMMODITY_METERING_TRIGGER
+    static CommodityMeteringTestEventTriggerHandler CommodityMeteringTestEventTriggerHandler;
+    sTestEventTriggerDelegate.AddHandler(&CommodityMeteringTestEventTriggerHandler);
 #endif
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
     sTestEventTriggerDelegate.AddHandler(&Server::GetInstance().GetICDManager());

@@ -21,6 +21,7 @@ using namespace chip;
 using namespace chip::app;
 using namespace chip::app::DataModel;
 using namespace chip::app::Clusters::Thermostat::Structs;
+using namespace System::Clock;
 
 namespace chip {
 namespace app {
@@ -47,8 +48,8 @@ ThermostatSuggestionStructWithOwnedMembers::operator=(const ThermostatSuggestion
     {
         ChipLogError(Zcl, "Failed to set Preset handle with err %" CHIP_ERROR_FORMAT, err.Format());
     }
-    SetEffectiveTime(other.effectiveTime);
-    SetExpirationTime(other.expirationTime);
+    SetEffectiveTime(Seconds32(other.effectiveTime));
+    SetExpirationTime(Seconds32(other.expirationTime));
     return *this;
 }
 
@@ -85,14 +86,14 @@ CHIP_ERROR ThermostatSuggestionStructWithOwnedMembers::SetPresetHandle(const Byt
     return CHIP_NO_ERROR;
 }
 
-void ThermostatSuggestionStructWithOwnedMembers::SetEffectiveTime(const uint32_t newEffectiveTime)
+void ThermostatSuggestionStructWithOwnedMembers::SetEffectiveTime(const Seconds32 newEffectiveTime)
 {
-    effectiveTime = newEffectiveTime;
+    effectiveTime = newEffectiveTime.count();
 }
 
-void ThermostatSuggestionStructWithOwnedMembers::SetExpirationTime(const uint32_t newExpirationTime)
+void ThermostatSuggestionStructWithOwnedMembers::SetExpirationTime(const Seconds32 newExpirationTime)
 {
-    expirationTime = newExpirationTime;
+    expirationTime = newExpirationTime.count();
 }
 
 uint8_t ThermostatSuggestionStructWithOwnedMembers::GetUniqueID() const
@@ -105,14 +106,14 @@ const ByteSpan & ThermostatSuggestionStructWithOwnedMembers::GetPresetHandle() c
     return presetHandle;
 }
 
-uint32_t ThermostatSuggestionStructWithOwnedMembers::GetEffectiveTime() const
+Seconds32 ThermostatSuggestionStructWithOwnedMembers::GetEffectiveTime() const
 {
-    return effectiveTime;
+    return Seconds32(effectiveTime);
 }
 
-uint32_t ThermostatSuggestionStructWithOwnedMembers::GetExpirationTime() const
+Seconds32 ThermostatSuggestionStructWithOwnedMembers::GetExpirationTime() const
 {
-    return expirationTime;
+    return Seconds32(expirationTime);
 }
 
 } // namespace Thermostat

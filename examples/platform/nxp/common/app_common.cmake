@@ -93,6 +93,13 @@ if (CONFIG_DIAG_LOGS_DEMO)
     )
 endif()
 
+if(CONFIG_CHIP_SE05X)
+    list(FIND EXTRA_MCUX_MODULES "${CHIP_ROOT}/third_party/simw-top-mini/repo/matter" se_index)
+    if(se_index EQUAL -1)
+        message(FATAL_ERROR "MCUX_MODULES must include ${CHIP_ROOT}/third_party/simw-top-mini/repo/matter in the application when CONFIG_CHIP_SE05X is enabled")
+    endif()
+endif()
+
 if (CONFIG_CHIP_APP_FACTORY_DATA)
     if (CONFIG_CHIP_APP_FACTORY_DATA_IMPL_PLATFORM)
         target_sources(app PRIVATE
@@ -104,9 +111,17 @@ if (CONFIG_CHIP_APP_FACTORY_DATA)
             )
         endif()
     elseif (CONFIG_CHIP_APP_FACTORY_DATA_IMPL_COMMON)
-        target_sources(app PRIVATE
-            ${EXAMPLE_PLATFORM_NXP_COMMON_DIR}/factory_data/source/AppFactoryDataDefaultImpl.cpp
-        )
+        if (CONFIG_CHIP_SE05X)
+            target_sources(app PRIVATE
+                ${EXAMPLE_PLATFORM_NXP_COMMON_DIR}/../se05x/rw61x_factory_data/AppFactoryDataDefaultImpl.cpp
+            )
+            target_include_directories(app PRIVATE
+                ${CHIP_ROOT}/examples)
+        else ()
+            target_sources(app PRIVATE
+                ${EXAMPLE_PLATFORM_NXP_COMMON_DIR}/factory_data/source/AppFactoryDataDefaultImpl.cpp
+            )
+        endif()
     endif()
 endif()
 
@@ -205,6 +220,10 @@ if (CONFIG_CHIP_APP_OPERATIONAL_KEYSTORE)
         target_sources(app PRIVATE
             ${EXAMPLE_PLATFORM_NXP_COMMON_DIR}/operational_keystore/source/OperationalKeystoreEmpty.cpp
         )
+    elseif (CONFIG_CHIP_APP_OPERATIONAL_KEYSTORE_SE05X)
+        target_sources(app PRIVATE
+            ${EXAMPLE_PLATFORM_NXP_COMMON_DIR}/operational_keystore/source/OperationalKeystoreSE05X.cpp
+        )
     endif()
 endif()
 
@@ -270,3 +289,11 @@ if (CONFIG_CHIP_APP_WIFI_CONNECT)
         ${EXAMPLE_PLATFORM_NXP_COMMON_DIR}/wifi_connect/source/WifiConnect.cpp
     )
 endif()
+
+# Use MCUX post-build function to convert the executable to binary format
+mcux_convert_binary(
+    BINARY ${APPLICATION_BINARY_DIR}/app.bin
+    TARGET app
+    TOOLCHAINS ${CONFIG_TOOLCHAIN}
+    EXTRA_ARGS "${CONFIG_REMOVE_SECTIONS_FROM_BIN}"
+)
