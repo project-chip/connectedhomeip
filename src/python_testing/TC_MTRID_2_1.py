@@ -46,14 +46,14 @@ import logging
 from TC_MTRIDTestBase import MeterIdentificationTestBaseHelper
 
 from matter.clusters import MeterIdentification
-from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+from matter.testing.matter_testing import TestStep, async_test_body, default_matter_test_main
 
 logger = logging.getLogger(__name__)
 
 cluster = MeterIdentification
 
 
-class TC_MTRID_2_1(MatterBaseTest, MeterIdentificationTestBaseHelper):
+class TC_MTRID_2_1(MeterIdentificationTestBaseHelper):
     """Implementation of test case TC_MTRID_2_1."""
 
     def desc_TC_MTRID_2_1(self) -> str:
