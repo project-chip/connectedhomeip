@@ -153,7 +153,6 @@ class MetadataReader:
                 script_args=attr.get("script-args"),
                 factory_reset=attr.get("factory-reset", False),
                 quiet=attr.get("quiet", True),
-                reboot_dut=attr.get("reboot-dut", False),
             ))
 
         return runs_metadata
