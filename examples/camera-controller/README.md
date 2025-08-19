@@ -202,8 +202,8 @@ URL, which, for example, looks like this: `https://localhost:1234/streams/1`
 Think of this server as a secure, private YouTube or Dropbox, but just for your
 camera's video clips.
 
-Here is the command to set up a local Push AV Server, using a virtual environment.
-(recommended)
+Here is the command to set up a local Push AV Server, using a virtual
+environment. (recommended)
 
 ```
 # Create a virtual environment
@@ -283,13 +283,3 @@ pushavstreamtransport manually-trigger-transport 1 0 1 1
 This command means, "Start recording now and upload the clip to the URL I gave
 you earlier." The camera then connects to the push_av_server at
 `https://localhost:1234/streams/1` and pushes the video clip.
-
-#### Summary Analogy
-
-Imagine you're setting up a package delivery: The Server is the destination
-address (e.g., "123 Main St"). The Controller is the person who writes the
-shipping label with that address and gives it to the sender. The Camera is the
-person with the package who reads the label and mails it. The
-`allocate-push-transport` command is the controller giving the shipping label to
-the camera. The `manually-trigger-transport` command is the controller saying,
-"Okay, send the package now!"
