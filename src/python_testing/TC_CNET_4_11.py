@@ -21,9 +21,10 @@ import platform
 import shutil
 import subprocess
 
-import chip.clusters as Clusters
-from chip.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main, has_feature, run_if_endpoint_matches
 from mobly import asserts
+
+import matter.clusters as Clusters
+from matter.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main, has_feature, run_if_endpoint_matches
 
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO)
