@@ -239,7 +239,8 @@ class TC_ACL_2_10(MatterBaseTest):
                 logging.info("Created restart flag file to signal app restart")
 
                 # The test runner will automatically wait for the app-ready-pattern before continuing
-                time.sleep(1) # Waiting 1 second after the app-ready-pattern is detected as we need to wait a tad longer for the app to be ready and stable, otherwise TH2 connection fails later on in test step 14.
+                # Waiting 1 second after the app-ready-pattern is detected as we need to wait a tad longer for the app to be ready and stable, otherwise TH2 connection fails later on in test step 14.
+                time.sleep(1)
 
                 # Expire sessions and re-establish connections
                 self.th1.ExpireSessions(self.dut_node_id)
@@ -339,7 +340,6 @@ class TC_ACL_2_10(MatterBaseTest):
         asserts.assert_equal(entry3.data, D_OK_EMPTY, "Data should be D_OK_EMPTY")
         asserts.assert_equal(entry3.fabricIndex, f1, "FabricIndex should be F1")
 
-
         # Step 17: Write minimum required ACL (admin only)
         self.step(17)
         acl_original = [Clusters.AccessControl.Structs.AccessControlEntryStruct(
@@ -370,6 +370,7 @@ class TC_ACL_2_10(MatterBaseTest):
                              "Remaining entry should have admin privilege")
         asserts.assert_equal(final_acl[0].subjects, [self.th1.nodeId],
                              "Entry should have admin node ID")
+
 
 if __name__ == "__main__":
     default_matter_test_main()
