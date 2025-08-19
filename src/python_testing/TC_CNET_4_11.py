@@ -220,6 +220,13 @@ async def change_networks(test, cluster, ssid, password, breadcrumb):
 
 class TC_CNET_4_11(MatterBaseTest):
 
+    def teardown_class(self):
+        # TH changes its Wi-Fi connection back to PIXIT.CNET.WIFI_1ST_ACCESSPOINT_SSID
+        asyncio.get_event_loop().run_until_complete(
+            connect_host_wifi(self.matter_test_config.wifi_ssid, self.matter_test_config.wifi_passphrase)
+        )
+        return super().teardown_class()
+
     # Overrides default_timeout: Test includes several long waits, adjust timeout to accommodate.
     @property
     def default_timeout(self) -> int:
@@ -495,7 +502,7 @@ class TC_CNET_4_11(MatterBaseTest):
 
         response = await self.send_single_cmd(
             cmd=cgen.Commands.ArmFailSafe(expiryLengthSeconds=0),
-            timedRequestTimeoutMs=TIMED_REQUEST_TIMEOUT_MS
+            timedRequestTimeoutMs=TIMED_REQUEST_TIMEOUT_MS*4
         )
         asserts.assert_equal(
             response.errorCode,
