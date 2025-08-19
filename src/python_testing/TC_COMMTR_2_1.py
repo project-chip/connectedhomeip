@@ -44,18 +44,17 @@
 
 import logging
 
-import test_plan_support
 from TC_COMMTR_TestBase import CommodityMeteringTestBaseHelper
 
 import matter.clusters as Clusters
-from matter.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main, has_cluster, run_if_endpoint_matches
+from matter.testing.matter_testing import TestStep, default_matter_test_main, has_cluster, run_if_endpoint_matches
 
 logger = logging.getLogger(__name__)
 
 cluster = Clusters.CommodityMetering
 
 
-class TC_COMMTR_2_1(MatterBaseTest, CommodityMeteringTestBaseHelper):
+class TC_COMMTR_2_1(CommodityMeteringTestBaseHelper):
     """Implementation of test case TC_COMMTR_2_1."""
 
     def desc_TC_COMMTR_2_1(self) -> str:
@@ -71,7 +70,7 @@ class TC_COMMTR_2_1(MatterBaseTest, CommodityMeteringTestBaseHelper):
     def steps_TC_COMMTR_2_1(self) -> list[TestStep]:
 
         steps = [
-            TestStep("1", "Commissioning, already done", test_plan_support.commission_if_required(), is_commissioning=True),
+            TestStep("1", "Commissioning, already done", "DUT is commissioned", is_commissioning=True),
             TestStep("2", "TH reads MaximumMeteredQuantities attribute", """
                      - DUT replies a null value or a uint16 value;
                      - Store value as MaxMeteredQuantities."""),
