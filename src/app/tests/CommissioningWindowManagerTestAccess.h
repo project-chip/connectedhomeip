@@ -18,6 +18,7 @@
 #pragma once
 
 #include <app/server/CommissioningWindowManager.h>
+#include <transport/Session.h>
 
 namespace chip {
 namespace Test
@@ -30,8 +31,15 @@ class CommissioningWindowManagerTestAccess
 {
     public:
         CommissioningWindowManagerTestAccess() = delete;
-        CommissioningWindowManagerTestAccess(mCommissioningWindowManager *cmwinMgr) : mwinMgr(cmwinMgr) {}
-        void SetPaseSession(SessionHolderWithDelegate PASEsession) {mcmwinMgr->mPASESession = PASEsession}
+        CommissioningWindowManagerTestAccess(CommissioningWindowManager *cmwinMgr) : mcmwinMgr(cmwinMgr) {}
+        void SetPASESession(SessionHolderWithDelegate PASEsession) 
+        {
+            auto optSession = PASEsession.Get();
+            if (optSession.HasValue())
+            {
+                mcmwinMgr->mPASESession.ShiftToSession(optSession.Value());
+            }
+        }
     private:
         CommissioningWindowManager * mcmwinMgr = nullptr;
 };

@@ -35,6 +35,8 @@
 #include <lib/core/StringBuilderAdapters.h>
 #include <pw_unit_test/framework.h>
 
+#include <app/tests/CommissioningWindowManagerTestAccess.h>
+
 using namespace chip::Crypto;
 
 using chip::CommissioningWindowAdvertisement;
@@ -416,21 +418,17 @@ TEST_F(TestCommissioningWindowManager, TestOnPlatformEventCommissioningComplete)
     event.Type = chip::DeviceLayer::DeviceEventType::kCommissioningComplete;
 
     commissionMgr.OnPlatformEvent(&event);
-    // EXPECT_TRUE(commissionMgr.IsCommissioningWindowOpen);
-
 }
 
-TEST_F(TestCommissioningWindowManager, TestOnPlatformEventOperationalNetworkEnabled) 
+TEST_F(TestCommissioningWindowManager, TestOnPlatformEventFailSafeTimerExpired) 
 {
     CommissioningWindowManager & commissionMgr = Server::GetInstance().GetCommissioningWindowManager();
-    
-    EXPECT_EQ(commissionMgr.OpenBasicCommissioningWindow(commissionMgr.MaxCommissioningTimeout(), CommissioningWindowAdvertisement::kDnssdOnly), CHIP_NO_ERROR);
+    chip::Test::CommissioningWindowManagerTestAccess access(&commissionMgr);
+    access.SetPASESession();
 
     chip::DeviceLayer::ChipDeviceEvent event;
     event.Type = chip::DeviceLayer::DeviceEventType::kFailSafeTimerExpired;
 
     commissionMgr.OnPlatformEvent(&event);
-    // EXPECT_TRUE(commissionMgr.IsCommissioningWindowOpen);
-
 }
 } // namespace
