@@ -140,11 +140,7 @@ static_library("efr32") {
   }
 
   if (chip_enable_multi_ota_requestor) {
-    if (use_SiWx917) {
-      public_deps += [ "${silabs_platform_dir}/multi-ota:multi-ota-efr32-ncp" ]
-    } else {
-      public_deps += [ "${silabs_platform_dir}/multi-ota:multi-ota-efr32" ]
-    }
+    public_deps += [ "${silabs_platform_dir}/multi-ota:multi-ota-efr32" ]
   } else if (chip_enable_ota_requestor) {
     sources += [
       "${silabs_platform_dir}/OTAImageProcessorImpl.h",

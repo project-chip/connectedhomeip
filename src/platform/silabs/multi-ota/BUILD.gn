@@ -67,26 +67,17 @@ source_set("multi-ota-efr32") {
     ":multi-ota-common",
     "${silabs_platform_dir}/platformAbstraction:gsdk",
   ]
-  if (chip_enable_multi_ota_encryption) {
-    sources += [ "${silabs_platform_dir}/multi-ota/OtaTlvEncryptionKey.cpp" ]
-  }
-}
 
-source_set("multi-ota-efr32-ncp") {
-  sources = [
-    "OTAFirmwareProcessor.cpp",
-    "SiWx917/OTAWiFiFirmwareProcessor.cpp",
-  ]
-  public_deps = [
-    ":multi-ota-common",
-    "${silabs_platform_dir}/platformAbstraction:gsdk",
-    "${silabs_platform_dir}/wifi:wifi-platform",
-  ]
+  # WiFi-specific sources and dependencies for NCP builds
+  if (use_SiWx917) {
+    sources += [ "SiWx917/OTAWiFiFirmwareProcessor.cpp" ]
+    public_deps += [ "${silabs_platform_dir}/wifi:wifi-platform" ]
+    public_configs = [ ":multi-ota-siwx-config" ]
+  }
 
   if (chip_enable_multi_ota_encryption) {
     sources += [ "${silabs_platform_dir}/multi-ota/OtaTlvEncryptionKey.cpp" ]
   }
-  public_configs = [ ":multi-ota-siwx-config" ]
 }
 
 source_set("multi-ota-siwx") {
