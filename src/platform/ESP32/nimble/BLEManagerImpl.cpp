@@ -66,6 +66,8 @@
 
 // Not declared in any header file, hence requires a forward declaration.
 extern "C" void ble_store_config_init(void);
+#include <tracing/macros.h>
+#include <tracing/metric_event.h>
 
 #define MAX_ADV_DATA_LEN 31
 #define CHIP_ADV_DATA_TYPE_FLAGS 0x01
@@ -118,6 +120,14 @@ SemaphoreHandle_t semaphoreHandle = NULL;
 // LE Random Device Address
 // (see Bluetooth® Core Specification 4.2 Vol 6, Part B, Section 1.3.2.1 "Static device address")
 uint8_t own_addr_type = BLE_OWN_ADDR_RANDOM;
+
+#ifdef CONFIG_ENABLE_ESP_DIAGNOSTICS_TRACE
+// Add metric key definitions near other const definitions (around line 90)
+constexpr chip::Tracing::MetricKey kMetricBluetoothConnections = "ble_con_count";
+constexpr chip::Tracing::MetricKey kMetricBluetoothGATTMTU     = "ble_mtu";
+constexpr chip::Tracing::MetricKey kMetricBluetoothSubscribers = "ble_subscribers";
+constexpr chip::Tracing::MetricKey kMetricBluetoothAdvMode     = "ble_adv_mode";
+#endif // CONFIG_ENABLE_ESP_DIAGNOSTICS_TRACE
 
 } // unnamed namespace
 
@@ -200,6 +210,7 @@ void BLEManagerImpl::ConnectDevice(const ble_addr_t & addr, uint16_t timeout)
 CHIP_ERROR BLEManagerImpl::_Init()
 {
     CHIP_ERROR err;
+    MATTER_TRACE_INSTANT("BLE_mode", "Nimble");
 
     // Initialize the Chip BleLayer.
 #ifdef CONFIG_ENABLE_ESP32_BLE_CONTROLLER
@@ -241,7 +252,10 @@ void BLEManagerImpl::_Shutdown()
         return;
     }
 
-    CancelBleAdvTimeoutTimer();
+#ifdef CONFIG_ENABLE_ESP_DIAGNOSTICS_TRACE
+    MATTER_LOG_METRIC(kMetricBluetoothConnections, static_cast<int32_t>(mNumGAPCons));
+#endif // CONFIG_ENABLE_ESP_DIAGNOSTICS_TRACE
+    MATTER_TRACE_INSTANT("BLE", "Shutdown");
 
     BleLayer::Shutdown();
 
@@ -277,6 +291,7 @@ void BLEManagerImpl::BleAdvTimeoutHandler(System::Layer *, void *)
     if (BLEMgrImpl().mFlags.Has(Flags::kFastAdvertisingEnabled))
     {
         ChipLogProgress(DeviceLayer, "bleAdv Timeout : Start slow advertisement");
+        MATTER_TRACE_INSTANT("BLE_adv", "SlowAdvertising");
         BLEMgrImpl().mFlags.Set(Flags::kFastAdvertisingEnabled, 0);
         BLEMgrImpl().mFlags.Set(Flags::kAdvertisingRefreshNeeded, 1);
 
@@ -289,6 +304,7 @@ void BLEManagerImpl::BleAdvTimeoutHandler(System::Layer *, void *)
     else
     {
         ChipLogProgress(DeviceLayer, "bleAdv Timeout : Start extended advertisement");
+        MATTER_TRACE_INSTANT("BLE_adv", "ExtendedAdvertising");
         BLEMgrImpl().mFlags.Set(Flags::kAdvertising);
         BLEMgrImpl().mFlags.Set(Flags::kExtAdvertisingEnabled);
         BLEMgr().SetAdvertisingMode(BLEAdvertisingMode::kSlowAdvertising);
@@ -377,6 +393,7 @@ void BLEManagerImpl::_OnPlatformEvent(const ChipDeviceEvent * event)
         break;
 
     case DeviceEventType::kCHIPoBLEConnectionError:
+        MATTER_TRACE_INSTANT("BLE_Error", ErrorStr(event->CHIPoBLEConnectionError.Reason));
         HandleConnectionError(event->CHIPoBLEConnectionError.ConId, event->CHIPoBLEConnectionError.Reason);
         break;
 
@@ -736,6 +753,7 @@ void BLEManagerImpl::DriveBLEState(void)
     // Perform any initialization actions that must occur after the Chip task is running.
     if (!mFlags.Has(Flags::kAsyncInitCompleted))
     {
+        MATTER_TRACE_INSTANT("BLE_State", "AsyncInitStarted");
         mFlags.Set(Flags::kAsyncInitCompleted);
     }
 
@@ -747,6 +765,7 @@ void BLEManagerImpl::DriveBLEState(void)
     // Initializes the ESP BLE layer if needed.
     if (mServiceMode == ConnectivityManager::kCHIPoBLEServiceMode_Enabled && !mFlags.Has(Flags::kESPBLELayerInitialized))
     {
+        MATTER_TRACE_INSTANT("BLE_State", "Initializing");
         err = InitESPBleLayer();
         SuccessOrExit(err);
 
@@ -796,6 +815,7 @@ void BLEManagerImpl::DriveBLEState(void)
             if (!mFlags.Has(Flags::kAdvertising))
             {
                 ChipLogProgress(DeviceLayer, "CHIPoBLE advertising started");
+                MATTER_TRACE_INSTANT("BLE_State", "AdvertisingStarted");
 
                 mFlags.Set(Flags::kAdvertising);
 
@@ -836,6 +856,7 @@ void BLEManagerImpl::DriveBLEState(void)
             mFlags.Set(Flags::kFastAdvertisingEnabled, true);
 
             ChipLogProgress(DeviceLayer, "CHIPoBLE advertising stopped");
+            MATTER_TRACE_INSTANT("BLE_State", "AdvertisingStopped");
 
             CancelBleAdvTimeoutTimer();
 
@@ -862,6 +883,7 @@ exit:
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(DeviceLayer, "Disabling CHIPoBLE service due to error: %" CHIP_ERROR_FORMAT, err.Format());
+        MATTER_TRACE_INSTANT("BLE_Error", "InitFailed");
         mServiceMode = ConnectivityManager::kCHIPoBLEServiceMode_Disabled;
     }
 }
@@ -1036,6 +1058,7 @@ void BLEManagerImpl::ClaimBLEMemory(System::Layer *, void *)
 CHIP_ERROR BLEManagerImpl::DeinitBLE()
 {
     esp_err_t err = ESP_OK;
+    MATTER_TRACE_INSTANT("BLE_State", "Deinit");
     VerifyOrReturnError(ble_hs_is_enabled(), CHIP_ERROR_INCORRECT_STATE, ChipLogProgress(DeviceLayer, "BLE already deinited"));
     VerifyOrReturnError(0 == nimble_port_stop(), MapBLEError(ESP_FAIL), ChipLogError(DeviceLayer, "nimble_port_stop() failed"));
 
@@ -1174,6 +1197,10 @@ CHIP_ERROR BLEManagerImpl::StartAdvertising(void)
 
     ChipLogProgress(DeviceLayer, "Configuring CHIPoBLE advertising (interval %" PRIu32 " ms, %sconnectable)",
                     (((uint32_t) adv_params.itvl_min) * 10) / 16, (connectable) ? "" : "non-");
+
+    const char * advMode =
+        mFlags.Has(Flags::kFastAdvertisingEnabled) ? "fast" : (mFlags.Has(Flags::kExtAdvertisingEnabled) ? "extended" : "slow");
+    MATTER_TRACE_INSTANT("BLE_adv", advMode);
 
     {
         if (ble_gap_ext_adv_active(kMatterAdvInstance))
@@ -1678,9 +1705,13 @@ CHIP_ERROR BLEManagerImpl::HandleGAPPeripheralConnect(struct ble_gap_event * gap
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     ChipLogProgress(DeviceLayer, "BLE GAP connection established (con %u)", gapEvent->connect.conn_handle);
+    MATTER_TRACE_INSTANT("BLE_Connection", "Established");
 
-    // Track the number of active GAP connections.
     mNumGAPCons++;
+#ifdef CONFIG_ENABLE_ESP_DIAGNOSTICS_TRACE
+    MATTER_LOG_METRIC(kMetricBluetoothConnections, static_cast<int32_t>(mNumGAPCons));
+#endif // CONFIG_ENABLE_ESP_DIAGNOSTICS_TRACE
+
     err = SetSubscribed(gapEvent->connect.conn_handle);
     VerifyOrExit(err != CHIP_ERROR_NO_MEMORY, err = CHIP_NO_ERROR);
     SuccessOrExit(err);
@@ -1700,6 +1731,7 @@ CHIP_ERROR BLEManagerImpl::HandleGAPConnect(struct ble_gap_event * gapEvent)
     rc = ble_gattc_exchange_mtu(gapEvent->connect.conn_handle, NULL, NULL);
     if (rc != 0)
     {
+        MATTER_TRACE_INSTANT("BLE_Error", "MTU exchange failed");
         return CHIP_ERROR_INTERNAL;
     }
 
@@ -1714,10 +1746,15 @@ CHIP_ERROR BLEManagerImpl::HandleGAPDisconnect(struct ble_gap_event * gapEvent)
     ChipLogProgress(DeviceLayer, "BLE GAP connection terminated (con %u reason 0x%02x)", gapEvent->disconnect.conn.conn_handle,
                     gapEvent->disconnect.reason);
 
+    MATTER_TRACE_INSTANT("BLE_Disconnect", "ConnectionTerminated");
+
     // Update the number of GAP connections.
     if (mNumGAPCons > 0)
     {
         mNumGAPCons--;
+#ifdef CONFIG_ENABLE_ESP_DIAGNOSTICS_TRACE
+        MATTER_LOG_METRIC(kMetricBluetoothConnections, static_cast<int32_t>(mNumGAPCons));
+#endif // CONFIG_ENABLE_ESP_DIAGNOSTICS_TRACE
     }
 
 #ifdef CONFIG_ENABLE_ESP32_BLE_CONTROLLER
@@ -1780,10 +1817,23 @@ CHIP_ERROR BLEManagerImpl::SetSubscribed(uint16_t conId)
     if (freeIndex < kMaxConnections)
     {
         mSubscribedConIds[freeIndex] = conId;
+        uint16_t subscriberCount     = 0;
+        for (uint16_t i = 0; i < kMaxConnections; i++)
+        {
+            if (mSubscribedConIds[i] != BLE_CONNECTION_UNINITIALIZED)
+            {
+                subscriberCount++;
+            }
+        }
+#ifdef CONFIG_ENABLE_ESP_DIAGNOSTICS_TRACE
+        MATTER_LOG_METRIC(kMetricBluetoothSubscribers, static_cast<int32_t>(subscriberCount));
+#endif // CONFIG_ENABLE_ESP_DIAGNOSTICS_TRACE
+        MATTER_TRACE_INSTANT("BLE_Subscribe", "Added");
         return CHIP_NO_ERROR;
     }
     else
     {
+        MATTER_TRACE_INSTANT("BLE_Error", "MaxSubscribersReached");
         return CHIP_ERROR_NO_MEMORY;
     }
 }
@@ -1794,7 +1844,17 @@ bool BLEManagerImpl::UnsetSubscribed(uint16_t conId)
     {
         if (mSubscribedConIds[i] == conId)
         {
-            mSubscribedConIds[i] = BLE_CONNECTION_UNINITIALIZED;
+            mSubscribedConIds[i]     = BLE_CONNECTION_UNINITIALIZED;
+            uint16_t subscriberCount = 0;
+            for (uint16_t count = 0; count < kMaxConnections; count++)
+            {
+                if (mSubscribedConIds[count] != BLE_CONNECTION_UNINITIALIZED)
+                {
+                    subscriberCount++;
+                }
+            }
+            MATTER_LOG_METRIC(kMetricBluetoothSubscribers, static_cast<int32_t>(subscriberCount));
+            MATTER_TRACE_INSTANT("BLE_Subscribe", "Removed");
             return true;
         }
     }
@@ -1835,14 +1895,23 @@ int BLEManagerImpl::ble_svr_gap_event(struct ble_gap_event * event, void * arg)
 
     case BLE_GAP_EVENT_ADV_COMPLETE:
         ESP_LOGD(TAG, "BLE_GAP_EVENT_ADV_COMPLETE event");
+        MATTER_TRACE_INSTANT("BLE_Adv", "Complete");
         break;
 
     case BLE_GAP_EVENT_SUBSCRIBE:
         if (event->subscribe.attr_handle == sInstance.mTXCharCCCDAttrHandle)
         {
             sInstance.HandleTXCharCCCDWrite(event);
+            uint16_t subscriberCount = 0;
+            for (uint16_t i = 0; i < kMaxConnections; i++)
+            {
+                if (sInstance.mSubscribedConIds[i] != BLE_CONNECTION_UNINITIALIZED)
+                {
+                    subscriberCount++;
+                }
+            }
+            MATTER_LOG_METRIC(kMetricBluetoothSubscribers, static_cast<int32_t>(subscriberCount));
         }
-
         break;
 
     case BLE_GAP_EVENT_NOTIFY_TX:
@@ -1855,6 +1924,9 @@ int BLEManagerImpl::ble_svr_gap_event(struct ble_gap_event * event, void * arg)
 
     case BLE_GAP_EVENT_MTU:
         ESP_LOGD(TAG, "BLE_GAP_EVENT_MTU = %d channel id = %d", event->mtu.value, event->mtu.channel_id);
+#ifdef CONFIG_ENABLE_ESP_DIAGNOSTICS_TRACE
+        MATTER_LOG_METRIC(kMetricBluetoothGATTMTU, static_cast<int32_t>(event->mtu.value));
+#endif // CONFIG_ENABLE_ESP_DIAGNOSTICS_TRACE
         break;
 
 #ifdef CONFIG_ENABLE_ESP32_BLE_CONTROLLER
@@ -1874,6 +1946,7 @@ exit:
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(DeviceLayer, "Disabling CHIPoBLE service due to error: %" CHIP_ERROR_FORMAT, err.Format());
+        MATTER_TRACE_INSTANT("BLE_Error", ErrorStr(err));
         sInstance.mServiceMode = ConnectivityManager::kCHIPoBLEServiceMode_Disabled;
     }
 
@@ -2036,6 +2109,7 @@ CHIP_ERROR BLEManagerImpl::ConfigureBle(uint32_t aAdapterId, bool aIsCentral)
     mIsCentral = aIsCentral;
     if (mIsCentral)
     {
+        MATTER_TRACE_INSTANT("BLE_role", "Central");
         int rc = peer_init(MYNEWT_VAL(BLE_MAX_CONNECTIONS), 64, 64, 64);
         assert(rc == 0);
     }
