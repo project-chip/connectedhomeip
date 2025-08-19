@@ -88,7 +88,7 @@ public:
 
     BLEEndPoint * Get(size_t i) const
     {
-        alignas(BLEEndPoint) static std::byte sStorage[sizeof(BLEEndPoint)];
+        alignas(BLEEndPoint) static std::byte sStorage[sizeof(BLEEndPoint) * BLE_LAYER_NUM_BLE_ENDPOINTS];
         VerifyOrReturnValue(i < BLE_LAYER_NUM_BLE_ENDPOINTS, nullptr);
         return reinterpret_cast<BLEEndPoint *>(&sStorage[i]);
     }
