@@ -15,74 +15,17 @@
 #    limitations under the License.
 #
 
-import os
-import pprint
-import sys
 
+import matter.clusters as Clusters
 import graphviz
 from rich.console import Console
 
+from matter.testing.basic_composition import BasicCompositionTests
 from matter.testing.matter_testing import MatterBaseTest, async_test_body, default_matter_test_main  # noqa: E402
 from matter.testing.taglist_and_topology_test import build_tree_for_graph
 
 console = None
 maxClusterNameLength = 30
-
-
-# Given there is currently no tranlation from DeviceTypeID to the device type name,
-# this dict is created for now. When some more general is available, it should be updated to use this.
-deviceTypeDict = {
-    22: "Root Node",
-    17: "Power Source",
-    18: "OTA Requestor",
-    20: "OTA Provider",
-    14: "Aggregator",
-    19: "Bridged Node",
-    256: "On/Off Light",
-    257: "Dimmable Light",
-    268: "Color Temperature Light",
-    269: "Extended Color Light",
-    266: "On/Off Plug-in Unit",
-    267: "Dimmable Plug-In Unit",
-    771: "Pump",
-    259: "On/Off Light Switch",
-    260: "Dimmer Switch",
-    261: "Color Dimmer Switch",
-    2112: "Control Bridge",
-    772: "Pump Controller",
-    15: "Generic Switch",
-    21: "Contact Sensor",
-    262: "Light Sensor",
-    263: "Occupancy Sensor",
-    770: "Temperature Sensor",
-    773: "Pressure Sensor",
-    774: "Flow Sensor",
-    775: "Humidity Sensor",
-    2128: "On/Off Sensor",
-    10: "Door Lock",
-    11: "Door Lock Controller",
-    514: "Window Covering",
-    515: "Window Covering Controller",
-    768: "Heating/Cooling Unit",
-    769: "Thermostat",
-    43: "Fan",
-    35: "Casting Video Player",
-    34: "Speaker",
-    36: "Content App",
-    40: "Basic Video Player",
-    41: "Casting Video Client",
-    42: "Video Remote Control",
-    39: "Mode Select",
-    45: "Air Purifier",
-    44: "Air Quality Sensor",
-    112: "Refrigerator",
-    113: "Temperature Controlled Cabinet",
-    114: "Room Air Conditioner",
-    115: "Laundry Washer",
-    116: "Robotic Vacuum Cleaner",
-    117: "Dishwasher",
-    118: "Smoke CO Alarm"
-}
 
 
 def AddServerOrClientNode(graphSection, endpoint, clusterName, color, nodeRef):
@@ -97,7 +40,7 @@ def AddServerOrClientNode(graphSection, endpoint, clusterName, color, nodeRef):
     graphSection.edge(nodeRef, f"ep{endpoint}_{clusterName}", style="invis")
 
 
-def CreateEndpointGraph(graph, graphSection, endpoint, wildcardResponse):
+def CreateEndpointGraph(graph, graphSection, endpoint, wildcardResponse, device_type_xml):
 
     numberOfRowsInEndpoint = 2
 
@@ -106,7 +49,7 @@ def CreateEndpointGraph(graph, graphSection, endpoint, wildcardResponse):
     listOfDeviceTypes = []
     for deviceTypeStruct in wildcardResponse[endpoint][Clusters.Objects.Descriptor][Clusters.Objects.Descriptor.Attributes.DeviceTypeList]:
         try:
-            listOfDeviceTypes.append(deviceTypeDict[deviceTypeStruct.deviceType])
+            listOfDeviceTypes.append(device_type_xml[deviceTypeStruct.deviceType].name)
         except KeyError:
             listOfDeviceTypes.append(deviceTypeStruct.deviceType)
 
@@ -215,49 +158,16 @@ def create_graph(wildcardResponse, xml_device_types):
     deviceGraph.save(f'matter_device_graph_0x{vid:04X}_0x{pid:04X}_{software_version}.dot')
 
 
-class TC_MatterDeviceGraph(MatterBaseTest):
+class TC_MatterDeviceGraph(MatterBaseTest, BasicCompositionTests):
+    @async_test_body
+    async def setup_class(self):
+        super().setup_class()
+        await self.setup_class_helper(False)
+        self.build_spec_xmls()
+
     @async_test_body
     async def test_matter_device_graph(self):
-
-
-<< << << < HEAD: src/tools/device-graph/matter-device-graph.py
-
-# Create console to print
-global console
-console = Console()
-
-# Run descriptor validation test
-dev_ctrl = self.default_controller
-
-# Perform wildcard read to get all attributes from device
-console.print("[blue]Capturing data from device")
-wildcardResponse = await dev_ctrl.ReadAttribute(self.dut_node_id, [('*')])
-# console.print(wildcardResponse)
-
-# Creating graph object
-deviceGraph = graphviz.Digraph()
- deviceGraph.attr(style="rounded", splines="line", compound="true")
-
-  console.print("[blue]Generating graph")
-   # Loop through each endpoint in the response from the wildcard read
-   for endpoint in wildcardResponse:
-
-        if endpoint == 0:
-            with deviceGraph.subgraph(name='cluster_rootnode') as rootNodeSection:
-                CreateEndpointGraph(deviceGraph, rootNodeSection, endpoint, wildcardResponse)
-        else:
-            with deviceGraph.subgraph(name='cluster_endpoints') as endpointsSection:
-                with endpointsSection.subgraph(name=f'cluster_{endpoint}') as endpointSection:
-                    CreateEndpointGraph(deviceGraph, endpointSection, endpoint, wildcardResponse)
-
-    deviceGraph.save(f'{sys.path[0]}/matter-device-graph.dot')
-
-    deviceDataFile = open(f'{sys.path[0]}/matter-device-data.txt', 'w')
-    deviceDataFile.write(pprint.pformat((wildcardResponse)))
-    deviceDataFile.close()
-== == == =
-create_graph(self.endpoints, self.xml_device_types)
->>>>>> > 091d31b870(Update drawing script to use parser): src/tools/device-graph/matter_device_graph.py
+        create_graph(self.endpoints, self.xml_device_types)
 
 
 if __name__ == "__main__":
