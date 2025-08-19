@@ -23,7 +23,7 @@
 
 #if SL_WIFI
 #include <platform/silabs/wifi/ncp/spi_multiplex.h>
-#endif                                              // SL_WIFI
+#endif  // SL_WIFI
 
 extern "C" {
 #include "btl_interface.h"
