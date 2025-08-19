@@ -21,11 +21,11 @@
 #     factory-reset: true
 #     quiet: true
 #     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
+#     app-ready-pattern: "Server initialization complete"
 #     reboot-dut: true
 #     script-args: >
 #       --storage-path admin_storage.json
 #       --commissioning-method on-network
-#       --int-arg PIXIT.WAITTIME.REBOOT:5
 #       --discriminator 1234
 #       --passcode 20202021
 #       --trace-to json:${TRACE_TEST_JSON}.json
@@ -98,6 +98,8 @@ class TC_ACL_2_10(MatterBaseTest):
                      "Result is SUCCESS, value is list of AccessControlEntryStruct containing 2 elements, and MUST NOT contain an element with FabricIndex `F2`"),
             TestStep(16, "TH1 reads DUT Endpoint 0 AccessControl cluster Extension attribute",
                      "Result is SUCCESS, value is list of AccessControlExtensionStruct containing 1 element; MUST NOT contain an element with FabricIndex `F2` or Data `D_OK_SINGLE`"),
+            TestStep(17, "TH1 writes DUT Endpoint 0 AccessControl cluster ACL attribute value is acl_original",
+                     "Result is SUCCESS"),
         ]
         return steps
 
@@ -223,26 +225,21 @@ class TC_ACL_2_10(MatterBaseTest):
 
         self.step(9)
         # Reboot DUT
-        # Check if we're in CI environment
-        self.is_ci = self.check_pics("PICS_SDK_CI_ONLY")
+        # Check if restart flag file is available (indicates test runner supports app restart)
+        restart_flag_file = self.get_restart_flag_file()
 
-        if not self.is_ci:
-            # Non-CI environment: ask user to manually reboot
+        if not restart_flag_file:
+            # No restart flag file: ask user to manually reboot
             self.wait_for_user_input(prompt_msg="Reboot the DUT. Press Enter when ready.\n")
         else:
-            # CI environment: restart the app process using the test runner functionality
-            restart_flag_file = self.get_restart_flag_file()
-            if not restart_flag_file:
-                asserts.fail("Restart flag file not set. This test must be run via a runner that provides it.")
-
             try:
                 # Create the restart flag file to signal the test runner
                 with open(restart_flag_file, "w") as f:
                     f.write("restart")
                 logging.info("Created restart flag file to signal app restart")
 
-                # Wait for app to restart (give it some time)
-                time.sleep(5)
+                # The test runner will automatically wait for the app-ready-pattern before continuing
+                time.sleep(1) # Waiting 1 second after the app-ready-pattern is detected as we need to wait a tad longer for the app to be ready and stable, otherwise TH2 connection fails later on in test step 14.
 
                 # Expire sessions and re-establish connections
                 self.th1.ExpireSessions(self.dut_node_id)
@@ -253,18 +250,6 @@ class TC_ACL_2_10(MatterBaseTest):
             except Exception as e:
                 logging.error(f"Failed to restart app: {e}")
                 asserts.fail(f"App restart failed: {e}")
-
-        # Wait for reboot to complete
-        if 'PIXIT.WAITTIME.REBOOT' in self.matter_test_config.global_test_params:
-            wait_time_reboot = self.matter_test_config.global_test_params['PIXIT.WAITTIME.REBOOT']
-            if wait_time_reboot == 0:
-                asserts.fail("PIXIT.WAITTIME.REBOOT shall be higher than 0.")
-        else:
-            wait_time_reboot = 5  # default fallback
-
-        logging.info(f"Waiting {wait_time_reboot} seconds for reboot to complete")
-        time.sleep(wait_time_reboot)
-        logging.info("Reboot wait completed")
 
         self.step(10)
         # TH1 reads DUT Endpoint 0 AccessControl cluster ACL attribute
@@ -354,6 +339,37 @@ class TC_ACL_2_10(MatterBaseTest):
         asserts.assert_equal(entry3.data, D_OK_EMPTY, "Data should be D_OK_EMPTY")
         asserts.assert_equal(entry3.fabricIndex, f1, "FabricIndex should be F1")
 
+
+        # Step 17: Write minimum required ACL (admin only)
+        self.step(17)
+        acl_original = [Clusters.AccessControl.Structs.AccessControlEntryStruct(
+            privilege=Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kAdminister,
+            authMode=Clusters.AccessControl.Enums.AccessControlEntryAuthModeEnum.kCase,
+            subjects=[self.th1.nodeId],
+            targets=NullValue,
+            fabricIndex=f1
+        )]
+        result = await self.th1.WriteAttribute(
+            self.dut_node_id,
+            [(0, acl_attribute(value=acl_original))]
+        )
+        asserts.assert_equal(result[0].Status, Status.Success,
+                             "Write admin-only ACL should succeed")
+        logging.info("Successfully reset ACL to admin-only entry")
+
+        # Final verification that ACL contains only admin entry
+        final_acl = await self.read_single_attribute_check_success(
+            endpoint=0,
+            cluster=acl_cluster,
+            attribute=acl_attribute
+        )
+        asserts.assert_equal(len(final_acl), 1,
+                             "ACL should contain exactly one admin entry")
+        asserts.assert_equal(final_acl[0].privilege,
+                             Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kAdminister,
+                             "Remaining entry should have admin privilege")
+        asserts.assert_equal(final_acl[0].subjects, [self.th1.nodeId],
+                             "Entry should have admin node ID")
 
 if __name__ == "__main__":
     default_matter_test_main()

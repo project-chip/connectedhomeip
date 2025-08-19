@@ -33,7 +33,6 @@ class Metadata:
     factory_reset_app_only: bool = False
     script_gdb: bool = False
     quiet: bool = False
-    reboot_dut: bool = False
 
 
 class NamedStringIO(StringIO):

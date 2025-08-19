@@ -92,7 +92,7 @@ def forward_fifo(path: str, f_out: typing.BinaryIO, stop_event: threading.Event)
 
 
 class AppProcessManager:
-    def __init__(self, app, app_args, app_ready_pattern, stream_output, app_stdin_pipe=None):
+    def __init__(self, app: str, app_args: str, app_ready_pattern: typing.Optional[str], stream_output: typing.BinaryIO, app_stdin_pipe: typing.Optional[str] = None):
         self.app = app
         self.app_args = app_args
         self.app_ready_pattern = app_ready_pattern
