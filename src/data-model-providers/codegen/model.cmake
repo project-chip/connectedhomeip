@@ -15,6 +15,8 @@ set(BASE_DIR ${CMAKE_CURRENT_LIST_DIR})
 
 # If you change this list, please ALSO CHANGE model.gni
 SET(CODEGEN_DATA_MODEL_SOURCES
+  "${BASE_DIR}/ClusterIntegration.cpp"
+  "${BASE_DIR}/ClusterIntegration.h"
   "${BASE_DIR}/CodegenDataModelProvider.cpp"
   "${BASE_DIR}/CodegenDataModelProvider.h"
   "${BASE_DIR}/CodegenDataModelProvider_Read.cpp"
