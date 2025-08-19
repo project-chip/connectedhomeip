@@ -1,0 +1,13 @@
+#include "darwin-framework-tool.xcconfig"
+
+// Compiler settings
+WARNING_CFLAGS = -Wformat -Wformat-nonliteral -Wformat-security -Wconversion -Wno-documentation -Wno-error=sign-conversion
+
+// Linker settings
+
+LDFLAGS_NO_INITS =
+LDFLAGS_UNEXPORTS =
+OTHER_LDFLAGS[sdk=macosx*] = $(inherited)
+
+LD_RUNPATH_SEARCH_PATHS = /System/Library/Frameworks
+FRAMEWORK_SEARCH_PATHS = $(SDKROOT)/System/iOSSupport/System/Library/Frameworks
