@@ -617,12 +617,7 @@ class MdnsDiscovery:
             await azc.async_add_service_listener(service_type, service_listener)
 
             # Wait for the add/update service event or timeout
-            try:
-                logger.info(f"Service record information lookup {rec_types} for '{service_name}' in progress...")
-                await wait_for(service_listener.updated_event.wait(), SERVICE_LISTENER_TIMEOUT_SEC)
-            except TimeoutError:
-                logger.info(
-                    f"Service record information lookup {rec_types} for '{service_name}' timeout ({SERVICE_LISTENER_TIMEOUT_SEC} seconds) reached without an update.")
+            await service_listener.wait_for_service_update(service_name, rec_types, SERVICE_LISTENER_TIMEOUT_SEC)
 
             # Prepare and perform query
             service_info = MdnsAsyncServiceInfo(name=service_name, type_=service_type)
