@@ -93,10 +93,11 @@ public:
         factoryInitParams.listenPort               = 88;
         factoryInitParams.fabricTable              = nullptr;
         factoryInitParams.fabricIndependentStorage = &factoryStorage;
-        
+
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
         factoryInitParams.wifipaf_layer = WiFiPAF::WiFiPAFLayer::GetWiFiPAFLayer();
 #endif
+
     }
     void TearDown() override
     {
