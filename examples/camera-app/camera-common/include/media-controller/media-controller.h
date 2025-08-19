@@ -47,4 +47,5 @@ public:
     // if the transport is ready.
     virtual void DistributeVideo(const char * data, size_t size, uint16_t videoStreamID) = 0;
     virtual void DistributeAudio(const char * data, size_t size, uint16_t audioStreamID) = 0;
+    virtual void SetPreRollLength(Transport * transport, uint16_t PreRollBufferLength)   = 0;
 };
