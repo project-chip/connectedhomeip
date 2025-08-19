@@ -35,12 +35,13 @@
 
 import logging
 
-import chip.clusters as Clusters
-from chip.interaction_model import InteractionModelError, Status
-from chip.testing.event_attribute_reporting import AttributeSubscriptionHandler
-from chip.testing.matter_testing import (AttributeMatcher, AttributeValue, MatterBaseTest, TestStep, async_test_body,
-                                         default_matter_test_main)
 from mobly import asserts
+
+import matter.clusters as Clusters
+from matter.interaction_model import InteractionModelError, Status
+from matter.testing.event_attribute_reporting import AttributeSubscriptionHandler
+from matter.testing.matter_testing import (AttributeMatcher, AttributeValue, MatterBaseTest, TestStep, async_test_body,
+                                           default_matter_test_main)
 
 
 def main_state_matcher(main_state: Clusters.ClosureControl.Enums.MainStateEnum) -> AttributeMatcher:
@@ -298,7 +299,7 @@ class TC_CLCTRL_3_1(MatterBaseTest):
 
                     logging.info("Unlatch the DUT manually to set OverallCurrentState.Latch to False")
                     # Simulating manual unlatching by waiting for user input
-                    self.wait_for_user_input(promt_msg="Press Enter after unlatching the DUT...")
+                    self.wait_for_user_input(prompt_msg="Press Enter after unlatching the DUT...")
                     logging.info("Manual unlatching completed.")
                 else:
                     logging.info("LatchControlModes Bit 1 is 1 (RemoteUnlatching = True), proceeding to step 5f")

@@ -33,6 +33,7 @@ namespace {
 using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;
+using namespace chip::app::Clusters::GeneralDiagnostics::Attributes;
 using namespace chip::app::DataModel;
 
 template <class T>
@@ -64,15 +65,9 @@ struct TestGeneralDiagnosticsCluster : public ::testing::Test
 
 TEST_F(TestGeneralDiagnosticsCluster, CompileTest)
 {
-    const GeneralDiagnosticsEnabledAttributes enabledAttributes{
-        .enableTotalOperationalHours = false,
-        .enableBootReason            = false,
-        .enableActiveHardwareFaults  = false,
-        .enableActiveRadioFaults     = false,
-        .enableActiveNetworkFaults   = false,
-    };
+    const GeneralDiagnosticsCluster::OptionalAttributeSet optionalAttributeSet;
 
-    GeneralDiagnosticsCluster cluster(enabledAttributes);
+    GeneralDiagnosticsCluster cluster(optionalAttributeSet);
     ASSERT_EQ(cluster.GetClusterFlags({ kRootEndpointId, GeneralDiagnostics::Id }), BitFlags<ClusterQualityFlags>());
 
     const GeneralDiagnosticsFunctionsConfig functionsConfig{
@@ -80,7 +75,7 @@ TEST_F(TestGeneralDiagnosticsCluster, CompileTest)
         .enablePayloadSnaphot = true,
     };
 
-    GeneralDiagnosticsClusterFullConfigurable clusterWithTimeAndPayload(enabledAttributes, functionsConfig);
+    GeneralDiagnosticsClusterFullConfigurable clusterWithTimeAndPayload(optionalAttributeSet, functionsConfig);
     ASSERT_EQ(clusterWithTimeAndPayload.GetClusterFlags({ kRootEndpointId, GeneralDiagnostics::Id }),
               BitFlags<ClusterQualityFlags>());
 }
@@ -92,15 +87,9 @@ TEST_F(TestGeneralDiagnosticsCluster, AttributesTest)
         class NullProvider : public DeviceLayer::DiagnosticDataProvider
         {
         };
-        const GeneralDiagnosticsEnabledAttributes enabledAttributes{
-            .enableTotalOperationalHours = false,
-            .enableBootReason            = false,
-            .enableActiveHardwareFaults  = false,
-            .enableActiveRadioFaults     = false,
-            .enableActiveNetworkFaults   = false,
-        };
+        const GeneralDiagnosticsCluster::OptionalAttributeSet optionalAttributeSet;
         ScopedDiagnosticsProvider<NullProvider> nullProvider;
-        GeneralDiagnosticsCluster cluster(enabledAttributes);
+        GeneralDiagnosticsCluster cluster(optionalAttributeSet);
 
         // Check required accepted commands are present
         ConcreteClusterPath generalDiagnosticsPath = ConcreteClusterPath(kRootEndpointId, GeneralDiagnostics::Id);
@@ -179,16 +168,16 @@ TEST_F(TestGeneralDiagnosticsCluster, AttributesTest)
         };
 
         // Enable all the optional attributes
-        const GeneralDiagnosticsEnabledAttributes enabledAttributes{
-            .enableTotalOperationalHours = true,
-            .enableBootReason            = true,
-            .enableActiveHardwareFaults  = true,
-            .enableActiveRadioFaults     = true,
-            .enableActiveNetworkFaults   = true,
-        };
+        const GeneralDiagnosticsCluster::OptionalAttributeSet optionalAttributeSet =
+            GeneralDiagnosticsCluster::OptionalAttributeSet()
+                .Set<TotalOperationalHours::Id>()
+                .Set<BootReason::Id>()
+                .Set<ActiveHardwareFaults::Id>()
+                .Set<ActiveRadioFaults::Id>()
+                .Set<ActiveNetworkFaults::Id>();
 
         ScopedDiagnosticsProvider<AllProvider> nullProvider;
-        GeneralDiagnosticsCluster cluster(enabledAttributes);
+        GeneralDiagnosticsCluster cluster(optionalAttributeSet);
 
         // Check mandatory commands are present
         ConcreteClusterPath generalDiagnosticsPath = ConcreteClusterPath(kRootEndpointId, GeneralDiagnostics::Id);
