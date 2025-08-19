@@ -149,7 +149,7 @@ class TC_SU_2_8(MatterBaseTest):
         asserts.assert_equal(previous_state, event.previousState,
                              f"Previous state is {event.previousState} and it should be {previous_state}.")
         asserts.assert_equal(next_state, event.newState,
-                             f"Newvious state is {event.newState} and it should be {next_state}.")
+                             f"New state is {event.newState} and it should be {next_state}.")
 
         asserts.assert_equal(software_version, event.targetSoftwareVersion,
                              f"Target version is {event.targetSoftwareVersion} and it should be {software_version}.")
