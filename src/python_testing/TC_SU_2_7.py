@@ -44,7 +44,12 @@
 
 import logging
 import signal
+from os import environ, getcwd, kill
+from subprocess import PIPE, Popen
+from time import sleep
+
 import psutil
+from mobly import asserts
 
 import matter.clusters as Clusters
 from matter import ChipDeviceCtrl
@@ -52,10 +57,6 @@ from matter.clusters.Types import NullValue
 from matter.interaction_model import Status
 from matter.testing.event_attribute_reporting import EventSubscriptionHandler
 from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
-
-from mobly import asserts
-from os import kill
-
 
 # Create a logger
 logger = logging.getLogger(__name__)
@@ -69,6 +70,8 @@ class TC_SU_2_7(MatterBaseTest):
 
     ota_prov = Clusters.OtaSoftwareUpdateProvider
     ota_req = Clusters.OtaSoftwareUpdateRequestor
+    current_provider_app_pid = None
+    current_requestor_app_pid = None
 
     def desc_TC_SU_2_7(self) -> str:
         return "[TC-SU-2.7] Verifying Events on OTA-R(DUT)"
@@ -107,7 +110,7 @@ class TC_SU_2_7(MatterBaseTest):
         ]
         return steps
 
-    def get_pid_by_name(self, process_name):
+    def _get_pid_by_name(self, process_name):
         """
         Finds the PID of a process by its name.
         Returns the PID if found, None otherwise.
@@ -117,11 +120,32 @@ class TC_SU_2_7(MatterBaseTest):
                 return proc.info['pid']
         return None
 
+    async def _verify_version_applied_basic_information(self, controller, target_version):
+
+        basicinfo_softwareversion = await self.read_single_attribute_check_success(
+            dev_ctrl=controller,
+            cluster=Clusters.BasicInformation,
+            attribute=Clusters.BasicInformation.Attributes.SoftwareVersion
+        )
+
+        # asserts.assert_equal(version_applied_event, target_version, f"Version fom event is not {update_software_version}")
+        asserts.assert_equal(basicinfo_softwareversion, target_version,
+                             f"Version from basic info cluster is not {target_version}")
+
     async def _write_acl_rules(self, controller, endpoint: int, node_id):
         logger.info("Configure ACL Entries")
         admin_node_id = controller.nodeId
         logging.info(f"Admin node id is {admin_node_id}")
         logging.info(f"FabricId value: {controller.fabricId}")
+
+        acl_attr_base = await self.read_single_attribute_check_success(
+            dev_ctrl=controller,
+            cluster=Clusters.AccessControl,
+            attribute=Clusters.AccessControl.Attributes.Acl,
+            node_id=node_id,
+        )
+        logger.info(f"Requestor base acl {acl_attr_base}")
+
         acl_entries = [
             Clusters.Objects.AccessControl.Structs.AccessControlEntryStruct(
                 fabricIndex=controller.fabricId,
@@ -143,7 +167,9 @@ class TC_SU_2_7(MatterBaseTest):
             )
         ]
 
-        acl_attr = Clusters.Objects.AccessControl.Attributes.Acl(value=acl_entries)
+        all_acls = acl_attr_base + acl_entries
+
+        acl_attr = Clusters.Objects.AccessControl.Attributes.Acl(value=all_acls)
         resp = await controller.WriteAttribute(node_id, [(endpoint, acl_attr)])
         asserts.assert_equal(resp[0].Status, Status.Success, "ACL write failed.")
         logger.info("ACL permissions configured successfully.")
@@ -187,7 +213,7 @@ class TC_SU_2_7(MatterBaseTest):
         cmd_announce_ota_provider = self.ota_req.Commands.AnnounceOTAProvider(
             providerNodeID=provider_node_id,
             vendorID=0xFFF1,
-            announcementReason=self.ota_req.Enums.AnnouncementReasonEnum.kUrgentUpdateAvailable,
+            announcementReason=self.ota_req.Enums.AnnouncementReasonEnum.kUpdateAvailable,
             metadataForNode=None,
             endpoint=0
         )
@@ -201,20 +227,80 @@ class TC_SU_2_7(MatterBaseTest):
         logger.info(f"Announce command sent {cmd_resp}")
         return cmd_resp
 
+    def _launch_app(self, app_name_path: str, env_app_name: str, base_params: list = [], extra_params: list = []) -> int:
+        """_summary_
+
+        Args:
+            app_name_path (str): _description_
+            env_app_name (str): _description_
+            base_params (list, optional): _description_. Defaults to [].
+            extra_params (list, optional): _description_. Defaults to [].
+
+        Returns:
+            int: PID of the process
+        """
+
+        base_path = getcwd()
+        app_path = ''
+        # Verify if the env variable for the ota provider is available
+        if environ.get(env_app_name):
+            app_path = environ.get(env_app_name)
+        else:
+            app_path = f"{base_path}/{app_name_path}"
+        params = base_params + extra_params
+        params.insert(0, app_path)
+        print(" ".join(params))
+        process = Popen(params, shell=True, stdout=PIPE, stderr=PIPE)
+        return process
+
+    def _launch_provider_app(self, extra_params: list = []):
+        """Launch the provider app with different configurations.
+        """
+        pid = self._launch_app(
+            app_name_path='out/debug/chip-ota-provider-app',
+            env_app_name="OTA_PROVIDER_APP",
+            base_params=[
+                '--filepath firmware_requestor_v2.min.ota',
+                '--discriminator 321',
+                '--secured-device-port 5541', "--passcode 2321",
+            ],
+            extra_params=extra_params
+        )
+        sleep(5)
+        return pid
+
+    def _launch_requestor_app(self, extra_params: list = []):
+        pid = self._launch_app(
+            app_name_path='out/debug/chip-ota-requestor-app',
+            env_app_name="OTA_REQUESTOR_APP",
+            base_params=[
+                "--discriminator 123",
+                '--passcode 2123',
+                "--secured-device-port 5540",
+                "--KVS /tmp/chip_kvs_requestor",
+            ],
+            extra_params=extra_params,
+        )
+        return pid
+
+    def _kill_apps(self):
+        logger.info("Killing apps PROVIDER and REQUESTOR")
+        kill(self.current_provider_app_pid, signal.SIGTERM)
+        kill(self.current_provider_app_pid, signal.SIGTERM)
+        # Clean the kvs files
+
     @async_test_body
     async def test_TC_SU_2_7(self):
 
         #### Apps to run for this test case ###
-        # Terminal 1: ./out/debug/chip-ota-requestor-app --discriminator 123 --passcode 2123 --secured-device-port 5541 --autoApplyImage --KVS /tmp/chip_kvs_requestor
-        # Terminal 2:  ./out/debug/chip-ota-provider-app --filepath firmware_requestor_v2.min.ota  --discriminator 321 --passcode 2321
+        # Terminal 1: ./out/debug/chip-ota-requestor-app --discriminator 123 --passcode 2123 --secured-device-port 5541 --autoApplyImage --KVS /tmp/chip_kvs_requestor --autoApplyImage
+        # Terminal 2: ./out/debug/chip-ota-provider-app --filepath firmware_requestor_v2.min.ota  --discriminator 321 --passcode 2321
         # Terminal 3: python3 src/python_testing/TC_SU_2_7.py --commissioning-method on-network --passcode 2123 --discriminator 123 --endpoint 0 --nodeId 123
         ###
-
-        basic_information = Clusters.BasicInformation
         # Define varaibles to use in test case
-        update_software_version = '2'
-        provider_pid = self.get_pid_by_name("chip-ota-provider-app")
-        logger.info(f"Test started with provider PID {provider_pid}")
+        update_software_version = 2
+        self.current_provider_app_pid = self._get_pid_by_name("chip-ota-provider-app")
+        logger.info(f"Test started with provider PID {self.current_provider_app_pid}")
 
         # Requestor is the DUT
         admin_node_id = self.default_controller.nodeId
@@ -233,7 +319,7 @@ class TC_SU_2_7(MatterBaseTest):
         logger.info(f"Provider NodeId: {provider_data['node_id']}")
 
         # commission TH2 for
-        resp = await controller.CommissionOnNetwork(
+        await controller.CommissionOnNetwork(
             nodeId=provider_data['node_id'],
             setupPinCode=provider_data['setup_pincode'],
             filterType=ChipDeviceCtrl.DiscoveryFilterType.LONG_DISCRIMINATOR,
@@ -244,6 +330,14 @@ class TC_SU_2_7(MatterBaseTest):
 
         # write the rules into the provider
         await self._write_acl_rules(controller=controller, endpoint=0, node_id=provider_data['node_id'])
+
+        acl_attr = await self.read_single_attribute_check_success(
+            dev_ctrl=controller,
+            cluster=Clusters.AccessControl,
+            attribute=Clusters.AccessControl.Attributes.Acl,
+            node_id=provider_data['node_id'],
+        )
+        logger.info(f"AFTER ACL Entries {acl_attr}")
 
         await self._write_ota_providers(controller=controller, provider_node_id=provider_data['node_id'], endpoint=0)
 
@@ -261,71 +355,120 @@ class TC_SU_2_7(MatterBaseTest):
         # Create event subscriber
         state_transition_event_handler = EventSubscriptionHandler(
             expected_cluster=self.ota_req, expected_event_id=self.ota_req.Events.StateTransition.event_id)
-        await state_transition_event_handler.start(controller, requestor_node_id, 0)
+        await state_transition_event_handler.start(controller, requestor_node_id, endpoint=0, min_interval_sec=0, max_interval_sec=5000)
+        update_applied_event_handler = EventSubscriptionHandler(
+            expected_cluster=self.ota_req, expected_event_id=self.ota_req.Events.VersionApplied.event_id)
+        await update_applied_event_handler.start(controller, requestor_node_id, endpoint=0, min_interval_sec=0, max_interval_sec=6000)
 
         await self._announce_ota_provider(controller, provider_data['node_id'], requestor_node_id)
-
         # Register event
         event_report = state_transition_event_handler.wait_for_event_report(self.ota_req.Events.StateTransition, timeout_sec=5)
+
         # Start on idle to then change to Querying
         asserts.assert_equal(event_report.previousState, self.ota_req.Enums.UpdateStateEnum.kIdle, "Previous state was not Idle")
         asserts.assert_equal(event_report.newState,  self.ota_req.Enums.UpdateStateEnum.kQuerying, "New state is not KQueryng")
-        asserts.assert_equal(event_report.software_version,  update_software_version,
-                             f"Target version is not {update_software_version}")
+        asserts.assert_equal(event_report.targetSoftwareVersion,  NullValue, "target is not Null")
         logger.info(f"Event report {event_report}")
 
+        # Event for Downloading
         event_report = state_transition_event_handler.wait_for_event_report(self.ota_req.Events.StateTransition, timeout_sec=10)
         logger.info(f"Event report after QueryImage {event_report}")
         asserts.assert_equal(event_report.previousState, self.ota_req.Enums.UpdateStateEnum.kQuerying,
                              "Previous state was not Querying")
         asserts.assert_equal(event_report.newState, self.ota_req.Enums.UpdateStateEnum.kDownloading,
                              "Current state is not Downloading")
-        asserts.assert_equal(event_report.software_version,  update_software_version,
-                             f"Target version is not {update_software_version}")
+        asserts.assert_equal(event_report.targetSoftwareVersion,  update_software_version,
+                             f"Target version is not {update_software_version} from {event_report.targetSoftwareVersion}")
 
-        event_report = state_transition_event_handler.wait_for_event_report(self.ota_req.Events.StateTransition, timeout_sec=60*5)
+        # # Event for Applying
+        event_report = state_transition_event_handler.wait_for_event_report(self.ota_req.Events.StateTransition, timeout_sec=60*6)
+        logger.info(f"Event report for Complete transfer {event_report}")
         asserts.assert_equal(event_report.newState, self.ota_req.Enums.UpdateStateEnum.kApplying, "Current state is not Applying")
+        asserts.assert_equal(event_report.previousState, self.ota_req.Enums.UpdateStateEnum.kDownloading,
+                             "Current state is not Applying")
+        asserts.assert_equal(event_report.targetSoftwareVersion,  update_software_version,
+                             f"Target version is not {update_software_version} from {event_report.targetSoftwareVersion}")
 
         self.step(2)
-        # await self._announce_ota_provider(controller, provider_data['node_id'], requestor_node_id)
-        # event_report = state_transition_event_handler.wait_for_event_report(self.ota_req.Events.StateTransition, timeout_sec=60*5)
-        # logger.info(f"Event report after QueryImage {event_report}")
-        # asserts.assert_equal(event_report.newState, self.ota_req.Enums.UpdateStateEnum.kApplying,
-        #                      "Previous state was not Querying")
+        self._kill_apps()
+        # self._launch_provider_app(extra_params=["--delayedQueryActionTimeSec 60","--queryImageStatus  busy"])
+        # self._launch_requestor_app(extra_params=[])
+        await self._announce_ota_provider(controller, provider_data['node_id'], requestor_node_id)
+        event_report = state_transition_event_handler.wait_for_event_report(self.ota_req.Events.StateTransition, timeout_sec=60*5)
+        asserts.assert_equal(event_report.newState, self.ota_req.Enums.UpdateStateEnum.kQuerying,
+                             "Current state was not Querying")
+        logger.info(f"Event report after QueryImage {event_report}")
+        event_report = state_transition_event_handler.wait_for_event_report(self.ota_req.Events.StateTransition, timeout_sec=60*5)
+        asserts.assert_equal(event_report.newState, self.ota_req.Enums.UpdateStateEnum.kDelayedOnQuery,
+                             "Current state is not DelayedOnQuery")
+        asserts.assert_equal(event_report.reason, self.ota_req.Enums.ChangeReasonEnum.kDelayByProvider,
+                             "Current state is not DelayedOnQuery")
+        logger.info(f"Event report after 2 {event_report}")
 
         self.step(3)
-        logger.info(f"Killing ota-provider-app PID {provider_pid}")
-        kill(provider_pid, signal.SIGTERM)
+        self._kill_apps()
+        # self._launch_provider_app(extra_params=[])
+        # self._launch_requestor_app(extra_params=["--autoApplyImage"])
+        logger.info(f"Killing ota-provider-app PID {self.current_provider_app_pid}")
+        kill(self.current_provider_app_pid, signal.SIGTERM)
+        sleep(2)
         await self._announce_ota_provider(controller, provider_data['node_id'], requestor_node_id)
-        event_report = state_transition_event_handler.wait_for_event_report(self.ota_req.Events.StateTransition, timeout_sec=60*4)
-        asserts.assert_equal(event_report.previousState, self.ota_req.Enums.UpdateStateEnum.kDownloading,
-                             "Previous state was not Downloading")
-        asserts.assert_equal(event_report.newState, self.ota_req.Enums.UpdateStateEnum.kIdle,
-                             "Current state is not Idle")
+        event_report = state_transition_event_handler.wait_for_event_report(self.ota_req.Events.StateTransition, timeout_sec=60*1)
+        # logger.info(f"First event {event_report}")
+        # asserts.assert_equal(event_report.newState, self.ota_req.Enums.UpdateStateEnum.kQuerying,"Current state is not Idle")
+        event_report = state_transition_event_handler.wait_for_event_report(self.ota_req.Events.StateTransition, timeout_sec=60*5)
+        # logger.info(f"Second event {event_report}")
+        asserts.assert_equal(event_report.newState, self.ota_req.Enums.UpdateStateEnum.kIdle, "Current state is not Idle")
+        asserts.assert_equal(event_report.reason, self.ota_req.Enums.ChangeReasonEnum.kFailure, "Current reason is not failure")
 
         self.step(4)
+        # Launch the provider app with user consent flag true and  deferred to trigger the event
+        self._kill_apps()
+        # self._launch_provider_app(extra_params=["-u deferred", "-c"])
+        # self._launch_requestor_app(extra_params=["-c true", "-u deferred"])
+        await self._announce_ota_provider(controller, provider_data['node_id'], requestor_node_id)
+        event_report = state_transition_event_handler.wait_for_event_report(self.ota_req.Events.StateTransition, timeout_sec=30)
+        asserts.assert_equal(event_report.newState, self.ota_req.Enums.UpdateStateEnum.kQuerying)
+        event_report = state_transition_event_handler.wait_for_event_report(self.ota_req.Events.StateTransition, timeout_sec=30)
+        asserts.assert_equal(event_report.newState, self.ota_req.Enums.UpdateStateEnum.kDelayedOnUserConsent)
 
         self.step(5)
+        self._kill_apps()
+        # self._launch_provider_app()
+        # self._launch_requestor_app()
+        error_download_event_handler = EventSubscriptionHandler(
+            expected_cluster=self.ota_req, expected_event_id=self.ota_req.Events.DownloadError.event_id)
+        await error_download_event_handler.start(controller, requestor_node_id, endpoint=0, min_interval_sec=0, max_interval_sec=5000)
+        await self._announce_ota_provider(controller, provider_data['node_id'], requestor_node_id)
+        event_report = error_download_event_handler.wait_for_event_report(self.ota_req.Events.DownloadError, timeout_sec=60*5)
+        asserts.assert_equal(event_report.softwareversion, update_software_version)
+        # asserts.assert_equal(event_report.bytesdownloaded, self.ota_req.Enums.UpdateStateEnum.kQuerying)
+        # asserts.assert_equal(event_report.progresspercent, self.ota_req.Enums.UpdateStateEnum.kQuerying)
+        asserts.assert_equal(event_report.platformcode, NullValue)
 
         self.step(6)
+        # fails
+        # Again the process to update the cluster but we check the Delayed on Apply
+        # Delayed on apply
+        # self._launch_provider_app(extra_params["--applyUpdateAction awaitNextAction","--delayedApplyActionTimeSec 10"])
+        # self._launch_requestor_app()
+        await self._announce_ota_provider(controller, provider_data['node_id'], requestor_node_id)
+        event_report = state_transition_event_handler.wait_for_event_report(self.ota_req.Events.StateTransition, timeout_sec=30)
+        asserts.assert_equal(event_report.newState, self.ota_req.Enums.UpdateStateEnum.kQuerying)
+        event_report = state_transition_event_handler.wait_for_event_report(self.ota_req.Events.StateTransition, timeout_sec=30)
+        asserts.assert_equal(event_report.newState, self.ota_req.Enums.UpdateStateEnum.kDownloading)
+        event_report = state_transition_event_handler.wait_for_event_report(self.ota_req.Events.StateTransition, timeout_sec=60*5)
+        asserts.assert_equal(event_report.newState, self.ota_req.Enums.UpdateStateEnum.kDelayedOnApply)
 
         self.step(7)
-        # Update is completed at tihs point
-        events_subscriber_req_va = EventSubscriptionHandler(
-            expected_cluster=self.ota_req, expected_event_id=self.ota_req.Events.VersionApplied.event_id)
-        await events_subscriber_req_va.start(controller, requestor_node_id, 0)
-        event_report = events_subscriber_req_va.wait_for_event_report(self.ota_req.Events.VersionApplied, timeout_sec=60*10)
-        version_applied_event = event_report.softwareVersion
-
-        basicinfo_softwareversion = await self.read_single_attribute_check_success(
-            dev_ctrl=controller,
-            cluster=basic_information,
-            attribute=basic_information.Attributes.softwareVersion
-        )
-
-        asserts.assert_equal(version_applied_event, update_software_version, f"Version fom event is not {update_software_version}")
-        asserts.assert_equal(basicinfo_softwareversion, update_software_version,
-                             f"Version from basic info cluster is not {update_software_version}")
+        # Update is completed at this point, listen for
+        event_report = state_transition_event_handler.wait_for_event_report(self.ota_req.Events.StateTransition, timeout_sec=60*2)
+        asserts.assert_equal(event_report.newState, self.ota_req.Enums.UpdateStateEnum.kApplying)
+        event_report_version_applied = update_applied_event_handler.wait_for_event_report(
+            self.ota_req.Events.VersionApplied, timeout_sec=60*2)
+        self._verify_version_applied_basic_information(controller=controller, target_version=update_software_version)
+        asserts.assert_equal(event_report_version_applied.softwareVersion, update_software_version,
+                             f"Version fom event is not {update_software_version}")
 
 
 if __name__ == "__main__":
