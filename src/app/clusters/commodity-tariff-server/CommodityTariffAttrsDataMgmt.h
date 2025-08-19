@@ -25,9 +25,9 @@
 
 #include <atomic>
 #include <cassert>
-#include <string> 
-#include <unordered_set>
 #include <map>
+#include <string>
+#include <unordered_set>
 
 namespace chip {
 
@@ -446,7 +446,8 @@ CHIP_ERROR Validate(const T & aValue, AttributeId aAttrId, void * aCtx);
 
 #define X(attrType)                                                                                                                \
     template <>                                                                                                                    \
-    CHIP_ERROR Validate<DataModel::Nullable<attrType>>(const DataModel::Nullable<attrType> & aValue, AttributeId aAttrId, void * aCtx);
+    CHIP_ERROR Validate<DataModel::Nullable<attrType>>(const DataModel::Nullable<attrType> & aValue, AttributeId aAttrId,          \
+                                                       void * aCtx);
 ALL_ATTRIBUTES
 #undef X
 
@@ -1043,7 +1044,7 @@ private:
      * @brief Validates the new value using type-specific validation
      * @return CHIP_ERROR Validation result
      */
-    CHIP_ERROR ValidateNewValue() { return Validate<ValueType>(GetNewValueRef(), mAttrId,  mAuxData); }
+    CHIP_ERROR ValidateNewValue() { return Validate<ValueType>(GetNewValueRef(), mAttrId, mAuxData); }
 
     /**
      * @brief Compares two lists for equality
