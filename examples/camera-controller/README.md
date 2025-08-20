@@ -172,10 +172,11 @@ pairing onnetwork 1 20202021
 
 Wait for the command to complete and confirm that commissioning was successful.
 
-3. To start a live video stream from your camera, use the liveview start command
-   followed by the nodeID you set during pairing. For example, if your nodeID is
-   1, you can request a stream with a minimum resolution of 800x600 pixels and a
-   minimum frame rate of 30 frames per second using the command below.
+3. To start a live video stream from your camera, use the `liveview start`
+   command followed by the nodeID you set during pairing. For example, if your
+   nodeID is 1, you can request a stream with a minimum resolution of 800x600
+   pixels and a minimum frame rate of 30 frames per second using the command
+   below.
 
 ```
 liveview start 1 --min-res-width 800 --min-res-height 600 --min-framerate 30
