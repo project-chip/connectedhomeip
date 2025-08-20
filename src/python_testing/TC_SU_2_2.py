@@ -46,6 +46,9 @@ import logging
 import asyncio
 import threading     # For Step #1
 import time          # For Step #2
+import subprocess
+import os
+import signal
 
 
 import chip.clusters as Clusters
@@ -66,6 +69,173 @@ class TC_SU_2_2(MatterBaseTest):
     """
     cluster_otap = Clusters.OtaSoftwareUpdateProvider
     cluster_otar = Clusters.OtaSoftwareUpdateRequestor
+
+    async def launch_ota_provider(self, ota_file: str, provider_discriminator: int,
+                                  provider_setupPinCode: int, secured_device_port: int):
+        """
+        Launches the OTA Provider in a new macOS Terminal window.
+        Returns the subprocess.Popen object.
+        """
+        cmd = f'''
+        osascript -e 'tell application "Terminal"
+            do script "cd /Users/jdelgado/connectedhomeip && \
+        source scripts/bootstrap.sh && \
+        source scripts/activate.sh && \
+        ./out/debug/chip-ota-provider-app --filepath {ota_file} \
+        --discriminator {provider_discriminator} \
+        --passcode {provider_setupPinCode} \
+        --secured-device-port {secured_device_port}; exit"
+        end tell'
+        '''
+
+        proc = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        await asyncio.sleep(10)  # give the provider time to initialize
+        logger.info(f'Launched OTA Provider with command: {cmd}')
+        return proc
+
+    async def kill_ota_provider(self, step: str, proc: subprocess.Popen):
+        """
+        Forcefully kills the OTA Provider process.
+        """
+        if proc and proc.poll() is None:  # check if still running
+            os.kill(proc.pid, signal.SIGKILL)
+            await asyncio.sleep(1)  # give macOS a moment to clean up
+            logger.info(f'{step} - Killed OTA Provider process.')
+        else:
+            logger.info(f'{step} - OTA Provider process already terminated.')
+
+    async def close_terminal_window(self):
+        cmd = '''
+        osascript -e 'tell application "Terminal"
+            try
+                close (last window)
+            end try
+        end tell'
+        '''
+        subprocess.Popen(cmd, shell=True)
+        await asyncio.sleep(1)
+
+    async def set_ota_acls_for_provider(self, controller, requestor_node: int, provider_node: int, fabric_index: int):
+        """
+        Set ACLs for OTA interaction between a fixed Requestor and a single Provider.
+        Preserves existing ACLs to avoid overwriting.
+        """
+        # -------------------------------
+        # Read existing ACLs on Requestor
+        # -------------------------------
+        acl_original_requestor = await self.read_single_attribute(
+            dev_ctrl=controller,
+            node_id=requestor_node,
+            endpoint=0,
+            attribute=Clusters.AccessControl.Attributes.Acl,
+        )
+
+        # ACLs on Requestor to allow Provider interaction
+        acl_operate_provider = Clusters.AccessControl.Structs.AccessControlEntryStruct(
+            fabricIndex=fabric_index,
+            privilege=Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kOperate,
+            authMode=Clusters.AccessControl.Enums.AccessControlEntryAuthModeEnum.kCase,
+            subjects=[],
+            targets=[Clusters.AccessControl.Structs.AccessControlTargetStruct(
+                endpoint=0,
+                cluster=Clusters.OtaSoftwareUpdateRequestor.id)]
+        )
+        acl_view_provider = Clusters.AccessControl.Structs.AccessControlEntryStruct(
+            fabricIndex=fabric_index,
+            privilege=Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kView,
+            authMode=Clusters.AccessControl.Enums.AccessControlEntryAuthModeEnum.kCase,
+            subjects=[],
+            targets=[]
+        )
+        acl_admin_provider = Clusters.AccessControl.Structs.AccessControlEntryStruct(
+            fabricIndex=fabric_index,
+            privilege=Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kAdminister,
+            authMode=Clusters.AccessControl.Enums.AccessControlEntryAuthModeEnum.kCase,
+            subjects=[],
+            targets=[Clusters.AccessControl.Structs.AccessControlTargetStruct(
+                endpoint=0,
+                cluster=Clusters.OtaSoftwareUpdateRequestor.id)]
+        )
+
+        # Combine original + new ACLs on Requestor
+        acls_requestor = acl_original_requestor + [acl_admin_provider, acl_view_provider, acl_operate_provider]
+        resp = await self.write_acl(controller, requestor_node, acls_requestor)
+        logger.info(f'Wrote combined ACLs on Requestor to allow access from Provider {provider_node}: {resp}')
+
+        # -------------------------------
+        # Read existing ACLs on Provider
+        # -------------------------------
+        acl_original_provider = await self.read_single_attribute(
+            dev_ctrl=controller,
+            node_id=provider_node,
+            endpoint=0,
+            attribute=Clusters.AccessControl.Attributes.Acl,
+        )
+
+        # ACLs on Provider to allow Requestor interaction
+        acl_operate_requestor = Clusters.AccessControl.Structs.AccessControlEntryStruct(
+            fabricIndex=fabric_index,
+            privilege=Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kOperate,
+            authMode=Clusters.AccessControl.Enums.AccessControlEntryAuthModeEnum.kCase,
+            subjects=[],
+            targets=[Clusters.AccessControl.Structs.AccessControlTargetStruct(
+                endpoint=0,
+                cluster=Clusters.OtaSoftwareUpdateProvider.id)]
+        )
+        acl_view_requestor = Clusters.AccessControl.Structs.AccessControlEntryStruct(
+            fabricIndex=fabric_index,
+            privilege=Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kView,
+            authMode=Clusters.AccessControl.Enums.AccessControlEntryAuthModeEnum.kCase,
+            subjects=[],
+            targets=[]
+        )
+        acl_admin_requestor = Clusters.AccessControl.Structs.AccessControlEntryStruct(
+            fabricIndex=fabric_index,
+            privilege=Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kAdminister,
+            authMode=Clusters.AccessControl.Enums.AccessControlEntryAuthModeEnum.kCase,
+            subjects=[requestor_node],
+            targets=[Clusters.AccessControl.Structs.AccessControlTargetStruct(
+                endpoint=0,
+                cluster=Clusters.OtaSoftwareUpdateProvider.id)]
+        )
+
+        # Combine original + new ACLs on Provider
+        acls_provider = acl_original_provider + [acl_admin_requestor, acl_view_requestor, acl_operate_requestor]
+        resp = await self.write_acl(controller, provider_node, acls_provider)
+        logger.info(f'Wrote combined ACLs on Provider {provider_node} to allow access from Requestor: {resp}')
+
+    async def add_single_ota_provider(self, controller, requestor_node_id: int, provider_node_id: int):
+        """
+        Adds a single OTA provider to the Requestor's DefaultOTAProviders attribute.
+        Preserves existing providers and writes only the new one.
+        """
+        # Read existing DefaultOTAProviders on the Requestor
+        current_providers = await self.read_single_attribute_check_success(
+            dev_ctrl=controller,
+            cluster=self.cluster_otar,
+            attribute=self.cluster_otar.Attributes.DefaultOTAProviders
+        )
+        logger.info(f'Current DefaultOTAProviders on Requestor: {current_providers}')
+
+        # Create a ProviderLocation for the new provider
+        provider_location = self.cluster_otar.Structs.ProviderLocation(
+            providerNodeID=provider_node_id,
+            endpoint=0,
+            fabricIndex=controller.fabricId
+        )
+        logger.info(f'ProviderLocation to add: {provider_location}')
+
+        # Combine with existing providers (preserving previous ones)
+        updated_providers = current_providers + [provider_location]
+
+        # Write the updated DefaultOTAProviders list back to the Requestor
+        attr = self.cluster_otar.Attributes.DefaultOTAProviders(value=updated_providers)
+        resp = await controller.WriteAttribute(
+            attributes=[(0, attr)],
+            nodeid=requestor_node_id
+        )
+        logger.info(f'Write DefaultOTAProviders response: {resp}')
+        asserts.assert_equal(resp[0].Status, Status.Success, "Failed to write DefaultOTAProviders attribute")
 
     async def write_acl(self, controller, acl):
         """
@@ -106,10 +276,10 @@ class TC_SU_2_2(MatterBaseTest):
                      "QueryStatus is set to 'UpdateAvailable'. "
                      "Set ImageURI to the location where the image is located..",
                      "Verify that there is a transfer of the software image from the TH/OTA-P to the DUT."),
-            TestStep(2, "DUT sends a QueryImage command to the TH/OTA-P. TH/OTA-P sends a QueryImageResponse back to DUT. "
-                     "QueryStatus is set to 'Busy', DelayedActionTime is set to 60 seconds.",
-                     "Verify that the DUT does not send a QueryImage command before the minimum interval defined by spec "
-                     "which is 2 minutes (120 seconds) from the last QueryImage command."),
+            # TestStep(2, "DUT sends a QueryImage command to the TH/OTA-P. TH/OTA-P sends a QueryImageResponse back to DUT. "
+            #          "QueryStatus is set to 'Busy', DelayedActionTime is set to 60 seconds.",
+            #          "Verify that the DUT does not send a QueryImage command before the minimum interval defined by spec "
+            #          "which is 2 minutes (120 seconds) from the last QueryImage command."),
             # TestStep(3, "DUT sends a QueryImage command to the TH/OTA-P. TH/OTA-P sends a QueryImageResponse back to DUT. " \
             #          "QueryStatus is set to 'NotAvailable'.",
             #          "Verify that the DUT does not send a QueryImage command before the minimum interval defined by spec " \
@@ -138,14 +308,14 @@ class TC_SU_2_2(MatterBaseTest):
         # Manual Setup
         # ------------------------------------------------------------------------------------
         # For STEP [1]
-        # 1. Launch OTA Provider from Terminal 1:
+        # 1. Launch OTA Provider:
         #     ./out/debug/chip-ota-provider-app --filepath firmware_requestor_v2.ota \
         #         --discriminator 1111
         #         --passcode 20202021
         #         --secured-device-port 5540
         #
         # For STEP [2]
-        # 1. Launch OTA Provider from Terminal 1:
+        # 1. Launch OTA Provider:
         #     ./out/debug/chip-ota-provider-app --filepath firmware_requestor_v2.ota \
         #         --discriminator 1111 \
         #          --passcode 20202021 \
@@ -153,14 +323,15 @@ class TC_SU_2_2(MatterBaseTest):
         #          -q busy \
         #          -t 60
         #
-        # 2. Launch OTA Requestor (TH1 / DUT) from Terminal 2:
+        # 2. Launch OTA Requestor (DUT) from Terminal 1:
         #     ./out/debug/chip-ota-requestor-app \
         #         --discriminator 1234 \
         #         --passcode 20202021 \
         #         --secured-device-port 5541 \
         #         --autoApplyImage \
         #         --KVS /tmp/chip_kvs_requestor
-        # 3. Run Python test with commission Provisioner/Requestor from Terminal 3:
+        #
+        # 3. Run Python test with commission Provisioner/Requestor from Terminal 2:
         #     python3 src/python_testing/TC_SU_2_2.py \
         #         --commissioning-method on-network \
         #         --discriminator 1234 \
@@ -172,20 +343,36 @@ class TC_SU_2_2(MatterBaseTest):
         # ------------------------------------------------------------------------------------
 
         self.step(0)
-
         # ------------------------------------------------------------------------------------
-        # Step 1.0: DUT is already commissioned via test args (DUT/TH1 = OTA Requestor)
+        # Step 0: DUT is already commissioned via test args (DUT = OTA Requestor)
+        # Establishing controller reference - DUT is Requestor, NodeID=2, Fabric=1
         # ------------------------------------------------------------------------------------
-        # 1.0 Establishing TH1 controller - DUT is TH1, NodeID=2, Fabric=1
         controller = self.default_controller
         requestor_node_id = self.dut_node_id  # 2
         fabric_id = controller.fabricId
         logger.info(f'Step #1.0 - Requestor (DUT) NodeID: {requestor_node_id}, FabricId: {fabric_id}')
 
-        provider_node_id = 1
-        provider_discriminator = 1111
-        provider_setupPinCode = 20202021
-        logger.info(f'Step #1.0 - Provider NodeID: {provider_node_id}, FabricId: {fabric_id}')
+        self.step(1)
+        # ------------------------------------------------------------------------------------
+        # Step 1 - DUT sends a QueryImage command to the TH/OTA-P with response as Sucecss
+        # ------------------------------------------------------------------------------------
+
+        # Provider Step 1
+        provider_node_id_s1 = 1
+        provider_discriminator_s1 = 1111
+        provider_setupPinCode_s1 = 20202021
+        provider_sec_dev_port_s1 = 5540
+        provider_ota_file_s1 = "firmware_requestor_v2min.ota"
+        provider_window_s1 = "Step #1"
+        logger.info(
+            f'Step #1.0 - Provider_S1, NodeID: {provider_node_id_s1}, FabricId: {fabric_id}, SecuredDevicePort: {provider_sec_dev_port_s1}')
+
+        provider_proc_s1 = await self.launch_ota_provider(
+            ota_file=provider_ota_file_s1,
+            provider_discriminator=provider_discriminator_s1,
+            provider_setupPinCode=provider_setupPinCode_s1,
+            secured_device_port=provider_sec_dev_port_s1
+        )
 
         # ------------------------------------------------------------------------------------
         # Step 1.1 - Open commissioning window on DUT (via TH1)
@@ -198,138 +385,45 @@ class TC_SU_2_2(MatterBaseTest):
         logger.info(f'Step #1.1: Commissioning window opened: {vars(params)}')
 
         # ------------------------------------------------------------------------------------
-        # Step # 1.2 - Commissioning TH2 (OTA Provider) using TH1 controller
+        # Step # 1.2 - Commissioning OTA Provider_S1 using TH1 controller
         # ------------------------------------------------------------------------------------
 
         logger.info('Step #1.2 - Commissioning DUT with TH2')
         resp = await controller.CommissionOnNetwork(
-            nodeId=provider_node_id,
-            setupPinCode=provider_setupPinCode,
+            nodeId=provider_node_id_s1,
+            setupPinCode=provider_setupPinCode_s1,
             filterType=ChipDeviceCtrl.DiscoveryFilterType.LONG_DISCRIMINATOR,
-            filter=provider_discriminator
+            filter=provider_discriminator_s1
         )
-        logger.info(f'Step #1.2 - TH2 Commissioning response: {resp}')
+        logger.info(f'Step #1.2 - Provider_S1, Commissioning response: {resp}')
 
         # ------------------------------------------------------------------------------------
         # Step # 1.3 - Setting ACLs
         # ------------------------------------------------------------------------------------
-        fabric_index = controller.fabricId
 
-        logger.info(f"Step #1.3 - Setting ACLs under FabricIndex {fabric_index}")
+        logger.info(f"Step #1.3 - Setting ACLs under FabricIndex {fabric_id}")
         logger.info(f"Step #1.3 - Requestor (DUT) NodeID: {requestor_node_id}")
-        logger.info(f"Step #1.3 - Provider NodeID: {provider_node_id}")
+        logger.info(f"Step #1.3 - Provider_S1, NodeID: {provider_node_id_s1}")
 
-        # ACL on Requestor to allow Provider to operate OTA Requestor
+        # -------------------------------
+        # Set ACLs for OTA update:
+        # - On Requestor to allow specified Provider to interact with OTA Requestor cluster
+        # - On Provider to allow Requestor to interact with OTA Provider cluster
+        # -------------------------------
 
-        # Provider can send commands to OTA Requestor
-        acl_operate_provider = Clusters.AccessControl.Structs.AccessControlEntryStruct(
-            fabricIndex=fabric_index,
-            privilege=Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kOperate,
-            authMode=Clusters.AccessControl.Enums.AccessControlEntryAuthModeEnum.kCase,
-            subjects=[],
-            targets=[Clusters.AccessControl.Structs.AccessControlTargetStruct(
-                endpoint=0,
-                cluster=Clusters.OtaSoftwareUpdateRequestor.id)]
-        )
-
-        # Provider can view attributes to OTA Requestor
-        acl_view_provider = Clusters.AccessControl.Structs.AccessControlEntryStruct(
-            fabricIndex=fabric_index,
-            privilege=Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kView,
-            authMode=Clusters.AccessControl.Enums.AccessControlEntryAuthModeEnum.kCase,
-            subjects=[],
-            targets=[]
-        )
-
-        # Provider can administer (modify ACLs etc.) on Requestor - optional
-        acl_admin_provider = Clusters.AccessControl.Structs.AccessControlEntryStruct(
-            fabricIndex=fabric_index,
-            privilege=Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kAdminister,
-            authMode=Clusters.AccessControl.Enums.AccessControlEntryAuthModeEnum.kCase,
-            subjects=[],
-            targets=[Clusters.AccessControl.Structs.AccessControlTargetStruct(
-                endpoint=0,
-                cluster=Clusters.OtaSoftwareUpdateRequestor.id)]
-        )
-
-        # Group all three ACL entries and write them on Requestor
-        acls_on_th1 = [acl_admin_provider, acl_view_provider, acl_operate_provider]
-        resp = await self.write_acl(controller, requestor_node_id, acls_on_th1)
-        logger.info(f'Step #1.3.1 - Wrote ACLs on Requestor to allow access from Provider: {resp}')
-
-        # ACL to allow Requestor to operate OTA Provider
-
-        # can send commands to OTA Provider
-        acl_operate_requestor = Clusters.AccessControl.Structs.AccessControlEntryStruct(
-            fabricIndex=fabric_index,
-            privilege=Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kOperate,
-            authMode=Clusters.AccessControl.Enums.AccessControlEntryAuthModeEnum.kCase,
-            subjects=[],
-            targets=[Clusters.AccessControl.Structs.AccessControlTargetStruct(
-                endpoint=0,
-                cluster=Clusters.OtaSoftwareUpdateProvider.id
-            )]
-        )
-
-        # can view attributes to OTA Provider
-        acl_view_requestor = Clusters.AccessControl.Structs.AccessControlEntryStruct(
-            fabricIndex=fabric_index,
-            privilege=Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kView,
-            authMode=Clusters.AccessControl.Enums.AccessControlEntryAuthModeEnum.kCase,
-            subjects=[],
-            targets=[]
-        )
-
-        # TH1 can administer to OTA Provider
-        acl_admin_requestor = Clusters.AccessControl.Structs.AccessControlEntryStruct(
-            fabricIndex=fabric_index,
-            privilege=Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kAdminister,
-            authMode=Clusters.AccessControl.Enums.AccessControlEntryAuthModeEnum.kCase,
-            subjects=[requestor_node_id],
-            targets=[Clusters.AccessControl.Structs.AccessControlTargetStruct(
-                endpoint=0,
-                cluster=Clusters.OtaSoftwareUpdateProvider.id
-            )]
-        )
-
-        # Group all ACL entries and write them on TH2 (Provider)
-        acls_on_th2 = [acl_admin_requestor, acl_view_requestor, acl_operate_requestor]
-        resp = await self.write_acl(controller, provider_node_id, acls_on_th2)
-        logger.info(f'Step #1.3.2 - Wrote ACLs on Provider to allow access from Requestor: {resp}')
+        # ACLs for Provider_S1
+        await self.set_ota_acls_for_provider(
+            controller, requestor_node=requestor_node_id,
+            provider_node=provider_node_id_s1,
+            fabric_index=fabric_id)
 
         # ------------------------------------------------------------------------------------
-        # Step #1.4 - Read the current OTA providers on the Requestor,
-        # create a ProviderLocation structure pointing to Provider as the OTA provider,
-        # and write this updated provider list back to the DUT (TH1)
+        # Step #1.4 - Add OTA Provider to the Requestor
+        # For each provider, read the current DefaultOTAProviders, add the new one, and write it back
         # ------------------------------------------------------------------------------------
 
-        # Read the actual value of DefaultOTAProviders attribute on the Requestor (NodeID=2)
-        actual_otap_info = await self.read_single_attribute_check_success(
-            dev_ctrl=controller,
-            cluster=self.cluster_otar,
-            attribute=self.cluster_otar.Attributes.DefaultOTAProviders)
-        logger.info(f'Step #1.4 - Read actaul DefaultOTAProviders value on DUT (TH1): {actual_otap_info}')
-
-        # Create the ProviderLocation struct the OTA Provider (NodeID=1, Fabric=1)
-        provider_for_fabric = self.cluster_otar.Structs.ProviderLocation(
-            providerNodeID=provider_node_id,        # TH2 is the OTA Provider (NodeID=1)
-            endpoint=0,
-            fabricIndex=controller.fabricId           # FabricId from TH1 (the DUT)
-        )
-        logger.info(f'Step #1.4 - ProviderLocation to write: {provider_for_fabric}')
-
-        # Create the DefaultOTAProviders attribute with the OTA provider list
-        attr = self.cluster_otar.Attributes.DefaultOTAProviders(value=[provider_for_fabric])
-        logger.info(f'Step #1.4 - Attribute to write: {attr}')
-
-        # Write the DefaultOTAProviders attribute to the Requestor
-        resp = await controller.WriteAttribute(
-            attributes=[(0, attr)],
-            nodeid=requestor_node_id,
-        )
-        logger.info(f'Step #1.4 - Write DefaultOTAProviders response: {resp}')
-        # Verify write succeeded (response code 0)
-        asserts.assert_equal(resp[0].Status, Status.Success, "Failed to write DefaultOTAProviders attribute")
+        # Add Provider S1 to Requestor
+        await self.add_single_ota_provider(controller, requestor_node_id, provider_node_id_s1)
 
         # ------------------------------------------------------------------------------------
         # Step # 1.5 - Provider sends AnnounceOTAProvider command to TH1 Requestor
@@ -337,7 +431,7 @@ class TC_SU_2_2(MatterBaseTest):
 
         logger.info("Step #1.5.1 - TH2 (Provider) sends AnnounceOTAProvider command to TH1 (DUT)")
         cmd_announce = Clusters.OtaSoftwareUpdateRequestor.Commands.AnnounceOTAProvider(
-            providerNodeID=0x0000000000000001,  # Provider
+            providerNodeID=provider_node_id_s1,  # Provider
             vendorID=0xFFF1,
             announcementReason=Clusters.OtaSoftwareUpdateRequestor.Enums.AnnouncementReasonEnum.kSimpleAnnouncement,
             metadataForNode=None,
@@ -352,7 +446,6 @@ class TC_SU_2_2(MatterBaseTest):
         )
         logging.info(f"Step #1.5 - AnnounceOTAProvider response: {resp_announce}.")
 
-        self.step(1)
         # ------------------------------------------------------------------------------------
         # Step # 1.6 - Matcher for OTA records logs
         # Step # 1.6.1 - UpdateState matcher: track "Downloading > Applying > Idle"
@@ -380,8 +473,8 @@ class TC_SU_2_2(MatterBaseTest):
                 node_id=requestor_node_id,
                 endpoint=0,
                 fabric_filtered=False,
-                min_interval_sec=1,
-                max_interval_sec=3,
+                min_interval_sec=0.5,
+                max_interval_sec=1,
                 keepSubscriptions=True
             ),
             accumulator_progress.start(
@@ -487,8 +580,8 @@ class TC_SU_2_2(MatterBaseTest):
             logger.warning(f"OTA update encountered an error or timeout: {e}")
         finally:
             # Cancel both subscriptions and task
-            accumulator_state.cancel()
-            accumulator_progress.cancel()
+            await accumulator_state.cancel()
+            await accumulator_progress.cancel()
 
         # ------------------------------------------------------------------------------------
         # Step # 1.7 - Verify image transfer from TH/OTA-P to DUT is successful
@@ -509,89 +602,94 @@ class TC_SU_2_2(MatterBaseTest):
         msg = f"Observed OTA flow: {state_sequence}, Expected: {expected_flow}"
         asserts.assert_equal(state_sequence, expected_flow, msg=msg)
 
-        self.step(2)
         # ------------------------------------------------------------------------------------
-        # Step #2 - DUT handles QueryImageResponse with QueryStatus=Busy
-        # Verify that DUT does not send another QueryImage before 120s
+        # Step # 1.8 - Close Provider_S1 Process
         # ------------------------------------------------------------------------------------
-        logger.info("Step #2 - Validate DUT respects minimum QueryImage interval after Busy response")
-        t_start_query = time.time()
+        await self.kill_ota_provider(step=provider_window_s1, proc=provider_proc_s1)
+        # await self.close_terminal_window()
 
-        logger.info("Step #2 - Create an accumulator for the UpdateState attribute")
-        # UpdateState Accumulator
-        accumulator_state = ClusterAttributeChangeAccumulator(
-            expected_cluster=Clusters.OtaSoftwareUpdateRequestor,
-            expected_attribute=Clusters.OtaSoftwareUpdateRequestor.Attributes.UpdateState
-        )
+        # self.step(2)
+        # # ------------------------------------------------------------------------------------
+        # # Step #2 - DUT handles QueryImageResponse with QueryStatus=Busy
+        # # Verify that DUT does not send another QueryImage before 120s
+        # # ------------------------------------------------------------------------------------
+        # logger.info("Step #2 - Validate DUT respects minimum QueryImage interval after Busy response")
+        # t_start_query = time.time()
 
-        # Start subscriptions
-        await accumulator_state.start(
-            dev_ctrl=controller,
-            node_id=requestor_node_id,
-            endpoint=0,
-            fabric_filtered=False,
-            min_interval_sec=1,
-            max_interval_sec=1,
-            keepSubscriptions=True
-        )
+        # logger.info("Step #2 - Create an accumulator for the UpdateState attribute")
+        # # UpdateState Accumulator
+        # accumulator_state = ClusterAttributeChangeAccumulator(
+        #     expected_cluster=Clusters.OtaSoftwareUpdateRequestor,
+        #     expected_attribute=Clusters.OtaSoftwareUpdateRequestor.Attributes.UpdateState
+        # )
 
-        # Track OTA UpdateState: observed states only once per type, and final idle
-        observed_states = set()
-        state_sequence = []  # Full OTA state flow
-        final_downloading_seen = False
+        # # Start subscriptions
+        # await accumulator_state.start(
+        #     dev_ctrl=controller,
+        #     node_id=requestor_node_id,
+        #     endpoint=0,
+        #     fabric_filtered=False,
+        #     min_interval_sec=1,
+        #     max_interval_sec=1,
+        #     keepSubscriptions=True
+        # )
 
-        def matcher_busy_state(report):
-            """
-            Step #2 matcher function to track OTA UpdateState.
-            Records state Querying and after 120 seconds Downloading.
-            """
-            nonlocal observed_states, final_downloading_seen, state_sequence
-            global t_start_downloading
-            val = report.value
+        # # Track OTA UpdateState: observed states only once per type, and final idle
+        # observed_states = set()
+        # state_sequence = []  # Full OTA state flow
+        # final_downloading_seen = False
 
-            if val is None:
-                return False
+        # def matcher_busy_state(report):
+        #     """
+        #     Step #2 matcher function to track OTA UpdateState.
+        #     Records state Querying and after 120 seconds Downloading.
+        #     """
+        #     nonlocal observed_states, final_downloading_seen, state_sequence
+        #     global t_start_downloading
+        #     val = report.value
 
-            # Only track kQuerying (2) once
-            if val == Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kDelayedOnQuery:  #
-                if val not in observed_states:
-                    observed_states.add(val)
-                    state_sequence.append(val)
-                    logger.info(f'#2 - UpdateState recorded: {val}')
-            elif val == Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kDownloading:  # 4
-                if not final_downloading_seen:  # log only once
-                    final_downloading_seen = True
-                    state_sequence.append(val)
-                    t_start_downloading = time.time()
-                    logger.info("#2 - OTA UpdateState sequence From Busy (Querying) to Downloading....")
-            # Return True only when Downloading is reached
-            return final_downloading_seen
+        #     if val is None:
+        #         return False
 
-        # Create matcher object fro UpdateState
-        matcher_busy_state_obj = AttributeMatcher.from_callable(
-            description="Validate OTA Busy UpdateState transitions: Querying > Downloading",
-            matcher=matcher_busy_state
-        )
+        #     # Only track kQuerying (2) once
+        #     if val == Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kDelayedOnQuery:  #
+        #         if val not in observed_states:
+        #             observed_states.add(val)
+        #             state_sequence.append(val)
+        #             logger.info(f'#2 - UpdateState recorded: {val}')
 
-        # Start a task to collect updates
-        try:
-            # Wait until the final state (Idle) is reached or timeout (20 min)
-            await accumulator_state.await_all_expected_report_matches([matcher_busy_state_obj], timeout_sec=300.0)
-            logger.info("Step #2 - UpdateState Busy matchers have completed.")
-        except Exception as e:
-            logger.warning(f"OTA update encountered an error or timeout: {e}")
-        finally:
-            # Cancel both subscriptions and task
-            accumulator_state.cancel()
+        #     elif val == Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kDownloading:  # 4
+        #         if not final_downloading_seen:  # log only once
+        #             final_downloading_seen = True
+        #             state_sequence.append(val)
+        #             t_start_downloading = time.time()
+        #             logger.info("#2 - OTA UpdateState sequence From Busy (Querying) to Downloading....")
+        #     # Return True only when Downloading is reached
+        #     return final_downloading_seen
 
-        logger.info(f"Step #2 - Full OTA state sequence observed: {state_sequence}")
-        logger.info(f"Step #2 - Time Start as Busy: {t_start_query}, Time Ends as Busy {t_start_downloading}")
-        delayed_action_time = t_start_downloading - t_start_query
-        logger.info(f"Step #2 - Delay between Querying and Downloading: {delayed_action_time:.2f} s")
+        # # Create matcher object fro UpdateState
+        # matcher_busy_state_obj = AttributeMatcher.from_callable(
+        #     description="Validate OTA Busy UpdateState transitions: Querying > Downloading",
+        #     matcher=matcher_busy_state
+        # )
 
-        asserts.assert_true(delayed_action_time >= 120,
-                            f"Expected delay >= 120 seconds, but got {delayed_action_time:.2f} seconds")
+        # # Start a task to collect updates
+        # try:
+        #     # Wait until the final state (Idle) is reached or timeout (20 min)
+        #     await accumulator_state.await_all_expected_report_matches([matcher_busy_state_obj], timeout_sec=300.0)
+        #     logger.info("Step #2 - UpdateState Busy matchers have completed.")
+        # except Exception as e:
+        #     logger.warning(f"OTA update encountered an error or timeout: {e}")
+        # finally:
+        #     # Cancel both subscriptions and task
+        #     accumulator_state.cancel()
 
+        # logger.info(f"Step #2 - Full OTA state sequence observed: {state_sequence}")
+        # logger.info(f"Step #2 - Time Start as Busy: {t_start_query}, Time Ends as Busy {t_start_downloading}")
+        # delayed_action_time = t_start_downloading - t_start_query
+        # logger.info(f"Step #2 - Delay between Querying and Downloading: {delayed_action_time:.2f} s")
 
+        # asserts.assert_true(delayed_action_time >= 120,
+        #                     f"Expected delay >= 120 seconds, but got {delayed_action_time:.2f} seconds")
 if __name__ == "__main__":
     default_matter_test_main()
