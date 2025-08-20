@@ -20,6 +20,7 @@ namespace ProxyConfiguration {
 inline constexpr uint32_t kRevision = 1;
 
 namespace Attributes {
+
 constexpr std::array<DataModel::AttributeEntry, 0> kMandatoryMetadata = {
 
 };

@@ -46,6 +46,7 @@ pw_python_package("matter-testing-module") {
     "matter/testing/conformance.py",
     "matter/testing/conversions.py",
     "matter/testing/decorators.py",
+    "matter/testing/defaults.py",
     "matter/testing/event_attribute_reporting.py",
     "matter/testing/global_attribute_ids.py",
     "matter/testing/global_stash.py",

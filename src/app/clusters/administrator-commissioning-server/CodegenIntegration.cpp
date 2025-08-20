@@ -16,10 +16,9 @@
  */
 #include <app/clusters/administrator-commissioning-server/AdministratorCommissioningCluster.h>
 #include <app/static-cluster-config/AdministratorCommissioning.h>
-#include <data-model-providers/codegen/CodegenDataModelProvider.h>
+#include <data-model-providers/codegen/ClusterIntegration.h>
 
-#include <app-common/zap-generated/attributes/Accessors.h>
-#include <app/util/attribute-storage.h>
+#include <app/util/config.h> // REQUIRED for ifdefs for commands
 
 using namespace chip;
 using namespace chip::app;
@@ -51,43 +50,52 @@ using ClusterImpl = AdministratorCommissioningCluster;
 
 LazyRegisteredServerCluster<ClusterImpl> gServer;
 
+class IntegrationDelegate : public CodegenClusterIntegration::Delegate
+{
+public:
+    ServerClusterRegistration & CreateRegistration(EndpointId endpointId, unsigned emberEndpointIndex,
+                                                   uint32_t optionalAttributeBits, uint32_t featureMap) override
+    {
+        gServer.Create(endpointId, BitFlags<AdministratorCommissioning::Feature>(featureMap));
+        return gServer.Registration();
+    }
+
+    ServerClusterInterface & FindRegistration(unsigned emberEndpointIndex) override { return gServer.Cluster(); }
+    void ReleaseRegistration(unsigned emberEndpointIndex) override { gServer.Destroy(); }
+};
+
 } // namespace
 
 void emberAfAdministratorCommissioningClusterServerInitCallback(EndpointId endpointId)
 {
-    if (endpointId != kRootEndpointId)
-    {
-        return;
-    }
+    IntegrationDelegate integrationDelegate;
 
-    uint32_t rawFeatureMap;
-    if (FeatureMap::Get(endpointId, &rawFeatureMap) != Status::Success)
-    {
-        ChipLogError(AppServer, "Failed to get feature map for endpoint %u", endpointId);
-        rawFeatureMap = 0;
-    }
-
-    gServer.Create(endpointId, BitFlags<AdministratorCommissioning::Feature>(rawFeatureMap));
-    CHIP_ERROR err = CodegenDataModelProvider::Instance().Registry().Register(gServer.Registration());
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogError(AppServer, "Admin Commissioning register error: endpoint %u, %" CHIP_ERROR_FORMAT, endpointId, err.Format());
-    }
+    // register a singleton server (root endpoint only)
+    CodegenClusterIntegration::RegisterServer(
+        {
+            .endpointId                      = endpointId,
+            .clusterId                       = AdministratorCommissioning::Id,
+            .fixedClusterServerEndpointCount = 1,
+            .maxEndpointCount                = 1,
+            .fetchFeatureMap                 = true,
+            .fetchOptionalAttributes         = false,
+        },
+        integrationDelegate);
 }
 
 void MatterAdministratorCommissioningClusterServerShutdownCallback(EndpointId endpointId)
 {
-    if (endpointId != kRootEndpointId)
-    {
-        return;
-    }
+    IntegrationDelegate integrationDelegate;
 
-    CHIP_ERROR err = CodegenDataModelProvider::Instance().Registry().Unregister(&gServer.Cluster());
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogError(AppServer, "Admin Commissioning unregister error: endpoint %u, %" CHIP_ERROR_FORMAT, endpointId, err.Format());
-    }
-    gServer.Destroy();
+    // register a singleton server (root endpoint only)
+    CodegenClusterIntegration::UnregisterServer(
+        {
+            .endpointId                      = endpointId,
+            .clusterId                       = AdministratorCommissioning::Id,
+            .fixedClusterServerEndpointCount = 1,
+            .maxEndpointCount                = 1,
+        },
+        integrationDelegate);
 }
 
 void MatterAdministratorCommissioningPluginServerInitCallback() {}
