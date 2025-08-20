@@ -8,11 +8,12 @@ LEN_MSG = "UTF-8 encoded length must be ≤ 32 bytes"
 
 # Valid values
 VALID_VALUES = [
-    "Living Room",             # simple ASCII
-    "Kitchen",                 # shorter ASCII
-    "Cámara",                  # UTF-8 accented char
-    "设备",                    # UTF-8 multibyte chars, within 32 bytes
+    "Living Room",                       # simple ASCII
+    "Kitchen",                           # shorter ASCII
+    "Cámara",                            # UTF-8 accented char
+    "设备",                              # UTF-8 multibyte chars, within 32 bytes
     "12345678901234567890123456789012",  # exactly 32 ASCII chars
+    "",                                  # empty string allowed (0 bytes)
 ]
 
 
@@ -49,10 +50,7 @@ class TestAssertValidDnKey(unittest.TestCase):
         bad_string = "\udcff"
         msg = self._fail_msg(bad_string)
         self.assertIn(UTF8_MSG, msg)
-
-    def test_invalid_due_to_empty_string(self):
-        # Empty string is allowed (0 bytes) so it should pass
-        assert_valid_dn_key("")
+        self.assertNotIn(LEN_MSG, msg)
 
 
 if __name__ == "__main__":
