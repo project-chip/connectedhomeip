@@ -120,8 +120,9 @@ public:
 
     /**
      * Allows any needed app handling given provided and already validated pan, tilt, and zoom values that are to be set based on
-     * receoption of an MPTZSetPosition command. Returns a failure status if the physical device cannot realize these values. Within
-     * the provided callback the server will update the server held attribute values for PTZ assuming success.
+     * receoption of an MPTZSetPosition command. Returns a failure status if the physical device cannot realize these values.  The app shall
+     * not block on actual physical excetion of the command, rather return success on initiatiion of the movement.  On conclusion of the
+     * movement that app shall invoke the provided callback, at which time the server will update the server held attribute values for PTZ assuming success.
      * @param aPan  The validated value of the pan that is to be set
      * @param aTilt The validated value of the tilt that is to be set
      * @param aZoom The validated value of the zoom that is to be set
@@ -133,8 +134,9 @@ public:
     /**
      * Allows any needed app handling given provided and already validated pan, tilt, and zoom values that are to be set based on
      * receoption of an MPTZRelativeMove command.  The server has already validated the received relative values, and provides the
-     * app with the new, requested settings for PTZ. Returns a failure status if the physical device cannot realize these values.
-     * Within the provided callback the server will update the server held attribute values for PTZ assuming success.
+     * app with the new, requested settings for PTZ. Returns a failure status if the physical device cannot realize these values. The app shall
+     * not block on actual physical excetion of the command, rather return success on initiatiion of the movement.  On conclusion of the
+     * movement that app shall invoke the provided callback, at which time the server will update the server held attribute values for PTZ assuming success.
      * @param aPan  The validated value of the pan that is to be set
      * @param aTilt The validated value of the tilt that is to be set
      * @param aZoom The validated value of the zoom that is to be set
@@ -146,8 +148,10 @@ public:
     /**
      * Allows any needed app handling given provided and already validated pan, tilt, and zoom values that are to be set based on
      * receoption of an MPTZMoveToPreset command.  The server has already ensured the requested preset ID exists, and obtained the
-     * values for PTZ defined by that preset. Returns a failure status if the physical device cannot realize these values. Within
-     * the provided callback the server will update the server held attribute values for PTZ assuming success.
+     * values for PTZ defined by that preset. Returns a failure status if the physical device cannot realize these values. The app shall
+     * not block on actual physical excetion of the command, rather return success on initiatiion of the movement.  On conclusion of the
+     * movement that app shall invoke the provided callback, at which time the server will update the server held attribute values for PTZ 
+     * assuming success. Within the provided callback the server will update the server held attribute values for PTZ assuming success.
      * @param aPreset The preset ID associated with the provided PTZ values
      * @param aPan    The value for Pan associated with the preset
      * @param aTilt   The value for Tilt associated with the preset
@@ -350,10 +354,6 @@ private:
     EndpointId mEndpointId;
     BitFlags<Feature> mFeatures;
     BitFlags<OptionalAttributes> mOptionalAttrs;
-
-    // Command handler callback
-    app::CommandHandler::Handle mAsyncCommandHandler;
-    ConcreteCommandPath mRequestPath = ConcreteCommandPath(0, 0, 0);
 
     // Next available preset ID
     uint8_t mCurrentPresetID = 1;
