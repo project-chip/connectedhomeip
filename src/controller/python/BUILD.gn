@@ -450,16 +450,10 @@ matter_python_wheel_action("chip-repl") {
     "ipython!=8.1.0",
     "rich",
     "ipykernel",
+    "pyobjc-framework-corebluetooth ; sys_platform==\"darwin\"",
+    "dbus-python==1.2.18 ; sys_platform==\"linux\"",
+    "pygobject==3.50.0 ; sys_platform==\"linux\"",
   ]
-
-  if (current_os == "mac") {
-    py_package_reqs += [ "pyobjc-framework-corebluetooth" ]
-  } else if (current_os == "linux") {
-    py_package_reqs += [
-      "dbus-python==1.2.18",
-      "pygobject==3.50.0",
-    ]
-  }
 
   py_package_name = "${chip_python_package_prefix}-repl"
   py_platform_tag = "any"
