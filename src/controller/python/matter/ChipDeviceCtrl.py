@@ -3109,19 +3109,15 @@ class TLVJsonConverter():
     ''' Converter class used to convert dumped Matter JsonTlv files into a cache. '''
 
     def __init__(self, name: str = ''):
-        self._ChipStack = builtins.chipStack
-        self._dmLib = None
+        self._ChipStack = builtins.chipStack  # type: ignore[attr-defined]  # 'chipStack' is dynamically added to builtins
 
-        self._InitLib()
+        self._dmLib = CDLL(self._ChipStack.LocateChipDLL())
 
-    def _InitLib(self):
-        if self._dmLib is None:
-            self._dmLib = CDLL(self._ChipStack.LocateChipDLL())
-
-            self._dmLib.pychip_JsonToTlv.argtypes = [c_char_p, POINTER(c_ubyte), c_size_t]
-            self._dmLib.pychip_DeviceController_DeleteDeviceController.restype = c_size_t
+        self._dmLib.pychip_JsonToTlv.argtypes = [c_char_p, POINTER(c_ubyte), c_size_t]
+        self._dmLib.pychip_DeviceController_DeleteDeviceController.restype = c_size_t
 
     # PER ATTRIBUTE
+
     def _attribute_to_tlv(self, json_string: str) -> bytearray:
         ''' Converts the MatterJsonTlv for one attribute into TLV that can be parsed and put into the cache.'''
         # We don't currently have a way to size this properly, but we know attributes need to fit into 1 MTU.
@@ -3130,10 +3126,10 @@ class TLVJsonConverter():
         encoded_bytes = self._dmLib.pychip_JsonToTlv(json_string.encode("utf-8"),  (ctypes.c_ubyte * size).from_buffer(buf), size)
         return buf[:encoded_bytes]
 
-    def convert_dump_to_cache(self, json_tlv: str) -> AttributeCache:
-        ''' Converts a string containing the MatterJsonTlv dump of an entire device into an AttributeCache object.
+    def convert_dump_to_cache(self, json_tlv: typing.Any) -> AttributeCache:
+        ''' Converts a json object containing the MatterJsonTlv dump of an entire device into an AttributeCache object.
             Input:
-              json_tlv: json string read from the dump file.
+              json_tlv: json loaded from from the dump file.
             Returns:
               AttributeCache with the data from the json_string
         '''
