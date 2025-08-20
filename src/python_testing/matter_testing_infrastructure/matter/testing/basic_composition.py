@@ -32,7 +32,7 @@ from mobly import asserts
 import matter.clusters as Clusters
 import matter.tlv
 from matter.ChipDeviceCtrl import ChipDeviceController, TLVJsonConverter
-from matter.clusters.Attribute import ValueDecodeFailure
+from matter.clusters.Attribute import AttributeCache, ValueDecodeFailure
 from matter.testing.conformance import ConformanceException
 from matter.testing.matter_testing import MatterTestConfig, ProblemNotice
 from matter.testing.spec_parsing import PrebuiltDataModelDirectory, build_xml_clusters, build_xml_device_types, dm_from_spec_version
@@ -126,7 +126,7 @@ def MatterTlvToJson(tlv_data: dict[int, Any]) -> dict[str, Any]:
     return matter_json_dict
 
 
-def JsonToMatterTlv(json_filename: str) -> dict[int, Any]:
+def JsonToMatterTlv(json_filename: str) -> AttributeCache:
     converter = TLVJsonConverter()
     with open(json_filename, "r") as fin:
         json_tlv = json.load(fin)
