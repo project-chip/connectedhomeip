@@ -46,6 +46,17 @@ class CommodityTariffTestBaseHelper(MatterBaseTest):
         """
         asserts.assert_equal(len(list_to_check), len(set(list_to_check)), f"{object_name} in the list must be unique")
 
+    async def check_randomization_offset(self, randomization_type, randomization_offset):
+
+        if randomization_type == 1:
+            matter_asserts.assert_valid_int16(randomization_offset, 'RandomizationOffset must has int16 type.')
+        elif randomization_type == 4:
+            matter_asserts.assert_valid_int16(randomization_offset, 'RandomizationOffset must has int16 type.')
+            asserts.assert_less_equal(randomization_offset, 0, "RandomizationOffset must be less than 0.")
+        else:
+            matter_asserts.assert_valid_int16(randomization_offset, 'RandomizationOffset must has int16 type.')
+            asserts.assert_greater_equal(randomization_offset, 0, "RandomizationOffset must be greater than 0.")
+
     async def checkAuxiliaryLoadSwitchSettingsStruct(self,
                                                      endpoint: int = None,
                                                      cluster: Clusters.CommodityTariff = None,
@@ -107,14 +118,7 @@ class CommodityTariffTestBaseHelper(MatterBaseTest):
                 asserts.assert_greater_equal(struct.randomizationType, 0)
                 asserts.assert_less_equal(struct.randomizationType, 4)
             if struct.randomizationOffset is not None:
-                if struct.randomizationType is not None and struct.randomizationType == 1:
-                    matter_asserts.assert_valid_int16(struct.randomizationOffset, 'RandomizationOffset must has int16 type.')
-                elif struct.randomizationType is not None and struct.randomizationType == 4:
-                    matter_asserts.assert_valid_int16(struct.randomizationOffset, 'RandomizationOffset must has int16 type.')
-                    asserts.assert_less_equal(struct.randomizationOffset, 0, "RandomizationOffset must be less than 0.")
-                else:
-                    matter_asserts.assert_valid_int16(struct.randomizationOffset, 'RandomizationOffset must has int16 type.')
-                    asserts.assert_greater_equal(struct.randomizationOffset, 0, "RandomizationOffset must be greater than 0.")
+                await self.check_randomization_offset(struct.randomizationType, struct.randomizationOffset)
         else:
             asserts.assert_is_none(struct.randomizationOffset, "RandomizationOffset must be None")
             asserts.assert_is_none(struct.randomizationType, "RandomizationType must be None")
@@ -529,20 +533,35 @@ class CommodityTariffTestBaseHelper(MatterBaseTest):
         if not attribute_value:
             if await self.attribute_guard(endpoint=endpoint, attribute=cluster.Attributes.DefaultRandomizationOffset):
                 attribute_value = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.DefaultRandomizationOffset)
-        if attribute_value is not NullValue:
-            matter_asserts.assert_valid_int16(attribute_value, 'DefaultRandomizationOffset must be of type int16')
+
+        if self.check_pics("SETRF.S.A0011") and self.check_pics("SETRF.S.F05"):
+            asserts.assert_is_not_none(
+                attribute_value, "DefaultRandomizationOffset attribute must not be None if RNDM feature is enabled.")
+            if attribute_value is not NullValue:
+                self.check_randomization_offset(self.DefaultRandomizationType, attribute_value)
+        else:
+            asserts.assert_is_none(
+                attribute_value, "DefaultRandomizationOffset attribute must be None if RNDM feature is disabled.")
 
     async def check_default_randomization_type_attribute(self, endpoint, attribute_value=None):
 
         if not attribute_value:
             if await self.attribute_guard(endpoint=endpoint, attribute=cluster.Attributes.DefaultRandomizationType):
                 attribute_value = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.DefaultRandomizationType)
-        if attribute_value is not NullValue:
-            matter_asserts.assert_valid_enum(
-                attribute_value, "DefaultRandomizationType attribute must return a DayEntryRandomizationTypeEnum", cluster.Enums.DayEntryRandomizationTypeEnum)
-            asserts.assert_greater_equal(attribute_value, 0,
-                                         "DefaultRandomizationType must be greater or equal than 0.")
-            asserts.assert_less_equal(attribute_value, 4, "DefaultRandomizationType must be less or equal than 4.")
+        if self.check_pics("SETRF.S.A0012") and self.check_pics("SETRF.S.F05"):
+            asserts.assert_is_not_none(
+                attribute_value, "DefaultRandomizationType attribute must not be None if RNDM feature is enabled.")
+            if attribute_value is not NullValue:
+                matter_asserts.assert_valid_enum(
+                    attribute_value, "DefaultRandomizationType attribute must return a DayEntryRandomizationTypeEnum", cluster.Enums.DayEntryRandomizationTypeEnum)
+                asserts.assert_greater_equal(attribute_value, 0,
+                                             "DefaultRandomizationType must be greater or equal than 0.")
+                asserts.assert_less_equal(attribute_value, 4, "DefaultRandomizationType must be less or equal than 4.")
+
+                self.DefaultRandomizationType = attribute_value
+        else:
+            asserts.assert_is_none(
+                attribute_value, "DefaultRandomizationType attribute must be None if RNDM feature is disabled.")
 
     async def verify_reporting(self, reports: dict, attribute: ClusterObjects.ClusterAttributeDescriptor, attribute_name: str, saved_value) -> None:
 

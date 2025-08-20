@@ -253,9 +253,14 @@ class TC_SETRF_2_1(MatterBaseTest, CommodityTariffTestBaseHelper):
                         - Verify that PowerThreshold field in PowerThresholdStruct has type power-mW;
                         - Verify that ApparentPowerThreshold field in PowerThresholdStruct has type power-mVA;
                         - Verify that PowerThresholdSource field in PowerThresholdStruct has type PowerThresholdSourceEnum and value in range 0 - 2."""),
-            TestStep("19", "TH reads DefaultRandomizationOffset attribute.", "DUT replies a Null or a value of int16 value."),
-            TestStep("20", "TH reads DefaultRandomizationType attribute.",
-                     "DUT replies a Null or a value of DayEntryRandomizationType in range 0 - 4."),
+            TestStep("19", "TH reads DefaultRandomizationType attribute.", """
+                     -DUT replies a Null or a value of DayEntryRandomizationType in range 0 - 4;
+                     - Store value as a DefaultRandomizationTypeValue."""),
+            TestStep("20", "TH reads DefaultRandomizationOffset attribute.", """
+                     - DUT replies a Null or a value of int16 value;
+                     - If DefaultRandomizationTypeValue is 0x00 (Fixed), DUT replies a int16 value;
+                     - If DefaultRandomizationTypeValue is 0x04 (RandomNegative), DUT replies a int16 value less or equal 0;
+                     - If DefaultRandomizationTypeValue is not 0x01 (Fixed) or 0x04 (RandomNegative), DUT replies a int16 value greater or equal 0."""),
         ]
 
         return steps
@@ -337,21 +342,21 @@ class TC_SETRF_2_1(MatterBaseTest, CommodityTariffTestBaseHelper):
         # TH reads NextTariffComponents attribute, expects a list of TariffComponentStruct
         self.check_next_tariff_components_attribute(endpoint)
 
-        if not self.check_pics("SETRF.S.A0011"):  # Checks if attribute is supported
-            logger.info("PICS SETRF.S.A0011 is not True")
+        if not self.check_pics("SETRF.S.A0012"):  # Checks if attribute is supported
+            logger.info("PICS SETRF.S.A0012 is not True")
             self.skip_step("19")
         else:
             self.step("19")
-            # TH reads DefaultRandomizationOffset attribute, expects a int16
-            self.check_default_randomization_offset_attribute(endpoint)
+            # TH reads DefaultRandomizationType attribute, expects a DayEntryRandomizationTypeEnum
+            self.check_default_randomization_type_attribute(endpoint)
 
-        if not self.check_pics("SETRF.S.A0012"):  # Checks if attribute is supported
-            logger.info("PICS SETRF.S.A0012 is not True")
+        if not self.check_pics("SETRF.S.A0011"):  # Checks if attribute is supported
+            logger.info("PICS SETRF.S.A0011 is not True")
             self.skip_step("20")
         else:
             self.step("20")
-            # TH reads DefaultRandomizationType attribute, expects a DayEntryRandomizationTypeEnum
-            self.check_default_randomization_type_attribute(endpoint)
+            # TH reads DefaultRandomizationOffset attribute, expects a int16
+            self.check_default_randomization_offset_attribute(endpoint)
 
 
 if __name__ == "__main__":
