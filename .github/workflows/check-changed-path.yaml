@@ -1,0 +1,24 @@
+name: Check Changed Paths
+
+on:
+  workflow_call:
+    outputs:
+      non_markdown_changes:
+        description: "True if non-markdown files were changed."
+        value: ${{ jobs.changed_paths.outputs.non_markdown_changes }}
+
+jobs:
+  changed_paths:
+    runs-on: ubuntu-latest
+    if: github.actor != 'restyled-io[bot]'
+    outputs:
+      non_markdown_changes: ${{ steps.filter.outputs.non_markdown_changes }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check for non-markdown files
+        id: filter
+        uses: dorny/paths-filter@v3
+        with:
+          filters: |
+            non_markdown_changes:
+              - '!**/*.md'
