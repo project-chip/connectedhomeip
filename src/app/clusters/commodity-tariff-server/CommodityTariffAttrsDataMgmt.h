@@ -487,8 +487,8 @@ public:
                                              void *>;
 
     using StructType = std::conditional_t<IsList<NonNullableType>::value,
-                                             ListEntryType, // Extract the list element type
-                                             NonNullableType>;
+                                          ListEntryType, // Extract the list element type
+                                          NonNullableType>;
 
     /**
      * @brief Construct a new data class instance
@@ -1046,9 +1046,8 @@ private:
      */
     void CleanupStruct(StructType & aValue);
 
-
     //{
-        //CleanupStructValue<StructType>(aValue);
+    // CleanupStructValue<StructType>(aValue);
     //}
 
     void * mAuxData = nullptr; ///< Validation context data

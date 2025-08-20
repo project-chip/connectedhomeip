@@ -304,7 +304,7 @@ CHIP_ERROR CTC_BaseDataClass<T>::CopyData(const StructType & input, StructType &
 
 template <>
 CHIP_ERROR CTC_BaseDataClass<DataModel::Nullable<TariffInformationStruct::Type>>::CopyData(const StructType & input,
-                                                   StructType & output)
+                                                                                           StructType & output)
 {
     output.tariffLabel.SetNull();
     output.providerName.SetNull();
@@ -349,7 +349,8 @@ CHIP_ERROR CTC_BaseDataClass<DataModel::Nullable<TariffInformationStruct::Type>>
 }
 
 template <>
-CHIP_ERROR CTC_BaseDataClass<DataModel::Nullable<DataModel::List<DayEntryStruct::Type>>>::CopyData(const StructType & input, StructType & output)
+CHIP_ERROR CTC_BaseDataClass<DataModel::Nullable<DataModel::List<DayEntryStruct::Type>>>::CopyData(const StructType & input,
+                                                                                                   StructType & output)
 {
     output.dayEntryID = input.dayEntryID;
     output.startTime  = input.startTime;
@@ -376,7 +377,8 @@ CHIP_ERROR CTC_BaseDataClass<DataModel::Nullable<DataModel::List<DayEntryStruct:
 }
 
 template <>
-CHIP_ERROR CTC_BaseDataClass<DataModel::Nullable<DataModel::List<TariffComponentStruct::Type>>>::CopyData(const StructType & input,StructType & output)
+CHIP_ERROR CTC_BaseDataClass<DataModel::Nullable<DataModel::List<TariffComponentStruct::Type>>>::CopyData(const StructType & input,
+                                                                                                          StructType & output)
 {
     output.tariffComponentID = input.tariffComponentID;
 
@@ -465,7 +467,8 @@ CHIP_ERROR CTC_BaseDataClass<DataModel::Nullable<DataModel::List<TariffComponent
 }
 
 template <>
-CHIP_ERROR CTC_BaseDataClass<DataModel::Nullable<DataModel::List<TariffPeriodStruct::Type>>>::CopyData(const StructType & input,StructType & output)
+CHIP_ERROR CTC_BaseDataClass<DataModel::Nullable<DataModel::List<TariffPeriodStruct::Type>>>::CopyData(const StructType & input,
+                                                                                                       StructType & output)
 {
     output.label.SetNull();
     if (!input.label.IsNull())
@@ -492,7 +495,8 @@ CHIP_ERROR CTC_BaseDataClass<DataModel::Nullable<DataModel::List<TariffPeriodStr
 }
 
 template <>
-CHIP_ERROR CTC_BaseDataClass<DataModel::Nullable<DataModel::List<DayPatternStruct::Type>>>::CopyData(const StructType & input,StructType & output)
+CHIP_ERROR CTC_BaseDataClass<DataModel::Nullable<DataModel::List<DayPatternStruct::Type>>>::CopyData(const StructType & input,
+                                                                                                     StructType & output)
 {
     output.dayPatternID = input.dayPatternID;
     output.daysOfWeek   = input.daysOfWeek;
@@ -507,7 +511,8 @@ CHIP_ERROR CTC_BaseDataClass<DataModel::Nullable<DataModel::List<DayPatternStruc
 }
 
 template <>
-CHIP_ERROR CTC_BaseDataClass<DataModel::Nullable<DataModel::List<DayStruct::Type>>>::CopyData(const StructType & input,StructType & output)
+CHIP_ERROR CTC_BaseDataClass<DataModel::Nullable<DataModel::List<DayStruct::Type>>>::CopyData(const StructType & input,
+                                                                                              StructType & output)
 {
     output.date    = input.date;
     output.dayType = input.dayType;
@@ -522,7 +527,8 @@ CHIP_ERROR CTC_BaseDataClass<DataModel::Nullable<DataModel::List<DayStruct::Type
 }
 
 template <>
-CHIP_ERROR CTC_BaseDataClass<DataModel::Nullable<DataModel::List<CalendarPeriodStruct::Type>>>::CopyData(const StructType & input,StructType & output)
+CHIP_ERROR CTC_BaseDataClass<DataModel::Nullable<DataModel::List<CalendarPeriodStruct::Type>>>::CopyData(const StructType & input,
+                                                                                                         StructType & output)
 {
     output.startDate.SetNull();
     if (!input.startDate.IsNull())
@@ -589,7 +595,7 @@ CHIP_ERROR CTC_BaseDataClass<DataModel::Nullable<TariffInformationStruct::Type>>
     }
 
     const auto & newValue = GetNewValueRef().Value();
-    auto * ctx                                     = static_cast<TariffUpdateCtx *>(mAuxData);
+    auto * ctx            = static_cast<TariffUpdateCtx *>(mAuxData);
 
     // Validate string lengths (if fields are provided)
     VerifyOrReturnError(newValue.tariffLabel.IsNull() || newValue.tariffLabel.Value().size() <= kTariffInfoMaxLabelLength,
@@ -936,12 +942,13 @@ CHIP_ERROR CTC_BaseDataClass<DataModel::Nullable<DataModel::List<CalendarPeriodS
 
 // Define the template method
 template <typename T>
-void CTC_BaseDataClass<T>::CleanupStruct(StructType & aValue) {
+void CTC_BaseDataClass<T>::CleanupStruct(StructType & aValue)
+{
     // Implementation for all derived classes
 }
 
 template <>
-void CTC_BaseDataClass<DataModel::Nullable<TariffInformationStruct::Type>>::CleanupStruct(StructType& aValue)
+void CTC_BaseDataClass<DataModel::Nullable<TariffInformationStruct::Type>>::CleanupStruct(StructType & aValue)
 {
     if (!aValue.tariffLabel.IsNull() && aValue.tariffLabel.Value().data())
     {
@@ -959,7 +966,7 @@ void CTC_BaseDataClass<DataModel::Nullable<TariffInformationStruct::Type>>::Clea
 }
 
 template <>
-void CTC_BaseDataClass<DataModel::Nullable<DataModel::List<DayEntryStruct::Type>>>::CleanupStruct(StructType& aValue)
+void CTC_BaseDataClass<DataModel::Nullable<DataModel::List<DayEntryStruct::Type>>>::CleanupStruct(StructType & aValue)
 {
     aValue.duration.ClearValue();
     aValue.randomizationOffset.ClearValue();
@@ -967,13 +974,13 @@ void CTC_BaseDataClass<DataModel::Nullable<DataModel::List<DayEntryStruct::Type>
 }
 
 template <>
-void CTC_BaseDataClass<DataModel::Nullable<DataModel::List<DayPatternStruct::Type>>>::CleanupStruct(StructType& aValue)
+void CTC_BaseDataClass<DataModel::Nullable<DataModel::List<DayPatternStruct::Type>>>::CleanupStruct(StructType & aValue)
 {
     CommonUtilities::CleanUpIDs(aValue.dayEntryIDs);
 }
 
 template <>
-void CTC_BaseDataClass<DataModel::Nullable<DataModel::List<TariffComponentStruct::Type>>>::CleanupStruct(StructType& aValue)
+void CTC_BaseDataClass<DataModel::Nullable<DataModel::List<TariffComponentStruct::Type>>>::CleanupStruct(StructType & aValue)
 {
     if (aValue.label.HasValue() && !aValue.label.Value().IsNull())
     {
@@ -989,7 +996,7 @@ void CTC_BaseDataClass<DataModel::Nullable<DataModel::List<TariffComponentStruct
 }
 
 template <>
-void CTC_BaseDataClass<DataModel::Nullable<DataModel::List<TariffPeriodStruct::Type>>>::CleanupStruct(StructType& aValue)
+void CTC_BaseDataClass<DataModel::Nullable<DataModel::List<TariffPeriodStruct::Type>>>::CleanupStruct(StructType & aValue)
 {
     if (!aValue.label.IsNull() && aValue.label.Value().data())
     {
@@ -1001,13 +1008,13 @@ void CTC_BaseDataClass<DataModel::Nullable<DataModel::List<TariffPeriodStruct::T
 }
 
 template <>
-void CTC_BaseDataClass<DataModel::Nullable<DataModel::List<DayStruct::Type>>>::CleanupStruct(StructType& aValue)
+void CTC_BaseDataClass<DataModel::Nullable<DataModel::List<DayStruct::Type>>>::CleanupStruct(StructType & aValue)
 {
     CommonUtilities::CleanUpIDs(aValue.dayEntryIDs);
 }
 
 template <>
-void CTC_BaseDataClass<DataModel::Nullable<DataModel::List<CalendarPeriodStruct::Type>>>::CleanupStruct(StructType& aValue)
+void CTC_BaseDataClass<DataModel::Nullable<DataModel::List<CalendarPeriodStruct::Type>>>::CleanupStruct(StructType & aValue)
 {
     CommonUtilities::CleanUpIDs(aValue.dayPatternIDs);
 }
