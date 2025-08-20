@@ -357,7 +357,8 @@ class CommodityTariffTestBaseHelper(MatterBaseTest):
             attribute_value = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.DayEntries)
 
         if attribute_value is not NullValue:
-            matter_asserts.assert_list(attribute_value, "DayEntries attribute must return a list")
+            matter_asserts.assert_list(
+                attribute_value, "DayEntries attribute must return a list with length less or equal 672", max_length=672)
             matter_asserts.assert_list_element_type(
                 attribute_value, cluster.Structs.DayEntryStruct, "DayEntries attribute must contain DayEntryStruct elements")
 
