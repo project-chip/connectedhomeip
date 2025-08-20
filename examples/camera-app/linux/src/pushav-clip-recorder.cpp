@@ -613,8 +613,9 @@ void PushAVClipRecorder::CleanupOutput()
 
 void PushAVClipRecorder::FinalizeCurrentClip(int reason)
 {
-    int64_t clipLengthInPTS    = currentPts - mCurrentClipStartPts;
-    const int64_t clipDuration = mClipInfo.mInitialDuration * AV_TIME_BASE_Q.den;
+    int64_t clipLengthInPTS = currentPts - mCurrentClipStartPts;
+    // Final duration has to be (clipDuration + preRollLen) seconds
+    const int64_t clipDuration = (mClipInfo.mInitialDuration + (mClipInfo.mPreRollLength / 1000)) * AV_TIME_BASE_Q.den;
     // Pre-calculate common path components
     const std::string prefix   = mClipInfo.mRecorderId + "_clip_" + std::to_string(mClipInfo.mClipId);
     const std::string basePath = mClipInfo.mOutputPath + prefix;

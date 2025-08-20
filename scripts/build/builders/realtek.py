@@ -157,7 +157,7 @@ class RealtekBuilder(Builder):
 
     def build_outputs(self):
         yield BuilderOutput(
-            os.path.join(self.output_dir, 'bin', 'matter-cli-ftd'),
+            os.path.join(self.output_dir, 'bin', self.app.TargetName),
             self.app.AppNamePrefix)
         if self.options.enable_link_map_file:
             yield BuilderOutput(
