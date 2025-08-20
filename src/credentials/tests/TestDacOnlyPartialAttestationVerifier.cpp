@@ -48,6 +48,16 @@ static void OnAttestationInformationVerificationCallback(void * context, const D
 
 } // namespace
 
+/**
+ * Helper function to load a P256 keypair from raw private and public key byte spans.
+ * Combines the public and private key data into a serialized keypair format,
+ * then deserializes it into the provided keypair object.
+ *
+ * @param private_key ByteSpan containing the raw private key bytes.
+ * @param public_key ByteSpan containing the raw public key bytes.
+ * @param keypair Reference to a P256Keypair object to populate.
+ * @return CHIP_ERROR indicating success or failure of the operation.
+ */
 CHIP_ERROR LoadKeypairFromRaw(ByteSpan private_key, ByteSpan public_key, Crypto::P256Keypair & keypair)
 {
     Crypto::P256SerializedKeypair serialized_keypair;
@@ -282,202 +292,202 @@ TEST_F(TestDacOnlyPartialAttestationVerifier, TestWithMatchingPAIAndDACProductID
     EXPECT_EQ(attestationResult, AttestationVerificationResult::kAttestationSignatureInvalid);
 }
 
+// Test case validates that the verifier correctly rejects DAC certificates that have expired
 TEST_F(TestDacOnlyPartialAttestationVerifier, TestWithExpiredDACCertificate)
 {
-    // Prepare TLV attestationElements
-    uint8_t cdData[32]    = { 0x11, 0x22, 0x33, 0x44 };
-    uint8_t nonceData[32] = { 0x55, 0x66, 0x77, 0x88 };
+    // The following attestation information uses arbitrary values solely for test structure;
+    // the actual contents do not represent real or meaningful data.
+    uint8_t cdData[32]        = { 0x11, 0x22, 0x33, 0x44 };
+    uint8_t nonceData[32]     = { 0x55, 0x66, 0x77, 0x88 };
+    uint8_t challengeData[32] = { 0xAA, 0xBB, 0xCC, 0xDD };
     uint8_t tlvBuf[128];
 
+    // Construct TLV structure representing attestation elements that would be signed by device
     chip::TLV::TLVWriter writer;
     writer.Init(tlvBuf, sizeof(tlvBuf));
     chip::TLV::TLVType outerType;
 
+    // Add attestation elements to the TLV structure
     CHIP_ERROR err = writer.StartContainer(chip::TLV::AnonymousTag(), chip::TLV::kTLVType_Structure, outerType);
     ASSERT_EQ(err, CHIP_NO_ERROR);
-
     writer.Put(chip::TLV::ContextTag(1), ByteSpan(cdData));
     writer.Put(chip::TLV::ContextTag(2), ByteSpan(nonceData));
     writer.Put(chip::TLV::ContextTag(3), static_cast<uint32_t>(0));
     writer.Put(chip::TLV::ContextTag(4), ByteSpan());
     writer.Put(chip::TLV::ContextTag(5), ByteSpan());
-
     err = writer.EndContainer(outerType);
     ASSERT_EQ(err, CHIP_NO_ERROR);
 
     size_t tlvLen = writer.GetLengthWritten();
 
-    uint8_t challengeData[32] = { 0xAA, 0xBB, 0xCC, 0xDD };
-
-    uint8_t toSign[128 + 32];
+    // Create the message that the device would have signed: attestation elements + challenge
+    uint8_t toSign[sizeof(tlvBuf) + sizeof(challengeData)];
     memcpy(toSign, tlvBuf, tlvLen);
     memcpy(toSign + tlvLen, challengeData, sizeof(challengeData));
 
+    // Use a test certificate that is specifically expired
     chip::Crypto::P256Keypair keypair;
-    err = LoadKeypairFromRaw(
-        ByteSpan(TestCerts::sTestCert_DAC_FFF2_8004_0020_ValInPast_PrivateKey),
-        ByteSpan(TestCerts::sTestCert_DAC_FFF2_8004_0020_ValInPast_PublicKey),
-        keypair);
+    err = LoadKeypairFromRaw(ByteSpan(TestCerts::sTestCert_DAC_FFF2_8004_0020_ValInPast_PrivateKey),
+                             ByteSpan(TestCerts::sTestCert_DAC_FFF2_8004_0020_ValInPast_PublicKey), keypair);
     ASSERT_EQ(err, CHIP_NO_ERROR);
 
+    // Generate signature using the expired certificate's private key
     chip::Crypto::P256ECDSASignature signature;
     err = keypair.ECDSA_sign_msg(toSign, tlvLen + sizeof(challengeData), signature);
     ASSERT_EQ(err, CHIP_NO_ERROR);
 
+    // Create attestation info using the expired DAC certificate
     DeviceAttestationVerifier::AttestationInfo expiredDACInfo(
         ByteSpan(tlvBuf, tlvLen), ByteSpan(challengeData), ByteSpan(signature.ConstBytes(), signature.Length()),
-        TestCerts::sTestCert_PAI_FFF2_8004_FB_Cert,
-        TestCerts::sTestCert_DAC_FFF2_8004_0020_ValInPast_Cert,
-        ByteSpan(nonceData), static_cast<VendorId>(0xFFF2), 8004);
+        TestCerts::sTestCert_PAI_FFF2_8004_FB_Cert, TestCerts::sTestCert_DAC_FFF2_8004_0020_ValInPast_Cert, ByteSpan(nonceData),
+        static_cast<VendorId>(0xFFF2), 8004);
 
     verifier.VerifyAttestationInformation(expiredDACInfo, &attestationCallback);
-    
-    #if !defined(CURRENT_TIME_NOT_IMPLEMENTED)
+
+    // Expect the verifier to detect the expired certificate and reject attestation
+#if !defined(CURRENT_TIME_NOT_IMPLEMENTED)
     EXPECT_EQ(attestationResult, AttestationVerificationResult::kDacExpired);
-    #endif
+#endif
 }
 
+// Test case verifies that certificates with future validity periods are properly rejected
 TEST_F(TestDacOnlyPartialAttestationVerifier, TestWithValidInFutureDACCertificate)
 {
-    uint8_t cdData[32]    = { 0x11, 0x22, 0x33, 0x44 };
-    uint8_t nonceData[32] = { 0x55, 0x66, 0x77, 0x88 };
+    // The following attestation information uses arbitrary values solely for test structure;
+    // the actual contents do not represent real or meaningful data.
+    uint8_t cdData[32]        = { 0x11, 0x22, 0x33, 0x44 };
+    uint8_t nonceData[32]     = { 0x55, 0x66, 0x77, 0x88 };
+    uint8_t challengeData[32] = { 0xAA, 0xBB, 0xCC, 0xDD };
     uint8_t tlvBuf[128];
 
+    // Construct TLV structure representing attestation elements that would be signed by device
     chip::TLV::TLVWriter writer;
     writer.Init(tlvBuf, sizeof(tlvBuf));
     chip::TLV::TLVType outerType;
 
+    // Add attestation elements to the TLV structure
     CHIP_ERROR err = writer.StartContainer(chip::TLV::AnonymousTag(), chip::TLV::kTLVType_Structure, outerType);
     ASSERT_EQ(err, CHIP_NO_ERROR);
-
     writer.Put(chip::TLV::ContextTag(1), ByteSpan(cdData));
     writer.Put(chip::TLV::ContextTag(2), ByteSpan(nonceData));
     writer.Put(chip::TLV::ContextTag(3), static_cast<uint32_t>(0));
     writer.Put(chip::TLV::ContextTag(4), ByteSpan());
     writer.Put(chip::TLV::ContextTag(5), ByteSpan());
-
     err = writer.EndContainer(outerType);
     ASSERT_EQ(err, CHIP_NO_ERROR);
 
     size_t tlvLen = writer.GetLengthWritten();
 
-    uint8_t challengeData[32] = { 0xAA, 0xBB, 0xCC, 0xDD };
-
-    uint8_t toSign[128 + 32];
+    // Concatenate TLV structure and challenge data for signing
+    uint8_t toSign[sizeof(tlvBuf) + sizeof(challengeData)];
     memcpy(toSign, tlvBuf, tlvLen);
     memcpy(toSign + tlvLen, challengeData, sizeof(challengeData));
 
+    // Load a certificate that has a validity period starting in the future
     chip::Crypto::P256Keypair keypair;
-    err = LoadKeypairFromRaw(
-        ByteSpan(TestCerts::sTestCert_DAC_FFF2_8004_0021_ValInFuture_PrivateKey),
-        ByteSpan(TestCerts::sTestCert_DAC_FFF2_8004_0021_ValInFuture_PublicKey),
-        keypair);
+    err = LoadKeypairFromRaw(ByteSpan(TestCerts::sTestCert_DAC_FFF2_8004_0021_ValInFuture_PrivateKey),
+                             ByteSpan(TestCerts::sTestCert_DAC_FFF2_8004_0021_ValInFuture_PublicKey), keypair);
     ASSERT_EQ(err, CHIP_NO_ERROR);
 
+    // Sign the concatenated data
     chip::Crypto::P256ECDSASignature signature;
     err = keypair.ECDSA_sign_msg(toSign, tlvLen + sizeof(challengeData), signature);
     ASSERT_EQ(err, CHIP_NO_ERROR);
 
-    DeviceAttestationVerifier::AttestationInfo expiredDACInfo(
+    // Provide the future-valid certificate to the verifier
+    DeviceAttestationVerifier::AttestationInfo futureValDACInfo(
         ByteSpan(tlvBuf, tlvLen), ByteSpan(challengeData), ByteSpan(signature.ConstBytes(), signature.Length()),
-        TestCerts::sTestCert_PAI_FFF2_8004_FB_Cert,
-        TestCerts::sTestCert_DAC_FFF2_8004_0021_ValInFuture_Cert,
-        ByteSpan(nonceData), static_cast<VendorId>(0xFFF2), 8004);
+        TestCerts::sTestCert_PAI_FFF2_8004_FB_Cert, TestCerts::sTestCert_DAC_FFF2_8004_0021_ValInFuture_Cert, ByteSpan(nonceData),
+        static_cast<VendorId>(0xFFF2), 8004);
 
-    verifier.VerifyAttestationInformation(expiredDACInfo, &attestationCallback);
-    #if !defined(CURRENT_TIME_NOT_IMPLEMENTED)
+    verifier.VerifyAttestationInformation(futureValDACInfo, &attestationCallback);
+    // Verify that the future-valid certificate is rejected as expired (not yet valid)
+#if !defined(CURRENT_TIME_NOT_IMPLEMENTED)
     EXPECT_EQ(attestationResult, AttestationVerificationResult::kDacExpired);
-    #endif
+#endif
 }
 
+// Test case verifies that wrong formats for attestation elements are properly rejected
 TEST_F(TestDacOnlyPartialAttestationVerifier, TestWithMalformedAttestationElements)
 {
-    // Create a malformed attestationElements buffer (not valid TLV)
-    uint8_t malformedAttestationElements[32] = { 0xFF, 0xEE, 0xDD, 0xCC, 0xBB, 0xAA, 0x99, 0x88,
-                                                 0x77, 0x66, 0x55, 0x44, 0x33, 0x22, 0x11, 0x00,
-                                                 0x10, 0x20, 0x30, 0x40, 0x50, 0x60, 0x70, 0x80,
-                                                 0x90, 0xA0, 0xB0, 0xC0, 0xD0, 0xE0, 0xF0, 0x0F };
+    // Create a malformed attestationElements buffer
+    uint8_t malformedAttestationElements[32] = { 0xFF, 0xEE, 0xDD, 0xCC, 0xBB, 0xAA, 0x99, 0x88, 0x77, 0x66, 0x55,
+                                                 0x44, 0x33, 0x22, 0x11, 0x00, 0x10, 0x20, 0x30, 0x40, 0x50, 0x60,
+                                                 0x70, 0x80, 0x90, 0xA0, 0xB0, 0xC0, 0xD0, 0xE0, 0xF0, 0x0F };
 
-    // Prepare attestationChallenge
+    // The following attestation information uses arbitrary values solely for test structure;
+    // the actual contents do not represent real or meaningful data.
     uint8_t challengeData[32] = { 0xAA, 0xBB, 0xCC, 0xDD };
+    uint8_t nonceData[32]     = { 0 };
 
     // Concatenate attestationElements + attestationChallenge for signing
     uint8_t toSign[sizeof(malformedAttestationElements) + sizeof(challengeData)];
     memcpy(toSign, malformedAttestationElements, sizeof(malformedAttestationElements));
     memcpy(toSign + sizeof(malformedAttestationElements), challengeData, sizeof(challengeData));
 
-    // Load DAC private key and public key from test vectors
+    // Load a valid keypair for signing
     chip::Crypto::P256Keypair keypair;
-    CHIP_ERROR err = LoadKeypairFromRaw(
-        ByteSpan(TestCerts::sTestCert_DAC_FFF1_8000_0004_PrivateKey),
-        ByteSpan(TestCerts::sTestCert_DAC_FFF1_8000_0004_PublicKey),
-        keypair);
+    CHIP_ERROR err = LoadKeypairFromRaw(ByteSpan(TestCerts::sTestCert_DAC_FFF1_8000_0004_PrivateKey),
+                                        ByteSpan(TestCerts::sTestCert_DAC_FFF1_8000_0004_PublicKey), keypair);
     ASSERT_EQ(err, CHIP_NO_ERROR);
 
-    // Sign the malformed attestationElements + attestationChallenge
+    // Sign the concatenated data
     chip::Crypto::P256ECDSASignature signature;
     err = keypair.ECDSA_sign_msg(toSign, sizeof(toSign), signature);
     ASSERT_EQ(err, CHIP_NO_ERROR);
 
     // Prepare AttestationInfo with valid certificates and keys, but malformed attestationElements
     DeviceAttestationVerifier::AttestationInfo malformedInfo(
-        ByteSpan(malformedAttestationElements, sizeof(malformedAttestationElements)),
-        ByteSpan(challengeData),
-        ByteSpan(signature.ConstBytes(), signature.Length()),
-        TestCerts::sTestCert_PAI_FFF1_8000_Cert,
-        TestCerts::sTestCert_DAC_FFF1_8000_0004_Cert,
-        ByteSpan(challengeData), // Use challengeData as nonce for simplicity
-        kTestVendorId, kTestProductId);
+        ByteSpan(malformedAttestationElements, sizeof(malformedAttestationElements)), ByteSpan(challengeData),
+        ByteSpan(signature.ConstBytes(), signature.Length()), TestCerts::sTestCert_PAI_FFF1_8000_Cert,
+        TestCerts::sTestCert_DAC_FFF1_8000_0004_Cert, ByteSpan(nonceData), kTestVendorId, kTestProductId);
 
     verifier.VerifyAttestationInformation(malformedInfo, &attestationCallback);
     EXPECT_EQ(attestationResult, AttestationVerificationResult::kAttestationElementsMalformed);
 }
 
+// Test case verifies that nonce in attestation elements does not match the expected nonce
 TEST_F(TestDacOnlyPartialAttestationVerifier, TestWithMismatchedNonce)
 {
-    // Prepare TLV attestationElements with a nonce that does NOT match info.attestationNonceBuffer
-    uint8_t cdData[32]    = { 0x11, 0x22, 0x33, 0x44 };
-    uint8_t nonceInElements[32] = { 0x55, 0x66, 0x77, 0x88 }; // This will be embedded in attestationElements
+    // The following attestation information uses arbitrary values solely for test structure;
+    // the actual contents do not represent real or meaningful data.
+    uint8_t cdData[32]          = { 0x11, 0x22, 0x33, 0x44 };
+    uint8_t nonceInElements[32] = { 0x55, 0x66, 0x77, 0x88 };
+    uint8_t challengeData[32]   = { 0xAA, 0xBB, 0xCC, 0xDD };
+    uint8_t expectedNonce[32]   = { 0x99, 0x88, 0x77 };
+
     uint8_t tlvBuf[128];
 
+    // Construct TLV structure representing attestation elements that would be signed by device
     chip::TLV::TLVWriter writer;
     writer.Init(tlvBuf, sizeof(tlvBuf));
     chip::TLV::TLVType outerType;
 
+    // Add attestation elements to the TLV structure
     CHIP_ERROR err = writer.StartContainer(chip::TLV::AnonymousTag(), chip::TLV::kTLVType_Structure, outerType);
     ASSERT_EQ(err, CHIP_NO_ERROR);
-
     writer.Put(chip::TLV::ContextTag(1), ByteSpan(cdData));
     writer.Put(chip::TLV::ContextTag(2), ByteSpan(nonceInElements));
     writer.Put(chip::TLV::ContextTag(3), static_cast<uint32_t>(0));
     writer.Put(chip::TLV::ContextTag(4), ByteSpan());
     writer.Put(chip::TLV::ContextTag(5), ByteSpan());
-
     err = writer.EndContainer(outerType);
     ASSERT_EQ(err, CHIP_NO_ERROR);
 
     size_t tlvLen = writer.GetLengthWritten();
 
-    // Prepare attestationChallenge
-    uint8_t challengeData[32] = { 0xAA, 0xBB, 0xCC, 0xDD };
-
-    // Prepare a different nonce for AttestationInfo (does not match nonceInElements)
-    uint8_t expectedNonce[32] = { 0x99, 0x88, 0x77 };
-
-    // Concatenate attestationElements + attestationChallenge for signing
-    uint8_t toSign[128 + 32];
+    // Concatenate TLV and challenge data
+    uint8_t toSign[sizeof(tlvBuf) + sizeof(challengeData)];
     memcpy(toSign, tlvBuf, tlvLen);
     memcpy(toSign + tlvLen, challengeData, sizeof(challengeData));
 
-    // Load DAC private key and public key from test vectors
+    // Load the keypair for signing
     chip::Crypto::P256Keypair keypair;
-    err = LoadKeypairFromRaw(
-        ByteSpan(TestCerts::sTestCert_DAC_FFF1_8000_0004_PrivateKey),
-        ByteSpan(TestCerts::sTestCert_DAC_FFF1_8000_0004_PublicKey),
-        keypair);
+    err = LoadKeypairFromRaw(ByteSpan(TestCerts::sTestCert_DAC_FFF1_8000_0004_PrivateKey),
+                             ByteSpan(TestCerts::sTestCert_DAC_FFF1_8000_0004_PublicKey), keypair);
     ASSERT_EQ(err, CHIP_NO_ERROR);
 
-    // Sign the attestationElements + attestationChallenge
+    // Sign the concatenated data
     chip::Crypto::P256ECDSASignature signature;
     err = keypair.ECDSA_sign_msg(toSign, tlvLen + sizeof(challengeData), signature);
     ASSERT_EQ(err, CHIP_NO_ERROR);
@@ -485,67 +495,62 @@ TEST_F(TestDacOnlyPartialAttestationVerifier, TestWithMismatchedNonce)
     // Prepare AttestationInfo with valid certificates and keys, but mismatched nonce
     DeviceAttestationVerifier::AttestationInfo mismatchedNonceInfo(
         ByteSpan(tlvBuf, tlvLen), ByteSpan(challengeData), ByteSpan(signature.ConstBytes(), signature.Length()),
-        TestCerts::sTestCert_PAI_FFF1_8000_Cert,
-        TestCerts::sTestCert_DAC_FFF1_8000_0004_Cert,
-        ByteSpan(expectedNonce), // This does NOT match nonceInElements
+        TestCerts::sTestCert_PAI_FFF1_8000_Cert, TestCerts::sTestCert_DAC_FFF1_8000_0004_Cert, ByteSpan(expectedNonce),
         kTestVendorId, kTestProductId);
 
     verifier.VerifyAttestationInformation(mismatchedNonceInfo, &attestationCallback);
     EXPECT_EQ(attestationResult, AttestationVerificationResult::kAttestationNonceMismatch);
 }
 
+// Test case verifies that the verifier handles cases where PAA certificate lookup fails
 TEST_F(TestDacOnlyPartialAttestationVerifier, TestWithInvalidPAAFormat)
 {
-    // Prepare TLV attestationElements
-    uint8_t cdData[32]    = { 0x11, 0x22, 0x33, 0x44 };
-    uint8_t nonceData[32] = { 0x55, 0x66, 0x77, 0x88 };
+    // The following attestation information uses arbitrary values solely for test structure;
+    // the actual contents do not represent real or meaningful data.
+    uint8_t cdData[32]        = { 0x11, 0x22, 0x33, 0x44 };
+    uint8_t nonceData[32]     = { 0x55, 0x66, 0x77, 0x88 };
+    uint8_t challengeData[32] = { 0xAA, 0xBB, 0xCC, 0xDD };
     uint8_t tlvBuf[128];
 
+    // Construct TLV structure representing attestation elements that would be signed by device
     chip::TLV::TLVWriter writer;
     writer.Init(tlvBuf, sizeof(tlvBuf));
     chip::TLV::TLVType outerType;
 
+    // Add attestation elements to the TLV structure
     CHIP_ERROR err = writer.StartContainer(chip::TLV::AnonymousTag(), chip::TLV::kTLVType_Structure, outerType);
     ASSERT_EQ(err, CHIP_NO_ERROR);
-
     writer.Put(chip::TLV::ContextTag(1), ByteSpan(cdData));
     writer.Put(chip::TLV::ContextTag(2), ByteSpan(nonceData));
     writer.Put(chip::TLV::ContextTag(3), static_cast<uint32_t>(0));
     writer.Put(chip::TLV::ContextTag(4), ByteSpan());
     writer.Put(chip::TLV::ContextTag(5), ByteSpan());
-
     err = writer.EndContainer(outerType);
     ASSERT_EQ(err, CHIP_NO_ERROR);
 
     size_t tlvLen = writer.GetLengthWritten();
 
-    // Prepare attestationChallenge
-    uint8_t challengeData[32] = { 0xAA, 0xBB, 0xCC, 0xDD };
-
-    // Concatenate attestationElements + attestationChallenge
-    uint8_t toSign[128 + 32];
+    // Concatenate TLV and challenge data
+    uint8_t toSign[sizeof(tlvBuf) + sizeof(challengeData)];
     memcpy(toSign, tlvBuf, tlvLen);
     memcpy(toSign + tlvLen, challengeData, sizeof(challengeData));
 
-    // Load DAC private key and public key from test vectors
+    // Load the keypair for signing
     chip::Crypto::P256Keypair keypair;
-    err = LoadKeypairFromRaw(
-        ByteSpan(TestCerts::sTestCert_DAC_FFF1_8000_0004_PrivateKey),
-        ByteSpan(TestCerts::sTestCert_DAC_FFF1_8000_0004_PublicKey),
-        keypair);
+    err = LoadKeypairFromRaw(ByteSpan(TestCerts::sTestCert_DAC_FFF1_8000_0004_PrivateKey),
+                             ByteSpan(TestCerts::sTestCert_DAC_FFF1_8000_0004_PublicKey), keypair);
     ASSERT_EQ(err, CHIP_NO_ERROR);
 
-    // Sign the attestationElements + attestationChallenge
+    // Sign the concatenated data
     chip::Crypto::P256ECDSASignature signature;
     err = keypair.ECDSA_sign_msg(toSign, tlvLen + sizeof(challengeData), signature);
     ASSERT_EQ(err, CHIP_NO_ERROR);
 
-    // Prepare AttestationInfo
+    // Use valid certificates but the verifier configuration will cause PAA format validation to fail
     DeviceAttestationVerifier::AttestationInfo validInfo(
         ByteSpan(tlvBuf, tlvLen), ByteSpan(challengeData), ByteSpan(signature.ConstBytes(), signature.Length()),
-        TestCerts::sTestCert_PAI_FFF1_8000_Cert,
-        TestCerts::sTestCert_DAC_FFF1_8000_0004_Cert,
-        ByteSpan(nonceData), kTestVendorId, kTestProductId);
+        TestCerts::sTestCert_PAI_FFF1_8000_Cert, TestCerts::sTestCert_DAC_FFF1_8000_0004_Cert, ByteSpan(nonceData), kTestVendorId,
+        kTestProductId);
 
     verifier.VerifyAttestationInformation(validInfo, &attestationCallback);
     EXPECT_EQ(attestationResult, AttestationVerificationResult::kPaaFormatInvalid);
