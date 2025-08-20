@@ -128,8 +128,8 @@ public:
      *
      * @return CHIP_ERROR The result of encryption
      */
-    CHIP_ERROR Encrypt(const uint8_t * input, size_t input_length, uint8_t * output, ConstNonceView nonce, const PacketHeader & header,
-                       MessageAuthenticationCode & mac) const;
+    CHIP_ERROR Encrypt(const uint8_t * input, size_t input_length, uint8_t * output, ConstNonceView nonce,
+                       const PacketHeader & header, MessageAuthenticationCode & mac) const;
 
     /**
      * @brief

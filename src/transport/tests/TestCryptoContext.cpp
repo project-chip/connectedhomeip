@@ -58,7 +58,7 @@ TEST_F(TestGroupCryptoContext, TestBuildPrivacyNonce)
     {
         MessageAuthenticationCode mic;
         uint16_t sessionId = testVector.sessionId;
-        const ByteSpan expectedPrivacyNonce{testVector.privacyNonce};
+        const ByteSpan expectedPrivacyNonce{ testVector.privacyNonce };
         CryptoContext::NonceStorage privacyNonce;
         CryptoContext::ConstNonceView privacyNonceView(privacyNonce);
 
