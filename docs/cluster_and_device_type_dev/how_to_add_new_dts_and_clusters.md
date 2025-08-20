@@ -7,7 +7,7 @@ specifications were properly reviewed and approved.
 ## Add the cluster definitions to the SDK
 
 The following steps should be followed to add new cluster definitions to the
-SDK. Using [Alchemy](https://github.com/project-chip/alchemy) as described in [Writing and updating clusters](https://github.com/project-chip/connectedhomeip/blob/master/docs/guides/writing_clusters.md) to define and generate the new cluster will automatically handle steps 1-5 below, although they should be double-checked.
+SDK. Using [Alchemy](https://github.com/project-chip/alchemy) as described in [Writing and updating clusters](../guides/writing_clusters.md) to define and generate the new cluster will automatically handle steps 1-5 below, although they should be double-checked.
 
 **Add your new cluster definition to an appropriately-name file in this
 directory:**
