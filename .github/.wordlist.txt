@@ -456,6 +456,7 @@ DM
 DMG
 DMM
 DMTT
+dn
 DNS
 Dnsmasq
 dnsmasqd
@@ -479,6 +480,7 @@ dropdown
 dryrun
 DS
 DSLS
+dt
 duplicative
 DUT
 DUT's
@@ -1293,6 +1295,7 @@ runtime
 RVC
 rw
 RXD
+sa
 sandboxed
 sankey
 saveAs
@@ -1346,6 +1349,7 @@ SHAs
 showDocumentation
 showsdks
 shubhamdp
+sii
 SIGINT
 SiLabs
 Silabs's
