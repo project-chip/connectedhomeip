@@ -172,10 +172,12 @@ persistence
 
 -   When using AttributeAccessInterface, you need to manage any Attributes that
     require Persistence.
--   This can be done by using GetAttributePersistenceProvider()
+-   This can be done by using AttributePersistence
 -   This provides a useful API for Reading & Writing values of any type to the
-    default Persistence Store
-    -   [src/app/persistence/AttributePersistenceProvider.h](https://github.com/project-chip/connectedhomeip/blob/master/src/app/persistence/AttributePersistenceProvider.h)
+    default PersistenceProvider
+    -   [src/app/AttributePersistenceProvider.h](https://github.com/project-chip/connectedhomeip/blob/master/src/app/AttributePersistence.h)
+-   Can use a mix of `TestPersistentStorageDelegate` with the
+    `DefaultAttributePersistenceProvider` for UnitTesting
 
 #### Ember layer read / write
 
