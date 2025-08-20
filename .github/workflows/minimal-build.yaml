@@ -21,6 +21,7 @@ on:
             - 'v*-branch'
     pull_request:
     merge_group:
+    workflow_dispatch:
 
 concurrency:
     group: ${{ github.ref }}-${{ github.workflow }}-${{ (github.event_name == 'pull_request' && github.event.number) || (github.event_name == 'workflow_dispatch' && github.run_number) || github.sha }}
@@ -30,7 +31,9 @@ jobs:
     minimal-all-clusters:
         name: Linux / configure build of all-clusters-app
 
-        if: github.actor != 'restyled-io[bot]'
+        if: |
+            github.actor != 'restyled-io[bot]' &&
+            github.event.pull_request.draft == false
         runs-on: ubuntu-latest
 
         container:
@@ -52,7 +55,9 @@ jobs:
     minimal-network-manager:
         name: Linux / configure build of network-manager-app
 
-        if: github.actor != 'restyled-io[bot]'
+        if: |
+            github.actor != 'restyled-io[bot]' &&
+            github.event.pull_request.draft == false
         runs-on: ubuntu-latest
 
         container:
