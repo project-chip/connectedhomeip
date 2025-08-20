@@ -41,11 +41,12 @@ import chip.clusters as Clusters
 from chip.interaction_model import InteractionModelError, Status
 from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from mobly import asserts
+from TC_PAVSTTestBase import PAVSTTestBase
 
 logger = logging.getLogger(__name__)
 
 
-class TC_PAVST_2_8(MatterBaseTest):
+class TC_PAVST_2_8(MatterBaseTest, PAVSTTestBase):
     def desc_TC_PAVST_2_8(self) -> str:
         return "[TC-PAVST-2.8] Attributes with Server as DUT"
 
@@ -90,183 +91,105 @@ class TC_PAVST_2_8(MatterBaseTest):
     async def test_TC_PAVST_2_8(self):
         endpoint = self.get_endpoint(default=1)
         pvcluster = Clusters.PushAvStreamTransport
-        avcluster = Clusters.CameraAvStreamManagement
         pvattr = Clusters.PushAvStreamTransport.Attributes
-        avattr = Clusters.CameraAvStreamManagement.Attributes
-        aSupportedFormats = []
         aAllocatedVideoStreams = []
         aAllocatedAudioStreams = []
+
+        aTransportOptions = ""
         aConnectionID = ""
+        aTransportStatus = ""
 
         self.step(1)
-        if self.pics_guard(self.check_pics("PAVST.S")):
-            transport_configs = await self.read_single_attribute_check_success(
-                endpoint=endpoint,
-                cluster=pvcluster,
-                attribute=pvattr.CurrentConnections,
-            )
-            for config in transport_configs:
-                if config.ConnectionID != 0:
-                    try:
-                        await self.send_single_cmd(
-                            cmd=pvcluster.Commands.DeallocatePushTransport(
-                                ConnectionID=config.ConnectionID
-                            ),
-                            endpoint=endpoint,
-                        )
-                    except InteractionModelError as e:
-                        asserts.assert_true(
-                            e.status == Status.Success, "Unexpected error returned"
-                        )
+        # Commission DUT - already done
+        # @run_if_endpoint_matches(has_cluster(Clusters.PushAvStreamTransport))
+        status = await self.check_and_delete_all_push_av_transports(endpoint, pvattr)
+        asserts.assert_equal(
+            status, Status.Success, "Status must be SUCCESS!"
+        )
 
-            aSupportedFormats = await self.read_single_attribute_check_success(
-                endpoint=endpoint, cluster=pvcluster, attribute=pvattr.SupportedFormats
-            )
-            asserts.assert_greater_equal(
-                len(aSupportedFormats), 1, "SupportedFormats must not be empty!"
-            )
-
-            await self.send_single_cmd(
-                cmd=Clusters.CameraAvStreamManagement.Commands.VideoStreamAllocate(
-                    streamUsage=0,
-                    videoCodec=0,
-                    minFrameRate=30,
-                    maxFrameRate=120,
-                    minResolution=Clusters.CameraAvStreamManagement.Structs.VideoResolutionStruct(
-                        width=400, height=300
-                    ),
-                    maxResolution=Clusters.CameraAvStreamManagement.Structs.VideoResolutionStruct(
-                        width=1920, height=1080
-                    ),
-                    minBitRate=20000,
-                    maxBitRate=150000,
-                    minKeyFrameInterval=4000,
-                    maxKeyFrameInterval=4000,
-                    watermarkEnabled=1,
-                    OSDEnabled=1,
-                ),
-                endpoint=endpoint,
-            )
-
-            aAllocatedVideoStreams = await self.read_single_attribute_check_success(
-                endpoint=endpoint,
-                cluster=avcluster,
-                attribute=avattr.AllocatedVideoStreams,
-            )
-            asserts.assert_greater_equal(
+        aAllocatedVideoStreams = await self.allocate_one_video_stream()
+        asserts.assert_greater_equal(
                 len(aAllocatedVideoStreams),
                 1,
                 "AllocatedVideoStreams must not be empty",
             )
 
-            await self.send_single_cmd(
-                cmd=Clusters.CameraAvStreamManagement.Commands.AudioStreamAllocate(
-                    streamUsage=0,
-                    audioCodec=0,
-                    channelCount=2,
-                    sampleRate=48000,
-                    bitRate=96000,
-                    bitDepth=16,
-                ),
-                endpoint=endpoint,
-            )
+        aAllocatedAudioStreams = await self.allocate_one_audio_stream()
+        asserts.assert_greater_equal(
+            len(aAllocatedAudioStreams),
+            1,
+            "AllocatedAudioStreams must not be empty",
+        )
 
-            aAllocatedAudioStreams = await self.read_single_attribute_check_success(
-                endpoint=endpoint,
-                cluster=avcluster,
-                attribute=avattr.AllocatedAudioStreams,
-            )
-            asserts.assert_greater_equal(
-                len(aAllocatedAudioStreams),
-                1,
-                "AllocatedAudioStreams must not be empty",
-            )
-
-            await self.send_single_cmd(
-                cmd=pvcluster.Commands.AllocatePushTransport(
-                    {
-                        "streamUsage": 0,
-                        "videoStreamID": 1,
-                        "audioStreamID": 1,
-                        "endpointID": 1,
-                        "url": "https://localhost:1234/streams/1",
-                        "triggerOptions": {"triggerType": 2},
-                        "ingestMethod": 0,
-                        "containerFormat": 0,
-                        "containerOptions": {
-                            "containerType": 0,
-                            "CMAFContainerOptions": {"chunkDuration": 4},
-                        },
-                        "expiryTime": 5,
-                    }
-                ),
-                endpoint=endpoint,
-            )
-
+        status = await self.allocate_one_pushav_transport(endpoint)
+        asserts.assert_equal(
+            status, Status.Success, "Push AV Transport should be allocated successfully"
+        )
+    
         self.step(2)
-        if self.pics_guard(self.check_pics("PAVST.S.A0001")):
-            transport_configs = await self.read_single_attribute_check_success(
-                endpoint=endpoint,
-                cluster=pvcluster,
-                attribute=pvattr.CurrentConnections,
-            )
-            asserts.assert_greater_equal(
-                len(transport_configs), 1, "TransportConfigurations must not be empty!"
-            )
+        # @run_if_endpoint_matches(has_cluster(Clusters.PushAvStreamTransport)):
+        transportConfigs = await self.read_pavst_attribute_expect_success(endpoint,
+            pvattr.CurrentConnections,
+        )
+        asserts.assert_greater_equal(
+            len(transportConfigs), 1, "TransportConfigurations must not be empty!"
+        )
+        aTransportOptions = transportConfigs[0].transportOptions
+        aConnectionID = transportConfigs[0].connectionID
+        aTransportStatus = transportConfigs[0].transportStatus
 
         # TH1 sends command
         self.step(3)
-        if self.pics_guard(self.check_pics("PAVST.S.A0001")):
-            status = await self.send_single_cmd(
-                cmd=pvcluster.Commands.FindTransport({"connectionID": 10}),
-                endpoint=endpoint,
-            )
-            asserts.assert_true(
-                status == pvattr.Status.NOT_FOUND,
-                "DUT must respond with NOT_FOUND status code.",
-            )
+        # @run_if_endpoint_matches(has_cluster(Clusters.PushAvStreamTransport)):
+        cmd = pvcluster.Commands.FindTransport(
+                connectionID = 10
+        )
+        status = await  self.psvt_find_transport(cmd)
+        asserts.assert_true(
+            status == Status.NotFound,
+            "DUT responds with NOT_FOUND status code.",
+        )
 
         # TH2 sends command
         self.step(4)
+        if self.pics_guard(self.check_pics("PAVST.S.A0001")):
         # Establishing TH2 controller
-        th2_certificate_authority = (
-            self.certificate_authority_manager.NewCertificateAuthority()
-        )
-        th2_fabric_admin = th2_certificate_authority.NewFabricAdmin(
-            vendorId=0xFFF1, fabricId=self.fabricId + 1
-        )
-        th2 = th2_fabric_admin.NewController(nodeId=2, useTestCommissioner=True)
-        if th2.pics_guard(th2.check_pics("PAVST.S.A0001")):
-            status = await th2.send_single_cmd(
-                cmd=pvcluster.Commands.FindTransport({"connectionID": aConnectionID}),
-                endpoint=endpoint,
+            th2_certificate_authority = (
+                self.certificate_authority_manager.NewCertificateAuthority()
             )
+            th2_fabric_admin = th2_certificate_authority.NewFabricAdmin(
+                vendorId=0xFFF1, fabricId=self.matter_test_config.fabric_id + 1
+            )
+            self.th2 = th2_fabric_admin.NewController(nodeId=2, useTestCommissioner=True)
+            #@run_if_endpoint_matches(has_cluster(Clusters.PushAvStreamTransport)):
+            cmd = pvcluster.Commands.FindTransport(
+                    connectionID = aConnectionID,
+            )
+            status = await self.th2.psvt_find_transport(cmd)
             asserts.assert_true(
-                status == pvattr.Status.NOT_FOUND,
-                "DUT must respond with NOT_FOUND status code.",
+                status == Status.NOT_FOUND,
+                "DUT responds with NOT_FOUND status code.",
             )
 
         self.step(5)
-        if self.pics_guard(self.check_pics("PAVST.S.A0001")):
-            transport_configs = await self.send_single_cmd(
-                cmd=pvcluster.Commands.FindTransport({"connectionID": aConnectionID}),
-                endpoint=endpoint,
-            )
-            asserts.assert_true(
-                transport_configs[0].connectionID == aConnectionID,
-                "DUT must respond with TransportConfiguration with the given connectionID.",
-            )
+        #@run_if_endpoint_matches(has_cluster(Clusters.PushAvStreamTransport)):
+        cmd = pvcluster.Commands.FindTransport(
+                connectionID = aConnectionID,
+        )
+        status = await  self.psvt_find_transport(cmd, expected_connectionID = aConnectionID)
+        asserts.assert_true(
+            status == Status.Success,
+            "DUT responds with SUCCESS status code.")
 
         self.step(6)
-        if self.pics_guard(self.check_pics("PAVST.S.A0001")):
-            transport_configs = await self.send_single_cmd(
-                cmd=pvcluster.Commands.FindTransport({"connectionID": None}),
-                endpoint=endpoint,
-            )
-            asserts.assert_true(
-                transport_configs[0].connectionID == aConnectionID,
-                "DUT must respond with TransportConfiguration with the existing connectionID.",
-            )
+        #@run_if_endpoint_matches(has_cluster(Clusters.PushAvStreamTransport)):
+        cmd = pvcluster.Commands.FindTransport(
+                connectionID = None,
+        )
+        status = await  self.psvt_find_transport(cmd, expected_connectionID = aConnectionID)
+        asserts.assert_true(
+            status == Status.Success,
+            "DUT responds with SUCCESS status code.")
 
 
 if __name__ == "__main__":
