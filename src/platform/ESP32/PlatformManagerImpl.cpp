@@ -120,6 +120,7 @@ void PlatformManagerImpl::HandleESPSystemEvent(void * arg, esp_event_base_t even
         switch (eventId)
         {
         case IP_EVENT_STA_GOT_IP:
+        case IP_EVENT_ETH_GOT_IP:
             memcpy(&event.Platform.ESPSystemEvent.Data.IpGotIp, eventData, sizeof(event.Platform.ESPSystemEvent.Data.IpGotIp));
             break;
         case IP_EVENT_GOT_IP6:
