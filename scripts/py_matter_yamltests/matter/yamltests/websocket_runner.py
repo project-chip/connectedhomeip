@@ -107,12 +107,10 @@ class WebSocketRunner(TestRunner):
 
             instance = subprocess.Popen(
                 command,
-                text=True,                  # return str instead of bytes
-                bufsize=1,                  # line-buffered
+                bufsize=0,                  # unbuffered
+                text=False,                 # keep output as bytes
                 stdout=subprocess.PIPE,
                 stderr=subprocess.STDOUT,
-                encoding="utf-8",           # force utf-8 decoding
-                errors="replace"            # replace bad bytes so readline() never fails
             )
 
             # Loop to read the subprocess output with a timeout
@@ -120,7 +118,7 @@ class WebSocketRunner(TestRunner):
             while True:
                 if time.time() - start_time > _WEBSOCKET_SERVER_MESSAGE_TIMEOUT:
                     for line in lines:
-                        print(line, end='')
+                        print(line.decode('utf-8', errors='replace'), end='')
                     self._hooks.abort(url)
                     await self._stop_server(instance)
                     raise Exception(
@@ -131,7 +129,7 @@ class WebSocketRunner(TestRunner):
                     line = instance.stdout.readline()
                     if line:
                         lines.append(line)
-                        if re.search(_WEBSOCKET_SERVER_MESSAGE, line):
+                        if re.search(_WEBSOCKET_SERVER_MESSAGE, line.decode('utf-8', errors='replace')):
                             break  # Exit the loop if the pattern is found
                 else:
                     continue
