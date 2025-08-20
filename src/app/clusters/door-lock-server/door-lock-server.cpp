@@ -3233,7 +3233,7 @@ Status DoorLockServer::clearCredentials(chip::EndpointId endpointId, chip::Fabri
 
     Status status          = Status::Success;
     bool clearedCredential = false;
-    for (uint16_t i = 1; i < maxNumberOfCredentials; ++i)
+    for (uint16_t i = 1; i <= maxNumberOfCredentials; ++i)
     {
         Status clearStatus = clearCredential(endpointId, modifier, sourceNodeId, credentialType, i, false);
         if (Status::Success != clearStatus)
