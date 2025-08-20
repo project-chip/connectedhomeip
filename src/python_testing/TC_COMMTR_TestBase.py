@@ -36,7 +36,10 @@ class CommodityMeteringTestBaseHelper(MatterBaseTest):
     test_event_fake_data = 0x0b07000000000000
     test_event_clear = 0x0b07000000000001
 
+    MaximumMeteredQuantities = None
+
     async def send_test_event_trigger_attrs_value_update(self, t_wait=5):
+        await self.send_test_event_triggers(eventTrigger=self.test_event_fake_data)
         await asyncio.sleep(t_wait)
 
     async def send_test_event_trigger_clear(self, t_wait=5):
@@ -54,9 +57,9 @@ class CommodityMeteringTestBaseHelper(MatterBaseTest):
 
     async def check_maximum_metered_quantities_attribute(self, endpoint, attribute_value=None):
 
-        if not attribute_value:
-            self.MaximumMeteredQuantities = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.MaximumMeteredQuantities)
         self.MaximumMeteredQuantities = attribute_value
+        if not self.MaximumMeteredQuantities:
+            self.MaximumMeteredQuantities = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.MaximumMeteredQuantities)
         if self.MaximumMeteredQuantities is not NullValue:
             matter_asserts.assert_valid_uint16(self.MaximumMeteredQuantities, 'MaximumMeteredQuantities must be uint16')
 
@@ -67,11 +70,10 @@ class CommodityMeteringTestBaseHelper(MatterBaseTest):
                 endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.MeteredQuantity
             )
 
-        if not self.MaximumMeteredQuantities:
-            self.check_maximum_metered_quantities_attribute(endpoint)
-
         if attribute_value is not NullValue:
             # Looks like MaximumMeteredQuantities can't be Null if MeteredQuantity is not Null due to it defines the size of the list
+            self.MaximumMeteredQuantities = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.MaximumMeteredQuantities)
+            await self.check_maximum_metered_quantities_attribute(endpoint, self.MaximumMeteredQuantities)
             asserts.assert_not_equal(self.MaximumMeteredQuantities, NullValue, "MaximumMeteredQuantities must not be NullValue")
             matter_asserts.assert_list(attribute_value, "MeteredQuantity attribute must return a list",
                                        max_length=self.MaximumMeteredQuantities)
@@ -107,5 +109,5 @@ class CommodityMeteringTestBaseHelper(MatterBaseTest):
         try:
             asserts.assert_not_equal(reports[attribute][0].value, saved_value,
                                      "Reported value should be different from saved value")
-        except KeyError as err:
+        except (KeyError, IndexError) as err:
             asserts.fail(f"There is not reports for attribute {attribute_name}:\n{err}")
