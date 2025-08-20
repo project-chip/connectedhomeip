@@ -98,33 +98,33 @@ class TC_MTRID_2_1(MeterIdentificationTestBaseHelper):
 
         self.step("2")
         # TH reads MeterType attribute, expects a null or a MeterTypeEnum value
-        self.check_meter_type_attribute(endpoint)
+        await self.check_meter_type_attribute(endpoint)
 
         self.step("3")
         # TH reads PointOfDelivery attribute, expects a null or a value of string type
-        self.check_point_of_delivery_attribute(endpoint)
+        await self.check_point_of_delivery_attribute(endpoint)
 
         self.step("4")
         # TH reads MeterSerialNumber attribute, expects a null or a value of string type
-        self.check_meter_serial_number_attribute(endpoint)
+        await self.check_meter_serial_number_attribute(endpoint)
 
-        self.step("5")
         # Check that PICS MTRID.S.A0003 is True
         if not self.check_pics("MTRID.S.A0003"):
             logger.info("PICS MTRID.S.A0003 is not True")
-            self.mark_current_step_skipped()
+            self.skip_step("5")
+        else:
+            self.step("5")
+            # TH reads ProtocolVersion attribute, expects a null or a value of string type
+            await self.check_protocol_version_attribute(endpoint)
 
-        # TH reads ProtocolVersion attribute, expects a null or a value of string type
-        self.check_protocol_version_attribute(endpoint)
-
-        self.step("6")
         # Check that PICS MTRID.S.F00 is True
         if not self.check_pics("MTRID.S.F00"):
             logger.info("PICS MTRID.S.F00 is not True")
-            self.mark_current_step_skipped()
-
-        # TH reads PowerThreshold attribute, expects a null or a value of PowerThresholdStruct type
-        self.check_power_threshold_attribute(endpoint)
+            self.skip_step("6")
+        else:
+            self.step("6")
+            # TH reads PowerThreshold attribute, expects a null or a value of PowerThresholdStruct type
+            await self.check_power_threshold_attribute(endpoint)
 
 
 if __name__ == "__main__":
