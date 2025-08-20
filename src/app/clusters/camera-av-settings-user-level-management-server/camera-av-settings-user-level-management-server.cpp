@@ -1358,6 +1358,10 @@ void CameraAvSettingsUserLevelMgmtServer::OnPhysicalMovementComplete(Status stat
         SetTilt(mTargetTilt);
         SetZoom(mTargetZoom);
     }
+    else
+    {
+        ChipLogError(Zcl, "CameraAVSettingsUserLevelMgmt[ep=%d]. Camera failed to move to new requested values of Pan, Tilt, and/or Zoom.", mEndpointId);
+    }
 
     SetMovementState(PhysicalMovementEnum::kIdle);
 }
