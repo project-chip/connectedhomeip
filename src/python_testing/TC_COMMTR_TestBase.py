@@ -17,7 +17,6 @@
 
 import asyncio
 import logging
-import time
 
 from mobly import asserts
 
@@ -42,15 +41,16 @@ class CommodityMeteringTestBaseHelper(MatterBaseTest):
 
     async def send_test_event_trigger_clear(self, t_wait=5):
         await self.send_test_event_triggers(eventTrigger=self.test_event_clear)
-        time.sleep(t_wait)
+        await asyncio.sleep(t_wait)
 
     async def checkMeteredQuantityStruct(self, struct: Clusters.CommodityMetering.Structs.MeteredQuantityStruct = None):
         """Supporting function to check MeteredQuantityStruct."""
 
-        matter_asserts.assert_list(struct.tariffComponentIDs, "TariffComponentIDs attribute must return a list", max_length=128)
+        matter_asserts.assert_list(struct.tariffComponentIDs,
+                                   "TariffComponentIDs field of MeteredQuantityStruct must return a list", max_length=128)
         matter_asserts.assert_list_element_type(
-            struct.tariffComponentIDs, int, "TariffComponentIDs attribute must contain int elements")
-        matter_asserts.assert_valid_int64(struct.quantity, 'Quantity')
+            struct.tariffComponentIDs, int, "TariffComponentIDs field of MeteredQuantityStruct must contain int elements")
+        matter_asserts.assert_valid_int64(struct.quantity, 'Quantity field of MeteredQuantityStruct must be int64')
 
     async def check_maximum_metered_quantities_attribute(self, endpoint, attribute_value=None):
 
@@ -105,7 +105,7 @@ class CommodityMeteringTestBaseHelper(MatterBaseTest):
     async def verify_reporting(self, reports: dict, attribute: ClusterObjects.ClusterAttributeDescriptor, attribute_name: str, saved_value) -> None:
 
         try:
-            asserts.assert_not_equal(reports[attribute], saved_value,
+            asserts.assert_not_equal(reports[attribute][0].value, saved_value,
                                      "Reported value should be different from saved value")
         except KeyError as err:
             asserts.fail(f"There is not reports for attribute {attribute_name}:\n{err}")
