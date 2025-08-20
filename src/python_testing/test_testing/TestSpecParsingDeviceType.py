@@ -17,17 +17,7 @@
 import re
 import xml.etree.ElementTree as ElementTree
 
-<<<<<<< HEAD:src/python_testing/test_testing/TestSpecParsingDeviceType.py
-import chip.clusters as Clusters
-from chip.clusters import Attribute
-from chip.testing.conformance import conformance_allowed
-from chip.testing.matter_testing import MatterBaseTest, default_matter_test_main
-from chip.testing.spec_parsing import (PrebuiltDataModelDirectory, XmlDeviceType, build_xml_clusters, build_xml_device_types,
-                                       parse_single_device_type)
-from chip.tlv import uint
 from DeviceConformanceTests import DeviceConformanceTests, get_supersets
-=======
->>>>>>> master:src/python_testing/TestSpecParsingDeviceType.py
 from fake_device_builder import create_minimal_dt
 from jinja2 import Template
 from mobly import asserts

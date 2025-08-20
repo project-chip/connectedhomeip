@@ -17,13 +17,7 @@
 
 from typing import Callable
 
-<<<<<<< HEAD:src/python_testing/test_testing/TestDefaultWarnings.py
-import chip.clusters as Clusters
 import DefaultChecker as DefaultChecker
-from chip.testing.matter_testing import MatterBaseTest, default_matter_test_main
-=======
-import TC_DefaultWarnings
->>>>>>> master:src/python_testing/TestDefaultWarnings.py
 from mobly import asserts
 
 import matter.clusters as Clusters
