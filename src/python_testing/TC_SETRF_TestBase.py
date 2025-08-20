@@ -229,11 +229,17 @@ class CommodityTariffTestBaseHelper(MatterBaseTest):
             await self.checkPowerThresholdStruct(endpoint=endpoint, cluster=cluster, struct=struct.powerThreshold)
         else:
             asserts.assert_is_none(struct.powerThreshold, "PowerThreshold must be None")
-        if struct.threshold is not NullValue:
-            matter_asserts.assert_valid_int64(struct.threshold, 'Threshold must has int64 type.')
+
+        if self.BlockModeValue == 0:
+            asserts.assert_equal(struct.threshold, NullValue, "Threshold field must be Null if BlockMode is 0.")
+        else:
+            if struct.threshold is not NullValue:
+                matter_asserts.assert_valid_int64(struct.threshold, 'Threshold field must has int64 type.')
+
         if struct.label is not None and struct.label is not NullValue:
             matter_asserts.assert_is_string(struct.label, "Label must be a string")
             asserts.assert_less_equal(len(struct.label), 128, "Label must have length at most 128!")
+
         if struct.predicted is not None:
             matter_asserts.assert_valid_bool(struct.predicted, 'Predicted must has bool type.')
 
@@ -261,6 +267,7 @@ class CommodityTariffTestBaseHelper(MatterBaseTest):
         if struct.blockMode is not NullValue:
             matter_asserts.assert_valid_enum(
                 struct.blockMode, "BlockMode attribute must return a BlockModeEnum", cluster.Enums.BlockModeEnum)
+            self.BlockModeValue = struct.blockMode
 
     async def checkTariffPeriodStruct(self,
                                       endpoint: int = None,
