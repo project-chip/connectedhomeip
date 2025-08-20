@@ -64,7 +64,7 @@ class TC_SETRF_2_1(MatterBaseTest, CommodityTariffTestBaseHelper):
     def pics_TC_SETRF_2_1(self) -> list[str]:
         """This function returns a list of PICS for this test case that must be True for the test to be run"""
 
-        return ["SETRF.S",]
+        return ["SETRF.S"]
 
     def steps_TC_SETRF_2_1(self) -> list[TestStep]:
 
