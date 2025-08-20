@@ -25,7 +25,7 @@ from matter.testing.matter_testing import MatterBaseTest, async_test_body, defau
 from matter.testing.taglist_and_topology_test import build_tree_for_graph
 
 console = None
-maxClusterNameLength = 30
+maxClusterNameLength = 20
 
 
 def AddServerOrClientNode(graphSection, endpoint, clusterName, color, nodeRef):
@@ -36,13 +36,11 @@ def AddServerOrClientNode(graphSection, endpoint, clusterName, color, nodeRef):
         clusterNameAdjustedLength = clusterName
 
     graphSection.node(f"ep{endpoint}_{clusterName}", label=f"{clusterNameAdjustedLength}", style="filled,rounded",
-                      color=color, shape="box", fixedsize="true", width="3", height="0.5")
+                      color=color, shape="box", fixedsize="true", width="2", height="0.5")
     graphSection.edge(nodeRef, f"ep{endpoint}_{clusterName}", style="invis")
 
 
-def CreateEndpointGraph(graph, graphSection, endpoint, wildcardResponse, device_type_xml):
-
-    numberOfRowsInEndpoint = 2
+def AddNodeLabel(graphSection, endpoint, wildcardResponse, device_type_xml, aggregator):
 
     partsListFromWildcardRead = wildcardResponse[endpoint][Clusters.Objects.Descriptor][Clusters.Objects.Descriptor.Attributes.PartsList]
 
@@ -58,13 +56,23 @@ def CreateEndpointGraph(graph, graphSection, endpoint, wildcardResponse, device_
     # console.print(f"PartsList: {partsListFromWildcardRead}")
 
     endpointLabel = f"Endpoint: {endpoint}\lDeviceTypeList: {listOfDeviceTypes}\lPartsList: {partsListFromWildcardRead}\l"  # noqa: W605
+    if aggregator:
+        color = 'grey'
+    else:
+        color = 'dodgerblue'
+    graphSection.node(f"ep{endpoint}", label=endpointLabel, style="filled,rounded",
+                      color=color, shape="box", fixedsize="true", width="4", height="1")
+
+
+def CreateEndpointGraph(graph, graphSection, endpoint, wildcardResponse, device_type_xml):
+    AddNodeLabel(graphSection, endpoint, wildcardResponse, device_type_xml, False)
+    partsListFromWildcardRead = wildcardResponse[endpoint][Clusters.Objects.Descriptor][Clusters.Objects.Descriptor.Attributes.PartsList]
+
+    numberOfRowsInEndpoint = 2
 
     nextNodeRef = ""
     nodeRef = f"ep{endpoint}"
     clusterColumnCount = 0
-
-    graphSection.node(f"ep{endpoint}", label=endpointLabel, style="filled,rounded",
-                      color="dodgerblue", shape="box", fixedsize="true", width="4", height="1")
 
     for clusterId in wildcardResponse[endpoint][Clusters.Objects.Descriptor][Clusters.Objects.Descriptor.Attributes.ServerList]:
         clusterColumnCount += 1
@@ -72,7 +80,7 @@ def CreateEndpointGraph(graph, graphSection, endpoint, wildcardResponse, device_
         try:
             clusterName = Clusters.ClusterObjects.ALL_CLUSTERS[clusterId].__name__
         except KeyError:
-            clusterName = f"Custom server\l0x{clusterId:08X}"  # noqa: W605
+            clusterName = f"MEI 0x{clusterId:08X}"
 
         AddServerOrClientNode(graphSection, endpoint, clusterName, "olivedrab", nodeRef)
 
@@ -89,7 +97,7 @@ def CreateEndpointGraph(graph, graphSection, endpoint, wildcardResponse, device_
         try:
             clusterName = Clusters.ClusterObjects.ALL_CLUSTERS[clusterId].__name__
         except KeyError:
-            clusterName = f"Custom client\l0x{clusterId:08X}"  # noqa: W605
+            clusterName = f"MEI 0x{clusterId:08X}"
 
         AddServerOrClientNode(graphSection, endpoint, clusterName, "orange", nodeRef)
 
@@ -107,7 +115,7 @@ def CreateEndpointGraph(graph, graphSection, endpoint, wildcardResponse, device_
                        lhead=f'cluster_EP{part}', minlen=f"{numberOfRowsInEndpoint}")
 
 
-def create_graph(wildcardResponse, xml_device_types):
+def create_graph(wildcardResponse, xml_device_types, outfile_dir: str = '.'):
 
     # Create console to print
     global console
@@ -116,9 +124,28 @@ def create_graph(wildcardResponse, xml_device_types):
     # Perform wildcard read to get all attributes from device
     console.print("[blue]Capturing data from device")
 
+    vid = wildcardResponse[0][Clusters.BasicInformation][Clusters.BasicInformation.Attributes.VendorID]
+    pid = wildcardResponse[0][Clusters.BasicInformation][Clusters.BasicInformation.Attributes.ProductID]
+    software_version = wildcardResponse[0][Clusters.BasicInformation][Clusters.BasicInformation.Attributes.SoftwareVersion]
+    vendor_name = wildcardResponse[0][Clusters.BasicInformation][Clusters.BasicInformation.Attributes.VendorName]
+    product_name = wildcardResponse[0][Clusters.BasicInformation][Clusters.BasicInformation.Attributes.ProductName]
+    try:
+        spec_version = wildcardResponse[0][Clusters.BasicInformation][Clusters.BasicInformation.Attributes.SpecificationVersion]
+    except KeyError:
+        # TODO: we can probably guess from the data model version, but I don't care that much right now
+        spec_version = "pre-1.3"
+
+    cluster_info_string = f'''
+    Vendor: {vendor_name} (0x{vid:04X})
+    Product: {product_name} (0x{pid:04X})
+    Software version: {software_version}
+    Specification version: {spec_version}
+    '''
+
     # Creating graph object
     deviceGraph = graphviz.Digraph()
     deviceGraph.attr(style="rounded", splines="line", compound="true")
+    deviceGraph.attr(label=cluster_info_string, labelloc='t')
 
     console.print("[blue]Generating graph")
     # Loop through each endpoint in the response from the wildcard read
@@ -138,24 +165,30 @@ def create_graph(wildcardResponse, xml_device_types):
             # For aggregators, just open a container
             print(f"adding aggregator on EP {endpoint}")
             with currentAggregator.subgraph(name=f'cluster_EP{endpoint}') as subgraph[endpoint]:
+                AddNodeLabel(subgraph[endpoint], endpoint, wildcardResponse, xml_device_types, True)
+                subgraph[endpoint].attr(rank="same", label='')
+
                 currentAggregator = subgraph[endpoint]
                 for c in tree[endpoint].children:
                     create_subgraph(c)
+
+                # required for ordering these correctly - for some reason graphiz puts these backwards if we don't have
+                # explicit edge ordering
+                for c in tree[endpoint].children:
+                    subgraph[endpoint].edge(f"ep{endpoint}", f'ep{c}', style='invis')
         else:
             print(f"adding tree on EP {endpoint}")
             # normal tree, this will appear in its nearest container, but the children are created external
             with currentAggregator.subgraph(name=f'cluster_EP{endpoint}') as subgraph[endpoint]:
                 CreateEndpointGraph(deviceGraph, subgraph[endpoint],
                                     tree[endpoint].endpoint, wildcardResponse, xml_device_types)
+                subgraph[endpoint].attr(rank="same", label='')
             for c in tree[endpoint].children:
                 create_subgraph(c)
 
     create_subgraph(0)
 
-    vid = wildcardResponse[0][Clusters.BasicInformation][Clusters.BasicInformation.Attributes.VendorID]
-    pid = wildcardResponse[0][Clusters.BasicInformation][Clusters.BasicInformation.Attributes.ProductID]
-    software_version = wildcardResponse[0][Clusters.BasicInformation][Clusters.BasicInformation.Attributes.SoftwareVersion]
-    deviceGraph.save(f'matter_device_graph_0x{vid:04X}_0x{pid:04X}_{software_version}.dot')
+    deviceGraph.save(f'{outfile_dir}/matter_device_graph_0x{vid:04X}_0x{pid:04X}_{software_version}.dot')
 
 
 class TC_MatterDeviceGraph(MatterBaseTest, BasicCompositionTests):
@@ -167,7 +200,8 @@ class TC_MatterDeviceGraph(MatterBaseTest, BasicCompositionTests):
 
     @async_test_body
     async def test_matter_device_graph(self):
-        create_graph(self.endpoints, self.xml_device_types)
+        outfile_dir = self.user_params.get("outfile_path", '.')
+        create_graph(self.endpoints, self.xml_device_types, outfile_dir)
 
 
 if __name__ == "__main__":
