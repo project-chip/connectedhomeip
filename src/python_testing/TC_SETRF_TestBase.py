@@ -355,12 +355,18 @@ class CommodityTariffTestBaseHelper(MatterBaseTest):
 
         if not attribute_value:
             attribute_value = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.DayEntries)
+
         if attribute_value is not NullValue:
             matter_asserts.assert_list(attribute_value, "DayEntries attribute must return a list")
             matter_asserts.assert_list_element_type(
                 attribute_value, cluster.Structs.DayEntryStruct, "DayEntries attribute must contain DayEntryStruct elements")
+
+            dayEntryIDs_from_day_entries_attribute = []
+
             for item in attribute_value:
                 await self.checkDayEntryStruct(endpoint=endpoint, cluster=cluster, struct=item)
+                dayEntryIDs_from_day_entries_attribute.append(item.dayEntryID)
+            self.check_list_elements_uniqueness(dayEntryIDs_from_day_entries_attribute, "DayEntryIDs")
 
     async def check_day_patterns_attribute(self, endpoint, attribute_value=None):
 
