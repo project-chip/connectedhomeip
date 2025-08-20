@@ -38,7 +38,7 @@
 import logging
 
 import chip.clusters as Clusters
-from chip.interaction_model import InteractionModelError, Status
+from chip.interaction_model import Status
 from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from mobly import asserts
 from TC_PAVSTTestBase import PAVSTTestBase
@@ -192,7 +192,6 @@ class TC_PAVST_2_6(MatterBaseTest, PAVSTTestBase):
         asserts.assert_greater_equal(
             len(transportConfigs), 1, "TransportConfigurations must be 1!"
         )
-        result = transportConfigs[0].transportStatus == (not aTransportStatus)
         asserts.assert_true(
             transportConfigs[0].transportStatus
             == (not aTransportStatus),

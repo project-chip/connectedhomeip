@@ -38,7 +38,7 @@
 import logging
 
 import chip.clusters as Clusters
-from chip.interaction_model import InteractionModelError, Status
+from chip.interaction_model import Status
 from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from mobly import asserts
 from TC_PAVSTTestBase import PAVSTTestBase
