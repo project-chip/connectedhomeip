@@ -42,7 +42,6 @@
 
 
 import logging
-import time
 
 from mobly import asserts
 from TC_MTRIDTestBase import MeterIdentificationTestBaseHelper
