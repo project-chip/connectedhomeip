@@ -30,7 +30,7 @@
 namespace chip {
 namespace DeviceLayer {
 
-__attribute__((section(".bss"))) static uint8_t mFactoryDataBuffer[FIXED_PARTITION_SIZE(factory_partition)];
+static uint8_t * mFactoryDataBuffer = (uint8_t *) malloc(sizeof(uint8_t) * FIXED_PARTITION_SIZE(factory_partition));
 
 struct InternalFlashFactoryData
 {
