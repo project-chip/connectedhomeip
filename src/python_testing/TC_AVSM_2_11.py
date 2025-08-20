@@ -178,7 +178,8 @@ class TC_AVSM_2_11(MatterBaseTest, AVSMTestBase):
 
         self.step(8)
         try:
-            notSupportedStreamUsage = next((e for e in Globals.Enums.StreamUsageEnum if e not in aSupportedStreamUsages), None)
+            notSupportedStreamUsage = next(
+                (e for e in Globals.Enums.StreamUsageEnum if e not in aSupportedStreamUsages and e != Globals.Enums.StreamUsageEnum.kInternal), None)
             await self.send_single_cmd(
                 endpoint=endpoint, cmd=commands.SetStreamPriorities(streamPriorities=([notSupportedStreamUsage]))
             )
