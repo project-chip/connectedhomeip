@@ -36,11 +36,26 @@ env:
     CHIP_NO_LOG_TIMESTAMPS: true
 
 jobs:
+    changed_paths:
+      runs-on: ubuntu-latest
+      if: github.actor != 'restyled-io[bot]'
+      outputs:
+        non_markdown_changes: ${{ steps.filter.outputs.non_markdown_changes }}
+      steps:
+        - uses: actions/checkout@v4
+        - name: Check for non-markdown files
+          id: filter
+          uses: dorny/paths-filter@v3
+          with:
+            filters: |
+              non_markdown_changes:
+                - '!**.md'
+
     build_linux_gcc_debug:
         name: Build on Linux (gcc_debug)
-
+        needs: changed_paths
         runs-on: ubuntu-latest
-        if: github.actor != 'restyled-io[bot]' && steps.changed_paths.outputs.non_markdown_changes == 'true'
+        if: github.actor != 'restyled-io[bot]' && needs.changed_paths.outputs.non_markdown_changes == 'true'
 
         container:
             image: ghcr.io/project-chip/chip-build:162
@@ -61,14 +76,6 @@ jobs:
               run: echo "$CONCURRENCY_CONTEXT"
             - name: Checkout
               uses: actions/checkout@v5
-            - name: Detect changed paths
-              uses: dorny/paths-filter@v3
-              id: changed_paths
-              with:
-                filters: |
-                  non_markdown_changes:
-                    # returns true if at least one non-markdown file is present
-                    - '!**/*.md'
             - name: Try to ensure the directories for core dumping exist and we
                   can write them.
               run: |
@@ -156,9 +163,9 @@ jobs:
 
     build_linux:
         name: Build on Linux (fake, gcc_release, clang, simulated)
-
+        needs: changed_paths
         runs-on: ubuntu-latest
-        if: github.actor != 'restyled-io[bot]' && inputs.run-codeql != true && steps.changed_paths.outputs.non_markdown_changes == 'true'
+        if: github.actor != 'restyled-io[bot]' && inputs.run-codeql != true && needs.changed_paths.outputs.non_markdown_changes == 'true'
 
         container:
             image: ghcr.io/project-chip/chip-build:162
@@ -182,14 +189,6 @@ jobs:
               with:
                   fetch-depth: 2
                   persist-credentials: true
-            - name: Detect changed paths
-              uses: dorny/paths-filter@v3
-              id: changed_paths
-              with:
-                filters: |
-                  non_markdown_changes:
-                    # returns true if at least one non-markdown file is present
-                    - '!**/*.md'
             - name: Try to ensure the directories for core dumping exist and we
                   can write them.
               run: |
@@ -342,9 +341,9 @@ jobs:
 
     build_linux_python_lib:
         name: Build on Linux (python_lib)
-
+        needs: changed_paths
         runs-on: ubuntu-latest
-        if: github.actor != 'restyled-io[bot]' && inputs.run-codeql != true && steps.changed_paths.outputs.non_markdown_changes == 'true'
+        if: github.actor != 'restyled-io[bot]' && inputs.run-codeql != true && needs.changed_paths.outputs.non_markdown_changes == 'true'
 
         container:
             image: ghcr.io/project-chip/chip-build:162
@@ -365,14 +364,6 @@ jobs:
               run: echo "$CONCURRENCY_CONTEXT"
             - name: Checkout
               uses: actions/checkout@v5
-            - name: Detect changed paths
-              uses: dorny/paths-filter@v3
-              id: changed_paths
-              with:
-                filters: |
-                  non_markdown_changes:
-                    # returns true if at least one non-markdown file is present
-                    - '!**/*.md'
             - name: Checkout submodules & Bootstrap
               uses: ./.github/actions/checkout-submodules-and-bootstrap
               with:
@@ -415,9 +406,9 @@ jobs:
 
     build_linux_python_lighting_device:
         name: Build on Linux (python lighting-app)
-
+        needs: changed_paths
         runs-on: ubuntu-latest
-        if: github.actor != 'restyled-io[bot]' && inputs.run-codeql != true && steps.changed_paths.outputs.non_markdown_changes == 'true'
+        if: github.actor != 'restyled-io[bot]' && inputs.run-codeql != true && needs.changed_paths.outputs.non_markdown_changes == 'true'
 
         container:
             image: ghcr.io/project-chip/chip-build:162
@@ -438,14 +429,6 @@ jobs:
               run: echo "$CONCURRENCY_CONTEXT"
             - name: Checkout
               uses: actions/checkout@v5
-            - name: Detect changed paths
-              uses: dorny/paths-filter@v3
-              id: changed_paths
-              with:
-                filters: |
-                  non_markdown_changes:
-                    # returns true if at least one non-markdown file is present
-                    - '!**/*.md'
             - name: Checkout submodules & Bootstrap
               uses: ./.github/actions/checkout-submodules-and-bootstrap
               with:
@@ -457,8 +440,9 @@ jobs:
 
     build_darwin:
         name: Build on Darwin (clang, simulated)
+        needs: changed_paths
         runs-on: macos-13
-        if: github.actor != 'restyled-io[bot]'  && inputs.run-codeql != true && steps.changed_paths.outputs.non_markdown_changes == 'true'
+        if: github.actor != 'restyled-io[bot]'  && inputs.run-codeql != true && needs.changed_paths.outputs.non_markdown_changes == 'true'
 
         steps:
             - name: Checkout
@@ -466,14 +450,6 @@ jobs:
               with:
                   fetch-depth: 2
                   persist-credentials: true
-            - name: Detect changed paths
-              uses: dorny/paths-filter@v3
-              id: changed_paths
-              with:
-                filters: |
-                  non_markdown_changes:
-                    # returns true if at least one non-markdown file is present
-                    - '!**/*.md'
             - name: Checkout submodules & Bootstrap
               uses: ./.github/actions/checkout-submodules-and-bootstrap
               with:
@@ -552,11 +528,11 @@ jobs:
 
     build_linux_gcc_coverage:
         name: Build on Linux (coverage)
-
+        needs: changed_paths
         env:
             TSAN_OPTIONS: "halt_on_error=1 suppressions=scripts/tests/chiptest/tsan-linux-suppressions.txt"
 
-        if: github.actor != 'restyled-io[bot]' && inputs.run-codeql != true && steps.changed_paths.outputs.non_markdown_changes == 'true'
+        if: github.actor != 'restyled-io[bot]' && inputs.run-codeql != true && needs.changed_paths.outputs.non_markdown_changes == 'true'
         runs-on: ubuntu-latest
 
         container:
@@ -567,14 +543,6 @@ jobs:
         steps:
             - name: Checkout
               uses: actions/checkout@v5
-            - name: Detect changed paths
-              uses: dorny/paths-filter@v3
-              id: changed_paths
-              with:
-                filters: |
-                  non_markdown_changes:
-                    # returns true if at least one non-markdown file is present
-                    - '!**/*.md'
             - name: Checkout submodules & Bootstrap
               uses: ./.github/actions/checkout-submodules-and-bootstrap
               with:
