@@ -134,6 +134,9 @@ Protocols::InteractionModel::Status CameraAVStreamManager::VideoStreamAllocate(c
                 // Inform DPTZ that there's an allocated stream
                 mCameraDeviceHAL->GetCameraAVSettingsUserLevelMgmtDelegate().VideoStreamAllocated(outStreamID);
 
+                // Set the current frame rate attribute from HAL
+                GetCameraAVStreamMgmtServer()->SetCurrentFrameRate(mCameraDeviceHAL->GetCameraHALInterface().GetCurrentFrameRate());
+
                 return Status::Success;
             }
             else
@@ -152,9 +155,6 @@ void CameraAVStreamManager::OnVideoStreamAllocated(const VideoStreamStruct & all
 {
     // Start the video stream using the final allocated parameters
     mCameraDeviceHAL->GetCameraHALInterface().StartVideoStream(allocatedStream);
-
-    // Set the current frame rate attribute from HAL once stream has started
-    GetCameraAVStreamMgmtServer()->SetCurrentFrameRate(mCameraDeviceHAL->GetCameraHALInterface().GetCurrentFrameRate());
 }
 
 Protocols::InteractionModel::Status CameraAVStreamManager::VideoStreamModify(const uint16_t streamID,
