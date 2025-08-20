@@ -150,7 +150,7 @@ public:
      * receoption of an MPTZMoveToPreset command.  The server has already ensured the requested preset ID exists, and obtained the
      * values for PTZ defined by that preset. Returns a failure status if the physical device cannot realize these values. The app shall
      * not block on actual physical excetion of the command, rather return success on initiatiion of the movement.  On conclusion of the
-     * movement that app shall invoke the provided callback, at which time the server will update the server held attribute values for PTZ 
+     * movement that app shall invoke the provided callback, at which time the server will update the server held attribute values for PTZ
      * assuming success. Within the provided callback the server will update the server held attribute values for PTZ assuming success.
      * @param aPreset The preset ID associated with the provided PTZ values
      * @param aPan    The value for Pan associated with the preset
