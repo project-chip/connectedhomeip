@@ -117,6 +117,7 @@ RUN set -x \
     wget \
     zlib1g-dev \
     zstd \
+    gnupg=2.4.8 \
     && rm -rf /var/lib/apt/lists/ \
     && git lfs install \
     && : # last line
