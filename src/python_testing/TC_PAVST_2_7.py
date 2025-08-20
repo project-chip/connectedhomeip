@@ -140,10 +140,10 @@ class TC_PAVST_2_7(MatterBaseTest, PAVSTTestBase):
 
         aAllocatedVideoStreams = await self.allocate_one_video_stream()
         asserts.assert_greater_equal(
-                len(aAllocatedVideoStreams),
-                1,
-                "AllocatedVideoStreams must not be empty",
-            )
+            len(aAllocatedVideoStreams),
+            1,
+            "AllocatedVideoStreams must not be empty",
+        )
 
         aAllocatedAudioStreams = await self.allocate_one_audio_stream()
         asserts.assert_greater_equal(
@@ -152,31 +152,31 @@ class TC_PAVST_2_7(MatterBaseTest, PAVSTTestBase):
             "AllocatedAudioStreams must not be empty",
         )
 
-        status = await self.allocate_one_pushav_transport(endpoint, triggerType = pvcluster.Enums.TransportTriggerTypeEnum.kContinuous)
+        status = await self.allocate_one_pushav_transport(endpoint, triggerType=pvcluster.Enums.TransportTriggerTypeEnum.kContinuous)
         asserts.assert_equal(
             status, Status.Success, "Push AV Transport should be allocated successfully"
         )
-    
+
         self.step(2)
         # @run_if_endpoint_matches(has_cluster(Clusters.PushAvStreamTransport)):
         transportConfigs = await self.read_pavst_attribute_expect_success(endpoint,
-            pvattr.CurrentConnections,
-        )
+                                                                          pvattr.CurrentConnections,
+                                                                          )
         asserts.assert_greater_equal(
             len(transportConfigs), 1, "TransportConfigurations must not be empty!"
         )
         aTransportOptions = transportConfigs[0].transportOptions
         aConnectionID = transportConfigs[0].connectionID
-        aTransportStatus = transportConfigs[0].transportStatus 
+        aTransportStatus = transportConfigs[0].transportStatus
 
         # TH1 sends command
         self.step(3)
         # @run_if_endpoint_matches(has_cluster(Clusters.PushAvStreamTransport)):
         cmd = pvcluster.Commands.ManuallyTriggerTransport(
-                connectionID = 10,
-                activationReason = pvcluster.Enums.TriggerActivationReasonEnum.kEmergency
+            connectionID=10,
+            activationReason=pvcluster.Enums.TriggerActivationReasonEnum.kEmergency
         )
-        status = await  self.psvt_manually_trigger_transport(cmd)
+        status = await self.psvt_manually_trigger_transport(cmd)
         asserts.assert_true(
             status == Status.NotFound,
             "DUT responds with NOT_FOUND status code.",
@@ -185,7 +185,7 @@ class TC_PAVST_2_7(MatterBaseTest, PAVSTTestBase):
         # TH2 sends command
         self.step(4)
         if self.pics_guard(self.check_pics("PAVST.S.A0001")):
-        # Establishing TH2 controller
+            # Establishing TH2 controller
             th2_certificate_authority = (
                 self.certificate_authority_manager.NewCertificateAuthority()
             )
@@ -193,10 +193,10 @@ class TC_PAVST_2_7(MatterBaseTest, PAVSTTestBase):
                 vendorId=0xFFF1, fabricId=self.matter_test_config.fabric_id + 1
             )
             self.th2 = th2_fabric_admin.NewController(nodeId=2, useTestCommissioner=True)
-            #@run_if_endpoint_matches(has_cluster(Clusters.PushAvStreamTransport)):
+            # @run_if_endpoint_matches(has_cluster(Clusters.PushAvStreamTransport)):
             cmd = pvcluster.Commands.ManuallyTriggerTransport(
-                    connectionID = aConnectionID,
-                    activationReason = pvcluster.Enums.TriggerActivationReasonEnum.kEmergency  
+                connectionID=aConnectionID,
+                activationReason=pvcluster.Enums.TriggerActivationReasonEnum.kEmergency
             )
             status = await self.th2.psvt_manually_trigger_transport(cmd)
             asserts.assert_true(
@@ -205,61 +205,61 @@ class TC_PAVST_2_7(MatterBaseTest, PAVSTTestBase):
             )
 
         self.step(5)
-        #@run_if_endpoint_matches(has_cluster(Clusters.PushAvStreamTransport)):
+        # @run_if_endpoint_matches(has_cluster(Clusters.PushAvStreamTransport)):
         cmd = pvcluster.Commands.SetTransportStatus(
-                connectionID = aConnectionID,
-                transportStatus = pvcluster.Enums.TransportStatusEnum.kInactive
+            connectionID=aConnectionID,
+            transportStatus=pvcluster.Enums.TransportStatusEnum.kInactive
         )
-        status = await  self.psvt_set_transport_status(cmd)
+        status = await self.psvt_set_transport_status(cmd)
         asserts.assert_true(
             status == Status.Success,
             "DUT responds with SUCCESS status code.")
 
         self.step(6)
-        #@run_if_endpoint_matches(has_cluster(Clusters.PushAvStreamTransport)):
+        # @run_if_endpoint_matches(has_cluster(Clusters.PushAvStreamTransport)):
         cmd = pvcluster.Commands.ManuallyTriggerTransport(
-                connectionID = aConnectionID,
-                activationReason = pvcluster.Enums.TriggerActivationReasonEnum.kEmergency
+            connectionID=aConnectionID,
+            activationReason=pvcluster.Enums.TriggerActivationReasonEnum.kEmergency
         )
-        status = await  self.psvt_manually_trigger_transport(cmd, expected_cluster_status = pvcluster.Enums.StatusCodeEnum.kInvalidTransportStatus)
+        status = await self.psvt_manually_trigger_transport(cmd, expected_cluster_status=pvcluster.Enums.StatusCodeEnum.kInvalidTransportStatus)
         asserts.assert_true(
             status == pvcluster.Enums.StatusCodeEnum.kInvalidTransportStatus,
             "DUT must respond with TransportStatus Inactive.",
         )
 
         self.step(7)
-        #@run_if_endpoint_matches(has_cluster(Clusters.PushAvStreamTransport)):
+        # @run_if_endpoint_matches(has_cluster(Clusters.PushAvStreamTransport)):
         cmd = pvcluster.Commands.SetTransportStatus(
-                connectionID = aConnectionID,
-                transportStatus = pvcluster.Enums.TransportStatusEnum.kActive
+            connectionID=aConnectionID,
+            transportStatus=pvcluster.Enums.TransportStatusEnum.kActive
         )
-        status = await  self.psvt_set_transport_status(cmd)
+        status = await self.psvt_set_transport_status(cmd)
         asserts.assert_true(
             status == Status.Success,
             "DUT responds with SUCCESS status code.")
-        
+
         self.step(8)
-        #@run_if_endpoint_matches(has_cluster(Clusters.PushAvStreamTransport)):
+        # @run_if_endpoint_matches(has_cluster(Clusters.PushAvStreamTransport)):
         cmd = pvcluster.Commands.ManuallyTriggerTransport(
-                connectionID = aConnectionID,
-                activationReason = pvcluster.Enums.TriggerActivationReasonEnum.kEmergency
+            connectionID=aConnectionID,
+            activationReason=pvcluster.Enums.TriggerActivationReasonEnum.kEmergency
         )
-        status = await  self.psvt_manually_trigger_transport(cmd, expected_cluster_status = pvcluster.Enums.StatusCodeEnum.kInvalidTriggerType)
+        status = await self.psvt_manually_trigger_transport(cmd, expected_cluster_status=pvcluster.Enums.StatusCodeEnum.kInvalidTriggerType)
         asserts.assert_true(
             status == pvcluster.Enums.StatusCodeEnum.kInvalidTriggerType,
             "DUT must respond with InvalidTriggerType status code.",
         )
-        
+
         self.step(9)
-        #@run_if_endpoint_matches(has_cluster(Clusters.PushAvStreamTransport)):
+        # @run_if_endpoint_matches(has_cluster(Clusters.PushAvStreamTransport)):
         cmd = pvcluster.Commands.DeallocatePushTransport(
-                connectionID = aConnectionID
+            connectionID=aConnectionID
         )
-        status = await  self.psvt_deallocate_push_transport(cmd)
+        status = await self.psvt_deallocate_push_transport(cmd)
         asserts.assert_true(
             status == Status.Success,
             "DUT responds with SUCCESS status code.")
-        
+
         self.step(10)
         # @run_if_endpoint_matches(has_cluster(Clusters.PushAvStreamTransport))
         status = await self.check_and_delete_all_push_av_transports(endpoint, pvattr)
@@ -269,10 +269,10 @@ class TC_PAVST_2_7(MatterBaseTest, PAVSTTestBase):
 
         aAllocatedVideoStreams = await self.allocate_one_video_stream()
         asserts.assert_greater_equal(
-                len(aAllocatedVideoStreams),
-                1,
-                "AllocatedVideoStreams must not be empty",
-            )
+            len(aAllocatedVideoStreams),
+            1,
+            "AllocatedVideoStreams must not be empty",
+        )
 
         aAllocatedAudioStreams = await self.allocate_one_audio_stream()
         asserts.assert_greater_equal(
@@ -281,38 +281,38 @@ class TC_PAVST_2_7(MatterBaseTest, PAVSTTestBase):
             "AllocatedAudioStreams must not be empty",
         )
 
-        status = await self.allocate_one_pushav_transport(endpoint, triggerType = pvcluster.Enums.TransportTriggerTypeEnum.kCommand)
+        status = await self.allocate_one_pushav_transport(endpoint, triggerType=pvcluster.Enums.TransportTriggerTypeEnum.kCommand)
         asserts.assert_equal(
             status, Status.Success, "Push AV Transport should be allocated successfully"
         )
-        
+
         self.step(11)
-        #@run_if_endpoint_matches(has_cluster(Clusters.PushAvStreamTransport)):
+        # @run_if_endpoint_matches(has_cluster(Clusters.PushAvStreamTransport)):
         cmd = pvcluster.Commands.SetTransportStatus(
-                connectionID = aConnectionID,
-                transportStatus = pvcluster.Enums.TransportStatusEnum.kActive
+            connectionID=aConnectionID,
+            transportStatus=pvcluster.Enums.TransportStatusEnum.kActive
         )
-        status = await  self.psvt_set_transport_status(cmd)
+        status = await self.psvt_set_transport_status(cmd)
         asserts.assert_true(
             status == Status.Success,
             "DUT responds with SUCCESS status code.")
         transportConfigs = await self.read_pavst_attribute_expect_success(endpoint,
-            pvattr.CurrentConnections,
-        )
+                                                                          pvattr.CurrentConnections,
+                                                                          )
         asserts.assert_greater_equal(
             len(transportConfigs), 1, "TransportConfigurations must not be empty!"
         )
         aTransportOptions = transportConfigs[0].transportOptions
         aConnectionID = transportConfigs[0].connectionID
         aTransportStatus = transportConfigs[0].transportStatus
-        
+
         self.step(12)
         # @run_if_endpoint_matches(has_cluster(Clusters.PushAvStreamTransport)):
         cmd = pvcluster.Commands.ManuallyTriggerTransport(
-                connectionID = aConnectionID,
-                activationReason = pvcluster.Enums.TriggerActivationReasonEnum.kEmergency
+            connectionID=aConnectionID,
+            activationReason=pvcluster.Enums.TriggerActivationReasonEnum.kEmergency
         )
-        status = await  self.psvt_manually_trigger_transport(cmd)
+        status = await self.psvt_manually_trigger_transport(cmd)
         asserts.assert_true(
             status == Status.Success,
             "DUT responds with Success status code.",

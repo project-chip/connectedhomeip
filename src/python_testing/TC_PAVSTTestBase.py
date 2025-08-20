@@ -150,7 +150,6 @@ class PAVSTTestBase:
             asserts.assert_is_not_none(
                 videoStreamAllocateResponse.videoStreamID, "VideoStreamAllocateResponse does not contain StreamID"
             )
-            
 
             return [videoStreamAllocateResponse.videoStreamID]
         except InteractionModelError as e:
@@ -183,7 +182,7 @@ class PAVSTTestBase:
         if not any(stream.audioStreamID == audioStreamID for stream in aAllocatedAudioStreams):
             asserts.fail(f"Audio Stream with ID {audioStreamID} not found as expected")
 
-    async def allocate_one_pushav_transport(self, endpoint, triggerType = Clusters.PushAvStreamTransport.Enums.TransportTriggerTypeEnum.kContinuous):
+    async def allocate_one_pushav_transport(self, endpoint, triggerType=Clusters.PushAvStreamTransport.Enums.TransportTriggerTypeEnum.kContinuous):
         endpoint = self.get_endpoint(default=1)
         cluster = Clusters.PushAvStreamTransport
         attr = Clusters.PushAvStreamTransport.Attributes
@@ -193,12 +192,13 @@ class PAVSTTestBase:
         aFeatureMap = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=Clusters.CameraAvStreamManagement, attribute=Clusters.CameraAvStreamManagement.Attributes.FeatureMap)
         logger.info(f"Rx'd FeatureMap: {aFeatureMap}")
         adoSupport = aFeatureMap & Clusters.CameraAvStreamManagement.Bitmaps.Feature.kAudio
-        asserts.assert_equal(adoSupport, Clusters.CameraAvStreamManagement.Bitmaps.Feature.kAudio, "Audio Feature is not supported.")
+        asserts.assert_equal(adoSupport, Clusters.CameraAvStreamManagement.Bitmaps.Feature.kAudio,
+                             "Audio Feature is not supported.")
 
         # Check if audio stream has already been allocated
         aAllocatedAudioStream = await self.allocate_one_audio_stream()
-        logger.info(f"Rx'd AllocatedAudioStream: {aAllocatedAudioStream}")        
-        
+        logger.info(f"Rx'd AllocatedAudioStream: {aAllocatedAudioStream}")
+
         # Check if video stream has already been allocated
         aAllocatedVideoStream = await self.allocate_one_video_stream()
         logger.info(f"Rx'd AllocatedVideoStream: {aAllocatedVideoStream}")
@@ -209,25 +209,25 @@ class PAVSTTestBase:
         asserts.assert_greater(len(aStreamUsagePriorities), 0, "StreamUsagePriorities is empty")
 
         await self.send_single_cmd(
-                cmd=cluster.Commands.AllocatePushTransport(
-                    {
-                        "streamUsage": aStreamUsagePriorities[0],
-                        "videoStreamID": aAllocatedVideoStream,
-                        "audioStreamID": aAllocatedAudioStream,
-                        "endpointID": 1,
-                        "url": "https://localhost:1234/streams/1",
-                        "triggerOptions": {"triggerType": triggerType},
-                        "ingestMethod": Clusters.PushAvStreamTransport.Enums.IngestMethodsEnum.kCMAFIngest,
-                        "containerFormat": Clusters.PushAvStreamTransport.Enums.ContainerFormatEnum.kCmaf,
-                        "containerOptions": {
-                            "containerType": 0,
-                            "CMAFContainerOptions": {"chunkDuration": 4},
-                        },
-                        "expiryTime": 5,
-                    }
-                ),
-                endpoint=endpoint,
-            )
+            cmd=cluster.Commands.AllocatePushTransport(
+                {
+                    "streamUsage": aStreamUsagePriorities[0],
+                    "videoStreamID": aAllocatedVideoStream,
+                    "audioStreamID": aAllocatedAudioStream,
+                    "endpointID": 1,
+                    "url": "https://localhost:1234/streams/1",
+                    "triggerOptions": {"triggerType": triggerType},
+                    "ingestMethod": Clusters.PushAvStreamTransport.Enums.IngestMethodsEnum.kCMAFIngest,
+                    "containerFormat": Clusters.PushAvStreamTransport.Enums.ContainerFormatEnum.kCmaf,
+                    "containerOptions": {
+                        "containerType": 0,
+                        "CMAFContainerOptions": {"chunkDuration": 4},
+                    },
+                    "expiryTime": 5,
+                }
+            ),
+            endpoint=endpoint,
+        )
         return Status.Success
         pass
 
@@ -254,7 +254,7 @@ class PAVSTTestBase:
                         e.status == Status.Success, "Unexpected error returned"
                     )
                 pass
-                    
+
         return Status.Success
 
     async def psvt_modify_push_transport(self, cmd):
@@ -269,7 +269,7 @@ class PAVSTTestBase:
             )
             return e.status
         pass
-    
+
     async def psvt_deallocate_push_transport(self, cmd):
         endpoint = self.get_endpoint(default=1)
         status = Status.Success
@@ -282,7 +282,7 @@ class PAVSTTestBase:
             )
             return e.status
         pass
-    
+
     async def psvt_set_transport_status(self, cmd):
         endpoint = self.get_endpoint(default=1)
         status = Status.Success
@@ -295,8 +295,8 @@ class PAVSTTestBase:
             )
             return e.status
         pass
-    
-    async def psvt_find_transport(self, cmd, expected_connectionID = None):
+
+    async def psvt_find_transport(self, cmd, expected_connectionID=None):
         endpoint = self.get_endpoint(default=1)
         status = Status.Success
         try:
@@ -311,17 +311,17 @@ class PAVSTTestBase:
             )
             return e.status
         pass
-    
-    async def psvt_manually_trigger_transport(self, cmd, expected_cluster_status = None):
+
+    async def psvt_manually_trigger_transport(self, cmd, expected_cluster_status=None):
         endpoint = self.get_endpoint(default=1)
         status = Status.Success
         try:
             status = await self.send_single_cmd(cmd=cmd, endpoint=endpoint)
             return Status.Success
         except InteractionModelError as e:
-            if (expected_cluster_status!= None):
+            if (expected_cluster_status != None):
                 asserts.assert_true(
-                   e.clusterStatus == expected_cluster_status, "Unexpected error returned"
+                    e.clusterStatus == expected_cluster_status, "Unexpected error returned"
                 )
                 return e.clusterStatus
             else:
