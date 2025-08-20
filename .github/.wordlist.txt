@@ -144,6 +144,7 @@ betaprogram
 BinaryInputBasic
 Binfmt
 bitbake
+bitrate
 bld
 BLE
 BleApplicationDelegate
@@ -271,6 +272,7 @@ cn
 COAP
 codeaurora
 codebase
+codec
 codegen
 CodeGenerator
 CodeLab
@@ -1053,6 +1055,7 @@ optionOverride
 optionsMask
 optionsOverride
 orgs
+Orchestrator
 OSS
 OTA
 OTADownloader
@@ -1502,6 +1505,7 @@ TotalTrihalomethanesConcentrationMeasurement
 TPK
 trackAlloc
 trackFree
+transcoder
 TransferSession
 transitionTime
 TransportMgrBase
