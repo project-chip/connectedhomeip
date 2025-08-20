@@ -234,7 +234,7 @@ CHIP_ERROR SessionManager::PrepareMessage(const SessionHandle & sessionHandle, P
                                 chip::ByteSpan(message->Start(), message->TotalLength()),
                                 /* messageTotalSize = */
                                 (packetHeader.EncodeSizeBytes() + payloadHeader.EncodeSizeBytes() + message->TotalLength() +
-                                 cryptoContext.EncryptionOverhead()));
+                                 packetHeader.MICTagLength()));
         CHIP_TRACE_MESSAGE_SENT(payloadHeader, packetHeader, destination_address, message->Start(), message->TotalLength());
 
         CryptoContext::NonceStorage nonce;
@@ -272,7 +272,7 @@ CHIP_ERROR SessionManager::PrepareMessage(const SessionHandle & sessionHandle, P
                                 chip::ByteSpan(message->Start(), message->TotalLength()),
                                 /* totalMessageSize = */
                                 (packetHeader.EncodeSizeBytes() + payloadHeader.EncodeSizeBytes() + message->TotalLength() +
-                                 cryptoContext.EncryptionOverhead()));
+                                 packetHeader.MICTagLength()));
         CHIP_TRACE_MESSAGE_SENT(payloadHeader, packetHeader, destination_address, message->Start(), message->TotalLength());
 
         CryptoContext::NonceStorage nonce;
