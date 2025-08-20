@@ -135,7 +135,7 @@ RUN set -x \
     pygit \
     PyGithub \
     ruff \
-    gcovr==8.3 \
+    gcovr \
     && : # last line
 
 # Install bloat comparison tools
