@@ -75,7 +75,7 @@ public:
 
 private:
     CameraDeviceInterface * mCameraDeviceHAL = nullptr;
-    PhysicalPTZCallback * mCallback = nullptr;
+    PhysicalPTZCallback * mCallback          = nullptr;
 };
 
 } // namespace CameraAvSettingsUserLevelManagement
