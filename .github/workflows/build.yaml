@@ -51,6 +51,8 @@ jobs:
                 net.ipv4.conf.all.forwarding=1 net.ipv6.conf.all.forwarding=1"
 
         steps:
+            - name: Get IP Addresses
+              run: ip a
             - name: Dump GitHub context
               env:
                   GITHUB_CONTEXT: ${{ toJSON(github) }}
