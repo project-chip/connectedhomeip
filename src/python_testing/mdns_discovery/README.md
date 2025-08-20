@@ -233,10 +233,11 @@ full information.
 
 ## 🌐 Asserts for mDNS Values
 
-This module contains validation helpers used by mDNS discovery–related tests. Each function raises a `TestFailure` on failure and is designed to make the exact failing constraint obvious.
+This module contains validation helpers used by mDNS discovery–related tests.
+Each function raises a `TestFailure` on failure and is designed to make the
+exact failing constraint obvious.
 
-You can import them from the following file:
-`mdns_discovery/utils/asserts.py`
+You can import them from the following file: `mdns_discovery/utils/asserts.py`
 
 ```
 from mdns_discovery.utils.asserts import assert_valid_dn_key
@@ -245,6 +246,7 @@ assert_valid_dn_key("Kitchen")
 ```
 
 ### ✅ Available assert functions
+
 |                      |                                           |
 | -------------------- | ----------------------------------------- |
 | assert_valid_d_key   | assert_valid_commissionable_instance_name |
