@@ -7,7 +7,7 @@ specifications were properly reviewed and approved.
 ## Add the cluster definitions to the SDK
 
 The following steps should be followed to add new cluster definitions to the
-SDK.
+SDK. Using [Alchemy](https://github.com/project-chip/alchemy) as described in [Writing and updating clusters](https://github.com/project-chip/connectedhomeip/blob/master/docs/guides/writing_clusters.md) to define and generate the new cluster will automatically handle steps 1-5 below, although they should be double-checked.
 
 **Add your new cluster definition to an appropriately-name file in this
 directory:**
@@ -29,8 +29,6 @@ directory:**
     >  <cluster code="YOUR NEW CLUSTER ID"/>
     > </struct>
     > ```
-
-6. [src/controller/python/matter/clusters/\_\_init\_\_.py](https://github.com/project-chip/connectedhomeip/tree/master/src/controller/python/matter/clusters/__init__.py)
 
 **Enable your new cluster in the Python and Android clients** in
 [src/controller/data_model/controller-clusters.zap](https://github.com/project-chip/connectedhomeip/blob/master/src/controller/data_model/controller-clusters.zap)
@@ -56,12 +54,6 @@ Use the ZAP GUI tool to edit the file above:
 6. In the Enable column, select "Client" from the drop-down box.
 7. Click `File->Save` to save the configuration.
 8. Close the GUI.
-
-**Add entries for your new cluster to
-[BUILD.gn](c/src/controller/data_model/BUILD.gn)** in the outputs section of the
-java-jni-generate bits. The entries should look like
-"jni/YourClusterNameClient-InvokeSubscribeImpl.cpp" and
-"jni/YourClusterNameClient-ReadImpl.cpp".
 
 **Add an entry to the ClientDirectories** section of
 [src/app/zap_cluster_list.json](https://github.com/project-chip/connectedhomeip/blob/master/src/app/zap_cluster_list.json).
