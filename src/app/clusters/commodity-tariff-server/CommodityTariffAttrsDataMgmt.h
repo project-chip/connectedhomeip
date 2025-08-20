@@ -76,106 +76,6 @@ inline bool operator==(const Type & lhs, const Type & rhs)
 } // namespace Globals
 
 namespace CommodityTariff {
-
-/**
- * @struct TariffUpdateCtx
- * @brief Context for validating tariff attribute updates and maintaining referential integrity
- *
- * This structure tracks relationships between tariff components during attribute updates
- * to ensure all references are valid and consistent. It serves as a validation context
- * that collects all IDs and references before checking their consistency.
- *
- * @section references Referential Integrity Tracking
- * The context maintains several sets of IDs to validate that:
- * - All referenced DayEntry IDs exist in the master set
- * - All referenced TariffComponent IDs exist in the master set
- * - All referenced DayPattern IDs exist in the master set
- * - No dangling references exist between tariff components
- *
- * @section lifecycle Lifecycle
- * - Created at the start of a tariff update operation
- * - Populated during attribute parsing/processing
- * - Used for validation before committing changes
- * - Destroyed after update completion
- */
-struct TariffUpdateCtx
-{
-    /**
-     * @brief Reference to the tariff's start timestamp
-     * @note This is a reference to allow validation against the actual attribute value
-     */
-    DataModel::Nullable<uint32_t> & TariffStartTimestamp;
-
-    /// @name DayEntry ID Tracking
-    /// @{
-    /**
-     * @brief Master set of all valid DayEntry IDs
-     * @details Contains all DayEntry IDs that exist in the tariff definition
-     */
-    std::unordered_set<uint32_t> DayEntryKeyIDs;
-
-    /**
-     * @brief DayEntry IDs referenced by DayPattern items
-     * @details Collected separately for reference validation
-     */
-    std::unordered_set<uint32_t> DayPatternsDayEntryIDs;
-
-    /**
-     * @brief DayEntry IDs referenced by TariffPeriod items
-     * @details Collected separately for reference validation
-     */
-    std::unordered_set<uint32_t> TariffPeriodsDayEntryIDs;
-
-    /**
-     * @brief DayEntry IDs referenced by IndividualDays items
-     * @details Collected separately for reference validation
-     */
-    std::unordered_set<uint32_t> IndividualDaysDayEntryIDs;
-    /// @}
-
-    /// @name TariffComponent ID Tracking
-    /// @{
-    /**
-     * @brief Master set of all valid TariffComponent IDs
-     * @details Contains all TariffComponent IDs that exist in the tariff definition
-     */
-    std::unordered_set<uint32_t> TariffComponentKeyIDs;
-
-    /**
-     * @brief TariffComponent IDs referenced by TariffPeriod items
-     * @details Collected for validating period->component references
-     */
-    std::unordered_set<uint32_t> TariffPeriodsTariffComponentIDs;
-    /// @}
-
-    /// @name DayPattern ID Tracking
-    /// @{
-    /**
-     * @brief Master set of all valid DayPattern IDs
-     * @details Contains all DayPattern IDs that exist in the tariff definition
-     */
-    std::unordered_set<uint32_t> DayPatternKeyIDs;
-
-    /**
-     * @brief DayPattern IDs referenced by CalendarPeriod items
-     * @details Collected for validating calendar->pattern references
-     */
-    std::unordered_set<uint32_t> CalendarPeriodsDayPatternIDs;
-    /// @}
-
-    /**
-     * @brief Bitmask of active tariff features
-     * @details Used to validate feature-dependent constraints
-     */
-    BitMask<Feature> mFeature;
-
-    /**
-     * @brief Timestamp when the tariff update was initiated
-     * @note Used for change tracking and versioning
-     */
-    uint32_t TariffUpdateTimestamp;
-};
-
 namespace Structs {
 
 namespace TariffPriceStruct {
@@ -401,56 +301,6 @@ struct StrToSpan
     }
 };
 
-#define SCALAR_ATTRS                                                                                                               \
-    X(Clusters::Globals::TariffUnitEnum)                                                                                           \
-    X(uint32_t)                                                                                                                    \
-    X(int16_t)                                                                                                                     \
-    X(Clusters::CommodityTariff::DayEntryRandomizationTypeEnum)
-
-#define COMPLEX_ATTRIBUTES                                                                                                         \
-    X(Clusters::CommodityTariff::Structs::TariffInformationStruct::Type)                                                           \
-    X(DataModel::List<Clusters::CommodityTariff::Structs::DayEntryStruct::Type>)                                                   \
-    X(DataModel::List<Clusters::CommodityTariff::Structs::DayPatternStruct::Type>)                                                 \
-    X(DataModel::List<Clusters::CommodityTariff::Structs::TariffComponentStruct::Type>)                                            \
-    X(DataModel::List<Clusters::CommodityTariff::Structs::TariffPeriodStruct::Type>)                                               \
-    X(DataModel::List<Clusters::CommodityTariff::Structs::DayStruct::Type>)                                                        \
-    X(DataModel::List<Clusters::CommodityTariff::Structs::CalendarPeriodStruct::Type>)
-
-#define ALL_ATTRIBUTES                                                                                                             \
-    SCALAR_ATTRS                                                                                                                   \
-    COMPLEX_ATTRIBUTES
-
-template <typename T>
-CHIP_ERROR CopyData(const T & input, T & output);
-
-// Declare the specializations (no definitions here)
-#define X(attrType)                                                                                                                \
-    template <>                                                                                                                    \
-    CHIP_ERROR CopyData<attrType>(const attrType & input, attrType & output);
-COMPLEX_ATTRIBUTES
-#undef X
-
-// Primary template declaration
-template <typename T>
-void CleanupStructValue(T & aValue);
-
-// Specialization declarations
-#define X(attrType)                                                                                                                \
-    template <>                                                                                                                    \
-    void CleanupStructValue<attrType>(attrType & aValue);
-COMPLEX_ATTRIBUTES
-#undef X
-
-template <typename T>
-CHIP_ERROR Validate(const T & aValue, AttributeId aAttrId, void * aCtx);
-
-#define X(attrType)                                                                                                                \
-    template <>                                                                                                                    \
-    CHIP_ERROR Validate<DataModel::Nullable<attrType>>(const DataModel::Nullable<attrType> & aValue, AttributeId aAttrId,          \
-                                                       void * aCtx);
-ALL_ATTRIBUTES
-#undef X
-
 /// @brief Type trait for nullable types
 template <typename U>
 struct IsNullable : std::false_type
@@ -576,7 +426,7 @@ using ExtractNestedType_t = typename ExtractNestedType<U>::type;
  * CTC_BaseDataClass<Nullable<List<DayEntryStruct>>> data(attrId);
  * data.SetNewValue(mListData->aValue)
  * - CreateNewListValue(aValue.Size());                 // Allocate 3 elements
- * - Loop for list items: CopyData<ListEntryType>(src_item[i], dst_item[i]);   //copy list elements...
+ * - Loop for list items: CopyData(src_item[i], dst_item[i]);   //copy list elements...
  * - MarkAsAssigned();
  * data.UpdateBegin(validationCtx);
  * data.UpdateFinish(true);
@@ -635,6 +485,10 @@ public:
     using ListEntryType   = std::conditional_t<IsList<NonNullableType>::value,
                                              ExtractNestedType_t<NonNullableType>, // Extract the list element type
                                              void *>;
+
+    using StructType = std::conditional_t<IsList<NonNullableType>::value,
+                                             ListEntryType, // Extract the list element type
+                                             NonNullableType>;
 
     /**
      * @brief Construct a new data class instance
@@ -822,7 +676,7 @@ public:
                 auto buffer = GetNewValueRef().Value().data();
                 for (size_t idx = 0; idx < newValue.size(); idx++)
                 {
-                    if (CHIP_NO_ERROR == (err = CopyData<ListEntryType>(newValue[idx], buffer[idx])))
+                    if (CHIP_NO_ERROR == (err = CopyData(newValue[idx], buffer[idx])))
                     {
                         continue;
                     }
@@ -837,7 +691,7 @@ public:
             if (CHIP_NO_ERROR == err)
             {
                 GetNewValueRef().SetNonNull(NonNullableType()); // Default construct in place
-                err = CopyData<NonNullableType>(newValue, GetNewValueRef().Value());
+                err = CopyData(newValue, GetNewValueRef().Value());
                 if (err != CHIP_NO_ERROR)
                 {
                     // Revert on copy failure to maintain consistent state
@@ -988,7 +842,7 @@ public:
      * @brief Cleans up an external list entry
      * @param[in,out] entry The list entry to clean up
      */
-    void CleanupExtListEntry(ListEntryType & entry) { CleanupStructValue<ListEntryType>(entry); }
+    void CleanupExtListEntry(ListEntryType & entry) { CleanupStruct(entry); }
 
     /**
      * @brief Gets the attribute ID
@@ -1040,11 +894,13 @@ private:
 
     // Internal implementation methods...
 
+    CHIP_ERROR CopyData(const StructType & input, StructType & output);
+
     /**
      * @brief Validates the new value using type-specific validation
      * @return CHIP_ERROR Validation result
      */
-    CHIP_ERROR ValidateNewValue() { return Validate<ValueType>(GetNewValueRef(), mAttrId, mAuxData); }
+    CHIP_ERROR ValidateNewValue(); //{ return Validate<ValueType>(GetNewValueRef(), mAttrId, mAuxData); }
 
     /**
      * @brief Compares two lists for equality
@@ -1154,7 +1010,7 @@ private:
                 }
                 else if constexpr (IsValueStruct())
                 {
-                    CleanupStruct<NonNullableType>(aValue.Value());
+                    CleanupStruct(aValue.Value());
                 }
             }
             aValue.SetNull();
@@ -1175,7 +1031,7 @@ private:
 
         for (auto & item : list)
         {
-            CleanupStruct<ListEntryType>(item);
+            CleanupStruct(item);
         }
         if (list.data())
         {
@@ -1188,16 +1044,120 @@ private:
      * @brief Cleans up a struct value
      * @param aValue Struct to clean up
      */
-    template <typename StructType>
-    void CleanupStruct(StructType & aValue)
-    {
-        CleanupStructValue<StructType>(aValue);
-    }
+    void CleanupStruct(StructType & aValue);
+
+
+    //{
+        //CleanupStructValue<StructType>(aValue);
+    //}
 
     void * mAuxData = nullptr; ///< Validation context data
     const AttributeId mAttrId; ///< Managed attribute ID
 };
 
 } // namespace CommodityTariffAttrsDataMgmt
+
+namespace Clusters {
+namespace CommodityTariff {
+/**
+ * @struct TariffUpdateCtx
+ * @brief Context for validating tariff attribute updates and maintaining referential integrity
+ *
+ * This structure tracks relationships between tariff components during attribute updates
+ * to ensure all references are valid and consistent. It serves as a validation context
+ * that collects all IDs and references before checking their consistency.
+ *
+ * @section references Referential Integrity Tracking
+ * The context maintains several sets of IDs to validate that:
+ * - All referenced DayEntry IDs exist in the master set
+ * - All referenced TariffComponent IDs exist in the master set
+ * - All referenced DayPattern IDs exist in the master set
+ * - No dangling references exist between tariff components
+ *
+ * @section lifecycle Lifecycle
+ * - Created at the start of a tariff update operation
+ * - Populated during attribute parsing/processing
+ * - Used for validation before committing changes
+ * - Destroyed after update completion
+ */
+struct TariffUpdateCtx
+{
+    /**
+     * @brief Reference to the tariff's start timestamp
+     * @note This is a reference to allow validation against the actual attribute value
+     */
+    DataModel::Nullable<uint32_t> & TariffStartTimestamp;
+
+    /// @name DayEntry ID Tracking
+    /// @{
+    /**
+     * @brief Master set of all valid DayEntry IDs
+     * @details Contains all DayEntry IDs that exist in the tariff definition
+     */
+    std::unordered_set<uint32_t> DayEntryKeyIDs;
+
+    /**
+     * @brief DayEntry IDs referenced by DayPattern items
+     * @details Collected separately for reference validation
+     */
+    std::unordered_set<uint32_t> DayPatternsDayEntryIDs;
+
+    /**
+     * @brief DayEntry IDs referenced by TariffPeriod items
+     * @details Collected separately for reference validation
+     */
+    std::unordered_set<uint32_t> TariffPeriodsDayEntryIDs;
+
+    /**
+     * @brief DayEntry IDs referenced by IndividualDays items
+     * @details Collected separately for reference validation
+     */
+    std::unordered_set<uint32_t> IndividualDaysDayEntryIDs;
+    /// @}
+
+    /// @name TariffComponent ID Tracking
+    /// @{
+    /**
+     * @brief Master set of all valid TariffComponent IDs
+     * @details Contains all TariffComponent IDs that exist in the tariff definition
+     */
+    std::unordered_set<uint32_t> TariffComponentKeyIDs;
+
+    /**
+     * @brief TariffComponent IDs referenced by TariffPeriod items
+     * @details Collected for validating period->component references
+     */
+    std::unordered_set<uint32_t> TariffPeriodsTariffComponentIDs;
+    /// @}
+
+    /// @name DayPattern ID Tracking
+    /// @{
+    /**
+     * @brief Master set of all valid DayPattern IDs
+     * @details Contains all DayPattern IDs that exist in the tariff definition
+     */
+    std::unordered_set<uint32_t> DayPatternKeyIDs;
+
+    /**
+     * @brief DayPattern IDs referenced by CalendarPeriod items
+     * @details Collected for validating calendar->pattern references
+     */
+    std::unordered_set<uint32_t> CalendarPeriodsDayPatternIDs;
+    /// @}
+
+    /**
+     * @brief Bitmask of active tariff features
+     * @details Used to validate feature-dependent constraints
+     */
+    BitMask<Feature> mFeature;
+
+    /**
+     * @brief Timestamp when the tariff update was initiated
+     * @note Used for change tracking and versioning
+     */
+    uint32_t TariffUpdateTimestamp;
+};
+} // namespace CommodityTariff
+} // namespace Clusters
 } // namespace app
 } // namespace chip
