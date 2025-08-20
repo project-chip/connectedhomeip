@@ -339,11 +339,21 @@ config NET_TX_STACK_SIZE
     default 600 if PM || SOC_RISCV_TELINK_TL321X
 
 config NET_RX_STACK_SIZE
-    default 600 if PM || SOC_RISCV_TELINK_TL321X
+    default 664 if PM || SOC_RISCV_TELINK_TL321X
 
 # Disable certain parts of Zephyr IPv6 stack
 config NET_IPV6_NBR_CACHE
     default n
+
+config NET_PKT_TXTIME
+    default y if OPENTHREAD_FTD
+
+config NET_PKT_TIMESTAMP
+    default y if OPENTHREAD_FTD
+
+config IEEE802154_2015
+    bool "support ssed device to add thread"
+    default y if OPENTHREAD_FTD && ZEPHYR_VERSION_3_3
 
 config NET_MAX_CONN
     default 1 if !WIFI
@@ -420,6 +430,7 @@ config CHIP_WIFI_CONNECTION_RECOVERY_JITTER
       within range [-JITTER; +JITTER].
 
 config NET_MGMT_EVENT_STACK_SIZE
+    default 1280 if SOC_RISCV_TELINK_W91
     default 1128 if ZEPHYR_VERSION_3_3
     default 1250
 

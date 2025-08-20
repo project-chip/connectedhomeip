@@ -20,6 +20,9 @@ import("${chip_root}/src/crypto/crypto.gni")
 import("${chip_root}/src/platform/device.gni")
 import("${chip_root}/src/platform/nxp/common/ota/ota.gni")
 
+# Include to define nxp_crypto_impl
+import("${chip_root}/src/platform/nxp/crypto/nxp_crypto.gni")
+
 import("${nxp_sdk_build_root}/nxp_sdk.gni")
 
 # If external SDK is used, do not import ${nxp_sdk_name}.gni

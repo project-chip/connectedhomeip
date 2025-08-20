@@ -54,16 +54,24 @@ namespace Internal {
  *
  *  @return The mapped POSIX network or OS error.
  */
-DLL_EXPORT CHIP_ERROR MapErrorPOSIX(int aError)
+#if CHIP_CONFIG_ERROR_SOURCE && CHIP_CONFIG_ERROR_STD_SOURCE_LOCATION
+DLL_EXPORT CHIP_ERROR MapErrorPOSIX(int aError, std::source_location location)
 {
-    return (aError == 0 ? CHIP_NO_ERROR : CHIP_ERROR(ChipError::Range::kPOSIX, static_cast<ChipError::ValueType>(aError)));
+    return (aError == 0 ? CHIP_NO_ERROR
+                        : CHIP_ERROR(ChipError::Range::kPOSIX, static_cast<ChipError::ValueType>(aError), location));
 }
-
+#elif CHIP_CONFIG_ERROR_SOURCE
 DLL_EXPORT CHIP_ERROR MapErrorPOSIX(int aError, const char * file, unsigned int line)
 {
     return (aError == 0 ? CHIP_NO_ERROR
                         : CHIP_ERROR(ChipError::Range::kPOSIX, static_cast<ChipError::ValueType>(aError), file, line));
 }
+#else
+DLL_EXPORT CHIP_ERROR MapErrorPOSIX(int aError)
+{
+    return (aError == 0 ? CHIP_NO_ERROR : CHIP_ERROR(ChipError::Range::kPOSIX, static_cast<ChipError::ValueType>(aError)));
+}
+#endif
 } // namespace Internal
 
 /**
@@ -129,7 +137,7 @@ bool FormatPOSIXError(char * buf, uint16_t bufSize, CHIP_ERROR err)
  */
 DLL_EXPORT CHIP_ERROR MapErrorZephyr(int aError)
 {
-    return Internal::MapErrorPOSIX(-aError);
+    return Internal::MapErrorPOSIX(-aError CHIP_ERROR_SOURCE_LOCATION_NULL);
 }
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP

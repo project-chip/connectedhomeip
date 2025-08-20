@@ -47,7 +47,7 @@ sys.path.insert(0, os.path.join(
     os.path.dirname(__file__), '../../../../src/app/'))
 
 import ota_image_tool  # noqa: E402 isort:skip
-from chip.tlv import TLVWriter  # noqa: E402 isort:skip
+from matter.tlv import TLVWriter  # noqa: E402 isort:skip
 from custom import CertDeclaration, DacCert, DacPKey, PaiCert  # noqa: E402 isort:skip
 from default import InputArgument  # noqa: E402 isort:skip
 
