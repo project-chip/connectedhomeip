@@ -151,10 +151,21 @@ Protocols::InteractionModel::Status CameraAVStreamManager::VideoStreamAllocate(c
     return Status::DynamicConstraintError;
 }
 
-void CameraAVStreamManager::OnVideoStreamAllocated(const VideoStreamStruct & allocatedStream)
+void CameraAVStreamManager::OnVideoStreamAllocated(const VideoStreamStruct & allocatedStream, bool shouldStartNewVideo)
 {
-    // Start the video stream using the final allocated parameters
-    mCameraDeviceHAL->GetCameraHALInterface().StartVideoStream(allocatedStream);
+    // Only start the video stream if the flag indicates we should (new allocation or configuration changed)
+    if (shouldStartNewVideo)
+    {
+        ChipLogProgress(Camera, "Starting new video stream with ID: %u due to new allocation or configuration change",
+                        allocatedStream.videoStreamID);
+        // Start the video stream using the final allocated parameters
+        mCameraDeviceHAL->GetCameraHALInterface().StartVideoStream(allocatedStream);
+    }
+    else
+    {
+        ChipLogProgress(Camera, "Reusing existing video stream with ID: %u without starting new video",
+                        allocatedStream.videoStreamID);
+    }
 }
 
 Protocols::InteractionModel::Status CameraAVStreamManager::VideoStreamModify(const uint16_t streamID,
