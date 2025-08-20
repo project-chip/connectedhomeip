@@ -70,6 +70,8 @@ void ThreadStackManagerImpl::_LockThreadStack(void)
 {
     xSemaphoreTake(sInstance.mThreadStackLock, portMAX_DELAY);
 #if DLPS_EN
+    // Wake up the radio before accessing the Thread stack to ensure it's
+    // responsive, as part of the Deep Low Power State (DLPS) management.
     BEE_RadioExternalWakeup();
 #endif
 }
