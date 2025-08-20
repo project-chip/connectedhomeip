@@ -3,10 +3,10 @@ import unittest
 from mdns_discovery.utils.asserts import assert_valid_t_key
 from mobly import signals
 
-INT_MSG   = "Must be a decimal integer without leading zeroes"
+INT_MSG = "Must be a decimal integer without leading zeroes"
 RANGE_MSG = "Only bits 0-2 may be present (value must fit in 3 bits)"
-BIT0_MSG  = "Bit 0 is reserved and must be 0"
-PROV_MSG  = "Bits 1 and 2 are provisional and must not be set (strict mode)"
+BIT0_MSG = "Bit 0 is reserved and must be 0"
+PROV_MSG = "Bits 1 and 2 are provisional and must not be set (strict mode)"
 
 # Valid values (strict mode)
 VALID_VALUES = [

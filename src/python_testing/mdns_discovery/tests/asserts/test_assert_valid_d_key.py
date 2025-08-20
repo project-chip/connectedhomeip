@@ -4,7 +4,7 @@ from mdns_discovery.utils.asserts import assert_valid_d_key
 from mobly import signals
 
 DEC_MSG = "Must be a decimal integer"
-LZ_MSG  = "Value must be a decimal integer without leading zeroes"
+LZ_MSG = "Value must be a decimal integer without leading zeroes"
 RNG_MSG = "Value must be within 0-4095 (12-bit range)"
 
 # Valid values

@@ -4,7 +4,7 @@ from mdns_discovery.utils.asserts import assert_valid_dn_key
 from mobly import signals
 
 UTF8_MSG = "Must be a valid UTF-8 string"
-LEN_MSG  = "UTF-8 encoded length must be ≤ 32 bytes"
+LEN_MSG = "UTF-8 encoded length must be ≤ 32 bytes"
 
 # Valid values
 VALID_VALUES = [

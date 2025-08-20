@@ -3,9 +3,9 @@ import unittest
 from mdns_discovery.utils.asserts import assert_valid_vendor_subtype
 from mobly import signals
 
-FMT_MSG  = "Must match format '_V<value>._sub.<commissionable-service-type>'"
-DEC_MSG  = "Value must be a decimal integer without leading zeroes"
-RNG_MSG  = "Value must be within 0-65535 (16-bit range)"
+FMT_MSG = "Must match format '_V<value>._sub.<commissionable-service-type>'"
+DEC_MSG = "Value must be a decimal integer without leading zeroes"
+RNG_MSG = "Value must be within 0-65535 (16-bit range)"
 
 # Valid values
 VALID_VALUES = [

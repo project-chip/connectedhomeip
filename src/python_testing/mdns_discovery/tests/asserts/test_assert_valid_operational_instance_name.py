@@ -3,7 +3,7 @@ import unittest
 from mdns_discovery.utils.asserts import assert_valid_operational_instance_name
 from mobly import signals
 
-HY_MSG  = 'Contains exactly one hyphen separating two parts'
+HY_MSG = 'Contains exactly one hyphen separating two parts'
 LEN_MSG = 'Each part is exactly 16 characters long'
 HEX_MSG = 'Each part only contains hexadecimal uppercase characters [A-F0-9]'
 
