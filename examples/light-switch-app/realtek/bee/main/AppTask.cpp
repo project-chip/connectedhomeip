@@ -73,7 +73,7 @@ using namespace app::Clusters::Descriptor::Structs;
 
 namespace {
 
-#if (CONFIG_1_TO_2_ZAP || CONFIG_1_TO_8_ZAP || CONFIG_1_TO_12_ZAP)
+#if (CONFIG_1_TO_2_ZAP || CONFIG_1_TO_8_ZAP || CONFIG_1_TO_11_ZAP)
 
 // Switches Namespace: 0x43, tag 0x08 (Custom)
 constexpr const uint8_t kNamespaceSwitches = 0x43;
