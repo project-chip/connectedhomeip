@@ -1,7 +1,7 @@
 import unittest
-from mobly import signals
 
 from mdns_discovery.utils.asserts import assert_valid_vp_key
+from mobly import signals
 
 VID_MSG = "Must contain at least a Vendor ID"
 SEP_MSG = "If Product ID is present, there must be exactly one '+' separator"

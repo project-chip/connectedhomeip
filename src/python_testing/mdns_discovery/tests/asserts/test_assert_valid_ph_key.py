@@ -1,7 +1,7 @@
 import unittest
-from mobly import signals
 
 from mdns_discovery.utils.asserts import assert_valid_ph_key
+from mobly import signals
 
 INT_MSG = "Must be a decimal integer without leading zeroes"
 GT0_MSG = "Value must be greater than 0"

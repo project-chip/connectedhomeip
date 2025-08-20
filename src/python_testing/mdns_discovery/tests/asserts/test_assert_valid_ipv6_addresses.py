@@ -1,7 +1,7 @@
 import unittest
-from mobly import signals
 
 from mdns_discovery.utils.asserts import assert_valid_ipv6_addresses
+from mobly import signals
 
 
 class TestAssertValidIPv6Addresses(unittest.TestCase):

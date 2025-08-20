@@ -1,7 +1,7 @@
 import unittest
-from mobly import signals
 
 from mdns_discovery.utils.asserts import assert_valid_hostname
+from mobly import signals
 
 HEX_MSG = "Must start with 12 or 16 uppercase hexadecimal characters [A-F0-9]"
 SUF_MSG = "Must be followed by a valid domain suffix (e.g., .local.)"

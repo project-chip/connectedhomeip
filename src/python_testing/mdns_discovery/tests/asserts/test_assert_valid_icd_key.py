@@ -1,7 +1,7 @@
 import unittest
-from mobly import signals
 
 from mdns_discovery.utils.asserts import assert_valid_icd_key
+from mobly import signals
 
 DEC_MSG = 'Encoded as a decimal number in ASCII text'
 LEAD_MSG = 'Omitting any leading zeros'

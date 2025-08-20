@@ -405,24 +405,26 @@ def assert_valid_d_key(d_key: str) -> None:
         "Value must be within 0-4095 (12-bit range)",
     ]
 
-    failed = None
-    # Require strictly a number, no optional "D=" prefix
-    m = re.fullmatch(r'(0|[1-9]\d{0,3})', d_key)
+    failed: list[str] = []
 
-    if not m:
-        failed = constraints[0]
+    # Require strictly a number, no optional "D=" prefix
+    if not re.fullmatch(r'\d+', d_key):
+        failed.append(constraints[0])
     else:
-        val_str = m.group(0)
-        try:
-            val = int(val_str)
-            if val > 4095:
-                failed = constraints[2]
-        except ValueError:
-            failed = constraints[1]
+        # Leading zeroes not allowed (except for "0")
+        if not re.fullmatch(r'(0|[1-9]\d*)', d_key):
+            failed.append(constraints[1])
+        else:
+            try:
+                val = int(d_key)
+                if val > 4095:
+                    failed.append(constraints[2])
+            except ValueError:
+                failed.append(constraints[0])
 
     asserts.assert_true(
-        failed is None,
-        f"Invalid D key: '{d_key}', failed constraint: [{failed}]"
+        not failed,
+        f"Invalid D key: '{d_key}', failed constraint(s): {failed}"
     )
 
 

@@ -1,7 +1,7 @@
 import unittest
-from mobly import signals
 
 from mdns_discovery.utils.asserts import assert_valid_jf_key
+from mobly import signals
 
 DEC_MSG = "Must be a decimal integer without leading zeroes"
 MASK_MSG = "Only bits 0-3 may be set (value must fit in 4 bits)"

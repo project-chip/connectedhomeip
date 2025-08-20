@@ -1,7 +1,7 @@
 import unittest
-from mobly import signals
 
 from mdns_discovery.utils.asserts import assert_valid_pi_key
+from mobly import signals
 
 UTF8_MSG = "Must be a valid UTF-8 string"
 LEN_MSG  = "UTF-8 encoded length must be ≤ 128 bytes"

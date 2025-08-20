@@ -1,7 +1,7 @@
 import unittest
-from mobly import signals
 
 from mdns_discovery.utils.asserts import assert_valid_ri_key
+from mobly import signals
 
 HEX_MSG = "Must only contain uppercase hexadecimal characters [A-F0-9]"
 LEN_MSG = "Length must be between 1 and 100 characters"

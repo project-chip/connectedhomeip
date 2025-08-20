@@ -1,7 +1,7 @@
 import unittest
-from mobly import signals
 
 from mdns_discovery.utils.asserts import assert_valid_sii_key
+from mobly import signals
 
 INT_MSG = "Must be a decimal integer without leading zeroes"
 RNG_MSG = "Value must be ≤ 3600000 (1 hour in milliseconds)"

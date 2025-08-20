@@ -1,7 +1,7 @@
 import unittest
-from mobly import signals
 
 from mdns_discovery.utils.asserts import assert_valid_short_discriminator_subtype
+from mobly import signals
 
 FMT_MSG  = "Must match format '_S<value>._sub.<commissionable-service-type>'"
 DEC_MSG  = "Value must be a decimal integer without leading zeroes"

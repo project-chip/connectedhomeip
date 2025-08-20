@@ -1,7 +1,7 @@
 import unittest
-from mobly import signals
 
 from mdns_discovery.utils.asserts import assert_is_commissionable_type
+from mobly import signals
 
 EXPECTED = "_matterc._udp.local."
 

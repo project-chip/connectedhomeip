@@ -1,7 +1,7 @@
 import unittest
-from mobly import signals
 
 from mdns_discovery.utils.asserts import assert_is_operational_type
+from mobly import signals
 
 EXPECTED = "_matter._tcp.local."
 

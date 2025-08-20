@@ -1,7 +1,7 @@
 import unittest
-from mobly import signals
 
 from mdns_discovery.utils.asserts import assert_valid_vendor_id
+from mobly import signals
 
 INT_MSG = "Must be a decimal integer without leading zeroes"
 RNG_MSG = "Value must be within 0-65535 (16-bit range)"

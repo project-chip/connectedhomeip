@@ -1,7 +1,7 @@
 import unittest
-from mobly import signals
 
 from mdns_discovery.utils.asserts import assert_valid_t_key
+from mobly import signals
 
 INT_MSG   = "Must be a decimal integer without leading zeroes"
 RANGE_MSG = "Only bits 0-2 may be present (value must fit in 3 bits)"

@@ -1,7 +1,7 @@
 import unittest
-from mobly import signals
 
 from mdns_discovery.utils.asserts import assert_valid_cm_key
+from mobly import signals
 
 DEC_MSG = "Must be a decimal number"
 SET_MSG = "Value must be one of: 0, 1, 2, 3"

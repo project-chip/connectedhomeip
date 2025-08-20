@@ -1,7 +1,7 @@
 import unittest
 
-from mobly import signals
 from mdns_discovery.utils.asserts import assert_valid_operational_instance_name
+from mobly import signals
 
 HY_MSG  = 'Contains exactly one hyphen separating two parts'
 LEN_MSG = 'Each part is exactly 16 characters long'
