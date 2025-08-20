@@ -57,14 +57,8 @@ def assert_valid_operational_instance_name(instance_name: str) -> None:
     Example:
         "B7322C948581262F-0000000012344321"
 
-    Returns:
-        None
-
     Raises:
-        TestFailure: If `instance_name` does not conform to the constraints.
-
-    Spec:
-        https://github.com/CHIP-Specifications/connectedhomeip-spec/blob/master/src/secure_channel/Discovery.adoc#21-operational-instance-name
+        TestFailure (AssertionError via mobly.asserts): if constraints are violated.
     """
     consts = [
         'Contains exactly one hyphen separating two parts',
@@ -72,24 +66,24 @@ def assert_valid_operational_instance_name(instance_name: str) -> None:
         'Each part only contains hexadecimal uppercase characters [A-F0-9]',
     ]
 
-    failed = None
+    failed: list[str] = []
     parts = instance_name.split('-')
 
-    # 1. Must contain exactly one hyphen → two parts
+    # Hyphen count must yield exactly two parts
     if len(parts) != 2:
-        failed = consts[0]
-
-    # 2. Each part must be 16 characters
-    elif not all(len(p) == 16 for p in parts):
-        failed = consts[1]
-
-    # 3. Each part must be uppercase hex only
-    elif not all(re.fullmatch(r'[A-F0-9]{16}', p) for p in parts):
-        failed = consts[2]
+        failed.append(consts[0])
+    else:
+        # Length check (gate): only if hyphen count is correct
+        if not all(len(p) == 16 for p in parts):
+            failed.append(consts[1])
+        else:
+            # Charset check (independent of length; length already validated)
+            if not all(re.fullmatch(r'[A-F0-9]+', p) for p in parts):
+                failed.append(consts[2])
 
     asserts.assert_true(
-        failed is None,
-        f"Invalid operational instance name: '{instance_name}', failed constraint: [{failed}]"
+        not failed,
+        f"Invalid operational instance name: '{instance_name}', failed constraint(s): {failed}"
     )
 
 
@@ -106,33 +100,27 @@ def assert_valid_commissionable_instance_name(instance_name: str) -> None:
     Example:
         "DD200C20D25AE5F7"
 
-    Returns:
-        None
-
     Raises:
-        TestFailure: If `instance_name` does not conform to the constraints.
-
-    Spec:
-        https://github.com/CHIP-Specifications/connectedhomeip-spec/blob/master/src/secure_channel/Discovery.adoc#1-commissionable-node-discovery
+        TestFailure (AssertionError via mobly.asserts): if constraints are violated.
     """
     consts = [
         'Length must be exactly 16 characters',
         'Must only contain hexadecimal uppercase characters [A-F0-9]',
     ]
 
-    failed = None
+    failed: list[str] = []
 
-    # 1. Length must be exactly 16 characters
+    # Length must be exactly 16 characters
     if len(instance_name) != 16:
-        failed = consts[0]
-
-    # 2. Must be uppercase hex only
-    elif not re.fullmatch(r'[A-F0-9]{16}', instance_name):
-        failed = consts[1]
+        failed.append(consts[0])
+    else:
+        # Charset check only if length is correct
+        if not re.fullmatch(r'[A-F0-9]+', instance_name):
+            failed.append(consts[1])
 
     asserts.assert_true(
-        failed is None,
-        f"Invalid commissionable instance name: '{instance_name}', failed constraint: [{failed}]"
+        not failed,
+        f"Invalid commissionable instance name: '{instance_name}', failed constraint(s): {failed}"
     )
 
 
@@ -164,22 +152,29 @@ def assert_valid_hostname(hostname: str) -> None:
         "Must be followed by a valid domain suffix (e.g., .local.)"
     ]
 
-    failed = None
+    failed: list[str] = []
 
-    # Split into hex prefix + domain suffix
-    match = re.fullmatch(r'([A-F0-9]{12}|[A-F0-9]{16})(\..+)', hostname)
-    if not match:
-        failed = constraints[0]
+    # Find the leading run of uppercase hex characters
+    m = re.match(r'^([A-F0-9]+)', hostname)
+    leading_hex = m.group(1) if m else ''
+
+    # Validate hex prefix length: must be exactly 12 or 16
+    if len(leading_hex) not in (12, 16):
+        failed.append(constraints[0])
     else:
-        hex_part, domain_part = match.groups()
-
-        # Validate domain suffix
-        if not re.fullmatch(r'[A-Za-z0-9-]+(?:\.[A-Za-z0-9-]+)*\.?', domain_part[1:]):
-            failed = constraints[1]
+        # Require a '.' immediately after the valid hex prefix
+        next_idx = len(leading_hex)
+        if next_idx >= len(hostname) or hostname[next_idx] != '.':
+            failed.append(constraints[1])
+        else:
+            # Validate the domain suffix after the dot
+            domain_part = hostname[next_idx + 1:]  # skip the '.'
+            if not domain_part or not re.fullmatch(r'[A-Za-z0-9-]+(?:\.[A-Za-z0-9-]+)*\.?', domain_part):
+                failed.append(constraints[1])
 
     asserts.assert_true(
-        failed is None,
-        f"Invalid hostname: '{hostname}', failed constraint: [{failed}]"
+        not failed,
+        f"Invalid hostname: '{hostname}', failed constraint(s): {failed}"
     )
 
 
@@ -199,14 +194,8 @@ def assert_valid_long_discriminator_subtype(ld_subtype: str) -> None:
     Example:
         "_L3840._sub._matterc._udp.local."
 
-    Returns:
-        None
-
     Raises:
         TestFailure: If `ld_subtype` does not conform to the constraints.
-
-    Spec:
-        https://github.com/CHIP-Specifications/connectedhomeip-spec/blob/master/src/secure_channel/Discovery.adoc#13-commissioning-subtypes
     """
     constraints = [
         "Must match format '_L<value>._sub.<commissionable-service-type>'",
@@ -214,26 +203,28 @@ def assert_valid_long_discriminator_subtype(ld_subtype: str) -> None:
         "Value must be within 0-4095 (12-bit range)",
     ]
 
-    failed = None
+    failed: list[str] = []
+
+    # Regex enforces format and no leading zeros except "0"
     m = re.fullmatch(
         rf'_L(?P<val>0|[1-9]\d{{0,3}})\._sub\.{re.escape(MdnsServiceType.COMMISSIONABLE.value)}',
         ld_subtype
     )
 
     if not m:
-        failed = constraints[0]
+        failed.append(constraints[0])
     else:
         val_str = m.group("val")
         try:
             val = int(val_str)
             if val > 4095:
-                failed = constraints[2]
+                failed.append(constraints[2])
         except ValueError:
-            failed = constraints[1]
+            failed.append(constraints[1])
 
     asserts.assert_true(
-        failed is None,
-        f"Invalid long discriminator subtype: '{ld_subtype}', failed constraint: [{failed}]"
+        not failed,
+        f"Invalid long discriminator subtype: '{ld_subtype}', failed constraint(s): {failed}"
     )
 
 
@@ -251,14 +242,8 @@ def assert_valid_short_discriminator_subtype(sd_subtype: str) -> None:
     Example:
         "_S15._sub._matterc._udp.local."
 
-    Returns:
-        None
-
     Raises:
         TestFailure: If `sd_subtype` does not conform to the constraints.
-
-    Spec:
-        https://github.com/CHIP-Specifications/connectedhomeip-spec/blob/master/src/secure_channel/Discovery.adoc#13-commissioning-subtypes
     """
     constraints = [
         "Must match format '_S<value>._sub.<commissionable-service-type>'",
@@ -266,26 +251,28 @@ def assert_valid_short_discriminator_subtype(sd_subtype: str) -> None:
         "Value must be within 0-15 (4-bit range)",
     ]
 
-    failed = None
+    failed: list[str] = []
+
+    # Regex enforces format and no leading zeros except for "0"
     m = re.fullmatch(
         rf'_S(?P<val>0|[1-9]\d?)\._sub\.{re.escape(MdnsServiceType.COMMISSIONABLE.value)}',
         sd_subtype
     )
 
     if not m:
-        failed = constraints[0]
+        failed.append(constraints[0])
     else:
         val_str = m.group("val")
         try:
             val = int(val_str)
             if val > 15:
-                failed = constraints[2]
+                failed.append(constraints[2])
         except ValueError:
-            failed = constraints[1]
+            failed.append(constraints[1])
 
     asserts.assert_true(
-        failed is None,
-        f"Invalid short discriminator subtype: '{sd_subtype}', failed constraint: [{failed}]"
+        not failed,
+        f"Invalid short discriminator subtype: '{sd_subtype}', failed constraint(s): {failed}"
     )
 
 
@@ -303,14 +290,8 @@ def assert_valid_vendor_subtype(vendor_subtype: str) -> None:
     Example:
         "_V65521._sub._matterc._udp.local."
 
-    Returns:
-        None
-
     Raises:
         TestFailure: If `vendor_subtype` does not conform to the constraints.
-
-    Spec:
-        https://github.com/CHIP-Specifications/connectedhomeip-spec/blob/master/src/secure_channel/Discovery.adoc#13-commissioning-subtypes
     """
     constraints = [
         "Must match format '_V<value>._sub.<commissionable-service-type>'",
@@ -318,26 +299,28 @@ def assert_valid_vendor_subtype(vendor_subtype: str) -> None:
         "Value must be within 0-65535 (16-bit range)",
     ]
 
-    failed = None
+    failed: list[str] = []
+
+    # Regex enforces format and no leading zeros except for "0"
     m = re.fullmatch(
         rf'_V(?P<val>0|[1-9]\d*)\._sub\.{re.escape(MdnsServiceType.COMMISSIONABLE.value)}',
         vendor_subtype
     )
 
     if not m:
-        failed = constraints[0]
+        failed.append(constraints[0])
     else:
         val_str = m.group("val")
         try:
             val = int(val_str)
             if val > 65535:
-                failed = constraints[2]
+                failed.append(constraints[2])
         except ValueError:
-            failed = constraints[1]
+            failed.append(constraints[1])
 
     asserts.assert_true(
-        failed is None,
-        f"Invalid vendor subtype: '{vendor_subtype}', failed constraint: [{failed}]"
+        not failed,
+        f"Invalid vendor subtype: '{vendor_subtype}', failed constraint(s): {failed}"
     )
 
 
@@ -355,14 +338,8 @@ def assert_valid_devtype_subtype(devtype_subtype: str) -> None:
     Example:
         "_T10._sub._matterc._udp.local."
 
-    Returns:
-        None
-
     Raises:
         TestFailure: If `devtype_subtype` does not conform to the constraints.
-
-    Spec:
-        https://github.com/CHIP-Specifications/connectedhomeip-spec/blob/master/src/secure_channel/Discovery.adoc#13-commissioning-subtypes
     """
     constraints = [
         "Must match format '_T<value>._sub.<commissionable-service-type>'",
@@ -370,26 +347,28 @@ def assert_valid_devtype_subtype(devtype_subtype: str) -> None:
         "Value must be within 0-4294967295 (32-bit range)",
     ]
 
-    failed = None
+    failed: list[str] = []
+
+    # Regex enforces format and no leading zeros except for "0"
     m = re.fullmatch(
         rf'_T(?P<val>0|[1-9]\d*)\._sub\.{re.escape(MdnsServiceType.COMMISSIONABLE.value)}',
         devtype_subtype
     )
 
     if not m:
-        failed = constraints[0]
+        failed.append(constraints[0])
     else:
         val_str = m.group("val")
         try:
             val = int(val_str)
             if val > 0xFFFFFFFF:
-                failed = constraints[2]
+                failed.append(constraints[2])
         except ValueError:
-            failed = constraints[1]
+            failed.append(constraints[1])
 
     asserts.assert_true(
-        failed is None,
-        f"Invalid device type subtype: '{devtype_subtype}', failed constraint: [{failed}]"
+        not failed,
+        f"Invalid device type subtype: '{devtype_subtype}', failed constraint(s): {failed}"
     )
 
 
@@ -481,34 +460,34 @@ def assert_valid_vp_key(vp_key: str) -> None:
         "Product ID (if present) must be a valid decimal integer",
     ]
 
-    failed = None
+    failed: list[str] = []
 
     if '+' not in vp_key:
         # Vendor ID only
         try:
             assert_valid_vendor_id(vp_key)
         except Exception:
-            failed = constraints[2]
+            failed.append(constraints[2])
     else:
         # Must contain exactly one '+'
         if vp_key.count('+') != 1:
-            failed = constraints[1]
+            failed.append(constraints[1])
         else:
             vid_str, pid_str = vp_key.split('+', 1)
             try:
                 assert_valid_vendor_id(vid_str)
             except Exception:
-                failed = constraints[2]
+                failed.append(constraints[2])
 
-            if failed is None:
+            if not failed:
                 try:
                     assert_valid_product_id(pid_str)
                 except Exception:
-                    failed = constraints[3]
+                    failed.append(constraints[3])
 
     asserts.assert_true(
-        failed is None,
-        f"Invalid VP key: '{vp_key}', failed constraint: [{failed}]"
+        not failed,
+        f"Invalid VP key: '{vp_key}', failed constraint(s): {failed}"
     )
 
 
@@ -540,16 +519,19 @@ def assert_valid_cm_key(cm_key: str) -> None:
         "Value must be one of: 0, 1, 2, 3",
     ]
 
-    failed = None
-    m = re.fullmatch(r'(0|[1-3])', cm_key)
+    failed: list[str] = []
 
-    if not m:
-        # Either not decimal or not in the allowed set
-        failed = constraints[1]
+    # Must be all digits
+    if not re.fullmatch(r'\d+', cm_key):
+        failed.append(constraints[0])
+    else:
+        # Must be one of 0–3
+        if cm_key not in {"0", "1", "2", "3"}:
+            failed.append(constraints[1])
 
     asserts.assert_true(
-        failed is None,
-        f"Invalid CM key: '{cm_key}', failed constraint: [{failed}]"
+        not failed,
+        f"Invalid CM key: '{cm_key}', failed constraint(s): {failed}"
     )
 
 
@@ -582,22 +564,22 @@ def assert_valid_dt_key(dt_key: str) -> None:
         "Value must be within 0-4294967295 (32-bit range)",
     ]
 
-    failed = None
-    m = re.fullmatch(r'(0|[1-9]\d{0,9})', dt_key)
+    failed: list[str] = []
 
-    if not m:
-        failed = constraints[0]
+    # Must be integer without leading zeros (except for "0")
+    if not re.fullmatch(r'(0|[1-9]\d*)', dt_key):
+        failed.append(constraints[0])
     else:
         try:
             val = int(dt_key)
             if val > 0xFFFFFFFF:
-                failed = constraints[1]
+                failed.append(constraints[1])
         except ValueError:
-            failed = constraints[0]
+            failed.append(constraints[0])
 
     asserts.assert_true(
-        failed is None,
-        f"Invalid DT key: '{dt_key}', failed constraint: [{failed}]"
+        not failed,
+        f"Invalid DT key: '{dt_key}', failed constraint(s): {failed}"
     )
 
 
@@ -629,17 +611,18 @@ def assert_valid_dn_key(dn_key: str) -> None:
         "UTF-8 encoded length must be ≤ 32 bytes",
     ]
 
-    failed = None
+    failed: list[str] = []
+
     try:
         encoded = dn_key.encode("utf-8")
         if len(encoded) > 32:
-            failed = constraints[1]
+            failed.append(constraints[1])
     except UnicodeEncodeError:
-        failed = constraints[0]
+        failed.append(constraints[0])
 
     asserts.assert_true(
-        failed is None,
-        f"Invalid DN key: '{dn_key}', failed constraint: [{failed}]"
+        not failed,
+        f"Invalid DN key: '{dn_key}', failed constraint(s): {failed}"
     )
 
 
@@ -672,16 +655,19 @@ def assert_valid_ri_key(ri_key: str) -> None:
         "Length must be between 1 and 100 characters",
     ]
 
-    failed = None
+    failed: list[str] = []
 
+    # Charset check
     if not re.fullmatch(r'[A-F0-9]+', ri_key):
-        failed = constraints[0]
-    elif len(ri_key) > 100:
-        failed = constraints[1]
+        failed.append(constraints[0])
+    else:
+        # Length check
+        if not (1 <= len(ri_key) <= 100):
+            failed.append(constraints[1])
 
     asserts.assert_true(
-        failed is None,
-        f"Invalid RI key: '{ri_key}', failed constraint: [{failed}]"
+        not failed,
+        f"Invalid RI key: '{ri_key}', failed constraint(s): {failed}"
     )
 
 
@@ -716,25 +702,26 @@ def assert_valid_ph_key(ph_key: str) -> None:
         "Only bits 0-19 may be set (value must fit in 20 bits)",
     ]
 
-    failed = None
+    failed: list[str] = []
 
-    if not re.fullmatch(r'[1-9]\d*', ph_key):
-        failed = constraints[0]
+    # Accept "0" syntactically (no leading zeros) so we can surface the correct >0 failure
+    if not re.fullmatch(r'(0|[1-9]\d*)', ph_key):
+        failed.append(constraints[0])
     else:
         try:
             v = int(ph_key)
             if v <= 0:
-                failed = constraints[1]
+                failed.append(constraints[1])
             else:
                 allowed_mask = (1 << 20) - 1  # 20 valid bits
                 if v & ~allowed_mask:
-                    failed = constraints[2]
+                    failed.append(constraints[2])
         except ValueError:
-            failed = constraints[0]
+            failed.append(constraints[0])
 
     asserts.assert_true(
-        failed is None,
-        f"Invalid PH key: '{ph_key}', failed constraint: [{failed}]"
+        not failed,
+        f"Invalid PH key: '{ph_key}', failed constraint(s): {failed}"
     )
 
 
@@ -766,17 +753,18 @@ def assert_valid_pi_key(pi_key: str) -> None:
         "UTF-8 encoded length must be ≤ 128 bytes",
     ]
 
-    failed = None
+    failed: list[str] = []
+
     try:
         encoded = pi_key.encode("utf-8")
         if len(encoded) > 128:
-            failed = constraints[1]
+            failed.append(constraints[1])
     except UnicodeEncodeError:
-        failed = constraints[0]
+        failed.append(constraints[0])
 
     asserts.assert_true(
-        failed is None,
-        f"Invalid PI key: '{pi_key}', failed constraint: [{failed}]"
+        not failed,
+        f"Invalid PI key: '{pi_key}', failed constraint(s): {failed}"
     )
 
 
@@ -815,33 +803,34 @@ def assert_valid_jf_key(jf_key: str) -> None:
         "Bit 3 requires both bits 1 and 2",
     ]
 
-    failed = None
+    failed: list[str] = []
 
+    # Decimal check without leading zeroes
     if not re.fullmatch(r'[1-9]\d*', jf_key):
-        failed = constraints[0]
+        failed.append(constraints[0])
     else:
         try:
             v = int(jf_key)
 
-            # only bits 0..3 allowed
+            # Only bits 0..3 allowed
             if v & ~0xF:
-                failed = constraints[1]
-            # bit0 cannot coexist with bits1..3
+                failed.append(constraints[1])
+            # Bit 0 cannot coexist with bits 1..3
             elif (v & 0x1) and (v & 0xE):
-                failed = constraints[2]
-            # bit2 requires bit1
+                failed.append(constraints[2])
+            # Bit 2 requires bit 1
             elif (v & 0x4) and not (v & 0x2):
-                failed = constraints[3]
-            # bit3 requires bits1 and 2
+                failed.append(constraints[3])
+            # Bit 3 requires bits 1 and 2
             elif (v & 0x8) and ((v & 0x6) != 0x6):
-                failed = constraints[4]
+                failed.append(constraints[4])
 
         except ValueError:
-            failed = constraints[0]
+            failed.append(constraints[0])
 
     asserts.assert_true(
-        failed is None,
-        f"Invalid JF key: '{jf_key}', failed constraint: [{failed}]"
+        not failed,
+        f"Invalid JF key: '{jf_key}', failed constraint(s): {failed}"
     )
 
 
@@ -877,22 +866,22 @@ def assert_valid_sii_key(sii_key: str) -> None:
         "Value must be ≤ 3600000 (1 hour in milliseconds)",
     ]
 
-    failed = None
-    m = re.fullmatch(r'(0|[1-9]\d*)', sii_key)
+    failed: list[str] = []
 
-    if not m:
-        failed = constraints[0]
+    # Decimal integer without leading zeroes (except "0")
+    if not re.fullmatch(r'(0|[1-9]\d*)', sii_key):
+        failed.append(constraints[0])
     else:
         try:
             val = int(sii_key)
             if val > 3_600_000:
-                failed = constraints[1]
+                failed.append(constraints[1])
         except ValueError:
-            failed = constraints[0]
+            failed.append(constraints[0])
 
     asserts.assert_true(
-        failed is None,
-        f"Invalid SII key: '{sii_key}', failed constraint: [{failed}]"
+        not failed,
+        f"Invalid SII key: '{sii_key}', failed constraint(s): {failed}"
     )
 
 
@@ -926,22 +915,22 @@ def assert_valid_sai_key(sai_key: str) -> None:
         "Value must be ≤ 3600000 (1 hour in milliseconds)",
     ]
 
-    failed = None
-    m = re.fullmatch(r'(0|[1-9]\d*)', sai_key)
+    failed: list[str] = []
 
-    if not m:
-        failed = constraints[0]
+    # Decimal integer without leading zeroes (except "0")
+    if not re.fullmatch(r'(0|[1-9]\d*)', sai_key):
+        failed.append(constraints[0])
     else:
         try:
             val = int(sai_key)
             if val > 3_600_000:
-                failed = constraints[1]
+                failed.append(constraints[1])
         except ValueError:
-            failed = constraints[0]
+            failed.append(constraints[0])
 
     asserts.assert_true(
-        failed is None,
-        f"Invalid SAI key: '{sai_key}', failed constraint: [{failed}]"
+        not failed,
+        f"Invalid SAI key: '{sai_key}', failed constraint(s): {failed}"
     )
 
 
@@ -975,22 +964,22 @@ def assert_valid_sat_key(sat_key: str) -> None:
         "Value must be ≤ 65535 (65.535 seconds)",
     ]
 
-    failed = None
-    m = re.fullmatch(r'(0|[1-9]\d*)', sat_key)
+    failed: list[str] = []
 
-    if not m:
-        failed = constraints[0]
+    # Decimal integer without leading zeroes (except "0")
+    if not re.fullmatch(r'(0|[1-9]\d*)', sat_key):
+        failed.append(constraints[0])
     else:
         try:
             val = int(sat_key)
             if val > 65_535:
-                failed = constraints[1]
+                failed.append(constraints[1])
         except ValueError:
-            failed = constraints[0]
+            failed.append(constraints[0])
 
     asserts.assert_true(
-        failed is None,
-        f"Invalid SAT key: '{sat_key}', failed constraint: [{failed}]"
+        not failed,
+        f"Invalid SAT key: '{sat_key}', failed constraint(s): {failed}"
     )
 
 
@@ -1031,29 +1020,30 @@ def assert_valid_t_key(t_key: str, enforce_provisional: bool = True) -> None:
         "Bits 1 and 2 are provisional and must not be set (strict mode)",
     ]
 
-    failed = None
+    failed: list[str] = []
 
+    # Must be decimal without leading zeroes (except "0")
     m = re.fullmatch(r'(0|[1-9]\d*)', t_key)
     if not m:
-        failed = constraints[0]
+        failed.append(constraints[0])
     else:
         try:
             v = int(t_key)
-            # Only bits 0-2 allowed
+            # Only bits 0–2 allowed
             if v & ~0x7:
-                failed = constraints[1]
+                failed.append(constraints[1])
             # Bit 0 reserved
             elif v & 0x1:
-                failed = constraints[2]
-            # Bits 1 and 2 provisional
+                failed.append(constraints[2])
+            # Bits 1 and 2 provisional (only enforced if strict mode)
             elif enforce_provisional and (v & 0x6):
-                failed = constraints[3]
+                failed.append(constraints[3])
         except ValueError:
-            failed = constraints[0]
+            failed.append(constraints[0])
 
     asserts.assert_true(
-        failed is None,
-        f"Invalid T key: '{t_key}', failed constraint: [{failed}]"
+        not failed,
+        f"Invalid T key: '{t_key}', failed constraint(s): {failed}"
     )
 
 
@@ -1065,23 +1055,21 @@ def assert_valid_icd_key(icd_key: str) -> None:
         'Allowed values: 0 or 1',
     ]
 
-    failed = None
+    failed: list[str] = []
 
-    # 1. Must be ASCII decimal text
+    # Must be ASCII decimal text
     if not re.fullmatch(r'\d+', icd_key):
-        failed = consts[0]
-
-    # 2. No leading zeros (except "0")
+        failed.append(consts[0])
+    # No leading zeros (except "0")
     elif not re.fullmatch(r'0|[1-9]\d*', icd_key):
-        failed = consts[1]
-
-    # 3. Only 0 or 1 allowed
+        failed.append(consts[1])
+    # Only 0 or 1 allowed
     elif icd_key not in ("0", "1"):
-        failed = consts[2]
+        failed.append(consts[2])
 
     asserts.assert_true(
-        failed is None,
-        f"Invalid ICD key: '{icd_key}', failed constraint: [{failed}]"
+        not failed,
+        f"Invalid ICD key: '{icd_key}', failed constraint(s): {failed}"
     )
 
 
@@ -1115,22 +1103,22 @@ def assert_valid_vendor_id(vendor_id: str) -> None:
         "Value must be within 0-65535 (16-bit range)",
     ]
 
-    failed = None
-    m = re.fullmatch(r'(0|[1-9]\d{0,4})', vendor_id)
+    failed: list[str] = []
 
-    if not m:
-        failed = constraints[0]
+    # Must be a decimal integer without leading zeroes (except "0"), up to 5 digits
+    if not re.fullmatch(r'(0|[1-9]\d{0,4})', vendor_id):
+        failed.append(constraints[0])
     else:
         try:
             val = int(vendor_id)
             if val > 65_535:
-                failed = constraints[1]
+                failed.append(constraints[1])
         except ValueError:
-            failed = constraints[0]
+            failed.append(constraints[0])
 
     asserts.assert_true(
-        failed is None,
-        f"Invalid Vendor ID: '{vendor_id}', failed constraint: [{failed}]"
+        not failed,
+        f"Invalid Vendor ID: '{vendor_id}', failed constraint(s): {failed}"
     )
 
 
@@ -1162,22 +1150,22 @@ def assert_valid_product_id(product_id: str) -> None:
         "Value must be within 0-65535 (16-bit range)",
     ]
 
-    failed = None
-    m = re.fullmatch(r'(0|[1-9]\d{0,4})', product_id)
+    failed: list[str] = []
 
-    if not m:
-        failed = constraints[0]
+    # Must be a decimal integer without leading zeroes (except "0"), up to 5 digits
+    if not re.fullmatch(r'(0|[1-9]\d{0,4})', product_id):
+        failed.append(constraints[0])
     else:
         try:
             val = int(product_id)
             if val > 65_535:
-                failed = constraints[1]
+                failed.append(constraints[1])
         except ValueError:
-            failed = constraints[0]
+            failed.append(constraints[0])
 
     asserts.assert_true(
-        failed is None,
-        f"Invalid Product ID: '{product_id}', failed constraint: [{failed}]"
+        not failed,
+        f"Invalid Product ID: '{product_id}', failed constraint(s): {failed}"
     )
 
 
