@@ -108,6 +108,14 @@ public:
                                                                     uint16_t & outStreamID) = 0;
 
     /**
+     *   @brief Called after the server has finalized video stream allocation and narrowed parameters.
+     *          This is where the actual video stream should be started using the final allocated parameters.
+     *
+     *   @param allocatedStream   The finalized video stream with narrowed parameters from the server.
+     */
+    virtual void OnVideoStreamAllocated(const VideoStreamStruct & allocatedStream) = 0;
+
+    /**
      *   @brief Handle Command Delegate for Video stream modification.
      *
      *   @param streamID           Indicates the streamID of the video stream to modify.

@@ -1804,6 +1804,9 @@ void CameraAVStreamMgmtServer::HandleVideoStreamAllocate(HandlerContext & ctx,
 
         response.videoStreamID = videoStreamID;
         ctx.mCommandHandler.AddResponse(ctx.mRequestPath, response);
+
+        // Call delegate with the final allocated stream parameters
+        mDelegate.OnVideoStreamAllocated(videoStreamArgs);
     }
     else
     {
