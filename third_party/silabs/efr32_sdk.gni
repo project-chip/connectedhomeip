@@ -37,9 +37,13 @@ declare_args() {
 
   # enable by default for thread/non-wifi-ncp builds
   enable_openthread_cli = !(use_rs9116 || use_wf200 || use_SiWx917)
+
+  # Max KVS entry counts. Its the current maximal value we support.
   kvs_max_entries = 511
   sl_nvm3_max_object_size = 1024
   sl_nvm3_nvm_size = 40960
+
+  # NVM3 cache size. A cache size >= total object count is recommended.
   sl_nvm3_cache_size = 600
 
   # Use Silabs factory data provider example.
