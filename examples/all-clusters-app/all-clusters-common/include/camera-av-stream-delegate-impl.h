@@ -78,6 +78,8 @@ public:
 
     Protocols::InteractionModel::Status SnapshotStreamDeallocate(const uint16_t streamID);
 
+    void OnVideoStreamAllocated(const VideoStreamStruct & allocatedStream) override;
+
     void OnStreamUsagePrioritiesChanged();
 
     void OnAttributeChanged(AttributeId attributeId);
