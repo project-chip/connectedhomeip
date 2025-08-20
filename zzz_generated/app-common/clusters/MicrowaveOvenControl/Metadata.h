@@ -20,6 +20,7 @@ namespace MicrowaveOvenControl {
 inline constexpr uint32_t kRevision = 1;
 
 namespace Attributes {
+
 namespace CookTime {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(CookTime::Id, BitFlags<DataModel::AttributeQualityFlags>(),
                                                           Access::Privilege::kView, std::nullopt);
@@ -66,6 +67,7 @@ constexpr std::array<DataModel::AttributeEntry, 2> kMandatoryMetadata = {
 } // namespace Attributes
 
 namespace Commands {
+
 namespace SetCookingParameters {
 inline constexpr DataModel::AcceptedCommandEntry
     kMetadataEntry(SetCookingParameters::Id, BitFlags<DataModel::CommandQualityFlags>(), Access::Privilege::kOperate);

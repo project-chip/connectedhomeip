@@ -20,6 +20,7 @@ namespace TemperatureMeasurement {
 inline constexpr uint32_t kRevision = 4;
 
 namespace Attributes {
+
 namespace MeasuredValue {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(MeasuredValue::Id, BitFlags<DataModel::AttributeQualityFlags>(),
                                                           Access::Privilege::kView, std::nullopt);

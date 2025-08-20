@@ -160,7 +160,7 @@ void MTRDeviceControllerDelegateBridge::OnCommissioningComplete(chip::NodeId nod
     if (strongDelegate && mQueue && strongController) {
 
         // Always collect the metrics to avoid unbounded growth of the stats in the collector
-        MTRMetrics * metrics = [[MTRMetricsCollector sharedInstance] metricSnapshot:TRUE];
+        MTRMetrics * metrics = [[MTRMetricsCollector sharedInstance] metricSnapshotForCommissioning:YES];
         MTR_LOG("%@ Device commissioning complete with metrics %@", strongController, metrics);
 
         if ([strongDelegate respondsToSelector:@selector(controller:commissioningComplete:nodeID:)] ||
