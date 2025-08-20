@@ -117,7 +117,7 @@ RUN set -x \
     wget \
     zlib1g-dev \
     zstd \
-    gnupg=2.4.8 \
+    gnupg \
     && rm -rf /var/lib/apt/lists/ \
     && git lfs install \
     && : # last line
@@ -135,7 +135,7 @@ RUN set -x \
     pygit \
     PyGithub \
     ruff \
-    gcovr \
+    gcovr==8.3 \
     && : # last line
 
 # Install bloat comparison tools
