@@ -495,7 +495,7 @@ CHIP_ERROR UpdateTariffComponentAttrsDayEntryById(Instance * aInstance, CurrentT
         if (current == nullptr)
         {
             err = CHIP_ERROR_NOT_FOUND;
-            break;
+            goto exit;
         }
         entry = *current;
         if (current->label.HasValue())
@@ -508,7 +508,8 @@ CHIP_ERROR UpdateTariffComponentAttrsDayEntryById(Instance * aInstance, CurrentT
                 if (!CommodityTariffAttrsDataMgmt::SpanCopier<char>::Copy(current->label.Value().Value(), tmpNullLabel,
                                                                           srcLabelSpan.size()))
                 {
-                    return CHIP_ERROR_NO_MEMORY;
+                    err = CHIP_ERROR_NO_MEMORY;
+                    goto exit;
                 }
             }
             entry.label = MakeOptional(tmpNullLabel);
@@ -516,22 +517,19 @@ CHIP_ERROR UpdateTariffComponentAttrsDayEntryById(Instance * aInstance, CurrentT
         tempVector.push_back(entry);
     }
 
-    if (err == CHIP_NO_ERROR)
+    err = mgmtObj.SetNewValue(
+        MakeNullable(DataModel::List<Structs::TariffComponentStruct::Type>(tempVector.data(), tempVector.size())));
+    SuccessOrExit(err);
+
+    err = mgmtObj.UpdateBegin(nullptr);
+    SuccessOrExit(err);
+
+    if (mgmtObj.UpdateFinish(err == CHIP_NO_ERROR)) // Success path
     {
-        err = mgmtObj.SetNewValue(
-            MakeNullable(DataModel::List<Structs::TariffComponentStruct::Type>(tempVector.data(), tempVector.size())));
-
-        if (err == CHIP_NO_ERROR)
-        {
-            err = mgmtObj.UpdateBegin(nullptr);
-
-            if (mgmtObj.UpdateFinish(err == CHIP_NO_ERROR)) // Success path
-            {
-                aInstance->AttributeUpdCb(mgmtObj.GetAttrId());
-            }
-        }
+        aInstance->AttributeUpdCb(mgmtObj.GetAttrId());
     }
 
+exit:
     for (auto & entry : tempVector)
     {
         mgmtObj.CleanupExtListEntry(entry);
