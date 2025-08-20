@@ -134,7 +134,7 @@ git config --global --add safe.directory /var/connectedhomeip/third_party/pigwee
 scp ./out/linux-arm64-camera-controller-clang/chip-camera-controller ubuntu@<RASPBERRY_PI_IP_ADDRESS>:/home/ubuntu
 ```
 
-### 3. Running the Local Demonstration
+### 3. Running the Live View Demo
 
 After building the applications using Option A, you can run the full end-to-end
 example on your Linux machine. You will need two separate terminal windows.
@@ -182,3 +182,104 @@ liveview start 1
 
 Wave your hand in front of the camera to trigger live view; a video window will
 appear, confirming that the stream is active.
+
+### 4. Running the Video Recording Upload Demo
+
+The Push AV Server acts as the recording destination (like a cloud service) for
+video clips. The demo shows how a Matter Camera Controller tells a Matter Camera
+to record a clip and upload it to that server.
+
+The server itself doesn't control the camera; it's a passive service that
+securely receives and stores media. The relationship is established by the
+controller.
+
+#### The Server's Role: The Recording Destination
+
+The Push AV Server runs in the background, waiting for authenticated devices to
+push video content to it. The key piece of information it provides is its ingest
+URL, which, for example, looks like this: `https://localhost:1234/streams/1`
+
+Think of this server as a secure, private YouTube or Dropbox, but just for your
+camera's video clips.
+
+Here is the command to set up a local Push AV Server, using a virtual
+environment. (recommended)
+
+```
+# Create a virtual environment
+python3 -m venv pavs_env
+
+# Activate it
+source pavs_env/bin/activate
+
+# Install dependencies
+pip install uvicorn fastapi jinja2 cryptography zeroconf pydantic
+
+# Run the server
+python server.py --working-directory ~/.pavstest
+```
+
+#### The Controller's Role: The Orchestrator
+
+The `chip-camera-controller` acts as the "brain" of the operation. It's what you
+use to configure the system. It tells the camera where to send its recordings.
+
+This happens in this specific command:
+
+-   Build & run camera application
+
+```
+./scripts/examples/gn_build_example.sh examples/camera-app/linux out/debug
+./out/debug/chip-camera-app
+```
+
+-   Build & run `chip-camera-controller` steps for clip recording & uploading
+
+```
+./scripts/build/build_examples.py --target linux-x64-camera-controller build
+./out/linux-x64-camera-controller/chip-camera-controller
+```
+
+-   Pair Camera
+
+```
+pairing code 1 34970112332
+```
+
+-   Video Stream Allocation
+
+```
+cameraavstreammanagement video-stream-allocate 3 0 30 30 '{ "width":640, "height":480}' '{ "width":640, "height":480}' 10000 10000 1 10 1 1 --WatermarkEnabled 1 --OSDEnabled 1
+```
+
+-   Audio Stream Allocation
+
+```
+cameraavstreammanagement audio-stream-allocate 3 0 2 48000 96000 16 1 1
+```
+
+-   Push AV Transport allocation
+
+```
+pushavstreamtransport allocate-push-transport '{"streamUsage":0, "videoStreamID":1, "audioStreamID":2, "endpointID":1, "url":"https://localhost:1234/streams/1", "triggerOptions":{"triggerType":0, "maxPreRollLen":1, "motionTimeControl":{"initialDuration":20, "augmentationDuration":5,"maxDuration":40, "blindDuration":5}}, "ingestMethod":0, "containerOptions":{"containerType":0, "CMAFContainerOptions": {"chunkDuration": 4, "CMAFInterface": 0, "segmentDuration": 6, "sessionGroup": 1, "trackName": "main"}}}' 1 1
+```
+
+Here, the controller is sending the server's URL to the camera. It's essentially
+saying, "When I tell you to record a clip, this is the address you need to send
+it to."
+
+#### The Camera's Role: The Content Producer
+
+The `chip-camera-app` is the device that does the actual work of recording and
+sending the video. After it receives the configuration from the controller, it
+waits for a trigger.
+
+This command from the controller is the trigger:
+
+```
+pushavstreamtransport manually-trigger-transport 1 0 1 1
+```
+
+This command means, "Start recording now and upload the clip to the URL I gave
+you earlier." The camera then connects to the push_av_server at
+`https://localhost:1234/streams/1` and pushes the video clip.
