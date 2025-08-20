@@ -17,7 +17,7 @@ import signal
 import tempfile
 from contextlib import contextmanager
 from dataclasses import dataclass
-from typing import Optional, Union
+from typing import ContextManager, Optional, Union
 
 import matter.clusters as Clusters
 from matter.ChipDeviceCtrl import ChipDeviceController
@@ -72,12 +72,16 @@ class AppServerSubprocess(Subprocess):
     # Prefix for log messages from the application server.
     PREFIX = b"[SERVER]"
 
+    # Instance attribute to hold the KVS context manager used for temp file lifecycle
+    _kvs_context: Optional[ContextManager[str]]
+
     def __init__(self, app: str, storage_dir: str, discriminator: int,
                  passcode: int, port: int = 5540, extra_args: list[str] = []):
         # Open a KVS file and keep it alive for the lifetime of this subprocess.
         # We manually enter the context here and exit it in terminate().
-        self._kvs_context = create_kvs_file(storage_dir)
-        kvs_path = self._kvs_context.__enter__()
+        kvs_context = create_kvs_file(storage_dir)
+        self._kvs_context = kvs_context
+        kvs_path = kvs_context.__enter__()
         try:
             # Build the command list
             command = [app]
@@ -96,7 +100,8 @@ class AppServerSubprocess(Subprocess):
                              output_cb=lambda line, is_stderr: self.PREFIX + line)
         except Exception:
             # If initialization fails, ensure we clean up the KVS file immediately
-            self._kvs_context.__exit__(None, None, None)
+            if self._kvs_context is not None:
+                self._kvs_context.__exit__(None, None, None)
             self._kvs_context = None
             raise
 
