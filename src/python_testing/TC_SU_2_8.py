@@ -147,12 +147,12 @@ class TC_SU_2_8(MatterBaseTest):
         logging.info(f"State Transition: {event}")
 
         asserts.assert_equal(previous_state, event.previousState,
-                             f"Previous state is {event.previousState} and it should be {previous_state}.")
+                             f"Previous state is {event.previousState} and it should be {previous_state}")
         asserts.assert_equal(next_state, event.newState,
-                             f"New state is {event.newState} and it should be {next_state}.")
+                             f"New state is {event.newState} and it should be {next_state}")
 
         asserts.assert_equal(software_version, event.targetSoftwareVersion,
-                             f"Target version is {event.targetSoftwareVersion} and it should be {software_version}.")
+                             f"Target version is {event.targetSoftwareVersion} and it should be {software_version}")
 
     @async_test_body
     async def test_TC_SU_2_8(self):
@@ -288,12 +288,16 @@ class TC_SU_2_8(MatterBaseTest):
         event_cb = EventSubscriptionHandler(expected_cluster=Clusters.Objects.OtaSoftwareUpdateRequestor)
         await event_cb.start(dev_ctrl=th2, node_id=dut_node_id, endpoint=endpoint,
                              fabric_filtered=False, min_interval_sec=0, max_interval_sec=5000)
-        event = event_cb.wait_for_event_report(Clusters.Objects.OtaSoftwareUpdateRequestor.Events.StateTransition, 5000)
 
-        self.check_event_status(event=event, previous_state=Clusters.Objects.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kQuerying,
-                                next_state=Clusters.Objects.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kDownloading, software_version=target_version)
-        self.check_event_status(event=event, previous_state=Clusters.Objects.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kDownloading,
-                                next_state=Clusters.Objects.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kDownloading, software_version=target_version)
+        event_1 = event_cb.wait_for_event_report(Clusters.Objects.OtaSoftwareUpdateRequestor.Events.StateTransition, 5000)
+
+        await self.check_event_status(event=event_1, previous_state=Clusters.Objects.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kQuerying,
+                                      next_state=Clusters.Objects.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kDownloading, software_version=target_version)
+
+        event_2 = event_cb.wait_for_event_report(Clusters.Objects.OtaSoftwareUpdateRequestor.Events.StateTransition, 5000)
+
+        await self.check_event_status(event=event_2, previous_state=Clusters.Objects.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kDownloading,
+                                      next_state=Clusters.Objects.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kApplying, software_version=target_version)
 
 
 if __name__ == "__main__":
