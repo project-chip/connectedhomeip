@@ -79,6 +79,9 @@ private:
     chip::TestPersistentStorageDelegate mStorage;
     chip::PersistentStorageOperationalKeystore mOpKeyStore;
     chip::Credentials::PersistentStorageOpCertStore mOpCertStore;
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+    chip::WiFiPAF::WiFiPAFLayer wifipaf;
+#endif
 };
 
 // Test DeviceControllerFactory Class
@@ -95,7 +98,6 @@ public:
         factoryInitParams.fabricIndependentStorage = &factoryStorage;
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
-        chip::WiFiPAF::WiFiPAFLayer wifipaf;
         factoryInitParams.wifipaf_layer = &wifipaf;
 #endif
     }
