@@ -96,19 +96,19 @@ class TC_COMMTR_2_1(CommodityMeteringTestBaseHelper):
 
         self.step("2")
         # Read MaximumMeteredQuantities attribute, expected to be Null or uint16
-        self.check_maximum_metered_quantities_attribute(endpoint)
+        await self.check_maximum_metered_quantities_attribute(endpoint)
 
         self.step("3")
         # Read MeteredQuantity attribute, expected to be Null or list of MeteredQuantityStruct entries.
-        self.check_metered_quantity_attribute(endpoint)
+        await self.check_metered_quantity_attribute(endpoint)
 
         self.step("4")
         # Read MeteredQuantityTimestamp attribute, expected to be Null or epoch-s
-        self.check_metered_quantity_timestamp_attribute(endpoint)
+        await self.check_metered_quantity_timestamp_attribute(endpoint)
 
         self.step("5")
         # Read TariffUnit attribute, expected to be Null or TariffUnitEnum
-        self.check_tariff_unit_attribute(endpoint)
+        await self.check_tariff_unit_attribute(endpoint)
 
 
 if __name__ == "__main__":
