@@ -493,7 +493,14 @@ CHIP_ERROR Storage::GetPersistentUniqueId(uint8_t * value, size_t max, size_t & 
 
 CHIP_ERROR Storage::SetSetupDiscriminator(uint16_t value)
 {
-    return Flash::Set(Parameters::ID::kDiscriminator, value);
+    CHIP_ERROR err = Flash::Set(Parameters::ID::kDiscriminator, value);
+#if ENABLE_CHIP_SHELL
+    if (err == CHIP_NO_ERROR)
+    {
+        err = Storage::Commit();
+    }
+#endif // ENABLE_CHIP_SHELL
+    return err;
 }
 
 CHIP_ERROR Storage::GetSetupDiscriminator(uint16_t & value)
