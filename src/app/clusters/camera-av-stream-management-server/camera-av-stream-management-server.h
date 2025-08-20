@@ -112,8 +112,10 @@ public:
      *          This is where the actual video stream should be started using the final allocated parameters.
      *
      *   @param allocatedStream   The finalized video stream with narrowed parameters from the server.
+     *   @param shouldStartNewVideo  Flag indicating whether to start a new video stream (true for new allocations
+     *                              or when stream configuration has been modified, false for stream reuse without changes).
      */
-    virtual void OnVideoStreamAllocated(const VideoStreamStruct & allocatedStream) = 0;
+    virtual void OnVideoStreamAllocated(const VideoStreamStruct & allocatedStream, bool shouldStartNewVideo) = 0;
 
     /**
      *   @brief Handle Command Delegate for Video stream modification.
@@ -515,7 +517,8 @@ public:
 
     CHIP_ERROR AddVideoStream(const VideoStreamStruct & videoStream);
 
-    CHIP_ERROR UpdateVideoStreamRangeParams(VideoStreamStruct & videoStreamToUpdate, const VideoStreamStruct & videoStream);
+    CHIP_ERROR UpdateVideoStreamRangeParams(VideoStreamStruct & videoStreamToUpdate, const VideoStreamStruct & videoStream,
+                                            bool & wasModified);
 
     CHIP_ERROR RemoveVideoStream(uint16_t videoStreamId);
 
