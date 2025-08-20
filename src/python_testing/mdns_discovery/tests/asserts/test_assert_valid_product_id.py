@@ -57,6 +57,21 @@ class TestAssertValidProductId(unittest.TestCase):
         msg = self._fail_msg("")
         self.assertIn(INT_MSG, msg)
 
+    def test_non_decimal_and_range_combination_not_possible(self):
+        # Inputs with non-digits (e.g., '12A3') fail the syntactic check and skip range evaluation.
+        # Thus RNG_MSG cannot appear together with INT_MSG for non-decimal inputs.
+        self.skipTest("Non-decimal input cannot also trigger range failure (range check skipped).")
+
+    def test_leading_zero_and_range_combination_not_possible(self):
+        # Inputs like '0123' fail the syntactic check due to leading zero and skip range evaluation.
+        # Thus RNG_MSG cannot appear together with INT_MSG in this scenario.
+        self.skipTest("Leading-zero inputs skip range check; cannot produce both INT_MSG and RNG_MSG.")
+
+    def test_too_many_digits_and_range_combination_not_possible(self):
+        # Inputs with >5 digits (e.g., '123456') fail the syntactic check and skip range evaluation.
+        # Thus RNG_MSG cannot appear together with INT_MSG here either.
+        self.skipTest("Too many digits (>5) skip range check; cannot produce both INT_MSG and RNG_MSG.")
+
 
 if __name__ == "__main__":
     unittest.main()

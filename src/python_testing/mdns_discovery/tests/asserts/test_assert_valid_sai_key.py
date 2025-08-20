@@ -52,6 +52,23 @@ class TestAssertValidSaiKey(unittest.TestCase):
         msg = self._fail_msg("")
         self.assertIn(INT_MSG, msg)
 
+    def test_invalid_due_to_leading_zero_and_out_of_range(self):
+        # Digits-only so range is evaluated; leading zero violates INT_MSG; numeric value exceeds max -> RNG_MSG
+        msg = self._fail_msg("03600001")
+        self.assertIn(INT_MSG, msg)
+        self.assertIn(RNG_MSG, msg)
+
+    def test_invalid_due_to_many_leading_zeros_and_out_of_range(self):
+        # Another both-fail variant with multiple leading zeros and clearly > 3_600_000
+        msg = self._fail_msg("0003600001")
+        self.assertIn(INT_MSG, msg)
+        self.assertIn(RNG_MSG, msg)
+
+    def test_non_decimal_and_out_of_range_combination_not_possible(self):
+        # Range check only runs for digits-only inputs (re.fullmatch(r'\d+')).
+        # If the input contains non-digits (e.g., '12A3'), it's impossible to also trigger RNG_MSG.
+        self.skipTest("Non-decimal input cannot simultaneously trigger range failure (digits-only required for range).")
+
 
 if __name__ == "__main__":
     unittest.main()

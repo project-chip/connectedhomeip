@@ -57,6 +57,41 @@ class TestAssertValidVendorSubtype(unittest.TestCase):
         msg = self._fail_msg("_V123._matterc._udp.local.")
         self.assertIn(FMT_MSG, msg)
 
+    def test_invalid_due_to_format_and_decimal(self):
+        # Leading zero should now produce both FMT (strict pattern) and DEC (value rule)
+        msg = self._fail_msg("_V0123._sub._matterc._udp.local.")
+        self.assertIn(FMT_MSG, msg)
+        self.assertIn(DEC_MSG, msg)
+        self.assertNotIn(RNG_MSG, msg)
+
+    def test_invalid_due_to_format_and_range(self):
+        # Wrong service but numeric value is out of range
+        msg = self._fail_msg("_V70000._sub._wrongservice")
+        self.assertIn(FMT_MSG, msg)
+        self.assertIn(RNG_MSG, msg)
+        self.assertNotIn(DEC_MSG, msg)
+
+    def test_invalid_due_to_format_decimal_and_range(self):
+        # Leading zero AND wrong service AND out of range -> all three
+        msg = self._fail_msg("_V065536._sub._wrongservice")
+        self.assertIn(FMT_MSG, msg)
+        self.assertIn(DEC_MSG, msg)
+        self.assertIn(RNG_MSG, msg)
+
+    def test_invalid_due_to_decimal_only_within_format(self):
+        # Wrong value token (non-decimal) inside otherwise correct structure
+        msg = self._fail_msg("_V12AB._sub._matterc._udp.local.")
+        self.assertIn(FMT_MSG, msg)  # strict pattern fails
+        self.assertIn(DEC_MSG, msg)  # decimal rule also fails
+        self.assertNotIn(RNG_MSG, msg)
+
+    def test_invalid_due_to_range_only(self):
+        # Correct format & decimal rules satisfied; only range should fail
+        msg = self._fail_msg("_V65536._sub._matterc._udp.local.")
+        self.assertIn(RNG_MSG, msg)
+        # We do not enforce absence of others here because the validator may include them,
+        # but at minimum RNG must be present.
+
 
 if __name__ == "__main__":
     unittest.main()

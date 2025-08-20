@@ -32,15 +32,16 @@ class TestAssertValidCmKey(unittest.TestCase):
                 assert_valid_cm_key(value)
 
     def test_invalid_due_to_non_decimal(self):
-        # Not a decimal number
+        # Not a decimal number -> now accumulates: non-decimal AND not in allowed set
         msg = self._fail_msg("A")
         self.assertIn(DEC_MSG, msg)
-        self.assertNotIn(SET_MSG, msg)
+        self.assertIn(SET_MSG, msg)
 
     def test_invalid_due_to_negative_number(self):
-        # Negative not allowed
+        # Negative not allowed -> non-decimal and also not in allowed set
         msg = self._fail_msg("-1")
         self.assertIn(DEC_MSG, msg)
+        self.assertIn(SET_MSG, msg)
 
     def test_invalid_due_to_out_of_range(self):
         # Decimal but outside allowed set
@@ -49,9 +50,28 @@ class TestAssertValidCmKey(unittest.TestCase):
         self.assertIn(SET_MSG, msg)
 
     def test_invalid_due_to_empty_string(self):
-        # Empty string not valid
+        # Empty string not valid -> non-decimal and also not in allowed set
         msg = self._fail_msg("")
         self.assertIn(DEC_MSG, msg)
+        self.assertIn(SET_MSG, msg)
+
+    def test_invalid_due_to_non_decimal_and_out_of_set_letter(self):
+        # Triggers both: non-decimal and not in allowed set
+        msg = self._fail_msg("x")
+        self.assertIn(DEC_MSG, msg)
+        self.assertIn(SET_MSG, msg)
+
+    def test_invalid_due_to_non_decimal_and_out_of_set_mixed(self):
+        # Mixed characters still should accumulate both failures
+        msg = self._fail_msg("1a")
+        self.assertIn(DEC_MSG, msg)
+        self.assertIn(SET_MSG, msg)
+
+    def test_invalid_due_to_non_decimal_and_out_of_set_empty(self):
+        # Empty string accumulates both failures
+        msg = self._fail_msg("")
+        self.assertIn(DEC_MSG, msg)
+        self.assertIn(SET_MSG, msg)
 
 
 if __name__ == "__main__":

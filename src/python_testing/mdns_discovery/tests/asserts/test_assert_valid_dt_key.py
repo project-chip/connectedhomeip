@@ -53,6 +53,16 @@ class TestAssertValidDtKey(unittest.TestCase):
         msg = self._fail_msg("")
         self.assertIn(INT_MSG, msg)
 
+    def test_invalid_due_to_leading_zero_and_out_of_range(self):
+        # Numeric with leading zero and value > 32-bit → INT and RNG should both appear
+        msg = self._fail_msg("04294967296")
+        self.assertIn(INT_MSG, msg)
+        self.assertIn(RNG_MSG, msg)
+
+    def test_non_decimal_cannot_combine_with_range(self):
+        # Non-decimal inputs can't trigger RNG because they aren't parsed as numbers
+        self.skipTest("Multiple failures with non-decimal inputs are not feasible: range check requires digits-only input.")
+
 
 if __name__ == "__main__":
-    unittest.main()
+    unittest.m

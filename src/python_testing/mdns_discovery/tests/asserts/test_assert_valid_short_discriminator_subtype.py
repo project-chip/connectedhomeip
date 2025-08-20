@@ -38,14 +38,14 @@ class TestAssertValidShortDiscriminatorSubtype(unittest.TestCase):
         self.assertIn(FMT_MSG, msg)
 
     def test_invalid_due_to_leading_zero(self):
-        # Invalid: leading zero not allowed except for zero itself
+        # With the updated validator, the structure is valid, but the value has a leading zero.
         msg = self._fail_msg("_S05._sub._matterc._udp.local.")
-        self.assertIn(FMT_MSG, msg)
+        self.assertIn(DEC_MSG, msg)
 
     def test_invalid_due_to_non_decimal_value(self):
-        # Invalid: contains non-decimal characters
+        # Structure is valid; value is non-decimal -> decimal/leading-zero constraint fails.
         msg = self._fail_msg("_SAB._sub._matterc._udp.local.")
-        self.assertIn(FMT_MSG, msg)
+        self.assertIn(DEC_MSG, msg)
 
     def test_invalid_due_to_value_out_of_range(self):
         # Invalid: 16 is outside the 0–15 range
@@ -56,6 +56,34 @@ class TestAssertValidShortDiscriminatorSubtype(unittest.TestCase):
         # Invalid: missing '._sub.<service>'
         msg = self._fail_msg("_S5._matterc._udp.local.")
         self.assertIn(FMT_MSG, msg)
+
+    def test_invalid_due_to_decimal_and_range(self):
+        # Correct format; value has a leading zero and is out of range (16)
+        msg = self._fail_msg("_S016._sub._matterc._udp.local.")
+        self.assertIn(DEC_MSG, msg)
+        self.assertIn(RNG_MSG, msg)
+        self.assertNotIn(FMT_MSG, msg)
+
+    def test_invalid_due_to_format_and_decimal(self):
+        # Wrong format (missing '._sub.<service>') and decimal rule fails (no extractable value)
+        msg = self._fail_msg("_S05._matterc._udp.local.")
+        self.assertIn(FMT_MSG, msg)
+        self.assertIn(DEC_MSG, msg)
+        self.assertNotIn(RNG_MSG, msg)
+
+    def test_invalid_due_to_format_and_range(self):
+        # Wrong service -> format fails, but we can still extract a valid integer and check range.
+        msg = self._fail_msg("_S16._sub._wrongservice")
+        self.assertIn(FMT_MSG, msg)
+        self.assertIn(RNG_MSG, msg)
+        self.assertNotIn(DEC_MSG, msg)
+
+    def test_invalid_due_to_format_decimal_and_range(self):
+        # Wrong service (format), leading zero (decimal), and out of range (16)
+        msg = self._fail_msg("_S016._sub._wrongservice")
+        self.assertIn(FMT_MSG, msg)
+        self.assertIn(DEC_MSG, msg)
+        self.assertIn(RNG_MSG, msg)
 
 
 if __name__ == "__main__":

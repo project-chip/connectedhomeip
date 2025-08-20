@@ -20,7 +20,7 @@ VALID_VALUES = [
 class TestAssertValidHostname(unittest.TestCase):
 
     def _fail_msg(self, value: str) -> str:
-        # Helper: run expecting failure and return assertion message (catch both types)
+        # Helper: run expecting failure and return the assertion message (catch both types)
         try:
             assert_valid_hostname(value)
         except (AssertionError, signals.TestFailure) as e:
@@ -67,6 +67,30 @@ class TestAssertValidHostname(unittest.TestCase):
         # Underscore not allowed in labels → suffix constraint fails
         msg = self._fail_msg("ABCDEF123456.loc_al.")
         self.assertNotIn(HEX_MSG, msg)
+        self.assertIn(SUF_MSG, msg)
+
+    def test_invalid_due_to_hex_length_and_missing_suffix(self):
+        # Too-short hex (11) and no dot at all -> both HEX and SUF should fail
+        msg = self._fail_msg("ABCDEF12345")
+        self.assertIn(HEX_MSG, msg)
+        self.assertIn(SUF_MSG, msg)
+
+    def test_invalid_due_to_lowercase_hex_and_missing_suffix(self):
+        # Lowercase hex and no dot -> both constraints fail
+        msg = self._fail_msg("abcdef123456")
+        self.assertIn(HEX_MSG, msg)
+        self.assertIn(SUF_MSG, msg)
+
+    def test_invalid_due_to_hex_length_and_bad_domain_characters(self):
+        # Too-short hex and bad domain label (underscore)
+        msg = self._fail_msg("ABCDEF12345._lo_cal.")
+        self.assertIn(HEX_MSG, msg)
+        self.assertIn(SUF_MSG, msg)
+
+    def test_invalid_due_to_lowercase_hex_and_bad_domain_characters(self):
+        # Lowercase hex and invalid domain label -> both constraints fail
+        msg = self._fail_msg("abcdef123456._bad_.")
+        self.assertIn(HEX_MSG, msg)
         self.assertIn(SUF_MSG, msg)
 
 

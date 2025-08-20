@@ -73,13 +73,21 @@ def assert_valid_operational_instance_name(instance_name: str) -> None:
     if len(parts) != 2:
         failed.append(consts[0])
     else:
-        # Length check (gate): only if hyphen count is correct
-        if not all(len(p) == 16 for p in parts):
+        # Evaluate length and charset independently (when hyphen is correct),
+        # so tests can observe multiple failures at once if applicable.
+        part_a, part_b = parts[0], parts[1]
+
+        # Length checks
+        len_ok_a = len(part_a) == 16
+        len_ok_b = len(part_b) == 16
+        if not (len_ok_a and len_ok_b):
             failed.append(consts[1])
-        else:
-            # Charset check (independent of length; length already validated)
-            if not all(re.fullmatch(r'[A-F0-9]+', p) for p in parts):
-                failed.append(consts[2])
+
+        # Charset checks (evaluate regardless of length so we can accumulate)
+        hex_ok_a = bool(re.fullmatch(r'[A-F0-9]+', part_a))
+        hex_ok_b = bool(re.fullmatch(r'[A-F0-9]+', part_b))
+        if not (hex_ok_a and hex_ok_b):
+            failed.append(consts[2])
 
     asserts.assert_true(
         not failed,
@@ -110,13 +118,13 @@ def assert_valid_commissionable_instance_name(instance_name: str) -> None:
 
     failed: list[str] = []
 
-    # Length must be exactly 16 characters
+    # Evaluate constraints independently so multiple failures can be reported together
     if len(instance_name) != 16:
         failed.append(consts[0])
-    else:
-        # Charset check only if length is correct
-        if not re.fullmatch(r'[A-F0-9]+', instance_name):
-            failed.append(consts[1])
+
+    # Require exactly 16 uppercase hex characters for charset constraint
+    if not re.fullmatch(r'[A-F0-9]{16}', instance_name):
+        failed.append(consts[1])
 
     asserts.assert_true(
         not failed,
@@ -138,14 +146,8 @@ def assert_valid_hostname(hostname: str) -> None:
     Example:
         "B75AFB458ECD.local."
 
-    Returns:
-        None
-
     Raises:
         TestFailure: If `hostname` does not conform to the constraints.
-
-    Spec:
-        https://github.com/CHIP-Specifications/connectedhomeip-spec/blob/master/src/secure_channel/Discovery.adoc#11-host-name-construction
     """
     constraints = [
         "Must start with 12 or 16 uppercase hexadecimal characters [A-F0-9]",
@@ -154,23 +156,22 @@ def assert_valid_hostname(hostname: str) -> None:
 
     failed: list[str] = []
 
-    # Find the leading run of uppercase hex characters
+    # Independent check 1: Hex prefix (uppercase A-F and digits), length 12 or 16
     m = re.match(r'^([A-F0-9]+)', hostname)
     leading_hex = m.group(1) if m else ''
-
-    # Validate hex prefix length: must be exactly 12 or 16
     if len(leading_hex) not in (12, 16):
         failed.append(constraints[0])
+
+    # Independent check 2: Domain suffix after the first dot, regardless of hex validity
+    dot_idx = hostname.find('.')
+    if dot_idx == -1:
+        # No dot at all -> suffix invalid
+        failed.append(constraints[1])
     else:
-        # Require a '.' immediately after the valid hex prefix
-        next_idx = len(leading_hex)
-        if next_idx >= len(hostname) or hostname[next_idx] != '.':
+        domain_part = hostname[dot_idx + 1:]  # everything after the first '.'
+        # Must be label(s) of [A-Za-z0-9-], separated by dots; optional trailing dot allowed
+        if not domain_part or not re.fullmatch(r'[A-Za-z0-9-]+(?:\.[A-Za-z0-9-]+)*\.?', domain_part):
             failed.append(constraints[1])
-        else:
-            # Validate the domain suffix after the dot
-            domain_part = hostname[next_idx + 1:]  # skip the '.'
-            if not domain_part or not re.fullmatch(r'[A-Za-z0-9-]+(?:\.[A-Za-z0-9-]+)*\.?', domain_part):
-                failed.append(constraints[1])
 
     asserts.assert_true(
         not failed,
@@ -193,9 +194,6 @@ def assert_valid_long_discriminator_subtype(ld_subtype: str) -> None:
 
     Example:
         "_L3840._sub._matterc._udp.local."
-
-    Raises:
-        TestFailure: If `ld_subtype` does not conform to the constraints.
     """
     constraints = [
         "Must match format '_L<value>._sub.<commissionable-service-type>'",
@@ -205,19 +203,28 @@ def assert_valid_long_discriminator_subtype(ld_subtype: str) -> None:
 
     failed: list[str] = []
 
-    # Regex enforces format and no leading zeros except "0"
-    m = re.fullmatch(
-        rf'_L(?P<val>0|[1-9]\d{{0,3}})\._sub\.{re.escape(MdnsServiceType.COMMISSIONABLE.value)}',
-        ld_subtype
+    # Strict format check
+    strict = re.compile(
+        rf'_L(0|[1-9]\d{{0,3}})\._sub\.{re.escape(MdnsServiceType.COMMISSIONABLE.value)}'
     )
-
-    if not m:
+    if not strict.fullmatch(ld_subtype):
         failed.append(constraints[0])
-    else:
-        val_str = m.group("val")
+
+    # Best-effort value extraction to evaluate DEC and RNG independently
+    val_str = None
+    m = re.search(r'_L(?P<val>[^.]*)', ld_subtype)
+    if m:
+        val_str = m.group('val')
+
+    # Decimal without leading zeroes
+    if val_str is None or not re.fullmatch(r'(0|[1-9]\d*)', val_str):
+        failed.append(constraints[1])
+
+    # Range (only when digits-only)
+    if val_str is not None and re.fullmatch(r'\d+', val_str):
         try:
-            val = int(val_str)
-            if val > 4095:
+            v = int(val_str)
+            if v > 4095:
                 failed.append(constraints[2])
         except ValueError:
             failed.append(constraints[1])
@@ -253,22 +260,33 @@ def assert_valid_short_discriminator_subtype(sd_subtype: str) -> None:
 
     failed: list[str] = []
 
-    # Regex enforces format and no leading zeros except for "0"
-    m = re.fullmatch(
-        rf'_S(?P<val>0|[1-9]\d?)\._sub\.{re.escape(MdnsServiceType.COMMISSIONABLE.value)}',
-        sd_subtype
-    )
+    # Loose capture for the value, so we can independently validate decimal/leading zeroes and range.
+    # Also separately validate the full strict format.
+    service = re.escape(MdnsServiceType.COMMISSIONABLE.value)
 
-    if not m:
+    # Strict format check (structure only)
+    if not re.fullmatch(rf'_S[^.]*\._sub\.{service}', sd_subtype or ""):
         failed.append(constraints[0])
-    else:
-        val_str = m.group("val")
+
+    # Try to extract the value string between "_S" and "._sub."
+    val_str: str | None = None
+    m_val = re.search(r'_S(?P<val>[^.]*)\._sub\.', sd_subtype or "")
+    if m_val:
+        val_str = m_val.group("val")
+
+    # Decimal without leading zeroes
+    if val_str is None or not re.fullmatch(r'(0|[1-9]\d*)', val_str):
+        failed.append(constraints[1])
+
+    # Range check if the value is digits (allow leading zeros here to enable multi-fail)
+    if val_str is not None and re.fullmatch(r'\d+', val_str):
         try:
             val = int(val_str)
             if val > 15:
                 failed.append(constraints[2])
         except ValueError:
-            failed.append(constraints[1])
+            # Ignore; decimal check already captured above
+            pass
 
     asserts.assert_true(
         not failed,
@@ -289,9 +307,6 @@ def assert_valid_vendor_subtype(vendor_subtype: str) -> None:
 
     Example:
         "_V65521._sub._matterc._udp.local."
-
-    Raises:
-        TestFailure: If `vendor_subtype` does not conform to the constraints.
     """
     constraints = [
         "Must match format '_V<value>._sub.<commissionable-service-type>'",
@@ -301,22 +316,31 @@ def assert_valid_vendor_subtype(vendor_subtype: str) -> None:
 
     failed: list[str] = []
 
-    # Regex enforces format and no leading zeros except for "0"
-    m = re.fullmatch(
-        rf'_V(?P<val>0|[1-9]\d*)\._sub\.{re.escape(MdnsServiceType.COMMISSIONABLE.value)}',
-        vendor_subtype
-    )
+    service = re.escape(MdnsServiceType.COMMISSIONABLE.value)
 
-    if not m:
+    # Strict format check (structure & placement of tokens)
+    strict = re.fullmatch(rf'_V(?P<val>0|[1-9]\d*)\._sub\.{service}', vendor_subtype or "")
+    if not strict:
         failed.append(constraints[0])
-    else:
-        val_str = m.group("val")
+
+    # Try to extract the raw value using a loose pattern so we can independently
+    # validate decimal/leading-zero and range even when the strict format fails.
+    m_val = re.search(r'_V(?P<val>[^.]*)\._sub\.', vendor_subtype or "")
+    val_str = m_val.group("val") if m_val else None
+
+    # Decimal without leading zeroes (except "0")
+    if val_str is None or not re.fullmatch(r'(0|[1-9]\d*)', val_str):
+        failed.append(constraints[1])
+
+    # Range check whenever value is all digits (even if leading zeroes were present)
+    if val_str is not None and re.fullmatch(r'\d+', val_str):
         try:
-            val = int(val_str)
-            if val > 65535:
+            v = int(val_str)
+            if v > 65_535:
                 failed.append(constraints[2])
         except ValueError:
-            failed.append(constraints[1])
+            # Decimal check already recorded above
+            pass
 
     asserts.assert_true(
         not failed,
@@ -349,21 +373,34 @@ def assert_valid_devtype_subtype(devtype_subtype: str) -> None:
 
     failed: list[str] = []
 
-    # Regex enforces format and no leading zeros except for "0"
-    m = re.fullmatch(
-        rf'_T(?P<val>0|[1-9]\d*)\._sub\.{re.escape(MdnsServiceType.COMMISSIONABLE.value)}',
-        devtype_subtype
+    # Strict format check (enforces correct service type and no leading zeros)
+    strict_re = re.compile(
+        rf'_T(0|[1-9]\d*)\._sub\.{re.escape(MdnsServiceType.COMMISSIONABLE.value)}'
     )
-
-    if not m:
+    format_ok = bool(strict_re.fullmatch(devtype_subtype))
+    if not format_ok:
         failed.append(constraints[0])
-    else:
-        val_str = m.group("val")
+
+    # Best-effort value extraction so we can independently check DEC and RNG even if format fails.
+    val_str: str | None = None
+
+    # Try to extract value between '_T' and the next dot, regardless of other pieces.
+    m = re.search(r'_T(?P<val>[^.]*)', devtype_subtype)
+    if m:
+        val_str = m.group('val')
+
+    # Decimal-without-leading-zeroes rule
+    if val_str is None or not re.fullmatch(r'(0|[1-9]\d*)', val_str):
+        failed.append(constraints[1])
+
+    # Range rule: only if we can parse an integer
+    if val_str is not None and re.fullmatch(r'\d+', val_str):
         try:
             val = int(val_str)
             if val > 0xFFFFFFFF:
                 failed.append(constraints[2])
         except ValueError:
+            # Shouldn't happen due to \d+ guard; keep parity with safety.
             failed.append(constraints[1])
 
     asserts.assert_true(
@@ -395,9 +432,6 @@ def assert_valid_d_key(d_key: str) -> None:
 
     Raises:
         TestFailure: If `d_key` does not conform to the constraints.
-
-    Spec:
-        https://github.com/CHIP-Specifications/connectedhomeip-spec/blob/master/src/secure_channel/Discovery.adoc#15-txt-key-for-discriminator-d
     """
     constraints = [
         "Must be a decimal integer",
@@ -407,20 +441,24 @@ def assert_valid_d_key(d_key: str) -> None:
 
     failed: list[str] = []
 
-    # Require strictly a number, no optional "D=" prefix
-    if not re.fullmatch(r'\d+', d_key):
+    is_decimal = bool(re.fullmatch(r'\d+', d_key))
+    if not is_decimal:
         failed.append(constraints[0])
-    else:
-        # Leading zeroes not allowed (except for "0")
-        if not re.fullmatch(r'(0|[1-9]\d*)', d_key):
-            failed.append(constraints[1])
-        else:
-            try:
-                val = int(d_key)
-                if val > 4095:
-                    failed.append(constraints[2])
-            except ValueError:
-                failed.append(constraints[0])
+
+    # Leading zeroes check applies only to decimal strings
+    if is_decimal and not re.fullmatch(r'(0|[1-9]\d*)', d_key):
+        failed.append(constraints[1])
+
+    # Range check applies only to decimal strings
+    if is_decimal:
+        try:
+            val = int(d_key)
+            if val > 4095:
+                failed.append(constraints[2])
+        except ValueError:
+            # Shouldn't occur because is_decimal implies only digits,
+            # but keep parity with original safety.
+            failed.append(constraints[0])
 
     asserts.assert_true(
         not failed,
@@ -441,19 +479,6 @@ def assert_valid_vp_key(vp_key: str) -> None:
       from the Vendor ID using a '+' character
     - Only one '+' separator is allowed
     - Both Vendor ID and Product ID must be valid decimal integers
-
-    Examples:
-        "123"
-        "132+456"
-
-    Returns:
-        None
-
-    Raises:
-        TestFailure: If `vp_key` does not conform to the constraints.
-
-    Spec:
-        https://github.com/CHIP-Specifications/connectedhomeip-spec/blob/master/src/secure_channel/Discovery.adoc#16-txt-key-for-vendor-id-and-product-id-vp
     """
     constraints = [
         "Must contain at least a Vendor ID",
@@ -471,21 +496,25 @@ def assert_valid_vp_key(vp_key: str) -> None:
         except Exception:
             failed.append(constraints[2])
     else:
-        # Must contain exactly one '+'
+        # '+' present
         if vp_key.count('+') != 1:
             failed.append(constraints[1])
         else:
             vid_str, pid_str = vp_key.split('+', 1)
+
+            # Vendor ID check
             try:
                 assert_valid_vendor_id(vid_str)
             except Exception:
                 failed.append(constraints[2])
 
-            if not failed:
-                try:
-                    assert_valid_product_id(pid_str)
-                except Exception:
-                    failed.append(constraints[3])
+            # Product ID check runs regardless
+            try:
+                if pid_str == "":
+                    raise ValueError("empty product id")
+                assert_valid_product_id(pid_str)
+            except Exception:
+                failed.append(constraints[3])
 
     asserts.assert_true(
         not failed,
@@ -523,13 +552,13 @@ def assert_valid_cm_key(cm_key: str) -> None:
 
     failed: list[str] = []
 
-    # Must be all digits
-    if not re.fullmatch(r'\d+', cm_key):
+    is_decimal = bool(re.fullmatch(r'\d+', cm_key))
+    if not is_decimal:
         failed.append(constraints[0])
-    else:
-        # Must be one of 0–3
-        if cm_key not in {"0", "1", "2", "3"}:
-            failed.append(constraints[1])
+
+    # Independently evaluate membership so multiple failures can be reported together
+    if cm_key not in {"0", "1", "2", "3"}:
+        failed.append(constraints[1])
 
     asserts.assert_true(
         not failed,
@@ -568,15 +597,19 @@ def assert_valid_dt_key(dt_key: str) -> None:
 
     failed: list[str] = []
 
-    # Must be integer without leading zeros (except for "0")
-    if not re.fullmatch(r'(0|[1-9]\d*)', dt_key):
+    # Independently evaluate the integer/leading-zero rule
+    is_int_no_leading = bool(re.fullmatch(r'(0|[1-9]\d*)', dt_key))
+    if not is_int_no_leading:
         failed.append(constraints[0])
-    else:
+
+    # Independently evaluate the range rule whenever it's numeric (digits only)
+    if re.fullmatch(r'\d+', dt_key):
         try:
             val = int(dt_key)
             if val > 0xFFFFFFFF:
                 failed.append(constraints[1])
         except ValueError:
+            # Defensive: shouldn't happen with \d+ guard
             failed.append(constraints[0])
 
     asserts.assert_true(
@@ -647,7 +680,7 @@ def assert_valid_ri_key(ri_key: str) -> None:
         None
 
     Raises:
-        TestFailure: If `ri_key` does not conform to the constraints.
+        TestFailure: If ri_key does not conform to the constraints.
 
     Spec:
         https://github.com/CHIP-Specifications/connectedhomeip-spec/blob/master/src/secure_channel/Discovery.adoc#110-txt-key-for-rotating-device-identifier-ri
@@ -659,13 +692,13 @@ def assert_valid_ri_key(ri_key: str) -> None:
 
     failed: list[str] = []
 
-    # Charset check
-    if not re.fullmatch(r'[A-F0-9]+', ri_key):
+    # Check charset independently of length
+    if not re.fullmatch(r'[A-F0-9]+', ri_key or ""):
         failed.append(constraints[0])
-    else:
-        # Length check
-        if not (1 <= len(ri_key) <= 100):
-            failed.append(constraints[1])
+
+    # Check length independently of charset
+    if not (1 <= len(ri_key) <= 100):
+        failed.append(constraints[1])
 
     asserts.assert_true(
         not failed,
@@ -688,15 +721,6 @@ def assert_valid_ph_key(ph_key: str) -> None:
 
     Example:
         "33"
-
-    Returns:
-        None
-
-    Raises:
-        TestFailure: If `ph_key` does not conform to the constraints.
-
-    Spec:
-        https://github.com/CHIP-Specifications/connectedhomeip-spec/blob/master/src/secure_channel/Discovery.adoc#111-txt-key-for-pairing-hint-ph
     """
     constraints = [
         "Must be a decimal integer without leading zeroes",
@@ -706,18 +730,21 @@ def assert_valid_ph_key(ph_key: str) -> None:
 
     failed: list[str] = []
 
-    # Accept "0" syntactically (no leading zeros) so we can surface the correct >0 failure
-    if not re.fullmatch(r'(0|[1-9]\d*)', ph_key):
+    # Evaluate constraints independently to accumulate failures where meaningful.
+    is_digits = bool(re.fullmatch(r'\d+', ph_key))
+    is_dec_no_leading = bool(re.fullmatch(r'(0|[1-9]\d*)', ph_key))
+    if not is_dec_no_leading:
         failed.append(constraints[0])
-    else:
+
+    if is_digits:
         try:
             v = int(ph_key)
             if v <= 0:
                 failed.append(constraints[1])
-            else:
-                allowed_mask = (1 << 20) - 1  # 20 valid bits
-                if v & ~allowed_mask:
-                    failed.append(constraints[2])
+            # Bit-mask validity only meaningful for positive integers
+            allowed_mask = (1 << 20) - 1
+            if v > 0 and (v & ~allowed_mask):
+                failed.append(constraints[2])
         except ValueError:
             failed.append(constraints[0])
 
@@ -787,15 +814,6 @@ def assert_valid_jf_key(jf_key: str) -> None:
 
     Example:
         "14"
-
-    Returns:
-        None
-
-    Raises:
-        TestFailure: If `jf_key` does not conform to the constraints.
-
-    Spec:
-        https://github.com/CHIP-Specifications/connectedhomeip-spec/blob/master/src/secure_channel/Discovery.adoc#113-txt-key-for-joint-fabric
     """
     constraints = [
         "Must be a decimal integer without leading zeroes",
@@ -814,17 +832,14 @@ def assert_valid_jf_key(jf_key: str) -> None:
         try:
             v = int(jf_key)
 
-            # Only bits 0..3 allowed
+            # Evaluate all bit constraints independently to accumulate failures
             if v & ~0xF:
                 failed.append(constraints[1])
-            # Bit 0 cannot coexist with bits 1..3
-            elif (v & 0x1) and (v & 0xE):
+            if (v & 0x1) and (v & 0xE):
                 failed.append(constraints[2])
-            # Bit 2 requires bit 1
-            elif (v & 0x4) and not (v & 0x2):
+            if (v & 0x4) and not (v & 0x2):
                 failed.append(constraints[3])
-            # Bit 3 requires bits 1 and 2
-            elif (v & 0x8) and ((v & 0x6) != 0x6):
+            if (v & 0x8) and ((v & 0x6) != 0x6):
                 failed.append(constraints[4])
 
         except ValueError:
@@ -844,24 +859,6 @@ def assert_valid_sii_key(sii_key: str) -> None:
     **Session Idle Interval**
 
     Verify that the TXT record SII key is valid.
-
-    Constraints:
-    - Unsigned integer with units of milliseconds
-    - Encoded as a variable-length decimal number in ASCII encoding
-    - Omitting any leading zeros
-    - Maximum value of 3600000 (1 hour in milliseconds)
-
-    Example:
-        "5300"
-
-    Returns:
-        None
-
-    Raises:
-        TestFailure: If `sii_key` does not conform to the constraints.
-
-    Spec:
-        https://github.com/CHIP-Specifications/connectedhomeip-spec/blob/master/src/secure_channel/Discovery.adoc#4-common-txt-keyvalue-pairs
     """
     constraints = [
         "Must be a decimal integer without leading zeroes",
@@ -870,16 +867,19 @@ def assert_valid_sii_key(sii_key: str) -> None:
 
     failed: list[str] = []
 
-    # Decimal integer without leading zeroes (except "0")
-    if not re.fullmatch(r'(0|[1-9]\d*)', sii_key):
+    # Check decimal-without-leading-zeroes independently
+    if not re.fullmatch(r'(0|[1-9]\d*)', sii_key or ""):
         failed.append(constraints[0])
-    else:
+
+    # Range check if it's digits-only (even if leading zeroes are present)
+    if re.fullmatch(r'\d+', sii_key or ""):
         try:
             val = int(sii_key)
             if val > 3_600_000:
                 failed.append(constraints[1])
         except ValueError:
-            failed.append(constraints[0])
+            # Defensive: parsing failed, format already captured above if relevant
+            pass
 
     asserts.assert_true(
         not failed,
@@ -919,16 +919,19 @@ def assert_valid_sai_key(sai_key: str) -> None:
 
     failed: list[str] = []
 
-    # Decimal integer without leading zeroes (except "0")
-    if not re.fullmatch(r'(0|[1-9]\d*)', sai_key):
+    # Format (no leading zeroes) — evaluated independently
+    if not re.fullmatch(r'(0|[1-9]\d*)', sai_key or ""):
         failed.append(constraints[0])
-    else:
+
+    # Range — parse if it's all digits (even if leading zeroes present) to allow multi-fail
+    if re.fullmatch(r'\d+', sai_key or ""):
         try:
             val = int(sai_key)
             if val > 3_600_000:
                 failed.append(constraints[1])
         except ValueError:
-            failed.append(constraints[0])
+            # If somehow int() fails despite digits-only, still mark format as bad (already added above if applicable)
+            pass
 
     asserts.assert_true(
         not failed,
@@ -968,16 +971,19 @@ def assert_valid_sat_key(sat_key: str) -> None:
 
     failed: list[str] = []
 
-    # Decimal integer without leading zeroes (except "0")
-    if not re.fullmatch(r'(0|[1-9]\d*)', sat_key):
+    # Format (no leading zeroes) — evaluated independently
+    if not re.fullmatch(r'(0|[1-9]\d*)', sat_key or ""):
         failed.append(constraints[0])
-    else:
+
+    # Range — parse if it's all digits (even if leading zeroes present) to allow multi-fail
+    if re.fullmatch(r'\d+', sat_key or ""):
         try:
             val = int(sat_key)
             if val > 65_535:
                 failed.append(constraints[1])
         except ValueError:
-            failed.append(constraints[0])
+            # If parse fails despite digits, ignore (format already captured)
+            pass
 
     asserts.assert_true(
         not failed,
@@ -1000,20 +1006,6 @@ def assert_valid_t_key(t_key: str, enforce_provisional: bool = True) -> None:
     - Bits 1 and 2 are provisional:
         * If enforce_provisional=True → must not be set
         * If enforce_provisional=False → allowed, only bit 0 must be clear
-
-    Example:
-        "0"
-
-    Args:
-        t_key (str): The value to validate
-        enforce_provisional (bool): Whether to enforce strict prohibition
-                                    of provisional bits 1 and 2 (default: True)
-
-    Raises:
-        TestFailure: If `t_key` does not conform to the constraints.
-
-    Spec:
-        https://github.com/CHIP-Specifications/connectedhomeip-spec/blob/master/src/secure_channel/Discovery.adoc#4-common-txt-keyvalue-pairs
     """
     constraints = [
         "Must be a decimal integer without leading zeroes",
@@ -1024,23 +1016,23 @@ def assert_valid_t_key(t_key: str, enforce_provisional: bool = True) -> None:
 
     failed: list[str] = []
 
-    # Must be decimal without leading zeroes (except "0")
-    m = re.fullmatch(r'(0|[1-9]\d*)', t_key)
-    if not m:
+    # Integer format (no leading zeroes except "0") — independent of bit checks
+    if not re.fullmatch(r'(0|[1-9]\d*)', t_key or ""):
         failed.append(constraints[0])
-    else:
+
+    # Bit checks: run whenever it's digits-only (even if leading zeros were present)
+    if re.fullmatch(r'\d+', t_key or ""):
         try:
             v = int(t_key)
-            # Only bits 0–2 allowed
+            # Evaluate all conditions independently (no elif gating)
             if v & ~0x7:
-                failed.append(constraints[1])
-            # Bit 0 reserved
-            elif v & 0x1:
-                failed.append(constraints[2])
-            # Bits 1 and 2 provisional (only enforced if strict mode)
-            elif enforce_provisional and (v & 0x6):
-                failed.append(constraints[3])
+                failed.append(constraints[1])   # bits above 2 present
+            if v & 0x1:
+                failed.append(constraints[2])   # bit 0 must be 0
+            if enforce_provisional and (v & 0x6):
+                failed.append(constraints[3])   # bits 1 or 2 set (strict mode)
         except ValueError:
+            # Defensive: if parsing somehow fails, treat as integer-format error
             failed.append(constraints[0])
 
     asserts.assert_true(
@@ -1059,14 +1051,17 @@ def assert_valid_icd_key(icd_key: str) -> None:
 
     failed: list[str] = []
 
-    # Must be ASCII decimal text
-    if not re.fullmatch(r'\d+', icd_key):
+    # Check decimal ASCII
+    is_decimal = bool(re.fullmatch(r'\d+', icd_key))
+    if not is_decimal:
         failed.append(consts[0])
-    # No leading zeros (except "0")
-    elif not re.fullmatch(r'0|[1-9]\d*', icd_key):
+
+    # Check leading zeros (applies only to purely decimal strings)
+    if is_decimal and not re.fullmatch(r'0|[1-9]\d*', icd_key):
         failed.append(consts[1])
-    # Only 0 or 1 allowed
-    elif icd_key not in ("0", "1"):
+
+    # Check allowed set independently (string membership)
+    if icd_key not in ("0", "1"):
         failed.append(consts[2])
 
     asserts.assert_true(
@@ -1090,15 +1085,6 @@ def assert_valid_vendor_id(vendor_id: str) -> None:
 
     Example:
         "123", "54632"
-
-    Returns:
-        None
-
-    Raises:
-        TestFailure: If `vendor_id` does not conform to the constraints.
-
-    Spec:
-        https://github.com/CHIP-Specifications/connectedhomeip-spec/blob/master/src/secure_channel/Discovery.adoc#16-txt-key-for-vendor-id-and-product-id-vp
     """
     constraints = [
         "Must be a decimal integer without leading zeroes",
@@ -1107,10 +1093,12 @@ def assert_valid_vendor_id(vendor_id: str) -> None:
 
     failed: list[str] = []
 
-    # Must be a decimal integer without leading zeroes (except "0"), up to 5 digits
-    if not re.fullmatch(r'(0|[1-9]\d{0,4})', vendor_id):
+    # Check integer/format constraint independently
+    if not re.fullmatch(r'(0|[1-9]\d{0,4})', vendor_id or ""):
         failed.append(constraints[0])
-    else:
+
+    # Check numeric range constraint independently (if digits-only)
+    if re.fullmatch(r'\d+', vendor_id or ""):
         try:
             val = int(vendor_id)
             if val > 65_535:
@@ -1137,15 +1125,6 @@ def assert_valid_product_id(product_id: str) -> None:
 
     Example:
         "456", "21387"
-
-    Returns:
-        None
-
-    Raises:
-        TestFailure: If `product_id` does not conform to the constraints.
-
-    Spec:
-        https://github.com/CHIP-Specifications/connectedhomeip-spec/blob/master/src/secure_channel/Discovery.adoc#16-txt-key-for-vendor-id-and-product-id-vp
     """
     constraints = [
         "Must be a decimal integer without leading zeroes",
@@ -1154,15 +1133,18 @@ def assert_valid_product_id(product_id: str) -> None:
 
     failed: list[str] = []
 
-    # Must be a decimal integer without leading zeroes (except "0"), up to 5 digits
-    if not re.fullmatch(r'(0|[1-9]\d{0,4})', product_id):
+    # Syntactic check: decimal without leading zeroes (except "0") and up to 5 digits
+    syntactic_ok = bool(re.fullmatch(r'(0|[1-9]\d{0,4})', product_id))
+    if not syntactic_ok:
         failed.append(constraints[0])
     else:
+        # Range check only when the syntax is valid
         try:
             val = int(product_id)
             if val > 65_535:
                 failed.append(constraints[1])
         except ValueError:
+            # Defensive: should not happen when syntactic_ok is True
             failed.append(constraints[0])
 
     asserts.assert_true(

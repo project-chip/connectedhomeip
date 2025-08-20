@@ -46,7 +46,7 @@ class TestAssertValidDKey(unittest.TestCase):
         self.assertIn(DEC_MSG, msg)
 
     def test_invalid_due_to_leading_zero(self):
-        # Leading zeros not allowed (except "0")
+        # Leading zeros not allowed (except "0"); within range so RNG should be absent
         msg = self._fail_msg("0123")
         self.assertNotIn(DEC_MSG, msg)
         self.assertIn(LZ_MSG, msg)
@@ -65,6 +65,26 @@ class TestAssertValidDKey(unittest.TestCase):
         self.assertIn(DEC_MSG, msg)
         self.assertNotIn(LZ_MSG, msg)
         self.assertNotIn(RNG_MSG, msg)
+
+    # Multi-failure: leading zeros and out-of-range
+    def test_invalid_due_to_leading_zero_and_out_of_range(self):
+        msg = self._fail_msg("05000")
+        self.assertNotIn(DEC_MSG, msg)
+        self.assertIn(LZ_MSG, msg)
+        self.assertIn(RNG_MSG, msg)
+
+    # Another combined case within the same pattern
+    def test_invalid_due_to_leading_zero_and_out_of_range_boundary(self):
+        # 04096 -> leading zero present; numeric value 4096 is out of range
+        msg = self._fail_msg("04096")
+        self.assertNotIn(DEC_MSG, msg)
+        self.assertIn(LZ_MSG, msg)
+        self.assertIn(RNG_MSG, msg)
+
+    def test_non_decimal_cannot_combine_with_other_failures(self):
+        # Non-decimal inputs cannot also fail leading-zero or range constraints,
+        # since those are only applicable when the input is strictly decimal.
+        self.skipTest("Multiple failures with DEC_MSG are not feasible: LZ/RNG apply only to decimal inputs.")
 
 
 if __name__ == "__main__":

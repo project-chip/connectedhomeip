@@ -50,6 +50,36 @@ class TestAssertValidIcdKey(unittest.TestCase):
         msg = self._fail_msg("")
         self.assertIn(DEC_MSG, msg)
 
+    def test_invalid_due_to_non_decimal_and_not_allowed(self):
+        # Non-decimal implies not allowed set membership as well
+        msg = self._fail_msg("1A")
+        self.assertIn(DEC_MSG, msg)
+        self.assertIn(VAL_MSG, msg)
+        self.assertNotIn(LEAD_MSG, msg)
+
+    def test_invalid_due_to_leading_zero_and_not_allowed(self):
+        # Decimal with leading zero and not exactly "0" or "1"
+        msg = self._fail_msg("02")
+        self.assertIn(LEAD_MSG, msg)
+        self.assertIn(VAL_MSG, msg)
+        self.assertNotIn(DEC_MSG, msg)
+
+    def test_invalid_due_to_multiple_leading_zeros_and_not_allowed(self):
+        msg = self._fail_msg("0002")
+        self.assertIn(LEAD_MSG, msg)
+        self.assertIn(VAL_MSG, msg)
+        self.assertNotIn(DEC_MSG, msg)
+
+    def test_invalid_due_to_empty_string_reports_non_decimal_and_not_allowed(self):
+        msg = self._fail_msg("")
+        self.assertIn(DEC_MSG, msg)
+        self.assertIn(VAL_MSG, msg)
+        self.assertNotIn(LEAD_MSG, msg)
+
+    def test_impossible_non_decimal_and_leading_zero_combination(self):
+        # Leading-zero rule only applies to digit-only strings; cannot co-occur with non-decimal.
+        self.skipTest("Multiple failures with DEC+LEAD are not feasible: leading-zero check requires digits-only input.")
+
 
 if __name__ == "__main__":
     unittest.main()

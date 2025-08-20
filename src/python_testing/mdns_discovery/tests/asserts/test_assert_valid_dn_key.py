@@ -52,6 +52,9 @@ class TestAssertValidDnKey(unittest.TestCase):
         self.assertIn(UTF8_MSG, msg)
         self.assertNotIn(LEN_MSG, msg)
 
-
-if __name__ == "__main__":
-    unittest.main()
+    def test_multiple_failures_not_possible_due_to_gating(self):
+        # For DN, the length is defined only for strings that encode as valid UTF-8.
+        # If UTF-8 encoding fails, we cannot evaluate the byte-length constraint.
+        # Therefore, no input can trigger both UTF8_MSG and LEN_MSG simultaneously.
+        self.skipTest("Multiple failures not possible: UTF-8 validity is prerequisite for byte-length evaluation.")
+        

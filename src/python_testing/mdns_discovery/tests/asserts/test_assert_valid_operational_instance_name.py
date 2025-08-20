@@ -88,6 +88,24 @@ class TestOperationalInstanceName(unittest.TestCase):
         self.assertIn(LEN_MSG, msg)
         self.assertNotIn(HEX_MSG, msg)
 
+    def test_invalid_due_to_length_and_hex_in_first_part(self):
+        # First part too short (15) and contains lowercase -> LEN + HEX
+        msg = self._fail_msg("ABCDEF12345aBCD-0000000012344321")
+        self.assertNotIn(HY_MSG, msg)
+        self.assertIn(LEN_MSG, msg)
+        self.assertIn(HEX_MSG, msg)
+
+    def test_invalid_due_to_length_and_hex_in_second_part(self):
+        # Second part too short (15) and contains lowercase -> LEN + HEX
+        msg = self._fail_msg("ABCDEF1234567890-0000000012344z1")
+        self.assertNotIn(HY_MSG, msg)
+        self.assertIn(LEN_MSG, msg)
+        self.assertIn(HEX_MSG, msg)
+
+    def test_multiple_failures_not_possible_with_hyphen_error(self):
+        # When hyphen count is wrong, length/charset aren't evaluated; only HY applies.
+        self.skipTest("Multiple failures involving the hyphen check are not possible due to gating on hyphen count.")
+
 
 if __name__ == "__main__":
     unittest.main()

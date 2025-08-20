@@ -1,5 +1,4 @@
 import unittest
-
 from mdns_discovery.utils.asserts import assert_valid_ri_key
 from mobly import signals
 
@@ -8,16 +7,15 @@ LEN_MSG = "Length must be between 1 and 100 characters"
 
 # Valid values
 VALID_VALUES = [
-    "A",                   # minimum length, valid hex
-    "0A1B2C3D",            # typical value
-    "FFFFFFFFFFFFFFFF",    # repeated hex chars
-    "1234567890ABCDEF",    # mixed digits and letters
+    "A",  # minimum length, valid hex
+    "0A1B2C3D",  # typical value
+    "FFFFFFFFFFFFFFFF",  # repeated hex chars
+    "1234567890ABCDEF",  # mixed digits and letters
     "ABCDEF" * 16 + "AB",  # exactly 100 chars
 ]
 
 
 class TestAssertValidRiKey(unittest.TestCase):
-
     def _fail_msg(self, value: str) -> str:
         # Helper: run expecting failure and return the assertion message (catch both types)
         try:
@@ -53,6 +51,33 @@ class TestAssertValidRiKey(unittest.TestCase):
         # Empty string fails charset
         msg = self._fail_msg("")
         self.assertIn(HEX_MSG, msg)
+
+    def test_invalid_due_to_hex_and_length_empty(self):
+        # Empty string violates both: not hex and length < 1
+        msg = self._fail_msg("")
+        self.assertIn(HEX_MSG, msg)
+        self.assertIn(LEN_MSG, msg)
+
+    def test_invalid_due_to_hex_and_length_over_100(self):
+        # Length > 100 and contains a lowercase non-hex character
+        bad = "A" * 100 + "g"  # 101 chars, includes invalid 'g'
+        msg = self._fail_msg(bad)
+        self.assertIn(HEX_MSG, msg)
+        self.assertIn(LEN_MSG, msg)
+
+    def test_invalid_due_to_lowercase_only_and_over_100(self):
+        # All lowercase hex characters (invalid charset) and length > 100
+        bad = "a" * 101
+        msg = self._fail_msg(bad)
+        self.assertIn(HEX_MSG, msg)
+        self.assertIn(LEN_MSG, msg)
+
+    def test_invalid_due_to_separator_and_over_100(self):
+        # Includes a non-hex separator and total length > 100
+        bad = ("A" * 50) + "-" + ("B" * 51)  # 102 chars total, '-' breaks hex charset
+        msg = self._fail_msg(bad)
+        self.assertIn(HEX_MSG, msg)
+        self.assertIn(LEN_MSG, msg)
 
 
 if __name__ == "__main__":

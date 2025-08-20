@@ -57,6 +57,42 @@ class TestAssertValidVendorId(unittest.TestCase):
         msg = self._fail_msg("")
         self.assertIn(INT_MSG, msg)
 
+    # --- New multi-failure tests appended ---
+
+    def test_invalid_due_to_leading_zero_and_out_of_range(self):
+        # Digits-only so range is evaluated; leading zero violates INT; value exceeds max -> RNG
+        msg = self._fail_msg("065536")
+        self.assertIn(INT_MSG, msg)
+        self.assertIn(RNG_MSG, msg)
+
+    def test_invalid_due_to_many_leading_zeros_and_out_of_range(self):
+        # Multiple leading zeros and clearly > 65535 -> both failures
+        msg = self._fail_msg("00065536")
+        self.assertIn(INT_MSG, msg)
+        self.assertIn(RNG_MSG, msg)
+
+    def test_invalid_due_to_too_many_digits_and_out_of_range(self):
+        # >5 digits violates INT; numeric value also exceeds 16-bit range -> both failures
+        msg = self._fail_msg("123456")
+        self.assertIn(INT_MSG, msg)
+        self.assertIn(RNG_MSG, msg)
+
+    def test_non_decimal_and_out_of_range_combination_not_possible(self):
+        # Range check only runs for digits-only inputs; with non-digits, RNG_MSG cannot be emitted.
+        self.skipTest("Non-decimal input cannot simultaneously trigger range failure (digits-only required for range).")
+
+    def test_invalid_due_to_too_many_digits_and_out_of_range_variant(self):
+        # Another >5-digits case that also exceeds 16-bit range -> both failures
+        msg = self._fail_msg("700000")
+        self.assertIn(INT_MSG, msg)
+        self.assertIn(RNG_MSG, msg)
+
+    def test_invalid_due_to_many_leading_zeros_and_massive_out_of_range(self):
+        # Leading zeros plus a clearly out-of-range value -> both failures
+        msg = self._fail_msg("000000655360")
+        self.assertIn(INT_MSG, msg)
+        self.assertIn(RNG_MSG, msg)
+
 
 if __name__ == "__main__":
     unittest.main()
