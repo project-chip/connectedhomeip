@@ -69,15 +69,16 @@
 
 #define LWIP_SOCKET 0
 
+// Setting the priority of the lwip thread to osPriorityAboveNormal
+#define TCPIP_THREAD_PRIO (32)
+
 #ifdef DIC_ENABLE
 #define LWIP_DNS 1
 #define DNS_RAND_TXID() ((u32_t) rand())
 #define TCP_MSS (4 * 1152)
-#define TCPIP_THREAD_PRIO (3)
 #else
 #define LWIP_DNS 0
 #define TCP_MSS (1152)
-#define TCPIP_THREAD_PRIO (2)
 #endif /* DIC_ENABLE */
 
 #define LWIP_FREERTOS_USE_STATIC_TCPIP_TASK 1

@@ -5,6 +5,7 @@
 #pragma once
 
 #include <app/data-model-provider/MetadataTypes.h>
+#include <array>
 #include <lib/core/DataModelTypes.h>
 
 #include <cstdint>
@@ -19,6 +20,7 @@ namespace EnergyEvse {
 inline constexpr uint32_t kRevision = 3;
 
 namespace Attributes {
+
 namespace State {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(State::Id, BitFlags<DataModel::AttributeQualityFlags>(),
                                                           Access::Privilege::kView, std::nullopt);
@@ -114,10 +116,24 @@ namespace SessionEnergyDischarged {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(SessionEnergyDischarged::Id, BitFlags<DataModel::AttributeQualityFlags>(),
                                                           Access::Privilege::kView, std::nullopt);
 } // namespace SessionEnergyDischarged
+constexpr std::array<DataModel::AttributeEntry, 10> kMandatoryMetadata = {
+    State::kMetadataEntry,
+    SupplyState::kMetadataEntry,
+    FaultState::kMetadataEntry,
+    ChargingEnabledUntil::kMetadataEntry,
+    CircuitCapacity::kMetadataEntry,
+    MinimumChargeCurrent::kMetadataEntry,
+    MaximumChargeCurrent::kMetadataEntry,
+    SessionID::kMetadataEntry,
+    SessionDuration::kMetadataEntry,
+    SessionEnergyCharged::kMetadataEntry,
+
+};
 
 } // namespace Attributes
 
 namespace Commands {
+
 namespace Disable {
 inline constexpr DataModel::AcceptedCommandEntry
     kMetadataEntry(Disable::Id, BitFlags<DataModel::CommandQualityFlags>(DataModel::CommandQualityFlags::kTimed),

@@ -14,6 +14,7 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 #
+<<<<<<< HEAD:src/python_testing/test_testing/TestSpecParsingSelection.py
 import chip.clusters as Clusters
 from chip.testing.conformance import ConformanceDecision, ConformanceException
 from chip.testing.global_attribute_ids import is_standard_attribute_id
@@ -21,7 +22,16 @@ from chip.testing.matter_testing import MatterBaseTest, default_matter_test_main
 from chip.testing.spec_parsing import PrebuiltDataModelDirectory, build_xml_clusters, dm_from_spec_version
 from chip.tlv import uint
 from DeviceConformanceTests import DeviceConformanceTests
+=======
+>>>>>>> master:src/python_testing/TestSpecParsingSelection.py
 from mobly import asserts, signals
+
+import matter.clusters as Clusters
+from matter.testing.conformance import ConformanceDecision, ConformanceException
+from matter.testing.global_attribute_ids import is_standard_attribute_id
+from matter.testing.matter_testing import MatterBaseTest, default_matter_test_main
+from matter.testing.spec_parsing import PrebuiltDataModelDirectory, build_xml_clusters, dm_from_spec_version
+from matter.tlv import uint
 
 
 class TestSpecParsingSelection(MatterBaseTest, DeviceConformanceTests):
