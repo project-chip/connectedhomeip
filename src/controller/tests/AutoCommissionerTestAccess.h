@@ -49,13 +49,14 @@ public:
     void SetUTCRequirements(bool requiresUTC) { mCommissioner->mDeviceCommissioningInfo.requiresUTC = requiresUTC; }
 
     CHIP_ERROR CallNOCChainGenerated(ByteSpan noc, ByteSpan icac, ByteSpan rcac, Crypto::IdentityProtectionKeySpan ipk,
-                                               NodeId adminSubject)
+                                     NodeId adminSubject)
     {
-        return mCommissioner->NOCChainGenerated(noc,icac,rcac,ipk,adminSubject);
+        return mCommissioner->NOCChainGenerated(noc, icac, rcac, ipk, adminSubject);
     }
     void SetCommissioner(Controller::DeviceCommissioner * commissioner) { mCommissioner->mCommissioner = commissioner; }
     void SetCommissioneeDeviceProxy(CommissioneeDeviceProxy * proxy) { mCommissioner->mCommissioneeDeviceProxy = proxy; }
     Controller::CommissioningParameters & AccessParams() { return mCommissioner->mParams; }
+
 private:
     Controller::AutoCommissioner * mCommissioner = nullptr;
 };

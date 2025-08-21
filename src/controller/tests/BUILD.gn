@@ -57,7 +57,7 @@ chip_test_suite("tests") {
   }
 
   if (chip_support_commissioning_in_controller && chip_build_controller) {
-    test_sources += [ "TestAutoCommissioner.cpp"]
+    test_sources += [ "TestAutoCommissioner.cpp" ]
   }
 
   if (chip_device_config_enable_joint_fabric) {
@@ -68,10 +68,9 @@ chip_test_suite("tests") {
 
   sources = [
     "AutoCommissionerTestAccess.h",
-    "Test_cert_data.h",
     "Test_cert_data.cpp",
+    "Test_cert_data.h",
   ]
-
 
   public_deps = [
     "${chip_root}/src/app/common:cluster-objects",
