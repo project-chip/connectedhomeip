@@ -76,7 +76,7 @@ Status AVSettingsUserLevelManagementDelegate::MPTZSetPosition(Optional<int16_t> 
     // hardware interactions to actually set the camera to the new values of PTZ.  Once the hardware has confirmed movements, invoke
     // the callback. The server itself will persist the new values.
     //
-    if (callback != nullptr) 
+    if (callback != nullptr)
     {
         DeviceLayer::SystemLayer().ScheduleLambda([callback] { callback->OnPhysicalMovementComplete(Status::Success); });
     }    return Status::Success;
@@ -89,7 +89,7 @@ Status AVSettingsUserLevelManagementDelegate::MPTZRelativeMove(Optional<int16_t>
     // hardware interactions to actually set the camera to the new values of PTZ.  Once the hardware has confirmed movements, invoke
     // the callback. The server itself will persist the new values.
     //
-    if (callback != nullptr) 
+    if (callback != nullptr)
     {
         DeviceLayer::SystemLayer().ScheduleLambda([callback] { callback->OnPhysicalMovementComplete(Status::Success); });
     }
@@ -103,7 +103,7 @@ Status AVSettingsUserLevelManagementDelegate::MPTZMoveToPreset(uint8_t aPreset, 
     // Do any needed hardware interactions to actually set the camera to the new values of PTZ.  Once the hardware has confirmed
     // movements, invoke the callback. The server itself will persist the new values.
     //
-    if (callback != nullptr) 
+    if (callback != nullptr)
     {
         DeviceLayer::SystemLayer().ScheduleLambda([callback] { callback->OnPhysicalMovementComplete(Status::Success); });
     }    return Status::Success;

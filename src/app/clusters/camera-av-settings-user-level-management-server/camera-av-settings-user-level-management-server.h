@@ -127,7 +127,7 @@ public:
      * @param aPan  The validated value of the pan that is to be set
      * @param aTilt The validated value of the tilt that is to be set
      * @param aZoom The validated value of the zoom that is to be set
-     * @param callback The callback to be invoked once the physical movement of the camera has completed, 
+     * @param callback The callback to be invoked once the physical movement of the camera has completed,
      *                 it is the delegates responsibility to ensure liveness of this server cluster before invocation of the callback,
      *                 which needs to take place in the Matter threading context.
      */

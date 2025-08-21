@@ -72,7 +72,7 @@ CHIP_ERROR CameraAvSettingsUserLevelMgmtServer::Init()
 
     // All of the attributes are dependent on Feature Flags being set, ensure that this is the case
     //
-    if (SupportsOptAttr(OptionalAttributes::kMptzPosition) != 
+    if (SupportsOptAttr(OptionalAttributes::kMptzPosition) !=
         (HasFeature(Feature::kMechanicalPan) || HasFeature(Feature::kMechanicalTilt) || HasFeature(Feature::kMechanicalZoom)))
     {
         ChipLogError(Zcl,
@@ -81,7 +81,7 @@ CHIP_ERROR CameraAvSettingsUserLevelMgmtServer::Init()
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
 
-    if (SupportsOptAttr(OptionalAttributes::kMaxPresets) != (HasFeature(Feature::kMechanicalPresets))) 
+    if (SupportsOptAttr(OptionalAttributes::kMaxPresets) != (HasFeature(Feature::kMechanicalPresets)))
     {
         ChipLogError(Zcl,
             "CameraAVSettingsUserLevelMgmt[ep=%d]: Feature configuration error. If MaxPresets "
@@ -145,7 +145,7 @@ CHIP_ERROR CameraAvSettingsUserLevelMgmtServer::Init()
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
 
-    if (SupportsOptAttr(OptionalAttributes::kMovementState) != 
+    if (SupportsOptAttr(OptionalAttributes::kMovementState) !=
         (HasFeature(Feature::kMechanicalPan) || HasFeature(Feature::kMechanicalTilt) || HasFeature(Feature::kMechanicalZoom)))
     {
         ChipLogError(Zcl,
