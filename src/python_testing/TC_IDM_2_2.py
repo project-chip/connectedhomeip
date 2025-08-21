@@ -101,7 +101,7 @@ class TC_IDM_2_2(MatterBaseTest, BasicCompositionTests):
             try:
                 if isinstance(attribute_path[0], AttributePath):
                     endpoint = attribute_path[0].EndpointId
-                    cluster = attribute_path[0].ClusterId 
+                    cluster = attribute_path[0].ClusterId
                     attribute = attribute_path[0].AttributeId
                 else:
                     # Handle tuple case
@@ -343,7 +343,7 @@ class TC_IDM_2_2(MatterBaseTest, BasicCompositionTests):
         """
         Attempts to read an unsupported attribute from a supported cluster on any endpoint.
         Expects an UNSUPPORTED_ATTRIBUTE error from the DUT.
-        
+
         If no unsupported attributes are found (e.g., when testing with chip-all-clusters-app),
         the test is skipped as this is a valid scenario.
         """
@@ -383,7 +383,7 @@ class TC_IDM_2_2(MatterBaseTest, BasicCompositionTests):
         for i in range(repeat_count):
             result = await self.verify_attribute_read([(endpoint, cluster, attribute)])
             results.append(result)
-            
+
         # Verify all reads returned consistent values
         if len(results) > 1:
             first_result = results[0]
@@ -391,9 +391,9 @@ class TC_IDM_2_2(MatterBaseTest, BasicCompositionTests):
                 # Compare the attribute values from each read
                 first_attr_value = first_result.tlvAttributes[endpoint][cluster.id][attribute.attribute_id]
                 current_attr_value = result.tlvAttributes[endpoint][cluster.id][attribute.attribute_id]
-                asserts.assert_equal(first_attr_value, current_attr_value, 
-                                   f"Read {i} returned different value than first read")
-                                   
+                asserts.assert_equal(first_attr_value, current_attr_value,
+                                     f"Read {i} returned different value than first read")
+
         logging.info(f"Successfully completed {repeat_count} consistent reads of {attribute}")
         return results
 
