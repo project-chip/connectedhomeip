@@ -494,7 +494,7 @@ class TC_SETRF_3_1(MatterBaseTest, CommodityTariffTestBaseHelper):
         # Commissioning
 
         self.step("2")
-        # TH establishes a subscription to TariffInfo attribute
+        # TH establishes a subscription to Commodity Tariff cluster attributes
         subscription_handler = AttributeSubscriptionHandler(cluster)
         await subscription_handler.start(self.default_controller, self.dut_node_id,
                                          endpoint,
@@ -632,111 +632,126 @@ class TC_SETRF_3_1(MatterBaseTest, CommodityTariffTestBaseHelper):
         await self.send_test_event_trigger_for_fake_data()
 
         self.step("24")
-        self.verify_reporting(subscription_handler.attribute_reports, cluster.Attributes.TariffInfo, "TariffInfo", TariffInfoValue)
-        self.check_tariff_info_attribute(endpoint, subscription_handler.attribute_reports[cluster.Attributes.TariffInfo])
+        if self.verify_reporting(subscription_handler.attribute_reports, cluster.Attributes.TariffInfo, "TariffInfo", TariffInfoValue):
+            self.check_tariff_info_attribute(
+                endpoint, subscription_handler.attribute_reports[cluster.Attributes.TariffInfo][0].value)
 
         self.step("25")
-        self.verify_reporting(subscription_handler.attribute_reports, cluster.Attributes.TariffUnit, "TariffUnit", TariffUnitValue)
-        self.check_tariff_info_attribute(endpoint, subscription_handler.attribute_reports[cluster.Attributes.TariffUnit])
+        if self.verify_reporting(subscription_handler.attribute_reports, cluster.Attributes.TariffUnit, "TariffUnit", TariffUnitValue):
+            self.check_tariff_unit_attribute(
+                endpoint, subscription_handler.attribute_reports[cluster.Attributes.TariffUnit][0].value)
 
         self.step("26")
-        self.verify_reporting(subscription_handler.attribute_reports, cluster.Attributes.StartDate, "StartDate", StartDateValue)
-        self.check_tariff_info_attribute(endpoint, subscription_handler.attribute_reports[cluster.Attributes.StartDate])
+        if self.verify_reporting(subscription_handler.attribute_reports, cluster.Attributes.StartDate, "StartDate", StartDateValue):
+            self.check_start_date_attribute(
+                endpoint, subscription_handler.attribute_reports[cluster.Attributes.StartDate][0].value)
 
         self.step("27")
-        self.verify_reporting(subscription_handler.attribute_reports, cluster.Attributes.DayEntries, "DayEntries", DayEntriesValue)
-        self.check_tariff_info_attribute(endpoint, subscription_handler.attribute_reports[cluster.Attributes.DayEntries])
+        if self.verify_reporting(subscription_handler.attribute_reports, cluster.Attributes.DayEntries, "DayEntries", DayEntriesValue):
+            self.check_day_entries_attribute(
+                endpoint, subscription_handler.attribute_reports[cluster.Attributes.DayEntries][0].value)
 
         self.step("28")
-        self.verify_reporting(subscription_handler.attribute_reports,
-                              cluster.Attributes.DayPatterns, "DayPatterns", DayPatternsValue)
-        self.check_tariff_info_attribute(endpoint, subscription_handler.attribute_reports[cluster.Attributes.DayPatterns])
+        if self.verify_reporting(subscription_handler.attribute_reports,
+                                 cluster.Attributes.DayPatterns, "DayPatterns", DayPatternsValue):
+            self.check_day_patterns_attribute(
+                endpoint, subscription_handler.attribute_reports[cluster.Attributes.DayPatterns][0].value)
 
         self.step("29")
-        self.verify_reporting(subscription_handler.attribute_reports,
-                              cluster.Attributes.CalendarPeriods, "CalendarPeriods", CalendarPeriodsValue)
-        self.check_tariff_info_attribute(endpoint, subscription_handler.attribute_reports[cluster.Attributes.CalendarPeriods])
+        if self.verify_reporting(subscription_handler.attribute_reports,
+                                 cluster.Attributes.CalendarPeriods, "CalendarPeriods", CalendarPeriodsValue):
+            self.check_calendar_periods_attribute(
+                endpoint, subscription_handler.attribute_reports[cluster.Attributes.CalendarPeriods][0].value)
 
         self.step("30")
-        self.verify_reporting(subscription_handler.attribute_reports,
-                              cluster.Attributes.IndividualDays, "IndividualDays", IndividualDaysValue)
-        self.check_tariff_info_attribute(endpoint, subscription_handler.attribute_reports[cluster.Attributes.IndividualDays])
+        if self.verify_reporting(subscription_handler.attribute_reports,
+                                 cluster.Attributes.IndividualDays, "IndividualDays", IndividualDaysValue):
+            self.check_individual_days_attribute(
+                endpoint, subscription_handler.attribute_reports[cluster.Attributes.IndividualDays][0].value)
 
         self.step("31")
-        self.verify_reporting(subscription_handler.attribute_reports, cluster.Attributes.CurrentDay, "CurrentDay", CurrentDayValue)
-        self.check_tariff_info_attribute(endpoint, subscription_handler.attribute_reports[cluster.Attributes.CurrentDay])
+        if self.verify_reporting(subscription_handler.attribute_reports, cluster.Attributes.CurrentDay, "CurrentDay", CurrentDayValue):
+            self.check_current_day_attribute(
+                endpoint, subscription_handler.attribute_reports[cluster.Attributes.CurrentDay][0].value)
 
         self.step("32")
-        self.verify_reporting(subscription_handler.attribute_reports, cluster.Attributes.NextDay, "NextDay", NextDayValue)
-        self.check_tariff_info_attribute(endpoint, subscription_handler.attribute_reports[cluster.Attributes.NextDay])
+        if self.verify_reporting(subscription_handler.attribute_reports, cluster.Attributes.NextDay, "NextDay", NextDayValue):
+            self.check_next_day_attribute(endpoint, subscription_handler.attribute_reports[cluster.Attributes.NextDay][0].value)
 
         self.step("33")
-        self.verify_reporting(subscription_handler.attribute_reports,
-                              cluster.Attributes.CurrentDayEntry, "CurrentDayEntry", CurrentDayEntryValue)
-        self.check_tariff_info_attribute(endpoint, subscription_handler.attribute_reports[cluster.Attributes.CurrentDayEntry])
+        if self.verify_reporting(subscription_handler.attribute_reports,
+                                 cluster.Attributes.CurrentDayEntry, "CurrentDayEntry", CurrentDayEntryValue):
+            self.check_current_day_entry_attribute(
+                endpoint, subscription_handler.attribute_reports[cluster.Attributes.CurrentDayEntry][0].value)
 
         self.step("34")
-        self.verify_reporting(subscription_handler.attribute_reports, cluster.Attributes.CurrentDayEntryDate,
-                              "CurrentDayEntryDate", CurrentDayEntryDateValue)
-        self.check_tariff_info_attribute(endpoint, subscription_handler.attribute_reports[cluster.Attributes.CurrentDayEntryDate])
+        if self.verify_reporting(subscription_handler.attribute_reports, cluster.Attributes.CurrentDayEntryDate,
+                                 "CurrentDayEntryDate", CurrentDayEntryDateValue):
+            self.check_current_day_entry_date_attribute(
+                endpoint, subscription_handler.attribute_reports[cluster.Attributes.CurrentDayEntryDate][0].value)
 
         self.step("35")
-        self.verify_reporting(subscription_handler.attribute_reports,
-                              cluster.Attributes.NextDayEntry, "NextDayEntry", NextDayEntryValue)
-        self.check_tariff_info_attribute(endpoint, subscription_handler.attribute_reports[cluster.Attributes.NextDayEntry])
+        if self.verify_reporting(subscription_handler.attribute_reports,
+                                 cluster.Attributes.NextDayEntry, "NextDayEntry", NextDayEntryValue):
+            self.check_next_day_entry_attribute(
+                endpoint, subscription_handler.attribute_reports[cluster.Attributes.NextDayEntry][0].value)
 
         self.step("36")
-        self.verify_reporting(subscription_handler.attribute_reports,
-                              cluster.Attributes.NextDayEntryDate, "NextDayEntryDate", NextDayEntryDateValue)
-        self.check_tariff_info_attribute(endpoint, subscription_handler.attribute_reports[cluster.Attributes.NextDayEntryDate])
+        if self.verify_reporting(subscription_handler.attribute_reports,
+                                 cluster.Attributes.NextDayEntryDate, "NextDayEntryDate", NextDayEntryDateValue):
+            self.check_next_day_entry_date_attribute(
+                endpoint, subscription_handler.attribute_reports[cluster.Attributes.NextDayEntryDate][0].value)
 
         self.step("37")
-        self.verify_reporting(subscription_handler.attribute_reports,
-                              cluster.Attributes.TariffComponents, "TariffComponents", TariffComponentsValue)
-        self.check_tariff_info_attribute(endpoint, subscription_handler.attribute_reports[cluster.Attributes.TariffComponents])
+        if self.verify_reporting(subscription_handler.attribute_reports,
+                                 cluster.Attributes.TariffComponents, "TariffComponents", TariffComponentsValue):
+            self.check_tariff_components_attribute(
+                endpoint, subscription_handler.attribute_reports[cluster.Attributes.TariffComponents][0].value)
 
         self.step("38")
-        self.verify_reporting(subscription_handler.attribute_reports,
-                              cluster.Attributes.TariffPeriods, "TariffPeriods", TariffPeriodsValue)
-        self.check_tariff_info_attribute(endpoint, subscription_handler.attribute_reports[cluster.Attributes.TariffPeriods])
+        if self.verify_reporting(subscription_handler.attribute_reports,
+                                 cluster.Attributes.TariffPeriods, "TariffPeriods", TariffPeriodsValue):
+            self.check_tariff_periods_attribute(
+                endpoint, subscription_handler.attribute_reports[cluster.Attributes.TariffPeriods][0].value)
 
         self.step("39")
-        self.verify_reporting(subscription_handler.attribute_reports, cluster.Attributes.CurrentTariffComponents,
-                              "CurrentTariffComponents", CurrentTariffComponentsValue)
-        self.check_tariff_info_attribute(
-            endpoint, subscription_handler.attribute_reports[cluster.Attributes.CurrentTariffComponents])
+        if self.verify_reporting(subscription_handler.attribute_reports, cluster.Attributes.CurrentTariffComponents,
+                                 "CurrentTariffComponents", CurrentTariffComponentsValue):
+            self.check_current_tariff_components_attribute(
+                endpoint, subscription_handler.attribute_reports[cluster.Attributes.CurrentTariffComponents][0].value)
 
         self.step("40")
-        self.verify_reporting(subscription_handler.attribute_reports, cluster.Attributes.NextTariffComponents,
-                              "NextTariffComponents", NextTariffComponentsValue)
-        self.check_tariff_info_attribute(endpoint, subscription_handler.attribute_reports[cluster.Attributes.NextTariffComponents])
+        if self.verify_reporting(subscription_handler.attribute_reports, cluster.Attributes.NextTariffComponents,
+                                 "NextTariffComponents", NextTariffComponentsValue):
+            self.check_next_tariff_components_attribute(
+                endpoint, subscription_handler.attribute_reports[cluster.Attributes.NextTariffComponents][0].value)
 
         if not self.check_pics("SETRF.S.A0011"):  # Checks if attribute is supported
             logger.info("PICS SETRF.S.A0011 is not True")
             self.skip_step("41")
         else:
             self.step("41")
-            self.verify_reporting(subscription_handler.attribute_reports, cluster.Attributes.DefaultRandomizationOffset,
-                                  "DefaultRandomizationOffset", DefaultRandomizationOffsetValue)
-            self.check_default_randomization_offset_attribute(
-                endpoint, subscription_handler.attribute_reports[cluster.Attributes.DefaultRandomizationOffset])
+            if self.verify_reporting(subscription_handler.attribute_reports, cluster.Attributes.DefaultRandomizationOffset,
+                                     "DefaultRandomizationOffset", DefaultRandomizationOffsetValue):
+                self.check_default_randomization_offset_attribute(
+                    endpoint, subscription_handler.attribute_reports[cluster.Attributes.DefaultRandomizationOffset][0].value)
 
         if not self.check_pics("SETRF.S.A0012"):  # Checks if attribute is supported
             logger.info("PICS SETRF.S.A0012 is not True")
             self.skip_step("42")
         else:
             self.step("42")
-            self.verify_reporting(subscription_handler.attribute_reports,
-                                  cluster.Attributes.DefaultRandomizationType, "DefaultRandomizationType", DefaultRandomizationTypeValue)
-            self.check_default_randomization_type_attribute(
-                endpoint, subscription_handler.attribute_reports[cluster.Attributes.DefaultRandomizationType])
+            if self.verify_reporting(subscription_handler.attribute_reports,
+                                     cluster.Attributes.DefaultRandomizationType, "DefaultRandomizationType", DefaultRandomizationTypeValue):
+                self.check_default_randomization_type_attribute(
+                    endpoint, subscription_handler.attribute_reports[cluster.Attributes.DefaultRandomizationType][0].value)
 
         self.step("43")
         # TH sends TestEventTrigger command for Test Event Clear
         await self.send_test_event_trigger_clear()
 
         self.step("44")
-        # TH removes the subscription to TariffInfo attribute
+        # TH removes the subscription to Commodity Tariff cluster attributes
         subscription_handler.cancel()
 
 

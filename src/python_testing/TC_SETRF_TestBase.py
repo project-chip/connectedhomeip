@@ -563,10 +563,12 @@ class CommodityTariffTestBaseHelper(MatterBaseTest):
             asserts.assert_is_none(
                 attribute_value, "DefaultRandomizationType attribute must be None if RNDM feature is disabled.")
 
-    async def verify_reporting(self, reports: dict, attribute: ClusterObjects.ClusterAttributeDescriptor, attribute_name: str, saved_value) -> None:
+    async def verify_reporting(self, reports: dict, attribute: ClusterObjects.ClusterAttributeDescriptor, attribute_name: str, saved_value) -> bool:
 
         try:
-            asserts.assert_not_equal(reports[attribute], saved_value,
+            asserts.assert_not_equal(reports[attribute][0].value, saved_value,
                                      "Reported value should be different from saved value")
-        except KeyError as err:
+            return True  # if reports are presented
+        except (KeyError, IndexError) as err:
             asserts.fail(f"There is not reports for attribute {attribute_name}:\n{err}")
+            return False  # if there are no reports at all
