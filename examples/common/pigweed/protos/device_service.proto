@@ -35,6 +35,11 @@ message FabricInfo {
 message DeviceState {
   uint64 time_since_boot_millis = 1;
   repeated FabricInfo fabric_info = 2;
+
+  uint32 total_secure_sessions = 3;
+  uint32 case_sessions = 4;
+  uint32 pase_sessions = 5;
+  uint32 active_subscriptions = 6;
 }
 
 message PairingState {
@@ -52,6 +57,7 @@ message RebootRequest {
 service Device {
   rpc FactoryReset(pw.protobuf.Empty) returns (pw.protobuf.Empty){}
   rpc Reboot(RebootRequest) returns (pw.protobuf.Empty){}
+  rpc RebootToBootloader(RebootRequest) returns (pw.protobuf.Empty){}
   rpc TriggerOta(pw.protobuf.Empty) returns (pw.protobuf.Empty){}
   rpc SetOtaMetadataForProvider(MetadataForProvider) returns (pw.protobuf.Empty){}
   rpc GetDeviceInfo(pw.protobuf.Empty) returns (DeviceInfo){}

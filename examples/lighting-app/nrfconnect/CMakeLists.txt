@@ -198,6 +198,7 @@ target_compile_options(app PRIVATE
                        "-DPW_RPC_DESCRIPTOR_SERVICE=1"
                        "-DPW_RPC_DEVICE_SERVICE=1"
                        "-DPW_RPC_LIGHTING_SERVICE=1"
+                       "-DPW_RPC_OTCLI_SERVICE=1"
                        "-DPW_RPC_THREAD_SERVICE=1"
                        )
 
@@ -207,6 +208,7 @@ target_link_libraries(app PRIVATE
   descriptor_service.nanopb_rpc
   device_service.nanopb_rpc
   lighting_service.nanopb_rpc
+  ot_cli_service.nanopb_rpc
   thread_service.nanopb_rpc
   pw_checksum
   pw_hdlc

@@ -18,6 +18,7 @@
 
 #pragma once
 
+#include "app/InteractionModelEngine.h"
 #include "app/clusters/ota-requestor/OTARequestorInterface.h"
 #include "app/icd/server/ICDNotifier.h"
 #include "app/server/CommissioningWindowManager.h"
@@ -34,6 +35,7 @@
 #include <platform/CommissionableDataProvider.h>
 #include <platform/DeviceInstanceInfoProvider.h>
 #include <setup_payload/QRCodeSetupPayloadGenerator.h>
+#include <transport/SecureSession.h>
 
 namespace chip {
 namespace rpc {
@@ -223,6 +225,11 @@ public:
         return pw::Status::Unimplemented();
     }
 
+    virtual pw::Status RebootToBootloader(const chip_rpc_RebootRequest & request, pw_protobuf_Empty & response)
+    {
+        return pw::Status::Unimplemented();
+    }
+
     virtual pw::Status TriggerOta(const pw_protobuf_Empty & request, pw_protobuf_Empty & response)
     {
 #if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
@@ -314,6 +321,27 @@ public:
             }
         }
         response.fabric_info_count = count;
+
+        size_t totalSecureSessions = 0;
+        size_t caseSessions        = 0;
+        size_t paseSessions        = 0;
+        Server::GetInstance().GetSecureSessionManager().GetSecureSessions().ForEachSession([&](Transport::SecureSession * session) {
+            totalSecureSessions++;
+            if (session->GetSecureSessionType() == Transport::SecureSession::Type::kCASE)
+            {
+                caseSessions++;
+            }
+            else if (session->GetSecureSessionType() == Transport::SecureSession::Type::kPASE)
+            {
+                paseSessions++;
+            }
+            return Loop::Continue;
+        });
+        response.total_secure_sessions = static_cast<uint32_t>(totalSecureSessions);
+        response.case_sessions         = static_cast<uint32_t>(caseSessions);
+        response.pase_sessions         = static_cast<uint32_t>(paseSessions);
+        response.active_subscriptions =
+            app::InteractionModelEngine::GetInstance()->GetNumActiveReadHandlers(app::ReadHandler::InteractionType::Subscribe);
         return pw::OkStatus();
     }
 
@@ -416,23 +444,28 @@ public:
 
     virtual pw::Status SetSpakeInfo(const chip_rpc_SpakeInfo & request, pw_protobuf_Empty & response)
     {
+        ChipLogError(AppServer, "SetSpakeInfo started");
         if (request.has_salt)
         {
             mCommissionableDataProvider.SetSpake2pSalt(ByteSpan(request.salt.bytes, request.salt.size));
+            ChipLogError(AppServer, "SetSpakeInfo salt");
         }
         if (request.has_iteration_count)
         {
             mCommissionableDataProvider.SetSpake2pIterationCount(request.iteration_count);
+            ChipLogError(AppServer, "SetSpakeInfo count");
         }
         if (request.has_verifier)
         {
             mCommissionableDataProvider.SetSpake2pVerifier(ByteSpan(request.verifier.bytes, request.verifier.size));
+            ChipLogError(AppServer, "SetSpakeInfo verify");
         }
 
         if (Server::GetInstance().GetCommissioningWindowManager().IsCommissioningWindowOpen() &&
             Server::GetInstance().GetCommissioningWindowManager().CommissioningWindowStatusForCluster() !=
                 app::Clusters::AdministratorCommissioning::CommissioningWindowStatusEnum::kEnhancedWindowOpen)
         {
+            ChipLogError(AppServer, "SetSpakeInfo close");
             // Cache values before closing to restore them after restart.
             app::DataModel::Nullable<VendorId> vendorId = Server::GetInstance().GetCommissioningWindowManager().GetOpenerVendorId();
             app::DataModel::Nullable<FabricIndex> fabricIndex =
@@ -459,7 +492,9 @@ public:
             else
             {
                 DeviceLayer::StackLock lock;
+                ChipLogError(AppServer, "SetSpakeInfo open");
                 Server::GetInstance().GetCommissioningWindowManager().OpenBasicCommissioningWindow();
+                ChipLogError(AppServer, "SetSpakeInfo open done");
             }
         }
 
