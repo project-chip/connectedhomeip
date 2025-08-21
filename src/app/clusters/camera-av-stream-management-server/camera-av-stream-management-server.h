@@ -617,6 +617,42 @@ private:
         return CHIP_NO_ERROR;
     }
 
+    template <typename StreamContainer, typename IdGetter>
+    bool ValidateStreamForModifyOrDeallocateImpl(StreamContainer & streams, uint16_t streamID, HandlerContext & ctx,
+                                                 const char * streamTypeName, IdGetter id_getter)
+    {
+        auto it = std::find_if(streams.begin(), streams.end(), [&](const auto & stream) { return id_getter(stream) == streamID; });
+
+        if (it == streams.end())
+        {
+            ChipLogError(Zcl, "CameraAVStreamMgmt[ep=%d]: %s stream with ID: %u not found", mEndpointId, streamTypeName, streamID);
+            ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Protocols::InteractionModel::Status::NotFound);
+            return false;
+        }
+
+        if (it->referenceCount > 0)
+        {
+            ChipLogError(Zcl, "CameraAVStreamMgmt[ep=%d]: %s stream with ID: %u still in use", mEndpointId, streamTypeName,
+                         streamID);
+            ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Protocols::InteractionModel::Status::InvalidInState);
+            return false;
+        }
+
+        using StreamType = typename StreamContainer::value_type;
+        if constexpr (std::is_same_v<StreamType, VideoStreamStruct> || std::is_same_v<StreamType, AudioStreamStruct>)
+        {
+            if (it->streamUsage == Globals::StreamUsageEnum::kInternal)
+            {
+                ChipLogError(Zcl, "CameraAVStreamMgmt[ep=%d]: %s stream with ID: %u is Internal", mEndpointId, streamTypeName,
+                             streamID);
+                ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Protocols::InteractionModel::Status::DynamicConstraintError);
+                return false;
+            }
+        }
+
+        return true;
+    }
+
     bool IsBitDepthValid(uint8_t bitDepth) { return (bitDepth == 8 || bitDepth == 16 || bitDepth == 24 || bitDepth == 32); }
 
     /**
