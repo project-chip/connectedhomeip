@@ -182,10 +182,14 @@ Wait for the command to complete and confirm that commissioning was successful.
 liveview start 1 --min-res-width 800 --min-res-height 600 --min-framerate 30
 ```
 
-To see what video formats and resolutions your camera supports, use the
-following command:
+To see what video formats and resolutions your camera supports, first list the
+available video devices, then check the formats for your specific device:
 
 ```
+# List all available video devices
+v4l2-ctl --list-devices
+
+# Check formats for a specific device (replace /dev/video0 with your device)
 v4l2-ctl -d /dev/video0 --list-formats-ext
 ```
 

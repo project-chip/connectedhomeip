@@ -208,7 +208,7 @@ Protocols::InteractionModel::Status CameraAVStreamManager::SnapshotStreamDealloc
     return Status::Success;
 }
 
-void CameraAVStreamManager::OnVideoStreamAllocated(const VideoStreamStruct & allocatedStream, bool shouldStartNewVideo)
+void CameraAVStreamManager::OnVideoStreamAllocated(const VideoStreamStruct & allocatedStream, StreamAllocationAction action)
 {
     ChipLogProgress(Zcl, "Video stream has been allocated");
 }
