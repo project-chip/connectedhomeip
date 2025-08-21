@@ -343,7 +343,7 @@ DataModel::ActionReturnStatus BasicInformationCluster::ReadAttribute(const DataM
     case Reachable::Id:
         // On some platforms `true` is defined as a unsigned int and that gets
         // a ambigous TLVWriter::Put error. Hence the specialization.
-        return encoder.Encode<bool>(true);
+        return encoder.Encode(true);
     default:
         return Protocols::InteractionModel::Status::UnsupportedAttribute;
     }
@@ -421,7 +421,7 @@ CHIP_ERROR BasicInformationCluster::Startup(ServerClusterContext & context)
     // Specialization because some platforms `#define` true/false as 1/0 and we get;
     // error: no matching function for call to
     //   'chip::app::AttributePersistence::LoadNativeEndianValue(<brace-enclosed initializer list>, bool&, int)'
-    (void) persistence.LoadNativeEndianValue<bool>({ kRootEndpointId, BasicInformation::Id, Attributes::LocalConfigDisabled::Id },
+    (void) persistence.LoadNativeEndianValue({ kRootEndpointId, BasicInformation::Id, Attributes::LocalConfigDisabled::Id },
                                                    mLocalConfigDisabled, false);
 
     return CHIP_NO_ERROR;
