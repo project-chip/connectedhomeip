@@ -688,6 +688,12 @@ private:
     bool CheckSnapshotStreamsAvailability(HandlerContext & ctx);
 
     bool ValidateSnapshotStreamId(const DataModel::Nullable<uint16_t> & snapshotStreamID, HandlerContext & ctx);
+
+    bool ValidateVideoStreamForModifyOrDeallocate(const uint16_t videoStreamID, HandlerContext & ctx);
+
+    bool ValidateAudioStreamForDeallocate(const uint16_t audioStreamID, HandlerContext & ctx);
+
+    bool ValidateSnapshotStreamForModifyOrDeallocate(const uint16_t snapshotStreamID, HandlerContext & ctx);
 };
 
 } // namespace CameraAvStreamManagement
