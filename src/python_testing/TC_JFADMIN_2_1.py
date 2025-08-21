@@ -175,8 +175,8 @@ class TC_JFADMIN_2_1(MatterBaseTest):
         attributeAdminFabricIndex = response[1][Clusters.JointFabricAdministrator].administratorFabricIndex
         asserts.assert_greater_equal(attributeAdminFabricIndex, 1,
                                      "AdministratorFabricIndex is < 1. Expected AdministratorFabricIndex >= 1")
-        asserts.assert_less_equal(attributeAdminFabricIndex, 255,
-                                  "AdministratorFabricIndex is > 255. Expected AdministratorFabricIndex <= 255")
+        asserts.assert_less_equal(attributeAdminFabricIndex, 254,
+                                  "AdministratorFabricIndex is > 254. Expected AdministratorFabricIndex <= 254")
 
         self.step("2")
         response = await devCtrlEcoA.ReadAttribute(
