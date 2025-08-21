@@ -36,7 +36,7 @@ chip_config_memory_management = "platform"
 #
 chip_system_config_event_loop = "FreeRTOS"
 
-chip_enable_ota_requestor = true
+chip_enable_ota_requestor = false
 
 #chip_stack_lock_tracking = "none"
 

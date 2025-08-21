@@ -21,6 +21,8 @@ import("${chip_root}/src/platform/device.gni")
 import("${scm1612s_sdk_build_root}/scm1612s_executable.gni")
 import("${scm1612s_sdk_build_root}/scm1612s_sdk.gni")
 
+import("${chip_root}/src/app/chip_data_model.gni")
+
 assert(current_os == "freertos")
 
 scm1612s_project_dir = "${chip_root}/examples/lighting-app/senscomm/scm1612s"
@@ -73,6 +75,11 @@ scm1612s_postbuild("lighting_postbuild") {
   ]
 }
 
+chip_data_model("senscomm-lighting") {
+  zap_file = "${scm1612s_project_dir}/data_model/lighting-app.zap"
+  is_server = true
+}
+
 scm1612s_executable("lighting_app") {
   output_name = "${elf_name}"
   include_dirs = []
@@ -91,9 +98,9 @@ scm1612s_executable("lighting_app") {
   ]
 
   deps = [
+    ":senscomm-lighting",
     ":lighting_app_sdk_sources",
     "${chip_root}/examples/common/QRCode",
-    "${chip_root}/examples/lighting-app/lighting-common",
     "${chip_root}/examples/providers:device_info_provider",
     "${chip_root}/src/lib",
     "${chip_root}/src/setup_payload",
