@@ -28,7 +28,6 @@
 
 #include "PersistentStorageOpKeystoreBase.h"
 
-
 namespace chip {
 
 using namespace chip::Crypto;
@@ -93,7 +92,7 @@ CHIP_ERROR PersistentStorageOpKeystoreNXP::CommitOpKeypairForFabric(FabricIndex 
 }
 
 CHIP_ERROR PersistentStorageOpKeystoreNXP::NewOpKeypairForFabric(FabricIndex fabricIndex,
-                                                                  MutableByteSpan & outCertificateSigningRequest)
+                                                                 MutableByteSpan & outCertificateSigningRequest)
 {
     VerifyOrReturnError(mStorage != nullptr, CHIP_ERROR_INCORRECT_STATE);
     VerifyOrReturnError(IsValidFabricIndex(fabricIndex), CHIP_ERROR_INVALID_FABRIC_INDEX);
@@ -134,7 +133,7 @@ void PersistentStorageOpKeystoreNXP::RevertPendingKeypair()
 }
 
 CHIP_ERROR PersistentStorageOpKeystoreNXP::ActivateOpKeypairForFabric(FabricIndex fabricIndex,
-                                                                       const Crypto::P256PublicKey & nocPublicKey)
+                                                                      const Crypto::P256PublicKey & nocPublicKey)
 {
     VerifyOrReturnError(mStorage != nullptr, CHIP_ERROR_INCORRECT_STATE);
     VerifyOrReturnError(mPendingKeypair != nullptr, CHIP_ERROR_INVALID_FABRIC_INDEX);

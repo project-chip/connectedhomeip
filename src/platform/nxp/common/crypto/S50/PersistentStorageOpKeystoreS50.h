@@ -49,8 +49,7 @@ public:
 
     // Non-copyable
     PersistentStorageOpKeystoreS50(PersistentStorageOpKeystoreS50 const &) = delete;
-    void operator=(PersistentStorageOpKeystoreS50 const &)                  = delete;
-
+    void operator=(PersistentStorageOpKeystoreS50 const &)                 = delete;
 
     CHIP_ERROR SignWithOpKeypair(FabricIndex fabricIndex, const ByteSpan & message,
                                  Crypto::P256ECDSASignature & outSignature) const override;

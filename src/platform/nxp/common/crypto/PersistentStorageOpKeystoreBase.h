@@ -60,7 +60,6 @@ public:
 class PersistentStorageOpKeystoreNXP : public Crypto::OperationalKeystore
 {
 public:
-
     /**
      * @brief Initialize the Operational Keystore to map to a given storage delegate.
      *

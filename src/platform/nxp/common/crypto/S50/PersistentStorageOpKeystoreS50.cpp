@@ -72,8 +72,8 @@ static inline const mbedtls_ecp_keypair * to_const_keypair(const P256KeypairCont
 CHIP_ERROR P256KeypairNXP::ExportBlob(P256SerializedKeypairNXP & output) const
 {
     VerifyOrReturnError(mInitialized, CHIP_ERROR_UNINITIALIZED);
-    status_t status  = STATUS_SUCCESS;
-    size_t blobSize  = kPrivateKeyBlobLength;
+    status_t status                          = STATUS_SUCCESS;
+    size_t blobSize                          = kPrivateKeyBlobLength;
     mcuxClEls_KeyProp_t plain_key_properties = {
         .word = { .value = MCUXCLELS_KEYPROPERTY_VALUE_SECURE | MCUXCLELS_KEYPROPERTY_VALUE_PRIVILEGED |
                       MCUXCLELS_KEYPROPERTY_VALUE_KEY_SIZE_256 | MCUXCLELS_KEYPROPERTY_VALUE_KGSRC }
@@ -114,7 +114,7 @@ CHIP_ERROR P256KeypairNXP::ImportBlob(P256SerializedKeypairNXP & input)
 }
 
 CHIP_ERROR PersistentStorageOpKeystoreS50::SignWithOpKeypair(FabricIndex fabricIndex, const ByteSpan & message,
-                                                              Crypto::P256ECDSASignature & outSignature) const
+                                                             Crypto::P256ECDSASignature & outSignature) const
 {
     CHIP_ERROR error = CHIP_NO_ERROR;
     status_t status  = STATUS_SUCCESS;
@@ -133,7 +133,7 @@ CHIP_ERROR PersistentStorageOpKeystoreS50::SignWithOpKeypair(FabricIndex fabricI
     uint16_t els_key_blob_size = sizeof(els_key_blob);
     uint8_t digest[kSHA256_Hash_Length];
 
-     mcuxClEls_KeyIndex_t key_index           = MCUXCLELS_KEY_SLOTS;
+    mcuxClEls_KeyIndex_t key_index           = MCUXCLELS_KEY_SLOTS;
     mcuxClEls_KeyProp_t plain_key_properties = {
         .word = { .value = MCUXCLELS_KEYPROPERTY_VALUE_SECURE | MCUXCLELS_KEYPROPERTY_VALUE_PRIVILEGED |
                       MCUXCLELS_KEYPROPERTY_VALUE_KEY_SIZE_256 | MCUXCLELS_KEYPROPERTY_VALUE_KGSRC }

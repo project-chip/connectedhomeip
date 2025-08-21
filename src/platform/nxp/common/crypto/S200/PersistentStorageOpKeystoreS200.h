@@ -50,7 +50,6 @@ public:
     PersistentStorageOpKeystoreS200(PersistentStorageOpKeystoreS200 const &) = delete;
     void operator=(PersistentStorageOpKeystoreS200 const &)                  = delete;
 
-
     CHIP_ERROR SignWithOpKeypair(FabricIndex fabricIndex, const ByteSpan & message,
                                  Crypto::P256ECDSASignature & outSignature) const override;
 };
