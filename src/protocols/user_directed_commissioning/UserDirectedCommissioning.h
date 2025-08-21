@@ -351,7 +351,7 @@ public:
     void SetCancelPasscode(bool newValue) { mCancelPasscode = newValue; };
     bool GetCancelPasscode() const { return mCancelPasscode; };
 
-    void SetPasscodeLength(uint4_t newValue) { mPasscodeLength = newValue; };
+    void SetPasscodeLength(uint8_t newValue) { mPasscodeLength = newValue; };
     uint4_t GetPasscodeLength() const { return mPasscodeLength; };
 
     /**
@@ -401,7 +401,7 @@ public:
         }
         if (mPasscodeLength != 0)
         {
-            ChipLogDetail(AppServer, "\ttPasscode length: %d", static_cast<uint16_t>(mPasscodeLength));
+            ChipLogDetail(AppServer, "\tpasscode length: %d", static_cast<uint16_t>(mPasscodeLength));
         }
         ChipLogDetail(AppServer, "---- Commissioner Declaration End ----");
     }
@@ -429,7 +429,7 @@ private:
     bool mCommissionerPasscode    = false;
     bool mQRCodeDisplayed         = false;
     bool mCancelPasscode          = false;
-    uint4_t mPasscodeLength       = 0;
+    uint8_t mPasscodeLength       = 0;
 };
 
 class DLL_EXPORT InstanceNameResolver
