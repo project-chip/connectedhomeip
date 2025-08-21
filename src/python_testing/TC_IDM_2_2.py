@@ -39,6 +39,7 @@
 import asyncio
 import copy
 import logging
+import time
 
 from mobly import asserts
 
@@ -69,33 +70,8 @@ class TC_IDM_2_2(MatterBaseTest, BasicCompositionTests):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.endpoint = 0
-        self.timeout_ms = 10000  # 10 second timeout for read operations
-        self.large_operation_timeout_ms = 60000  # 60 second timeout for large operations (like reading all attributes)
-        self.setup_timeout_ms = 60000  # 60 second timeout for setup phase
-        # Operation type to handler mapping (use function references directly)
-        self._operation_map = {
-            self._read_single_attribute: self._read_single_attribute,
-            self._read_all_cluster_attributes: self._read_all_cluster_attributes,
-            self._read_attribute_all_endpoints: self._read_attribute_all_endpoints,
-            self._read_global_attribute: self._read_global_attribute,
-            self._read_all_attributes: self._read_all_attributes,
-            self._read_global_attribute_all_endpoints: self._read_global_attribute_all_endpoints,
-            self._read_cluster_all_endpoints: self._read_cluster_all_endpoints,
-            self._read_endpoint_all_clusters: self._read_endpoint_all_clusters,
-            self._read_unsupported_endpoint: self._read_unsupported_endpoint,
-            self._read_unsupported_cluster: self._read_unsupported_cluster,
-            self._read_unsupported_attribute: self._read_unsupported_attribute,
-            self._read_repeat_attribute: self._read_repeat_attribute,
-            self._read_data_version_filter: self._read_data_version_filter,
-            self._read_non_global_attribute: self._read_non_global_attribute,
-            self._read_limited_access: self._read_limited_access,
-            self._read_all_events_attributes: self._read_all_events_attributes,
-            self._read_data_version_filter_multiple_clusters: self._read_data_version_filter_multiple_clusters,
-            self._read_multiple_data_version_filters: self._read_multiple_data_version_filters,
-        }
 
     # === Attribute Reading and Verification ===
-
     async def read_attribute(self, attribute_path: list) -> dict:
         """Read attributes from the device."""
         try:
@@ -112,7 +88,7 @@ class TC_IDM_2_2(MatterBaseTest, BasicCompositionTests):
         """Read and verify attributes from the device.
 
         Args:
-            attribute_path: List of attribute paths to read (should be AttributePath or direct values)
+            attribute_path: List of attribute paths to read (should be AttributePath objects or tuples like (endpoint, cluster, attribute))
             expected_error: Optional expected error status
 
         Returns:
@@ -123,9 +99,15 @@ class TC_IDM_2_2(MatterBaseTest, BasicCompositionTests):
         """
         if expected_error:
             try:
-                endpoint = attribute_path[0][0] if len(attribute_path[0]) > 0 else None
-                cluster = attribute_path[0][1] if len(attribute_path[0]) > 1 else None
-                attribute = attribute_path[0][2] if len(attribute_path[0]) > 2 else None
+                if isinstance(attribute_path[0], AttributePath):
+                    endpoint = attribute_path[0].EndpointId
+                    cluster = attribute_path[0].ClusterId  # This might be None for global attributes
+                    attribute = attribute_path[0].AttributeId
+                else:
+                    # Handle tuple case
+                    endpoint = attribute_path[0][0] if len(attribute_path[0]) > 0 else None
+                    cluster = attribute_path[0][1] if len(attribute_path[0]) > 1 else None
+                    attribute = attribute_path[0][2] if len(attribute_path[0]) > 2 else None
                 result = await self.read_single_attribute_expect_error(
                     endpoint=endpoint,
                     cluster=cluster,
@@ -137,11 +119,12 @@ class TC_IDM_2_2(MatterBaseTest, BasicCompositionTests):
                     return None
                 raise
 
+        logging.info(f"Reading attribute Here: {attribute_path}")
         read_request = await self.read_attribute(attribute_path)
-        await self.verify_read_response(read_request, attribute_path)
+        self.verify_read_response(read_request, attribute_path)
         return read_request
 
-    async def verify_read_response(self, read_request: dict, attribute_path: list):
+    def verify_read_response(self, read_request: dict, attribute_path: list):
         """Verify the response from a read request.
 
         Args:
@@ -153,17 +136,17 @@ class TC_IDM_2_2(MatterBaseTest, BasicCompositionTests):
         """
         if not attribute_path or not attribute_path[0]:
             # Empty path - verify all endpoints and clusters
-            await self.verify_all_endpoints_clusters(read_request)
+            self.verify_all_endpoints_clusters(read_request)
             return
 
         if isinstance(attribute_path[0], tuple):
-            await self.verify_specific_path(read_request, attribute_path[0])
+            self.verify_specific_path(read_request, attribute_path[0])
         elif isinstance(attribute_path[0], type):
-            await self.verify_cluster_path(read_request, attribute_path[0])
+            self.verify_cluster_path(read_request, attribute_path[0])
         elif isinstance(attribute_path[0], AttributePath):
-            await self.verify_attribute_path(read_request, attribute_path[0])
+            self.verify_attribute_path(read_request, attribute_path[0])
 
-    async def verify_all_endpoints_clusters(self, read_request: dict):
+    def verify_all_endpoints_clusters(self, read_request: dict):
         """Verify read response for all endpoints and clusters.
 
         Args:
@@ -201,7 +184,7 @@ class TC_IDM_2_2(MatterBaseTest, BasicCompositionTests):
                 asserts.assert_equal(returned_attrs, attr_list,
                                      f"Mismatch for {cluster} at endpoint {endpoint}")
 
-    async def verify_specific_path(self, read_request: dict, path: tuple):
+    def verify_specific_path(self, read_request: dict, path: tuple):
         """Verify read response for a specific path.
 
         Args:
@@ -222,17 +205,21 @@ class TC_IDM_2_2(MatterBaseTest, BasicCompositionTests):
         # Handle case where endpoint is None (read from all endpoints)
         if endpoint is None:
             for ep in read_request.tlvAttributes:
-                await self._verify_single_endpoint_path(read_request, ep, attribute)
+                self._verify_single_endpoint_path(read_request, ep, attribute)
         else:
-            await self._verify_single_endpoint_path(read_request, endpoint, attribute)
+            self._verify_single_endpoint_path(read_request, endpoint, attribute)
 
-    async def _verify_single_endpoint_path(
+    def _verify_single_endpoint_path(
         self,
         read_request: dict,
         endpoint: int,
         attribute: Clusters.ClusterObjects.ClusterAttributeDescriptor
     ) -> None:
-        """Verify read response for a single endpoint path.
+        """Verify read response for a single endpoint path by validating against Descriptor cluster data.
+        
+        This function validates endpoint data by checking the ServerList from the Descriptor cluster
+        against the actual clusters returned, regardless of what was originally read.
+        
         Args:
             read_request: The read request response to verify
             endpoint: The endpoint to verify
@@ -240,12 +227,12 @@ class TC_IDM_2_2(MatterBaseTest, BasicCompositionTests):
         Raises:
             AssertionError if verification fails
         """
-        # This method is only used for Descriptor cluster, so we can use it directly
+        # Use Descriptor cluster's ServerList to validate the endpoint data
         server_list = read_request.tlvAttributes[endpoint][Clusters.Descriptor.id][
             Clusters.Descriptor.Attributes.ServerList.attribute_id]
         asserts.assert_equal(sorted(server_list), sorted([x.id for x in self.endpoints[endpoint]]))
 
-    async def verify_cluster_path(self, read_request: dict, cluster: ClusterObjects.Cluster):
+    def verify_cluster_path(self, read_request: dict, cluster: ClusterObjects.Cluster):
         """Verify read response for a cluster path.
 
         Args:
@@ -265,7 +252,7 @@ class TC_IDM_2_2(MatterBaseTest, BasicCompositionTests):
                                  sorted(read_request.tlvAttributes[endpoint][cluster.id].keys()),
                                  "Expected attribute list doesn't match")
 
-    async def verify_attribute_path(self, read_request: dict, path: AttributePath):
+    def verify_attribute_path(self, read_request: dict, path: AttributePath):
         """Verify read response for an attribute path.
 
         Args:
@@ -318,7 +305,7 @@ class TC_IDM_2_2(MatterBaseTest, BasicCompositionTests):
             self.default_controller.Read(self.dut_node_id, [()]),
             timeout=120.0
         )
-        await self._verify_empty_tuple([()], read_request)
+        self._verify_empty_tuple([()], read_request)
         return read_request
 
     async def _read_global_attribute_all_endpoints(self, attribute_id):
@@ -372,10 +359,6 @@ class TC_IDM_2_2(MatterBaseTest, BasicCompositionTests):
         for endpoint_id, endpoint in self.endpoints.items():
             for cluster_type, cluster in endpoint.items():
                 if global_attribute_ids.cluster_id_type(cluster_type.id) != global_attribute_ids.ClusterIdType.kStandard:
-                    continue
-
-                # Skip clusters that do not have AttributeList
-                if not hasattr(cluster_type.Attributes, "AttributeList") or cluster_type.Attributes.AttributeList not in cluster:
                     continue
 
                 all_attrs = set(ClusterObjects.ALL_ATTRIBUTES[cluster_type.id].keys())
@@ -519,17 +502,7 @@ class TC_IDM_2_2(MatterBaseTest, BasicCompositionTests):
             dataVersionFilters=data_version_filter_1)
         return read_request, filtered_read
 
-    async def _test_read_operation(self, handler, **kwargs) -> dict:
-        try:
-            if handler is None or handler not in self._operation_map:
-                raise ValueError(f"Invalid operation handler: {handler}")
-            return await handler(**kwargs)
-        except ChipStackError as e:  # chipstack-ok
-            logging.error(f"Operation {handler} failed: {str(e)}")
-            logging.error(f"Arguments: {kwargs}")
-            raise
-
-    async def _verify_empty_tuple(self, attr_path, read_request):
+    def _verify_empty_tuple(self, attr_path, read_request):
         """Verify read response for empty tuple path (all attributes from all clusters on all endpoints).
 
         This method is based on Austin's implementation in PR #34003.
@@ -554,7 +527,7 @@ class TC_IDM_2_2(MatterBaseTest, BasicCompositionTests):
             asserts.assert_equal(returned_clusters, server_list)
 
         # Verify all endpoints and clusters
-        await self.verify_all_endpoints_clusters(read_request)
+        self.verify_all_endpoints_clusters(read_request)
 
     def steps_TC_IDM_2_2(self) -> list[TestStep]:
         steps = [
@@ -672,6 +645,7 @@ class TC_IDM_2_2(MatterBaseTest, BasicCompositionTests):
         asserts.assert_equal(filtered_read13, {}, "Expected empty response with matching data version")
 
         self.step(14)
+        time.sleep(1) # Waiting 1 second after the app-ready-pattern is detected as we need to wait a tad longer for the app to be ready and stable, otherwise TH2 connection fails later on in test step 14.
         read_request14, filtered_read14 = await self._read_data_version_filter(
             endpoint=self.endpoint,
             cluster=Clusters.BasicInformation,
