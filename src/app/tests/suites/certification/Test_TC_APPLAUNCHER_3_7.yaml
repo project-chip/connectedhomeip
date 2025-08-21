@@ -72,8 +72,8 @@ tests:
           value: 1
 
     - label:
-          "Step 2a: TH sends a LaunchApp command to DUT to launch an app which is
-          not available"
+          "Step 2a: TH sends a LaunchApp command to DUT to launch an app which
+          is not available"
       command: "LaunchApp"
       arguments:
           values:
