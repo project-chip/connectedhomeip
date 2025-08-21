@@ -187,7 +187,13 @@ if CHIP_APP_OPERATIONAL_KEYSTORE
     choice CHIP_APP_OPERATIONAL_KEYSTORE_SELECTION
         prompt "Select Operation Keystore Implementation"
         default CHIP_APP_OPERATIONAL_KEYSTORE_SE05X if CHIP_SE05X
-        default CHIP_APP_OPERATIONAL_KEYSTORE_S200
+        default CHIP_APP_OPERATIONAL_KEYSTORE_S200 if CHIP_NXP_PLATFORM_MCXW71 || CHIP_NXP_PLATFORM_MCXW72
+        default CHIP_APP_OPERATIONAL_KEYSTORE_S50 if CHIP_NXP_PLATFORM_RW61X
+
+        config CHIP_APP_OPERATIONAL_KEYSTORE_S50
+            bool "Operation Keystore S50"
+            help
+                Enable application Operational keystore S50 implementation.
 
         config CHIP_APP_OPERATIONAL_KEYSTORE_S200
             bool "Operation Keystore S200"
@@ -205,6 +211,12 @@ if CHIP_APP_OPERATIONAL_KEYSTORE
                 Enable application Operational keystore SE05X implementation.
 
     endchoice # CHIP_APP_OPERATIONAL_KEYSTORE_SELECTION
+
+    config PRIVATE_ECC_KEY_BLOB_SIZE
+        int "Operationnal private ECC key blob size"
+        default 120 if CHIP_APP_OPERATIONAL_KEYSTORE_S200
+        default 48 if CHIP_APP_OPERATIONAL_KEYSTORE_S50
+
 endif # CHIP_APP_OPERATIONAL_KEYSTORE
 
 config CHIP_APP_OTA_REQUESTOR
