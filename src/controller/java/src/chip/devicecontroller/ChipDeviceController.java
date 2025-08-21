@@ -634,6 +634,11 @@ public class ChipDeviceController {
     getConnectedDevicePointer(deviceControllerPtr, nodeId, jniCallback.getCallbackHandle());
   }
 
+  /**
+   * Set a listener which will be notified when the Commissioner state machine is changing.
+   *
+   * @param MatterCommissioningProgressListener listener to notify (or null to disable the Listener)
+   */
   public void setMatterCommissioningProgressListener(MatterCommissioningProgressListener listener) {
     setMatterCommissioningProgressListener(deviceControllerPtr, listener);
   }

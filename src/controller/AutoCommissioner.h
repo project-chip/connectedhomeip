@@ -175,7 +175,7 @@ private:
     uint16_t mAttestationSignatureLen = 0;
     uint8_t mAttestationSignature[Crypto::kMax_ECDSA_Signature_Length];
 
-    CommissioningProgressListener mCommissioningProgressListener;
+    CommissioningProgressListener mCommissioningProgressListener = nullptr;
     void NotifyMatterCommissioningProgress(uint32_t stage);
 
 };
