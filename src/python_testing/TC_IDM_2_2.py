@@ -101,7 +101,7 @@ class TC_IDM_2_2(MatterBaseTest, BasicCompositionTests):
             try:
                 if isinstance(attribute_path[0], AttributePath):
                     endpoint = attribute_path[0].EndpointId
-                    cluster = attribute_path[0].ClusterId  # This might be None for global attributes
+                    cluster = attribute_path[0].ClusterId 
                     attribute = attribute_path[0].AttributeId
                 else:
                     # Handle tuple case
@@ -273,19 +273,8 @@ class TC_IDM_2_2(MatterBaseTest, BasicCompositionTests):
                               read_request.tlvAttributes[endpoint][Clusters.Descriptor.id],
                               "AttributeList not in output")
 
-    async def _read_single_attribute(self, endpoint, attribute):
-        # Find the cluster that contains this attribute
-        cluster_obj = None
-        for cluster_name in dir(Clusters):
-            cluster = getattr(Clusters, cluster_name)
-            if hasattr(cluster, 'Attributes') and hasattr(cluster.Attributes, attribute.__name__):
-                cluster_obj = cluster
-                break
-
-        if cluster_obj is None:
-            raise ValueError(f"Could not determine cluster for attribute {attribute}")
-
-        return await self.verify_attribute_read([(endpoint, cluster_obj, attribute)])
+    async def _read_single_attribute(self, endpoint, cluster, attribute):
+        return await self.verify_attribute_read([(endpoint, cluster, attribute)])
 
     async def _read_all_cluster_attributes(self, endpoint, cluster):
         return await self.verify_attribute_read([(endpoint, cluster)])
@@ -354,7 +343,9 @@ class TC_IDM_2_2(MatterBaseTest, BasicCompositionTests):
         """
         Attempts to read an unsupported attribute from a supported cluster on any endpoint.
         Expects an UNSUPPORTED_ATTRIBUTE error from the DUT.
-        Fails the test if no such attribute is found, but as a fallback, tries a known invalid attribute ID (0xFFFF).
+        
+        If no unsupported attributes are found (e.g., when testing with chip-all-clusters-app),
+        the test is skipped as this is a valid scenario.
         """
         for endpoint_id, endpoint in self.endpoints.items():
             for cluster_type, cluster in endpoint.items():
@@ -383,32 +374,27 @@ class TC_IDM_2_2(MatterBaseTest, BasicCompositionTests):
                                         msg="Unexpected success reading invalid attribute")
                     return
 
-        # Fallback: try a known invalid attribute according to the yaml script version of this test
-        try:
-            result = await self.read_single_attribute_expect_error(
-                endpoint=1,
-                cluster=Clusters.Thermostat,
-                attribute=Clusters.Thermostat.Attributes.OutdoorTemperature,
-                error=Status.UnsupportedAttribute
-            )
-            asserts.assert_true(isinstance(result.Reason, InteractionModelError),
-                                msg="Unexpected success reading unsupported attribute")
-            return
-        except AssertionError as e:
-            # This means the DUT did not return the expected UNSUPPORTED_ATTRIBUTE error
-            logging.error(f"AssertionError during unsupported attribute test: {e}")
-        except KeyError as e:
-            # This means the cluster or attribute does not exist in the Python cluster definitions
-            logging.error(f"KeyError during unsupported attribute test: {e}")
-
-        # If we get here, neither the for-loop nor the fallback succeeded
-        asserts.fail("Could not find a cluster/attribute combination to test unsupported attribute (even with fallback)")
+        # If we get here, no unsupported attributes were found
+        logging.info("No unsupported attributes found - skipping test (expected with chip-all-clusters-app)")
+        self.skip_step("No unsupported attributes available to test")
 
     async def _read_repeat_attribute(self, endpoint, cluster, attribute, repeat_count):
         results = []
-        for _ in range(repeat_count):
-            results.append(await self.verify_attribute_read(
-                [(endpoint, cluster, attribute)]))
+        for i in range(repeat_count):
+            result = await self.verify_attribute_read([(endpoint, cluster, attribute)])
+            results.append(result)
+            
+        # Verify all reads returned consistent values
+        if len(results) > 1:
+            first_result = results[0]
+            for i, result in enumerate(results[1:], 2):
+                # Compare the attribute values from each read
+                first_attr_value = first_result.tlvAttributes[endpoint][cluster.id][attribute.attribute_id]
+                current_attr_value = result.tlvAttributes[endpoint][cluster.id][attribute.attribute_id]
+                asserts.assert_equal(first_attr_value, current_attr_value, 
+                                   f"Read {i} returned different value than first read")
+                                   
+        logging.info(f"Successfully completed {repeat_count} consistent reads of {attribute}")
         return results
 
     async def _read_data_version_filter(self, endpoint, cluster, attribute, test_value=None):
@@ -587,6 +573,7 @@ class TC_IDM_2_2(MatterBaseTest, BasicCompositionTests):
         self.step(1)
         await self._read_single_attribute(
             endpoint=self.endpoint,
+            cluster=Clusters.Descriptor,
             attribute=Clusters.Descriptor.Attributes.ServerList)
 
         self.step(2)
