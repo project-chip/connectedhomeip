@@ -71,8 +71,14 @@ CHIP_ERROR OTAFirmwareProcessor::ProcessInternal(ByteSpan & block)
         byteBlock.reduce_size(requestedOtaMaxBlockSize);
     }
 
-    OTATlvProcessor::vOtaProcessInternalEncryption(byteBlock);
-    block = byteBlock;
+    OTATlvProcessor::vOtaProcessInternalEncryption(mBlock);
+    if (IsLastBlock())
+    {
+        // Remove padding from the last block since if the file was padded, last block will contain padding bytes.
+        VerifyOrReturnError(OTATlvProcessor::RemovePadding(mBlock) == CHIP_NO_ERROR, CHIP_ERROR_WRONG_ENCRYPTION_TYPE,
+                            ChipLogError(SoftwareUpdate, "Failed to remove padding"));
+    }
+    block = mBlock;
 #endif
 
     uint32_t blockReadOffset = 0;

@@ -154,8 +154,19 @@ public:
     bool IsValidTag(OTAProcessorTag tag);
 
 #ifdef SL_MATTER_ENABLE_OTA_ENCRYPTION
+    bool IsLastBlock() const { return mLastBlock; }
+
     CHIP_ERROR vOtaProcessInternalEncryption(MutableByteSpan & block);
-#endif
+    /**
+     * @brief Remove padding from the given block.
+     * This is necessary to remove any padding that might have been added during encryption.
+     *
+     * @param block The block of data to remove padding from.
+     * @return CHIP_NO_ERROR on success, or an error code if padding removal fails.
+     * @note The method assumes the block is padded using PKCS7 padding.
+     */
+    CHIP_ERROR RemovePadding(MutableByteSpan & block);
+#endif // SL_MATTER_ENABLE_OTA_ENCRYPTION
 
 protected:
     /**
