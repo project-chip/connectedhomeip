@@ -40,6 +40,11 @@ class CommodityTariffTestBaseHelper(MatterBaseTest):
     EventTriggerChangeDay = 0x0700000000000002
     EventTriggerChangeTime = 0x0700000000000003
 
+    # Attributes to store values between test steps
+    startDateAttributeValue = None
+    defaultRandomizationType = None
+    defaultRandomizationOffset = None
+
     async def check_list_elements_uniqueness(self, list_to_check: list, object_name: str = "Elements"):
         """
         Checks that all elements in the list are unique.
@@ -356,9 +361,10 @@ class CommodityTariffTestBaseHelper(MatterBaseTest):
 
     async def check_start_date_attribute(self, endpoint, attribute_value=None):
 
+        self.startDateAttributeValue = attribute_value
         if not attribute_value:
             attribute_value = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.StartDate)
-        self.startDateAttributeValue = attribute_value
+
         if self.startDateAttributeValue is not NullValue:
             matter_asserts.assert_valid_uint32(self.startDateAttributeValue, 'StartDate attribute must has uint32 type.')
 
@@ -530,45 +536,62 @@ class CommodityTariffTestBaseHelper(MatterBaseTest):
 
     async def check_default_randomization_offset_attribute(self, endpoint, attribute_value=None):
 
-        if not attribute_value:
+        self.defaultRandomizationOffset = attribute_value
+        if self.defaultRandomizationOffset is None:
             if await self.attribute_guard(endpoint=endpoint, attribute=cluster.Attributes.DefaultRandomizationOffset):
-                attribute_value = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.DefaultRandomizationOffset)
+                self.defaultRandomizationOffset = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.DefaultRandomizationOffset)
 
         if self.check_pics("SETRF.S.A0011") and self.check_pics("SETRF.S.F05"):
             asserts.assert_is_not_none(
-                attribute_value, "DefaultRandomizationOffset attribute must not be None if RNDM feature is enabled.")
-            if attribute_value is not NullValue:
-                self.check_randomization_offset(self.DefaultRandomizationType, attribute_value)
+                self.defaultRandomizationOffset, "DefaultRandomizationOffset attribute must not be None if RNDM feature is enabled.")
+            if self.defaultRandomizationType is NullValue:
+                asserts.assert_equal(self.defaultRandomizationOffset, NullValue,
+                                     "DefaultRandomizationOffset attribute must be NullValue if DefaultRandomizationType is NullValue.")
+            if self.defaultRandomizationOffset is not None and self.defaultRandomizationOffset is not NullValue:
+                self.check_randomization_offset(self.defaultRandomizationType, self.defaultRandomizationOffset)
         else:
             asserts.assert_is_none(
-                attribute_value, "DefaultRandomizationOffset attribute must be None if RNDM feature is disabled.")
+                self.defaultRandomizationOffset, "DefaultRandomizationOffset attribute must be None if RNDM feature is disabled.")
 
     async def check_default_randomization_type_attribute(self, endpoint, attribute_value=None):
 
-        if not attribute_value:
+        self.defaultRandomizationType = attribute_value
+        if self.defaultRandomizationType is None:
             if await self.attribute_guard(endpoint=endpoint, attribute=cluster.Attributes.DefaultRandomizationType):
-                attribute_value = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.DefaultRandomizationType)
+                self.defaultRandomizationType = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.DefaultRandomizationType)
+
         if self.check_pics("SETRF.S.A0012") and self.check_pics("SETRF.S.F05"):
             asserts.assert_is_not_none(
-                attribute_value, "DefaultRandomizationType attribute must not be None if RNDM feature is enabled.")
-            if attribute_value is not NullValue:
+                self.defaultRandomizationType, "DefaultRandomizationType attribute must not be None if RNDM feature is enabled.")
+            if self.defaultRandomizationType is not NullValue:
                 matter_asserts.assert_valid_enum(
-                    attribute_value, "DefaultRandomizationType attribute must return a DayEntryRandomizationTypeEnum", cluster.Enums.DayEntryRandomizationTypeEnum)
-                asserts.assert_greater_equal(attribute_value, 0,
+                    self.defaultRandomizationType, "DefaultRandomizationType attribute must return a DayEntryRandomizationTypeEnum", cluster.Enums.DayEntryRandomizationTypeEnum)
+                asserts.assert_greater_equal(self.defaultRandomizationType, 0,
                                              "DefaultRandomizationType must be greater or equal than 0.")
-                asserts.assert_less_equal(attribute_value, 4, "DefaultRandomizationType must be less or equal than 4.")
-
-                self.DefaultRandomizationType = attribute_value
+                asserts.assert_less_equal(self.defaultRandomizationType, 4,
+                                          "DefaultRandomizationType must be less or equal than 4.")
         else:
             asserts.assert_is_none(
-                attribute_value, "DefaultRandomizationType attribute must be None if RNDM feature is disabled.")
+                self.defaultRandomizationType, "DefaultRandomizationType attribute must be None if RNDM feature is disabled.")
 
     async def verify_reporting(self, reports: dict, attribute: ClusterObjects.ClusterAttributeDescriptor, attribute_name: str, saved_value) -> bool:
+        """This function verifies that the reported value is different from the saved value.
+
+        Args:
+            reports (dict): All reports stored in attribute_reports attribute in subscription handler object;
+            attribute (ClusterObjects.ClusterAttributeDescriptor): Attribute to check;
+            attribute_name (str): String with attribute name for error message;
+            saved_value: Value that has been saved before TestEventTrigger sending;
+
+        Returns:
+            bool: - True if report is presented; 
+                  - False if there are no reports at all;
+        """
 
         try:
             asserts.assert_not_equal(reports[attribute][0].value, saved_value,
                                      "Reported value should be different from saved value")
-            return True  # if reports are presented
+            return True
         except (KeyError, IndexError) as err:
             asserts.fail(f"There is not reports for attribute {attribute_name}:\n{err}")
-            return False  # if there are no reports at all
+            return False
