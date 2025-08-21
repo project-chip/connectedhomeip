@@ -20,24 +20,14 @@
 
 #include "Test_cert_data.h"
 #include <controller/AutoCommissioner.h>
-#include <controller/CHIPDeviceController.h>
-#include <controller/CommissioneeDeviceProxy.h>
 #include <controller/CommissioningDelegate.h>
 #include <controller/tests/AutoCommissionerTestAccess.h>
-#include <crypto/CHIPCryptoPAL.h>
-#include <crypto/SessionKeystore.h>
-#include <cstring>
-#include <lib/core/CHIPPersistentStorageDelegate.h>
-#include <lib/core/Optional.h>
 #include <lib/core/StringBuilderAdapters.h>
 #include <lib/support/CHIPMemString.h>
+
+#include <cstring>
 #include <memory>
-#include <messaging/ExchangeMgr.h>
-#include <optional>
-#include <protocols/secure_channel/MessageCounterManager.h>
-#include <transport/Session.h>
-#include <transport/TransportMgrBase.h>
-#include <transport/tests/UDPTransportManager.h>
+
 
 using namespace chip;
 using namespace chip::Dnssd;
