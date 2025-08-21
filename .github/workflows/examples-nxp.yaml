@@ -43,12 +43,12 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: ghcr.io/project-chip/chip-build-nxp:153
+            image: ghcr.io/project-chip/chip-build-nxp:162
             volumes:
                 - "/tmp/bloat_reports:/tmp/bloat_reports"
         steps:
             - name: Checkout
-              uses: actions/checkout@v4
+              uses: actions/checkout@v5
             - name: Checkout submodules & Bootstrap
               uses: ./.github/actions/checkout-submodules-and-bootstrap
               with:
@@ -110,6 +110,7 @@ jobs:
               run: |
                   scripts/run_in_build_env.sh "\
                       ./scripts/build/build_examples.py \
+                      --target nxp-rt1060-freertos-thermostat-wifi-evkc-iw610-cmake \
                       --target nxp-rt1060-freertos-thermostat-thread-wifi-ota-evkc-iwx12-cmake \
                       build \
                   "
@@ -176,11 +177,11 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: ghcr.io/project-chip/chip-build-nxp-zephyr:153
+            image: ghcr.io/project-chip/chip-build-nxp-zephyr:162
 
         steps:
             - name: Checkout
-              uses: actions/checkout@v4
+              uses: actions/checkout@v5
             - name: Checkout submodules & Bootstrap
               uses: ./.github/actions/checkout-submodules-and-bootstrap
               with:

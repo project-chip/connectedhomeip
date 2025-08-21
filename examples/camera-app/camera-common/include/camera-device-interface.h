@@ -22,7 +22,9 @@
 #include <app/clusters/camera-av-settings-user-level-management-server/camera-av-settings-user-level-management-server.h>
 #include <app/clusters/camera-av-stream-management-server/camera-av-stream-management-server.h>
 #include <app/clusters/chime-server/chime-server.h>
+#include <app/clusters/push-av-stream-transport-server/push-av-stream-transport-cluster.h>
 #include <app/clusters/webrtc-transport-provider-server/webrtc-transport-provider-server.h>
+#include <app/clusters/zone-management-server/zone-management-server.h>
 
 using chip::app::Clusters::CameraAvStreamManagement::AudioCapabilitiesStruct;
 using chip::app::Clusters::CameraAvStreamManagement::AudioStreamStruct;
@@ -53,7 +55,9 @@ struct VideoStream
                 videoStreamParams.minResolution.width <= inputParams.minResolution.width &&
                 videoStreamParams.minResolution.height <= inputParams.minResolution.height &&
                 videoStreamParams.maxResolution.width >= inputParams.maxResolution.width &&
-                videoStreamParams.maxResolution.height >= inputParams.maxResolution.height);
+                videoStreamParams.maxResolution.height >= inputParams.maxResolution.height &&
+                videoStreamParams.minBitRate <= inputParams.minBitRate && videoStreamParams.maxBitRate >= inputParams.maxBitRate &&
+                videoStreamParams.keyFrameInterval == inputParams.keyFrameInterval);
     }
 };
 
@@ -68,7 +72,7 @@ struct AudioStream
     {
         return (audioStreamParams.audioCodec == inputParams.audioCodec &&
                 audioStreamParams.channelCount == inputParams.channelCount &&
-                audioStreamParams.sampleRate == inputParams.sampleRate);
+                audioStreamParams.sampleRate == inputParams.sampleRate && audioStreamParams.bitDepth == inputParams.bitDepth);
     }
 };
 
@@ -82,7 +86,7 @@ struct SnapshotStream
     bool IsCompatible(const SnapshotStreamStruct & inputParams) const
     {
         return (snapshotStreamParams.imageCodec == inputParams.imageCodec && snapshotStreamParams.quality == inputParams.quality &&
-                snapshotStreamParams.frameRate <= inputParams.frameRate &&
+                snapshotStreamParams.frameRate == inputParams.frameRate &&
                 snapshotStreamParams.minResolution.width <= inputParams.minResolution.width &&
                 snapshotStreamParams.minResolution.height <= inputParams.minResolution.height &&
                 snapshotStreamParams.maxResolution.width >= inputParams.maxResolution.width &&
@@ -128,8 +132,14 @@ public:
     // Getter for CameraAVSettingsUserLevelManagement Delegate
     virtual chip::app::Clusters::CameraAvSettingsUserLevelManagement::Delegate & GetCameraAVSettingsUserLevelMgmtDelegate() = 0;
 
+    // Getter for ZoneManagement Delegate
+    virtual chip::app::Clusters::ZoneManagement::Delegate & GetZoneManagementDelegate() = 0;
+
     // Getter for the Media Controller
     virtual MediaController & GetMediaController() = 0;
+
+    // Getter for PushAVStreamTransport Delegate
+    virtual chip::app::Clusters::PushAvStreamTransportDelegate & GetPushAVTransportDelegate() = 0;
 
     // Class defining the Camera HAL interface
     class CameraHALInterface
@@ -340,6 +350,58 @@ public:
         virtual int16_t GetTiltMin() = 0;
         virtual int16_t GetTiltMax() = 0;
         virtual uint8_t GetZoomMax() = 0;
+
+        // Get the maximum number of zones supported by camera.
+        virtual uint8_t GetMaxZones() = 0;
+
+        // Get the maximum number of user-defined zones supported by camera.
+        virtual uint8_t GetMaxUserDefinedZones() = 0;
+
+        // Get the maximum sensitivity level supported by camera.
+        virtual uint8_t GetSensitivityMax() = 0;
+
+        // Get/Set the Zone Detection sensitivity(1 to SensitivityMax)
+        virtual uint8_t GetDetectionSensitivity()                         = 0;
+        virtual CameraError SetDetectionSensitivity(uint8_t aSensitivity) = 0;
+
+        // Create a zone trigger
+        virtual CameraError
+        CreateZoneTrigger(const chip::app::Clusters::ZoneManagement::ZoneTriggerControlStruct & zoneTrigger) = 0;
+
+        // Update a zone trigger
+        virtual CameraError
+        UpdateZoneTrigger(const chip::app::Clusters::ZoneManagement::ZoneTriggerControlStruct & zoneTrigger) = 0;
+
+        // Remove a zone trigger
+        virtual CameraError RemoveZoneTrigger(uint16_t zoneID) = 0;
+
+        class ZoneEventCallback
+        {
+        public:
+            virtual ~ZoneEventCallback() = default;
+
+            /*
+             * Callback for ZoneTriggered event. This notification callback
+             * would be called by the camera-device to generate and Log a
+             * ZoneTriggered event.
+             */
+            virtual void OnZoneTriggeredEvent(uint16_t zoneId,
+                                              chip::app::Clusters::ZoneManagement::ZoneEventTriggeredReasonEnum triggerReason)
+            {
+                return;
+            }
+
+            /*
+             * Callback for ZoneStopped event. This notification callback
+             * would be called by the camera-device to generate and Log a
+             * ZoneStopped event.
+             */
+            virtual void OnZoneStoppedEvent(uint16_t zoneId,
+                                            chip::app::Clusters::ZoneManagement::ZoneEventStoppedReasonEnum stopReason)
+            {
+                return;
+            }
+        };
     };
 
     virtual CameraHALInterface & GetCameraHALInterface() = 0;

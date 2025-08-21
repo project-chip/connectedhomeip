@@ -16,6 +16,7 @@
  */
 #include <app/clusters/software-diagnostics-server/software-diagnostics-logic.h>
 
+#include <app/data-model-provider/MetadataTypes.h>
 #include <app/server-cluster/AttributeListBuilder.h>
 #include <app/server-cluster/DefaultServerCluster.h>
 #include <lib/support/CodeUtils.h>
@@ -86,7 +87,8 @@ CHIP_ERROR SoftwareDiagnosticsLogic::ReadThreadMetrics(AttributeValueEncoder & e
 
 CHIP_ERROR SoftwareDiagnosticsLogic::AcceptedCommands(ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder)
 {
-    if (mEnabledAttributes.enableCurrentWatermarks && DeviceLayer::GetDiagnosticDataProvider().SupportsWatermarks())
+    if (mOptionalAttributeSet.IsSet(Attributes::CurrentHeapHighWatermark::Id) &&
+        DeviceLayer::GetDiagnosticDataProvider().SupportsWatermarks())
     {
         static constexpr DataModel::AcceptedCommandEntry kAcceptedCommands[] = { Commands::ResetWatermarks::kMetadataEntry };
         return builder.ReferenceExisting(kAcceptedCommands);
@@ -100,14 +102,16 @@ CHIP_ERROR SoftwareDiagnosticsLogic::Attributes(ReadOnlyBufferBuilder<DataModel:
 {
     AttributeListBuilder listBuilder(builder);
 
-    const AttributeListBuilder::OptionalAttributeEntry optionalEntries[] = {
-        { mEnabledAttributes.enableThreadMetrics, Attributes::ThreadMetrics::kMetadataEntry },
-        { mEnabledAttributes.enableCurrentHeapFree, Attributes::CurrentHeapFree::kMetadataEntry },
-        { mEnabledAttributes.enableCurrentHeapUsed, Attributes::CurrentHeapUsed::kMetadataEntry },
-        { mEnabledAttributes.enableCurrentWatermarks, Attributes::CurrentHeapHighWatermark::kMetadataEntry },
+    static constexpr DataModel::AttributeEntry optionalEntries[] = {
+        //
+        Attributes::ThreadMetrics::kMetadataEntry,            //
+        Attributes::CurrentHeapFree::kMetadataEntry,          //
+        Attributes::CurrentHeapUsed::kMetadataEntry,          //
+        Attributes::CurrentHeapHighWatermark::kMetadataEntry, //
     };
 
-    return listBuilder.Append(Span<const DataModel::AttributeEntry>() /* mandatory */, Span(optionalEntries));
+    return listBuilder.Append(Span(SoftwareDiagnostics::Attributes::kMandatoryMetadata), Span(optionalEntries),
+                              mOptionalAttributeSet);
 }
 
 } // namespace Clusters
