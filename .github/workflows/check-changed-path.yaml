@@ -3,8 +3,8 @@ name: Check Changed Paths
 on:
   workflow_call:
     outputs:
-      non_markdown_changes:
-        description: "True if non-markdown files were changed."
+      proceed:
+        description: "Determines if the workflow should proceed based on modified paths."
         value: ${{ jobs.changed_paths.outputs.non_markdown_changes }}
 
 jobs:
