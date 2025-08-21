@@ -58,7 +58,7 @@ class CommodityMeteringTestBaseHelper(MatterBaseTest):
     async def check_maximum_metered_quantities_attribute(self, endpoint, attribute_value=None):
 
         self.MaximumMeteredQuantities = attribute_value
-        if not self.MaximumMeteredQuantities:
+        if self.MaximumMeteredQuantities is None:
             self.MaximumMeteredQuantities = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.MaximumMeteredQuantities)
         if self.MaximumMeteredQuantities is not NullValue:
             matter_asserts.assert_valid_uint16(self.MaximumMeteredQuantities, 'MaximumMeteredQuantities must be uint16')
@@ -71,10 +71,16 @@ class CommodityMeteringTestBaseHelper(MatterBaseTest):
             )
 
         if attribute_value is not NullValue:
-            # Looks like MaximumMeteredQuantities can't be Null if MeteredQuantity is not Null due to it defines the size of the list
-            self.MaximumMeteredQuantities = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.MaximumMeteredQuantities)
-            await self.check_maximum_metered_quantities_attribute(endpoint, self.MaximumMeteredQuantities)
-            asserts.assert_not_equal(self.MaximumMeteredQuantities, NullValue, "MaximumMeteredQuantities must not be NullValue")
+
+            # Looks like MaximumMeteredQuantities can't be Null if MeteredQuantity is not Null due to it defines the constraints for the length of the list.
+            # If MaximumMeteredQuantities is not set yet to a valid real value by any reasons, then we read it.
+            if self.MaximumMeteredQuantities is None or self.MaximumMeteredQuantities is NullValue:
+                self.MaximumMeteredQuantities = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.MaximumMeteredQuantities)
+            await self.check_maximum_metered_quantities_attribute(endpoint, self.MaximumMeteredQuantities)  # validate it
+            # and check that it is not Null
+            asserts.assert_not_equal(self.MaximumMeteredQuantities, NullValue,
+                                     "MaximumMeteredQuantities must not be NullValue")
+
             matter_asserts.assert_list(attribute_value, "MeteredQuantity attribute must return a list",
                                        max_length=self.MaximumMeteredQuantities)
             matter_asserts.assert_list_element_type(
