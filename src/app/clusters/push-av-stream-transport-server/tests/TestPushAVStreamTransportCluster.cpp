@@ -283,9 +283,9 @@ public:
         return Status::Success;
     }
 
-    bool ValidateStreamUsage(StreamUsageEnum streamUsage) { return true; }
+    bool ValidateStreamUsage(StreamUsageEnum streamUsage) override { return true; }
 
-    bool ValidateSegmentDuration(uint16_t segmentDuration) { return true; }
+    bool ValidateSegmentDuration(uint16_t segmentDuration) override { return true; }
 
     Protocols::InteractionModel::Status
     ValidateBandwidthLimit(StreamUsageEnum streamUsage, const Optional<DataModel::Nullable<uint16_t>> & videoStreamId,

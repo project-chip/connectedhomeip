@@ -64,9 +64,9 @@ public:
 
     Protocols::InteractionModel::Status SelectVideoStream(StreamUsageEnum streamUsage, uint16_t & videoStreamId) override;
 
-    bool ValidateStreamUsage(StreamUsageEnum streamUsage);
+    bool ValidateStreamUsage(StreamUsageEnum streamUsage) override;
 
-    bool ValidateSegmentDuration(uint16_t segmentDuration);
+    bool ValidateSegmentDuration(uint16_t segmentDuration) override;
 
     Protocols::InteractionModel::Status SelectAudioStream(StreamUsageEnum streamUsage, uint16_t & audioStreamId) override;
 
