@@ -268,6 +268,9 @@ CommissioningStage AutoCommissioner::GetNextCommissioningStage(CommissioningStag
         ChipLogProgress(Controller, "Going from commissioning step '%s' with lastErr = '%s' -> '%s'", StageToString(currentStage),
                         lastErr.AsString(), StageToString(nextStage));
     }
+
+    NotifyMatterCommissioningProgress(nextStage);
+
     return nextStage;
 }
 
@@ -945,6 +948,19 @@ CHIP_ERROR AutoCommissioner::PerformStep(CommissioningStage nextStage)
     mCommissioner->PerformCommissioningStep(proxy, nextStage, mParams, this, GetEndpoint(nextStage),
                                             GetCommandTimeout(proxy, nextStage));
     return CHIP_NO_ERROR;
+}
+
+void AutoCommissioner::SetMatterCommissioningProgressListener(CommissioningProgressListener listener)
+{
+    mCommissioningProgressListener = listener;
+}
+
+// Function called to notify the progression of Matter Commissioning
+void AutoCommissioner::NotifyMatterCommissioningProgress(uint32_t stage)
+{
+    if (mCommissioningProgressListener != nullptr) {
+        mCommissioningProgressListener(stage);
+    }
 }
 
 } // namespace Controller

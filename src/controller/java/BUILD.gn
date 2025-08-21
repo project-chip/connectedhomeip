@@ -561,6 +561,7 @@ android_library("android_chip_im") {
     "src/chip/devicecontroller/ResubscriptionAttemptCallback.java",
     "src/chip/devicecontroller/StatusException.java",
     "src/chip/devicecontroller/SubscriptionEstablishedCallback.java",
+    "src/chip/devicecontroller/MatterCommissioningProgressListener.java",
     "src/chip/devicecontroller/WriteAttributesCallback.java",
     "src/chip/devicecontroller/WriteAttributesCallbackJni.java",
     "src/chip/devicecontroller/model/AttributeState.java",

@@ -58,6 +58,9 @@ public:
     ByteSpan GetAttestationSignature() const { return ByteSpan(mAttestationSignature, mAttestationSignatureLen); }
     ByteSpan GetAttestationNonce() const { return ByteSpan(mAttestationNonce); }
 
+    typedef void (*CommissioningProgressListener)(uint32_t stage);
+    void SetMatterCommissioningProgressListener(CommissioningProgressListener listener);
+
 protected:
     virtual void CleanupCommissioning();
     CommissioningStage GetNextCommissioningStage(CommissioningStage currentStage, CHIP_ERROR & lastErr);
@@ -171,6 +174,10 @@ private:
     uint8_t mAttestationElements[Credentials::kMaxRspLen];
     uint16_t mAttestationSignatureLen = 0;
     uint8_t mAttestationSignature[Crypto::kMax_ECDSA_Signature_Length];
+
+    CommissioningProgressListener mCommissioningProgressListener;
+    void NotifyMatterCommissioningProgress(uint32_t stage);
+
 };
 } // namespace Controller
 } // namespace chip
