@@ -360,6 +360,7 @@ TEST_F(AutoCommissionerTest, NOCChainGenerated_EmptyRCACReturnsInvalidArgument)
 
     CHIP_ERROR err = privateConfigCommissioner.CallNOCChainGenerated(ByteSpan(), ByteSpan(), ByteSpan(), Crypto::IdentityProtectionKeySpan(), 0);
 
+    
     EXPECT_EQ(err, CHIP_ERROR_INVALID_ARGUMENT);
 }
 
@@ -372,6 +373,7 @@ TEST_F(AutoCommissionerTest, NOCChainGenerated_CorruptedRCACLengthReturnsError)
 
     CHIP_ERROR err = privateConfigCommissioner.CallNOCChainGenerated(
         ByteSpan(), ByteSpan(), corrupted_size_rcac, Crypto::IdentityProtectionKeySpan(), 0);
+
 
     EXPECT_EQ(err, CHIP_ERROR_INVALID_ARGUMENT);
 }
@@ -386,6 +388,7 @@ TEST_F(AutoCommissionerTest, NOCChainGenerated_CorruptedNOCLengthReturnsError)
     CHIP_ERROR err = privateConfigCommissioner.CallNOCChainGenerated(
         corrupted_size_noc, ByteSpan(), ByteSpan(chip::TestCerts::kTestRCAC,chip::TestCerts::kTestRCAC_size), Crypto::IdentityProtectionKeySpan(), 0);
 
+
     EXPECT_EQ(err, CHIP_ERROR_INVALID_ARGUMENT);
 }
 
@@ -395,6 +398,7 @@ TEST_F(AutoCommissionerTest, NOCChainGenerated_EmptyNOCReturnsInvalidArgument)
 {
     AutoCommissionerTestAccess privateConfigCommissioner(&mCommissioner);
     CHIP_ERROR err = privateConfigCommissioner.CallNOCChainGenerated(ByteSpan(), ByteSpan(), ByteSpan(chip::TestCerts::kTestRCAC,chip::TestCerts::kTestRCAC_size), Crypto::IdentityProtectionKeySpan(), 0);
+
 
     EXPECT_EQ(err, CHIP_ERROR_INVALID_ARGUMENT);
 }
