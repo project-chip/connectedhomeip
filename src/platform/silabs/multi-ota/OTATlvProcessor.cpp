@@ -39,7 +39,10 @@ CHIP_ERROR OTATlvProcessor::Process(ByteSpan & block)
     CHIP_ERROR status     = CHIP_NO_ERROR;
     uint32_t bytes        = std::min(mLength - mProcessedLength, static_cast<uint32_t>(block.size()));
     ByteSpan relevantData = block.SubSpan(0, bytes);
-
+    if (mProcessedLength + bytes >= mLength)
+    {
+        mLastBlock = true;
+    }
     status = ProcessInternal(relevantData);
     if (!IsError(status))
     {
@@ -67,8 +70,9 @@ void OTATlvProcessor::ClearInternal()
     mProcessedLength = 0;
     mWasSelected     = false;
 #ifdef SL_MATTER_ENABLE_OTA_ENCRYPTION
-    mIVOffset = 0;
-#endif
+    mIVOffset  = 0;
+    mLastBlock = false;
+#endif // SL_MATTER_ENABLE_OTA_ENCRYPTION
 }
 
 bool OTATlvProcessor::IsError(CHIP_ERROR & status)
@@ -115,5 +119,42 @@ CHIP_ERROR OTATlvProcessor::vOtaProcessInternalEncryption(MutableByteSpan & bloc
 
     return CHIP_NO_ERROR;
 }
-#endif
+
+CHIP_ERROR OTATlvProcessor::RemovePadding(MutableByteSpan & block)
+{
+    if (block.size() == 0)
+    {
+        ChipLogError(DeviceLayer, "Block size is zero, cannot unpad");
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+
+    uint8_t padLength = block.data()[block.size() - 1];
+    if (padLength == 0 || padLength > block.size())
+    {
+        ChipLogError(DeviceLayer, "Invalid PKCS7 padding");
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+
+    // Verify padding bytes
+    uint8_t mismatch = 0;
+    for (size_t i = 0; i < padLength; ++i)
+    {
+        if (block.data()[block.size() - 1 - i] != padLength)
+        {
+            // not returning early here, we want to check all padding bytes
+            // preventing timing side-channel attacks
+            mismatch = 1;
+        }
+    }
+
+    if (mismatch != 0)
+    {
+        ChipLogError(DeviceLayer, "PKCS7 padding verification failed");
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+
+    block.reduce_size(block.size() - padLength);
+    return CHIP_NO_ERROR;
+}
+#endif // SL_MATTER_ENABLE_OTA_ENCRYPTION
 } // namespace chip
