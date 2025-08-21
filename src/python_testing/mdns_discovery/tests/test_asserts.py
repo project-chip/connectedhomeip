@@ -1237,6 +1237,7 @@ class TestAssertValidRiKey(unittest.TestCase):
         "1234567890ABCDEF",  # mixed digits and letters
         "ABCDEF" * 16 + "AB",  # exactly 100 chars
     ]
+
     def test_valid_values(self):
         # All values in VALID_VALUES should pass
         for value in self.VALID_VALUES:
