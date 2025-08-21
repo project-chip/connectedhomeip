@@ -59,7 +59,7 @@ static constexpr size_t kPrivateKeyBlobLength = Crypto::kP256_PrivateKey_Length 
 #if defined(MBEDTLS_THREADING_C) && defined(MBEDTLS_THREADING_ALT)
 #define ELS_MUTEX_UNLOCK() (void) mcux_els_mutex_unlock()
 #define ELS_MUTEX_LOCK() (void) mcux_els_mutex_lock()
-#else 
+#else
 #define ELS_MUTEX_UNLOCK()
 #define ELS_MUTEX_LOCK()
 #endif
@@ -86,7 +86,7 @@ CHIP_ERROR P256KeypairNXP::ExportBlob(P256SerializedKeypairNXP & output) const
     uint8_t privkey[kP256_PrivateKey_Length];
     mbedtls_mpi_write_binary(&keypair->CHIP_CRYPTO_PAL_PRIVATE(d), Uint8::to_uchar(privkey), sizeof(privkey));
     PLOG_DEBUG_BUFFER("plain private key", privkey, kP256_PrivateKey_Length);
-    els_enable();    
+    els_enable();
 
     ELS_MUTEX_LOCK();
     /* Import plain DAC key into S50 */
