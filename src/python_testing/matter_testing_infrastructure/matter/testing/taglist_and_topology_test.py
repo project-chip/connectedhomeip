@@ -20,7 +20,6 @@ from collections import defaultdict
 from dataclasses import dataclass, field
 from typing import Any, Dict, List, Set, Tuple
 
-
 import matter.clusters as Clusters
 from matter.clusters.Types import Nullable
 from matter.testing.problem_notices import ClusterPathLocation, ProblemNotice, ProblemSeverity

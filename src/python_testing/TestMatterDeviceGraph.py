@@ -20,8 +20,7 @@ import sys
 
 import chip.clusters as Clusters
 from chip.testing.matter_testing import MatterBaseTest, default_matter_test_main
-from chip.testing.spec_parsing import build_xml_device_types, PrebuiltDataModelDirectory
-
+from chip.testing.spec_parsing import PrebuiltDataModelDirectory, build_xml_device_types
 
 DEFAULT_CHIP_ROOT = os.path.abspath(
     os.path.join(os.path.dirname(__file__), '..', '..'))
