@@ -85,39 +85,6 @@ class TC_SU_2_8(MatterBaseTest):
         resp = await self.send_single_cmd(cmd=cmd, dev_ctrl=controller)
         logging.info(f"Announce resp: {resp}.")
 
-    async def configure_acl_permissions(self, controller, endpoint: int, node_id, cluster):
-        """
-        Configure ACL entries required for OTA communication.
-        """
-
-        logging.info("Configuring ACL permissions.")
-
-        acl_entries = [
-            Clusters.Objects.AccessControl.Structs.AccessControlEntryStruct(
-                privilege=Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kView,
-                authMode=Clusters.AccessControl.Enums.AccessControlEntryAuthModeEnum.kCase,
-                subjects=[],
-                targets=[]
-            ),
-            Clusters.Objects.AccessControl.Structs.AccessControlEntryStruct(
-                privilege=Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kAdminister,
-                authMode=Clusters.AccessControl.Enums.AccessControlEntryAuthModeEnum.kCase,
-                subjects=[],
-                targets=[]
-            ),
-            Clusters.Objects.AccessControl.Structs.AccessControlEntryStruct(
-                privilege=Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kOperate,
-                authMode=Clusters.AccessControl.Enums.AccessControlEntryAuthModeEnum.kCase,
-                subjects=[],
-                targets=[]
-            )
-        ]
-
-        acl_attr = Clusters.Objects.AccessControl.Attributes.Acl(value=acl_entries)
-        resp = await controller.WriteAttribute(node_id, [(endpoint, acl_attr)])
-        asserts.assert_equal(resp[0].Status, Status.Success, "ACL write failed.")
-        logging.info("ACL permissions configured successfully.")
-
     async def check_state_remains_idle(self, endpoint: int, idle):
         """
         Poll UpdateState and checks it remains the same.
@@ -234,10 +201,6 @@ class TC_SU_2_8(MatterBaseTest):
         logging.info(f"Commissioning response: {resp}.")
 
         # ACL permissions are not required
-        # await self.configure_acl_permissions(th1, endpoint, p1_node, cluster=Clusters.OtaSoftwareUpdateRequestor.id)
-        # await self.configure_acl_permissions(th1, endpoint, dut_node_id, cluster=Clusters.OtaSoftwareUpdateProvider.id)
-        # await self.configure_acl_permissions(th2, endpoint, p2_node, cluster=Clusters.OtaSoftwareUpdateRequestor.id)
-        # await self.configure_acl_permissions(th2, endpoint, dut_node_id, cluster=Clusters.OtaSoftwareUpdateProvider.id)
 
         if fabric_id_th2 == th1.fabricId:
             raise AssertionError(f"Fabric IDs are the same for TH1: {th1.fabricId} and TH2: {fabric_id_th2}.")
