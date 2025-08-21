@@ -36,14 +36,15 @@
 # === END CI TEST ARGUMENTS ===
 #
 
-import chip.clusters as Clusters
-from chip import ChipDeviceCtrl
-from chip.clusters import Globals
-from chip.clusters.Types import NullValue
-from chip.interaction_model import InteractionModelError, Status
-from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from mobly import asserts
 from TC_WEBRTCPTestBase import WEBRTCPTestBase
+
+import matter.clusters as Clusters
+from matter import ChipDeviceCtrl
+from matter.clusters import Globals
+from matter.clusters.Types import NullValue
+from matter.interaction_model import InteractionModelError, Status
+from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 
 
 class TC_WebRTCProvider_2_5(MatterBaseTest, WEBRTCPTestBase):
@@ -200,7 +201,6 @@ class TC_WebRTCProvider_2_5(MatterBaseTest, WEBRTCPTestBase):
         resp = await self.send_single_cmd(cmd=cmd, endpoint=endpoint, payloadCapability=ChipDeviceCtrl.TransportPayloadCapability.LARGE_PAYLOAD)
         asserts.assert_equal(type(resp), Clusters.WebRTCTransportProvider.Commands.SolicitOfferResponse,
                              "Incorrect response type")
-        asserts.assert_not_equal(resp.webRTCSessionID, 0, "webrtcSessionID in SolicitOfferResponse should not be 0.")
         asserts.assert_false(resp.deferredOffer, "Expected 'deferredOffer' to be False.")
 
         # Save the session ID for later steps

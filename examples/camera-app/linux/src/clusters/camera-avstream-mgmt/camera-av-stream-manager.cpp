@@ -268,6 +268,13 @@ Protocols::InteractionModel::Status CameraAVStreamManager::VideoStreamDeallocate
                 ChipLogError(Camera, "Video stream with ID: %d still in use", streamID);
                 return Status::InvalidInState;
             }
+
+            if (stream.videoStreamParams.streamUsage == Globals::StreamUsageEnum::kInternal)
+            {
+                ChipLogError(Camera, "Video stream with ID: %d is Internal", streamID);
+                return Status::DynamicConstraintError;
+            }
+
             // Stop the video stream
             mCameraDeviceHAL->GetCameraHALInterface().StopVideoStream(streamID);
 
@@ -325,6 +332,13 @@ Protocols::InteractionModel::Status CameraAVStreamManager::AudioStreamDeallocate
                 ChipLogError(Camera, "Audio stream with ID: %d still in use", streamID);
                 return Status::InvalidInState;
             }
+
+            if (stream.audioStreamParams.streamUsage == Globals::StreamUsageEnum::kInternal)
+            {
+                ChipLogError(Camera, "Audio stream with ID: %d is Internal", streamID);
+                return Status::DynamicConstraintError;
+            }
+
             // Stop the audio stream
             mCameraDeviceHAL->GetCameraHALInterface().StopAudioStream(streamID);
 
