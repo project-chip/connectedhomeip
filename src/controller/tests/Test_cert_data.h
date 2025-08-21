@@ -26,13 +26,11 @@
 
 #pragma once
 
-
+#include <crypto/CHIPCryptoPAL.h>
 #include <cstddef> // For size_t
 #include <cstdint> // For uint8_t
-#include <crypto/CHIPCryptoPAL.h>
 
-
-// Valid NOC chain certificates for testing 
+// Valid NOC chain certificates for testing
 namespace chip {
 namespace TestCerts {
 
@@ -40,11 +38,11 @@ namespace TestCerts {
 extern const size_t kTestRCAC_size;
 extern const uint8_t kTestRCAC[];
 
-// icac certificate genereated by chip-tool signed by kTestRCAC 
+// icac certificate genereated by chip-tool signed by kTestRCAC
 extern const size_t kTestICAC_size;
 extern const uint8_t kTestICAC[];
 
-// noc certificate genereated by chip-tool signed by kTestICAC 
+// noc certificate genereated by chip-tool signed by kTestICAC
 extern const size_t kTestIcacNOC_size;
 extern const uint8_t kTestIcacNOC[];
 
