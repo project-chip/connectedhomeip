@@ -263,7 +263,7 @@ public:
     void OnProgressUpdate(JCMDeviceCommissioner & commissioner, JCMTrustVerificationStage stage, JCMTrustVerificationInfo & info,
                           JCMTrustVerificationError error);
     void OnAskUserForConsent(JCMDeviceCommissioner & commissioner, JCMTrustVerificationInfo & info);
-    void OnVerifyVendorId(JCMDeviceCommissioner & commissioner, JCMTrustVerificationInfo & info);
+    void OnLookupOperationalTrustAnchor(JCMDeviceCommissioner & commissioner, JCMTrustVerificationInfo & info);
 
 private:
     CHIP_ERROR RunInternal(NodeId remoteId);

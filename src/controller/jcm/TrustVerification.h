@@ -158,7 +158,7 @@ public:
     virtual void OnProgressUpdate(DeviceCommissioner & commissioner, TrustVerificationStage stage, TrustVerificationInfo & info,
                                   TrustVerificationError error)                                       = 0;
     virtual void OnAskUserForConsent(DeviceCommissioner & commissioner, TrustVerificationInfo & info) = 0;
-    virtual void OnVerifyVendorId(DeviceCommissioner & commissioner, TrustVerificationInfo & info)    = 0;
+    virtual void OnLookupOperationalTrustAnchor(DeviceCommissioner & commissioner, TrustVerificationInfo & info) = 0;
 };
 
 } // namespace JCM

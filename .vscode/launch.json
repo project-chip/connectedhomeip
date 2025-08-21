@@ -5,14 +5,6 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Python Debugger: Current File with Arguments",
-            "type": "debugpy",
-            "request": "launch",
-            "program": "${file}",
-            "console": "integratedTerminal",
-            "args": []
-        },
-        {
             "name": "Python: Mock Server Tests",
             "type": "debugpy",
             "request": "launch",
@@ -52,20 +44,113 @@
             "pid": "${command:pickProcess}"
         },
         {
-            "name": "Run application (Darwin x64)",
+            "name": "Run application (chip-tool)",
             "type": "lldb",
             "request": "launch",
-            "program": "${workspaceFolder}/out/${input:outAppDarwin}",
-            "args": [],
+            "program": "${workspaceFolder}/examples/chip-tool/out/debug/chip-tool",
+            "args": [
+                "--storage-directory",
+                "./storage",
+                "interactive",
+                "start"
+            ],
+            "cwd": "${workspaceFolder}/examples/chip-tool/out/debug"
+        },
+        {
+            "name": "Run mdns-advertiser product-id 1 (Linux x64)",
+            "type": "lldb",
+            "request": "launch",
+            "program": "${workspaceFolder}/examples/minimal-mdns/out/debug/mdns-advertiser",
+            "args": [
+                "-4",
+                "-m",
+                "commissionable-node",
+                "--vendor-id",
+                "4381",
+                "--product-id",
+                "1",
+                "--device-type",
+                "144",
+                "--commissioning-mode",
+                "0"
+            ],
             "cwd": "${workspaceFolder}"
         },
         {
-            "name": "Run application Energy-Gtw-Sample (Darwin arm64)",
+            "name": "Run application on localhost (jfc-a)",
             "type": "lldb",
             "request": "launch",
-            "program": "${workspaceFolder}/out/darwin-arm64-energy-gateway/chip-energy-gateway-app",
-            "args": ["--enable-key", "00112233445566778899aabbccddeeff"],
-            "cwd": "${workspaceFolder}/examples/energy-gateway-app"
+            "program": "${workspaceFolder}/examples/jf-control-app/out/debug/jfc-app",
+            "args": [
+                "--rpc-server-ip",
+                "127.0.0.1",
+                "--rpc-server-port",
+                "33033",
+                "--storage-directory",
+                "./jfc_a_storage_directory",
+                "--commissioner-vendor-id",
+                "0xFFF1"
+            ],
+            "cwd": "${workspaceFolder}/examples/jf-control-app/out/debug"
+        },
+        {
+            "name": "Run application (jfc-a)",
+            "type": "lldb",
+            "request": "launch",
+            "program": "${workspaceFolder}/examples/jf-control-app/out/debug/jfc-app",
+            "args": [
+                "--rpc-server-ip",
+                "192.168.1.64",
+                "--rpc-server-port",
+                "33033",
+                "--storage-directory",
+                "./jfc_a_storage_directory",
+                "--commissioner-vendor-id",
+                "0xFFF1"
+            ],
+            "cwd": "${workspaceFolder}/examples/jf-control-app/out/debug"
+        },
+        {
+            "name": "Run application (jfc-b)",
+            "type": "lldb",
+            "request": "launch",
+            "program": "${workspaceFolder}/examples/jf-control-app/out/debug/jfc-app",
+            "args": [
+                "--rpc-server-ip",
+                "192.168.1.64",
+                "--rpc-server-port",
+                "33055",
+                "--storage-directory",
+                "./jfc_b_storage_directory",
+                "--commissioner-vendor-id",
+                "0xFFF2"
+            ],
+            "cwd": "${workspaceFolder}/examples/jf-control-app/out/debug"
+        },
+        {
+            "name": "Run TestJCMCommissioner",
+            "type": "lldb",
+            "request": "launch",
+            "program": "${workspaceFolder}/src/controller/tests/out/test/tests/TestJCMCommissioner",
+            "cwd": "${workspaceFolder}/src/controller/tests/out/test/tests"
+        },
+        {
+            "name": "Run application (valgrind jfc-app)",
+            "type": "lldb",
+            "request": "launch",
+            "program": "valgrind",
+            "args": [
+                "${workspaceFolder}/examples/jf-control-app/out/debug/jfc-app",
+                "--rpc-server-ip",
+                "192.168.1.64",
+                "--rpc-server-port",
+                "33055",
+                "--storage-directory",
+                "./jfc_b_storage_directory",
+                "--commissioner-vendor-id",
+                "0xFFF2"
+            ],
+            "cwd": "${workspaceFolder}/examples/jf-control-app/out/debug"
         },
         {
             "name": "Run application (Linux x64)",

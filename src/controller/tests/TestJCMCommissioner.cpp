@@ -64,10 +64,12 @@ public:
         commissioner.ContinueAfterUserConsent(mShouldConsent);
     }
 
-    void OnVerifyVendorId(DeviceCommissioner & commissioner, TrustVerificationInfo & info) override
+    void OnLookupOperationalTrustAnchor(
+        DeviceCommissioner & commissioner, 
+        TrustVerificationInfo & info)
     {
         mAskedForVendorIdVerification = true;
-        commissioner.ContinueAfterVendorIDVerification(mShouldVerifyVendorId);
+        commissioner.ContinueAfterLookupOperationalTrustAnchor(info.rootPublicKey.Span());
     }
 
     int mProgressUpdates               = 0;
@@ -76,7 +78,7 @@ public:
     bool mAskedForConsent              = false;
     bool mShouldConsent                = true;
     bool mAskedForVendorIdVerification = false;
-    bool mShouldVerifyVendorId         = true;
+    CHIP_ERROR mVerifyVendorIdStatus   = CHIP_NO_ERROR;
     VendorId mLastVendorId             = VendorId::Common;
 };
 
@@ -373,7 +375,7 @@ TEST_F_FROM_FIXTURE(TestCommissioner, TestTrustVerificationStageFinishedHandlesU
 TEST_F_FROM_FIXTURE(TestCommissioner, TestTrustVerificationStageFinishedHandlesError)
 {
     TestableDeviceCommissioner commissioner;
-    mTrustVerificationDelegate.mShouldVerifyVendorId = false; // Simulate vendor id verification failure
+    mTrustVerificationDelegate.mVerifyVendorIdError = CHIP_ERROR_INTERNAL; // Simulate vendor id verification failure
     commissioner.RegisterTrustVerificationDelegate(&mTrustVerificationDelegate);
 
     TrustVerificationStage stage = TrustVerificationStage::kVerifyingAdministratorInformation;

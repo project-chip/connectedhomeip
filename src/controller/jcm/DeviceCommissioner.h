@@ -51,6 +51,10 @@ public:
     DeviceCommissioner() {}
     ~DeviceCommissioner() {}
 
+    DeviceProxy *GetDeviceProxy() {
+        return mDeviceProxy;
+    }
+
     void RegisterTrustVerificationDelegate(TrustVerificationDelegate * trustVerificationDelegate)
     {
         ChipLogProgress(Controller, "JCM: Setting trust verification delegate");
@@ -64,7 +68,7 @@ public:
      *
      * @return CHIP_ERROR indicating success or failure of the operation.
      */
-    CHIP_ERROR StartJCMTrustVerification() override;
+    CHIP_ERROR StartJCMTrustVerification(DeviceProxy *proxy) override;
 
     /*
      * ContinueAfterUserConsent is a method that continues the JCM trust verification process after the user has
@@ -75,13 +79,13 @@ public:
      */
     void ContinueAfterUserConsent(bool consent);
 
-    /*
-     * ContinueAfterVendorIDVerification is a method that continues the JCM trust verification process after the
-     * vendor ID verification step. It will call the trust verification delegate to continue the process.
+    /**
+     * ContinueAfterLookupOperationalTrustAnchor is a method that continues the JCM trust verification process after the
+     * lookup of the operational trust anchor. It will call the trust verification delegate to continue the process.
      *
-     * @param verified A boolean indicating whether the vendor ID verification was successful (true) or not (false).
+     * @param globallyTrustedRootSpan A ByteSpan representing the globally trusted root public key.
      */
-    void ContinueAfterVendorIDVerification(bool verified);
+    void ContinueAfterLookupOperationalTrustAnchor(CHIP_ERROR err, ByteSpan globallyTrustedRootSpan);
 
     /*
      * GetTrustVerificationInfo is a method that returns the JCM trust verification information.
@@ -102,8 +106,19 @@ private:
 
     // JCM commissioning trust verification steps
     TrustVerificationError VerifyAdministratorInformation();
+    CHIP_ERROR OnSignVIDVerificationSuccessCb(
+        ByteSpan signatureSpan,
+        ByteSpan clientChallengeSpan);
     TrustVerificationError PerformVendorIDVerificationProcedure();
     TrustVerificationError AskUserForConsent();
+
+    /*
+     * ContinueAfterVendorIDVerification is a method that continues the JCM trust verification process after the
+     * vendor ID verification step.
+     *
+     * @param err The error code indicating the result of the vendor ID verification. CHIP_NO_ERROR if successful.
+     */
+    void ContinueAfterVendorIDVerification(CHIP_ERROR err);
 
     TrustVerificationStage GetNextTrustVerificationStage(TrustVerificationStage currentStage);
     void PerformTrustVerificationStage(TrustVerificationStage nextStage);
@@ -127,6 +142,8 @@ private:
     // and is passed to the JCM trust verification delegate
     // when the trust verification process is complete
     TrustVerificationInfo mInfo;
+    // Device proxy for the device being commissioned
+    DeviceProxy *mDeviceProxy;
 
     friend class TestCommissioner;
 };
