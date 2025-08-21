@@ -79,7 +79,8 @@ Status AVSettingsUserLevelManagementDelegate::MPTZSetPosition(Optional<int16_t> 
     if (callback != nullptr)
     {
         DeviceLayer::SystemLayer().ScheduleLambda([callback] { callback->OnPhysicalMovementComplete(Status::Success); });
-    }    return Status::Success;
+    }
+    return Status::Success;
 }
 
 Status AVSettingsUserLevelManagementDelegate::MPTZRelativeMove(Optional<int16_t> aPan, Optional<int16_t> aTilt,
@@ -106,7 +107,8 @@ Status AVSettingsUserLevelManagementDelegate::MPTZMoveToPreset(uint8_t aPreset, 
     if (callback != nullptr)
     {
         DeviceLayer::SystemLayer().ScheduleLambda([callback] { callback->OnPhysicalMovementComplete(Status::Success); });
-    }    return Status::Success;
+    }
+    return Status::Success;
 }
 
 Status AVSettingsUserLevelManagementDelegate::MPTZSavePreset(uint8_t aPreset)

@@ -76,72 +76,81 @@ CHIP_ERROR CameraAvSettingsUserLevelMgmtServer::Init()
         (HasFeature(Feature::kMechanicalPan) || HasFeature(Feature::kMechanicalTilt) || HasFeature(Feature::kMechanicalZoom)))
     {
         ChipLogError(Zcl,
-            "CameraAVSettingsUserLevelMgmt[ep=%d]: Feature configuration error. If MPTZPosition is enabled "
-            "then one of Pan, Tilt, or Zoom is required and vice versa", mEndpointId);
+                     "CameraAVSettingsUserLevelMgmt[ep=%d]: Feature configuration error. If MPTZPosition is enabled "
+                     "then one of Pan, Tilt, or Zoom is required and vice versa",
+                     mEndpointId);
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
 
     if (SupportsOptAttr(OptionalAttributes::kMaxPresets) != (HasFeature(Feature::kMechanicalPresets)))
     {
         ChipLogError(Zcl,
-            "CameraAVSettingsUserLevelMgmt[ep=%d]: Feature configuration error. If MaxPresets "
-            "is enabled, then MechanicalPresets feature is required and vice versa", mEndpointId);
+                     "CameraAVSettingsUserLevelMgmt[ep=%d]: Feature configuration error. If MaxPresets "
+                     "is enabled, then MechanicalPresets feature is required and vice versa",
+                     mEndpointId);
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
 
     if (SupportsOptAttr(OptionalAttributes::kMptzPresets) != (HasFeature(Feature::kMechanicalPresets)))
     {
         ChipLogError(Zcl,
-            "CameraAVSettingsUserLevelMgmt[ep=%d]: Feature configuration error. If MPTZPresets "
-            "is enabled, then MechanicalPresets feature is required", mEndpointId);
+                     "CameraAVSettingsUserLevelMgmt[ep=%d]: Feature configuration error. If MPTZPresets "
+                     "is enabled, then MechanicalPresets feature is required",
+                     mEndpointId);
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
 
     if (SupportsOptAttr(OptionalAttributes::kDptzStreams) != (HasFeature(Feature::kDigitalPTZ)))
     {
         ChipLogError(Zcl,
-            "CameraAVSettingsUserLevelMgmt[ep=%d]: Feature configuration error. If "
-            "DPTZStreams is enabled, then DigitalPTZ feature is required and vice versa", mEndpointId);
+                     "CameraAVSettingsUserLevelMgmt[ep=%d]: Feature configuration error. If "
+                     "DPTZStreams is enabled, then DigitalPTZ feature is required and vice versa",
+                     mEndpointId);
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
 
     if (SupportsOptAttr(OptionalAttributes::kZoomMax) != (HasFeature(Feature::kMechanicalZoom)))
     {
         ChipLogError(Zcl,
-            "CameraAVSettingsUserLevelMgmt[ep=%d]: Feature configuration error. If ZoomMax is "
-            "enabled, then MechanicalZoom feature is required and vice versa", mEndpointId);
+                     "CameraAVSettingsUserLevelMgmt[ep=%d]: Feature configuration error. If ZoomMax is "
+                     "enabled, then MechanicalZoom feature is required and vice versa",
+                     mEndpointId);
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
 
     if (SupportsOptAttr(OptionalAttributes::kTiltMin) != (HasFeature(Feature::kMechanicalTilt)))
     {
         ChipLogError(Zcl,
-            "CameraAVSettingsUserLevelMgmt[ep=%d]: Feature configuration error. If TiltMin is "
-            "enabled, then MechanicalTilt feature is required and vice versa", mEndpointId);
+                     "CameraAVSettingsUserLevelMgmt[ep=%d]: Feature configuration error. If TiltMin is "
+                     "enabled, then MechanicalTilt feature is required and vice versa",
+                     mEndpointId);
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
 
     if (SupportsOptAttr(OptionalAttributes::kTiltMax) != (HasFeature(Feature::kMechanicalTilt)))
     {
         ChipLogError(Zcl,
-            "CameraAVSettingsUserLevelMgmt[ep=%d]: Feature configuration error. If TiltMax is "
-            "enabled, then MechanicalTilt feature is required and vice versa", mEndpointId);
+                     "CameraAVSettingsUserLevelMgmt[ep=%d]: Feature configuration error. If TiltMax is "
+                     "enabled, then MechanicalTilt feature is required and vice versa",
+                     mEndpointId);
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
 
     if (SupportsOptAttr(OptionalAttributes::kPanMin) != (HasFeature(Feature::kMechanicalPan)))
     {
         ChipLogError(Zcl,
-            "CameraAVSettingsUserLevelMgmt[ep=%d]: Feature configuration error. If PanMin is "
-            "enabled, then MechanicalPan feature is required and vice versa", mEndpointId);
+                     "CameraAVSettingsUserLevelMgmt[ep=%d]: Feature configuration error. If PanMin is "
+                     "enabled, then MechanicalPan feature is required and vice versa",
+                     mEndpointId);
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
 
     if (SupportsOptAttr(OptionalAttributes::kPanMax) != (HasFeature(Feature::kMechanicalPan)))
     {
         ChipLogError(Zcl,
-            "CameraAVSettingsUserLevelMgmt[ep=%d]: Feature configuration error. If PanMax is "
-            "enabled, then MechanicalPan feature is required and vice versa", mEndpointId);
+                     "CameraAVSettingsUserLevelMgmt[ep=%d]: Feature configuration error. If PanMax is "
+                     "enabled, then MechanicalPan feature is required and vice versa",
+                     mEndpointId);
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
 
@@ -149,8 +158,9 @@ CHIP_ERROR CameraAvSettingsUserLevelMgmtServer::Init()
         (HasFeature(Feature::kMechanicalPan) || HasFeature(Feature::kMechanicalTilt) || HasFeature(Feature::kMechanicalZoom)))
     {
         ChipLogError(Zcl,
-            "CameraAVSettingsUserLevelMgmt[ep=%d]: Feature configuration error. If MovementState is enabled "
-            "then one of Pan, Tilt, or Zoom is required and vice versa", mEndpointId);
+                     "CameraAVSettingsUserLevelMgmt[ep=%d]: Feature configuration error. If MovementState is enabled "
+                     "then one of Pan, Tilt, or Zoom is required and vice versa",
+                     mEndpointId);
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
 
@@ -371,7 +381,6 @@ void CameraAvSettingsUserLevelMgmtServer::SetZoom(Optional<uint8_t> aZoom)
         }
     }
 }
-
 
 void CameraAvSettingsUserLevelMgmtServer::SetMovementState(PhysicalMovementEnum aMovementState)
 {
@@ -836,8 +845,8 @@ void CameraAvSettingsUserLevelMgmtServer::HandleMPTZSetPosition(HandlerContext &
         return;
     }
 
-    // If the camera is still in motion, then return Busy.  Subsequently check with the delegate that we're in a position to change any
-    // of the PTZ values which may not be possible for other reasons
+    // If the camera is still in motion, then return Busy.  Subsequently check with the delegate that we're in a position to change
+    // any of the PTZ values which may not be possible for other reasons
     //
     if (IsMoving())
     {
@@ -1009,8 +1018,8 @@ void CameraAvSettingsUserLevelMgmtServer::HandleMPTZRelativeMove(HandlerContext 
         return;
     }
 
-    // If the camera is still in motion, then return Busy.  Subsequently check with the delegate that we're in a position to change any
-    // of the PTZ values which may not be possible for other reasons
+    // If the camera is still in motion, then return Busy.  Subsequently check with the delegate that we're in a position to change
+    // any of the PTZ values which may not be possible for other reasons
     //
     if (IsMoving())
     {
@@ -1039,9 +1048,9 @@ void CameraAvSettingsUserLevelMgmtServer::HandleMPTZRelativeMove(HandlerContext 
     // We don't update the server persisted attributes until the delegate confirms via callback that the physical device movement is
     // complete
     //
-    mTargetPan     = newPan;
-    mTargetTilt    = newTilt;
-    mTargetZoom    = newZoom;
+    mTargetPan  = newPan;
+    mTargetTilt = newTilt;
+    mTargetZoom = newZoom;
     SetMovementState(PhysicalMovementEnum::kMoving);
 
     ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);
@@ -1083,8 +1092,8 @@ void CameraAvSettingsUserLevelMgmtServer::HandleMPTZMoveToPreset(HandlerContext 
         return;
     }
 
-    // If the camera is still in motion, then return Busy.  Subsequently check with the delegate that we're in a position to change any
-    // of the PTZ values which may not be possible for other reasons
+    // If the camera is still in motion, then return Busy.  Subsequently check with the delegate that we're in a position to change
+    // any of the PTZ values which may not be possible for other reasons
     //
     if (IsMoving())
     {
@@ -1115,9 +1124,9 @@ void CameraAvSettingsUserLevelMgmtServer::HandleMPTZMoveToPreset(HandlerContext 
     // We don't update the server persisted attributes until the delegate confirms via callback that the physical device movement is
     // complete
     //
-    mTargetPan     = presetValues.pan;
-    mTargetTilt    = presetValues.tilt;
-    mTargetZoom    = presetValues.zoom;
+    mTargetPan  = presetValues.pan;
+    mTargetTilt = presetValues.tilt;
+    mTargetZoom = presetValues.zoom;
     SetMovementState(PhysicalMovementEnum::kMoving);
 
     ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);
