@@ -1605,34 +1605,42 @@ public class ChipDeviceController {
     shutdownCommissioning(deviceControllerPtr);
   }
 
-  // Functions used by Chiptool for Android to retrieve some values of CommissioningStage enum (as defined in CommissioningDelegate.h)
-  // The Android application can use MatterCommissioningProgressListener() to know the current CommissioningStage.
-  // The value returned by MatterCommissioningProgressListener is then compared to the values returned by the
+  // Functions used by Chiptool for Android to retrieve some values of CommissioningStage enum (as
+  // defined in CommissioningDelegate.h)
+  // The Android application can use MatterCommissioningProgressListener() to know the current
+  // CommissioningStage.
+  // The value returned by MatterCommissioningProgressListener is then compared to the values
+  // returned by the
   // functions below to know at which stage of the commissioning we are.
   public int getCommissioningStagekErrorValue() {
     return getCommissioningStagekErrorValue(deviceControllerPtr);
   }
+
   public int getCommissioningStagekReadCommissioningInfoValue() {
     return getCommissioningStagekReadCommissioningInfoValue(deviceControllerPtr);
   }
+
   public int getCommissioningStagekSendDACCertificateRequestValue() {
     return getCommissioningStagekSendDACCertificateRequestValue(deviceControllerPtr);
   }
+
   public int getCommissioningStagekSendNOCValue() {
     return getCommissioningStagekSendNOCValue(deviceControllerPtr);
   }
+
   public int getCommissioningStagekThreadNetworkSetupValue() {
     return getCommissioningStagekThreadNetworkSetupValue(deviceControllerPtr);
   }
+
   public int getCommissioningStagekFindOperationalForStayActiveValue() {
     return getCommissioningStagekFindOperationalForStayActiveValue(deviceControllerPtr);
   }
+
   public int getCommissioningStagekSendCompleteValue() {
     return getCommissioningStagekSendCompleteValue(deviceControllerPtr);
   }
 
   public static native byte[] validateAndExtractCSR(byte[] csrElements, byte[] csrNonce);
-
 
   private native PaseVerifierParams computePaseVerifier(
       long deviceControllerPtr, long devicePtr, long setupPincode, long iterations, byte[] salt);
@@ -1716,7 +1724,8 @@ public class ChipDeviceController {
 
   private native void releaseOperationalDevicePointer(long devicePtr);
 
-  private native void setMatterCommissioningProgressListener(long deviceControllerPtr, MatterCommissioningProgressListener listener);
+  private native void setMatterCommissioningProgressListener(
+      long deviceControllerPtr, MatterCommissioningProgressListener listener);
 
   private native long getGroupDevicePointer(long deviceControllerPtr, int groupId);
 
@@ -1807,16 +1816,26 @@ public class ChipDeviceController {
 
   private native void stopDnssd(long deviceControllerPtr);
 
-  // Functions used by Chiptool for Android to retrieve some values of CommissioningStage enum (as defined in CommissioningDelegate.h)
-  // The Android application can use MatterCommissioningProgressListener() to know the current CommissioningStage.
-  // The value returned by MatterCommissioningProgressListener is then compared to the values returned by the
+  // Functions used by Chiptool for Android to retrieve some values of CommissioningStage enum (as
+  // defined in CommissioningDelegate.h)
+  // The Android application can use MatterCommissioningProgressListener() to know the current
+  // CommissioningStage.
+  // The value returned by MatterCommissioningProgressListener is then compared to the values
+  // returned by the
   // functions below to know at which stage of the commissioning we are.
   private native int getCommissioningStagekErrorValue(long deviceControllerPtr);
+
   private native int getCommissioningStagekReadCommissioningInfoValue(long deviceControllerPtr);
+
   private native int getCommissioningStagekSendDACCertificateRequestValue(long deviceControllerPtr);
+
   private native int getCommissioningStagekSendNOCValue(long deviceControllerPtr);
+
   private native int getCommissioningStagekThreadNetworkSetupValue(long deviceControllerPtr);
-  private native int getCommissioningStagekFindOperationalForStayActiveValue(long deviceControllerPtr);
+
+  private native int getCommissioningStagekFindOperationalForStayActiveValue(
+      long deviceControllerPtr);
+
   private native int getCommissioningStagekSendCompleteValue(long deviceControllerPtr);
 
   static {
