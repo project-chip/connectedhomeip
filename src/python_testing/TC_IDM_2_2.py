@@ -177,7 +177,8 @@ class TC_IDM_2_2(MatterBaseTest, BasicCompositionTests):
 
             # Attribute lists
             for cluster in read_request.tlvAttributes[endpoint]:
-                returned_attrs = sorted([x for x in read_request.tlvAttributes[endpoint][cluster].keys()])
+                returned_attrs = sorted([x for x in read_request.tlvAttributes[endpoint][cluster].keys()
+                                       if x != Clusters.UnitTesting.Attributes.WriteOnlyInt8u.attribute_id])
                 attr_list = sorted([x for x in read_request.tlvAttributes[endpoint][cluster][
                     ClusterObjects.ALL_CLUSTERS[cluster].Attributes.AttributeList.attribute_id]
                     if x != Clusters.UnitTesting.Attributes.WriteOnlyInt8u.attribute_id])
