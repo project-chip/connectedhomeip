@@ -213,7 +213,7 @@ if CHIP_APP_OPERATIONAL_KEYSTORE
     endchoice # CHIP_APP_OPERATIONAL_KEYSTORE_SELECTION
 
     config PRIVATE_ECC_KEY_BLOB_SIZE
-        int "Operationnal private ECC key blob size"
+        int "Operational private ECC key blob size"
         default 120 if CHIP_APP_OPERATIONAL_KEYSTORE_S200
         default 48 if CHIP_APP_OPERATIONAL_KEYSTORE_S50
 

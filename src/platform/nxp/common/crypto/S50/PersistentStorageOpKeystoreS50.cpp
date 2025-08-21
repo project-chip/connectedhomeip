@@ -91,7 +91,7 @@ CHIP_ERROR P256KeypairNXP::ExportBlob(P256SerializedKeypairNXP & output) const
     ELS_MUTEX_LOCK();
     /* Import plain DAC key into S50 */
     status = import_plain_key_into_els(privkey, kP256_PrivateKey_Length, plain_key_properties, &key_index);
-    STATUS_SUCCESS_OR_EXIT_MSG("derive_key failed: 0x%08x", status);
+    STATUS_SUCCESS_OR_EXIT_MSG("import_plain_key_into_els failed: 0x%08x", status);
 
     /* ELS generate key blob. The blob created here is one that can be directly imported into ELS again. */
     status = export_key_from_els(key_index, output.Bytes(), &blobSize);
@@ -180,7 +180,8 @@ CHIP_ERROR PersistentStorageOpKeystoreS50::SignWithOpKeypair(FabricIndex fabricI
     PLOG_DEBUG_BUFFER("public_key", public_key, public_key_size);
 
     /* ECC sign message hash with the key index slot reserved during the blob importation */
-    ELS_sign_hash(digest, ecc_signature, &sign_options, key_index);
+    status = ELS_sign_hash(digest, ecc_signature, &sign_options, key_index);
+    STATUS_SUCCESS_OR_EXIT_MSG("ELS_sign_hash failed: 0x%08x", status);
 
     /* Delete SE50 key with the index slot reserved during the blob importation (free key slot) */
     els_delete_key(key_index);
