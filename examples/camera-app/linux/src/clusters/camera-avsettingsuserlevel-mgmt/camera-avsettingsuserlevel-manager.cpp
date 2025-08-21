@@ -70,7 +70,7 @@ Status CameraAVSettingsUserLevelManager::MPTZSetPosition(Optional<int16_t> aPan,
     //
     mCameraDeviceHAL->GetCameraHALInterface().SetPhysicalPTZ(aPan, aTilt, aZoom);
 
-    // For the purposes of the Camera App, run a timer equivalent to a typical physical elapsed time for PTZ. AAn actual HAL will
+    // For the purposes of the Camera App, run a timer equivalent to a typical physical elapsed time for PTZ. An actual HAL will
     // invoke OnPhysicalMoveCompleted method once it has determined via its own means that the move is completed.
     //
     DeviceLayer::SystemLayer().StartTimer(System::Clock::Seconds16(2), onTimerExpiry, this);
@@ -308,7 +308,7 @@ CHIP_ERROR CameraAVSettingsUserLevelManager::PersistentAttributesLoadedCallback(
     return CHIP_NO_ERROR;
 }
 
-// Timer expiration to mimic PTZ phyiscal movememt
+// Timer expiration to mimic PTZ physical movememt
 //
 static void onTimerExpiry(System::Layer * systemLayer, void * data)
 {
@@ -321,5 +321,8 @@ static void onTimerExpiry(System::Layer * systemLayer, void * data)
 //
 void CameraAVSettingsUserLevelManager::OnPhysicalMoveCompleted(Protocols::InteractionModel::Status status)
 {
-    mCallback->OnPhysicalMovementComplete(status);
+    if (mCallback != nullptr)
+    {
+        mCallback->OnPhysicalMovementComplete(status);
+    }
 }

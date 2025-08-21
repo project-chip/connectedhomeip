@@ -1050,7 +1050,7 @@ void CameraAvSettingsUserLevelMgmtServer::HandleMPTZRelativeMove(HandlerContext 
     mTargetPan     = newPan;
     mTargetTilt    = newTilt;
     mTargetZoom    = newZoom;
-    mMovementState = PhysicalMovementEnum::kMoving;
+    SetMovementState(PhysicalMovementEnum::kMoving);
 
     ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);
 }
@@ -1126,7 +1126,7 @@ void CameraAvSettingsUserLevelMgmtServer::HandleMPTZMoveToPreset(HandlerContext 
     mTargetPan     = presetValues.pan;
     mTargetTilt    = presetValues.tilt;
     mTargetZoom    = presetValues.zoom;
-    mMovementState = PhysicalMovementEnum::kMoving;
+    SetMovementState(PhysicalMovementEnum::kMoving);
 
     ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);
 }

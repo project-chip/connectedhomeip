@@ -76,8 +76,10 @@ Status AVSettingsUserLevelManagementDelegate::MPTZSetPosition(Optional<int16_t> 
     // hardware interactions to actually set the camera to the new values of PTZ.  Once the hardware has confirmed movements, invoke
     // the callback. The server itself will persist the new values.
     //
-    DeviceLayer::SystemLayer().ScheduleLambda([callback] { callback->OnPhysicalMovementComplete(Status::Success); });
-    return Status::Success;
+    if (callback != nullptr) 
+    {
+        DeviceLayer::SystemLayer().ScheduleLambda([callback] { callback->OnPhysicalMovementComplete(Status::Success); });
+    }    return Status::Success;
 }
 
 Status AVSettingsUserLevelManagementDelegate::MPTZRelativeMove(Optional<int16_t> aPan, Optional<int16_t> aTilt,
@@ -87,7 +89,10 @@ Status AVSettingsUserLevelManagementDelegate::MPTZRelativeMove(Optional<int16_t>
     // hardware interactions to actually set the camera to the new values of PTZ.  Once the hardware has confirmed movements, invoke
     // the callback. The server itself will persist the new values.
     //
-    DeviceLayer::SystemLayer().ScheduleLambda([callback] { callback->OnPhysicalMovementComplete(Status::Success); });
+    if (callback != nullptr) 
+    {
+        DeviceLayer::SystemLayer().ScheduleLambda([callback] { callback->OnPhysicalMovementComplete(Status::Success); });
+    }
     return Status::Success;
 }
 
@@ -98,8 +103,10 @@ Status AVSettingsUserLevelManagementDelegate::MPTZMoveToPreset(uint8_t aPreset, 
     // Do any needed hardware interactions to actually set the camera to the new values of PTZ.  Once the hardware has confirmed
     // movements, invoke the callback. The server itself will persist the new values.
     //
-    DeviceLayer::SystemLayer().ScheduleLambda([callback] { callback->OnPhysicalMovementComplete(Status::Success); });
-    return Status::Success;
+    if (callback != nullptr) 
+    {
+        DeviceLayer::SystemLayer().ScheduleLambda([callback] { callback->OnPhysicalMovementComplete(Status::Success); });
+    }    return Status::Success;
 }
 
 Status AVSettingsUserLevelManagementDelegate::MPTZSavePreset(uint8_t aPreset)

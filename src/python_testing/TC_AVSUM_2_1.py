@@ -223,7 +223,7 @@ class TC_AVSUM_2_1(MatterBaseTest, AVSUMTestBase):
         else:
             logging.info("DPTZ Feature not supported. Test step skipped")
             self.skip_step(12)
-            self.skip_step(12)
+            self.skip_step(13)
             self.skip_step(14)
 
 
