@@ -86,7 +86,14 @@ class TC_SETRF_2_1(MatterBaseTest, CommodityTariffTestBaseHelper):
             TestStep("4", "TH reads StartDate attribute.", """
                      - DUT replies a Null or a value of epoch-s type;
                      - Store value as startDateAttributeValue."""),
-            TestStep("5", "TH reads DayEntries attribute.", """
+            TestStep("5", "TH reads IndividualDays attribute.", """
+                     - DUT replies a Null or a value that is a list of DayStruct entries with list length less or equal 50;
+                     - Verify that Date field has epoch-s type;
+                     - Verify that DayType field has DayTypeEnum type and value in range 0 - 3.
+                     - Verify that DayEntryIDs field is list of uint32 with length in range 1 - 96;
+                     - Verify that the DayStruct in this list SHALL be arranged in increasing order by the value of Date field;
+                     - Verify that the DayStruct in this list do not overlap."""),
+            TestStep("6", "TH reads DayEntries attribute.", """
                      - DUT replies a Null or a value that is a list of DayEntryStruct entries;
                      - Verify that DayEntryID field has uint32 type;
                      - Verify that StartTime field has uint16 type with value less or equal 1499;
@@ -99,12 +106,12 @@ class TC_SETRF_2_1(MatterBaseTest, CommodityTariffTestBaseHelper):
                         - Verify that if RandomizationOffset field is presented and randomizationTypeValue is 0x04 (RandomNegative) it has int16 type and value less or equal 0;
                         - Verify that if RandomizationOffset field is presented and randomizationTypeValue is not 0x01 (Fixed) or 0x04 (RandomNegative) it has int16 type and value greater or equal 0.
                         value greater or equal 0."""),
-            TestStep("6", "TH reads DayPatterns attribute.", """
+            TestStep("7", "TH reads DayPatterns attribute.", """
                      - DUT replies a Null or a value that is a list of DayPatternStruct entries with length less or equal 28;
                      - Verify that DayPatternID field has uint32 type;
                      - Verify that DaysOfWeek field has DayPatternDayOfWeekBitmap type;
                      - Verify that DayEntryIDs field is list of uint32 with length in range 1 - 96;"""),
-            TestStep("7", "TH reads CalendarPeriods attribute.", """
+            TestStep("8", "TH reads CalendarPeriods attribute.", """
                      - DUT replies a Null or a value that is a list of CalendarPeriodStruct entries;
                      - Verify that the list length between 1 and 4 entries.
                      - Verify that StartDate field is null or has type epoch-s with value greater or equal startDateAttributeValue;
@@ -112,13 +119,6 @@ class TC_SETRF_2_1(MatterBaseTest, CommodityTariffTestBaseHelper):
                      - Verify that if the startDateAttributeValue is Null, the StartDate field on the first CalendarPeriodStruct item SHALL also be Null;
                      - Verify that if the startDateAttributeValue is Null, the StartDate field on any subsequent CalendarPeriodStruct items is not null;
                      - Verify that DayPatternIDs field is list of uint32 with length in range 1 - 7"""),
-            TestStep("8", "TH reads IndividualDays attribute.", """
-                     - DUT replies a Null or a value that is a list of DayStruct entries with list length less or equal 50;
-                     - Verify that Date field has epoch-s type;
-                     - Verify that DayType field has DayTypeEnum type and value in range 0 - 3.
-                     - Verify that DayEntryIDs field is list of uint32 with length in range 1 - 96;
-                     - Verify that the DayStruct in this list SHALL be arranged in increasing order by the value of Date field;
-                     - Verify that the DayStruct in this list do not overlap."""),
             TestStep("9", "TH reads CurrentDay attribute.", """
                      - DUT replies a Null or a value of DayStruct type;
                      - Verify that Date field has epoch-s type;
@@ -276,71 +276,71 @@ class TC_SETRF_2_1(MatterBaseTest, CommodityTariffTestBaseHelper):
 
         self.step("2")
         # TH reads TariffInfo attribute, expects a TariffInformationStruct
-        self.check_tariff_info_attribute(endpoint)
+        await self.check_tariff_info_attribute(endpoint)
 
         self.step("3")
         # TH reads TariffUnit attribute, expects a TariffUnitEnum
-        self.check_tariff_unit_attribute(endpoint)
+        await self.check_tariff_unit_attribute(endpoint)
 
         self.step("4")
         # TH reads StartDate attribute, expects a epoch-s
-        self.check_start_date_attribute(endpoint)
+        await self.check_start_date_attribute(endpoint)
 
         self.step("5")
-        # TH reads DayEntries attribute, expects a list of DayEntryStruct
-        self.check_day_entries_attribute(endpoint)
+        # TH reads IndividualDays attribute, expects a list of DayStruct
+        await self.check_individual_days_attribute(endpoint)
 
         self.step("6")
-        # TH reads DayPatterns attribute, expects a list of DayPatternStruct
-        self.check_day_patterns_attribute(endpoint)
+        # TH reads DayEntries attribute, expects a list of DayEntryStruct
+        await self.check_day_entries_attribute(endpoint)
 
         self.step("7")
-        # TH reads CalendarPeriods attribute, expects a list of CalendarPeriodStruct sorted by StartDate field in increasing order
-        self.check_calendar_periods_attribute(endpoint)
+        # TH reads DayPatterns attribute, expects a list of DayPatternStruct
+        await self.check_day_patterns_attribute(endpoint)
 
         self.step("8")
-        # TH reads IndividualDays attribute, expects a list of DayStruct
-        self.check_individual_days_attribute(endpoint)
+        # TH reads CalendarPeriods attribute, expects a list of CalendarPeriodStruct sorted by StartDate field in increasing order
+        await self.check_calendar_periods_attribute(endpoint)
 
         self.step("9")
         # TH reads CurrentDay attribute, expects a DayStruct
-        self.check_current_day_attribute(endpoint)
+        await self.check_current_day_attribute(endpoint)
 
         self.step("10")
         # TH reads NextDay attribute, expects a DayStruct
-        self.check_next_day_attribute(endpoint)
+        await self.check_next_day_attribute(endpoint)
 
         self.step("11")
         # TH reads CurrentDayEntry attribute, expects a DayEntryStruct
-        self.check_current_day_entry_attribute(endpoint)
+        await self.check_current_day_entry_attribute(endpoint)
 
         self.step("12")
         # TH reads CurrentDayEntryDate attribute, expects a uint32
-        self.check_current_day_entry_date_attribute(endpoint)
+        await self.check_current_day_entry_date_attribute(endpoint)
 
         self.step("13")
         # TH reads NextDayEntry attribute, expects a DayEntryStruct
-        self.check_next_day_entry_attribute(endpoint)
+        await self.check_next_day_entry_attribute(endpoint)
 
         self.step("14")
         # TH reads NextDayEntryDate attribute, expects a uint32
-        self.check_next_day_entry_date_attribute(endpoint)
+        await self.check_next_day_entry_date_attribute(endpoint)
 
         self.step("15")
         # TH reads TariffComponents attribute, expects a list of TariffComponentStruct
-        self.check_tariff_components_attribute(endpoint)
+        await self.check_tariff_components_attribute(endpoint)
 
         self.step("16")
         # TH reads TariffPeriods attribute, expects a list of TariffPeriodStruct
-        self.check_tariff_periods_attribute(endpoint)
+        await self.check_tariff_periods_attribute(endpoint)
 
         self.step("17")
         # TH reads CurrentTariffComponents attribute, expects a list of TariffComponentStruct
-        self.check_current_tariff_components_attribute(endpoint)
+        await self.check_current_tariff_components_attribute(endpoint)
 
         self.step("18")
         # TH reads NextTariffComponents attribute, expects a list of TariffComponentStruct
-        self.check_next_tariff_components_attribute(endpoint)
+        await self.check_next_tariff_components_attribute(endpoint)
 
         if not self.check_pics("SETRF.S.A0012"):  # Checks if attribute is supported
             logger.info("PICS SETRF.S.A0012 is not True")
@@ -348,7 +348,7 @@ class TC_SETRF_2_1(MatterBaseTest, CommodityTariffTestBaseHelper):
         else:
             self.step("19")
             # TH reads DefaultRandomizationType attribute, expects a DayEntryRandomizationTypeEnum
-            self.check_default_randomization_type_attribute(endpoint)
+            await self.check_default_randomization_type_attribute(endpoint)
 
         if not self.check_pics("SETRF.S.A0011"):  # Checks if attribute is supported
             logger.info("PICS SETRF.S.A0011 is not True")
@@ -356,7 +356,7 @@ class TC_SETRF_2_1(MatterBaseTest, CommodityTariffTestBaseHelper):
         else:
             self.step("20")
             # TH reads DefaultRandomizationOffset attribute, expects a int16
-            self.check_default_randomization_offset_attribute(endpoint)
+            await self.check_default_randomization_offset_attribute(endpoint)
 
 
 if __name__ == "__main__":

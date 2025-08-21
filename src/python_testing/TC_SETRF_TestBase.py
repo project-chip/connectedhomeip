@@ -15,8 +15,8 @@
 #    limitations under the License.
 
 
+import asyncio
 import logging
-import time
 
 from mobly import asserts
 
@@ -44,6 +44,7 @@ class CommodityTariffTestBaseHelper(MatterBaseTest):
     startDateAttributeValue = None
     defaultRandomizationType = None
     defaultRandomizationOffset = None
+    dayEntryIDsEvents = []
 
     async def check_list_elements_uniqueness(self, list_to_check: list, object_name: str = "Elements"):
         """
@@ -111,11 +112,16 @@ class CommodityTariffTestBaseHelper(MatterBaseTest):
         Checks the correctness of the DayEntryStruct data type entries."""
 
         matter_asserts.assert_valid_uint32(struct.dayEntryID, 'DayEntryID must has uint32 type.')
+
         matter_asserts.assert_valid_uint16(struct.startTime, 'StartTime must has uint16 type.')
         asserts.assert_less_equal(struct.startTime, 1499)
-        if struct.duration is not None:
-            matter_asserts.assert_valid_uint16(struct.duration, 'Duration must has uint16 type.')
-            asserts.assert_less_equal(struct.duration, 1500 - struct.startTime)
+
+        # checking Duration field only for days with DayType: Event
+        if struct.dayEntryID in self.dayEntryIDsEvents:
+            if struct.duration is not None:
+                matter_asserts.assert_valid_uint16(struct.duration, 'Duration must has uint16 type.')
+                asserts.assert_less_equal(struct.duration, 1500 - struct.startTime)
+
         if self.check_pics("SETRF.S.F05"):
             if struct.randomizationType is not None:
                 matter_asserts.assert_valid_enum(
@@ -152,15 +158,22 @@ class CommodityTariffTestBaseHelper(MatterBaseTest):
         Checks the correctness of the DayStruct data type entries."""
 
         matter_asserts.assert_valid_uint32(struct.date, 'Date field must has epoch-s type.')
+
         matter_asserts.assert_valid_enum(
             struct.dayType, "DayType field must has a DayTypeEnum", cluster.Enums.DayTypeEnum)
         asserts.assert_greater_equal(struct.dayType, 0, "DayType must be greater than 0.")
         asserts.assert_less_equal(struct.dayType, 3, "DayType must be less than 3.")
+
         matter_asserts.assert_list(
             struct.dayEntryIDs, "DayEntryIDs attribute must return a list with length in range 1 - 96", min_length=1, max_length=96)
         for dayEntryID in struct.dayEntryIDs:
             matter_asserts.assert_valid_uint32(dayEntryID, 'DayEntryID must has uint32 type.')
+
         self.check_list_elements_uniqueness(struct.dayEntryIDs, "DayEntryIDs")
+
+        # Collect all DayEntryIDs for DayType: Event
+        if struct.dayType == 3:
+            self.dayEntryIDsEvents += struct.dayEntryIDs
 
     async def checkPeakPeriodStruct(self,
                                     endpoint: int = None,
@@ -316,30 +329,29 @@ class CommodityTariffTestBaseHelper(MatterBaseTest):
         if struct.priceLevel is not None:
             matter_asserts.assert_valid_int16(struct.priceLevel, 'PriceLevel field of TariffPriceStruct must be int16')
 
-    async def send_test_event_trigger_for_fake_data(self):
-        """Sends test event triggers to propagate fake data to the attributes instead of Null
-           values that are default values after cluster initialization."""
+    async def send_test_event_trigger_for_attributes_value_set(self):
+        """Simulate updating of values for all cluster attributes with valid data not equal to the pre-test state."""
 
         await self.send_test_event_triggers(eventTrigger=self.EventTriggerFakeData)
-        time.sleep(3)  # Wait some time to be sure that fake data is propagated
+        await asyncio.sleep(3)  # Wait some time to be sure that fake data is propagated
 
     async def send_test_event_trigger_clear(self):
-        """Reset cluster state to default (Null) values."""
+        """Return the device to pre-test state."""
 
         await self.send_test_event_triggers(eventTrigger=self.EventTriggerClear)
-        time.sleep(3)  # Wait some time to be sure that the cluster state has been reset
+        await asyncio.sleep(3)  # Wait some time to be sure that the cluster state has been reset
 
     async def send_test_event_trigger_change_day(self):
         """This test event trigger ensure time shifting on 24h to simulate a day change."""
 
         await self.send_test_event_triggers(eventTrigger=self.EventTriggerChangeDay)
-        time.sleep(3)  # Wait some time to be sure that test event triggers takes effect
+        await asyncio.sleep(3)  # Wait some time to be sure that test event triggers takes effect
 
     async def send_test_event_trigger_change_time(self):
         """This test event trigger ensure time shifting on 4h to simulate a time change."""
 
         await self.send_test_event_triggers(eventTrigger=self.EventTriggerChangeTime)
-        time.sleep(3)  # Wait some time to be sure that test event triggers takes effect
+        await asyncio.sleep(3)  # Wait some time to be sure that test event triggers takes effect
 
     async def check_tariff_info_attribute(self, endpoint, attribute_value=None):
 
