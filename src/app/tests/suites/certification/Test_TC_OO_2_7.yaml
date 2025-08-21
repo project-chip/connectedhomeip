@@ -17,14 +17,16 @@ name: 4.2.4. [TC-OO-2.7] Scenes Management Cluster Interaction (DUT as Server)
 PICS:
     - OO.S
     - S.S
+    - GRPKEY.S
+    - G.S
 
 config:
     nodeId: 0x12344321
     cluster: "Scenes Management"
-    endpoint: 1
-    G1:
-        type: group_id
-        defaultValue: 0x0001
+    endpoint: 0
+
+    # Users should set endpoint value on the command line to PIXIT.G.ENDPOINT
+    Groups.Endpoint: 1
 
 tests:
     - label: "Wait for the commissioned device to be retrieved"
