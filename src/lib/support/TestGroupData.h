@@ -19,6 +19,7 @@
 #pragma once
 
 #include <credentials/GroupDataProvider.h>
+#include <credentials/GroupcastDataProvider.h>
 #include <crypto/CHIPCryptoPAL.h>
 
 namespace chip {
@@ -101,6 +102,20 @@ inline CHIP_ERROR InitData(chip::Credentials::GroupDataProvider * provider, chip
     provider->SetGroupKeyAt(fabric_index, 0, chip::Credentials::GroupDataProvider::GroupKey(kGroup1, kKeySet1));
     provider->SetGroupKeyAt(fabric_index, 1, chip::Credentials::GroupDataProvider::GroupKey(kGroup2, kKeySet2));
     provider->SetGroupKeyAt(fabric_index, 2, chip::Credentials::GroupDataProvider::GroupKey(kGroup3, kKeySet3));
+
+    // Groupcast
+
+    chip::Groupcast::DataProvider &groupcast = chip::Groupcast::DataProvider::Instance();
+
+    static const chip::GroupId kGroup4 = 0x8101;
+    static const chip::GroupId kGroup5 = 0x8102;
+    chip::Groupcast::Group group(kGroup4);
+    group.endpoint_count = 1;
+    group.endpoints[0] = 1;
+    groupcast.JoinGroup(fabric_index, compressed_fabric_id, group, ByteSpan(epoch_keys1[0].key), 0);
+
+    group.group_id = kGroup5;
+    groupcast.JoinGroup(fabric_index, compressed_fabric_id, group, ByteSpan(epoch_keys2[0].key), 0);
 
     return CHIP_NO_ERROR;
 }

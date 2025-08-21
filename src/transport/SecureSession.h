@@ -28,7 +28,6 @@
 #include <transport/CryptoContext.h>
 #include <transport/Session.h>
 #include <transport/SessionMessageCounter.h>
-#include <transport/raw/PeerAddress.h>
 
 namespace chip {
 namespace Transport {
@@ -204,9 +203,6 @@ public:
         return System::Clock::Timeout();
     }
 
-    const PeerAddress & GetPeerAddress() const { return mPeerAddress; }
-    void SetPeerAddress(const PeerAddress & address) { mPeerAddress = address; }
-
     Type GetSecureSessionType() const { return mSecureSessionType; }
     bool IsCASESession() const { return GetSecureSessionType() == Type::kCASE; }
     bool IsPASESession() const { return GetSecureSessionType() == Type::kPASE; }
@@ -339,8 +335,6 @@ private:
     CATValues mPeerCATs              = CATValues{};
     const uint16_t mLocalSessionId;
     uint16_t mPeerSessionId = 0;
-
-    PeerAddress mPeerAddress;
 
     /// Timestamp of last tx or rx. @see SessionTimestamp in the spec
     System::Clock::Timestamp mLastActivityTime = System::SystemClock().GetMonotonicTimestamp();

@@ -51,6 +51,7 @@
 #include <transport/raw/Base.h>
 #include <transport/raw/PeerAddress.h>
 #include <transport/raw/Tuple.h>
+#include <credentials/GroupDataProvider.h> // FIXME: Remove this dependency
 
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
 #include <transport/SessionConnectionDelegate.h>
@@ -602,6 +603,12 @@ private:
     void SecureGroupMessageDispatch(const PacketHeader & partialPacketHeader, const Transport::PeerAddress & peerAddress,
                                     System::PacketBufferHandle && msg);
 
+    bool GroupDecrypt(const PacketHeader & partialPacketHeader, PacketHeader & packetHeader, PayloadHeader & payloadHeader,
+                      MessageAuthenticationCode & mac, Credentials::GroupDataProvider::GroupSession & session,
+                      System::PacketBufferHandle && msg);
+    bool GroupcastDecrypt(const PacketHeader & partialPacketHeader, PacketHeader & packetHeader, PayloadHeader & payloadHeader,
+                          MessageAuthenticationCode & mac, Credentials::GroupDataProvider::GroupSession & session,
+                          System::PacketBufferHandle && msg);
     /**
      * @brief Parse, decrypt, validate, and dispatch an unsecured message.
      *
