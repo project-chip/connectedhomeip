@@ -16,11 +16,13 @@
  *    limitations under the License.
  */
 #include "camera-app.h"
+#include <app/clusters/push-av-stream-transport-server/CodegenIntegration.h>
 
 using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::Chime;
+using namespace chip::app::Clusters::PushAvStreamTransport;
 using namespace chip::app::Clusters::WebRTCTransportProvider;
 using namespace chip::app::Clusters::CameraAvStreamManagement;
 using namespace chip::app::Clusters::CameraAvSettingsUserLevelManagement;
@@ -37,6 +39,12 @@ CameraApp::CameraApp(chip::EndpointId aClustersEndpoint, CameraDeviceInterface *
 
     // Instantiate Chime Server
     mChimeServerPtr = std::make_unique<ChimeServer>(mEndpoint, mCameraDevice->GetChimeDelegate());
+
+    // Instantiate WebRTCTransport Provider
+    mWebRTCTransportProviderPtr =
+        std::make_unique<WebRTCTransportProviderServer>(mCameraDevice->GetWebRTCProviderDelegate(), mEndpoint);
+
+    Clusters::PushAvStreamTransport::SetDelegate(mEndpoint, &(mCameraDevice->GetPushAVTransportDelegate()));
 
     // Fetch all initialization parameters for CameraAVStreamMgmt Server
     BitFlags<CameraAvStreamManagement::Feature> avsmFeatures;
@@ -250,13 +258,7 @@ void CameraApp::InitializeCameraAVStreamMgmt()
 void CameraApp::InitCameraDeviceClusters()
 {
     // Initialize Cluster Servers
-    mWebRTCTransportProviderServer.Create(mEndpoint, mCameraDevice->GetWebRTCProviderDelegate());
-    CHIP_ERROR err = CodegenDataModelProvider::Instance().Registry().Register(mWebRTCTransportProviderServer.Registration());
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogError(Camera, "Failed to register WebRTCTransportProvider on endpoint %u: %" CHIP_ERROR_FORMAT, mEndpoint,
-                     err.Format());
-    }
+    mWebRTCTransportProviderPtr->Init();
 
     mChimeServerPtr->Init();
 
@@ -265,16 +267,6 @@ void CameraApp::InitCameraDeviceClusters()
     InitializeCameraAVStreamMgmt();
 
     mZoneMgmtServerPtr->Init();
-}
-
-void CameraApp::Shutdown()
-{
-    CHIP_ERROR err = CodegenDataModelProvider::Instance().Registry().Unregister(&mWebRTCTransportProviderServer.Cluster());
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogError(Camera, "WebRTCTransportProvider unregister error: %" CHIP_ERROR_FORMAT, err.Format());
-    }
-    mWebRTCTransportProviderServer.Destroy();
 }
 
 static constexpr EndpointId kCameraEndpointId = 1;
@@ -292,8 +284,5 @@ void CameraAppInit(CameraDeviceInterface * cameraDevice)
 void CameraAppShutdown()
 {
     ChipLogDetail(Camera, "CameraAppShutdown: Shutting down Camera app");
-
-    gCameraApp.get()->Shutdown();
-
     gCameraApp = nullptr;
 }

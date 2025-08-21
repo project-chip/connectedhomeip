@@ -29,6 +29,7 @@
 #include <app/server/Server.h>
 #include <app/util/attribute-storage.h>
 #include <platform/PlatformManager.h>
+#include <soil-measurement-stub.h>
 
 #include "ButtonEventsSimulator.h"
 #include <air-quality-instance.h>
@@ -38,7 +39,6 @@
 #include <oven-modes.h>
 #include <oven-operational-state-delegate.h>
 #include <rvc-modes.h>
-#include <soil-measurement-stub.h>
 
 #include <memory>
 #include <string>
@@ -954,8 +954,6 @@ void AllClustersAppCommandHandler::OnAirQualityChange(uint32_t aNewValue)
 
 void AllClustersAppCommandHandler::OnSoilMoistureChange(EndpointId endpointId, DataModel::Nullable<Percent> soilMoisture)
 {
-    SoilMeasurement::Instance * soilMeasurementInstance = SoilMeasurement::GetInstance();
-
     if (soilMoisture.IsNull())
     {
         ChipLogDetail(NotSpecified, "Set SoilMoisture value to null");
@@ -970,7 +968,7 @@ void AllClustersAppCommandHandler::OnSoilMoistureChange(EndpointId endpointId, D
         ChipLogDetail(NotSpecified, "Set SoilMoisture value to %u", soilMoisture.Value());
     }
 
-    soilMeasurementInstance->SetSoilMeasuredValue(soilMoisture);
+    SoilMeasurement::SetSoilMoistureMeasuredValue(soilMoisture);
 }
 
 void AllClustersAppCommandHandler::HandleSetOccupancyChange(EndpointId endpointId, uint8_t newOccupancyValue)

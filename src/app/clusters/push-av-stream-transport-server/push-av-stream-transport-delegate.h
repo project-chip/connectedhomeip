@@ -131,7 +131,7 @@ public:
      * @param url The URL to validate
      * @return true if URL is valid, false otherwise
      */
-    virtual bool ValidateUrl(std::string url) = 0;
+    virtual bool ValidateUrl(const std::string & url) = 0;
 
     /**
      * @brief Validates the provided StreamUsage.
