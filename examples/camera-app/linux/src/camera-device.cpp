@@ -18,6 +18,7 @@
 
 #include "camera-device.h"
 #include <AppMain.h>
+#include <chrono>
 #include <fcntl.h> // For file descriptor operations
 #include <filesystem>
 #include <fstream>
@@ -323,11 +324,14 @@ CameraDevice::CameraDevice()
     // Provider manager uses the Media controller to register WebRTC Transport with media controller for AV source data
     mWebRTCProviderManager.SetMediaController(&mMediaController);
 
+    mPushAVTransportManager.SetMediaController(&mMediaController);
+
     // Set the CameraDevice interface in WebRTCManager
     mWebRTCProviderManager.SetCameraDevice(this);
 
     // Set the CameraDevice interface in ZoneManager
     mZoneManager.SetCameraDevice(this);
+    mPushAVTransportManager.SetCameraDevice(this);
 }
 
 CameraDevice::~CameraDevice()
@@ -343,6 +347,7 @@ void CameraDevice::Init()
     InitializeCameraDevice();
     InitializeStreams();
     mWebRTCProviderManager.Init();
+    mPushAVTransportManager.Init();
 }
 
 CameraError CameraDevice::InitializeCameraDevice()
@@ -463,8 +468,9 @@ GstElement * CameraDevice::CreateVideoPipeline(const std::string & device, int w
     g_object_set(capsfilter, "caps", caps, nullptr);
     gst_caps_unref(caps);
 
-    // Configure encoder for low‑latency
+    // Configure encoder for low-latency
     gst_util_set_object_arg(G_OBJECT(x264enc), "tune", "zerolatency");
+    g_object_set(G_OBJECT(x264enc), "key-int-max", static_cast<guint>(framerate), nullptr);
 
     // Configure appsink for receiving H.264 RTP data
     g_object_set(appsink, "emit-signals", TRUE, "sync", FALSE, "async", FALSE, nullptr);
@@ -1220,14 +1226,27 @@ void CameraDevice::InitializeVideoStreams()
 
 void CameraDevice::InitializeAudioStreams()
 {
-    // Create single audio stream with typical supported parameters
-    AudioStream audioStream = { { 1 /* Id */, StreamUsageEnum::kLiveView /* StreamUsage */, AudioCodecEnum::kOpus,
-                                  kMicrophoneMaxChannelCount /* ChannelCount(Max from Spec) */, 48000 /* SampleRate */,
-                                  20000 /* BitRate*/, 24 /* BitDepth */, 0 /* RefCount */ },
-                                false,
-                                nullptr };
+    // Mono stream
+    AudioStream monoStream = { { 1 /* Id */, StreamUsageEnum::kLiveView, AudioCodecEnum::kOpus, 1 /* ChannelCount: Mono */,
+                                 48000 /* SampleRate */, 20000 /* BitRate */, 24 /* BitDepth */, 0 /* RefCount */ },
+                               false,
+                               nullptr };
+    mAudioStreams.push_back(monoStream);
 
-    mAudioStreams.push_back(audioStream);
+    // Stereo stream
+    AudioStream stereoStream = { { 2 /* Id */, StreamUsageEnum::kLiveView, AudioCodecEnum::kOpus, 2 /* ChannelCount: Stereo */,
+                                   48000 /* SampleRate */, 32000 /* BitRate */, 24 /* BitDepth */, 0 /* RefCount */ },
+                                 false,
+                                 nullptr };
+    mAudioStreams.push_back(stereoStream);
+
+    // Max channel count stream (from spec constant)
+    AudioStream maxChannelStream = { { 3 /* Id */, StreamUsageEnum::kLiveView, AudioCodecEnum::kOpus,
+                                       kMicrophoneMaxChannelCount /* Max from Spec */, 48000 /* SampleRate */, 64000 /* BitRate */,
+                                       24 /* BitDepth */, 0 /* RefCount */ },
+                                     false,
+                                     nullptr };
+    mAudioStreams.push_back(maxChannelStream);
 }
 
 void CameraDevice::InitializeSnapshotStreams()
@@ -1258,6 +1277,11 @@ ChimeDelegate & CameraDevice::GetChimeDelegate()
 WebRTCTransportProvider::Delegate & CameraDevice::GetWebRTCProviderDelegate()
 {
     return mWebRTCProviderManager;
+}
+
+PushAvStreamTransportDelegate & CameraDevice::GetPushAVTransportDelegate()
+{
+    return mPushAVTransportManager;
 }
 
 CameraAVStreamMgmtDelegate & CameraDevice::GetCameraAVStreamMgmtDelegate()
