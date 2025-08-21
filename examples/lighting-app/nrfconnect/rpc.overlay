@@ -30,8 +30,12 @@ CONFIG_CONSOLE_GETCHAR=y
 CONFIG_CONSOLE_PUTCHAR_BUFSIZE=256
 
 # Disable features which may interfere with Pigweed HDLC transport
-CONFIG_SHELL=n
-CONFIG_OPENTHREAD_SHELL=n
+
+# Enable shell to satisfy dependency for OPENTHREAD_CLI, but disable the
+# shell's serial backend to allow Pigweed RPC to use the UART.
+CONFIG_SHELL=y
+CONFIG_SHELL_BACKEND_SERIAL=n
+CONFIG_OPENTHREAD_SHELL=y
 CONFIG_BOOT_BANNER=n
 
 # Configure Zephyr logger with defaults backends disabled as the app provides its own,
@@ -44,10 +48,9 @@ CONFIG_LOG_BACKEND_RTT=n
 CONFIG_LOG_OUTPUT=y
 
 # Increase zephyr tty rx buffer
-CONFIG_CONSOLE_GETCHAR_BUFSIZE=128
+CONFIG_CONSOLE_GETCHAR_BUFSIZE=256
 
 # Increase thread stack sizes
 CONFIG_BT_RX_STACK_SIZE=4096
 CONFIG_MAIN_STACK_SIZE=8092
 CONFIG_SYSTEM_WORKQUEUE_STACK_SIZE=2048
-

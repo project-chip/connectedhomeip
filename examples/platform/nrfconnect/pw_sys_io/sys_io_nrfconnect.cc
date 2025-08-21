@@ -17,14 +17,50 @@
 
 #include <cinttypes>
 
+#include "pw_span/span.h"
 #include "pw_sys_io/sys_io.h"
 #include <cassert>
 #include <zephyr/console/console.h>
 #include <zephyr/kernel.h>
 
+// #if defined(CONFIG_USB_DEVICE_STACK) && defined(CONFIG_USB_CDC_ACM)
+// #include <zephyr/drivers/uart.h>
+// #include <zephyr/usb/usb_device.h>
+// #endif
+
 #ifdef CONFIG_USB
 #include <zephyr/usb/usb_device.h>
 #endif
+
+namespace {
+
+constexpr size_t kConsoleWriteThreadStackSize = 2048;
+constexpr int kConsoleWriteThreadPriority     = 5;
+constexpr size_t kConsoleWriteMsgqSize        = 1024;
+
+K_THREAD_STACK_DEFINE(sConsoleWriteStack, kConsoleWriteThreadStackSize);
+k_thread sConsoleWriteThread;
+
+K_MSGQ_DEFINE(sConsoleWriteMsgq, sizeof(char), kConsoleWriteMsgqSize, 1);
+
+void ConsoleWriteThreadMain(void *, void *, void *)
+{
+    char tx_char;
+
+    while (true)
+    {
+        // Wait indefinitely for a character to be available in the message queue.
+        if (k_msgq_get(&sConsoleWriteMsgq, &tx_char, K_FOREVER) == 0)
+        {
+            // This call will block if the USB host is not connected or not reading.
+            // This is acceptable because we are in a dedicated writer thread, so other
+            // application threads will not be affected.
+            console_putchar(tx_char);
+        }
+    }
+}
+
+} // namespace
 
 extern "C" void pw_sys_io_Init()
 {
@@ -37,6 +73,8 @@ extern "C" void pw_sys_io_Init()
 
     err = console_init();
     assert(err == 0);
+    k_thread_create(&sConsoleWriteThread, sConsoleWriteStack, K_THREAD_STACK_SIZEOF(sConsoleWriteStack), ConsoleWriteThreadMain,
+                    nullptr, nullptr, nullptr, kConsoleWriteThreadPriority, 0, K_NO_WAIT);
 }
 
 namespace pw::sys_io {
@@ -54,7 +92,14 @@ Status ReadByte(std::byte * dest)
 
 Status WriteByte(std::byte b)
 {
-    return console_putchar(static_cast<char>(b)) < 0 ? Status::FailedPrecondition() : OkStatus();
+    (void) b;
+    char c = static_cast<char>(b);
+
+    // k_msgq_put with K_NO_WAIT will return -ENOMSG if the queue is full.
+    // This makes the write non-blocking and lossy if the consumer (console)
+    // is too slow or not connected, which is the desired behavior for logs.
+    k_msgq_put(&sConsoleWriteMsgq, &c, K_NO_WAIT);
+    return OkStatus();
 }
 
 // Writes a string using pw::sys_io, and add newline characters at the end.

@@ -46,14 +46,16 @@ static int InitUSB()
         return err;
     }
 
-    const struct device * dev = DEVICE_DT_GET(DT_CHOSEN(zephyr_console));
-    uint32_t dtr              = 0;
+    // const struct device * dev = DEVICE_DT_GET(DT_CHOSEN(zephyr_console));
+    // uint32_t dtr              = 0;
 
+    /*
     while (!dtr)
     {
         uart_line_ctrl_get(dev, UART_LINE_CTRL_DTR, &dtr);
         k_sleep(K_MSEC(100));
     }
+        */
 
     return 0;
 }
@@ -63,12 +65,12 @@ int main()
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-#ifdef CONFIG_CHIP_PW_RPC
-    rpc::Init();
-#endif
-
 #if DT_NODE_HAS_COMPAT(DT_CHOSEN(zephyr_console), zephyr_cdc_acm_uart)
     err = System::MapErrorZephyr(InitUSB());
+#endif
+
+#ifdef CONFIG_CHIP_PW_RPC
+    rpc::Init();
 #endif
 
     if (err == CHIP_NO_ERROR)
