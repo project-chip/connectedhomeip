@@ -122,12 +122,14 @@ public:
      * Allows any needed app handling given provided and already validated pan, tilt, and zoom values that are to be set based on
      * reception of an MPTZSetPosition command. Returns a failure status if the physical device cannot realize these values.  The
      * app shall not block on actual physical execution of the command, rather return success on initiation of the movement.  On
-     * conclusion of the movement that app shall invoke the provided callback, at which time the server will update the server held
-     * attribute values for PTZ assuming success.
+     * conclusion of the movement the app shall invoke the provided callback, at which time the server will update the server held
+     * attribute values for PTZ, if the motion succeeded.
      * @param aPan  The validated value of the pan that is to be set
      * @param aTilt The validated value of the tilt that is to be set
      * @param aZoom The validated value of the zoom that is to be set
-     * @param callback The callback to be invoked once the physical movement of the camera has completed
+     * @param callback The callback to be invoked once the physical movement of the camera has completed, 
+     *                 it is the delegates responsibility to ensure liveness of this server cluster before invocation of the callback,
+     *                 which needs to take place in the Matter threading context.
      */
     virtual Protocols::InteractionModel::Status MPTZSetPosition(Optional<int16_t> aPan, Optional<int16_t> aTilt,
                                                                 Optional<uint8_t> aZoom, PhysicalPTZCallback * callback) = 0;
@@ -137,12 +139,14 @@ public:
      * reception of an MPTZRelativeMove command.  The server has already validated the received relative values, and provides the
      * app with the new, requested settings for PTZ. Returns a failure status if the physical device cannot realize these values.
      * The app shall not block on actual physical execution of the command, rather return success on initiation of the movement.  On
-     * conclusion of the movement that app shall invoke the provided callback, at which time the server will update the server held
-     * attribute values for PTZ assuming success.
+     * conclusion of the movement the app shall invoke the provided callback, at which time the server will update the server held
+     * attribute values for PTZ, if the motion succeeded.
      * @param aPan  The validated value of the pan that is to be set
      * @param aTilt The validated value of the tilt that is to be set
      * @param aZoom The validated value of the zoom that is to be set
      * @param callback The callback to be invoked once the physical movement of the camera has completed
+     *                 it is the delegates responsibility to ensure liveness of this server cluster before invocation of the callback.
+     *                 which needs to take place in the Matter threading context.
      */
     virtual Protocols::InteractionModel::Status MPTZRelativeMove(Optional<int16_t> aPan, Optional<int16_t> aTilt,
                                                                  Optional<uint8_t> aZoom, PhysicalPTZCallback * callback) = 0;
@@ -152,14 +156,16 @@ public:
      * reception of an MPTZMoveToPreset command.  The server has already ensured the requested preset ID exists, and obtained the
      * values for PTZ defined by that preset. Returns a failure status if the physical device cannot realize these values. The app
      * shall not block on actual physical execution of the command, rather return success on initiation of the movement.  On
-     * conclusion of the movement that app shall invoke the provided callback, at which time the server will update the server held
+     * conclusion of the movement the app shall invoke the provided callback, at which time the server will update the server held
      * attribute values for PTZ assuming success. Within the provided callback the server will update the server held attribute
-     * values for PTZ assuming success.
+     * values for PTZ, if the motion succeeded.
      * @param aPreset The preset ID associated with the provided PTZ values
      * @param aPan    The value for Pan associated with the preset
      * @param aTilt   The value for Tilt associated with the preset
      * @param aZoom   The value for Zoom associated with the preset
      * @param callback The callback to be invoked once the physical movement of the camera has completed
+     *                 it is the delegates responsibility to ensure liveness of this server cluster before invocation of the callback.
+     *                 which needs to take place in the Matter threading context.
      */
     virtual Protocols::InteractionModel::Status MPTZMoveToPreset(uint8_t aPreset, Optional<int16_t> aPan, Optional<int16_t> aTilt,
                                                                  Optional<uint8_t> aZoom, PhysicalPTZCallback * callback) = 0;
@@ -350,7 +356,7 @@ public:
     void OnPhysicalMovementComplete(Protocols::InteractionModel::Status status) override;
 
     // Is a command already being processed
-    bool IsProcessingAsyncCommand() const { return mMovementState == PhysicalMovementEnum::kMoving; }
+    bool IsMoving() const { return mMovementState == PhysicalMovementEnum::kMoving; }
 
 private:
     Delegate & mDelegate;
