@@ -153,6 +153,12 @@ public:
     virtual ~UserPrompter() = default;
 };
 
+struct PasscodeInfo
+{
+    uint32_t passcode;
+    uint32_t displayLength;
+};
+
 class DLL_EXPORT PasscodeService
 {
 public:
@@ -177,14 +183,14 @@ public:
     /**
      * @brief
      *   Called to get the commissioner-generated setup passcode.
-     * Returns 0 if feature is disabled.
+     * Returns {0, 0} if feature is disabled.
      *
      *  @param[in]    vendorId           The vendorId in the DNS-SD advertisement of the requesting commissionee.
      *  @param[in]    productId          The productId in the DNS-SD advertisement of the requesting commissionee.
      *  @param[in]    rotatingId         The rotatingId in the DNS-SD advertisement of the requesting commissionee.
      *
      */
-    virtual uint32_t GetCommissionerPasscode(uint16_t vendorId, uint16_t productId, chip::CharSpan rotatingId) = 0;
+    virtual PasscodeInfo GetCommissionerPasscode(uint16_t vendorId, uint16_t productId, chip::CharSpan rotatingId) = 0;
 
     /**
      * @brief

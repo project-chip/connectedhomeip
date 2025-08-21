@@ -455,7 +455,9 @@ void CommissionerDiscoveryController::InternalHandleContentAppPasscodeResponse()
             // first step of commissioner passcode
             ChipLogError(AppServer, "UX Ok: commissioner passcode, sending CDC");
             // generate a passcode
-            passcode = mPasscodeService->GetCommissionerPasscode(client->GetVendorId(), client->GetProductId(), rotatingIdSpan);
+            PasscodeInfo passcodeInfo = mPasscodeService->GetCommissionerPasscode(client->GetVendorId(), client->GetProductId(),
+                                                                                  rotatingIdSpan);
+            passcode = passcodeInfo.passcode;
             if (passcode == 0)
             {
                 // passcode feature disabled
@@ -473,6 +475,7 @@ void CommissionerDiscoveryController::InternalHandleContentAppPasscodeResponse()
 
             CommissionerDeclaration cd;
             cd.SetCommissionerPasscode(true);
+            cd.SetPasscodeLength(passcodeInfo.displayLength);
             if (mUserPrompter->DisplaysPasscodeAndQRCode())
             {
                 cd.SetQRCodeDisplayed(true);

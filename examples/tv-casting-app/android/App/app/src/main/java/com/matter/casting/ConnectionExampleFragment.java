@@ -30,7 +30,7 @@ import android.widget.TextView;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
-import com.chip.casting.R;
+import com.R;
 import com.matter.casting.core.CastingPlayer;
 import com.matter.casting.support.CommissionerDeclaration;
 import com.matter.casting.support.ConnectionCallbacks;
@@ -219,7 +219,7 @@ public class ConnectionExampleFragment extends Fragment {
                                 displayPasscodeInputDialog(activity);
 
                                 connectionFragmentStatusTextView.setText(
-                                    "CommissionerDeclaration message received from Casting Player: A passcode is now displayed for the user by the Casting Player. \n\n");
+                                    "CommissionerDeclaration message received from Casting Player: A passcode (length "+cd.getPasscodeLength()+") is now displayed for the user by the Casting Player. \n\n");
                               }
                               if (cd.getCancelPasscode()) {
                                 if (useCommissionerGeneratedPasscode) {

@@ -541,7 +541,7 @@ convertCommissionerDeclarationFromCppToJava(const chip::Protocols::UserDirectedC
     return env->NewObject(jCommissionerDeclarationClass, jCommissionerDeclarationConstructor,
                           static_cast<jint>(cppCd.GetErrorCode()), cppCd.GetNeedsPasscode(), cppCd.GetNoAppsFound(),
                           cppCd.GetPasscodeDialogDisplayed(), cppCd.GetCommissionerPasscode(), cppCd.GetQRCodeDisplayed(),
-                          cppCd.GetCancelPasscode());
+                          cppCd.GetCancelPasscode(), cppCd.GetPasscodeLength());
 }
 
 }; // namespace support
