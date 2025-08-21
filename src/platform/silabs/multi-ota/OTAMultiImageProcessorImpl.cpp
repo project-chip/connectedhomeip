@@ -430,7 +430,7 @@ void OTAMultiImageProcessorImpl::HandleApply(intptr_t context)
 #if defined(_SILICON_LABS_32B_SERIES_3) && CHIP_PROGRESS_LOGGING
     osDelay(100); // sl-temp: delay for uart print before reboot
 #endif
-    CORE_CRITICAL_SECTION(bootloader_rebootAndInstall());
+    CORE_CRITICAL_SECTION(bootloader_rebootAndInstall();)
 #endif
 }
 

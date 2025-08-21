@@ -206,6 +206,7 @@ protected:
     static constexpr size_t kOTAEncryptionKeyLength = 16;
     uint32_t mUnalignmentNum                        = 0;
 #endif
+    bool mLastBlock                              = false;
     uint32_t mLength                             = 0;
     uint32_t mProcessedLength                    = 0;
     bool mWasSelected                            = false;
