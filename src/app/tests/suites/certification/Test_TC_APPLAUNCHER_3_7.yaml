@@ -62,7 +62,7 @@ tests:
                 value: 0
               - name: "Data"
                 value: DataValue
-  
+
     - label: "Step 1b: TH reads the Status attribute"
       endpoint: ApplicationBasic.Endpoint
       cluster: "Application Basic"
@@ -70,7 +70,7 @@ tests:
       attribute: "Status"
       response:
           value: 1
-   
+
     - label:
           "Step 2a: TH sends a LaunchApp command to DUT to launch an app which is
           not available"
