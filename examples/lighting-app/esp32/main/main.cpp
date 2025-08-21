@@ -39,11 +39,6 @@
 #include <platform/ESP32/ESP32Utils.h>
 #include <setup_payload/OnboardingCodesUtil.h>
 
-#if CONFIG_ENABLE_ESP_INSIGHTS_SYSTEM_STATS
-#include <tracing/esp32_trace/insights_sys_stats.h>
-#define START_TIMEOUT_MS 60000
-#endif
-
 #if CONFIG_ENABLE_ESP32_FACTORY_DATA_PROVIDER
 #include <platform/ESP32/ESP32FactoryDataProvider.h>
 #endif // CONFIG_ENABLE_ESP32_FACTORY_DATA_PROVIDER
@@ -64,21 +59,20 @@
 #include <platform/ESP32/ESP32SecureCertDACProvider.h>
 #endif
 
-#if CONFIG_ENABLE_ESP_INSIGHTS_TRACE
-#include <esp_insights.h>
-#include <tracing/esp32_trace/esp32_tracing.h>
-#include <tracing/registry.h>
-#endif
+#if CONFIG_ESP_INSIGHTS_ENABLED && CONFIG_ENABLE_ESP_DIAGNOSTICS_TRACE
+#include <insights-delegate.h>
+#define START_TIMEOUT_MS 10000
+static uint8_t endUserBuffer[CONFIG_END_USER_BUFFER_SIZE]; // Global static buffer used to store diagnostics
+extern const char insights_auth_key_start[] asm("_binary_insights_auth_key_txt_start");
+extern const char insights_auth_key_end[] asm("_binary_insights_auth_key_txt_end");
+
+using namespace chip::Insights;
+#endif // CONFIG_ESP_INSIGHTS_ENABLED && CONFIG_ENABLE_ESP_DIAGNOSTICS_TRACE
 
 using namespace ::chip;
 using namespace ::chip::Credentials;
 using namespace ::chip::DeviceManager;
 using namespace ::chip::DeviceLayer;
-
-#if CONFIG_ENABLE_ESP_INSIGHTS_TRACE
-extern const char insights_auth_key_start[] asm("_binary_insights_auth_key_txt_start");
-extern const char insights_auth_key_end[] asm("_binary_insights_auth_key_txt_end");
-#endif
 
 static const char TAG[] = "light-app";
 
@@ -125,6 +119,20 @@ chip::Credentials::DeviceAttestationCredentialsProvider * get_dac_provider(void)
 
 } // namespace
 
+static void InitInsights()
+{
+#if CONFIG_ESP_INSIGHTS_ENABLED && CONFIG_ENABLE_ESP_DIAGNOSTICS_TRACE
+    chip::Insights::InsightsInitParams initParams = { .diagnosticBuffer     = endUserBuffer,
+                                                      .diagnosticBufferSize = CONFIG_END_USER_BUFFER_SIZE,
+                                                      .authKey              = insights_auth_key_start };
+    InsightsDelegate & insightsDelegate           = InsightsDelegate::GetInstance();
+    CHIP_ERROR error                              = insightsDelegate.Init(initParams);
+    VerifyOrReturn(error == CHIP_NO_ERROR, ESP_LOGE(TAG, "Failed to initialize ESP Insights"));
+    error = insightsDelegate.StartPeriodicInsights(chip::System::Clock::Timeout(START_TIMEOUT_MS));
+    VerifyOrReturn(error == CHIP_NO_ERROR, ESP_LOGE(TAG, "Failed to start periodic insights"));
+#endif // CONFIG_ESP_INSIGHTS_ENABLED && CONFIG_ENABLE_ESP_DIAGNOSTICS_TRACE
+}
+
 static void InitServer(intptr_t context)
 {
     // Print QR Code URL
@@ -132,27 +140,7 @@ static void InitServer(intptr_t context)
 
     DeviceCallbacksDelegate::Instance().SetAppDelegate(&sAppDeviceCallbacksDelegate);
     Esp32AppServer::Init(); // Init ZCL Data Model and CHIP App Server AND Initialize device attestation config
-
-#if CONFIG_ENABLE_ESP_INSIGHTS_TRACE
-    esp_insights_config_t config = {
-        .log_type = ESP_DIAG_LOG_TYPE_ERROR | ESP_DIAG_LOG_TYPE_WARNING | ESP_DIAG_LOG_TYPE_EVENT,
-        .auth_key = insights_auth_key_start,
-    };
-
-    esp_err_t ret = esp_insights_init(&config);
-
-    if (ret != ESP_OK)
-    {
-        ESP_LOGE(TAG, "Failed to initialize ESP Insights, err:0x%x", ret);
-    }
-
-    static Tracing::Insights::ESP32Backend backend;
-    Tracing::Register(backend);
-
-#if CONFIG_ENABLE_ESP_INSIGHTS_SYSTEM_STATS
-    chip::System::Stats::InsightsSystemMetrics::GetInstance().RegisterAndEnable(chip::System::Clock::Timeout(START_TIMEOUT_MS));
-#endif
-#endif
+    InitInsights();
 }
 
 extern "C" void app_main()
