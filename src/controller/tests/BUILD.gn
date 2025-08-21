@@ -57,7 +57,7 @@ chip_test_suite("tests") {
   }
 
   if (chip_support_commissioning_in_controller && chip_build_controller) {
-    test_sources += [ "TestAutoCommissioner.cpp" ]
+    test_sources += [ "TestAutoCommissioner.cpp"]
   }
 
   test_sources += [ "TestCommissioningDelegate.cpp" ]
@@ -68,7 +68,8 @@ chip_test_suite("tests") {
 
   cflags = [ "-Wconversion" ]
 
-  sources = [ "AutoCommissionerTestAccess.h" ]
+sources = [
+    "AutoCommissionerTestAccess.h","Test_cert_data.h", "Test_cert_data.cpp" ]
 
   public_deps = [
     "${chip_root}/src/app/common:cluster-objects",

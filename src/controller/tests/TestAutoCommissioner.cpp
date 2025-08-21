@@ -23,14 +23,27 @@
 #include <controller/tests/AutoCommissionerTestAccess.h>
 #include <lib/core/StringBuilderAdapters.h>
 #include <lib/support/CHIPMemString.h>
-
+#include <controller/CHIPDeviceController.h>
+#include <controller/CommissioneeDeviceProxy.h>
+#include <transport/TransportMgrBase.h>
+#include <transport/tests/UDPTransportManager.h>
 #include <cstring>
 #include <memory>
+#include <lib/core/Optional.h>
+#include <messaging/ExchangeMgr.h>
+#include <transport/Session.h>
+#include <protocols/secure_channel/MessageCounterManager.h>
+#include <crypto/CHIPCryptoPAL.h>
+#include <optional>
+#include <crypto/SessionKeystore.h>
+#include <lib/core/CHIPPersistentStorageDelegate.h>
+#include "Test_cert_data.h"
 
 using namespace chip;
 using namespace chip::Dnssd;
 using namespace chip::Controller;
 using namespace chip::Test;
+
 
 namespace {
 
@@ -338,4 +351,53 @@ TEST_F(AutoCommissionerTest, NextStageConfigureTCAcknowledgments)
     EXPECT_EQ(nextStage, kSendPAICertificateRequest);
 }
 
-} // namespace
+
+// Happy paths and valid arguments are thoroughly checked with the Python integration tests in src/controller/python/OpCredsBinding.cpp
+// Ensures empty RCAC certificates arent admited
+TEST_F(AutoCommissionerTest, NOCChainGenerated_EmptyRCACReturnsInvalidArgument)
+{
+    AutoCommissionerTestAccess privateConfigCommissioner(&mCommissioner);
+
+    CHIP_ERROR err = privateConfigCommissioner.CallNOCChainGenerated(ByteSpan(), ByteSpan(), ByteSpan(), Crypto::IdentityProtectionKeySpan(), 0);
+
+    EXPECT_EQ(err, CHIP_ERROR_INVALID_ARGUMENT);
+}
+
+// Ensures extra checks are done with RCAC buffer size 
+TEST_F(AutoCommissionerTest, NOCChainGenerated_CorruptedRCACLengthReturnsError)
+{
+    AutoCommissionerTestAccess privateConfigCommissioner(&mCommissioner);
+    uint8_t buffer[10];
+    ByteSpan corrupted_size_rcac(buffer, std::numeric_limits<size_t>::max());
+
+    CHIP_ERROR err = privateConfigCommissioner.CallNOCChainGenerated(
+        ByteSpan(), ByteSpan(), corrupted_size_rcac, Crypto::IdentityProtectionKeySpan(), 0);
+
+    EXPECT_EQ(err, CHIP_ERROR_INVALID_ARGUMENT);
+}
+
+// Ensures extra checks are done with NOC buffer size 
+TEST_F(AutoCommissionerTest, NOCChainGenerated_CorruptedNOCLengthReturnsError)
+{
+    AutoCommissionerTestAccess privateConfigCommissioner(&mCommissioner);
+    uint8_t buffer[10];
+    ByteSpan corrupted_size_noc(buffer, std::numeric_limits<size_t>::max());
+
+    CHIP_ERROR err = privateConfigCommissioner.CallNOCChainGenerated(
+        corrupted_size_noc, ByteSpan(), ByteSpan(chip::TestCerts::kTestRCAC,chip::TestCerts::kTestRCAC_size), Crypto::IdentityProtectionKeySpan(), 0);
+
+    EXPECT_EQ(err, CHIP_ERROR_INVALID_ARGUMENT);
+}
+
+
+// Ensures empty NOC certificates arent admited
+TEST_F(AutoCommissionerTest, NOCChainGenerated_EmptyNOCReturnsInvalidArgument)
+{
+    AutoCommissionerTestAccess privateConfigCommissioner(&mCommissioner);
+    CHIP_ERROR err = privateConfigCommissioner.CallNOCChainGenerated(ByteSpan(), ByteSpan(), ByteSpan(chip::TestCerts::kTestRCAC,chip::TestCerts::kTestRCAC_size), Crypto::IdentityProtectionKeySpan(), 0);
+
+    EXPECT_EQ(err, CHIP_ERROR_INVALID_ARGUMENT);
+}
+
+
+} //namepace chip
