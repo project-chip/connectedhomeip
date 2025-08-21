@@ -539,7 +539,12 @@ jobs:
 
             - name: Run Build Coverage
               run: ./scripts/build_coverage.sh --yaml --xml
-
+            # This is a workaround to unblock CI: failure is due to missing gpg which got triggered when codecov-action@v5 made a new release
+            # TODO: install gpg in chip-build image directly
+            - name: Install gpg
+              run: |
+                apt-get update
+                apt-get install -y --no-install-recommends gnupg
             - name: Upload coverage reports to Codecov with GitHub Action
               uses: codecov/codecov-action@v5
               env:
