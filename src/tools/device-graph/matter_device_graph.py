@@ -40,6 +40,11 @@ def AddServerOrClientNode(graphSection, endpoint, clusterName, color, nodeRef):
     graphSection.edge(nodeRef, f"ep{endpoint}_{clusterName}", style="invis")
 
 
+def tag_str(tag: Clusters.Descriptor.Structs.SemanticTagStruct):
+    # TODO: resolve to names once the namespace stuff lands
+    return f"({tag.namespaceID}: {tag.tag}{f' {tag.label}' if tag.label is not None else ''})"
+
+
 def AddNodeLabel(graphSection, endpoint, wildcardResponse, device_type_xml, aggregator):
 
     partsListFromWildcardRead = wildcardResponse[endpoint][Clusters.Objects.Descriptor][Clusters.Objects.Descriptor.Attributes.PartsList]
@@ -51,17 +56,23 @@ def AddNodeLabel(graphSection, endpoint, wildcardResponse, device_type_xml, aggr
         except KeyError:
             listOfDeviceTypes.append(deviceTypeStruct.deviceType)
 
+    try:
+        tags = [tag_str(t) for t in wildcardResponse[endpoint][Clusters.Descriptor][Clusters.Descriptor.Attributes.TagList]]
+    except KeyError:
+        tags = []
+
     # console.print(f"Endpoint: {endpoint}")
     # console.print(f"DeviceTypeList: {listOfDeviceTypes}")
     # console.print(f"PartsList: {partsListFromWildcardRead}")
 
-    endpointLabel = f"Endpoint: {endpoint}\lDeviceTypeList: {listOfDeviceTypes}\lPartsList: {partsListFromWildcardRead}\l"  # noqa: W605
+    endpointLabel = f"Endpoint: {endpoint}\lDeviceTypeList: {listOfDeviceTypes}\lPartsList: {partsListFromWildcardRead}\lTags: {tags}\l"  # noqa: W605
+
     if aggregator:
         color = 'grey'
     else:
         color = 'dodgerblue'
     graphSection.node(f"ep{endpoint}", label=endpointLabel, style="filled,rounded",
-                      color=color, shape="box", fixedsize="true", width="4", height="1")
+                      color=color, shape="box", fixedsize="true", width="5", height="1")
 
 
 def CreateEndpointGraph(graph, graphSection, endpoint, wildcardResponse, device_type_xml):
@@ -130,7 +141,7 @@ def create_graph(wildcardResponse, xml_device_types, outfile_dir: str = '.'):
     vendor_name = wildcardResponse[0][Clusters.BasicInformation][Clusters.BasicInformation.Attributes.VendorName]
     product_name = wildcardResponse[0][Clusters.BasicInformation][Clusters.BasicInformation.Attributes.ProductName]
     try:
-        spec_version = wildcardResponse[0][Clusters.BasicInformation][Clusters.BasicInformation.Attributes.SpecificationVersion]
+        spec_version = f'0x{wildcardResponse[0][Clusters.BasicInformation][Clusters.BasicInformation.Attributes.SpecificationVersion]:04X}'
     except KeyError:
         # TODO: we can probably guess from the data model version, but I don't care that much right now
         spec_version = "pre-1.3"
@@ -188,7 +199,8 @@ def create_graph(wildcardResponse, xml_device_types, outfile_dir: str = '.'):
 
     create_subgraph(0)
 
-    deviceGraph.save(f'{outfile_dir}/matter_device_graph_0x{vid:04X}_0x{pid:04X}_{software_version}.dot')
+    filename = f'{outfile_dir}/matter_device_graph_0x{vid:04X}_0x{pid:04X}_{software_version}.dot'
+    deviceGraph.render(filename, format='png')
 
 
 class TC_MatterDeviceGraph(MatterBaseTest, BasicCompositionTests):
