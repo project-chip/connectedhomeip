@@ -958,7 +958,8 @@ void AutoCommissioner::SetMatterCommissioningProgressListener(CommissioningProgr
 // Function called to notify the progression of Matter Commissioning
 void AutoCommissioner::NotifyMatterCommissioningProgress(uint32_t stage)
 {
-    if (mCommissioningProgressListener != nullptr) {
+    if (mCommissioningProgressListener != nullptr)
+    {
         mCommissioningProgressListener(stage);
     }
 }

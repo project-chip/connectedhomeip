@@ -177,7 +177,6 @@ private:
 
     CommissioningProgressListener mCommissioningProgressListener = nullptr;
     void NotifyMatterCommissioningProgress(uint32_t stage);
-
 };
 } // namespace Controller
 } // namespace chip

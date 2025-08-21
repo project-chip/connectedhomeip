@@ -104,9 +104,8 @@ chip::NodeId kLocalDeviceId  = chip::kTestControllerNodeId;
 chip::NodeId kRemoteDeviceId = chip::kTestDeviceNodeId;
 
 // Java object containing the commissioning progress listener to notify
-jobject mJListenerObject = nullptr;
+jobject mJListenerObject                       = nullptr;
 jmethodID mMatterCommissioningProgressListener = nullptr;
-
 
 jint JNI_OnLoad(JavaVM * jvm, void * reserved)
 {
@@ -1361,12 +1360,13 @@ JNI_METHOD(void, setMatterCommissioningProgressListener)(JNIEnv * env, jobject s
     VerifyOrReturn(env != nullptr, ChipLogError(DeviceLayer, "setMatterCommissioningProgressListener(): Invalid env"));
 
     // Clean up previous global ref if any
-    if (mJListenerObject != nullptr) {
+    if (mJListenerObject != nullptr)
+    {
         env->DeleteGlobalRef(mJListenerObject);
     }
 
     // Save the java listener (for later use)
-    mJListenerObject = env->NewGlobalRef(jListenerObject);
+    mJListenerObject     = env->NewGlobalRef(jListenerObject);
     jclass listenerClass = env->GetObjectClass(jListenerObject);
 
     mMatterCommissioningProgressListener = env->GetMethodID(listenerClass, "onNewCommissioningStage", "(I)V");
