@@ -1036,13 +1036,13 @@ TEST_F(TestCodeDrivenDataModelProvider, AddEndpointStartsClusterWithMultipleEndp
     mEndpointStorage.push_back(std::move(endpoint1));
     mOwnedRegistrations.push_back(std::make_unique<EndpointInterfaceRegistration>(*mEndpointStorage.back(), endpointEntry1));
     ASSERT_EQ(localProvider.AddEndpoint(*mOwnedRegistrations.back()), CHIP_NO_ERROR);
-    ASSERT_EQ(testCluster.startupCallCount, 0);
+    ASSERT_EQ(testCluster.startupCallCount, 1); // Cluster should start on first endpoint
 
     auto endpoint2 = std::make_unique<SpanEndpoint>(SpanEndpoint::Builder().Build());
     mEndpointStorage.push_back(std::move(endpoint2));
     mOwnedRegistrations.push_back(std::make_unique<EndpointInterfaceRegistration>(*mEndpointStorage.back(), endpointEntry2));
     ASSERT_EQ(localProvider.AddEndpoint(*mOwnedRegistrations.back()), CHIP_NO_ERROR);
-    ASSERT_EQ(testCluster.startupCallCount, 1);
+    ASSERT_EQ(testCluster.startupCallCount, 1); // Should not start again
 
     localProvider.Shutdown();
 }
@@ -1096,6 +1096,32 @@ TEST_F(TestCodeDrivenDataModelProvider, RemoveEndpointThenRemoveClusterCallsShut
     ASSERT_EQ(localProvider.RemoveEndpoint(endpointEntry1.id), CHIP_NO_ERROR);
     ASSERT_EQ(localProvider.RemoveCluster(&testCluster), CHIP_NO_ERROR);
     EXPECT_EQ(testCluster.shutdownCallCount, 1);
+
+    localProvider.Shutdown();
+}
+
+TEST_F(TestCodeDrivenDataModelProvider, StartupOnlyStartsClustersWithRegisteredEndpoints)
+{
+    CodeDrivenDataModelProvider localProvider(mServerClusterTestContext.StorageDelegate(),
+                                              mServerClusterTestContext.AttributePersistenceProvider());
+
+    MockServerCluster clusterWithRegisteredEndpoint(ConcreteClusterPath(endpointEntry1.id, 100), 1, {});
+    static ServerClusterRegistration registration1(clusterWithRegisteredEndpoint);
+    ASSERT_EQ(localProvider.AddCluster(registration1), CHIP_NO_ERROR);
+
+    MockServerCluster clusterWithoutRegisteredEndpoint(ConcreteClusterPath(endpointEntry2.id, 200), 1, {});
+    static ServerClusterRegistration registration2(clusterWithoutRegisteredEndpoint);
+    ASSERT_EQ(localProvider.AddCluster(registration2), CHIP_NO_ERROR);
+
+    auto endpoint1 = std::make_unique<SpanEndpoint>(SpanEndpoint::Builder().Build());
+    mEndpointStorage.push_back(std::move(endpoint1));
+    mOwnedRegistrations.push_back(std::make_unique<EndpointInterfaceRegistration>(*mEndpointStorage.back(), endpointEntry1));
+    ASSERT_EQ(localProvider.AddEndpoint(*mOwnedRegistrations.back()), CHIP_NO_ERROR);
+
+    ASSERT_EQ(localProvider.Startup(mContext), CHIP_NO_ERROR);
+
+    EXPECT_EQ(clusterWithRegisteredEndpoint.startupCallCount, 1);
+    EXPECT_EQ(clusterWithoutRegisteredEndpoint.startupCallCount, 0);
 
     localProvider.Shutdown();
 }

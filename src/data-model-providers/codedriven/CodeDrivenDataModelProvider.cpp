@@ -42,13 +42,26 @@ CHIP_ERROR CodeDrivenDataModelProvider::Startup(DataModel::InteractionModelConte
         .interactionContext = *mInteractionModelContext,
     });
 
-    // Start up all registered server clusters
+    // Start up registered server clusters if one of their associated endpoints is registered.
     bool had_failure = false;
     for (auto * cluster : mServerClusterRegistry.AllServerClusterInstances())
     {
-        if (cluster->Startup(*mServerClusterContext) != CHIP_NO_ERROR)
+        bool endpointRegistered = false;
+        for (const auto & path : cluster->GetPaths())
         {
-            had_failure = true;
+            if (mEndpointInterfaceRegistry.Get(path.mEndpointId) != nullptr)
+            {
+                endpointRegistered = true;
+                break;
+            }
+        }
+
+        if (endpointRegistered)
+        {
+            if (cluster->Startup(*mServerClusterContext) != CHIP_NO_ERROR)
+            {
+                had_failure = true;
+            }
         }
     }
 
@@ -255,37 +268,29 @@ CHIP_ERROR CodeDrivenDataModelProvider::AddEndpoint(EndpointInterfaceRegistratio
     if (mServerClusterContext.has_value())
     {
         // If the provider has been started, we need to check if any clusters on this new endpoint
-        // are now fully resolved and ready for startup.
+        // should be started up.
         for (auto * cluster : mServerClusterRegistry.AllServerClusterInstances())
         {
             bool clusterIsOnNewEndpoint = false;
+            int registeredEndpointCount = 0;
+
             for (const auto & path : cluster->GetPaths())
             {
+                if (mEndpointInterfaceRegistry.Get(path.mEndpointId) != nullptr)
+                {
+                    registeredEndpointCount++;
+                }
                 if (path.mEndpointId == registration.endpointEntry.id)
                 {
                     clusterIsOnNewEndpoint = true;
-                    break;
                 }
             }
 
-            if (clusterIsOnNewEndpoint)
+            // If the cluster is on the endpoint we just added, and this is the *only*
+            // registered endpoint for this cluster, it's time to start it.
+            if (clusterIsOnNewEndpoint && registeredEndpointCount == 1)
             {
-                // This cluster is on the new endpoint. Check if all its required endpoints are now registered.
-                bool allEndpointsRegistered = true;
-                for (const auto & path : cluster->GetPaths())
-                {
-                    if (mEndpointInterfaceRegistry.Get(path.mEndpointId) == nullptr)
-                    {
-                        allEndpointsRegistered = false;
-                        break;
-                    }
-                }
-
-                if (allEndpointsRegistered)
-                {
-                    // This was the last endpoint this cluster was waiting for. Start it up.
-                    ReturnErrorOnFailure(cluster->Startup(*mServerClusterContext));
-                }
+                ReturnErrorOnFailure(cluster->Startup(*mServerClusterContext));
             }
         }
     }

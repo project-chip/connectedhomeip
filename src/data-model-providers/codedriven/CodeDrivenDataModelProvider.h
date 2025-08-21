@@ -96,8 +96,12 @@ public:
      * @brief Adds an endpoint to the data model provider.
      *
      * This method registers an endpoint, making it part of the device's data model.
-     * If the provider has already been started, this will trigger a Startup() call on
+     * If the provider has already been started, this may trigger a Startup() call on
      * each ServerClusterInterface associated with the endpoint.
+     * The Startup() call on the associated clusters will ONLY happen if this is the first
+     * endpoint associated with the cluster (i.e. ServerClusterInterface.GetPaths() returns
+     * at least one path with endpoint ID == registration.endpointEntry.id). This ensures
+     * the cluster is only started once, even if it is associated with multiple endpoints.
      *
      * Prerequisites:
      *   - It MUST be called after all clusters for the endpoint have been registered with
@@ -175,7 +179,7 @@ public:
      * @brief Remove a ServerClusterInterface from the Data Model Provider.
      *
      * To avoid violating the requirement of non-atomic changes to endpoints, this SHALL only be
-     * called after the endpoint has been removed using RemoveEndpoint().
+     * called after all endpoints associated with the cluster have been removed using RemoveEndpoint().
      *
      * Requirements:
      *   - entry MUST be valid
