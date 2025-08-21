@@ -81,7 +81,7 @@ public:
 
     Protocols::InteractionModel::Status SnapshotStreamDeallocate(const uint16_t streamID) override;
 
-    void OnVideoStreamAllocated(const VideoStreamStruct & allocatedStream, bool shouldStartNewVideo) override;
+    void OnVideoStreamAllocated(const VideoStreamStruct & allocatedStream, StreamAllocationAction action) override;
 
     void OnStreamUsagePrioritiesChanged() override;
 

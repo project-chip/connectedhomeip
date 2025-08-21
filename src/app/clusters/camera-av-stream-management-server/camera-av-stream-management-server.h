@@ -70,6 +70,13 @@ constexpr size_t kArrayTlvOverhead = 2;
 
 constexpr size_t kStreamUsagePrioritiesTlvSize = kArrayTlvOverhead + kStreamUsageTlvSize * kNumOfStreamUsageTypes;
 
+enum class StreamAllocationAction
+{
+    kNewAllocation, // Fresh stream allocation - always start
+    kModification,  // Existing stream with parameter changes - restart if active
+    kReuse          // Reusing existing stream without changes - no action needed
+};
+
 class CameraAVStreamMgmtServer;
 
 // ImageSnapshot response data for a CaptureSnapshot command.
@@ -112,10 +119,9 @@ public:
      *          This is where the actual video stream should be started using the final allocated parameters.
      *
      *   @param allocatedStream   The finalized video stream with narrowed parameters from the server.
-     *   @param shouldStartNewVideo  Flag indicating whether to start a new video stream (true for new allocations
-     *                              or when stream configuration has been modified, false for stream reuse without changes).
+     *   @param action           Action indicating how to handle the stream: new allocation, modification, or reuse.
      */
-    virtual void OnVideoStreamAllocated(const VideoStreamStruct & allocatedStream, bool shouldStartNewVideo) = 0;
+    virtual void OnVideoStreamAllocated(const VideoStreamStruct & allocatedStream, StreamAllocationAction action) = 0;
 
     /**
      *   @brief Handle Command Delegate for Video stream modification.

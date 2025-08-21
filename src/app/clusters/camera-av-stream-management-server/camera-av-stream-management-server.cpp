@@ -1812,8 +1812,8 @@ void CameraAVStreamMgmtServer::HandleVideoStreamAllocate(HandlerContext & ctx,
             videoStreamArgs.videoStreamID = videoStreamID;
             AddVideoStream(videoStreamArgs);
 
-            // Call delegate with the allocated stream parameters and start flag
-            mDelegate.OnVideoStreamAllocated(videoStreamArgs, true);
+            // Call delegate with the allocated stream parameters and new allocation action
+            mDelegate.OnVideoStreamAllocated(videoStreamArgs, StreamAllocationAction::kNewAllocation);
         }
         else
         {
@@ -1823,8 +1823,9 @@ void CameraAVStreamMgmtServer::HandleVideoStreamAllocate(HandlerContext & ctx,
             // Reusing the existing stream. Update range parameters and check if they were modified
             UpdateVideoStreamRangeParams(videoStreamToUpdate, videoStreamArgs, wasModified);
 
-            // Call delegate with the final updated stream parameters and start flag
-            mDelegate.OnVideoStreamAllocated(videoStreamToUpdate, wasModified);
+            // Call delegate with the final updated stream parameters and appropriate action
+            mDelegate.OnVideoStreamAllocated(videoStreamToUpdate,
+                                             wasModified ? StreamAllocationAction::kModification : StreamAllocationAction::kReuse);
         }
 
         response.videoStreamID = videoStreamID;
