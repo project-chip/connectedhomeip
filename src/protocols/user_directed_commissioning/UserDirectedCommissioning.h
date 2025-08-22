@@ -96,7 +96,7 @@ public:
     size_t GetRotatingIdLength() const { return mRotatingIdLen; }
     void SetRotatingId(const uint8_t * rotatingId, size_t rotatingIdLen)
     {
-        size_t maxSize = ArraySize(mRotatingId);
+        size_t maxSize = MATTER_ARRAY_SIZE(mRotatingId);
         mRotatingIdLen = (maxSize < rotatingIdLen) ? maxSize : rotatingIdLen;
         memcpy(mRotatingId, rotatingId, mRotatingIdLen);
     }
@@ -352,7 +352,7 @@ public:
     bool GetCancelPasscode() const { return mCancelPasscode; };
 
     void SetPasscodeLength(uint8_t newValue) { mPasscodeLength = newValue; };
-    uint4_t GetPasscodeLength() const { return mPasscodeLength; };
+    uint8_t GetPasscodeLength() const { return mPasscodeLength; };
 
     /**
      *  Writes the CommissionerDeclaration message to the given buffer.

@@ -226,6 +226,9 @@ CHIP_ERROR CommissionerDeclaration::ReadPayload(uint8_t * udcPayload, size_t pay
         case kCancelPasscodeTag:
             err = reader.Get(mCancelPasscode);
             break;
+        case kPasscodeLengthTag:
+            err = reader.Get(mPasscodeLength);
+            break;
         }
     }
 
