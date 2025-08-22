@@ -86,6 +86,7 @@ if (chip_build_tests) {
       "${chip_root}/src/app/clusters/push-av-stream-transport-server/tests",
       "${chip_root}/src/app/clusters/webrtc-transport-requestor-server/tests",
       "${chip_root}/src/app/clusters/zone-management-server/tests",
+      "${chip_root}/src/app/clusters/commodity-tariff-server/tests",
       "${chip_root}/src/srp/tests",
     ]
 

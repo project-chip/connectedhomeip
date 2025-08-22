@@ -349,6 +349,7 @@ struct ExtractNonNullableType<DataModel::Nullable<U>>
 };
 template <typename U>
 using ExtractNonNullableType_t = typename ExtractNonNullableType<U>::type;
+
 template <typename U>
 struct ExtractNestedType
 {
@@ -480,15 +481,15 @@ public:
     /// The exposed attribute value type
     using ValueType = T;
 
-    /// The non-nullable version of the value type
-    using NonNullableType = ExtractNonNullableType_t<ValueType>;
-    using ListEntryType   = std::conditional_t<IsList<NonNullableType>::value,
-                                             ExtractNestedType_t<NonNullableType>, // Extract the list element type
+    using DataType = ExtractNonNullableType_t<ValueType>;
+
+    using ListEntryType = std::conditional_t<IsList<DataType>::value,
+                                             ExtractNestedType_t<DataType>, // Extract the list element type
                                              void *>;
 
-    using StructType = std::conditional_t<IsList<NonNullableType>::value,
+    using StructType = std::conditional_t<IsList<DataType>::value,
                                           ListEntryType, // Extract the list element type
-                                          NonNullableType>;
+                                          DataType>;
 
     /**
      * @brief Construct a new data class instance
@@ -655,63 +656,101 @@ public:
     {
         CHIP_ERROR err = CHIP_NO_ERROR;
 
-        if (aValue.IsNull())
+        // Handle nullable case first - early return for null
+        if constexpr (TypeIsNullable<ValueType>())
         {
-            CleanupByIdx(1 - mActiveValueIdx.load());
-            mUpdateState.store(UpdateState::kInitialized);
-            MarkAsAssigned();
-            return CHIP_NO_ERROR;
+            if (aValue.IsNull())
+            {
+                CleanupByIdx(1 - mActiveValueIdx.load());
+                mUpdateState.store(UpdateState::kInitialized);
+                MarkAsAssigned();
+                return CHIP_NO_ERROR;
+            }
         }
 
-        auto & newValue = aValue.Value();
+        // Get reference to the actual value (non-nullable part)
+        const auto & actualValue = [&]() -> const auto & {
+            if constexpr (TypeIsNullable<ValueType>())
+            {
+                return aValue.Value();
+            }
+            else
+            {
+                return aValue;
+            }
+        }();
 
-        if constexpr (IsValueList())
+        // Get reference to the storage location
+        auto getStorageRef = [this]() -> auto & {
+            if constexpr (TypeIsNullable<ValueType>())
+            {
+                return GetNewValueRef().Value();
+            }
+            else
+            {
+                return GetNewValueRef();
+            }
+        };
+
+        auto assignStorageVal = [this](auto && value) -> auto & {
+            if constexpr (TypeIsNullable<ValueType>())
+            {
+                return GetNewValueRef().SetNonNull(value);
+            }
+            else
+            {
+                return GetNewValueRef() = value;
+            }
+        };
+
+        if constexpr (TypeIsList<DataType>())
         {
             assertChipStackLockedByCurrentThread();
 
-            err = CreateNewListValue(newValue.size());
+            err = CreateNewListValue(actualValue.size());
 
             if (CHIP_NO_ERROR == err)
             {
-                auto buffer = GetNewValueRef().Value().data();
-                for (size_t idx = 0; idx < newValue.size(); idx++)
+                auto buffer = getStorageRef().data();
+                for (size_t idx = 0; idx < actualValue.size(); idx++)
                 {
-                    if (CHIP_NO_ERROR == (err = CopyData(newValue[idx], buffer[idx])))
+                    if constexpr (TypeIsStruct<ListEntryType>())
                     {
-                        continue;
+                        if (CHIP_NO_ERROR == (err = CopyData(actualValue[idx], buffer[idx])))
+                        {
+                            continue;
+                        }
+                        break;
                     }
-                    break;
+                    else
+                    {
+                        buffer[idx] = actualValue[idx];
+                    }
                 }
             }
         }
-        else if constexpr (IsValueStruct())
+        else if constexpr (TypeIsStruct<DataType>())
         {
             err = CreateNewSingleValue();
 
             if (CHIP_NO_ERROR == err)
             {
-                GetNewValueRef().SetNonNull(NonNullableType()); // Default construct in place
-                err = CopyData(newValue, GetNewValueRef().Value());
-                if (err != CHIP_NO_ERROR)
-                {
-                    // Revert on copy failure to maintain consistent state
-                    GetNewValueRef().SetNull();
-                }
+                getStorageRef() = DataType(); // Default construct in place
+                err             = CopyData(actualValue, getStorageRef());
             }
         }
-        else if constexpr (IsValueScalar())
+        else if constexpr (TypeIsScalar<DataType>())
         {
             err = CreateNewSingleValue();
 
             if (CHIP_NO_ERROR == err)
             {
-                GetNewValueRef().SetNonNull(newValue);
+                assignStorageVal(actualValue);
             }
         }
 
         if (err == CHIP_NO_ERROR)
         {
-            mHoldState[1 - mActiveValueIdx.load()] = StorageState::kHold;
             MarkAsAssigned();
         }
         else
@@ -736,6 +775,7 @@ public:
             return CHIP_ERROR_INCORRECT_STATE;
         }
         mUpdateState.store(UpdateState::kAssigned);
+        mHoldState[1 - mActiveValueIdx.load()] = StorageState::kHold;
         return CHIP_NO_ERROR;
     }
 
@@ -868,6 +908,30 @@ private:
      */
     void SwapActiveValueStorage() { mActiveValueIdx.store(1 - mActiveValueIdx.load()); }
 
+    template <typename U>
+    static constexpr bool TypeIsNullable()
+    {
+        return IsNullable<U>::value;
+    }
+
+    template <typename U>
+    static constexpr bool TypeIsList()
+    {
+        return IsList<U>::value;
+    }
+
+    template <typename U>
+    static constexpr bool TypeIsStruct()
+    {
+        return IsStruct<U>::value;
+    }
+
+    template <typename U>
+    static constexpr bool TypeIsScalar()
+    {
+        return (IsNumeric<U>::value || IsEnum<U>::value);
+    }
+
     /**
      * @brief Checks if value type is nullable
      * @return true if nullable, false otherwise
@@ -878,19 +942,19 @@ private:
      * @brief Checks if value type is a list
      * @return true if list type, false otherwise
      */
-    static constexpr bool IsValueList() { return IsList<NonNullableType>::value; }
+    static constexpr bool IsValueList() { return IsList<DataType>::value; }
 
     /**
      * @brief Checks if value type is a struct
      * @return true if struct type, false otherwise
      */
-    static constexpr bool IsValueStruct() { return IsStruct<NonNullableType>::value; }
+    static constexpr bool IsValueStruct() { return IsStruct<DataType>::value; }
 
     /**
      * @brief Checks if value type is scalar (numeric or enum)
      * @return true if scalar type, false otherwise
      */
-    static constexpr bool IsValueScalar() { return (IsNumeric<NonNullableType>::value || IsEnum<NonNullableType>::value); }
+    static constexpr bool IsValueScalar() { return (IsNumeric<DataType>::value || IsEnum<DataType>::value); }
 
     // Internal implementation methods...
 
@@ -943,7 +1007,7 @@ private:
         }
         else
         {
-            if constexpr (IsList<NonNullableType>::value)
+            if constexpr (IsList<DataType>::value)
             {
                 is_neq = ListsNotEqual(a.Value(), b.Value());
             }
@@ -1004,7 +1068,7 @@ private:
         {
             if (!aValue.IsNull())
             {
-                if constexpr (IsList<NonNullableType>::value)
+                if constexpr (IsList<DataType>::value)
                 {
                     CleanupList(aValue.Value());
                 }
@@ -1029,10 +1093,15 @@ private:
     {
         assertChipStackLockedByCurrentThread();
 
-        for (auto & item : list)
+        if constexpr (TypeIsStruct<ListEntryType>())
         {
-            CleanupStruct(item);
+
+            for (auto & item : list)
+            {
+                CleanupStruct(item);
+            }
         }
+
         if (list.data())
         {
             Platform::MemoryFree(list.data());
