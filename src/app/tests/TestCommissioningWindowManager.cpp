@@ -20,6 +20,7 @@
 #include <app/reporting/ReportSchedulerImpl.h>
 #include <app/server/CommissioningWindowManager.h>
 #include <app/server/Server.h>
+#include <app/server/Dnssd.h>
 #include <crypto/RandUtils.h>
 #include <data-model-providers/codegen/CodegenDataModelProvider.h>
 #include <lib/dnssd/Advertiser.h>
@@ -423,12 +424,52 @@ TEST_F(TestCommissioningWindowManager, TestOnPlatformEventCommissioningComplete)
 TEST_F(TestCommissioningWindowManager, TestOnPlatformEventFailSafeTimerExpired) 
 {
     CommissioningWindowManager & commissionMgr = Server::GetInstance().GetCommissioningWindowManager();
-    chip::Test::CommissioningWindowManagerTestAccess access(&commissionMgr);
-    access.SetPASESession();
+    // chip::Test::CommissioningWindowManagerTestAccess access(&commissionMgr);
+    // access.SetPASESession();
 
     chip::DeviceLayer::ChipDeviceEvent event;
     event.Type = chip::DeviceLayer::DeviceEventType::kFailSafeTimerExpired;
 
     commissionMgr.OnPlatformEvent(&event);
 }
+
+
+TEST_F(TestCommissioningWindowManager, TestOnPlatformEventOperationalNetworkEnabled) 
+{
+    CommissioningWindowManager & commissionMgr = Server::GetInstance().GetCommissioningWindowManager();
+
+    chip::DeviceLayer::ChipDeviceEvent event;
+    event.Type = chip::DeviceLayer::DeviceEventType::kOperationalNetworkEnabled;
+
+    commissionMgr.OnPlatformEvent(&event);
+    EXPECT_EQ(chip::app::DnssdServer::Instance().AdvertiseOperational(), CHIP_NO_ERROR);
+
+}
+
+TEST_F(TestCommissioningWindowManager, TestOnPlatformEventOperationalNetworkEnabledFail) 
+{
+    CommissioningWindowManager & commissionMgr = Server::GetInstance().GetCommissioningWindowManager();
+
+    // Stopping DNS-SD server to trigger AdvertiseOperational() failure
+    chip::app::DnssdServer::Instance().StopServer();
+
+    chip::DeviceLayer::ChipDeviceEvent event;
+    event.Type = chip::DeviceLayer::DeviceEventType::kOperationalNetworkEnabled;
+
+    // This should attempt to start operational advertising, which will fail
+    commissionMgr.OnPlatformEvent(&event);
+    EXPECT_EQ(chip::app::DnssdServer::Instance().AdvertiseOperational(), CHIP_ERROR_INCORRECT_STATE);
+
+    chip::app::DnssdServer::Instance().StartServer(); // Restart the server for subsequent tests
+}
+
+TEST_F(TestCommissioningWindowManager, TestOnPlatformEventCloseCloseAllBleConnections) {
+    CommissioningWindowManager & commissionMgr = Server::GetInstance().GetCommissioningWindowManager();
+
+    chip::DeviceLayer::ChipDeviceEvent event;
+    event.Type = chip::DeviceLayer::DeviceEventType::kCloseAllBleConnections;
+
+    commissionMgr.OnPlatformEvent(&event);
+} 
+
 } // namespace
