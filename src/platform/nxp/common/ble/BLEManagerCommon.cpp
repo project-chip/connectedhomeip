@@ -769,7 +769,7 @@ CHIP_ERROR BLEManagerCommon::StopAdvertising(void)
         mFlags.Clear(Flags::kAdvertising);
         mFlags.Clear(Flags::kRestartAdvertising);
 
-        if (mDeviceIds.size())
+        if (!mDeviceIds.size())
         {
             ble_err_t err = blekw_stop_advertising();
             VerifyOrReturnError(err == BLE_OK, CHIP_ERROR_INCORRECT_STATE);
@@ -940,6 +940,7 @@ void BLEManagerCommon::HandleConnectEvent(blekw_msg_t * msg)
     if (mServiceMode == kMultipleBLE_Enabled)
     {
         _SetAdvertisingEnabled(false);
+        CancelBleAdvTimeoutTimer();
         mServiceMode = kMultipleBLE_Disabled;
     }
 
