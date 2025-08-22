@@ -178,7 +178,7 @@ class TC_MTRID_3_1(MeterIdentificationTestBaseHelper):
         await self.check_test_event_triggers_enabled()
 
         self.step("9")
-        await self.send_test_event_trigger_fake_data()
+        await self.send_test_event_trigger_attributes_value_set()
 
         self.step("10")
         await self.verify_reporting(subscription_handler.attribute_reports, cluster.Attributes.MeterType, "MeterType", meter_type)

@@ -15,7 +15,6 @@
 #    limitations under the License.
 
 
-import asyncio
 import logging
 
 from mobly import asserts
@@ -37,13 +36,11 @@ class MeterIdentificationTestBaseHelper(MatterBaseTest):
     test_event_fake_data = 0x0B06000000000000
     test_event_clear = 0x0B06000000000001
 
-    async def send_test_event_trigger_fake_data(self, t_wait=5):
+    async def send_test_event_trigger_attributes_value_set(self):
         await self.send_test_event_triggers(eventTrigger=self.test_event_fake_data)
-        await asyncio.sleep(t_wait)
 
-    async def send_test_event_clear(self, t_wait=5):
+    async def send_test_event_clear(self):
         await self.send_test_event_triggers(eventTrigger=self.test_event_clear)
-        await asyncio.sleep(t_wait)
 
     async def checkPowerThresholdStruct(self, struct: Globals.Structs.PowerThresholdStruct = None):
         """PowerThresholdStruct type validator."""
@@ -121,6 +118,7 @@ class MeterIdentificationTestBaseHelper(MatterBaseTest):
 
         try:
             asserts.assert_not_equal(reports[attribute][0].value, saved_value,
-                                     "Reported value should be different from saved value")
+                                     f"""Reported '{attribute_name}' value should be different from saved value. 
+                                     Subscriptions should only report when values have changed.""")
         except KeyError as err:
             asserts.fail(f"There is not reports for attribute {attribute_name}:\n{err}")
