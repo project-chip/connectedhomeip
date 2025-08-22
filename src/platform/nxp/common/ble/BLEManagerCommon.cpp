@@ -659,7 +659,7 @@ CHIP_ERROR BLEManagerCommon::ConfigureAdvertisingData(void)
 
     adv_params.minInterval = adv_params.maxInterval = advInterval;
     adv_params.advertisingType                      = gAdvConnectableUndirected_c;
-    adv_params.ownAddressType                       = gBleAddrTypeRandom_c;
+    adv_params.ownAddressType                       = ConfigurationMgr().IsFullyProvisioned() ? gBleAddrTypePublic_c : gBleAddrTypeRandom_c;
     adv_params.peerAddressType                      = gBleAddrTypePublic_c;
     memset(adv_params.peerAddress, 0, gcBleDeviceAddressSize_c);
     adv_params.channelMap   = (gapAdvertisingChannelMapFlags_t) (gAdvChanMapFlag37_c | gAdvChanMapFlag38_c | gAdvChanMapFlag39_c);
@@ -922,6 +922,21 @@ CHIP_ERROR BLEManagerCommon::AddReadNotificationHandle(uint16_t name)
     VerifyOrExit(!mFlags.Has(Flags::kK32WBLEStackInitialized), err = CHIP_ERROR_INCORRECT_STATE);
 
     mReadNotificationHandle[mReadHandleSize++] = name;
+
+exit:
+    return err;
+}
+
+CHIP_ERROR BLEManagerCommon::DisconnectAndUnbond(void)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
+    for (auto & id : mDeviceIds)
+    {
+        VerifyOrExit(Gap_Disconnect(id) == gBleSuccess_c, err = CHIP_ERROR_INTERNAL);
+    }
+
+    VerifyOrExit(Gap_RemoveAllBonds() == gBleSuccess_c, err = CHIP_ERROR_INTERNAL);
 
 exit:
     return err;
@@ -1224,11 +1239,13 @@ void BLEManagerCommon::blekw_gap_connection_cb(deviceId_t deviceId, gapConnectio
         }
 #endif
     }
+#if gAppUsePairing_d == 0
     else if (pConnectionEvent->eventType == gConnEvtPairingRequest_c)
     {
         /* Reject request for pairing */
         Gap_RejectPairing(deviceId, gPairingNotSupported_c);
     }
+#endif
     else if (pConnectionEvent->eventType == gConnEvtAuthenticationRejected_c)
     {
         ChipLogProgress(DeviceLayer, "BLE Authentication rejected (reason:%d).\n",
