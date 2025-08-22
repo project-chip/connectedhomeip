@@ -20,6 +20,9 @@
  *      This file implements Layer using dispatch.
  */
 
+#include <algorithm>
+#include <chrono>
+#include <dispatch/dispatch.h>
 #if !__has_feature(objc_arc)
 #error This file must be compiled with ARC. Use -fobjc-arc flag (or convert project to ARC).
 #endif
@@ -34,18 +37,11 @@
 
 // Note: CONFIG_BUILD_FOR_HOST_UNIT_TEST
 //
-// Certain unit tests are executed without a main dispatch queue, relying instead on a mock clock
-// to manually trigger timer callbacks at specific times.
-// Under normal conditions, the absence of a dispatch queue would cause the tests to fail. However,
-// when CONFIG_BUILD_FOR_HOST_UNIT_TEST is defined, this constraint is relaxed, allowing such tests
-// to run successfully.
-//
-// Consequently, the StartTimer method conditionally skips installing dispatch sources when no dispatch
-// queue is available, since these dispatch sources would never trigger during these specific unit tests.
-// In these scenarios, timer events are explicitly triggered via calls to HandleDispatchQueueEvents(), using
-// the mock clock provided by the test environment.
-// Creating a dispatch queue in test mode does not work because dispatch_source timers always follow
-// the real system clock, not our mock clock, so we must rely on mTimerList + HandleDispatchQueueEvents() instead.
+// Certain unit tests are executed without a main dispatch queue. When
+// CONFIG_BUILD_FOR_HOST_UNIT_TEST is defined, we will create a serial
+// dispatch queue and immediately suspend it. We will then use the normal
+// dispatch-based timer code, but manually gather and run timers from
+// HandleDispatchQueueEvents().
 
 namespace chip {
 namespace System {
@@ -62,43 +58,27 @@ namespace System {
             }
             delete ctx;
         }
-
-        void MaybeCancelTimerCompleteBlockCallbackContext(TimerList::Node * timer)
-        {
-            VerifyOrReturn(nullptr != timer);
-
-            __auto_type & cb = timer->GetCallback();
-            VerifyOrReturn(cb.GetOnComplete() == TimerCompleteBlockCallback);
-
-            __auto_type * ctx = static_cast<TimerCompleteBlockCallbackContext *>(cb.GetAppState());
-            delete ctx;
-        }
     }
 
-    void LayerImplDispatch::EnableTimer(const char * source, TimerList::Node * timer)
+    void LayerImplDispatch::EnableTimer(const char * source, dispatch_source_t timerSource)
     {
-        VerifyOrReturn(HasTimerSource(timer));
-
 #if SYSTEM_LAYER_IMPL_DISPATCH_DEBUG
-        ChipLogError(Inet, "%s (%s) : timer=%p - source=%p", __func__, source, timer, timer->mTimerSource);
+        ChipLogError(Inet, "%s (%s) : source=%p", __func__, source, timerSource);
 #endif
-        dispatch_resume(timer->mTimerSource);
+        dispatch_resume(timerSource);
     }
 
-    void LayerImplDispatch::DisableTimer(const char * source, TimerList::Node * timer)
+    void LayerImplDispatch::DisableTimer(const char * source, dispatch_source_t timerSource)
     {
-        VerifyOrReturn(HasTimerSource(timer));
-
-        bool isCancelled = dispatch_testcancel(timer->mTimerSource);
+        bool isCancelled = dispatch_testcancel(timerSource);
 
 #if SYSTEM_LAYER_IMPL_DISPATCH_DEBUG
-        ChipLogError(Inet, "%s (%s) : timer=%p - source=%p - cancelled=%d", __func__, source, timer, timer->mTimerSource, cancelled);
+        ChipLogError(Inet, "%s (%s) : source=%p - cancelled=%d", __func__, source, timerSource, cancelled);
 #endif
 
         if (!isCancelled) {
-            dispatch_source_cancel(timer->mTimerSource);
+            dispatch_source_cancel(timerSource);
         }
-        timer->mTimerSource = nullptr;
     }
 
     CHIP_ERROR LayerImplDispatch::Init()
@@ -119,12 +99,18 @@ namespace System {
     {
         VerifyOrReturn(mLayerState.SetShuttingDown());
 
-        TimerList::Node * timer;
-        while ((timer = mTimerList.PopEarliest()) != nullptr) {
-            MaybeCancelTimerCompleteBlockCallbackContext(timer);
-            DisableTimer(__func__, timer);
+        for (const TimerData & timer : mTimers) {
+            DisableTimer(__func__, timer.timerSource);
+        };
+        mTimers.clear();
+
+#if CONFIG_BUILD_FOR_HOST_UNIT_TEST
+        if (mHasSuspendedDispatchQueue) {
+            dispatch_resume(mDispatchQueue);
+            mHasSuspendedDispatchQueue = false;
         }
-        mTimerPool.ReleaseAll();
+#endif
+        mDispatchQueue = nullptr;
 
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS
         mSocketWatchPool.Clear();
@@ -141,18 +127,18 @@ namespace System {
 
         VerifyOrReturnError(mLayerState.IsInitialized(), CHIP_ERROR_INCORRECT_STATE);
 
-        __auto_type dispatchQueue = GetDispatchQueue();
-        if (HasDispatchQueue(dispatchQueue)) {
-            dispatch_async(dispatchQueue, ^{
-                block();
-            });
-        }
 #if CONFIG_BUILD_FOR_HOST_UNIT_TEST
-        else {
+        if (mHasSuspendedDispatchQueue) {
             std::lock_guard<std::mutex> lock(mTestQueueMutex);
             mTestQueuedBlocks.emplace_back(block);
+            return CHIP_NO_ERROR;
         }
 #endif
+
+        __auto_type dispatchQueue = GetDispatchQueue();
+        dispatch_async(dispatchQueue, ^{
+            block();
+        });
         return CHIP_NO_ERROR;
     }
 
@@ -173,7 +159,7 @@ namespace System {
         __auto_type * ctx = new TimerCompleteBlockCallbackContext { block };
         VerifyOrReturnError(nullptr != ctx, CHIP_ERROR_NO_MEMORY);
 
-        return StartTimer(delay, TimerCompleteBlockCallback, ctx);
+        return StartTimer(delay, TimerCompleteBlockCallback, ctx, false);
     }
 
     CHIP_ERROR LayerImplDispatch::StartTimer(Clock::Timeout delay, TimerCompleteCallback onComplete, void * appState)
@@ -196,30 +182,33 @@ namespace System {
             CancelTimer(onComplete, appState);
         }
 
-        __auto_type * timer = mTimerPool.Create(*this, SystemClock().GetMonotonicTimestamp() + delay, onComplete, appState);
-        VerifyOrReturnError(timer != nullptr, CHIP_ERROR_NO_MEMORY);
-
         __auto_type dispatchQueue = GetDispatchQueue();
-        if (HasDispatchQueue(dispatchQueue)) {
-            __auto_type timerSource = dispatch_source_create(DISPATCH_SOURCE_TYPE_TIMER, 0, DISPATCH_TIMER_STRICT, dispatchQueue);
-            VerifyOrDie(timerSource != nullptr);
+        __auto_type timerSource = dispatch_source_create(DISPATCH_SOURCE_TYPE_TIMER, 0, DISPATCH_TIMER_STRICT, dispatchQueue);
+        VerifyOrDie(timerSource != nullptr);
 
-            timer->mTimerSource = timerSource;
+        dispatch_time_t walltime = dispatch_time(DISPATCH_WALLTIME_NOW, std::chrono::nanoseconds(Clock::Milliseconds64(delay)).count());
 
-            dispatch_source_set_timer(
-                timerSource, dispatch_walltime(nullptr, static_cast<int64_t>(Clock::Milliseconds64(delay).count() * NSEC_PER_MSEC)),
-                DISPATCH_TIME_FOREVER, 2 * NSEC_PER_MSEC);
+        mTimers.emplace_back(timerSource, walltime, onComplete, appState);
 
-            dispatch_source_set_event_handler(timerSource, ^{
-                DisableTimer(__func__, timer);
-                mTimerList.Remove(timer);
-                mTimerPool.Invoke(timer);
-            });
+        dispatch_source_set_timer(timerSource, walltime, DISPATCH_TIME_FOREVER, std::chrono::nanoseconds(2).count());
 
-            EnableTimer(__func__, timer);
-        }
+        LayerImplDispatch * self = this;
+        dispatch_source_set_event_handler(timerSource, ^{
+            auto data = std::find_if(mTimers.begin(), mTimers.end(), [timerSource](const TimerData & data) { return data.timerSource == timerSource; });
+            TimerCompleteCallback callback = data->onComplete;
+            void * state = data->appState;
+            mTimers.erase(data);
+            callback(self, state);
+        });
 
-        (void) mTimerList.Add(timer);
+        dispatch_source_set_cancel_handler(timerSource, ^{
+            if (onComplete == TimerCompleteBlockCallback) {
+                delete static_cast<TimerCompleteBlockCallbackContext *>(appState);
+            }
+        });
+
+        EnableTimer(__func__, timerSource);
+
         return CHIP_NO_ERROR;
     }
 
@@ -232,7 +221,7 @@ namespace System {
 
         assertChipStackLockedByCurrentThread();
 
-        Clock::Timeout remainingTime = mTimerList.GetRemainingTime(onComplete, appState);
+        Clock::Timeout remainingTime = GetRemainingTime(onComplete, appState);
         if (remainingTime.count() < delay.count()) {
             return StartTimer(delay, onComplete, appState);
         }
@@ -245,18 +234,7 @@ namespace System {
 #if SYSTEM_LAYER_IMPL_DISPATCH_DEBUG
         ChipLogError(Inet, "%s (onComplete: %p - appState: %p)", __func__, onComplete, appState);
 #endif
-        bool timerIsActive = (mTimerList.GetRemainingTime(onComplete, appState) > Clock::kZero);
-
-        if (!timerIsActive) {
-            // check if the timer is in the mExpiredTimers list about to be fired.
-            for (TimerList::Node * timer = mExpiredTimers.Earliest(); timer != nullptr; timer = timer->mNextTimer) {
-                if (timer->GetCallback().GetOnComplete() == onComplete && timer->GetCallback().GetAppState() == appState) {
-                    return true;
-                }
-            }
-        }
-
-        return timerIsActive;
+        return (GetRemainingTime(onComplete, appState) > Clock::kZero);
     }
 
     Clock::Timeout LayerImplDispatch::GetRemainingTime(TimerCompleteCallback onComplete, void * appState)
@@ -264,7 +242,13 @@ namespace System {
 #if SYSTEM_LAYER_IMPL_DISPATCH_DEBUG
         ChipLogError(Inet, "%s (onComplete: %p - appState: %p)", __func__, onComplete, appState);
 #endif
-        return mTimerList.GetRemainingTime(onComplete, appState);
+        dispatch_time_t walltime = dispatch_time(DISPATCH_WALLTIME_NOW, 0);
+        const TimerData * data = FindTimerData(onComplete, appState);
+        if (data && walltime < data->walltime) {
+            return std::chrono::duration_cast<Clock::Timeout>(std::chrono::duration<uint64_t, std::nano>(data->walltime - walltime));
+        }
+
+        return Clock::kZero;
     }
 
     void LayerImplDispatch::CancelTimer(TimerCompleteCallback onComplete, void * appState)
@@ -276,20 +260,13 @@ namespace System {
 
         VerifyOrReturn(mLayerState.IsInitialized());
 
-        __auto_type * timer = mTimerList.Remove(onComplete, appState);
-        if (timer == nullptr) {
-            // The timer was not in our "will fire in the future" list, but it might
-            // be in the "we're about to fire these" chunk we already grabbed from
-            // that list.  Check for it there too, and if found there we still want
-            // to cancel it.
-            timer = mExpiredTimers.Remove(onComplete, appState);
+        auto data = std::find_if(mTimers.cbegin(), mTimers.cend(), [onComplete, appState](const TimerData & data) {
+            return data.onComplete == onComplete && data.appState == appState;
+        });
+        if (data != mTimers.cend()) {
+            DisableTimer(__func__, data->timerSource);
+            mTimers.erase(data);
         }
-        VerifyOrReturn(timer != nullptr);
-
-        MaybeCancelTimerCompleteBlockCallbackContext(timer);
-        DisableTimer(__func__, timer);
-
-        mTimerPool.Release(timer);
     }
 
     void LayerImplDispatch::HandleDispatchQueueEvents(Clock::Timeout timeout)
@@ -318,14 +295,20 @@ namespace System {
             VerifyOrDo(CHIP_NO_ERROR == error, delete ctx);
         }
 
-        // Obtain the list of currently expired timers. Any new timers added by timer callback are NOT handled on this pass,
-        // since that could result in infinite handling of new timers blocking any other progress.
-        VerifyOrDieWithMsg(mExpiredTimers.Empty(), DeviceLayer, "Re-entry into HandleEvents from a timer callback?");
-        mExpiredTimers = mTimerList.ExtractEarlier(Clock::Timeout(1) + SystemClock().GetMonotonicTimestamp());
-        TimerList::Node * timer = nullptr;
-        while ((timer = mExpiredTimers.PopEarliest()) != nullptr) {
-            DisableTimer(__func__, timer);
-            mTimerPool.Invoke(timer);
+        std::vector<TimerData> timerData;
+        dispatch_time_t walltime = dispatch_time(DISPATCH_WALLTIME_NOW, 0);
+        for (auto data = mTimers.begin(); data != mTimers.end();) {
+            if (walltime >= data->walltime) {
+                timerData.insert(std::lower_bound(timerData.begin(), timerData.end(), data->walltime, [](const TimerData & a, dispatch_time_t b) {
+                    return a.walltime < b;
+                }), std::move(*data));
+                mTimers.erase(data);
+            } else {
+                ++data;
+            }
+        }
+        for (const TimerData & d : timerData) {
+            d.onComplete(this, d.appState);
         }
 #endif
     }
