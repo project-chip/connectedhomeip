@@ -128,16 +128,14 @@ class TC_SU_2_8(MatterBaseTest):
         P1_NODE_ID = 10
         P1_DISCRIMINATOR = 1111
         P2_NODE_ID = 11
-        P2_DISCRIMINATOR = 2222
         OTA_PROVIDER_PASSCODE = 20202021
 
-        # Variables for commissioning TH1-OTA Provider 1
+        # Variables for commissioning TH1-OTA Provider
         p1_node = P1_NODE_ID
         p1_disc = P1_DISCRIMINATOR
 
-        # Variables for commissioning TH2-OTA Provider 2
+        # Variables for commissioning TH2-OTA Provider
         p2_node = P2_NODE_ID
-        p2_disc = P2_DISCRIMINATOR
 
         p_pass = OTA_PROVIDER_PASSCODE
 
@@ -165,8 +163,10 @@ class TC_SU_2_8(MatterBaseTest):
         logging.info("Openning commissioning window on DUT.")
         params = await self.open_commissioning_window(th1, dut_node_id)
 
+        dut_node_id_th2 = 2
+
         resp = await th2.CommissionOnNetwork(
-            nodeId=self.dut_node_id,
+            nodeId=dut_node_id_th2,
             setupPinCode=params.commissioningParameters.setupPinCode,
             filterType=ChipDeviceCtrl.DiscoveryFilterType.LONG_DISCRIMINATOR,
             filter=params.randomDiscriminator
@@ -176,7 +176,7 @@ class TC_SU_2_8(MatterBaseTest):
 
         # Commissioning Provider-TH1
 
-        logging.info("Commissioning OTA Provider 1 to TH1")
+        logging.info("Commissioning OTA Provider to TH1")
 
         resp = await th1.CommissionOnNetwork(
             nodeId=p1_node,
@@ -189,13 +189,16 @@ class TC_SU_2_8(MatterBaseTest):
 
         # Commissioning Provider-TH2
 
-        logging.info("Commissioning OTA Provider 2 to TH2")
+        logging.info("Openning commissioning window on DUT.")
+        params = await self.open_commissioning_window(th1, p1_node)
+
+        logging.info("Commissioning OTA Provider to TH2")
 
         resp = await th2.CommissionOnNetwork(
             nodeId=p2_node,
-            setupPinCode=p_pass,
+            setupPinCode=params.commissioningParameters.setupPinCode,
             filterType=ChipDeviceCtrl.DiscoveryFilterType.LONG_DISCRIMINATOR,
-            filter=p2_disc
+            filter=params.randomDiscriminator
         )
 
         logging.info(f"Commissioning response: {resp}.")
@@ -232,13 +235,13 @@ class TC_SU_2_8(MatterBaseTest):
         # DUT tries to send a QueryImage command to TH1/OTA-P.
         self.step(1)
 
-        # Do not announce TH1-OTA Provider 1
+        # Do not announce TH1-OTA Provider
         # await self._announce(th1, vendor_id, p1_node, endpoint)
 
         # Add sleep time so the Provider will respond with Idle state since it has no permissions for update
         time.sleep(5)
 
-        # Check state remains as kIdle for TH1
+        # Check state remains as kIdle for TH1-OTA Provider
         await self.check_state_remains_idle(endpoint, Clusters.Objects.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kIdle)
 
         # TH1/OTA-P does not respond with QueryImageResponse and sends QueryImage command to TH2/OTA-P.
