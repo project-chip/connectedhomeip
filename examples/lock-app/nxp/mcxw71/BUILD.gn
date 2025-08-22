@@ -200,8 +200,9 @@ mcxw71_executable("lock_app") {
   }
 
   if (nxp_multiple_ble_connections) {
-    sources +=
-        [ "${common_example_dir}/app_ble/source/NXPHostBLEApplicationManager.cpp" ]
+    sources += [
+      "${common_example_dir}/app_ble/source/NXPHostBLEApplicationManager.cpp",
+    ]
   } else {
     sources += [
       "${common_example_dir}/app_ble/source/BLEApplicationManagerEmpty.cpp",
