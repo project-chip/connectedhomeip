@@ -39,7 +39,7 @@ import logging
 
 import chip.clusters as Clusters
 from chip.interaction_model import Status
-from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+from chip.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main, has_cluster, run_if_endpoint_matches
 from mobly import asserts
 from TC_PAVSTTestBase import PAVSTTestBase
 
@@ -87,7 +87,7 @@ class TC_PAVST_2_4(MatterBaseTest, PAVSTTestBase):
             )
         ]
 
-    @async_test_body
+    @run_if_endpoint_matches(has_cluster(Clusters.PushAvStreamTransport))
     async def test_TC_PAVST_2_4(self):
         endpoint = self.get_endpoint(default=1)
         pvcluster = Clusters.PushAvStreamTransport
@@ -100,7 +100,6 @@ class TC_PAVST_2_4(MatterBaseTest, PAVSTTestBase):
 
         self.step(1)
         # Commission DUT - already done
-        # @run_if_endpoint_matches(has_cluster(Clusters.PushAvStreamTransport))
         status = await self.check_and_delete_all_push_av_transports(endpoint, pvattr)
         asserts.assert_equal(
             status, Status.Success, "Status must be SUCCESS!"
@@ -126,7 +125,6 @@ class TC_PAVST_2_4(MatterBaseTest, PAVSTTestBase):
         )
 
         self.step(2)
-        # @run_if_endpoint_matches(has_cluster(Clusters.PushAvStreamTransport)):
         transportConfigs = await self.read_pavst_attribute_expect_success(endpoint,
                                                                           pvattr.CurrentConnections,
                                                                           )
@@ -138,9 +136,10 @@ class TC_PAVST_2_4(MatterBaseTest, PAVSTTestBase):
 
         # TH1 sends command
         self.step(3)
-        # @run_if_endpoint_matches(has_cluster(Clusters.PushAvStreamTransport)):
+        all_connectionID = [tc.connectionID for tc in transportConfigs]
+        max_connectionID = max(all_connectionID)
         cmd = pvcluster.Commands.ModifyPushTransport(
-            connectionID=10,
+            connectionID=max_connectionID + 1,
             transportOptions=aTransportOptions
         )
         status = await self.psvt_modify_push_transport(cmd)
@@ -160,7 +159,6 @@ class TC_PAVST_2_4(MatterBaseTest, PAVSTTestBase):
                 vendorId=0xFFF1, fabricId=self.matter_test_config.fabric_id + 1
             )
             self.th2 = th2_fabric_admin.NewController(nodeId=2, useTestCommissioner=True)
-            # @run_if_endpoint_matches(has_cluster(Clusters.PushAvStreamTransport)):
             cmd = pvcluster.Commands.ModifyPushTransport(
                 connectionID=aConnectionID,
                 transportOptions=aTransportOptions
@@ -172,7 +170,6 @@ class TC_PAVST_2_4(MatterBaseTest, PAVSTTestBase):
             )
 
         self.step(5)
-        # @run_if_endpoint_matches(has_cluster(Clusters.PushAvStreamTransport)):
         aModifiedTransportOptions = aTransportOptions.expiryTime
         aModifiedTransportOptions = aModifiedTransportOptions + 120
         aTransportOptions.expiryTime = aModifiedTransportOptions
@@ -186,7 +183,6 @@ class TC_PAVST_2_4(MatterBaseTest, PAVSTTestBase):
             "DUT responds with SUCCESS status code.")
 
         self.step(6)
-        # @run_if_endpoint_matches(has_cluster(Clusters.PushAvStreamTransport)):
         transportConfigs = await self.read_pavst_attribute_expect_success(
             endpoint, pvattr.CurrentConnections
         )
