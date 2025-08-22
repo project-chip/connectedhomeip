@@ -136,7 +136,7 @@ class XmlDeviceTypeClusterRequirements:
     name: str
     side: ClusterSide
     conformance: ConformanceCallable
-    # mask to conformance
+    # Feature mask (1 << feature_id) to conformance
     feature_overrides: dict[uint, Callable] = field(default_factory=dict)
     attribute_overrides: dict[uint, Callable] = field(default_factory=dict)
     command_overrides: dict[uint, Callable] = field(default_factory=dict)
