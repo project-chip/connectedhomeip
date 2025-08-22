@@ -95,7 +95,7 @@ class TC_EGC_2_1(ElectricalGridConditionsTestBaseHelper, MatterBaseTest):
             self.check_ElectricalGridConditionsStruct(cluster=cluster, struct=val)
 
         self.step("4")
-        if await self.attribute_guard(endpoint=endpoint, attribute=attributes.ForecastConditions):
+        if self.attribute_guard(endpoint=endpoint, attribute=attributes.ForecastConditions):
             val = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.ForecastConditions)
             self.check_ForecastConditions(cluster=cluster, forecastConditions=val)
 

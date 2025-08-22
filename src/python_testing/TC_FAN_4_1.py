@@ -180,7 +180,7 @@ class TC_FAN_4_1(MatterBaseTest):
         percent_setting_original = await self.read_single_attribute_check_success(cluster=fan, attribute=fan.Attributes.PercentSetting)
 
         self.step(8)
-        if await self.feature_guard(self.get_endpoint(), cluster=fan, feature_int=fan.Bitmaps.Feature.kMultiSpeed):
+        if self.feature_guard(self.get_endpoint(), cluster=fan, feature_int=fan.Bitmaps.Feature.kMultiSpeed):
             speed_setting_original = await self.read_single_attribute_check_success(cluster=fan, attribute=fan.Attributes.SpeedSetting)
 
         self.step(9)
@@ -213,7 +213,7 @@ class TC_FAN_4_1(MatterBaseTest):
                              "PercentSetting was changed when on/off cluster was changed")
 
         self.step(15)
-        if await self.feature_guard(self.get_endpoint(), cluster=fan, feature_int=fan.Bitmaps.Feature.kMultiSpeed):
+        if self.feature_guard(self.get_endpoint(), cluster=fan, feature_int=fan.Bitmaps.Feature.kMultiSpeed):
             speed_setting_new = await self.read_single_attribute_check_success(cluster=fan, attribute=fan.Attributes.SpeedSetting)
             asserts.assert_equal(speed_setting_new, speed_setting_original,
                                  "SpeedSetting was changed when on/off cluster was changed")

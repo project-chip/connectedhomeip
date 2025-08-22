@@ -152,7 +152,7 @@ class TC_RR_1_1(MatterBaseTest):
         asserts.assert_greater_equal(capability_minima.caseSessionsPerFabric, 3)
 
         fabric_table_entries_to_check: dict[int, FabricTableEntryToCheck] = {}
-        await self._populate_wildcard()
+        self._populate_wildcard()
         supports_vid_verification = Clusters.OperationalCredentials.Commands.SetVIDVerificationStatement.command_id in self.stored_global_wildcard.attributes[
             0][Clusters.OperationalCredentials][Clusters.OperationalCredentials.Attributes.AcceptedCommandList]
         logging.info(f"Device supports VID verification: {supports_vid_verification}")

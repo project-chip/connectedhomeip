@@ -146,17 +146,18 @@ class TC_TestAttrAvail(MatterBaseTest):
         self.th1 = self.default_controller
 
         self.step(2)
-        attr_should_be_there = await self.attribute_guard(endpoint=self.endpoint, attribute=attributes.OperationalState)
+        attr_should_be_there = self.attribute_guard(endpoint=self.endpoint, attribute=attributes.OperationalState)
         asserts.assert_true(attr_should_be_there, True)
         self.print_step("Operational State Attr", attr_should_be_there)
 
         self.step(3)
-        cmd_should_be_there = await self.command_guard(endpoint=self.endpoint, command=commands.Resume)
+        cmd_should_be_there = self.command_guard(endpoint=self.endpoint, command=commands.Resume)
         asserts.assert_true(cmd_should_be_there, True)
         self.print_step("Operational Resume Command available ", cmd_should_be_there)
 
         self.step(4)
-        feat_should_be_there = await self.feature_guard(endpoint=self.endpoint, cluster=Clusters.BooleanStateConfiguration, feature_int=Clusters.BooleanStateConfiguration.Bitmaps.Feature.kAudible)
+        feat_should_be_there = self.feature_guard(endpoint=self.endpoint, cluster=Clusters.BooleanStateConfiguration,
+                                                  feature_int=Clusters.BooleanStateConfiguration.Bitmaps.Feature.kAudible)
         asserts.assert_true(feat_should_be_there, True)
         self.print_step("Boolean State Config Audio Feature available ", feat_should_be_there)
 

@@ -154,7 +154,7 @@ class TC_CC_2_1(MatterBaseTest):
         # Validate the expected attribute is found.
         for primary in primary_list:
             attribute_str = primary.format(primary=primary_index)
-            await self._populate_wildcard()
+            self._populate_wildcard()
             has_attr_func = has_attribute(attribute=getattr(self.attributes, attribute_str))
             has_attr_status = has_attr_func(self.stored_global_wildcard, self.endpoint)
             if attribute_str not in instance_attribute_names or not has_attr_status:
@@ -188,7 +188,7 @@ class TC_CC_2_1(MatterBaseTest):
         # If attribute_guard return false it set the current step as skipped so we can finish the step here.
         logger.info(f"Verifying the attribute :  {attribute}")
         # Verify if the attribute is implemented in the current cluster.
-        if await self.attribute_guard(endpoint=self.endpoint, attribute=attribute):
+        if self.attribute_guard(endpoint=self.endpoint, attribute=attribute):
             # it is so retrieve the value to check the type.
             attr_val = await self.read_single_attribute_check_success(cluster=self.cluster, attribute=attribute, endpoint=self.endpoint)
             logger.info(f"Current value for {attribute} is {attr_val}")
@@ -320,7 +320,7 @@ class TC_CC_2_1(MatterBaseTest):
 
         self.step(23)
         # Manual check
-        if await self.attribute_guard(endpoint=self.endpoint, attribute=self.attributes.StartUpColorTemperatureMireds):
+        if self.attribute_guard(endpoint=self.endpoint, attribute=self.attributes.StartUpColorTemperatureMireds):
             sctmr_val = await self.read_single_attribute_check_success(cluster=self.cluster, endpoint=self.endpoint, attribute=self.attributes.StartUpColorTemperatureMireds)
             asserts.assert_true(sctmr_val is NullValue or ((sctmr_val >= 1) and (sctmr_val <= 65279)), "Value is out of range.")
 
