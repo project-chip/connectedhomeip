@@ -19,9 +19,9 @@ import logging
 from enum import StrEnum
 from typing import Any
 
+from DeviceConformanceTests import DeviceConformanceTests
 from fake_device_builder import create_minimal_cluster, create_minimal_dt
 from mobly import asserts
-from TC_DeviceConformance import DeviceConformanceTests
 
 import matter.clusters as Clusters
 from matter.testing.basic_composition import arls_populated
