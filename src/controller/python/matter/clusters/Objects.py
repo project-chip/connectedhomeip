@@ -692,7 +692,7 @@ class Globals:
                         ClusterObjectFieldDescriptor(Label="streamUsage", Tag=3, Type=Globals.Enums.StreamUsageEnum),
                         ClusterObjectFieldDescriptor(Label="videoStreamID", Tag=4, Type=typing.Union[Nullable, uint]),
                         ClusterObjectFieldDescriptor(Label="audioStreamID", Tag=5, Type=typing.Union[Nullable, uint]),
-                        ClusterObjectFieldDescriptor(Label="metadataEnabled", Tag=6, Type=typing.Optional[bool]),
+                        ClusterObjectFieldDescriptor(Label="metadataEnabled", Tag=6, Type=bool),
                         ClusterObjectFieldDescriptor(Label="fabricIndex", Tag=254, Type=uint),
                     ])
 
@@ -702,7 +702,7 @@ class Globals:
             streamUsage: 'Globals.Enums.StreamUsageEnum' = 0
             videoStreamID: 'typing.Union[Nullable, uint]' = NullValue
             audioStreamID: 'typing.Union[Nullable, uint]' = NullValue
-            metadataEnabled: 'typing.Optional[bool]' = None
+            metadataEnabled: 'bool' = False
             fabricIndex: 'uint' = 0
 
 
@@ -46656,11 +46656,10 @@ class CameraAvStreamManagement(Cluster):
                         ClusterObjectFieldDescriptor(Label="maxResolution", Tag=6, Type=CameraAvStreamManagement.Structs.VideoResolutionStruct),
                         ClusterObjectFieldDescriptor(Label="minBitRate", Tag=7, Type=uint),
                         ClusterObjectFieldDescriptor(Label="maxBitRate", Tag=8, Type=uint),
-                        ClusterObjectFieldDescriptor(Label="minKeyFrameInterval", Tag=9, Type=uint),
-                        ClusterObjectFieldDescriptor(Label="maxKeyFrameInterval", Tag=10, Type=uint),
-                        ClusterObjectFieldDescriptor(Label="watermarkEnabled", Tag=11, Type=typing.Optional[bool]),
-                        ClusterObjectFieldDescriptor(Label="OSDEnabled", Tag=12, Type=typing.Optional[bool]),
-                        ClusterObjectFieldDescriptor(Label="referenceCount", Tag=13, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="keyFrameInterval", Tag=9, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="watermarkEnabled", Tag=10, Type=typing.Optional[bool]),
+                        ClusterObjectFieldDescriptor(Label="OSDEnabled", Tag=11, Type=typing.Optional[bool]),
+                        ClusterObjectFieldDescriptor(Label="referenceCount", Tag=12, Type=uint),
                     ])
 
             videoStreamID: 'uint' = 0
@@ -46672,8 +46671,7 @@ class CameraAvStreamManagement(Cluster):
             maxResolution: 'CameraAvStreamManagement.Structs.VideoResolutionStruct' = field(default_factory=lambda: CameraAvStreamManagement.Structs.VideoResolutionStruct())
             minBitRate: 'uint' = 0
             maxBitRate: 'uint' = 0
-            minKeyFrameInterval: 'uint' = 0
-            maxKeyFrameInterval: 'uint' = 0
+            keyFrameInterval: 'uint' = 0
             watermarkEnabled: 'typing.Optional[bool]' = None
             OSDEnabled: 'typing.Optional[bool]' = None
             referenceCount: 'uint' = 0
@@ -46880,10 +46878,9 @@ class CameraAvStreamManagement(Cluster):
                         ClusterObjectFieldDescriptor(Label="maxResolution", Tag=5, Type=CameraAvStreamManagement.Structs.VideoResolutionStruct),
                         ClusterObjectFieldDescriptor(Label="minBitRate", Tag=6, Type=uint),
                         ClusterObjectFieldDescriptor(Label="maxBitRate", Tag=7, Type=uint),
-                        ClusterObjectFieldDescriptor(Label="minKeyFrameInterval", Tag=8, Type=uint),
-                        ClusterObjectFieldDescriptor(Label="maxKeyFrameInterval", Tag=9, Type=uint),
-                        ClusterObjectFieldDescriptor(Label="watermarkEnabled", Tag=10, Type=typing.Optional[bool]),
-                        ClusterObjectFieldDescriptor(Label="OSDEnabled", Tag=11, Type=typing.Optional[bool]),
+                        ClusterObjectFieldDescriptor(Label="keyFrameInterval", Tag=8, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="watermarkEnabled", Tag=9, Type=typing.Optional[bool]),
+                        ClusterObjectFieldDescriptor(Label="OSDEnabled", Tag=10, Type=typing.Optional[bool]),
                     ])
 
             streamUsage: Globals.Enums.StreamUsageEnum = 0
@@ -46894,8 +46891,7 @@ class CameraAvStreamManagement(Cluster):
             maxResolution: CameraAvStreamManagement.Structs.VideoResolutionStruct = field(default_factory=lambda: CameraAvStreamManagement.Structs.VideoResolutionStruct())
             minBitRate: uint = 0
             maxBitRate: uint = 0
-            minKeyFrameInterval: uint = 0
-            maxKeyFrameInterval: uint = 0
+            keyFrameInterval: uint = 0
             watermarkEnabled: typing.Optional[bool] = None
             OSDEnabled: typing.Optional[bool] = None
 
