@@ -20,7 +20,8 @@ from typing import Optional
 import matter.clusters as Clusters
 from matter.testing.basic_composition import BasicCompositionTests
 from matter.testing.matter_testing import MatterBaseTest
-from matter.testing.problem_notices import AttributePathLocation, ClusterPathLocation, ProblemLocation, ProblemNotice, ProblemSeverity
+from matter.testing.problem_notices import (AttributePathLocation, ClusterPathLocation, ProblemLocation, ProblemNotice,
+                                            ProblemSeverity)
 
 FLAG_PRODUCT_NAME = "pixit_allow_test_in_product_name"
 FLAG_VENDOR_NAME = "pixit_allow_test_in_vendor_name"
