@@ -40,10 +40,10 @@
 import logging
 from typing import List
 
-import chip.clusters as Clusters
-from chip.clusters.Types import Nullable
-from chip.interaction_model import InteractionModelError, Status
-from chip.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main, has_cluster, run_if_endpoint_matches
+import matter.clusters as Clusters
+from matter.clusters.Types import Nullable
+from matter.interaction_model import InteractionModelError, Status
+from matter.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main, has_cluster, run_if_endpoint_matches
 from mobly import asserts
 
 
@@ -326,8 +326,12 @@ class TC_G_2_3(MatterBaseTest):
         self.step("17")
         groupTableList: List[Clusters.GroupKeyManagement.Attributes.GroupTable] = await self.read_single_attribute(
             dev_ctrl=th1, node_id=self.dut_node_id, endpoint=0, attribute=Clusters.GroupKeyManagement.Attributes.GroupTable)
-        asserts.assert_true(all(entry.groupId != kGroupId13 for entry in groupTableList),
-                            f"Group ID {kGroupId13} was unexpectedly found in the group table")
+
+        # Verify that GroupId ( 0x0006 + maxgroups to 0x0006 + maxgroups+1) is not present
+        base = 0x0006
+        forbidden_ids = [base + maxgroups, base + maxgroups + 1]
+        asserts.assert_true(all(entry.groupId != forbidden_ids for entry in groupTableList),
+                            f"Group ID {forbidden_ids} was unexpectedly found in the group table")
 
         self.step("18")
         cmd = Clusters.Groups.Commands.RemoveAllGroups()
