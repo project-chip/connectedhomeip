@@ -186,7 +186,7 @@ class TC_AVSM_2_11(MatterBaseTest, AVSMTestBase):
         readStreamUsagePriorities = await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=cluster, attribute=attr.StreamUsagePriorities
         )
-        logger.info(f"Rx'd StreamUsagePriorities: {aStreamUsagePriorities}")
+        logger.info(f"Rx'd StreamUsagePriorities: {readStreamUsagePriorities}")
         asserts.assert_equal(readStreamUsagePriorities, aStreamUsagePriorities,
                              "The read StreamUsagePriorities is different from the one set in SetStreamPriorities")
 

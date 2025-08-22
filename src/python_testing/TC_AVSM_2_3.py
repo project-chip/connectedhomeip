@@ -149,7 +149,7 @@ class TC_AVSM_2_3(MatterBaseTest, AVSMTestBase):
                 OSDEnabled=None if aOSD is None else not aOSD,
             )
             await self.send_single_cmd(endpoint=endpoint, cmd=cmd)
-            asserts.fail("Unexpected success when expecting NOT_FOUND due to wrong streamID)")
+            asserts.fail("Unexpected success when expecting NOT_FOUND due to wrong streamID")
         except InteractionModelError as e:
             asserts.assert_equal(e.status, Status.NotFound, "Unexpected error when expecting NOT_FOUND")
             pass
