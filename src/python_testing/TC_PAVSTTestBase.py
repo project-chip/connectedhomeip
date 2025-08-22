@@ -213,7 +213,7 @@ class PAVSTTestBase:
                         "streamUsage": aStreamUsagePriorities[0],
                         "videoStreamID": aAllocatedVideoStream,
                         "audioStreamID": aAllocatedAudioStream,
-                        "endpointID": 1,
+                        "endpointID": endpoint,
                         "url": "https://localhost:1234/streams/1",
                         "triggerOptions": {"triggerType": triggerType},
                         "ingestMethod": cluster.Enums.IngestMethodsEnum.kCMAFIngest,
