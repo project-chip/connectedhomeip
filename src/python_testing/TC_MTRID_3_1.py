@@ -76,34 +76,53 @@ class TC_MTRID_3_1(MeterIdentificationTestBaseHelper):
                      - MaxIntervalCeiling: 10""", "Subscription successfully established."),
             TestStep("3", "TH reads MeterType attribute.", """
                      - DUT replies a null or a MeterTypeEnum value;
+                     - Verify that value in range 0 - 2;
                      - Store value as meter_type."""),
             TestStep("4", "TH reads PointOfDelivery attribute.", """
                      - DUT replies a null or a value of string type;
+                     - Verify that size is in range 0 - 64;
                      - Store value as point_of_delivery."""),
             TestStep("5", "TH reads MeterSerialNumber attribute.", """
                      - DUT replies a null or a value of string type;
+                     - Verify that size is in range 0 - 64;
                      - Store value as meter_serial_number."""),
             TestStep("6", "TH reads ProtocolVersion attribute.", """
                      - DUT replies a null or a value of string type;
+                     - Verify that size is in range 0 - 64;
                      - Store value as protocol_version."""),
             TestStep("7", "TH reads PowerThreshold attribute.", """
-                     - DUT replies a null or a MeterTypeEnum value;
+                     - DUT replies a null or a value of PowerThresholdStruct type;
+                     - PowerThreshold field has type int64;
+                     - ApparentPowerThreshold field has type int64;
+                     - PowerThresholdSource field has type PowerThresholdSourceEnum and value in range 0 - 2;
                      - Store value as power_threshold."""),
             TestStep("8", "TH reads TestEventTriggersEnabled attribute from General Diagnostics Cluster.",
                      "TestEventTriggersEnabled is True."),
             TestStep("9", """TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 with EnableKey field set to PIXIT.MTRID.TEST_EVENT_TRIGGER_KEY 
                      and EventTrigger field set to PIXIT.MTRID.TEST_EVENT_TRIGGER for Attributes Value Set Test Event.""",
                      "DUT returns SUCCESS."),
-            TestStep("10", "TH awaits a MeterType attribute with 10s timeout.",
-                     "Verify the report is received and the value does not match the meter_type."),
-            TestStep("11", "TH awaits a PointOfDelivery attribute with 10s timeout.",
-                     "Verify the report is received and the value does not match the point_of_delivery."),
-            TestStep("12", "TH awaits a MeterSerialNumber attribute with 10s timeout.",
-                     "Verify the report is received and the value does not match the meter_serial_number."),
-            TestStep("13", "TH awaits a ProtocolVersion attribute with 10s timeout.",
-                     "Verify the report is received and the value does not match the protocol_version."),
-            TestStep("14", "TH awaits a PowerThreshold attribute with 10s timeout.",
-                     "Verify the report is received and the value does not match the power_threshold."),
+            TestStep("10", "TH awaits a MeterType attribute with 10s timeout.", """
+                     - Verify the report is received and contains a null or a MeterTypeEnum value;
+                     - Value in range 0 - 2;
+                     - The value does not match the meter_type."""),
+            TestStep("11", "TH awaits a PointOfDelivery attribute with 10s timeout.", """
+                     - Verify the report is received and contains a null or a value of string type;
+                     - Size in range 0 - 64;
+                     - The value does not match the point_of_delivery."""),
+            TestStep("12", "TH awaits a MeterSerialNumber attribute with 10s timeout.", """
+                     - Verify the report is received and contains a null or a value of string type;
+                     - Size in range 0 - 64;
+                     - The value does not match the meter_serial_number."""),
+            TestStep("13", "TH awaits a ProtocolVersion attribute with 10s timeout.", """
+                     - Verify the report is received and contains a null or a value of string type;
+                     - Size in range 0 - 64;
+                     - The value does not match the protocol_version."""),
+            TestStep("14", "TH awaits a PowerThreshold attribute with 10s timeout.", """
+                     - Verify the report is received and contains a null or a value of PowerThresholdStruct type;
+                     - PowerThreshold field has type int64;
+                     - ApparentPowerThreshold field has type int64;
+                     - PowerThresholdSource field has type PowerThresholdSourceEnum and value in range 0 - 2;
+                     - The value does not match the power_threshold."""),
             TestStep("15", """TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 with EnableKey field set to PIXIT.MTRID.TEST_EVENT_TRIGGER_KEY 
                      and EventTrigger field set to PIXIT.MTRID.TEST_EVENT_TRIGGER for Test Event Clear.""",
                      "DUT returns SUCCESS."),
