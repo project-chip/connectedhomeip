@@ -219,7 +219,9 @@ public class ConnectionExampleFragment extends Fragment {
                                 displayPasscodeInputDialog(activity);
 
                                 connectionFragmentStatusTextView.setText(
-                                    "CommissionerDeclaration message received from Casting Player: A passcode (length "+cd.getPasscodeLength()+") is now displayed for the user by the Casting Player. \n\n");
+                                    "CommissionerDeclaration message received from Casting Player: A passcode (length "
+                                        + cd.getPasscodeLength()
+                                        + ") is now displayed for the user by the Casting Player. \n\n");
                               }
                               if (cd.getCancelPasscode()) {
                                 if (useCommissionerGeneratedPasscode) {

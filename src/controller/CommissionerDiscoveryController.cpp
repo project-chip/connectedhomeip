@@ -455,8 +455,8 @@ void CommissionerDiscoveryController::InternalHandleContentAppPasscodeResponse()
             // first step of commissioner passcode
             ChipLogError(AppServer, "UX Ok: commissioner passcode, sending CDC");
             // generate a passcode
-            PasscodeInfo passcodeInfo = mPasscodeService->GetCommissionerPasscode(client->GetVendorId(), client->GetProductId(),
-                                                                                  rotatingIdSpan);
+            PasscodeInfo passcodeInfo =
+                mPasscodeService->GetCommissionerPasscode(client->GetVendorId(), client->GetProductId(), rotatingIdSpan);
             passcode = passcodeInfo.passcode;
             if (passcode == 0)
             {

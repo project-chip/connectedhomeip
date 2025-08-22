@@ -110,9 +110,7 @@ public class CommissionerDeclaration {
    */
   private boolean cancelPasscode = false;
 
-  /**
-   * Feature: Commissioner-Generated Passcode - Length of passcode
-   */
+  /** Feature: Commissioner-Generated Passcode - Length of passcode */
   private int passcodeLength = 0;
 
   public CommissionerDeclaration(
