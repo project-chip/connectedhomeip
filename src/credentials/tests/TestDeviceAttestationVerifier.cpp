@@ -122,8 +122,8 @@ TEST_F(TestDeviceAttestationVerifier, AttestationDeviceInfoCopiesFields)
     writer.Put(chip::TLV::ContextTag(1), ByteSpan(cdData));
     writer.Put(chip::TLV::ContextTag(2), ByteSpan(nonceData));
     writer.Put(chip::TLV::ContextTag(3), static_cast<uint32_t>(0)); // Timestamp
-    writer.Put(chip::TLV::ContextTag(4), ByteSpan()); // FirmwareInfo
-    writer.Put(chip::TLV::ContextTag(5), ByteSpan()); // VendorReserved
+    writer.Put(chip::TLV::ContextTag(4), ByteSpan());               // FirmwareInfo
+    writer.Put(chip::TLV::ContextTag(5), ByteSpan());               // VendorReserved
     err = writer.EndContainer(outerType);
     ASSERT_EQ(err, CHIP_NO_ERROR);
 
@@ -131,11 +131,10 @@ TEST_F(TestDeviceAttestationVerifier, AttestationDeviceInfoCopiesFields)
 
     // Construct AttestationInfo
     DeviceAttestationVerifier::AttestationInfo attestationInfo(attestationElementsSpan,
-                                                               nonceSpan,               // attestationChallenge
-                                                               nonceSpan,               // attestationSignature
-                                                               paiSpan,
-                                                               dacSpan,
-                                                               nonceSpan,               // certificationDeclarationBuffer
+                                                               nonceSpan, // attestationChallenge
+                                                               nonceSpan, // attestationSignature
+                                                               paiSpan, dacSpan,
+                                                               nonceSpan, // certificationDeclarationBuffer
                                                                VendorId(0x1234),
                                                                0x5678 // productId
     );
@@ -248,7 +247,7 @@ TEST_F(TestDeviceAttestationVerifier, AttestationResultDescription)
           "Reached a critical-but-unimplemented part of the device attestation procedure!" }
     };
 
-     // Iterate over each case and verify the description
+    // Iterate over each case and verify the description
     for (const auto & c : cases)
     {
         EXPECT_STREQ(GetAttestationResultDescription(c.value), c.expected);
