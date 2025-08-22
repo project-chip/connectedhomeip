@@ -483,7 +483,7 @@ public:
 
     using DataType = ExtractNonNullableType_t<ValueType>;
 
-    using ListEntryType   = std::conditional_t<IsList<DataType>::value,
+    using ListEntryType = std::conditional_t<IsList<DataType>::value,
                                              ExtractNestedType_t<DataType>, // Extract the list element type
                                              void *>;
 
@@ -692,7 +692,7 @@ public:
             }
         };
 
-        auto assignStorageVal = [this](auto&& value) -> auto& {
+        auto assignStorageVal = [this](auto && value) -> auto & {
             if constexpr (TypeIsNullable<ValueType>())
             {
                 return GetNewValueRef().SetNonNull(value);
@@ -736,7 +736,7 @@ public:
             if (CHIP_NO_ERROR == err)
             {
                 getStorageRef() = DataType(); // Default construct in place
-                err = CopyData(actualValue, getStorageRef());
+                err             = CopyData(actualValue, getStorageRef());
             }
         }
         else if constexpr (TypeIsScalar<DataType>())
@@ -909,16 +909,28 @@ private:
     void SwapActiveValueStorage() { mActiveValueIdx.store(1 - mActiveValueIdx.load()); }
 
     template <typename U>
-    static constexpr bool TypeIsNullable() { return IsNullable<U>::value; }
+    static constexpr bool TypeIsNullable()
+    {
+        return IsNullable<U>::value;
+    }
 
     template <typename U>
-    static constexpr bool TypeIsList() { return IsList<U>::value; }
+    static constexpr bool TypeIsList()
+    {
+        return IsList<U>::value;
+    }
 
     template <typename U>
-    static constexpr bool TypeIsStruct() { return IsStruct<U>::value; }
+    static constexpr bool TypeIsStruct()
+    {
+        return IsStruct<U>::value;
+    }
 
     template <typename U>
-    static constexpr bool TypeIsScalar() { return (IsNumeric<U>::value || IsEnum<U>::value); }
+    static constexpr bool TypeIsScalar()
+    {
+        return (IsNumeric<U>::value || IsEnum<U>::value);
+    }
 
     /**
      * @brief Checks if value type is nullable
@@ -1083,11 +1095,11 @@ private:
 
         if constexpr (TypeIsStruct<ListEntryType>())
         {
-            
+
             for (auto & item : list)
             {
                 CleanupStruct(item);
-            }            
+            }
         }
 
         if (list.data())
