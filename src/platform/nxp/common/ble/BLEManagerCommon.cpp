@@ -659,8 +659,8 @@ CHIP_ERROR BLEManagerCommon::ConfigureAdvertisingData(void)
 
     adv_params.minInterval = adv_params.maxInterval = advInterval;
     adv_params.advertisingType                      = gAdvConnectableUndirected_c;
-    adv_params.ownAddressType                       = ConfigurationMgr().IsFullyProvisioned() ? gBleAddrTypePublic_c : gBleAddrTypeRandom_c;
-    adv_params.peerAddressType                      = gBleAddrTypePublic_c;
+    adv_params.ownAddressType  = ConfigurationMgr().IsFullyProvisioned() ? gBleAddrTypePublic_c : gBleAddrTypeRandom_c;
+    adv_params.peerAddressType = gBleAddrTypePublic_c;
     memset(adv_params.peerAddress, 0, gcBleDeviceAddressSize_c);
     adv_params.channelMap   = (gapAdvertisingChannelMapFlags_t) (gAdvChanMapFlag37_c | gAdvChanMapFlag38_c | gAdvChanMapFlag39_c);
     adv_params.filterPolicy = gProcessAll_c;
