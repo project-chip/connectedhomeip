@@ -180,7 +180,6 @@ class TC_MTRID_3_1(MeterIdentificationTestBaseHelper):
             )
             await self.check_protocol_version_attribute(endpoint, protocol_version)
             matcher_list.append(self._protocol_version_matcher())
-
         else:
 
             if self.check_pics("MTRID.S.A0003"):  # for cases when it is not supported by DUT, but enabled in PICS
@@ -204,7 +203,6 @@ class TC_MTRID_3_1(MeterIdentificationTestBaseHelper):
             )
             await self.check_power_threshold_attribute(endpoint, power_threshold)
             matcher_list.append(self._power_threshold_matcher())
-
         else:
 
             if self.check_pics("MTRID.S.A0004"):
@@ -222,19 +220,19 @@ class TC_MTRID_3_1(MeterIdentificationTestBaseHelper):
         subscription_handler.await_all_expected_report_matches(matcher_list, timeout_sec=2)
 
         self.step("10")
-        await self.verify_reporting(subscription_handler.attribute_reports, cluster.Attributes.MeterType, "MeterType", meter_type)
         await self.check_meter_type_attribute(endpoint, subscription_handler.attribute_reports[cluster.Attributes.MeterType][0].value)
+        await self.verify_reporting(subscription_handler.attribute_reports, cluster.Attributes.MeterType, "MeterType", meter_type)
 
         self.step("11")
+        await self.check_point_of_delivery_attribute(endpoint, subscription_handler.attribute_reports[cluster.Attributes.PointOfDelivery][0].value)
         await self.verify_reporting(subscription_handler.attribute_reports,
                                     cluster.Attributes.PointOfDelivery, "PointOfDelivery", point_of_delivery)
-        await self.check_point_of_delivery_attribute(endpoint, subscription_handler.attribute_reports[cluster.Attributes.PointOfDelivery][0].value)
 
         self.step("12")
-        await self.verify_reporting(subscription_handler.attribute_reports, cluster.Attributes.MeterSerialNumber,
-                                    "MeterSerialNumber", meter_serial_number)
         await self.check_meter_serial_number_attribute(
             endpoint, subscription_handler.attribute_reports[cluster.Attributes.MeterSerialNumber][0].value)
+        await self.verify_reporting(subscription_handler.attribute_reports, cluster.Attributes.MeterSerialNumber,
+                                    "MeterSerialNumber", meter_serial_number)
 
         if await self.attribute_guard(endpoint=endpoint, attribute=cluster.Attributes.ProtocolVersion):
 
@@ -244,11 +242,10 @@ class TC_MTRID_3_1(MeterIdentificationTestBaseHelper):
                 logger.warning("ProtocolVersion attribute is actually supported by DUT, but PICS MTRID.S.A0003 is False")
 
             # TH reads ProtocolVersion attribute, expects a null or a value of string type
-            await self.verify_reporting(subscription_handler.attribute_reports,
-                                        cluster.Attributes.ProtocolVersion, "ProtocolVersion", protocol_version)
             await self.check_protocol_version_attribute(
                 endpoint, subscription_handler.attribute_reports[cluster.Attributes.ProtocolVersion][0].value)
-
+            await self.verify_reporting(subscription_handler.attribute_reports,
+                                        cluster.Attributes.ProtocolVersion, "ProtocolVersion", protocol_version)
         else:
 
             if self.check_pics("MTRID.S.A0003"):  # for cases when it is not supported by DUT, but enabled in PICS
@@ -266,11 +263,10 @@ class TC_MTRID_3_1(MeterIdentificationTestBaseHelper):
                 logger.warning("PowerThreshold attribute is actually supported by DUT, but PICS MTRID.S.A0004 is False")
 
             # TH reads PowerThreshold attribute, expects a null or a value of PowerThresholdStruct type
-            await self.verify_reporting(subscription_handler.attribute_reports,
-                                        cluster.Attributes.PowerThreshold, "PowerThreshold", power_threshold)
             await self.check_power_threshold_attribute(
                 endpoint, subscription_handler.attribute_reports[cluster.Attributes.PowerThreshold][0].value)
-
+            await self.verify_reporting(subscription_handler.attribute_reports,
+                                        cluster.Attributes.PowerThreshold, "PowerThreshold", power_threshold)
         else:
 
             if self.check_pics("MTRID.S.A0004"):
