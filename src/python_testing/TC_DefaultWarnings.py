@@ -34,7 +34,7 @@
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 # === END CI TEST ARGUMENTS ===
 
-from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from mobly import asserts
 from test_testing.DefaultChecker import (FLAG_DEFAULT_CALENDAR_FORMAT, FLAG_FAULT_INJECTION, FLAG_FIXED_LABEL_DEFAULT_VALUES,
                                          FLAG_FIXED_LABEL_EMPTY, FLAG_PRODUCT_NAME, FLAG_SAMPLE_MEI, FLAG_UNIT_TESTING,

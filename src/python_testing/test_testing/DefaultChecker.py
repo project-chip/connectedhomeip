@@ -17,10 +17,10 @@
 
 from typing import Optional
 
-import chip.clusters as Clusters
-from chip.testing.basic_composition import BasicCompositionTests
-from chip.testing.matter_testing import MatterBaseTest
-from chip.testing.problem_notices import AttributePathLocation, ClusterPathLocation, ProblemLocation, ProblemNotice, ProblemSeverity
+import matter.clusters as Clusters
+from matter.testing.basic_composition import BasicCompositionTests
+from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.problem_notices import AttributePathLocation, ClusterPathLocation, ProblemLocation, ProblemNotice, ProblemSeverity
 
 FLAG_PRODUCT_NAME = "pixit_allow_test_in_product_name"
 FLAG_VENDOR_NAME = "pixit_allow_test_in_vendor_name"
