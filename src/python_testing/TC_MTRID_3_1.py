@@ -137,6 +137,8 @@ class TC_MTRID_3_1(MeterIdentificationTestBaseHelper):
 
         endpoint = self.get_endpoint()
 
+        matcher_list = self.get_mandatory_matchers()
+
         self.step("1")
 
         self.step("2")
@@ -165,7 +167,7 @@ class TC_MTRID_3_1(MeterIdentificationTestBaseHelper):
         await self.check_meter_serial_number_attribute(endpoint, meter_serial_number)
 
         # Checks if ProtocolVersion attribute is supported
-        if self.attribute_guard(endpoint=endpoint, attribute=cluster.Attributes.ProtocolVersion):
+        if await self.attribute_guard(endpoint=endpoint, attribute=cluster.Attributes.ProtocolVersion):
 
             self.step("6")
 
@@ -177,6 +179,7 @@ class TC_MTRID_3_1(MeterIdentificationTestBaseHelper):
                 endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.ProtocolVersion
             )
             await self.check_protocol_version_attribute(endpoint, protocol_version)
+            matcher_list.append(self._protocol_version_matcher())
 
         else:
 
@@ -188,7 +191,7 @@ class TC_MTRID_3_1(MeterIdentificationTestBaseHelper):
                 self.skip_step("6")
 
         # Checks if PowerThreshold attribute is supported
-        if self.attribute_guard(endpoint=endpoint, attribute=cluster.Attributes.PowerThreshold):
+        if await self.attribute_guard(endpoint=endpoint, attribute=cluster.Attributes.PowerThreshold):
 
             self.step("7")
 
@@ -200,6 +203,7 @@ class TC_MTRID_3_1(MeterIdentificationTestBaseHelper):
                 endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.PowerThreshold
             )
             await self.check_power_threshold_attribute(endpoint, power_threshold)
+            matcher_list.append(self._power_threshold_matcher())
 
         else:
 
@@ -215,6 +219,7 @@ class TC_MTRID_3_1(MeterIdentificationTestBaseHelper):
 
         self.step("9")
         await self.send_test_event_trigger_attributes_value_set()
+        subscription_handler.await_all_expected_report_matches(matcher_list, timeout_sec=2)
 
         self.step("10")
         await self.verify_reporting(subscription_handler.attribute_reports, cluster.Attributes.MeterType, "MeterType", meter_type)
@@ -231,7 +236,7 @@ class TC_MTRID_3_1(MeterIdentificationTestBaseHelper):
         await self.check_meter_serial_number_attribute(
             endpoint, subscription_handler.attribute_reports[cluster.Attributes.MeterSerialNumber][0].value)
 
-        if self.attribute_guard(endpoint=endpoint, attribute=cluster.Attributes.ProtocolVersion):
+        if await self.attribute_guard(endpoint=endpoint, attribute=cluster.Attributes.ProtocolVersion):
 
             self.step("13")
 
@@ -239,9 +244,6 @@ class TC_MTRID_3_1(MeterIdentificationTestBaseHelper):
                 logger.warning("ProtocolVersion attribute is actually supported by DUT, but PICS MTRID.S.A0003 is False")
 
             # TH reads ProtocolVersion attribute, expects a null or a value of string type
-            protocol_version = await self.read_single_attribute_check_success(
-                endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.ProtocolVersion
-            )
             await self.verify_reporting(subscription_handler.attribute_reports,
                                         cluster.Attributes.ProtocolVersion, "ProtocolVersion", protocol_version)
             await self.check_protocol_version_attribute(
@@ -256,7 +258,7 @@ class TC_MTRID_3_1(MeterIdentificationTestBaseHelper):
             else:  # attribute is not supported at all
                 self.skip_step("13")
 
-        if self.attribute_guard(endpoint=endpoint, attribute=cluster.Attributes.PowerThreshold):
+        if await self.attribute_guard(endpoint=endpoint, attribute=cluster.Attributes.PowerThreshold):
 
             self.step("14")
 
@@ -264,9 +266,6 @@ class TC_MTRID_3_1(MeterIdentificationTestBaseHelper):
                 logger.warning("PowerThreshold attribute is actually supported by DUT, but PICS MTRID.S.A0004 is False")
 
             # TH reads PowerThreshold attribute, expects a null or a value of PowerThresholdStruct type
-            power_threshold = await self.read_single_attribute_check_success(
-                endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.PowerThreshold
-            )
             await self.verify_reporting(subscription_handler.attribute_reports,
                                         cluster.Attributes.PowerThreshold, "PowerThreshold", power_threshold)
             await self.check_power_threshold_attribute(
