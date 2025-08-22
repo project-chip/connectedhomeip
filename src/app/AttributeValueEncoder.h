@@ -107,7 +107,8 @@ public:
             return mAttributeValueEncoder.EncodeListItem(mCheckpoint, aArg, mAttributeValueEncoder.AccessingFabricIndex());
         }
 
-        template <typename T, std::enable_if_t<IsBaseType<T> && !DataModel::IsFabricScoped<T>::value && !IsMatterEnum<T>, bool> = true>
+        template <typename T,
+                  std::enable_if_t<IsBaseType<T> && !DataModel::IsFabricScoped<T>::value && !IsMatterEnum<T>, bool> = true>
         CHIP_ERROR Encode(const T & aArg) const
         {
             return mAttributeValueEncoder.EncodeListItem(mCheckpoint, aArg);
@@ -119,8 +120,8 @@ public:
         CHIP_ERROR Encode(const T & aArg) const
         {
             static_assert(!DataModel::IsFabricScoped<T>::value, "How do we have a fabric-scoped enum?");
-            static_assert(!std::is_same_v<std::remove_cv_t<std::remove_reference_t<decltype(to_underlying(aArg))>>, T>,
-                          "Encode will call itself recursively");
+            using UnderlyingType = std::remove_cv_t<std::remove_reference_t<decltype(to_underlying(aArg))>>;
+            static_assert(!std::is_same_v<UnderlyingType, T>, "Encode will call itself recursively");
 
             CHIP_DM_ENCODING_MAYBE_FAIL_UNKNOWN_ENUM_VALUE(aArg);
 
@@ -165,8 +166,8 @@ public:
     template <typename T, std::enable_if_t<IsBaseType<T> && IsMatterEnum<T>, bool> = true>
     CHIP_ERROR Encode(const T & aArg)
     {
-        static_assert(!std::is_same_v<std::remove_cv_t<std::remove_reference_t<decltype(to_underlying(aArg))>>, T>,
-                      "Encode will call itself recursively");
+        using UnderlyingType = std::remove_cv_t<std::remove_reference_t<decltype(to_underlying(aArg))>>;
+        static_assert(!std::is_same_v<UnderlyingType, T>, "Encode will call itself recursively");
 
         CHIP_DM_ENCODING_MAYBE_FAIL_UNKNOWN_ENUM_VALUE(aArg);
 
