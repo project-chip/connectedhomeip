@@ -148,7 +148,7 @@ class TC_SU_2_2(MatterBaseTest):
         )
         logger.info(f'Prerequisite #3.1 - ACLs current privileges on Requestor (DUT): {acl_original_requestor}')
 
-        # ACLs on Requestor to allow Provider interaction
+        # Add minimal ACL: ACLs on Requestor to allow Provider interaction
         acl_operate_provider = Clusters.AccessControl.Structs.AccessControlEntryStruct(
             fabricIndex=fabric_index,
             privilege=Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kOperate,
@@ -158,26 +158,11 @@ class TC_SU_2_2(MatterBaseTest):
                 endpoint=0,
                 cluster=Clusters.OtaSoftwareUpdateRequestor.id)]
         )
-        acl_view_provider = Clusters.AccessControl.Structs.AccessControlEntryStruct(
-            fabricIndex=fabric_index,
-            privilege=Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kView,
-            authMode=Clusters.AccessControl.Enums.AccessControlEntryAuthModeEnum.kCase,
-            subjects=[provider_node],
-            targets=[]
-        )
-        acl_admin_provider = Clusters.AccessControl.Structs.AccessControlEntryStruct(
-            fabricIndex=fabric_index,
-            privilege=Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kAdminister,
-            authMode=Clusters.AccessControl.Enums.AccessControlEntryAuthModeEnum.kCase,
-            subjects=[provider_node],
-            targets=[Clusters.AccessControl.Structs.AccessControlTargetStruct(
-                endpoint=0,
-                cluster=Clusters.OtaSoftwareUpdateRequestor.id)]
-        )
 
         # Combine original + new ACLs on Requestor
         # This avoids overwriting existing entries when adding new ACLs
-        acls_requestor = acl_original_requestor + [acl_admin_provider, acl_view_provider, acl_operate_provider]
+        # acls_requestor = acl_original_requestor + [acl_operate_provider]
+        acls_requestor = acl_original_requestor + [acl_operate_provider]
         resp = await self.write_acl(controller, requestor_node, acls_requestor)
         logger.info(
             f'Prerequisite #3.1 - Response of wrote combined ACLs on Requestor to allow Provider with node {provider_node}: {resp}')
@@ -204,7 +189,7 @@ class TC_SU_2_2(MatterBaseTest):
         )
         logger.info(f'Prerequisite #3.2 - ACLs current privileges on Provider with node {provider_node}: {acl_original_requestor}')
 
-        # ACLs on Provider to allow Requestor interaction
+        # Add minimal ACL: ACLs on Provider to allow Requestor interaction
         acl_operate_requestor = Clusters.AccessControl.Structs.AccessControlEntryStruct(
             fabricIndex=fabric_index,
             privilege=Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kOperate,
@@ -214,26 +199,11 @@ class TC_SU_2_2(MatterBaseTest):
                 endpoint=0,
                 cluster=Clusters.OtaSoftwareUpdateProvider.id)]
         )
-        acl_view_requestor = Clusters.AccessControl.Structs.AccessControlEntryStruct(
-            fabricIndex=fabric_index,
-            privilege=Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kView,
-            authMode=Clusters.AccessControl.Enums.AccessControlEntryAuthModeEnum.kCase,
-            subjects=[requestor_node],
-            targets=[]
-        )
-        acl_admin_requestor = Clusters.AccessControl.Structs.AccessControlEntryStruct(
-            fabricIndex=fabric_index,
-            privilege=Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kAdminister,
-            authMode=Clusters.AccessControl.Enums.AccessControlEntryAuthModeEnum.kCase,
-            subjects=[requestor_node],
-            targets=[Clusters.AccessControl.Structs.AccessControlTargetStruct(
-                endpoint=0,
-                cluster=Clusters.OtaSoftwareUpdateProvider.id)]
-        )
 
         # Combine original + new ACLs on Provider
         # This avoids overwriting existing entries when adding new ACLs
-        acls_provider = acl_original_provider + [acl_admin_requestor, acl_view_requestor, acl_operate_requestor]
+        acls_provider = acl_original_provider + [acl_operate_requestor]
+        # acls_provider = acl_original_provider + [acl_operate_requestor]
         resp = await self.write_acl(controller, provider_node, acls_provider)
         logger.info(
             f'Prerequisite #3.2 - Response of wrote combined ACLs on Provider with node {provider_node} to allow access from Requestor: {resp}')
