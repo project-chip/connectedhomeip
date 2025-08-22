@@ -277,9 +277,7 @@ public class ChipDeviceController {
    *     CommissionParameters}
    */
   public void pairDeviceThroughNfc(
-      long deviceId,
-      long setupPincode,
-      @Nonnull CommissionParameters params) {
+      long deviceId, long setupPincode, @Nonnull CommissionParameters params) {
 
     Log.d(TAG, "Pairing device with ID: " + deviceId + " through NFC");
     pairDeviceThroughNfc(
