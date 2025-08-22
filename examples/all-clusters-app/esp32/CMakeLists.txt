@@ -62,6 +62,7 @@ pw_set_backend(pw_log pw_log_basic)
 pw_set_backend(pw_assert.check pw_assert_log.check_backend)
 pw_set_backend(pw_assert.assert pw_assert.assert_compatibility_backend)
 pw_set_backend(pw_sys_io pw_sys_io.esp32)
+pw_set_backend(pw_sync.interrupt_spin_lock pw_sync.no_lock)
 pw_set_backend(pw_trace_tokenized.lock pw_trace_tokenized.no_lock)
 pw_set_backend(pw_trace pw_trace_tokenized)
 
