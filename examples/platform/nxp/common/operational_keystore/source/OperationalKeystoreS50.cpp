@@ -16,9 +16,9 @@
  */
 
 #include "OperationalKeystore.h"
-#include <platform/nxp/common/crypto/S200/PersistentStorageOpKeystoreS200.h>
+#include <platform/nxp/common/crypto/S50/PersistentStorageOpKeystoreS50.h>
 
-static chip::PersistentStorageOpKeystoreS200 sInstance;
+static chip::PersistentStorageOpKeystoreS50 sInstance;
 
 chip::Crypto::OperationalKeystore * chip::NXP::App::OperationalKeystore::GetInstance()
 {
@@ -28,7 +28,5 @@ chip::Crypto::OperationalKeystore * chip::NXP::App::OperationalKeystore::GetInst
 CHIP_ERROR chip::NXP::App::OperationalKeystore::Init(PersistentStorageDelegate * delegate)
 {
     VerifyOrReturnError(delegate != nullptr, CHIP_ERROR_INTERNAL);
-    sInstance.Init(delegate);
-
-    return CHIP_NO_ERROR;
+    return sInstance.Init(delegate);
 }
