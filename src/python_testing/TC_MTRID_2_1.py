@@ -43,6 +43,7 @@
 
 import logging
 
+from mobly import asserts
 from TC_MTRIDTestBase import MeterIdentificationTestBaseHelper
 
 from matter.clusters import MeterIdentification
@@ -108,23 +109,45 @@ class TC_MTRID_2_1(MeterIdentificationTestBaseHelper):
         # TH reads MeterSerialNumber attribute, expects a null or a value of string type
         await self.check_meter_serial_number_attribute(endpoint)
 
-        # Check that PICS MTRID.S.A0003 is True
-        if not self.check_pics("MTRID.S.A0003"):
-            logger.info("PICS MTRID.S.A0003 is not True")
-            self.skip_step("5")
-        else:
+        # Checks if ProtocolVersion attribute is supported
+        if self.attribute_guard(endpoint=endpoint, attribute=cluster.Attributes.ProtocolVersion):
+
             self.step("5")
+
+            if not self.check_pics("MTRID.S.A0003"):  # for cases when it is supported by DUT, but disabled in PICS
+                logger.warning("ProtocolVersion attribute is actually supported by DUT, but PICS MTRID.S.A0003 is False")
+
             # TH reads ProtocolVersion attribute, expects a null or a value of string type
             await self.check_protocol_version_attribute(endpoint)
 
-        # Check that PICS MTRID.S.F00 is True
-        if not self.check_pics("MTRID.S.F00"):
-            logger.info("PICS MTRID.S.F00 is not True")
-            self.skip_step("6")
         else:
+
+            if self.check_pics("MTRID.S.A0003"):  # for cases when it is not supported by DUT, but enabled in PICS
+                self.step("5")
+                asserts.fail(
+                    "PICS file does not correspond to real DUT functionality. ProtocolVersion is not actually supported, but MTRID.S.A0003 is True.")
+            else:  # attribute is not supported at all
+                self.skip_step("5")
+
+        # Checks if PowerThreshold attribute is supported
+        if self.attribute_guard(endpoint=endpoint, attribute=cluster.Attributes.PowerThreshold):
+
             self.step("6")
+
+            if not self.check_pics("MTRID.S.A0004"):
+                logger.warning("PowerThreshold attribute is actually supported by DUT, but PICS MTRID.S.A0004 is False")
+
             # TH reads PowerThreshold attribute, expects a null or a value of PowerThresholdStruct type
             await self.check_power_threshold_attribute(endpoint)
+
+        else:
+
+            if self.check_pics("MTRID.S.A0004"):
+                self.step("6")
+                asserts.fail(
+                    "PICS file does not correspond to real DUT functionality. PowerThreshold is not actually supported, but MTRID.S.A0004 is True.")
+            else:
+                self.skip_step("6")
 
 
 if __name__ == "__main__":
