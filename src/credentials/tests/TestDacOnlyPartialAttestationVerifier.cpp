@@ -253,6 +253,11 @@ TEST_F(TestDacOnlyPartialAttestationVerifier, TestWithMatchingPAIAndDACProductID
 // Test case validates that the verifier correctly rejects DAC certificates that have expired
 TEST_F(TestDacOnlyPartialAttestationVerifier, TestWithExpiredDACCertificate)
 {
+    // This check is only valid if the platform supports current time retrieval
+    // This is necessary to determine if the certificate is expired
+#if defined(CURRENT_TIME_NOT_IMPLEMENTED)
+    GTEST_SKIP() << "Skipping test: platform does not support current time.";
+#endif
     // The actual contents do not represent real or meaningful data.
     uint8_t cdData[32] = { 0x11, 0x22, 0x33, 0x44 };
     uint8_t tlvBuf[128];
@@ -300,14 +305,17 @@ TEST_F(TestDacOnlyPartialAttestationVerifier, TestWithExpiredDACCertificate)
     verifier.VerifyAttestationInformation(expiredDACInfo, &attestationCallback);
 
     // Expect the verifier to detect the expired certificate and reject attestation
-#if !defined(CURRENT_TIME_NOT_IMPLEMENTED)
     EXPECT_EQ(attestationResult, AttestationVerificationResult::kDacExpired);
-#endif
 }
 
 // Test case verifies that certificates with future validity periods are properly rejected
 TEST_F(TestDacOnlyPartialAttestationVerifier, TestWithValidInFutureDACCertificate)
 {
+    // This check is only valid if the platform supports current time retrieval
+    // This is necessary to determine if the certificate is not yet valid
+#if defined(CURRENT_TIME_NOT_IMPLEMENTED)
+    GTEST_SKIP() << "Skipping test: platform does not support current time.";
+#endif
     // The actual contents do not represent real or meaningful data.
     uint8_t cdData[32] = { 0x11, 0x22, 0x33, 0x44 };
     uint8_t tlvBuf[128];
@@ -354,9 +362,7 @@ TEST_F(TestDacOnlyPartialAttestationVerifier, TestWithValidInFutureDACCertificat
 
     verifier.VerifyAttestationInformation(futureValDACInfo, &attestationCallback);
     // Verify that the future-valid certificate is rejected as expired (not yet valid)
-#if !defined(CURRENT_TIME_NOT_IMPLEMENTED)
     EXPECT_EQ(attestationResult, AttestationVerificationResult::kDacExpired);
-#endif
 }
 
 // Test case verifies that wrong formats for attestation elements are properly rejected
