@@ -321,7 +321,7 @@ static void onTimerExpiry(System::Layer * systemLayer, void * data)
     }
 }
 
-// To be invoked by the camera once a physical PTZ action has completed. The callback method is realized by our cluster server, 
+// To be invoked by the camera once a physical PTZ action has completed. The callback method is realized by our cluster server,
 // make sure that is still alive before trying to invoke methods thereon.
 //
 void CameraAVSettingsUserLevelManager::OnPhysicalMoveCompleted(Protocols::InteractionModel::Status status)
