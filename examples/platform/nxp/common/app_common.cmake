@@ -76,9 +76,14 @@ if (CONFIG_CHIP_APP_BLE_MANAGER)
     target_include_directories(app PRIVATE
         ${EXAMPLE_PLATFORM_NXP_COMMON_DIR}/app_ble/include
     )
-    if (CONFIG_CHIP_APP_BLE_MANAGER_CUSTOM)
+
+    if (CONFIG_CHIP_APP_BLE_MANAGER_CUSTOM_BLE_ZEPHYR)
         target_sources(app PRIVATE
             ${EXAMPLE_PLATFORM_NXP_COMMON_DIR}/app_ble/source/BleZephyrManagerApp.cpp
+        )
+    elseif(CONFIG_CHIP_APP_BLE_MANAGER_CUSTOM_NXP_BLE_HOST)
+        target_sources(app PRIVATE
+            ${EXAMPLE_PLATFORM_NXP_COMMON_DIR}/app_ble/source/NXPHostBLEApplicationManager.cpp
         )
     else()
         target_sources(app PRIVATE
