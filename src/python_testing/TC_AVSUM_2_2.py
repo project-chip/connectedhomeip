@@ -83,7 +83,7 @@ class TC_AVSUM_2_2(MatterBaseTest, AVSUMTestBase):
             TestStep(25, "Read MPTZPosition. Verify the Zoom value is that set in Step 24."),
             TestStep(26, "Create an invalid value for a Zoom."),
             TestStep(27, "Set the invalid value via the MPTZSetPosition command. Verify failure response."),
-            TestStep(28, "Read MPTZPosition. Verify the Tilt value is that set in Step 24."),
+            TestStep(28, "Read MPTZPosition. Verify the Zoom value is that set in Step 24."),
         ]
         return steps
 
