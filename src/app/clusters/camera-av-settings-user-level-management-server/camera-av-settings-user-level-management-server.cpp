@@ -82,7 +82,7 @@ CHIP_ERROR CameraAvSettingsUserLevelMgmtServer::Init()
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
 
-    if (SupportsOptAttr(OptionalAttributes::kMaxPresets) != (HasFeature(Feature::kMechanicalPresets)))
+    if (SupportsOptAttr(OptionalAttributes::kMaxPresets) != HasFeature(Feature::kMechanicalPresets))
     {
         ChipLogError(Zcl,
                      "CameraAVSettingsUserLevelMgmt[ep=%d]: Feature configuration error. If MaxPresets "
@@ -91,7 +91,7 @@ CHIP_ERROR CameraAvSettingsUserLevelMgmtServer::Init()
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
 
-    if (SupportsOptAttr(OptionalAttributes::kMptzPresets) != (HasFeature(Feature::kMechanicalPresets)))
+    if (SupportsOptAttr(OptionalAttributes::kMptzPresets) != HasFeature(Feature::kMechanicalPresets))
     {
         ChipLogError(Zcl,
                      "CameraAVSettingsUserLevelMgmt[ep=%d]: Feature configuration error. If MPTZPresets "
@@ -100,7 +100,7 @@ CHIP_ERROR CameraAvSettingsUserLevelMgmtServer::Init()
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
 
-    if (SupportsOptAttr(OptionalAttributes::kDptzStreams) != (HasFeature(Feature::kDigitalPTZ)))
+    if (SupportsOptAttr(OptionalAttributes::kDptzStreams) != HasFeature(Feature::kDigitalPTZ))
     {
         ChipLogError(Zcl,
                      "CameraAVSettingsUserLevelMgmt[ep=%d]: Feature configuration error. If "
@@ -109,7 +109,7 @@ CHIP_ERROR CameraAvSettingsUserLevelMgmtServer::Init()
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
 
-    if (SupportsOptAttr(OptionalAttributes::kZoomMax) != (HasFeature(Feature::kMechanicalZoom)))
+    if (SupportsOptAttr(OptionalAttributes::kZoomMax) != HasFeature(Feature::kMechanicalZoom))
     {
         ChipLogError(Zcl,
                      "CameraAVSettingsUserLevelMgmt[ep=%d]: Feature configuration error. If ZoomMax is "
@@ -118,7 +118,7 @@ CHIP_ERROR CameraAvSettingsUserLevelMgmtServer::Init()
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
 
-    if (SupportsOptAttr(OptionalAttributes::kTiltMin) != (HasFeature(Feature::kMechanicalTilt)))
+    if (SupportsOptAttr(OptionalAttributes::kTiltMin) != HasFeature(Feature::kMechanicalTilt))
     {
         ChipLogError(Zcl,
                      "CameraAVSettingsUserLevelMgmt[ep=%d]: Feature configuration error. If TiltMin is "
@@ -127,7 +127,7 @@ CHIP_ERROR CameraAvSettingsUserLevelMgmtServer::Init()
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
 
-    if (SupportsOptAttr(OptionalAttributes::kTiltMax) != (HasFeature(Feature::kMechanicalTilt)))
+    if (SupportsOptAttr(OptionalAttributes::kTiltMax) != HasFeature(Feature::kMechanicalTilt))
     {
         ChipLogError(Zcl,
                      "CameraAVSettingsUserLevelMgmt[ep=%d]: Feature configuration error. If TiltMax is "
@@ -136,7 +136,7 @@ CHIP_ERROR CameraAvSettingsUserLevelMgmtServer::Init()
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
 
-    if (SupportsOptAttr(OptionalAttributes::kPanMin) != (HasFeature(Feature::kMechanicalPan)))
+    if (SupportsOptAttr(OptionalAttributes::kPanMin) != HasFeature(Feature::kMechanicalPan))
     {
         ChipLogError(Zcl,
                      "CameraAVSettingsUserLevelMgmt[ep=%d]: Feature configuration error. If PanMin is "
@@ -145,7 +145,7 @@ CHIP_ERROR CameraAvSettingsUserLevelMgmtServer::Init()
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
 
-    if (SupportsOptAttr(OptionalAttributes::kPanMax) != (HasFeature(Feature::kMechanicalPan)))
+    if (SupportsOptAttr(OptionalAttributes::kPanMax) != HasFeature(Feature::kMechanicalPan))
     {
         ChipLogError(Zcl,
                      "CameraAVSettingsUserLevelMgmt[ep=%d]: Feature configuration error. If PanMax is "
