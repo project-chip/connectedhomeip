@@ -22,28 +22,29 @@
 namespace chip {
 namespace app {
 
-    /**
-     * Wraps around a PersistentStorageDelegate to perform ByteSpan I/O over StorageKey
-     */
-    class StorageDelegateWrapper {
-    public:
-        constexpr StorageDelegateWrapper() {};
+/**
+ * Wraps around a PersistentStorageDelegate to perform ByteSpan I/O over StorageKey
+ */
+class StorageDelegateWrapper
+{
+public:
+    constexpr StorageDelegateWrapper(){};
 
-        // Passed-in storage must outlive this object.
-        CHIP_ERROR Init(PersistentStorageDelegate * storage)
-        {
-            VerifyOrReturnError(storage != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-            mStorage = storage;
-            return CHIP_NO_ERROR;
-        }
+    // Passed-in storage must outlive this object.
+    CHIP_ERROR Init(PersistentStorageDelegate * storage)
+    {
+        VerifyOrReturnError(storage != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+        mStorage = storage;
+        return CHIP_NO_ERROR;
+    }
 
-        CHIP_ERROR WriteValue(const StorageKeyName & aKey, const ByteSpan & aValue);
-        CHIP_ERROR ReadValue(const StorageKeyName & aKey, MutableByteSpan & aValue);
-        CHIP_ERROR DeleteKey(const StorageKeyName & aKey);
+    CHIP_ERROR WriteValue(const StorageKeyName & aKey, const ByteSpan & aValue);
+    CHIP_ERROR ReadValue(const StorageKeyName & aKey, MutableByteSpan & aValue);
+    CHIP_ERROR DeleteKey(const StorageKeyName & aKey);
 
-    private:
-        PersistentStorageDelegate * mStorage = nullptr;
-    };
+private:
+    PersistentStorageDelegate * mStorage = nullptr;
+};
 
 } // namespace app
 } // namespace chip
