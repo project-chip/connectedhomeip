@@ -692,14 +692,14 @@ public:
             }
         };
 
-        auto assignStorageVal = [this](auto&& aValue) -> auto& {
+        auto assignStorageVal = [this](auto&& value) -> auto& {
             if constexpr (TypeIsNullable<ValueType>())
             {
-                return GetNewValueRef().SetNonNull(aValue);
+                return GetNewValueRef().SetNonNull(value);
             }
             else
             {
-                return GetNewValueRef() = aValue;
+                return GetNewValueRef() = value;
             }
         };
 
