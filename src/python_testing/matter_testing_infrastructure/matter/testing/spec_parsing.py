@@ -893,15 +893,15 @@ def parse_single_device_type(root: ElementTree.Element, cluster_definition_xml: 
                 def append_overrides(override_element_type: str):
                     if override_element_type == 'feature':
                         # The device types use feature name rather than feature code. So we need to build a new map.
-                        map = {f.name: id for id, f in cluster_definition_xml[cid].features.items()}
+                        name_to_id_map = {f.name: id for id, f in cluster_definition_xml[cid].features.items()}
                         # But also...that's not universal, so let's be tolerant to using the code too.
-                        map.update(cluster_definition_xml[cid].feature_map)
+                        name_to_id_map.update(cluster_definition_xml[cid].feature_map)
                         override = cluster.feature_overrides
                     elif override_element_type == 'attribute':
-                        map = cluster_definition_xml[cid].attribute_map
+                        name_to_id_map = cluster_definition_xml[cid].attribute_map
                         override = cluster.attribute_overrides
                     elif override_element_type == 'command':
-                        map = cluster_definition_xml[cid].command_map
+                        name_to_id_map = cluster_definition_xml[cid].command_map
                         override = cluster.command_overrides
                     else:
                         problems.append(ProblemNotice("Parse Device Type XML", location=location,
@@ -928,7 +928,7 @@ def parse_single_device_type(root: ElementTree.Element, cluster_definition_xml: 
                                 continue
                             conformance_override = parse_callable_from_xml(conformance_xml, cluster_conformance_params)
 
-                            map_id = [map[n] for n in map.keys() if _fuzzy_name(n) == _fuzzy_name(name)]
+                            map_id = [name_to_id_map[n] for n in name_to_id_map.keys() if _fuzzy_name(n) == _fuzzy_name(name)]
                             if len(map_id) == 0:
                                 # The thermostat in particular explicitly disallows some zigbee things that don't appear in the spec due to
                                 # ifdefs. We can ignore problems if the device type spec disallows things that don't exist.
