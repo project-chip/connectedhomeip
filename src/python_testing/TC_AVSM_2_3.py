@@ -74,11 +74,16 @@ class TC_AVSM_2_3(MatterBaseTest, AVSMTestBase):
             ),
             TestStep(
                 4,
+                "TH sends the SnapshotStreamModify command with SnapshotStreamID set to aStreamID + 1.",
+                "DUT responds with an NOT_FOUND status code.",
+            ),
+            TestStep(
+                5,
                 "TH sends the SnapshotStreamModify command with SnapshotStreamID set to aStreamID. If WMARK is supported, set WaterMarkEnabled to !aWmark`and if OSD is supported, set OSDEnabled to `!aOSD in the command.",
                 "DUT responds with a SUCCESS status code.",
             ),
             TestStep(
-                5,
+                6,
                 "TH reads AllocatedSnapshotStreams attribute from CameraAVStreamManagement Cluster on DUT",
                 "Verify the following: If WMARK is supported, verify WaterMarkEnabled == !aWmark. If OSD is supported, verify OSDEnabled == !aOSD.",
             ),
@@ -139,6 +144,19 @@ class TC_AVSM_2_3(MatterBaseTest, AVSMTestBase):
         self.step(4)
         try:
             cmd = commands.SnapshotStreamModify(
+                snapshotStreamID=aStreamID + 1,
+                watermarkEnabled=None if aWmark is None else not aWmark,
+                OSDEnabled=None if aOSD is None else not aOSD,
+            )
+            await self.send_single_cmd(endpoint=endpoint, cmd=cmd)
+            asserts.fail("Unexpected success when expecting NOT_FOUND due to wrong streamID)")
+        except InteractionModelError as e:
+            asserts.assert_equal(e.status, Status.NotFound, "Unexpected error when expecting NOT_FOUND")
+            pass
+
+        self.step(5)
+        try:
+            cmd = commands.SnapshotStreamModify(
                 snapshotStreamID=aStreamID,
                 watermarkEnabled=None if aWmark is None else not aWmark,
                 OSDEnabled=None if aOSD is None else not aOSD,
@@ -148,7 +166,7 @@ class TC_AVSM_2_3(MatterBaseTest, AVSMTestBase):
             asserts.assert_equal(e.status, Status.Success, "Unexpected error returned")
             pass
 
-        self.step(5)
+        self.step(6)
         aAllocatedSnapshotStreams = await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=cluster, attribute=attr.AllocatedSnapshotStreams
         )
