@@ -604,7 +604,7 @@ void Instance::UpdateDayInformation(uint32_t now)
     ChipLogDetail(NotSpecified, "UpdateCurrentAttrs: current day date: %u", currentDay.Value().date);
     SetCurrentDay(currentDay);
 
-    nextDay.SetNonNull(Utils::FindDay(mServerTariffAttrsCtx, now + kSecondsPerDay));
+    nextDay.SetNonNull(Utils::FindDay(mServerTariffAttrsCtx, ( now + (kSecondsPerDay - now % kSecondsPerDay)) + 1 ));
 
     if (Utils::DayIsValid(&nextDay.Value()))
     {

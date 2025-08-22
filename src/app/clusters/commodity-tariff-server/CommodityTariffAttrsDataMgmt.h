@@ -468,15 +468,22 @@ public:
     /// The exposed attribute value type
     using ValueType = T;
 
-    /// The non-nullable version of the value type
-    using NonNullableType = ExtractNestedType_t<ValueType>;
-    using ListEntryType   = std::conditional_t<IsList<NonNullableType>::value,
-                                             ExtractNestedType_t<NonNullableType>, // Extract the list element type
+    //using DataType = ExtractNestedType_t<ValueType>;
+
+    // Determine the actual data type we're working with
+    using DataType = std::conditional_t<
+        IsNullable<ValueType>::value,
+        ExtractNestedType_t<ValueType>,
+        ValueType
+    >;
+
+    using ListEntryType   = std::conditional_t<IsList<DataType>::value,
+                                             ExtractNestedType_t<DataType>, // Extract the list element type
                                              void *>;
 
-    using StructType = std::conditional_t<IsList<NonNullableType>::value,
+    using StructType = std::conditional_t<IsList<DataType>::value,
                                           ListEntryType, // Extract the list element type
-                                          NonNullableType>;
+                                          DataType>;
 
     /**
      * @brief Construct a new data class instance
@@ -655,13 +662,6 @@ public:
             }
         }
 
-        // Determine the actual data type we're working with
-        using DataType = std::conditional_t<
-            TypeIsNullable<ValueType>(),
-            ExtractNestedType_t<ValueType>,
-            ValueType
-        >;
-
         // Get reference to the actual value (non-nullable part)
         const auto & actualValue = [&]() -> const auto & {
             if constexpr (TypeIsNullable<ValueType>())
@@ -686,6 +686,17 @@ public:
             }
         };
 
+        auto assignStorageVal = [this](auto&& aValue) -> auto& {
+            if constexpr (TypeIsNullable<ValueType>())
+            {
+                return GetNewValueRef().SetNonNull(aValue);
+            }
+            else
+            {
+                return GetNewValueRef() = aValue;
+            }
+        };
+
         if constexpr (TypeIsList<DataType>())
         {
             assertChipStackLockedByCurrentThread();
@@ -694,15 +705,21 @@ public:
 
             if (CHIP_NO_ERROR == err)
             {
-                auto & storage = getStorageRef();
-                auto buffer = storage.data();
+                auto buffer = getStorageRef().data();
                 for (size_t idx = 0; idx < actualValue.size(); idx++)
                 {
-                    if (CHIP_NO_ERROR == (err = CopyData(actualValue[idx], buffer[idx])))
+                    if constexpr (TypeIsStruct<ListEntryType>())
                     {
-                        continue;
+                        if (CHIP_NO_ERROR == (err = CopyData(actualValue[idx], buffer[idx])))
+                        {
+                            continue;
+                        }
+                        break;
                     }
-                    break;
+                    else
+                    {
+                        buffer[idx] = actualValue[idx];
+                    }
                 }
             }
         }
@@ -712,7 +729,7 @@ public:
 
             if (CHIP_NO_ERROR == err)
             {
-                getStorageRef() = NonNullableType(); // Default construct in place
+                getStorageRef() = DataType(); // Default construct in place
                 err = CopyData(actualValue, getStorageRef());
             }
         }
@@ -722,7 +739,7 @@ public:
 
             if (CHIP_NO_ERROR == err)
             {
-                getStorageRef() = actualValue;
+                assignStorageVal(actualValue);
             }
         }
 
@@ -907,19 +924,19 @@ private:
      * @brief Checks if value type is a list
      * @return true if list type, false otherwise
      */
-    static constexpr bool IsValueList() { return IsList<NonNullableType>::value; }
+    static constexpr bool IsValueList() { return IsList<DataType>::value; }
 
     /**
      * @brief Checks if value type is a struct
      * @return true if struct type, false otherwise
      */
-    static constexpr bool IsValueStruct() { return IsStruct<NonNullableType>::value; }
+    static constexpr bool IsValueStruct() { return IsStruct<DataType>::value; }
 
     /**
      * @brief Checks if value type is scalar (numeric or enum)
      * @return true if scalar type, false otherwise
      */
-    static constexpr bool IsValueScalar() { return (IsNumeric<NonNullableType>::value || IsEnum<NonNullableType>::value); }
+    static constexpr bool IsValueScalar() { return (IsNumeric<DataType>::value || IsEnum<DataType>::value); }
 
     // Internal implementation methods...
 
@@ -972,7 +989,7 @@ private:
         }
         else
         {
-            if constexpr (IsList<NonNullableType>::value)
+            if constexpr (IsList<DataType>::value)
             {
                 is_neq = ListsNotEqual(a.Value(), b.Value());
             }
@@ -1033,7 +1050,7 @@ private:
         {
             if (!aValue.IsNull())
             {
-                if constexpr (IsList<NonNullableType>::value)
+                if constexpr (IsList<DataType>::value)
                 {
                     CleanupList(aValue.Value());
                 }
@@ -1058,10 +1075,15 @@ private:
     {
         assertChipStackLockedByCurrentThread();
 
-        for (auto & item : list)
+        if constexpr (TypeIsStruct<ListEntryType>())
         {
-            CleanupStruct(item);
+            
+            for (auto & item : list)
+            {
+                CleanupStruct(item);
+            }            
         }
+
         if (list.data())
         {
             Platform::MemoryFree(list.data());
