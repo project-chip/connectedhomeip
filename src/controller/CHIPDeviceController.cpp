@@ -2318,6 +2318,14 @@ void DeviceCommissioner::ContinueReadingCommissioningInfo(const CommissioningPar
         VerifyOrReturn(builder.AddAttributePath(Clusters::NetworkCommissioning::Id,
                                                 Clusters::NetworkCommissioning::Attributes::ConnectMaxTimeSeconds::Id));
 
+        // If we were asked to do network scans, also read ScanMaxTimeSeconds,
+        // so we know how long to wait for those.
+        if (params.GetAttemptWiFiNetworkScan().ValueOr(false) || params.GetAttemptThreadNetworkScan().ValueOr(false))
+        {
+            VerifyOrReturn(builder.AddAttributePath(Clusters::NetworkCommissioning::Id,
+                                                    Clusters::NetworkCommissioning::Attributes::ScanMaxTimeSeconds::Id));
+        }
+
         // OperationalCredentials: existing fabrics, if necessary
         if (params.GetCheckForMatchingFabric())
         {
@@ -2519,6 +2527,22 @@ CHIP_ERROR DeviceCommissioner::ParseNetworkCommissioningInfo(ReadCommissioningIn
                          info.network.thread.endpoint, err.Format());
             return_err = err;
         }
+
+        err = mAttributeCache->Get<ScanMaxTimeSeconds::TypeInfo>(info.network.thread.endpoint, info.network.thread.maxScanTime);
+        if (err != CHIP_NO_ERROR)
+        {
+            // We don't always read this attribute, and we read it as a wildcard, so don't log error
+            // simply because it's it's missing.
+            if (err != CHIP_ERROR_KEY_NOT_FOUND)
+            {
+                ChipLogError(Controller, "Failed to read Thread ScanMaxTimeSeconds (endpoint: %u): %" CHIP_ERROR_FORMAT,
+                             info.network.thread.endpoint, err.Format());
+                return_err = err;
+            }
+
+            // Just flag as "we don't know".
+            info.network.thread.maxScanTime = 0;
+        }
     }
 
     if (info.network.wifi.endpoint != kInvalidEndpointId)
@@ -2531,11 +2555,27 @@ CHIP_ERROR DeviceCommissioner::ParseNetworkCommissioningInfo(ReadCommissioningIn
                          info.network.wifi.endpoint, err.Format());
             return_err = err;
         }
+
+        err = mAttributeCache->Get<ScanMaxTimeSeconds::TypeInfo>(info.network.wifi.endpoint, info.network.wifi.maxScanTime);
+        if (err != CHIP_NO_ERROR)
+        {
+            // We don't always read this attribute, and we read it as a wildcard, so don't log error
+            // simply because it's it's missing.
+            if (err != CHIP_ERROR_KEY_NOT_FOUND)
+            {
+                ChipLogError(Controller, "Failed to read Wi-Fi ScanMaxTimeSeconds (endpoint: %u): %" CHIP_ERROR_FORMAT,
+                             info.network.wifi.endpoint, err.Format());
+                return_err = err;
+            }
+
+            // Just flag as "we don't know".
+            info.network.wifi.maxScanTime = 0;
+        }
     }
 
     if (return_err != CHIP_NO_ERROR)
     {
-        ChipLogError(Controller, "Failed to parsing Network Commissioning information: %" CHIP_ERROR_FORMAT, return_err.Format());
+        ChipLogError(Controller, "Failed to parse Network Commissioning information: %" CHIP_ERROR_FORMAT, return_err.Format());
     }
     return return_err;
 }
