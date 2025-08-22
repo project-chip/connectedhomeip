@@ -326,7 +326,8 @@ class TC_SU_2_2(MatterBaseTest):
                 ota_file=provider_ota_file,
                 provider_discriminator=provider_discriminator,
                 provider_setupPinCode=provider_setupPinCode,
-                secured_device_port=provider_port
+                secured_device_port=provider_port,
+                queue="updateAvailable",
             )
         else:
             provider_proc = await self.launch_ota_provider(
@@ -480,7 +481,7 @@ class TC_SU_2_2(MatterBaseTest):
         cmd_announce = Clusters.OtaSoftwareUpdateRequestor.Commands.AnnounceOTAProvider(
             providerNodeID=1,  # Provider
             vendorID=0xFFF1,
-            announcementReason=Clusters.OtaSoftwareUpdateRequestor.Enums.AnnouncementReasonEnum.kSimpleAnnouncement,
+            announcementReason=Clusters.OtaSoftwareUpdateRequestor.Enums.AnnouncementReasonEnum.kUpdateAvailable,
             metadataForNode=None,
             endpoint=0
         )
@@ -718,7 +719,7 @@ class TC_SU_2_2(MatterBaseTest):
         cmd_announce = Clusters.OtaSoftwareUpdateRequestor.Commands.AnnounceOTAProvider(
             providerNodeID=provider_node_id_s2,  # Provider_S2
             vendorID=0xFFF1,
-            announcementReason=Clusters.OtaSoftwareUpdateRequestor.Enums.AnnouncementReasonEnum.kSimpleAnnouncement,
+            announcementReason=Clusters.OtaSoftwareUpdateRequestor.Enums.AnnouncementReasonEnum.kUpdateAvailable,
             metadataForNode=None,
             endpoint=0
         )
