@@ -156,7 +156,7 @@ public:
 struct PasscodeInfo
 {
     uint32_t passcode;
-    uint32_t displayLength;
+    uint8_t displayLength;
 };
 
 class DLL_EXPORT PasscodeService
