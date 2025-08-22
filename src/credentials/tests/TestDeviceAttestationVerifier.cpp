@@ -263,9 +263,9 @@ TEST_F(TestDeviceAttestationVerifier, AttestationResultDescription)
 TEST_F(TestDeviceAttestationVerifier, SetRevocationDelegate)
 {
     // Create a minimal AttestationTrustStore with a dummy certificate
-    static uint8_t dummyCert[1] = { 0x00 };
-    ByteSpan certSpan(dummyCert);
-    ArrayAttestationTrustStore trustStore(&certSpan, 1);
+    static uint8_t dummyCert[1]       = { 0x00 };
+    static const ByteSpan certSpans[] = { ByteSpan(dummyCert) };
+    ArrayAttestationTrustStore trustStore(certSpans, 1);
     DefaultDACVerifier verifier(&trustStore);
 
     // Check the initial state of the revocation delegate
