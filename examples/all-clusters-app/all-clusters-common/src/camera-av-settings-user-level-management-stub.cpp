@@ -196,8 +196,7 @@ void emberAfCameraAvSettingsUserLevelManagementClusterInitCallback(chip::Endpoin
         CameraAvSettingsUserLevelManagement::OptionalAttributes::kTiltMax,
         CameraAvSettingsUserLevelManagement::OptionalAttributes::kPanMin,
         CameraAvSettingsUserLevelManagement::OptionalAttributes::kPanMax,
-        CameraAvSettingsUserLevelManagement::OptionalAttributes::kMovementState
-    );
+        CameraAvSettingsUserLevelManagement::OptionalAttributes::kMovementState);
 
     gAVSettingsUserLevelManagementCluster = std::make_unique<CameraAvSettingsUserLevelMgmtServer>(
         kEndpointId, *gDelegate.get(), avsumFeatures, avsumAttrs, appMaxPresets);
