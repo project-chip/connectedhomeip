@@ -338,18 +338,6 @@ struct IsStruct
 
 /// @brief Type extraction utilities
 template <typename U>
-struct ExtractNonNullableType
-{
-    using type = U;
-};
-template <typename U>
-struct ExtractNonNullableType<DataModel::Nullable<U>>
-{
-    using type = typename ExtractNonNullableType<U>::type;
-};
-template <typename U>
-using ExtractNonNullableType_t = typename ExtractNonNullableType<U>::type;
-template <typename U>
 struct ExtractNestedType
 {
     using type = U; // Base case - not a wrapper
@@ -481,7 +469,7 @@ public:
     using ValueType = T;
 
     /// The non-nullable version of the value type
-    using NonNullableType = ExtractNonNullableType_t<ValueType>;
+    using NonNullableType = ExtractNestedType_t<ValueType>;
     using ListEntryType   = std::conditional_t<IsList<NonNullableType>::value,
                                              ExtractNestedType_t<NonNullableType>, // Extract the list element type
                                              void *>;
@@ -655,28 +643,62 @@ public:
     {
         CHIP_ERROR err = CHIP_NO_ERROR;
 
-        if (aValue.IsNull())
+        // Handle nullable case first - early return for null
+        if constexpr (TypeIsNullable<ValueType>())
         {
-            CleanupByIdx(1 - mActiveValueIdx.load());
-            mUpdateState.store(UpdateState::kInitialized);
-            MarkAsAssigned();
-            return CHIP_NO_ERROR;
+            if (aValue.IsNull())
+            {
+                CleanupByIdx(1 - mActiveValueIdx.load());
+                mUpdateState.store(UpdateState::kInitialized);
+                MarkAsAssigned();
+                return CHIP_NO_ERROR;
+            }
         }
 
-        auto & newValue = aValue.Value();
+        // Determine the actual data type we're working with
+        using DataType = std::conditional_t<
+            TypeIsNullable<ValueType>(),
+            ExtractNestedType_t<ValueType>,
+            ValueType
+        >;
 
-        if constexpr (IsValueList())
+        // Get reference to the actual value (non-nullable part)
+        const auto & actualValue = [&]() -> const auto & {
+            if constexpr (TypeIsNullable<ValueType>())
+            {
+                return aValue.Value();
+            }
+            else
+            {
+                return aValue;
+            }
+        }();
+
+        // Get reference to the storage location
+        auto getStorageRef = [this]() -> auto & {
+            if constexpr (TypeIsNullable<ValueType>())
+            {
+                return GetNewValueRef().Value();
+            }
+            else
+            {
+                return GetNewValueRef();
+            }
+        };
+
+        if constexpr (TypeIsList<DataType>())
         {
             assertChipStackLockedByCurrentThread();
 
-            err = CreateNewListValue(newValue.size());
+            err = CreateNewListValue(actualValue.size());
 
             if (CHIP_NO_ERROR == err)
             {
-                auto buffer = GetNewValueRef().Value().data();
-                for (size_t idx = 0; idx < newValue.size(); idx++)
+                auto & storage = getStorageRef();
+                auto buffer = storage.data();
+                for (size_t idx = 0; idx < actualValue.size(); idx++)
                 {
-                    if (CHIP_NO_ERROR == (err = CopyData(newValue[idx], buffer[idx])))
+                    if (CHIP_NO_ERROR == (err = CopyData(actualValue[idx], buffer[idx])))
                     {
                         continue;
                     }
@@ -684,34 +706,28 @@ public:
                 }
             }
         }
-        else if constexpr (IsValueStruct())
+        else if constexpr (TypeIsStruct<DataType>())
         {
             err = CreateNewSingleValue();
 
             if (CHIP_NO_ERROR == err)
             {
-                GetNewValueRef().SetNonNull(NonNullableType()); // Default construct in place
-                err = CopyData(newValue, GetNewValueRef().Value());
-                if (err != CHIP_NO_ERROR)
-                {
-                    // Revert on copy failure to maintain consistent state
-                    GetNewValueRef().SetNull();
-                }
+                getStorageRef() = NonNullableType(); // Default construct in place
+                err = CopyData(actualValue, getStorageRef());
             }
         }
-        else if constexpr (IsValueScalar())
+        else if constexpr (TypeIsScalar<DataType>())
         {
             err = CreateNewSingleValue();
 
             if (CHIP_NO_ERROR == err)
             {
-                GetNewValueRef().SetNonNull(newValue);
+                getStorageRef() = actualValue;
             }
         }
 
         if (err == CHIP_NO_ERROR)
         {
-            mHoldState[1 - mActiveValueIdx.load()] = StorageState::kHold;
             MarkAsAssigned();
         }
         else
@@ -736,6 +752,7 @@ public:
             return CHIP_ERROR_INCORRECT_STATE;
         }
         mUpdateState.store(UpdateState::kAssigned);
+        mHoldState[1 - mActiveValueIdx.load()] = StorageState::kHold;
         return CHIP_NO_ERROR;
     }
 
@@ -867,6 +884,18 @@ private:
      * @brief Swaps active and new value storage indices
      */
     void SwapActiveValueStorage() { mActiveValueIdx.store(1 - mActiveValueIdx.load()); }
+
+    template <typename U>
+    static constexpr bool TypeIsNullable() { return IsNullable<U>::value; }
+
+    template <typename U>
+    static constexpr bool TypeIsList() { return IsList<U>::value; }
+
+    template <typename U>
+    static constexpr bool TypeIsStruct() { return IsStruct<U>::value; }
+
+    template <typename U>
+    static constexpr bool TypeIsScalar() { return (IsNumeric<U>::value || IsEnum<U>::value); }
 
     /**
      * @brief Checks if value type is nullable
