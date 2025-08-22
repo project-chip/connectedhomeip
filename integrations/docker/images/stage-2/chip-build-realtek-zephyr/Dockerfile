@@ -6,6 +6,8 @@ RUN set -x \
     && apt-get update \
     && DEBIAN_FRONTEND=noninteractive apt-get install -fy --no-install-recommends \
     xz-utils \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/* \
     && : # last line
 
 WORKDIR /opt/realtek-zephyr
@@ -28,5 +30,5 @@ COPY --from=build /opt/realtek-zephyr/zephyr-rtk-project/ /opt/realtek-zephyr/ze
 
 WORKDIR /opt/realtek-zephyr
 
-ENV ZEPHYR_BASE=/opt/realtek-zephyr/zephyr-rtk-project/zephyr
-ENV ZEPHYR_SDK_INSTALL_DIR=/opt/realtek-zephyr/zephyr-sdk-0.16.8
+ENV ZEPHYR_REALTEK_BASE=/opt/realtek-zephyr/zephyr-rtk-project/zephyr
+ENV ZEPHYR_REALTEK_SDK_INSTALL_DIR=/opt/realtek-zephyr/zephyr-sdk-0.16.8

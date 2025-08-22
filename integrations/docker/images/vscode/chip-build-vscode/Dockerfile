@@ -136,6 +136,8 @@ ENV ZEPHYR_NXP_BASE=/opt/nxp-zephyr/zephyrproject/zephyr
 ENV ZEPHYR_NXP_SDK_INSTALL_DIR=/opt/nxp-zephyr/zephyr-sdk-0.17.0
 ENV NXP_UPDATE_SDK_SCRIPT_DOCKER=/opt/nxp/nxp_matter_support/scripts/update_nxp_sdk.py
 ENV NXP_SDK_PATH=/opt/nxp
+ENV ZEPHYR_REALTEK_BASE=/opt/realtek-zephyr/zephyr-rtk-project/zephyr
+ENV ZEPHYR_REALTEK_SDK_INSTALL_DIR=/opt/realtek-zephyr/zephyr-sdk-0.16.8
 
 # Places bootstrap files there instead of the default one which is `.environment`.
 # NOTE: This directory is NOT persistent.
