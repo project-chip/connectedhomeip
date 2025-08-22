@@ -112,7 +112,7 @@ public:
         const ReadOnlyBuffer<AttributeId> & scalarAttributes,
         const ReadOnlyBuffer<AttributeId> & attributes,
         MutableByteSpan & buffer,
-        StorageDelegateWrapper & storageDelegate)
+        PersistentStorageDelegate & storageDelegate)
     {
 
         ChipError err;
@@ -124,7 +124,7 @@ public:
             StorageKeyName safePath = DefaultStorageKeyAllocator::SafeAttributeValue(endpointId, clusterId, attr);
 
             // Read Value
-            err = storageDelegate.ReadValue(safePath, buffer);
+            err = storageDelegate.SyncGetKeyValue(safePath.KeyName(), buffer);
             if (err == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND) {
                 continue;
             } else if (err != CHIP_NO_ERROR) {
@@ -136,8 +136,8 @@ public:
             UnalignedSwap(copy_of_buffer);
 #endif // CHIP_CONFIG_BIG_ENDIAN_TARGET
 
-            ReturnErrorOnFailure(storageDelegate.WriteValue(DefaultStorageKeyAllocator::AttributeValue(endpointId, clusterId, attr), buffer));
-            err = storageDelegate.DeleteValue(safePath);
+            ReturnErrorOnFailure(storageDelegate.SyncSetKeyValue(DefaultStorageKeyAllocator::AttributeValue(endpointId, clusterId, attr).KeyName(), buffer));
+            err = storageDelegate.SyncDeleteKeyValue(safePath.KeyName());
             // do nothing with this error
         }
 
@@ -149,7 +149,7 @@ public:
             StorageKeyName safePath = DefaultStorageKeyAllocator::SafeAttributeValue(endpointId, clusterId, attr);
 
             // Read Value
-            err = storageDelegate.ReadValue(safePath, buffer);
+            err = storageDelegate.SyncGetKeyValue(safePath, buffer);
             if (err == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND) {
                 continue;
             } else if (err != CHIP_NO_ERROR) {
@@ -157,8 +157,8 @@ public:
                 continue;
             }
 
-            ReturnErrorOnFailure(storageDelegate.WriteValue(DefaultStorageKeyAllocator::AttributeValue(endpointId, clusterId, attr), buffer));
-            err = storageDelegate.DeleteValue(safePath);
+            ReturnErrorOnFailure(storageDelegate.SyncSetKeyValue(DefaultStorageKeyAllocator::AttributeValue(endpointId, clusterId, attr).KeyName(), buffer));
+            err = storageDelegate.SyncDeleteKeyValue(safePath.KeyName());
             // do nothing with this error
         }
     }
