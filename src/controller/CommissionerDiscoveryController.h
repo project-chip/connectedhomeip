@@ -76,10 +76,11 @@ public:
      *  @param[in]    commissioneeName   The commissioneeName in the DNS-SD advertisement of the requesting commissionee.
      *  @param[in]    pairingHint        The pairingHint in the DNS-SD advertisement of the requesting commissionee.
      *  @param[in]    pairingInstruction The pairingInstruction in the DNS-SD advertisement of the requesting commissionee.
+     *  @param[in]    passcodeLength     The length of the passcode as specificed by the commissionee. 0 means not specified.
      *
      */
     virtual void PromptForCommissionPasscode(uint16_t vendorId, uint16_t productId, const char * commissioneeName,
-                                             uint16_t pairingHint, const char * pairingInstruction) = 0;
+                                             uint16_t pairingHint, const char * pairingInstruction, uint8_t passcodeLength) = 0;
 
     /**
      * @brief
@@ -112,12 +113,14 @@ public:
      *  @param[in]    productId          The productId in the DNS-SD advertisement of the requesting commissionee.
      *  @param[in]    commissioneeName   The commissioneeName in the DNS-SD advertisement of the requesting commissionee.
      *  @param[in]    passcode           The passcode to display.
+     *  @param[in]    passcodeLength     The length of the passcode as specificed by the commissionee. 0 means not specified.
      *  @param[in]    pairingHint        The pairingHint in the DNS-SD advertisement of the requesting commissionee.
      *  @param[in]    pairingInstruction The pairingInstruction in the DNS-SD advertisement of the requesting commissionee.
      *
      */
     virtual void PromptWithCommissionerPasscode(uint16_t vendorId, uint16_t productId, const char * commissioneeName,
-                                                uint32_t passcode, uint16_t pairingHint, const char * pairingInstruction) = 0;
+                                                uint32_t passcode, uint8_t passcodeLength, uint16_t pairingHint, 
+                                                const char * pairingInstruction) = 0;
 
     /**
      * @brief

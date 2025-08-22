@@ -66,7 +66,7 @@ class MyUserPrompter : public UserPrompter
 
     // tv should override this with a dialog prompt
     inline void PromptForCommissionPasscode(uint16_t vendorId, uint16_t productId, const char * commissioneeName,
-                                            uint16_t pairingHint, const char * pairingInstruction) override
+                                            uint16_t pairingHint, const char * pairingInstruction, uint8_t passcodeLength) override
     {
         return;
     }
@@ -79,7 +79,8 @@ class MyUserPrompter : public UserPrompter
 
     // tv should override this with a dialog prompt
     inline void PromptWithCommissionerPasscode(uint16_t vendorId, uint16_t productId, const char * commissioneeName,
-                                               uint32_t passcode, uint16_t pairingHint, const char * pairingInstruction) override
+                                               uint32_t passcode, uint8_t passcodeLength, uint16_t pairingHint,
+                                               const char * pairingInstruction) override
     {
         return;
     }
@@ -134,6 +135,7 @@ class MyPasscodeService : public PasscodeService
     PasscodeInfo GetCommissionerPasscode(uint16_t vendorId, uint16_t productId, chip::CharSpan rotatingId) override
     {
         // TODO: randomly generate this value
+        ChipLogDetail(AppServer, "GetCommissionerPasscode: returning a passcode");
         return { 12345678, 8 };
     }
 

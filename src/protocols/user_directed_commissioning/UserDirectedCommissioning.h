@@ -147,6 +147,9 @@ public:
     void SetCancelPasscode(bool newValue) { mCancelPasscode = newValue; };
     bool GetCancelPasscode() const { return mCancelPasscode; };
 
+    void SetPasscodeLength(uint8_t newValue) { mPasscodeLength = newValue; };
+    uint8_t GetPasscodeLength() const { return mPasscodeLength; };
+
     /**
      *  Writes the IdentificationDeclaration message to the given buffer.
      *
@@ -185,6 +188,7 @@ public:
         client->SetCommissionerPasscode(GetCommissionerPasscode());
         client->SetCommissionerPasscodeReady(GetCommissionerPasscodeReady());
         client->SetCancelPasscode(GetCancelPasscode());
+        client->SetPasscodeLength(GetPasscodeLength());
     }
 
     void DebugLog()
@@ -247,6 +251,10 @@ public:
         {
             ChipLogDetail(AppServer, "\tcancel passcode: true");
         }
+        if (mPasscodeLength != 0)
+        {
+            ChipLogDetail(AppServer, "\tpasscode length: %d", static_cast<uint16_t>(mPasscodeLength));
+        }
         ChipLogDetail(AppServer, "---- Identification Declaration End ----");
     }
 
@@ -271,6 +279,7 @@ private:
         kCommissionerPasscodeTag,
         kCommissionerPasscodeReadyTag,
         kCancelPasscodeTag,
+        kPasscodeLengthTag,
 
         kMaxNum = UINT8_MAX
     };
@@ -296,6 +305,7 @@ private:
     bool mCommissionerPasscode      = false;
     bool mCommissionerPasscodeReady = false;
     bool mCancelPasscode            = false;
+    uint8_t mPasscodeLength       = 0;
 };
 
 /**
