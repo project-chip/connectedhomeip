@@ -139,7 +139,7 @@ class TC_SU_2_8(MatterBaseTest):
 
         p_pass = OTA_PROVIDER_PASSCODE
 
-        # Commissioning TH1-OTA Provider 1 / TH2-OTA Provider 2
+        # Commissioning TH1-OTA Provider / TH2-OTA Provider
         self.step(0)
 
         endpoint = self.get_endpoint(default=0)
