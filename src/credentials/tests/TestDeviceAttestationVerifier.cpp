@@ -127,7 +127,7 @@ TEST_F(TestDeviceAttestationVerifier, AttestationDeviceInfoCopiesFields)
     err = writer.EndContainer(outerType);
     ASSERT_EQ(err, CHIP_NO_ERROR);
 
-    ByteSpan attestationElementsSpan(tlvBuf);
+    ByteSpan attestationElementsSpan(tlvBuf, writer.GetLengthWritten());
 
     // Construct AttestationInfo
     DeviceAttestationVerifier::AttestationInfo attestationInfo(attestationElementsSpan,
@@ -148,19 +148,16 @@ TEST_F(TestDeviceAttestationVerifier, AttestationDeviceInfoCopiesFields)
 
     // Verify that the PAI, DAC, and CD buffers were copied correctly
     ByteSpan copiedPai = deviceInfo.paiDerBuffer();
-    ASSERT_EQ(copiedPai.size(), paiSpan.size());
-    EXPECT_EQ(0, memcmp(copiedPai.data(), paiSpan.data(), paiSpan.size()));
+    EXPECT_TRUE(copiedPai.data_equal(paiSpan));
 
     // Verify that the DAC buffer was copied correctly
     ByteSpan copiedDac = deviceInfo.dacDerBuffer();
-    ASSERT_EQ(copiedDac.size(), dacSpan.size());
-    EXPECT_EQ(0, memcmp(copiedDac.data(), dacSpan.data(), dacSpan.size()));
+    EXPECT_TRUE(copiedDac.data_equal(dacSpan));
 
     // Verify that the CD buffer was copied correctly
     ASSERT_TRUE(deviceInfo.cdBuffer().HasValue());
     ByteSpan copiedCd = deviceInfo.cdBuffer().Value();
-    ASSERT_EQ(copiedCd.size(), sizeof(cdData));
-    EXPECT_EQ(0, memcmp(copiedCd.data(), cdData, sizeof(cdData)));
+    EXPECT_TRUE(copiedCd.data_equal(ByteSpan(cdData)));
 }
 
 // Test that setting the DeviceAttestationVerifier to nullptr does not change the current verifier
@@ -232,14 +229,17 @@ TEST_F(TestDeviceAttestationVerifier, AttestationResultDescription)
           "Certification declaration signature failed to validate against the verification certificate" },
         { AttestationVerificationResult::kCertificationDeclarationInvalidFormat, "Certification declaration format is invalid" },
         { AttestationVerificationResult::kCertificationDeclarationInvalidVendorId,
-          "Certification declaration vendor ID failed to cross-reference with DAC and/or PAI and/or Basic Information cluster" },
+          "Certification declaration vendor ID failed to cross-reference with DAC and/or PAI and/or Basic Information "
+          "cluster" },
         { AttestationVerificationResult::kCertificationDeclarationInvalidProductId,
-          "Certification declaration product ID failed to cross-reference with DAC and/or PAI and/or Basic Information cluster" },
+          "Certification declaration product ID failed to cross-reference with DAC and/or PAI and/or Basic Information "
+          "cluster" },
         { AttestationVerificationResult::kCertificationDeclarationInvalidPAA,
           "Certification declaration required a fixed allowed PAA which does not match the final PAA found" },
         { AttestationVerificationResult::kNoMemory, "Failed to allocate memory to process attestation verification" },
         { AttestationVerificationResult::kInvalidArgument,
-          "Some unexpected invalid argument was provided internally to the device attestation procedure (likely malformed input "
+          "Some unexpected invalid argument was provided internally to the device attestation procedure (likely malformed "
+          "input "
           "data from candidate device)" },
         { AttestationVerificationResult::kInternalError,
           "An internal error arose in the device attestation procedure (likely malformed input data from candidate device)" },
