@@ -32,10 +32,12 @@ namespace chip::app {
 /// have known (strong) types and their load/decode logic is often
 /// similar and reusable. This class implements the logic of handling
 /// such attributes, so that it can be reused across cluster implementations.
-class AttributePersistence
-{
+class AttributePersistence {
 public:
-    AttributePersistence(AttributePersistenceProvider & provider) : mProvider(provider) {}
+    AttributePersistence(AttributePersistenceProvider & provider)
+        : mProvider(provider)
+    {
+    }
 
     /// Loads a native-endianness stored value of type `T` into `value` from the persistence provider.
     ///
@@ -89,6 +91,78 @@ public:
     /// not use internal classes directly.
     CHIP_ERROR StoreString(const ConcreteAttributePath & path, const Storage::Internal::ShortString & value);
 
+    void UnalignedHostSwap(MutableByteSpan & buffer)
+    {
+        if (copy_of_buffer.size() == 2) {
+            // perform an unaligned_swap
+            uint16_t data = Encoding::LittleEndian::GetUnaligned16(buffer.data());
+            memcpy(buffer.data(), reinterpret_cast<uint8_t *>(&data));
+        } else if (copy_of_buffer.size() == 4) {
+            uint32_t data = Encoding::LittleEndian::GetUnaligned32(buffer.data());
+            memcpy(buffer.data(), reinterpret_cast<uint8_t *>(&data));
+        } else if (copy_of_buffer.size() == 8) {
+            uint64_t data = Encoding::LittleEndian::GetUnaligned64(buffer.data());
+            memcpy(buffer.data(), reinterpret_cast<uint8_t *>(&data));
+        }
+    }
+
+    // Only available in little endian for the moment
+    CHIP_ERROR MigrateFromSafeAttributePersistanceProvider(
+        EndpointId endpointId, ClusterId ClusterId,
+        const ReadOnlyBuffer<AttributeId> & scalarAttributes,
+        const ReadOnlyBuffer<AttributeId> & attributes,
+        MutableByteSpan & buffer,
+        StorageDelegateWrapper & storageDelegate)
+    {
+
+        ChipError err;
+
+        for (auto attr : scalarAttributes) {
+            // We make a copy of the buffer so it can be resized
+            MutableByteSpan copy_of_buffer = buffer;
+
+            StorageKeyName safePath = DefaultStorageKeyAllocator::SafeAttributeValue(endpointId, clusterId, attr);
+
+            // Read Value
+            err = storageDelegate.ReadValue(safePath, buffer);
+            if (err == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND) {
+                continue;
+            } else if (err != CHIP_NO_ERROR) {
+                ChipLogError(Unspecified, "Error reading attribute %s - %" CHIP_ERROR_FORMAT, safePath.KeyName(), err);
+                continue;
+            }
+
+#if CHIP_CONFIG_BIG_ENDIAN_TARGET
+            UnalignedSwap(copy_of_buffer);
+#endif // CHIP_CONFIG_BIG_ENDIAN_TARGET
+
+            ReturnErrorOnFailure(storageDelegate.WriteValue(DefaultStorageKeyAllocator::AttributeValue(endpointId, clusterId, attr), buffer));
+            err = storageDelegate.DeleteValue(safePath);
+            // do nothing with this error
+        }
+
+        // These are not integers (probably strings) so no need to care for endianness
+        for (auto attr : attributes) {
+            // We make a copy of the buffer so it can be resized
+            MutableByteSpan copy_of_buffer = buffer;
+
+            StorageKeyName safePath = DefaultStorageKeyAllocator::SafeAttributeValue(endpointId, clusterId, attr);
+
+            // Read Value
+            err = storageDelegate.ReadValue(safePath, buffer);
+            if (err == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND) {
+                continue;
+            } else if (err != CHIP_NO_ERROR) {
+                ChipLogError(Unspecified, "Error reading attribute %s - %" CHIP_ERROR_FORMAT, safePath.KeyName(), err);
+                continue;
+            }
+
+            ReturnErrorOnFailure(storageDelegate.WriteValue(DefaultStorageKeyAllocator::AttributeValue(endpointId, clusterId, attr), buffer));
+            err = storageDelegate.DeleteValue(safePath);
+            // do nothing with this error
+        }
+    }
+
 private:
     AttributePersistenceProvider & mProvider;
 
@@ -98,7 +172,7 @@ private:
     /// Error reason for load failure is logged (or nothing logged in case "Value not found" is the
     /// reason for the load failure).
     bool InternalRawLoadNativeEndianValue(const ConcreteAttributePath & path, void * data, const void * valueOnLoadFailure,
-                                          size_t size);
+        size_t size);
 };
 
 } // namespace chip::app
