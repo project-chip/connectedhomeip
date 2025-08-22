@@ -30,7 +30,7 @@ CHIP_ERROR TrustyDACProvider::GetDeviceAttestationCert(MutableByteSpan & out_dac
     size_t out_size = 0;
     int rc;
 
-    rc = trusty_matter.ExportDACCert(out_dac_buffer.data(), out_dac_buffer.size(), out_size);
+    rc = GetTrustyMatter().ExportDACCert(out_dac_buffer.data(), out_dac_buffer.size(), out_size);
     if (rc == 0)
     {
         out_dac_buffer.reduce_size(out_size);
@@ -44,7 +44,7 @@ CHIP_ERROR TrustyDACProvider::GetProductAttestationIntermediateCert(MutableByteS
     size_t out_size = 0;
     int rc;
 
-    rc = trusty_matter.ExportPAICert(out_pai_buffer.data(), out_pai_buffer.size(), out_size);
+    rc = GetTrustyMatter().ExportPAICert(out_pai_buffer.data(), out_pai_buffer.size(), out_size);
     if (rc == 0)
     {
         out_pai_buffer.reduce_size(out_size);
@@ -58,7 +58,7 @@ CHIP_ERROR TrustyDACProvider::GetCertificationDeclaration(MutableByteSpan & out_
     size_t out_size = 0;
     int rc;
 
-    rc = trusty_matter.ExportCDCert(out_cd_buffer.data(), out_cd_buffer.size(), out_size);
+    rc = GetTrustyMatter().ExportCDCert(out_cd_buffer.data(), out_cd_buffer.size(), out_size);
     if (rc == 0)
     {
         out_cd_buffer.reduce_size(out_size);
@@ -83,8 +83,8 @@ CHIP_ERROR TrustyDACProvider::SignWithDeviceAttestationKey(const ByteSpan & mess
     VerifyOrReturnError(IsSpanUsable(out_signature_buffer), CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(IsSpanUsable(message_to_sign), CHIP_ERROR_INVALID_ARGUMENT);
 
-    rc = trusty_matter.SignWithDACKey(message_to_sign.data(), message_to_sign.size(), out_signature_buffer.data(),
-                                      out_signature_buffer.size(), out_size);
+    rc = GetTrustyMatter().SignWithDACKey(message_to_sign.data(), message_to_sign.size(), out_signature_buffer.data(),
+                                          out_signature_buffer.size(), out_size);
     if (rc == 0)
     {
         out_signature_buffer.reduce_size(out_size);
