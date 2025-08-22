@@ -78,7 +78,13 @@ Status AVSettingsUserLevelManagementDelegate::MPTZSetPosition(Optional<int16_t> 
     //
     if (callback != nullptr)
     {
-        DeviceLayer::SystemLayer().ScheduleLambda([callback] { callback->OnPhysicalMovementComplete(Status::Success); });
+        mCallback = callback;
+        DeviceLayer::SystemLayer().ScheduleLambda([this] { 
+            if (this->GetServer() != nullptr)
+            {
+                mCallback->OnPhysicalMovementComplete(Status::Success); 
+            }
+        });
     }
     return Status::Success;
 }
@@ -92,7 +98,13 @@ Status AVSettingsUserLevelManagementDelegate::MPTZRelativeMove(Optional<int16_t>
     //
     if (callback != nullptr)
     {
-        DeviceLayer::SystemLayer().ScheduleLambda([callback] { callback->OnPhysicalMovementComplete(Status::Success); });
+        mCallback = callback;
+        DeviceLayer::SystemLayer().ScheduleLambda([this] { 
+            if (this->GetServer() != nullptr)
+            {
+                mCallback->OnPhysicalMovementComplete(Status::Success); 
+            }
+        });
     }
     return Status::Success;
 }
@@ -106,7 +118,13 @@ Status AVSettingsUserLevelManagementDelegate::MPTZMoveToPreset(uint8_t aPreset, 
     //
     if (callback != nullptr)
     {
-        DeviceLayer::SystemLayer().ScheduleLambda([callback] { callback->OnPhysicalMovementComplete(Status::Success); });
+        mCallback = callback;
+        DeviceLayer::SystemLayer().ScheduleLambda([this] { 
+            if (this->GetServer() != nullptr)
+            {
+                mCallback->OnPhysicalMovementComplete(Status::Success); 
+            }
+        });
     }
     return Status::Success;
 }

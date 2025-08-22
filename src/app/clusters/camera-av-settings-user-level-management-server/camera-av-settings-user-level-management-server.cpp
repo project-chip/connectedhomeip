@@ -56,6 +56,7 @@ CameraAvSettingsUserLevelMgmtServer::~CameraAvSettingsUserLevelMgmtServer()
     // Unregister command handler and attribute access interfaces
     CommandHandlerInterfaceRegistry::Instance().UnregisterCommandHandler(this);
     AttributeAccessInterfaceRegistry::Instance().Unregister(this);
+    mDelegate.SetServer(nullptr);
 }
 
 CHIP_ERROR CameraAvSettingsUserLevelMgmtServer::Init()

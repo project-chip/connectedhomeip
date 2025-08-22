@@ -314,15 +314,26 @@ static void onTimerExpiry(System::Layer * systemLayer, void * data)
 {
     CameraAVSettingsUserLevelManager * delegate = reinterpret_cast<CameraAVSettingsUserLevelManager *>(data);
 
-    delegate->OnPhysicalMoveCompleted(Protocols::InteractionModel::Status::Success);
+    // Make sure that our delegate instance is still alive
+    if (delegate != nullptr)
+    {
+        delegate->OnPhysicalMoveCompleted(Protocols::InteractionModel::Status::Success);
+    }
 }
 
-// To be invoked by the camera once a physical PTZ action has completed
+// To be invoked by the camera once a physical PTZ action has completed. The callback method is realized by our cluster server, 
+// make sure that is still alive before trying to invoke methods thereon.
 //
 void CameraAVSettingsUserLevelManager::OnPhysicalMoveCompleted(Protocols::InteractionModel::Status status)
 {
-    if (mCallback != nullptr)
+    // Make sure we're running in the Matter thread
+    assertChipStackLockedByCurrentThread();
+
+    if (this->GetServer() != nullptr)
     {
-        mCallback->OnPhysicalMovementComplete(status);
+        if (mCallback != nullptr)
+        {
+            mCallback->OnPhysicalMovementComplete(status);
+        }
     }
 }
