@@ -43,7 +43,6 @@
 
 import logging
 
-from mobly import asserts
 from TC_MTRIDTestBase import MeterIdentificationTestBaseHelper
 
 from matter.clusters import MeterIdentification
@@ -60,16 +59,16 @@ class TC_MTRID_3_1(MeterIdentificationTestBaseHelper):
 
     def desc_TC_MTRID_3_1(self) -> str:
         """Returns a description of this test"""
+
         return "Subscription Report Verification with Server as DUT"
 
     def pics_TC_MTRID_3_1(self) -> list[str]:
         """This function returns a list of PICS for this test case that must be True for the test to be run"""
-        return ["MTRID.S",
-                "DGGEN.S",
-                "DGGEN.S.A0008",
-                "DGGEN.S.C00.Rsp"]
+
+        return ["MTRID.S"]
 
     def steps_TC_MTRID_3_1(self) -> list[TestStep]:
+
         steps = [
             TestStep("1", "Commissioning, already done", "DUT is commissioned.", is_commissioning=True),
             TestStep("2", """Set up a subscription to the Meter Identification cluster:
@@ -118,10 +117,6 @@ class TC_MTRID_3_1(MeterIdentificationTestBaseHelper):
 
         endpoint = self.get_endpoint()
         attributes = cluster.Attributes
-
-        # If TestEventTriggers is not enabled this TC can't be checked properly.
-        if not self.check_pics('DGGEN.S') or not self.check_pics('DGGEN.S.A0008') or not self.check_pics('DGGEN.S.C00.Rsp'):
-            asserts.skip("PICS DGGEN.S or DGGEN.S.A0008 or DGGEN.S.C00.Rsp is not True")
 
         self.step("1")
 
