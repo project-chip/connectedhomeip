@@ -85,14 +85,9 @@ using namespace chip::Crypto;
 
 #define CDC_JNI_CALLBACK_LOCAL_REF_COUNT 256
 
-static void PairDeviceCommon(
-    JNIEnv * env,
-    AndroidDeviceControllerWrapper * wrapper,
-    chip::NodeId deviceId,
-    RendezvousParameters & rendezvousParams,
-    jbyteArray csrNonce,
-    jobject networkCredentials,
-    jobject icdRegistrationInfo);
+static void PairDeviceCommon(JNIEnv * env, AndroidDeviceControllerWrapper * wrapper, chip::NodeId deviceId,
+                             RendezvousParameters & rendezvousParams, jbyteArray csrNonce, jobject networkCredentials,
+                             jobject icdRegistrationInfo);
 static void * IOThreadMain(void * arg);
 static CHIP_ERROR StopIOThread();
 static CHIP_ERROR N2J_PaseVerifierParams(JNIEnv * env, jlong setupPincode, jbyteArray pakeVerifier, jobject & outParams);
@@ -683,17 +678,13 @@ JNI_METHOD(void, pairDevice)
 #endif
                                                 .SetPeerAddress(Transport::PeerAddress::BLE());
 
-    PairDeviceCommon(env, wrapper, static_cast<chip::NodeId>(deviceId), rendezvousParams, csrNonce, networkCredentials, icdRegistrationInfo);
+    PairDeviceCommon(env, wrapper, static_cast<chip::NodeId>(deviceId), rendezvousParams, csrNonce, networkCredentials,
+                     icdRegistrationInfo);
 }
 
-static void PairDeviceCommon(
-    JNIEnv * env,
-    AndroidDeviceControllerWrapper * wrapper,
-    chip::NodeId deviceId,
-    RendezvousParameters & rendezvousParams,
-    jbyteArray csrNonce,
-    jobject networkCredentials,
-    jobject icdRegistrationInfo)
+static void PairDeviceCommon(JNIEnv * env, AndroidDeviceControllerWrapper * wrapper, chip::NodeId deviceId,
+                             RendezvousParameters & rendezvousParams, jbyteArray csrNonce, jobject networkCredentials,
+                             jobject icdRegistrationInfo)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -724,8 +715,8 @@ static void PairDeviceCommon(
 }
 
 JNI_METHOD(void, pairDeviceThroughNfc)
-(JNIEnv * env, jobject self, jlong handle, jlong deviceId, jlong pinCode, jbyteArray csrNonce,
- jobject networkCredentials, jobject icdRegistrationInfo)
+(JNIEnv * env, jobject self, jlong handle, jlong deviceId, jlong pinCode, jbyteArray csrNonce, jobject networkCredentials,
+ jobject icdRegistrationInfo)
 {
     chip::DeviceLayer::StackLock lock;
     AndroidDeviceControllerWrapper * wrapper = AndroidDeviceControllerWrapper::FromJNIHandle(handle);
@@ -738,11 +729,11 @@ JNI_METHOD(void, pairDeviceThroughNfc)
         return;
     }
 
-    RendezvousParameters rendezvousParams = RendezvousParameters()
-        .SetSetupPINCode(static_cast<uint32_t>(pinCode))
-        .SetPeerAddress(Transport::PeerAddress::NFC());
+    RendezvousParameters rendezvousParams =
+        RendezvousParameters().SetSetupPINCode(static_cast<uint32_t>(pinCode)).SetPeerAddress(Transport::PeerAddress::NFC());
 
-    PairDeviceCommon(env, wrapper, static_cast<chip::NodeId>(deviceId), rendezvousParams, csrNonce, networkCredentials, icdRegistrationInfo);
+    PairDeviceCommon(env, wrapper, static_cast<chip::NodeId>(deviceId), rendezvousParams, csrNonce, networkCredentials,
+                     icdRegistrationInfo);
 }
 
 JNI_METHOD(void, pairDeviceWithAddress)
