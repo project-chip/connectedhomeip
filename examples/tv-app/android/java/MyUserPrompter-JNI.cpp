@@ -160,7 +160,7 @@ void JNIMyUserPrompter::PromptForCommissionPasscode(uint16_t vendorId, uint16_t 
 
         env->ExceptionClear();
         env->CallVoidMethod(mJNIMyUserPrompterObject.ObjectRef(), mPromptForCommissionPincodeMethod, static_cast<jint>(vendorId),
-                            static_cast<jint>(productId), static_cast<jint>(passcodeLength), jcommissioneeName, 
+                            static_cast<jint>(productId), static_cast<jint>(passcodeLength), jcommissioneeName,
                             static_cast<jint>(pairingHint), pairingInstruction);
         if (env->ExceptionCheck())
         {

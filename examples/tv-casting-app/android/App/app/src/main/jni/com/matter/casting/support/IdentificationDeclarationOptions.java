@@ -90,9 +90,7 @@ public class IdentificationDeclarationOptions {
    * to exit the commissioning process.
    */
   private boolean cancelPasscode = false;
-  /**
-   * Feature: Coordinate Passcode Dialogs Flag - to indicate the passcode length.
-   */
+  /** Feature: Coordinate Passcode Dialogs Flag - to indicate the passcode length. */
   private int passcodeLength = 0;
   /**
    * Feature: Target Content Application - The set of content app Vendor IDs (and optionally,

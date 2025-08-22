@@ -119,7 +119,7 @@ public:
      *
      */
     virtual void PromptWithCommissionerPasscode(uint16_t vendorId, uint16_t productId, const char * commissioneeName,
-                                                uint32_t passcode, uint8_t passcodeLength, uint16_t pairingHint, 
+                                                uint32_t passcode, uint8_t passcodeLength, uint16_t pairingHint,
                                                 const char * pairingInstruction) = 0;
 
     /**

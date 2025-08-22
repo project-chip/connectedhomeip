@@ -71,7 +71,13 @@ public class MatterCommissioningPrompter extends UserPrompterResolver implements
   }
 
   @Override
-  public void promptForCommissionPinCode(int vendorId, int productId, int passcodeLength, String commissioneeName, int pairingHint, String pairingInstruction) {
+  public void promptForCommissionPinCode(
+      int vendorId,
+      int productId,
+      int passcodeLength,
+      String commissioneeName,
+      int pairingHint,
+      String pairingInstruction) {
     Log.d(
         TAG,
         "Received prompt for PIN code vendor id:"
@@ -134,7 +140,13 @@ public class MatterCommissioningPrompter extends UserPrompterResolver implements
     Bundle bundle = new Bundle();
     PromptCommissionerPasscode promptCommissionerPasscode =
         new PromptCommissionerPasscode(
-            vendorId, productId, commissioneeName, passcode, passcodeLength, pairingHint, pairingInstruction);
+            vendorId,
+            productId,
+            commissioneeName,
+            passcode,
+            passcodeLength,
+            pairingHint,
+            pairingInstruction);
     bundle.putParcelable(MsgHandler.KEY_PROMPT_COMMISSIONER_PASSCODE, promptCommissionerPasscode);
     android.os.Message obtained = android.os.Message.obtain();
     obtained.what = MsgHandler.MSG_CommissionerPasscode;

@@ -168,7 +168,7 @@ public:
         ChipLogDetail(AppServer, "IdentificationDeclarationOptions::mCancelPasscode:            %s",
                       mCancelPasscode ? "true" : "false");
         ChipLogDetail(AppServer, "IdentificationDeclarationOptions::mCommissioneeInstanceName:  %s", mCommissioneeInstanceName);
-        ChipLogDetail(AppServer, "IdentificationDeclarationOptions::mPasscodeLength:            %d", 
+        ChipLogDetail(AppServer, "IdentificationDeclarationOptions::mPasscodeLength:            %d",
                       static_cast<uint16_t>(mPasscodeLength));
 
         ChipLogDetail(AppServer, "IdentificationDeclarationOptions::TargetAppInfos list:");

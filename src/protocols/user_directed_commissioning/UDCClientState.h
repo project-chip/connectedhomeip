@@ -239,7 +239,7 @@ private:
     bool mCommissionerPasscode      = false;
     bool mCommissionerPasscodeReady = false;
     bool mCancelPasscode            = false;
-    uint8_t mPasscodeLength = 0;
+    uint8_t mPasscodeLength         = 0;
 
     UDCClientProcessingState mUDCClientProcessingState;
     System::Clock::Timestamp mExpirationTime = System::Clock::kZero;
