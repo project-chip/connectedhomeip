@@ -18,8 +18,9 @@
 #include <app/clusters/group-key-mgmt-server/group-key-mgmt-cluster.h>
 #include <app/static-cluster-config/GroupKeyManagement.h>
 #include <app/util/config.h>
-#include <data-model-providers/codegen/CodegenDataModelProvider.h>
+#include <data-model-providers/codegen/ClusterIntegration.h>
 
+namespace {
 using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;
@@ -31,29 +32,52 @@ static_assert((GroupKeyManagement::StaticApplicationConfig::kFixedClusterConfig.
 
 LazyRegisteredServerCluster<GroupKeyManagementCluster> gServer;
 
+class IntegrationDelegate : public CodegenClusterIntegration::Delegate
+{
+public:
+    ServerClusterRegistration & CreateRegistration(EndpointId endpointId, unsigned emberEndpointIndex,
+                                                   uint32_t optionalAttributeBits, uint32_t featureMap) override
+    {
+        gServer.Create();
+        return gServer.Registration();
+    }
+
+    ServerClusterInterface & FindRegistration(unsigned emberEndpointIndex) override { return gServer.Cluster(); }
+
+    // Nothing to destroy: separate singleton class without constructor/destructor is used
+    void ReleaseRegistration(unsigned emberEndpointIndex) override { gServer.Destroy(); }
+};
+
+} // namespace
+
 void emberAfGroupKeyManagementClusterServerInitCallback(EndpointId endpointId)
 {
-    VerifyOrDie(endpointId == kRootEndpointId);
-    gServer.Create();
+    IntegrationDelegate integrationDelegate;
 
-    CHIP_ERROR err = CodegenDataModelProvider::Instance().Registry().Register(gServer.Registration());
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogError(AppServer, "Failed to register GroupKeyManagement on endpoint %u: %" CHIP_ERROR_FORMAT, endpointId,
-                     err.Format());
-    }
+    CodegenClusterIntegration::RegisterServer(
+        {
+            .endpointId                      = endpointId,
+            .clusterId                       = GroupKeyManagement::Id,
+            .fixedClusterServerEndpointCount = 1,
+            .maxEndpointCount                = 1,
+            .fetchFeatureMap                 = false,
+            .fetchOptionalAttributes         = false,
+        },
+        integrationDelegate);
 }
 
 void MatterGroupKeyManagementClusterServerShutdownCallback(EndpointId endpointId)
 {
-    VerifyOrReturn(endpointId == kRootEndpointId);
-    CHIP_ERROR err = CodegenDataModelProvider::Instance().Registry().Unregister(&gServer.Cluster());
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogError(AppServer, "Failed to unregister GroupKeyManagement on endpoint %u: %" CHIP_ERROR_FORMAT, endpointId,
-                     err.Format());
-    }
-    gServer.Destroy();
+    IntegrationDelegate integrationDelegate;
+
+    CodegenClusterIntegration::UnregisterServer(
+        {
+            .endpointId                      = endpointId,
+            .clusterId                       = GroupKeyManagement::Id,
+            .fixedClusterServerEndpointCount = 1,
+            .maxEndpointCount                = 1,
+        },
+        integrationDelegate);
 }
 
 void MatterGroupKeyManagementPluginServerInitCallback() {}
