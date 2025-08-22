@@ -338,6 +338,19 @@ struct IsStruct
 
 /// @brief Type extraction utilities
 template <typename U>
+struct ExtractNonNullableType
+{
+    using type = U;
+};
+template <typename U>
+struct ExtractNonNullableType<DataModel::Nullable<U>>
+{
+    using type = typename ExtractNonNullableType<U>::type;
+};
+template <typename U>
+using ExtractNonNullableType_t = typename ExtractNonNullableType<U>::type;
+
+template <typename U>
 struct ExtractNestedType
 {
     using type = U; // Base case - not a wrapper
@@ -468,14 +481,7 @@ public:
     /// The exposed attribute value type
     using ValueType = T;
 
-    //using DataType = ExtractNestedType_t<ValueType>;
-
-    // Determine the actual data type we're working with
-    using DataType = std::conditional_t<
-        IsNullable<ValueType>::value,
-        ExtractNestedType_t<ValueType>,
-        ValueType
-    >;
+    using DataType = ExtractNonNullableType_t<ValueType>;
 
     using ListEntryType   = std::conditional_t<IsList<DataType>::value,
                                              ExtractNestedType_t<DataType>, // Extract the list element type
