@@ -17148,8 +17148,7 @@ public:
 
 private:
     chip::app::Clusters::TlsCertificateManagement::Commands::ProvisionClientCertificate::Type mRequest;
-    TypedComplexArgument<chip::app::DataModel::Nullable<chip::app::DataModel::List<const chip::ByteSpan>>>
-        mComplex_IntermediateCertificates;
+    TypedComplexArgument<chip::app::DataModel::List<const chip::ByteSpan>> mComplex_IntermediateCertificates;
 };
 
 /*

@@ -56,7 +56,6 @@ from matter.interaction_model import InteractionModelError, Status
 from matter.testing.conversions import hex_from_bytes
 from matter.testing.matter_testing import (MatterBaseTest, TestStep, default_matter_test_main, has_cluster, run_if_endpoint_matches,
                                            type_matches)
-from matter.tlv import TLVWriter
 from matter.utils import CommissioningBuildingBlocks
 
 
@@ -128,7 +127,7 @@ class TC_TLSCERT(MatterBaseTest):
         asserts.assert_greater_equal(caid, 0, "Invalid CCDID returned")
         asserts.assert_less_equal(caid, 65534, "Invalid CCDID returned")
 
-    def assert_valid_csr(self, response: Clusters.TlsCertificateManagement.Commands.TLSClientCSRResponse, nonce: bytes):
+    def assert_valid_csr(self, response: Clusters.TlsCertificateManagement.Commands.ClientCSRResponse, nonce: bytes):
         # Verify der encoded and PKCS #10 (rfc2986 is PKCS #10) - next two requirements
         try:
             temp, _ = der_decoder(response.csr, asn1Spec=rfc2986.CertificationRequest())
@@ -141,36 +140,27 @@ class TC_TLSCERT(MatterBaseTest):
         csr_pubkey = csr.public_key()
         asserts.assert_equal(csr_pubkey.key_size, 256, "Incorrect key size")
 
-        # Verify signature algorithm is ecdsa-with-SHA156
+        # Verify signature algorithm is ecdsa-with-SHA256
         signature_algorithm = dict(layer1['signatureAlgorithm'])['algorithm']
         asserts.assert_equal(signature_algorithm, rfc5480.ecdsa_with_SHA256, "CSR specifies incorrect signature key algorithm")
 
         # Verify signature is valid
         asserts.assert_true(csr.is_signature_valid, "Signature is invalid")
 
-        # Verify response.nonce is octet string of length 32
+        # Verify response.nonceSignature is octet string of length 32
         try:
-            # response.nonce is an octet string if it can be converted to an int
-            int(hex_from_bytes(response.nonce), 16)
+            # response.nonceSignature is an octet string if it can be converted to an int
+            int(hex_from_bytes(response.nonceSignature), 16)
         except ValueError:
-            asserts.fail("Returned CSR nonce is not an octet string")
+            asserts.fail("Returned CSR nonceSignature is not an octet string")
 
-        # Verify response.nonce is valid signature
-        nocsr_elements = dict(
-            [
-                (1, response.csr),
-                (2, nonce),
-            ]
-        )
-        writer = TLVWriter()
-        writer.put(None, nocsr_elements)
-
+        # Verify response.nonceSignature is valid signature
         baselen = curve_by_name("NIST256p").baselen
-        signature_raw_r = int(hex_from_bytes(response.nonce[:baselen]), 16)
-        signature_raw_s = int(hex_from_bytes(response.nonce[baselen:]), 16)
+        signature_raw_r = int(hex_from_bytes(response.nonceSignature[:baselen]), 16)
+        signature_raw_s = int(hex_from_bytes(response.nonceSignature[baselen:]), 16)
 
-        nocsr_signature = utils.encode_dss_signature(signature_raw_r, signature_raw_s)
-        csr_pubkey.verify(signature=nocsr_signature, data=writer.encoding, signature_algorithm=ec.ECDSA(hashes.SHA256()))
+        nonceSignature = utils.encode_dss_signature(signature_raw_r, signature_raw_s)
+        csr_pubkey.verify(signature=nonceSignature, data=nonce, signature_algorithm=ec.ECDSA(hashes.SHA256()))
 
     class TargetedFabric:
         def __init__(self, matter_test: MatterBaseTest, endpoint: Optional[int] = None,
@@ -222,13 +212,13 @@ class TC_TLSCERT(MatterBaseTest):
 
         async def send_csr_command(
                 self, nonce: bytes,
-                expected_status: Status = Status.Success) -> Union[Clusters.TlsCertificateManagement.Commands.TLSClientCSRResponse, InteractionModelError]:
+                expected_status: Status = Status.Success) -> Union[Clusters.TlsCertificateManagement.Commands.ClientCSRResponse, InteractionModelError]:
             try:
-                result = await self.test.send_single_cmd(cmd=Clusters.TlsCertificateManagement.Commands.TLSClientCSR(nonce=nonce),
+                result = await self.test.send_single_cmd(cmd=Clusters.TlsCertificateManagement.Commands.ClientCSR(nonce=nonce),
                                                          endpoint=self.endpoint, dev_ctrl=self.dev_ctrl, node_id=self.node_id, payloadCapability=ChipDeviceCtrl.TransportPayloadCapability.LARGE_PAYLOAD)
 
-                asserts.assert_true(type_matches(result, Clusters.TlsCertificateManagement.Commands.TLSClientCSRResponse),
-                                    "Unexpected return type for TLSClientCSR")
+                asserts.assert_true(type_matches(result, Clusters.TlsCertificateManagement.Commands.ClientCSRResponse),
+                                    "Unexpected return type for ClientCSR")
                 return result
             except InteractionModelError as e:
                 asserts.assert_equal(e.status, expected_status, "Unexpected error returned")
@@ -238,7 +228,7 @@ class TC_TLSCERT(MatterBaseTest):
                 self, certificate: bytes, ccdid: int,
                 expected_status: Status = Status.Success) -> InteractionModelError:
             try:
-                result = await self.test.send_single_cmd(cmd=Clusters.TlsCertificateManagement.Commands.ProvisionClientCertificate(ccdid=ccdid, clientCertificateDetails=Clusters.TlsCertificateManagement.Structs.TLSClientCertificateDetailStruct(clientCertificate=certificate)),
+                result = await self.test.send_single_cmd(cmd=Clusters.TlsCertificateManagement.Commands.ProvisionClientCertificate(ccdid=ccdid, clientCertificate=certificate),
                                                          endpoint=self.endpoint, dev_ctrl=self.dev_ctrl, node_id=self.node_id, payloadCapability=ChipDeviceCtrl.TransportPayloadCapability.LARGE_PAYLOAD)
 
                 return result
@@ -275,10 +265,10 @@ class TC_TLSCERT(MatterBaseTest):
             cluster = Clusters.TlsCertificateManagement
             return await self.test.read_single_attribute_check_success(endpoint=self.endpoint, dev_ctrl=self.dev_ctrl, node_id=self.node_id, cluster=cluster, attribute=attribute)
 
-    def desc_TC_TLSCERT_3_1(self) -> str:
+    def desc_TC_TLSCERT_2_2(self) -> str:
         return "[TC-TLSCERT-3.1] ProvisionRootCertificate command basic insertion and modification"
 
-    def steps_TC_TLSCERT_3_1(self) -> list[TestStep]:
+    def steps_TC_TLSCERT_2_2(self) -> list[TestStep]:
         steps = [
             TestStep(1, "Commissioning, already done", is_commissioning=True),
             TestStep(2, "CR1 opens commissioning window on DUT",
@@ -306,7 +296,7 @@ class TC_TLSCERT(MatterBaseTest):
         return steps
 
     @run_if_endpoint_matches(has_cluster(Clusters.TlsCertificateManagement))
-    async def test_TC_TLSCERT_3_1(self):
+    async def test_TC_TLSCERT_2_2(self):
         endpoint = self.get_endpoint(default=1)
         attributes = Clusters.TlsCertificateManagement.Attributes
 
@@ -415,10 +405,10 @@ class TC_TLSCERT(MatterBaseTest):
         asserts.assert_equal(
             resp.statusCode, Clusters.OperationalCredentials.Enums.NodeOperationalCertStatusEnum.kOk)
 
-    def desc_TC_TLSCERT_3_1_8(self) -> str:
+    def desc_TC_TLSCERT_2_9(self) -> str:
         return "[TC-TLSCERT-3.1.8] ProvisionClientCertificate command verification"
 
-    def steps_TC_TLSCERT_3_1_8(self) -> list[TestStep]:
+    def steps_TC_TLSCERT_2_9(self) -> list[TestStep]:
         steps = [
             TestStep(1, "Commissioning, already done", is_commissioning=True),
             TestStep(2, "CR1 opens commissioning window on DUT",
@@ -426,7 +416,7 @@ class TC_TLSCERT(MatterBaseTest):
             TestStep(3, "Create two distinct, valid, self-signed, DER-encoded x509 certificates"),
             TestStep(4, "Read ProvisionedClientCertificates"),
             TestStep(5, "Sends the RemoveClientCertificate command for any certificates found in step 4"),
-            TestStep(6, "Sends the TLSClientCSR command"),
+            TestStep(6, "Sends the ClientCSR command"),
             TestStep(7, "Validates the CSR and nonce signature"),
             TestStep(8, "Sends the ProvisionClientCertificate command to the TlsCertificateManagement cluster",
                      "Verify that the DUT sends ProvisionClientCertificateResponse."),
@@ -447,7 +437,7 @@ class TC_TLSCERT(MatterBaseTest):
         return steps
 
     @run_if_endpoint_matches(has_cluster(Clusters.TlsCertificateManagement))
-    async def test_TC_TLSCERT_3_1_8(self):
+    async def test_TC_TLSCERT_2_9(self):
         endpoint = self.get_endpoint(default=1)
         attributes = Clusters.TlsCertificateManagement.Attributes
 
