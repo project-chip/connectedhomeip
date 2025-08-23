@@ -255,7 +255,9 @@ TEST_F(TestCommodityTariffBaseDataClass, ListValueCreationAndCleanup)
     EXPECT_TRUE(data.UpdateFinish(true));
 
     EXPECT_EQ(data.GetValue().size(), SampleListLen);
-    EXPECT_EQ(data.GetValue()[0], (const uint32_t) 10);
+    EXPECT_EQ(data.GetValue()[0], 10u);
+    EXPECT_EQ(data.GetValue()[1], 20u);
+    EXPECT_EQ(data.GetValue()[2], 30u);
 
     data.Cleanup();
     EXPECT_EQ(data.GetValue().data(), nullptr);
