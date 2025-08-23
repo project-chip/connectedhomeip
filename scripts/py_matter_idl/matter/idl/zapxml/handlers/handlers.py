@@ -26,7 +26,7 @@ LOGGER = logging.getLogger('matter-xml-parser')
 
 
 def _IsConformanceTagName(name: str) -> bool:
-    return name in {'mandatoryConform', 'optionalConform', 'otherwiseConform', 'provisionalConform', 'deprecateConform'}
+    return name in {'mandatoryConform', 'optionalConform', 'otherwiseConform', 'provisionalConform', 'deprecateConform', 'describedConform'}
 
 
 class ClusterNameHandler(BaseHandler):
@@ -172,7 +172,7 @@ class AttributeHandler(BaseHandler):
         self._cluster.attributes.append(self._attribute)
 
 
-class SkipProvisioalHandler(BaseHandler):
+class SkipProvisionalHandler(BaseHandler):
     def __init__(self, context: Context, attrs):
         super().__init__(context, handled=HandledDepth.SINGLE_TAG)
 
@@ -235,7 +235,7 @@ class StructHandler(BaseHandler, IdlPostProcessor):
                 field.qualities |= FieldQuality.FABRIC_SENSITIVE
 
             self._struct.fields.append(field)
-            return SkipProvisioalHandler(self.context, attrs)
+            return SkipProvisionalHandler(self.context, attrs)
         elif name.lower() == 'cluster':
             self._cluster_codes.add(ParseInt(attrs['code']))
             return BaseHandler(self.context, handled=HandledDepth.SINGLE_TAG)
@@ -364,7 +364,8 @@ class FeaturesHandler(BaseHandler):
 
     def __init__(self, context: Context, cluster: Cluster):
         super().__init__(context)
-        self._features = Bitmap(name='Feature', base_type="bitmap32", entries=[])
+        self._features = Bitmap(
+            name='Feature', base_type="bitmap32", entries=[])
         self._cluster = cluster
 
     def GetNextProcessor(self, name, attrs):
