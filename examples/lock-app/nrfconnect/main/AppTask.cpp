@@ -37,6 +37,7 @@
 #include <lib/core/ErrorStr.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CodeUtils.h>
+#include <platform/nrfconnect/FactoryResetTestEventTriggerHandler.h>
 #include <setup_payload/OnboardingCodesUtil.h>
 #include <system/SystemClock.h>
 
@@ -234,8 +235,11 @@ CHIP_ERROR AppTask::Init()
     static CommonCaseDeviceServerInitParams initParams;
     static SimpleTestEventTriggerDelegate sTestEventTriggerDelegate{};
     static OTATestEventTriggerHandler sOtaTestEventTriggerHandler{};
+    static DeviceLayer::FactoryResetTestEventTriggerHandler sFactoryResetEventTriggerHandler{};
     VerifyOrDie(sTestEventTriggerDelegate.Init(ByteSpan(sTestEventTriggerEnableKey)) == CHIP_NO_ERROR);
     VerifyOrDie(sTestEventTriggerDelegate.AddHandler(&sOtaTestEventTriggerHandler) == CHIP_NO_ERROR);
+    VerifyOrDie(sTestEventTriggerDelegate.AddHandler(&sFactoryResetEventTriggerHandler) == CHIP_NO_ERROR);
+    LOG_INF("Factory Reset Test Event Trigger Handler registered");
 #ifdef CONFIG_CHIP_CRYPTO_PSA
     initParams.operationalKeystore = &sPSAOperationalKeystore;
 #endif

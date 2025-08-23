@@ -48294,6 +48294,22 @@ class WebRTCTransportProvider(Cluster):
         class Feature(IntFlag):
             kMetadata = 0x1
 
+    class Structs:
+        @dataclass
+        class SFrameStruct(ClusterObject):
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="cipherSuite", Tag=0, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="baseKey", Tag=1, Type=bytes),
+                        ClusterObjectFieldDescriptor(Label="kid", Tag=2, Type=bytes),
+                    ])
+
+            cipherSuite: 'uint' = 0
+            baseKey: 'bytes' = b""
+            kid: 'bytes' = b""
+
     class Commands:
         @dataclass
         class SolicitOffer(ClusterCommand):
@@ -48313,6 +48329,7 @@ class WebRTCTransportProvider(Cluster):
                         ClusterObjectFieldDescriptor(Label="ICEServers", Tag=4, Type=typing.Optional[typing.List[Globals.Structs.ICEServerStruct]]),
                         ClusterObjectFieldDescriptor(Label="ICETransportPolicy", Tag=5, Type=typing.Optional[str]),
                         ClusterObjectFieldDescriptor(Label="metadataEnabled", Tag=6, Type=typing.Optional[bool]),
+                        ClusterObjectFieldDescriptor(Label="SFrameConfig", Tag=7, Type=typing.Optional[WebRTCTransportProvider.Structs.SFrameStruct]),
                     ])
 
             streamUsage: Globals.Enums.StreamUsageEnum = 0
@@ -48322,6 +48339,7 @@ class WebRTCTransportProvider(Cluster):
             ICEServers: typing.Optional[typing.List[Globals.Structs.ICEServerStruct]] = None
             ICETransportPolicy: typing.Optional[str] = None
             metadataEnabled: typing.Optional[bool] = None
+            SFrameConfig: typing.Optional[WebRTCTransportProvider.Structs.SFrameStruct] = None
 
         @dataclass
         class SolicitOfferResponse(ClusterCommand):
@@ -48365,6 +48383,7 @@ class WebRTCTransportProvider(Cluster):
                         ClusterObjectFieldDescriptor(Label="ICEServers", Tag=6, Type=typing.Optional[typing.List[Globals.Structs.ICEServerStruct]]),
                         ClusterObjectFieldDescriptor(Label="ICETransportPolicy", Tag=7, Type=typing.Optional[str]),
                         ClusterObjectFieldDescriptor(Label="metadataEnabled", Tag=8, Type=typing.Optional[bool]),
+                        ClusterObjectFieldDescriptor(Label="SFrameConfig", Tag=9, Type=typing.Optional[WebRTCTransportProvider.Structs.SFrameStruct]),
                     ])
 
             webRTCSessionID: typing.Union[Nullable, uint] = NullValue
@@ -48376,6 +48395,7 @@ class WebRTCTransportProvider(Cluster):
             ICEServers: typing.Optional[typing.List[Globals.Structs.ICEServerStruct]] = None
             ICETransportPolicy: typing.Optional[str] = None
             metadataEnabled: typing.Optional[bool] = None
+            SFrameConfig: typing.Optional[WebRTCTransportProvider.Structs.SFrameStruct] = None
 
         @dataclass
         class ProvideOfferResponse(ClusterCommand):

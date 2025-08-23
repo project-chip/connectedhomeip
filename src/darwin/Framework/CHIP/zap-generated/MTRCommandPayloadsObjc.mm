@@ -34667,6 +34667,8 @@ NS_ASSUME_NONNULL_BEGIN
         _iceTransportPolicy = nil;
 
         _metadataEnabled = nil;
+
+        _sFrameConfig = nil;
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
     }
@@ -34684,6 +34686,7 @@ NS_ASSUME_NONNULL_BEGIN
     other.iceServers = self.iceServers;
     other.iceTransportPolicy = self.iceTransportPolicy;
     other.metadataEnabled = self.metadataEnabled;
+    other.sFrameConfig = self.sFrameConfig;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
 
@@ -34692,7 +34695,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: streamUsage:%@; originatingEndpointID:%@; videoStreamID:%@; audioStreamID:%@; iceServers:%@; iceTransportPolicy:%@; metadataEnabled:%@; >", NSStringFromClass([self class]), _streamUsage, _originatingEndpointID, _videoStreamID, _audioStreamID, _iceServers, _iceTransportPolicy, _metadataEnabled];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: streamUsage:%@; originatingEndpointID:%@; videoStreamID:%@; audioStreamID:%@; iceServers:%@; iceTransportPolicy:%@; metadataEnabled:%@; sFrameConfig:%@; >", NSStringFromClass([self class]), _streamUsage, _originatingEndpointID, _videoStreamID, _audioStreamID, _iceServers, _iceTransportPolicy, _metadataEnabled, _sFrameConfig];
     return descriptionString;
 }
 
@@ -34804,6 +34807,14 @@ NS_ASSUME_NONNULL_BEGIN
         if (self.metadataEnabled != nil) {
             auto & definedValue_0 = encodableStruct.metadataEnabled.Emplace();
             definedValue_0 = self.metadataEnabled.boolValue;
+        }
+    }
+    {
+        if (self.sFrameConfig != nil) {
+            auto & definedValue_0 = encodableStruct.SFrameConfig.Emplace();
+            definedValue_0.cipherSuite = self.sFrameConfig.cipherSuite.unsignedShortValue;
+            definedValue_0.baseKey = AsByteSpan(self.sFrameConfig.baseKey);
+            definedValue_0.kid = AsByteSpan(self.sFrameConfig.kid);
         }
     }
 
@@ -34980,6 +34991,8 @@ NS_ASSUME_NONNULL_BEGIN
         _iceTransportPolicy = nil;
 
         _metadataEnabled = nil;
+
+        _sFrameConfig = nil;
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
     }
@@ -34999,6 +35012,7 @@ NS_ASSUME_NONNULL_BEGIN
     other.iceServers = self.iceServers;
     other.iceTransportPolicy = self.iceTransportPolicy;
     other.metadataEnabled = self.metadataEnabled;
+    other.sFrameConfig = self.sFrameConfig;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
 
@@ -35007,7 +35021,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: webRTCSessionID:%@; sdp:%@; streamUsage:%@; originatingEndpointID:%@; videoStreamID:%@; audioStreamID:%@; iceServers:%@; iceTransportPolicy:%@; metadataEnabled:%@; >", NSStringFromClass([self class]), _webRTCSessionID, _sdp, _streamUsage, _originatingEndpointID, _videoStreamID, _audioStreamID, _iceServers, _iceTransportPolicy, _metadataEnabled];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: webRTCSessionID:%@; sdp:%@; streamUsage:%@; originatingEndpointID:%@; videoStreamID:%@; audioStreamID:%@; iceServers:%@; iceTransportPolicy:%@; metadataEnabled:%@; sFrameConfig:%@; >", NSStringFromClass([self class]), _webRTCSessionID, _sdp, _streamUsage, _originatingEndpointID, _videoStreamID, _audioStreamID, _iceServers, _iceTransportPolicy, _metadataEnabled, _sFrameConfig];
     return descriptionString;
 }
 
@@ -35130,6 +35144,14 @@ NS_ASSUME_NONNULL_BEGIN
         if (self.metadataEnabled != nil) {
             auto & definedValue_0 = encodableStruct.metadataEnabled.Emplace();
             definedValue_0 = self.metadataEnabled.boolValue;
+        }
+    }
+    {
+        if (self.sFrameConfig != nil) {
+            auto & definedValue_0 = encodableStruct.SFrameConfig.Emplace();
+            definedValue_0.cipherSuite = self.sFrameConfig.cipherSuite.unsignedShortValue;
+            definedValue_0.baseKey = AsByteSpan(self.sFrameConfig.baseKey);
+            definedValue_0.kid = AsByteSpan(self.sFrameConfig.kid);
         }
     }
 
