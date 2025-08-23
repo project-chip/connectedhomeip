@@ -5,6 +5,7 @@
 #pragma once
 
 #include <app/data-model-provider/MetadataTypes.h>
+#include <array>
 #include <lib/core/DataModelTypes.h>
 
 #include <cstdint>
@@ -19,6 +20,7 @@ namespace SmokeCoAlarm {
 inline constexpr uint32_t kRevision = 1;
 
 namespace Attributes {
+
 namespace ExpressedState {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(ExpressedState::Id, BitFlags<DataModel::AttributeQualityFlags>(),
                                                           Access::Privilege::kView, std::nullopt);
@@ -71,10 +73,16 @@ namespace ExpiryDate {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(ExpiryDate::Id, BitFlags<DataModel::AttributeQualityFlags>(),
                                                           Access::Privilege::kView, std::nullopt);
 } // namespace ExpiryDate
+constexpr std::array<DataModel::AttributeEntry, 5> kMandatoryMetadata = {
+    ExpressedState::kMetadataEntry,     BatteryAlert::kMetadataEntry,      TestInProgress::kMetadataEntry,
+    HardwareFaultAlert::kMetadataEntry, EndOfServiceAlert::kMetadataEntry,
+
+};
 
 } // namespace Attributes
 
 namespace Commands {
+
 namespace SelfTestRequest {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(SelfTestRequest::Id, BitFlags<DataModel::CommandQualityFlags>(),
                                                                 Access::Privilege::kOperate);
