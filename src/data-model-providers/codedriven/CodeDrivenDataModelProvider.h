@@ -100,7 +100,8 @@ public:
      * each ServerClusterInterface associated with the endpoint.
      * The Startup() call on the associated clusters will ONLY happen if this is the first
      * endpoint associated with the cluster (i.e. ServerClusterInterface.GetPaths() returns
-     * at least one path with endpoint ID == registration.endpointEntry.id). This ensures
+     * at least one path with endpoint ID == registration.endpointEntry.id, and none 
+     * of the other endpoints in GetPaths() are registered yet). This ensures
      * the cluster is only started once, even if it is associated with multiple endpoints.
      *
      * Prerequisites:
