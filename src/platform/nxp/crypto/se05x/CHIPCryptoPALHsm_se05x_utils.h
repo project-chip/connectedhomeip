@@ -79,6 +79,12 @@ extern "C" {
 CHIP_ERROR se05x_session_open(void);
 
 /**
+ * @brief Close session to se05x secure element.
+ * @return CHIP_ERROR_INTERNAL on error, CHIP_NO_ERROR otherwise
+ */
+CHIP_ERROR se05x_close_session(void);
+
+/**
  * @brief Check if key exists in se05x.
  * @param[in] Key id of the key to be checked.
  * @return CHIP_ERROR_INTERNAL on error, CHIP_NO_ERROR otherwise
@@ -102,6 +108,15 @@ void se05x_delete_key(uint32_t keyid);
  */
 CHIP_ERROR se05x_set_key_for_spake(uint32_t keyid, const uint8_t * key, size_t keylen, sss_key_part_t keyPart,
                                    sss_cipher_type_t cipherType);
+/**
+ * @brief Set certificate in se05x.
+ * The certificate is stored with transient option. The contents are lost on session close.
+ * @param[in] keyid - Key id of the object.
+ * @param[in] buf - Buffer containing certificate in DER format.
+ * @param[in] buflen - Buffer length.
+ * @return CHIP_ERROR_INTERNAL on error, CHIP_NO_ERROR otherwise
+ */
+CHIP_ERROR se05x_get_certificate(uint32_t keyId, uint8_t * buf, size_t * buflen);
 
 /**
  * @brief Set certificate in se05x.

@@ -102,6 +102,10 @@ if(CONFIG_CHIP_SE05X)
     if(se_index EQUAL -1)
         message(FATAL_ERROR "MCUX_MODULES must include ${CHIP_ROOT}/third_party/simw-top-mini/repo/matter in the application when CONFIG_CHIP_SE05X is enabled")
     endif()
+
+    if (CONFIG_CHIP_SE05X_DEVICE_ATTESTATION)
+        add_definitions(-DENABLE_SE05X_DEVICE_ATTESTATION=1)
+    endif()
 endif()
 
 if (CONFIG_CHIP_APP_FACTORY_DATA)

@@ -25,9 +25,13 @@ import("//build_overrides/build.gni")
 # chip_se05x_host_gpio:
 # Enable / Disable the implementation of GPIO functions to control the SE05x secure element power.
 # Possible values:
-#  - none : GPIO function will have no impact.
-#  - rpi  : Enable GPIO function for Raspberry pi platform.
-#           Connect power pin of SE05x to Pin#11 of raspberry pi.
+#  - none        : GPIO function will have no impact.
+#  - rpi         : Enable GPIO function for Raspberry pi platform.
+#                  Connect Enable pin of SE05x to Pin#11 of raspberry pi.
+#                  Connect Jumper J14 to 3-4 on OM-SE051ARD.
+#  - frdm_imx93  : Enable GPIO function for frdm i.MX93.
+#                  Connect Enable pin of SE05x to Pin#29 of P11 connector on frdm i.MX93.
+#                  Connect Jumper J14 to 3-4 on OM-SE051ARD.
 
 declare_args() {
   chip_se05x_smcom = "t=1oi2c"
