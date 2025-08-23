@@ -612,8 +612,7 @@ CHIP_ERROR CertificateTableImpl::GetRootCertificateCount(FabricIndex fabric, uin
 }
 
 CHIP_ERROR CertificateTableImpl::PrepareClientCertificate(FabricIndex fabric, const ByteSpan & nonce, ClientBuffer & buffer,
-                                                          TLSCCDID & id,
-                                                          MutableByteSpan & csr, MutableByteSpan & nonceSignature)
+                                                          TLSCCDID & id, MutableByteSpan & csr, MutableByteSpan & nonceSignature)
 {
     VerifyOrReturnError(IsInitialized(), CHIP_ERROR_INTERNAL);
 
