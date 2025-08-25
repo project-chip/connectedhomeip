@@ -67,7 +67,7 @@ public:
     void OnPhysicalMoveCompleted(Protocols::InteractionModel::Status status);
 
     void CancelActiveTimers();
-    
+
     /**
      * DPTZ Stream Indication
      */

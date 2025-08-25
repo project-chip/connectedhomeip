@@ -1356,7 +1356,7 @@ void CameraAvSettingsUserLevelMgmtServer::OnPhysicalMovementComplete(Status stat
 {
     // Make sure we're running in the Matter thread
     assertChipStackLockedByCurrentThread();
-    
+
     if (status == Status::Success)
     {
         SetPan(mTargetPan);

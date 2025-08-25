@@ -80,7 +80,7 @@ Status AVSettingsUserLevelManagementDelegate::MPTZSetPosition(Optional<int16_t> 
     //
     mCallback = callback;
     DeviceLayer::SystemLayer().StartTimer(System::Clock::Seconds16(2), onTimerExpiry, this);
-    
+
     return Status::Success;
 }
 
@@ -93,7 +93,7 @@ Status AVSettingsUserLevelManagementDelegate::MPTZRelativeMove(Optional<int16_t>
     //
     mCallback = callback;
     DeviceLayer::SystemLayer().StartTimer(System::Clock::Seconds16(2), onTimerExpiry, this);
-    
+
     return Status::Success;
 }
 
@@ -106,7 +106,7 @@ Status AVSettingsUserLevelManagementDelegate::MPTZMoveToPreset(uint8_t aPreset, 
     //
     mCallback = callback;
     DeviceLayer::SystemLayer().StartTimer(System::Clock::Seconds16(2), onTimerExpiry, this);
-    
+
     return Status::Success;
 }
 
