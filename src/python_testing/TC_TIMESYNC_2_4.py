@@ -42,8 +42,8 @@ from mobly import asserts
 
 import matter.clusters as Clusters
 from matter.interaction_model import InteractionModelError, Status
-from matter.testing.timeoperations import utc_time_in_matter_epoch
 from matter.testing.matter_testing import MatterBaseTest, async_test_body, default_matter_test_main, matchers
+from matter.testing.timeoperations import utc_time_in_matter_epoch
 
 
 class TC_TIMESYNC_2_4(MatterBaseTest):
