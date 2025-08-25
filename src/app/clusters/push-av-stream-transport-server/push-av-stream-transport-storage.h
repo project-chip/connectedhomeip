@@ -147,7 +147,15 @@ struct CMAFContainerOptionsStorage : public CMAFContainerOptionsStruct
 
     CMAFContainerOptionsStorage & operator=(const Structs::CMAFContainerOptionsStruct::Type & aCMAFContainerOptions)
     {
-        chunkDuration = aCMAFContainerOptions.chunkDuration;
+        CMAFInterface   = aCMAFContainerOptions.CMAFInterface;
+        segmentDuration = aCMAFContainerOptions.segmentDuration;
+        chunkDuration   = aCMAFContainerOptions.chunkDuration;
+        sessionGroup    = aCMAFContainerOptions.sessionGroup;
+
+        MutableCharSpan trackNameBuffer(mTrackNameBuffer);
+        // ValidateIncomingTransportOptions() function already checked the trackName length
+        CopyCharSpanToMutableCharSpanWithTruncation(aCMAFContainerOptions.trackName, trackNameBuffer);
+        trackName = trackNameBuffer;
 
         CENCKey = aCMAFContainerOptions.CENCKey;
 
@@ -188,6 +196,7 @@ struct CMAFContainerOptionsStorage : public CMAFContainerOptionsStruct
     }
 
 private:
+    char mTrackNameBuffer[kMaxTrackNameLength];
     uint8_t mCENCKeyBuffer[kMaxCENCKeyLength];
     uint8_t mCENCKeyIDBuffer[kMaxCENCKeyIDLength];
 };

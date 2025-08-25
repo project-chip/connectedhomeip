@@ -6,6 +6,7 @@
 #include <app/clusters/push-av-stream-transport-server/constants.h>
 #include <app/clusters/push-av-stream-transport-server/push-av-stream-transport-delegate.h>
 #include <app/clusters/push-av-stream-transport-server/push-av-stream-transport-storage.h>
+#include <app/clusters/tls-client-management-server/tls-client-management-server.h>
 #include <app/server-cluster/DefaultServerCluster.h>
 #include <protocols/interaction_model/StatusCode.h>
 #include <vector>
@@ -29,6 +30,16 @@ public:
             return;
         }
         mDelegate->SetEndpointId(aEndpoint);
+    }
+
+    void SetTLSClientManagementDelegate(EndpointId aEndpoint, TlsClientManagementDelegate * delegate)
+    {
+        mTLSClientManagementDelegate = delegate;
+        if (mTLSClientManagementDelegate == nullptr)
+        {
+            ChipLogError(Zcl, "Push AV Stream Transport [ep=%d]: Trying to set TLS Client Management delegate to null", aEndpoint);
+            return;
+        }
     }
 
     enum class UpsertResultEnum : uint8_t
@@ -95,8 +106,8 @@ public:
                                   const Optional<PushAvStreamTransport::TriggerActivationReasonEnum> activationReason);
 
 private:
-    PushAvStreamTransportDelegate * mDelegate = nullptr;
-
+    PushAvStreamTransportDelegate * mDelegate                  = nullptr;
+    TlsClientManagementDelegate * mTLSClientManagementDelegate = nullptr;
     /// Convenience method that returns if the internal delegate is null and will log
     /// an error if the check returns true
     bool IsNullDelegateWithLogging(EndpointId endpointIdForLogging);
