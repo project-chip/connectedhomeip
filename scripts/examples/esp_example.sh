@@ -22,7 +22,9 @@ env
 app="$1"
 sdkconfig_name="$2"
 idf_target="$3"
-root=examples/$app/esp32
+project_dir=examples/$app/esp32
+# Lets build at one place, so that we can re-use the ccache
+build_dir=out/esp32/build
 
 shift 1
 
@@ -41,15 +43,14 @@ source "$IDF_PATH/export.sh"
 source "scripts/activate.sh"
 # shellcheck source=/dev/null
 
-rm -f "$root"/sdkconfig
+rm -f "$build_dir"/sdkconfig
 (
-    cd "$root"
-    idf.py -D SDKCONFIG_DEFAULTS="$sdkconfig_name" set-target "$idf_target" build
+    idf.py --project-dir "$project_dir" --build-dir "$build_dir" --ccache -D SDKCONFIG_DEFAULTS="$sdkconfig_name" set-target "$idf_target" build
 ) || {
     echo "build $sdkconfig_name failed"
     exit 1
 }
 
-project_name=$(grep -o 'project([^)]*)' "$root"/CMakeLists.txt | sed 's/project(\(.*\))/\1/')
+project_name=$(grep -o 'project([^)]*)' "$project_dir"/CMakeLists.txt | sed 's/project(\(.*\))/\1/')
 
-cp "$root"/build/"$project_name".elf "$root"/build/"${sdkconfig_name%".defaults"}"-"$project_name".elf
+cp "$build_dir"/"$project_name".elf "$build_dir"/"${sdkconfig_name%".defaults"}"-"$project_name".elf
