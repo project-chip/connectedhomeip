@@ -193,11 +193,11 @@ class TestMatterTestingSupport(MatterBaseTest):
 
     def test_get_wait_time_function(self):
         th_utc = utc_time_in_matter_epoch()
-        secs = timeoperations.get_wait_seconds_from_set_time(th_utc, 5)
+        secs = get_wait_seconds_from_set_time(th_utc, 5)
         asserts.assert_equal(secs, 5)
         # If we've pass less than a second, we still want to wait 5
         time.sleep(0.5)
-        secs = timeoperations.get_wait_seconds_from_set_time(th_utc, 5)
+        secs = get_wait_seconds_from_set_time(th_utc, 5)
         asserts.assert_equal(secs, 5)
 
         time.sleep(0.5)
