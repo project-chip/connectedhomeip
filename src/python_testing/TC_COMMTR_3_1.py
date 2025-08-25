@@ -93,14 +93,21 @@ class TC_COMMTR_3_1(CommodityMeteringTestBaseHelper):
             TestStep("8", """TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 with EnableKey field set to PIXIT.COMMTR.TEST_EVENT_TRIGGER_KEY 
                      and EventTrigger field set to PIXIT.COMMTR.TEST_EVENT_TRIGGER for Attributes Value Set Test Event.""",
                      "Status code must be SUCCESS."),
-            TestStep("9", "TH awaits a MeteredQuantity attribute with 10s timeout.",
-                     "Verify the report is received and the value does not match the MeteredQuantityValue."),
-            TestStep("10", "TH awaits a MeteredQuantityTimestamp attribute with 10s timeout.",
-                     "Verify the report is received and the value does not match the MeteredQuantityTimestampValue."),
-            TestStep("11", "TH awaits a TariffUnit attribute with 10s timeout.",
-                     "Verify the report is received and the value does not match the TariffUnitValue."),
-            TestStep("12", "TH awaits a MaximumMeteredQuantities attribute with 10s timeout.",
-                     """Verify the report is received and the value does not match the MaxMeteredQuantitiesValue."""),
+            TestStep("9", "TH awaits a MaximumMeteredQuantities attribute with 10s timeout.", """
+                     - Verify the report is received and it contains a uint16 value, or null;
+                     - Verify the report is received and the value does not match the MaxMeteredQuantitiesValue."""),
+            TestStep("10", "TH awaits a MeteredQuantity attribute with 10s timeout.", """
+                     - Verify the report is received and it contains a list of MeteredQuantityStruct entries with length less or equal MaximumMeteredQuantitiesValue from step 9, or null;
+                     - For each entry:
+                        - TariffComponentIDs field has a list of uint32 value with length less or equal 128;
+                        - Quantity field has an int64 value;
+                     - The value does not match the MeteredQuantityValue."""),
+            TestStep("11", "TH awaits a MeteredQuantityTimestamp attribute with 10s timeout.", """
+                     - Verify the report is received and it contains a epoch-s value, or null;
+                     - The value does not match the MeteredQuantityTimestampValue."""),
+            TestStep("12", "TH awaits a TariffUnit attribute with 10s timeout.", """
+                     - Verify the report is received and it contains a TariffUnitEnum value in range 0-1, or null;
+                     - The value does not match the TariffUnitValue."""),
             TestStep("13", """TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 with EnableKey field set to PIXIT.COMMTR.TEST_EVENT_TRIGGER_KEY and 
                      EventTrigger field set to PIXIT.COMMTR.TEST_EVENT_TRIGGER for Test Event Clear.""", "Status code must be SUCCESS."),
             TestStep("14", "TH removes the subscription the Commodity Metering cluster.", "Subscription is removed successfully."),
