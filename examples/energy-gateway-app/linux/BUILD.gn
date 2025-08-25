@@ -35,7 +35,7 @@ config("includes") {
 executable("chip-energy-gateway-app") {
   sources = [
     "${chip_root}/examples/energy-gateway-app/commodity-metering/src/CommodityMeteringEventTriggers.cpp",
-    "${chip_root}/examples/energy-gateway-app/commodity-metering/src/CommodityMeteringInstance.cpp",
+    "${chip_root}/examples/energy-gateway-app/commodity-metering/src/CommodityMeteringMain.cpp",
     "${chip_root}/examples/energy-gateway-app/commodity-price/src/CommodityPriceDelegate.cpp",
     "${chip_root}/examples/energy-gateway-app/commodity-price/src/CommodityPriceEventTriggers.cpp",
     "${chip_root}/examples/energy-gateway-app/commodity-price/src/CommodityPriceMain.cpp",

@@ -16,8 +16,9 @@
  *    limitations under the License.
  */
 
-#include <CommodityMeteringInstance.h>
+#include <CommodityMeteringMain.h>
 #include <app/clusters/commodity-metering-server/CommodityMeteringTestEventTriggerHandler.h>
+
 #include <array>
 #include <cstdint>
 #include <vector>
@@ -35,8 +36,8 @@ static constexpr uint32_t TariffComponents2[] = { 0x5002, 0x5003, 0x5004 };
 
 // Non-constexpr storage for the actual data
 static const Structs::MeteredQuantityStruct::Type Data[] = {
-    { DataModel::List(TariffComponents1, MATTER_ARRAY_SIZE(TariffComponents1)), 3500 },
-    { DataModel::List(TariffComponents2, MATTER_ARRAY_SIZE(TariffComponents2)), -2000 }
+    { .tariffComponentIDs = DataModel::List(TariffComponents1, MATTER_ARRAY_SIZE(TariffComponents1)), .quantity = 3500 },
+    { .tariffComponentIDs = DataModel::List(TariffComponents2, MATTER_ARRAY_SIZE(TariffComponents2)), .quantity = -2000 }
 };
 } // namespace Sample1
 
@@ -45,8 +46,8 @@ static constexpr uint32_t TariffComponents1[] = { 0x6001 };
 static constexpr uint32_t TariffComponents2[] = { 0x6002, 0x6003 };
 
 static const Structs::MeteredQuantityStruct::Type Data[] = {
-    { DataModel::List(TariffComponents1, MATTER_ARRAY_SIZE(TariffComponents1)), 4200 },
-    { DataModel::List(TariffComponents2, MATTER_ARRAY_SIZE(TariffComponents2)), -1500 }
+    { .tariffComponentIDs = DataModel::List(TariffComponents1, MATTER_ARRAY_SIZE(TariffComponents1)), .quantity = 4200 },
+    { .tariffComponentIDs = DataModel::List(TariffComponents2, MATTER_ARRAY_SIZE(TariffComponents2)), .quantity = -1500 }
 };
 } // namespace Sample2
 } // namespace MeteredQuantitySamples
@@ -150,7 +151,7 @@ private:
 
     void SaveAttributes()
     {
-        mInstance = GetInstance();
+        mInstance = GetCommodityMeteringInstance();
         VerifyOrDieWithMsg(mInstance, AppServer, "CommodityMetering instance is null");
         mMaximumMeteredQuantities = mInstance->GetMaximumMeteredQuantities();
         SaveMeteredQuantity(mInstance->GetMeteredQuantity());
@@ -182,12 +183,16 @@ private:
         uint32_t matterEpoch = 0;
 
         CHIP_ERROR err = System::Clock::GetClock_MatterEpochS(matterEpoch);
-        if (err != CHIP_NO_ERROR)
+        if (err == CHIP_NO_ERROR)
         {
-            ChipLogError(Support, "UpdAttrs() could not get time");
+            ChipLogDetail(Support, "UpdAttrs() got time: %" PRIu32, matterEpoch);
+            mMeteredQuantityTimestamp.SetNonNull(matterEpoch);
         }
-
-        mMeteredQuantityTimestamp.SetNonNull(matterEpoch);
+        else
+        {
+            ChipLogError(Support, "UpdAttrs() could not get time, setting Null");
+            mMeteredQuantityTimestamp.SetNull();
+        }
 
         if (mTariffUnit.IsNull() || (mTariffUnit.Value() == Globals::TariffUnitEnum::kKWh))
         {

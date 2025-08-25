@@ -85,7 +85,7 @@ bool NullableListsEqual(const DataModel::Nullable<DataModel::List<T>> & a, const
 template <typename T>
 struct SpanCopier
 {
-    static bool Copy(const chip::Span<const T> & source, DataModel::List<const T> & destination,
+    static bool Copy(const Span<const T> & source, DataModel::List<const T> & destination,
                      size_t maxElements = std::numeric_limits<size_t>::max())
     {
         if (source.empty())
@@ -95,7 +95,7 @@ struct SpanCopier
         }
 
         size_t elementsToCopy = std::min(source.size(), maxElements);
-        auto * buffer         = static_cast<T *>(chip::Platform::MemoryCalloc(elementsToCopy, sizeof(T)));
+        auto * buffer         = static_cast<T *>(Platform::MemoryCalloc(elementsToCopy, sizeof(T)));
 
         if (!buffer)
         {
@@ -103,7 +103,7 @@ struct SpanCopier
         }
 
         std::copy(source.begin(), source.begin() + elementsToCopy, buffer);
-        destination = DataModel::List<const T>(chip::Span<const T>(buffer, elementsToCopy));
+        destination = DataModel::List<const T>(buffer, elementsToCopy);
         return true;
     }
 };
