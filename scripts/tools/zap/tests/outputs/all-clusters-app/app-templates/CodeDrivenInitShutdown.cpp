@@ -54,6 +54,9 @@ void MatterClusterServerInitCallback(EndpointId endpoint, ClusterId clusterId)
     case app::Clusters::AdministratorCommissioning::Id:
         MatterAdministratorCommissioningClusterInitCallback(endpoint);
         break;
+    case app::Clusters::OperationalCredentials::Id:
+        MatterOperationalCredentialsClusterInitCallback(endpoint);
+        break;
     case app::Clusters::GroupKeyManagement::Id:
         MatterGroupKeyManagementClusterInitCallback(endpoint);
         break;
@@ -93,6 +96,9 @@ void MatterClusterServerShutdownCallback(EndpointId endpoint, ClusterId clusterI
         break;
     case app::Clusters::AdministratorCommissioning::Id:
         MatterAdministratorCommissioningClusterShutdownCallback(endpoint);
+        break;
+    case app::Clusters::OperationalCredentials::Id:
+        MatterOperationalCredentialsClusterShutdownCallback(endpoint);
         break;
     case app::Clusters::GroupKeyManagement::Id:
         MatterGroupKeyManagementClusterShutdownCallback(endpoint);
