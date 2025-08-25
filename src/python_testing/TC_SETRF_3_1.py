@@ -648,99 +648,99 @@ class TC_SETRF_3_1(MatterBaseTest, CommodityTariffTestBaseHelper):
         await self.send_test_event_trigger_for_attributes_value_set()
 
         self.step("24")
-        if await self.verify_reporting(subscription_handler.attribute_reports, cluster.Attributes.TariffInfo, "TariffInfo", TariffInfoValue):
-            await self.check_tariff_info_attribute(
-                endpoint, subscription_handler.attribute_reports[cluster.Attributes.TariffInfo][0].value)
+        await self.check_tariff_info_attribute(
+            endpoint, subscription_handler.attribute_reports[cluster.Attributes.TariffInfo][0].value)
+        await self.verify_reporting(subscription_handler.attribute_reports, cluster.Attributes.TariffInfo, "TariffInfo", TariffInfoValue)
 
         self.step("25")
-        if await self.verify_reporting(subscription_handler.attribute_reports, cluster.Attributes.TariffUnit, "TariffUnit", TariffUnitValue):
-            await self.check_tariff_unit_attribute(
-                endpoint, subscription_handler.attribute_reports[cluster.Attributes.TariffUnit][0].value)
+        await self.check_tariff_unit_attribute(
+            endpoint, subscription_handler.attribute_reports[cluster.Attributes.TariffUnit][0].value)
+        await self.verify_reporting(subscription_handler.attribute_reports, cluster.Attributes.TariffUnit, "TariffUnit", TariffUnitValue)
 
         self.step("26")
-        if await self.verify_reporting(subscription_handler.attribute_reports, cluster.Attributes.StartDate, "StartDate", StartDateValue):
-            await self.check_start_date_attribute(
-                endpoint, subscription_handler.attribute_reports[cluster.Attributes.StartDate][0].value)
+        await self.check_start_date_attribute(
+            endpoint, subscription_handler.attribute_reports[cluster.Attributes.StartDate][0].value)
+        await self.verify_reporting(subscription_handler.attribute_reports, cluster.Attributes.StartDate, "StartDate", StartDateValue)
 
         self.step("27")
-        if await self.verify_reporting(subscription_handler.attribute_reports, cluster.Attributes.DayEntries, "DayEntries", DayEntriesValue):
-            await self.check_day_entries_attribute(
-                endpoint, subscription_handler.attribute_reports[cluster.Attributes.DayEntries][0].value)
+        await self.check_day_entries_attribute(
+            endpoint, subscription_handler.attribute_reports[cluster.Attributes.DayEntries][0].value)
+        await self.verify_reporting(subscription_handler.attribute_reports, cluster.Attributes.DayEntries, "DayEntries", DayEntriesValue)
 
         self.step("28")
-        if await self.verify_reporting(subscription_handler.attribute_reports,
-                                       cluster.Attributes.DayPatterns, "DayPatterns", DayPatternsValue):
-            await self.check_day_patterns_attribute(
-                endpoint, subscription_handler.attribute_reports[cluster.Attributes.DayPatterns][0].value)
+        await self.check_day_patterns_attribute(
+            endpoint, subscription_handler.attribute_reports[cluster.Attributes.DayPatterns][0].value)
+        await self.verify_reporting(subscription_handler.attribute_reports,
+                                    cluster.Attributes.DayPatterns, "DayPatterns", DayPatternsValue)
 
         self.step("29")
-        if await self.verify_reporting(subscription_handler.attribute_reports,
-                                       cluster.Attributes.CalendarPeriods, "CalendarPeriods", CalendarPeriodsValue):
-            await self.check_calendar_periods_attribute(
-                endpoint, subscription_handler.attribute_reports[cluster.Attributes.CalendarPeriods][0].value)
+        await self.check_calendar_periods_attribute(
+            endpoint, subscription_handler.attribute_reports[cluster.Attributes.CalendarPeriods][0].value)
+        await self.verify_reporting(subscription_handler.attribute_reports,
+                                    cluster.Attributes.CalendarPeriods, "CalendarPeriods", CalendarPeriodsValue)
 
         self.step("30")
-        if await self.verify_reporting(subscription_handler.attribute_reports,
-                                       cluster.Attributes.IndividualDays, "IndividualDays", IndividualDaysValue):
-            await self.check_individual_days_attribute(
-                endpoint, subscription_handler.attribute_reports[cluster.Attributes.IndividualDays][0].value)
+        await self.check_individual_days_attribute(
+            endpoint, subscription_handler.attribute_reports[cluster.Attributes.IndividualDays][0].value)
+        await self.verify_reporting(subscription_handler.attribute_reports,
+                                    cluster.Attributes.IndividualDays, "IndividualDays", IndividualDaysValue)
 
         self.step("31")
-        if await self.verify_reporting(subscription_handler.attribute_reports, cluster.Attributes.CurrentDay, "CurrentDay", CurrentDayValue):
-            await self.check_current_day_attribute(
-                endpoint, subscription_handler.attribute_reports[cluster.Attributes.CurrentDay][0].value)
+        await self.check_current_day_attribute(
+            endpoint, subscription_handler.attribute_reports[cluster.Attributes.CurrentDay][0].value)
+        await self.verify_reporting(subscription_handler.attribute_reports, cluster.Attributes.CurrentDay, "CurrentDay", CurrentDayValue)
 
         self.step("32")
-        if await self.verify_reporting(subscription_handler.attribute_reports, cluster.Attributes.NextDay, "NextDay", NextDayValue):
-            await self.check_next_day_attribute(endpoint, subscription_handler.attribute_reports[cluster.Attributes.NextDay][0].value)
+        await self.check_next_day_attribute(endpoint, subscription_handler.attribute_reports[cluster.Attributes.NextDay][0].value)
+        await self.verify_reporting(subscription_handler.attribute_reports, cluster.Attributes.NextDay, "NextDay", NextDayValue)
 
         self.step("33")
-        if await self.verify_reporting(subscription_handler.attribute_reports,
-                                       cluster.Attributes.CurrentDayEntry, "CurrentDayEntry", CurrentDayEntryValue):
-            await self.check_current_day_entry_attribute(
-                endpoint, subscription_handler.attribute_reports[cluster.Attributes.CurrentDayEntry][0].value)
+        await self.check_current_day_entry_attribute(
+            endpoint, subscription_handler.attribute_reports[cluster.Attributes.CurrentDayEntry][0].value)
+        await self.verify_reporting(subscription_handler.attribute_reports,
+                                    cluster.Attributes.CurrentDayEntry, "CurrentDayEntry", CurrentDayEntryValue)
 
         self.step("34")
-        if await self.verify_reporting(subscription_handler.attribute_reports, cluster.Attributes.CurrentDayEntryDate,
-                                       "CurrentDayEntryDate", CurrentDayEntryDateValue):
-            await self.check_current_day_entry_date_attribute(
-                endpoint, subscription_handler.attribute_reports[cluster.Attributes.CurrentDayEntryDate][0].value)
+        await self.check_current_day_entry_date_attribute(
+            endpoint, subscription_handler.attribute_reports[cluster.Attributes.CurrentDayEntryDate][0].value)
+        await self.verify_reporting(subscription_handler.attribute_reports, cluster.Attributes.CurrentDayEntryDate,
+                                    "CurrentDayEntryDate", CurrentDayEntryDateValue)
 
         self.step("35")
-        if await self.verify_reporting(subscription_handler.attribute_reports,
-                                       cluster.Attributes.NextDayEntry, "NextDayEntry", NextDayEntryValue):
-            await self.check_next_day_entry_attribute(
-                endpoint, subscription_handler.attribute_reports[cluster.Attributes.NextDayEntry][0].value)
+        await self.check_next_day_entry_attribute(
+            endpoint, subscription_handler.attribute_reports[cluster.Attributes.NextDayEntry][0].value)
+        await self.verify_reporting(subscription_handler.attribute_reports,
+                                    cluster.Attributes.NextDayEntry, "NextDayEntry", NextDayEntryValue)
 
         self.step("36")
-        if await self.verify_reporting(subscription_handler.attribute_reports,
-                                       cluster.Attributes.NextDayEntryDate, "NextDayEntryDate", NextDayEntryDateValue):
-            await self.check_next_day_entry_date_attribute(
-                endpoint, subscription_handler.attribute_reports[cluster.Attributes.NextDayEntryDate][0].value)
+        await self.check_next_day_entry_date_attribute(
+            endpoint, subscription_handler.attribute_reports[cluster.Attributes.NextDayEntryDate][0].value)
+        await self.verify_reporting(subscription_handler.attribute_reports,
+                                    cluster.Attributes.NextDayEntryDate, "NextDayEntryDate", NextDayEntryDateValue)
 
         self.step("37")
-        if await self.verify_reporting(subscription_handler.attribute_reports,
-                                       cluster.Attributes.TariffComponents, "TariffComponents", TariffComponentsValue):
-            await self.check_tariff_components_attribute(
-                endpoint, subscription_handler.attribute_reports[cluster.Attributes.TariffComponents][0].value)
+        await self.check_tariff_components_attribute(
+            endpoint, subscription_handler.attribute_reports[cluster.Attributes.TariffComponents][0].value)
+        await self.verify_reporting(subscription_handler.attribute_reports,
+                                    cluster.Attributes.TariffComponents, "TariffComponents", TariffComponentsValue)
 
         self.step("38")
-        if await self.verify_reporting(subscription_handler.attribute_reports,
-                                       cluster.Attributes.TariffPeriods, "TariffPeriods", TariffPeriodsValue):
-            await self.check_tariff_periods_attribute(
-                endpoint, subscription_handler.attribute_reports[cluster.Attributes.TariffPeriods][0].value)
+        await self.check_tariff_periods_attribute(
+            endpoint, subscription_handler.attribute_reports[cluster.Attributes.TariffPeriods][0].value)
+        await self.verify_reporting(subscription_handler.attribute_reports,
+                                    cluster.Attributes.TariffPeriods, "TariffPeriods", TariffPeriodsValue)
 
         self.step("39")
-        if await self.verify_reporting(subscription_handler.attribute_reports, cluster.Attributes.CurrentTariffComponents,
-                                       "CurrentTariffComponents", CurrentTariffComponentsValue):
-            await self.check_current_tariff_components_attribute(
-                endpoint, subscription_handler.attribute_reports[cluster.Attributes.CurrentTariffComponents][0].value)
+        await self.check_current_tariff_components_attribute(
+            endpoint, subscription_handler.attribute_reports[cluster.Attributes.CurrentTariffComponents][0].value)
+        await self.verify_reporting(subscription_handler.attribute_reports, cluster.Attributes.CurrentTariffComponents,
+                                    "CurrentTariffComponents", CurrentTariffComponentsValue)
 
         self.step("40")
-        if await self.verify_reporting(subscription_handler.attribute_reports, cluster.Attributes.NextTariffComponents,
-                                       "NextTariffComponents", NextTariffComponentsValue):
-            await self.check_next_tariff_components_attribute(
-                endpoint, subscription_handler.attribute_reports[cluster.Attributes.NextTariffComponents][0].value)
+        await self.check_next_tariff_components_attribute(
+            endpoint, subscription_handler.attribute_reports[cluster.Attributes.NextTariffComponents][0].value)
+        await self.verify_reporting(subscription_handler.attribute_reports, cluster.Attributes.NextTariffComponents,
+                                    "NextTariffComponents", NextTariffComponentsValue)
 
         if await self.attribute_guard(endpoint=endpoint, attribute=cluster.Attributes.DefaultRandomizationType):
 
@@ -750,10 +750,10 @@ class TC_SETRF_3_1(MatterBaseTest, CommodityTariffTestBaseHelper):
                 logger.warning("DefaultRandomizationType attribute is actually supported by DUT, but PICS SETRF.S.A0012 is False")
 
             # TH reads DefaultRandomizationType attribute, expects a DayEntryRandomizationTypeEnum
-            if await self.verify_reporting(subscription_handler.attribute_reports,
-                                           cluster.Attributes.DefaultRandomizationType, "DefaultRandomizationType", DefaultRandomizationTypeValue):
-                await self.check_default_randomization_type_attribute(
-                    endpoint, subscription_handler.attribute_reports[cluster.Attributes.DefaultRandomizationType][0].value)
+            await self.check_default_randomization_type_attribute(
+                endpoint, subscription_handler.attribute_reports[cluster.Attributes.DefaultRandomizationType][0].value)
+            await self.verify_reporting(subscription_handler.attribute_reports,
+                                        cluster.Attributes.DefaultRandomizationType, "DefaultRandomizationType", DefaultRandomizationTypeValue)
         else:
 
             if self.check_pics("SETRF.S.A0012"):  # for cases when it is not supported by DUT, but enabled in PICS
@@ -770,10 +770,10 @@ class TC_SETRF_3_1(MatterBaseTest, CommodityTariffTestBaseHelper):
             if not self.check_pics("SETRF.S.A0011"):  # for cases when it is supported by DUT, but disabled in PICS
                 logger.warning("DefaultRandomizationOffset attribute is actually supported by DUT, but PICS SETRF.S.A0011 is False")
 
-            if await self.verify_reporting(subscription_handler.attribute_reports, cluster.Attributes.DefaultRandomizationOffset,
-                                           "DefaultRandomizationOffset", DefaultRandomizationOffsetValue):
-                await self.check_default_randomization_offset_attribute(
-                    endpoint, subscription_handler.attribute_reports[cluster.Attributes.DefaultRandomizationOffset][0].value)
+            await self.check_default_randomization_offset_attribute(
+                endpoint, subscription_handler.attribute_reports[cluster.Attributes.DefaultRandomizationOffset][0].value)
+            await self.verify_reporting(subscription_handler.attribute_reports, cluster.Attributes.DefaultRandomizationOffset,
+                                        "DefaultRandomizationOffset", DefaultRandomizationOffsetValue)
         else:
 
             if self.check_pics("SETRF.S.A0011"):  # for cases when it is not supported by DUT, but enabled in PICS
