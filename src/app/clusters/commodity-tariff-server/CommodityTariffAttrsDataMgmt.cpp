@@ -898,23 +898,23 @@ CHIP_ERROR CTC_BaseDataClass<DataModel::Nullable<DataModel::List<CalendarPeriodS
         // Special handling for first item
         if (isFirstItem)
         {
+            // Case 1: Invalid - tariff start date is 0 but item has a positive start date
             if (tariffStartDate.Value() == 0 && (!item.startDate.IsNull() && item.startDate.Value() > 0))
             {
                 ChipLogError(NotSpecified,
                              "The first StartDate in CalendarPeriods can't have a value if the StartDate of tariff is 0");
                 return CHIP_ERROR_INVALID_ARGUMENT;
             }
-            else if (tariffStartDate.Value() > 0 && (item.startDate.IsNull() || item.startDate.Value() == 0))
+
+            // Case 2: Invalid - tariff has positive start date but item has no valid start date
+            if (tariffStartDate.Value() > 0 && (item.startDate.IsNull() || item.startDate.Value() == 0))
             {
                 ChipLogError(NotSpecified,
                              "The first StartDate in CalendarPeriods can't be not set if the StartDate of tariff is specified");
                 return CHIP_ERROR_INVALID_ARGUMENT;
             }
-            else
-            {
-                previousStartDate = item.startDate;
-            }
-
+ 
+            previousStartDate = item.startDate;
             isFirstItem = false;
             // First item can have null StartDate
             continue;
