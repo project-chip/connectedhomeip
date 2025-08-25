@@ -23,12 +23,16 @@
 #include <controller/CommissioningDelegate.h>
 #include <controller/CurrentFabricRemover.h>
 #include <controller/jcm/DeviceCommissioner.h>
+#include <controller/jcm/TrustVerification.h>
 
 #include <commands/common/CredentialIssuerCommands.h>
 #include <lib/support/Span.h>
 #include <lib/support/ThreadOperationalDataset.h>
 
 #include <optional>
+
+using namespace ::chip;
+using namespace ::chip::Credentials;
 
 using JCMDeviceCommissioner        = chip::Controller::JCM::DeviceCommissioner;
 using JCMTrustVerificationDelegate = chip::Controller::JCM::TrustVerificationDelegate;
@@ -68,7 +72,6 @@ class PairingCommand : public CHIPCommand,
                        public chip::Controller::DeviceDiscoveryDelegate,
                        public JCMTrustVerificationDelegate,
                        public chip::Credentials::DeviceAttestationDelegate
-
 {
 public:
     PairingCommand(const char * commandName, PairingMode mode, PairingNetworkType networkType,
@@ -263,7 +266,10 @@ public:
     void OnProgressUpdate(JCMDeviceCommissioner & commissioner, JCMTrustVerificationStage stage, JCMTrustVerificationInfo & info,
                           JCMTrustVerificationError error);
     void OnAskUserForConsent(JCMDeviceCommissioner & commissioner, JCMTrustVerificationInfo & info);
-    void OnLookupOperationalTrustAnchor(JCMDeviceCommissioner & commissioner, JCMTrustVerificationInfo & info);
+    CHIP_ERROR OnLookupOperationalTrustAnchor(
+        VendorId vendorID, 
+        CertificateKeyId subjectKeyId,
+        ByteSpan & globallyTrustedRoot);
 
 private:
     CHIP_ERROR RunInternal(NodeId remoteId);
@@ -334,6 +340,7 @@ private:
 
     chip::Optional<bool> mExecuteJCM;
     ::pw::rpc::NanopbClientReader<::RequestOptions> rpcGetStream;
+    chip::ByteSpan mRemoteAdminTrustedRoot;
 
     // For unpair
     chip::Platform::UniquePtr<chip::Controller::CurrentFabricRemover> mCurrentFabricRemover;
@@ -343,4 +350,6 @@ private:
     void PersistIcdInfo();
     CHIP_ERROR SetAnchorNodeId(NodeId value);
     NodeId GetAnchorNodeId();
+
+    CHIP_ERROR OnLookupOperationTrustAnchor(ByteSpan & globallyTrustedRoot);
 };

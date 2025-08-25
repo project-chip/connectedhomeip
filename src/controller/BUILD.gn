@@ -131,6 +131,7 @@ source_set("jcm") {
     "jcm/AutoCommissioner.h",
     "jcm/DeviceCommissioner.cpp",
     "jcm/DeviceCommissioner.h",
+    "jcm/TrustVerification.cpp",
     "jcm/TrustVerification.h",
   ]
   public_deps = [

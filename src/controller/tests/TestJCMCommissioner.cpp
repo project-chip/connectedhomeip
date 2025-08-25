@@ -55,6 +55,7 @@ public:
         mProgressUpdates++;
         mLastStage = stage;
         mLastError = error;
+        mRemoteAdminTrustedRoot = info.adminRCAC.Span();
     }
 
     void OnAskUserForConsent(DeviceCommissioner & commissioner, TrustVerificationInfo & info) override
@@ -64,22 +65,27 @@ public:
         commissioner.ContinueAfterUserConsent(mShouldConsent);
     }
 
-    void OnLookupOperationalTrustAnchor(
-        DeviceCommissioner & commissioner, 
-        TrustVerificationInfo & info)
+    CHIP_ERROR OnLookupOperationalTrustAnchor(
+        VendorId vendorID, 
+        CertificateKeyId subjectKeyId, 
+        ByteSpan & globallyTrustedRootSpan)
     {
-        mAskedForVendorIdVerification = true;
-        commissioner.ContinueAfterLookupOperationalTrustAnchor(info.rootPublicKey.Span());
+        mLookedUpOperationalTrustAnchor = true;
+        globallyTrustedRootSpan = mRemoteAdminTrustedRoot;
+
+        return CHIP_NO_ERROR;
     }
 
     int mProgressUpdates               = 0;
     TrustVerificationStage mLastStage  = TrustVerificationStage::kIdle;
     TrustVerificationError mLastError  = TrustVerificationError::kSuccess;
     bool mAskedForConsent              = false;
+    bool mLookedUpOperationalTrustAnchor = false;
     bool mShouldConsent                = true;
     bool mAskedForVendorIdVerification = false;
-    CHIP_ERROR mVerifyVendorIdStatus   = CHIP_NO_ERROR;
+    CHIP_ERROR mVerifyVendorIdError    = CHIP_NO_ERROR;
     VendorId mLastVendorId             = VendorId::Common;
+    ByteSpan mRemoteAdminTrustedRoot;
 };
 
 class MockClusterStateCache : public ClusterStateCache

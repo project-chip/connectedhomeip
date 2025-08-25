@@ -44,7 +44,8 @@ namespace JCM {
  * for commissioning Joint Fabric Administrator devices in a CHIP network. It extends the DeviceCommissioner class and
  * implements the JCM trust verification process.
  */
-class DeviceCommissioner : public chip::Controller::DeviceCommissioner
+class DeviceCommissioner : public chip::Controller::DeviceCommissioner,
+                           public VendorIdVerificationClient
 {
 public:
     // The constructor initializes the DeviceCommissioner with a reference to this device commissioner
@@ -97,6 +98,8 @@ protected:
     CHIP_ERROR ParseExtraCommissioningInfo(ReadCommissioningInfo & info, const CommissioningParameters & params) override;
     // Override CleanupCommissioning to clean up JCM trust verification state
     void CleanupCommissioning(DeviceProxy * proxy, NodeId nodeId, const CompletionStatus & completionStatus) override;
+    CHIP_ERROR OnLookupOperationalTrustAnchor(VendorId vendorID, CertificateKeyId subjectKeyId, ByteSpan & globallyTrustedRootSpan);
+    void OnVendorIdVerficationComplete(CHIP_ERROR err);
 
 private:
     // Parses the JCM extra commissioning information from the device

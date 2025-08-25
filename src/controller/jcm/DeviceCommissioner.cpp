@@ -396,147 +396,43 @@ TrustVerificationError DeviceCommissioner::VerifyAdministratorInformation()
     return TrustVerificationError::kSuccess;
 }
 
-static CHIP_ERROR VerifyNOCCertificateChain(ByteSpan nocSpan, ByteSpan icacSpan, ByteSpan rcacSpan)
+void DeviceCommissioner::OnVendorIdVerficationComplete(CHIP_ERROR err)
 {
-    ValidationContext validContext;
-
-    validContext.Reset();
-    validContext.mRequiredKeyUsages.Set(KeyUsageFlags::kDigitalSignature);
-    validContext.mRequiredKeyPurposes.Set(KeyPurposeFlags::kClientAuth);
-
-    ChipCertificateSet certificates;
-    constexpr uint8_t kMaxNumCertsInOpCreds = 3;
-    ReturnLogErrorOnFailure(certificates.Init(kMaxNumCertsInOpCreds));
-    ReturnLogErrorOnFailure(certificates.LoadCert(rcacSpan, BitFlags<CertDecodeFlags>(CertDecodeFlags::kIsTrustAnchor)));
-    if (!icacSpan.empty())
-    {
-        ReturnLogErrorOnFailure(certificates.LoadCert(icacSpan, BitFlags<CertDecodeFlags>(CertDecodeFlags::kGenerateTBSHash)));
-    }
-    ReturnLogErrorOnFailure(certificates.LoadCert(nocSpan, BitFlags<CertDecodeFlags>(CertDecodeFlags::kGenerateTBSHash)));
-    ReturnLogErrorOnFailure(certificates.ValidateCert(certificates.GetLastCert(), validContext));
-
-    return CHIP_NO_ERROR;
-}
-
-void DeviceCommissioner::ContinueAfterLookupOperationalTrustAnchor(CHIP_ERROR err, ByteSpan globallyTrustedRootSpan)
-{
-    if (err != CHIP_NO_ERROR)
-    {
-        ContinueAfterVendorIDVerification(err);
-        return;
-    }
-
-    // 12bii. Verify that the NOC chain is valid using Crypto_VerifyChain() against the entire chain reconstructed 
-    // from the NOCs attribute entry whose FabricIndex field matches the fabric being verified, but populating 
-    // the trusted root with the GloballyTrustedRoot certificate rather than the value in TrustedRootCertificates 
-    // associated with the candidate fabric. If the chain is not valid, the procedure terminates as failed.
-    err = VerifyNOCCertificateChain(mInfo.adminNOC.Span(), mInfo.adminICAC.Span(), globallyTrustedRootSpan);
-
-    // 13. If all prior step succeeded err == CHIP_NO_ERROR and the candidate fabric's VendorID SHALL be deemed authentic.
     ContinueAfterVendorIDVerification(err);
 }
 
-CHIP_ERROR DeviceCommissioner::OnSignVIDVerificationSuccessCb(
-    ByteSpan signatureSpan,
-    ByteSpan clientChallengeSpan)
+CHIP_ERROR DeviceCommissioner::OnLookupOperationalTrustAnchor(VendorId vendorID, CertificateKeyId subjectKeyId, ByteSpan & globallyTrustedRootSpan)
 {
-    ChipLogProgress(Controller, "Vendor ID verification succeeded for vendor ID: %u", mInfo.adminVendorId);
+    if (mTrustVerificationDelegate != nullptr)
+    {
+        return mTrustVerificationDelegate->OnLookupOperationalTrustAnchor(vendorID, subjectKeyId, globallyTrustedRootSpan);
+    }
 
-    // Extract the root public key
-    P256PublicKeySpan rootPublicKeySpan(mInfo.rootPublicKey.Get());
-    P256PublicKey rootPublicKey(rootPublicKeySpan);
-
-    // Locally generate the vendor_fabric_binding_message
-    uint8_t vendorFabricBindingMessageBuffer[kVendorFabricBindingMessageV1Size];
-    MutableByteSpan vendorFabricBindingMessageSpan{ vendorFabricBindingMessageBuffer };
-    ReturnLogErrorOnFailure(Crypto::GenerateVendorFabricBindingMessage(FabricBindingVersion::kVersion1, rootPublicKey,
-                  mInfo.adminFabricIndex, mInfo.adminVendorId, vendorFabricBindingMessageSpan));
-
-    // Locally generate the vendor_id_verification_tbs message
-    ByteSpan vidVerificationStatementSpan;
-    uint8_t vidVerificationStatementBuffer[kVendorIdVerificationTbsV1MaxSize];
-    MutableByteSpan vidVerificationTbsSpan{ vidVerificationStatementBuffer };
-
-    // Retrieve attestation challenge
-    ByteSpan attestationChallengeSpan = mDeviceProxy->GetSecureSession().Value()->AsSecureSession()->GetCryptoContext().GetAttestationChallenge();
-    ReturnLogErrorOnFailure(GenerateVendorIdVerificationToBeSigned(mInfo.adminFabricIndex, clientChallengeSpan, attestationChallengeSpan,
-                                                            vendorFabricBindingMessageSpan, vidVerificationStatementSpan,
-                                                            vidVerificationTbsSpan));
-
-    // 10. Given the subject public key associated with the fabric being verified, validate that Crypto_Verify(noc_public_key,
-    // vendor_id_verification_tbs, signature) succeeds, otherwise the procedure terminates as failed.
-    VerifyOrReturnError(signatureSpan.size() >= P256ECDSASignature::Capacity(), CHIP_ERROR_BUFFER_TOO_SMALL);
-
-    P256PublicKeySpan nocPublicKeySpan;
-    ReturnLogErrorOnFailure(ExtractPublicKeyFromChipCert(mInfo.adminNOC.Span(), nocPublicKeySpan));
-
-    P256PublicKey nocPublicKey(nocPublicKeySpan);
-    P256ECDSASignature signature;
-    memcpy(signature.Bytes(), signatureSpan.data(), signature.Capacity());
-    signature.SetLength(signature.Capacity());
-    ReturnLogErrorOnFailure(nocPublicKey.ECDSA_validate_msg_signature(vidVerificationTbsSpan.data(), vidVerificationTbsSpan.size(), signature));
-
-    // 11. Verify that the NOC chain is valid using Crypto_VerifyChain() against the entire chain reconstructed from both the
-    // NOCs and TrustedRootCertificates attribute entries whose FabricIndex field matches the fabric being verified.
-    // If the chain is not valid, the procedure terminates as failed.
-    ReturnLogErrorOnFailure(VerifyNOCCertificateChain(mInfo.adminNOC.Span(), mInfo.adminICAC.Span(), mInfo.adminRCAC.Span()));
-
-    // 12a If the VIDVerificationStatement field was present in the entry in Fabrics whose VendorID is being verified 
-    // (Not currently supported)
-    // 12b. Otherwise (i.e VIDVerificationStatement not used):
-    // 12bi. Look-up the entry in the Operational Trust Anchors Schema under the expected VendorID (VID field) 
-    // being verified whose IsRoot field is true and whose SubjectKeyID matches the SubjectKeyID field value of 
-    // the TrustedRootCertificates attribute entry whose FabricIndex field matches the fabric being verified 
-    // (i.e. the RCAC of the candidate fabric)
-    mTrustVerificationDelegate->OnLookupOperationalTrustAnchor(*this, mInfo);
-    
-    // 13. Given that all prior steps succeeded, the candidate fabric’s VendorID SHALL be deemed authentic and err should be CHIP_NO_ERROR.
-    return CHIP_NO_ERROR;
+    return CHIP_ERROR_INTERNAL; 
 }
 
 TrustVerificationError DeviceCommissioner::PerformVendorIDVerificationProcedure()
 {
     ChipLogProgress(Controller, "Performing vendor ID verification for vendor ID: %u", mInfo.adminVendorId);
 
-    // Generate a 32-octet random challenge
-    uint8_t kClientChallenge[32];
-    DRBG_get_bytes(kClientChallenge, sizeof(kClientChallenge));
-    ByteSpan clientChallengeSpan{ kClientChallenge };
-    chip::app::Clusters::OperationalCredentials::Commands::SignVIDVerificationRequest::Type request;
+    ByteSpan rcacSpan = mInfo.adminRCAC.Span();
+    ByteSpan icacSpan = mInfo.adminICAC.Span();
+    ByteSpan nocSpan = mInfo.adminNOC.Span();
 
-    // The selected fabric information that matches the Fabrics attribute whose VendorID field to be verified 
-    // is in the JCMTrustVerificationInfo info
-    request.fabricIndex = mInfo.adminFabricIndex;
-    request.clientChallenge = clientChallengeSpan;
-
-    auto onSuccessCb = [this, &clientChallengeSpan](const app::ConcreteCommandPath & aPath, const app::StatusIB & aStatus,
-                                     const decltype(request)::ResponseType & responseData) {
-        CHIP_ERROR err = this->OnSignVIDVerificationSuccessCb(responseData.signature, clientChallengeSpan); 
-        if (err != CHIP_NO_ERROR)
-        {
-            this->ContinueAfterVendorIDVerification(err);
-        }
-    };
-
-    auto onFailureCb = [this](CHIP_ERROR err) {
-        this->ContinueAfterVendorIDVerification(err);
-    };
-
-    CHIP_ERROR err = InvokeCommandRequest(mDeviceProxy->GetExchangeManager(), mDeviceProxy->GetSecureSession().Value(), 
-                                            kRootEndpointId, request,
-                                            onSuccessCb, onFailureCb);
+    CHIP_ERROR err = VerifyVendorId(
+        mDeviceProxy, 
+        mInfo.adminFabricIndex, 
+        mInfo.adminVendorId, 
+        rcacSpan, 
+        icacSpan, 
+        nocSpan
+    );
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(Controller, "Failed to send SignVIDVerificationRequest: %s", ErrorStr(err));
+        ChipLogError(Controller, "Failed to send Verify VendorId: %s", ErrorStr(err));
         ContinueAfterVendorIDVerification(err);
+        return TrustVerificationError::kVendorIdVerificationFailed;
     }
-
-    if (mTrustVerificationDelegate == nullptr)
-    {
-        ChipLogError(Controller, "JCM: TrustVerificationDelegate is not set");
-        return TrustVerificationError::kTrustVerificationDelegateNotSet; // Indicate that the delegate is not set
-    }
-
 
     return TrustVerificationError::kAsync; // Indicate that this is an async operation
 }

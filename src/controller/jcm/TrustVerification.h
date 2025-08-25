@@ -20,15 +20,25 @@
 #include <cstdint>
 #include <string>
 
+#include <app/DeviceProxy.h>
 #include <app-common/zap-generated/cluster-objects.h>
+#include <credentials/CHIPCert.h>
+#include <credentials/FabricTable.h>
+#include <crypto/CHIPCryptoPAL.h>
+#include <lib/core/CHIPCore.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/CHIPVendorIdentifiers.hpp>
 #include <lib/support/DLLUtil.h>
 
 namespace chip {
 namespace Controller {
-
 namespace JCM {
+
+using namespace ::chip;
+using namespace ::chip::app;
+using namespace ::chip::app::Clusters::OperationalCredentials::Commands;
+using namespace ::chip::Credentials;
+using namespace ::chip::Crypto;
 
 struct TrustVerificationInfo
 {
@@ -158,7 +168,46 @@ public:
     virtual void OnProgressUpdate(DeviceCommissioner & commissioner, TrustVerificationStage stage, TrustVerificationInfo & info,
                                   TrustVerificationError error)                                       = 0;
     virtual void OnAskUserForConsent(DeviceCommissioner & commissioner, TrustVerificationInfo & info) = 0;
-    virtual void OnLookupOperationalTrustAnchor(DeviceCommissioner & commissioner, TrustVerificationInfo & info) = 0;
+    virtual CHIP_ERROR OnLookupOperationalTrustAnchor(VendorId vendorID, CertificateKeyId subjectKeyId, ByteSpan & globallyTrustedRootSpan) = 0;
+};
+
+/**
+ * A client that handles Vendor ID verification for a specific device.
+ */
+class DLL_EXPORT VendorIdVerificationClient {
+public:
+    virtual ~VendorIdVerificationClient() = default;
+
+    CHIP_ERROR VerifyVendorId(
+        DeviceProxy * deviceProxy, 
+        FabricIndex fabricIndex, 
+        VendorId vendorID, 
+        ByteSpan & rcacSpan,
+        ByteSpan & icacSpan,
+        ByteSpan & nocSpan);
+
+protected:
+    virtual CHIP_ERROR OnLookupOperationalTrustAnchor(
+        VendorId vendorID, 
+        CertificateKeyId subjectKeyId,
+        ByteSpan & globallyTrustedRootSpan) = 0;
+    virtual void OnVendorIdVerficationComplete(CHIP_ERROR err) = 0;
+
+private:
+    CHIP_ERROR VerifyNOCCertificateChain(
+        ByteSpan & nocSpan, 
+        ByteSpan & icacSpan, 
+        ByteSpan & rcacSpan);
+
+    CHIP_ERROR Verify(
+        DeviceProxy * deviceProxy, 
+        FabricIndex fabricIndex, 
+        VendorId vendorID, 
+        ByteSpan & rcacSpan,
+        ByteSpan & icacSpan,
+        ByteSpan & nocSpan,
+        SignVIDVerificationResponse::DecodableType responseData,
+        ByteSpan & clientChallengeSpan);
 };
 
 } // namespace JCM

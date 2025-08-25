@@ -914,6 +914,7 @@ void PairingCommand::OnDeviceAttestationCompleted(Controller::DeviceCommissioner
 void PairingCommand::OnProgressUpdate(JCMDeviceCommissioner & commissioner, JCMTrustVerificationStage stage,
                                       JCMTrustVerificationInfo & info, JCMTrustVerificationError error)
 {
+    mRemoteAdminTrustedRoot = info.adminRCAC.Span();
     ChipLogProgress(Controller, "JCM: Trust Verification progress: %d", static_cast<int>(stage));
 }
 
@@ -924,140 +925,17 @@ void PairingCommand::OnAskUserForConsent(JCMDeviceCommissioner & commissioner, J
     commissioner.ContinueAfterUserConsent(true);
 }
 
-// static CHIP_ERROR VerifyNOCCertificateChain(ByteSpan nocSpan, ByteSpan icacSpan, ByteSpan rcacSpan)
-// {
-//     Credentials::ValidationContext validContext;
-
-//     validContext.Reset();
-//     validContext.mRequiredKeyUsages.Set(KeyUsageFlags::kDigitalSignature);
-//     validContext.mRequiredKeyPurposes.Set(KeyPurposeFlags::kClientAuth);
-
-//     Credentials::ChipCertificateSet certificates;
-//     constexpr uint8_t kMaxNumCertsInOpCreds = 3;
-//     ReturnLogErrorOnFailure(certificates.Init(kMaxNumCertsInOpCreds));
-//     ReturnLogErrorOnFailure(certificates.LoadCert(rcacSpan, BitFlags<CertDecodeFlags>(CertDecodeFlags::kIsTrustAnchor)));
-//     if (!icacSpan.empty())
-//     {
-//         ReturnLogErrorOnFailure(certificates.LoadCert(icacSpan, BitFlags<CertDecodeFlags>(CertDecodeFlags::kGenerateTBSHash)));
-//     }
-//     ReturnLogErrorOnFailure(certificates.LoadCert(nocSpan, BitFlags<CertDecodeFlags>(CertDecodeFlags::kGenerateTBSHash)));
-//     ReturnLogErrorOnFailure(certificates.ValidateCert(certificates.GetLastCert(), validContext));
-
-//     return CHIP_NO_ERROR;
-// }
-
-// static CHIP_ERROR OnSignVIDVerificationSuccessCb(
-//     DeviceProxy *proxy,
-//     JCMDeviceCommissioner & commissioner, 
-//     JCMTrustVerificationInfo & info,
-//     ByteSpan signatureSpan,
-//      ByteSpan clientChallengeSpan)
-// {
-//     ChipLogProgress(Controller, "Vendor ID verification succeeded for vendor ID: %u", info.adminVendorId);
-
-//     Credentials::P256PublicKeySpan rootPublicKeySpan(info.rootPublicKey.Get());
-//     Crypto::P256PublicKey rootPublicKey(rootPublicKeySpan);
-
-//     uint8_t vendorFabricBindingMessageBuffer[Crypto::kVendorFabricBindingMessageV1Size];
-//     MutableByteSpan vendorFabricBindingMessageSpan{ vendorFabricBindingMessageBuffer };
-//     // Locally generate the vendor_fabric_binding_message
-//     ReturnLogErrorOnFailure(chip::Crypto::GenerateVendorFabricBindingMessage(chip::Crypto::FabricBindingVersion::kVersion1, rootPublicKey,
-//                   info.adminFabricIndex, info.adminVendorId, vendorFabricBindingMessageSpan));
-
-//     // Locally generate the vendor_id_verification_tbs message
-//     ByteSpan vidVerificationStatementSpan;
-//     uint8_t vidVerificationStatementBuffer[Crypto::kVendorIdVerificationTbsV1MaxSize];
-//     MutableByteSpan vidVerificationTbsSpan{ vidVerificationStatementBuffer };
-
-//     // Retrieve attestation challenge
-//     ByteSpan attestationChallengeSpan = proxy->GetSecureSession().Value()->AsSecureSession()->GetCryptoContext().GetAttestationChallenge();
-//     ReturnLogErrorOnFailure(chip::Crypto::GenerateVendorIdVerificationToBeSigned(info.adminFabricIndex, clientChallengeSpan, attestationChallengeSpan,
-//                                                             vendorFabricBindingMessageSpan, vidVerificationStatementSpan,
-//                                                             vidVerificationTbsSpan));
-
-//     // 10. Given the subject public key associated with the fabric being verified, validate that Crypto_Verify(noc_public_key,
-//     // vendor_id_verification_tbs, signature) succeeds, otherwise the procedure terminates as failed.
-//     VerifyOrReturnError(signatureSpan.size() >= Crypto::P256ECDSASignature::Capacity(), CHIP_ERROR_BUFFER_TOO_SMALL);
-
-//     P256PublicKeySpan nocPublicKeySpan;
-//     ReturnLogErrorOnFailure(ExtractPublicKeyFromChipCert(info.adminNOC.Span(), nocPublicKeySpan));
-
-//     Crypto::P256PublicKey nocPublicKey(nocPublicKeySpan);
-//     Crypto::P256ECDSASignature signature;
-//     memcpy(signature.Bytes(), signatureSpan.data(), signature.Capacity());
-//     signature.SetLength(signature.Capacity());
-//     ReturnLogErrorOnFailure(nocPublicKey.ECDSA_validate_msg_signature(vidVerificationTbsSpan.data(), vidVerificationTbsSpan.size(), signature));
-
-//     // 11. Verify that the NOC chain is valid using Crypto_VerifyChain() against the entire chain reconstructed from both the
-//     // NOCs and TrustedRootCertificates attribute entries whose FabricIndex field matches the fabric being verified.
-//     // If the chain is not valid, the procedure terminates as failed.
-//     ReturnLogErrorOnFailure(VerifyNOCCertificateChain(info.adminNOC.Span(), info.adminICAC.Span(), info.adminRCAC.Span()));
-
-//     // 12a If the VIDVerificationStatement field was present in the entry in Fabrics whose VendorID is being verified 
-//     // (Not currently supported)
-//     // 12b. Otherwise (i.e VIDVerificationStatement not used):
-//     // 12bi. Look-up the entry in the Operational Trust Anchors Schema under the expected VendorID (VID field) 
-//     // being verified whose IsRoot field is true and whose SubjectKeyID matches the SubjectKeyID field value of 
-//     // the TrustedRootCertificates attribute entry whose FabricIndex field matches the fabric being verified 
-//     // (i.e. the RCAC of the candidate fabric)
-//     // TODO - DCL Lookup https://zigbee-alliance.github.io/distributed-compliance-ledger/#/Query/NocCertificatesByVidAndSkid 
-//     // Temporary code below
-//     ByteSpan globallyTrustedRootSpan = info.adminRCAC.Span();
-
-//     // 12bii. Verify that the NOC chain is valid using Crypto_VerifyChain() against the entire chain reconstructed 
-//     // from the NOCs attribute entry whose FabricIndex field matches the fabric being verified, but populating 
-//     // the trusted root with the GloballyTrustedRoot certificate rather than the value in TrustedRootCertificates 
-//     // associated with the candidate fabric. If the chain is not valid, the procedure terminates as failed.
-//     ReturnLogErrorOnFailure(VerifyNOCCertificateChain(info.adminNOC.Span(), info.adminICAC.Span(), globallyTrustedRootSpan));
-
-//     // 13. Given that all prior steps succeeded, the candidate fabric’s VendorID SHALL be deemed authentic and err should be CHIP_NO_ERROR.
-//     return CHIP_NO_ERROR;
-// }
-
-// void PairingCommand::OnVerifyVendorId(JCMDeviceCommissioner & commissioner, JCMTrustVerificationInfo & info)
-// {
-//     ChipLogProgress(Controller, "Performing vendor ID verification for vendor ID: %u", info.adminVendorId);
-
-//     // Generate a 32-octet random challenge
-//     uint8_t kClientChallenge[32];
-//     chip::Crypto::DRBG_get_bytes(kClientChallenge, sizeof(kClientChallenge));
-//     ByteSpan clientChallengeSpan{ kClientChallenge };
-//     chip::app::Clusters::OperationalCredentials::Commands::SignVIDVerificationRequest::Type request;
-
-//     // The selected fabric information that matches the Fabrics attribute whose VendorID field to be verified 
-//     // is in the JCMTrustVerificationInfo info
-//     request.fabricIndex = info.adminFabricIndex;
-//     request.clientChallenge = clientChallengeSpan;
-
-//     auto proxy = commissioner.GetDeviceProxy();
-//     auto onSuccessCb = [proxy, &commissioner, &info, &clientChallengeSpan](const app::ConcreteCommandPath & aPath, const app::StatusIB & aStatus,
-//                                      const decltype(request)::ResponseType & responseData) {
-//         CHIP_ERROR err = OnSignVIDVerificationSuccessCb(proxy, commissioner, info, responseData.signature, clientChallengeSpan); 
-//         commissioner.ContinueAfterVendorIDVerification(err);
-                    
-//     };
-//     auto onFailureCb = [&commissioner](CHIP_ERROR err) {
-//         commissioner.ContinueAfterVendorIDVerification(err);
-//     };
-
-//     CHIP_ERROR err = InvokeCommandRequest(proxy->GetExchangeManager(), proxy->GetSecureSession().Value(), kRootEndpointId, request,
-//                                               onSuccessCb, onFailureCb);
-//     if (err != CHIP_NO_ERROR)
-//     {
-//         ChipLogError(Controller, "Failed to send SignVIDVerificationRequest: %s", ErrorStr(err));
-//         commissioner.ContinueAfterVendorIDVerification(err);
-//     }
-// }
-
-void PairingCommand::OnLookupOperationalTrustAnchor(
-    JCMDeviceCommissioner & commissioner, 
-    JCMTrustVerificationInfo & info)
+// TODO: Complete DCL lookup implementation
+CHIP_ERROR PairingCommand::OnLookupOperationalTrustAnchor(
+        VendorId vendorID, 
+        CertificateKeyId subjectKeyId,
+        ByteSpan & globallyTrustedRootSpan)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    // TODO: Perform DCL Lookup https://zigbee-alliance.github.io/distributed-compliance-ledger/#/Query/NocCertificatesByVidAndSkid
-    // Temporarily return the already known rootPublicKey
-    ByteSpan globallyTrustedRootSpan = info.rootPublicKey.Span();
+    // Perform DCL Lookup https://zigbee-alliance.github.io/distributed-compliance-ledger/#/Query/NocCertificatesByVidAndSkid
+    // temporarily return the already known remote admin trusted root certificate
+    globallyTrustedRootSpan = mRemoteAdminTrustedRoot;
 
-    commissioner.ContinueAfterLookupOperationalTrustAnchor(err, globallyTrustedRootSpan);
+    return err;
 }
