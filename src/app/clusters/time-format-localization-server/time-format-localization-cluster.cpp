@@ -1,5 +1,5 @@
 /*
- *    Copyright (c) 2025 Project CHIP Authors
+ *    Copyright (c) 2021-2025 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -137,14 +137,16 @@ DataModel::ActionReturnStatus TimeFormatLocalizationCluster::WriteAttribute(cons
 DataModel::ActionReturnStatus TimeFormatLocalizationCluster::WriteImpl(const DataModel::WriteAttributeRequest & request,
                                                                        AttributeValueDecoder & decoder)
 {
-    AttributePersistence persistence{ mContext->attributeStorage };
+    // Use a couple of if statements instead of a switch case to try to reduce memory footprint.
 
-    switch (request.path.mAttributeId)
+    if (request.path.mAttributeId == TimeFormatLocalization::Attributes::HourFormat::Id)
     {
-    case TimeFormatLocalization::Attributes::HourFormat::Id: {
+        AttributePersistence persistence{ mContext->attributeStorage };
         return persistence.DecodeAndStoreNativeEndianValue(request.path, decoder, mHourFormat);
     }
-    case TimeFormatLocalization::Attributes::ActiveCalendarType::Id: {
+    
+    if (request.path.mAttributeId == TimeFormatLocalization::Attributes::ActiveCalendarType::Id)
+    {
         TimeFormatLocalization::CalendarTypeEnum newCalendar;
         ReturnErrorOnFailure(decoder.Decode(newCalendar));
 
@@ -155,15 +157,14 @@ DataModel::ActionReturnStatus TimeFormatLocalizationCluster::WriteImpl(const Dat
 
         mCalendarType = newCalendar;
 
-        // Using WriteAttribute directly so we can check that the decoded value is in the supported list
+        // Using WriteValue directly so we can check that the decoded value is in the supported list
         // before storing it.
         return mContext->attributeStorage.WriteValue(
             { kRootEndpointId, TimeFormatLocalization::Id, TimeFormatLocalization::Attributes::ActiveCalendarType::Id },
             { reinterpret_cast<const uint8_t *>(&mCalendarType), sizeof(mCalendarType) });
     }
-    default:
-        return Protocols::InteractionModel::Status::UnsupportedWrite;
-    }
+    
+    return Protocols::InteractionModel::Status::UnsupportedWrite;
 }
 
 DataModel::ActionReturnStatus TimeFormatLocalizationCluster::ReadAttribute(const DataModel::ReadAttributeRequest & request,
@@ -201,8 +202,8 @@ CHIP_ERROR TimeFormatLocalizationCluster::Attributes(const ConcreteClusterPath &
         TimeFormatLocalization::Attributes::SupportedCalendarTypes::kMetadataEntry
     };
 
-    chip::app::OptionalAttributeSet<TimeFormatLocalization::Attributes::ActiveCalendarType::Id,
-                                    TimeFormatLocalization::Attributes::SupportedCalendarTypes::Id>
+    OptionalAttributeSet<TimeFormatLocalization::Attributes::ActiveCalendarType::Id,
+                         TimeFormatLocalization::Attributes::SupportedCalendarTypes::Id>
         optionalAttributeSet;
 
     if (mFeatures.Has(TimeFormatLocalization::Feature::kCalendarFormat))

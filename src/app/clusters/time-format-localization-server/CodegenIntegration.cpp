@@ -46,10 +46,9 @@ void emberAfTimeFormatLocalizationClusterServerInitCallback(EndpointId endpoint)
         rawFeatureMap = 0;
     }
 
-    // Get the default values from ZAP, just in case of read failure we set the values to the initial of the enum (k12hr and
-    // kBuddhist).
-    TimeFormatLocalization::HourFormatEnum defaultHourFormat     = TimeFormatLocalization::HourFormatEnum::k12hr;
-    TimeFormatLocalization::CalendarTypeEnum defaultCalendarType = TimeFormatLocalization::CalendarTypeEnum::kBuddhist;
+    // Get the default values from ZAP in case there is not a valid value in storage.
+    TimeFormatLocalization::HourFormatEnum defaultHourFormat;
+    TimeFormatLocalization::CalendarTypeEnum defaultCalendarType;
 
     // First the HourFormat
     if (TimeFormatLocalization::Attributes::HourFormat::Get(endpoint, &defaultHourFormat) != Status::Success)
