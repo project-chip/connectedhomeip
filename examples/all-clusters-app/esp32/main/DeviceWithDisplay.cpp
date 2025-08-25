@@ -674,7 +674,7 @@ void SetupPretendDevices()
     AddEndpoint("External");
     AddCluster("Contact Sensor");
     AddAttribute("Contact", "true");
-    app::Clusters::BooleanState::Attributes::StateValue::Set(1, true);
+    app::Clusters::BooleanState::SetStateValue(true);
 
     AddDevice("Thermostat");
     AddEndpoint("1");
