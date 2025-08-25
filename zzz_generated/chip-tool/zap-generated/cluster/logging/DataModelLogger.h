@@ -482,6 +482,9 @@ static CHIP_ERROR
 LogValue(const char * label, size_t indent,
          const chip::app::Clusters::CameraAvSettingsUserLevelManagement::Structs::DPTZStruct::DecodableType & value);
 
+static CHIP_ERROR LogValue(const char * label, size_t indent,
+                           const chip::app::Clusters::WebRTCTransportProvider::Structs::SFrameStruct::DecodableType & value);
+
 static CHIP_ERROR
 LogValue(const char * label, size_t indent,
          const chip::app::Clusters::PushAvStreamTransport::Structs::TransportMotionTriggerTimeControlStruct::DecodableType & value);
@@ -883,6 +886,22 @@ static CHIP_ERROR LogValue(const char * label, size_t indent,
                            const chip::app::Clusters::PumpConfigurationAndControl::Events::AirDetection::DecodableType & value);
 static CHIP_ERROR LogValue(const char * label, size_t indent,
                            const chip::app::Clusters::PumpConfigurationAndControl::Events::TurbineOperation::DecodableType & value);
+static CHIP_ERROR LogValue(const char * label, size_t indent,
+                           const chip::app::Clusters::Thermostat::Events::SystemModeChange::DecodableType & value);
+static CHIP_ERROR LogValue(const char * label, size_t indent,
+                           const chip::app::Clusters::Thermostat::Events::LocalTemperatureChange::DecodableType & value);
+static CHIP_ERROR LogValue(const char * label, size_t indent,
+                           const chip::app::Clusters::Thermostat::Events::OccupancyChange::DecodableType & value);
+static CHIP_ERROR LogValue(const char * label, size_t indent,
+                           const chip::app::Clusters::Thermostat::Events::SetpointChange::DecodableType & value);
+static CHIP_ERROR LogValue(const char * label, size_t indent,
+                           const chip::app::Clusters::Thermostat::Events::RunningStateChange::DecodableType & value);
+static CHIP_ERROR LogValue(const char * label, size_t indent,
+                           const chip::app::Clusters::Thermostat::Events::RunningModeChange::DecodableType & value);
+static CHIP_ERROR LogValue(const char * label, size_t indent,
+                           const chip::app::Clusters::Thermostat::Events::ActiveScheduleChange::DecodableType & value);
+static CHIP_ERROR LogValue(const char * label, size_t indent,
+                           const chip::app::Clusters::Thermostat::Events::ActivePresetChange::DecodableType & value);
 static CHIP_ERROR LogValue(const char * label, size_t indent,
                            const chip::app::Clusters::OccupancySensing::Events::OccupancyChanged::DecodableType & value);
 static CHIP_ERROR LogValue(const char * label, size_t indent,

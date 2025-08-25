@@ -19,7 +19,7 @@
 # test-runner-runs:
 #   run1:
 #     app: ${CLOSURE_APP}
-#     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
+#     app-args: --discriminator 1234 --KVS kvs1 --enable-key 000102030405060708090a0b0c0d0e0f --trace-to json:${TRACE_APP}.json
 #     script-args: >
 #       --storage-path admin_storage.json
 #       --commissioning-method on-network
@@ -37,13 +37,14 @@
 import logging
 import time
 
-import chip.clusters as Clusters
-from chip.clusters.Types import NullValue
-from chip.interaction_model import InteractionModelError, Status
-from chip.testing.event_attribute_reporting import ClusterAttributeChangeAccumulator
-from chip.testing.matter_testing import (AttributeMatcher, AttributeValue, MatterBaseTest, TestStep, async_test_body,
-                                         default_matter_test_main)
 from mobly import asserts
+
+import matter.clusters as Clusters
+from matter.clusters.Types import NullValue
+from matter.interaction_model import InteractionModelError, Status
+from matter.testing.event_attribute_reporting import AttributeSubscriptionHandler
+from matter.testing.matter_testing import (AttributeMatcher, AttributeValue, MatterBaseTest, TestStep, async_test_body,
+                                           default_matter_test_main)
 
 triggerProtected = 0x0104000000000001
 triggerDisengaged = 0x0104000000000002
@@ -230,7 +231,7 @@ class TC_CLCTRL_4_1(MatterBaseTest):
         # STEP 2e: TH establishes a wildcard subscription to all attributes on the Closure Control Cluster, with MinIntervalFloor = 0, MaxIntervalCeiling = 30 and KeepSubscriptions = false
         self.step("2e")
 
-        sub_handler = ClusterAttributeChangeAccumulator(Clusters.ClosureControl)
+        sub_handler = AttributeSubscriptionHandler(expected_cluster=Clusters.ClosureControl)
         await sub_handler.start(dev_controller, self.dut_node_id, endpoint=endpoint, min_interval_sec=0, max_interval_sec=30, keepSubscriptions=False)
 
         # STEP 3a: If the attribute is supported on the cluster, TH reads from the DUT the OverallCurrentState attribute
@@ -266,7 +267,7 @@ class TC_CLCTRL_4_1(MatterBaseTest):
             try:
                 await self.send_single_cmd(cmd=Clusters.ClosureControl.Commands.MoveTo(
                     position=Clusters.ClosureControl.Enums.TargetPositionEnum.kMoveToFullyClosed,
-                ), endpoint=endpoint)
+                ), endpoint=endpoint, timedRequestTimeoutMs=1000)
             except InteractionModelError as e:
                 asserts.assert_equal(
                     e.status, Status.Success, f"Failed to send command MoveTo: {e.status}")
@@ -337,7 +338,7 @@ class TC_CLCTRL_4_1(MatterBaseTest):
 
                     logging.info("Latch the DUT manually to set OverallCurrentState.Latch to True")
                     # Simulating manual latching by waiting for user input
-                    self.wait_for_user_input(promt_msg="Press Enter after latching the DUT...")
+                    self.wait_for_user_input(prompt_msg="Press Enter after latching the DUT...")
                     logging.info("Manual latching completed.")
                 else:
                     logging.info("LatchControlModes Bit 0 is 1 (RemoteLatching = True), proceeding to step 3j")
@@ -348,7 +349,7 @@ class TC_CLCTRL_4_1(MatterBaseTest):
                     try:
                         await self.send_single_cmd(cmd=Clusters.ClosureControl.Commands.MoveTo(
                             latch=True
-                        ), endpoint=endpoint)
+                        ), endpoint=endpoint, timedRequestTimeoutMs=1000)
                     except InteractionModelError as e:
                         asserts.assert_equal(
                             e.status, Status.Success, f"Failed to send command MoveTo: {e.status}")
@@ -387,7 +388,7 @@ class TC_CLCTRL_4_1(MatterBaseTest):
             try:
                 await self.send_single_cmd(cmd=Clusters.ClosureControl.Commands.MoveTo(
                     position=Clusters.ClosureControl.Enums.TargetPositionEnum.kMoveToFullyOpen,
-                ), endpoint=endpoint)
+                ), endpoint=endpoint, timedRequestTimeoutMs=1000)
                 asserts.fail("Expected InvalidInState error, but command succeeded.")
             except InteractionModelError as e:
                 asserts.assert_equal(
@@ -412,7 +413,7 @@ class TC_CLCTRL_4_1(MatterBaseTest):
 
                 logging.info("Unlatch the DUT manually to set OverallCurrentState.Latch to False")
                 # Simulating manual unlatching by waiting for user input
-                self.wait_for_user_input(promt_msg="Press Enter after unlatching the DUT...")
+                self.wait_for_user_input(prompt_msg="Press Enter after unlatching the DUT...")
                 logging.info("Manual unlatching completed.")
             else:
                 logging.info("LatchControlModes Bit 1 is 1 (RemoteUnlatching = True), proceeding to step 5b")
@@ -423,7 +424,7 @@ class TC_CLCTRL_4_1(MatterBaseTest):
                 try:
                     await self.send_single_cmd(cmd=Clusters.ClosureControl.Commands.MoveTo(
                         latch=False
-                    ), endpoint=endpoint)
+                    ), endpoint=endpoint, timedRequestTimeoutMs=1000)
                 except InteractionModelError as e:
                     asserts.assert_equal(
                         e.status, Status.Success, f"Failed to send command MoveTo: {e.status}")
@@ -439,10 +440,10 @@ class TC_CLCTRL_4_1(MatterBaseTest):
             sub_handler.await_all_expected_report_matches(expected_matchers=[current_latch_matcher(False)],
                                                           timeout_sec=timeout)
         else:
-            logging.info("Motion Latching feature not supported, skipping steps 3k to 5e")
+            logging.info("Motion Latching feature not supported, skipping steps 3f to 5e")
 
-            # Skipping steps 3k to 5e
-            self.mark_step_range_skipped("3k", "5e")
+            # Skipping steps 3f to 5e
+            self.mark_step_range_skipped("3f", "5e")
 
         # STEP 6a: If the SP feature is not supported on the cluster, skip steps 6b to 6e
         self.step("6a")
@@ -489,7 +490,7 @@ class TC_CLCTRL_4_1(MatterBaseTest):
                 try:
                     await self.send_single_cmd(cmd=Clusters.ClosureControl.Commands.MoveTo(
                         speed=Clusters.Globals.Enums.ThreeLevelAutoEnum.kLow
-                    ), endpoint=endpoint)
+                    ), endpoint=endpoint, timedRequestTimeoutMs=1000)
                 except InteractionModelError as e:
                     asserts.assert_equal(
                         e.status, Status.Success, f"Failed to send command MoveTo: {e.status}")
@@ -509,7 +510,7 @@ class TC_CLCTRL_4_1(MatterBaseTest):
         try:
             await self.send_single_cmd(cmd=Clusters.ClosureControl.Commands.MoveTo(
                 position=Clusters.ClosureControl.Enums.TargetPositionEnum.kMoveToSignaturePosition,
-            ), endpoint=endpoint)
+            ), endpoint=endpoint, timedRequestTimeoutMs=1000)
         except InteractionModelError as e:
             asserts.assert_equal(
                 e.status, Status.Success, f"Failed to send command MoveTo: {e.status}")
@@ -556,7 +557,7 @@ class TC_CLCTRL_4_1(MatterBaseTest):
             try:
                 await self.send_single_cmd(cmd=Clusters.ClosureControl.Commands.MoveTo(
                     position=Clusters.ClosureControl.Enums.TargetPositionEnum.kMoveToVentilationPosition,
-                ), endpoint=endpoint)
+                ), endpoint=endpoint, timedRequestTimeoutMs=1000)
             except InteractionModelError as e:
                 asserts.assert_equal(
                     e.status, Status.Success, f"Failed to send command MoveTo: {e.status}")
@@ -603,7 +604,7 @@ class TC_CLCTRL_4_1(MatterBaseTest):
             try:
                 await self.send_single_cmd(cmd=Clusters.ClosureControl.Commands.MoveTo(
                     position=Clusters.ClosureControl.Enums.TargetPositionEnum.kMoveToPedestrianPosition,
-                ), endpoint=endpoint)
+                ), endpoint=endpoint, timedRequestTimeoutMs=1000)
             except InteractionModelError as e:
                 asserts.assert_equal(
                     e.status, Status.Success, f"Failed to send command MoveTo: {e.status}")
@@ -641,7 +642,7 @@ class TC_CLCTRL_4_1(MatterBaseTest):
         try:
             await self.send_single_cmd(cmd=Clusters.ClosureControl.Commands.MoveTo(
                 position=Clusters.ClosureControl.Enums.TargetPositionEnum.kMoveToFullyOpen,
-            ), endpoint=endpoint)
+            ), endpoint=endpoint, timedRequestTimeoutMs=1000)
         except InteractionModelError as e:
             asserts.assert_equal(
                 e.status, Status.Success, f"Failed to send command MoveTo: {e.status}")
@@ -679,7 +680,7 @@ class TC_CLCTRL_4_1(MatterBaseTest):
         try:
             await self.send_single_cmd(cmd=Clusters.ClosureControl.Commands.MoveTo(
                 position=Clusters.ClosureControl.Enums.TargetPositionEnum.kMoveToFullyClosed,
-            ), endpoint=endpoint)
+            ), endpoint=endpoint, timedRequestTimeoutMs=1000)
         except InteractionModelError as e:
             asserts.assert_equal(
                 e.status, Status.Success, f"Failed to send command MoveTo: {e.status}")
@@ -726,7 +727,7 @@ class TC_CLCTRL_4_1(MatterBaseTest):
             try:
                 await self.send_single_cmd(cmd=Clusters.ClosureControl.Commands.MoveTo(
                     speed=Clusters.Globals.Enums.ThreeLevelAutoEnum.kHigh
-                ), endpoint=endpoint)
+                ), endpoint=endpoint, timedRequestTimeoutMs=1000)
             except InteractionModelError as e:
                 asserts.assert_equal(
                     e.status, Status.Success, f"Failed to send command MoveTo: {e.status}")
@@ -757,7 +758,7 @@ class TC_CLCTRL_4_1(MatterBaseTest):
             try:
                 await self.send_single_cmd(cmd=Clusters.ClosureControl.Commands.MoveTo(
                     speed=Clusters.Globals.Enums.ThreeLevelAutoEnum.kLow
-                ), endpoint=endpoint)
+                ), endpoint=endpoint, timedRequestTimeoutMs=1000)
             except InteractionModelError as e:
                 asserts.assert_equal(
                     e.status, Status.Success, f"Failed to send command MoveTo: {e.status}")
@@ -812,7 +813,7 @@ class TC_CLCTRL_4_1(MatterBaseTest):
             try:
                 await self.send_single_cmd(cmd=Clusters.ClosureControl.Commands.MoveTo(
                     position=Clusters.ClosureControl.Enums.TargetPositionEnum.kMoveToFullyOpen,
-                ), endpoint=endpoint)
+                ), endpoint=endpoint, timedRequestTimeoutMs=1000)
                 asserts.fail("Expected InvalidInState error, but command succeeded.")
             except InteractionModelError as e:
                 asserts.assert_equal(
@@ -875,7 +876,7 @@ class TC_CLCTRL_4_1(MatterBaseTest):
             try:
                 await self.send_single_cmd(cmd=Clusters.ClosureControl.Commands.MoveTo(
                     position=Clusters.ClosureControl.Enums.TargetPositionEnum.kMoveToFullyOpen,
-                ), endpoint=endpoint)
+                ), endpoint=endpoint, timedRequestTimeoutMs=1000)
                 asserts.fail("Expected InvalidInState error, but command succeeded.")
             except InteractionModelError as e:
                 asserts.assert_equal(
@@ -918,7 +919,7 @@ class TC_CLCTRL_4_1(MatterBaseTest):
             try:
                 await self.send_single_cmd(cmd=Clusters.ClosureControl.Commands.MoveTo(
                     postion=Clusters.ClosureControl.Enums.TargetPositionEnum.kMoveToFullyOpen,
-                ), endpoint=endpoint)
+                ), endpoint=endpoint, timedRequestTimeoutMs=1000)
             except InteractionModelError as e:
                 asserts.assert_equal(
                     e.status, Status.Success, f"Failed to send command MoveTo: {e.status}")
@@ -967,7 +968,7 @@ class TC_CLCTRL_4_1(MatterBaseTest):
             try:
                 await self.send_single_cmd(cmd=Clusters.ClosureControl.Commands.MoveTo(
                     position=Clusters.ClosureControl.Enums.TargetPositionEnum.kMoveToFullyClosed,
-                ), endpoint=endpoint)
+                ), endpoint=endpoint, timedRequestTimeoutMs=1000)
             except InteractionModelError as e:
                 asserts.assert_equal(
                     e.status, Status.Success, f"Failed to send command MoveTo: {e.status}")

@@ -193,6 +193,13 @@ Protocols::InteractionModel::Status CameraAVStreamManager::VideoStreamDeallocate
                 ChipLogError(Camera, "Video stream with ID: %d still in use", streamID);
                 return Status::InvalidInState;
             }
+
+            if (stream.videoStreamParams.streamUsage == Globals::StreamUsageEnum::kInternal)
+            {
+                ChipLogError(Camera, "Video stream with ID: %d is Internal", streamID);
+                return Status::DynamicConstraintError;
+            }
+
             // Stop the video stream
             mCameraDeviceHAL->GetCameraHALInterface().StopVideoStream(streamID);
 
@@ -250,6 +257,13 @@ Protocols::InteractionModel::Status CameraAVStreamManager::AudioStreamDeallocate
                 ChipLogError(Camera, "Audio stream with ID: %d still in use", streamID);
                 return Status::InvalidInState;
             }
+
+            if (stream.audioStreamParams.streamUsage == Globals::StreamUsageEnum::kInternal)
+            {
+                ChipLogError(Camera, "Audio stream with ID: %d is Internal", streamID);
+                return Status::DynamicConstraintError;
+            }
+
             // Stop the audio stream
             mCameraDeviceHAL->GetCameraHALInterface().StopAudioStream(streamID);
 
@@ -277,6 +291,12 @@ Protocols::InteractionModel::Status CameraAVStreamManager::SnapshotStreamAllocat
             if (!stream.isAllocated)
             {
                 stream.isAllocated = true;
+
+                // Set the optional Watermark and OSD values that may have been provided.  This is the initial
+                // setting of these values, they may be subsequently modified. If the values have no value that
+                // is ok, the allocated stream will store as such and ignore.
+                stream.snapshotStreamParams.watermarkEnabled = allocateArgs.watermarkEnabled;
+                stream.snapshotStreamParams.OSDEnabled       = allocateArgs.OSDEnabled;
 
                 // Start the snapshot stream for serving.
                 mCameraDeviceHAL->GetCameraHALInterface().StartSnapshotStream(outStreamID);

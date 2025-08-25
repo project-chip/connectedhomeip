@@ -18,6 +18,8 @@
 
 #include <app/AttributeValueEncoder.h>
 #include <app/data-model-provider/MetadataTypes.h>
+#include <app/server-cluster/OptionalAttributeSet.h>
+#include <clusters/SoftwareDiagnostics/Attributes.h>
 #include <clusters/SoftwareDiagnostics/Enums.h>
 #include <lib/core/CHIPError.h>
 #include <lib/support/ReadOnlyBuffer.h>
@@ -27,27 +29,22 @@ namespace chip {
 namespace app {
 namespace Clusters {
 
-struct SoftwareDiagnosticsEnabledAttributes
-{
-    bool enableThreadMetrics : 1;
-    bool enableCurrentHeapFree : 1;
-    bool enableCurrentHeapUsed : 1;
-    bool enableCurrentWatermarks : 1;
-};
-
 /// Type-safe implementation for callbacks for the SoftwareDiagnostics server
 class SoftwareDiagnosticsLogic
 {
 public:
-    SoftwareDiagnosticsLogic(const SoftwareDiagnosticsEnabledAttributes enabledAttributes) : mEnabledAttributes(enabledAttributes)
-    {}
+    using OptionalAttributeSet = chip::app::OptionalAttributeSet<
+        SoftwareDiagnostics::Attributes::ThreadMetrics::Id, SoftwareDiagnostics::Attributes::CurrentHeapFree::Id,
+        SoftwareDiagnostics::Attributes::CurrentHeapUsed::Id, SoftwareDiagnostics::Attributes::CurrentHeapHighWatermark::Id>;
+
+    SoftwareDiagnosticsLogic(const OptionalAttributeSet & optionalAttributeSet) : mOptionalAttributeSet(optionalAttributeSet) {}
     virtual ~SoftwareDiagnosticsLogic() = default;
 
-    CHIP_ERROR GetCurrentHeapFree(uint64_t & out) const { return GetDiagnosticDataProvider().GetCurrentHeapFree(out); }
-    CHIP_ERROR GetCurrentHeapUsed(uint64_t & out) const { return GetDiagnosticDataProvider().GetCurrentHeapUsed(out); }
+    CHIP_ERROR GetCurrentHeapFree(uint64_t & out) const { return DeviceLayer::GetDiagnosticDataProvider().GetCurrentHeapFree(out); }
+    CHIP_ERROR GetCurrentHeapUsed(uint64_t & out) const { return DeviceLayer::GetDiagnosticDataProvider().GetCurrentHeapUsed(out); }
     CHIP_ERROR GetCurrentHighWatermark(uint64_t & out) const
     {
-        return GetDiagnosticDataProvider().GetCurrentHeapHighWatermark(out);
+        return DeviceLayer::GetDiagnosticDataProvider().GetCurrentHeapHighWatermark(out);
     }
 
     // Encodes the thread metrics list, using the provided encoder.
@@ -56,12 +53,13 @@ public:
     /// Determines the feature map based on the DiagnosticsProvider support.
     BitFlags<SoftwareDiagnostics::Feature> GetFeatureMap() const
     {
-        return BitFlags<SoftwareDiagnostics::Feature>().Set(SoftwareDiagnostics::Feature::kWatermarks,
-                                                            mEnabledAttributes.enableCurrentWatermarks &&
-                                                                GetDiagnosticDataProvider().SupportsWatermarks());
+        return BitFlags<SoftwareDiagnostics::Feature>().Set(
+            SoftwareDiagnostics::Feature::kWatermarks,
+            mOptionalAttributeSet.IsSet(SoftwareDiagnostics::Attributes::CurrentHeapHighWatermark::Id) &&
+                DeviceLayer::GetDiagnosticDataProvider().SupportsWatermarks());
     }
 
-    CHIP_ERROR ResetWatermarks() { return GetDiagnosticDataProvider().ResetWatermarks(); }
+    CHIP_ERROR ResetWatermarks() { return DeviceLayer::GetDiagnosticDataProvider().ResetWatermarks(); }
 
     /// Returns acceptable attributes for the given Diagnostics data provider:
     ///   - ALWAYS includes global attributes
@@ -71,48 +69,8 @@ public:
     /// Determines what commands are supported
     CHIP_ERROR AcceptedCommands(ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder);
 
-protected:
-    /// Software Diagnostics provider logic generally forwards all calls to a diagnostic data provider
-    ///
-    /// To allow unit testing, we have this as a protected member so we can both
-    /// use `DeviceLayer::GetDiagnosticDataProvider` and not incur RAM cost and also
-    /// have a RAM-based implementation for unit testing.
-    [[nodiscard]] virtual DeviceLayer::DiagnosticDataProvider & GetDiagnosticDataProvider() const = 0;
-
 private:
-    const SoftwareDiagnosticsEnabledAttributes mEnabledAttributes;
-};
-
-/// Minimal class that uses DeviceLayer (singleton) diagnostics provider
-class DeviceLayerSoftwareDiagnosticsLogic : public SoftwareDiagnosticsLogic
-{
-public:
-    DeviceLayerSoftwareDiagnosticsLogic(const SoftwareDiagnosticsEnabledAttributes enabledAttributes) :
-        SoftwareDiagnosticsLogic(enabledAttributes)
-    {}
-
-protected:
-    [[nodiscard]] DeviceLayer::DiagnosticDataProvider & GetDiagnosticDataProvider() const override
-    {
-        return DeviceLayer::GetDiagnosticDataProvider();
-    }
-};
-
-/// Minimal class that uses an injected diagnostics provider (i.e. uses RAM but is unit testable)
-class InjectedDiagnosticsSoftwareDiagnosticsLogic : public SoftwareDiagnosticsLogic
-{
-public:
-    InjectedDiagnosticsSoftwareDiagnosticsLogic(DeviceLayer::DiagnosticDataProvider & provider,
-                                                const SoftwareDiagnosticsEnabledAttributes enabledAttributes) :
-        SoftwareDiagnosticsLogic(enabledAttributes),
-        mProvider(provider)
-    {}
-
-protected:
-    [[nodiscard]] DeviceLayer::DiagnosticDataProvider & GetDiagnosticDataProvider() const override { return mProvider; }
-
-private:
-    DeviceLayer::DiagnosticDataProvider & mProvider;
+    const OptionalAttributeSet mOptionalAttributeSet;
 };
 
 } // namespace Clusters

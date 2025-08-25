@@ -343,7 +343,7 @@ fabric_scoped struct WebRTCSessionStruct {
   StreamUsageEnum streamUsage = 3;
   nullable int16u videoStreamID = 4;
   nullable int16u audioStreamID = 5;
-  optional boolean metadataEnabled = 6;
+  boolean metadataEnabled = 6;
   fabric_idx fabricIndex = 254;
 }
 
@@ -846,6 +846,7 @@ cluster GeneralCommissioning = 48 {
   provisional readonly attribute access(read: administer) optional nullable int32u TCUpdateDeadline = 9;
   provisional readonly attribute access(read: manage) optional octet_string<8> recoveryIdentifier = 10;
   provisional readonly attribute access(read: manage) optional nullable NetworkRecoveryReasonEnum networkRecoveryReason = 11;
+  provisional readonly attribute optional boolean isCommissioningWithoutPower = 12;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute attrib_id attributeList[] = 65531;
@@ -1528,7 +1529,7 @@ cluster GroupKeyManagement = 63 {
 
 /** An interface for configuring and controlling the functionality of a thermostat. */
 cluster Thermostat = 513 {
-  revision 7;
+  revision 9;
 
   enum ACCapacityFormatEnum : enum8 {
     kBTUh = 0;
@@ -1646,6 +1647,7 @@ cluster Thermostat = 513 {
     kLocalTemperatureNotExposed = 0x40;
     kMatterScheduleConfiguration = 0x80;
     kPresets = 0x100;
+    kEvents = 0x200;
   }
 
   bitmap HVACSystemTypeBitmap : bitmap8 {
@@ -1769,6 +1771,47 @@ cluster Thermostat = 513 {
     int16u transitionTime = 0;
     nullable temperature heatSetpoint = 1;
     nullable temperature coolSetpoint = 2;
+  }
+
+  info event SystemModeChange = 0 {
+    optional SystemModeEnum previousSystemMode = 0;
+    SystemModeEnum currentSystemMode = 1;
+  }
+
+  info event LocalTemperatureChange = 1 {
+    nullable temperature currentLocalTemperature = 0;
+  }
+
+  info event OccupancyChange = 2 {
+    optional OccupancyBitmap previousOccupancy = 0;
+    OccupancyBitmap currentOccupancy = 1;
+  }
+
+  info event SetpointChange = 3 {
+    SystemModeEnum systemMode = 0;
+    optional OccupancyBitmap occupancy = 1;
+    optional temperature previousSetpoint = 2;
+    temperature currentSetpoint = 3;
+  }
+
+  info event RunningStateChange = 4 {
+    optional RelayStateBitmap previousRunningState = 0;
+    RelayStateBitmap currentRunningState = 1;
+  }
+
+  info event RunningModeChange = 5 {
+    optional ThermostatRunningModeEnum previousRunningMode = 0;
+    ThermostatRunningModeEnum currentRunningMode = 1;
+  }
+
+  info event ActiveScheduleChange = 6 {
+    optional nullable octet_string previousScheduleHandle = 0;
+    nullable octet_string currentScheduleHandle = 1;
+  }
+
+  info event ActivePresetChange = 7 {
+    optional nullable octet_string previousPresetHandle = 0;
+    nullable octet_string currentPresetHandle = 1;
   }
 
   readonly attribute nullable temperature localTemperature = 0;
@@ -2095,7 +2138,7 @@ endpoint 0 {
     callback attribute vendorID;
     callback attribute productName;
     callback attribute productID;
-    persist  attribute nodeLabel;
+    callback attribute nodeLabel;
     callback attribute location;
     callback attribute hardwareVersion;
     callback attribute hardwareVersionString;
@@ -2106,14 +2149,14 @@ endpoint 0 {
     callback attribute productURL;
     callback attribute productLabel;
     callback attribute serialNumber;
-    persist  attribute localConfigDisabled default = 0;
+    callback attribute localConfigDisabled;
     callback attribute uniqueID;
     callback attribute capabilityMinima;
     callback attribute specificationVersion;
     callback attribute maxPathsPerInvoke;
-    callback attribute configurationVersion default = 1;
-    ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 5;
+    callback attribute configurationVersion;
+    callback attribute featureMap;
+    callback attribute clusterRevision;
   }
 
   server cluster GeneralCommissioning {
@@ -2298,19 +2341,19 @@ endpoint 1 {
 
   server cluster Thermostat {
     ram      attribute localTemperature default = 2800;
-    ram      attribute absMinHeatSetpointLimit default = 700;
-    ram      attribute absMaxHeatSetpointLimit default = 3000;
-    ram      attribute absMinCoolSetpointLimit default = 1600;
-    ram      attribute absMaxCoolSetpointLimit default = 3200;
-    persist  attribute occupiedCoolingSetpoint default = 2600;
+    ram      attribute absMinHeatSetpointLimit default = 0;
+    ram      attribute absMaxHeatSetpointLimit default = 3500;
+    ram      attribute absMinCoolSetpointLimit default = 1000;
+    ram      attribute absMaxCoolSetpointLimit default = 4000;
+    persist  attribute occupiedCoolingSetpoint default = 2300;
     persist  attribute occupiedHeatingSetpoint default = 2000;
-    persist  attribute minHeatSetpointLimit default = 700;
+    persist  attribute minHeatSetpointLimit default = 500;
     persist  attribute maxHeatSetpointLimit default = 3000;
-    persist  attribute minCoolSetpointLimit default = 1600;
-    persist  attribute maxCoolSetpointLimit default = 3200;
+    persist  attribute minCoolSetpointLimit default = 1500;
+    persist  attribute maxCoolSetpointLimit default = 3500;
     persist  attribute controlSequenceOfOperation default = 0x04;
     persist  attribute systemMode default = 0x01;
-    persist  attribute ACLouverPosition default = 0;
+    persist  attribute ACLouverPosition default = 1;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
@@ -2325,13 +2368,16 @@ endpoint 1 {
     ram      attribute fanModeSequence default = 2;
     ram      attribute percentSetting default = 0;
     ram      attribute percentCurrent default = 0;
+    ram      attribute speedMax default = 100;
+    ram      attribute speedSetting default = 0;
+    ram      attribute speedCurrent;
     ram      attribute rockSupport default = 0x00;
     ram      attribute rockSetting default = 0x00;
     ram      attribute airflowDirection default = 0;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 37;
+    ram      attribute featureMap default = 53;
     ram      attribute clusterRevision default = 1;
 
     handle command Step;
