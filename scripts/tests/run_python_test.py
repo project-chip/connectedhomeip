@@ -268,7 +268,7 @@ def main_impl(app: str, factory_reset: bool, factory_reset_app_only: bool, app_a
             daemon=True)
         restart_monitor_thread.start()
 
-    # TODO: Remove this below workaround once we understand if mobile-device-test needs to be run through Cirque and through this script for CI test pipeline, task PR: https://github.com/project-chip/matter-test-scripts/issues/681    
+    # TODO: Remove this below workaround once we understand if mobile-device-test needs to be run through Cirque and through this script for CI test pipeline, task PR: https://github.com/project-chip/matter-test-scripts/issues/681
     if "mobile-device-test.py" not in script:
         script_args += f" --restart-flag-file {restart_flag_file}"
 
