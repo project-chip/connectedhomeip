@@ -27,3 +27,45 @@ declare_args() {
   # CHIP extra version string.
   chip_version_extra = ""
 }
+template("gen_sdk_version") {
+  action("gen_${target_name}") {
+    filename = invoker.filename
+    directory = invoker.directory
+
+    # Check if we are inside a repository
+    is_git_repository = exec_script("${chip_root}/build/chip/check_path.py",
+                                    [ rebase_path("${chip_root}/.git/logs/HEAD",
+                                                  root_build_dir) ],
+                                    "value")
+
+    if (is_git_repository) {
+      inputs = [ "${chip_root}/.git/logs/HEAD" ]
+    }
+    outputs = [
+      "${directory}/${filename}.h",
+      "${directory}/${filename}.cpp",
+    ]
+
+    script = "${chip_root}/build/chip/write_sdk_version_header.py"
+
+    args = [
+      "--output",
+      filename,
+      "--gen-dir",
+      rebase_path(directory, root_build_dir),
+      "--root",
+      rebase_path("${chip_root}", root_build_dir),
+    ]
+
+    if (is_git_repository) {
+      args += [ "--git" ]
+    }
+  }
+  source_set(target_name) {
+    filename = invoker.filename
+    directory = invoker.directory
+
+    sources = [ "${directory}/${filename}.cpp" ]
+    public_deps = [ ":gen_${target_name}" ]
+  }
+}
