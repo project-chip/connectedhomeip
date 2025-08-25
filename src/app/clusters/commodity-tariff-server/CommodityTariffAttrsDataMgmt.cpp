@@ -913,9 +913,9 @@ CHIP_ERROR CTC_BaseDataClass<DataModel::Nullable<DataModel::List<CalendarPeriodS
                              "The first StartDate in CalendarPeriods can't be not set if the StartDate of tariff is specified");
                 return CHIP_ERROR_INVALID_ARGUMENT;
             }
- 
+
             previousStartDate = item.startDate;
-            isFirstItem = false;
+            isFirstItem       = false;
             // First item can have null StartDate
             continue;
         }
