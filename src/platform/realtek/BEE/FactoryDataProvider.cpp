@@ -30,6 +30,10 @@
 #include <platform/internal/GenericConfigurationManagerImpl.ipp>
 #include <platform/realtek/BEE/CHIPDevicePlatformConfig.h>
 
+#if CONFIG_FACTORY_DATA
+#define FACTORY_DATA_BUFFER_LEN (2560)
+#endif
+
 #define FACTORY_TEST 0
 
 using namespace ::chip::DeviceLayer::Internal;
@@ -108,14 +112,13 @@ CHIP_ERROR FactoryDataProvider::Init()
     CHIP_ERROR err = CHIP_NO_ERROR;
 
 #if CONFIG_FACTORY_DATA
-#define BUFFER_LEN (1024 * 3)
-    uint8_t * buffer         = (uint8_t *) malloc(BUFFER_LEN); // FactoryData won't overflow 2KB
+    uint8_t * buffer         = (uint8_t *) malloc(FACTORY_DATA_BUFFER_LEN);
     uint16_t factorydata_len = 0x5A5A;
 
     if (buffer)
     {
         FactoryDataDecoder decoder = FactoryDataDecoder::GetInstance();
-        err                        = decoder.ReadFactoryData(buffer, BUFFER_LEN, &factorydata_len);
+        err                        = decoder.ReadFactoryData(buffer, FACTORY_DATA_BUFFER_LEN, &factorydata_len);
         ChipLogDetail(DeviceLayer, "DecodeFactoryData factorydata_len %d!", factorydata_len);
         if (err != CHIP_NO_ERROR)
         {

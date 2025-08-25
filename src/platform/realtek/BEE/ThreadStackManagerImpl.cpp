@@ -40,6 +40,18 @@
 #include <platform/ThreadStackManager.h>
 #include <platforms/openthread-system.h>
 
+#if DLPS_EN
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+void BEE_RadioExternalWakeup(void);
+
+#ifdef __cplusplus
+}
+#endif
+#endif
+
 extern void otSysInit(int argc, char * argv[]);
 
 namespace chip {
@@ -52,6 +64,26 @@ ThreadStackManagerImpl ThreadStackManagerImpl::sInstance;
 CHIP_ERROR ThreadStackManagerImpl::_InitThreadStack(void)
 {
     return InitThreadStack(NULL);
+}
+
+void ThreadStackManagerImpl::_LockThreadStack(void)
+{
+    xSemaphoreTake(sInstance.mThreadStackLock, portMAX_DELAY);
+#if DLPS_EN
+    // Wake up the radio before accessing the Thread stack to ensure it's
+    // responsive, as part of the Deep Low Power State (DLPS) management.
+    BEE_RadioExternalWakeup();
+#endif
+}
+
+bool ThreadStackManagerImpl::_TryLockThreadStack(void)
+{
+    return xSemaphoreTake(sInstance.mThreadStackLock, 0) == pdTRUE;
+}
+
+void ThreadStackManagerImpl::_UnlockThreadStack(void)
+{
+    xSemaphoreGive(sInstance.mThreadStackLock);
 }
 
 CHIP_ERROR ThreadStackManagerImpl::InitThreadStack(otInstance * otInst)
