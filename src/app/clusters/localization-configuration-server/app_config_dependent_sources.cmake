@@ -16,5 +16,15 @@
 TARGET_SOURCES(
   ${APP_TARGET}
   PRIVATE
-    "${CLUSTER_DIR}/localization-configuration-server.cpp"
+    "${CLUSTER_DIR}/CodegenIntegration.cpp"
+)
+
+# These are the things that BUILD.gn dependencies would pull
+TARGET_SOURCES(
+  ${APP_TARGET}
+  PRIVATE
+    "${CLUSTER_DIR}/localization-configuration-cluster.cpp"
+    "${CLUSTER_DIR}/localization-configuration-cluster.h"
+    "${CLUSTER_DIR}/localization-configuration-logic.cpp"
+    "${CLUSTER_DIR}/localization-configuration-logic.h"
 )

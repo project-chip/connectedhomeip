@@ -15,18 +15,21 @@
 import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
 
-source_set("localization-configuration-server") {
-  sources = [
-    "localization-configuration-cluster.cpp",
-    "localization-configuration-cluster.h",
-    "localization-configuration-logic.cpp",
-    "localization-configuration-logic.h",
-  ]
+import("${chip_root}/build/chip/chip_test_suite.gni")
+
+chip_test_suite("tests") {
+  output_name = "libTestLocalizationConfigurationCluster"
+
+  test_sources = [ "TestLocalizationConfigurationCluster.cpp" ]
+
+  cflags = [ "-Wconversion" ]
 
   public_deps = [
-    "${chip_root}/src/app:app",
-    "${chip_root}/src/app:test-event-trigger",
-    "${chip_root}/src/app/server-cluster",
-    "${chip_root}/zzz_generated/app-common/clusters/LocalizationConfiguration",
+    "${chip_root}/src/app/clusters/localization-configuration-server",
+    "${chip_root}/src/app/clusters/testing",
+    "${chip_root}/src/lib/core:string-builder-adapters",
+    "${chip_root}/src/lib/support",
+    "${chip_root}/src/platform",
+    "${dir_pw_unit_test}",
   ]
 }
