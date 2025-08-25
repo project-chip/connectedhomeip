@@ -1092,6 +1092,7 @@ private:
     CHIP_ERROR ParseGeneralCommissioningInfo(ReadCommissioningInfo & info);
     CHIP_ERROR ParseBasicInformation(ReadCommissioningInfo & info);
     CHIP_ERROR ParseNetworkCommissioningInfo(ReadCommissioningInfo & info);
+    CHIP_ERROR ParseNetworkCommissioningTimeouts(NetworkClusterInfo & networkInfo, const char * networkType);
     CHIP_ERROR ParseFabrics(ReadCommissioningInfo & info);
     CHIP_ERROR ParseICDInfo(ReadCommissioningInfo & info);
     CHIP_ERROR ParseTimeSyncInfo(ReadCommissioningInfo & info);
