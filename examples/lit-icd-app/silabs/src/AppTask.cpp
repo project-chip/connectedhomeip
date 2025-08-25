@@ -121,7 +121,7 @@ void AppTask::ApplicationEventHandler(AppEvent * aEvent)
     PlatformMgr().ScheduleWork([](intptr_t) {
         bool state = true;
 
-        Protocols::InteractionModel::Status status = chip::app::Clusters::BooleanState::Attributes::StateValue::Get(1, &state);
+        Protocols::InteractionModel::Status status = chip::app::Clusters::BooleanState::GetStateValue(&state);
         if (status != Protocols::InteractionModel::Status::Success)
         {
             // Failed to read StateValue. Default to true (open state)
@@ -129,7 +129,7 @@ void AppTask::ApplicationEventHandler(AppEvent * aEvent)
             ChipLogError(NotSpecified, "ERR: reading boolean status value %x", to_underlying(status));
         }
 
-        status = chip::app::Clusters::BooleanState::Attributes::StateValue::Set(1, !state);
+        status = chip::app::Clusters::BooleanState::SetStateValue(!state);
         if (status != Protocols::InteractionModel::Status::Success)
         {
             ChipLogError(NotSpecified, "ERR: updating boolean status value %x", to_underlying(status));
