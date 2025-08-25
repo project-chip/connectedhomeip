@@ -111,10 +111,6 @@ config("efr32-common-config") {
     defines += [ "HEAP_MONITORING" ]
   }
 
-  if (chip_enable_multi_ota_requestor) {
-    defines += [ "CHIP_DEVICE_CONFIG_ENABLE_MULTI_OTA_REQUESTOR=1" ]
-  }
-
   ldflags = [
     "-Wl,--no-warn-rwx-segment",
     "-fno-lto",
