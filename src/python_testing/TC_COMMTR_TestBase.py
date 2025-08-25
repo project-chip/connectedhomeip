@@ -15,7 +15,6 @@
 #    limitations under the License.
 
 
-import asyncio
 import logging
 
 from mobly import asserts
@@ -40,11 +39,9 @@ class CommodityMeteringTestBaseHelper(MatterBaseTest):
 
     async def send_test_event_trigger_attrs_value_update(self, t_wait=5):
         await self.send_test_event_triggers(eventTrigger=self.test_event_fake_data)
-        await asyncio.sleep(t_wait)
 
     async def send_test_event_trigger_clear(self, t_wait=5):
         await self.send_test_event_triggers(eventTrigger=self.test_event_clear)
-        await asyncio.sleep(t_wait)
 
     async def checkMeteredQuantityStruct(self, struct: Clusters.CommodityMetering.Structs.MeteredQuantityStruct = None):
         """Supporting function to check MeteredQuantityStruct."""
