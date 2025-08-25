@@ -420,9 +420,8 @@ void OTAMultiImageProcessorImpl::HandleApply(intptr_t context)
     imageProcessor->mAccumulator.Clear();
 
     ChipLogProgress(SoftwareUpdate, "HandleApply: Finished");
-
     // This reboots the device
-    CORE_CRITICAL_SECTION(bootloader_rebootAndInstall();)
+    CORE_CRITICAL_SECTION(bootloader_rebootAndInstall());
 }
 
 CHIP_ERROR OTAMultiImageProcessorImpl::ReleaseBlock()

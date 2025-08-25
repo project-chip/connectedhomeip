@@ -240,7 +240,7 @@ config NETWORK_LAYER_BLE
 
 config OPERATIONAL_KEYSTORE
 	bool "Use custom implementation of operational keystore"
-	default y if CHIP_NXP_PLATFORM_MCXW71 || CHIP_NXP_PLATFORM_MCXW72
+	default y if CHIP_NXP_PLATFORM_MCXW71 || CHIP_NXP_PLATFORM_MCXW72 || CHIP_NXP_PLATFORM_RW61X
 	default y if CHIP_SE05X
 	help
 		"Use custom implementation of operational keystore"
