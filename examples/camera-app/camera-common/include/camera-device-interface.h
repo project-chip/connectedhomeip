@@ -22,6 +22,7 @@
 #include <app/clusters/camera-av-settings-user-level-management-server/camera-av-settings-user-level-management-server.h>
 #include <app/clusters/camera-av-stream-management-server/camera-av-stream-management-server.h>
 #include <app/clusters/chime-server/chime-server.h>
+#include <app/clusters/push-av-stream-transport-server/push-av-stream-transport-cluster.h>
 #include <app/clusters/webrtc-transport-provider-server/webrtc-transport-provider-server.h>
 #include <app/clusters/zone-management-server/zone-management-server.h>
 
@@ -136,6 +137,9 @@ public:
 
     // Getter for the Media Controller
     virtual MediaController & GetMediaController() = 0;
+
+    // Getter for PushAVStreamTransport Delegate
+    virtual chip::app::Clusters::PushAvStreamTransportDelegate & GetPushAVTransportDelegate() = 0;
 
     // Class defining the Camera HAL interface
     class CameraHALInterface

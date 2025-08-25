@@ -110,6 +110,9 @@ class ConformanceDecisionWithChoice:
     decision: ConformanceDecision
     choice: Optional[Choice] = None
 
+    def is_mandatory(self) -> bool:
+        return self.decision == ConformanceDecision.MANDATORY
+
 
 @dataclass
 class ConformanceParseParameters:
@@ -241,7 +244,12 @@ class device_feature(Conformance):
         self.feature = feature
 
     def __call__(self, feature_map: uint = uint(0), attribute_list: list[uint] = [], all_command_list: list[uint] = []) -> ConformanceDecisionWithChoice:
-        return ConformanceDecisionWithChoice(ConformanceDecision.OPTIONAL)
+        if (self.feature.lower() == "matter"):
+            return ConformanceDecisionWithChoice(ConformanceDecision.MANDATORY)
+        elif (self.feature.lower() == 'zigbee'):
+            return ConformanceDecisionWithChoice(ConformanceDecision.DISALLOWED)
+        else:
+            return ConformanceDecisionWithChoice(ConformanceDecision.OPTIONAL)
 
     def __str__(self):
         return self.feature
@@ -596,6 +604,9 @@ def parse_callable_from_xml(element: ElementTree.Element, params: ConformancePar
                 return command(params.command_map[command_name], command_name)
             except KeyError:
                 raise ConformanceException(f'Conformance specifies command "{command_name}" not in command table.')
+            return command(params.command_map[element.get('name')], element.get('name'))
+        elif element.tag == CONDITION_TAG:
+            return device_feature(element.attrib['name'])
         else:
             raise ConformanceException(
                 f'Unexpected xml conformance element with no children {str(element.tag)} {str(element.attrib)}')
