@@ -42,4 +42,3 @@ source_set("bindings") {
     "${chip_root}/zzz_generated/app-common/clusters/Binding",
   ]
 }
-
