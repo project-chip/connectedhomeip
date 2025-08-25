@@ -42,7 +42,7 @@ from mobly import asserts
 import matter.clusters as Clusters
 from matter.clusters.Types import NullValue
 from matter.interaction_model import InteractionModelError, Status
-from matter.testing import timeoperations
+from matter.testing.timeoperations import utc_time_in_matter_epoch
 from matter.testing.matter_testing import MatterBaseTest, async_test_body, default_matter_test_main
 
 
@@ -92,7 +92,7 @@ class TC_TIMESYNC_2_5(MatterBaseTest):
 
         self.print_step(4, "Test setting unsorted list - expect error")
         if dst_max_size_dut > 1:
-            th_utc = timeoperations.utc_time_in_matter_epoch()
+            th_utc = utc_time_in_matter_epoch()
             dst = [dst_struct(offset=3600, validStarting=th_utc, validUntil=th_utc+1.577e+13),
                    dst_struct(offset=3600, validStarting=0, validUntil=th_utc)]
             await self.send_set_dst_cmd_expect_error(dst=dst, error=Status.ConstraintError)
@@ -104,7 +104,7 @@ class TC_TIMESYNC_2_5(MatterBaseTest):
 
         self.print_step(6, "Test setting list with invalid second entry - expect error")
         if dst_max_size_dut > 1:
-            th_utc = timeoperations.utc_time_in_matter_epoch()
+            th_utc = utc_time_in_matter_epoch()
             dst = [dst_struct(offset=3600, validStarting=0, validUntil=th_utc+3e+8),
                    dst_struct(offset=3600, validStarting=th_utc, validUntil=th_utc+1.577e+13)]
             await self.send_set_dst_cmd_expect_error(dst=dst, error=Status.ConstraintError)
@@ -116,7 +116,7 @@ class TC_TIMESYNC_2_5(MatterBaseTest):
 
         self.print_step(8, "Test setting list with two null values - expect error")
         if dst_max_size_dut > 1:
-            th_utc = timeoperations.utc_time_in_matter_epoch()
+            th_utc = utc_time_in_matter_epoch()
             dst = [dst_struct(offset=3600, validStarting=0, validUntil=NullValue),
                    dst_struct(offset=3600, validStarting=th_utc+3e+8, validUntil=NullValue)]
             await self.send_set_dst_cmd_expect_error(dst=dst, error=Status.ConstraintError)
@@ -128,7 +128,7 @@ class TC_TIMESYNC_2_5(MatterBaseTest):
 
         self.print_step(10, "Test setting list with null value not at end - expect error")
         if dst_max_size_dut > 1:
-            th_utc = timeoperations.utc_time_in_matter_epoch()
+            th_utc = utc_time_in_matter_epoch()
             dst = [dst_struct(offset=3600, validStarting=0, validUntil=NullValue),
                    dst_struct(offset=3600, validStarting=th_utc+3e+8, validUntil=th_utc+1.577e+13)]
             await self.send_set_dst_cmd_expect_error(dst=dst, error=Status.ConstraintError)
@@ -140,7 +140,7 @@ class TC_TIMESYNC_2_5(MatterBaseTest):
 
         self.print_step(12, "Test setting too many entries")
         dst = []
-        th_utc = timeoperations.utc_time_in_matter_epoch()
+        th_utc = utc_time_in_matter_epoch()
         for i in range(dst_max_size_dut+1):
             year = 3.156e+13
             six_months = 1.577e+13
@@ -154,7 +154,7 @@ class TC_TIMESYNC_2_5(MatterBaseTest):
         asserts.assert_false(attr, "DSTOffset not set correctly to empty list")
 
         self.print_step(14, "Set valid list with null ValidUntil")
-        th_utc = timeoperations.utc_time_in_matter_epoch()
+        th_utc = utc_time_in_matter_epoch()
         dst = [dst_struct(offset=3600, validStarting=th_utc+3e+8, validUntil=NullValue)]
         await self.send_set_dst_cmd(dst=dst)
 
@@ -163,7 +163,7 @@ class TC_TIMESYNC_2_5(MatterBaseTest):
         asserts.assert_equal(dut_dst, dst)
 
         self.print_step(16, "Set valid list with non-null ValidUntil")
-        th_utc = timeoperations.utc_time_in_matter_epoch()
+        th_utc = utc_time_in_matter_epoch()
         dst = [dst_struct(offset=3600, validStarting=th_utc+3e+8, validUntil=th_utc+1.577e+13)]
         await self.send_set_dst_cmd(dst=dst)
 
@@ -173,7 +173,7 @@ class TC_TIMESYNC_2_5(MatterBaseTest):
 
         self.print_step(18, "Test setting max entries")
         dst = []
-        th_utc = timeoperations.utc_time_in_matter_epoch()
+        th_utc = utc_time_in_matter_epoch()
         for i in range(dst_max_size_dut):
             year = 3.156e+13
             six_months = 1.577e+13

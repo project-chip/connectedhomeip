@@ -24,7 +24,8 @@ from mobly import asserts
 import matter.clusters as Clusters
 from matter.clusters import Globals
 from matter.clusters.Types import NullValue
-from matter.testing import matter_asserts, timeoperations
+from matter.testing import matter_asserts
+from matter.testing.timeoperations import utc_time_in_matter_epoch
 
 logger = logging.getLogger(__name__)
 
@@ -82,7 +83,7 @@ class CommodityPriceTestBaseHelper:
 
         if now_time_must_be_within_period:  # Only check time limits when dealing with current price (not list of Forecast)
             # - verify that the PeriodStart is in the past.
-            now_time_epoch_s = timeoperations.utc_time_in_matter_epoch() // 1_000_000
+            now_time_epoch_s = utc_time_in_matter_epoch() // 1_000_000
             asserts.assert_less_equal(struct.periodStart, now_time_epoch_s,
                                       "PeriodStart must not be in the past")
 
