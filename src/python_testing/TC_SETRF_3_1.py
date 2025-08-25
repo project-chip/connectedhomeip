@@ -485,6 +485,7 @@ class TC_SETRF_3_1(MatterBaseTest, CommodityTariffTestBaseHelper):
         """Implementation of test case TC_SETRF_3_1."""
 
         endpoint = self.get_endpoint()
+        matcher_list = self.get_mandatory_matchers()
 
         self.step("1")
         # Commissioning
@@ -610,6 +611,7 @@ class TC_SETRF_3_1(MatterBaseTest, CommodityTariffTestBaseHelper):
             DefaultRandomizationTypeValue = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster,
                                                                                            attribute=cluster.Attributes.DefaultRandomizationType)
             await self.check_default_randomization_type_attribute(endpoint, DefaultRandomizationTypeValue)
+            matcher_list.append(self._default_randomization_type_matcher())
         else:
 
             if self.check_pics("SETRF.S.A0012"):  # for cases when it is not supported by DUT, but enabled in PICS
@@ -630,6 +632,7 @@ class TC_SETRF_3_1(MatterBaseTest, CommodityTariffTestBaseHelper):
             DefaultRandomizationOffsetValue = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster,
                                                                                              attribute=cluster.Attributes.DefaultRandomizationOffset)
             await self.check_default_randomization_offset_attribute(endpoint, DefaultRandomizationOffsetValue)
+            matcher_list.append(self._default_randomization_offset_matcher())
         else:
 
             if self.check_pics("SETRF.S.A0011"):  # for cases when it is not supported by DUT, but enabled in PICS
@@ -646,6 +649,7 @@ class TC_SETRF_3_1(MatterBaseTest, CommodityTariffTestBaseHelper):
         self.step("23")
         # TH sends TestEventTrigger command for Attributes Value Set Test Event
         await self.send_test_event_trigger_for_attributes_value_set()
+        subscription_handler.await_all_expected_report_matches(matcher_list, timeout_sec=2)
 
         self.step("24")
         await self.check_tariff_info_attribute(

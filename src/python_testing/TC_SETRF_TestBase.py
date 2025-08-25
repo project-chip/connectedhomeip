@@ -24,7 +24,7 @@ import matter.clusters as Clusters
 from matter.clusters import ClusterObjects, Globals
 from matter.clusters.Types import NullValue
 from matter.testing import matter_asserts
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import AttributeMatcher, AttributeValue, MatterBaseTest
 
 logger = logging.getLogger(__name__)
 
@@ -896,3 +896,196 @@ class CommodityTariffTestBaseHelper(MatterBaseTest):
         except (KeyError, IndexError) as err:
             asserts.fail(f"There are no reports for attribute {attribute_name}:\n{err}")
             return False
+
+    @staticmethod
+    def _tariff_info_matcher() -> AttributeMatcher:
+        def predicate(report: AttributeValue) -> bool:
+            if report.attribute == cluster.Attributes.TariffInfo:
+                return True
+            else:
+                return False
+        return AttributeMatcher.from_callable(description="TariffInfo", matcher=predicate)
+
+    @staticmethod
+    def _tariff_unit_matcher() -> AttributeMatcher:
+        def predicate(report: AttributeValue) -> bool:
+            if report.attribute == cluster.Attributes.TariffUnit:
+                return True
+            else:
+                return False
+        return AttributeMatcher.from_callable(description="TariffUnit", matcher=predicate)
+
+    @staticmethod
+    def _start_date_matcher() -> AttributeMatcher:
+        def predicate(report: AttributeValue) -> bool:
+            if report.attribute == cluster.Attributes.StartDate:
+                return True
+            else:
+                return False
+        return AttributeMatcher.from_callable(description="StartDate", matcher=predicate)
+
+    @staticmethod
+    def _day_entries_matcher() -> AttributeMatcher:
+        def predicate(report: AttributeValue) -> bool:
+            if report.attribute == cluster.Attributes.DayEntries:
+                return True
+            else:
+                return False
+        return AttributeMatcher.from_callable(description="DayEntries", matcher=predicate)
+
+    @staticmethod
+    def _day_patterns_matcher() -> AttributeMatcher:
+        def predicate(report: AttributeValue) -> bool:
+            if report.attribute == cluster.Attributes.DayPatterns:
+                return True
+            else:
+                return False
+        return AttributeMatcher.from_callable(description="DayPatterns", matcher=predicate)
+
+    @staticmethod
+    def _calendar_periods_matcher() -> AttributeMatcher:
+        def predicate(report: AttributeValue) -> bool:
+            if report.attribute == cluster.Attributes.CalendarPeriods:
+                return True
+            else:
+                return False
+        return AttributeMatcher.from_callable(description="CalendarPeriods", matcher=predicate)
+
+    @staticmethod
+    def _individual_days_matcher() -> AttributeMatcher:
+        def predicate(report: AttributeValue) -> bool:
+            if report.attribute == cluster.Attributes.IndividualDays:
+                return True
+            else:
+                return False
+        return AttributeMatcher.from_callable(description="IndividualDays", matcher=predicate)
+
+    @staticmethod
+    def _current_day_matcher() -> AttributeMatcher:
+        def predicate(report: AttributeValue) -> bool:
+            if report.attribute == cluster.Attributes.CurrentDay:
+                return True
+            else:
+                return False
+        return AttributeMatcher.from_callable(description="CurrentDay", matcher=predicate)
+
+    @staticmethod
+    def _next_day_matcher() -> AttributeMatcher:
+        def predicate(report: AttributeValue) -> bool:
+            if report.attribute == cluster.Attributes.NextDay:
+                return True
+            else:
+                return False
+        return AttributeMatcher.from_callable(description="NextDay", matcher=predicate)
+
+    @staticmethod
+    def _current_day_entry_matcher() -> AttributeMatcher:
+        def predicate(report: AttributeValue) -> bool:
+            if report.attribute == cluster.Attributes.CurrentDayEntry:
+                return True
+            else:
+                return False
+        return AttributeMatcher.from_callable(description="CurrentDayEntry", matcher=predicate)
+
+    @staticmethod
+    def _current_day_entry_date_matcher() -> AttributeMatcher:
+        def predicate(report: AttributeValue) -> bool:
+            if report.attribute == cluster.Attributes.CurrentDayEntryDate:
+                return True
+            else:
+                return False
+        return AttributeMatcher.from_callable(description="CurrentDayEntryDate", matcher=predicate)
+
+    @staticmethod
+    def _next_day_entry_matcher() -> AttributeMatcher:
+        def predicate(report: AttributeValue) -> bool:
+            if report.attribute == cluster.Attributes.NextDayEntry:
+                return True
+            else:
+                return False
+        return AttributeMatcher.from_callable(description="NextDayEntry", matcher=predicate)
+
+    @staticmethod
+    def _next_day_entry_date_matcher() -> AttributeMatcher:
+        def predicate(report: AttributeValue) -> bool:
+            if report.attribute == cluster.Attributes.NextDayEntryDate:
+                return True
+            else:
+                return False
+        return AttributeMatcher.from_callable(description="NextDayEntryDate", matcher=predicate)
+
+    @staticmethod
+    def _tariff_components_matcher() -> AttributeMatcher:
+        def predicate(report: AttributeValue) -> bool:
+            if report.attribute == cluster.Attributes.TariffComponents:
+                return True
+            else:
+                return False
+        return AttributeMatcher.from_callable(description="TariffComponents", matcher=predicate)
+
+    @staticmethod
+    def _tariff_periods_matcher() -> AttributeMatcher:
+        def predicate(report: AttributeValue) -> bool:
+            if report.attribute == cluster.Attributes.TariffPeriods:
+                return True
+            else:
+                return False
+        return AttributeMatcher.from_callable(description="TariffPeriods", matcher=predicate)
+
+    @staticmethod
+    def _current_tariff_component_matcher() -> AttributeMatcher:
+        def predicate(report: AttributeValue) -> bool:
+            if report.attribute == cluster.Attributes.CurrentTariffComponents:
+                return True
+            else:
+                return False
+        return AttributeMatcher.from_callable(description="CurrentTariffComponents", matcher=predicate)
+
+    @staticmethod
+    def _next_tariff_component_matcher() -> AttributeMatcher:
+        def predicate(report: AttributeValue) -> bool:
+            if report.attribute == cluster.Attributes.NextTariffComponents:
+                return True
+            else:
+                return False
+        return AttributeMatcher.from_callable(description="NextTariffComponents", matcher=predicate)
+
+    @staticmethod
+    def _default_randomization_offset_matcher() -> AttributeMatcher:
+        def predicate(report: AttributeValue) -> bool:
+            if report.attribute == cluster.Attributes.DefaultRandomizationOffset:
+                return True
+            else:
+                return False
+        return AttributeMatcher.from_callable(description="DefaultRandomizationOffset", matcher=predicate)
+
+    @staticmethod
+    def _default_randomization_type_matcher() -> AttributeMatcher:
+        def predicate(report: AttributeValue) -> bool:
+            if report.attribute == cluster.Attributes.DefaultRandomizationType:
+                return True
+            else:
+                return False
+        return AttributeMatcher.from_callable(description="DefaultRandomizationType", matcher=predicate)
+
+    def get_mandatory_matchers(self) -> List[AttributeMatcher]:
+
+        return [
+            self._tariff_info_matcher(),
+            self._tariff_unit_matcher(),
+            self._start_date_matcher(),
+            self._day_entries_matcher(),
+            self._day_patterns_matcher(),
+            self._calendar_periods_matcher(),
+            self._individual_days_matcher(),
+            self._current_day_matcher(),
+            self._next_day_matcher(),
+            self._current_day_entry_matcher(),
+            self._current_day_entry_date_matcher(),
+            self._next_day_entry_matcher(),
+            self._next_day_entry_date_matcher(),
+            self._tariff_components_matcher(),
+            self._tariff_periods_matcher(),
+            self._current_tariff_component_matcher(),
+            self._next_tariff_component_matcher()
+        ]
