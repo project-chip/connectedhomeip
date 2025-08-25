@@ -27,13 +27,12 @@ from copy import deepcopy
 from dataclasses import dataclass, field
 from enum import Enum, auto
 from importlib.abc import Traversable
-from typing import Optional, Union
+from typing import Callable, Optional, Union
 
 import matter.clusters as Clusters
 import matter.testing.conformance as conformance_support
-from matter.testing.conformance import (OPTIONAL_CONFORM, TOP_LEVEL_CONFORMANCE_TAGS, ConformanceDecisionWithChoice,
-                                        ConformanceException, ConformanceParseParameters, feature, is_disallowed, mandatory,
-                                        optional, or_operation, parse_callable_from_xml, parse_device_type_callable_from_xml)
+from matter.testing.conformance import (OPTIONAL_CONFORM, TOP_LEVEL_CONFORMANCE_TAGS, ConformanceException, ConformanceParseParameters, feature, is_disallowed, mandatory,
+                                        optional, or_operation, parse_callable_from_xml)
 from matter.testing.global_attribute_ids import GlobalAttributeIds
 from matter.testing.problem_notices import (AttributePathLocation, ClusterPathLocation, CommandPathLocation, DeviceTypePathLocation,
                                             EventPathLocation, FeaturePathLocation, ProblemNotice, ProblemSeverity)
