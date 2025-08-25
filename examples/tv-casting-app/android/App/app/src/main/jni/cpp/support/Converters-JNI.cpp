@@ -480,7 +480,7 @@ matter::casting::core::IdentificationDeclarationOptions * convertIdentificationD
     cppIdOptions->mCommissionerPasscode      = env->GetBooleanField(jIdOptions, commissionerPasscodeField);
     cppIdOptions->mCommissionerPasscodeReady = env->GetBooleanField(jIdOptions, commissionerPasscodeReadyField);
     cppIdOptions->mCancelPasscode            = env->GetBooleanField(jIdOptions, cancelPasscodeField);
-    cppIdOptions->mPasscodeLength            = env->GetIntField(jIdOptions, passcodeLengthField);
+    cppIdOptions->mPasscodeLength            = static_cast<uint8_t>(env->GetIntField(jIdOptions, passcodeLengthField));
 
     jobject targetAppInfosList = env->GetObjectField(jIdOptions, targetAppInfosField);
     VerifyOrReturnValue(
