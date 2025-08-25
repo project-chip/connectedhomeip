@@ -102,11 +102,11 @@ class TC_TIMESYNC_2_9(MatterBaseTest):
 
         self.print_step(4, "Read UTCTime")
         utc = await self.read_ts_attribute_expect_success(utc_attr)
-        timeoperations.compare_time(received=utc, offset=timedelta(), tolerance=timedelta(seconds=5))
+        compare_time(received=utc, offset=timedelta(), tolerance=timedelta(seconds=5))
 
         self.print_step(5, "Read LocalTime")
         local = await self.read_ts_attribute_expect_success(local_attr)
-        timeoperations.compare_time(received=local, offset=timedelta(seconds=7200+3600), tolerance=timedelta(seconds=5))
+        compare_time(received=local, offset=timedelta(seconds=7200+3600), tolerance=timedelta(seconds=5))
 
         self.print_step(6, "Send SetDSTOffset command")
         dst = [dst_struct(offset=-3600, validStarting=0, validUntil=NullValue)]
@@ -114,11 +114,11 @@ class TC_TIMESYNC_2_9(MatterBaseTest):
 
         self.print_step(7, "Read UTCTime")
         utc = await self.read_ts_attribute_expect_success(utc_attr)
-        timeoperations.compare_time(received=utc, offset=timedelta(), tolerance=timedelta(seconds=5))
+        compare_time(received=utc, offset=timedelta(), tolerance=timedelta(seconds=5))
 
         self.print_step(8, "Read LocalTime")
         local = await self.read_ts_attribute_expect_success(local_attr)
-        timeoperations.compare_time(received=local, offset=timedelta(seconds=7200-3600), tolerance=timedelta(seconds=5))
+        compare_time(received=local, offset=timedelta(seconds=7200-3600), tolerance=timedelta(seconds=5))
 
         self.print_step(9, "Send SetTimeZone command")
         tz = [tz_struct(offset=-7200, validAt=0)]
@@ -131,11 +131,11 @@ class TC_TIMESYNC_2_9(MatterBaseTest):
 
         self.print_step(11, "Read UTCTime")
         utc = await self.read_ts_attribute_expect_success(utc_attr)
-        timeoperations.compare_time(received=utc, offset=timedelta(), tolerance=timedelta(seconds=5))
+        compare_time(received=utc, offset=timedelta(), tolerance=timedelta(seconds=5))
 
         self.print_step(12, "Read LocalTime")
         local = await self.read_ts_attribute_expect_success(local_attr)
-        timeoperations.compare_time(received=local, offset=timedelta(seconds=-7200+3600), tolerance=timedelta(seconds=5))
+        compare_time(received=local, offset=timedelta(seconds=-7200+3600), tolerance=timedelta(seconds=5))
 
         self.print_step(13, "Send SetDSTOffset command")
         dst = [dst_struct(offset=-3600, validStarting=0, validUntil=NullValue)]
@@ -143,11 +143,11 @@ class TC_TIMESYNC_2_9(MatterBaseTest):
 
         self.print_step(14, "Read UTCTime")
         utc = await self.read_ts_attribute_expect_success(utc_attr)
-        timeoperations.compare_time(received=utc, offset=timedelta(), tolerance=timedelta(seconds=5))
+        compare_time(received=utc, offset=timedelta(), tolerance=timedelta(seconds=5))
 
         self.print_step(15, "Read LocalTime")
         local = await self.read_ts_attribute_expect_success(local_attr)
-        timeoperations.compare_time(received=local, offset=timedelta(seconds=-7200-3600), tolerance=timedelta(seconds=5))
+        compare_time(received=local, offset=timedelta(seconds=-7200-3600), tolerance=timedelta(seconds=5))
 
         self.print_step(16, "Send SetTimeZone command")
         tz = [tz_struct(offset=0, validAt=0)]
