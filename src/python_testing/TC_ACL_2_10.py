@@ -130,7 +130,7 @@ class TC_ACL_2_10(MatterBaseTest):
             filterType=ChipDeviceCtrl.DiscoveryFilterType.LONG_DISCRIMINATOR, filter=self.discriminator)
 
         self.step(4)
-        # Read CurrentFabricIndex again after TH2 commissioning
+        # Read TH2's fabric index
         f2 = await self.read_single_attribute_check_success(dev_ctrl=self.th2, endpoint=0, cluster=oc_cluster, attribute=cfi_attribute)
         logging.info("CurrentFabricIndex F2: %s", str(f2))
 
