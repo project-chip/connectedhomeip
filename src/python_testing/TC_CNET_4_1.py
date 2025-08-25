@@ -43,6 +43,9 @@ class TC_CNET_4_1(MatterBaseTest):
     def desc_TC_CNET_4_1(self) -> str:
         return "[TC-CNET-4.1] [Wi-Fi] Verification for attributes check [DUT-Server]"
 
+    def pics_TC_CNET_4_1(self):
+        return ['CNET.S.F00']
+
     def steps_TC_CNET_4_1(self) -> list[TestStep]:
         steps = [
             TestStep(0, test_plan_support.commission_if_required(), "", is_commissioning=True),
