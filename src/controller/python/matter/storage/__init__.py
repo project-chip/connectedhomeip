@@ -191,34 +191,29 @@ class PersistentStorageBase(PersistentStorage):
     and SDK configurations.
     """
 
-    def __init__(self, data: Dict = {}):
+    def __init__(self, data: Dict = {}, sdkData: Dict = {}):
         """Initializes the persistent storage with provided data."""
         super().__init__()
         self._data = copy.deepcopy(data)
-        if 'sdk-config' not in self._data:
-            LOGGER.warning("No valid SDK configuration present")
-            self._data['sdk-config'] = {}
-        if 'repl-config' not in self._data:
-            LOGGER.warning("No valid REPL configuration present")
-            self._data['repl-config'] = {}
+        self._sdkData = copy.deepcopy(sdkData)
 
     def GetKey(self, key: str) -> Any | None:
-        return copy.deepcopy(self._data['repl-config'].get(key, None))
+        return copy.deepcopy(self._data.get(key, None))
 
     def SetKey(self, key: str, value: Any):
         if not key:
             raise ValueError("Invalid key")
         LOGGER.debug("Set key: %s = %s", key, value)
-        self._data['repl-config'][key] = value
+        self._data[key] = value
         self.Commit()
 
     def DeleteKey(self, key: str):
         LOGGER.debug("Delete key: %s", key)
-        self._data['repl-config'].pop(key, None)
+        self._data.pop(key, None)
         self.Commit()
 
     def GetSdkKey(self, key: str) -> bytes | None:
-        if value := self._data['sdk-config'].get(key, None):
+        if value := self._sdkData.get(key, None):
             return base64.b64decode(value)
         return None
 
@@ -228,12 +223,12 @@ class PersistentStorageBase(PersistentStorage):
         if value is None:
             raise ValueError("SDK key value is not expected to be None")
         LOGGER.debug("Set SDK key: %s = hex:%s", key, value.hex())
-        self._data['sdk-config'][key] = base64.b64encode(value).decode("utf-8")
+        self._sdkData[key] = base64.b64encode(value).decode("utf-8")
         self.Commit()
 
     def DeleteSdkKey(self, key: str):
         LOGGER.debug("Delete SDK key: %s", key)
-        self._data['sdk-config'].pop(key, None)
+        self._sdkData.pop(key, None)
         self.Commit()
 
 
@@ -257,59 +252,61 @@ _caKeyMatch = re.compile(r'(ExampleCAIntermediateCert|ExampleCARootCert|ExampleO
 class PersistentStorageJSON(PersistentStorageBase):
     """Persistent storage back-end which stores data in a JSON file."""
 
-    def _caKeysBackwardCompatibilityRewrite(self, data: Dict) -> Dict:
+    def _caKeysBackwardCompatibilityRewrite(self, data: Dict, sdkData: Dict):
         """Rewrites CA keys if the index does not start from 0.
 
         This rewrite is a backward compatibility patch for old CertificateAuthority
         class which used 1-based indexing for CA keys. The new implementation uses
         0-based indexing to be compatible with chip-tool implementation.
         """
-        sdkConfig = data.get('sdk-config', {})
-        replConfig = data.get('repl-config', {})
-
         caKeys = {}
-        for key in sdkConfig:
+        for key in sdkData:
             if match := _caKeyMatch.fullmatch(key):
                 caKeys[key] = (match.group(1), int(match.group(2)))
 
         if not caKeys or min([v[1] for v in caKeys.values()]) == 0:
             # No CA keys found or they are 0-based indexed - nothing to rewrite.
-            return data
+            return data, sdkData
 
         LOGGER.info("Rewriting CA keys to 0-based indexing")
 
         caKeysRewritten = {}
         for key, (prefix, index) in caKeys.items():
-            caKeysRewritten[f"{prefix}{index - 1}"] = sdkConfig.pop(key)
-        data['sdk-config'].update(caKeysRewritten)
+            caKeysRewritten[f"{prefix}{index - 1}"] = sdkData.pop(key)
+        sdkData.update(caKeysRewritten)
 
         caListRewritten = {}
-        for key, value in replConfig.get('caList', {}).items():
+        for key, value in data.get('caList', {}).items():
             caListRewritten[str(int(key) - 1)] = value
-        replConfig['caList'] = caListRewritten
+        data['caList'] = caListRewritten
 
-        return data
+        return data, sdkData
 
     def __init__(self, path: str):
         LOGGER.info("Loading configuration from JSON file: %s", path)
         self._path = path
         try:
             with open(self._path) as f:
-                data = json.loads(f.read() or '{}')
+                jsonData = json.loads(f.read() or '{}')
+                data = jsonData.get('repl-config', {})
+                sdkData = jsonData.get('sdk-config', {})
                 # TODO: Remove this compatibility layer when all JSON files are rewritten.
-                data = self._caKeysBackwardCompatibilityRewrite(data)
+                data, sdkData = self._caKeysBackwardCompatibilityRewrite(data, sdkData)
         except FileNotFoundError:
             LOGGER.info("Configuration file not found, using empty configuration")
-            data = {}
+            data, sdkData = {}, {}
         except Exception as ex:
             LOGGER.critical("Could not load configuration from JSON file: %s", ex)
-            data = {}
-        super().__init__(data)
+            data, sdkData = {}, {}
+        super().__init__(data, sdkData)
 
     def Commit(self):
         try:
             with open(self._path, 'w') as f:
-                json.dump(self._data, f, ensure_ascii=True, indent=4)
+                json.dump({
+                    'repl-config': self._data,
+                    'sdk-config': self._sdkData,
+                }, f, ensure_ascii=True, indent=4)
         except Exception as ex:
             LOGGER.critical("Could not save configuration to JSON file: %s", ex)
 
@@ -345,13 +342,13 @@ class PersistentStorageINI(PersistentStorageBase):
         self._chipToolFabricStoragePath = chipToolFabricStoragePath
         self._path = path
         try:
-            data = {}
+            data, sdkData = {}, {}
             config = PersistentStorageINI.ConfigParser()
             config.read(path)
             if config.has_section('Default'):
-                data['sdk-config'] = dict(config.items('Default'))
+                sdkData = dict(config.items('Default'))
             if config.has_section('REPL'):
-                data['repl-config'] = {
+                data = {
                     k: json.loads(v) if v else None
                     for k, v in config.items('REPL')
                 }
@@ -359,18 +356,18 @@ class PersistentStorageINI(PersistentStorageBase):
                 LOGGER.info("Loading fabric configuration from INI file: %s", chipToolFabricStoragePath)
                 config.read(chipToolFabricStoragePath)
                 for key, value in config.items('Default'):
-                    data['sdk-config'][key] = value
+                    sdkData[key] = value
         except Exception as ex:
             LOGGER.critical("Could not load configuration from INI file: %s", ex)
-        super().__init__(data)
+        super().__init__(data, sdkData)
 
     def Commit(self):
         # Get a copy of the SDK configuration so that we can modify it.
-        sdkConfig = self._data['sdk-config'].copy()
+        sdkConfig = self._sdkData.copy()
         if self._chipToolFabricStoragePath:
             # Compatibility layer with chip-tool persistent storage.
             configFabric = PersistentStorageINI.ConfigParser()
-            for key in self._data['sdk-config']:
+            for key in self._sdkData:
                 # Move CA keys to the separate fabric configuration file.
                 if _caKeyMatch.fullmatch(key):
                     configFabric['Default'][key] = sdkConfig.pop(key)
@@ -383,7 +380,7 @@ class PersistentStorageINI(PersistentStorageBase):
         config['Default'] = sdkConfig
         config['REPL'] = {
             k: json.dumps(v, separators=(',', ':'))
-            for k, v in self._data['repl-config'].items()
+            for k, v in self._data.items()
         }
         try:
             with open(self._path, 'w') as f:
