@@ -169,6 +169,8 @@ uint32_t IdentificationDeclaration::WritePayload(uint8_t * payloadBuffer, size_t
                  LogErrorOnFailure(err));
     VerifyOrExit(CHIP_NO_ERROR == (err = writer.PutBoolean(chip::TLV::ContextTag(kCancelPasscodeTag), mCancelPasscode)),
                  LogErrorOnFailure(err));
+    VerifyOrExit(CHIP_NO_ERROR == (err = writer.Put(chip::TLV::ContextTag(kPasscodeLengthTag), GetPasscodeLength())),
+                 LogErrorOnFailure(err));
 
     VerifyOrExit(CHIP_NO_ERROR == (err = writer.EndContainer(outerContainerType)), LogErrorOnFailure(err));
     VerifyOrExit(CHIP_NO_ERROR == (err = writer.Finalize()), LogErrorOnFailure(err));
@@ -225,6 +227,9 @@ CHIP_ERROR CommissionerDeclaration::ReadPayload(uint8_t * udcPayload, size_t pay
             break;
         case kCancelPasscodeTag:
             err = reader.Get(mCancelPasscode);
+            break;
+        case kPasscodeLengthTag:
+            err = reader.Get(mPasscodeLength);
             break;
         }
     }
