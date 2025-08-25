@@ -36,8 +36,8 @@
 #include <lib/support/BytesToHex.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/SafeInt.h>
+#include <lib/support/logging/Constants.h>
 #include <protocols/Protocols.h>
-
 namespace chip {
 namespace Credentials {
 
@@ -557,6 +557,8 @@ CHIP_ERROR ConvertX509CertToChipCert(const ByteSpan x509Cert, MutableByteSpan & 
     TLVWriter writer;
 
     VerifyOrReturnError(!x509Cert.empty(), CHIP_ERROR_INVALID_ARGUMENT);
+    ChipLogError(kLogModule_Crypto, "Bound check: cert.size=%zu, CanCastTo<uint32_t>=%d", x509Cert.size(),
+                 CanCastTo<uint32_t>(x509Cert.size()));
     VerifyOrReturnError(CanCastTo<uint32_t>(x509Cert.size()), CHIP_ERROR_INVALID_ARGUMENT);
 
     reader.Init(x509Cert);
