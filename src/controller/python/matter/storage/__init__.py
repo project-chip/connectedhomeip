@@ -39,9 +39,7 @@ class PersistentStorage(ABC):
     """Abstract base class for persistent storage.
 
     This class provides persistent storage interface for both the Matter SDK
-    and the native Python configuration storage. It keeps the configuration in
-    the dictionary _data attribute with two top-level keys 'repl-config' and
-    'sdk-config' respectively for the REPL and SDK configurations.
+    and the native Python configuration storage.
 
     It interfaces with a C++ adapter that implements the PersistentStorageDelegate
     interface and can be passed into C++ logic that needs an instance of that
@@ -80,25 +78,13 @@ class PersistentStorage(ABC):
     def _OnDeleteKeyValueCb(self, key):
         self.DeleteSdkKey(key.decode("utf-8"))
 
-    def __init__(self, data: Dict = {}):
-        """Initializes the persistent storage with provided data."""
-        self._data = copy.deepcopy(data)
+    def __init__(self):
         self._handle = GetLibraryHandle()
-
-        if 'sdk-config' not in self._data:
-            LOGGER.warning("No valid SDK configuration present")
-            self._data['sdk-config'] = {}
-
-        if 'repl-config' not in self._data:
-            LOGGER.warning("No valid REPL configuration present")
-            self._data['repl-config'] = {}
-
         self._handle.pychip_Storage_InitializeStorageAdapter.restype = c_void_p
         self._handle.pychip_Storage_InitializeStorageAdapter.argtypes = [ctypes.py_object,
                                                                          _SetKeyValueCbFunc,
                                                                          _GetKeyValueCbFunc,
                                                                          _DeleteKeyValueCbFunc]
-
         self._closure = self._handle.pychip_Storage_InitializeStorageAdapter(
             ctypes.py_object(self), self._OnSetKeyValueCb, self._OnGetKeyValueCb, self._OnDeleteKeyValueCb)
 
@@ -197,14 +183,24 @@ class PersistentStorage(ABC):
         pass
 
 
-class VolatileTemporaryPersistentStorage(PersistentStorage):
-    """In-memory temporary persistent storage.
+class PersistentStorageBase(PersistentStorage):
+    """Base class for persistent storage implementations.
 
-    This class does not provide any persistence storage on its own. It keeps
-    the configuration in memory. Please use a dedicated subclass to provide
-    a non-volatile persistence storage, such as PersistentStorageJSON or
-    PersistentStorageINI.
+    This class keeps the configuration in the dictionary _data attribute with
+    two top-level keys 'repl-config' and 'sdk-config' respectively for the REPL
+    and SDK configurations.
     """
+
+    def __init__(self, data: Dict = {}):
+        """Initializes the persistent storage with provided data."""
+        super().__init__()
+        self._data = copy.deepcopy(data)
+        if 'sdk-config' not in self._data:
+            LOGGER.warning("No valid SDK configuration present")
+            self._data['sdk-config'] = {}
+        if 'repl-config' not in self._data:
+            LOGGER.warning("No valid REPL configuration present")
+            self._data['repl-config'] = {}
 
     def GetKey(self, key: str) -> Any | None:
         return copy.deepcopy(self._data['repl-config'].get(key, None))
@@ -240,6 +236,16 @@ class VolatileTemporaryPersistentStorage(PersistentStorage):
         self._data['sdk-config'].pop(key, None)
         self.Commit()
 
+
+class VolatileTemporaryPersistentStorage(PersistentStorageBase):
+    """In-memory temporary persistent storage.
+
+    This class does not provide any persistence storage on its own. It keeps
+    the configuration in memory. Please use a dedicated subclass to provide
+    a non-volatile persistence storage, such as PersistentStorageJSON or
+    PersistentStorageINI.
+    """
+
     def Commit(self):
         pass
 
@@ -248,7 +254,7 @@ class VolatileTemporaryPersistentStorage(PersistentStorage):
 _caKeyMatch = re.compile(r'(ExampleCAIntermediateCert|ExampleCARootCert|ExampleOpCredsCAKey|ExampleOpCredsICAKey)(\d+)')
 
 
-class PersistentStorageJSON(VolatileTemporaryPersistentStorage):
+class PersistentStorageJSON(PersistentStorageBase):
     """Persistent storage back-end which stores data in a JSON file."""
 
     def _caKeysBackwardCompatibilityRewrite(self, data: Dict) -> Dict:
@@ -308,7 +314,7 @@ class PersistentStorageJSON(VolatileTemporaryPersistentStorage):
             LOGGER.critical("Could not save configuration to JSON file: %s", ex)
 
 
-class PersistentStorageINI(VolatileTemporaryPersistentStorage):
+class PersistentStorageINI(PersistentStorageBase):
     """Persistent storage back-end which stores data in an INI file.
 
     This persistent storage is compatible with the chip-tool implementation.
