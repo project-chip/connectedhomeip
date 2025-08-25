@@ -1354,6 +1354,9 @@ void CameraAvSettingsUserLevelMgmtServer::HandleDPTZRelativeMove(HandlerContext 
 //
 void CameraAvSettingsUserLevelMgmtServer::OnPhysicalMovementComplete(Status status)
 {
+    // Make sure we're running in the Matter thread
+    assertChipStackLockedByCurrentThread();
+    
     if (status == Status::Success)
     {
         SetPan(mTargetPan);

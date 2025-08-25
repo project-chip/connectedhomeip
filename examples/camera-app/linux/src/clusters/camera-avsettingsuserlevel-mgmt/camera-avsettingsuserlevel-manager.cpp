@@ -314,11 +314,14 @@ static void onTimerExpiry(System::Layer * systemLayer, void * data)
 {
     CameraAVSettingsUserLevelManager * delegate = reinterpret_cast<CameraAVSettingsUserLevelManager *>(data);
 
-    // Make sure that our delegate instance is still alive
-    if (delegate != nullptr)
-    {
-        delegate->OnPhysicalMoveCompleted(Protocols::InteractionModel::Status::Success);
-    }
+    // All timers are cancelled on delegate shutdown, hence if this is invoked the delegate is alive
+    delegate->OnPhysicalMoveCompleted(Protocols::InteractionModel::Status::Success);
+}
+
+void CameraAVSettingsUserLevelManager::CancelActiveTimers()
+{
+    // Cancel the PTZ mimic timer if it is active
+    DeviceLayer::SystemLayer().CancelTimer(onTimerExpiry, this);
 }
 
 // To be invoked by the camera once a physical PTZ action has completed. The callback method is realized by our cluster server,
@@ -326,10 +329,7 @@ static void onTimerExpiry(System::Layer * systemLayer, void * data)
 //
 void CameraAVSettingsUserLevelManager::OnPhysicalMoveCompleted(Protocols::InteractionModel::Status status)
 {
-    // Make sure we're running in the Matter thread
-    assertChipStackLockedByCurrentThread();
-
-    if (this->GetServer() != nullptr)
+    if (GetServer() != nullptr)
     {
         if (mCallback != nullptr)
         {

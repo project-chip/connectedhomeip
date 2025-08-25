@@ -30,7 +30,7 @@ class AVSettingsUserLevelManagementDelegate : public Delegate
 {
 public:
     AVSettingsUserLevelManagementDelegate()  = default;
-    ~AVSettingsUserLevelManagementDelegate() = default;
+    ~AVSettingsUserLevelManagementDelegate() { CancelActiveTimers(); };
 
     bool CanChangeMPTZ() override;
 
@@ -41,6 +41,14 @@ public:
     virtual void VideoStreamAllocated(uint16_t aStreamID) override;
     virtual void VideoStreamDeallocated(uint16_t aStreamID) override;
     virtual void DefaultViewportUpdated(Globals::Structs::ViewportStruct::Type aViewport) override;
+
+
+    // To be invoked by the Camera App once a physical PTZ action has been completed.  This is expected to be a discrete period of
+    // time after a request is made for PTZ via the HAL.  This results on the request command receiving an appropriate status
+    // response.
+    void OnPhysicalMoveCompleted(Protocols::InteractionModel::Status status);
+
+    void CancelActiveTimers();
 
     /**
      * delegate command handlers

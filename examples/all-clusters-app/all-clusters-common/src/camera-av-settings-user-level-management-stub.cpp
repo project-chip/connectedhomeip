@@ -31,6 +31,8 @@ std::unique_ptr<AVSettingsUserLevelManagementDelegate> gDelegate;
 std::unique_ptr<CameraAvSettingsUserLevelMgmtServer> gAVSettingsUserLevelManagementCluster;
 static constexpr EndpointId kEndpointId = 1;
 
+static void onTimerExpiry(System::Layer * systemLayer, void * data);
+
 void Shutdown()
 {
     if (gAVSettingsUserLevelManagementCluster != nullptr)
@@ -76,16 +78,9 @@ Status AVSettingsUserLevelManagementDelegate::MPTZSetPosition(Optional<int16_t> 
     // hardware interactions to actually set the camera to the new values of PTZ.  Once the hardware has confirmed movements, invoke
     // the callback. The server itself will persist the new values.
     //
-    if (callback != nullptr)
-    {
-        mCallback = callback;
-        DeviceLayer::SystemLayer().ScheduleLambda([this] {
-            if (this->GetServer() != nullptr)
-            {
-                mCallback->OnPhysicalMovementComplete(Status::Success);
-            }
-        });
-    }
+    mCallback = callback;
+    DeviceLayer::SystemLayer().StartTimer(System::Clock::Seconds16(2), onTimerExpiry, this);
+    
     return Status::Success;
 }
 
@@ -96,16 +91,9 @@ Status AVSettingsUserLevelManagementDelegate::MPTZRelativeMove(Optional<int16_t>
     // hardware interactions to actually set the camera to the new values of PTZ.  Once the hardware has confirmed movements, invoke
     // the callback. The server itself will persist the new values.
     //
-    if (callback != nullptr)
-    {
-        mCallback = callback;
-        DeviceLayer::SystemLayer().ScheduleLambda([this] {
-            if (this->GetServer() != nullptr)
-            {
-                mCallback->OnPhysicalMovementComplete(Status::Success);
-            }
-        });
-    }
+    mCallback = callback;
+    DeviceLayer::SystemLayer().StartTimer(System::Clock::Seconds16(2), onTimerExpiry, this);
+    
     return Status::Success;
 }
 
@@ -116,16 +104,9 @@ Status AVSettingsUserLevelManagementDelegate::MPTZMoveToPreset(uint8_t aPreset, 
     // Do any needed hardware interactions to actually set the camera to the new values of PTZ.  Once the hardware has confirmed
     // movements, invoke the callback. The server itself will persist the new values.
     //
-    if (callback != nullptr)
-    {
-        mCallback = callback;
-        DeviceLayer::SystemLayer().ScheduleLambda([this] {
-            if (this->GetServer() != nullptr)
-            {
-                mCallback->OnPhysicalMovementComplete(Status::Success);
-            }
-        });
-    }
+    mCallback = callback;
+    DeviceLayer::SystemLayer().StartTimer(System::Clock::Seconds16(2), onTimerExpiry, this);
+    
     return Status::Success;
 }
 
@@ -185,6 +166,36 @@ CHIP_ERROR AVSettingsUserLevelManagementDelegate::LoadDPTZStreams(std::vector<DP
 CHIP_ERROR AVSettingsUserLevelManagementDelegate::PersistentAttributesLoadedCallback()
 {
     return CHIP_NO_ERROR;
+}
+
+// Timer expiration to mimic PTZ physical movememt
+//
+static void onTimerExpiry(System::Layer * systemLayer, void * data)
+{
+    AVSettingsUserLevelManagementDelegate * delegate = reinterpret_cast<AVSettingsUserLevelManagementDelegate *>(data);
+
+    // All timers are cancelled on delegate shutdown, hence if this is invoked the delegate is alive
+    delegate->OnPhysicalMoveCompleted(Protocols::InteractionModel::Status::Success);
+}
+
+void AVSettingsUserLevelManagementDelegate::CancelActiveTimers()
+{
+    // Cancel the PTZ mimic timer if it is active
+    DeviceLayer::SystemLayer().CancelTimer(onTimerExpiry, this);
+}
+
+// To be invoked by the camera once a physical PTZ action has completed. The callback method is realized by our cluster server,
+// make sure that is still alive before trying to invoke methods thereon.
+//
+void AVSettingsUserLevelManagementDelegate::OnPhysicalMoveCompleted(Protocols::InteractionModel::Status status)
+{
+    if (GetServer() != nullptr)
+    {
+        if (mCallback != nullptr)
+        {
+            mCallback->OnPhysicalMovementComplete(status);
+        }
+    }
 }
 
 void emberAfCameraAvSettingsUserLevelManagementClusterInitCallback(chip::EndpointId aEndpointId)

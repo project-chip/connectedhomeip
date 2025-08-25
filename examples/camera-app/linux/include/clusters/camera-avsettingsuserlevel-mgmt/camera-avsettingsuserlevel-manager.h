@@ -34,7 +34,7 @@ class CameraAVSettingsUserLevelManager : public Delegate
 {
 public:
     CameraAVSettingsUserLevelManager()  = default;
-    ~CameraAVSettingsUserLevelManager() = default;
+    ~CameraAVSettingsUserLevelManager() { CancelActiveTimers(); };
 
     bool CanChangeMPTZ() override;
 
@@ -66,6 +66,8 @@ public:
     // response.
     void OnPhysicalMoveCompleted(Protocols::InteractionModel::Status status);
 
+    void CancelActiveTimers();
+    
     /**
      * DPTZ Stream Indication
      */
