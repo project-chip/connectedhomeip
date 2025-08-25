@@ -19,8 +19,8 @@
 
 #include <app/CASESessionManager.h>
 #include <app/clusters/bindings/PendingNotificationMap.h>
-#include <app/server/Server.h>
 #include <app/clusters/bindings/binding-table.h>
+#include <app/server/Server.h>
 #include <credentials/FabricTable.h>
 #include <lib/core/CHIPPersistentStorageDelegate.h>
 
