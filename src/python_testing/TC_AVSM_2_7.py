@@ -132,38 +132,48 @@ class TC_AVSM_2_7(MatterBaseTest):
             ),
             TestStep(
                 17,
+                "TH sends the VideoStreamAllocate command with the same arguments from step 10 except with StreamUsage set to Internal",
+                "DUT responds with a CONSTRAINT_ERROR status code.",
+            ),
+            TestStep(
+                18,
                 "TH sends the VideoStreamAllocate command with the same arguments from step 10 except StreamUsage set to a value not in aStreamUsagePriorities.",
                 "DUT responds with a INVALID IN STATE status code.",
             ),
             TestStep(
-                18,
+                19,
                 "TH sends the VideoStreamAllocate command with the same arguments from step 10 except MinFrameRate set to 0(outside of valid range).",
                 "DUT responds with a CONSTRAINT_ERROR status code.",
             ),
             TestStep(
-                19,
+                20,
                 "TH sends the VideoStreamAllocate command with the same arguments from step 10 except MinFrameRate > MaxFrameRate.",
                 "DUT responds with a CONSTRAINT_ERROR status code.",
             ),
             TestStep(
-                20,
+                21,
                 "TH sends the VideoStreamAllocate command with the same arguments from step 10 except MinBitRate set to 0(outside of valid range).",
                 "DUT responds with a CONSTRAINT_ERROR status code.",
             ),
             TestStep(
-                21,
+                22,
                 "TH sends the VideoStreamAllocate command with the same arguments from step 10 except MinBitRate > MaxBitRate.",
                 "DUT responds with a CONSTRAINT_ERROR status code.",
             ),
             TestStep(
-                22,
-                "TH sends the VideoStreamAllocate command with the same arguments from step 10 except MinKeyFrameInterval > MaxKeyFrameInterval.",
+                23,
+                "TH sends the VideoStreamAllocate command with the same arguments from step 10 except KeyFrameInterval > Max value",
                 "DUT responds with a CONSTRAINT_ERROR status code.",
             ),
             TestStep(
-                23,
+                24,
                 "TH sends the VideoStreamAllocate command with the same arguments from step 10 except VideoCodec is set to 10 (out of range).",
                 "DUT responds with a CONSTRAINT_ERROR status code.",
+            ),
+            TestStep(
+                25,
+                "TH sends the VideoStreamAllocate command with the same arguments from step 10 except MaxFrameRate set to a value not in aVideoSensorParams.",
+                "DUT responds with a DYNAMIC_CONSTRAINT_ERROR status code.",
             ),
         ]
 
@@ -344,6 +354,36 @@ class TC_AVSM_2_7(MatterBaseTest):
 
         self.step(17)
         try:
+            outOfConstraintStreamUsage = Globals.Enums.StreamUsageEnum.kInternal
+            videoStreamAllocateCmd = commands.VideoStreamAllocate(
+                streamUsage=outOfConstraintStreamUsage,
+                videoCodec=aRateDistortionTradeOffPoints[0].codec,
+                minFrameRate=30,  # An acceptable value for min frame rate
+                maxFrameRate=aVideoSensorParams.maxFPS,
+                minResolution=aMinViewport,
+                maxResolution=cluster.Structs.VideoResolutionStruct(
+                    width=aVideoSensorParams.sensorWidth, height=aVideoSensorParams.sensorHeight
+                ),
+                minBitRate=aRateDistortionTradeOffPoints[0].minBitRate,
+                maxBitRate=aRateDistortionTradeOffPoints[0].minBitRate,
+                keyFrameInterval=4000,
+                watermarkEnabled=watermark,
+                OSDEnabled=osd,
+            )
+            await self.send_single_cmd(endpoint=endpoint, cmd=videoStreamAllocateCmd)
+            asserts.fail(
+                "Unexpected success when expecting CONSTRAINT_ERROR due to StreamUsage set to Internal",
+            )
+        except InteractionModelError as e:
+            asserts.assert_equal(
+                e.status,
+                Status.ConstraintError,
+                "Unexpected error returned when expecting CONSTRAINT_ERROR due to StreamUsage set to Internal",
+            )
+            pass
+
+        self.step(18)
+        try:
             notSupportedStreamUsage = next(
                 (e for e in Globals.Enums.StreamUsageEnum if e not in aStreamUsagePriorities and e != Globals.Enums.StreamUsageEnum.kInternal),
                 Globals.Enums.StreamUsageEnum.kUnknownEnumValue,
@@ -375,7 +415,7 @@ class TC_AVSM_2_7(MatterBaseTest):
             )
             pass
 
-        self.step(18)
+        self.step(19)
         try:
             videoStreamAllocateCmd = commands.VideoStreamAllocate(
                 streamUsage=aStreamUsagePriorities[0],
@@ -402,7 +442,7 @@ class TC_AVSM_2_7(MatterBaseTest):
             )
             pass
 
-        self.step(19)
+        self.step(20)
         try:
             videoStreamAllocateCmd = commands.VideoStreamAllocate(
                 streamUsage=aStreamUsagePriorities[0],
@@ -429,7 +469,7 @@ class TC_AVSM_2_7(MatterBaseTest):
             )
             pass
 
-        self.step(20)
+        self.step(21)
         try:
             videoStreamAllocateCmd = commands.VideoStreamAllocate(
                 streamUsage=aStreamUsagePriorities[0],
@@ -456,7 +496,7 @@ class TC_AVSM_2_7(MatterBaseTest):
             )
             pass
 
-        self.step(21)
+        self.step(22)
         try:
             videoStreamAllocateCmd = commands.VideoStreamAllocate(
                 streamUsage=aStreamUsagePriorities[0],
@@ -483,7 +523,7 @@ class TC_AVSM_2_7(MatterBaseTest):
             )
             pass
 
-        self.step(22)
+        self.step(23)
         try:
             videoStreamAllocateCmd = commands.VideoStreamAllocate(
                 streamUsage=aStreamUsagePriorities[0],
@@ -494,9 +534,9 @@ class TC_AVSM_2_7(MatterBaseTest):
                 maxResolution=cluster.Structs.VideoResolutionStruct(
                     width=aVideoSensorParams.sensorWidth, height=aVideoSensorParams.sensorHeight
                 ),
-                minBitRate=aRateDistortionTradeOffPoints[0].minBitRate + 1,
+                minBitRate=aRateDistortionTradeOffPoints[0].minBitRate,
                 maxBitRate=aRateDistortionTradeOffPoints[0].minBitRate,
-                keyFrameInterval=4000 + 1,
+                keyFrameInterval=65500 + 1,
                 watermarkEnabled=watermark,
                 OSDEnabled=osd,
             )
@@ -510,7 +550,7 @@ class TC_AVSM_2_7(MatterBaseTest):
             )
             pass
 
-        self.step(23)
+        self.step(24)
         try:
             videoStreamAllocateCmd = commands.VideoStreamAllocate(
                 streamUsage=aStreamUsagePriorities[0],
@@ -521,7 +561,7 @@ class TC_AVSM_2_7(MatterBaseTest):
                 maxResolution=cluster.Structs.VideoResolutionStruct(
                     width=aVideoSensorParams.sensorWidth, height=aVideoSensorParams.sensorHeight
                 ),
-                minBitRate=aRateDistortionTradeOffPoints[0].minBitRate + 1,
+                minBitRate=aRateDistortionTradeOffPoints[0].minBitRate,
                 maxBitRate=aRateDistortionTradeOffPoints[0].minBitRate,
                 keyFrameInterval=4000,
                 watermarkEnabled=watermark,
@@ -534,6 +574,33 @@ class TC_AVSM_2_7(MatterBaseTest):
                 e.status,
                 Status.ConstraintError,
                 "Unexpected error returned when expecting CONSTRAINT_ERROR due to invalid codec",
+            )
+            pass
+
+        self.step(25)
+        try:
+            videoStreamAllocateCmd = commands.VideoStreamAllocate(
+                streamUsage=aStreamUsagePriorities[0],
+                videoCodec=aRateDistortionTradeOffPoints[0].codec,
+                minFrameRate=30,  # An acceptable value for min frame rate
+                maxFrameRate=aVideoSensorParams.maxFPS + 10,
+                minResolution=aMinViewport,
+                maxResolution=cluster.Structs.VideoResolutionStruct(
+                    width=aVideoSensorParams.sensorWidth, height=aVideoSensorParams.sensorHeight
+                ),
+                minBitRate=aRateDistortionTradeOffPoints[0].minBitRate,
+                maxBitRate=aRateDistortionTradeOffPoints[0].minBitRate,
+                keyFrameInterval=4000,
+                watermarkEnabled=watermark,
+                OSDEnabled=osd,
+            )
+            await self.send_single_cmd(endpoint=endpoint, cmd=videoStreamAllocateCmd)
+            asserts.fail("Unexpected success when expecting DYNAMIC_CONSTRAINT_ERROR due to unsupported MaxFrameRate")
+        except InteractionModelError as e:
+            asserts.assert_equal(
+                e.status,
+                Status.DynamicConstraintError,
+                "Unexpected error returned when expecting DYNAMIC_CONSTRAINT_ERROR due to unsupported MaxFrameRate",
             )
             pass
 

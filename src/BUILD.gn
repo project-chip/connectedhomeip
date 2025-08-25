@@ -124,6 +124,7 @@ if (chip_build_tests) {
       # with ember
       # Disabled on EFR32 since "include <random>" fails with `::fabs` not defined
       tests += [
+        "${chip_root}/src/data-model-providers/codedriven/tests",
         "${chip_root}/src/data-model-providers/codegen/tests",
         "${chip_root}/examples/common/server-cluster-shim/tests",
       ]
