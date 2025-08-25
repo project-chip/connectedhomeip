@@ -795,6 +795,8 @@ public:
      */
     void OnNodeDiscovered(const chip::Dnssd::DiscoveredNodeData & nodeData) override;
 
+    void ContinueCommissioningOverOperationalNetwork();
+
     void RegisterPairingDelegate(DevicePairingDelegate * pairingDelegate) { mPairingDelegate = pairingDelegate; }
     DevicePairingDelegate * GetPairingDelegate() const { return mPairingDelegate; }
 
@@ -836,6 +838,8 @@ public:
                                          /* fireAndForget = */ true);
     }
 
+    bool IsNFCCommissioning() { return mNFCCommissioning; }
+
     // Check if the commissioning mode is valid for the current commissioning parameters.
     virtual bool HasValidCommissioningMode(const Dnssd::CommissionNodeData & nodeData);
 
@@ -871,6 +875,9 @@ private:
     CommissioneeDeviceProxy * mDeviceInPASEEstablishment = nullptr;
 
     Optional<System::Clock::Timeout> mCommissioningStepTimeout; // Note: For multi-interaction steps this is per interaction
+
+    bool mNFCCommissioning = false;
+
     CommissioningStage mCommissioningStage = CommissioningStage::kSecurePairing;
     uint8_t mReadCommissioningInfoProgress = 0; // see ContinueReadingCommissioningInfo()
 
