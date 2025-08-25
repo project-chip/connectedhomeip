@@ -26,7 +26,6 @@
 #include <lib/support/DefaultStorageKeyAllocator.h>
 #include <optional>
 
-
 // TODO: Remove the Ember Prefix and place the class and structure to chip::app::Clusters::Binding namespace.
 /**
  * @brief Defines binding types.

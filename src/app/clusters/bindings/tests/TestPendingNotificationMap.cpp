@@ -91,7 +91,7 @@ TEST_F(TestPendingNotificationMap, TestAddRemove)
     size_t pendingMapCount = 0;
     for (iter = pendingMap.begin(); iter != pendingMap.end(); ++iter)
     {
-        PendingNotificationEntry entry = *iter;
+        PendingNotificationEntry entry      = *iter;
         EmberBindingTableEntry bindingEntry = BindingTable::GetInstance().GetAt(entry.mBindingEntryId);
         pendingMapCount++;
         EXPECT_NE(chip::ScopedNodeId(bindingEntry.nodeId, bindingEntry.fabricIndex), chip::ScopedNodeId());
@@ -101,7 +101,7 @@ TEST_F(TestPendingNotificationMap, TestAddRemove)
     pendingMapCount = 0;
     for (iter = pendingMap.begin(); iter != pendingMap.end(); ++iter)
     {
-        PendingNotificationEntry entry = *iter;
+        PendingNotificationEntry entry      = *iter;
         EmberBindingTableEntry bindingEntry = BindingTable::GetInstance().GetAt(entry.mBindingEntryId);
         pendingMapCount++;
         EXPECT_NE(bindingEntry.fabricIndex, 0);
