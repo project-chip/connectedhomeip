@@ -69,7 +69,7 @@ class TC_SETRF_2_2(MatterBaseTest, CommodityTariffTestBaseHelper):
     def pics_TC_SETRF_2_2(self) -> list[str]:
         """This function returns a list of PICS for this test case that must be True for the test to be run"""
 
-        return ["SETRF.S", "DGGEN.S", "DGGEN.S.A0008", "DGGEN.S.C00.Rsp"]
+        return ["SETRF.S"]
 
     def steps_TC_SETRF_2_2(self) -> list[TestStep]:
 
@@ -94,10 +94,6 @@ class TC_SETRF_2_2(MatterBaseTest, CommodityTariffTestBaseHelper):
         """Implements test procedure for test case TC_SETRF_2_2."""
 
         endpoint = self.get_endpoint()
-
-        # If TestEventTriggers is not enabled this TC can't be checked properly.
-        if not self.check_pics("DGGEN.S") or not self.check_pics("DGGEN.S.A0008") or not self.check_pics("DGGEN.S.C00.Rsp"):
-            asserts.skip("PICS DGGEN.S or DGGEN.S.A0008 or DGGEN.S.C00.Rsp is not True")
 
         self.step("1")
         # Commissioning
