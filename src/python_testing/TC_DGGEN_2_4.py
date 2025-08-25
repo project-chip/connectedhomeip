@@ -42,7 +42,8 @@ from mobly import asserts
 import matter.clusters as Clusters
 from matter.clusters.Types import NullValue
 from matter.interaction_model import InteractionModelError
-from matter.testing import timeoperations
+from matter.testing.timeoperations import (utc_datetime_from_matter_epoch_us, utc_datetime_from_posix_time_ms,
+                                           utc_time_in_matter_epoch)
 from matter.testing.matter_testing import MatterBaseTest, async_test_body, default_matter_test_main
 
 logger = logging.getLogger(__name__)
@@ -104,7 +105,7 @@ class TC_DGGEN_2_4(MatterBaseTest):
 
             self.print_step("1b", "Write current time to DUT")
             # Get current time in the correct format to set via command.
-            th_utc = timeoperations.utc_time_in_matter_epoch(desired_datetime=None)
+            th_utc = utc_time_in_matter_epoch(desired_datetime=None)
 
             await self.set_time_in_timesync(th_utc)
 
@@ -144,8 +145,8 @@ class TC_DGGEN_2_4(MatterBaseTest):
             asserts.assert_greater_equal(response.systemTimeMs // 1000, testvar_UpTime1,
                                          "System time in milliseconds must be >= UpTime1")
 
-            utc_from_posix = timeoperations.utc_datetime_from_posix_time_ms(posix_time_ms=response.posixTimeMs)
-            utc_from_utctime1 = timeoperations.utc_datetime_from_matter_epoch_us(testvar_UTCTime1)
+            utc_from_posix = utc_datetime_from_posix_time_ms(posix_time_ms=response.posixTimeMs)
+            utc_from_utctime1 = utc_datetime_from_matter_epoch_us(testvar_UTCTime1)
 
             asserts.assert_greater_equal(
                 utc_from_posix, utc_from_utctime1, "PosixTimeMs field converted to a UTC timestamp must be >= than UTCTime1 converted to a UTC timestamp")

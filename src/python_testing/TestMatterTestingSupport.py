@@ -24,7 +24,7 @@ from mobly import asserts, signals
 
 import matter.clusters as Clusters
 from matter.clusters.Types import Nullable, NullValue
-from matter.testing import timeoperations
+from matter.testing.timeoperations import compare_time, get_wait_seconds_from_set_time, utc_time_in_matter_epoch
 from matter.testing.matter_testing import (MatterBaseTest, async_test_body, default_matter_test_main, matchers,
                                            parse_matter_test_args)
 from matter.testing.pics import parse_pics, parse_pics_xml
@@ -109,11 +109,11 @@ class TestMatterTestingSupport(MatterBaseTest):
     @async_test_body
     async def test_matter_epoch_time(self):
         # Matter epoch should return zero
-        ret = timeoperations.utc_time_in_matter_epoch(datetime(2000, 1, 1, 0, 0, 0, 0, timezone.utc))
+        ret = utc_time_in_matter_epoch(datetime(2000, 1, 1, 0, 0, 0, 0, timezone.utc))
         asserts.assert_equal(ret, 0, "UTC epoch returned non-zero value")
 
         # Jan 2 is exactly 1 day after Jan 1
-        ret = timeoperations.utc_time_in_matter_epoch(datetime(2000, 1, 2, 0, 0, 0, 0, timezone.utc))
+        ret = utc_time_in_matter_epoch(datetime(2000, 1, 2, 0, 0, 0, 0, timezone.utc))
         expected_delay = timedelta(days=1)
         actual_delay = timedelta(microseconds=ret)
         asserts.assert_equal(expected_delay, actual_delay, "Calculation for Jan 2 date is incorrect")
@@ -121,13 +121,13 @@ class TestMatterTestingSupport(MatterBaseTest):
         # There's a catch 22 for knowing the current time, but we can check that it's
         # going up, and that it's larger than when I wrote the test
         # Check that the returned value is larger than the test writing date
-        writing_date = timeoperations.utc_time_in_matter_epoch(datetime(2023, 5, 5, 0, 0, 0, 0, timezone.utc))
-        current_date = timeoperations.utc_time_in_matter_epoch()
+        writing_date = utc_time_in_matter_epoch(datetime(2023, 5, 5, 0, 0, 0, 0, timezone.utc))
+        current_date = utc_time_in_matter_epoch()
         asserts.assert_greater(current_date, writing_date, "Calculation for current date is smaller than writing date")
 
         # Check that the time is going up
         last_date = current_date
-        current_date = timeoperations.utc_time_in_matter_epoch()
+        current_date = utc_time_in_matter_epoch()
         asserts.assert_greater(current_date, last_date, "Time does not appear to be incrementing")
 
     @async_test_body
@@ -166,33 +166,33 @@ class TestMatterTestingSupport(MatterBaseTest):
 
     def test_time_compare_function(self):
         # only offset, exact match
-        timeoperations.compare_time(received=1000, offset=timedelta(microseconds=1000), utc=0, tolerance=timedelta())
+        compare_time(received=1000, offset=timedelta(microseconds=1000), utc=0, tolerance=timedelta())
         # only utc, exact match
-        timeoperations.compare_time(received=1000, offset=timedelta(), utc=1000, tolerance=timedelta())
+        compare_time(received=1000, offset=timedelta(), utc=1000, tolerance=timedelta())
         # both, exact match
-        timeoperations.compare_time(received=2000, offset=timedelta(microseconds=1000), utc=1000, tolerance=timedelta())
+        compare_time(received=2000, offset=timedelta(microseconds=1000), utc=1000, tolerance=timedelta())
         # both, negative offset
-        timeoperations.compare_time(received=0, offset=timedelta(microseconds=-1000), utc=1000, tolerance=timedelta())
+        compare_time(received=0, offset=timedelta(microseconds=-1000), utc=1000, tolerance=timedelta())
 
         # Exact match, within delta, both
-        timeoperations.compare_time(received=2000, offset=timedelta(microseconds=1000), utc=1000, tolerance=timedelta(seconds=5))
+        compare_time(received=2000, offset=timedelta(microseconds=1000), utc=1000, tolerance=timedelta(seconds=5))
 
         # Just inside tolerance
-        timeoperations.compare_time(received=1001, offset=timedelta(), utc=2000, tolerance=timedelta(microseconds=1000))
+        compare_time(received=1001, offset=timedelta(), utc=2000, tolerance=timedelta(microseconds=1000))
 
         # Just outside tolerance
         try:
-            timeoperations.compare_time(received=999, offset=timedelta(), utc=2000, tolerance=timedelta(microseconds=1000))
+            compare_time(received=999, offset=timedelta(), utc=2000, tolerance=timedelta(microseconds=1000))
             asserts.fail("Expected failure case for time just outside of the tolerance failed")
         except signals.TestFailure:
             pass
 
         # everything in the seconds range
-        timeoperations.compare_time(received=timedelta(seconds=3600).total_seconds() * 1000000,
-                                    offset=timedelta(seconds=3605), utc=0, tolerance=timedelta(seconds=5))
+        compare_time(received=timedelta(seconds=3600).total_seconds() * 1000000,
+                     offset=timedelta(seconds=3605), utc=0, tolerance=timedelta(seconds=5))
 
     def test_get_wait_time_function(self):
-        th_utc = timeoperations.utc_time_in_matter_epoch()
+        th_utc = utc_time_in_matter_epoch()
         secs = timeoperations.get_wait_seconds_from_set_time(th_utc, 5)
         asserts.assert_equal(secs, 5)
         # If we've pass less than a second, we still want to wait 5
@@ -201,9 +201,9 @@ class TestMatterTestingSupport(MatterBaseTest):
         asserts.assert_equal(secs, 5)
 
         time.sleep(0.5)
-        secs = timeoperations.get_wait_seconds_from_set_time(th_utc, 5)
+        secs = get_wait_seconds_from_set_time(th_utc, 5)
         asserts.assert_equal(secs, 4)
-        secs = timeoperations.get_wait_seconds_from_set_time(th_utc, 15)
+        secs = get_wait_seconds_from_set_time(th_utc, 15)
         asserts.assert_equal(secs, 14)
 
     def create_example_topology(self):
