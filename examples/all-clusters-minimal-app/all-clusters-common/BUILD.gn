@@ -20,5 +20,5 @@ chip_data_model("all-clusters-common") {
   zap_file = "all-clusters-minimal-app.zap"
   is_server = true
   public_deps =
-￼     [ "${chip_root}/src/app/clusters/bindings:binding-manager" ]
+      [ "${chip_root}/src/app/clusters/bindings:binding-manager" ]
 }
