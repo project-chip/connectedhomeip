@@ -1,5 +1,5 @@
 /*
- *    Copyright (c) 2022 Project CHIP Authors
+ *    Copyright (c) 2025 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -17,7 +17,7 @@
 
 /**
  *    @file
- *          Platform-specific implementation of the persistent operational keystore for MCXW7x
+ *          Base implementation of the persistent operational keystore for secure element usage
  */
 
 #pragma once
@@ -30,28 +30,24 @@
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CodeUtils.h>
 
-#include "sss_crypto.h"
-
 namespace chip {
 
-#define SSS_KEY_PAIR_BLOB_SIZE 120
+typedef Crypto::SensitiveDataBuffer<CONFIG_PRIVATE_ECC_KEY_BLOB_SIZE> P256SerializedKeypairNXP;
 
-typedef Crypto::SensitiveDataBuffer<SSS_KEY_PAIR_BLOB_SIZE> P256SerializedKeypairSSS;
-
-class P256KeypairSSS : public Crypto::P256Keypair
+class P256KeypairNXP : public Crypto::P256Keypair
 {
 public:
     /**
      * @brief Export an encrypted blob.
      * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
      **/
-    CHIP_ERROR ExportBlob(P256SerializedKeypairSSS & output) const;
+    CHIP_ERROR ExportBlob(P256SerializedKeypairNXP & output) const;
 
     /**
      * @brief Import an encrypted blob.
      * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
      **/
-    CHIP_ERROR ImportBlob(P256SerializedKeypairSSS & input);
+    CHIP_ERROR ImportBlob(P256SerializedKeypairNXP & input);
 };
 
 /**
@@ -61,16 +57,9 @@ public:
  *        of how to use the interface.
  *
  */
-class PersistentStorageOpKeystoreS200 : public Crypto::OperationalKeystore
+class PersistentStorageOpKeystoreNXP : public Crypto::OperationalKeystore
 {
 public:
-    PersistentStorageOpKeystoreS200() = default;
-    virtual ~PersistentStorageOpKeystoreS200() { Finish(); }
-
-    // Non-copyable
-    PersistentStorageOpKeystoreS200(PersistentStorageOpKeystoreS200 const &) = delete;
-    void operator=(PersistentStorageOpKeystoreS200 const &)                  = delete;
-
     /**
      * @brief Initialize the Operational Keystore to map to a given storage delegate.
      *
@@ -108,8 +97,6 @@ public:
     CHIP_ERROR CommitOpKeypairForFabric(FabricIndex fabricIndex) override;
     CHIP_ERROR RemoveOpKeypairForFabric(FabricIndex fabricIndex) override;
     void RevertPendingKeypair() override;
-    CHIP_ERROR SignWithOpKeypair(FabricIndex fabricIndex, const ByteSpan & message,
-                                 Crypto::P256ECDSASignature & outSignature) const override;
     Crypto::P256Keypair * AllocateEphemeralKeypairForCASE() override;
     void ReleaseEphemeralKeypair(Crypto::P256Keypair * keypair) override;
 
@@ -136,11 +123,11 @@ protected:
 
     // This pending fabric index is `kUndefinedFabricIndex` if there isn't a pending keypair override for a given fabric.
     FabricIndex mPendingFabricIndex  = kUndefinedFabricIndex;
-    P256KeypairSSS * mPendingKeypair = nullptr;
+    P256KeypairNXP * mPendingKeypair = nullptr;
     bool mIsPendingKeypairActive     = false;
 
     // Optimize loading the keyblob from storage all the time
-    mutable P256KeypairSSS * mCachedKeypair = nullptr;
+    mutable P256KeypairNXP * mCachedKeypair = nullptr;
     mutable FabricIndex mCachedFabricIndex  = kUndefinedFabricIndex;
 
     // If overridding NewOpKeypairForFabric method in a subclass, set this to true in

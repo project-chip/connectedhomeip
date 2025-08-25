@@ -10171,6 +10171,12 @@ provisional cluster WebRTCTransportProvider = 1363 {
     kMetadata = 0x1;
   }
 
+  struct SFrameStruct {
+    int16u cipherSuite = 0;
+    octet_string<128> baseKey = 1;
+    octet_string<8> kid = 2;
+  }
+
   readonly attribute access(read: manage) WebRTCSessionStruct currentSessions[] = 0;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
@@ -10186,6 +10192,7 @@ provisional cluster WebRTCTransportProvider = 1363 {
     optional ICEServerStruct ICEServers[] = 4;
     optional char_string<16> ICETransportPolicy = 5;
     optional boolean metadataEnabled = 6;
+    optional SFrameStruct SFrameConfig = 7;
   }
 
   response struct SolicitOfferResponse = 1 {
@@ -10205,6 +10212,7 @@ provisional cluster WebRTCTransportProvider = 1363 {
     optional ICEServerStruct ICEServers[] = 6;
     optional char_string<16> ICETransportPolicy = 7;
     optional boolean metadataEnabled = 8;
+    optional SFrameStruct SFrameConfig = 9;
   }
 
   response struct ProvideOfferResponse = 3 {

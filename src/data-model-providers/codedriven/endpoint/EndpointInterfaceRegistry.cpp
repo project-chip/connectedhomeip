@@ -24,10 +24,8 @@ CHIP_ERROR EndpointInterfaceRegistry::Register(EndpointInterfaceRegistration & e
 {
     VerifyOrReturnError(entry.next == nullptr, CHIP_ERROR_INVALID_ARGUMENT);              // Should not be part of another list
     VerifyOrReturnError(entry.endpointInterface != nullptr, CHIP_ERROR_INVALID_ARGUMENT); // Should not be null
-
-    auto newEndpointId = entry.endpointInterface->GetEndpointEntry().id;
-    VerifyOrReturnError(newEndpointId != kInvalidEndpointId, CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrReturnError(Get(newEndpointId) == nullptr, CHIP_ERROR_DUPLICATE_KEY_ID); // Check for duplicates
+    VerifyOrReturnError(entry.endpointEntry.id != kInvalidEndpointId, CHIP_ERROR_INVALID_ARGUMENT); // Should not be invalid ID
+    VerifyOrReturnError(Get(entry.endpointEntry.id) == nullptr, CHIP_ERROR_DUPLICATE_KEY_ID);       // Check for duplicates
 
     entry.next     = mRegistrations;
     mRegistrations = &entry;
@@ -44,7 +42,7 @@ CHIP_ERROR EndpointInterfaceRegistry::Unregister(EndpointId endpointId)
 
     while (current != nullptr)
     {
-        if (current->endpointInterface->GetEndpointEntry().id == endpointId)
+        if (current->endpointEntry.id == endpointId)
         {
             if (prev == nullptr) // Node to remove is the head
             {
@@ -66,7 +64,7 @@ CHIP_ERROR EndpointInterfaceRegistry::Unregister(EndpointId endpointId)
         prev    = current;
         current = current->next;
     }
-    return CHIP_NO_ERROR;
+    return CHIP_ERROR_NOT_FOUND;
 }
 
 EndpointInterface * EndpointInterfaceRegistry::Get(EndpointId endpointId)
@@ -81,7 +79,7 @@ EndpointInterface * EndpointInterfaceRegistry::Get(EndpointId endpointId)
 
     while (current != nullptr)
     {
-        if (current->endpointInterface->GetEndpointEntry().id == endpointId)
+        if (current->endpointEntry.id == endpointId)
         {
             mCachedInterface  = current->endpointInterface;
             mCachedEndpointId = endpointId;
