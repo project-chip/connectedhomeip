@@ -19,8 +19,7 @@
  * @file Basic implementation of a binding table.
  */
 
-#include <app/util/binding-table.h>
-#include <app/util/config.h>
+#include <app/clusters/bindings/binding-table.h>
 
 namespace chip {
 
@@ -38,7 +37,7 @@ CHIP_ERROR BindingTable::Add(const EmberBindingTableEntry & entry)
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
     uint8_t newIndex = GetNextAvaiableIndex();
-    if (newIndex >= MATTER_BINDING_TABLE_SIZE)
+    if (newIndex >= kMaxBindingEntries)
     {
         return CHIP_ERROR_NO_MEMORY;
     }
@@ -292,14 +291,14 @@ BindingTable::Iterator BindingTable::end()
 
 uint8_t BindingTable::GetNextAvaiableIndex()
 {
-    for (uint8_t i = 0; i < MATTER_BINDING_TABLE_SIZE; i++)
+    for (uint8_t i = 0; i < kMaxBindingEntries; i++)
     {
         if (mBindingTable[i].type == MATTER_UNUSED_BINDING)
         {
             return i;
         }
     }
-    return MATTER_BINDING_TABLE_SIZE;
+    return kMaxBindingEntries;
 }
 
 BindingTable::Iterator BindingTable::Iterator::operator++()

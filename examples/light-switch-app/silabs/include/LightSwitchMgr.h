@@ -21,7 +21,7 @@
 
 #include "AppEvent.h"
 #include <app-common/zap-generated/ids/Clusters.h>
-#include <app/clusters/bindings/bindings.h>
+#include <app/clusters/bindings/BindingManager.h>
 #include <app/util/basic-types.h>
 #include <cmsis_os2.h>
 #include <lib/core/CHIPError.h>

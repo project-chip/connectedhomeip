@@ -15,8 +15,7 @@
  *    limitations under the License.
  */
 
-#include <app/util/binding-table.h>
-#include <app/util/config.h>
+#include <app/clusters/bindings/binding-table.h>
 #include <credentials/FabricTable.h>
 #include <lib/core/DataModelTypes.h>
 
@@ -68,7 +67,7 @@ public:
 class PendingNotificationMap
 {
 public:
-    static constexpr uint8_t kMaxPendingNotifications = MATTER_BINDING_TABLE_SIZE;
+    static constexpr uint8_t kMaxPendingNotifications = BindingTable::kMaxBindingEntries;
 
     friend class Iterator;
 

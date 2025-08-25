@@ -20,8 +20,8 @@
 #include "AppEvent.h"
 #include "BindingHandler.h"
 
+#include <app/clusters/bindings/binding-table.h>
 #include <app/server/Server.h>
-#include <app/util/binding-table.h>
 #include <controller/InvokeInteraction.h>
 
 #include <app/clusters/switch-server/switch-server.h>

@@ -20,7 +20,6 @@
 #include "AppConfig.h"
 #include <app/CommandSender.h>
 #include <app/clusters/bindings/BindingManager.h>
-#include <app/clusters/bindings/bindings.h>
 #include <app/server/Server.h>
 #include <controller/InvokeInteraction.h>
 #include <controller/ReadInteraction.h>

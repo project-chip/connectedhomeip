@@ -18,8 +18,7 @@
 #include <lib/core/StringBuilderAdapters.h>
 #include <pw_unit_test/framework.h>
 
-#include <app/util/binding-table.h>
-#include <app/util/config.h>
+#include <app/clusters/bindings/binding-table.h>
 #include <lib/support/DefaultStorageKeyAllocator.h>
 #include <lib/support/TestPersistentStorageDelegate.h>
 
@@ -66,15 +65,15 @@ TEST(TestBindingTable, TestAdd)
     EmberBindingTableEntry unusedEntry;
     unusedEntry.type = MATTER_UNUSED_BINDING;
     EXPECT_EQ(table.Add(unusedEntry), CHIP_ERROR_INVALID_ARGUMENT);
-    for (uint8_t i = 0; i < MATTER_BINDING_TABLE_SIZE; i++)
+    for (uint8_t i = 0; i < BindingTable::kMaxBindingEntries; i++)
     {
         EXPECT_EQ(table.Add(EmberBindingTableEntry::ForNode(0, i, 0, 0, std::nullopt)), CHIP_NO_ERROR);
     }
     EXPECT_EQ(table.Add(EmberBindingTableEntry::ForNode(0, 0, 0, 0, std::nullopt)), CHIP_ERROR_NO_MEMORY);
-    EXPECT_EQ(table.Size(), MATTER_BINDING_TABLE_SIZE);
+    EXPECT_EQ(table.Size(), BindingTable::kMaxBindingEntries);
 
     auto iter = table.begin();
-    for (uint8_t i = 0; i < MATTER_BINDING_TABLE_SIZE; i++)
+    for (uint8_t i = 0; i < BindingTable::kMaxBindingEntries; i++)
     {
         EXPECT_NE(iter, table.end());
         EXPECT_EQ(iter->nodeId, i);
@@ -95,14 +94,14 @@ TEST(TestBindingTable, TestRemoveThenAdd)
     EXPECT_EQ(iter, table.end());
     EXPECT_EQ(table.Size(), 0u);
     EXPECT_EQ(table.begin(), table.end());
-    for (uint8_t i = 0; i < MATTER_BINDING_TABLE_SIZE; i++)
+    for (uint8_t i = 0; i < BindingTable::kMaxBindingEntries; i++)
     {
         EXPECT_EQ(table.Add(EmberBindingTableEntry::ForNode(0, i, 0, 0, std::nullopt)), CHIP_NO_ERROR);
     }
     iter = table.begin();
     ++iter;
     EXPECT_EQ(table.RemoveAt(iter), CHIP_NO_ERROR);
-    EXPECT_EQ(table.Size(), MATTER_BINDING_TABLE_SIZE - 1);
+    EXPECT_EQ(table.Size(), BindingTable::kMaxBindingEntries - 1);
     EXPECT_EQ(iter->nodeId, 2u);
     EXPECT_EQ(iter.GetIndex(), 2u);
     auto iterCheck = table.begin();
@@ -110,9 +109,9 @@ TEST(TestBindingTable, TestRemoveThenAdd)
     EXPECT_EQ(iter, iterCheck);
 
     EXPECT_EQ(table.Add(EmberBindingTableEntry::ForNode(0, 1, 0, 0, std::nullopt)), CHIP_NO_ERROR);
-    EXPECT_EQ(table.Size(), MATTER_BINDING_TABLE_SIZE);
+    EXPECT_EQ(table.Size(), BindingTable::kMaxBindingEntries);
     iter = table.begin();
-    for (uint8_t i = 0; i < MATTER_BINDING_TABLE_SIZE - 1; i++)
+    for (uint8_t i = 0; i < BindingTable::kMaxBindingEntries - 1; i++)
     {
         ++iter;
     }
@@ -122,7 +121,7 @@ TEST(TestBindingTable, TestRemoveThenAdd)
     EXPECT_EQ(iter, table.end());
     iter = table.begin();
     EXPECT_EQ(table.RemoveAt(iter), CHIP_NO_ERROR);
-    EXPECT_EQ(table.Size(), MATTER_BINDING_TABLE_SIZE - 1);
+    EXPECT_EQ(table.Size(), BindingTable::kMaxBindingEntries - 1);
     EXPECT_EQ(iter, table.begin());
     EXPECT_EQ(iter.GetIndex(), 2u);
     EXPECT_EQ(iter->nodeId, 2u);
