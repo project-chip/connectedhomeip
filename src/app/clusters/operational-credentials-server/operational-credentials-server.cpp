@@ -717,6 +717,25 @@ bool emberAfOperationalCredentialsClusterAddNOCCallback(app::CommandHandler * co
     VerifyOrExit(IsOperationalNodeId(commandData.caseAdminSubject) || IsCASEAuthTag(commandData.caseAdminSubject),
                  nocResponse = NodeOperationalCertStatusEnum::kInvalidAdminSubject);
 
+#if CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
+    // These checks should only run during JCM.
+    if (Server::GetInstance().GetCommissioningWindowManager().IsJCM())
+    {
+        // NOC must contain an Administrator CAT
+        CATValues cats;
+        err = ExtractCATsFromOpCert(NOCValue, cats);
+        VerifyOrExit(err == CHIP_NO_ERROR && cats.ContainsIdentifier(kAdminCATIdentifier),
+                     nocResponse = NodeOperationalCertStatusEnum::kInvalidNOC);
+
+        // CaseAdminSubject must contain an Anchor CAT
+        VerifyOrExit(IsCASEAuthTag(commandData.caseAdminSubject),
+                     nocResponse = NodeOperationalCertStatusEnum::kInvalidAdminSubject);
+        CASEAuthTag tag = CASEAuthTagFromNodeId(commandData.caseAdminSubject);
+        VerifyOrExit(IsValidCASEAuthTag(tag) && (GetCASEAuthTagIdentifier(tag) == kAnchorCATIdentifier),
+                     nocResponse = NodeOperationalCertStatusEnum::kInvalidAdminSubject);
+    }
+#endif // CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
+
     err = fabricTable.AddNewPendingFabricWithOperationalKeystore(NOCValue, ICACValue.ValueOr(ByteSpan{}), adminVendorId,
                                                                  &newFabricIndex);
     VerifyOrExit(err == CHIP_NO_ERROR, nocResponse = ConvertToNOCResponseStatus(err));
