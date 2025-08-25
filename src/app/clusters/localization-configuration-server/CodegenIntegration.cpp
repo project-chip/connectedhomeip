@@ -97,7 +97,6 @@ void emberAfLocalizationConfigurationClusterServerInitCallback(EndpointId endpoi
 void MatterLocalizationConfigurationClusterServerShutdownCallback(EndpointId endpointId)
 {
     VerifyOrReturn(endpointId == kRootEndpointId);
-    gServer.Destroy();
 
     CHIP_ERROR err = CodegenDataModelProvider::Instance().Registry().Unregister(&gServer.Cluster());
     if (err != CHIP_NO_ERROR)
