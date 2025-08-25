@@ -43,7 +43,7 @@ from mobly import asserts
 import matter.clusters as Clusters
 from matter.clusters.Types import NullValue
 from matter.interaction_model import InteractionModelError
-from matter.testing import timeoperations
+from matter.testing.timeoperations import compare_time, utc_time_in_matter_epoch
 from matter.testing.matter_testing import MatterBaseTest, async_test_body, default_matter_test_main, matchers
 from matter.tlv import uint
 
@@ -87,7 +87,7 @@ class TC_TIMESYNC_2_9(MatterBaseTest):
         # It doesn't actually matter if this succeeds. The DUT is free to reject this command and use its own time.
         # If the DUT fails to get the time completely, all other tests will fail.
         try:
-            await self.send_set_utc_cmd(timeoperations.utc_time_in_matter_epoch())
+            await self.send_set_utc_cmd(utc_time_in_matter_epoch())
         except InteractionModelError:
             pass
 

@@ -21,7 +21,7 @@ from mobly import asserts
 
 import matter.clusters as Clusters
 from matter.interaction_model import InteractionModelError, Status
-from matter.testing import timeoperations
+from matter.testing.timeoperations import utc_time_in_matter_epoch
 
 logger = logging.getLogger(__name__)
 
@@ -209,7 +209,7 @@ class DEMTestBase:
 
     def get_current_utc_time_in_seconds(self):
         microseconds_in_second = 1000000
-        return int(timeoperations.utc_time_in_matter_epoch()/microseconds_in_second)
+        return int(utc_time_in_matter_epoch()/microseconds_in_second)
 
     async def send_test_event_trigger_power_adjustment(self):
         await self.send_test_event_triggers(eventTrigger=0x0098000000000000)

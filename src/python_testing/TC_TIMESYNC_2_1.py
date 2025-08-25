@@ -43,7 +43,7 @@ from mobly import asserts
 
 import matter.clusters as Clusters
 from matter.clusters.Types import NullValue
-from matter.testing import timeoperations
+from matter.testing.timeoperations import utc_time_in_matter_epoch
 from matter.testing.matter_testing import (MatterBaseTest, default_matter_test_main, has_attribute, has_cluster,
                                            run_if_endpoint_matches)
 
@@ -144,7 +144,7 @@ class TC_TIMESYNC_2_1(MatterBaseTest):
                 toleranace = timedelta(minutes=10)
             else:
                 toleranace = timedelta(minutes=1)
-            delta_us = abs(utc_dut - timeoperations.utc_time_in_matter_epoch())
+            delta_us = abs(utc_dut - utc_time_in_matter_epoch())
             delta = timedelta(microseconds=delta_us)
             asserts.assert_less_equal(delta, toleranace, "UTC time is not within tolerance of TH")
 

@@ -44,7 +44,7 @@ from mobly import asserts
 import matter.clusters as Clusters
 from matter.clusters.Types import NullValue
 from matter.interaction_model import InteractionModelError
-from matter.testing import timeoperations
+from matter.testing.timeoperations import compare_time, utc_time_in_matter_epoch
 from matter.testing.matter_testing import MatterBaseTest, async_test_body, default_matter_test_main, matchers
 from matter.tlv import uint
 
@@ -97,17 +97,17 @@ class TC_TIMESYNC_2_7(MatterBaseTest):
         # It doesn't actually matter if this succeeds. The DUT is free to reject this command and use its own time.
         # If the DUT fails to get the time completely, all other tests will fail.
         try:
-            await self.send_set_utc_cmd(timeoperations.utc_time_in_matter_epoch())
+            await self.send_set_utc_cmd(utc_time_in_matter_epoch())
         except InteractionModelError:
             pass
 
         self.print_step(4, "Read UTCTime")
         utc = await self.read_ts_attribute_expect_success(utc_attr)
-        timeoperations.compare_time(received=utc, offset=timedelta(), tolerance=timedelta(seconds=5))
+        compare_time(received=utc, offset=timedelta(), tolerance=timedelta(seconds=5))
 
         self.print_step(5, "Read LocalTime")
         local = await self.read_ts_attribute_expect_success(local_attr)
-        timeoperations.compare_time(received=local, offset=timedelta(), tolerance=timedelta(seconds=5))
+        compare_time(received=local, offset=timedelta(), tolerance=timedelta(seconds=5))
 
         self.print_step(6, "Send SetTimeZone command with 3600 offset")
         tz = [tz_struct(offset=3600, validAt=0)]
@@ -120,18 +120,18 @@ class TC_TIMESYNC_2_7(MatterBaseTest):
 
         self.print_step(8, "Read UTCTime")
         utc = await self.read_ts_attribute_expect_success(utc_attr)
-        timeoperations.compare_time(received=utc, offset=timedelta(), tolerance=timedelta(seconds=5))
+        compare_time(received=utc, offset=timedelta(), tolerance=timedelta(seconds=5))
 
         self.print_step(9, "Read LocalTime")
         local = await self.read_ts_attribute_expect_success(local_attr)
-        timeoperations.compare_time(received=local, offset=timedelta(seconds=3600), tolerance=timedelta(seconds=5))
+        compare_time(received=local, offset=timedelta(seconds=3600), tolerance=timedelta(seconds=5))
 
         self.print_step(10, "Read TZ list size")
         tz_list_size = await self.read_ts_attribute_expect_success(attributes.TimeZoneListMaxSize)
 
         self.print_step(11, "Set time zone with two items")
         if tz_list_size > 1:
-            th_utc = timeoperations.utc_time_in_matter_epoch()
+            th_utc = utc_time_in_matter_epoch()
             tz = [tz_struct(offset=3600, validAt=0), tz_struct(offset=7200, validAt=th_utc+1e+7)]
             ret = await self.send_set_time_zone_cmd(tz)
             asserts.assert_true(ret.DSTOffsetRequired, "DSTOffsetRequired not set to true")
@@ -144,13 +144,13 @@ class TC_TIMESYNC_2_7(MatterBaseTest):
         self.print_step(13, "Read LocalTime")
         if tz_list_size > 1:
             local = await self.read_ts_attribute_expect_success(local_attr)
-            timeoperations.compare_time(received=local, offset=timedelta(seconds=3600), tolerance=timedelta(seconds=5))
+            compare_time(received=local, offset=timedelta(seconds=3600), tolerance=timedelta(seconds=5))
 
         self.print_step(14, "Wait 15s and read LocalTime")
         if tz_list_size > 1:
             time.sleep(15)
             local = await self.read_ts_attribute_expect_success(local_attr)
-            timeoperations.compare_time(received=local, offset=timedelta(seconds=7200), tolerance=timedelta(seconds=5))
+            compare_time(received=local, offset=timedelta(seconds=7200), tolerance=timedelta(seconds=5))
 
         self.print_step(15, "Send SetTimeZone with negative offset")
         tz = [tz_struct(offset=-3600, validAt=0)]
@@ -163,7 +163,7 @@ class TC_TIMESYNC_2_7(MatterBaseTest):
 
         self.print_step(17, "Read LocalTime")
         local = await self.read_ts_attribute_expect_success(local_attr)
-        timeoperations.compare_time(received=local, offset=timedelta(seconds=-3600), tolerance=timedelta(seconds=5))
+        compare_time(received=local, offset=timedelta(seconds=-3600), tolerance=timedelta(seconds=5))
 
         self.print_step(18, "Send SetTimeZone with 0 offset")
         tz = [tz_struct(offset=0, validAt=0)]

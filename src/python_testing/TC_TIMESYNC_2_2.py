@@ -42,7 +42,7 @@ from mobly import asserts
 import matter.clusters as Clusters
 from matter.clusters.Types import NullValue
 from matter.interaction_model import InteractionModelError
-from matter.testing import timeoperations
+from matter.testing.timeoperations import compare_time, utc_time_in_matter_epoch
 from matter.testing.matter_testing import MatterBaseTest, async_test_body, default_matter_test_main
 
 
@@ -70,7 +70,7 @@ class TC_TIMESYNC_2_2(MatterBaseTest):
 
         self.print_step(2, "Read UTCTime attribute")
         utc_dut_initial = await self.read_ts_attribute_expect_success(endpoint=endpoint, attribute=attributes.UTCTime)
-        th_utc = timeoperations.utc_time_in_matter_epoch()
+        th_utc = utc_time_in_matter_epoch()
 
         code = 0
         try:
@@ -93,14 +93,14 @@ class TC_TIMESYNC_2_2(MatterBaseTest):
         asserts.assert_not_equal(granularity_dut, time_cluster.Enums.GranularityEnum.kNoTimeGranularity)
 
         self.print_step(4, "Read UTC time")
-        th_utc = timeoperations.utc_time_in_matter_epoch()
+        th_utc = utc_time_in_matter_epoch()
         utc_dut = await self.read_ts_attribute_expect_success(endpoint=endpoint, attribute=attributes.UTCTime)
         asserts.assert_is_not(utc_dut, NullValue, "Received null value for UTCTime after set")
         if granularity_dut == time_cluster.Enums.GranularityEnum.kMinutesGranularity:
             tolerance = timedelta(minutes=10)
         else:
             tolerance = timedelta(minutes=1)
-        timeoperations.compare_time(received=utc_dut, utc=th_utc, tolerance=tolerance)
+        compare_time(received=utc_dut, utc=th_utc, tolerance=tolerance)
 
         self.print_step(5, "Read time source")
         if timesource_attr_id in attribute_list:
