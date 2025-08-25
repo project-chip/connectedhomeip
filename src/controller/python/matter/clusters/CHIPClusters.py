@@ -13286,6 +13286,7 @@ class ChipClusters:
                     "ICEServers": "ICEServerStruct",
                     "ICETransportPolicy": "str",
                     "metadataEnabled": "bool",
+                    "SFrameConfig": "SFrameStruct",
                 },
             },
             0x00000002: {
@@ -13301,6 +13302,7 @@ class ChipClusters:
                     "ICEServers": "ICEServerStruct",
                     "ICETransportPolicy": "str",
                     "metadataEnabled": "bool",
+                    "SFrameConfig": "SFrameStruct",
                 },
             },
             0x00000004: {
