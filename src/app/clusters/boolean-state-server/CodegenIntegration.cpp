@@ -77,9 +77,9 @@ SetStateValue(const StateValue::TypeInfo::Type & stateValue)
     return gServer.Cluster().SetStateValue(stateValue);
 }
 
-Attributes::StateValue::TypeInfo::Type GetStateValue()
+CHIP_ERROR GetStateValue(Attributes::StateValue::TypeInfo::Type & stateValue)
 {
-    return gServer.Cluster().GetStateValue();
+    return gServer.Cluster().GetStateValue(stateValue);
 }
 
 } // namespace chip::app::Clusters::BooleanState

@@ -19,7 +19,7 @@
 #include "DeviceWithDisplay.h"
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/ids/Clusters.h>
-#include <app/clusters/boolean-state-server/boolean-state-cluster.h>
+#include <app/clusters/boolean-state-server/CodegenIntegration.h>
 #include <setup_payload/QRCodeSetupPayloadGenerator.h>
 
 #include <string>

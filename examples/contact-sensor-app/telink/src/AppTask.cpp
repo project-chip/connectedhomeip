@@ -20,7 +20,7 @@
 #include "LEDManager.h"
 
 #include <app-common/zap-generated/attributes/Accessors.h>
-#include <app/clusters/boolean-state-server/boolean-state-cluster.h>
+#include <app/clusters/boolean-state-server/CodegenIntegration.h>
 
 #include <zephyr/kernel.h>
 #include <zephyr/logging/log.h>
@@ -137,10 +137,10 @@ void AppTask::UpdateDeviceState(void)
 
 void AppTask::UpdateDeviceStateInternal(intptr_t arg)
 {
-    bool stateValueAttrValue = 0;
+    bool stateValueAttrValue = false;
 
     /* get boolean state attribute value */
-    (void) app::Clusters::BooleanState::GetStateValue(&stateValueAttrValue);
+    (void) app::Clusters::BooleanState::GetStateValue(stateValueAttrValue);
 
     LedManager::getInstance().setLed(LedManager::EAppLed_App0, stateValueAttrValue);
 }

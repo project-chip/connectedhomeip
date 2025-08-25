@@ -35,7 +35,7 @@
 
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/ids/Clusters.h>
-#include <app/clusters/boolean-state-server/boolean-state-cluster.h>
+#include <app/clusters/boolean-state-server/CodegenIntegration.h>
 #include <app/server/Server.h>
 #include <app/util/attribute-storage.h>
 #include <assert.h>
@@ -122,8 +122,8 @@ void AppTask::ApplicationEventHandler(AppEvent * aEvent)
     PlatformMgr().ScheduleWork([](intptr_t) {
         bool state = true;
 
-        Protocols::InteractionModel::Status status = chip::app::Clusters::BooleanState::GetStateValue(&state);
-        if (status != Protocols::InteractionModel::Status::Success)
+        CHIP_ERROR status = chip::app::Clusters::BooleanState::GetStateValue(state);
+        if (status != CHIP_NO_ERROR)
         {
             // Failed to read StateValue. Default to true (open state)
             state = true;
@@ -131,7 +131,7 @@ void AppTask::ApplicationEventHandler(AppEvent * aEvent)
         }
 
         status = chip::app::Clusters::BooleanState::SetStateValue(!state);
-        if (status != Protocols::InteractionModel::Status::Success)
+        if (status != CHIP_NO_ERROR)
         {
             ChipLogError(NotSpecified, "ERR: updating boolean status value %x", to_underlying(status));
         }

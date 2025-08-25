@@ -22,7 +22,7 @@
 
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/cluster-enums.h>
-#include <app/clusters/boolean-state-server/boolean-state-cluster.h>
+#include <app/clusters/boolean-state-server/CodegenIntegration.h>
 
 namespace example {
 namespace Ui {
@@ -36,7 +36,7 @@ void BooleanState::UpdateState()
         mTargetState.ClearValue();
     }
 
-    chip::app::Clusters::BooleanState::GetStateValue(&mState);
+    (void) chip::app::Clusters::BooleanState::GetStateValue(mState);
 }
 
 void BooleanState::Render()

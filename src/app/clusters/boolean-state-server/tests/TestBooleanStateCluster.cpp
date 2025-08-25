@@ -128,10 +128,13 @@ TEST_F(TestBooleanStateCluster, StateValue)
     BooleanStateClusterTest(kEndpoint).Check([](BooleanStateCluster & booleanState) {
         StateValue::TypeInfo::Type stateValue = false;
         ASSERT_EQ(booleanState.SetStateValue(stateValue), CHIP_NO_ERROR);
-        ASSERT_EQ(booleanState.GetStateValue(), stateValue);
+        StateValue::TypeInfo::Type stateVal;
+        ASSERT_EQ(booleanState.GetStateValue(stateVal), CHIP_NO_ERROR);
+        ASSERT_EQ(stateVal, stateValue);
 
         stateValue = true;
         ASSERT_EQ(booleanState.SetStateValue(stateValue), CHIP_NO_ERROR);
-        ASSERT_EQ(booleanState.GetStateValue(), stateValue);
+        ASSERT_EQ(booleanState.GetStateValue(stateVal), CHIP_NO_ERROR);
+        ASSERT_EQ(stateVal, stateValue);
     });
 }

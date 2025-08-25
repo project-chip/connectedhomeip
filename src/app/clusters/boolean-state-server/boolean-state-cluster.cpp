@@ -61,9 +61,12 @@ BooleanStateCluster::SetStateValue(const StateValue::TypeInfo::Type & stateValue
     return CHIP_NO_ERROR;
 }
 
-StateValue::TypeInfo::Type BooleanStateCluster::GetStateValue() const
+CHIP_ERROR
+BooleanStateCluster::GetStateValue(StateValue::TypeInfo::Type & stateValue) const
 {
-    return mStateValue;
+    stateValue = mStateValue;
+
+    return CHIP_NO_ERROR;
 }
 
 } // namespace chip::app::Clusters

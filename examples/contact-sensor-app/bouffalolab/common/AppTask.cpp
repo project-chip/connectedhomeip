@@ -18,7 +18,7 @@
 
 #include <app-common/zap-generated/attributes/Accessors.h>
 
-#include <app/clusters/boolean-state-server/boolean-state-cluster.h>
+#include <app/clusters/boolean-state-server/CodegenIntegration.h>
 #include <app/server/Dnssd.h>
 #include <app/server/Server.h>
 #include <credentials/DeviceAttestationCredsProvider.h>

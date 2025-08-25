@@ -34,7 +34,8 @@ public:
     CHIP_ERROR
     SetStateValue(const BooleanState::Attributes::StateValue::TypeInfo::Type & stateValue);
 
-    BooleanState::Attributes::StateValue::TypeInfo::Type GetStateValue() const;
+    CHIP_ERROR
+    GetStateValue(BooleanState::Attributes::StateValue::TypeInfo::Type & stateValue) const;
 
 protected:
     BooleanState::Attributes::StateValue::TypeInfo::Type mStateValue;
