@@ -144,7 +144,7 @@ DataModel::ActionReturnStatus TimeFormatLocalizationCluster::WriteImpl(const Dat
         AttributePersistence persistence{ mContext->attributeStorage };
         return persistence.DecodeAndStoreNativeEndianValue(request.path, decoder, mHourFormat);
     }
-    
+
     if (request.path.mAttributeId == TimeFormatLocalization::Attributes::ActiveCalendarType::Id)
     {
         TimeFormatLocalization::CalendarTypeEnum newCalendar;
@@ -163,7 +163,7 @@ DataModel::ActionReturnStatus TimeFormatLocalizationCluster::WriteImpl(const Dat
             { kRootEndpointId, TimeFormatLocalization::Id, TimeFormatLocalization::Attributes::ActiveCalendarType::Id },
             { reinterpret_cast<const uint8_t *>(&mCalendarType), sizeof(mCalendarType) });
     }
-    
+
     return Protocols::InteractionModel::Status::UnsupportedWrite;
 }
 
