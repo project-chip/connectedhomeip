@@ -23,6 +23,7 @@ import matter.CertificateAuthority
 import matter.logging
 import matter.native
 from matter.ChipStack import ChipStack
+from matter.storage import PersistentStorageJSON
 from matter.yaml.runner import ReplTestRunner
 from matter.yamltests.runner import TestRunner
 
@@ -38,7 +39,7 @@ class Runner(TestRunner):
     async def start(self):
         matter.native.Init()
         matter.logging.RedirectToPythonLogging()
-        chip_stack = ChipStack(self._repl_storage_path)
+        chip_stack = ChipStack(PersistentStorageJSON(self._repl_storage_path))
         certificate_authority_manager = matter.CertificateAuthority.CertificateAuthorityManager(
             chip_stack, chip_stack.GetStorageManager())
         certificate_authority_manager.LoadAuthoritiesFromStorage()

@@ -123,6 +123,11 @@ class TC_AVSM_2_5(MatterBaseTest):
                 "TH sends the AudioStreamAllocate command with values from step 6 except with AudioCodec set to 10(outside of valid range)",
                 "DUT responds with a CONSTRAINT_ERROR status code.",
             ),
+            TestStep(
+                15,
+                "TH sends the AudioStreamAllocate command with values from step 6 except with SampleRate set to a value not in aMicrophoneCapabilities",
+                "DUT responds with a DYNAMIC_CONSTRAINT_ERROR status code.",
+            ),
         ]
 
     @run_if_endpoint_matches(
@@ -219,12 +224,12 @@ class TC_AVSM_2_5(MatterBaseTest):
             )
             pass
 
+        self.step(9)
         notSupportedStreamUsage = next(
             (e for e in Globals.Enums.StreamUsageEnum if e not in aStreamUsagePriorities and e != Globals.Enums.StreamUsageEnum.kInternal),
             Globals.Enums.StreamUsageEnum.kUnknownEnumValue,
         )
 
-        self.step(9)
         try:
             adoStreamAllocateCmd = commands.AudioStreamAllocate(
                 streamUsage=notSupportedStreamUsage,
@@ -341,6 +346,26 @@ class TC_AVSM_2_5(MatterBaseTest):
                 e.status,
                 Status.ConstraintError,
                 "Unexpected status returned when expecting CONSTRAINT_ERROR due to AudioCodec set to 10(outside of valid range)",
+            )
+            pass
+
+        self.step(15)
+        try:
+            adoStreamAllocateCmd = commands.AudioStreamAllocate(
+                streamUsage=aStreamUsagePriorities[0],
+                audioCodec=aMicrophoneCapabilities.supportedCodecs[0],
+                channelCount=aMicrophoneCapabilities.maxNumberOfChannels,
+                sampleRate=aMicrophoneCapabilities.supportedSampleRates[0] + 10,
+                bitRate=aBitRate,
+                bitDepth=aMicrophoneCapabilities.supportedBitDepths[0],
+            )
+            await self.send_single_cmd(endpoint=endpoint, cmd=adoStreamAllocateCmd)
+            asserts.fail("Unexpected success when expecting DYNAMIC_CONSTRAINT_ERROR due to unsupported sample rate")
+        except InteractionModelError as e:
+            asserts.assert_equal(
+                e.status,
+                Status.DynamicConstraintError,
+                "Unexpected status returned when expecting DYNAMIC_CONSTRAINT_ERROR due to unsupported sample rate",
             )
             pass
 
