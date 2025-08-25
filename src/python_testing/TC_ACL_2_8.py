@@ -148,6 +148,43 @@ class TC_ACL_2_8(MatterBaseTest):
         else:
             return await controller.WriteAttribute(node_id, path)
 
+    def _validate_events(self, events, expected_fabric_index, expected_node_id, other_fabric_index, controller_name, is_filtered, force_legacy_encoding):
+        """Helper method to validate events for a controller"""
+        logging.info(f"Found {len(events)} events for {controller_name}")
+
+        # We expect to see two events with the expected fabric index if not using legacy encoding
+        # We expect to see one event with the expected fabric index if using legacy encoding
+        expected_events_count = 1 if force_legacy_encoding else 2
+
+        found_valid_events = 0
+        found_other_event = False
+
+        for event in events:
+            logging.info(f"Examining event: {str(event)}")
+            if hasattr(event, 'Data') and hasattr(event.Data, 'fabricIndex'):
+                # If this is an event for the expected fabric
+                if event.Data.fabricIndex == expected_fabric_index:
+                    # Check for expected field values
+                    if ((event.Data.changeType == Clusters.AccessControl.Enums.ChangeTypeEnum.kAdded and
+                        event.Data.adminNodeID == NullValue and
+                        event.Data.adminPasscodeID == 0) or
+                        (event.Data.changeType == Clusters.AccessControl.Enums.ChangeTypeEnum.kChanged and
+                        event.Data.adminNodeID == expected_node_id and
+                            event.Data.adminPasscodeID == NullValue)):
+                        found_valid_events += 1
+
+                # If this is an event for the other fabric
+                if event.Data.fabricIndex == other_fabric_index:
+                    found_other_event = True
+
+        asserts.assert_equal(found_valid_events, expected_events_count,
+                             f"Expected {expected_events_count} valid events for {controller_name}, found {found_valid_events}")
+
+        if is_filtered:
+            other_controller = "TH1" if controller_name == "TH2" else "TH2"
+            asserts.assert_false(
+                found_other_event, f"{controller_name} should not see any events from {other_controller}'s fabric when fabric filtered")
+
     async def internal_test_TC_ACL_2_8(self, force_legacy_encoding: bool):
         self.step(1)
         # Open commissioning window with default controller
@@ -241,15 +278,19 @@ class TC_ACL_2_8(MatterBaseTest):
             "Write should have succeeded")
 
         self.step(7)
-        # TH1 reads ACL attribute
+        # TH1 reads ACL attribute with fabricFiltered=True (default)
         ac_cluster = Clusters.AccessControl
         acl_attr = Clusters.AccessControl.Attributes.Acl
-        acl_list = await self.read_single_attribute_check_success(dev_ctrl=self.th1, endpoint=0, cluster=ac_cluster, attribute=acl_attr)
-        logging.info(f"ACL list {str(acl_list)}")
+
+        # Read with fabric_filtered=True (default)
+        acl_list_filtered = await self.read_single_attribute_check_success(
+            dev_ctrl=self.th1, endpoint=0, cluster=ac_cluster, attribute=acl_attr
+        )
+        logging.info("TH1 read ACL result (fabricFiltered=True): %s", str(acl_list_filtered))
 
         asserts.assert_equal(
-            len(acl_list), 1, "Should have exactly one ACL entry")
-        entry = acl_list[0]
+            len(acl_list_filtered), 1, "Should have exactly one ACL entry when fabric filtered")
+        entry = acl_list_filtered[0]
 
         asserts.assert_equal(
             entry.privilege, 5, "Privilege should be Administer (5)")
@@ -262,18 +303,41 @@ class TC_ACL_2_8(MatterBaseTest):
             "Targets should be NullValue")
         asserts.assert_equal(entry.fabricIndex, f1)
 
-        for entry in acl_list:
+        for entry in acl_list_filtered:
             asserts.assert_not_equal(
                 entry.fabricIndex, f2, "Should not contain entry with FabricIndex F2")
 
+        # Read with fabric_filtered=False
+        acl_list_unfiltered = await self.read_single_attribute_check_success(
+            dev_ctrl=self.th1, endpoint=0, cluster=ac_cluster, attribute=acl_attr,
+            fabric_filtered=False
+        )
+        logging.info("TH1 read ACL result (fabric_filtered=False): %s", str(acl_list_unfiltered))
+        asserts.assert_greater(len(acl_list_unfiltered), 1, "Should have at least two ACL entries when not fabric filtered")
+        # Check non-accessing fabric entry is empty because data leaks are bad
+        for entry in acl_list_unfiltered:
+            if entry.fabricIndex == f2:
+                asserts.assert_equal(entry.privilege, 0)
+                asserts.assert_equal(entry.authMode, 0)
+                asserts.assert_true(
+                    entry.subjects is None or entry.subjects == NullValue or entry.subjects == [],
+                    "Non-accessing fabric: subjects should be empty"
+                )
+                asserts.assert_true(
+                    entry.targets is None or entry.targets == NullValue,
+                    "Non-accessing fabric: targets should be empty"
+                )
+
         self.step(8)
-        # TH2 reads ACL attribute
-        acl_list = await self.read_single_attribute_check_success(dev_ctrl=self.th2, endpoint=0, cluster=ac_cluster, attribute=acl_attr)
-        logging.info(f"ACL list {str(acl_list)}")
+        # TH2 reads ACL attribute with fabricFiltered=True (default)
+        acl_list_filtered = await self.read_single_attribute_check_success(
+            dev_ctrl=self.th2, endpoint=0, cluster=ac_cluster, attribute=acl_attr
+        )
+        logging.info("TH2 read ACL result (fabric_filtered=True): %s", str(acl_list_filtered))
 
         asserts.assert_equal(
-            len(acl_list), 1, "Should have exactly one ACL entry")
-        entry = acl_list[0]
+            len(acl_list_filtered), 1, "Should have exactly one ACL entry when fabric filtered")
+        entry = acl_list_filtered[0]
 
         # Verify entry contents
         asserts.assert_equal(
@@ -287,25 +351,55 @@ class TC_ACL_2_8(MatterBaseTest):
             "Targets should be NullValue")
         asserts.assert_equal(entry.fabricIndex, f2)
 
-        for entry in acl_list:
+        for entry in acl_list_filtered:
             asserts.assert_not_equal(
                 entry.fabricIndex, f1, "Should not contain entry with FabricIndex F1")
 
+        # Read with fabric_filtered=False
+        acl_list_unfiltered = await self.read_single_attribute_check_success(
+            dev_ctrl=self.th2, endpoint=0, cluster=ac_cluster, attribute=acl_attr,
+            fabric_filtered=False
+        )
+        logging.info("TH2 read ACL result (fabric_filtered=False): %s", str(acl_list_unfiltered))
+        asserts.assert_greater(len(acl_list_unfiltered), 1, "Should have at least two ACL entries when not fabric filtered")
+        # Check non-accessing fabric entry is empty because data leaks are bad
+        for entry in acl_list_unfiltered:
+            if entry.fabricIndex == f1:
+                asserts.assert_equal(entry.privilege, 0)
+                asserts.assert_equal(entry.authMode, 0)
+                asserts.assert_true(
+                    entry.subjects is None or entry.subjects == NullValue or entry.subjects == [],
+                    "Non-accessing fabric: subjects should be empty"
+                )
+                asserts.assert_true(
+                    entry.targets is None or entry.targets == NullValue,
+                    "Non-accessing fabric: targets should be empty"
+                )
+
         self.step(9)
-        # TH1 reads AccessControlEntryChanged events
-        events = await self.th1.ReadEvent(
+        # TH1 reads AccessControlEntryChanged events with fabricFiltered=True
+        events_filtered = await self.th1.ReadEvent(
             self.dut_node_id,
             [(0, Clusters.AccessControl.Events.AccessControlEntryChanged)],
             fabricFiltered=True
         )
+        self._validate_events(events_filtered, f1, self.th1.nodeId, f2, "TH1", True, force_legacy_encoding)
+
+        # Read with fabricFiltered=False
+        events_unfiltered = await self.th1.ReadEvent(
+            self.dut_node_id,
+            [(0, Clusters.AccessControl.Events.AccessControlEntryChanged)],
+            fabricFiltered=False
+        )
+        self._validate_events(events_unfiltered, f1, self.th1.nodeId, f2, "TH1", False, force_legacy_encoding)
 
         if force_legacy_encoding:
-            asserts.assert_equal(len(events), 3, "Should have exactly 3 events")
+            asserts.assert_equal(len(events_filtered), 3, "Should have exactly 3 events")
         else:
-            asserts.assert_equal(len(events), 2, "Should have exactly 2 events")
+            asserts.assert_equal(len(events_filtered), 2, "Should have exactly 2 events")
 
         # Unified event extraction
-        result = self._get_relevant_acl_events(events, self.th1.nodeId, [self.th1.nodeId, 1111])
+        result = self._get_relevant_acl_events(events_filtered, self.th1.nodeId, [self.th1.nodeId, 1111])
         added_event = result[0]
         self._verify_acl_event(
             added_event,
@@ -349,19 +443,28 @@ class TC_ACL_2_8(MatterBaseTest):
                 "Should not contain event with FabricIndex F2")
 
         self.step(10)
-        # TH2 reads AccessControlEntryChanged events
-        events = await self.th2.ReadEvent(
+        # TH2 reads AccessControlEntryChanged events with fabricFiltered=True
+        events_filtered = await self.th2.ReadEvent(
             self.dut_node_id,
             [(0, Clusters.AccessControl.Events.AccessControlEntryChanged)],
             fabricFiltered=True
         )
+        self._validate_events(events_filtered, f2, self.th2.nodeId, f1, "TH2", True, force_legacy_encoding)
+
+        # Read with fabricFiltered=False
+        events_unfiltered = await self.th2.ReadEvent(
+            self.dut_node_id,
+            [(0, Clusters.AccessControl.Events.AccessControlEntryChanged)],
+            fabricFiltered=False
+        )
+        self._validate_events(events_unfiltered, f2, self.th2.nodeId, f1, "TH2", False, force_legacy_encoding)
 
         if force_legacy_encoding:
-            asserts.assert_equal(len(events), 3, "Should have exactly 3 events")
+            asserts.assert_equal(len(events_filtered), 3, "Should have exactly 3 events")
         else:
-            asserts.assert_equal(len(events), 2, "Should have exactly 2 events")
+            asserts.assert_equal(len(events_filtered), 2, "Should have exactly 2 events")
 
-        result = self._get_relevant_acl_events(events, self.th2.nodeId, [self.th2.nodeId, 2222])
+        result = self._get_relevant_acl_events(events_filtered, self.th2.nodeId, [self.th2.nodeId, 2222])
         added_event = result[0]
         self._verify_acl_event(
             added_event,
