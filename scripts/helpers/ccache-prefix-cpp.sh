@@ -1,8 +1,10 @@
 #!/bin/bash
 
-cmd="$@"
-
 # Add -P flag to get rid of #line directives which break caching
-cmd="${cmd/" -E "/" -E -P "}"
+args=()
+for arg in "$@"; do
+    args+=("$arg")
+    [[ "$arg" == "-E" ]] && args+=("-P")
+done
 
-eval "$cmd"
+exec "${args[@]}"
