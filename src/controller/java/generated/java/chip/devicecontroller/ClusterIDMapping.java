@@ -17865,6 +17865,7 @@ public class ClusterIDMapping {
             TiltMax(6L),
             PanMin(7L),
             PanMax(8L),
+            MovementState(9L),
             GeneratedCommandList(65528L),
             AcceptedCommandList(65529L),
             AttributeList(65531L),
