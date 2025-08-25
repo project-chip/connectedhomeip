@@ -394,8 +394,7 @@ extern "C" sl_status_t sl_wfx_host_process_event(sl_wfx_generic_message_t * even
         ChipLogError(DeviceLayer, "event: SL_WFX_EXCEPTION_IND_ID");
         ChipLogError(DeviceLayer, "firmware_exception->header.length: %d", firmware_exception->header.length);
         // create a bytespan header.length with exception payload
-        ByteSpan exception_byte_span = ByteSpan((uint8_t *) firmware_exception, firmware_exception->header.length);
-        ChipLogByteSpan(DeviceLayer, exception_byte_span);
+        ChipLogByteSpan(DeviceLayer, ByteSpan((uint8_t *) firmware_exception, firmware_exception->header.length));
         break;
     }
     case SL_WFX_ERROR_IND_ID: {
@@ -404,8 +403,7 @@ extern "C" sl_status_t sl_wfx_host_process_event(sl_wfx_generic_message_t * even
         ChipLogError(DeviceLayer, "firmware_error->type: %lu", firmware_error->body.type);
         ChipLogError(DeviceLayer, "firmware_error->header.length: %d", firmware_error->header.length);
         // create a bytespan header.length with error payload
-        ByteSpan error_byte_span = ByteSpan((uint8_t *) firmware_error, firmware_error->header.length);
-        ChipLogByteSpan(DeviceLayer, error_byte_span);
+        ChipLogByteSpan(DeviceLayer, ByteSpan((uint8_t *) firmware_error, firmware_error->header.length));
         break;
     }
     }
