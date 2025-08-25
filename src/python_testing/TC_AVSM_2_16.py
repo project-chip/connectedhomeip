@@ -188,14 +188,16 @@ class TC_AVSM_2_9(MatterBaseTest, AVSMTestBase):
             endpoint=endpoint, cluster=cluster, attribute=attr.AllocatedVideoStreams
         )
         logger.info(f"Rx'd AllocatedVideoStreams: {aAllocatedVideoStreams}")
-        asserts.assert_equal(aAllocatedVideoStreams[0].referenceCount, aVideoRefCount+1, "The reference count for allocated video streams is not as expected")
+        asserts.assert_equal(aAllocatedVideoStreams[0].referenceCount, aVideoRefCount+1,
+                             "The reference count for allocated video streams is not as expected")
 
         self.step(6)
         aAllocatedAudioStreams = await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=cluster, attribute=attr.AllocatedAudioStreams
         )
         logger.info(f"Rx'd AllocatedAudioStreams: {aAllocatedAudioStreams}")
-        asserts.assert_equal(aAllocatedAudioStreams[0].referenceCount, aAudioRefCount+1, "The reference count for allocated video streams is not as expected")
+        asserts.assert_equal(aAllocatedAudioStreams[0].referenceCount, aAudioRefCount+1,
+                             "The reference count for allocated video streams is not as expected")
 
         self.step(7)
         try:
@@ -270,6 +272,7 @@ class TC_AVSM_2_9(MatterBaseTest, AVSMTestBase):
         )
         logger.info(f"Rx'd AllocatedAudioStreams: {aAllocatedVideoStreams}")
         asserts.assert_equal(len(aAllocatedVideoStreams), 0, "The number of allocated audio streams in the list is not 0")
+
 
 if __name__ == "__main__":
     default_matter_test_main()
