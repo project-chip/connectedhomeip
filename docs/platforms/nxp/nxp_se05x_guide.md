@@ -73,6 +73,7 @@ control the enable pin as required.
 
 ```
     cd connectedhomeip
+    export IMX_SDK_ROOT= <path of the Yocto SDK>
     ./scripts/examples/imxlinux_example.sh -s examples/thermostat/nxp/linux-se05x/ -o out/thermostat -d
 ```
 
@@ -245,7 +246,7 @@ using chip tool. Ensure to connect Jumper J6 to 2-3 pins to use onboard antenna
 of OM-SE051ARD board
 
 ```
-./out/linux-x64-chip-tool-nfc-commission/chip-tool pairing nfc-wifi 1 "ssid-name" "password" <passcode (Noted in previous step)> 3840
+./out/linux-x64-chip-tool-nfc-commission/chip-tool pairing nfc-thread 1 1 <passcode (Noted in previous step)> 3840
 ```
 
 ### Step 4: Run Thermostat example
@@ -285,3 +286,12 @@ the KVS file / file system for CASE operation to work.
     public key is read out. The private key bytes are filled with the
     information of the Node operational key id. This is called reference key.
     Reference key is used to refer SE05x for ECDSA Sign operation.
+
+### Step 5: Run Chip-tool example
+
+```
+./out/linux-x64-chip-tool-nfc-commission/chip-tool thermostat read local-temperature 1 1
+```
+
+The command will establish a CASE session using the Node operation key created
+during the NFC commissioning step.

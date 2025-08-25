@@ -180,7 +180,6 @@ public:
         PairingCommand("nfc-thread", PairingMode::Nfc, PairingNetworkType::Thread, credsIssuerConfig)
     {}
 };
-
 class PairSoftAP : public PairingCommand
 {
 public:
