@@ -158,7 +158,7 @@ CHIP_ERROR BindingTable::LoadFromStorage()
     while (index != kNextNullIndex)
     {
         uint8_t nextIndex = kNextNullIndex;
-        error = LoadEntryFromStorage(index, nextIndex);
+        error             = LoadEntryFromStorage(index, nextIndex);
         if (error != CHIP_NO_ERROR)
         {
             mHead = kNextNullIndex;
