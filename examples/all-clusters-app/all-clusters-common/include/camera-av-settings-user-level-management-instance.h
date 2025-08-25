@@ -29,7 +29,7 @@ namespace CameraAvSettingsUserLevelManagement {
 class AVSettingsUserLevelManagementDelegate : public Delegate
 {
 public:
-    AVSettingsUserLevelManagementDelegate() = default;
+    AVSettingsUserLevelManagementDelegate()  = default;
     ~AVSettingsUserLevelManagementDelegate() = default; //{ CancelActiveTimers(); };
 
     bool CanChangeMPTZ() override;
