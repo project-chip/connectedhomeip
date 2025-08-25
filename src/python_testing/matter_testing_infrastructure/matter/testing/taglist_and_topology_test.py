@@ -20,8 +20,10 @@ from collections import defaultdict
 from dataclasses import dataclass, field
 from typing import Any, Dict, List, Set, Tuple
 
+
 import matter.clusters as Clusters
 from matter.clusters.Types import Nullable
+from matter.testing.problem_notices import ClusterPathLocation, ProblemNotice, ProblemSeverity
 
 
 @dataclass
@@ -209,3 +211,66 @@ def flat_list_ok(flat_endpoint_id_to_check: int, endpoints_dict: Dict[int, Any])
     for child in endpoints_dict[flat_endpoint_id_to_check][Clusters.Descriptor][Clusters.Descriptor.Attributes.PartsList]:
         sub_children.update(get_all_children(child, endpoints_dict))
     return all(item in endpoints_dict[flat_endpoint_id_to_check][Clusters.Descriptor][Clusters.Descriptor.Attributes.PartsList] for item in sub_children)
+
+
+@dataclass
+class EndpointTree:
+    endpoint: int
+    children: list[int]
+    is_aggregator_or_root: bool = False
+    is_tree_root: bool = False
+
+
+type TreeDict = dict[int, EndpointTree]
+
+
+def build_tree_for_graph(endpoints: dict[int, Any]) -> tuple[TreeDict, list[ProblemNotice]]:
+    problems: list[ProblemNotice] = []
+    aggregator_endpoints, tree_endpoints = separate_endpoint_types(endpoints)
+    problem_endpoints = parts_list_problems(tree_endpoints, endpoints)
+    for p in problem_endpoints:
+        location = ClusterPathLocation(endpoint_id=p, cluster_id=Clusters.Descriptor.id)
+        problems.append(ProblemNotice(test_name="Tree graph", location=location,
+                        severify=ProblemSeverity.ERROR, problem=f"Bad topology on endpoint {p}"))
+
+    roots = find_tree_roots(tree_endpoints, endpoints)
+    all_endpoints: TreeDict = {}
+
+    def create_tree(endpoint: int):
+        children = endpoints[endpoint][Clusters.Descriptor][Clusters.Descriptor.Attributes.PartsList]
+        all_endpoints[endpoint] = EndpointTree(endpoint=endpoint, children=children)
+        for e in all_endpoints[endpoint].children:
+            create_tree(e)
+
+    # Endpoints in trees
+    for r in roots:
+        create_tree(r)
+        all_endpoints[r].is_tree_root = True
+
+    singletons = set(endpoints[0][Clusters.Descriptor][Clusters.Descriptor.Attributes.PartsList]) - \
+        set(all_endpoints.keys()) - set(aggregator_endpoints)
+    # Aggregators
+    all_aggregator_children = set()
+    for a in aggregator_endpoints:
+        all_children = endpoints[a][Clusters.Descriptor][Clusters.Descriptor.Attributes.PartsList]
+        children_roots = [c for c in all_children if c in roots or c in singletons]
+        all_aggregator_children.update(set(all_children))
+        all_endpoints[a] = EndpointTree(endpoint=a, children=children_roots, is_aggregator_or_root=True)
+    # Singletons are roots of a 1-element tree
+
+    for s in singletons:
+        if endpoints[s][Clusters.Descriptor][Clusters.Descriptor.Attributes.PartsList]:
+            location = ClusterPathLocation(endpoint_id=p, cluster_id=Clusters.Descriptor.id)
+            problems.append(ProblemNotice(test_name="Tree graph", location=location,
+                            severify=ProblemSeverity.ERROR, problem=f"Bad topology on endpoint {s}"))
+        all_endpoints[s] = EndpointTree(endpoint=s, children=[], is_tree_root=True)
+
+    if problems:
+        return {}, problems
+    # NOTE: Does not handle aggregator of aggregators
+    root_node_trees = [r for r in roots if r not in all_aggregator_children]
+    singletons_in_root = [s for s in singletons if s not in all_aggregator_children]
+    root_node_children = root_node_trees + singletons_in_root + aggregator_endpoints
+    all_endpoints[0] = EndpointTree(endpoint=0, children=root_node_children, is_aggregator_or_root=True)
+
+    return all_endpoints, []
