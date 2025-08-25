@@ -659,8 +659,8 @@ CHIP_ERROR BLEManagerCommon::ConfigureAdvertisingData(void)
 
     adv_params.minInterval = adv_params.maxInterval = advInterval;
     adv_params.advertisingType                      = gAdvConnectableUndirected_c;
-    adv_params.ownAddressType                       = gBleAddrTypeRandom_c;
-    adv_params.peerAddressType                      = gBleAddrTypePublic_c;
+    adv_params.ownAddressType  = ConfigurationMgr().IsFullyProvisioned() ? gBleAddrTypePublic_c : gBleAddrTypeRandom_c;
+    adv_params.peerAddressType = gBleAddrTypePublic_c;
     memset(adv_params.peerAddress, 0, gcBleDeviceAddressSize_c);
     adv_params.channelMap   = (gapAdvertisingChannelMapFlags_t) (gAdvChanMapFlag37_c | gAdvChanMapFlag38_c | gAdvChanMapFlag39_c);
     adv_params.filterPolicy = gProcessAll_c;
@@ -769,7 +769,7 @@ CHIP_ERROR BLEManagerCommon::StopAdvertising(void)
         mFlags.Clear(Flags::kAdvertising);
         mFlags.Clear(Flags::kRestartAdvertising);
 
-        if (mDeviceIds.size())
+        if (!mDeviceIds.size())
         {
             ble_err_t err = blekw_stop_advertising();
             VerifyOrReturnError(err == BLE_OK, CHIP_ERROR_INCORRECT_STATE);
@@ -927,6 +927,21 @@ exit:
     return err;
 }
 
+CHIP_ERROR BLEManagerCommon::DisconnectAndUnbond(void)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
+    for (auto & id : mDeviceIds)
+    {
+        VerifyOrExit(Gap_Disconnect(id) == gBleSuccess_c, err = CHIP_ERROR_INTERNAL);
+    }
+
+    VerifyOrExit(Gap_RemoveAllBonds() == gBleSuccess_c, err = CHIP_ERROR_INTERNAL);
+
+exit:
+    return err;
+}
+
 void BLEManagerCommon::HandleConnectEvent(blekw_msg_t * msg)
 {
     uint8_t deviceId = msg->data.u8;
@@ -940,6 +955,7 @@ void BLEManagerCommon::HandleConnectEvent(blekw_msg_t * msg)
     if (mServiceMode == kMultipleBLE_Enabled)
     {
         _SetAdvertisingEnabled(false);
+        CancelBleAdvTimeoutTimer();
         mServiceMode = kMultipleBLE_Disabled;
     }
 
@@ -1223,11 +1239,13 @@ void BLEManagerCommon::blekw_gap_connection_cb(deviceId_t deviceId, gapConnectio
         }
 #endif
     }
+#if gAppUsePairing_d == 0
     else if (pConnectionEvent->eventType == gConnEvtPairingRequest_c)
     {
         /* Reject request for pairing */
         Gap_RejectPairing(deviceId, gPairingNotSupported_c);
     }
+#endif
     else if (pConnectionEvent->eventType == gConnEvtAuthenticationRejected_c)
     {
         ChipLogProgress(DeviceLayer, "BLE Authentication rejected (reason:%d).\n",

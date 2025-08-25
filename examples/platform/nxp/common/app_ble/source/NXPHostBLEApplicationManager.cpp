@@ -1,7 +1,7 @@
 /*
  *
  *    Copyright (c) 2024 Project CHIP Authors
- *    Copyright 2024 NXP
+ *    Copyright 2024-2025 NXP
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -26,6 +26,9 @@
 
 #include "gatt_db_app_interface.h"
 #include "gatt_db_handles.h"
+
+extern "C" void btSettingsInit(void);
+extern "C" void btSettingsWipe(void);
 
 using namespace ::chip::DeviceLayer;
 using namespace ::chip::DeviceLayer::Internal;
@@ -63,6 +66,10 @@ void BLEApplicationManager::Init(void)
     {
         ChipLogError(DeviceLayer, "Error while adding BLE write notification handle");
     }
+
+#if gAppUseBonding_d
+    btSettingsInit();
+#endif
 }
 
 void BLEApplicationManager::EnableMultipleConnectionsHandler(void)
@@ -91,4 +98,19 @@ void BLEApplicationManager::EnableMultipleConnections(intptr_t arg)
     {
         ChipLogProgress(DeviceLayer, "Device must be commissioned before adding multiple BLE connections");
     }
+}
+
+void BLEApplicationManager::FactoryReset(void)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
+    err = DeviceLayer::Internal::BLEMgrImpl().DisconnectAndUnbond();
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(DeviceLayer, "Error during BLEMgrImpl().DisconnectAndUnbond()");
+    }
+
+#if gAppUseBonding_d
+    btSettingsWipe();
+#endif
 }
