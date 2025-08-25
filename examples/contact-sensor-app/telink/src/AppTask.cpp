@@ -20,6 +20,7 @@
 #include "LEDManager.h"
 
 #include <app-common/zap-generated/attributes/Accessors.h>
+#include <app/clusters/boolean-state-server/boolean-state-cluster.h>
 
 #include <zephyr/kernel.h>
 #include <zephyr/logging/log.h>

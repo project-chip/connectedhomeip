@@ -19,6 +19,7 @@
 #include "WaterLeakDetectorManager.h"
 
 #include <app-common/zap-generated/attributes/Accessors.h>
+#include <app/clusters/boolean-state-server/boolean-state-cluster.h>
 #include <lib/core/ErrorStr.h>
 #include <lib/support/logging/CHIPLogging.h>
 
