@@ -738,6 +738,8 @@ def convert_args_to_matter_config(args: argparse.Namespace):
     config.timeout = args.timeout  # This can be none, we pull the default from the test if it's unspecified
     config.endpoint = args.endpoint  # This can be None, the get_endpoint function allows the tests to supply a default
     config.restart_flag_file = args.restart_flag_file
+
+    # Map CLI arg to the current config field name used by tests
     config.pipe_name = args.app_pipe
     if config.pipe_name is not None and not os.path.exists(config.pipe_name):
         # Named pipes are unique, so we MUST have consistent paths
