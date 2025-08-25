@@ -129,12 +129,14 @@ class CommodityTariffTestBaseHelper(MatterBaseTest):
         matter_asserts.assert_valid_uint8(struct.decimalPoints, 'DecimalPoints')
 
     async def checkDayEntryStruct(self,
+                                  endpoint: int,
                                   cluster: Clusters.CommodityTariff = None,
                                   struct: Clusters.CommodityTariff.Structs.DayEntryStruct = None) -> None:
         """
         Checks the correctness of the DayEntryStruct data type entries.
 
         Args:
+            endpoint (int): Endpoint ID;
             cluster (Clusters.CommodityTariff): CommodityTariff cluster;
             struct (DayEntryStruct): DayEntryStruct data type entity.
         """
@@ -155,7 +157,7 @@ class CommodityTariffTestBaseHelper(MatterBaseTest):
 
         # if SETRF.S.F05(RNDM) feature is enabled
         # checks RandomizationOffset and RandomizationType fields
-        if self.check_pics("SETRF.S.F05"):
+        if self.feature_guard(cluster=cluster, endpoint=endpoint, feature_int=cluster.Bitmaps.Feature.kRandomization):
             if struct.randomizationType is not None:
                 # checks RandomizationType field must be DayEntryRandomizationTypeEnum type value and in range 0 - 4
                 matter_asserts.assert_valid_enum(
@@ -292,46 +294,46 @@ class CommodityTariffTestBaseHelper(MatterBaseTest):
                             'At least one field from price, friendlyCredit, auxiliaryLoad, peakPeriod, powerThreshold must be set')
 
         # if SETRF.S.F00(PRICE) feature is enabled
-        if self.check_pics("SETRF.S.F00"):
+        if self.feature_guard(cluster=cluster, endpoint=endpoint, feature_int=cluster.Bitmaps.Feature.kPricing):
             # checks Price field must be of type TariffPriceStruct
             if struct.price is not None and struct.price is not NullValue:
                 asserts.assert_true(isinstance(
                     struct.price, cluster.Structs.TariffPriceStruct), "Price field must be of type TariffPriceStruct")
-                await self.checkTariffPriceStruct(endpoint=endpoint, cluster=cluster, struct=struct.price)
+                await self.checkTariffPriceStruct(cluster=cluster, struct=struct.price)
         else:  # if SETRF.S.F00(PRICE) feature is disabled
             asserts.assert_is_none(struct.price, "Price must be None")
 
         # if SETRF.S.F01(FCRED) feature is enabled
-        if self.check_pics("SETRF.S.F01"):
+        if self.feature_guard(cluster=cluster, endpoint=endpoint, feature_int=cluster.Bitmaps.Feature.kFriendlyCredit):
             # checks FriendlyCredit field must be bool
             matter_asserts.assert_valid_bool(struct.friendlyCredit, 'FriendlyCredit')
         else:  # if SETRF.S.F01(FCRED) feature is disabled
             asserts.assert_is_none(struct.friendlyCredit, "FriendlyCredit must be None")
 
         # if SETRF.S.F02(AUXLD) feature is enabled
-        if self.check_pics("SETRF.S.F02"):
+        if self.feature_guard(cluster=cluster, endpoint=endpoint, feature_int=cluster.Bitmaps.Feature.kAuxiliaryLoad):
             # checks AuxiliaryLoad field must be of type AuxiliaryLoadSwitchSettingsStruct
             asserts.assert_true(isinstance(
                 struct.auxiliaryLoad, cluster.Structs.AuxiliaryLoadSwitchSettingsStruct), "struct.auxiliaryLoad must be of type AuxiliaryLoadSwitchSettingsStruct")
-            await self.checkAuxiliaryLoadSwitchSettingsStruct(endpoint=endpoint, cluster=cluster, struct=struct.auxiliaryLoad)
+            await self.checkAuxiliaryLoadSwitchSettingsStruct(cluster=cluster, struct=struct.auxiliaryLoad)
         else:  # if SETRF.S.F02(AUXLD) feature is disabled
             asserts.assert_is_none(struct.auxiliaryLoad, "AuxiliaryLoad must be None")
 
         # if SETRF.S.F03(PEAKP) feature is enabled
-        if self.check_pics("SETRF.S.F03"):
+        if self.feature_guard(cluster=cluster, endpoint=endpoint, feature_int=cluster.Bitmaps.Feature.kPeakPeriod):
             # checks PeakPeriod field must be of type PeakPeriodStruct
             asserts.assert_true(isinstance(
                 struct.peakPeriod, cluster.Structs.PeakPeriodStruct), "PeakPeriod must be of type PeakPeriodStruct")
-            await self.checkPeakPeriodStruct(endpoint=endpoint, cluster=cluster, struct=struct.peakPeriod)
+            await self.checkPeakPeriodStruct(cluster=cluster, struct=struct.peakPeriod)
         else:  # if SETRF.S.F03(PEAKP) feature is disabled
             asserts.assert_is_none(struct.peakPeriod, "PeakPeriod must be None")
 
         # if SETRF.S.F04(PWRTHLD) feature is enabled
-        if self.check_pics("SETRF.S.F04"):
+        if self.feature_guard(cluster=cluster, endpoint=endpoint, feature_int=cluster.Bitmaps.Feature.kPowerThreshold):
             # checks PowerThreshold field must be of type PowerThresholdStruct
             asserts.assert_true(isinstance(
                 struct.powerThreshold, Globals.Structs.PowerThresholdStruct), "PowerThreshold must be of type PowerThresholdStruct")
-            await self.checkPowerThresholdStruct(endpoint=endpoint, cluster=cluster, struct=struct.powerThreshold)
+            await self.checkPowerThresholdStruct(cluster=cluster, struct=struct.powerThreshold)
         else:  # if SETRF.S.F04(PWRTHLD) feature is disabled
             asserts.assert_is_none(struct.powerThreshold, "PowerThreshold must be None")
 
@@ -376,13 +378,13 @@ class CommodityTariffTestBaseHelper(MatterBaseTest):
             asserts.assert_less_equal(len(struct.providerName), 128, "ProviderName must have length at most 128!")
 
         # if SETRF.S.F00(PRICE) feature is enabled
-        if self.check_pics("SETRF.S.F00"):
+        if self.feature_guard(cluster=cluster, endpoint=endpoint, feature_int=cluster.Bitmaps.Feature.kPricing):
             # checks Currency field must be CurrencyStruct
             asserts.assert_true(struct.currency is not None, "Currency must have real value or can be Null")
             if struct.currency is not NullValue:
                 asserts.assert_true(isinstance(
                     struct.currency, Globals.Structs.CurrencyStruct), "Currency must be of type CurrencyStruct")
-                await self.checkCurrencyStruct(endpoint=endpoint, cluster=cluster, struct=struct.currency)
+                await self.checkCurrencyStruct(cluster=cluster, struct=struct.currency)
         else:  # if SETRF.S.F00(PRICE) feature is disabled
             asserts.assert_is_none(struct.currency, "Currency must be None")
 
@@ -561,7 +563,7 @@ class CommodityTariffTestBaseHelper(MatterBaseTest):
                 matter_asserts.assert_list_element_type(
                     attribute_value, cluster.Structs.DayPatternStruct, "DayPatterns attribute must contain DayPatternStruct elements")
                 for item in attribute_value:  # check each DayPatternStruct
-                    await self.checkDayPatternStruct(endpoint=endpoint, cluster=cluster, struct=item)
+                    await self.checkDayPatternStruct(cluster=cluster, struct=item)
 
     async def check_calendar_periods_attribute(self, endpoint: int, attribute_value: Optional[List[cluster.Structs.CalendarPeriodStruct]] = None) -> None:
         """Validate CalendarPeriods attribute.
@@ -583,7 +585,7 @@ class CommodityTariffTestBaseHelper(MatterBaseTest):
 
             # check each CalendarPeriodStruct
             for item in attribute_value:
-                await self.checkCalendarPeriodStruct(endpoint=endpoint, cluster=cluster, struct=item, start_date_attribute=self.startDateAttributeValue)
+                await self.checkCalendarPeriodStruct(cluster=cluster, struct=item, start_date_attribute=self.startDateAttributeValue)
 
             # check CalendarPeriods order
             for item in range(len(attribute_value) - 1):
@@ -621,7 +623,7 @@ class CommodityTariffTestBaseHelper(MatterBaseTest):
 
             # check each DayStruct
             for item in attribute_value:
-                await self.checkDayStruct(endpoint=endpoint, cluster=cluster, struct=item)
+                await self.checkDayStruct(cluster=cluster, struct=item)
 
             # check IndividualDays order
             for item in range(len(attribute_value) - 1):
@@ -643,7 +645,7 @@ class CommodityTariffTestBaseHelper(MatterBaseTest):
         if attribute_value is not NullValue:
             asserts.assert_true(isinstance(
                 attribute_value, cluster.Structs.DayStruct), "CurrentDay must be of type DayStruct")
-            await self.checkDayStruct(endpoint=endpoint, cluster=cluster, struct=attribute_value)
+            await self.checkDayStruct(cluster=cluster, struct=attribute_value)
 
     async def check_next_day_attribute(self, endpoint: int, attribute_value: Optional[cluster.Structs.DayStruct] = None) -> None:
         """Validate NextDay attribute.
@@ -660,7 +662,7 @@ class CommodityTariffTestBaseHelper(MatterBaseTest):
         if attribute_value is not NullValue:
             asserts.assert_true(isinstance(
                 attribute_value, cluster.Structs.DayStruct), "NextDay must be of type DayStruct")
-            await self.checkDayStruct(endpoint=endpoint, cluster=cluster, struct=attribute_value)
+            await self.checkDayStruct(cluster=cluster, struct=attribute_value)
 
     async def check_current_day_entry_attribute(self, endpoint: int, attribute_value: Optional[cluster.Structs.DayEntryStruct] = None) -> None:
         """Validate CurrentDayEntry attribute.
@@ -768,7 +770,7 @@ class CommodityTariffTestBaseHelper(MatterBaseTest):
 
             # check each TariffPeriodStruct
             for item in attribute_value:
-                await self.checkTariffPeriodStruct(endpoint=endpoint, cluster=cluster, struct=item)
+                await self.checkTariffPeriodStruct(cluster=cluster, struct=item)
 
     async def check_current_tariff_components_attribute(self, endpoint: int, attribute_value: Optional[List[cluster.Structs.TariffComponentStruct]] = None) -> None:
         """Validate CurrentTariffComponents attribute.
@@ -827,8 +829,9 @@ class CommodityTariffTestBaseHelper(MatterBaseTest):
             if await self.attribute_guard(endpoint=endpoint, attribute=cluster.Attributes.DefaultRandomizationOffset):
                 self.defaultRandomizationOffset = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.DefaultRandomizationOffset)
 
-        # check if RNDM feature is enabled
-        if self.check_pics("SETRF.S.A0011") and self.check_pics("SETRF.S.F05"):
+        # check if RNDM feature and DefaultRandomizationOffset attribute are enabled
+        if (self.attribute_guard(endpoint=endpoint, attribute=cluster.Attributes.DefaultRandomizationOffset) and
+                self.feature_guard(endpoint=endpoint, cluster=cluster, feature_int=cluster.Bitmaps.Feature.kRandomization)):
             # if feature is enabled, DefaultRandomizationOffset attribute must not be None
             asserts.assert_is_not_none(
                 self.defaultRandomizationOffset, "DefaultRandomizationOffset attribute must not be None if RNDM feature is enabled.")
@@ -853,7 +856,8 @@ class CommodityTariffTestBaseHelper(MatterBaseTest):
                 self.defaultRandomizationType = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.DefaultRandomizationType)
 
         # check if RNDM feature is enabled
-        if self.check_pics("SETRF.S.A0012") and self.check_pics("SETRF.S.F05"):
+        if (self.attribute_guard(endpoint=endpoint, attribute=cluster.Attributes.DefaultRandomizationType) and
+                self.feature_guard(endpoint=endpoint, cluster=cluster, feature_int=cluster.Bitmaps.Feature.kRandomization)):
             # if feature is enabled, DefaultRandomizationType attribute must not be None
             asserts.assert_is_not_none(
                 self.defaultRandomizationType, "DefaultRandomizationType attribute must not be None if RNDM feature is enabled.")

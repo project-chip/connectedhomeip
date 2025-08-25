@@ -259,9 +259,9 @@ class TC_SETRF_3_1(MatterBaseTest, CommodityTariffTestBaseHelper):
                         - Verify that PowerThreshold field in PowerThresholdStruct has type power-mW;
                         - Verify that ApparentPowerThreshold field in PowerThresholdStruct has type power-mVA;
                         - Verify that PowerThresholdSource field in PowerThresholdStruct has type PowerThresholdSourceEnum and value in range 0 - 2."""),
-            TestStep("20", "TH reads DefaultRandomizationOffset attribute.", "DUT replies a Null or a value of int16 value."),
-            TestStep("21", "TH reads DefaultRandomizationType attribute.",
+            TestStep("20", "TH reads DefaultRandomizationType attribute.",
                      "DUT replies a Null or a value of DayEntryRandomizationType in range 0 - 4."),
+            TestStep("21", "TH reads DefaultRandomizationOffset attribute.", "DUT replies a Null or a value of int16 value."),
             TestStep("22", "TH reads TestEventTriggersEnabled attribute from General Diagnostics Cluster.", "Values is True."),
             TestStep("23", "TH sends TestEventTrigger command for Fake Tariff Set Test Event.",
                      "DUT replies with SUCCESS status code."),
@@ -467,12 +467,12 @@ class TC_SETRF_3_1(MatterBaseTest, CommodityTariffTestBaseHelper):
                         - Verify that PowerThreshold field in PowerThresholdStruct has type power-mW;
                         - Verify that ApparentPowerThreshold field in PowerThresholdStruct has type power-mVA;
                         - Verify that PowerThresholdSource field in PowerThresholdStruct has type PowerThresholdSourceEnum and value in range 0 - 2."""),
-            TestStep("41", "TH reads DefaultRandomizationOffset attribute.", """
-                     - Verify the report is received and the value does not match the DefaultRandomizationOffsetValue;
-                     - DUT replies a Null or a value of int16 value."""),
-            TestStep("42", "TH reads DefaultRandomizationType attribute.", """
+            TestStep("41", "TH reads DefaultRandomizationType attribute.", """
                      - Verify the report is received and the value does not match the DefaultRandomizationTypeValue;
                      - DUT replies a Null or a value of DayEntryRandomizationType in range 0 - 4."""),
+            TestStep("42", "TH reads DefaultRandomizationOffset attribute.", """
+                     - Verify the report is received and the value does not match the DefaultRandomizationOffsetValue;
+                     - DUT replies a Null or a value of int16 value."""),
             TestStep("43", "TH sends TestEventTrigger command for Test Event Clear.",
                            "DUT replies with SUCCESS status code."),
             TestStep("44", "TH removes the subscription to Commodity Tariff attributes.", "Subscription successfully removed."),
@@ -599,25 +599,45 @@ class TC_SETRF_3_1(MatterBaseTest, CommodityTariffTestBaseHelper):
                                                                                    attribute=cluster.Attributes.NextTariffComponents)
         await self.check_next_tariff_components_attribute(endpoint, NextTariffComponentsValue)
 
-        if not self.check_pics("SETRF.S.A0011"):  # Checks if attribute is supported
-            logger.info("PICS SETRF.S.A0011 is not True")
-            self.skip_step("20")
-        else:
-            self.step("20")
-            # TH reads DefaultRandomizationOffset attribute, expects a int16
-            DefaultRandomizationOffsetValue = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster,
-                                                                                             attribute=cluster.Attributes.DefaultRandomizationOffset)
-            await self.check_default_randomization_offset_attribute(endpoint, DefaultRandomizationOffsetValue)
+        if await self.attribute_guard(endpoint=endpoint, attribute=cluster.Attributes.DefaultRandomizationType):
 
-        if not self.check_pics("SETRF.S.A0012"):  # Checks if attribute is supported
-            logger.info("PICS SETRF.S.A0012 is not True")
-            self.skip_step("21")
-        else:
-            self.step("21")
+            self.step("20")
+
+            if not self.check_pics("SETRF.S.A0012"):  # for cases when it is supported by DUT, but disabled in PICS
+                logger.warning("DefaultRandomizationType attribute is actually supported by DUT, but PICS SETRF.S.A0012 is False")
+
             # TH reads DefaultRandomizationType attribute, expects a DayEntryRandomizationTypeEnum
             DefaultRandomizationTypeValue = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster,
                                                                                            attribute=cluster.Attributes.DefaultRandomizationType)
             await self.check_default_randomization_type_attribute(endpoint, DefaultRandomizationTypeValue)
+        else:
+
+            if self.check_pics("SETRF.S.A0012"):  # for cases when it is not supported by DUT, but enabled in PICS
+                self.step("20")
+                asserts.fail(
+                    "PICS file does not correspond to real DUT functionality. DefaultRandomizationType is not actually supported, but SETRF.S.A0012 is True.")
+            else:  # attribute is not supported at all
+                self.skip_step("20")
+
+        if await self.attribute_guard(endpoint=endpoint, attribute=cluster.Attributes.DefaultRandomizationOffset):
+
+            self.step("21")
+
+            if not self.check_pics("SETRF.S.A0011"):  # for cases when it is supported by DUT, but disabled in PICS
+                logger.warning("DefaultRandomizationOffset attribute is actually supported by DUT, but PICS SETRF.S.A0011 is False")
+
+            # TH reads DefaultRandomizationOffset attribute, expects a int16
+            DefaultRandomizationOffsetValue = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster,
+                                                                                             attribute=cluster.Attributes.DefaultRandomizationOffset)
+            await self.check_default_randomization_offset_attribute(endpoint, DefaultRandomizationOffsetValue)
+        else:
+
+            if self.check_pics("SETRF.S.A0011"):  # for cases when it is not supported by DUT, but enabled in PICS
+                self.step("21")
+                asserts.fail(
+                    "PICS file does not correspond to real DUT functionality. DefaultRandomizationOffset is not actually supported, but SETRF.S.A0011 is True.")
+            else:  # attribute is not supported at all
+                self.skip_step("21")
 
         self.step("22")
         # TH reads TestEventTriggersEnabled attribute from General Diagnostics Cluster.
@@ -722,25 +742,46 @@ class TC_SETRF_3_1(MatterBaseTest, CommodityTariffTestBaseHelper):
             await self.check_next_tariff_components_attribute(
                 endpoint, subscription_handler.attribute_reports[cluster.Attributes.NextTariffComponents][0].value)
 
-        if not self.check_pics("SETRF.S.A0011"):  # Checks if attribute is supported
-            logger.info("PICS SETRF.S.A0011 is not True")
-            self.skip_step("41")
-        else:
-            self.step("41")
-            if await self.verify_reporting(subscription_handler.attribute_reports, cluster.Attributes.DefaultRandomizationOffset,
-                                           "DefaultRandomizationOffset", DefaultRandomizationOffsetValue):
-                await self.check_default_randomization_offset_attribute(
-                    endpoint, subscription_handler.attribute_reports[cluster.Attributes.DefaultRandomizationOffset][0].value)
+        if await self.attribute_guard(endpoint=endpoint, attribute=cluster.Attributes.DefaultRandomizationType):
 
-        if not self.check_pics("SETRF.S.A0012"):  # Checks if attribute is supported
-            logger.info("PICS SETRF.S.A0012 is not True")
-            self.skip_step("42")
-        else:
-            self.step("42")
+            self.step("41")
+
+            if not self.check_pics("SETRF.S.A0012"):  # for cases when it is supported by DUT, but disabled in PICS
+                logger.warning("DefaultRandomizationType attribute is actually supported by DUT, but PICS SETRF.S.A0012 is False")
+
+            # TH reads DefaultRandomizationType attribute, expects a DayEntryRandomizationTypeEnum
             if await self.verify_reporting(subscription_handler.attribute_reports,
                                            cluster.Attributes.DefaultRandomizationType, "DefaultRandomizationType", DefaultRandomizationTypeValue):
                 await self.check_default_randomization_type_attribute(
                     endpoint, subscription_handler.attribute_reports[cluster.Attributes.DefaultRandomizationType][0].value)
+        else:
+
+            if self.check_pics("SETRF.S.A0012"):  # for cases when it is not supported by DUT, but enabled in PICS
+                self.step("41")
+                asserts.fail(
+                    "PICS file does not correspond to real DUT functionality. DefaultRandomizationType is not actually supported, but SETRF.S.A0012 is True.")
+            else:  # attribute is not supported at all
+                self.skip_step("41")
+
+        if await self.attribute_guard(endpoint=endpoint, attribute=cluster.Attributes.DefaultRandomizationOffset):
+
+            self.step("42")
+
+            if not self.check_pics("SETRF.S.A0011"):  # for cases when it is supported by DUT, but disabled in PICS
+                logger.warning("DefaultRandomizationOffset attribute is actually supported by DUT, but PICS SETRF.S.A0011 is False")
+
+            if await self.verify_reporting(subscription_handler.attribute_reports, cluster.Attributes.DefaultRandomizationOffset,
+                                           "DefaultRandomizationOffset", DefaultRandomizationOffsetValue):
+                await self.check_default_randomization_offset_attribute(
+                    endpoint, subscription_handler.attribute_reports[cluster.Attributes.DefaultRandomizationOffset][0].value)
+        else:
+
+            if self.check_pics("SETRF.S.A0011"):  # for cases when it is not supported by DUT, but enabled in PICS
+                self.step("42")
+                asserts.fail(
+                    "PICS file does not correspond to real DUT functionality. DefaultRandomizationOffset is not actually supported, but SETRF.S.A0011 is True.")
+            else:  # attribute is not supported at all
+                self.skip_step("42")
 
         self.step("43")
         # TH sends TestEventTrigger command for Test Event Clear

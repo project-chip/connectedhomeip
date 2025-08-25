@@ -43,6 +43,7 @@
 
 import logging
 
+from mobly import asserts
 from TC_SETRF_TestBase import CommodityTariffTestBaseHelper
 
 import matter.clusters as Clusters
@@ -342,21 +343,41 @@ class TC_SETRF_2_1(MatterBaseTest, CommodityTariffTestBaseHelper):
         # TH reads NextTariffComponents attribute, expects a list of TariffComponentStruct
         await self.check_next_tariff_components_attribute(endpoint)
 
-        if not self.check_pics("SETRF.S.A0012"):  # Checks if attribute is supported
-            logger.info("PICS SETRF.S.A0012 is not True")
-            self.skip_step("19")
-        else:
+        if await self.attribute_guard(endpoint=endpoint, attribute=cluster.Attributes.DefaultRandomizationType):
+
             self.step("19")
+
+            if not self.check_pics("SETRF.S.A0012"):  # for cases when it is supported by DUT, but disabled in PICS
+                logger.warning("DefaultRandomizationType attribute is actually supported by DUT, but PICS SETRF.S.A0012 is False")
+
             # TH reads DefaultRandomizationType attribute, expects a DayEntryRandomizationTypeEnum
             await self.check_default_randomization_type_attribute(endpoint)
-
-        if not self.check_pics("SETRF.S.A0011"):  # Checks if attribute is supported
-            logger.info("PICS SETRF.S.A0011 is not True")
-            self.skip_step("20")
         else:
+
+            if self.check_pics("SETRF.S.A0012"):  # for cases when it is not supported by DUT, but enabled in PICS
+                self.step("19")
+                asserts.fail(
+                    "PICS file does not correspond to real DUT functionality. DefaultRandomizationType is not actually supported, but SETRF.S.A0012 is True.")
+            else:  # attribute is not supported at all
+                self.skip_step("19")
+
+        if await self.attribute_guard(endpoint=endpoint, attribute=cluster.Attributes.DefaultRandomizationOffset):
+
             self.step("20")
+
+            if not self.check_pics("SETRF.S.A0011"):  # for cases when it is supported by DUT, but disabled in PICS
+                logger.warning("DefaultRandomizationOffset attribute is actually supported by DUT, but PICS SETRF.S.A0011 is False")
+
             # TH reads DefaultRandomizationOffset attribute, expects a int16
             await self.check_default_randomization_offset_attribute(endpoint)
+        else:
+
+            if self.check_pics("SETRF.S.A0011"):  # for cases when it is not supported by DUT, but enabled in PICS
+                self.step("20")
+                asserts.fail(
+                    "PICS file does not correspond to real DUT functionality. DefaultRandomizationOffset is not actually supported, but SETRF.S.A0011 is True.")
+            else:  # attribute is not supported at all
+                self.skip_step("20")
 
 
 if __name__ == "__main__":
