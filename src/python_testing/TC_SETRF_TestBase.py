@@ -15,7 +15,6 @@
 #    limitations under the License.
 
 
-import asyncio
 import logging
 from typing import Any, List, Optional
 
@@ -447,25 +446,21 @@ class CommodityTariffTestBaseHelper(MatterBaseTest):
         """Simulate updating of values for all cluster attributes with valid data not equal to the pre-test state."""
 
         await self.send_test_event_triggers(eventTrigger=self.EventTriggerFakeData)
-        await asyncio.sleep(3)  # Wait some time to be sure that fake data is propagated
 
     async def send_test_event_trigger_clear(self):
         """Return the device to pre-test state."""
 
         await self.send_test_event_triggers(eventTrigger=self.EventTriggerClear)
-        await asyncio.sleep(3)  # Wait some time to be sure that the cluster state has been reset
 
     async def send_test_event_trigger_change_day(self):
         """This test event trigger ensure time shifting on 24h to simulate a day change."""
 
         await self.send_test_event_triggers(eventTrigger=self.EventTriggerChangeDay)
-        await asyncio.sleep(3)  # Wait some time to be sure that test event triggers takes effect
 
     async def send_test_event_trigger_change_time(self):
         """This test event trigger ensure time shifting on 4h to simulate a time change."""
 
         await self.send_test_event_triggers(eventTrigger=self.EventTriggerChangeTime)
-        await asyncio.sleep(3)  # Wait some time to be sure that test event triggers takes effect
 
     async def check_tariff_info_attribute(self, endpoint: int, attribute_value: Optional[cluster.Structs.TariffInformationStruct] = None) -> None:
         """Validate TariffInfo attribute.
