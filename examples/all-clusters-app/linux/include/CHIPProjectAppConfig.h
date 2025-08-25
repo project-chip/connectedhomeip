@@ -54,3 +54,6 @@
 
 // Needed for CI tests
 #define CHIP_CONFIG_ENABLE_ACL_EXTENSIONS 1
+
+// Max Binding entries per fabric for CI tests
+#define CHIP_CONFIG_MAX_BINDING_ENTRIES_PER_FABRIC 1

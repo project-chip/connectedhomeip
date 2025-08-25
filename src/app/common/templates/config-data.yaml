@@ -79,6 +79,7 @@ CommandHandlerInterfaceOnlyClusters:
 ClustersWithInitFunctions:
     - Administrator Commissioning
     - Basic Information
+    - Binding
     - Color Control
     - Ethernet Network Diagnostics
     - General Diagnostics
@@ -113,6 +114,7 @@ ClustersWithShutdownFunctions:
     - Administrator Commissioning
     - Barrier Control
     - Basic Information
+    - Binding
     - Color Control
     - Door Lock
     - General Diagnostics

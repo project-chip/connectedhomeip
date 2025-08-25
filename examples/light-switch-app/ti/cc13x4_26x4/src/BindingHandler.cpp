@@ -23,7 +23,6 @@
 #include "app/server/Server.h"
 #include "controller/InvokeInteraction.h"
 #include "platform/CHIPDeviceLayer.h"
-#include <app/clusters/bindings/bindings.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
 
