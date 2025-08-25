@@ -255,7 +255,7 @@ TEST_F(TestDacOnlyPartialAttestationVerifier, TestWithExpiredDACCertificate)
 {
     // This check is only valid if the platform supports current time retrieval
     // This is necessary to determine if the certificate is expired
-#if defined(CURRENT_TIME_NOT_IMPLEMENTED)
+#if defined(CURRENT_TIME_NOT_IMPLEMENTED) || !(CHIP_SYSTEM_CONFIG_PLATFORM_PROVIDES_TIME)
     GTEST_SKIP() << "Skipping test: platform does not support current time.";
 #endif
     // The actual contents do not represent real or meaningful data.
@@ -313,7 +313,7 @@ TEST_F(TestDacOnlyPartialAttestationVerifier, TestWithValidInFutureDACCertificat
 {
     // This check is only valid if the platform supports current time retrieval
     // This is necessary to determine if the certificate is not yet valid
-#if defined(CURRENT_TIME_NOT_IMPLEMENTED)
+#if defined(CURRENT_TIME_NOT_IMPLEMENTED) || !(CHIP_SYSTEM_CONFIG_PLATFORM_PROVIDES_TIME)
     GTEST_SKIP() << "Skipping test: platform does not support current time.";
 #endif
     // The actual contents do not represent real or meaningful data.
