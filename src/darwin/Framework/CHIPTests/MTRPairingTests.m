@@ -190,19 +190,18 @@ static MTRTestKeys * sTestKeys = nil;
         return [path.cluster isEqual:@(MTRClusterIDTypeNetworkCommissioningID)] &&
             [path.attribute isEqual:@(MTRAttributeIDTypeGlobalAttributeFeatureMapID)];
     };
-    bool foundNetworkCommissioningFeatureMap = false;
+    NSUInteger networkCommissioningFeatureMapCount = 0;
     for (MTRAttributePath * path in info.attributes) {
         if (isNetworkCommissioningFeatureMap(path)) {
-            foundNetworkCommissioningFeatureMap = true;
-            break;
+            ++networkCommissioningFeatureMapCount;
         }
     }
-    XCTAssertTrue(foundNetworkCommissioningFeatureMap);
+    XCTAssertGreaterThan(networkCommissioningFeatureMapCount, 0);
 
     if (self.extraAttributesToRead) {
         // The attributes we tried to read should really have worked.
         XCTAssertNotNil(info.attributes);
-        XCTAssertGreaterThanOrEqual(info.attributes.count, 2);
+        XCTAssertEqual(info.attributes.count, 2 + networkCommissioningFeatureMapCount);
         for (MTRAttributePath * path in info.attributes) {
             if (isNetworkCommissioningFeatureMap(path)) {
                 // We checked for these already.

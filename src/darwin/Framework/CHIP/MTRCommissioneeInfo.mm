@@ -57,7 +57,7 @@ MTR_DIRECT_MEMBERS
             }
         }
 
-        // Always include the Network Commissioning FeatureMap atribute.
+        // Always include the Network Commissioning FeatureMap attribute.
         requestPaths.emplace_back(MTRClusterIDTypeNetworkCommissioningID, MTRAttributeIDTypeGlobalAttributeFeatureMapID);
 
         info.attributes->ForEachAttribute([&](const chip::app::ConcreteAttributePath & path) -> CHIP_ERROR {
