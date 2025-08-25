@@ -90,6 +90,7 @@ ASR
 AssertionError
 AST
 ASYNC
+AsyncZeroconfServiceTypes
 ATL
 ATLs
 atomics
@@ -424,6 +425,7 @@ DevKitC
 DevKitM
 devtype
 df
+dff
 dfe
 DFILE
 dfu
@@ -454,6 +456,7 @@ DM
 DMG
 DMM
 DMTT
+dn
 DNS
 Dnsmasq
 dnsmasqd
@@ -477,6 +480,7 @@ dropdown
 dryrun
 DS
 DSLS
+dt
 duplicative
 DUT
 DUT's
@@ -698,6 +702,7 @@ HydrogenSulphideConcentrationMeasurement
 IasAce
 IasWd
 iaszone
+IB
 ibb
 ICA
 ICAC
@@ -856,6 +861,7 @@ localhost
 LocalizationConfiguration
 localstatedir
 LockingState
+lookups
 LogEvent
 loopback
 LowPower
@@ -1290,6 +1296,7 @@ runtime
 RVC
 rw
 RXD
+sai
 sandboxed
 sankey
 saveAs
@@ -1343,6 +1350,7 @@ SHAs
 showDocumentation
 showsdks
 shubhamdp
+sii
 SIGINT
 SiLabs
 Silabs's
@@ -1411,6 +1419,7 @@ SubscribeResponse
 SubscriptionId
 substeps
 subtype
+subtypes
 sudo
 SulfateConcentrationMeasurement
 SulfurDioxideConcentrationMeasurement
@@ -1690,6 +1699,7 @@ zclwrite
 ZephyrConfig
 zephyrproject
 zhengyaohan
+Zeroconf
 Zigbee
 zigbeealliance
 zigbeethread
