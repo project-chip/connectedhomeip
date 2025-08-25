@@ -753,9 +753,9 @@ void ClosureManager::HandlePanelStepAction(EndpointId endpointId)
         {
             // Underflow protection: if currentPosition <= stepValue, set to 0.
             chip::Percent100ths decreasedCurrentPosition = (currentPosition > stepValue)
-                                                        ? static_cast<chip::Percent100ths>(currentPosition - stepValue)
-                                                        : static_cast<chip::Percent100ths>(0);
-            nextCurrentPosition = std::max(decreasedCurrentPosition, targetPosition);
+                ? static_cast<chip::Percent100ths>(currentPosition - stepValue)
+                : static_cast<chip::Percent100ths>(0);
+            nextCurrentPosition                          = std::max(decreasedCurrentPosition, targetPosition);
         }
 
         panelCurrentState.Value().position.SetValue(DataModel::MakeNullable(nextCurrentPosition));
@@ -943,7 +943,8 @@ bool ClosureManager::GetPanelNextPosition(const GenericDimensionStateStruct & cu
     else if (currentPosition > targetPosition)
     {
         // Handling overflow for CurrentPosition
-        chip::Percent100ths newCurrentPosition = (currentPosition > kMotionPositionStep) ? currentPosition - kMotionPositionStep : 0;
+        chip::Percent100ths newCurrentPosition =
+            (currentPosition > kMotionPositionStep) ? currentPosition - kMotionPositionStep : 0;
         // Moving down: Decreasing the current position by a step of 2000 units,
         // ensuring it does not go below the target position.
         nextPosition.SetNonNull(std::max(newCurrentPosition, targetPosition));

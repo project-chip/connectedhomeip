@@ -37,10 +37,10 @@ using namespace chip::app::Clusters::ClosureControl;
 using namespace chip::app::Clusters::ClosureDimension;
 
 namespace {
-constexpr uint32_t kDefaultCountdownTimeSeconds   = 10;    // 10 seconds
+constexpr uint32_t kDefaultCountdownTimeSeconds   = 10;   // 10 seconds
 constexpr uint32_t kCalibrateCountdownTimeMs      = 3000; // 3 seconds
-constexpr uint32_t kMotionCountdownTimeMs         = 1000;  // 1 second for each motion.
-constexpr chip::Percent100ths kMotionPositionStep = 2000;  // 20% of the total range per motion interval.
+constexpr uint32_t kMotionCountdownTimeMs         = 1000; // 1 second for each motion.
+constexpr chip::Percent100ths kMotionPositionStep = 2000; // 20% of the total range per motion interval.
 
 // Define the Namespace and Tag for the endpoint
 // Derived from https://github.com/CHIP-Specifications/connectedhomeip-spec/blob/master/src/namespaces/Namespace-Closure.adoc
@@ -1102,11 +1102,11 @@ void ClosureManager::HandlePanelStepAction(EndpointId endpointId)
         }
         else
         {
-                        // Underflow protection: if currentPosition <= stepValue, set to 0.
+            // Underflow protection: if currentPosition <= stepValue, set to 0.
             chip::Percent100ths decreasedCurrentPosition = (currentPosition > stepValue)
-                                                        ? static_cast<chip::Percent100ths>(currentPosition - stepValue)
-                                                        : static_cast<chip::Percent100ths>(0);
-            nextCurrentPosition = std::max(decreasedCurrentPosition, targetPosition);
+                ? static_cast<chip::Percent100ths>(currentPosition - stepValue)
+                : static_cast<chip::Percent100ths>(0);
+            nextCurrentPosition                          = std::max(decreasedCurrentPosition, targetPosition);
         }
 
         panelCurrentState.Value().position.SetValue(DataModel::MakeNullable(nextCurrentPosition));
@@ -1168,7 +1168,8 @@ bool ClosureManager::GetPanelNextPosition(const GenericDimensionStateStruct & cu
     else if (currentPosition > targetPosition)
     {
         // Handling overflow for CurrentPosition
-        chip::Percent100ths newCurrentPosition = (currentPosition > kMotionPositionStep) ? currentPosition - kMotionPositionStep : 0;
+        chip::Percent100ths newCurrentPosition =
+            (currentPosition > kMotionPositionStep) ? currentPosition - kMotionPositionStep : 0;
         // Moving down: Decreasing the current position by a step of 2000 units,
         // ensuring it does not go below the target position.
         nextPosition.SetNonNull(std::max(newCurrentPosition, targetPosition));
