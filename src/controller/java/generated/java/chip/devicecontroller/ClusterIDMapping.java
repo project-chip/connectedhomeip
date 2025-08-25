@@ -17683,7 +17683,7 @@ public class ClusterIDMapping {
                         }
                         throw new NoSuchFieldError();
                     }
-                }public enum VideoStreamAllocateCommandField {StreamUsage(0),VideoCodec(1),MinFrameRate(2),MaxFrameRate(3),MinResolution(4),MaxResolution(5),MinBitRate(6),MaxBitRate(7),MinKeyFrameInterval(8),MaxKeyFrameInterval(9),WatermarkEnabled(10),OSDEnabled(11),;
+                }public enum VideoStreamAllocateCommandField {StreamUsage(0),VideoCodec(1),MinFrameRate(2),MaxFrameRate(3),MinResolution(4),MaxResolution(5),MinBitRate(6),MaxBitRate(7),KeyFrameInterval(8),WatermarkEnabled(9),OSDEnabled(10),;
                     private final int id;
                     VideoStreamAllocateCommandField(int id) {
                         this.id = id;
@@ -18158,7 +18158,7 @@ public class ClusterIDMapping {
                 }
                 throw new NoSuchFieldError();
             }
-        }public enum SolicitOfferCommandField {StreamUsage(0),OriginatingEndpointID(1),VideoStreamID(2),AudioStreamID(3),ICEServers(4),ICETransportPolicy(5),MetadataEnabled(6),;
+        }public enum SolicitOfferCommandField {StreamUsage(0),OriginatingEndpointID(1),VideoStreamID(2),AudioStreamID(3),ICEServers(4),ICETransportPolicy(5),MetadataEnabled(6),SFrameConfig(7),;
                     private final int id;
                     SolicitOfferCommandField(int id) {
                         this.id = id;
@@ -18175,7 +18175,7 @@ public class ClusterIDMapping {
                         }
                         throw new NoSuchFieldError();
                     }
-                }public enum ProvideOfferCommandField {WebRTCSessionID(0),Sdp(1),StreamUsage(2),OriginatingEndpointID(3),VideoStreamID(4),AudioStreamID(5),ICEServers(6),ICETransportPolicy(7),MetadataEnabled(8),;
+                }public enum ProvideOfferCommandField {WebRTCSessionID(0),Sdp(1),StreamUsage(2),OriginatingEndpointID(3),VideoStreamID(4),AudioStreamID(5),ICEServers(6),ICETransportPolicy(7),MetadataEnabled(8),SFrameConfig(9),;
                     private final int id;
                     ProvideOfferCommandField(int id) {
                         this.id = id;

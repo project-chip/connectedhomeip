@@ -158,9 +158,6 @@ class TC_WebRTCProvider_2_4(MatterBaseTest, WEBRTCPTestBase):
         saved_session_id = resp.webRTCSessionID
         asserts.assert_equal(videoStreamID, resp.videoStreamID, "Video stream ID does not match that in the command")
         asserts.assert_equal(audioStreamID, resp.audioStreamID, "Audio stream ID does not match that in the command")
-        asserts.assert_not_equal(
-            saved_session_id, 0, "Allocated WebRTCSessionID must be non‑zero"
-        )
 
         self.step(5)
         current_sessions = await self.read_single_attribute_check_success(

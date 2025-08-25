@@ -5753,18 +5753,10 @@ DataModelLogger::LogValue(const char * label, size_t indent,
         }
     }
     {
-        CHIP_ERROR err = LogValue("MinKeyFrameInterval", indent + 1, value.minKeyFrameInterval);
+        CHIP_ERROR err = LogValue("KeyFrameInterval", indent + 1, value.keyFrameInterval);
         if (err != CHIP_NO_ERROR)
         {
-            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'MinKeyFrameInterval'");
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("MaxKeyFrameInterval", indent + 1, value.maxKeyFrameInterval);
-        if (err != CHIP_NO_ERROR)
-        {
-            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'MaxKeyFrameInterval'");
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'KeyFrameInterval'");
             return err;
         }
     }
@@ -6223,6 +6215,40 @@ CHIP_ERROR DataModelLogger::LogValue(
         if (err != CHIP_NO_ERROR)
         {
             DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'Viewport'");
+            return err;
+        }
+    }
+    DataModelLogger::LogString(indent, "}");
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR
+DataModelLogger::LogValue(const char * label, size_t indent,
+                          const chip::app::Clusters::WebRTCTransportProvider::Structs::SFrameStruct::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    {
+        CHIP_ERROR err = LogValue("CipherSuite", indent + 1, value.cipherSuite);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'CipherSuite'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("BaseKey", indent + 1, value.baseKey);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'BaseKey'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("Kid", indent + 1, value.kid);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'Kid'");
             return err;
         }
     }

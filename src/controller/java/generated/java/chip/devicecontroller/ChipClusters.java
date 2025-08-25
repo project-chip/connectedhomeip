@@ -57564,11 +57564,11 @@ public class ChipClusters {
         }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
-    public void videoStreamAllocate(VideoStreamAllocateResponseCallback callback, Integer streamUsage, Integer videoCodec, Integer minFrameRate, Integer maxFrameRate, ChipStructs.CameraAvStreamManagementClusterVideoResolutionStruct minResolution, ChipStructs.CameraAvStreamManagementClusterVideoResolutionStruct maxResolution, Long minBitRate, Long maxBitRate, Integer minKeyFrameInterval, Integer maxKeyFrameInterval, Optional<Boolean> watermarkEnabled, Optional<Boolean> OSDEnabled) {
-      videoStreamAllocate(callback, streamUsage, videoCodec, minFrameRate, maxFrameRate, minResolution, maxResolution, minBitRate, maxBitRate, minKeyFrameInterval, maxKeyFrameInterval, watermarkEnabled, OSDEnabled, 0);
+    public void videoStreamAllocate(VideoStreamAllocateResponseCallback callback, Integer streamUsage, Integer videoCodec, Integer minFrameRate, Integer maxFrameRate, ChipStructs.CameraAvStreamManagementClusterVideoResolutionStruct minResolution, ChipStructs.CameraAvStreamManagementClusterVideoResolutionStruct maxResolution, Long minBitRate, Long maxBitRate, Integer keyFrameInterval, Optional<Boolean> watermarkEnabled, Optional<Boolean> OSDEnabled) {
+      videoStreamAllocate(callback, streamUsage, videoCodec, minFrameRate, maxFrameRate, minResolution, maxResolution, minBitRate, maxBitRate, keyFrameInterval, watermarkEnabled, OSDEnabled, 0);
     }
 
-    public void videoStreamAllocate(VideoStreamAllocateResponseCallback callback, Integer streamUsage, Integer videoCodec, Integer minFrameRate, Integer maxFrameRate, ChipStructs.CameraAvStreamManagementClusterVideoResolutionStruct minResolution, ChipStructs.CameraAvStreamManagementClusterVideoResolutionStruct maxResolution, Long minBitRate, Long maxBitRate, Integer minKeyFrameInterval, Integer maxKeyFrameInterval, Optional<Boolean> watermarkEnabled, Optional<Boolean> OSDEnabled, int timedInvokeTimeoutMs) {
+    public void videoStreamAllocate(VideoStreamAllocateResponseCallback callback, Integer streamUsage, Integer videoCodec, Integer minFrameRate, Integer maxFrameRate, ChipStructs.CameraAvStreamManagementClusterVideoResolutionStruct minResolution, ChipStructs.CameraAvStreamManagementClusterVideoResolutionStruct maxResolution, Long minBitRate, Long maxBitRate, Integer keyFrameInterval, Optional<Boolean> watermarkEnabled, Optional<Boolean> OSDEnabled, int timedInvokeTimeoutMs) {
       final long commandId = 3L;
 
       ArrayList<StructElement> elements = new ArrayList<>();
@@ -57604,19 +57604,15 @@ public class ChipClusters {
       BaseTLVType maxBitRatetlvValue = new UIntType(maxBitRate);
       elements.add(new StructElement(maxBitRateFieldID, maxBitRatetlvValue));
 
-      final long minKeyFrameIntervalFieldID = 8L;
-      BaseTLVType minKeyFrameIntervaltlvValue = new UIntType(minKeyFrameInterval);
-      elements.add(new StructElement(minKeyFrameIntervalFieldID, minKeyFrameIntervaltlvValue));
+      final long keyFrameIntervalFieldID = 8L;
+      BaseTLVType keyFrameIntervaltlvValue = new UIntType(keyFrameInterval);
+      elements.add(new StructElement(keyFrameIntervalFieldID, keyFrameIntervaltlvValue));
 
-      final long maxKeyFrameIntervalFieldID = 9L;
-      BaseTLVType maxKeyFrameIntervaltlvValue = new UIntType(maxKeyFrameInterval);
-      elements.add(new StructElement(maxKeyFrameIntervalFieldID, maxKeyFrameIntervaltlvValue));
-
-      final long watermarkEnabledFieldID = 10L;
+      final long watermarkEnabledFieldID = 9L;
       BaseTLVType watermarkEnabledtlvValue = watermarkEnabled.<BaseTLVType>map((nonOptionalwatermarkEnabled) -> new BooleanType(nonOptionalwatermarkEnabled)).orElse(new EmptyType());
       elements.add(new StructElement(watermarkEnabledFieldID, watermarkEnabledtlvValue));
 
-      final long OSDEnabledFieldID = 11L;
+      final long OSDEnabledFieldID = 10L;
       BaseTLVType OSDEnabledtlvValue = OSDEnabled.<BaseTLVType>map((nonOptionalOSDEnabled) -> new BooleanType(nonOptionalOSDEnabled)).orElse(new EmptyType());
       elements.add(new StructElement(OSDEnabledFieldID, OSDEnabledtlvValue));
 
@@ -59904,11 +59900,11 @@ public class ChipClusters {
       return 0L;
     }
 
-    public void solicitOffer(SolicitOfferResponseCallback callback, Integer streamUsage, Integer originatingEndpointID, @Nullable Optional<Integer> videoStreamID, @Nullable Optional<Integer> audioStreamID, Optional<ArrayList<ChipStructs.WebRTCTransportProviderClusterICEServerStruct>> ICEServers, Optional<String> ICETransportPolicy, Optional<Boolean> metadataEnabled) {
-      solicitOffer(callback, streamUsage, originatingEndpointID, videoStreamID, audioStreamID, ICEServers, ICETransportPolicy, metadataEnabled, 0);
+    public void solicitOffer(SolicitOfferResponseCallback callback, Integer streamUsage, Integer originatingEndpointID, @Nullable Optional<Integer> videoStreamID, @Nullable Optional<Integer> audioStreamID, Optional<ArrayList<ChipStructs.WebRTCTransportProviderClusterICEServerStruct>> ICEServers, Optional<String> ICETransportPolicy, Optional<Boolean> metadataEnabled, Optional<ChipStructs.WebRTCTransportProviderClusterSFrameStruct> SFrameConfig) {
+      solicitOffer(callback, streamUsage, originatingEndpointID, videoStreamID, audioStreamID, ICEServers, ICETransportPolicy, metadataEnabled, SFrameConfig, 0);
     }
 
-    public void solicitOffer(SolicitOfferResponseCallback callback, Integer streamUsage, Integer originatingEndpointID, @Nullable Optional<Integer> videoStreamID, @Nullable Optional<Integer> audioStreamID, Optional<ArrayList<ChipStructs.WebRTCTransportProviderClusterICEServerStruct>> ICEServers, Optional<String> ICETransportPolicy, Optional<Boolean> metadataEnabled, int timedInvokeTimeoutMs) {
+    public void solicitOffer(SolicitOfferResponseCallback callback, Integer streamUsage, Integer originatingEndpointID, @Nullable Optional<Integer> videoStreamID, @Nullable Optional<Integer> audioStreamID, Optional<ArrayList<ChipStructs.WebRTCTransportProviderClusterICEServerStruct>> ICEServers, Optional<String> ICETransportPolicy, Optional<Boolean> metadataEnabled, Optional<ChipStructs.WebRTCTransportProviderClusterSFrameStruct> SFrameConfig, int timedInvokeTimeoutMs) {
       final long commandId = 0L;
 
       ArrayList<StructElement> elements = new ArrayList<>();
@@ -59939,6 +59935,10 @@ public class ChipClusters {
       final long metadataEnabledFieldID = 6L;
       BaseTLVType metadataEnabledtlvValue = metadataEnabled.<BaseTLVType>map((nonOptionalmetadataEnabled) -> new BooleanType(nonOptionalmetadataEnabled)).orElse(new EmptyType());
       elements.add(new StructElement(metadataEnabledFieldID, metadataEnabledtlvValue));
+
+      final long SFrameConfigFieldID = 7L;
+      BaseTLVType SFrameConfigtlvValue = SFrameConfig.<BaseTLVType>map((nonOptionalSFrameConfig) -> nonOptionalSFrameConfig.encodeTlv()).orElse(new EmptyType());
+      elements.add(new StructElement(SFrameConfigFieldID, SFrameConfigtlvValue));
 
       StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
@@ -59979,11 +59979,11 @@ public class ChipClusters {
         }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
-    public void provideOffer(ProvideOfferResponseCallback callback, @Nullable Integer webRTCSessionID, String sdp, Integer streamUsage, Integer originatingEndpointID, @Nullable Optional<Integer> videoStreamID, @Nullable Optional<Integer> audioStreamID, Optional<ArrayList<ChipStructs.WebRTCTransportProviderClusterICEServerStruct>> ICEServers, Optional<String> ICETransportPolicy, Optional<Boolean> metadataEnabled) {
-      provideOffer(callback, webRTCSessionID, sdp, streamUsage, originatingEndpointID, videoStreamID, audioStreamID, ICEServers, ICETransportPolicy, metadataEnabled, 0);
+    public void provideOffer(ProvideOfferResponseCallback callback, @Nullable Integer webRTCSessionID, String sdp, Integer streamUsage, Integer originatingEndpointID, @Nullable Optional<Integer> videoStreamID, @Nullable Optional<Integer> audioStreamID, Optional<ArrayList<ChipStructs.WebRTCTransportProviderClusterICEServerStruct>> ICEServers, Optional<String> ICETransportPolicy, Optional<Boolean> metadataEnabled, Optional<ChipStructs.WebRTCTransportProviderClusterSFrameStruct> SFrameConfig) {
+      provideOffer(callback, webRTCSessionID, sdp, streamUsage, originatingEndpointID, videoStreamID, audioStreamID, ICEServers, ICETransportPolicy, metadataEnabled, SFrameConfig, 0);
     }
 
-    public void provideOffer(ProvideOfferResponseCallback callback, @Nullable Integer webRTCSessionID, String sdp, Integer streamUsage, Integer originatingEndpointID, @Nullable Optional<Integer> videoStreamID, @Nullable Optional<Integer> audioStreamID, Optional<ArrayList<ChipStructs.WebRTCTransportProviderClusterICEServerStruct>> ICEServers, Optional<String> ICETransportPolicy, Optional<Boolean> metadataEnabled, int timedInvokeTimeoutMs) {
+    public void provideOffer(ProvideOfferResponseCallback callback, @Nullable Integer webRTCSessionID, String sdp, Integer streamUsage, Integer originatingEndpointID, @Nullable Optional<Integer> videoStreamID, @Nullable Optional<Integer> audioStreamID, Optional<ArrayList<ChipStructs.WebRTCTransportProviderClusterICEServerStruct>> ICEServers, Optional<String> ICETransportPolicy, Optional<Boolean> metadataEnabled, Optional<ChipStructs.WebRTCTransportProviderClusterSFrameStruct> SFrameConfig, int timedInvokeTimeoutMs) {
       final long commandId = 2L;
 
       ArrayList<StructElement> elements = new ArrayList<>();
@@ -60022,6 +60022,10 @@ public class ChipClusters {
       final long metadataEnabledFieldID = 8L;
       BaseTLVType metadataEnabledtlvValue = metadataEnabled.<BaseTLVType>map((nonOptionalmetadataEnabled) -> new BooleanType(nonOptionalmetadataEnabled)).orElse(new EmptyType());
       elements.add(new StructElement(metadataEnabledFieldID, metadataEnabledtlvValue));
+
+      final long SFrameConfigFieldID = 9L;
+      BaseTLVType SFrameConfigtlvValue = SFrameConfig.<BaseTLVType>map((nonOptionalSFrameConfig) -> nonOptionalSFrameConfig.encodeTlv()).orElse(new EmptyType());
+      elements.add(new StructElement(SFrameConfigFieldID, SFrameConfigtlvValue));
 
       StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
