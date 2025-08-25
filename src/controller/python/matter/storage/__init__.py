@@ -307,12 +307,6 @@ class PersistentStorageJSON(VolatileTemporaryPersistentStorage):
         except Exception as ex:
             LOGGER.critical("Could not save configuration to JSON file: %s", ex)
 
-    @property
-    def jsonData(self) -> Dict:
-        ''' Returns a copy of the internal cached JSON data.
-        '''
-        return copy.deepcopy(self._data)
-
 
 class PersistentStorageINI(VolatileTemporaryPersistentStorage):
     """Persistent storage back-end which stores data in an INI file.
