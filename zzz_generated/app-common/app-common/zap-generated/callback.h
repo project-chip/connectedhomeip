@@ -7006,12 +7006,6 @@ bool emberAfThreadNetworkDiagnosticsClusterResetCountsCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::ThreadNetworkDiagnostics::Commands::ResetCounts::DecodableType & commandData);
 /**
- * @brief Ethernet Network Diagnostics Cluster ResetCounts Command callback (from client)
- */
-bool emberAfEthernetNetworkDiagnosticsClusterResetCountsCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::EthernetNetworkDiagnostics::Commands::ResetCounts::DecodableType & commandData);
-/**
  * @brief Time Synchronization Cluster SetUTCTime Command callback (from client)
  */
 bool emberAfTimeSynchronizationClusterSetUTCTimeCallback(
@@ -7107,30 +7101,6 @@ bool emberAfOperationalCredentialsClusterSetVIDVerificationStatementCallback(
 bool emberAfOperationalCredentialsClusterSignVIDVerificationRequestCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::OperationalCredentials::Commands::SignVIDVerificationRequest::DecodableType & commandData);
-/**
- * @brief Group Key Management Cluster KeySetWrite Command callback (from client)
- */
-bool emberAfGroupKeyManagementClusterKeySetWriteCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::GroupKeyManagement::Commands::KeySetWrite::DecodableType & commandData);
-/**
- * @brief Group Key Management Cluster KeySetRead Command callback (from client)
- */
-bool emberAfGroupKeyManagementClusterKeySetReadCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::GroupKeyManagement::Commands::KeySetRead::DecodableType & commandData);
-/**
- * @brief Group Key Management Cluster KeySetRemove Command callback (from client)
- */
-bool emberAfGroupKeyManagementClusterKeySetRemoveCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::GroupKeyManagement::Commands::KeySetRemove::DecodableType & commandData);
-/**
- * @brief Group Key Management Cluster KeySetReadAllIndices Command callback (from client)
- */
-bool emberAfGroupKeyManagementClusterKeySetReadAllIndicesCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::GroupKeyManagement::Commands::KeySetReadAllIndices::DecodableType & commandData);
 /**
  * @brief ICD Management Cluster RegisterClient Command callback (from client)
  */
