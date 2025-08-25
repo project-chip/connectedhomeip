@@ -81,7 +81,7 @@ void AppTask::UpdateClusterStateInternal(intptr_t arg)
     ChipLogProgress(NotSpecified, "StateValue::Set : %d", newValue);
 
     // write the new boolean state value
-    Protocols::InteractionModel::Status status = app::Clusters::BooleanState::Attributes::StateValue::Set(1, newValue);
+    Protocols::InteractionModel::Status status = app::Clusters::BooleanState::SetStateValue(newValue);
     if (status != Protocols::InteractionModel::Status::Success)
     {
         ChipLogError(NotSpecified, "ERR: updating boolean status value %x", to_underlying(status));
@@ -139,7 +139,7 @@ void AppTask::UpdateDeviceStateInternal(intptr_t arg)
     bool stateValueAttrValue = 0;
 
     /* get boolean state attribute value */
-    (void) app::Clusters::BooleanState::Attributes::StateValue::Get(1, &stateValueAttrValue);
+    (void) app::Clusters::BooleanState::GetStateValue(&stateValueAttrValue);
 
     LedManager::getInstance().setLed(LedManager::EAppLed_App0, stateValueAttrValue);
 }
