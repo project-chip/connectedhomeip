@@ -84,7 +84,7 @@
  * each with many Content Apps. Each Casting Player will set 1 binding per endpoint on it. A Casting Player will have 1 endpoint for
  * every Matter Content App installed on it + 1 endpoint representing the Casting Player + 1 endpoint representing a speaker.
  */
-#define MATTER_BINDING_TABLE_SIZE 64
+#define CHIP_CONFIG_MAX_BINDING_ENTRIES_PER_FABRIC 4
 
 // Enable some test-only interaction model APIs.
 #define CONFIG_BUILD_FOR_HOST_UNIT_TEST 1
