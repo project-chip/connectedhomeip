@@ -164,25 +164,25 @@ class TC_COMMTR_3_1(CommodityMeteringTestBaseHelper):
         await self.send_test_event_trigger_attrs_value_update()
 
         self.step("9")
-        await self.verify_reporting(subscription_handler.attribute_reports, cluster.Attributes.MeteredQuantity,
-                                    "MeteredQuantity", MeteredQuantityValue)
-        await self.check_metered_quantity_attribute(endpoint, subscription_handler.attribute_reports[cluster.Attributes.MeteredQuantity][0].value)
-
-        self.step("10")
-        await self.verify_reporting(subscription_handler.attribute_reports, cluster.Attributes.MeteredQuantityTimestamp,
-                                    "MeteredQuantityTimestamp", MeteredQuantityTimestampValue)
-        await self.check_metered_quantity_timestamp_attribute(
-            endpoint, subscription_handler.attribute_reports[cluster.Attributes.MeteredQuantityTimestamp][0].value)
-
-        self.step("11")
-        await self.verify_reporting(subscription_handler.attribute_reports, cluster.Attributes.TariffUnit, "TariffUnit", TariffUnitValue)
-        await self.check_tariff_unit_attribute(endpoint, subscription_handler.attribute_reports[cluster.Attributes.TariffUnit][0].value)
-
-        self.step("12")
-        await self.verify_reporting(subscription_handler.attribute_reports, cluster.Attributes.MaximumMeteredQuantities,
-                                    "MaximumMeteredQuantities", MaxMeteredQuantitiesValue)
         await self.check_maximum_metered_quantities_attribute(
             endpoint, subscription_handler.attribute_reports[cluster.Attributes.MaximumMeteredQuantities][0].value)
+        await self.verify_reporting(subscription_handler.attribute_reports, cluster.Attributes.MaximumMeteredQuantities,
+                                    "MaximumMeteredQuantities", MaxMeteredQuantitiesValue)
+
+        self.step("10")
+        await self.check_metered_quantity_attribute(endpoint, subscription_handler.attribute_reports[cluster.Attributes.MeteredQuantity][0].value)
+        await self.verify_reporting(subscription_handler.attribute_reports, cluster.Attributes.MeteredQuantity,
+                                    "MeteredQuantity", MeteredQuantityValue)
+
+        self.step("11")
+        await self.check_metered_quantity_timestamp_attribute(
+            endpoint, subscription_handler.attribute_reports[cluster.Attributes.MeteredQuantityTimestamp][0].value)
+        await self.verify_reporting(subscription_handler.attribute_reports, cluster.Attributes.MeteredQuantityTimestamp,
+                                    "MeteredQuantityTimestamp", MeteredQuantityTimestampValue)
+
+        self.step("12")
+        await self.check_tariff_unit_attribute(endpoint, subscription_handler.attribute_reports[cluster.Attributes.TariffUnit][0].value)
+        await self.verify_reporting(subscription_handler.attribute_reports, cluster.Attributes.TariffUnit, "TariffUnit", TariffUnitValue)
 
         self.step("13")
         # TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 with EnableKey field set to PIXIT.COMMTR.TEST_EVENT_TRIGGER_KEY
