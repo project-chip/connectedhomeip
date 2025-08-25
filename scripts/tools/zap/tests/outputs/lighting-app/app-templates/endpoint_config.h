@@ -496,7 +496,8 @@
         { ZAP_EMPTY_DEFAULT(), 0x00000008, 8, ZAP_TYPE(INT64U),                                                                    \
           ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(READABLE) },                    /* TimeSinceReset */           \
         { ZAP_SIMPLE_DEFAULT(3), 0x0000FFFC, 4, ZAP_TYPE(BITMAP32), ZAP_ATTRIBUTE_MASK(READABLE) }, /* FeatureMap */               \
-        { ZAP_SIMPLE_DEFAULT(1), 0x0000FFFD, 2, ZAP_TYPE(INT16U), ZAP_ATTRIBUTE_MASK(READABLE) },   /* ClusterRevision */          \
+        { ZAP_EMPTY_DEFAULT(), 0x0000FFFD, 2, ZAP_TYPE(INT16U),                                                                    \
+          ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(READABLE) }, /* ClusterRevision */                             \
                                                                                                                                    \
         /* Endpoint: 0, Cluster: Switch (server) */                                                                                \
         { ZAP_SIMPLE_DEFAULT(2), 0x00000000, 1, ZAP_TYPE(INT8U), ZAP_ATTRIBUTE_MASK(READABLE) },    /* NumberOfPositions */        \
@@ -748,6 +749,9 @@
     const EmberAfGenericClusterFunction chipFuncArrayWiFiNetworkDiagnosticsServer[] = {                                            \
         (EmberAfGenericClusterFunction) emberAfWiFiNetworkDiagnosticsClusterServerInitCallback,                                    \
         (EmberAfGenericClusterFunction) MatterWiFiNetworkDiagnosticsClusterServerShutdownCallback,                                 \
+    };                                                                                                                             \
+    const EmberAfGenericClusterFunction chipFuncArrayEthernetNetworkDiagnosticsServer[] = {                                        \
+        (EmberAfGenericClusterFunction) emberAfEthernetNetworkDiagnosticsClusterServerInitCallback,                                \
     };                                                                                                                             \
     const EmberAfGenericClusterFunction chipFuncArrayAdministratorCommissioningServer[] = {                                        \
         (EmberAfGenericClusterFunction) emberAfAdministratorCommissioningClusterServerInitCallback,                                \
@@ -1156,9 +1160,9 @@
       .clusterId = 0x00000037, \
       .attributes = ZAP_ATTRIBUTE_INDEX(167), \
       .attributeCount = 11, \
-      .clusterSize = 6, \
-      .mask = ZAP_CLUSTER_MASK(SERVER), \
-      .functions = NULL, \
+      .clusterSize = 4, \
+      .mask = ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(INIT_FUNCTION), \
+      .functions = chipFuncArrayEthernetNetworkDiagnosticsServer, \
       .acceptedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 36 ), \
       .generatedCommandList = nullptr, \
       .eventList = nullptr, \

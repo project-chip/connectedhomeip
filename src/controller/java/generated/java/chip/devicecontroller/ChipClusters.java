@@ -59900,11 +59900,11 @@ public class ChipClusters {
       return 0L;
     }
 
-    public void solicitOffer(SolicitOfferResponseCallback callback, Integer streamUsage, Integer originatingEndpointID, @Nullable Optional<Integer> videoStreamID, @Nullable Optional<Integer> audioStreamID, Optional<ArrayList<ChipStructs.WebRTCTransportProviderClusterICEServerStruct>> ICEServers, Optional<String> ICETransportPolicy, Optional<Boolean> metadataEnabled) {
-      solicitOffer(callback, streamUsage, originatingEndpointID, videoStreamID, audioStreamID, ICEServers, ICETransportPolicy, metadataEnabled, 0);
+    public void solicitOffer(SolicitOfferResponseCallback callback, Integer streamUsage, Integer originatingEndpointID, @Nullable Optional<Integer> videoStreamID, @Nullable Optional<Integer> audioStreamID, Optional<ArrayList<ChipStructs.WebRTCTransportProviderClusterICEServerStruct>> ICEServers, Optional<String> ICETransportPolicy, Optional<Boolean> metadataEnabled, Optional<ChipStructs.WebRTCTransportProviderClusterSFrameStruct> SFrameConfig) {
+      solicitOffer(callback, streamUsage, originatingEndpointID, videoStreamID, audioStreamID, ICEServers, ICETransportPolicy, metadataEnabled, SFrameConfig, 0);
     }
 
-    public void solicitOffer(SolicitOfferResponseCallback callback, Integer streamUsage, Integer originatingEndpointID, @Nullable Optional<Integer> videoStreamID, @Nullable Optional<Integer> audioStreamID, Optional<ArrayList<ChipStructs.WebRTCTransportProviderClusterICEServerStruct>> ICEServers, Optional<String> ICETransportPolicy, Optional<Boolean> metadataEnabled, int timedInvokeTimeoutMs) {
+    public void solicitOffer(SolicitOfferResponseCallback callback, Integer streamUsage, Integer originatingEndpointID, @Nullable Optional<Integer> videoStreamID, @Nullable Optional<Integer> audioStreamID, Optional<ArrayList<ChipStructs.WebRTCTransportProviderClusterICEServerStruct>> ICEServers, Optional<String> ICETransportPolicy, Optional<Boolean> metadataEnabled, Optional<ChipStructs.WebRTCTransportProviderClusterSFrameStruct> SFrameConfig, int timedInvokeTimeoutMs) {
       final long commandId = 0L;
 
       ArrayList<StructElement> elements = new ArrayList<>();
@@ -59935,6 +59935,10 @@ public class ChipClusters {
       final long metadataEnabledFieldID = 6L;
       BaseTLVType metadataEnabledtlvValue = metadataEnabled.<BaseTLVType>map((nonOptionalmetadataEnabled) -> new BooleanType(nonOptionalmetadataEnabled)).orElse(new EmptyType());
       elements.add(new StructElement(metadataEnabledFieldID, metadataEnabledtlvValue));
+
+      final long SFrameConfigFieldID = 7L;
+      BaseTLVType SFrameConfigtlvValue = SFrameConfig.<BaseTLVType>map((nonOptionalSFrameConfig) -> nonOptionalSFrameConfig.encodeTlv()).orElse(new EmptyType());
+      elements.add(new StructElement(SFrameConfigFieldID, SFrameConfigtlvValue));
 
       StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
@@ -59975,11 +59979,11 @@ public class ChipClusters {
         }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
-    public void provideOffer(ProvideOfferResponseCallback callback, @Nullable Integer webRTCSessionID, String sdp, Integer streamUsage, Integer originatingEndpointID, @Nullable Optional<Integer> videoStreamID, @Nullable Optional<Integer> audioStreamID, Optional<ArrayList<ChipStructs.WebRTCTransportProviderClusterICEServerStruct>> ICEServers, Optional<String> ICETransportPolicy, Optional<Boolean> metadataEnabled) {
-      provideOffer(callback, webRTCSessionID, sdp, streamUsage, originatingEndpointID, videoStreamID, audioStreamID, ICEServers, ICETransportPolicy, metadataEnabled, 0);
+    public void provideOffer(ProvideOfferResponseCallback callback, @Nullable Integer webRTCSessionID, String sdp, Integer streamUsage, Integer originatingEndpointID, @Nullable Optional<Integer> videoStreamID, @Nullable Optional<Integer> audioStreamID, Optional<ArrayList<ChipStructs.WebRTCTransportProviderClusterICEServerStruct>> ICEServers, Optional<String> ICETransportPolicy, Optional<Boolean> metadataEnabled, Optional<ChipStructs.WebRTCTransportProviderClusterSFrameStruct> SFrameConfig) {
+      provideOffer(callback, webRTCSessionID, sdp, streamUsage, originatingEndpointID, videoStreamID, audioStreamID, ICEServers, ICETransportPolicy, metadataEnabled, SFrameConfig, 0);
     }
 
-    public void provideOffer(ProvideOfferResponseCallback callback, @Nullable Integer webRTCSessionID, String sdp, Integer streamUsage, Integer originatingEndpointID, @Nullable Optional<Integer> videoStreamID, @Nullable Optional<Integer> audioStreamID, Optional<ArrayList<ChipStructs.WebRTCTransportProviderClusterICEServerStruct>> ICEServers, Optional<String> ICETransportPolicy, Optional<Boolean> metadataEnabled, int timedInvokeTimeoutMs) {
+    public void provideOffer(ProvideOfferResponseCallback callback, @Nullable Integer webRTCSessionID, String sdp, Integer streamUsage, Integer originatingEndpointID, @Nullable Optional<Integer> videoStreamID, @Nullable Optional<Integer> audioStreamID, Optional<ArrayList<ChipStructs.WebRTCTransportProviderClusterICEServerStruct>> ICEServers, Optional<String> ICETransportPolicy, Optional<Boolean> metadataEnabled, Optional<ChipStructs.WebRTCTransportProviderClusterSFrameStruct> SFrameConfig, int timedInvokeTimeoutMs) {
       final long commandId = 2L;
 
       ArrayList<StructElement> elements = new ArrayList<>();
@@ -60018,6 +60022,10 @@ public class ChipClusters {
       final long metadataEnabledFieldID = 8L;
       BaseTLVType metadataEnabledtlvValue = metadataEnabled.<BaseTLVType>map((nonOptionalmetadataEnabled) -> new BooleanType(nonOptionalmetadataEnabled)).orElse(new EmptyType());
       elements.add(new StructElement(metadataEnabledFieldID, metadataEnabledtlvValue));
+
+      final long SFrameConfigFieldID = 9L;
+      BaseTLVType SFrameConfigtlvValue = SFrameConfig.<BaseTLVType>map((nonOptionalSFrameConfig) -> nonOptionalSFrameConfig.encodeTlv()).orElse(new EmptyType());
+      elements.add(new StructElement(SFrameConfigFieldID, SFrameConfigtlvValue));
 
       StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
