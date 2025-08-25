@@ -184,11 +184,31 @@ static MTRTestKeys * sTestKeys = nil;
         XCTAssertNil(info.rootEndpoint);
     }
 
+    // In all cases, we should have the network commissioning feature maps in
+    // the list.
+    __auto_type isNetworkCommissioningFeatureMap = ^(MTRAttributePath * path) {
+        return [path.cluster isEqual:@(MTRClusterIDTypeNetworkCommissioningID)] &&
+            [path.attribute isEqual:@(MTRAttributeIDTypeGlobalAttributeFeatureMapID)];
+    };
+    bool foundNetworkCommissioningFeatureMap = false;
+    for (MTRAttributePath * path in info.attributes) {
+        if (isNetworkCommissioningFeatureMap(path)) {
+            foundNetworkCommissioningFeatureMap = true;
+            break;
+        }
+    }
+    XCTAssertTrue(foundNetworkCommissioningFeatureMap);
+
     if (self.extraAttributesToRead) {
         // The attributes we tried to read should really have worked.
         XCTAssertNotNil(info.attributes);
-        XCTAssertEqual(info.attributes.count, 2);
+        XCTAssertGreaterThanOrEqual(info.attributes.count, 2);
         for (MTRAttributePath * path in info.attributes) {
+            if (isNetworkCommissioningFeatureMap(path)) {
+                // We checked for these already.
+                continue;
+            }
+
             XCTAssertEqualObjects(path.endpoint, @(0));
             if ([path.cluster isEqual:@(MTRClusterIDTypeDescriptorID)]) {
                 XCTAssertEqualObjects(path.attribute, @(MTRAttributeIDTypeGlobalAttributeAttributeListID));

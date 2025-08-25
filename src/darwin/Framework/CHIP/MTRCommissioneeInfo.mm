@@ -16,6 +16,8 @@
 
 #import "MTRCommissioneeInfo_Internal.h"
 
+#import <Matter/MTRClusterConstants.h>
+
 #import "MTRBaseDevice.h"
 #import "MTRBaseDevice_Internal.h"
 #import "MTRDefines_Internal.h"
@@ -45,13 +47,18 @@ MTR_DIRECT_MEMBERS
         }
     }
 
-    if (commissioningParameters.extraAttributesToRead != nil && info.attributes != nullptr) {
+    if (info.attributes != nullptr) {
         NSMutableDictionary<MTRAttributePath *, NSDictionary<NSString *, id> *> * attributes = [[NSMutableDictionary alloc] init];
 
         std::vector<chip::app::AttributePathParams> requestPaths;
-        for (MTRAttributeRequestPath * requestPath in commissioningParameters.extraAttributesToRead) {
-            [requestPath convertToAttributePathParams:requestPaths.emplace_back()];
+        if (commissioningParameters.extraAttributesToRead != nil) {
+            for (MTRAttributeRequestPath * requestPath in commissioningParameters.extraAttributesToRead) {
+                [requestPath convertToAttributePathParams:requestPaths.emplace_back()];
+            }
         }
+
+        // Always include the Network Commissioning FeatureMap atribute.
+        requestPaths.emplace_back(MTRClusterIDTypeNetworkCommissioningID, MTRAttributeIDTypeGlobalAttributeFeatureMapID);
 
         info.attributes->ForEachAttribute([&](const chip::app::ConcreteAttributePath & path) -> CHIP_ERROR {
             // Only grab paths that are included in extraAttributesToRead so that
