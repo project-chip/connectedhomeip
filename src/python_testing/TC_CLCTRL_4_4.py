@@ -35,14 +35,15 @@
 import logging
 import typing
 
-import chip.clusters as Clusters
-from chip.clusters.Types import Nullable, NullValue
-from chip.interaction_model import InteractionModelError, Status
-from chip.testing.event_attribute_reporting import ClusterAttributeChangeAccumulator
-from chip.testing.matter_testing import (AttributeMatcher, AttributeValue, MatterBaseTest, TestStep, async_test_body,
-                                         default_matter_test_main)
-from chip.tlv import uint
 from mobly import asserts
+
+import matter.clusters as Clusters
+from matter.clusters.Types import Nullable, NullValue
+from matter.interaction_model import InteractionModelError, Status
+from matter.testing.event_attribute_reporting import AttributeSubscriptionHandler
+from matter.testing.matter_testing import (AttributeMatcher, AttributeValue, MatterBaseTest, TestStep, async_test_body,
+                                           default_matter_test_main)
+from matter.tlv import uint
 
 
 def current_latch_matcher(latch: bool) -> AttributeMatcher:
@@ -154,11 +155,11 @@ class TC_CLCTRL_4_4(MatterBaseTest):
 
         if not is_countdown_time_supported:
             logging.info("CountdownTime attribute not supported, skipping test")
-            self.skip_all_remaining_steps()
+            self.mark_all_remaining_steps_skipped("2c")
             return
 
         self.step("2c")
-        sub_handler = ClusterAttributeChangeAccumulator(Clusters.ClosureControl)
+        sub_handler = AttributeSubscriptionHandler(expected_cluster=Clusters.ClosureControl)
         await sub_handler.start(self.default_controller, self.dut_node_id, endpoint=endpoint, min_interval_sec=0, max_interval_sec=30, keepSubscriptions=False)
 
         self.step("2d")

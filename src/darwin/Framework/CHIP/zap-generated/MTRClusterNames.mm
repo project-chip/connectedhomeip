@@ -1477,6 +1477,10 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
             result = @"NetworkRecoveryReason";
             break;
 
+        case MTRAttributeIDTypeClusterGeneralCommissioningAttributeIsCommissioningWithoutPowerID:
+            result = @"IsCommissioningWithoutPower";
+            break;
+
         case MTRAttributeIDTypeClusterGeneralCommissioningAttributeGeneratedCommandListID:
             result = @"GeneratedCommandList";
             break;
@@ -8985,8 +8989,8 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
             result = @"MeteredQuantityTimestamp";
             break;
 
-        case MTRAttributeIDTypeClusterCommodityMeteringAttributeMeasurementTypeID:
-            result = @"MeasurementType";
+        case MTRAttributeIDTypeClusterCommodityMeteringAttributeTariffUnitID:
+            result = @"TariffUnit";
             break;
 
         case MTRAttributeIDTypeClusterCommodityMeteringAttributeMaximumMeteredQuantitiesID:

@@ -343,7 +343,7 @@ fabric_scoped struct WebRTCSessionStruct {
   StreamUsageEnum streamUsage = 3;
   nullable int16u videoStreamID = 4;
   nullable int16u audioStreamID = 5;
-  optional boolean metadataEnabled = 6;
+  boolean metadataEnabled = 6;
   fabric_idx fabricIndex = 254;
 }
 
@@ -799,7 +799,7 @@ cluster OtaSoftwareUpdateRequestor = 42 {
   }
 
   /** Announce the presence of an OTA Provider */
-  command AnnounceOTAProvider(AnnounceOTAProviderRequest): DefaultSuccess = 0;
+  command access(invoke: administer) AnnounceOTAProvider(AnnounceOTAProviderRequest): DefaultSuccess = 0;
 }
 
 /** This cluster is used to manage global aspects of the Commissioning flow. */
@@ -851,6 +851,7 @@ cluster GeneralCommissioning = 48 {
   provisional readonly attribute access(read: administer) optional nullable int32u TCUpdateDeadline = 9;
   provisional readonly attribute access(read: manage) optional octet_string<8> recoveryIdentifier = 10;
   provisional readonly attribute access(read: manage) optional nullable NetworkRecoveryReasonEnum networkRecoveryReason = 11;
+  provisional readonly attribute optional boolean isCommissioningWithoutPower = 12;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute attrib_id attributeList[] = 65531;
@@ -1925,7 +1926,7 @@ endpoint 0 {
     callback attribute vendorID;
     callback attribute productName;
     callback attribute productID;
-    persist  attribute nodeLabel;
+    callback attribute nodeLabel;
     callback attribute location;
     callback attribute hardwareVersion;
     callback attribute hardwareVersionString;
@@ -1936,14 +1937,14 @@ endpoint 0 {
     callback attribute productURL;
     callback attribute productLabel;
     callback attribute serialNumber;
-    persist  attribute localConfigDisabled default = 0;
+    callback attribute localConfigDisabled;
     callback attribute uniqueID;
     callback attribute capabilityMinima;
     callback attribute specificationVersion;
     callback attribute maxPathsPerInvoke;
-    callback attribute configurationVersion default = 1;
-    ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 5;
+    callback attribute configurationVersion;
+    callback attribute featureMap;
+    callback attribute clusterRevision;
   }
 
   server cluster OtaSoftwareUpdateRequestor {
@@ -2122,7 +2123,7 @@ endpoint 0 {
     callback attribute currentMaxRate;
     callback attribute overrunCount;
     ram      attribute featureMap default = 3;
-    ram      attribute clusterRevision default = 1;
+    callback attribute clusterRevision default = 1;
 
     handle command ResetCounts;
   }
@@ -2138,7 +2139,7 @@ endpoint 0 {
     callback attribute carrierDetect;
     callback attribute timeSinceReset;
     ram      attribute featureMap default = 3;
-    ram      attribute clusterRevision default = 1;
+    callback attribute clusterRevision;
 
     handle command ResetCounts;
   }

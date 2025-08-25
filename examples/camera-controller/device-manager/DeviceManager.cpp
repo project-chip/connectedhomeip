@@ -85,11 +85,14 @@ void DeviceManager::Shutdown()
     WebRTCManager::Instance().Disconnect();
 }
 
-CHIP_ERROR DeviceManager::AllocateVideoStream(NodeId nodeId, uint8_t streamUsage)
+CHIP_ERROR DeviceManager::AllocateVideoStream(NodeId nodeId, uint8_t streamUsage, WebRTCOfferType offerType,
+                                              Optional<uint16_t> minWidth, Optional<uint16_t> minHeight,
+                                              Optional<uint16_t> minFrameRate, Optional<uint32_t> minBitRate)
 {
     ChipLogProgress(Camera, "Allocate a video stream on the camera device.");
 
-    CHIP_ERROR error = mAVStreamManagment.AllocateVideoStream(nodeId, kCameraEndpointId, streamUsage);
+    CHIP_ERROR error = mAVStreamManagment.AllocateVideoStream(nodeId, kCameraEndpointId, streamUsage, minWidth, minHeight,
+                                                              minFrameRate, minBitRate);
 
     if (error != CHIP_NO_ERROR)
     {
@@ -102,6 +105,7 @@ CHIP_ERROR DeviceManager::AllocateVideoStream(NodeId nodeId, uint8_t streamUsage
     {
         mNodeId      = nodeId;
         mStreamUsage = streamUsage;
+        mOfferType   = offerType;
     }
 
     return error;
@@ -170,8 +174,11 @@ void DeviceManager::HandleVideoStreamAllocateResponse(TLV::TLVReader & data)
     ChipLogProgress(Camera, "DecodableType fields:");
     ChipLogProgress(Camera, "  videoStreamId: %u", value.videoStreamID);
 
-    // Store the stream ID we're setting up
-    mPendingVideoStreamId = value.videoStreamID;
+    // Store the stream ID we're setting up only for LiveView streams
+    if (mStreamUsage == static_cast<uint8_t>(StreamUsageEnum::kLiveView))
+    {
+        mPendingVideoStreamId = value.videoStreamID;
+    }
 
     InitiateWebRTCSession(value.videoStreamID);
 }
@@ -192,15 +199,26 @@ void DeviceManager::InitiateWebRTCSession(uint16_t videoStreamId)
     auto videoStreamIdOptional = MakeOptional(videoStreamIdNullable);
     auto streamUsage           = static_cast<StreamUsageEnum>(mStreamUsage);
 
-    // Provide the offer to establish the WebRTC session
-    err = WebRTCManager::Instance().ProvideOffer(app::DataModel::NullNullable, // session ID (null)
-                                                 streamUsage,                  // stream‑usage field
-                                                 videoStreamIdOptional,        // videoStreamId you just built
-                                                 NullOptional);                // audioStreamID (empty)
+    // Choose between ProvideOffer and SolicitOffer based on the configured offer type
+    if (mOfferType == WebRTCOfferType::kProvideOffer)
+    {
+        ChipLogProgress(Camera, "Using ProvideOffer for WebRTC session establishment");
+        err = WebRTCManager::Instance().ProvideOffer(app::DataModel::NullNullable, // session ID (null)
+                                                     streamUsage,                  // stream‑usage field
+                                                     videoStreamIdOptional,        // videoStreamId you just built
+                                                     NullOptional);                // audioStreamID (empty)
+    }
+    else // WebRTCOfferType::kSolicitOffer
+    {
+        ChipLogProgress(Camera, "Using SolicitOffer for WebRTC session establishment");
+        err = WebRTCManager::Instance().SolicitOffer(streamUsage,           // stream‑usage field
+                                                     videoStreamIdOptional, // videoStreamId you just built
+                                                     NullOptional);         // audioStreamID (empty)
+    }
 
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(Camera, "Failed to provide an offer. Error: %" CHIP_ERROR_FORMAT, err.Format());
+        ChipLogError(Camera, "Failed to initiate WebRTC offer. Error: %" CHIP_ERROR_FORMAT, err.Format());
     }
 }
 
@@ -208,11 +226,15 @@ void DeviceManager::OnWebRTCSessionEstablished(uint16_t streamId)
 {
     ChipLogProgress(Camera, "WebRTC session established for stream ID: %u", streamId);
 
-    // Verify this matches our pending stream
-    if (streamId == mPendingVideoStreamId)
+    // Only start video stream process for LiveView streams
+    if (mStreamUsage == static_cast<uint8_t>(StreamUsageEnum::kLiveView))
     {
-        StartVideoStreamProcess(streamId);
-        mPendingVideoStreamId = 0;
+        // Verify this matches our pending stream
+        if (streamId == mPendingVideoStreamId)
+        {
+            StartVideoStreamProcess(streamId);
+            mPendingVideoStreamId = 0;
+        }
     }
 }
 

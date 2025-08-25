@@ -5,6 +5,7 @@
 #pragma once
 
 #include <app/data-model-provider/MetadataTypes.h>
+#include <array>
 #include <lib/core/DataModelTypes.h>
 
 #include <cstdint>
@@ -19,6 +20,7 @@ namespace PressureMeasurement {
 inline constexpr uint32_t kRevision = 3;
 
 namespace Attributes {
+
 namespace MeasuredValue {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(MeasuredValue::Id, BitFlags<DataModel::AttributeQualityFlags>(),
                                                           Access::Privilege::kView, std::nullopt);
@@ -55,10 +57,18 @@ namespace Scale {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(Scale::Id, BitFlags<DataModel::AttributeQualityFlags>(),
                                                           Access::Privilege::kView, std::nullopt);
 } // namespace Scale
+constexpr std::array<DataModel::AttributeEntry, 3> kMandatoryMetadata = {
+    MeasuredValue::kMetadataEntry,
+    MinMeasuredValue::kMetadataEntry,
+    MaxMeasuredValue::kMetadataEntry,
+
+};
 
 } // namespace Attributes
 
 namespace Commands {} // namespace Commands
+
+namespace Events {} // namespace Events
 } // namespace PressureMeasurement
 } // namespace Clusters
 } // namespace app
