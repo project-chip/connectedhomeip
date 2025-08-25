@@ -31,7 +31,6 @@
 #include <lib/support/CodeUtils.h>
 
 using namespace chip;
-using namespace chip::Test;
 using namespace chip::app;
 using namespace chip::app::Clusters;
 using namespace chip::app::CommodityTariffAttrsDataMgmt;
