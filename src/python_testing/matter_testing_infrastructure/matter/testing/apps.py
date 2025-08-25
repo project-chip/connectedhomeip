@@ -15,33 +15,13 @@
 import os
 import signal
 import tempfile
-from contextlib import contextmanager
 from dataclasses import dataclass
-from typing import ContextManager, Optional, Union
+from typing import Optional, Union
 
 import matter.clusters as Clusters
 from matter.ChipDeviceCtrl import ChipDeviceController
 from matter.clusters.Types import NullValue
 from matter.testing.tasks import Subprocess
-
-
-@contextmanager
-def create_kvs_file(storage_dir: str, prefix: str = "kvs-app-"):
-    """Context manager for creating and cleaning up KVS temporary files.
-
-    Creates a temporary file and yields its path, automatically cleaning up
-    the file descriptor and deleting the file when the context exits.
-    """
-    fd, path = tempfile.mkstemp(dir=storage_dir, prefix=prefix)
-    try:
-        yield path
-    finally:
-        os.close(fd)
-        try:
-            os.unlink(path)
-        except OSError:
-            # Ignore errors if file was already deleted or doesn't exist
-            pass
 
 
 @dataclass
@@ -72,16 +52,10 @@ class AppServerSubprocess(Subprocess):
     # Prefix for log messages from the application server.
     PREFIX = b"[SERVER]"
 
-    # Instance attribute to hold the KVS context manager used for temp file lifecycle
-    _kvs_context: Optional[ContextManager[str]]
-
     def __init__(self, app: str, storage_dir: str, discriminator: int,
                  passcode: int, port: int = 5540, extra_args: list[str] = []):
-        # Open a KVS file and keep it alive for the lifetime of this subprocess.
-        # We manually enter the context here and exit it in terminate().
-        kvs_context = create_kvs_file(storage_dir)
-        self._kvs_context = kvs_context
-        kvs_path = kvs_context.__enter__()
+        # Create a temporary KVS file and keep the descriptor to avoid leaks.
+        self.kvs_fd, kvs_path = tempfile.mkstemp(dir=storage_dir, prefix="kvs-app-")
         try:
             # Build the command list
             command = [app]
@@ -99,21 +73,17 @@ class AppServerSubprocess(Subprocess):
             super().__init__(*command,  # Pass the constructed command list
                              output_cb=lambda line, is_stderr: self.PREFIX + line)
         except Exception:
-            # If initialization fails, ensure we clean up the KVS file immediately
-            if self._kvs_context is not None:
-                self._kvs_context.__exit__(None, None, None)
-            self._kvs_context = None
+            # Do not leak KVS file descriptor on failure
+            os.close(self.kvs_fd)
             raise
 
-    def terminate(self):
-        # Terminate the server application and then clean up the KVS file
-        super().terminate()
-        kvs_ctx = getattr(self, "_kvs_context", None)
-        if kvs_ctx is not None:
+    def __del__(self):
+        # Do not leak KVS file descriptor.
+        if hasattr(self, "kvs_fd"):
             try:
-                kvs_ctx.__exit__(None, None, None)
-            finally:
-                self._kvs_context = None
+                os.close(self.kvs_fd)
+            except OSError:
+                pass
 
 
 class IcdAppServerSubprocess(AppServerSubprocess):
@@ -188,7 +158,7 @@ class OTAProviderSubprocess(AppServerSubprocess):
             storage_dir: Directory for persistent storage
             discriminator: Discriminator for commissioning
             passcode: Passcode for commissioning
-            port: UDP port for secure connections
+            port: UDP port for secure connections (default: 5541)
             ota_source: Either OtaImagePath or ImageListPath specifying the OTA image source
             extra_args: Additional command line arguments
         """

@@ -1,14 +1,10 @@
 # src/python_testing/matter_testing_infrastructure/matter/typings/matter/testing/apps.py
 
-from contextlib import contextmanager
 from dataclasses import dataclass
 from typing import Any, List, Optional, Union
 
 from matter.testing.tasks import Subprocess
 from matter.ChipDeviceCtrl import ChipDeviceController
-
-@contextmanager
-def create_kvs_file(storage_dir: str, prefix: str = "kvs-app-") -> Any: ...
 
 
 @dataclass
@@ -50,7 +46,8 @@ class OTAProviderSubprocess(AppServerSubprocess):
 
     def __init__(self, app: str, storage_dir: str, discriminator: int,
                  passcode: int, ota_source: Union[OtaImagePath, ImageListPath],
-                 port: int = 5540, extra_args: List[str] = ...) -> None: ...
+                 port: int = 5541, extra_args: List[str] = ...,
+                 kvs_path: Optional[str] = ..., persist_kvs: bool = ...) -> None: ...
 
     def create_acl_entry(self, dev_ctrl: ChipDeviceController, provider_node_id: int,
                          requestor_node_id: Optional[int] = None) -> Any: ...
