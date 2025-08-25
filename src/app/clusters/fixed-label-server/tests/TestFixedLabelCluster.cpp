@@ -40,6 +40,22 @@ struct TestFixedLabelCluster : public ::testing::Test
 
 constexpr size_t kFixedLabelFixedClusterCount = 2;
 
+class FixedLabelClusterTest
+{
+    FixedLabelCluster fixedLabel;
+
+public:
+    template <typename... Args>
+    FixedLabelClusterTest(Args &&... args) : fixedLabel(std::forward<Args>(args)...)
+    {}
+
+    template <typename F>
+    void Check(F check)
+    {
+        check(fixedLabel);
+    }
+};
+
 class ReadAttribute
 {
     FixedLabelCluster & mCluster;
@@ -72,15 +88,15 @@ TEST_F(TestFixedLabelCluster, AttributeTest)
 {
     for (EndpointId endpoint = 0; endpoint < kFixedLabelFixedClusterCount; ++endpoint)
     {
-        FixedLabelCluster fixedLabel(endpoint);
+        FixedLabelClusterTest(endpoint).Check([&](FixedLabelCluster & fixedLabel) {
+            ReadOnlyBufferBuilder<DataModel::AttributeEntry> attributes;
+            ASSERT_EQ(fixedLabel.Attributes(ConcreteClusterPath(endpoint, FixedLabel::Id), attributes), CHIP_NO_ERROR);
 
-        ReadOnlyBufferBuilder<DataModel::AttributeEntry> attributes;
-        ASSERT_EQ(fixedLabel.Attributes(ConcreteClusterPath(endpoint, FixedLabel::Id), attributes), CHIP_NO_ERROR);
-
-        ReadOnlyBufferBuilder<DataModel::AttributeEntry> expected;
-        AttributeListBuilder listBuilder(expected);
-        ASSERT_EQ(listBuilder.Append(Span(FixedLabel::Attributes::kMandatoryMetadata), {}), CHIP_NO_ERROR);
-        ASSERT_TRUE(Testing::EqualAttributeSets(attributes.TakeBuffer(), expected.TakeBuffer()));
+            ReadOnlyBufferBuilder<DataModel::AttributeEntry> expected;
+            AttributeListBuilder listBuilder(expected);
+            ASSERT_EQ(listBuilder.Append(Span(FixedLabel::Attributes::kMandatoryMetadata), {}), CHIP_NO_ERROR);
+            ASSERT_TRUE(Testing::EqualAttributeSets(attributes.TakeBuffer(), expected.TakeBuffer()));
+        });
     }
 }
 
@@ -88,27 +104,27 @@ TEST_F(TestFixedLabelCluster, ReadAttributeTest)
 {
     for (EndpointId endpoint = 0; endpoint < kFixedLabelFixedClusterCount; ++endpoint)
     {
-        FixedLabelCluster fixedLabel(endpoint);
+        FixedLabelClusterTest(endpoint).Check([&](FixedLabelCluster & fixedLabel) {
+            DataModel::ReadAttributeRequest request;
+            request.path.mEndpointId  = endpoint;
+            request.path.mClusterId   = FixedLabel::Id;
+            request.path.mAttributeId = Globals::Attributes::ClusterRevision::Id;
 
-        DataModel::ReadAttributeRequest request;
-        request.path.mEndpointId  = endpoint;
-        request.path.mClusterId   = FixedLabel::Id;
-        request.path.mAttributeId = Globals::Attributes::ClusterRevision::Id;
+            ReadAttribute readAttribute(fixedLabel);
+            readAttribute(request);
+            EXPECT_TRUE(readAttribute.GetStatus().IsSuccess());
 
-        ReadAttribute readAttribute(fixedLabel);
-        readAttribute(request);
-        EXPECT_TRUE(readAttribute.GetStatus().IsSuccess());
+            request.path.mAttributeId = FeatureMap::Id;
+            readAttribute(request);
+            EXPECT_TRUE(readAttribute.GetStatus().IsSuccess());
 
-        request.path.mAttributeId = FeatureMap::Id;
-        readAttribute(request);
-        EXPECT_TRUE(readAttribute.GetStatus().IsSuccess());
+            request.path.mAttributeId = LabelList::Id;
+            readAttribute(request);
+            EXPECT_TRUE(readAttribute.GetStatus().IsSuccess());
 
-        request.path.mAttributeId = LabelList::Id;
-        readAttribute(request);
-        EXPECT_TRUE(readAttribute.GetStatus().IsSuccess());
-
-        request.path.mAttributeId = 0xFFFF;
-        readAttribute(request);
-        EXPECT_TRUE(readAttribute.GetStatus().IsError());
+            request.path.mAttributeId = 0xFFFF;
+            readAttribute(request);
+            EXPECT_TRUE(readAttribute.GetStatus().IsError());
+        });
     }
 }
