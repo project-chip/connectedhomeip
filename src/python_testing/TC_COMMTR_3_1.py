@@ -76,18 +76,18 @@ class TC_COMMTR_3_1(CommodityMeteringTestBaseHelper):
                      - MinIntervalFloor: 0
                      - MaxIntervalCeiling: 10""",
                      "Subscription is established successfully."),
-            TestStep("3", "TH reads MeteredQuantity attribute.", """
-                     - DUT replies a list of MeteredQuantityStruct entries or null;
-                     - Value is saved as MeteredQuantityValue."""),
-            TestStep("4", "TH reads MeteredQuantityTimestamp attribute.", """
-                     - DUT replies a epoch-s value, or null;
-                     - Value is saved as MeteredQuantityTimestampValue."""),
-            TestStep("5", "TH reads TariffUnit attribute.", """
-                     - DUT replies a TariffUnitEnum value or null;
-                     - Value is saved as TariffUnitValue."""),
-            TestStep("6", "TH reads MaximumMeteredQuantities attribute.", """
+            TestStep("3", "TH reads MaximumMeteredQuantities attribute.", """
                      - DUT replies a uint16 value or null;
                      - Value is saved as MaxMeteredQuantitiesValue."""),
+            TestStep("4", "TH reads MeteredQuantity attribute.", """
+                     - DUT replies a list of MeteredQuantityStruct entries or null;
+                     - Value is saved as MeteredQuantityValue."""),
+            TestStep("5", "TH reads MeteredQuantityTimestamp attribute.", """
+                     - DUT replies a epoch-s value, or null;
+                     - Value is saved as MeteredQuantityTimestampValue."""),
+            TestStep("6", "TH reads TariffUnit attribute.", """
+                     - DUT replies a TariffUnitEnum value or null;
+                     - Value is saved as TariffUnitValue."""),
             TestStep("7", "TH reads TestEventTriggersEnabled attribute from General Diagnostics Cluster.", "Values is True."),
             TestStep("8", """TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 with EnableKey field set to PIXIT.COMMTR.TEST_EVENT_TRIGGER_KEY 
                      and EventTrigger field set to PIXIT.COMMTR.TEST_EVENT_TRIGGER for Attributes Value Set Test Event.""",
@@ -118,6 +118,7 @@ class TC_COMMTR_3_1(CommodityMeteringTestBaseHelper):
     async def test_TC_COMMTR_3_1(self):
 
         endpoint = self.get_endpoint()
+        matcher_list = self.get_mandatory_matchers()
 
         self.step("1")
         # commissioning
@@ -131,28 +132,28 @@ class TC_COMMTR_3_1(CommodityMeteringTestBaseHelper):
                                          max_interval_sec=10, keepSubscriptions=True)
 
         self.step("3")
+        # TH reads MaximumMeteredQuantities attribute and saves value as MaxMeteredQuantitiesValue.
+        MaxMeteredQuantitiesValue = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster,
+                                                                                   attribute=cluster.Attributes.MaximumMeteredQuantities)
+        await self.check_maximum_metered_quantities_attribute(endpoint, MaxMeteredQuantitiesValue)
+
+        self.step("4")
         # TH reads MeteredQuantity attribute and saves value as MeteredQuantityValue.
         MeteredQuantityValue = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster,
                                                                               attribute=cluster.Attributes.MeteredQuantity)
         await self.check_metered_quantity_attribute(endpoint, MeteredQuantityValue)
 
-        self.step("4")
+        self.step("5")
         # TH reads MeteredQuantityTimestamp attribute and saves value as MeteredQuantityTimestampValue.
         MeteredQuantityTimestampValue = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster,
                                                                                        attribute=cluster.Attributes.MeteredQuantityTimestamp)
         await self.check_metered_quantity_timestamp_attribute(endpoint, MeteredQuantityTimestampValue)
 
-        self.step("5")
+        self.step("6")
         # TH reads TariffUnit attribute and saves value as TariffUnitValue.
         TariffUnitValue = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster,
                                                                          attribute=cluster.Attributes.TariffUnit)
         await self.check_tariff_unit_attribute(endpoint, TariffUnitValue)
-
-        self.step("6")
-        # TH reads MaximumMeteredQuantities attribute and saves value as MaxMeteredQuantitiesValue.
-        MaxMeteredQuantitiesValue = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster,
-                                                                                   attribute=cluster.Attributes.MaximumMeteredQuantities)
-        await self.check_maximum_metered_quantities_attribute(endpoint, MaxMeteredQuantitiesValue)
 
         self.step("7")
         # TH reads TestEventTriggersEnabled attribute from General Diagnostics Cluster. It must be True.
@@ -162,6 +163,7 @@ class TC_COMMTR_3_1(CommodityMeteringTestBaseHelper):
         # TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 with EnableKey field set to PIXIT.COMMTR.TEST_EVENT_TRIGGER_KEY
         # and EventTrigger field set to PIXIT.COMMTR.TEST_EVENT_TRIGGER for Attributes Value Set Test Event.
         await self.send_test_event_trigger_attrs_value_update()
+        subscription_handler.await_all_expected_report_matches(matcher_list, timeout_sec=2)
 
         self.step("9")
         await self.check_maximum_metered_quantities_attribute(
