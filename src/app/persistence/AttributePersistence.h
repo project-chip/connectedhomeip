@@ -20,8 +20,8 @@
 #include <app/data-model-provider/ActionReturnStatus.h>
 #include <app/persistence/AttributePersistenceProvider.h>
 #include <app/persistence/String.h>
-#include <lib/support/ReadOnlyBuffer.h>
 #include <lib/core/CHIPEncoding.h>
+#include <lib/support/ReadOnlyBuffer.h>
 
 #include <type_traits>
 
