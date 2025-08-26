@@ -28,7 +28,6 @@
 
 #include <cstdint>
 #include <mutex>
-#include <pw_unit_test/framework.h>
 #include <thread>
 
 #include <lib/support/CodeUtils.h>
@@ -902,7 +901,6 @@ TEST_F(TestCommodityTariffBaseDataClass, ConcurrentListOperations)
         for (size_t i = 0; i < list.size(); i++)
         {
             list[i] = threadId * 100 + static_cast<uint32_t>(i);
-            ;
         }
 
         EXPECT_EQ(data.MarkAsAssigned(), CHIP_NO_ERROR);
@@ -936,14 +934,14 @@ TEST_F(TestCommodityTariffBaseDataClass, ConcurrentListOperations)
 
 TEST_F(TestCommodityTariffBaseDataClass, StressTest_ManyThreads)
 {
-    constexpr size_t NUM_THREADS           = 10; // Changed to size_t
-    constexpr size_t OPERATIONS_PER_THREAD = 50; // Changed to size_t
+    constexpr size_t NUM_THREADS           = 10;
+    constexpr size_t OPERATIONS_PER_THREAD = 50;
 
     CTC_BaseDataClass<DataModel::Nullable<uint32_t>> data(2);
     std::mutex dataMutex;
-    std::atomic<size_t> totalOperations(0); // Changed to size_t
+    std::atomic<size_t> totalOperations(0);
 
-    auto worker = [&](uint32_t threadId) { // Changed to uint32_t
+    auto worker = [&](uint32_t threadId) {
         for (size_t i = 0; i < OPERATIONS_PER_THREAD; i++)
         {
             std::lock_guard<std::mutex> lock(dataMutex);
