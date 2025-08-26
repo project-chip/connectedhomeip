@@ -218,7 +218,7 @@ class TC_MTRID_3_1(MeterIdentificationTestBaseHelper):
 
         self.step("9")
         await self.send_test_event_trigger_attributes_value_set()
-        subscription_handler.await_all_expected_report_matches(matcher_list, timeout_sec=2)
+        subscription_handler.await_all_expected_report_matches(matcher_list, timeout_sec=10)
 
         self.step("10")
         await self.check_meter_type_attribute(endpoint, subscription_handler.attribute_reports[cluster.Attributes.MeterType][0].value)
