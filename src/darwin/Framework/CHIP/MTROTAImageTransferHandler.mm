@@ -381,8 +381,8 @@ CHIP_ERROR MTROTAImageTransferHandler::OnBlockQuery(const TransferSession::Outpu
                     // Actual Block Size used over all transports SHALL be the negotiated Maximum
                     // Block Size for every block except the last one, which may be of any size less
                     // or equal to the Maximum Block Size (including zero).
-                    MTR_LOG_ERROR("Invalid OTA block size %llu for non-final block when updating " ChipLogFormatScopedNodeId ".  Expected block of size %@",
-                        static_cast<unsigned long long>(data.length), ChipLogValueScopedNodeId(strongWrapper.otaImageTransferHandler->mPeer), blockSize);
+                    MTR_LOG_ERROR("Invalid OTA block size %lu for non-final block when updating " ChipLogFormatScopedNodeId ".  Expected block of size %@",
+                        static_cast<unsigned long>(data.length), ChipLogValueScopedNodeId(strongWrapper.otaImageTransferHandler->mPeer), blockSize);
                     NotifyEventHandled(eventType, CHIP_ERROR_INCORRECT_STATE);
                     return;
                 }
