@@ -111,81 +111,80 @@ public:
         }
 #endif // CHIP_CONFIG_BIG_ENDIAN_TARGET
 
-    // Only available in little endian for the moment
-    CHIP_ERROR MigrateFromSafeAttributePersistanceProvider(EndpointId endpointId, ClusterId ClusterId,
-                                                           const ReadOnlyBuffer<AttributeId> & scalarAttributes,
-                                                           const ReadOnlyBuffer<AttributeId> & attributes, MutableByteSpan & buffer,
-                                                           PersistentStorageDelegate & storageDelegate)
-    {
-
-        ChipError err;
-
-        for (auto attr : scalarAttributes)
+        // Only available in little endian for the moment
+        CHIP_ERROR MigrateFromSafeAttributePersistanceProvider(
+            EndpointId endpointId, ClusterId ClusterId, const ReadOnlyBuffer<AttributeId> & scalarAttributes,
+            const ReadOnlyBuffer<AttributeId> & attributes, MutableByteSpan & buffer, PersistentStorageDelegate & storageDelegate)
         {
-            // We make a copy of the buffer so it can be resized
-            MutableByteSpan copy_of_buffer = buffer;
 
-            StorageKeyName safePath = DefaultStorageKeyAllocator::SafeAttributeValue(endpointId, clusterId, attr);
+            ChipError err;
 
-            // Read Value
-            err = storageDelegate.SyncGetKeyValue(safePath.KeyName(), buffer);
-            if (err == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND)
+            for (auto attr : scalarAttributes)
             {
-                continue;
-            }
-            else if (err != CHIP_NO_ERROR)
-            {
-                ChipLogError(Unspecified, "Error reading attribute %s - %" CHIP_ERROR_FORMAT, safePath.KeyName(), err);
-                continue;
-            }
+                // We make a copy of the buffer so it can be resized
+                MutableByteSpan copy_of_buffer = buffer;
+
+                StorageKeyName safePath = DefaultStorageKeyAllocator::SafeAttributeValue(endpointId, clusterId, attr);
+
+                // Read Value
+                err = storageDelegate.SyncGetKeyValue(safePath.KeyName(), buffer);
+                if (err == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND)
+                {
+                    continue;
+                }
+                else if (err != CHIP_NO_ERROR)
+                {
+                    ChipLogError(Unspecified, "Error reading attribute %s - %" CHIP_ERROR_FORMAT, safePath.KeyName(), err);
+                    continue;
+                }
 
 #if CHIP_CONFIG_BIG_ENDIAN_TARGET
-            UnalignedSwap(copy_of_buffer);
+                UnalignedSwap(copy_of_buffer);
 #endif // CHIP_CONFIG_BIG_ENDIAN_TARGET
 
-            ReturnErrorOnFailure(storageDelegate.SyncSetKeyValue(
-                DefaultStorageKeyAllocator::AttributeValue(endpointId, clusterId, attr).KeyName(), buffer));
-            err = storageDelegate.SyncDeleteKeyValue(safePath.KeyName());
-            // do nothing with this error
-        }
-
-        // These are not integers (probably strings) so no need to care for endianness
-        for (auto attr : attributes)
-        {
-            // We make a copy of the buffer so it can be resized
-            MutableByteSpan copy_of_buffer = buffer;
-
-            StorageKeyName safePath = DefaultStorageKeyAllocator::SafeAttributeValue(endpointId, clusterId, attr);
-
-            // Read Value
-            err = storageDelegate.SyncGetKeyValue(safePath, copy_of_buffer);
-            if (err == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND)
-            {
-                continue;
-            }
-            else if (err != CHIP_NO_ERROR)
-            {
-                ChipLogError(Unspecified, "Error reading attribute %s - %" CHIP_ERROR_FORMAT, safePath.KeyName(), err);
-                continue;
+                ReturnErrorOnFailure(storageDelegate.SyncSetKeyValue(
+                    DefaultStorageKeyAllocator::AttributeValue(endpointId, clusterId, attr).KeyName(), buffer));
+                err = storageDelegate.SyncDeleteKeyValue(safePath.KeyName());
+                // do nothing with this error
             }
 
-            ReturnErrorOnFailure(storageDelegate.SyncSetKeyValue(
-                DefaultStorageKeyAllocator::AttributeValue(endpointId, clusterId, attr).KeyName(), copy_of_buffer));
-            err = storageDelegate.SyncDeleteKeyValue(safePath.KeyName());
-            // do nothing with this error
+            // These are not integers (probably strings) so no need to care for endianness
+            for (auto attr : attributes)
+            {
+                // We make a copy of the buffer so it can be resized
+                MutableByteSpan copy_of_buffer = buffer;
+
+                StorageKeyName safePath = DefaultStorageKeyAllocator::SafeAttributeValue(endpointId, clusterId, attr);
+
+                // Read Value
+                err = storageDelegate.SyncGetKeyValue(safePath, copy_of_buffer);
+                if (err == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND)
+                {
+                    continue;
+                }
+                else if (err != CHIP_NO_ERROR)
+                {
+                    ChipLogError(Unspecified, "Error reading attribute %s - %" CHIP_ERROR_FORMAT, safePath.KeyName(), err);
+                    continue;
+                }
+
+                ReturnErrorOnFailure(storageDelegate.SyncSetKeyValue(
+                    DefaultStorageKeyAllocator::AttributeValue(endpointId, clusterId, attr).KeyName(), copy_of_buffer));
+                err = storageDelegate.SyncDeleteKeyValue(safePath.KeyName());
+                // do nothing with this error
+            }
         }
-    }
 
-private:
-    AttributePersistenceProvider & mProvider;
+    private:
+        AttributePersistenceProvider & mProvider;
 
-    /// Loads a raw value of size `size` into the memory pointed to by `data`.
-    /// If load fails, `false` is returned and data is filled with `valueOnLoadFailure`.
-    ///
-    /// Error reason for load failure is logged (or nothing logged in case "Value not found" is the
-    /// reason for the load failure).
-    bool InternalRawLoadNativeEndianValue(const ConcreteAttributePath & path, void * data, const void * valueOnLoadFailure,
-                                          size_t size);
-};
+        /// Loads a raw value of size `size` into the memory pointed to by `data`.
+        /// If load fails, `false` is returned and data is filled with `valueOnLoadFailure`.
+        ///
+        /// Error reason for load failure is logged (or nothing logged in case "Value not found" is the
+        /// reason for the load failure).
+        bool InternalRawLoadNativeEndianValue(const ConcreteAttributePath & path, void * data, const void * valueOnLoadFailure,
+                                              size_t size);
+    };
 
 } // namespace chip::app
