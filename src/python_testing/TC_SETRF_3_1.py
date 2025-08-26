@@ -48,14 +48,14 @@ from TC_SETRF_TestBase import CommodityTariffTestBaseHelper
 
 import matter.clusters as Clusters
 from matter.testing.event_attribute_reporting import AttributeSubscriptionHandler
-from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+from matter.testing.matter_testing import TestStep, async_test_body, default_matter_test_main
 
 logger = logging.getLogger(__name__)
 
 cluster = Clusters.CommodityTariff
 
 
-class TC_SETRF_3_1(MatterBaseTest, CommodityTariffTestBaseHelper):
+class TC_SETRF_3_1(CommodityTariffTestBaseHelper):
     """Implementation of test case TC_SETRF_3_1."""
 
     def desc_TC_SETRF_3_1(self) -> str:

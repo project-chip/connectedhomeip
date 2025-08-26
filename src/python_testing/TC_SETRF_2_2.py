@@ -51,14 +51,14 @@ import matter.clusters as Clusters
 from matter.clusters.Types import NullValue
 from matter.interaction_model import InteractionModelError, Status
 from matter.testing import matter_asserts
-from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+from matter.testing.matter_testing import TestStep, async_test_body, default_matter_test_main
 
 logger = logging.getLogger(__name__)
 
 cluster = Clusters.CommodityTariff
 
 
-class TC_SETRF_2_2(MatterBaseTest, CommodityTariffTestBaseHelper):
+class TC_SETRF_2_2(CommodityTariffTestBaseHelper):
     """Implementation of test case TC_SETRF_2_2."""
 
     def desc_TC_SETRF_2_2(self) -> str:
