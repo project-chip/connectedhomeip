@@ -59,7 +59,7 @@ CHIP_ERROR ContactSensorApp::AppTask::ProcessSetStateClusterHandler(void)
     BooleanState::GetStateValue(val);
     auto status = BooleanState::SetStateValue(!val);
 
-    VerifyOrReturnError(status == chip::Protocols::InteractionModel::Status::Success, CHIP_ERROR_WRITE_FAILED);
+    VerifyOrReturnError(status == CHIP_NO_ERROR, CHIP_ERROR_WRITE_FAILED);
 
     return CHIP_NO_ERROR;
 }
