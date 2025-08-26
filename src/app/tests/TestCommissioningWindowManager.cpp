@@ -409,6 +409,7 @@ TEST_F(TestCommissioningWindowManager, TestCheckCommissioningWindowManagerEnhanc
     chip::DeviceLayer::PlatformMgr().RunEventLoop();
 }
 
+// Verify that the commissioning window is closed when commissioning has completed
 TEST_F(TestCommissioningWindowManager, TestOnPlatformEventCommissioningComplete) 
 {
     CommissioningWindowManager & commissionMgr = Server::GetInstance().GetCommissioningWindowManager();
@@ -423,11 +424,13 @@ TEST_F(TestCommissioningWindowManager, TestOnPlatformEventCommissioningComplete)
     commissionMgr.OnPlatformEvent(&event);
     EXPECT_FALSE(commissionMgr.IsCommissioningWindowOpen());
 
+    // When BLE is enabled
     #if CONFIG_NETWORK_LAYER_BLE && CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION
         EXPECT_FALSE(Server::GetInstance().GetBleLayerObject()->IsBleClosing());
     #endif
 }
 
+// Verify that the commissioning mode is expired when failsafe timer expires
 TEST_F(TestCommissioningWindowManager, TestOnPlatformEventFailSafeTimerExpired) 
 {
     CommissioningWindowManager & commissionMgr = Server::GetInstance().GetCommissioningWindowManager();
@@ -443,7 +446,7 @@ TEST_F(TestCommissioningWindowManager, TestOnPlatformEventFailSafeTimerExpired)
     EXPECT_EQ(commissionMgr.GetCommissioningMode(), chip::Dnssd::CommissioningMode::kDisabled);
 }
 
-
+// Verify that operational advertising is started when the operational network is enabled
 TEST_F(TestCommissioningWindowManager, TestOnPlatformEventOperationalNetworkEnabled) 
 {
     CommissioningWindowManager & commissionMgr = Server::GetInstance().GetCommissioningWindowManager();
@@ -453,9 +456,9 @@ TEST_F(TestCommissioningWindowManager, TestOnPlatformEventOperationalNetworkEnab
 
     commissionMgr.OnPlatformEvent(&event);
     EXPECT_EQ(chip::app::DnssdServer::Instance().AdvertiseOperational(), CHIP_NO_ERROR);
-
 }
 
+// Verify that operational advertising failure is handled gracefully
 TEST_F(TestCommissioningWindowManager, TestOnPlatformEventOperationalNetworkEnabledFail) 
 {
     CommissioningWindowManager & commissionMgr = Server::GetInstance().GetCommissioningWindowManager();
@@ -466,13 +469,14 @@ TEST_F(TestCommissioningWindowManager, TestOnPlatformEventOperationalNetworkEnab
     chip::DeviceLayer::ChipDeviceEvent event;
     event.Type = chip::DeviceLayer::DeviceEventType::kOperationalNetworkEnabled;
 
-    // This should attempt to start operational advertising, which will fail
     commissionMgr.OnPlatformEvent(&event);
+    // This should attempt to start operational advertising, which will fail
     EXPECT_EQ(chip::app::DnssdServer::Instance().AdvertiseOperational(), CHIP_ERROR_INCORRECT_STATE);
 
     chip::app::DnssdServer::Instance().StartServer(); // Restart the server for subsequent tests
 }
 
+// Verify that BLE advertising is stopped when all BLE connections are closed
 TEST_F(TestCommissioningWindowManager, TestOnPlatformEventCloseCloseAllBleConnections) {
     CommissioningWindowManager & commissionMgr = Server::GetInstance().GetCommissioningWindowManager();
 
