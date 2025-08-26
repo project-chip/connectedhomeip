@@ -894,7 +894,7 @@ private:
     /**
      * @brief Checks if value type is nullable
      * @return true if nullable, false otherwise
-     */    
+     */
     template <typename U>
     static constexpr bool TypeIsNullable()
     {
@@ -914,7 +914,7 @@ private:
     /**
      * @brief Checks if value type is a struct
      * @return true if struct type, false otherwise
-     */    
+     */
     template <typename U>
     static constexpr bool TypeIsStruct()
     {

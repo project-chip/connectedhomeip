@@ -27,9 +27,9 @@
 #include <app/clusters/commodity-tariff-server/CommodityTariffAttrsDataMgmt.h>
 
 #include <cstdint>
-#include <thread>
 #include <mutex>
 #include <pw_unit_test/framework.h>
+#include <thread>
 
 #include <lib/support/CodeUtils.h>
 
@@ -293,7 +293,7 @@ TEST_F(TestCommodityTariffBaseDataClass, ListValueMemoryManagement)
 TEST_F(TestCommodityTariffBaseDataClass, StateMachineEnforcement)
 {
     CTC_BaseDataClass<uint32_t> data(1);
-    
+
     // Should fail - not in initialized state
     EXPECT_EQ(data.CreateNewSingleValue(), CHIP_NO_ERROR);
     data.GetNewValue() = 0xaau;
@@ -312,31 +312,32 @@ TEST_F(TestCommodityTariffBaseDataClass, StateMachineEnforcement)
 TEST_F(TestCommodityTariffBaseDataClass, DoubleUpdatePrevention)
 {
     CTC_BaseDataClass<uint32_t> data(1);
-    
+
     // Start first update
     data.CreateNewSingleValue();
-    
+
     // Should fail - already in update
     EXPECT_EQ(data.CreateNewSingleValue(), CHIP_ERROR_INCORRECT_STATE);
 }
 
-TEST_F(TestCommodityTariffBaseDataClass, NullableScalarChangeDetection) {
+TEST_F(TestCommodityTariffBaseDataClass, NullableScalarChangeDetection)
+{
     CTC_BaseDataClass<DataModel::Nullable<uint32_t>> data(5u);
-    
+
     // Set initial value
     EXPECT_EQ(data.CreateNewSingleValue(), CHIP_NO_ERROR);
     data.GetNewValue().SetNonNull(50u);
     EXPECT_EQ(data.MarkAsAssigned(), CHIP_NO_ERROR);
     EXPECT_EQ(data.UpdateBegin(nullptr), CHIP_NO_ERROR);
     EXPECT_TRUE(data.UpdateFinish(true));
-    
+
     // Set same value - should detect no change
     EXPECT_EQ(data.CreateNewSingleValue(), CHIP_NO_ERROR);
     data.GetNewValue().SetNonNull(50u);
     EXPECT_EQ(data.MarkAsAssigned(), CHIP_NO_ERROR);
     EXPECT_EQ(data.UpdateBegin(nullptr), CHIP_NO_ERROR);
     EXPECT_FALSE(data.UpdateFinish(true)); // No change detected
-    
+
     // Set different value - should detect change
     EXPECT_EQ(data.CreateNewSingleValue(), CHIP_NO_ERROR);
     data.GetNewValue().SetNonNull(100u);
@@ -345,53 +346,68 @@ TEST_F(TestCommodityTariffBaseDataClass, NullableScalarChangeDetection) {
     EXPECT_TRUE(data.UpdateFinish(true)); // Change detected
 }
 
-TEST_F(TestCommodityTariffBaseDataClass, ErrorConditions) {
+TEST_F(TestCommodityTariffBaseDataClass, ErrorConditions)
+{
     CTC_BaseDataClass<DataModel::Nullable<uint32_t>> data(0u);
-    
+
     // Wrong method call for type
     EXPECT_EQ(data.CreateNewListValue(5), CHIP_ERROR_INTERNAL);
-    
+
     // Double initialization
     EXPECT_EQ(data.CreateNewSingleValue(), CHIP_NO_ERROR);
     EXPECT_EQ(data.CreateNewSingleValue(), CHIP_ERROR_INCORRECT_STATE);
 }
 
-TEST_F(TestCommodityTariffBaseDataClass, UpdateAbort) {
+TEST_F(TestCommodityTariffBaseDataClass, UpdateAbort)
+{
     CTC_BaseDataClass<DataModel::Nullable<uint32_t>> data(0u);
-    
+
     // Start update but abort
     EXPECT_EQ(data.CreateNewSingleValue(), CHIP_NO_ERROR);
     data.GetNewValue().SetNonNull(99u);
     EXPECT_EQ(data.MarkAsAssigned(), CHIP_NO_ERROR);
-    
+
     // Abort without validation
     EXPECT_FALSE(data.UpdateFinish(false));
     EXPECT_FALSE(data.HasNewValue()); // Should not have value after abort
-    EXPECT_FALSE(data.HasValue()); // Should not have value after abort
+    EXPECT_FALSE(data.HasValue());    // Should not have value after abort
 }
 
 // Complex struct with resources that need explicit cleanup
-struct ResourceStruct {
+struct ResourceStruct
+{
     uint32_t id;
-    char* dynamicString;          // Requires manual memory management
-    DataModel::List<uint32_t>* nestedList; // Requires cleanup
-    
+    char * dynamicString;                   // Requires manual memory management
+    DataModel::List<uint32_t> * nestedList; // Requires cleanup
+
     ResourceStruct() : id(0), dynamicString(nullptr), nestedList(nullptr) {}
-    
-    bool operator!=(const ResourceStruct& other) const {
-        if (id != other.id) return true;
-        if (dynamicString && other.dynamicString) {
-            if (strcmp(dynamicString, other.dynamicString) != 0) return true;
-        } else if (dynamicString != other.dynamicString) {
+
+    bool operator!=(const ResourceStruct & other) const
+    {
+        if (id != other.id)
+            return true;
+        if (dynamicString && other.dynamicString)
+        {
+            if (strcmp(dynamicString, other.dynamicString) != 0)
+                return true;
+        }
+        else if (dynamicString != other.dynamicString)
+        {
             return true; // One is null, other isn't
         }
         // Compare nested lists if both exist
-        if (nestedList && other.nestedList) {
-            if (nestedList->size() != other.nestedList->size()) return true;
-            for (size_t i = 0; i < nestedList->size(); i++) {
-                if ((*nestedList)[i] != (*other.nestedList)[i]) return true;
+        if (nestedList && other.nestedList)
+        {
+            if (nestedList->size() != other.nestedList->size())
+                return true;
+            for (size_t i = 0; i < nestedList->size(); i++)
+            {
+                if ((*nestedList)[i] != (*other.nestedList)[i])
+                    return true;
             }
-        } else if (nestedList != other.nestedList) {
+        }
+        else if (nestedList != other.nestedList)
+        {
             return true; // One is null, other isn't
         }
         return false;
@@ -405,47 +421,56 @@ template <>
 CHIP_ERROR CTC_BaseDataClass<ComplexType>::CopyData(const StructType & input, StructType & output)
 {
     output.id = input.id;
-    
+
     // Copy dynamic string
-    if (input.dynamicString) {
-        output.dynamicString = static_cast<char*>(Platform::MemoryCalloc(strlen(input.dynamicString) + 1, 1));
-        if (!output.dynamicString) {
+    if (input.dynamicString)
+    {
+        output.dynamicString = static_cast<char *>(Platform::MemoryCalloc(strlen(input.dynamicString) + 1, 1));
+        if (!output.dynamicString)
+        {
             return CHIP_ERROR_NO_MEMORY;
         }
         strcpy(output.dynamicString, input.dynamicString);
-    } else {
+    }
+    else
+    {
         output.dynamicString = nullptr;
     }
-    
+
     // Copy nested list
-    if (input.nestedList) {
-        output.nestedList = static_cast<DataModel::List<uint32_t>*>(
-            Platform::MemoryCalloc(1, sizeof(DataModel::List<uint32_t>)));
-        if (!output.nestedList) {
+    if (input.nestedList)
+    {
+        output.nestedList = static_cast<DataModel::List<uint32_t> *>(Platform::MemoryCalloc(1, sizeof(DataModel::List<uint32_t>)));
+        if (!output.nestedList)
+        {
             Platform::MemoryFree(output.dynamicString);
             return CHIP_ERROR_NO_MEMORY;
         }
-        
+
         output.nestedList->~List<uint32_t>(); // Properly destruct before placement new
         new (output.nestedList) DataModel::List<uint32_t>();
-        
-        if (input.nestedList->size() > 0) {
-            auto* buffer = static_cast<uint32_t*>(
-                Platform::MemoryCalloc(input.nestedList->size(), sizeof(uint32_t)));
-            if (!buffer) {
+
+        if (input.nestedList->size() > 0)
+        {
+            auto * buffer = static_cast<uint32_t *>(Platform::MemoryCalloc(input.nestedList->size(), sizeof(uint32_t)));
+            if (!buffer)
+            {
                 Platform::MemoryFree(output.dynamicString);
                 Platform::MemoryFree(output.nestedList);
                 return CHIP_ERROR_NO_MEMORY;
             }
-            for (size_t i = 0; i < input.nestedList->size(); i++) {
+            for (size_t i = 0; i < input.nestedList->size(); i++)
+            {
                 buffer[i] = (*input.nestedList)[i];
             }
             *output.nestedList = DataModel::List<uint32_t>(buffer, input.nestedList->size());
         }
-    } else {
+    }
+    else
+    {
         output.nestedList = nullptr;
     }
-    
+
     return CHIP_NO_ERROR;
 }
 
@@ -459,54 +484,56 @@ template <>
 void CTC_BaseDataClass<ComplexType>::CleanupStruct(StructType & value)
 {
     // Cleanup dynamic string
-    if (value.dynamicString) {
+    if (value.dynamicString)
+    {
         Platform::MemoryFree(value.dynamicString);
         value.dynamicString = nullptr;
     }
-    
+
     // Cleanup nested list
-    if (value.nestedList) {
-        if (value.nestedList->data()) {
+    if (value.nestedList)
+    {
+        if (value.nestedList->data())
+        {
             Platform::MemoryFree(value.nestedList->data());
         }
         Platform::MemoryFree(value.nestedList);
         value.nestedList = nullptr;
     }
-    
+
     value.id = 0;
 }
 
 TEST_F(TestCommodityTariffBaseDataClass, NullableListOfResourceStructs_CreationAndCleanup)
 {
     CTC_BaseDataClass<ComplexType> data(1);
-    
+
     // Create list with resource-intensive structs
     EXPECT_EQ(data.CreateNewListValue(2), CHIP_NO_ERROR);
-    
-    auto& newList = data.GetNewValue().Value();
-    
+
+    auto & newList = data.GetNewValue().Value();
+
     // First struct with dynamic resources
-    newList[0].id = 1;
-    newList[0].dynamicString = static_cast<char*>(Platform::MemoryCalloc(10, 1));
+    newList[0].id            = 1;
+    newList[0].dynamicString = static_cast<char *>(Platform::MemoryCalloc(10, 1));
     strcpy(newList[0].dynamicString, "test1");
-    
-    newList[0].nestedList = static_cast<DataModel::List<uint32_t>*>(
-        Platform::MemoryCalloc(1, sizeof(DataModel::List<uint32_t>)));
+
+    newList[0].nestedList = static_cast<DataModel::List<uint32_t> *>(Platform::MemoryCalloc(1, sizeof(DataModel::List<uint32_t>)));
     new (newList[0].nestedList) DataModel::List<uint32_t>();
-    auto* nestedBuffer1 = static_cast<uint32_t*>(Platform::MemoryCalloc(2, sizeof(uint32_t)));
-    nestedBuffer1[0] = 100;
-    nestedBuffer1[1] = 200;
+    auto * nestedBuffer1   = static_cast<uint32_t *>(Platform::MemoryCalloc(2, sizeof(uint32_t)));
+    nestedBuffer1[0]       = 100;
+    nestedBuffer1[1]       = 200;
     *newList[0].nestedList = DataModel::List<uint32_t>(nestedBuffer1, 2);
-    
+
     // Second struct
-    newList[1].id = 2;
-    newList[1].dynamicString = static_cast<char*>(Platform::MemoryCalloc(10, 1));
+    newList[1].id            = 2;
+    newList[1].dynamicString = static_cast<char *>(Platform::MemoryCalloc(10, 1));
     strcpy(newList[1].dynamicString, "test2");
-    
+
     data.MarkAsAssigned();
     data.UpdateBegin(nullptr);
     EXPECT_TRUE(data.UpdateFinish(true));
-    
+
     // Verify data was copied correctly
     EXPECT_FALSE(data.GetValue().IsNull());
     EXPECT_EQ(data.GetValue().Value().size(), 2ul);
@@ -519,30 +546,30 @@ TEST_F(TestCommodityTariffBaseDataClass, NullableListOfResourceStructs_CreationA
 TEST_F(TestCommodityTariffBaseDataClass, NullableListOfResourceStructs_SetNewValue)
 {
     CTC_BaseDataClass<ComplexType> data(1);
-    
+
     // Prepare source data
     ComplexType sourceValue;
-    
+
     // Create a struct with resources
     ResourceStruct testStruct = {};
-    testStruct.id = 42;
-    testStruct.dynamicString = static_cast<char*>(Platform::MemoryCalloc(20, 1));
+    testStruct.id             = 42;
+    testStruct.dynamicString  = static_cast<char *>(Platform::MemoryCalloc(20, 1));
     strcpy(testStruct.dynamicString, "dynamic_content");
 
-    testStruct.nestedList = new DataModel::List<uint32_t>();
-    auto* nestedBuffer = static_cast<uint32_t*>(Platform::MemoryCalloc(2, sizeof(uint32_t)));
-    nestedBuffer[0] = 100;
-    nestedBuffer[1] = 200;
+    testStruct.nestedList  = new DataModel::List<uint32_t>();
+    auto * nestedBuffer    = static_cast<uint32_t *>(Platform::MemoryCalloc(2, sizeof(uint32_t)));
+    nestedBuffer[0]        = 100;
+    nestedBuffer[1]        = 200;
     *testStruct.nestedList = DataModel::List<uint32_t>(nestedBuffer, 2);
 
     sourceValue.SetNonNull(DataModel::List<ResourceStruct>(&testStruct, 1ul));
-    
+
     // Use SetNewValue to copy the complex data
     EXPECT_EQ(data.SetNewValue(sourceValue), CHIP_NO_ERROR);
-    
+
     data.UpdateBegin(nullptr);
     data.UpdateFinish(true);
-    
+
     // Cleanup source (should not affect the copied data)
     data.CleanupExtListEntry(testStruct);
     EXPECT_EQ(testStruct.dynamicString, nullptr);
@@ -560,24 +587,24 @@ TEST_F(TestCommodityTariffBaseDataClass, NullableListOfResourceStructs_SetNewVal
 TEST_F(TestCommodityTariffBaseDataClass, NullableListOfResourceStructs_NullTransition)
 {
     CTC_BaseDataClass<ComplexType> data(1);
-    
+
     // First set non-null with resources
     data.CreateNewListValue(1);
-    data.GetNewValue().Value()[0].id = 1;
-    data.GetNewValue().Value()[0].dynamicString = static_cast<char*>(Platform::MemoryCalloc(10, 1));
+    data.GetNewValue().Value()[0].id            = 1;
+    data.GetNewValue().Value()[0].dynamicString = static_cast<char *>(Platform::MemoryCalloc(10, 1));
     strcpy(data.GetNewValue().Value()[0].dynamicString, "test");
-    
+
     data.MarkAsAssigned();
     data.UpdateBegin(nullptr);
     EXPECT_TRUE(data.UpdateFinish(true));
-    
+
     EXPECT_FALSE(data.GetValue().IsNull());
-    
+
     // Transition to null - should cleanup all resources
     data.SetNewValue(std::nullopt);
     data.UpdateBegin(nullptr);
     EXPECT_TRUE(data.UpdateFinish(true));
-    
+
     EXPECT_TRUE(data.GetValue().IsNull());
     // Memory should be properly freed by cleanup
 }
@@ -585,26 +612,27 @@ TEST_F(TestCommodityTariffBaseDataClass, NullableListOfResourceStructs_NullTrans
 TEST_F(TestCommodityTariffBaseDataClass, NullableListOfResourceStructs_UpdateRejectionCleanup)
 {
     CTC_BaseDataClass<ComplexType> data(1);
-    
+
     // Create resource-intensive update but reject it
     data.CreateNewListValue(3);
-    
-    for (uint32_t i = 0; i < 3; i++) {
-        data.GetNewValue().Value()[i].id = i;
-        data.GetNewValue().Value()[i].dynamicString = static_cast<char*>(Platform::MemoryCalloc(20, 1));
-        sprintf(data.GetNewValue().Value()[i].dynamicString, "resource_%d", i);
+
+    for (uint32_t i = 0; i < 3; i++)
+    {
+        data.GetNewValue().Value()[i].id            = i;
+        data.GetNewValue().Value()[i].dynamicString = static_cast<char *>(Platform::MemoryCalloc(20, 1));
+        sprintf(data.GetNewValue().Value()[i].dynamicString, "resource_%" PRIu32 "", i);
     }
-    
+
     data.MarkAsAssigned();
 
     EXPECT_TRUE(data.HasNewValue());
     EXPECT_FALSE(data.HasValue());
 
     data.UpdateBegin(nullptr);
-    
+
     // Reject the update - should cleanup all allocated resources
     EXPECT_FALSE(data.UpdateFinish(false));
-    
+
     // Verify cleanup happened (no memory leaks)
     EXPECT_FALSE(data.HasNewValue());
     EXPECT_FALSE(data.HasValue());
@@ -613,156 +641,172 @@ TEST_F(TestCommodityTariffBaseDataClass, NullableListOfResourceStructs_UpdateRej
 TEST_F(TestCommodityTariffBaseDataClass, NullableListOfResourceStructs_ZeroSizeList)
 {
     CTC_BaseDataClass<ComplexType> data(1);
-    
+
     // Test empty list creation
     EXPECT_EQ(data.CreateNewListValue(0), CHIP_ERROR_INVALID_LIST_LENGTH);
     EXPECT_TRUE(data.GetNewValue().IsNull()); // Should be null for zero size
-    
+
     data.MarkAsAssigned();
     data.UpdateBegin(nullptr);
     EXPECT_FALSE(data.UpdateFinish(true));
-    
+
     EXPECT_TRUE(data.GetValue().IsNull());
 }
 
-TEST_F(TestCommodityTariffBaseDataClass, ConcurrentReadAccess) {
+TEST_F(TestCommodityTariffBaseDataClass, ConcurrentReadAccess)
+{
     CTC_BaseDataClass<DataModel::Nullable<uint32_t>> data(2);
-    
+
     // Initialize with a value
     EXPECT_EQ(data.CreateNewSingleValue(), CHIP_NO_ERROR);
     data.GetNewValue().SetNonNull(123);
     EXPECT_EQ(data.MarkAsAssigned(), CHIP_NO_ERROR);
     EXPECT_EQ(data.UpdateBegin(nullptr), CHIP_NO_ERROR);
     EXPECT_TRUE(data.UpdateFinish(true));
-    
+
     // Multiple threads should be able to read simultaneously
     auto reader = [&data]() {
-        for (int i = 0; i < 1000; i++) {
-            auto& value = data.GetValue();
+        for (int i = 0; i < 1000; i++)
+        {
+            auto & value = data.GetValue();
             EXPECT_FALSE(value.IsNull());
             EXPECT_EQ(value.Value(), 123u);
         }
     };
-    
+
     std::thread t1(reader);
     std::thread t2(reader);
     std::thread t3(reader);
-    
+
     t1.join();
     t2.join();
     t3.join();
 }
 
-TEST_F(TestCommodityTariffBaseDataClass, ConcurrentWriteAccess_ShouldBeSynchronized) {
+TEST_F(TestCommodityTariffBaseDataClass, ConcurrentWriteAccess_ShouldBeSynchronized)
+{
     CTC_BaseDataClass<DataModel::Nullable<uint32_t>> data(2);
-    
+
     std::atomic<int> successCount(0);
     std::atomic<int> failureCount(0);
-    
+
     auto writer = [&data, &successCount, &failureCount](uint32_t value) {
-        for (uint32_t i = 0; i < 100; i++) {
+        for (uint32_t i = 0; i < 100; i++)
+        {
             CHIP_ERROR err = data.CreateNewSingleValue();
-            if (err != CHIP_NO_ERROR) {
+            if (err != CHIP_NO_ERROR)
+            {
                 failureCount++;
                 continue;
             }
-            
+
             data.GetNewValue().SetNonNull(value + i);
             err = data.MarkAsAssigned();
-            if (err != CHIP_NO_ERROR) {
+            if (err != CHIP_NO_ERROR)
+            {
                 failureCount++;
                 continue;
             }
-            
+
             err = data.UpdateBegin(nullptr);
-            if (err != CHIP_NO_ERROR) {
+            if (err != CHIP_NO_ERROR)
+            {
                 failureCount++;
                 continue;
             }
-            
-            if (data.UpdateFinish(true)) {
+
+            if (data.UpdateFinish(true))
+            {
                 successCount++;
             }
-            
+
             // Small delay to increase chance of race conditions
             std::this_thread::sleep_for(std::chrono::microseconds(10));
         }
     };
-    
+
     std::thread t1(writer, 1000);
     std::thread t2(writer, 2000);
     std::thread t3(writer, 3000);
-    
+
     t1.join();
     t2.join();
     t3.join();
-    
+
     // Without synchronization, we expect many failures due to state conflicts
     EXPECT_GT(failureCount.load(), 0) << "Concurrent writes should cause state errors without synchronization";
     EXPECT_TRUE(successCount.load() > 0) << "Some writes should succeed";
 }
 
-TEST_F(TestCommodityTariffBaseDataClass, ConcurrentWriteAccess_WithSynchronization) {
+TEST_F(TestCommodityTariffBaseDataClass, ConcurrentWriteAccess_WithSynchronization)
+{
     CTC_BaseDataClass<DataModel::Nullable<uint32_t>> data(2);
     std::mutex dataMutex;
-    
+
     std::atomic<int> successCount(0);
     std::atomic<int> failureCount(0);
     std::vector<uint32_t> finalValues;
-    
+
     auto synchronizedWriter = [&data, &dataMutex, &successCount, &failureCount, &finalValues](uint32_t baseValue) {
-        for (uint32_t i = 0; i < 50; i++) {
+        for (uint32_t i = 0; i < 50; i++)
+        {
             std::lock_guard<std::mutex> lock(dataMutex);
-            
+
             CHIP_ERROR err = data.CreateNewSingleValue();
-            if (err != CHIP_NO_ERROR) continue;
-            
+            if (err != CHIP_NO_ERROR)
+                continue;
+
             data.GetNewValue().SetNonNull(baseValue + i);
             err = data.MarkAsAssigned();
-            if (err != CHIP_NO_ERROR) {
+            if (err != CHIP_NO_ERROR)
+            {
                 failureCount++;
                 continue;
             }
-            
+
             err = data.UpdateBegin(nullptr);
-            if (err != CHIP_NO_ERROR) {
+            if (err != CHIP_NO_ERROR)
+            {
                 failureCount++;
                 continue;
             }
-            
-            if (data.UpdateFinish(true)) {
+
+            if (data.UpdateFinish(true))
+            {
                 successCount++;
                 // Store the value that was successfully written
-                if (!data.GetValue().IsNull()) {
+                if (!data.GetValue().IsNull())
+                {
                     finalValues.push_back(data.GetValue().Value());
                 }
             }
         }
     };
-    
+
     std::thread t1(synchronizedWriter, 1000);
     std::thread t2(synchronizedWriter, 2000);
     std::thread t3(synchronizedWriter, 3000);
-    
+
     t1.join();
     t2.join();
     t3.join();
-    
+
     // With synchronization, all operations should succeed
-    EXPECT_EQ(failureCount.load(), 0)   << "All synchronized writes should succeed";
+    EXPECT_EQ(failureCount.load(), 0) << "All synchronized writes should succeed";
     EXPECT_EQ(successCount.load(), 150) << "All synchronized writes should succeed";
     EXPECT_TRUE(data.HasValue()) << "Data should have a value after writes";
 }
 
-TEST_F(TestCommodityTariffBaseDataClass, MixedReadWriteConcurrency) {
+TEST_F(TestCommodityTariffBaseDataClass, MixedReadWriteConcurrency)
+{
     CTC_BaseDataClass<DataModel::Nullable<uint32_t>> data(2);
     std::mutex dataMutex;
     std::atomic<bool> stopThreads(false);
-    
+
     std::atomic<int> readCount(0);
     std::atomic<int> writeCount(0);
     std::atomic<int> readErrors(0);
-    
+
     // Initialize with a value
     {
         std::lock_guard<std::mutex> lock(dataMutex);
@@ -772,148 +816,169 @@ TEST_F(TestCommodityTariffBaseDataClass, MixedReadWriteConcurrency) {
         EXPECT_EQ(data.UpdateBegin(nullptr), CHIP_NO_ERROR);
         EXPECT_TRUE(data.UpdateFinish(true));
     }
-    
+
     auto reader = [&]() {
-        while (!stopThreads.load()) {
+        while (!stopThreads.load())
+        {
             // Readers don't need synchronization for GetValue()
-            auto& value = data.GetValue();
+            auto & value = data.GetValue();
             readCount++;
-            
-            if (value.IsNull()) {
+
+            if (value.IsNull())
+            {
                 readErrors++;
-            } else if (value.Value() < 100) {
+            }
+            else if (value.Value() < 100)
+            {
                 readErrors++; // Should never see values < 100
             }
-            
+
             std::this_thread::sleep_for(std::chrono::microseconds(5));
         }
     };
-    
+
     auto writer = [&](uint32_t startValue) {
-        for (uint32_t i = 0; i < 20; i++) {
+        for (uint32_t i = 0; i < 20; i++)
+        {
             std::lock_guard<std::mutex> lock(dataMutex);
-            
+
             CHIP_ERROR err = data.CreateNewSingleValue();
-            if (err != CHIP_NO_ERROR) continue;
-            
+            if (err != CHIP_NO_ERROR)
+                continue;
+
             data.GetNewValue().SetNonNull(startValue + i);
             err = data.MarkAsAssigned();
-            if (err != CHIP_NO_ERROR) continue;
-            
+            if (err != CHIP_NO_ERROR)
+                continue;
+
             err = data.UpdateBegin(nullptr);
-            if (err != CHIP_NO_ERROR) continue;
-            
-            if (data.UpdateFinish(true)) {
+            if (err != CHIP_NO_ERROR)
+                continue;
+
+            if (data.UpdateFinish(true))
+            {
                 writeCount++;
             }
-            
+
             std::this_thread::sleep_for(std::chrono::microseconds(10));
         }
     };
-    
+
     // Start readers
     std::thread reader1(reader);
     std::thread reader2(reader);
-    
+
     // Start writers
     std::thread writer1(writer, 100);
     std::thread writer2(writer, 200);
-    
+
     writer1.join();
     writer2.join();
-    
+
     stopThreads.store(true);
     reader1.join();
     reader2.join();
-    
+
     EXPECT_GT(readCount.load(), 0) << "Should have performed many reads";
     EXPECT_GT(writeCount.load(), 0) << "Should have performed many writes";
     EXPECT_EQ(readErrors.load(), 0) << "No read errors should occur during concurrent access";
-    
+
     // Final value should be from one of the writers
     EXPECT_FALSE(data.GetValue().IsNull());
     EXPECT_GE(data.GetValue().Value(), 100u);
 }
 
-TEST_F(TestCommodityTariffBaseDataClass, ConcurrentListOperations) {
+TEST_F(TestCommodityTariffBaseDataClass, ConcurrentListOperations)
+{
     CTC_BaseDataClass<DataModel::List<uint32_t>> data(2);
     std::mutex dataMutex;
-    
+
     auto listWriter = [&](uint32_t threadId) {
         std::lock_guard<std::mutex> lock(dataMutex);
-        
+
         EXPECT_EQ(data.CreateNewListValue(3), CHIP_NO_ERROR);
-        auto& list = data.GetNewValue();
-        
-        for (size_t i = 0; i < list.size(); i++) {
-            list[i] = threadId * 100 + static_cast<uint32_t>(i);;
+        auto & list = data.GetNewValue();
+
+        for (size_t i = 0; i < list.size(); i++)
+        {
+            list[i] = threadId * 100 + static_cast<uint32_t>(i);
+            ;
         }
-        
+
         EXPECT_EQ(data.MarkAsAssigned(), CHIP_NO_ERROR);
         EXPECT_EQ(data.UpdateBegin(nullptr), CHIP_NO_ERROR);
         EXPECT_TRUE(data.UpdateFinish(true));
     };
-    
+
     std::thread t1(listWriter, 1);
     std::thread t2(listWriter, 2);
     std::thread t3(listWriter, 3);
-    
+
     t1.join();
     t2.join();
     t3.join();
-    
+
     // Final list should be from one of the threads
     EXPECT_TRUE(data.HasValue());
     EXPECT_EQ(data.GetValue().size(), 3u);
-    
+
     // Verify the list contains valid values from one thread
-    auto& finalList = data.GetValue();
+    auto & finalList   = data.GetValue();
     uint32_t baseValue = finalList[0] / 100 * 100;
     EXPECT_GE(baseValue, 100u);
     EXPECT_LE(baseValue, 300u);
-    
-    for (size_t i = 0; i < finalList.size(); i++) {
+
+    for (size_t i = 0; i < finalList.size(); i++)
+    {
         EXPECT_EQ(finalList[i], baseValue + i);
     }
 }
 
-TEST_F(TestCommodityTariffBaseDataClass, StressTest_ManyThreads) {
-    constexpr size_t NUM_THREADS = 10;  // Changed to size_t
-    constexpr size_t OPERATIONS_PER_THREAD = 50;  // Changed to size_t
-    
+TEST_F(TestCommodityTariffBaseDataClass, StressTest_ManyThreads)
+{
+    constexpr size_t NUM_THREADS           = 10; // Changed to size_t
+    constexpr size_t OPERATIONS_PER_THREAD = 50; // Changed to size_t
+
     CTC_BaseDataClass<DataModel::Nullable<uint32_t>> data(2);
     std::mutex dataMutex;
-    std::atomic<size_t> totalOperations(0);  // Changed to size_t
-    
-    auto worker = [&](uint32_t threadId) {  // Changed to uint32_t
-        for (size_t i = 0; i < OPERATIONS_PER_THREAD; i++) {
+    std::atomic<size_t> totalOperations(0); // Changed to size_t
+
+    auto worker = [&](uint32_t threadId) { // Changed to uint32_t
+        for (size_t i = 0; i < OPERATIONS_PER_THREAD; i++)
+        {
             std::lock_guard<std::mutex> lock(dataMutex);
-            
+
             CHIP_ERROR err = data.CreateNewSingleValue();
-            if (err != CHIP_NO_ERROR) continue;
-            
+            if (err != CHIP_NO_ERROR)
+                continue;
+
             data.GetNewValue().SetNonNull(threadId * 1000 + static_cast<uint32_t>(i));
             err = data.MarkAsAssigned();
-            if (err != CHIP_NO_ERROR) continue;
-            
+            if (err != CHIP_NO_ERROR)
+                continue;
+
             err = data.UpdateBegin(nullptr);
-            if (err != CHIP_NO_ERROR) continue;
-            
-            if (data.UpdateFinish(true)) {
+            if (err != CHIP_NO_ERROR)
+                continue;
+
+            if (data.UpdateFinish(true))
+            {
                 totalOperations++;
             }
         }
     };
-    
+
     std::vector<std::thread> threads;
-    for (uint32_t i = 0; i < NUM_THREADS; i++) {
+    for (uint32_t i = 0; i < NUM_THREADS; i++)
+    {
         threads.emplace_back(worker, i);
     }
-    
-    for (auto& t : threads) {
+
+    for (auto & t : threads)
+    {
         t.join();
     }
-    
+
     EXPECT_EQ(totalOperations, NUM_THREADS * OPERATIONS_PER_THREAD);
     EXPECT_TRUE(data.HasValue());
     EXPECT_FALSE(data.GetValue().IsNull());
