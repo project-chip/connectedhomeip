@@ -127,7 +127,7 @@ ChipDeviceScanner & mDeviceScanner = Internal::ChipDeviceScanner::GetInstance();
 BLEManagerImpl BLEManagerImpl::sInstance;
 const struct ble_gatt_svc_def BLEManagerImpl::CHIPoBLEGATTSvc = { .type            = BLE_GATT_SVC_TYPE_PRIMARY,
                                                                   .uuid            = (ble_uuid_t *) (&ShortUUID_CHIPoBLEService),
-                                                                  .characteristics = (struct ble_gatt_chr_def[]) {
+                                                                  .characteristics = (struct ble_gatt_chr_def[]){
                                                                       {
                                                                           .uuid       = (ble_uuid_t *) (&UUID128_CHIPoBLEChar_RX),
                                                                           .access_cb  = gatt_svr_chr_access,
