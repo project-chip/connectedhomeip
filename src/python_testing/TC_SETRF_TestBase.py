@@ -16,6 +16,7 @@
 
 
 import logging
+import random
 from typing import Any, List, Optional
 
 from mobly import asserts
@@ -46,6 +47,8 @@ class CommodityTariffTestBaseHelper(MatterBaseTest):
     defaultRandomizationOffset = None
     BlockModeValue = None
     tariffInformationValue = None
+    tariffComponentValue = None
+    dayEntriesValue = None
     currentDayEntryDateValue = None
     dayEntryIDsEvents = []
 
@@ -532,24 +535,25 @@ class CommodityTariffTestBaseHelper(MatterBaseTest):
             attribute_value (Optional[List[cluster.Structs.DayEntryStruct]], optional): DayEntries attribute value. Defaults to None.
         """
 
-        if not attribute_value:
-            attribute_value = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.DayEntries)
+        self.dayEntriesValue = attribute_value
+        if not self.dayEntriesValue:
+            self.dayEntriesValue = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.DayEntries)
 
         if self.tariffInformationValue is not None and self.tariffInformationValue is NullValue:
-            asserts.assert_equal(attribute_value, NullValue, "DayEntries must be Null when TariffInfo is Null")
+            asserts.assert_equal(self.dayEntriesValue, NullValue, "DayEntries must be Null when TariffInfo is Null")
 
         # if attribute value is not null it must be list of DayEntryStruct
-        if attribute_value is not NullValue:
+        if self.dayEntriesValue is not NullValue:
             matter_asserts.assert_list(
-                attribute_value, "DayEntries attribute must return a list with length less or equal 672", max_length=672)
+                self.dayEntriesValue, "DayEntries attribute must return a list with length less or equal 672", max_length=672)
             matter_asserts.assert_list_element_type(
-                attribute_value, cluster.Structs.DayEntryStruct, "DayEntries attribute must contain DayEntryStruct elements")
+                self.dayEntriesValue, cluster.Structs.DayEntryStruct, "DayEntries attribute must contain DayEntryStruct elements")
 
             # is used to check DayEntryID uniqueness below
             dayEntryIDs_from_day_entries_attribute = []
 
             # check each DayEntryStruct
-            for item in attribute_value:
+            for item in self.dayEntriesValue:
                 await self.checkDayEntryStruct(endpoint=endpoint, cluster=cluster, struct=item)
                 dayEntryIDs_from_day_entries_attribute.append(item.dayEntryID)
 
@@ -778,21 +782,22 @@ class CommodityTariffTestBaseHelper(MatterBaseTest):
             attribute_value (Optional[List[cluster.Structs.TariffComponentStruct]], optional): TariffComponents attribute value. Defaults to None.
         """
 
-        if not attribute_value:
-            attribute_value = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.TariffComponents)
+        self.tariffComponentValue = attribute_value
+        if not self.tariffComponentValue:
+            self.tariffComponentValue = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.TariffComponents)
 
         if self.tariffInformationValue is not None and self.tariffInformationValue is NullValue:
-            asserts.assert_equal(len(attribute_value), 0, "TariffComponents must be empty when TariffInfo is Null")
+            asserts.assert_equal(len(self.tariffComponentValue), 0, "TariffComponents must be empty when TariffInfo is Null")
 
         # if attribute value is not null it must be list of TariffComponentStruct
-        if attribute_value is not NullValue:
+        if self.tariffComponentValue is not NullValue:
             matter_asserts.assert_list(
-                attribute_value, "TariffComponents attribute must return a list with length greater or equal 1", min_length=1, max_length=672)
+                self.tariffComponentValue, "TariffComponents attribute must return a list with length greater or equal 1", min_length=1, max_length=672)
             matter_asserts.assert_list_element_type(
-                attribute_value, cluster.Structs.TariffComponentStruct, "TariffComponents attribute must contain TariffComponentStruct elements")
+                self.tariffComponentValue, cluster.Structs.TariffComponentStruct, "TariffComponents attribute must contain TariffComponentStruct elements")
 
             # check each TariffComponentStruct
-            for item in attribute_value:
+            for item in self.tariffComponentValue:
                 await self.checkTariffComponentStruct(endpoint=endpoint, cluster=cluster, struct=item)
 
     async def check_tariff_periods_attribute(self, endpoint: int, attribute_value: Optional[List[cluster.Structs.TariffPeriodStruct]] = None) -> None:
@@ -927,6 +932,23 @@ class CommodityTariffTestBaseHelper(MatterBaseTest):
         else:  # if feature is disabled, DefaultRandomizationType attribute must be None
             asserts.assert_is_none(
                 self.defaultRandomizationType, "DefaultRandomizationType attribute must be None if RNDM feature is disabled.")
+
+    async def get_tariff_components_IDs_from_tariff_components_attribute(self, tariff_components: List[cluster.Structs.TariffComponentStruct]) -> List[int]:
+
+        return [tariff_component.tariffComponentID for tariff_component in tariff_components]
+
+    async def get_day_entry_IDs_from_day_entries_attribute(self, tariff_components: List[cluster.Structs.DayEntryStruct]) -> List[int]:
+
+        return [tariff_component.dayEntryID for tariff_component in tariff_components]
+
+    async def generate_unique_uint32_for_IDs(self, list_of_IDs: List[int]) -> int:
+
+        IDs_set = set(list_of_IDs)
+
+        while True:
+            new_ID = random.randint(0, 2**32 - 1)
+            if new_ID not in IDs_set:
+                return new_ID
 
     async def verify_reporting(self, reports: dict, attribute: ClusterObjects.ClusterAttributeDescriptor, attribute_name: str, saved_value) -> bool:
         """This function verifies that the reported value is different from the saved value.
