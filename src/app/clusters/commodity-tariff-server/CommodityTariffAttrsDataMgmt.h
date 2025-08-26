@@ -628,7 +628,7 @@ public:
             return CHIP_ERROR_INCORRECT_STATE;
         }
 
-        if constexpr (TypeIsList<ValueType>())
+        if constexpr (TypeIsList<DataType>())
         {
             return CHIP_ERROR_INTERNAL;
         }
@@ -683,7 +683,7 @@ public:
         }();
 
         // Get reference to the storage location
-        auto getStorageRef = [this]() -> auto & {
+        [[maybe_unused]] const auto getStorageRef = [this]() -> auto & {
             if constexpr (TypeIsNullable<ValueType>())
             {
                 return GetNewValueRef().Value();
@@ -694,7 +694,7 @@ public:
             }
         };
 
-        auto assignStorageVal = [this](auto && value) -> auto & {
+        [[maybe_unused]] const auto assignStorageVal = [this](auto && value) -> auto & {
             if constexpr (TypeIsNullable<ValueType>())
             {
                 return GetNewValueRef().SetNonNull(value);
@@ -958,7 +958,7 @@ private:
      * @brief Validates the new value using type-specific validation
      * @return CHIP_ERROR Validation result
      */
-    CHIP_ERROR ValidateNewValue(); //{ return Validate<ValueType>(GetNewValueRef(), mAttrId, mAuxData); }
+    CHIP_ERROR ValidateNewValue();
 
     /**
      * @brief Compares two lists for equality

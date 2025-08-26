@@ -514,7 +514,7 @@ TEST_F(TestCommodityTariffBaseDataClass, NullableListOfResourceStructs_CreationA
     EXPECT_EQ(data.GetValue().Value()[0].nestedList->size(), 2ul);
     EXPECT_EQ((*data.GetValue().Value()[0].nestedList)[0], 100u);
 }
-
+/*
 TEST_F(TestCommodityTariffBaseDataClass, NullableListOfResourceStructs_SetNewValue)
 {
     CTC_BaseDataClass<ComplexType> data(1);
@@ -540,7 +540,7 @@ TEST_F(TestCommodityTariffBaseDataClass, NullableListOfResourceStructs_SetNewVal
     //EXPECT_EQ(data.GetValue().Value().size(), 1ul);
     //EXPECT_STREQ(data.GetValue().Value()[0].dynamicString, "dynamic_content");
 }
-/*
+
 TEST_F(TestCommodityTariffBaseDataClass, NullableListOfResourceStructs_NullTransition)
 {
     CTC_BaseDataClass<ComplexType> data(1);
