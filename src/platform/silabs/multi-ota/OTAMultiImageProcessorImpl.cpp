@@ -262,7 +262,7 @@ void OTAMultiImageProcessorImpl::HandleStatus(CHIP_ERROR status)
     }
     else
     {
-        ChipLogError(SoftwareUpdate, "Image update canceled. Failed to process OTA block: %s", ErrorStr(status));
+        ChipLogError(SoftwareUpdate, "Image update canceled. Failed to process OTA block: %" CHIP_ERROR_FORMAT, status.Format());
         GetRequestorInstance()->CancelImageUpdate();
     }
 }
@@ -420,9 +420,8 @@ void OTAMultiImageProcessorImpl::HandleApply(intptr_t context)
     imageProcessor->mAccumulator.Clear();
 
     ChipLogProgress(SoftwareUpdate, "HandleApply: Finished");
-
     // This reboots the device
-    CORE_CRITICAL_SECTION(bootloader_rebootAndInstall();)
+    CORE_CRITICAL_SECTION(bootloader_rebootAndInstall());
 }
 
 CHIP_ERROR OTAMultiImageProcessorImpl::ReleaseBlock()

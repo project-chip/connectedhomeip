@@ -48,9 +48,10 @@ import os
 import signal
 import subprocess
 
-from chip import ChipDeviceCtrl
-from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from mobly import asserts
+
+from matter import ChipDeviceCtrl
+from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 
 
 class TC_DA_1_9(MatterBaseTest):

@@ -253,6 +253,7 @@ CHIP_ERROR CheckEventValidity(const ConcreteEventPath & path, const SubjectDescr
         .cluster     = path.mClusterId,
         .endpoint    = path.mEndpointId,
         .requestType = RequestType::kEventReadRequest,
+        .entityId    = path.mEventId,
     };
     CHIP_ERROR err = GetAccessControl().Check(subjectDescriptor, requestPath, Access::Privilege::kView);
     if (IsTranslatableAclError(path, err, outStatus))
@@ -267,25 +268,14 @@ CHIP_ERROR CheckEventValidity(const ConcreteEventPath & path, const SubjectDescr
     {
         // cannot get event data to validate. Event is not supported.
         // we still fall through into "ValidateClusterPath" to try to return a `better code`
-        // (i.e. say invalid endpoint or cluser), however if path seems ok we will
+        // (i.e. say invalid endpoint or cluster), however if path seems ok we will
         // return unsupported event as we failed to get event metadata.
-        outStatus = StatusIB(Status::UnsupportedEvent);
-    }
-    else
-    {
-        // set up the status as "OK" as long as validation below works
-        outStatus = StatusIB(Status::Success);
-
-        requestPath.entityId = path.mEventId;
-
-        err = GetAccessControl().Check(subjectDescriptor, requestPath, eventInfo.readPrivilege);
-        if (IsTranslatableAclError(path, err, outStatus))
-        {
-            return CHIP_NO_ERROR;
-        }
-        ReturnErrorOnFailure(err);
+        outStatus = StatusIB(DataModel::ValidateClusterPath(provider, path, Status::UnsupportedEvent));
+        return CHIP_NO_ERROR;
     }
 
+    // Although EventInfo() was successful, we still need to Validate Cluster Path since providers MAY return CHIP_NO_ERROR although
+    // events are unknown.
     Status status = DataModel::ValidateClusterPath(provider, path, Status::Success);
     if (status != Status::Success)
     {
@@ -294,7 +284,18 @@ CHIP_ERROR CheckEventValidity(const ConcreteEventPath & path, const SubjectDescr
         return CHIP_NO_ERROR;
     }
 
-    // Status set above: could be success, but also UnsupportedEvent
+    // Per spec, the required-privilege ACL check is performed only after path existence is validated
+    err = GetAccessControl().Check(subjectDescriptor, requestPath, eventInfo.readPrivilege);
+    if (IsTranslatableAclError(path, err, outStatus))
+    {
+        return CHIP_NO_ERROR;
+    }
+    ReturnErrorOnFailure(err);
+
+    // set up the status as "OK" Since all above checks passed
+    outStatus = StatusIB(Status::Success);
+
+    // Status was set above = Success
     return CHIP_NO_ERROR;
 }
 

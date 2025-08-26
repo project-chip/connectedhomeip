@@ -201,6 +201,7 @@ template("siwx917_sdk") {
                                     # 1->SOC and 0->NCP
       "RSI_WLAN_API_ENABLE",
       "NVM3_DEFAULT_NVM_SIZE=40960",
+      "NVM3_DEFAULT_CACHE_SIZE=${sl_nvm3_cache_size}",
       "NVM3_DEFAULT_MAX_OBJECT_SIZE=${sl_nvm3_max_object_size}",
       "KVS_MAX_ENTRIES=${kvs_max_entries}",
       "${silabs_mcu}=1",
@@ -267,6 +268,15 @@ template("siwx917_sdk") {
       "SL_WLAN_EVENT_THREAD_PRIORITY=osPriorityRealtime6",
       "SL_WLAN_COMMAND_ENGINE_THREAD_PRIORITY=osPriorityRealtime5",
     ]
+
+    # Defines for Si917Y MCU
+    if (is_si917y_mcu) {
+      defines += [
+        "SI91X_32kHz_EXTERNAL_OSCILLATOR=1",
+        "SL_SI91X_ACX_MODULE=1",
+        "SI917Y_DEVKIT=1",
+      ]
+    }
 
     if (silabs_log_enabled && chip_logging) {
       defines += [ "SILABS_LOG_ENABLED=1" ]
