@@ -216,7 +216,7 @@ RUN case ${TARGETPLATFORM} in \
     && mv out/linux-x64-water-leak-detector-ipv6only/water-leak-detector-app out/water-leak-detector-app \
     && mv out/linux-x64-camera-ipv6only/chip-camera-app out/chip-camera-app \
     && mv out/linux-x64-camera-controller-ipv6only/chip-camera-controller out/chip-camera-controller \
-    && mv out/linux-x64-closure-ipv6only/chip-closure-app out/chip-closure-app \
+    && mv out/linux-x64-closure-ipv6only/closure-app out/chip-closure-app \
     ;; \
     "linux/arm64")\
     set -x \
@@ -282,7 +282,7 @@ RUN case ${TARGETPLATFORM} in \
     && mv out/linux-arm64-water-leak-detector-ipv6only/water-leak-detector-app out/water-leak-detector-app \
     && mv out/linux-arm64-camera-clang-ipv6only/chip-camera-app out/chip-camera-app \
     && mv out/linux-arm64-camera-controller-ipv6only/chip-camera-controller out/chip-camera-controller \
-    && mv out/linux-arm64-closure-ipv6only/chip-closure-app out/chip-closure-app \
+    && mv out/linux-arm64-closure-ipv6only/closure-app out/chip-closure-app \
     ;; \
     *) ;; \
     esac
