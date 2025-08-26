@@ -21,27 +21,27 @@
 #include <transport/Session.h>
 
 namespace chip {
-namespace Test
-{
- /**
- * @brief Class acts as an accessor to private methods of the CommissioningWindowManagerTestAccess class without needing to give friend access to
- *        each individual test.
+namespace Test {
+/**
+ * @brief Class acts as an accessor to private methods of the CommissioningWindowManagerTestAccess class without needing to give
+ * friend access to each individual test.
  */
 class CommissioningWindowManagerTestAccess
 {
-    public:
-        CommissioningWindowManagerTestAccess() = delete;
-        CommissioningWindowManagerTestAccess(CommissioningWindowManager *cmwinMgr) : mcmwinMgr(cmwinMgr) {}
-        void SetPASESession(SessionHolderWithDelegate PASEsession) 
+public:
+    CommissioningWindowManagerTestAccess() = delete;
+    CommissioningWindowManagerTestAccess(CommissioningWindowManager * cmwinMgr) : mcmwinMgr(cmwinMgr) {}
+    void SetPASESession(SessionHolderWithDelegate PASEsession)
+    {
+        auto optSession = PASEsession.Get();
+        if (optSession.HasValue())
         {
-            auto optSession = PASEsession.Get();
-            if (optSession.HasValue())
-            {
-                mcmwinMgr->mPASESession.ShiftToSession(optSession.Value());
-            }
+            mcmwinMgr->mPASESession.ShiftToSession(optSession.Value());
         }
-    private:
-        CommissioningWindowManager * mcmwinMgr = nullptr;
+    }
+
+private:
+    CommissioningWindowManager * mcmwinMgr = nullptr;
 };
 } // namespace Test
 
