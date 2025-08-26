@@ -289,7 +289,8 @@ public:
 
     /**
      * @brief
-     *   Destructor. Cleans up any internal data, but does not destroy the delegate.
+     *   Destructor. Cleans up any internal data, including unregistering the command handler and attribute interface, 
+     *   but does not destroy the delegate.
      */
     ~WebRTCTransportProviderServer() override;
 
@@ -304,9 +305,9 @@ public:
 
     /**
      * @brief
-     *   Unregisters the command handler and attribute interface, releasing resources.
+     *   Handles any cleanup required on the instance or app/delegate prior to the destructor being called.
      */
-    void Shutdown();
+    void Shutdown() {};
 
     /**
      * @brief Get a reference to the current WebRTC sessions.

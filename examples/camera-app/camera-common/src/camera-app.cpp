@@ -274,6 +274,7 @@ void CameraApp::ShutdownCameraDeviceClusters()
 {
     ChipLogDetail(Camera, "CameraAppShutdown: Shutting down Camera device clusters");
     mAVSettingsUserLevelMgmtServerPtr->Shutdown();
+    mWebRTCTransportProviderPtr->Shutdown();
 }
 
 static constexpr EndpointId kCameraEndpointId = 1;
