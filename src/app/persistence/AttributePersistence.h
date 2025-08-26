@@ -90,25 +90,26 @@ public:
     /// not use internal classes directly.
     CHIP_ERROR StoreString(const ConcreteAttributePath & path, const Storage::Internal::ShortString & value);
 
+#if CHIP_CONFIG_BIG_ENDIAN_TARGET
     void UnalignedHostSwap(MutableByteSpan & buffer)
     {
         if (buffer.size() == 2)
         {
             // perform an unaligned_swap
-            uint16_t data = Encoding::LittleEndian::GetUnaligned16(buffer.data());
+            uint16_t data = Encoding::LittleEndian::Get16(buffer.data());
             memcpy(buffer.data(), reinterpret_cast<uint8_t *>(&data));
         }
         else if (buffer.size() == 4)
         {
-            uint32_t data = Encoding::LittleEndian::GetUnaligned32(buffer.data());
+            uint32_t data = Encoding::LittleEndian::Get32(buffer.data());
             memcpy(buffer.data(), reinterpret_cast<uint8_t *>(&data));
         }
         else if (buffer.size() == 8)
         {
-            uint64_t data = Encoding::LittleEndian::GetUnaligned64(buffer.data());
+            uint64_t data = Encoding::LittleEndian::Get64(buffer.data());
             memcpy(buffer.data(), reinterpret_cast<uint8_t *>(&data));
         }
-    }
+#endif // CHIP_CONFIG_BIG_ENDIAN_TARGET
 
     // Only available in little endian for the moment
     CHIP_ERROR MigrateFromSafeAttributePersistanceProvider(EndpointId endpointId, ClusterId ClusterId,
@@ -157,7 +158,7 @@ public:
             StorageKeyName safePath = DefaultStorageKeyAllocator::SafeAttributeValue(endpointId, clusterId, attr);
 
             // Read Value
-            err = storageDelegate.SyncGetKeyValue(safePath, buffer);
+            err = storageDelegate.SyncGetKeyValue(safePath, copy_of_buffer);
             if (err == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND)
             {
                 continue;
@@ -169,7 +170,7 @@ public:
             }
 
             ReturnErrorOnFailure(storageDelegate.SyncSetKeyValue(
-                DefaultStorageKeyAllocator::AttributeValue(endpointId, clusterId, attr).KeyName(), buffer));
+                DefaultStorageKeyAllocator::AttributeValue(endpointId, clusterId, attr).KeyName(), copy_of_buffer));
             err = storageDelegate.SyncDeleteKeyValue(safePath.KeyName());
             // do nothing with this error
         }
