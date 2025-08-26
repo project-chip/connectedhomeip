@@ -136,7 +136,8 @@ public class ConnectionExampleFragment extends Fragment {
               if (useCommissionerGeneratedPasscode) {
                 // Set commissionerPasscode to true for CastingPlayer/Commissioner-Generated
                 // passcode commissioning.
-                idOptions = new IdentificationDeclarationOptions(false, false, true, false, false, 0);
+                idOptions =
+                    new IdentificationDeclarationOptions(false, false, true, false, false, 0);
                 Log.d(
                     TAG,
                     "onViewCreated() calling CastingPlayer.verifyOrEstablishConnection() Target Content Application Vendor ID: "
@@ -150,7 +151,7 @@ public class ConnectionExampleFragment extends Fragment {
                                 InitializationExample.commissionableDataProvider
                                     .get()
                                     .getSetupPasscode()))
-                         .length();
+                        .length();
                 idOptions =
                     new IdentificationDeclarationOptions(
                         false, false, false, false, false, passcodeLength);
