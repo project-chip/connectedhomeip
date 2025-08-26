@@ -107,7 +107,7 @@ public:
     CameraError CaptureSnapshot(const chip::app::DataModel::Nullable<uint16_t> streamID, const VideoResolutionStruct & resolution,
                                 ImageSnapshot & outImageSnapshot) override;
 
-    CameraError StartVideoStream(uint16_t streamID) override;
+    CameraError StartVideoStream(const VideoStreamStruct & allocatedStream) override;
 
     // Stop video stream
     CameraError StopVideoStream(uint16_t streamID) override;
