@@ -37,6 +37,9 @@ public:
     CHIP_ERROR
     GetStateValue(BooleanState::Attributes::StateValue::TypeInfo::Type & stateValue) const;
 
+    CHIP_ERROR
+    LogEvent(BooleanState::Attributes::StateValue::TypeInfo::Type stateValue, EventNumber & eventNumber) const;
+
 protected:
     BooleanState::Attributes::StateValue::TypeInfo::Type mStateValue;
 };

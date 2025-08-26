@@ -82,4 +82,10 @@ CHIP_ERROR GetStateValue(Attributes::StateValue::TypeInfo::Type & stateValue)
     return gServer.Cluster().GetStateValue(stateValue);
 }
 
+CHIP_ERROR
+LogEvent(BooleanState::Attributes::StateValue::TypeInfo::Type stateValue, EventNumber & eventNumber)
+{
+    return gServer.Cluster().LogEvent(stateValue, eventNumber);
+}
+
 } // namespace chip::app::Clusters::BooleanState

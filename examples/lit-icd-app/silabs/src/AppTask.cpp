@@ -122,7 +122,7 @@ void AppTask::ApplicationEventHandler(AppEvent * aEvent)
     PlatformMgr().ScheduleWork([](intptr_t) {
         bool state = true;
 
-        CHIP_ERROR status = chip::app::Clusters::BooleanState::GetStateValue(state);
+        auto status = chip::app::Clusters::BooleanState::GetStateValue(state);
         if (status != CHIP_NO_ERROR)
         {
             // Failed to read StateValue. Default to true (open state)

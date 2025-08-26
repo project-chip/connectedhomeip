@@ -15,6 +15,7 @@
  */
 
 #include "boolean-state-cluster.h"
+#include <app/EventLogging.h>
 #include <app/server-cluster/AttributeListBuilder.h>
 #include <clusters/BooleanState/Metadata.h>
 
@@ -67,6 +68,13 @@ BooleanStateCluster::GetStateValue(StateValue::TypeInfo::Type & stateValue) cons
     stateValue = mStateValue;
 
     return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR
+BooleanStateCluster::LogEvent(StateValue::TypeInfo::Type stateValue, EventNumber & eventNumber) const
+{
+    BooleanState::Events::StateChange::Type event{ stateValue };
+    return app::LogEvent(event, mPath.mEndpointId, eventNumber);
 }
 
 } // namespace chip::app::Clusters

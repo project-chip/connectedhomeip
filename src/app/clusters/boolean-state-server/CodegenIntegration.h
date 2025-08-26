@@ -27,4 +27,7 @@ SetStateValue(const Attributes::StateValue::TypeInfo::Type & stateValue);
 
 CHIP_ERROR GetStateValue(Attributes::StateValue::TypeInfo::Type & stateValue);
 
+CHIP_ERROR
+LogEvent(BooleanState::Attributes::StateValue::TypeInfo::Type stateValue, EventNumber & eventNumber);
+
 } // namespace chip::app::Clusters::BooleanState
