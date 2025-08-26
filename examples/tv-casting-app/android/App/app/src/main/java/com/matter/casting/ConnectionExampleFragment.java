@@ -144,8 +144,16 @@ public class ConnectionExampleFragment extends Fragment {
                         + ", useCommissionerGeneratedPasscode: "
                         + useCommissionerGeneratedPasscode);
               } else {
-                int passcodeLength = String.valueOf(Math.abs(InitializationExample.commissionableDataProvider.get().getSetupPasscode())).length();
-                idOptions = new IdentificationDeclarationOptions(false, false, false, false, false, passcodeLength);
+                int passcodeLength =
+                    String.valueOf(
+                            Math.abs(
+                                InitializationExample.commissionableDataProvider
+                                    .get()
+                                    .getSetupPasscode()))
+                         .length();
+                idOptions =
+                    new IdentificationDeclarationOptions(
+                        false, false, false, false, false, passcodeLength);
                 Log.d(
                     TAG,
                     "onViewCreated() calling CastingPlayer.verifyOrEstablishConnection() Target Content Application Vendor ID: "
