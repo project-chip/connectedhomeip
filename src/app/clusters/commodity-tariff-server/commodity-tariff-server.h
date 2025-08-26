@@ -301,8 +301,6 @@ struct CurrentTariffAttrsCtx
     std::map<uint32_t, const Structs::DayPatternStruct::Type *> DayPatternsMap;
     std::map<uint32_t, const Structs::DayEntryStruct::Type *> DayEntriesMap;
     std::map<uint32_t, const Structs::TariffComponentStruct::Type *> TariffComponentsMap;
-
-    uint32_t mForwardAlarmTriggerTime;
 };
 
 /**

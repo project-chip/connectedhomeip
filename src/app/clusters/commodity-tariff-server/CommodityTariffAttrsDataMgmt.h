@@ -1125,6 +1125,8 @@ namespace CommodityTariff {
  */
 struct TariffUpdateCtx
 {
+    BlockModeEnum blockMode;
+
     /**
      * @brief Reference to the tariff's start timestamp
      * @note This is a reference to allow validation against the actual attribute value

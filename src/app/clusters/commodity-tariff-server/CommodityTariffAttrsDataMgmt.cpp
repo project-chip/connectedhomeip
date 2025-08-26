@@ -184,6 +184,11 @@ static CHIP_ERROR ValidateListEntry(const TariffComponentStruct::Type & entryNew
 
     VerifyOrReturnError(entryNewValue.tariffComponentID > 0, CHIP_ERROR_INVALID_ARGUMENT);
 
+    if ((aCtx->blockMode == BlockModeEnum::kNoBlock) && (!entryNewValue.threshold.IsNull()))
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+
     // entryNewValue.label
     if (entryNewValue.label.HasValue() && !entryNewValue.label.Value().IsNull())
     {
@@ -609,6 +614,11 @@ CHIP_ERROR CTC_BaseDataClass<DataModel::Nullable<TariffInformationStruct::Type>>
     {
         VerifyOrReturnError(EnsureKnownEnumValue(newValue.blockMode.Value()) != BlockModeEnum::kUnknownEnumValue,
                             CHIP_ERROR_INVALID_ARGUMENT);
+        ctx->blockMode = newValue.blockMode.Value();
+    }
+    else
+    {
+        ctx->blockMode = BlockModeEnum::kNoBlock;
     }
 
     // Handle currency validation based on pricing feature
