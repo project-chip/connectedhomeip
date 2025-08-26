@@ -14,10 +14,33 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+#include <app/clusters/operational-credentials-server/operational-credentials-cluster.h>
 
 /****************************************************************************
  * @file
  * @brief Implementation for the Operational Credentials Cluster
  ***************************************************************************/
 
- 
+using namespace chip;
+using namespace chip::app;
+using namespace chip::app::Clusters;
+
+CHIP_ERROR OperationalCredentialsCluster::Attributes(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder)
+{
+    return CHIP_NO_ERROR;
+}
+
+DataModel::ActionReturnStatus OperationalCredentialsCluster::ReadAttribute(const DataModel::ReadAttributeRequest & request, AttributeValueEncoder & encoder)
+{
+    return Protocols::InteractionModel::Status::UnsupportedAttribute;
+}
+
+CHIP_ERROR OperationalCredentialsCluster::AcceptedCommands(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder) 
+{
+    return CHIP_NO_ERROR;
+}
+
+std::optional<DataModel::ActionReturnStatus> OperationalCredentialsCluster::InvokeCommand(const DataModel::InvokeRequest & request, TLV::TLVReader & input_arguments, CommandHandler * handler) 
+{
+    return Protocols::InteractionModel::Status::UnsupportedCommand;
+}

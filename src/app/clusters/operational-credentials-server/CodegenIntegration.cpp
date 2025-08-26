@@ -14,3 +14,63 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+#include <app/clusters/operational-credentials-server/operational-credentials-cluster.h>
+#include <data-model-providers/codegen/ClusterIntegration.h>
+
+using namespace chip;
+using namespace chip::app;
+using namespace chip::app::Clusters;
+
+namespace {
+
+LazyRegisteredServerCluster<OperationalCredentialsCluster> gServer;
+
+class IntegrationDelegate : public CodegenClusterIntegration::Delegate
+{
+public:
+    ServerClusterRegistration & CreateRegistration(EndpointId endpointId, unsigned emberEndpointIndex,
+                                                   uint32_t optionalAttributeBits, uint32_t featureMap) override
+    {
+        gServer.Create(endpointId);
+        return gServer.Registration();
+    }
+
+    ServerClusterInterface & FindRegistration(unsigned emberEndpointIndex) override { return gServer.Cluster(); }
+    void ReleaseRegistration(unsigned emberEndpointIndex) override { gServer.Destroy(); }
+};
+
+} // namespace
+
+void emberAfOperationalCredentialsClusterServerInitCallback(EndpointId endpointId)
+{
+    IntegrationDelegate integrationDelegate;
+
+    // register a singleton server (root endpoint only)
+    CodegenClusterIntegration::RegisterServer(
+        {
+            .endpointId                      = endpointId,
+            .clusterId                       = OperationalCredentials::Id,
+            .fixedClusterServerEndpointCount = 1,
+            .maxEndpointCount                = 1,
+            .fetchFeatureMap                 = true,
+            .fetchOptionalAttributes         = false,
+        },
+        integrationDelegate);
+}
+
+void MatterOperationalCredentialsClusterServerShutdownCallback(EndpointId endpointId)
+{
+    IntegrationDelegate integrationDelegate;
+
+    // register a singleton server (root endpoint only)
+    CodegenClusterIntegration::UnregisterServer(
+        {
+            .endpointId                      = endpointId,
+            .clusterId                       = OperationalCredentials::Id,
+            .fixedClusterServerEndpointCount = 1,
+            .maxEndpointCount                = 1,
+        },
+        integrationDelegate);
+}
+
+void MatterOperationalCredentialsPluginServerInitCallback() {}
