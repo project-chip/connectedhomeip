@@ -307,7 +307,7 @@ public:
      * @brief
      *   Handles any cleanup required on the instance or app/delegate prior to the destructor being called.
      */
-    void Shutdown() {};
+    void Shutdown(){};
 
     /**
      * @brief Get a reference to the current WebRTC sessions.
