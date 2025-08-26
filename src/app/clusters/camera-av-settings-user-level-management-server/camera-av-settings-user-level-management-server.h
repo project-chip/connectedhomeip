@@ -101,7 +101,7 @@ public:
     virtual ~Delegate() = default;
 
     /**
-     * Allows the delegate to perform any specific functions such as timer cancellation on a shutdown, this is invoked prior to 
+     * Allows the delegate to perform any specific functions such as timer cancellation on a shutdown, this is invoked prior to
      * the destructor, it shall not be invoked as part of the destructor.
      */
     virtual void ShutdownApp() = 0;
@@ -280,8 +280,8 @@ public:
 
     CHIP_ERROR Init();
 
-    // Handle any dynamic cleanup required prior to the destructor being called on an app shutdown.  To be invoked by 
-    // an app as part of its own shutdown sequence.  
+    // Handle any dynamic cleanup required prior to the destructor being called on an app shutdown.  To be invoked by
+    // an app as part of its own shutdown sequence.
     void Shutdown();
 
     bool HasFeature(Feature aFeature) const;

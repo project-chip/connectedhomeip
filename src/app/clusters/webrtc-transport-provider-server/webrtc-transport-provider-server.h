@@ -289,7 +289,7 @@ public:
 
     /**
      * @brief
-     *   Destructor. Cleans up any internal data, including unregistering the command handler and attribute interface, 
+     *   Destructor. Cleans up any internal data, including unregistering the command handler and attribute interface,
      *   but does not destroy the delegate.
      */
     ~WebRTCTransportProviderServer() override;
