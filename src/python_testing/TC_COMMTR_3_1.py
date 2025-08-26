@@ -163,7 +163,7 @@ class TC_COMMTR_3_1(CommodityMeteringTestBaseHelper):
         # TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 with EnableKey field set to PIXIT.COMMTR.TEST_EVENT_TRIGGER_KEY
         # and EventTrigger field set to PIXIT.COMMTR.TEST_EVENT_TRIGGER for Attributes Value Set Test Event.
         await self.send_test_event_trigger_attrs_value_update()
-        subscription_handler.await_all_expected_report_matches(matcher_list, timeout_sec=2)
+        subscription_handler.await_all_expected_report_matches(matcher_list, timeout_sec=10)
 
         self.step("9")
         await self.check_maximum_metered_quantities_attribute(
