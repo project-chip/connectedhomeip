@@ -127,7 +127,7 @@ public:
             // We make a copy of the buffer so it can be resized
             MutableByteSpan copy_of_buffer = buffer;
 
-            StorageKeyName safePath = DefaultStorageKeyAllocator::SafeAttributeValue(endpointId, clusterId, attr);
+            auto safePath = DefaultStorageKeyAllocator::SafeAttributeValue(endpointId, clusterId, attr);
 
             // Read Value
             err = storageDelegate.SyncGetKeyValue(safePath.KeyName(), buffer);
@@ -137,7 +137,7 @@ public:
             }
             else if (err != CHIP_NO_ERROR)
             {
-                ChipLogError(Unspecified, "Error reading attribute %s - %" CHIP_ERROR_FORMAT, safePath.KeyName(), err);
+                //ChipLogError(Unspecified, "Error reading attribute %s - %" CHIP_ERROR_FORMAT, safePath.KeyName(), err);
                 continue;
             }
 
