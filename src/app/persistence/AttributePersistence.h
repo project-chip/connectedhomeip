@@ -20,6 +20,7 @@
 #include <app/data-model-provider/ActionReturnStatus.h>
 #include <app/persistence/AttributePersistenceProvider.h>
 #include <app/persistence/String.h>
+#include <lib/core/CHIPEncoding.h>
 
 #include <type_traits>
 
@@ -32,10 +33,12 @@ namespace chip::app {
 /// have known (strong) types and their load/decode logic is often
 /// similar and reusable. This class implements the logic of handling
 /// such attributes, so that it can be reused across cluster implementations.
-class AttributePersistence
-{
+class AttributePersistence {
 public:
-    AttributePersistence(AttributePersistenceProvider & provider) : mProvider(provider) {}
+    AttributePersistence(AttributePersistenceProvider & provider)
+        : mProvider(provider)
+    {
+    }
 
     /// Loads a native-endianness stored value of type `T` into `value` from the persistence provider.
     ///
@@ -91,19 +94,14 @@ public:
 
     void UnalignedHostSwap(MutableByteSpan & buffer)
     {
-        if (copy_of_buffer.size() == 2)
-        {
+        if (buffer.size() == 2) {
             // perform an unaligned_swap
             uint16_t data = Encoding::LittleEndian::GetUnaligned16(buffer.data());
             memcpy(buffer.data(), reinterpret_cast<uint8_t *>(&data));
-        }
-        else if (copy_of_buffer.size() == 4)
-        {
+        } else if (buffer.size() == 4) {
             uint32_t data = Encoding::LittleEndian::GetUnaligned32(buffer.data());
             memcpy(buffer.data(), reinterpret_cast<uint8_t *>(&data));
-        }
-        else if (copy_of_buffer.size() == 8)
-        {
+        } else if (buffer.size() == 8) {
             uint64_t data = Encoding::LittleEndian::GetUnaligned64(buffer.data());
             memcpy(buffer.data(), reinterpret_cast<uint8_t *>(&data));
         }
@@ -111,15 +109,14 @@ public:
 
     // Only available in little endian for the moment
     CHIP_ERROR MigrateFromSafeAttributePersistanceProvider(EndpointId endpointId, ClusterId ClusterId,
-                                                           const ReadOnlyBuffer<AttributeId> & scalarAttributes,
-                                                           const ReadOnlyBuffer<AttributeId> & attributes, MutableByteSpan & buffer,
-                                                           PersistentStorageDelegate & storageDelegate)
+        const ReadOnlyBuffer<AttributeId> & scalarAttributes,
+        const ReadOnlyBuffer<AttributeId> & attributes, MutableByteSpan & buffer,
+        PersistentStorageDelegate & storageDelegate)
     {
 
         ChipError err;
 
-        for (auto attr : scalarAttributes)
-        {
+        for (auto attr : scalarAttributes) {
             // We make a copy of the buffer so it can be resized
             MutableByteSpan copy_of_buffer = buffer;
 
@@ -127,12 +124,9 @@ public:
 
             // Read Value
             err = storageDelegate.SyncGetKeyValue(safePath.KeyName(), buffer);
-            if (err == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND)
-            {
+            if (err == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND) {
                 continue;
-            }
-            else if (err != CHIP_NO_ERROR)
-            {
+            } else if (err != CHIP_NO_ERROR) {
                 ChipLogError(Unspecified, "Error reading attribute %s - %" CHIP_ERROR_FORMAT, safePath.KeyName(), err);
                 continue;
             }
@@ -148,8 +142,7 @@ public:
         }
 
         // These are not integers (probably strings) so no need to care for endianness
-        for (auto attr : attributes)
-        {
+        for (auto attr : attributes) {
             // We make a copy of the buffer so it can be resized
             MutableByteSpan copy_of_buffer = buffer;
 
@@ -157,12 +150,9 @@ public:
 
             // Read Value
             err = storageDelegate.SyncGetKeyValue(safePath, buffer);
-            if (err == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND)
-            {
+            if (err == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND) {
                 continue;
-            }
-            else if (err != CHIP_NO_ERROR)
-            {
+            } else if (err != CHIP_NO_ERROR) {
                 ChipLogError(Unspecified, "Error reading attribute %s - %" CHIP_ERROR_FORMAT, safePath.KeyName(), err);
                 continue;
             }
@@ -183,7 +173,7 @@ private:
     /// Error reason for load failure is logged (or nothing logged in case "Value not found" is the
     /// reason for the load failure).
     bool InternalRawLoadNativeEndianValue(const ConcreteAttributePath & path, void * data, const void * valueOnLoadFailure,
-                                          size_t size);
+        size_t size);
 };
 
 } // namespace chip::app
