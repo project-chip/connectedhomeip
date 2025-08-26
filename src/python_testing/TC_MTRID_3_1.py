@@ -140,6 +140,7 @@ class TC_MTRID_3_1(MeterIdentificationTestBaseHelper):
         matcher_list = self.get_mandatory_matchers()
 
         self.step("1")
+        # Commissioning, already done
 
         self.step("2")
         subscription_handler = AttributeSubscriptionHandler(cluster)
