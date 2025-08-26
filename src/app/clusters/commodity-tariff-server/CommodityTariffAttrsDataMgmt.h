@@ -592,14 +592,7 @@ public:
             }
             else
             {
-                if constexpr (TypeIsNullable<ValueType>())
-                {
-                    GetNewValueRef().SetNull();
-                }
-                else
-                {
-                    GetNewValueRef() = DataModel::List<ListEntryType>();
-                }
+                return CHIP_ERROR_INVALID_LIST_LENGTH;
             }
         }
         else
@@ -663,7 +656,6 @@ public:
         {
             if (aValue.IsNull())
             {
-                CleanupByIdx(1 - mActiveValueIdx.load());
                 mUpdateState.store(UpdateState::kInitialized);
                 MarkAsAssigned();
                 return CHIP_NO_ERROR;
@@ -755,10 +747,6 @@ public:
         {
             MarkAsAssigned();
         }
-        else
-        {
-            CleanupByIdx(1 - mActiveValueIdx.load());
-        }
 
         return err;
     }
@@ -841,21 +829,14 @@ public:
             return false;
         }
 
-        if (aUpdateAllow && (mUpdateState.load() == UpdateState::kValidated) && (HasChanged()))
+        if (aUpdateAllow && (mUpdateState.load() == UpdateState::kValidated))
         {
-            if (HasValue())
-            {
-                CleanupByIdx(mActiveValueIdx.load()); // Cleanup current value
-            }
-
             SwapActiveValueStorage();
 
-            ret = true;
+            ret = HasChanged();
         }
-        else
-        {
-            CleanupByIdx(1 - mActiveValueIdx.load());
-        }
+
+        CleanupByIdx(1 - mActiveValueIdx.load());
 
         mUpdateState.store(UpdateState::kIdle);
 
