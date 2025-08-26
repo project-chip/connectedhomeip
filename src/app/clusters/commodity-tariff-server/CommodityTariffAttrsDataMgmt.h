@@ -503,11 +503,11 @@ public:
      */
     explicit CTC_BaseDataClass(AttributeId aAttrId) : mAttrId(aAttrId)
     {
-        if constexpr (IsValueNullable())
+        if constexpr (TypeIsNullable<ValueType>())
         {
             GetValueRef().SetNull();
         }
-        else if constexpr (IsValueList())
+        else if constexpr (TypeIsList<ValueType>())
         {
             GetValueRef() = ValueType();
         }
@@ -572,37 +572,32 @@ public:
             return CHIP_ERROR_INCORRECT_STATE;
         }
 
-        if constexpr (!IsValueList())
+        if constexpr (TypeIsList<DataType>())
         {
-            return CHIP_ERROR_INTERNAL;
-        }
-
-        if (size >= 1)
-        {
-            auto * buffer = static_cast<ListEntryType *>(Platform::MemoryCalloc(size, sizeof(ListEntryType)));
-            if (!buffer)
+            if (size >= 1)
             {
-                return CHIP_ERROR_NO_MEMORY;
-            }
-            if constexpr (IsValueNullable())
-            {
-                GetNewValueRef().SetNonNull(DataModel::List<ListEntryType>(buffer, size));
+                auto * buffer = static_cast<ListEntryType *>(Platform::MemoryCalloc(size, sizeof(ListEntryType)));
+                if (!buffer)
+                {
+                    return CHIP_ERROR_NO_MEMORY;
+                }
+                if constexpr (TypeIsNullable<ValueType>())
+                {
+                    GetNewValueRef().SetNonNull(DataModel::List<ListEntryType>(buffer, size));
+                }
+                else
+                {
+                    GetNewValueRef() = DataModel::List<ListEntryType>(buffer, size);
+                }
             }
             else
             {
-                GetNewValueRef() = DataModel::List<ListEntryType>(buffer, size);
+                return CHIP_ERROR_INVALID_LIST_LENGTH;
             }
         }
         else
         {
-            if constexpr (IsValueNullable())
-            {
-                GetNewValueRef().SetNull();
-            }
-            else
-            {
-                GetNewValueRef() = DataModel::List<ListEntryType>();
-            }
+            return CHIP_ERROR_INTERNAL;
         }
 
         mUpdateState.store(UpdateState::kInitialized);
@@ -626,12 +621,12 @@ public:
             return CHIP_ERROR_INCORRECT_STATE;
         }
 
-        if constexpr (IsValueList())
+        if constexpr (TypeIsList<DataType>())
         {
             return CHIP_ERROR_INTERNAL;
         }
 
-        if constexpr (IsValueNullable())
+        if constexpr (TypeIsNullable<ValueType>())
         {
             GetNewValueRef().SetNull();
         }
@@ -661,7 +656,6 @@ public:
         {
             if (aValue.IsNull())
             {
-                CleanupByIdx(1 - mActiveValueIdx.load());
                 mUpdateState.store(UpdateState::kInitialized);
                 MarkAsAssigned();
                 return CHIP_NO_ERROR;
@@ -681,7 +675,7 @@ public:
         }();
 
         // Get reference to the storage location
-        auto getStorageRef = [this]() -> auto & {
+        [[maybe_unused]] const auto getStorageRef = [this]() -> auto & {
             if constexpr (TypeIsNullable<ValueType>())
             {
                 return GetNewValueRef().Value();
@@ -692,7 +686,7 @@ public:
             }
         };
 
-        auto assignStorageVal = [this](auto && value) -> auto & {
+        [[maybe_unused]] const auto assignStorageVal = [this](auto && value) -> auto & {
             if constexpr (TypeIsNullable<ValueType>())
             {
                 return GetNewValueRef().SetNonNull(value);
@@ -752,10 +746,6 @@ public:
         if (err == CHIP_NO_ERROR)
         {
             MarkAsAssigned();
-        }
-        else
-        {
-            CleanupByIdx(1 - mActiveValueIdx.load());
         }
 
         return err;
@@ -839,21 +829,14 @@ public:
             return false;
         }
 
-        if (aUpdateAllow && (mUpdateState.load() == UpdateState::kValidated) && (HasChanged()))
+        if (aUpdateAllow && (mUpdateState.load() == UpdateState::kValidated))
         {
-            if (HasValue())
-            {
-                CleanupByIdx(mActiveValueIdx.load()); // Cleanup current value
-            }
-
             SwapActiveValueStorage();
 
-            ret = true;
+            ret = HasChanged();
         }
-        else
-        {
-            CleanupByIdx(1 - mActiveValueIdx.load());
-        }
+
+        CleanupByIdx(1 - mActiveValueIdx.load());
 
         mUpdateState.store(UpdateState::kIdle);
 
@@ -908,53 +891,45 @@ private:
      */
     void SwapActiveValueStorage() { mActiveValueIdx.store(1 - mActiveValueIdx.load()); }
 
+    /**
+     * @brief Checks if value type is nullable
+     * @return true if nullable, false otherwise
+     */
     template <typename U>
     static constexpr bool TypeIsNullable()
     {
         return IsNullable<U>::value;
     }
 
+    /**
+     * @brief Checks if value type is a list
+     * @return true if list type, false otherwise
+     */
     template <typename U>
     static constexpr bool TypeIsList()
     {
         return IsList<U>::value;
     }
 
+    /**
+     * @brief Checks if value type is a struct
+     * @return true if struct type, false otherwise
+     */
     template <typename U>
     static constexpr bool TypeIsStruct()
     {
         return IsStruct<U>::value;
     }
 
+    /**
+     * @brief Checks if value type is scalar (numeric or enum)
+     * @return true if scalar type, false otherwise
+     */
     template <typename U>
     static constexpr bool TypeIsScalar()
     {
         return (IsNumeric<U>::value || IsEnum<U>::value);
     }
-
-    /**
-     * @brief Checks if value type is nullable
-     * @return true if nullable, false otherwise
-     */
-    static constexpr bool IsValueNullable() { return IsNullable<ValueType>::value; }
-
-    /**
-     * @brief Checks if value type is a list
-     * @return true if list type, false otherwise
-     */
-    static constexpr bool IsValueList() { return IsList<DataType>::value; }
-
-    /**
-     * @brief Checks if value type is a struct
-     * @return true if struct type, false otherwise
-     */
-    static constexpr bool IsValueStruct() { return IsStruct<DataType>::value; }
-
-    /**
-     * @brief Checks if value type is scalar (numeric or enum)
-     * @return true if scalar type, false otherwise
-     */
-    static constexpr bool IsValueScalar() { return (IsNumeric<DataType>::value || IsEnum<DataType>::value); }
 
     // Internal implementation methods...
 
@@ -964,7 +939,7 @@ private:
      * @brief Validates the new value using type-specific validation
      * @return CHIP_ERROR Validation result
      */
-    CHIP_ERROR ValidateNewValue(); //{ return Validate<ValueType>(GetNewValueRef(), mAttrId, mAuxData); }
+    CHIP_ERROR ValidateNewValue();
 
     /**
      * @brief Compares two lists for equality
@@ -1026,11 +1001,11 @@ private:
      */
     bool HasChanged()
     {
-        if constexpr (IsValueNullable())
+        if constexpr (TypeIsNullable<ValueType>())
         {
             return NullableNotEqual(GetNewValueRef(), GetValueRef());
         }
-        else if constexpr (IsValueList())
+        else if constexpr (TypeIsList<ValueType>())
         {
             return ListsNotEqual(GetNewValueRef(), GetValueRef());
         }
@@ -1064,22 +1039,22 @@ private:
      */
     void CleanupValueByRef(ValueType & aValue)
     {
-        if constexpr (IsValueNullable())
+        if constexpr (TypeIsNullable<ValueType>())
         {
             if (!aValue.IsNull())
             {
-                if constexpr (IsList<DataType>::value)
+                if constexpr (TypeIsList<DataType>())
                 {
                     CleanupList(aValue.Value());
                 }
-                else if constexpr (IsValueStruct())
+                else if constexpr (TypeIsStruct<DataType>())
                 {
                     CleanupStruct(aValue.Value());
                 }
             }
             aValue.SetNull();
         }
-        else if constexpr (IsValueList())
+        else if constexpr (TypeIsList<ValueType>())
         {
             CleanupList(aValue);
         }
