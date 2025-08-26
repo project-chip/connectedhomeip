@@ -34,7 +34,7 @@ class CameraAVSettingsUserLevelManager : public Delegate
 {
 public:
     CameraAVSettingsUserLevelManager() = default;
-    ~CameraAVSettingsUserLevelManager() = default; 
+    ~CameraAVSettingsUserLevelManager() = default;
 
     void ShutdownApp() override;
 

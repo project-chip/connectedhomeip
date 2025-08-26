@@ -179,7 +179,7 @@ static void onTimerExpiry(System::Layer * systemLayer, void * data)
     delegate->OnPhysicalMoveCompleted(Protocols::InteractionModel::Status::Success);
 }
 
-void AVSettingsUserLevelManagementDelegate::ShutdownApp() 
+void AVSettingsUserLevelManagementDelegate::ShutdownApp()
 {
     CancelActiveTimers();
 }

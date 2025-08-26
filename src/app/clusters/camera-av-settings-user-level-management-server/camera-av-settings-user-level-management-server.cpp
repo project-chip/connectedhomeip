@@ -179,7 +179,7 @@ CHIP_ERROR CameraAvSettingsUserLevelMgmtServer::Init()
     return CHIP_NO_ERROR;
 }
 
-void CameraAvSettingsUserLevelMgmtServer::Shutdown() 
+void CameraAvSettingsUserLevelMgmtServer::Shutdown()
 {
     mDelegate.ShutdownApp();
 }
