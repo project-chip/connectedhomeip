@@ -103,7 +103,11 @@ if (chip_crypto == "openssl") {
   }
 
   source_set("cryptopal_openssl") {
-    sources = [ "CHIPCryptoPALOpenSSL.cpp" ]
+    sources = [
+      "CHIPCryptoPALOpenSSL.cpp",
+      "CHIPCryptoPALOpenSSL.h",
+      "P256KeyPairOpenSSL.cpp",
+    ]
     public_configs = [ ":openssl_config" ]
     public_deps = [ ":public_headers" ]
   }
@@ -112,7 +116,11 @@ if (chip_crypto == "openssl") {
 
   source_set("cryptopal_boringssl") {
     # BoringSSL is close enough to OpenSSL that it uses same PAL, with minor #ifdef differences
-    sources = [ "CHIPCryptoPALOpenSSL.cpp" ]
+    sources = [
+      "CHIPCryptoPALOpenSSL.cpp",
+      "CHIPCryptoPALOpenSSL.h",
+      "P256KeyPairOpenSSL.cpp",
+    ]
     public_deps = [
       ":public_headers",
       "${boringssl_root}:boringssl",
