@@ -412,25 +412,35 @@ TEST_F(TestCommissioningWindowManager, TestCheckCommissioningWindowManagerEnhanc
 TEST_F(TestCommissioningWindowManager, TestOnPlatformEventCommissioningComplete) 
 {
     CommissioningWindowManager & commissionMgr = Server::GetInstance().GetCommissioningWindowManager();
+    chip::Test::CommissioningWindowManagerTestAccess access(&commissionMgr);
 
     EXPECT_EQ(commissionMgr.OpenBasicCommissioningWindow(commissionMgr.MaxCommissioningTimeout(), CommissioningWindowAdvertisement::kDnssdOnly), CHIP_NO_ERROR);
+    EXPECT_TRUE(commissionMgr.IsCommissioningWindowOpen());
 
     chip::DeviceLayer::ChipDeviceEvent event;
     event.Type = chip::DeviceLayer::DeviceEventType::kCommissioningComplete;
 
     commissionMgr.OnPlatformEvent(&event);
+    EXPECT_FALSE(commissionMgr.IsCommissioningWindowOpen());
+
+    #if CONFIG_NETWORK_LAYER_BLE && CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION
+        EXPECT_FALSE(Server::GetInstance().GetBleLayerObject()->IsBleClosing());
+    #endif
 }
 
 TEST_F(TestCommissioningWindowManager, TestOnPlatformEventFailSafeTimerExpired) 
 {
     CommissioningWindowManager & commissionMgr = Server::GetInstance().GetCommissioningWindowManager();
-    // chip::Test::CommissioningWindowManagerTestAccess access(&commissionMgr);
-    // access.SetPASESession();
+
+    EXPECT_EQ(commissionMgr.OpenBasicCommissioningWindow(commissionMgr.MaxCommissioningTimeout(), CommissioningWindowAdvertisement::kDnssdOnly), CHIP_NO_ERROR);
+    EXPECT_TRUE(commissionMgr.IsCommissioningWindowOpen());
 
     chip::DeviceLayer::ChipDeviceEvent event;
     event.Type = chip::DeviceLayer::DeviceEventType::kFailSafeTimerExpired;
 
     commissionMgr.OnPlatformEvent(&event);
+    commissionMgr.CloseCommissioningWindow();
+    EXPECT_EQ(commissionMgr.GetCommissioningMode(), chip::Dnssd::CommissioningMode::kDisabled);
 }
 
 
@@ -470,6 +480,7 @@ TEST_F(TestCommissioningWindowManager, TestOnPlatformEventCloseCloseAllBleConnec
     event.Type = chip::DeviceLayer::DeviceEventType::kCloseAllBleConnections;
 
     commissionMgr.OnPlatformEvent(&event);
+    EXPECT_FALSE(chip::DeviceLayer::ConnectivityMgr().IsBLEAdvertisingEnabled());
 } 
 
 } // namespace
