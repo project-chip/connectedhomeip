@@ -113,9 +113,10 @@ public:
 #endif // CHIP_CONFIG_BIG_ENDIAN_TARGET
 
     // Only available in little endian for the moment
-    CHIP_ERROR MigrateFromSafeAttributePersistanceProvider(
-        EndpointId endpointId, ClusterId ClusterId, const ReadOnlyBuffer<AttributeId> & scalarAttributes,
-        const ReadOnlyBuffer<AttributeId> & attributes, MutableByteSpan & buffer, PersistentStorageDelegate & storageDelegate)
+    CHIP_ERROR MigrateFromSafeAttributePersistanceProvider(EndpointId endpointId, ClusterId ClusterId,
+                                                           const ReadOnlyBuffer<AttributeId> & scalarAttributes,
+                                                           const ReadOnlyBuffer<AttributeId> & attributes, MutableByteSpan & buffer,
+                                                           PersistentStorageDelegate & storageDelegate)
     {
 
         ChipError err;
@@ -176,16 +177,16 @@ public:
         }
     }
 
-    private:
-        AttributePersistenceProvider & mProvider;
+private:
+    AttributePersistenceProvider & mProvider;
 
-        /// Loads a raw value of size `size` into the memory pointed to by `data`.
-        /// If load fails, `false` is returned and data is filled with `valueOnLoadFailure`.
-        ///
-        /// Error reason for load failure is logged (or nothing logged in case "Value not found" is the
-        /// reason for the load failure).
-        bool InternalRawLoadNativeEndianValue(const ConcreteAttributePath & path, void * data, const void * valueOnLoadFailure,
-                                              size_t size);
-    };
+    /// Loads a raw value of size `size` into the memory pointed to by `data`.
+    /// If load fails, `false` is returned and data is filled with `valueOnLoadFailure`.
+    ///
+    /// Error reason for load failure is logged (or nothing logged in case "Value not found" is the
+    /// reason for the load failure).
+    bool InternalRawLoadNativeEndianValue(const ConcreteAttributePath & path, void * data, const void * valueOnLoadFailure,
+                                          size_t size);
+};
 
 } // namespace chip::app
