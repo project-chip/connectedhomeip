@@ -42,7 +42,6 @@ from TC_AVSMTestBase import AVSMTestBase
 
 import matter.clusters as Clusters
 from matter import ChipDeviceCtrl
-from matter.clusters.Types import NullValue
 from matter.interaction_model import InteractionModelError, Status
 from matter.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main, has_feature, run_if_endpoint_matches
 
