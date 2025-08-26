@@ -10,8 +10,9 @@ using namespace chip::Controller;
 
 namespace {
 
-class CommissioningDelegateHeaderAPITest : public ::testing::Test
+class CommissioningDelegateTest : public ::testing::Test
 {
+    // This test fixture is currently empty, but can be extended in the future.
 };
 
 struct TestDADelegate : public Credentials::DeviceAttestationDelegate
@@ -32,7 +33,7 @@ struct TestDADelegate : public Credentials::DeviceAttestationDelegate
 };
 
 // ---------- StageToString (and MetricKey… if enabled) ----------
-TEST_F(CommissioningDelegateHeaderAPITest, StageToString_AllCases_AndDefault)
+TEST_F(CommissioningDelegateTest, StageToString_AllCases_AndDefault)
 {
     struct Case
     {
@@ -55,6 +56,9 @@ TEST_F(CommissioningDelegateHeaderAPITest, StageToString_AllCases_AndDefault)
         { kSendAttestationRequest, "SendAttestationRequest" },
         { kAttestationVerification, "AttestationVerification" },
         { kAttestationRevocationCheck, "AttestationRevocationCheck" },
+#if CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
+        { kJCMTrustVerification, "JCMTrustVerification" },
+#endif // CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
         { kSendOpCertSigningRequest, "SendOpCertSigningRequest" },
         { kValidateCSR, "ValidateCSR" },
         { kGenerateNOCChain, "GenerateNOCChain" },
@@ -69,9 +73,9 @@ TEST_F(CommissioningDelegateHeaderAPITest, StageToString_AllCases_AndDefault)
         { kFailsafeBeforeThreadEnable, "FailsafeBeforeThreadEnable" },
         { kWiFiNetworkEnable, "WiFiNetworkEnable" },
         { kThreadNetworkEnable, "ThreadNetworkEnable" },
-        { kEvictPreviousCaseSessions, "kEvictPreviousCaseSessions" },
-        { kFindOperationalForStayActive, "kFindOperationalForStayActive" },
-        { kFindOperationalForCommissioningComplete, "kFindOperationalForCommissioningComplete" },
+        { kEvictPreviousCaseSessions, "EvictPreviousCaseSessions" },
+        { kFindOperationalForStayActive, "FindOperationalForStayActive" },
+        { kFindOperationalForCommissioningComplete, "FindOperationalForCommissioningComplete" },
         { kICDSendStayActive, "ICDSendStayActive" },
         { kSendComplete, "SendComplete" },
         { kCleanup, "Cleanup" },
@@ -91,7 +95,7 @@ TEST_F(CommissioningDelegateHeaderAPITest, StageToString_AllCases_AndDefault)
 }
 
 #if MATTER_TRACING_ENABLED
-TEST_F(CommissioningDelegateHeaderAPITest, MetricKeyForCommissioningStage_AllCases)
+TEST_F(CommissioningDelegateTest, MetricKeyForCommissioningStage_AllCases)
 {
     struct Case
     {
@@ -146,7 +150,7 @@ TEST_F(CommissioningDelegateHeaderAPITest, MetricKeyForCommissioningStage_AllCas
 #endif
 
 // ---------- CommissioningParameters getters/setters & buffer-clearing ----------
-TEST_F(CommissioningDelegateHeaderAPITest, CommissioningParameters_DefaultsAndSettersExerciseUncovered)
+TEST_F(CommissioningDelegateTest, CommissioningParameters_DefaultsAndSettersExerciseUncovered)
 {
     CommissioningParameters p;
 
@@ -252,8 +256,8 @@ TEST_F(CommissioningDelegateHeaderAPITest, CommissioningParameters_DefaultsAndSe
     p.SetNoc(ByteSpan{ att });
     p.SetIcac(ByteSpan{ csr });
     // IdentityProtectionKey: provide 16 bytes (AES-128-sized)
-    uint8_t ipkBytes[16] = {};
-    p.SetIpk(Crypto::IdentityProtectionKeySpan{ ipkBytes });
+    std::array<uint8_t, 16> ipkBytes{};
+    p.SetIpk(ipkBytes);
     p.SetAdminSubject(NodeId{ 0x1111'2222'3333'4444ULL });
 
     EXPECT_TRUE(p.GetNOCChainGenerationParameters().HasValue());
@@ -344,7 +348,7 @@ TEST_F(CommissioningDelegateHeaderAPITest, CommissioningParameters_DefaultsAndSe
 
 // ---------- Small POD structs & CommissioningReport ----------
 
-TEST_F(CommissioningDelegateHeaderAPITest, PODStructConstructorsCover)
+TEST_F(CommissioningDelegateTest, PODStructConstructorsCover)
 {
     // WiFiCredentials
     const uint8_t s[] = { 'X', 'Y' };
@@ -370,7 +374,7 @@ TEST_F(CommissioningDelegateHeaderAPITest, PODStructConstructorsCover)
     EXPECT_EQ(report.stageCompleted, kError);
 }
 
-TEST_F(CommissioningDelegateHeaderAPITest, AttestationPayloadSettersStoreSpans)
+TEST_F(CommissioningDelegateTest, AttestationPayloadSettersStoreSpans)
 {
     CommissioningParameters p;
 
@@ -392,7 +396,7 @@ TEST_F(CommissioningDelegateHeaderAPITest, AttestationPayloadSettersStoreSpans)
     EXPECT_EQ(std::memcmp(gotSig.data(), sig, sizeof(sig)), 0);
 }
 
-TEST_F(CommissioningDelegateHeaderAPITest, CertSettersStoreSpans)
+TEST_F(CommissioningDelegateTest, CertSettersStoreSpans)
 {
     CommissioningParameters p;
 
@@ -414,7 +418,7 @@ TEST_F(CommissioningDelegateHeaderAPITest, CertSettersStoreSpans)
     EXPECT_EQ(std::memcmp(gotDAC.data(), dac, sizeof(dac)), 0);
 }
 
-TEST_F(CommissioningDelegateHeaderAPITest, RemoteNodeIdSetterStoresValue)
+TEST_F(CommissioningDelegateTest, RemoteNodeIdSetterStoresValue)
 {
     CommissioningParameters p;
 
@@ -425,7 +429,7 @@ TEST_F(CommissioningDelegateHeaderAPITest, RemoteNodeIdSetterStoresValue)
     EXPECT_EQ(p.GetRemoteNodeId().Value(), id);
 }
 
-TEST_F(CommissioningDelegateHeaderAPITest, CompletionStatus_DefaultAndRoundTrip)
+TEST_F(CommissioningDelegateTest, CompletionStatus_DefaultAndRoundTrip)
 {
     CommissioningParameters p;
 
