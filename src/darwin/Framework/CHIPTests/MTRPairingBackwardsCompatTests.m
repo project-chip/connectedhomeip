@@ -97,7 +97,7 @@ static const uint32_t kPasscode = 20202021; // Matches kOnboardingPayload
     [self waitForExpectations:@[ expectation ] timeout:kPairingTimeoutInSeconds];
 }
 
-- (void)test001_PairDeviceWithString
+- (void)test002_PairDeviceWithString
 {
     [self startServerApp];
     __auto_type * controller = [self createControllerOnTestFabric];
