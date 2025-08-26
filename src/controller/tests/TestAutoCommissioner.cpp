@@ -358,7 +358,8 @@ TEST_F(AutoCommissionerTest, NOCChainGenerated_CorruptedRCACLengthReturnsError)
 {
     AutoCommissionerTestAccess privateConfigCommissioner(&mCommissioner);
     uint8_t buffer[10];
-    ByteSpan corruptedSizeRCAC(buffer, std::numeric_limits<size_t>::max());
+    ByteSpan corruptedSizeRCAC(
+        buffer, static_cast<size_t>(std::numeric_limits<uint32_t>::max()) + 1); // Use uint32_t for portability on 32-bit systems
 
     CHIP_ERROR err = privateConfigCommissioner.CallNOCChainGenerated(ByteSpan(), ByteSpan(), corruptedSizeRCAC,
                                                                      Crypto::IdentityProtectionKeySpan(), 0);
@@ -371,7 +372,7 @@ TEST_F(AutoCommissionerTest, NOCChainGenerated_CorruptedNOCLengthReturnsError)
 {
     AutoCommissionerTestAccess privateConfigCommissioner(&mCommissioner);
     uint8_t buffer[10];
-    ByteSpan corruptedSizeNOC(buffer, std::numeric_limits<size_t>::max());
+    ByteSpan corruptedSizeNOC(buffer, static_cast<size_t>(std::numeric_limits<uint32_t>::max()) + 1);
 
     CHIP_ERROR err = privateConfigCommissioner.CallNOCChainGenerated(corruptedSizeNOC, ByteSpan(), chip::TestCerts::kTestRCACSpan,
                                                                      Crypto::IdentityProtectionKeySpan(), 0);

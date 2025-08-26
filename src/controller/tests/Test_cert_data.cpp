@@ -1,8 +1,6 @@
 /*
  *
- *    Copyright (c) 2020-2021 Project CHIP Authors
- *    Copyright (c) 2019 Google LLC.
- *    Copyright (c) 2016-2017 Nest Labs, Inc.
+ *    Copyright (c) 2020-2025 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -20,7 +18,7 @@
 
 /**
  *    @file
- *      This file contains definitions of test certificates used by various unit tests.
+ *      This file contains definitions of test certificates used by unit tests.
  *
  */
 
