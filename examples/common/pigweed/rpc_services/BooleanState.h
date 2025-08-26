@@ -23,6 +23,7 @@
 #include "pigweed/rpc_services/internal/StatusUtils.h"
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app/EventLogging.h>
+#include <app/clusters/boolean-state-server/CodegenIntegration.h>
 #include <platform/PlatformManager.h>
 
 namespace chip {

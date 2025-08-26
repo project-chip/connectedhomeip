@@ -21,6 +21,7 @@
 
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app/InteractionModelEngine.h>
+#include <app/clusters/boolean-state-server/CodegenIntegration.h>
 #include <platform/CHIPDeviceLayer.h>
 
 #ifndef APP_DEVICE_TYPE_ENDPOINT
