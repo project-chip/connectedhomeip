@@ -160,7 +160,7 @@ if [ "$#" == "0" ]; then
         --slc_reuse_files
             Use generated files without running slc again.
         --verbose
-            Add additionnal logs.
+            Add additional logs.
         --bootloader
             Add bootloader to the generated image.
 
@@ -279,7 +279,7 @@ else
                 optArgs+="verbose_mode=true "
                 VERBOSE_MODE=true
                 shift
-                ;;    
+                ;;
             --gn_path)
                 if [ -z "$2" ]; then
                     echo "--gn_path requires a path to GN"
