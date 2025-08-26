@@ -43,7 +43,7 @@ public:
             DeviceLayer::StackLock lock;
 
             // Update attribute first, then emit StateChange event only on success.
-            RETURN_STATUS_IF_NOT_OK(app::Clusters::BooleanState::Attributes::StateValue::Set(endpointId, newState));
+            RETURN_STATUS_IF_NOT_OK(app::Clusters::BooleanState::SetStateValue(newState));
 
             chip::app::Clusters::BooleanState::Events::StateChange::Type event{ newState };
             RETURN_STATUS_IF_NOT_OK(app::LogEvent(event, endpointId, eventNumber));
@@ -60,7 +60,7 @@ public:
 
         {
             DeviceLayer::StackLock lock;
-            RETURN_STATUS_IF_NOT_OK(app::Clusters::BooleanState::Attributes::StateValue::Get(endpointId, &state_value));
+            RETURN_STATUS_IF_NOT_OK(app::Clusters::BooleanState::GetStateValue(state_value));
         }
 
         response.state.state_value = state_value;
