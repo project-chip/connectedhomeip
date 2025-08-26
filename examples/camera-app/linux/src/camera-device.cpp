@@ -624,21 +624,21 @@ CameraError CameraDevice::CaptureSnapshot(const chip::app::DataModel::Nullable<u
     return CameraError::SUCCESS;
 }
 
-CameraError CameraDevice::StartVideoStream(uint16_t streamID)
+CameraError CameraDevice::StartVideoStream(const VideoStreamStruct & allocatedStream)
 {
-    auto it = std::find_if(mVideoStreams.begin(), mVideoStreams.end(),
-                           [streamID](const VideoStream & s) { return s.videoStreamParams.videoStreamID == streamID; });
+    uint16_t streamID = allocatedStream.videoStreamID;
+    auto it           = std::find_if(mVideoStreams.begin(), mVideoStreams.end(),
+                                     [streamID](const VideoStream & s) { return s.videoStreamParams.videoStreamID == streamID; });
 
     if (it == mVideoStreams.end())
     {
         return CameraError::ERROR_VIDEO_STREAM_START_FAILED;
     }
 
-    // Create Gstreamer video pipeline
-    CameraError error = CameraError::SUCCESS;
-    GstElement * videoPipeline =
-        CreateVideoPipeline(mVideoDevicePath, it->videoStreamParams.minResolution.width, it->videoStreamParams.minResolution.height,
-                            it->videoStreamParams.minFrameRate, error);
+    // Create Gstreamer video pipeline using the final allocated stream parameters
+    CameraError error          = CameraError::SUCCESS;
+    GstElement * videoPipeline = CreateVideoPipeline(mVideoDevicePath, allocatedStream.minResolution.width,
+                                                     allocatedStream.minResolution.height, allocatedStream.minFrameRate, error);
     if (videoPipeline == nullptr)
     {
         ChipLogError(Camera, "Failed to create video pipeline.");
@@ -656,8 +656,8 @@ CameraError CameraDevice::StartVideoStream(uint16_t streamID)
         gst_object_unref(appsink);
     }
 
-    ChipLogProgress(Camera, "Starting video stream (id=%u): %u×%u @ %ufps", streamID, it->videoStreamParams.minResolution.width,
-                    it->videoStreamParams.minResolution.height, it->videoStreamParams.minFrameRate);
+    ChipLogProgress(Camera, "Starting video stream (id=%u): %u×%u @ %ufps", streamID, allocatedStream.minResolution.width,
+                    allocatedStream.minResolution.height, allocatedStream.minFrameRate);
 
     // Start the pipeline
     ChipLogProgress(Camera, "Requesting PLAYING …");

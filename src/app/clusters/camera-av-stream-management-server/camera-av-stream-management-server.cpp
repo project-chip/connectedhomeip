@@ -279,8 +279,18 @@ CHIP_ERROR CameraAVStreamMgmtServer::AddVideoStream(const VideoStreamStruct & vi
 }
 
 CHIP_ERROR CameraAVStreamMgmtServer::UpdateVideoStreamRangeParams(VideoStreamStruct & videoStreamToUpdate,
-                                                                  const VideoStreamStruct & videoStream)
+                                                                  const VideoStreamStruct & videoStream, bool & wasModified)
 {
+    // Store original values to detect changes
+    uint16_t origMinFrameRate = videoStreamToUpdate.minFrameRate;
+    uint16_t origMaxFrameRate = videoStreamToUpdate.maxFrameRate;
+    uint16_t origMinResWidth  = videoStreamToUpdate.minResolution.width;
+    uint16_t origMinResHeight = videoStreamToUpdate.minResolution.height;
+    uint16_t origMaxResWidth  = videoStreamToUpdate.maxResolution.width;
+    uint16_t origMaxResHeight = videoStreamToUpdate.maxResolution.height;
+    uint32_t origMinBitRate   = videoStreamToUpdate.minBitRate;
+    uint32_t origMaxBitRate   = videoStreamToUpdate.maxBitRate;
+
     // Adjust the range parameters for the allocated video stream to be the
     // intersection of the existing and the new one.
     videoStreamToUpdate.minFrameRate         = std::max(videoStreamToUpdate.minFrameRate, videoStream.minFrameRate);
@@ -291,6 +301,14 @@ CHIP_ERROR CameraAVStreamMgmtServer::UpdateVideoStreamRangeParams(VideoStreamStr
     videoStreamToUpdate.maxResolution.height = std::min(videoStreamToUpdate.maxResolution.height, videoStream.maxResolution.height);
     videoStreamToUpdate.minBitRate           = std::max(videoStreamToUpdate.minBitRate, videoStream.minBitRate);
     videoStreamToUpdate.maxBitRate           = std::min(videoStreamToUpdate.maxBitRate, videoStream.maxBitRate);
+
+    // Check if any parameter was actually modified
+    wasModified = (origMinFrameRate != videoStreamToUpdate.minFrameRate) ||
+        (origMaxFrameRate != videoStreamToUpdate.maxFrameRate) || (origMinResWidth != videoStreamToUpdate.minResolution.width) ||
+        (origMinResHeight != videoStreamToUpdate.minResolution.height) ||
+        (origMaxResWidth != videoStreamToUpdate.maxResolution.width) ||
+        (origMaxResHeight != videoStreamToUpdate.maxResolution.height) || (origMinBitRate != videoStreamToUpdate.minBitRate) ||
+        (origMaxBitRate != videoStreamToUpdate.maxBitRate);
 
     auto path = ConcreteAttributePath(mEndpointId, CameraAvStreamManagement::Id, Attributes::AllocatedVideoStreams::Id);
     mDelegate.OnAttributeChanged(Attributes::AllocatedVideoStreams::Id);
@@ -1782,7 +1800,6 @@ void CameraAVStreamMgmtServer::HandleVideoStreamAllocate(HandlerContext & ctx,
 
     if (status == Status::Success)
     {
-
         // Check if the streamID matches an existing one in the
         // mAllocatedVideoStreams.
         auto it =
@@ -1794,12 +1811,21 @@ void CameraAVStreamMgmtServer::HandleVideoStreamAllocate(HandlerContext & ctx,
             // Add the allocated videostream object in the AllocatedVideoStreams list.
             videoStreamArgs.videoStreamID = videoStreamID;
             AddVideoStream(videoStreamArgs);
+
+            // Call delegate with the allocated stream parameters and new allocation action
+            mDelegate.OnVideoStreamAllocated(videoStreamArgs, StreamAllocationAction::kNewAllocation);
         }
         else
         {
+            bool wasModified = false;
+
             VideoStreamStruct & videoStreamToUpdate = *it;
-            // Reusing the existing stream. Update range parameters
-            UpdateVideoStreamRangeParams(videoStreamToUpdate, videoStreamArgs);
+            // Reusing the existing stream. Update range parameters and check if they were modified
+            UpdateVideoStreamRangeParams(videoStreamToUpdate, videoStreamArgs, wasModified);
+
+            // Call delegate with the final updated stream parameters and appropriate action
+            mDelegate.OnVideoStreamAllocated(videoStreamToUpdate,
+                                             wasModified ? StreamAllocationAction::kModification : StreamAllocationAction::kReuse);
         }
 
         response.videoStreamID = videoStreamID;
