@@ -19,8 +19,8 @@
 #include <app/TimerDelegates.h>
 #include <app/reporting/ReportSchedulerImpl.h>
 #include <app/server/CommissioningWindowManager.h>
-#include <app/server/Server.h>
 #include <app/server/Dnssd.h>
+#include <app/server/Server.h>
 #include <crypto/RandUtils.h>
 #include <data-model-providers/codegen/CodegenDataModelProvider.h>
 #include <lib/dnssd/Advertiser.h>
@@ -410,12 +410,14 @@ TEST_F(TestCommissioningWindowManager, TestCheckCommissioningWindowManagerEnhanc
 }
 
 // Verify that the commissioning window is closed when commissioning has completed
-TEST_F(TestCommissioningWindowManager, TestOnPlatformEventCommissioningComplete) 
+TEST_F(TestCommissioningWindowManager, TestOnPlatformEventCommissioningComplete)
 {
     CommissioningWindowManager & commissionMgr = Server::GetInstance().GetCommissioningWindowManager();
     chip::Test::CommissioningWindowManagerTestAccess access(&commissionMgr);
 
-    EXPECT_EQ(commissionMgr.OpenBasicCommissioningWindow(commissionMgr.MaxCommissioningTimeout(), CommissioningWindowAdvertisement::kDnssdOnly), CHIP_NO_ERROR);
+    EXPECT_EQ(commissionMgr.OpenBasicCommissioningWindow(commissionMgr.MaxCommissioningTimeout(),
+                                                         CommissioningWindowAdvertisement::kDnssdOnly),
+              CHIP_NO_ERROR);
     EXPECT_TRUE(commissionMgr.IsCommissioningWindowOpen());
 
     chip::DeviceLayer::ChipDeviceEvent event;
@@ -424,18 +426,20 @@ TEST_F(TestCommissioningWindowManager, TestOnPlatformEventCommissioningComplete)
     commissionMgr.OnPlatformEvent(&event);
     EXPECT_FALSE(commissionMgr.IsCommissioningWindowOpen());
 
-    // When BLE is enabled
-    #if CONFIG_NETWORK_LAYER_BLE && CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION
-        EXPECT_FALSE(Server::GetInstance().GetBleLayerObject()->IsBleClosing());
-    #endif
+// When BLE is enabled
+#if CONFIG_NETWORK_LAYER_BLE && CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION
+    EXPECT_FALSE(Server::GetInstance().GetBleLayerObject()->IsBleClosing());
+#endif
 }
 
 // Verify that the commissioning mode is expired when failsafe timer expires
-TEST_F(TestCommissioningWindowManager, TestOnPlatformEventFailSafeTimerExpired) 
+TEST_F(TestCommissioningWindowManager, TestOnPlatformEventFailSafeTimerExpired)
 {
     CommissioningWindowManager & commissionMgr = Server::GetInstance().GetCommissioningWindowManager();
 
-    EXPECT_EQ(commissionMgr.OpenBasicCommissioningWindow(commissionMgr.MaxCommissioningTimeout(), CommissioningWindowAdvertisement::kDnssdOnly), CHIP_NO_ERROR);
+    EXPECT_EQ(commissionMgr.OpenBasicCommissioningWindow(commissionMgr.MaxCommissioningTimeout(),
+                                                         CommissioningWindowAdvertisement::kDnssdOnly),
+              CHIP_NO_ERROR);
     EXPECT_TRUE(commissionMgr.IsCommissioningWindowOpen());
 
     chip::DeviceLayer::ChipDeviceEvent event;
@@ -447,7 +451,7 @@ TEST_F(TestCommissioningWindowManager, TestOnPlatformEventFailSafeTimerExpired)
 }
 
 // Verify that operational advertising is started when the operational network is enabled
-TEST_F(TestCommissioningWindowManager, TestOnPlatformEventOperationalNetworkEnabled) 
+TEST_F(TestCommissioningWindowManager, TestOnPlatformEventOperationalNetworkEnabled)
 {
     CommissioningWindowManager & commissionMgr = Server::GetInstance().GetCommissioningWindowManager();
 
@@ -459,7 +463,7 @@ TEST_F(TestCommissioningWindowManager, TestOnPlatformEventOperationalNetworkEnab
 }
 
 // Verify that operational advertising failure is handled gracefully
-TEST_F(TestCommissioningWindowManager, TestOnPlatformEventOperationalNetworkEnabledFail) 
+TEST_F(TestCommissioningWindowManager, TestOnPlatformEventOperationalNetworkEnabledFail)
 {
     CommissioningWindowManager & commissionMgr = Server::GetInstance().GetCommissioningWindowManager();
 
@@ -477,7 +481,8 @@ TEST_F(TestCommissioningWindowManager, TestOnPlatformEventOperationalNetworkEnab
 }
 
 // Verify that BLE advertising is stopped when all BLE connections are closed
-TEST_F(TestCommissioningWindowManager, TestOnPlatformEventCloseCloseAllBleConnections) {
+TEST_F(TestCommissioningWindowManager, TestOnPlatformEventCloseCloseAllBleConnections)
+{
     CommissioningWindowManager & commissionMgr = Server::GetInstance().GetCommissioningWindowManager();
 
     chip::DeviceLayer::ChipDeviceEvent event;
@@ -485,6 +490,6 @@ TEST_F(TestCommissioningWindowManager, TestOnPlatformEventCloseCloseAllBleConnec
 
     commissionMgr.OnPlatformEvent(&event);
     EXPECT_FALSE(chip::DeviceLayer::ConnectivityMgr().IsBLEAdvertisingEnabled());
-} 
+}
 
 } // namespace

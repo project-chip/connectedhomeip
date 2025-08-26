@@ -76,7 +76,7 @@ public:
     /**
      * Open the pairing window using default configured parameters.
      */
-    CHIP_ERROR 
+    CHIP_ERROR
     OpenBasicCommissioningWindow(
         System::Clock::Seconds32 commissioningTimeout      = System::Clock::Seconds32(CHIP_DEVICE_CONFIG_DISCOVERY_TIMEOUT_SECS),
         CommissioningWindowAdvertisement advertisementMode = chip::CommissioningWindowAdvertisement::kAllSupported);
@@ -227,7 +227,6 @@ private:
     // For tests only, so that we can test the commissioning window timeout
     // without having to wait 3 minutes.
     Optional<System::Clock::Seconds32> mMinCommissioningTimeoutOverride;
-
 
     friend class Test::CommissioningWindowManagerTestAccess;
     // The PASE session we are using, so we can handle CloseSession properly.
