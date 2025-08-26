@@ -47,7 +47,7 @@ CHIP_ERROR StorageDelegateWrapper::ReadValue(const StorageKeyName & aKey, Mutabl
 CHIP_ERROR StorageDelegateWrapper::DeleteKey(const StorageKeyName & aKey)
 {
     VerifyOrReturnError(mStorage != nullptr, CHIP_ERROR_INCORRECT_STATE);
-    mStorage->SyncDeleteKeyValue(akey.KeyName());
+    mStorage->SyncDeleteKeyValue(aKey.KeyName());
 }
 
 } // namespace app
