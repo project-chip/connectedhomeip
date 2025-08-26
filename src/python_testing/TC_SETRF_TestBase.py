@@ -742,7 +742,7 @@ class CommodityTariffTestBaseHelper(MatterBaseTest):
         # if attribute value is not null it must be list of TariffComponentStruct
         if attribute_value is not NullValue:
             matter_asserts.assert_list(
-                attribute_value, "TariffComponents attribute must return a list with length greater or equal 1", min_length=1)
+                attribute_value, "TariffComponents attribute must return a list with length greater or equal 1", min_length=1, max_length=672)
             matter_asserts.assert_list_element_type(
                 attribute_value, cluster.Structs.TariffComponentStruct, "TariffComponents attribute must contain TariffComponentStruct elements")
 
@@ -764,7 +764,7 @@ class CommodityTariffTestBaseHelper(MatterBaseTest):
         # if attribute value is not null it must be list of TariffPeriodStruct
         if attribute_value is not NullValue:
             matter_asserts.assert_list(
-                attribute_value, "TariffPeriods attribute must return a list with length greater or equal 1", min_length=1)
+                attribute_value, "TariffPeriods attribute must return a list with length greater or equal 1", min_length=1, max_length=672)
             matter_asserts.assert_list_element_type(
                 attribute_value, cluster.Structs.TariffPeriodStruct, "TariffPeriods attribute must contain TariffPeriodStruct elements")
 
