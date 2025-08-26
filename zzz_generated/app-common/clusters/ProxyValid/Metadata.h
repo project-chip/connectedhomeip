@@ -5,6 +5,7 @@
 #pragma once
 
 #include <app/data-model-provider/MetadataTypes.h>
+#include <array>
 #include <lib/core/DataModelTypes.h>
 
 #include <cstdint>
@@ -18,7 +19,13 @@ namespace ProxyValid {
 
 inline constexpr uint32_t kRevision = 1;
 
-namespace Attributes {} // namespace Attributes
+namespace Attributes {
+
+constexpr std::array<DataModel::AttributeEntry, 0> kMandatoryMetadata = {
+
+};
+
+} // namespace Attributes
 
 namespace Commands {} // namespace Commands
 

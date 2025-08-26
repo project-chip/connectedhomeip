@@ -80,6 +80,10 @@ armeabi
 armino
 ARMmbed
 armv
+ARD
+SCL
+SDA
+VCC
 ASAN
 asdk
 ASR
@@ -140,6 +144,7 @@ betaprogram
 BinaryInputBasic
 Binfmt
 bitbake
+bitrate
 bld
 BLE
 BleApplicationDelegate
@@ -267,6 +272,7 @@ cn
 COAP
 codeaurora
 codebase
+codec
 codegen
 CodeGenerator
 CodeLab
@@ -332,6 +338,7 @@ cstdint
 csu
 csv
 ctl
+CTS
 ctrl
 ctypes
 CurrentHue
@@ -589,6 +596,7 @@ formatters
 FOTA
 FreeRTOS
 FreeRTOSConfig
+FRDM
 FS
 fsl
 fstab
@@ -1031,7 +1039,6 @@ OnOffSwitchConfiguration
 OnPlatformEvent
 onwards
 OO
-openiotsdk
 openjdk
 OpenOCD
 OpenSSL
@@ -1048,6 +1055,7 @@ optionOverride
 optionsMask
 optionsOverride
 orgs
+Orchestrator
 OSS
 OTA
 OTADownloader
@@ -1271,6 +1279,7 @@ rtd
 RTL
 rtld
 RTOS
+RTS
 RTT
 RTX
 runArgs
@@ -1282,6 +1291,7 @@ RVC
 rw
 RXD
 sandboxed
+sankey
 saveAs
 saveDataVersschemaionAs
 sbin
@@ -1495,6 +1505,7 @@ TotalTrihalomethanesConcentrationMeasurement
 TPK
 trackAlloc
 trackFree
+transcoder
 TransferSession
 transitionTime
 TransportMgrBase

@@ -18,6 +18,8 @@
 
 #include <app/AttributeValueEncoder.h>
 #include <app/data-model-provider/MetadataTypes.h>
+#include <app/server-cluster/OptionalAttributeSet.h>
+#include <clusters/SoftwareDiagnostics/Attributes.h>
 #include <clusters/SoftwareDiagnostics/Enums.h>
 #include <lib/core/CHIPError.h>
 #include <lib/support/ReadOnlyBuffer.h>
@@ -27,20 +29,15 @@ namespace chip {
 namespace app {
 namespace Clusters {
 
-struct SoftwareDiagnosticsEnabledAttributes
-{
-    bool enableThreadMetrics : 1;
-    bool enableCurrentHeapFree : 1;
-    bool enableCurrentHeapUsed : 1;
-    bool enableCurrentWatermarks : 1;
-};
-
 /// Type-safe implementation for callbacks for the SoftwareDiagnostics server
 class SoftwareDiagnosticsLogic
 {
 public:
-    SoftwareDiagnosticsLogic(const SoftwareDiagnosticsEnabledAttributes & enabledAttributes) : mEnabledAttributes(enabledAttributes)
-    {}
+    using OptionalAttributeSet = chip::app::OptionalAttributeSet<
+        SoftwareDiagnostics::Attributes::ThreadMetrics::Id, SoftwareDiagnostics::Attributes::CurrentHeapFree::Id,
+        SoftwareDiagnostics::Attributes::CurrentHeapUsed::Id, SoftwareDiagnostics::Attributes::CurrentHeapHighWatermark::Id>;
+
+    SoftwareDiagnosticsLogic(const OptionalAttributeSet & optionalAttributeSet) : mOptionalAttributeSet(optionalAttributeSet) {}
     virtual ~SoftwareDiagnosticsLogic() = default;
 
     CHIP_ERROR GetCurrentHeapFree(uint64_t & out) const { return DeviceLayer::GetDiagnosticDataProvider().GetCurrentHeapFree(out); }
@@ -56,9 +53,10 @@ public:
     /// Determines the feature map based on the DiagnosticsProvider support.
     BitFlags<SoftwareDiagnostics::Feature> GetFeatureMap() const
     {
-        return BitFlags<SoftwareDiagnostics::Feature>().Set(SoftwareDiagnostics::Feature::kWatermarks,
-                                                            mEnabledAttributes.enableCurrentWatermarks &&
-                                                                DeviceLayer::GetDiagnosticDataProvider().SupportsWatermarks());
+        return BitFlags<SoftwareDiagnostics::Feature>().Set(
+            SoftwareDiagnostics::Feature::kWatermarks,
+            mOptionalAttributeSet.IsSet(SoftwareDiagnostics::Attributes::CurrentHeapHighWatermark::Id) &&
+                DeviceLayer::GetDiagnosticDataProvider().SupportsWatermarks());
     }
 
     CHIP_ERROR ResetWatermarks() { return DeviceLayer::GetDiagnosticDataProvider().ResetWatermarks(); }
@@ -72,7 +70,7 @@ public:
     CHIP_ERROR AcceptedCommands(ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder);
 
 private:
-    const SoftwareDiagnosticsEnabledAttributes mEnabledAttributes;
+    const OptionalAttributeSet mOptionalAttributeSet;
 };
 
 } // namespace Clusters

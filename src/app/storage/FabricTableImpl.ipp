@@ -48,25 +48,10 @@ enum class TagEntry : uint8_t
 // byte value, 1 byte end struct. 8 Bytes leaves space for potential increase in count_value size.
 static constexpr size_t kPersistentBufferEntryCountBytes = 8;
 
-template <class StorageId, class StorageData>
-struct EndpointEntryCount : public PersistentData<kPersistentBufferEntryCountBytes>
+struct BaseEntryCount : public PersistentData<kPersistentBufferEntryCountBytes>
 {
-    using Serializer = DefaultSerializer<StorageId, StorageData>;
-
-    EndpointId endpoint_id = kInvalidEndpointId;
-    uint8_t count_value    = 0;
-
-    EndpointEntryCount(EndpointId endpoint, uint8_t count = 0) : endpoint_id(endpoint), count_value(count) {}
-    ~EndpointEntryCount() {}
-
-    void Clear() override { count_value = 0; }
-
-    CHIP_ERROR UpdateKey(StorageKeyName & key) const override
-    {
-        VerifyOrReturnError(kInvalidEndpointId != endpoint_id, CHIP_ERROR_INVALID_ARGUMENT);
-        key = Serializer::EndpointEntryCountKey(endpoint_id);
-        return CHIP_NO_ERROR;
-    }
+    uint8_t count_value = 0;
+    BaseEntryCount(uint8_t count = 0) : count_value(count) {}
 
     CHIP_ERROR Serialize(TLV::TLVWriter & writer) const override
     {
@@ -96,6 +81,26 @@ struct EndpointEntryCount : public PersistentData<kPersistentBufferEntryCountByt
             count_value = 0;
         }
 
+        return CHIP_NO_ERROR;
+    }
+};
+
+template <class StorageId, class StorageData>
+struct EndpointEntryCount : public BaseEntryCount
+{
+    using Serializer = DefaultSerializer<StorageId, StorageData>;
+
+    EndpointId endpoint_id = kInvalidEndpointId;
+
+    EndpointEntryCount(EndpointId endpoint, uint8_t count = 0) : BaseEntryCount(count), endpoint_id(endpoint) {}
+    ~EndpointEntryCount() {}
+
+    void Clear() override { count_value = 0; }
+
+    CHIP_ERROR UpdateKey(StorageKeyName & key) const override
+    {
+        VerifyOrReturnError(kInvalidEndpointId != endpoint_id, CHIP_ERROR_INVALID_ARGUMENT);
+        key = Serializer::EndpointEntryCountKey(endpoint_id);
         return CHIP_NO_ERROR;
     }
 };
@@ -227,11 +232,11 @@ struct FabricEntryData : public PersistentData<kFabricMaxBytes>
         TLV::TLVType fabricEntryContainer;
         ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, fabricEntryContainer));
         ReturnErrorOnFailure(writer.Put(TLV::ContextTag(TagEntry::kEntryCount), entry_count));
+
+        // Storing the entry map
         TLV::TLVType entryMapContainer;
         ReturnErrorOnFailure(
             writer.StartContainer(TLV::ContextTag(TagEntry::kStorageIdArray), TLV::kTLVType_Array, entryMapContainer));
-
-        // Storing the entry map
         for (uint16_t i = 0; i < max_per_fabric; i++)
         {
             TLV::TLVType entryIdContainer;
@@ -240,6 +245,7 @@ struct FabricEntryData : public PersistentData<kFabricMaxBytes>
             ReturnErrorOnFailure(writer.EndContainer(entryIdContainer));
         }
         ReturnErrorOnFailure(writer.EndContainer(entryMapContainer));
+
         return writer.EndContainer(fabricEntryContainer);
     }
 
@@ -809,7 +815,7 @@ FabricTableImpl<StorageId, StorageData>::EntryIteratorImpl<kEntryMaxBytes>::Entr
     FabricTableImpl & provider, FabricIndex fabricIdx, EndpointId endpoint, uint16_t maxPerFabric, uint16_t maxPerEndpoint,
     PersistentStore<kEntryMaxBytes> & store) :
     mProvider(provider),
-    mFabric(fabricIdx), mEndpoint(endpoint), mMaxPerFabric(maxPerFabric), mMaxPerEndpoint(maxPerEndpoint), mStore(store)
+    mStore(store), mFabric(fabricIdx), mEndpoint(endpoint), mMaxPerFabric(maxPerFabric), mMaxPerEndpoint(maxPerEndpoint)
 {
     using TypedFabricEntryData = FabricEntryData<StorageId, StorageData, Serializer::kEntryMaxBytes(),
                                                  Serializer::kFabricMaxBytes(), Serializer::kMaxPerFabric()>;
