@@ -115,7 +115,7 @@ public:
 #endif // CHIP_CONFIG_BIG_ENDIAN_TARGET
 
     // Only available in little endian for the moment
-    CHIP_ERROR MigrateFromSafeAttributePersistanceProvider(EndpointId endpointId, ClusterId ClusterId,
+    CHIP_ERROR MigrateFromSafeAttributePersistanceProvider(EndpointId endpointId, ClusterId clusterId,
                                                            const ReadOnlyBuffer<AttributeId> & scalarAttributes,
                                                            const ReadOnlyBuffer<AttributeId> & attributes, MutableByteSpan & buffer,
                                                            PersistentStorageDelegate & storageDelegate)
