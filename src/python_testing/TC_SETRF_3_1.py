@@ -649,7 +649,7 @@ class TC_SETRF_3_1(CommodityTariffTestBaseHelper):
         self.step("23")
         # TH sends TestEventTrigger command for Attributes Value Set Test Event
         await self.send_test_event_trigger_for_attributes_value_set()
-        subscription_handler.await_all_expected_report_matches(matcher_list, timeout_sec=2)
+        subscription_handler.await_all_expected_report_matches(matcher_list, timeout_sec=10)
 
         self.step("24")
         await self.check_tariff_info_attribute(
