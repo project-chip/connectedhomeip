@@ -46,6 +46,7 @@ class CommodityTariffTestBaseHelper(MatterBaseTest):
     defaultRandomizationOffset = None
     BlockModeValue = None
     tariffInformationValue = None
+    currentDayEntryDateValue = None
     dayEntryIDsEvents = []
 
     async def check_list_elements_uniqueness(self, list_to_check: list[Any], object_name: str = "Elements") -> None:
@@ -717,16 +718,17 @@ class CommodityTariffTestBaseHelper(MatterBaseTest):
             endpoint (int): endpoint;
             attribute_value (Optional[int], optional): CurrentDayEntryDate attribute value. Defaults to None.
         """
-
-        if not attribute_value:
-            attribute_value = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.CurrentDayEntryDate)
+        self.currentDayEntryDateValue = attribute_value
+        if not self.currentDayEntryDateValue:
+            self.currentDayEntryDateValue = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.CurrentDayEntryDate)
 
         if self.tariffInformationValue is not None and self.tariffInformationValue is NullValue:
-            asserts.assert_equal(attribute_value, NullValue, "CurrentDayEntryDate must be Null when TariffInfo is Null")
+            asserts.assert_equal(self.currentDayEntryDateValue, NullValue,
+                                 "CurrentDayEntryDate must be Null when TariffInfo is Null")
 
         # if attribute value is not null it must be uint32
-        if attribute_value is not NullValue:
-            matter_asserts.assert_valid_uint32(attribute_value, 'CurrentDayEntryDate must be of type uint32')
+        if self.currentDayEntryDateValue is not NullValue:
+            matter_asserts.assert_valid_uint32(self.currentDayEntryDateValue, 'CurrentDayEntryDate must be of type uint32')
 
     async def check_next_day_entry_attribute(self, endpoint: int, attribute_value: Optional[cluster.Structs.DayEntryStruct] = None) -> None:
         """Validate NextDayEntry attribute.
@@ -762,9 +764,11 @@ class CommodityTariffTestBaseHelper(MatterBaseTest):
         if self.tariffInformationValue is not None and self.tariffInformationValue is NullValue:
             asserts.assert_equal(attribute_value, NullValue, "NextDayEntryDate must be Null when TariffInfo is Null")
 
-        # if attribute value is not null it must be uint32
+        # if attribute value is not null it must be uint32 and greater than CurrentDayEntryDate
         if attribute_value is not NullValue:
             matter_asserts.assert_valid_uint32(attribute_value, 'NextDayEntryDate must be of type uint32')
+            asserts.assert_greater(attribute_value, self.currentDayEntryDateValue,
+                                   "NextDayEntryDate must be greater than CurrentDayEntryDate")
 
     async def check_tariff_components_attribute(self, endpoint: int, attribute_value: Optional[List[cluster.Structs.TariffComponentStruct]] = None) -> None:
         """Validate TariffComponents attribute.
