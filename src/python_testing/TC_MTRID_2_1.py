@@ -96,6 +96,7 @@ class TC_MTRID_2_1(MeterIdentificationTestBaseHelper):
         endpoint = self.get_endpoint()
 
         self.step("1")
+        # Commissioning, already done
 
         self.step("2")
         # TH reads MeterType attribute, expects a null or a MeterTypeEnum value
