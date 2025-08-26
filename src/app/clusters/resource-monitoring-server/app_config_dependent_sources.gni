@@ -11,10 +11,4 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-app_config_dependent_sources = [
-  "replacement-product-list-manager.h",
-  "resource-monitoring-cluster-objects.cpp",
-  "resource-monitoring-cluster-objects.h",
-  "resource-monitoring-server.cpp",
-  "resource-monitoring-server.h",
-]
+app_config_dependent_sources = [ "CodegenIntegration.cpp" ]
