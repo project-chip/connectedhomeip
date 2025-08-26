@@ -43,7 +43,7 @@ from mobly import asserts
 
 import matter.clusters as Clusters
 from matter import CertificateAuthority
-from matter.storage import PersistentStorage
+from matter.storage import VolatileTemporaryPersistentStorage
 from matter.testing.apps import AppServerSubprocess, JFControllerSubprocess
 from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 
@@ -158,7 +158,8 @@ class TC_JFADMIN_2_1(MatterBaseTest):
     @async_test_body
     async def test_TC_JFADMIN_2_1(self):
         # Creating a Controller for Ecosystem A
-        _fabric_a_persistent_storage = PersistentStorage(jsonData=self.ecoACtrlStorage)
+        _fabric_a_persistent_storage = VolatileTemporaryPersistentStorage(
+            self.ecoACtrlStorage['repl-config'], self.ecoACtrlStorage['sdk-config'])
         _certAuthorityManagerA = CertificateAuthority.CertificateAuthorityManager(
             chipStack=self.matter_stack._chip_stack,
             persistentStorage=_fabric_a_persistent_storage)
