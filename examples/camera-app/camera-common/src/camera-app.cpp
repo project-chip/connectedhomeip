@@ -270,6 +270,12 @@ void CameraApp::InitCameraDeviceClusters()
     mZoneMgmtServerPtr->Init();
 }
 
+void CameraApp::ShutdownCameraDeviceClusters()
+{
+    ChipLogDetail(Camera, "CameraAppShutdown: Shutting down Camera device clusters");
+    mAVSettingsUserLevelMgmtServerPtr->Shutdown();
+}
+
 static constexpr EndpointId kCameraEndpointId = 1;
 
 Platform::UniquePtr<CameraApp> gCameraApp;
@@ -285,5 +291,6 @@ void CameraAppInit(CameraDeviceInterface * cameraDevice)
 void CameraAppShutdown()
 {
     ChipLogDetail(Camera, "CameraAppShutdown: Shutting down Camera app");
+    gCameraApp.get()->ShutdownCameraDeviceClusters();
     gCameraApp = nullptr;
 }

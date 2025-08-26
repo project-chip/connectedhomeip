@@ -30,7 +30,9 @@ class AVSettingsUserLevelManagementDelegate : public Delegate
 {
 public:
     AVSettingsUserLevelManagementDelegate() = default;
-    ~AVSettingsUserLevelManagementDelegate() { CancelActiveTimers(); };
+    ~AVSettingsUserLevelManagementDelegate() = default;
+
+    void ShutdownApp() override;
 
     bool CanChangeMPTZ() override;
 

@@ -179,6 +179,11 @@ CHIP_ERROR CameraAvSettingsUserLevelMgmtServer::Init()
     return CHIP_NO_ERROR;
 }
 
+void CameraAvSettingsUserLevelMgmtServer::Shutdown() 
+{
+    mDelegate.ShutdownApp();
+}
+
 bool CameraAvSettingsUserLevelMgmtServer::HasFeature(Feature aFeature) const
 {
     return mFeatures.Has(aFeature);

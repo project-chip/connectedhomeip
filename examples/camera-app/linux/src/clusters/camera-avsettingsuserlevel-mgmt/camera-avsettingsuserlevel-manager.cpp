@@ -324,6 +324,11 @@ void CameraAVSettingsUserLevelManager::CancelActiveTimers()
     DeviceLayer::SystemLayer().CancelTimer(onTimerExpiry, this);
 }
 
+void CameraAVSettingsUserLevelManager::ShutdownApp()
+{
+    CancelActiveTimers();
+}
+
 // To be invoked by the camera once a physical PTZ action has completed. The callback method is realized by our cluster server,
 // make sure that is still alive before trying to invoke methods thereon.
 //

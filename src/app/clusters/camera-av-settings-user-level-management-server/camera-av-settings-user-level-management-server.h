@@ -101,6 +101,11 @@ public:
     virtual ~Delegate() = default;
 
     /**
+     * Allows the delegate to perform any specific functions such as timer cancellation on a shutdown
+     */
+    virtual void ShutdownApp() = 0;
+
+    /**
      * Allows the delegate to determine whether a change in MPTZ is possible given current device status
      */
     virtual bool CanChangeMPTZ() = 0;
@@ -273,6 +278,7 @@ public:
     ~CameraAvSettingsUserLevelMgmtServer() override;
 
     CHIP_ERROR Init();
+
     void Shutdown();
 
     bool HasFeature(Feature aFeature) const;

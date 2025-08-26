@@ -34,7 +34,9 @@ class CameraAVSettingsUserLevelManager : public Delegate
 {
 public:
     CameraAVSettingsUserLevelManager() = default;
-    ~CameraAVSettingsUserLevelManager() { CancelActiveTimers(); };
+    ~CameraAVSettingsUserLevelManager() = default; 
+
+    void ShutdownApp() override;
 
     bool CanChangeMPTZ() override;
 

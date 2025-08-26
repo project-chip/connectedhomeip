@@ -37,6 +37,7 @@ void Shutdown()
 {
     if (gAVSettingsUserLevelManagementCluster != nullptr)
     {
+        gDelegate->CancelActiveTimers();
         gDelegate                             = nullptr;
         gAVSettingsUserLevelManagementCluster = nullptr;
     }
@@ -176,6 +177,11 @@ static void onTimerExpiry(System::Layer * systemLayer, void * data)
 
     // All timers are cancelled on delegate shutdown, hence if this is invoked the delegate is alive
     delegate->OnPhysicalMoveCompleted(Protocols::InteractionModel::Status::Success);
+}
+
+void AVSettingsUserLevelManagementDelegate::ShutdownApp() 
+{
+    CancelActiveTimers();
 }
 
 void AVSettingsUserLevelManagementDelegate::CancelActiveTimers()
