@@ -28,6 +28,7 @@
 
 #include <cstdint>
 #include <thread>
+#include <mutex>
 #include <pw_unit_test/framework.h>
 
 #include <lib/support/CodeUtils.h>
