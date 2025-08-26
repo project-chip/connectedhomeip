@@ -137,7 +137,7 @@ public:
             }
             else if (err != CHIP_NO_ERROR)
             {
-                //ChipLogError(Unspecified, "Error reading attribute %s - %" CHIP_ERROR_FORMAT, safePath.KeyName(), err);
+                // ChipLogError(Unspecified, "Error reading attribute %s - %" CHIP_ERROR_FORMAT, safePath.KeyName(), err);
                 continue;
             }
 
