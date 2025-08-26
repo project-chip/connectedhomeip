@@ -148,8 +148,7 @@ not_automated:
           Depends on TLS Certificate Management Cluster. Will be enabled once
           local tests are fully verified.
     - name: TC_AVSM_2_16.py
-      reason:
-          Pending rework of WebRTC App to handle multi-clients
+      reason: Pending rework of WebRTC App to handle multi-clients
 
 # This is a list of slow tests (just arbitrarily picked around 20 seconds)
 # used in some script reporting for "be patient" messages as well as potentially
