@@ -5,10 +5,12 @@ on:
             - master
             - 'v*-branch'
     pull_request:
+    workflow_dispatch:
 
 jobs:
   validation:
     name: "Validation"
+    if: github.event_name != 'pull_request' || github.event.pull_request.draft == false
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
