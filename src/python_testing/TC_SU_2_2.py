@@ -69,6 +69,24 @@ class TC_SU_2_2(MatterBaseTest):
     cluster_otap = Clusters.OtaSoftwareUpdateProvider
     cluster_otar = Clusters.OtaSoftwareUpdateRequestor
 
+    def launch_ota_provider_run_py_test(self, ota_file, provider_discriminator, provider_setupPinCode, secured_device_port):
+        CHIP_ROOT = "/Users/jdelgado/connectedhomeip"
+        RUNNER_SCRIPT_DIR = os.path.join(CHIP_ROOT, "scripts")
+
+        app = os.path.join(CHIP_ROOT, "out/debug/chip-ota-provider-app")
+        app_args = f"--filepath {ota_file} --discriminator {provider_discriminator} --passcode {provider_setupPinCode} --secured-device-port {secured_device_port}"
+
+        script = os.path.join(CHIP_ROOT, "src/python_testing/provider_placeholder.py")
+        script_args = ""
+
+        run_python_test = os.path.join(RUNNER_SCRIPT_DIR, "run_python_test.py")
+        cmd = f'{run_python_test} --app {app} --app-args "{app_args}" --script {script} --script-args "{script_args}"'
+
+        proc = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        time.sleep(5)
+
+        return proc
+
     async def launch_ota_provider(self, ota_file: str, provider_discriminator: int,
                                   provider_setupPinCode: int, secured_device_port: int,
                                   queue: str = None, timeout: int = None):
@@ -88,7 +106,6 @@ class TC_SU_2_2(MatterBaseTest):
         --secured-device-port {secured_device_port} {queue_cmd} {timeout_cmd}; exit"
         end tell'
         '''
-
         proc = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         await asyncio.sleep(10)  # give the provider time to initialize
         logger.info(f'Launched OTA Provider with command: {cmd}')
@@ -230,6 +247,11 @@ class TC_SU_2_2(MatterBaseTest):
         )
         logger.info(f'Prerequisite #4.0 - Current DefaultOTAProviders on Requestor: {current_providers}')
 
+        # If there is already a provider, skip adding
+        if current_providers:
+            logger.info(f'Skipping add: Requestor already has a provider registered ({current_providers})')
+            return
+
         # Create a ProviderLocation for the new provider
         provider_location = self.cluster_otar.Structs.ProviderLocation(
             providerNodeID=provider_node_id,
@@ -250,11 +272,6 @@ class TC_SU_2_2(MatterBaseTest):
         logger.info(f'Prerequisite #4.0 - Write DefaultOTAProviders response: {resp}')
         asserts.assert_equal(resp[0].Status, Status.Success, "Failed to write DefaultOTAProviders attribute")
 
-    async def is_port_free(self, port):
-        """Check if a TCP port is free"""
-        with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-            return s.connect_ex(('127.0.0.1', port)) != 0
-
     async def write_acl(self, controller, node_id, acl):
         """
         Writes the Access Control List (ACL) to the DUT device using the specified controller.
@@ -274,112 +291,6 @@ class TC_SU_2_2(MatterBaseTest):
         asserts.assert_equal(result[0].Status, Status.Success, "ACL write failed")
         return True
 
-    async def run_ota_step(
-        self,
-        step_number,
-        controller,
-        requestor_node_id,
-        requestor_discriminator,
-        requestor_passcode,
-        requestor_port,
-        provider_node_id,
-        provider_discriminator,
-        provider_setupPinCode,
-        provider_port,
-        provider_ota_file,
-        fabric_id,
-        provider_queue="Busy",   # Optional
-        provider_timeout=120         # Optional
-    ):
-        """
-        Run a full OTA step: launch Requestor, Provider, Commissioning, ACLs, AnnounceOTAProvider.
-        """
-
-        # ------------------------------------------------------------------------------------
-        # Prerequisites: All the steps to prepare the Requestor and Provider for OTA update
-        # ------------------------------------------------------------------------------------
-
-        # Prerequisite #1.1 - Launch Requestor (DUT) from the test
-        logger.info(f'{step_number}: Prerequisite #1.1 - Launching Requestor (DUT) from test')
-        requestor_proc = await self.launch_ota_requestor(
-            discriminator=requestor_discriminator,
-            passcode=requestor_passcode,
-            secured_device_port=requestor_port
-        )
-        await asyncio.sleep(5)
-
-        # Prerequisite #1.2 - Commission the Requestor using controller
-        logger.info(f'{step_number}: Prerequisite #1.2 - Commissioning Requestor (NodeID={requestor_node_id})')
-
-        await controller.CommissionOnNetwork(
-            nodeId=requestor_node_id,
-            setupPinCode=requestor_passcode,
-            filterType=ChipDeviceCtrl.DiscoveryFilterType.LONG_DISCRIMINATOR,
-            filter=requestor_discriminator
-        )
-
-        # Prerequisite #2.0 - Launch Provider
-        logger.info(f'{step_number}: Prerequisite #2.0 - Launch Provider')
-
-        if step_number == "[STEP_1]":
-            provider_proc = await self.launch_ota_provider(
-                ota_file=provider_ota_file,
-                provider_discriminator=provider_discriminator,
-                provider_setupPinCode=provider_setupPinCode,
-                secured_device_port=provider_port,
-                queue="updateAvailable",
-            )
-        else:
-            provider_proc = await self.launch_ota_provider(
-                ota_file=provider_ota_file,
-                provider_discriminator=provider_discriminator,
-                provider_setupPinCode=provider_setupPinCode,
-                secured_device_port=provider_port,
-                queue=provider_queue,       # STEP_2
-                timeout=provider_timeout    # STEP_2
-            )
-
-        # Prerequisite #2.1 - Open commissioning window on DUT
-        logger.info(f'{step_number}: Prerequisite #2.1 - Commissioning window opened on Requestor (DUT)')
-
-        params = await self.open_commissioning_window(controller, requestor_node_id)
-        setup_pin_code = params.commissioningParameters.setupPinCode
-        long_discriminator = params.randomDiscriminator
-        logging.info(f'{step_number}: Prerequisite #2.1 - Commissioning window opened: {vars(params)}')
-
-        # Prerequisite #2.2 - Commission Provider
-        logging.info(f'{step_number}: Prerequisite #2.2 - Commissioning DUT with Provider')
-
-        resp = await controller.CommissionOnNetwork(
-            nodeId=provider_node_id,
-            setupPinCode=provider_setupPinCode,
-            filterType=ChipDeviceCtrl.DiscoveryFilterType.LONG_DISCRIMINATOR,
-            filter=provider_discriminator
-        )
-        logger.info(f'{step_number}: Prerequisite #2.2 - Provider Commissioning response: {resp}')
-
-        # Prerequisite #3.0 - Setting ACLs
-        logger.info(f'{step_number}: Prerequisite #3.0 - Setting ACLs under FabricIndex {fabric_id}')
-        logger.info(f'{step_number}: Prerequisite #3.0 - Requestor (DUT), NodeID: {requestor_node_id}')
-        logger.info(f'{step_number}: Prerequisite #3.0 - Provider, NodeID: {provider_node_id}')
-
-        # Set ACLs for OTA update:
-        # - On Requestor to allow specified Provider to interact with OTA Requestor cluster
-        # - On Provider to allow Requestor to interact with OTA Provider cluster
-        await self.set_ota_acls_for_provider(
-            controller,
-            requestor_node=requestor_node_id,
-            provider_node=provider_node_id,
-            fabric_index=fabric_id
-        )
-
-        # Prerequisite #4.0 - Add OTA Provider to the Requestor
-        logger.info(f'{step_number}: Prerequisite #4.0 - Add Provider to Requestor(DUT) DefaultOTAProviders')
-
-        await self.add_single_ota_provider(controller, requestor_node_id, provider_node_id)
-
-        return requestor_proc, provider_proc
-
     def desc_TC_SU_2_2(self) -> str:
         return "[TC-SU-2.2] Handling Different QueryImageResponse Scenarios on Requestor"
 
@@ -393,8 +304,8 @@ class TC_SU_2_2(MatterBaseTest):
     def steps_TC_SU_2_2(self) -> list[TestStep]:
         # TODO: In progress
         steps = [
-            TestStep(0, "Prerequisite: Commission the DUT (Requestor) with the TH/OTA-P (Provider) from Test.",
-                     is_commissioning=False),
+            TestStep(0, "Prerequisite: Commission the DUT (Requestor) with the TH/OTA-P (Provider)",
+                     is_commissioning=True),
             TestStep(1, "DUT sends a QueryImage command to the TH/OTA-P. TH/OTA-P sends a QueryImageResponse back to DUT. "
                      "QueryStatus is set to 'UpdateAvailable'. "
                      "Set ImageURI to the location where the image is located..",
@@ -436,48 +347,96 @@ class TC_SU_2_2(MatterBaseTest):
         # ------------------------------------------------------------------------------------
 
         self.step(0)
+        # Commission the DUT (Requestor) with the TH/OTA-P (Provider)
+
+        self.step(1)
         # ------------------------------------------------------------------------------------
-        # Prerequisite #1.0 - Setup Requestor as DUT
+        # [STEP_1]: Prerequisites
         # ------------------------------------------------------------------------------------
+        step_number_s1 = "[STEP_1]"
+
+        # Prerequisite #1.0 - Requestor (DUT) info
         controller = self.default_controller
         fabric_id = controller.fabricId
-        provider_ota_file_all_test = "firmware_requestor_v2min.ota"
+        requestor_node_id = self.dut_node_id  # Assigned on execution time
+        logger.info(f'{step_number_s1}: Prerequisite #1.0 - Requestor (DUT), NodeID: {requestor_node_id}, FabricId: {fabric_id}')
 
-        step_number_s1 = "[STEP_1]"
-        requestor_node_id_s1 = self.dut_node_id  # Assigned on execution time
-        requestor_discriminator_s1 = 1234
-        requestor_passcode_s1 = 20202021
-        requestor_port_s1 = 5541
+        # Prerequisite #1.0 - Provider_S1 info
         provider_node_id_s1 = 1
         provider_discriminator_s1 = 1111
         provider_setupPinCode_s1 = 20202021
         provider_port_s1 = 5540
-        fabric_id = controller.fabricId
+        provider_ota_file_s1 = "firmware_requestor_v2min.ota"
+        logger.info(f"""{step_number_s1}: Prerequisite #1.0 - Provider:
+            NodeID: {provider_node_id_s1},
+            discriminator: {provider_discriminator_s1},
+            setupPinCode: {provider_setupPinCode_s1},
+            port: {provider_port_s1},
+            ota_file: {provider_ota_file_s1}""")
 
-        logger.info(f'Prerequisite #1.0 - Requestor (DUT), NodeID: {requestor_node_id_s1}, FabricId: {fabric_id}')
-
-        # --- Step 1 ---
-        requestor_proc_1, provider_proc_1 = await self.run_ota_step(
-            step_number=step_number_s1,
-            controller=self.default_controller,
-            requestor_node_id=requestor_node_id_s1,
-            requestor_discriminator=requestor_discriminator_s1,
-            requestor_passcode=requestor_passcode_s1,
-            requestor_port=requestor_port_s1,
-            provider_node_id=provider_node_id_s1,
+        # Prerequisite #2.0- Launch Provider
+        logger.info(f'{step_number_s1}: Prerequisite #2.0 - Launch Provider')
+        provider_proc = await self.launch_ota_provider(
+            ota_file=provider_ota_file_s1,
             provider_discriminator=provider_discriminator_s1,
             provider_setupPinCode=provider_setupPinCode_s1,
-            provider_port=provider_port_s1,
-            provider_ota_file=provider_ota_file_all_test,
-            fabric_id=controller.fabricId
+            secured_device_port=provider_port_s1,
+            queue="updateAvailable",
+        )
+        logger.info(f'{step_number_s1}: Prerequisite #2.0 - Launched Provider: {provider_proc}')
+
+        # Prerequisite #2.1 - Open commissioning window on DUT
+        logger.info(f'{step_number_s1}: Prerequisite #2.1 - Commissioning window opened on Requestor (DUT)')
+        params = await self.open_commissioning_window(controller, requestor_node_id)
+        setup_pin_code = params.commissioningParameters.setupPinCode
+        long_discriminator = params.randomDiscriminator
+        logging.info(f'{step_number_s1}: Prerequisite #2.1 - Commissioning window opened: {vars(params)}')
+
+        # TODO Implementing the launch Provider using run_py_test
+        # logger.info(f'{step_number_s1}: Prerequisite #2.0 - Launch Provider')
+        # provider_proc = self.launch_ota_provider_run_py_test(
+        #     ota_file=provider_ota_file_s1,
+        #     provider_discriminator=long_discriminator,  # dinámico
+        #     provider_setupPinCode=setup_pin_code,       # dinámico
+        #     secured_device_port=provider_port_s1,
+        # )
+        # logger.info(f'{step_number_s1}: Prerequisite #2.0 - Launched Provider PID: {provider_proc.pid}')
+        # await asyncio.sleep(10)
+
+        # Prerequisite #2.2 - Commissioning Provider
+        logging.info(f'{step_number_s1}: Prerequisite #2.2 - Commissioning DUT with Provider')
+        resp = await controller.CommissionOnNetwork(
+            nodeId=provider_node_id_s1,
+            setupPinCode=provider_setupPinCode_s1,    # setup_pin_code,     # provider_setupPinCode_s1,
+            filterType=ChipDeviceCtrl.DiscoveryFilterType.LONG_DISCRIMINATOR,
+            filter=provider_discriminator_s1  # l ong_discriminator  # provider_discriminator_s1
+        )
+        logger.info(f'{step_number_s1}: Prerequisite #2.2 - Provider Commissioning response: {resp}')
+
+        # Prerequisite #3.0 - Setting ACLs
+        logger.info(f'{step_number_s1}: Prerequisite #3.0 - Setting ACLs under FabricIndex {fabric_id}')
+        logger.info(f'{step_number_s1}: Prerequisite #3.0 - Requestor (DUT), NodeID: {requestor_node_id}')
+        logger.info(f'{step_number_s1}: Prerequisite #3.0 - Provider, NodeID: {provider_node_id_s1}')
+
+        # Set ACLs for OTA update:
+        # - On Requestor to allow specified Provider to interact with OTA Requestor cluster
+        # - On Provider to allow Requestor to interact with OTA Provider cluster
+        await self.set_ota_acls_for_provider(
+            controller,
+            requestor_node=requestor_node_id,
+            provider_node=provider_node_id_s1,
+            fabric_index=fabric_id
         )
 
-        self.step(1)
+        # Prerequisite #4.0 - Add OTA Provider to the Requestor
+        logger.info(f'{step_number_s1}: Prerequisite #4.0 - Add Provider to Requestor(DUT) DefaultOTAProviders')
+        await self.add_single_ota_provider(controller, requestor_node_id, provider_node_id_s1)
+
         # ------------------------------------------------------------------------------------
-        # Step #1.0 - Provider sends AnnounceOTAProvider command to Requestor
+        # [STEP_1]: Step #1.0 - Provider sends AnnounceOTAProvider command to Requestor
         # ------------------------------------------------------------------------------------
 
-        logger.info("Step #1.0 - Provider_S1 sends AnnounceOTAProvider command to DUT")
+        logger.info(f'{step_number_s1}: Step #1.0 - Provider_S1 sends AnnounceOTAProvider command to DUT')
         cmd_announce = Clusters.OtaSoftwareUpdateRequestor.Commands.AnnounceOTAProvider(
             providerNodeID=1,  # Provider
             vendorID=0xFFF1,
@@ -485,29 +444,29 @@ class TC_SU_2_2(MatterBaseTest):
             metadataForNode=None,
             endpoint=0
         )
-        logger.info(f'Step #1.0 - cmd AnnounceOTAProvider: {cmd_announce}')
+        logger.info(f'{step_number_s1}: Step #1.0 - cmd AnnounceOTAProvider: {cmd_announce}')
 
         resp_announce = await self.send_single_cmd(
             dev_ctrl=controller,
-            node_id=requestor_node_id_s1,  # DUT NodeID
+            node_id=requestor_node_id,  # DUT NodeID
             cmd=cmd_announce
         )
-        logging.info(f'Step #1.0 - cmd AnnounceOTAProvider response: {resp_announce}.')
+        logging.info(f'{step_number_s1}: Step #1.0 - cmd AnnounceOTAProvider response: {resp_announce}.')
 
         # ------------------------------------------------------------------------------------
-        # Step #1.1 - Matcher for OTA records logs
-        # Step #1.1.1 - UpdateState matcher: track "Downloading > Applying > Idle"
-        # Step #1.1.2 - UpdateStateProgress matcher: Track progress reaching 99%
+        # [STEP_1]: Step #1.1 - Matcher for OTA records logs
+        # [STEP_1]: Step #1.1.1 - UpdateState matcher: track "Downloading > Applying > Idle"
+        # [STEP_1]: Step #1.1.2 - UpdateStateProgress matcher: Track progress reaching 99%
         # ------------------------------------------------------------------------------------
 
-        logger.info("Step #1.1.1 - Create an accumulator for the UpdateState attribute")
+        logger.info(f'{step_number_s1}: Step #1.1.1 - Create an accumulator for the UpdateState attribute')
         # UpdateState Accumulator
         accumulator_state = ClusterAttributeChangeAccumulator(
             expected_cluster=Clusters.OtaSoftwareUpdateRequestor,
             expected_attribute=Clusters.OtaSoftwareUpdateRequestor.Attributes.UpdateState
         )
 
-        logger.info("Step #1.1.2 - Create an accumulator for the UpdateStateProgress attribute")
+        logger.info(f'{step_number_s1}: Step #1.1.2 - Create an accumulator for the UpdateStateProgress attribute')
         # UpdateProgress Accumulator
         accumulator_progress = ClusterAttributeChangeAccumulator(
             expected_cluster=Clusters.OtaSoftwareUpdateRequestor,
@@ -518,7 +477,7 @@ class TC_SU_2_2(MatterBaseTest):
         await asyncio.gather(
             accumulator_state.start(
                 dev_ctrl=controller,
-                node_id=requestor_node_id_s1,
+                node_id=requestor_node_id,
                 endpoint=0,
                 fabric_filtered=False,
                 min_interval_sec=0.5,
@@ -527,7 +486,7 @@ class TC_SU_2_2(MatterBaseTest):
             ),
             accumulator_progress.start(
                 dev_ctrl=controller,
-                node_id=requestor_node_id_s1,
+                node_id=requestor_node_id,
                 endpoint=0,
                 fabric_filtered=False,
                 min_interval_sec=2,
@@ -560,12 +519,12 @@ class TC_SU_2_2(MatterBaseTest):
                 if val not in observed_states:
                     observed_states.add(val)
                     state_sequence.append(val)
-                    logger.info(f'1.1.1 - UpdateState recorded: {val}')
+                    logger.info(f'{step_number_s1}: 1.1.1 - UpdateState recorded: {val}')
             elif val == Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kIdle:  # 1
                 if not final_idle_seen:  # log only once
                     final_idle_seen = True
                     state_sequence.append(val)
-                    logger.info("1.1.1 - OTA UpdateState sequence complete, final state is Idle")
+                    logger.info(f'{step_number_s1}: 1.1.1 - OTA UpdateState sequence complete, final state is Idle')
             # Return True only when Idle is reached
             return final_idle_seen
 
@@ -593,8 +552,8 @@ class TC_SU_2_2(MatterBaseTest):
                 # logger.info(f'Step #1.1.2 - UpdateStateProgress recorded: {progress_values}')
 
             # Check UpdateStateProgress 99 progress
-            if val == 99:
-                logger.info("Step #1.1.2 - UpdateStateProgress reached 99")
+            if val >= 98:
+                logger.info('{step_number_s1}: Step #1.1.2 - UpdateStateProgress reached 99')
                 return True
             return False
 
@@ -605,7 +564,7 @@ class TC_SU_2_2(MatterBaseTest):
         )
 
         # ------------------------------------------------------------------------------------
-        # Step #1.2 - Start a task to collect progress updates and validation
+        # [STEP_1]: Step #1.2 - Start a task to collect progress updates and validation
         # ------------------------------------------------------------------------------------
         try:
             # Wait until the final state (Idle) is reached or timeout (20 min)
@@ -625,7 +584,7 @@ class TC_SU_2_2(MatterBaseTest):
             thread_state.join()
             thread_progress.join()
 
-            logger.info("Step #1.2 - Both UpdateState (1.1.1) and UpdateStateProgress (1.1.2) matchers have completed.")
+            logger.info(f'{step_number_s1}: Step #1.2 - Both UpdateState (1.1.1) and UpdateStateProgress (1.1.2) matchers have completed.')
         except Exception as e:
             logger.warning(f'OTA update encountered an error or timeout: {e}')
         finally:
@@ -634,12 +593,12 @@ class TC_SU_2_2(MatterBaseTest):
             await accumulator_progress.cancel()
 
         # ------------------------------------------------------------------------------------
-        # Step #1.3 - Verify image transfer from TH/OTA-P to DUT is successful
+        # [STEP_1]: Step #1.3 - Verify image transfer from TH/OTA-P to DUT is successful
         # ------------------------------------------------------------------------------------
 
         # Log the full sequence
-        logger.info(f"Step #1.3 - Full OTA state sequence observed: {state_sequence}")
-        logger.info(f"Step #1.3 - Progress values observed: {progress_values}")
+        logger.info(f'{step_number_s1}: Step #1.3 - Full OTA state sequence observed: {state_sequence}')
+        logger.info(f'{step_number_s1}: Step #1.3 - Progress values observed: {progress_values}')
 
         # Expected OTA flow
         expected_flow = [
@@ -653,68 +612,81 @@ class TC_SU_2_2(MatterBaseTest):
         asserts.assert_equal(state_sequence, expected_flow, msg=msg)
 
         # ------------------------------------------------------------------------------------
-        # Step #1.4 - Close Provider_S1 Process  (CLEANUP!!!!)
+        # [STEP_1]: Step #1.4 - Close Provider_S1 Process  (CLEANUP!!!!)
         # ------------------------------------------------------------------------------------
-        logger.info(f"Step #1.4 - Close Provider_S1 Process")
+        logger.info(f'{step_number_s1}:Step #1.4 - Close Provider Process')
         await self.kill_ota_provider_process()
-        await self.kill_ota_requestor_process()
-        subprocess.run("rm -rf /tmp/chip_kvs*", shell=True)
         await asyncio.sleep(3)
 
-        # Evict sessions
-        controller.MarkSessionForEviction(provider_node_id_s1)
-        await asyncio.sleep(2)
-        controller.MarkSessionForEviction(requestor_node_id_s1)
-        await asyncio.sleep(2)
-        controller.DeleteAllSessionResumptionStorage()
-
-        # Close BLE if open
-        controller.CloseBLEConnection()
-        await asyncio.sleep(2)
+        # Expire sessions
+        controller.ExpireSessions(provider_node_id_s1)
+        subprocess.run("rm -rf /tmp/chip_kvs /tmp/chip_kvs-shm /tmp/chip_kvs-wal", shell=True)
+        await asyncio.sleep(3)
 
         self.step(2)
         # ------------------------------------------------------------------------------------
-        # Prerequisite Step #2.0 - Setup Requestor_S2 and Provider_S2 as DUT
+        # [STEP_2]: Prerequisite Step #2.0 - Setup Requestor_S2 and Provider_S2 as DUT
         # ------------------------------------------------------------------------------------
-        # controller = self.default_controller
-        # fabric_id = controller.fabricId
-        # provider_ota_file_all_test = "firmware_requestor_v2min.ota"
 
+        # Prerequisite #1.0 - Requestor (DUT) info
         step_number_s2 = "[STEP_2]"
-        requestor_node_id_s2 = self.dut_node_id     # Assigned on execution time
-        requestor_discriminator_s2 = 1234
-        requestor_passcode_s2 = 20202021
-        requestor_port_s2 = 5542                    # Changed in each step
-        provider_node_id_s2 = 3                     # Changed in each step
-        provider_discriminator_s2 = 2222            # Changed in each step
-        provider_setupPinCode_s2 = 20202021
-        provider_port_s2 = 5543                     # Changed in each step
-        fabric_id = controller.fabricId
+        logger.info(f'{step_number_s2}: Prerequisite #1.0 - Requestor (DUT), NodeID: {requestor_node_id}, FabricId: {fabric_id}')
 
-        logger.info(f'Prerequisite #2.0 - Requestor_S2 (DUT), NodeID: {requestor_node_id_s2}, FabricId: {fabric_id}')
+        # Prerequisite #1.0 - Provider_S2 info
+        provider_node_id_s2 = 3
+        provider_discriminator_s2 = 2222             # Changed in each step
+        provider_setupPinCode_s2 = 20202022          # Changed in each step
+        provider_port_s2 = 5540                      # Previous used on Steps 1, Provider_S1 5540, Requestor 5541
+        provider_ota_file_s2 = "firmware_requestor_v3min.ota"
+        logger.info(f"""{step_number_s2}: Prerequisite #1.0 - Provider:
+            NodeID: {provider_node_id_s2},
+            discriminator: {provider_discriminator_s2},
+            setupPinCode: {provider_setupPinCode_s2},
+            port: {provider_port_s2},
+            ota_file: {provider_ota_file_s2}""")
 
-        # --- Step 2 ---
-        requestor_proc_2, provider_proc_2 = await self.run_ota_step(
-            step_number=step_number_s2,
-            controller=self.default_controller,
-            requestor_node_id=requestor_node_id_s2,
-            requestor_discriminator=requestor_discriminator_s2,
-            requestor_passcode=requestor_passcode_s2,
-            requestor_port=requestor_port_s2,
-            provider_node_id=provider_node_id_s2,
+        # Prerequisite #2.0- Launch Provider
+        logger.info(f'{step_number_s2}: Prerequisite #2.0 - Launch Provider')
+        provider_proc_s2 = await self.launch_ota_provider(
+            ota_file=provider_ota_file_s2,
             provider_discriminator=provider_discriminator_s2,
             provider_setupPinCode=provider_setupPinCode_s2,
-            provider_port=provider_port_s2,
-            provider_ota_file=provider_ota_file_all_test,
-            fabric_id=controller.fabricId,
-            provider_queue="busy",   # optional
-            provider_timeout=60         # optional
+            secured_device_port=provider_port_s2,
+            queue="busy",
+            timeout=120
         )
+        logger.info(f'{step_number_s2}: Prerequisite #2.0 - Launched Provider: {provider_proc_s2}')
 
-        # # ------------------------------------------------------------------------------------
-        # # Step #2.0 - Provider sends AnnounceOTAProvider command to Requestor
-        # # ------------------------------------------------------------------------------------
+        # Prerequisite #2.2 - Commission Provider
+        logging.info(f'{step_number_s2}: Prerequisite #2.2 - Commissioning DUT with Provider')
+        resp = await controller.CommissionOnNetwork(
+            nodeId=provider_node_id_s2,
+            setupPinCode=provider_setupPinCode_s2,
+            filterType=ChipDeviceCtrl.DiscoveryFilterType.LONG_DISCRIMINATOR,
+            filter=provider_discriminator_s2
+        )
+        logger.info(f'{step_number_s2}: Prerequisite #2.2 - Provider Commissioning response: {resp}')
 
+        # Prerequisite #3.0 - Setting ACLs
+        logger.info(f'{step_number_s2}: Prerequisite #3.0 - Setting ACLs under FabricIndex {fabric_id}')
+        logger.info(f'{step_number_s2}: Prerequisite #3.0 - Requestor (DUT), NodeID: {requestor_node_id}')
+        logger.info(f'{step_number_s2}: Prerequisite #3.0 - Provider, NodeID: {provider_node_id_s2}')
+
+        # Set ACLs for OTA update:
+        # - On Requestor to allow specified Provider to interact with OTA Requestor cluster
+        # - On Provider to allow Requestor to interact with OTA Provider cluster
+        await self.set_ota_acls_for_provider(
+            controller=controller,
+            requestor_node=requestor_node_id,     # DUT
+            provider_node=provider_node_id_s2,    # Provider
+            fabric_index=fabric_id
+        )
+        logger.info(f'{step_number_s2}: ACLs set between Requestor (DUT) and Provider')
+        await asyncio.sleep(2)
+
+        # ------------------------------------------------------------------------------------
+        # [STEP_2]: Step #2.0 - Provider sends AnnounceOTAProvider command to Requestor
+        # ------------------------------------------------------------------------------------
         logger.info("Step #2.0 - Provider_S2 sends AnnounceOTAProvider command to DUT")
         cmd_announce = Clusters.OtaSoftwareUpdateRequestor.Commands.AnnounceOTAProvider(
             providerNodeID=provider_node_id_s2,  # Provider_S2
@@ -723,22 +695,22 @@ class TC_SU_2_2(MatterBaseTest):
             metadataForNode=None,
             endpoint=0
         )
-        logger.info(f"Step #2.0 - cmd AnnounceOTAProvider: {cmd_announce}")
+        logger.info(f'{step_number_s2}: - cmd AnnounceOTAProvider: {cmd_announce}')
 
         resp_announce = await self.send_single_cmd(
             dev_ctrl=controller,
-            node_id=requestor_node_id_s2,  # DUT NodeID
+            node_id=requestor_node_id,  # DUT NodeID
             cmd=cmd_announce
         )
-        logging.info(f"Step #2.0 - cmd AnnounceOTAProvider response: {resp_announce}.")
+        logging.info(f'{step_number_s2}: - cmd AnnounceOTAProvider response: {resp_announce}.')
 
         # ------------------------------------------------------------------------------------
-        # Step # 2.1 - Matcher for OTA records logs
+        # [STEP_2]: Step # 2.1 - Matcher for OTA records logs
         # ------------------------------------------------------------------------------------
-        logger.info("Step #2.1 - Validate DUT respects minimum QueryImage interval after Busy response")
+        logger.info(f'{step_number_s2}:Step #2.1 - Validate DUT respects minimum QueryImage interval after Busy response.')
         t_start_query = time.time()
 
-        logger.info("Step #2.1 - Create an accumulator for the UpdateState attribute")
+        logger.info(f'{step_number_s2}:Step #2.1 - Create an accumulator for the UpdateState attribute.')
         # UpdateState Accumulator
         accumulator_state = ClusterAttributeChangeAccumulator(
             expected_cluster=Clusters.OtaSoftwareUpdateRequestor,
@@ -748,7 +720,7 @@ class TC_SU_2_2(MatterBaseTest):
         # Start subscriptions
         await accumulator_state.start(
             dev_ctrl=controller,
-            node_id=requestor_node_id_s2,
+            node_id=requestor_node_id,  # DUT
             endpoint=0,
             fabric_filtered=False,
             min_interval_sec=1,
@@ -778,65 +750,58 @@ class TC_SU_2_2(MatterBaseTest):
                 if val not in observed_states:
                     observed_states.add(val)
                     state_sequence.append(val)
-                    logger.info(f'Step #2.1 - UpdateState recorded: {val}')
+                    logger.info(f'{step_number_s2}: Step #2.1 - UpdateState recorded: {val}')
 
             elif val == Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kDownloading:  # 4
                 if not final_downloading_seen:  # log only once
                     final_downloading_seen = True
                     state_sequence.append(val)
                     t_start_downloading = time.time()
-                    logger.info("Step #2.1 - OTA UpdateState sequence From Busy (Querying) to Downloading....")
+                    logger.info(f'{step_number_s2}:Step #2.1 - OTA UpdateState sequence From Busy (Querying) to Downloading....')
             # Return True only when Downloading is reached
             return final_downloading_seen
 
-        # Create matcher object fro UpdateState
+        # Create matcher object for UpdateState
         matcher_busy_state_obj = AttributeMatcher.from_callable(
             description="Validate OTA Busy UpdateState transitions: Querying > Downloading",
             matcher=matcher_busy_state
         )
 
         # ------------------------------------------------------------------------------------
-        # Step #2.2 - Start a task to collect progress updates and validation
+        # [STEP_2]: Step #2.2 - Start a task to collect progress updates and validation
         # ------------------------------------------------------------------------------------
         try:
             # Wait until the final state (Idle) is reached or timeout (20 min)
             await accumulator_state.await_all_expected_report_matches([matcher_busy_state_obj], timeout_sec=300.0)
-            logger.info("Step #2.2 - UpdateState Busy matchers have completed.")
+            logger.info(f'{step_number_s2}: Step #2.2 - UpdateState Busy matchers have completed.')
         except Exception as e:
             logger.warning(f"OTA update encountered an error or timeout: {e}")
         finally:
             # Cancel both subscriptions and task
-            accumulator_state.cancel()
+            await accumulator_state.cancel()
 
         # ------------------------------------------------------------------------------------
-        # Step # 2.3 - Verify image transfer from TH/OTA-P to DUT is Busy
+        # [STEP_2]: Step # 2.3 - Verify image transfer from TH/OTA-P to DUT is Busy
         # ------------------------------------------------------------------------------------
-        logger.info(f"Step #2.3 - Full OTA state sequence observed: {state_sequence}")
-        logger.info(f"Step #2.3 - Time Start as Busy: {t_start_query}, Time Ends as Busy {t_start_downloading}")
+        logger.info(f'{step_number_s2}: Step #2.3 - Full OTA state sequence observed: {state_sequence}')
+        logger.info(f'{step_number_s2}: Step #2.3 - Time Start as Busy: {t_start_query}, Time Ends as Busy {t_start_downloading}')
         delayed_action_time = t_start_downloading - t_start_query
-        logger.info(f"Step #2.3 - Delay between Querying and Downloading: {delayed_action_time:.2f} s")
+        logger.info(f'{step_number_s2}: Step #2.3 - Delay between Querying and Downloading: {delayed_action_time:.2f} s.')
 
         asserts.assert_true(delayed_action_time >= 120,
                             f"Expected delay >= 120 seconds, but got {delayed_action_time:.2f} seconds")
 
         # ------------------------------------------------------------------------------------
-        # Step # 2.4 - Close Requestor S_2 and Provider_S2 Process  (CLEANUP!!!!)
+        # [STEP_2]: Step # 2.4 - Close Requestor S_2 and Provider_S2 Process  (CLEANUP!!!!)
         # ------------------------------------------------------------------------------------
-        logger.info(f"Step #2.4 - Close Requestor_S2 and Provider_S2 Process")
+
+        await asyncio.sleep(270)          # TEMP
+
+        logger.info(f'{step_number_s2}: Step #2.4 - Close Requestor_S2 and Provider_S2 Process.')
         await self.kill_ota_provider_process()
-        await self.kill_ota_requestor_process(process_name="chip-ota-requestor-app")
-        subprocess.run("rm -rf /tmp/chip_kvs*", shell=True)
         await asyncio.sleep(3)
-
-        # Evict sessions
-        controller.MarkSessionForEviction(provider_node_id_s2)
-        await asyncio.sleep(2)
-        controller.MarkSessionForEviction(requestor_node_id_s2)
-        await asyncio.sleep(2)
-        controller.DeleteAllSessionResumptionStorage()
-
-        # Close BLE if open
-        controller.CloseBLEConnection()
+        controller.ExpireSessions(provider_node_id_s2)
+        subprocess.run("rm -rf /tmp/chip_kvs /tmp/chip_kvs-shm /tmp/chip_kvs-wal", shell=True)
         await asyncio.sleep(2)
 
 
