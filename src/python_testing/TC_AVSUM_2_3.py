@@ -169,7 +169,7 @@ class TC_AVSUM_2_3(MatterBaseTest, AVSUMTestBase):
             newpan_mptzposition_dut = await self.read_avsum_attribute_expect_success(endpoint, attributes.MPTZPosition)
             asserts.assert_equal(newpan_mptzposition_dut.pan, pan_max_dut, "Received Pan does not match PanMax")
             currentPan = pan_max_dut
-            
+
         else:
             self.skip_step(4)
             self.skip_step(5)

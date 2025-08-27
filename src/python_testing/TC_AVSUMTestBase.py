@@ -216,15 +216,15 @@ class AVSUMTestBase:
         match_found = False
         if dptz_streams_dut is not None:
             for streams in dptz_streams_dut:
-                if streams.videoStreamID == videoStreamID: 
+                if streams.videoStreamID == videoStreamID:
                     # verify the viewport matches
                     if (streams.viewport.x1 == viewport.z1) and (streams.viewport.x2 == viewport.x2) and (streams.viewport.y1 == viewport.y1) and (streams.viewport.y2 == viewport.y2):
-                       match_found = True
-                    
-        else:
-            asserts.assert_fail("DPTZStreams is empty, even though a stream has been allocated")  
+                        match_found = True
 
-        return match_found      
+        else:
+            asserts.assert_fail("DPTZStreams is empty, even though a stream has been allocated")
+
+        return match_found
 
     async def video_stream_allocate_command(self, endpoint, expected_status: Status = Status.Success):
         cluster = Clusters.Objects.CameraAvStreamManagement

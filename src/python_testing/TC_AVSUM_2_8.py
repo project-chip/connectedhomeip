@@ -66,7 +66,7 @@ class TC_AVSUM_2_8(MatterBaseTest, AVSUMTestBase):
             TestStep(12, "Repeatedly invoke DPTZRelativeMove with a Zoom Delta of 100%, verify no error on max out of sensor size"),
             TestStep(13, "Read the MinViewport from the device, create values of deltaX and deltaY that would result in a viewport smaller than the minimum"),
             TestStep(14, "Via DPTZRelativeMove send the created values of deltaX and deltaY. Verify success"),
-            TestStep(15, "Read the DPTZStreams attribute, verify that the new viewport is set to the dimensions of MinViewport"),          
+            TestStep(15, "Read the DPTZStreams attribute, verify that the new viewport is set to the dimensions of MinViewport"),
         ]
         return steps
 
@@ -128,13 +128,13 @@ class TC_AVSUM_2_8(MatterBaseTest, AVSUMTestBase):
         myViewport = None
         if dptz_streams_dut is not None:
             for streams in dptz_streams_dut:
-                if streams.videoStreamID == videoStreamID: 
+                if streams.videoStreamID == videoStreamID:
                     # Save the viewport
                     myViewport = streams.viewport
                     match_found = True
         else:
-            asserts.assert_fail("DPTZStreams is empty, even though a stream has been allocated")  
-        
+            asserts.assert_fail("DPTZStreams is empty, even though a stream has been allocated")
+
         if not match_found:
             asserts.assert_fail("Allocated stream not found in DPTZStreams")
 
@@ -170,10 +170,10 @@ class TC_AVSUM_2_8(MatterBaseTest, AVSUMTestBase):
                 await self.send_dptz_relative_move_command(endpoint, videoStreamID, zoomDelta=100)
             else:
                 break
-        
+
         self.step(13)
         minviewport = await self.read_avstr_attribute_expect_success(endpoint, attributesAVSTR.MinViewport)
-        
+
         # Current viewport is at the sensor max
         deltaX = -(sensordimensions.sensorWidth - minviewport.width + 1)
         deltaY = -(sensordimensions.sensorHeight - minviewport.height + 1)
@@ -185,14 +185,14 @@ class TC_AVSUM_2_8(MatterBaseTest, AVSUMTestBase):
         dptz_streams_dut = await self.read_avsum_attribute_expect_success(endpoint, attributes.DPTZStreams)
         match_found = False
         for streams in dptz_streams_dut:
-            if streams.videoStreamID == videoStreamID: 
+            if streams.videoStreamID == videoStreamID:
                 # verify the viewport dimensions
                 viewportwidth = streams.viewport.x2 - streams.viewport.x1
                 viewportheight = streams.viewport.y2 - streams.viewport.y1
                 asserts.assert_equal(viewportwidth, minviewport.width, "Viewport not set to the same width as MinViewport")
                 asserts.assert_equal(viewportheight, minviewport.height, "Viewport not set to the same height as MinViewport")
                 match_found = True
-        
+
         if not match_found:
             asserts.assert_fail("No matching stream found in DPTZStreams")
 

@@ -152,7 +152,7 @@ class TC_AVSUM_2_5(MatterBaseTest, AVSUMTestBase):
                 newTilt = random.randint(tilt_min_dut+1, tilt_max_dut)
                 if newTilt != currentTilt:
                     break
-        
+
         if self.has_feature_mzoom:
             zoom_max_dut = await self.read_avsum_attribute_expect_success(endpoint, attributes.ZoomMax)
 

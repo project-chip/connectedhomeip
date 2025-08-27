@@ -79,15 +79,15 @@ class TC_AVSUM_2_7(MatterBaseTest, AVSUMTestBase):
         match_found = False
         if dptz_streams_dut is not None:
             for streams in dptz_streams_dut:
-                if streams.videoStreamID == videoStreamID: 
+                if streams.videoStreamID == videoStreamID:
                     # verify the viewport matches
                     if (streams.viewport.x1 == viewport.z1) and (streams.viewport.x2 == viewport.x2) and (streams.viewport.y1 == viewport.y1) and (streams.viewport.y2 == viewport.y2):
-                       match_found = True
-                    
-        else:
-            asserts.assert_fail("DPTZStreams is empty, even though a stream has been allocated")  
+                        match_found = True
 
-        return match_found      
+        else:
+            asserts.assert_fail("DPTZStreams is empty, even though a stream has been allocated")
+
+        return match_found
 
     @run_if_endpoint_matches(has_feature(Clusters.CameraAvSettingsUserLevelManagement,
                                          Clusters.CameraAvSettingsUserLevelManagement.Bitmaps.Feature.kDigitalPTZ) and
@@ -151,7 +151,7 @@ class TC_AVSUM_2_7(MatterBaseTest, AVSUMTestBase):
         await self.send_dptz_set_viewport_command(endpoint, videoStreamID, passingviewport)
 
         self.step(12)
-        # Verify the viewport has been updated in DPTZStreams                    
+        # Verify the viewport has been updated in DPTZStreams
         if not self.dptzstreamentryvalid(endpoint, videoStreamID, passingviewport):
             asserts.assert_fail("Viewport has not been updated in DPTZStreams")
 
