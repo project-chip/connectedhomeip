@@ -75,6 +75,7 @@ executable("${sample_name}") {
     "${project_dir}/common/clusters/window-covering/chef-window-covering.cpp",
     "${project_dir}/common/stubs.cpp",
     "${project_dir}/linux/main.cpp",
+    "../../../src/app/clusters/boolean-state-server/CodegenIntegration.cpp",
   ]
 
   deps = [
