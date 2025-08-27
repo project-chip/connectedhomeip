@@ -787,7 +787,7 @@ class CommodityTariffTestBaseHelper(MatterBaseTest):
             self.tariffComponentValue = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.TariffComponents)
 
         if self.tariffInformationValue is not None and self.tariffInformationValue is NullValue:
-            asserts.assert_equal(len(self.tariffComponentValue), 0, "TariffComponents must be empty when TariffInfo is Null")
+            asserts.assert_equal(self.tariffComponentValue, NullValue, "TariffComponents must be empty when TariffInfo is Null")
 
         # if attribute value is not null it must be list of TariffComponentStruct
         if self.tariffComponentValue is not NullValue:
@@ -812,7 +812,7 @@ class CommodityTariffTestBaseHelper(MatterBaseTest):
             attribute_value = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.TariffPeriods)
 
         if self.tariffInformationValue is not None and self.tariffInformationValue is NullValue:
-            asserts.assert_equal(len(attribute_value), 0, "TariffPeriods must be empty when TariffInfo is Null")
+            asserts.assert_equal(attribute_value, NullValue, "TariffPeriods must be empty when TariffInfo is Null")
 
         # if attribute value is not null it must be list of TariffPeriodStruct
         if attribute_value is not NullValue:
@@ -888,6 +888,10 @@ class CommodityTariffTestBaseHelper(MatterBaseTest):
             if await self.attribute_guard(endpoint=endpoint, attribute=cluster.Attributes.DefaultRandomizationOffset):
                 self.defaultRandomizationOffset = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.DefaultRandomizationOffset)
 
+        if self.tariffInformationValue is not None and self.tariffInformationValue is NullValue:
+            asserts.assert_equal(self.defaultRandomizationOffset, NullValue,
+                                 "DefaultRandomizationOffset must be Null when TariffInfo is Null")
+
         # check if RNDM feature and DefaultRandomizationOffset attribute are enabled
         if (self.attribute_guard(endpoint=endpoint, attribute=cluster.Attributes.DefaultRandomizationOffset) and
                 self.feature_guard(endpoint=endpoint, cluster=cluster, feature_int=cluster.Bitmaps.Feature.kRandomization)):
@@ -913,6 +917,10 @@ class CommodityTariffTestBaseHelper(MatterBaseTest):
         if self.defaultRandomizationType is None:
             if await self.attribute_guard(endpoint=endpoint, attribute=cluster.Attributes.DefaultRandomizationType):
                 self.defaultRandomizationType = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.DefaultRandomizationType)
+
+        if self.tariffInformationValue is not None and self.tariffInformationValue is NullValue:
+            asserts.assert_equal(self.defaultRandomizationType, NullValue,
+                                 "DefaultRandomizationType must be Null when TariffInfo is Null")
 
         # check if RNDM feature is enabled
         if (self.attribute_guard(endpoint=endpoint, attribute=cluster.Attributes.DefaultRandomizationType) and
