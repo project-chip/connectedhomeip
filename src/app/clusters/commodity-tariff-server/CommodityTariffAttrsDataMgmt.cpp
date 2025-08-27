@@ -87,6 +87,13 @@ namespace DayEntriesDataClass_Utils {
 
 static CHIP_ERROR ValidateListEntry(const DayEntryStruct::Type & entryNewValue, TariffUpdateCtx * aCtx)
 {
+    // Check for duplicate IDs
+    if (!aCtx->DayEntryKeyIDs.insert(entryNewValue.dayEntryID).second)
+    {
+        ChipLogError(NotSpecified, "Duplicate dayEntryID found");
+        return CHIP_ERROR_DUPLICATE_KEY_ID;
+    }
+
     VerifyOrReturnError_LogSend(entryNewValue.startTime < kDayEntryDurationLimit, CHIP_ERROR_INVALID_ARGUMENT,
                                 "DayEntry startTime must be less than %u", kDayEntryDurationLimit);
 
@@ -668,13 +675,6 @@ CHIP_ERROR CTC_BaseDataClass<DataModel::Nullable<DataModel::List<DayEntryStruct:
     // Validate each entry
     for (const auto & item : newList)
     {
-        // Check for duplicate IDs
-        if (!ctx->DayEntryKeyIDs.insert(item.dayEntryID).second)
-        {
-            ChipLogError(NotSpecified, "Duplicate dayEntryID found");
-            return CHIP_ERROR_DUPLICATE_KEY_ID;
-        }
-
         // Validate entry contents
         CHIP_ERROR entryErr = DayEntriesDataClass_Utils::ValidateListEntry(item, ctx);
         if (entryErr != CHIP_NO_ERROR)
