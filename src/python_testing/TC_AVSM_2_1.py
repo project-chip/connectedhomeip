@@ -59,7 +59,8 @@ class TC_AVSM_2_1(MatterBaseTest):
                 4, "TH reads VideoSensorParams attribute.", "Verify that the DUT response contains a VideoSensorParamsStruct value."
             ),
             TestStep(5, "TH reads NightVisionUsesInfrared attribute.", "Verify that the DUT response contains a bool value."),
-            TestStep(6, "TH reads MinViewport attribute.", "Verify that the DUT response contains a VideoResolutionStruct value."),
+            TestStep(6, "TH reads MinViewportResolution attribute.",
+                     "Verify that the DUT response contains a VideoResolutionStruct value."),
             TestStep(
                 7,
                 "TH reads RateDistortionTradeOffPoints attribute.",
@@ -185,8 +186,8 @@ class TC_AVSM_2_1(MatterBaseTest):
 
         self.step(6)
         if self.pics_guard(self.check_pics("AVSM.S.A0004")):
-            value = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attr.MinViewport)
-            logger.info(f"Rx'd MinViewport: {value}")
+            value = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attr.MinViewportResolution)
+            logger.info(f"Rx'd MinViewportResolution: {value}")
 
         self.step(7)
         if self.pics_guard(self.check_pics("AVSM.S.A0005")):
