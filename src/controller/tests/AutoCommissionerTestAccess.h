@@ -47,6 +47,13 @@ public:
     }
     void SetBreadcrumb(uint64_t value) { mCommissioner->mDeviceCommissioningInfo.general.breadcrumb = value; }
     void SetUTCRequirements(bool requiresUTC) { mCommissioner->mDeviceCommissioningInfo.requiresUTC = requiresUTC; }
+    bool AccessIsScanNeeded() { return mCommissioner->IsScanNeeded(); }
+    bool AccessIsSecondaryNetworkSupported() const { return mCommissioner->IsSecondaryNetworkSupported(); }
+    Controller::ReadCommissioningInfo & GetDeviceCommissioningInfo() { return mCommissioner->mDeviceCommissioningInfo; }
+    void AccessResetTryingSecondaryNetwork() { mCommissioner->ResetTryingSecondaryNetwork(); }
+
+    bool AccessTryingSecondaryNetwork() { return mCommissioner->TryingSecondaryNetwork(); }
+    void AccessTrySecondaryNetwork() { mCommissioner->TrySecondaryNetwork(); }
 
     CHIP_ERROR NOCChainGenerated(ByteSpan noc, ByteSpan icac, ByteSpan rcac, Crypto::IdentityProtectionKeySpan ipk,
                                  NodeId adminSubject)
