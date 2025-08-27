@@ -160,6 +160,19 @@
 #endif
 
 /**
+ * CHIP_DEVICE_CONFIG_ICD_SIT_POLLING_INTERVAL
+ *
+ * The SIT slow polling interval (in milliseconds) is a configuration that allows LIT capable devices
+ * operating in SIT mode to use a shorter slow polling interval than their typical
+ * Slow polling interval.
+ *
+ * The SIT slow polling interval cannot be set to a value greater than CHIP_DEVICE_CONFIG_ICD_SIT_SLOW_POLL_LIMIT
+ */
+#ifndef CHIP_DEVICE_CONFIG_ICD_SIT_POLLING_INTERVAL
+#define CHIP_DEVICE_CONFIG_ICD_SIT_POLLING_INTERVAL CHIP_DEVICE_CONFIG_ICD_SIT_SLOW_POLL_LIMIT
+#endif // CHIP_DEVICE_CONFIG_ICD_SIT_POLLING_INTERVAL
+
+/**
  * CHIP_DEVICE_CONFIG_ICD_FAST_POLL_INTERVAL
  *
  * The default amount of time in milliseconds that the sleepy end device will use as an active interval.
@@ -584,6 +597,17 @@
  */
 #ifndef CHIP_DEVICE_CONFIG_LWIP_WIFI_AP_IF_NAME
 #define CHIP_DEVICE_CONFIG_LWIP_WIFI_AP_IF_NAME "ap"
+#endif
+
+// -------------------- NFC/CHIPoNFC Configuration --------------------
+
+/**
+ * CHIP_DEVICE_CONFIG_ENABLE_NFC_BASED_COMMISSIONING
+ *
+ * Enable support for NFC Commissioning (chip-over-NFC).
+ */
+#ifndef CHIP_DEVICE_CONFIG_ENABLE_NFC_BASED_COMMISSIONING
+#define CHIP_DEVICE_CONFIG_ENABLE_NFC_BASED_COMMISSIONING 0
 #endif
 
 // -------------------- BLE/CHIPoBLE Configuration --------------------

@@ -37,8 +37,8 @@
 
 import logging
 
-import chip.clusters as Clusters
-from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+import matter.clusters as Clusters
+from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 
 logger = logging.getLogger(__name__)
 
@@ -58,8 +58,9 @@ class TC_AVSM_2_1(MatterBaseTest):
             TestStep(
                 4, "TH reads VideoSensorParams attribute.", "Verify that the DUT response contains a VideoSensorParamsStruct value."
             ),
-            TestStep(5, "TH reads NightVisionCapable attribute.", "Verify that the DUT response contains a bool value."),
-            TestStep(6, "TH reads MinViewport attribute.", "Verify that the DUT response contains a VideoResolutionStruct value."),
+            TestStep(5, "TH reads NightVisionUsesInfrared attribute.", "Verify that the DUT response contains a bool value."),
+            TestStep(6, "TH reads MinViewportResolution attribute.",
+                     "Verify that the DUT response contains a VideoResolutionStruct value."),
             TestStep(
                 7,
                 "TH reads RateDistortionTradeOffPoints attribute.",
@@ -107,11 +108,11 @@ class TC_AVSM_2_1(MatterBaseTest):
             TestStep(
                 19,
                 "TH reads AllocatedSnapshotStreams attribute.",
-                "Verify that the DUT response contains a list of AudioStreamStruct entries.",
+                "Verify that the DUT response contains a list of SnapshotStreamStruct entries.",
             ),
             TestStep(
                 20,
-                "TH reads RankedVideoStreamPrioritiesList attribute.",
+                "TH reads StreamUsagePriorities attribute.",
                 "Verify that the DUT response contains a list of StreamUsageEnum entries.",
             ),
             TestStep(
@@ -179,14 +180,14 @@ class TC_AVSM_2_1(MatterBaseTest):
         self.step(5)
         if self.pics_guard(self.check_pics("AVSM.S.A0003")):
             value = await self.read_single_attribute_check_success(
-                endpoint=endpoint, cluster=cluster, attribute=attr.NightVisionCapable
+                endpoint=endpoint, cluster=cluster, attribute=attr.NightVisionUsesInfrared
             )
-            logger.info(f"Rx'd NightVisionCapable: {value}")
+            logger.info(f"Rx'd NightVisionUsesInfrared: {value}")
 
         self.step(6)
         if self.pics_guard(self.check_pics("AVSM.S.A0004")):
-            value = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attr.MinViewport)
-            logger.info(f"Rx'd MinViewport: {value}")
+            value = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attr.MinViewportResolution)
+            logger.info(f"Rx'd MinViewportResolution: {value}")
 
         self.step(7)
         if self.pics_guard(self.check_pics("AVSM.S.A0005")):
@@ -282,9 +283,9 @@ class TC_AVSM_2_1(MatterBaseTest):
         self.step(20)
         if self.pics_guard(self.check_pics("AVSM.S.A0012")):
             value = await self.read_single_attribute_check_success(
-                endpoint=endpoint, cluster=cluster, attribute=attr.RankedVideoStreamPrioritiesList
+                endpoint=endpoint, cluster=cluster, attribute=attr.StreamUsagePriorities
             )
-            logger.info(f"Rx'd RankedVideoStreamPrioritiesList: {value}")
+            logger.info(f"Rx'd StreamUsagePrioritiesList: {value}")
 
         self.step(21)
         if self.pics_guard(self.check_pics("AVSM.S.A0013")):

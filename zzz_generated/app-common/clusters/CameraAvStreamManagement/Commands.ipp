@@ -151,8 +151,7 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
     encoder.Encode(to_underlying(Fields::kMaxResolution), maxResolution);
     encoder.Encode(to_underlying(Fields::kMinBitRate), minBitRate);
     encoder.Encode(to_underlying(Fields::kMaxBitRate), maxBitRate);
-    encoder.Encode(to_underlying(Fields::kMinFragmentLen), minFragmentLen);
-    encoder.Encode(to_underlying(Fields::kMaxFragmentLen), maxFragmentLen);
+    encoder.Encode(to_underlying(Fields::kKeyFrameInterval), keyFrameInterval);
     encoder.Encode(to_underlying(Fields::kWatermarkEnabled), watermarkEnabled);
     encoder.Encode(to_underlying(Fields::kOSDEnabled), OSDEnabled);
     return encoder.Finalize();
@@ -200,13 +199,9 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, maxBitRate);
         }
-        else if (__context_tag == to_underlying(Fields::kMinFragmentLen))
+        else if (__context_tag == to_underlying(Fields::kKeyFrameInterval))
         {
-            err = DataModel::Decode(reader, minFragmentLen);
-        }
-        else if (__context_tag == to_underlying(Fields::kMaxFragmentLen))
-        {
-            err = DataModel::Decode(reader, maxFragmentLen);
+            err = DataModel::Decode(reader, keyFrameInterval);
         }
         else if (__context_tag == to_underlying(Fields::kWatermarkEnabled))
         {

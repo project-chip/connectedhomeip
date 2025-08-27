@@ -48,9 +48,7 @@ ALL_PLATFORMS = set([
     'telink',
     'tizen',
     'webos',
-    'mw320',
     'genio',
-    'openiotsdk',
     'silabs_docker',
     'unit_tests'
 ])

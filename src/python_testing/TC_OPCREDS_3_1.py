@@ -37,14 +37,15 @@ import copy
 import logging
 import random
 
-import chip.clusters as Clusters
-import chip.discovery as Discovery
-from chip import ChipDeviceCtrl
-from chip.exceptions import ChipStackError
-from chip.interaction_model import InteractionModelError, Status
-from chip.testing.matter_testing import MatterBaseTest, async_test_body, default_matter_test_main
-from chip.tlv import TLVReader, TLVWriter
 from mobly import asserts
+
+import matter.clusters as Clusters
+import matter.discovery as Discovery
+from matter import ChipDeviceCtrl
+from matter.exceptions import ChipStackError
+from matter.interaction_model import InteractionModelError, Status
+from matter.testing.matter_testing import MatterBaseTest, async_test_body, default_matter_test_main
+from matter.tlv import TLVReader, TLVWriter
 
 
 class TC_OPCREDS_3_1(MatterBaseTest):
@@ -62,7 +63,8 @@ class TC_OPCREDS_3_1(MatterBaseTest):
                 await dev_ctrl.EstablishPASESessionIP(ipaddr=a, setupPinCode=setupPinCode,
                                                       nodeid=nodeid, port=device.port)
                 break
-            except ChipStackError:
+            except ChipStackError:  # chipstack-ok: This disables ChipStackError linter check. Expected fullback behavior when trying multiple IPs, failures are tolerated to continue with next address
+                # assert_raises is not applicable since failure is not fatal here
                 continue
         try:
             dev_ctrl.GetConnectedDeviceSync(nodeid=nodeid, allowPASE=True, timeoutMs=1000)

@@ -207,6 +207,71 @@ public:
     virtual CHIP_ERROR ValidateStreamUsage(StreamUsageEnum streamUsage,
                                            const Optional<DataModel::Nullable<uint16_t>> & videoStreamId,
                                            const Optional<DataModel::Nullable<uint16_t>> & audioStreamId) = 0;
+
+    /**
+     * @brief
+     *   Validates that the given VideoStreamID matches a value in AllocatedVideoStreams.
+     *
+     *   This method is called during SolicitOffer command processing when a VideoStreamID
+     *   is present and not null. The implementation must check if the provided ID exists
+     *   in the AllocatedVideoStreams list from the CameraAvStreamManagement cluster.
+     *
+     * @param[in] videoStreamId  The video stream ID to validate.
+     *
+     * @return CHIP_ERROR
+     *   - CHIP_NO_ERROR if the VideoStreamID is valid and matches AllocatedVideoStreams.
+     *   - CHIP_ERROR_NOT_FOUND or other appropriate error if validation fails.
+     */
+    virtual CHIP_ERROR ValidateVideoStreamID(uint16_t videoStreamId) = 0;
+
+    /**
+     * @brief
+     *   Validates that the given AudioStreamID matches a value in AllocatedAudioStreams.
+     *
+     *   This method is called during SolicitOffer command processing when an AudioStreamID
+     *   is present and not null. The implementation must check if the provided ID exists
+     *   in the AllocatedAudioStreams list from the CameraAvStreamManagement cluster.
+     *
+     * @param[in] audioStreamId  The audio stream ID to validate.
+     *
+     * @return CHIP_ERROR
+     *   - CHIP_NO_ERROR if the AudioStreamID is valid and matches AllocatedAudioStreams.
+     *   - CHIP_ERROR_NOT_FOUND or other appropriate error if validation fails.
+     */
+    virtual CHIP_ERROR ValidateAudioStreamID(uint16_t audioStreamId) = 0;
+
+    /**
+     * @brief Check whether privacy mode is active.
+     *
+     * Reads the SoftLivestreamPrivacyModeEnabled and HardPrivacyModeOn attributes from the CameraAvStreamManagement
+     * cluster. Privacy mode is considered **active** when **either** attribute is true.
+     *
+     * @param[out] isActive Set to true if privacy mode is active, false if inactive.
+     * @return CHIP_NO_ERROR on success, error code if privacy mode state cannot be determined.
+     */
+    virtual CHIP_ERROR IsPrivacyModeActive(bool & isActive) = 0;
+
+    /**
+     * @brief Check if there are any allocated video streams.
+     *
+     * This method is called during ProvideOffer command processing when VideoStreamID
+     * is present and null to determine if automatic stream selection is possible.
+     *
+     * @return true if there are allocated video streams available.
+     * @return false if no video streams are currently allocated.
+     */
+    virtual bool HasAllocatedVideoStreams() = 0;
+
+    /**
+     * @brief Check if there are any allocated audio streams.
+     *
+     * This method is called during ProvideOffer command processing when AudioStreamID
+     * is present and null to determine if automatic stream selection is possible.
+     *
+     * @return true if there are allocated audio streams available.
+     * @return false if no audio streams are currently allocated.
+     */
+    virtual bool HasAllocatedAudioStreams() = 0;
 };
 
 class WebRTCTransportProviderServer : public AttributeAccessInterface, public CommandHandlerInterface
@@ -243,6 +308,16 @@ public:
      */
     void Shutdown();
 
+    /**
+     * @brief Get a reference to the current WebRTC sessions.
+     *
+     * This method provides read-only access to the current list of active WebRTC sessions
+     * managed by this server instance.
+     *
+     * @return const std::vector<WebRTCSessionStruct>& Reference to the current sessions list.
+     */
+    const std::vector<WebRTCSessionStruct> & GetCurrentSessions() const { return mCurrentSessions; }
+
 private:
     enum class UpsertResultEnum : uint8_t
     {
@@ -258,7 +333,7 @@ private:
     WebRTCSessionStruct * CheckForMatchingSession(HandlerContext & ctx, uint16_t sessionId);
     UpsertResultEnum UpsertSession(const WebRTCSessionStruct & session);
     void RemoveSession(uint16_t sessionId);
-    uint16_t GenerateSessionId();
+    CHIP_ERROR GenerateSessionId(uint16_t & outSessionId);
 
     // Command Handlers
     void HandleSolicitOffer(HandlerContext & ctx, const Commands::SolicitOffer::DecodableType & req);

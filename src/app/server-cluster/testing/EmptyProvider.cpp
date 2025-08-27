@@ -23,11 +23,6 @@ using Protocols::InteractionModel::Status;
 using namespace chip::app;
 using namespace chip::app::DataModel;
 
-CHIP_ERROR EmptyProvider::Shutdown()
-{
-    return CHIP_NO_ERROR;
-}
-
 CHIP_ERROR EmptyProvider::Endpoints(ReadOnlyBufferBuilder<app::DataModel::EndpointEntry> & builder)
 {
     return CHIP_NO_ERROR;
@@ -39,6 +34,12 @@ CHIP_ERROR EmptyProvider::SemanticTags(EndpointId endpointId, ReadOnlyBufferBuil
 }
 CHIP_ERROR EmptyProvider::DeviceTypes(EndpointId endpointId, ReadOnlyBufferBuilder<app::DataModel::DeviceTypeEntry> & builder)
 {
+    return CHIP_IM_GLOBAL_STATUS(UnsupportedEndpoint);
+}
+
+CHIP_ERROR EmptyProvider::EventInfo(const app::ConcreteEventPath & path, app::DataModel::EventEntry & eventInfo)
+{
+    // no events in empty providers as there are no clusters
     return CHIP_IM_GLOBAL_STATUS(UnsupportedEndpoint);
 }
 

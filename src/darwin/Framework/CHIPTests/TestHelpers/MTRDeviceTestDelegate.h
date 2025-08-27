@@ -20,30 +20,34 @@
 NS_ASSUME_NONNULL_BEGIN
 
 typedef void (^MTRDeviceTestDelegateDataHandler)(NSArray<NSDictionary<NSString *, id> *> *);
+typedef void (^MTRDeviceTestDelegateHandler)(NSError * error);
 
 @interface MTRDeviceTestDelegate : NSObject <MTRDeviceDelegate>
-@property (nonatomic, nullable) dispatch_block_t onReachable;
-@property (nonatomic, nullable) dispatch_block_t onNotReachable;
-@property (nonatomic, nullable) dispatch_block_t onInternalStateChanged;
-@property (nonatomic, nullable) MTRDeviceTestDelegateDataHandler onAttributeDataReceived;
-@property (nonatomic, nullable) MTRDeviceTestDelegateDataHandler onEventDataReceived;
-@property (nonatomic, nullable) dispatch_block_t onReportBegin;
-@property (nonatomic, nullable) dispatch_block_t onReportEnd;
-@property (nonatomic, nullable) dispatch_block_t onDeviceCachePrimed;
-@property (nonatomic) BOOL skipExpectedValuesForWrite;
-@property (nonatomic) BOOL forceAttributeReportsIfMatchingCache;
-@property (nonatomic, nullable) dispatch_block_t onDeviceConfigurationChanged;
-@property (nonatomic) BOOL pretendThreadEnabled;
-@property (nonatomic, nullable) dispatch_block_t onSubscriptionPoolDequeue;
-@property (nonatomic, nullable) dispatch_block_t onSubscriptionPoolWorkComplete;
-@property (nonatomic, nullable) dispatch_block_t onClusterDataPersisted;
-@property (nonatomic, nullable) dispatch_block_t onSubscriptionCallbackDelete;
-@property (nonatomic, nullable) dispatch_block_t onSubscriptionReset;
-@property (nonatomic, nullable) NSNumber * subscriptionMaxIntervalOverride;
+@property (atomic, copy, nullable) dispatch_block_t onReachable;
+@property (atomic, copy, nullable) dispatch_block_t onNotReachable;
+@property (atomic, copy, nullable) dispatch_block_t onInternalStateChanged;
+@property (atomic, copy, nullable) MTRDeviceTestDelegateDataHandler onAttributeDataReceived;
+@property (atomic, copy, nullable) MTRDeviceTestDelegateDataHandler onEventDataReceived;
+@property (atomic, copy, nullable) dispatch_block_t onReportBegin;
+@property (atomic, copy, nullable) dispatch_block_t onReportEnd;
+@property (atomic, copy, nullable) dispatch_block_t onDeviceCachePrimed;
+@property (atomic) BOOL skipExpectedValuesForWrite;
+@property (atomic) BOOL forceAttributeReportsIfMatchingCache;
+@property (atomic, copy, nullable) dispatch_block_t onDeviceConfigurationChanged;
+@property (atomic) BOOL pretendThreadEnabled;
+@property (atomic, copy, nullable) dispatch_block_t onSubscriptionPoolDequeue;
+@property (atomic, copy, nullable) dispatch_block_t onSubscriptionPoolWorkComplete;
+@property (atomic, copy, nullable) dispatch_block_t onClusterDataPersisted;
+@property (atomic, copy, nullable) dispatch_block_t onSubscriptionCallbackDelete;
+@property (atomic, copy, nullable) dispatch_block_t onSubscriptionReset;
+@property (atomic, nullable) NSNumber * subscriptionMaxIntervalOverride;
+@property (atomic, copy, nullable) MTRDeviceTestDelegateHandler onUTCTimeSet;
+@property (atomic) BOOL forceTimeUpdateShortDelayToZero;
+@property (atomic) BOOL forceTimeSynchronizationLossDetectionCadenceToZero;
 @end
 
 @interface MTRDeviceTestDelegateWithSubscriptionSetupOverride : MTRDeviceTestDelegate
-@property (nonatomic) BOOL skipSetupSubscription;
+@property (atomic) BOOL skipSetupSubscription;
 @end
 
 NS_ASSUME_NONNULL_END

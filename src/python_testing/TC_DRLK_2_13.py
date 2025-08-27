@@ -39,12 +39,13 @@ import logging
 import random
 from dataclasses import dataclass
 
-import chip.clusters as Clusters
-from chip.clusters.Attribute import EventPriority
-from chip.clusters.Types import NullValue
-from chip.interaction_model import InteractionModelError, Status
-from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main, type_matches
 from mobly import asserts
+
+import matter.clusters as Clusters
+from matter.clusters.Attribute import EventPriority
+from matter.clusters.Types import NullValue
+from matter.interaction_model import InteractionModelError, Status
+from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main, type_matches
 
 logger = logging.getLogger(__name__)
 
@@ -449,7 +450,7 @@ class TC_DRLK_2_13(MatterBaseTest):
                                                                                 cluster=Clusters.Objects.DoorLock,
                                                                                 attribute=Clusters.DoorLock.Attributes.NumberOfAliroEndpointKeysSupported)
             if self.max_aliro_keys_supported < 2:
-                self.skip_all_remaining_steps("13")
+                self.mark_all_remaining_steps_skipped("13")
                 return
         self.step("12b")
         if self.pics_guard(self.check_pics("DRLK.S.F08") and self.check_pics("DRLK.S.C1a.Rsp")):
@@ -590,7 +591,8 @@ class TC_DRLK_2_13(MatterBaseTest):
             if self.max_aliro_keys_supported > self.numberofcredentialsupportedperuser:
                 logging.info(
                     "Skipping execution from Step 29a to step 35 since 'max_aliro_keys_supported > numberofcredentialsupportedperuser' as per test plan spec")
-                self.skip_all_remaining_steps("29a")
+                self.mark_all_remaining_steps_skipped("29a")
+                return
             else:
                 # Perform setUser as we have removed user in previous step and SetCredentials always expects a user with index to be present
                 self.step("29a")

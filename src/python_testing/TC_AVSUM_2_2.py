@@ -38,11 +38,12 @@
 
 import random
 
-import chip.clusters as Clusters
-from chip.interaction_model import Status
-from chip.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main, has_cluster, run_if_endpoint_matches
 from mobly import asserts
 from TC_AVSUMTestBase import AVSUMTestBase
+
+import matter.clusters as Clusters
+from matter.interaction_model import Status
+from matter.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main, has_cluster, run_if_endpoint_matches
 
 
 class TC_AVSUM_2_2(MatterBaseTest, AVSUMTestBase):
@@ -62,27 +63,27 @@ class TC_AVSUM_2_2(MatterBaseTest, AVSUMTestBase):
             TestStep(5, "Read and verify the PanMax attribute."),
             TestStep(6, "Create a valid value for a Pan"),
             TestStep(7, "Set the new Pan value via the MPTZSetPosition command. Verify success response."),
-            TestStep(8, "Read MPTZPosition. Verify the Pan value is that set in Step 4."),
+            TestStep(8, "Read MPTZPosition. Verify the Pan value is that set in Step 7."),
             TestStep(9, "If PIXIT.CANBEMADEBUSY is set, place the DUT into a state where it cannot accept a command. Else jump to step 11."),
             TestStep(10, "Send an MPTZSetPositionCommand with the previously set Pan value. Verify failure response."),
             TestStep(11, "Create an invalid value for a Pan."),
             TestStep(12, "Set the invalid value via the MPTZSetPosition command. Verify failure response."),
-            TestStep(13, "Read MPTZPosition. Verify the Pan value is that set in Step 4."),
+            TestStep(13, "Read MPTZPosition. Verify the Pan value is that set in Step 7."),
             TestStep(14, "If Tilt is supported, read and verify the TiltMin and TiltMax attributes. If not skip to step 13"),
             TestStep(15, "Read and verify the TiltMax attribute."),
             TestStep(16, "Create a valid value for a Tilt different from the initial value."),
             TestStep(17, "Set the new Tilt value via the MPTZSetPosition command. Verify success response."),
-            TestStep(18, "Read MPTZPosition. Verify the Tilt value is that set in Step 9."),
+            TestStep(18, "Read MPTZPosition. Verify the Tilt value is that set in Step 16."),
             TestStep(19, "Create an invalid value for a Tilt."),
             TestStep(20, "Set the invalid value via the MPTZSetPosition command. Verify failure response."),
-            TestStep(21, "Read MPTZPosition. Verify the Tilt value is that set in Step 9."),
+            TestStep(21, "Read MPTZPosition. Verify the Tilt value is that set in Step 16."),
             TestStep(22, "If Zoom is supported, read and verify the ZoomMax attribute."),
             TestStep(23, "Create a valid value for Zoom."),
             TestStep(24, "Set the new Zoom value via the MPTZSetPosition command. Verify success response."),
-            TestStep(25, "Read MPTZPosition. Verify the Zoom value is that set in Step 14."),
+            TestStep(25, "Read MPTZPosition. Verify the Zoom value is that set in Step 24."),
             TestStep(26, "Create an invalid value for a Zoom."),
             TestStep(27, "Set the invalid value via the MPTZSetPosition command. Verify failure response."),
-            TestStep(28, "Read MPTZPosition. Verify the Tilt value is that set in Step 14."),
+            TestStep(28, "Read MPTZPosition. Verify the Zoom value is that set in Step 24."),
         ]
         return steps
 
@@ -110,10 +111,11 @@ class TC_AVSUM_2_2(MatterBaseTest, AVSUMTestBase):
         attribute_list = await self.read_avsum_attribute_expect_success(endpoint, attributes.AttributeList)
 
         if not (self.has_feature_mpan | self.has_feature_mtilt | self.has_feature_mzoom):
-            asserts.fail("One of MPAN, MTILT, or MZOOM is mandatory")
+            asserts.fail("One of MPAN, MTILT, or MZOOM is mandatory for command support")
 
         self.step(2)
-        asserts.assert_in(attributes.MPTZPosition.attribute_id, attribute_list, "MPTZPosition attribute is mandatory.")
+        asserts.assert_in(attributes.MPTZPosition.attribute_id, attribute_list,
+                          "MPTZPosition attribute is mandatory if the command is supported.")
         mptzposition_dut = await self.read_avsum_attribute_expect_success(endpoint, attributes.MPTZPosition)
         initialPan = mptzposition_dut.pan
         initialTilt = mptzposition_dut.tilt
@@ -160,7 +162,7 @@ class TC_AVSUM_2_2(MatterBaseTest, AVSUMTestBase):
             if canbemadebusy:
                 self.step(10)
                 # Busy response check
-                if not self.is_ci:
+                if not self.is_pics_sdk_ci_only:
                     self.wait_for_user_input(prompt_msg="Place device into a busy state. Hit ENTER once ready.")
                     await self.send_mptz_set_pan_position_command(endpoint, newPan, expected_status=Status.Busy)
             else:

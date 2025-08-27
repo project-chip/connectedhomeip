@@ -62,14 +62,15 @@ import os
 import random
 import tempfile
 
-import chip.clusters as Clusters
-from chip.clusters.Types import NullValue
-from chip.interaction_model import Status
-from chip.testing.apps import AppServerSubprocess
-from chip.testing.matter_testing import (MatterBaseTest, SetupParameters, TestStep, async_test_body, default_matter_test_main,
-                                         type_matches)
-from chip.tlv import uint
 from mobly import asserts
+
+import matter.clusters as Clusters
+from matter.clusters.Types import NullValue
+from matter.interaction_model import Status
+from matter.testing.apps import AppServerSubprocess
+from matter.testing.commissioning import SetupParameters
+from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main, type_matches
+from matter.tlv import uint
 
 
 class TC_ECOINFO_2_1(MatterBaseTest):
@@ -126,7 +127,8 @@ class TC_ECOINFO_2_1(MatterBaseTest):
             expected_output="Server initialization complete",
             timeout=30)
 
-        # Add some server to the DUT_FSA's Aggregator/Bridge.
+        # Automatically commission some server to the DUT_FSA using the command line interface provided
+        # by either the unified fabric-sync app or the fabric-admin + fabric-bridge apps.
         if self.user_params.get("unified_fabric_sync_app"):
             self.dut_fsa_stdin.write(f"app pair-device 2 {self.th_server_setup_params.qr_code}\n")
         else:

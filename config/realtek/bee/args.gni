@@ -42,7 +42,7 @@ chip_enable_ota_requestor = false
 
 chip_system_config_use_openthread_inet_endpoints = true
 chip_with_lwip = false
-openthread_root = ""
+openthread_root = "//third_party/openthread/repo"
 chip_openthread_target = "//config/realtek/bee/openthread:openthread"
 
 chip_config_network_layer_ble = true

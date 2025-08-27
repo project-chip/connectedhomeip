@@ -32,14 +32,20 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
 {
     switch (path.mAttributeId)
     {
-    case Attributes::SupportedZoneSources::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, supportedZoneSources);
+    case Attributes::MaxUserDefinedZones::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, maxUserDefinedZones);
+    case Attributes::MaxZones::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, maxZones);
     case Attributes::Zones::TypeInfo::GetAttributeId():
         return DataModel::Decode(reader, zones);
     case Attributes::Triggers::TypeInfo::GetAttributeId():
         return DataModel::Decode(reader, triggers);
+    case Attributes::SensitivityMax::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, sensitivityMax);
     case Attributes::Sensitivity::TypeInfo::GetAttributeId():
         return DataModel::Decode(reader, sensitivity);
+    case Attributes::TwoDCartesianMax::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, twoDCartesianMax);
     case Attributes::GeneratedCommandList::TypeInfo::GetAttributeId():
         return DataModel::Decode(reader, generatedCommandList);
     case Attributes::AcceptedCommandList::TypeInfo::GetAttributeId():

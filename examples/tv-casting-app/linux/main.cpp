@@ -174,7 +174,8 @@ int main(int argc, char * argv[])
     {
         // TODO: Replace testingRootStore with a AttestationTrustStore that has the necessary official PAA roots available
         const chip::Credentials::AttestationTrustStore * testingRootStore = chip::Credentials::GetTestAttestationTrustStore();
-        SetDeviceAttestationVerifier(GetDefaultDACVerifier(testingRootStore));
+        chip::Credentials::DeviceAttestationRevocationDelegate * kDeviceAttestationRevocationNotChecked = nullptr;
+        SetDeviceAttestationVerifier(GetDefaultDACVerifier(testingRootStore, kDeviceAttestationRevocationNotChecked));
     }
 
     SuccessOrExit(err = CastingServer::GetInstance()->PreInit());
