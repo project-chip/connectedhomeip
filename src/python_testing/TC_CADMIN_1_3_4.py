@@ -45,18 +45,18 @@
 # === END CI TEST ARGUMENTS ===
 
 import asyncio
-import base64
 import logging
 import random
 from time import sleep
 
-import chip.clusters as Clusters
-from chip import ChipDeviceCtrl
-from chip.exceptions import ChipStackError
-from chip.testing.matter_testing import TestStep, default_matter_test_main, has_cluster, has_feature, run_if_endpoint_matches
-from chip.tlv import TLVReader
 from mobly import asserts
 from support_modules.cadmin_support import CADMINBaseTest
+
+import matter.clusters as Clusters
+from matter import ChipDeviceCtrl
+from matter.exceptions import ChipStackError
+from matter.testing.matter_testing import TestStep, default_matter_test_main, has_cluster, has_feature, run_if_endpoint_matches
+from matter.tlv import TLVReader
 
 opcreds = Clusters.OperationalCredentials
 nonce = random.randbytes(32)
@@ -150,8 +150,8 @@ class TC_CADMIN(CADMINBaseTest):
         self.step(5)
         # TH_CR1 reads the Fabrics attribute
         th1_fabric_info = await self.get_fabrics(th=self.th1)
-        th1_cam_rcac = TLVReader(base64.b64decode(
-            self.certificate_authority_manager.activeCaList[0]._persistentStorage._jsonData["sdk-config"]["f/1/r"])).get()["Any"][9]
+        th1_cam_rcac = TLVReader(
+            self.certificate_authority_manager.activeCaList[0]._persistentStorage.GetSdkKey("f/1/r")).get()["Any"][9]
         if th1_fabric_info[0].rootPublicKey != th1_cam_rcac:
             asserts.fail("Public keys from fabric and certs for TH1 are not the same.")
         if th1_fabric_info[0].nodeID != self.dut_node_id:

@@ -37,12 +37,13 @@
 
 import logging
 
-from chip.ChipDeviceCtrl import TransportPayloadCapability
-from chip.clusters import CameraAvStreamManagement, Objects, WebRTCTransportRequestor
-from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
-from chip.webrtc import PeerConnection, WebRTCManager
 from mobly import asserts
 from test_plan_support import commission_if_required
+
+from matter.ChipDeviceCtrl import TransportPayloadCapability
+from matter.clusters import CameraAvStreamManagement, Objects, WebRTCTransportRequestor
+from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+from matter.webrtc import PeerConnection, WebRTCManager
 
 
 class TC_WEBRTC_1_5(MatterBaseTest):
@@ -182,7 +183,7 @@ class TC_WEBRTC_1_5(MatterBaseTest):
             aRateDistortionTradeOffPoints = await self.read_avstr_attribute_expect_success(
                 endpoint, attrs.RateDistortionTradeOffPoints
             )
-            aMinViewport = await self.read_avstr_attribute_expect_success(endpoint, attrs.MinViewport)
+            aMinViewportRes = await self.read_avstr_attribute_expect_success(endpoint, attrs.MinViewportResolution)
             aVideoSensorParams = await self.read_avstr_attribute_expect_success(endpoint, attrs.VideoSensorParams)
 
             response = await self.send_single_cmd(
@@ -191,14 +192,13 @@ class TC_WEBRTC_1_5(MatterBaseTest):
                     videoCodec=aRateDistortionTradeOffPoints[0].codec,
                     minFrameRate=30,
                     maxFrameRate=aVideoSensorParams.maxFPS,
-                    minResolution=aMinViewport,
+                    minResolution=aMinViewportRes,
                     maxResolution=CameraAvStreamManagement.Structs.VideoResolutionStruct(
                         width=aVideoSensorParams.sensorWidth, height=aVideoSensorParams.sensorHeight
                     ),
                     minBitRate=aRateDistortionTradeOffPoints[0].minBitRate,
                     maxBitRate=aRateDistortionTradeOffPoints[0].minBitRate,
-                    minKeyFrameInterval=2000,
-                    maxKeyFrameInterval=8000,
+                    keyFrameInterval=4000,
                     watermarkEnabled=watermark,
                     OSDEnabled=osd,
                 ),

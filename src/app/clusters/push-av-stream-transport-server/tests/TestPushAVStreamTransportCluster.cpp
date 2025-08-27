@@ -214,7 +214,7 @@ class TestPushAVStreamTransportDelegateImpl : public PushAvStreamTransportDelega
 {
 public:
     Protocols::InteractionModel::Status AllocatePushTransport(const TransportOptionsStruct & transportOptions,
-                                                              const uint16_t connectionID)
+                                                              const uint16_t connectionID) override
     {
         PushAvStream stream{ connectionID, transportOptions, TransportStatusEnum::kInactive,
                              PushAvStreamTransportStatusEnum::kIdle };
@@ -225,7 +225,7 @@ public:
         return Status::Success;
     }
 
-    Protocols::InteractionModel::Status DeallocatePushTransport(const uint16_t connectionID)
+    Protocols::InteractionModel::Status DeallocatePushTransport(const uint16_t connectionID) override
     {
         pushavStreams.erase(std::remove_if(pushavStreams.begin(), pushavStreams.end(),
                                            [connectionID](const PushAvStream & stream) { return stream.id == connectionID; }),
@@ -235,7 +235,7 @@ public:
     }
 
     Protocols::InteractionModel::Status ModifyPushTransport(const uint16_t connectionID,
-                                                            const TransportOptionsStorage transportOptions)
+                                                            const TransportOptionsStorage transportOptions) override
     {
         for (PushAvStream & stream : pushavStreams)
         {
@@ -250,7 +250,7 @@ public:
     }
 
     Protocols::InteractionModel::Status SetTransportStatus(const std::vector<uint16_t> connectionIDList,
-                                                           TransportStatusEnum transportStatus)
+                                                           TransportStatusEnum transportStatus) override
     {
         for (PushAvStream & stream : pushavStreams)
         {
@@ -268,7 +268,7 @@ public:
 
     Protocols::InteractionModel::Status
     ManuallyTriggerTransport(const uint16_t connectionID, TriggerActivationReasonEnum activationReason,
-                             const Optional<Structs::TransportMotionTriggerTimeControlStruct::DecodableType> & timeControl)
+                             const Optional<Structs::TransportMotionTriggerTimeControlStruct::DecodableType> & timeControl) override
     {
         // TODO: Validates the requested stream usage against the camera's resource management and stream priority policies.
         for (PushAvStream & stream : pushavStreams)
@@ -282,46 +282,46 @@ public:
         return Status::Success;
     }
 
-    Protocols::InteractionModel::Status ValidateBandwidthLimit(StreamUsageEnum streamUsage,
-                                                               const Optional<DataModel::Nullable<uint16_t>> & videoStreamId,
-                                                               const Optional<DataModel::Nullable<uint16_t>> & audioStreamId)
+    Protocols::InteractionModel::Status
+    ValidateBandwidthLimit(StreamUsageEnum streamUsage, const Optional<DataModel::Nullable<uint16_t>> & videoStreamId,
+                           const Optional<DataModel::Nullable<uint16_t>> & audioStreamId) override
     {
         // TODO: Validates the requested stream usage against the camera's resource management.
         // Returning Status::Success to pass through checks in the Server Implementation.
         return Status::Success;
     }
 
-    bool ValidateUrl(std::string url) { return true; }
+    bool ValidateUrl(const std::string & url) override { return true; }
 
-    Protocols::InteractionModel::Status SelectVideoStream(StreamUsageEnum streamUsage, uint16_t & videoStreamId)
+    Protocols::InteractionModel::Status SelectVideoStream(StreamUsageEnum streamUsage, uint16_t & videoStreamId) override
     {
         // TODO: Select and Assign videoStreamID from the allocated videoStreams
         // Returning Status::Success to pass through checks in the Server Implementation.
         return Status::Success;
     }
 
-    Protocols::InteractionModel::Status SelectAudioStream(StreamUsageEnum streamUsage, uint16_t & audioStreamId)
+    Protocols::InteractionModel::Status SelectAudioStream(StreamUsageEnum streamUsage, uint16_t & audioStreamId) override
     {
         // TODO: Select and Assign audioStreamID from the allocated audioStreams
         // Returning Status::Success to pass through checks in the Server Implementation.
         return Status::Success;
     }
 
-    Protocols::InteractionModel::Status ValidateVideoStream(uint16_t videoStreamId)
+    Protocols::InteractionModel::Status ValidateVideoStream(uint16_t videoStreamId) override
     {
         // TODO: Validate videoStreamID from the allocated videoStreams
         // Returning Status::Success to pass through checks in the Server Implementation.
         return Status::Success;
     }
 
-    Protocols::InteractionModel::Status ValidateAudioStream(uint16_t audioStreamId)
+    Protocols::InteractionModel::Status ValidateAudioStream(uint16_t audioStreamId) override
     {
         // TODO: Validate audioStreamID from the allocated audioStreams
         // Returning Status::Success to pass through checks in the Server Implementation.
         return Status::Success;
     }
 
-    PushAvStreamTransportStatusEnum GetTransportBusyStatus(const uint16_t connectionID)
+    PushAvStreamTransportStatusEnum GetTransportBusyStatus(const uint16_t connectionID) override
     {
         for (PushAvStream & stream : pushavStreams)
         {
@@ -333,25 +333,22 @@ public:
         return PushAvStreamTransportStatusEnum::kUnknown;
     }
 
-    void OnAttributeChanged(AttributeId attributeId)
+    void OnAttributeChanged(AttributeId attributeId) override
     {
         ChipLogProgress(Zcl, "Attribute changed for AttributeId = " ChipLogFormatMEI, ChipLogValueMEI(attributeId));
     }
 
     void Init() { ChipLogProgress(Zcl, "Push AV Stream Transport Initialized"); }
-    CHIP_ERROR
-    LoadCurrentConnections(std::vector<TransportConfigurationStorage> & currentConnections)
+
+    CHIP_ERROR LoadCurrentConnections(std::vector<TransportConfigurationStorage> & currentConnections) override
     {
         ChipLogProgress(Zcl, "Push AV Current Connections loaded");
-
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR
-    PersistentAttributesLoadedCallback()
+    CHIP_ERROR PersistentAttributesLoadedCallback() override
     {
         ChipLogProgress(Zcl, "Persistent attributes loaded");
-
         return CHIP_NO_ERROR;
     }
 
@@ -1072,7 +1069,7 @@ TEST_F(MockEventLogging, Test_AllocateTransport_ModifyTransport_FindTransport_Fi
     ConcreteCommandPath kFindCommandPath{ 1, Clusters::PushAvStreamTransport::Id, Commands::FindTransport::Id };
     Commands::FindTransport::DecodableType findCommandData;
     // As connectionID is static, the new allocated connectionID will be 2.
-    findCommandData.connectionID.SetValue(DataModel::MakeNullable(allocatedConnectionID));
+    findCommandData.connectionID.SetNonNull(allocatedConnectionID);
 
     server.GetLogic().HandleFindTransport(findCommandHandler, kFindCommandPath, findCommandData);
 
