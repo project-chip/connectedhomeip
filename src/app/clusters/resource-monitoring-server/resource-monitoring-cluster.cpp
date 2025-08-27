@@ -35,7 +35,6 @@ namespace Clusters {
 namespace ResourceMonitoring {
 
 ResourceMonitoringCluster::ResourceMonitoringCluster(
-    ResourceMonitoringDelegate* aDelegate,
     EndpointId aEndpointId,
     ClusterId aClusterId,
     uint32_t aFeatureMap,
@@ -43,12 +42,24 @@ ResourceMonitoringCluster::ResourceMonitoringCluster(
     bool aResetConditionCommandSupported
 ) :    
     DefaultServerCluster(ConcreteClusterPath(aEndpointId, aClusterId)),
-    mDelegate(aDelegate),
-    mFeatureMap(aFeatureMap),
     mDegradationDirection(aDegradationDirection),
+    mFeatureMap(aFeatureMap),
     mResetConditionCommandSupported(aResetConditionCommandSupported)
 {
-    mDelegate->SetInstance(this);
+}
+
+
+CHIP_ERROR ResourceMonitoringCluster::SetDelegate(ResourceMonitoringDelegate* aDelegate)
+{
+    if (aDelegate != nullptr)
+    {
+        mDelegate = aDelegate;
+        mDelegate->SetInstance(this);
+        ChipLogDetail(Zcl, "ResourceMonitoring: calling mDelegate->Init()");
+        ReturnErrorOnFailure(mDelegate->Init());
+    }
+
+    return CHIP_NO_ERROR;
 }
 
 bool ResourceMonitoringCluster::HasFeature(ResourceMonitoring::Feature aFeature) const
@@ -83,68 +94,68 @@ DataModel::ActionReturnStatus ResourceMonitoringCluster::WriteImpl(const DataMod
 DataModel::ActionReturnStatus ResourceMonitoringCluster::ReadActivatedCarbonFilterMonitoringAttribute(
     const DataModel::ReadAttributeRequest & request, AttributeValueEncoder & encoder)
 {
-     switch (request.path.mAttributeId)
+    switch (request.path.mAttributeId)
     {
-    case ActivatedCarbonFilterMonitoring::Attributes::Condition::Id: {
-        return encoder.Encode(mCondition);
-    }
-    case ActivatedCarbonFilterMonitoring::Attributes::FeatureMap::Id: {
-        return encoder.Encode(mFeatureMap);
-    }
-    case ActivatedCarbonFilterMonitoring::Attributes::DegradationDirection::Id: {
-        return encoder.Encode(mDegradationDirection);
-    }
-    case ActivatedCarbonFilterMonitoring::Attributes::ChangeIndication::Id: {
-        return encoder.Encode(mChangeIndication);
-    }
-    case ActivatedCarbonFilterMonitoring::Attributes::InPlaceIndicator::Id: {
-        return encoder.Encode(mInPlaceIndicator);
-    }
-    case ActivatedCarbonFilterMonitoring::Attributes::LastChangedTime::Id: {
-        return encoder.Encode(mLastChangedTime);
-    }
-    case ActivatedCarbonFilterMonitoring::Attributes::ReplacementProductList::Id: {
-        return DataModel::ActionReturnStatus{ReadReplaceableProductList(encoder)};
-    }
-    case ActivatedCarbonFilterMonitoring::Attributes::ClusterRevision::Id: {
-        return encoder.Encode(HepaFilterMonitoring::kRevision);
-    }
-    default:
-        return Protocols::InteractionModel::Status::UnreportableAttribute;
+        case ActivatedCarbonFilterMonitoring::Attributes::Condition::Id: {
+            return encoder.Encode(mCondition);
+        }
+        case ActivatedCarbonFilterMonitoring::Attributes::FeatureMap::Id: {
+            return encoder.Encode(mFeatureMap);
+        }
+        case ActivatedCarbonFilterMonitoring::Attributes::DegradationDirection::Id: {
+            return encoder.Encode(mDegradationDirection);
+        }
+        case ActivatedCarbonFilterMonitoring::Attributes::ChangeIndication::Id: {
+            return encoder.Encode(mChangeIndication);
+        }
+        case ActivatedCarbonFilterMonitoring::Attributes::InPlaceIndicator::Id: {
+            return encoder.Encode(mInPlaceIndicator);
+        }
+        case ActivatedCarbonFilterMonitoring::Attributes::LastChangedTime::Id: {
+            return encoder.Encode(mLastChangedTime);
+        }
+        case ActivatedCarbonFilterMonitoring::Attributes::ReplacementProductList::Id: {
+            return DataModel::ActionReturnStatus{ReadReplaceableProductList(encoder)};
+        }
+        case ActivatedCarbonFilterMonitoring::Attributes::ClusterRevision::Id: {
+            return encoder.Encode(HepaFilterMonitoring::kRevision);
+        }
+        default:
+            return Protocols::InteractionModel::Status::UnreportableAttribute;
     }
 }
 
 DataModel::ActionReturnStatus ResourceMonitoringCluster::ReadHepaFilterMonitoringAttribute(
     const DataModel::ReadAttributeRequest & request, AttributeValueEncoder & encoder)
 {
-     switch (request.path.mAttributeId)
+    switch (request.path.mAttributeId)
     {
-    case HepaFilterMonitoring::Attributes::Condition::Id: {
-        return encoder.Encode(mCondition);
-    }
-    case HepaFilterMonitoring::Attributes::FeatureMap::Id: {
-        return encoder.Encode(mFeatureMap);
-    }
-    case HepaFilterMonitoring::Attributes::DegradationDirection::Id: {
-        return encoder.Encode(mDegradationDirection);
-    }
-    case HepaFilterMonitoring::Attributes::ChangeIndication::Id: {
-        return encoder.Encode(mChangeIndication);
-    }
-    case HepaFilterMonitoring::Attributes::InPlaceIndicator::Id: {
-        return encoder.Encode(mInPlaceIndicator);
-    }
-    case HepaFilterMonitoring::Attributes::LastChangedTime::Id: {
-        return encoder.Encode(mLastChangedTime);
-    }
-    case HepaFilterMonitoring::Attributes::ReplacementProductList::Id: {
-        return DataModel::ActionReturnStatus{ReadReplaceableProductList(encoder)};
-    }
-    case HepaFilterMonitoring::Attributes::ClusterRevision::Id: {
-        return encoder.Encode(HepaFilterMonitoring::kRevision);
-    }
-    default:
-        return Protocols::InteractionModel::Status::UnreportableAttribute;
+        case HepaFilterMonitoring::Attributes::Condition::Id: {
+            return encoder.Encode(mCondition);
+        }
+        case HepaFilterMonitoring::Attributes::FeatureMap::Id: {
+            return encoder.Encode(mFeatureMap);
+        }
+        case HepaFilterMonitoring::Attributes::DegradationDirection::Id: {
+            return encoder.Encode(mDegradationDirection);
+        }
+        case HepaFilterMonitoring::Attributes::ChangeIndication::Id: {
+            return encoder.Encode(mChangeIndication);
+        }
+        case HepaFilterMonitoring::Attributes::InPlaceIndicator::Id: {
+            return encoder.Encode(mInPlaceIndicator);
+        }
+        case HepaFilterMonitoring::Attributes::LastChangedTime::Id: {
+            return encoder.Encode(mLastChangedTime);
+        }
+        case HepaFilterMonitoring::Attributes::ReplacementProductList::Id: {
+            return DataModel::ActionReturnStatus{ReadReplaceableProductList(encoder)};
+        }
+        case HepaFilterMonitoring::Attributes::ClusterRevision::Id: {
+            return encoder.Encode(HepaFilterMonitoring::kRevision);
+        }
+        default:
+            return Protocols::InteractionModel::Status::UnreportableAttribute;
     }
 }
 
@@ -214,12 +225,10 @@ chip::Protocols::InteractionModel::Status ResourceMonitoringCluster::UpdateCondi
     if (mCondition != oldConditionattr)
     {
         if (mClusterId == HepaFilterMonitoring::Id) {
-            // MatterReportingAttributeChangeCallback(mEndpointId, mClusterId, Attributes::Condition::Id);
             NotifyAttributeChanged(HepaFilterMonitoring::Attributes::Condition::Id);
         } 
 
         if (mClusterId == ActivatedCarbonFilterMonitoring::Id) {
-            // MatterReportingAttributeChangeCallback(mEndpointId, mClusterId, Attributes::Condition::Id);
             NotifyAttributeChanged(ActivatedCarbonFilterMonitoring::Attributes::Condition::Id);
         }
     }
@@ -254,12 +263,10 @@ chip::Protocols::InteractionModel::Status ResourceMonitoringCluster::UpdateInPla
     if (mInPlaceIndicator != oldInPlaceIndicator)
     {
         if (mClusterId == HepaFilterMonitoring::Id) {
-            // MatterReportingAttributeChangeCallback(mEndpointId, mClusterId, Attributes::InPlaceIndicator::Id);
             NotifyAttributeChanged(HepaFilterMonitoring::Attributes::InPlaceIndicator::Id);   
         }
         
         if (mClusterId == ActivatedCarbonFilterMonitoring::Id) {
-            // MatterReportingAttributeChangeCallback(mEndpointId, mClusterId, Attributes::InPlaceIndicator::Id);
             NotifyAttributeChanged(ActivatedCarbonFilterMonitoring::Attributes::InPlaceIndicator::Id);   
         }
     }
@@ -328,9 +335,6 @@ CHIP_ERROR ResourceMonitoringCluster::Startup(ServerClusterContext & context)
 {
     ReturnErrorOnFailure(DefaultServerCluster::Startup(context));
     LoadPersistentAttributes();
-
-    // ReturnErrorOnFailure(CommandHandlerInterfaceRegistry::Instance().RegisterCommandHandler(this));
-    // VerifyOrReturnError(AttributeAccessInterfaceRegistry::Instance().Register(this), CHIP_ERROR_INCORRECT_STATE);
 
     return CHIP_NO_ERROR;
 }

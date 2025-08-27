@@ -16,13 +16,16 @@
 TARGET_SOURCES(
   ${APP_TARGET}
   PRIVATE
-    "${CLUSTER_DIR}/CodegenIntegration.cpp"
+    "${CLUSTER_DIR}/CodegenIntegration.cpp",
+    "${CLUSTER_DIR}/CodegenIntegration.h",
 )
 
 # These are the things that BUILD.gn dependencies would pull
 TARGET_SOURCES(
   ${APP_TARGET}
   PRIVATE
+    "${CLUSTER_DIR}/"resource-monitoring-cluster-objects.cpp",
+    "${CLUSTER_DIR}/"resource-monitoring-cluster-objects.h",
     "${CLUSTER_DIR}/replacement-product-list-manager.h"
     "${CLUSTER_DIR}/resource-monitoring-cluster.cpp"
     "${CLUSTER_DIR}/resource-monitoring-cluster.h"
