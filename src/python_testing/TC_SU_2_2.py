@@ -52,12 +52,13 @@ import signal
 import psutil
 import socket
 
+import matter.clusters as Clusters
+from matter import ChipDeviceCtrl
+from matter.interaction_model import Status
+from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+from matter.testing.event_attribute_reporting import AttributeSubscriptionHandler, AttributeMatcher
 
-import chip.clusters as Clusters
-from chip import ChipDeviceCtrl
-from chip.interaction_model import Status
-from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main, AttributeChangeCallback
-from chip.testing.matter_testing import ClusterAttributeChangeAccumulator, AttributeMatcher
+from matter.testing import matter_asserts
 
 from mobly import asserts
 
@@ -461,14 +462,14 @@ class TC_SU_2_2(MatterBaseTest):
 
         logger.info(f'{step_number_s1}: Step #1.1.1 - Create an accumulator for the UpdateState attribute')
         # UpdateState Accumulator
-        accumulator_state = ClusterAttributeChangeAccumulator(
+        accumulator_state = AttributeSubscriptionHandler(
             expected_cluster=Clusters.OtaSoftwareUpdateRequestor,
             expected_attribute=Clusters.OtaSoftwareUpdateRequestor.Attributes.UpdateState
         )
 
         logger.info(f'{step_number_s1}: Step #1.1.2 - Create an accumulator for the UpdateStateProgress attribute')
         # UpdateProgress Accumulator
-        accumulator_progress = ClusterAttributeChangeAccumulator(
+        accumulator_progress = AttributeSubscriptionHandler(
             expected_cluster=Clusters.OtaSoftwareUpdateRequestor,
             expected_attribute=Clusters.OtaSoftwareUpdateRequestor.Attributes.UpdateStateProgress
         )
@@ -712,7 +713,7 @@ class TC_SU_2_2(MatterBaseTest):
 
         logger.info(f'{step_number_s2}:Step #2.1 - Create an accumulator for the UpdateState attribute.')
         # UpdateState Accumulator
-        accumulator_state = ClusterAttributeChangeAccumulator(
+        accumulator_state = AttributeSubscriptionHandler(
             expected_cluster=Clusters.OtaSoftwareUpdateRequestor,
             expected_attribute=Clusters.OtaSoftwareUpdateRequestor.Attributes.UpdateState
         )
