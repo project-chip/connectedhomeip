@@ -143,12 +143,12 @@ class TC_SETRF_2_2(CommodityTariffTestBaseHelper):
 
         self.step("4")
         # TH reads TariffComponents attribute, expects a list of TariffComponentStruct
-        self.tariffComponentValue = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.TariffComponents)
-        await self.check_tariff_components_attribute(endpoint, self.tariffComponentValue)
-        tariffComponentIDs.extend(await self.get_tariff_components_IDs_from_tariff_components_attribute(self.tariffComponentValue))
-        tariffComponentID1 = self.tariffComponentValue[0].tariffComponentID
-        label1 = self.tariffComponentValue[0].label
-        tariffComponentStruct1 = self.tariffComponentValue[0]
+        self.tariffComponentsValue = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.TariffComponents)
+        await self.check_tariff_components_attribute(endpoint, self.tariffComponentsValue)
+        tariffComponentIDs.extend(await self.get_tariff_components_IDs_from_tariff_components_attribute(self.tariffComponentsValue))
+        tariffComponentID1 = self.tariffComponentsValue[0].tariffComponentID
+        label1 = self.tariffComponentsValue[0].label
+        tariffComponentStruct1 = self.tariffComponentsValue[0]
 
         self.step("5")
         # TH reads TariffPeriods attribute, expects a list of TariffPeriodStruct

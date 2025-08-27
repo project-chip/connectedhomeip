@@ -42,16 +42,21 @@ class CommodityTariffTestBaseHelper(MatterBaseTest):
     EventTriggerChangeTime = 0x0700000000000003
 
     # Variables to store values between test steps
-    startDateAttributeValue = None
-    defaultRandomizationType = None
-    defaultRandomizationOffset = None
-    BlockModeValue = None
-    tariffInformationValue = None
-    tariffComponentValue = None
-    tariffPeriodsValue = None
-    dayEntriesValue = None
-    currentDayEntryDateValue = None
-    dayEntryIDsEvents = []
+    # Attributes
+    startDateAttributeValue: int = None
+    defaultRandomizationType: cluster.Attributes.DefaultRandomizationType = None
+    defaultRandomizationOffset: int = None
+    tariffInformationValue: cluster.Structs.TariffInformationStruct = None
+    tariffComponentsValue: List[cluster.Structs.TariffComponentStruct] = None
+    tariffPeriodsValue: List[cluster.Structs.TariffPeriodStruct] = None
+    dayEntriesValue: List[cluster.Structs.DayEntryStruct] = None
+    currentDayEntryDateValue: int = None
+
+    # Fields
+    BlockModeValue: cluster.Enums.BlockModeEnum = None
+
+    # Other
+    dayEntryIDsEvents: List[int] = []
 
     async def check_list_elements_uniqueness(self, list_to_check: list[Any], object_name: str = "Elements") -> None:
         """
@@ -783,22 +788,22 @@ class CommodityTariffTestBaseHelper(MatterBaseTest):
             attribute_value (Optional[List[cluster.Structs.TariffComponentStruct]], optional): TariffComponents attribute value. Defaults to None.
         """
 
-        self.tariffComponentValue = attribute_value
-        if not self.tariffComponentValue:
-            self.tariffComponentValue = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.TariffComponents)
+        self.tariffComponentsValue = attribute_value
+        if not self.tariffComponentsValue:
+            self.tariffComponentsValue = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.TariffComponents)
 
         if self.tariffInformationValue is not None and self.tariffInformationValue is NullValue:
-            asserts.assert_equal(self.tariffComponentValue, NullValue, "TariffComponents must be empty when TariffInfo is Null")
+            asserts.assert_equal(self.tariffComponentsValue, NullValue, "TariffComponents must be empty when TariffInfo is Null")
 
         # if attribute value is not null it must be list of TariffComponentStruct
-        if self.tariffComponentValue is not NullValue:
+        if self.tariffComponentsValue is not NullValue:
             matter_asserts.assert_list(
-                self.tariffComponentValue, "TariffComponents attribute must return a list with length greater or equal 1", min_length=1, max_length=672)
+                self.tariffComponentsValue, "TariffComponents attribute must return a list with length greater or equal 1", min_length=1, max_length=672)
             matter_asserts.assert_list_element_type(
-                self.tariffComponentValue, cluster.Structs.TariffComponentStruct, "TariffComponents attribute must contain TariffComponentStruct elements")
+                self.tariffComponentsValue, cluster.Structs.TariffComponentStruct, "TariffComponents attribute must contain TariffComponentStruct elements")
 
             # check each TariffComponentStruct
-            for item in self.tariffComponentValue:
+            for item in self.tariffComponentsValue:
                 await self.checkTariffComponentStruct(endpoint=endpoint, cluster=cluster, struct=item)
 
     async def check_tariff_periods_attribute(self, endpoint: int, attribute_value: Optional[List[cluster.Structs.TariffPeriodStruct]] = None) -> None:
