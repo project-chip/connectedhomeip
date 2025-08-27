@@ -556,22 +556,20 @@ PushAvStreamTransportServerLogic::HandleAllocatePushTransport(CommandHandler & h
         Status tlsEndpointValidityStatus = mTLSClientManagementDelegate->FindProvisionedEndpointByID(
             commandPath.mEndpointId, handler.GetAccessingFabricIndex(), commandData.transportOptions.endpointID, TLSEndpoint);
 
-        // Todo: Not Returning on Error as tls certificate management is not implemented yet
         VerifyOrDo(tlsEndpointValidityStatus == Status::Success, {
             ChipLogError(Zcl, "HandleAllocatePushTransport[ep=%d]: TLSEndpointID of command data is not valid/Provisioned",
                          mEndpointId);
-            // auto status = to_underlying(StatusCodeEnum::kInvalidTLSEndpoint);
-            //  handler.AddClusterSpecificFailure(commandPath, status);
-            //  return std::nullopt;
+            auto status = to_underlying(StatusCodeEnum::kInvalidTLSEndpoint);
+            handler.AddClusterSpecificFailure(commandPath, status);
+            return std::nullopt;
         });
     }
     else
     {
         ChipLogError(Zcl, "HandleAllocatePushTransport[ep=%d]: TLS Client Management Delegate is not set", mEndpointId);
-        // Todo: Not returning on error as tls certificate management is not implemented yet
-        // auto status = to_underlying(StatusCodeEnum::kInvalidTLSEndpoint);
-        // handler.AddClusterSpecificFailure(commandPath, status);
-        // return std::nullopt;
+        auto status = to_underlying(StatusCodeEnum::kInvalidTLSEndpoint);
+        handler.AddClusterSpecificFailure(commandPath, status);
+        return std::nullopt;
     }
 
     IngestMethodsEnum ingestMethod = commandData.transportOptions.ingestMethod;
