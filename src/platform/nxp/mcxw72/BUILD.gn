@@ -81,7 +81,7 @@ static_library("nxp_platform") {
   ]
   deps = []
   defines = [
-    "NXP_DEVICE_K32W1_MCXW7X=1",
+    "NXP_DEVICE_MCXW7X=1",
     "NXP_USE_MML=1",
   ]
 
@@ -141,7 +141,7 @@ static_library("nxp_platform") {
   public_deps = [ "${chip_root}/src/platform:platform_base" ]
 
   if (nxp_use_low_power) {
-    sources += [ "../mcxw71_k32w1/LowPowerHooks.cpp" ]
+    sources += [ "../mcxw71/LowPowerHooks.cpp" ]
   }
 
   deps += [
