@@ -615,6 +615,13 @@ Optional<System::Clock::Timeout> AutoCommissioner::GetCommandTimeout(DeviceProxy
     case CommissioningStage::kThreadNetworkEnable:
         timeout = System::Clock::Seconds16(mDeviceCommissioningInfo.network.thread.minConnectionTime);
         break;
+    case CommissioningStage::kScanNetworks:
+        // We're not sure which sort of scan we will do, so just use the larger
+        // of the timeouts we might have.  Note that anything we select here is
+        // still clamped to be at least kMinimumCommissioningStepTimeout below.
+        timeout = System::Clock::Seconds16(
+            std::max(mDeviceCommissioningInfo.network.wifi.maxScanTime, mDeviceCommissioningInfo.network.thread.maxScanTime));
+        break;
     case CommissioningStage::kSendNOC:
     case CommissioningStage::kSendOpCertSigningRequest:
         timeout = kSlowCryptoProcessingTime;
