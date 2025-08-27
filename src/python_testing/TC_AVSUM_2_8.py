@@ -172,7 +172,7 @@ class TC_AVSUM_2_8(MatterBaseTest, AVSUMTestBase):
                 break
 
         self.step(13)
-        minviewport = await self.read_avstr_attribute_expect_success(endpoint, attributesAVSTR.MinViewport)
+        minviewport = await self.read_avstr_attribute_expect_success(endpoint, attributesAVSTR.MinViewportResolution)
 
         # Current viewport is at the sensor max
         deltaX = -(sensordimensions.sensorWidth - minviewport.width + 1)
@@ -189,8 +189,8 @@ class TC_AVSUM_2_8(MatterBaseTest, AVSUMTestBase):
                 # verify the viewport dimensions
                 viewportwidth = streams.viewport.x2 - streams.viewport.x1
                 viewportheight = streams.viewport.y2 - streams.viewport.y1
-                asserts.assert_equal(viewportwidth, minviewport.width, "Viewport not set to the same width as MinViewport")
-                asserts.assert_equal(viewportheight, minviewport.height, "Viewport not set to the same height as MinViewport")
+                asserts.assert_equal(viewportwidth, minviewport.width, "Viewport not set to the same width as MinViewportResolution")
+                asserts.assert_equal(viewportheight, minviewport.height, "Viewport not set to the same height as MinViewportResolution")
                 match_found = True
                 break
 
