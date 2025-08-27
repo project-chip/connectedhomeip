@@ -223,7 +223,7 @@ def _GetDarwinFrameworkToolUnsupportedTests() -> Set[str]:
     }
 
 
-def _GetChipReplUnsupportedTests() -> Set[str]:
+def _GetReplUnsupportedTests() -> Set[str]:
     """Tests that fail in matter-repl for some reason"""
     return {
         "Test_AddNewFabricFromExistingFabric.yaml",     # matter-repl does not support GetCommissionerRootCertificate and IssueNocChain command
@@ -348,7 +348,7 @@ def _AllFoundYamlTests(treat_repl_unsupported_as_in_development: bool, treat_dft
     slow_tests = _GetSlowTests()
     extra_slow_tests = _GetExtraSlowTests()
     in_development_tests = _GetInDevelopmentTests()
-    matter_repl_unsupported_tests = _GetChipReplUnsupportedTests()
+    matter_repl_unsupported_tests = _GetReplUnsupportedTests()
     dft_unsupported_as_in_development_tests = _GetDarwinFrameworkToolUnsupportedTests()
     chip_tool_unsupported_as_in_development_tests = _GetChipToolUnsupportedTests()
     purposeful_failure_tests = _GetPurposefulFailureTests()
