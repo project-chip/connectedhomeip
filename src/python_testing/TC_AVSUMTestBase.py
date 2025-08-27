@@ -218,8 +218,9 @@ class AVSUMTestBase:
             for streams in dptz_streams_dut:
                 if streams.videoStreamID == videoStreamID:
                     # verify the viewport matches
-                    if (streams.viewport.x1 == viewport.z1) and (streams.viewport.x2 == viewport.x2) and (streams.viewport.y1 == viewport.y1) and (streams.viewport.y2 == viewport.y2):
+                    if (streams.viewport == viewport):
                         match_found = True
+                        break
 
         else:
             asserts.assert_fail("DPTZStreams is empty, even though a stream has been allocated")

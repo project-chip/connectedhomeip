@@ -131,6 +131,7 @@ class TC_AVSUM_2_8(MatterBaseTest, AVSUMTestBase):
                     # Save the viewport
                     myViewport = streams.viewport
                     match_found = True
+                    break
         else:
             asserts.assert_fail("DPTZStreams is empty, even though a stream has been allocated")
 
@@ -191,6 +192,7 @@ class TC_AVSUM_2_8(MatterBaseTest, AVSUMTestBase):
                 asserts.assert_equal(viewportwidth, minviewport.width, "Viewport not set to the same width as MinViewport")
                 asserts.assert_equal(viewportheight, minviewport.height, "Viewport not set to the same height as MinViewport")
                 match_found = True
+                break
 
         if not match_found:
             asserts.assert_fail("No matching stream found in DPTZStreams")
