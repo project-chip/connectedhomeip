@@ -500,7 +500,7 @@ jobs:
 
             - name: Run Tests using the python parser sending commands to chip-tool
               env:
-                LSAN_OPTIONS: "detect_leaks=0"
+                # LSAN_OPTIONS: "detect_leaks=0"
               run: |
                   ./scripts/run_in_build_env.sh \
                   "./scripts/tests/run_test_suite.py \
