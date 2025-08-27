@@ -619,6 +619,18 @@ public:
      **/
     CHIP_ERROR ECDH_derive_secret(const P256PublicKey & remote_public_key, P256ECDHDerivedSecret & out_secret) const override;
 
+    /**
+     * @brief Helper function to load a P256 keypair from raw private and public key byte spans.
+     * Combines the public and private key data into a serialized keypair format,
+     * then deserializes it into the provided keypair object.
+     *
+     * @param private_key ByteSpan containing the raw private key bytes.
+     * @param public_key ByteSpan containing the raw public key bytes.
+     * @param keypair Reference to a P256Keypair object to populate.
+     * @return CHIP_ERROR indicating success or failure of the operation.
+     */
+    CHIP_ERROR LoadKeypairFromRaw(ByteSpan private_key, ByteSpan public_key);
+
     /** @brief Return public key for the keypair.
      **/
     const P256PublicKey & Pubkey() const override { return mPublicKey; }
