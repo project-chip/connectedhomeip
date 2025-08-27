@@ -15,7 +15,8 @@
  *    limitations under the License.
  */
 #include <app/clusters/resource-monitoring-server/resource-monitoring-cluster.h>
-#include <app/static-cluster-config/ResourceMonitoringServer.h>
+#include <app/static-cluster-config/HepaFilterMonitoring.h>
+#include <app/static-cluster-config/ActivatedCarbonFilterMonitoring.h>
 #include <app/util/attribute-storage.h>
 #include <data-model-providers/codegen/CodegenDataModelProvider.h>
 
@@ -25,16 +26,18 @@
 using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;
+using namespace Protocols::InteractionModel;
 
 namespace {
 
+/// Choosing HepaFilterMonitoring as the fixed cluster for this example.    
 static constexpr size_t kResourceMonitoringFixedClusterCount =
-    ResourceMonitoring::StaticApplicationConfig::kFixedClusterConfig.size();
+    HepaFilterMonitoring::StaticApplicationConfig::kFixedClusterConfig.size();
 static constexpr size_t kResourceMonitoringMaxClusterCount = kResourceMonitoringFixedClusterCount + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT;
 
-LazyRegisteredServerCluster<ResourceMonitoringCluster> gServers[kResourceMonitoringMaxClusterCount];
+LazyRegisteredServerCluster<ResourceMonitoring::ResourceMonitoringCluster> gServers[kResourceMonitoringMaxClusterCount];
 
-// Find the 0-based array index corresponding to the given endpoint id.
+// Find the 0-based array index corresponding to the given {endpoint id, cluster id}.
 // Log an error if not found.
 bool findEndpointWithLog(EndpointId endpointId, ClusterId clusterId, uint16_t & outArrayIndex)
 {
@@ -53,27 +56,67 @@ bool findEndpointWithLog(EndpointId endpointId, ClusterId clusterId, uint16_t & 
     return true;
 }
 
+void CreateConcreteResourceMonitoringCluster(uint16_t arrayIndex, EndpointId endpointId, ClusterId clusterId)
+{
+    uint32_t rawFeatureMap{0};
+
+    /*
+    if (clusterId == HepaFilterMonitoring::Id) 
+    {
+        if (HepaFilterMonitoring::Attributes::FeatureMap::Get(endpointId, &rawFeatureMap) != Status::Success)
+        {
+            ChipLogError(AppServer, "Failed to get feature map for endpoint %u cluster %u", endpointId, clusterId);
+            rawFeatureMap = 0;
+        }
+    }
+    else if (clusterId == ActivatedCarbonFilterMonitoring::Id) 
+    {      
+        if (ActivatedCarbonFilterMonitoring::Attributes::FeatureMap::Get(endpointId, &rawFeatureMap) != Status::Success)
+        {
+            ChipLogError(AppServer, "Failed to get feature map for endpoint %u cluster %u", endpointId, clusterId);
+            rawFeatureMap = 0;
+        }
+    }
+    else 
+    {
+        ChipLogError(AppServer, "Invalid cluster id: %u for Resource Monitoring on endpoint: %u", clusterId, endpointId);
+        return;
+    }
+    */
+
+    gServers[arrayIndex].Create(
+        endpointId,
+        clusterId,
+        rawFeatureMap,
+        chip::app::Clusters::ResourceMonitoring::DegradationDirectionEnum::kDown,
+        true /* ResetCondition command supported */);
+}
+
 } // namespace
 
-void emberAfOtaSoftwareUpdateProviderClusterInitCallback(EndpointId endpointId, ClusterId clusterId)
+void emberAfResourceMonitotingClusterInitCallback(EndpointId endpointId, ClusterId clusterId)
 {
     uint16_t arrayIndex = 0;
     if (!findEndpointWithLog(endpointId, clusterId, arrayIndex))
     {
         return;
     }
-    gServers[arrayIndex].Create(endpointId);
+
+    // this call performs creation of concrete cluster object on gServers[arrayIndex]
+    CreateConcreteResourceMonitoringCluster(arrayIndex, endpointId, clusterId);
+
+
     CHIP_ERROR err = CodegenDataModelProvider::Instance().Registry().Register(gServers[arrayIndex].Registration());
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(AppServer, "Failed to register Resource Monitogin on endpoint %u: %" CHIP_ERROR_FORMAT, endpointId, err.Format());
+        ChipLogError(AppServer, "Failed to register Resource Monitoring on endpoint %u: %" CHIP_ERROR_FORMAT, endpointId, err.Format());
     }
 }
 
-void emberAfOtaSoftwareUpdateProviderClusterShutdownCallback(EndpointId endpointId)
+void emberAfResourceMonitoringClusterShutdownCallback(EndpointId endpointId, ClusterId clusterId)
 {
     uint16_t arrayIndex = 0;
-    if (!findEndpointWithLog(endpointId, arrayIndex))
+    if (!findEndpointWithLog(endpointId, clusterId, arrayIndex))
     {
         return;
     }
@@ -89,3 +132,24 @@ void emberAfOtaSoftwareUpdateProviderClusterShutdownCallback(EndpointId endpoint
 void MatterResourceMonitoringPluginServerInitCallback() {}
 
 void MatterResourceMonitoringPluginServerShutdownCallback() {}
+
+
+namespace chip {
+namespace app {
+namespace Clusters {
+namespace ResourceMonitoring {
+
+void SetDelegate(EndpointId endpointId, ClusterId clusterId, ResourceMonitoringDelegate * delegate)
+{
+    uint16_t arrayIndex = 0;
+    if (!findEndpointWithLog(endpointId, clusterId, arrayIndex))
+    {
+        return;
+    }
+    gServers[arrayIndex].Cluster().SetDelegate(delegate);
+}
+
+} // namespace ResourceMonitoring
+} // namespace Clusters
+} // namespace app
+} // namespace chip
