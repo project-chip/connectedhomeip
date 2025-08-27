@@ -95,11 +95,16 @@ class TC_AVSM_2_11(MatterBaseTest, AVSMTestBase):
             ),
             TestStep(
                 8,
+                "TH reads StreamUsagePriorities attribute from CameraAVStreamManagement Cluster on DUT.",
+                "Verify the list is the same as set in StreamPriorities in step 7.",
+            ),
+            TestStep(
+                9,
                 "TH sends the SetStreamPriorities command with StreamPriorities containing a StreamUsage not in aSupportedStreamUsages.",
                 "DUT responds with a DYNAMIC_CONSTRAINT_ERROR status code.",
             ),
             TestStep(
-                9,
+                10,
                 "TH sends the SetStreamPriorities command with StreamPriorities containing duplicate StreamUsage values from aSupportedStreamUsages.",
                 "DUT responds with a ALREADY_EXISTS status code.",
             ),
@@ -169,14 +174,23 @@ class TC_AVSM_2_11(MatterBaseTest, AVSMTestBase):
 
         self.step(7)
         try:
+            aStreamUsagePriorities = aSupportedStreamUsages[0:1]
             await self.send_single_cmd(
-                endpoint=endpoint, cmd=commands.SetStreamPriorities(streamPriorities=(aSupportedStreamUsages))
+                endpoint=endpoint, cmd=commands.SetStreamPriorities(streamPriorities=(aStreamUsagePriorities))
             )
         except InteractionModelError as e:
             asserts.assert_equal(e.status, Status.Success, "Unexpected error returned")
             pass
 
         self.step(8)
+        readStreamUsagePriorities = await self.read_single_attribute_check_success(
+            endpoint=endpoint, cluster=cluster, attribute=attr.StreamUsagePriorities
+        )
+        logger.info(f"Rx'd StreamUsagePriorities: {readStreamUsagePriorities}")
+        asserts.assert_equal(readStreamUsagePriorities, aStreamUsagePriorities,
+                             "The read StreamUsagePriorities is different from the one set in SetStreamPriorities")
+
+        self.step(9)
         try:
             notSupportedStreamUsage = next(
                 (e for e in Globals.Enums.StreamUsageEnum if e not in aSupportedStreamUsages and e != Globals.Enums.StreamUsageEnum.kInternal), None)
@@ -194,7 +208,7 @@ class TC_AVSM_2_11(MatterBaseTest, AVSMTestBase):
             )
             pass
 
-        self.step(9)
+        self.step(10)
         try:
             await self.send_single_cmd(
                 endpoint=endpoint,

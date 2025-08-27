@@ -45,7 +45,7 @@ from mobly import asserts
 import matter.clusters as Clusters
 import matter.tlv
 from matter import CertificateAuthority
-from matter.storage import PersistentStorage
+from matter.storage import VolatileTemporaryPersistentStorage
 from matter.testing.apps import AppServerSubprocess, JFControllerSubprocess
 from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 
@@ -244,7 +244,8 @@ class TC_JCM_1_1(MatterBaseTest):
     async def test_TC_JCM_1_1(self):
 
         # Creating a Controller for Ecosystem A
-        _fabric_a_persistent_storage = PersistentStorage(jsonData=self.ecoACtrlStorage)
+        _fabric_a_persistent_storage = VolatileTemporaryPersistentStorage(
+            self.ecoACtrlStorage['repl-config'], self.ecoACtrlStorage['sdk-config'])
         _certAuthorityManagerA = CertificateAuthority.CertificateAuthorityManager(
             chipStack=self.matter_stack._chip_stack,
             persistentStorage=_fabric_a_persistent_storage)
@@ -255,7 +256,8 @@ class TC_JCM_1_1(MatterBaseTest):
             catTags=[int(self.ecoACATs, 16)])
 
         # Creating a Controller for Ecosystem B
-        _fabric_b_persistent_storage = PersistentStorage(jsonData=self.ecoBCtrlStorage)
+        _fabric_b_persistent_storage = VolatileTemporaryPersistentStorage(
+            self.ecoBCtrlStorage['repl-config'], self.ecoBCtrlStorage['sdk-config'])
         _certAuthorityManagerB = CertificateAuthority.CertificateAuthorityManager(
             chipStack=self.matter_stack._chip_stack,
             persistentStorage=_fabric_b_persistent_storage)
