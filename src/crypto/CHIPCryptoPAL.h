@@ -622,11 +622,10 @@ public:
     /**
      * @brief Helper function to load a P256 keypair from raw private and public key byte spans.
      * Combines the public and private key data into a serialized keypair format,
-     * then deserializes it into the provided keypair object.
+     * then deserializes it into this keypair object.
      *
      * @param private_key ByteSpan containing the raw private key bytes.
      * @param public_key ByteSpan containing the raw public key bytes.
-     * @param keypair Reference to a P256Keypair object to populate.
      * @return CHIP_ERROR indicating success or failure of the operation.
      */
     CHIP_ERROR LoadKeypairFromRaw(ByteSpan private_key, ByteSpan public_key);
