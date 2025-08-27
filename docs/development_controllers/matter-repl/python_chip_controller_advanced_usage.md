@@ -141,9 +141,7 @@ InitBLE 0[1716395111.776809][364405:364405] CHIP:DL: writing settings to file (/
 [1716395111.777555][364405:364405] CHIP:DL: Found the primary Ethernet interface:eno2
 [1716395111.777868][364405:364405] CHIP:DL: Got WiFi interface: wlp7s0
 [1716395111.777877][364405:364405] CHIP:DL: Failed to reset WiFi statistic counts
-────────────────────────────────────────────────────────────────────────────────────────────────────────── Matter REPL ──────────────────────────────────────────────────────────────────────────────────────────────────────────
-
-
+───────────────────────────────────────────────────────────────────── Matter REPL ──────────────────────────────────────────────────────────────────────
 
             Welcome to the Matter Python REPL!
 
@@ -152,8 +150,7 @@ InitBLE 0[1716395111.776809][364405:364405] CHIP:DL: writing settings to file (/
             To get more information on a particular object/class, you can pass
             that into matterhelp() as well.
 
-
-─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
 2024-05-22 18:25:11 allenwind PersistentStorage[364405] WARNING Initializing persistent storage from file: /tmp/repl-storage.json
 2024-05-22 18:25:11 allenwind PersistentStorage[364405] WARNING Loading configuration from /tmp/repl-storage.json...
 2024-05-22 18:25:11 allenwind CertificateAuthorityManager[364405] WARNING Loading certificate authorities from storage...
@@ -162,14 +159,13 @@ InitBLE 0[1716395111.776809][364405:364405] CHIP:DL: writing settings to file (/
 2024-05-22 18:25:11 allenwind FabricAdmin[364405] WARNING New FabricAdmin: FabricId: 0x0000000000000001, VendorId = 0xFFF1
 2024-05-22 18:25:11 allenwind FabricAdmin[364405] WARNING Allocating new controller with CaIndex: 1, FabricId: 0x0000000000000001, NodeId: 0x000000000001B669, CatTags: []
 
-
 The following objects have been created:
-        certificateAuthorityManager:    Manages a list of CertificateAuthority instances.
-        caList:                         The list of CertificateAuthority instances.
-        caList:                 A specific FabricAdmin object at index m for the nth CertificateAuthority instance.
 
+        certificateAuthorityManager:    Manages a list of CertificateAuthority instances
+        caList:                         The list of CertificateAuthority instances
+        caList[n].adminList[m]:         A specific FabricAdmin object at index m for the nth CertificateAuthority instance
+        devCtrl:                        Default Matter Device Controller (nodeId=0x000000000001B669) to manage caList[0].adminList[0] (fabricId=1)
 
-Default CHIP Device Controller (NodeId: 112233): has been initialized to manage caList[0].adminList[0] (FabricId = 1), and is available as devCtrl
 
 In [1]:
 ```

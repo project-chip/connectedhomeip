@@ -46,15 +46,12 @@ def ReplInit(debug):
 
     console.rule('Matter REPL')
     console.print('''
-            [bold blue]
-
             Welcome to the Matter Python REPL!
 
-            For help, please type [/][bold green]matterhelp()[/][bold blue]
+            For help, please type [bold green]matterhelp()[/]
 
             To get more information on a particular object/class, you can pass
-            that into [bold green]matterhelp()[/][bold blue] as well.
-
+            that into [bold green]matterhelp()[/] as well.
             ''')
     console.rule()
 
@@ -157,9 +154,9 @@ Note that you are still running from {os.getcwd()} so other relative paths may b
 Please add a valid `--trust-store` argument to your script. If using jupyterlab,
 the command should look like:
 
-%run {{module.path}} --trust-store /chip/root/credentials/development/paa-root-certs
+%run {{module.path}} --trust-store /matter/root/credentials/development/paa-root-certs
 
-or run `os.chdir` to the root of your CHIP repository checkout.
+or run `os.chdir` to the root of your Matter SDK repository checkout.
         ''')
         # nothing we can do ... things will NOT work
         return
@@ -194,18 +191,13 @@ or run `os.chdir` to the root of your CHIP repository checkout.
     devCtrl = caList[0].adminList[0].NewController(paaTrustStorePath=args.trust_store)
     builtins.devCtrl = devCtrl
 
-    console.print(
-        '\n\n[blue]The following objects have been created:')
-
-    console.print(
-        '''\t[red]certificateAuthorityManager[blue]:\tManages a list of CertificateAuthority instances.
-    \t[red]caList[blue]:\t\t\t\tThe list of CertificateAuthority instances.
-    \t[red]caList\\[n].adminList\\[m][blue]:\t\tA specific FabricAdmin object at index m for the nth CertificateAuthority instance.''')
-
-    console.print(
-        f'\n\n[blue]Default CHIP Device Controller (NodeId: {devCtrl.nodeId}): '
-        f'has been initialized to manage [bold red]caList[0].adminList[0][blue] (FabricId = {caList[0].adminList[0].fabricId}), '
-        'and is available as [bold red]devCtrl')
+    console.print(f'''
+The following objects have been created:\n
+\t[bold green]certificateAuthorityManager[/]:\tManages a list of CertificateAuthority instances
+\t[bold green]caList[/]:\t\t\t\tThe list of CertificateAuthority instances
+\t[bold green]caList\\[n].adminList\\[m][/]:\t\tA specific FabricAdmin object at index m for the nth CertificateAuthority instance
+\t[bold green]devCtrl[/]:\t\t\tDefault Matter Device Controller (nodeId=0x{devCtrl.nodeId:016X}) to manage [bold green]caList[0].adminList[0][/] (fabricId={caList[0].adminList[0].fabricId})
+    ''')
 
 
 if __name__ == "__main__":
