@@ -104,7 +104,7 @@ class TC_CHIME_2_4(MatterBaseTest, CHIMETestBase):
         self.step(6)
         # Use the current selected chime when in CI
         longestChimeDurationChime = await self.read_chime_attribute_expect_success(endpoint, attributes.SelectedChime)
-        
+
         if not self.is_ci:
             user_response = self.wait_for_user_input(prompt_msg="Plesse enter the ChimeID of the longest duration chime",
                                                      prompt_msg_placeholder=str(longestChimeDurationChime),
@@ -120,9 +120,9 @@ class TC_CHIME_2_4(MatterBaseTest, CHIMETestBase):
 
             if not found_id:
                 asserts.assert_fail("Unknown ChimeID selected")
-            
+
             longestChimeDurationChime = chosenChimeID
-            
+
         await self.write_chime_attribute_expect_success(endpoint, attributes.SelectedChime, longestChimeDurationChime)
 
         self.step(7)
