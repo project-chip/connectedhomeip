@@ -76,6 +76,7 @@ executable("${sample_name}") {
     "${project_dir}/common/stubs.cpp",
     "${project_dir}/linux/main.cpp",
     "../../../src/app/clusters/boolean-state-server/CodegenIntegration.cpp",
+    "../../../src/app/clusters/boolean-state-server/boolean-state-cluster.cpp",
   ]
 
   deps = [
