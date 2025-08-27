@@ -477,8 +477,8 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(Globals::WebRTCEndReaso
     using EnumType = Globals::WebRTCEndReasonEnum;
     switch (val)
     {
-    case EnumType::kIceFailed:
-    case EnumType::kIceTimeout:
+    case EnumType::kICEFailed:
+    case EnumType::kICETimeout:
     case EnumType::kUserHangup:
     case EnumType::kUserBusy:
     case EnumType::kReplaced:
@@ -488,6 +488,7 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(Globals::WebRTCEndReaso
     case EnumType::kOutOfResources:
     case EnumType::kMediaTimeout:
     case EnumType::kLowPower:
+    case EnumType::kPrivacyMode:
     case EnumType::kUnknownReason:
         return val;
     default:
