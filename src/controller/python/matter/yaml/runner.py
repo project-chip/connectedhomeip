@@ -834,7 +834,7 @@ class ReplTestRunner:
         try:
             return DefaultPseudoCluster(test_step)
         except ActionCreationError as e:
-            logger.warning(f"Failed create default pseudo cluster: {e}")
+            logger.warning(f"Failed to create default pseudo cluster: {e}")
             return None
 
     def encode(self, request) -> Optional[BaseAction]:
