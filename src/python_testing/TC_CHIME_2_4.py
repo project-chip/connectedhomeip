@@ -106,7 +106,7 @@ class TC_CHIME_2_4(MatterBaseTest, CHIMETestBase):
         self.step(7)
         if not self.is_ci:
             self.wait_for_user_input(prompt_msg="About to play multiple chimes on the DUT. Hit ENTER once ready.")
-        
+
         await self.send_play_chime_sound_command(endpoint)
         await self.send_play_chime_sound_command(endpoint)
         await self.send_play_chime_sound_command(endpoint)
@@ -116,10 +116,10 @@ class TC_CHIME_2_4(MatterBaseTest, CHIMETestBase):
                                                      prompt_msg_placeholder="y",
                                                      default_value="y")
             asserts.assert_equal(user_response.lower(), "y")
-        
+
         self.step(8)
         myChimeSounds = await self.read_chime_attribute_expect_success(endpoint, attributes.InstalledChimeSounds)
-        if len(myChimeSounds) > 1: 
+        if len(myChimeSounds) > 1:
 
             if not self.is_ci:
                 self.wait_for_user_input(prompt_msg="About to play a single chime on the DUT. Hit ENTER once ready.")
@@ -137,7 +137,7 @@ class TC_CHIME_2_4(MatterBaseTest, CHIMETestBase):
                     newSelectedChime = chime.chimeID
                     break
 
-            await self.write_chime_attribute_expect_success(endpoint, attributes.SelectedChime, newSelectedChime)            
+            await self.write_chime_attribute_expect_success(endpoint, attributes.SelectedChime, newSelectedChime)
 
             self.step(11)
             if not self.is_ci:
