@@ -172,12 +172,25 @@ pairing onnetwork 1 20202021
 
 Wait for the command to complete and confirm that commissioning was successful.
 
-3. Start the Live Stream Still in the controller shell, use the Live View
-   command with the nodeID you assigned during pairing to request a video
-   stream.
+3. To start a live video stream from your camera, use the `liveview start`
+   command followed by the nodeID you set during pairing. For example, if your
+   nodeID is 1, you can request a stream with a minimum resolution of 800x600
+   pixels and a minimum frame rate of 30 frames per second using the command
+   below.
 
 ```
-liveview start 1
+liveview start 1 --min-res-width 800 --min-res-height 600 --min-framerate 30
+```
+
+To see what video formats and resolutions your camera supports, first list the
+available video devices, then check the formats for your specific device:
+
+```
+# List all available video devices
+v4l2-ctl --list-devices
+
+# Check formats for a specific device (replace /dev/video0 with your device)
+v4l2-ctl -d /dev/video0 --list-formats-ext
 ```
 
 Wave your hand in front of the camera to trigger live view; a video window will
