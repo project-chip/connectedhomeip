@@ -96,7 +96,7 @@ declare_args() {
   # Enable TestEventTrigger in GeneralDiagnostics cluster
   sl_enable_test_event_trigger = false
 
-  verbose_mode = false
+  sl_verbose_mode = false
 }
 
 examples_plat_dir = "${chip_root}/examples/platform/silabs/efr32"
@@ -681,7 +681,7 @@ template("efr32_sdk") {
       ]
     }
 
-    if (verbose_mode) {
+    if (sl_verbose_mode) {
       defines += [ "VERBOSE_MODE=1" ]
     }
 

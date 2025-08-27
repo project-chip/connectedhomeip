@@ -276,7 +276,7 @@ else
                 shift
                 ;;
             --verbose)
-                optArgs+="verbose_mode=true "
+                optArgs+="sl_verbose_mode=true "
                 VERBOSE_MODE=true
                 shift
                 ;;
@@ -361,7 +361,7 @@ else
         echo "================= Warning!!!!! ================"
         echo "Verbose mode is enabled. BAUDRATE FOR UART LOGS IS SET TO 921600"
         echo "Use Simplicity Studio or commander with the following command to set the baudrate:"
-        echo "commander vcom config --baudrate 921600 --handshake none"
+        echo "commander vcom config --baudrate 921600 --handshake rtscts"
         echo "==============================================="
     fi
 
