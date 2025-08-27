@@ -21,7 +21,7 @@ interfaces working as Bluetooth LE central and peripheral, respectively.
 
 1. Build `bluez` project from sources by completing the following steps:
 
-    ```
+    ```bash
     sudo apt-get update
     sudo apt-get install libtool m4 automake autotools-dev libudev-dev libical-dev libreadline-dev
 
@@ -35,19 +35,19 @@ interfaces working as Bluetooth LE central and peripheral, respectively.
 
 2. Run bluetoothd:
 
-    ```
+    ```bash
     sudo ./src/bluetoothd --experimental --debug &
     ```
 
 3. Bring up two virtual Bluetooth LE interfaces:
 
-    ```
+    ```bash
     sudo ./emulator/btvirt -L -l2
     ```
 
     You can find the virtual interface by running `hciconfig` command:
 
-    ```
+    ```console
     $ hciconfig
 
     hci2:	Type: Primary  Bus: Virtual
@@ -69,15 +69,15 @@ interfaces working as Bluetooth LE central and peripheral, respectively.
     For example, add `--ble-controller=2` to use the virtual interface `hci2`
     listed above.
 
-    ```
-    chip-repl --ble-controller=2
+    ```bash
+    matter-repl --ble-controller=2
     ```
 
 <hr>
 
 ## Debugging with gdb
 
-You can run the chip-repl under GDB for debugging, however, since the Matter SDK
+You can run the matter-repl under GDB for debugging, however, since the Matter SDK
 library is a dynamic library, you cannot read the symbols unless it is fully
 loaded.
 
@@ -86,8 +86,8 @@ The following block is a example debug session using GDB:
 ```
 # GDB cannot run scripts directly
 # so you need to run Python3 with the path of device controller REPL
-# Here, we use the feature from bash to get the path of chip-repl without typing it.
-$ gdb --args python3 `which chip-repl`
+# Here, we use the feature from bash to get the path of matter-repl without typing it.
+$ gdb --args python3 `which matter-repl`
 GNU gdb (GDB) 14.2
 Copyright (C) 2023 Free Software Foundation, Inc.
 License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
@@ -126,7 +126,7 @@ library, let run the Matter device controller first.
 
 ```
 (gdb) run
-Starting program: /home/sag/projects/project-chip/connectedhomeip/out/venv/bin/python3 /home/sag/projects/project-chip/connectedhomeip/out/venv/bin/chip-repl
+Starting program: /home/sag/projects/project-chip/connectedhomeip/out/venv/bin/python3 /home/sag/projects/project-chip/connectedhomeip/out/venv/bin/matter-repl
 [Thread debugging using libthread_db enabled]
 Using host libthread_db library "/usr/lib/libthread_db.so.1".
 Python 3.11.9 (main, Apr 29 2024, 11:59:58) [GCC 13.2.1 20240417]

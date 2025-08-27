@@ -1,4 +1,4 @@
-# Requirements for running chip-repl in jupyterlab
+# Requirements for running matter-repl in jupyterlab
 # Once installed, start with
 #
 # jupyter-lab

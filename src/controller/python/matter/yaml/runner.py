@@ -741,7 +741,7 @@ class NotImplementedAction(BaseAction):
 class ReplTestRunner:
     '''Test runner to encode/decode values from YAML test Parser for executing the TestStep.
 
-    Uses ChipDeviceController from chip-repl to execute parsed YAML TestSteps.
+    Uses ChipDeviceController from matter-repl to execute parsed YAML TestSteps.
     '''
 
     def __init__(self, test_spec_definition, certificate_authority_manager, alpha_dev_ctrl):
