@@ -242,7 +242,7 @@ await devCtrl.ReadAttribute(200,[(1, chip.clusters.CommodityPrice)])
 The response in the default app is a null `CurrentPrice` and an empty
 `PriceForecast` attribute:
 
-```python
+```
     Out[11]:
 
     {
@@ -293,7 +293,7 @@ await devCtrl.SendCommand(200, 0, chip.clusters.GeneralDiagnostics.Commands.Test
 -   Step 6: (In matter-repl) Re-Read `CurrentPrice` attribute (see the values
     have changed)
 
-```python
+```
     await devCtrl.ReadAttribute(200,[(1,chip.clusters.CommodityPrice.Attributes.CurrentPrice)])
     Out[18]:
 
@@ -331,7 +331,7 @@ i.e.
 
 -   Step 7: (In matter-repl) Send `GetDetailedPriceRequest()`
 
-```python
+```
 await devCtrl.SendCommand(200, 1, chip.clusters.CommodityPrice.Commands.GetDetailedPriceRequest(3))
 Out[15]:
 
@@ -372,7 +372,7 @@ await devCtrl.SendCommand(200, 0, chip.clusters.GeneralDiagnostics.Commands.Test
 -   Step 9: (In matter-repl) Read `PriceForecast` attributes (see the values
     have changed)
 
-```python
+```
 await devCtrl.ReadAttribute(200,[(1,chip.clusters.CommodityPrice.Attributes.PriceForecast)])
 Out[21]:
 
@@ -450,7 +450,7 @@ dev = await devCtrl.GetConnectedDevice(200, allowPASE=False, timeoutMs=1000, pay
 
 -   Step 10b: Send the `GetDetailedForecastRequest()` command:
 
-```python
+```
 await devCtrl.SendCommand(200, 1, chip.clusters.CommodityPrice.Commands.GetDetailedForecastRequest(3))
 Out[24]:
 
@@ -532,7 +532,7 @@ assumes you have already commissioned the app (see above).
 
 -   Step 1: (In matter-repl) Read `Electrical Grid Conditions` attributes
 
-```python
+```
 # Read from NodeID 200, Endpoint 1, all attributes on ElectricalGridConditions cluster
 await devCtrl.ReadAttribute(200,[(1, chip.clusters.ElectricalGridConditions)])
 Out[2]:
@@ -578,7 +578,7 @@ await devCtrl.SendCommand(200, 0, chip.clusters.GeneralDiagnostics.Commands.Test
 -   Step 3: (In matter-repl) Re-Read `CurrentConditions` attribute (see the
     values have changed)
 
-```python
+```
 await devCtrl.ReadAttribute(200,[(1, chip.clusters.ElectricalGridConditions.Attributes.CurrentConditions)])
 Out[7]:
 
@@ -611,7 +611,7 @@ Out[7]:
 -   Step 5: (In matter-repl) Re-Read `ForecastConditions` attribute (see the
     values have changed)
 
-```python
+```
 await devCtrl.ReadAttribute(200,[(1, chip.clusters.ElectricalGridConditions.Attributes.ForecastConditions)])
 Out[9]:
 
