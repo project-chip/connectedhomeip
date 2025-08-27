@@ -189,8 +189,10 @@ class TC_AVSUM_2_8(MatterBaseTest, AVSUMTestBase):
                 # verify the viewport dimensions
                 viewportwidth = streams.viewport.x2 - streams.viewport.x1
                 viewportheight = streams.viewport.y2 - streams.viewport.y1
-                asserts.assert_equal(viewportwidth, minviewport.width, "Viewport not set to the same width as MinViewportResolution")
-                asserts.assert_equal(viewportheight, minviewport.height, "Viewport not set to the same height as MinViewportResolution")
+                asserts.assert_equal(viewportwidth, minviewport.width,
+                                     "Viewport not set to the same width as MinViewportResolution")
+                asserts.assert_equal(viewportheight, minviewport.height,
+                                     "Viewport not set to the same height as MinViewportResolution")
                 match_found = True
                 break
 
