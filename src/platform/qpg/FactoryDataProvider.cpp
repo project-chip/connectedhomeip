@@ -115,7 +115,7 @@ CHIP_ERROR FactoryDataProvider::SignWithDeviceAttestationKey(const ByteSpan & me
 
         // In a non-exemplary implementation, the public key is not needed here. It is used here merely because
         // Crypto::P256Keypair is only (currently) constructable from raw keys if both private/public keys are present.
-        ReturnErrorOnFailure(keypair.LoadKeypairFromRaw(qorvoDacPrivateKey, qorvoDacPublicKey));
+        ReturnErrorOnFailure(keypair.HazardousOperationLoadKeypairFromRaw(qorvoDacPrivateKey, qorvoDacPublicKey));
         ReturnErrorOnFailure(keypair.ECDSA_sign_msg(messageToSign.data(), messageToSign.size(), signature));
     }
 

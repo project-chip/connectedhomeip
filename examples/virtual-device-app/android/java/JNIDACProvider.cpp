@@ -154,7 +154,7 @@ CHIP_ERROR JNIDACProvider::SignWithDeviceAttestationKey(const ByteSpan & digest_
 
     // In a non-exemplary implementation, the public key is not needed here. It is used here merely because
     // Crypto::P256Keypair is only (currently) constructable from raw keys if both private/public keys are present.
-    ReturnErrorOnFailure(keypair.LoadKeypairFromRaw(privateKeyBufSpan, publicKeyBufSpan));
+    ReturnErrorOnFailure(keypair.HazardousOperationLoadKeypairFromRaw(privateKeyBufSpan, publicKeyBufSpan));
     ReturnErrorOnFailure(keypair.ECDSA_sign_msg(digest_to_sign.data(), digest_to_sign.size(), signature));
 
     return CopySpanToMutableSpan(ByteSpan{ signature.ConstBytes(), signature.Length() }, out_signature_buffer);

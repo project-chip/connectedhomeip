@@ -107,7 +107,7 @@ CHIP_ERROR FactoryDataProvider::SignWithDeviceAttestationKey(const ByteSpan & me
     // In a non-exemplary implementation, the public key is not needed here. It is used here merely because
     // Crypto::P256Keypair is only (currently) constructable from raw keys if both private/public keys are present.
 #if (CONFIG_STM32_FACTORY_DATA_ENABLE == 0)
-    ReturnErrorOnFailure(keypair.LoadKeypairFromRaw(DevelopmentCerts::kDacPrivateKey, DevelopmentCerts::kDacPublicKey));
+    ReturnErrorOnFailure(keypair.HazardousOperationLoadKeypairFromRaw(DevelopmentCerts::kDacPrivateKey, DevelopmentCerts::kDacPublicKey));
 
 #else
     uint8_t Privatekeybuffer[PRIVATE_KEY_LEN];
@@ -121,7 +121,7 @@ CHIP_ERROR FactoryDataProvider::SignWithDeviceAttestationKey(const ByteSpan & me
     err = FACTORYDATA_GetValue(TAG_ID_DEVICE_ATTESTATION_PUBLIC_KEY, Publickeybuffer, PUBLIC_KEY_LEN, &tlvDataLength);
     VerifyOrReturnError(DATAFACTORY_OK == err, MapSTM32WBError(err));
 
-    ReturnErrorOnFailure(keypair.LoadKeypairFromRaw(ByteSpan(Privatekeybuffer), ByteSpan(Publickeybuffer)));
+    ReturnErrorOnFailure(keypair.HazardousOperationLoadKeypairFromRaw(ByteSpan(Privatekeybuffer), ByteSpan(Publickeybuffer)));
 #endif
 
     ReturnErrorOnFailure(keypair.ECDSA_sign_msg(messageToSign.data(), messageToSign.size(), signature));

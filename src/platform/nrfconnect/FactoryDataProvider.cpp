@@ -185,7 +185,7 @@ CHIP_ERROR FactoryDataProvider<FlashFactoryData>::SignWithDeviceAttestationKey(c
 
         err = chip::Crypto::ExtractPubkeyFromX509Cert(dacCertSpan, dacPublicKey);
         VerifyOrExit(err == CHIP_NO_ERROR, );
-        err = keypair.LoadKeypairFromRaw(
+        err = keypair.HazardousOperationLoadKeypairFromRaw(
             ByteSpan(reinterpret_cast<uint8_t *>(mFactoryData.dac_priv_key.data), mFactoryData.dac_priv_key.len),
             ByteSpan(dacPublicKey.Bytes(), dacPublicKey.Length()));
         VerifyOrExit(err == CHIP_NO_ERROR, );
