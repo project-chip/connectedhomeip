@@ -54,7 +54,6 @@ public:
 
     CHIP_ERROR SearchForId(uint8_t searchedType, uint8_t * pBuf, size_t bufLength, uint16_t & length,
                            uint32_t * contentAddr = NULL);
-    CHIP_ERROR LoadKeypairFromRaw(ByteSpan privateKey, ByteSpan publicKey, Crypto::P256Keypair & keypair);
 
     CHIP_ERROR EncryptFactoryData(uint8_t * FactoryDataBuff);
     CHIP_ERROR DecryptFactoryData(uint8_t * FactoryDataBuff);
