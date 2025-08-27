@@ -1837,45 +1837,11 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
       setupPINCode:(uint32_t)setupPINCode
              error:(NSError * __autoreleasing *)error
 {
-    [[MTRMetricsCollector sharedInstance] resetMetrics];
+    auto * setupPayload = [[MTRSetupPayload alloc] initWithSetupPasscode:@(setupPINCode) discriminator:@(discriminator)];
 
-    // Track overall commissioning
-    MATTER_LOG_METRIC_BEGIN(kMetricDeviceCommissioning);
-
-    // Capture in a block variable to avoid losing granularity for metrics,
-    // when translating CHIP_ERROR to NSError
-    __block CHIP_ERROR errorCode = CHIP_NO_ERROR;
-
-    auto block = ^BOOL {
-        // Track work until end of scope
-        MATTER_LOG_METRIC_SCOPE(kMetricPairDevice, errorCode);
-
-        std::string manualPairingCode;
-        chip::SetupPayload payload;
-        payload.discriminator.SetLongValue(discriminator);
-        payload.setUpPINCode = setupPINCode;
-
-        errorCode = chip::ManualSetupPayloadGenerator(payload).payloadDecimalStringRepresentation(manualPairingCode);
-        VerifyOrReturnValue(![MTRDeviceController_Concrete checkForError:errorCode logMsg:kDeviceControllerErrorSetupCodeGen error:error], NO);
-
-        self->_operationalCredentialsDelegate->SetDeviceID(deviceID);
-
-        MATTER_LOG_METRIC_BEGIN(kMetricSetupPASESession);
-        errorCode = self->_cppCommissioner->EstablishPASEConnection(deviceID, manualPairingCode.c_str());
-        if (CHIP_NO_ERROR == errorCode) {
-            self->_deviceControllerDelegateBridge->SetDeviceNodeID(deviceID);
-        } else {
-            MATTER_LOG_METRIC_END(kMetricSetupPASESession, errorCode);
-        }
-
-        return ![MTRDeviceController_Concrete checkForError:errorCode logMsg:kDeviceControllerErrorPairDevice error:error];
-    };
-
-    auto success = [self syncRunOnWorkQueueWithBoolReturnValue:block error:error];
-    if (!success) {
-        MATTER_LOG_METRIC_END(kMetricDeviceCommissioning, errorCode);
-    }
-    return success;
+    return [self setupCommissioningSessionWithPayload:setupPayload
+                                            newNodeID:@(deviceID)
+                                                error:error];
 }
 
 - (BOOL)pairDevice:(uint64_t)deviceID
@@ -1925,38 +1891,15 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
 
 - (BOOL)pairDevice:(uint64_t)deviceID onboardingPayload:(NSString *)onboardingPayload error:(NSError * __autoreleasing *)error
 {
-    [[MTRMetricsCollector sharedInstance] resetMetrics];
-
-    // Track overall commissioning
-    MATTER_LOG_METRIC_BEGIN(kMetricDeviceCommissioning);
-    emitMetricForSetupPayload([MTRSetupPayload setupPayloadWithOnboardingPayload:onboardingPayload error:nil]);
-
-    // Capture in a block variable to avoid losing granularity for metrics,
-    // when translating CHIP_ERROR to NSError
-    __block CHIP_ERROR errorCode = CHIP_NO_ERROR;
-
-    auto block = ^BOOL {
-        // Track work until end of scope
-        MATTER_LOG_METRIC_SCOPE(kMetricPairDevice, errorCode);
-
-        self->_operationalCredentialsDelegate->SetDeviceID(deviceID);
-
-        MATTER_LOG_METRIC_BEGIN(kMetricSetupPASESession);
-        errorCode = self->_cppCommissioner->EstablishPASEConnection(deviceID, [onboardingPayload UTF8String]);
-        if (CHIP_NO_ERROR == errorCode) {
-            self->_deviceControllerDelegateBridge->SetDeviceNodeID(deviceID);
-        } else {
-            MATTER_LOG_METRIC_END(kMetricSetupPASESession, errorCode);
+    auto * setupPayload = [[MTRSetupPayload alloc] initWithPayload:onboardingPayload];
+    if (!setupPayload) {
+        if (error) {
+            *error = [MTRError errorForCHIPErrorCode:CHIP_ERROR_INVALID_ARGUMENT];
         }
-
-        return ![MTRDeviceController_Concrete checkForError:errorCode logMsg:kDeviceControllerErrorPairDevice error:error];
-    };
-
-    auto success = [self syncRunOnWorkQueueWithBoolReturnValue:block error:error];
-    if (!success) {
-        MATTER_LOG_METRIC_END(kMetricDeviceCommissioning, errorCode);
+        return NO;
     }
-    return success;
+
+    return [self setupCommissioningSessionWithPayload:setupPayload newNodeID:@(deviceID) error:error];
 }
 
 - (BOOL)openPairingWindow:(uint64_t)deviceID duration:(NSUInteger)duration error:(NSError * __autoreleasing *)error
