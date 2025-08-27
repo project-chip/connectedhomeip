@@ -77,8 +77,8 @@ interfaces working as Bluetooth LE central and peripheral, respectively.
 
 ## Debugging with gdb
 
-You can run the matter-repl under GDB for debugging, however, since the Matter SDK
-library is a dynamic library, you cannot read the symbols unless it is fully
+You can run the matter-repl under GDB for debugging, however, since the Matter
+SDK library is a dynamic library, you cannot read the symbols unless it is fully
 loaded.
 
 The following block is a example debug session using GDB:

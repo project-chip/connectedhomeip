@@ -290,8 +290,8 @@ The response in the default app is a null `CurrentPrice` and an empty
 await devCtrl.SendCommand(200, 0, chip.clusters.GeneralDiagnostics.Commands.TestEventTrigger(enableKey=bytes([b for b in range(16)]), eventTrigger=0x0095000000000000))
 ```
 
--   Step 6: (In matter-repl) Re-Read `CurrentPrice` attribute (see the values have
-    changed)
+-   Step 6: (In matter-repl) Re-Read `CurrentPrice` attribute (see the values
+    have changed)
 
 ```python
     await devCtrl.ReadAttribute(200,[(1,chip.clusters.CommodityPrice.Attributes.CurrentPrice)])
@@ -369,8 +369,8 @@ GetDetailedPriceResponse(
 await devCtrl.SendCommand(200, 0, chip.clusters.GeneralDiagnostics.Commands.TestEventTrigger(enableKey=bytes([b for b in range(16)]), eventTrigger=0x0095000000000001))
 ```
 
--   Step 9: (In matter-repl) Read `PriceForecast` attributes (see the values have
-    changed)
+-   Step 9: (In matter-repl) Read `PriceForecast` attributes (see the values
+    have changed)
 
 ```python
 await devCtrl.ReadAttribute(200,[(1,chip.clusters.CommodityPrice.Attributes.PriceForecast)])
@@ -575,8 +575,8 @@ The response in the default app is a null `CurrentConditions` and an empty
 await devCtrl.SendCommand(200, 0, chip.clusters.GeneralDiagnostics.Commands.TestEventTrigger(enableKey=bytes([b for b in range(16)]), eventTrigger=0x00A0000000000000))
 ```
 
--   Step 3: (In matter-repl) Re-Read `CurrentConditions` attribute (see the values
-    have changed)
+-   Step 3: (In matter-repl) Re-Read `CurrentConditions` attribute (see the
+    values have changed)
 
 ```python
 await devCtrl.ReadAttribute(200,[(1, chip.clusters.ElectricalGridConditions.Attributes.CurrentConditions)])
