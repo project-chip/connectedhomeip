@@ -38,8 +38,9 @@ jobs:
             GITHUB_CACHE_PATH: /tmp/cirque-cache
 
         runs-on: ubuntu-latest
-        if: github.actor != 'restyled-io[bot]'
-
+        if: |
+            github.actor != 'restyled-io[bot]' &&
+            (github.event_name != 'pull_request' || github.event.pull_request.draft == false)
         # need to run with privilege, which isn't supported by job.XXX.contaner
         #  https://github.com/actions/container-action/issues/2
         #         container:
