@@ -21,6 +21,7 @@ on:
             - 'v*-branch'
     pull_request:
     merge_group:
+    workflow_dispatch:
 
 concurrency:
     group: ${{ github.ref }}-${{ github.workflow }}-${{ (github.event_name == 'pull_request' && github.event.number) || (github.event_name == 'workflow_dispatch' && github.run_number) || github.sha }}
@@ -34,8 +35,9 @@ jobs:
         name: Chef - Linux CI Examples (All chef devices)
         timeout-minutes: 120
         runs-on: ubuntu-latest
-        if: github.actor != 'restyled-io[bot]'
-
+        if: |
+            github.actor != 'restyled-io[bot]' &&
+            (github.event_name != 'pull_request' || github.event.pull_request.draft == false)
         container:
             image: ghcr.io/project-chip/chip-build:162
             options: --user root
@@ -54,8 +56,9 @@ jobs:
 
     chef_device_functional_test:
         name: Chef - Device functional tests (Linux)
-        if: github.actor != 'restyled-io[bot]'
-        timeout-minutes: 90
+        if: |
+            github.actor != 'restyled-io[bot]' &&
+            (github.event_name != 'pull_request' || github.event.pull_request.draft == false)        timeout-minutes: 90
         runs-on: ubuntu-latest
         container:
             image: ghcr.io/project-chip/chip-build:162
@@ -93,8 +96,9 @@ jobs:
     chef_esp32:
         name: Chef - ESP32 CI Examples
         runs-on: ubuntu-latest
-        if: github.actor != 'restyled-io[bot]'
-
+        if: |
+            github.actor != 'restyled-io[bot]' &&
+            (github.event_name != 'pull_request' || github.event.pull_request.draft == false)
         container:
             image: ghcr.io/project-chip/chip-build-esp32:162
             options: --user root
@@ -114,7 +118,9 @@ jobs:
     chef_nrfconnect:
         name: Chef - NRFConnect CI Examples
         runs-on: ubuntu-latest
-        if: github.actor != 'restyled-io[bot]'
+        if: |
+            github.actor != 'restyled-io[bot]' &&
+            (github.event_name != 'pull_request' || github.event.pull_request.draft == false)
 
         container:
             image: ghcr.io/project-chip/chip-build-nrf-platform:162
@@ -135,8 +141,10 @@ jobs:
     chef_telink:
         name: Chef - Telink CI Examples
         runs-on: ubuntu-latest
-        if: github.actor != 'restyled-io[bot]'
-
+        if: |
+            github.actor != 'restyled-io[bot]' &&
+            (github.event_name != 'pull_request' || github.event.pull_request.draft == false)
+            
         container:
             image: ghcr.io/project-chip/chip-build-telink:162
             options: --user root
