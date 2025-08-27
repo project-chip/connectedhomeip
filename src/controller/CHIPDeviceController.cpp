@@ -596,7 +596,7 @@ CommissioneeDeviceProxy * DeviceCommissioner::FindCommissioneeDevice(NodeId id)
     MATTER_TRACE_SCOPE("FindCommissioneeDevice", "DeviceCommissioner");
     CommissioneeDeviceProxy * foundDevice = nullptr;
     mCommissioneeDevicePool.ForEachActiveObject([&](auto * deviceProxy) {
-        if (deviceProxy->GetDeviceId() == id || deviceProxy->GetOriginalDeviceId() == id)
+        if (deviceProxy->GetDeviceId() == id || deviceProxy->GetTemporaryCommissioningId() == id)
         {
             foundDevice = deviceProxy;
             return Loop::Break;
