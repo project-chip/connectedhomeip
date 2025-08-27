@@ -16,6 +16,7 @@
  */
 #pragma once
 
+#include <cstdint>
 #include <lib/core/DataModelTypes.h>
 
 namespace chip {
@@ -56,6 +57,8 @@ struct IsOneOf<T>
 class AttributeSet
 {
 public:
+    explicit AttributeSet(uint32_t initialValue) : mSetBits(initialValue) {}
+
     AttributeSet()                                       = default;
     AttributeSet(const AttributeSet & other)             = default;
     AttributeSet(AttributeSet && other)                  = default;
@@ -65,8 +68,10 @@ public:
     // Checks if an attribute ID is set.
     //
     // NOTE: this does NOT validate that the ID is < 32 because all the Set functions
-    //       generally are asserted on this (forceset as well as subclasses).
-    //       This MUST be called with id < 32.
+    //       generally are asserted on this (forceset as well as subclasses) and the
+    //       initial value contructor uses a uint32_t bitmask as well.
+    //
+    // This MUST be called with id < 32.
     constexpr bool IsSet(AttributeId id) const { return (mSetBits & (1u << id)) != 0; }
 
     /// Exposes a "force attribute bit set" without extra validation,
@@ -135,6 +140,7 @@ template <AttributeId... OptionalAttributeIds>
 class OptionalAttributeSet : public AttributeSet
 {
 public:
+    explicit OptionalAttributeSet(uint32_t initialValue) : AttributeSet(initialValue & All()) {}
     OptionalAttributeSet(const AttributeSet & initialValue) : AttributeSet(initialValue) {}
     OptionalAttributeSet() = default;
 
@@ -145,6 +151,18 @@ public:
         static_assert(Internal::IsOneOf<ATTRIBUTE_ID, OptionalAttributeIds...>::value, "attribute MUST be optional");
         (void) AttributeSet::Set(ATTRIBUTE_ID, value);
         return *this;
+    }
+
+    static constexpr uint32_t All()
+    {
+        if constexpr (sizeof...(OptionalAttributeIds) == 0)
+        {
+            return 0;
+        }
+        else
+        {
+            return ((1U << OptionalAttributeIds) | ...);
+        }
     }
 };
 
