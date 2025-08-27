@@ -67,6 +67,12 @@ bool IsSupportedCalendarType(TimeFormatLocalization::CalendarTypeEnum reqCalenda
     TimeFormatLocalization::CalendarTypeEnum type;
     bool found = false;
 
+    // Set input value to kUnknownEnumValue to signal an empty supported CalendarList.
+    if (validCalendar != nullptr)
+    {
+        *validCalendar = TimeFormatLocalization::CalendarTypeEnum::kUnknownEnumValue;
+    }
+
     while (it.Next(type))
     {
         // Update the optional validCalendar to a value from the SupportedList.
@@ -117,6 +123,12 @@ CHIP_ERROR TimeFormatLocalizationCluster::Startup(ServerClusterContext & context
     TimeFormatLocalization::CalendarTypeEnum validCalendar = defaultCalendarType;
     if (!IsSupportedCalendarType(mCalendarType, &validCalendar))
     {
+        // If the requested calendar is not valid and it was set to kUnknownEnumValue
+        // it means that the SupportedCalendar list is empty;
+        if (validCalendar == TimeFormatLocalization::CalendarTypeEnum::kUnknownEnumValue)
+        {
+            return CHIP_ERROR_NOT_FOUND;
+        }
         mCalendarType = validCalendar;
     }
 
