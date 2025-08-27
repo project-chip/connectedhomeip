@@ -44,7 +44,7 @@ jobs:
             github.actor != 'restyled-io[bot]' &&
             (github.event_name != 'pull_request' || github.event.pull_request.draft == false)
         runs-on: ubuntu-latest
-        
+
         container:
             image: ghcr.io/project-chip/chip-build-java:162
             options: --privileged --sysctl "net.ipv6.conf.all.disable_ipv6=0
