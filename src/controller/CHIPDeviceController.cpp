@@ -1082,6 +1082,7 @@ CHIP_ERROR DeviceCommissioner::StopPairing(NodeId remoteDeviceId)
     if (mSetUpCodePairer.StopPairing(remoteDeviceId))
     {
         mRunCommissioningAfterConnection = false;
+        OnSessionEstablishmentError(CHIP_ERROR_CANCELLED);
         return CHIP_NO_ERROR;
     }
 
