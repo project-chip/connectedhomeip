@@ -301,11 +301,11 @@ class CommodityTariffTestBaseHelper(MatterBaseTest):
         matter_asserts.assert_valid_uint32(struct.tariffComponentID, 'TariffComponentID must has uint32 type.')
 
         # checks that at least one field from price, friendlyCredit, auxiliaryLoad, peakPeriod, powerThreshold is set
-        asserts.assert_true(any(struct.price, struct.friendlyCredit, struct.auxiliaryLoad, struct.peakPeriod, struct.powerThreshold),
+        asserts.assert_true(any((struct.price, struct.friendlyCredit, struct.auxiliaryLoad, struct.peakPeriod, struct.powerThreshold)),
                             'At least one field from price, friendlyCredit, auxiliaryLoad, peakPeriod, powerThreshold must be set')
 
         # if SETRF.S.F00(PRICE) feature is enabled
-        if self.feature_guard(cluster=cluster, endpoint=endpoint, feature_int=cluster.Bitmaps.Feature.kPricing):
+        if await self.feature_guard(cluster=cluster, endpoint=endpoint, feature_int=cluster.Bitmaps.Feature.kPricing):
             # checks Price field must be of type TariffPriceStruct
             if struct.price is not None and struct.price is not NullValue:
                 asserts.assert_true(isinstance(
@@ -315,14 +315,14 @@ class CommodityTariffTestBaseHelper(MatterBaseTest):
             asserts.assert_is_none(struct.price, "Price must be None")
 
         # if SETRF.S.F01(FCRED) feature is enabled
-        if self.feature_guard(cluster=cluster, endpoint=endpoint, feature_int=cluster.Bitmaps.Feature.kFriendlyCredit):
+        if await self.feature_guard(cluster=cluster, endpoint=endpoint, feature_int=cluster.Bitmaps.Feature.kFriendlyCredit):
             # checks FriendlyCredit field must be bool
             matter_asserts.assert_valid_bool(struct.friendlyCredit, 'FriendlyCredit')
         else:  # if SETRF.S.F01(FCRED) feature is disabled
             asserts.assert_is_none(struct.friendlyCredit, "FriendlyCredit must be None")
 
         # if SETRF.S.F02(AUXLD) feature is enabled
-        if self.feature_guard(cluster=cluster, endpoint=endpoint, feature_int=cluster.Bitmaps.Feature.kAuxiliaryLoad):
+        if await self.feature_guard(cluster=cluster, endpoint=endpoint, feature_int=cluster.Bitmaps.Feature.kAuxiliaryLoad):
             # checks AuxiliaryLoad field must be of type AuxiliaryLoadSwitchSettingsStruct
             asserts.assert_true(isinstance(
                 struct.auxiliaryLoad, cluster.Structs.AuxiliaryLoadSwitchSettingsStruct), "struct.auxiliaryLoad must be of type AuxiliaryLoadSwitchSettingsStruct")
@@ -331,7 +331,7 @@ class CommodityTariffTestBaseHelper(MatterBaseTest):
             asserts.assert_is_none(struct.auxiliaryLoad, "AuxiliaryLoad must be None")
 
         # if SETRF.S.F03(PEAKP) feature is enabled
-        if self.feature_guard(cluster=cluster, endpoint=endpoint, feature_int=cluster.Bitmaps.Feature.kPeakPeriod):
+        if await self.feature_guard(cluster=cluster, endpoint=endpoint, feature_int=cluster.Bitmaps.Feature.kPeakPeriod):
             # checks PeakPeriod field must be of type PeakPeriodStruct
             asserts.assert_true(isinstance(
                 struct.peakPeriod, cluster.Structs.PeakPeriodStruct), "PeakPeriod must be of type PeakPeriodStruct")
@@ -340,7 +340,7 @@ class CommodityTariffTestBaseHelper(MatterBaseTest):
             asserts.assert_is_none(struct.peakPeriod, "PeakPeriod must be None")
 
         # if SETRF.S.F04(PWRTHLD) feature is enabled
-        if self.feature_guard(cluster=cluster, endpoint=endpoint, feature_int=cluster.Bitmaps.Feature.kPowerThreshold):
+        if await self.feature_guard(cluster=cluster, endpoint=endpoint, feature_int=cluster.Bitmaps.Feature.kPowerThreshold):
             # checks PowerThreshold field must be of type PowerThresholdStruct
             asserts.assert_true(isinstance(
                 struct.powerThreshold, Globals.Structs.PowerThresholdStruct), "PowerThreshold must be of type PowerThresholdStruct")
@@ -424,7 +424,7 @@ class CommodityTariffTestBaseHelper(MatterBaseTest):
             struct.dayEntryIDs, "DayEntryIDs attribute must return a list with length in range 1 - 20", min_length=1, max_length=20)
         for dayEntryID in struct.dayEntryIDs:
             matter_asserts.assert_valid_uint32(dayEntryID, 'DayEntryID must has uint32 type.')
-        self.check_list_elements_uniqueness(struct.dayEntryIDs, "DayEntryIDs")
+        await self.check_list_elements_uniqueness(struct.dayEntryIDs, "DayEntryIDs")
 
         # checks TariffComponentIDs field must be list with length in range 1 - 20
         matter_asserts.assert_list(
@@ -958,7 +958,7 @@ class CommodityTariffTestBaseHelper(MatterBaseTest):
             List[int]: List of all DayEntryIDs from the list of TariffPeriodStruct where particular TariffComponentID is present.
         """
 
-        return list(set([tariff_period.dayEntryIDs for tariff_period in tariff_periods if tariff_componentID in tariff_period.tariffComponentIDs])).sort()
+        return sorted(set([dayEntryID for tariff_period in tariff_periods if tariff_componentID in tariff_period.tariffComponentIDs for dayEntryID in tariff_period.dayEntryIDs]))
 
     async def get_tariff_components_IDs_from_tariff_components_attribute(self, tariff_components: List[cluster.Structs.TariffComponentStruct]) -> List[int]:
         """Extracts TariffComponentIDs from the list of TariffComponentStruct entities.
