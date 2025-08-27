@@ -264,14 +264,14 @@ CHIP_ERROR FactoryDataProvider::SignWithDeviceAttestationKey(const ByteSpan & me
 
         ReturnErrorOnFailure(chip::Crypto::ExtractPubkeyFromX509Cert(dacCertSpan, dacPublicKey));
 
-        ReturnErrorOnFailure(keypair.LoadKeypairFromRaw(
+        ReturnErrorOnFailure(keypair.HazardousOperationLoadKeypairFromRaw(
             ByteSpan(reinterpret_cast<uint8_t *>(mFactoryData.dac.dac_key.value), mFactoryData.dac.dac_key.len),
             ByteSpan(dacPublicKey.Bytes(), dacPublicKey.Length())));
 #endif
     }
     else
     {
-        ReturnErrorOnFailure(keypair.LoadKeypairFromRaw(ByteSpan(kDacPrivateKey), ByteSpan(kDacPublicKey)));
+        ReturnErrorOnFailure(keypair.HazardousOperationLoadKeypairFromRaw(ByteSpan(kDacPrivateKey), ByteSpan(kDacPublicKey)));
     }
 #if CONFIG_ENABLE_AMEBA_CRYPTO
     VerifyOrReturnError(signature.SetLength(chip::Crypto::kP256_ECDSA_Signature_Length_Raw) == CHIP_NO_ERROR, CHIP_ERROR_INTERNAL);

@@ -320,7 +320,7 @@ CHIP_ERROR FactoryDataProvider::SignWithDeviceAttestationKey(const ByteSpan & me
     chip::Crypto::P256PublicKey dacPublicKey;
 
     ReturnErrorOnFailure(chip::Crypto::ExtractPubkeyFromX509Cert(dacCertSpan, dacPublicKey));
-    ReturnErrorOnFailure(keypair.LoadKeypairFromRaw(
+    ReturnErrorOnFailure(keypair.HazardousOperationLoadKeypairFromRaw(
         ByteSpan(reinterpret_cast<uint8_t *>(mFactoryData.dac.dac_key.value), mFactoryData.dac.dac_key.len),
         ByteSpan(dacPublicKey.Bytes(), dacPublicKey.Length())));
 #else
@@ -336,7 +336,7 @@ CHIP_ERROR FactoryDataProvider::SignWithDeviceAttestationKey(const ByteSpan & me
         0x70, 0x9c, 0xa6, 0x94, 0x6a, 0xf5, 0xf2, 0xf7, 0x53, 0x08, 0x33, 0xa5, 0x2b, 0x44, 0xfb, 0xff,
     };
 
-    ReturnErrorOnFailure(keypair.LoadKeypairFromRaw(ByteSpan(kDacPrivateKey), ByteSpan(kDacPublicKey)));
+    ReturnErrorOnFailure(keypair.HazardousOperationLoadKeypairFromRaw(ByteSpan(kDacPrivateKey), ByteSpan(kDacPublicKey)));
 #endif
 
     ReturnErrorOnFailure(keypair.ECDSA_sign_msg(messageToSign.data(), messageToSign.size(), signature));

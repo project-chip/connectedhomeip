@@ -186,7 +186,7 @@ CHIP_ERROR ExampleDACProvider::SignWithDeviceAttestationKey(const ByteSpan & mes
 
     // In a non-exemplary implementation, the public key is not needed here. It is used here merely because
     // Crypto::P256Keypair is only (currently) constructable from raw keys if both private/public keys are present.
-    ReturnErrorOnFailure(keypair.LoadKeypairFromRaw(DevelopmentCerts::kDacPrivateKey, DevelopmentCerts::kDacPublicKey));
+    ReturnErrorOnFailure(keypair.HazardousOperationLoadKeypairFromRaw(DevelopmentCerts::kDacPrivateKey, DevelopmentCerts::kDacPublicKey));
     ReturnErrorOnFailure(keypair.ECDSA_sign_msg(message_to_sign.data(), message_to_sign.size(), signature));
 
     return CopySpanToMutableSpan(ByteSpan{ signature.ConstBytes(), signature.Length() }, out_signature_buffer);

@@ -1311,7 +1311,7 @@ const char * PemEncoder::NextLine()
     return hasLine ? mStringBuilder.c_str() : nullptr;
 }
 
-CHIP_ERROR P256Keypair::LoadKeypairFromRaw(ByteSpan private_key, ByteSpan public_key)
+CHIP_ERROR P256Keypair::HazardousOperationLoadKeypairFromRaw(ByteSpan private_key, ByteSpan public_key)
 {
     Crypto::P256SerializedKeypair serialized_keypair;
     ReturnErrorOnFailure(serialized_keypair.SetLength(private_key.size() + public_key.size()));

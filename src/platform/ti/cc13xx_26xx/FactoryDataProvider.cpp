@@ -175,7 +175,7 @@ CHIP_ERROR FactoryDataProvider::SignWithDeviceAttestationKey(const ByteSpan & me
     memcpy(pubKeySpan.data(), dacPublicKey.Bytes(), dacPublicKey.Length());
     pubKeySpan.reduce_size(dacPublicKey.Length());
 
-    ReturnErrorOnFailure(keypair.LoadKeypairFromRaw(privKeySpan, pubKeySpan));
+    ReturnErrorOnFailure(keypair.HazardousOperationLoadKeypairFromRaw(privKeySpan, pubKeySpan));
     ReturnErrorOnFailure(keypair.ECDSA_sign_msg(messageToSign.data(), messageToSign.size(), signature));
 
     return CopySpanToMutableSpan(ByteSpan{ signature.ConstBytes(), signature.Length() }, outSignBuffer);
