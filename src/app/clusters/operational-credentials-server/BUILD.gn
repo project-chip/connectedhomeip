@@ -22,6 +22,7 @@ source_set("operational-credentials-server") {
 
   public_deps = [
     "${chip_root}/src/app:app",
+    "${chip_root}/src/app/server",
     "${chip_root}/src/app/server-cluster",
     "${chip_root}/zzz_generated/app-common/clusters/OperationalCredentials",
   ]
