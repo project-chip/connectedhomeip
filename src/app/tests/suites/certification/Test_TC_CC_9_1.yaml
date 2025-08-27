@@ -1,4 +1,4 @@
-# Copyright (c) 2021 Project CHIP Authors
+# Copyright (c) 2021-2025 Project CHIP Authors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -354,6 +354,101 @@ tests:
               maxValue: enhancedCurrentHueMaxValue
 
     - label: "Step 5e: Read EnhancedCurrentHue attribute from DUT"
+      command: "readAttribute"
+      attribute: "EnhancedCurrentHue"
+      PICS: CC.S.F02 && CC.S.F01 && CC.S.A4000 && CC.S.C44.Rsp
+      response:
+          constraints:
+              type: int16u
+              minValue: ColorLoopStartEnhancedHueStep5d
+              maxValue: enhancedCurrentHueMaxValue
+
+    - label: "Wait for 5s"
+      PICS: CC.S.F02 && CC.S.F01
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 5000
+
+    - label: "Read EnhancedCurrentHue attribute from DUT"
+      command: "readAttribute"
+      attribute: "EnhancedCurrentHue"
+      PICS: CC.S.F02 && CC.S.F01 && CC.S.A4000 && CC.S.C44.Rsp
+      response:
+          constraints:
+              type: int16u
+              minValue: ColorLoopStartEnhancedHueStep5d
+              maxValue: enhancedCurrentHueMaxValue
+
+    - label: "Wait for 5s"
+      PICS: CC.S.F02 && CC.S.F01
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 5000
+
+    - label: "Read EnhancedCurrentHue attribute from DUT"
+      command: "readAttribute"
+      attribute: "EnhancedCurrentHue"
+      PICS: CC.S.F02 && CC.S.F01 && CC.S.A4000 && CC.S.C44.Rsp
+      response:
+          constraints:
+              type: int16u
+              minValue: ColorLoopStartEnhancedHueStep5d
+              maxValue: enhancedCurrentHueMaxValue
+
+    - label: "Wait for 5s"
+      PICS: CC.S.F02 && CC.S.F01
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 5000
+
+    - label: "Read EnhancedCurrentHue attribute from DUT"
+      command: "readAttribute"
+      attribute: "EnhancedCurrentHue"
+      PICS: CC.S.F02 && CC.S.F01 && CC.S.A4000 && CC.S.C44.Rsp
+      response:
+          constraints:
+              type: int16u
+              minValue: ColorLoopStartEnhancedHueStep5d
+              maxValue: enhancedCurrentHueMaxValue
+
+    - label: "Wait for 5s"
+      PICS: CC.S.F02 && CC.S.F01
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 5000
+
+    - label: "Read EnhancedCurrentHue attribute from DUT"
+      command: "readAttribute"
+      attribute: "EnhancedCurrentHue"
+      PICS: CC.S.F02 && CC.S.F01 && CC.S.A4000 && CC.S.C44.Rsp
+      response:
+          constraints:
+              type: int16u
+              minValue: ColorLoopStartEnhancedHueStep5d
+              maxValue: enhancedCurrentHueMaxValue
+
+    - label: "Wait for 5s"
+      PICS: CC.S.F02 && CC.S.F01
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 5000
+
+    - label: "Read EnhancedCurrentHue attribute from DUT"
       command: "readAttribute"
       attribute: "EnhancedCurrentHue"
       PICS: CC.S.F02 && CC.S.F01 && CC.S.A4000 && CC.S.C44.Rsp
