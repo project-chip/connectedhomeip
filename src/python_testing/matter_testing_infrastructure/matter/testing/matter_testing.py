@@ -449,7 +449,10 @@ class MatterBaseTest(base_test.BaseTestClass):
 
     def get_endpoint(self, default: Optional[int] = 0) -> int:
         """Gets the target endpoint ID from config, with a fallback default."""
-        return self.matter_test_config.endpoint if self.matter_test_config.endpoint is not None else default
+        endpoint = self.matter_test_config.endpoint
+        if endpoint is not None:
+            return endpoint
+        return 0 if default is None else default
 
     def get_wifi_ssid(self, default: str = "") -> str:
         ''' Get WiFi SSID
@@ -671,6 +674,7 @@ class MatterBaseTest(base_test.BaseTestClass):
                 starting_step_idx = idx
                 break
         asserts.assert_is_not_none(starting_step_idx, "mark_step_ranges_skipped was provided with invalid starting_step_num")
+        starting_index: int = typing.cast(int, starting_step_idx)
 
         ending_step_idx = None
         # If ending_step_number is None, we skip all steps until the end of the test
@@ -681,11 +685,12 @@ class MatterBaseTest(base_test.BaseTestClass):
                     break
 
             asserts.assert_is_not_none(ending_step_idx, "mark_step_ranges_skipped was provided with invalid ending_step_num")
-            asserts.assert_greater(ending_step_idx, starting_step_idx,
+            ending_index: int = typing.cast(int, ending_step_idx)
+            asserts.assert_greater(ending_index, starting_index,
                                    "mark_step_ranges_skipped was provided with ending_step_num that is before starting_step_num")
-            skipping_steps = steps[starting_step_idx:ending_step_idx+1]
+            skipping_steps = steps[starting_index:ending_index+1]
         else:
-            skipping_steps = steps[starting_step_idx:]
+            skipping_steps = steps[starting_index:]
 
         for step in skipping_steps:
             self.skip_step(step.test_plan_number)
