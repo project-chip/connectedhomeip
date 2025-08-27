@@ -721,7 +721,7 @@ JNI_METHOD(void, pairDeviceThroughNfc)
     chip::DeviceLayer::StackLock lock;
     AndroidDeviceControllerWrapper * wrapper = AndroidDeviceControllerWrapper::FromJNIHandle(handle);
 
-    ChipLogProgress(Controller, "pairDeviceThroughNfc() called with device ID, connection object, and pincode");
+    ChipLogProgress(Controller, "pairDeviceThroughNfc() called with device ID and pincode");
 
     if (!chip::CanCastTo<uint32_t>(pinCode))
     {
