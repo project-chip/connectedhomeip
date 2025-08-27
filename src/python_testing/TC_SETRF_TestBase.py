@@ -304,7 +304,7 @@ class CommodityTariffTestBaseHelper(MatterBaseTest):
             if struct.price is not None and struct.price is not NullValue:
                 asserts.assert_true(isinstance(
                     struct.price, cluster.Structs.TariffPriceStruct), "Price field must be of type TariffPriceStruct")
-                await self.checkTariffPriceStruct(cluster=cluster, struct=struct.price)
+                await self.checkTariffPriceStruct(struct=struct.price)
         else:  # if SETRF.S.F00(PRICE) feature is disabled
             asserts.assert_is_none(struct.price, "Price must be None")
 
@@ -338,7 +338,7 @@ class CommodityTariffTestBaseHelper(MatterBaseTest):
             # checks PowerThreshold field must be of type PowerThresholdStruct
             asserts.assert_true(isinstance(
                 struct.powerThreshold, Globals.Structs.PowerThresholdStruct), "PowerThreshold must be of type PowerThresholdStruct")
-            await self.checkPowerThresholdStruct(cluster=cluster, struct=struct.powerThreshold)
+            await self.checkPowerThresholdStruct(struct=struct.powerThreshold)
         else:  # if SETRF.S.F04(PWRTHLD) feature is disabled
             asserts.assert_is_none(struct.powerThreshold, "PowerThreshold must be None")
 
@@ -389,7 +389,7 @@ class CommodityTariffTestBaseHelper(MatterBaseTest):
             if struct.currency is not NullValue:
                 asserts.assert_true(isinstance(
                     struct.currency, Globals.Structs.CurrencyStruct), "Currency must be of type CurrencyStruct")
-                await self.checkCurrencyStruct(cluster=cluster, struct=struct.currency)
+                await self.checkCurrencyStruct(struct=struct.currency)
         else:  # if SETRF.S.F00(PRICE) feature is disabled
             asserts.assert_is_none(struct.currency, "Currency must be None")
 
@@ -582,7 +582,7 @@ class CommodityTariffTestBaseHelper(MatterBaseTest):
                 matter_asserts.assert_list_element_type(
                     attribute_value, cluster.Structs.DayPatternStruct, "DayPatterns attribute must contain DayPatternStruct elements")
                 for item in attribute_value:  # check each DayPatternStruct
-                    await self.checkDayPatternStruct(cluster=cluster, struct=item)
+                    await self.checkDayPatternStruct(struct=item)
 
     async def check_calendar_periods_attribute(self, endpoint: int, attribute_value: Optional[List[cluster.Structs.CalendarPeriodStruct]] = None) -> None:
         """Validate CalendarPeriods attribute.
@@ -607,7 +607,7 @@ class CommodityTariffTestBaseHelper(MatterBaseTest):
 
             # check each CalendarPeriodStruct
             for item in attribute_value:
-                await self.checkCalendarPeriodStruct(cluster=cluster, struct=item, start_date_attribute=self.startDateAttributeValue)
+                await self.checkCalendarPeriodStruct(struct=item, start_date_attribute=self.startDateAttributeValue)
 
             # check CalendarPeriods order
             for item in range(len(attribute_value) - 1):
@@ -823,7 +823,7 @@ class CommodityTariffTestBaseHelper(MatterBaseTest):
 
             # check each TariffPeriodStruct
             for item in attribute_value:
-                await self.checkTariffPeriodStruct(cluster=cluster, struct=item)
+                await self.checkTariffPeriodStruct(struct=item)
 
     async def check_current_tariff_components_attribute(self, endpoint: int, attribute_value: Optional[List[cluster.Structs.TariffComponentStruct]] = None) -> None:
         """Validate CurrentTariffComponents attribute.
