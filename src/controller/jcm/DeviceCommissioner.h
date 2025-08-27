@@ -52,10 +52,6 @@ public:
     DeviceCommissioner() {}
     ~DeviceCommissioner() {}
 
-    DeviceProxy *GetDeviceProxy() {
-        return mDeviceProxy;
-    }
-
     void RegisterTrustVerificationDelegate(TrustVerificationDelegate * trustVerificationDelegate)
     {
         ChipLogProgress(Controller, "JCM: Setting trust verification delegate");

@@ -298,7 +298,7 @@ protected:
     {
         chip::Test::AppContext::SetUp();
 
-        mDeviceCommissioner = new DeviceCommissioner();
+        mDeviceCommissioner = new TestableDeviceCommissioner();
         mDeviceCommissioner->RegisterTrustVerificationDelegate(&mTrustVerificationDelegate);
 
 #if CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
@@ -325,7 +325,7 @@ protected:
 
 private:
     AutoCommissioner mAutoCommissioner;
-    DeviceCommissioner * mDeviceCommissioner = nullptr;
+    DeviceCommissioner * mDeviceCommissioner;
     MockTrustVerificationDelegate mTrustVerificationDelegate;
     MockClusterStateCache mClusterStateCache;
     ReadCommissioningInfo mInfo;
@@ -334,14 +334,10 @@ private:
 
 TEST_F_FROM_FIXTURE(TestCommissioner, TestTrustVerificationStageFinishedProgressesThroughStages)
 {
-    TestableDeviceCommissioner commissioner;
-
     // Simulate user consenting
     mTrustVerificationDelegate.mShouldConsent = true;
-    // Register the mock trust verification delegate
-    commissioner.RegisterTrustVerificationDelegate(&mTrustVerificationDelegate);
     // Set up the mock ReadCommissioningInfo
-    commissioner.ParseExtraCommissioningInfo(mInfo, mCommissioningParams);
+    mDeviceCommissioner->ParseExtraCommissioningInfo(mInfo, mCommissioningParams);
 
     TrustVerificationStage stage = TrustVerificationStage::kIdle;
     TrustVerificationError error = TrustVerificationError::kSuccess;
@@ -349,7 +345,7 @@ TEST_F_FROM_FIXTURE(TestCommissioner, TestTrustVerificationStageFinishedProgress
     // Start at Started, advance through all stages
 
     // Advance to kAskUserForConsent (should trigger consent)
-    commissioner.TrustVerificationStageFinished(stage, error);
+    mDeviceCommissioner->TrustVerificationStageFinished(stage, error);
     EXPECT_EQ(mTrustVerificationDelegate.mProgressUpdates, 5); // Progress not incremented for consent
     EXPECT_EQ(mTrustVerificationDelegate.mLastStage, TrustVerificationStage::kComplete);
     EXPECT_EQ(mTrustVerificationDelegate.mLastError, TrustVerificationError::kSuccess);
@@ -360,18 +356,17 @@ TEST_F_FROM_FIXTURE(TestCommissioner, TestTrustVerificationStageFinishedProgress
 
 TEST_F_FROM_FIXTURE(TestCommissioner, TestTrustVerificationStageFinishedHandlesUserConsent)
 {
-    TestableDeviceCommissioner commissioner;
-    mTrustVerificationDelegate.mShouldConsent = false; // Simulate user rejecting consent
-    commissioner.RegisterTrustVerificationDelegate(&mTrustVerificationDelegate);
+    // Simulate user rejecting consent
+    mTrustVerificationDelegate.mShouldConsent = false;
 
     // Simulate reaching consent stage
-    commissioner.mInfo.adminFabricIndex = 1;
-    commissioner.mInfo.adminEndpointId  = 1;
+    mDeviceCommissioner->mInfo.adminFabricIndex = 1;
+    mDeviceCommissioner->mInfo.adminEndpointId  = 1;
 
     TrustVerificationStage stage = TrustVerificationStage::kPerformingVendorIDVerification;
     TrustVerificationError error = TrustVerificationError::kSuccess;
 
-    commissioner.TrustVerificationStageFinished(stage, error);
+    mDeviceCommissioner->TrustVerificationStageFinished(stage, error);
     EXPECT_TRUE(mTrustVerificationDelegate.mAskedForConsent);
     EXPECT_EQ(mTrustVerificationDelegate.mProgressUpdates, 2); // Only OnProgressUpdate called for error
     EXPECT_EQ(mTrustVerificationDelegate.mLastStage, TrustVerificationStage::kAskingUserForConsent);
@@ -380,15 +375,14 @@ TEST_F_FROM_FIXTURE(TestCommissioner, TestTrustVerificationStageFinishedHandlesU
 
 TEST_F_FROM_FIXTURE(TestCommissioner, TestTrustVerificationStageFinishedHandlesError)
 {
-    TestableDeviceCommissioner commissioner;
-    mTrustVerificationDelegate.mVerifyVendorIdError = CHIP_ERROR_INTERNAL; // Simulate vendor id verification failure
-    commissioner.RegisterTrustVerificationDelegate(&mTrustVerificationDelegate);
+    // Simulate vendor id verification failure
+    mTrustVerificationDelegate.mVerifyVendorIdError = CHIP_ERROR_INTERNAL;
 
     TrustVerificationStage stage = TrustVerificationStage::kVerifyingAdministratorInformation;
     TrustVerificationError error = TrustVerificationError::kSuccess;
 
     // Simulate error at operational credentials stage
-    commissioner.TrustVerificationStageFinished(stage, error);
+    mDeviceCommissioner->TrustVerificationStageFinished(stage, error);
     EXPECT_EQ(mTrustVerificationDelegate.mProgressUpdates, 2);
     EXPECT_EQ(mTrustVerificationDelegate.mLastStage, TrustVerificationStage::kPerformingVendorIDVerification);
     EXPECT_EQ(mTrustVerificationDelegate.mLastError, TrustVerificationError::kVendorIdVerificationFailed);
