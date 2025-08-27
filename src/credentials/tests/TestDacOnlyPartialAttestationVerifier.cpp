@@ -315,27 +315,29 @@ TEST_F(TestDacOnlyPartialAttestationVerifier, TestWithMatchingPAIAndDACProductID
 // Test case validates that the verifier correctly rejects DAC certificates that have expired
 TEST_F(TestDacOnlyPartialAttestationVerifier, TestWithExpiredDACCertificate)
 {
-    // This check is only valid if the platform supports current time retrieval
-    // This is necessary to determine if the certificate is not yet valid
+// This check is only valid if the platform supports current time retrieval
+// This is necessary to determine if the certificate is not yet valid
 #if defined(CURRENT_TIME_NOT_IMPLEMENTED) || !(CHIP_SYSTEM_CONFIG_PLATFORM_PROVIDES_TIME)
     GTEST_SKIP() << "Skipping test: platform does not support current time.";
-#endif
+#else
     RunDACValidityTest(TestCerts::sTestCert_DAC_FFF2_8004_0020_ValInPast_PrivateKey,
                        TestCerts::sTestCert_DAC_FFF2_8004_0020_ValInPast_PublicKey,
                        TestCerts::sTestCert_DAC_FFF2_8004_0020_ValInPast_Cert);
+#endif
 }
 
 // Test case verifies that certificates with future validity periods are properly rejected
 TEST_F(TestDacOnlyPartialAttestationVerifier, TestWithValidInFutureDACCertificate)
 {
-    // This check is only valid if the platform supports current time retrieval
-    // This is necessary to determine if the certificate is not yet valid
+// This check is only valid if the platform supports current time retrieval
+// This is necessary to determine if the certificate is not yet valid
 #if defined(CURRENT_TIME_NOT_IMPLEMENTED) || !(CHIP_SYSTEM_CONFIG_PLATFORM_PROVIDES_TIME)
     GTEST_SKIP() << "Skipping test: platform does not support current time.";
-#endif
+#else
     RunDACValidityTest(TestCerts::sTestCert_DAC_FFF2_8004_0021_ValInFuture_PrivateKey,
                        TestCerts::sTestCert_DAC_FFF2_8004_0021_ValInFuture_PublicKey,
                        TestCerts::sTestCert_DAC_FFF2_8004_0021_ValInFuture_Cert);
+#endif
 }
 
 // Test case verifies that wrong formats for attestation elements are properly rejected
