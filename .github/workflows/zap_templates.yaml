@@ -41,8 +41,8 @@ jobs:
             run:
                 shell: sh
         if: |
-          github.actor != 'restyled-io[bot]' &&
-          (github.event_name != 'pull_request' || github.event.pull_request.draft == false)
+            github.actor != 'restyled-io[bot]' &&
+            (github.event_name != 'pull_request' || github.event.pull_request.draft == false)
 
         steps:
             - name: Checkout
