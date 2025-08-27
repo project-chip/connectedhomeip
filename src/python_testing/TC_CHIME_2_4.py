@@ -55,7 +55,7 @@ class TC_CHIME_2_4(MatterBaseTest, CHIMETestBase):
             TestStep(4, "Write the value of True to the Enabled attribute."),
             TestStep(5, "Invoke the PlayChimeSound command. Verify a success response, and a chime is played."),
             TestStep(6, "Ensure that the SelectedChime is the longest chime available on the DUT"),
-            TestStep(7, "Invoke PlayChimeSound three (3) times in rapid succession. Enure success responses. Ensure no more than two were audible"),
+            TestStep(7, "Invoke PlayChimeSound three (3) times in rapid succession. Ensure success responses. Ensure no more than two were audible"),
             TestStep(8, "If there is more than one chime sound supported, proceed to step 9, otherwise end the test case"),
             TestStep(9, "Invoke PlayChimeSound on the DUT. Verify success"),
             TestStep(10, "Write a new supported chime sound to SelectedChime"),
@@ -102,6 +102,28 @@ class TC_CHIME_2_4(MatterBaseTest, CHIMETestBase):
             asserts.assert_equal(user_response.lower(), "y")
 
         self.step(6)
+        # Use the current selected chime when in CI
+        longestChimeDurationChime = await self.read_chime_attribute_expect_success(endpoint, attributes.SelectedChime)
+        
+        if not self.is_ci:
+            user_response = self.wait_for_user_input(prompt_msg="Plesse enter the ChimeID of the longest duration chime",
+                                                     prompt_msg_placeholder=str(longestChimeDurationChime),
+                                                     default_value=str(longestChimeDurationChime))
+            chosenChimeID = int(user_response)
+            # Make sure the selected ID is valid
+            myChimeSounds = await self.read_chime_attribute_expect_success(endpoint, attributes.InstalledChimeSounds)
+            found_id = False
+            for chime in myChimeSounds:
+                if chime.chimeID == chosenChimeID:
+                    found_id = True
+                    break
+
+            if not found_id:
+                asserts.assert_fail("Unknown ChimeID selected")
+            
+            longestChimeDurationChime = chosenChimeID
+            
+        await self.write_chime_attribute_expect_success(endpoint, attributes.SelectedChime, longestChimeDurationChime)
 
         self.step(7)
         if not self.is_ci:
@@ -128,12 +150,9 @@ class TC_CHIME_2_4(MatterBaseTest, CHIMETestBase):
             await self.send_play_chime_sound_command(endpoint)
 
             self.step(10)
-            myChimeSounds = await self.read_chime_attribute_expect_success(endpoint, attributes.InstalledChimeSounds)
-            mySelectedChime = await self.read_chime_attribute_expect_success(endpoint, attributes.SelectedChime)
-
-            newSelectedChime = mySelectedChime
+            newSelectedChime = longestChimeDurationChime
             for chime in myChimeSounds:
-                if chime.chimeID != mySelectedChime:
+                if chime.chimeID != longestChimeDurationChime:
                     newSelectedChime = chime.chimeID
                     break
 
