@@ -228,9 +228,9 @@ mcxw72_executable("lock_app") {
     "../common/main",
     "../common/main/include",
     "${chip_root}/examples/lock-app/lock-common/include",
-    "${common_example_dir}/../mcxw71_k32w1/util",
-    "${common_example_dir}/../mcxw71_k32w1/app/support",
-    "${common_example_dir}/../mcxw71_k32w1/button",
+    "${common_example_dir}/../mcxw71/util",
+    "${common_example_dir}/../mcxw71/app/support",
+    "${common_example_dir}/../mcxw71/button",
   ]
 
   sources += [

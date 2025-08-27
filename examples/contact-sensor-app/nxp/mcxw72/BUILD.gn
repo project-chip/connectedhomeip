@@ -217,9 +217,9 @@ mcxw72_executable("contact_sensor_app") {
     "../common",
     "../common/include",
     "include/config",
-    "${common_example_dir}/../mcxw71_k32w1/util",
-    "${common_example_dir}/../mcxw71_k32w1/app/support",
-    "${common_example_dir}/../mcxw71_k32w1/button",
+    "${common_example_dir}/../mcxw71/util",
+    "${common_example_dir}/../mcxw71/app/support",
+    "${common_example_dir}/../mcxw71/button",
   ]
 
   deps += [

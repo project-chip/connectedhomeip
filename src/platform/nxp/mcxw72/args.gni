@@ -19,7 +19,7 @@ import("//build_overrides/openthread.gni")
 openthread_root =
     "//third_party/connectedhomeip/third_party/openthread/ot-nxp/openthread"
 nxp_platform = "mcxw72"
-nxp_sdk_name = "mcxw71_k32w1_sdk"
+nxp_sdk_name = "mcxw7x_sdk"
 nxp_use_lwip = false
 nxp_nvm_component = "nvs"
 
