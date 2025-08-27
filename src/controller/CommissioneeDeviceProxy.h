@@ -84,10 +84,11 @@ public:
      */
     void Init(ControllerDeviceInitParams params, NodeId deviceId, const Transport::PeerAddress & peerAddress)
     {
-        mSessionManager = params.sessionManager;
-        mExchangeMgr    = params.exchangeMgr;
-        mPeerId         = PeerId().SetNodeId(deviceId);
-        mState          = ConnectionState::Connecting;
+        mSessionManager   = params.sessionManager;
+        mExchangeMgr      = params.exchangeMgr;
+        mPeerId           = PeerId().SetNodeId(deviceId);
+        mOriginalDeviceId = deviceId;
+        mState            = ConnectionState::Connecting;
 
         mDeviceAddress = peerAddress;
     }
@@ -150,6 +151,8 @@ public:
 
     Transport::Type GetDeviceTransportType() const { return mDeviceAddress.GetTransportType(); }
 
+    NodeId GetOriginalDeviceId() const { return mOriginalDeviceId; }
+
 private:
     enum class ConnectionState
     {
@@ -160,6 +163,13 @@ private:
 
     /* Compressed fabric ID and node ID assigned to the device. */
     PeerId mPeerId;
+
+    /*
+     * mPeerId can change when we get a NOC, but for purposes of stopping
+     * commissioning it's useful to allow clients to use the original ID they
+     * used as a commissioning process identifier.
+     */
+    NodeId mOriginalDeviceId;
 
     /** Address used to communicate with the device.
      */
