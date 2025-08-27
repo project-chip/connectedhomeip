@@ -48,8 +48,6 @@ public:
      * Creates a resource monitoring cluster object. The Init() method needs to be called for this instance to be registered and
      * called by the interaction model at the appropriate times.
      *
-     * @param aDelegate A pointer to the delegate to be used by this server.
-     * Note: the caller must ensure that the delegate lives throughout the instance's lifetime.
      * @param aEndpointId                       The endpoint on which this cluster exists. This must match the zap configuration.
      * @param aClusterId                        The ID of the ResourceMonitoring aliased cluster to be instantiated.
      * @param aFeatureMap                       The feature map of the cluster.
@@ -57,13 +55,12 @@ public:
      * @param aResetConditionCommandSupported   Whether the ResetCondition command is supported by the cluster.                    
      */
     ResourceMonitoringCluster(
-        ResourceMonitoringDelegate* aDelegate,
         EndpointId aEndpointId,
         ClusterId aClusterId,
         uint32_t aFeatureMap,
         ResourceMonitoring::Attributes::DegradationDirection::TypeInfo::Type aDegradationDirection,
         bool aResetConditionCommandSupported
-    );     
+    );
 
     CHIP_ERROR Startup(ServerClusterContext & context) override;
 
@@ -90,7 +87,14 @@ public:
     Protocols::InteractionModel::Status UpdateInPlaceIndicator(bool newInPlaceIndicator);
     Protocols::InteractionModel::Status UpdateLastChangedTime(DataModel::Nullable<uint32_t> newLastChangedTime);
 
-    
+    /**
+     * Sets delegate to passed ResourceMonitoringDelegate pointer. If this is not nullptr, subsequent action is to set instance
+     * pointer in the delegate to this (ResourceMonitoringCluster) instance.
+     *
+     * @param aDelegate A pointer to the delegate to be used by this server.
+     * Note: the caller must ensure that the delegate lives throughout the instance's lifetime.
+     */
+    CHIP_ERROR SetDelegate(ResourceMonitoringDelegate* aDelegate);
 
     // Attribute getters
     uint8_t GetCondition() const;
@@ -128,18 +132,9 @@ private:
     DataModel::ActionReturnStatus WriteImpl(const DataModel::WriteAttributeRequest & request,
                                            AttributeValueDecoder & decoder);
 
-    std::optional<DataModel::ActionReturnStatus> ResourceMonitoringCluster::ResetCondition(const ConcreteCommandPath & commandPath,
+    std::optional<DataModel::ActionReturnStatus> ResetCondition(const ConcreteCommandPath & commandPath,
                                                                  const ResourceMonitoring::Commands::ResetCondition::DecodableType & commandData,
                                                                  CommandHandler * handler);
-
-    /**
-     * Checks if the given feature is supported by the cluster.
-     * @param feature   The aFeature to check.
-     *
-     * @return true     If the feature is supported.
-     * @return false    If the feature is not supported.
-     */
-    bool HasFeature(ResourceMonitoring::Feature aFeature) const;
 
     chip::Percent mCondition                       = 100;
     DegradationDirectionEnum mDegradationDirection = DegradationDirectionEnum::kDown;
