@@ -109,9 +109,11 @@ static_library("nxp_platform") {
 
   if (chip_crypto == "platform") {
     sources += [
-      "../common/crypto/CHIPCryptoPalS200.cpp",
-      "../common/crypto/PersistentStorageOpKeystoreS200.cpp",
-      "../common/crypto/PersistentStorageOpKeystoreS200.h",
+      "../common/crypto/PersistentStorageOpKeystoreBase.cpp",
+      "../common/crypto/PersistentStorageOpKeystoreBase.h",
+      "../common/crypto/S200/CHIPCryptoPalS200.cpp",
+      "../common/crypto/S200/PersistentStorageOpKeystoreS200.cpp",
+      "../common/crypto/S200/PersistentStorageOpKeystoreS200.h",
     ]
 
     # TODO: Why are these definitions and include dirs required here and not
