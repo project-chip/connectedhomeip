@@ -943,6 +943,15 @@ class CommodityTariffTestBaseHelper(MatterBaseTest):
                 self.defaultRandomizationType, "DefaultRandomizationType attribute must be None if RNDM feature is disabled.")
 
     async def get_day_entry_IDs_from_tariff_periods_for_particular_tariff_component(self, tariff_componentID: int, tariff_periods: List[cluster.Structs.TariffPeriodStruct]) -> List[int]:
+        """Extracts DayEntryIDs field values from the list of TariffPeriodStruct where particular TariffComponentID is present.
+
+        Args:
+            tariff_componentID (int): TariffComponentID to search for in TariffComponentIDs field.
+            tariff_periods (List[cluster.Structs.TariffPeriodStruct]): List of TariffPeriodStruct entities.
+
+        Returns:
+            List[int]: List of all DayEntryIDs from the list of TariffPeriodStruct where particular TariffComponentID is present.
+        """
 
         return list(set([tariff_period.dayEntryIDs for tariff_period in tariff_periods if tariff_componentID in tariff_period.tariffComponentIDs])).sort()
 
