@@ -942,14 +942,39 @@ class CommodityTariffTestBaseHelper(MatterBaseTest):
                 self.defaultRandomizationType, "DefaultRandomizationType attribute must be None if RNDM feature is disabled.")
 
     async def get_tariff_components_IDs_from_tariff_components_attribute(self, tariff_components: List[cluster.Structs.TariffComponentStruct]) -> List[int]:
+        """Extracts TariffComponentIDs from the list of TariffComponentStruct entities.
+
+        Args:
+            tariff_components (List[cluster.Structs.TariffComponentStruct]): List of TariffComponentStruct entities.
+
+        Returns:
+            List[int]: List of TariffComponentIDs only.
+        """
 
         return [tariff_component.tariffComponentID for tariff_component in tariff_components]
 
     async def get_day_entry_IDs_from_day_entries_attribute(self, tariff_components: List[cluster.Structs.DayEntryStruct]) -> List[int]:
+        """Extracts DayEntryIDs from the list of DayEntryStruct entities.
+
+        Args:
+            tariff_components (List[cluster.Structs.DayEntryStruct]): List of DayEntryStruct entities.
+
+        Returns:
+            List[int]: List of DayEntryIDs only.
+        """
 
         return [tariff_component.dayEntryID for tariff_component in tariff_components]
 
     async def generate_unique_uint32_for_IDs(self, list_of_IDs: List[int]) -> int:
+        """This function generates random ID (uint32) that is not in the list of given IDs.
+        Is intended to be used in TC_SETRF_2_2.
+
+        Args:
+            list_of_IDs (List[int]): List of IDs (for example, DayEntryIDs or TariffComponentIDs).
+
+        Returns:
+            int: ID (uint32) that is not in the list of given IDs
+        """
 
         IDs_set = set(list_of_IDs)
 
