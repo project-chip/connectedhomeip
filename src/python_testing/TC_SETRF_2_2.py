@@ -85,26 +85,30 @@ class TC_SETRF_2_2(CommodityTariffTestBaseHelper):
                      - Store the value of TariffComponentID field the TariffComponentStruct of the first entry as tariffComponentID1;
                      - Store the value of Label field the TariffComponentStruct of the first entry as label1;
                      - Store the TariffComponentStruct of the first entry as tariffComponentStruct1."""),
-            TestStep("5", "TH sends GetTariffComponent command with TariffComponentID set to tariffComponentID1.", """
+            TestStep("5", "TH reads TariffPeriods attribute.", """
+                     - DUT replies a list of TariffPeriodStruct entries with list length in range 1-672;
+                     - Find TariffPeriodStruct entries that have an entry equal tariffComponentID1 in TariffComponentID field;
+                     - For the found entries, store unique values of DayEntryID from DayEntryIDs field in order from min to max as dayEntryIDs1."""),
+            TestStep("6", "TH sends GetTariffComponent command with TariffComponentID set to tariffComponentID1.", """
                      - DUT replies a GetTariffComponentResponse command;
                      - Verify that Label field is a string with max length 128;
                      - Verify that Label field equals label1;
                      - Verify that DayEntryIDs field is a list of unique uint32 entries with list length in range 1 - 96;
                      - Verify that DayEntryIDs field equals dayEntryIDs1;
                      - Verify that TariffComponent field is a TariffComponentStruct equal to tariffComponentStruct1."""),
-            TestStep("6", "TH sends GetTariffComponent command with TariffComponentID set to an uint32 value not equal any from tariffComponentIDs.",
+            TestStep("7", "TH sends GetTariffComponent command with TariffComponentID set to an uint32 value not equal any from tariffComponentIDs.",
                      "DUT replies with NOT_FOUND status code."),
-            TestStep("7", "TH reads DayEntries attribute.", """
+            TestStep("8", "TH reads DayEntries attribute.", """
                      - DUT replies a list of DayEntryStruct entries with list length less or equal 672;
                      - Store the values of DayEntryID field of DayEntryStruct for all entries as dayEntryIDs;
                      - Store the value of DayEntryID field of the DayEntryStruct of the first entry as dayEntryID1;
                      - Store the DayEntryStruct of the first entry as dayEntryStruct1."""),
-            TestStep("8", "TH sends GetDayEntry command with DayEntryID set to dayEntryID1.", """
+            TestStep("9", "TH sends GetDayEntry command with DayEntryID set to dayEntryID1.", """
                      - DUT replies a GetDayEntry command;
                      - Verify that DayEntry field is a DayEntryStruct equal to dayEntryStruct1;"""),
-            TestStep("9", "TH sends GetDayEntry command with DayEntryID set to an uint32 value not equal any from dayEntryIDs.",
+            TestStep("10", "TH sends GetDayEntry command with DayEntryID set to an uint32 value not equal any from dayEntryIDs.",
                      "DUT replies with NOT_FOUND status code."),
-            TestStep("10", "TH sends TestEventTrigger command to General Diagnostics Cluster for Test Event Clear",
+            TestStep("11", "TH sends TestEventTrigger command to General Diagnostics Cluster for Test Event Clear",
                      "DUT replies with SUCCESS status code."),
         ]
 
@@ -122,6 +126,7 @@ class TC_SETRF_2_2(CommodityTariffTestBaseHelper):
         label1: str | None = None
         tariffComponentStruct1: Clusters.CommodityTariff.Structs.TariffComponentStruct | None = None
         dayEntryIDs: List[int] = []
+        dayEntryIDs1: List[int] = []
         dayEntryID1: int | None = None
         dayEntryStruct1: Clusters.CommodityTariff.Structs.DayEntryStruct | None = None
 
@@ -139,13 +144,19 @@ class TC_SETRF_2_2(CommodityTariffTestBaseHelper):
         self.step("4")
         # TH reads TariffComponents attribute, expects a list of TariffComponentStruct
         self.tariffComponentValue = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.TariffComponents)
-        self.check_tariff_components_attribute(endpoint=endpoint, attribute_value=self.tariffComponentValue)
+        await self.check_tariff_components_attribute(endpoint, self.tariffComponentValue)
         tariffComponentIDs.extend(await self.get_tariff_components_IDs_from_tariff_components_attribute(self.tariffComponentValue))
         tariffComponentID1 = self.tariffComponentValue[0].tariffComponentID
         label1 = self.tariffComponentValue[0].label
         tariffComponentStruct1 = self.tariffComponentValue[0]
 
         self.step("5")
+        # TH reads TariffPeriods attribute, expects a list of TariffPeriodStruct
+        self.tariffPeriodsValue = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.TariffPeriods)
+        await self.check_tariff_periods_attribute(endpoint, self.tariffPeriodsValue)
+        dayEntryIDs1 = await self.get_day_entry_IDs_from_tariff_periods_for_particular_tariff_component(tariffComponentID1, self.tariffPeriodsValue)
+
+        self.step("6")
         # TH sends command GetTariffComponent command with TariffComponentID field set ID of the first TariffComponentStruct, expects a GetTariffComponentResponse
         try:
             command = Clusters.CommodityTariff.Commands.GetTariffComponent(tariffComponentID=tariffComponentID1)
@@ -162,10 +173,12 @@ class TC_SETRF_2_2(CommodityTariffTestBaseHelper):
             asserts.assert_equal(
                 result.label, label1, "Label field must be equal to the label field of the first TariffComponentStruct in TariffComponents attribute.")
 
-        matter_asserts.assert_list(result.dayEntryIDs, "DayEntryIDs attribute must return a list.", 1)
+        matter_asserts.assert_list(result.dayEntryIDs, "DayEntryIDs attribute must return a list.", 1, 96)
         for item in result.dayEntryIDs:
             matter_asserts.assert_valid_uint32(item, "DayEntryIDs list element must have uint32 type")
             self.check_list_elements_uniqueness(result.dayEntryIDs, "DayEntryIDs")
+        asserts.assert_equal(result.dayEntryIDs.sort(), dayEntryIDs1,
+                             "DayEntryIDs field in GetTariffComponentResponse must be equal to the DayEntryIDs list of all TariffPeriods where first TariffComponentID is present.")
 
         asserts.assert_is_instance(result.tariffComponent, cluster.Structs.TariffComponentStruct,
                                    "TariffComponent must be a TariffComponentStruct.")
@@ -173,7 +186,7 @@ class TC_SETRF_2_2(CommodityTariffTestBaseHelper):
         asserts.assert_equal(result.tariffComponent, tariffComponentStruct1,
                              "TariffComponent field must be equal to the first TariffComponentStruct in TariffComponents attribute.")
 
-        self.step("6")
+        self.step("7")
         # TH sends command GetTariffComponent command with absent TariffComponentID value, expects NOT_FOUND status code
         absentTariffComponentID = self.generate_unique_uint32_for_IDs(tariffComponentIDs)
         try:
@@ -186,14 +199,14 @@ class TC_SETRF_2_2(CommodityTariffTestBaseHelper):
                 err.status, Status.NotFound, "Unexpected error returned"
             )
 
-        self.step("7")
+        self.step("8")
         # TH reads DayEntries attribute, expects a list of DayEntryStruct
         self.dayEntriesValue = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.DayEntries)
         dayEntryIDs.extend(await self.get_day_entry_IDs_from_day_entries_attribute(self.dayEntriesValue))
         dayEntryID1 = self.dayEntriesValue[0].dayEntryID
         dayEntryStruct1 = self.dayEntriesValue[0]
 
-        self.step("8")
+        self.step("9")
         # TH sends command GetDayEntry command with DayEntryID field set to the first DayEntryStruct, TH awaits a GetDayEntryResponse
         try:
             command = Clusters.CommodityTariff.Commands.GetDayEntry(dayEntryID=dayEntryID1)
@@ -209,7 +222,7 @@ class TC_SETRF_2_2(CommodityTariffTestBaseHelper):
         asserts.assert_equal(result.dayEntry, dayEntryStruct1,
                              "DayEntry field must be equal to the first DayEntryStruct in DayEntries attribute.")
 
-        self.step("9")
+        self.step("10")
         # TH sends command GetDayEntry command with DayEntryID field set to an absent value, expects NOT_FOUND status code
         absentDayEntryID = self.generate_unique_uint32_for_IDs(dayEntryIDs)
         try:
@@ -221,7 +234,7 @@ class TC_SETRF_2_2(CommodityTariffTestBaseHelper):
                 err.status, Status.NotFound, "Unexpected error returned"
             )
 
-        self.step("10")
+        self.step("11")
         # TH sends TestEventTrigger command to General Diagnostics Cluster for Test Event Clear, expects a SUCCESS status code
         await self.send_test_event_trigger_clear()
 

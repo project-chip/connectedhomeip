@@ -48,6 +48,7 @@ class CommodityTariffTestBaseHelper(MatterBaseTest):
     BlockModeValue = None
     tariffInformationValue = None
     tariffComponentValue = None
+    tariffPeriodsValue = None
     dayEntriesValue = None
     currentDayEntryDateValue = None
     dayEntryIDsEvents = []
@@ -807,22 +808,22 @@ class CommodityTariffTestBaseHelper(MatterBaseTest):
             endpoint (int): endpoint;
             attribute_value (Optional[List[cluster.Structs.TariffPeriodStruct]], optional): TariffPeriods attribute value. Defaults to None.
         """
-
-        if not attribute_value:
-            attribute_value = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.TariffPeriods)
+        self.tariffPeriodsValue = attribute_value
+        if not self.tariffPeriodsValue:
+            self.tariffPeriodsValue = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.TariffPeriods)
 
         if self.tariffInformationValue is not None and self.tariffInformationValue is NullValue:
-            asserts.assert_equal(attribute_value, NullValue, "TariffPeriods must be empty when TariffInfo is Null")
+            asserts.assert_equal(self.tariffPeriodsValue, NullValue, "TariffPeriods must be empty when TariffInfo is Null")
 
         # if attribute value is not null it must be list of TariffPeriodStruct
-        if attribute_value is not NullValue:
+        if self.tariffPeriodsValue is not NullValue:
             matter_asserts.assert_list(
-                attribute_value, "TariffPeriods attribute must return a list with length greater or equal 1", min_length=1, max_length=672)
+                self.tariffPeriodsValue, "TariffPeriods attribute must return a list with length greater or equal 1", min_length=1, max_length=672)
             matter_asserts.assert_list_element_type(
-                attribute_value, cluster.Structs.TariffPeriodStruct, "TariffPeriods attribute must contain TariffPeriodStruct elements")
+                self.tariffPeriodsValue, cluster.Structs.TariffPeriodStruct, "TariffPeriods attribute must contain TariffPeriodStruct elements")
 
             # check each TariffPeriodStruct
-            for item in attribute_value:
+            for item in self.tariffPeriodsValue:
                 await self.checkTariffPeriodStruct(struct=item)
 
     async def check_current_tariff_components_attribute(self, endpoint: int, attribute_value: Optional[List[cluster.Structs.TariffComponentStruct]] = None) -> None:
@@ -940,6 +941,10 @@ class CommodityTariffTestBaseHelper(MatterBaseTest):
         else:  # if feature is disabled, DefaultRandomizationType attribute must be None
             asserts.assert_is_none(
                 self.defaultRandomizationType, "DefaultRandomizationType attribute must be None if RNDM feature is disabled.")
+
+    async def get_day_entry_IDs_from_tariff_periods_for_particular_tariff_component(self, tariff_componentID: int, tariff_periods: List[cluster.Structs.TariffPeriodStruct]) -> List[int]:
+
+        return list(set([tariff_period.dayEntryIDs for tariff_period in tariff_periods if tariff_componentID in tariff_period.tariffComponentIDs])).sort()
 
     async def get_tariff_components_IDs_from_tariff_components_attribute(self, tariff_components: List[cluster.Structs.TariffComponentStruct]) -> List[int]:
         """Extracts TariffComponentIDs from the list of TariffComponentStruct entities.
