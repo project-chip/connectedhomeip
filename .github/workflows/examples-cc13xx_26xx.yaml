@@ -21,6 +21,7 @@ on:
             - 'v*-branch'
     pull_request:
     merge_group:
+    workflow_dispatch:
 
 concurrency:
     group:
@@ -39,7 +40,9 @@ jobs:
             BUILD_TYPE: gn_cc13xx_26xx
 
         runs-on: ubuntu-latest
-        if: github.actor != 'restyled-io[bot]'
+        if: |
+            github.actor != 'restyled-io[bot]' &&
+            (github.event_name != 'pull_request' || github.event.pull_request.draft == false)
 
         container:
             image: ghcr.io/project-chip/chip-build-ti:162
