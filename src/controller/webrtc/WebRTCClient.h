@@ -47,7 +47,7 @@ public:
      */
     const char * GetLocalSessionDescriptionInternal();
 
-    const char *  GetPeerConnectionState();
+    const char * GetPeerConnectionState();
     void Disconnect();
 
 private:
