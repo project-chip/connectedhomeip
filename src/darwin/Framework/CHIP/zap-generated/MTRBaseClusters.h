@@ -14597,11 +14597,11 @@ MTR_PROVISIONALLY_AVAILABLE
                                               reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler MTR_PROVISIONALLY_AVAILABLE;
 + (void)readAttributeNightVisionUsesInfraredWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
 
-- (void)readAttributeMinViewportWithCompletion:(void (^)(MTRCameraAVStreamManagementClusterVideoResolutionStruct * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
-- (void)subscribeAttributeMinViewportWithParams:(MTRSubscribeParams *)params
-                        subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
-                                  reportHandler:(void (^)(MTRCameraAVStreamManagementClusterVideoResolutionStruct * _Nullable value, NSError * _Nullable error))reportHandler MTR_PROVISIONALLY_AVAILABLE;
-+ (void)readAttributeMinViewportWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(MTRCameraAVStreamManagementClusterVideoResolutionStruct * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
+- (void)readAttributeMinViewportResolutionWithCompletion:(void (^)(MTRCameraAVStreamManagementClusterVideoResolutionStruct * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
+- (void)subscribeAttributeMinViewportResolutionWithParams:(MTRSubscribeParams *)params
+                                  subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
+                                            reportHandler:(void (^)(MTRCameraAVStreamManagementClusterVideoResolutionStruct * _Nullable value, NSError * _Nullable error))reportHandler MTR_PROVISIONALLY_AVAILABLE;
++ (void)readAttributeMinViewportResolutionWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(MTRCameraAVStreamManagementClusterVideoResolutionStruct * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
 
 - (void)readAttributeRateDistortionTradeOffPointsWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
 - (void)subscribeAttributeRateDistortionTradeOffPointsWithParams:(MTRSubscribeParams *)params
@@ -17830,8 +17830,8 @@ typedef NS_ENUM(uint8_t, MTRDataTypeThreeLevelAutoEnum) {
 } MTR_PROVISIONALLY_AVAILABLE;
 
 typedef NS_ENUM(uint8_t, MTRDataTypeWebRTCEndReasonEnum) {
-    MTRDataTypeWebRTCEndReasonEnumIceFailed MTR_PROVISIONALLY_AVAILABLE = 0x00,
-    MTRDataTypeWebRTCEndReasonEnumIceTimeout MTR_PROVISIONALLY_AVAILABLE = 0x01,
+    MTRDataTypeWebRTCEndReasonEnumICEFailed MTR_PROVISIONALLY_AVAILABLE = 0x00,
+    MTRDataTypeWebRTCEndReasonEnumICETimeout MTR_PROVISIONALLY_AVAILABLE = 0x01,
     MTRDataTypeWebRTCEndReasonEnumUserHangup MTR_PROVISIONALLY_AVAILABLE = 0x02,
     MTRDataTypeWebRTCEndReasonEnumUserBusy MTR_PROVISIONALLY_AVAILABLE = 0x03,
     MTRDataTypeWebRTCEndReasonEnumReplaced MTR_PROVISIONALLY_AVAILABLE = 0x04,
@@ -17841,7 +17841,8 @@ typedef NS_ENUM(uint8_t, MTRDataTypeWebRTCEndReasonEnum) {
     MTRDataTypeWebRTCEndReasonEnumOutOfResources MTR_PROVISIONALLY_AVAILABLE = 0x08,
     MTRDataTypeWebRTCEndReasonEnumMediaTimeout MTR_PROVISIONALLY_AVAILABLE = 0x09,
     MTRDataTypeWebRTCEndReasonEnumLowPower MTR_PROVISIONALLY_AVAILABLE = 0x0A,
-    MTRDataTypeWebRTCEndReasonEnumUnknownReason MTR_PROVISIONALLY_AVAILABLE = 0x0B,
+    MTRDataTypeWebRTCEndReasonEnumPrivacyMode MTR_PROVISIONALLY_AVAILABLE = 0x0B,
+    MTRDataTypeWebRTCEndReasonEnumUnknownReason MTR_PROVISIONALLY_AVAILABLE = 0x0C,
 } MTR_PROVISIONALLY_AVAILABLE;
 
 typedef NS_ENUM(uint8_t, MTRIdentifyEffectIdentifier) {
