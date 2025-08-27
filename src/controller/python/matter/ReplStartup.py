@@ -154,7 +154,7 @@ Note that you are still running from {os.getcwd()} so other relative paths may b
 Please add a valid `--trust-store` argument to your script. If using jupyterlab,
 the command should look like:
 
-%run {{module.path}} --trust-store /matter/root/credentials/development/paa-root-certs
+%run {{module.path}} --trust-store <path_to_sdk_root>/credentials/development/paa-root-certs
 
 or run `os.chdir` to the root of your Matter SDK repository checkout.
         ''')
