@@ -893,8 +893,8 @@ class CommodityTariffTestBaseHelper(MatterBaseTest):
                                  "DefaultRandomizationOffset must be Null when TariffInfo is Null")
 
         # check if RNDM feature and DefaultRandomizationOffset attribute are enabled
-        if (self.attribute_guard(endpoint=endpoint, attribute=cluster.Attributes.DefaultRandomizationOffset) and
-                self.feature_guard(endpoint=endpoint, cluster=cluster, feature_int=cluster.Bitmaps.Feature.kRandomization)):
+        if (await self.attribute_guard(endpoint=endpoint, attribute=cluster.Attributes.DefaultRandomizationOffset) and
+                await self.feature_guard(endpoint=endpoint, cluster=cluster, feature_int=cluster.Bitmaps.Feature.kRandomization)):
             # if feature is enabled, DefaultRandomizationOffset attribute must not be None
             asserts.assert_is_not_none(
                 self.defaultRandomizationOffset, "DefaultRandomizationOffset attribute must not be None if RNDM feature is enabled.")
@@ -923,8 +923,8 @@ class CommodityTariffTestBaseHelper(MatterBaseTest):
                                  "DefaultRandomizationType must be Null when TariffInfo is Null")
 
         # check if RNDM feature is enabled
-        if (self.attribute_guard(endpoint=endpoint, attribute=cluster.Attributes.DefaultRandomizationType) and
-                self.feature_guard(endpoint=endpoint, cluster=cluster, feature_int=cluster.Bitmaps.Feature.kRandomization)):
+        if (await self.attribute_guard(endpoint=endpoint, attribute=cluster.Attributes.DefaultRandomizationType) and
+                await self.feature_guard(endpoint=endpoint, cluster=cluster, feature_int=cluster.Bitmaps.Feature.kRandomization)):
             # if feature is enabled, DefaultRandomizationType attribute must not be None
             asserts.assert_is_not_none(
                 self.defaultRandomizationType, "DefaultRandomizationType attribute must not be None if RNDM feature is enabled.")
