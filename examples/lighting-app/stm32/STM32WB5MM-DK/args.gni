@@ -23,6 +23,7 @@ optimize_debug_level = "s"
 optimize_for_size = true
 
 chip_enable_ota_requestor = false
+chip_enable_openthread = true
 chip_enable_ble = true
 chip_config_enable_arg_parser = false
 chip_openthread_ftd = false
