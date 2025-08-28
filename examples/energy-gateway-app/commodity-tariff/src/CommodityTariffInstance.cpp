@@ -27,6 +27,7 @@ using namespace chip::app::Clusters::Globals::Structs;
 using namespace chip::app::Clusters::CommodityTariff;
 using namespace chip::app::Clusters::CommodityTariff::Attributes;
 using namespace chip::app::Clusters::CommodityTariff::Structs;
+using namespace chip::app::CommodityTariffAttrsDataMgmt;
 using namespace CommodityTariffConsts;
 
 using chip::Protocols::InteractionModel::Status;
@@ -199,6 +200,43 @@ bool CommodityTariffDelegate::TariffDataUpd_CrossValidator(TariffUpdateCtx & Upd
         ChipLogError(NotSpecified, "Both IndividualDays and CalendarPeriods are not present!");
         return false;
     }
+
+    auto & tariffPeriods = GetTariffPeriods_MgmtObj().GetNewValue().Value();
+    auto & dayEntries = GetDayEntries_MgmtObj().GetNewValue().Value();
+    auto & tariffComponents = GetTariffComponents_MgmtObj().GetNewValue().Value();
+    std::map<uint32_t, const Structs::DayEntryStruct::Type *> DayEntriesMap;
+    std::map<uint32_t, const Structs::TariffComponentStruct::Type *> TariffComponentsMap;
+
+
+    CommodityTariffAttrsDataMgmt::ListToMap<Structs::DayEntryStruct::Type, &Structs::DayEntryStruct::Type::dayEntryID>(
+        dayEntries, DayEntriesMap);
+    CommodityTariffAttrsDataMgmt::ListToMap<Structs::TariffComponentStruct::Type, &Structs::TariffComponentStruct::Type::tariffComponentID>(
+        tariffComponents, TariffComponentsMap);
+
+    for (const auto & period : tariffPeriods)
+    {
+        const DataModel::List<const uint32_t> & DeIDs = period.dayEntryIDs;
+        const DataModel::List<const uint32_t> & TcIDs = period.tariffComponentIDs;
+        uint16_t startTime = 0;
+
+        for (const auto & DeItem : DeIDs)
+        {
+            if (DayEntriesMap[DeItem]->dayEntryID != startTime)
+            {
+                return false;
+            }
+        }
+
+        for (const auto & TcItem : TcIDs)
+        {
+            if (TariffComponentsMap[TcItem]->tariffComponentID != TcItem)
+            {
+                return false;
+            }
+            chip::app::Clusters::CommodityTariff::TariffComponentsDataClass_Utils::ValidateListEntry(*TariffComponentsMap[TcItem], nullptr, &UpdCtx);
+        } 
+    }
+
 
     return true;
 }
