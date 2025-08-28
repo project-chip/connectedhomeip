@@ -1,0 +1,61 @@
+# Exclusion list for AttributePersistenceProvider and SafeAttributePersistenceProvider usage checker
+# This file contains paths to files that currently use these classes and are allowed to continue using them
+# Files listed here will be skipped when checking for new usage of these persistence providers
+
+# Documentation files
+docs/cluster_and_device_type_dev/cluster_and_device_type_dev.md
+docs/upgrading.md
+
+# Example applications
+examples/energy-management-app/energy-management-common/energy-evse/src/EnergyEvseDelegateImpl.cpp
+examples/energy-management-app/energy-management-common/energy-evse/src/EnergyEvseManager.cpp
+
+# Build files
+src/app/BUILD.gn
+src/app/chip_data_model.cmake
+src/app/persistence/BUILD.gn
+
+# Core persistence provider implementation files
+src/app/SafeAttributePersistenceProvider.h
+src/app/SafeAttributePersistenceProvider.cpp
+src/app/DefaultSafeAttributePersistenceProvider.h
+src/app/persistence/AttributePersistence.cpp
+src/app/persistence/AttributePersistence.h
+src/app/persistence/AttributePersistenceProvider.h
+src/app/persistence/AttributePersistenceProviderInstance.cpp
+src/app/persistence/AttributePersistenceProviderInstance.h
+src/app/persistence/DefaultAttributePersistenceProvider.h
+src/app/persistence/DeferredAttributePersistenceProvider.cpp
+src/app/persistence/DeferredAttributePersistenceProvider.h
+src/app/persistence/String.h
+
+# Server and data model implementations
+src/app/server/Server.cpp
+src/app/server-cluster/ServerClusterContext.h
+src/app/server-cluster/testing/TestServerClusterContext.h
+src/app/util/attribute-storage.cpp
+
+# Data model providers
+src/data-model-providers/codedriven/CodeDrivenDataModelProvider.cpp
+src/data-model-providers/codedriven/CodeDrivenDataModelProvider.h
+src/data-model-providers/codedriven/tests/TestCodeDrivenDataModelProvider.cpp
+src/data-model-providers/codegen/CodegenDataModelProvider.cpp
+src/data-model-providers/codegen/model.cmake
+
+# Cluster server implementations that currently use SafeAttributePersistenceProvider
+src/app/clusters/basic-information/BasicInformationCluster.cpp
+src/app/clusters/boolean-state-configuration-server/boolean-state-configuration-server.cpp
+src/app/clusters/camera-av-settings-user-level-management-server/camera-av-settings-user-level-management-server.h
+src/app/clusters/camera-av-stream-management-server/camera-av-stream-management-server.h
+src/app/clusters/chime-server/chime-server.cpp
+src/app/clusters/mode-base-server/mode-base-server.cpp
+src/app/clusters/mode-base-server/mode-base-server.h
+src/app/clusters/resource-monitoring-server/resource-monitoring-server.cpp
+src/app/clusters/thread-network-directory-server/thread-network-directory-server.cpp
+src/app/clusters/tls-certificate-management-server/tls-certificate-management-server.cpp
+src/app/clusters/tls-client-management-server/tls-client-management-server.cpp
+src/app/clusters/unit-localization-server/unit-localization-server.cpp
+src/app/clusters/zone-management-server/zone-management-server.h
+
+# Platform-specific project files
+src/darwin/Framework/Matter.xcodeproj/project.pbxproj
