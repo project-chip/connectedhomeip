@@ -729,7 +729,7 @@ public:
 
             if (CHIP_NO_ERROR == err)
             {
-                getStorageRef() = DataType(); // Default construct in place
+                assignStorageVal(DataType()); // Default construct in place
                 err             = CopyData(actualValue, getStorageRef());
             }
         }
