@@ -92,12 +92,16 @@ struct RefEncodableClientCert
     {
         VerifyOrReturnError(certificate != nullptr, CHIP_ERROR_INTERNAL);
 
-        MutableByteSpan targetBytes(certBytes);
-        ReturnErrorOnFailure(CopySpanToMutableSpan(src.clientCertificate.Value(), targetBytes));
+        if (src.clientCertificate.HasValue())
+        {
+            MutableByteSpan targetBytes(certBytes);
+            ReturnErrorOnFailure(CopySpanToMutableSpan(src.clientCertificate.Value().Value(), targetBytes));
+            certificate->clientCertificate.SetValue(Nullable<ByteSpan>(targetBytes));
+        }
 
         if (src.intermediateCertificates.HasValue())
         {
-            auto srcIter = src.intermediateCertificates.Value().begin();
+            auto srcIter = src.intermediateCertificates.Value().Value().begin();
             uint8_t i    = 0;
             while (srcIter.Next())
             {
@@ -116,7 +120,6 @@ struct RefEncodableClientCert
 
         certificate->fabricIndex = fabric;
         certificate->ccdid       = src.ccdid;
-        certificate->clientCertificate.SetValue(targetBytes);
         return CHIP_NO_ERROR;
     }
 };
@@ -280,18 +283,13 @@ Status TlsCertificateManagementCommandDelegate::GenerateClientCsr(EndpointId mat
     std::array<uint8_t, 128> nonceData;
     MutableByteSpan nonceSignature(nonceData);
 
-    ScopedMemoryBuffer<uint8_t> nocsrElementsData;
-    size_t nocsrElementsSize = kSpecMaxCertBytes + 128 + /*tlvPadding=*/100;
-    nocsrElementsData.Alloc(nocsrElementsSize);
-    MutableByteSpan nocsrElementsBuffer(nocsrElementsData.Get(), nocsrElementsSize);
-
     ClientCsrResponseType csrResponse;
     UniquePtr<InlineBufferedClientCert> certBuffer(New<InlineBufferedClientCert>());
-    auto result = mCertificateTable.PrepareClientCertificate(fabric, request.nonce, certBuffer->buffer, nocsrElementsBuffer,
-                                                             csrResponse.ccdid, csr, nonceSignature);
+    auto result = mCertificateTable.PrepareClientCertificate(fabric, request.nonce, certBuffer->buffer, csrResponse.ccdid, csr,
+                                                             nonceSignature);
     VerifyOrReturnValue(result == CHIP_NO_ERROR, Status::Failure);
-    csrResponse.csr   = csr;
-    csrResponse.nonce = nonceSignature;
+    csrResponse.csr            = csr;
+    csrResponse.nonceSignature = nonceSignature;
     return loadedCallback(csrResponse);
 }
 
@@ -300,8 +298,12 @@ ClusterStatusCode TlsCertificateManagementCommandDelegate::ProvisionClientCert(E
 {
     UniquePtr<InlineBufferedClientCert> certBuffer(New<InlineBufferedClientCert>());
     VerifyOrReturnError(certBuffer, ClusterStatusCode(CHIP_ERROR_NO_MEMORY));
-    auto result = mCertificateTable.UpdateClientCertificateEntry(fabric, provisionReq.ccdid, certBuffer->buffer,
-                                                                 provisionReq.clientCertificateDetails);
+    TLSClientCertificateDetailStruct::DecodableType details;
+    details.ccdid = provisionReq.ccdid;
+    details.clientCertificate.SetValue(provisionReq.clientCertificate);
+    details.intermediateCertificates.SetValue(provisionReq.intermediateCertificates);
+    details.SetFabricIndex(fabric);
+    auto result = mCertificateTable.UpdateClientCertificateEntry(fabric, provisionReq.ccdid, certBuffer->buffer, details);
     VerifyOrReturnValue(result == CHIP_NO_ERROR, ClusterStatusCode(Status::Failure));
     return ClusterStatusCode(Status::Success);
 }
@@ -384,7 +386,7 @@ TlsCertificateManagementCommandDelegate::LookupClientCertByFingerprint(EndpointI
                 continue;
             }
             bool match = false;
-            ReturnErrorOnFailure(FingerprintMatch(fingerprint, cert.clientCertificate.Value(), match));
+            ReturnErrorOnFailure(FingerprintMatch(fingerprint, cert.clientCertificate.Value().Value(), match));
             if (match)
             {
                 UniquePtr<InlineEncodableClientCert> callbackCert(New<InlineEncodableClientCert>());

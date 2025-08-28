@@ -14293,9 +14293,10 @@ class ChipClusters:
             },
             0x00000007: {
                 "commandId": 0x00000007,
-                "commandName": "TLSClientCSR",
+                "commandName": "ClientCSR",
                 "args": {
                     "nonce": "bytes",
+                    "ccdid": "int",
                 },
             },
             0x00000009: {
@@ -14303,7 +14304,8 @@ class ChipClusters:
                 "commandName": "ProvisionClientCertificate",
                 "args": {
                     "ccdid": "int",
-                    "clientCertificateDetails": "TLSClientCertificateDetailStruct",
+                    "clientCertificate": "bytes",
+                    "intermediateCertificates": "bytes",
                 },
             },
             0x0000000A: {

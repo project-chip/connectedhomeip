@@ -50264,12 +50264,19 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 else
                 {
                     jobject newElement_0_clientCertificateInsideOptional;
-                    jbyteArray newElement_0_clientCertificateInsideOptionalByteArray =
-                        env->NewByteArray(static_cast<jsize>(entry_0.clientCertificate.Value().size()));
-                    env->SetByteArrayRegion(newElement_0_clientCertificateInsideOptionalByteArray, 0,
-                                            static_cast<jsize>(entry_0.clientCertificate.Value().size()),
-                                            reinterpret_cast<const jbyte *>(entry_0.clientCertificate.Value().data()));
-                    newElement_0_clientCertificateInsideOptional = newElement_0_clientCertificateInsideOptionalByteArray;
+                    if (entry_0.clientCertificate.Value().IsNull())
+                    {
+                        newElement_0_clientCertificateInsideOptional = nullptr;
+                    }
+                    else
+                    {
+                        jbyteArray newElement_0_clientCertificateInsideOptionalByteArray =
+                            env->NewByteArray(static_cast<jsize>(entry_0.clientCertificate.Value().Value().size()));
+                        env->SetByteArrayRegion(newElement_0_clientCertificateInsideOptionalByteArray, 0,
+                                                static_cast<jsize>(entry_0.clientCertificate.Value().Value().size()),
+                                                reinterpret_cast<const jbyte *>(entry_0.clientCertificate.Value().Value().data()));
+                        newElement_0_clientCertificateInsideOptional = newElement_0_clientCertificateInsideOptionalByteArray;
+                    }
                     chip::JniReferences::GetInstance().CreateOptional(newElement_0_clientCertificateInsideOptional,
                                                                       newElement_0_clientCertificate);
                 }
@@ -50281,20 +50288,27 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 else
                 {
                     jobject newElement_0_intermediateCertificatesInsideOptional;
-                    chip::JniReferences::GetInstance().CreateArrayList(newElement_0_intermediateCertificatesInsideOptional);
-
-                    auto iter_newElement_0_intermediateCertificatesInsideOptional_3 =
-                        entry_0.intermediateCertificates.Value().begin();
-                    while (iter_newElement_0_intermediateCertificatesInsideOptional_3.Next())
+                    if (entry_0.intermediateCertificates.Value().IsNull())
                     {
-                        auto & entry_3 = iter_newElement_0_intermediateCertificatesInsideOptional_3.GetValue();
-                        jobject newElement_3;
-                        jbyteArray newElement_3ByteArray = env->NewByteArray(static_cast<jsize>(entry_3.size()));
-                        env->SetByteArrayRegion(newElement_3ByteArray, 0, static_cast<jsize>(entry_3.size()),
-                                                reinterpret_cast<const jbyte *>(entry_3.data()));
-                        newElement_3 = newElement_3ByteArray;
-                        chip::JniReferences::GetInstance().AddToList(newElement_0_intermediateCertificatesInsideOptional,
-                                                                     newElement_3);
+                        newElement_0_intermediateCertificatesInsideOptional = nullptr;
+                    }
+                    else
+                    {
+                        chip::JniReferences::GetInstance().CreateArrayList(newElement_0_intermediateCertificatesInsideOptional);
+
+                        auto iter_newElement_0_intermediateCertificatesInsideOptional_4 =
+                            entry_0.intermediateCertificates.Value().Value().begin();
+                        while (iter_newElement_0_intermediateCertificatesInsideOptional_4.Next())
+                        {
+                            auto & entry_4 = iter_newElement_0_intermediateCertificatesInsideOptional_4.GetValue();
+                            jobject newElement_4;
+                            jbyteArray newElement_4ByteArray = env->NewByteArray(static_cast<jsize>(entry_4.size()));
+                            env->SetByteArrayRegion(newElement_4ByteArray, 0, static_cast<jsize>(entry_4.size()),
+                                                    reinterpret_cast<const jbyte *>(entry_4.data()));
+                            newElement_4 = newElement_4ByteArray;
+                            chip::JniReferences::GetInstance().AddToList(newElement_0_intermediateCertificatesInsideOptional,
+                                                                         newElement_4);
+                        }
                     }
                     chip::JniReferences::GetInstance().CreateOptional(newElement_0_intermediateCertificatesInsideOptional,
                                                                       newElement_0_intermediateCertificates);
