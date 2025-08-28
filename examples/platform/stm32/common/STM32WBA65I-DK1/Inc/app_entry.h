@@ -69,7 +69,7 @@ typedef void (*PushButtonCallback)(ButtonDesc_t *aMessage);
 #define X_CUBE_MATTER_VERSION "v1.4.0"
 #define PRODUCT_NAME "Dimmable Light"
 #define VENDOR_NAME "STMicroelectronics"
-#define MATTER_SDK_VERSION "1.4"
+#define MATTER_SDK_VERSION "Master"
 /* USER CODE BEGIN EC */
 
 /* USER CODE END EC */

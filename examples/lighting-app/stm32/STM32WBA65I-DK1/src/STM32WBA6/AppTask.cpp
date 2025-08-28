@@ -129,8 +129,6 @@ void UnlockOpenThreadTask(void) {
 CHIP_ERROR AppTask::Init() {
 
     CHIP_ERROR err = CHIP_NO_ERROR;
-    ChipLogProgress(NotSpecified, "Current Software Version: %s",
-            CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING);
 
     /* Setup button handler */
     APPE_PushButtonSetReceiveCb(ButtonEventHandler);
