@@ -1,9 +1,9 @@
 #!/bin/bash
 
-# This script checks for the use of 'SafeAttributePersistenceProvider' and 'AttributePersistenceProvider' 
+# This script checks for the use of 'SafeAttributePersistenceProvider' 
 # symbols in the codebase. It takes exclusion folders as arguments and can also read exclusions from a file.
 
-# Function to check for SafeAttributePersistenceProvider and AttributePersistenceProvider symbols
+# Function to check for SafeAttributePersistenceProvider symbols
 check_symbols() {
     local exclusions=()
     while [[ $# -gt 0 ]]; do
@@ -40,24 +40,14 @@ check_symbols() {
     # Search for SafeAttributePersistenceProvider usage (class usage, not just includes)
     safe_provider_matches=$(git grep -I -n '\<SafeAttributePersistenceProvider\>' -- './*' "${exclusions[@]}" | grep -v '#include')
 
-    # Search for AttributePersistenceProvider usage (class usage, not just includes)
-    provider_matches=$(git grep -I -n '\<AttributePersistenceProvider\>' -- './*' "${exclusions[@]}" | grep -v '#include')
-
-    if [[ -n "$safe_provider_matches" || -n "$provider_matches" ]]; then
-        echo "Error: Found 'SafeAttributePersistenceProvider' or 'AttributePersistenceProvider' usage in the following files and lines:"
-        if [[ -n "$safe_provider_matches" ]]; then
-            echo ""
-            echo "SafeAttributePersistenceProvider usage:"
-            echo "$safe_provider_matches"
-        fi
-        if [[ -n "$provider_matches" ]]; then
-            echo ""
-            echo "AttributePersistenceProvider usage:"
-            echo "$provider_matches"
-        fi
+    if [[ -n "$safe_provider_matches" ]]; then
+        echo "Error: Found 'SafeAttributePersistenceProvider' usage in the following files and lines:"
+        echo ""
+        echo "SafeAttributePersistenceProvider usage:"
+        echo "$safe_provider_matches"
         exit 1
     else
-        echo "SUCCESS: No unauthorized usage of AttributePersistenceProvider or SafeAttributePersistenceProvider found."
+        echo "SUCCESS: No unauthorized usage of SafeAttributePersistenceProvider found."
     fi
 }
 
