@@ -125,16 +125,16 @@ TEST_F(TestLocalizationConfigurationCluster, TestReadAndWriteActiveLocale)
 
     // Create cluster instance with an invalid locale.
     CharSpan initialLocale = CharSpan::fromCharString("de-DE");
-    LocalizationConfigurationCluster cluster(initialLocale);
+    LocalizationConfigurationCluster cluster(*mDeviceInfoProvider, initialLocale);
 
     // ActiveLocale should not be set.
     CharSpan actualLocale = cluster.GetLogic().GetActiveLocale();
     EXPECT_EQ(actualLocale.size(), size_t(0));
 
     // Test 1: Write a valid supported locale.
-    CharSpan validLocale = CharSpan::fromCharString("es-ES");
-    CHIP_ERROR error     = cluster.GetLogic().SetActiveLocale(validLocale);
-    EXPECT_EQ(error, CHIP_NO_ERROR);
+    CharSpan validLocale                       = CharSpan::fromCharString("es-ES");
+    Protocols::InteractionModel::Status status = cluster.GetLogic().SetActiveLocale(validLocale);
+    EXPECT_EQ(status, Protocols::InteractionModel::Status::Success);
 
     // Verify the valid locale was written correctly.
     actualLocale = cluster.GetLogic().GetActiveLocale();
@@ -144,8 +144,8 @@ TEST_F(TestLocalizationConfigurationCluster, TestReadAndWriteActiveLocale)
     // Test 2: Write an invalid unsupported locale.
     CharSpan invalidLocale = CharSpan::fromCharString("de-DE");
 
-    error = cluster.GetLogic().SetActiveLocale(invalidLocale);
-    EXPECT_EQ(error, CHIP_ERROR_NOT_FOUND);
+    status = cluster.GetLogic().SetActiveLocale(invalidLocale);
+    EXPECT_EQ(status, Protocols::InteractionModel::Status::ConstraintError);
 }
 
 TEST_F(TestLocalizationConfigurationCluster, TestReadAttributes)
@@ -156,7 +156,7 @@ TEST_F(TestLocalizationConfigurationCluster, TestReadAttributes)
 
     // Create cluster instance
     CharSpan initialLocale = CharSpan::fromCharString("en-US");
-    LocalizationConfigurationCluster cluster(initialLocale);
+    LocalizationConfigurationCluster cluster(*mDeviceInfoProvider, initialLocale);
 
     ReadOnlyBufferBuilder<DataModel::AttributeEntry> attributesBuilder;
     ASSERT_EQ(cluster.Attributes(ConcreteClusterPath(kRootEndpointId, LocalizationConfiguration::Id), attributesBuilder),
