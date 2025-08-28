@@ -67,7 +67,7 @@ void emberAfGeneralCommissioningClusterInitCallback(EndpointId endpointId)
     CHIP_ERROR err = CodegenDataModelProvider::Instance().Registry().Register(gServer.Registration());
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(AppServer, "Admin Commissioning register error: endpoint %u, %" CHIP_ERROR_FORMAT, endpointId, err.Format());
+        ChipLogError(AppServer, "General Commissioning register error: endpoint %u, %" CHIP_ERROR_FORMAT, endpointId, err.Format());
     }
     DeviceLayer::PlatformMgrImpl().AddEventHandler(OnPlatformEventHandler);
     chip::Server::GetInstance().GetFabricTable().AddFabricDelegate(&fabricDelegate);
@@ -85,7 +85,7 @@ void emberAfGeneralCommissioningClusterShutdownCallback(EndpointId endpointId)
     CHIP_ERROR err = CodegenDataModelProvider::Instance().Registry().Unregister(&gServer.Cluster());
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(AppServer, "Admin Commissioning unregister error: endpoint %u, %" CHIP_ERROR_FORMAT, endpointId, err.Format());
+        ChipLogError(AppServer, "General Commissioning unregister error: endpoint %u, %" CHIP_ERROR_FORMAT, endpointId, err.Format());
     }
     gServer.Destroy();
 }
