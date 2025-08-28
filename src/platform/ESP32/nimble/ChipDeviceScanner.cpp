@@ -53,7 +53,7 @@ bool NimbleGetChipDeviceInfo(const ble_hs_adv_field * field, chip::Ble::ChipBLED
 void ChipDeviceScanner::ReportDevice(const uint8_t * adv_data, size_t adv_data_len, const ble_addr_t & addr)
 {
     const struct ble_hs_adv_field * field = reinterpret_cast<const struct ble_hs_adv_field *>(adv_data);
-    while (field && field->length > 0 && field->length <= adv_data_len - 2)
+    while (field && field->length > 0 && field->length + 1 <= adv_data_len)
     {
         chip::Ble::ChipBLEDeviceIdentificationInfo deviceInfo;
         if (NimbleGetChipDeviceInfo(field, deviceInfo))
@@ -63,7 +63,7 @@ void ChipDeviceScanner::ReportDevice(const uint8_t * adv_data, size_t adv_data_l
         }
         adv_data     = adv_data + 1 + field->length;
         adv_data_len = adv_data_len - 1 - field->length;
-        field        = reinterpret_cast<const struct ble_hs_adv_field *>(adv_data);
+        field        = adv_data_len >= 2 ? reinterpret_cast<const struct ble_hs_adv_field *>(adv_data) : nullptr;
     }
     ChipLogDetail(Ble, "Device %s does not look like a CHIP device", addr_str(addr.val));
 }
