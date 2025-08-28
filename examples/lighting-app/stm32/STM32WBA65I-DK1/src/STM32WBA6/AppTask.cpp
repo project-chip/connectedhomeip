@@ -296,7 +296,7 @@ void AppTask::ButtonEventHandler(ButtonDesc_t *Button) {
     	 AppEvent event;
     	 event.Type = AppEvent::kEventType_Timer;
     	 event.Handler = UpdateNvmEventHandler;
-    	 sAppTask.mFunction = kFunction_FactoryReset;;
+    	 sAppTask.mFunction = kFunction_FactoryReset;
     	 sAppTask.PostEvent(&event);
     }
     else {
