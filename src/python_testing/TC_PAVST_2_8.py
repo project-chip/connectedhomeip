@@ -37,12 +37,13 @@
 
 import logging
 
+from mobly import asserts
+from TC_PAVSTTestBase import PAVSTTestBase
+
 import matter.clusters as Clusters
+from matter.clusters.Types import Nullable
 from matter.interaction_model import Status
 from matter.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main, has_cluster, run_if_endpoint_matches
-from mobly import asserts
-from matter.clusters.Types import Nullable
-from TC_PAVSTTestBase import PAVSTTestBase
 
 logger = logging.getLogger(__name__)
 

@@ -18,10 +18,11 @@
 import logging
 import random
 
-import matter.clusters as Clusters
-from matter.interaction_model import InteractionModelError, Status
-from matter import ChipDeviceCtrl
 from mobly import asserts
+
+import matter.clusters as Clusters
+from matter import ChipDeviceCtrl
+from matter.interaction_model import InteractionModelError, Status
 
 logger = logging.getLogger(__name__)
 
