@@ -168,15 +168,15 @@ static inline void emitMetricForSetupPayload(NSString * payload)
     }
 }
 
-- (void)stop
+- (BOOL)stop
 {
     MTRDeviceController_Concrete * strongController = _controller;
     if (!strongController) {
         // Nothing to do; controller is gone, so we are stopped no matter what.
-        return;
+        return NO;
     }
 
-    [strongController stopCommissioning:self forCommissioningID:_commissioningID];
+    return [strongController stopCommissioning:self forCommissioningID:_commissioningID];
 }
 
 - (void)_earlyFailCommissioning:(CHIP_ERROR)error
