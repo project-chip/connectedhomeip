@@ -41,6 +41,9 @@ MTR_UNSTABLE_API
  *
  * The provided delegate will be notified about various things as commissioning
  * proceeds.  The calls into the delegate will happen on the provided queue.
+ *
+ * Modifying the parameters after this call will have no effect on the behavior
+ * of the MTRCommissioningOperation.
  */
 - (nullable instancetype)initWithParameters:(MTRCommissioningParameters *)parameters
                                setupPayload:(NSString *)payload
@@ -57,8 +60,11 @@ MTR_UNSTABLE_API
 /**
  * Stop commissioning.  This will typically result in
  * commissioning:failedWithError: callbacks to delegates.
+ *
+ * Returns YES if this commissioning was still in-progress and has now been
+ * stopped; returns NO if this commissioning wasn't in-progress.
  */
-- (void)stop;
+- (BOOL)stop;
 
 @end
 

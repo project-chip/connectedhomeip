@@ -238,8 +238,11 @@ NS_ASSUME_NONNULL_BEGIN
 
 /**
  * Stop commissioning for the given MTRCommissioningOperation.
+ *
+ * Returns NO if this is not the current commissioning or if we can't
+ * sync-dispatch things to the Matter queue to talk to the C++ code.
  */
-- (void)stopCommissioning:(MTRCommissioningOperation *)commissioning forCommissioningID:(NSNumber *)commissioningID;
+- (BOOL)stopCommissioning:(MTRCommissioningOperation *)commissioning forCommissioningID:(NSNumber *)commissioningID;
 
 /**
  * Notification that a commissioning operation is done.

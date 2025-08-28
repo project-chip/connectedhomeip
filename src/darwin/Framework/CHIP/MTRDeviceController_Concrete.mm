@@ -1291,15 +1291,15 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
     return [self _cancelCommissioningForNodeID:nodeID error:error];
 }
 
-- (void)stopCommissioning:(MTRCommissioningOperation *)commissioning forCommissioningID:(NSNumber *)commissioningID
+- (BOOL)stopCommissioning:(MTRCommissioningOperation *)commissioning forCommissioningID:(NSNumber *)commissioningID
 {
     auto * currentCommissioning = self.currentCommissioning;
     if (commissioning != currentCommissioning) {
         MTR_LOG_ERROR("%@ commissioning %@ has already stopped and been replaced by %@", self, commissioning, currentCommissioning);
-        return;
+        return NO;
     }
 
-    [self _cancelCommissioningForNodeID:commissioningID error:nil];
+    return [self _cancelCommissioningForNodeID:commissioningID error:nil];
 }
 
 - (BOOL)_cancelCommissioningForNodeID:(NSNumber *)nodeID error:(NSError * __autoreleasing *)error
