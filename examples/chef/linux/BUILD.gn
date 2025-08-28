@@ -32,6 +32,7 @@ if (chip_enable_pw_rpc) {
 import("sample.gni")
 
 project_dir = "./.."
+chip_root = "./../../.."
 
 chip_data_model("chef-data-model") {
   zap_file = "${project_dir}/devices/${sample_zap_file}"
@@ -75,8 +76,8 @@ executable("${sample_name}") {
     "${project_dir}/common/clusters/window-covering/chef-window-covering.cpp",
     "${project_dir}/common/stubs.cpp",
     "${project_dir}/linux/main.cpp",
-    "../../../src/app/clusters/boolean-state-server/CodegenIntegration.cpp",
-    "../../../src/app/clusters/boolean-state-server/boolean-state-cluster.cpp",
+    "${chip_root}/src/app/clusters/boolean-state-server/CodegenIntegration.cpp",
+    "${chip_root}/src/app/clusters/boolean-state-server/boolean-state-cluster.cpp",
   ]
 
   deps = [

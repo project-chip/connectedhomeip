@@ -116,6 +116,8 @@ target_sources(app PRIVATE
     ${CHEF}/common/stubs.cpp
     ${CHEF}/nrfconnect/AppTask.cpp
     ${CHEF}/nrfconnect/main.cpp
+    ${CHIP_ROOT}/src/app/clusters/boolean-state-server/CodegenIntegration.cpp
+    ${CHIP_ROOT}/src/app/clusters/boolean-state-server/boolean-state-cluster.cpp
 )
 
 message(STATUS ${CHEF}/devices/${CONFIG_CHEF_DEVICE_TYPE}.zap)
