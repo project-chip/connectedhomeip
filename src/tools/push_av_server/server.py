@@ -468,6 +468,9 @@ class PushAvServer:
             p = self.wd.path("streams", str(stream_id), file_path)
             with open(p, "r") as f:
                 context['cert'] = json.load(f)
+        elif file_path == 'details.json':
+            context['type'] = 'details'
+            context['details'] = self._read_stream_details(stream_id)
         else:
             context['type'] = 'media'
             context['probe'] = self.ffprobe_check(stream_id, file_path)
