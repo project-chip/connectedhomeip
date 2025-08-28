@@ -217,18 +217,6 @@ Protocols::InteractionModel::Status CameraAVStreamManager::VideoStreamDeallocate
     {
         if (stream.videoStreamParams.videoStreamID == streamID && stream.isAllocated)
         {
-            if (stream.videoStreamParams.referenceCount > 0)
-            {
-                ChipLogError(Camera, "Video stream with ID: %d still in use", streamID);
-                return Status::InvalidInState;
-            }
-
-            if (stream.videoStreamParams.streamUsage == Globals::StreamUsageEnum::kInternal)
-            {
-                ChipLogError(Camera, "Video stream with ID: %d is Internal", streamID);
-                return Status::DynamicConstraintError;
-            }
-
             // Stop the video stream
             mCameraDeviceHAL->GetCameraHALInterface().StopVideoStream(streamID);
 
@@ -240,7 +228,7 @@ Protocols::InteractionModel::Status CameraAVStreamManager::VideoStreamDeallocate
         }
     }
 
-    ChipLogError(Camera, "Allocated video stream with ID: %d not found", streamID);
+    ChipLogError(Camera, "Allocated video stream with ID: %d not found internally", streamID);
 
     return Status::NotFound;
 }
@@ -281,18 +269,6 @@ Protocols::InteractionModel::Status CameraAVStreamManager::AudioStreamDeallocate
     {
         if (stream.audioStreamParams.audioStreamID == streamID && stream.isAllocated)
         {
-            if (stream.audioStreamParams.referenceCount > 0)
-            {
-                ChipLogError(Camera, "Audio stream with ID: %d still in use", streamID);
-                return Status::InvalidInState;
-            }
-
-            if (stream.audioStreamParams.streamUsage == Globals::StreamUsageEnum::kInternal)
-            {
-                ChipLogError(Camera, "Audio stream with ID: %d is Internal", streamID);
-                return Status::DynamicConstraintError;
-            }
-
             // Stop the audio stream
             mCameraDeviceHAL->GetCameraHALInterface().StopAudioStream(streamID);
 
@@ -302,7 +278,7 @@ Protocols::InteractionModel::Status CameraAVStreamManager::AudioStreamDeallocate
         }
     }
 
-    ChipLogError(Camera, "Allocated audio stream with ID: %d not found", streamID);
+    ChipLogError(Camera, "Allocated audio stream with ID: %d not found internally", streamID);
 
     return Status::NotFound;
 }
