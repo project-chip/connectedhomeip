@@ -17,7 +17,7 @@
 
 import random
 import tempfile
-from typing import Union
+from typing import Optional, Union
 
 import requests
 from cryptography import x509
@@ -77,67 +77,65 @@ class PushAvServerProcess(Subprocess):
         )
 
     def __del__(self):
-        self._working_directory.cleanup()
+        try:
+            self._working_directory.cleanup()
+        except Exception:
+            pass
 
-    def get_root_cert(self):
-        response = requests.get(f"{self.base_url}/certs/server/root.pem", verify=False).json()
-        root_cert_response = response["cert"]["public_cert"]
-        root_cert_pem = x509.load_pem_x509_certificate(
-            root_cert_response.encode("utf-8")
-        )
-        root_cert_der = root_cert_pem.public_bytes(encoding=serialization.Encoding.DER)
-        return root_cert_der
+    def _get_json(self, endpoint: str) -> dict:
+        url = f"{self.base_url}{endpoint}"
+        response = requests.get(url, verify=False, timeout=5)
+        response.raise_for_status()
+        return response.json()
 
-    def get_device_certificate(self, device_name: str = "DUT"):
-        client_cert_response = requests.get(
-            f"{self.base_url}/certs/device/{device_name}.pem", verify=False
-        ).json()
-        device_cert = client_cert_response["cert"]["public_cert"]
-        device_cert_pem = x509.load_pem_x509_certificate(device_cert.encode("utf-8"))
-        device_cert_der = device_cert_pem.public_bytes(
-            encoding=serialization.Encoding.DER
-        )
-        return device_cert_der
+    def _post_json(self, endpoint: str, data: Optional[dict] = None) -> dict:
+        url = f"{self.base_url}{endpoint}"
+        response = requests.post(url, json=data or {}, verify=False, timeout=5)
+        response.raise_for_status()
+        return response.json()
 
-    def sign_csr(self, csr_der, device_name: str = "DUT"):
-        # Load DER CSR
+    def get_root_cert(self) -> bytes:
+        """Retrieve the root certificate in DER format."""
+        response = self._get_json("/certs/server/root.pem")
+        root_cert_pem = response["cert"]["public_cert"].encode("utf-8")
+        root_cert = x509.load_pem_x509_certificate(root_cert_pem)
+        return root_cert.public_bytes(encoding=serialization.Encoding.DER)
+
+    def get_device_certificate(self, device_name: str = "DUT") -> bytes:
+        """Retrieve a device certificate in DER format."""
+        response = self._get_json(f"/certs/device/{device_name}.pem")
+        device_cert_pem = response["cert"]["public_cert"].encode("utf-8")
+        device_cert = x509.load_pem_x509_certificate(device_cert_pem)
+        return device_cert.public_bytes(encoding=serialization.Encoding.DER)
+
+    def sign_csr(self, csr_der: bytes, device_name: str = "DUT") -> dict:
+        """Submit a CSR for signing and return the server's response."""
         csr = x509.load_der_x509_csr(csr_der)
         csr_pem = csr.public_bytes(serialization.Encoding.PEM).decode("utf-8")
+        return self._post_json(f"/certs/{device_name}/sign", {"csr": csr_pem})
 
-        # Sign the request
-        # Returns the certificate path that is created in server's working directory
-        csr_response = requests.post(
-            f"{self.base_url}/certs/{device_name}/sign", json={"csr": csr_pem}, verify=False
-        ).json()
-
-        return csr_response
-
-    def create_stream(self):
-        response = requests.post(
-            f"{self.base_url}/streams", verify=False
-        ).json()
-        return response['stream_id']
+    def create_stream(self) -> str:
+        """Request the server to create a new stream."""
+        response = self._post_json("/streams")
+        return response["stream_id"]
 
 
 class PAVSTIUtils:
-    """Utils Push AV TCs for TLS requirements"""
+    """Utils for Push AV TC's TLS requirements."""
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-
-    def assert_valid_caid(self, caid):
+    def assert_valid_caid(self, caid: int) -> None:
         asserts.assert_greater_equal(caid, 0, "Invalid CAID returned")
         asserts.assert_less_equal(caid, 65534, "Invalid CAID returned")
 
-    def assert_valid_ccdid(self, caid):
-        asserts.assert_greater_equal(caid, 0, "Invalid CCDID returned")
-        asserts.assert_less_equal(caid, 65534, "Invalid CCDID returned")
+    def assert_valid_ccdid(self, ccdid: int) -> None:
+        asserts.assert_greater_equal(ccdid, 0, "Invalid CCDID returned")
+        asserts.assert_less_equal(ccdid, 65534, "Invalid CCDID returned")
 
     def assert_valid_csr(
         self,
         response: Clusters.TlsCertificateManagement.Commands.TLSClientCSRResponse,
         nonce: bytes,
-    ):
+    ) -> None:
         try:
             temp, _ = der_decoder(response.csr, asn1Spec=rfc2986.CertificationRequest())
         except PyAsn1Error:
@@ -147,9 +145,11 @@ class PAVSTIUtils:
         # Verify public key is 256 bytes
         csr = x509.load_der_x509_csr(response.csr)
         csr_pubkey = csr.public_key()
+
+        # Ensure key size is 256 bits
         asserts.assert_equal(csr_pubkey.key_size, 256, "Incorrect key size")
 
-        # Verify signature algorithm is ecdsa-with-SHA156
+        # Ensure signature algorithm is ecdsa-with-SHA256
         signature_algorithm = dict(layer1["signatureAlgorithm"])["algorithm"]
         asserts.assert_equal(
             signature_algorithm,
@@ -157,8 +157,8 @@ class PAVSTIUtils:
             "CSR specifies incorrect signature key algorithm",
         )
 
-        # Verify signature is valid
-        asserts.assert_true(csr.is_signature_valid, "Signature is invalid")
+        # Validate signature
+        asserts.assert_true(csr.is_signature_valid, "CSR signature is invalid")
 
         # Verify response.nonce is octet string of length 32
         try:
@@ -187,6 +187,10 @@ class PAVSTIUtils:
             data=writer.encoding,
             signature_algorithm=ec.ECDSA(hashes.SHA256()),
         )
+
+    # ----------------------------------------------------------------------
+    # Command helpers
+    # ----------------------------------------------------------------------
 
     async def send_provision_root_command(
         self, certificate: bytes, expected_status: Status = Status.Success
@@ -311,7 +315,14 @@ class PAVSTIUtils:
             asserts.assert_equal(e.status, expected_status, "Unexpected error returned")
             return e
 
-    async def precondition_provision_tls_endpoint(self, endpoint: int, server: PushAvServerProcess):
+    # ----------------------------------------------------------------------
+    # Precondition setup
+    # ----------------------------------------------------------------------
+
+    async def precondition_provision_tls_endpoint(
+        self, endpoint: int, server: PushAvServerProcess
+    ) -> int:
+        """Perform provisioning steps to set up TLS endpoint."""
         root_cert_der = server.get_root_cert()
         prc_result = await self.send_provision_root_command(certificate=root_cert_der)
         self.assert_valid_caid(prc_result.caid)
@@ -329,7 +340,7 @@ class PAVSTIUtils:
         )
         result = await self.send_provision_tls_endpoint_command(
             endpoint=endpoint,
-            hostname=b"locahost",
+            hostname=b"localhost",
             port=1234,
             expected_status=Status.Success,
             caid=prc_result.caid,
