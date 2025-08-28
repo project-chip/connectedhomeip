@@ -625,7 +625,7 @@ PushAvStreamTransportServerLogic::HandleAllocatePushTransport(CommandHandler & h
         else
         {
             auto delegateStatus = Protocols::InteractionModel::ClusterStatusCode(
-                mDelegate->ValidateAudioStream(transportOptions.videoStreamID.Value().Value()));
+                mDelegate->ValidateAudioStream(transportOptions.audioStreamID.Value().Value()));
 
             if (!delegateStatus.IsSuccess())
             {
@@ -761,6 +761,7 @@ PushAvStreamTransportServerLogic::HandleModifyPushTransport(CommandHandler & han
         handler.AddStatus(commandPath, Status::ResourceExhausted);
         return std::nullopt;
     }
+
     // Call the delegate
     status = mDelegate->ModifyPushTransport(connectionID, *transportOptionsPtr);
 
@@ -819,6 +820,7 @@ PushAvStreamTransportServerLogic::HandleSetTransportStatus(CommandHandler & hand
         }
         connectionIDList.push_back(connectionID.Value());
     }
+
     // Call the delegate
     status = mDelegate->SetTransportStatus(connectionIDList, transportStatus);
     if (status == Status::Success)
@@ -902,20 +904,20 @@ std::optional<DataModel::ActionReturnStatus> PushAvStreamTransportServerLogic::H
         handler.AddClusterSpecificFailure(commandPath, clusterStatus);
         return std::nullopt;
     }
+
     if (transportConfiguration->transportOptions.HasValue())
     {
         if (transportConfiguration->transportOptions.Value().triggerOptions.triggerType == TransportTriggerTypeEnum::kContinuous)
         {
-
             auto clusterStatus = to_underlying(StatusCodeEnum::kInvalidTriggerType);
             ChipLogError(Zcl, "HandleManuallyTriggerTransport[ep=%d]: Invalid Trigger type", mEndpointId);
             handler.AddClusterSpecificFailure(commandPath, clusterStatus);
             return std::nullopt;
         }
+
         if (transportConfiguration->transportOptions.Value().triggerOptions.triggerType == TransportTriggerTypeEnum::kCommand &&
             !timeControl.HasValue())
         {
-
             ChipLogError(Zcl, "HandleManuallyTriggerTransport[ep=%d]: Time control field not present", mEndpointId);
             handler.AddStatus(commandPath, Status::DynamicConstraintError);
             return std::nullopt;

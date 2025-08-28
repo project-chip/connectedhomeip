@@ -183,7 +183,7 @@ class TC_WEBRTC_1_5(MatterBaseTest):
             aRateDistortionTradeOffPoints = await self.read_avstr_attribute_expect_success(
                 endpoint, attrs.RateDistortionTradeOffPoints
             )
-            aMinViewport = await self.read_avstr_attribute_expect_success(endpoint, attrs.MinViewport)
+            aMinViewportRes = await self.read_avstr_attribute_expect_success(endpoint, attrs.MinViewportResolution)
             aVideoSensorParams = await self.read_avstr_attribute_expect_success(endpoint, attrs.VideoSensorParams)
 
             response = await self.send_single_cmd(
@@ -192,7 +192,7 @@ class TC_WEBRTC_1_5(MatterBaseTest):
                     videoCodec=aRateDistortionTradeOffPoints[0].codec,
                     minFrameRate=30,
                     maxFrameRate=aVideoSensorParams.maxFPS,
-                    minResolution=aMinViewport,
+                    minResolution=aMinViewportRes,
                     maxResolution=CameraAvStreamManagement.Structs.VideoResolutionStruct(
                         width=aVideoSensorParams.sensorWidth, height=aVideoSensorParams.sensorHeight
                     ),

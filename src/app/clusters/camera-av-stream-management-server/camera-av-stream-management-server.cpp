@@ -48,7 +48,8 @@ namespace CameraAvStreamManagement {
 CameraAVStreamMgmtServer::CameraAVStreamMgmtServer(
     CameraAVStreamMgmtDelegate & aDelegate, EndpointId aEndpointId, const BitFlags<Feature> aFeatures,
     const BitFlags<OptionalAttribute> aOptionalAttrs, uint8_t aMaxConcurrentEncoders, uint32_t aMaxEncodedPixelRate,
-    const VideoSensorParamsStruct & aVideoSensorParams, bool aNightVisionUsesInfrared, const VideoResolutionStruct & aMinViewPort,
+    const VideoSensorParamsStruct & aVideoSensorParams, bool aNightVisionUsesInfrared,
+    const VideoResolutionStruct & aMinViewPortRes,
     const std::vector<Structs::RateDistortionTradeOffPointsStruct::Type> & aRateDistortionTradeOffPoints,
     uint32_t aMaxContentBufferSize, const AudioCapabilitiesStruct & aMicrophoneCapabilities,
     const AudioCapabilitiesStruct & aSpeakerCapabilities, TwoWayTalkSupportTypeEnum aTwoWayTalkSupport,
@@ -59,7 +60,7 @@ CameraAVStreamMgmtServer::CameraAVStreamMgmtServer(
     AttributeAccessInterface(MakeOptional(aEndpointId), CameraAvStreamManagement::Id), mDelegate(aDelegate),
     mEndpointId(aEndpointId), mFeatures(aFeatures), mOptionalAttrs(aOptionalAttrs), mMaxConcurrentEncoders(aMaxConcurrentEncoders),
     mMaxEncodedPixelRate(aMaxEncodedPixelRate), mVideoSensorParams(aVideoSensorParams),
-    mNightVisionUsesInfrared(aNightVisionUsesInfrared), mMinViewPort(aMinViewPort),
+    mNightVisionUsesInfrared(aNightVisionUsesInfrared), mMinViewPortResolution(aMinViewPortRes),
     mRateDistortionTradeOffPointsList(aRateDistortionTradeOffPoints), mMaxContentBufferSize(aMaxContentBufferSize),
     mMicrophoneCapabilities(aMicrophoneCapabilities), mSpeakerCapabilities(aSpeakerCapabilities),
     mTwoWayTalkSupport(aTwoWayTalkSupport), mSnapshotCapabilitiesList(aSnapshotCapabilities),
@@ -492,11 +493,12 @@ CHIP_ERROR CameraAVStreamMgmtServer::Read(const ConcreteReadAttributePath & aPat
                                          mEndpointId));
         ReturnErrorOnFailure(aEncoder.Encode(mNightVisionUsesInfrared));
         break;
-    case MinViewport::Id:
-        VerifyOrReturnError(
-            HasFeature(Feature::kVideo), CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute),
-            ChipLogError(Zcl, "CameraAVStreamMgmt[ep=%d]: can not get MinViewport, feature is not supported", mEndpointId));
-        ReturnErrorOnFailure(aEncoder.Encode(mMinViewPort));
+    case MinViewportResolution::Id:
+        VerifyOrReturnError(HasFeature(Feature::kVideo), CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute),
+                            ChipLogError(Zcl,
+                                         "CameraAVStreamMgmt[ep=%d]: can not get MinViewportResolution, feature is not supported",
+                                         mEndpointId));
+        ReturnErrorOnFailure(aEncoder.Encode(mMinViewPortResolution));
         break;
     case RateDistortionTradeOffPoints::Id:
         VerifyOrReturnError(
@@ -1010,7 +1012,7 @@ CHIP_ERROR CameraAVStreamMgmtServer::SetViewport(const Globals::Structs::Viewpor
     //
     uint16_t requestedWidth  = static_cast<uint16_t>(aViewport.x2 - aViewport.x1);
     uint16_t requestedHeight = static_cast<uint16_t>(aViewport.y2 - aViewport.y1);
-    if ((requestedWidth < mMinViewPort.width) || (requestedHeight < mMinViewPort.height) ||
+    if ((requestedWidth < mMinViewPortResolution.width) || (requestedHeight < mMinViewPortResolution.height) ||
         (requestedWidth > mVideoSensorParams.sensorWidth) || (requestedHeight > mVideoSensorParams.sensorHeight))
     {
         ChipLogError(Zcl, "CameraAVStreamMgmt[ep=%d]: SetViewport with invalid viewport dimensions", mEndpointId);

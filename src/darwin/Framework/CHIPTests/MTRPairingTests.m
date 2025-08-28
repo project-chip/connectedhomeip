@@ -91,6 +91,9 @@ static MTRTestKeys * sTestKeys = nil;
     XCTAssertEqualObjects(attestationDeviceInfo.productID, @(0x8001));
     XCTAssertEqualObjects(attestationDeviceInfo.basicInformationVendorID, @(0xFFF1));
     XCTAssertEqualObjects(attestationDeviceInfo.basicInformationProductID, @(0x8000));
+    XCTAssertEqualObjects(attestationDeviceInfo.certificateDeclaration,
+        attestationDeviceInfo.certificationDeclaration);
+    XCTAssertNotNil(attestationDeviceInfo.certificationDeclaration);
 
     if (_callback) {
         _callback();

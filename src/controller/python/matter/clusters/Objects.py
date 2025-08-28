@@ -479,8 +479,8 @@ class Globals:
             kUnknownEnumValue = 4
 
         class WebRTCEndReasonEnum(MatterIntEnum):
-            kIceFailed = 0x00
-            kIceTimeout = 0x01
+            kICEFailed = 0x00
+            kICETimeout = 0x01
             kUserHangup = 0x02
             kUserBusy = 0x03
             kReplaced = 0x04
@@ -490,12 +490,13 @@ class Globals:
             kOutOfResources = 0x08
             kMediaTimeout = 0x09
             kLowPower = 0x0A
-            kUnknownReason = 0x0B
+            kPrivacyMode = 0x0B
+            kUnknownReason = 0x0C
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
             # be used by code to process how it handles receiving an unknown
             # enum value. This specific value should never be transmitted.
-            kUnknownEnumValue = 12
+            kUnknownEnumValue = 13
 
     class Bitmaps:
         class TestGlobalBitmap(IntFlag):
@@ -46473,7 +46474,7 @@ class CameraAvStreamManagement(Cluster):
                 ClusterObjectFieldDescriptor(Label="maxEncodedPixelRate", Tag=0x00000001, Type=typing.Optional[uint]),
                 ClusterObjectFieldDescriptor(Label="videoSensorParams", Tag=0x00000002, Type=typing.Optional[CameraAvStreamManagement.Structs.VideoSensorParamsStruct]),
                 ClusterObjectFieldDescriptor(Label="nightVisionUsesInfrared", Tag=0x00000003, Type=typing.Optional[bool]),
-                ClusterObjectFieldDescriptor(Label="minViewport", Tag=0x00000004, Type=typing.Optional[CameraAvStreamManagement.Structs.VideoResolutionStruct]),
+                ClusterObjectFieldDescriptor(Label="minViewportResolution", Tag=0x00000004, Type=typing.Optional[CameraAvStreamManagement.Structs.VideoResolutionStruct]),
                 ClusterObjectFieldDescriptor(Label="rateDistortionTradeOffPoints", Tag=0x00000005, Type=typing.Optional[typing.List[CameraAvStreamManagement.Structs.RateDistortionTradeOffPointsStruct]]),
                 ClusterObjectFieldDescriptor(Label="maxContentBufferSize", Tag=0x00000006, Type=uint),
                 ClusterObjectFieldDescriptor(Label="microphoneCapabilities", Tag=0x00000007, Type=typing.Optional[CameraAvStreamManagement.Structs.AudioCapabilitiesStruct]),
@@ -46521,7 +46522,7 @@ class CameraAvStreamManagement(Cluster):
     maxEncodedPixelRate: typing.Optional[uint] = None
     videoSensorParams: typing.Optional[CameraAvStreamManagement.Structs.VideoSensorParamsStruct] = None
     nightVisionUsesInfrared: typing.Optional[bool] = None
-    minViewport: typing.Optional[CameraAvStreamManagement.Structs.VideoResolutionStruct] = None
+    minViewportResolution: typing.Optional[CameraAvStreamManagement.Structs.VideoResolutionStruct] = None
     rateDistortionTradeOffPoints: typing.Optional[typing.List[CameraAvStreamManagement.Structs.RateDistortionTradeOffPointsStruct]] = None
     maxContentBufferSize: uint = 0
     microphoneCapabilities: typing.Optional[CameraAvStreamManagement.Structs.AudioCapabilitiesStruct] = None
@@ -47147,7 +47148,7 @@ class CameraAvStreamManagement(Cluster):
             value: typing.Optional[bool] = None
 
         @dataclass
-        class MinViewport(ClusterAttributeDescriptor):
+        class MinViewportResolution(ClusterAttributeDescriptor):
             @ChipUtility.classproperty
             def cluster_id(cls) -> int:
                 return 0x00000551

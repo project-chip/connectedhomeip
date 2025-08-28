@@ -596,7 +596,7 @@ CommissioneeDeviceProxy * DeviceCommissioner::FindCommissioneeDevice(NodeId id)
     MATTER_TRACE_SCOPE("FindCommissioneeDevice", "DeviceCommissioner");
     CommissioneeDeviceProxy * foundDevice = nullptr;
     mCommissioneeDevicePool.ForEachActiveObject([&](auto * deviceProxy) {
-        if (deviceProxy->GetDeviceId() == id)
+        if (deviceProxy->GetDeviceId() == id || deviceProxy->GetTemporaryCommissioningId() == id)
         {
             foundDevice = deviceProxy;
             return Loop::Break;
@@ -1082,6 +1082,7 @@ CHIP_ERROR DeviceCommissioner::StopPairing(NodeId remoteDeviceId)
     if (mSetUpCodePairer.StopPairing(remoteDeviceId))
     {
         mRunCommissioningAfterConnection = false;
+        OnSessionEstablishmentError(CHIP_ERROR_CANCELLED);
         return CHIP_NO_ERROR;
     }
 
