@@ -70,83 +70,84 @@ class TC_SU_2_2(MatterBaseTest):
     cluster_otap = Clusters.OtaSoftwareUpdateProvider
     cluster_otar = Clusters.OtaSoftwareUpdateRequestor
 
-    def launch_ota_provider_run_py_test(self, ota_file, provider_discriminator, provider_setupPinCode, secured_device_port):
-        CHIP_ROOT = "/Users/jdelgado/connectedhomeip"
-        RUNNER_SCRIPT_DIR = os.path.join(CHIP_ROOT, "scripts")
+    def launch_provider_regex(self, ota_file: str, discriminator: int, passcode: int, secured_device_port: int,
+                              wait_for: str, queue: str = None, timeout: int = None):
+        """
+        Launch OTA provider with required parameters, always log output in real-time to provider.log,
+        wait until a specific status is found, and continue reading output to allow tail -f.
+        Raises RuntimeError if the wait_for status is not found.
+        """
+        import subprocess
+        import threading
+        import time
+        import logging
 
-        app = os.path.join(CHIP_ROOT, "out/debug/chip-ota-provider-app")
-        app_args = f"--filepath {ota_file} --discriminator {provider_discriminator} --passcode {provider_setupPinCode} --secured-device-port {secured_device_port}"
+        logger = logging.getLogger(__name__)
+        path_to_app = "./out/debug/chip-ota-provider-app"
 
-        script = os.path.join(CHIP_ROOT, "src/python_testing/provider_placeholder.py")
-        script_args = ""
+        args = [
+            path_to_app,
+            f"--filepath={ota_file}",
+            f"--discriminator={discriminator}",
+            f"--passcode={passcode}",
+            f"--secured-device-port={secured_device_port}"
+        ]
 
-        run_python_test = os.path.join(RUNNER_SCRIPT_DIR, "run_python_test.py")
-        cmd = f'{run_python_test} --app {app} --app-args "{app_args}" --script {script} --script-args "{script_args}"'
+        if queue:
+            args += ["-q", queue]
+        if timeout:
+            args += ["-t", str(timeout)]
 
-        proc = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-        time.sleep(5)
+        # Clean logs
+        log_file_path = "provider.log"
+        open(log_file_path, "w").close()
+
+        proc = subprocess.Popen(args, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
+
+        found_wait_for = False
+
+        while True:
+            line = proc.stdout.readline()
+            if line:
+                # Siempre escribir a log en tiempo real
+                with open(log_file_path, "a") as f:
+                    f.write(line)
+                    f.flush()
+                if not found_wait_for and wait_for in line:
+                    found_wait_for = True
+                    logger.info(f"Provider reached status: {queue or 'no queue'}")
+                    break
+            elif proc.poll() is not None:
+                break
+            time.sleep(0.1)
+
+        # If regext not found, fail test
+        if not found_wait_for:
+            proc.terminate()
+            raise RuntimeError("Provider ended before matching status")
+
+        # Thread that write logs without block test
+        def _follow_output(proc):
+            for line in proc.stdout:
+                with open(log_file_path, "a") as f:
+                    f.write(line)
+                    f.flush()
+
+        threading.Thread(target=_follow_output, args=(proc,), daemon=True).start()
 
         return proc
 
-    async def launch_ota_provider(self, ota_file: str, provider_discriminator: int,
-                                  provider_setupPinCode: int, secured_device_port: int,
-                                  queue: str = None, timeout: int = None):
+    def stop_provider(self, proc: subprocess.Popen):
         """
-        Launches the OTA Provider in a new macOS Terminal window.
-        Returns the subprocess.Popen object.
+        Close Provider process.
         """
-        queue_cmd = f"-q {queue}" if queue else ""
-        timeout_cmd = f"-t {timeout}" if timeout else ""
-        cmd = f'''
-        osascript -e 'tell application "Terminal"
-            do script "cd /Users/jdelgado/connectedhomeip && \
-        source scripts/activate.sh && \
-        ./out/debug/chip-ota-provider-app --filepath {ota_file} \
-        --discriminator {provider_discriminator} \
-        --passcode {provider_setupPinCode} \
-        --secured-device-port {secured_device_port} {queue_cmd} {timeout_cmd}; exit"
-        end tell'
-        '''
-        proc = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-        await asyncio.sleep(10)  # give the provider time to initialize
-        logger.info(f'Launched OTA Provider with command: {cmd}')
-        return proc
-
-    async def kill_ota_provider_process(self, process_name="chip-ota-provider-app", timeout=10):
-        """
-        Kills the OTA Provider process by name.
-        """
-        for proc in psutil.process_iter(['pid', 'name']):
-            if process_name in proc.info['name']:
-                logger.info(f'Killing OTA Provider process: {proc.info}')
-                proc.terminate()
-
-    async def kill_ota_requestor_process(self, process_name="ota.update", timeout=10):
-        """
-        Kills the OTA Provider process by name.
-        """
-        for proc in psutil.process_iter(['pid', 'name']):
-            if process_name in proc.info['name']:
-                logger.info(f'Killing OTA Provider process: {proc.info}')
-                proc.terminate()
-
-    async def launch_ota_requestor(self, discriminator: int, passcode: int, secured_device_port: int = 5541):
-        cmd = f'''
-        osascript -e 'tell application "Terminal"
-            do script "cd /Users/jdelgado/connectedhomeip && \
-        source scripts/activate.sh && \
-        ./out/debug/chip-ota-requestor-app \
-            --discriminator {discriminator} \
-            --passcode {passcode} \
-            --secured-device-port {secured_device_port} \
-            --autoApplyImage \
-            --KVS /tmp/chip_kvs_requestor; exit"
-        end tell'
-        '''
-        proc = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-        await asyncio.sleep(10)
-        logger.info(f'Launched OTA Requestor with command: {cmd}')
-        return proc
+        if proc.poll() is None:
+            proc.terminate()
+            try:
+                proc.wait(timeout=5)
+            except subprocess.TimeoutExpired:
+                proc.kill()
+            logger.info(f"Provider process {proc.pid} terminated")
 
     async def set_ota_acls_for_provider(self, controller, requestor_node: int, provider_node: int, fabric_index: int):
         """
@@ -368,6 +369,7 @@ class TC_SU_2_2(MatterBaseTest):
         provider_setupPinCode_s1 = 20202021
         provider_port_s1 = 5540
         provider_ota_file_s1 = "firmware_requestor_v2min.ota"
+        provider_path_s1 = './out/debug/chip-ota-provider-app'
         logger.info(f"""{step_number_s1}: Prerequisite #1.0 - Provider:
             NodeID: {provider_node_id_s1},
             discriminator: {provider_discriminator_s1},
@@ -375,16 +377,16 @@ class TC_SU_2_2(MatterBaseTest):
             port: {provider_port_s1},
             ota_file: {provider_ota_file_s1}""")
 
-        # Prerequisite #2.0- Launch Provider
+        # Prerequisite #2.0- Launch Provider with Queue "updateAvailable"
         logger.info(f'{step_number_s1}: Prerequisite #2.0 - Launch Provider')
-        provider_proc = await self.launch_ota_provider(
+        provider_proc = self.launch_provider_regex(
             ota_file=provider_ota_file_s1,
-            provider_discriminator=provider_discriminator_s1,
-            provider_setupPinCode=provider_setupPinCode_s1,
+            discriminator=provider_discriminator_s1,
+            passcode=provider_setupPinCode_s1,
             secured_device_port=provider_port_s1,
-            queue="updateAvailable",
+            wait_for="Status: Satisfied"
         )
-        logger.info(f'{step_number_s1}: Prerequisite #2.0 - Launched Provider: {provider_proc}')
+        logger.info(f'{step_number_s1}: Prerequisite #2.0 - Launched Provider PID {provider_proc.pid}')
 
         # Prerequisite #2.1 - Open commissioning window on DUT
         logger.info(f'{step_number_s1}: Prerequisite #2.1 - Commissioning window opened on Requestor (DUT)')
@@ -392,17 +394,6 @@ class TC_SU_2_2(MatterBaseTest):
         setup_pin_code = params.commissioningParameters.setupPinCode
         long_discriminator = params.randomDiscriminator
         logging.info(f'{step_number_s1}: Prerequisite #2.1 - Commissioning window opened: {vars(params)}')
-
-        # TODO Implementing the launch Provider using run_py_test
-        # logger.info(f'{step_number_s1}: Prerequisite #2.0 - Launch Provider')
-        # provider_proc = self.launch_ota_provider_run_py_test(
-        #     ota_file=provider_ota_file_s1,
-        #     provider_discriminator=long_discriminator,  # dinámico
-        #     provider_setupPinCode=setup_pin_code,       # dinámico
-        #     secured_device_port=provider_port_s1,
-        # )
-        # logger.info(f'{step_number_s1}: Prerequisite #2.0 - Launched Provider PID: {provider_proc.pid}')
-        # await asyncio.sleep(10)
 
         # Prerequisite #2.2 - Commissioning Provider
         logging.info(f'{step_number_s1}: Prerequisite #2.2 - Commissioning DUT with Provider')
@@ -554,7 +545,7 @@ class TC_SU_2_2(MatterBaseTest):
 
             # Check UpdateStateProgress 99 progress
             if val >= 98:
-                logger.info('{step_number_s1}: Step #1.1.2 - UpdateStateProgress reached 99')
+                logger.info('Step #1.1.2 - UpdateStateProgress reached 99')
                 return True
             return False
 
@@ -616,7 +607,8 @@ class TC_SU_2_2(MatterBaseTest):
         # [STEP_1]: Step #1.4 - Close Provider_S1 Process  (CLEANUP!!!!)
         # ------------------------------------------------------------------------------------
         logger.info(f'{step_number_s1}:Step #1.4 - Close Provider Process')
-        await self.kill_ota_provider_process()
+        self.stop_provider(provider_proc)
+
         await asyncio.sleep(3)
 
         # Expire sessions
@@ -646,17 +638,17 @@ class TC_SU_2_2(MatterBaseTest):
             port: {provider_port_s2},
             ota_file: {provider_ota_file_s2}""")
 
-        # Prerequisite #2.0- Launch Provider
         logger.info(f'{step_number_s2}: Prerequisite #2.0 - Launch Provider')
-        provider_proc_s2 = await self.launch_ota_provider(
+        provider_proc_s2 = self.launch_provider_regex(
             ota_file=provider_ota_file_s2,
-            provider_discriminator=provider_discriminator_s2,
-            provider_setupPinCode=provider_setupPinCode_s2,
+            discriminator=provider_discriminator_s2,
+            passcode=provider_setupPinCode_s2,
             secured_device_port=provider_port_s2,
+            wait_for="Status: Satisfied",
             queue="busy",
             timeout=120
         )
-        logger.info(f'{step_number_s2}: Prerequisite #2.0 - Launched Provider: {provider_proc_s2}')
+        logger.info(f'{step_number_s1}: Prerequisite #2.0 - Launched Provider PID {provider_proc_s2.pid}')
 
         # Prerequisite #2.2 - Commission Provider
         logging.info(f'{step_number_s2}: Prerequisite #2.2 - Commissioning DUT with Provider')
@@ -799,7 +791,8 @@ class TC_SU_2_2(MatterBaseTest):
         await asyncio.sleep(270)          # TEMP
 
         logger.info(f'{step_number_s2}: Step #2.4 - Close Requestor_S2 and Provider_S2 Process.')
-        await self.kill_ota_provider_process()
+        # await self.kill_ota_provider_process()
+        self.stop_provider(provider_proc_s2)
         await asyncio.sleep(3)
         controller.ExpireSessions(provider_node_id_s2)
         subprocess.run("rm -rf /tmp/chip_kvs /tmp/chip_kvs-shm /tmp/chip_kvs-wal", shell=True)
