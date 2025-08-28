@@ -19,6 +19,15 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing * error) {
+  NSString * errorStr = [NSString stringWithFormat:@"Command payload decoding failed: %s", err.AsString()];
+  MTR_LOG_ERROR("%s", errorStr.UTF8String);
+  if (error != nil) {
+    NSDictionary * userInfo = @ { NSLocalizedFailureReasonErrorKey : NSLocalizedString(errorStr, nil) };
+    *error = [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeSchemaMismatch userInfo:userInfo];
+  }
+}
+
 {{#zcl_clusters}}
 {{#zcl_commands}}
 {{#*inline "completeImpl"}}
@@ -185,12 +194,7 @@ NS_ASSUME_NONNULL_BEGIN
     }
   }
 
-  NSString * errorStr = [NSString stringWithFormat:@"Command payload decoding failed: %s", err.AsString()];
-  MTR_LOG_ERROR("%s", errorStr.UTF8String);
-  if (error != nil) {
-    NSDictionary * userInfo = @ { NSLocalizedFailureReasonErrorKey : NSLocalizedString(errorStr, nil) };
-    *error = [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeSchemaMismatch userInfo:userInfo];
-  }
+  LogAndConvertDecodingError(err, error);
   return nil;
 }
 {{/if}}
@@ -225,6 +229,21 @@ NS_ASSUME_NONNULL_BEGIN
 @implementation MTR{{asUpperCamelCase parent.name preserveAcronyms=true}}Cluster{{asUpperCamelCase name preserveAcronyms=true}}Params (InternalMethods)
 
 {{#if (isStrEqual source "server")}}
+- (nullable instancetype)initWithDecodableStruct:(const chip::app::Clusters::{{asUpperCamelCase parent.name}}::Commands::{{asUpperCamelCase name}}::DecodableType &)decodableStruct
+{
+  if (!(self = [super init])) {
+    return nil;
+  }
+
+  CHIP_ERROR err = [self _setFieldsFromDecodableStruct:decodableStruct];
+  if (err == CHIP_NO_ERROR) {
+    return self;
+  }
+
+  LogAndConvertDecodingError(err, nil);
+  return nil;
+}
+
 - (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::{{asUpperCamelCase parent.name}}::Commands::{{asUpperCamelCase name}}::DecodableType &)decodableStruct
 {
   {{#zcl_command_arguments}}
