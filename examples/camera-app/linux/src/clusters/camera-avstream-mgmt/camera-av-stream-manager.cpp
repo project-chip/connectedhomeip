@@ -49,10 +49,85 @@ void CameraAVStreamManager::SetCameraDeviceHAL(CameraDeviceInterface * aCameraDe
 }
 
 CHIP_ERROR CameraAVStreamManager::ValidateStreamUsage(StreamUsageEnum streamUsage,
-                                                      const Optional<DataModel::Nullable<uint16_t>> & videoStreamId,
-                                                      const Optional<DataModel::Nullable<uint16_t>> & audioStreamId)
+                                                      Optional<DataModel::Nullable<uint16_t>> & videoStreamId,
+                                                      Optional<DataModel::Nullable<uint16_t>> & audioStreamId)
 {
-    // TODO: Validates the requested stream usage against the camera's resource management and stream priority policies.
+    // The server ensures that at least one stream Id has a value, and that there are streams allocated
+    // If a stream id(s) are provided, ensure that the requested Stream Usage matches the allocation
+    // If they're Null, look for a stream ID that matches the usage
+    bool matchedVideoStream = false;
+    bool matchedAudioStream = false;
+
+    // Is the requested stream usage supported by the camera?
+    auto myStreamUsages = GetCameraAVStreamMgmtServer()->GetSupportedStreamUsages();
+    auto it             = std::find(myStreamUsages.begin(), myStreamUsages.end(), streamUsage);
+    if (it == myStreamUsages.end())
+    {
+        ChipLogError(Camera, "Requested stream usage not found in supported stream usages");
+        return CHIP_ERROR_NOT_FOUND;
+    }
+
+    if (videoStreamId.HasValue())
+    {
+        const std::vector<VideoStreamStruct> & allocatedVideoStreams = GetCameraAVStreamMgmtServer()->GetAllocatedVideoStreams();
+        if (videoStreamId.Value().IsNull())
+        {
+            for (const auto & stream : allocatedVideoStreams)
+            {
+                if (stream.streamUsage == streamUsage)
+                {
+                    videoStreamId.Emplace(stream.videoStreamID);
+                    matchedVideoStream = true;
+                    break;
+                }
+            }
+        }
+        else
+        {
+            for (const auto & stream : allocatedVideoStreams)
+            {
+                if (stream.videoStreamID == videoStreamId.Value().Value())
+                {
+                    matchedVideoStream = (stream.streamUsage == streamUsage);
+                    break;
+                }
+            }
+        }
+    }
+
+    if (audioStreamId.HasValue())
+    {
+        const std::vector<AudioStreamStruct> & allocatedAudioStreams = GetCameraAVStreamMgmtServer()->GetAllocatedAudioStreams();
+        if (audioStreamId.Value().IsNull())
+        {
+            for (const auto & stream : allocatedAudioStreams)
+            {
+                if (stream.streamUsage == streamUsage)
+                {
+                    audioStreamId.Emplace(stream.audioStreamID);
+                    matchedAudioStream = true;
+                    break;
+                }
+            }
+        }
+        else
+        {
+            for (const auto & stream : allocatedAudioStreams)
+            {
+                if (stream.audioStreamID == audioStreamId.Value().Value())
+                {
+                    matchedAudioStream = (stream.streamUsage == streamUsage);
+                    break;
+                }
+            }
+        }
+    }
+
+    // Failure if a stream has value (actual or Null) and there's no match for either stream type
+    if ((audioStreamId.HasValue() && !matchedAudioStream) || (videoStreamId.HasValue() && !matchedVideoStream))
+    {
+        return CHIP_ERROR_NOT_FOUND;
+    }
     return CHIP_NO_ERROR;
 }
 
@@ -398,6 +473,7 @@ Protocols::InteractionModel::Status CameraAVStreamManager::SnapshotStreamDealloc
 void CameraAVStreamManager::OnStreamUsagePrioritiesChanged()
 {
     ChipLogProgress(Camera, "Stream usage priorities changed");
+    mCameraDeviceHAL->GetCameraHALInterface().SetStreamUsagePriorities(GetCameraAVStreamMgmtServer()->GetStreamUsagePriorities());
 }
 
 void CameraAVStreamManager::OnAttributeChanged(AttributeId attributeId)
