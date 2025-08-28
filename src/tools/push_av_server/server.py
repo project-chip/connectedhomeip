@@ -29,7 +29,6 @@ from fastapi.templating import Jinja2Templates
 from pydantic import BaseModel
 from zeroconf import ServiceInfo, Zeroconf
 
-
 module_dir_path = os.path.dirname(os.path.realpath(__file__))
 templates_path = os.path.join(module_dir_path, "templates")
 static_path = os.path.join(module_dir_path, "static")
