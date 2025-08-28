@@ -562,9 +562,7 @@ if (chip_device_platform != "none") {
     ]
 
     if (chip_enable_nfc_based_commissioning) {
-      sources += [
-        "../include/platform/internal/NFCCommissioningManager.h",
-      ]
+      sources += [ "../include/platform/internal/NFCCommissioningManager.h" ]
     }
 
     if (current_os == "zephyr") {
