@@ -45,8 +45,11 @@ public:
     ~FabricTableHolder()
     {
         mFabricTable.Shutdown();
+        ChipLogProgress(Controller, "Shutting down Keystore");
         mOpKeyStore.Finish();
+        ChipLogProgress(Controller, "Shutting down CertStore");
         mOpCertStore.Finish();
+        ChipLogProgress(Controller, "All processes are closed");
     }
 
     CHIP_ERROR Init()
@@ -54,16 +57,6 @@ public:
         ReturnErrorOnFailure(mOpKeyStore.Init(&mStorage));
         ReturnErrorOnFailure(mOpCertStore.Init(&mStorage));
 
-        chip::FabricTable::InitParams initParams;
-        initParams.storage             = &mStorage;
-        initParams.operationalKeystore = &mOpKeyStore;
-        initParams.opCertStore         = &mOpCertStore;
-
-        return mFabricTable.Init(initParams);
-    }
-
-    CHIP_ERROR InitFabricTable()
-    {
         chip::FabricTable::InitParams initParams;
         initParams.storage             = &mStorage;
         initParams.operationalKeystore = &mOpKeyStore;
@@ -202,8 +195,6 @@ TEST_F(TestDeviceControllerFactory, DeviceControllerFactoryMethods)
         EXPECT_TRUE(DeviceControllerFactory::GetInstance().ReleaseSystemState());
         DeviceControllerFactory::GetInstance().Shutdown();
     }
-    EXPECT_EQ(fHolder.InitFabricTable(), CHIP_NO_ERROR);
-    factoryInitParams.fabricTable = &fHolder.GetFabricTable();
 
     //
     // Test retain and release system state
