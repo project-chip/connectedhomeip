@@ -17,24 +17,22 @@
  */
 
 #include <app/clusters/localization-configuration-server/localization-configuration-logic.h>
-#include <platform/DeviceInfoProvider.h>
 #include <platform/PlatformManager.h>
 
 namespace chip::app::Clusters {
 
-CHIP_ERROR LocalizationConfigurationServerLogic::SetActiveLocale(CharSpan activeLocale)
+Protocols::InteractionModel::Status LocalizationConfigurationServerLogic::SetActiveLocale(CharSpan activeLocale)
 {
     char validLocaleBuffer[35];
-    MutableCharSpan validLocale(validLocaleBuffer, sizeof(validLocaleBuffer));
+    MutableCharSpan validLocale{ validLocaleBuffer };
 
-    CHIP_ERROR error = IsSupportedLocale(activeLocale, validLocale);
-    if (error != CHIP_NO_ERROR)
+    if (!IsSupportedLocale(activeLocale, validLocale))
     {
-        return error;
+        return Protocols::InteractionModel::Status::ConstraintError;
     }
 
     mActiveLocale.SetContent(activeLocale);
-    return CHIP_NO_ERROR;
+    return Protocols::InteractionModel::Status::Success;
 }
 
 CharSpan LocalizationConfigurationServerLogic::GetActiveLocale()
@@ -44,30 +42,22 @@ CharSpan LocalizationConfigurationServerLogic::GetActiveLocale()
 
 CHIP_ERROR LocalizationConfigurationServerLogic::ReadSupportedLocales(AttributeValueEncoder & aEncoder)
 {
-    CHIP_ERROR err                             = CHIP_NO_ERROR;
-    DeviceLayer::DeviceInfoProvider * provider = DeviceLayer::GetDeviceInfoProvider();
-    if (provider)
+    CHIP_ERROR err                                                 = CHIP_NO_ERROR;
+    DeviceLayer::DeviceInfoProvider::SupportedLocalesIterator * it = mDeviceInfoProvider.IterateSupportedLocales();
+    if (it)
     {
-        DeviceLayer::DeviceInfoProvider::SupportedLocalesIterator * it = provider->IterateSupportedLocales();
-        if (it)
-        {
-            err = aEncoder.EncodeList([&it](const auto & encoder) -> CHIP_ERROR {
-                CharSpan activeLocale;
+        err = aEncoder.EncodeList([&it](const auto & encoder) -> CHIP_ERROR {
+            CharSpan supportedLocale;
 
-                while (it->Next(activeLocale))
-                {
-                    ReturnErrorOnFailure(encoder.Encode(activeLocale));
-                }
+            while (it->Next(supportedLocale))
+            {
+                ReturnErrorOnFailure(encoder.Encode(supportedLocale));
+            }
 
-                return CHIP_NO_ERROR;
-            });
+            return CHIP_NO_ERROR;
+        });
 
-            it->Release();
-        }
-        else
-        {
-            err = aEncoder.EncodeEmptyList();
-        }
+        it->Release();
     }
     else
     {
@@ -76,22 +66,25 @@ CHIP_ERROR LocalizationConfigurationServerLogic::ReadSupportedLocales(AttributeV
     return err;
 }
 
-CHIP_ERROR LocalizationConfigurationServerLogic::IsSupportedLocale(CharSpan newLangtag, MutableCharSpan & validLocale)
+bool LocalizationConfigurationServerLogic::IsSupportedLocale(CharSpan newLangTag, MutableCharSpan & validLocale)
 {
-    DeviceLayer::DeviceInfoProvider * provider = DeviceLayer::GetDeviceInfoProvider();
     DeviceLayer::DeviceInfoProvider::SupportedLocalesIterator * it;
     bool firstValidLocale = false;
-    if (provider && (it = provider->IterateSupportedLocales()))
+    if ((it = mDeviceInfoProvider.IterateSupportedLocales()))
     {
         CharSpan outLocale;
 
         while (it->Next(outLocale))
         {
-            if (outLocale.data_equal(newLangtag))
+            if (outLocale.data_equal(newLangTag))
             {
                 it->Release();
-                return CHIP_NO_ERROR;
+                return true;
             }
+            /*
+             * For backward compatibility, if the newLangTag is not found, we need to find the first valid locale.
+             * This is used to set the active locale to the first valid locale if the newLangTag is not found.
+             */
             if (!firstValidLocale)
             {
                 CopyCharSpanToMutableCharSpan(outLocale, validLocale);
@@ -102,7 +95,7 @@ CHIP_ERROR LocalizationConfigurationServerLogic::IsSupportedLocale(CharSpan newL
         it->Release();
     }
 
-    return CHIP_ERROR_NOT_FOUND;
+    return false;
 }
 
 } // namespace chip::app::Clusters

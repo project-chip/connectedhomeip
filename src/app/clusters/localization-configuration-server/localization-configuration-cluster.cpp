@@ -76,10 +76,10 @@ DataModel::ActionReturnStatus LocalizationConfigurationCluster::WriteAttribute(c
         CharSpan label;
         ReturnErrorOnFailure(aDecoder.Decode(label));
         ChipLogProgress(AppServer, "Setting active locale to %s", label.data());
-        CHIP_ERROR error = mLogic.SetActiveLocale(label);
-        if (error != CHIP_NO_ERROR)
+        Protocols::InteractionModel::Status status = mLogic.SetActiveLocale(label);
+        if (status != Protocols::InteractionModel::Status::Success)
         {
-            return Status::ConstraintError;
+            return status;
         }
 
         // Store the string in persistence
