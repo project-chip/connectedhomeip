@@ -248,9 +248,9 @@ class TC_AVSM_2_1(MatterBaseTest):
             )
             logger.info(f"Rx'd TwoWayTalkSupport: {value}")
             asserts.assert_is_not_none(value, "TwoWayTalkSupport is None")
-            asserts.assert_less(
+            asserts.assert_in(
                 value,
-                cluster.Enums.TwoWayTalkSupportTypeEnum.kUnknownEnumValue,
+                cluster.Enums.TwoWayTalkSupportTypeEnum,
                 "TwoWayTalkSupport is not a valid TwoWayTalkSupportTypeEnum",
             )
 
@@ -300,7 +300,9 @@ class TC_AVSM_2_1(MatterBaseTest):
             logger.info(f"Rx'd SupportedStreamUsages: {supportedStreamUsages}")
             matter_asserts.assert_all(
                 supportedStreamUsages,
-                lambda x: x < Clusters.Globals.Enums.StreamUsageEnum.kUnknownEnumValue,
+                lambda x: self.assert_enum(
+                    x, Clusters.Globals.Enums.StreamUsageEnum, "SupportedStreamUsage not a valid StreamUsageEnum"
+                ),
                 "StreamUsage is not a valid StreamUsageEnum",
             )
 
@@ -339,7 +341,9 @@ class TC_AVSM_2_1(MatterBaseTest):
             logger.info(f"Rx'd StreamUsagePrioritiesList: {streamUsagePriorities}")
             matter_asserts.assert_all(
                 streamUsagePriorities,
-                lambda x: x < Clusters.Globals.Enums.StreamUsageEnum.kUnknownEnumValue,
+                lambda x: self.assert_enum(
+                    x, Clusters.Globals.Enums.StreamUsageEnum, "StreamUsagePriority not a valid StreamUsageEnum"
+                ),
                 "StreamUsage is not a valid StreamUsageEnum",
             )
 
@@ -372,8 +376,10 @@ class TC_AVSM_2_1(MatterBaseTest):
             value = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attr.NightVision)
             logger.info(f"Rx'd NightVision: {value}")
             asserts.assert_is_not_none(value, "NightVision is None")
-            asserts.assert_less(
-                value, cluster.Enums.TriStateAutoEnum.kUnknownEnumValue, "NightVision is not a valid TriStateAutoEnum"
+            asserts.assert_in(
+                value,
+                cluster.Enums.TriStateAutoEnum,
+                "NightVision is not a valid TriStateAutoEnum",
             )
 
         self.step(25)
@@ -383,8 +389,10 @@ class TC_AVSM_2_1(MatterBaseTest):
             )
             logger.info(f"Rx'd NightVisionIllum: {value}")
             asserts.assert_is_not_none(value, "NightVisionIllum is None")
-            asserts.assert_less(
-                value, cluster.Enums.TriStateAutoEnum.kUnknownEnumValue, "NightVisionIllum is not a valid TriStateAutoEnum"
+            asserts.assert_in(
+                value,
+                cluster.Enums.TriStateAutoEnum,
+                "NightVisionIllum is not a valid TriStateAutoEnum",
             )
 
         self.step(26)
@@ -531,9 +539,9 @@ class TC_AVSM_2_1(MatterBaseTest):
             )
             logger.info(f"Rx'd StatusLightBrightness: {value}")
             asserts.assert_is_not_none(value, "StatusLightBrightness is None")
-            asserts.assert_less(
+            asserts.assert_in(
                 value,
-                Clusters.Globals.Enums.ThreeLevelAutoEnum.kUnknownEnumValue,
+                Clusters.Globals.Enums.ThreeLevelAutoEnum,
                 "StatusLightBrightness is not a valid ThreeLevelAutoEnum",
             )
 
@@ -562,9 +570,9 @@ class TC_AVSM_2_1(MatterBaseTest):
     def assert_rate_distortion_trade_off_point_struct(
         self, rateDistortionTradeOffPoints: Clusters.CameraAvStreamManagement.Structs.RateDistortionTradeOffPointsStruct
     ) -> bool:
-        asserts.assert_less(
+        asserts.assert_in(
             rateDistortionTradeOffPoints.codec,
-            Clusters.CameraAvStreamManagement.Enums.VideoCodecEnum.kUnknownEnumValue,
+            Clusters.CameraAvStreamManagement.Enums.VideoCodecEnum,
             "Codec is not a valid VideoCodecEnum",
         )
         self.assert_video_resolution_struct(rateDistortionTradeOffPoints.resolution)
@@ -578,7 +586,9 @@ class TC_AVSM_2_1(MatterBaseTest):
         asserts.assert_greater_equal(len(audioCapabilities.supportedCodecs), 1, "SupportedCodecs list is empty")
         matter_asserts.assert_all(
             audioCapabilities.supportedCodecs,
-            lambda x: x < Clusters.CameraAvStreamManagement.Enums.AudioCodecEnum.kUnknownEnumValue,
+            lambda x: self.assert_enum(
+                x, Clusters.CameraAvStreamManagement.Enums.AudioCodecEnum, "SupportedCodec not a valid AudioCodecEnum"
+            ),
             "SupportedCodec contains an entry that is not a valid AudioCodecEnum",
         )
         asserts.assert_greater_equal(len(audioCapabilities.supportedSampleRates), 1, "SupportedSampleRates list is empty")
@@ -591,15 +601,19 @@ class TC_AVSM_2_1(MatterBaseTest):
     ) -> bool:
         self.assert_video_resolution_struct(snapshotCapabilities.resolution)
         asserts.assert_greater_equal(snapshotCapabilities.maxFrameRate, 1, "MaxFrameRate is less than 1")
-        asserts.assert_less(
+        asserts.assert_in(
             snapshotCapabilities.imageCodec,
-            Clusters.CameraAvStreamManagement.Enums.ImageCodecEnum.kUnknownEnumValue,
+            Clusters.CameraAvStreamManagement.Enums.ImageCodecEnum,
             "ImageCodec is not a valid ImageCodecEnum",
         )
         return True
 
     def assert_viewport_struct(self, viewport: Clusters.Globals.Structs.ViewportStruct) -> bool:
         # No constraints
+        return True
+
+    def assert_enum(self, member, enum, msg) -> bool:
+        asserts.assert_in(member, enum, msg)
         return True
 
 
