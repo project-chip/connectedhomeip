@@ -16,9 +16,11 @@
 
 
 import logging
+import random
 
-import chip.clusters as Clusters
-from chip.interaction_model import InteractionModelError, Status
+import matter.clusters as Clusters
+from matter.interaction_model import InteractionModelError, Status
+from matter import ChipDeviceCtrl
 from mobly import asserts
 
 logger = logging.getLogger(__name__)
@@ -110,7 +112,7 @@ class PAVSTTestBase:
         )
         logger.info(f"Rx'd RateDistortionTradeOffPoints: {aRateDistortionTradeOffPoints}")
         aMinViewport = await self.read_single_attribute_check_success(
-            endpoint=endpoint, cluster=cluster, attribute=attr.MinViewport
+            endpoint=endpoint, cluster=cluster, attribute=attr.MinViewportResolution
         )
         logger.info(f"Rx'd MinViewport: {aMinViewport}")
         aVideoSensorParams = await self.read_single_attribute_check_success(
@@ -140,8 +142,7 @@ class PAVSTTestBase:
                 ),
                 minBitRate=aRateDistortionTradeOffPoints[0].minBitRate,
                 maxBitRate=aRateDistortionTradeOffPoints[0].minBitRate,
-                minKeyFrameInterval=4000,
-                maxKeyFrameInterval=4000,
+                keyFrameInterval=4000,
                 watermarkEnabled=watermark,
                 OSDEnabled=osd
             )
@@ -219,7 +220,8 @@ class PAVSTTestBase:
                         "ingestMethod": cluster.Enums.IngestMethodsEnum.kCMAFIngest,
                         "containerOptions": {
                             "containerType": cluster.Enums.ContainerFormatEnum.kCmaf,
-                            "CMAFContainerOptions": {"chunkDuration": 4},
+                            "CMAFContainerOptions": {"CMAFInterface": cluster.Enums.CMAFInterfaceEnum.kInterface1, "chunkDuration": 4, "segmentDuration": 3,
+                                                     "sessionGroup": 3, "trackName": ""},
                         },
                         "expiryTime": 5,
                     }
@@ -256,10 +258,13 @@ class PAVSTTestBase:
 
         return Status.Success
 
-    async def psvt_modify_push_transport(self, cmd):
+    async def psvt_modify_push_transport(self, cmd, devCtrl=None):
         endpoint = self.get_endpoint(default=1)
+        dev_ctrl = self.default_controller
+        if (devCtrl is not None):
+            dev_ctrl = devCtrl
         try:
-            await self.send_single_cmd(cmd=cmd, endpoint=endpoint)
+            await self.send_single_cmd(cmd=cmd, endpoint=endpoint, dev_ctrl=dev_ctrl)
             return Status.Success
         except InteractionModelError as e:
             asserts.assert_true(
@@ -268,10 +273,13 @@ class PAVSTTestBase:
             return e.status
         pass
 
-    async def psvt_deallocate_push_transport(self, cmd):
+    async def psvt_deallocate_push_transport(self, cmd, devCtrl=None):
         endpoint = self.get_endpoint(default=1)
+        dev_ctrl = self.default_controller
+        if (devCtrl is not None):
+            dev_ctrl = devCtrl
         try:
-            await self.send_single_cmd(cmd=cmd, endpoint=endpoint)
+            await self.send_single_cmd(cmd=cmd, endpoint=endpoint, dev_ctrl=dev_ctrl)
             return Status.Success
         except InteractionModelError as e:
             asserts.assert_true(
@@ -280,10 +288,13 @@ class PAVSTTestBase:
             return e.status
         pass
 
-    async def psvt_set_transport_status(self, cmd):
+    async def psvt_set_transport_status(self, cmd, devCtrl=None):
         endpoint = self.get_endpoint(default=1)
+        dev_ctrl = self.default_controller
+        if (devCtrl is not None):
+            dev_ctrl = devCtrl
         try:
-            await self.send_single_cmd(cmd=cmd, endpoint=endpoint)
+            await self.send_single_cmd(cmd=cmd, endpoint=endpoint, dev_ctrl=dev_ctrl)
             return Status.Success
         except InteractionModelError as e:
             asserts.assert_true(
@@ -292,10 +303,13 @@ class PAVSTTestBase:
             return e.status
         pass
 
-    async def psvt_find_transport(self, cmd, expected_connectionID=None):
+    async def psvt_find_transport(self, cmd, expected_connectionID=None, devCtrl=None):
         endpoint = self.get_endpoint(default=1)
+        dev_ctrl = self.default_controller
+        if (devCtrl is not None):
+            dev_ctrl = devCtrl
         try:
-            status = await self.send_single_cmd(cmd=cmd, endpoint=endpoint)
+            status = await self.send_single_cmd(cmd=cmd, endpoint=endpoint, dev_ctrl=dev_ctrl)
             asserts.assert_equal(
                 status.transportConfigurations[0].connectionID, expected_connectionID, "Unexpected connection ID returned"
             )
@@ -307,10 +321,13 @@ class PAVSTTestBase:
             return e.status
         pass
 
-    async def psvt_manually_trigger_transport(self, cmd, expected_cluster_status=None):
+    async def psvt_manually_trigger_transport(self, cmd, expected_cluster_status=None, devCtrl=None):
         endpoint = self.get_endpoint(default=1)
+        dev_ctrl = self.default_controller
+        if (devCtrl is not None):
+            dev_ctrl = devCtrl
         try:
-            await self.send_single_cmd(cmd=cmd, endpoint=endpoint)
+            await self.send_single_cmd(cmd=cmd, endpoint=endpoint, dev_ctrl=dev_ctrl)
             return Status.Success
         except InteractionModelError as e:
             if (expected_cluster_status is not None):
@@ -324,3 +341,41 @@ class PAVSTTestBase:
                 )
                 return e.status
         pass
+
+    async def psvt_create_test_harness_controller(self):
+        self.th1 = self.default_controller
+        self.discriminator = random.randint(0, 4095)
+        params = await self.th1.OpenCommissioningWindow(
+        nodeid=self.dut_node_id, timeout=900, iteration=10000, discriminator=self.discriminator, option=1)
+
+        th2_certificate_authority = (
+            self.certificate_authority_manager.NewCertificateAuthority()
+        )
+        th2_fabric_admin = th2_certificate_authority.NewFabricAdmin(
+            vendorId=0xFFF1, fabricId=self.th1.fabricId + 1
+        )
+
+        self.th2 = th2_fabric_admin.NewController(
+        nodeId=2, useTestCommissioner=True)
+
+        setupPinCode = params.setupPinCode
+
+        await self.th2.CommissionOnNetwork(
+        nodeId=self.dut_node_id, setupPinCode=setupPinCode,
+        filterType=ChipDeviceCtrl.DiscoveryFilterType.LONG_DISCRIMINATOR, filter=self.discriminator)
+
+        return self.th2
+
+    async def read_currentfabricindex(self, th: ChipDeviceCtrl) -> int:
+        cluster = Clusters.Objects.OperationalCredentials
+        attribute = Clusters.OperationalCredentials.Attributes.CurrentFabricIndex
+        current_fabric_index = await self.read_single_attribute_check_success(dev_ctrl=th, endpoint=0, cluster=cluster, attribute=attribute)
+        return current_fabric_index
+
+    async def psvt_remove_current_fabric(self, devCtrl):
+        fabric_idx_cr2_2 = await self.read_currentfabricindex(th=devCtrl)
+        removeFabricCmd2 = Clusters.OperationalCredentials.Commands.RemoveFabric(fabric_idx_cr2_2)
+        resp=await self.th1.SendCommand(nodeid=self.dut_node_id, endpoint=0, payload=removeFabricCmd2)
+        return resp
+        asserts.assert_equal(
+            resp.statusCode, Clusters.OperationalCredentials.Enums.NodeOperationalCertStatusEnum.kOk, "Expected removal of TH2's fabric to succeed")

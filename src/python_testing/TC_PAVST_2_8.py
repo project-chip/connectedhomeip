@@ -37,10 +37,11 @@
 
 import logging
 
-import chip.clusters as Clusters
-from chip.interaction_model import Status
-from chip.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main, has_cluster, run_if_endpoint_matches
+import matter.clusters as Clusters
+from matter.interaction_model import Status
+from matter.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main, has_cluster, run_if_endpoint_matches
 from mobly import asserts
+from matter.clusters.Types import Nullable
 from TC_PAVSTTestBase import PAVSTTestBase
 
 logger = logging.getLogger(__name__)
@@ -147,23 +148,18 @@ class TC_PAVST_2_8(MatterBaseTest, PAVSTTestBase):
 
         # TH2 sends command
         self.step(4)
-        if self.pics_guard(self.check_pics("PAVST.S.A0001")):
-            # Establishing TH2 controller
-            th2_certificate_authority = (
-                self.certificate_authority_manager.NewCertificateAuthority()
-            )
-            th2_fabric_admin = th2_certificate_authority.NewFabricAdmin(
-                vendorId=0xFFF1, fabricId=self.matter_test_config.fabric_id + 1
-            )
-            self.th2 = th2_fabric_admin.NewController(nodeId=2, useTestCommissioner=True)
-            cmd = pvcluster.Commands.FindTransport(
-                connectionID=aConnectionID,
-            )
-            status = await self.th2.psvt_find_transport(cmd)
-            asserts.assert_true(
-                status == Status.NOT_FOUND,
-                "DUT responds with NOT_FOUND status code.",
-            )
+        th2 = await self.psvt_create_test_harness_controller()
+        cmd = pvcluster.Commands.FindTransport(
+            connectionID=aConnectionID,
+        )
+        status = await self.psvt_find_transport(cmd, expected_connectionID=aConnectionID, devCtrl=th2)
+        asserts.assert_true(
+            status == Status.NotFound,
+            "DUT responds with NOT_FOUND status code.",
+        )
+        resp = await self.psvt_remove_current_fabric(th2)
+        asserts.assert_equal(
+            resp.statusCode, Clusters.OperationalCredentials.Enums.NodeOperationalCertStatusEnum.kOk, "Expected removal of TH2's fabric to succeed")
 
         self.step(5)
         cmd = pvcluster.Commands.FindTransport(
@@ -176,7 +172,7 @@ class TC_PAVST_2_8(MatterBaseTest, PAVSTTestBase):
 
         self.step(6)
         cmd = pvcluster.Commands.FindTransport(
-            connectionID=None,
+            connectionID=Nullable(),
         )
         status = await self.psvt_find_transport(cmd, expected_connectionID=aConnectionID)
         asserts.assert_true(
