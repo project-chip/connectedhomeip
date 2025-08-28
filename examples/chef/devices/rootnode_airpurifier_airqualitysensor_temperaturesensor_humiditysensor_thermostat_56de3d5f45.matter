@@ -245,8 +245,8 @@ enum ThreeLevelAutoEnum : enum8 {
 }
 
 enum WebRTCEndReasonEnum : enum8 {
-  kIceFailed = 0;
-  kIceTimeout = 1;
+  kICEFailed = 0;
+  kICETimeout = 1;
   kUserHangup = 2;
   kUserBusy = 3;
   kReplaced = 4;
@@ -256,7 +256,8 @@ enum WebRTCEndReasonEnum : enum8 {
   kOutOfResources = 8;
   kMediaTimeout = 9;
   kLowPower = 10;
-  kUnknownReason = 11;
+  kPrivacyMode = 11;
+  kUnknownReason = 12;
 }
 
 bitmap TestGlobalBitmap : bitmap32 {

@@ -17540,7 +17540,7 @@ public class ClusterIDMapping {
             MaxEncodedPixelRate(1L),
             VideoSensorParams(2L),
             NightVisionUsesInfrared(3L),
-            MinViewport(4L),
+            MinViewportResolution(4L),
             RateDistortionTradeOffPoints(5L),
             MaxContentBufferSize(6L),
             MicrophoneCapabilities(7L),

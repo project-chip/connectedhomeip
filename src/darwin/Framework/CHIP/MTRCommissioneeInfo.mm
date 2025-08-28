@@ -16,6 +16,8 @@
 
 #import "MTRCommissioneeInfo_Internal.h"
 
+#import <Matter/MTRClusterConstants.h>
+
 #import "MTRBaseDevice.h"
 #import "MTRBaseDevice_Internal.h"
 #import "MTRDefines_Internal.h"
@@ -45,13 +47,22 @@ MTR_DIRECT_MEMBERS
         }
     }
 
-    if (commissioningParameters.extraAttributesToRead != nil && info.attributes != nullptr) {
+    if (info.attributes != nullptr) {
         NSMutableDictionary<MTRAttributePath *, NSDictionary<NSString *, id> *> * attributes = [[NSMutableDictionary alloc] init];
 
-        std::vector<chip::app::AttributePathParams> requestPaths;
-        for (MTRAttributeRequestPath * requestPath in commissioningParameters.extraAttributesToRead) {
-            [requestPath convertToAttributePathParams:requestPaths.emplace_back()];
+        // Only expose attributes that match pathFilters, so that API consumers
+        // don't start relying on undocumented internal details of which paths
+        // we read from the device in which circumstances.
+        std::vector<chip::app::AttributePathParams> pathFilters;
+        if (commissioningParameters.extraAttributesToRead != nil) {
+            for (MTRAttributeRequestPath * requestPath in commissioningParameters.extraAttributesToRead) {
+                [requestPath convertToAttributePathParams:pathFilters.emplace_back()];
+            }
         }
+
+        // Always include the Network Commissioning cluster FeatureMap
+        // attributes, using a wildcard-endpoint path.
+        pathFilters.emplace_back(MTRClusterIDTypeNetworkCommissioningID, MTRAttributeIDTypeGlobalAttributeFeatureMapID);
 
         info.attributes->ForEachAttribute([&](const chip::app::ConcreteAttributePath & path) -> CHIP_ERROR {
             // Only grab paths that are included in extraAttributesToRead so that
@@ -67,8 +78,8 @@ MTR_DIRECT_MEMBERS
             // This is unfortunately not very efficient; if we have a lot of
             // paths we may need a better way to do this.
             bool isRequestedPath = false;
-            for (auto & requestPath : requestPaths) {
-                if (!requestPath.IsAttributePathSupersetOf(path)) {
+            for (auto & filter : pathFilters) {
+                if (!filter.IsAttributePathSupersetOf(path)) {
                     continue;
                 }
 

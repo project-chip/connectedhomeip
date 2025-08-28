@@ -57441,7 +57441,7 @@ public class ChipClusters {
     private static final long MAX_ENCODED_PIXEL_RATE_ATTRIBUTE_ID = 1L;
     private static final long VIDEO_SENSOR_PARAMS_ATTRIBUTE_ID = 2L;
     private static final long NIGHT_VISION_USES_INFRARED_ATTRIBUTE_ID = 3L;
-    private static final long MIN_VIEWPORT_ATTRIBUTE_ID = 4L;
+    private static final long MIN_VIEWPORT_RESOLUTION_ATTRIBUTE_ID = 4L;
     private static final long RATE_DISTORTION_TRADE_OFF_POINTS_ATTRIBUTE_ID = 5L;
     private static final long MAX_CONTENT_BUFFER_SIZE_ATTRIBUTE_ID = 6L;
     private static final long MICROPHONE_CAPABILITIES_ATTRIBUTE_ID = 7L;
@@ -57872,7 +57872,7 @@ public class ChipClusters {
       void onSuccess(ChipStructs.CameraAvStreamManagementClusterVideoSensorParamsStruct value);
     }
 
-    public interface MinViewportAttributeCallback extends BaseAttributeCallback {
+    public interface MinViewportResolutionAttributeCallback extends BaseAttributeCallback {
       void onSuccess(ChipStructs.CameraAvStreamManagementClusterVideoResolutionStruct value);
     }
 
@@ -58032,9 +58032,9 @@ public class ChipClusters {
         }, NIGHT_VISION_USES_INFRARED_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
-    public void readMinViewportAttribute(
-        MinViewportAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, MIN_VIEWPORT_ATTRIBUTE_ID);
+    public void readMinViewportResolutionAttribute(
+        MinViewportResolutionAttributeCallback callback) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, MIN_VIEWPORT_RESOLUTION_ATTRIBUTE_ID);
 
       readAttribute(new ReportCallbackImpl(callback, path) {
           @Override
@@ -58042,12 +58042,12 @@ public class ChipClusters {
             ChipStructs.CameraAvStreamManagementClusterVideoResolutionStruct value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
-        }, MIN_VIEWPORT_ATTRIBUTE_ID, true);
+        }, MIN_VIEWPORT_RESOLUTION_ATTRIBUTE_ID, true);
     }
 
-    public void subscribeMinViewportAttribute(
-        MinViewportAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, MIN_VIEWPORT_ATTRIBUTE_ID);
+    public void subscribeMinViewportResolutionAttribute(
+        MinViewportResolutionAttributeCallback callback, int minInterval, int maxInterval) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, MIN_VIEWPORT_RESOLUTION_ATTRIBUTE_ID);
 
       subscribeAttribute(new ReportCallbackImpl(callback, path) {
           @Override
@@ -58055,7 +58055,7 @@ public class ChipClusters {
             ChipStructs.CameraAvStreamManagementClusterVideoResolutionStruct value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
-        }, MIN_VIEWPORT_ATTRIBUTE_ID, minInterval, maxInterval);
+        }, MIN_VIEWPORT_RESOLUTION_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
     public void readRateDistortionTradeOffPointsAttribute(

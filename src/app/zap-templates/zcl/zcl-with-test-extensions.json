@@ -764,7 +764,7 @@
         "Service Area": ["CurrentArea", "EstimatedEndTime", "FeatureMap"],
         "Camera AV Stream Management": [
             "VideoSensorParams",
-            "MinViewport",
+            "MinViewportResolution",
             "MicrophoneCapabilities",
             "SpeakerCapabilities",
             "Viewport",

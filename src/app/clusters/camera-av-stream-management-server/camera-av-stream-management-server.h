@@ -70,6 +70,13 @@ constexpr size_t kArrayTlvOverhead = 2;
 
 constexpr size_t kStreamUsagePrioritiesTlvSize = kArrayTlvOverhead + kStreamUsageTlvSize * kNumOfStreamUsageTypes;
 
+enum class StreamAllocationAction
+{
+    kNewAllocation, // Fresh stream allocation - always start
+    kModification,  // Existing stream with parameter changes - restart if active
+    kReuse          // Reusing existing stream without changes - no action needed
+};
+
 class CameraAVStreamMgmtServer;
 
 // ImageSnapshot response data for a CaptureSnapshot command.
@@ -106,6 +113,15 @@ public:
      */
     virtual Protocols::InteractionModel::Status VideoStreamAllocate(const VideoStreamStruct & allocateArgs,
                                                                     uint16_t & outStreamID) = 0;
+
+    /**
+     *   @brief Called after the server has finalized video stream allocation and narrowed parameters.
+     *          This is where the actual video stream should be started using the final allocated parameters.
+     *
+     *   @param allocatedStream   The finalized video stream with narrowed parameters from the server.
+     *   @param action           Action indicating how to handle the stream: new allocation, modification, or reuse.
+     */
+    virtual void OnVideoStreamAllocated(const VideoStreamStruct & allocatedStream, StreamAllocationAction action) = 0;
 
     /**
      *   @brief Handle Command Delegate for Video stream modification.
@@ -422,7 +438,7 @@ public:
 
     bool GetNightVisionUsesInfrared() const { return mNightVisionUsesInfrared; }
 
-    const VideoResolutionStruct & GetMinViewport() const { return mMinViewPort; }
+    const VideoResolutionStruct & GetMinViewportResolution() const { return mMinViewPortResolution; }
 
     const std::vector<RateDistortionTradeOffStruct> & GetRateDistortionTradeOffPoints() const
     {
@@ -507,7 +523,8 @@ public:
 
     CHIP_ERROR AddVideoStream(const VideoStreamStruct & videoStream);
 
-    CHIP_ERROR UpdateVideoStreamRangeParams(VideoStreamStruct & videoStreamToUpdate, const VideoStreamStruct & videoStream);
+    CHIP_ERROR UpdateVideoStreamRangeParams(VideoStreamStruct & videoStreamToUpdate, const VideoStreamStruct & videoStream,
+                                            bool & wasModified);
 
     CHIP_ERROR RemoveVideoStream(uint16_t videoStreamId);
 
@@ -539,7 +556,7 @@ private:
     const uint32_t mMaxEncodedPixelRate;
     const VideoSensorParamsStruct mVideoSensorParams;
     const bool mNightVisionUsesInfrared;
-    const VideoResolutionStruct mMinViewPort;
+    const VideoResolutionStruct mMinViewPortResolution;
     const std::vector<RateDistortionTradeOffStruct> mRateDistortionTradeOffPointsList;
     const uint32_t mMaxContentBufferSize;
     const AudioCapabilitiesStruct mMicrophoneCapabilities;

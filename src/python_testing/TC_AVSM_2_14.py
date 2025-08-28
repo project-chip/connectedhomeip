@@ -48,7 +48,7 @@ logger = logging.getLogger(__name__)
 
 class TC_AVSM_2_14(MatterBaseTest):
     def desc_TC_AVSM_2_14(self) -> str:
-        return "[TC-AVSM-2.5] Validate Audio Stream Allocation reuse with Server as DUT"
+        return "[TC-AVSM-2.14] Validate Audio Stream Allocation reuse with Server as DUT"
 
     def pics_TC_AVSM_2_14(self):
         return ["AVSM.S"]

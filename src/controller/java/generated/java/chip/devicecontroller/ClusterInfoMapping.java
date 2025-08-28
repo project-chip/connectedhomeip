@@ -18269,7 +18269,7 @@ public class ClusterInfoMapping {
     }
   }
 
-  public static class DelegatedCameraAvStreamManagementClusterMinViewportAttributeCallback implements ChipClusters.CameraAvStreamManagementCluster.MinViewportAttributeCallback, DelegatedClusterCallback {
+  public static class DelegatedCameraAvStreamManagementClusterMinViewportResolutionAttributeCallback implements ChipClusters.CameraAvStreamManagementCluster.MinViewportResolutionAttributeCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
     @Override
     public void setCallbackDelegate(ClusterCommandCallback callback) {

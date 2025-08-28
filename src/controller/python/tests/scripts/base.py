@@ -45,7 +45,10 @@ from matter import ChipDeviceCtrl
 from matter.ChipStack import ChipStack
 from matter.crypto import p256keypair
 from matter.exceptions import ChipStackException
+from matter.storage import PersistentStorageJSON
 from matter.utils import CommissioningBuildingBlocks
+
+DEFAULT_REPL_STORAGE_PATH = '/tmp/repl-storage.json'
 
 logger = logging.getLogger('PythonMatterControllerTEST')
 logger.setLevel(logging.INFO)
@@ -185,7 +188,7 @@ class BaseTestHelper:
                  keypair: p256keypair.P256Keypair = None):
         matter.native.Init()
 
-        self.chipStack = ChipStack('/tmp/repl_storage.json', enableServerInteractions=True)
+        self.chipStack = ChipStack(PersistentStorageJSON(DEFAULT_REPL_STORAGE_PATH), enableServerInteractions=True)
         self.certificateAuthorityManager = matter.CertificateAuthority.CertificateAuthorityManager(chipStack=self.chipStack)
         self.certificateAuthority = self.certificateAuthorityManager.NewCertificateAuthority()
         self.fabricAdmin = self.certificateAuthority.NewFabricAdmin(vendorId=0xFFF1, fabricId=1)

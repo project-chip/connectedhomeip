@@ -62,7 +62,8 @@ class TC_AVSM_2_1(MatterBaseTest):
                 4, "TH reads VideoSensorParams attribute.", "Verify that the DUT response contains a VideoSensorParamsStruct value."
             ),
             TestStep(5, "TH reads NightVisionUsesInfrared attribute.", "Verify that the DUT response contains a bool value."),
-            TestStep(6, "TH reads MinViewport attribute.", "Verify that the DUT response contains a VideoResolutionStruct value."),
+            TestStep(6, "TH reads MinViewportResolution attribute.",
+                     "Verify that the DUT response contains a VideoResolutionStruct value."),
             TestStep(
                 7,
                 "TH reads RateDistortionTradeOffPoints attribute.",

@@ -90,6 +90,9 @@ jobs:
             src/python_testing/matter_testing_infrastructure/matter/testing/commissioning.py \
             src/python_testing/matter_testing_infrastructure/matter/testing/decorators.py \
             src/python_testing/matter_testing_infrastructure/matter/testing/basic_composition.py \
+            src/python_testing/matter_testing_infrastructure/matter/testing/conformance.py \
+            src/python_testing/matter_testing_infrastructure/matter/testing/spec_parsing.py \
+            src/python_testing/matter_testing_infrastructure/matter/testing/metadata.py \
             src/python_testing/matter_testing_infrastructure/matter/testing/matter_testing.py"
 
           # Print a reminder about expanding coverage

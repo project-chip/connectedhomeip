@@ -53,7 +53,7 @@ choices.
    To build and install the Python CHIP controller with pre-generated files use
    the -z argument that points to the directory of pre-generated code:
 
-    ```
+    ```shell
     scripts/build_python.sh -m platform -i out/python_env -z "/some/pregen/dir"
     ```
 
@@ -64,18 +64,18 @@ choices.
 
 1. Activate the Python virtual environment:
 
-    ```
+    ```shell
     source out/python_env/bin/activate
     ```
 
 2. Launch the REPL.
 
-    ```
+    ```shell
     sudo out/python_env/bin/chip-repl
     ```
 
 > By default, the REPL points to `/tmp/repl-storage.json` for persistent
-> storage. You can over-ride that location by passing in `--storagepath <path>`
+> storage. You can over-ride that location by passing in `--storage-path <path>`
 > to the above invocation.
 
 ## REPL Playground
