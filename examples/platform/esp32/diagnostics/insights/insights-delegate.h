@@ -51,22 +51,10 @@ public:
      */
     CHIP_ERROR StopPeriodicInsights();
 
-    /**
-     * @brief Set sampling interval for sending diagnostic data to insights
-     *
-     * @param aTimeout Sampling interval
-     * @return CHIP_ERROR CHIP_NO_ERROR on success, error code otherwise
-     */
-    CHIP_ERROR SetSamplingInterval(chip::System::Clock::Timeout aTimeout);
-
 private:
     Tracing::Diagnostics::CircularDiagnosticBuffer * mStorageInstance = nullptr;
     System::Clock::Timeout mTimeout                                   = System::Clock::kZero;
-    struct StringCompare
-    {
-        bool operator()(const char * a, const char * b) const { return strcmp(a, b) < 0; }
-    };
-    std::map<const char *, chip::Tracing::Diagnostics::ValueType, StringCompare> mRegisteredMetrics;
+    std::map<std::string, chip::Tracing::Diagnostics::ValueType> mRegisteredMetrics;
 
     CHIP_ERROR SendInsightsData();
     void LogTraceData(const chip::Tracing::Diagnostics::DiagnosticEntry & entry);

@@ -46,6 +46,7 @@ CHIP_ERROR InsightsDelegate::StartPeriodicInsights(chip::System::Clock::Timeout 
 {
     VerifyOrReturnError(mStorageInstance != nullptr, CHIP_ERROR_INTERNAL, ESP_LOGE(TAG, "mStorageInstance is nullptr"));
     VerifyOrReturnError(aTimeout != System::Clock::kZero, CHIP_ERROR_INVALID_ARGUMENT);
+    StopPeriodicInsights();
     mTimeout = aTimeout;
     return DeviceLayer::SystemLayer().StartTimer(mTimeout, InsightsHandler, this);
 }
@@ -54,21 +55,6 @@ CHIP_ERROR InsightsDelegate::StopPeriodicInsights()
 {
     DeviceLayer::SystemLayer().CancelTimer(InsightsHandler, this);
     return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR InsightsDelegate::SetSamplingInterval(chip::System::Clock::Timeout aTimeout)
-{
-    mTimeout = aTimeout;
-
-    if (mTimeout == System::Clock::kZero)
-    {
-        StopPeriodicInsights();
-        return CHIP_NO_ERROR;
-    }
-
-    // Cancel existing timer and start new one
-    DeviceLayer::SystemLayer().CancelTimer(InsightsHandler, this);
-    return DeviceLayer::SystemLayer().StartTimer(mTimeout, InsightsHandler, this);
 }
 
 CHIP_ERROR InsightsDelegate::SendInsightsData()
@@ -133,12 +119,14 @@ void InsightsDelegate::LogTraceData(const DiagnosticEntry & entry)
 
 void InsightsDelegate::RegisterMetric(const char * key, ValueType type)
 {
+    std::string keyStr(key);
+
     // Check for the same key will not have two different types.
-    if (mRegisteredMetrics.find(key) != mRegisteredMetrics.end())
+    if (mRegisteredMetrics.find(keyStr) != mRegisteredMetrics.end())
     {
-        if (mRegisteredMetrics[key] != type)
+        if (mRegisteredMetrics[keyStr] != type)
         {
-            ESP_LOGE(TAG, "Type mismatch for metric key %s", key);
+            ESP_LOGE(TAG, "Type mismatch for metric key %s", keyStr.c_str());
             return;
         }
     }
@@ -177,19 +165,15 @@ void InsightsDelegate::RegisterMetric(const char * key, ValueType type)
 
 void InsightsDelegate::LogMetricData(const DiagnosticEntry & entry)
 {
-    if (mRegisteredMetrics.find(entry.label) == mRegisteredMetrics.end())
+    std::string keyStr(entry.label);
+    if (mRegisteredMetrics.find(keyStr) == mRegisteredMetrics.end())
     {
         RegisterMetric(entry.label, entry.type);
     }
 
-    // Use a fixed-size buffer for log messages
-    static constexpr size_t MAX_LOG_LENGTH = 128;
-    char logBuffer[MAX_LOG_LENGTH];
-
     switch (entry.type)
     {
     case ValueType::kSignedInteger: {
-        snprintf(logBuffer, MAX_LOG_LENGTH, "The value of %s is %ld", entry.label, static_cast<int32_t>(entry.intValue));
         esp_err_t err = esp_diag_metrics_add_int(entry.label, static_cast<int32_t>(entry.intValue));
         if (err == ESP_OK)
         {
@@ -199,7 +183,6 @@ void InsightsDelegate::LogMetricData(const DiagnosticEntry & entry)
     }
 
     case ValueType::kUnsignedInteger: {
-        snprintf(logBuffer, MAX_LOG_LENGTH, "The value of %s is %lu", entry.label, entry.uintValue);
         esp_err_t err = esp_diag_metrics_add_uint(entry.label, entry.uintValue);
         if (err == ESP_OK)
         {
