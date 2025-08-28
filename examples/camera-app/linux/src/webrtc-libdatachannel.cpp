@@ -26,6 +26,7 @@ namespace {
 constexpr int kVideoH264PayloadType = 96;
 constexpr int kVideoBitRate         = 3000;
 constexpr int kSSRC                 = 42;
+constexpr int kMaxFragmentSize = 1188; // 1200 (max packet size) - 12 (RTP header size)
 
 rtc::Description::Type SDPTypeToRtcType(SDPType type)
 {
@@ -113,10 +114,11 @@ public:
         mRtpCfg = std::make_shared<rtc::RtpPacketizationConfig>(kSSRC, "videosrc", kVideoH264PayloadType,
                                                                 rtc::H264RtpPacketizer::ClockRate);
 
+        // Setting MTU size to 1200 as default size used in the libdatachannel is 1400
         // Pick separator:
         // - StartSequence : for Annex-B (00 00 01 / 00 00 00 01)
         // - Length : for 4-byte length-prefixed NAL units
-        mPacketizer = std::make_shared<rtc::H264RtpPacketizer>(rtc::NalUnit::Separator::StartSequence, mRtpCfg);
+        mPacketizer = std::make_shared<rtc::H264RtpPacketizer>(rtc::NalUnit::Separator::StartSequence, mRtpCfg, kMaxFragmentSize);
 
         // RTCP helpers (recommended)
         mSr   = std::make_shared<rtc::RtcpSrReporter>(mRtpCfg);
