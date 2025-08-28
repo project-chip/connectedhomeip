@@ -115,10 +115,6 @@
 // ========== Platform-specific Cluster Overrides =========
 #define CHIP_CLUSTER_NETWORK_COMMISSIONING_MAX_NETWORKS 1
 
-// EMBER_AF_OTA_SOFTWARE_UPDATE_PROVIDER_CLUSTER_SERVER_ENDPOINT_COUNT is only defined if the
-// cluster is actually enabled in the ZAP config.  To allow operation in setups
-#define EMBER_AF_OTA_SOFTWARE_UPDATE_PROVIDER_CLUSTER_SERVER_ENDPOINT_COUNT 1
-
 /**
  * CHIP_DEVICE_CONFIG_ENABLE_CHIP_TIME_SERVICE_TIME_SYNC
  *

@@ -25,7 +25,6 @@
 #include MBEDTLS_CONFIG_FILE
 #endif
 
-#define MBEDTLS_HEAP_SIZE 15000
 #include "mbedtls/pk.h"
 #include "mbedtls/platform.h"
 #include "mbedtls/sha1.h"
@@ -37,9 +36,6 @@
 
 #include <string.h>
 
-static uint8_t mdedtls_heap[MBEDTLS_HEAP_SIZE];
-
-static void freertos_mbedtls_heap_init(void);
 
 static inline void mutex_init(mbedtls_threading_mutex_t * mutex)
 {
@@ -108,13 +104,8 @@ void freertos_mbedtls_mutex_init(void)
     mbedtls_threading_set_alt(mutex_init, mutex_free, mutex_lock, mutex_unlock);
 }
 
-static void freertos_mbedtls_heap_init(void)
-{
-    mbedtls_memory_buffer_alloc_init(mdedtls_heap, sizeof(mdedtls_heap));
-}
 
 void freertos_mbedtls_init(void)
 {
     freertos_mbedtls_mutex_init();
-    freertos_mbedtls_heap_init();
 }
