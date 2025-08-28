@@ -20,6 +20,7 @@
 #include <app/static-cluster-config/LocalizationConfiguration.h>
 #include <data-model-providers/codegen/CodegenDataModelProvider.h>
 #include <lib/support/CodeUtils.h>
+#include <platform/DeviceInfoProvider.h>
 #include <protocols/interaction_model/StatusCode.h>
 
 using namespace chip;
@@ -45,26 +46,7 @@ Status MatterLocalizationConfigurationClusterServerPreAttributeChangedCallback(c
                                                                                EmberAfAttributeType attributeType, uint16_t size,
                                                                                uint8_t * value)
 {
-    Status res = Status::Success;
-
-    switch (attributePath.mAttributeId)
-    {
-    case ActiveLocale::Id: {
-        // TODO:: allow fromZclString for CharSpan as well and use that here
-        auto langtag = CharSpan(Uint8::to_char(&value[1]), static_cast<size_t>(value[0]));
-        char tempBuf[Attributes::ActiveLocale::TypeInfo::MaxLength()];
-        MutableCharSpan validLocale(tempBuf);
-        CHIP_ERROR error = gServer.Cluster().GetLogic().IsSupportedLocale(langtag, validLocale);
-        if (error != CHIP_NO_ERROR)
-        {
-            res = Status::InvalidValue;
-        }
-        break;
-    }
-    default:
-        break;
-    }
-    return res;
+    return Status::Success;
 }
 
 void emberAfLocalizationConfigurationClusterServerInitCallback(EndpointId endpointId)
@@ -74,7 +56,7 @@ void emberAfLocalizationConfigurationClusterServerInitCallback(EndpointId endpoi
     MutableCharSpan activeLocale(outBuf);
     ActiveLocale::Get(endpointId, activeLocale);
 
-    gServer.Create(activeLocale);
+    gServer.Create(*DeviceLayer::GetDeviceInfoProvider(), activeLocale);
 
     CHIP_ERROR err = CodegenDataModelProvider::Instance().Registry().Register(gServer.Registration());
     if (err != CHIP_NO_ERROR)
@@ -86,9 +68,8 @@ void emberAfLocalizationConfigurationClusterServerInitCallback(EndpointId endpoi
     char tempBuf[Attributes::ActiveLocale::TypeInfo::MaxLength()];
     MutableCharSpan validLocale(tempBuf);
 
-    CHIP_ERROR error = gServer.Cluster().GetLogic().IsSupportedLocale(activeLocale, validLocale);
-
-    if (error != CHIP_NO_ERROR)
+    // If the active locale is not supported, set the first supported locale.
+    if (!gServer.Cluster().GetLogic().IsSupportedLocale(activeLocale, validLocale))
     {
         gServer.Cluster().GetLogic().SetActiveLocale(validLocale);
     }

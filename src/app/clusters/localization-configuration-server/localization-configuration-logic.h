@@ -21,6 +21,8 @@
 #include <app/AttributeValueEncoder.h>
 #include <app/persistence/String.h>
 #include <lib/support/Span.h>
+#include <platform/DeviceInfoProvider.h>
+#include <protocols/interaction_model/StatusCode.h>
 
 namespace chip {
 namespace app {
@@ -29,14 +31,48 @@ namespace Clusters {
 class LocalizationConfigurationServerLogic
 {
 public:
-    LocalizationConfigurationServerLogic() = default;
-    CHIP_ERROR SetActiveLocale(CharSpan activeLocale);
+    LocalizationConfigurationServerLogic(DeviceLayer::DeviceInfoProvider & aDeviceInfoProvider) :
+        mDeviceInfoProvider(aDeviceInfoProvider)
+    {}
+
+    /*
+     * Set the active locale.
+     *
+     * @param activeLocale The active locale to set.
+     * @return InteractionModel::Status::Success on success, InteractionModel::Status::ConstraintError if the locale is not valid or
+     * supportedLocale.
+     */
+    Protocols::InteractionModel::Status SetActiveLocale(CharSpan activeLocale);
+
+    /*
+     * Get the active locale.
+     *
+     * @return The active locale.
+     */
     CharSpan GetActiveLocale();
+
+    /*
+     * Read the supported locales.
+     *
+     * @param aEncoder The encoder to write the supported locales to.
+     * @return CHIP_NO_ERROR on success.
+     */
     CHIP_ERROR ReadSupportedLocales(AttributeValueEncoder & aEncoder);
-    CHIP_ERROR IsSupportedLocale(CharSpan newLangtag, MutableCharSpan & validLocale);
+
+    /*
+     * Check if a locale is supported.
+     *
+     * For backward compatibility, if the locale is not a supported locale, the validLocale will have the first supported locale.
+     *
+     * @param newLangTag The locale to check.
+     * @param validLocale The valid locale if the newLangTag is supported.
+     * @return true if the locale is supported, false otherwise.
+     */
+    bool IsSupportedLocale(CharSpan newLangTag, MutableCharSpan & validLocale);
 
 private:
     Storage::String<35> mActiveLocale;
+    DeviceLayer::DeviceInfoProvider & mDeviceInfoProvider;
 };
 } // namespace Clusters
 } // namespace app
