@@ -26,7 +26,7 @@ namespace {
 constexpr int kVideoH264PayloadType = 96;
 constexpr int kVideoBitRate         = 3000;
 constexpr int kSSRC                 = 42;
-constexpr int kMaxFragmentSize = 1188; // 1200 (max packet size) - 12 (RTP header size)
+constexpr int kMaxFragmentSize      = 1188; // 1200 (max packet size) - 12 (RTP header size)
 
 rtc::Description::Type SDPTypeToRtcType(SDPType type)
 {
