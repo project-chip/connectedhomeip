@@ -30,6 +30,11 @@ from pydantic import BaseModel
 from zeroconf import ServiceInfo, Zeroconf
 
 
+module_dir_path = os.path.dirname(os.path.realpath(__file__))
+templates_path = os.path.join(module_dir_path, "templates")
+static_path = os.path.join(module_dir_path, "static")
+
+
 class WorkingDirectory:
     """
     Collection of utilities to add convention to the files used by this program.
@@ -394,7 +399,7 @@ class SupportedIngestInterface(str, Enum):
 
 class PushAvServer:
 
-    templates = Jinja2Templates(directory="templates")
+    templates = Jinja2Templates(directory=templates_path)
 
     def __init__(self, wd: WorkingDirectory, device_hierarchy: CAHierarchy, strict_mode: bool):
         self.wd = wd
@@ -671,7 +676,7 @@ class PushAvContext:
         self.directory.mkdir("streams")
 
         self.app = FastAPI()
-        self.app.mount("/static", StaticFiles(directory="static"), name="static")
+        self.app.mount("/static", StaticFiles(directory=static_path), name="static")
         pas = PushAvServer(self.directory, self.device_hierarchy, strict_mode)
         self.app.include_router(pas.router)
 
