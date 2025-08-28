@@ -163,7 +163,7 @@ public:
      *
      * @retval CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND if no stored value exists for the attribute
      */
-    virtual CHIP_ERROR SafeDeleteValue(const ConcreteAttributePath & aPath) override
+    virtual CHIP_ERROR SafeDeleteValue(const ConcreteAttributePath & aPath) = 0;
 };
 
 /**
