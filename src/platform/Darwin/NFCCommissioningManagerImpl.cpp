@@ -94,7 +94,7 @@ bool NFCCommissioningManagerImpl::CanSendToPeer(const Transport::PeerAddress & a
 
     chip::Nfc::NFCTag::Identifier identifier = { .discriminator = address.GetNFCShortId() };
     bool found                               = mReaderTransport->FindTagMatchingIdentifier(identifier);
-    ChipLogError(DeviceLayer, "%s NFC tag %u", found ? "Found" : "Did not find", address.GetNFCShortId());
+    ChipLogDetail(DeviceLayer, "%s NFC tag %u", found ? "Found" : "Did not find", address.GetNFCShortId());
     return found;
 }
 
@@ -112,7 +112,7 @@ CHIP_ERROR NFCCommissioningManagerImpl::SendToNfcTag(const Transport::PeerAddres
         std::move(msgBuf), identifier, [&](System::PacketBufferHandle && responseBuffer, CHIP_ERROR error) -> void {
             if (error == CHIP_NO_ERROR)
             {
-                ChipLogError(DeviceLayer, "Successfully sent message to NFC tag %u, received response buffer of length %lu bytes",
+                ChipLogProgress(DeviceLayer, "Successfully sent message to NFC tag %u, received response buffer of length %lu bytes",
                              address.GetNFCShortId(), responseBuffer->DataLength());
                 this->mNFCBase->OnNfcTagResponse(address, std::move(responseBuffer));
             }

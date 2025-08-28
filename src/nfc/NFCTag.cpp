@@ -250,9 +250,9 @@ CHIP_ERROR NFCTag::ProcessAPDUResponse(System::PacketBufferHandle & response)
     // It can be read thanks to a call to getResponse() command.
     while (IsResponseBlockAvailable(sw1))
     {
-        // If SW2 is 0x00 or if it is higher than TYPE4_SIMPLE_APDU_MAX_RX_SIZE, we clamp it to
-        // TYPE4_SIMPLE_APDU_MAX_RX_SIZE.
-        size_t nextBlockLength = ((sw2 == 0x00) || (sw2 > mType4SimpleADPUMaxTxSize)) ? mType4SimpleADPUMaxRxSize : sw2;
+        // If SW2 is 0x00 or if it is higher than mType4SimpleADPUMaxRxSize, we clamp it to
+        // mType4SimpleADPUMaxRxSize.
+        size_t nextBlockLength = ((sw2 == 0x00) || (sw2 > mType4SimpleADPUMaxRxSize)) ? mType4SimpleADPUMaxRxSize : sw2;
 
         mAPDUResponseLength = sizeof(mAPDURxBuffer); // Initialized with with mAPDURxBuffer size to indicate to the low
                                                      // level driver the capacity of the RX buffer
