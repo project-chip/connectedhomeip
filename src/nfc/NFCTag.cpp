@@ -110,13 +110,6 @@ static inline void PrintSw1Sw2(uint8_t sw1, uint8_t sw2)
     ChipLogProgress(DeviceLayer, "SW1=0x%x SW2=0x%x", sw1, sw2);
 }
 
-CHIP_ERROR NFCTag::RetrieveDiscriminator()
-{
-    // Discriminator can be found in the response to select application
-    CHIP_ERROR res = SelectMatterApplet();
-    return res;
-}
-
 CHIP_ERROR NFCTag::SendMessage(const NFCMessage & message, System::PacketBufferHandle & response)
 {
     return SendChainedAPDUs(message.GetDataToSend(), response);

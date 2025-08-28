@@ -94,7 +94,7 @@ public:
      *
      * @param message The NFC message to send to the tag.
      * @param tagIdentifier The identifier of the tag that is the destination of the message
-     * @param callback Callback function to be invoked providing status on the send request. The calllback must be
+     * @param callback Callback function to be invoked providing status on the send request. The callback must be
      *                 invoked in the context of the Matter Stack
      *
      * @return The error code specifying the status of the request.

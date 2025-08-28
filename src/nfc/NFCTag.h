@@ -111,7 +111,6 @@ protected:
     virtual CHIP_ERROR Transceive(uint8_t * sendBuffer, size_t sendBufferLength, uint8_t * recvBuffer, size_t * recvLength) = 0;
 
 private:
-    CHIP_ERROR RetrieveDiscriminator();
     void ProcessError(const char * msg);
     CHIP_ERROR ProcessAPDUResponse(System::PacketBufferHandle & response);
     void ResetChainedResponseBuffer();

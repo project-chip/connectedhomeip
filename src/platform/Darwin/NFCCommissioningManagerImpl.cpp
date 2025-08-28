@@ -123,7 +123,7 @@ CHIP_ERROR NFCCommissioningManagerImpl::SendToNfcTag(const Transport::PeerAddres
                 this->mNFCBase->OnNfcTagError(address);
             }
         });
-    ChipLogError(DeviceLayer, "Queued SendMessage to NFC tag %u, error: %u", address.GetNFCShortId(), err.AsInteger());
+    ChipLogProgress(DeviceLayer, "Queued SendMessage to NFC tag %u, error: %u", address.GetNFCShortId(), err.AsInteger());
     return err;
 }
 
