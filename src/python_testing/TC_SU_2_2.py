@@ -424,10 +424,10 @@ class TC_SU_2_2(MatterBaseTest):
         await self.add_single_ota_provider(controller, requestor_node_id, provider_node_id_s1)
 
         # ------------------------------------------------------------------------------------
-        # [STEP_1]: Step #1.0 - Provider sends AnnounceOTAProvider command to Requestor
+        # [STEP_1]: Step #1.0 - Controller (DUT/Requestor) sends AnnounceOTAProvider command
         # ------------------------------------------------------------------------------------
 
-        logger.info(f'{step_number_s1}: Step #1.0 - Provider_S1 sends AnnounceOTAProvider command to DUT')
+        logger.info(f'{step_number_s1}: Step #1.0 - Controller (DUT/Requestor) sends AnnounceOTAProvider command')
         cmd_announce = Clusters.OtaSoftwareUpdateRequestor.Commands.AnnounceOTAProvider(
             providerNodeID=1,  # Provider
             vendorID=0xFFF1,
@@ -677,9 +677,9 @@ class TC_SU_2_2(MatterBaseTest):
         await asyncio.sleep(2)
 
         # ------------------------------------------------------------------------------------
-        # [STEP_2]: Step #2.0 - Provider sends AnnounceOTAProvider command to Requestor
+        # [STEP_2]: Step #2.0 - Controller (DUT/Requestor) sends AnnounceOTAProvider command
         # ------------------------------------------------------------------------------------
-        logger.info("Step #2.0 - Provider_S2 sends AnnounceOTAProvider command to DUT")
+        logger.info("Step #2.0 - Controller (DUT/Requestor) sends AnnounceOTAProvider command")
         cmd_announce = Clusters.OtaSoftwareUpdateRequestor.Commands.AnnounceOTAProvider(
             providerNodeID=provider_node_id_s2,  # Provider_S2
             vendorID=0xFFF1,
