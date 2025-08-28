@@ -342,6 +342,7 @@ jobs:
               run: |
                   scripts/find_attribute_persistence_provider_usage.sh \
                   --skip-subtree .github/ \
+                  --skip-subtree scripts/ \
                   --skip-from-file scripts/attribute_persistence_provider_exclusions.txt
 
             # git grep exits with 0 if it finds a match, but we want
