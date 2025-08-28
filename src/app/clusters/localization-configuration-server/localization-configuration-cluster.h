@@ -29,8 +29,8 @@ namespace Clusters {
 class LocalizationConfigurationCluster : public DefaultServerCluster
 {
 public:
-    LocalizationConfigurationCluster(CharSpan activeLocale) :
-        DefaultServerCluster({ kRootEndpointId, LocalizationConfiguration::Id })
+    LocalizationConfigurationCluster(DeviceLayer::DeviceInfoProvider & aDeviceInfoProvider, CharSpan activeLocale) :
+        DefaultServerCluster({ kRootEndpointId, LocalizationConfiguration::Id }), mLogic(aDeviceInfoProvider)
     {
         mLogic.SetActiveLocale(activeLocale);
     }
