@@ -22,6 +22,7 @@
 #include <app/clusters/camera-av-settings-user-level-management-server/camera-av-settings-user-level-management-server.h>
 #include <app/clusters/camera-av-stream-management-server/camera-av-stream-management-server.h>
 #include <app/clusters/chime-server/chime-server.h>
+#include <app/clusters/push-av-stream-transport-server/push-av-stream-transport-cluster.h>
 #include <app/clusters/webrtc-transport-provider-server/webrtc-transport-provider-server.h>
 #include <app/clusters/zone-management-server/zone-management-server.h>
 
@@ -54,7 +55,9 @@ struct VideoStream
                 videoStreamParams.minResolution.width <= inputParams.minResolution.width &&
                 videoStreamParams.minResolution.height <= inputParams.minResolution.height &&
                 videoStreamParams.maxResolution.width >= inputParams.maxResolution.width &&
-                videoStreamParams.maxResolution.height >= inputParams.maxResolution.height);
+                videoStreamParams.maxResolution.height >= inputParams.maxResolution.height &&
+                videoStreamParams.minBitRate <= inputParams.minBitRate && videoStreamParams.maxBitRate >= inputParams.maxBitRate &&
+                videoStreamParams.keyFrameInterval == inputParams.keyFrameInterval);
     }
 };
 
@@ -69,7 +72,7 @@ struct AudioStream
     {
         return (audioStreamParams.audioCodec == inputParams.audioCodec &&
                 audioStreamParams.channelCount == inputParams.channelCount &&
-                audioStreamParams.sampleRate == inputParams.sampleRate);
+                audioStreamParams.sampleRate == inputParams.sampleRate && audioStreamParams.bitDepth == inputParams.bitDepth);
     }
 };
 
@@ -83,7 +86,7 @@ struct SnapshotStream
     bool IsCompatible(const SnapshotStreamStruct & inputParams) const
     {
         return (snapshotStreamParams.imageCodec == inputParams.imageCodec && snapshotStreamParams.quality == inputParams.quality &&
-                snapshotStreamParams.frameRate <= inputParams.frameRate &&
+                snapshotStreamParams.frameRate == inputParams.frameRate &&
                 snapshotStreamParams.minResolution.width <= inputParams.minResolution.width &&
                 snapshotStreamParams.minResolution.height <= inputParams.minResolution.height &&
                 snapshotStreamParams.maxResolution.width >= inputParams.maxResolution.width &&
@@ -135,6 +138,9 @@ public:
     // Getter for the Media Controller
     virtual MediaController & GetMediaController() = 0;
 
+    // Getter for PushAVStreamTransport Delegate
+    virtual chip::app::Clusters::PushAvStreamTransportDelegate & GetPushAVTransportDelegate() = 0;
+
     // Class defining the Camera HAL interface
     class CameraHALInterface
     {
@@ -160,7 +166,7 @@ public:
         virtual CameraError CaptureSnapshot(const chip::app::DataModel::Nullable<uint16_t> streamID,
                                             const VideoResolutionStruct & resolution, ImageSnapshot & outImageSnapshot) = 0;
         // Start video stream
-        virtual CameraError StartVideoStream(uint16_t streamID) = 0;
+        virtual CameraError StartVideoStream(const VideoStreamStruct & allocatedStream) = 0;
 
         // Stop video stream
         virtual CameraError StopVideoStream(uint16_t streamID) = 0;

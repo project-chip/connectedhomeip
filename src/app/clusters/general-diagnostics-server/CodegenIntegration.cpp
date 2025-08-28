@@ -20,7 +20,7 @@
 #include <app/static-cluster-config/GeneralDiagnostics.h>
 #include <app/util/config.h>
 #include <app/util/util.h>
-#include <data-model-providers/codegen/CodegenDataModelProvider.h>
+#include <data-model-providers/codegen/ClusterIntegration.h>
 
 using namespace chip;
 using namespace chip::app;
@@ -43,61 +43,75 @@ LazyRegisteredServerCluster<GeneralDiagnosticsClusterFullConfigurable> gServer;
 LazyRegisteredServerCluster<GeneralDiagnosticsCluster> gServer;
 #endif
 
+class IntegrationDelegate : public CodegenClusterIntegration::Delegate
+{
+public:
+    ServerClusterRegistration & CreateRegistration(EndpointId endpointId, unsigned emberEndpointIndex,
+                                                   uint32_t optionalAttributeBits, uint32_t featureMap) override
+    {
+        GeneralDiagnosticsCluster::OptionalAttributeSet optionalAttributeSet(optionalAttributeBits);
+
+#if defined(ZCL_USING_TIME_SYNCHRONIZATION_CLUSTER_SERVER) || defined(GENERAL_DIAGNOSTICS_ENABLE_PAYLOAD_TEST_REQUEST_CMD)
+        const GeneralDiagnosticsFunctionsConfig functionsConfig
+        {
+            /*
+            Only consider real time if time sync cluster is actually enabled. If it's not
+            enabled, this avoids likelihood of frequently reporting unusable unsynched time.
+            */
+#if defined(ZCL_USING_TIME_SYNCHRONIZATION_CLUSTER_SERVER)
+            .enablePosixTime = true,
+#else
+            .enablePosixTime      = false,
+#endif
+#if defined(GENERAL_DIAGNOSTICS_ENABLE_PAYLOAD_TEST_REQUEST_CMD)
+            .enablePayloadSnaphot = true,
+#else
+            .enablePayloadSnaphot = false,
+#endif
+        };
+        gServer.Create(optionalAttributeSet, functionsConfig);
+#else
+        gServer.Create(optionalAttributeSet);
+#endif
+        return gServer.Registration();
+    }
+
+    ServerClusterInterface & FindRegistration(unsigned emberEndpointIndex) override { return gServer.Cluster(); }
+    void ReleaseRegistration(unsigned emberEndpointIndex) override { gServer.Destroy(); }
+};
+
 } // namespace
 
 void emberAfGeneralDiagnosticsClusterServerInitCallback(EndpointId endpointId)
 {
-    VerifyOrDie(endpointId == kRootEndpointId);
+    IntegrationDelegate integrationDelegate;
 
-    GeneralDiagnosticsCluster::OptionalAttributeSet optionalAttributeSet =
-        GeneralDiagnosticsCluster::OptionalAttributeSet()
-            .Set<TotalOperationalHours::Id>(emberAfContainsAttribute(endpointId, GeneralDiagnostics::Id, TotalOperationalHours::Id))
-            .Set<BootReason::Id>(emberAfContainsAttribute(endpointId, GeneralDiagnostics::Id, BootReason::Id))
-            .Set<ActiveHardwareFaults::Id>(emberAfContainsAttribute(endpointId, GeneralDiagnostics::Id, ActiveHardwareFaults::Id))
-            .Set<ActiveRadioFaults::Id>(emberAfContainsAttribute(endpointId, GeneralDiagnostics::Id, ActiveRadioFaults::Id))
-            .Set<ActiveNetworkFaults::Id>(emberAfContainsAttribute(endpointId, GeneralDiagnostics::Id, ActiveNetworkFaults::Id));
-
-#if defined(ZCL_USING_TIME_SYNCHRONIZATION_CLUSTER_SERVER) || defined(GENERAL_DIAGNOSTICS_ENABLE_PAYLOAD_TEST_REQUEST_CMD)
-    const GeneralDiagnosticsFunctionsConfig functionsConfig
-    {
-        /*
-        Only consider real time if time sync cluster is actually enabled. If it's not
-        enabled, this avoids likelihood of frequently reporting unusable unsynched time.
-        */
-#if defined(ZCL_USING_TIME_SYNCHRONIZATION_CLUSTER_SERVER)
-        .enablePosixTime = true,
-#else
-        .enablePosixTime      = false,
-#endif
-#if defined(GENERAL_DIAGNOSTICS_ENABLE_PAYLOAD_TEST_REQUEST_CMD)
-        .enablePayloadSnaphot = true,
-#else
-        .enablePayloadSnaphot = false,
-#endif
-    };
-    gServer.Create(optionalAttributeSet, functionsConfig);
-#else
-    gServer.Create(optionalAttributeSet);
-#endif
-
-    CHIP_ERROR err = CodegenDataModelProvider::Instance().Registry().Register(gServer.Registration());
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogError(AppServer, "Failed to register GeneralDiagnostics on endpoint %u: %" CHIP_ERROR_FORMAT, endpointId,
-                     err.Format());
-    }
+    // register a singleton server (root endpoint only)
+    CodegenClusterIntegration::RegisterServer(
+        {
+            .endpointId                      = endpointId,
+            .clusterId                       = GeneralDiagnostics::Id,
+            .fixedClusterServerEndpointCount = 1,
+            .maxEndpointCount                = 1,
+            .fetchFeatureMap                 = false,
+            .fetchOptionalAttributes         = true,
+        },
+        integrationDelegate);
 }
 
 void MatterGeneralDiagnosticsClusterServerShutdownCallback(EndpointId endpointId)
 {
-    VerifyOrReturn(endpointId == kRootEndpointId);
-    CHIP_ERROR err = CodegenDataModelProvider::Instance().Registry().Unregister(&gServer.Cluster());
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogError(AppServer, "Failed to unregister GeneralDiagnostics on endpoint %u: %" CHIP_ERROR_FORMAT, endpointId,
-                     err.Format());
-    }
-    gServer.Destroy();
+    IntegrationDelegate integrationDelegate;
+
+    // register a singleton server (root endpoint only)
+    CodegenClusterIntegration::UnregisterServer(
+        {
+            .endpointId                      = endpointId,
+            .clusterId                       = GeneralDiagnostics::Id,
+            .fixedClusterServerEndpointCount = 1,
+            .maxEndpointCount                = 1,
+        },
+        integrationDelegate);
 }
 
 void MatterGeneralDiagnosticsPluginServerInitCallback() {}
