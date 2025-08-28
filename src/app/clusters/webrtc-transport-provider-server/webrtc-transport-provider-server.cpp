@@ -72,7 +72,8 @@ WebRTCTransportProviderServer::WebRTCTransportProviderServer(Delegate & delegate
 
 WebRTCTransportProviderServer::~WebRTCTransportProviderServer()
 {
-    Shutdown();
+    CommandHandlerInterfaceRegistry::Instance().UnregisterCommandHandler(this);
+    AttributeAccessInterfaceRegistry::Instance().Unregister(this);
 }
 
 CHIP_ERROR WebRTCTransportProviderServer::Init()
@@ -81,12 +82,6 @@ CHIP_ERROR WebRTCTransportProviderServer::Init()
     VerifyOrReturnError(AttributeAccessInterfaceRegistry::Instance().Register(this), CHIP_ERROR_INCORRECT_STATE);
 
     return CHIP_NO_ERROR;
-}
-
-void WebRTCTransportProviderServer::Shutdown()
-{
-    CommandHandlerInterfaceRegistry::Instance().UnregisterCommandHandler(this);
-    AttributeAccessInterfaceRegistry::Instance().Unregister(this);
 }
 
 // AttributeAccessInterface

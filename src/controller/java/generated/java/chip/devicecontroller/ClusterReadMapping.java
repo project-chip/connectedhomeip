@@ -17931,6 +17931,17 @@ public class ClusterReadMapping {
           readCameraAvSettingsUserLevelManagementPanMaxCommandParams
         );
         result.put("readPanMaxAttribute", readCameraAvSettingsUserLevelManagementPanMaxAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readCameraAvSettingsUserLevelManagementMovementStateCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readCameraAvSettingsUserLevelManagementMovementStateAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.CameraAvSettingsUserLevelManagementCluster) cluster).readMovementStateAttribute(
+              (ChipClusters.IntegerAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
+          readCameraAvSettingsUserLevelManagementMovementStateCommandParams
+        );
+        result.put("readMovementStateAttribute", readCameraAvSettingsUserLevelManagementMovementStateAttributeInteractionInfo);
      Map<String, CommandParameterInfo> readCameraAvSettingsUserLevelManagementGeneratedCommandListCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
         InteractionInfo readCameraAvSettingsUserLevelManagementGeneratedCommandListAttributeInteractionInfo = new InteractionInfo(
           (cluster, callback, commandArguments) -> {

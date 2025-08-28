@@ -18518,6 +18518,17 @@ static id _Nullable DecodeAttributeValueForCameraAVSettingsUserLevelManagementCl
         value = [NSNumber numberWithShort:cppValue];
         return value;
     }
+    case Attributes::MovementState::Id: {
+        using TypeInfo = Attributes::MovementState::TypeInfo;
+        TypeInfo::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+        NSNumber * _Nonnull value;
+        value = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue)];
+        return value;
+    }
     default: {
         // Not a known CameraAVSettingsUserLevelManagement attribute.
         break;
