@@ -184,7 +184,8 @@ class PAVSTTestBase:
         if not any(stream.audioStreamID == audioStreamID for stream in aAllocatedAudioStreams):
             asserts.fail(f"Audio Stream with ID {audioStreamID} not found as expected")
 
-    async def allocate_one_pushav_transport(self, endpoint, triggerType=Clusters.PushAvStreamTransport.Enums.TransportTriggerTypeEnum.kContinuous):
+    async def allocate_one_pushav_transport(self, endpoint, triggerType=Clusters.PushAvStreamTransport.Enums.TransportTriggerTypeEnum.kContinuous,
+                                            trigger_Options=None):
         endpoint = self.get_endpoint(default=1)
         cluster = Clusters.PushAvStreamTransport
 
@@ -208,6 +209,10 @@ class PAVSTTestBase:
         )
         asserts.assert_greater(len(aStreamUsagePriorities), 0, "StreamUsagePriorities is empty")
 
+        triggerOptions = {"triggerType": triggerType}
+        if (trigger_Options is not None):
+            triggerOptions = trigger_Options
+
         try:
             await self.send_single_cmd(
                 cmd=cluster.Commands.AllocatePushTransport(
@@ -217,7 +222,7 @@ class PAVSTTestBase:
                         "audioStreamID": aAllocatedAudioStream,
                         "endpointID": endpoint,
                         "url": "https://localhost:1234/streams/1",
-                        "triggerOptions": {"triggerType": triggerType},
+                        "triggerOptions": triggerOptions,
                         "ingestMethod": cluster.Enums.IngestMethodsEnum.kCMAFIngest,
                         "containerOptions": {
                             "containerType": cluster.Enums.ContainerFormatEnum.kCmaf,

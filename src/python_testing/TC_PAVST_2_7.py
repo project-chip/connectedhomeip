@@ -266,10 +266,21 @@ class TC_PAVST_2_7(MatterBaseTest, PAVSTTestBase):
             "AllocatedAudioStreams must not be empty",
         )
 
-        status = await self.allocate_one_pushav_transport(endpoint, triggerType=pvcluster.Enums.TransportTriggerTypeEnum.kCommand)
+        triggerOptions = {"triggerType": pvcluster.Enums.TransportTriggerTypeEnum.kCommand,
+                          "maxPreRollLen": 4000,}
+
+        status = await self.allocate_one_pushav_transport(endpoint, trigger_Options=triggerOptions)
         asserts.assert_equal(
             status, Status.Success, "Push AV Transport should be allocated successfully"
         )
+
+        transportConfigs = await self.read_pavst_attribute_expect_success(endpoint,
+                                                                          pvattr.CurrentConnections,
+                                                                          )
+        asserts.assert_greater_equal(
+            len(transportConfigs), 1, "TransportConfigurations must not be empty!"
+        )
+        aConnectionID = transportConfigs[0].connectionID
 
         self.step(11)
         cmd = pvcluster.Commands.SetTransportStatus(
@@ -280,18 +291,13 @@ class TC_PAVST_2_7(MatterBaseTest, PAVSTTestBase):
         asserts.assert_true(
             status == Status.Success,
             "DUT responds with SUCCESS status code.")
-        transportConfigs = await self.read_pavst_attribute_expect_success(endpoint,
-                                                                          pvattr.CurrentConnections,
-                                                                          )
-        asserts.assert_greater_equal(
-            len(transportConfigs), 1, "TransportConfigurations must not be empty!"
-        )
-        aConnectionID = transportConfigs[0].connectionID
 
         self.step(12)
+        timeControl = {"initialDuration": 1, "augmentationDuration": 1, "maxDuration": 1, "blindDuration": 1}
         cmd = pvcluster.Commands.ManuallyTriggerTransport(
             connectionID=aConnectionID,
-            activationReason=pvcluster.Enums.TriggerActivationReasonEnum.kEmergency
+            activationReason=pvcluster.Enums.TriggerActivationReasonEnum.kUserInitiated,
+            timeControl=timeControl
         )
         status = await self.psvt_manually_trigger_transport(cmd)
         asserts.assert_true(
