@@ -21,7 +21,8 @@
 namespace chip {
 namespace app {
 
-class DefaultSafeAttributePersistenceProvider : protected StorageDelegateWrapper, public SafeAttributePersistenceProvider {
+class DefaultSafeAttributePersistenceProvider : protected StorageDelegateWrapper, public SafeAttributePersistenceProvider
+{
 public:
     DefaultSafeAttributePersistenceProvider() = default;
 

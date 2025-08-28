@@ -35,12 +35,10 @@ namespace chip::app {
 /// have known (strong) types and their load/decode logic is often
 /// similar and reusable. This class implements the logic of handling
 /// such attributes, so that it can be reused across cluster implementations.
-class AttributePersistence {
+class AttributePersistence
+{
 public:
-    AttributePersistence(AttributePersistenceProvider & provider)
-        : mProvider(provider)
-    {
-    }
+    AttributePersistence(AttributePersistenceProvider & provider) : mProvider(provider) {}
 
     /// Loads a native-endianness stored value of type `T` into `value` from the persistence provider.
     ///
@@ -96,8 +94,8 @@ public:
 
     // Only available in little endian for the moment
     CHIP_ERROR MigrateFromSafeAttributePersistanceProvider(EndpointId endpointId, ClusterId clusterId,
-        const ReadOnlyBuffer<AttributeId> & attributes, MutableByteSpan & buffer,
-        PersistentStorageDelegate & storageDelegate)
+                                                           const ReadOnlyBuffer<AttributeId> & attributes, MutableByteSpan & buffer,
+                                                           PersistentStorageDelegate & storageDelegate)
     {
 
         ChipError err;
@@ -106,7 +104,8 @@ public:
         DefaultAttributePersistenceProvider normProvider;
         normProvider.Init(storageDelegate);
 
-        for (auto attr : attributes) {
+        for (auto attr : attributes)
+        {
             // We make a copy of the buffer so it can be resized
             MutableByteSpan copyOfBuffer = buffer;
 
@@ -114,10 +113,13 @@ public:
             auto attrPath = ConcreteAttributePath(endpointId, clusterId, attr);
             // Read Value, will resize copyOfBuffer to read size
             err = safeProvider.SafeReadValue(attrPath, copyOfBuffer);
-            if (err == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND) {
+            if (err == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND)
+            {
                 // The value does not exist
                 continue;
-            } else if (err != CHIP_NO_ERROR) {
+            }
+            else if (err != CHIP_NO_ERROR)
+            {
                 // ChipLogError(Unspecified, "Error reading attribute %s - %" CHIP_ERROR_FORMAT, safePath.KeyName(), err);
                 continue;
             }
@@ -137,7 +139,7 @@ private:
     /// Error reason for load failure is logged (or nothing logged in case "Value not found" is the
     /// reason for the load failure).
     bool InternalRawLoadNativeEndianValue(const ConcreteAttributePath & path, void * data, const void * valueOnLoadFailure,
-        size_t size);
+                                          size_t size);
 };
 
 } // namespace chip::app
