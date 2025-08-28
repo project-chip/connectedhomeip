@@ -42,20 +42,21 @@
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
 
-from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
-from matter.testing.event_attribute_reporting import EventSubscriptionHandler
-from matter.interaction_model import Status
-from matter.clusters.Types import NullValue
-from matter import ChipDeviceCtrl
-import matter.clusters as Clusters
-from mobly import asserts
-import psutil
-from time import sleep
-from subprocess import PIPE, STDOUT, Popen, run
-from os import environ, getcwd, setpgrp
-import logging
 import asyncio
+import logging
+from os import environ, getcwd, setpgrp
+from subprocess import Popen, run
+from time import sleep
 
+import psutil
+from mobly import asserts
+
+import matter.clusters as Clusters
+from matter import ChipDeviceCtrl
+from matter.clusters.Types import NullValue
+from matter.interaction_model import Status
+from matter.testing.event_attribute_reporting import EventSubscriptionHandler
+from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 
 # Create a logger
 logger = logging.getLogger(__name__)
@@ -428,6 +429,7 @@ class TC_SU_2_7(MatterBaseTest):
         self.current_provider_app_proc.terminate()
         controller.ExpireSessions(nodeid=provider_data['node_id'])
         run("rm -rf /tmp/chip_kvs_provider*", shell=True)
+        self.ota_req.Attributes.UpdateState
         sleep(3)
 
         self.step(3)
@@ -468,7 +470,6 @@ class TC_SU_2_7(MatterBaseTest):
         sleep(3)
 
         self.step(4)
-
         self._launch_provider_app(extra_params=["-u deferred", "-c"])
         await controller.CommissionOnNetwork(
             nodeId=provider_data['node_id'],
@@ -478,9 +479,9 @@ class TC_SU_2_7(MatterBaseTest):
         )
         await self._write_acl_rules(controller=controller, endpoint=0, node_id=provider_data['node_id'])
         await self._write_ota_providers(controller=controller, provider_node_id=provider_data['node_id'], endpoint=0)
-        update_applied_event_handler = EventSubscriptionHandler(
-            expected_cluster=self.ota_req, expected_event_id=self.ota_req.Events.VersionApplied.event_id)
-        await update_applied_event_handler.start(controller, requestor_node_id, endpoint=0, min_interval_sec=0, max_interval_sec=60*6)
+        state_transition_event_handler = EventSubscriptionHandler(
+            expected_cluster=self.ota_req, expected_event_id=self.ota_req.Events.StateTransition.event_id)
+        await state_transition_event_handler.start(controller, requestor_node_id, endpoint=0, min_interval_sec=0, max_interval_sec=60*6)
         # self._launch_requestor_app(extra_params=["-c true", "-u deferred"])
         await self._announce_ota_provider(controller, provider_data['node_id'], requestor_node_id)
         event_report = state_transition_event_handler.wait_for_event_report(self.ota_req.Events.StateTransition, timeout_sec=30)
@@ -520,9 +521,6 @@ class TC_SU_2_7(MatterBaseTest):
         # fails
         # Again the process to update the cluster but we check the Delayed on Apply
         # Delayed on apply
-        update_applied_event_handler = EventSubscriptionHandler(
-            expected_cluster=self.ota_req, expected_event_id=self.ota_req.Events.VersionApplied.event_id)
-        await update_applied_event_handler.start(controller, requestor_node_id, endpoint=0, min_interval_sec=0, max_interval_sec=60*6)
         self._launch_provider_app(extra_params=["--applyUpdateAction awaitNextAction", "--delayedApplyActionTimeSec 10"])
         await controller.CommissionOnNetwork(
             nodeId=provider_data['node_id'],
@@ -530,6 +528,9 @@ class TC_SU_2_7(MatterBaseTest):
             filterType=ChipDeviceCtrl.DiscoveryFilterType.LONG_DISCRIMINATOR,
             filter=provider_data['discriminator']
         )
+        state_transition_event_handler = EventSubscriptionHandler(
+            expected_cluster=self.ota_req, expected_event_id=self.ota_req.Events.StateTransition.event_id)
+        await state_transition_event_handler.start(controller, requestor_node_id, endpoint=0, min_interval_sec=0, max_interval_sec=60*6)
         await self._write_acl_rules(controller=controller, endpoint=0, node_id=provider_data['node_id'])
         await self._write_ota_providers(controller=controller, provider_node_id=provider_data['node_id'], endpoint=0)
         await self._announce_ota_provider(controller, provider_data['node_id'], requestor_node_id)
