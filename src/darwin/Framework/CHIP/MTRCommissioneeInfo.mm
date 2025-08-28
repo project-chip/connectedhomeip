@@ -37,6 +37,8 @@ MTR_DIRECT_MEMBERS
 
 - (instancetype)initWithCommissioningInfo:(const chip::Controller::ReadCommissioningInfo &)info commissioningParameters:(MTRCommissioningParameters *)commissioningParameters
 {
+    using namespace chip::app;
+
     self = [super init];
     _productIdentity = [[MTRProductIdentity alloc] initWithVendorID:@(info.basic.vendorId) productID:@(info.basic.productId)];
 
@@ -47,13 +49,15 @@ MTR_DIRECT_MEMBERS
         }
     }
 
+    auto * networkCommissioningFeatureMaps = [NSMutableDictionary dictionary];
+
     if (info.attributes != nullptr) {
         NSMutableDictionary<MTRAttributePath *, NSDictionary<NSString *, id> *> * attributes = [[NSMutableDictionary alloc] init];
 
         // Only expose attributes that match pathFilters, so that API consumers
         // don't start relying on undocumented internal details of which paths
         // we read from the device in which circumstances.
-        std::vector<chip::app::AttributePathParams> pathFilters;
+        std::vector<AttributePathParams> pathFilters;
         if (commissioningParameters.extraAttributesToRead != nil) {
             for (MTRAttributeRequestPath * requestPath in commissioningParameters.extraAttributesToRead) {
                 [requestPath convertToAttributePathParams:pathFilters.emplace_back()];
@@ -64,7 +68,7 @@ MTR_DIRECT_MEMBERS
         // attributes, using a wildcard-endpoint path.
         pathFilters.emplace_back(MTRClusterIDTypeNetworkCommissioningID, MTRAttributeIDTypeGlobalAttributeFeatureMapID);
 
-        info.attributes->ForEachAttribute([&](const chip::app::ConcreteAttributePath & path) -> CHIP_ERROR {
+        info.attributes->ForEachAttribute([&](const ConcreteAttributePath & path) -> CHIP_ERROR {
             // Only grab paths that are included in extraAttributesToRead so that
             // API consumers don't develop dependencies on implementation details
             // (like which other attributes we happen to read).
@@ -111,7 +115,23 @@ MTR_DIRECT_MEMBERS
         });
 
         _attributes = attributes;
+
+        // Now grab the Network Commissioning feature maps in a nicer form.
+        info.attributes->ForEachAttribute(MTRClusterIDTypeNetworkCommissioningID, [&](const ConcreteAttributePath & path) -> CHIP_ERROR {
+            if (path.mAttributeId != MTRAttributeIDTypeGlobalAttributeFeatureMapID) {
+                return CHIP_NO_ERROR;
+            }
+
+            uint32_t value;
+            CHIP_ERROR err = info.attributes->Get<Clusters::NetworkCommissioning::Attributes::FeatureMap::TypeInfo>(path, value);
+            if (err == CHIP_NO_ERROR) {
+                networkCommissioningFeatureMaps[@(path.mEndpointId)] = @(value);
+            }
+            return CHIP_NO_ERROR;
+        });
     }
+
+    _networkCommissioningFeatureMaps = networkCommissioningFeatureMaps;
 
     return self;
 }

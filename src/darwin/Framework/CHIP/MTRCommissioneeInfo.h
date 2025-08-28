@@ -49,6 +49,13 @@ MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
 @property (nonatomic, copy, readonly, nullable) MTREndpointInfo * rootEndpoint;
 
 /**
+ * A dictionary mapping endpoint IDs to FeatureMap values for the Network
+ * Commissioning cluster, for endpoints that implement that cluster.  May
+ * contain no entries if there are no such endpoints.
+ */
+@property (nonatomic, copy, readonly) NSDictionary<NSNumber *, NSNumber *> * networkCommissioningFeatureMaps MTR_AVAILABLE(ios(26.1), macos(26.1), watchos(26.1), tvos(26.1));
+
+/**
  * Attributes that were read from the commissionee.  This will contain the
  * following, if they are available:
  *
