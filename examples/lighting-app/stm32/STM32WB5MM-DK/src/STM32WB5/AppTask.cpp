@@ -35,7 +35,6 @@
 #endif
 
 /*Matter includes*/
-#include <DeviceInfoProviderImpl.h>
 #include <app-common/zap-generated/attribute-type.h>
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app/clusters/network-commissioning/network-commissioning.h>
@@ -45,17 +44,16 @@
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <data-model-providers/codegen/Instance.h>
 #include <inet/EndPointStateOpenThread.h>
+#include <platform/CHIPDeviceLayer.h>
 #include <setup_payload/OnboardingCodesUtil.h>
 #include <setup_payload/QRCodeSetupPayloadGenerator.h>
 #include <setup_payload/SetupPayload.h>
-#include <platform/CHIPDeviceLayer.h>
 
 #if CHIP_ENABLE_OPENTHREAD
 #include <platform/OpenThread/GenericNetworkCommissioningThreadDriver.h>
 #include <platform/OpenThread/OpenThreadUtils.h>
 #include <platform/ThreadStackManager.h>
 #endif
-
 
 using namespace ::chip;
 using namespace ::chip::app;
@@ -93,12 +91,12 @@ static bool sHaveFabric          = false;
 static uint8_t NvmTimerCpt       = 0;
 static uint8_t NvmButtonStateCpt = 0;
 
+chip::DeviceLayer::DeviceInfoProviderImpl gExampleDeviceInfoProvider;
+
 #if CHIP_ENABLE_OPENTHREAD
 Clusters::NetworkCommissioning::InstanceAndDriver<DeviceLayer::NetworkCommissioning::GenericThreadDriver>
     sThreadNetworkDriver(0 /*endpointId*/);
 #endif // CHIP_ENABLE_OPENTHREAD
-
-chip::DeviceLayer::DeviceInfoProviderImpl gExampleDeviceInfoProvider;
 
 CHIP_ERROR AppTask::StartAppTask()
 {
@@ -145,6 +143,7 @@ CHIP_ERROR AppTask::Init()
     ThreadStackMgr().InitThreadStack();
     ConnectivityMgr().SetThreadDeviceType(ConnectivityManager::kThreadDeviceType_Router);
     sThreadNetworkDriver.Init();
+
     PlatformMgr().AddEventHandler(MatterEventHandler, 0);
 
     err = LightingMgr().Init();
@@ -167,12 +166,12 @@ CHIP_ERROR AppTask::Init()
     SetDeviceInstanceInfoProvider(&mFactoryDataProvider);
     SetCommissionableDataProvider(&mFactoryDataProvider);
     SetDeviceAttestationCredentialsProvider(&mFactoryDataProvider);
-    
+
     chip::Inet::EndPointStateOpenThread::OpenThreadEndpointInitParam nativeParams;
-    nativeParams.lockCb = LockOpenThreadTask;
-    nativeParams.unlockCb = UnlockOpenThreadTask;
+    nativeParams.lockCb                = LockOpenThreadTask;
+    nativeParams.unlockCb              = UnlockOpenThreadTask;
     nativeParams.openThreadInstancePtr = chip::DeviceLayer::ThreadStackMgrImpl().OTInstance();
-    initParams.endpointNativeParams = static_cast<void*>(&nativeParams);
+    initParams.endpointNativeParams    = static_cast<void *>(&nativeParams);
     chip::Server::GetInstance().Init(initParams);
 
     gExampleDeviceInfoProvider.SetStorageDelegate(&Server::GetInstance().GetPersistentStorage());

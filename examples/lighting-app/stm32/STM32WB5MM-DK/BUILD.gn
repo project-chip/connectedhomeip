@@ -25,6 +25,7 @@ assert(current_os == "freertos")
 stm32_project_dir = "${chip_root}/examples/lighting-app/stm32/STM32WB5MM-DK"
 examples_plat_dir = "${chip_root}/examples/platform/stm32"
 stm32_board_src = "${chip_root}/examples/platform/stm32/common/STM32WB5MM-DK"
+app_data_model = "${chip_root}/examples/lighting-app/stm32/data_model:stm32-lighting"
 
 declare_args() {
   # Dump memory usage at link time.
@@ -105,10 +106,11 @@ stm32_executable("lighting_app") {
 
     deps = [
       ":sdk",
-      "${chip_root}/examples/lighting-app/lighting-common",
       "${chip_root}/examples/providers:device_info_provider_please_do_not_reuse_as_is",
+      "${chip_root}/src/app/clusters/network-commissioning:network-commissioning",
       "${chip_root}/src/lib",
       "${chip_root}/src/setup_payload",
+       app_data_model,
     ]
 
  # deps += [ "${chip_root}/src/platform/logging:default" ]

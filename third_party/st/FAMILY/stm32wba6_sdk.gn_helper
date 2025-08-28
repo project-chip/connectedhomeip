@@ -19,9 +19,9 @@ declare_args() {
   stm32_wpan_sdk = "${chip_root}/third_party/st/STM32CubeWBA/Middlewares/ST/STM32_WPAN"
   stm32_wpan_sdk_patch = "${chip_root}/third_party/st/STM32CubeWBAPatch"
   stm32_config_files = "${chip_root}/examples/platform/stm32/config_files/STM32WBA6"
-  stm32_system = "${chip_root}/examples/platform/stm32/common/STM32WBA651-DK1/Common/WPAN/Modules"
-  stm32_system_interfaces = "${chip_root}/examples/platform/stm32/common/STM32WBA651-DK1/Common/WPAN/Interfaces"
-  stm32_system_Config = "${chip_root}/examples/platform/stm32/common/STM32WBA651-DK1/Common/WPAN/Config"
+  stm32_system = "${chip_root}/examples/platform/stm32/common/STM32WBA65I-DK1/Common/WPAN/Modules"
+  stm32_system_interfaces = "${chip_root}/examples/platform/stm32/common/STM32WBA65I-DK1/Common/WPAN/Interfaces"
+  stm32_system_Config = "${chip_root}/examples/platform/stm32/common/STM32WBA65I-DK1/Common/WPAN/Config"
   stm32_mbedtls_alt = "${chip_root}/third_party/st/STM32CubeWBA/Middlewares/ST/mbedtls_alt/interfaces/patterns"
 
   ## PATHS FOR FREERTOS ##  

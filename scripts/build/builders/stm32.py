@@ -49,7 +49,7 @@ class stm32Board(Enum):
         if self == stm32Board.STM32WB55XX:
             return 'STM32WB5MM-DK'
         elif stm32Board.STM32WBA6XX:
-            return 'STM32WBA651-DK1'
+            return 'STM32WBA65I-DK1'
         else:
             raise Exception('Unknown board #: %r' % self)
 

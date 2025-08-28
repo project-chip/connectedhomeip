@@ -20,8 +20,8 @@ stm32_sdk_target = get_label_info(":sdk", "label_no_toolchain")
 
 # Size Optimizations
 optimize_debug_level = "s"
+optimize_for_size = true
 
-chip_system_config_use_openthread_inet_endpoints = true
 chip_enable_ota_requestor = false
 chip_enable_ble = true
 chip_config_enable_arg_parser = false
