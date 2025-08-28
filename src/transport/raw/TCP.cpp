@@ -510,7 +510,7 @@ void TCPBase::HandleTCPEndPointConnectComplete(Inet::TCPEndPoint * endPoint, CHI
                 System::PacketBufferHandle buffer = std::move(pending->mPacketBuffer);
                 tcp->mPendingPackets.ReleaseObject(pending);
 
-                if ((conErr == CHIP_NO_ERROR) && (err == CHIP_NO_ERROR))
+                if (err == CHIP_NO_ERROR)
                 {
                     err = endPoint->Send(std::move(buffer));
                 }
@@ -529,7 +529,7 @@ void TCPBase::HandleTCPEndPointConnectComplete(Inet::TCPEndPoint * endPoint, CHI
     }
     else
     {
-        ChipLogError(Inet, "Connection establishment with %s encountered an error: %" CHIP_ERROR_FORMAT, addrStr, err.Format());
+        ChipLogError(Inet, "Connection establishment with %s encountered an error: %" CHIP_ERROR_FORMAT, addrStr, conErr.Format());
         endPoint->Free();
         tcp->mUsedEndPointCount--;
     }
