@@ -823,6 +823,11 @@ public:
         return mDefaultCommissioner == nullptr ? NullOptional : MakeOptional(mDefaultCommissioner->GetCommissioningParameters());
     }
 
+    CHIP_ERROR UpdateCommissioningParameters(const CommissioningParameters & newParameters)
+    {
+        return mDefaultCommissioner->SetCommissioningParameters(newParameters);
+    }
+
     // Reset the arm failsafe timer during commissioning.  If this returns
     // false, that means that the timer was already set for a longer time period
     // than the new time we are trying to set.  In this case, neither
@@ -1092,6 +1097,7 @@ private:
     CHIP_ERROR ParseGeneralCommissioningInfo(ReadCommissioningInfo & info);
     CHIP_ERROR ParseBasicInformation(ReadCommissioningInfo & info);
     CHIP_ERROR ParseNetworkCommissioningInfo(ReadCommissioningInfo & info);
+    CHIP_ERROR ParseNetworkCommissioningTimeouts(NetworkClusterInfo & networkInfo, const char * networkType);
     CHIP_ERROR ParseFabrics(ReadCommissioningInfo & info);
     CHIP_ERROR ParseICDInfo(ReadCommissioningInfo & info);
     CHIP_ERROR ParseTimeSyncInfo(ReadCommissioningInfo & info);
