@@ -438,7 +438,7 @@ public:
 
     bool GetNightVisionUsesInfrared() const { return mNightVisionUsesInfrared; }
 
-    const VideoResolutionStruct & GetMinViewport() const { return mMinViewPort; }
+    const VideoResolutionStruct & GetMinViewportResolution() const { return mMinViewPortResolution; }
 
     const std::vector<RateDistortionTradeOffStruct> & GetRateDistortionTradeOffPoints() const
     {
@@ -556,7 +556,7 @@ private:
     const uint32_t mMaxEncodedPixelRate;
     const VideoSensorParamsStruct mVideoSensorParams;
     const bool mNightVisionUsesInfrared;
-    const VideoResolutionStruct mMinViewPort;
+    const VideoResolutionStruct mMinViewPortResolution;
     const std::vector<RateDistortionTradeOffStruct> mRateDistortionTradeOffPointsList;
     const uint32_t mMaxContentBufferSize;
     const AudioCapabilitiesStruct mMicrophoneCapabilities;
