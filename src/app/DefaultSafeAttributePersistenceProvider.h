@@ -21,8 +21,7 @@
 namespace chip {
 namespace app {
 
-class DefaultSafeAttributePersistenceProvider : protected StorageDelegateWrapper, public SafeAttributePersistenceProvider
-{
+class DefaultSafeAttributePersistenceProvider : protected StorageDelegateWrapper, public SafeAttributePersistenceProvider {
 public:
     DefaultSafeAttributePersistenceProvider() = default;
 
@@ -40,7 +39,7 @@ public:
             DefaultStorageKeyAllocator::SafeAttributeValue(aPath.mEndpointId, aPath.mClusterId, aPath.mAttributeId), aValue);
     }
 
-    CHIP_ERROR SafeDeleteValue(const ConcreteAttributePath & aPath, MutableByteSpan & aValue) override
+    CHIP_ERROR SafeDeleteValue(const ConcreteAttributePath & aPath) override
     {
         return StorageDelegateWrapper::DeleteKey(
             DefaultStorageKeyAllocator::SafeAttributeValue(aPath.mEndpointId, aPath.mClusterId, aPath.mAttributeId));
