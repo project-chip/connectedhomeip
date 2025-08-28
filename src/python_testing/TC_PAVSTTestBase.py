@@ -346,7 +346,7 @@ class PAVSTTestBase:
         self.th1 = self.default_controller
         self.discriminator = random.randint(0, 4095)
         params = await self.th1.OpenCommissioningWindow(
-        nodeid=self.dut_node_id, timeout=900, iteration=10000, discriminator=self.discriminator, option=1)
+            nodeid=self.dut_node_id, timeout=900, iteration=10000, discriminator=self.discriminator, option=1)
 
         th2_certificate_authority = (
             self.certificate_authority_manager.NewCertificateAuthority()
@@ -356,13 +356,13 @@ class PAVSTTestBase:
         )
 
         self.th2 = th2_fabric_admin.NewController(
-        nodeId=2, useTestCommissioner=True)
+            nodeId=2, useTestCommissioner=True)
 
         setupPinCode = params.setupPinCode
 
         await self.th2.CommissionOnNetwork(
-        nodeId=self.dut_node_id, setupPinCode=setupPinCode,
-        filterType=ChipDeviceCtrl.DiscoveryFilterType.LONG_DISCRIMINATOR, filter=self.discriminator)
+            nodeId=self.dut_node_id, setupPinCode=setupPinCode,
+            filterType=ChipDeviceCtrl.DiscoveryFilterType.LONG_DISCRIMINATOR, filter=self.discriminator)
 
         return self.th2
 
@@ -375,7 +375,7 @@ class PAVSTTestBase:
     async def psvt_remove_current_fabric(self, devCtrl):
         fabric_idx_cr2_2 = await self.read_currentfabricindex(th=devCtrl)
         removeFabricCmd2 = Clusters.OperationalCredentials.Commands.RemoveFabric(fabric_idx_cr2_2)
-        resp=await self.th1.SendCommand(nodeid=self.dut_node_id, endpoint=0, payload=removeFabricCmd2)
+        resp = await self.th1.SendCommand(nodeid=self.dut_node_id, endpoint=0, payload=removeFabricCmd2)
         return resp
         asserts.assert_equal(
             resp.statusCode, Clusters.OperationalCredentials.Enums.NodeOperationalCertStatusEnum.kOk, "Expected removal of TH2's fabric to succeed")
