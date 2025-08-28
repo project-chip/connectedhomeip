@@ -42,7 +42,6 @@ public:
     NFCMessage(NFCMessage && other) noexcept;
     NFCMessage & operator=(NFCMessage && other) noexcept;
 
-
     // Deleted Copy Constructor
     NFCMessage(const NFCMessage &) = delete;
 
@@ -53,7 +52,7 @@ public:
     ~NFCMessage() = default;
 
     // Get the data to send
-    const chip::ByteSpan& GetDataToSend() const { return mDataToSend; }
+    const chip::ByteSpan & GetDataToSend() const { return mDataToSend; }
 
     // Check if the message is valid
     bool IsValid() const { return mDataToSendBuffer != nullptr; }
@@ -65,7 +64,8 @@ public:
 class DLL_EXPORT NFCTag
 {
 public:
-    struct Identifier {
+    struct Identifier
+    {
         uint16_t discriminator = 0;
 
         constexpr Identifier()                     = default;
@@ -80,12 +80,12 @@ public:
             return *this != _invalidID;
         }
 
-        friend bool operator == (const Identifier& lhs, const Identifier &rhs)
+        friend bool operator==(const Identifier & lhs, const Identifier & rhs)
         {
             return &lhs == &rhs || lhs.discriminator == rhs.discriminator;
         }
 
-        friend bool operator != (const Identifier& lhs, const Identifier &rhs) { return !(lhs == rhs); }
+        friend bool operator!=(const Identifier & lhs, const Identifier & rhs) { return !(lhs == rhs); }
     };
 
 public:
@@ -97,14 +97,14 @@ public:
     NFCTag & operator=(NFCTag &&)      = delete;
 
     bool IsValid() const { return mID.IsValid(); }
-    const Identifier& identifier() const { return mID; }
+    const Identifier & identifier() const { return mID; }
 
     size_t GetType4SimpleADPUMaxTxSize() const { return mType4SimpleADPUMaxTxSize; }
     size_t GetType4SimpleADPUMaxRxSize() const { return mType4SimpleADPUMaxRxSize; }
 
     CHIP_ERROR SelectMatterApplet();
-    CHIP_ERROR SendMessage(const NFCMessage& message, System::PacketBufferHandle& response);
-    CHIP_ERROR SendChainedAPDUs(const ByteSpan& dataToSend, System::PacketBufferHandle& response);
+    CHIP_ERROR SendMessage(const NFCMessage & message, System::PacketBufferHandle & response);
+    CHIP_ERROR SendChainedAPDUs(const ByteSpan & dataToSend, System::PacketBufferHandle & response);
     void Print() const;
 
 protected:
@@ -113,17 +113,19 @@ protected:
 private:
     CHIP_ERROR RetrieveDiscriminator();
     void ProcessError(const char * msg);
-    CHIP_ERROR ProcessAPDUResponse(System::PacketBufferHandle& response);
+    CHIP_ERROR ProcessAPDUResponse(System::PacketBufferHandle & response);
     void ResetChainedResponseBuffer();
     CHIP_ERROR AddDataToChainedResponseBuffer(uint8_t * data, size_t dataLen);
-    CHIP_ERROR SendTransportAPDU(const uint8_t * dataToSend, size_t dataToSendLength, bool isLastBlock, size_t totalLength, uint8_t * recvBuffer, size_t * recvBufferLength);
+    CHIP_ERROR SendTransportAPDU(const uint8_t * dataToSend, size_t dataToSendLength, bool isLastBlock, size_t totalLength,
+                                 uint8_t * recvBuffer, size_t * recvBufferLength);
     CHIP_ERROR GetResponse(size_t length, uint8_t * recvBuffer, size_t * recvBufferLength);
-    CHIP_ERROR Transceive(const char * commandName, uint8_t * sendBuffer, size_t sendBufferLength, uint8_t * recvBuffer, size_t * recvBufferLength);
+    CHIP_ERROR Transceive(const char * commandName, uint8_t * sendBuffer, size_t sendBufferLength, uint8_t * recvBuffer,
+                          size_t * recvBufferLength);
 
 private:
     Identifier mID = {};
 
-    static constexpr size_t kMaxADPUSize = 256;
+    static constexpr size_t kMaxADPUSize    = 256;
     static constexpr size_t kMaxMessageSize = 1280;
 
     size_t mType4SimpleADPUMaxTxSize = 0;
@@ -132,15 +134,15 @@ private:
     uint16_t mDiscriminator = 0;
 
     // Buffer containing a single APDU command to send to the tag
-    uint8_t mAPDUTxBuffer[kMaxADPUSize] = {0};
+    uint8_t mAPDUTxBuffer[kMaxADPUSize] = { 0 };
 
     // Buffer used to receive the response to an APDU command
-    uint8_t mAPDURxBuffer[kMaxADPUSize] = {0};
-    size_t mAPDUResponseLength = 0;
+    uint8_t mAPDURxBuffer[kMaxADPUSize] = { 0 };
+    size_t mAPDUResponseLength          = 0;
 
     // Buffer storing the chained APDU messages received from the tag
-    uint8_t mChainedResponseBuffer[kMaxMessageSize] = {0};
-    size_t mChainedResponseLength = 0;
+    uint8_t mChainedResponseBuffer[kMaxMessageSize] = { 0 };
+    size_t mChainedResponseLength                   = 0;
 };
 
 } // namespace Nfc

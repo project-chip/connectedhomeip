@@ -15,10 +15,10 @@
  *    limitations under the License.
  */
 
+#include <lib/core/Global.h>
 #include <memory>
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 #include <platform/internal/NFCCommissioningManager.h>
-#include <lib/core/Global.h>
 
 #if CHIP_DEVICE_CONFIG_ENABLE_NFC_BASED_COMMISSIONING
 
@@ -56,7 +56,6 @@ NFCCommissioningManagerImpl & NFCCommissioningMgrImpl()
     return sInstance.get();
 }
 
-
 // ===== start impl of NFCCommissioningManager internal interface, ref NFCCommissioningManager.h
 
 CHIP_ERROR NFCCommissioningManagerImpl::_Init()
@@ -71,7 +70,7 @@ void NFCCommissioningManagerImpl::_Shutdown()
     mReaderTransport.reset(nullptr);
 }
 
-void NFCCommissioningManagerImpl::_SetNFCReaderTransport(Nfc::NFCReaderTransport* readerTransport)
+void NFCCommissioningManagerImpl::_SetNFCReaderTransport(Nfc::NFCReaderTransport * readerTransport)
 {
     ChipLogDetail(DeviceLayer, "Setting Darwin NFC Commissioning Reader Transport");
     mReaderTransport.reset(readerTransport);
@@ -87,41 +86,43 @@ void NFCCommissioningManagerImpl::SetNFCBase(Transport::NFCBase * nfcBase)
 
 bool NFCCommissioningManagerImpl::CanSendToPeer(const Transport::PeerAddress & address)
 {
-    if (!mReaderTransport) {
+    if (!mReaderTransport)
+    {
         ChipLogError(DeviceLayer, "Cannot send to NFC tag %u since reader transport is not valid", address.GetNFCShortId());
         return false;
     }
 
-    chip::Nfc::NFCTag::Identifier identifier = {
-        .discriminator = address.GetNFCShortId()
-    };
-    bool found = mReaderTransport->FindTagMatchingIdentifier(identifier);
-    ChipLogError(DeviceLayer, "%s NFC tag %u", found? "Found" : "Did not find", address.GetNFCShortId());
+    chip::Nfc::NFCTag::Identifier identifier = { .discriminator = address.GetNFCShortId() };
+    bool found                               = mReaderTransport->FindTagMatchingIdentifier(identifier);
+    ChipLogError(DeviceLayer, "%s NFC tag %u", found ? "Found" : "Did not find", address.GetNFCShortId());
     return found;
-
 }
 
 CHIP_ERROR NFCCommissioningManagerImpl::SendToNfcTag(const Transport::PeerAddress & address, System::PacketBufferHandle && msgBuf)
 {
-    if (!mReaderTransport) {
+    if (!mReaderTransport)
+    {
         ChipLogError(DeviceLayer, "Unable to send message to NFC tag %u since transport is not valid", address.GetNFCShortId());
         return CHIP_ERROR_INCORRECT_STATE;
     }
 
-    chip::Nfc::NFCTag::Identifier identifier = {
-        .discriminator = address.GetNFCShortId()
-    };
+    chip::Nfc::NFCTag::Identifier identifier = { .discriminator = address.GetNFCShortId() };
 
-    CHIP_ERROR err =  mReaderTransport->SendMessage(std::move(msgBuf), identifier, [&](System::PacketBufferHandle && responseBuffer, CHIP_ERROR error) -> void {
-            if (error == CHIP_NO_ERROR) {
-                    ChipLogError(DeviceLayer, "Successfully sent message to NFC tag %u, received response buffer of length %lu bytes", address.GetNFCShortId(), responseBuffer->DataLength());
-                    this->mNFCBase->OnNfcTagResponse(address, std::move(responseBuffer));
-                }
-                else {
-                    ChipLogError(DeviceLayer, "Received failure response sending message to NFC tag %u, error: %u", address.GetNFCShortId(), error.AsInteger());
-                    this->mNFCBase->OnNfcTagError(address);
-                }
-            });
+    CHIP_ERROR err = mReaderTransport->SendMessage(
+        std::move(msgBuf), identifier, [&](System::PacketBufferHandle && responseBuffer, CHIP_ERROR error) -> void {
+            if (error == CHIP_NO_ERROR)
+            {
+                ChipLogError(DeviceLayer, "Successfully sent message to NFC tag %u, received response buffer of length %lu bytes",
+                             address.GetNFCShortId(), responseBuffer->DataLength());
+                this->mNFCBase->OnNfcTagResponse(address, std::move(responseBuffer));
+            }
+            else
+            {
+                ChipLogError(DeviceLayer, "Received failure response sending message to NFC tag %u, error: %u",
+                             address.GetNFCShortId(), error.AsInteger());
+                this->mNFCBase->OnNfcTagError(address);
+            }
+        });
     ChipLogError(DeviceLayer, "Queued SendMessage to NFC tag %u, error: %u", address.GetNFCShortId(), err.AsInteger());
     return err;
 }

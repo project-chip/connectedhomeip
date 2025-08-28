@@ -17,8 +17,8 @@
 
 #pragma once
 
-#include <nfc/NFCTag.h>
 #include <functional>
+#include <nfc/NFCTag.h>
 
 #if CHIP_DEVICE_CONFIG_ENABLE_NFC_BASED_COMMISSIONING
 
@@ -38,7 +38,7 @@ public:
      *
      * @param tagIdentifier Specifies identifier for the tag that was discovered
      */
-    virtual void OnTagDiscovered(const NFCTag::Identifier& tagIdentifier) = 0;
+    virtual void OnTagDiscovered(const NFCTag::Identifier & tagIdentifier) = 0;
 
     /**
      * Invoked when request to find tag fails.
@@ -62,7 +62,7 @@ public:
      * @param delegate If not nullptr, the delegate to receive updates. The lifetime of the delegate
      *                 is assumed to be managed by the caller of this method.
      */
-    virtual void SetDelegate(NFCReaderTransportDelegate* delegate) = 0;
+    virtual void SetDelegate(NFCReaderTransportDelegate * delegate) = 0;
 
     /**
      * Starts discovering NFC tags matching specified identifier
@@ -71,7 +71,7 @@ public:
      *
      * @return The error code specifying the status of the request.
      */
-    virtual CHIP_ERROR StartDiscoveringTagMatchingAddress(const NFCTag::Identifier& tagIdentifier) = 0;
+    virtual CHIP_ERROR StartDiscoveringTagMatchingAddress(const NFCTag::Identifier & tagIdentifier) = 0;
 
     /**
      * Stop discovering all NFC tags.
@@ -87,7 +87,7 @@ public:
      *
      * @return true if the tag was previously detected and is still present, false otherwise.
      */
-    virtual bool FindTagMatchingIdentifier(const NFCTag::Identifier& tagIdentifier) = 0;
+    virtual bool FindTagMatchingIdentifier(const NFCTag::Identifier & tagIdentifier) = 0;
 
     /**
      * Sends an NFC message to the tag
@@ -99,9 +99,8 @@ public:
      *
      * @return The error code specifying the status of the request.
      */
-    virtual CHIP_ERROR SendMessage(System::PacketBufferHandle && message,
-                                   const NFCTag::Identifier& tagIdentifier,
-                                   std::function<void (System::PacketBufferHandle && , CHIP_ERROR)> callback) = 0;
+    virtual CHIP_ERROR SendMessage(System::PacketBufferHandle && message, const NFCTag::Identifier & tagIdentifier,
+                                   std::function<void(System::PacketBufferHandle &&, CHIP_ERROR)> callback) = 0;
 };
 
 } // namespace Nfc

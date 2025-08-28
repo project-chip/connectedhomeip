@@ -57,7 +57,7 @@ NFCMessage & NFCMessage::operator=(NFCMessage && other) noexcept
 {
     if (this != &other)
     {
-        mDataToSend = other.mDataToSend;
+        mDataToSend       = other.mDataToSend;
         mDataToSendBuffer = std::move(other.mDataToSendBuffer);
         other.mDataToSend = chip::ByteSpan();
     }
@@ -68,23 +68,15 @@ NFCMessage & NFCMessage::operator=(NFCMessage && other) noexcept
 // NFCTag
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-NFCTag::NFCTag(const Identifier & identifier, size_t simpleADPUMaxTxSize, size_t simpleADPUMaxRxSize)
-    :   mID(identifier),
-        mType4SimpleADPUMaxTxSize(simpleADPUMaxTxSize),
-        mType4SimpleADPUMaxRxSize(simpleADPUMaxRxSize)
-{
-}
+NFCTag::NFCTag(const Identifier & identifier, size_t simpleADPUMaxTxSize, size_t simpleADPUMaxRxSize) :
+    mID(identifier), mType4SimpleADPUMaxTxSize(simpleADPUMaxTxSize), mType4SimpleADPUMaxRxSize(simpleADPUMaxRxSize)
+{}
 
-NFCTag::NFCTag(Identifier && identifier, size_t simpleADPUMaxTxSize, size_t simpleADPUMaxRxSize)
-    :   mID(std::move(identifier)),
-        mType4SimpleADPUMaxTxSize(simpleADPUMaxTxSize),
-        mType4SimpleADPUMaxRxSize(simpleADPUMaxRxSize)
-{
-}
+NFCTag::NFCTag(Identifier && identifier, size_t simpleADPUMaxTxSize, size_t simpleADPUMaxRxSize) :
+    mID(std::move(identifier)), mType4SimpleADPUMaxTxSize(simpleADPUMaxTxSize), mType4SimpleADPUMaxRxSize(simpleADPUMaxRxSize)
+{}
 
-NFCTag::~NFCTag()
-{
-}
+NFCTag::~NFCTag() {}
 
 void NFCTag::Print() const
 {
@@ -125,7 +117,7 @@ CHIP_ERROR NFCTag::RetrieveDiscriminator()
     return res;
 }
 
-CHIP_ERROR NFCTag::SendMessage(const NFCMessage& message, System::PacketBufferHandle& response)
+CHIP_ERROR NFCTag::SendMessage(const NFCMessage & message, System::PacketBufferHandle & response)
 {
     return SendChainedAPDUs(message.GetDataToSend(), response);
 }
@@ -139,11 +131,11 @@ CHIP_ERROR NFCTag::SendMessage(const NFCMessage& message, System::PacketBufferHa
 //
 // When the tag's response is fully received, OnNfcTagResponse() notification
 // will be called.
-CHIP_ERROR NFCTag::SendChainedAPDUs(const ByteSpan& dataToSend, System::PacketBufferHandle& response)
+CHIP_ERROR NFCTag::SendChainedAPDUs(const ByteSpan & dataToSend, System::PacketBufferHandle & response)
 {
     CHIP_ERROR result;
-    size_t totalLength            = dataToSend.size();
-    size_t nbrOfBytesRemaining    = dataToSend.size();
+    size_t totalLength             = dataToSend.size();
+    size_t nbrOfBytesRemaining     = dataToSend.size();
     const uint8_t * nextDataToSend = dataToSend.data();
 
     while (nbrOfBytesRemaining > 0)
@@ -220,7 +212,7 @@ CHIP_ERROR NFCTag::SendChainedAPDUs(const ByteSpan& dataToSend, System::PacketBu
 }
 
 // Process an APDU response contained in mAPDURxBuffer
-CHIP_ERROR NFCTag::ProcessAPDUResponse(System::PacketBufferHandle& response)
+CHIP_ERROR NFCTag::ProcessAPDUResponse(System::PacketBufferHandle & response)
 {
 
     // mAPDURxBuffer should contain at least  the 2 status bytes
@@ -253,7 +245,7 @@ CHIP_ERROR NFCTag::ProcessAPDUResponse(System::PacketBufferHandle& response)
     // SW1=0x61 indicates a chained response. it means that the response is too big to be transmitted in a single packet.
 
     // Put the received bytes (without the 2 status bytes) into the ChainedResponseBuffer
-    CHIP_ERROR result= AddDataToChainedResponseBuffer(mAPDURxBuffer, mAPDUResponseLength - 2);
+    CHIP_ERROR result = AddDataToChainedResponseBuffer(mAPDURxBuffer, mAPDUResponseLength - 2);
     if (result != CHIP_NO_ERROR)
     {
         ProcessError("Too many data!");
@@ -323,8 +315,8 @@ CHIP_ERROR NFCTag::SelectMatterApplet()
 {
     VerifyOrReturnLogError(mID.IsValid(), CHIP_ERROR_INCORRECT_STATE);
 
-    uint8_t dataReceived[10] = {0};
-    size_t receivedLength = sizeof(dataReceived);
+    uint8_t dataReceived[10]       = { 0 };
+    size_t receivedLength          = sizeof(dataReceived);
     uint8_t select_matter_applet[] = {
         0x00, 0xA4, 0x04, 0x0C, 0x09,                         // CLA INS P1 P2 Lc
         0xA0, 0x00, 0x00, 0x09, 0x09, 0x8A, 0x77, 0xE4, 0x01, // Matter AID
@@ -338,7 +330,8 @@ CHIP_ERROR NFCTag::SelectMatterApplet()
         if (receivedLength >= 10)
         {
             mDiscriminator = static_cast<uint16_t>(dataReceived[2] * 256 + dataReceived[3]);
-            ChipLogDetail(DeviceLayer, "NFCTag: received SELECT AID response on tag %u with discriminatorToMatch %u", mID.discriminator, mDiscriminator);
+            ChipLogDetail(DeviceLayer, "NFCTag: received SELECT AID response on tag %u with discriminatorToMatch %u",
+                          mID.discriminator, mDiscriminator);
         }
         else
         {
@@ -378,16 +371,17 @@ CHIP_ERROR NFCTag::AddDataToChainedResponseBuffer(uint8_t * data, size_t dataLen
 
 /////////////////////////////////////////////////////////////////
 
-CHIP_ERROR NFCTag::SendTransportAPDU(const uint8_t * dataToSend, size_t dataToSendLength, bool isLastBlock, size_t totalLength, uint8_t * recvBuffer, size_t * recvLength)
+CHIP_ERROR NFCTag::SendTransportAPDU(const uint8_t * dataToSend, size_t dataToSendLength, bool isLastBlock, size_t totalLength,
+                                     uint8_t * recvBuffer, size_t * recvLength)
 {
 
     VerifyOrReturnLogError(dataToSendLength <= sizeof(mAPDUTxBuffer), CHIP_ERROR_INTERNAL);
 
     mAPDUTxBuffer[0] = isLastBlock ? static_cast<uint8_t>(0x80) : static_cast<uint8_t>(0x90); // CLA
     mAPDUTxBuffer[1] = 0x20;                                                                  // INS
-    mAPDUTxBuffer[2] = static_cast<uint8_t>((totalLength >> 8) & 0xFF); // P1 (contains the totalLength's MSB)
-    mAPDUTxBuffer[3] = static_cast<uint8_t>(totalLength & 0xFF);        // P2 (contains the totalLength's LSB)
-    mAPDUTxBuffer[4] = static_cast<uint8_t>(dataToSendLength);          // Lc
+    mAPDUTxBuffer[2] = static_cast<uint8_t>((totalLength >> 8) & 0xFF);                       // P1 (contains the totalLength's MSB)
+    mAPDUTxBuffer[3] = static_cast<uint8_t>(totalLength & 0xFF);                              // P2 (contains the totalLength's LSB)
+    mAPDUTxBuffer[4] = static_cast<uint8_t>(dataToSendLength);                                // Lc
     memcpy(&(mAPDUTxBuffer[5]), dataToSend, dataToSendLength);
     mAPDUTxBuffer[5 + dataToSendLength] = static_cast<uint8_t>(mType4SimpleADPUMaxRxSize); // Le
 
@@ -413,7 +407,8 @@ CHIP_ERROR NFCTag::GetResponse(size_t length, uint8_t * recvBuffer, size_t * rec
     return result;
 }
 
-CHIP_ERROR NFCTag::Transceive(const char * commandName, uint8_t * sendBuffer, size_t sendBufferLength, uint8_t * recvBuffer, size_t * recvLength)
+CHIP_ERROR NFCTag::Transceive(const char * commandName, uint8_t * sendBuffer, size_t sendBufferLength, uint8_t * recvBuffer,
+                              size_t * recvLength)
 {
     // Before the transceive action, recvLength contains the size of recvBuffer buffer.
     // After the transceive, it will contain the length of the received data.

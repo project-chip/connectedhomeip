@@ -23,8 +23,8 @@
 
 #pragma once
 
-#include <transport/raw/NfcApplicationDelegate.h>
 #include <platform/internal/NFCCommissioningManager.h>
+#include <transport/raw/NfcApplicationDelegate.h>
 
 #if CHIP_DEVICE_CONFIG_ENABLE_NFC_BASED_COMMISSIONING
 
@@ -56,15 +56,15 @@ private:
 
     CHIP_ERROR _Init();
     void _Shutdown();
-    Nfc::NFCReaderTransport* _GetNFCReaderTransport() const { return mReaderTransport.get(); }
-    void _SetNFCReaderTransport(Nfc::NFCReaderTransport* readerTransport);
+    Nfc::NFCReaderTransport * _GetNFCReaderTransport() const { return mReaderTransport.get(); }
+    void _SetNFCReaderTransport(Nfc::NFCReaderTransport * readerTransport);
 
     // ===== Members for internal use by the following friends.
 
     friend NFCCommissioningManager & NFCCommissioningMgr();
     friend NFCCommissioningManagerImpl & NFCCommissioningMgrImpl();
 
-    Transport::NFCBase* mNFCBase = nullptr;
+    Transport::NFCBase * mNFCBase = nullptr;
     std::unique_ptr<chip::Nfc::NFCReaderTransport> mReaderTransport;
 };
 

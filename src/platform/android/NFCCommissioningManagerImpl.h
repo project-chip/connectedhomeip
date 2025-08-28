@@ -63,8 +63,8 @@ private:
 
     CHIP_ERROR _Init();
     void _Shutdown();
-    Nfc::NFCReaderTransport* _GetNFCReaderTransport() const { return nullptr; }
-    void _SetNFCReaderTransport(Nfc::NFCReaderTransport* readerTransport) {}
+    Nfc::NFCReaderTransport * _GetNFCReaderTransport() const { return nullptr; }
+    void _SetNFCReaderTransport(Nfc::NFCReaderTransport * readerTransport) {}
 
     // ===== Members for internal use by the following friends.
 

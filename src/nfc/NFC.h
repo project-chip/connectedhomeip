@@ -18,6 +18,6 @@
 
 #pragma once
 
-#include <nfc/NfcConfig.h>
 #include <nfc/NFCReaderTransport.h>
 #include <nfc/NFCTag.h>
+#include <nfc/NfcConfig.h>
