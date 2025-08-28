@@ -2,6 +2,7 @@
 
 #include <app/server/CommissioningWindowManager.h>
 #include <app/server/Server.h>
+#include <lib/support/RpcErrorMapping.h>
 #include <lib/support/logging/CHIPLogging.h>
 
 using namespace chip;
@@ -79,7 +80,7 @@ CHIP_ERROR JointFabric::GetICACCSRForJF(MutableByteSpan & icacCSR)
     if (pw::OkStatus() != status)
     {
         ChipLogError(JointFabric, "Writing to GetStream failed");
-        return CHIP_ERROR_SHUT_DOWN;
+        return rpc::MapRpcStatusToChipError(status);
     }
 
     // wait for the ICAC CSR from JFC
