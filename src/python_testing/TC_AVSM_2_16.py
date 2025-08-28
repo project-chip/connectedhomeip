@@ -48,7 +48,7 @@ from matter.testing.matter_testing import MatterBaseTest, TestStep, default_matt
 logger = logging.getLogger(__name__)
 
 
-class TC_AVSM_2_9(MatterBaseTest, AVSMTestBase):
+class TC_AVSM_2_16(MatterBaseTest, AVSMTestBase):
     def desc_TC_AVSM_2_16(self) -> str:
         return "[TC-AVSM-2.16] Validate correct handling of stream reference counts with Server as DUT"
 
