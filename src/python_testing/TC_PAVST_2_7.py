@@ -267,7 +267,7 @@ class TC_PAVST_2_7(MatterBaseTest, PAVSTTestBase):
         )
 
         triggerOptions = {"triggerType": pvcluster.Enums.TransportTriggerTypeEnum.kCommand,
-                          "maxPreRollLen": 4000,}
+                          "maxPreRollLen": 4000, }
 
         status = await self.allocate_one_pushav_transport(endpoint, trigger_Options=triggerOptions)
         asserts.assert_equal(
