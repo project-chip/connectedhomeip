@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# This script checks for the use of 'SafeAttributePersistenceProvider' 
+# This script checks for the use of 'SafeAttributePersistenceProvider'
 # symbols in the codebase. It takes exclusion folders as arguments and can also read exclusions from a file.
 
 # Function to check for SafeAttributePersistenceProvider symbols
