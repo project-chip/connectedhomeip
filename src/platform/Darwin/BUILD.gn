@@ -156,6 +156,13 @@ static_library("Darwin") {
       "BleUtils.mm",
     ]
   }
+
+  if (chip_enable_nfc_based_commissioning) {
+    sources += [
+      "NFCCommissioningManagerImpl.cpp",
+      "NFCCommissioningManagerImpl.h",
+    ]
+  }
 }
 
 source_set("tracing") {
