@@ -25,6 +25,7 @@
 #include <app/data-model/List.h>
 #include <lib/support/BitFlags.h>
 #include <lib/support/BitMask.h>
+#include <lib/support/TypeTraits.h>
 
 #include <type_traits>
 
@@ -84,6 +85,9 @@ private:
     template <typename T>
     static constexpr bool IsBaseType = std::is_same_v<const T &, decltype(BaseEncodableValue(std::declval<const T &>()))>;
 
+    template <typename T>
+    static constexpr bool IsMatterEnum = std::is_enum_v<T> && DataModel::detail::HasUnknownValue<T>;
+
 public:
     class ListEncodeHelper
     {
@@ -103,10 +107,25 @@ public:
             return mAttributeValueEncoder.EncodeListItem(mCheckpoint, aArg, mAttributeValueEncoder.AccessingFabricIndex());
         }
 
-        template <typename T, std::enable_if_t<IsBaseType<T> && !DataModel::IsFabricScoped<T>::value, bool> = true>
+        template <typename T,
+                  std::enable_if_t<IsBaseType<T> && !DataModel::IsFabricScoped<T>::value && !IsMatterEnum<T>, bool> = true>
         CHIP_ERROR Encode(const T & aArg) const
         {
             return mAttributeValueEncoder.EncodeListItem(mCheckpoint, aArg);
+        }
+
+        // Specialization for enums to share as much code as possible in attribute encoding while
+        // still doing the "unknown value" checks that might be needed..
+        template <typename T, std::enable_if_t<IsBaseType<T> && IsMatterEnum<T>, bool> = true>
+        CHIP_ERROR Encode(const T & aArg) const
+        {
+            static_assert(!DataModel::IsFabricScoped<T>::value, "How do we have a fabric-scoped enum?");
+            using UnderlyingType = std::remove_cv_t<std::remove_reference_t<decltype(to_underlying(aArg))>>;
+            static_assert(!std::is_same_v<UnderlyingType, T>, "Encode will call itself recursively");
+
+            CHIP_DM_ENCODING_MAYBE_FAIL_UNKNOWN_ENUM_VALUE(aArg);
+
+            return Encode(to_underlying(aArg));
         }
 
         template <typename T, std::enable_if_t<!IsBaseType<T>, bool> = true>
@@ -137,11 +156,22 @@ public:
      * entirely encoded or fail to be encoded.  Consumers are allowed to make
      * either one call to Encode or one call to EncodeList to handle a read.
      */
-    template <typename T, std::enable_if_t<IsBaseType<T>, bool> = true>
+    template <typename T, std::enable_if_t<IsBaseType<T> && !IsMatterEnum<T>, bool> = true>
     CHIP_ERROR Encode(const T & aArg)
     {
         mTriedEncode = true;
         return EncodeAttributeReportIB(aArg);
+    }
+
+    template <typename T, std::enable_if_t<IsBaseType<T> && IsMatterEnum<T>, bool> = true>
+    CHIP_ERROR Encode(const T & aArg)
+    {
+        using UnderlyingType = std::remove_cv_t<std::remove_reference_t<decltype(to_underlying(aArg))>>;
+        static_assert(!std::is_same_v<UnderlyingType, T>, "Encode will call itself recursively");
+
+        CHIP_DM_ENCODING_MAYBE_FAIL_UNKNOWN_ENUM_VALUE(aArg);
+
+        return Encode(to_underlying(aArg));
     }
 
     template <typename T, std::enable_if_t<!IsBaseType<T>, bool> = true>
