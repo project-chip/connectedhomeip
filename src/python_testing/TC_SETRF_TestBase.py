@@ -14,7 +14,7 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 
-
+import datetime
 import logging
 import random
 from typing import Any, List, Optional
@@ -48,9 +48,17 @@ class CommodityTariffTestBaseHelper(MatterBaseTest):
     defaultRandomizationOffset: int = None
     tariffInformationValue: cluster.Structs.TariffInformationStruct = None
     tariffComponentsValue: List[cluster.Structs.TariffComponentStruct] = None
+    currentTariffComponentsValue: List[cluster.Structs.TariffComponentStruct] = None
+    nextTariffComponentsValue: List[cluster.Structs.TariffComponentStruct] = None
     tariffPeriodsValue: List[cluster.Structs.TariffPeriodStruct] = None
     dayEntriesValue: List[cluster.Structs.DayEntryStruct] = None
+    dayPatternsValue: List[cluster.Structs.DayPatternStruct] = None
+    calendarPeriodsValue: List[cluster.Structs.CalendarPeriodStruct] = None
+    currentDayValue: cluster.Structs.DayStruct = None
+    nextDayValue: cluster.Structs.DayStruct = None
+    individualDayValue: cluster.Structs.DayStruct = None
     currentDayEntryDateValue: int = None
+    nextDayEntryDateValue: int = None
 
     # Fields
     BlockModeValue: cluster.Enums.BlockModeEnum = None
@@ -574,20 +582,21 @@ class CommodityTariffTestBaseHelper(MatterBaseTest):
             attribute_value (Optional[List[cluster.Structs.DayPatternStruct]], optional): DayPatterns attribute value. Defaults to None.
         """
 
-        if not attribute_value:
-            attribute_value = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.DayPatterns)
+        self.dayPatternsValue = attribute_value
+        if not self.dayPatternsValue:
+            self.dayPatternsValue = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.DayPatterns)
 
         if self.tariffInformationValue is not None and self.tariffInformationValue is NullValue:
-            asserts.assert_equal(attribute_value, NullValue, "DayPatterns must be Null when TariffInfo is Null")
+            asserts.assert_equal(self.dayPatternsValue, NullValue, "DayPatterns must be Null when TariffInfo is Null")
 
         # if attribute value is not null it must be list of DayPatternStruct with length in range 0 - 28
-        if attribute_value is not NullValue:
+        if self.dayPatternsValue is not NullValue:
             matter_asserts.assert_list(
-                attribute_value, "DayPatterns attribute must return a list with length less or equal 28", min_length=0, max_length=28)
-            if attribute_value:  # if list is not empty
+                self.dayPatternsValue, "DayPatterns attribute must return a list with length less or equal 28", min_length=0, max_length=28)
+            if self.dayPatternsValue:  # if list is not empty
                 matter_asserts.assert_list_element_type(
-                    attribute_value, cluster.Structs.DayPatternStruct, "DayPatterns attribute must contain DayPatternStruct elements")
-                for item in attribute_value:  # check each DayPatternStruct
+                    self.dayPatternsValue, cluster.Structs.DayPatternStruct, "DayPatterns attribute must contain DayPatternStruct elements")
+                for item in self.dayPatternsValue:  # check each DayPatternStruct
                     await self.checkDayPatternStruct(struct=item)
 
     async def check_calendar_periods_attribute(self, endpoint: int, attribute_value: Optional[List[cluster.Structs.CalendarPeriodStruct]] = None) -> None:
@@ -598,37 +607,38 @@ class CommodityTariffTestBaseHelper(MatterBaseTest):
             attribute_value (Optional[List[cluster.Structs.CalendarPeriodStruct]], optional): CalendarPeriods attribute value. Defaults to None.
         """
 
-        if not attribute_value:
-            attribute_value = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.CalendarPeriods)
+        self.calendarPeriodsValue = attribute_value
+        if not self.calendarPeriodsValue:
+            self.calendarPeriodsValue = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.CalendarPeriods)
 
         if self.tariffInformationValue is not None and self.tariffInformationValue is NullValue:
-            asserts.assert_equal(attribute_value, NullValue, "CalendarPeriods must be Null when TariffInfo is Null")
+            asserts.assert_equal(self.calendarPeriodsValue, NullValue, "CalendarPeriods must be Null when TariffInfo is Null")
 
         # if attribute value is not null it must be list of CalendarPeriodStruct with length in range 1 - 4
-        if attribute_value is not NullValue:
+        if self.calendarPeriodsValue is not NullValue:
             matter_asserts.assert_list(
-                attribute_value, "CalendarPeriods attribute must return a list with length in range 1 - 4", min_length=1, max_length=4)
+                self.calendarPeriodsValue, "CalendarPeriods attribute must return a list with length in range 1 - 4", min_length=1, max_length=4)
             matter_asserts.assert_list_element_type(
-                attribute_value, cluster.Structs.CalendarPeriodStruct, "CalendarPeriods attribute must contain CalendarPeriodStruct elements")
+                self.calendarPeriodsValue, cluster.Structs.CalendarPeriodStruct, "CalendarPeriods attribute must contain CalendarPeriodStruct elements")
 
             # check each CalendarPeriodStruct
-            for item in attribute_value:
+            for item in self.calendarPeriodsValue:
                 await self.checkCalendarPeriodStruct(struct=item, start_date_attribute=self.startDateAttributeValue)
 
             # check CalendarPeriods order
-            for item in range(len(attribute_value) - 1):
-                asserts.assert_less(attribute_value[item].startDate, attribute_value[item + 1].startDate,
+            for item in range(len(self.calendarPeriodsValue) - 1):
+                asserts.assert_less(self.calendarPeriodsValue[item].startDate, self.calendarPeriodsValue[item + 1].startDate,
                                     "CalendarPeriods must be sorted by Date in increasing order!")
 
             # If StartDate is Null, the first CalendarPeriod item Start Date field must also be Null
             if self.startDateAttributeValue is NullValue:
-                asserts.assert_true(attribute_value[0].startDate is NullValue,
+                asserts.assert_true(self.calendarPeriodsValue[0].startDate is NullValue,
                                     "If StartDate is Null, the first CalendarPeriod item Start Date field must also be Null")
 
                 # If StartDate is Null only first CalendarPeriod item Start Date field must be Null, the other CalendarPeriod items Start Date field must not be Null
-                if len(attribute_value) > 1:
-                    for item in range(1, len(attribute_value)):
-                        asserts.assert_true(attribute_value[item].startDate is not NullValue,
+                if len(self.calendarPeriodsValue) > 1:
+                    for item in range(1, len(self.calendarPeriodsValue)):
+                        asserts.assert_true(self.calendarPeriodsValue[item].startDate is not NullValue,
                                             "If StartDate is Null only first CalendarPeriod item Start Date field must be Null, the other CalendarPeriod items Start Date field must not be Null")
 
     async def check_individual_days_attribute(self, endpoint: int, attribute_value: Optional[List[cluster.Structs.DayStruct]] = None) -> None:
@@ -639,26 +649,27 @@ class CommodityTariffTestBaseHelper(MatterBaseTest):
             attribute_value (Optional[List[cluster.Structs.DayStruct]], optional): IndividualDays attribute value. Defaults to None.
         """
 
-        if not attribute_value:
-            attribute_value = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.IndividualDays)
+        self.individualDayValue = attribute_value
+        if not self.individualDayValue:
+            self.individualDayValue = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.IndividualDays)
 
         if self.tariffInformationValue is not None and self.tariffInformationValue is NullValue:
-            asserts.assert_equal(attribute_value, NullValue, "IndividualDays must be Null when TariffInfo is Null")
+            asserts.assert_equal(self.individualDayValue, NullValue, "IndividualDays must be Null when TariffInfo is Null")
 
         # if attribute value is not null it must be list of DayStruct with length in range 0 - 50
-        if attribute_value is not NullValue:
+        if self.individualDayValue is not NullValue:
             matter_asserts.assert_list(
-                attribute_value, "IndividualDays attribute must return a list with length less or equal 50", max_length=50)
+                self.individualDayValue, "IndividualDays attribute must return a list with length less or equal 50", max_length=50)
             matter_asserts.assert_list_element_type(
-                attribute_value, cluster.Structs.DayStruct, "IndividualDays attribute must contain DayStruct elements")
+                self.individualDayValue, cluster.Structs.DayStruct, "IndividualDays attribute must contain DayStruct elements")
 
             # check each DayStruct
-            for item in attribute_value:
+            for item in self.individualDayValue:
                 await self.checkDayStruct(cluster=cluster, struct=item)
 
             # check IndividualDays order
-            for item in range(len(attribute_value) - 1):
-                asserts.assert_less(attribute_value[item].date, attribute_value[item + 1].date,
+            for item in range(len(self.individualDayValue) - 1):
+                asserts.assert_less(self.individualDayValue[item].date, self.individualDayValue[item + 1].date,
                                     "IndividualDays must be sorted by Date in increasing order!")
 
     async def check_current_day_attribute(self, endpoint: int, attribute_value: Optional[cluster.Structs.DayStruct] = None) -> None:
@@ -669,17 +680,18 @@ class CommodityTariffTestBaseHelper(MatterBaseTest):
             attribute_value (Optional[cluster.Structs.DayStruct], optional): CurrentDay attribute value. Defaults to None.
         """
 
-        if not attribute_value:
-            attribute_value = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.CurrentDay)
+        self.currentDayValue = attribute_value
+        if not self.currentDayValue:
+            self.currentDayValue = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.CurrentDay)
 
         if self.tariffInformationValue is not None and self.tariffInformationValue is NullValue:
-            asserts.assert_equal(attribute_value, NullValue, "CurrentDay must be Null when TariffInfo is Null")
+            asserts.assert_equal(self.currentDayValue, NullValue, "CurrentDay must be Null when TariffInfo is Null")
 
         # if attribute value is not null it must be DayStruct
-        if attribute_value is not NullValue:
+        if self.currentDayValue is not NullValue:
             asserts.assert_true(isinstance(
-                attribute_value, cluster.Structs.DayStruct), "CurrentDay must be of type DayStruct")
-            await self.checkDayStruct(cluster=cluster, struct=attribute_value)
+                self.currentDayValue, cluster.Structs.DayStruct), "CurrentDay must be of type DayStruct")
+            await self.checkDayStruct(cluster=cluster, struct=self.currentDayValue)
 
     async def check_next_day_attribute(self, endpoint: int, attribute_value: Optional[cluster.Structs.DayStruct] = None) -> None:
         """Validate NextDay attribute.
@@ -768,16 +780,17 @@ class CommodityTariffTestBaseHelper(MatterBaseTest):
             attribute_value (Optional[int], optional): NextDayEntryDate attribute value. Defaults to None.
         """
 
-        if not attribute_value:
-            attribute_value = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.NextDayEntryDate)
+        self.nextDayEntryDateValue = attribute_value
+        if not self.nextDayEntryDateValue:
+            self.nextDayEntryDateValue = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.NextDayEntryDate)
 
         if self.tariffInformationValue is not None and self.tariffInformationValue is NullValue:
-            asserts.assert_equal(attribute_value, NullValue, "NextDayEntryDate must be Null when TariffInfo is Null")
+            asserts.assert_equal(self.nextDayEntryDateValue, NullValue, "NextDayEntryDate must be Null when TariffInfo is Null")
 
         # if attribute value is not null it must be uint32 and greater than CurrentDayEntryDate
-        if attribute_value is not NullValue:
-            matter_asserts.assert_valid_uint32(attribute_value, 'NextDayEntryDate must be of type uint32')
-            asserts.assert_greater(attribute_value, self.currentDayEntryDateValue,
+        if self.nextDayEntryDateValue is not NullValue:
+            matter_asserts.assert_valid_uint32(self.nextDayEntryDateValue, 'NextDayEntryDate must be of type uint32')
+            asserts.assert_greater(self.nextDayEntryDateValue, self.currentDayEntryDateValue,
                                    "NextDayEntryDate must be greater than CurrentDayEntryDate")
 
     async def check_tariff_components_attribute(self, endpoint: int, attribute_value: Optional[List[cluster.Structs.TariffComponentStruct]] = None) -> None:
@@ -839,21 +852,23 @@ class CommodityTariffTestBaseHelper(MatterBaseTest):
             attribute_value (Optional[List[cluster.Structs.TariffComponentStruct]], optional): CurrentTariffComponents attribute value. Defaults to None.
         """
 
-        if not attribute_value:
-            attribute_value = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.CurrentTariffComponents)
+        self.currentTariffComponentsValue = attribute_value
+        if not self.currentTariffComponentsValue:
+            self.currentTariffComponentsValue = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.CurrentTariffComponents)
 
         if self.tariffInformationValue is not None and self.tariffInformationValue is NullValue:
-            asserts.assert_equal(attribute_value, NullValue, "CurrentTariffComponents must be Null when TariffInfo is Null")
+            asserts.assert_equal(self.currentTariffComponentsValue, NullValue,
+                                 "CurrentTariffComponents must be Null when TariffInfo is Null")
 
         # if attribute value is not null it must be list of TariffComponentStruct with length in range 0 - 20
-        if attribute_value is not NullValue:
+        if self.currentTariffComponentsValue is not NullValue:
             matter_asserts.assert_list(
-                attribute_value, "CurrentTariffComponents attribute must return a list with length less or equal 20", max_length=20)
+                self.currentTariffComponentsValue, "CurrentTariffComponents attribute must return a list with length less or equal 20", max_length=20)
             matter_asserts.assert_list_element_type(
-                attribute_value, cluster.Structs.TariffComponentStruct, "CurrentTariffComponents attribute must contain TariffComponentStruct elements")
+                self.currentTariffComponentsValue, cluster.Structs.TariffComponentStruct, "CurrentTariffComponents attribute must contain TariffComponentStruct elements")
 
             # check each TariffComponentStruct
-            for item in attribute_value:
+            for item in self.currentTariffComponentsValue:
                 await self.checkTariffComponentStruct(endpoint=endpoint, cluster=cluster, struct=item)
 
     async def check_next_tariff_components_attribute(self, endpoint: int, attribute_value: Optional[List[cluster.Structs.TariffComponentStruct]] = None) -> None:
@@ -864,21 +879,23 @@ class CommodityTariffTestBaseHelper(MatterBaseTest):
             attribute_value (Optional[List[cluster.Structs.TariffComponentStruct]], optional): NextTariffComponents attribute value. Defaults to None.
         """
 
-        if not attribute_value:
-            attribute_value = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.NextTariffComponents)
+        self.nextTariffComponentsValue = attribute_value
+        if not self.nextTariffComponentsValue:
+            self.nextTariffComponentsValue = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.NextTariffComponents)
 
         if self.tariffInformationValue is not None and self.tariffInformationValue is NullValue:
-            asserts.assert_equal(attribute_value, NullValue, "NextTariffComponents must be Null when TariffInfo is Null")
+            asserts.assert_equal(self.nextTariffComponentsValue, NullValue,
+                                 "NextTariffComponents must be Null when TariffInfo is Null")
 
         # if attribute value is not null it must be list of TariffComponentStruct with length in range 0 - 20
-        if attribute_value is not NullValue:
+        if self.nextTariffComponentsValue is not NullValue:
             matter_asserts.assert_list(
-                attribute_value, "NextTariffComponents attribute must return a list with length less or equal 20", max_length=20)
+                self.nextTariffComponentsValue, "NextTariffComponents attribute must return a list with length less or equal 20", max_length=20)
             matter_asserts.assert_list_element_type(
-                attribute_value, cluster.Structs.TariffComponentStruct, "NextTariffComponents attribute must contain TariffComponentStruct elements")
+                self.nextTariffComponentsValue, cluster.Structs.TariffComponentStruct, "NextTariffComponents attribute must contain TariffComponentStruct elements")
 
             # check TariffComponentStruct
-            for item in attribute_value:
+            for item in self.nextTariffComponentsValue:
                 await self.checkTariffComponentStruct(endpoint=endpoint, cluster=cluster, struct=item)
 
     async def check_default_randomization_offset_attribute(self, endpoint: int, attribute_value: Optional[int] = None) -> None:
@@ -946,6 +963,29 @@ class CommodityTariffTestBaseHelper(MatterBaseTest):
         else:  # if feature is disabled, DefaultRandomizationType attribute must be None
             asserts.assert_is_none(
                 self.defaultRandomizationType, "DefaultRandomizationType attribute must be None if RNDM feature is disabled.")
+
+    async def convert_matter_time_to_posix_epoch_time(self, matter_time: int) -> int:
+
+        MATTER_UNIX_EPOCH_OFFSET = 10957 * 24 * 60 * 60
+
+        return matter_time + MATTER_UNIX_EPOCH_OFFSET
+
+    async def get_day_of_week_from_current_day_entry_date(self, current_day_entry_date: int) -> int:
+
+        weekDays = {
+            0: cluster.Bitmaps.DayPatternDayOfWeekBitmap.kMonday,
+            1: cluster.Bitmaps.DayPatternDayOfWeekBitmap.kTuesday,
+            2: cluster.Bitmaps.DayPatternDayOfWeekBitmap.kWednesday,
+            3: cluster.Bitmaps.DayPatternDayOfWeekBitmap.kThursday,
+            4: cluster.Bitmaps.DayPatternDayOfWeekBitmap.kFriday,
+            5: cluster.Bitmaps.DayPatternDayOfWeekBitmap.kSaturday,
+            6: cluster.Bitmaps.DayPatternDayOfWeekBitmap.kSunday
+        }
+
+        current_day_entry_date_epoch = self.convert_matter_time_to_posix_epoch_time(current_day_entry_date)
+        dayOfWeek = datetime.datetime.fromtimestamp(current_day_entry_date_epoch).weekday()
+
+        return weekDays[dayOfWeek]
 
     async def get_day_entry_IDs_from_tariff_periods_for_particular_tariff_component(self, tariff_componentID: int, tariff_periods: List[cluster.Structs.TariffPeriodStruct]) -> List[int]:
         """Extracts DayEntryIDs field values from the list of TariffPeriodStruct where particular TariffComponentID is present.
