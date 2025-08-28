@@ -301,6 +301,16 @@ struct StrToSpan
     }
 };
 
+template <typename T, auto X>
+void ListToMap(const DataModel::List<T> & aList, std::map<uint32_t, const T *> & aMap)
+{
+    for (const auto & item : aList)
+    {
+        // Insert into map with specified entry as key
+        aMap.emplace(item.*X, &item);
+    }
+}
+
 /// @brief Type trait for nullable types
 template <typename U>
 struct IsNullable : std::false_type
@@ -1148,16 +1158,17 @@ struct TariffUpdateCtx
     std::unordered_set<uint32_t> DayPatternsDayEntryIDs;
 
     /**
+     * @brief DayEntry IDs referenced by IndividualDays items
+     * @details Collected separately for reference validation
+     */
+    std::unordered_set<uint32_t> IndividualDaysDayEntryIDs;    
+
+    /**
      * @brief DayEntry IDs referenced by TariffPeriod items
      * @details Collected separately for reference validation
      */
     std::unordered_set<uint32_t> TariffPeriodsDayEntryIDs;
 
-    /**
-     * @brief DayEntry IDs referenced by IndividualDays items
-     * @details Collected separately for reference validation
-     */
-    std::unordered_set<uint32_t> IndividualDaysDayEntryIDs;
     /// @}
 
     /// @name TariffComponent ID Tracking
@@ -1173,6 +1184,7 @@ struct TariffUpdateCtx
      * @details Collected for validating period->component references
      */
     std::unordered_set<uint32_t> TariffPeriodsTariffComponentIDs;
+    std::map<uint32_t, std::pair<const std::unordered_set<uint32_t>, const std::unordered_set<uint32_t>> >  TariffPeriodsTariffComponentIDsDayEntryIDsMap;
     /// @}
 
     /// @name DayPattern ID Tracking
@@ -1202,6 +1214,11 @@ struct TariffUpdateCtx
      */
     uint32_t TariffUpdateTimestamp;
 };
+
+namespace TariffComponentsDataClass_Utils {
+    CHIP_ERROR ValidateListEntry(const Structs::TariffComponentStruct::Type & entryNewValue, Feature * entryFeatureValue, TariffUpdateCtx * aCtx);
+}
+
 } // namespace CommodityTariff
 } // namespace Clusters
 } // namespace app

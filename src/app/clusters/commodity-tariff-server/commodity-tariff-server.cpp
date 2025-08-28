@@ -289,16 +289,6 @@ void Instance::TariffDataUpdatedCb(bool is_erased, std::vector<AttributeId> & aU
 }
 
 namespace Utils {
-template <typename T, auto X>
-void ListToMap(const DataModel::List<T> & aList, std::map<uint32_t, const T *> & aMap)
-{
-    for (const auto & item : aList)
-    {
-        // Insert into map with specified entry as key
-        aMap.emplace(item.*X, &item);
-    }
-}
-
 template <typename T>
 std::pair<const T *, const T *> GetCurrNextItemsById(const std::map<uint32_t, const T *> & aMap, uint32_t aId)
 {
@@ -543,11 +533,11 @@ static void AttrsCtxInit(Delegate & aTariffProvider, CurrentTariffAttrsCtx & aCt
 {
     aCtx.mTariffProvider = &aTariffProvider;
 
-    Utils::ListToMap<Structs::DayPatternStruct::Type, &Structs::DayPatternStruct::Type::dayPatternID>(
+    CommodityTariffAttrsDataMgmt::ListToMap<Structs::DayPatternStruct::Type, &Structs::DayPatternStruct::Type::dayPatternID>(
         aTariffProvider.GetDayPatterns().Value(), aCtx.DayPatternsMap);
-    Utils::ListToMap<Structs::DayEntryStruct::Type, &Structs::DayEntryStruct::Type::dayEntryID>(
+    CommodityTariffAttrsDataMgmt::ListToMap<Structs::DayEntryStruct::Type, &Structs::DayEntryStruct::Type::dayEntryID>(
         aTariffProvider.GetDayEntries().Value(), aCtx.DayEntriesMap);
-    Utils::ListToMap<Structs::TariffComponentStruct::Type, &Structs::TariffComponentStruct::Type::tariffComponentID>(
+    CommodityTariffAttrsDataMgmt::ListToMap<Structs::TariffComponentStruct::Type, &Structs::TariffComponentStruct::Type::tariffComponentID>(
         aTariffProvider.GetTariffComponents().Value(), aCtx.TariffComponentsMap);
 }
 

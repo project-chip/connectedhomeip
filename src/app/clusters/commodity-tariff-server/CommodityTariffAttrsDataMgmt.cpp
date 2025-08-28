@@ -136,9 +136,12 @@ static CHIP_ERROR ValidateListEntry(const DayPatternStruct::Type & entryNewValue
 // TariffPeriodsDataClass
 namespace TariffPeriodsDataClass_Utils {
 static CHIP_ERROR ValidateListEntry(const TariffPeriodStruct::Type & entryNewValue, std::unordered_set<uint32_t> & seenDeIDs,
-                                    std::unordered_set<uint32_t> & seenTcIDs,
-                                    std::map<uint32_t, std::unordered_set<uint32_t>> & componentMap)
+                                    std::unordered_set<uint32_t> & seenTcIDs)
 {
+    std::unordered_set<uint32_t> entryDeIDs;
+    std::unordered_set<uint32_t> entryTcIDs;
+
+
     if (!entryNewValue.label.IsNull())
     {
         const auto & labelSpan = entryNewValue.label.Value();
@@ -160,25 +163,19 @@ static CHIP_ERROR ValidateListEntry(const TariffPeriodStruct::Type & entryNewVal
         return CHIP_ERROR_INVALID_ARGUMENT;
 
     // Check that the current period item has no duplicated dayEntryIDs
-    if (CommonUtilities::HasDuplicateIDs(entryNewValue.dayEntryIDs, seenDeIDs))
+    if (CommonUtilities::HasDuplicateIDs(entryNewValue.dayEntryIDs, entryDeIDs))
     {
         return CHIP_ERROR_DUPLICATE_KEY_ID;
     }
 
-    for (const auto & tcId : entryNewValue.tariffComponentIDs)
+    // Check that the current period item has no duplicated tariffComponentIDs
+    if (CommonUtilities::HasDuplicateIDs(entryNewValue.tariffComponentIDs, seenTcIDs))
     {
-        for (const auto & deId : entryNewValue.dayEntryIDs)
-        {
-            if (!componentMap[tcId].insert(deId).second)
-            {
-                ChipLogError(NotSpecified, "Current dayEntryID already attached to the tariffComponentID");
-                return CHIP_ERROR_DUPLICATE_KEY_ID;
-            }
-        }
-
-        // Here we save the tariff component IDs in the context for the next cross-checks
-        seenTcIDs.insert(tcId);
+        return CHIP_ERROR_DUPLICATE_KEY_ID;
     }
+
+    seenDeIDs.merge(entryDeIDs);
+    seenTcIDs.merge(entryTcIDs);
 
     return CHIP_NO_ERROR;
 }
@@ -186,12 +183,24 @@ static CHIP_ERROR ValidateListEntry(const TariffPeriodStruct::Type & entryNewVal
 
 // TariffComponentsDataClass
 namespace TariffComponentsDataClass_Utils {
-static CHIP_ERROR ValidateListEntry(const TariffComponentStruct::Type & entryNewValue, TariffUpdateCtx * aCtx)
+CHIP_ERROR ValidateListEntry(const TariffComponentStruct::Type & entryNewValue, Feature * entryFeatureValue, TariffUpdateCtx * aCtx)
 {
+    BitMask<Feature> entryFeatures;
+
+    uint8_t FeaturesCount = [&entryFeatures]() -> uint8_t {
+        uint8_t count = 0;
+        auto n = entryFeatures.Raw();
+        while (n) {
+            n &= (n - 1);
+            count++;
+        };
+        return count;
+    }();
 
     VerifyOrReturnError(entryNewValue.tariffComponentID > 0, CHIP_ERROR_INVALID_ARGUMENT);
 
-    if ((aCtx->blockMode == BlockModeEnum::kNoBlock) && (!entryNewValue.threshold.IsNull()))
+    if ( ((aCtx->blockMode == BlockModeEnum::kNoBlock) && (!entryNewValue.threshold.IsNull())) ||
+        ((aCtx->blockMode != BlockModeEnum::kNoBlock) && (entryNewValue.threshold.IsNull())) )
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
@@ -213,6 +222,8 @@ static CHIP_ERROR ValidateListEntry(const TariffComponentStruct::Type & entryNew
         const auto & price = entryNewValue.price.Value().Value();
         VerifyOrReturnError(EnsureKnownEnumValue(price.priceType) != TariffPriceTypeEnum::kUnknownEnumValue,
                             CHIP_ERROR_INVALID_ARGUMENT);
+
+        entryFeatures.Set(CommodityTariff::Feature::kPricing);
     }
     else if (CommonUtilities::HasFeatureInCtx(aCtx, CommodityTariff::Feature::kPricing))
     {
@@ -228,6 +239,8 @@ static CHIP_ERROR ValidateListEntry(const TariffComponentStruct::Type & entryNew
         // If friendlyCredit is provided, the FCRED feature MUST be supported
         VerifyOrReturnError(CommonUtilities::HasFeatureInCtx(aCtx, CommodityTariff::Feature::kFriendlyCredit),
                             CHIP_ERROR_INVALID_ARGUMENT);
+
+        entryFeatures.Set(CommodityTariff::Feature::kFriendlyCredit);
     }
 
     // Validate auxiliaryLoad field
@@ -239,6 +252,8 @@ static CHIP_ERROR ValidateListEntry(const TariffComponentStruct::Type & entryNew
         const auto & auxiliaryLoad = entryNewValue.auxiliaryLoad.Value();
         VerifyOrReturnError(EnsureKnownEnumValue(auxiliaryLoad.requiredState) != AuxiliaryLoadSettingEnum::kUnknownEnumValue,
                             CHIP_ERROR_INVALID_ARGUMENT);
+
+        entryFeatures.Set(CommodityTariff::Feature::kAuxiliaryLoad);
     }
     else if (CommonUtilities::HasFeatureInCtx(aCtx, CommodityTariff::Feature::kAuxiliaryLoad))
     {
@@ -257,6 +272,8 @@ static CHIP_ERROR ValidateListEntry(const TariffComponentStruct::Type & entryNew
         VerifyOrReturnError(EnsureKnownEnumValue(peakPeriod.severity) != PeakPeriodSeverityEnum::kUnknownEnumValue,
                             CHIP_ERROR_INVALID_ARGUMENT);
         VerifyOrReturnError(peakPeriod.peakPeriod > 0, CHIP_ERROR_INVALID_ARGUMENT);
+
+        entryFeatures.Set(CommodityTariff::Feature::kPeakPeriod);
     }
     else if (CommonUtilities::HasFeatureInCtx(aCtx, CommodityTariff::Feature::kPeakPeriod))
     {
@@ -288,6 +305,8 @@ static CHIP_ERROR ValidateListEntry(const TariffComponentStruct::Type & entryNew
         {
             VerifyOrReturnError(powerThreshold.apparentPowerThreshold.Value() > 0, CHIP_ERROR_INVALID_ARGUMENT);
         }
+
+        entryFeatures.Set(CommodityTariff::Feature::kPowerThreshold);
     }
 
     if (entryNewValue.predicted.HasValue())
@@ -295,6 +314,17 @@ static CHIP_ERROR ValidateListEntry(const TariffComponentStruct::Type & entryNew
         // No need to check the value itself since it's just a bool
         // But we can add debug logging if needed:
         ChipLogDetail(NotSpecified, "Predicted flag set to %s", entryNewValue.predicted.Value() ? "true" : "false");
+    }
+
+    if (FeaturesCount > 1)
+    {
+        ChipLogError(NotSpecified, "Exactly one feature required for one TariffComponent entry");
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+
+    if (entryFeatureValue != nullptr)
+    {
+        *entryFeatureValue = Feature(entryFeatures.Raw());
     }
 
     return CHIP_NO_ERROR;
@@ -763,7 +793,7 @@ CHIP_ERROR CTC_BaseDataClass<DataModel::Nullable<DataModel::List<TariffComponent
             return CHIP_ERROR_DUPLICATE_KEY_ID;
         }
 
-        CHIP_ERROR entryErr = TariffComponentsDataClass_Utils::ValidateListEntry(item, ctx);
+        CHIP_ERROR entryErr = chip::app::Clusters::CommodityTariff::TariffComponentsDataClass_Utils::ValidateListEntry(item, nullptr, ctx);
         if (entryErr != CHIP_NO_ERROR)
         {
             return entryErr;
@@ -784,7 +814,6 @@ CHIP_ERROR CTC_BaseDataClass<DataModel::Nullable<DataModel::List<TariffPeriodStr
 
     const auto & newList = GetNewValueRef().Value();
     auto * ctx           = static_cast<TariffUpdateCtx *>(mAuxData);
-    std::map<uint32_t, std::unordered_set<uint32_t>> tariffComponentsMap;
 
     // Validate list length
     if (newList.size() == 0 || newList.size() > kTariffPeriodsAttrMaxLength)
@@ -797,7 +826,7 @@ CHIP_ERROR CTC_BaseDataClass<DataModel::Nullable<DataModel::List<TariffPeriodStr
     for (const auto & item : newList)
     {
         CHIP_ERROR entryErr = TariffPeriodsDataClass_Utils::ValidateListEntry(
-            item, ctx->TariffPeriodsDayEntryIDs, ctx->TariffPeriodsTariffComponentIDs, tariffComponentsMap);
+            item, ctx->TariffPeriodsDayEntryIDs, ctx->TariffPeriodsTariffComponentIDs);
 
         if (entryErr != CHIP_NO_ERROR)
         {
