@@ -264,7 +264,7 @@ TEST_F(TestCommodityTariffBaseDataClass, NullableStructValueHandling)
     CTC_BaseDataClass<DataModel::Nullable<MockStruct>> data(1);
     const uint32_t sample_field_one = 100;
     const uint16_t sample_field_two = 200;
-    MockStruct testStruct = { sample_field_one, sample_field_two };
+    MockStruct testStruct           = { sample_field_one, sample_field_two };
     DataModel::Nullable<MockStruct> newValue;
 
     newValue.SetNonNull(testStruct);
@@ -774,7 +774,7 @@ TEST_F(TestCommodityTariffBaseDataClass, ConcurrentWriteAccess_ShouldBeSynchroni
     // Without synchronization, we expect many failures due to state conflicts
     if (failureCount.load() > 0)
     {
-        EXPECT_GT(failureCount.load(), 0) << "Concurrent writes should cause state errors without synchronization";        
+        EXPECT_GT(failureCount.load(), 0) << "Concurrent writes should cause state errors without synchronization";
     }
 
     EXPECT_GT(successCount.load(), 0) << "Some writes should succeed";

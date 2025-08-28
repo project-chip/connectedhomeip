@@ -730,7 +730,7 @@ public:
             if (CHIP_NO_ERROR == err)
             {
                 assignStorageVal(DataType()); // Default construct in place
-                err             = CopyData(actualValue, getStorageRef());
+                err = CopyData(actualValue, getStorageRef());
             }
         }
         else if constexpr (TypeIsScalar<DataType>())
