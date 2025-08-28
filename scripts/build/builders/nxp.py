@@ -16,7 +16,6 @@ import importlib.util
 import logging
 import os
 from enum import Enum, auto
-from typing import Optional
 
 from .builder import BuilderOutput
 from .gn import GnBuilder
@@ -175,6 +174,8 @@ class NxpBuilder(GnBuilder):
                  iw416_transceiver: bool = False,
                  w8801_transceiver: bool = False,
                  iwx12_transceiver: bool = False,
+                 iw610_transceiver: bool = False,
+                 se05x_enable: bool = False,
                  log_level: NxpLogLevel = NxpLogLevel.DEFAULT,
                  ):
         super(NxpBuilder, self).__init__(
@@ -208,6 +209,8 @@ class NxpBuilder(GnBuilder):
         self.iw416_transceiver = iw416_transceiver
         self.w8801_transceiver = w8801_transceiver
         self.iwx12_transceiver = iwx12_transceiver
+        self.iw610_transceiver = iw610_transceiver
+        self.se05x_enable = se05x_enable
         if self.low_power and log_level != NxpLogLevel.NONE:
             logging.warning("Switching log level to 'NONE' for low power build")
             log_level = NxpLogLevel.NONE
@@ -356,11 +359,16 @@ class NxpBuilder(GnBuilder):
         if self.w8801_transceiver:
             flags.append('-DCONFIG_MCUX_COMPONENT_component.wifi_bt_module.88W8801=y')
 
-        if self.iwx12_transceiver:
+        if self.iwx12_transceiver or self.iw610_transceiver:
             flags.append('-DCONFIG_MCUX_COMPONENT_component.wifi_bt_module.IW61X=y')
+        if self.iw610_transceiver:
+            flags.append('-DCONFIG_MCUX_COMPONENT_component.wifi_bt_module.board_murata_2ll_m2=y')
 
         if self.board == NxpBoard.RT1170:
             flags.append('-Dcore_id=cm7')
+
+        if self.se05x_enable:
+            flags.append('-DCONFIG_CHIP_SE05X=y')
 
         build_flags = " ".join(flags)
 

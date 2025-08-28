@@ -33,7 +33,6 @@
 #include <app/util/attribute-table.h>
 #include <crypto/RandUtils.h>
 #include <data-model-providers/codegen/EmberAttributeDataBuffer.h>
-#include <data-model-providers/codegen/EmberMetadata.h>
 #include <lib/support/BitFlags.h>
 #include <lib/support/ReadOnlyBuffer.h>
 #include <optional>
@@ -54,10 +53,10 @@ class ContextAttributesChangeListener : public AttributesChangedListener
 public:
     ContextAttributesChangeListener(const DataModel::InteractionModelContext & context) : mListener(context.dataModelChangeListener)
     {}
-    void MarkDirty(const AttributePathParams & path) override { mListener->MarkDirty(path); }
+    void MarkDirty(const AttributePathParams & path) override { mListener.MarkDirty(path); }
 
 private:
-    DataModel::ProviderChangeListener * mListener;
+    DataModel::ProviderChangeListener & mListener;
 };
 
 /// Attempts to read via an attribute access interface (AAI)
@@ -134,8 +133,8 @@ DataModel::AttributeEntry AttributeEntryFrom(const ConcreteClusterPath & cluster
         BitFlags<DataModel::AttributeQualityFlags>{}
             .Set(AttributeQualityFlags::kListAttribute, (attribute.attributeType == ZCL_ARRAY_ATTRIBUTE_TYPE))
             .Set(DataModel::AttributeQualityFlags::kTimed, attribute.MustUseTimedWrite()),
-        RequiredPrivilege::ForReadAttribute(attributePath),
-        attribute.IsReadOnly() ? std::nullopt : std::make_optional(RequiredPrivilege::ForWriteAttribute(attributePath)));
+        attribute.IsReadable() ? std::make_optional(RequiredPrivilege::ForReadAttribute(attributePath)) : std::nullopt,
+        attribute.IsWritable() ? std::make_optional(RequiredPrivilege::ForWriteAttribute(attributePath)) : std::nullopt);
 
     // TODO: Set additional flags:
     // entry.flags.Set(DataModel::AttributeQualityFlags::kFabricScoped)
@@ -249,16 +248,13 @@ DataModel::ActionReturnStatus ServerClusterShim::ReadAttribute(const DataModel::
                   ChipLogValueMEI(request.path.mClusterId), request.path.mEndpointId, ChipLogValueMEI(request.path.mAttributeId),
                   request.path.mExpanded);
 
-    auto metadata = Ember::FindAttributeMetadata(request.path);
+    const EmberAfAttributeMetadata * attributeMetadata =
+        emberAfLocateAttributeMetadata(request.path.mEndpointId, request.path.mClusterId, request.path.mAttributeId);
 
-    // Explicit failure in finding a suitable metadata
-    if (const Status * status = std::get_if<Status>(&metadata))
-    {
-        VerifyOrDie((*status == Status::UnsupportedEndpoint) || //
-                    (*status == Status::UnsupportedCluster) ||  //
-                    (*status == Status::UnsupportedAttribute));
-        return *status;
-    }
+    // ReadAttribute requirement is that request.path is a VALID path inside the provider
+    // metadata tree. Clients are supposed to validate this (and data version and other flags)
+    // This SHOULD NEVER HAPPEN hence the general return code (seemed preferable to VerifyOrDie)
+    VerifyOrReturnError(attributeMetadata != nullptr, Status::Failure);
 
     if (!PathsContainsOrLogError({ request.path.mEndpointId, request.path.mClusterId }, *this))
     {
@@ -269,10 +265,6 @@ DataModel::ActionReturnStatus ServerClusterShim::ReadAttribute(const DataModel::
     std::optional<CHIP_ERROR> aai_result = TryReadViaAccessInterface(
         request.path, AttributeAccessInterfaceRegistry::Instance().Get(request.path.mEndpointId, request.path.mClusterId), encoder);
     VerifyOrReturnError(!aai_result.has_value(), *aai_result);
-
-    const EmberAfAttributeMetadata * attributeMetadata = std::get<const EmberAfAttributeMetadata *>(metadata);
-    // We can only get a status or metadata.
-    VerifyOrDie(attributeMetadata != nullptr);
 
     // At this point, we have to use ember directly to read the data.
     EmberAfAttributeSearchRecord record;
@@ -298,42 +290,20 @@ DataModel::ActionReturnStatus ServerClusterShim::ReadAttribute(const DataModel::
 ActionReturnStatus ServerClusterShim::WriteAttribute(const WriteAttributeRequest & request, AttributeValueDecoder & decoder)
 {
     // Context not initialized. Need to call Startup(context) before writing.
-    if (mContext == nullptr || mContext->interactionContext == nullptr ||
-        mContext->interactionContext->dataModelChangeListener == nullptr)
-    {
-        return Status::InvalidInState;
-    }
+    VerifyOrReturnError(mContext != nullptr, Status::InvalidInState);
 
-    auto metadata = Ember::FindAttributeMetadata(request.path);
+    const EmberAfAttributeMetadata * attributeMetadata =
+        emberAfLocateAttributeMetadata(request.path.mEndpointId, request.path.mClusterId, request.path.mAttributeId);
 
-    // Explicit failure in finding a suitable metadata
-    if (const Status * status = std::get_if<Status>(&metadata))
-    {
-        VerifyOrDie((*status == Status::UnsupportedEndpoint) || //
-                    (*status == Status::UnsupportedCluster) ||  //
-                    (*status == Status::UnsupportedAttribute));
-
-        // Check if this is an attribute that ember does not know about but is valid after all and
-        // adjust the return code. All these global attributes are `read only` hence the return
-        // of unsupported write.
-        //
-        // If the cluster or endpoint does not exist, though, keep that return code.
-        if ((*status == Protocols::InteractionModel::Status::UnsupportedAttribute) &&
-            IsSupportedGlobalAttributeNotInMetadata(request.path.mAttributeId))
-        {
-            return Status::UnsupportedWrite;
-        }
-
-        return *status;
-    }
+    // WriteAttribute requirement is that request.path is a VALID path inside the provider
+    // metadata tree. Clients are supposed to validate this (and data version and other flags)
+    // This SHOULD NEVER HAPPEN hence the general return code (seemed preferable to VerifyOrDie)
+    VerifyOrReturnError(attributeMetadata != nullptr, Status::Failure);
 
     if (!PathsContainsOrLogError({ request.path.mEndpointId, request.path.mClusterId }, *this))
     {
         return Status::Failure;
     }
-
-    const EmberAfAttributeMetadata ** attributeMetadata = std::get_if<const EmberAfAttributeMetadata *>(&metadata);
-    VerifyOrDie(*attributeMetadata != nullptr);
 
     // Extra check: internal requests can bypass the read only check, however global attributes
     // have no underlying storage, so write still cannot be done
@@ -360,7 +330,7 @@ ActionReturnStatus ServerClusterShim::WriteAttribute(const WriteAttributeRequest
         }
     }
 
-    ContextAttributesChangeListener changeListener(*mContext->interactionContext);
+    ContextAttributesChangeListener changeListener(mContext->interactionContext);
 
     AttributeAccessInterface * aai =
         AttributeAccessInterfaceRegistry::Instance().Get(request.path.mEndpointId, request.path.mClusterId);
@@ -378,18 +348,18 @@ ActionReturnStatus ServerClusterShim::WriteAttribute(const WriteAttributeRequest
 
     MutableByteSpan dataBuffer = gEmberAttributeIOBufferSpan;
     {
-        Ember::EmberAttributeDataBuffer emberData(*attributeMetadata, dataBuffer);
+        Ember::EmberAttributeDataBuffer emberData(attributeMetadata, dataBuffer);
         ReturnErrorOnFailure(decoder.Decode(emberData));
     }
 
-    if (dataBuffer.size() > (*attributeMetadata)->size)
+    if (dataBuffer.size() > attributeMetadata->size)
     {
         ChipLogDetail(Zcl, "Data to write exceeds the attribute size claimed.");
         return Status::InvalidValue;
     }
 
     Protocols::InteractionModel::Status status;
-    EmberAfWriteDataInput dataInput(dataBuffer.data(), (*attributeMetadata)->attributeType);
+    EmberAfWriteDataInput dataInput(dataBuffer.data(), attributeMetadata->attributeType);
     dataInput.SetChangeListener(&changeListener);
     // TODO: dataInput.SetMarkDirty() should be according to `ChangesOmmited`
 
@@ -458,54 +428,12 @@ CHIP_ERROR ServerClusterShim::AcceptedCommands(const ConcreteClusterPath & path,
 
     CommandHandlerInterface * interface =
         CommandHandlerInterfaceRegistry::Instance().GetCommandHandler(path.mEndpointId, path.mClusterId);
+
     if (interface != nullptr)
     {
-        size_t commandCount = 0;
-
-        CHIP_ERROR err = interface->EnumerateAcceptedCommands(
-            path,
-            [](CommandId id, void * context) -> Loop {
-                *reinterpret_cast<size_t *>(context) += 1;
-                return Loop::Continue;
-            },
-            reinterpret_cast<void *>(&commandCount));
-
-        if (err == CHIP_NO_ERROR)
-        {
-            using EnumerationData = struct
-            {
-                ConcreteCommandPath commandPath;
-                ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> * acceptedCommandList;
-                CHIP_ERROR processingError;
-            };
-
-            EnumerationData enumerationData;
-            enumerationData.commandPath         = ConcreteCommandPath(path.mEndpointId, path.mClusterId, kInvalidCommandId);
-            enumerationData.processingError     = CHIP_NO_ERROR;
-            enumerationData.acceptedCommandList = &builder;
-
-            ReturnErrorOnFailure(builder.EnsureAppendCapacity(commandCount));
-
-            ReturnErrorOnFailure(interface->EnumerateAcceptedCommands(
-                path,
-                [](CommandId commandId, void * context) -> Loop {
-                    auto input                    = reinterpret_cast<EnumerationData *>(context);
-                    input->commandPath.mCommandId = commandId;
-                    CHIP_ERROR appendError        = input->acceptedCommandList->Append(AcceptedCommandEntryFor(input->commandPath));
-                    if (appendError != CHIP_NO_ERROR)
-                    {
-                        input->processingError = appendError;
-                        return Loop::Break;
-                    }
-                    return Loop::Continue;
-                },
-                reinterpret_cast<void *>(&enumerationData)));
-            ReturnErrorOnFailure(enumerationData.processingError);
-
-            // the two invocations MUST return the same sizes.
-            VerifyOrReturnError(builder.Size() == commandCount, CHIP_ERROR_INTERNAL);
-            return CHIP_NO_ERROR;
-        }
+        CHIP_ERROR err = interface->RetrieveAcceptedCommands(path, builder);
+        // If retrieving the accepted commands returns CHIP_ERROR_NOT_IMPLEMENTED then continue with normal procesing.
+        // Otherwise we finished.
         VerifyOrReturnError(err == CHIP_ERROR_NOT_IMPLEMENTED, err);
     }
 
@@ -548,49 +476,9 @@ CHIP_ERROR ServerClusterShim::GeneratedCommands(const ConcreteClusterPath & path
         CommandHandlerInterfaceRegistry::Instance().GetCommandHandler(path.mEndpointId, path.mClusterId);
     if (interface != nullptr)
     {
-        size_t commandCount = 0;
-
-        CHIP_ERROR err = interface->EnumerateGeneratedCommands(
-            path,
-            [](CommandId id, void * context) -> Loop {
-                *reinterpret_cast<size_t *>(context) += 1;
-                return Loop::Continue;
-            },
-            reinterpret_cast<void *>(&commandCount));
-
-        if (err == CHIP_NO_ERROR)
-        {
-            ReturnErrorOnFailure(builder.EnsureAppendCapacity(commandCount));
-
-            using EnumerationData = struct
-            {
-                ReadOnlyBufferBuilder<CommandId> * generatedCommandList;
-                CHIP_ERROR processingError;
-            };
-            EnumerationData enumerationData;
-            enumerationData.processingError      = CHIP_NO_ERROR;
-            enumerationData.generatedCommandList = &builder;
-
-            ReturnErrorOnFailure(interface->EnumerateGeneratedCommands(
-                path,
-                [](CommandId id, void * context) -> Loop {
-                    auto input = reinterpret_cast<EnumerationData *>(context);
-
-                    CHIP_ERROR appendError = input->generatedCommandList->Append(id);
-                    if (appendError != CHIP_NO_ERROR)
-                    {
-                        input->processingError = appendError;
-                        return Loop::Break;
-                    }
-                    return Loop::Continue;
-                },
-                reinterpret_cast<void *>(&enumerationData)));
-            ReturnErrorOnFailure(enumerationData.processingError);
-
-            // the two invocations MUST return the same sizes.
-            VerifyOrReturnError(builder.Size() == commandCount, CHIP_ERROR_INTERNAL);
-            return CHIP_NO_ERROR;
-        }
+        CHIP_ERROR err = interface->RetrieveGeneratedCommands(path, builder);
+        // If retrieving generated commands returns CHIP_ERROR_NOT_IMPLEMENTED then continue with normal procesing.
+        // Otherwise we finished.
         VerifyOrReturnError(err == CHIP_ERROR_NOT_IMPLEMENTED, err);
     }
 

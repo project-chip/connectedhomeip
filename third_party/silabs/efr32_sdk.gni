@@ -37,10 +37,14 @@ declare_args() {
 
   # enable by default for thread/non-wifi-ncp builds
   enable_openthread_cli = !(use_rs9116 || use_wf200 || use_SiWx917)
-  kvs_max_entries = 255
-  sl_nvm3_max_object_size = 4092
+
+  # Max KVS entry counts. Its the current maximal value we support.
+  kvs_max_entries = 511
+  sl_nvm3_max_object_size = 1024
   sl_nvm3_nvm_size = 40960
-  sl_nvm3_cache_size = 200
+
+  # NVM3 cache size. A cache size >= total object count is recommended.
+  sl_nvm3_cache_size = 600
 
   # Use Silabs factory data provider example.
   # Users can implement their own.
@@ -500,7 +504,6 @@ template("efr32_sdk") {
       "SL_OPENTHREAD_STACK_FEATURES_CONFIG_FILE=\"sl_openthread_features_config.h\"",
       "SL_CSL_TIMEOUT=${sl_ot_csl_timeout_sec}",
       "CIRCULAR_QUEUE_USE_LOCAL_CONFIG_HEADER=1",
-      "SILABS_LOG_OUT_UART=${sl_uart_log_output}",
       "SL_RAIL_3_API=1",
       "SL_CODE_COMPONENT_OPENTHREAD=openthread",
       "SL_CODE_COMPONENT_INTERRUPT_MANAGER=interrupt_manager",
@@ -510,6 +513,12 @@ template("efr32_sdk") {
       defines += [ "SILABS_LOG_ENABLED=1" ]
     } else {
       defines += [ "SILABS_LOG_ENABLED=0" ]
+    }
+
+    if (sl_uart_log_output) {
+      defines += [ "SILABS_LOG_OUT_UART=1" ]
+    } else {
+      defines += [ "SILABS_LOG_OUT_UART=0" ]
     }
 
     if (use_silabs_thread_lib) {

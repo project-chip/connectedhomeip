@@ -24,6 +24,7 @@
 
 #include "CHIPCryptoPALHsm_se05x_utils.h"
 #include "fsl_sss_policy.h"
+#include "se05x_host_gpio.h"
 
 ex_sss_boot_ctx_t gex_sss_chip_ctx;
 static int is_session_open = 0;
@@ -84,6 +85,13 @@ CHIP_ERROR se05x_session_open(void)
         return CHIP_NO_ERROR;
     }
 
+    ChipLogDetail(Crypto, "Turn ON SE05x secure element before session open");
+    if (se05x_host_gpio_set_value(1) != 0)
+    {
+        ChipLogError(NotSpecified, "SE05x - Error in se05x_host_gpio_set_value(1) function");
+        return CHIP_ERROR_INTERNAL;
+    }
+
     memset(&gex_sss_chip_ctx, 0, sizeof(gex_sss_chip_ctx));
 
     char * portName     = nullptr;
@@ -128,6 +136,13 @@ CHIP_ERROR se05x_close_session(void)
         ex_sss_session_close(&gex_sss_chip_ctx);
         memset(&gex_sss_chip_ctx, 0, sizeof(gex_sss_chip_ctx));
         is_session_open = 0;
+    }
+
+    ChipLogDetail(Crypto, "Turn OFF SE05x secure element after session close");
+    if (se05x_host_gpio_set_value(0) != 0)
+    {
+        ChipLogError(NotSpecified, "SE05x - Error in se05x_host_gpio_set_value(0) function");
+        return CHIP_ERROR_INTERNAL;
     }
 
 #if !ENABLE_SE05X_RND_GEN

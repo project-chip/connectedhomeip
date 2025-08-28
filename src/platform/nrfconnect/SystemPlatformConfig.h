@@ -47,7 +47,7 @@ struct ChipDeviceEvent;
 #define CHIP_SYSTEM_CONFIG_USE_LWIP 0
 
 #ifndef CONFIG_ARCH_POSIX
-#define CHIP_SYSTEM_CONFIG_PACKETBUFFER_POOL_SIZE 15
+#define CHIP_SYSTEM_CONFIG_PACKETBUFFER_POOL_SIZE CONFIG_CHIP_SYSTEM_PACKETBUFFER_POOL_SIZE
 #endif
 
 #ifndef CHIP_SYSTEM_CONFIG_PACKETBUFFER_CAPACITY_MAX
@@ -66,6 +66,8 @@ struct ChipDeviceEvent;
 
 // ========== Platform-specific Configuration Overrides =========
 
+// Disable Thread Local Storage (TLS) since nRF Connect SDK does not support it.
+#define CHIP_SYSTEM_CONFIG_THREAD_LOCAL_STORAGE 0
 // Disable Zephyr Socket extensions module, as the Zephyr RTOS now implements recvmsg()
 #define CHIP_SYSTEM_CONFIG_USE_ZEPHYR_SOCKET_EXTENSIONS 0
 

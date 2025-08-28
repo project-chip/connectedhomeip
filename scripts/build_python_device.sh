@@ -94,14 +94,14 @@ chip_data_model_arg="chip_data_model=\"///examples/lighting-app/lighting-common\
 gn --root="$CHIP_ROOT" gen "$OUTPUT_ROOT" --args="chip_detail_logging=$chip_detail_logging $chip_mdns_arg chip_controller=false $chip_data_model_arg"
 
 # Compiles python files
-ninja -v -C "$OUTPUT_ROOT" chip-core
+ninja -v -C "$OUTPUT_ROOT" matter-core
 
 # Create a virtual environment that has access to the built python tools
 virtualenv --clear "$ENVIRONMENT_ROOT"
 
 # Activate the new environment to register the python WHL
 
-WHEEL=("$OUTPUT_ROOT"/controller/python/chip_core*.whl)
+WHEEL=("$OUTPUT_ROOT"/controller/python/matter_core*.whl)
 
 source "$ENVIRONMENT_ROOT"/bin/activate
 "$ENVIRONMENT_ROOT"/bin/python -m ensurepip --upgrade
