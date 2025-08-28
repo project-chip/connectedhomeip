@@ -179,12 +179,15 @@ public:
 #endif
 
     std::optional<DataModel::ActionReturnStatus> HandleArmFailSafe(CommandHandler * commandObj, const ConcreteCommandPath & path, FabricIndex fabricIndex, const GeneralCommissioning::Commands::ArmFailSafe::DecodableType & commandData);
+
     std::optional<DataModel::ActionReturnStatus> HandleCommissioningComplete(CommandHandler * commandObj, const ConcreteCommandPath & path, FabricIndex fabricIndex, const GeneralCommissioning::Commands::CommissioningComplete::DecodableType & commandData);
+
     std::optional<DataModel::ActionReturnStatus> HandleSetRegulatoryConfig(CommandHandler * commandObj, const ConcreteCommandPath & path, const GeneralCommissioning::Commands::SetRegulatoryConfig::DecodableType & commandData);
 
 #if CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
     std::optional<DataModel::ActionReturnStatus> HandleSetTCAcknowledgements(CommandHandler * commandObj, const ConcreteCommandPath & path, const GeneralCommissioning::Commands::SetTCAcknowledgements::DecodableType & commandData);
 #endif
+
     const BitFlags<GeneralCommissioning::Feature> & GetFeatureFlags() const { return mFeatureFlags; }
 private:
     const BitFlags<GeneralCommissioning::Feature> mFeatureFlags;
