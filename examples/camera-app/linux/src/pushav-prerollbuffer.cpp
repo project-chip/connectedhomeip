@@ -51,19 +51,6 @@ void PreRollBuffer::PushBufferToTransport()
             continue;
         }
 
-        // if (sink->transport->GetTransportStatus() /*0:Active, 1:Inactive */)
-        // {
-        //     // Remove delivery records when transport is inactive
-        //     for (auto & [_, bufferQueue] : buffers)
-        //     {
-        //         for (auto & frame : bufferQueue)
-        //         {
-        //             frame->deliveredTo.erase(sink);
-        //         }
-        //     }
-        //     continue;
-        // }
-
         int64_t minTimeToDeliver = (sink->requestedPreBufferLengthMs == 0 && sink->transport->CanSendVideo())
             ? currentTime - sink->minKeyframeIntervalMs
             : currentTime - sink->requestedPreBufferLengthMs;
