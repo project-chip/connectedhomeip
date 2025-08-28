@@ -82,6 +82,10 @@ action("framework") {
     args += [ "--no-compdb" ]
   }
 
+  if (chip_enable_nfc_based_commissioning) {
+    args += [ "--nfc" ]
+  }
+
   if (config_enable_yaml_tests) {
     args += [ "--enable-encoding-sentinel-enum-values" ]
   } else {
