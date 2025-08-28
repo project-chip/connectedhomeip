@@ -109,7 +109,6 @@ class TC_SU_2_2(MatterBaseTest):
         while True:
             line = proc.stdout.readline()
             if line:
-                # Siempre escribir a log en tiempo real
                 with open(log_file_path, "a") as f:
                     f.write(line)
                     f.flush()
@@ -299,7 +298,7 @@ class TC_SU_2_2(MatterBaseTest):
     def pics_TC_SU_2_2(self):
         """Return the PICS definitions associated with this test."""
         pics = [
-            "MCORE.S",      # Pics
+            "MCORE.OTA.Requestor",      # Pics
         ]
         return pics
 
