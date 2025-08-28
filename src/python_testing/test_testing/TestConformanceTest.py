@@ -116,7 +116,7 @@ def create_onoff_endpoint(endpoint: int) -> dict[int, dict[int, dict[int, Any]]]
     return endpoint_tlv
 
 
-class TestConformanceSupport(MatterBaseTest, DeviceConformanceTests):
+class TestConformanceTest(MatterBaseTest, DeviceConformanceTests):
     def setup_class(self):
         # Latest fully qualified version
         # TODO: It might be good to find a way to run this against each directory.
