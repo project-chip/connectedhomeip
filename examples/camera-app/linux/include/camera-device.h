@@ -21,7 +21,7 @@
 #include "camera-avsettingsuserlevel-manager.h"
 #include "camera-device-interface.h"
 #include "chime-manager.h"
-#include "push-av-stream-transport-delegate-impl.h"
+#include "push-av-stream-manager.h"
 #include "webrtc-provider-manager.h"
 #include "zone-manager.h"
 
@@ -87,7 +87,7 @@ public:
     chip::app::Clusters::CameraAvStreamManagement::CameraAVStreamMgmtDelegate & GetCameraAVStreamMgmtDelegate() override;
     chip::app::Clusters::CameraAvStreamManagement::CameraAVStreamController & GetCameraAVStreamMgmtController() override;
     chip::app::Clusters::CameraAvSettingsUserLevelManagement::Delegate & GetCameraAVSettingsUserLevelMgmtDelegate() override;
-    chip::app::Clusters::PushAvStreamTransportDelegate & GetPushAVDelegate() override;
+    chip::app::Clusters::PushAvStreamTransportDelegate & GetPushAVTransportDelegate() override;
     chip::app::Clusters::ZoneManagement::Delegate & GetZoneManagementDelegate() override;
 
     MediaController & GetMediaController() override;
@@ -107,7 +107,7 @@ public:
     CameraError CaptureSnapshot(const chip::app::DataModel::Nullable<uint16_t> streamID, const VideoResolutionStruct & resolution,
                                 ImageSnapshot & outImageSnapshot) override;
 
-    CameraError StartVideoStream(uint16_t streamID) override;
+    CameraError StartVideoStream(const VideoStreamStruct & allocatedStream) override;
 
     // Stop video stream
     CameraError StopVideoStream(uint16_t streamID) override;

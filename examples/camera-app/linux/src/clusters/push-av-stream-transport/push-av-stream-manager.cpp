@@ -16,13 +16,14 @@
  *    limitations under the License.
  */
 
+#include "push-av-stream-manager.h"
+
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <fstream>
 #include <iostream>
 #include <lib/support/logging/CHIPLogging.h>
-#include <push-av-stream-transport-delegate-impl.h>
 
 using namespace chip;
 using namespace chip::app;
@@ -30,16 +31,6 @@ using namespace chip::app::DataModel;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::PushAvStreamTransport;
 using chip::Protocols::InteractionModel::Status;
-
-void PushAvStreamTransportManager::SetMediaController(MediaController * mediaController)
-{
-    mMediaController = mediaController;
-}
-
-void PushAvStreamTransportManager::SetCameraDevice(CameraDeviceInterface * aCameraDevice)
-{
-    mCameraDevice = aCameraDevice;
-}
 
 PushAvStreamTransportManager::~PushAvStreamTransportManager()
 {
@@ -54,6 +45,22 @@ PushAvStreamTransportManager::~PushAvStreamTransportManager()
     }
     mTransportMap.clear();
     mTransportOptionsMap.clear();
+}
+
+void PushAvStreamTransportManager::Init()
+{
+    ChipLogProgress(Zcl, "Push AV Stream Transport Initialized");
+    return;
+}
+
+void PushAvStreamTransportManager::SetMediaController(MediaController * mediaController)
+{
+    mMediaController = mediaController;
+}
+
+void PushAvStreamTransportManager::SetCameraDevice(CameraDeviceInterface * aCameraDevice)
+{
+    mCameraDevice = aCameraDevice;
 }
 
 Protocols::InteractionModel::Status
@@ -231,7 +238,7 @@ PushAvStreamTransportManager::ValidateBandwidthLimit(StreamUsageEnum streamUsage
     return Status::Success;
 }
 
-bool PushAvStreamTransportManager::ValidateUrl(std::string url)
+bool PushAvStreamTransportManager::ValidateUrl(const std::string & url)
 {
     const std::string https = "https://";
 
@@ -360,12 +367,6 @@ PushAvStreamTransportStatusEnum PushAvStreamTransportManager::GetTransportBusySt
 void PushAvStreamTransportManager::OnAttributeChanged(AttributeId attributeId)
 {
     ChipLogProgress(Zcl, "Attribute changed for AttributeId = " ChipLogFormatMEI, ChipLogValueMEI(attributeId));
-}
-
-void PushAvStreamTransportManager::Init()
-{
-    ChipLogProgress(Zcl, "Push AV Stream Transport Initialized");
-    return;
 }
 
 CHIP_ERROR PushAvStreamTransportManager::LoadCurrentConnections(std::vector<TransportConfigurationStorage> & currentConnections)

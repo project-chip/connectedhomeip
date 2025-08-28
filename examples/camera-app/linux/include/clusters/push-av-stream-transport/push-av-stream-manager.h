@@ -17,16 +17,15 @@
  */
 
 #pragma once
-#include <app/clusters/push-av-stream-transport-server/push-av-stream-transport-cluster.h>
-#include <app/util/config.h>
-#include <lib/support/logging/CHIPLogging.h>
-#include <vector>
-
-#include "camera-device-interface.h"
 #include <app-common/zap-generated/cluster-enums.h>
+#include <app/clusters/push-av-stream-transport-server/push-av-stream-transport-cluster.h>
+
+#include <camera-device-interface.h>
 #include <media-controller.h>
 #include <pushav-transport.h>
+
 #include <unordered_map>
+#include <vector>
 
 namespace chip {
 namespace app {
@@ -47,42 +46,50 @@ struct PushAvStream
 class PushAvStreamTransportManager : public PushAvStreamTransportDelegate
 {
 public:
-    Protocols::InteractionModel::Status AllocatePushTransport(const TransportOptionsStruct & transportOptions,
-                                                              const uint16_t connectionID);
-    Protocols::InteractionModel::Status DeallocatePushTransport(const uint16_t connectionID);
-    Protocols::InteractionModel::Status ModifyPushTransport(const uint16_t connectionID,
-                                                            const TransportOptionsStorage transportOptions);
-    Protocols::InteractionModel::Status SetTransportStatus(const std::vector<uint16_t> connectionIDList,
-                                                           TransportStatusEnum transportStatus);
+    PushAvStreamTransportManager() = default;
+    ~PushAvStreamTransportManager();
 
-    Protocols::InteractionModel::Status
-    ManuallyTriggerTransport(const uint16_t connectionID, TriggerActivationReasonEnum activationReason,
-                             const Optional<Structs::TransportMotionTriggerTimeControlStruct::DecodableType> & timeControl);
-
-    bool ValidateUrl(std::string url);
-
-    Protocols::InteractionModel::Status ValidateBandwidthLimit(StreamUsageEnum streamUsage,
-                                                               const Optional<DataModel::Nullable<uint16_t>> & videoStreamId,
-                                                               const Optional<DataModel::Nullable<uint16_t>> & audioStreamId);
-    Protocols::InteractionModel::Status SelectVideoStream(StreamUsageEnum streamUsage, uint16_t & videoStreamId);
-
-    Protocols::InteractionModel::Status SelectAudioStream(StreamUsageEnum streamUsage, uint16_t & audioStreamId);
-
-    Protocols::InteractionModel::Status ValidateVideoStream(uint16_t videoStreamId);
-
-    Protocols::InteractionModel::Status ValidateAudioStream(uint16_t audioStreamId);
-
-    PushAvStreamTransportStatusEnum GetTransportBusyStatus(const uint16_t connectionID);
-
-    void OnAttributeChanged(AttributeId attributeId);
-    CHIP_ERROR LoadCurrentConnections(std::vector<TransportConfigurationStorage> & currentConnections);
-    CHIP_ERROR PersistentAttributesLoadedCallback();
-
+    void Init();
     void SetMediaController(MediaController * mediaController);
     void SetCameraDevice(CameraDeviceInterface * cameraDevice);
-    void Init();
 
-    ~PushAvStreamTransportManager();
+    // Add missing override keywords and fix signatures
+    Protocols::InteractionModel::Status AllocatePushTransport(const TransportOptionsStruct & transportOptions,
+                                                              const uint16_t connectionID) override;
+
+    Protocols::InteractionModel::Status DeallocatePushTransport(const uint16_t connectionID) override;
+
+    Protocols::InteractionModel::Status ModifyPushTransport(const uint16_t connectionID,
+                                                            const TransportOptionsStorage transportOptions) override;
+
+    Protocols::InteractionModel::Status SetTransportStatus(const std::vector<uint16_t> connectionIDList,
+                                                           TransportStatusEnum transportStatus) override;
+
+    Protocols::InteractionModel::Status ManuallyTriggerTransport(
+        const uint16_t connectionID, TriggerActivationReasonEnum activationReason,
+        const Optional<Structs::TransportMotionTriggerTimeControlStruct::DecodableType> & timeControl) override;
+
+    bool ValidateUrl(const std::string & url) override;
+
+    Protocols::InteractionModel::Status
+    ValidateBandwidthLimit(StreamUsageEnum streamUsage, const Optional<DataModel::Nullable<uint16_t>> & videoStreamId,
+                           const Optional<DataModel::Nullable<uint16_t>> & audioStreamId) override;
+
+    Protocols::InteractionModel::Status SelectVideoStream(StreamUsageEnum streamUsage, uint16_t & videoStreamId) override;
+
+    Protocols::InteractionModel::Status SelectAudioStream(StreamUsageEnum streamUsage, uint16_t & audioStreamId) override;
+
+    Protocols::InteractionModel::Status ValidateVideoStream(uint16_t videoStreamId) override;
+
+    Protocols::InteractionModel::Status ValidateAudioStream(uint16_t audioStreamId) override;
+
+    PushAvStreamTransportStatusEnum GetTransportBusyStatus(const uint16_t connectionID) override;
+
+    void OnAttributeChanged(AttributeId attributeId) override;
+
+    CHIP_ERROR LoadCurrentConnections(std::vector<TransportConfigurationStorage> & currentConnections) override;
+
+    CHIP_ERROR PersistentAttributesLoadedCallback() override;
 
 private:
     std::vector<PushAvStream> pushavStreams;
