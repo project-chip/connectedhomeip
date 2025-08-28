@@ -14,19 +14,17 @@
 import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
 
-group("general-commissioning-server") {
-}
+source_set("general-commissioning-server") {
+  sources = [
+    "general-commissioning-cluster.cpp",
+    "general-commissioning-cluster.h",
+    "general-commissioning-logic.cpp",
+    "general-commissioning-logic.h",
+  ]
 
-# TODO: we have a dependency on GeneralCommissioning: setting a breadcrumb
-# via `GeneralCommissioning::SetBreadcrumb`. This should be decoupled when
-# GeneralCommissioning is turned into code-driven
-#
-# See https://github.com/project-chip/connectedhomeip/issues/39412
-#
-# This source set enablese other tests to share the coupling for test
-# purposes only (and breadcrumb setting in this case is a noop)
-source_set("test-only-temporary-coupling") {
-  sources = [ "TemporaryTestCoupling.cpp" ]
-  deps =
-      [ "${chip_root}/zzz_generated/app-common/clusters/GeneralCommissioning" ]
+  deps = [
+    "${chip_root}/src/app:app",
+    "${chip_root}/src/app/server-cluster",
+    "${chip_root}/zzz_generated/app-common/clusters/GeneralCommissioning",
+  ]
 }
