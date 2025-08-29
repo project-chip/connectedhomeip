@@ -332,7 +332,8 @@ CHIP_ERROR ASRFactoryDataProvider::SignWithDeviceAttestationKey(const ByteSpan &
     size_t pubKeyLen  = sizeof(pubKeyBuf);
     ReturnErrorOnFailure(ASRConfig::ReadFactoryConfigValue(ASR_DAC_KEY_PARTITION, privKeyBuf, privKeyLen, privKeyLen));
     ReturnErrorOnFailure(ASRConfig::ReadFactoryConfigValue(ASR_DAC_PUB_KEY_PARTITION, pubKeyBuf, pubKeyLen, pubKeyLen));
-    ReturnErrorOnFailure(keypair.HazardousOperationLoadKeypairFromRaw(ByteSpan(privKeyBuf, privKeyLen), ByteSpan(pubKeyBuf, pubKeyLen)));
+    ReturnErrorOnFailure(
+        keypair.HazardousOperationLoadKeypairFromRaw(ByteSpan(privKeyBuf, privKeyLen), ByteSpan(pubKeyBuf, pubKeyLen)));
 #endif
 
     ReturnErrorOnFailure(keypair.ECDSA_sign_msg(messageToSign.data(), messageToSign.size(), signature));

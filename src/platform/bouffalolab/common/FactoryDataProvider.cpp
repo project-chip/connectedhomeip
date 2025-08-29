@@ -121,7 +121,8 @@ CHIP_ERROR FactoryDataProvider::SignWithDeviceAttestationKey(const ByteSpan & me
 
     ReturnErrorOnFailure(chip::Crypto::ExtractPubkeyFromX509Cert(dacCert, dacPublicKey));
 
-    ReturnErrorOnFailure(keypair.HazardousOperationLoadKeypairFromRaw(dacPrivateKey, ByteSpan(dacPublicKey.Bytes(), dacPublicKey.Length())));
+    ReturnErrorOnFailure(
+        keypair.HazardousOperationLoadKeypairFromRaw(dacPrivateKey, ByteSpan(dacPublicKey.Bytes(), dacPublicKey.Length())));
     ReturnErrorOnFailure(keypair.ECDSA_sign_msg(messageToSign.data(), messageToSign.size(), signature));
 
     ReturnErrorOnFailure(CopySpanToMutableSpan(ByteSpan(signature.Bytes(), signature.Length()), outSignBuffer));

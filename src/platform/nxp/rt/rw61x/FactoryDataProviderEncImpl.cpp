@@ -253,8 +253,8 @@ CHIP_ERROR FactoryDataProviderImpl::SignWithDacKey(const ByteSpan & digestToSign
     ReturnLogErrorOnFailure(SearchForId(FactoryDataId::kDacPrivateKeyId, NULL, 0, keySize, &keyAddr));
     MutableByteSpan dacPrivateKeySpan((uint8_t *) keyAddr, keySize);
 
-    ReturnLogErrorOnFailure(keypair.HazardousOperationLoadKeypairFromRaw(ByteSpan(dacPrivateKeySpan.data(), dacPrivateKeySpan.size()),
-                                                       ByteSpan(dacPublicKey.Bytes(), dacPublicKey.Length())));
+    ReturnLogErrorOnFailure(keypair.HazardousOperationLoadKeypairFromRaw(
+        ByteSpan(dacPrivateKeySpan.data(), dacPrivateKeySpan.size()), ByteSpan(dacPublicKey.Bytes(), dacPublicKey.Length())));
 
     ReturnLogErrorOnFailure(keypair.ECDSA_sign_msg(digestToSign.data(), digestToSign.size(), signature));
 
