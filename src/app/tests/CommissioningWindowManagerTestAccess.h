@@ -31,14 +31,8 @@ class CommissioningWindowManagerTestAccess
 public:
     CommissioningWindowManagerTestAccess() = delete;
     CommissioningWindowManagerTestAccess(CommissioningWindowManager * cmwinMgr) : mcmwinMgr(cmwinMgr) {}
-    void SetPASESession(SessionHolderWithDelegate PASEsession)
-    {
-        auto optSession = PASEsession.Get();
-        if (optSession.HasValue())
-        {
-            mcmwinMgr->mPASESession.ShiftToSession(optSession.Value());
-        }
-    }
+
+    SessionHolderWithDelegate & GetPASESession() { return mcmwinMgr->mPASESession; }
 
 private:
     CommissioningWindowManager * mcmwinMgr = nullptr;
