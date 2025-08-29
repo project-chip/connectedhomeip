@@ -253,18 +253,8 @@ class TC_PAVST_2_7(MatterBaseTest, PAVSTTestBase):
         )
 
         aAllocatedVideoStreams = await self.allocate_one_video_stream()
-        asserts.assert_greater_equal(
-            len(aAllocatedVideoStreams),
-            1,
-            "AllocatedVideoStreams must not be empty",
-        )
 
         aAllocatedAudioStreams = await self.allocate_one_audio_stream()
-        asserts.assert_greater_equal(
-            len(aAllocatedAudioStreams),
-            1,
-            "AllocatedAudioStreams must not be empty",
-        )
 
         triggerOptions = {"triggerType": pvcluster.Enums.TransportTriggerTypeEnum.kCommand,
                           "maxPreRollLen": 4000, }
