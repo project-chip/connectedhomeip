@@ -619,6 +619,18 @@ public:
     CHIP_ERROR
     ContinueCommissioningAfterDeviceAttestation(DeviceProxy * device, Credentials::AttestationVerificationResult attestationResult);
 
+#if CHIP_DEVICE_CONFIG_ENABLE_NFC_BASED_COMMISSIONING
+    /**
+     * @brief
+     *   This method instructs the commissioner to proceed to the commissioning complete stage for a device
+     *   that had previously completed the unpowered stage phase of commissioning.
+     *
+     * @param[in] remoteDeviceId        The remote device Id.
+     */
+    CHIP_ERROR ContinueCommissioningAfterUnpoweredPhaseComplete(NodeId remoteDeviceId);
+#endif
+
+
     CHIP_ERROR GetDeviceBeingCommissioned(NodeId deviceId, CommissioneeDeviceProxy ** device);
 
     /**
