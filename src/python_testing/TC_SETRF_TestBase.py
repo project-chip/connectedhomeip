@@ -46,7 +46,7 @@ class CommodityTariffTestBaseHelper(MatterBaseTest):
     startDateAttributeValue: int = None
     defaultRandomizationType: cluster.Attributes.DefaultRandomizationType = None
     defaultRandomizationOffset: int = None
-    tariffInformationValue: cluster.Structs.TariffInformationStruct = None
+    tariffInfoValue: cluster.Structs.TariffInformationStruct = None
     tariffComponentsValue: List[cluster.Structs.TariffComponentStruct] = None
     currentTariffComponentsValue: List[cluster.Structs.TariffComponentStruct] = None
     nextTariffComponentsValue: List[cluster.Structs.TariffComponentStruct] = None
@@ -491,16 +491,16 @@ class CommodityTariffTestBaseHelper(MatterBaseTest):
             attribute_value (cluster.Structs.TariffInformationStruct, optional): TariffInfo attribute value. Defaults to None.
         """
 
-        self.tariffInformationValue = attribute_value
+        self.tariffInfoValue = attribute_value
         # if attribute value is not set, read it
-        if not self.tariffInformationValue:
-            self.tariffInformationValue = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.TariffInfo)
+        if not self.tariffInfoValue:
+            self.tariffInfoValue = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.TariffInfo)
 
         # if attribute value is not null it must be of type TariffInformationStruct
-        if self.tariffInformationValue is not NullValue:
+        if self.tariffInfoValue is not NullValue:
             asserts.assert_true(isinstance(
-                self.tariffInformationValue, cluster.Structs.TariffInformationStruct), "TariffInfo must be of type TariffInformationStruct")
-            await self.checkTariffInformationStruct(endpoint=endpoint, cluster=cluster, struct=self.tariffInformationValue)
+                self.tariffInfoValue, cluster.Structs.TariffInformationStruct), "TariffInfo must be of type TariffInformationStruct")
+            await self.checkTariffInformationStruct(endpoint=endpoint, cluster=cluster, struct=self.tariffInfoValue)
 
     async def check_tariff_unit_attribute(self, endpoint: int, attribute_value: Optional[Globals.Enums.TariffUnitEnum] = None) -> None:
         """Validate TariffUnit attribute.
@@ -513,7 +513,7 @@ class CommodityTariffTestBaseHelper(MatterBaseTest):
         if not attribute_value:
             attribute_value = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.TariffUnit)
 
-        if self.tariffInformationValue is not None and self.tariffInformationValue is NullValue:
+        if self.tariffInfoValue is not None and self.tariffInfoValue is NullValue:
             asserts.assert_equal(attribute_value, NullValue, "TariffUnit must be Null when TariffInfo is Null")
 
         # if attribute value is not null it must be of type TariffUnitEnum and in range 0 - 1
@@ -534,7 +534,7 @@ class CommodityTariffTestBaseHelper(MatterBaseTest):
         if not self.startDateAttributeValue:
             self.startDateAttributeValue = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.StartDate)
 
-        if self.tariffInformationValue is not None and self.tariffInformationValue is NullValue:
+        if self.tariffInfoValue is not None and self.tariffInfoValue is NullValue:
             asserts.assert_equal(self.startDateAttributeValue, NullValue, "StartDate must be Null when TariffInfo is Null")
 
         # if attribute value is not null it must be of type uint32
@@ -553,7 +553,7 @@ class CommodityTariffTestBaseHelper(MatterBaseTest):
         if not self.dayEntriesValue:
             self.dayEntriesValue = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.DayEntries)
 
-        if self.tariffInformationValue is not None and self.tariffInformationValue is NullValue:
+        if self.tariffInfoValue is not None and self.tariffInfoValue is NullValue:
             asserts.assert_equal(self.dayEntriesValue, NullValue, "DayEntries must be Null when TariffInfo is Null")
 
         # if attribute value is not null it must be list of DayEntryStruct
@@ -586,7 +586,7 @@ class CommodityTariffTestBaseHelper(MatterBaseTest):
         if not self.dayPatternsValue:
             self.dayPatternsValue = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.DayPatterns)
 
-        if self.tariffInformationValue is not None and self.tariffInformationValue is NullValue:
+        if self.tariffInfoValue is not None and self.tariffInfoValue is NullValue:
             asserts.assert_equal(self.dayPatternsValue, NullValue, "DayPatterns must be Null when TariffInfo is Null")
 
         # if attribute value is not null it must be list of DayPatternStruct with length in range 0 - 28
@@ -611,7 +611,7 @@ class CommodityTariffTestBaseHelper(MatterBaseTest):
         if not self.calendarPeriodsValue:
             self.calendarPeriodsValue = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.CalendarPeriods)
 
-        if self.tariffInformationValue is not None and self.tariffInformationValue is NullValue:
+        if self.tariffInfoValue is not None and self.tariffInfoValue is NullValue:
             asserts.assert_equal(self.calendarPeriodsValue, NullValue, "CalendarPeriods must be Null when TariffInfo is Null")
 
         # if attribute value is not null it must be list of CalendarPeriodStruct with length in range 1 - 4
@@ -653,7 +653,7 @@ class CommodityTariffTestBaseHelper(MatterBaseTest):
         if not self.individualDayValue:
             self.individualDayValue = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.IndividualDays)
 
-        if self.tariffInformationValue is not None and self.tariffInformationValue is NullValue:
+        if self.tariffInfoValue is not None and self.tariffInfoValue is NullValue:
             asserts.assert_equal(self.individualDayValue, NullValue, "IndividualDays must be Null when TariffInfo is Null")
 
         # if attribute value is not null it must be list of DayStruct with length in range 0 - 50
@@ -684,7 +684,7 @@ class CommodityTariffTestBaseHelper(MatterBaseTest):
         if not self.currentDayValue:
             self.currentDayValue = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.CurrentDay)
 
-        if self.tariffInformationValue is not None and self.tariffInformationValue is NullValue:
+        if self.tariffInfoValue is not None and self.tariffInfoValue is NullValue:
             asserts.assert_equal(self.currentDayValue, NullValue, "CurrentDay must be Null when TariffInfo is Null")
 
         # if attribute value is not null it must be DayStruct
@@ -704,7 +704,7 @@ class CommodityTariffTestBaseHelper(MatterBaseTest):
         if not attribute_value:
             attribute_value = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.NextDay)
 
-        if self.tariffInformationValue is not None and self.tariffInformationValue is NullValue:
+        if self.tariffInfoValue is not None and self.tariffInfoValue is NullValue:
             asserts.assert_equal(attribute_value, NullValue, "NextDay must be Null when TariffInfo is Null")
 
         # if attribute value is not null it must be DayStruct
@@ -724,7 +724,7 @@ class CommodityTariffTestBaseHelper(MatterBaseTest):
         if not attribute_value:
             attribute_value = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.CurrentDayEntry)
 
-        if self.tariffInformationValue is not None and self.tariffInformationValue is NullValue:
+        if self.tariffInfoValue is not None and self.tariffInfoValue is NullValue:
             asserts.assert_equal(attribute_value, NullValue, "CurrentDayEntry must be Null when TariffInfo is Null")
 
         # if attribute value is not null it must be DayEntryStruct
@@ -744,7 +744,7 @@ class CommodityTariffTestBaseHelper(MatterBaseTest):
         if not self.currentDayEntryDateValue:
             self.currentDayEntryDateValue = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.CurrentDayEntryDate)
 
-        if self.tariffInformationValue is not None and self.tariffInformationValue is NullValue:
+        if self.tariffInfoValue is not None and self.tariffInfoValue is NullValue:
             asserts.assert_equal(self.currentDayEntryDateValue, NullValue,
                                  "CurrentDayEntryDate must be Null when TariffInfo is Null")
 
@@ -763,7 +763,7 @@ class CommodityTariffTestBaseHelper(MatterBaseTest):
         if not attribute_value:
             attribute_value = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.NextDayEntry)
 
-        if self.tariffInformationValue is not None and self.tariffInformationValue is NullValue:
+        if self.tariffInfoValue is not None and self.tariffInfoValue is NullValue:
             asserts.assert_equal(attribute_value, NullValue, "NextDayEntry must be Null when TariffInfo is Null")
 
         # if attribute value is not null it must be DayEntryStruct
@@ -784,7 +784,7 @@ class CommodityTariffTestBaseHelper(MatterBaseTest):
         if not self.nextDayEntryDateValue:
             self.nextDayEntryDateValue = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.NextDayEntryDate)
 
-        if self.tariffInformationValue is not None and self.tariffInformationValue is NullValue:
+        if self.tariffInfoValue is not None and self.tariffInfoValue is NullValue:
             asserts.assert_equal(self.nextDayEntryDateValue, NullValue, "NextDayEntryDate must be Null when TariffInfo is Null")
 
         # if attribute value is not null it must be uint32 and greater than CurrentDayEntryDate
@@ -805,7 +805,7 @@ class CommodityTariffTestBaseHelper(MatterBaseTest):
         if not self.tariffComponentsValue:
             self.tariffComponentsValue = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.TariffComponents)
 
-        if self.tariffInformationValue is not None and self.tariffInformationValue is NullValue:
+        if self.tariffInfoValue is not None and self.tariffInfoValue is NullValue:
             asserts.assert_equal(self.tariffComponentsValue, NullValue, "TariffComponents must be empty when TariffInfo is Null")
 
         # if attribute value is not null it must be list of TariffComponentStruct
@@ -830,7 +830,7 @@ class CommodityTariffTestBaseHelper(MatterBaseTest):
         if not self.tariffPeriodsValue:
             self.tariffPeriodsValue = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.TariffPeriods)
 
-        if self.tariffInformationValue is not None and self.tariffInformationValue is NullValue:
+        if self.tariffInfoValue is not None and self.tariffInfoValue is NullValue:
             asserts.assert_equal(self.tariffPeriodsValue, NullValue, "TariffPeriods must be empty when TariffInfo is Null")
 
         # if attribute value is not null it must be list of TariffPeriodStruct
@@ -856,7 +856,7 @@ class CommodityTariffTestBaseHelper(MatterBaseTest):
         if not self.currentTariffComponentsValue:
             self.currentTariffComponentsValue = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.CurrentTariffComponents)
 
-        if self.tariffInformationValue is not None and self.tariffInformationValue is NullValue:
+        if self.tariffInfoValue is not None and self.tariffInfoValue is NullValue:
             asserts.assert_equal(self.currentTariffComponentsValue, NullValue,
                                  "CurrentTariffComponents must be Null when TariffInfo is Null")
 
@@ -883,7 +883,7 @@ class CommodityTariffTestBaseHelper(MatterBaseTest):
         if not self.nextTariffComponentsValue:
             self.nextTariffComponentsValue = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.NextTariffComponents)
 
-        if self.tariffInformationValue is not None and self.tariffInformationValue is NullValue:
+        if self.tariffInfoValue is not None and self.tariffInfoValue is NullValue:
             asserts.assert_equal(self.nextTariffComponentsValue, NullValue,
                                  "NextTariffComponents must be Null when TariffInfo is Null")
 
@@ -911,7 +911,7 @@ class CommodityTariffTestBaseHelper(MatterBaseTest):
             if await self.attribute_guard(endpoint=endpoint, attribute=cluster.Attributes.DefaultRandomizationOffset):
                 self.defaultRandomizationOffset = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.DefaultRandomizationOffset)
 
-        if self.tariffInformationValue is not None and self.tariffInformationValue is NullValue:
+        if self.tariffInfoValue is not None and self.tariffInfoValue is NullValue:
             asserts.assert_equal(self.defaultRandomizationOffset, NullValue,
                                  "DefaultRandomizationOffset must be Null when TariffInfo is Null")
 
@@ -941,7 +941,7 @@ class CommodityTariffTestBaseHelper(MatterBaseTest):
             if await self.attribute_guard(endpoint=endpoint, attribute=cluster.Attributes.DefaultRandomizationType):
                 self.defaultRandomizationType = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.DefaultRandomizationType)
 
-        if self.tariffInformationValue is not None and self.tariffInformationValue is NullValue:
+        if self.tariffInfoValue is not None and self.tariffInfoValue is NullValue:
             asserts.assert_equal(self.defaultRandomizationType, NullValue,
                                  "DefaultRandomizationType must be Null when TariffInfo is Null")
 
@@ -1010,18 +1010,31 @@ class CommodityTariffTestBaseHelper(MatterBaseTest):
 
         return weekDays[dayOfWeek]
 
-    async def get_day_entry_IDs_from_tariff_periods_for_particular_tariff_component(self, tariff_componentID: int, tariff_periods: List[cluster.Structs.TariffPeriodStruct]) -> List[int]:
+    async def get_day_entry_IDs_from_tariff_periods_for_particular_tariff_component(self, tariff_componentID: int) -> List[int]:
         """Extracts DayEntryIDs field values from the list of TariffPeriodStruct where particular TariffComponentID is present.
 
         Args:
             tariff_componentID (int): TariffComponentID to search for in TariffComponentIDs field.
-            tariff_periods (List[cluster.Structs.TariffPeriodStruct]): List of TariffPeriodStruct entities.
 
         Returns:
             List[int]: List of all DayEntryIDs from the list of TariffPeriodStruct where particular TariffComponentID is present.
         """
 
-        return sorted(set([dayEntryID for tariff_period in tariff_periods if tariff_componentID in tariff_period.tariffComponentIDs for dayEntryID in tariff_period.dayEntryIDs]))
+        return sorted(set([dayEntryID for tariff_period in self.tariffPeriodsValue if tariff_componentID in tariff_period.tariffComponentIDs for dayEntryID in tariff_period.dayEntryIDs]))
+
+    async def get_tariff_period_label_for_particular_tariff_component(self, tariff_componentID: int) -> List[int]:
+        """Gets Label field from the TariffPeriodStruct where particular TariffComponentID is present.
+
+        Args:
+            tariff_componentID (int): TariffComponentID to search for in TariffComponentIDs field.
+
+        Returns:
+            List[int]: Label field from the TariffPeriodStruct where particular TariffComponentID is present.
+        """
+
+        for tariff_period in self.tariffPeriodsValue:
+            if tariff_componentID in tariff_period.tariffComponentIDs:
+                return tariff_period.label
 
     async def get_tariff_components_IDs_from_tariff_components_attribute(self, tariff_components: List[cluster.Structs.TariffComponentStruct]) -> List[int]:
         """Extracts TariffComponentIDs from the list of TariffComponentStruct entities.

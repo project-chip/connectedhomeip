@@ -147,14 +147,14 @@ class TC_SETRF_2_2(CommodityTariffTestBaseHelper):
         await self.check_tariff_components_attribute(endpoint, self.tariffComponentsValue)
         tariffComponentIDs.extend(await self.get_tariff_components_IDs_from_tariff_components_attribute(self.tariffComponentsValue))
         tariffComponentID1 = self.tariffComponentsValue[0].tariffComponentID
-        label1 = self.tariffComponentsValue[0].label
         tariffComponentStruct1 = self.tariffComponentsValue[0]
 
         self.step("5")
         # TH reads TariffPeriods attribute, expects a list of TariffPeriodStruct
         self.tariffPeriodsValue = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.TariffPeriods)
         await self.check_tariff_periods_attribute(endpoint, self.tariffPeriodsValue)
-        dayEntryIDs1 = await self.get_day_entry_IDs_from_tariff_periods_for_particular_tariff_component(tariffComponentID1, self.tariffPeriodsValue)
+        dayEntryIDs1 = await self.get_day_entry_IDs_from_tariff_periods_for_particular_tariff_component(tariffComponentID1)
+        label1 = await self.get_tariff_period_label_for_particular_tariff_component(tariffComponentID1)
 
         self.step("6")
         # TH sends command GetTariffComponent command with TariffComponentID field set ID of the first TariffComponentStruct, expects a GetTariffComponentResponse
@@ -171,7 +171,7 @@ class TC_SETRF_2_2(CommodityTariffTestBaseHelper):
             matter_asserts.assert_is_string(result.label, "Label must be a string.")
             matter_asserts.assert_string_length(result.label, "Label must be between 0 and 128 characters.", 0, 128)
             asserts.assert_equal(
-                result.label, label1, "Label field must be equal to the label field of the first TariffComponentStruct in TariffComponents attribute.")
+                result.label, label1, "Label field must be equal to the label field of the TariffPeriodStruct where first TariffComponentID is present.")
 
         matter_asserts.assert_list(result.dayEntryIDs, "DayEntryIDs attribute must return a list.", 1, 96)
         for item in result.dayEntryIDs:
