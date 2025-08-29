@@ -7,12 +7,12 @@ runs:
       if: ${{ runner.os == 'Linux' }}
       shell: bash
       run: |
-          ip netns add peer
+          sudo ip netns add peer
 
-          ip link add name veth0 type veth peer name veth0-peer
-          ip -6 addr add fd00:0:1:1::1/64 dev veth0
-          ip link set dev veth0 up
+          sudo ip link add name veth0 type veth peer name veth0-peer
+          sudo ip -6 addr add fd00:0:1:1::1/64 dev veth0
+          sudo ip link set dev veth0 up
 
-          ip link set veth0-peer netns peer
-          ip netns exec peer ip -6 addr add fd00:0:1:1::2/64 dev veth0-peer
-          ip netns exec peer ip link set dev veth0-peer up
+          sudo ip link set veth0-peer netns peer
+          sudo ip netns exec peer ip -6 addr add fd00:0:1:1::2/64 dev veth0-peer
+          sudo ip netns exec peer ip link set dev veth0-peer up
