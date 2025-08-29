@@ -34,8 +34,9 @@ using namespace chip::app::Clusters::ClosureDimension;
 namespace {
 // Define a constant for the countdown time
 constexpr uint32_t kCountdownTimeSeconds          = 10;
+constexpr uint32_t kCalibrateCountdownTimeMs      = 3000; // 3 seconds for calibrate motion
 constexpr uint32_t kMotionCountdownTimeMs         = 1000; // 1 second for each motion.
-constexpr chip::Percent100ths kMotionPositionStep = 1000; // 10% of the total range per motion interval.
+constexpr chip::Percent100ths kMotionPositionStep = 2000; // 20% of the total range per motion interval.
 
 // Define the Namespace and Tag for the endpoint
 // Derived from https://github.com/CHIP-Specifications/connectedhomeip-spec/blob/master/src/namespaces/Namespace-Closure.adoc
@@ -169,7 +170,7 @@ CHIP_ERROR ClosureManager::SetClosurePanelInitialState(ClosureDimensionEndpoint 
     ReturnErrorOnFailure(closurePanelEndpoint.GetLogic().SetTargetState(targetState));
 
     ReturnErrorOnFailure(closurePanelEndpoint.GetLogic().SetResolution(Percent100ths(100)));
-    ReturnErrorOnFailure(closurePanelEndpoint.GetLogic().SetStepValue(1000));
+    ReturnErrorOnFailure(closurePanelEndpoint.GetLogic().SetStepValue(2000));
     ReturnErrorOnFailure(closurePanelEndpoint.GetLogic().SetUnit(ClosureUnitEnum::kMillimeter));
     ReturnErrorOnFailure(closurePanelEndpoint.GetLogic().SetUnitRange(
         ClosureDimension::Structs::UnitRangeStruct::Type{ .min = static_cast<int16_t>(0), .max = static_cast<int16_t>(10000) }));
@@ -198,7 +199,7 @@ chip::Protocols::InteractionModel::Status ClosureManager::OnCalibrateCommand()
 
     // For sample application, we are using a timer to simulate the hardware calibration action.
     // In a real application, this would be replaced with actual calibration logic and call HandleClosureActionComplete.
-    VerifyOrReturnValue(DeviceLayer::SystemLayer().StartTimer(System::Clock::Seconds32(kCountdownTimeSeconds),
+    VerifyOrReturnValue(DeviceLayer::SystemLayer().StartTimer(System::Clock::Milliseconds32(kCalibrateCountdownTimeMs),
                                                               HandleEp1ClosureActionTimer, nullptr) == CHIP_NO_ERROR,
                         Status::Failure, ChipLogError(AppServer, "Failed to start closure action timer"));
 
@@ -275,16 +276,16 @@ ClosureManager::OnMoveToCommand(const Optional<TargetPositionEnum> & position, c
             ep3Position = static_cast<chip::Percent100ths>(0);
             break;
         case TargetPositionEnum::kMoveToPedestrianPosition:
-            ep2Position = static_cast<chip::Percent100ths>(3000);
-            ep3Position = static_cast<chip::Percent100ths>(3000);
+            ep2Position = static_cast<chip::Percent100ths>(6000);
+            ep3Position = static_cast<chip::Percent100ths>(6000);
             break;
         case TargetPositionEnum::kMoveToSignaturePosition:
-            ep2Position = static_cast<chip::Percent100ths>(2000);
-            ep3Position = static_cast<chip::Percent100ths>(2000);
+            ep2Position = static_cast<chip::Percent100ths>(4000);
+            ep3Position = static_cast<chip::Percent100ths>(4000);
             break;
         case TargetPositionEnum::kMoveToVentilationPosition:
-            ep2Position = static_cast<chip::Percent100ths>(1000);
-            ep3Position = static_cast<chip::Percent100ths>(1000);
+            ep2Position = static_cast<chip::Percent100ths>(2000);
+            ep3Position = static_cast<chip::Percent100ths>(2000);
             break;
         default:
             ChipLogError(AppServer, "Invalid target position received in OnMoveToCommand");
@@ -750,7 +751,11 @@ void ClosureManager::HandlePanelStepAction(EndpointId endpointId)
         }
         else
         {
-            nextCurrentPosition = std::max(static_cast<chip::Percent100ths>(currentPosition - stepValue), targetPosition);
+            // Underflow protection: if currentPosition <= stepValue, set to 0.
+            chip::Percent100ths decreasedCurrentPosition = (currentPosition > stepValue)
+                ? static_cast<chip::Percent100ths>(currentPosition - stepValue)
+                : static_cast<chip::Percent100ths>(0);
+            nextCurrentPosition                          = std::max(decreasedCurrentPosition, targetPosition);
         }
 
         panelCurrentState.Value().position.SetValue(DataModel::MakeNullable(nextCurrentPosition));
@@ -931,14 +936,18 @@ bool ClosureManager::GetPanelNextPosition(const GenericDimensionStateStruct & cu
 
     if (currentPosition < targetPosition)
     {
-        // Increment position by 1000 units, capped at target.
+        // Increment position by 2000 units, capped at target.
+        // No overflow handling needed due to currentposition max value is 10000
         nextPosition.SetNonNull(std::min(static_cast<chip::Percent100ths>(currentPosition + kMotionPositionStep), targetPosition));
     }
     else if (currentPosition > targetPosition)
     {
-        // Moving down: Decreasing the current position by a step of 1000 units,
+        // Handling overflow for CurrentPosition
+        chip::Percent100ths newCurrentPosition =
+            (currentPosition > kMotionPositionStep) ? currentPosition - kMotionPositionStep : 0;
+        // Moving down: Decreasing the current position by a step of 2000 units,
         // ensuring it does not go below the target position.
-        nextPosition.SetNonNull(std::max(static_cast<chip::Percent100ths>(currentPosition - kMotionPositionStep), targetPosition));
+        nextPosition.SetNonNull(std::max(newCurrentPosition, targetPosition));
     }
     else
     {
