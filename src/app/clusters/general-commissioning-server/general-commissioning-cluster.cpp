@@ -64,6 +64,16 @@ DataModel::ActionReturnStatus GeneralCommissioningCluster::ReadAttribute(const D
     case ClusterRevision::Id: {
         return encoder.Encode(GeneralCommissioning::kRevision);
     }
+    case Breadcrumb::Id: {
+        uint64_t breadcrumbValue = 0;
+        Protocols::InteractionModel::Status status = Breadcrumb::Get(request.path.mEndpointId, &breadcrumbValue);
+        if (status != Protocols::InteractionModel::Status::Success)
+        {
+            printf("reached failure for breadcrumb");
+            return status;
+        }
+        return encoder.Encode(breadcrumbValue);
+    }
     case RegulatoryConfig::Id: {
         return mLogic.ReadIfSupported(&ConfigurationManager::GetRegulatoryLocation, encoder);
     }
