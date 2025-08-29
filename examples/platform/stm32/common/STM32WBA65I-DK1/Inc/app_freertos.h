@@ -1,21 +1,21 @@
 /* USER CODE BEGIN Header */
 /**
-  ******************************************************************************
-  * @file    app_freertos.h
-  * @author  MCD Application Team
-  * @brief   FreeRTOS applicative header file
-  ******************************************************************************
-    * @attention
-  *
-  * Copyright (c) 2023 STMicroelectronics.
-  * All rights reserved.
-  *
-  * This software is licensed under terms that can be found in the LICENSE file
-  * in the root directory of this software component.
-  * If no LICENSE file comes with this software, it is provided AS-IS.
-  *
-  ******************************************************************************
-  */
+ ******************************************************************************
+ * @file    app_freertos.h
+ * @author  MCD Application Team
+ * @brief   FreeRTOS applicative header file
+ ******************************************************************************
+ * @attention
+ *
+ * Copyright (c) 2023 STMicroelectronics.
+ * All rights reserved.
+ *
+ * This software is licensed under terms that can be found in the LICENSE file
+ * in the root directory of this software component.
+ * If no LICENSE file comes with this software, it is provided AS-IS.
+ *
+ ******************************************************************************
+ */
 /* USER CODE END Header */
 
 /* Define to prevent recursive inclusion -------------------------------------*/
@@ -23,14 +23,13 @@
 #define __APP_FREERTOS_H
 
 #ifdef __cplusplus
- extern "C" {
+extern "C" {
 #endif
 
 /* Includes ------------------------------------------------------------------*/
 #include "FreeRTOS.h"
-#include "task.h"
 #include "cmsis_os2.h"
-
+#include "task.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
@@ -39,7 +38,7 @@
 
 /* Exported types ------------------------------------------------------------*/
 /* USER CODE BEGIN ET */
-extern osMutexId_t             LinkLayerMutex;
+extern osMutexId_t LinkLayerMutex;
 /* USER CODE END ET */
 
 /* Exported constants --------------------------------------------------------*/
@@ -48,7 +47,7 @@ extern osMutexId_t             LinkLayerMutex;
 /* USER CODE END EC */
 
 /* External variables --------------------------------------------------------*/
-extern void* p_param;
+extern void * p_param;
 /* USER CODE BEGIN EV */
 
 /* USER CODE END EV */
@@ -76,7 +75,6 @@ extern void* p_param;
 /* USER CODE END EFP */
 
 /* USER CODE BEGIN 1 */
-
 
 /* USER CODE END 1 */
 

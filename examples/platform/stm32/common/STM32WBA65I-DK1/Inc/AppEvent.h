@@ -16,11 +16,11 @@
  *    limitations under the License.
  */
 
+#include <stdarg.h>
 #include <stdint.h>
-#include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <stdarg.h>
+#include <string.h>
 
 #ifndef APP_EVENT_H
 #define APP_EVENT_H
@@ -28,10 +28,8 @@
 struct AppEvent;
 typedef void (*EventHandler)(AppEvent *);
 
-struct AppEvent
-{
-    enum AppEventTypes
-    {
+struct AppEvent {
+    enum AppEventTypes {
         kEventType_Button = 0,
         kEventType_Timer,
         kEventType_Level,
@@ -40,8 +38,7 @@ struct AppEvent
 
     uint16_t Type;
 
-    union
-    {
+    union {
         struct
         {
             uint8_t ButtonIdx;

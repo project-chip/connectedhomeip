@@ -23,14 +23,11 @@
 
 #include <functional>
 
-
 #include <lib/core/CHIPError.h>
 
-class LightingManager
-{
+class LightingManager {
 public:
-    enum Action_t
-    {
+    enum Action_t {
         ON_ACTION = 0,
         OFF_ACTION,
         LEVEL_ACTION,
@@ -39,8 +36,7 @@ public:
         INVALID_ACTION
     } Action;
 
-    enum State_t
-    {
+    enum State_t {
         kState_On = 0,
         kState_Off,
     } State;
@@ -59,7 +55,6 @@ private:
     State_t mState;
     uint8_t mLevel;
 
-
     LightingCallback_fn mActionInitiated_CB;
     LightingCallback_fn mActionCompleted_CB;
 
@@ -68,7 +63,6 @@ private:
     void UpdateLight();
 
     static LightingManager sLight;
-
 };
 
 inline LightingManager & LightingMgr(void)

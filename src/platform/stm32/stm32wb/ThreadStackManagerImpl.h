@@ -37,92 +37,91 @@ extern "C" void otSysEventSignalPending(void);
 namespace chip {
 namespace DeviceLayer {
 
-class ThreadStackManager;
-class ThreadStackManagerImpl;
-namespace Internal {
-extern int GetEntropy(uint8_t * buf, size_t bufSize);
-}
+    class ThreadStackManager;
+    class ThreadStackManagerImpl;
+    namespace Internal {
+        extern int GetEntropy(uint8_t * buf, size_t bufSize);
+    }
 
-/**
- * Concrete implementation of the ThreadStackManager singleton object for stm32 platforms
- * using the OpenThread stack.
- */
-class ThreadStackManagerImpl final : public ThreadStackManager,
-                                     public Internal::GenericThreadStackManagerImpl_OpenThread<ThreadStackManagerImpl>,
-                                     public Internal::GenericThreadStackManagerImpl_FreeRTOS<ThreadStackManagerImpl>
-{
-    // Allow the ThreadStackManager interface class to delegate method calls to
-    // the implementation methods provided by this class.
-    friend class ThreadStackManager;
+    /**
+     * Concrete implementation of the ThreadStackManager singleton object for stm32 platforms
+     * using the OpenThread stack.
+     */
+    class ThreadStackManagerImpl final : public ThreadStackManager,
+                                         public Internal::GenericThreadStackManagerImpl_OpenThread<ThreadStackManagerImpl>,
+                                         public Internal::GenericThreadStackManagerImpl_FreeRTOS<ThreadStackManagerImpl> {
+        // Allow the ThreadStackManager interface class to delegate method calls to
+        // the implementation methods provided by this class.
+        friend class ThreadStackManager;
 
-    // Allow the generic implementation base classes to call helper methods on
-    // this class.
+        // Allow the generic implementation base classes to call helper methods on
+        // this class.
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
-    friend Internal::GenericThreadStackManagerImpl_OpenThread<ThreadStackManagerImpl>;
-    friend Internal::GenericThreadStackManagerImpl_OpenThread<ThreadStackManagerImpl>;
-    friend Internal::GenericThreadStackManagerImpl_FreeRTOS<ThreadStackManagerImpl>;
+        friend Internal::GenericThreadStackManagerImpl_OpenThread<ThreadStackManagerImpl>;
+        friend Internal::GenericThreadStackManagerImpl_OpenThread<ThreadStackManagerImpl>;
+        friend Internal::GenericThreadStackManagerImpl_FreeRTOS<ThreadStackManagerImpl>;
 #endif
 
-    // Allow glue functions called by OpenThread to call helper methods on this
-    // class.
-    friend void ::otTaskletsSignalPending(otInstance * otInst);
-    friend void ::otSysEventSignalPending(void);
+        // Allow glue functions called by OpenThread to call helper methods on this
+        // class.
+        friend void ::otTaskletsSignalPending(otInstance * otInst);
+        friend void ::otSysEventSignalPending(void);
 
-public:
-    // ===== Platform-specific members that may be accessed directly by the application.
+    public:
+        // ===== Platform-specific members that may be accessed directly by the application.
 
-    using ThreadStackManager::InitThreadStack;
-    CHIP_ERROR InitThreadStack(otInstance * otInst);
-    void SendThreadmsg();
+        using ThreadStackManager::InitThreadStack;
+        CHIP_ERROR InitThreadStack(otInstance * otInst);
+        void SendThreadmsg();
 
-    CHIP_ERROR SetThreadEnabled(bool val);
+        CHIP_ERROR SetThreadEnabled(bool val);
 
-protected:
-    CHIP_ERROR _StartThreadTask();
+    protected:
+        CHIP_ERROR _StartThreadTask();
 
-    void _ProcessThreadActivity();
+        void _ProcessThreadActivity();
 
-private:
-    // ===== Methods that implement the ThreadStackManager abstract interface.
+    private:
+        // ===== Methods that implement the ThreadStackManager abstract interface.
 
-    CHIP_ERROR _InitThreadStack(void);
+        CHIP_ERROR _InitThreadStack(void);
 
-    // ===== Members for internal use by the following friends.
+        // ===== Members for internal use by the following friends.
 
-    friend ThreadStackManager & ::chip::DeviceLayer::ThreadStackMgr(void);
-    friend ThreadStackManagerImpl & ::chip::DeviceLayer::ThreadStackMgrImpl(void);
-    friend int Internal::GetEntropy(uint8_t * buf, size_t bufSize);
+        friend ThreadStackManager & ::chip::DeviceLayer::ThreadStackMgr(void);
+        friend ThreadStackManagerImpl & ::chip::DeviceLayer::ThreadStackMgrImpl(void);
+        friend int Internal::GetEntropy(uint8_t * buf, size_t bufSize);
 
-    static ThreadStackManagerImpl sInstance;
+        static ThreadStackManagerImpl sInstance;
 
-    static bool IsInitialized();
+        static bool IsInitialized();
 
-    // ===== Private members for use by this class only.
+        // ===== Private members for use by this class only.
 
-    ThreadStackManagerImpl() = default;
-};
+        ThreadStackManagerImpl() = default;
+    };
 
-/**
- * Returns the public interface of the ThreadStackManager singleton object.
- *
- * chip applications should use this to access features of the ThreadStackManager object
- * that are common to all platforms.
- */
-inline ThreadStackManager & ThreadStackMgr(void)
-{
-    return ThreadStackManagerImpl::sInstance;
-}
+    /**
+     * Returns the public interface of the ThreadStackManager singleton object.
+     *
+     * chip applications should use this to access features of the ThreadStackManager object
+     * that are common to all platforms.
+     */
+    inline ThreadStackManager & ThreadStackMgr(void)
+    {
+        return ThreadStackManagerImpl::sInstance;
+    }
 
-/**
- * Returns the platform-specific implementation of the ThreadStackManager singleton object.
- *
- * chip applications can use this to gain access to features of the ThreadStackManager
- * that are specific to the platform.
- */
-inline ThreadStackManagerImpl & ThreadStackMgrImpl(void)
-{
-    return ThreadStackManagerImpl::sInstance;
-}
+    /**
+     * Returns the platform-specific implementation of the ThreadStackManager singleton object.
+     *
+     * chip applications can use this to gain access to features of the ThreadStackManager
+     * that are specific to the platform.
+     */
+    inline ThreadStackManagerImpl & ThreadStackMgrImpl(void)
+    {
+        return ThreadStackManagerImpl::sInstance;
+    }
 
 } // namespace DeviceLayer
 } // namespace chip

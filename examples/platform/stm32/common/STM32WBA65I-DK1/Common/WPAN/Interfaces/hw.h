@@ -1,20 +1,20 @@
 /**
-  ******************************************************************************
-  * @file    hw.h
-  * @author  MCD Application Team
-  * @brief   This file contains the interface of STM32 HW drivers.
-  ******************************************************************************
-  * @attention
-  *
-  * Copyright (c) 2024 STMicroelectronics.
-  * All rights reserved.
-  *
-  * This software is licensed under terms that can be found in the LICENSE file
-  * in the root directory of this software component.
-  * If no LICENSE file comes with this software, it is provided AS-IS.
-  *
-  ******************************************************************************
-  */
+ ******************************************************************************
+ * @file    hw.h
+ * @author  MCD Application Team
+ * @brief   This file contains the interface of STM32 HW drivers.
+ ******************************************************************************
+ * @attention
+ *
+ * Copyright (c) 2024 STMicroelectronics.
+ * All rights reserved.
+ *
+ * This software is licensed under terms that can be found in the LICENSE file
+ * in the root directory of this software component.
+ * If no LICENSE file comes with this software, it is provided AS-IS.
+ *
+ ******************************************************************************
+ */
 
 #ifndef HW_H__
 #define HW_H__
@@ -31,10 +31,9 @@
 #endif
 
 /* Return values definition */
-enum
-{
-  HW_OK     = 0,
-  HW_BUSY   = 1
+enum {
+    HW_OK = 0,
+    HW_BUSY = 1
 };
 
 /*
@@ -43,7 +42,7 @@ enum
  * This function must be called once after reset before calling any of the
  * other HW functions.
  */
-extern void HW_Init( void );
+extern void HW_Init(void);
 
 /*
  * HW_Delay
@@ -55,19 +54,19 @@ extern void HW_Init( void );
  * if the function is interrupted.
  * The function is declared "weak" and can be overloaded by the user.
  */
-extern void HW_Delay( uint32_t delay_us );
+extern void HW_Delay(uint32_t delay_us);
 
 /*
  * HW_GetPackageType
  *
  * Returns the package type (cf Package Data Register in STM32WB UM)
  */
-extern uint32_t HW_GetPackageType( void );
+extern uint32_t HW_GetPackageType(void);
 
 /*
  * HW_Config_HSE
  */
-void HW_Config_HSE( uint8_t hsetune );
+void HW_Config_HSE(uint8_t hsetune);
 
 /* ---------------------------------------------------------------------------
  *                                 AES
@@ -75,12 +74,11 @@ void HW_Config_HSE( uint8_t hsetune );
  */
 
 /* Mode definitions used for HW_AES_SetKey() function */
-enum
-{
-  HW_AES_DEC     = 0,
-  HW_AES_ENC     = 1,
-  HW_AES_REV     = 2,
-  HW_AES_SWAP    = 4
+enum {
+    HW_AES_DEC = 0,
+    HW_AES_ENC = 1,
+    HW_AES_REV = 2,
+    HW_AES_SWAP = 4
 };
 
 /*
@@ -91,7 +89,7 @@ enum
  * otherwise it returns 1.
  * Be careful: no re-entrance is ensured for the HW_AES functions
  */
-extern int HW_AES_Enable( void );
+extern int HW_AES_Enable(void);
 
 /*
  * HW_AES_SetKey
@@ -101,8 +99,8 @@ extern int HW_AES_Enable( void );
  * HW_AES_DEC for decryption. It can be or-ed with HW_AES_REV for a reveresd
  * oreder of key bytes, and with HW_AES_SWAP to use data byte swapping mode.
  */
-extern void HW_AES_SetKey( uint32_t mode,
-                           const uint8_t* key );
+extern void HW_AES_SetKey(uint32_t mode,
+    const uint8_t * key);
 
 /*
  * HW_AES_Crypt
@@ -110,8 +108,8 @@ extern void HW_AES_SetKey( uint32_t mode,
  * Encrypts/decrypts the 16-byte input data ("input"). Result is written in the
  * 16-byte buffer ("output") allocated by the user.
  */
-extern void HW_AES_Crypt( const uint32_t* input,
-                          uint32_t* output );
+extern void HW_AES_Crypt(const uint32_t * input,
+    uint32_t * output);
 
 /*
  * HW_AES_Crypt
@@ -121,14 +119,14 @@ extern void HW_AES_Crypt( const uint32_t* input,
  *
  * Note : input & output are 8 bits aligned.
  */
-extern void HW_AES_Crypt8( const uint8_t* input, uint8_t* output );
+extern void HW_AES_Crypt8(const uint8_t * input, uint8_t * output);
 
 /*
  * HW_AES_Disable
  *
  * Disables the AES hardware block.
  */
-extern void HW_AES_Disable( void );
+extern void HW_AES_Disable(void);
 
 /*
  * HW_AES_InitCcm
@@ -137,10 +135,10 @@ extern void HW_AES_Disable( void );
  * Note: B0 and B1 4-word blocks must be provided by user.
  *
  */
-extern void HW_AES_InitCcm( uint8_t decrypt,
-                            const uint8_t* key,
-                            const uint32_t* b0,
-                            const uint32_t* b1 );
+extern void HW_AES_InitCcm(uint8_t decrypt,
+    const uint8_t * key,
+    const uint32_t * b0,
+    const uint32_t * b1);
 
 /*
  * HW_AES_EndCcm
@@ -148,8 +146,8 @@ extern void HW_AES_InitCcm( uint8_t decrypt,
  * Completes CCM processing by computing the authentication tag
  *
  */
-extern void HW_AES_EndCcm( uint8_t tag_length,
-                           uint8_t* tag );
+extern void HW_AES_EndCcm(uint8_t tag_length,
+    uint8_t * tag);
 
 /*
  * HW_AES_SetLast
@@ -158,7 +156,7 @@ extern void HW_AES_EndCcm( uint8_t tag_length,
  * case of decryption
  *
  */
-extern void HW_AES_SetLast( uint8_t left_length );
+extern void HW_AES_SetLast(uint8_t left_length);
 
 /* ---------------------------------------------------------------------------
  *                                 PKA
@@ -178,7 +176,7 @@ extern void HW_AES_SetLast( uint8_t left_length );
  * dedicated functions.
  * Be careful: no re-entrance is ensured for the HW_PKA functions
  */
-extern int HW_PKA_Enable( void );
+extern int HW_PKA_Enable(void);
 
 /*
  * HW_PKA_WriteSingleInput
@@ -187,8 +185,8 @@ extern int HW_PKA_Enable( void );
  * This function must not be directly called when using P-256 elliptic curve
  * dedicated functions.
  */
-extern void HW_PKA_WriteSingleInput( uint32_t index,
-                                     uint32_t word );
+extern void HW_PKA_WriteSingleInput(uint32_t index,
+    uint32_t word);
 
 /*
  * HW_PKA_WriteOperand
@@ -197,9 +195,9 @@ extern void HW_PKA_WriteSingleInput( uint32_t index,
  * This function must not be directly called when using P-256 elliptic curve
  * dedicated functions.
  */
-extern void HW_PKA_WriteOperand( uint32_t index,
-                                 int size,
-                                 const uint32_t* in );
+extern void HW_PKA_WriteOperand(uint32_t index,
+    int size,
+    const uint32_t * in);
 
 /*
  * HW_PKA_Start
@@ -211,7 +209,7 @@ extern void HW_PKA_WriteOperand( uint32_t index,
  * "mode" can be one of the LL_PKA_MODE...  definitions that can be found
  * in "stm32wbxx_ll_pka.h" file.
  */
-extern void HW_PKA_Start( uint32_t mode );
+extern void HW_PKA_Start(uint32_t mode);
 
 /*
  * HW_PKA_EndOfOperation
@@ -219,7 +217,7 @@ extern void HW_PKA_Start( uint32_t mode );
  * Returns 0 if the PKA processing is still active.
  * Returns a value different from 0 when the PKA processing is complete.
  */
-extern int HW_PKA_EndOfOperation( void );
+extern int HW_PKA_EndOfOperation(void);
 
 /*
  * HW_PKA_ReadSingleOutput
@@ -228,7 +226,7 @@ extern int HW_PKA_EndOfOperation( void );
  * This function must not be directly called when using P-256 elliptic curve
  * dedicated functions.
  */
-extern uint32_t HW_PKA_ReadSingleOutput( uint32_t index );
+extern uint32_t HW_PKA_ReadSingleOutput(uint32_t index);
 
 /*
  * HW_PKA_ReadResult
@@ -237,9 +235,9 @@ extern uint32_t HW_PKA_ReadSingleOutput( uint32_t index );
  * This function must not be directly called when using P-256 elliptic curve
  * dedicated functions.
  */
-extern void HW_PKA_ReadResult( uint32_t index,
-                               int size,
-                               uint32_t* out );
+extern void HW_PKA_ReadResult(uint32_t index,
+    int size,
+    uint32_t * out);
 
 /*
  * HW_PKA_Disable
@@ -248,7 +246,7 @@ extern void HW_PKA_ReadResult( uint32_t index,
  * This function disables also the PKA clock and the PKA security.
  * It then releases the PKA semaphore.
  */
-extern void HW_PKA_Disable( void );
+extern void HW_PKA_Disable(void);
 
 /*
  * Notes:
@@ -277,7 +275,7 @@ extern void HW_PKA_Disable( void );
  *
  * The check result is retrieved by calling HW_PKA_P256_IsRangeCheckOk().
  */
-extern void HW_PKA_P256_StartRangeCheck( const uint32_t* coord );
+extern void HW_PKA_P256_StartRangeCheck(const uint32_t * coord);
 
 /*
  * HW_PKA_P256_IsRangeCheckOk
@@ -287,7 +285,7 @@ extern void HW_PKA_P256_StartRangeCheck( const uint32_t* coord );
  *
  * Returns 0 if the check fails ; 1 otherwise.
  */
-extern uint32_t HW_PKA_P256_IsRangeCheckOk( void );
+extern uint32_t HW_PKA_P256_IsRangeCheckOk(void);
 
 /*
  * HW_PKA_P256_StartPointCheck
@@ -304,8 +302,8 @@ extern uint32_t HW_PKA_P256_IsRangeCheckOk( void );
  *
  * The check result is retrieved by calling HW_PKA_P256_IsPointCheckOk().
  */
-extern void HW_PKA_P256_StartPointCheck( const uint32_t* x,
-                                         const uint32_t* y );
+extern void HW_PKA_P256_StartPointCheck(const uint32_t * x,
+    const uint32_t * y);
 
 /*
  * HW_PKA_P256_IsPointCheckOk
@@ -315,7 +313,7 @@ extern void HW_PKA_P256_StartPointCheck( const uint32_t* x,
  *
  * Returns 0 if the check fails ; 1 otherwise.
  */
-extern uint32_t HW_PKA_P256_IsPointCheckOk( void );
+extern uint32_t HW_PKA_P256_IsPointCheckOk(void);
 
 /*
  * HW_PKA_P256_StartEccScalarMul
@@ -331,9 +329,9 @@ extern uint32_t HW_PKA_P256_IsPointCheckOk( void );
  * p_x and p_y, and the scalar k. Each parameter must be a vector of 8 x 32-bit
  * words (32 bytes).
  */
-extern void HW_PKA_P256_StartEccScalarMul( const uint32_t* k,
-                                           const uint32_t* p_x,
-                                           const uint32_t* p_y );
+extern void HW_PKA_P256_StartEccScalarMul(const uint32_t * k,
+    const uint32_t * p_x,
+    const uint32_t * p_y);
 
 /*
  * HW_PKA_P256_ReadEccScalarMul
@@ -346,8 +344,8 @@ extern void HW_PKA_P256_StartEccScalarMul( const uint32_t* k,
  * p_x and p_y, 8 x 32-bit words each (2 times 32 bytes).
  * Before returning, it disables the PKA block, releasing the PKA semaphore.
  */
-extern void HW_PKA_P256_ReadEccScalarMul( uint32_t* p_x,
-                                          uint32_t* p_y );
+extern void HW_PKA_P256_ReadEccScalarMul(uint32_t * p_x,
+    uint32_t * p_y);
 
 /* ---------------------------------------------------------------------------
  *                                 RNG
@@ -364,11 +362,10 @@ extern void HW_PKA_P256_ReadEccScalarMul( uint32_t* p_x,
  */
 
 /* Error codes definition for HW_RNG return values */
-enum
-{
-  HW_RNG_CLOCK_ERROR = CFG_HW_ERROR_OFFSET + 0x101,
-  HW_RNG_NOISE_ERROR = CFG_HW_ERROR_OFFSET + 0x102,
-  HW_RNG_UFLOW_ERROR = CFG_HW_ERROR_OFFSET + 0x103,
+enum {
+    HW_RNG_CLOCK_ERROR = CFG_HW_ERROR_OFFSET + 0x101,
+    HW_RNG_NOISE_ERROR = CFG_HW_ERROR_OFFSET + 0x102,
+    HW_RNG_UFLOW_ERROR = CFG_HW_ERROR_OFFSET + 0x103,
 };
 
 /* RNG_KERNEL_CLK_ON
@@ -388,7 +385,7 @@ void RNG_KERNEL_CLK_OFF(void);
  *
  * Disables the RNG peripheral and switch off its clock in RCC.
  */
-extern void HW_RNG_Disable( void );
+extern void HW_RNG_Disable(void);
 
 /* HW_RNG_Start
  *
@@ -396,7 +393,7 @@ extern void HW_RNG_Disable( void );
  * to be called only once at reset before calling HW_RNG_Get() to retrieve
  * the generated random values.
  */
-extern void HW_RNG_Start( void );
+extern void HW_RNG_Start(void);
 
 /*
  * HW_RNG_Get
@@ -406,8 +403,8 @@ extern void HW_RNG_Start( void );
  * The random numbers are written in memory from "val" pointer.
  * "val" must point to a sufficient memory buffer allocated by the caller.
  */
-extern void HW_RNG_Get( uint8_t n,
-                        uint32_t* val );
+extern void HW_RNG_Get(uint8_t n,
+    uint32_t * val);
 
 /*
  * HW_RNG_Process
@@ -423,23 +420,23 @@ extern void HW_RNG_Get( uint8_t n,
  * the hardware must then be reset.
  * - HW_RNG_UFLOW_ERROR in case of pool underflow error.
  */
-extern int HW_RNG_Process( void );
+extern int HW_RNG_Process(void);
 
 /*
  * HW_RNG_EnableClock
  *
  * This function enables the RNG clock for "other user" than RNG driver itself
  */
-extern void HW_RNG_EnableClock( uint8_t user_mask );
+extern void HW_RNG_EnableClock(uint8_t user_mask);
 
 /*
  * HW_RNG_DisableClock
  *
  * This function disables the RNG clock for "other user" than RNG driver itself
  */
-extern void HW_RNG_DisableClock( uint8_t user_mask );
+extern void HW_RNG_DisableClock(uint8_t user_mask);
 
-extern void HWCB_RNG_Process( void );
+extern void HWCB_RNG_Process(void);
 
 /* ---------------------------------------------------------------------------
  *                               GPIO
@@ -447,12 +444,11 @@ extern void HWCB_RNG_Process( void );
  */
 
 /* Index definitions used for all GPIO functions */
-enum
-{
-  HW_GPIO_DBG          =  0,
-  HW_GPIO_GREEN_LED    = 13,
-  HW_GPIO_RED_LED      = 14,
-  HW_GPIO_BLUE_LED     = 15,
+enum {
+    HW_GPIO_DBG = 0,
+    HW_GPIO_GREEN_LED = 13,
+    HW_GPIO_RED_LED = 14,
+    HW_GPIO_BLUE_LED = 15,
 };
 
 /*
@@ -460,7 +456,7 @@ enum
  *
  * This function initilaizes the GPIO pins used for debug.
  */
-extern void HW_GPIO_Init( const uint32_t* dbg_pins );
+extern void HW_GPIO_Init(const uint32_t * dbg_pins);
 
 /*
  * HW_GPIO_Read
@@ -468,7 +464,7 @@ extern void HW_GPIO_Init( const uint32_t* dbg_pins );
  * This function reads the output pin which index is given in parameter.
  * It returns 0 if the pin is low, 1 if the pin is high.
  */
-extern uint8_t HW_GPIO_Read( uint8_t index );
+extern uint8_t HW_GPIO_Read(uint8_t index);
 
 /*
  * HW_GPIO_Set
@@ -476,7 +472,7 @@ extern uint8_t HW_GPIO_Read( uint8_t index );
  * This function sets to high level the output pin which index is given
  * in parameter.
  */
-extern void HW_GPIO_Set( uint8_t index );
+extern void HW_GPIO_Set(uint8_t index);
 
 /*
  * HW_GPIO_Reset
@@ -484,10 +480,10 @@ extern void HW_GPIO_Set( uint8_t index );
  * This function resets to low level the output pin which index is given
  * in parameter.
  */
-extern void HW_GPIO_Reset( uint8_t index );
+extern void HW_GPIO_Reset(uint8_t index);
 
-extern void GPIO_SetDebug( int gpio_pin,
-                           int pin_value );
+extern void GPIO_SetDebug(int gpio_pin,
+    int pin_value);
 
 /* ---------------------------------------------------------------------------
  *                             OTP
@@ -496,11 +492,12 @@ extern void GPIO_SetDebug( int gpio_pin,
 
 typedef __PACKED_STRUCT
 {
-  uint8_t additional_data[8]; /*!< 64 bits of data to fill OTP slot */
-  uint8_t bd_address[6];      /*!< Bluetooth Device Address*/
-  uint8_t hsetune;            /*!< Load capacitance to be applied on HSE pad */
-  uint8_t index;              /*!< Structure index */
-} HW_OTP_data_t;
+    uint8_t additional_data[8]; /*!< 64 bits of data to fill OTP slot */
+    uint8_t bd_address[6]; /*!< Bluetooth Device Address*/
+    uint8_t hsetune; /*!< Load capacitance to be applied on HSE pad */
+    uint8_t index; /*!< Structure index */
+}
+HW_OTP_data_t;
 
 /*
  * HW_OTP_Read
@@ -508,8 +505,8 @@ typedef __PACKED_STRUCT
  * Read the OTP
  *
  */
-int HW_OTP_Read( uint8_t index,
-                 HW_OTP_data_t** data );
+int HW_OTP_Read(uint8_t index,
+    HW_OTP_data_t ** data);
 
 /*
  * HW_OTP_Write
@@ -517,9 +514,9 @@ int HW_OTP_Read( uint8_t index,
  * ReadWrite the OTP
  *
  */
-int HW_OTP_Write( uint8_t* additional_data,
-                  uint8_t* bd_address,
-                  uint8_t hsetune,
-                  uint8_t index );
+int HW_OTP_Write(uint8_t * additional_data,
+    uint8_t * bd_address,
+    uint8_t hsetune,
+    uint8_t index);
 
 #endif /* HW_H__ */

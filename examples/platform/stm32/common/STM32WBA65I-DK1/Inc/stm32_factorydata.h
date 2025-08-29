@@ -1,21 +1,21 @@
 /* USER CODE BEGIN Header */
 /**
  ******************************************************************************
-  * @file    flash_wb.h
-  * @author  MCD Application Team
-  * @brief   Header file for flash_wb.c
+ * @file    flash_wb.h
+ * @author  MCD Application Team
+ * @brief   Header file for flash_wb.c
  ******************************************************************************
-  * @attention
-  *
-  * Copyright (c) 2023 STMicroelectronics.
-  * All rights reserved.
-  *
-  * This software is licensed under terms that can be found in the LICENSE file
-  * in the root directory of this software component.
-  * If no LICENSE file comes with this software, it is provided AS-IS.
-  *
-  ******************************************************************************
-  */
+ * @attention
+ *
+ * Copyright (c) 2023 STMicroelectronics.
+ * All rights reserved.
+ *
+ * This software is licensed under terms that can be found in the LICENSE file
+ * in the root directory of this software component.
+ * If no LICENSE file comes with this software, it is provided AS-IS.
+ *
+ ******************************************************************************
+ */
 /* USER CODE END Header */
 
 /* Define to prevent recursive inclusion -------------------------------------*/
@@ -31,15 +31,13 @@ extern "C" {
 
 #define PRIVATE_KEY_LEN 32
 #define PUBLIC_KEY_LEN 65
-typedef enum
-{
+typedef enum {
     DATAFACTORY_OK,
     DATAFACTORY_DATA_NOT_FOUND,
     DATAFACTORY_BUFFER_TOO_SMALL,
     DATAFACTORY_PARAM_ERROR,
 
-
-}FACTORYDATA_StatusTypeDef;
+} FACTORYDATA_StatusTypeDef;
 
 typedef enum {
     /* DeviceAttestationCredentialsProvider */
@@ -70,10 +68,9 @@ typedef enum {
 
 } FACTORYDATA_TagId;
 
-FACTORYDATA_StatusTypeDef FACTORYDATA_GetValue(FACTORYDATA_TagId tag,uint8_t *data, uint32_t size, uint32_t *out_datalength);
+FACTORYDATA_StatusTypeDef FACTORYDATA_GetValue(FACTORYDATA_TagId tag, uint8_t * data, uint32_t size, uint32_t * out_datalength);
 
 #ifdef __cplusplus
 }
 #endif
 #endif /*STM32_FACTORYDATA_H*/
-

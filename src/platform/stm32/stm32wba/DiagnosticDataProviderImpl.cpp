@@ -53,46 +53,45 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetRebootCount(uint16_t & rebootCount)
 
 CHIP_ERROR DiagnosticDataProviderImpl::GetCurrentHeapFree(uint64_t & currentHeapFree)
 {
-	HeapStats_t heapStats;
-	vPortGetHeapStats(&heapStats);
-	currentHeapFree = static_cast<uint64_t>(heapStats.xAvailableHeapSpaceInBytes);
-	return CHIP_NO_ERROR;
+    HeapStats_t heapStats;
+    vPortGetHeapStats(&heapStats);
+    currentHeapFree = static_cast<uint64_t>(heapStats.xAvailableHeapSpaceInBytes);
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR DiagnosticDataProviderImpl::GetCurrentHeapUsed(uint64_t & currentHeapUsed)
 {
-	HeapStats_t heapStats;
-	vPortGetHeapStats(&heapStats);
-	//using the linker defined heap size
-	uint64_t totalHeapSize = static_cast<uint64_t>(configTOTAL_HEAP_SIZE /*(50*1024)*/);
-	// Calculate used heap space
-	currentHeapUsed = static_cast<uint64_t>(totalHeapSize - heapStats.xAvailableHeapSpaceInBytes);
-	return CHIP_NO_ERROR;
+    HeapStats_t heapStats;
+    vPortGetHeapStats(&heapStats);
+    // using the linker defined heap size
+    uint64_t totalHeapSize = static_cast<uint64_t>(configTOTAL_HEAP_SIZE /*(50*1024)*/);
+    // Calculate used heap space
+    currentHeapUsed = static_cast<uint64_t>(totalHeapSize - heapStats.xAvailableHeapSpaceInBytes);
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR DiagnosticDataProviderImpl::GetCurrentHeapHighWatermark(uint64_t & currentHeapHighWatermark)
 {
     HeapStats_t heapStats;
     vPortGetHeapStats(&heapStats);
-	uint64_t totalHeapSize = static_cast<uint64_t>(configTOTAL_HEAP_SIZE);
+    uint64_t totalHeapSize   = static_cast<uint64_t>(configTOTAL_HEAP_SIZE);
     currentHeapHighWatermark = static_cast<uint64_t>(totalHeapSize - heapStats.xMinimumEverFreeBytesRemaining);
     return CHIP_NO_ERROR;
 }
 
-
 CHIP_ERROR DiagnosticDataProviderImpl::ResetWatermarks()
 {
-	HeapStats_t heapStats;
-	vPortGetHeapStats(&heapStats);
+    HeapStats_t heapStats;
+    vPortGetHeapStats(&heapStats);
 
-	heapStats.xAvailableHeapSpaceInBytes = 0;
-	heapStats.xSizeOfLargestFreeBlockInBytes = 0;
-	heapStats.xSizeOfSmallestFreeBlockInBytes = 0;
-	heapStats.xNumberOfFreeBlocks = 0;
-	heapStats.xMinimumEverFreeBytesRemaining = 0;
-	heapStats.xNumberOfSuccessfulAllocations = 0;
-	heapStats.xNumberOfSuccessfulFrees = 0;
-	return CHIP_NO_ERROR;
+    heapStats.xAvailableHeapSpaceInBytes      = 0;
+    heapStats.xSizeOfLargestFreeBlockInBytes  = 0;
+    heapStats.xSizeOfSmallestFreeBlockInBytes = 0;
+    heapStats.xNumberOfFreeBlocks             = 0;
+    heapStats.xMinimumEverFreeBytesRemaining  = 0;
+    heapStats.xNumberOfSuccessfulAllocations  = 0;
+    heapStats.xNumberOfSuccessfulFrees        = 0;
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR DiagnosticDataProviderImpl::GetThreadMetrics(ThreadMetrics ** threadMetricsOut)
@@ -153,7 +152,7 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetUpTime(uint64_t & upTime)
 {
     System::Clock::Timestamp currentTime = System::SystemClock().GetMonotonicTimestamp();
 
-    System::Clock::Timestamp startTime   = PlatformMgrImpl().GetStartTime();
+    System::Clock::Timestamp startTime = PlatformMgrImpl().GetStartTime();
 
     if (currentTime >= startTime)
     {
@@ -223,7 +222,6 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetNetworkInterfaces(NetworkInterface ** 
     *netifpp = ifp;
     return CHIP_NO_ERROR;
 }
-
 
 DiagnosticDataProvider & GetDiagnosticDataProviderImpl()
 {

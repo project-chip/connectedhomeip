@@ -1,47 +1,46 @@
 /**
-  ******************************************************************************
-  * @file    threadplat_pka.h
-  * @author  MCD Application Team
-  * @brief
-  ******************************************************************************
-  * @attention
-  *
-  * <h2><center>&copy; COPYRIGHT(c) 2016 STMicroelectronics</center></h2>
-  *
-  * Redistribution and use in source and binary forms, with or without modification,
-  * are permitted provided that the following conditions are met:
-  *   1. Redistributions of source code must retain the above copyright notice,
-  *      this list of conditions and the following disclaimer.
-  *   2. Redistributions in binary form must reproduce the above copyright notice,
-  *      this list of conditions and the following disclaimer in the documentation
-  *      and/or other materials provided with the distribution.
-  *   3. Neither the name of STMicroelectronics nor the names of its contributors
-  *      may be used to endorse or promote products derived from this software
-  *      without specific prior written permission.
-  *
-  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
-  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-  * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
-  * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
-  * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
-  * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
-  * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
-  * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
-  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-  *
-  ******************************************************************************
-  */
+ ******************************************************************************
+ * @file    threadplat_pka.h
+ * @author  MCD Application Team
+ * @brief
+ ******************************************************************************
+ * @attention
+ *
+ * <h2><center>&copy; COPYRIGHT(c) 2016 STMicroelectronics</center></h2>
+ *
+ * Redistribution and use in source and binary forms, with or without modification,
+ * are permitted provided that the following conditions are met:
+ *   1. Redistributions of source code must retain the above copyright notice,
+ *      this list of conditions and the following disclaimer.
+ *   2. Redistributions in binary form must reproduce the above copyright notice,
+ *      this list of conditions and the following disclaimer in the documentation
+ *      and/or other materials provided with the distribution.
+ *   3. Neither the name of STMicroelectronics nor the names of its contributors
+ *      may be used to endorse or promote products derived from this software
+ *      without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
+ * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+ * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+ * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+ * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+ * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+ * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ *
+ ******************************************************************************
+ */
 
 #ifndef THREADPLAT_PKA_H_
 #define THREADPLAT_PKA_H_
 
-#include <stdint.h>
 #include "mbedtls/bignum.h"
+#include <stdint.h>
 
-//define
+// define
 #define OTPLAT_PKA_IT 0
-
 
 #if (OTPLAT_PKA_IT == 0)
 /*
@@ -49,9 +48,8 @@
  *
  * Call this function in loop task when polling for PKA end of operation
  *
- */    
+ */
 void otPlatPkaProccessLoop(void);
-
 
 /*
  * This function is called to schedule otPlatPkaProccessLoop()
@@ -69,7 +67,7 @@ void APP_THREAD_SchedulePka(void);
 void APP_THREAD_WaitPkaEndOfOperation(void);
 
 /*
- * This function is called to post Pka end of operation 
+ * This function is called to post Pka end of operation
  *  Semaphore, wait event
  *
  *
@@ -77,9 +75,7 @@ void APP_THREAD_WaitPkaEndOfOperation(void);
 void APP_THREAD_PostPkaEndOfOperation(void);
 #endif
 
-
 void otPlatPkaProccessLoop(void);
-
 
 /*
  * otPlatPkaEnable
@@ -112,9 +108,9 @@ extern int otPlatPkaEnable(void);
  * p_x and p_y, and the scalar k. Each parameter must be a vector of 8 x 32-bit
  * words (32 bytes).
  */
-extern void otPlatPkaP256StartEccScalarMul (const uint32_t* k,
-                                            const uint32_t* p_x,
-                                            const uint32_t* p_y);
+extern void otPlatPkaP256StartEccScalarMul(const uint32_t * k,
+    const uint32_t * p_x,
+    const uint32_t * p_y);
 
 /*
  * otPlatEndOfOperation, must be called after otPlatEnable()
@@ -123,7 +119,6 @@ extern void otPlatPkaP256StartEccScalarMul (const uint32_t* k,
  * Returns a value different from 0 when the PKA processing is complete.
  */
 extern int otPlatEndOfOperation(void);
-
 
 /*
  * otPlatPkaP256ReadEccScalarMul
@@ -134,10 +129,10 @@ extern int otPlatEndOfOperation(void);
  *
  * This function retrieves the result from PKA memory: coordinates of point P,
  * p_x and p_y, 8 x 32-bit words each (2 times 32 bytes).
- * 
+ *
  */
-extern void otPlatPkaP256ReadEccScalarMul(uint32_t* p_x,
-                                          uint32_t* p_y);
+extern void otPlatPkaP256ReadEccScalarMul(uint32_t * p_x,
+    uint32_t * p_y);
 
 /*
  * otPlatPkaMpiInvMod
@@ -147,7 +142,7 @@ extern void otPlatPkaP256ReadEccScalarMul(uint32_t* p_x,
  * A first operand
  * N modulus
  */
-int otPlatPkaMpiInvMod(mbedtls_mpi* X,const mbedtls_mpi* A,const mbedtls_mpi* N);
+int otPlatPkaMpiInvMod(mbedtls_mpi * X, const mbedtls_mpi * A, const mbedtls_mpi * N);
 
 /*
  * otPlatDisable
@@ -157,4 +152,4 @@ int otPlatPkaMpiInvMod(mbedtls_mpi* X,const mbedtls_mpi* A,const mbedtls_mpi* N)
  * It then releases the PKA semaphore.
  */
 extern void otPlatPkaDisable(void);
-#endif  // THREADPLAT_PKA_H_
+#endif // THREADPLAT_PKA_H_

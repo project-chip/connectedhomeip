@@ -29,8 +29,7 @@
 extern "C" {
 #endif
 
-typedef enum
-{
+typedef enum {
     NVM_OK,
     NVM_KEY_NOT_FOUND,
     NVM_WRITE_FAILED,
@@ -44,8 +43,7 @@ typedef enum
     NVM_BUFFER_TOO_SMALL
 } NVM_StatusTypeDef;
 
-typedef enum
-{
+typedef enum {
     SECTOR_DEFAULT = 0,
     SECTOR_NO_SECURE,
     SECTOR_SECURE

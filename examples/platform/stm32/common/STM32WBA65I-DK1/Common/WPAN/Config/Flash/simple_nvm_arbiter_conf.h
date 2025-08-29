@@ -1,21 +1,21 @@
 /* USER CODE BEGIN Header */
 /**
-  ******************************************************************************
-  * @file    simple_nvm_arbiter_conf.h
-  * @author  MCD Application Team
-  * @brief   Configuration header for simple_nvm_arbiter.c module
-  ******************************************************************************
-  * @attention
-  *
-  * Copyright (c) 2022 STMicroelectronics.
-  * All rights reserved.
-  *
-  * This software is licensed under terms that can be found in the LICENSE file
-  * in the root directory of this software component.
-  * If no LICENSE file comes with this software, it is provided AS-IS.
-  *
-  ******************************************************************************
-  */
+ ******************************************************************************
+ * @file    simple_nvm_arbiter_conf.h
+ * @author  MCD Application Team
+ * @brief   Configuration header for simple_nvm_arbiter.c module
+ ******************************************************************************
+ * @attention
+ *
+ * Copyright (c) 2022 STMicroelectronics.
+ * All rights reserved.
+ *
+ * This software is licensed under terms that can be found in the LICENSE file
+ * in the root directory of this software component.
+ * If no LICENSE file comes with this software, it is provided AS-IS.
+ *
+ ******************************************************************************
+ */
 /* USER CODE END Header */
 
 /* Define to prevent recursive inclusion -------------------------------------*/
@@ -45,7 +45,7 @@ extern "C" {
  * @details This number must be lower than SNVMA_MAX_NUMBER_NVM
  *
  */
-#define SNVMA_NVM_NUMBER                2u
+#define SNVMA_NVM_NUMBER 2u
 
 /* Check that NVM number does not exceed limitations */
 #if SNVMA_NVM_NUMBER > SNVMA_MAX_NUMBER_NVM
@@ -58,13 +58,13 @@ extern "C" {
 
 /* NVM ID #1 */
 #define SNVMA_NVM_ID_1
-#define SNVMA_NVM_ID_1_BANK_NUMBER      2u
-#define SNVMA_NVM_ID_1_BANK_SIZE        1u
+#define SNVMA_NVM_ID_1_BANK_NUMBER 2u
+#define SNVMA_NVM_ID_1_BANK_SIZE 1u
 
 /* NVM ID #2 */
 #define SNVMA_NVM_ID_2
-#define SNVMA_NVM_ID_2_BANK_NUMBER      2u
-#define SNVMA_NVM_ID_2_BANK_SIZE        4u
+#define SNVMA_NVM_ID_2_BANK_NUMBER 2u
+#define SNVMA_NVM_ID_2_BANK_SIZE 4u
 
 #if (SNVMA_NVM_ID_1_BANK_NUMBER == 0u) || (SNVMA_NVM_ID_1_BANK_SIZE == 0u)
 #error NVM ID #1 => Bank not initialized
@@ -103,15 +103,14 @@ extern "C" {
  * @details Enumeration member can be renamed to fit user needs - ie: SNVMA_BufferId_4 => SNVMA_BleNvmId
  *
  */
-typedef enum SNVMA_BufferId
-{
-  APP_BLE_NvmBuffer,
-  APP_Matter_NvmBuffer=4,
-  SNVMA_BufferId_Max  /* End of the enumeration */
-}SNVMA_BufferId_t;
+typedef enum SNVMA_BufferId {
+    APP_BLE_NvmBuffer,
+    APP_Matter_NvmBuffer = 4,
+    SNVMA_BufferId_Max /* End of the enumeration */
+} SNVMA_BufferId_t;
 
 /* Exported variables --------------------------------------------------------*/
-extern SNVMA_NvmElt_t SNVMA_NvmConfiguration [SNVMA_NVM_NUMBER];
+extern SNVMA_NvmElt_t SNVMA_NvmConfiguration[SNVMA_NVM_NUMBER];
 
 /* Exported macros -----------------------------------------------------------*/
 /* Exported functions ------------------------------------------------------- */

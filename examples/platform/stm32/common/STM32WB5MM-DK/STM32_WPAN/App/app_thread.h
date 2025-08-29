@@ -41,8 +41,7 @@ extern "C" {
 
 /* Thread application generic defines */
 /*------------------------------------*/
-typedef enum
-{
+typedef enum {
     APP_THREAD_LIMITED,
     APP_THREAD_FULL,
 } APP_THREAD_InitMode_t;
@@ -63,8 +62,7 @@ typedef enum
  *  running on M4. Some of these errors may be fatal
  *  or just warnings
  */
-typedef enum
-{
+typedef enum {
     ERR_REC_MULTI_MSG_FROM_M0,
     ERR_THREAD_SET_STATE_CB,
     ERR_THREAD_SET_CHANNEL,

@@ -28,7 +28,7 @@
 
 namespace chip {
 namespace DeviceLayer {
-struct ChipDeviceEvent;
+    struct ChipDeviceEvent;
 } // namespace DeviceLayer
 } // namespace chip
 

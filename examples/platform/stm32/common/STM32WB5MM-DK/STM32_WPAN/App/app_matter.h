@@ -34,8 +34,7 @@ extern "C" {
 
 /* Exported types ------------------------------------------------------------*/
 
-typedef enum
-{
+typedef enum {
     MATTER_STM_PEER_CONN_HANDLE_EVT,
     MATTER_STM_PEER_DISCON_HANDLE_EVT,
     MATTER_STM_ACK_INDICATE_EVT,

@@ -1,20 +1,20 @@
 /**
-  ******************************************************************************
-  * @file    simple_nvm_arbiter.h
-  * @author  MCD Application Team
-  * @brief   Header for simple_nvm_arbiter.c module
-  ******************************************************************************
-  * @attention
-  *
-  * Copyright (c) 2023 STMicroelectronics.
-  * All rights reserved.
-  *
-  * This software is licensed under terms that can be found in the LICENSE file
-  * in the root directory of this software component.
-  * If no LICENSE file comes with this software, it is provided AS-IS.
-  *
-  ******************************************************************************
-  */
+ ******************************************************************************
+ * @file    simple_nvm_arbiter.h
+ * @author  MCD Application Team
+ * @brief   Header for simple_nvm_arbiter.c module
+ ******************************************************************************
+ * @attention
+ *
+ * Copyright (c) 2023 STMicroelectronics.
+ * All rights reserved.
+ *
+ * This software is licensed under terms that can be found in the LICENSE file
+ * in the root directory of this software component.
+ * If no LICENSE file comes with this software, it is provided AS-IS.
+ *
+ ******************************************************************************
+ */
 
 /* Define to prevent recursive inclusion -------------------------------------*/
 #ifndef SIMPLE_NVM_ARBITER_H
@@ -51,7 +51,7 @@ extern "C" {
  * @retval SNVMA_Cmd_Status_t::SNVMA_ERROR_NVM_OVERLAP_FLASH
  * @retval SNVMA_Cmd_Status_t::SNVMA_ERROR_CRC_INIT
  */
-SNVMA_Cmd_Status_t SNVMA_Init (const uint32_t * p_NvmStartAddress);
+SNVMA_Cmd_Status_t SNVMA_Init(const uint32_t * p_NvmStartAddress);
 
 /**
  * @brief  Register a user buffer to a NVM
@@ -73,9 +73,9 @@ SNVMA_Cmd_Status_t SNVMA_Init (const uint32_t * p_NvmStartAddress);
  * @retval SNVMA_Cmd_Status_t::SNVMA_ERROR_BUFFER_SIZE
  * @retval SNVMA_Cmd_Status_t::SNVMA_ERROR_NVM_BUFFER_FULL
  */
-SNVMA_Cmd_Status_t SNVMA_Register (const SNVMA_BufferId_t BufferId,
-                                   const uint32_t * p_BufferAddress,
-                                   const uint32_t BufferSize);
+SNVMA_Cmd_Status_t SNVMA_Register(const SNVMA_BufferId_t BufferId,
+    const uint32_t * p_BufferAddress,
+    const uint32_t BufferSize);
 
 /**
  * @brief  Restore a user buffer from a NVM
@@ -97,7 +97,7 @@ SNVMA_Cmd_Status_t SNVMA_Register (const SNVMA_BufferId_t BufferId,
  * @retval SNVMA_Cmd_Status_t::SNVMA_ERROR_NVM_BANK_CORRUPTED
  * @retval SNVMA_Cmd_Status_t::SNVMA_ERROR_BUFFER_CONFIG_MISSMATCH
  */
-SNVMA_Cmd_Status_t SNVMA_Restore (const SNVMA_BufferId_t BufferId);
+SNVMA_Cmd_Status_t SNVMA_Restore(const SNVMA_BufferId_t BufferId);
 
 /**
  * @brief  Register a user buffer to a NVM
@@ -120,8 +120,8 @@ SNVMA_Cmd_Status_t SNVMA_Restore (const SNVMA_BufferId_t BufferId);
  * @retval SNVMA_Cmd_Status_t::SNVMA_ERROR_BUFFERID_NOT_REGISTERED
  * @retval SNVMA_Cmd_Status_t::SNVMA_ERROR_FLASH_ERROR
  */
-SNVMA_Cmd_Status_t SNVMA_Write (const SNVMA_BufferId_t BufferId,
-                                void (* Callback) (SNVMA_Callback_Status_t));
+SNVMA_Cmd_Status_t SNVMA_Write(const SNVMA_BufferId_t BufferId,
+    void (*Callback)(SNVMA_Callback_Status_t));
 
 #ifdef __cplusplus
 }

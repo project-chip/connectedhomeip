@@ -23,10 +23,9 @@
  *
  */
 /* this file behaves like a config.h, comes first */
-#include <platform/internal/CHIPDeviceLayerInternal.h>
 #include <platform/FreeRTOS/GenericThreadStackManagerImpl_FreeRTOS.hpp>
 #include <platform/OpenThread/GenericThreadStackManagerImpl_OpenThread.hpp>
-
+#include <platform/internal/CHIPDeviceLayerInternal.h>
 
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CHIPPlatformMemory.h>
@@ -35,11 +34,11 @@
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 #include <platform/internal/DeviceNetworkInfo.h>
 
+#include "dbg_trace.h"
 #include <openthread/heap.h>
 #include <openthread/message.h>
-#include "dbg_trace.h"
 
-//#include <transport/raw/MessageHeader.h>
+// #include <transport/raw/MessageHeader.h>
 
 #include <openthread/error.h>
 #include <openthread/icmp6.h>
@@ -59,8 +58,6 @@ CHIP_ERROR ThreadStackManagerImpl::_InitThreadStack(void)
     return InitThreadStack(NULL);
 }
 
-
-
 CHIP_ERROR ThreadStackManagerImpl::InitThreadStack(otInstance * otInst)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -72,8 +69,7 @@ CHIP_ERROR ThreadStackManagerImpl::InitThreadStack(otInstance * otInst)
     SuccessOrExit(err);
 
 exit:
-     return err;
-
+    return err;
 }
 
 CHIP_ERROR ThreadStackManagerImpl::_StartThreadTask()
@@ -85,17 +81,15 @@ CHIP_ERROR ThreadStackManagerImpl::_StartThreadTask()
     SuccessOrExit(err);
 
 exit:
-     return err;
-
+    return err;
 }
 CHIP_ERROR ThreadStackManagerImpl::SetThreadEnabled(bool val)
 {
-	 CHIP_ERROR err = CHIP_NO_ERROR;
-	 err =GenericThreadStackManagerImpl_OpenThread<ThreadStackManagerImpl>::_SetThreadEnabled(val);
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    err            = GenericThreadStackManagerImpl_OpenThread<ThreadStackManagerImpl>::_SetThreadEnabled(val);
 
-	return err;
+    return err;
 }
-
 
 bool ThreadStackManagerImpl::IsInitialized()
 {
@@ -109,45 +103,40 @@ using namespace ::chip::DeviceLayer;
 
 void ThreadStackManagerImpl::_ProcessThreadActivity()
 {
-   GenericThreadStackManagerImpl_OpenThread<ThreadStackManagerImpl>::_ProcessThreadActivity();
-
+    GenericThreadStackManagerImpl_OpenThread<ThreadStackManagerImpl>::_ProcessThreadActivity();
 }
-
 
 ///**
 // * Glue function called directly by the OpenThread stack when tasklet processing work
 // * is pending.
 //// */
-//extern "C" void otTaskletsSignalPending(otInstance * p_instance)
+// extern "C" void otTaskletsSignalPending(otInstance * p_instance)
 //{
 //	ThreadStackMgrImpl().SignalThreadActivityPending();
-//}
+// }
 
 /**
  * Glue function called directly by the OpenThread stack when system event processing work
  * is pending.
  */
-extern "C"
-{
+extern "C" {
 void otSysEventSignalPending(void)
 {
-	ChipLogProgress(DeviceLayer, "otSysEventSignalPending DEBUG THIS ");
-//    BaseType_t yieldRequired = ThreadStackMgrImpl().SignalThreadActivityPendingFromISR();
-//    portYIELD_FROM_ISR(yieldRequired);
+    ChipLogProgress(DeviceLayer, "otSysEventSignalPending DEBUG THIS ");
+    //    BaseType_t yieldRequired = ThreadStackMgrImpl().SignalThreadActivityPendingFromISR();
+    //    portYIELD_FROM_ISR(yieldRequired);
 }
 }
-extern "C"
-{
+extern "C" {
 void * otPlatCAlloc(size_t aNum, size_t aSize)
 {
     return CHIPPlatformMemoryCalloc(aNum, aSize);
 }
 }
 
-extern "C"
-{
+extern "C" {
 void otPlatFree(void * aPtr)
 {
-	CHIPPlatformMemoryFree(aPtr);
+    CHIPPlatformMemoryFree(aPtr);
 }
 }

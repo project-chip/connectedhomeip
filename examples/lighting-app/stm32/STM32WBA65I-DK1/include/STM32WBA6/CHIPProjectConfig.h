@@ -29,7 +29,6 @@
 // Use a default pairing code if one hasn't been provisioned in flash.
 #define CHIP_DEVICE_CONFIG_USE_TEST_SETUP_PIN_CODE 20202021
 
-
 // Use a default pairing code if one hasn't been provisioned in flash.
 #define CHIP_DEVICE_CONFIG_USE_TEST_PAIRING_CODE "CHIPUS"
 
@@ -148,7 +147,6 @@
  * This value is generally *not* incremented for device software versions.
  */
 #define CHIP_DEVICE_CONFIG_DEVICE_HARDWARE_VERSION 1
-
 
 /**
  * CHIP_ERROR_LOGGING

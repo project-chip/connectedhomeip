@@ -25,8 +25,7 @@
 
 namespace chip {
 
-class OTAImageProcessorImpl : public OTAImageProcessorInterface
-{
+class OTAImageProcessorImpl : public OTAImageProcessorInterface {
 public:
     //////////// OTAImageProcessorInterface Implementation ///////////////
     CHIP_ERROR PrepareDownload() override;

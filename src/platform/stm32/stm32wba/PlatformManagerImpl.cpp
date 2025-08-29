@@ -23,26 +23,25 @@
  */
 
 #include <crypto/CHIPCryptoPAL.h>
-#include <platform/internal/CHIPDeviceLayerInternal.h>
+#include <platform/CommissionableDataProvider.h>
 #include <platform/FreeRTOS/SystemTimeSupport.h>
 #include <platform/PlatformManager.h>
+#include <platform/internal/CHIPDeviceLayerInternal.h>
 #include <platform/internal/GenericPlatformManagerImpl_FreeRTOS.ipp>
 #include <platform/stm32/stm32wba/DiagnosticDataProviderImpl.h>
-#include <platform/CommissionableDataProvider.h>
-
 
 namespace chip {
 namespace DeviceLayer {
 
 PlatformManagerImpl PlatformManagerImpl::sInstance;
 
-extern "C" int mbedtls_hardware_poll(void *data, unsigned char *output, size_t len, size_t *olen);
+extern "C" int mbedtls_hardware_poll(void * data, unsigned char * output, size_t len, size_t * olen);
 
 CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
 {
     System::Clock::InitClock_RealTime();
-	chip::Crypto::add_entropy_source(mbedtls_hardware_poll, NULL, 16);
-	ReturnErrorOnFailure(Internal::GenericPlatformManagerImpl_FreeRTOS<PlatformManagerImpl>::_InitChipStack());
+    chip::Crypto::add_entropy_source(mbedtls_hardware_poll, NULL, 16);
+    ReturnErrorOnFailure(Internal::GenericPlatformManagerImpl_FreeRTOS<PlatformManagerImpl>::_InitChipStack());
     // Start timer to increment TotalOperationalHours every hour
     SystemLayer().StartTimer(System::Clock::Seconds32(kSecondsPerHour), UpdateOperationalHours, NULL);
     return CHIP_NO_ERROR;
@@ -50,7 +49,7 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
 
 void PlatformManagerImpl::_RunEventLoop(void)
 {
-	Internal::GenericPlatformManagerImpl_FreeRTOS<PlatformManagerImpl>::_RunEventLoop();
+    Internal::GenericPlatformManagerImpl_FreeRTOS<PlatformManagerImpl>::_RunEventLoop();
 }
 
 void PlatformManagerImpl::UpdateOperationalHours(System::Layer * systemLayer, void * appState)
@@ -71,7 +70,7 @@ void PlatformManagerImpl::UpdateOperationalHours(System::Layer * systemLayer, vo
 
 void PlatformManagerImpl::_Shutdown()
 {
-     Internal::GenericPlatformManagerImpl_FreeRTOS<PlatformManagerImpl>::_Shutdown();
+    Internal::GenericPlatformManagerImpl_FreeRTOS<PlatformManagerImpl>::_Shutdown();
 }
 
 } // namespace DeviceLayer

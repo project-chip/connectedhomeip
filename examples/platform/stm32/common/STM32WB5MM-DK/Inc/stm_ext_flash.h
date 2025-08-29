@@ -32,8 +32,7 @@ extern "C" {
 #define EXTERNAL_FLASH_ADDRESS 0x90000000U
 #define OTA_MAX_SIZE 0x100000 // 1 Mbytes
 
-typedef enum
-{
+typedef enum {
     STM_EXT_FLASH_OK,
     STM_EXT_FLASH_INIT_FAILED,
     STM_EXT_FLASH_WRITE_FAILED,

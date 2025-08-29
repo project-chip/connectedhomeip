@@ -30,68 +30,67 @@
 namespace chip {
 namespace DeviceLayer {
 
-/**
- * Concrete implementation of the PlatformManager singleton object for the STM32 platform.
- */
-class PlatformManagerImpl final : public PlatformManager, public Internal::GenericPlatformManagerImpl_FreeRTOS<PlatformManagerImpl>
-{
-    // Allow the PlatformManager interface class to delegate method calls to
-    // the implementation methods provided by this class.
-    friend PlatformManager;
+    /**
+     * Concrete implementation of the PlatformManager singleton object for the STM32 platform.
+     */
+    class PlatformManagerImpl final : public PlatformManager, public Internal::GenericPlatformManagerImpl_FreeRTOS<PlatformManagerImpl> {
+        // Allow the PlatformManager interface class to delegate method calls to
+        // the implementation methods provided by this class.
+        friend PlatformManager;
 
-    // Allow the generic implementation base class to call helper methods on
-    // this class.
+        // Allow the generic implementation base class to call helper methods on
+        // this class.
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
-    friend Internal::GenericPlatformManagerImpl_FreeRTOS<PlatformManagerImpl>;
+        friend Internal::GenericPlatformManagerImpl_FreeRTOS<PlatformManagerImpl>;
 #endif
 
-public:
-    // ===== Platform-specific members that may be accessed directly by the application.
+    public:
+        // ===== Platform-specific members that may be accessed directly by the application.
 
-    CHIP_ERROR InitLwIPCoreLock(void);
+        CHIP_ERROR InitLwIPCoreLock(void);
 
-    System::Clock::Timestamp GetStartTime() { return mStartTime; }
+        System::Clock::Timestamp GetStartTime() { return mStartTime; }
 
-private:
-    // ===== Methods that implement the PlatformManager abstract interface.
-    static void UpdateOperationalHours(System::Layer * systemLayer, void * appState);
-    CHIP_ERROR _InitChipStack(void);
-    void _Shutdown(void);
-    void _RunEventLoop(void);
-    CHIP_ERROR _GetTotalOperationalHours(uint32_t & totalOperationalHours);
-    // ===== Members for internal use by the following friends.
+    private:
+        // ===== Methods that implement the PlatformManager abstract interface.
+        static void UpdateOperationalHours(System::Layer * systemLayer, void * appState);
+        CHIP_ERROR _InitChipStack(void);
+        void _Shutdown(void);
+        void _RunEventLoop(void);
+        CHIP_ERROR _GetTotalOperationalHours(uint32_t & totalOperationalHours);
+        // ===== Members for internal use by the following friends.
 
-    friend PlatformManager & PlatformMgr(void);
-    friend PlatformManagerImpl & PlatformMgrImpl(void);
+        friend PlatformManager & PlatformMgr(void);
+        friend PlatformManagerImpl & PlatformMgrImpl(void);
 
-    System::Clock::Timestamp mStartTime = System::Clock::kZero;
+        System::Clock::Timestamp mStartTime = System::Clock::kZero;
 
-    uint64_t mStartTimeMilliseconds = 0;
+        uint64_t mStartTimeMilliseconds = 0;
 
-    static PlatformManagerImpl sInstance;
-};
+        static PlatformManagerImpl sInstance;
+    };
 
-/**
- * Returns the public interface of the PlatformManager singleton object.
- *
- * Chip applications should use this to access features of the PlatformManager object
- * that are common to all platforms.
- */
-inline PlatformManager & PlatformMgr(void)
-{
-    return PlatformManagerImpl::sInstance;
-}
+    /**
+     * Returns the public interface of the PlatformManager singleton object.
+     *
+     * Chip applications should use this to access features of the PlatformManager object
+     * that are common to all platforms.
+     */
+    inline PlatformManager & PlatformMgr(void)
+    {
+        return PlatformManagerImpl::sInstance;
+    }
 
-/**
- * Returns the platform-specific implementation of the PlatformManager singleton object.
- *
- * Chip applications can use this to gain access to features of the PlatformManager
- * that are specific to the STM32 platform.
- */
-inline PlatformManagerImpl & PlatformMgrImpl(void)
-{
-    return PlatformManagerImpl::sInstance;
-}
+    /**
+     * Returns the platform-specific implementation of the PlatformManager singleton object.
+     *
+     * Chip applications can use this to gain access to features of the PlatformManager
+     * that are specific to the STM32 platform.
+     */
+    inline PlatformManagerImpl & PlatformMgrImpl(void)
+    {
+        return PlatformManagerImpl::sInstance;
+    }
 
 } // namespace DeviceLayer
 } // namespace chip

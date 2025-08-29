@@ -82,15 +82,14 @@ CHIP_ERROR ConfigurationManagerImpl::Init()
         /* IWDG is controlled by Software or Hardware and it is checked through FLASH_OPTR_IWDG_SW bit */
         if (__HAL_RCC_GET_FLAG(RCC_FLAG_IWDGRST))
         {
-            matterBootCause = (FLASH ->OPTR & FLASH_OPTR_IWDG_SW)
-                                  ? BootReasonType::kSoftwareWatchdogReset
-                                  : BootReasonType::kHardwareWatchdogReset;
+            matterBootCause = (FLASH->OPTR & FLASH_OPTR_IWDG_SW) ? BootReasonType::kSoftwareWatchdogReset
+                                                                 : BootReasonType::kHardwareWatchdogReset;
         }
 
         /* Brown-out reset BootReason Type */
         else if (__HAL_RCC_GET_FLAG(RCC_FLAG_BORRST))
         {
-             matterBootCause = BootReasonType::kBrownOutReset;
+            matterBootCause = BootReasonType::kBrownOutReset;
         }
 
         /* Software Reset BootReason Type */
@@ -103,13 +102,13 @@ CHIP_ERROR ConfigurationManagerImpl::Init()
         /* Power on or Pin reset BootReason Type */
         else if (__HAL_RCC_GET_FLAG(RCC_FLAG_PINRST) || __HAL_RCC_GET_FLAG(RCC_FLAG_OBLRST))
         {
-             matterBootCause = BootReasonType::kPowerOnReboot;
+            matterBootCause = BootReasonType::kPowerOnReboot;
         }
 
         /* Unspecified BootReason Type */
         else
         {
-             matterBootCause = BootReasonType::kUnspecified;
+            matterBootCause = BootReasonType::kUnspecified;
         }
 
         /* Clear RCC reset flags after determining the boot reason type */
@@ -135,8 +134,8 @@ CHIP_ERROR ConfigurationManagerImpl::Init()
 
     err = CHIP_NO_ERROR;
 
-    exit:
-        return err;
+exit:
+    return err;
 }
 
 CHIP_ERROR ConfigurationManagerImpl::GetRebootCount(uint32_t & rebootCount)
@@ -183,8 +182,8 @@ void ConfigurationManagerImpl::InitiateFactoryReset()
 CHIP_ERROR ConfigurationManagerImpl::ReadPersistedStorageValue(::chip::Platform::PersistedStorage::Key persistedStorageKey,
                                                                uint32_t & value)
 {
-    CHIP_ERROR err  = CHIP_NO_ERROR;
-    ChipLogDetail( DataManagement, "ST => ReadPersistedStorageValue");
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    ChipLogDetail(DataManagement, "ST => ReadPersistedStorageValue");
 
     err = ReadConfigValue(persistedStorageKey, value);
     if (err == CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND)
@@ -201,7 +200,7 @@ CHIP_ERROR ConfigurationManagerImpl::WritePersistedStorageValue(::chip::Platform
                                                                 uint32_t value)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-    ChipLogDetail( DataManagement, "ST => WritePersistedStorageValue");
+    ChipLogDetail(DataManagement, "ST => WritePersistedStorageValue");
     err = WriteConfigValue(persistedStorageKey, value);
     SuccessOrExit(err);
 exit:
@@ -268,10 +267,7 @@ void ConfigurationManagerImpl::RunConfigUnitTest(void)
     STM32Config::RunConfigUnitTest();
 }
 
-void ConfigurationManagerImpl::DoFactoryReset(intptr_t arg)
-{
-
-}
+void ConfigurationManagerImpl::DoFactoryReset(intptr_t arg) {}
 
 ConfigurationManager & ConfigurationMgrImpl()
 {
@@ -280,7 +276,7 @@ ConfigurationManager & ConfigurationMgrImpl()
 
 CHIP_ERROR ConfigurationManagerImpl::GetCountryCode(char * buf, size_t bufSize, size_t & codeLen)
 {
-   return STM32Config::ReadConfigValueStr(STM32Config::kConfigKey_CountryCode, buf, bufSize, codeLen);
+    return STM32Config::ReadConfigValueStr(STM32Config::kConfigKey_CountryCode, buf, bufSize, codeLen);
 }
 
 } // namespace DeviceLayer

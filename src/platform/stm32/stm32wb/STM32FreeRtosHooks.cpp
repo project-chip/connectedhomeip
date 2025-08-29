@@ -36,7 +36,6 @@
 
 #include <string.h>
 
-
 static inline void mutex_init(mbedtls_threading_mutex_t * mutex)
 {
     mutex->mutex = xSemaphoreCreateMutex();
@@ -103,7 +102,6 @@ void freertos_mbedtls_mutex_init(void)
     // Configure mbedtls to use mutexes from FreeRTOS
     mbedtls_threading_set_alt(mutex_init, mutex_free, mutex_lock, mutex_unlock);
 }
-
 
 void freertos_mbedtls_init(void)
 {

@@ -1,8 +1,8 @@
+#include "platform/flash.h"
+#include "flash_wb.h"
 #include <assert.h>
 #include <stdio.h>
 #include <string.h>
-#include "flash_wb.h"
-#include "platform/flash.h"
 #include OPENTHREAD_CONFIG_FILE
 
 /******************************************************************************
@@ -23,10 +23,10 @@
 
 /* Private typedef -----------------------------------------------------------*/
 OT_TOOL_PACKED_BEGIN
-struct settingsBlock 
+struct settingsBlock
 {
-	uint16_t key;
-	uint16_t length;
+    uint16_t key;
+    uint16_t length;
 } OT_TOOL_PACKED_END;
 /* Private define ------------------------------------------------------------*/
 #define THREAD_SETTINGS_BUFFER_SIZE 1024
@@ -36,12 +36,12 @@ struct settingsBlock
 /* Private macro -------------------------------------------------------------*/
 /* Private variables ---------------------------------------------------------*/
 /* Flag to know whether we are in reset */
-__attribute__ ((section (".noinit"))) uint32_t sSettingsIsReset;
+__attribute__((section(".noinit"))) uint32_t sSettingsIsReset;
 
 /* Pointer to Buf currently used */
-__attribute__ ((section (".noinit"))) uint32_t sSettingsBufPos;
+__attribute__((section(".noinit"))) uint32_t sSettingsBufPos;
 
-//Keep last, aligned 32-bit
+// Keep last, aligned 32-bit
 //__attribute__ ((section (".noinit"))) __attribute__ ((aligned (8))) static uint8_t sSettingBufStart[THREAD_SETTINGS_BUFFER_SIZE];
 
 /* Private function prototypes -----------------------------------------------*/
@@ -53,214 +53,203 @@ static uint32_t SetBufferToFreeSpace(void);
 
 /* Private functions ---------------------------------------------------------*/
 static inline uint32_t GetSettingsBuffer_Base(void)
- {
-	static uint32_t Ot_NVMAddr = 0;
-	NM_GetOtNVMAddr(&Ot_NVMAddr);
-	return (uint32_t) Ot_NVMAddr;
+{
+    static uint32_t Ot_NVMAddr = 0;
+    NM_GetOtNVMAddr(&Ot_NVMAddr);
+    return (uint32_t) Ot_NVMAddr;
 }
 
-static inline uint32_t GetSettingsBuffer_Size(void) 
+static inline uint32_t GetSettingsBuffer_Size(void)
 {
-	return OT_NVM_SIZE;
+    return OT_NVM_SIZE;
 }
 
 static uint32_t SetBufferToFreeSpace(void)
 {
-	uint32_t buf_pos = GetSettingsBuffer_Base();
-	const struct settingsBlock *currentBlock;
+    uint32_t buf_pos = GetSettingsBuffer_Base();
+    const struct settingsBlock * currentBlock;
 
-	while (buf_pos < (GetSettingsBuffer_Base()+GetSettingsBuffer_Size ())) 
-	{
-		currentBlock = (struct settingsBlock*) (buf_pos);
+    while (buf_pos < (GetSettingsBuffer_Base() + GetSettingsBuffer_Size()))
+    {
+        currentBlock = (struct settingsBlock *) (buf_pos);
 
-		// check if we find the end of block in nvm
-		if ((currentBlock->key == DEFAULT_VALUE_UINT16_T) && (currentBlock->length == DEFAULT_VALUE_UINT16_T))
-		{
-			break;
-		}
-		buf_pos += (sizeof(struct settingsBlock) + currentBlock->length);
-	}
-	return buf_pos;
+        // check if we find the end of block in nvm
+        if ((currentBlock->key == DEFAULT_VALUE_UINT16_T) && (currentBlock->length == DEFAULT_VALUE_UINT16_T))
+        {
+            break;
+        }
+        buf_pos += (sizeof(struct settingsBlock) + currentBlock->length);
+    }
+    return buf_pos;
 }
 
-void otPlatSettingsInit(otInstance *aInstance) 
+void otPlatSettingsInit(otInstance * aInstance)
 {
-	OT_UNUSED_VARIABLE(aInstance);
+    OT_UNUSED_VARIABLE(aInstance);
 
-	if (sSettingsIsReset != THREAD_SETTINGS_RESET_FLAG) 
-	{
-		sSettingsIsReset = THREAD_SETTINGS_RESET_FLAG;
-		sSettingsBufPos = SetBufferToFreeSpace();
-	}
+    if (sSettingsIsReset != THREAD_SETTINGS_RESET_FLAG)
+    {
+        sSettingsIsReset = THREAD_SETTINGS_RESET_FLAG;
+        sSettingsBufPos  = SetBufferToFreeSpace();
+    }
 }
 
-void otPlatSettingsDeinit(otInstance *aInstance) 
+void otPlatSettingsDeinit(otInstance * aInstance)
 {
-	OT_UNUSED_VARIABLE(aInstance);
+    OT_UNUSED_VARIABLE(aInstance);
 }
 
-otError otPlatSettingsGet(otInstance *aInstance, uint16_t aKey, int aIndex,
-		uint8_t *aValue, uint16_t *aValueLength) 
+otError otPlatSettingsGet(otInstance * aInstance, uint16_t aKey, int aIndex, uint8_t * aValue, uint16_t * aValueLength)
 {
-	OT_UNUSED_VARIABLE(aInstance);
+    OT_UNUSED_VARIABLE(aInstance);
 
-	const struct settingsBlock *currentBlock;
-	uint32_t buf_pos = GetSettingsBuffer_Base();
-	int currentIndex = 0;
-	uint16_t readLength;
-	uint16_t valueLength = 0U;
-	otError error = OT_ERROR_NOT_FOUND;
+    const struct settingsBlock * currentBlock;
+    uint32_t buf_pos = GetSettingsBuffer_Base();
+    int currentIndex = 0;
+    uint16_t readLength;
+    uint16_t valueLength = 0U;
+    otError error        = OT_ERROR_NOT_FOUND;
 
-	while (buf_pos < sSettingsBufPos)
-	 {
-		currentBlock = (struct settingsBlock*) (buf_pos);
+    while (buf_pos < sSettingsBufPos)
+    {
+        currentBlock = (struct settingsBlock *) (buf_pos);
 
-		if (aKey == currentBlock->key) 
-		{
-			if (currentIndex == aIndex)
-			{
-				readLength = currentBlock->length;
+        if (aKey == currentBlock->key)
+        {
+            if (currentIndex == aIndex)
+            {
+                readLength = currentBlock->length;
 
-				// Perform read only if an input buffer was passed in
-				if (aValue != NULL && aValueLength != NULL) 
-				{
-					// Adjust read length if input buffer size is smaller
-					if (readLength > *aValueLength) 
-					{
-						readLength = *aValueLength;
-					}
-					memcpy(aValue,
-							(uint8_t*) (buf_pos + sizeof(struct settingsBlock)),
-							readLength);
-				}
-				valueLength = currentBlock->length;
-				error = OT_ERROR_NONE;
-				break;
-			}
-			currentIndex++;
-		}
-		buf_pos += (sizeof(struct settingsBlock) + currentBlock->length);
-	}
+                // Perform read only if an input buffer was passed in
+                if (aValue != NULL && aValueLength != NULL)
+                {
+                    // Adjust read length if input buffer size is smaller
+                    if (readLength > *aValueLength)
+                    {
+                        readLength = *aValueLength;
+                    }
+                    memcpy(aValue, (uint8_t *) (buf_pos + sizeof(struct settingsBlock)), readLength);
+                }
+                valueLength = currentBlock->length;
+                error       = OT_ERROR_NONE;
+                break;
+            }
+            currentIndex++;
+        }
+        buf_pos += (sizeof(struct settingsBlock) + currentBlock->length);
+    }
 
-	if (aValueLength != NULL) 
-	{
-		*aValueLength = valueLength;
-	}
+    if (aValueLength != NULL)
+    {
+        *aValueLength = valueLength;
+    }
 
-	return error;
+    return error;
 }
 
-otError otPlatSettingsAdd(otInstance *aInstance, uint16_t aKey,
-                          const uint8_t *aValue, uint16_t aValueLength) 
+otError otPlatSettingsAdd(otInstance * aInstance, uint16_t aKey, const uint8_t * aValue, uint16_t aValueLength)
 {
-	OT_UNUSED_VARIABLE(aInstance);
-	OT_UNUSED_VARIABLE(aValue);
+    OT_UNUSED_VARIABLE(aInstance);
+    OT_UNUSED_VARIABLE(aValue);
 
-	otError error;
-	struct settingsBlock *currentBlock;
-	const uint16_t newBlockLength = sizeof(struct settingsBlock) + aValueLength;
+    otError error;
+    struct settingsBlock * currentBlock;
+    const uint16_t newBlockLength = sizeof(struct settingsBlock) + aValueLength;
 
-	if ((sSettingsBufPos + newBlockLength)
-			<= (GetSettingsBuffer_Base() + GetSettingsBuffer_Size()))
-	{
-		currentBlock = (struct settingsBlock*) sSettingsBufPos;
-		currentBlock->key = aKey;
-		currentBlock->length = aValueLength;
+    if ((sSettingsBufPos + newBlockLength) <= (GetSettingsBuffer_Base() + GetSettingsBuffer_Size()))
+    {
+        currentBlock         = (struct settingsBlock *) sSettingsBufPos;
+        currentBlock->key    = aKey;
+        currentBlock->length = aValueLength;
 
-		memcpy((uint8_t*) (sSettingsBufPos + sizeof(struct settingsBlock)),
-				           aValue, aValueLength);
+        memcpy((uint8_t *) (sSettingsBufPos + sizeof(struct settingsBlock)), aValue, aValueLength);
 
-		/* Update current position on Buffer */
-		sSettingsBufPos += newBlockLength;
+        /* Update current position on Buffer */
+        sSettingsBufPos += newBlockLength;
 
-		error = OT_ERROR_NONE;
-	} 
-	else 
-	{
-		error = OT_ERROR_NO_BUFS;
-	}
+        error = OT_ERROR_NONE;
+    }
+    else
+    {
+        error = OT_ERROR_NO_BUFS;
+    }
 
-	return error;
+    return error;
 }
 
-otError otPlatSettingsDelete(otInstance *aInstance, uint16_t aKey, int aIndex)
+otError otPlatSettingsDelete(otInstance * aInstance, uint16_t aKey, int aIndex)
 {
-	OT_UNUSED_VARIABLE(aInstance);
+    OT_UNUSED_VARIABLE(aInstance);
 
-	const struct settingsBlock *currentBlock;
-	uint32_t buf_pos = GetSettingsBuffer_Base();
-	int currentIndex = 0;
-	uint16_t currentBlockLength;
-	uint32_t nextBlockStart;
-	otError error = OT_ERROR_NOT_FOUND;
+    const struct settingsBlock * currentBlock;
+    uint32_t buf_pos = GetSettingsBuffer_Base();
+    int currentIndex = 0;
+    uint16_t currentBlockLength;
+    uint32_t nextBlockStart;
+    otError error = OT_ERROR_NOT_FOUND;
 
-	while (buf_pos < sSettingsBufPos)
-	 {
-		currentBlock = (struct settingsBlock*) (buf_pos);
-		currentBlockLength = sizeof(struct settingsBlock)
-				+ currentBlock->length;
+    while (buf_pos < sSettingsBufPos)
+    {
+        currentBlock       = (struct settingsBlock *) (buf_pos);
+        currentBlockLength = sizeof(struct settingsBlock) + currentBlock->length;
 
-		if (aKey == currentBlock->key) 
-		{
-			if ((currentIndex == aIndex) || (aIndex == -1))
-			{
-				nextBlockStart = buf_pos + currentBlockLength;
-				if (nextBlockStart < sSettingsBufPos)
-				{
-					memmove((uint8_t*) buf_pos, (uint8_t*) nextBlockStart,
-							(sSettingsBufPos - nextBlockStart));
-				}
+        if (aKey == currentBlock->key)
+        {
+            if ((currentIndex == aIndex) || (aIndex == -1))
+            {
+                nextBlockStart = buf_pos + currentBlockLength;
+                if (nextBlockStart < sSettingsBufPos)
+                {
+                    memmove((uint8_t *) buf_pos, (uint8_t *) nextBlockStart, (sSettingsBufPos - nextBlockStart));
+                }
 
-				sSettingsBufPos -= currentBlockLength;
-				error = OT_ERROR_NONE;
-				break;
-			} 
-			else
-			{
-				currentIndex++;
-			}
-		}
-		buf_pos += currentBlockLength;
-	}
-	return error;
+                sSettingsBufPos -= currentBlockLength;
+                error = OT_ERROR_NONE;
+                break;
+            }
+            else
+            {
+                currentIndex++;
+            }
+        }
+        buf_pos += currentBlockLength;
+    }
+    return error;
 }
 
-otError otPlatSettingsSet(otInstance *aInstance, uint16_t aKey,
-		const uint8_t *aValue, uint16_t aValueLength)
+otError otPlatSettingsSet(otInstance * aInstance, uint16_t aKey, const uint8_t * aValue, uint16_t aValueLength)
 {
-	OT_UNUSED_VARIABLE(aInstance);
+    OT_UNUSED_VARIABLE(aInstance);
 
-	const struct settingsBlock *currentBlock;
-	uint32_t buf_pos = GetSettingsBuffer_Base();
-	uint16_t currentBlockLength;
-	uint32_t nextBlockStart;
+    const struct settingsBlock * currentBlock;
+    uint32_t buf_pos = GetSettingsBuffer_Base();
+    uint16_t currentBlockLength;
+    uint32_t nextBlockStart;
 
-	while (buf_pos < sSettingsBufPos) 
-	{
-		currentBlock = (struct settingsBlock*) (buf_pos);
-		currentBlockLength = sizeof(struct settingsBlock)
-				+ currentBlock->length;
-		if (aKey == currentBlock->key) 
-		{
-			nextBlockStart = buf_pos + currentBlockLength;
-			if (nextBlockStart < sSettingsBufPos)
-			{
-				memmove((uint8_t*) (buf_pos), (uint8_t*) nextBlockStart,
-						(sSettingsBufPos - nextBlockStart));
-			}
-			sSettingsBufPos -= currentBlockLength;
-		} 
-		else 
-		{
-			buf_pos += currentBlockLength;
-		}
-	}
+    while (buf_pos < sSettingsBufPos)
+    {
+        currentBlock       = (struct settingsBlock *) (buf_pos);
+        currentBlockLength = sizeof(struct settingsBlock) + currentBlock->length;
+        if (aKey == currentBlock->key)
+        {
+            nextBlockStart = buf_pos + currentBlockLength;
+            if (nextBlockStart < sSettingsBufPos)
+            {
+                memmove((uint8_t *) (buf_pos), (uint8_t *) nextBlockStart, (sSettingsBufPos - nextBlockStart));
+            }
+            sSettingsBufPos -= currentBlockLength;
+        }
+        else
+        {
+            buf_pos += currentBlockLength;
+        }
+    }
 
-	return otPlatSettingsAdd(aInstance, aKey, aValue, aValueLength);
+    return otPlatSettingsAdd(aInstance, aKey, aValue, aValueLength);
 }
 
-void otPlatSettingsWipe(otInstance *aInstance) 
+void otPlatSettingsWipe(otInstance * aInstance)
 {
-	sSettingsIsReset = ~sSettingsIsReset;
-	sSettingsBufPos = GetSettingsBuffer_Base();
+    sSettingsIsReset = ~sSettingsIsReset;
+    sSettingsBufPos  = GetSettingsBuffer_Base();
 }

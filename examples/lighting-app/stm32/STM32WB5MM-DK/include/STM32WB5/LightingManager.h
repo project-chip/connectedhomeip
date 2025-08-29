@@ -25,11 +25,9 @@
 
 #include <lib/core/CHIPError.h>
 
-class LightingManager
-{
+class LightingManager {
 public:
-    enum Action_t
-    {
+    enum Action_t {
         ON_ACTION = 0,
         OFF_ACTION,
         LEVEL_ACTION,
@@ -38,8 +36,7 @@ public:
         INVALID_ACTION
     } Action;
 
-    enum State_t
-    {
+    enum State_t {
         kState_On = 0,
         kState_Off,
     } State;

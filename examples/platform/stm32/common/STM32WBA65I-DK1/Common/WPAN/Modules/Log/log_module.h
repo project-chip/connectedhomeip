@@ -1,21 +1,21 @@
 /* USER CODE BEGIN Header */
 /**
-  ******************************************************************************
-  * @file    log_module.h
-  * @author  MCD Application Team
-  * @brief   Header file of the log module.
-  ******************************************************************************
-  * @attention
-  *
-  * Copyright (c) 2024 STMicroelectronics.
-  * All rights reserved.
-  *
-  * This software is licensed under terms that can be found in the LICENSE file
-  * in the root directory of this software component.
-  * If no LICENSE file comes with this software, it is provided AS-IS.
-  *
-  ******************************************************************************
-  */
+ ******************************************************************************
+ * @file    log_module.h
+ * @author  MCD Application Team
+ * @brief   Header file of the log module.
+ ******************************************************************************
+ * @attention
+ *
+ * Copyright (c) 2024 STMicroelectronics.
+ * All rights reserved.
+ *
+ * This software is licensed under terms that can be found in the LICENSE file
+ * in the root directory of this software component.
+ * If no LICENSE file comes with this software, it is provided AS-IS.
+ *
+ ******************************************************************************
+ */
 /* USER CODE END Header */
 
 /* Define to prevent recursive inclusion -------------------------------------*/
@@ -27,10 +27,10 @@ extern "C" {
 #endif
 
 /* Includes ------------------------------------------------------------------*/
-#include <stdarg.h>
-#include <stdint.h>
-#include <stdbool.h>
 #include "log_module_conf.h"
+#include <stdarg.h>
+#include <stdbool.h>
+#include <stdint.h>
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
@@ -49,8 +49,8 @@ extern "C" {
  */
 typedef struct
 {
-  Log_Verbose_Level_t   verbose_level;
-  uint32_t              region_mask;
+    Log_Verbose_Level_t verbose_level;
+    uint32_t region_mask;
 } Log_Module_t;
 
 /**

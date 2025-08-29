@@ -32,9 +32,9 @@ extern "C" {
 /*! Attribute structure */
 typedef struct
 {
-    uint16_t vendorId;             /*! VendorId info from image header */
-    uint16_t productId;            /*! ProductId info from image header */
-    uint32_t softwareVersion;      /*! Software version of the binary */
+    uint16_t vendorId; /*! VendorId info from image header */
+    uint16_t productId; /*! ProductId info from image header */
+    uint32_t softwareVersion; /*! Software version of the binary */
     uint32_t minApplicableVersion; /*! Minimum running software version to be compatible with the OTA image */
     uint32_t maxApplicableVersion; /*! Maximum running software version to be compatible with the OTA image */
 } Ota_ImageHeader_t;

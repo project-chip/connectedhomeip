@@ -1,21 +1,21 @@
 /* USER CODE BEGIN Header */
 /**
-  ******************************************************************************
-  * @file    log_module_conf.h
-  * @author  MCD Application Team
-  * @brief   Header file of the log module.
-  ******************************************************************************
-  * @attention
-  *
-  * Copyright (c) 2024 STMicroelectronics.
-  * All rights reserved.
-  *
-  * This software is licensed under terms that can be found in the LICENSE file
-  * in the root directory of this software component.
-  * If no LICENSE file comes with this software, it is provided AS-IS.
-  *
-  ******************************************************************************
-  */
+ ******************************************************************************
+ * @file    log_module_conf.h
+ * @author  MCD Application Team
+ * @brief   Header file of the log module.
+ ******************************************************************************
+ * @attention
+ *
+ * Copyright (c) 2024 STMicroelectronics.
+ * All rights reserved.
+ *
+ * This software is licensed under terms that can be found in the LICENSE file
+ * in the root directory of this software component.
+ * If no LICENSE file comes with this software, it is provided AS-IS.
+ *
+ ******************************************************************************
+ */
 /* USER CODE END Header */
 
 /* Define to prevent recursive inclusion -------------------------------------*/
@@ -40,20 +40,20 @@ extern "C" {
  *         When this define is set to 1, the time stamp is added to the trace data,
  *         according to the function registered with Log_Module_RegisterTimeStampFunction.
  */
-#define LOG_INSERT_TIME_STAMP_INSIDE_THE_TRACE    CFG_LOG_INSERT_TIME_STAMP_INSIDE_THE_TRACE
+#define LOG_INSERT_TIME_STAMP_INSIDE_THE_TRACE CFG_LOG_INSERT_TIME_STAMP_INSIDE_THE_TRACE
 
 /**
  * @brief  When this define is set to 0, the color of the trace data remains the same for all regions.
  *         When this define is set to 1, the color added to the trace data is based on LOG_COLOR_DEFAULT_CONFIGURATION.
  */
-#define LOG_INSERT_COLOR_INSIDE_THE_TRACE         CFG_LOG_INSERT_COLOR_INSIDE_THE_TRACE
+#define LOG_INSERT_COLOR_INSIDE_THE_TRACE CFG_LOG_INSERT_COLOR_INSIDE_THE_TRACE
 
 /**
  * @brief  When this define is set to 0, the trace data is not modified.
  *         When this define is set to 1, if there is no ENDOFLINE_CHAR as last
  *         character in the trace data, then one is added.
  */
-#define LOG_INSERT_EOL_INSIDE_THE_TRACE           CFG_LOG_INSERT_EOL_INSIDE_THE_TRACE
+#define LOG_INSERT_EOL_INSIDE_THE_TRACE CFG_LOG_INSERT_EOL_INSIDE_THE_TRACE
 
 /* USER CODE BEGIN Module configuration */
 
@@ -61,10 +61,10 @@ extern "C" {
 
 /* Private defines -----------------------------------------------------------*/
 /* These defines are related to the UTIL_ADV_TRACE. Do not modify them please. */
-#define LOG_MODULE_MIN_VERBOSE_LEVEL    (0)
-#define LOG_MODULE_MAX_VERBOSE_LEVEL    (0xFFFFFFFF)
-#define LOG_MODULE_MIN_REGION_VALUE     (0)
-#define LOG_MODULE_ALL_REGION_MASK      (0xFFFFFFFF)
+#define LOG_MODULE_MIN_VERBOSE_LEVEL (0)
+#define LOG_MODULE_MAX_VERBOSE_LEVEL (0xFFFFFFFF)
+#define LOG_MODULE_MIN_REGION_VALUE (0)
+#define LOG_MODULE_ALL_REGION_MASK (0xFFFFFFFF)
 
 /* USER CODE BEGIN PD */
 
@@ -85,25 +85,24 @@ extern "C" {
  *         The user can add its own levels but must NOT add a value to the said
  *         levels. Verbose levels are handled by the UTIL_ADV_TRACE.
  */
-typedef enum
-{
-  LOG_VERBOSE_INFO = LOG_MODULE_MIN_VERBOSE_LEVEL,
-  /* USER CODE BEGIN Log_Verbose_Level_t_0 */
+typedef enum {
+    LOG_VERBOSE_INFO = LOG_MODULE_MIN_VERBOSE_LEVEL,
+    /* USER CODE BEGIN Log_Verbose_Level_t_0 */
 
-  /* USER CODE END Log_Verbose_Level_t_0 */
-  LOG_VERBOSE_ERROR,
-  /* USER CODE BEGIN Log_Verbose_Level_t_1 */
+    /* USER CODE END Log_Verbose_Level_t_0 */
+    LOG_VERBOSE_ERROR,
+    /* USER CODE BEGIN Log_Verbose_Level_t_1 */
 
-  /* USER CODE END Log_Verbose_Level_t_1 */
-  LOG_VERBOSE_WARNING,
-  /* USER CODE BEGIN Log_Verbose_Level_t_2 */
+    /* USER CODE END Log_Verbose_Level_t_1 */
+    LOG_VERBOSE_WARNING,
+    /* USER CODE BEGIN Log_Verbose_Level_t_2 */
 
-  /* USER CODE END Log_Verbose_Level_t_2 */
-  LOG_VERBOSE_DEBUG,
-  /* USER CODE BEGIN Log_Verbose_Level_t_3 */
+    /* USER CODE END Log_Verbose_Level_t_2 */
+    LOG_VERBOSE_DEBUG,
+    /* USER CODE BEGIN Log_Verbose_Level_t_3 */
 
-  /* USER CODE END Log_Verbose_Level_t_3 */
-  LOG_VERBOSE_ALL_LOGS = LOG_MODULE_MAX_VERBOSE_LEVEL,
+    /* USER CODE END Log_Verbose_Level_t_3 */
+    LOG_VERBOSE_ALL_LOGS = LOG_MODULE_MAX_VERBOSE_LEVEL,
 } Log_Verbose_Level_t;
 
 /**
@@ -124,33 +123,31 @@ typedef enum
  *         The user can add its own regions but must NOT add a value to them.
  *         The log module handles the mask on its own.
  */
-typedef enum
-{
-  LOG_REGION_BLE = LOG_MODULE_MIN_REGION_VALUE,
-  LOG_REGION_SYSTEM,
-  LOG_REGION_APP,
-  LOG_REGION_LINKLAYER,
-  LOG_REGION_MAC,
-  LOG_REGION_ZIGBEE,
-  LOG_REGION_THREAD,
-  LOG_REGION_RTOS,
-  /* USER CODE BEGIN Log_Region_t */
+typedef enum {
+    LOG_REGION_BLE = LOG_MODULE_MIN_REGION_VALUE,
+    LOG_REGION_SYSTEM,
+    LOG_REGION_APP,
+    LOG_REGION_LINKLAYER,
+    LOG_REGION_MAC,
+    LOG_REGION_ZIGBEE,
+    LOG_REGION_THREAD,
+    LOG_REGION_RTOS,
+    /* USER CODE BEGIN Log_Region_t */
 
-  /* USER CODE END Log_Region_t */
-  LOG_REGION_ALL_REGIONS = LOG_MODULE_ALL_REGION_MASK,
+    /* USER CODE END Log_Region_t */
+    LOG_REGION_ALL_REGIONS = LOG_MODULE_ALL_REGION_MASK,
 } Log_Region_t;
 
-typedef enum
-{
-  LOG_COLOR_NONE          = 0,     /* Initialization */
-  LOG_COLOR_CODE_DEFAULT  = 37,    /* White */
-  LOG_COLOR_CODE_RED      = 91,
-  LOG_COLOR_CODE_GREEN    = 92,
-  LOG_COLOR_CODE_YELLOW   = 93,
-  LOG_COLOR_CODE_CYAN     = 96,
-  /* USER CODE BEGIN Log_Color_t */
+typedef enum {
+    LOG_COLOR_NONE = 0, /* Initialization */
+    LOG_COLOR_CODE_DEFAULT = 37, /* White */
+    LOG_COLOR_CODE_RED = 91,
+    LOG_COLOR_CODE_GREEN = 92,
+    LOG_COLOR_CODE_YELLOW = 93,
+    LOG_COLOR_CODE_CYAN = 96,
+    /* USER CODE BEGIN Log_Color_t */
 
-  /* USER CODE END Log_Color_t */
+    /* USER CODE END Log_Color_t */
 } Log_Color_t;
 
 /* USER CODE BEGIN ET */
@@ -160,21 +157,29 @@ typedef enum
 /* Exported macro ------------------------------------------------------------*/
 /* Display 64 bits number for all compiler. */
 /* Example : LOG_INFO_APP( "New Device : " LOG_DISPLAY64() " installed in %d seconds", LOG_NUMBER64( dlDevice ), iTime ); */
-#define LOG_DISPLAY64()             "0x%08X%08X"
-#define LOG_NUMBER64( number )      (uint32_t)( number >> 32u ), (uint32_t)( number )
+#define LOG_DISPLAY64() "0x%08X%08X"
+#define LOG_NUMBER64(number) (uint32_t) (number >> 32u), (uint32_t) (number)
 
 /* Module API - Log macros for each region */
 /* LOG_REGION_BLE */
 #if (CFG_LOG_SUPPORTED != 0)
-#define LOG_INFO_BLE(...)         Log_Module_Print( LOG_VERBOSE_INFO, LOG_REGION_BLE, __VA_ARGS__)
-#define LOG_ERROR_BLE(...)        Log_Module_Print( LOG_VERBOSE_ERROR, LOG_REGION_BLE, __VA_ARGS__)
-#define LOG_WARNING_BLE(...)      Log_Module_Print( LOG_VERBOSE_WARNING, LOG_REGION_BLE, __VA_ARGS__)
-#define LOG_DEBUG_BLE(...)        Log_Module_Print( LOG_VERBOSE_DEBUG, LOG_REGION_BLE, __VA_ARGS__)
+#define LOG_INFO_BLE(...) Log_Module_Print(LOG_VERBOSE_INFO, LOG_REGION_BLE, __VA_ARGS__)
+#define LOG_ERROR_BLE(...) Log_Module_Print(LOG_VERBOSE_ERROR, LOG_REGION_BLE, __VA_ARGS__)
+#define LOG_WARNING_BLE(...) Log_Module_Print(LOG_VERBOSE_WARNING, LOG_REGION_BLE, __VA_ARGS__)
+#define LOG_DEBUG_BLE(...) Log_Module_Print(LOG_VERBOSE_DEBUG, LOG_REGION_BLE, __VA_ARGS__)
 #else /* (CFG_LOG_SUPPORTED != 0) */
-#define LOG_INFO_BLE(...)         do {} while(0)
-#define LOG_ERROR_BLE(...)        do {} while(0)
-#define LOG_WARNING_BLE(...)      do {} while(0)
-#define LOG_DEBUG_BLE(...)        do {} while(0)
+#define LOG_INFO_BLE(...) \
+    do {                  \
+    } while (0)
+#define LOG_ERROR_BLE(...) \
+    do {                   \
+    } while (0)
+#define LOG_WARNING_BLE(...) \
+    do {                     \
+    } while (0)
+#define LOG_DEBUG_BLE(...) \
+    do {                   \
+    } while (0)
 #endif /* (CFG_LOG_SUPPORTED != 0) */
 
 /* USER CODE BEGIN LOG_REGION_BLE */
@@ -192,15 +197,23 @@ typedef enum
 
 /* LOG_REGION_SYSTEM */
 #if (CFG_LOG_SUPPORTED != 0)
-#define LOG_INFO_SYSTEM(...)      Log_Module_Print( LOG_VERBOSE_INFO, LOG_REGION_SYSTEM, __VA_ARGS__)
-#define LOG_ERROR_SYSTEM(...)     Log_Module_Print( LOG_VERBOSE_ERROR, LOG_REGION_SYSTEM, __VA_ARGS__)
-#define LOG_WARNING_SYSTEM(...)   Log_Module_Print( LOG_VERBOSE_WARNING, LOG_REGION_SYSTEM, __VA_ARGS__)
-#define LOG_DEBUG_SYSTEM(...)     Log_Module_Print( LOG_VERBOSE_DEBUG, LOG_REGION_SYSTEM, __VA_ARGS__)
+#define LOG_INFO_SYSTEM(...) Log_Module_Print(LOG_VERBOSE_INFO, LOG_REGION_SYSTEM, __VA_ARGS__)
+#define LOG_ERROR_SYSTEM(...) Log_Module_Print(LOG_VERBOSE_ERROR, LOG_REGION_SYSTEM, __VA_ARGS__)
+#define LOG_WARNING_SYSTEM(...) Log_Module_Print(LOG_VERBOSE_WARNING, LOG_REGION_SYSTEM, __VA_ARGS__)
+#define LOG_DEBUG_SYSTEM(...) Log_Module_Print(LOG_VERBOSE_DEBUG, LOG_REGION_SYSTEM, __VA_ARGS__)
 #else /* (CFG_LOG_SUPPORTED != 0) */
-#define LOG_INFO_SYSTEM(...)      do {} while(0)
-#define LOG_ERROR_SYSTEM(...)     do {} while(0)
-#define LOG_WARNING_SYSTEM(...)   do {} while(0)
-#define LOG_DEBUG_SYSTEM(...)     do {} while(0)
+#define LOG_INFO_SYSTEM(...) \
+    do {                     \
+    } while (0)
+#define LOG_ERROR_SYSTEM(...) \
+    do {                      \
+    } while (0)
+#define LOG_WARNING_SYSTEM(...) \
+    do {                        \
+    } while (0)
+#define LOG_DEBUG_SYSTEM(...) \
+    do {                      \
+    } while (0)
 #endif /* (CFG_LOG_SUPPORTED != 0) */
 
 /* USER CODE BEGIN LOG_REGION_SYSTEM */
@@ -218,15 +231,23 @@ typedef enum
 
 /* LOG_REGION_APP */
 #if (CFG_LOG_SUPPORTED != 0)
-#define LOG_INFO_APP(...)         Log_Module_Print( LOG_VERBOSE_INFO, LOG_REGION_APP, __VA_ARGS__)
-#define LOG_ERROR_APP(...)        Log_Module_Print( LOG_VERBOSE_ERROR, LOG_REGION_APP, __VA_ARGS__)
-#define LOG_WARNING_APP(...)      Log_Module_Print( LOG_VERBOSE_WARNING, LOG_REGION_APP, __VA_ARGS__)
-#define LOG_DEBUG_APP(...)        Log_Module_Print( LOG_VERBOSE_DEBUG, LOG_REGION_APP, __VA_ARGS__)
+#define LOG_INFO_APP(...) Log_Module_Print(LOG_VERBOSE_INFO, LOG_REGION_APP, __VA_ARGS__)
+#define LOG_ERROR_APP(...) Log_Module_Print(LOG_VERBOSE_ERROR, LOG_REGION_APP, __VA_ARGS__)
+#define LOG_WARNING_APP(...) Log_Module_Print(LOG_VERBOSE_WARNING, LOG_REGION_APP, __VA_ARGS__)
+#define LOG_DEBUG_APP(...) Log_Module_Print(LOG_VERBOSE_DEBUG, LOG_REGION_APP, __VA_ARGS__)
 #else /* (CFG_LOG_SUPPORTED != 0) */
-#define LOG_INFO_APP(...)         do {} while(0)
-#define LOG_ERROR_APP(...)        do {} while(0)
-#define LOG_WARNING_APP(...)      do {} while(0)
-#define LOG_DEBUG_APP(...)        do {} while(0)
+#define LOG_INFO_APP(...) \
+    do {                  \
+    } while (0)
+#define LOG_ERROR_APP(...) \
+    do {                   \
+    } while (0)
+#define LOG_WARNING_APP(...) \
+    do {                     \
+    } while (0)
+#define LOG_DEBUG_APP(...) \
+    do {                   \
+    } while (0)
 #endif /* (CFG_LOG_SUPPORTED != 0) */
 
 /* USER CODE BEGIN LOG_REGION_APP */
@@ -244,15 +265,23 @@ typedef enum
 
 /* LOG_REGION_LINKLAYER */
 #if (CFG_LOG_SUPPORTED != 0)
-#define LOG_INFO_LINKLAYER(...)   Log_Module_Print( LOG_VERBOSE_INFO, LOG_REGION_LINKLAYER, __VA_ARGS__)
-#define LOG_ERROR_LINKLAYER(...)  Log_Module_Print( LOG_VERBOSE_ERROR, LOG_REGION_LINKLAYER, __VA_ARGS__)
-#define LOG_WARNING_LINKLAYER(...)Log_Module_Print( LOG_VERBOSE_WARNING, LOG_REGION_LINKLAYER, __VA_ARGS__)
-#define LOG_DEBUG_LINKLAYER(...)  Log_Module_Print( LOG_VERBOSE_DEBUG, LOG_REGION_LINKLAYER, __VA_ARGS__)
+#define LOG_INFO_LINKLAYER(...) Log_Module_Print(LOG_VERBOSE_INFO, LOG_REGION_LINKLAYER, __VA_ARGS__)
+#define LOG_ERROR_LINKLAYER(...) Log_Module_Print(LOG_VERBOSE_ERROR, LOG_REGION_LINKLAYER, __VA_ARGS__)
+#define LOG_WARNING_LINKLAYER(...) Log_Module_Print(LOG_VERBOSE_WARNING, LOG_REGION_LINKLAYER, __VA_ARGS__)
+#define LOG_DEBUG_LINKLAYER(...) Log_Module_Print(LOG_VERBOSE_DEBUG, LOG_REGION_LINKLAYER, __VA_ARGS__)
 #else /* (CFG_LOG_SUPPORTED != 0) */
-#define LOG_INFO_LINKLAYER(...)   do {} while(0)
-#define LOG_ERROR_LINKLAYER(...)  do {} while(0)
-#define LOG_WARNING_LINKLAYER(...)do {} while(0)
-#define LOG_DEBUG_LINKLAYER(...)  do {} while(0)
+#define LOG_INFO_LINKLAYER(...) \
+    do {                        \
+    } while (0)
+#define LOG_ERROR_LINKLAYER(...) \
+    do {                         \
+    } while (0)
+#define LOG_WARNING_LINKLAYER(...) \
+    do {                           \
+    } while (0)
+#define LOG_DEBUG_LINKLAYER(...) \
+    do {                         \
+    } while (0)
 #endif /* (CFG_LOG_SUPPORTED != 0) */
 
 /* USER CODE BEGIN LOG_REGION_LINKLAYER */
