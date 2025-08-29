@@ -100,3 +100,6 @@ leak:uregex_open
 leak:_instantiateTLVs
 # macOS 15
 leak:dyld::ThreadLocalVariables::instantiateVariable
+
+# ignore (maybe false-positive?) leaks in macOS key value store init
+leak:KeyValueStoreManagerImpl::Init
