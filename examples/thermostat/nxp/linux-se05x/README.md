@@ -78,13 +78,13 @@ To use SE05x for device attestation,
 1. Enable device attestation option when building the example -
 
 ```
-gn gen out --args="chip_se05x_device_attestation=y"
+gn gen out --args="chip_se05x_device_attestation=true"
 ```
 
 2. Run the provision example (one time)
    `third_party/simw-top-mini/repo/demos/se05x_dev_attest_key_prov/` to
    provision the device attestation key at id - 0x7D300000 and device
-   attestation certificate at id - 0x7FFF3007.
+   attestation certificate at id - 0x7D300001.
 
 ```
 cd third_party/simw-top-mini/repo/demos/se05x_dev_attest_key_prov/linux

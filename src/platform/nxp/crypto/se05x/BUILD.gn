@@ -57,8 +57,7 @@ static_library("nxp_crypto_lib") {
   defines = []
 
   # In case nxp_external_sdk is defined assuming that se05x option would be set by KCONFIG.
-  if (!nxp_external_sdk)
-  {
+  if (!nxp_external_sdk) {
     if (chip_se05x_spake_verifier) {
       defines += [ "ENABLE_SE05X_SPAKE_VERIFIER=1" ]
     }

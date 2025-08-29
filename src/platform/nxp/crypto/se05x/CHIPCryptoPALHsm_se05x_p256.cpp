@@ -643,7 +643,6 @@ CHIP_ERROR P256Keypair::NewCertificateSigningRequest(uint8_t * csr, size_t & csr
                   sizeof(data_to_hash));
     VerifyOrExit(ret == 0, error = CHIP_ERROR_INTERNAL);
 
-
     buffer_index -= (kTlvHeader + sizeof(organisation_oid));
     VerifyOrExit(buffer_index > 0, error = CHIP_ERROR_INTERNAL);
     ret = add_tlv(data_to_hash, buffer_index, ASN1_OID, sizeof(organisation_oid), organisation_oid, sizeof(data_to_hash));
@@ -722,12 +721,13 @@ CHIP_ERROR P256Keypair::NewCertificateSigningRequest(uint8_t * csr, size_t & csr
     VerifyOrExit((csr_index + sizeof(signature_oid) + kTlvHeader) <= csr_length, error = CHIP_ERROR_INTERNAL);
     ret = add_tlv(csr, csr_index, ASN1_OID, sizeof(signature_oid), signature_oid, csr_length);
     VerifyOrExit(ret == 0, error = CHIP_ERROR_INTERNAL);
+
     csr_index = csr_index + kTlvHeader + sizeof(signature_oid);
 
     VerifyOrExit((csr_index + kTlvHeader) <= csr_length, error = CHIP_ERROR_INTERNAL);
     ret = add_tlv(csr, csr_index, ASN1_NULL, 0x00, NULL, csr_length);
     VerifyOrExit(ret == 0, error = CHIP_ERROR_INTERNAL);
-    
+
     csr_index = csr_index + kTlvHeader;
 
     VerifyOrExit((csr_index + kTlvHeader) <= csr_length, error = CHIP_ERROR_INTERNAL);

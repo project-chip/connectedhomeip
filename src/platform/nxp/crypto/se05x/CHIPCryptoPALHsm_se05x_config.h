@@ -127,8 +127,8 @@
 /*
  * Enable se05x for DA
  * Ensure to run the provision example (one time) `third_party/simw-top-mini/repo/demos/se05x_dev_attest_key_prov/` to provision the
-   device attestation key at id - 0x7FFF3007 and
-   device attestation certificate at id - 0x7FFF3003.
+   device attestation key at id - 0x7D300000 and
+   device attestation certificate at id - 0x7D300001.
  */
 #ifndef ENABLE_SE05X_DEVICE_ATTESTATION
 #ifdef CONFIG_CHIP_SE05X_DEVICE_ATTESTATION

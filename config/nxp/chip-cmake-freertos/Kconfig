@@ -251,9 +251,9 @@ config CHIP_SE05X_PBKDF2_SHA256
 		Enable SE05x Secure element for PBKDF2_SHA256.
 
 config CHIP_SE05X_HKDF_SHA256
-	bool "Enable SE05x Secure element for HMAC_SHA256"
+	bool "Enable SE05x Secure element for HKDF_SHA256"
 	help
-		Enable SE05x Secure element for HMAC_SHA256.
+		Enable SE05x Secure element for HKDF_SHA256.
 
 config CHIP_SE05X_HMAC_SHA256
 	bool "Enable SE05x Secure element for HMAC_SHA256"
