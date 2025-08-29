@@ -53,6 +53,7 @@ PushAvStreamTransportServerLogic::PushAvStreamTransportServerLogic(EndpointId aE
 
 PushAvStreamTransportServerLogic::~PushAvStreamTransportServerLogic()
 {
+    mDelegate = nullptr;
     for (const auto & timerContext : mTimerContexts)
     {
         DeviceLayer::SystemLayer().CancelTimer(PushAVStreamTransportDeallocateCallback, static_cast<void *>(timerContext.get()));
