@@ -1,24 +1,21 @@
 #include "general-commissioning-logic.h"
 
-#include <app/reporting/reporting.h>
 #include <app/server/CommissioningWindowManager.h>
-#include <app/util/attribute-storage.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
-#include <platform/ConfigurationManager.h>
+
 #include <platform/DeviceControlServer.h>
+
+#include <app/data-model/Decode.h>
+#include <app/data-model/Encode.h>
 
 #include <app/ConcreteCommandPath.h>
 #include <lib/core/Optional.h>
 #include <transport/SecureSession.h>
 
 #include <lib/core/DataModelTypes.h>
-#include <platform/CommissionableDataProvider.h>
 #include <protocols/interaction_model/StatusCode.h>
 #include <tracing/macros.h>
-
-#include <lib/support/CodeUtils.h>
-#include <lib/support/logging/CHIPLogging.h>
 
 using namespace chip;
 using namespace chip::app;
