@@ -970,6 +970,29 @@ class CommodityTariffTestBaseHelper(MatterBaseTest):
 
         return matter_time + MATTER_UNIX_EPOCH_OFFSET
 
+    async def get_day_pattern_IDs_for_active_calendar_period(self, next: bool = False) -> List[int]:
+        """Define active calendar period based on CurrentDayEntryDateValue or NextDayEntryDateValue and extract DayPatternIDs field.
+
+        Args:
+            next (bool, optional): If True, use NextDayEntryDateValue. Defaults to False (Use CurrentDayEntryDateValue).
+
+        Returns:
+            List[int]: DayPatternIDs field of active calendar period.
+        """
+
+        day_patterns_IDs = []
+
+        if not next:
+            date = self.currentDayEntryDateValue
+        else:
+            date = self.nextDayEntryDateValue
+
+        for period in self.calendarPeriodsValue[::-1]:
+            if period.startDate < date:
+                day_patterns_IDs = period.dayPatternIDs
+
+        return day_patterns_IDs
+
     async def get_day_of_week_from_current_day_entry_date(self, current_day_entry_date: int) -> int:
 
         weekDays = {
@@ -1257,3 +1280,30 @@ class CommodityTariffTestBaseHelper(MatterBaseTest):
             self._current_tariff_component_matcher(),
             self._next_tariff_component_matcher()
         ]
+
+    async def search_day_pattern_for_given_day_of_week_check_day_entry_IDs(self, list_of_day_pattern_IDs: List[int],
+                                                                           day_of_week: int,
+                                                                           list_of_day_entry_IDs: List[int],
+                                                                           current_or_next: str) -> None:
+        """1. Searches DayPattern in currently active CalendarPeriod that contains the given day of week.
+        2. Checks that DayEntryIDs from DayPattern are equal to DayEntryIDs from CurrentDay/NextDay attribute.
+
+        Args:
+            list_of_day_pattern_IDs (List[int]): List of DayPatternIDs from defined active CalendarPeriodStruct.
+            day_of_week (int): Day of Week defined based on CurrentDayEntryDate/NextDayEntryDate attribute value.
+            list_of_day_entry_IDs (List[int]): List of DayEntryIDs from CurrentDay/NextDay attribute.
+            current_or_next (str): "Current" or "Next".
+        """
+
+        day_pattern_found = False
+
+        for dayPattern in self.dayPatternsValue:
+            if dayPattern.dayPatternID in list_of_day_pattern_IDs:
+                if (dayPattern.daysOfWeek & day_of_week) == day_of_week:
+                    asserts.assert_equal(sorted(dayPattern.dayEntryIDs), sorted(list_of_day_entry_IDs),
+                                         f"DayEntryIDs from DayPatterns must be equal to DayEntryIDs from {current_or_next}Day.")
+                    day_pattern_found = True
+                    return
+
+        if not day_pattern_found:
+            asserts.fail(f"DayPattern not found for {current_or_next}DayEntryDate attribute value.")
