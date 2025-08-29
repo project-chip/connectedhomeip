@@ -22,7 +22,7 @@ from mobly import asserts
 
 from matter.testing.conformance import (Choice, Conformance, ConformanceDecision, ConformanceException, ConformanceParseParameters,
                                         deprecated, disallowed, mandatory, optional, parse_basic_callable_from_xml,
-                                        parse_callable_from_xml, parse_device_type_callable_from_xml, provisional, zigbee)
+                                        parse_callable_from_xml, provisional, zigbee)
 from matter.testing.matter_testing import MatterBaseTest, default_matter_test_main
 from matter.tlv import uint
 
@@ -705,7 +705,7 @@ class TestConformanceSupport(MatterBaseTest):
                '<condition name="zigbee" />'
                '</mandatoryConform>')
         et = ElementTree.fromstring(xml)
-        xml_callable = parse_device_type_callable_from_xml(et)
+        xml_callable = parse_callable_from_xml(et, self.params)
         asserts.assert_equal(str(xml_callable), 'Zigbee', msg)
         asserts.assert_equal(xml_callable(0, [], []).decision, ConformanceDecision.NOT_APPLICABLE, msg)
 
@@ -713,7 +713,7 @@ class TestConformanceSupport(MatterBaseTest):
                '<condition name="zigbee" />'
                '</optionalConform>')
         et = ElementTree.fromstring(xml)
-        xml_callable = parse_device_type_callable_from_xml(et)
+        xml_callable = parse_callable_from_xml(et, self.params)
         # expect no exception here
         asserts.assert_equal(str(xml_callable), '[Zigbee]', msg)
         asserts.assert_equal(xml_callable(0, [], []).decision, ConformanceDecision.NOT_APPLICABLE, msg)
@@ -724,23 +724,20 @@ class TestConformanceSupport(MatterBaseTest):
                '<provisionalConform />'
                '</otherwiseConform>')
         et = ElementTree.fromstring(xml)
-        xml_callable = parse_device_type_callable_from_xml(et)
+        xml_callable = parse_callable_from_xml(et, self.params)
         # expect no exception here
         asserts.assert_equal(str(xml_callable), 'Zigbee, P', msg)
         asserts.assert_equal(xml_callable(0, [], []).decision, ConformanceDecision.PROVISIONAL, msg)
 
-        # Device type conditions or features don't correspond to anything in the spec, so the XML takes a best
-        # guess as to what they are. We should be able to parse features, conditions, attributes as the same
-        # thing.
-        # TODO: allow querying conformance for conditional device features
-        # TODO: adjust conformance call function to accept a list of features and evaluate based on that
+        # TODO: adjust conformance call function to accept a list of conditions and evaluate based on that
         xml = ('<mandatoryConform>'
-               '<feature name="CD" />'
+               '<condition name="CD" />'
                '</mandatoryConform>')
         et = ElementTree.fromstring(xml)
-        xml_callable = parse_device_type_callable_from_xml(et)
+        xml_callable = parse_callable_from_xml(et, self.params)
         asserts.assert_equal(str(xml_callable), 'CD', msg)
-        # Device features are always optional (at least for now), even though we didn't pass this feature in
+        # Device conditions are always optional (at least for now), even though we didn't pass in anything
+        # to indicate whether or not this conditions is enabled
         asserts.assert_equal(xml_callable(0, [], []).decision, ConformanceDecision.OPTIONAL)
 
         xml = ('<otherwiseConform>'
@@ -748,7 +745,7 @@ class TestConformanceSupport(MatterBaseTest):
                '<condition name="testy" />'
                '</otherwiseConform>')
         et = ElementTree.fromstring(xml)
-        xml_callable = parse_device_type_callable_from_xml(et)
+        xml_callable = parse_callable_from_xml(et, self.params)
         asserts.assert_equal(str(xml_callable), 'CD, testy', msg)
         asserts.assert_equal(xml_callable(0, [], []).decision, ConformanceDecision.OPTIONAL)
 
