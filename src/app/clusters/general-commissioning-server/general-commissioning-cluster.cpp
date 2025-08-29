@@ -68,7 +68,6 @@ DataModel::ActionReturnStatus GeneralCommissioningCluster::ReadAttribute(const D
         Protocols::InteractionModel::Status status = Breadcrumb::Get(request.path.mEndpointId, &breadcrumbValue);
         if (status != Protocols::InteractionModel::Status::Success)
         {
-            printf("reached failure for breadcrumb");
             return status;
         }
         return encoder.Encode(breadcrumbValue);
