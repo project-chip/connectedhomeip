@@ -94,3 +94,6 @@ leak:icu::RegexCompile::doParseActions
 leak:icu::RegexMatcher::init2
 leak:utext_setup
 leak:uregex_open
+
+# ignore thread-local storage leaks
+leak:_instantiateTLVs
