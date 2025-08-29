@@ -227,15 +227,6 @@ exit:
     return CHIP_ERROR_INVALID_SIGNATURE;
 }
 
-CHIP_ERROR FactoryDataProviderImpl::LoadKeypairFromRaw(ByteSpan privateKey, ByteSpan publicKey, Crypto::P256Keypair & keypair)
-{
-    Crypto::P256SerializedKeypair serialized_keypair;
-    ReturnErrorOnFailure(serialized_keypair.SetLength(privateKey.size() + publicKey.size()));
-    memcpy(serialized_keypair.Bytes(), publicKey.data(), publicKey.size());
-    memcpy(serialized_keypair.Bytes() + publicKey.size(), privateKey.data(), privateKey.size());
-    return keypair.Deserialize(serialized_keypair);
-}
-
 CHIP_ERROR FactoryDataProviderImpl::SignWithDacKey(const ByteSpan & digestToSign, MutableByteSpan & outSignBuffer)
 {
     Crypto::P256ECDSASignature signature;
@@ -262,8 +253,8 @@ CHIP_ERROR FactoryDataProviderImpl::SignWithDacKey(const ByteSpan & digestToSign
     ReturnLogErrorOnFailure(SearchForId(FactoryDataId::kDacPrivateKeyId, NULL, 0, keySize, &keyAddr));
     MutableByteSpan dacPrivateKeySpan((uint8_t *) keyAddr, keySize);
 
-    ReturnLogErrorOnFailure(LoadKeypairFromRaw(ByteSpan(dacPrivateKeySpan.data(), dacPrivateKeySpan.size()),
-                                               ByteSpan(dacPublicKey.Bytes(), dacPublicKey.Length()), keypair));
+    ReturnLogErrorOnFailure(keypair.HazardousOperationLoadKeypairFromRaw(
+        ByteSpan(dacPrivateKeySpan.data(), dacPrivateKeySpan.size()), ByteSpan(dacPublicKey.Bytes(), dacPublicKey.Length())));
 
     ReturnLogErrorOnFailure(keypair.ECDSA_sign_msg(digestToSign.data(), digestToSign.size(), signature));
 

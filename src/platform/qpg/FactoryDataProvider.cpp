@@ -26,18 +26,6 @@
 #include "qvCHIP.h"
 
 namespace chip {
-namespace {
-
-CHIP_ERROR LoadKeypairFromRaw(ByteSpan privateKey, ByteSpan publicKey, Crypto::P256Keypair & keypair)
-{
-    Crypto::P256SerializedKeypair serializedKeypair;
-    ReturnErrorOnFailure(serializedKeypair.SetLength(privateKey.size() + publicKey.size()));
-    memcpy(serializedKeypair.Bytes(), publicKey.data(), publicKey.size());
-    memcpy(serializedKeypair.Bytes() + publicKey.size(), privateKey.data(), privateKey.size());
-    return keypair.Deserialize(serializedKeypair);
-}
-
-} // namespace
 
 namespace DeviceLayer {
 
@@ -127,7 +115,7 @@ CHIP_ERROR FactoryDataProvider::SignWithDeviceAttestationKey(const ByteSpan & me
 
         // In a non-exemplary implementation, the public key is not needed here. It is used here merely because
         // Crypto::P256Keypair is only (currently) constructable from raw keys if both private/public keys are present.
-        ReturnErrorOnFailure(LoadKeypairFromRaw(qorvoDacPrivateKey, qorvoDacPublicKey, keypair));
+        ReturnErrorOnFailure(keypair.HazardousOperationLoadKeypairFromRaw(qorvoDacPrivateKey, qorvoDacPublicKey));
         ReturnErrorOnFailure(keypair.ECDSA_sign_msg(messageToSign.data(), messageToSign.size(), signature));
     }
 
