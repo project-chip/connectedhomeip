@@ -17,9 +17,12 @@
 
 import asyncio
 import logging
+import os
 import platform
-import shutil
+import shutil  # Only for macOS networksetup
+import socket
 import subprocess
+from typing import Optional
 
 from mobly import asserts
 
@@ -29,8 +32,8 @@ from matter.testing.matter_testing import MatterBaseTest, TestStep, default_matt
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO)
 
-MAX_RETRIES = 5
-TIMEOUT = 900
+MAX_RETRIES = 3
+TIMEOUT = 120  # Reduced from 900 to prevent hanging
 TIMED_REQUEST_TIMEOUT_MS = 5000
 WIFI_WAIT_SECONDS = 5
 
@@ -39,70 +42,189 @@ cnet = Clusters.NetworkCommissioning
 attr = cnet.Attributes
 
 
-async def connect_wifi_linux(ssid, password):
-    """ Connects to WiFi with the SSID and Password provided as arguments using 'nmcli' in Linux."""
+class ConnectionResult:
+
+    def __init__(self, returncode: int, stderr: str = ""):
+        self.returncode = returncode
+        self.stderr = stderr
+
+
+async def detect_wifi_iface():
+    """Detect WiFi interface using wpa_supplicant sockets"""
+    try:
+        wpa_dir = "/var/run/wpa_supplicant"
+        candidates = [f for f in os.listdir(wpa_dir) if not f.startswith('.')] if os.path.exists(wpa_dir) else []
+        physical_interfaces = [c for c in candidates if not c.startswith('p2p-dev-')]
+        if physical_interfaces:
+            return physical_interfaces[0]
+        else:
+            return None
+    except Exception as e:
+        logger.error(f"detect_wifi_iface: Error: {e}")
+        return None
+
+
+async def wpa_command(iface, cmd):
+    """Send command to wpa_supplicant via Unix socket"""
+    sock_file = f"/var/run/wpa_supplicant/{iface}"
+    sock_tmp = f"/tmp/wpa_{iface}_sock"
+    if os.path.exists(sock_tmp):
+        os.remove(sock_tmp)
+    sock = socket.socket(socket.AF_UNIX, socket.SOCK_DGRAM)
+    try:
+        sock.bind(sock_tmp)
+        sock.sendto(cmd.encode(), sock_file)
+        resp, _ = sock.recvfrom(4096)
+        return resp.decode(errors="ignore").strip()
+    except Exception as e:
+        logger.error(f"wpa_command: Error sending '{cmd}' to {iface}: {e}")
+        raise
+    finally:
+        sock.close()
+        if os.path.exists(sock_tmp):
+            os.remove(sock_tmp)
+
+
+async def scan_and_find(iface, target_ssid, delay=5):
+    """Scans and searches for SSID, with retries"""
+    retry = 1
+    while retry <= MAX_RETRIES:
+        await wpa_command(iface, "SCAN")
+        await asyncio.sleep(delay)
+        results = await wpa_command(iface, "SCAN_RESULTS")
+        result_lines = results.splitlines()[1:]
+        for line in result_lines:
+            if line.endswith(f"\t{target_ssid}"):
+                return True
+        retry += 1
+    logger.error(f"scan_and_find: SSID {target_ssid} not found after {MAX_RETRIES} attempts")
+    return False
+
+
+async def request_dhcp(iface):
+    """Attempts to obtain IP using dhclient or networkctl"""
+    try:
+        proc = await asyncio.create_subprocess_exec(
+            "dhclient", "-r", iface,
+            stdout=asyncio.subprocess.DEVNULL,
+            stderr=asyncio.subprocess.DEVNULL
+        )
+        await proc.wait()
+        proc = await asyncio.create_subprocess_exec("dhclient", iface)
+        result = await proc.wait()
+        if result == 0:
+            return True
+        else:
+            logger.error(f"request_dhcp: dhclient failed with code {result}")
+    except FileNotFoundError:
+        try:
+            proc = await asyncio.create_subprocess_exec("networkctl", "renew", iface)
+            result = await proc.wait()
+            if result == 0:
+                return True
+            else:
+                logger.error(f"request_dhcp: networkctl failed with code {result}")
+        except Exception as e:
+            logger.error(f"request_dhcp: Could not request IP on {iface}: {e}")
+            return False
+    except Exception as e:
+        logger.error(f"request_dhcp: Unexpected error requesting DHCP on {iface}: {e}")
+        return False
+    return False
+
+
+async def connect_wifi_linux(ssid, password) -> ConnectionResult:
+    """Connects to WiFi using wpa_supplicant (works on Linux for both desktop and Raspberry Pi)."""
     if isinstance(ssid, bytes):
         ssid = ssid.decode()
     if isinstance(password, bytes):
         password = password.decode()
 
-    if not shutil.which("nmcli"):
-        logger.error("'nmcli' is not installed. Install with: sudo apt install network-manager")
-        return None
+    # Detect WiFi interface
+    iface = await detect_wifi_iface()
+    if not iface:
+        logger.error("connect_wifi_linux: No WiFi interface found")
+        return ConnectionResult(1, "No WiFi interface found")
 
-    result = None
+    logger.info(f"connect_wifi_linux: Connecting to {ssid} on interface {iface}")
+
+    # Scan for SSID
+    if not await scan_and_find(iface, ssid):
+        logger.error(f"connect_wifi_linux: SSID {ssid} not found in scan")
+        return ConnectionResult(1, f"SSID {ssid} not found")
+
+    # List known networks and find or add the target network
     try:
-        # Activates Wi-Fi in case it is deactivated
-        subprocess.run(["nmcli", "radio", "wifi", "on"], check=False)
-
-        # Detects the active Wi-Fi interface
-        interface_result = subprocess.run(
-            ["nmcli", "-t", "-f", "DEVICE,TYPE,STATE", "device"],
-            capture_output=True, text=True
-        )
-        interface = None
-        for line in interface_result.stdout.strip().splitlines():
-            parts = line.split(":")
-            if len(parts) >= 3 and parts[1] == "wifi":
-                interface = parts[0]
-                if parts[2] == "connected":
-                    # Disconnecting interface
-                    subprocess.run(["nmcli", "device", "disconnect", interface], check=False)
+        nets_result = await wpa_command(iface, "LIST_NETWORKS")
+        nets = nets_result.splitlines()[1:]
+        net_id = None
+        for n in nets:
+            cols = n.split("\t")
+            if len(cols) >= 2 and cols[1] == ssid:
+                net_id = cols[0]
                 break
 
-        # Let's try to connect
-        result = subprocess.run(
-            ["nmcli", "d", "wifi", "connect", ssid, "password", password],
-            capture_output=True, text=True
-        )
-        # wait the connection to be ready
-        await asyncio.sleep(WIFI_WAIT_SECONDS)
+        if not net_id:
+            # Add new network
+            net_id = await wpa_command(iface, "ADD_NETWORK")
+            await wpa_command(iface, f'SET_NETWORK {net_id} ssid "{ssid}"')
+            await wpa_command(iface, f'SET_NETWORK {net_id} password "{password}"')
 
-        # Let's verify it is connected
-        check = subprocess.run(
-            ["nmcli", "-t", "-f", "ACTIVE,SSID", "dev", "wifi"],
-            capture_output=True, text=True
-        )
-        if any(line.startswith("yes:" + ssid) for line in check.stdout.splitlines()):
-            logger.info(f" --- connect_wifi_linux: Successfully connected to '{ssid}'")
-        else:
-            logger.info(f" --- connect_wifi_linux: Could not confirm WiFi connection to '{ssid}'")
+        # Connect to network
+        logger.info(f"connect_wifi_linux: Connecting to network {ssid}")
+        await wpa_command(iface, f"SELECT_NETWORK {net_id}")
+        await wpa_command(iface, f"ENABLE_NETWORK {net_id}")
+        await wpa_command(iface, "SAVE_CONFIG")
 
-    except subprocess.CalledProcessError as e:
-        logger.error(f" --- connect_wifi_linux: nmcli command failed: {e.stderr.strip()}")
+        # Wait a moment for connection attempt
+        await asyncio.sleep(3)
+
+        # Check connection status
+        status = await wpa_command(iface, "STATUS")
+        if "wpa_state=COMPLETED" not in status:
+            logger.error(f"connect_wifi_linux: Connection failed. Status: {status}")
+            if "wpa_state=4WAY_HANDSHAKE" in status:
+                logger.error("connect_wifi_linux: Possible incorrect password")
+                return ConnectionResult(1, "Authentication failed - check password")
+            return ConnectionResult(1, "Connection failed")
+
+        logger.info(f"connect_wifi_linux: Connected to {ssid}")
+
+        # Request IP
+        if not await request_dhcp(iface):
+            logger.error("connect_wifi_linux: Could not obtain IP")
+            return ConnectionResult(1, "Could not obtain IP")
+
+        # Wait for IP confirmation
+        retry = 1
+        while retry <= MAX_RETRIES * 2:
+            proc = await asyncio.create_subprocess_exec(
+                "ip", "-4", "addr", "show", iface,
+                stdout=asyncio.subprocess.PIPE
+            )
+            stdout, _ = await proc.communicate()
+            output = stdout.decode()
+            if "inet " in output:
+                ip = output.split("inet ")[1].split()[0]
+                logger.info(f"connect_wifi_linux: Connected to {ssid} with IP {ip}")
+                return ConnectionResult(0)
+            await asyncio.sleep(1)
+            retry += 1
+
+        logger.error(f"connect_wifi_linux: Could not obtain IP after {MAX_RETRIES * 2}s")
+        return ConnectionResult(1, "Timeout waiting for IP")
+
     except Exception as e:
-        logger.error(f" --- connect_wifi_linux: Unexpected exception when trying to connect to '{ssid}': {e}")
-    finally:
-        return result
+        logger.error(f"connect_wifi_linux: Exception during connection: {e}")
+        return ConnectionResult(1, str(e))
 
 
-async def connect_wifi_mac(ssid, password):
+async def connect_wifi_mac(ssid, password) -> ConnectionResult:
     """ Connects to WiFi with the SSID and Password provided as arguments using 'networksetup' in Mac."""
     if not shutil.which("networksetup"):
         logger.error(" --- connect_wifi_mac: 'networksetup' is not present. Please install 'networksetup'.")
-        return None
+        return ConnectionResult(1, "networksetup not found")
 
-    result = None
     try:
         # Get the Wi-Fi interface
         interface_result = subprocess.run(
@@ -123,47 +245,42 @@ async def connect_wifi_mac(ssid, password):
             "-setairportnetwork", interface, ssid, password
         ], check=True, capture_output=True, text=True)
         await asyncio.sleep(WIFI_WAIT_SECONDS)
+        return ConnectionResult(result.returncode, result.stderr)
 
     except subprocess.CalledProcessError as e:
         logger.error(f" --- connect_wifi_mac: Error connecting with networksetup: {e.stderr.strip()}")
+        return ConnectionResult(e.returncode, e.stderr)
     except Exception as e:
         logger.error(f" --- connect_wifi_mac: Unexpected exception while trying to connect to {ssid}: {e}")
-    finally:
-        return result
+        return ConnectionResult(1, str(e))
 
 
-async def connect_host_wifi(ssid, password):
-    """ Checks in which OS (Linux or Darwin only) the script is running and calls the corresponding connect_wifi function. """
+async def connect_host_wifi(ssid, password) -> Optional[ConnectionResult]:
+    """ Checks in which OS (Linux or Darwin only) the script is running and calls the corresponding connect_wifi_* function. """
     os_name = platform.system()
-    logger.info(f" --- connect_host_wifi: OS detected: {os_name}")
-
-    # Let's try to connect the TH to the second network a few times, to avoid network instability
     retry = 1
+    conn = None
     while retry <= MAX_RETRIES:
-        logger.info(f" --- connect_host_wifi: Trying to connect to {ssid} - {retry}/{MAX_RETRIES}")
         try:
-            conn = None
             if os_name == "Linux":
                 conn = await connect_wifi_linux(ssid, password)
             elif os_name == "Darwin":
                 conn = await connect_wifi_mac(ssid, password)
             else:
-                logger.error(" --- connect_host_wifi: OS not supported.")
+                logger.error(f"connect_host_wifi: OS not supported: {os_name}")
+                return ConnectionResult(1, "OS not supported")
             if conn and conn.returncode == 0:
-                logger.info(f" --- connect_host_wifi: Connected to {ssid}")
+                logger.info(f"connect_host_wifi: Connected to {ssid}")
                 break
             elif conn:
-                stderr_msg = conn.stderr if conn.stderr else "No stderr"
-                logger.error(
-                    f" --- connect_host_wifi: Attempt {retry} failed. Return code: {conn.returncode} stderr: {stderr_msg}")
+                logger.error(f"connect_host_wifi: Attempt {retry} failed. Return code: {conn.returncode}")
             else:
-                logger.error(" --- connect_host_wifi: No result returned from connection attempt.")
-
-        except subprocess.CalledProcessError as e:
-            logger.error(
-                f" --- connect_host_wifi: Exception: {e} when trying to connect to {ssid} stderr: {conn.stderr.decode()}")
+                logger.error(f"connect_host_wifi: No result returned from connection attempt {retry}")
+        except Exception as e:
+            logger.error(f"connect_host_wifi: Exception on attempt {retry}: {e}")
         finally:
             retry += 1
+    return conn
 
 
 def is_network_switch_successful(err):
@@ -178,14 +295,18 @@ def is_network_switch_successful(err):
 async def change_networks(test, cluster, ssid, password, breadcrumb):
     """ Changes networks in DUT by sending ConnectNetwork command and
         changes TH network by calling connect_host_wifi function."""
-    # ConnectNetwork tells the DUT to change to the second Wi-Fi network, while TH stays in the first one
-    # so they loose connection between each other. Thus, ConnectNetwork can throw an exception
+    logger.info(f"change_networks: Starting network change to {ssid}")
+
     retry = 1
     while retry <= MAX_RETRIES:
+        logger.info(f"change_networks: Attempt {retry}/{MAX_RETRIES}")
+
         try:
             if retry > 1:
-                # Let's wait a couple seconds to finish changing networks
+                logger.info(f"change_networks: Waiting {WIFI_WAIT_SECONDS}s before retry")
                 await asyncio.sleep(WIFI_WAIT_SECONDS)
+
+            logger.info(f"change_networks: Sending ConnectNetwork command to DUT")
             err = await asyncio.wait_for(
                 test.send_single_cmd(
                     cmd=cluster.Commands.ConnectNetwork(
@@ -193,29 +314,42 @@ async def change_networks(test, cluster, ssid, password, breadcrumb):
                         breadcrumb=breadcrumb
                     )
                 ),
-                timeout=TIMEOUT
+                timeout=30  # Shorter timeout to avoid hanging
             )
-            logger.info(f" --- change_networks: err type: {type(err)}, value: {err}")
             success = is_network_switch_successful(err)
             if success:
-                logger.info(" --- change_networks: Network switch successful.")
+                logger.info("change_networks: DUT network switch successful")
                 break
             else:
-                logger.warning(f" --- change_networks: Error during network switch: {err}")
-
+                logger.error(f"change_networks: DUT network switch failed: {err}")
+        except asyncio.TimeoutError:
+            logger.error(f"change_networks: Timeout sending ConnectNetwork command on attempt {retry}")
         except Exception as e:
-            logger.error(f" --- change_networks: Lost connection with the DUT. Exception: {e}")
+            logger.error(f"change_networks: Lost connection with DUT on attempt {retry}. Exception: {e}")
 
-        # After telling the DUT to change networks, we must change TH to the second network, so it can find the DUT
-        # But first wait a couple of seconds so the DUT finishes changing networks
+        # Change TH network
+        logger.info(f"change_networks: Waiting {WIFI_WAIT_SECONDS}s for DUT to change networks")
         await asyncio.sleep(WIFI_WAIT_SECONDS)
-        await asyncio.wait_for(
-            connect_host_wifi(ssid=ssid, password=password),
-            timeout=TIMEOUT
-        )
+
+        logger.info(f"change_networks: Changing TH network to {ssid}")
+        try:
+            result = await asyncio.wait_for(
+                connect_host_wifi(ssid=ssid, password=password),
+                timeout=60  # Reasonable timeout for WiFi connection
+            )
+            if result and result.returncode == 0:
+                logger.info(f"change_networks: TH successfully connected to {ssid}")
+            else:
+                logger.error(f"change_networks: TH failed to connect to {ssid}")
+        except asyncio.TimeoutError:
+            logger.error(f"change_networks: Timeout changing TH to {ssid}")
+        except Exception as e:
+            logger.error(f"change_networks: TH failed to change to {ssid}: {e}")
+
         retry += 1
     else:
-        logger.error(f" --- change_networks: Failed to switch networks after {MAX_RETRIES} retries.")
+        logger.error(f"change_networks: Failed to switch networks after {MAX_RETRIES} retries.")
+        raise Exception(f"Failed to switch networks to {ssid} after {MAX_RETRIES} attempts")
 
 
 class TC_CNET_4_11(MatterBaseTest):
@@ -633,6 +767,9 @@ class TC_CNET_4_11(MatterBaseTest):
         # 1. NetworkID is the hex representation of the ASCII values for PIXIT.CNET.WIFI_2ND_ACCESSPOINT_SSID
         # 2. Connected is of type bool and is TRUE
         await self.find_network_and_assert(networks, wifi_2nd_ap_ssid)
+
+        # TH changes its Wi-Fi connection back to PIXIT.CNET.WIFI_1ST_ACCESSPOINT_SSID
+        await connect_host_wifi(wifi_1st_ap_ssid, wifi_1st_ap_credentials)
 
 
 if __name__ == "__main__":
