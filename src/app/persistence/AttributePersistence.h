@@ -17,10 +17,14 @@
 
 #include <app/AttributeValueDecoder.h>
 #include <app/ConcreteAttributePath.h>
+#include <app/DefaultSafeAttributePersistenceProvider.h>
 #include <app/data-model-provider/ActionReturnStatus.h>
 #include <app/persistence/AttributePersistenceProvider.h>
+#include <app/persistence/DefaultAttributePersistenceProvider.h>
 #include <app/persistence/String.h>
-
+#include <lib/core/CHIPEncoding.h>
+#include <lib/support/DefaultStorageKeyAllocator.h>
+#include <lib/support/ReadOnlyBuffer.h>
 #include <type_traits>
 
 namespace chip::app {
@@ -88,6 +92,44 @@ public:
     /// implies, however callers are generally expected to pass in a `Storage::String` value and
     /// not use internal classes directly.
     CHIP_ERROR StoreString(const ConcreteAttributePath & path, const Storage::Internal::ShortString & value);
+
+    // Only available in little endian for the moment
+    CHIP_ERROR MigrateFromSafeAttributePersistanceProvider(EndpointId endpointId, ClusterId clusterId,
+                                                           const ReadOnlyBuffer<AttributeId> & attributes, MutableByteSpan & buffer,
+                                                           PersistentStorageDelegate & storageDelegate)
+    {
+
+        ChipError err;
+        DefaultSafeAttributePersistenceProvider safeProvider;
+        safeProvider.Init(&storageDelegate);
+        DefaultAttributePersistenceProvider normProvider;
+        normProvider.Init(&storageDelegate);
+
+        for (auto attr : attributes)
+        {
+            // We make a copy of the buffer so it can be resized
+            MutableByteSpan copyOfBuffer = buffer;
+
+            auto safePath = DefaultStorageKeyAllocator::SafeAttributeValue(endpointId, clusterId, attr);
+            auto attrPath = ConcreteAttributePath(endpointId, clusterId, attr);
+            // Read Value, will resize copyOfBuffer to read size
+            err = safeProvider.SafeReadValue(attrPath, copyOfBuffer);
+            if (err == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND)
+            {
+                // The value does not exist
+                continue;
+            }
+            else if (err != CHIP_NO_ERROR)
+            {
+                // ChipLogError(Unspecified, "Error reading attribute %s - %" CHIP_ERROR_FORMAT, safePath.KeyName(), err);
+                continue;
+            }
+
+            ReturnErrorOnFailure(normProvider.WriteValue(attrPath, copyOfBuffer));
+            // do nothing with this error
+            err = safeProvider.SafeDeleteValue(attrPath);
+        }
+    }
 
 private:
     AttributePersistenceProvider & mProvider;
