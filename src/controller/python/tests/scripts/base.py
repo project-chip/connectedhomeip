@@ -1074,7 +1074,7 @@ class BaseTestHelper:
         return True
 
     def TestCloseSession(self, nodeid: int):
-        self.logger.info(f"Closing sessions with device {nodeid}")
+        self.logger.info("Closing sessions with device 0x%016X", nodeid)
         try:
             self.devCtrl.MarkSessionDefunct(nodeid)
             return True
@@ -1163,7 +1163,7 @@ class BaseTestHelper:
             return False
 
     async def TestTriggerTestEventHandler(self, nodeid, enable_key, event_trigger):
-        self.logger.info("Test trigger test event handler for device = %08x trigger = %016x", nodeid, event_trigger)
+        self.logger.info("Test trigger test event handler for device 0x%016X trigger 0x%016x", nodeid, event_trigger)
         try:
             await self.devCtrl.SendCommand(nodeid, 0, Clusters.GeneralDiagnostics.Commands.TestEventTrigger(enableKey=enable_key, eventTrigger=event_trigger))
             return True
@@ -1172,7 +1172,7 @@ class BaseTestHelper:
             return False
 
     async def TestWaitForActive(self, nodeid, stayActiveDurationMs=30000):
-        self.logger.info("Test wait for device = %08x", nodeid)
+        self.logger.info("Test wait for device 0x%016X", nodeid)
         try:
             await self.devCtrl.WaitForActive(nodeid, stayActiveDurationMs=stayActiveDurationMs)
             return True

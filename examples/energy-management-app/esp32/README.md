@@ -25,7 +25,7 @@ guides to get started.
 
 -   Download the auth key and copy Auth Key to the example
 
-```
+```bash
 cp /path/to/auth/key.txt path/to/connectedhomeip/examples/energy-management-app/esp32/main/insights_auth_key.txt
 ```
 
@@ -76,13 +76,13 @@ cp /path/to/auth/key.txt path/to/connectedhomeip/examples/energy-management-app/
 -   After successful commissioning, use the Energy Electric Vehicle Supply
     Equipment cluster command to disable/enable charging and discharging.
 
-```
-        $./out/debug/chip-tool energyevse disable <NODE ID> 1
-```
-
-```
-        $ ./out/debug/chip-tool energyevse enable-charging 0xFFFFFFFF 6000 32000 <NODE ID> 1 --timedInteractionTimeoutMs <Time>
+```bash
+./out/debug/chip-tool energyevse disable <NODE ID> 1
 ```
 
--   More examples using chip-repl are demonstrated in
+```bash
+./out/debug/chip-tool energyevse enable-charging 0xFFFFFFFF 6000 32000 <NODE ID> 1 --timedInteractionTimeoutMs <Time>
+```
+
+-   More examples using matter-repl are demonstrated in
     [Energy Management Linux](../linux/README.md)

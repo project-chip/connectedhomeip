@@ -3,7 +3,7 @@
 The Python CHIP controller is a library that allows to create a Matter fabric
 and commission Matter devices with it.
 
-The `chip-repl` is a REPl which sets up a Python CHIP Controller and allows to
+The `matter-repl` is a REPl which sets up a Python CHIP Controller and allows to
 explore the Python CHIP Controller API and communicate with devices from the
 command line.
 
@@ -11,7 +11,7 @@ command line.
 
 -   [Source files](#source-files)
 -   [Building Python CHIP Controller](#building-and-installing)
--   [Running the CHIP REPL](#running-the-chip-repl)
+-   [Running the matter-repl](#running-the-matter-repl)
 -   [Using Python CHIP Controller REPL for Matter accessory testing](#using-python-chip-controller-repl-for-matter-accessory-testing)
 -   [Example usage of the Python CHIP Controller REPL](#example-usage-of-the-python-chip-controller-repl)
 -   [Explore Clusters, Attributes and Commands](#explore-clusters-attributes-and-commands)
@@ -88,22 +88,22 @@ To build and run the Python CHIP controller:
 
 <hr>
 
-## Running the CHIP REPL
+## Running the matter-repl
 
 1. Activate the Python virtual environment with the Python CHIP Controller
    installed:
 
-    ```
+    ```bash
     source out/python_env/bin/activate
     ```
 
 2. Run the CHIP REPL to explore the API of the Python CHIP controller:
 
-    ```
-    chip-repl
+    ```bash
+    matter-repl
     ```
 
-NOTE: To get more verbose logs, pass the debug flag: `chip-repl --debug`
+NOTE: To get more verbose logs, pass the debug flag: `matter-repl --debug`
 
 <hr>
 

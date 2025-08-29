@@ -518,7 +518,7 @@ class ChipDeviceControllerBase():
         def HandleOpenWindowComplete(nodeid: int, setupPinCode: int, setupManualCode: bytes,
                                      setupQRCode: bytes, err: PyChipError) -> None:
             if err.is_success:
-                LOGGER.info("Open Commissioning Window complete setting nodeid {} pincode to {}".format(nodeid, setupPinCode))
+                LOGGER.info("Open Commissioning Window complete setting node ID 0x%016X pincode to %d", nodeid, setupPinCode)
                 commissioningParameters = CommissioningParameters(
                     setupPinCode=setupPinCode, setupManualCode=setupManualCode.decode(), setupQRCode=setupQRCode.decode())
             else:
@@ -535,7 +535,7 @@ class ChipDeviceControllerBase():
 
         def HandleUnpairDeviceComplete(nodeid: int, err: PyChipError):
             if err.is_success:
-                LOGGER.info("Succesfully unpaired device with nodeid {}".format(nodeid))
+                LOGGER.info("Successfully unpaired device with node ID 0x%016X", nodeid)
             else:
                 LOGGER.warning("Failed to unpair device: {}".format(err))
 
@@ -1602,6 +1602,7 @@ class ChipDeviceControllerBase():
         Raises:
             InteractionModelError on error
         '''
+        LOGGER.debug("Sending command %s to node ID 0x%016X", payload, nodeid)
         self.CheckIsActive()
 
         eventLoop = asyncio.get_running_loop()
