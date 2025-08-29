@@ -15,6 +15,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 {{! We only need to generate conversion from decodable structs for the server-generated commands }}
 {{#if (isStrEqual source "server")}}
+- (nullable instancetype)initWithDecodableStruct:(const chip::app::Clusters::{{asUpperCamelCase parent.name}}::Commands::{{asUpperCamelCase name}}::DecodableType &)decodableStruct;
 - (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::{{asUpperCamelCase parent.name}}::Commands::{{asUpperCamelCase name}}::DecodableType &)decodableStruct;
 {{/if}}
 
