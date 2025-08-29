@@ -70,198 +70,255 @@ class TC_SETRF_2_1(CommodityTariffTestBaseHelper):
     def steps_TC_SETRF_2_1(self) -> list[TestStep]:
 
         steps = [
-            TestStep("1", "Commissioning, already done", "DUT is successfully commissioned", is_commissioning=True),
-            TestStep("2", "TH reads TariffInfo attribute.", """
-                     - DUT replies a Null or value of TariffInformationStruct type;
-                     - Verify that TariffLabel field has type string with max length 128 or Null;
-                     - Verify that ProviderName field has type string with max length 128 or Null;
-                     - Verify that BlockMode field has type BlockModeEnum and value in range 0 - 2 or Null value;
-                     - Verify that does not contain Currency field if SETRF.S.F00(PRICE) is False;
-                     - Verify that contains Currency field if SETRF.S.F00(PRICE) is True;
-                        - Verify that it has type currency or Null;
-                        - Verify that Currency field of Currency struct has type uint16 with value less or equal 999;
-                        - Verify that DecimalPoints field of Currency struct has type uint8."""),
-            TestStep("3", "TH reads TariffUnit attribute.", """
-                     - DUT replies a Null or a value of TariffUnitEnum type;
-                     - Value in range 0 - 1."""),
-            TestStep("4", "TH reads StartDate attribute.", """
-                     - DUT replies a Null or a value of epoch-s type;
-                     - Store value as startDateAttributeValue."""),
-            TestStep("5", "TH reads IndividualDays attribute.", """
-                     - DUT replies a Null or a value that is a list of DayStruct entries with list length less or equal 50;
-                     - Verify that Date field has epoch-s type;
-                     - Verify that DayType field has DayTypeEnum type and value in range 0 - 3.
-                     - Verify that DayEntryIDs field is list of uint32 with length in range 1 - 96;
-                     - Verify that the DayStruct in this list SHALL be arranged in increasing order by the value of Date field;
-                     - Verify that the DayStruct in this list do not overlap."""),
-            TestStep("6", "TH reads DayEntries attribute.", """
-                     - DUT replies a Null or a value that is a list of DayEntryStruct entries;
+            TestStep("1", "Commission DUT to TH (can be skipped if done in a preceding test).",
+                     "DUT is commissioned.", is_commissioning=True),
+            TestStep("2", "TH reads from the DUT the TariffInfo attribute.", """
+                     - Verify that the DUT response contains a null or a value of TariffInformationStruct type;
+                        - Verify that TariffLabel field has type string with max length 128 or null;
+                        - Verify that ProviderName field has type string with max length 128 or null;
+                        - Verify that BlockMode field has type BlockModeEnum. Value has to be between a range of 0 - 2 or null;
+                            - Store the value as BlockModeValue;
+                        - Currency field:
+                            - Verify that it does not contain Currency field if SETRF.S.F00(PRICE) is False;
+                            - Verify that it contains Currency field if SETRF.S.F00(PRICE) is True;
+                                - Verify that it has type currency or null;
+                                    - Verify that Currency field of Currency struct has type uint16 with value less or equal 999;
+                                    - Verify that DecimalPoints field of Currency struct has type uint8;
+                        - Store the value as tariffInfoValue."""),
+            TestStep("3", "TH reads from the DUT the TariffUnit attribute.", """
+                     - If tariffInfoValue equals null, Verify that the DUT response contains a null;
+                     - If tariffInfoValue doesn't equal null, Verify that the DUT response contains a null or a value of TariffUnitEnum type;
+                     - Value has to be between a range of 0 - 1."""),
+            TestStep("4", "TH reads from the DUT the StartDate attribute.", """
+                     - If tariffInfoValue equals null, Verify that the DUT response contains a null;
+                     - If tariffInfoValue doesn't equal null,Verify that the DUT response contains a null or a value of epoch-s type;
+                     - Store the value as startDateAttributeValue."""),
+            TestStep("5", "TH reads from the DUT the IndividualDays attribute.", """
+                     - If tariffInfoValue equals null, Verify that the DUT response contains a null;
+                     - If tariffInfoValue doesn't equal null, Verify that the DUT response contains a null or a value that is a list of DayStruct entries with list length less or equal 50;
+                     - For each entry:
+                        - Date field
+                            - Verify that Date field has epoch-s type;
+                            - Verify that the DayStruct in this list are arranged in increasing order by the value of Date field;
+                        - Verify that DayType field has DayTypeEnum type. Value has to be between a range of 0 - 3;
+                        - Verify that DayEntryIDs of DayStruct field is a list of unique uint32 with list length in range 1 - 96;
+                        - If DayType equals 3 (Event), store DayEntryIDs value in dayEntryIDsEvents list."""),
+            TestStep("6", "TH reads from the DUT the DayEntries attribute.", """
+                     - If tariffInfoValue equals null, Verify that the DUT response contains a null;
+                     - If tariffInfoValue doesn't equal null, Verify that the DUT response contains a null or a value that is a list of DayEntryStruct entries with list length less or equal 672;
+                     - For each entry:
+                        - Verify that DayEntryID has a unique uint32 value;
+                        - Verify that StartTime field has uint16 type with value less or equal 1499;
+                            - Store the field value as startTimeFieldValue;
+                        - If DayEntryID is a value from dayEntryIDsEvents list, check that Duration field has a uint16 value less or equal 1500 - startTimeFieldValue;
+                        - RandomizationType fields:
+                            - Verify that entry does not contain RandomizationType fields if SETRF.S.F05(RNDM) is False;
+                            - If SETRF.S.F05(RNDM) and RandomizationType field is presented it has DayEntryRandomizationType type. Value has to be between a range of 0 - 4;
+                            - Store the field value randomizationTypeValue;
+                        - RandomizationOffset field:
+                            - Verify that entry does not contain RandomizationOffset fields if SETRF.S.F05(RNDM) is False;
+                            - If SETRF.S.F05(RNDM) and randomizationTypeValue is 0x01 (Fixed) and RandomizationOffset field is presented, it has int16 value;
+                            - If SETRF.S.F05(RNDM) and randomizationTypeValue is 0x04 (RandomNegative) and RandomizationOffset field is presented, it has a int16 value less or equal 0;
+                            - If SETRF.S.F05(RNDM) and randomizationTypeValue is 0x00 (None), 0x02 (Random) or 0x03 (RandomPositive) and RandomizationOffset field is presented, it has a int16 value greater or equal 0."""),
+            TestStep("7", "TH reads from the DUT the DayPatterns attribute.", """
+                     - If tariffInfoValue equals null, Verify that the DUT response contains a null;
+                     - If tariffInfoValue doesn't equal null, Verify that the DUT response contains a null or a value that is a list of DayPatternStruct entries with list length less or equal 28;
+                     - For each entry:
+                        - Verify that DayPatternID field has uint32 type;
+                        - Verify that DaysOfWeek field has DayPatternDayOfWeekBitmap type;
+                        - Verify that DayEntryIDs field is a list of unique uint32 with list length in range 1 - 96."""),
+            TestStep("8", "TH reads from the DUT the CalendarPeriods attribute.", """
+                     - DUT replies a Null or a value that is a list of DayStruct entries;
+                     - If tariffInfoValue equals null, Verify that the DUT response contains a null;
+                     - If tariffInfoValue doesn't equal null, Verify that the DUT response contains a null or a value that is a list of CalendarPeriodStruct entries with list length in range 1 - 4;
+                     - For each entry:
+                        - StartDate field
+                            - Verify that StartDate field is null or has type epoch-s with value greater or equal startDateAttributeValue;
+                            - Verify that the calendar period items in this list are arranged in increasing order by the value of StartDate field;
+                            - Verify that if the startDateAttributeValue is null then the StartDate field is null on the first CalendarPeriodStruct item and is not null on any subsequent CalendarPeriodStruct items;
+                        - Verify that DayPatternIDs field is a list of uint32 with list length in range 1 - 7"""),
+            TestStep("9", "TH reads from the DUT the CurrentDay attribute.", """
+                     - If tariffInfoValue equals null, Verify that the DUT response contains a null;
+                     - If tariffInfoValue doesn't equal null, Verify that the DUT response contains a null or a value of DayStruct type;
+                        - Verify that Date field of DayStruct has epoch-s type;
+                        - Verify that DayType field of DayStruct has DayTypeEnum type. Value has to be between a range of 0 - 3;
+                        - Verify that DayEntryIDs field is a list of unique uint32 with list length in range 1 - 96."""),
+            TestStep("10", "TH reads NextDay attribute.", """
+                     - TH reads from the DUT the NextDay attribute.;
+                        - If tariffInfoValue equals null, Verify that the DUT response contains a null;
+                        - If tariffInfoValue doesn't equal null, Verify that the DUT response contains a null or a value of DayStruct type;
+                            - Verify that DayType field of DayStruct has DayTypeEnum type. Value has to be between a range of 0 - 3;
+                            - Verify that DayEntryIDs field is a list of unique uint32 with list length in range 1 - 96."""),
+            TestStep("11", "TH reads from the DUT the CurrentDayEntry attribute.", """
+                     - If tariffInfoValue equals null, Verify that the DUT response contains a null;
+                     - If tariffInfoValue doesn't equal null, Verify that the DUT response contains a null or a value of DayEntryStruct type;
+                     - Verify that the DUT response contains a null if tariffInfoValue equals null.
                      - Verify that DayEntryID field has uint32 type;
                      - Verify that StartTime field has uint16 type with value less or equal 1499;
-                        - Store value as startTimeFieldValue;
-                     - Verify that if Duration field is presented it has uint16 type with value less or equal 1500 - startTimeFieldValue;
-                     - Verify that entry does not contain RandomizationOffset and RandomizationType fields if SETRF.S.F05(RNDM) is False.
-                     - Verify that if SETRF.S.F05(RNDM) is True and RandomizationType field is presented it has DayEntryRandomizationType type and value in range 0 - 4;
-                        - Store value as randomizationTypeValue;
-                        - Verify that if RandomizationOffset field is presented and randomizationTypeValue is 0x01 (Fixed) it has int16 type;
-                        - Verify that if RandomizationOffset field is presented and randomizationTypeValue is 0x04 (RandomNegative) it has int16 type and value less or equal 0;
-                        - Verify that if RandomizationOffset field is presented and randomizationTypeValue is not 0x01 (Fixed) or 0x04 (RandomNegative) it has int16 type and value greater or equal 0.
-                        value greater or equal 0."""),
-            TestStep("7", "TH reads DayPatterns attribute.", """
-                     - DUT replies a Null or a value that is a list of DayPatternStruct entries with length less or equal 28;
-                     - Verify that DayPatternID field has uint32 type;
-                     - Verify that DaysOfWeek field has DayPatternDayOfWeekBitmap type;
-                     - Verify that DayEntryIDs field is list of uint32 with length in range 1 - 96;"""),
-            TestStep("8", "TH reads CalendarPeriods attribute.", """
-                     - DUT replies a Null or a value that is a list of CalendarPeriodStruct entries;
-                     - Verify that the list length between 1 and 4 entries.
-                     - Verify that StartDate field is null or has type epoch-s with value greater or equal startDateAttributeValue;
-                     - Verify that the calendar period items in this list are arranged in increasing order by the value of StartDate field;
-                     - Verify that if the startDateAttributeValue is Null, the StartDate field on the first CalendarPeriodStruct item SHALL also be Null;
-                     - Verify that if the startDateAttributeValue is Null, the StartDate field on any subsequent CalendarPeriodStruct items is not null;
-                     - Verify that DayPatternIDs field is list of uint32 with length in range 1 - 7"""),
-            TestStep("9", "TH reads CurrentDay attribute.", """
-                     - DUT replies a Null or a value of DayStruct type;
-                     - Verify that Date field has epoch-s type;
-                     - Verify that DayType field has DayTypeEnum type and value in 0 - 3;
-                     - Verify that DayEntryIDs field is list of uint32 with length in range 1 - 96."""),
-            TestStep("10", "TH reads NextDay attribute.", """
-                     - DUT replies a Null or a value of DayStruct type;
-                     - Verify that Date field has epoch-s type;
-                     - Verify that DayType field has DayTypeEnum type and value in 0 - 3;
-                     - Verify that DayEntryIDs field is list of uint32 with length in range 1 - 96."""),
-            TestStep("11", "TH reads CurrentDayEntry attribute.", """
-                     - DUT replies a Null or a value of DayEntryStruct type;
+                        - Store the field value as startTimeFieldValue;
+                     - RandomizationType fields:
+                        - Verify that entry does not contain RandomizationType fields if SETRF.S.F05(RNDM) is False;
+                        - If SETRF.S.F05(RNDM) and RandomizationType field is presented it has DayEntryRandomizationType type. Value has to be between a range of 0 - 4;
+                        - Store the field value randomizationTypeValue;
+                     - RandomizationOffset field:
+                        - Verify that entry does not contain RandomizationOffset fields if SETRF.S.F05(RNDM) is False;
+                        - If SETRF.S.F05(RNDM) and randomizationTypeValue is 0x01 (Fixed) and RandomizationOffset field is presented, it has int16 value;
+                        - If SETRF.S.F05(RNDM) and randomizationTypeValue is 0x04 (RandomNegative) and RandomizationOffset field is presented, it has a int16 value less or equal 0;
+                        - If SETRF.S.F05(RNDM) and randomizationTypeValue is 0x00 (None), 0x02 (Random) or 0x03 (RandomPositive) and RandomizationOffset field is presented, it has a int16 value greater or equal 0."""),
+            TestStep("12", "TH reads from the DUT the CurrentDayEntryDate attribute.", """
+                     - If tariffInfoValue equals null, Verify that the DUT response contains a null;
+                     - If tariffInfoValue doesn't equal null, Verify that the DUT response contains a null or a value of epoch-s type;
+                     - Store the value as currentDayEntryDateValue."""),
+            TestStep("13", "TH reads from the DUT the NextDayEntry attribute.", """
+                     - If tariffInfoValue equals null, Verify that the DUT response contains a null;
+                     - If tariffInfoValue doesn't equal null, Verify that the DUT response contains a null or a value of DayEntryStruct type;
                      - Verify that DayEntryID field has uint32 type;
-                     - Verify that StartTime field has uint16 type and value less or equal 1499;
-                        - Store value as startTimeFieldValue;
-                     - Verify that if Duration field is presented it has uint16 type;
-                     - Verify that if Duration field is presented its value less or equal 1500 - startTimeFieldValue;
-                     - Verify that entry does not contain RandomizationOffset and RandomizationType fields if SETRF.S.F05(RNDM) is False;
-                     - Verify that if SETRF.S.F05(RNDM) is True and RandomizationType field is presented it has DayEntryRandomizationType type and value in range 0 - 4;
-                        - Store value as randomizationTypeValue;
-                        - If RandomizationOffset field is presented and randomizationTypeValue is 0x01 (Fixed) it has int16 type;
-                        - If RandomizationOffset field is presented and randomizationTypeValue is 0x04 (RandomNegative) it has int16 type and value less or equal 0.
-                        - If RandomizationOffset field is presented and randomizationTypeValue is not 0x01 (Fixed) or 0x04 (RandomNegative) it has int16 type and value greater or equal 0."""),
-            TestStep("12", "TH reads CurrentDayEntryDate attribute.", "DUT replies a Null or an value of epoch-s type."),
-            TestStep("13", "TH reads NextDayEntry attribute.", """
-                     - DUT replies a Null or a value of DayEntryStruct type;
-                     - Verify that DayEntryID field has uint32 type;
-                     - Verify that StartTime field has uint16 type and value less or equal 1499;
-                        - Store value as startTimeFieldValue;
-                     - Verify that if Duration field is presented it has uint16 type;
-                     - Verify that if Duration field is presented its value less or equal 1500 - startTimeFieldValue;
-                     - Verify that entry does not contain RandomizationOffset and RandomizationType fields if SETRF.S.F05(RNDM) is False;
-                     - Verify that if SETRF.S.F05(RNDM) is True and RandomizationType field is presented it has DayEntryRandomizationType type and value in range 0 - 4;
-                        - Store value as randomizationTypeValue;
-                        - If RandomizationOffset field is presented and randomizationTypeValue is 0x01 (Fixed) it has int16 type;
-                        - If RandomizationOffset field is presented and randomizationTypeValue is 0x04 (RandomNegative) it has int16 type and value less or equal 0.
-                        - If RandomizationOffset field is presented and randomizationTypeValue is not 0x01 (Fixed) or 0x04 (RandomNegative) it has int16 type and value greater or equal 0."""),
-            TestStep("14", "TH reads NextDayEntryDate attribute.", "DUT replies a Null or an value of epoch-s type."),
-            TestStep("15", "TH reads TariffComponents attribute.", """
-                     - DUT replies a Null or a value that is a list of TariffComponentStruct entries;
-                     - Verify that the list has 1 or more entries.
-                     - Verify that TariffComponentID field has uint32 type;
-                     - Verify that Threshold field is Null or has type int64;
-                     - Verify that if Label field is presented it is Null or has type string and max length is 128.
-                     - Verify that if Predicted field is presented it has type bool;
-                     - Verify that if Predicated is False TariffComponentID is a unique identifier for the combination of values of the Price, Threshold, FriendlyCredit, AuxiliaryLoad and PeakPeriod fields with the value 
-                     of the DayEntryIDs field on the encompassing TariffPeriodStruct;
-                     - Verify that the entry does not contain Price field if SETRF.S.F00(PRICE) is False;
-                     - Verify that if SETRF.S.F00(PRICE) is True and if Price field is presented it is Null or has type TariffPriceStruct;
-                     - Verify that if SETRF.S.F00(PRICE) is True and if Price field is presented and it is not Null: 
-                        - PriceType field in TariffPriceStruct has TariffPriceTypeEnum type and value in range 0 - 4;
-                        - If Price field is presented in TariffPriceStruct it has money type;
-                        - If PriceLevel field is presented in TariffPriceStruct it has int16 type;
-                     - Verify that entry does not contain FriendlyCredit field if SETRF.S.F01(FCRED) is False;
-                     - Verify that if SETRF.S.F01(FCRED) and FriendlyCredit field is presented it has type bool;
-                     - Verify that entry does not contain AuxiliaryLoad field if SETRF.S.F02(AUXLD) is False;
-                     - Verify that if SETRF.S.F02(AUXLD) is True and AuxiliaryLoad field is presented it has AuxiliaryLoadSwitchSettingsStruct type;
-                        - Verify that Number field in AuxiliaryLoadSwitchSettingsStruct has uint8 type;
-                        - Verify that RequiredState field in AuxiliaryLoadSwitchSettingsStruct has AuxiliaryLoadSettingEnum type and value in range 0 - 2;
-                     - Verify that entry does not contain PeakPeriod field if SETRF.S.F03(PEAKP) is False;
-                     - Verify that if SETRF.S.F03(PEAKP) is True and PeakPeriod field is presented it has PeakPeriodStruct type;
-                        - Verify that Severity field in PeakPeriodStruct has type PeakPeriodSeverityEnum and value in range 0 - 3;
-                        - Verify that PeakPeriod in PeakPeriodStruct has type uint16 and its value greater that 1;
-                     - Verify that entry does not contain PowerThreshold field if SETRF.S.F04(PWRTHLD) is False;
-                     - Verify that if SETRF.S.F04(PWRTHLD) is True and PowerThreshold field is presented it has PowerThresholdStruct type;
-                        - Verify that PowerThreshold field in PowerThresholdStruct has type power-mW;
-                        - Verify that ApparentPowerThreshold field in PowerThresholdStruct has type power-mVA;
-                        - Verify that PowerThresholdSource field in PowerThresholdStruct has type PowerThresholdSourceEnum and value in range 0 - 2."""),
-            TestStep("16", "TH reads TariffPeriods attribute.", """
-                     - DUT replies a Null or a value that is a list of TariffPeriodStruct entries;
-                     - Verify that the list has 1 or more entries;
-                     - Verify that if Label field is Null or has type string and max length is 128;
-                     - Verify that DayEntryIDs field is a list of uint32 and its length is greater or equal 1 and less or equal 20;
-                     - Verify that TariffComponentIDs field is a list of uint32 and its length is greater or equal 1 and less or equal 20;"""),
-            TestStep("17", "TH reads CurrentTariffComponents attribute.", """
-                     - DUT replies a Null or a value that is a list of TariffComponentStruct entries;
-                     - Verify that the list has 1 or more entries.
-                     - Verify that TariffComponentID field has uint32 type;
-                     - Verify that Threshold field is Null or has type int64;
-                     - Verify that if Label field is presented it is Null or has type string and max length is 128.
-                     - Verify that if Predicted field is presented it has type bool;
-                     - Verify that if Predicated is False TariffComponentID is a unique identifier for the combination of values of the Price, Threshold, FriendlyCredit, AuxiliaryLoad and PeakPeriod fields with the value 
-                     of the DayEntryIDs field on the encompassing TariffPeriodStruct;
-                     - Verify that the entry does not contain Price field if SETRF.S.F00(PRICE) is False;
-                     - Verify that if SETRF.S.F00(PRICE) is True and if Price field is presented it is Null or has type TariffPriceStruct;
-                     - Verify that if SETRF.S.F00(PRICE) is True and if Price field is presented and it is not Null: 
-                        - PriceType field in TariffPriceStruct has TariffPriceTypeEnum type and value in range 0 - 4;
-                        - If Price field is presented in TariffPriceStruct it has money type;
-                        - If PriceLevel field is presented in TariffPriceStruct it has int16 type;
-                     - Verify that entry does not contain FriendlyCredit field if SETRF.S.F01(FCRED) is False;
-                     - Verify that if SETRF.S.F01(FCRED) and FriendlyCredit field is presented it has type bool;
-                     - Verify that entry does not contain AuxiliaryLoad field if SETRF.S.F02(AUXLD) is False;
-                     - Verify that if SETRF.S.F02(AUXLD) is True and AuxiliaryLoad field is presented it has AuxiliaryLoadSwitchSettingsStruct type;
-                        - Verify that Number field in AuxiliaryLoadSwitchSettingsStruct has uint8 type;
-                        - Verify that RequiredState field in AuxiliaryLoadSwitchSettingsStruct has AuxiliaryLoadSettingEnum type and value in range 0 - 2;
-                     - Verify that entry does not contain PeakPeriod field if SETRF.S.F03(PEAKP) is False;
-                     - Verify that if SETRF.S.F03(PEAKP) is True and PeakPeriod field is presented it has PeakPeriodStruct type;
-                        - Verify that Severity field in PeakPeriodStruct has type PeakPeriodSeverityEnum and value in range 0 - 3;
-                        - Verify that PeakPeriod in PeakPeriodStruct has type uint16 and its value greater that 1;
-                     - Verify that entry does not contain PowerThreshold field if SETRF.S.F04(PWRTHLD) is False;
-                     - Verify that if SETRF.S.F04(PWRTHLD) is True and PowerThreshold field is presented it has PowerThresholdStruct type;
-                        - Verify that PowerThreshold field in PowerThresholdStruct has type power-mW;
-                        - Verify that ApparentPowerThreshold field in PowerThresholdStruct has type power-mVA;
-                        - Verify that PowerThresholdSource field in PowerThresholdStruct has type PowerThresholdSourceEnum and value in range 0 - 2."""),
-            TestStep("18", "TH reads NextTariffComponents attribute.", """
-                     - DUT replies a Null or a value that is a list of TariffComponentStruct entries;
-                     - Verify that the list has 1 or more entries.
-                     - Verify that TariffComponentID field has uint32 type;
-                     - Verify that Threshold field is Null or has type int64;
-                     - Verify that if Label field is presented it is Null or has type string and max length is 128.
-                     - Verify that if Predicted field is presented it has type bool;
-                     - Verify that if Predicated is False TariffComponentID is a unique identifier for the combination of values of the Price, Threshold, FriendlyCredit, AuxiliaryLoad and PeakPeriod fields with the value 
-                     of the DayEntryIDs field on the encompassing TariffPeriodStruct;
-                     - Verify that the entry does not contain Price field if SETRF.S.F00(PRICE) is False;
-                     - Verify that if SETRF.S.F00(PRICE) is True and if Price field is presented it is Null or has type TariffPriceStruct;
-                     - Verify that if SETRF.S.F00(PRICE) is True and if Price field is presented and it is not Null: 
-                        - PriceType field in TariffPriceStruct has TariffPriceTypeEnum type and value in range 0 - 4;
-                        - If Price field is presented in TariffPriceStruct it has money type;
-                        - If PriceLevel field is presented in TariffPriceStruct it has int16 type;
-                     - Verify that entry does not contain FriendlyCredit field if SETRF.S.F01(FCRED) is False;
-                     - Verify that if SETRF.S.F01(FCRED) and FriendlyCredit field is presented it has type bool;
-                     - Verify that entry does not contain AuxiliaryLoad field if SETRF.S.F02(AUXLD) is False;
-                     - Verify that if SETRF.S.F02(AUXLD) is True and AuxiliaryLoad field is presented it has AuxiliaryLoadSwitchSettingsStruct type;
-                        - Verify that Number field in AuxiliaryLoadSwitchSettingsStruct has uint8 type;
-                        - Verify that RequiredState field in AuxiliaryLoadSwitchSettingsStruct has AuxiliaryLoadSettingEnum type and value in range 0 - 2;
-                     - Verify that entry does not contain PeakPeriod field if SETRF.S.F03(PEAKP) is False;
-                     - Verify that if SETRF.S.F03(PEAKP) is True and PeakPeriod field is presented it has PeakPeriodStruct type;
-                        - Verify that Severity field in PeakPeriodStruct has type PeakPeriodSeverityEnum and value in range 0 - 3;
-                        - Verify that PeakPeriod in PeakPeriodStruct has type uint16 and its value greater that 1;
-                     - Verify that entry does not contain PowerThreshold field if SETRF.S.F04(PWRTHLD) is False;
-                     - Verify that if SETRF.S.F04(PWRTHLD) is True and PowerThreshold field is presented it has PowerThresholdStruct type;
-                        - Verify that PowerThreshold field in PowerThresholdStruct has type power-mW;
-                        - Verify that ApparentPowerThreshold field in PowerThresholdStruct has type power-mVA;
-                        - Verify that PowerThresholdSource field in PowerThresholdStruct has type PowerThresholdSourceEnum and value in range 0 - 2."""),
-            TestStep("19", "TH reads DefaultRandomizationType attribute.", """
-                     -DUT replies a Null or a value of DayEntryRandomizationType in range 0 - 4;
-                     - Store value as a DefaultRandomizationTypeValue."""),
-            TestStep("20", "TH reads DefaultRandomizationOffset attribute.", """
-                     - DUT replies a Null or a value of int16 value;
-                     - If DefaultRandomizationTypeValue is 0x00 (Fixed), DUT replies a int16 value;
-                     - If DefaultRandomizationTypeValue is 0x04 (RandomNegative), DUT replies a int16 value less or equal 0;
-                     - If DefaultRandomizationTypeValue is not 0x01 (Fixed) or 0x04 (RandomNegative), DUT replies a int16 value greater or equal 0."""),
+                     - Verify that StartTime field has uint16 type with value less or equal 1499;
+                        - Store the field value as startTimeFieldValue;
+                        - RandomizationType fields:
+                            - Verify that entry does not contain RandomizationType fields if SETRF.S.F05(RNDM) is False;
+                            - If SETRF.S.F05(RNDM) and RandomizationType field is presented it has DayEntryRandomizationType type. Value has to be between a range of 0 - 4;
+                            - Store the field value randomizationTypeValue;
+                     - RandomizationOffset field: 
+                        - Verify that entry does not contain RandomizationOffset fields if SETRF.S.F05(RNDM) is False;
+                        - If SETRF.S.F05(RNDM) and randomizationTypeValue is 0x01 (Fixed) and RandomizationOffset field is presented, it has int16 value;
+                        - If SETRF.S.F05(RNDM) and randomizationTypeValue is 0x04 (RandomNegative) and RandomizationOffset field is presented, it has a int16 value less or equal 0;
+                        - If SETRF.S.F05(RNDM) and randomizationTypeValue is 0x00 (None), 0x02 (Random) or 0x03 (RandomPositive) and RandomizationOffset field is presented, it has a int16 value greater or equal 0."""),
+            TestStep("14", "TH reads from the DUT the NextDayEntryDate attribute.", """
+                     - If tariffInfoValue equals null, Verify that the DUT response contains a null;
+                     - If tariffInfoValue doesn't equal null, Verify that the DUT response contains a null or an epoch-s value greater than currentDayEntryDateValue;"""),
+            TestStep("15", "TH reads from the DUT the TariffComponents attribute.", """
+                     - If tariffInfoValue equals null, Verify that the DUT response contains a null;
+                     - If tariffInfoValue doesn't equal null, Verify that the DUT response contains a null or a list of TariffComponentStruct entries with list length in range 1-672;
+                     - For each entry:
+                        - Verify that TariffComponentID field has uint32 type;
+                        - Threshold field:
+                            - Verify that Threshold is null if BlockModeValue is 0 (NoBlock);
+                            - Verify that Threshold has type int64 or null if BlockModeValue is 1 (Combined) or 2 (Individual).
+                        - Verify that if Label field is presented it is null or has type string with max length 128;
+                        - Predicted field:
+                            - Verify that if Predicted field is presented it has type bool;
+                            - Verify that if Predicted is False TariffComponentID is a unique identifier for the combination of values of the Price, Threshold, FriendlyCredit, AuxiliaryLoad, and PeakPeriod fields with the value of the DayEntryIDs field on the encompassing TariffPeriodStruct;
+                        - Verify that it has at least one of the fields: Price, FriendlyCredit, AuxiliaryLoad, PeakPeriod, PowerThreshold;
+                        - Price field 
+                            - Verify that the entry does not contain Price field if SETRF.S.F00(PRICE) is False;
+                            - If SETRF.S.F00(PRICE) is True and if Price field is presented it is null or has type TariffPriceStruct;
+                                - Verify that PriceType field has TariffPriceTypeEnum type. Value has to be between a range of 0 - 4;
+                                - Verify that if Price field is presented it has money type;
+                                - Verify that if PriceLevel field is presented it has int16 type;
+                        - FriendlyCredit field 
+                            - Verify that entry does not contain FriendlyCredit field if SETRF.S.F01(FCRED) is False;
+                            - If SETRF.S.F01(FCRED) and FriendlyCredit field is presented it has type bool;
+                            - AuxiliaryLoad field
+                                - Verify that entry does not contain AuxiliaryLoad field if SETRF.S.F02(AUXLD) is False;
+                                - If SETRF.S.F02(AUXLD) and AuxiliaryLoad field is presented it has AuxiliaryLoadSwitchSettingsStruct type;
+                                    - Verify that Number field has uint8 type;
+                                    - Verify that RequiredState field has AuxiliaryLoadSettingEnum type. Value has to be between a range of 0 - 2;
+                            - PeakPeriod field
+                                - Verify that entry does not contain PeakPeriod field if SETRF.S.F03(PEAKP) is False;
+                                - If SETRF.S.F03(PEAKP) and PeakPeriod field is presented it has PeakPeriodStruct type;
+                                    - Verify that Severity field has PeakPeriodSeverityEnum type. Value has to be between a range of 0 - 3;
+                                    - Verify that PeakPeriod field has uint16 type and value greater or equal 1;
+                            - PowerThreshold field
+                                - Verify that entry does not contain PowerThreshold field if SETRF.S.F04(PWRTHLD) is False;
+                                - If SETRF.S.F04(PWRTHLD) is True and PowerThreshold field is presented it has PowerThresholdStruct type;
+                                    - Verify that PowerThreshold field has power-mW type;
+                                    - Verify that ApparentPowerThreshold field has power-mVA type;
+                                    - Verify that PowerThresholdSource field has PowerThresholdSourceEnum type. Value has to be between a range of 0 - 2."""),
+            TestStep("16", "TH reads from the DUT the TariffPeriods attribute.", """
+                     - If tariffInfoValue equals null, Verify that the DUT response contains a null;
+                     - If tariffInfoValue doesn't equal null, Verify that the DUT response contains a null or a list of TariffPeriodStruct entries with list length in range 1-672;
+                     - For each entry:
+                        - Verify that Label field is null or has type string with max length 128;
+                        - Verify that DayEntryIDs field is a list of unique uint32 with list length in range 1 - 20;
+                        - Verify that TariffComponentIDs field is a list of uint32 with list length in range 1 - 20."""),
+            TestStep("17", "TH reads from the DUT the CurrentTariffComponents attribute.", """
+                     - If tariffInfoValue equals null, Verify that the DUT response contains a null;
+                     - If tariffInfoValue doesn't equal null, Verify that the DUT response contains a null or a value that is a list of TariffComponentStruct entries with list length less or equal 20;
+                     - For each entry:
+                        - Verify that TariffComponentID field has uint32 type;
+                        - Threshold field:
+                            - Verify that Threshold is null if BlockModeValue is 0 (NoBlock);
+                            - Verify that Threshold has type int64 or null if BlockModeValue is 1 (Combined) or 2 (Individual).
+                        - Verify that if Label field is presented it is null or has type string with max length 128;
+                        - Predicted field:
+                            - Verify that if Predicted field is presented it has type bool;
+                            - Verify that if Predicted is False TariffComponentID is a unique identifier for the combination of values of the Price, Threshold, FriendlyCredit, AuxiliaryLoad, and PeakPeriod fields with the value of the DayEntryIDs field on the encompassing TariffPeriodStruct;
+                            - Verify that it has at least one of the fields: Price, FriendlyCredit, AuxiliaryLoad, PeakPeriod, PowerThreshold;
+                        - Price field
+                            - Verify that the entry does not contain Price field if SETRF.S.F00(PRICE) is False;
+                            - If SETRF.S.F00(PRICE) is True and if Price field is presented it is null or has type TariffPriceStruct;
+                                - Verify that PriceType field has TariffPriceTypeEnum type. Value has to be between a range of 0 - 4;
+                                - Verify that if Price field is presented it has money type;
+                                - Verify that if PriceLevel field is presented it has int16 type;
+                            - FriendlyCredit field
+                                - Verify that entry does not contain FriendlyCredit field if SETRF.S.F01(FCRED) is False;
+                                - If SETRF.S.F01(FCRED) and FriendlyCredit field is presented it has type bool;
+                            - AuxiliaryLoad field
+                                - Verify that entry does not contain AuxiliaryLoad field if SETRF.S.F02(AUXLD) is False;
+                                - If SETRF.S.F02(AUXLD) and AuxiliaryLoad field is presented it has AuxiliaryLoadSwitchSettingsStruct type;
+                                    - Verify that Number field has uint8 type;
+                                    - Verify that RequiredState field has AuxiliaryLoadSettingEnum type. Value has to be between a range of 0 - 2;
+                            - PeakPeriod field
+                                - Verify that entry does not contain PeakPeriod field if SETRF.S.F03(PEAKP) is False;
+                                - If SETRF.S.F03(PEAKP) and PeakPeriod field is presented it has PeakPeriodStruct type;
+                                    - Verify that Severity field has PeakPeriodSeverityEnum type. Value has to be between a range of 0 - 3;
+                                    - Verify that PeakPeriod field has uint16 type and value greater or equal 1;
+                            - PowerThreshold field
+                                - Verify that entry does not contain PowerThreshold field if SETRF.S.F04(PWRTHLD) is False;
+                                - If SETRF.S.F04(PWRTHLD) is True and PowerThreshold field is presented it has PowerThresholdStruct type;
+                                    - Verify that PowerThreshold field has power-mW type;
+                                    - Verify that ApparentPowerThreshold field has power-mVA type;
+                                    - Verify that PowerThresholdSource field has PowerThresholdSourceEnum type. Value has to be between a range of 0 - 2."""),
+            TestStep("18", "TH reads from the DUT the NextTariffComponents attribute.", """
+                     - If tariffInfoValue equals null, Verify that the DUT response contains a null;
+                     - If tariffInfoValue doesn't equal null, Verify that the DUT response contains a null or a value that is a list of TariffComponentStruct entries with list length less or equal 20;
+                     - For each entry:
+                        - Verify that TariffComponentID field has uint32 type;
+                        - Threshold field:
+                            - Verify that Threshold is null if BlockModeValue is 0 (NoBlock);
+                            - Verify that Threshold has type int64 or null if BlockModeValue is 1 (Combined) or 2 (Individual).
+                        - Verify that if Label field is presented it is null or has type string with max length 128;
+                        - Predicted field:
+                            - Verify that if Predicted field is presented it has type bool;
+                            - Verify that if Predicted is False TariffComponentID is a unique identifier for the combination of values of the Price, Threshold, FriendlyCredit, AuxiliaryLoad, and PeakPeriod fields with the value of the DayEntryIDs field on the encompassing TariffPeriodStruct;
+                        - Verify that it has at least one of the fields: Price, FriendlyCredit, AuxiliaryLoad, PeakPeriod, PowerThreshold;
+                        - Price field
+                            - Verify that the entry does not contain Price field if SETRF.S.F00(PRICE) is False;
+                            - If SETRF.S.F00(PRICE) is True and if Price field is presented it is null or has type TariffPriceStruct;
+                                - Verify that PriceType field has TariffPriceTypeEnum type. Value has to be between a range of 0 - 4;
+                                - Verify that if Price field is presented it has money type;
+                                - Verify that if PriceLevel field is presented it has int16 type;
+                        - FriendlyCredit field
+                            - Verify that entry does not contain FriendlyCredit field if SETRF.S.F01(FCRED) is False;
+                            - If SETRF.S.F01(FCRED) and FriendlyCredit field is presented it has type bool;
+                        - AuxiliaryLoad field
+                            - Verify that entry does not contain AuxiliaryLoad field if SETRF.S.F02(AUXLD) is False;
+                            - If SETRF.S.F02(AUXLD) and AuxiliaryLoad field is presented it has AuxiliaryLoadSwitchSettingsStruct type;
+                            - Verify that Number field has uint8 type;
+                            - Verify that RequiredState field has AuxiliaryLoadSettingEnum type. Value has to be between a range of 0 - 2;
+                            - PeakPeriod field
+                                - Verify that entry does not contain PeakPeriod field if SETRF.S.F03(PEAKP) is False;
+                                - If SETRF.S.F03(PEAKP) and PeakPeriod field is presented it has PeakPeriodStruct type;
+                                - Verify that Severity field has PeakPeriodSeverityEnum type. Value has to be between a range of 0 - 3;
+                                - Verify that PeakPeriod field has uint16 type and value greater or equal 1;
+                            - PowerThreshold field
+                                - Verify that entry does not contain PowerThreshold field if SETRF.S.F04(PWRTHLD) is False;
+                                - If SETRF.S.F04(PWRTHLD) is True and PowerThreshold field is presented it has PowerThresholdStruct type;
+                                    - Verify that PowerThreshold field has power-mW type;
+                                    - Verify that ApparentPowerThreshold field has power-mVA type;
+                                    - Verify that PowerThresholdSource field has PowerThresholdSourceEnum type. Value has to be between a range of 0 - 2."""),
+            TestStep("19", "TH reads from the DUT the DefaultRandomizationType attribute.", """
+                     - If tariffInfoValue equals null, Verify that the DUT response contains a null;
+                     - If tariffInfoValue doesn't equal null, Verify that the DUT response contains a null or a value of DayEntryRandomizationTypeEnum. Value has to be between a range of 0 - 4;
+                     - Store the value as defaultRandomizationTypeValue."""),
+            TestStep("20", "TH reads from the DUT the DefaultRandomizationOffset attribute.", """
+                     - If tariffInfoValue equals null, Verify that the DUT response contains a null;
+                     - If defaultRandomizationTypeValue is null, Verify that the DUT response contains a null;
+                     - Verify that the DUT response contains a null if tariffInfoValue equals null;
+                     - If defaultRandomizationTypeValue is 0x01 (Fixed), Verify that the DUT response contains a int16 value;
+                     - If defaultRandomizationTypeValue is 0x04 (RandomNegative), Verify that the DUT response contains a int16 value less or equal 0;
+                     - If defaultRandomizationTypeValue is 0x00 (None), 0x02 (Random) or 0x03 (RandomPositive), Verify that the DUT response contains a int16 value greater or equal 0."""),
         ]
 
         return steps
