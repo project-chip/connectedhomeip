@@ -23,6 +23,7 @@
 #include "camera-device-interface.h"
 #include <app/util/config.h>
 #include <cstring>
+#include <data-model-providers/codegen/CodegenDataModelProvider.h>
 #include <protocols/interaction_model/StatusCode.h>
 #include <utility>
 
@@ -37,12 +38,15 @@ public:
     // Initialize all the camera device clusters.
     void InitCameraDeviceClusters();
 
+    void Shutdown();
+
 private:
     chip::EndpointId mEndpoint;
     CameraDeviceInterface * mCameraDevice;
 
     // SDK cluster servers
-    std::unique_ptr<chip::app::Clusters::WebRTCTransportProvider::WebRTCTransportProviderServer> mWebRTCTransportProviderPtr;
+    chip::app::LazyRegisteredServerCluster<chip::app::Clusters::WebRTCTransportProvider::WebRTCTransportProviderServer>
+        mWebRTCTransportProviderServer;
     std::unique_ptr<chip::app::Clusters::ChimeServer> mChimeServerPtr;
     std::unique_ptr<chip::app::Clusters::CameraAvStreamManagement::CameraAVStreamMgmtServer> mAVStreamMgmtServerPtr;
     std::unique_ptr<chip::app::Clusters::CameraAvSettingsUserLevelManagement::CameraAvSettingsUserLevelMgmtServer>
