@@ -17,8 +17,6 @@
 
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
-#include <app/clusters/resource-monitoring-server/resource-monitoring-cluster-objects.h>
-#include <app/clusters/resource-monitoring-server/resource-monitoring-server.h>
 #include <resource-monitoring-delegates.h>
 
 using namespace chip;
@@ -37,10 +35,10 @@ constexpr std::bitset<4> gActivatedCarbonFeatureMap{ static_cast<uint32_t>(Resou
                                                      static_cast<uint32_t>(ResourceMonitoring::Feature::kReplacementProductList) };
 
 static ActivatedCarbonFilterMonitoringDelegate * gActivatedCarbonFilterDelegate = nullptr;
-static ResourceMonitoring::Instance * gActivatedCarbonFilterInstance            = nullptr;
+static ResourceMonitoring::ResourceMonitoringCluster * gActivatedCarbonFilterInstance            = nullptr;
 
 static HepaFilterMonitoringDelegate * gHepaFilterDelegate = nullptr;
-static ResourceMonitoring::Instance * gHepaFilterInstance = nullptr;
+static ResourceMonitoring::ResourceMonitoringCluster * gHepaFilterInstance = nullptr;
 
 static ImmutableReplacementProductListManager sReplacementProductListManager;
 
@@ -116,8 +114,8 @@ void emberAfActivatedCarbonFilterMonitoringClusterInitCallback(chip::EndpointId 
 {
     VerifyOrDie(gActivatedCarbonFilterInstance == nullptr && gActivatedCarbonFilterDelegate == nullptr);
     gActivatedCarbonFilterDelegate = new ActivatedCarbonFilterMonitoringDelegate;
-    gActivatedCarbonFilterInstance = new ResourceMonitoring::Instance(
-        gActivatedCarbonFilterDelegate, endpoint, ActivatedCarbonFilterMonitoring::Id,
+    gActivatedCarbonFilterInstance = new ResourceMonitoring::ResourceMonitoringCluster(
+        endpoint, ActivatedCarbonFilterMonitoring::Id,
         static_cast<uint32_t>(gActivatedCarbonFeatureMap.to_ulong()), ResourceMonitoring::DegradationDirectionEnum::kDown, true);
     TEMPORARY_RETURN_IGNORED gActivatedCarbonFilterInstance->Init();
 }
@@ -127,7 +125,8 @@ void emberAfHepaFilterMonitoringClusterInitCallback(chip::EndpointId endpoint)
     VerifyOrDie(gHepaFilterInstance == nullptr && gHepaFilterDelegate == nullptr);
 
     gHepaFilterDelegate = new HepaFilterMonitoringDelegate;
-    gHepaFilterInstance = new ResourceMonitoring::Instance(gHepaFilterDelegate, endpoint, HepaFilterMonitoring::Id,
+
+    gHepaFilterInstance = new ResourceMonitoring::ResourceMonitoringCluster(endpoint, HepaFilterMonitoring::Id,
                                                            static_cast<uint32_t>(gHepaFilterFeatureMap.to_ulong()),
                                                            ResourceMonitoring::DegradationDirectionEnum::kDown, true);
     TEMPORARY_RETURN_IGNORED gHepaFilterInstance->Init();

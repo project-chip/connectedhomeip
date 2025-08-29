@@ -29,6 +29,17 @@ using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::ResourceMonitoring;
 using chip::Protocols::InteractionModel::Status;
 
+namespace {
+    
+constexpr DataModel::AttributeEntry kMandatoryAttributes[] = {
+    ResourceMonitoring::Attributes::Condition::kMetadataEntry,
+    ResourceMonitoring::Attributes::DegradationDirection::kMetadataEntry,
+    ResourceMonitoring::Attributes::ChangeIndication::kMetadataEntry,
+    ResourceMonitoring::Attributes::ReplacementProductList::kMetadataEntry,
+};
+
+} // namespace
+
 namespace chip {
 namespace app {
 namespace Clusters {
@@ -176,7 +187,29 @@ DataModel::ActionReturnStatus ResourceMonitoringCluster::ReadAttribute(const Dat
         return Protocols::InteractionModel::Status::UnsupportedCluster;
     }
 
-   
+}
+
+CHIP_ERROR ResourceMonitoringCluster::Attributes(const ConcreteClusterPath & path,
+                                                     ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder)
+{
+    DataModel::AttributeEntry optionalAttributes[] = {
+        ResourceMonitoring::Attributes::InPlaceIndicator::kMetadataEntry,
+        ResourceMonitoring::Attributes::LastChangedTime::kMetadataEntry,
+    };
+
+    OptionalAttributeSet<ResourceMonitoring::Attributes::InPlaceIndicator::Id,
+                         ResourceMonitoring::Attributes::LastChangedTime::Id>
+        optionalAttributeSet;
+
+    // where do I find whether these optional attributes get supported or not?
+    // feature map for this cluster does not seem to hint anything related to these attributes
+    // for now, let's assume they are always supported
+    optionalAttributeSet.Set<ResourceMonitoring::Attributes::InPlaceIndicator::Id>();
+    optionalAttributeSet.Set<ResourceMonitoring::Attributes::LastChangedTime::Id>();
+
+    AttributeListBuilder listBuilder(builder);
+
+    return listBuilder.Append(Span(kMandatoryAttributes), Span(optionalAttributes), optionalAttributeSet);
 }
 
 CHIP_ERROR ResourceMonitoringCluster::ReadReplaceableProductList(AttributeValueEncoder & aEncoder)
@@ -249,7 +282,6 @@ ResourceMonitoringCluster::UpdateChangeIndication(chip::app::Clusters::ResourceM
     mChangeIndication        = aNewChangeIndication;
     if (mChangeIndication != oldChangeIndication)
     {
-        // MatterReportingAttributeChangeCallback(mEndpointId, mClusterId, Attributes::ChangeIndication::Id);
         NotifyAttributeChanged(ResourceMonitoring::Attributes::ChangeIndication::Id);        
     }
 
