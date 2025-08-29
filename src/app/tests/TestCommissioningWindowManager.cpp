@@ -450,6 +450,36 @@ TEST_F(TestCommissioningWindowManager, TestOnPlatformEventFailSafeTimerExpired)
     EXPECT_EQ(commissionMgr.GetCommissioningMode(), chip::Dnssd::CommissioningMode::kDisabled);
 }
 
+TEST_F(TestCommissioningWindowManager, TestOnPlatformEventFailSafeTimerExpiredPASEEVicted)
+{
+    CommissioningWindowManager & commissionMgr = Server::GetInstance().GetCommissioningWindowManager();
+    auto access                                = chip::Test::CommissioningWindowManagerTestAccess(&commissionMgr);
+    auto & sessionMgr                          = Server::GetInstance().GetSecureSessionManager();
+
+    // chip::SessionHolder sessionHolder;
+    auto & PASESession            = access.GetPASESession();
+    uint16_t localSessionId       = 1;
+    chip::NodeId peerNodeId       = chip::kUndefinedNodeId;
+    uint16_t peerSessionId        = 2;
+    chip::FabricIndex fabricIndex = chip::kUndefinedFabricIndex;
+    // 5540 is a port number assigned to Matter by IANA
+    chip::Transport::PeerAddress peerAddress =
+        chip::Transport::PeerAddress::UDP(chip::Inet::IPAddress::Loopback(chip::Inet::IPAddressType::kAny), 5540);
+    auto role = chip::CryptoContext::SessionRole::kResponder;
+
+    CHIP_ERROR err = sessionMgr.InjectPaseSessionWithTestKey(PASESession, localSessionId, peerNodeId, peerSessionId, fabricIndex,
+                                                             peerAddress, role);
+    EXPECT_EQ(err, CHIP_NO_ERROR);
+    EXPECT_TRUE(PASESession.Get().HasValue());
+    EXPECT_TRUE(PASESession->AsSecureSession()->IsActiveSession());
+
+    chip::DeviceLayer::ChipDeviceEvent event;
+    event.Type = chip::DeviceLayer::DeviceEventType::kFailSafeTimerExpired;
+
+    commissionMgr.OnPlatformEvent(&event);
+    EXPECT_FALSE(PASESession.Get().HasValue());
+}
+
 // Verify that operational advertising is started when the operational network is enabled
 TEST_F(TestCommissioningWindowManager, TestOnPlatformEventOperationalNetworkEnabled)
 {
