@@ -26,7 +26,7 @@ using namespace chip::app;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::GeneralCommissioning::Attributes;
 using chip::Protocols::InteractionModel::Status;
-using chip::DeviceLayer;
+using namespace chip::DeviceLayer;
 
 namespace {
 
@@ -69,7 +69,7 @@ void emberAfGeneralCommissioningClusterInitCallback(EndpointId endpointId)
     {
         ChipLogError(AppServer, "General Commissioning register error: endpoint %u, %" CHIP_ERROR_FORMAT, endpointId, err.Format());
     }
-    DeviceLayer::PlatformMgrImpl().AddEventHandler(OnPlatformEventHandler);
+    DeviceLayer::PlatformMgrImpl().AddEventHandler(chip::app::Clusters::GeneralCommissioningLogic::OnPlatformEventHandler);
     chip::Server::GetInstance().GetFabricTable().AddFabricDelegate(&fabricDelegate);
 }
 
@@ -80,7 +80,7 @@ void emberAfGeneralCommissioningClusterShutdownCallback(EndpointId endpointId)
         return;
     }
     Server::GetInstance().GetFabricTable().RemoveFabricDelegate(&fabricDelegate);
-    DeviceLayer::PlatformMgrImpl().RemoveEventHandler(OnPlatformEventHandler);
+    DeviceLayer::PlatformMgrImpl().RemoveEventHandler(chip::app::Clusters::GeneralCommissioningLogic::OnPlatformEventHandler);
 
     CHIP_ERROR err = CodegenDataModelProvider::Instance().Registry().Unregister(&gServer.Cluster());
     if (err != CHIP_NO_ERROR)

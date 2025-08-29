@@ -29,6 +29,7 @@
 #endif
 
 using namespace chip::DeviceLayer;
+using namespace chip::app::Clusters::GeneralCommissioning::Attributes;
 
 namespace{
 
@@ -40,7 +41,6 @@ namespace{
         Optional<TermsAndConditions> requirements;
         Optional<uint32_t> updateAcceptanceDeadline;
     } TermsAndConditionsState;
-#endif
 
 
 CHIP_ERROR GetTermsAndConditionsAttributeState(TermsAndConditionsProvider * tcProvider,
@@ -99,7 +99,7 @@ void NotifyTermsAndConditionsAttributeChangeIfRequired(const TermsAndConditionsS
         MatterReportingAttributeChangeCallback(kRootEndpointId, GeneralCommissioning::Id, TCUpdateDeadline::Id);
     }
 }
-
+#endif
 class GeneralCommissioningFabricTableDelegate : public chip::FabricTable::Delegate
 {
 public:
@@ -143,14 +143,8 @@ namespace GeneralCommissioning
 class GeneralCommissioningLogic
 {
 public:
-    GeneralCommissioningLogic(BitFlags<GeneralCommissioning::Feature>featureFlags) : mFeatureFlags(featureFlags)
-    {
-        chip::Server::GetInstance().GetFabricTable().AddFabricDelegate(&fabricDelegate);
-    }
-    ~GeneralCommissioningLogic()
-    {
-        chip::Server::GetInstance().GetFabricTable().RemoveFabricDelegate(&fabricDelegate);
-    }
+    GeneralCommissioningLogic(BitFlags<GeneralCommissioning::Feature>featureFlags) : mFeatureFlags(featureFlags){}
+    ~GeneralCommissioningLogic(){}
 
     CHIP_ERROR ReadIfSupported(CHIP_ERROR (ConfigurationManager::*getter)(uint8_t &),
                                                                AttributeValueEncoder & aEncoder)
@@ -178,7 +172,7 @@ public:
     CHIP_ERROR ReadTCUpdateDeadline(AttributeValueEncoder & aEncoder);
 #endif
 
-    std::optional<DataModel::ActionReturnStatus> HandleArmFailSafe(CommandHandler * commandObj, const ConcreteCommandPath & path, FabricIndex fabricIndex, const GeneralCommissioning::Commands::ArmFailSafe::DecodableType & commandData);
+    std::optional<DataModel::ActionReturnStatus> HandleArmFailSafe(CommandHandler * commandObj, const ConcreteCommandPath & path, const GeneralCommissioning::Commands::ArmFailSafe::DecodableType & commandData);
 
     std::optional<DataModel::ActionReturnStatus> HandleCommissioningComplete(CommandHandler * commandObj, const ConcreteCommandPath & path, FabricIndex fabricIndex, const GeneralCommissioning::Commands::CommissioningComplete::DecodableType & commandData);
 
@@ -189,9 +183,9 @@ public:
 #endif
 
     const BitFlags<GeneralCommissioning::Feature> & GetFeatureFlags() const { return mFeatureFlags; }
+    static void OnPlatformEventHandler(const DeviceLayer::ChipDeviceEvent * event, intptr_t arg);
 private:
     const BitFlags<GeneralCommissioning::Feature> mFeatureFlags;
-    static void OnPlatformEventHandler(const DeviceLayer::ChipDeviceEvent * event, intptr_t arg);
 };
 
 } // namespace Clusters

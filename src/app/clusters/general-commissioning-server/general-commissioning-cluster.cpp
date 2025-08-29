@@ -107,26 +107,30 @@ std::optional<DataModel::ActionReturnStatus> GeneralCommissioningCluster::Invoke
     using namespace GeneralCommissioning::Commands;
     switch (request.path.mCommandId)
     {
-    case ArmFailSafe::Id:
+    case ArmFailSafe::Id:{
         ArmFailSafe::DecodableType request_data;
         ReturnErrorOnFailure(request_data.Decode(input_arguments));
-        return mLogic.HandleArmFailSafe(handler,request.path, handler->GetAccessingFabricIndex(),request_data);
+        return mLogic.HandleArmFailSafe(handler,request.path,request_data);
+    }
 
-    case CommissioningComplete::Id:
+    case CommissioningComplete::Id:{
         CommissioningComplete::DecodableType request_data;
-        ReturnErrorOnFailure(request_data.Decode(input_arguments));
-        return mLogic.HandleCommissioningComplete(handler,request.path, handler->GetAccessingFabricIndex(),request_data);
+        ReturnErrorOnFailure(request_data.Decode(input_arguments, handler->GetAccessingFabricIndex()));
+        return mLogic.HandleCommissioningComplete(handler,request.path,handler->GetAccessingFabricIndex(),request_data);
+    }
 
-    case SetRegulatoryConfig::Id:
+    case SetRegulatoryConfig::Id:{
         SetRegulatoryConfig::DecodableType request_data;
         ReturnErrorOnFailure(request_data.Decode(input_arguments));
-        return mLogic.HandleSetRegulatoryConfig(handler,request.path, request_data);
+        return mLogic.HandleSetRegulatoryConfig(handler,request.path,request_data);
+    }
 
 #if CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
-    case SetTCAcknowledgements::Id:
+    case SetTCAcknowledgements::Id:{
         SetTCAcknowledgements::DecodableType request_data;
         ReturnErrorOnFailure(request_data.Decode(input_arguments));
         return mLogic.HandleSetTCAcknowledgements(handler,request.path, request_data);
+    }
 #endif
     default:
         return Protocols::InteractionModel::Status::UnsupportedCommand;
