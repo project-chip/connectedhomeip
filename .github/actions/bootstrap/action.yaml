@@ -62,7 +62,7 @@ runs:
 
     - name: Save bootstrap cache
       uses: ./.github/actions/dynamic
-      if: ${{ fromJSON(steps.restore.outputs.outputs).cache-hit != 'true' }}
+      if: ${{ fromJSON(steps.restore.outputs.outputs).cache-hit != 'true' && github.event_name != 'pull_request' }}
       continue-on-error: true
       with:
         action: ${{ steps.prepare.outputs.backend }}/cache/save@v4
