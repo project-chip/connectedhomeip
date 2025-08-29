@@ -56,13 +56,15 @@ class TC_AVSUM_2_7(MatterBaseTest, AVSUMTestBase):
             TestStep(3, "Create a viewport smaller than the supported minimum"),
             TestStep(4, "Send DPTZSetVieport with an unknown stream ID, verify NotFound response"),
             TestStep(5, "Send a VideoStreamAllocate command to AVStreamManagement to allocate a video stream ID. Record the returned ID"),
-            TestStep(6, "Send DPTZSetVieport with a the viewport created in Step 2. Verify ConstraintError response"),
-            TestStep(7, "Create a viewport with valid aspect ratio that is larger than the camera sensor"),
-            TestStep(8, "Send DPTZSetVieport with a the viewport created in Step 6. Verify ConstraintError response"),
-            TestStep(9, "Create a valid viewport give the dimensions of the sensor and the device resolution"),
-            TestStep(10, "Send DPTZSetVieport with a the viewport created in Step 9. Verify success"),
-            TestStep(11, "Modify the valid viewport so that the aspect ratio is invalid"),
-            TestStep(12, "Send DPTZSetVieport with a the viewport created in Step 10. Verify ConstraintError response"),
+            TestStep(6, "Read the DPTZStreams attribute, verify that the response contains an entry with the allocated stream ID and the device viewport"),
+            TestStep(7, "Send DPTZSetVieport with a the viewport created in Step 3. Verify ConstraintError response"),
+            TestStep(8, "Create a viewport with valid aspect ratio that is larger than the camera sensor"),
+            TestStep(9, "Send DPTZSetVieport with a the viewport created in Step 6. Verify ConstraintError response"),
+            TestStep(10, "Create a valid viewport give the dimensions of the sensor and the device resolution"),
+            TestStep(11, "Send DPTZSetVieport with a the viewport created in Step 9. Verify success"),
+            TestStep(12, "Read the DPTZStreams attribute, verify that the response contains an entry with the allocated stream ID and the viewport from step 10"),
+            TestStep(13, "Modify the valid viewport so that the aspect ratio is invalid"),
+            TestStep(14, "Send DPTZSetVieport with a the viewport created in Step 10. Verify ConstraintError response"),
         ]
         return steps
 
@@ -105,15 +107,20 @@ class TC_AVSUM_2_7(MatterBaseTest, AVSUMTestBase):
         videoStreamID = await self.video_stream_allocate_command(endpoint)
 
         self.step(6)
+        # Read DPTZStreams and verify that the stream and viewport are present
+        if not self.dptzstreamentryvalid(endpoint, videoStreamID, viewport):
+            asserts.assert_fail("No matching stream id and viewport found in DPTZStreams for the allocated video stream")
+
+        self.step(7)
         # Send a dptzsetviewport for the correct stream but with an invalid viewport small dimension viewport
         await self.send_dptz_set_viewport_command(endpoint, videoStreamID, smallfailingviewport, expected_status=Status.ConstraintError)
 
-        self.step(7)
+        self.step(8)
         # Send a dptzsetviewport for the correct stream but with an invalid viewport larger than the sensor call deal with dimension viewport
         largefailingviewport = Globals.Structs.ViewportStruct(
             x1=0, y1=0, x2=sensordimensions.sensorWidth+16, y2=sensordimensions.sensorHeight+9)
 
-        self.step(8)
+        self.step(9)
         await self.send_dptz_set_viewport_command(endpoint, videoStreamID, largefailingviewport, expected_status=Status.ConstraintError)
 
         # Get the current viewport
@@ -123,16 +130,21 @@ class TC_AVSUM_2_7(MatterBaseTest, AVSUMTestBase):
         viewportheight = viewport.y2 - viewport.y1
         x1 = sensordimensions.sensorWidth - viewportwidth
 
-        self.step(9)
-        passingviewport = Globals.Structs.ViewportStruct(x1=x1, y1=0, x2=sensordimensions.sensorWidth, y2=viewportheight)
         self.step(10)
+        passingviewport = Globals.Structs.ViewportStruct(x1=x1, y1=0, x2=sensordimensions.sensorWidth, y2=viewportheight)
+        self.step(11)
         await self.send_dptz_set_viewport_command(endpoint, videoStreamID, passingviewport)
 
-        self.step(11)
+        self.step(12)
+        # Verify the viewport has been updated in DPTZStreams
+        if not self.dptzstreamentryvalid(endpoint, videoStreamID, passingviewport):
+            asserts.assert_fail("Viewport has not been updated in DPTZStreams")
+
+        self.step(13)
         # Deliberately mess with the aspect ratio, ensure that the viewport setting fails.
         failingviewport = Globals.Structs.ViewportStruct(
             x1=x1, y1=viewportheight//2, x2=sensordimensions.sensorWidth, y2=viewportheight)
-        self.step(12)
+        self.step(14)
         await self.send_dptz_set_viewport_command(endpoint, videoStreamID, failingviewport, expected_status=Status.ConstraintError)
 
 
