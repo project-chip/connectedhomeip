@@ -80,10 +80,6 @@ struct TestDacOnlyPartialAttestationVerifier : public ::testing::Test
 
     // The following test data uses arbitrary values solely for test structure;
     // the actual contents do not represent real or meaningful data.
-    static constexpr uint8_t kTestAttestationElements[32] = { 0x01, 0x02, 0x03 };
-    static constexpr uint8_t kTestChallengeData[32]       = { 0x04, 0x05, 0x06 };
-    static constexpr uint8_t kTestSignatureData[64]       = { 0x07, 0x08, 0x09 };
-    static constexpr uint8_t kTestNonceData[32]           = { 0x0A, 0x0B, 0x0C };
 
     void SetUp() override { attestationResult = AttestationVerificationResult::kSuccess; }
 
