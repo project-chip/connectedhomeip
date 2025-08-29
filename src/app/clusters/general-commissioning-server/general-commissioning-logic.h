@@ -1,6 +1,5 @@
 #pragma once
 
-
 #include <app/AttributeValueDecoder.h>
 #include <app/CommandHandler.h>
 
@@ -9,15 +8,15 @@
 #include <app/data-model/Encode.h>
 #include <lib/core/DataModelTypes.h>
 
-#include <clusters/GeneralCommissioning/Enums.h>
-#include <lib/core/CHIPError.h>
 #include <app/AttributeValueEncoder.h>
+#include <clusters/GeneralCommissioning/Enums.h>
+#include <credentials/FabricTable.h>
+#include <lib/core/CHIPError.h>
 #include <platform/CHIPDeviceConfig.h>
 #include <platform/ConfigurationManager.h>
-#include <credentials/FabricTable.h>
 
-#include <app/reporting/reporting.h>
 #include <app/CommandHandler.h>
+#include <app/reporting/reporting.h>
 
 #include <app/data-model-provider/ActionReturnStatus.h>
 #include <app/server/Server.h>
@@ -31,17 +30,16 @@
 using namespace chip::DeviceLayer;
 using namespace chip::app::Clusters::GeneralCommissioning::Attributes;
 
-namespace{
+namespace {
 
 #if CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
-    typedef struct sTermsAndConditionsState
-    {
-        Optional<TermsAndConditions> acceptance;
-        bool acknowledgementsRequired;
-        Optional<TermsAndConditions> requirements;
-        Optional<uint32_t> updateAcceptanceDeadline;
-    } TermsAndConditionsState;
-
+typedef struct sTermsAndConditionsState
+{
+    Optional<TermsAndConditions> acceptance;
+    bool acknowledgementsRequired;
+    Optional<TermsAndConditions> requirements;
+    Optional<uint32_t> updateAcceptanceDeadline;
+} TermsAndConditionsState;
 
 CHIP_ERROR GetTermsAndConditionsAttributeState(TermsAndConditionsProvider * tcProvider,
                                                TermsAndConditionsState & outTermsAndConditionsState)
@@ -123,31 +121,28 @@ public:
             NotifyTermsAndConditionsAttributeChangeIfRequired(initialState, updatedState);
         }
 #endif // CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
-
     }
 };
-}
+} // namespace
 
 namespace chip {
 namespace app {
 namespace Clusters {
 
-namespace GeneralCommissioning
+namespace GeneralCommissioning {
+void SetBreadcrumb(Attributes::Breadcrumb::TypeInfo::Type breadcrumb)
 {
-    void SetBreadcrumb(Attributes::Breadcrumb::TypeInfo::Type breadcrumb)
-    {
-        Breadcrumb::Set(0, breadcrumb);
-    } 
+    Breadcrumb::Set(0, breadcrumb);
 }
+} // namespace GeneralCommissioning
 
 class GeneralCommissioningLogic
 {
 public:
-    GeneralCommissioningLogic(BitFlags<GeneralCommissioning::Feature>featureFlags) : mFeatureFlags(featureFlags){}
-    ~GeneralCommissioningLogic(){}
+    GeneralCommissioningLogic(BitFlags<GeneralCommissioning::Feature> featureFlags) : mFeatureFlags(featureFlags) {}
+    ~GeneralCommissioningLogic() {}
 
-    CHIP_ERROR ReadIfSupported(CHIP_ERROR (ConfigurationManager::*getter)(uint8_t &),
-                                                               AttributeValueEncoder & aEncoder)
+    CHIP_ERROR ReadIfSupported(CHIP_ERROR (ConfigurationManager::*getter)(uint8_t &), AttributeValueEncoder & aEncoder)
     {
         uint8_t data   = 0;
         CHIP_ERROR err = (DeviceLayer::ConfigurationMgr().*getter)(data);
@@ -172,18 +167,27 @@ public:
     CHIP_ERROR ReadTCUpdateDeadline(AttributeValueEncoder & aEncoder);
 #endif
 
-    std::optional<DataModel::ActionReturnStatus> HandleArmFailSafe(CommandHandler * commandObj, const ConcreteCommandPath & path, const GeneralCommissioning::Commands::ArmFailSafe::DecodableType & commandData);
+    std::optional<DataModel::ActionReturnStatus>
+    HandleArmFailSafe(CommandHandler * commandObj, const ConcreteCommandPath & path,
+                      const GeneralCommissioning::Commands::ArmFailSafe::DecodableType & commandData);
 
-    std::optional<DataModel::ActionReturnStatus> HandleCommissioningComplete(CommandHandler * commandObj, const ConcreteCommandPath & path, FabricIndex fabricIndex, const GeneralCommissioning::Commands::CommissioningComplete::DecodableType & commandData);
+    std::optional<DataModel::ActionReturnStatus>
+    HandleCommissioningComplete(CommandHandler * commandObj, const ConcreteCommandPath & path, FabricIndex fabricIndex,
+                                const GeneralCommissioning::Commands::CommissioningComplete::DecodableType & commandData);
 
-    std::optional<DataModel::ActionReturnStatus> HandleSetRegulatoryConfig(CommandHandler * commandObj, const ConcreteCommandPath & path, const GeneralCommissioning::Commands::SetRegulatoryConfig::DecodableType & commandData);
+    std::optional<DataModel::ActionReturnStatus>
+    HandleSetRegulatoryConfig(CommandHandler * commandObj, const ConcreteCommandPath & path,
+                              const GeneralCommissioning::Commands::SetRegulatoryConfig::DecodableType & commandData);
 
 #if CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
-    std::optional<DataModel::ActionReturnStatus> HandleSetTCAcknowledgements(CommandHandler * commandObj, const ConcreteCommandPath & path, const GeneralCommissioning::Commands::SetTCAcknowledgements::DecodableType & commandData);
+    std::optional<DataModel::ActionReturnStatus>
+    HandleSetTCAcknowledgements(CommandHandler * commandObj, const ConcreteCommandPath & path,
+                                const GeneralCommissioning::Commands::SetTCAcknowledgements::DecodableType & commandData);
 #endif
 
     const BitFlags<GeneralCommissioning::Feature> & GetFeatureFlags() const { return mFeatureFlags; }
     static void OnPlatformEventHandler(const DeviceLayer::ChipDeviceEvent * event, intptr_t arg);
+
 private:
     const BitFlags<GeneralCommissioning::Feature> mFeatureFlags;
 };

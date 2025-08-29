@@ -1,16 +1,16 @@
 #include "general-commissioning-logic.h"
 
+#include <app/reporting/reporting.h>
 #include <app/server/CommissioningWindowManager.h>
 #include <app/util/attribute-storage.h>
-#include <app/reporting/reporting.h>
-#include <platform/ConfigurationManager.h>
-#include <platform/DeviceControlServer.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
+#include <platform/ConfigurationManager.h>
+#include <platform/DeviceControlServer.h>
 
-#include <transport/SecureSession.h>
 #include <app/ConcreteCommandPath.h>
 #include <lib/core/Optional.h>
+#include <transport/SecureSession.h>
 
 #include <lib/core/DataModelTypes.h>
 #include <platform/CommissionableDataProvider.h>
@@ -24,11 +24,11 @@ using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters::GeneralCommissioning;
 using namespace chip::app::Clusters::GeneralCommissioning::Attributes;
-using chip::Transport::Session;
-using chip::Transport::SecureSession;
 using chip::app::Clusters::GeneralCommissioning::CommissioningErrorEnum;
 using chip::Protocols::InteractionModel::ClusterStatusCode;
 using chip::Protocols::InteractionModel::Status;
+using chip::Transport::SecureSession;
+using chip::Transport::Session;
 
 namespace {
 
@@ -37,8 +37,8 @@ namespace {
     {                                                                                                                              \
         if (!::chip::ChipError::IsSuccess(expr))                                                                                   \
         {                                                                                                                          \
-            commandObj->AddStatus(path, Protocols::InteractionModel::Status::code, #expr);                     \
-            return std::nullopt;                                                                                                                \
+            commandObj->AddStatus(path, Protocols::InteractionModel::Status::code, #expr);                                         \
+            return std::nullopt;                                                                                                   \
         }                                                                                                                          \
     } while (false)
 } // namespace
@@ -84,7 +84,7 @@ CHIP_ERROR GeneralCommissioningLogic::ReadTCAcceptedVersion(AttributeValueEncode
     return aEncoder.Encode(outTermsAndConditions.ValueOr(TermsAndConditions(0, 0)).GetVersion());
 }
 
-CHIP_ERROR GeneralCommissioningLogic::ReadTCMinRequiredVersion(AttributeValueEncoder &aEncoder)
+CHIP_ERROR GeneralCommissioningLogic::ReadTCMinRequiredVersion(AttributeValueEncoder & aEncoder)
 {
     TermsAndConditionsProvider * tcProvider = TermsAndConditionsManager::GetInstance();
     Optional<TermsAndConditions> outTermsAndConditions;
@@ -95,7 +95,7 @@ CHIP_ERROR GeneralCommissioningLogic::ReadTCMinRequiredVersion(AttributeValueEnc
     return aEncoder.Encode(outTermsAndConditions.ValueOr(TermsAndConditions(0, 0)).GetVersion());
 }
 
-CHIP_ERROR GeneralCommissioningLogic::ReadTCAcknowledgements(AttributeValueEncoder &aEncoder)
+CHIP_ERROR GeneralCommissioningLogic::ReadTCAcknowledgements(AttributeValueEncoder & aEncoder)
 {
     TermsAndConditionsProvider * tcProvider = TermsAndConditionsManager::GetInstance();
     Optional<TermsAndConditions> outTermsAndConditions;
@@ -106,7 +106,7 @@ CHIP_ERROR GeneralCommissioningLogic::ReadTCAcknowledgements(AttributeValueEncod
     return aEncoder.Encode(outTermsAndConditions.ValueOr(TermsAndConditions(0, 0)).GetValue());
 }
 
-CHIP_ERROR GeneralCommissioningLogic::ReadTCAcknowledgementsRequired(AttributeValueEncoder &aEncoder)
+CHIP_ERROR GeneralCommissioningLogic::ReadTCAcknowledgementsRequired(AttributeValueEncoder & aEncoder)
 {
     TermsAndConditionsProvider * tcProvider = TermsAndConditionsManager::GetInstance();
     bool acknowledgementsRequired;
@@ -117,7 +117,7 @@ CHIP_ERROR GeneralCommissioningLogic::ReadTCAcknowledgementsRequired(AttributeVa
     return aEncoder.Encode(acknowledgementsRequired);
 }
 
-CHIP_ERROR GeneralCommissioningLogic::ReadTCUpdateDeadLine(AttributeValueEncoder &aEncoder)
+CHIP_ERROR GeneralCommissioningLogic::ReadTCUpdateDeadLine(AttributeValueEncoder & aEncoder)
 {
     TermsAndConditionsProvider * tcProvider = TermsAndConditionsManager::GetInstance();
     Optional<uint32_t> outUpdateAcceptanceDeadline;
@@ -133,9 +133,11 @@ CHIP_ERROR GeneralCommissioningLogic::ReadTCUpdateDeadLine(AttributeValueEncoder
     return aEncoder.Encode(outUpdateAcceptanceDeadline.Value());
 }
 
-#endif //CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
+#endif // CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
 
-std::optional<DataModel::ActionReturnStatus> GeneralCommissioningLogic::HandleArmFailSafe(CommandHandler * commandObj, const ConcreteCommandPath & path, const GeneralCommissioning::Commands::ArmFailSafe::DecodableType & commandData)
+std::optional<DataModel::ActionReturnStatus>
+GeneralCommissioningLogic::HandleArmFailSafe(CommandHandler * commandObj, const ConcreteCommandPath & path,
+                                             const GeneralCommissioning::Commands::ArmFailSafe::DecodableType & commandData)
 {
     MATTER_TRACE_SCOPE("ArmFailSafe", "GeneralCommissioning");
     auto & failSafeContext = Server::GetInstance().GetFailSafeContext();
@@ -145,11 +147,11 @@ std::optional<DataModel::ActionReturnStatus> GeneralCommissioningLogic::HandleAr
                     static_cast<unsigned>(commandData.expiryLengthSeconds));
 
     /*
-    * If the fail-safe timer is not fully disarmed, don't allow arming a new fail-safe.
-    * If the fail-safe timer was not currently armed, then the fail-safe timer SHALL be armed.
-    * If the fail-safe timer was currently armed, and current accessing fabric matches the fail-safe
-    * context’s Fabric Index, then the fail-safe timer SHALL be re-armed.
-    */
+     * If the fail-safe timer is not fully disarmed, don't allow arming a new fail-safe.
+     * If the fail-safe timer was not currently armed, then the fail-safe timer SHALL be armed.
+     * If the fail-safe timer was currently armed, and current accessing fabric matches the fail-safe
+     * context’s Fabric Index, then the fail-safe timer SHALL be re-armed.
+     */
 
     if (!failSafeContext.IsFailSafeBusy() &&
         (!failSafeContext.IsFailSafeArmed() || failSafeContext.MatchesFabricIndex(commandObj->GetAccessingFabricIndex())))
@@ -172,9 +174,9 @@ std::optional<DataModel::ActionReturnStatus> GeneralCommissioningLogic::HandleAr
         }
         else
         {
-            CheckSuccess(
-                failSafeContext.ArmFailSafe(commandObj->GetAccessingFabricIndex(), System::Clock::Seconds16(commandData.expiryLengthSeconds)),
-                Failure);
+            CheckSuccess(failSafeContext.ArmFailSafe(commandObj->GetAccessingFabricIndex(),
+                                                     System::Clock::Seconds16(commandData.expiryLengthSeconds)),
+                         Failure);
             Breadcrumb::Set(path.mEndpointId, commandData.breadcrumb);
             response.errorCode = CommissioningErrorEnum::kOk;
         }
@@ -184,11 +186,13 @@ std::optional<DataModel::ActionReturnStatus> GeneralCommissioningLogic::HandleAr
         response.errorCode = CommissioningErrorEnum::kBusyWithOtherAdmin;
     }
 
-    commandObj->AddResponse(path, response);   
+    commandObj->AddResponse(path, response);
     return std::nullopt;
 }
 
-std::optional<DataModel::ActionReturnStatus> GeneralCommissioningLogic::HandleCommissioningComplete(CommandHandler * commandObj, const ConcreteCommandPath & path, FabricIndex accessingFabricIndex, const GeneralCommissioning::Commands::CommissioningComplete::DecodableType & commandData)
+std::optional<DataModel::ActionReturnStatus> GeneralCommissioningLogic::HandleCommissioningComplete(
+    CommandHandler * commandObj, const ConcreteCommandPath & path, FabricIndex accessingFabricIndex,
+    const GeneralCommissioning::Commands::CommissioningComplete::DecodableType & commandData)
 {
     MATTER_TRACE_SCOPE("CommissioningComplete", "GeneralCommissioning");
 
@@ -305,7 +309,9 @@ std::optional<DataModel::ActionReturnStatus> GeneralCommissioningLogic::HandleCo
     return std::nullopt;
 }
 
-std::optional<DataModel::ActionReturnStatus> GeneralCommissioningLogic::HandleSetRegulatoryConfig(CommandHandler * commandObj, const ConcreteCommandPath & path, const GeneralCommissioning::Commands::SetRegulatoryConfig::DecodableType & commandData)
+std::optional<DataModel::ActionReturnStatus> GeneralCommissioningLogic::HandleSetRegulatoryConfig(
+    CommandHandler * commandObj, const ConcreteCommandPath & path,
+    const GeneralCommissioning::Commands::SetRegulatoryConfig::DecodableType & commandData)
 {
     MATTER_TRACE_SCOPE("SetRegulatoryConfig", "GeneralCommissioning");
     DeviceControlServer * server = &DeviceLayer::DeviceControlServer::DeviceControlSvr();
@@ -352,7 +358,9 @@ std::optional<DataModel::ActionReturnStatus> GeneralCommissioningLogic::HandleSe
 }
 
 #if CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
-std::optional<DataModel::ActionReturnStatus> HandleSetTCAcknowledgements(CommandHandler * commandObj, const ConcreteCommandPath & path, const GeneralCommissioning::Commands::SetTCAcknowledgements::DecodableType & commandData);
+std::optional<DataModel::ActionReturnStatus>
+HandleSetTCAcknowledgements(CommandHandler * commandObj, const ConcreteCommandPath & path,
+                            const GeneralCommissioning::Commands::SetTCAcknowledgements::DecodableType & commandData);
 {
     MATTER_TRACE_SCOPE("SetTCAcknowledgements", "GeneralCommissioning");
 
@@ -440,6 +448,6 @@ void GeneralCommissioningLogic::OnPlatformEventHandler(const DeviceLayer::ChipDe
     }
 }
 
-}
-}
-}
+} // namespace Clusters
+} // namespace app
+} // namespace chip
