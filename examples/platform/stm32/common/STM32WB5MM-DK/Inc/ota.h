@@ -25,16 +25,16 @@
 extern "C" {
 #endif
 
-#include <platform/stm32/FactoryDataProvider.h>
-#include <platform/stm32/OTAImageProcessorImpl.h>
+#include <platform/stm32/stm32wb/FactoryDataProvider.h>
+#include <platform/stm32/stm32wb/OTAImageProcessorImpl.h>
 #include <stdint.h>
 
 /*! Attribute structure */
 typedef struct
 {
-    uint16_t vendorId;             /*! VendorId info from image header */
-    uint16_t productId;            /*! ProductId info from image header */
-    uint32_t softwareVersion;      /*! Software version of the binary */
+    uint16_t vendorId; /*! VendorId info from image header */
+    uint16_t productId; /*! ProductId info from image header */
+    uint32_t softwareVersion; /*! Software version of the binary */
     uint32_t minApplicableVersion; /*! Minimum running software version to be compatible with the OTA image */
     uint32_t maxApplicableVersion; /*! Maximum running software version to be compatible with the OTA image */
 } Ota_ImageHeader_t;

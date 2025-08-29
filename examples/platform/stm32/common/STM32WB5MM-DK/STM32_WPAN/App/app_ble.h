@@ -36,8 +36,7 @@ extern "C" {
 
 /* Exported types ------------------------------------------------------------*/
 
-typedef enum
-{
+typedef enum {
     APP_BLE_IDLE,
     APP_BLE_FAST_ADV,
     APP_BLE_LP_ADV,

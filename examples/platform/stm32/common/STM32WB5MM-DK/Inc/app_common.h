@@ -60,12 +60,11 @@ extern "C" {
  *  Macro delimiters                *
  * -------------------------------- */
 
-#define M_BEGIN                                                                                                                    \
-    do                                                                                                                             \
-    {
+#define M_BEGIN \
+    do {
 
-#define M_END                                                                                                                      \
-    }                                                                                                                              \
+#define M_END \
+    }         \
     while (0)
 
 /* -------------------------------- *
@@ -80,44 +79,46 @@ extern "C" {
 #define MIN(x, y) (((x) < (y)) ? (x) : (y))
 #endif
 
-#define MODINC(a, m)                                                                                                               \
-    M_BEGIN(a)++;                                                                                                                  \
-    if ((a) >= (m))                                                                                                                \
-        (a) = 0;                                                                                                                   \
+#define MODINC(a, m) \
+    M_BEGIN(a)       \
+    ++;              \
+    if ((a) >= (m))  \
+        (a) = 0;     \
     M_END
 
-#define MODDEC(a, m)                                                                                                               \
-    M_BEGIN if ((a) == 0)(a) = (m);                                                                                                \
-    (a)--;                                                                                                                         \
+#define MODDEC(a, m)                \
+    M_BEGIN if ((a) == 0)(a) = (m); \
+    (a)--;                          \
     M_END
 
-#define MODADD(a, b, m)                                                                                                            \
-    M_BEGIN(a) += (b);                                                                                                             \
-    if ((a) >= (m))                                                                                                                \
-        (a) -= (m);                                                                                                                \
+#define MODADD(a, b, m) \
+    M_BEGIN(a) += (b);  \
+    if ((a) >= (m))     \
+        (a) -= (m);     \
     M_END
 
 #define MODSUB(a, b, m) MODADD(a, (m) - (b), m)
 
-#define PAUSE(t)                                                                                                                   \
-    M_BEGIN                                                                                                                        \
-    volatile int _i;                                                                                                               \
-    for (_i = t; _i > 0; _i--)                                                                                                     \
-        ;                                                                                                                          \
+#define PAUSE(t)               \
+    M_BEGIN                    \
+    volatile int _i;           \
+    for (_i = t; _i > 0; _i--) \
+        ;                      \
     M_END
 
 #define DIVF(x, y) ((x) / (y))
 
-#define DIVC(x, y) (((x) + (y) -1) / (y))
+#define DIVC(x, y) (((x) + (y) - 1) / (y))
 
 #define DIVR(x, y) (((x) + ((y) / 2)) / (y))
 
-#define SHRR(x, n) ((((x) >> ((n) -1)) + 1) >> 1)
+#define SHRR(x, n) ((((x) >> ((n) - 1)) + 1) >> 1)
 
 #define BITN(w, n) (((w)[(n) / 32] >> ((n) % 32)) & 1)
 
-#define BITNSET(w, n, b)                                                                                                           \
-    M_BEGIN(w)[(n) / 32] |= ((U32) (b)) << ((n) % 32);                                                                             \
+#define BITNSET(w, n, b)                     \
+    M_BEGIN(w)                               \
+    [(n) / 32] |= ((U32) (b)) << ((n) % 32); \
     M_END
 
 /* -------------------------------- *

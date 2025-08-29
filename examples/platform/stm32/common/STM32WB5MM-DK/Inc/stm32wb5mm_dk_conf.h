@@ -90,7 +90,7 @@ extern "C" {
 #define MAX_DECIMATION_FACTOR 128
 #endif
 
-#define MAX_MIC_FREQ 1280                 /*kHz - Maximum PDM clock */
+#define MAX_MIC_FREQ 1280 /*kHz - Maximum PDM clock */
 #define MAX_AUDIO_IN_CHANNEL_NBR_PER_IF 1 /* Maximum number of microphones channels for peripheral interface */
 #define MAX_AUDIO_IN_CHANNEL_NBR_TOTAL 1
 
