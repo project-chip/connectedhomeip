@@ -209,6 +209,8 @@ export CCACHE_NOHASHDIR=1
 export CCACHE_IGNOREOPTIONS="-I* -fmacro-prefix-map=*"
 export CCACHE_PREFIX_CPP="$_CHIP_ROOT/scripts/helpers/ccache-prefix-cpp.sh"
 export CCACHE_BASEDIR="$_CHIP_ROOT"
+export CCACHE_SLOPPINESS=time_macros
+export CCACHE_COMPILERCHECK=content
 
 unset -f _bootstrap_or_activate
 unset -f _install_additional_pip_requirements
