@@ -372,8 +372,7 @@ std::optional<DataModel::ActionReturnStatus> GeneralCommissioningLogic::HandleSe
 }
 
 #if CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
-std::optional<DataModel::ActionReturnStatus>
-HandleSetTCAcknowledgements(CommandHandler * commandObj, const ConcreteCommandPath & path,
+std::optional<DataModel::ActionReturnStatus> GeneralCommissioningLogic::HandleSetTCAcknowledgements(CommandHandler * commandObj, const ConcreteCommandPath & path,
                             const GeneralCommissioning::Commands::SetTCAcknowledgements::DecodableType & commandData);
 {
     MATTER_TRACE_SCOPE("SetTCAcknowledgements", "GeneralCommissioning");
