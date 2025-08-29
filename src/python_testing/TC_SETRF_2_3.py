@@ -301,8 +301,8 @@ class TC_SETRF_2_3(CommodityTariffTestBaseHelper):
         await self.send_test_event_trigger_change_time()
 
         self.step("19")
-        # TH reads CurrentDayEntryDate attribute, expects a epoch-s. Checks that CurrentDayEntryDate changed after TestEventTrigger.
-        # Checks that CurrentDayEntryDate is equal to NextDayEntryDate (previously read) after TestEventTrigger.
+        # TH reads CurrentDayEntryDate attribute, expects a epoch-s. Checks that CurrentDayEntryDate changed after TestEventTrigger Change Time Test Event.
+        # Checks that CurrentDayEntryDate is equal to NextDayEntryDate (previously read) after TestEventTrigger Change Time Test Event.
         currentDayEntryDateValue_previous = self.currentDayEntryDateValue
         self.currentDayEntryDateValue = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.CurrentDayEntryDate)
         await self.check_current_day_entry_date_attribute(endpoint, self.currentDayEntryDateValue)
@@ -312,6 +312,7 @@ class TC_SETRF_2_3(CommodityTariffTestBaseHelper):
                              "CurrentDayEntryDate must be equal to NextDayEntryDate after TestEventTrigger.")
 
         self.step("20")
+        # TH reads CurrentDay attribute, expects a DayStruct. Checks that CurrentDay did not change after TestEventTrigger Change Time Test Event.
         currentDayValue_previous = self.currentDayValue
         self.currentDayValue = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.CurrentDay)
         await self.check_current_day_attribute(endpoint, self.currentDayValue)
@@ -319,6 +320,7 @@ class TC_SETRF_2_3(CommodityTariffTestBaseHelper):
                              "CurrentDay must not change after TestEventTrigger for Change Time Test Event.")
 
         self.step("21")
+        # TH reads NextDayEntryDate attribute, expects a epoch-s. Checks that NextDayEntryDate changed after TestEventTrigger Change Time Test Event.
         nextDayEntryDateValue_previous = self.nextDayEntryDateValue
         self.nextDayEntryDateValue = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.NextDayEntryDate)
         await self.check_next_day_entry_date_attribute(endpoint, self.nextDayEntryDateValue)
@@ -326,6 +328,7 @@ class TC_SETRF_2_3(CommodityTariffTestBaseHelper):
                                  "NextDayEntryDate must change after TestEventTrigger for Change Time Test Event.")
 
         self.step("22")
+        # TH reads NextDay attribute, expects a DayStruct. Checks that NextDay did not change after TestEventTrigger Change Time Test Event.
         nextDayValue_previous = self.nextDayValue
         self.nextDayValue = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.NextDay)
         await self.check_next_day_attribute(endpoint, self.nextDayValue)
@@ -335,9 +338,12 @@ class TC_SETRF_2_3(CommodityTariffTestBaseHelper):
                                  "NextDay must not be equal to CurrentDay after TestEventTrigger for Change Time Test Event.")
 
         self.step("23")
+        # TH sends TestEventTrigger for Change Day Test Event.
         await self.send_test_event_trigger_change_day()
 
         self.step("24")
+        # TH reads CurrentDayEntryDate attribute, expects a epoch-s. Checks that CurrentDayEntryDate changed after TestEventTrigger for Change Day Test Event.
+        # Checks that CurrentDayEntryDate is not equal to NextDayEntryDate (previously read) after TestEventTrigger for Change Day Test Event.
         currentDayEntryDateValue_previous = self.currentDayEntryDateValue
         self.currentDayEntryDateValue = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.CurrentDayEntryDate)
         await self.check_current_day_entry_date_attribute(endpoint, self.currentDayEntryDateValue)
@@ -347,6 +353,8 @@ class TC_SETRF_2_3(CommodityTariffTestBaseHelper):
                                  "CurrentDayEntryDate must be not equal to NextDayEntryDate after TestEventTrigger for Change Day Test Event.")
 
         self.step("25")
+        # TH reads CurrentDay attribute, expects a DayStruct. Checks that CurrentDay changed after TestEventTrigger for Change Day Test Event.
+        # Checks that CurrentDay is equal to NextDay (previously read) after TestEventTrigger for Change Day Test Event.
         currentDayValue_previous = self.currentDayValue
         self.currentDayValue = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.CurrentDay)
         await self.check_current_day_attribute(endpoint, self.currentDayValue)
@@ -356,6 +364,8 @@ class TC_SETRF_2_3(CommodityTariffTestBaseHelper):
                              "CurrentDay must be equal to NextDay after TestEventTrigger for Change Day Test Event.")
 
         self.step("26")
+        # TH reads NextDayEntryDate attribute, expects a epoch-s. Checks that NextDayEntryDate changed after TestEventTrigger for Change Day Test Event.
+        # Checks that NextDayEntryDate is not equal to CurrentDayEntryDate after TestEventTrigger for Change Day Test Event.
         nextDayEntryDateValue_previous = self.nextDayEntryDateValue
         self.nextDayEntryDateValue = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.NextDayEntryDate)
         await self.check_next_day_entry_date_attribute(endpoint, self.nextDayEntryDateValue)
@@ -365,6 +375,8 @@ class TC_SETRF_2_3(CommodityTariffTestBaseHelper):
                                  "NextDayEntryDate must not be equal to CurrentDayEntryDate after TestEventTrigger for Change Day Test Event.")
 
         self.step("27")
+        # TH reads NextDay attribute, expects a DayStruct. Checks that NextDay changed after TestEventTrigger for Change Day Test Event.
+        # Checks that NextDay is not equal to CurrentDay after TestEventTrigger for Change Day Test Event.
         nextDayValue_previous = self.nextDayValue
         self.nextDayValue = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.NextDay)
         await self.check_next_day_attribute(endpoint, self.nextDayValue)
