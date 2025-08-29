@@ -311,6 +311,9 @@ void ListToMap(const DataModel::List<T> & aList, std::map<uint32_t, const T *> &
     }
 }
 
+template <typename T>
+CHIP_ERROR ValidateListEntry(const T & entryNewValue, void * aCtx);
+
 /// @brief Type trait for nullable types
 template <typename U>
 struct IsNullable : std::false_type
@@ -1177,7 +1180,7 @@ struct TariffUpdateCtx
      * @brief Master set of all valid TariffComponent IDs
      * @details Contains all TariffComponent IDs that exist in the tariff definition
      */
-    std::unordered_set<uint32_t> TariffComponentKeyIDs;
+    std::unordered_map<uint32_t, uint8_t> TariffComponentKeyIDs;
 
     /**
      * @brief TariffComponent IDs referenced by TariffPeriod items
