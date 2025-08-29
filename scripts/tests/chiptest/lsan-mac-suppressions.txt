@@ -103,3 +103,6 @@ leak:dyld::ThreadLocalVariables::instantiateVariable
 
 # ignore (maybe false-positive?) leaks in macOS key value store init
 leak:KeyValueStoreManagerImpl::Init
+
+# ignore float to string conversion bigalloc pooling
+leak:__Balloc_D2A
