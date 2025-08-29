@@ -366,8 +366,9 @@ CHIP_ERROR DeviceAttestationCredsCC32XX::SignWithDeviceAttestationKey(const Byte
 
     // In a non-exemplary implementation, the public key is not needed here. It is used here merely because
     // Crypto::P256Keypair is only (currently) constructable from raw keys if both private/public keys are present.
-    ReturnErrorOnFailure(keypair.HazardousOperationLoadKeypairFromRaw(ByteSpan(mFactoryData->dac_priv_key.data, mFactoryData->dac_priv_key.len),
-                                                    ByteSpan(mFactoryData->dac_pub_key.data, mFactoryData->dac_pub_key.len)));
+    ReturnErrorOnFailure(
+        keypair.HazardousOperationLoadKeypairFromRaw(ByteSpan(mFactoryData->dac_priv_key.data, mFactoryData->dac_priv_key.len),
+                                                     ByteSpan(mFactoryData->dac_pub_key.data, mFactoryData->dac_pub_key.len)));
     ReturnErrorOnFailure(keypair.ECDSA_sign_msg(message_to_sign.data(), message_to_sign.size(), signature));
 
     return CopySpanToMutableSpan(ByteSpan{ signature.ConstBytes(), signature.Length() }, out_buffer);

@@ -165,9 +165,9 @@ CHIP_ERROR ESP32SecureCertDACProvider ::SignWithDeviceAttestationKey(const ByteS
 
         ESP_FAULT_ASSERT(esp_err == ESP_OK && sc_keypair != NULL && sc_keypair_len != 0);
 
-        chipError =
-            keypair.HazardousOperationLoadKeypairFromRaw(ByteSpan(reinterpret_cast<const uint8_t *>(sc_keypair + kPrivKeyOffset), kDACPrivateKeySize),
-                                       ByteSpan(reinterpret_cast<const uint8_t *>(sc_keypair + kPubKeyOffset), kDACPublicKeySize));
+        chipError = keypair.HazardousOperationLoadKeypairFromRaw(
+            ByteSpan(reinterpret_cast<const uint8_t *>(sc_keypair + kPrivKeyOffset), kDACPrivateKeySize),
+            ByteSpan(reinterpret_cast<const uint8_t *>(sc_keypair + kPubKeyOffset), kDACPublicKeySize));
         VerifyOrReturnError(chipError == CHIP_NO_ERROR, chipError, esp_secure_cert_free_priv_key(sc_keypair));
 
         chipError = keypair.ECDSA_sign_msg(messageToSign.data(), messageToSign.size(), signature);

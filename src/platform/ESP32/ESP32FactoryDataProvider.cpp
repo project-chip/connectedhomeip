@@ -143,7 +143,8 @@ CHIP_ERROR ESP32FactoryDataProvider::SignWithDeviceAttestationKey(const ByteSpan
         ESP32Config::ReadConfigValueBin(ESP32Config::kConfigKey_DACPrivateKey, privKeyBuf, privKeyLen, privKeyLen));
     ReturnErrorOnFailure(ESP32Config::ReadConfigValueBin(ESP32Config::kConfigKey_DACPublicKey, pubKeyBuf, pubKeyLen, pubKeyLen));
 
-    ReturnErrorOnFailure(keypair.HazardousOperationLoadKeypairFromRaw(ByteSpan(privKeyBuf, privKeyLen), ByteSpan(pubKeyBuf, pubKeyLen)));
+    ReturnErrorOnFailure(
+        keypair.HazardousOperationLoadKeypairFromRaw(ByteSpan(privKeyBuf, privKeyLen), ByteSpan(pubKeyBuf, pubKeyLen)));
     ReturnErrorOnFailure(keypair.ECDSA_sign_msg(messageToSign.data(), messageToSign.size(), signature));
 
     return CopySpanToMutableSpan(ByteSpan{ signature.ConstBytes(), signature.Length() }, outSignBuffer);
