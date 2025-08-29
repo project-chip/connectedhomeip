@@ -23,7 +23,7 @@ import("${chip_root}/build/chip/chip_test_suite.gni")
 chip_test_suite("tests") {
   output_name = "libControllerTests"
 
-  test_sources = [ "TestDeviceController.cpp" ]
+  test_sources = []
 
   # Not supported on efr32.
   if (chip_device_platform != "efr32") {
@@ -32,6 +32,7 @@ chip_test_suite("tests") {
 
   if (chip_device_platform != "mbed" && chip_device_platform != "esp32") {
     test_sources += [
+      "TestDeviceController.cpp",
       "TestEventCaching.cpp",
       "TestEventChunking.cpp",
       "TestEventNumberCaching.cpp",
