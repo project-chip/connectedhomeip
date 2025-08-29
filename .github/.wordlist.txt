@@ -1260,6 +1260,8 @@ RGB
 riscv
 rloc
 rmw
+rnd
+RND
 rodata
 Rollershade
 rootfs
