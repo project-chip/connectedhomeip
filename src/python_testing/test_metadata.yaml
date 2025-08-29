@@ -147,6 +147,8 @@ not_automated:
       reason:
           Depends on TLS Certificate Management Cluster. Will be enabled once
           local tests are fully verified.
+    - name: TC_PAVSTI_Utils.py
+      reason: Helper methods for Push AV Integration TCs
 
 # This is a list of slow tests (just arbitrarily picked around 20 seconds)
 # used in some script reporting for "be patient" messages as well as potentially
