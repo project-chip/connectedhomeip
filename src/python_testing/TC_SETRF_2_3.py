@@ -130,9 +130,9 @@ class TC_SETRF_2_3(CommodityTariffTestBaseHelper):
         if dayTypeCurrentValue == 3:  # If CurrentDay has Event type.
             # we check CurrentDay against corresponding DayStruct from IndividualDays
             self.step("6")
-            self.individualDayValue = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.IndividualDays)
-            await self.check_individual_days_attribute(endpoint, self.individualDayValue)
-            for day in self.individualDayValue:
+            self.individualDaysValue = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.IndividualDays)
+            await self.check_individual_days_attribute(endpoint, self.individualDaysValue)
+            for day in self.individualDaysValue:
                 if day.date == dateCurrentValue:
                     asserts.assert_equal(day.dayType, dayTypeCurrentValue,
                                          "DayType from CurrentDay must be equal to DayType from IndividualDays.")
@@ -223,9 +223,9 @@ class TC_SETRF_2_3(CommodityTariffTestBaseHelper):
         if dayTypeCurrentValue == 3:  # If NextDay has Event type.
             # we check NextDay against corresponding DayStruct from IndividualDays
             self.step("13")
-            self.individualDayValue = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.IndividualDays)
-            await self.check_individual_days_attribute(endpoint, self.individualDayValue)
-            for day in self.individualDayValue:
+            self.individualDaysValue = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.IndividualDays)
+            await self.check_individual_days_attribute(endpoint, self.individualDaysValue)
+            for day in self.individualDaysValue:
                 if day.date == dateNextValue:
                     asserts.assert_equal(day.dayType, dayTypeNextValue,
                                          "DayType from NextDay must be equal to DayType from IndividualDays.")
