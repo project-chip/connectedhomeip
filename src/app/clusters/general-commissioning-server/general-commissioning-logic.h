@@ -130,11 +130,9 @@ namespace app {
 namespace Clusters {
 
 namespace GeneralCommissioning {
-inline void SetBreadcrumb(Attributes::Breadcrumb::TypeInfo::Type breadcrumb)
-{
-    printf("Inside general commissioning set breadcrumb");
-    Breadcrumb::Set(0, breadcrumb);
-}
+
+void SetBreadcrumb(Attributes::Breadcrumb::TypeInfo::Type breadcrumb);
+
 } // namespace GeneralCommissioning
 
 class GeneralCommissioningLogic

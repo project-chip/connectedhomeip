@@ -448,6 +448,13 @@ void GeneralCommissioningLogic::OnPlatformEventHandler(const DeviceLayer::ChipDe
     }
 }
 
+namespace GeneralCommissioning {
+void SetBreadcrumb(Attributes::Breadcrumb::TypeInfo::Type breadcrumb)
+{
+     Breadcrumb::Set(0, breadcrumb);
+}
+} // namespace GeneralCommissioning
+
 } // namespace Clusters
 } // namespace app
 } // namespace chip
