@@ -71,6 +71,7 @@ public:
                                                 AttributeValueEncoder & encoder) override;
     DataModel::ActionReturnStatus WriteAttribute(const DataModel::WriteAttributeRequest & request,
                                                  AttributeValueDecoder & decoder) override;
+                                                 
     CHIP_ERROR Attributes(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder) override;
 
     /**
@@ -171,10 +172,7 @@ protected:
 
 public:
 
-    // This constructor deduces the non type template parameter ID to assist in mInstance type definition.
-    ResourceMonitoringDelegate(ResourceMonitoringCluster * instance) : mInstance(instance) {}
-
-    ResourceMonitoringDelegate()          = delete; // pointer to instance must be provided at construction
+    ResourceMonitoringDelegate()          = default;
     virtual ~ResourceMonitoringDelegate() = default;
 
     // The following methods should be overridden by the SDK user to implement the business logic of their application
