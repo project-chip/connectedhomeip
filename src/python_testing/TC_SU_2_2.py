@@ -131,9 +131,7 @@ class TC_SU_2_2(MatterBaseTest):
                 with open(log_file_path, "a") as f:
                     f.write(line)
                     f.flush()
-
         threading.Thread(target=_follow_output, args=(proc,), daemon=True).start()
-
         return proc
 
     def stop_provider(self, proc: subprocess.Popen):
@@ -179,7 +177,6 @@ class TC_SU_2_2(MatterBaseTest):
 
         # Combine original + new ACLs on Requestor
         # This avoids overwriting existing entries when adding new ACLs
-        # acls_requestor = acl_original_requestor + [acl_operate_provider]
         acls_requestor = acl_original_requestor + [acl_operate_provider]
         resp = await self.write_acl(controller, requestor_node, acls_requestor)
         logger.info(
@@ -221,7 +218,6 @@ class TC_SU_2_2(MatterBaseTest):
         # Combine original + new ACLs on Provider
         # This avoids overwriting existing entries when adding new ACLs
         acls_provider = acl_original_provider + [acl_operate_requestor]
-        # acls_provider = acl_original_provider + [acl_operate_requestor]
         resp = await self.write_acl(controller, provider_node, acls_provider)
         logger.info(
             f'Prerequisite #3.2 - Response of wrote combined ACLs on Provider with node {provider_node} to allow access from Requestor: {resp}')
@@ -387,22 +383,15 @@ class TC_SU_2_2(MatterBaseTest):
         )
         logger.info(f'{step_number_s1}: Prerequisite #2.0 - Launched Provider PID {provider_proc.pid}')
 
-        # Prerequisite #2.1 - Open commissioning window on DUT
-        logger.info(f'{step_number_s1}: Prerequisite #2.1 - Commissioning window opened on Requestor (DUT)')
-        params = await self.open_commissioning_window(controller, requestor_node_id)
-        setup_pin_code = params.commissioningParameters.setupPinCode
-        long_discriminator = params.randomDiscriminator
-        logging.info(f'{step_number_s1}: Prerequisite #2.1 - Commissioning window opened: {vars(params)}')
-
-        # Prerequisite #2.2 - Commissioning Provider
-        logging.info(f'{step_number_s1}: Prerequisite #2.2 - Commissioning DUT with Provider')
+        # Prerequisite #2.1 - Commissioning Provider
+        logging.info(f'{step_number_s1}: Prerequisite #2.1 - Commissioning DUT with Provider')
         resp = await controller.CommissionOnNetwork(
             nodeId=provider_node_id_s1,
-            setupPinCode=provider_setupPinCode_s1,    # setup_pin_code,     # provider_setupPinCode_s1,
+            setupPinCode=provider_setupPinCode_s1,    # setup_pin_code
             filterType=ChipDeviceCtrl.DiscoveryFilterType.LONG_DISCRIMINATOR,
-            filter=provider_discriminator_s1  # l ong_discriminator  # provider_discriminator_s1
+            filter=provider_discriminator_s1          # long_discriminator
         )
-        logger.info(f'{step_number_s1}: Prerequisite #2.2 - Provider Commissioning response: {resp}')
+        logger.info(f'{step_number_s1}: Prerequisite #2.1 - Provider Commissioning response: {resp}')
 
         # Prerequisite #3.0 - Setting ACLs
         logger.info(f'{step_number_s1}: Prerequisite #3.0 - Setting ACLs under FabricIndex {fabric_id}')
