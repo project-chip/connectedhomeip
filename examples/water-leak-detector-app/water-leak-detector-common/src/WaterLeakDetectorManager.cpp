@@ -42,7 +42,6 @@ void WaterLeakDetectorManager::InitInstance(EndpointId endpoint)
 
 void WaterLeakDetectorManager::OnLeakDetected(bool detected)
 {
-    auto status = chip::app::Clusters::BooleanState::SetStateValue(detected);
-    VerifyOrReturn(status == CHIP_NO_ERROR, ChipLogError(NotSpecified, "Failed to set BooleanState StateValue attribute"));
+    chip::app::Clusters::BooleanState::SetStateValue(detected);
     ChipLogDetail(NotSpecified, "Leak status updated to: %d", detected);
 }

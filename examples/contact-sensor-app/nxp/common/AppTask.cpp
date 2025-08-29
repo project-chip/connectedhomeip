@@ -48,18 +48,14 @@ ContactSensorApp::AppTask & ContactSensorApp::AppTask::GetDefaultInstance()
 
 bool ContactSensorApp::AppTask::CheckStateClusterHandler(void)
 {
-    bool val = false;
-    BooleanState::GetStateValue(val);
+    auto val = BooleanState::GetStateValue();
     return val;
 }
 
 CHIP_ERROR ContactSensorApp::AppTask::ProcessSetStateClusterHandler(void)
 {
-    bool val = false;
-    BooleanState::GetStateValue(val);
-    auto status = BooleanState::SetStateValue(!val);
-
-    VerifyOrReturnError(status == CHIP_NO_ERROR, CHIP_ERROR_WRITE_FAILED);
+    auto val = BooleanState::GetStateValue();
+    BooleanState::SetStateValue(!val);
 
     return CHIP_NO_ERROR;
 }

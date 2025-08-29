@@ -14,8 +14,8 @@
  *    limitations under the License.
  */
 
-#include "boolean-state-cluster.h"
 #include <app/EventLogging.h>
+#include <app/clusters/boolean-state-server/boolean-state-cluster.h>
 #include <app/server-cluster/AttributeListBuilder.h>
 #include <clusters/BooleanState/Metadata.h>
 
@@ -39,7 +39,7 @@ DataModel::ActionReturnStatus BooleanStateCluster::ReadAttribute(const DataModel
     case FeatureMap::Id:
         return encoder.Encode<uint32_t>(0);
     default:
-        return Protocols::InteractionModel::Status::UnreportableAttribute;
+        return Protocols::InteractionModel::Status::UnsupportedAttribute;
     }
 }
 
@@ -50,24 +50,16 @@ CHIP_ERROR BooleanStateCluster::Attributes(const ConcreteClusterPath & path,
     return listBuilder.Append(Span(BooleanState::Attributes::kMandatoryMetadata), {});
 }
 
-CHIP_ERROR
-BooleanStateCluster::SetStateValue(const StateValue::TypeInfo::Type & stateValue)
+void BooleanStateCluster::SetStateValue(const StateValue::TypeInfo::Type & stateValue)
 {
-    VerifyOrReturnError(mStateValue != stateValue, CHIP_NO_ERROR);
-
+    VerifyOrReturn(mStateValue != stateValue);
     mStateValue = stateValue;
-
     NotifyAttributeChanged(StateValue::Id);
-
-    return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR
-BooleanStateCluster::GetStateValue(StateValue::TypeInfo::Type & stateValue) const
+BooleanState::Attributes::StateValue::TypeInfo::Type BooleanStateCluster::GetStateValue() const
 {
-    stateValue = mStateValue;
-
-    return CHIP_NO_ERROR;
+    return mStateValue;
 }
 
 CHIP_ERROR

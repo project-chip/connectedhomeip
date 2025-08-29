@@ -36,7 +36,7 @@ void BooleanState::UpdateState()
         mTargetState.ClearValue();
     }
 
-    chip::app::Clusters::BooleanState::GetStateValue(mState);
+    mState = chip::app::Clusters::BooleanState::GetStateValue();
 }
 
 void BooleanState::Render()
