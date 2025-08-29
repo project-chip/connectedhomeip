@@ -136,7 +136,7 @@ bool CommodityTariffDelegate::TariffDataUpd_CrossValidator(TariffUpdateCtx & Upd
     // Checks that all TariffComponentIDs in Tariff Periods are in main TariffComponents list:
     for (const auto & item : UpdCtx.TariffPeriodsTariffComponentIDs)
     {
-        if (!UpdCtx.TariffComponentKeyIDs.count(item))
+        if (UpdCtx.TariffComponentKeyIDs.find(item) == UpdCtx.TariffComponentKeyIDs.end())
         {
             return false; // The item not found in original list
         }
@@ -217,11 +217,11 @@ bool CommodityTariffDelegate::TariffDataUpd_CrossValidator(TariffUpdateCtx & Upd
     {
         const DataModel::List<const uint32_t> & DeIDs = period.dayEntryIDs;
         const DataModel::List<const uint32_t> & TcIDs = period.tariffComponentIDs;
-        uint16_t startTime = 0;
+        //uint16_t startTime = 0;
 
         for (const auto & DeItem : DeIDs)
         {
-            if (DayEntriesMap[DeItem]->dayEntryID != startTime)
+            if (DayEntriesMap[DeItem]->dayEntryID != DeItem)
             {
                 return false;
             }
@@ -233,11 +233,8 @@ bool CommodityTariffDelegate::TariffDataUpd_CrossValidator(TariffUpdateCtx & Upd
             {
                 return false;
             }
-            chip::app::Clusters::CommodityTariff::TariffComponentsDataClass_Utils::ValidateListEntry(*TariffComponentsMap[TcItem], nullptr, &UpdCtx);
-        } 
+        }
     }
-
-
     return true;
 }
 
