@@ -306,8 +306,6 @@ jobs:
               run: echo "$CONCURRENCY_CONTEXT"
             - name: Checkout
               uses: actions/checkout@v4
-            - name: Set up a IPV6 known environment
-              uses: ./.github/actions/add-ipv6
             - name: Checkout submodules & Bootstrap
               uses: ./.github/actions/checkout-submodules-and-bootstrap
               with:
@@ -474,7 +472,7 @@ jobs:
         steps:
             - name: Checkout
               uses: actions/checkout@v4
-              
+
             - name: Set up a IPV6 known environment
               uses: ./.github/actions/add-ipv6
 
