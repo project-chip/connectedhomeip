@@ -581,6 +581,7 @@ NetworkCommissioningLogic::HandleAddOrUpdateThreadNetwork(CommandHandler & handl
 void NetworkCommissioningLogic::UpdateBreadcrumb(const Optional<uint64_t> & breadcrumb)
 {
     VerifyOrReturn(breadcrumb.HasValue());
+    printf("SetBreadCrumb Called from Network Commissioning %llu", breadcrumb.Value());
     GeneralCommissioning::SetBreadcrumb(breadcrumb.Value());
 }
 

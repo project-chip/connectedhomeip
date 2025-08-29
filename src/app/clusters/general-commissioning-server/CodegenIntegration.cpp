@@ -55,6 +55,7 @@ void emberAfGeneralCommissioningClusterInitCallback(EndpointId endpointId)
     {
         return;
     }
+    printf("Inside Init callback");
     Breadcrumb::Set(0, 0);
     uint32_t rawFeatureMap;
     if (FeatureMap::Get(endpointId, &rawFeatureMap) != Status::Success)
