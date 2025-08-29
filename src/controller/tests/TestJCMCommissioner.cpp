@@ -19,6 +19,7 @@
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app/InteractionModelEngine.h>
 #include <app/tests/AppTestContext.h>
+#include <app/tests/test-interaction-model-api.h>
 #include <controller/CommissioningDelegate.h>
 #include <controller/jcm/AutoCommissioner.h>
 #include <controller/jcm/DeviceCommissioner.h>
@@ -41,6 +42,8 @@ using namespace chip::Credentials;
 using namespace chip::Crypto;
 using namespace chip::Transport;
 using namespace chip::Messaging;
+using namespace chip::Platform;
+using namespace chip::Test;
 
 namespace chip {
 namespace Controller {
@@ -251,6 +254,27 @@ private:
     MockClusterStateCacheCallback mClusterStateCacheCallback;
 };
 
+class MockDeviceProxy : public DeviceProxy, public SessionDelegate
+{
+public:
+    MockDeviceProxy(Messaging::ExchangeManager * exchangeManager, const SessionHandle & session) :
+        mExchangeManager(exchangeManager), mSecureSession(*this) { 
+            //exchangeManager->Init(session);
+            mSecureSession.Grab(session); 
+        }
+    void Disconnect() override {}
+    NodeId GetDeviceId() const override { return kLocalNodeId; }
+    Messaging::ExchangeManager * GetExchangeManager() const override { return mExchangeManager; }
+    chip::Optional<SessionHandle> GetSecureSession() const override { return mSecureSession.Get(); }
+    bool IsSecureConnected() const override { return true; }
+    void OnSessionReleased() override {}
+
+private:
+    const NodeId kLocalNodeId      = 0xC439A991071292DB;
+    Messaging::ExchangeManager * mExchangeManager;
+    SessionHolderWithDelegate mSecureSession;
+};
+
 class TestableDeviceCommissioner : public DeviceCommissioner
 {
 public:
@@ -265,6 +289,30 @@ public:
     TrustVerificationError mResult;
 };
 
+class TestVendorIDVerificationDataModel : public CodegenDataModelProvider
+{
+public:
+    static TestVendorIDVerificationDataModel & Instance()
+    {
+        static TestVendorIDVerificationDataModel model;
+        return model;
+    }
+
+    std::optional<DataModel::ActionReturnStatus> InvokeCommand(const DataModel::InvokeRequest & request,
+                                                               chip::TLV::TLVReader & input_arguments,
+                                                               CommandHandler * handler) override
+    {
+        ChipLogDetail(Controller, "Received Cluster Command: Endpoint=%x Cluster=" ChipLogFormatMEI " Command=" ChipLogFormatMEI,
+            request.path.mEndpointId, ChipLogValueMEI(request.path.mClusterId), ChipLogValueMEI(request.path.mCommandId));
+
+        //handler->AddStatus(request.path, Protocols::InteractionModel::Status::Success);
+        //SignVIDVerificationResponse::DecodableType responseData;
+        //handler->AddResponseData(request.path, request.path.mCommandId, responseData);
+
+        return std::nullopt; // handler status is set by the dispatch
+    }
+};
+
 class TestCommissioner : public chip::Test::AppContext
 {
 public:
@@ -272,7 +320,7 @@ public:
 
     static void SetUpTestSuite()
     {
-        ASSERT_EQ(chip::Platform::MemoryInit(), CHIP_NO_ERROR);
+        ASSERT_EQ(Platform::MemoryInit(), CHIP_NO_ERROR);
 
         chip::Test::AppContext::SetUpTestSuite();
     }
@@ -280,9 +328,9 @@ public:
     // Performs shared teardown for all tests in the test suite.  Run once for the whole suite.
     static void TearDownTestSuite()
     {
-        chip::Test::AppContext::TearDownTestSuite();
+        AppContext::TearDownTestSuite();
 
-        chip::Platform::MemoryShutdown();
+        Platform::MemoryShutdown();
     }
 
     void TestTrustVerificationStageFinishedProgressesThroughStages();
@@ -296,10 +344,13 @@ public:
 protected:
     void SetUp() override
     {
-        chip::Test::AppContext::SetUp();
-
+        AppContext::SetUp();
+        mOldProvider = InteractionModelEngine::GetInstance()->SetDataModelProvider(&TestVendorIDVerificationDataModel::Instance());
         mDeviceCommissioner = new TestableDeviceCommissioner();
         mDeviceCommissioner->RegisterTrustVerificationDelegate(&mTrustVerificationDelegate);
+        SessionHandle session = GetSessionBobToAlice();
+        mDeviceProxy = new MockDeviceProxy(&GetExchangeManager(), session);
+        mDeviceCommissioner->mDeviceProxy = mDeviceProxy;
 
 #if CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
         mCommissioningParams.SetUseJCM(true);
@@ -315,12 +366,18 @@ protected:
 
     void TearDown() override
     {
+        DrainAndServiceIO();
+
         mClusterStateCache.TearDown();
+
+        InteractionModelEngine::GetInstance()->SetDataModelProvider(mOldProvider);
+        chip::Test::AppContext::TearDown();
 
         delete mDeviceCommissioner;
         mDeviceCommissioner = nullptr;
 
-        chip::Test::AppContext::TearDown();
+        delete mDeviceProxy;
+        mDeviceProxy = nullptr;
     }
 
 private:
@@ -330,6 +387,8 @@ private:
     MockClusterStateCache mClusterStateCache;
     ReadCommissioningInfo mInfo;
     CommissioningParameters mCommissioningParams;
+    DeviceProxy * mDeviceProxy = nullptr;
+    chip::app::DataModel::Provider * mOldProvider = nullptr;
 };
 
 TEST_F_FROM_FIXTURE(TestCommissioner, TestTrustVerificationStageFinishedProgressesThroughStages)
