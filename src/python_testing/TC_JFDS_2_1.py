@@ -154,9 +154,9 @@ class TC_JFDS_2_1(MatterBaseTest):
             TestStep("2", "TH reads AnchorNodeID attribute from DUT",
                      "Verify that the DUT NodeId is returned"),
             TestStep("3", "TH reads AnchorVendorID attribute from DUT",
-                     "Verify that the VendorId of the DUT is returned")
-            # TestStep("4", "{PLACEHOLDER_NOT_IMPLEMENTED]TH reads FriendlyName from DUT",
-            #          "Verify that the a valid string is returned")
+                     "Verify that the VendorId of the DUT is returned"),
+            TestStep("4", "TH reads FriendlyName from DUT",
+                     "Verify that the a valid string is returned")
         ]
 
     @async_test_body
@@ -190,6 +190,12 @@ class TC_JFDS_2_1(MatterBaseTest):
             nodeid=1, attributes=[(1, Clusters.JointFabricDatastore.Attributes.AnchorVendorID)],
             returnClusterObject=True)
         asserts.assert_greater_equal(response[1][Clusters.JointFabricDatastore].anchorVendorID, 0)
+
+        self.step("4")
+        response = await devCtrlEcoA.ReadAttribute(
+            nodeid=1, attributes=[(1, Clusters.JointFabricDatastore.Attributes.FriendlyName)],
+            returnClusterObject=True)
+        asserts.assert_is_instance(response[1][Clusters.JointFabricDatastore].friendlyName, str)
 
         # Shutdown the Python Controllers started at the beginning of this script
         devCtrlEcoA.Shutdown()
