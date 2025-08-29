@@ -18,7 +18,7 @@
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app/clusters/resource-monitoring-server/resource-monitoring-cluster-objects.h>
-#include <app/clusters/resource-monitoring-server/resource-monitoring-server.h>
+#include <app/clusters/resource-monitoring-server/resource-monitoring-cluster.h>
 
 namespace chip {
 namespace app {
@@ -28,7 +28,7 @@ namespace ActivatedCarbonFilterMonitoring {
 
 /// This is an application level Delegate to handle ActivatedCarbonFilterMonitoringDelegate commands according to the specific
 /// business logic.
-class ActivatedCarbonFilterMonitoringDelegate : public ResourceMonitoring::Delegate
+class ActivatedCarbonFilterMonitoringDelegate : public ResourceMonitoring::ResourceMonitoringDelegate
 {
 private:
     CHIP_ERROR Init() override;
@@ -44,7 +44,7 @@ public:
 namespace HepaFilterMonitoring {
 
 /// This is an application level delegate to handle HepaFilterMonitoringDelegate commands according to the specific business logic.
-class HepaFilterMonitoringDelegate : public ResourceMonitoring::Delegate
+class HepaFilterMonitoringDelegate : public ResourceMonitoring::ResourceMonitoringDelegate
 {
 private:
     CHIP_ERROR Init() override;
