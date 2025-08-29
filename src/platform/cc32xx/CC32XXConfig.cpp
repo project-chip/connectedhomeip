@@ -537,12 +537,14 @@ CHIP_ERROR CC32XXConfig::ReadKVSFromNV()
     {
         bufferLength = rc;
         pList->CreateLinkedListFromNV(list, bufferLength);
+        delete[] list;
         cc32xxLog("read in KVS Linked List from NV");
         return CHIP_NO_ERROR;
     }
     else
     {
         cc32xxLog("could not read in Linked List from NV, error %d", rc);
+        delete[] list;
         return CHIP_ERROR_PERSISTED_STORAGE_FAILED;
     }
 }
