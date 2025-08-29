@@ -159,6 +159,8 @@ CHIP_ERROR TargetNavigatorAttrAccess::Read(const app::ConcreteReadAttributePath 
         return ReadCurrentTargetAttribute(aEncoder, delegate);
     }
     case app::Clusters::TargetNavigator::Attributes::ClusterRevision::Id:
+        VerifyOrReturnError(!isDelegateNull(delegate, endpoint), CHIP_NO_ERROR);
+
         return ReadRevisionAttribute(endpoint, aEncoder, delegate);
     default:
         break;
