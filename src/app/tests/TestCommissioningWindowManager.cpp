@@ -19,6 +19,7 @@
 #include <app/TimerDelegates.h>
 #include <app/reporting/ReportSchedulerImpl.h>
 #include <app/server/CommissioningWindowManager.h>
+#include <app/server/Dnssd.h>
 #include <app/server/Server.h>
 #include <crypto/RandUtils.h>
 #include <data-model-providers/codegen/CodegenDataModelProvider.h>
@@ -34,6 +35,8 @@
 
 #include <lib/core/StringBuilderAdapters.h>
 #include <pw_unit_test/framework.h>
+
+#include <app/tests/CommissioningWindowManagerTestAccess.h>
 
 using namespace chip::Crypto;
 
@@ -404,6 +407,121 @@ TEST_F(TestCommissioningWindowManager, TestCheckCommissioningWindowManagerEnhanc
     chip::DeviceLayer::PlatformMgr().ScheduleWork(CheckCommissioningWindowManagerEnhancedWindowTask);
     chip::DeviceLayer::PlatformMgr().ScheduleWork(StopEventLoop);
     chip::DeviceLayer::PlatformMgr().RunEventLoop();
+}
+
+// Verify that the commissioning window is closed when commissioning has completed
+TEST_F(TestCommissioningWindowManager, TestOnPlatformEventCommissioningComplete)
+{
+    CommissioningWindowManager & commissionMgr = Server::GetInstance().GetCommissioningWindowManager();
+    chip::Test::CommissioningWindowManagerTestAccess access(&commissionMgr);
+
+    EXPECT_EQ(commissionMgr.OpenBasicCommissioningWindow(commissionMgr.MaxCommissioningTimeout(),
+                                                         CommissioningWindowAdvertisement::kDnssdOnly),
+              CHIP_NO_ERROR);
+    EXPECT_TRUE(commissionMgr.IsCommissioningWindowOpen());
+
+    chip::DeviceLayer::ChipDeviceEvent event;
+    event.Type = chip::DeviceLayer::DeviceEventType::kCommissioningComplete;
+
+    commissionMgr.OnPlatformEvent(&event);
+    EXPECT_FALSE(commissionMgr.IsCommissioningWindowOpen());
+
+// When BLE is enabled
+#if CONFIG_NETWORK_LAYER_BLE && CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION
+    EXPECT_FALSE(Server::GetInstance().GetBleLayerObject()->IsBleClosing());
+#endif
+}
+
+// Verify that the commissioning mode is expired when failsafe timer expires
+TEST_F(TestCommissioningWindowManager, TestOnPlatformEventFailSafeTimerExpired)
+{
+    CommissioningWindowManager & commissionMgr = Server::GetInstance().GetCommissioningWindowManager();
+
+    EXPECT_EQ(commissionMgr.OpenBasicCommissioningWindow(commissionMgr.MaxCommissioningTimeout(),
+                                                         CommissioningWindowAdvertisement::kDnssdOnly),
+              CHIP_NO_ERROR);
+    EXPECT_TRUE(commissionMgr.IsCommissioningWindowOpen());
+
+    chip::DeviceLayer::ChipDeviceEvent event;
+    event.Type = chip::DeviceLayer::DeviceEventType::kFailSafeTimerExpired;
+
+    commissionMgr.OnPlatformEvent(&event);
+    commissionMgr.CloseCommissioningWindow();
+    EXPECT_EQ(commissionMgr.GetCommissioningMode(), chip::Dnssd::CommissioningMode::kDisabled);
+}
+
+// Verify that PASE session is properly evicted when failsafe timer is expired
+TEST_F(TestCommissioningWindowManager, TestOnPlatformEventFailSafeTimerExpiredPASEEVicted)
+{
+    CommissioningWindowManager & commissionMgr = Server::GetInstance().GetCommissioningWindowManager();
+    auto access                                = chip::Test::CommissioningWindowManagerTestAccess(&commissionMgr);
+    auto & sessionMgr                          = Server::GetInstance().GetSecureSessionManager();
+
+    auto & PASESession                       = access.GetPASESession();
+    uint16_t localSessionId                  = 1;
+    chip::NodeId peerNodeId                  = chip::kUndefinedNodeId;
+    uint16_t peerSessionId                   = 2;
+    chip::FabricIndex fabricIndex            = chip::kUndefinedFabricIndex;
+    chip::Transport::PeerAddress peerAddress = chip::Transport::PeerAddress::UDP(
+        chip::Inet::IPAddress::Loopback(chip::Inet::IPAddressType::kAny), 5540); // 5540 is a port number assigned to Matter by IANA
+
+    auto role = chip::CryptoContext::SessionRole::kResponder;
+
+    // Inject a fake PASE session into SessionManager
+    CHIP_ERROR err = sessionMgr.InjectPaseSessionWithTestKey(PASESession, localSessionId, peerNodeId, peerSessionId, fabricIndex,
+                                                             peerAddress, role);
+    EXPECT_EQ(err, CHIP_NO_ERROR);
+    EXPECT_TRUE(PASESession.Get().HasValue());
+    EXPECT_TRUE(PASESession->AsSecureSession()->IsActiveSession());
+
+    chip::DeviceLayer::ChipDeviceEvent event;
+    event.Type = chip::DeviceLayer::DeviceEventType::kFailSafeTimerExpired;
+
+    commissionMgr.OnPlatformEvent(&event);
+    // Verify that PASE Session was evicted after failsafe timer expiration
+    EXPECT_FALSE(PASESession.Get().HasValue());
+}
+
+// Verify that operational advertising is started when the operational network is enabled
+TEST_F(TestCommissioningWindowManager, TestOnPlatformEventOperationalNetworkEnabled)
+{
+    CommissioningWindowManager & commissionMgr = Server::GetInstance().GetCommissioningWindowManager();
+
+    chip::DeviceLayer::ChipDeviceEvent event;
+    event.Type = chip::DeviceLayer::DeviceEventType::kOperationalNetworkEnabled;
+
+    commissionMgr.OnPlatformEvent(&event);
+    EXPECT_EQ(chip::app::DnssdServer::Instance().AdvertiseOperational(), CHIP_NO_ERROR);
+}
+
+// Verify that operational advertising failure is handled gracefully
+TEST_F(TestCommissioningWindowManager, TestOnPlatformEventOperationalNetworkEnabledFail)
+{
+    CommissioningWindowManager & commissionMgr = Server::GetInstance().GetCommissioningWindowManager();
+
+    // Stopping DNS-SD server to trigger AdvertiseOperational() failure
+    chip::app::DnssdServer::Instance().StopServer();
+
+    chip::DeviceLayer::ChipDeviceEvent event;
+    event.Type = chip::DeviceLayer::DeviceEventType::kOperationalNetworkEnabled;
+
+    commissionMgr.OnPlatformEvent(&event);
+    // This should attempt to start operational advertising, which will fail
+    EXPECT_EQ(chip::app::DnssdServer::Instance().AdvertiseOperational(), CHIP_ERROR_INCORRECT_STATE);
+
+    chip::app::DnssdServer::Instance().StartServer(); // Restart the server for subsequent tests
+}
+
+// Verify that BLE advertising is stopped when all BLE connections are closed
+TEST_F(TestCommissioningWindowManager, TestOnPlatformEventCloseCloseAllBleConnections)
+{
+    CommissioningWindowManager & commissionMgr = Server::GetInstance().GetCommissioningWindowManager();
+
+    chip::DeviceLayer::ChipDeviceEvent event;
+    event.Type = chip::DeviceLayer::DeviceEventType::kCloseAllBleConnections;
+
+    commissionMgr.OnPlatformEvent(&event);
+    EXPECT_FALSE(chip::DeviceLayer::ConnectivityMgr().IsBLEAdvertisingEnabled());
 }
 
 } // namespace
