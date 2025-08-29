@@ -96,4 +96,7 @@ leak:utext_setup
 leak:uregex_open
 
 # ignore thread-local storage leaks
+# macOS 14
 leak:_instantiateTLVs
+# macOS 15
+leak:dyld::ThreadLocalVariables::instantiateVariable
