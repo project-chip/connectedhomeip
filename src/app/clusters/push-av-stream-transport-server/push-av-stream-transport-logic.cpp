@@ -625,7 +625,7 @@ PushAvStreamTransportServerLogic::HandleAllocatePushTransport(CommandHandler & h
         else
         {
             auto delegateStatus = Protocols::InteractionModel::ClusterStatusCode(
-                mDelegate->ValidateAudioStream(transportOptions.videoStreamID.Value().Value()));
+                mDelegate->ValidateAudioStream(transportOptions.audioStreamID.Value().Value()));
 
             if (!delegateStatus.IsSuccess())
             {
@@ -761,6 +761,7 @@ PushAvStreamTransportServerLogic::HandleModifyPushTransport(CommandHandler & han
         handler.AddStatus(commandPath, Status::ResourceExhausted);
         return std::nullopt;
     }
+
     // Call the delegate
     status = mDelegate->ModifyPushTransport(connectionID, *transportOptionsPtr);
 
@@ -819,6 +820,7 @@ PushAvStreamTransportServerLogic::HandleSetTransportStatus(CommandHandler & hand
         }
         connectionIDList.push_back(connectionID.Value());
     }
+
     // Call the delegate
     status = mDelegate->SetTransportStatus(connectionIDList, transportStatus);
     if (status == Status::Success)
@@ -902,20 +904,20 @@ std::optional<DataModel::ActionReturnStatus> PushAvStreamTransportServerLogic::H
         handler.AddClusterSpecificFailure(commandPath, clusterStatus);
         return std::nullopt;
     }
+
     if (transportConfiguration->transportOptions.HasValue())
     {
         if (transportConfiguration->transportOptions.Value().triggerOptions.triggerType == TransportTriggerTypeEnum::kContinuous)
         {
-
             auto clusterStatus = to_underlying(StatusCodeEnum::kInvalidTriggerType);
             ChipLogError(Zcl, "HandleManuallyTriggerTransport[ep=%d]: Invalid Trigger type", mEndpointId);
             handler.AddClusterSpecificFailure(commandPath, clusterStatus);
             return std::nullopt;
         }
+
         if (transportConfiguration->transportOptions.Value().triggerOptions.triggerType == TransportTriggerTypeEnum::kCommand &&
             !timeControl.HasValue())
         {
-
             ChipLogError(Zcl, "HandleManuallyTriggerTransport[ep=%d]: Time control field not present", mEndpointId);
             handler.AddStatus(commandPath, Status::DynamicConstraintError);
             return std::nullopt;
@@ -953,11 +955,11 @@ PushAvStreamTransportServerLogic::HandleFindTransport(CommandHandler & handler, 
 
     Commands::FindTransportResponse::Type response;
 
-    Optional<DataModel::Nullable<uint16_t>> connectionID = commandData.connectionID;
+    DataModel::Nullable<uint16_t> connectionID = commandData.connectionID;
 
     std::vector<Structs::TransportConfigurationStruct::Type> transportConfigurations;
 
-    if (!connectionID.HasValue() || connectionID.Value().IsNull())
+    if (connectionID.IsNull())
     {
         if (mCurrentConnections.size() == 0)
         {
@@ -978,7 +980,7 @@ PushAvStreamTransportServerLogic::HandleFindTransport(CommandHandler & handler, 
     {
         FabricIndex fabricIndex = handler.GetAccessingFabricIndex();
         TransportConfigurationStorage * transportConfiguration =
-            FindStreamTransportConnectionWithinFabric(connectionID.Value().Value(), fabricIndex);
+            FindStreamTransportConnectionWithinFabric(connectionID.Value(), fabricIndex);
         if (transportConfiguration == nullptr)
         {
             ChipLogError(Zcl, "HandleFindTransport[ep=%d]: ConnectionID not found", mEndpointId);

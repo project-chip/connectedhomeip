@@ -8129,8 +8129,8 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
             result = @"NightVisionUsesInfrared";
             break;
 
-        case MTRAttributeIDTypeClusterCameraAVStreamManagementAttributeMinViewportID:
-            result = @"MinViewport";
+        case MTRAttributeIDTypeClusterCameraAVStreamManagementAttributeMinViewportResolutionID:
+            result = @"MinViewportResolution";
             break;
 
         case MTRAttributeIDTypeClusterCameraAVStreamManagementAttributeRateDistortionTradeOffPointsID:
@@ -8989,8 +8989,8 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
             result = @"MeteredQuantityTimestamp";
             break;
 
-        case MTRAttributeIDTypeClusterCommodityMeteringAttributeMeasurementTypeID:
-            result = @"MeasurementType";
+        case MTRAttributeIDTypeClusterCommodityMeteringAttributeTariffUnitID:
+            result = @"TariffUnit";
             break;
 
         case MTRAttributeIDTypeClusterCommodityMeteringAttributeMaximumMeteredQuantitiesID:

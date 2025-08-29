@@ -176,6 +176,7 @@ public:
     {
         return CHIP_NO_ERROR;
     }
+
     CHIP_ERROR SendWriteRequest(BLE_CONNECTION_OBJECT, const ChipBleUUID *, const ChipBleUUID *, PacketBufferHandle) override
     {
         return CHIP_NO_ERROR;
@@ -413,6 +414,53 @@ TEST_F(TestBleLayer, ExceedBleConnectionEndPointLimit)
     EXPECT_FALSE(HandleWriteReceivedCapabilitiesRequest(connObj));
 }
 
+namespace {
+BLEEndPoint * MakeCentralEndPoint(TestBleLayer & ble, BLE_CONNECTION_OBJECT connObj)
+{
+    BLEEndPoint * ep = nullptr;
+    EXPECT_EQ(ble.NewBleEndPoint(&ep, connObj, kBleRole_Central, true), CHIP_NO_ERROR);
+    EXPECT_NE(ep, nullptr);
+
+    return ep;
+}
+} // namespace
+
+TEST_F(TestBleLayer, StartConnectFailsIfCalledTwice)
+{
+    const auto connObj = GetConnectionObject();
+    BLEEndPoint * ep   = MakeCentralEndPoint(*this, connObj);
+    ASSERT_NE(ep, nullptr);
+
+    ASSERT_EQ(ep->StartConnect(), CHIP_NO_ERROR);              // first call OK
+    EXPECT_EQ(ep->StartConnect(), CHIP_ERROR_INCORRECT_STATE); // second should fail
+
+    ep->Abort();
+}
+
+// This test checks that the BLE layer can handle a new connection
+// and that the connection complete callback is invoked.
+TEST_F(TestBleLayer, OnConnectionCompleteCallbackPath)
+{
+    auto connObj = GetConnectionObject();
+    EXPECT_EQ(NewBleConnectionByObject(connObj), CHIP_NO_ERROR);
+    EXPECT_EQ(mOnBleConnectionCompleteCalls, 1);
+    EXPECT_EQ(mOnBleConnectionErrorCalls, 0);
+}
+
+// This test checks that the BLE layer can handle a connection error
+// and that the error callback is invoked.
+TEST_F(TestBleLayer, OnConnectionErrorCallbackPath)
+{
+    // Simulate a connection error by passing an invalid connection object
+    for (size_t i = 0; i < BLE_LAYER_NUM_BLE_ENDPOINTS; i++)
+    {
+        // Saturate BLE end-point pool
+        ASSERT_TRUE(HandleWriteReceivedCapabilitiesRequest(GetConnectionObject()));
+    }
+
+    auto exhaustedConnObj = GetConnectionObject();
+    EXPECT_EQ(NewBleConnectionByObject(exhaustedConnObj), CHIP_NO_ERROR);
+}
 // This test creats new ble connection by discriminator and simulates error
 TEST_F(TestBleLayer, NewBleConnectionByDiscriminatorThenError)
 {

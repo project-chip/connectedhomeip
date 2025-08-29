@@ -37,10 +37,11 @@
 
 import logging
 
-import chip.clusters as Clusters
-from chip.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main, has_cluster, run_if_endpoint_matches
 from mobly import asserts
 from TC_AVSUMTestBase import AVSUMTestBase
+
+import matter.clusters as Clusters
+from matter.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main, has_cluster, run_if_endpoint_matches
 
 
 class TC_AVSUM_2_1(MatterBaseTest, AVSUMTestBase):
@@ -104,7 +105,7 @@ class TC_AVSUM_2_1(MatterBaseTest, AVSUMTestBase):
                               "ZoomMax attribute is a mandatory attribute if MZOOM.")
             zoom_max_dut = await self.read_avsum_attribute_expect_success(endpoint, attributes.ZoomMax)
             asserts.assert_less_equal(zoom_max_dut, 100, "ZoomMax is not in valid range.")
-            asserts.assert_greater_equal(zoom_max_dut, 1, "ZoomMax is not in valid range.")
+            asserts.assert_greater_equal(zoom_max_dut, 2, "ZoomMax must be at least 2.")
         else:
             logging.info("MZOOM Feature not supported. Test step skipped")
             self.skip_step(3)
