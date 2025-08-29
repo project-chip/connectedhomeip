@@ -40,3 +40,6 @@ dependencies:
         version: "^0.7.0"
         rules:
             - if: "target in [esp32p4]"
+
+    tee_sec_storage:
+        path: ${IDF_PATH}/components/esp_tee/subproject/components/tee_sec_storage

@@ -32,6 +32,7 @@ declare_args() {
   chip_enable_ble_controller = false
   chip_use_secure_cert_dac_provider = false
   chip_use_esp32_ecdsa_peripheral = false
+  chip_use_esp32_tee_secure_storage = false
   chip_enable_route_hook = false
   chip_memory_alloc_mode = "default"
 }
@@ -223,10 +224,17 @@ static_library("ESP32") {
     ]
   }
 
-  if (chip_use_esp32_ecdsa_peripheral) {
+  if (chip_use_esp32_ecdsa_peripheral || chip_use_esp32_tee_secure_storage) {
     sources += [
       "ESP32CHIPCryptoPAL.cpp",
       "ESP32CHIPCryptoPAL.h",
+    ]
+  }
+
+  if (chip_use_esp32_tee_secure_storage) {
+    sources += [
+      "ESP32PersistentStorageOpKeystoreTEE.cpp",
+      "ESP32PersistentStorageOpKeystoreTEE.h",
     ]
   }
 
