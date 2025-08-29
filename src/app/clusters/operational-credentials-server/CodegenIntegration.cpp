@@ -52,7 +52,7 @@ void emberAfOperationalCredentialsClusterServerInitCallback(EndpointId endpointI
             .clusterId                       = OperationalCredentials::Id,
             .fixedClusterServerEndpointCount = 1,
             .maxEndpointCount                = 1,
-            .fetchFeatureMap                 = true,
+            .fetchFeatureMap                 = false,
             .fetchOptionalAttributes         = false,
         },
         integrationDelegate);

@@ -166,9 +166,6 @@ void SendNOCResponse(app::CommandHandler * commandObj, const ConcreteCommandPath
     commandObj->AddResponse(path, payload);
 }
 
-} // anonymous namespace
-
-
 CHIP_ERROR ReadNOCs(AttributeValueEncoder & aEncoder)
 {
     return aEncoder.EncodeList([](const auto & encoder) -> CHIP_ERROR {
@@ -1039,7 +1036,7 @@ exit:
     return std::nullopt;
 }
 
-/************************************************************************************************************/
+} // anonymous namespace
 
 CHIP_ERROR OperationalCredentialsCluster::Attributes(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder)
 {
