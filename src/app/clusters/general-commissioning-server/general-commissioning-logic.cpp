@@ -38,7 +38,7 @@ namespace {
         if (!::chip::ChipError::IsSuccess(expr))                                                                                   \
         {                                                                                                                          \
             commandObj->AddStatus(path, Protocols::InteractionModel::Status::code, #expr);                     \
-            return;                                                                                                                \
+            return std::nullopt;                                                                                                                \
         }                                                                                                                          \
     } while (false)
 } // namespace
@@ -135,7 +135,7 @@ CHIP_ERROR GeneralCommissioningLogic::ReadTCUpdateDeadLine(AttributeValueEncoder
 
 #endif //CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
 
-std::optional<DataModel::ActionReturnStatus> GeneralCommissioningLogic::HandleArmFailSafe(CommandHandler * commandObj, const ConcreteCommandPath & path, FabricIndex accessingFabricIndex, const GeneralCommissioning::Commands::ArmFailSafe::DecodableType & commandData)
+std::optional<DataModel::ActionReturnStatus> GeneralCommissioningLogic::HandleArmFailSafe(CommandHandler * commandObj, const ConcreteCommandPath & path, const GeneralCommissioning::Commands::ArmFailSafe::DecodableType & commandData)
 {
     MATTER_TRACE_SCOPE("ArmFailSafe", "GeneralCommissioning");
     auto & failSafeContext = Server::GetInstance().GetFailSafeContext();
@@ -152,7 +152,7 @@ std::optional<DataModel::ActionReturnStatus> GeneralCommissioningLogic::HandleAr
     */
 
     if (!failSafeContext.IsFailSafeBusy() &&
-        (!failSafeContext.IsFailSafeArmed() || failSafeContext.MatchesFabricIndex(accessingFabricIndex)))
+        (!failSafeContext.IsFailSafeArmed() || failSafeContext.MatchesFabricIndex(commandObj->GetAccessingFabricIndex())))
     {
         // We do not allow CASE connections to arm the failsafe for the first time while the commissioning window is open in order
         // to allow commissioners the opportunity to obtain this failsafe for the purpose of commissioning
@@ -173,7 +173,7 @@ std::optional<DataModel::ActionReturnStatus> GeneralCommissioningLogic::HandleAr
         else
         {
             CheckSuccess(
-                failSafeContext.ArmFailSafe(accessingFabricIndex, System::Clock::Seconds16(commandData.expiryLengthSeconds)),
+                failSafeContext.ArmFailSafe(commandObj->GetAccessingFabricIndex(), System::Clock::Seconds16(commandData.expiryLengthSeconds)),
                 Failure);
             Breadcrumb::Set(path.mEndpointId, commandData.breadcrumb);
             response.errorCode = CommissioningErrorEnum::kOk;
@@ -206,9 +206,8 @@ std::optional<DataModel::ActionReturnStatus> GeneralCommissioningLogic::HandleCo
     {
         response.errorCode = CommissioningErrorEnum::kNoFailSafe;
         commandObj->AddResponse(path, response);
-        return;
+        return std::nullopt;
     }
-
 #if CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
     TermsAndConditionsProvider * tcProvider = TermsAndConditionsManager::GetInstance();
 
@@ -225,7 +224,7 @@ std::optional<DataModel::ActionReturnStatus> GeneralCommissioningLogic::HandleCo
         {
             response.errorCode = CommissioningErrorEnum::kTCAcknowledgementsNotReceived;
             commandObj->AddResponse(path, response);
-            return;
+            return std::nullopt;
         }
 
         if (requiredTermsAndConditionsMaybe.HasValue() && acceptedTermsAndConditionsMaybe.HasValue())
@@ -237,14 +236,14 @@ std::optional<DataModel::ActionReturnStatus> GeneralCommissioningLogic::HandleCo
             {
                 response.errorCode = CommissioningErrorEnum::kTCMinVersionNotMet;
                 commandObj->AddResponse(path, response);
-                return;
+                return std::nullopt;
             }
 
             if (!requiredTermsAndConditions.ValidateValue(acceptedTermsAndConditions))
             {
                 response.errorCode = CommissioningErrorEnum::kRequiredTCNotAccepted;
                 commandObj->AddResponse(path, response);
-                return;
+                return std::nullopt;
             }
         }
 
@@ -276,7 +275,7 @@ std::optional<DataModel::ActionReturnStatus> GeneralCommissioningLogic::HandleCo
         response.errorCode = CommissioningErrorEnum::kInvalidAuthentication;
         ChipLogError(FailSafe, "GeneralCommissioning: Got commissioning complete in invalid security context");
         commandObj->AddResponse(path, response);
-        return;
+        return std::nullopt;
     }
 
     // Handle NOC commands
@@ -317,21 +316,21 @@ std::optional<DataModel::ActionReturnStatus> GeneralCommissioningLogic::HandleSe
     {
         ChipLogError(Zcl, "Invalid country code: '%s'", NullTerminated(countryCode).c_str());
         commandObj->AddStatus(path, Protocols::InteractionModel::Status::ConstraintError);
-        return;
+        return std::nullopt;
     }
 
     if (commandData.newRegulatoryConfig > RegulatoryLocationTypeEnum::kIndoorOutdoor)
     {
         response.errorCode = CommissioningErrorEnum::kValueOutsideRange;
         commandObj->AddResponse(path, response);
-        return;
+        return std::nullopt;
     }
 
     uint8_t locationCapability;
     if (ConfigurationMgr().GetLocationCapability(locationCapability) != CHIP_NO_ERROR)
     {
         commandObj->AddStatus(path, Protocols::InteractionModel::Status::Failure);
-        return;
+        return std::nullopt;
     }
 
     uint8_t location = to_underlying(commandData.newRegulatoryConfig);
@@ -342,7 +341,7 @@ std::optional<DataModel::ActionReturnStatus> GeneralCommissioningLogic::HandleSe
     {
         response.errorCode = CommissioningErrorEnum::kValueOutsideRange;
         commandObj->AddResponse(path, response);
-        return;
+        return std::nullopt;
     }
 
     CheckSuccess(server->SetRegulatoryConfig(location, countryCode), Failure);
@@ -363,7 +362,7 @@ std::optional<DataModel::ActionReturnStatus> HandleSetTCAcknowledgements(Command
     if (nullptr == tcProvider)
     {
         commandObj->AddStatus(path, Protocols::InteractionModel::Status::Failure);
-        return;
+        return std::nullopt;
     }
 
     Optional<TermsAndConditions> requiredTermsAndConditionsMaybe;
@@ -383,14 +382,14 @@ std::optional<DataModel::ActionReturnStatus> HandleSetTCAcknowledgements(Command
         {
             response.errorCode = CommissioningErrorEnum::kTCMinVersionNotMet;
             commandObj->AddResponse(path, response);
-            return;
+            return std::nullopt;
         }
 
         if (!requiredTermsAndConditions.ValidateValue(acceptedTermsAndConditions))
         {
             response.errorCode = CommissioningErrorEnum::kRequiredTCNotAccepted;
             commandObj->AddResponse(path, response);
-            return;
+            return std::nullopt;
         }
     }
 
