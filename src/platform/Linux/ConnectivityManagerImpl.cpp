@@ -826,12 +826,8 @@ CHIP_ERROR ConnectivityManagerImpl::_WiFiPAFCancelPublish(uint32_t PublishId)
     ChipLogProgress(DeviceLayer, "WiFi-PAF: cancel publish_id: %d ! ", PublishId);
     std::lock_guard<std::mutex> lock(mWpaSupplicantMutex);
 
-    if (!mWpaSupplicant.iface)
-    {
-        // This is expected during startup.
-        ChipLogDetail(DeviceLayer, "WiFi-PAF: Skip D-Bus 'cancel publish' call since wpa_supplicant is not ready");
-        return CHIP_NO_ERROR;
-    }
+    VerifyOrReturnError(mWpaSupplicant.iface, CHIP_ERROR_INTERNAL,
+                        ChipLogError(DeviceLayer, "WiFi-PAF: Skip D-Bus 'cancel publish' call since wpa_supplicant is not ready"));
 
     gboolean result =
         wpa_supplicant_1_interface_call_nancancel_publish_sync(mWpaSupplicant.iface.get(), PublishId, nullptr, &err.GetReceiver());
