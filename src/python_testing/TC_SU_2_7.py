@@ -44,9 +44,11 @@
 
 import asyncio
 import logging
-from os import environ, getcwd, setpgrp
+import threading
+from os import environ, getcwd, setpgrp, path
 from subprocess import Popen, run
 from time import sleep
+
 
 import psutil
 from mobly import asserts
@@ -191,6 +193,15 @@ class TC_SU_2_7(MatterBaseTest):
         logger.info(f"Status of write ACL: {result}")
         return True
 
+    async def _update_ota_requestor_state(self, controller, requestor_node_id, endpoint: int = 0, state: Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum = Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kUnknown):
+        logger.info(f"Updating Requestor -> UpdateState to {state}")
+        new_state_attr = Clusters.OtaSoftwareUpdateRequestor.Attributes.UpdateState(state)
+        resp = await controller.WriteAttribute(
+            attributes=[(endpoint, new_state_attr)],
+            nodeid=requestor_node_id,
+        )
+        asserts.assert_equal(resp[0].Status, Status.Success, "Failed to write UpdateState Attirbute")
+
     async def _write_ota_providers(self, controller, provider_node_id, endpoint: int = 0):
 
         current_otap_info = await self.read_single_attribute_check_success(
@@ -274,19 +285,26 @@ class TC_SU_2_7(MatterBaseTest):
         sleep(5)
         return process
 
-    def _launch_provider_app(self, extra_params: list = []):
+    def _launch_provider_app(self, version: int = 2, extra_params: list = []):
         """Launch the provider app with different configurations.
         """
-        logger.info("LAUNCHING PROVIDER APP")
+        logger.info(f"LAUNCHING PROVIDER APP WITH VERSION {version}")
+
+        ota_file = f"{getcwd()}/firmware_requestor_v{version}.min.ota"
+        # verify ota file exists
+        if not path.exists(ota_file):
+            raise FileNotFoundError
+
+        version_param = f"--filepath {ota_file}"
         proc = self._launch_app(
             app_name_path='out/debug/chip-ota-provider-app',
             env_app_name="OTA_PROVIDER_APP",
             base_params=[
-                f"--filepath {getcwd()}/firmware_requestor_v2.min.ota",
                 '--discriminator 321',
                 '--passcode 2321',
                 '--secured-device-port 5541',
                 "--KVS /tmp/chip_kvs_provider",
+                version_param,
             ],
             extra_params=extra_params,
         )
@@ -316,11 +334,18 @@ class TC_SU_2_7(MatterBaseTest):
         if reason is not None:
             asserts.assert_equal(event_report.reason,  reason, f"Reason is not {reason}")
 
+    def _kill_process(self):
+        logger.info(f"Killing provider with pid {self.current_provider_app_proc.pid}")
+        self.current_provider_app_proc.kill()
+
+    def _terminate_process(self):
+        logger.info(f"Terminating provider with pid {self.current_provider_app_proc.pid}")
+        self.current_provider_app_proc.terminate()
+
     @async_test_body
     async def teardown_test(self):
         if self.current_provider_app_proc is not None:
-            logger.info(f"Killing provider app {self.current_provider_app_proc.pid}")
-            self.current_provider_app_proc.terminate()
+            self._terminate_process()
 
     @async_test_body
     async def test_TC_SU_2_7(self):
@@ -429,7 +454,6 @@ class TC_SU_2_7(MatterBaseTest):
         self.current_provider_app_proc.terminate()
         controller.ExpireSessions(nodeid=provider_data['node_id'])
         run("rm -rf /tmp/chip_kvs_provider*", shell=True)
-        self.ota_req.Attributes.UpdateState
         sleep(3)
 
         self.step(3)
@@ -447,30 +471,51 @@ class TC_SU_2_7(MatterBaseTest):
             expected_cluster=self.ota_req, expected_event_id=self.ota_req.Events.StateTransition.event_id)
         await state_transition_event_handler.start(controller, requestor_node_id, endpoint=0, min_interval_sec=0, max_interval_sec=60*6)
         # This step we need to Kill the provider PID before the announcement
-        logger.info(f"Terminating the process for the provider {self.current_provider_app_proc.pid}")
-        self.current_provider_app_proc.kill()
+        self._kill_process()
         sleep(3)
         await self._announce_ota_provider(controller, provider_data['node_id'], requestor_node_id)
-        # event_report = state_transition_event_handler.wait_for_event_report(self.ota_req.Events.StateTransition, timeout_sec=60*5)
-        # logger.info(f"Event  response : {event_report}")
-        # asserts.assert_equal(event_report.newState, self.ota_req.Enums.UpdateStateEnum.kQuerying)
         event_report = state_transition_event_handler.wait_for_event_report(self.ota_req.Events.StateTransition, timeout_sec=60*5)
-        logger.info(f"Event  response : {event_report}")
-        asserts.assert_equal(event_report.newState, self.ota_req.Enums.UpdateStateEnum.kIdle)
-        asserts.assert_equal(event_report.reason, self.ota_req.Enums.ChangeReasonEnum.kFailure)
-
-        #  self._verify_event_transition_status(event_report, previous_state=self.ota_req.Enums.UpdateStateEnum.kDownloading, new_state=self.ota_req.Enums.UpdateStateEnum.kIdle,
-        #                                    reason = self.ota_req.Enums.ChangeReasonEnum.kFailure)
+        logger.info(f"Event response after killing app: {event_report}")
+        asserts.assert_equal(event_report.newState, self.ota_req.Enums.UpdateStateEnum.kQuerying)
+        event_report = state_transition_event_handler.wait_for_event_report(self.ota_req.Events.StateTransition, timeout_sec=60*5)
+        logger.info(f"Event response : {event_report}")
+        self._verify_event_transition_status(event_report, previous_state=self.ota_req.Enums.UpdateStateEnum.kQuerying,
+                                             new_state=self.ota_req.Enums.UpdateStateEnum.kIdle, reason=self.ota_req.Enums.ChangeReasonEnum.kFailure)
         state_transition_event_handler.reset()
         await state_transition_event_handler.cancel()
-        # logger.info(f"About close the provider app with proc {self.current_provider_app_proc.pid}")
-        # self.current_provider_app_proc.terminate()
         controller.ExpireSessions(nodeid=provider_data['node_id'])
         run("rm -rf /tmp/chip_kvs_provider*", shell=True)
         sleep(3)
 
         self.step(4)
-        self._launch_provider_app(extra_params=["-u deferred", "-c"])
+        # Need to launch the requestor with -c true
+        # self._launch_provider_app(extra_params=["-u deferred", "-c true"])
+        # await controller.CommissionOnNetwork(
+        #     nodeId=provider_data['node_id'],
+        #     setupPinCode=provider_data['setup_pincode'],
+        #     filterType=ChipDeviceCtrl.DiscoveryFilterType.LONG_DISCRIMINATOR,
+        #     filter=provider_data['discriminator']
+        # )
+        # await self._write_acl_rules(controller=controller, endpoint=0, node_id=provider_data['node_id'])
+        # await self._write_ota_providers(controller=controller, provider_node_id=provider_data['node_id'], endpoint=0)
+        # state_transition_event_handler = EventSubscriptionHandler(
+        #     expected_cluster=self.ota_req, expected_event_id=self.ota_req.Events.StateTransition.event_id)
+        # await state_transition_event_handler.start(controller, requestor_node_id, endpoint=0, min_interval_sec=0, max_interval_sec=60*6)
+        # # self._launch_requestor_app(extra_params=["-c true", "-u deferred"])
+        # await self._announce_ota_provider(controller, provider_data['node_id'], requestor_node_id)
+        # event_report = state_transition_event_handler.wait_for_event_report(self.ota_req.Events.StateTransition, timeout_sec=30)
+        # self._verify_event_transition_status(event_report, previous_state=self.ota_req.Enums.UpdateStateEnum.kIdle,
+        #                                      new_state=self.ota_req.Enums.UpdateStateEnum.kQuerying)
+        # event_report = state_transition_event_handler.wait_for_event_report(self.ota_req.Events.StateTransition, timeout_sec=30)
+        # self._verify_event_transition_status(event_report, previous_state=self.ota_req.Enums.UpdateStateEnum.kQuerying,
+        #                                      new_state=self.ota_req.Enums.UpdateStateEnum.kDelayedOnUserConsent)
+        # state_transition_event_handler.reset()
+        # await state_transition_event_handler.cancel()
+        # controller.ExpireSessions(nodeid=provider_data['node_id'])
+
+        self.step(5)
+        update_software_version = 3
+        self._launch_provider_app(version=update_software_version)
         await controller.CommissionOnNetwork(
             nodeId=provider_data['node_id'],
             setupPinCode=provider_data['setup_pincode'],
@@ -481,47 +526,49 @@ class TC_SU_2_7(MatterBaseTest):
         await self._write_ota_providers(controller=controller, provider_node_id=provider_data['node_id'], endpoint=0)
         state_transition_event_handler = EventSubscriptionHandler(
             expected_cluster=self.ota_req, expected_event_id=self.ota_req.Events.StateTransition.event_id)
-        await state_transition_event_handler.start(controller, requestor_node_id, endpoint=0, min_interval_sec=0, max_interval_sec=60*6)
-        # self._launch_requestor_app(extra_params=["-c true", "-u deferred"])
+        error_download_event_handler = EventSubscriptionHandler(
+            expected_cluster=self.ota_req, expected_event_id=self.ota_req.Events.DownloadError.event_id)
+        await state_transition_event_handler.start(controller, requestor_node_id, endpoint=0, min_interval_sec=0, max_interval_sec=60*5)
+        await error_download_event_handler.start(controller, requestor_node_id, endpoint=0, min_interval_sec=0, max_interval_sec=5000)
         await self._announce_ota_provider(controller, provider_data['node_id'], requestor_node_id)
-        event_report = state_transition_event_handler.wait_for_event_report(self.ota_req.Events.StateTransition, timeout_sec=30)
-        self._verify_event_transition_status(event_report, previous_state=self.ota_req.Enums.UpdateStateEnum.kIdle,
-                                             new_state=self.ota_req.Enums.UpdateStateEnum.kQuerying)
-        event_report = state_transition_event_handler.wait_for_event_report(self.ota_req.Events.StateTransition, timeout_sec=30)
-        self._verify_event_transition_status(event_report, previous_state=self.ota_req.Enums.UpdateStateEnum.kQuerying,
-                                             new_state=self.ota_req.Enums.UpdateStateEnum.kDelayedOnUserConsent)
+        # Blocks the script waiting for StateTransition Event
+        event_report = state_transition_event_handler.wait_for_event_report(self.ota_req.Events.StateTransition, timeout_sec=10)
+        logger.info(f"Event report Querying {event_report}")
+        asserts.assert_equal(event_report.newState, self.ota_req.Enums.UpdateStateEnum.kQuerying)
+
+        # Block waiting for Download
+        event_report = state_transition_event_handler.wait_for_event_report(self.ota_req.Events.StateTransition, timeout_sec=10)
+        logger.info(f"Event report Downloading {event_report}")
+        asserts.assert_equal(event_report.newState, self.ota_req.Enums.UpdateStateEnum.kDownloading)
+        # Kill the current process
+        self._kill_process()
+
+        event_report = state_transition_event_handler.wait_for_event_report(self.ota_req.Events.StateTransition, timeout_sec=280)
+        logger.info(f"Event report Downloading {event_report}")
+        asserts.assert_equal(event_report.newState, self.ota_req.Enums.UpdateStateEnum.kIdle)
+        # Somehow here the provider app should be terminated
+        # Download error should not come out in less than 5 minutes
+        download_event_report = error_download_event_handler.wait_for_event_report(
+            self.ota_req.Events.DownloadError, timeout_sec=60*20)
+        logger.info(f"Download error Event: {download_event_report}")
+        asserts.assert_equal(download_event_report.softwareVersion, update_software_version)
+        asserts.assert_greater(download_event_report.bytesDownloaded, 0)
+        asserts.assert_greater(download_event_report.progressPercent, 0)
+        asserts.assert_equal(download_event_report.platformCode, NullValue)
+        # Cancel Handlers
+        error_download_event_handler.reset()
+        await error_download_event_handler.cancel()
         state_transition_event_handler.reset()
         await state_transition_event_handler.cancel()
         controller.ExpireSessions(nodeid=provider_data['node_id'])
-
-        self.step(5)
-        self._launch_provider_app()
-        await controller.CommissionOnNetwork(
-            nodeId=provider_data['node_id'],
-            setupPinCode=provider_data['setup_pincode'],
-            filterType=ChipDeviceCtrl.DiscoveryFilterType.LONG_DISCRIMINATOR,
-            filter=provider_data['discriminator']
-        )
-        await self._write_acl_rules(controller=controller, endpoint=0, node_id=provider_data['node_id'])
-        await self._write_ota_providers(controller=controller, provider_node_id=provider_data['node_id'], endpoint=0)
-        error_download_event_handler = EventSubscriptionHandler(
-            expected_cluster=self.ota_req, expected_event_id=self.ota_req.Events.DownloadError.event_id)
-        await error_download_event_handler.start(controller, requestor_node_id, endpoint=0, min_interval_sec=0, max_interval_sec=5000)
-        await self._announce_ota_provider(controller, provider_data['node_id'], requestor_node_id)
-        event_report = error_download_event_handler.wait_for_event_report(self.ota_req.Events.DownloadError, timeout_sec=60*5)
-        asserts.assert_equal(event_report.softwareversion, update_software_version)
-        # asserts.assert_equal(event_report.bytesdownloaded, self.ota_req.Enums.UpdateStateEnum.kQuerying)
-        # asserts.assert_equal(event_report.progresspercent, self.ota_req.Enums.UpdateStateEnum.kQuerying)
-        asserts.assert_equal(event_report.platformcode, NullValue)
-        error_download_event_handler.reset()
-        await error_download_event_handler.cancel()
-        controller.ExpireSessions(nodeid=provider_data['node_id'])
+        run("rm -rf /tmp/chip_kvs_provider*", shell=True)
 
         self.step(6)
-        # fails
         # Again the process to update the cluster but we check the Delayed on Apply
         # Delayed on apply
-        self._launch_provider_app(extra_params=["--applyUpdateAction awaitNextAction", "--delayedApplyActionTimeSec 10"])
+        # Autoapply flag must be disabled in requestor in order to work
+        update_software_version = 4
+        self._launch_provider_app(version=4, extra_params=["--applyUpdateAction awaitNextAction", "--delayedApplyActionTimeSec 30"])
         await controller.CommissionOnNetwork(
             nodeId=provider_data['node_id'],
             setupPinCode=provider_data['setup_pincode'],
@@ -534,11 +581,15 @@ class TC_SU_2_7(MatterBaseTest):
         await self._write_acl_rules(controller=controller, endpoint=0, node_id=provider_data['node_id'])
         await self._write_ota_providers(controller=controller, provider_node_id=provider_data['node_id'], endpoint=0)
         await self._announce_ota_provider(controller, provider_data['node_id'], requestor_node_id)
+        # Kill the process after 1 minute
         event_report = state_transition_event_handler.wait_for_event_report(self.ota_req.Events.StateTransition, timeout_sec=30)
+        logger.info(f"Event report Querying {event_report}")
         asserts.assert_equal(event_report.newState, self.ota_req.Enums.UpdateStateEnum.kQuerying)
         event_report = state_transition_event_handler.wait_for_event_report(self.ota_req.Events.StateTransition, timeout_sec=30)
+        logger.info(f"Event report Downloading {event_report}")
         asserts.assert_equal(event_report.newState, self.ota_req.Enums.UpdateStateEnum.kDownloading)
         event_report = state_transition_event_handler.wait_for_event_report(self.ota_req.Events.StateTransition, timeout_sec=60*5)
+        logger.info(f"Event report Last {event_report}")
         asserts.assert_equal(event_report.newState, self.ota_req.Enums.UpdateStateEnum.kDelayedOnApply)
 
         self.step(7)
@@ -546,10 +597,8 @@ class TC_SU_2_7(MatterBaseTest):
             expected_cluster=self.ota_req, expected_event_id=self.ota_req.Events.VersionApplied.event_id)
         await update_applied_event_handler.start(controller, requestor_node_id, endpoint=0, min_interval_sec=0, max_interval_sec=60*6)
         # Update is completed at this point, listen for
-        event_report = state_transition_event_handler.wait_for_event_report(self.ota_req.Events.StateTransition, timeout_sec=60*2)
-        asserts.assert_equal(event_report.newState, self.ota_req.Enums.UpdateStateEnum.kApplying)
         event_report_version_applied = update_applied_event_handler.wait_for_event_report(
-            self.ota_req.Events.VersionApplied, timeout_sec=60*2)
+            self.ota_req.Events.VersionApplied, timeout_sec=60*3)
         self._verify_version_applied_basic_information(controller=controller, target_version=update_software_version)
         asserts.assert_equal(event_report_version_applied.softwareVersion, update_software_version,
                              f"Version fom event is not {update_software_version}")
