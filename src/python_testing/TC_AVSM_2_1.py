@@ -62,7 +62,8 @@ class TC_AVSM_2_1(MatterBaseTest):
                 4, "TH reads VideoSensorParams attribute.", "Verify that the DUT response contains a VideoSensorParamsStruct value."
             ),
             TestStep(5, "TH reads NightVisionUsesInfrared attribute.", "Verify that the DUT response contains a bool value."),
-            TestStep(6, "TH reads MinViewport attribute.", "Verify that the DUT response contains a VideoResolutionStruct value."),
+            TestStep(6, "TH reads MinViewportResolution attribute.",
+                     "Verify that the DUT response contains a VideoResolutionStruct value."),
             TestStep(
                 7,
                 "TH reads RateDistortionTradeOffPoints attribute.",
@@ -194,13 +195,13 @@ class TC_AVSM_2_1(MatterBaseTest):
             asserts.assert_is_not_none(value, "NightVisionUsesInfrared is None")
 
         self.step(6)
-        if await self.attribute_guard(endpoint=endpoint, attribute=attr.MinViewport):
-            minViewport = await self.read_single_attribute_check_success(
-                endpoint=endpoint, cluster=cluster, attribute=attr.MinViewport
+        if await self.attribute_guard(endpoint=endpoint, attribute=attr.MinViewportResolution):
+            minViewportResolution = await self.read_single_attribute_check_success(
+                endpoint=endpoint, cluster=cluster, attribute=attr.MinViewportResolution
             )
-            logger.info(f"Rx'd MinViewport: {minViewport}")
-            asserts.assert_is_not_none(minViewport, "MinViewport is None")
-            self.assert_video_resolution_struct(minViewport)
+            logger.info(f"Rx'd MinViewportResolution: {minViewportResolution}")
+            asserts.assert_is_not_none(minViewportResolution, "MinViewportResolution is None")
+            self.assert_video_resolution_struct(minViewportResolution)
 
         self.step(7)
         if await self.attribute_guard(endpoint=endpoint, attribute=attr.RateDistortionTradeOffPoints):
