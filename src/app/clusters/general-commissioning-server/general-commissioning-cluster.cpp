@@ -27,7 +27,6 @@
 using namespace chip::app::Clusters::GeneralCommissioning;
 using namespace chip::app::Clusters::GeneralCommissioning::Attributes;
 
-
 namespace chip {
 namespace app {
 namespace Clusters {
@@ -99,7 +98,6 @@ DataModel::ActionReturnStatus GeneralCommissioningCluster::ReadAttribute(const D
     }
 }
 
-
 std::optional<DataModel::ActionReturnStatus> GeneralCommissioningCluster::InvokeCommand(const DataModel::InvokeRequest & request,
                                                                                         TLV::TLVReader & input_arguments,
                                                                                         CommandHandler * handler)
@@ -107,45 +105,44 @@ std::optional<DataModel::ActionReturnStatus> GeneralCommissioningCluster::Invoke
     using namespace GeneralCommissioning::Commands;
     switch (request.path.mCommandId)
     {
-    case ArmFailSafe::Id:{
+    case ArmFailSafe::Id: {
         ArmFailSafe::DecodableType request_data;
         ReturnErrorOnFailure(request_data.Decode(input_arguments));
-        return mLogic.HandleArmFailSafe(handler,request.path,request_data);
+        return mLogic.HandleArmFailSafe(handler, request.path, request_data);
     }
 
-    case CommissioningComplete::Id:{
+    case CommissioningComplete::Id: {
         CommissioningComplete::DecodableType request_data;
         ReturnErrorOnFailure(request_data.Decode(input_arguments, handler->GetAccessingFabricIndex()));
-        return mLogic.HandleCommissioningComplete(handler,request.path,handler->GetAccessingFabricIndex(),request_data);
+        return mLogic.HandleCommissioningComplete(handler, request.path, handler->GetAccessingFabricIndex(), request_data);
     }
 
-    case SetRegulatoryConfig::Id:{
+    case SetRegulatoryConfig::Id: {
         SetRegulatoryConfig::DecodableType request_data;
         ReturnErrorOnFailure(request_data.Decode(input_arguments));
-        return mLogic.HandleSetRegulatoryConfig(handler,request.path,request_data);
+        return mLogic.HandleSetRegulatoryConfig(handler, request.path, request_data);
     }
 
 #if CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
-    case SetTCAcknowledgements::Id:{
+    case SetTCAcknowledgements::Id: {
         SetTCAcknowledgements::DecodableType request_data;
         ReturnErrorOnFailure(request_data.Decode(input_arguments));
-        return mLogic.HandleSetTCAcknowledgements(handler,request.path, request_data);
+        return mLogic.HandleSetTCAcknowledgements(handler, request.path, request_data);
     }
 #endif
     default:
         return Protocols::InteractionModel::Status::UnsupportedCommand;
     }
-
 }
 
 CHIP_ERROR GeneralCommissioningCluster::AcceptedCommands(const ConcreteClusterPath & path,
-                                                        ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder)
+                                                         ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder)
 {
     return builder.ReferenceExisting(kAcceptedCommands);
 }
 
 CHIP_ERROR GeneralCommissioningCluster::GeneratedCommands(const ConcreteClusterPath & path,
-                                                         ReadOnlyBufferBuilder<CommandId> & builder)
+                                                          ReadOnlyBufferBuilder<CommandId> & builder)
 {
     return builder.ReferenceExisting(kGeneratedCommands);
 }
@@ -155,15 +152,15 @@ CHIP_ERROR GeneralCommissioningCluster::Attributes(const ConcreteClusterPath & p
 {
     AttributeListBuilder attributeListBuilder(builder);
     const DataModel::AttributeEntry kMandatoryAttributes[] = {
-       GeneralCommissioning::Attributes::Breadcrumb::kMetadataEntry,
-       GeneralCommissioning::Attributes::BasicCommissioningInfo::kMetadataEntry,
-       GeneralCommissioning::Attributes::RegulatoryConfig::kMetadataEntry,
-       GeneralCommissioning::Attributes::LocationCapability::kMetadataEntry,
-       GeneralCommissioning::Attributes::SupportsConcurrentConnection::kMetadataEntry,
+        GeneralCommissioning::Attributes::Breadcrumb::kMetadataEntry,
+        GeneralCommissioning::Attributes::BasicCommissioningInfo::kMetadataEntry,
+        GeneralCommissioning::Attributes::RegulatoryConfig::kMetadataEntry,
+        GeneralCommissioning::Attributes::LocationCapability::kMetadataEntry,
+        GeneralCommissioning::Attributes::SupportsConcurrentConnection::kMetadataEntry,
     };
     const BitFlags<GeneralCommissioning::Feature> featureFlags = mLogic.GetFeatureFlags();
 
-    const bool hasTermsAndConditions  = featureFlags.Has(Feature::kTermsAndConditions);
+    const bool hasTermsAndConditions = featureFlags.Has(Feature::kTermsAndConditions);
 
     const AttributeListBuilder::OptionalAttributeEntry optionalEntries[] = {
         { hasTermsAndConditions, TCAcceptedVersion::kMetadataEntry },
@@ -175,7 +172,6 @@ CHIP_ERROR GeneralCommissioningCluster::Attributes(const ConcreteClusterPath & p
 
     return attributeListBuilder.Append(Span(kMandatoryAttributes), Span(optionalEntries));
 }
-
 
 } // namespace Clusters
 } // namespace app

@@ -85,7 +85,8 @@ void emberAfGeneralCommissioningClusterShutdownCallback(EndpointId endpointId)
     CHIP_ERROR err = CodegenDataModelProvider::Instance().Registry().Unregister(&gServer.Cluster());
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(AppServer, "General Commissioning unregister error: endpoint %u, %" CHIP_ERROR_FORMAT, endpointId, err.Format());
+        ChipLogError(AppServer, "General Commissioning unregister error: endpoint %u, %" CHIP_ERROR_FORMAT, endpointId,
+                     err.Format());
     }
     gServer.Destroy();
 }
