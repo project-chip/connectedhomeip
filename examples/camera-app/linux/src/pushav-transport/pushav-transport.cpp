@@ -132,7 +132,7 @@ void PushAVTransport::ConfigureRecorderSettings(const TransportOptionsStruct & t
 
     mTransportTriggerType   = transportOptions.triggerOptions.triggerType;
     clipInfo.mClipId        = 0;
-    clipInfo.mOutputPath    = "./clips/";
+    clipInfo.mOutputPath    = "/tmp";
     clipInfo.mInputTimeBase = { 1, 1000000 };
 
     uint8_t audioCodec = static_cast<uint8_t>(mAudioStreamParams.audioCodec);
