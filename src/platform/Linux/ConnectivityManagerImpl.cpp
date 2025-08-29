@@ -832,10 +832,10 @@ CHIP_ERROR ConnectivityManagerImpl::_WiFiPAFCancelPublish(uint32_t PublishId)
     gboolean result =
         wpa_supplicant_1_interface_call_nancancel_publish_sync(mWpaSupplicant.iface.get(), PublishId, nullptr, &err.GetReceiver());
 
-    if (!result)
-    {
-        ChipLogError(DeviceLayer, "WiFi-PAF: Failed to Cancel Publish");
-    }
+    // TODO: make sure that the callers do check the return values. This doesn't seem to be happening now.
+    VerifyOrReturnError(
+        result, CHIP_ERROR_INTERNAL,
+        ChipLogError(DeviceLayer, "WiFi-PAF: Failed to Cancel Publish with Error: %s", err ? err->message : "unknown error"));
 
     return CHIP_NO_ERROR;
 }
