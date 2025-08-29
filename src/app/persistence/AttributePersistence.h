@@ -17,13 +17,14 @@
 
 #include <app/AttributeValueDecoder.h>
 #include <app/ConcreteAttributePath.h>
+#include <app/DefaultSafeAttributePersistenceProvider.h>
 #include <app/data-model-provider/ActionReturnStatus.h>
 #include <app/persistence/AttributePersistenceProvider.h>
+#include <app/persistence/DefaultAttributePersistenceProvider.h>
 #include <app/persistence/String.h>
 #include <lib/core/CHIPEncoding.h>
 #include <lib/support/DefaultStorageKeyAllocator.h>
 #include <lib/support/ReadOnlyBuffer.h>
-
 #include <type_traits>
 
 namespace chip::app {
@@ -100,9 +101,9 @@ public:
 
         ChipError err;
         DefaultSafeAttributePersistenceProvider safeProvider;
-        safeProvider.Init(storageDelegate);
+        safeProvider.Init(&storageDelegate);
         DefaultAttributePersistenceProvider normProvider;
-        normProvider.Init(storageDelegate);
+        normProvider.Init(&storageDelegate);
 
         for (auto attr : attributes)
         {
@@ -126,7 +127,7 @@ public:
 
             ReturnErrorOnFailure(normProvider.WriteValue(attrPath, copyOfBuffer));
             // do nothing with this error
-            err = safeProvider.DeleteValue(attrPath);
+            err = safeProvider.SafeDeleteValue(attrPath);
         }
     }
 
