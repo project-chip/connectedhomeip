@@ -155,7 +155,7 @@ static inline Structs::TariffComponentStruct::Type TariffComponents[] = {
           .powerThreshold         = MakeOptional(2400000),
           .apparentPowerThreshold = MakeOptional(120),
           .powerThresholdSource   = static_cast<Globals::PowerThresholdSourceEnum>(0) }),
-      .threshold      = DataModel::Nullable<int64_t>(120),
+      .threshold      = NullOptional,
       .label          = MakeOptional(DataModel::MakeNullable(CharSpan::fromCharString("Tariff Component 1"))),
       .predicted      = MakeOptional(false) },
     { .tariffComponentID = 20,
@@ -172,7 +172,7 @@ static inline Structs::TariffComponentStruct::Type TariffComponents[] = {
           .powerThreshold         = MakeOptional(4800000),
           .apparentPowerThreshold = MakeOptional(240),
           .powerThresholdSource   = static_cast<Globals::PowerThresholdSourceEnum>(0) }),
-      .threshold      = DataModel::Nullable<int64_t>(240),
+      .threshold      = NullOptional,
       .label          = MakeOptional(DataModel::MakeNullable(CharSpan::fromCharString("Tariff Component 2"))),
       .predicted      = MakeOptional(false) }
 };
