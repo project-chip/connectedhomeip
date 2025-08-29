@@ -200,7 +200,7 @@ DataModel::ActionReturnStatus TimeFormatLocalizationCluster::ReadAttribute(const
         return encoder.Encode(TimeFormatLocalization::kRevision);
 
     default:
-        return Protocols::InteractionModel::Status::UnreportableAttribute;
+        return Protocols::InteractionModel::Status::UnsupportedAttribute;
     }
 }
 
