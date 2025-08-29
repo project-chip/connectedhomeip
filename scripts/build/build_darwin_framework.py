@@ -90,6 +90,7 @@ def build_darwin_framework(args):
         'CHIP_INET_CONFIG_ENABLE_IPV4': args.ipv4,
         'CHIP_IS_ASAN': args.asan,
         'CHIP_IS_BLE': args.ble,
+        'CHIP_IS_NFC': args.nfc,
         'CHIP_IS_CLANG': args.clang,
         'CHIP_ENABLE_ENCODING_SENTINEL_ENUM_VALUES': args.enable_encoding_sentinel_enum_values,
         'CHIP_USE_NETWORK_FRAMEWORK': args.use_network_framework
@@ -174,6 +175,7 @@ if __name__ == "__main__":
     parser.add_argument('--ipv4', action=argparse.BooleanOptionalAction)
     parser.add_argument('--asan', action=argparse.BooleanOptionalAction)
     parser.add_argument('--ble', action=argparse.BooleanOptionalAction)
+    parser.add_argument('--nfc', action=argparse.BooleanOptionalAction)
     parser.add_argument('--clang', action=argparse.BooleanOptionalAction)
     parser.add_argument('--enable-encoding-sentinel-enum-values', action=argparse.BooleanOptionalAction)
     parser.add_argument('--compdb', action=argparse.BooleanOptionalAction)
