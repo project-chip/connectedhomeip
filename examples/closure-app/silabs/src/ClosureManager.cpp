@@ -137,7 +137,7 @@ CHIP_ERROR ClosureManager::SetClosureControlInitialState(ClosureControlEndpoint 
 {
     ChipLogProgress(AppServer, "ClosureControlEndpoint SetInitialState");
     ClosureControl::ClusterConformance conformance = closureControlEndpoint.GetLogic().GetConformance();
-    Optional<DataModel::Nullable<CurrentPositionEnum>> currentPosition = conformance.HasFeature(ClosureControl::Feature::kPositioning) ? 
+    Optional<DataModel::Nullable<CurrentPositionEnum>> currentPosition = conformance.HasFeature(ClosureControl::Feature::kPositioning) ?
                 MakeOptional(DataModel::MakeNullable(CurrentPositionEnum::kFullyClosed)) : NullNullable;
     Optional<DataModel::Nullable<bool>> currentLatch = conformance.HasFeature(ClosureControl::Feature::kMotionLatching) ?
                 MakeOptional(DataModel::MakeNullable(true)) : NullNullable;
@@ -154,7 +154,7 @@ CHIP_ERROR ClosureManager::SetClosureControlInitialState(ClosureControlEndpoint 
         ReturnErrorOnFailure(closureControlEndpoint.GetLogic().SetCountdownTimeFromDelegate(NullNullable));
     }
     ReturnErrorOnFailure(closureControlEndpoint.GetLogic().SetMainState(MainStateEnum::kStopped));
-    
+
     if(conformance.HasFeature(ClosureControl::Feature::kMotionLatching))
     {
         BitFlags<ClosureControl::LatchControlModesBitmap> latchControlModes;
@@ -162,7 +162,7 @@ CHIP_ERROR ClosureManager::SetClosureControlInitialState(ClosureControlEndpoint 
             .Set(ClosureControl::LatchControlModesBitmap::kRemoteUnlatching);
         ReturnErrorOnFailure(closureControlEndpoint.GetLogic().SetLatchControlModes(latchControlModes));
     }
-    
+
     return CHIP_NO_ERROR;
 }
 
@@ -171,7 +171,7 @@ CHIP_ERROR ClosureManager::SetClosurePanelInitialState(ClosureDimensionEndpoint 
     ChipLogProgress(AppServer, "ClosurePanelEndpoint SetInitialState");
     ClosureDimension::ClusterConformance conformance = closurePanelEndpoint.GetLogic().GetConformance();
 
-    Optional<DataModel::Nullable<Percent100ths>> currentPosition = conformance.HasFeature(ClosureDimension::Feature::kPositioning) ? 
+    Optional<DataModel::Nullable<Percent100ths>> currentPosition = conformance.HasFeature(ClosureDimension::Feature::kPositioning) ?
                                                             MakeOptional(DataModel::MakeNullable<Percent100ths>(10000)) : NullNullable;
     Optional<DataModel::Nullable<bool>> currentLatch = conformance.HasFeature(ClosureDimension::Feature::kMotionLatching) ?
                 MakeOptional(DataModel::MakeNullable(true)) : NullNullable;
