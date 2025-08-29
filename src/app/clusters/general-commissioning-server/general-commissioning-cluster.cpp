@@ -19,7 +19,6 @@
 #include <app/data-model-provider/MetadataTypes.h>
 #include <app/server-cluster/AttributeListBuilder.h>
 #include <clusters/GeneralCommissioning/Commands.h>
-#include <lib/support/CodeUtils.h>
 
 #include <clusters/GeneralCommissioning/Ids.h>
 #include <clusters/GeneralCommissioning/Metadata.h>

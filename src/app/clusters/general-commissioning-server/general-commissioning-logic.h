@@ -1,11 +1,9 @@
 #pragma once
 
-#include <app/AttributeValueDecoder.h>
 #include <app/CommandHandler.h>
 
 #include <app-common/zap-generated/attributes/Accessors.h>
-#include <app/data-model/Decode.h>
-#include <app/data-model/Encode.h>
+
 #include <lib/core/DataModelTypes.h>
 
 #include <app/AttributeValueEncoder.h>
@@ -20,7 +18,7 @@
 
 #include <app/data-model-provider/ActionReturnStatus.h>
 #include <app/server/Server.h>
-#include <platform/DeviceControlServer.h>
+
 
 #if CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
 #include <app/server/TermsAndConditionsManager.h>  //nogncheck

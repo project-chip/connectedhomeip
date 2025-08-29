@@ -20,8 +20,6 @@
 
 #include <app/clusters/general-commissioning-server/general-commissioning-logic.h>
 #include <app/server-cluster/DefaultServerCluster.h>
-#include <clusters/GeneralCommissioning/ClusterId.h>
-#include <protocols/interaction_model/StatusCode.h>
 
 namespace chip {
 namespace app {
