@@ -1,4 +1,5 @@
 /*
+ *
  *    Copyright (c) 2025 Project CHIP Authors
  *    All rights reserved.
  *
@@ -14,6 +15,7 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+
 #include <app/clusters/general-commissioning-server/general-commissioning-cluster.h>
 #include <app/static-cluster-config/GeneralCommissioning.h>
 #include <data-model-providers/codegen/CodegenDataModelProvider.h>
