@@ -32,6 +32,7 @@
 #include <app/clusters/ota-requestor/OTATestEventTriggerHandler.h>
 #include <app/server/Dnssd.h>
 #include <app/server/Server.h>
+#include <app/util/attribute-storage.h>
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
 #include <data-model-providers/codegen/Instance.h>
@@ -66,18 +67,13 @@ using namespace app::Clusters::Descriptor::Structs;
 #define FACTORY_RESET_CANCEL_WINDOW_TIMEOUT 5000
 #define RESET_TRIGGER_TIMEOUT 1500
 
-#if CONFIG_DAC_KEY_ENC
-#define APP_TASK_STACK_SIZE (8 * 1024)
-#else
 #define APP_TASK_STACK_SIZE (4 * 1024)
-#endif
-
 #define APP_TASK_PRIORITY 2
 #define APP_EVENT_QUEUE_SIZE 10
 
 namespace {
 
-#if (CONFIG_1_TO_2_ZAP || CONFIG_1_TO_8_ZAP || CONFIG_1_TO_12_ZAP)
+#if (CONFIG_1_TO_2_ZAP || CONFIG_1_TO_8_ZAP || CONFIG_1_TO_11_ZAP)
 
 // Switches Namespace: 0x43, tag 0x08 (Custom)
 constexpr const uint8_t kNamespaceSwitches = 0x43;
@@ -139,8 +135,9 @@ TaskHandle_t sAppTaskHandle;
 QueueHandle_t sAppEventQueue;
 
 // NOTE! This key is for test/certification only and should not be available in production devices!
-uint8_t sTestEventTriggerEnableKey[TestEventTriggerDelegate::kEnableKeyLength] = { 0x00, 0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77,
-                                                                                   0x88, 0x99, 0xaa, 0xbb, 0xcc, 0xdd, 0xee, 0xff };
+static const uint8_t sTestEventTriggerEnableKey[TestEventTriggerDelegate::kEnableKeyLength] = { 0x00, 0x11, 0x22, 0x33, 0x44, 0x55,
+                                                                                                0x66, 0x77, 0x88, 0x99, 0xaa, 0xbb,
+                                                                                                0xcc, 0xdd, 0xee, 0xff };
 
 chip::DeviceLayer::DeviceInfoProviderImpl gExampleDeviceInfoProvider;
 } // namespace
