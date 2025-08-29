@@ -624,7 +624,7 @@ void Instance::UpdateDayEntryInformation(uint32_t now)
     if (currentEntry != nullptr)
     {
         tmpDayEntry.SetNonNull(*currentEntry);
-        tmpDate.SetNonNull(mCurrentDay.Value().date);
+        tmpDate.SetNonNull(mCurrentDay.Value().date + (currentEntry->startTime * 60));
 
         if (CHIP_NO_ERROR !=
             Utils::UpdateTariffComponentAttrsDayEntryById(this, mServerTariffAttrsCtx, currentEntry->dayEntryID,
@@ -652,18 +652,11 @@ void Instance::UpdateDayEntryInformation(uint32_t now)
             ChipLogError(NotSpecified, "Unable to update the NextTariffComponents attribute!");
         }
         ChipLogDetail(NotSpecified, "UpdateCurrentAttrs: next day entry: %u", tmpDayEntry.Value().dayEntryID);
+        tmpDate.SetNonNull(mCurrentDayEntryDate.Value() + currentEntryMinutesRemain * 60);
     }
 
     SetNextDayEntry(tmpDayEntry);
-
-    // Set next day entry date if needed
-    if (currentEntryMinutesRemain > 0)
-    {
-        tmpDate.SetNonNull((currentEntryMinutesRemain >= (kDayEntryDurationLimit - minutesSinceMidnight)) && !mNextDay.IsNull()
-                               ? mNextDay.Value().date
-                               : mCurrentDay.Value().date);
-        SetNextDayEntryDate(tmpDate);
-    }
+    SetNextDayEntryDate(tmpDate);
 }
 
 void Instance::DeinitCurrentAttrs()
