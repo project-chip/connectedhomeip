@@ -64,7 +64,7 @@ DataModel::ActionReturnStatus GeneralCommissioningCluster::ReadAttribute(const D
         return encoder.Encode(GeneralCommissioning::kRevision);
     }
     case Breadcrumb::Id: {
-        uint64_t breadcrumbValue = 0;
+        uint64_t breadcrumbValue                   = 0;
         Protocols::InteractionModel::Status status = Breadcrumb::Get(request.path.mEndpointId, &breadcrumbValue);
         if (status != Protocols::InteractionModel::Status::Success)
         {

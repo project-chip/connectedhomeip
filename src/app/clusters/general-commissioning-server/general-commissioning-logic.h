@@ -19,7 +19,6 @@
 #include <app/data-model-provider/ActionReturnStatus.h>
 #include <app/server/Server.h>
 
-
 #if CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
 #include <app/server/TermsAndConditionsManager.h>  //nogncheck
 #include <app/server/TermsAndConditionsProvider.h> //nogncheck
