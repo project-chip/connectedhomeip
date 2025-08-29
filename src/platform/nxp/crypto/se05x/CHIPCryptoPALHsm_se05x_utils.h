@@ -79,12 +79,6 @@ extern "C" {
 CHIP_ERROR se05x_session_open(void);
 
 /**
- * @brief Close session to se05x secure element.
- * @return CHIP_ERROR_INTERNAL on error, CHIP_NO_ERROR otherwise
- */
-CHIP_ERROR se05x_close_session(void);
-
-/**
  * @brief Check if key exists in se05x.
  * @param[in] Key id of the key to be checked.
  * @return CHIP_ERROR_INTERNAL on error, CHIP_NO_ERROR otherwise
