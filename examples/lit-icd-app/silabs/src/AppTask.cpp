@@ -35,6 +35,7 @@
 
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/ids/Clusters.h>
+#include <app/clusters/boolean-state-server/CodegenIntegration.h>
 #include <app/server/Server.h>
 #include <app/util/attribute-storage.h>
 #include <assert.h>
@@ -119,21 +120,8 @@ void AppTask::ApplicationEventHandler(AppEvent * aEvent)
     // DO NOT COPY for product logic. LIT ICD app is a test app with very simple application logic to enable testing.
     // The goal of the app is just to enable testing of LIT ICD features without impacting product sample apps.
     PlatformMgr().ScheduleWork([](intptr_t) {
-        bool state = true;
-
-        Protocols::InteractionModel::Status status = chip::app::Clusters::BooleanState::Attributes::StateValue::Get(1, &state);
-        if (status != Protocols::InteractionModel::Status::Success)
-        {
-            // Failed to read StateValue. Default to true (open state)
-            state = true;
-            ChipLogError(NotSpecified, "ERR: reading boolean status value %x", to_underlying(status));
-        }
-
-        status = chip::app::Clusters::BooleanState::Attributes::StateValue::Set(1, !state);
-        if (status != Protocols::InteractionModel::Status::Success)
-        {
-            ChipLogError(NotSpecified, "ERR: updating boolean status value %x", to_underlying(status));
-        }
+        auto state = chip::app::Clusters::BooleanState::GetStateValue();
+        chip::app::Clusters::BooleanState::SetStateValue(!state);
     });
 }
 

@@ -20,6 +20,7 @@
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/cluster-enums.h>
 #include <app-common/zap-generated/ids/Clusters.h>
+#include <app/clusters/boolean-state-server/CodegenIntegration.h>
 #include <setup_payload/QRCodeSetupPayloadGenerator.h>
 
 #include <string>
@@ -674,7 +675,7 @@ void SetupPretendDevices()
     AddEndpoint("External");
     AddCluster("Contact Sensor");
     AddAttribute("Contact", "true");
-    app::Clusters::BooleanState::Attributes::StateValue::Set(1, true);
+    app::Clusters::BooleanState::SetStateValue(true);
 
     AddDevice("Thermostat");
     AddEndpoint("1");

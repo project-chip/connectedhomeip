@@ -19,6 +19,7 @@
 #include "WaterLeakDetectorManager.h"
 
 #include <app-common/zap-generated/attributes/Accessors.h>
+#include <app/clusters/boolean-state-server/CodegenIntegration.h>
 #include <lib/core/ErrorStr.h>
 #include <lib/support/logging/CHIPLogging.h>
 
@@ -41,7 +42,6 @@ void WaterLeakDetectorManager::InitInstance(EndpointId endpoint)
 
 void WaterLeakDetectorManager::OnLeakDetected(bool detected)
 {
-    Status status = chip::app::Clusters::BooleanState::Attributes::StateValue::Set(mEndpoint, detected);
-    VerifyOrReturn(Status::Success == status, ChipLogError(NotSpecified, "Failed to set BooleanState StateValue attribute"));
+    chip::app::Clusters::BooleanState::SetStateValue(detected);
     ChipLogDetail(NotSpecified, "Leak status updated to: %d", detected);
 }

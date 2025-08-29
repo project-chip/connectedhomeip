@@ -22,6 +22,7 @@
 
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/cluster-enums.h>
+#include <app/clusters/boolean-state-server/CodegenIntegration.h>
 
 namespace example {
 namespace Ui {
@@ -31,16 +32,11 @@ void BooleanState::UpdateState()
 {
     if (mTargetState.HasValue())
     {
-        // TODO: if src/app/clusters/boolean-state exists, we should use its
-        //       mutation API.
-        //
-        // See  https://github.com/project-chip/connectedhomeip/issues/25225 for
-        // the feature request asking for a BooleanState HAL.
-        chip::app::Clusters::BooleanState::Attributes::StateValue::Set(mEndpointId, mTargetState.Value());
+        chip::app::Clusters::BooleanState::SetStateValue(mTargetState.Value());
         mTargetState.ClearValue();
     }
 
-    chip::app::Clusters::BooleanState::Attributes::StateValue::Get(mEndpointId, &mState);
+    mState = chip::app::Clusters::BooleanState::GetStateValue();
 }
 
 void BooleanState::Render()

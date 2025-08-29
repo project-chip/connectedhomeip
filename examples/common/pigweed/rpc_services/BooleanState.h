@@ -22,7 +22,7 @@
 #include "boolean_state_service/boolean_state_service.rpc.pb.h"
 #include "pigweed/rpc_services/internal/StatusUtils.h"
 #include <app-common/zap-generated/attributes/Accessors.h>
-#include <app/EventLogging.h>
+#include <app/clusters/boolean-state-server/CodegenIntegration.h>
 #include <platform/PlatformManager.h>
 
 namespace chip {
@@ -35,18 +35,15 @@ public:
 
     virtual pw::Status Set(const chip_rpc_BooleanStateSetRequest & request, chip_rpc_BooleanStateSetResponse & response)
     {
-        EndpointId endpointId = request.endpoint_id;
-        bool newState         = request.state_value;
+        bool newState = request.state_value;
 
         EventNumber eventNumber;
         {
             DeviceLayer::StackLock lock;
 
             // Update attribute first, then emit StateChange event only on success.
-            RETURN_STATUS_IF_NOT_OK(app::Clusters::BooleanState::Attributes::StateValue::Set(endpointId, newState));
-
-            chip::app::Clusters::BooleanState::Events::StateChange::Type event{ newState };
-            RETURN_STATUS_IF_NOT_OK(app::LogEvent(event, endpointId, eventNumber));
+            app::Clusters::BooleanState::SetStateValue(newState);
+            RETURN_STATUS_IF_NOT_OK(app::Clusters::BooleanState::LogEvent(newState, eventNumber));
         }
 
         response.event_number = static_cast<uint64_t>(eventNumber);
@@ -55,12 +52,11 @@ public:
 
     virtual pw::Status Get(const chip_rpc_BooleanStateGetRequest & request, chip_rpc_BooleanStateGetResponse & response)
     {
-        EndpointId endpointId = request.endpoint_id;
-        bool state_value      = false;
+        bool state_value = false;
 
         {
             DeviceLayer::StackLock lock;
-            RETURN_STATUS_IF_NOT_OK(app::Clusters::BooleanState::Attributes::StateValue::Get(endpointId, &state_value));
+            state_value = app::Clusters::BooleanState::GetStateValue();
         }
 
         response.state.state_value = state_value;

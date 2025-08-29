@@ -207,6 +207,7 @@
             "MaxPathsPerInvoke",
             "ConfigurationVersion"
         ],
+        "Boolean State": ["ClusterRevision", "FeatureMap", "StateValue"],
         "Bridged Device Basic Information": ["ProductAppearance"],
         "Chime": ["SelectedChime", "Enabled"],
         "Closure Control": [

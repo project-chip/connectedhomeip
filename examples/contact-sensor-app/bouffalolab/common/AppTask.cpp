@@ -18,6 +18,7 @@
 
 #include <app-common/zap-generated/attributes/Accessors.h>
 
+#include <app/clusters/boolean-state-server/CodegenIntegration.h>
 #include <app/server/Dnssd.h>
 #include <app/server/Server.h>
 #include <credentials/DeviceAttestationCredsProvider.h>
@@ -200,13 +201,13 @@ void AppTask::AppTaskMain(void * pvParameter)
             if (APP_EVENT_CONTACT_SENSOR_TRUE & appEvent)
             {
                 stateValueAttrValue = 1;
-                app::Clusters::BooleanState::Attributes::StateValue::Set(1, stateValueAttrValue);
+                app::Clusters::BooleanState::SetStateValue(stateValueAttrValue);
             }
 
             if (APP_EVENT_CONTACT_SENSOR_FALSE & appEvent)
             {
                 stateValueAttrValue = 0;
-                app::Clusters::BooleanState::Attributes::StateValue::Set(1, stateValueAttrValue);
+                app::Clusters::BooleanState::SetStateValue(stateValueAttrValue);
             }
 
             PlatformMgr().UnlockChipStack();

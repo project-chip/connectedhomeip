@@ -20,6 +20,7 @@
 #include "LEDManager.h"
 
 #include <app-common/zap-generated/attributes/Accessors.h>
+#include <app/clusters/boolean-state-server/CodegenIntegration.h>
 
 #include <zephyr/kernel.h>
 #include <zephyr/logging/log.h>
@@ -81,11 +82,7 @@ void AppTask::UpdateClusterStateInternal(intptr_t arg)
     ChipLogProgress(NotSpecified, "StateValue::Set : %d", newValue);
 
     // write the new boolean state value
-    Protocols::InteractionModel::Status status = app::Clusters::BooleanState::Attributes::StateValue::Set(1, newValue);
-    if (status != Protocols::InteractionModel::Status::Success)
-    {
-        ChipLogError(NotSpecified, "ERR: updating boolean status value %x", to_underlying(status));
-    }
+    app::Clusters::BooleanState::SetStateValue(newValue);
 }
 
 void AppTask::ContactActionEventHandler(AppEvent * aEvent)
@@ -136,10 +133,8 @@ void AppTask::UpdateDeviceState(void)
 
 void AppTask::UpdateDeviceStateInternal(intptr_t arg)
 {
-    bool stateValueAttrValue = 0;
-
     /* get boolean state attribute value */
-    (void) app::Clusters::BooleanState::Attributes::StateValue::Get(1, &stateValueAttrValue);
+    auto stateValueAttrValue = app::Clusters::BooleanState::GetStateValue();
 
     LedManager::getInstance().setLed(LedManager::EAppLed_App0, stateValueAttrValue);
 }
