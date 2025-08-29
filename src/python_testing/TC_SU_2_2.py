@@ -413,30 +413,8 @@ class TC_SU_2_2(MatterBaseTest):
         await self.add_single_ota_provider(controller, requestor_node_id, provider_node_id_s1)
 
         # ------------------------------------------------------------------------------------
-        # [STEP_1]: Step #1.0 - Controller (DUT/Requestor) sends AnnounceOTAProvider command
-        # ------------------------------------------------------------------------------------
-
-        logger.info(f'{step_number_s1}: Step #1.0 - Controller (DUT/Requestor) sends AnnounceOTAProvider command')
-        cmd_announce = Clusters.OtaSoftwareUpdateRequestor.Commands.AnnounceOTAProvider(
-            providerNodeID=1,  # Provider
-            vendorID=0xFFF1,
-            announcementReason=Clusters.OtaSoftwareUpdateRequestor.Enums.AnnouncementReasonEnum.kUpdateAvailable,
-            metadataForNode=None,
-            endpoint=0
-        )
-        logger.info(f'{step_number_s1}: Step #1.0 - cmd AnnounceOTAProvider: {cmd_announce}')
-
-        resp_announce = await self.send_single_cmd(
-            dev_ctrl=controller,
-            node_id=requestor_node_id,  # DUT NodeID
-            cmd=cmd_announce
-        )
-        logging.info(f'{step_number_s1}: Step #1.0 - cmd AnnounceOTAProvider response: {resp_announce}.')
-
-        # ------------------------------------------------------------------------------------
         # [STEP_1]: Step #1.1 - Matcher for OTA records logs
-        # [STEP_1]: Step #1.1.1 - UpdateState matcher: track "Downloading > Applying > Idle"
-        # [STEP_1]: Step #1.1.2 - UpdateStateProgress matcher: Track progress reaching 99%
+        # Start accumulators first to avoid missing any rapid OTA events (race condition)
         # ------------------------------------------------------------------------------------
 
         logger.info(f'{step_number_s1}: Step #1.1.1 - Create an accumulator for the UpdateState attribute')
@@ -475,7 +453,33 @@ class TC_SU_2_2(MatterBaseTest):
             )
         )
 
-        # Track OTA UpdateState: observed states only once per type, and final idle
+        # ------------------------------------------------------------------------------------
+        # [STEP_1]: Step #1.0 - Controller (DUT/Requestor) sends AnnounceOTAProvider command
+        # ------------------------------------------------------------------------------------
+
+        logger.info(f'{step_number_s1}: Step #1.0 - Controller (DUT/Requestor) sends AnnounceOTAProvider command')
+        cmd_announce = Clusters.OtaSoftwareUpdateRequestor.Commands.AnnounceOTAProvider(
+            providerNodeID=1,  # Provider
+            vendorID=0xFFF1,
+            announcementReason=Clusters.OtaSoftwareUpdateRequestor.Enums.AnnouncementReasonEnum.kUpdateAvailable,
+            metadataForNode=None,
+            endpoint=0
+        )
+        logger.info(f'{step_number_s1}: Step #1.0 - cmd AnnounceOTAProvider: {cmd_announce}')
+
+        resp_announce = await self.send_single_cmd(
+            dev_ctrl=controller,
+            node_id=requestor_node_id,  # DUT NodeID
+            cmd=cmd_announce
+        )
+        logging.info(f'{step_number_s1}: Step #1.0 - cmd AnnounceOTAProvider response: {resp_announce}.')
+
+        # ------------------------------------------------------------------------------------
+        # [STEP_1]: Step #1.1 -  Track OTA UpdateState: observed states only once per type, and final idle
+        # [STEP_1]: Step #1.1.1 - UpdateState matcher: track "Downloading > Applying > Idle"
+        # [STEP_1]: Step #1.1.2 - UpdateStateProgress matcher: Track progress reaching 99%
+        # ------------------------------------------------------------------------------------
+
         observed_states = set()
         state_sequence = []  # Full OTA state flow
         final_idle_seen = False
@@ -666,28 +670,10 @@ class TC_SU_2_2(MatterBaseTest):
         await asyncio.sleep(2)
 
         # ------------------------------------------------------------------------------------
-        # [STEP_2]: Step #2.0 - Controller (DUT/Requestor) sends AnnounceOTAProvider command
+        # [STEP_2]: Step #2.1 - Matcher for OTA records logs
+        # Start accumulators first to avoid missing any rapid OTA events (race condition)
         # ------------------------------------------------------------------------------------
-        logger.info("Step #2.0 - Controller (DUT/Requestor) sends AnnounceOTAProvider command")
-        cmd_announce = Clusters.OtaSoftwareUpdateRequestor.Commands.AnnounceOTAProvider(
-            providerNodeID=provider_node_id_s2,  # Provider_S2
-            vendorID=0xFFF1,
-            announcementReason=Clusters.OtaSoftwareUpdateRequestor.Enums.AnnouncementReasonEnum.kUpdateAvailable,
-            metadataForNode=None,
-            endpoint=0
-        )
-        logger.info(f'{step_number_s2}: - cmd AnnounceOTAProvider: {cmd_announce}')
 
-        resp_announce = await self.send_single_cmd(
-            dev_ctrl=controller,
-            node_id=requestor_node_id,  # DUT NodeID
-            cmd=cmd_announce
-        )
-        logging.info(f'{step_number_s2}: - cmd AnnounceOTAProvider response: {resp_announce}.')
-
-        # ------------------------------------------------------------------------------------
-        # [STEP_2]: Step # 2.1 - Matcher for OTA records logs
-        # ------------------------------------------------------------------------------------
         logger.info(f'{step_number_s2}:Step #2.1 - Validate DUT respects minimum QueryImage interval after Busy response.')
         t_start_query = time.time()
 
@@ -709,7 +695,32 @@ class TC_SU_2_2(MatterBaseTest):
             keepSubscriptions=True
         )
 
+        # ------------------------------------------------------------------------------------
+        # [STEP_2]: Step #2.0 - Controller (DUT/Requestor) sends AnnounceOTAProvider command
+        # ------------------------------------------------------------------------------------
+
+        logger.info("Step #2.0 - Controller (DUT/Requestor) sends AnnounceOTAProvider command")
+        cmd_announce = Clusters.OtaSoftwareUpdateRequestor.Commands.AnnounceOTAProvider(
+            providerNodeID=provider_node_id_s2,  # Provider_S2
+            vendorID=0xFFF1,
+            announcementReason=Clusters.OtaSoftwareUpdateRequestor.Enums.AnnouncementReasonEnum.kUpdateAvailable,
+            metadataForNode=None,
+            endpoint=0
+        )
+        logger.info(f'{step_number_s2}: - cmd AnnounceOTAProvider: {cmd_announce}')
+
+        resp_announce = await self.send_single_cmd(
+            dev_ctrl=controller,
+            node_id=requestor_node_id,  # DUT NodeID
+            cmd=cmd_announce
+        )
+        logging.info(f'{step_number_s2}: - cmd AnnounceOTAProvider response: {resp_announce}.')
+
+        # ------------------------------------------------------------------------------------
+        # [STEP_2]: Step #2.1 - Matcher for OTA records logs
         # Track OTA UpdateState: observed states only once per type, and final idle
+        # ------------------------------------------------------------------------------------
+
         observed_states = set()
         state_sequence = []  # Full OTA state flow
         final_downloading_seen = False
