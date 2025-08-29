@@ -45,7 +45,7 @@ from matter.ChipDeviceCtrl import TransportPayloadCapability
 from matter.clusters import Objects, WebRTCTransportProvider
 from matter.clusters.Types import NullValue
 from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
-from matter.webrtc import PeerConnection, WebRTCManager
+from matter.webrtc import LibdatachannelPeerConnection, WebRTCManager
 
 
 class TC_WEBRTC_1_2(MatterBaseTest, WebRTCTestHelper):
@@ -109,12 +109,14 @@ class TC_WEBRTC_1_2(MatterBaseTest, WebRTCTestHelper):
 
         endpoint = self.get_endpoint(default=1)
         webrtc_manager = WebRTCManager(event_loop=self.event_loop)
-        webrtc_peer: PeerConnection = webrtc_manager.create_peer(
+        webrtc_peer: LibdatachannelPeerConnection = webrtc_manager.create_peer(
             node_id=self.dut_node_id, fabric_index=self.default_controller.GetFabricIndexInternal(), endpoint=endpoint
         )
         # Test Invokation
+        aVideoStreamId = await self.allocate_video_stream(endpoint)
+
         self.step("precondition-2")
-        if not await establish_webrtc_session(webrtc_manager, webrtc_peer, endpoint, self):
+        if not await establish_webrtc_session(webrtc_manager, webrtc_peer, endpoint, self, aVideoStreamId):
             raise Exception("Failed to create WebRTC session")
 
         self.step(1)
@@ -134,6 +136,7 @@ class TC_WEBRTC_1_2(MatterBaseTest, WebRTCTestHelper):
                 sdp=offer,
                 streamUsage=Objects.Globals.Enums.StreamUsageEnum.kLiveView,
                 originatingEndpointID=1,
+                videoStreamID=aVideoStreamId,
             ),
             endpoint=endpoint,
             payloadCapability=TransportPayloadCapability.LARGE_PAYLOAD,
@@ -144,7 +147,7 @@ class TC_WEBRTC_1_2(MatterBaseTest, WebRTCTestHelper):
         )
 
         self.step(3)
-        answer_sessionId, answer = await webrtc_peer.get_remote_answer(timeout=30)
+        answer_sessionId, answer = await webrtc_peer.get_remote_answer(timeout_s=30)
 
         asserts.assert_equal(prev_sessionid, answer_sessionId, "Session id does not match with the previous session")
         asserts.assert_true(len(answer) > 0, "Invalid answer SDP received")
@@ -169,7 +172,7 @@ class TC_WEBRTC_1_2(MatterBaseTest, WebRTCTestHelper):
         ice_session_id, remote_candidates = await webrtc_peer.get_remote_ice_candidates()
         asserts.assert_equal(prev_sessionid, ice_session_id, "ProvideIceCandidates invoked with wrong session id")
         asserts.assert_true(len(remote_candidates) > 0, "Invalid remote ice candidates received")
-        webrtc_peer.set_remote_ice_candidates(remote_candidates)
+        webrtc_peer.set_remote_ice_candidates([cand.candidate for cand in remote_candidates])
 
         self.step(7)
         if not webrtc_peer.is_session_connected():
@@ -188,20 +191,19 @@ class TC_WEBRTC_1_2(MatterBaseTest, WebRTCTestHelper):
             payloadCapability=TransportPayloadCapability.LARGE_PAYLOAD,
         )
 
-        webrtc_manager.close_all()
+        await webrtc_manager.close_all()
 
 
-async def establish_webrtc_session(webrtc_manager, webrtc_peer, endpoint, ctrl):
+async def establish_webrtc_session(webrtc_manager, webrtc_peer, endpoint, ctrl, allocated_video_streamid):
     webrtc_peer.create_offer()
     offer = await webrtc_peer.get_local_offer()
-    aVideoStreamId = await ctrl.allocate_video_stream(endpoint)
     provide_offer_response: WebRTCTransportProvider.Commands.ProvideOfferResponse = await webrtc_peer.send_command(
         cmd=WebRTCTransportProvider.Commands.ProvideOffer(
             webRTCSessionID=NullValue,
             sdp=offer,
             streamUsage=Objects.Globals.Enums.StreamUsageEnum.kLiveView,
             originatingEndpointID=1,
-            videoStreamID=aVideoStreamId,
+            videoStreamID=allocated_video_streamid,
         ),
         endpoint=endpoint,
         payloadCapability=TransportPayloadCapability.LARGE_PAYLOAD,
@@ -209,7 +211,7 @@ async def establish_webrtc_session(webrtc_manager, webrtc_peer, endpoint, ctrl):
     asserts.assert_true(provide_offer_response.webRTCSessionID >= 0, "Invalid response")
     webrtc_manager.session_id_created(provide_offer_response.webRTCSessionID, ctrl.dut_node_id)
 
-    answer_sessionId, answer = await webrtc_peer.get_remote_answer(timeout=30)
+    answer_sessionId, answer = await webrtc_peer.get_remote_answer(timeout_s=30)
     webrtc_peer.set_remote_answer(answer)
 
     local_candidates = await webrtc_peer.get_local_ice_candidates()
@@ -225,7 +227,7 @@ async def establish_webrtc_session(webrtc_manager, webrtc_peer, endpoint, ctrl):
     )
 
     ice_session_id, remote_candidates = await webrtc_peer.get_remote_ice_candidates()
-    webrtc_peer.set_remote_ice_candidates(remote_candidates)
+    webrtc_peer.set_remote_ice_candidates([cand.candidate for cand in remote_candidates])
 
     return await webrtc_peer.check_for_session_establishment()
 

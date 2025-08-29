@@ -263,12 +263,15 @@ matter_python_wheel_action("matter-core") {
       if (chip_support_webrtc_python_bindings) {
         sources += [
           "matter/webrtc/__init__.py",
+          "matter/webrtc/async_websocket_client.py",
+          "matter/webrtc/browser_peer_connection.py",
+          "matter/webrtc/browser_webrtc_client.py",
           "matter/webrtc/command.py",
+          "matter/webrtc/libdatachannel_peer_connection.py",
+          "matter/webrtc/libdatachannel_webrtc_client.py",
           "matter/webrtc/library_handle.py",
-          "matter/webrtc/peer_connection.py",
           "matter/webrtc/types.py",
           "matter/webrtc/utils.py",
-          "matter/webrtc/webrtc_client.py",
           "matter/webrtc/webrtc_manager.py",
         ]
       }

@@ -15,11 +15,13 @@
 #  limitations under the License.
 #
 
+from ctypes import string_at
+
 from .library_handle import _GetWebRTCLibraryHandle
 from .types import GatheringCompleteCallbackType, IceCandidateCallbackType, LocalDescriptionCallbackType, StateChangeCallback
 
 
-class WebRTCClient:
+class LibdatachannelWebRTCClient:
     def __init__(self):
         self._lib = _GetWebRTCLibraryHandle()
         self._handle = self._lib.pychip_webrtc_client_create()
@@ -64,7 +66,7 @@ class WebRTCClient:
         return self._lib.pychip_webrtc_get_local_description(self._handle).decode("utf-8")
 
     def get_peer_connection_state(self):
-        return self._lib.pychip_webrtc_get_peer_connection_state(self._handle)
+        return self._lib.pychip_webrtc_get_peer_connection_state(self._handle).decode("utf-8")
 
     def on_gathering_complete(self, callback):
         def c_callback():
@@ -74,8 +76,8 @@ class WebRTCClient:
         self._lib.pychip_webrtc_client_set_gathering_complete_callback(self._handle, self._gathering_cb)
 
     def on_state_change(self, callback):
-        def c_callback(state):
-            callback(state)
+        def c_callback(state: bytes):
+            callback(string_at(state).decode("utf-8"))
 
         self._on_state_change_cb = StateChangeCallback(c_callback)
         self._lib.pychip_webrtc_client_set_state_change_callback(self._handle, self._on_state_change_cb)

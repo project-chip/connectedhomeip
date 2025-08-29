@@ -45,7 +45,7 @@ from matter.ChipDeviceCtrl import TransportPayloadCapability
 from matter.clusters import Objects, WebRTCTransportProvider
 from matter.clusters.Types import NullValue
 from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
-from matter.webrtc import PeerConnection, WebRTCManager
+from matter.webrtc import LibdatachannelPeerConnection, WebRTCManager
 
 
 class TC_WEBRTC_1_1(MatterBaseTest, WebRTCTestHelper):
@@ -101,7 +101,7 @@ class TC_WEBRTC_1_1(MatterBaseTest, WebRTCTestHelper):
 
         endpoint = self.get_endpoint(default=1)
         webrtc_manager = WebRTCManager(event_loop=self.event_loop)
-        webrtc_peer: PeerConnection = webrtc_manager.create_peer(
+        webrtc_peer: LibdatachannelPeerConnection = webrtc_manager.create_peer(
             node_id=self.dut_node_id, fabric_index=self.default_controller.GetFabricIndexInternal(), endpoint=endpoint
         )
 
@@ -166,7 +166,7 @@ class TC_WEBRTC_1_1(MatterBaseTest, WebRTCTestHelper):
         asserts.assert_equal(session_id, ice_session_id, "ProvideIceCandidates invoked with wrong session id")
         asserts.assert_true(len(remote_candidates) > 0, "Invalid remote ice candidates received")
 
-        webrtc_peer.set_remote_ice_candidates(remote_candidates)
+        webrtc_peer.set_remote_ice_candidates([cand.candidate for cand in remote_candidates])
 
         self.step(6)
         if not await webrtc_peer.check_for_session_establishment():
@@ -185,7 +185,7 @@ class TC_WEBRTC_1_1(MatterBaseTest, WebRTCTestHelper):
             payloadCapability=TransportPayloadCapability.LARGE_PAYLOAD,
         )
 
-        webrtc_manager.close_all()
+        await webrtc_manager.close_all()
 
 
 if __name__ == "__main__":

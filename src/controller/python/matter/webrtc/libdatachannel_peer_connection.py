@@ -20,13 +20,13 @@ import logging
 from typing import Optional
 
 from .command import WebRTCProviderCommand
-from .types import Events, IceCandiate, IceCandidateList, PeerConnectionState
+from .libdatachannel_webrtc_client import LibdatachannelWebRTCClient
+from .types import Events, IceCandidate, IceCandidateList, PeerConnectionState
 from .utils import AsyncEventQueue
-from .webrtc_client import WebRTCClient
 
 
-class PeerConnection(WebRTCClient):
-    """Manages a WebRTC peer connection, handling events such as offers, answers, ICE candidates,
+class LibdatachannelPeerConnection(LibdatachannelWebRTCClient):
+    """Manages a libdatachannel WebRTC peer connection, handling events such as offers, answers, ICE candidates,
     and state changes including events through matter commands. Provides asynchronous methods
     to interact with the connection, including session setup, description and ice candidate
     setting and handle incoming commands from matter.
@@ -41,7 +41,7 @@ class PeerConnection(WebRTCClient):
         PeerConnection
     """
 
-    def __init__(self, node_id: int, fabric_index: int, endpoint: int, event_loop: None | asyncio.AbstractEventLoop = None):
+    def __init__(self, node_id: int, fabric_index: int, endpoint: int, event_loop: Optional[asyncio.AbstractEventLoop] = None):
         super().__init__()
         self.event_loop = event_loop or asyncio.get_running_loop()
 
@@ -71,8 +71,7 @@ class PeerConnection(WebRTCClient):
         self.fabric_index = fabric_index
         self.endpoint = endpoint
         self._command_sender = WebRTCProviderCommand()
-        self._command_sender.init(self._handle, self.dut_node_id, self.fabric_index, self.endpoint)
-        self._command_sender.init_callback(self._handle)
+        self._command_sender.init(self.dut_node_id, self.fabric_index, self.endpoint)
 
         # Set native callbacks
         self.on_ice_candidate(self.on_ice_candidate_cb)
@@ -84,7 +83,7 @@ class PeerConnection(WebRTCClient):
         default_stun_url = "stun:stun.l.google.com:19302"
         self.create_peer_connection(stun_url=default_stun_url)
 
-    async def get_local_ice_candidates(self, timeout: int | None = None) -> list[IceCandiate]:
+    async def get_local_ice_candidates(self, timeout_s: Optional[int] = None) -> list[IceCandidate]:
         """Retrieves the local ICE candidates for the WebRTC peer connection.
 
         Waits for gathering complete to return ice candidates.
@@ -92,7 +91,7 @@ class PeerConnection(WebRTCClient):
         Ensure that the WebRTC peer connection is properly initialized before calling this function.
 
         Args:
-            timeout (int | None): The maximum time in seconds to wait for a candidate.
+            timeout_s (Optional[int]): The maximum time in seconds to wait for a candidate.
             If None, the function will wait indefinitely.
 
         Returns:
@@ -105,7 +104,7 @@ class PeerConnection(WebRTCClient):
             return self._ice_candidates.candidates
 
         while True:
-            candidate = await self._local_events[Events.ICE_CANDIDATE].get(timeout)
+            candidate = await self._local_events[Events.ICE_CANDIDATE].get(timeout_s)
             if candidate == self._ice_sentinel:
                 break
             self._ice_candidates.candidates.append(candidate)
@@ -182,11 +181,11 @@ class PeerConnection(WebRTCClient):
         """
         self.set_remote_description(offer_sdp, "offer")
 
-    async def get_remote_offer(self, timeout: int | None = None) -> tuple[int, str]:
+    async def get_remote_offer(self, timeout_s: Optional[int] = None) -> tuple[int, str]:
         """Waits for a remote SDP offer to be received through a matter command.
 
         Args:
-            timeout (int | None): The maximum time in seconds to wait for a remote offer.
+            timeout_s (Optional[int]): The maximum time in seconds to wait for a remote offer.
             If None, the function will wait indefinitely.
 
         Returns:
@@ -196,13 +195,13 @@ class PeerConnection(WebRTCClient):
             asyncio.TimeoutError: If no remote offer is received within the specified timeout period.
         """
         logging.debug("Waiting for remote offer")
-        return await self._remote_events[Events.OFFER].get(timeout)
+        return await self._remote_events[Events.OFFER].get(timeout_s)
 
-    async def get_remote_answer(self, timeout: int | None = None) -> tuple[int, str]:
+    async def get_remote_answer(self, timeout_s: Optional[int] = None) -> tuple[int, str]:
         """Waits for a remote SDP answer to be received through a matter command.
 
         Args:
-            timeout (int | None): The maximum time in seconds to wait for a remote offer.
+            timeout_s (Optional[int]): The maximum time in seconds to wait for a remote offer.
             If None, the function will wait indefinitely.
 
         Returns:
@@ -212,13 +211,13 @@ class PeerConnection(WebRTCClient):
             asyncio.TimeoutError: If no remote offer is received within the specified timeout period.
         """
         logging.debug("Waiting for remote answer")
-        return await self._remote_events[Events.ANSWER].get(timeout)
+        return await self._remote_events[Events.ANSWER].get(timeout_s)
 
-    async def get_remote_ice_candidates(self, timeout: int | None = None) -> tuple[int, list[str]]:
+    async def get_remote_ice_candidates(self, timeout_s: Optional[int] = None) -> tuple[int, list[str]]:
         """Waits for a remote SDP answer to be received through a matter command.
 
         Args:
-            timeout (int | None): The maximum time in seconds to wait for a remote offer.
+            timeout_s (Optional[int]): The maximum time in seconds to wait for a remote offer.
             If None, the function will wait indefinitely.
 
         Returns:
@@ -228,7 +227,7 @@ class PeerConnection(WebRTCClient):
             asyncio.TimeoutError: If no remote offer is received within the specified timeout period.
         """
         logging.debug("waiting for remote iceCandidates")
-        return await self._remote_events[Events.ICE_CANDIDATE].get(timeout)
+        return await self._remote_events[Events.ICE_CANDIDATE].get(timeout_s)
 
     async def check_for_session_establishment(self) -> bool:
         """Monitors the peer connection state and determines if a session has been successfully established.
@@ -269,7 +268,7 @@ class PeerConnection(WebRTCClient):
         # clear old events
         self._local_events[Events.PEER_CONNECTION_STATE].clear()
         # get latest state
-        self._peer_state = PeerConnectionState(self.get_peer_connection_state())
+        self._peer_state = PeerConnectionState(self.get_peer_connection_state().lower())
         return self._peer_state == PeerConnectionState.CONNECTED
 
     async def send_command(self, *args, **kwargs):
@@ -284,12 +283,12 @@ class PeerConnection(WebRTCClient):
         Returns:
             Response Type if applicable.
         """
-        return await self._command_sender.send_webrtc_provider_command(self._handle, *args, **kwargs)
+        return await self._command_sender.send_webrtc_provider_command(*args, **kwargs)
 
     # Callbacks from WebRTC Client Library
     def on_ice_candidate_cb(self, candidate: str, mid: str) -> None:
         """Callback function called when a local ICE candidate is received."""
-        self._local_events[Events.ICE_CANDIDATE].put(IceCandiate(candidate=candidate, mid=mid))
+        self._local_events[Events.ICE_CANDIDATE].put(IceCandidate(candidate=candidate, sdpMid=mid))
 
     def on_local_description_cb(self, sdp: str, type: str) -> None:
         """Callback function called when a local SDP description is received."""
@@ -300,9 +299,9 @@ class PeerConnection(WebRTCClient):
         """Callback function called when the ICE candidate gathering process is complete."""
         self._local_events[Events.ICE_CANDIDATE].put(self._ice_sentinel)
 
-    def on_state_change_cb(self, state: int) -> None:
+    def on_state_change_cb(self, state: str) -> None:
         """Callback function called when the state of the WebRTC peer connection changes."""
-        self._local_events[Events.PEER_CONNECTION_STATE].put(PeerConnectionState(state))
+        self._local_events[Events.PEER_CONNECTION_STATE].put(PeerConnectionState(state.lower()))
 
     # Callbacks from WebRTC Requestor Delegates
     def on_remote_offer(self, sessionId: int, offer_sdp: str) -> None:
