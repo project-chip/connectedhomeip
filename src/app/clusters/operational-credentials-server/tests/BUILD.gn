@@ -18,16 +18,17 @@ import("//build_overrides/chip.gni")
 import("${chip_root}/build/chip/chip_test_suite.gni")
 
 chip_test_suite("tests") {
-  output_name = "libTestAdministratorCommissioningCluster"
+  output_name = "libTestOperationalCredentialsCluster"
 
-  test_sources = [ "TestAdministratorCommissioningCluster.cpp" ]
+  test_sources = [
+    "TestOperationalCredentials.cpp",
+  ]
 
   cflags = [ "-Wconversion" ]
 
   public_deps = [
-    "${chip_root}/src/app/clusters/administrator-commissioning-server",
+    "${chip_root}/src/app/clusters/operational-credentials-server",
     "${chip_root}/src/app/clusters/testing",
-    "${chip_root}/src/lib/core:string-builder-adapters",
     "${chip_root}/src/lib/support",
   ]
 }

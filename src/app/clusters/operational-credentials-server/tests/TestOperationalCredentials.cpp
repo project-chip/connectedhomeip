@@ -15,14 +15,76 @@
  */
 #include <pw_unit_test/framework.h>
 
+#include <app/clusters/operational-credentials-server/operational-credentials-cluster.h>
+#include <app/clusters/testing/AttributeTesting.h>
+#include <app/data-model-provider/MetadataTypes.h>
+#include <app/server-cluster/DefaultServerCluster.h>
+#include <clusters/OperationalCredentials/Metadata.h>
+#include <lib/core/CHIPError.h>
+#include <lib/core/DataModelTypes.h>
+#include <lib/support/ReadOnlyBuffer.h>
+
+namespace {
+
+using namespace chip;
+using namespace chip::app::Clusters;
+using namespace chip::app::Clusters::OperationalCredentials;
+
+using chip::app::DataModel::AcceptedCommandEntry;
+using chip::app::DataModel::AttributeEntry;
+
 // initialize memory as ReadOnlyBufferBuilder may allocate
 struct TestOperationalCredentials : public ::testing::Test
 {
-    static void SetUpTestSuite() {  }
-    static void TearDownTestSuite() {  }
+    static void SetUpTestSuite() { ASSERT_EQ(chip::Platform::MemoryInit(), CHIP_NO_ERROR); }
+    static void TearDownTestSuite() { chip::Platform::MemoryShutdown(); }
 };
 
 TEST_F(TestOperationalCredentials, TestAttributes)
 {
-    ASSERT_TRUE(true);
+    OperationalCredentialsCluster cluster(kRootEndpointId);
+
+    ReadOnlyBufferBuilder<AttributeEntry> builder;
+    ASSERT_EQ(cluster.Attributes({ kRootEndpointId, OperationalCredentials::Id }, builder), CHIP_NO_ERROR);
+
+    ReadOnlyBufferBuilder<AttributeEntry> expectedBuilder;
+    ASSERT_EQ(expectedBuilder.AppendElements({
+                  OperationalCredentials::Attributes::NOCs::kMetadataEntry,
+                  OperationalCredentials::Attributes::Fabrics::kMetadataEntry,
+                  OperationalCredentials::Attributes::SupportedFabrics::kMetadataEntry,
+                  OperationalCredentials::Attributes::CommissionedFabrics::kMetadataEntry,
+                  OperationalCredentials::Attributes::TrustedRootCertificates::kMetadataEntry,
+                  OperationalCredentials::Attributes::CurrentFabricIndex::kMetadataEntry,
+              }),
+              CHIP_NO_ERROR);
+    ASSERT_EQ(expectedBuilder.ReferenceExisting(app::DefaultServerCluster::GlobalAttributes()), CHIP_NO_ERROR);
+
+    ASSERT_TRUE(Testing::EqualAttributeSets(builder.TakeBuffer(), expectedBuilder.TakeBuffer()));
 }
+
+TEST_F(TestOperationalCredentials, TestCommands)
+{
+    OperationalCredentialsCluster cluster(kRootEndpointId);
+
+    ReadOnlyBufferBuilder<AcceptedCommandEntry> builder;
+    ASSERT_EQ(cluster.AcceptedCommands({ kRootEndpointId, OperationalCredentials::Id }, builder), CHIP_NO_ERROR);
+
+    ReadOnlyBufferBuilder<AcceptedCommandEntry> expectedBuilder;
+    ASSERT_EQ(expectedBuilder.AppendElements({
+                  OperationalCredentials::Commands::AttestationRequest::kMetadataEntry,
+                  OperationalCredentials::Commands::CertificateChainRequest::kMetadataEntry,
+                  OperationalCredentials::Commands::CSRRequest::kMetadataEntry,
+                  OperationalCredentials::Commands::AddNOC::kMetadataEntry,
+                  OperationalCredentials::Commands::UpdateNOC::kMetadataEntry,
+                  OperationalCredentials::Commands::UpdateFabricLabel::kMetadataEntry,
+                  OperationalCredentials::Commands::RemoveFabric::kMetadataEntry,
+                  OperationalCredentials::Commands::AddTrustedRootCertificate::kMetadataEntry,
+                  OperationalCredentials::Commands::SetVIDVerificationStatement::kMetadataEntry,
+                  OperationalCredentials::Commands::SignVIDVerificationRequest::kMetadataEntry,
+              }),
+              CHIP_NO_ERROR);
+
+    EXPECT_TRUE(Testing::EqualAcceptedCommandSets(builder.TakeBuffer(), expectedBuilder.TakeBuffer()));
+}
+
+} // namespace
