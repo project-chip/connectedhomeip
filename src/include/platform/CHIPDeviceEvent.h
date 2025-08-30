@@ -553,6 +553,7 @@ struct ChipDeviceEvent final
             bool addNocCommandHasBeenInvoked;
             bool updateNocCommandHasBeenInvoked;
             bool updateTermsAndConditionsHasBeenInvoked;
+            bool setVidVerificationStatementHasBeenInvoked;
         } FailSafeTimerExpired;
 
         struct

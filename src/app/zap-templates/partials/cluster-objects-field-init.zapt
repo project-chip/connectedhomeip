@@ -8,7 +8,7 @@
           {{~#if_is_struct type}}
             {{! Structs have their own initializers }}
           {{~else~}}
-          = static_cast<{{zapTypeToEncodableClusterObjectType type ns=ns}}>(0)
+          = static_cast<{{zapTypeToEncodableClusterObjectType type ns=ns cluster=cluster}}>(0)
           {{~/if_is_struct}}
         {{~/unless}}
       {{~/unless}}

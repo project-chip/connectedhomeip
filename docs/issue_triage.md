@@ -106,6 +106,7 @@ types or functionality) as well as individual examples.
 | `examples/build_overrides`                     |                              | UNMAINTAINED |
 | `examples/chef`                                | Andrei Litvin                |              |
 | `examples/chip-tool`                           |                              | UNMAINTAINED |
+| `examples/closure-app`                         | Satyanaag Bollimpalli        |              |
 | `examples/contact-sensor-app`                  |                              | UNMAINTAINED |
 | `examples/darwin-framework-tool`               | Boris Zbarsky                |              |
 | `examples/dishwasher-app`                      |                              | UNMAINTAINED |
@@ -113,6 +114,8 @@ types or functionality) as well as individual examples.
 | `examples/fabric-admin`                        | Yufeng Wang, Terence Hampson |              |
 | `examples/fabric-bridge-app`                   | Yufeng Wang, Terence Hampson |              |
 | `examples/java-matter-controller`              | Yunhan Wang, Yufeng Wang     |              |
+| `examples/jf-admin-app`                        | Doru Gucea                   |              |
+| `examples/jf-control-app`                      | Doru Gucea                   |              |
 | `examples/kotlin-matter-controller`            | Yunhan Wang, Yufeng Wang     |              |
 | `examples/laundry-washer-app`                  |                              | UNMAINTAINED |
 | `examples/lighting-app`                        | Junior Martinez              |              |

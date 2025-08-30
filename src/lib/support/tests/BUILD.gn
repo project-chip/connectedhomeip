@@ -31,6 +31,7 @@ chip_test_suite("tests") {
   output_name = "libSupportTests"
 
   test_sources = [
+    "TestAutoRelease.cpp",
     "TestBitMask.cpp",
     "TestBufferReader.cpp",
     "TestBufferWriter.cpp",
@@ -50,6 +51,7 @@ chip_test_suite("tests") {
     "TestPersistedCounter.cpp",
     "TestPool.cpp",
     "TestPrivateHeap.cpp",
+    "TestReadOnlyBuffer.cpp",
     "TestSafeInt.cpp",
     "TestSafeString.cpp",
     "TestScoped.cpp",

@@ -18,9 +18,6 @@
 
 #pragma once
 
-#include <platform/CHIPDeviceConfig.h>
-#include <platform/CommissionableDataProvider.h>
-
 #include "app/clusters/ota-requestor/OTARequestorInterface.h"
 #include "app/icd/server/ICDNotifier.h"
 #include "app/server/CommissioningWindowManager.h"
@@ -33,6 +30,8 @@
 #include "platform/PlatformManager.h"
 #include "setup_payload/OnboardingCodesUtil.h"
 #include <crypto/CHIPCryptoPAL.h>
+#include <platform/CHIPDeviceConfig.h>
+#include <platform/CommissionableDataProvider.h>
 #include <platform/DeviceInstanceInfoProvider.h>
 #include <setup_payload/QRCodeSetupPayloadGenerator.h>
 
@@ -482,13 +481,28 @@ public:
         return pw::OkStatus();
     }
 
-    virtual pw::Status TriggerIcdCheckin(const pw_protobuf_Empty & request, pw_protobuf_Empty & response)
+    virtual pw::Status ShutdownAllSubscriptions(const pw_protobuf_Empty & request, pw_protobuf_Empty & response)
     {
 #if CHIP_CONFIG_ENABLE_ICD_CIP
         chip::DeviceLayer::PlatformMgr().ScheduleWork(
             [](intptr_t) {
                 chip::app::InteractionModelEngine::GetInstance()->ShutdownAllSubscriptionHandlers();
-                ChipLogDetail(AppServer, "Being triggerred to send ICD check-in message to subscriber");
+                ChipLogDetail(AppServer, "Being triggered to shutdown all subscriptions in server side");
+            },
+            reinterpret_cast<intptr_t>(nullptr));
+        return pw::OkStatus();
+#else  // CHIP_CONFIG_ENABLE_ICD_CIP
+        ChipLogError(AppServer, "ShutdownAllSubscriptions is not supported");
+        return pw::Status::Unimplemented();
+#endif // CHIP_CONFIG_ENABLE_ICD_CIP
+    }
+
+    virtual pw::Status TriggerIcdCheckin(const pw_protobuf_Empty & request, pw_protobuf_Empty & response)
+    {
+#if CHIP_CONFIG_ENABLE_ICD_CIP
+        chip::DeviceLayer::PlatformMgr().ScheduleWork(
+            [](intptr_t) {
+                ChipLogDetail(AppServer, "Being triggered to send ICD check-in message to subscriber");
                 chip::app::ICDNotifier::GetInstance().NotifyNetworkActivityNotification();
             },
             reinterpret_cast<intptr_t>(nullptr));

@@ -18,10 +18,10 @@
 import unittest
 from unittest.mock import mock_open, patch
 
-from matter_yamltests.errors import (TestStepGroupResponseError, TestStepInvalidTypeError, TestStepKeyError,
+from matter.yamltests.errors import (TestStepGroupResponseError, TestStepInvalidTypeError, TestStepKeyError,
                                      TestStepNodeIdAndGroupIdError, TestStepValueAndValuesError,
                                      TestStepVerificationStandaloneError)
-from matter_yamltests.yaml_loader import YamlLoader
+from matter.yamltests.yaml_loader import YamlLoader
 
 
 def mock_open_with_parameter_content(content):

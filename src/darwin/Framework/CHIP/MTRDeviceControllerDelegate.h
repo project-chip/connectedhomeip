@@ -68,6 +68,8 @@ MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
  * Exactly one of error and nodeID will be nil.
  *
  * If nodeID is not nil, then it represents the node id the node was assigned, as encoded in its operational certificate.
+ *
+ * This selector will not be used if controller:commissioningComplete:nodeID:metrics: is supported.
  */
 - (void)controller:(MTRDeviceController *)controller
     commissioningComplete:(NSError * _Nullable)error
@@ -81,6 +83,8 @@ MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
  * If nodeID is not nil, then it represents the node id the node was assigned, as encoded in its operational certificate.
  *
  * The metrics object contains information corresponding to the commissioning session.
+ *
+ * If supported, this selector will be used in preference to controller:commissioningComplete:nodeID:.
  */
 - (void)controller:(MTRDeviceController *)controller
     commissioningComplete:(NSError * _Nullable)error

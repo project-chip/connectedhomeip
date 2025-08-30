@@ -818,7 +818,7 @@ void BLEManagerCommon::DriveBLEState(void)
 exit:
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(DeviceLayer, "Disabling CHIPoBLE service due to error: %s", ErrorStr(err));
+        ChipLogError(DeviceLayer, "Disabling CHIPoBLE service due to error: %" CHIP_ERROR_FORMAT, err.Format());
         mServiceMode = kCHIPoBLE_Disabled;
     }
 }
@@ -932,10 +932,6 @@ void BLEManagerCommon::HandleConnectEvent(blekw_msg_t * msg)
     uint8_t deviceId = msg->data.u8;
     ChipLogProgress(DeviceLayer, "BLE is connected with device: %d.\n", deviceId);
 
-#if gClkUseFro32K && defined(nxp_use_low_power) && (nxp_use_low_power == 1)
-    PWR_DisallowDeviceToSleep();
-#endif
-
     mDeviceIds.insert(deviceId);
 
     if (mServiceMode == kCHIPoBLE_Enabled)
@@ -954,10 +950,6 @@ void BLEManagerCommon::HandleConnectionCloseEvent(blekw_msg_t * msg)
 {
     uint8_t deviceId = msg->data.u8;
     ChipLogProgress(DeviceLayer, "BLE is disconnected with device: %d.\n", deviceId);
-
-#if gClkUseFro32K && defined(nxp_use_low_power) && (nxp_use_low_power == 1)
-    PWR_AllowDeviceToSleep();
-#endif
 
     mDeviceIds.erase(deviceId);
 
@@ -1041,7 +1033,7 @@ void BLEManagerCommon::HandleTXCharCCCDWrite(blekw_msg_t * msg)
 exit:
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(DeviceLayer, "HandleTXCharCCCDWrite() failed: %s", ErrorStr(err));
+        ChipLogError(DeviceLayer, "HandleTXCharCCCDWrite() failed: %" CHIP_ERROR_FORMAT, err.Format());
     }
 }
 
@@ -1076,7 +1068,7 @@ void BLEManagerCommon::HandleRXCharWrite(blekw_msg_t * msg)
 exit:
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(DeviceLayer, "HandleRXCharWrite() failed: %s", ErrorStr(err));
+        ChipLogError(DeviceLayer, "HandleRXCharWrite() failed: %" CHIP_ERROR_FORMAT, err.Format());
     }
 }
 
@@ -1195,16 +1187,16 @@ void BLEManagerCommon::blekw_gap_connection_cb(deviceId_t deviceId, gapConnectio
 
     if (pConnectionEvent->eventType == gConnEvtConnected_c)
     {
-#if NXP_DEVICE_K32W1_MCXW7X
+#if NXP_DEVICE_MCXW7X
 #if defined(nxp_use_low_power) && (nxp_use_low_power == 1)
-        /* Disallow must be called here for K32W1, otherwise an assert will be reached.
+        /* Disallow must be called here for MCXW7X, otherwise an assert will be reached.
          * Disclaimer: this is a workaround until a better cross platform solution is found. */
         PWR_DisallowDeviceToSleep();
 #endif
 #endif
 
 #if CHIP_DEVICE_CONFIG_BLE_SET_PHY_2M_REQ
-        ChipLogProgress(DeviceLayer, "BLE K32W: Trying to set the PHY to 2M");
+        ChipLogProgress(DeviceLayer, "BLE MCXW7X: Trying to set the PHY to 2M");
 
         (void) Gap_LeSetPhy(FALSE, deviceId, 0, gConnPhyUpdateReqTxPhySettings_c, gConnPhyUpdateReqRxPhySettings_c,
                             (uint16_t) gConnPhyUpdateReqPhyOptions_c);

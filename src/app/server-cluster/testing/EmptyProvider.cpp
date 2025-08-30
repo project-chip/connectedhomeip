@@ -23,46 +23,55 @@ using Protocols::InteractionModel::Status;
 using namespace chip::app;
 using namespace chip::app::DataModel;
 
-CHIP_ERROR EmptyProvider::Shutdown()
+CHIP_ERROR EmptyProvider::Endpoints(ReadOnlyBufferBuilder<app::DataModel::EndpointEntry> & builder)
 {
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR EmptyProvider::Endpoints(ListBuilder<app::DataModel::EndpointEntry> & builder)
-{
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR EmptyProvider::SemanticTags(EndpointId endpointId, ListBuilder<SemanticTag> & builder)
+CHIP_ERROR EmptyProvider::SemanticTags(EndpointId endpointId, ReadOnlyBufferBuilder<SemanticTag> & builder)
 {
     return CHIP_IM_GLOBAL_STATUS(UnsupportedEndpoint);
 }
-CHIP_ERROR EmptyProvider::DeviceTypes(EndpointId endpointId, ListBuilder<app::DataModel::DeviceTypeEntry> & builder)
+CHIP_ERROR EmptyProvider::DeviceTypes(EndpointId endpointId, ReadOnlyBufferBuilder<app::DataModel::DeviceTypeEntry> & builder)
 {
     return CHIP_IM_GLOBAL_STATUS(UnsupportedEndpoint);
 }
 
-CHIP_ERROR EmptyProvider::ClientClusters(EndpointId endpointId, ListBuilder<ClusterId> & builder)
+CHIP_ERROR EmptyProvider::EventInfo(const app::ConcreteEventPath & path, app::DataModel::EventEntry & eventInfo)
+{
+    // no events in empty providers as there are no clusters
+    return CHIP_IM_GLOBAL_STATUS(UnsupportedEndpoint);
+}
+
+CHIP_ERROR EmptyProvider::ClientClusters(EndpointId endpointId, ReadOnlyBufferBuilder<ClusterId> & builder)
 {
     return CHIP_IM_GLOBAL_STATUS(UnsupportedEndpoint);
 }
-CHIP_ERROR EmptyProvider::ServerClusters(EndpointId endpointId, ListBuilder<app::DataModel::ServerClusterEntry> & builder)
+CHIP_ERROR EmptyProvider::ServerClusters(EndpointId endpointId, ReadOnlyBufferBuilder<app::DataModel::ServerClusterEntry> & builder)
 {
     return CHIP_IM_GLOBAL_STATUS(UnsupportedEndpoint);
 }
 
-CHIP_ERROR EmptyProvider::Attributes(const app::ConcreteClusterPath & path, ListBuilder<app::DataModel::AttributeEntry> & builder)
+CHIP_ERROR EmptyProvider::Attributes(const app::ConcreteClusterPath & path,
+                                     ReadOnlyBufferBuilder<app::DataModel::AttributeEntry> & builder)
 {
     return CHIP_IM_GLOBAL_STATUS(UnsupportedEndpoint);
 }
 
-CHIP_ERROR EmptyProvider::GeneratedCommands(const app::ConcreteClusterPath & path, ListBuilder<CommandId> & builder)
+#if CHIP_CONFIG_USE_ENDPOINT_UNIQUE_ID
+CHIP_ERROR EmptyProvider::EndpointUniqueID(EndpointId endpointId, MutableCharSpan & epUniqueId)
+{
+    return CHIP_IM_GLOBAL_STATUS(UnsupportedEndpoint);
+}
+#endif
+
+CHIP_ERROR EmptyProvider::GeneratedCommands(const app::ConcreteClusterPath & path, ReadOnlyBufferBuilder<CommandId> & builder)
 {
     return CHIP_IM_GLOBAL_STATUS(UnsupportedEndpoint);
 }
 
 CHIP_ERROR EmptyProvider::AcceptedCommands(const app::ConcreteClusterPath & path,
-                                           ListBuilder<app::DataModel::AcceptedCommandEntry> & builder)
+                                           ReadOnlyBufferBuilder<app::DataModel::AcceptedCommandEntry> & builder)
 {
     return CHIP_IM_GLOBAL_STATUS(UnsupportedEndpoint);
 }

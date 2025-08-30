@@ -32,15 +32,16 @@
 #           --int-arg PIXIT.CGEN.TCRevision:1
 #           --qr-code MT:-24J0AFN00KA0648G00
 #           --trace-to json:log
-#       factoryreset: True
+#       factory-reset: true
 #       quiet: True
 # === END CI TEST ARGUMENTS ===
 
-import chip.clusters as Clusters
-from chip import ChipDeviceCtrl
-from chip.commissioning import ROOT_ENDPOINT_ID
-from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from mobly import asserts
+
+import matter.clusters as Clusters
+from matter import ChipDeviceCtrl
+from matter.commissioning import ROOT_ENDPOINT_ID
+from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 
 
 class TC_CGEN_2_8(MatterBaseTest):
@@ -132,7 +133,7 @@ class TC_CGEN_2_8(MatterBaseTest):
         # Step 5: Factory reset is handled by test operator
         self.step(5)
         if not self.check_pics('PICS_USER_PROMPT'):
-            self.skip_all_remaining_steps(6)
+            self.mark_all_remaining_steps_skipped(6)
             return
 
         self.wait_for_user_input(prompt_msg="Manually trigger factory reset on the DUT, then continue")

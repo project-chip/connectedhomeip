@@ -110,7 +110,26 @@ void emberAfDeviceEnergyManagementModeClusterInitCallback(chip::EndpointId endpo
     gDeviceEnergyManagementModeInstance->Init();
 }
 
-void MatterDeviceEnergyManagementModeClusterServerShutdownCallback(chip::EndpointId endpoint)
+void emberAfDeviceEnergyManagementModeClusterShutdownCallback(chip::EndpointId endpointId)
 {
+    if (endpointId != GetEnergyDeviceEndpointId())
+    {
+        return;
+    }
+
+    if (gDeviceEnergyManagementModeInstance)
+    {
+        gDeviceEnergyManagementModeInstance->Shutdown();
+    }
+    DeviceEnergyManagementMode::Shutdown();
+}
+
+void MatterDeviceEnergyManagementModeClusterServerShutdownCallback(chip::EndpointId endpointId)
+{
+    if (endpointId != GetEnergyDeviceEndpointId())
+    {
+        return;
+    }
+
     DeviceEnergyManagementMode::Shutdown();
 }

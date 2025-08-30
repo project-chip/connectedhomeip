@@ -264,7 +264,7 @@ Davis, CA 95616, USA
         <feature name="RCK"/>
       </mandatoryConform>
       <constraint>
-        <desc/>
+        <min value="1"/>
       </constraint>
     </attribute>
     <attribute id="0x0008" name="RockSetting" type="RockBitmap" default="0">
@@ -284,7 +284,7 @@ Davis, CA 95616, USA
         <feature name="WND"/>
       </mandatoryConform>
       <constraint>
-        <desc/>
+        <min value="1"/>
       </constraint>
     </attribute>
     <attribute id="0x000A" name="WindSetting" type="WindBitmap" default="0">
@@ -303,9 +303,6 @@ Davis, CA 95616, USA
       <mandatoryConform>
         <feature name="DIR"/>
       </mandatoryConform>
-      <constraint>
-        <desc/>
-      </constraint>
     </attribute>
   </attributes>
   <commands>
@@ -314,7 +311,10 @@ Davis, CA 95616, USA
       <mandatoryConform>
         <feature name="STEP"/>
       </mandatoryConform>
-      <field id="0" name="Direction" type="StepDirectionEnum" default="Increase">
+      <field id="0" name="Direction" type="StepDirectionEnum">
+        <default>
+          <enum default="Increase"/>
+        </default>
         <mandatoryConform/>
       </field>
       <field id="1" name="Wrap" type="bool" default="false">

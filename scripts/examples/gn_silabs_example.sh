@@ -41,7 +41,6 @@ env
 USE_WIFI=false
 USE_DOCKER=false
 USE_GIT_SHA_FOR_VERSION=true
-USE_SLC=false
 GN_PATH="$PW_PATH/gn"
 USE_BOOTLOADER=false
 DOTFILE=".gn"
@@ -243,7 +242,7 @@ else
             #    shift
             #    ;;
             --release)
-                optArgs+="is_debug=false disable_lcd=true chip_build_libshell=false enable_openthread_cli=false use_external_flash=false chip_logging=false silabs_log_enabled=false "
+                optArgs+="is_debug=false disable_lcd=true chip_build_libshell=false enable_openthread_cli=false use_external_flash=false chip_logging=false silabs_log_enabled=false sl_uart_log_output=false "
                 shift
                 ;;
             --bootloader)
@@ -264,7 +263,6 @@ else
 
             --slc_generate)
                 optArgs+="slc_generate=true "
-                USE_SLC=true
                 shift
                 ;;
             --use_pw_rpc)
@@ -308,7 +306,8 @@ else
     fi
 
     # 917 exception. TODO find a more generic way
-    if [ "$SILABS_BOARD" == "BRD4338A" ] || [ "$SILABS_BOARD" == "BRD2605A" ] || [ "$SILABS_BOARD" == "BRD4343A" ] || [ "$SILABS_BOARD" == "BRD4342A" ]; then
+    WIFI_SOC_BOARDS=("BRD4338A" "BRD2605A" "BRD4343A" "BRD4342A" "BRD2708A" "BRD2911A")
+    if [[ " ${WIFI_SOC_BOARDS[@]} " =~ " ${SILABS_BOARD} " ]]; then
         echo "Compiling for 917 WiFi SOC"
         USE_WIFI=true
     fi
@@ -321,11 +320,8 @@ else
         } &>/dev/null
     fi
 
-    if [ "$USE_SLC" == false ]; then
-        # Activation needs to be after SLC generation which is done in gn gen.
-        # Zap generation requires activation and is done in the build phase
-        source "$CHIP_ROOT/scripts/activate.sh"
-    fi
+    # Zap generation requires activation
+    source "$CHIP_ROOT/scripts/activate.sh"
 
     if [ "$USE_WIFI" == true ]; then
         DOTFILE="$ROOT/build_for_wifi_gnfile.gn"
@@ -348,12 +344,6 @@ else
     fi
 
     "$GN_PATH" gen --check --script-executable="$PYTHON_PATH" --fail-on-unused-args --add-export-compile-commands=* --root="$ROOT" --dotfile="$DOTFILE" --args="silabs_board=\"$SILABS_BOARD\" $optArgs" "$BUILD_DIR"
-
-    if [ "$USE_SLC" == true ]; then
-        # Activation needs to be after SLC generation which is done in gn gen.
-        # Zap generation requires activation and is done in the build phase
-        source "$CHIP_ROOT/scripts/activate.sh"
-    fi
 
     ninja -C "$BUILD_DIR"/
     #print stats

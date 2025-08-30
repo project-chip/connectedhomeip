@@ -693,15 +693,15 @@ Davis, CA 95616, USA
         <max value="1"/>
       </constraint>
     </attribute>
-    <attribute id="0x4003" name="ColorLoopDirection" type="uint8" default="0">
+    <attribute id="0x4003" name="ColorLoopDirection" type="ColorLoopDirectionEnum">
+      <default>
+        <enum default="Decrement"/>
+      </default>
       <access read="true" readPrivilege="view"/>
       <quality scene="true" persistence="nonVolatile"/>
       <mandatoryConform>
         <feature name="CL"/>
       </mandatoryConform>
-      <constraint>
-        <max value="1"/>
-      </constraint>
     </attribute>
     <attribute id="0x4004" name="ColorLoopTime" type="uint16" default="25">
       <access read="true" readPrivilege="view"/>
@@ -753,15 +753,16 @@ Davis, CA 95616, USA
     <attribute id="0x400D" name="CoupleColorTempToLevelMinMireds" type="uint16" default="MS">
       <access read="true" readPrivilege="view"/>
       <mandatoryConform>
-        <orTerm>
-          <feature name="CT"/>
-          <attribute name="ColorTemperatureMireds"/>
-        </orTerm>
+        <feature name="CT"/>
       </mandatoryConform>
       <constraint>
         <between>
-          <attribute name="ColorTempPhysicalMinMireds"/>
-          <attribute name="ColorTemperatureMireds"/>
+          <from>
+            <attribute name="ColorTempPhysicalMinMireds"/>
+          </from>
+          <to>
+            <attribute name="ColorTemperatureMireds"/>
+          </to>
         </between>
       </constraint>
     </attribute>
@@ -769,10 +770,7 @@ Davis, CA 95616, USA
       <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
       <quality nullable="true" persistence="nonVolatile"/>
       <mandatoryConform>
-        <orTerm>
-          <feature name="CT"/>
-          <attribute name="ColorTemperatureMireds"/>
-        </orTerm>
+        <feature name="CT"/>
       </mandatoryConform>
       <constraint>
         <between>

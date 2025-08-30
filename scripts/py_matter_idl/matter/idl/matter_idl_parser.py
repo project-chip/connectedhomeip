@@ -1,27 +1,33 @@
-#!/usr/bin/env python
+# Copyright (c) 2022 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#   http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
 
 import dataclasses
 import functools
 import logging
-import sys
-from pathlib import Path
+import pprint
 from typing import Dict, List, Optional
 
+import click
 from lark import Lark
 from lark.lexer import Token
 from lark.visitors import Transformer, v_args
 
-try:
-    from matter.idl.matter_idl_types import AccessPrivilege
-except ModuleNotFoundError:
-    sys.path.append(str(Path(__file__).resolve().parent / ".." / ".."))
-    from matter.idl.matter_idl_types import AccessPrivilege
-
-from matter.idl.matter_idl_types import (ApiMaturity, Attribute, AttributeInstantiation, AttributeOperation, AttributeQuality,
-                                         AttributeStorage, Bitmap, Cluster, Command, CommandInstantiation, CommandQuality,
-                                         ConstantEntry, DataType, DeviceType, Endpoint, Enum, Event, EventPriority, EventQuality,
-                                         Field, FieldQuality, Idl, ParseMetaData, ServerClusterInstantiation, Struct, StructQuality,
-                                         StructTag)
+from matter.idl.matter_idl_types import (AccessPrivilege, ApiMaturity, Attribute, AttributeInstantiation, AttributeOperation,
+                                         AttributeQuality, AttributeStorage, Bitmap, Cluster, Command, CommandInstantiation,
+                                         CommandQuality, ConstantEntry, DataType, DeviceType, Endpoint, Enum, Event, EventPriority,
+                                         EventQuality, Field, FieldQuality, Idl, ParseMetaData, ServerClusterInstantiation, Struct,
+                                         StructQuality, StructTag)
 
 
 def UnionOfAllFlags(flags_list):
@@ -37,7 +43,7 @@ class PrefixCppDocComment:
         self.value_len = len(token.value)  # includes /***/ AND whitespace
         self.value = token.value[3:-2].strip()
 
-    def appply_to_idl(self, idl: Idl, content: str):
+    def apply_to_idl(self, idl: Idl, content: str):
         if self.start_pos is None:
             return
 
@@ -46,7 +52,7 @@ class PrefixCppDocComment:
             actual_pos += 1
 
         # A doc comment will apply to any supported element assuming it immediately
-        # preceeds id (skipping whitespace)
+        # precedes id (skipping whitespace)
         for item in self.supported_types(idl):
             meta = item.parse_meta
             if meta and meta.start_pos == actual_pos:
@@ -195,10 +201,10 @@ class MatterIdlTransformer(Transformer):
             raise Exception("Unexpected size for data type")
 
     @v_args(inline=True)
-    def constant_entry(self, api_maturity, id, number):
+    def constant_entry(self, api_maturity, id, number, spec_name):
         if api_maturity is None:
             api_maturity = ApiMaturity.STABLE
-        return ConstantEntry(name=id, code=number, api_maturity=api_maturity)
+        return ConstantEntry(name=id, code=number, api_maturity=api_maturity, specification_name=spec_name)
 
     @v_args(inline=True)
     def enum(self, shared, id, type, *entries):
@@ -230,6 +236,9 @@ class MatterIdlTransformer(Transformer):
 
     def attr_readonly(self, _):
         return AttributeQuality.READABLE
+
+    def attr_writeonly(self, _):
+        return AttributeQuality.WRITABLE
 
     def attr_nosubscribe(self, _):
         return AttributeQuality.NOSUBSCRIBE
@@ -412,10 +421,8 @@ class MatterIdlTransformer(Transformer):
     def attribute(self, qualities, definition_tuple):
         (definition, acl) = definition_tuple
 
-        # until we support write only (and need a bit of a reshuffle)
-        # if the 'attr_readonly == READABLE' is not in the list, we make things
-        # read/write
-        if AttributeQuality.READABLE not in qualities:
+        # If the attribute is neither "readonly" nor "writeonly", then it must be Read/Write
+        if AttributeQuality.READABLE not in qualities and AttributeQuality.WRITABLE not in qualities:
             qualities |= AttributeQuality.READABLE
             qualities |= AttributeQuality.WRITABLE
 
@@ -685,7 +692,7 @@ class ParserWithLines:
         idl.clusters = [c for c in clusters.values()]
 
         for comment in self.transformer.doc_comments:
-            comment.appply_to_idl(idl, file)
+            comment.apply_to_idl(idl, file)
 
         if self.merge_globals:
             idl = _merge_global_types_into_clusters(idl)
@@ -711,40 +718,35 @@ def CreateParser(skip_meta: bool = False, merge_globals=True):
     return ParserWithLines(skip_meta, merge_globals)
 
 
-if __name__ == '__main__':
-    # This Parser is generally not intended to be run as a stand-alone binary.
+# Supported log levels, mapping string values required for argument
+# parsing into logging constants
+__LOG_LEVELS__ = {
+    'debug': logging.DEBUG,
+    'info': logging.INFO,
+    'warn': logging.WARN,
+    'fatal': logging.FATAL,
+}
+
+
+@click.command()
+@click.option(
+    '--log-level',
+    default='INFO',
+    type=click.Choice(list(__LOG_LEVELS__.keys()), case_sensitive=False),
+    help='Determines the verbosity of script output.')
+@click.argument('filename')
+def main(log_level, filename=None):
+    # The IDL parser is generally not intended to be run as a stand-alone binary.
     # The ability to run is for debug and to print out the parsed AST.
-    import pprint
 
-    import click
+    logging.basicConfig(
+        level=__LOG_LEVELS__[log_level],
+        format='%(asctime)s %(levelname)-7s %(message)s',
+    )
 
-    # Supported log levels, mapping string values required for argument
-    # parsing into logging constants
-    __LOG_LEVELS__ = {
-        'debug': logging.DEBUG,
-        'info': logging.INFO,
-        'warn': logging.WARN,
-        'fatal': logging.FATAL,
-    }
+    logging.info("Starting to parse ...")
+    data = CreateParser().parse(open(filename).read(), file_name=filename)
+    logging.info("Parse completed")
 
-    @click.command()
-    @click.option(
-        '--log-level',
-        default='INFO',
-        type=click.Choice(list(__LOG_LEVELS__.keys()), case_sensitive=False),
-        help='Determines the verbosity of script output.')
-    @click.argument('filename')
-    def main(log_level, filename=None):
-        logging.basicConfig(
-            level=__LOG_LEVELS__[log_level],
-            format='%(asctime)s %(levelname)-7s %(message)s',
-        )
-
-        logging.info("Starting to parse ...")
-        data = CreateParser().parse(open(filename).read(), file_name=filename)
-        logging.info("Parse completed")
-
-        logging.info("Data:")
-        pprint.pp(data)
-
-    main(auto_envvar_prefix='CHIP')
+    logging.info("Data:")
+    pprint.pp(data)

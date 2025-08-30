@@ -261,7 +261,7 @@ void ConfigurationManagerImpl::DoFactoryReset(intptr_t arg)
     err = QPGConfig::FactoryResetConfig();
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(DeviceLayer, "FactoryResetConfig() failed: %s", ErrorStr(err));
+        ChipLogError(DeviceLayer, "FactoryResetConfig() failed: %" CHIP_ERROR_FORMAT, err.Format());
     }
 
     qvErr = qvCHIP_KvsErasePartition();

@@ -48,12 +48,6 @@ limitations under the License.
     <description>Attributes and commands for selecting a mode from a list of supported options.</description>
     <globalAttribute side="either" code="0xFFFD" value="1"/>
 
-    <features>
-      <feature bit="0" code="DEPONOFF" name="OnOff" summary="Dependency with the OnOff cluster">
-        <optionalConform/>
-      </feature>
-    </features>
-
     <!-- Base data types -->
     <attribute side="server" code="0x0000" name="SupportedModes" define="SUPPORTED_MODES" type="array" entryType="ModeOptionStruct" length="255">
       <mandatoryConform/>

@@ -32,9 +32,10 @@ import typing
 
 import click
 import coloredlogs
-from chip.testing.metadata import Metadata, MetadataReader
-from chip.testing.tasks import Subprocess
 from colorama import Fore, Style
+
+from matter.testing.metadata import Metadata, MetadataReader
+from matter.testing.tasks import Subprocess
 
 DEFAULT_CHIP_ROOT = os.path.abspath(
     os.path.join(os.path.dirname(__file__), '..', '..'))
@@ -191,7 +192,6 @@ def main_impl(app: str, factory_reset: bool, factory_reset_app_only: bool, app_a
     app_stdin_forwarding_thread = None
     app_stdin_forwarding_stop_event = threading.Event()
     app_exit_code = 0
-    app_pid = 0
 
     stream_output = sys.stdout.buffer
     if quiet:
@@ -215,14 +215,12 @@ def main_impl(app: str, factory_reset: bool, factory_reset_app_only: bool, app_a
             app_stdin_forwarding_thread.start()
         else:
             app_process.p.stdin.close()
-        app_pid = app_process.p.pid
 
     script_command = [
         script,
         "--fail-on-skipped",
         "--paa-trust-store-path", os.path.join(DEFAULT_CHIP_ROOT, MATTER_DEVELOPMENT_PAA_ROOT_CERTS),
         "--log-format", '%(message)s',
-        "--app-pid", str(app_pid),
     ] + shlex.split(script_args)
 
     if script_gdb:
@@ -267,6 +265,9 @@ def main_impl(app: str, factory_reset: bool, factory_reset_app_only: bool, app_a
             logging.info("Test completed successfully")
 
     if exit_code != 0:
+        logging.error("SUBPROCESS failure: ")
+        logging.error("  TEST SCRIPT: %d (%r)", test_script_exit_code, final_script_command)
+        logging.error("  APP:         %d (%r)", app_exit_code, [app] + shlex.split(app_args))
         sys.exit(exit_code)
 
 

@@ -74,12 +74,15 @@ public:
 
     bool HasPendingRootCert() const override;
     bool HasPendingNocChain() const override;
+    bool HasPendingVidVerificationElements() const override;
 
     bool HasCertificateForFabric(FabricIndex fabricIndex, CertChainElement element) const override;
 
     CHIP_ERROR AddNewTrustedRootCertForFabric(FabricIndex fabricIndex, const ByteSpan & rcac) override;
     CHIP_ERROR AddNewOpCertsForFabric(FabricIndex fabricIndex, const ByteSpan & noc, const ByteSpan & icac) override;
     CHIP_ERROR UpdateOpCertsForFabric(FabricIndex fabricIndex, const ByteSpan & noc, const ByteSpan & icac) override;
+    CHIP_ERROR UpdateVidVerificationSignerCertForFabric(FabricIndex fabricIndex, ByteSpan vvsc) override;
+    CHIP_ERROR UpdateVidVerificationStatementForFabric(FabricIndex fabricIndex, ByteSpan vidVerificationStatement) override;
 
     CHIP_ERROR CommitOpCertsForFabric(FabricIndex fabricIndex) override;
     CHIP_ERROR RemoveOpCertsForFabric(FabricIndex fabricIndex) override;
@@ -95,6 +98,7 @@ public:
         }
         mStateFlags.Clear(StateFlags::kAddNewOpCertsCalled);
         mStateFlags.Clear(StateFlags::kUpdateOpCertsCalled);
+        RevertVidVerificationStatement();
     }
 
     void RevertPendingOpCerts() override
@@ -108,14 +112,18 @@ public:
     }
 
     CHIP_ERROR GetCertificate(FabricIndex fabricIndex, CertChainElement element, MutableByteSpan & outCertificate) const override;
+    CHIP_ERROR GetVidVerificationElement(FabricIndex fabricIndex, VidVerificationElement element,
+                                         MutableByteSpan & outElement) const override;
 
 protected:
     enum class StateFlags : uint8_t
     {
         // Below are flags to assist interlock logic
-        kAddNewOpCertsCalled     = (1u << 0),
-        kAddNewTrustedRootCalled = (1u << 1),
-        kUpdateOpCertsCalled     = (1u << 2),
+        kAddNewOpCertsCalled             = (1u << 0),
+        kAddNewTrustedRootCalled         = (1u << 1),
+        kUpdateOpCertsCalled             = (1u << 2),
+        kVidVerificationStatementUpdated = (1u << 3),
+        kVvscUpdated                     = (1u << 4),
     };
 
     // Returns CHIP_ERROR_NOT_FOUND if a pending certificate couldn't be found, otherwise status of pending copy
@@ -123,6 +131,24 @@ protected:
 
     // Returns true if any pending or persisted state exists for the fabricIndex, false if nothing at all is found.
     bool HasAnyCertificateForFabric(FabricIndex fabricIndex) const;
+
+    // Returns true if there is stored or pending NOC chain .
+    bool HasNocChainForFabric(FabricIndex fabricIndex) const;
+
+    // Returns CHIP_NO_ERROR if all assumptions for VID Verification update operations are OK.
+    CHIP_ERROR BasicVidVerificationAssumptionsAreMet(FabricIndex fabricIndex) const;
+
+    // Commits pending VID Verification data (called only from CommitOpCertsForFabric).
+    CHIP_ERROR CommitVidVerificationForFabric(FabricIndex fabricIndex);
+
+    // Reverts pending VID Verification data if any.
+    void RevertVidVerificationStatement()
+    {
+        mPendingVvsc.Free();
+        mPendingVidVerificationStatement.Free();
+        mStateFlags.Clear(StateFlags::kVidVerificationStatementUpdated);
+        mStateFlags.Clear(StateFlags::kVvscUpdated);
+    }
 
     PersistentStorageDelegate * mStorage = nullptr;
 
@@ -132,6 +158,8 @@ protected:
     Platform::ScopedMemoryBufferWithSize<uint8_t> mPendingRcac;
     Platform::ScopedMemoryBufferWithSize<uint8_t> mPendingIcac;
     Platform::ScopedMemoryBufferWithSize<uint8_t> mPendingNoc;
+    Platform::ScopedMemoryBufferWithSize<uint8_t> mPendingVvsc;
+    Platform::ScopedMemoryBufferWithSize<uint8_t> mPendingVidVerificationStatement;
 
     BitFlags<StateFlags> mStateFlags;
 };

@@ -49,15 +49,25 @@
 #define LDMA_DESCRIPTOR_ARRAY_LENGTH (LDMA_MAX_TRANSFER_LENGTH / 2048)
 #define SPI_HANDLE sl_spidrv_exp_handle
 #define MAX_DATA_PACKET_SIZE 1800
+#define SLI_SPI_HANDLE sl_spidrv_exp_handle
+#define SLI_SPI_BIT_RATE 12500000
 
 // use SPI handle for EXP header (configured in project settings)
 extern SPIDRV_Handle_t sl_spidrv_exp_handle;
-static uint8_t dummy_buffer[MAX_DATA_PACKET_SIZE]   = { 0 };
-static sl_si91x_host_init_configuration init_config = { 0 };
+static uint8_t dummy_buffer[MAX_DATA_PACKET_SIZE]     = { 0 };
+static sl_si91x_host_init_configuration_t init_config = { 0 };
 
 uint32_t rx_ldma_channel;
 uint32_t tx_ldma_channel;
 osMutexId_t ncp_transfer_mutex = 0;
+
+// LDMA descriptor and transfer configuration structures for USART TX channel
+LDMA_Descriptor_t ldmaTXDescriptor[LDMA_DESCRIPTOR_ARRAY_LENGTH];
+LDMA_TransferCfg_t ldmaTXConfig;
+
+// LDMA descriptor and transfer configuration structures for USART RX channel
+LDMA_Descriptor_t ldmaRXDescriptor[LDMA_DESCRIPTOR_ARRAY_LENGTH];
+LDMA_TransferCfg_t ldmaRXConfig;
 
 static osSemaphoreId_t transfer_done_semaphore = NULL;
 
@@ -153,7 +163,7 @@ uint32_t sl_si91x_host_get_wake_indicator(void)
     return GPIO_PinInGet(WAKE_INDICATOR_PIN.port, WAKE_INDICATOR_PIN.pin);
 }
 
-sl_status_t sl_si91x_host_init(const sl_si91x_host_init_configuration * config)
+sl_status_t sl_si91x_host_init(const sl_si91x_host_init_configuration_t * config)
 {
 #if SL_SPICTRL_MUX
     sl_status_t status = sl_board_disable_display();
@@ -262,4 +272,15 @@ void sl_si91x_host_disable_bus_interrupt(void)
 bool sl_si91x_host_is_in_irq_context(void)
 {
     return (SCB->ICSR & SCB_ICSR_VECTACTIVE_Msk) != 0U;
+}
+
+__WEAK void sl_si91x_host_spi_cs_assert()
+{
+    SPIDRV_SetBitrate(SLI_SPI_HANDLE, SLI_SPI_BIT_RATE);
+    GPIO_PinOutClear(SL_SPIDRV_EXP_CS_PORT, SL_SPIDRV_EXP_CS_PIN);
+}
+
+__WEAK void sl_si91x_host_spi_cs_deassert()
+{
+    GPIO_PinOutSet(SL_SPIDRV_EXP_CS_PORT, SL_SPIDRV_EXP_CS_PIN);
 }

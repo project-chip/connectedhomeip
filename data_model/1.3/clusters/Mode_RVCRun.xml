@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <!--
-Copyright (C) Connectivity Standards Alliance (2023). All rights reserved.
+Copyright (C) Connectivity Standards Alliance (2025). All rights reserved.
 The information within this document is the property of the Connectivity
 Standards Alliance and its use and disclosure are restricted, except as
 expressly set forth herein.
@@ -67,6 +67,37 @@ Davis, CA 95616, USA
   </clusterIds>
   <classification hierarchy="derived" baseCluster="Mode Base" role="application" picsCode="RVCRUNM" scope="Endpoint"/>
   <dataTypes>
+    <enum name="ModeTag">
+      <item value="0x4000" name="Idle"/>
+      <item value="0x4001" name="Cleaning"/>
+      <item value="0x4002" name="Mapping"/>
+    </enum>
+    <enum name="StatusCodeEnum">
+      <item value="0x41" name="Stuck">
+        <mandatoryConform/>
+      </item>
+      <item value="0x42" name="DustBinMissing">
+        <mandatoryConform/>
+      </item>
+      <item value="0x43" name="DustBinFull">
+        <mandatoryConform/>
+      </item>
+      <item value="0x44" name="WaterTankEmpty">
+        <mandatoryConform/>
+      </item>
+      <item value="0x45" name="WaterTankMissing">
+        <mandatoryConform/>
+      </item>
+      <item value="0x46" name="WaterTankLidOpen">
+        <mandatoryConform/>
+      </item>
+      <item value="0x47" name="MopCleaningPadMissing">
+        <mandatoryConform/>
+      </item>
+      <item value="0x48" name="BatteryLow">
+        <mandatoryConform/>
+      </item>
+    </enum>
     <struct name="ModeOptionStruct">
       <field id="0" name="Label">
         <mandatoryConform/>
@@ -76,17 +107,18 @@ Davis, CA 95616, USA
       </field>
       <field id="2" name="ModeTags">
         <mandatoryConform/>
-        <constraint type="between" from="1" to="8"/>
+        <constraint>
+          <between>
+            <from value="1"/>
+            <to value="8"/>
+          </between>
+        </constraint>
       </field>
     </struct>
   </dataTypes>
   <attributes>
-    <attribute id="0x0000" name="SupportedModes">
-      <mandatoryConform/>
-    </attribute>
-    <attribute id="0x0001" name="CurrentMode">
-      <mandatoryConform/>
-    </attribute>
+    <attribute id="0x0000" name="SupportedModes"/>
+    <attribute id="0x0001" name="CurrentMode"/>
     <attribute id="0x0002" name="StartUpMode">
       <disallowConform/>
     </attribute>

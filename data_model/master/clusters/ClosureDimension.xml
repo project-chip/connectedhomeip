@@ -57,31 +57,29 @@ Davis, CA 95616, USA
 
 :xrefstyle: basic
 -->
-<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" name="Closure Dimension Cluster Clusters" revision="1">
+<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0105" name="Closure Dimension Cluster" revision="1">
   <revisionHistory>
     <revision revision="1" summary="Initial revision"/>
   </revisionHistory>
   <clusterIds>
-    <clusterId id="0x0105" name="Closure 1st Dimension" picsCode="CLDIMA"/>
-    <clusterId id="0x0106" name="Closure 2nd Dimension" picsCode="CLDIMB"/>
-    <clusterId id="0x0107" name="Closure 3rd Dimension" picsCode="CLDIMC"/>
-    <clusterId id="0x0108" name="Closure 4th Dimension" picsCode="CLDIMD"/>
-    <clusterId id="0x0109" name="Closure 5th Dimension" picsCode="CLDIME"/>
+    <clusterId id="0x0105" name="Closure Dimension">
+      <provisionalConform/>
+    </clusterId>
   </clusterIds>
   <classification hierarchy="base" role="application" picsCode="CLDIM" scope="Endpoint"/>
   <features>
     <feature bit="0" code="PS" name="Positioning" summary="Supports positioning in the range from 0.00% to 100.00%">
       <optionalConform choice="a" more="true" min="1"/>
     </feature>
-    <feature bit="1" code="LT" name="MotionLatching" summary="Supports a latch (securing a position, a state ...)">
+    <feature bit="1" code="LT" name="MotionLatching" summary="Supports a latch to secure the closure to a position or state">
       <optionalConform choice="a" more="true" min="1"/>
     </feature>
-    <feature bit="2" code="UT" name="Unit" summary="Supports additional data (in mm, degrees ...) to enhance control">
+    <feature bit="2" code="UT" name="Unit" summary="Specifies the relevant unit and range for this dimension (mm, degrees etc.)">
       <optionalConform>
         <feature name="PS"/>
       </optionalConform>
     </feature>
-    <feature bit="3" code="LM" name="Limitation" summary="Supports the limitation of the operating range">
+    <feature bit="3" code="LM" name="Limitation" summary="Supports limitation of the operating range">
       <optionalConform>
         <feature name="PS"/>
       </optionalConform>
@@ -91,21 +89,9 @@ Davis, CA 95616, USA
         <feature name="PS"/>
       </optionalConform>
     </feature>
-    <feature bit="5" code="TR" name="Translation" summary="Drives a translation motion">
-      <optionalConform choice="b">
-        <feature name="PS"/>
-      </optionalConform>
-    </feature>
-    <feature bit="6" code="RO" name="Rotation" summary="Drives a rotation motion">
-      <optionalConform choice="b">
-        <feature name="PS"/>
-      </optionalConform>
-    </feature>
-    <feature bit="7" code="MD" name="Modulation" summary="Modulates a particular flow level (light, air, privacy ...)">
-      <optionalConform choice="b">
-        <feature name="PS"/>
-      </optionalConform>
-    </feature>
+    <feature bit="5" code="TR" name="Translation" summary="Drives a translation motion"/>
+    <feature bit="6" code="RO" name="Rotation" summary="Drives a rotation motion"/>
+    <feature bit="7" code="MD" name="Modulation" summary="Modulates a particular flow level (light, air, privacy ...)"/>
   </features>
   <dataTypes>
     <enum name="ClosureUnitEnum">
@@ -113,32 +99,6 @@ Davis, CA 95616, USA
         <mandatoryConform/>
       </item>
       <item value="1" name="Degree" summary="Degree used as unit">
-        <mandatoryConform/>
-      </item>
-    </enum>
-    <enum name="LatchingAxisEnum">
-      <item value="0" name="VerticalTranslation" summary="Vertical translation latching">
-        <mandatoryConform/>
-      </item>
-      <item value="1" name="HorizontalTranslation" summary="Horizontal translation latching">
-        <mandatoryConform/>
-      </item>
-      <item value="2" name="DepthTranslation" summary="Depth translation latching">
-        <mandatoryConform/>
-      </item>
-      <item value="3" name="VerticalRotation" summary="Vertical rotation latching">
-        <mandatoryConform/>
-      </item>
-      <item value="4" name="HorizontalRotation" summary="Horizontal rotation latching">
-        <mandatoryConform/>
-      </item>
-      <item value="5" name="DepthRotation" summary="Depth rotation latching">
-        <mandatoryConform/>
-      </item>
-      <item value="6" name="Turnstile" summary="Turnstile rotation latching">
-        <mandatoryConform/>
-      </item>
-      <item value="7" name="Revolving" summary="Revolving rotation latching">
         <mandatoryConform/>
       </item>
     </enum>
@@ -287,7 +247,7 @@ Davis, CA 95616, USA
         <mandatoryConform/>
       </item>
     </enum>
-    <struct name="CurrentStruct">
+    <struct name="CurrentStateStruct">
       <field id="0" name="Position" type="percent100ths">
         <mandatoryConform>
           <feature name="PS"/>
@@ -296,7 +256,7 @@ Davis, CA 95616, USA
           <desc/>
         </constraint>
       </field>
-      <field id="1" name="Latching" type="LatchingEnum" default="NotLatched">
+      <field id="1" name="Latch" type="bool" default="false">
         <mandatoryConform>
           <feature name="LT"/>
         </mandatoryConform>
@@ -320,8 +280,11 @@ Davis, CA 95616, USA
       <field id="1" name="Max" type="percent100ths">
         <mandatoryConform/>
         <constraint>
-          <between value="100">
-            <field name="Min"/>
+          <between>
+            <from>
+              <field name="Min"/>
+            </from>
+            <to value="100"/>
           </between>
         </constraint>
       </field>
@@ -335,7 +298,7 @@ Davis, CA 95616, USA
           <desc/>
         </constraint>
       </field>
-      <field id="1" name="TagLatch" type="TagLatchEnum">
+      <field id="1" name="Latch" type="bool" default="false">
         <mandatoryConform>
           <feature name="LT"/>
         </mandatoryConform>
@@ -355,30 +318,26 @@ Davis, CA 95616, USA
     <struct name="UnitRangeStruct">
       <field id="0" name="Min" type="int16">
         <mandatoryConform/>
+        <constraint>
+          <between>
+            <from value="-32768"/>
+            <to value="Max - 1"/>
+          </between>
+        </constraint>
       </field>
       <field id="1" name="Max" type="int16">
         <mandatoryConform/>
         <constraint>
-          <between value="32767">
-            <field name="Min"/>
+          <between>
+            <from value="Min + 1"/>
+            <to value="32767"/>
           </between>
         </constraint>
       </field>
     </struct>
   </dataTypes>
   <attributes>
-    <attribute id="0x0000" name="TagList" type="list" default="MS">
-      <entry type="SemanticTagStruct"/>
-      <access read="true" readPrivilege="view"/>
-      <optionalConform/>
-      <constraint>
-        <countBetween>
-          <from value="1"/>
-          <to value="2"/>
-        </countBetween>
-      </constraint>
-    </attribute>
-    <attribute id="0x0001" name="Current" type="CurrentStruct" default="null">
+    <attribute id="0x0000" name="CurrentState" type="CurrentStateStruct" default="null">
       <access read="true" readPrivilege="view"/>
       <quality nullable="true" quieterReporting="true"/>
       <mandatoryConform/>
@@ -386,7 +345,7 @@ Davis, CA 95616, USA
         <desc/>
       </constraint>
     </attribute>
-    <attribute id="0x0002" name="Target" type="TargetStruct" default="null">
+    <attribute id="0x0001" name="Target" type="TargetStruct" default="null">
       <access read="true" readPrivilege="view"/>
       <quality nullable="true"/>
       <mandatoryConform/>
@@ -394,7 +353,7 @@ Davis, CA 95616, USA
         <desc/>
       </constraint>
     </attribute>
-    <attribute id="0x0003" name="Resolution" type="percent100ths">
+    <attribute id="0x0002" name="Resolution" type="percent100ths">
       <access read="true" readPrivilege="view"/>
       <mandatoryConform>
         <feature name="PS"/>
@@ -403,7 +362,7 @@ Davis, CA 95616, USA
         <min value="0.01"/>
       </constraint>
     </attribute>
-    <attribute id="0x0004" name="StepValue" type="percent100ths">
+    <attribute id="0x0003" name="StepValue" type="percent100ths">
       <access read="true" readPrivilege="view"/>
       <mandatoryConform>
         <feature name="PS"/>
@@ -412,13 +371,13 @@ Davis, CA 95616, USA
         <desc/>
       </constraint>
     </attribute>
-    <attribute id="0x0005" name="Unit" type="ClosureUnitEnum">
+    <attribute id="0x0004" name="Unit" type="ClosureUnitEnum">
       <access read="true" readPrivilege="view"/>
       <mandatoryConform>
         <feature name="UT"/>
       </mandatoryConform>
     </attribute>
-    <attribute id="0x0006" name="UnitRange" type="UnitRangeStruct" default="null">
+    <attribute id="0x0005" name="UnitRange" type="UnitRangeStruct" default="null">
       <access read="true" readPrivilege="view"/>
       <quality nullable="true" persistence="nonVolatile"/>
       <mandatoryConform>
@@ -428,7 +387,7 @@ Davis, CA 95616, USA
         <desc/>
       </constraint>
     </attribute>
-    <attribute id="0x0007" name="LimitRange" type="RangePercent100thsStruct">
+    <attribute id="0x0006" name="LimitRange" type="RangePercent100thsStruct">
       <access read="true" readPrivilege="view"/>
       <mandatoryConform>
         <feature name="LM"/>
@@ -437,19 +396,19 @@ Davis, CA 95616, USA
         <desc/>
       </constraint>
     </attribute>
-    <attribute id="0x0008" name="TranslationDirection" type="TranslationDirectionEnum">
+    <attribute id="0x0007" name="TranslationDirection" type="TranslationDirectionEnum">
       <access read="true" readPrivilege="view"/>
       <mandatoryConform>
         <feature name="TR"/>
       </mandatoryConform>
     </attribute>
-    <attribute id="0x0009" name="RotationAxis" type="RotationAxisEnum">
+    <attribute id="0x0008" name="RotationAxis" type="RotationAxisEnum">
       <access read="true" readPrivilege="view"/>
       <mandatoryConform>
         <feature name="RO"/>
       </mandatoryConform>
     </attribute>
-    <attribute id="0x000A" name="Overflow" type="OverflowEnum">
+    <attribute id="0x0009" name="Overflow" type="OverflowEnum">
       <access read="true" readPrivilege="view"/>
       <quality persistence="nonVolatile"/>
       <otherwiseConform>
@@ -461,24 +420,10 @@ Davis, CA 95616, USA
         </optionalConform>
       </otherwiseConform>
     </attribute>
-    <attribute id="0x000B" name="ModulationType" type="ModulationTypeEnum">
+    <attribute id="0x000A" name="ModulationType" type="ModulationTypeEnum">
       <access read="true" readPrivilege="view"/>
       <mandatoryConform>
         <feature name="MD"/>
-      </mandatoryConform>
-    </attribute>
-    <attribute id="0x000C" name="LatchingAxis" type="LatchingAxisEnum">
-      <access read="true" readPrivilege="view"/>
-      <mandatoryConform>
-        <andTerm>
-          <feature name="LT"/>
-          <notTerm>
-            <feature name="TR"/>
-          </notTerm>
-          <notTerm>
-            <feature name="RO"/>
-          </notTerm>
-        </andTerm>
       </mandatoryConform>
     </attribute>
   </attributes>
@@ -489,7 +434,7 @@ Davis, CA 95616, USA
       <field id="0" name="Position" type="percent100ths">
         <optionalConform choice="a" more="true" min="1"/>
       </field>
-      <field id="1" name="TagLatch" type="TagLatchEnum">
+      <field id="1" name="Latch" type="bool">
         <optionalConform choice="a" more="true" min="1"/>
       </field>
       <field id="2" name="Speed" type="ThreeLevelAutoEnum">
@@ -510,7 +455,10 @@ Davis, CA 95616, USA
           <min value="1"/>
         </constraint>
       </field>
-      <field id="2" name="Speed" type="ThreeLevelAutoEnum" default="MS">
+      <field id="2" name="Speed" type="ThreeLevelAutoEnum">
+        <default>
+          <enum default="Auto"/>
+        </default>
         <optionalConform/>
         <constraint>
           <desc/>

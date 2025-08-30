@@ -79,8 +79,12 @@ Davis, CA 95616, USA
       <mandatoryConform/>
       <constraint>
         <between>
-          <attribute name="MinMeasuredValue"/>
-          <attribute name="MaxMeasuredValue"/>
+          <from>
+            <attribute name="MinMeasuredValue"/>
+          </from>
+          <to>
+            <attribute name="MaxMeasuredValue"/>
+          </to>
         </between>
       </constraint>
     </attribute>
@@ -118,8 +122,12 @@ Davis, CA 95616, USA
       </mandatoryConform>
       <constraint>
         <between>
-          <attribute name="MinScaledValue"/>
-          <attribute name="MaxScaledValue"/>
+          <from>
+            <attribute name="MinScaledValue"/>
+          </from>
+          <to>
+            <attribute name="MaxScaledValue"/>
+          </to>
         </between>
       </constraint>
     </attribute>

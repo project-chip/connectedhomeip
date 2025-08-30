@@ -32,20 +32,22 @@ class EmptyProvider : public app::DataModel::Provider
 {
 public:
     using ActionReturnStatus = app::DataModel::ActionReturnStatus;
-    template <typename T>
-    using ListBuilder = app::DataModel::ListBuilder<T>;
 
-    CHIP_ERROR Shutdown() override;
-    CHIP_ERROR Endpoints(ListBuilder<app::DataModel::EndpointEntry> & builder) override;
+    CHIP_ERROR Endpoints(ReadOnlyBufferBuilder<app::DataModel::EndpointEntry> & builder) override;
 
-    CHIP_ERROR SemanticTags(EndpointId endpointId, ListBuilder<SemanticTag> & builder) override;
-    CHIP_ERROR DeviceTypes(EndpointId endpointId, ListBuilder<app::DataModel::DeviceTypeEntry> & builder) override;
-    CHIP_ERROR ClientClusters(EndpointId endpointId, ListBuilder<ClusterId> & builder) override;
-    CHIP_ERROR ServerClusters(EndpointId endpointId, ListBuilder<app::DataModel::ServerClusterEntry> & builder) override;
-    CHIP_ERROR Attributes(const app::ConcreteClusterPath & path, ListBuilder<app::DataModel::AttributeEntry> & builder) override;
-    CHIP_ERROR GeneratedCommands(const app::ConcreteClusterPath & path, ListBuilder<CommandId> & builder) override;
+    CHIP_ERROR SemanticTags(EndpointId endpointId, ReadOnlyBufferBuilder<SemanticTag> & builder) override;
+    CHIP_ERROR DeviceTypes(EndpointId endpointId, ReadOnlyBufferBuilder<app::DataModel::DeviceTypeEntry> & builder) override;
+    CHIP_ERROR ClientClusters(EndpointId endpointId, ReadOnlyBufferBuilder<ClusterId> & builder) override;
+    CHIP_ERROR ServerClusters(EndpointId endpointId, ReadOnlyBufferBuilder<app::DataModel::ServerClusterEntry> & builder) override;
+#if CHIP_CONFIG_USE_ENDPOINT_UNIQUE_ID
+    CHIP_ERROR EndpointUniqueID(EndpointId endpointId, MutableCharSpan & epUniqueId) override;
+#endif
+    CHIP_ERROR EventInfo(const app::ConcreteEventPath & path, app::DataModel::EventEntry & eventInfo) override;
+    CHIP_ERROR Attributes(const app::ConcreteClusterPath & path,
+                          ReadOnlyBufferBuilder<app::DataModel::AttributeEntry> & builder) override;
+    CHIP_ERROR GeneratedCommands(const app::ConcreteClusterPath & path, ReadOnlyBufferBuilder<CommandId> & builder) override;
     CHIP_ERROR AcceptedCommands(const app::ConcreteClusterPath & path,
-                                ListBuilder<app::DataModel::AcceptedCommandEntry> & builder) override;
+                                ReadOnlyBufferBuilder<app::DataModel::AcceptedCommandEntry> & builder) override;
     void ListAttributeWriteNotification(const app::ConcreteAttributePath & aPath,
                                         app::DataModel::ListWriteOperation opType) override
     {}

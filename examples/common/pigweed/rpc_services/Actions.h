@@ -94,7 +94,8 @@ public:
 
     {
         DeviceLayer::StackLock lock;
-        ChipLogProgress(NotSpecified, " request.endpoint_id=%d, request.cluster_id=%d", request.endpoint_id, request.cluster_id);
+        ChipLogProgress(NotSpecified, " request.endpoint_id=%d, request.cluster_id=%d", (int) request.endpoint_id,
+                        (int) request.cluster_id);
 
         for (int i = 0; i < request.actions_count; i++)
         {

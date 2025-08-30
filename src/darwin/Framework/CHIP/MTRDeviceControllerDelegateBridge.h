@@ -15,6 +15,7 @@
  *    limitations under the License.
  */
 
+#import "MTRCommissioningParameters.h"
 #import "MTRDeviceControllerDelegate.h"
 
 #include <controller/CHIPDeviceController.h>
@@ -45,11 +46,15 @@ public:
 
     void SetDeviceNodeID(chip::NodeId deviceNodeId);
 
+    void SetCommissioningParameters(MTRCommissioningParameters * commissioningParameters);
+
 private:
     MTRDeviceController * __weak mController;
     _Nullable id<MTRDeviceControllerDelegate> mDelegate;
     _Nullable dispatch_queue_t mQueue;
     chip::NodeId mDeviceNodeId;
+
+    MTRCommissioningParameters * mCommissioningParameters;
 
     MTRCommissioningStatus MapStatus(chip::Controller::DevicePairingDelegate::Status status);
 };

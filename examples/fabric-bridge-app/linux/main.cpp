@@ -18,12 +18,11 @@
 
 #include <AppMain.h>
 
-#include "BridgedAdministratorCommissioning.h"
-#include "BridgedDevice.h"
-#include "BridgedDeviceBasicInformationImpl.h"
-#include "BridgedDeviceManager.h"
-#include "CommissionableInit.h"
 #include "CommissionerControlDelegate.h"
+#include <fabric-bridge-common/BridgedAdministratorCommissioning.h>
+#include <fabric-bridge-common/BridgedDevice.h>
+#include <fabric-bridge-common/BridgedDeviceBasicInformationImpl.h>
+#include <fabric-bridge-common/BridgedDeviceManager.h>
 
 #include <app/AttributeAccessInterfaceRegistry.h>
 #include <app/CommandHandlerInterfaceRegistry.h>
@@ -125,17 +124,10 @@ public:
     CHIP_ERROR Init();
 
     void InvokeCommand(HandlerContext & handlerContext) override;
-
-private:
-    CommandHandlerInterface * mOriginalCommandHandlerInterface = nullptr;
 };
 
 CHIP_ERROR AdministratorCommissioningCommandHandler::Init()
 {
-    mOriginalCommandHandlerInterface =
-        CommandHandlerInterfaceRegistry::Instance().GetCommandHandler(kRootEndpointId, AdministratorCommissioning::Id);
-    VerifyOrReturnError(mOriginalCommandHandlerInterface, CHIP_ERROR_INTERNAL);
-    ReturnErrorOnFailure(CommandHandlerInterfaceRegistry::Instance().UnregisterCommandHandler(mOriginalCommandHandlerInterface));
     ReturnErrorOnFailure(CommandHandlerInterfaceRegistry::Instance().RegisterCommandHandler(this));
     return CHIP_NO_ERROR;
 }
@@ -150,8 +142,6 @@ void AdministratorCommissioningCommandHandler::InvokeCommand(HandlerContext & ha
     if (handlerContext.mRequestPath.mCommandId != AdministratorCommissioning::Commands::OpenCommissioningWindow::Id ||
         endpointId == kRootEndpointId)
     {
-        // Proceed with default handling in Administrator Commissioning Server
-        mOriginalCommandHandlerInterface->InvokeCommand(handlerContext);
         return;
     }
 
@@ -256,7 +246,6 @@ void BridgedDeviceInformationCommandHandler::InvokeCommand(HandlerContext & hand
     handlerContext.mCommandHandler.AddStatus(handlerContext.mRequestPath, status);
 }
 
-BridgedAdministratorCommissioning gBridgedAdministratorCommissioning;
 BridgedDeviceBasicInformationImpl gBridgedDeviceBasicInformationAttributes;
 AdministratorCommissioningCommandHandler gAdministratorCommissioningCommandHandler;
 BridgedDeviceInformationCommandHandler gBridgedDeviceInformationCommandHandler;
@@ -281,7 +270,6 @@ void ApplicationInit()
 #endif
 
     bridge::BridgedDeviceManager::Instance().Init();
-    VerifyOrDie(bridge::gBridgedAdministratorCommissioning.Init() == CHIP_NO_ERROR);
     VerifyOrDieWithMsg(bridge::gAdministratorCommissioningCommandHandler.Init() == CHIP_NO_ERROR, NotSpecified,
                        "Failed to initialize Commissioner command handler");
 

@@ -34,8 +34,18 @@ NS_ASSUME_NONNULL_BEGIN
 // Adds a mocked peripheral and causes any mocked `CBCentralManager`
 // instances to discover this as a `CBPeripheral`, if they are scanning.
 // The provided identifier becomes the `identifier` of the `CBPeripheral`.
+// Services and characteristics are provided as CBMutableService with
+// CBMutableCharacteristic objects. They should not be modified after
+// being passed to this method.
 - (void)addMockPeripheralWithIdentifier:(NSUUID *)identifier
-                               services:(NSArray<CBUUID *> *)services
+                               services:(NSArray<CBMutableService *> *)services
+                      advertisementData:(nullable NSDictionary<NSString *, id> *)advertisementData;
+
+// Convenience version of `addMockPeripheralWithIdentifier:...` that
+// specifies only services UUIDs but no other service details. Useful
+// in scenarios that exercise only discovery but don't connect.
+- (void)addMockPeripheralWithIdentifier:(NSUUID *)identifier
+                           serviceUUIDs:(NSArray<CBUUID *> *)serviceUUIDs
                       advertisementData:(nullable NSDictionary<NSString *, id> *)advertisementData;
 
 // Convenience version of `addMockPeripheralWithIdentifier:...` that
@@ -55,6 +65,12 @@ NS_ASSUME_NONNULL_BEGIN
     (NSArray<CBUUID *> * _Nullable serviceUUIDs, NSDictionary<NSString *, id> * _Nullable options);
 
 @property (readwrite, strong, nullable) void (^onStopScan)(void);
+
+@property (readwrite, strong, nullable) BOOL (^onConnectPeripheralWithOptions)
+    (CBPeripheral * peripheral, NSDictionary<NSString *, id> * _Nullable options);
+
+@property (readwrite, strong, nullable) void (^onWriteValueForCharacteristic)
+    (CBPeripheral * peripheral, NSData * value, CBMutableCharacteristic * characteristic, CBCharacteristicWriteType type);
 
 @end
 
