@@ -324,7 +324,7 @@ namespace {
 // To reduce the various use of previousProcessed.HasValue() && previousProcessed.Value() == nextAttribute to save code size.
 bool IsSameAttribute(const Optional<ConcreteAttributePath> & previousProcessed, const ConcreteDataAttributePath & nextAttribute)
 {
-    return previousProcessed.HasValue() && previousProcessed.Value() == nextAttribute;
+    return previousProcessed.HasValue() && previousProcessed.Value() == static_cast<ConcreteAttributePath>(nextAttribute);
 }
 
 bool ShouldReportListWriteEnd(const Optional<ConcreteAttributePath> & previousProcessed, bool previousProcessedAttributeIsList,

@@ -81,7 +81,7 @@ bool ChunkedWriteCallback::IsAppendingToLastItem(const ConcreteDataAttributePath
     {
         return false;
     }
-    if (!mProcessingAttributePath.HasValue() || !(mProcessingAttributePath.Value() == aPath))
+    if (!mProcessingAttributePath.HasValue() || !(mProcessingAttributePath.Value() == static_cast<ConcreteAttributePath>(aPath)))
     {
         return false;
     }
