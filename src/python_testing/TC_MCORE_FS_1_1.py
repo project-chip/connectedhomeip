@@ -127,7 +127,8 @@ class TC_MCORE_FS_1_1(MatterBaseTest):
 
     def steps_TC_MCORE_FS_1_1(self) -> list[TestStep]:
         return [
-            TestStep(1, "Enable Fabric Synchronization on DUT_FSA using the manufacturer specified mechanism.", is_commissioning=True),
+            TestStep("precondition", "Commissioning already done.", is_commissioning=True),
+            TestStep(1, "Enable Fabric Synchronization on DUT_FSA using the manufacturer specified mechanism."),
             TestStep(2, "Commission DUT_FSA onto TH_FSA fabric."),
             TestStep(3, "Reverse Commission TH_FSAs onto DUT_FSA fabric."),
             TestStep("3a", "TH_FSA sends RequestCommissioningApproval"),
@@ -172,11 +173,10 @@ class TC_MCORE_FS_1_1(MatterBaseTest):
         asserts.assert_not_equal(dut_commissioning_control_endpoint, 0, "Invalid aggregator endpoint. Cannot proceed with test.")
 
         # Commissioning
-        self.step(0)
+        self.step("precondition")
 
         self.step(1)
         self.step(2)
-        self.step(3)
         th_fsa_server_fabrics = await self.read_single_attribute_check_success(cluster=Clusters.OperationalCredentials, attribute=Clusters.OperationalCredentials.Attributes.Fabrics, dev_ctrl=self.TH_server_controller, node_id=self.server_nodeid, endpoint=0, fabric_filtered=False)
         th_fsa_server_vid = await self.read_single_attribute_check_success(cluster=Clusters.BasicInformation, attribute=Clusters.BasicInformation.Attributes.VendorID, dev_ctrl=self.TH_server_controller, node_id=self.server_nodeid, endpoint=0)
         th_fsa_server_pid = await self.read_single_attribute_check_success(cluster=Clusters.BasicInformation, attribute=Clusters.BasicInformation.Attributes.ProductID, dev_ctrl=self.TH_server_controller, node_id=self.server_nodeid, endpoint=0)

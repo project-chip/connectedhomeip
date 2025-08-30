@@ -50,7 +50,7 @@ class TC_DRLK_2_5(MatterBaseTest):
 
     def steps_TC_DRLK_2_5(self) -> list[TestStep]:
         steps = [
-            TestStep("0", "Commissioning already done.", is_commissioning=True),
+            TestStep("precondition", "Commissioning already done.", is_commissioning=True),
             TestStep("1", "TH reads NumberOfWeekDaySchedulesSupportedPerUser attribute.",
                      "Verify that TH is able to read the attribute successfully."),
             TestStep("2a", "TH sends SetUser Command to DUT.", "Verify that the DUT sends SUCCESS response."),
@@ -194,7 +194,7 @@ class TC_DRLK_2_5(MatterBaseTest):
         end_Minute = 55
 
         # Commissioning
-        self.step("0")
+        self.step("precondition")
 
         self.step("1")
         if self.pics_guard(self.check_pics("DRLK.S.F04") and self.check_pics("DRLK.S.A0014")):
