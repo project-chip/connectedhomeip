@@ -80,10 +80,6 @@ void AddResponse(CommandHandler * commandObj, const ConcreteCommandPath & path, 
     commandObj->AddResponse(path, response);
 }
 
-#if CHIP_CONFIG_ENABLE_BDX_LOG_TRANSFER
-BDXDiagnosticLogsProvider gBDXDiagnosticLogsProvider;
-#endif // CHIP_CONFIG_ENABLE_BDX_LOG_TRANSFER
-
 } // anonymous namespace
 
 DiagnosticLogsServer DiagnosticLogsServer::sInstance;
@@ -153,6 +149,7 @@ void DiagnosticLogsServer::HandleLogRequestForBdx(CommandHandler * commandObj, c
     // to transfer as much of the current logs as it can fit within the response, and the Status field of the
     // RetrieveLogsResponse SHALL be set to Exhausted.
 #if CHIP_CONFIG_ENABLE_BDX_LOG_TRANSFER
+    auto & gBDXDiagnosticLogsProvider = BDXDiagnosticLogsProvider::GetInstance();
     VerifyOrReturn(!gBDXDiagnosticLogsProvider.IsBusy(), AddResponse(commandObj, path, StatusEnum::kBusy));
     auto err = gBDXDiagnosticLogsProvider.InitializeTransfer(commandObj, path, delegate, intent, transferFileDesignator.Value());
     VerifyOrReturn(CHIP_NO_ERROR == err, AddResponse(commandObj, path, StatusEnum::kDenied));
