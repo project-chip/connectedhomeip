@@ -36,9 +36,10 @@
 # === END CI TEST ARGUMENTS ===
 
 
-import chip.clusters as Clusters
-from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from modebase_cluster_check import ModeBaseClusterChecks
+
+import matter.clusters as Clusters
+from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 
 CLUSTER = Clusters.RefrigeratorAndTemperatureControlledCabinetMode
 
@@ -58,8 +59,6 @@ class TC_TCCM_1_2(MatterBaseTest, ModeBaseClusterChecks):
             TestStep(1, "Commissioning, already done", is_commissioning=True),
             TestStep(2, "TH reads from the DUT the SupportedModes attribute."),
             TestStep(3, "TH reads from the DUT the CurrentMode attribute."),
-            TestStep(4, "TH reads from the DUT the OnMode attribute."),
-            TestStep(5, "TH reads from the DUT the StartUpMode attribute.")
         ]
         return steps
 
@@ -90,18 +89,6 @@ class TC_TCCM_1_2(MatterBaseTest, ModeBaseClusterChecks):
         # Verify that the CurrentMode attribute has a valid value.
         mode = self.cluster.Attributes.CurrentMode
         await self.read_and_check_mode(endpoint=endpoint, mode=mode, supported_modes=supported_modes)
-
-        self.step(4)
-        # Verify that the OnMode attribute has a valid value or null.
-        mode = self.cluster.Attributes.OnMode
-        await self.read_and_check_mode(endpoint=endpoint, mode=mode,
-                                       supported_modes=supported_modes, is_nullable=True)
-
-        self.step(5)
-        # Verify that the StartUpMode has a valid value or null
-        mode = self.cluster.Attributes.StartUpMode
-        await self.read_and_check_mode(endpoint=endpoint, mode=mode,
-                                       supported_modes=supported_modes, is_nullable=True)
 
 
 if __name__ == "__main__":

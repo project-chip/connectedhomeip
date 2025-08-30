@@ -161,6 +161,9 @@ matter_add_gn_arg_bool  ("chip_enable_read_client"                CONFIG_CHIP_EN
 matter_add_gn_arg_bool  ("chip_mdns_minimal"                      CONFIG_WIFI_NRF70)
 matter_add_gn_arg_bool  ("chip_mdns_platform"                     CONFIG_NET_L2_OPENTHREAD)
 
+matter_add_gn_arg_bool  ("chip_system_config_use_sockets"                   NOT CONFIG_CHIP_USE_OPENTHREAD_ENDPOINT)
+matter_add_gn_arg_bool  ("chip_system_config_use_openthread_inet_endpoints" CONFIG_CHIP_USE_OPENTHREAD_ENDPOINT)
+
 if (CONFIG_CHIP_ENABLE_ICD_SUPPORT)
     matter_add_gn_arg_bool  ("chip_enable_icd_lit"                       CONFIG_CHIP_ICD_LIT_SUPPORT)
     matter_add_gn_arg_bool  ("chip_enable_icd_checkin"                   CONFIG_CHIP_ICD_CHECK_IN_SUPPORT)
@@ -262,17 +265,6 @@ if (CONFIG_CHIP_LIB_SHELL)
     # the Matter shell library is linked using the '--whole-archive' flag.
     target_link_options(chip INTERFACE
         -Wl,-u,_ZN4chip5Shell6Engine11RunMainLoopEv
-    )
-endif()
-
-# ==============================================================================
-# Define 'chip-ota-image' target for building CHIP OTA image
-# ==============================================================================
-
-if (CONFIG_CHIP_OTA_IMAGE_BUILD AND NOT SYSBUILD)
-    chip_ota_image(chip-ota-image
-        INPUT_FILES ${PROJECT_BINARY_DIR}/dfu_multi_image.bin
-        OUTPUT_FILE ${PROJECT_BINARY_DIR}/${CONFIG_CHIP_OTA_IMAGE_FILE_NAME}
     )
 endif()
 

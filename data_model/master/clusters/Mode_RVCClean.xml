@@ -73,7 +73,10 @@ Davis, CA 95616, USA
       <disallowConform/>
     </feature>
     <feature bit="20" code="DIRECTMODECH" name="DirectModeChange" summary="Cluster supports changing clean modes from non-Idle states">
-      <optionalConform/>
+      <otherwiseConform>
+        <provisionalConform/>
+        <optionalConform/>
+      </otherwiseConform>
     </feature>
   </features>
   <dataTypes>

@@ -127,17 +127,14 @@ public:
 
     void OnConnectWiFiNetwork();
     void UpdateNetworkingStatus();
-    static SlWiFiDriver & GetInstance()
-    {
-        static SlWiFiDriver instance;
-        return instance;
-    }
+    static SlWiFiDriver * GetInstance() { return mDriver; }
 
 private:
     bool NetworkMatch(const WiFiNetwork & network, ByteSpan networkId);
     bool StartScanWiFiNetworks(ByteSpan ssid);
     static void OnScanWiFiNetworkDone(wfx_wifi_scan_result_t * aScanResult);
 
+    static SlWiFiDriver * mDriver;
     WiFiNetwork mSavedNetwork   = {};
     WiFiNetwork mStagingNetwork = {};
     ScanCallback * mpScanCallback;

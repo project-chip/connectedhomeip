@@ -57,26 +57,50 @@ Davis, CA 95616, USA
 
 :xrefstyle: basic
 -->
-<deviceType xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd devicetype devicetype.xsd" id="ID-TBD" name="Electrical Energy Tariff" revision="1">
+<deviceType xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd devicetype devicetype.xsd" id="0x0513" name="Electrical Energy Tariff" revision="1">
   <revisionHistory>
     <revision revision="1" summary="Initial revision"/>
   </revisionHistory>
   <classification class="simple" scope="endpoint"/>
+  <conditions>
+    <condition name="ActiveTariff" summary="The tariff represents the currently active tariff"/>
+  </conditions>
   <clusters>
-    <cluster id="ID-TBD" name="Electrical Metering" side="server">
-      <optionalConform/>
-    </cluster>
-    <cluster id="0x0090" name="Electrical Power Measurement" side="server">
-      <optionalConform/>
-    </cluster>
-    <cluster id="0x0091" name="Electrical Energy Measurement" side="server">
-      <optionalConform/>
-    </cluster>
-    <cluster id="0x0095" name="Energy Price" side="server">
+    <cluster id="0x001D" name="Descriptor" side="server">
       <mandatoryConform/>
+      <features>
+        <feature code="" name="TagList">
+          <mandatoryConform/>
+        </feature>
+      </features>
+      <attributes>
+        <attribute code="0x0004" name="TagList">
+          <mandatoryConform/>
+          <constraint>
+            <tags>
+              <tag name="ElectricalEnergy"/>
+            </tags>
+          </constraint>
+        </attribute>
+        <attribute code="0x0004" name="TagList">
+          <mandatoryConform>
+            <condition name="ActiveTariff"/>
+          </mandatoryConform>
+          <constraint>
+            <tags>
+              <tag name="Current"/>
+            </tags>
+          </constraint>
+        </attribute>
+      </attributes>
     </cluster>
-    <cluster id="0x0700" name="Energy Tariff" side="server">
-      <mandatoryConform/>
+    <cluster id="0x0095" name="Commodity Price" side="server">
+      <optionalConform choice="a" more="true" min="1">
+        <condition name="ActiveTariff"/>
+      </optionalConform>
+    </cluster>
+    <cluster id="0x0700" name="Commodity Tariff" side="server">
+      <optionalConform choice="a" more="true" min="1"/>
     </cluster>
   </clusters>
 </deviceType>

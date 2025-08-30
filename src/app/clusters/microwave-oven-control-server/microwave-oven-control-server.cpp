@@ -16,7 +16,6 @@
  *
  */
 
-#include "app/data-model-provider/MetadataList.h"
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app/AttributeAccessInterfaceRegistry.h>
 #include <app/CommandHandlerInterfaceRegistry.h>
@@ -27,6 +26,7 @@
 #include <app/data-model-provider/MetadataTypes.h>
 #include <app/reporting/reporting.h>
 #include <app/util/attribute-storage.h>
+#include <lib/support/ReadOnlyBuffer.h>
 
 using namespace chip;
 using namespace chip::app;
@@ -137,7 +137,7 @@ void Instance::SetCookTimeSec(uint32_t cookTimeSec)
 
 CHIP_ERROR Instance::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
 {
-    ChipLogError(Zcl, "Microwave Oven Control: Reading");
+    ChipLogDetail(Zcl, "Microwave Oven Control: Reading");
     switch (aPath.mAttributeId)
     {
     case MicrowaveOvenControl::Attributes::CookTime::Id:
@@ -251,7 +251,7 @@ void Instance::HandleSetCookingParameters(HandlerContext & ctx, const Commands::
     if (startAfterSetting.HasValue())
     {
 
-        DataModel::ListBuilder<DataModel::AcceptedCommandEntry> acceptedCommandsList;
+        ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> acceptedCommandsList;
 
         InteractionModelEngine::GetInstance()->GetDataModelProvider()->AcceptedCommands(
             ConcreteClusterPath(mEndpointId, OperationalState::Id), acceptedCommandsList);

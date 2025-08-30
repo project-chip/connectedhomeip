@@ -1,0 +1,26 @@
+// Product settings
+AD_HOC_CODE_SIGNING_ALLOWED = YES
+CODE_SIGN_ENTITLEMENTS = $(CHIP_ROOT)/examples/darwin-framework-tool/entitlements/darwin-framework-tool.entitlements
+CODE_SIGN_IDENTITY = -
+IPHONEOS_DEPLOYMENT_TARGET = 16.1 // required for HomeKit XPC APIs
+PRODUCT_NAME = $(TARGET_NAME)
+SUPPORTS_MACCATALYST = YES
+
+// Compiler settings
+CHIP_BUILD_TOOLS = true
+GCC_PREPROCESSOR_DEFINITIONS = $(inherited) CHIP_HAVE_CONFIG_H CHIP_CONFIG_SKIP_APP_SPECIFIC_GENERATED_HEADER_INCLUDES=1 CONFIG_BUILD_FOR_HOST_UNIT_TEST CONFIG_USE_INTERACTIVE_MODE=1
+HEADER_SEARCH_PATHS = $(CHIP_ROOT)/examples/darwin-framework-tool $(CHIP_ROOT)/examples/chip-tool $(CHIP_ROOT)/examples/chip-tool/commands/clusters $(CHIP_ROOT)/examples/common $(CHIP_ROOT)/zzz_generated/darwin-framework-tool $(CHIP_ROOT)/zzz_generated/chip-tool $(CHIP_ROOT)/zzz_generated/app-common $(CHIP_ROOT)/src $(CHIP_ROOT)/src/include $(CONFIGURATION_TEMP_DIR)/Matter.build/out/gen/include $(CHIP_ROOT)/third_party/editline/include $(CHIP_ROOT)/third_party/editline/repo/include $(CHIP_ROOT)/third_party/inipp/repo/inipp $(CHIP_ROOT)/third_party/jsoncpp/repo/include $(CHIP_ROOT)/third_party/libwebsockets $(CHIP_ROOT)/third_party/libwebsockets/repo/include $(CHIP_ROOT)/third_party/libwebsockets/repo/lib/core $(CHIP_ROOT)/third_party/libwebsockets/repo/lib/core-net $(CHIP_ROOT)/third_party/libwebsockets/repo/lib/event-libs $(CHIP_ROOT)/third_party/libwebsockets/repo/lib/plat/unix $(CHIP_ROOT)/third_party/libwebsockets/repo/lib/roles $(CHIP_ROOT)/third_party/libwebsockets/repo/lib/roles/h1 $(CHIP_ROOT)/third_party/libwebsockets/repo/lib/roles/http $(CHIP_ROOT)/third_party/libwebsockets/repo/lib/roles/ws $(CHIP_ROOT)/third_party/libwebsockets/repo/lib/secure-streams $(CHIP_ROOT)/third_party/libwebsockets/repo/lib/system/async-dns $(CHIP_ROOT)/third_party/libwebsockets/repo/lib/system/metrics $(CHIP_ROOT)/third_party/nlassert/repo/include $(CHIP_ROOT)/third_party/nlio/repo/include
+OTHER_CFLAGS = -DLWS_PLAT_UNIX
+OTHER_CFLAGS[sdk=iphoneos*] = -DLWS_PLAT_UNIX -DLWS_DETECTED_PLAT_IOS
+OTHER_CPLUSPLUSFLAGS = $(OTHER_CFLAGS)
+OTHER_CPLUSPLUSFLAGS[sdk=iphoneos*] = $(OTHER_CFLAGS)
+SYSTEM_HEADER_SEARCH_PATHS = $(CHIP_ROOT)/src/darwin/Framework/CHIP
+WARNING_CFLAGS = -Wformat -Wformat-nonliteral -Wformat-security -Wconversion -Wno-documentation
+
+// Linker settings
+FRAMEWORK_SEARCH_PATHS = $(inherited) $(SDKROOT)/System/iOSSupport/System/Library/Frameworks
+LD_RUNPATH_SEARCH_PATHS = @executable_path $(BUILT_PRODUCTS_DIR)
+LIBRARY_SEARCH_PATHS = $(CONFIGURATION_TEMP_DIR)/Matter.build/out/lib $(CONFIGURATION_TEMP_DIR)/Matter.build/out/obj/src/app/lib
+
+// Include override file last, if it exists
+#include? "darwin-framework-tool.override.xcconfig"

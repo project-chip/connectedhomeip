@@ -15,7 +15,7 @@ RUN set -x \
     && rm -rf zephyr-sdk-0.17.0_linux-x86_64_minimal.tar.xz \
     && zephyr-sdk-0.17.0/setup.sh -t arm-zephyr-eabi \
     && pip3 install --break-system-packages -U --no-cache-dir west \
-    && west init zephyrproject -m https://github.com/nxp-zephyr/nxp-zsdk.git --mr nxp-v4.0.0 \
+    && west init zephyrproject -m https://github.com/nxp-zephyr/nxp-zsdk.git --mr nxp-v4.1.0 \
     && cd zephyrproject \
     && west update -o=--depth=1 -n \
     && west zephyr-export \

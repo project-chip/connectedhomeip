@@ -30,7 +30,7 @@
 #include <setup_payload/OnboardingCodesUtil.h>
 
 #include <OTAProviderCommands.h>
-#include <app/clusters/ota-provider/ota-provider.h>
+#include <app/clusters/ota-provider/CodegenIntegration.h>
 #include <ota-provider-common/BdxOtaSender.h>
 #include <ota-provider-common/OTAProviderExample.h>
 #include <shell_extension/launch.h>

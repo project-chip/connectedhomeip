@@ -14,26 +14,19 @@
 
 import("//build_overrides/chip.gni")
 import("//build_overrides/nlassert.gni")
+import("//build_overrides/nxp_sdk.gni")
 import("${chip_root}/build/chip/buildconfig_header.gni")
 import("${chip_root}/src/crypto/crypto.gni")
-import("${chip_root}/src/platform/nxp/crypto/se05x/args.gni")
+import("${chip_root}/src/platform/device.gni")
+
+#allows to get common NXP SDK gn options
+import("${nxp_sdk_build_root}/nxp_sdk.gni")
+if (!nxp_external_sdk) {
+  import("${chip_root}/src/platform/nxp/crypto/se05x/args.gni")
+}
 
 if (chip_crypto == "platform") {
   import("//build_overrides/mbedtls.gni")
-}
-
-source_set("public_headers") {
-  sources = [
-    "CHIPCryptoPAL.h",
-    "OperationalKeystore.h",
-  ]
-
-  public_deps = [
-    "${chip_root}/src/lib/asn1",
-    "${chip_root}/src/lib/core",
-    "${chip_root}/src/lib/support",
-    "${nlassert_root}:nlassert",
-  ]
 }
 
 static_library("nxp_crypto_lib") {
@@ -46,12 +39,24 @@ static_library("nxp_crypto_lib") {
     "${chip_root}/src/platform/nxp/crypto/se05x/CHIPCryptoPALHsm_se05x_rng.cpp",
     "${chip_root}/src/platform/nxp/crypto/se05x/CHIPCryptoPALHsm_se05x_utils.cpp",
     "${chip_root}/src/platform/nxp/crypto/se05x/CHIPCryptoPAL_HostFallBack.cpp",
+    "${chip_root}/src/platform/nxp/crypto/se05x/PersistentStorageOperationalKeystore_se05x.cpp",
   ]
 
-  public_deps = [ ":public_headers" ]
-  deps = [ "${chip_root}/${nxp_crypto_mw_root}:se05x" ]
+  if (nxp_platform == "rt/rw61x") {
+    sources += [
+      "${chip_root}/examples/platform/nxp/se05x/DeviceAttestationSe05xCredsExample.cpp",
+      "${chip_root}/src/credentials/examples/ExampleDACs.h",
+      "${chip_root}/src/credentials/examples/ExamplePAI.h",
+    ]
+  }
 
-  external_mbedtls = current_os == "zephyr"
+  if (chip_device_platform == "linux") {
+    deps = [ "${chip_root}/${nxp_crypto_mw_root}:se05x" ]
+  }
+
+  external_mbedtls = current_os == "zephyr" || nxp_external_sdk
+
+  public_deps = [ "${chip_root}/src/crypto" ]
 
   if (!external_mbedtls) {
     public_deps += [ "${mbedtls_root}:mbedtls" ]

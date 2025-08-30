@@ -19,12 +19,14 @@
 #include <app/data-model-provider/Provider.h>
 
 #include <app/CommandHandlerInterface.h>
+#include <app/ConcreteAttributePath.h>
 #include <app/ConcreteCommandPath.h>
 #include <app/data-model-provider/ActionReturnStatus.h>
-#include <app/data-model-provider/MetadataList.h>
+#include <app/data-model-provider/MetadataTypes.h>
+#include <app/server-cluster/SingleEndpointServerClusterRegistry.h>
 #include <app/util/af-types.h>
-#include <data-model-providers/codegen/ServerClusterInterfaceRegistry.h>
 #include <lib/core/CHIPPersistentStorageDelegate.h>
+#include <lib/support/ReadOnlyBuffer.h>
 
 namespace chip {
 namespace app {
@@ -44,6 +46,9 @@ namespace app {
 class CodegenDataModelProvider : public DataModel::Provider
 {
 public:
+    // access to the typed global singleton of this class.
+    static CodegenDataModelProvider & Instance();
+
     /// clears out internal caching. Especially useful in unit tests,
     /// where path caching does not really apply (the same path may result in different outcomes)
     void Reset() { mPreviouslyFoundCluster = std::nullopt; }
@@ -51,7 +56,7 @@ public:
     void SetPersistentStorageDelegate(PersistentStorageDelegate * delegate) { mPersistentStorageDelegate = delegate; }
     PersistentStorageDelegate * GetPersistentStorageDelegate() { return mPersistentStorageDelegate; }
 
-    ServerClusterInterfaceRegistry & Registry() { return mRegistry; }
+    SingleEndpointServerClusterRegistry & Registry() { return mRegistry; }
 
     /// Generic model implementations
     CHIP_ERROR Startup(DataModel::InteractionModelContext context) override;
@@ -67,15 +72,19 @@ public:
                                                                TLV::TLVReader & input_arguments, CommandHandler * handler) override;
 
     /// attribute tree iteration
-    CHIP_ERROR Endpoints(DataModel::ListBuilder<DataModel::EndpointEntry> & out) override;
-    CHIP_ERROR SemanticTags(EndpointId endpointId, DataModel::ListBuilder<SemanticTag> & builder) override;
-    CHIP_ERROR DeviceTypes(EndpointId endpointId, DataModel::ListBuilder<DataModel::DeviceTypeEntry> & builder) override;
-    CHIP_ERROR ClientClusters(EndpointId endpointId, DataModel::ListBuilder<ClusterId> & builder) override;
-    CHIP_ERROR ServerClusters(EndpointId endpointId, DataModel::ListBuilder<DataModel::ServerClusterEntry> & builder) override;
-    CHIP_ERROR GeneratedCommands(const ConcreteClusterPath & path, DataModel::ListBuilder<CommandId> & builder) override;
+    CHIP_ERROR Endpoints(ReadOnlyBufferBuilder<DataModel::EndpointEntry> & out) override;
+    CHIP_ERROR SemanticTags(EndpointId endpointId, ReadOnlyBufferBuilder<SemanticTag> & builder) override;
+    CHIP_ERROR DeviceTypes(EndpointId endpointId, ReadOnlyBufferBuilder<DataModel::DeviceTypeEntry> & builder) override;
+    CHIP_ERROR ClientClusters(EndpointId endpointId, ReadOnlyBufferBuilder<ClusterId> & builder) override;
+    CHIP_ERROR ServerClusters(EndpointId endpointId, ReadOnlyBufferBuilder<DataModel::ServerClusterEntry> & builder) override;
+#if CHIP_CONFIG_USE_ENDPOINT_UNIQUE_ID
+    CHIP_ERROR EndpointUniqueID(EndpointId endpointId, MutableCharSpan & epUniqueId) override;
+#endif
+    CHIP_ERROR EventInfo(const ConcreteEventPath & path, DataModel::EventEntry & eventInfo) override;
+    CHIP_ERROR GeneratedCommands(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<CommandId> & builder) override;
     CHIP_ERROR AcceptedCommands(const ConcreteClusterPath & path,
-                                DataModel::ListBuilder<DataModel::AcceptedCommandEntry> & builder) override;
-    CHIP_ERROR Attributes(const ConcreteClusterPath & path, DataModel::ListBuilder<DataModel::AttributeEntry> & builder) override;
+                                ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder) override;
+    CHIP_ERROR Attributes(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder) override;
 
     void Temporary_ReportAttributeChanged(const AttributePathParams & path) override;
 
@@ -86,6 +95,10 @@ protected:
     virtual void InitDataModelForTesting();
 
 private:
+    // Context is available after startup and cleared in shutdown.
+    // This has a value for as long as we assume the context is valid.
+    std::optional<DataModel::InteractionModelContext> mContext;
+
     // Iteration is often done in a tight loop going through all values.
     // To avoid N^2 iterations, cache a hint of where something is positioned
     uint16_t mEndpointIterationHint = 0;
@@ -112,7 +125,7 @@ private:
     // Ember requires a persistence provider, so we make sure we can always have something
     PersistentStorageDelegate * mPersistentStorageDelegate = nullptr;
 
-    ServerClusterInterfaceRegistry mRegistry;
+    SingleEndpointServerClusterRegistry mRegistry;
 
     /// Finds the specified ember cluster
     ///

@@ -109,7 +109,7 @@ CHIP_ERROR EndpointListLoader::Load()
         {
             // if we discovered a new Endpoint from the bindings, read its EndpointAttributes
             chip::EndpointId endpointId = binding.remote;
-            ChipLogProgress(AppServer, "EndpointListLoader::Load() Found new endpointId: %d", endpointId);
+            ChipLogProgress(AppServer, "EndpointListLoader::Load() Checking if endpointId: %d is new", endpointId);
             std::vector<memory::Strong<Endpoint>> endpoints = CastingPlayer::GetTargetCastingPlayer()->GetEndpoints();
             if (std::find_if(endpoints.begin(), endpoints.end(), [&endpointId](const memory::Strong<Endpoint> & endpoint) {
                     return endpoint->GetId() == endpointId;
@@ -149,7 +149,8 @@ void EndpointListLoader::Complete()
 
     if (mPendingAttributeReads == 0)
     {
-        ChipLogProgress(AppServer, "EndpointListLoader::Complete() Loading %lu endpoint(s)", mNewEndpointsToLoad);
+        ChipLogProgress(AppServer, "EndpointListLoader::Complete() Done reading attributes. Loading %lu endpoint(s)",
+                        mNewEndpointsToLoad);
         for (unsigned long i = 0; i < mNewEndpointsToLoad; i++)
         {
             EndpointAttributes endpointAttributes = mEndpointAttributesList[i];
@@ -212,6 +213,8 @@ CHIP_ERROR EndpointListLoader::ReadVendorId(EndpointAttributes * endpointAttribu
            chip::app::Clusters::ApplicationBasic::Attributes::VendorID::TypeInfo::DecodableArgType decodableVendorId) {
             EndpointAttributes * _endpointAttributes = static_cast<EndpointAttributes *>(context);
             _endpointAttributes->mVendorId           = decodableVendorId;
+            ChipLogProgress(AppServer, "EndpointListLoader::ReadVendorId() endpointId: %d, decodableVendorId: %d",
+                            _endpointAttributes->mId, decodableVendorId);
             EndpointListLoader::GetInstance()->Complete();
         },
         [](void * context, CHIP_ERROR err) {
@@ -233,6 +236,8 @@ CHIP_ERROR EndpointListLoader::ReadProductId(EndpointAttributes * endpointAttrib
            chip::app::Clusters::ApplicationBasic::Attributes::ProductID::TypeInfo::DecodableArgType decodableProductId) {
             EndpointAttributes * _endpointAttributes = static_cast<EndpointAttributes *>(context);
             _endpointAttributes->mProductId          = decodableProductId;
+            ChipLogProgress(AppServer, "EndpointListLoader::ReadProductId() endpointId: %d, decodableProductId: %d",
+                            _endpointAttributes->mId, decodableProductId);
             EndpointListLoader::GetInstance()->Complete();
         },
         [](void * context, CHIP_ERROR err) {

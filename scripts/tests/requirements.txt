@@ -4,7 +4,9 @@ click
 colorama
 coloredlogs
 diskcache
-mypy==1.10.1
-pyyaml
+mypy==1.16.0
+types-PyYAML
 tabulate
-websockets
+
+-e ${PW_PROJECT_ROOT}/scripts/py_matter_idl
+-e ${PW_PROJECT_ROOT}/scripts/py_matter_yamltests

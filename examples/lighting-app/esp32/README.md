@@ -8,6 +8,23 @@ and refer
 [building and commissioning](../../../docs/platforms/esp32/build_app_and_commission.md)
 guides to get started.
 
+### Building example for Target ESP32-C6
+
+ESP32-C6 supports both Wi-Fi and Thread transport protocols.
+
+-   To build for Matter Over Wi-Fi
+
+    ```
+    idf.py set-target esp32c6 build
+    ```
+
+-   To build for Matter Over Thread, use custom configuration file
+
+
+    ```
+    idf.py -DSDKCONFIG_DEFAULTS="sdkconfig.defaults;sdkconfig.defaults.esp32c6_thread" set-target esp32c6 build
+    ```
+
 ### Enabling ESP-Insights:
 
 -   Before building the app, enable the option: ESP_INSIGHTS_ENABLED through

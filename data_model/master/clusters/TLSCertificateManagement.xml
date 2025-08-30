@@ -62,7 +62,9 @@ Davis, CA 95616, USA
     <revision revision="1" summary="Initial Release"/>
   </revisionHistory>
   <clusterIds>
-    <clusterId id="0x0801" name="TLS Certificate Management"/>
+    <clusterId id="0x0801" name="TLS Certificate Management">
+      <provisionalConform/>
+    </clusterId>
   </clusterIds>
   <classification hierarchy="base" role="utility" picsCode="TLSCERT" scope="Node"/>
   <dataTypes>
@@ -73,54 +75,87 @@ Davis, CA 95616, USA
         <mandatoryConform/>
       </field>
       <field id="1" name="Certificate" type="octstr">
-        <mandatoryConform/>
+        <optionalConform/>
         <constraint>
           <maxLength value="3000"/>
         </constraint>
       </field>
+      <access fabricScoped="true"/>
     </struct>
     <struct name="TLSClientCertificateDetailStruct">
       <field id="0" name="CCDID" type="TLSCCDID">
         <mandatoryConform/>
       </field>
       <field id="1" name="ClientCertificate" type="octstr">
-        <mandatoryConform/>
+        <optionalConform/>
         <constraint>
           <maxLength value="3000"/>
         </constraint>
       </field>
       <field id="2" name="IntermediateCertificates" type="list">
-        <entry type="octstr"/>
-        <mandatoryConform/>
+        <entry type="octstr">
+          <constraint>
+            <maxLength value="3000"/>
+          </constraint>
+        </entry>
+        <optionalConform/>
+        <constraint>
+          <maxCount value="10"/>
+        </constraint>
       </field>
+      <access fabricScoped="true"/>
     </struct>
   </dataTypes>
   <attributes>
-    <attribute id="0x0000" name="MaxRootCertificates" type="uint8">
-      <access read="true" readPrivilege="view" fabricSensitive="true"/>
+    <attribute id="0x0000" name="MaxRootCertificates" type="uint8" default="5">
+      <access read="true" readPrivilege="view"/>
       <quality persistence="fixed"/>
       <mandatoryConform/>
+      <constraint>
+        <between>
+          <from value="5"/>
+          <to value="254"/>
+        </between>
+      </constraint>
     </attribute>
-    <attribute id="0x0001" name="CurrentRootCertificates" type="uint8">
+    <attribute id="0x0001" name="ProvisionedRootCertificates" type="list">
+      <entry type="TLSCertStruct"/>
       <access read="true" readPrivilege="view" fabricSensitive="true"/>
       <quality persistence="nonVolatile"/>
       <mandatoryConform/>
+      <constraint>
+        <maxCount>
+          <attribute name="MaxRootCertificates"/>
+        </maxCount>
+      </constraint>
     </attribute>
-    <attribute id="0x0002" name="MaxClientCertificates" type="uint8">
-      <access read="true" readPrivilege="view" fabricSensitive="true"/>
+    <attribute id="0x0002" name="MaxClientCertificates" type="uint8" default="5">
+      <access read="true" readPrivilege="view"/>
       <quality persistence="fixed"/>
       <mandatoryConform/>
+      <constraint>
+        <between>
+          <from value="5"/>
+          <to value="254"/>
+        </between>
+      </constraint>
     </attribute>
-    <attribute id="0x0003" name="CurrentClientCertificates" type="uint8">
+    <attribute id="0x0003" name="ProvisionedClientCertificates" type="list">
+      <entry type="TLSClientCertificateDetailStruct"/>
       <access read="true" readPrivilege="view" fabricSensitive="true"/>
       <quality persistence="nonVolatile"/>
       <mandatoryConform/>
+      <constraint>
+        <maxCount>
+          <attribute name="MaxClientCertificates"/>
+        </maxCount>
+      </constraint>
     </attribute>
   </attributes>
   <commands>
     <command id="0x00" name="ProvisionRootCertificate" direction="commandToServer" response="ProvisionRootCertificateResponse">
       <quality largeMessage="true"/>
-      <access invokePrivilege="admin"/>
+      <access invokePrivilege="admin" fabricScoped="true"/>
       <mandatoryConform/>
       <field id="0" name="Certificate" type="octstr">
         <mandatoryConform/>
@@ -142,7 +177,7 @@ Davis, CA 95616, USA
     </command>
     <command id="0x02" name="FindRootCertificate" direction="commandToServer" response="FindRootCertificateResponse">
       <quality largeMessage="true"/>
-      <access invokePrivilege="operate"/>
+      <access invokePrivilege="operate" fabricScoped="true"/>
       <mandatoryConform/>
       <field id="0" name="CAID" type="TLSCAID" default="null">
         <quality nullable="true"/>
@@ -156,13 +191,18 @@ Davis, CA 95616, USA
         <entry type="TLSCertStruct"/>
         <mandatoryConform/>
         <constraint>
-          <minCount value="1"/>
+          <countBetween>
+            <from value="1"/>
+            <to>
+              <attribute name="MaxRootCertificates"/>
+            </to>
+          </countBetween>
         </constraint>
       </field>
     </command>
     <command id="0x04" name="LookupRootCertificate" direction="commandToServer" response="LookupRootCertificateResponse">
       <quality largeMessage="true"/>
-      <access invokePrivilege="operate"/>
+      <access invokePrivilege="operate" fabricScoped="true"/>
       <mandatoryConform/>
       <field id="0" name="Fingerprint" type="octstr">
         <mandatoryConform/>
@@ -178,9 +218,9 @@ Davis, CA 95616, USA
         <mandatoryConform/>
       </field>
     </command>
-    <command id="0x06" name="RemoveRootCertificate" direction="commandToServer" response="N">
+    <command id="0x06" name="RemoveRootCertificate" direction="commandToServer" response="Y">
       <quality largeMessage="true"/>
-      <access invokePrivilege="admin"/>
+      <access invokePrivilege="admin" fabricScoped="true"/>
       <mandatoryConform/>
       <field id="0" name="CAID" type="TLSCAID">
         <mandatoryConform/>
@@ -188,10 +228,13 @@ Davis, CA 95616, USA
     </command>
     <command id="0x07" name="TLSClientCSR" direction="commandToServer" response="TLSClientCSRResponse">
       <quality largeMessage="true"/>
-      <access invokePrivilege="admin"/>
+      <access invokePrivilege="admin" fabricScoped="true"/>
       <mandatoryConform/>
-      <field id="1" name="Nonce" type="octstr">
+      <field id="0" name="Nonce" type="octstr">
         <mandatoryConform/>
+        <constraint>
+          <maxLength value="128"/>
+        </constraint>
       </field>
     </command>
     <command id="0x08" name="TLSClientCSRResponse" direction="responseFromServer">
@@ -202,14 +245,20 @@ Davis, CA 95616, USA
       </field>
       <field id="1" name="CSR" type="octstr">
         <mandatoryConform/>
+        <constraint>
+          <maxLength value="3000"/>
+        </constraint>
       </field>
       <field id="2" name="Nonce" type="octstr">
         <mandatoryConform/>
+        <constraint>
+          <maxLength value="128"/>
+        </constraint>
       </field>
     </command>
-    <command id="0x09" name="ProvisionClientCertificate" direction="commandToServer" response="ProvisionClientCertificateResponse">
+    <command id="0x09" name="ProvisionClientCertificate" direction="commandToServer" response="Y">
       <quality largeMessage="true"/>
-      <access invokePrivilege="admin"/>
+      <access invokePrivilege="admin" fabricScoped="true"/>
       <mandatoryConform/>
       <field id="0" name="CCDID" type="TLSCCDID">
         <mandatoryConform/>
@@ -218,36 +267,34 @@ Davis, CA 95616, USA
         <mandatoryConform/>
       </field>
     </command>
-    <command id="0x0A" name="ProvisionClientCertificateResponse" direction="responseFromServer">
+    <command id="0x0A" name="FindClientCertificate" direction="commandToServer" response="FindClientCertificateResponse">
       <quality largeMessage="true"/>
-      <mandatoryConform/>
-      <field id="0" name="CCDID" type="TLSCCDID">
-        <mandatoryConform/>
-      </field>
-    </command>
-    <command id="0x0B" name="FindClientCertificate" direction="commandToServer" response="FindClientCertificateResponse">
-      <quality largeMessage="true"/>
-      <access invokePrivilege="operate"/>
+      <access invokePrivilege="operate" fabricScoped="true"/>
       <mandatoryConform/>
       <field id="0" name="CCDID" type="TLSCCDID">
         <quality nullable="true"/>
         <mandatoryConform/>
       </field>
     </command>
-    <command id="0x0C" name="FindClientCertificateResponse" direction="responseFromServer">
+    <command id="0x0B" name="FindClientCertificateResponse" direction="responseFromServer">
       <quality largeMessage="true"/>
       <mandatoryConform/>
       <field id="0" name="CertificateDetails" type="list">
         <entry type="TLSClientCertificateDetailStruct"/>
         <mandatoryConform/>
         <constraint>
-          <minCount value="1"/>
+          <countBetween>
+            <from value="1"/>
+            <to>
+              <attribute name="MaxClientCertificates"/>
+            </to>
+          </countBetween>
         </constraint>
       </field>
     </command>
-    <command id="0x0D" name="LookupClientCertificate" direction="commandToServer" response="LookupClientCertificateResponse">
+    <command id="0x0C" name="LookupClientCertificate" direction="commandToServer" response="LookupClientCertificateResponse">
       <quality largeMessage="true"/>
-      <access invokePrivilege="operate"/>
+      <access invokePrivilege="operate" fabricScoped="true"/>
       <mandatoryConform/>
       <field id="0" name="Fingerprint" type="octstr">
         <mandatoryConform/>
@@ -256,16 +303,16 @@ Davis, CA 95616, USA
         </constraint>
       </field>
     </command>
-    <command id="0x0E" name="LookupClientCertificateResponse" direction="responseFromServer">
+    <command id="0x0D" name="LookupClientCertificateResponse" direction="responseFromServer">
       <quality largeMessage="true"/>
       <mandatoryConform/>
       <field id="0" name="CCDID" type="TLSCCDID">
         <mandatoryConform/>
       </field>
     </command>
-    <command id="0x0F" name="RemoveClientCertificate" direction="commandToServer" response="N">
+    <command id="0x0E" name="RemoveClientCertificate" direction="commandToServer" response="Y">
       <quality largeMessage="true"/>
-      <access invokePrivilege="admin"/>
+      <access invokePrivilege="admin" fabricScoped="true"/>
       <mandatoryConform/>
       <field id="0" name="CCDID" type="TLSCCDID">
         <mandatoryConform/>

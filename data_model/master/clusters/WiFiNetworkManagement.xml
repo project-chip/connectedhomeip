@@ -90,7 +90,7 @@ Davis, CA 95616, USA
     </command>
     <command id="0x01" name="NetworkPassphraseResponse" direction="responseFromServer">
       <mandatoryConform/>
-      <field name="Passphrase" type="octstr">
+      <field id="0" name="Passphrase" type="octstr">
         <mandatoryConform/>
         <constraint>
           <maxLength value="64"/>

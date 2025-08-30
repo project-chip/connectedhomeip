@@ -268,16 +268,6 @@ void ConnectivityManagerImpl::_ClearWiFiStationProvision()
     }
 }
 
-bool ConnectivityManagerImpl::_CanStartWiFiScan()
-{
-    std::lock_guard<std::mutex> lock(mWpaSupplicantMutex);
-
-    bool ret = mWpaSupplicant.state == GDBusWpaSupplicant::WPA_INTERFACE_CONNECTED &&
-        mWpaSupplicant.scanState == GDBusWpaSupplicant::WIFI_SCANNING_IDLE;
-
-    return ret;
-}
-
 CHIP_ERROR ConnectivityManagerImpl::_SetWiFiAPMode(WiFiAPMode val)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -491,7 +481,7 @@ void ConnectivityManagerImpl::_OnWpaInterfaceProxyReady(GObject * source_object,
         CHIP_ERROR errInner = StopAutoScan();
         if (errInner != CHIP_NO_ERROR)
         {
-            ChipLogError(DeviceLayer, "wpa_supplicant: Failed to stop auto scan: %s", ErrorStr(errInner));
+            ChipLogError(DeviceLayer, "wpa_supplicant: Failed to stop auto scan: %" CHIP_ERROR_FORMAT, errInner.Format());
         }
     });
 
@@ -819,7 +809,7 @@ exit:
     if (err != CHIP_NO_ERROR)
     {
         SetWiFiAPMode(kWiFiAPMode_Disabled);
-        ChipLogError(DeviceLayer, "Drive AP state failed: %s", ErrorStr(err));
+        ChipLogError(DeviceLayer, "Drive AP state failed: %" CHIP_ERROR_FORMAT, err.Format());
     }
 }
 
@@ -1466,8 +1456,8 @@ bool ConnectivityManagerImpl::_GetBssInfo(const gchar * bssPath, NetworkCommissi
         bssidLen = 0;
         ChipLogError(DeviceLayer, "Got a network with bssid not equals to 6");
     }
-    ChipLogDetail(DeviceLayer, "Network Found: %.*s (%s) Signal:%d", int(ssidLen), StringOrNullMarker((const gchar *) ssidStr),
-                  bssidStr, signal);
+    ChipLogDetail(DeviceLayer, "Network Found: %s (%s) Signal:%d",
+                  NullTerminated(StringOrNullMarker((const gchar *) ssidStr), ssidLen).c_str(), bssidStr, signal);
 
     // A flag for enterprise encryption option to avoid returning open for these networks by mistake
     // TODO: The following code will mistakenly recognize WEP encryption as OPEN network, this should be fixed by reading

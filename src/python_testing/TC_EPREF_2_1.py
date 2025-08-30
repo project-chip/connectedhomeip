@@ -33,11 +33,12 @@
 
 import logging
 
-import chip.clusters as Clusters
-from chip.interaction_model import Status
-from chip.testing.matter_asserts import assert_valid_uint8
-from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from mobly import asserts
+
+import matter.clusters as Clusters
+from matter.interaction_model import Status
+from matter.testing.matter_asserts import assert_valid_uint8
+from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 
 
 class TC_EPREF_2_1(MatterBaseTest):
@@ -48,7 +49,8 @@ class TC_EPREF_2_1(MatterBaseTest):
     def steps_TC_EPREF_2_1(self) -> list[TestStep]:
         steps = [
             TestStep("1", "Commissioning, already done", is_commissioning=True),
-            TestStep("2", "TH reads from the DUT the FeatureMap attribute."),
+            TestStep("2", "TH reads from the DUT the FeatureMap attribute",
+                     "Execute steps 3 to 5 if BALA feature is set to 1 and execute steps 6 to 7b if LPMS feature is set to 1"),
             TestStep("3", "TH reads from the DUT the EnergyBalances attribute."),
             TestStep("4", "TH reads from the DUT the CurrentEnergyBalance attribute."),
             TestStep("4a", "TH writes to the DUT the CurrentEnergyBalance attribute"),
@@ -219,7 +221,12 @@ class TC_EPREF_2_1(MatterBaseTest):
                               )
 
         else:
-            logging.info("Device does not support EnergyBalance feature and related attributes, skipped Test Step 2 to 5")
+            self.skip_step("3")
+            self.skip_step("4")
+            self.skip_step("4a")
+            self.skip_step("4b")
+            self.skip_step("5")
+            logging.info("Device does not support EnergyBalance feature and related attributes, skipped Test Step 3 to 5")
 
         if Clusters.EnergyPreference.Bitmaps.Feature.kLowPowerModeSensitivity & feature_map:
 
@@ -292,6 +299,10 @@ class TC_EPREF_2_1(MatterBaseTest):
                 logging.info("CurrentLowPowerModeSensitivity Attribute Write Response - Status: 0x87 (CONSTRAINT_ERROR)")
 
         else:
+            self.skip_step("6")
+            self.skip_step("7")
+            self.skip_step("7a")
+            self.skip_step("7b")
             logging.info("Device does not support LowPowerModeSensitivity feature and related attributes, skipped Test Step 6 to 7b")
 
 

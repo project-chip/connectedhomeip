@@ -348,6 +348,7 @@ void JsonBackend::LogMessageSend(MessageSendInfo & info)
     DecodePayloadHeader(value["payloadHeader"], info.payloadHeader);
     DecodePacketHeader(value["packetHeader"], info.packetHeader);
     DecodePayloadData(value["payload"], info.payload, info.payloadHeader->GetProtocolID(), info.payloadHeader->GetMessageType());
+    value["messageTotalSize"] = static_cast<int>(info.messageTotalSize);
 
     OutputValue(value);
 }
@@ -374,6 +375,7 @@ void JsonBackend::LogMessageReceived(MessageReceivedInfo & info)
     DecodePayloadHeader(value["payloadHeader"], info.payloadHeader);
     DecodePacketHeader(value["packetHeader"], info.packetHeader);
     DecodePayloadData(value["payload"], info.payload, info.payloadHeader->GetProtocolID(), info.payloadHeader->GetMessageType());
+    value["messageTotalSize"] = static_cast<int>(info.messageTotalSize);
 
     OutputValue(value);
 }
@@ -513,7 +515,7 @@ void JsonBackend::OutputValue(::Json::Value & value)
         chip::CharSpan line;
         while (splitter.Next(line))
         {
-            ChipLogProgress(Automation, "%.*s", static_cast<int>(line.size()), line.data());
+            ChipLogProgress(Automation, "%s", NullTerminated(line).c_str());
         }
     }
 }

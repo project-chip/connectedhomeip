@@ -93,7 +93,7 @@ public:
         AddArgument("trace_decode", 0, 1, &mTraceDecode);
 #endif // CHIP_CONFIG_TRANSPORT_TRACE_ENABLED
         AddArgument("trace-to", &mTraceTo, "Trace destinations, comma-separated (" SUPPORTED_COMMAND_LINE_TRACING_TARGETS ")");
-        AddArgument("ble-adapter", 0, UINT16_MAX, &mBleAdapterId);
+        AddArgument("ble-adapter", 0, UINT16_MAX, &mBleAdapterId, "Bluetooth adapter index. 0 -> hci0, 1 -> hci1, etc.");
         AddArgument("storage-directory", &mStorageDirectory,
                     "Directory to place camera-controller's storage files in.  Defaults to $TMPDIR, with fallback to /tmp");
         AddArgument("commissioner-vendor-id", 0, UINT16_MAX, &mCommissionerVendorId,

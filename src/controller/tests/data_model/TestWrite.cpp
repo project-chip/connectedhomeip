@@ -243,6 +243,7 @@ TEST_F(TestWrite, TestDataResponseWithAcceptedDataVersion)
 
     chip::Optional<chip::DataVersion> dataVersion;
     dataVersion.SetValue(kAcceptedDataVersion);
+    chip::Test::SetVersionTo(kAcceptedDataVersion);
     chip::Controller::WriteAttribute<Clusters::UnitTesting::Attributes::ListStructOctetString::TypeInfo>(
         sessionHandle, kTestEndpointId, value, onSuccessCb, onFailureCb, nullptr, dataVersion);
 
@@ -282,6 +283,9 @@ TEST_F(TestWrite, TestDataResponseWithRejectedDataVersion)
     };
 
     chip::Optional<chip::DataVersion> dataVersion(kRejectedDataVersion);
+    chip::Test::SetVersionTo(kAcceptedDataVersion);
+    static_assert(kAcceptedDataVersion != kRejectedDataVersion);
+
     chip::Controller::WriteAttribute<Clusters::UnitTesting::Attributes::ListStructOctetString::TypeInfo>(
         sessionHandle, kTestEndpointId, value, onSuccessCb, onFailureCb, nullptr, dataVersion);
 
@@ -451,8 +455,8 @@ TEST_F(TestWrite, TestWriteClusterSpecificStatuses)
 
         StatusIB pathStatus = writeCb->GetPathStatus();
         EXPECT_EQ(pathStatus.mStatus, Protocols::InteractionModel::Status::Success);
-        ASSERT_TRUE(pathStatus.mClusterStatus.HasValue());
-        EXPECT_EQ(pathStatus.mClusterStatus.Value(), kExampleClusterSpecificSuccess);
+        ASSERT_TRUE(pathStatus.mClusterStatus.has_value());
+        EXPECT_EQ(*pathStatus.mClusterStatus, kExampleClusterSpecificSuccess); // NOLINT(bugprone-unchecked-optional-access)
 
         EXPECT_EQ(chip::app::InteractionModelEngine::GetInstance()->GetNumActiveWriteHandlers(), 0u);
         EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 0u);
@@ -484,8 +488,8 @@ TEST_F(TestWrite, TestWriteClusterSpecificStatuses)
 
         StatusIB pathStatus = writeCb->GetPathStatus();
         EXPECT_EQ(pathStatus.mStatus, Protocols::InteractionModel::Status::Failure);
-        ASSERT_TRUE(pathStatus.mClusterStatus.HasValue());
-        EXPECT_EQ(pathStatus.mClusterStatus.Value(), kExampleClusterSpecificFailure);
+        ASSERT_TRUE(pathStatus.mClusterStatus.has_value());
+        EXPECT_EQ(*pathStatus.mClusterStatus, kExampleClusterSpecificFailure); // NOLINT(bugprone-unchecked-optional-access)
 
         EXPECT_EQ(chip::app::InteractionModelEngine::GetInstance()->GetNumActiveWriteHandlers(), 0u);
         EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 0u);

@@ -23,7 +23,6 @@
 
 #include <platform/nxp/common/ota/OTAFirmwareProcessor.h>
 #if CONFIG_CHIP_OTA_FACTORY_DATA_PROCESSOR
-#include <platform/nxp/common/factory_data/legacy/FactoryDataProviderImpl.h>
 #include <platform/nxp/common/ota/OTAFactoryDataProcessor.h>
 #endif // CONFIG_CHIP_OTA_FACTORY_DATA_PROCESSOR
 

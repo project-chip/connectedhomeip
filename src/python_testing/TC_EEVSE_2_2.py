@@ -44,11 +44,13 @@ import logging
 import time
 from datetime import datetime, timedelta, timezone
 
-import chip.clusters as Clusters
-from chip.clusters.Types import NullValue
-from chip.testing.matter_testing import EventChangeCallback, MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from mobly import asserts
 from TC_EEVSE_Utils import EEVSEBaseTestHelper
+
+import matter.clusters as Clusters
+from matter.clusters.Types import NullValue
+from matter.testing.event_attribute_reporting import EventSubscriptionHandler
+from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 
 logger = logging.getLogger(__name__)
 
@@ -70,7 +72,7 @@ class TC_EEVSE_2_2(MatterBaseTest, EEVSEBaseTestHelper):
                      is_commissioning=True),
             TestStep("2", "TH reads TestEventTriggersEnabled attribute from General Diagnostics Cluster",
                      "Value has to be 1 (True)"),
-            TestStep("3", "TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 with EnableKey field set to PIXIT.EEVSE.TESTEVENT_TRIGGERKEY and EventTrigger field set to PIXIT.EEVSE.TESTEVENTTRIGGER for Basic Functionality Test Event",
+            TestStep("3", "TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 with EnableKey field set to PIXIT.EEVSE.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to PIXIT.EEVSE.TEST_EVENT_TRIGGER for Basic Functionality Test Event",
                      "Verify DUT responds w/ status SUCCESS(0x00)"),
             TestStep("3a", "After a few seconds TH reads from the DUT the State",
                      "Value has to be 0x00 (NotPluggedIn)"),
@@ -78,16 +80,16 @@ class TC_EEVSE_2_2(MatterBaseTest, EEVSEBaseTestHelper):
                      "Value has to be 0x00 (Disabled)"),
             TestStep("3c", "TH reads from the DUT the FaultState",
                      "Value has to be 0x00 (NoError)"),
-            TestStep("4", "TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 with EnableKey field set to PIXIT.EEVSE.TESTEVENT_TRIGGERKEY and EventTrigger field set to PIXIT.EEVSE.TESTEVENTTRIGGER for EV Plugged-in Test Event",
-                     "Verify DUT responds w/ status SUCCESS(0x00) and event EEVSE.S.E00(EVConnected) sent"),
+            TestStep("4", "TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 with EnableKey field set to PIXIT.EEVSE.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to PIXIT.EEVSE.TEST_EVENT_TRIGGER for EV Plugged-in Test Event",
+                     "Verify DUT responds w/ status SUCCESS(0x00) and event EVConnected sent"),
             TestStep("4a", "TH reads from the DUT the State",
                      "Value has to be 0x01 (PluggedInNoDemand)"),
             TestStep("4b", "TH reads from the DUT the SessionID",
                      "Value is noted for later"),
-            TestStep("5", "TH sends command EnableCharging with ChargingEnabledUntil=2 minutes in the future, minimumChargeCurrent=6000, maximumChargeCurrent=60000",
+            TestStep("5", "TH sends command EnableCharging with ChargingEnabledUntil=5 seconds in the future, minimumChargeCurrent=6000, maximumChargeCurrent=60000",
                      "Verify DUT responds w/ status SUCCESS(0x00)"),
-            TestStep("6", "TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 with EnableKey field set to PIXIT.EEVSE.TESTEVENT_TRIGGERKEY and EventTrigger field set to PIXIT.EEVSE.TESTEVENTTRIGGER for EV Charge Demand Test Event",
-                     "Verify DUT responds w/ status SUCCESS(0x00) and event EEVSE.S.E02(EnergyTransferStarted) sent"),
+            TestStep("6", "TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 with EnableKey field set to PIXIT.EEVSE.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to PIXIT.EEVSE.TEST_EVENT_TRIGGER for EV Charge Demand Test Event",
+                     "Verify DUT responds w/ status SUCCESS(0x00) and event EnergyTransferStarted sent"),
             TestStep("6a", "TH reads from the DUT the State",
                      "Value has to be 0x03 (PluggedInCharging)"),
             TestStep("6b", "TH reads from the DUT the SupplyState",
@@ -97,15 +99,15 @@ class TC_EEVSE_2_2(MatterBaseTest, EEVSEBaseTestHelper):
             TestStep("6d", "TH reads from the DUT the MinimumChargeCurrent",
                      "Value has to be the minimumChargeCurrent commanded value"),
             TestStep("6e", "TH reads from the DUT the MaximumChargeCurrent",
-                     "Value has to be the min(maximumChargeCurrent commanded value,CircuitCapacity)"),
-            TestStep("7", "Wait 2 minutes",
-                     "Event EEVSE.S.E03(EnergyTransferStopped) sent with reason EvseStopped"),
+                     "Value has to be the minimum value of maximumChargeCurrent commanded value and CircuitCapacity"),
+            TestStep("7", "Wait 5 seconds",
+                     "Event EnergyTransferStopped sent with reason EvseStopped"),
             TestStep("7a", "TH reads from the DUT the State",
                      "Value has to be 0x02 (PluggedInDemand)"),
             TestStep("7b", "TH reads from the DUT the SupplyState",
                      "Value has to be 0x00 (Disabled)"),
             TestStep("8", "TH sends command EnableCharging with ChargingEnabledUntil=null, minimumChargeCurrent=6000, maximumChargeCurrent=12000",
-                     "Verify DUT responds w/ status SUCCESS(0x00) and Event EEVSE.S.E02(EnergyTransferStarted) sent"),
+                     "Verify DUT responds w/ status SUCCESS(0x00) and event EnergyTransferStarted sent"),
             TestStep("8a", "TH reads from the DUT the State",
                      "Value has to be 0x03 (PluggedInCharging)"),
             TestStep("8b", "TH reads from the DUT the SupplyState",
@@ -115,25 +117,25 @@ class TC_EEVSE_2_2(MatterBaseTest, EEVSEBaseTestHelper):
             TestStep("8d", "TH reads from the DUT the MinimumChargeCurrent",
                      "Value has to be the minimumChargeCurrent commanded value"),
             TestStep("8e", "TH reads from the DUT the MaximumChargeCurrent",
-                     "Value has to be the min(maximumChargeCurrent commanded value,CircuitCapacity)"),
+                     "Value has to be the minimum value of maximumChargeCurrent commanded value and CircuitCapacity"),
             TestStep("9", "If the optional attribute is supported, TH writes to the DUT the UserMaximumChargeCurrent=6000",
                      "Charging rate reduced to 6A"),
             TestStep("9a", "After a few seconds TH reads from the DUT the MaximumChargeCurrent",
                      "Value has to be the configured UserMaximumChargeCurrent value"),
-            TestStep("10", "TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 with EnableKey field set to PIXIT.EEVSE.TESTEVENT_TRIGGERKEY and EventTrigger field set to PIXIT.EEVSE.TESTEVENTTRIGGER for EV Charge Demand Test Event Clear",
-                     "Verify DUT responds w/ status SUCCESS(0x00) and event EEVSE.S.E03(EnergyTransferStopped) sent with reason EvStopped"),
+            TestStep("10", "TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 with EnableKey field set to PIXIT.EEVSE.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to PIXIT.EEVSE.TEST_EVENT_TRIGGER for EV Charge Demand Test Event Clear",
+                     "Verify DUT responds w/ status SUCCESS(0x00) and event EnergyTransferStopped sent with reason EvStopped"),
             TestStep("10a", "TH reads from the DUT the State",
                      "Value has to be 0x01 (PluggedInNoDemand)"),
-            TestStep("11", "TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 with EnableKey field set to PIXIT.EEVSE.TESTEVENT_TRIGGERKEY and EventTrigger field set to PIXIT.EEVSE.TESTEVENTTRIGGER for EV Charge Demand Test Event",
-                     "Verify DUT responds w/ status SUCCESS(0x00) and event EEVSE.S.E02(EnergyTransferStarted) sent"),
+            TestStep("11", "TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 with EnableKey field set to PIXIT.EEVSE.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to PIXIT.EEVSE.TEST_EVENT_TRIGGER for EV Charge Demand Test Event",
+                     "Verify DUT responds w/ status SUCCESS(0x00) and event EnergyTransferStarted sent"),
             TestStep("11a", "TH reads from the DUT the State",
                      "Value has to be 0x03 (PluggedInCharging)"),
-            TestStep("12", "TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 with EnableKey field set to PIXIT.EEVSE.TESTEVENT_TRIGGERKEY and EventTrigger field set to PIXIT.EEVSE.TESTEVENTTRIGGER for EV Charge Demand Test Event Clear",
-                     "Verify DUT responds w/ status SUCCESS(0x00) and event EEVSE.S.E03(EnergyTransferStopped) sent with reason EvStopped"),
+            TestStep("12", "TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 with EnableKey field set to PIXIT.EEVSE.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to PIXIT.EEVSE.TEST_EVENT_TRIGGER for EV Charge Demand Test Event Clear",
+                     "Verify DUT responds w/ status SUCCESS(0x00) and event EnergyTransferStopped sent with reason EvStopped"),
             TestStep("12a", "TH reads from the DUT the State",
                      "Value has to be 0x01 (PluggedInNoDemand)"),
-            TestStep("13", "TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 with EnableKey field set to PIXIT.EEVSE.TESTEVENT_TRIGGERKEY and EventTrigger field set to PIXIT.EEVSE.TESTEVENTTRIGGER for EV Plugged-in Test Event Clear",
-                     "Verify DUT responds w/ status SUCCESS(0x00) and event EEVSE.S.E01(EVNotDetected) sent"),
+            TestStep("13", "TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 with EnableKey field set to PIXIT.EEVSE.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to PIXIT.EEVSE.TEST_EVENT_TRIGGER for EV Plugged-in Test Event Clear",
+                     "Verify DUT responds w/ status SUCCESS(0x00) and event EVNotDetected sent"),
             TestStep("13a", "TH reads from the DUT the State",
                      "Value has to be 0x00 (NotPluggedIn)"),
             TestStep("13b", "TH reads from the DUT the SupplyState",
@@ -141,22 +143,22 @@ class TC_EEVSE_2_2(MatterBaseTest, EEVSEBaseTestHelper):
             TestStep("13c", "TH reads from the DUT the SessionID",
                      "Value has to be the same value noted in 4b"),
             TestStep("13d", "TH reads from the DUT the SessionDuration",
-                     "Value has to be greater than 120 (and match the time taken for the tests from step 4 to step 13)"),
-            TestStep("14", "TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 with EnableKey field set to PIXIT.EEVSE.TESTEVENT_TRIGGERKEY and EventTrigger field set to PIXIT.EEVSE.TESTEVENTTRIGGER for EV Plugged-in Test Event",
-                     "Verify DUT responds w/ status SUCCESS(0x00) and event EEVSE.S.E00(EVConnected) sent"),
-            TestStep("14a", "TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 with EnableKey field set to PIXIT.EEVSE.TESTEVENT_TRIGGERKEY and EventTrigger field set to PIXIT.EEVSE.TESTEVENTTRIGGER for EV Charge Demand Test Event",
-                     "Verify DUT responds w/ status SUCCESS(0x00) and event EEVSE.S.E02(EnergyTransferStarted) sent"),
+                     "Value has to be greater than 5s (and match the time taken for the tests from step 4 to step 13)"),
+            TestStep("14", "TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 with EnableKey field set to PIXIT.EEVSE.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to PIXIT.EEVSE.TEST_EVENT_TRIGGER for EV Plugged-in Test Event",
+                     "Verify DUT responds w/ status SUCCESS(0x00) and event EVConnected sent"),
+            TestStep("14a", "TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 with EnableKey field set to PIXIT.EEVSE.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to PIXIT.EEVSE.TEST_EVENT_TRIGGER for EV Charge Demand Test Event",
+                     "Verify DUT responds w/ status SUCCESS(0x00) and event EnergyTransferStarted sent"),
             TestStep("14b", "TH reads from the DUT the SessionID",
                      "Value has to be 1 more than the value noted in 4b"),
             TestStep("15", "TH sends command Disable",
-                     "Verify DUT responds w/ status SUCCESS(0x00) and Event EEVSE.S.E03(EnergyTransferStopped) sent with reason EvseStopped"),
+                     "Verify DUT responds w/ status SUCCESS(0x00) and event EnergyTransferStopped sent with reason EvseStopped"),
             TestStep("15a", "TH reads from the DUT the SupplyState",
                      "Value has to be 0x00 (Disabled)"),
-            TestStep("16", "TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 with EnableKey field set to PIXIT.EEVSE.TESTEVENT_TRIGGERKEY and EventTrigger field set to PIXIT.EEVSE.TESTEVENTTRIGGER for EV Charge Demand Test Event Clear",
+            TestStep("16", "TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 with EnableKey field set to PIXIT.EEVSE.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to PIXIT.EEVSE.TEST_EVENT_TRIGGER for EV Charge Demand Test Event Clear",
                      "Verify DUT responds w/ status SUCCESS(0x00)"),
-            TestStep("17", "TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 with EnableKey field set to PIXIT.EEVSE.TESTEVENT_TRIGGERKEY and EventTrigger field set to PIXIT.EEVSE.TESTEVENTTRIGGER for EV Plugged-in Test Event Clear",
-                     "Verify DUT responds w/ status SUCCESS(0x00) and event EEVSE.S.E01(EVNotDetected) sent"),
-            TestStep("18", "TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 with EnableKey field set to PIXIT.EEVSE.TESTEVENT_TRIGGERKEY and EventTrigger field set to PIXIT.EEVSE.TESTEVENTTRIGGER for Basic Functionality Test Event Clear",
+            TestStep("17", "TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 with EnableKey field set to PIXIT.EEVSE.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to PIXIT.EEVSE.TEST_EVENT_TRIGGER for EV Plugged-in Test Event Clear",
+                     "Verify DUT responds w/ status SUCCESS(0x00) and event EVNotDetected sent"),
+            TestStep("18", "TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 with EnableKey field set to PIXIT.EEVSE.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to PIXIT.EEVSE.TEST_EVENT_TRIGGER for Basic Functionality Test Event Clear",
                      "Verify DUT responds w/ status SUCCESS(0x00)"),
         ]
 
@@ -169,7 +171,7 @@ class TC_EEVSE_2_2(MatterBaseTest, EEVSEBaseTestHelper):
         # Commission DUT - already done
 
         # Subscribe to Events and when they are sent push them to a queue for checking later
-        events_callback = EventChangeCallback(Clusters.EnergyEvse)
+        events_callback = EventSubscriptionHandler(expected_cluster=Clusters.EnergyEvse)
         await events_callback.start(self.default_controller,
                                     self.dut_node_id,
                                     self.get_endpoint())
@@ -206,18 +208,18 @@ class TC_EEVSE_2_2(MatterBaseTest, EEVSEBaseTestHelper):
         self.validate_ev_connected_event(event_data, session_id)
 
         self.step("5")
-        charging_duration = 5  # TODO test plan spec says 120s - reduced for now
+        charging_duration = 5
         min_charge_current = 6000
         max_charge_current = 60000
         expected_state = Clusters.EnergyEvse.Enums.StateEnum.kPluggedInCharging
-        # get epoch time for ChargeUntil variable (2 minutes from now)
+        # get epoch time for ChargeUntil variable
         utc_time_charging_end = datetime.now(
             tz=timezone.utc) + timedelta(seconds=charging_duration)
 
         # Matter epoch is 0 hours, 0 minutes, 0 seconds on Jan 1, 2000 UTC
         epoch_time = int((utc_time_charging_end - datetime(2000,
                          1, 1, 0, 0, 0, 0, timezone.utc)).total_seconds())
-        await self.send_enable_charge_command(endpoint=1, charge_until=epoch_time, min_charge=min_charge_current, max_charge=max_charge_current)
+        await self.send_enable_charge_command(charge_until=epoch_time, min_charge=min_charge_current, max_charge=max_charge_current)
 
         self.step("6")
         await self.send_test_event_trigger_charge_demand()
@@ -290,10 +292,10 @@ class TC_EEVSE_2_2(MatterBaseTest, EEVSEBaseTestHelper):
         self.validate_energy_transfer_started_event(
             event_data, session_id, expected_state, expected_max_charge)
 
-        self.step("9")
         # This will only work if the optional UserMaximumChargeCurrent attribute is supported
         supported_attributes = await self.get_supported_energy_evse_attributes()
         if Clusters.EnergyEvse.Attributes.UserMaximumChargeCurrent.attribute_id in supported_attributes:
+            self.step("9")
             logging.info("UserMaximumChargeCurrent is supported...")
             user_max_charge_current = 6000
             await self.write_user_max_charge(1, user_max_charge_current)
@@ -307,6 +309,7 @@ class TC_EEVSE_2_2(MatterBaseTest, EEVSEBaseTestHelper):
         else:
             logging.info(
                 "UserMaximumChargeCurrent is NOT supported... skipping.")
+            self.mark_step_range_skipped("9", "9a")
 
         self.step("10")
         await self.send_test_event_trigger_charge_demand_clear()

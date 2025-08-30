@@ -101,6 +101,7 @@ silabs_executable("chef_app") {
   if (chip_enable_pw_rpc) {
     defines += [
       "PW_RPC_ENABLED",
+      "PW_RPC_ACTIONS_SERVICE=1",
       "PW_RPC_ATTRIBUTE_SERVICE=1",
       "PW_RPC_BUTTON_SERVICE=1",
       "PW_RPC_DESCRIPTOR_SERVICE=1",
