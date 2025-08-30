@@ -879,6 +879,7 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
 
     // MTRCommissioningOperation already checks whether we have an existing
     // currentCommissioning.
+    MTR_LOG("%@ starting new commissioning %@", self, commissioning);
     self.currentCommissioning = commissioning;
 
     // Capture in a block variable to avoid losing granularity for metrics,
@@ -916,6 +917,7 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
 - (void)commissioningDone:(MTRCommissioningOperation *)commissioning
 {
     if (self.currentCommissioning == commissioning) {
+        MTR_LOG("%@ stopping commissioning %@", self, commissioning);
         self.currentCommissioning = nil;
 
         // Reset ourselves as the device controller delegate, so we can
@@ -1281,7 +1283,8 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
 {
     auto * currentCommissioning = self.currentCommissioning;
     if (currentCommissioning && !currentCommissioning.isInternallyCreated) {
-        MTR_LOG_ERROR("Trying to cancelCommissioningForNodeID: when using MTRCommissioningOperation; call ignored");
+        MTR_LOG_ERROR("Trying to cancelCommissioningForNodeID 0x%016llX (%@) when using MTRCommissioningOperation; call ignored",
+                      nodeID.unsignedLongLongValue, nodeID);
         if (error) {
             *error = [MTRError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE];
         }
