@@ -506,14 +506,14 @@ CHIP_ERROR PosixConfig::ClearNamespace(const char * ns)
     err = storage->ClearAll();
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(DeviceLayer, "Storage ClearAll failed: %s", ErrorStr(err));
+        ChipLogError(DeviceLayer, "Storage ClearAll failed: %" CHIP_ERROR_FORMAT, err.Format());
     }
     SuccessOrExit(err);
 
     err = storage->Commit();
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(DeviceLayer, "Storage Commit failed: %s", ErrorStr(err));
+        ChipLogError(DeviceLayer, "Storage Commit failed: %" CHIP_ERROR_FORMAT, err.Format());
     }
 
 exit:
@@ -538,14 +538,14 @@ CHIP_ERROR PosixConfig::FactoryResetConfig()
     err = storage->ClearAll();
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(DeviceLayer, "Storage ClearAll failed: %s", ErrorStr(err));
+        ChipLogError(DeviceLayer, "Storage ClearAll failed: %" CHIP_ERROR_FORMAT, err.Format());
     }
     SuccessOrExit(err);
 
     err = storage->Commit();
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(DeviceLayer, "Storage Commit failed: %s", ErrorStr(err));
+        ChipLogError(DeviceLayer, "Storage Commit failed: %" CHIP_ERROR_FORMAT, err.Format());
     }
 
 exit:
@@ -570,14 +570,14 @@ CHIP_ERROR PosixConfig::FactoryResetCounters()
     err = storage->ClearAll();
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(DeviceLayer, "Storage ClearAll failed: %s", ErrorStr(err));
+        ChipLogError(DeviceLayer, "Storage ClearAll failed: %" CHIP_ERROR_FORMAT, err.Format());
     }
     SuccessOrExit(err);
 
     err = storage->Commit();
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(DeviceLayer, "Storage Commit failed: %s", ErrorStr(err));
+        ChipLogError(DeviceLayer, "Storage Commit failed: %" CHIP_ERROR_FORMAT, err.Format());
     }
 
 exit:

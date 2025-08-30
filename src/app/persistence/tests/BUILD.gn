@@ -20,10 +20,16 @@ import("${chip_root}/build/chip/chip_test_suite.gni")
 chip_test_suite("tests") {
   output_name = "appPersistenceTests"
 
-  test_sources = [ "TestPascalString.cpp" ]
+  test_sources = [
+    "TestAttributePersistence.cpp",
+    "TestPascalString.cpp",
+    "TestString.cpp",
+  ]
 
   public_deps = [
+    "${chip_root}/src/app/data-model-provider/tests:encode-decode",
     "${chip_root}/src/app/persistence",
+    "${chip_root}/src/app/persistence:default",
     "${chip_root}/src/lib/core:string-builder-adapters",
     "${chip_root}/src/lib/support:testing",
   ]

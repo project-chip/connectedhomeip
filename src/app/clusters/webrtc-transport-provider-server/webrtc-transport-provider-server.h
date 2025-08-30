@@ -333,7 +333,7 @@ private:
     WebRTCSessionStruct * CheckForMatchingSession(HandlerContext & ctx, uint16_t sessionId);
     UpsertResultEnum UpsertSession(const WebRTCSessionStruct & session);
     void RemoveSession(uint16_t sessionId);
-    uint16_t GenerateSessionId();
+    CHIP_ERROR GenerateSessionId(uint16_t & outSessionId);
 
     // Command Handlers
     void HandleSolicitOffer(HandlerContext & ctx, const Commands::SolicitOffer::DecodableType & req);

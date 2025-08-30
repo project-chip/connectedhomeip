@@ -111,11 +111,6 @@ static_library("shell") {
       "MainLoopBee.cpp",
       "streamer_bee.cpp",
     ]
-  } else if (chip_device_platform == "openiotsdk") {
-    sources += [
-      "MainLoopDefault.cpp",
-      "streamer_openiotsdk.cpp",
-    ]
   } else if (chip_device_platform == "asr") {
     sources += [
       "MainLoopDefault.cpp",
