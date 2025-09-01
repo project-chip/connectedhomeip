@@ -7137,6 +7137,51 @@ bool emberAfDishwasherAlarmClusterModifyEnabledAlarmsCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::DishwasherAlarm::Commands::ModifyEnabledAlarms::DecodableType & commandData);
 /**
+<<<<<<< HEAD
+=======
+ * @brief Groupcast Cluster JoinGroup Command callback (from client)
+ */
+bool emberAfGroupcastClusterJoinGroupCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::Groupcast::Commands::JoinGroup::DecodableType & commandData);
+/**
+ * @brief Groupcast Cluster LeaveGroup Command callback (from client)
+ */
+bool emberAfGroupcastClusterLeaveGroupCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::Groupcast::Commands::LeaveGroup::DecodableType & commandData);
+/**
+ * @brief Groupcast Cluster UpdateGroupKey Command callback (from client)
+ */
+bool emberAfGroupcastClusterUpdateGroupKeyCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::Groupcast::Commands::UpdateGroupKey::DecodableType & commandData);
+/**
+ * @brief Groupcast Cluster ExpireGracePeriod Command callback (from client)
+ */
+bool emberAfGroupcastClusterExpireGracePeriodCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::Groupcast::Commands::ExpireGracePeriod::DecodableType & commandData);
+/**
+ * @brief Groupcast Cluster ConfigureAuxiliaryACL Command callback (from client)
+ */
+bool emberAfGroupcastClusterConfigureAuxiliaryACLCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::Groupcast::Commands::ConfigureAuxiliaryACL::DecodableType & commandData);
+/**
+ * @brief HEPA Filter Monitoring Cluster ResetCondition Command callback (from client)
+ */
+bool emberAfHepaFilterMonitoringClusterResetConditionCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::HepaFilterMonitoring::Commands::ResetCondition::DecodableType & commandData);
+/**
+ * @brief Activated Carbon Filter Monitoring Cluster ResetCondition Command callback (from client)
+ */
+bool emberAfActivatedCarbonFilterMonitoringClusterResetConditionCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::ActivatedCarbonFilterMonitoring::Commands::ResetCondition::DecodableType & commandData);
+/**
+>>>>>>> 1129ad4805 (duplicated emberAf* functions for ActivatedCarbon and HEPA.)
  * @brief Boolean State Configuration Cluster SuppressAlarm Command callback (from client)
  */
 bool emberAfBooleanStateConfigurationClusterSuppressAlarmCallback(

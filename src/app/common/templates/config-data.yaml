@@ -144,6 +144,7 @@ ClustersWithPreAttributeChangeFunctions:
 CodeDrivenClusters:
     # keep-sorted start
     - Access Control
+    - Activated Carbon Filter Monitoring
     - Administrator Commissioning
     - Basic Information
     - Binding
@@ -154,6 +155,7 @@ CodeDrivenClusters:
     - Fixed Label
     - General Commissioning
     - General Diagnostics
+    - HEPA Filter Monitoring
     - Group Key Management
     - Groupcast
     - Identify
