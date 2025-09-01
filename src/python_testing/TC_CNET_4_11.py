@@ -22,6 +22,7 @@ import platform
 import shutil  # Only for macOS networksetup
 import socket
 import subprocess
+import time
 from typing import Optional
 
 from mobly import asserts
@@ -47,6 +48,31 @@ class ConnectionResult:
     def __init__(self, returncode: int, stderr: str = ""):
         self.returncode = returncode
         self.stderr = stderr
+
+
+async def run_command(command: str, description: str = "", check: bool = True) -> str:
+    """Execute a shell command asynchronously."""
+    try:
+        if description:
+            logger.debug(f"run_command: {description} - {command}")
+
+        proc = await asyncio.create_subprocess_shell(
+            command,
+            stdout=asyncio.subprocess.PIPE,
+            stderr=asyncio.subprocess.PIPE
+        )
+        stdout, stderr = await proc.communicate()
+
+        if check and proc.returncode != 0:
+            logger.error(f"run_command: Command failed: {command} - {stderr.decode()}")
+            raise subprocess.CalledProcessError(proc.returncode, command, stderr.decode())
+
+        return stdout.decode()
+    except Exception as e:
+        if check:
+            raise
+        logger.warning(f"run_command: Command failed (ignored): {command} - {e}")
+        return ""
 
 
 async def detect_wifi_iface():
@@ -134,7 +160,7 @@ async def request_dhcp(iface):
 
 
 async def connect_wifi_linux(ssid, password) -> ConnectionResult:
-    """Connects to WiFi using wpa_supplicant (works on Linux for both desktop and Raspberry Pi)."""
+    """Connects to WiFi using wpa_supplicant with improved error handling and interface reset."""
     if isinstance(ssid, bytes):
         ssid = ssid.decode()
     if isinstance(password, bytes):
@@ -148,71 +174,155 @@ async def connect_wifi_linux(ssid, password) -> ConnectionResult:
 
     logger.info(f"connect_wifi_linux: Connecting to {ssid} on interface {iface}")
 
-    # Scan for SSID
-    if not await scan_and_find(iface, ssid):
-        logger.error(f"connect_wifi_linux: SSID {ssid} not found in scan")
-        return ConnectionResult(1, f"SSID {ssid} not found")
-
-    # List known networks and find or add the target network
     try:
+        # First, ensure interface is up and reset state
+        await run_command(f"sudo ip link set {iface} up", check=False)
+        await asyncio.sleep(1)
+
+        # Disconnect from any current connection
+        await wpa_command(iface, "DISCONNECT")
+        await asyncio.sleep(2)
+
+        # Remove all existing networks to avoid conflicts
         nets_result = await wpa_command(iface, "LIST_NETWORKS")
-        nets = nets_result.splitlines()[1:]
-        net_id = None
-        for n in nets:
-            cols = n.split("\t")
-            if len(cols) >= 2 and cols[1] == ssid:
-                net_id = cols[0]
+        if nets_result and "network id" in nets_result:
+            nets = nets_result.splitlines()[1:]
+            for n in nets:
+                if n.strip():
+                    cols = n.split("\t")
+                    if len(cols) >= 1:
+                        await wpa_command(iface, f"REMOVE_NETWORK {cols[0]}")
+
+        # Add and configure the target network
+        net_id = await wpa_command(iface, "ADD_NETWORK")
+        if net_id.startswith("FAIL"):
+            logger.error(f"connect_wifi_linux: Failed to add network: {net_id}")
+            return ConnectionResult(1, f"Failed to add network: {net_id}")
+
+        net_id = net_id.strip()
+
+        # Configure network with explicit parameters
+        config_commands = [
+            f'SET_NETWORK {net_id} ssid "{ssid}"',
+            f'SET_NETWORK {net_id} psk "{password}"',
+            f'SET_NETWORK {net_id} key_mgmt WPA-PSK',
+            f'SET_NETWORK {net_id} proto RSN WPA',
+            f'SET_NETWORK {net_id} pairwise CCMP TKIP',
+            f'SET_NETWORK {net_id} group CCMP TKIP',
+        ]
+
+        for cmd in config_commands:
+            result = await wpa_command(iface, cmd)
+            if result.startswith("FAIL"):
+                logger.error(f"connect_wifi_linux: Failed to configure network: {cmd} -> {result}")
+                return ConnectionResult(1, f"Failed to configure network: {cmd}")
+
+        # Enable and select the network
+        await wpa_command(iface, f"ENABLE_NETWORK {net_id}")
+        await wpa_command(iface, f"SELECT_NETWORK {net_id}")
+        await wpa_command(iface, "REASSOCIATE")
+
+        # Wait for connection with multiple attempts
+        max_attempts = 3
+        timeout = 20
+
+        for attempt in range(max_attempts):
+            logger.info(f"connect_wifi_linux: Connection attempt {attempt + 1}/{max_attempts}")
+
+            start_time = time.time()
+            connected = False
+
+            while time.time() - start_time < timeout:
+                status = await wpa_command(iface, "STATUS")
+
+                if "wpa_state=COMPLETED" in status:
+                    logger.info(f"connect_wifi_linux: WiFi association completed for {ssid}")
+                    connected = True
+                    break
+                elif "wpa_state=4WAY_HANDSHAKE" in status:
+                    # Authentication in progress, wait a bit more
+                    await asyncio.sleep(2)
+                elif "wpa_state=DISCONNECTED" in status or "wpa_state=INACTIVE" in status:
+                    logger.warning(f"connect_wifi_linux: Connection failed, status: {status}")
+                    break
+
+                await asyncio.sleep(1)
+
+            if connected:
                 break
 
-        if not net_id:
-            # Add new network
-            net_id = await wpa_command(iface, "ADD_NETWORK")
-            await wpa_command(iface, f'SET_NETWORK {net_id} ssid "{ssid}"')
-            await wpa_command(iface, f'SET_NETWORK {net_id} password "{password}"')
+            # If connection failed and we have more attempts, reset interface
+            if attempt < max_attempts - 1:
+                logger.warning(f"connect_wifi_linux: Attempt {attempt + 1} failed, resetting interface")
+                await run_command(f"sudo ip link set {iface} down", check=False)
+                await asyncio.sleep(2)
+                await run_command(f"sudo ip link set {iface} up", check=False)
+                await asyncio.sleep(3)
+                await wpa_command(iface, f"SELECT_NETWORK {net_id}")
+                await wpa_command(iface, "REASSOCIATE")
+                await asyncio.sleep(2)
 
-        # Connect to network
-        logger.info(f"connect_wifi_linux: Connecting to network {ssid}")
-        await wpa_command(iface, f"SELECT_NETWORK {net_id}")
-        await wpa_command(iface, f"ENABLE_NETWORK {net_id}")
-        await wpa_command(iface, "SAVE_CONFIG")
+        if not connected:
+            final_status = await wpa_command(iface, "STATUS")
+            logger.error(f"connect_wifi_linux: Connection failed after {max_attempts} attempts. Final status: {final_status}")
+            return ConnectionResult(1, f"Connection failed: {final_status}")
 
-        # Wait a moment for connection attempt
-        await asyncio.sleep(3)
+        # Connection successful, get IP address
+        logger.info(f"connect_wifi_linux: WiFi connected, requesting IP address")
 
-        # Check connection status
-        status = await wpa_command(iface, "STATUS")
-        if "wpa_state=COMPLETED" not in status:
-            logger.error(f"connect_wifi_linux: Connection failed. Status: {status}")
-            if "wpa_state=4WAY_HANDSHAKE" in status:
-                logger.error("connect_wifi_linux: Possible incorrect password")
-                return ConnectionResult(1, "Authentication failed - check password")
-            return ConnectionResult(1, "Connection failed")
+        # Release any existing DHCP lease and request new one
+        await run_command(f"sudo dhclient -r {iface}", check=False)
+        await asyncio.sleep(1)
+        dhcp_result = await run_command(f"sudo dhclient {iface}", check=False)
 
-        logger.info(f"connect_wifi_linux: Connected to {ssid}")
+        # Wait for IP assignment with retry
+        ip_timeout = 15
+        ip_start = time.time()
 
-        # Request IP
-        if not await request_dhcp(iface):
-            logger.error("connect_wifi_linux: Could not obtain IP")
-            return ConnectionResult(1, "Could not obtain IP")
-
-        # Wait for IP confirmation
-        retry = 1
-        while retry <= MAX_RETRIES * 2:
+        while time.time() - ip_start < ip_timeout:
             proc = await asyncio.create_subprocess_exec(
                 "ip", "-4", "addr", "show", iface,
-                stdout=asyncio.subprocess.PIPE
+                stdout=asyncio.subprocess.PIPE,
+                stderr=asyncio.subprocess.PIPE
             )
             stdout, _ = await proc.communicate()
             output = stdout.decode()
-            if "inet " in output:
-                ip = output.split("inet ")[1].split()[0]
-                logger.info(f"connect_wifi_linux: Connected to {ssid} with IP {ip}")
-                return ConnectionResult(0)
-            await asyncio.sleep(1)
-            retry += 1
 
-        logger.error(f"connect_wifi_linux: Could not obtain IP after {MAX_RETRIES * 2}s")
-        return ConnectionResult(1, "Timeout waiting for IP")
+            if "inet " in output:
+                import re
+                ip_match = re.search(r'inet\s+(\S+)', output)
+                if ip_match:
+                    ip_info = ip_match.group(1)
+                    logger.info(f"connect_wifi_linux: Connected to {ssid} with IP {ip_info}")
+
+                    # Test connectivity to gateway
+                    try:
+                        gateway_proc = await asyncio.create_subprocess_exec(
+                            "ip", "route", "show", "default",
+                            stdout=asyncio.subprocess.PIPE
+                        )
+                        gw_stdout, _ = await gateway_proc.communicate()
+                        gw_output = gw_stdout.decode()
+                        gw_match = re.search(r'default via (\S+)', gw_output)
+                        if gw_match:
+                            gateway = gw_match.group(1)
+                            ping_proc = await asyncio.create_subprocess_exec(
+                                "ping", "-c", "1", "-W", "3", gateway,
+                                stdout=asyncio.subprocess.PIPE,
+                                stderr=asyncio.subprocess.PIPE
+                            )
+                            ping_stdout, _ = await ping_proc.communicate()
+                            if "1 received" in ping_stdout.decode():
+                                logger.info(f"connect_wifi_linux: Connectivity verified to gateway {gateway}")
+                    except:
+                        logger.warning("connect_wifi_linux: Could not verify connectivity, but connection appears established")
+
+                    return ConnectionResult(0, "")
+
+            await asyncio.sleep(1)
+
+        logger.error("connect_wifi_linux: WiFi connected but no IP address obtained")
+        return ConnectionResult(1, "No IP address obtained")
 
     except Exception as e:
         logger.error(f"connect_wifi_linux: Exception during connection: {e}")
@@ -294,8 +404,12 @@ def is_network_switch_successful(err):
 
 async def change_networks(test, cluster, ssid, password, breadcrumb):
     """ Changes networks in DUT by sending ConnectNetwork command and
-        changes TH network by calling connect_host_wifi function."""
+        changes TH network by calling connect_host_wifi function with fallback."""
     logger.info(f"change_networks: Starting network change to {ssid}")
+
+    # Store original network for fallback
+    original_ssid = test.matter_test_config.wifi_ssid
+    original_password = test.matter_test_config.wifi_passphrase
 
     retry = 1
     while retry <= MAX_RETRIES:
@@ -319,7 +433,6 @@ async def change_networks(test, cluster, ssid, password, breadcrumb):
             success = is_network_switch_successful(err)
             if success:
                 logger.info("change_networks: DUT network switch successful")
-                break
             else:
                 logger.error(f"change_networks: DUT network switch failed: {err}")
         except asyncio.TimeoutError:
@@ -327,7 +440,7 @@ async def change_networks(test, cluster, ssid, password, breadcrumb):
         except Exception as e:
             logger.error(f"change_networks: Lost connection with DUT on attempt {retry}. Exception: {e}")
 
-        # Change TH network
+        # Wait for DUT to change networks
         logger.info(f"change_networks: Waiting {WIFI_WAIT_SECONDS}s for DUT to change networks")
         await asyncio.sleep(WIFI_WAIT_SECONDS)
 
@@ -339,26 +452,78 @@ async def change_networks(test, cluster, ssid, password, breadcrumb):
             )
             if result and result.returncode == 0:
                 logger.info(f"change_networks: TH successfully connected to {ssid}")
+                return  # Success!
             else:
                 logger.error(f"change_networks: TH failed to connect to {ssid}")
+
+                # Try fallback to original network immediately
+                logger.warning(f"change_networks: Attempting fallback to original network {original_ssid}")
+                try:
+                    fallback_result = await asyncio.wait_for(
+                        connect_host_wifi(ssid=original_ssid, password=original_password),
+                        timeout=60
+                    )
+                    if fallback_result and fallback_result.returncode == 0:
+                        logger.info(f"change_networks: Successfully fell back to {original_ssid}")
+                    else:
+                        logger.error(f"change_networks: Fallback to {original_ssid} also failed!")
+                except Exception as fallback_e:
+                    logger.error(f"change_networks: Fallback connection failed: {fallback_e}")
+
         except asyncio.TimeoutError:
             logger.error(f"change_networks: Timeout changing TH to {ssid}")
+
+            # Attempt fallback on timeout as well
+            logger.warning(f"change_networks: Timeout occurred, attempting fallback to {original_ssid}")
+            try:
+                fallback_result = await connect_host_wifi(ssid=original_ssid, password=original_password)
+                if fallback_result and fallback_result.returncode == 0:
+                    logger.info(f"change_networks: Successfully fell back to {original_ssid} after timeout")
+            except Exception as fallback_e:
+                logger.error(f"change_networks: Fallback after timeout failed: {fallback_e}")
+
         except Exception as e:
             logger.error(f"change_networks: TH failed to change to {ssid}: {e}")
 
         retry += 1
-    else:
-        logger.error(f"change_networks: Failed to switch networks after {MAX_RETRIES} retries.")
-        raise Exception(f"Failed to switch networks to {ssid} after {MAX_RETRIES} attempts")
+
+    # All attempts failed, ensure we have fallback connectivity
+    logger.error(f"change_networks: Failed to switch networks after {MAX_RETRIES} retries.")
+    logger.info(f"change_networks: Ensuring fallback connectivity to {original_ssid}")
+
+    try:
+        fallback_result = await connect_host_wifi(ssid=original_ssid, password=original_password)
+        if fallback_result and fallback_result.returncode == 0:
+            logger.info(f"change_networks: Final fallback to {original_ssid} successful")
+        else:
+            logger.error(f"change_networks: Final fallback to {original_ssid} failed - WiFi may be disconnected!")
+    except Exception as final_e:
+        logger.error(f"change_networks: Final fallback attempt failed: {final_e}")
+
+    raise Exception(f"Failed to switch networks to {ssid} after {MAX_RETRIES} attempts")
 
 
 class TC_CNET_4_11(MatterBaseTest):
 
     def teardown_class(self):
-        # TH changes its Wi-Fi connection back to PIXIT.CNET.WIFI_1ST_ACCESSPOINT_SSID
-        asyncio.get_event_loop().run_until_complete(
-            connect_host_wifi(self.matter_test_config.wifi_ssid, self.matter_test_config.wifi_passphrase)
-        )
+        """Ensure TH returns to original WiFi network on test completion."""
+        logger.info("teardown_class: Restoring TH connection to original network")
+        try:
+            # TH changes its Wi-Fi connection back to PIXIT.CNET.WIFI_1ST_ACCESSPOINT_SSID
+            loop = asyncio.new_event_loop()
+            asyncio.set_event_loop(loop)
+            result = loop.run_until_complete(
+                connect_host_wifi(self.matter_test_config.wifi_ssid, self.matter_test_config.wifi_passphrase)
+            )
+            loop.close()
+
+            if result and result.returncode == 0:
+                logger.info("teardown_class: Successfully restored original WiFi connection")
+            else:
+                logger.error("teardown_class: Failed to restore original WiFi connection")
+        except Exception as e:
+            logger.error(f"teardown_class: Exception restoring WiFi: {e}")
+
         return super().teardown_class()
 
     # Overrides default_timeout: Test includes several long waits, adjust timeout to accommodate.
