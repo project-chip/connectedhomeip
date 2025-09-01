@@ -45,6 +45,7 @@ config("app-main-config") {
     "${chip_root}",
     "../",
     "../../../linux",
+    "${chip_root}/src/platform/nxp/crypto/se05x",
   ]
 }
 
