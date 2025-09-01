@@ -34,17 +34,25 @@ from matter.testing.matter_testing import MatterBaseTest, TestStep, default_matt
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO)
 
-MAX_RETRIES = 3
-TIMEOUT = 900  # 15 minutes timeout for the overall test with network operations (restored original value)
-TIMED_REQUEST_TIMEOUT_MS = 5000
-WIFI_WAIT_SECONDS = 5
-CONNECTION_TIMEOUT = 20  # Timeout for WiFi connection attempts
-IP_TIMEOUT = 15  # Timeout for IP assignment
-COMMAND_TIMEOUT = 15  # Shorter timeout for commands (ConnectNetwork is expected to timeout)
-NETWORK_CHANGE_TIMEOUT = 45  # Reasonable timeout for network changes
-NETWORK_STABILIZATION_WAIT = 15  # Wait for network stabilization after changes (increased)
-ATTRIBUTE_READ_TIMEOUT = 30  # Timeout for reading attributes after network changes (increased)
-MDNS_DISCOVERY_TIMEOUT = 45  # Extended timeout for mDNS discovery (increased for slow DUT)
+# General configuration
+MAX_RETRIES = 3                      # Number of retry attempts for failed operations
+TIMEOUT = 900                        # Overall test timeout (15 min) - main test execution time limit
+
+# Matter command timeouts
+TIMED_REQUEST_TIMEOUT_MS = 5000      # Matter command timeout (5s) - for individual Matter commands
+COMMAND_TIMEOUT = 15                 # Quick command timeout (15s) - for ConnectNetwork that may timeout intentionally
+ATTRIBUTE_READ_TIMEOUT = 30          # Attribute read timeout (30s) - after network changes when DUT may be slow
+
+# Network operation timeouts
+CONNECTION_TIMEOUT = 20              # WiFi connection timeout (20s) - time to establish WiFi link
+IP_TIMEOUT = 15                      # IP assignment timeout (15s) - time to get IP address via DHCP
+NETWORK_CHANGE_TIMEOUT = 45          # Network transition timeout (45s) - for network changes
+MDNS_DISCOVERY_TIMEOUT = 60          # mDNS discovery timeout (60s) - device discovery after network changes
+
+# Wait periods (not timeouts, but delays for stability)
+WIFI_WAIT_SECONDS = 5                # WiFi stabilization wait (5s) - basic network settling time
+NETWORK_STABILIZATION_WAIT = 15      # Network stabilization wait (15s) - after major network changes
+RETRY_DELAY_SECONDS = 3              # Delay between retry attempts (3s) - consistent retry timing
 
 cgen = Clusters.GeneralCommissioning
 cnet = Clusters.NetworkCommissioning
@@ -58,12 +66,9 @@ class ConnectionResult:
         self.stderr = stderr
 
 
-async def run_command(command: str, description: str = "", check: bool = True) -> str:
-    """Execute a shell command asynchronously."""
+async def run_command(command: str) -> str:
+    """Execute a shell command asynchronously"""
     try:
-        if description:
-            logger.debug(f"run_command: {description} - {command}")
-
         proc = await asyncio.create_subprocess_shell(
             command,
             stdout=asyncio.subprocess.PIPE,
@@ -71,15 +76,14 @@ async def run_command(command: str, description: str = "", check: bool = True) -
         )
         stdout, stderr = await proc.communicate()
 
-        if check and proc.returncode != 0:
+        if proc.returncode != 0:
             logger.error(f"run_command: Command failed: {command} - {stderr.decode()}")
-            raise subprocess.CalledProcessError(proc.returncode, command, stderr.decode())
+            return ""
 
         return stdout.decode()
     except Exception as e:
-        if check:
-            raise
-        logger.warning(f"run_command: Command failed (ignored): {command} - {e}")
+        logger.error(f"run_command: Command execution failed: {command} - {e}")
+        return ""
         return ""
 
 
@@ -119,44 +123,45 @@ async def wpa_command(iface, cmd):
             os.remove(sock_tmp)
 
 
-async def scan_and_find_ssid(iface, target_ssid, retries=3, delay=3):
-    """Scans and searches for SSID with retries, like the working wifi.py"""
+async def scan_and_find_ssid(iface, target_ssid, retries=MAX_RETRIES, delay=RETRY_DELAY_SECONDS):
+    """Scans and searches for SSID with retries"""
     logger.info(f"scan_and_find_ssid: Scanning for {target_ssid} on {iface}")
 
-    for attempt in range(1, retries + 1):
+    retry = 0
+    while retry < retries:
+        retry += 1
         try:
-            logger.debug(f"scan_and_find_ssid: Scan attempt {attempt}/{retries}")
+            logger.debug(f"scan_and_find_ssid: Scan attempt {retry}/{retries}")
             await wpa_command(iface, "SCAN")
             await asyncio.sleep(delay)
 
             results = await wpa_command(iface, "SCAN_RESULTS")
-            scan_lines = results.splitlines()[1:]  # Skip header
+            scan_lines = results.splitlines()[1:]
 
             for line in scan_lines:
                 if line.endswith(f"\t{target_ssid}"):
-                    logger.info(f"scan_and_find_ssid: Found {target_ssid} on attempt {attempt}")
+                    logger.info(f"scan_and_find_ssid: Found {target_ssid} on attempt {retry}")
                     return True
 
-            logger.warning(f"scan_and_find_ssid: SSID {target_ssid} not found on attempt {attempt}")
+            logger.warning(f"scan_and_find_ssid: SSID {target_ssid} not found on attempt {retry}")
 
         except Exception as e:
-            logger.error(f"scan_and_find_ssid: Scan attempt {attempt} failed: {e}")
+            logger.error(f"scan_and_find_ssid: Scan attempt {retry} failed: {e}")
 
-        if attempt < retries:
-            await asyncio.sleep(1)  # Brief wait before retry
+        if retry < retries:
+            await asyncio.sleep(1)
 
     logger.error(f"scan_and_find_ssid: SSID {target_ssid} not found after {retries} attempts")
     return False
 
 
 async def connect_wifi_linux(ssid, password) -> ConnectionResult:
-    """Connects to WiFi using wpa_supplicant with improved error handling and interface reset."""
+    """Connects to WiFi using wpa_supplicant commands in Linux (for both desktop and Raspberry Pi)"""
     if isinstance(ssid, bytes):
         ssid = ssid.decode()
     if isinstance(password, bytes):
         password = password.decode()
 
-    # Detect WiFi interface
     iface = await detect_wifi_iface()
     if not iface:
         logger.error("connect_wifi_linux: No WiFi interface found")
@@ -165,13 +170,13 @@ async def connect_wifi_linux(ssid, password) -> ConnectionResult:
     logger.info(f"connect_wifi_linux: Connecting to {ssid} on interface {iface}")
 
     try:
-        # First, scan to ensure SSID is available (like wifi.py)
+        # Scan to ensure SSID is available
         if not await scan_and_find_ssid(iface, ssid):
             logger.error(f"connect_wifi_linux: SSID {ssid} not found in scan")
             return ConnectionResult(1, f"SSID {ssid} not available")
 
-        # First, ensure interface is up and reset state
-        await run_command(f"sudo ip link set {iface} up", check=False)
+        # Ensure interface is up and reset state
+        await run_command(f"sudo ip link set {iface} up")
         await asyncio.sleep(1)
 
         # Disconnect from any current connection
@@ -218,12 +223,12 @@ async def connect_wifi_linux(ssid, password) -> ConnectionResult:
         await wpa_command(iface, "REASSOCIATE")
 
         # Wait for connection with multiple attempts
-        attempt = 0
+        retry = 0
         timeout = CONNECTION_TIMEOUT
 
-        while attempt < MAX_RETRIES:
-            attempt += 1
-            logger.info(f"connect_wifi_linux: Connection attempt {attempt}/{MAX_RETRIES}")
+        while retry < MAX_RETRIES:
+            retry += 1
+            logger.info(f"connect_wifi_linux: Connection attempt {retry}/{MAX_RETRIES}")
 
             start_time = time.time()
             connected = False
@@ -248,11 +253,11 @@ async def connect_wifi_linux(ssid, password) -> ConnectionResult:
                 break
 
             # If connection failed and we have more attempts, reset interface
-            if attempt < MAX_RETRIES:
-                logger.warning(f"connect_wifi_linux: Attempt {attempt} failed, resetting interface")
-                await run_command(f"sudo ip link set {iface} down", check=False)
+            if retry < MAX_RETRIES:
+                logger.warning(f"connect_wifi_linux: Attempt {retry} failed, resetting interface")
+                await run_command(f"sudo ip link set {iface} down")
                 await asyncio.sleep(2)
-                await run_command(f"sudo ip link set {iface} up", check=False)
+                await run_command(f"sudo ip link set {iface} up")
                 await asyncio.sleep(3)
                 await wpa_command(iface, f"SELECT_NETWORK {net_id}")
                 await wpa_command(iface, "REASSOCIATE")
@@ -267,9 +272,9 @@ async def connect_wifi_linux(ssid, password) -> ConnectionResult:
         logger.info(f"connect_wifi_linux: WiFi connected, requesting IP address")
 
         # Release any existing DHCP lease and request new one
-        await run_command(f"sudo dhclient -r {iface}", check=False)
+        await run_command(f"sudo dhclient -r {iface}")
         await asyncio.sleep(1)
-        await run_command(f"sudo dhclient {iface}", check=False)
+        await run_command(f"sudo dhclient {iface}")
 
         # Wait for IP assignment with retry
         ip_timeout = IP_TIMEOUT
@@ -363,9 +368,10 @@ async def connect_wifi_mac(ssid, password) -> ConnectionResult:
 async def connect_host_wifi(ssid, password) -> Optional[ConnectionResult]:
     """ Checks in which OS (Linux or Darwin only) the script is running and calls the corresponding connect_wifi_* function. """
     os_name = platform.system()
-    retry = 1
+    retry = 0
     conn = None
-    while retry <= MAX_RETRIES:
+    while retry < MAX_RETRIES:
+        retry += 1
         try:
             if os_name == "Linux":
                 conn = await connect_wifi_linux(ssid, password)
@@ -383,8 +389,6 @@ async def connect_host_wifi(ssid, password) -> Optional[ConnectionResult]:
                 logger.error(f"connect_host_wifi: No result returned from connection attempt {retry}")
         except Exception as e:
             logger.error(f"connect_host_wifi: Exception on attempt {retry}: {e}")
-        finally:
-            retry += 1
     return conn
 
 
@@ -406,8 +410,9 @@ async def change_networks(test, cluster, ssid, password, breadcrumb):
     original_ssid = test.matter_test_config.wifi_ssid
     original_password = test.matter_test_config.wifi_passphrase
 
-    retry = 1
-    while retry <= MAX_RETRIES:
+    retry = 0
+    while retry < MAX_RETRIES:
+        retry += 1
         logger.info(f"change_networks: Attempt {retry}/{MAX_RETRIES}")
 
         try:
@@ -424,7 +429,7 @@ async def change_networks(test, cluster, ssid, password, breadcrumb):
                             breadcrumb=breadcrumb
                         )
                     ),
-                    timeout=COMMAND_TIMEOUT  # Shorter timeout to avoid hanging
+                    timeout=COMMAND_TIMEOUT
                 )
                 success = is_network_switch_successful(err)
                 logger.info(f"change_networks: ConnectNetwork command completed successfully")
@@ -446,11 +451,11 @@ async def change_networks(test, cluster, ssid, password, breadcrumb):
                 logger.info("change_networks: DUT network switch command sent successfully")
             else:
                 logger.error(f"change_networks: DUT network switch failed, retrying...")
-                continue  # Skip to next retry
+                continue
 
         except Exception as e:
             logger.error(f"change_networks: Unexpected error on attempt {retry}: {e}")
-            continue  # Skip to next retry
+            continue
 
         # Wait for DUT to change networks
         logger.info(f"change_networks: Waiting {WIFI_WAIT_SECONDS}s for DUT to change networks")
@@ -460,11 +465,11 @@ async def change_networks(test, cluster, ssid, password, breadcrumb):
         try:
             result = await asyncio.wait_for(
                 connect_host_wifi(ssid=ssid, password=password),
-                timeout=NETWORK_CHANGE_TIMEOUT  # Reasonable timeout for WiFi connection
+                timeout=NETWORK_CHANGE_TIMEOUT
             )
             if result and result.returncode == 0:
                 logger.info(f"change_networks: TH successfully connected to {ssid}")
-                # Extra wait for network stabilization after TH connects (like wifi.py)
+                # Extra wait for network stabilization after TH connects
                 logger.info("change_networks: Waiting additional 3s for network stabilization...")
                 await asyncio.sleep(3)
                 return  # Success!
@@ -520,27 +525,6 @@ async def change_networks(test, cluster, ssid, password, breadcrumb):
 
 class TC_CNET_4_11(MatterBaseTest):
 
-    def teardown_class(self):
-        """Ensure TH returns to original WiFi network on test completion."""
-        logger.info("teardown_class: Restoring TH connection to original network")
-        try:
-            # TH changes its Wi-Fi connection back to PIXIT.CNET.WIFI_1ST_ACCESSPOINT_SSID
-            loop = asyncio.new_event_loop()
-            asyncio.set_event_loop(loop)
-            result = loop.run_until_complete(
-                connect_host_wifi(self.matter_test_config.wifi_ssid, self.matter_test_config.wifi_passphrase)
-            )
-            loop.close()
-
-            if result and result.returncode == 0:
-                logger.info("teardown_class: Successfully restored original WiFi connection")
-            else:
-                logger.error("teardown_class: Failed to restore original WiFi connection")
-        except Exception as e:
-            logger.error(f"teardown_class: Exception restoring WiFi: {e}")
-
-        return super().teardown_class()
-
     # Overrides default_timeout: Test includes several long waits, adjust timeout to accommodate.
     @property
     def default_timeout(self) -> int:
@@ -557,16 +541,21 @@ class TC_CNET_4_11(MatterBaseTest):
 
     async def verify_operational_network(self, ssid):
         networks = None
-        retry = 1
+        retry = 0
 
         logger.info(f"verify_operational_network: Waiting {NETWORK_STABILIZATION_WAIT}s for network stabilization...")
         await asyncio.sleep(NETWORK_STABILIZATION_WAIT)
 
-        while retry <= MAX_RETRIES:
+        while retry < MAX_RETRIES:
+            retry += 1
             logger.info(f" --- verify_operational_network: Trying to verify operational network: {retry}/{MAX_RETRIES}")
             try:
-                # Use extended timeout for mDNS discovery after network changes
-                timeout_to_use = MDNS_DISCOVERY_TIMEOUT if retry == 1 else ATTRIBUTE_READ_TIMEOUT
+                # Use extended timeout for mDNS discovery, especially on first attempt after network change
+                if retry == 1:
+                    timeout_to_use = MDNS_DISCOVERY_TIMEOUT  # Extended timeout for first attempt (60s)
+                else:
+                    timeout_to_use = ATTRIBUTE_READ_TIMEOUT  # Shorter timeout for subsequent attempts (30s)
+
                 logger.debug(f"verify_operational_network: Using timeout {timeout_to_use}s for attempt {retry}")
 
                 networks = await asyncio.wait_for(
@@ -591,71 +580,16 @@ class TC_CNET_4_11(MatterBaseTest):
             except Exception as e:
                 logger.error(f" --- verify_operational_network: Exception reading networks: {e}")
 
-            # Wait between retries with fixed delay
-            logger.info(f"verify_operational_network: Waiting {WIFI_WAIT_SECONDS}s before retry...")
-            await asyncio.sleep(WIFI_WAIT_SECONDS)
-            retry += 1
+            # Wait between retries - longer delay after first attempt failure
+            retry_delay = WIFI_WAIT_SECONDS if retry > 1 else RETRY_DELAY_SECONDS
+            logger.info(f"verify_operational_network: Waiting {retry_delay}s before retry...")
+            await asyncio.sleep(retry_delay)
         else:
             asserts.fail(f" --- verify_operational_network: Could not read networks after {MAX_RETRIES} retries.")
 
         userwifi_netidx = await self.find_network_and_assert(networks, ssid)
         if userwifi_netidx is not None:
             logger.info(f" --- verify_operational_network: DUT connected to SSID: {ssid}")
-
-    async def check_required_ssids_available(self):
-        """Check if both required SSIDs are available in the environment before running test"""
-        logger.info("Checking if required SSIDs are available...")
-
-        try:
-            iface = await detect_wifi_iface()
-            if not iface:
-                logger.warning("No WiFi interface found for SSID scanning, proceeding with test")
-                return
-
-            ssid1 = self.matter_test_config.wifi_ssid
-            # Get second SSID from global test params
-            if "PIXIT.CNET.WIFI_2ND_ACCESSPOINT_SSID" not in self.matter_test_config.global_test_params:
-                logger.warning("PIXIT.CNET.WIFI_2ND_ACCESSPOINT_SSID not provided, skipping SSID availability check")
-                return
-
-            ssid2 = self.matter_test_config.global_test_params["PIXIT.CNET.WIFI_2ND_ACCESSPOINT_SSID"]
-
-            logger.info(f"Required SSIDs: {ssid1}, {ssid2}")
-
-            # Scan for available networks
-            await wpa_command(iface, "SCAN")
-            await asyncio.sleep(3)  # Wait for scan to complete
-            results = await wpa_command(iface, "SCAN_RESULTS")
-
-            available_ssids = []
-            if results and "bssid" in results.lower():
-                result_lines = results.splitlines()[1:]  # Skip header
-                for line in result_lines:
-                    if line.strip():
-                        parts = line.split('\t')
-                        if len(parts) >= 5:
-                            ssid = parts[4].strip()
-                            if ssid:
-                                available_ssids.append(ssid)
-
-            logger.info(f"Available SSIDs: {available_ssids}")
-
-            missing_ssids = []
-            if ssid1 not in available_ssids:
-                missing_ssids.append(ssid1)
-            if ssid2 not in available_ssids:
-                missing_ssids.append(ssid2)
-
-            if missing_ssids:
-                logger.warning(f"Required SSIDs not found in scan: {missing_ssids}")
-                logger.warning("This may cause test failures if networks are not actually available")
-                logger.warning("Proceeding with test anyway")
-            else:
-                logger.info("All required SSIDs are available, proceeding with test")
-
-        except Exception as e:
-            logger.warning(f"Could not verify SSID availability: {e}")
-            logger.warning("Proceeding with test assuming SSIDs are available")
 
     def steps_TC_CNET_4_11(self):
         return [
@@ -747,8 +681,6 @@ class TC_CNET_4_11(MatterBaseTest):
 
         # TH reads the Networks attribute list from the DUT on all endpoints (all network commissioning clusters)
         connected_network_count = {}
-        # Check if both required SSIDs are available before running the test
-        await self.check_required_ssids_available()
 
         networks_dict = await self.read_single_attribute_all_endpoints(
             cluster=cnet,
@@ -832,16 +764,18 @@ class TC_CNET_4_11(MatterBaseTest):
 
         # Try with retries in case of temporary connectivity issues
         response = None
-        for attempt in range(1, MAX_RETRIES + 1):
+        retry = 0
+        while retry < MAX_RETRIES:
+            retry += 1
             try:
-                logger.info(f"Step 5 attempt {attempt}/{MAX_RETRIES}: Sending AddOrUpdateWiFiNetwork command")
+                logger.info(f"Step 5 attempt {retry}/{MAX_RETRIES}: Sending AddOrUpdateWiFiNetwork command")
                 response = await self.send_single_cmd(cmd=cmd, timedRequestTimeoutMs=TIMED_REQUEST_TIMEOUT_MS)
                 break
             except Exception as e:
-                logger.warning(f"Step 5 attempt {attempt} failed: {e}")
-                if attempt < MAX_RETRIES:
-                    logger.info(f"Retrying in 3 seconds...")
-                    await asyncio.sleep(3)
+                logger.warning(f"Step 5 attempt {retry} failed: {e}")
+                if retry < MAX_RETRIES:
+                    logger.info(f"Retrying in {RETRY_DELAY_SECONDS} seconds...")
+                    await asyncio.sleep(RETRY_DELAY_SECONDS)
                 else:
                     raise Exception(f"Failed to send AddOrUpdateWiFiNetwork after {MAX_RETRIES} attempts: {e}")
 
@@ -907,12 +841,10 @@ class TC_CNET_4_11(MatterBaseTest):
         # configuration to NetworkCommissioning cluster done so far to be reverted.
         self.step(10)
 
-        # When ArmFailSafe(0) is sent, the DUT will revert to original network configuration
-        # which causes temporary loss of connectivity. We need to handle timeout gracefully.
         try:
             response = await self.send_single_cmd(
                 cmd=cgen.Commands.ArmFailSafe(expiryLengthSeconds=0),
-                timedRequestTimeoutMs=TIMED_REQUEST_TIMEOUT_MS*6  # Increased timeout
+                timedRequestTimeoutMs=TIMED_REQUEST_TIMEOUT_MS*6
             )
             asserts.assert_equal(
                 response.errorCode,
@@ -920,13 +852,10 @@ class TC_CNET_4_11(MatterBaseTest):
                 "ArmFailSafeResponse error code is not OK.",
             )
         except Exception as e:
-            # ArmFailSafe(0) often causes connectivity loss before response can be sent
-            # This is expected behavior when the DUT reverts to original network
             logger.warning(f"ArmFailSafe(0) command may have succeeded despite timeout: {e}")
             logger.info("Proceeding with network change as this is expected behavior")
 
         # Wait for DUT to complete network reversion
-        logger.info("Waiting for DUT to complete network reversion...")
         await asyncio.sleep(WIFI_WAIT_SECONDS * 2)
 
         # TH changes its WiFi connection to PIXIT.CNET.WIFI_1ST_ACCESSPOINT_SSID
@@ -944,7 +873,6 @@ class TC_CNET_4_11(MatterBaseTest):
         self.step(12)
 
         # Give more time for both TH and DUT to stabilize on the original network
-        logger.info("Waiting for network stabilization after failsafe reversion...")
         await asyncio.sleep(WIFI_WAIT_SECONDS * 2)
 
         # Verify that DUT has reverted to original network and is reachable
