@@ -131,7 +131,6 @@ class TC_MCORE_FS_1_1(MatterBaseTest):
             TestStep("precondition", "Commissioning already done.", is_commissioning=True),
             TestStep(1, "Enable Fabric Synchronization on DUT_FSA using the manufacturer specified mechanism."),
             TestStep(2, "Commission DUT_FSA onto TH_FSA fabric."),
-            TestStep(3, "Reverse Commission TH_FSAs onto DUT_FSA fabric."),
             TestStep("3a", "TH_FSA sends RequestCommissioningApproval"),
             TestStep("3b", "TH_FSA sends CommissionNode"),
             TestStep("3c", "DUT_FSA commissions TH_FSA"),
