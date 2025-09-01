@@ -20,6 +20,7 @@ namespace SoilMeasurement {
 inline constexpr uint32_t kRevision = 1;
 
 namespace Attributes {
+
 namespace SoilMoistureMeasurementLimits {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(SoilMoistureMeasurementLimits::Id,
                                                           BitFlags<DataModel::AttributeQualityFlags>(), Access::Privilege::kView,

@@ -26,6 +26,7 @@
 #include <crypto/CHIPCryptoPAL.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/core/CHIPError.h>
+#include <lib/dnssd/Advertiser.h>
 
 using namespace ::chip;
 using namespace ::chip::app;
@@ -566,6 +567,25 @@ void DeviceCommissioner::CleanupCommissioning(DeviceProxy * proxy, NodeId nodeId
     chip::Controller::DeviceCommissioner::CleanupCommissioning(proxy, nodeId, completionStatus);
 
     mInfo.Cleanup();
+}
+
+bool DeviceCommissioner::HasValidCommissioningMode(const Dnssd::CommissionNodeData & nodeData)
+{
+    if (GetCommissioningParameters().HasValue() && GetCommissioningParameters().Value().GetUseJCM().ValueOr(false))
+    {
+        if (nodeData.commissioningMode != to_underlying(Dnssd::CommissioningMode::kEnabledJointFabric))
+        {
+            ChipLogProgress(Controller, "Discovered device has a commissioning mode (%u) that is not supported by JCM.",
+                            static_cast<unsigned>(nodeData.commissioningMode));
+            return false;
+        }
+    }
+    else
+    {
+        return chip::Controller::DeviceCommissioner::HasValidCommissioningMode(nodeData);
+    }
+
+    return true;
 }
 
 } // namespace JCM

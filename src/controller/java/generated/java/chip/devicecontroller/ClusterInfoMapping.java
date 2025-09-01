@@ -18269,7 +18269,7 @@ public class ClusterInfoMapping {
     }
   }
 
-  public static class DelegatedCameraAvStreamManagementClusterMinViewportAttributeCallback implements ChipClusters.CameraAvStreamManagementCluster.MinViewportAttributeCallback, DelegatedClusterCallback {
+  public static class DelegatedCameraAvStreamManagementClusterMinViewportResolutionAttributeCallback implements ChipClusters.CameraAvStreamManagementCluster.MinViewportResolutionAttributeCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
     @Override
     public void setCallbackDelegate(ClusterCommandCallback callback) {
@@ -29713,11 +29713,8 @@ public class ClusterInfoMapping {
     CommandParameterInfo cameraAvStreamManagementvideoStreamAllocatemaxBitRateCommandParameterInfo = new CommandParameterInfo("maxBitRate", Long.class, Long.class);
     cameraAvStreamManagementvideoStreamAllocateCommandParams.put("maxBitRate",cameraAvStreamManagementvideoStreamAllocatemaxBitRateCommandParameterInfo);
 
-    CommandParameterInfo cameraAvStreamManagementvideoStreamAllocateminKeyFrameIntervalCommandParameterInfo = new CommandParameterInfo("minKeyFrameInterval", Integer.class, Integer.class);
-    cameraAvStreamManagementvideoStreamAllocateCommandParams.put("minKeyFrameInterval",cameraAvStreamManagementvideoStreamAllocateminKeyFrameIntervalCommandParameterInfo);
-
-    CommandParameterInfo cameraAvStreamManagementvideoStreamAllocatemaxKeyFrameIntervalCommandParameterInfo = new CommandParameterInfo("maxKeyFrameInterval", Integer.class, Integer.class);
-    cameraAvStreamManagementvideoStreamAllocateCommandParams.put("maxKeyFrameInterval",cameraAvStreamManagementvideoStreamAllocatemaxKeyFrameIntervalCommandParameterInfo);
+    CommandParameterInfo cameraAvStreamManagementvideoStreamAllocatekeyFrameIntervalCommandParameterInfo = new CommandParameterInfo("keyFrameInterval", Integer.class, Integer.class);
+    cameraAvStreamManagementvideoStreamAllocateCommandParams.put("keyFrameInterval",cameraAvStreamManagementvideoStreamAllocatekeyFrameIntervalCommandParameterInfo);
 
     CommandParameterInfo cameraAvStreamManagementvideoStreamAllocatewatermarkEnabledCommandParameterInfo = new CommandParameterInfo("watermarkEnabled", Optional.class, Boolean.class);
     cameraAvStreamManagementvideoStreamAllocateCommandParams.put("watermarkEnabled",cameraAvStreamManagementvideoStreamAllocatewatermarkEnabledCommandParameterInfo);
@@ -29753,10 +29750,7 @@ public class ClusterInfoMapping {
              commandArguments.get("maxBitRate")
 
            , (Integer)
-             commandArguments.get("minKeyFrameInterval")
-
-           , (Integer)
-             commandArguments.get("maxKeyFrameInterval")
+             commandArguments.get("keyFrameInterval")
 
            , (Optional<Boolean>)
              commandArguments.get("watermarkEnabled")
@@ -30138,6 +30132,7 @@ public class ClusterInfoMapping {
 
     CommandParameterInfo webRTCTransportProvidersolicitOffermetadataEnabledCommandParameterInfo = new CommandParameterInfo("metadataEnabled", Optional.class, Boolean.class);
     webRTCTransportProvidersolicitOfferCommandParams.put("metadataEnabled",webRTCTransportProvidersolicitOffermetadataEnabledCommandParameterInfo);
+
     InteractionInfo webRTCTransportProvidersolicitOfferInteractionInfo = new InteractionInfo(
       (cluster, callback, commandArguments) -> {
         ((ChipClusters.WebRTCTransportProviderCluster) cluster)
@@ -30162,6 +30157,9 @@ public class ClusterInfoMapping {
 
            , (Optional<Boolean>)
              commandArguments.get("metadataEnabled")
+
+           , (Optional<ChipStructs.WebRTCTransportProviderClusterSFrameStruct>)
+             commandArguments.get("SFrameConfig")
 
             );
         },
@@ -30196,6 +30194,7 @@ public class ClusterInfoMapping {
 
     CommandParameterInfo webRTCTransportProviderprovideOffermetadataEnabledCommandParameterInfo = new CommandParameterInfo("metadataEnabled", Optional.class, Boolean.class);
     webRTCTransportProviderprovideOfferCommandParams.put("metadataEnabled",webRTCTransportProviderprovideOffermetadataEnabledCommandParameterInfo);
+
     InteractionInfo webRTCTransportProviderprovideOfferInteractionInfo = new InteractionInfo(
       (cluster, callback, commandArguments) -> {
         ((ChipClusters.WebRTCTransportProviderCluster) cluster)
@@ -30226,6 +30225,9 @@ public class ClusterInfoMapping {
 
            , (Optional<Boolean>)
              commandArguments.get("metadataEnabled")
+
+           , (Optional<ChipStructs.WebRTCTransportProviderClusterSFrameStruct>)
+             commandArguments.get("SFrameConfig")
 
             );
         },

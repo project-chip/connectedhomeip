@@ -823,6 +823,11 @@ public:
         return mDefaultCommissioner == nullptr ? NullOptional : MakeOptional(mDefaultCommissioner->GetCommissioningParameters());
     }
 
+    CHIP_ERROR UpdateCommissioningParameters(const CommissioningParameters & newParameters)
+    {
+        return mDefaultCommissioner->SetCommissioningParameters(newParameters);
+    }
+
     // Reset the arm failsafe timer during commissioning.  If this returns
     // false, that means that the timer was already set for a longer time period
     // than the new time we are trying to set.  In this case, neither
@@ -835,6 +840,9 @@ public:
         return ExtendArmFailSafeInternal(proxy, step, armFailSafeTimeout, commandTimeout, onSuccess, onFailure,
                                          /* fireAndForget = */ true);
     }
+
+    // Check if the commissioning mode is valid for the current commissioning parameters.
+    virtual bool HasValidCommissioningMode(const Dnssd::CommissionNodeData & nodeData);
 
 protected:
     // Cleans up and resets failsafe as appropriate depending on the error and the failed stage.
@@ -1089,6 +1097,7 @@ private:
     CHIP_ERROR ParseGeneralCommissioningInfo(ReadCommissioningInfo & info);
     CHIP_ERROR ParseBasicInformation(ReadCommissioningInfo & info);
     CHIP_ERROR ParseNetworkCommissioningInfo(ReadCommissioningInfo & info);
+    CHIP_ERROR ParseNetworkCommissioningTimeouts(NetworkClusterInfo & networkInfo, const char * networkType);
     CHIP_ERROR ParseFabrics(ReadCommissioningInfo & info);
     CHIP_ERROR ParseICDInfo(ReadCommissioningInfo & info);
     CHIP_ERROR ParseTimeSyncInfo(ReadCommissioningInfo & info);

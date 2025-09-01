@@ -14031,7 +14031,7 @@ private:
 | * MaxEncodedPixelRate                                               | 0x0001 |
 | * VideoSensorParams                                                 | 0x0002 |
 | * NightVisionUsesInfrared                                           | 0x0003 |
-| * MinViewport                                                       | 0x0004 |
+| * MinViewportResolution                                             | 0x0004 |
 | * RateDistortionTradeOffPoints                                      | 0x0005 |
 | * MaxContentBufferSize                                              | 0x0006 |
 | * MicrophoneCapabilities                                            | 0x0007 |
@@ -14176,8 +14176,7 @@ public:
         AddArgument("MaxResolution", &mComplex_MaxResolution);
         AddArgument("MinBitRate", 0, UINT32_MAX, &mRequest.minBitRate);
         AddArgument("MaxBitRate", 0, UINT32_MAX, &mRequest.maxBitRate);
-        AddArgument("MinKeyFrameInterval", 0, UINT16_MAX, &mRequest.minKeyFrameInterval);
-        AddArgument("MaxKeyFrameInterval", 0, UINT16_MAX, &mRequest.maxKeyFrameInterval);
+        AddArgument("KeyFrameInterval", 0, UINT16_MAX, &mRequest.keyFrameInterval);
         AddArgument("WatermarkEnabled", 0, 1, &mRequest.watermarkEnabled);
         AddArgument("OSDEnabled", 0, 1, &mRequest.OSDEnabled);
         ClusterCommand::AddArguments();
@@ -14846,7 +14845,8 @@ class WebRTCTransportProviderSolicitOffer : public ClusterCommand
 {
 public:
     WebRTCTransportProviderSolicitOffer(CredentialIssuerCommands * credsIssuerConfig) :
-        ClusterCommand("solicit-offer", credsIssuerConfig), mComplex_ICEServers(&mRequest.ICEServers)
+        ClusterCommand("solicit-offer", credsIssuerConfig), mComplex_ICEServers(&mRequest.ICEServers),
+        mComplex_SFrameConfig(&mRequest.SFrameConfig)
     {
         AddArgument("StreamUsage", 0, UINT8_MAX, &mRequest.streamUsage);
         AddArgument("OriginatingEndpointID", 0, UINT16_MAX, &mRequest.originatingEndpointID);
@@ -14855,6 +14855,7 @@ public:
         AddArgument("ICEServers", &mComplex_ICEServers, "", Argument::kOptional);
         AddArgument("ICETransportPolicy", &mRequest.ICETransportPolicy);
         AddArgument("MetadataEnabled", 0, 1, &mRequest.metadataEnabled);
+        AddArgument("SFrameConfig", &mComplex_SFrameConfig, "", Argument::kOptional);
         ClusterCommand::AddArguments();
     }
 
@@ -14884,6 +14885,8 @@ private:
     TypedComplexArgument<
         chip::Optional<chip::app::DataModel::List<const chip::app::Clusters::Globals::Structs::ICEServerStruct::Type>>>
         mComplex_ICEServers;
+    TypedComplexArgument<chip::Optional<chip::app::Clusters::WebRTCTransportProvider::Structs::SFrameStruct::Type>>
+        mComplex_SFrameConfig;
 };
 
 /*
@@ -14893,7 +14896,8 @@ class WebRTCTransportProviderProvideOffer : public ClusterCommand
 {
 public:
     WebRTCTransportProviderProvideOffer(CredentialIssuerCommands * credsIssuerConfig) :
-        ClusterCommand("provide-offer", credsIssuerConfig), mComplex_ICEServers(&mRequest.ICEServers)
+        ClusterCommand("provide-offer", credsIssuerConfig), mComplex_ICEServers(&mRequest.ICEServers),
+        mComplex_SFrameConfig(&mRequest.SFrameConfig)
     {
         AddArgument("WebRTCSessionID", 0, UINT16_MAX, &mRequest.webRTCSessionID);
         AddArgument("Sdp", &mRequest.sdp);
@@ -14904,6 +14908,7 @@ public:
         AddArgument("ICEServers", &mComplex_ICEServers, "", Argument::kOptional);
         AddArgument("ICETransportPolicy", &mRequest.ICETransportPolicy);
         AddArgument("MetadataEnabled", 0, 1, &mRequest.metadataEnabled);
+        AddArgument("SFrameConfig", &mComplex_SFrameConfig, "", Argument::kOptional);
         ClusterCommand::AddArguments();
     }
 
@@ -14933,6 +14938,8 @@ private:
     TypedComplexArgument<
         chip::Optional<chip::app::DataModel::List<const chip::app::Clusters::Globals::Structs::ICEServerStruct::Type>>>
         mComplex_ICEServers;
+    TypedComplexArgument<chip::Optional<chip::app::Clusters::WebRTCTransportProvider::Structs::SFrameStruct::Type>>
+        mComplex_SFrameConfig;
 };
 
 /*
@@ -29843,7 +29850,7 @@ void registerClusterCameraAvStreamManagement(Commands & commands, CredentialIssu
         make_unique<ReadAttribute>(Id, "max-encoded-pixel-rate", Attributes::MaxEncodedPixelRate::Id, credsIssuerConfig),         //
         make_unique<ReadAttribute>(Id, "video-sensor-params", Attributes::VideoSensorParams::Id, credsIssuerConfig),              //
         make_unique<ReadAttribute>(Id, "night-vision-uses-infrared", Attributes::NightVisionUsesInfrared::Id, credsIssuerConfig), //
-        make_unique<ReadAttribute>(Id, "min-viewport", Attributes::MinViewport::Id, credsIssuerConfig),                           //
+        make_unique<ReadAttribute>(Id, "min-viewport-resolution", Attributes::MinViewportResolution::Id, credsIssuerConfig),      //
         make_unique<ReadAttribute>(Id, "rate-distortion-trade-off-points", Attributes::RateDistortionTradeOffPoints::Id,
                                    credsIssuerConfig),                                                                        //
         make_unique<ReadAttribute>(Id, "max-content-buffer-size", Attributes::MaxContentBufferSize::Id, credsIssuerConfig),   //
@@ -29901,7 +29908,8 @@ void registerClusterCameraAvStreamManagement(Commands & commands, CredentialIssu
         make_unique<WriteAttribute<bool>>(Id, "night-vision-uses-infrared", 0, 1, Attributes::NightVisionUsesInfrared::Id,
                                           WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttributeAsComplex<chip::app::Clusters::CameraAvStreamManagement::Structs::VideoResolutionStruct::Type>>(
-            Id, "min-viewport", Attributes::MinViewport::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+            Id, "min-viewport-resolution", Attributes::MinViewportResolution::Id, WriteCommandType::kForceWrite,
+            credsIssuerConfig), //
         make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<
             const chip::app::Clusters::CameraAvStreamManagement::Structs::RateDistortionTradeOffPointsStruct::Type>>>(
             Id, "rate-distortion-trade-off-points", Attributes::RateDistortionTradeOffPoints::Id, WriteCommandType::kForceWrite,
@@ -30008,8 +30016,8 @@ void registerClusterCameraAvStreamManagement(Commands & commands, CredentialIssu
         make_unique<SubscribeAttribute>(Id, "max-encoded-pixel-rate", Attributes::MaxEncodedPixelRate::Id, credsIssuerConfig),    //
         make_unique<SubscribeAttribute>(Id, "video-sensor-params", Attributes::VideoSensorParams::Id, credsIssuerConfig),         //
         make_unique<SubscribeAttribute>(Id, "night-vision-uses-infrared", Attributes::NightVisionUsesInfrared::Id,
-                                        credsIssuerConfig),                                                  //
-        make_unique<SubscribeAttribute>(Id, "min-viewport", Attributes::MinViewport::Id, credsIssuerConfig), //
+                                        credsIssuerConfig),                                                                       //
+        make_unique<SubscribeAttribute>(Id, "min-viewport-resolution", Attributes::MinViewportResolution::Id, credsIssuerConfig), //
         make_unique<SubscribeAttribute>(Id, "rate-distortion-trade-off-points", Attributes::RateDistortionTradeOffPoints::Id,
                                         credsIssuerConfig),                                                                      //
         make_unique<SubscribeAttribute>(Id, "max-content-buffer-size", Attributes::MaxContentBufferSize::Id, credsIssuerConfig), //
