@@ -1120,7 +1120,7 @@ def assert_valid_icd_key(icd_key: str) -> None:
 
     Spec:
         https://github.com/CHIP-Specifications/connectedhomeip-spec/blob/master/src/secure_channel/Discovery.adoc#4-common-txt-keyvalue-pairs
-    """    
+    """
     consts = [
         'Encoded as a decimal number in ASCII text',
         'Omitting any leading zeros',
