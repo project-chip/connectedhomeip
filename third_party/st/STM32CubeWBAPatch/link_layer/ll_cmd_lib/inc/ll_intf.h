@@ -1549,8 +1549,8 @@ struct hci_dispatch_tbl
      * @brief  The HCI_LE_Request_Peer_SCA_Complete event indicates that the HCI_LE_Request_Peer_SCA command has been completed.
      *
      * @param  status		: [in] whether the correct PDU is recieved by the controller.
-     * @param  conn_hndl	: [in] is the connection handle of the ACL connection in which the HCI_LE_Request_Peer_SCA command is
-     * issued.
+     * @param  conn_hndl	: [in] is the connection handle of the ACL connection in which the HCI_LE_Request_Peer_SCA command
+     * is issued.
      * @param  sca			: [in] contains the sleep clock accuracy of the peer.
      */
     void (*ll_intf_le_req_peer_sca_cpmlt_evnt)(uint8_t status, uint16_t conn_hndl, uint8_t sca);
@@ -1778,14 +1778,14 @@ struct hci_dispatch_tbl
      * @brief  is used to suggest maximum packet sizes to the Controller.
      *
      * @param  conn_handle_id 	: [in] Connection Handle Id to be used to identify a connection.
-     * @param  max_tx_octets	: [in] The maximum number of payload octets in a Link Layer Data Channel PDU that the local Controller
-     * will send on this connection.
-     * @param  max_tx_time		: [in] The maximum time that the local Controller will take to send a Link Layer Data Channel PDU on
-     * this connection.
-     * @param  max_rx_octets	: [in] The maximum number of payload octets in a Link Layer Data Channel PDU that the local controller
-     * expects to receive on this connection.
-     * @param  max_rx_time		: [in] The maximum time that the local Controller expects to take to receive a Link Layer Data Channel
-     * PDU on this connection.
+     * @param  max_tx_octets	: [in] The maximum number of payload octets in a Link Layer Data Channel PDU that the local
+     * Controller will send on this connection.
+     * @param  max_tx_time		: [in] The maximum time that the local Controller will take to send a Link Layer Data Channel PDU
+     * on this connection.
+     * @param  max_rx_octets	: [in] The maximum number of payload octets in a Link Layer Data Channel PDU that the local
+     * controller expects to receive on this connection.
+     * @param  max_rx_time		: [in] The maximum time that the local Controller expects to take to receive a Link Layer Data
+     * Channel PDU on this connection.
      */
     void (*ll_intf_le_data_length_chg_event)(uint16_t conn_handle_id, uint16_t max_tx_octets, uint16_t max_tx_time,
                                              uint16_t max_rx_octets, uint16_t max_rx_time);
@@ -2009,8 +2009,8 @@ struct hci_dispatch_tbl
      * @brief  Used by the Controller to report an issue following a request to a peer device to reply with an LL_CTE_RSP PDU
      * containing a CTE field.
      *
-     * @param  cte_prcdur_status	: [in] Identify whether the LL_CTE_RSP PDU was received successfully or the peer has rejected the
-     * request.
+     * @param  cte_prcdur_status	: [in] Identify whether the LL_CTE_RSP PDU was received successfully or the peer has rejected
+     * the request.
      * @param  conn_handle_id	: [in] Identifying the connection handle.
      */
     void (*ll_intf_le_cte_req_failed_evnt)(uint16_t conn_handle_id, uint8_t cte_prcdur_status);
@@ -2088,8 +2088,8 @@ struct hci_dispatch_tbl
     /**
      * @brief  Send the subrate change event to the host.
      *
-     * @param  ptr_le_subrate_change_evnt  	: [in] pointer to struct holding the changed subrate parameters to notify the host of
-     * it.
+     * @param  ptr_le_subrate_change_evnt  	: [in] pointer to struct holding the changed subrate parameters to notify the host
+     * of it.
      *
      * @retval None
      */
@@ -2653,8 +2653,8 @@ ble_stat_t ll_intf_read_cntrlr_ver_info(uint8_t * ptr_vrsn, uint8_t length);
  * 		   (It is implied that if a command is listed as supported, the feature underlying that command is also supported) .
  *
  * @param  supported_cmds : [out] A bit mask for each HCI command, where:
- * 			     If the controller sets a bit to 1, then the controller supports the corresponding command and the features
- * required for the comman, and If the controller sets a bit to 0, then this command is unsupported or undefined command .
+ * 			     If the controller sets a bit to 1, then the controller supports the corresponding command and the
+ * features required for the comman, and If the controller sets a bit to 0, then this command is unsupported or undefined command .
  *
  * @retval ble_stat_t : Command status to be sent to the Host.
  */
@@ -3399,8 +3399,8 @@ ble_stat_t ll_intf_le_remote_conn_parm_req_neg_reply(uint16_t conn_handle_id, ui
  * @param  conn_handle_id 	   : [in] Connection Handle Id to be used to identify a connection.
  * @param  tx_octets		   : [in] Preferred maximum number of payload octets that the local Controller should include in a
  * single Link Layer Data Channel PDU.
- * @param  tx_time		   : [in] Preferred maximum number of microseconds that the local Controller should use to transmit a
- * single Link Layer Data Channel PDU.
+ * @param  tx_time		   : [in] Preferred maximum number of microseconds that the local Controller should use to transmit
+ * a single Link Layer Data Channel PDU.
  *
  * @retval ble_stat_t 		   : Command status to be sent to the Host.
  */
@@ -3921,8 +3921,8 @@ ble_stat_t ll_intf_le_set_conn_cte_rsp_enable(le_set_conn_cte_rsp_enable_cmd_st 
  * @param  ptr_antenna_num						: [out] The number of antennae supported by the Controller.
  * @param  ptr_switching_pattern_max_len		: [out] Maximum length of antenna switching pattern supported by the
  * Controller.
- * @param  ptr_cte_max_len						: [out] Maximum length of Constant Tone Extension supported in 8 us
- * units.
+ * @param  ptr_cte_max_len						: [out] Maximum length of Constant Tone Extension supported in 8
+ * us units.
  *
  * @retval ble_stat_t	: Command status.
  */
@@ -4049,8 +4049,8 @@ ble_stat_t ll_intf_le_periodic_adv_set_info_transfer(uint16_t conn_handle, uint1
  *
  * @param  conn_handle 	: [in] Connection Handle Id to identify a connection.
  * @param  mode     	: [in] Specifies the action to be taken when periodic advertising synchronization information is received.
- * @param  skip 		: [in] Number of consecutive periodic advertising packets that the receiver may skip after successfully
- *receiving a periodic advertising packet.
+ * @param  skip 		: [in] Number of consecutive periodic advertising packets that the receiver may skip after
+ *successfully receiving a periodic advertising packet.
  * @param  sync_timeout	: [in] Maximum permitted time between successful receives.
  * @param  cte_type     : [in] Specifies whether to only synchronize to periodic advertising with certain types of Constant Tone
  *Extension.
@@ -4065,8 +4065,8 @@ ble_stat_t ll_intf_le_set_periodic_adv_sync_transfer_paramters(uint16_t conn_han
  * @brief  : used to specify the initial value for the mode, skip, timeout, and Constant Tone Extension type.
  *
  * @param  mode     	: [in] Specifies the action to be taken when periodic advertising synchronization information is received.
- * @param  skip 		: [in] Number of consecutive periodic advertising packets that the receiver may skip after successfully
- * receiving a periodic advertising packet.
+ * @param  skip 		: [in] Number of consecutive periodic advertising packets that the receiver may skip after
+ * successfully receiving a periodic advertising packet.
  * @param  sync_timeout	: [in] Maximum permitted time between successful receives.
  * @param  cte_type     : [in] Specifies whether to only synchronize to periodic advertising with certain types of Constant Tone
  * Extension.
@@ -4342,8 +4342,8 @@ ble_stat_t ll_intf_le_start_energy_detection(uint8_t * chnnl_map, uint32_t durat
  * @brief Used to select the source that drives the sleep clock, whether to use an external crystal oscillator or an integrated RC
  * oscillator (RCO).
  *
- * @param  slp_clk_src 				: [in] Indicate which source to drive the sleep clock. 0: Crystal Oscillator (default).
- * 1: RC0
+ * @param  slp_clk_src 				: [in] Indicate which source to drive the sleep clock. 0: Crystal Oscillator
+ * (default). 1: RC0
  * @param  ptr_slp_clk_freq_value 	: [out] Indicate the nominal frequency value of the sleep clock.
  *
  * @retval ble_stat_t : Command status to be sent to the Host.
@@ -4457,11 +4457,11 @@ ble_stat_t ll_intf_set_output_data_path(uint16_t conn_hndl, vendor_specific_from
 #if (SUPPORT_MASTER_CONNECTION)
 /*=============== LE Set CIG Parameters Command ===============*/
 /**
- * @brief  							: used to set the parameters of one or more CISes that are associated with a CIG in
- * the Controller
+ * @brief  							: used to set the parameters of one or more CISes that are associated with a CIG
+ * in the Controller
  *
- * @param  ptr_st_set_cig_params	: [IN]  pointer to ble_intf_set_cig_params_cmd_st that contains CIG parameters coming from the
- * Host
+ * @param  ptr_st_set_cig_params	: [IN]  pointer to ble_intf_set_cig_params_cmd_st that contains CIG parameters coming from
+ * the Host
  * @param  conn_hndl				: [out] pointer to array of connection handles in the CIG
  *
  * @retval ble_stat_t				: Command status.
@@ -4470,8 +4470,8 @@ ble_stat_t ll_intf_le_set_cig_params(ble_intf_set_cig_params_comman_cmd_st * ptr
 
 /*=============== LE Set CIG Parameters Test Command ===============*/
 /**
- * @brief  							 	: used to set the parameters of one or more CISes that are associated with a CIG
- * in the Controller
+ * @brief  							 	: used to set the parameters of one or more CISes that are associated with a
+ * CIG in the Controller
  *
  * @param  ptr_st_set_cig_params_test	: [IN]  pointer to ble_intf_set_cig_params_cmd_st that contains CIG parameters coming from
  * the Host
@@ -4483,8 +4483,8 @@ ble_stat_t ll_intf_le_set_cig_params_test(ble_intf_set_cig_params_comman_cmd_st 
 
 /*=============== LE Create CIS Command ===============*/
 /**
- * @brief  								: The HCI_LE_Create_CIS command is used by the master’s Host to create one or
- * more CISes using the connections identified by the ACL_Connection_Handle[i] parameter array
+ * @brief  								: The HCI_LE_Create_CIS command is used by the master’s Host to create one
+ * or more CISes using the connections identified by the ACL_Connection_Handle[i] parameter array
  * @param  ptr_st_create_cis_params		: pointer to ble_intf_create_cis_cmd_st that contains ACL_Connection_Handles,
  * 										  ISO_Connection_Handles and Number of CISes.
  * @retval ble_stat_t					: Command status.
@@ -4523,8 +4523,8 @@ ble_stat_t ll_intf_reject_cis_req(uint16_t conn_hndl, uint8_t reason);
 void ll_intf_set_cis_req_evnt_mask(uint32_t cis_req_evnt_mask);
 /*=============== LE Remove CIG Command ===============*/
 /**
- * @brief  								: is used by the master’s Host to remove all the CISes associated with the CIG
- * identified by CIG_ID
+ * @brief  								: is used by the master’s Host to remove all the CISes associated with the
+ * CIG identified by CIG_ID
  *
  * @param  cig_id						: contains the identifier of the CIG
  *
@@ -4585,8 +4585,8 @@ ble_stat_t ll_intf_cis_read_rssi(uint16_t conn_handle_id, int8_t * ptr_cis_rssi_
  */
 /*=============== LE BIG Create Sync Command ===============*/
 /**
- * @brief  								: is used to synchronize to a BIG described in the periodic advertising train
- * specified by the Sync_Handle parameter.
+ * @brief  								: is used to synchronize to a BIG described in the periodic advertising
+ * train specified by the Sync_Handle parameter.
  * @param  ptr_str_big_create_sync_cmd	: pointer to ble_intf_big_create_sync_cmd_st that contains the command parameters
  * @retval ble_stat_t					: Command status.
  */
@@ -4594,9 +4594,9 @@ ble_stat_t ll_intf_le_big_create_sync(ble_intf_big_create_sync_cmd_st * ptr_str_
 
 /*=============== LE BIG Terminate Sync Command ===============*/
 /**
- * @brief  								: is used to stop synchronizing or cancel the process of synchronizing to the BIG
- * identified by the BIG_Handle parameter. destroys the associated connection handles of the BISes in the BIG and removes the data
- * paths for all BISes in the BIG identified by BIG_Handle.
+ * @brief  								: is used to stop synchronizing or cancel the process of synchronizing to the
+ * BIG identified by the BIG_Handle parameter. destroys the associated connection handles of the BISes in the BIG and removes the
+ * data paths for all BISes in the BIG identified by BIG_Handle.
  * @param  big_hndle					: contains the identifier of the BIG_Handler.
  *
  * @retval ble_stat_t					: Command status.
@@ -4608,10 +4608,10 @@ ble_stat_t ll_intf_le_big_term_sync(uint8_t * big_hndle);
 #if (SUPPORT_BRD_ISOCHRONOUS)
 /*=============== LE Create BIG Command ===============*/
 /**
- * @brief  								: is used to create a BIG with one or more BISes (All BISes in a BIG have the
- * same value for all parameters)
- * @param  ptr_create_big_cmd_st		: pointer to ble_intf_create_big_st that contains the parameters of create big / test
- * command
+ * @brief  								: is used to create a BIG with one or more BISes (All BISes in a BIG have
+ * the same value for all parameters)
+ * @param  ptr_create_big_cmd_st		: pointer to ble_intf_create_big_st that contains the parameters of create big /
+ * test command
  *
  * @retval ble_stat_t					: Command status.
  */
@@ -4619,8 +4619,8 @@ ble_stat_t ll_intf_le_create_big(ble_intf_create_big_st * ptr_create_big_cmd_st)
 
 /*=============== LE Create BIG Test Command ===============*/
 /**
- * @brief  								: (should be used in the ISO Test mode) is used to create a BIG with one or more
- * BISes (All BISes in a BIG have the same value for all parameters)
+ * @brief  								: (should be used in the ISO Test mode) is used to create a BIG with one or
+ * more BISes (All BISes in a BIG have the same value for all parameters)
  * @param  ptr_create_big_test_cmd_st	: pointer to ble_intf_create_big_st that contains the parameters of create big / test
  * command
  *
@@ -4704,8 +4704,8 @@ ble_stat_t ll_intf_le_set_host_feature(uint8_t bit_num, uint8_t bit_value);
 
 /*=============== LE Setup ISO Data Path Command ===============*/
 /**
- * @brief  								: is used to identify and create the isochronous data path between the Host and
- * the Controller for an established CIS or BIS identified by the Connection_Handle parameter.
+ * @brief  								: is used to identify and create the isochronous data path between the Host
+ * and the Controller for an established CIS or BIS identified by the Connection_Handle parameter.
  * @param  conn_hndl					: contains the identifier of the Connection_Handler.
  * @param  ptr_st_setup_iso_data_path	: pointer that carries the information parameters of setup_iso_data_path
  *
@@ -4726,9 +4726,9 @@ ble_stat_t ll_intf_rmv_iso_data_path(uint16_t conn_hndl, uint8_t data_path_dirc)
 
 /*=============== LE ISO Test End Command ===============*/
 /**
- * @brief  								: (This command should only be used for testing purposes) is used to terminate
- * the ISO Transmit and/or Receive Test mode for a CIS or BIS specified by the Connection_Handle parameter but does not terminate
- * the CIS or BIS.
+ * @brief  								: (This command should only be used for testing purposes) is used to
+ * terminate the ISO Transmit and/or Receive Test mode for a CIS or BIS specified by the Connection_Handle parameter but does not
+ * terminate the CIS or BIS.
  * @param  conn_hndl					: contains the identifier of the Connection_Handler.
  * @param  rcvd_pckt_cntr				: number of received packets
  * @param  missed_pckt_cntr				: number of missed packets
@@ -4768,8 +4768,9 @@ ble_stat_t ll_intf_le_read_buffer_size_v2(uint16_t * le_acl_data_pkt_length, uin
  */
 /*=============== LE Read ISO Tx Sync Command ===============*/
 /**
- * @brief  								: is used to read the Time_Stamp and Time_Offset of a transmitted SDU
- * identified by the Packet_Sequence_Number on a CIS or BIS identified by the Connection_Handle parameter on the master or slave.
+ * @brief  								: is used to read the Time_Stamp and Time_Offset of a transmitted
+ * SDU identified by the Packet_Sequence_Number on a CIS or BIS identified by the Connection_Handle parameter on the master or
+ * slave.
  * @param  conn_hndl					: contains the identifier of the Connection_Handler.
  * @param  pkt_seq_num					: contains the sequence number of a transmitted SDU
  * @param  time_stamp					: contains the time stamp of a transmitted SDU
@@ -4781,8 +4782,8 @@ ble_stat_t ll_intf_le_read_iso_tx_sync(uint16_t conn_hndl, uint16_t * pkt_seq_nu
 
 /*=============== LE ISO Tx Test Command ===============*/
 /**
- * @brief  								: is used to configure an established CIS or BIS specified by the
- * Connection_Handle parameter, and transmit test payloads which are generated by the Controller
+ * @brief  								: is used to configure an established CIS or BIS specified by
+ * the Connection_Handle parameter, and transmit test payloads which are generated by the Controller
  * @param  conn_hndl					: contains the identifier of the Connection_Handler.
  * @param  pyld_t						: defines the configuration of SDUs in the payload
  *
@@ -4808,8 +4809,8 @@ ble_stat_t ll_intf_le_read_iso_link_quality(uint16_t conn_hndl, ble_intf_read_is
 
 /*=============== LE ISO Rx Test Command ===============*/
 /**
- * @brief  								: (This command should only be used for testing purposes) is used to configure an
- * established CIS or a synchronized BIG specified by the Connection_Handle parameter to receive payloads
+ * @brief  								: (This command should only be used for testing purposes) is used to configure
+ * an established CIS or a synchronized BIG specified by the Connection_Handle parameter to receive payloads
  * @param  conn_hndl					: contains the identifier of the Connection_Handler.
  * @param  pyld_t						: defines the configuration of SDUs in the payload
  *
@@ -4819,8 +4820,8 @@ ble_stat_t ll_intf_le_iso_rx_test(uint16_t conn_hndl, uint8_t pyld_t);
 
 /*=============== LE ISO Rx Test Counetrs Command ===============*/
 /**
- * @brief  								: (This command should only be used for testing purposes) is used to read the
- * test counters ) in the Controller which is configured in ISO Receive Test mode for a CIS or BIS specified by the
+ * @brief  								: (This command should only be used for testing purposes) is used to read
+ * the test counters ) in the Controller which is configured in ISO Receive Test mode for a CIS or BIS specified by the
  * Connection_Handle.
  * @param  conn_hndl					: contains the identifier of the Connection_Handler.
  * @param  rcvd_pckt_cntr				: number of received packets
@@ -4880,8 +4881,8 @@ ble_stat_t ll_intf_curb_sleep_state(uint8_t state);
  *
  * @param allow_low_isr : [in] Configuration parameter for the context of the low ISR in the bare-metal model. Range is [0,1].
  * 								0: Low ISR code is executed in the same context of the high ISR.
- * 								1: Low ISR code is executed in the context of the low ISR (by configuring a low priority
- * interrupt that is triggered by FW).
+ * 								1: Low ISR code is executed in the context of the low ISR (by configuring a low
+ * priority interrupt that is triggered by FW).
  * @param run_post_evnt_frm_isr : [in] Configuration parameter to decide whether the scheduling of the next BLE event is done in the
  * low ISR context or to be handled by the LL main thread. Range is [0,1]. 0: BLE next event scheduling is handled in the LL main
  * thread. 1: BLE next event scheduling is handled in the low ISR context.
@@ -5654,8 +5655,8 @@ void ll_intf_config_schdling_time(Evnt_timing_t * p_evnt_timing);
 
 /**
  * @brief  Set the rx data length throughput parameters.
- * 		the first rx_pckt_count will have a payload size of rx_pckt_len and the remaining rx slot (if any) will have a payload
- * size of connEffectiveMaxRxOctets of the current connection, if rx_pckt_count is set to a value greater than the
+ * 		the first rx_pckt_count will have a payload size of rx_pckt_len and the remaining rx slot (if any) will have a
+ * payload size of connEffectiveMaxRxOctets of the current connection, if rx_pckt_count is set to a value greater than the
  * PACKETS_PER_EVENT_MAX, the PACKETS_PER_EVENT_MAX will be used, if rx_pckt_len is set to a value greater than the
  * connEffectiveMaxRxOctets of the current connection, the connEffectiveMaxRxOctets will be used.
  *

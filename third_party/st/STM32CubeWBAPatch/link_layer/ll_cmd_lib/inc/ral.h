@@ -63,27 +63,27 @@ typedef uint8_t ral_instance_t;
  *						  ==============
  *
  *																					      ==============
- *											      			_ _(Requires ack)_ _ _ _ _ _ _=
- *RAL_RX_ACK = ral event allocation     		  /             			      ==============
+ *											      			_ _(Requires ack)_ _ _ _ _ _
+ *_= RAL_RX_ACK = ral event allocation     		  /             			      ==============
  *						  =============                	 /
  * ral_start_tx() _ _ _ _ = RAL_TX_PKT =_ _ ral_isr()_ _/
  *						  =============		   			\
  *						  					    		 \
  *==============
- *						  					     		  \_ _(Doesn't require ack)_ _ _ _=
- *RAL_TX_PKT =
+ *						  					     		  \_ _(Doesn't require ack)_ _ _
+ *_= RAL_TX_PKT =
  *																						  ==============
  *
  *																				      	  ==============
- *											      			_ _(Requires ack)_ _ _ _ _ _ _=
- *RAL_TX_ACK = ral event allocation     		  /             			      ==============
+ *											      			_ _(Requires ack)_ _ _ _ _ _
+ *_= RAL_TX_ACK = ral event allocation     		  /             			      ==============
  *						  =============                	 /
  * ral_start_rx() _ _ _ _ = RAL_RX_PKT =_ _ ral_isr()_ _/
  *						  =============		   			\
  *						  					    		 \
  *==============
- *						  					     		  \_ _(Doesn't require ack)_ _ _ _=
- *RAL_RX_PKT =
+ *						  					     		  \_ _(Doesn't require ack)_ _ _
+ *_= RAL_RX_PKT =
  *																						  ==============
  *						ral event allocation
  *						  ==============
@@ -835,8 +835,8 @@ ral_error_enum_t ral_set_ifs(ral_instance_t ral_instance, uint16_t ifs);
  * @param   ptr_coex_info 	  : [in] pointer to current coexistence parameters
  *
  * @retval RAL_ERROR_NONE if transmission started successfully
- * 		   RAL_ERROR_INVALID_PARAMETERS if the passed parameters doesn't make sense e.g. starting fifo mode but ptr_fifo_head =
- * NULL RAL_ERROR_BUSY if there is a transmission event that already started and not ended yet
+ * 		   RAL_ERROR_INVALID_PARAMETERS if the passed parameters doesn't make sense e.g. starting fifo mode but ptr_fifo_head
+ * = NULL RAL_ERROR_BUSY if there is a transmission event that already started and not ended yet
  *
  * @note: ral_tx_done won't be called unless emngr_handle_all_events() is called to call ral_sm_done which will call the ral_tx_done
  * call back
@@ -1242,8 +1242,8 @@ void ral_update_larger_mac_frm_cntr(ral_instance_t instance, uint32_t mac_frm_cn
  * @param  aPrevKey		:	key used in case of keyid of received MHR less than the keyid sustained by ral_instance by
  * one.
  * @param  aCurrKey		:	key used in case of keyid of received MHR equivalent to the keyid sustained by ral_instance.
- * @param  aNextKey		:	key used in case of keyid of received MHR greater than the keyid sustained by ral_instance by
- * one.
+ * @param  aNextKey		:	key used in case of keyid of received MHR greater than the keyid sustained by ral_instance
+ * by one.
  *
  * @retval None
  */
@@ -1296,9 +1296,9 @@ uint8_t ral_get_inst_keyId(ral_instance_t ral_instance);
  * @param  link_metrics  :[in]	pointer to the matching node
  *
  * @retval ral_error_enum_t : status
- * 							  RAL_ERROR_NONE						: successfully
- * configured. RAL_ERROR_LINK_METRICS_INVALID_ARGS	: in case of ptr_ext_addr NULL. RAL_ERROR_LINK_METRICS_NOT_FOUND
- * : in case of remove non-existing node. RAL_ERROR_LINK_METRICS_NO_BUF			: in case of not enough supported nodes.
+ * 							  RAL_ERROR_NONE						:
+ * successfully configured. RAL_ERROR_LINK_METRICS_INVALID_ARGS	: in case of ptr_ext_addr NULL. RAL_ERROR_LINK_METRICS_NOT_FOUND :
+ * in case of remove non-existing node. RAL_ERROR_LINK_METRICS_NO_BUF			: in case of not enough supported nodes.
  */
 ral_error_enum_t ral_config_enh_ack_probing(uint16_t short_addr, const uint8_t * ptr_ext_addr, void * link_metrics);
 /**

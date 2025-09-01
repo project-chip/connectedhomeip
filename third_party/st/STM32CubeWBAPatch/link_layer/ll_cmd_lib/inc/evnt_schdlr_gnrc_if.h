@@ -121,8 +121,8 @@ typedef struct _extrnl_evnt_st_t
  * @param  evnt_hndl_t [in]				: Event handle of registered event.
  * @param  updated_priority [in]		: Updated priority of the event during new extend request.
  * @param  flxbl_req [in]				: Flexible request flag,
- * 										  True: scheduler will try to extend duration with available duration up to
- * requested deadline False: scheduler will try to extend duration with requested duration only (full requested duration or not)
+ * 										  True: scheduler will try to extend duration with available duration up
+ * to requested deadline False: scheduler will try to extend duration with requested duration only (full requested duration or not)
  * @param  reqstd_deadline [in and out]	: Pointer to new end time that the event request to extend the grant to it.
  * It is also will be used as an output to report the given grant end time if the request is successfully accepted..
  * @retval Status (0: SUCCESS, 0xXX: ERROR_CODE from @ref ble_stat_t).

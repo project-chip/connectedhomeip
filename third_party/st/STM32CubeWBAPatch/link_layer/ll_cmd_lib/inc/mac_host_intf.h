@@ -1269,8 +1269,8 @@ mac_status_enum_t mac_init(uint32_t * mac_hndl, struct mac_dispatch_tbl * ptr_di
  *================          ================================   |    _ _ _  _ _ _ _ _ _ _ _
  * MLME-XX.Req/Res_ _ _  _> post DIRECT_DATA_TX_EVENT event    |    \ Main Thread          \
  *================<_ _ _ _ _================================   |. . .\ Emngr_hndl_all_events\
- * 				   <Return>     							   |	  \_ _ _ _ _ _ _ _ _ _ _ \ --->
- *direct_tx_evnt_cbk
+ * 				   <Return>     							   |	  \_ _ _ _ _ _ _ _ _ _ _
+ *\ ---> direct_tx_evnt_cbk
  *
  * */
 /*=========================================================================================================*/

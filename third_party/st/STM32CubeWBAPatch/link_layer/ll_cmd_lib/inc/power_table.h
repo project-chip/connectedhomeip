@@ -78,8 +78,8 @@ extern const uint8_t num_of_supported_power_tables;
  */
 /**
  * @brief	Used to initialize the EPA parameters. Called during the initialization.
- * 			Note: If an EPA is in use, then a valid callback function shall be passed to LL FW, otherwise the LL FW returns
- * error status.
+ * 			Note: If an EPA is in use, then a valid callback function shall be passed to LL FW, otherwise the LL FW
+ * returns error status.
  *
  * @param  use_epa : [in] 1: External PA exists. 0: There is no External PA.
  * @param  cbk	   : [in] Callback function to actually enable and disable the EPA.

@@ -129,8 +129,8 @@ pta_error pta_enable(pta_state enable);
  * 									  and beginning of event on air.
  *
  * @retval pta_error : 	PTA_DISABLED: If PTA is disabled.
- * 					   	PTA_ERROR_INVALID_REQUEST_TO_EVENT_TIME: If the request_to_event_time is greater than the
- * minimum time of the TX/RX interpacket time. PTA_ERROR_SUCCESS : Otherwise.
+ * 					   	PTA_ERROR_INVALID_REQUEST_TO_EVENT_TIME: If the request_to_event_time is greater than
+ * the minimum time of the TX/RX interpacket time. PTA_ERROR_SUCCESS : Otherwise.
  */
 pta_error pta_init(uint8_t request_to_event_time);
 
@@ -230,8 +230,8 @@ pta_error pta_set_coex_priority(uint32_t priority, uint32_t priority_mask);
 /**
  * @brief Used to configure the priority of the MAC Packets.
  * @note This API can be called directly to configure the priority of the MAC Packets. Beside this API,
- * 			there is an option to configure the priority of the MAC Packets through the "PTA_SET_PRIORITY" MAC custom HCI
- * command.
+ * 			there is an option to configure the priority of the MAC Packets through the "PTA_SET_PRIORITY" MAC custom
+ * HCI command.
  *
  * @param priority		: [in] Determines the state of each priority mode.
  * @param priority_mask	: [in] Determines which priorities are in effect in

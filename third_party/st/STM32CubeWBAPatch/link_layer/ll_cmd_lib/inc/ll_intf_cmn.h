@@ -54,8 +54,8 @@
  *
  * @param allow_low_isr : [in] Configuration parameter for the context of the low ISR in the bare-metal model. Range is [0,1].
  * 								0: Low ISR code is executed in the same context of the high ISR.
- * 								1: Low ISR code is executed in the context of the low ISR (by configuring a low priority
- * interrupt that is triggered by FW).
+ * 								1: Low ISR code is executed in the context of the low ISR (by configuring a low
+ * priority interrupt that is triggered by FW).
  * @param run_post_evnt_frm_isr : [in] Configuration parameter to decide whether the scheduling of the next BLE event is done in the
  * low ISR context or to be handled by the LL main thread. Range is [0,1]. 0: BLE next event scheduling is handled in the LL main
  * thread. 1: BLE next event scheduling is handled in the low ISR context.
@@ -71,8 +71,8 @@ ble_stat_t ll_intf_cmn_config_ll_ctx_params(uint8_t allow_low_isr, uint8_t run_p
  * @brief Used to select the source that drives the sleep clock, whether to use an external crystal oscillator or an integrated RC
  * oscillator (RCO).
  *
- * @param  slp_clk_src 				: [in] Indicate which source to drive the sleep clock. 0: Crystal Oscillator (default).
- * 1: RC0
+ * @param  slp_clk_src 				: [in] Indicate which source to drive the sleep clock. 0: Crystal Oscillator
+ * (default). 1: RC0
  * @param  ptr_slp_clk_freq_value 	: [out] Indicate the nominal frequency value of the sleep clock.
  *
  * @retval ble_stat_t : Command status to be sent to the Host.
