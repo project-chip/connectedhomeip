@@ -621,6 +621,10 @@ class CommodityTariffTestBaseHelper(MatterBaseTest):
         if not self.calendarPeriodsValue:
             self.calendarPeriodsValue = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.CalendarPeriods)
 
+        if self.startDateAttributeValue is None:
+            self.startDateAttributeValue = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.StartDate)
+            self.check_start_date_attribute(endpoint, self.startDateAttributeValue)
+
         logger.info(f"CalendarPeriods attribute value is: {self.calendarPeriodsValue}")
 
         if self.tariffInfoValue is not None and self.tariffInfoValue is NullValue:
@@ -1044,7 +1048,7 @@ class CommodityTariffTestBaseHelper(MatterBaseTest):
             6: cluster.Bitmaps.DayPatternDayOfWeekBitmap.kSunday
         }
 
-        current_day_entry_date_epoch = self.convert_matter_time_to_posix_epoch_time(current_day_entry_date)
+        current_day_entry_date_epoch = await self.convert_matter_time_to_posix_epoch_time(current_day_entry_date)
         dayOfWeek = datetime.datetime.fromtimestamp(current_day_entry_date_epoch).weekday()
 
         return weekDays[dayOfWeek]
