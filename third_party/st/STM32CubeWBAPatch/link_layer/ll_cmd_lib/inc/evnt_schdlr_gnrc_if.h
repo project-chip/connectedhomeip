@@ -203,4 +203,3 @@ uint8_t evnt_schdlr_confrm_grant(void * evnt_hndl);
 /**
  * @}
  */
-

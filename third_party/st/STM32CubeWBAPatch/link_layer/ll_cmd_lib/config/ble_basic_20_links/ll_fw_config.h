@@ -115,7 +115,7 @@
 #endif /* SUPPORT_CHANNEL_CLASSIFICATION */
 
 #ifndef SUPPORT_PERIODIC_ADV_ADI
-#define SUPPORT_PERIODIC_ADV_ADI                    0 
+#define SUPPORT_PERIODIC_ADV_ADI                    0
 #endif /* SUPPORT_PERIODIC_ADV_ADI */
 
 #ifndef SUPPORT_LE_ENHANCED_CONN_UPDATE
@@ -137,19 +137,19 @@
 #ifndef SUPPORT_CHANNEL_SOUNDING
 #define SUPPORT_CHANNEL_SOUNDING                                        0 /* Enable\Disable Channel Sounding Feature.   Enable:1 - Disable:0 */
 #endif /* SUPPORT_CHANNEL_SOUNDING */
- 
+
 #ifndef SUPPORT_FRAME_SPACE_UPDATE
 #define SUPPORT_FRAME_SPACE_UPDATE                                      0 /* Enable\Disable Frame Space Update Feature. Enable:1 - Disable:0 */
 #endif /* SUPPORT_FRAME_SPACE_UPDATE */
- 
+
 #ifndef SUPPORT_EXT_FEATURE_SET
 #define SUPPORT_EXT_FEATURE_SET                                         0 /* Enable\Disable Extended Feature Set Exchange. Enable:1 - Disable:0 */
 #endif /* SUPPORT_EXT_FEATURE_SET */
- 
+
 #ifndef SUPPORT_ISO_UNSEG_MODE
 #define SUPPORT_ISO_UNSEG_MODE                                          0 /* Enable\Disable Unsegmented Mode for Framed ISO PDUs. Enable: 1 - Disable: 0*/
 #endif /* SUPPORT_ISO_UNSEG_MODE */
- 
+
 #ifndef SUPPORT_LE_ADVERTISERS_MONITORING
 #define SUPPORT_LE_ADVERTISERS_MONITORING                               0 /* Enable\Disable Advertisers Monitoring Feature. Enable:1 - Disable:0 */
 #endif /* SUPPORT_LE_ADVERTISERS_MONITORING */

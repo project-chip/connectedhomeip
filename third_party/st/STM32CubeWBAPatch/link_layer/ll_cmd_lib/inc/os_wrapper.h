@@ -77,9 +77,9 @@ typedef enum int_state {
  * @brief Priority used for thread control.
  */
 typedef enum  {
-  os_priority_high,           
-  os_priority_normal,        
-  os_priority_low,          	
+  os_priority_high,
+  os_priority_normal,
+  os_priority_low,
 } os_priority;
 
 /**
@@ -399,7 +399,7 @@ os_mutex_id os_rcrsv_mutex_create(void);
  * @param  mutex_id      mutex id.
  * @param millisec      time-out value, 0 for no time-out.
  *
- * @retval status code , 0 for success 
+ * @retval status code , 0 for success
  */
 int32_t os_rcrsv_mutex_wait(
 		os_mutex_id mutex_id,
@@ -503,5 +503,3 @@ void* os_shrd_mem_alloc(
 uint8_t os_wrapper_is_rtos_used(void);
 
 #endif /* INCLUDE_CONN_MNGR_H_ */
-
-

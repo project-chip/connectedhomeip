@@ -38,7 +38,7 @@
  * OUT OF, OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  *
  * */
- 
+
 #ifndef INCLUDE_RAL_H_
 #define INCLUDE_RAL_H_
 
@@ -934,7 +934,7 @@ ral_error_enum_t ral_set_cont_recp_state(ral_instance_t ral_instance, ral_state_
  */
 ral_error_enum_t ral_set_auto_sleep_state(ral_instance_t ral_instance, ral_state_enum_t auto_sleep_state);
 /**
- * @brief	This function used to get the state of automatic switching to sleep mode 
+ * @brief	This function used to get the state of automatic switching to sleep mode
  *
  * @param   ral_instance 	 : [in] ral instance
  *

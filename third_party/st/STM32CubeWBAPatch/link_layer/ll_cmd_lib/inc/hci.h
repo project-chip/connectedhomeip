@@ -231,5 +231,3 @@ void hci_ll_set_custom_event_mask(uint8_t cstm_evnt_mask);
 #endif /* SUPPORT_HCI_EVENT_ONLY */
 
 #endif /* INCLUDE_HCI_H */
-
-

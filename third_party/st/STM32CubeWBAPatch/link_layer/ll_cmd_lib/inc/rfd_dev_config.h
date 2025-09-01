@@ -2,7 +2,7 @@
 /**
  ********************************************************************************
  * @file    rfd_dev_config.h
- * @brief Configurations for reduced function device and full function device 
+ * @brief Configurations for reduced function device and full function device
  *
  *
  ******************************************************************************

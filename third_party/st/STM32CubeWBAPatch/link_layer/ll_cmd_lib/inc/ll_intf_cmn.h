@@ -165,7 +165,7 @@ ble_stat_t ll_intf_cmn_le_set_dp_slp_mode(uint8_t dp_slp_mode);
  * @param  region_0x09_val: absolute gain fix for region 0x09 in dbm.
  * @param  r_msur_percent: percentage of the measured resistor value that will be used
  * 				to select the update values in pre-emphasis sequence (range: 0 to 99).
- * 
+ *
  * @retval None.
  */
 void ll_intf_cmn_gain_fix_init(
