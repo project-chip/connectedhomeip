@@ -98,7 +98,7 @@ user@ubuntu: export ARMGCC_DIR=  # with ARMGCC_DIR referencing the compiler path
     `west build` command :
 
 ```
-user@ubuntu: west build -d mcuboot_build -b <RT_board> examples/ota_examples/mcuboot_opensource
+user@ubuntu: west build -d mcuboot_build -b <RT_board> examples/ota_examples/mcuboot_opensource -DCONF_FILE=<absolute_path>/connectedhomeip/third_party/nxp/nxp_matter_support/cmake/rt/<RT_platform>/bootloader.conf
 ```
 
 > Note : For RT1170 platform, `-Dcore_id=cm7` argument should be added to the
@@ -205,6 +205,13 @@ partitioning with mcuboot, please refer to the dedicated `readme.txt` located in
 > Auto-generated signed application image can be found under the path
 > `<build_dir>/app_SIGNED.bin`.
 
+##### Signature Algorithm Compatibility
+
+Starting from MCUBoot v2.2, the default signature algorithm is EC256. Matter
+images are now signed using ECDSA by default. To maintain compatibility with
+older MCUBoot versions (prior to 2.2), which use RSA by default, we also provide
+an RSA-signed image named `<build_dir>/app_SIGNED_RSA.bin`.
+
 After flashing the bootloader, the application can be programmed to the board.
 The image must have the following format :
 
@@ -238,6 +245,16 @@ trailer, "`imgtool`" is provided in the SDK and can be found in
 The following commands can be run (make sure to replace the /path/to/file/binary
 with the adequate files):
 
+-   Signing with ECDSA (for MCUBoot version >= 2.2)
+
+```sh
+user@ubuntu: cd ~/Desktop/<matter_repo_root>/third_party/nxp/nxp_matter_support/github_sdk/sdk_next/repo/mcuxsdk/middleware/mcuboot_opensource/scripts/
+
+user@ubuntu: python3 imgtool.py sign --key ~/Desktop/<matter_repo_root>/third_party/nxp/nxp_matter_support/github_sdk/sdk_next/repo/mcuxsdk/middleware/mcuboot_opensource/boot/nxp_mcux_sdk/keys/sign-ecdsa-p256-priv.pem --align 4 --header-size 0x1000 --pad-header --pad --confirm --slot-size 0x440000 --max-sectors 1088 --version "1.0" ~/Desktop/connectedhomeip/examples/all-clusters-app/nxp/rt/<"rt_board">/out/debug/chip-<"rt_board">-all-cluster-example.bin ~/Desktop/connectedhomeip/examples/all-clusters-app/nxp/rt/<"rt_board">/out/debug/chip-<"rt_board">-all-cluster-example_SIGNED.bin
+```
+
+-   Signing with RSA (for MCUBoot version < 2.2)
+
 ```sh
 user@ubuntu: cd ~/Desktop/<matter_repo_root>/third_party/nxp/nxp_matter_support/github_sdk/sdk_next/repo/mcuxsdk/middleware/mcuboot_opensource/scripts/
 
@@ -253,16 +270,16 @@ Notes :
     adjusted accordingly.
 -   In this example, the image is signed with the private key provided by the
     SDK as an example
-    (`<matter_repo_root>/third_party/nxp/nxp_matter_support/github_sdk/sdk_next/repo/mcuxsdk/middleware/mcuboot_opensource/boot/nxp_mcux_sdk/keys/sign-rsa2048-priv.pem`),
+    (`<matter_repo_root>/third_party/nxp/nxp_matter_support/github_sdk/sdk_next/repo/mcuxsdk/middleware/mcuboot_opensource/boot/nxp_mcux_sdk/keys/sign-ecdsa-p256-priv.pem`),
     MCUBoot is built with its corresponding public key which would be used to
     verify the integrity of the image. It is possible to generate a new pair of
     keys using the following commands. This procedure should be done prior to
     building the mcuboot application.
 
--   To generate the private key :
+-   To generate the private key with ECDSA :
 
 ```
-user@ubuntu: python3 imgtool.py keygen -k priv_key.pem -t rsa-2048
+user@ubuntu: python3 imgtool.py keygen -k priv_key.pem -t ecdsa-p256
 ```
 
 -   To extract the public key :
@@ -272,10 +289,15 @@ user@ubuntu: python3 imgtool.py getpub -k priv_key.pem
 ```
 
 -   The extracted public key can then be copied to the
-    `<matter_repo_root>/third_party/nxp/nxp_matter_support/github_sdk/sdk_next/repo/mcuxsdk/middleware/mcuboot_opensource/boot/nxp_mcux_sdk/keys/sign-rsa2048-pub.c`,
-    given as a value to the rsa_pub_key[] array.
+    `<matter_repo_root>/third_party/nxp/nxp_matter_support/github_sdk/sdk_next/repo/mcuxsdk/middleware/mcuboot_opensource/boot/nxp_mcux_sdk/keys/sign-ecdsa-p256-pub.c`,
+    given as a value to the ecdsa_pub_key[] array.
 
 The resulting output is the signed binary of the application version "1.0".
+
+> Note : To generate RSA keys, make sure to replace the type `ecdsa-p256` with
+> `rsa-2048`, and replace `rsa_pub_key[]` in the
+> `<matter_repo_root>/third_party/nxp/nxp_matter_support/github_sdk/sdk_next/repo/mcuxsdk/middleware/mcuboot_opensource/boot/nxp_mcux_sdk/keys/sign-rsa2048-pub.c`
+> file.
 
 #### Flashing the signed application image
 
