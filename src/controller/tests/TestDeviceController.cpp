@@ -42,7 +42,8 @@ namespace {
 class FactoryInitParamsSetter
 {
 public:
-    FactoryInitParamsSetter() {
+    FactoryInitParamsSetter()
+    {
         // Set all the basic requirement to test DeviceControllerFactory
         EXPECT_EQ(opCertStore.Init(&cerStorage), CHIP_NO_ERROR);
 
@@ -64,11 +65,13 @@ public:
         factoryInitParams.wifipaf_layer = &wifipaf;
 #endif
     };
-    ~FactoryInitParamsSetter() {
+    ~FactoryInitParamsSetter()
+    {
         sProvider.Finish();
         opCertStore.Finish();
     };
     chip::Controller::FactoryInitParams GetFactoryInitParams() { return factoryInitParams; };
+
 protected:
     chip::TestPersistentStorageDelegate cerStorage;
     chip::Credentials::PersistentStorageOpCertStore opCertStore;
@@ -141,6 +144,7 @@ public:
 
 protected:
     FactoryInitParamsSetter params;
+
 private:
     chip::app::DataModel::Provider * mOldProvider = nullptr;
 };
