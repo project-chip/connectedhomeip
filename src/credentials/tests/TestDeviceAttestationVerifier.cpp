@@ -43,6 +43,9 @@ struct TestDeviceAttestationVerifier : public ::testing::Test
 // Test the verifier of default stubs
 TEST_F(TestDeviceAttestationVerifier, UnimplementedDACVerifierStub)
 {
+    // Explicitly reset to the default stub verifier before the test
+    SetDeviceAttestationVerifier(nullptr);
+
     // Test GetDeviceAttestationVerifier and ensure it's not null
     DeviceAttestationVerifier * verifier = GetDeviceAttestationVerifier();
     ASSERT_NE(verifier, nullptr);
