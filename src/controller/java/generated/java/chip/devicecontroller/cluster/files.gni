@@ -217,6 +217,7 @@ structs_sources = [
   "${chip_root}/src/controller/java/generated/java/chip/devicecontroller/cluster/structs/WaterHeaterModeClusterModeTagStruct.kt",
   "${chip_root}/src/controller/java/generated/java/chip/devicecontroller/cluster/structs/WebRTCTransportProviderClusterICECandidateStruct.kt",
   "${chip_root}/src/controller/java/generated/java/chip/devicecontroller/cluster/structs/WebRTCTransportProviderClusterICEServerStruct.kt",
+  "${chip_root}/src/controller/java/generated/java/chip/devicecontroller/cluster/structs/WebRTCTransportProviderClusterSFrameStruct.kt",
   "${chip_root}/src/controller/java/generated/java/chip/devicecontroller/cluster/structs/WebRTCTransportProviderClusterWebRTCSessionStruct.kt",
   "${chip_root}/src/controller/java/generated/java/chip/devicecontroller/cluster/structs/WebRTCTransportRequestorClusterICECandidateStruct.kt",
   "${chip_root}/src/controller/java/generated/java/chip/devicecontroller/cluster/structs/WebRTCTransportRequestorClusterICEServerStruct.kt",
