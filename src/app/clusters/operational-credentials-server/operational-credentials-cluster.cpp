@@ -1093,7 +1093,6 @@ exit:
 
     return std::nullopt;
 }
-
 } // anonymous namespace
 
 CHIP_ERROR OperationalCredentialsCluster::Attributes(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder)

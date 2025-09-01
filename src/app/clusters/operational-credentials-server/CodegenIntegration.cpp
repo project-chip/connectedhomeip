@@ -16,6 +16,7 @@
  */
 #include <app/clusters/operational-credentials-server/operational-credentials-cluster.h>
 #include <data-model-providers/codegen/ClusterIntegration.h>
+#include <app/static-cluster-config/OperationalCredentials.h>
 
 #include <app/server/Server.h>
 #include <app/EventLogging.h>
@@ -27,6 +28,10 @@
 using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;
+
+static_assert((OperationalCredentials::StaticApplicationConfig::kFixedClusterConfig.size() == 1 &&
+               OperationalCredentials::StaticApplicationConfig::kFixedClusterConfig[0].endpointNumber == kRootEndpointId) ||
+              (OperationalCredentials::StaticApplicationConfig::kFixedClusterConfig.size() == 0));
 
 namespace {
 
@@ -195,7 +200,6 @@ void emberAfOperationalCredentialsClusterServerInitCallback(EndpointId endpointI
 {
     IntegrationDelegate integrationDelegate;
 
-    // register a singleton server (root endpoint only)
     CodegenClusterIntegration::RegisterServer(
         {
             .endpointId                      = endpointId,
@@ -217,7 +221,6 @@ void MatterOperationalCredentialsClusterServerShutdownCallback(EndpointId endpoi
 
     DeviceLayer::PlatformMgrImpl().RemoveEventHandler(OnPlatformEventHandler);
     Server::GetInstance().GetFabricTable().RemoveFabricDelegate(&gFabricDelegate);
-    // register a singleton server (root endpoint only)
     CodegenClusterIntegration::UnregisterServer(
         {
             .endpointId                      = endpointId,
