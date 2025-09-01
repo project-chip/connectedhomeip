@@ -31,8 +31,6 @@ CommandHandlerInterfaceOnlyClusters:
     - Oven Cavity Operational State
     - Refrigerator And Temperature Controlled Cabinet Mode
     - Operational State
-    - Activated Carbon Filter Monitoring
-    - HEPA Filter Monitoring
     - RVC Operational State
     - Sample MEI
     - Microwave Oven Control
@@ -93,6 +91,10 @@ ClustersWithInitFunctions:
     - Scenes Management
     - Thermostat
     - Fixed Label
+    - Time Format Localization
+    - Wi-Fi Network Diagnostics
+    - HEPA Filter Monitoring
+    - Activated Carbon Filter Monitoring
 
 ClustersWithAttributeChangedFunctions:
     - Bridged Device Basic Information
