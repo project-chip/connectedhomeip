@@ -60,6 +60,11 @@ public:
         factoryInitParams.listenPort               = 88;
         factoryInitParams.fabricTable              = nullptr;
         factoryInitParams.fabricIndependentStorage = &factoryStorage;
+#if CONFIG_NETWORK_LAYER_BLE
+#if !CONFIG_DEVICE_LAYER
+        factoryInitParams.bleLayer = chip::DeviceLayer::ConnectivityMgr().GetBleLayer();
+#endif // CONFIG_DEVICE_LAYER
+#endif // CONFIG_NETWORK_LAYER_BLE
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
         factoryInitParams.wifipaf_layer = &wifipaf;
