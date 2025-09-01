@@ -18,7 +18,7 @@
 /**
  *    @file
  *          Utilities for accessing persisted device configuration on
- *          webOS platforms.
+ *          Linux platforms.
  */
 
 #pragma once
@@ -63,19 +63,16 @@ public:
     static const Key kConfigKey_HardwareVersion;
     static const Key kConfigKey_ManufacturingDate;
     static const Key kConfigKey_SetupPinCode;
-    static const Key kConfigKey_FabricId;
     static const Key kConfigKey_ServiceConfig;
     static const Key kConfigKey_PairedAccountId;
     static const Key kConfigKey_ServiceId;
-    static const Key kConfigKey_FabricSecret;
-    static const Key kConfigKey_GroupKeyIndex;
     static const Key kConfigKey_LastUsedEpochKeyId;
     static const Key kConfigKey_FailSafeArmed;
     static const Key kConfigKey_SetupDiscriminator;
     static const Key kConfigKey_RegulatoryLocation;
     static const Key kConfigKey_CountryCode;
-    static const Key kConfigKey_Breadcrumb;
     static const Key kConfigKey_LocationCapability;
+    static const Key kConfigKey_ConfigurationVersion;
     static const Key kConfigKey_Spake2pIterationCount;
     static const Key kConfigKey_Spake2pSalt;
     static const Key kConfigKey_Spake2pVerifier;
@@ -86,8 +83,6 @@ public:
     static const Key kCounterKey_UpTime;
     static const Key kCounterKey_TotalOperationalHours;
     static const Key kCounterKey_BootReason;
-
-    static const char kGroupKeyNamePrefix[];
 
     static CHIP_ERROR Init();
 

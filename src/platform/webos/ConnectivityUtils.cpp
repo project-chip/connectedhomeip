@@ -18,11 +18,11 @@
 /**
  *    @file
  *          Utilities for accessing parameters of the network interface and the wireless
- *          statistics(extracted from /proc/net/wireless) on webOS platforms.
+ *          statistics(extracted from /proc/net/wireless) on Linux platforms.
  */
 
-#include <platform/internal/CHIPDeviceLayerInternal.h>
 #include <platform/webos/ConnectivityUtils.h>
+#include <platform/internal/CHIPDeviceLayerInternal.h>
 
 #include <arpa/inet.h>
 #include <ifaddrs.h>
@@ -272,6 +272,10 @@ InterfaceTypeEnum ConnectivityUtils::GetInterfaceConnectionType(const char * ifn
         if (ioctl(sock, SIOCETHTOOL, &ifr) != -1)
             ret = InterfaceTypeEnum::kEthernet;
     }
+    else if (strncmp(ifname, "br", 2) == 0)
+    {
+        ret = InterfaceTypeEnum::kEthernet;
+    }
 
     close(sock);
 
@@ -306,6 +310,98 @@ CHIP_ERROR ConnectivityUtils::GetInterfaceHardwareAddrs(const char * ifname, uin
     }
 
     close(skfd);
+
+    return err;
+}
+
+CHIP_ERROR ConnectivityUtils::GetInterfaceIPv4Addrs(const char * ifname, uint8_t & size, NetworkInterface * ifp)
+{
+    CHIP_ERROR err;
+    struct ifaddrs * ifaddr = nullptr;
+
+    if (getifaddrs(&ifaddr) == -1)
+    {
+        ChipLogError(DeviceLayer, "Failed to get network interfaces");
+        err = CHIP_ERROR_READ_FAILED;
+    }
+    else
+    {
+        uint8_t index = 0;
+
+        for (struct ifaddrs * ifa = ifaddr; ifa != nullptr; ifa = ifa->ifa_next)
+        {
+            if (ifa->ifa_addr && ifa->ifa_addr->sa_family == AF_INET)
+            {
+                if (strcmp(ifname, ifa->ifa_name) == 0)
+                {
+                    void * addPtr = &((struct sockaddr_in *) ifa->ifa_addr)->sin_addr;
+
+                    memcpy(ifp->Ipv4AddressesBuffer[index], addPtr, kMaxIPv4AddrSize);
+                    ifp->Ipv4AddressSpans[index] = ByteSpan(ifp->Ipv4AddressesBuffer[index], kMaxIPv4AddrSize);
+                    index++;
+
+                    if (index >= kMaxIPv4AddrCount)
+                    {
+                        break;
+                    }
+                }
+            }
+        }
+
+        if (index > 0)
+        {
+            err  = CHIP_NO_ERROR;
+            size = index;
+        }
+
+        freeifaddrs(ifaddr);
+    }
+
+    return err;
+}
+
+CHIP_ERROR ConnectivityUtils::GetInterfaceIPv6Addrs(const char * ifname, uint8_t & size, NetworkInterface * ifp)
+{
+    CHIP_ERROR err;
+    struct ifaddrs * ifaddr = nullptr;
+
+    if (getifaddrs(&ifaddr) == -1)
+    {
+        ChipLogError(DeviceLayer, "Failed to get network interfaces");
+        err = CHIP_ERROR_READ_FAILED;
+    }
+    else
+    {
+        uint8_t index = 0;
+
+        for (struct ifaddrs * ifa = ifaddr; ifa != nullptr; ifa = ifa->ifa_next)
+        {
+            if (ifa->ifa_addr && ifa->ifa_addr->sa_family == AF_INET6)
+            {
+                if (strcmp(ifname, ifa->ifa_name) == 0)
+                {
+                    void * addPtr = &((struct sockaddr_in6 *) ifa->ifa_addr)->sin6_addr;
+
+                    memcpy(ifp->Ipv6AddressesBuffer[index], addPtr, kMaxIPv6AddrSize);
+                    ifp->Ipv6AddressSpans[index] = ByteSpan(ifp->Ipv6AddressesBuffer[index], kMaxIPv6AddrSize);
+                    index++;
+
+                    if (index >= kMaxIPv6AddrCount)
+                    {
+                        break;
+                    }
+                }
+            }
+        }
+
+        if (index > 0)
+        {
+            err  = CHIP_NO_ERROR;
+            size = index;
+        }
+
+        freeifaddrs(ifaddr);
+    }
 
     return err;
 }

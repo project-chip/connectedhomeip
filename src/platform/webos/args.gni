@@ -13,3 +13,9 @@
 # limitations under the License.
 
 chip_device_platform = "webos"
+declare_args() {
+    chip_enable_ble = false
+    chip_enable_openthread = false
+    chip_enable_nfc_based_commissioning = false
+    chip_enable_ota_requestor = false
+}
