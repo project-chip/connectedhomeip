@@ -362,6 +362,7 @@ CHIP_ERROR ConfigurationManagerImpl::GetRegulatoryLocation(uint8_t & location)
     }
     else
     {
+        VerifyOrReturnError(value <= UINT8_MAX, CHIP_ERROR_INVALID_INTEGER_VALUE);
         location = static_cast<uint8_t>(value);
     }
 

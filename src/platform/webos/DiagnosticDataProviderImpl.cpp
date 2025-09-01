@@ -270,9 +270,9 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetCurrentHeapHighWatermark(uint64_t & cu
     // the hard disk, called swap space, and free up that page of memory. So it is impossible
     // to know accurately peak physical memory it use.
     // Update the maximum heap high watermark if the current heap usage exceeds it.
-    if (mallocInfo.uordblks > static_cast<int>(maxHeapHighWatermark))
-    {
-        maxHeapHighWatermark = mallocInfo.uordblks;
+    if (static_cast<size_t>(mallocInfo.uordblks) > maxHeapHighWatermark)  
+    {  
+        maxHeapHighWatermark = mallocInfo.uordblks;  
     }
 
     // Set the current heap high watermark.

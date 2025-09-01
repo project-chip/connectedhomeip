@@ -780,22 +780,17 @@ void BLEManagerImpl::OnDeviceScanned(const pbnjson::JValue & device, const chip:
         ChipLogError(Ble, "Unknown discovery type. Ignoring scanned device.");
         return;
     }
-    ChipLogProgress(Ble, "Device address match. Attempting to connect.11111");
     mBLEScanConfig.mBleScanState = BleScanState::kConnecting;
-    ChipLogProgress(Ble, "Device address match. Attempting to connect.1222222");
 	mBLEScanConfig.mAddress = device["address"].asString();
-    ChipLogProgress(Ble, "Device address match. Attempting to connect.13333");
     chip::DeviceLayer::PlatformMgr().LockChipStack();
     // We StartScan in the ChipStack thread.
     // StopScan should also be performed in the ChipStack thread.
     // At the same time, the scan timer also needs to be canceled in the ChipStack thread.
     DeviceLayer::SystemLayer().CancelTimer(HandleScanTimer, this);
-    ChipLogProgress(Ble, "Device address match. Attempting to connect.14444");
     mDeviceScanner.StopScan();
     // Stop scanning and then start connecting timer
     DeviceLayer::SystemLayer().StartTimer(kConnectTimeout, HandleConnectTimer, this);
     chip::DeviceLayer::PlatformMgr().UnlockChipStack();
-ChipLogProgress(Ble, "Device address match. Attempting to connect.5555");
     CHIP_ERROR err = mConnection.ConnectDevice(mBLEScanConfig.mAddress, mEndpoint);
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Ble, "Device connection failed: %" CHIP_ERROR_FORMAT, err.Format()));
 
