@@ -432,7 +432,7 @@ TEST_F(TestCommissioningWindowManager, TestOnPlatformEventCommissioningComplete)
 #endif
 }
 
-// Verify that the commissioning mode is expired when failsafe timer expires
+// Verify that the when fail-safe timer expires commissioning mode is disabled
 TEST_F(TestCommissioningWindowManager, TestOnPlatformEventFailSafeTimerExpired)
 {
     CommissioningWindowManager & commissionMgr = Server::GetInstance().GetCommissioningWindowManager();
@@ -440,12 +440,12 @@ TEST_F(TestCommissioningWindowManager, TestOnPlatformEventFailSafeTimerExpired)
     EXPECT_EQ(commissionMgr.OpenBasicCommissioningWindow(commissionMgr.MaxCommissioningTimeout(),
                                                          CommissioningWindowAdvertisement::kDnssdOnly),
               CHIP_NO_ERROR);
-    EXPECT_TRUE(commissionMgr.IsCommissioningWindowOpen());
 
     chip::DeviceLayer::ChipDeviceEvent event;
     event.Type = chip::DeviceLayer::DeviceEventType::kFailSafeTimerExpired;
 
     commissionMgr.OnPlatformEvent(&event);
+    EXPECT_TRUE(commissionMgr.IsCommissioningWindowOpen());
     commissionMgr.CloseCommissioningWindow();
     EXPECT_EQ(commissionMgr.GetCommissioningMode(), chip::Dnssd::CommissioningMode::kDisabled);
 }
@@ -480,6 +480,7 @@ TEST_F(TestCommissioningWindowManager, TestOnPlatformEventFailSafeTimerExpiredPA
     commissionMgr.OnPlatformEvent(&event);
     // Verify that PASE Session was evicted after failsafe timer expiration
     EXPECT_FALSE(PASESession.Get().HasValue());
+    EXPECT_EQ(commissionMgr.GetCommissioningMode(), chip::Dnssd::CommissioningMode::kDisabled);
 }
 
 // Verify that operational advertising is started when the operational network is enabled

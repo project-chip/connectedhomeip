@@ -33,7 +33,7 @@
 namespace chip {
 
 namespace Test {
-// Forward declaration of CommissioningWindowManagerTestAccess class tests to allow it to be friends with CommissioningManager
+// Forward declaration of CommissioningWindowManagerTestAccess class tests to allow it to be friends with CommissioningWindowManager
 class CommissioningWindowManagerTestAccess;
 } // namespace Test
 

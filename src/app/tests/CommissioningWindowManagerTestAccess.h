@@ -23,19 +23,19 @@
 namespace chip {
 namespace Test {
 /**
- * @brief Class acts as an accessor to private methods of the CommissioningWindowManagerTestAccess class without needing to give
+ * @brief Class acts as an accessor to private members of the CommissioningWindowManager class without needing to give
  * friend access to each individual test.
  */
 class CommissioningWindowManagerTestAccess
 {
 public:
     CommissioningWindowManagerTestAccess() = delete;
-    CommissioningWindowManagerTestAccess(CommissioningWindowManager * cmwinMgr) : mcmwinMgr(cmwinMgr) {}
+    CommissioningWindowManagerTestAccess(CommissioningWindowManager * cmwinMgr) : mCmwinMgr(cmwinMgr) {}
 
-    SessionHolderWithDelegate & GetPASESession() { return mcmwinMgr->mPASESession; }
+    SessionHolderWithDelegate & GetPASESession() { return mCmwinMgr->mPASESession; }
 
 private:
-    CommissioningWindowManager * mcmwinMgr = nullptr;
+    CommissioningWindowManager * mCmwinMgr = nullptr;
 };
 } // namespace Test
 
