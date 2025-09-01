@@ -1372,7 +1372,7 @@ class CommodityTariffTestBaseHelper(MatterBaseTest):
         if not day_pattern_found:
             asserts.fail(f"DayPattern not found for {current_or_next}DayEntryDate attribute value.")
 
-    async def validate_tariff_component_ID_uniqueness_for_features(self, tariff_components_list: List[cluster.Structs.TariffComponentStruct]):
+    async def validate_tariff_component_ID_uniqueness_for_features(self, tariff_components_list: List[cluster.Structs.TariffComponentStruct]) -> None:
 
         # flags to check specific feature fields in mask
         features_fields_flags = {

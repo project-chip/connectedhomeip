@@ -74,42 +74,41 @@ class TC_SETRF_2_2(CommodityTariffTestBaseHelper):
     def steps_TC_SETRF_2_2(self) -> list[TestStep]:
 
         steps = [
-            TestStep("1", "Commissioning, already done", "DUT is commissioned.", is_commissioning=True),
-            TestStep("2", "TH reads TestEventTriggersEnabled attribute from General Diagnostics Cluster",
-                     "TestEventTriggersEnabled is True"),
-            TestStep("3", "TH sends TestEventTrigger command to General Diagnostics Cluster for Fake Tariff Set Test Event",
-                     "DUT replies with SUCCESS status code."),
-            TestStep("4", "TH reads TariffComponents attribute.", """
-                     - DUT replies a list of TariffComponentStruct entries with list length in range 1-672;
-                     - Store the values of TariffComponentID field of TariffComponentStruct for all entries as tariffComponentIDs;
-                     - Store the value of TariffComponentID field the TariffComponentStruct of the first entry as tariffComponentID1;
-                     - Store the value of Label field the TariffComponentStruct of the first entry as label1;
-                     - Store the TariffComponentStruct of the first entry as tariffComponentStruct1."""),
-            TestStep("5", "TH reads TariffPeriods attribute.", """
-                     - DUT replies a list of TariffPeriodStruct entries with list length in range 1-672;
-                     - Find TariffPeriodStruct entries that have an entry equal tariffComponentID1 in TariffComponentID field;
-                     - For the found entries, store unique values of DayEntryID from DayEntryIDs field in order from min to max as dayEntryIDs1."""),
-            TestStep("6", "TH sends GetTariffComponent command with TariffComponentID set to tariffComponentID1.", """
-                     - DUT replies a GetTariffComponentResponse command;
-                     - Verify that Label field is a string with max length 128;
-                     - Verify that Label field equals label1;
-                     - Verify that DayEntryIDs field is a list of unique uint32 entries with list length in range 1 - 96;
-                     - Verify that DayEntryIDs field equals dayEntryIDs1;
-                     - Verify that TariffComponent field is a TariffComponentStruct equal to tariffComponentStruct1."""),
-            TestStep("7", "TH sends GetTariffComponent command with TariffComponentID set to an uint32 value not equal any from tariffComponentIDs.",
-                     "DUT replies with NOT_FOUND status code."),
-            TestStep("8", "TH reads DayEntries attribute.", """
-                     - DUT replies a list of DayEntryStruct entries with list length less or equal 672;
-                     - Store the values of DayEntryID field of DayEntryStruct for all entries as dayEntryIDs;
-                     - Store the value of DayEntryID field of the DayEntryStruct of the first entry as dayEntryID1;
-                     - Store the DayEntryStruct of the first entry as dayEntryStruct1."""),
-            TestStep("9", "TH sends GetDayEntry command with DayEntryID set to dayEntryID1.", """
-                     - DUT replies a GetDayEntry command;
-                     - Verify that DayEntry field is a DayEntryStruct equal to dayEntryStruct1;"""),
-            TestStep("10", "TH sends GetDayEntry command with DayEntryID set to an uint32 value not equal any from dayEntryIDs.",
-                     "DUT replies with NOT_FOUND status code."),
-            TestStep("11", "TH sends TestEventTrigger command to General Diagnostics Cluster for Test Event Clear",
-                     "DUT replies with SUCCESS status code."),
+            TestStep("1", "Commission DUT to TH (can be skipped if done in a preceding test).",
+                     "DUT is commissioned.", is_commissioning=True),
+            TestStep("2", "TH reads TestEventTriggersEnabled attribute from General Diagnostics Cluster.",
+                     "Value has to be 1 (True)."),
+            TestStep("3", "TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 with EnableKey field set to PIXIT.SETRF.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to PIXIT.SETRF.TEST_EVENT_TRIGGER for Attributes Value Set Test Event",
+                     "Verify DUT responds w/ status SUCCESS(0x00)."),
+            TestStep("4", "TH reads from the DUT the TariffComponents attribute.", """
+                     - Verify that the DUT response contains a list of TariffComponentStruct entries with list length in range 1-672;
+                        - Store the values of TariffComponentID field of TariffComponentStruct for all entries as tariffComponentIDs;
+                        - Store the value of TariffComponentID field of the TariffComponentStruct of the first entry as tariffComponentID1;
+                        - Store the TariffComponentStruct of the first entry as tariffComponentStruct1."""),
+            TestStep("5", "TH reads from the DUT the TariffPeriods attribute.", """
+                     - Verify that the DUT response contains a list of TariffPeriodStruct entries with list length in range 1-672;
+                        - Find TariffPeriodStruct entries that contain tariffComponentID1 value in TariffComponentIDs field;
+                            - Store DayEntryIDs field values of the found TariffPeriodStruct entries from min to max as dayEntryIDs1 list."""),
+            TestStep("6", "TH sends command GetTariffComponent command with TariffComponentID set to tariffComponentID1.", """
+                     - Verify that the DUT response contains a GetTariffComponentResponse command;
+                        - Verify that Label field is a string with max length 128 or null;
+                        - Verify that DayEntryIDs field is a list of unique uint32 entries with list length in range 1 - 96;
+                        - Verify that DayEntryIDs field equals dayEntryIDs1;
+                        - Verify that TariffComponent field is a TariffComponentStruct equal to tariffComponentStruct1."""),
+            TestStep("7", "TH sends command GetTariffComponent command with TariffComponentID set to an uint32 value not equal any from tariffComponentIDs.",
+                     "Verify that the DUT response contains status NOT_FOUND(0x8b)."),
+            TestStep("8", "TH reads from the DUT the DayEntries attribute.", """
+                     - Verify that the DUT response contains a list of DayEntryStruct entries with list length less or equal 672;
+                        - Store the values of DayEntryID field of DayEntryStruct for all entries as dayEntryIDs;
+                        - Store the value of DayEntryID field of the DayEntryStruct of the first entry as dayEntryID1;
+                        - Store the DayEntryStruct of the first entry as dayEntryStruct1."""),
+            TestStep("9", "TH sends command GetDayEntry command with DayEntryID set to dayEntryID1.", """
+                     - Verify that the DUT response contains a GetDayEntry command;
+                        - Verify that DayEntry field is a DayEntryStruct equal to dayEntryStruct1."""),
+            TestStep("10", "TH sends command GetDayEntry command with DayEntryID set to an uint32 value not equal any from dayEntryIDs.",
+                     "Verify that the DUT response contains status NOT_FOUND(0x8b)."),
+            TestStep("11", "TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 with EnableKey field set to PIXIT.SETRF.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to PIXIT.SETRF.TEST_EVENT_TRIGGER for Test Event Clear",
+                     "Verify  DUT  responds  w/  status SUCCESS(0x00)."),
         ]
 
         return steps
