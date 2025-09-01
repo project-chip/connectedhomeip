@@ -51,8 +51,8 @@ MDNS_DISCOVERY_TIMEOUT = 60          # mDNS discovery timeout (60s) - device dis
 
 # Wait periods (not timeouts, but delays for stability)
 WIFI_WAIT_SECONDS = 5                # WiFi stabilization wait (5s) - basic network settling time
-NETWORK_STABILIZATION_WAIT = 15      # Network stabilization wait (15s) - after major network changes
-RETRY_DELAY_SECONDS = 3              # Delay between retry attempts (3s) - consistent retry timing
+NETWORK_STABILIZATION_WAIT = 25      # Network stabilization wait (25s) - after major network changes
+RETRY_DELAY_SECONDS = 5              # Delay between retry attempts (5s) - delay for DUT recovery
 
 cgen = Clusters.GeneralCommissioning
 cnet = Clusters.NetworkCommissioning
@@ -580,8 +580,14 @@ class TC_CNET_4_11(MatterBaseTest):
             except Exception as e:
                 logger.error(f" --- verify_operational_network: Exception reading networks: {e}")
 
-            # Wait between retries - longer delay after first attempt failure
-            retry_delay = WIFI_WAIT_SECONDS if retry > 1 else RETRY_DELAY_SECONDS
+            # Progressive delay - ESP32 needs more time after network switch
+            if retry == 1:
+                retry_delay = 10  # First retry: 10s
+            elif retry == 2:
+                retry_delay = 15  # Second retry: 15s
+            else:
+                retry_delay = RETRY_DELAY_SECONDS  # Final retry: 5s
+
             logger.info(f"verify_operational_network: Waiting {retry_delay}s before retry...")
             await asyncio.sleep(retry_delay)
         else:
