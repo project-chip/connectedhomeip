@@ -596,7 +596,7 @@ CommissioneeDeviceProxy * DeviceCommissioner::FindCommissioneeDevice(NodeId id)
     MATTER_TRACE_SCOPE("FindCommissioneeDevice", "DeviceCommissioner");
     CommissioneeDeviceProxy * foundDevice = nullptr;
     mCommissioneeDevicePool.ForEachActiveObject([&](auto * deviceProxy) {
-        if (deviceProxy->GetDeviceId() == id)
+        if (deviceProxy->GetDeviceId() == id || deviceProxy->GetTemporaryCommissioningId() == id)
         {
             foundDevice = deviceProxy;
             return Loop::Break;
@@ -1082,6 +1082,7 @@ CHIP_ERROR DeviceCommissioner::StopPairing(NodeId remoteDeviceId)
     if (mSetUpCodePairer.StopPairing(remoteDeviceId))
     {
         mRunCommissioningAfterConnection = false;
+        OnSessionEstablishmentError(CHIP_ERROR_CANCELLED);
         return CHIP_NO_ERROR;
     }
 
@@ -2318,6 +2319,14 @@ void DeviceCommissioner::ContinueReadingCommissioningInfo(const CommissioningPar
         VerifyOrReturn(builder.AddAttributePath(Clusters::NetworkCommissioning::Id,
                                                 Clusters::NetworkCommissioning::Attributes::ConnectMaxTimeSeconds::Id));
 
+        // If we were asked to do network scans, also read ScanMaxTimeSeconds,
+        // so we know how long to wait for those.
+        if (params.GetAttemptWiFiNetworkScan().ValueOr(false) || params.GetAttemptThreadNetworkScan().ValueOr(false))
+        {
+            VerifyOrReturn(builder.AddAttributePath(Clusters::NetworkCommissioning::Id,
+                                                    Clusters::NetworkCommissioning::Attributes::ScanMaxTimeSeconds::Id));
+        }
+
         // OperationalCredentials: existing fabrics, if necessary
         if (params.GetCheckForMatchingFabric())
         {
@@ -2511,33 +2520,52 @@ CHIP_ERROR DeviceCommissioner::ParseNetworkCommissioningInfo(ReadCommissioningIn
 
     if (info.network.thread.endpoint != kInvalidEndpointId)
     {
-        err = mAttributeCache->Get<ConnectMaxTimeSeconds::TypeInfo>(info.network.thread.endpoint,
-                                                                    info.network.thread.minConnectionTime);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogError(Controller, "Failed to read Thread ConnectMaxTimeSeconds (endpoint %u): %" CHIP_ERROR_FORMAT,
-                         info.network.thread.endpoint, err.Format());
-            return_err = err;
-        }
+        err = ParseNetworkCommissioningTimeouts(info.network.thread, "Thread");
+        AccumulateErrors(return_err, err);
     }
 
     if (info.network.wifi.endpoint != kInvalidEndpointId)
     {
-        err =
-            mAttributeCache->Get<ConnectMaxTimeSeconds::TypeInfo>(info.network.wifi.endpoint, info.network.wifi.minConnectionTime);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogError(Controller, "Failed to read Wi-Fi ConnectMaxTimeSeconds (endpoint %u): %" CHIP_ERROR_FORMAT,
-                         info.network.wifi.endpoint, err.Format());
-            return_err = err;
-        }
+        err = ParseNetworkCommissioningTimeouts(info.network.wifi, "Wi-Fi");
+        AccumulateErrors(return_err, err);
     }
 
     if (return_err != CHIP_NO_ERROR)
     {
-        ChipLogError(Controller, "Failed to parsing Network Commissioning information: %" CHIP_ERROR_FORMAT, return_err.Format());
+        ChipLogError(Controller, "Failed to parse Network Commissioning information: %" CHIP_ERROR_FORMAT, return_err.Format());
     }
     return return_err;
+}
+
+CHIP_ERROR DeviceCommissioner::ParseNetworkCommissioningTimeouts(NetworkClusterInfo & networkInfo, const char * networkType)
+{
+    using namespace NetworkCommissioning::Attributes;
+
+    CHIP_ERROR err = mAttributeCache->Get<ConnectMaxTimeSeconds::TypeInfo>(networkInfo.endpoint, networkInfo.minConnectionTime);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Controller, "Failed to read %s ConnectMaxTimeSeconds (endpoint %u): %" CHIP_ERROR_FORMAT, networkType,
+                     networkInfo.endpoint, err.Format());
+        return err;
+    }
+
+    err = mAttributeCache->Get<ScanMaxTimeSeconds::TypeInfo>(networkInfo.endpoint, networkInfo.maxScanTime);
+    if (err != CHIP_NO_ERROR)
+    {
+        // We don't always read this attribute, and we read it as a wildcard, so
+        // don't treat it as an error simply because it's missing.
+        if (err != CHIP_ERROR_KEY_NOT_FOUND)
+        {
+            ChipLogError(Controller, "Failed to read %s ScanMaxTimeSeconds (endpoint: %u): %" CHIP_ERROR_FORMAT, networkType,
+                         networkInfo.endpoint, err.Format());
+            return err;
+        }
+
+        // Just flag as "we don't know".
+        networkInfo.maxScanTime = 0;
+    }
+
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR DeviceCommissioner::ParseTimeSyncInfo(ReadCommissioningInfo & info)

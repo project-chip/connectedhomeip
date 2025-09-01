@@ -245,8 +245,8 @@ enum ThreeLevelAutoEnum : enum8 {
 }
 
 enum WebRTCEndReasonEnum : enum8 {
-  kIceFailed = 0;
-  kIceTimeout = 1;
+  kICEFailed = 0;
+  kICETimeout = 1;
   kUserHangup = 2;
   kUserBusy = 3;
   kReplaced = 4;
@@ -256,7 +256,8 @@ enum WebRTCEndReasonEnum : enum8 {
   kOutOfResources = 8;
   kMediaTimeout = 9;
   kLowPower = 10;
-  kUnknownReason = 11;
+  kPrivacyMode = 11;
+  kUnknownReason = 12;
 }
 
 bitmap TestGlobalBitmap : bitmap32 {
@@ -2633,7 +2634,7 @@ provisional cluster CameraAvStreamManagement = 1361 {
   readonly attribute optional int32u maxEncodedPixelRate = 1;
   readonly attribute optional VideoSensorParamsStruct videoSensorParams = 2;
   readonly attribute optional boolean nightVisionUsesInfrared = 3;
-  readonly attribute optional VideoResolutionStruct minViewport = 4;
+  readonly attribute optional VideoResolutionStruct minViewportResolution = 4;
   readonly attribute optional RateDistortionTradeOffPointsStruct rateDistortionTradeOffPoints[] = 5;
   readonly attribute int32u maxContentBufferSize = 6;
   readonly attribute optional AudioCapabilitiesStruct microphoneCapabilities = 7;
@@ -3908,7 +3909,7 @@ endpoint 1 {
     callback attribute maxEncodedPixelRate;
     callback attribute videoSensorParams;
     callback attribute nightVisionUsesInfrared;
-    callback attribute minViewport;
+    callback attribute minViewportResolution;
     callback attribute rateDistortionTradeOffPoints;
     callback attribute maxContentBufferSize;
     callback attribute microphoneCapabilities;
