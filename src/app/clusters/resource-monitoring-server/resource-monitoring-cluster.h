@@ -71,7 +71,7 @@ public:
                                                 AttributeValueEncoder & encoder) override;
     DataModel::ActionReturnStatus WriteAttribute(const DataModel::WriteAttributeRequest & request,
                                                  AttributeValueDecoder & decoder) override;
-                                                 
+
     CHIP_ERROR Attributes(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder) override;
 
     /**
@@ -115,7 +115,6 @@ public:
                                         ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder) override;       
 
 private:
-
     ResourceMonitoringDelegate * mDelegate;
 
     void LoadPersistentAttributes();    

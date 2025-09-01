@@ -35,10 +35,10 @@ constexpr std::bitset<4> gActivatedCarbonFeatureMap{ static_cast<uint32_t>(Resou
                                                      static_cast<uint32_t>(ResourceMonitoring::Feature::kReplacementProductList) };
 
 static ActivatedCarbonFilterMonitoringDelegate * gActivatedCarbonFilterDelegate = nullptr;
-static ResourceMonitoring::ResourceMonitoringCluster * gActivatedCarbonFilterInstance            = nullptr;
+static ResourceMonitoring::ActivatedCarbonFilterMonitoringCluster * gActivatedCarbonFilterInstance            = nullptr;
 
 static HepaFilterMonitoringDelegate * gHepaFilterDelegate = nullptr;
-static ResourceMonitoring::ResourceMonitoringCluster * gHepaFilterInstance = nullptr;
+static ResourceMonitoring::HepaFilterMonitoringCluster * gHepaFilterInstance = nullptr;
 
 static ImmutableReplacementProductListManager sReplacementProductListManager;
 
@@ -114,7 +114,7 @@ void emberAfActivatedCarbonFilterMonitoringClusterInitCallback(chip::EndpointId 
 {
     VerifyOrDie(gActivatedCarbonFilterInstance == nullptr && gActivatedCarbonFilterDelegate == nullptr);
     gActivatedCarbonFilterDelegate = new ActivatedCarbonFilterMonitoringDelegate;
-    gActivatedCarbonFilterInstance = new ResourceMonitoring::ResourceMonitoringCluster(
+    gActivatedCarbonFilterInstance = new ResourceMonitoring::ActivatedCarbonFilterMonitoringCluster(
         endpoint, ActivatedCarbonFilterMonitoring::Id,
         static_cast<uint32_t>(gActivatedCarbonFeatureMap.to_ulong()), ResourceMonitoring::DegradationDirectionEnum::kDown, true);
     TEMPORARY_RETURN_IGNORED gActivatedCarbonFilterInstance->Init();
@@ -126,7 +126,7 @@ void emberAfHepaFilterMonitoringClusterInitCallback(chip::EndpointId endpoint)
 
     gHepaFilterDelegate = new HepaFilterMonitoringDelegate;
 
-    gHepaFilterInstance = new ResourceMonitoring::ResourceMonitoringCluster(endpoint, HepaFilterMonitoring::Id,
+    gHepaFilterInstance = new ResourceMonitoring::HepaFilterMonitoringCluster(endpoint, HepaFilterMonitoring::Id,
                                                            static_cast<uint32_t>(gHepaFilterFeatureMap.to_ulong()),
                                                            ResourceMonitoring::DegradationDirectionEnum::kDown, true);
     TEMPORARY_RETURN_IGNORED gHepaFilterInstance->Init();

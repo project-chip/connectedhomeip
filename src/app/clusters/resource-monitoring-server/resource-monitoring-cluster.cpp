@@ -56,8 +56,7 @@ ResourceMonitoringCluster::ResourceMonitoringCluster(
     mDegradationDirection(aDegradationDirection),
     mFeatureMap(aFeatureMap),
     mResetConditionCommandSupported(aResetConditionCommandSupported)
-{
-}
+{}
 
 
 CHIP_ERROR ResourceMonitoringCluster::SetDelegate(ResourceMonitoringDelegate* aDelegate)
@@ -173,7 +172,6 @@ DataModel::ActionReturnStatus ResourceMonitoringCluster::ReadHepaFilterMonitorin
 // Implements the read functionality for non-standard attributes.
 DataModel::ActionReturnStatus ResourceMonitoringCluster::ReadAttribute(const DataModel::ReadAttributeRequest & request, AttributeValueEncoder & encoder)
 {
-
     if (mClusterId == HepaFilterMonitoring::Id)
     {
         return ReadHepaFilterMonitoringAttribute(request, encoder);
@@ -330,7 +328,6 @@ chip::Protocols::InteractionModel::Status ResourceMonitoringCluster::UpdateLastC
 
 void ResourceMonitoringCluster::LoadPersistentAttributes()
 {
-
     CHIP_ERROR err;
 
     if (mClusterId == HepaFilterMonitoring::Id) {
@@ -363,6 +360,9 @@ void ResourceMonitoringCluster::LoadPersistentAttributes()
     }
 }
 
+
+
+
 CHIP_ERROR ResourceMonitoringCluster::Startup(ServerClusterContext & context)
 {
     ReturnErrorOnFailure(DefaultServerCluster::Startup(context));
@@ -376,7 +376,6 @@ CHIP_ERROR ResourceMonitoringCluster::Startup(ServerClusterContext & context)
                                                                chip::TLV::TLVReader & input_arguments,
                                                                CommandHandler * handler)
 {
-    ChipLogDetail(Zcl, "ResourceMonitoring Instance::InvokeCommand");
     switch (request.path.mCommandId)
     {
     case ResourceMonitoring::Commands::ResetCondition::Id:
@@ -405,7 +404,6 @@ std::optional<DataModel::ActionReturnStatus> ResourceMonitoringCluster::ResetCon
 CHIP_ERROR ResourceMonitoringCluster::AcceptedCommands(const ConcreteClusterPath & cluster,
                                               ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder)
 {
-    ChipLogDetail(Zcl, "ResourceMonitoringCluster Instance: RetrieveAcceptedCommands");
     ReturnErrorOnFailure(builder.EnsureAppendCapacity(1));
     if (mResetConditionCommandSupported)
     {
@@ -442,8 +440,6 @@ DataModel::Nullable<uint32_t> ResourceMonitoringCluster::GetLastChangedTime() co
 
 Protocols::InteractionModel::Status ResourceMonitoringDelegate::OnResetCondition()
 {
-    ChipLogDetail(Zcl, "ResourceMonitoringServer::OnResetCondition()");
-
     // call application specific pre reset logic,
     // anything other than Success will cause the command to fail, and not do any of the resets
     auto status = PreResetCondition();
@@ -486,13 +482,11 @@ Protocols::InteractionModel::Status ResourceMonitoringDelegate::OnResetCondition
 
 Protocols::InteractionModel::Status ResourceMonitoringDelegate::PreResetCondition()
 {
-    ChipLogDetail(Zcl, "ResourceMonitoringServer::PreResetCondition()");
     return Protocols::InteractionModel::Status::Success;
 }
 
 Protocols::InteractionModel::Status ResourceMonitoringDelegate::PostResetCondition()
 {
-    ChipLogDetail(Zcl, "ResourceMonitoringServer::PostResetCondition()");
     return Protocols::InteractionModel::Status::Success;
 }
 
