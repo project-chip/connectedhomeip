@@ -40,42 +40,32 @@ struct TestDeviceAttestationVerifier : public ::testing::Test
     static void TearDownTestSuite() { chip::Platform::MemoryShutdown(); }
 };
 
-// Test the verifier of default stubs
-TEST_F(TestDeviceAttestationVerifier, UnimplementedDACVerifierStub)
+// Test that GetDeviceAttestationVerifier returns the default stub when reset
+TEST_F(TestDeviceAttestationVerifier, ReturnsDefaultStubAfterReset)
 {
     // Explicitly reset to the default stub verifier before the test
     SetDeviceAttestationVerifier(nullptr);
 
-    // Test GetDeviceAttestationVerifier and ensure it's not null
+    // Ensure the returned verifier is not null
     DeviceAttestationVerifier * verifier = GetDeviceAttestationVerifier();
     ASSERT_NE(verifier, nullptr);
+}
 
-    // The actual contents do not represent real or meaningful data
+// Test VerifyAttestationInformation with the default stub verifier
+TEST_F(TestDeviceAttestationVerifier, StubVerifierVerifyAttestationInformation)
+{
+    // Explicitly reset to the default stub verifier before the test
+    SetDeviceAttestationVerifier(nullptr);
+
+    // Prepare dummy attestation data
     uint8_t testData[8] = { 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08 };
     ByteSpan testSpan(testData);
 
     // Create AttestationInfo using the constructor with all required arguments
-    DeviceAttestationVerifier::AttestationInfo attestationInfo(testSpan, // attestationElements
-                                                               testSpan, // attestationChallenge
-                                                               testSpan, // attestationSignature
-                                                               testSpan, // paiDerBuffer
-                                                               testSpan, // dacDerBuffer
-                                                               testSpan, // certificationDeclarationBuffer
-                                                               VendorId(0x1234),
-                                                               0x5678 // productId
-    );
+    DeviceAttestationVerifier::AttestationInfo attestationInfo(testSpan, testSpan, testSpan, testSpan, testSpan, testSpan,
+                                                               VendorId(0x1234), 0x5678);
 
-    // Prepare DeviceInfoForAttestation
-    DeviceInfoForAttestation deviceInfo;
-    deviceInfo.vendorId  = VendorId(0x1234);
-    deviceInfo.productId = 0x5678;
-
-    // Generate a P256 keypair for testing VerifyNodeOperationalCSRInformation
-    Crypto::P256Keypair keypair;
-    ASSERT_EQ(keypair.Initialize(Crypto::ECPKeyTarget::ECDSA), CHIP_NO_ERROR);
-    Crypto::P256PublicKey pubkey = keypair.Pubkey();
-
-    // Test VerifyAttestationInformation
+    // Test that the callback is not called for the stub verifier
     bool callbackCalled = false;
     chip::Callback::Callback<DeviceAttestationVerifier::OnAttestationInformationVerification> callback(
         [](void * context, const DeviceAttestationVerifier::AttestationInfo &, AttestationVerificationResult) {
@@ -83,19 +73,67 @@ TEST_F(TestDeviceAttestationVerifier, UnimplementedDACVerifierStub)
             *called       = true;
         },
         &callbackCalled);
+
+    DeviceAttestationVerifier * verifier = GetDeviceAttestationVerifier();
     verifier->VerifyAttestationInformation(attestationInfo, &callback);
     EXPECT_FALSE(callbackCalled);
+}
 
-    // Test ValidateCertificationDeclarationSignature
+// Test ValidateCertificationDeclarationSignature with the default stub verifier
+TEST_F(TestDeviceAttestationVerifier, StubVerifierValidateCertificationDeclarationSignature)
+{
+    // Explicitly reset to the default stub verifier before the test
+    SetDeviceAttestationVerifier(nullptr);
+
+    // Prepare dummy attestation data
+    uint8_t testData[8] = { 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08 };
+    ByteSpan testSpan(testData);
+
+    // Test that the stub verifier returns kNotImplemented
     ByteSpan certDeclBuffer              = testSpan;
+    DeviceAttestationVerifier * verifier = GetDeviceAttestationVerifier();
     AttestationVerificationResult result = verifier->ValidateCertificationDeclarationSignature(testSpan, certDeclBuffer);
     EXPECT_EQ(result, AttestationVerificationResult::kNotImplemented);
+}
 
-    // Test ValidateCertificateDeclarationPayload
-    result = verifier->ValidateCertificateDeclarationPayload(testSpan, testSpan, deviceInfo);
+// Test ValidateCertificateDeclarationPayload with the default stub verifier
+TEST_F(TestDeviceAttestationVerifier, StubVerifierValidateCertificateDeclarationPayload)
+{
+    // Explicitly reset to the default stub verifier before the test
+    SetDeviceAttestationVerifier(nullptr);
+
+    // Prepare dummy attestation data
+    uint8_t testData[8] = { 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08 };
+    ByteSpan testSpan(testData);
+
+    // Prepare DeviceInfoForAttestation
+    DeviceInfoForAttestation deviceInfo;
+    deviceInfo.vendorId  = VendorId(0x1234);
+    deviceInfo.productId = 0x5678;
+
+    // Test that the stub verifier returns kNotImplemented
+    DeviceAttestationVerifier * verifier = GetDeviceAttestationVerifier();
+    AttestationVerificationResult result = verifier->ValidateCertificateDeclarationPayload(testSpan, testSpan, deviceInfo);
     EXPECT_EQ(result, AttestationVerificationResult::kNotImplemented);
+}
 
-    // Test VerifyNodeOperationalCSRInformation
+// Test VerifyNodeOperationalCSRInformation with the default stub verifier
+TEST_F(TestDeviceAttestationVerifier, StubVerifierVerifyNodeOperationalCSRInformation)
+{
+    // Explicitly reset to the default stub verifier before the test
+    SetDeviceAttestationVerifier(nullptr);
+
+    // Prepare dummy attestation data
+    uint8_t testData[8] = { 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08 };
+    ByteSpan testSpan(testData);
+
+    // Generate a P256 keypair for testing
+    Crypto::P256Keypair keypair;
+    ASSERT_EQ(keypair.Initialize(Crypto::ECPKeyTarget::ECDSA), CHIP_NO_ERROR);
+    Crypto::P256PublicKey pubkey = keypair.Pubkey();
+
+    // Test that the stub verifier returns CHIP_ERROR_NOT_IMPLEMENTED
+    DeviceAttestationVerifier * verifier = GetDeviceAttestationVerifier();
     CHIP_ERROR error = verifier->VerifyNodeOperationalCSRInformation(testSpan, testSpan, testSpan, pubkey, testSpan);
     EXPECT_EQ(error, CHIP_ERROR_NOT_IMPLEMENTED);
 }
