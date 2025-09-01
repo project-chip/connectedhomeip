@@ -140,6 +140,18 @@ class TestEventTriggersCheck(MatterBaseTest, BasicCompositionTests):
 
 
 class DclCheck(MatterBaseTest, BasicCompositionTests):
+    def get_versions_and_assert_all_keys_exist(self):
+        entry = requests.get(f"{self.url}/dcl/model/versions/{self.vid}/{self.pid}").json()
+        key_model_versions = 'modelVersions'
+        asserts.assert_true(key_model_versions in entry.keys(),
+                            f"Unable to find {key_model_versions} in software versions schema for {self.vid_pid_str}")
+        logging.info(f'Found version info for vid=0x{self.vid_pid_str} in the DCL:')
+        logging.info(f'{entry[key_model_versions]}')
+        key_software_versions = 'softwareVersions'
+        asserts.assert_true(key_software_versions in entry[key_model_versions].keys(
+        ), f"Unable to find {key_software_versions} in software versions schema for {self.vid_pid_str}")
+        return entry[key_model_versions][key_software_versions]
+
     @async_test_body
     async def setup_class(self):
         setupCode = self.matter_test_config.qr_code_content or self.matter_test_config.manual_code
@@ -210,19 +222,11 @@ class DclCheck(MatterBaseTest, BasicCompositionTests):
 
     def test_AllSoftwareVersions(self):
         self.step(1)
-        versions_entry = requests.get(f"{self.url}/dcl/model/versions/{self.vid}/{self.pid}").json()
-        key_model_versions = 'modelVersions'
-        asserts.assert_true(key_model_versions in versions_entry.keys(),
-                            f"Unable to find {key_model_versions} in software versions schema for {self.vid_pid_str}")
-        logging.info(f'Found version info for vid=0x{self.vid_pid_str} in the DCL:')
-        logging.info(f'{versions_entry[key_model_versions]}')
-        key_software_versions = 'softwareVersions'
-        asserts.assert_true(key_software_versions in versions_entry[key_model_versions].keys(
-        ), f"Unable to find {key_software_versions} in software versions schema for {self.vid_pid_str}")
+        software_versions = self.get_versions_and_assert_all_keys_exist()
 
         problems = []
         self.step(2)
-        for software_version in versions_entry[key_model_versions][key_software_versions]:
+        for software_version in software_versions:
             entry_wrapper = requests.get(f"{self.url}/dcl/model/versions/{self.vid}/{self.pid}/{software_version}").json()
             key_model_version = 'modelVersion'
             if key_model_version not in entry_wrapper:
