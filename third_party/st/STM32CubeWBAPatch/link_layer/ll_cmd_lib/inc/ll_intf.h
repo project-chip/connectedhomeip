@@ -1780,8 +1780,8 @@ struct hci_dispatch_tbl
      * @param  conn_handle_id 	: [in] Connection Handle Id to be used to identify a connection.
      * @param  max_tx_octets	: [in] The maximum number of payload octets in a Link Layer Data Channel PDU that the local
      * Controller will send on this connection.
-     * @param  max_tx_time		: [in] The maximum time that the local Controller will take to send a Link Layer Data Channel
-     * PDU on this connection.
+     * @param  max_tx_time		: [in] The maximum time that the local Controller will take to send a Link Layer Data
+     * Channel PDU on this connection.
      * @param  max_rx_octets	: [in] The maximum number of payload octets in a Link Layer Data Channel PDU that the local
      * controller expects to receive on this connection.
      * @param  max_rx_time		: [in] The maximum time that the local Controller expects to take to receive a Link Layer
@@ -3921,8 +3921,8 @@ ble_stat_t ll_intf_le_set_conn_cte_rsp_enable(le_set_conn_cte_rsp_enable_cmd_st 
  * @param  ptr_antenna_num						: [out] The number of antennae supported by the Controller.
  * @param  ptr_switching_pattern_max_len		: [out] Maximum length of antenna switching pattern supported by the
  * Controller.
- * @param  ptr_cte_max_len						: [out] Maximum length of Constant Tone Extension supported in
- * 8 us units.
+ * @param  ptr_cte_max_len						: [out] Maximum length of Constant Tone Extension supported
+ * in 8 us units.
  *
  * @retval ble_stat_t	: Command status.
  */
@@ -4457,8 +4457,8 @@ ble_stat_t ll_intf_set_output_data_path(uint16_t conn_hndl, vendor_specific_from
 #if (SUPPORT_MASTER_CONNECTION)
 /*=============== LE Set CIG Parameters Command ===============*/
 /**
- * @brief  							: used to set the parameters of one or more CISes that are associated with a
- * CIG in the Controller
+ * @brief  							: used to set the parameters of one or more CISes that are associated with
+ * a CIG in the Controller
  *
  * @param  ptr_st_set_cig_params	: [IN]  pointer to ble_intf_set_cig_params_cmd_st that contains CIG parameters coming from
  * the Host
@@ -4470,8 +4470,8 @@ ble_stat_t ll_intf_le_set_cig_params(ble_intf_set_cig_params_comman_cmd_st * ptr
 
 /*=============== LE Set CIG Parameters Test Command ===============*/
 /**
- * @brief  							 	: used to set the parameters of one or more CISes that are associated with
- * a CIG in the Controller
+ * @brief  							 	: used to set the parameters of one or more CISes that are associated
+ * with a CIG in the Controller
  *
  * @param  ptr_st_set_cig_params_test	: [IN]  pointer to ble_intf_set_cig_params_cmd_st that contains CIG parameters coming from
  * the Host
@@ -4483,8 +4483,8 @@ ble_stat_t ll_intf_le_set_cig_params_test(ble_intf_set_cig_params_comman_cmd_st 
 
 /*=============== LE Create CIS Command ===============*/
 /**
- * @brief  								: The HCI_LE_Create_CIS command is used by the master’s Host to create
- * one or more CISes using the connections identified by the ACL_Connection_Handle[i] parameter array
+ * @brief  								: The HCI_LE_Create_CIS command is used by the master’s Host to
+ * create one or more CISes using the connections identified by the ACL_Connection_Handle[i] parameter array
  * @param  ptr_st_create_cis_params		: pointer to ble_intf_create_cis_cmd_st that contains ACL_Connection_Handles,
  * 										  ISO_Connection_Handles and Number of CISes.
  * @retval ble_stat_t					: Command status.
@@ -4523,8 +4523,8 @@ ble_stat_t ll_intf_reject_cis_req(uint16_t conn_hndl, uint8_t reason);
 void ll_intf_set_cis_req_evnt_mask(uint32_t cis_req_evnt_mask);
 /*=============== LE Remove CIG Command ===============*/
 /**
- * @brief  								: is used by the master’s Host to remove all the CISes associated with
- * the CIG identified by CIG_ID
+ * @brief  								: is used by the master’s Host to remove all the CISes associated
+ * with the CIG identified by CIG_ID
  *
  * @param  cig_id						: contains the identifier of the CIG
  *
@@ -4594,8 +4594,8 @@ ble_stat_t ll_intf_le_big_create_sync(ble_intf_big_create_sync_cmd_st * ptr_str_
 
 /*=============== LE BIG Terminate Sync Command ===============*/
 /**
- * @brief  								: is used to stop synchronizing or cancel the process of synchronizing to
- * the BIG identified by the BIG_Handle parameter. destroys the associated connection handles of the BISes in the BIG and removes
+ * @brief  								: is used to stop synchronizing or cancel the process of synchronizing
+ * to the BIG identified by the BIG_Handle parameter. destroys the associated connection handles of the BISes in the BIG and removes
  * the data paths for all BISes in the BIG identified by BIG_Handle.
  * @param  big_hndle					: contains the identifier of the BIG_Handler.
  *
@@ -4608,8 +4608,8 @@ ble_stat_t ll_intf_le_big_term_sync(uint8_t * big_hndle);
 #if (SUPPORT_BRD_ISOCHRONOUS)
 /*=============== LE Create BIG Command ===============*/
 /**
- * @brief  								: is used to create a BIG with one or more BISes (All BISes in a BIG
- * have the same value for all parameters)
+ * @brief  								: is used to create a BIG with one or more BISes (All BISes in a
+ * BIG have the same value for all parameters)
  * @param  ptr_create_big_cmd_st		: pointer to ble_intf_create_big_st that contains the parameters of create big /
  * test command
  *
@@ -4619,8 +4619,8 @@ ble_stat_t ll_intf_le_create_big(ble_intf_create_big_st * ptr_create_big_cmd_st)
 
 /*=============== LE Create BIG Test Command ===============*/
 /**
- * @brief  								: (should be used in the ISO Test mode) is used to create a BIG with one
- * or more BISes (All BISes in a BIG have the same value for all parameters)
+ * @brief  								: (should be used in the ISO Test mode) is used to create a BIG with
+ * one or more BISes (All BISes in a BIG have the same value for all parameters)
  * @param  ptr_create_big_test_cmd_st	: pointer to ble_intf_create_big_st that contains the parameters of create big / test
  * command
  *
@@ -4704,8 +4704,8 @@ ble_stat_t ll_intf_le_set_host_feature(uint8_t bit_num, uint8_t bit_value);
 
 /*=============== LE Setup ISO Data Path Command ===============*/
 /**
- * @brief  								: is used to identify and create the isochronous data path between the
- * Host and the Controller for an established CIS or BIS identified by the Connection_Handle parameter.
+ * @brief  								: is used to identify and create the isochronous data path between
+ * the Host and the Controller for an established CIS or BIS identified by the Connection_Handle parameter.
  * @param  conn_hndl					: contains the identifier of the Connection_Handler.
  * @param  ptr_st_setup_iso_data_path	: pointer that carries the information parameters of setup_iso_data_path
  *
@@ -4726,9 +4726,9 @@ ble_stat_t ll_intf_rmv_iso_data_path(uint16_t conn_hndl, uint8_t data_path_dirc)
 
 /*=============== LE ISO Test End Command ===============*/
 /**
- * @brief  								: (This command should only be used for testing purposes) is used
- * to terminate the ISO Transmit and/or Receive Test mode for a CIS or BIS specified by the Connection_Handle parameter but does not
- * terminate the CIS or BIS.
+ * @brief  								: (This command should only be used for testing purposes) is
+ * used to terminate the ISO Transmit and/or Receive Test mode for a CIS or BIS specified by the Connection_Handle parameter but
+ * does not terminate the CIS or BIS.
  * @param  conn_hndl					: contains the identifier of the Connection_Handler.
  * @param  rcvd_pckt_cntr				: number of received packets
  * @param  missed_pckt_cntr				: number of missed packets
@@ -4809,8 +4809,8 @@ ble_stat_t ll_intf_le_read_iso_link_quality(uint16_t conn_hndl, ble_intf_read_is
 
 /*=============== LE ISO Rx Test Command ===============*/
 /**
- * @brief  								: (This command should only be used for testing purposes) is used to
- * configure an established CIS or a synchronized BIG specified by the Connection_Handle parameter to receive payloads
+ * @brief  								: (This command should only be used for testing purposes) is used
+ * to configure an established CIS or a synchronized BIG specified by the Connection_Handle parameter to receive payloads
  * @param  conn_hndl					: contains the identifier of the Connection_Handler.
  * @param  pyld_t						: defines the configuration of SDUs in the payload
  *
@@ -4820,8 +4820,8 @@ ble_stat_t ll_intf_le_iso_rx_test(uint16_t conn_hndl, uint8_t pyld_t);
 
 /*=============== LE ISO Rx Test Counetrs Command ===============*/
 /**
- * @brief  								: (This command should only be used for testing purposes) is used to
- * read the test counters ) in the Controller which is configured in ISO Receive Test mode for a CIS or BIS specified by the
+ * @brief  								: (This command should only be used for testing purposes) is used
+ * to read the test counters ) in the Controller which is configured in ISO Receive Test mode for a CIS or BIS specified by the
  * Connection_Handle.
  * @param  conn_hndl					: contains the identifier of the Connection_Handler.
  * @param  rcvd_pckt_cntr				: number of received packets
@@ -4881,8 +4881,8 @@ ble_stat_t ll_intf_curb_sleep_state(uint8_t state);
  *
  * @param allow_low_isr : [in] Configuration parameter for the context of the low ISR in the bare-metal model. Range is [0,1].
  * 								0: Low ISR code is executed in the same context of the high ISR.
- * 								1: Low ISR code is executed in the context of the low ISR (by configuring a
- * low priority interrupt that is triggered by FW).
+ * 								1: Low ISR code is executed in the context of the low ISR (by configuring
+ * a low priority interrupt that is triggered by FW).
  * @param run_post_evnt_frm_isr : [in] Configuration parameter to decide whether the scheduling of the next BLE event is done in the
  * low ISR context or to be handled by the LL main thread. Range is [0,1]. 0: BLE next event scheduling is handled in the LL main
  * thread. 1: BLE next event scheduling is handled in the low ISR context.

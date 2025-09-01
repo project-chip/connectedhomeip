@@ -63,7 +63,8 @@ typedef uint8_t ral_instance_t;
  *						  ==============
  *
  *																					      ==============
- *											      			_ _(Requires ack)_ _ _ _ _
+ *											      			_ _(Requires ack)_ _ _ _
+ *_
  *_
  *_= RAL_RX_ACK = ral event allocation     		  /             			      ==============
  *						  =============                	 /
@@ -71,13 +72,15 @@ typedef uint8_t ral_instance_t;
  *						  =============		   			\
  *						  					    		 \
  *==============
- *						  					     		  \_ _(Doesn't require ack)_ _
+ *						  					     		  \_ _(Doesn't require ack)_
+ *_
  *_
  *_= RAL_TX_PKT =
  *																						  ==============
  *
  *																				      	  ==============
- *											      			_ _(Requires ack)_ _ _ _ _
+ *											      			_ _(Requires ack)_ _ _ _
+ *_
  *_
  *_= RAL_TX_ACK = ral event allocation     		  /             			      ==============
  *						  =============                	 /
@@ -85,7 +88,8 @@ typedef uint8_t ral_instance_t;
  *						  =============		   			\
  *						  					    		 \
  *==============
- *						  					     		  \_ _(Doesn't require ack)_ _
+ *						  					     		  \_ _(Doesn't require ack)_
+ *_
  *_
  *_= RAL_RX_PKT =
  *																						  ==============
