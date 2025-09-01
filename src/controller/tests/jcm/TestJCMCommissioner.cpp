@@ -308,10 +308,10 @@ public:
             aRequest.path.mEndpointId, ChipLogValueMEI(aRequest.path.mClusterId), ChipLogValueMEI(aRequest.path.mCommandId));
 
         // Get the fabric table.
-        SessionHandle sessionHandle = CurrentContext().actionContext->CurrentExchange()->GetSessionHandle();
         FabricTable & fabricTable = mMessagingContext.GetFabricTable();
 
         // Sign the VID verification request.
+        SessionHandle sessionHandle = mMessagingContext.GetSessionBobToAlice();
         ByteSpan attestationChallengeSpan = sessionHandle->AsSecureSession()->GetCryptoContext().GetAttestationChallenge();
         FabricTable::SignVIDVerificationResponseData responseData;
         VerifyOrDie(fabricTable.SignVIDVerificationRequest(dataRequest.fabricIndex, dataRequest.clientChallenge, attestationChallengeSpan, responseData) == CHIP_NO_ERROR);
@@ -412,6 +412,7 @@ protected:
     void TearDown() override
     {
         DrainAndServiceIO();
+        ExpireJFSessionBobToAlice();
 
         chip::Test::ResetMockNodeConfig();
         InteractionModelEngine::GetInstance()->SetDataModelProvider(mOldProvider);
@@ -521,9 +522,9 @@ TEST_F_FROM_FIXTURE(TestCommissioner, TestParseOperationalCredentials)
     // Verify the ParseOperationalCredentials results
     EXPECT_EQ(mDeviceCommissioner->mInfo.rootPublicKey.AllocatedSize(), Crypto::kP256_PublicKey_Length);
     EXPECT_EQ(mDeviceCommissioner->mInfo.adminVendorId, static_cast<VendorId>(chip::VendorId::TestVendor1));
-    EXPECT_EQ(mDeviceCommissioner->mInfo.adminFabricId, static_cast<FabricId>(1234));
-    EXPECT_EQ(mDeviceCommissioner->mInfo.adminNOC.AllocatedSize(), static_cast<size_t>(270));
-    EXPECT_EQ(mDeviceCommissioner->mInfo.adminICAC.AllocatedSize(), static_cast<size_t>(248));
+    EXPECT_EQ(mDeviceCommissioner->mInfo.adminFabricId, static_cast<FabricId>(18068348246522069002u));
+    EXPECT_EQ(mDeviceCommissioner->mInfo.adminNOC.AllocatedSize(), static_cast<size_t>(265));
+    EXPECT_EQ(mDeviceCommissioner->mInfo.adminICAC.AllocatedSize(), static_cast<size_t>(262));
 }
 
 // Test getting trusted root
@@ -543,12 +544,12 @@ TEST_F_FROM_FIXTURE(TestCommissioner, TestParseTrustedRoot)
     // Verify the ParseOperationalCredentials results
     EXPECT_EQ(mDeviceCommissioner->mInfo.rootPublicKey.AllocatedSize(), Crypto::kP256_PublicKey_Length);
     EXPECT_EQ(mDeviceCommissioner->mInfo.adminVendorId, static_cast<VendorId>(chip::VendorId::TestVendor1));
-    EXPECT_EQ(mDeviceCommissioner->mInfo.adminFabricId, static_cast<FabricId>(1234));
-    EXPECT_EQ(mDeviceCommissioner->mInfo.adminNOC.AllocatedSize(), static_cast<size_t>(270));
-    EXPECT_EQ(mDeviceCommissioner->mInfo.adminICAC.AllocatedSize(), static_cast<size_t>(248));
+    EXPECT_EQ(mDeviceCommissioner->mInfo.adminFabricId, static_cast<FabricId>(18068348246522069002u));
+    EXPECT_EQ(mDeviceCommissioner->mInfo.adminNOC.AllocatedSize(), static_cast<size_t>(265));
+    EXPECT_EQ(mDeviceCommissioner->mInfo.adminICAC.AllocatedSize(), static_cast<size_t>(262));
 
     // Verify the ParseTrustedRoot results
-    EXPECT_EQ(mDeviceCommissioner->mInfo.adminRCAC.AllocatedSize(), static_cast<size_t>(270));
+    EXPECT_EQ(mDeviceCommissioner->mInfo.adminRCAC.AllocatedSize(), static_cast<size_t>(272));
 }
 
 // Test parsing administrator info
@@ -562,10 +563,10 @@ TEST_F_FROM_FIXTURE(TestCommissioner, TestParseExtraCommissioningInfo)
     EXPECT_EQ(mDeviceCommissioner->mInfo.adminEndpointId, 1);
     EXPECT_EQ(mDeviceCommissioner->mInfo.rootPublicKey.AllocatedSize(), Crypto::kP256_PublicKey_Length);
     EXPECT_EQ(mDeviceCommissioner->mInfo.adminVendorId, static_cast<VendorId>(chip::VendorId::TestVendor1));
-    EXPECT_EQ(mDeviceCommissioner->mInfo.adminFabricId, static_cast<FabricId>(1234));
-    EXPECT_EQ(mDeviceCommissioner->mInfo.adminNOC.AllocatedSize(), static_cast<size_t>(270));
-    EXPECT_EQ(mDeviceCommissioner->mInfo.adminICAC.AllocatedSize(), static_cast<size_t>(248));
-    EXPECT_EQ(mDeviceCommissioner->mInfo.adminRCAC.AllocatedSize(), static_cast<size_t>(270));
+    EXPECT_EQ(mDeviceCommissioner->mInfo.adminFabricId, static_cast<FabricId>(18068348246522069002u));
+    EXPECT_EQ(mDeviceCommissioner->mInfo.adminNOC.AllocatedSize(), static_cast<size_t>(265));
+    EXPECT_EQ(mDeviceCommissioner->mInfo.adminICAC.AllocatedSize(), static_cast<size_t>(262));
+    EXPECT_EQ(mDeviceCommissioner->mInfo.adminRCAC.AllocatedSize(), static_cast<size_t>(272));
 }
 } // namespace JCM
 } // namespace Controller

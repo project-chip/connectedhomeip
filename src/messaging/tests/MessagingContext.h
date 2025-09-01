@@ -157,6 +157,7 @@ public:
     void ExpireSessionBobToAlice();
     void ExpireSessionAliceToBob();
     void ExpireSessionBobToFriends();
+    void ExpireJFSessionBobToAlice();
 
     void SetMRPMode(MRPMode mode);
 
@@ -192,7 +193,9 @@ private:
     {
         MessagingContextData() :
             mAliceAddress(Transport::PeerAddress::UDP(GetAddress(), CHIP_PORT + 1)),
-            mBobAddress(LoopbackTransport::LoopbackPeer(mAliceAddress))
+            mBobAddress(LoopbackTransport::LoopbackPeer(mAliceAddress)),
+            mJFAliceAddress(Transport::PeerAddress::UDP(GetAddress(), CHIP_PORT + 2)),
+            mJFBobAddress(LoopbackTransport::LoopbackPeer(mJFAliceAddress))
         {}
         ~MessagingContextData() { EXPECT_FALSE(mInitialized); }
 

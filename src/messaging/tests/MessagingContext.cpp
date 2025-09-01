@@ -307,6 +307,14 @@ void MessagingContext::ExpireSessionBobToAlice()
     }
 }
 
+void MessagingContext::ExpireJFSessionBobToAlice()
+{
+    if (mpData->mJFSessionBobToAlice)
+    {
+        mpData->mJFSessionBobToAlice.Get().Value()->AsSecureSession()->MarkForEviction();
+    }
+}
+
 void MessagingContext::ExpireSessionAliceToBob()
 {
     if (mpData->mSessionAliceToBob)
