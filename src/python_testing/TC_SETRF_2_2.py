@@ -176,8 +176,8 @@ class TC_SETRF_2_2(CommodityTariffTestBaseHelper):
         matter_asserts.assert_list(result.dayEntryIDs, "DayEntryIDs attribute must return a list.", 1, 96)
         for item in result.dayEntryIDs:
             matter_asserts.assert_valid_uint32(item, "DayEntryIDs list element must have uint32 type")
-            self.check_list_elements_uniqueness(result.dayEntryIDs, "DayEntryIDs")
-        asserts.assert_equal(result.dayEntryIDs.sort(), dayEntryIDs1,
+            await self.check_list_elements_uniqueness(result.dayEntryIDs, "DayEntryIDs")
+        asserts.assert_equal(sorted(result.dayEntryIDs), sorted(dayEntryIDs1),
                              "DayEntryIDs field in GetTariffComponentResponse must be equal to the DayEntryIDs list of all TariffPeriods where first TariffComponentID is present.")
 
         asserts.assert_is_instance(result.tariffComponent, cluster.Structs.TariffComponentStruct,
