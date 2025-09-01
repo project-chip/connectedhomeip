@@ -3557,8 +3557,8 @@ TEST_F(TestChipCryptoPAL, TestHazardousOperationLoadKeypairFromRaw)
     HeapChecker heapChecker;
 
     // Generate random private and public key buffers
-    uint8_t private_key[kP256_PrivateKey_Length] = {0};
-    uint8_t public_key[kP256_PublicKey_Length] = {0};
+    uint8_t private_key[kP256_PrivateKey_Length] = { 0 };
+    uint8_t public_key[kP256_PublicKey_Length]   = { 0 };
 
     // Use DRBG to fill with random data (not cryptographically valid, but enough for test)
     EXPECT_EQ(DRBG_get_bytes(private_key, sizeof(private_key)), CHIP_NO_ERROR);
@@ -3574,12 +3574,13 @@ TEST_F(TestChipCryptoPAL, TestHazardousOperationLoadKeypairFromRaw)
     {
         // Sign a message
         const char * msg = "Test message for HazardousOperationLoadKeypairFromRaw";
-        size_t msg_len = strlen(msg);
+        size_t msg_len   = strlen(msg);
         P256ECDSASignature signature;
         EXPECT_EQ(keypair.ECDSA_sign_msg(reinterpret_cast<const uint8_t *>(msg), msg_len, signature), CHIP_NO_ERROR);
 
         // Verify with public part of the keypair
-        EXPECT_EQ(keypair.Pubkey().ECDSA_validate_msg_signature(reinterpret_cast<const uint8_t *>(msg), msg_len, signature), CHIP_NO_ERROR);
+        EXPECT_EQ(keypair.Pubkey().ECDSA_validate_msg_signature(reinterpret_cast<const uint8_t *>(msg), msg_len, signature),
+                  CHIP_NO_ERROR);
 
         // Load public key separately
         P256PublicKey pubkey(public_key);
@@ -3591,9 +3592,9 @@ TEST_F(TestChipCryptoPAL, TestHazardousOperationLoadKeypairFromRaw)
 
     // Negative test: invalid buffer sizes
     P256Keypair badKeypair;
-    uint8_t tooShortPriv[10] = {0};
-    uint8_t tooShortPub[10] = {0};
-    CHIP_ERROR badErr = badKeypair.HazardousOperationLoadKeypairFromRaw(ByteSpan(tooShortPriv, sizeof(tooShortPriv)),
-                                                                        ByteSpan(tooShortPub, sizeof(tooShortPub)));
+    uint8_t tooShortPriv[10] = { 0 };
+    uint8_t tooShortPub[10]  = { 0 };
+    CHIP_ERROR badErr        = badKeypair.HazardousOperationLoadKeypairFromRaw(ByteSpan(tooShortPriv, sizeof(tooShortPriv)),
+                                                                               ByteSpan(tooShortPub, sizeof(tooShortPub)));
     EXPECT_EQ(badErr, CHIP_ERROR_INVALID_ARGUMENT);
 }
