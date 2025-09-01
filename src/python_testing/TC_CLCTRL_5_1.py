@@ -140,6 +140,10 @@ class TC_CLCTRL_5_1(MatterBaseTest):
             TestStep("10d", "TH sends command Stop to DUT"),
             TestStep("10e", "TH reads from the DUT the MainState attribute"),
             TestStep("11", "TH sends TestEventTrigger command to General Diagnostic Cluster on Endpoint 0 with EnableKey field set to PIXIT.CLCTRL.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to PIXIT.CLCTRL.TEST_EVENT_TRIGGER for MainState Test Event Clear"),
+            TestStep("12a", "If the CL feature is not supported on the cluster, skip steps 12b to 12d")
+            TestStep("12b", "TH sends command Calibrate to DUT"),
+            TestStep("12c", "TH reads from the DUT the MainState attribute"),
+            TestStep("12d", "Wait until TH receives a subscription report with MainState = Stopped.")
         ]
         return steps
 
@@ -657,6 +661,43 @@ class TC_CLCTRL_5_1(MatterBaseTest):
             asserts.assert_equal(
                 e.status, Status.Success, f"Failed to send command TestEventTrigger: {e.status}")
             pass
+
+        # STEP 12a: If the CL feature is not supported, skip steps 12b to 12d
+        self.step("12a")
+
+        if not is_cl_feature_supported:
+            logging.info("Calibration feature not supported, skipping steps 12b to 12d")
+
+            # Skipping steps 12b to 12d
+            self.mark_step_range_skipped("12b", "12d")
+        else:
+            # STEP 12b: TH sends command Calibrate to DUT
+            self.step("12b")
+
+            sub_handler.reset()
+            try:
+                await self.send_single_cmd(cmd=Clusters.ClosureControl.Commands.Calibrate(), endpoint=endpoint, timedRequestTimeoutMs=1000)
+            except InteractionModelError as e:
+                asserts.assert_equal(
+                    e.status, Status.Success, f"Failed to send command Calibrate: {e.status}")
+                pass
+
+            # STEP 12c: TH reads from the DUT the MainState attribute
+            self.step("12c")
+
+            mainstate = await self.read_clctrl_attribute_expect_success(endpoint=endpoint, attribute=attributes.MainState)
+            # Check if the MainState attribute has the expected values
+            asserts.assert_equal(mainstate, Clusters.ClosureControl.Enums.MainStateEnum.kCalibrating,
+                                 "MainState is not in the expected state")
+            logging.info(f"Mainstate: {mainstate}")
+
+            # STEP 12d: Wait until the TH receives a subscription report for the MainState attribute
+            self.step("12d")
+
+            # Wait for the mainstate to be updated
+            logging.info("Waiting for MainState attribute to be updated")
+            sub_handler.await_all_expected_report_matches(expected_matchers=[main_state_matcher(Clusters.ClosureControl.Enums.MainStateEnum.kStopped)],
+                                                          timeout_sec=timeout)
 
 
 if __name__ == "__main__":
