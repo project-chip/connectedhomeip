@@ -59,8 +59,11 @@ void InitDataModelHandler() {}
 class MockTrustVerificationDelegate : public TrustVerificationDelegate
 {
 public:
-    void OnProgressUpdate(DeviceCommissioner & commissioner, TrustVerificationStage stage, TrustVerificationInfo & info,
-                          TrustVerificationError error) override
+    void OnProgressUpdate(
+        DeviceCommissioner & commissioner, 
+        TrustVerificationStage stage, 
+        TrustVerificationInfo & info,
+        TrustVerificationError error) override
     {
         mProgressUpdates++;
         mLastStage = stage;
@@ -68,7 +71,9 @@ public:
         mRemoteAdminTrustedRoot = info.adminRCAC.Span();
     }
 
-    void OnAskUserForConsent(DeviceCommissioner & commissioner, TrustVerificationInfo & info) override
+    void OnAskUserForConsent(
+        DeviceCommissioner & commissioner, 
+        TrustVerificationInfo & info) override
     {
         mAskedForConsent = true;
         mLastVendorId    = info.adminVendorId;
@@ -77,7 +82,7 @@ public:
 
     CHIP_ERROR OnLookupOperationalTrustAnchor(
         VendorId vendorID, 
-        CertificateKeyId subjectKeyId, 
+        CertificateKeyId & subjectKeyId, 
         ByteSpan & globallyTrustedRootSpan)
     {
         mLookedUpOperationalTrustAnchor = true;
@@ -107,13 +112,16 @@ public:
     class MockClusterStateCacheCallback : public ClusterStateCache::Callback
     {
         void OnDone(ReadClient *) override {}
-        void OnAttributeData(const ConcreteDataAttributePath & aPath, TLV::TLVReader * apData, const StatusIB & aStatus) override {}
+        void OnAttributeData(
+            const ConcreteDataAttributePath & aPath, 
+            TLV::TLVReader * apData, 
+            const StatusIB & aStatus) override {}
     };
 
     CHIP_ERROR SetUp(
-        FabricTable & fabricTable,
-        FabricIndex fabricIndex,
-        NodeId nodeId
+        const FabricTable & fabricTable,
+        const FabricIndex fabricIndex,
+        const NodeId nodeId
     )
     {
         const FabricInfo * fabricInfo = fabricTable.FindFabricWithIndex(fabricIndex);
@@ -180,7 +188,9 @@ public:
     void TearDown() { ClearEventCache(); }
 
     template <typename AttrType>
-    CHIP_ERROR SetAttribute(const ConcreteAttributePath & path, const AttrType data)
+    CHIP_ERROR SetAttribute(
+        const ConcreteAttributePath & path, 
+        const AttrType data)
     {
         Platform::ScopedMemoryBufferWithSize<uint8_t> handle;
         handle.Calloc(3000);
@@ -200,7 +210,9 @@ public:
     }
 
     template <typename AttrType>
-    CHIP_ERROR SetAttributeForWrite(const ConcreteAttributePath & path, const AttrType data)
+    CHIP_ERROR SetAttributeForWrite(
+        const ConcreteAttributePath & path, 
+        const AttrType data)
     {
         Platform::ScopedMemoryBufferWithSize<uint8_t> handle;
         handle.Calloc(3000);
@@ -219,7 +231,8 @@ public:
         return CHIP_NO_ERROR;
     }
 
-    std::vector<uint8_t> hexStringToBytes(const std::string & hex_string)
+    std::vector<uint8_t> hexStringToBytes(
+        const std::string & hex_string)
     {
         std::vector<uint8_t> bytes;
 
@@ -244,7 +257,9 @@ private:
 class MockDeviceProxy : public DeviceProxy, public SessionDelegate
 {
 public:
-    MockDeviceProxy(Messaging::ExchangeManager * exchangeManager, const SessionHandle & session, NodeId nodeId) :
+    MockDeviceProxy(
+        Messaging::ExchangeManager * exchangeManager, 
+        const SessionHandle & session, NodeId nodeId) :
         mExchangeManager(exchangeManager), mSecureSession(*this), mRemoteNodeId(nodeId) {
             mSecureSession.Grab(session);
         }

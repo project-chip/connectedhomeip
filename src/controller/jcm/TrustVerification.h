@@ -165,10 +165,18 @@ class DLL_EXPORT TrustVerificationDelegate
 public:
     virtual ~TrustVerificationDelegate() = default;
 
-    virtual void OnProgressUpdate(DeviceCommissioner & commissioner, TrustVerificationStage stage, TrustVerificationInfo & info,
-                                  TrustVerificationError error)                                       = 0;
-    virtual void OnAskUserForConsent(DeviceCommissioner & commissioner, TrustVerificationInfo & info) = 0;
-    virtual CHIP_ERROR OnLookupOperationalTrustAnchor(VendorId vendorID, CertificateKeyId subjectKeyId, ByteSpan & globallyTrustedRootSpan) = 0;
+    virtual void OnProgressUpdate(
+        DeviceCommissioner & commissioner,
+        TrustVerificationStage stage,
+        TrustVerificationInfo & info,
+        TrustVerificationError error) = 0;
+    virtual void OnAskUserForConsent(
+        DeviceCommissioner & commissioner,
+        TrustVerificationInfo & info) = 0;
+    virtual CHIP_ERROR OnLookupOperationalTrustAnchor(
+        VendorId vendorID,
+        CertificateKeyId & subjectKeyId,
+        ByteSpan & globallyTrustedRootSpan) = 0;
 };
 
 /**
@@ -179,35 +187,35 @@ public:
     virtual ~VendorIdVerificationClient() = default;
 
     CHIP_ERROR VerifyVendorId(
-        DeviceProxy * deviceProxy, 
-        FabricIndex fabricIndex, 
-        VendorId vendorID, 
-        ByteSpan & rcacSpan,
-        ByteSpan & icacSpan,
-        ByteSpan & nocSpan);
+        DeviceProxy * deviceProxy,
+        const FabricIndex & fabricIndex,
+        const VendorId & vendorID,
+        const ByteSpan & rcacSpan,
+        const ByteSpan & icacSpan,
+        const ByteSpan & nocSpan);
 
 protected:
     virtual CHIP_ERROR OnLookupOperationalTrustAnchor(
-        VendorId vendorID, 
-        CertificateKeyId subjectKeyId,
+        VendorId vendorID,
+        CertificateKeyId & subjectKeyId,
         ByteSpan & globallyTrustedRootSpan) = 0;
-    virtual void OnVendorIdVerficationComplete(CHIP_ERROR err) = 0;
+    virtual void OnVendorIdVerficationComplete(const CHIP_ERROR & err) = 0;
 
 private:
     CHIP_ERROR VerifyNOCCertificateChain(
-        ByteSpan & nocSpan, 
-        ByteSpan & icacSpan, 
-        ByteSpan & rcacSpan);
+        const ByteSpan & nocSpan,
+        const ByteSpan & icacSpan,
+        const ByteSpan & rcacSpan);
 
     CHIP_ERROR Verify(
-        DeviceProxy * deviceProxy, 
-        FabricIndex fabricIndex, 
-        VendorId vendorID, 
-        ByteSpan & rcacSpan,
-        ByteSpan & icacSpan,
-        ByteSpan & nocSpan,
-        SignVIDVerificationResponse::DecodableType responseData,
-        ByteSpan & clientChallengeSpan);
+        DeviceProxy * deviceProxy,
+        const FabricIndex & fabricIndex,
+        const VendorId & vendorID,
+        const ByteSpan & rcacSpan,
+        const ByteSpan & icacSpan,
+        const ByteSpan & nocSpan,
+        const ByteSpan & clientChallengeSpan,
+        const SignVIDVerificationResponse::DecodableType responseData);
 };
 
 } // namespace JCM

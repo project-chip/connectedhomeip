@@ -31,7 +31,10 @@ namespace chip {
 namespace Controller {
 namespace JCM {
 
-CHIP_ERROR VendorIdVerificationClient::VerifyNOCCertificateChain(ByteSpan & nocSpan, ByteSpan  & icacSpan, ByteSpan & rcacSpan)
+CHIP_ERROR VendorIdVerificationClient::VerifyNOCCertificateChain(
+    const ByteSpan & nocSpan, 
+    const ByteSpan  & icacSpan, 
+    const ByteSpan & rcacSpan)
 {
     ValidationContext validContext;
 
@@ -55,13 +58,13 @@ CHIP_ERROR VendorIdVerificationClient::VerifyNOCCertificateChain(ByteSpan & nocS
 
 CHIP_ERROR VendorIdVerificationClient::Verify(
     DeviceProxy * deviceProxy, 
-    FabricIndex fabricIndex, 
-    VendorId vendorID, 
-    ByteSpan & rcacSpan,
-    ByteSpan & icacSpan,
-    ByteSpan & nocSpan,
-    SignVIDVerificationResponse::DecodableType responseData,
-    ByteSpan & clientChallengeSpan
+    const FabricIndex & fabricIndex, 
+    const VendorId & vendorID, 
+    const ByteSpan & rcacSpan,
+    const ByteSpan & icacSpan,
+    const ByteSpan & nocSpan,
+    const ByteSpan & clientChallengeSpan,
+    const SignVIDVerificationResponse::DecodableType responseData
 )
 {
     // Steps 1-9 have already been completed prior to the response callback
@@ -133,11 +136,11 @@ CHIP_ERROR VendorIdVerificationClient::Verify(
 
 CHIP_ERROR VendorIdVerificationClient::VerifyVendorId(
     DeviceProxy * deviceProxy,
-    FabricIndex fabricIndex,
-    VendorId vendorID,
-    ByteSpan & rcacSpan,
-    ByteSpan & icacSpan,
-    ByteSpan & nocSpan)
+    const FabricIndex & fabricIndex,
+    const VendorId & vendorID,
+    const ByteSpan & rcacSpan,
+    const ByteSpan & icacSpan,
+    const ByteSpan & nocSpan)
 {
     ChipLogProgress(Controller, "Performing vendor ID verification for vendor ID: %u", vendorID);
 
@@ -152,13 +155,10 @@ CHIP_ERROR VendorIdVerificationClient::VerifyVendorId(
     request.fabricIndex = fabricIndex;
     request.clientChallenge = clientChallengeSpan;
 
-    auto onSuccessCb = [this, deviceProxy, fabricIndex, vendorID, &rcacSpan, &icacSpan, &nocSpan, &clientChallengeSpan](const app::ConcreteCommandPath & aPath, const app::StatusIB & aStatus,
+    auto onSuccessCb = [this, deviceProxy, fabricIndex, vendorID, rcacSpan, icacSpan, nocSpan, clientChallengeSpan](const app::ConcreteCommandPath & aPath, const app::StatusIB & aStatus,
                                      const decltype(request)::ResponseType & responseData) {
-        CHIP_ERROR err = this->Verify(deviceProxy, fabricIndex, vendorID, rcacSpan, icacSpan, nocSpan, responseData, clientChallengeSpan); 
-        if (err != CHIP_NO_ERROR)
-        {
-            this->OnVendorIdVerficationComplete(err);
-        }
+        CHIP_ERROR err = this->Verify(deviceProxy, fabricIndex, vendorID, rcacSpan, icacSpan, nocSpan, clientChallengeSpan, responseData);
+        this->OnVendorIdVerficationComplete(err);
     };
 
     auto onFailureCb = [this](CHIP_ERROR err) {
