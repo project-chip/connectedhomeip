@@ -124,8 +124,8 @@ public:
     static const uint16_t kAliceKeyId   = 2;
     static const uint16_t kCharlieKeyId = 3;
     static const uint16_t kDavidKeyId   = 4;
-    static const uint16_t kJFBobKeyId   = 5;
-    static const uint16_t kJFAliceKeyId = 6;
+    static const uint16_t kJFAKeyId     = 5;
+    static const uint16_t kJFBKeyId     = 6;
     GroupId GetFriendsGroupId() const { return mpData->mFriendsGroupId; }
 
     SessionManager & GetSecureSessionManager() { return mpData->mSessionManager; }
@@ -136,28 +136,34 @@ public:
 
     FabricIndex GetAliceFabricIndex() { return mpData->mAliceFabricIndex; }
     FabricIndex GetBobFabricIndex() { return mpData->mBobFabricIndex; }
+    FabricIndex GetJFAFabricIndex() { return mpData->mJFAFabricIndex; }
+    FabricIndex GetJFBFabricIndex() { return mpData->mJFBFabricIndex; }
     const FabricInfo * GetAliceFabric() { return mpData->mFabricTable.FindFabricWithIndex(mpData->mAliceFabricIndex); }
-    const FabricInfo * GetJFAliceFabric() { return mpData->mFabricTable.FindFabricWithIndex(mpData->mJFAliceFabricIndex); }
     const FabricInfo * GetBobFabric() { return mpData->mFabricTable.FindFabricWithIndex(mpData->mBobFabricIndex); }
-    const FabricInfo * GetJFBobFabric() { return mpData->mFabricTable.FindFabricWithIndex(mpData->mJFBobFabricIndex); }
+    const FabricInfo * GetJFAFabric() { return mpData->mFabricTable.FindFabricWithIndex(mpData->mJFAFabricIndex); }
+    const FabricInfo * GetJFBFabric() { return mpData->mFabricTable.FindFabricWithIndex(mpData->mJFBFabricIndex); }
 
     CHIP_ERROR CreateSessionBobToAlice(); // Creates PASE session
     CHIP_ERROR CreateCASESessionBobToAlice();
     CHIP_ERROR CreateCASESessionBobToAlice(const CATValues & cats);
-    CHIP_ERROR CreateJFSessionBobToAlice(); // Creates PASE session
-    CHIP_ERROR CreateJFCASESessionBobToAlice();
-    CHIP_ERROR CreateJFCASESessionBobToAlice(const CATValues & cats);
     CHIP_ERROR CreateSessionAliceToBob(); // Creates PASE session
     CHIP_ERROR CreateCASESessionAliceToBob();
     CHIP_ERROR CreateCASESessionAliceToBob(const CATValues & cats);
     CHIP_ERROR CreateSessionBobToFriends(); // Creates PASE session
     CHIP_ERROR CreatePASESessionCharlieToDavid();
     CHIP_ERROR CreatePASESessionDavidToCharlie();
+    CHIP_ERROR CreateJFSessionAToB(); // Creates PASE session
+    CHIP_ERROR CreateJFCASESessionAToB();
+    CHIP_ERROR CreateJFCASESessionAToB(const CATValues & cats);
+    CHIP_ERROR CreateJFSessionBToA(); // Creates PASE session
+    CHIP_ERROR CreateJFCASESessionBToA();
+    CHIP_ERROR CreateJFCASESessionBToA(const CATValues & cats);
 
     void ExpireSessionBobToAlice();
     void ExpireSessionAliceToBob();
     void ExpireSessionBobToFriends();
-    void ExpireJFSessionBobToAlice();
+    void ExpireJFSessionAToB();
+    void ExpireJFSessionBToA();
 
     void SetMRPMode(MRPMode mode);
 
@@ -166,17 +172,18 @@ public:
     SessionHandle GetSessionCharlieToDavid();
     SessionHandle GetSessionDavidToCharlie();
     SessionHandle GetSessionBobToFriends();
-    SessionHandle GetJFSessionBobToAlice();
+    SessionHandle GetJFSessionAToB();
+    SessionHandle GetJFSessionBToA();
 
     CHIP_ERROR CreateAliceFabric();
     CHIP_ERROR CreateBobFabric();
-    CHIP_ERROR CreateJFAliceFabric();
-    CHIP_ERROR CreateJFBobFabric();
+    CHIP_ERROR CreateJFAFabric();
+    CHIP_ERROR CreateJFBFabric();
 
     const Transport::PeerAddress & GetAliceAddress() { return mpData->mAliceAddress; }
     const Transport::PeerAddress & GetBobAddress() { return mpData->mBobAddress; }
-    const Transport::PeerAddress & GetJFAliceAddress() { return mpData->mJFAliceAddress; }
-    const Transport::PeerAddress & GetJFBobAddress() { return mpData->mJFBobAddress; }
+    const Transport::PeerAddress & GetJFAAddress() { return mpData->mJFAAddress; }
+    const Transport::PeerAddress & GetJFBAddress() { return mpData->mJFBAddress; }
 
     Messaging::ExchangeContext * NewUnauthenticatedExchangeToAlice(Messaging::ExchangeDelegate * delegate);
     Messaging::ExchangeContext * NewUnauthenticatedExchangeToBob(Messaging::ExchangeDelegate * delegate);
@@ -194,8 +201,8 @@ private:
         MessagingContextData() :
             mAliceAddress(Transport::PeerAddress::UDP(GetAddress(), CHIP_PORT + 1)),
             mBobAddress(LoopbackTransport::LoopbackPeer(mAliceAddress)),
-            mJFAliceAddress(Transport::PeerAddress::UDP(GetAddress(), CHIP_PORT + 2)),
-            mJFBobAddress(LoopbackTransport::LoopbackPeer(mJFAliceAddress))
+            mJFAAddress(Transport::PeerAddress::UDP(GetAddress(), CHIP_PORT + 2)),
+            mJFBAddress(LoopbackTransport::LoopbackPeer(mJFAAddress))
         {}
         ~MessagingContextData() { EXPECT_FALSE(mInitialized); }
 
@@ -215,20 +222,21 @@ private:
 
         FabricIndex mAliceFabricIndex = kUndefinedFabricIndex;
         FabricIndex mBobFabricIndex   = kUndefinedFabricIndex;
-        FabricIndex mJFAliceFabricIndex = kUndefinedFabricIndex;
-        FabricIndex mJFBobFabricIndex = kUndefinedFabricIndex;
+        FabricIndex mJFAFabricIndex = kUndefinedFabricIndex;
+        FabricIndex mJFBFabricIndex = kUndefinedFabricIndex;
         GroupId mFriendsGroupId       = 0x0101;
         Transport::PeerAddress mAliceAddress;
         Transport::PeerAddress mBobAddress;
         Transport::PeerAddress mCharlieAddress;
         Transport::PeerAddress mDavidAddress;
-        Transport::PeerAddress mJFAliceAddress;
-        Transport::PeerAddress mJFBobAddress;
+        Transport::PeerAddress mJFAAddress;
+        Transport::PeerAddress mJFBAddress;
         SessionHolder mSessionAliceToBob;
         SessionHolder mSessionBobToAlice;
         SessionHolder mSessionCharlieToDavid;
         SessionHolder mSessionDavidToCharlie;
-        SessionHolder mJFSessionBobToAlice;
+        SessionHolder mJFSessionAToB;
+        SessionHolder mJFSessionBToA;
         Optional<Transport::OutgoingGroupSession> mSessionBobToFriends;
     };
     std::unique_ptr<MessagingContextData> mpData;

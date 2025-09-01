@@ -535,7 +535,6 @@ TEST_F_FROM_FIXTURE(TestInteractionModelEngine, TestSubjectHasActiveSubscription
     ExpireSessionAliceToBob();
     EXPECT_EQ(CHIP_NO_ERROR, CreateCASESessionBobToAlice(cats));
     EXPECT_EQ(CHIP_NO_ERROR, CreateCASESessionAliceToBob(cats));
-    EXPECT_EQ(CHIP_NO_ERROR, CreateJFCASESessionBobToAlice(cats));
 
     // Create ExchangeContexts
     Messaging::ExchangeContext * exchangeCtx = NewExchangeToBob(nullptr, false);

@@ -25,6 +25,7 @@
 #include <controller/jcm/AutoCommissioner.h>
 #include <controller/jcm/DeviceCommissioner.h>
 #include <controller/tests/data_model/DataModelFixtures.h>
+#include <credentials/tests/CHIPCert_unit_test_vectors.h>
 #include <credentials/CHIPCert.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/core/CHIPError.h>
@@ -45,6 +46,7 @@ using namespace chip::Credentials;
 using namespace chip::Messaging;
 using namespace chip::Platform;
 using namespace chip::Test;
+using namespace chip::TestCerts;
 using namespace chip::Transport;
 
 namespace chip {
@@ -314,7 +316,12 @@ public:
         SessionHandle sessionHandle = mMessagingContext.GetSessionBobToAlice();
         ByteSpan attestationChallengeSpan = sessionHandle->AsSecureSession()->GetCryptoContext().GetAttestationChallenge();
         FabricTable::SignVIDVerificationResponseData responseData;
-        VerifyOrDie(fabricTable.SignVIDVerificationRequest(dataRequest.fabricIndex, dataRequest.clientChallenge, attestationChallengeSpan, responseData) == CHIP_NO_ERROR);
+        CHIP_ERROR err = fabricTable.SignVIDVerificationRequest(dataRequest.fabricIndex, dataRequest.clientChallenge, attestationChallengeSpan, responseData);
+        if (err != CHIP_NO_ERROR)
+        {
+            aHandler->AddStatus(aRequest.path, Protocols::InteractionModel::Status::Failure);
+            return std::nullopt; // handler status is set by the dispatch
+        }
 
         // Return the response
         Clusters::OperationalCredentials::Commands::SignVIDVerificationResponse::Type response;
@@ -392,9 +399,9 @@ protected:
 
         mDeviceCommissioner = new TestableDeviceCommissioner();
         mDeviceCommissioner->RegisterTrustVerificationDelegate(&mTrustVerificationDelegate);
-        SessionHandle session = GetJFSessionBobToAlice();
-        NodeId aliceNodeId = GetJFAliceFabric()->GetNodeId();
-        mDeviceProxy = new MockDeviceProxy(&GetExchangeManager(), session, aliceNodeId);
+        SessionHandle session = GetJFSessionAToB();
+        NodeId jfbNodeId = GetJFBFabric()->GetNodeId();
+        mDeviceProxy = new MockDeviceProxy(&GetExchangeManager(), session, jfbNodeId);
         mDeviceCommissioner->mDeviceProxy = mDeviceProxy;
 
 #if CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
@@ -402,7 +409,7 @@ protected:
 #endif // CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
         mAutoCommissioner.SetCommissioningParameters(mCommissioningParams);
 
-        CHIP_ERROR err = mClusterStateCache.SetUp(GetFabricTable(), GetAliceFabricIndex(), aliceNodeId);
+        CHIP_ERROR err = mClusterStateCache.SetUp(GetFabricTable(), GetJFBFabricIndex(), jfbNodeId);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Controller, "MockClusterStateCache::SetUp failed with error: %s", ErrorStr(err));
@@ -411,8 +418,7 @@ protected:
 
     void TearDown() override
     {
-        DrainAndServiceIO();
-        ExpireJFSessionBobToAlice();
+        ExpireJFSessionAToB();
 
         chip::Test::ResetMockNodeConfig();
         InteractionModelEngine::GetInstance()->SetDataModelProvider(mOldProvider);
@@ -453,6 +459,10 @@ TEST_F_FROM_FIXTURE(TestCommissioner, TestTrustVerificationStageFinishedProgress
     // Start at Started, advance through all stages
     // Advance to kAskUserForConsent (should trigger consent)
     mDeviceCommissioner->TrustVerificationStageFinished(stage, error);
+
+    // Wait for JCM to complete
+    DrainAndServiceIO();
+
     EXPECT_EQ(mTrustVerificationDelegate.mProgressUpdates, 5); // Progress not incremented for consent
     EXPECT_EQ(mTrustVerificationDelegate.mLastStage, TrustVerificationStage::kComplete);
     EXPECT_EQ(mTrustVerificationDelegate.mLastError, TrustVerificationError::kSuccess);
@@ -490,6 +500,10 @@ TEST_F_FROM_FIXTURE(TestCommissioner, TestTrustVerificationStageFinishedHandlesE
 
     // Simulate error at operational credentials stage
     mDeviceCommissioner->TrustVerificationStageFinished(stage, error);
+
+    // Wait for JCM to complete
+    DrainAndServiceIO();
+
     EXPECT_EQ(mTrustVerificationDelegate.mProgressUpdates, 2);
     EXPECT_EQ(mTrustVerificationDelegate.mLastStage, TrustVerificationStage::kPerformingVendorIDVerification);
     EXPECT_EQ(mTrustVerificationDelegate.mLastError, TrustVerificationError::kVendorIdVerificationFailed);
@@ -502,7 +516,7 @@ TEST_F_FROM_FIXTURE(TestCommissioner, TestParseAdminFabricIndexAndEndpointId)
     EXPECT_EQ(CHIP_NO_ERROR, mDeviceCommissioner->ParseAdminFabricIndexAndEndpointId(mInfo));
 
     // Verify the ParseAdminFabricIndexAndEndpointId results
-    EXPECT_EQ(mDeviceCommissioner->mInfo.adminFabricIndex, 1);
+    EXPECT_EQ(mDeviceCommissioner->mInfo.adminFabricIndex, GetJFBFabricIndex());
     EXPECT_EQ(mDeviceCommissioner->mInfo.adminEndpointId, 1);
 }
 
@@ -516,15 +530,17 @@ TEST_F_FROM_FIXTURE(TestCommissioner, TestParseOperationalCredentials)
     EXPECT_EQ(CHIP_NO_ERROR, mDeviceCommissioner->ParseOperationalCredentials(mInfo));
 
     // Verify the ParseAdminFabricIndexAndEndpointId results
-    EXPECT_EQ(mDeviceCommissioner->mInfo.adminFabricIndex, 1);
+    EXPECT_EQ(mDeviceCommissioner->mInfo.adminFabricIndex, GetJFBFabricIndex());
     EXPECT_EQ(mDeviceCommissioner->mInfo.adminEndpointId, 1);
 
     // Verify the ParseOperationalCredentials results
     EXPECT_EQ(mDeviceCommissioner->mInfo.rootPublicKey.AllocatedSize(), Crypto::kP256_PublicKey_Length);
     EXPECT_EQ(mDeviceCommissioner->mInfo.adminVendorId, static_cast<VendorId>(chip::VendorId::TestVendor1));
-    EXPECT_EQ(mDeviceCommissioner->mInfo.adminFabricId, static_cast<FabricId>(18068348246522069002u));
-    EXPECT_EQ(mDeviceCommissioner->mInfo.adminNOC.AllocatedSize(), static_cast<size_t>(265));
-    EXPECT_EQ(mDeviceCommissioner->mInfo.adminICAC.AllocatedSize(), static_cast<size_t>(262));
+    EXPECT_EQ(mDeviceCommissioner->mInfo.adminFabricId, GetJFBFabric()->GetFabricId());
+    auto nocCertAsset = GetJFBNodeCertAsset();
+    EXPECT_EQ(mDeviceCommissioner->mInfo.adminNOC.AllocatedSize(), static_cast<size_t>(nocCertAsset.mCert.size()));
+    auto iaCertAsset = GetJFBIACertAsset();
+    EXPECT_EQ(mDeviceCommissioner->mInfo.adminICAC.AllocatedSize(), static_cast<size_t>(iaCertAsset.mCert.size()));
 }
 
 // Test getting trusted root
@@ -538,18 +554,21 @@ TEST_F_FROM_FIXTURE(TestCommissioner, TestParseTrustedRoot)
     EXPECT_EQ(CHIP_NO_ERROR, mDeviceCommissioner->ParseTrustedRoot(mInfo));
 
     // Verify the ParseAdminFabricIndexAndEndpointId results
-    EXPECT_EQ(mDeviceCommissioner->mInfo.adminFabricIndex, 1);
+    EXPECT_EQ(mDeviceCommissioner->mInfo.adminFabricIndex, GetJFBFabricIndex());
     EXPECT_EQ(mDeviceCommissioner->mInfo.adminEndpointId, 1);
 
     // Verify the ParseOperationalCredentials results
     EXPECT_EQ(mDeviceCommissioner->mInfo.rootPublicKey.AllocatedSize(), Crypto::kP256_PublicKey_Length);
     EXPECT_EQ(mDeviceCommissioner->mInfo.adminVendorId, static_cast<VendorId>(chip::VendorId::TestVendor1));
-    EXPECT_EQ(mDeviceCommissioner->mInfo.adminFabricId, static_cast<FabricId>(18068348246522069002u));
-    EXPECT_EQ(mDeviceCommissioner->mInfo.adminNOC.AllocatedSize(), static_cast<size_t>(265));
-    EXPECT_EQ(mDeviceCommissioner->mInfo.adminICAC.AllocatedSize(), static_cast<size_t>(262));
+    EXPECT_EQ(mDeviceCommissioner->mInfo.adminFabricId, GetJFBFabric()->GetFabricId());
+    auto nocCertAsset = GetJFBNodeCertAsset();
+    EXPECT_EQ(mDeviceCommissioner->mInfo.adminNOC.AllocatedSize(), static_cast<size_t>(nocCertAsset.mCert.size()));
+    auto iaCertAsset = GetJFBIACertAsset();
+    EXPECT_EQ(mDeviceCommissioner->mInfo.adminICAC.AllocatedSize(), static_cast<size_t>(iaCertAsset.mCert.size()));
 
     // Verify the ParseTrustedRoot results
-    EXPECT_EQ(mDeviceCommissioner->mInfo.adminRCAC.AllocatedSize(), static_cast<size_t>(272));
+    auto rootCertAsset = GetJFBRootCertAsset();
+    EXPECT_EQ(mDeviceCommissioner->mInfo.adminRCAC.AllocatedSize(), static_cast<size_t>(rootCertAsset.mCert.size()));
 }
 
 // Test parsing administrator info
@@ -559,14 +578,19 @@ TEST_F_FROM_FIXTURE(TestCommissioner, TestParseExtraCommissioningInfo)
     EXPECT_EQ(CHIP_NO_ERROR, mDeviceCommissioner->ParseExtraCommissioningInfo(mInfo, mCommissioningParams));
 
     // Verify the ParseExtraCommissioningInfo results
-    EXPECT_EQ(mDeviceCommissioner->mInfo.adminFabricIndex, 1);
+    EXPECT_EQ(mDeviceCommissioner->mInfo.adminFabricIndex, GetJFBFabricIndex());
     EXPECT_EQ(mDeviceCommissioner->mInfo.adminEndpointId, 1);
     EXPECT_EQ(mDeviceCommissioner->mInfo.rootPublicKey.AllocatedSize(), Crypto::kP256_PublicKey_Length);
     EXPECT_EQ(mDeviceCommissioner->mInfo.adminVendorId, static_cast<VendorId>(chip::VendorId::TestVendor1));
-    EXPECT_EQ(mDeviceCommissioner->mInfo.adminFabricId, static_cast<FabricId>(18068348246522069002u));
-    EXPECT_EQ(mDeviceCommissioner->mInfo.adminNOC.AllocatedSize(), static_cast<size_t>(265));
-    EXPECT_EQ(mDeviceCommissioner->mInfo.adminICAC.AllocatedSize(), static_cast<size_t>(262));
-    EXPECT_EQ(mDeviceCommissioner->mInfo.adminRCAC.AllocatedSize(), static_cast<size_t>(272));
+    EXPECT_EQ(mDeviceCommissioner->mInfo.adminFabricId, GetJFBFabric()->GetFabricId());
+    auto nocCertAsset = GetJFBNodeCertAsset();
+    EXPECT_EQ(mDeviceCommissioner->mInfo.adminNOC.AllocatedSize(), static_cast<size_t>(nocCertAsset.mCert.size()));
+    auto iaCertAsset = GetJFBIACertAsset();
+    EXPECT_EQ(mDeviceCommissioner->mInfo.adminICAC.AllocatedSize(), static_cast<size_t>(iaCertAsset.mCert.size()));
+
+    // Verify the ParseTrustedRoot results
+    auto rootCertAsset = GetJFBRootCertAsset();
+    EXPECT_EQ(mDeviceCommissioner->mInfo.adminRCAC.AllocatedSize(), static_cast<size_t>(rootCertAsset.mCert.size()));
 }
 } // namespace JCM
 } // namespace Controller
