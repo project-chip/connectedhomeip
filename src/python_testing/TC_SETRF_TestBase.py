@@ -1087,6 +1087,18 @@ class CommodityTariffTestBaseHelper(MatterBaseTest):
 
         return [tariff_component.tariffComponentID for tariff_component in tariff_components]
 
+    async def get_tariff_components_by_its_IDs(self, tariff_components_IDs: List[int]) -> List[cluster.Structs.TariffComponentStruct]:
+        """Extracts TariffComponentStruct entities by TariffComponentIDs.
+
+        Args:
+            tariff_components_IDs (List[int]): List of TariffComponentIDs.
+
+        Returns:
+            List[cluster.Structs.TariffComponentStruct]: List of TariffComponentStruct entities with specified TariffComponentIDs.
+        """
+
+        return [tariff_component for tariff_component in self.tariffComponentsValue if tariff_component.tariffComponentID in tariff_components_IDs]
+
     async def get_day_entry_IDs_from_day_entries_attribute(self, tariff_components: List[cluster.Structs.DayEntryStruct]) -> List[int]:
         """Extracts DayEntryIDs from the list of DayEntryStruct entities.
 
@@ -1359,3 +1371,45 @@ class CommodityTariffTestBaseHelper(MatterBaseTest):
 
         if not day_pattern_found:
             asserts.fail(f"DayPattern not found for {current_or_next}DayEntryDate attribute value.")
+
+    async def validate_tariff_component_ID_uniqueness_for_features(self, tariff_components_list: List[cluster.Structs.TariffComponentStruct]):
+
+        # flags to check specific feature fields in mask
+        features_fields_flags = {
+            "default": 0,
+            "price": 1 << 0,
+            "friendlyCredit": 1 << 1,
+            "auxiliaryLoad": 1 << 2,
+            "peakPeriod": 1 << 3,
+            "powerThreshold": 1 << 4
+        }
+
+        # store feature mask for each unique threshold value
+        groups_by_threshold_field = {}
+
+        # iterate over all tariff components
+        for tariff_component in tariff_components_list:
+
+            # skip predicted tariff components
+            if tariff_component.predicted is True:
+                continue
+
+            # Add Threshold value if it is not in groups_by_threshold_field
+            if tariff_component.threshold not in groups_by_threshold_field:
+                groups_by_threshold_field[tariff_component.threshold] = 0
+
+            # feature mask for current tariff_component
+            current_component_features_flags = 0
+
+            # iterate over all feature flags
+            for feature_flag in features_fields_flags.keys():
+                current_component_features_flags |= features_fields_flags[getattr(
+                    tariff_component, feature_flag, "default")]  # set corresponding flag about usage
+
+            # validate that there are no duplicate feature fields (comparing bitwise AND with current component feature flags mask and
+            # feature mask for current threshold value in groups_by_threshold_field)
+            asserts.assert_equal(current_component_features_flags & groups_by_threshold_field[tariff_component.threshold], 0,
+                                 f"TariffComponentID {tariff_component.tariffComponentID} must have unique combination of feature fields for given Threshold.")
+
+            # If validation above is successful then update feature mask for current threshold based on current component feature flags
+            groups_by_threshold_field[tariff_component.threshold] |= current_component_features_flags

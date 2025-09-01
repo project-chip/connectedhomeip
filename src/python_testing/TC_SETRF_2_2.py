@@ -123,7 +123,6 @@ class TC_SETRF_2_2(CommodityTariffTestBaseHelper):
         # Variables that will be used in the test to store intermediate values
         tariffComponentIDs: List[int] = []
         tariffComponentID1: int | None = None
-        label1: str | None = None
         tariffComponentStruct1: Clusters.CommodityTariff.Structs.TariffComponentStruct | None = None
         dayEntryIDs: List[int] = []
         dayEntryIDs1: List[int] = []
