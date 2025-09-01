@@ -204,10 +204,6 @@ class TC_IDM_4_2(MatterBaseTest):
             paaTrustStorePath=str(self.matter_test_config.paa_trust_store_path),
         )
 
-        # *** Step 0 ***
-        # Commissioning
-        self.step("precondition")
-
         # *** Step 1 ***
         # CR1 reads the ServerList attribute from the Descriptor cluster on EP0. If the ICDManagement cluster ID
         # (70,0x46) is present, set SUBSCRIPTION_MAX_INTERVAL_PUBLISHER_LIMIT_SEC = IdleModeDuration and
