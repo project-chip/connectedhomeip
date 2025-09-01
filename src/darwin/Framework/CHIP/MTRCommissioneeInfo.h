@@ -49,10 +49,13 @@ MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
 @property (nonatomic, copy, readonly, nullable) MTREndpointInfo * rootEndpoint;
 
 /**
- * Attributes that were read from the commissionee.  Will be present only if
- * extraAttributesToRead is set on MTRCommissioningParameters.
+ * Attributes that were read from the commissionee.  This will contain the
+ * following, if they are available:
+ *
+ * 1) The attributes in extraAttributesToRead on MTRCommissioningParameters.
+ * 2) The FeatureMap attributes of all Network Commissioning clusters on the commissionee.
  */
-@property (nonatomic, copy, readonly, nullable) NSDictionary<MTRAttributePath *, NSDictionary<NSString *, id> *> * attributes MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy, readonly, nullable) NSDictionary<MTRAttributePath *, NSDictionary<NSString *, id> *> * attributes MTR_UNSTABLE_API;
 
 @end
 

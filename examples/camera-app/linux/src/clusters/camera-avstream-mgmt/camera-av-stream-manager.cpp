@@ -127,10 +127,6 @@ Protocols::InteractionModel::Status CameraAVStreamManager::VideoStreamAllocate(c
             if (!stream.isAllocated)
             {
                 stream.isAllocated = true;
-
-                // Start the video stream from HAL for serving.
-                mCameraDeviceHAL->GetCameraHALInterface().StartVideoStream(outStreamID);
-
                 // Set the default viewport on the newly allocated stream
                 mCameraDeviceHAL->GetCameraHALInterface().SetViewport(stream,
                                                                       mCameraDeviceHAL->GetCameraHALInterface().GetViewport());
@@ -138,7 +134,7 @@ Protocols::InteractionModel::Status CameraAVStreamManager::VideoStreamAllocate(c
                 // Inform DPTZ that there's an allocated stream
                 mCameraDeviceHAL->GetCameraAVSettingsUserLevelMgmtDelegate().VideoStreamAllocated(outStreamID);
 
-                // Set the current frame rate attribute from HAL once stream has started
+                // Set the current frame rate attribute from HAL
                 GetCameraAVStreamMgmtServer()->SetCurrentFrameRate(mCameraDeviceHAL->GetCameraHALInterface().GetCurrentFrameRate());
 
                 return Status::Success;
@@ -153,6 +149,39 @@ Protocols::InteractionModel::Status CameraAVStreamManager::VideoStreamAllocate(c
     }
 
     return Status::DynamicConstraintError;
+}
+
+void CameraAVStreamManager::OnVideoStreamAllocated(const VideoStreamStruct & allocatedStream, StreamAllocationAction action)
+{
+    switch (action)
+    {
+    case StreamAllocationAction::kNewAllocation:
+        ChipLogProgress(Camera, "Starting new video stream with ID: %u", allocatedStream.videoStreamID);
+        mCameraDeviceHAL->GetCameraHALInterface().StartVideoStream(allocatedStream);
+
+        // Set the current frame rate attribute from HAL once stream has started
+        GetCameraAVStreamMgmtServer()->SetCurrentFrameRate(mCameraDeviceHAL->GetCameraHALInterface().GetCurrentFrameRate());
+        break;
+
+    case StreamAllocationAction::kModification:
+        // Find the stream and restart it with new parameters
+        for (VideoStream & stream : mCameraDeviceHAL->GetCameraHALInterface().GetAvailableVideoStreams())
+        {
+            if (stream.videoStreamParams.videoStreamID == allocatedStream.videoStreamID && stream.isAllocated)
+            {
+                // For modifications, we always stop and restart the stream to ensure new parameters are applied
+                ChipLogProgress(Camera, "Restarting video stream with ID: %u due to modifications", allocatedStream.videoStreamID);
+                mCameraDeviceHAL->GetCameraHALInterface().StopVideoStream(allocatedStream.videoStreamID);
+                mCameraDeviceHAL->GetCameraHALInterface().StartVideoStream(allocatedStream);
+                break;
+            }
+        }
+        break;
+
+    case StreamAllocationAction::kReuse:
+        ChipLogProgress(Camera, "Reusing existing video stream with ID: %u without changes", allocatedStream.videoStreamID);
+        break;
+    }
 }
 
 Protocols::InteractionModel::Status CameraAVStreamManager::VideoStreamModify(const uint16_t streamID,
