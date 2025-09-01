@@ -120,7 +120,8 @@ CHIP_ERROR GenericOpenThreadBorderRouterDelegate::GetDataset(Thread::Operational
     {
         return dataset.Init(ByteSpan(datasetTlvs.mTlvs, datasetTlvs.mLength));
     }
-    return DeviceLayer::Internal::MapOpenThreadError(otErr);
+    // Otherwise the dataset is not configured, return CHIP_ERROR_NOT_FOUND.
+    return CHIP_ERROR_NOT_FOUND;
 }
 
 void GenericOpenThreadBorderRouterDelegate::SetActiveDataset(const Thread::OperationalDataset & activeDataset, uint32_t sequenceNum,
