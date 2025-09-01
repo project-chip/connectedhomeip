@@ -129,8 +129,8 @@ pta_error pta_enable(pta_state enable);
  * 									  and beginning of event on air.
  *
  * @retval pta_error : 	PTA_DISABLED: If PTA is disabled.
- * 					   	PTA_ERROR_INVALID_REQUEST_TO_EVENT_TIME: If the request_to_event_time is greater than
- * the minimum time of the TX/RX interpacket time. PTA_ERROR_SUCCESS : Otherwise.
+ * 					   	PTA_ERROR_INVALID_REQUEST_TO_EVENT_TIME: If the request_to_event_time is greater
+ * than the minimum time of the TX/RX interpacket time. PTA_ERROR_SUCCESS : Otherwise.
  */
 pta_error pta_init(uint8_t request_to_event_time);
 
