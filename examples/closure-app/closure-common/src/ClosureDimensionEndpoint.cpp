@@ -52,11 +52,7 @@ CHIP_ERROR ClosureDimensionEndpoint::Init()
     ClusterConformance conformance;
     conformance.FeatureMap()
         .Set(Feature::kPositioning)
-        .Set(Feature::kMotionLatching)
-        .Set(Feature::kUnit)
-        .Set(Feature::kLimitation)
-        .Set(Feature::kSpeed)
-        .Set(Feature::kRotation);
+        .Set(Feature::kSpeed);
 
     ClusterInitParameters clusterInitParameters;
     clusterInitParameters.translationDirection = TranslationDirectionEnum::kDownward;
