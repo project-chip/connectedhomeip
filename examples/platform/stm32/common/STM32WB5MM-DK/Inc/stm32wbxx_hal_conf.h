@@ -96,11 +96,11 @@ extern "C" {
  */
 #if !defined(HSE_VALUE)
 #define HSE_VALUE 32000000U /*!< Value of the External oscillator in Hz */
-#endif /* HSE_VALUE */
+#endif                      /* HSE_VALUE */
 
 #if !defined(HSE_STARTUP_TIMEOUT)
 #define HSE_STARTUP_TIMEOUT ((uint32_t) 100) /*!< Time out for HSE start up, in ms */
-#endif /* HSE_STARTUP_TIMEOUT */
+#endif                                       /* HSE_STARTUP_TIMEOUT */
 
 /**
  * @brief Internal Multiple Speed oscillator (MSI) default value.
@@ -108,7 +108,7 @@ extern "C" {
  */
 #if !defined(MSI_VALUE)
 #define MSI_VALUE ((uint32_t) 4000000) /*!< Value of the Internal oscillator in Hz*/
-#endif /* MSI_VALUE */
+#endif                                 /* MSI_VALUE */
 
 /**
  * @brief Internal High Speed oscillator (HSI) value.
@@ -117,24 +117,24 @@ extern "C" {
  */
 #if !defined(HSI_VALUE)
 #define HSI_VALUE 16000000U /*!< Value of the Internal oscillator in Hz*/
-#endif /* HSI_VALUE */
+#endif                      /* HSI_VALUE */
 
 /**
  * @brief Internal Low Speed oscillator (LSI1) value.
  */
 #if !defined(LSI1_VALUE)
 #define LSI1_VALUE ((uint32_t) 32000) /*!< LSI1 Typical Value in Hz*/
-#endif /* LSI1_VALUE */ /*!< Value of the Internal Low Speed oscillator in Hz \
-                        The real value may vary depending on the variations   \
-                        in voltage and temperature.*/
+#endif /* LSI1_VALUE */               /*!< Value of the Internal Low Speed oscillator in Hz                                        \
+                                      The real value may vary depending on the variations                                          \
+                                      in voltage and temperature.*/
 /**
  * @brief Internal Low Speed oscillator (LSI2) value.
  */
 #if !defined(LSI2_VALUE)
 #define LSI2_VALUE ((uint32_t) 32000) /*!< LSI2 Typical Value in Hz*/
-#endif /* LSI2_VALUE */ /*!< Value of the Internal Low Speed oscillator in Hz \
-                        The real value may vary depending on the variations   \
-                        in voltage and temperature.*/
+#endif /* LSI2_VALUE */               /*!< Value of the Internal Low Speed oscillator in Hz                                        \
+                                      The real value may vary depending on the variations                                          \
+                                      in voltage and temperature.*/
 
 /**
  * @brief External Low Speed oscillator (LSE) value.
@@ -142,7 +142,7 @@ extern "C" {
  */
 #if !defined(LSE_VALUE)
 #define LSE_VALUE 32768U /*!< Value of the External oscillator in Hz*/
-#endif /* LSE_VALUE */
+#endif                   /* LSE_VALUE */
 
 /**
  * @brief Internal Multiple Speed oscillator (HSI48) default value.
@@ -150,11 +150,11 @@ extern "C" {
  */
 #if !defined(HSI48_VALUE)
 #define HSI48_VALUE ((uint32_t) 48000000) /*!< Value of the Internal oscillator in Hz*/
-#endif /* HSI48_VALUE */
+#endif                                    /* HSI48_VALUE */
 
 #if !defined(LSE_STARTUP_TIMEOUT)
 #define LSE_STARTUP_TIMEOUT 5000U /*!< Time out for LSE start up, in ms */
-#endif /* LSE_STARTUP_TIMEOUT */
+#endif                            /* LSE_STARTUP_TIMEOUT */
 
 /**
  * @brief External clock source for SAI1 peripheral
@@ -163,7 +163,7 @@ extern "C" {
  */
 #if !defined(EXTERNAL_SAI1_CLOCK_VALUE)
 #define EXTERNAL_SAI1_CLOCK_VALUE ((uint32_t) 2097000) /*!< Value of the SAI1 External clock source in Hz*/
-#endif /* EXTERNAL_SAI1_CLOCK_VALUE */
+#endif                                                 /* EXTERNAL_SAI1_CLOCK_VALUE */
 
 /* Tip: To avoid modifying this file each time you need to use different HSE,
    ===  you can define the HSE value in your toolchain compiler preprocessor. */
@@ -173,7 +173,7 @@ extern "C" {
  * @brief This is the HAL system configuration section
  */
 
-#define VDD_VALUE 3300U /*!< Value of VDD in mv */
+#define VDD_VALUE 3300U      /*!< Value of VDD in mv */
 #define TICK_INT_PRIORITY 0U /*!< tick interrupt priority */
 #define USE_RTOS 0U
 #define PREFETCH_ENABLE 1U

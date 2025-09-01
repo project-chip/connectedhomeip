@@ -35,7 +35,8 @@ extern "C" {
 
 /* Exported types ------------------------------------------------------------*/
 
-typedef enum {
+typedef enum
+{
     APP_BLE_IDLE,
     APP_BLE_LP_CONNECTING,
     APP_BLE_CONNECTED_SERVER,
@@ -77,7 +78,8 @@ typedef __PACKED_STRUCT __ALIGNED(4)
 }
 BleEvtPacket_t;
 
-typedef enum {
+typedef enum
+{
     PROC_GAP_GEN_PHY_TOGGLE,
     PROC_GAP_GEN_CONN_TERMINATE,
     PROC_GATT_EXCHANGE_CONFIG,
@@ -86,7 +88,8 @@ typedef enum {
     /* USER CODE END ProcGapGeneralId_t */
 } ProcGapGeneralId_t;
 
-typedef enum {
+typedef enum
+{
     PROC_GAP_PERIPH_ADVERTISE_START_LP,
     PROC_GAP_PERIPH_ADVERTISE_START_FAST,
     PROC_GAP_PERIPH_ADVERTISE_STOP,
@@ -99,7 +102,8 @@ typedef enum {
     /* USER CODE END ProcGapPeripheralId_t */
 } ProcGapPeripheralId_t;
 
-typedef enum {
+typedef enum
+{
     PROC_GAP_CENTRAL_SCAN_START,
     PROC_GAP_CENTRAL_SCAN_TERMINATE,
     /* USER CODE BEGIN ProcGapCentralId_t */
@@ -121,7 +125,8 @@ typedef enum {
 /**
  * BlueSTSDK Version
  **/
-enum {
+enum
+{
     BLUESTSDK_V1 = 0x01,
     BLUESTSDK_V2 = 0x02
 };
@@ -129,19 +134,21 @@ enum {
 /**
  * BOARD ID
  **/
-enum {
+enum
+{
     BOARD_ID_NUCLEO_WBA = 0x8B
 };
 
 /**
  * FIRMWARE ID
  **/
-enum {
-    FW_ID_P2P_SERVER = 0x83,
-    FW_ID_P2P_ROUTER = 0x85,
-    FW_ID_DT_SERVER = 0x88,
-    FW_ID_COC_PERIPH = 0x87,
-    FW_ID_HEART_RATE = 0x89,
+enum
+{
+    FW_ID_P2P_SERVER    = 0x83,
+    FW_ID_P2P_ROUTER    = 0x85,
+    FW_ID_DT_SERVER     = 0x88,
+    FW_ID_COC_PERIPH    = 0x87,
+    FW_ID_HEART_RATE    = 0x89,
     FW_ID_HEALTH_THERMO = 0x8A
 };
 /* USER CODE END EC */

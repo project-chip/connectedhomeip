@@ -30,10 +30,11 @@ extern "C" {
 #if ((CFG_DEBUG_TRACE_FULL != 0) || (CFG_DEBUG_TRACE_LIGHT != 0))
 #define PRINT_LOG_BUFF_DBG(...) DbgTraceBuffer(__VA_ARGS__)
 #if (CFG_DEBUG_TRACE_FULL != 0)
-#define PRINT_MESG_DBG(...)                                                                  \
-    do {                                                                                     \
-        printf("\r\n [%s][%s][%d] ", DbgTraceGetFileName(__FILE__), __FUNCTION__, __LINE__); \
-        printf(__VA_ARGS__);                                                                 \
+#define PRINT_MESG_DBG(...)                                                                                                        \
+    do                                                                                                                             \
+    {                                                                                                                              \
+        printf("\r\n [%s][%s][%d] ", DbgTraceGetFileName(__FILE__), __FUNCTION__, __LINE__);                                       \
+        printf(__VA_ARGS__);                                                                                                       \
     } while (0);
 #else
 #define PRINT_MESG_DBG printf

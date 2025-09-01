@@ -35,18 +35,11 @@ extern "C" {
 #define DEVICE_ATTESTATION_PRIVATE_KEY_ID_USER ((psa_key_id_t) 0x1fff0001)
 
 /* Exported functions ------------------------------------------------------- */
-psa_status_t storage_set(uint64_t obj_uid,
-    uint32_t obj_length,
-    const void * p_obj);
+psa_status_t storage_set(uint64_t obj_uid, uint32_t obj_length, const void * p_obj);
 
-psa_status_t storage_get(uint64_t obj_uid,
-    uint32_t obj_offset,
-    uint32_t obj_length,
-    void * p_obj);
+psa_status_t storage_get(uint64_t obj_uid, uint32_t obj_offset, uint32_t obj_length, void * p_obj);
 
-psa_status_t storage_get_info(uint64_t obj_uid,
-    void * p_obj_info,
-    uint32_t obj_info_size);
+psa_status_t storage_get_info(uint64_t obj_uid, void * p_obj_info, uint32_t obj_info_size);
 
 psa_status_t storage_remove(uint64_t obj_uid, uint32_t obj_size);
 

@@ -82,7 +82,8 @@ extern "C" {
  *         The user can add its own levels but must NOT add a value to the said
  *         levels. Verbose levels are handled by ADV Trace.
  */
-typedef enum {
+typedef enum
+{
     LOG_VERBOSE_INFO = LOG_MODULE_MIN_VERBOSE_LEVEL,
     /* USER CODE BEGIN Log_Verbose_Level_t_0 */
 
@@ -115,7 +116,8 @@ typedef enum {
  *         The user can add its own regions but must NOT add a value to them.
  *         The log module handles the mask on its own.
  */
-typedef enum {
+typedef enum
+{
     LOG_REGION_BLE = LOG_MODULE_MIN_REGION_VALUE,
     LOG_REGION_SYSTEM,
     LOG_REGION_APP,
@@ -130,13 +132,14 @@ typedef enum {
     LOG_REGION_ALL_REGIONS = LOG_MODULE_ALL_REGION_MASK,
 } Log_Region_t;
 
-typedef enum {
-    LOG_COLOR_NONE = 0, // Initialization.
+typedef enum
+{
+    LOG_COLOR_NONE         = 0,  // Initialization.
     LOG_COLOR_CODE_DEFAULT = 37, // White
-    LOG_COLOR_CODE_RED = 91,
-    LOG_COLOR_CODE_GREEN = 92,
-    LOG_COLOR_CODE_YELLOW = 93,
-    LOG_COLOR_CODE_CYAN = 96,
+    LOG_COLOR_CODE_RED     = 91,
+    LOG_COLOR_CODE_GREEN   = 92,
+    LOG_COLOR_CODE_YELLOW  = 93,
+    LOG_COLOR_CODE_CYAN    = 96,
     /* USER CODE BEGIN Log_Color_t */
 
     /* USER CODE END Log_Color_t */
@@ -296,7 +299,8 @@ void Log_Module_PrintWithArg(Log_Verbose_Level_t eVerboseLevel, Log_Region_t eRe
  * Add inside this user section your defines to match the new verbose levels you
  * created into Log_Verbose_Level_t.
  * Example :
- * #define LOG_CUSTOM_BLE(...)      { Log_Module_t _tmp = { .verbose_level = LOG_VERBOSE_CUSTOM, .region = LOG_REGION_BLE }; _Log(_tmp, __VA_ARGS__);         }
+ * #define LOG_CUSTOM_BLE(...)      { Log_Module_t _tmp = { .verbose_level = LOG_VERBOSE_CUSTOM, .region = LOG_REGION_BLE };
+ * _Log(_tmp, __VA_ARGS__);         }
  *
  * You don't need to update all regions with your custom values.
  * Do it accordingly to your needs. E.g you might not need LOG_VERBOSE_CUSTOM
@@ -316,7 +320,8 @@ void Log_Module_PrintWithArg(Log_Verbose_Level_t eVerboseLevel, Log_Region_t eRe
  * Add inside this user section your defines to match the new verbose levels you
  * created into Log_Verbose_Level_t.
  * Example :
- * #define LOG_CUSTOM_SYSTEM(...)      { Log_Module_t _tmp = { .verbose_level = LOG_VERBOSE_CUSTOM, .region = LOG_REGION_SYSTEM }; _Log(_tmp, __VA_ARGS__);         }
+ * #define LOG_CUSTOM_SYSTEM(...)      { Log_Module_t _tmp = { .verbose_level = LOG_VERBOSE_CUSTOM, .region = LOG_REGION_SYSTEM };
+ * _Log(_tmp, __VA_ARGS__);         }
  *
  * You don't need to update all regions with your custom values.
  * Do it accordingly to your needs. E.g you might not need LOG_VERBOSE_CUSTOM
@@ -336,7 +341,8 @@ void Log_Module_PrintWithArg(Log_Verbose_Level_t eVerboseLevel, Log_Region_t eRe
  * Add inside this user section your defines to match the new verbose levels you
  * created into Log_Verbose_Level_t.
  * Example :
- * #define LOG_CUSTOM_APP(...)      { Log_Module_t _tmp = { .verbose_level = LOG_VERBOSE_CUSTOM, .region = LOG_REGION_APP }; _Log(_tmp, __VA_ARGS__);         }
+ * #define LOG_CUSTOM_APP(...)      { Log_Module_t _tmp = { .verbose_level = LOG_VERBOSE_CUSTOM, .region = LOG_REGION_APP };
+ * _Log(_tmp, __VA_ARGS__);         }
  *
  * You don't need to update all regions with your custom values.
  * Do it accordingly to your needs. E.g you might not need LOG_VERBOSE_CUSTOM
@@ -350,10 +356,12 @@ void Log_Module_PrintWithArg(Log_Verbose_Level_t eVerboseLevel, Log_Region_t eRe
  * Add inside this user section your defines to match the new regions you
  * created into Log_Region_t.
  * Example :
- * #define LOG_INFO_CUSTOM(...)       { Log_Module_t _tmp = { .verbose_level = LOG_VERBOSE_INFO, .region = LOG_REGION_CUSTOM }; _Log(_tmp, __VA_ARGS__);          }
- * #define LOG_ERROR_CUSTOM(...)      { Log_Module_t _tmp = { .verbose_level = LOG_VERBOSE_ERROR, .region = LOG_REGION_CUSTOM }; _Log(_tmp, __VA_ARGS__);         }
- * #define LOG_WARNING_CUSTOM(...)    { Log_Module_t _tmp = { .verbose_level = LOG_VERBOSE_WARNING, .region = LOG_REGION_CUSTOM }; _Log(_tmp, __VA_ARGS__);       }
- * #define LOG_DEBUG_CUSTOM(...)      { Log_Module_t _tmp = { .verbose_level = LOG_VERBOSE_DEBUG, .region = LOG_REGION_CUSTOM }; _Log(_tmp, __VA_ARGS__);         }
+ * #define LOG_INFO_CUSTOM(...)       { Log_Module_t _tmp = { .verbose_level = LOG_VERBOSE_INFO, .region = LOG_REGION_CUSTOM };
+ * _Log(_tmp, __VA_ARGS__);          } #define LOG_ERROR_CUSTOM(...)      { Log_Module_t _tmp = { .verbose_level =
+ * LOG_VERBOSE_ERROR, .region = LOG_REGION_CUSTOM }; _Log(_tmp, __VA_ARGS__);         } #define LOG_WARNING_CUSTOM(...)    {
+ * Log_Module_t _tmp = { .verbose_level = LOG_VERBOSE_WARNING, .region = LOG_REGION_CUSTOM }; _Log(_tmp, __VA_ARGS__);       }
+ * #define LOG_DEBUG_CUSTOM(...)      { Log_Module_t _tmp = { .verbose_level = LOG_VERBOSE_DEBUG, .region = LOG_REGION_CUSTOM };
+ * _Log(_tmp, __VA_ARGS__);         }
  */
 
 /* USER CODE END APP_LOG_USER_DEFINES */

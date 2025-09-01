@@ -61,13 +61,15 @@ extern "C" {
 /******************************************************************************
  * HW UART
  ******************************************************************************/
-typedef enum {
+typedef enum
+{
     hw_uart1,
     hw_uart2,
     hw_lpuart1,
 } hw_uart_id_t;
 
-typedef enum {
+typedef enum
+{
     hw_uart_ok,
     hw_uart_error,
     hw_uart_busy,
@@ -92,7 +94,8 @@ void HW_UART_DMA_Interrupt_Handler(hw_uart_id_t hw_uart_id);
  * not re-initialized its context. Only the Hardware register which content has been lost is reconfigured
  * Otherwise, hw_ts_InitMode_Full should be requested (Start from Power ON) and everything is re-initialized.
  */
-typedef enum {
+typedef enum
+{
     hw_ts_InitMode_Full,
     hw_ts_InitMode_Limited,
 } HW_TS_InitMode_t;
@@ -103,7 +106,8 @@ typedef enum {
  *
  * When a Timer is created as a Repeated timer, it is automatically restarted when the timeout occurs.
  */
-typedef enum {
+typedef enum
+{
     hw_ts_SingleShot,
     hw_ts_Repeated
 } HW_TS_Mode_t;
@@ -113,7 +117,8 @@ typedef enum {
  * is returned. When hw_ts_Failed is returned, that means there are not enough free slots in the list to create a
  * Timer. In that case, CFG_HW_TS_MAX_NBR_CONCURRENT_TIMER should be increased
  */
-typedef enum {
+typedef enum
+{
     hw_ts_Successful,
     hw_ts_Failed,
 } HW_TS_ReturnStatus_t;
@@ -147,7 +152,7 @@ void HW_TS_Init(HW_TS_InitMode_t TimerInitMode, RTC_HandleTypeDef * hrtc);
  * @retval HW_TS_ReturnStatus_t: Return whether the creation is successful or not
  */
 HW_TS_ReturnStatus_t HW_TS_Create(uint32_t TimerProcessID, uint8_t * pTimerId, HW_TS_Mode_t TimerMode,
-    HW_TS_pTimerCb_t pTimerCallBack);
+                                  HW_TS_pTimerCb_t pTimerCallBack);
 
 /**
  * @brief  Stop a virtual timer

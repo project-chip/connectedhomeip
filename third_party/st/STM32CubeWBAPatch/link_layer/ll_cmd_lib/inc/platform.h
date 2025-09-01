@@ -37,24 +37,23 @@
  *
  * */
 
-
 #ifndef INCLUDE_PLATFORM_H_
 #define INCLUDE_PLATFORM_H_
 
-#include "radio.h"
 #include "common_types.h"
+#include "radio.h"
 
 /*====================================   MACROS   =======================================*/
 /*
  * The following macros are used for testing purpose only
  */
-#define RADIO_TEST 		0
-#define ACK_FRAME_TYPE  0x2
-#define MAC_ACK_WAIT	864
-#define ACK_LNGTH		5
-/******************************************************************************************//**
- *  								 Enums
- *********************************************************************************************/
+#define RADIO_TEST 0
+#define ACK_FRAME_TYPE 0x2
+#define MAC_ACK_WAIT 864
+#define ACK_LNGTH 5
+/******************************************************************************************/ /**
+                                                                                              *  								 Enums
+                                                                                              *********************************************************************************************/
 /**
  * @enum radio_state_enum_t
  * @brief the states of the Radio event it is used for coexistence
@@ -62,94 +61,95 @@
  */
 typedef enum _radio_evnt_type_enum
 {
-	TX_PCKT_STATE,      ///< Sending packet (not ACK)
-	TX_ACK_STATE,       ///< Sending ACK
-	RX_PCKT_STATE,		///< Receiving packet (not ACK)
-	RX_ACK_STATE,		///< Receiving Ack
-	RADIO_ED,			///< Energy detection
-	RADIO_SLEEP_STATE,	///< Sleep state
-	RADIO_DISABLED_STATE,///< Disable state
-#if(SUPPORT_COEXISTENCE)
-	TX_AT_STATE  ,       ///< Tx at specific time
-	RX_AT_STATE  ,      ///< Rx at specific time
-#endif /* SUPPORT_COEXISTENCE */
+    TX_PCKT_STATE,        ///< Sending packet (not ACK)
+    TX_ACK_STATE,         ///< Sending ACK
+    RX_PCKT_STATE,        ///< Receiving packet (not ACK)
+    RX_ACK_STATE,         ///< Receiving Ack
+    RADIO_ED,             ///< Energy detection
+    RADIO_SLEEP_STATE,    ///< Sleep state
+    RADIO_DISABLED_STATE, ///< Disable state
+#if (SUPPORT_COEXISTENCE)
+    TX_AT_STATE, ///< Tx at specific time
+    RX_AT_STATE, ///< Rx at specific time
+#endif           /* SUPPORT_COEXISTENCE */
 
-}radio_event_enum_t;
-/******************************************************************************************//**
- *  								 Structures
- *********************************************************************************************/
+} radio_event_enum_t;
+/******************************************************************************************/ /**
+                                                                                              *  								 Structures
+                                                                                              *********************************************************************************************/
 /**  @ingroup systm_layer
-*  @{
-*/
+ *  @{
+ */
 /**
  * @struct mac_cbk_dispatch_tbl
  *
  * @brief structure of all callback functions used to notify mac layer after specific event compeletion
  */
-struct mac_cbk_dispatch_tbl{
-	/**
-	 * @brief  callback function called after the end of Energy detection operation
-	 *
-	 * @param  aInstance:	radio instance
-	 * @param  aEnergyScanMaxRssi: the result for ED operation which is RSSI value
-	 *
-	 * @retval none
-	 *
-	 * @note  This function is called after handling SM_DONE event in ral through a sequence of calls
-	 * 		  ral_sm_done() -> ral_ed_scan_done() -> callback
-	 */
-	void (*mac_ed_scan_done)(otInstance *aInstance, int8_t aEnergyScanMaxRssi);
-	/**
-	 * @brief  callback function called after the end of transmission operation
-	 *
-	 * @param  aInstance:	radio instance
-	 * @param  aFrame: 		pointer to the transmitted frame
-	 * @param  aAckFrame: 	pointer to the received ack frame (in case of AR bit is detected in aFrame)
-	 * @param  aError: 		Error code if happens in Transmission
-	 *
-	 * @retval none
-	 * @note  This function is called after handling SM_DONE event in ral through a sequence of calls
-	 * 		  ral_sm_done() -> ral_tx_done() -> callback
-	 */
-	void (*mac_tx_done)(otInstance *aInstance, otRadioFrame *aFrame, otRadioFrame *aAckFrame, otError aError);
-	/**
-	 * @brief  callback function called after the end of Reception operation
-	 *
-	 * @param  aInstance:	radio instance
-	 * @param  aFrame: 		pointer to the received frame
-	 * @param  aError: 		Error code if happens in transmission
-	 *
-	 * @retval none
-	 * @note  This function is called after handling SM_DONE event in ral through a sequence of calls
-	 * 		  ral_sm_done() -> ral_rx_done() -> callback
-	 */
-	void (*mac_rx_done)(otInstance *aInstance, otRadioFrame *aFrame, otError aError);
-	/**
-	 * @brief  callback function called after successful start of transmission in ral
-	 *
-	 * @param  aInstance:	radio instance
-	 * @param  aFrame: 		pointer to the transmitted frame
-	 * @param  aError: 		Error code if happens in transmission
-	 *
-	 * @retval none
-	 * @note  This function is called after calling proc_radio_tx which is called with calling of otplatRadioTransmit
-	 *        in case of no error returned. These errors may be (CCA channel access failure, ral busy due to ongoing transmission ...etc )
-	 */
-	void (*mac_tx_strtd)(otInstance *aInstance, otRadioFrame *aFrame);
+struct mac_cbk_dispatch_tbl
+{
+    /**
+     * @brief  callback function called after the end of Energy detection operation
+     *
+     * @param  aInstance:	radio instance
+     * @param  aEnergyScanMaxRssi: the result for ED operation which is RSSI value
+     *
+     * @retval none
+     *
+     * @note  This function is called after handling SM_DONE event in ral through a sequence of calls
+     * 		  ral_sm_done() -> ral_ed_scan_done() -> callback
+     */
+    void (*mac_ed_scan_done)(otInstance * aInstance, int8_t aEnergyScanMaxRssi);
+    /**
+     * @brief  callback function called after the end of transmission operation
+     *
+     * @param  aInstance:	radio instance
+     * @param  aFrame: 		pointer to the transmitted frame
+     * @param  aAckFrame: 	pointer to the received ack frame (in case of AR bit is detected in aFrame)
+     * @param  aError: 		Error code if happens in Transmission
+     *
+     * @retval none
+     * @note  This function is called after handling SM_DONE event in ral through a sequence of calls
+     * 		  ral_sm_done() -> ral_tx_done() -> callback
+     */
+    void (*mac_tx_done)(otInstance * aInstance, otRadioFrame * aFrame, otRadioFrame * aAckFrame, otError aError);
+    /**
+     * @brief  callback function called after the end of Reception operation
+     *
+     * @param  aInstance:	radio instance
+     * @param  aFrame: 		pointer to the received frame
+     * @param  aError: 		Error code if happens in transmission
+     *
+     * @retval none
+     * @note  This function is called after handling SM_DONE event in ral through a sequence of calls
+     * 		  ral_sm_done() -> ral_rx_done() -> callback
+     */
+    void (*mac_rx_done)(otInstance * aInstance, otRadioFrame * aFrame, otError aError);
+    /**
+     * @brief  callback function called after successful start of transmission in ral
+     *
+     * @param  aInstance:	radio instance
+     * @param  aFrame: 		pointer to the transmitted frame
+     * @param  aError: 		Error code if happens in transmission
+     *
+     * @retval none
+     * @note  This function is called after calling proc_radio_tx which is called with calling of otplatRadioTransmit
+     *        in case of no error returned. These errors may be (CCA channel access failure, ral busy due to ongoing transmission
+     * ...etc )
+     */
+    void (*mac_tx_strtd)(otInstance * aInstance, otRadioFrame * aFrame);
 
-	void (*mac_frm_updtd)(otInstance *aInstance, otRadioFrame *aFrame);
-
+    void (*mac_frm_updtd)(otInstance * aInstance, otRadioFrame * aFrame);
 };
 /**
  * @}
  *
  */
-/******************************************************************************************//**
- *  								 APIs
- *********************************************************************************************/
+/******************************************************************************************/ /**
+                                                                                              *  								 APIs
+                                                                                              *********************************************************************************************/
 /**  @ingroup systm_layer_cmn_proc
-*  @{
-*/
+ *  @{
+ */
 /**
  * @brief  this function is used to initialize radio layer including registeration for ral callbacks,
  *         some filter configurations, some automatic configurations like auto_sleep and auto_ack...etc
@@ -172,15 +172,15 @@ void radio_call_back_funcs_init(struct mac_cbk_dispatch_tbl * ptr_cbk_dispatch_t
  *
  */
 
-void otDispatch_tbl_init(otInstance *sInstance);
+void otDispatch_tbl_init(otInstance * sInstance);
 /**
  * @}
  *
  */
 
 /**  @ingroup systm_layer_enc
-*  @{
-*/
+ *  @{
+ */
 /**
  * @brief  This function is used to encrypt frame pointed to by ptr_pckt
  *
@@ -194,19 +194,15 @@ void otDispatch_tbl_init(otInstance *sInstance);
  * @retval status of the encryption process
  *
  */
-uint32_t radio_encrypt_pckts( uint8_t *ptr_pckt,
-		 const  uint8_t  *ptr_session_key,
-		 uint8_t  *ptr_ccm_nonce,
-		 uint32_t  mic_len,
-		 uint32_t  ad_len,
-		 uint32_t  md_len);
+uint32_t radio_encrypt_pckts(uint8_t * ptr_pckt, const uint8_t * ptr_session_key, uint8_t * ptr_ccm_nonce, uint32_t mic_len,
+                             uint32_t ad_len, uint32_t md_len);
 /**
  * @}
  *
  */
 /**  @ingroup systm_layer_cmn_config
-*  @{
-*/
+ *  @{
+ */
 /**
  * @brief  This function is used to configure automatic ack response by ral layer
  *         including AIFS, ack frame timeout.. etc
@@ -222,13 +218,13 @@ otError radio_set_auto_Ack_state(uint8_t auto_ack_state);
  *
  */
 /**  @ingroup systm_layer_cmn_proc
-*  @{
-*/
+ *  @{
+ */
 /**
  * @fn	uint32_t  radio_reset()
  * @brief This API is used to reset radio layer operation which in turns stop all running operations
  */
-uint32_t  radio_reset(void);
+uint32_t radio_reset(void);
 /**
  * @}
  *
@@ -239,22 +235,22 @@ uint32_t  radio_reset(void);
  * @param  aChannel:				channel to receive on
  * @param  duration:				reception duration in microsecond , 0 means receive forever
  */
-otError proc_radio_rcv(uint8_t aChannel ,uint32_t duration);
+otError proc_radio_rcv(uint8_t aChannel, uint32_t duration);
 /**
  * @fn	otError proc_radio_tx(otRadioFrame *aFrame, ble_time_t* strt_time)
  * @brief This API is used to control ral setup for transmission based on CCA procedure.
  * @param  aFrame:				pointer to the Tx frame
  * @param  strt_time:			pointer to Tx request time
  */
-otError proc_radio_tx(otRadioFrame *aFrame , ble_time_t* strt_time);
+otError proc_radio_tx(otRadioFrame * aFrame, ble_time_t * strt_time);
 /**
  * @fn	otError proc_radio_ed(otInstance *aInstance, uint8_t aScanChannel, uint16_t aScanDuration)
  * @brief This API is used to control ral setup for energy scan.
  */
 otError proc_radio_ed(uint8_t aScanChannel, uint16_t aScanDuration);
 /**  @ingroup systm_layer_cmn_config
-*  @{
-*/
+ *  @{
+ */
 /**
  * @fn	void setPANcoordinator (uint8_t aEnable)
  * @brief This API is used to set Pan coordinator role in HW to be used while applying MAC 802.15.4 filter policies.
@@ -269,20 +265,20 @@ void setContRecp(uint8_t aEnable);
  * @fn	void enableScanFilters(otInstance *aInstance)
  * @brief This API is used to disable filter policy while performing scan.
  */
-void enableScanFilters(otInstance *aInstance);
+void enableScanFilters(otInstance * aInstance);
 /**
  * @fn	void disableScanFilters(otInstance *aInstance)
  * @brief This API is used to restore filter policy after the scan is complete.
  */
-void disableScanFilters(otInstance *aInstance);
+void disableScanFilters(otInstance * aInstance);
 
 /**
  * @}
  *
  */
 /**  @ingroup systm_layer_cmn_proc
-*  @{
-*/
+ *  @{
+ */
 /**
  * @brief  get the latest  LQI value
  * @retval uint8_t. LQI value
@@ -294,8 +290,8 @@ uint8_t radio_GetLQIValue(void);
  */
 #if RADIO_CSMA
 /**  @ingroup systm_layer_cmn_config
-*  @{
-*/
+ *  @{
+ */
 /**
  * @fn	void set_min_csma_be(uint8_t value)
  * @brief This API is used to set min csma backoff exponent
@@ -342,8 +338,8 @@ void set_max_frm_retries(uint8_t value);
  *
  */
 /**  @ingroup systm_layer_cmn_proc
-*  @{
-*/
+ *  @{
+ */
 /**
  * @fn	uint32_t mac_gen_rnd_num(uint8_t *ptr_rnd, uint8_t len, uint8_t check_cont_rx)
  * @brief This API is used to generate random number
@@ -352,14 +348,14 @@ void set_max_frm_retries(uint8_t value);
  * @param  len	 			: Number of required random bytes.
  * @param  check_cont_rx 	: this flag is set to check continuous reception .
  */
-uint32_t mac_gen_rnd_num(uint8_t *ptr_rnd, uint16_t len, uint8_t check_cont_rx);
+uint32_t mac_gen_rnd_num(uint8_t * ptr_rnd, uint16_t len, uint8_t check_cont_rx);
 /**
  * @}
  *
  */
 /**  @ingroup systm_layer_enc
-*  @{
-*/
+ *  @{
+ */
 /**
  * @brief  This function is used to decrypt frame pointed to by ptr_pckt
  *
@@ -373,12 +369,8 @@ uint32_t mac_gen_rnd_num(uint8_t *ptr_rnd, uint16_t len, uint8_t check_cont_rx);
  * @retval status of the decryption process
  *
  */
-uint32_t radio_decrypt_pckts( uint8_t *ptr_pckt,
-		 uint8_t  *ptr_session_key,
-		 uint8_t  *ptr_ccm_nonce,
-		 uint32_t  mic_len,
-		 uint32_t  ad_len,
-		 uint32_t  md_len);
+uint32_t radio_decrypt_pckts(uint8_t * ptr_pckt, uint8_t * ptr_session_key, uint8_t * ptr_ccm_nonce, uint32_t mic_len,
+                             uint32_t ad_len, uint32_t md_len);
 /**
  * @}
  *
@@ -389,7 +381,7 @@ uint32_t radio_decrypt_pckts( uint8_t *ptr_pckt,
  * @param  aFrame:				pointer to the received frame
  * @param  aError:			reception error
  */
-void radio_mac_rx_done(otRadioFrame *aFrame, otError aError);
+void radio_mac_rx_done(otRadioFrame * aFrame, otError aError);
 
 #if (SUPPORT_ENH_ACK_LINK_METRICS_PROBING_OT_1_2)
 /**
@@ -401,33 +393,31 @@ void radio_mac_rx_done(otRadioFrame *aFrame, otError aError);
  */
 void radio_link_metrics_set_noise_floor(int8_t noise_floor);
 #endif
-#if(SUPPORT_OPENTHREAD_1_2 && CONFIG_MAC_CSL_TRANSMITTER_ENABLE)
+#if (SUPPORT_OPENTHREAD_1_2 && CONFIG_MAC_CSL_TRANSMITTER_ENABLE)
 /**
  * @fn	void radio_mac_tx_done_error( otRadioFrame *aFrame, otError aError)
  * @brief This API is used to call mac Radio tx done
  * @param  tx_frame:				pointer to the Tx frame
  * @param  aError:			Tx error
  */
-void radio_mac_tx_done_error(otRadioFrame * tx_frame,otError aError);
+void radio_mac_tx_done_error(otRadioFrame * tx_frame, otError aError);
 #endif /*(SUPPORT_OPENTHREAD_1_2 && CONFIG_MAC_CSL_TRANSMITTER_ENABLE)*/
 #if !SUPPORT_COEXISTENCE
 /*##### Random Number Generation Group #####*/
 /** @ingroup rnd_gen_functions
  *  @{
  */
- /**
-  * @brief  Request new random number.
-  *
-  * @param  ptr_rnd	: Pointer to the output random bytes .
-  * @param  len	 	: Number of required random bytes.
-  *
-  * @retval Status.
-  */
- uint32_t platform_gen_rnd_num(
- 	uint8_t *ptr_rnd,
- 	uint32_t len);
+/**
+ * @brief  Request new random number.
+ *
+ * @param  ptr_rnd	: Pointer to the output random bytes .
+ * @param  len	 	: Number of required random bytes.
+ *
+ * @retval Status.
+ */
+uint32_t platform_gen_rnd_num(uint8_t * ptr_rnd, uint32_t len);
 /**  @}
-*/
+ */
 /**
  *
  * @brief A common wrapper for BLE-ECB and MAC-CCM security modes
@@ -447,10 +437,9 @@ void radio_mac_tx_done_error(otRadioFrame * tx_frame,otError aError);
  * @param	security_mode[in]: Hardware security mode.
  * @retval Status
  */
-uint32_t platform_crypto(uint8_t *ptr_pckt, const uint8_t *ptr_key,
-		uint8_t *ptr_nonce, uint32_t mic_len, uint32_t ad_len, uint32_t md_len,
-		crypto_endian_enum_t key_endian, crypto_endian_enum_t data_endian,
-		security_mode_enum_t security_mode);
+uint32_t platform_crypto(uint8_t * ptr_pckt, const uint8_t * ptr_key, uint8_t * ptr_nonce, uint32_t mic_len, uint32_t ad_len,
+                         uint32_t md_len, crypto_endian_enum_t key_endian, crypto_endian_enum_t data_endian,
+                         security_mode_enum_t security_mode);
 
 /**
  *
@@ -494,7 +483,7 @@ otError platform_zigbee_set_phy_cont_modul_mode(uint8_t type, uint8_t enable_mod
  * @param	ptr_ant_div_params[in]	: pointer to antenna diversity params structure
  * @retval Status
  */
-otError radio_set_ant_div_params(otInstance *aInstance, antenna_diversity_st* ptr_ant_div_params);
+otError radio_set_ant_div_params(otInstance * aInstance, antenna_diversity_st * ptr_ant_div_params);
 
 /**
  *
@@ -504,7 +493,7 @@ otError radio_set_ant_div_params(otInstance *aInstance, antenna_diversity_st* pt
  * @param	ptr_ant_div_params[out]	: pointer to antenna diversity params structure
  * @retval None
  */
-void radio_get_ant_div_params(otInstance *aInstance, antenna_diversity_st* ptr_ant_div_params);
+void radio_get_ant_div_params(otInstance * aInstance, antenna_diversity_st * ptr_ant_div_params);
 
 /**
  *
@@ -514,7 +503,7 @@ void radio_get_ant_div_params(otInstance *aInstance, antenna_diversity_st* ptr_a
  * @param	enable[in]	    : enable:1 / disable:0
  * @retval Status
  */
-otError radio_set_ant_div_enable(otInstance *aInstance, uint8_t enable);
+otError radio_set_ant_div_enable(otInstance * aInstance, uint8_t enable);
 
 /**
  *
@@ -524,7 +513,7 @@ otError radio_set_ant_div_enable(otInstance *aInstance, uint8_t enable);
  * @param	default_ant_id[in]	: default antenna id
  * @retval Status
  */
-otError radio_set_default_ant_id(otInstance *aInstance, uint8_t default_ant_id);
+otError radio_set_default_ant_id(otInstance * aInstance, uint8_t default_ant_id);
 
 /**
  *
@@ -534,7 +523,7 @@ otError radio_set_default_ant_id(otInstance *aInstance, uint8_t default_ant_id);
  * @param	rssi_threshold[in]	: rssi threshold to compare with during antenna diversity measurements
  * @retval Status
  */
-otError radio_set_ant_div_rssi_threshold(otInstance *aInstance, int8_t rssi_threshold);
+otError radio_set_ant_div_rssi_threshold(otInstance * aInstance, int8_t rssi_threshold);
 #endif /* SUPPORT_ANT_DIV */
 
 #if SUPPORT_CONFIGURABLE_GAIN_FIX
@@ -550,10 +539,8 @@ otError radio_set_ant_div_rssi_threshold(otInstance *aInstance, int8_t rssi_thre
  *
  * @retval NONE
  */
-void radio_gain_fix_init(
-		uint8_t region_0x1f_val, uint8_t region_0x0f_val,
-		uint8_t region_0x0b_val, uint8_t region_0x09_val,
-		uint8_t r_msur_percent);
+void radio_gain_fix_init(uint8_t region_0x1f_val, uint8_t region_0x0f_val, uint8_t region_0x0b_val, uint8_t region_0x09_val,
+                         uint8_t r_msur_percent);
 
 #endif /* SUPPORT_CONFIGURABLE_GAIN_FIX */
 

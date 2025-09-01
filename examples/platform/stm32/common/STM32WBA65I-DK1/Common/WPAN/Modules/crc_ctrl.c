@@ -33,7 +33,7 @@
  * @brief Initial value define for configuration tracking number
  *
  */
-#define CRCCTRL_NO_CONFIG (uint32_t) (0x00000000u)
+#define CRCCTRL_NO_CONFIG (uint32_t)(0x00000000u)
 
 /* Private typedef -----------------------------------------------------------*/
 /* Private macros ------------------------------------------------------------*/

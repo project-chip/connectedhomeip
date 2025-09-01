@@ -45,8 +45,8 @@ extern "C" {
 #define CFG_ADV_BD_ADDRESS (0x7257acd87a6c)
 #define CFG_FAST_CONN_ADV_INTERVAL_MIN (0x80) /**< 80ms */
 #define CFG_FAST_CONN_ADV_INTERVAL_MAX (0xa0) /**< 100ms */
-#define CFG_LP_CONN_ADV_INTERVAL_MIN (0x640) /**< 1s */
-#define CFG_LP_CONN_ADV_INTERVAL_MAX (0xfa0) /**< 2.5s */
+#define CFG_LP_CONN_ADV_INTERVAL_MIN (0x640)  /**< 1s */
+#define CFG_LP_CONN_ADV_INTERVAL_MAX (0xfa0)  /**< 2.5s */
 
 /**
  * Define IO Authentication
@@ -90,17 +90,17 @@ extern "C" {
 /**
  *   Identity root key used to derive LTK and CSRK
  */
-#define CFG_BLE_IR                                                                                     \
-    {                                                                                                  \
-        0x12, 0x34, 0x56, 0x78, 0x9a, 0xbc, 0xde, 0xf0, 0x12, 0x34, 0x56, 0x78, 0x9a, 0xbc, 0xde, 0xf0 \
+#define CFG_BLE_IR                                                                                                                 \
+    {                                                                                                                              \
+        0x12, 0x34, 0x56, 0x78, 0x9a, 0xbc, 0xde, 0xf0, 0x12, 0x34, 0x56, 0x78, 0x9a, 0xbc, 0xde, 0xf0                             \
     }
 
 /**
  * Encryption root key used to derive LTK and CSRK
  */
-#define CFG_BLE_ER                                                                                     \
-    {                                                                                                  \
-        0xfe, 0xdc, 0xba, 0x09, 0x87, 0x65, 0x43, 0x21, 0xfe, 0xdc, 0xba, 0x09, 0x87, 0x65, 0x43, 0x21 \
+#define CFG_BLE_ER                                                                                                                 \
+    {                                                                                                                              \
+        0xfe, 0xdc, 0xba, 0x09, 0x87, 0x65, 0x43, 0x21, 0xfe, 0xdc, 0xba, 0x09, 0x87, 0x65, 0x43, 0x21                             \
     }
 
 /* USER CODE BEGIN Generic_Parameters */
@@ -415,7 +415,8 @@ extern "C" {
 #define CFG_TS_TICK_VAL DIVR((CFG_RTCCLK_DIV * 1000000), LSE_VALUE)
 #define CFG_TS_TICK_VAL_PS DIVR(((uint64_t) CFG_RTCCLK_DIV * 1e12), (uint64_t) LSE_VALUE)
 
-typedef enum {
+typedef enum
+{
     CFG_TIM_PROC_ID_ISR,
 } CFG_TimProcID_t;
 
@@ -549,7 +550,8 @@ typedef enum {
  * Supported requester to the MCU Low Power Manager - can be increased up  to 32
  * It lists a bit mapping of all user of the Low Power Manager
  */
-typedef enum {
+typedef enum
+{
     CFG_LPM_APP,
     CFG_LPM_APP_BLE,
     CFG_LPM_APP_THREAD
@@ -677,7 +679,8 @@ typedef enum {
  ******************************************************************************/
 #define CONFIG_STM32_FACTORY_DATA_ENABLE 0
 
-typedef enum {
+typedef enum
+{
     BUTTON_1 = 0x1,
 } button_type_t;
 

@@ -160,7 +160,7 @@ typedef enum otLogRegion
  * @param[in]  ...         Arguments for the format specification.
  *
  */
-void otPlatLog(otLogLevel aLogLevel, otLogRegion aLogRegion, const char *aFormat, ...);
+void otPlatLog(otLogLevel aLogLevel, otLogRegion aLogRegion, const char * aFormat, ...);
 
 /**
  * Handles OpenThread log level changes.

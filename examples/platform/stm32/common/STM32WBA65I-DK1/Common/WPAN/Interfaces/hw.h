@@ -31,8 +31,9 @@
 #endif
 
 /* Return values definition */
-enum {
-    HW_OK = 0,
+enum
+{
+    HW_OK   = 0,
     HW_BUSY = 1
 };
 
@@ -74,10 +75,11 @@ void HW_Config_HSE(uint8_t hsetune);
  */
 
 /* Mode definitions used for HW_AES_SetKey() function */
-enum {
-    HW_AES_DEC = 0,
-    HW_AES_ENC = 1,
-    HW_AES_REV = 2,
+enum
+{
+    HW_AES_DEC  = 0,
+    HW_AES_ENC  = 1,
+    HW_AES_REV  = 2,
     HW_AES_SWAP = 4
 };
 
@@ -99,8 +101,7 @@ extern int HW_AES_Enable(void);
  * HW_AES_DEC for decryption. It can be or-ed with HW_AES_REV for a reveresd
  * oreder of key bytes, and with HW_AES_SWAP to use data byte swapping mode.
  */
-extern void HW_AES_SetKey(uint32_t mode,
-    const uint8_t * key);
+extern void HW_AES_SetKey(uint32_t mode, const uint8_t * key);
 
 /*
  * HW_AES_Crypt
@@ -108,8 +109,7 @@ extern void HW_AES_SetKey(uint32_t mode,
  * Encrypts/decrypts the 16-byte input data ("input"). Result is written in the
  * 16-byte buffer ("output") allocated by the user.
  */
-extern void HW_AES_Crypt(const uint32_t * input,
-    uint32_t * output);
+extern void HW_AES_Crypt(const uint32_t * input, uint32_t * output);
 
 /*
  * HW_AES_Crypt
@@ -135,10 +135,7 @@ extern void HW_AES_Disable(void);
  * Note: B0 and B1 4-word blocks must be provided by user.
  *
  */
-extern void HW_AES_InitCcm(uint8_t decrypt,
-    const uint8_t * key,
-    const uint32_t * b0,
-    const uint32_t * b1);
+extern void HW_AES_InitCcm(uint8_t decrypt, const uint8_t * key, const uint32_t * b0, const uint32_t * b1);
 
 /*
  * HW_AES_EndCcm
@@ -146,8 +143,7 @@ extern void HW_AES_InitCcm(uint8_t decrypt,
  * Completes CCM processing by computing the authentication tag
  *
  */
-extern void HW_AES_EndCcm(uint8_t tag_length,
-    uint8_t * tag);
+extern void HW_AES_EndCcm(uint8_t tag_length, uint8_t * tag);
 
 /*
  * HW_AES_SetLast
@@ -185,8 +181,7 @@ extern int HW_PKA_Enable(void);
  * This function must not be directly called when using P-256 elliptic curve
  * dedicated functions.
  */
-extern void HW_PKA_WriteSingleInput(uint32_t index,
-    uint32_t word);
+extern void HW_PKA_WriteSingleInput(uint32_t index, uint32_t word);
 
 /*
  * HW_PKA_WriteOperand
@@ -195,9 +190,7 @@ extern void HW_PKA_WriteSingleInput(uint32_t index,
  * This function must not be directly called when using P-256 elliptic curve
  * dedicated functions.
  */
-extern void HW_PKA_WriteOperand(uint32_t index,
-    int size,
-    const uint32_t * in);
+extern void HW_PKA_WriteOperand(uint32_t index, int size, const uint32_t * in);
 
 /*
  * HW_PKA_Start
@@ -235,9 +228,7 @@ extern uint32_t HW_PKA_ReadSingleOutput(uint32_t index);
  * This function must not be directly called when using P-256 elliptic curve
  * dedicated functions.
  */
-extern void HW_PKA_ReadResult(uint32_t index,
-    int size,
-    uint32_t * out);
+extern void HW_PKA_ReadResult(uint32_t index, int size, uint32_t * out);
 
 /*
  * HW_PKA_Disable
@@ -302,8 +293,7 @@ extern uint32_t HW_PKA_P256_IsRangeCheckOk(void);
  *
  * The check result is retrieved by calling HW_PKA_P256_IsPointCheckOk().
  */
-extern void HW_PKA_P256_StartPointCheck(const uint32_t * x,
-    const uint32_t * y);
+extern void HW_PKA_P256_StartPointCheck(const uint32_t * x, const uint32_t * y);
 
 /*
  * HW_PKA_P256_IsPointCheckOk
@@ -329,9 +319,7 @@ extern uint32_t HW_PKA_P256_IsPointCheckOk(void);
  * p_x and p_y, and the scalar k. Each parameter must be a vector of 8 x 32-bit
  * words (32 bytes).
  */
-extern void HW_PKA_P256_StartEccScalarMul(const uint32_t * k,
-    const uint32_t * p_x,
-    const uint32_t * p_y);
+extern void HW_PKA_P256_StartEccScalarMul(const uint32_t * k, const uint32_t * p_x, const uint32_t * p_y);
 
 /*
  * HW_PKA_P256_ReadEccScalarMul
@@ -344,8 +332,7 @@ extern void HW_PKA_P256_StartEccScalarMul(const uint32_t * k,
  * p_x and p_y, 8 x 32-bit words each (2 times 32 bytes).
  * Before returning, it disables the PKA block, releasing the PKA semaphore.
  */
-extern void HW_PKA_P256_ReadEccScalarMul(uint32_t * p_x,
-    uint32_t * p_y);
+extern void HW_PKA_P256_ReadEccScalarMul(uint32_t * p_x, uint32_t * p_y);
 
 /* ---------------------------------------------------------------------------
  *                                 RNG
@@ -362,7 +349,8 @@ extern void HW_PKA_P256_ReadEccScalarMul(uint32_t * p_x,
  */
 
 /* Error codes definition for HW_RNG return values */
-enum {
+enum
+{
     HW_RNG_CLOCK_ERROR = CFG_HW_ERROR_OFFSET + 0x101,
     HW_RNG_NOISE_ERROR = CFG_HW_ERROR_OFFSET + 0x102,
     HW_RNG_UFLOW_ERROR = CFG_HW_ERROR_OFFSET + 0x103,
@@ -403,8 +391,7 @@ extern void HW_RNG_Start(void);
  * The random numbers are written in memory from "val" pointer.
  * "val" must point to a sufficient memory buffer allocated by the caller.
  */
-extern void HW_RNG_Get(uint8_t n,
-    uint32_t * val);
+extern void HW_RNG_Get(uint8_t n, uint32_t * val);
 
 /*
  * HW_RNG_Process
@@ -444,11 +431,12 @@ extern void HWCB_RNG_Process(void);
  */
 
 /* Index definitions used for all GPIO functions */
-enum {
-    HW_GPIO_DBG = 0,
+enum
+{
+    HW_GPIO_DBG       = 0,
     HW_GPIO_GREEN_LED = 13,
-    HW_GPIO_RED_LED = 14,
-    HW_GPIO_BLUE_LED = 15,
+    HW_GPIO_RED_LED   = 14,
+    HW_GPIO_BLUE_LED  = 15,
 };
 
 /*
@@ -482,8 +470,7 @@ extern void HW_GPIO_Set(uint8_t index);
  */
 extern void HW_GPIO_Reset(uint8_t index);
 
-extern void GPIO_SetDebug(int gpio_pin,
-    int pin_value);
+extern void GPIO_SetDebug(int gpio_pin, int pin_value);
 
 /* ---------------------------------------------------------------------------
  *                             OTP
@@ -493,9 +480,9 @@ extern void GPIO_SetDebug(int gpio_pin,
 typedef __PACKED_STRUCT
 {
     uint8_t additional_data[8]; /*!< 64 bits of data to fill OTP slot */
-    uint8_t bd_address[6]; /*!< Bluetooth Device Address*/
-    uint8_t hsetune; /*!< Load capacitance to be applied on HSE pad */
-    uint8_t index; /*!< Structure index */
+    uint8_t bd_address[6];      /*!< Bluetooth Device Address*/
+    uint8_t hsetune;            /*!< Load capacitance to be applied on HSE pad */
+    uint8_t index;              /*!< Structure index */
 }
 HW_OTP_data_t;
 
@@ -505,8 +492,7 @@ HW_OTP_data_t;
  * Read the OTP
  *
  */
-int HW_OTP_Read(uint8_t index,
-    HW_OTP_data_t ** data);
+int HW_OTP_Read(uint8_t index, HW_OTP_data_t ** data);
 
 /*
  * HW_OTP_Write
@@ -514,9 +500,6 @@ int HW_OTP_Read(uint8_t index,
  * ReadWrite the OTP
  *
  */
-int HW_OTP_Write(uint8_t * additional_data,
-    uint8_t * bd_address,
-    uint8_t hsetune,
-    uint8_t index);
+int HW_OTP_Write(uint8_t * additional_data, uint8_t * bd_address, uint8_t hsetune, uint8_t index);
 
 #endif /* HW_H__ */

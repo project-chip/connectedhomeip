@@ -37,7 +37,8 @@
 
 /** @defgroup  hci_intf HCI Layer
  *  @ingroup BLE_STACK_API
- *  @brief Provide APIs to interface with HCI layer, like HCI layer initialization, allocation and free of HCI buffer header, process the received HCI command packet ...etc, HCI APIS are defined in hci.h header file.
+ *  @brief Provide APIs to interface with HCI layer, like HCI layer initialization, allocation and free of HCI buffer header,
+ * process the received HCI command packet ...etc, HCI APIS are defined in hci.h header file.
  *  @{
  */
 /* Define to prevnt recursive inclusion */
@@ -46,9 +47,9 @@
 
 /* Includes ---------------------------------------------------------------------*/
 
-#include <stdint.h>
 #include "bsp.h"
 #include "ll_intf.h"
+#include <stdint.h>
 
 /* Exported  Enumerations -----------------------------------------------------*/
 
@@ -56,20 +57,21 @@
  * @brief Enumeration holding the types of the returned commands in response
  * 		  to a received HCI command.
  */
-typedef enum {
-	HCI_RETURN_COMMAND_TYPE_COMPLETE,
-	HCI_RETURN_COMMAND_TYPE_STATUS,
+typedef enum
+{
+    HCI_RETURN_COMMAND_TYPE_COMPLETE,
+    HCI_RETURN_COMMAND_TYPE_STATUS,
 } hci_return_command_type;
 
 /* Exported  Defines -----------------------------------------------------------*/
 
-typedef uint8_t (*hci_trnsprt_cbk)(
-	ble_buff_hdr_t *ptr_evnt_hdr);
+typedef uint8_t (*hci_trnsprt_cbk)(ble_buff_hdr_t * ptr_evnt_hdr);
 
 /** @ingroup  ext_hci_cmds External HCI Commands
  * @{
  */
-typedef ble_stat_t (*ble_ext_custm_cb_t) (uint16_t ocf, uint8_t *pckt_p, uint8_t *evnt_pckt_p, uint8_t* params_length, hci_return_command_type* return_command_type);
+typedef ble_stat_t (*ble_ext_custm_cb_t)(uint16_t ocf, uint8_t * pckt_p, uint8_t * evnt_pckt_p, uint8_t * params_length,
+                                         hci_return_command_type * return_command_type);
 /**@}
  */
 
@@ -82,16 +84,14 @@ typedef ble_stat_t (*ble_ext_custm_cb_t) (uint16_t ocf, uint8_t *pckt_p, uint8_t
  *
  * @retval always returns SUCCESS
  */
-ble_stat_t ll_hci_init(
-	hci_trnsprt_cbk p_trnsprt_cbk);
+ble_stat_t ll_hci_init(hci_trnsprt_cbk p_trnsprt_cbk);
 
 /**
  * @brief  get a pointer to the HCI dispatch table.
  *
  * @param  p_p_dispatch_tbl : [out] pointer to be filled by the address of the HCI dispatch table.
  */
-void hci_get_dis_tbl(
-	const struct hci_dispatch_tbl** p_p_dispatch_tbl);
+void hci_get_dis_tbl(const struct hci_dispatch_tbl ** p_p_dispatch_tbl);
 
 #if !SUPPORT_HCI_EVENT_ONLY || SUPPORT_HCI_EVENT_ONLY_TESTING
 #if (SUPPORT_MASTER_CONNECTION || SUPPORT_SLAVE_CONNECTION)
@@ -102,8 +102,7 @@ void hci_get_dis_tbl(
  *
  * @retval ble_stat_t  : Command status to be sent to the Host.
  */
-ble_stat_t hci_rcvd_acl_data_pckt_hndlr(
-		ble_buff_hdr_t *ptr_buff_hdr);
+ble_stat_t hci_rcvd_acl_data_pckt_hndlr(ble_buff_hdr_t * ptr_buff_hdr);
 #endif /* (SUPPORT_MASTER_CONNECTION || SUPPORT_SLAVE_CONNECTION) */
 
 #if ((SUPPORT_CONNECTED_ISOCHRONOUS && (SUPPORT_MASTER_CONNECTION || SUPPORT_SLAVE_CONNECTION)) || (SUPPORT_BRD_ISOCHRONOUS))
@@ -114,9 +113,9 @@ ble_stat_t hci_rcvd_acl_data_pckt_hndlr(
  *
  * @retval ble_stat_t  : Command status to be sent to the Host.
  */
-ble_stat_t hci_rcvd_iso_data_pckt_hndlr(
-		ble_buff_hdr_t *ptr_buff_hdr);
-#endif /* ((SUPPORT_CONNECTED_ISOCHRONOUS && (SUPPORT_MASTER_CONNECTION || SUPPORT_SLAVE_CONNECTION)) || SUPPORT_BRD_ISOCHRONOUS) */
+ble_stat_t hci_rcvd_iso_data_pckt_hndlr(ble_buff_hdr_t * ptr_buff_hdr);
+#endif /* ((SUPPORT_CONNECTED_ISOCHRONOUS && (SUPPORT_MASTER_CONNECTION || SUPPORT_SLAVE_CONNECTION)) || SUPPORT_BRD_ISOCHRONOUS)  \
+        */
 
 /**
  * @brief  Process the received HCI command packet from the host.
@@ -125,9 +124,7 @@ ble_stat_t hci_rcvd_iso_data_pckt_hndlr(
  * @param  rcvd_pckt_len   		: [in] Length of the HCI command packet.
  * @retval ble_stat_t : Command status to be sent to the Host.
  */
-ble_stat_t hci_rcvd_cmd_pckt_hndlr(
-	uint8_t *ptr_rcvd_pckt_strt,
-	uint16_t rcvd_pckt_len);
+ble_stat_t hci_rcvd_cmd_pckt_hndlr(uint8_t * ptr_rcvd_pckt_strt, uint16_t rcvd_pckt_len);
 
 #endif /* !SUPPORT_HCI_EVENT_ONLY || SUPPORT_HCI_EVENT_ONLY_TESTING */
 
@@ -136,15 +133,14 @@ ble_stat_t hci_rcvd_cmd_pckt_hndlr(
  *
  * @retval ble_buff_hdr_t* : pointer to the buffer header allocated.
  */
-ble_buff_hdr_t* hci_alloc_msg(void);
+ble_buff_hdr_t * hci_alloc_msg(void);
 
 /**
  * @brief  free an allocated message structure
  *
  * @param  ptr_hci_msg  : [in] Pointer to the message to be freed.
  */
-void hci_free_msg(
-		ble_buff_hdr_t *ptr_hci_msg);
+void hci_free_msg(ble_buff_hdr_t * ptr_hci_msg);
 /**
  * @}
  */
@@ -165,7 +161,6 @@ uint8_t hci_rgstr_ble_external_custom_cbk(ble_ext_custm_cb_t ext_custm_cbk);
 /**@}
  */
 
-
 #if SUPPORT_HCI_EVENT_ONLY
 
 /**
@@ -182,7 +177,7 @@ void hci_init_events_queues(void);
  *
  * @retval ble_stat_t  None
  */
-uint8_t hci_queue_send_pckt(ble_buff_hdr_t *ptr_evnt_hdr);
+uint8_t hci_queue_send_pckt(ble_buff_hdr_t * ptr_evnt_hdr);
 
 /*
  * @brief register callback to be called sending data to host
@@ -205,14 +200,12 @@ void hci_rgstr_hst_cbk_ll_queue_full(hst_cbk_queue_full cbk);
  * */
 void hci_ll_set_le_event_mask(uint8_t event_mask[8]);
 
-
 /*
  * @brief sets the event mask in hci event only configuration
  * @param event_mask : [In] an array of 8 bytes representing new event mask
  * @retval: 		   None
  * */
 void hci_ll_set_event_mask(uint8_t event_mask[8]);
-
 
 /*
  * @brief sets the page 2 event mask in hci event only configuration

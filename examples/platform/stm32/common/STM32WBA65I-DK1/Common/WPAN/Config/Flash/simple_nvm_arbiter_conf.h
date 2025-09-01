@@ -78,7 +78,8 @@ extern "C" {
 
 /* Compute the number of sectors required */
 
-#define SNVMA_NUMBER_OF_SECTOR_NEEDED ((SNVMA_NVM_ID_1_BANK_NUMBER * SNVMA_NVM_ID_1_BANK_SIZE) + (SNVMA_NVM_ID_2_BANK_NUMBER * SNVMA_NVM_ID_2_BANK_SIZE))
+#define SNVMA_NUMBER_OF_SECTOR_NEEDED                                                                                              \
+    ((SNVMA_NVM_ID_1_BANK_NUMBER * SNVMA_NVM_ID_1_BANK_SIZE) + (SNVMA_NVM_ID_2_BANK_NUMBER * SNVMA_NVM_ID_2_BANK_SIZE))
 
 #define SNVMA_NUMBER_OF_BANKS ((SNVMA_NVM_ID_1_BANK_NUMBER) + (SNVMA_NVM_ID_2_BANK_NUMBER))
 
@@ -103,7 +104,8 @@ extern "C" {
  * @details Enumeration member can be renamed to fit user needs - ie: SNVMA_BufferId_4 => SNVMA_BleNvmId
  *
  */
-typedef enum SNVMA_BufferId {
+typedef enum SNVMA_BufferId
+{
     APP_BLE_NvmBuffer,
     APP_Matter_NvmBuffer = 4,
     SNVMA_BufferId_Max /* End of the enumeration */

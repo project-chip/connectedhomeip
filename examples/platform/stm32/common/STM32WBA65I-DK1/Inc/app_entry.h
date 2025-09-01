@@ -41,7 +41,8 @@ extern "C" {
 
 /* To keep the code reusable btw project we will map joystick on Button */
 #if (CFG_JOYSTICK_SUPPORTED == 1)
-typedef enum {
+typedef enum
+{
     B1 = 0,
     B2 = 1,
     B3 = 2

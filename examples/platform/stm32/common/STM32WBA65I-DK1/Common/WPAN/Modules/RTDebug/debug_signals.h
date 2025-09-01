@@ -29,7 +29,8 @@ typedef Debug_GPIO_t linklayer_debug_signal_t;
 /**********************************************/
 /** Specific System debug signals definition **/
 /**********************************************/
-typedef enum {
+typedef enum
+{
     ADC_ACTIVATION,
     ADC_DEACTIVATION,
     ADC_TEMPERATURE_ACQUISITION,
@@ -56,7 +57,8 @@ typedef enum {
 /** Global debug signals definition **/
 /*************************************/
 
-typedef enum {
+typedef enum
+{
     RT_DEBUG_SIGNAL_UNUSED = 0x0,
 
 /********************/

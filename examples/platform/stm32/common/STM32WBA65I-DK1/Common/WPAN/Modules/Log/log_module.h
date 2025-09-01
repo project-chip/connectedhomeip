@@ -178,7 +178,8 @@ void Log_Module_Set_Color(Log_Region_t Region, Log_Color_t Color);
  *
  * @param  TimeStampFunction    Callback function to insert TimeStamp.
  *                              This function is typedef void (char * data, uint16_t size_max, uint16_t * timestamp_size);
- *                              Where data is the location where to insert the new TimeStamp, and timestamp_size is the size of this insertion.
+ *                              Where data is the location where to insert the new TimeStamp, and timestamp_size is the size of this
+ * insertion.
  * @return None.
  */
 void Log_Module_RegisterTimeStampFunction(CallBack_TimeStamp * TimeStampFunction);

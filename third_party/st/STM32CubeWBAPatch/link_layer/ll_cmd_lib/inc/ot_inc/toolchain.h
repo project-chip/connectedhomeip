@@ -141,8 +141,7 @@ extern "C" {
 #define OT_TOOL_PACKED_END __attribute__((packed))
 #define OT_TOOL_WEAK __attribute__((weak))
 
-#define OT_TOOL_PRINTF_STYLE_FORMAT_ARG_CHECK(aFmtIndex, aStartIndex) \
-    __attribute__((format(printf, aFmtIndex, aStartIndex)))
+#define OT_TOOL_PRINTF_STYLE_FORMAT_ARG_CHECK(aFmtIndex, aStartIndex) __attribute__((format(printf, aFmtIndex, aStartIndex)))
 
 #elif defined(__ICCARM__) || defined(__ICC8051__)
 
@@ -203,28 +202,27 @@ extern "C" {
 
 #include <stddef.h>
 
-#define OT_UNUSED_VARIABLE(VARIABLE) \
-    do                               \
-    {                                \
-        if (&VARIABLE == NULL)       \
-        {                            \
-        }                            \
+#define OT_UNUSED_VARIABLE(VARIABLE)                                                                                               \
+    do                                                                                                                             \
+    {                                                                                                                              \
+        if (&VARIABLE == NULL)                                                                                                     \
+        {                                                                                                                          \
+        }                                                                                                                          \
     } while (false)
 
-#define OT_UNREACHABLE_CODE(CODE)                                                                    \
-    _Pragma("diag_suppress=Pe111") _Pragma("diag_suppress=Pe128") CODE _Pragma("diag_default=Pe111") \
-        _Pragma("diag_default=Pe128")
+#define OT_UNREACHABLE_CODE(CODE)                                                                                                  \
+    _Pragma("diag_suppress=Pe111") _Pragma("diag_suppress=Pe128") CODE _Pragma("diag_default=Pe111") _Pragma("diag_default=Pe128")
 
 #elif defined(__CC_ARM)
 
 #include <stddef.h>
 
-#define OT_UNUSED_VARIABLE(VARIABLE) \
-    do                               \
-    {                                \
-        if (&VARIABLE == NULL)       \
-        {                            \
-        }                            \
+#define OT_UNUSED_VARIABLE(VARIABLE)                                                                                               \
+    do                                                                                                                             \
+    {                                                                                                                              \
+        if (&VARIABLE == NULL)                                                                                                     \
+        {                                                                                                                          \
+        }                                                                                                                          \
     } while (false)
 
 #define OT_UNREACHABLE_CODE(CODE) CODE
@@ -233,27 +231,27 @@ extern "C" {
 
 #include <stddef.h>
 
-#define OT_UNUSED_VARIABLE(VARIABLE) \
-    do                               \
-    {                                \
-        if (&VARIABLE == NULL)       \
-        {                            \
-        }                            \
+#define OT_UNUSED_VARIABLE(VARIABLE)                                                                                               \
+    do                                                                                                                             \
+    {                                                                                                                              \
+        if (&VARIABLE == NULL)                                                                                                     \
+        {                                                                                                                          \
+        }                                                                                                                          \
     } while (false)
 
 /*
  * #112-D statement is unreachable
  * #129-D loop is not reachable
  */
-#define OT_UNREACHABLE_CODE(CODE) \
+#define OT_UNREACHABLE_CODE(CODE)                                                                                                  \
     _Pragma("diag_push") _Pragma("diag_suppress 112") _Pragma("diag_suppress 129") CODE _Pragma("diag_pop")
 
 #else
 
-#define OT_UNUSED_VARIABLE(VARIABLE) \
-    do                               \
-    {                                \
-        (void)(VARIABLE);            \
+#define OT_UNUSED_VARIABLE(VARIABLE)                                                                                               \
+    do                                                                                                                             \
+    {                                                                                                                              \
+        (void) (VARIABLE);                                                                                                         \
     } while (false)
 
 #define OT_UNREACHABLE_CODE(CODE) CODE
@@ -278,8 +276,8 @@ extern "C" {
 #endif
 
 #ifdef __APPLE__
-#define OT_APPLE_IGNORE_GNU_FOLDING_CONSTANT(...)                                               \
-    _Pragma("GCC diagnostic push") _Pragma("GCC diagnostic ignored \"-Wgnu-folding-constant\"") \
+#define OT_APPLE_IGNORE_GNU_FOLDING_CONSTANT(...)                                                                                  \
+    _Pragma("GCC diagnostic push") _Pragma("GCC diagnostic ignored \"-Wgnu-folding-constant\"")                                    \
         __VA_ARGS__ _Pragma("GCC diagnostic pop")
 #else
 #define OT_APPLE_IGNORE_GNU_FOLDING_CONSTANT(...) __VA_ARGS__
@@ -298,9 +296,9 @@ extern "C" {
 #elif defined(__GNUC__) && (__GNUC__ >= 7)
 #define OT_FALL_THROUGH __attribute__((fallthrough))
 #else
-#define OT_FALL_THROUGH \
-    do                  \
-    {                   \
+#define OT_FALL_THROUGH                                                                                                            \
+    do                                                                                                                             \
+    {                                                                                                                              \
     } while (false) /* fallthrough */
 #endif
 

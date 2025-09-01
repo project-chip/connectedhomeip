@@ -36,8 +36,8 @@
 #ifndef OPENTHREAD_TYPES_H_
 #define OPENTHREAD_TYPES_H_
 
-#include <stdint.h>
 #include <stdbool.h>
+#include <stdint.h>
 #ifdef OTDLL
 #include <guiddef.h>
 #endif
@@ -49,7 +49,7 @@ extern "C" {
 #endif
 
 #ifdef _WIN32
-#pragma warning(disable:4214)  // nonstandard extension used: bit field types other than int
+#pragma warning(disable : 4214) // nonstandard extension used: bit field types other than int
 #ifdef _KERNEL_MODE
 #include <ntdef.h>
 #else
@@ -63,9 +63,8 @@ extern "C" {
     ((type *)((uint8_t*)(address) - offsetof(type, field)))
 #pragma GCC diagnostic pop*/
 #define BASE 0x1
-#define myoffsetof(s,m) (((size_t)&(((s*)BASE)->m))-BASE)
-#define CONTAINING_RECORD(address, type, field) \
-    ((type *)((uint8_t*)(address) - myoffsetof(type, field)))
+#define myoffsetof(s, m) (((size_t) & (((s *) BASE)->m)) - BASE)
+#define CONTAINING_RECORD(address, type, field) ((type *) ((uint8_t *) (address) -myoffsetof(type, field)))
 #endif /* CONTAINING_RECORD */
 #endif /* _WIN32 */
 
@@ -87,7 +86,7 @@ typedef struct otApiInstance otApiInstance;
 typedef struct otDeviceList
 {
     uint16_t aDevicesLength;
-    GUID     aDevices[1];
+    GUID aDevices[1];
 } otDeviceList;
 
 #endif
@@ -274,16 +273,16 @@ typedef enum otError
     OT_ERROR_GENERIC = 255,
 } otError;
 
-#define OT_IP6_IID_SIZE            8   ///< Size of an IPv6 Interface Identifier (bytes)
+#define OT_IP6_IID_SIZE 8 ///< Size of an IPv6 Interface Identifier (bytes)
 
-#define OT_MASTER_KEY_SIZE         16  ///< Size of the Thread Master Key (bytes)
+#define OT_MASTER_KEY_SIZE 16 ///< Size of the Thread Master Key (bytes)
 
 /**
  * Concatenated List of Type Identifiers of Other Diagnostics TLVs Used to Request or Reset Multiple Diagnostic Values.
  */
-#define OT_NETWORK_DIAGNOSTIC_TYPELIST_TYPE          18
+#define OT_NETWORK_DIAGNOSTIC_TYPELIST_TYPE 18
 
-#define OT_NETWORK_DIAGNOSTIC_TYPELIST_MAX_ENTRIES   19  ///< Maximum Number of Other Network Diagnostic TLV Types
+#define OT_NETWORK_DIAGNOSTIC_TYPELIST_MAX_ENTRIES 19 ///< Maximum Number of Other Network Diagnostic TLV Types
 
 /**
  * @struct otMasterKey
@@ -294,7 +293,7 @@ typedef enum otError
 OT_TOOL_PACKED_BEGIN
 struct otMasterKey
 {
-    uint8_t m8[OT_MASTER_KEY_SIZE];    ///< Byte values
+    uint8_t m8[OT_MASTER_KEY_SIZE]; ///< Byte values
 } OT_TOOL_PACKED_END;
 
 /**
@@ -303,7 +302,7 @@ struct otMasterKey
  */
 typedef struct otMasterKey otMasterKey;
 
-#define OT_NETWORK_NAME_MAX_SIZE   16  ///< Maximum size of the Thread Network Name field (bytes)
+#define OT_NETWORK_NAME_MAX_SIZE 16 ///< Maximum size of the Thread Network Name field (bytes)
 
 /**
  * This structure represents a Network Name.
@@ -311,10 +310,10 @@ typedef struct otMasterKey otMasterKey;
  */
 typedef struct otNetworkName
 {
-    char m8[OT_NETWORK_NAME_MAX_SIZE + 1];  ///< Byte values
+    char m8[OT_NETWORK_NAME_MAX_SIZE + 1]; ///< Byte values
 } otNetworkName;
 
-#define OT_EXT_PAN_ID_SIZE         8   ///< Size of a Thread PAN ID (bytes)
+#define OT_EXT_PAN_ID_SIZE 8 ///< Size of a Thread PAN ID (bytes)
 
 /**
  * This structure represents an Extended PAN ID.
@@ -322,10 +321,10 @@ typedef struct otNetworkName
  */
 typedef struct otExtendedPanId
 {
-    uint8_t m8[OT_EXT_PAN_ID_SIZE];   ///< Byte values
+    uint8_t m8[OT_EXT_PAN_ID_SIZE]; ///< Byte values
 } otExtendedPanId;
 
-#define OT_MESH_LOCAL_PREFIX_SIZE  8  ///< Size of the Mesh Local Prefix (bytes)
+#define OT_MESH_LOCAL_PREFIX_SIZE 8 ///< Size of the Mesh Local Prefix (bytes)
 
 /**
  * This structure represents a Mesh Local Prefix.
@@ -333,31 +332,31 @@ typedef struct otExtendedPanId
  */
 typedef struct otMeshLocalPrefix
 {
-    uint8_t m8[OT_MESH_LOCAL_PREFIX_SIZE];  ///< Byte values
+    uint8_t m8[OT_MESH_LOCAL_PREFIX_SIZE]; ///< Byte values
 } otMeshLocalPrefix;
 
-#define OT_PSKC_MAX_SIZE                             16  ///< Maximum size of the PSKc (bytes)
+#define OT_PSKC_MAX_SIZE 16 ///< Maximum size of the PSKc (bytes)
 
-#define OT_COMMISSIONING_PASSPHRASE_MIN_SIZE         6   ///< Minimum size of the Commissioning Passphrase
-#define OT_COMMISSIONING_PASSPHRASE_MAX_SIZE         255 ///< Maximum size of the Commissioning Passphrase
+#define OT_COMMISSIONING_PASSPHRASE_MIN_SIZE 6   ///< Minimum size of the Commissioning Passphrase
+#define OT_COMMISSIONING_PASSPHRASE_MAX_SIZE 255 ///< Maximum size of the Commissioning Passphrase
 
 /**
-  * This structure represents PSKc.
-  *
-  */
+ * This structure represents PSKc.
+ *
+ */
 typedef struct otPSKc
 {
-    uint8_t m8[OT_PSKC_MAX_SIZE];  ///< Byte values
+    uint8_t m8[OT_PSKC_MAX_SIZE]; ///< Byte values
 } otPSKc;
 
 /**
-  * This structure represent Security Policy.
-  *
-  */
+ * This structure represent Security Policy.
+ *
+ */
 typedef struct otSecurityPolicy
 {
-    uint16_t mRotationTime;  ///< The value for thrKeyRotation in units of hours
-    uint8_t mFlags;          ///< Flags as defined in Thread 1.1 Section 8.10.1.15
+    uint16_t mRotationTime; ///< The value for thrKeyRotation in units of hours
+    uint8_t mFlags;         ///< Flags as defined in Thread 1.1 Section 8.10.1.15
 } otSecurityPolicy;
 
 /**
@@ -366,17 +365,17 @@ typedef struct otSecurityPolicy
  */
 enum
 {
-    OT_SECURITY_POLICY_OBTAIN_MASTER_KEY      = 1 << 7,  ///< Obtaining the Master Key
-    OT_SECURITY_POLICY_NATIVE_COMMISSIONING   = 1 << 6,  ///< Native Commissioning
-    OT_SECURITY_POLICY_ROUTERS                = 1 << 5,  ///< Routers enabled
-    OT_SECURITY_POLICY_EXTERNAL_COMMISSIONER  = 1 << 4,  ///< External Commissioner allowed
-    OT_SECURITY_POLICY_BEACONS                = 1 << 3,  ///< Beacons enabled
+    OT_SECURITY_POLICY_OBTAIN_MASTER_KEY     = 1 << 7, ///< Obtaining the Master Key
+    OT_SECURITY_POLICY_NATIVE_COMMISSIONING  = 1 << 6, ///< Native Commissioning
+    OT_SECURITY_POLICY_ROUTERS               = 1 << 5, ///< Routers enabled
+    OT_SECURITY_POLICY_EXTERNAL_COMMISSIONER = 1 << 4, ///< External Commissioner allowed
+    OT_SECURITY_POLICY_BEACONS               = 1 << 3, ///< Beacons enabled
 };
 
 /**
-  * This type represents Channel Mask Page 0.
-  *
-  */
+ * This type represents Channel Mask Page 0.
+ *
+ */
 typedef uint32_t otChannelMaskPage0;
 
 /**
@@ -391,7 +390,7 @@ typedef uint16_t otPanId;
  */
 typedef uint16_t otShortAddress;
 
-#define OT_EXT_ADDRESS_SIZE        8   ///< Size of an IEEE 802.15.4 Extended Address (bytes)
+#define OT_EXT_ADDRESS_SIZE 8 ///< Size of an IEEE 802.15.4 Extended Address (bytes)
 
 /**
  * This type represents the IEEE 802.15.4 Extended Address.
@@ -399,11 +398,11 @@ typedef uint16_t otShortAddress;
  */
 typedef struct otExtAddress
 {
-    uint8_t m8[OT_EXT_ADDRESS_SIZE];  ///< IEEE 802.15.4 Extended Address bytes
+    uint8_t m8[OT_EXT_ADDRESS_SIZE]; ///< IEEE 802.15.4 Extended Address bytes
 } otExtAddress;
 
-#define OT_IP6_PREFIX_SIZE         8   ///< Size of an IPv6 prefix (bytes)
-#define OT_IP6_ADDRESS_SIZE        16  ///< Size of an IPv6 address (bytes)
+#define OT_IP6_PREFIX_SIZE 8   ///< Size of an IPv6 prefix (bytes)
+#define OT_IP6_ADDRESS_SIZE 16 ///< Size of an IPv6 address (bytes)
 
 /**
  * @struct otIp6Address
@@ -416,10 +415,10 @@ struct otIp6Address
 {
     union
     {
-        uint8_t  m8[OT_IP6_ADDRESS_SIZE];                      ///< 8-bit fields
-        uint16_t m16[OT_IP6_ADDRESS_SIZE / sizeof(uint16_t)];  ///< 16-bit fields
-        uint32_t m32[OT_IP6_ADDRESS_SIZE / sizeof(uint32_t)];  ///< 32-bit fields
-    } mFields;                                                 ///< IPv6 accessor fields
+        uint8_t m8[OT_IP6_ADDRESS_SIZE];                      ///< 8-bit fields
+        uint16_t m16[OT_IP6_ADDRESS_SIZE / sizeof(uint16_t)]; ///< 16-bit fields
+        uint32_t m32[OT_IP6_ADDRESS_SIZE / sizeof(uint32_t)]; ///< 32-bit fields
+    } mFields;                                                ///< IPv6 accessor fields
 } OT_TOOL_PACKED_END;
 
 /**
@@ -468,7 +467,7 @@ typedef struct otMessageInfo
      * @p mLinkInfo points to @sa otThreadLinkInfo. This field is only valid for messages received from the
      * Thread radio and is ignored on transmission.
      */
-    const void *mLinkInfo;
+    const void * mLinkInfo;
 } otMessageInfo;
 
 /**
@@ -476,32 +475,31 @@ typedef struct otMessageInfo
  */
 typedef struct otMessage
 {
-    struct otMessage *mNext;  ///< A pointer to the next Message buffer.
+    struct otMessage * mNext; ///< A pointer to the next Message buffer.
 } otMessage;
 
+#define OT_PANID_BROADCAST 0xffff ///< IEEE 802.15.4 Broadcast PAN ID
 
-#define OT_PANID_BROADCAST   0xffff      ///< IEEE 802.15.4 Broadcast PAN ID
+#define OT_CHANNEL_11_MASK (1 << 11) ///< Channel 11
+#define OT_CHANNEL_12_MASK (1 << 12) ///< Channel 12
+#define OT_CHANNEL_13_MASK (1 << 13) ///< Channel 13
+#define OT_CHANNEL_14_MASK (1 << 14) ///< Channel 14
+#define OT_CHANNEL_15_MASK (1 << 15) ///< Channel 15
+#define OT_CHANNEL_16_MASK (1 << 16) ///< Channel 16
+#define OT_CHANNEL_17_MASK (1 << 17) ///< Channel 17
+#define OT_CHANNEL_18_MASK (1 << 18) ///< Channel 18
+#define OT_CHANNEL_19_MASK (1 << 19) ///< Channel 19
+#define OT_CHANNEL_20_MASK (1 << 20) ///< Channel 20
+#define OT_CHANNEL_21_MASK (1 << 21) ///< Channel 21
+#define OT_CHANNEL_22_MASK (1 << 22) ///< Channel 22
+#define OT_CHANNEL_23_MASK (1 << 23) ///< Channel 23
+#define OT_CHANNEL_24_MASK (1 << 24) ///< Channel 24
+#define OT_CHANNEL_25_MASK (1 << 25) ///< Channel 25
+#define OT_CHANNEL_26_MASK (1 << 26) ///< Channel 26
 
-#define OT_CHANNEL_11_MASK   (1 << 11)   ///< Channel 11
-#define OT_CHANNEL_12_MASK   (1 << 12)   ///< Channel 12
-#define OT_CHANNEL_13_MASK   (1 << 13)   ///< Channel 13
-#define OT_CHANNEL_14_MASK   (1 << 14)   ///< Channel 14
-#define OT_CHANNEL_15_MASK   (1 << 15)   ///< Channel 15
-#define OT_CHANNEL_16_MASK   (1 << 16)   ///< Channel 16
-#define OT_CHANNEL_17_MASK   (1 << 17)   ///< Channel 17
-#define OT_CHANNEL_18_MASK   (1 << 18)   ///< Channel 18
-#define OT_CHANNEL_19_MASK   (1 << 19)   ///< Channel 19
-#define OT_CHANNEL_20_MASK   (1 << 20)   ///< Channel 20
-#define OT_CHANNEL_21_MASK   (1 << 21)   ///< Channel 21
-#define OT_CHANNEL_22_MASK   (1 << 22)   ///< Channel 22
-#define OT_CHANNEL_23_MASK   (1 << 23)   ///< Channel 23
-#define OT_CHANNEL_24_MASK   (1 << 24)   ///< Channel 24
-#define OT_CHANNEL_25_MASK   (1 << 25)   ///< Channel 25
-#define OT_CHANNEL_26_MASK   (1 << 26)   ///< Channel 26
+#define OT_CHANNEL_ALL 0xffffffff ///< All channels
 
-#define OT_CHANNEL_ALL       0xffffffff  ///< All channels
-
-#define OT_STEERING_DATA_MAX_LENGTH       16  ///< Max steering data length (bytes)
+#define OT_STEERING_DATA_MAX_LENGTH 16 ///< Max steering data length (bytes)
 
 /**
  * This structure represents the steering data.
@@ -509,8 +507,8 @@ typedef struct otMessage
  */
 typedef struct otSteeringData
 {
-    uint8_t mLength;                          ///< Length of steering data (bytes)
-    uint8_t m8[OT_STEERING_DATA_MAX_LENGTH];  ///< Byte values
+    uint8_t mLength;                         ///< Length of steering data (bytes)
+    uint8_t m8[OT_STEERING_DATA_MAX_LENGTH]; ///< Byte values
 } otSteeringData;
 
 /**
@@ -519,18 +517,18 @@ typedef struct otSteeringData
  */
 typedef struct otActiveScanResult
 {
-    otExtAddress    mExtAddress;      ///< IEEE 802.15.4 Extended Address
-    otNetworkName   mNetworkName;     ///< Thread Network Name
-    otExtendedPanId mExtendedPanId;   ///< Thread Extended PAN ID
-    otSteeringData  mSteeringData;    ///< Steering Data
-    uint16_t        mPanId;           ///< IEEE 802.15.4 PAN ID
-    uint16_t        mJoinerUdpPort;   ///< Joiner UDP Port
-    uint8_t         mChannel;         ///< IEEE 802.15.4 Channel
-    int8_t          mRssi;            ///< RSSI (dBm)
-    uint8_t         mLqi;             ///< LQI
-    unsigned int    mVersion : 4;     ///< Version
-    bool            mIsNative : 1;    ///< Native Commissioner flag
-    bool            mIsJoinable : 1;  ///< Joining Permitted flag
+    otExtAddress mExtAddress;       ///< IEEE 802.15.4 Extended Address
+    otNetworkName mNetworkName;     ///< Thread Network Name
+    otExtendedPanId mExtendedPanId; ///< Thread Extended PAN ID
+    otSteeringData mSteeringData;   ///< Steering Data
+    uint16_t mPanId;                ///< IEEE 802.15.4 PAN ID
+    uint16_t mJoinerUdpPort;        ///< Joiner UDP Port
+    uint8_t mChannel;               ///< IEEE 802.15.4 Channel
+    int8_t mRssi;                   ///< RSSI (dBm)
+    uint8_t mLqi;                   ///< LQI
+    unsigned int mVersion : 4;      ///< Version
+    bool mIsNative : 1;             ///< Native Commissioner flag
+    bool mIsJoinable : 1;           ///< Joining Permitted flag
 } otActiveScanResult;
 
 /**
@@ -539,8 +537,8 @@ typedef struct otActiveScanResult
  */
 typedef struct otEnergyScanResult
 {
-    uint8_t mChannel;                ///< IEEE 802.15.4 Channel
-    int8_t  mMaxRssi;                ///< The max RSSI (dBm)
+    uint8_t mChannel; ///< IEEE 802.15.4 Channel
+    int8_t mMaxRssi;  ///< The max RSSI (dBm)
 } otEnergyScanResult;
 
 /**
@@ -549,31 +547,31 @@ typedef struct otEnergyScanResult
  */
 typedef struct otOperationalDataset
 {
-    uint64_t             mActiveTimestamp;            ///< Active Timestamp
-    uint64_t             mPendingTimestamp;           ///< Pending Timestamp
-    otMasterKey          mMasterKey;                  ///< Network Master Key
-    otNetworkName        mNetworkName;                ///< Network Name
-    otExtendedPanId      mExtendedPanId;              ///< Extended PAN ID
-    otMeshLocalPrefix    mMeshLocalPrefix;            ///< Mesh Local Prefix
-    uint32_t             mDelay;                      ///< Delay Timer
-    otPanId              mPanId;                      ///< PAN ID
-    uint16_t             mChannel;                    ///< Channel
-    otPSKc               mPSKc;                       ///< PSKc
-    otSecurityPolicy     mSecurityPolicy;             ///< Security Policy
-    otChannelMaskPage0   mChannelMaskPage0;           ///< Channel Mask Page 0
+    uint64_t mActiveTimestamp;            ///< Active Timestamp
+    uint64_t mPendingTimestamp;           ///< Pending Timestamp
+    otMasterKey mMasterKey;               ///< Network Master Key
+    otNetworkName mNetworkName;           ///< Network Name
+    otExtendedPanId mExtendedPanId;       ///< Extended PAN ID
+    otMeshLocalPrefix mMeshLocalPrefix;   ///< Mesh Local Prefix
+    uint32_t mDelay;                      ///< Delay Timer
+    otPanId mPanId;                       ///< PAN ID
+    uint16_t mChannel;                    ///< Channel
+    otPSKc mPSKc;                         ///< PSKc
+    otSecurityPolicy mSecurityPolicy;     ///< Security Policy
+    otChannelMaskPage0 mChannelMaskPage0; ///< Channel Mask Page 0
 
-    bool                 mIsActiveTimestampSet : 1;   ///< TRUE if Active Timestamp is set, FALSE otherwise.
-    bool                 mIsPendingTimestampSet : 1;  ///< TRUE if Pending Timestamp is set, FALSE otherwise.
-    bool                 mIsMasterKeySet : 1;         ///< TRUE if Network Master Key is set, FALSE otherwise.
-    bool                 mIsNetworkNameSet : 1;       ///< TRUE if Network Name is set, FALSE otherwise.
-    bool                 mIsExtendedPanIdSet : 1;     ///< TRUE if Extended PAN ID is set, FALSE otherwise.
-    bool                 mIsMeshLocalPrefixSet : 1;   ///< TRUE if Mesh Local Prefix is set, FALSE otherwise.
-    bool                 mIsDelaySet : 1;             ///< TRUE if Delay Timer is set, FALSE otherwise.
-    bool                 mIsPanIdSet : 1;             ///< TRUE if PAN ID is set, FALSE otherwise.
-    bool                 mIsChannelSet : 1;           ///< TRUE if Channel is set, FALSE otherwise.
-    bool                 mIsPSKcSet : 1;              ///< TRUE if PSKc is set, FALSE otherwise.
-    bool                 mIsSecurityPolicySet : 1;    ///< TRUE if Security Policy is set, FALSE otherwise.
-    bool                 mIsChannelMaskPage0Set : 1;  ///< TRUE if Channel Mask Page 0 is set, FALSE otherwise.
+    bool mIsActiveTimestampSet : 1;  ///< TRUE if Active Timestamp is set, FALSE otherwise.
+    bool mIsPendingTimestampSet : 1; ///< TRUE if Pending Timestamp is set, FALSE otherwise.
+    bool mIsMasterKeySet : 1;        ///< TRUE if Network Master Key is set, FALSE otherwise.
+    bool mIsNetworkNameSet : 1;      ///< TRUE if Network Name is set, FALSE otherwise.
+    bool mIsExtendedPanIdSet : 1;    ///< TRUE if Extended PAN ID is set, FALSE otherwise.
+    bool mIsMeshLocalPrefixSet : 1;  ///< TRUE if Mesh Local Prefix is set, FALSE otherwise.
+    bool mIsDelaySet : 1;            ///< TRUE if Delay Timer is set, FALSE otherwise.
+    bool mIsPanIdSet : 1;            ///< TRUE if PAN ID is set, FALSE otherwise.
+    bool mIsChannelSet : 1;          ///< TRUE if Channel is set, FALSE otherwise.
+    bool mIsPSKcSet : 1;             ///< TRUE if PSKc is set, FALSE otherwise.
+    bool mIsSecurityPolicySet : 1;   ///< TRUE if Security Policy is set, FALSE otherwise.
+    bool mIsChannelMaskPage0Set : 1; ///< TRUE if Channel Mask Page 0 is set, FALSE otherwise.
 } otOperationalDataset;
 
 /**
@@ -582,15 +580,15 @@ typedef struct otOperationalDataset
  */
 typedef struct otCommissioningDataset
 {
-    uint16_t              mLocator;                   ///< Border Router RLOC16
-    uint16_t              mSessionId;                 ///< Commissioner Session Id
-    otSteeringData        mSteeringData;              ///< Steering Data
-    uint16_t              mJoinerUdpPort;             ///< Joiner UDP Port
+    uint16_t mLocator;            ///< Border Router RLOC16
+    uint16_t mSessionId;          ///< Commissioner Session Id
+    otSteeringData mSteeringData; ///< Steering Data
+    uint16_t mJoinerUdpPort;      ///< Joiner UDP Port
 
-    bool                  mIsLocatorSet : 1;          ///< TRUE if Border Router RLOC16 is set, FALSE otherwise.
-    bool                  mIsSessionIdSet: 1;         ///< TRUE if Commissioner Session Id is set, FALSE otherwise.
-    bool                  mIsSteeringDataSet : 1;     ///< TRUE if Steering Data is set, FALSE otherwise.
-    bool                  mIsJoinerUdpPortSet : 1;    ///< TRUE if Joiner UDP Port is set, FALSE otherwise.
+    bool mIsLocatorSet : 1;       ///< TRUE if Border Router RLOC16 is set, FALSE otherwise.
+    bool mIsSessionIdSet : 1;     ///< TRUE if Commissioner Session Id is set, FALSE otherwise.
+    bool mIsSteeringDataSet : 1;  ///< TRUE if Steering Data is set, FALSE otherwise.
+    bool mIsJoinerUdpPortSet : 1; ///< TRUE if Joiner UDP Port is set, FALSE otherwise.
 } otCommissioningDataset;
 
 /**
@@ -599,42 +597,42 @@ typedef struct otCommissioningDataset
  */
 typedef enum otMeshcopTlvType
 {
-    OT_MESHCOP_TLV_CHANNEL                   = 0,    ///< meshcop Channel TLV
-    OT_MESHCOP_TLV_PANID                     = 1,    ///< meshcop Pan Id TLV
-    OT_MESHCOP_TLV_EXTPANID                  = 2,    ///< meshcop Extended Pan Id TLV
-    OT_MESHCOP_TLV_NETWORKNAME               = 3,    ///< meshcop Network Name TLV
-    OT_MESHCOP_TLV_PSKC                      = 4,    ///< meshcop PSKc TLV
-    OT_MESHCOP_TLV_MASTERKEY                 = 5,    ///< meshcop Network Master Key TLV
-    OT_MESHCOP_TLV_NETWORK_KEY_SEQUENCE      = 6,    ///< meshcop Network Key Sequence TLV
-    OT_MESHCOP_TLV_MESHLOCALPREFIX           = 7,    ///< meshcop Mesh Local Prefix TLV
-    OT_MESHCOP_TLV_STEERING_DATA             = 8,    ///< meshcop Steering Data TLV
-    OT_MESHCOP_TLV_BORDER_AGENT_RLOC         = 9,    ///< meshcop Border Agent Locator TLV
-    OT_MESHCOP_TLV_COMMISSIONER_ID           = 10,   ///< meshcop Commissioner ID TLV
-    OT_MESHCOP_TLV_COMM_SESSION_ID           = 11,   ///< meshcop Commissioner Session ID TLV
-    OT_MESHCOP_TLV_SECURITYPOLICY            = 12,   ///< meshcop Security Policy TLV
-    OT_MESHCOP_TLV_GET                       = 13,   ///< meshcop Get TLV
-    OT_MESHCOP_TLV_ACTIVETIMESTAMP           = 14,   ///< meshcop Active Timestamp TLV
-    OT_MESHCOP_TLV_STATE                     = 16,   ///< meshcop State TLV
-    OT_MESHCOP_TLV_JOINER_DTLS               = 17,   ///< meshcop Joiner DTLS Encapsulation TLV
-    OT_MESHCOP_TLV_JOINER_UDP_PORT           = 18,   ///< meshcop Joiner UDP Port TLV
-    OT_MESHCOP_TLV_JOINER_IID                = 19,   ///< meshcop Joiner IID TLV
-    OT_MESHCOP_TLV_JOINER_RLOC               = 20,   ///< meshcop Joiner Router Locator TLV
-    OT_MESHCOP_TLV_JOINER_ROUTER_KEK         = 21,   ///< meshcop Joiner Router KEK TLV
-    OT_MESHCOP_TLV_PROVISIONING_URL          = 32,   ///< meshcop Provisioning URL TLV
-    OT_MESHCOP_TLV_VENDOR_NAME_TLV           = 33,   ///< meshcop Vendor Name TLV
-    OT_MESHCOP_TLV_VENDOR_MODEL_TLV          = 34,   ///< meshcop Vendor Model TLV
-    OT_MESHCOP_TLV_VENDOR_SW_VERSION_TLV     = 35,   ///< meshcop Vendor SW Version TLV
-    OT_MESHCOP_TLV_VENDOR_DATA_TLV           = 36,   ///< meshcop Vendor Data TLV
-    OT_MESHCOP_TLV_VENDOR_STACK_VERSION_TLV  = 37,   ///< meshcop Vendor Stack Version TLV
-    OT_MESHCOP_TLV_PENDINGTIMESTAMP          = 51,   ///< meshcop Pending Timestamp TLV
-    OT_MESHCOP_TLV_DELAYTIMER                = 52,   ///< meshcop Delay Timer TLV
-    OT_MESHCOP_TLV_CHANNELMASK               = 53,   ///< meshcop Channel Mask TLV
-    OT_MESHCOP_TLV_COUNT                     = 54,   ///< meshcop Count TLV
-    OT_MESHCOP_TLV_PERIOD                    = 55,   ///< meshcop Period TLV
-    OT_MESHCOP_TLV_SCAN_DURATION             = 56,   ///< meshcop Scan Duration TLV
-    OT_MESHCOP_TLV_ENERGY_LIST               = 57,   ///< meshcop Energy List TLV
-    OT_MESHCOP_TLV_DISCOVERYREQUEST          = 128,  ///< meshcop Discovery Request TLV
-    OT_MESHCOP_TLV_DISCOVERYRESPONSE         = 129,  ///< meshcop Discovery Response TLV
+    OT_MESHCOP_TLV_CHANNEL                  = 0,   ///< meshcop Channel TLV
+    OT_MESHCOP_TLV_PANID                    = 1,   ///< meshcop Pan Id TLV
+    OT_MESHCOP_TLV_EXTPANID                 = 2,   ///< meshcop Extended Pan Id TLV
+    OT_MESHCOP_TLV_NETWORKNAME              = 3,   ///< meshcop Network Name TLV
+    OT_MESHCOP_TLV_PSKC                     = 4,   ///< meshcop PSKc TLV
+    OT_MESHCOP_TLV_MASTERKEY                = 5,   ///< meshcop Network Master Key TLV
+    OT_MESHCOP_TLV_NETWORK_KEY_SEQUENCE     = 6,   ///< meshcop Network Key Sequence TLV
+    OT_MESHCOP_TLV_MESHLOCALPREFIX          = 7,   ///< meshcop Mesh Local Prefix TLV
+    OT_MESHCOP_TLV_STEERING_DATA            = 8,   ///< meshcop Steering Data TLV
+    OT_MESHCOP_TLV_BORDER_AGENT_RLOC        = 9,   ///< meshcop Border Agent Locator TLV
+    OT_MESHCOP_TLV_COMMISSIONER_ID          = 10,  ///< meshcop Commissioner ID TLV
+    OT_MESHCOP_TLV_COMM_SESSION_ID          = 11,  ///< meshcop Commissioner Session ID TLV
+    OT_MESHCOP_TLV_SECURITYPOLICY           = 12,  ///< meshcop Security Policy TLV
+    OT_MESHCOP_TLV_GET                      = 13,  ///< meshcop Get TLV
+    OT_MESHCOP_TLV_ACTIVETIMESTAMP          = 14,  ///< meshcop Active Timestamp TLV
+    OT_MESHCOP_TLV_STATE                    = 16,  ///< meshcop State TLV
+    OT_MESHCOP_TLV_JOINER_DTLS              = 17,  ///< meshcop Joiner DTLS Encapsulation TLV
+    OT_MESHCOP_TLV_JOINER_UDP_PORT          = 18,  ///< meshcop Joiner UDP Port TLV
+    OT_MESHCOP_TLV_JOINER_IID               = 19,  ///< meshcop Joiner IID TLV
+    OT_MESHCOP_TLV_JOINER_RLOC              = 20,  ///< meshcop Joiner Router Locator TLV
+    OT_MESHCOP_TLV_JOINER_ROUTER_KEK        = 21,  ///< meshcop Joiner Router KEK TLV
+    OT_MESHCOP_TLV_PROVISIONING_URL         = 32,  ///< meshcop Provisioning URL TLV
+    OT_MESHCOP_TLV_VENDOR_NAME_TLV          = 33,  ///< meshcop Vendor Name TLV
+    OT_MESHCOP_TLV_VENDOR_MODEL_TLV         = 34,  ///< meshcop Vendor Model TLV
+    OT_MESHCOP_TLV_VENDOR_SW_VERSION_TLV    = 35,  ///< meshcop Vendor SW Version TLV
+    OT_MESHCOP_TLV_VENDOR_DATA_TLV          = 36,  ///< meshcop Vendor Data TLV
+    OT_MESHCOP_TLV_VENDOR_STACK_VERSION_TLV = 37,  ///< meshcop Vendor Stack Version TLV
+    OT_MESHCOP_TLV_PENDINGTIMESTAMP         = 51,  ///< meshcop Pending Timestamp TLV
+    OT_MESHCOP_TLV_DELAYTIMER               = 52,  ///< meshcop Delay Timer TLV
+    OT_MESHCOP_TLV_CHANNELMASK              = 53,  ///< meshcop Channel Mask TLV
+    OT_MESHCOP_TLV_COUNT                    = 54,  ///< meshcop Count TLV
+    OT_MESHCOP_TLV_PERIOD                   = 55,  ///< meshcop Period TLV
+    OT_MESHCOP_TLV_SCAN_DURATION            = 56,  ///< meshcop Scan Duration TLV
+    OT_MESHCOP_TLV_ENERGY_LIST              = 57,  ///< meshcop Energy List TLV
+    OT_MESHCOP_TLV_DISCOVERYREQUEST         = 128, ///< meshcop Discovery Request TLV
+    OT_MESHCOP_TLV_DISCOVERYRESPONSE        = 129, ///< meshcop Discovery Response TLV
 } otMeshcopTlvType;
 
 /**
@@ -670,20 +668,20 @@ typedef struct otLinkModeConfig
  */
 enum
 {
-    OT_CHANGED_IP6_ADDRESS_ADDED            = 1 << 0,   ///< IPv6 address was added
-    OT_CHANGED_IP6_ADDRESS_REMOVED          = 1 << 1,   ///< IPv6 address was removed
-    OT_CHANGED_THREAD_ROLE                  = 1 << 2,   ///< Role (disabled, detached, child, router, leader) changed
-    OT_CHANGED_THREAD_LL_ADDR               = 1 << 3,   ///< The link-local address changed
-    OT_CHANGED_THREAD_ML_ADDR               = 1 << 4,   ///< The mesh-local address changed
-    OT_CHANGED_THREAD_RLOC_ADDED            = 1 << 5,   ///< RLOC was added
-    OT_CHANGED_THREAD_RLOC_REMOVED          = 1 << 6,   ///< RLOC was removed
-    OT_CHANGED_THREAD_PARTITION_ID          = 1 << 7,   ///< Partition ID changed
-    OT_CHANGED_THREAD_KEY_SEQUENCE_COUNTER  = 1 << 8,   ///< Thread Key Sequence changed
-    OT_CHANGED_THREAD_NETDATA               = 1 << 9,   ///< Thread Network Data changed
-    OT_CHANGED_THREAD_CHILD_ADDED           = 1 << 10,  ///< Child was added
-    OT_CHANGED_THREAD_CHILD_REMOVED         = 1 << 11,  ///< Child was removed
-    OT_CHANGED_IP6_MULTICAST_SUBSRCRIBED    = 1 << 12,  ///< Subscribed to a IPv6 multicast address
-    OT_CHANGED_IP6_MULTICAST_UNSUBSRCRIBED  = 1 << 13,  ///< Unsubscribed from a IPv6 multicast address
+    OT_CHANGED_IP6_ADDRESS_ADDED           = 1 << 0,  ///< IPv6 address was added
+    OT_CHANGED_IP6_ADDRESS_REMOVED         = 1 << 1,  ///< IPv6 address was removed
+    OT_CHANGED_THREAD_ROLE                 = 1 << 2,  ///< Role (disabled, detached, child, router, leader) changed
+    OT_CHANGED_THREAD_LL_ADDR              = 1 << 3,  ///< The link-local address changed
+    OT_CHANGED_THREAD_ML_ADDR              = 1 << 4,  ///< The mesh-local address changed
+    OT_CHANGED_THREAD_RLOC_ADDED           = 1 << 5,  ///< RLOC was added
+    OT_CHANGED_THREAD_RLOC_REMOVED         = 1 << 6,  ///< RLOC was removed
+    OT_CHANGED_THREAD_PARTITION_ID         = 1 << 7,  ///< Partition ID changed
+    OT_CHANGED_THREAD_KEY_SEQUENCE_COUNTER = 1 << 8,  ///< Thread Key Sequence changed
+    OT_CHANGED_THREAD_NETDATA              = 1 << 9,  ///< Thread Network Data changed
+    OT_CHANGED_THREAD_CHILD_ADDED          = 1 << 10, ///< Child was added
+    OT_CHANGED_THREAD_CHILD_REMOVED        = 1 << 11, ///< Child was removed
+    OT_CHANGED_IP6_MULTICAST_SUBSRCRIBED   = 1 << 12, ///< Subscribed to a IPv6 multicast address
+    OT_CHANGED_IP6_MULTICAST_UNSUBSRCRIBED = 1 << 13, ///< Unsubscribed from a IPv6 multicast address
 };
 
 /**
@@ -691,13 +689,13 @@ enum
  */
 typedef struct otIp6Prefix
 {
-    otIp6Address  mPrefix;  ///< The IPv6 prefix.
-    uint8_t       mLength;  ///< The IPv6 prefix length.
+    otIp6Address mPrefix; ///< The IPv6 prefix.
+    uint8_t mLength;      ///< The IPv6 prefix length.
 } otIp6Prefix;
 
-#define OT_NETWORK_DATA_ITERATOR_INIT  0  ///< Initializer for otNetworkDataIterator.
+#define OT_NETWORK_DATA_ITERATOR_INIT 0 ///< Initializer for otNetworkDataIterator.
 
-typedef uint16_t otNetworkDataIterator;  ///< Used to iterate through Network Data information.
+typedef uint16_t otNetworkDataIterator; ///< Used to iterate through Network Data information.
 
 /**
  * This structure represents a Border Router configuration.
@@ -797,28 +795,28 @@ typedef struct otExternalRouteConfig
  */
 typedef enum otRoutePreference
 {
-    OT_ROUTE_PREFERENCE_LOW  = -1,  ///< Low route preference.
-    OT_ROUTE_PREFERENCE_MED  = 0,   ///< Medium route preference.
-    OT_ROUTE_PREFERENCE_HIGH = 1,   ///< High route preference.
+    OT_ROUTE_PREFERENCE_LOW  = -1, ///< Low route preference.
+    OT_ROUTE_PREFERENCE_MED  = 0,  ///< Medium route preference.
+    OT_ROUTE_PREFERENCE_HIGH = 1,  ///< High route preference.
 } otRoutePreference;
 
 /**
  * Used to indicate no fixed received signal strength was set
  */
-#define OT_MAC_FILTER_FIXED_RSS_DISABLED       127
+#define OT_MAC_FILTER_FIXED_RSS_DISABLED 127
 
-#define OT_MAC_FILTER_ITERATOR_INIT            0     ///< Initializer for otMacFilterIterator.
+#define OT_MAC_FILTER_ITERATOR_INIT 0 ///< Initializer for otMacFilterIterator.
 
-typedef uint8_t otMacFilterIterator;                 ///< Used to iterate through mac filter entries.
+typedef uint8_t otMacFilterIterator; ///< Used to iterate through mac filter entries.
 
 /**
  * Defines address mode of the mac filter.
  */
 typedef enum otMacFilterAddressMode
 {
-    OT_MAC_FILTER_ADDRESS_MODE_DISABLED,     ///< Address filter is disabled.
-    OT_MAC_FILTER_ADDRESS_MODE_WHITELIST,    ///< Whitelist address filter mode is enabled.
-    OT_MAC_FILTER_ADDRESS_MODE_BLACKLIST,    ///< Blacklist address filter mode is enabled.
+    OT_MAC_FILTER_ADDRESS_MODE_DISABLED,  ///< Address filter is disabled.
+    OT_MAC_FILTER_ADDRESS_MODE_WHITELIST, ///< Whitelist address filter mode is enabled.
+    OT_MAC_FILTER_ADDRESS_MODE_BLACKLIST, ///< Blacklist address filter mode is enabled.
 } otMacFilterAddressMode;
 
 /**
@@ -827,9 +825,9 @@ typedef enum otMacFilterAddressMode
  */
 typedef struct otMacFilterEntry
 {
-    otExtAddress mExtAddress;       ///< IEEE 802.15.4 Extended Address
-    int8_t       mRssIn;            ///< Received signal strength
-    bool         mFiltered;         ///< Indicates whether or not this entry is filtered.
+    otExtAddress mExtAddress; ///< IEEE 802.15.4 Extended Address
+    int8_t mRssIn;            ///< Received signal strength
+    bool mFiltered;           ///< Indicates whether or not this entry is filtered.
 } otMacFilterEntry;
 
 /**
@@ -837,11 +835,11 @@ typedef struct otMacFilterEntry
  */
 typedef enum
 {
-    OT_DEVICE_ROLE_DISABLED = 0,  ///< The Thread stack is disabled.
-    OT_DEVICE_ROLE_DETACHED = 1,  ///< Not currently participating in a Thread network/partition.
-    OT_DEVICE_ROLE_CHILD    = 2,  ///< The Thread Child role.
-    OT_DEVICE_ROLE_ROUTER   = 3,  ///< The Thread Router role.
-    OT_DEVICE_ROLE_LEADER   = 4,  ///< The Thread Leader role.
+    OT_DEVICE_ROLE_DISABLED = 0, ///< The Thread stack is disabled.
+    OT_DEVICE_ROLE_DETACHED = 1, ///< Not currently participating in a Thread network/partition.
+    OT_DEVICE_ROLE_CHILD    = 2, ///< The Thread Child role.
+    OT_DEVICE_ROLE_ROUTER   = 3, ///< The Thread Router role.
+    OT_DEVICE_ROLE_LEADER   = 4, ///< The Thread Leader role.
 } otDeviceRole;
 
 /**
@@ -850,24 +848,24 @@ typedef enum
  */
 typedef struct
 {
-    otExtAddress   mExtAddress;            ///< IEEE 802.15.4 Extended Address
-    uint32_t       mAge;                   ///< Time last heard
-    uint16_t       mRloc16;                ///< RLOC16
-    uint32_t       mLinkFrameCounter;      ///< Link Frame Counter
-    uint32_t       mMleFrameCounter;       ///< MLE Frame Counter
-    uint8_t        mLinkQualityIn;         ///< Link Quality In
-    int8_t         mAverageRssi;           ///< Average RSSI
-    int8_t         mLastRssi;              ///< Last observed RSSI
-    bool           mRxOnWhenIdle : 1;      ///< rx-on-when-idle
-    bool           mSecureDataRequest : 1; ///< Secure Data Requests
-    bool           mFullFunction : 1;      ///< Full Function Device
-    bool           mFullNetworkData : 1;   ///< Full Network Data
-    bool           mIsChild : 1;           ///< Is the neighbor a child
+    otExtAddress mExtAddress;    ///< IEEE 802.15.4 Extended Address
+    uint32_t mAge;               ///< Time last heard
+    uint16_t mRloc16;            ///< RLOC16
+    uint32_t mLinkFrameCounter;  ///< Link Frame Counter
+    uint32_t mMleFrameCounter;   ///< MLE Frame Counter
+    uint8_t mLinkQualityIn;      ///< Link Quality In
+    int8_t mAverageRssi;         ///< Average RSSI
+    int8_t mLastRssi;            ///< Last observed RSSI
+    bool mRxOnWhenIdle : 1;      ///< rx-on-when-idle
+    bool mSecureDataRequest : 1; ///< Secure Data Requests
+    bool mFullFunction : 1;      ///< Full Function Device
+    bool mFullNetworkData : 1;   ///< Full Network Data
+    bool mIsChild : 1;           ///< Is the neighbor a child
 } otNeighborInfo;
 
-#define OT_NEIGHBOR_INFO_ITERATOR_INIT  0  ///< Initializer for otNeighborInfoIterator.
+#define OT_NEIGHBOR_INFO_ITERATOR_INIT 0 ///< Initializer for otNeighborInfoIterator.
 
-typedef int16_t otNeighborInfoIterator;    ///< Used to iterate through neighbor table.
+typedef int16_t otNeighborInfoIterator; ///< Used to iterate through neighbor table.
 
 /**
  * This structure holds diagnostic information for a Thread Child
@@ -875,19 +873,19 @@ typedef int16_t otNeighborInfoIterator;    ///< Used to iterate through neighbor
  */
 typedef struct
 {
-    otExtAddress   mExtAddress;            ///< IEEE 802.15.4 Extended Address
-    uint32_t       mTimeout;               ///< Timeout
-    uint32_t       mAge;                   ///< Time last heard
-    uint16_t       mRloc16;                ///< RLOC16
-    uint16_t       mChildId;               ///< Child ID
-    uint8_t        mNetworkDataVersion;    ///< Network Data Version
-    uint8_t        mLinkQualityIn;         ///< Link Quality In
-    int8_t         mAverageRssi;           ///< Average RSSI
-    int8_t         mLastRssi;              ///< Last observed RSSI
-    bool           mRxOnWhenIdle : 1;      ///< rx-on-when-idle
-    bool           mSecureDataRequest : 1; ///< Secure Data Requests
-    bool           mFullFunction : 1;      ///< Full Function Device
-    bool           mFullNetworkData : 1;   ///< Full Network Data
+    otExtAddress mExtAddress;    ///< IEEE 802.15.4 Extended Address
+    uint32_t mTimeout;           ///< Timeout
+    uint32_t mAge;               ///< Time last heard
+    uint16_t mRloc16;            ///< RLOC16
+    uint16_t mChildId;           ///< Child ID
+    uint8_t mNetworkDataVersion; ///< Network Data Version
+    uint8_t mLinkQualityIn;      ///< Link Quality In
+    int8_t mAverageRssi;         ///< Average RSSI
+    int8_t mLastRssi;            ///< Last observed RSSI
+    bool mRxOnWhenIdle : 1;      ///< rx-on-when-idle
+    bool mSecureDataRequest : 1; ///< Secure Data Requests
+    bool mFullFunction : 1;      ///< Full Function Device
+    bool mFullNetworkData : 1;   ///< Full Network Data
 } otChildInfo;
 
 /**
@@ -897,16 +895,16 @@ typedef struct
 OT_TOOL_ALIGN(4)
 typedef struct
 {
-    otExtAddress   mExtAddress;            ///< IEEE 802.15.4 Extended Address
-    uint16_t       mRloc16;                ///< RLOC16
-    uint8_t        mRouterId;              ///< Router ID
-    uint8_t        mNextHop;               ///< Next hop to router
-    uint8_t        mPathCost;              ///< Path cost to router
-    uint8_t        mLinkQualityIn;         ///< Link Quality In
-    uint8_t        mLinkQualityOut;        ///< Link Quality Out
-    uint8_t        mAge;                   ///< Time last heard
-    bool           mAllocated : 1;         ///< Router ID allocated or not
-    bool           mLinkEstablished : 1;   ///< Link established with Router ID or not
+    otExtAddress mExtAddress;  ///< IEEE 802.15.4 Extended Address
+    uint16_t mRloc16;          ///< RLOC16
+    uint8_t mRouterId;         ///< Router ID
+    uint8_t mNextHop;          ///< Next hop to router
+    uint8_t mPathCost;         ///< Path cost to router
+    uint8_t mLinkQualityIn;    ///< Link Quality In
+    uint8_t mLinkQualityOut;   ///< Link Quality Out
+    uint8_t mAge;              ///< Time last heard
+    bool mAllocated : 1;       ///< Router ID allocated or not
+    bool mLinkEstablished : 1; ///< Link established with Router ID or not
 } otRouterInfo;
 
 /**
@@ -915,9 +913,9 @@ typedef struct
  */
 typedef struct otEidCacheEntry
 {
-    otIp6Address    mTarget;          ///< Target
-    otShortAddress  mRloc16;          ///< RLOC16
-    bool            mValid : 1;       ///< Indicates whether or not the cache entry is valid
+    otIp6Address mTarget;   ///< Target
+    otShortAddress mRloc16; ///< RLOC16
+    bool mValid : 1;        ///< Indicates whether or not the cache entry is valid
 } otEidCacheEntry;
 
 /**
@@ -926,11 +924,11 @@ typedef struct otEidCacheEntry
  */
 typedef struct otLeaderData
 {
-    uint32_t mPartitionId;            ///< Partition ID
-    uint8_t mWeighting;               ///< Leader Weight
-    uint8_t mDataVersion;             ///< Full Network Data Version
-    uint8_t mStableDataVersion;       ///< Stable Network Data Version
-    uint8_t mLeaderRouterId;          ///< Leader Router ID
+    uint32_t mPartitionId;      ///< Partition ID
+    uint8_t mWeighting;         ///< Leader Weight
+    uint8_t mDataVersion;       ///< Full Network Data Version
+    uint8_t mStableDataVersion; ///< Stable Network Data Version
+    uint8_t mLeaderRouterId;    ///< Leader Router ID
 } otLeaderData;
 
 /**
@@ -938,37 +936,37 @@ typedef struct otLeaderData
  */
 typedef struct otMacCounters
 {
-    uint32_t mTxTotal;                ///< The total number of transmissions.
-    uint32_t mTxUnicast;              ///< The total number of unicast transmissions.
-    uint32_t mTxBroadcast;            ///< The total number of broadcast transmissions.
-    uint32_t mTxAckRequested;         ///< The number of transmissions with ack request.
-    uint32_t mTxAcked;                ///< The number of transmissions that were acked.
-    uint32_t mTxNoAckRequested;       ///< The number of transmissions without ack request.
-    uint32_t mTxData;                 ///< The number of transmitted data.
-    uint32_t mTxDataPoll;             ///< The number of transmitted data poll.
-    uint32_t mTxBeacon;               ///< The number of transmitted beacon.
-    uint32_t mTxBeaconRequest;        ///< The number of transmitted beacon request.
-    uint32_t mTxOther;                ///< The number of transmitted other types of frames.
-    uint32_t mTxRetry;                ///< The number of retransmission times.
-    uint32_t mTxErrCca;               ///< The number of CCA failure times.
-    uint32_t mTxErrAbort;             ///< The number of frame transmission failures due to abort error.
-    uint32_t mRxTotal;                ///< The total number of received packets.
-    uint32_t mRxUnicast;              ///< The total number of unicast packets received.
-    uint32_t mRxBroadcast;            ///< The total number of broadcast packets received.
-    uint32_t mRxData;                 ///< The number of received data.
-    uint32_t mRxDataPoll;             ///< The number of received data poll.
-    uint32_t mRxBeacon;               ///< The number of received beacon.
-    uint32_t mRxBeaconRequest;        ///< The number of received beacon request.
-    uint32_t mRxOther;                ///< The number of received other types of frames.
-    uint32_t mRxWhitelistFiltered;    ///< The number of received packets filtered by whitelist.
-    uint32_t mRxDestAddrFiltered;     ///< The number of received packets filtered by destination check.
-    uint32_t mRxDuplicated;           ///< The number of received duplicated packets.
-    uint32_t mRxErrNoFrame;           ///< The number of received packets that do not contain contents.
-    uint32_t mRxErrUnknownNeighbor;   ///< The number of received packets from unknown neighbor.
-    uint32_t mRxErrInvalidSrcAddr;    ///< The number of received packets whose source address is invalid.
-    uint32_t mRxErrSec;               ///< The number of received packets with security error.
-    uint32_t mRxErrFcs;               ///< The number of received packets with FCS error.
-    uint32_t mRxErrOther;             ///< The number of received packets with other error.
+    uint32_t mTxTotal;              ///< The total number of transmissions.
+    uint32_t mTxUnicast;            ///< The total number of unicast transmissions.
+    uint32_t mTxBroadcast;          ///< The total number of broadcast transmissions.
+    uint32_t mTxAckRequested;       ///< The number of transmissions with ack request.
+    uint32_t mTxAcked;              ///< The number of transmissions that were acked.
+    uint32_t mTxNoAckRequested;     ///< The number of transmissions without ack request.
+    uint32_t mTxData;               ///< The number of transmitted data.
+    uint32_t mTxDataPoll;           ///< The number of transmitted data poll.
+    uint32_t mTxBeacon;             ///< The number of transmitted beacon.
+    uint32_t mTxBeaconRequest;      ///< The number of transmitted beacon request.
+    uint32_t mTxOther;              ///< The number of transmitted other types of frames.
+    uint32_t mTxRetry;              ///< The number of retransmission times.
+    uint32_t mTxErrCca;             ///< The number of CCA failure times.
+    uint32_t mTxErrAbort;           ///< The number of frame transmission failures due to abort error.
+    uint32_t mRxTotal;              ///< The total number of received packets.
+    uint32_t mRxUnicast;            ///< The total number of unicast packets received.
+    uint32_t mRxBroadcast;          ///< The total number of broadcast packets received.
+    uint32_t mRxData;               ///< The number of received data.
+    uint32_t mRxDataPoll;           ///< The number of received data poll.
+    uint32_t mRxBeacon;             ///< The number of received beacon.
+    uint32_t mRxBeaconRequest;      ///< The number of received beacon request.
+    uint32_t mRxOther;              ///< The number of received other types of frames.
+    uint32_t mRxWhitelistFiltered;  ///< The number of received packets filtered by whitelist.
+    uint32_t mRxDestAddrFiltered;   ///< The number of received packets filtered by destination check.
+    uint32_t mRxDuplicated;         ///< The number of received duplicated packets.
+    uint32_t mRxErrNoFrame;         ///< The number of received packets that do not contain contents.
+    uint32_t mRxErrUnknownNeighbor; ///< The number of received packets from unknown neighbor.
+    uint32_t mRxErrInvalidSrcAddr;  ///< The number of received packets whose source address is invalid.
+    uint32_t mRxErrSec;             ///< The number of received packets with security error.
+    uint32_t mRxErrFcs;             ///< The number of received packets with FCS error.
+    uint32_t mRxErrOther;           ///< The number of received packets with other error.
 } otMacCounters;
 
 /**
@@ -976,10 +974,10 @@ typedef struct otMacCounters
  */
 typedef struct otIpCounters
 {
-    uint32_t mTxSuccess;              ///< The number of IPv6 packets successfully transmitted.
-    uint32_t mRxSuccess;              ///< The number of IPv6 packets successfully received.
-    uint32_t mTxFailure;              ///< The number of IPv6 packets failed to transmit.
-    uint32_t mRxFailure;              ///< The number of IPv6 packets failed to receive.
+    uint32_t mTxSuccess; ///< The number of IPv6 packets successfully transmitted.
+    uint32_t mRxSuccess; ///< The number of IPv6 packets successfully received.
+    uint32_t mTxFailure; ///< The number of IPv6 packets failed to transmit.
+    uint32_t mRxFailure; ///< The number of IPv6 packets failed to receive.
 } otIpCounters;
 
 /**
@@ -987,24 +985,24 @@ typedef struct otIpCounters
  */
 typedef struct otBufferInfo
 {
-    uint16_t mTotalBuffers;           ///< The number of buffers in the pool.
-    uint16_t mFreeBuffers;            ///< The number of free message buffers.
-    uint16_t m6loSendMessages;        ///< The number of messages in the 6lo send queue.
-    uint16_t m6loSendBuffers;         ///< The number of buffers in the 6lo send queue.
-    uint16_t m6loReassemblyMessages;  ///< The number of messages in the 6LoWPAN reassembly queue.
-    uint16_t m6loReassemblyBuffers;   ///< The number of buffers in the 6LoWPAN reassembly queue.
-    uint16_t mIp6Messages;            ///< The number of messages in the IPv6 send queue.
-    uint16_t mIp6Buffers;             ///< The number of buffers in the IPv6 send queue.
-    uint16_t mMplMessages;            ///< The number of messages in the MPL send queue.
-    uint16_t mMplBuffers;             ///< The number of buffers in the MPL send queue.
-    uint16_t mMleMessages;            ///< The number of messages in the MLE send queue.
-    uint16_t mMleBuffers;             ///< The number of buffers in the MLE send queue.
-    uint16_t mArpMessages;            ///< The number of messages in the ARP send queue.
-    uint16_t mArpBuffers;             ///< The number of buffers in the ARP send queue.
-    uint16_t mCoapMessages;           ///< The number of messages in the CoAP send queue.
-    uint16_t mCoapBuffers;            ///< The number of buffers in the CoAP send queue.
-    uint16_t mCoapSecureMessages;     ///< The number of messages in the CoAP secure send queue.
-    uint16_t mCoapSecureBuffers;      ///< The number of buffers in the CoAP secure send queue.
+    uint16_t mTotalBuffers;          ///< The number of buffers in the pool.
+    uint16_t mFreeBuffers;           ///< The number of free message buffers.
+    uint16_t m6loSendMessages;       ///< The number of messages in the 6lo send queue.
+    uint16_t m6loSendBuffers;        ///< The number of buffers in the 6lo send queue.
+    uint16_t m6loReassemblyMessages; ///< The number of messages in the 6LoWPAN reassembly queue.
+    uint16_t m6loReassemblyBuffers;  ///< The number of buffers in the 6LoWPAN reassembly queue.
+    uint16_t mIp6Messages;           ///< The number of messages in the IPv6 send queue.
+    uint16_t mIp6Buffers;            ///< The number of buffers in the IPv6 send queue.
+    uint16_t mMplMessages;           ///< The number of messages in the MPL send queue.
+    uint16_t mMplBuffers;            ///< The number of buffers in the MPL send queue.
+    uint16_t mMleMessages;           ///< The number of messages in the MLE send queue.
+    uint16_t mMleBuffers;            ///< The number of buffers in the MLE send queue.
+    uint16_t mArpMessages;           ///< The number of messages in the ARP send queue.
+    uint16_t mArpBuffers;            ///< The number of buffers in the ARP send queue.
+    uint16_t mCoapMessages;          ///< The number of messages in the CoAP send queue.
+    uint16_t mCoapBuffers;           ///< The number of buffers in the CoAP send queue.
+    uint16_t mCoapSecureMessages;    ///< The number of messages in the CoAP secure send queue.
+    uint16_t mCoapSecureBuffers;     ///< The number of buffers in the CoAP secure send queue.
 } otBufferInfo;
 
 /**
@@ -1013,14 +1011,14 @@ typedef struct otBufferInfo
  */
 typedef struct otNetifAddress
 {
-    otIp6Address           mAddress;                 ///< The IPv6 unicast address.
-    uint8_t                mPrefixLength;            ///< The Prefix length.
-    bool                   mPreferred : 1;           ///< TRUE if the address is preferred, FALSE otherwise.
-    bool                   mValid : 1;               ///< TRUE if the address is valid, FALSE otherwise.
-    bool                   mScopeOverrideValid : 1;  ///< TRUE if the mScopeOverride value is valid, FALSE otherwise.
-    unsigned int           mScopeOverride : 4;       ///< The IPv6 scope of this address.
-    bool                   mRloc : 1;                ///< TRUE if the address is an RLOC, FALSE otherwise.
-    struct otNetifAddress *mNext;                    ///< A pointer to the next network interface address.
+    otIp6Address mAddress;           ///< The IPv6 unicast address.
+    uint8_t mPrefixLength;           ///< The Prefix length.
+    bool mPreferred : 1;             ///< TRUE if the address is preferred, FALSE otherwise.
+    bool mValid : 1;                 ///< TRUE if the address is valid, FALSE otherwise.
+    bool mScopeOverrideValid : 1;    ///< TRUE if the mScopeOverride value is valid, FALSE otherwise.
+    unsigned int mScopeOverride : 4; ///< The IPv6 scope of this address.
+    bool mRloc : 1;                  ///< TRUE if the address is an RLOC, FALSE otherwise.
+    struct otNetifAddress * mNext;   ///< A pointer to the next network interface address.
 } otNetifAddress;
 
 /**
@@ -1029,8 +1027,8 @@ typedef struct otNetifAddress
  */
 typedef struct otNetifMulticastAddress
 {
-    otIp6Address                    mAddress;   ///< The IPv6 multicast address.
-    struct otNetifMulticastAddress *mNext;      ///< A pointer to the next network interface multicast address.
+    otIp6Address mAddress;                  ///< The IPv6 multicast address.
+    struct otNetifMulticastAddress * mNext; ///< A pointer to the next network interface multicast address.
 } otNetifMulticastAddress;
 
 /**
@@ -1038,7 +1036,7 @@ typedef struct otNetifMulticastAddress
  */
 typedef enum otNetifInterfaceId
 {
-    OT_NETIF_INTERFACE_ID_THREAD = 1,  ///< The Thread Network interface ID.
+    OT_NETIF_INTERFACE_ID_THREAD = 1, ///< The Thread Network interface ID.
 } otNetifInterfaceId;
 
 /**
@@ -1047,16 +1045,16 @@ typedef enum otNetifInterfaceId
  */
 typedef struct
 {
-    uint8_t        *mInterfaceId;        ///< String of bytes representing interface ID. Like "eth0" or "wlan0".
-    uint8_t         mInterfaceIdLength;  ///< Length of interface ID string.
+    uint8_t * mInterfaceId;     ///< String of bytes representing interface ID. Like "eth0" or "wlan0".
+    uint8_t mInterfaceIdLength; ///< Length of interface ID string.
 
-    uint8_t        *mNetworkId;          ///< Network ID (or name). Can be null if mNetworkIdLength is 0.
-    uint8_t         mNetworkIdLength;    ///< Length of Network ID string.
+    uint8_t * mNetworkId;     ///< Network ID (or name). Can be null if mNetworkIdLength is 0.
+    uint8_t mNetworkIdLength; ///< Length of Network ID string.
 
-    uint8_t         mDadCounter;         ///< Duplicate address detection counter.
+    uint8_t mDadCounter; ///< Duplicate address detection counter.
 
-    uint8_t        *mSecretKey;          ///< Secret key used to create IID. Cannot be null.
-    uint16_t        mSecretKeyLength;    ///< Secret key length in bytes. Should be at least 16 bytes == 128 bits.
+    uint8_t * mSecretKey;      ///< Secret key used to create IID. Cannot be null.
+    uint16_t mSecretKeyLength; ///< Secret key length in bytes. Should be at least 16 bytes == 128 bits.
 } otSemanticallyOpaqueIidGeneratorData;
 
 /**
@@ -1064,9 +1062,9 @@ typedef struct
  */
 typedef struct otSockAddr
 {
-    otIp6Address mAddress;  ///< An IPv6 address.
-    uint16_t     mPort;     ///< A transport-layer port.
-    int8_t       mScopeId;  ///< An IPv6 scope identifier.
+    otIp6Address mAddress; ///< An IPv6 address.
+    uint16_t mPort;        ///< A transport-layer port.
+    int8_t mScopeId;       ///< An IPv6 scope identifier.
 } otSockAddr;
 
 /**
@@ -1075,11 +1073,11 @@ typedef struct otSockAddr
  */
 typedef struct otThreadLinkInfo
 {
-    uint16_t mPanId;         ///< Source PAN ID
-    uint8_t  mChannel;       ///< 802.15.4 Channel
-    int8_t   mRss;           ///< Received Signal Strength in dBm.
-    uint8_t  mLqi;           ///< Link Quality Indicator for a received message.
-    bool     mLinkSecurity;  ///< Indicates whether or not link security is enabled.
+    uint16_t mPanId;    ///< Source PAN ID
+    uint8_t mChannel;   ///< 802.15.4 Channel
+    int8_t mRss;        ///< Received Signal Strength in dBm.
+    uint8_t mLqi;       ///< Link Quality Indicator for a received message.
+    bool mLinkSecurity; ///< Indicates whether or not link security is enabled.
 } otThreadLinkInfo;
 
 #ifdef OTDLL
@@ -1092,12 +1090,12 @@ typedef struct otThreadLinkInfo
  * @param[in]  aContext     A pointer to application-specific context.
  *
  */
-typedef void (OTCALL *otDeviceAvailabilityChangedCallback)(bool aAdded, const GUID *aDeviceGuid, void *aContext);
+typedef void(OTCALL * otDeviceAvailabilityChangedCallback)(bool aAdded, const GUID * aDeviceGuid, void * aContext);
 
 #endif // OTDLL
 
 #ifdef __cplusplus
-}  // extern "C"
+} // extern "C"
 #endif
 
-#endif  // OPENTHREAD_TYPES_H_
+#endif // OPENTHREAD_TYPES_H_

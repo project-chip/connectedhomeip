@@ -46,14 +46,15 @@ extern "C" {
 /* Exported constants --------------------------------------------------------*/
 
 #define VLEVEL_OFF 0 /*!< used to set UTIL_ADV_TRACE_SetVerboseLevel() (not as message param) */
-#define VLEVEL_ALWAYS 0 /*!< used as message params, if this level is given \
-                             trace will be printed even when UTIL_ADV_TRACE_SetVerboseLevel(OFF) */
+#define VLEVEL_ALWAYS                                                                                                              \
+    0              /*!< used as message params, if this level is given                                                             \
+                        trace will be printed even when UTIL_ADV_TRACE_SetVerboseLevel(OFF) */
 #define VLEVEL_L 1 /*!< just essential traces */
 #define VLEVEL_M 2 /*!< functional traces */
 #define VLEVEL_H 3 /*!< all traces */
 
 #define TS_OFF 0 /*!< Log without TimeStamp */
-#define TS_ON 1 /*!< Log with TimeStamp */
+#define TS_ON 1  /*!< Log with TimeStamp */
 
 #define T_REG_OFF 0 /*!< Log without bitmask */
 
@@ -115,8 +116,8 @@ extern "C" {
 /**
  * @brief macro used to enter the critical section
  */
-#define UTILS_ENTER_CRITICAL_SECTION()      \
-    uint32_t primask_bit = __get_PRIMASK(); \
+#define UTILS_ENTER_CRITICAL_SECTION()                                                                                             \
+    uint32_t primask_bit = __get_PRIMASK();                                                                                        \
     __disable_irq()
 
 /**
@@ -127,8 +128,8 @@ extern "C" {
 /**
  * @brief macro used to enter the critical section
  */
-#define UTILS_ENTER_LIMITED_CRITICAL_SECTION(x) \
-    uint32_t basepri_value = __get_BASEPRI();   \
+#define UTILS_ENTER_LIMITED_CRITICAL_SECTION(x)                                                                                    \
+    uint32_t basepri_value = __get_BASEPRI();                                                                                      \
     __set_BASEPRI_MAX(x)
 
 /**
@@ -144,16 +145,17 @@ extern "C" {
  *
  ******************************************************************************/
 
-#define UTIL_ADV_TRACE_CONDITIONNAL /*!< not used */
-#define UTIL_ADV_TRACE_UNCHUNK_MODE /*!< not used */
-#define UTIL_ADV_TRACE_DEBUG(...) /*!< not used */
-#define UTIL_ADV_TRACE_INIT_CRITICAL_SECTION() UTILS_INIT_CRITICAL_SECTION() /*!< init the critical section in trace feature */
+#define UTIL_ADV_TRACE_CONDITIONNAL                                            /*!< not used */
+#define UTIL_ADV_TRACE_UNCHUNK_MODE                                            /*!< not used */
+#define UTIL_ADV_TRACE_DEBUG(...)                                              /*!< not used */
+#define UTIL_ADV_TRACE_INIT_CRITICAL_SECTION() UTILS_INIT_CRITICAL_SECTION()   /*!< init the critical section in trace feature */
 #define UTIL_ADV_TRACE_ENTER_CRITICAL_SECTION() UTILS_ENTER_CRITICAL_SECTION() /*!< enter the critical section in trace feature */
-#define UTIL_ADV_TRACE_EXIT_CRITICAL_SECTION() UTILS_EXIT_CRITICAL_SECTION() /*!< exit the critical section in trace feature */
-#define UTIL_ADV_TRACE_TMP_BUF_SIZE (CFG_LOG_TRACE_BUF_SIZE) /*!< trace buffer size */
-#define UTIL_ADV_TRACE_TMP_MAX_TIMESTMAP_SIZE (15U) /*!< trace timestamp size */
-#define UTIL_ADV_TRACE_FIFO_SIZE (CFG_LOG_TRACE_FIFO_SIZE) /*!< trace fifo size */
-#define UTIL_ADV_TRACE_MEMSET8(dest, value, size) UTIL_MEM_set_8((dest), (value), (size)) /*!< memset utilities interface to trace feature */
+#define UTIL_ADV_TRACE_EXIT_CRITICAL_SECTION() UTILS_EXIT_CRITICAL_SECTION()   /*!< exit the critical section in trace feature */
+#define UTIL_ADV_TRACE_TMP_BUF_SIZE (CFG_LOG_TRACE_BUF_SIZE)                   /*!< trace buffer size */
+#define UTIL_ADV_TRACE_TMP_MAX_TIMESTMAP_SIZE (15U)                            /*!< trace timestamp size */
+#define UTIL_ADV_TRACE_FIFO_SIZE (CFG_LOG_TRACE_FIFO_SIZE)                     /*!< trace fifo size */
+#define UTIL_ADV_TRACE_MEMSET8(dest, value, size)                                                                                  \
+    UTIL_MEM_set_8((dest), (value), (size))                  /*!< memset utilities interface to trace feature */
 #define UTIL_ADV_TRACE_VSNPRINTF(...) vsnprintf(__VA_ARGS__) /*!< vsnprintf utilities interface to trace feature */
 
 /* USER CODE BEGIN EM */

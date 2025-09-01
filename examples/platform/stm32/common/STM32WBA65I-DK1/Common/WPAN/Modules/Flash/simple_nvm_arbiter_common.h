@@ -40,7 +40,8 @@ extern "C" {
 /* Exported types ------------------------------------------------------------*/
 
 /* SNVMA command status */
-typedef enum SNVMA_Cmd_Status {
+typedef enum SNVMA_Cmd_Status
+{
     SNVMA_ERROR_OK,
     SNVMA_ERROR_NOK,
     SNVMA_ERROR_NOT_INIT,
@@ -67,13 +68,15 @@ typedef enum SNVMA_Cmd_Status {
 } SNVMA_Cmd_Status_t;
 
 /* SNVMA callback status */
-typedef enum SNVMA_Callback_Status {
+typedef enum SNVMA_Callback_Status
+{
     SNVMA_OPERATION_COMPLETE,
     SNVMA_OPERATION_FAILED
 } SNVMA_Callback_Status_t;
 
 /* Buffer Element */
-typedef struct SNVMA_BufferElt {
+typedef struct SNVMA_BufferElt
+{
     /* Buffer address */
     uint32_t * p_Addr;
     /* Buffer size */
@@ -81,7 +84,8 @@ typedef struct SNVMA_BufferElt {
 } SNVMA_BufferElt_t;
 
 /* Bank Element */
-typedef struct SNVMA_BankElt {
+typedef struct SNVMA_BankElt
+{
     /* Pointer onto the start address of the bank */
     uint32_t * p_StartAddr;
     /* Pointer onto the buffer address in the bank */
@@ -89,7 +93,8 @@ typedef struct SNVMA_BankElt {
 } SNVMA_BankElt_t;
 
 /* NVM Element */
-typedef struct SNVMA_NvmElt {
+typedef struct SNVMA_NvmElt
+{
     /* Bank number */
     uint8_t BankNumber;
     /* Bank size */

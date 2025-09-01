@@ -38,20 +38,17 @@
 /**
  * @brief Set ADC Clock source
  */
-#define ADCTCTRL_SET_CLOCK_SOURCE() \
-    LL_RCC_SetADCClockSource(LL_RCC_ADC_CLKSOURCE_HCLK)
+#define ADCTCTRL_SET_CLOCK_SOURCE() LL_RCC_SetADCClockSource(LL_RCC_ADC_CLKSOURCE_HCLK)
 
 /**
  * @brief Peripheral clock enable for ADC
  */
-#define ADCCTRL_ENABLE_CLOCK() \
-    LL_AHB4_GRP1_EnableClock(LL_AHB4_GRP1_PERIPH_ADC4)
+#define ADCCTRL_ENABLE_CLOCK() LL_AHB4_GRP1_EnableClock(LL_AHB4_GRP1_PERIPH_ADC4)
 
 /**
  * @brief Peripheral clock disable for ADC
  */
-#define ADCCTRL_DISABLE_CLOCK() \
-    LL_AHB4_GRP1_DisableClock(LL_AHB4_GRP1_PERIPH_ADC4)
+#define ADCCTRL_DISABLE_CLOCK() LL_AHB4_GRP1_DisableClock(LL_AHB4_GRP1_PERIPH_ADC4)
 
 /* Exported types ------------------------------------------------------------*/
 /* Exported constants --------------------------------------------------------*/

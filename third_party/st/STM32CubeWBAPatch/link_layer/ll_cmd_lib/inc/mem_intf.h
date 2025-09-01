@@ -59,10 +59,7 @@
  * @param  n 		: the number of bytes to be copied.
  * @retval pointer to destination.
  */
-void *ble_memcpy(
-	void *ptr_dstntion,
-	const void *ptr_src,
-	uint16_t n);
+void * ble_memcpy(void * ptr_dstntion, const void * ptr_src, uint16_t n);
 
 /**
  * @brief  Setting a certian block of memory with a certain value.
@@ -71,10 +68,7 @@ void *ble_memcpy(
  * @param  n 		: the number of bytes to be set to the value.
  * @retval pointer to destination.
  */
-void *ble_memset(
-	void *ptr_mem,
-	uint8_t value,
-	uint16_t n);
+void * ble_memset(void * ptr_mem, uint8_t value, uint16_t n);
 
 /**
  * @brief  comparing a certain block of memory with another.
@@ -85,10 +79,7 @@ void *ble_memset(
  * 		> 0 ptr_src is less than ptr_dstntion.
  * 		  0 ptr_dstntion is equal to ptr_src.
  */
-int8_t ble_memcmp(
-	const void *ptr_dstntion,
-	const void *ptr_src,
-	uint16_t n);
+int8_t ble_memcmp(const void * ptr_dstntion, const void * ptr_src, uint16_t n);
 
 /**
  * @brief  Moving  memory from position to another.
@@ -98,10 +89,7 @@ int8_t ble_memcmp(
  * @retval pointer to destination.
  */
 
-void *ble_memmov(
-	void *ptr_dstntion,
-	const void *ptr_src,
-	uint16_t n);
+void * ble_memmov(void * ptr_dstntion, const void * ptr_src, uint16_t n);
 /**
  * @brief  Coping n bytes of memory from position to another.
  * @param  destination	: pointer to the destination array where the content is to be copied.
@@ -110,8 +98,7 @@ void *ble_memmov(
  * @param  keep_endian  : flag to keep or change the endian
  * @retval pointer to destination.
  */
-void ble_memcpy_n_bytes(uint8_t *destination,
-		const uint8_t *source, uint8_t num_bytes, uint8_t keep_endian);
+void ble_memcpy_n_bytes(uint8_t * destination, const uint8_t * source, uint8_t num_bytes, uint8_t keep_endian);
 /**
  * @}
  */

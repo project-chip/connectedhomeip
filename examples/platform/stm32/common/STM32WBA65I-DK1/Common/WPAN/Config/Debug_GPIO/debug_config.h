@@ -45,561 +45,1113 @@
 
 /* System clock manager - System clock config */
 #define USE_RT_DEBUG_SCM_SYSTEM_CLOCK_CONFIG (0)
-#define GPIO_DEBUG_SCM_SYSTEM_CLOCK_CONFIG { GPIOA, GPIO_PIN_12 }
+#define GPIO_DEBUG_SCM_SYSTEM_CLOCK_CONFIG                                                                                         \
+    {                                                                                                                              \
+        GPIOA, GPIO_PIN_12                                                                                                         \
+    }
 
 /* System clock manager - Setup */
 #define USE_RT_DEBUG_SCM_SETUP (0)
-#define GPIO_DEBUG_SCM_SETUP { GPIOA, GPIO_PIN_5 }
+#define GPIO_DEBUG_SCM_SETUP                                                                                                       \
+    {                                                                                                                              \
+        GPIOA, GPIO_PIN_5                                                                                                          \
+    }
 
 /* System clock manager - HSE RDY interrupt handling */
 #define USE_RT_DEBUG_SCM_HSERDY_ISR (0)
-#define GPIO_DEBUG_SCM_HSERDY_ISR { GPIOA, GPIO_PIN_15 }
+#define GPIO_DEBUG_SCM_HSERDY_ISR                                                                                                  \
+    {                                                                                                                              \
+        GPIOA, GPIO_PIN_15                                                                                                         \
+    }
 
 #define USE_RT_DEBUG_ADC_ACTIVATION (0)
-#define GPIO_DEBUG_ADC_ACTIVATION { GPIOB, GPIO_PIN_4 }
+#define GPIO_DEBUG_ADC_ACTIVATION                                                                                                  \
+    {                                                                                                                              \
+        GPIOB, GPIO_PIN_4                                                                                                          \
+    }
 
 #define USE_RT_DEBUG_ADC_DEACTIVATION (0)
-#define GPIO_DEBUG_ADC_DEACTIVATION { GPIOA, GPIO_PIN_0 }
+#define GPIO_DEBUG_ADC_DEACTIVATION                                                                                                \
+    {                                                                                                                              \
+        GPIOA, GPIO_PIN_0                                                                                                          \
+    }
 
 #define USE_RT_DEBUG_ADC_TEMPERATURE_ACQUISITION (0)
-#define GPIO_DEBUG_ADC_TEMPERATURE_ACQUISITION { GPIOB, GPIO_PIN_8 }
+#define GPIO_DEBUG_ADC_TEMPERATURE_ACQUISITION                                                                                     \
+    {                                                                                                                              \
+        GPIOB, GPIO_PIN_8                                                                                                          \
+    }
 
 #define USE_RT_DEBUG_RNG_ENABLE (0)
-#define GPIO_DEBUG_RNG_ENABLE { GPIOA, GPIO_PIN_0 }
+#define GPIO_DEBUG_RNG_ENABLE                                                                                                      \
+    {                                                                                                                              \
+        GPIOA, GPIO_PIN_0                                                                                                          \
+    }
 
 #define USE_RT_DEBUG_RNG_DISABLE (0)
-#define GPIO_DEBUG_RNG_DISABLE { GPIOA, GPIO_PIN_0 }
+#define GPIO_DEBUG_RNG_DISABLE                                                                                                     \
+    {                                                                                                                              \
+        GPIOA, GPIO_PIN_0                                                                                                          \
+    }
 
 #define USE_RT_DEBUG_RNG_GEN_RAND_NUM (0)
-#define GPIO_DEBUG_RNG_GEN_RAND_NUM { GPIOB, GPIO_PIN_12 }
+#define GPIO_DEBUG_RNG_GEN_RAND_NUM                                                                                                \
+    {                                                                                                                              \
+        GPIOB, GPIO_PIN_12                                                                                                         \
+    }
 
 #define USE_RT_DEBUG_LOW_POWER_STOP_MODE_ENTER (0)
-#define GPIO_DEBUG_LOW_POWER_STOP_MODE_ENTER { GPIOA, GPIO_PIN_0 }
+#define GPIO_DEBUG_LOW_POWER_STOP_MODE_ENTER                                                                                       \
+    {                                                                                                                              \
+        GPIOA, GPIO_PIN_0                                                                                                          \
+    }
 
 #define USE_RT_DEBUG_LOW_POWER_STOP_MODE_EXIT (0)
-#define GPIO_DEBUG_LOW_POWER_STOP_MODE_EXIT { GPIOA, GPIO_PIN_0 }
+#define GPIO_DEBUG_LOW_POWER_STOP_MODE_EXIT                                                                                        \
+    {                                                                                                                              \
+        GPIOA, GPIO_PIN_0                                                                                                          \
+    }
 
 #define USE_RT_DEBUG_LOW_POWER_STOP_MODE_ACTIVE (0)
-#define GPIO_DEBUG_LOW_POWER_STOP_MODE_ACTIVE { GPIOB, GPIO_PIN_3 }
+#define GPIO_DEBUG_LOW_POWER_STOP_MODE_ACTIVE                                                                                      \
+    {                                                                                                                              \
+        GPIOB, GPIO_PIN_3                                                                                                          \
+    }
 
 #define USE_RT_DEBUG_LOW_POWER_STANDBY_MODE_ENTER (0)
-#define GPIO_DEBUG_LOW_POWER_STANDBY_MODE_ENTER { GPIOA, GPIO_PIN_0 }
+#define GPIO_DEBUG_LOW_POWER_STANDBY_MODE_ENTER                                                                                    \
+    {                                                                                                                              \
+        GPIOA, GPIO_PIN_0                                                                                                          \
+    }
 
 #define USE_RT_DEBUG_LOW_POWER_STANDBY_MODE_EXIT (0)
-#define GPIO_DEBUG_LOW_POWER_STANDBY_MODE_EXIT { GPIOA, GPIO_PIN_0 }
+#define GPIO_DEBUG_LOW_POWER_STANDBY_MODE_EXIT                                                                                     \
+    {                                                                                                                              \
+        GPIOA, GPIO_PIN_0                                                                                                          \
+    }
 
 #define USE_RT_DEBUG_LOW_POWER_STANDBY_MODE_ACTIVE (0)
-#define GPIO_DEBUG_LOW_POWER_STANDBY_MODE_ACTIVE { GPIOB, GPIO_PIN_15 }
+#define GPIO_DEBUG_LOW_POWER_STANDBY_MODE_ACTIVE                                                                                   \
+    {                                                                                                                              \
+        GPIOB, GPIO_PIN_15                                                                                                         \
+    }
 
 #define USE_RT_DEBUG_HCI_READ_DONE (0)
-#define GPIO_DEBUG_HCI_READ_DONE { GPIOA, GPIO_PIN_0 }
+#define GPIO_DEBUG_HCI_READ_DONE                                                                                                   \
+    {                                                                                                                              \
+        GPIOA, GPIO_PIN_0                                                                                                          \
+    }
 
 #define USE_RT_DEBUG_HCI_RCVD_CMD (0)
-#define GPIO_DEBUG_HCI_RCVD_CMD { GPIOA, GPIO_PIN_0 }
+#define GPIO_DEBUG_HCI_RCVD_CMD                                                                                                    \
+    {                                                                                                                              \
+        GPIOA, GPIO_PIN_0                                                                                                          \
+    }
 
 #define USE_RT_DEBUG_HCI_WRITE_DONE (0)
-#define GPIO_DEBUG_HCI_WRITE_DONE { GPIOA, GPIO_PIN_0 }
+#define GPIO_DEBUG_HCI_WRITE_DONE                                                                                                  \
+    {                                                                                                                              \
+        GPIOA, GPIO_PIN_0                                                                                                          \
+    }
 
 #define USE_RT_DEBUG_SCHDLR_EVNT_UPDATE (0)
-#define GPIO_DEBUG_SCHDLR_EVNT_UPDATE { GPIOA, GPIO_PIN_0 }
+#define GPIO_DEBUG_SCHDLR_EVNT_UPDATE                                                                                              \
+    {                                                                                                                              \
+        GPIOA, GPIO_PIN_0                                                                                                          \
+    }
 
 #define USE_RT_DEBUG_SCHDLR_TIMER_SET (0)
-#define GPIO_DEBUG_SCHDLR_TIMER_SET { GPIOA, GPIO_PIN_0 }
+#define GPIO_DEBUG_SCHDLR_TIMER_SET                                                                                                \
+    {                                                                                                                              \
+        GPIOA, GPIO_PIN_0                                                                                                          \
+    }
 
 #define USE_RT_DEBUG_SCHDLR_PHY_CLBR_TIMER (0)
-#define GPIO_DEBUG_SCHDLR_PHY_CLBR_TIMER { GPIOA, GPIO_PIN_0 }
+#define GPIO_DEBUG_SCHDLR_PHY_CLBR_TIMER                                                                                           \
+    {                                                                                                                              \
+        GPIOA, GPIO_PIN_0                                                                                                          \
+    }
 
 #define USE_RT_DEBUG_SCHDLR_EVNT_SKIPPED (0)
-#define GPIO_DEBUG_SCHDLR_EVNT_SKIPPED { GPIOA, GPIO_PIN_0 }
+#define GPIO_DEBUG_SCHDLR_EVNT_SKIPPED                                                                                             \
+    {                                                                                                                              \
+        GPIOA, GPIO_PIN_0                                                                                                          \
+    }
 
 #define USE_RT_DEBUG_SCHDLR_HNDL_NXT_TRACE (0)
-#define GPIO_DEBUG_SCHDLR_HNDL_NXT_TRACE { GPIOA, GPIO_PIN_12 }
+#define GPIO_DEBUG_SCHDLR_HNDL_NXT_TRACE                                                                                           \
+    {                                                                                                                              \
+        GPIOA, GPIO_PIN_12                                                                                                         \
+    }
 
 #define USE_RT_DEBUG_ACTIVE_SCHDLR_NEAR_DETEDTED (0)
-#define GPIO_DEBUG_ACTIVE_SCHDLR_NEAR_DETEDTED { GPIOA, GPIO_PIN_0 }
+#define GPIO_DEBUG_ACTIVE_SCHDLR_NEAR_DETEDTED                                                                                     \
+    {                                                                                                                              \
+        GPIOA, GPIO_PIN_0                                                                                                          \
+    }
 
 #define USE_RT_DEBUG_ACTIVE_SCHDLR_NEAR_GAP_CHECK (0)
-#define GPIO_DEBUG_ACTIVE_SCHDLR_NEAR_GAP_CHECK { GPIOA, GPIO_PIN_0 }
+#define GPIO_DEBUG_ACTIVE_SCHDLR_NEAR_GAP_CHECK                                                                                    \
+    {                                                                                                                              \
+        GPIOA, GPIO_PIN_0                                                                                                          \
+    }
 
 #define USE_RT_DEBUG_ACTIVE_SCHDLR_NEAR_TIME_CHECK (0)
-#define GPIO_DEBUG_ACTIVE_SCHDLR_NEAR_TIME_CHECK { GPIOA, GPIO_PIN_0 }
+#define GPIO_DEBUG_ACTIVE_SCHDLR_NEAR_TIME_CHECK                                                                                   \
+    {                                                                                                                              \
+        GPIOA, GPIO_PIN_0                                                                                                          \
+    }
 
 #define USE_RT_DEBUG_ACTIVE_SCHDLR_NEAR_TRACE (0)
-#define GPIO_DEBUG_ACTIVE_SCHDLR_NEAR_TRACE { GPIOA, GPIO_PIN_0 }
+#define GPIO_DEBUG_ACTIVE_SCHDLR_NEAR_TRACE                                                                                        \
+    {                                                                                                                              \
+        GPIOA, GPIO_PIN_0                                                                                                          \
+    }
 
 #define USE_RT_DEBUG_SCHDLR_EVNT_RGSTR (0)
-#define GPIO_DEBUG_SCHDLR_EVNT_RGSTR { GPIOB, GPIO_PIN_8 }
+#define GPIO_DEBUG_SCHDLR_EVNT_RGSTR                                                                                               \
+    {                                                                                                                              \
+        GPIOB, GPIO_PIN_8                                                                                                          \
+    }
 
 #define USE_RT_DEBUG_SCHDLR_ADD_CONFLICT_Q (0)
-#define GPIO_DEBUG_SCHDLR_ADD_CONFLICT_Q { GPIOA, GPIO_PIN_0 }
+#define GPIO_DEBUG_SCHDLR_ADD_CONFLICT_Q                                                                                           \
+    {                                                                                                                              \
+        GPIOA, GPIO_PIN_0                                                                                                          \
+    }
 
 #define USE_RT_DEBUG_SCHDLR_HNDL_MISSED_EVNT (0)
-#define GPIO_DEBUG_SCHDLR_HNDL_MISSED_EVNT { GPIOA, GPIO_PIN_5 }
+#define GPIO_DEBUG_SCHDLR_HNDL_MISSED_EVNT                                                                                         \
+    {                                                                                                                              \
+        GPIOA, GPIO_PIN_5                                                                                                          \
+    }
 
 #define USE_RT_DEBUG_SCHDLR_UNRGSTR_EVNT (0)
-#define GPIO_DEBUG_SCHDLR_UNRGSTR_EVNT { GPIOA, GPIO_PIN_0 }
+#define GPIO_DEBUG_SCHDLR_UNRGSTR_EVNT                                                                                             \
+    {                                                                                                                              \
+        GPIOA, GPIO_PIN_0                                                                                                          \
+    }
 
 #define USE_RT_DEBUG_SCHDLR_EXEC_EVNT_TRACE (0)
-#define GPIO_DEBUG_SCHDLR_EXEC_EVNT_TRACE { GPIOA, GPIO_PIN_15 }
+#define GPIO_DEBUG_SCHDLR_EXEC_EVNT_TRACE                                                                                          \
+    {                                                                                                                              \
+        GPIOA, GPIO_PIN_15                                                                                                         \
+    }
 
 #define USE_RT_DEBUG_SCHDLR_EXEC_EVNT_PROFILE (0)
-#define GPIO_DEBUG_SCHDLR_EXEC_EVNT_PROFILE { GPIOA, GPIO_PIN_0 }
+#define GPIO_DEBUG_SCHDLR_EXEC_EVNT_PROFILE                                                                                        \
+    {                                                                                                                              \
+        GPIOA, GPIO_PIN_0                                                                                                          \
+    }
 
 #define USE_RT_DEBUG_SCHDLR_EXEC_EVNT_ERROR (0)
-#define GPIO_DEBUG_SCHDLR_EXEC_EVNT_ERROR { GPIOA, GPIO_PIN_0 }
+#define GPIO_DEBUG_SCHDLR_EXEC_EVNT_ERROR                                                                                          \
+    {                                                                                                                              \
+        GPIOA, GPIO_PIN_0                                                                                                          \
+    }
 
 #define USE_RT_DEBUG_SCHDLR_EXEC_EVNT_WINDOW_WIDENING (0)
-#define GPIO_DEBUG_SCHDLR_EXEC_EVNT_WINDOW_WIDENING { GPIOA, GPIO_PIN_0 }
+#define GPIO_DEBUG_SCHDLR_EXEC_EVNT_WINDOW_WIDENING                                                                                \
+    {                                                                                                                              \
+        GPIOA, GPIO_PIN_0                                                                                                          \
+    }
 
 #define USE_RT_DEBUG_LLHWC_CMN_CLR_ISR (0)
-#define GPIO_DEBUG_LLHWC_CMN_CLR_ISR { GPIOA, GPIO_PIN_0 }
+#define GPIO_DEBUG_LLHWC_CMN_CLR_ISR                                                                                               \
+    {                                                                                                                              \
+        GPIOA, GPIO_PIN_0                                                                                                          \
+    }
 
 #define USE_RT_DEBUG_LLWCC_CMN_HG_ISR (0)
-#define GPIO_DEBUG_LLWCC_CMN_HG_ISR { GPIOA, GPIO_PIN_15 }
+#define GPIO_DEBUG_LLWCC_CMN_HG_ISR                                                                                                \
+    {                                                                                                                              \
+        GPIOA, GPIO_PIN_15                                                                                                         \
+    }
 
 #define USE_RT_DEBUG_LLHWC_CMN_LW_ISR (0)
-#define GPIO_DEBUG_LLHWC_CMN_LW_ISR { GPIOA, GPIO_PIN_12 }
+#define GPIO_DEBUG_LLHWC_CMN_LW_ISR                                                                                                \
+    {                                                                                                                              \
+        GPIOA, GPIO_PIN_12                                                                                                         \
+    }
 
 #define USE_RT_DEBUG_LLHWC_CMN_CLR_TIMER_ERROR (0)
-#define GPIO_DEBUG_LLHWC_CMN_CLR_TIMER_ERROR { GPIOA, GPIO_PIN_0 }
+#define GPIO_DEBUG_LLHWC_CMN_CLR_TIMER_ERROR                                                                                       \
+    {                                                                                                                              \
+        GPIOA, GPIO_PIN_0                                                                                                          \
+    }
 
 #define USE_RT_DEBUG_LLHWC_LL_ISR (0)
-#define GPIO_DEBUG_LLHWC_LL_ISR { GPIOA, GPIO_PIN_0 }
+#define GPIO_DEBUG_LLHWC_LL_ISR                                                                                                    \
+    {                                                                                                                              \
+        GPIOA, GPIO_PIN_0                                                                                                          \
+    }
 
 #define USE_RT_DEBUG_LLHWC_SPLTMR_SET (0)
-#define GPIO_DEBUG_LLHWC_SPLTMR_SET { GPIOA, GPIO_PIN_0 }
+#define GPIO_DEBUG_LLHWC_SPLTMR_SET                                                                                                \
+    {                                                                                                                              \
+        GPIOA, GPIO_PIN_0                                                                                                          \
+    }
 
 #define USE_RT_DEBUG_LLHWC_SPLTMR_GET (0)
-#define GPIO_DEBUG_LLHWC_SPLTMR_GET { GPIOA, GPIO_PIN_0 }
+#define GPIO_DEBUG_LLHWC_SPLTMR_GET                                                                                                \
+    {                                                                                                                              \
+        GPIOA, GPIO_PIN_0                                                                                                          \
+    }
 
 #define USE_RT_DEBUG_LLHWC_LOW_ISR (0)
-#define GPIO_DEBUG_LLHWC_LOW_ISR { GPIOA, GPIO_PIN_0 }
+#define GPIO_DEBUG_LLHWC_LOW_ISR                                                                                                   \
+    {                                                                                                                              \
+        GPIOA, GPIO_PIN_0                                                                                                          \
+    }
 
 #define USE_RT_DEBUG_LLHWC_STOP_SCN (0)
-#define GPIO_DEBUG_LLHWC_STOP_SCN { GPIOA, GPIO_PIN_0 }
+#define GPIO_DEBUG_LLHWC_STOP_SCN                                                                                                  \
+    {                                                                                                                              \
+        GPIOA, GPIO_PIN_0                                                                                                          \
+    }
 
 #define USE_RT_DEBUG_LLHWC_WAIT_ENVT_ON_AIR (0)
-#define GPIO_DEBUG_LLHWC_WAIT_ENVT_ON_AIR { GPIOA, GPIO_PIN_0 }
+#define GPIO_DEBUG_LLHWC_WAIT_ENVT_ON_AIR                                                                                          \
+    {                                                                                                                              \
+        GPIOA, GPIO_PIN_0                                                                                                          \
+    }
 
 #define USE_RT_DEBUG_LLHWC_SET_CONN_EVNT_PARAM (0)
-#define GPIO_DEBUG_LLHWC_SET_CONN_EVNT_PARAM { GPIOA, GPIO_PIN_0 }
+#define GPIO_DEBUG_LLHWC_SET_CONN_EVNT_PARAM                                                                                       \
+    {                                                                                                                              \
+        GPIOA, GPIO_PIN_0                                                                                                          \
+    }
 
 #define USE_RT_DEBUG_POST_EVNT (0)
-#define GPIO_DEBUG_POST_EVNT { GPIOA, GPIO_PIN_0 }
+#define GPIO_DEBUG_POST_EVNT                                                                                                       \
+    {                                                                                                                              \
+        GPIOA, GPIO_PIN_0                                                                                                          \
+    }
 
 #define USE_RT_DEBUG_HNDL_ALL_EVNTS (0)
-#define GPIO_DEBUG_HNDL_ALL_EVNTS { GPIOA, GPIO_PIN_0 }
+#define GPIO_DEBUG_HNDL_ALL_EVNTS                                                                                                  \
+    {                                                                                                                              \
+        GPIOA, GPIO_PIN_0                                                                                                          \
+    }
 
 #define USE_RT_DEBUG_PROCESS_EVNT (0)
-#define GPIO_DEBUG_PROCESS_EVNT { GPIOA, GPIO_PIN_0 }
+#define GPIO_DEBUG_PROCESS_EVNT                                                                                                    \
+    {                                                                                                                              \
+        GPIOA, GPIO_PIN_0                                                                                                          \
+    }
 
 #define USE_RT_DEBUG_PROCESS_ISO_DATA (0)
-#define GPIO_DEBUG_PROCESS_ISO_DATA { GPIOA, GPIO_PIN_0 }
+#define GPIO_DEBUG_PROCESS_ISO_DATA                                                                                                \
+    {                                                                                                                              \
+        GPIOA, GPIO_PIN_0                                                                                                          \
+    }
 
 #define USE_RT_DEBUG_ALLOC_TX_ISO_EMPTY_PKT (0)
-#define GPIO_DEBUG_ALLOC_TX_ISO_EMPTY_PKT { GPIOA, GPIO_PIN_0 }
+#define GPIO_DEBUG_ALLOC_TX_ISO_EMPTY_PKT                                                                                          \
+    {                                                                                                                              \
+        GPIOA, GPIO_PIN_0                                                                                                          \
+    }
 
 #define USE_RT_DEBUG_BIG_FREE_EMPTY_PKTS (0)
-#define GPIO_DEBUG_BIG_FREE_EMPTY_PKTS { GPIOA, GPIO_PIN_0 }
+#define GPIO_DEBUG_BIG_FREE_EMPTY_PKTS                                                                                             \
+    {                                                                                                                              \
+        GPIOA, GPIO_PIN_0                                                                                                          \
+    }
 
 #define USE_RT_DEBUG_RECOMBINE_UNFRMD_DATA_OK (0)
-#define GPIO_DEBUG_RECOMBINE_UNFRMD_DATA_OK { GPIOA, GPIO_PIN_0 }
+#define GPIO_DEBUG_RECOMBINE_UNFRMD_DATA_OK                                                                                        \
+    {                                                                                                                              \
+        GPIOA, GPIO_PIN_0                                                                                                          \
+    }
 
 #define USE_RT_DEBUG_RECOMBINE_UNFRMD_DATA_CRC (0)
-#define GPIO_DEBUG_RECOMBINE_UNFRMD_DATA_CRC { GPIOA, GPIO_PIN_0 }
+#define GPIO_DEBUG_RECOMBINE_UNFRMD_DATA_CRC                                                                                       \
+    {                                                                                                                              \
+        GPIOA, GPIO_PIN_0                                                                                                          \
+    }
 
 #define USE_RT_DEBUG_RECOMBINE_UNFRMD_DATA_NoRX (0)
-#define GPIO_DEBUG_RECOMBINE_UNFRMD_DATA_NoRX { GPIOA, GPIO_PIN_0 }
+#define GPIO_DEBUG_RECOMBINE_UNFRMD_DATA_NoRX                                                                                      \
+    {                                                                                                                              \
+        GPIOA, GPIO_PIN_0                                                                                                          \
+    }
 
 #define USE_RT_DEBUG_RECOMBINE_UNFRMD_DATA_TRACE (0)
-#define GPIO_DEBUG_RECOMBINE_UNFRMD_DATA_TRACE { GPIOA, GPIO_PIN_0 }
+#define GPIO_DEBUG_RECOMBINE_UNFRMD_DATA_TRACE                                                                                     \
+    {                                                                                                                              \
+        GPIOA, GPIO_PIN_0                                                                                                          \
+    }
 
 #define USE_RT_DEBUG_ISO_HNDL_SDU (0)
-#define GPIO_DEBUG_ISO_HNDL_SDU { GPIOA, GPIO_PIN_0 }
+#define GPIO_DEBUG_ISO_HNDL_SDU                                                                                                    \
+    {                                                                                                                              \
+        GPIOA, GPIO_PIN_0                                                                                                          \
+    }
 
 #define USE_RT_DEBUG_LL_INTF_INIT (0)
-#define GPIO_DEBUG_LL_INTF_INIT { GPIOA, GPIO_PIN_0 }
+#define GPIO_DEBUG_LL_INTF_INIT                                                                                                    \
+    {                                                                                                                              \
+        GPIOA, GPIO_PIN_0                                                                                                          \
+    }
 
 #define USE_RT_DEBUG_DATA_TO_CNTRLR (0)
-#define GPIO_DEBUG_DATA_TO_CNTRLR { GPIOA, GPIO_PIN_0 }
+#define GPIO_DEBUG_DATA_TO_CNTRLR                                                                                                  \
+    {                                                                                                                              \
+        GPIOA, GPIO_PIN_0                                                                                                          \
+    }
 
 #define USE_RT_DEBUG_FREE_LL_PKT_HNDLR (0)
-#define GPIO_DEBUG_FREE_LL_PKT_HNDLR { GPIOA, GPIO_PIN_0 }
+#define GPIO_DEBUG_FREE_LL_PKT_HNDLR                                                                                               \
+    {                                                                                                                              \
+        GPIOA, GPIO_PIN_0                                                                                                          \
+    }
 
 #define USE_RT_DEBUG_PHY_INIT_CLBR_TRACE (0)
-#define GPIO_DEBUG_PHY_INIT_CLBR_TRACE { GPIOA, GPIO_PIN_0 }
+#define GPIO_DEBUG_PHY_INIT_CLBR_TRACE                                                                                             \
+    {                                                                                                                              \
+        GPIOA, GPIO_PIN_0                                                                                                          \
+    }
 
 #define USE_RT_DEBUG_PHY_RUNTIME_CLBR_TRACE (0)
-#define GPIO_DEBUG_PHY_RUNTIME_CLBR_TRACE { GPIOA, GPIO_PIN_0 }
+#define GPIO_DEBUG_PHY_RUNTIME_CLBR_TRACE                                                                                          \
+    {                                                                                                                              \
+        GPIOA, GPIO_PIN_0                                                                                                          \
+    }
 
 #define USE_RT_DEBUG_PHY_CLBR_ISR (0)
-#define GPIO_DEBUG_PHY_CLBR_ISR { GPIOB, GPIO_PIN_3 }
+#define GPIO_DEBUG_PHY_CLBR_ISR                                                                                                    \
+    {                                                                                                                              \
+        GPIOB, GPIO_PIN_3                                                                                                          \
+    }
 
 #define USE_RT_DEBUG_PHY_INIT_CLBR_SINGLE_CH (0)
-#define GPIO_DEBUG_PHY_INIT_CLBR_SINGLE_CH { GPIOA, GPIO_PIN_0 }
+#define GPIO_DEBUG_PHY_INIT_CLBR_SINGLE_CH                                                                                         \
+    {                                                                                                                              \
+        GPIOA, GPIO_PIN_0                                                                                                          \
+    }
 
 #define USE_RT_DEBUG_PHY_CLBR_STRTD (0)
-#define GPIO_DEBUG_PHY_CLBR_STRTD { GPIOA, GPIO_PIN_0 }
+#define GPIO_DEBUG_PHY_CLBR_STRTD                                                                                                  \
+    {                                                                                                                              \
+        GPIOA, GPIO_PIN_0                                                                                                          \
+    }
 
 #define USE_RT_DEBUG_PHY_CLBR_EXEC (0)
-#define GPIO_DEBUG_PHY_CLBR_EXEC { GPIOB, GPIO_PIN_4 }
+#define GPIO_DEBUG_PHY_CLBR_EXEC                                                                                                   \
+    {                                                                                                                              \
+        GPIOB, GPIO_PIN_4                                                                                                          \
+    }
 
 #define USE_RT_DEBUG_RCO_STRT_STOP_RUNTIME_CLBR_ACTV (0)
-#define GPIO_DEBUG_RCO_STRT_STOP_RUNTIME_CLBR_ACTV { GPIOA, GPIO_PIN_0 }
+#define GPIO_DEBUG_RCO_STRT_STOP_RUNTIME_CLBR_ACTV                                                                                 \
+    {                                                                                                                              \
+        GPIOA, GPIO_PIN_0                                                                                                          \
+    }
 
 #define USE_RT_DEBUG_RCO_STRT_STOP_RUNTIME_RCO_CLBR (0)
-#define GPIO_DEBUG_RCO_STRT_STOP_RUNTIME_RCO_CLBR { GPIOA, GPIO_PIN_0 }
+#define GPIO_DEBUG_RCO_STRT_STOP_RUNTIME_RCO_CLBR                                                                                  \
+    {                                                                                                                              \
+        GPIOA, GPIO_PIN_0                                                                                                          \
+    }
 
 #define USE_RT_DEBUG_STRT_STOP_RUNTIME_RCO_CLBR_SWT (0)
-#define GPIO_DEBUG_STRT_STOP_RUNTIME_RCO_CLBR_SWT { GPIOA, GPIO_PIN_0 }
+#define GPIO_DEBUG_STRT_STOP_RUNTIME_RCO_CLBR_SWT                                                                                  \
+    {                                                                                                                              \
+        GPIOA, GPIO_PIN_0                                                                                                          \
+    }
 
 #define USE_RT_DEBUG_STRT_STOP_RUNTIME_RCO_CLBR_TRACE (0)
-#define GPIO_DEBUG_STRT_STOP_RUNTIME_RCO_CLBR_TRACE { GPIOA, GPIO_PIN_0 }
+#define GPIO_DEBUG_STRT_STOP_RUNTIME_RCO_CLBR_TRACE                                                                                \
+    {                                                                                                                              \
+        GPIOA, GPIO_PIN_0                                                                                                          \
+    }
 
 #define USE_RT_DEBUG_RCO_ISR_TRACE (0)
-#define GPIO_DEBUG_RCO_ISR_TRACE { GPIOA, GPIO_PIN_0 }
+#define GPIO_DEBUG_RCO_ISR_TRACE                                                                                                   \
+    {                                                                                                                              \
+        GPIOA, GPIO_PIN_0                                                                                                          \
+    }
 
 #define USE_RT_DEBUG_RCO_ISR_COMPENDATE (0)
-#define GPIO_DEBUG_RCO_ISR_COMPENDATE { GPIOA, GPIO_PIN_0 }
+#define GPIO_DEBUG_RCO_ISR_COMPENDATE                                                                                              \
+    {                                                                                                                              \
+        GPIOA, GPIO_PIN_0                                                                                                          \
+    }
 
 #define USE_RT_DEBUG_RAL_STRT_TX (0)
-#define GPIO_DEBUG_RAL_STRT_TX { GPIOA, GPIO_PIN_5 }
+#define GPIO_DEBUG_RAL_STRT_TX                                                                                                     \
+    {                                                                                                                              \
+        GPIOA, GPIO_PIN_5                                                                                                          \
+    }
 
 #define USE_RT_DEBUG_RAL_ISR_TIMER_ERROR (0)
-#define GPIO_DEBUG_RAL_ISR_TIMER_ERROR { GPIOA, GPIO_PIN_0 }
+#define GPIO_DEBUG_RAL_ISR_TIMER_ERROR                                                                                             \
+    {                                                                                                                              \
+        GPIOA, GPIO_PIN_0                                                                                                          \
+    }
 
 #define USE_RT_DEBUG_RAL_ISR_TRACE (0)
-#define GPIO_DEBUG_RAL_ISR_TRACE { GPIOB, GPIO_PIN_3 }
+#define GPIO_DEBUG_RAL_ISR_TRACE                                                                                                   \
+    {                                                                                                                              \
+        GPIOB, GPIO_PIN_3                                                                                                          \
+    }
 
 #define USE_RT_DEBUG_RAL_STOP_OPRTN (0)
-#define GPIO_DEBUG_RAL_STOP_OPRTN { GPIOB, GPIO_PIN_8 }
+#define GPIO_DEBUG_RAL_STOP_OPRTN                                                                                                  \
+    {                                                                                                                              \
+        GPIOB, GPIO_PIN_8                                                                                                          \
+    }
 
 #define USE_RT_DEBUG_RAL_STRT_RX (0)
-#define GPIO_DEBUG_RAL_STRT_RX { GPIOB, GPIO_PIN_12 }
+#define GPIO_DEBUG_RAL_STRT_RX                                                                                                     \
+    {                                                                                                                              \
+        GPIOB, GPIO_PIN_12                                                                                                         \
+    }
 
 #define USE_RT_DEBUG_RAL_DONE_CLBK_TX (0)
-#define GPIO_DEBUG_RAL_DONE_CLBK_TX { GPIOA, GPIO_PIN_0 }
+#define GPIO_DEBUG_RAL_DONE_CLBK_TX                                                                                                \
+    {                                                                                                                              \
+        GPIOA, GPIO_PIN_0                                                                                                          \
+    }
 
 #define USE_RT_DEBUG_RAL_DONE_CLBK_RX (0)
-#define GPIO_DEBUG_RAL_DONE_CLBK_RX { GPIOA, GPIO_PIN_0 }
+#define GPIO_DEBUG_RAL_DONE_CLBK_RX                                                                                                \
+    {                                                                                                                              \
+        GPIOA, GPIO_PIN_0                                                                                                          \
+    }
 
 #define USE_RT_DEBUG_RAL_DONE_CLBK_ED (0)
-#define GPIO_DEBUG_RAL_DONE_CLBK_ED { GPIOA, GPIO_PIN_0 }
+#define GPIO_DEBUG_RAL_DONE_CLBK_ED                                                                                                \
+    {                                                                                                                              \
+        GPIOA, GPIO_PIN_0                                                                                                          \
+    }
 
 #define USE_RT_DEBUG_RAL_ED_SCAN (0)
-#define GPIO_DEBUG_RAL_ED_SCAN { GPIOA, GPIO_PIN_0 }
+#define GPIO_DEBUG_RAL_ED_SCAN                                                                                                     \
+    {                                                                                                                              \
+        GPIOA, GPIO_PIN_0                                                                                                          \
+    }
 
 #define USE_RT_DEBUG_ERROR_MEM_CAP_EXCED (0)
-#define GPIO_DEBUG_ERROR_MEM_CAP_EXCED { GPIOA, GPIO_PIN_0 }
+#define GPIO_DEBUG_ERROR_MEM_CAP_EXCED                                                                                             \
+    {                                                                                                                              \
+        GPIOA, GPIO_PIN_0                                                                                                          \
+    }
 
 #define USE_RT_DEBUG_ERROR_COMMAND_DISALLOWED (0)
-#define GPIO_DEBUG_ERROR_COMMAND_DISALLOWED { GPIOA, GPIO_PIN_0 }
+#define GPIO_DEBUG_ERROR_COMMAND_DISALLOWED                                                                                        \
+    {                                                                                                                              \
+        GPIOA, GPIO_PIN_0                                                                                                          \
+    }
 
 #define USE_RT_DEBUG_PTA_INIT (0)
-#define GPIO_DEBUG_PTA_INIT { GPIOA, GPIO_PIN_0 }
+#define GPIO_DEBUG_PTA_INIT                                                                                                        \
+    {                                                                                                                              \
+        GPIOA, GPIO_PIN_0                                                                                                          \
+    }
 
 #define USE_RT_DEBUG_PTA_EN (0)
-#define GPIO_DEBUG_PTA_EN { GPIOA, GPIO_PIN_0 }
+#define GPIO_DEBUG_PTA_EN                                                                                                          \
+    {                                                                                                                              \
+        GPIOA, GPIO_PIN_0                                                                                                          \
+    }
 
 #define USE_RT_DEBUG_LLHWC_PTA_SET_EN (0)
-#define GPIO_DEBUG_LLHWC_PTA_SET_EN { GPIOA, GPIO_PIN_0 }
+#define GPIO_DEBUG_LLHWC_PTA_SET_EN                                                                                                \
+    {                                                                                                                              \
+        GPIOA, GPIO_PIN_0                                                                                                          \
+    }
 
 #define USE_RT_DEBUG_LLHWC_PTA_SET_PARAMS (0)
-#define GPIO_DEBUG_LLHWC_PTA_SET_PARAMS { GPIOA, GPIO_PIN_0 }
+#define GPIO_DEBUG_LLHWC_PTA_SET_PARAMS                                                                                            \
+    {                                                                                                                              \
+        GPIOA, GPIO_PIN_0                                                                                                          \
+    }
 
 #define USE_RT_DEBUG_COEX_STRT_ON_IDLE (0)
-#define GPIO_DEBUG_COEX_STRT_ON_IDLE { GPIOB, GPIO_PIN_15 }
+#define GPIO_DEBUG_COEX_STRT_ON_IDLE                                                                                               \
+    {                                                                                                                              \
+        GPIOB, GPIO_PIN_15                                                                                                         \
+    }
 
 #define USE_RT_DEBUG_COEX_ASK_FOR_AIR (0)
-#define GPIO_DEBUG_COEX_ASK_FOR_AIR { GPIOB, GPIO_PIN_3 }
+#define GPIO_DEBUG_COEX_ASK_FOR_AIR                                                                                                \
+    {                                                                                                                              \
+        GPIOB, GPIO_PIN_3                                                                                                          \
+    }
 
 #define USE_RT_DEBUG_COEX_TIMER_EVNT_CLBK (0)
-#define GPIO_DEBUG_COEX_TIMER_EVNT_CLBK { GPIOA, GPIO_PIN_0 }
+#define GPIO_DEBUG_COEX_TIMER_EVNT_CLBK                                                                                            \
+    {                                                                                                                              \
+        GPIOA, GPIO_PIN_0                                                                                                          \
+    }
 
 #define USE_RT_DEBUG_COEX_STRT_ONE_SHOT (0)
-#define GPIO_DEBUG_COEX_STRT_ONE_SHOT { GPIOA, GPIO_PIN_5 }
+#define GPIO_DEBUG_COEX_STRT_ONE_SHOT                                                                                              \
+    {                                                                                                                              \
+        GPIOA, GPIO_PIN_5                                                                                                          \
+    }
 
 #define USE_RT_DEBUG_COEX_FORCE_STOP_RX (0)
-#define GPIO_DEBUG_COEX_FORCE_STOP_RX { GPIOB, GPIO_PIN_12 }
+#define GPIO_DEBUG_COEX_FORCE_STOP_RX                                                                                              \
+    {                                                                                                                              \
+        GPIOB, GPIO_PIN_12                                                                                                         \
+    }
 
 #define USE_RT_DEBUG_LLHWC_ADV_DONE (0)
-#define GPIO_DEBUG_LLHWC_ADV_DONE { GPIOA, GPIO_PIN_0 }
+#define GPIO_DEBUG_LLHWC_ADV_DONE                                                                                                  \
+    {                                                                                                                              \
+        GPIOA, GPIO_PIN_0                                                                                                          \
+    }
 
 #define USE_RT_DEBUG_LLHWC_SCN_DONE (0)
-#define GPIO_DEBUG_LLHWC_SCN_DONE { GPIOA, GPIO_PIN_0 }
+#define GPIO_DEBUG_LLHWC_SCN_DONE                                                                                                  \
+    {                                                                                                                              \
+        GPIOA, GPIO_PIN_0                                                                                                          \
+    }
 
 #define USE_RT_DEBUG_LLHWC_INIT_DONE (0)
-#define GPIO_DEBUG_LLHWC_INIT_DONE { GPIOA, GPIO_PIN_0 }
+#define GPIO_DEBUG_LLHWC_INIT_DONE                                                                                                 \
+    {                                                                                                                              \
+        GPIOA, GPIO_PIN_0                                                                                                          \
+    }
 
 #define USE_RT_DEBUG_LLHWC_CONN_DONE (0)
-#define GPIO_DEBUG_LLHWC_CONN_DONE { GPIOA, GPIO_PIN_0 }
+#define GPIO_DEBUG_LLHWC_CONN_DONE                                                                                                 \
+    {                                                                                                                              \
+        GPIOA, GPIO_PIN_0                                                                                                          \
+    }
 
 #define USE_RT_DEBUG_LLHWC_CIG_DONE (0)
-#define GPIO_DEBUG_LLHWC_CIG_DONE { GPIOA, GPIO_PIN_0 }
+#define GPIO_DEBUG_LLHWC_CIG_DONE                                                                                                  \
+    {                                                                                                                              \
+        GPIOA, GPIO_PIN_0                                                                                                          \
+    }
 
 #define USE_RT_DEBUG_LLHWC_BIG_DONE (0)
-#define GPIO_DEBUG_LLHWC_BIG_DONE { GPIOA, GPIO_PIN_0 }
+#define GPIO_DEBUG_LLHWC_BIG_DONE                                                                                                  \
+    {                                                                                                                              \
+        GPIOA, GPIO_PIN_0                                                                                                          \
+    }
 
 #define USE_RT_DEBUG_OS_TMR_CREATE (0)
-#define GPIO_DEBUG_OS_TMR_CREATE { GPIOA, GPIO_PIN_0 }
+#define GPIO_DEBUG_OS_TMR_CREATE                                                                                                   \
+    {                                                                                                                              \
+        GPIOA, GPIO_PIN_0                                                                                                          \
+    }
 
 #define USE_RT_DEBUG_ADV_EXT_TIMEOUT_CBK (0)
-#define GPIO_DEBUG_ADV_EXT_TIMEOUT_CBK { GPIOA, GPIO_PIN_0 }
+#define GPIO_DEBUG_ADV_EXT_TIMEOUT_CBK                                                                                             \
+    {                                                                                                                              \
+        GPIOA, GPIO_PIN_0                                                                                                          \
+    }
 
 #define USE_RT_DEBUG_ADV_EXT_SCN_DUR_CBK (0)
-#define GPIO_DEBUG_ADV_EXT_SCN_DUR_CBK { GPIOA, GPIO_PIN_0 }
+#define GPIO_DEBUG_ADV_EXT_SCN_DUR_CBK                                                                                             \
+    {                                                                                                                              \
+        GPIOA, GPIO_PIN_0                                                                                                          \
+    }
 
 #define USE_RT_DEBUG_ADV_EXT_SCN_PERIOD_CBK (0)
-#define GPIO_DEBUG_ADV_EXT_SCN_PERIOD_CBK { GPIOA, GPIO_PIN_0 }
+#define GPIO_DEBUG_ADV_EXT_SCN_PERIOD_CBK                                                                                          \
+    {                                                                                                                              \
+        GPIOA, GPIO_PIN_0                                                                                                          \
+    }
 
 #define USE_RT_DEBUG_ADV_EXT_PRDC_SCN_TIMEOUT_CBK (0)
-#define GPIO_DEBUG_ADV_EXT_PRDC_SCN_TIMEOUT_CBK { GPIOA, GPIO_PIN_0 }
+#define GPIO_DEBUG_ADV_EXT_PRDC_SCN_TIMEOUT_CBK                                                                                    \
+    {                                                                                                                              \
+        GPIOA, GPIO_PIN_0                                                                                                          \
+    }
 
 #define USE_RT_DEBUG_BIS_SYNC_TIMEOUT_TMR_CBK (0)
-#define GPIO_DEBUG_BIS_SYNC_TIMEOUT_TMR_CBK { GPIOA, GPIO_PIN_0 }
+#define GPIO_DEBUG_BIS_SYNC_TIMEOUT_TMR_CBK                                                                                        \
+    {                                                                                                                              \
+        GPIOA, GPIO_PIN_0                                                                                                          \
+    }
 
 #define USE_RT_DEBUG_BIS_TERM_TMR_CBK (0)
-#define GPIO_DEBUG_BIS_TERM_TMR_CBK { GPIOA, GPIO_PIN_0 }
+#define GPIO_DEBUG_BIS_TERM_TMR_CBK                                                                                                \
+    {                                                                                                                              \
+        GPIOA, GPIO_PIN_0                                                                                                          \
+    }
 
 #define USE_RT_DEBUG_BIS_TST_MODE_CBK (0)
-#define GPIO_DEBUG_BIS_TST_MODE_CBK { GPIOA, GPIO_PIN_0 }
+#define GPIO_DEBUG_BIS_TST_MODE_CBK                                                                                                \
+    {                                                                                                                              \
+        GPIOA, GPIO_PIN_0                                                                                                          \
+    }
 
 #define USE_RT_DEBUG_BIS_TST_MODE_TMR_CBK (0)
-#define GPIO_DEBUG_BIS_TST_MODE_TMR_CBK { GPIOA, GPIO_PIN_0 }
+#define GPIO_DEBUG_BIS_TST_MODE_TMR_CBK                                                                                            \
+    {                                                                                                                              \
+        GPIOA, GPIO_PIN_0                                                                                                          \
+    }
 
 #define USE_RT_DEBUG_ISO_POST_TMR_CBK (0)
-#define GPIO_DEBUG_ISO_POST_TMR_CBK { GPIOA, GPIO_PIN_0 }
+#define GPIO_DEBUG_ISO_POST_TMR_CBK                                                                                                \
+    {                                                                                                                              \
+        GPIOA, GPIO_PIN_0                                                                                                          \
+    }
 
 #define USE_RT_DEBUG_ISO_TST_MODE_TMR_CBK (0)
-#define GPIO_DEBUG_ISO_TST_MODE_TMR_CBK { GPIOA, GPIO_PIN_0 }
+#define GPIO_DEBUG_ISO_TST_MODE_TMR_CBK                                                                                            \
+    {                                                                                                                              \
+        GPIOA, GPIO_PIN_0                                                                                                          \
+    }
 
 #define USE_RT_DEBUG_CONN_POST_TMR_CBK (0)
-#define GPIO_DEBUG_CONN_POST_TMR_CBK { GPIOA, GPIO_PIN_0 }
+#define GPIO_DEBUG_CONN_POST_TMR_CBK                                                                                               \
+    {                                                                                                                              \
+        GPIOA, GPIO_PIN_0                                                                                                          \
+    }
 
 #define USE_RT_DEBUG_EVNT_SCHDLR_TMR_CBK (0)
-#define GPIO_DEBUG_EVNT_SCHDLR_TMR_CBK { GPIOA, GPIO_PIN_0 }
+#define GPIO_DEBUG_EVNT_SCHDLR_TMR_CBK                                                                                             \
+    {                                                                                                                              \
+        GPIOA, GPIO_PIN_0                                                                                                          \
+    }
 
 #define USE_RT_DEBUG_HCI_POST_TMR_CBK (0)
-#define GPIO_DEBUG_HCI_POST_TMR_CBK { GPIOA, GPIO_PIN_0 }
+#define GPIO_DEBUG_HCI_POST_TMR_CBK                                                                                                \
+    {                                                                                                                              \
+        GPIOA, GPIO_PIN_0                                                                                                          \
+    }
 
 #define USE_RT_DEBUG_LLCP_POST_TMR_CBK (0)
-#define GPIO_DEBUG_LLCP_POST_TMR_CBK { GPIOA, GPIO_PIN_0 }
+#define GPIO_DEBUG_LLCP_POST_TMR_CBK                                                                                               \
+    {                                                                                                                              \
+        GPIOA, GPIO_PIN_0                                                                                                          \
+    }
 
 #define USE_RT_DEBUG_LLHWC_ENRGY_DETECT_CBK (0)
-#define GPIO_DEBUG_LLHWC_ENRGY_DETECT_CBK { GPIOA, GPIO_PIN_0 }
+#define GPIO_DEBUG_LLHWC_ENRGY_DETECT_CBK                                                                                          \
+    {                                                                                                                              \
+        GPIOA, GPIO_PIN_0                                                                                                          \
+    }
 
 #define USE_RT_DEBUG_PRVCY_POST_TMR_CBK (0)
-#define GPIO_DEBUG_PRVCY_POST_TMR_CBK { GPIOA, GPIO_PIN_0 }
+#define GPIO_DEBUG_PRVCY_POST_TMR_CBK                                                                                              \
+    {                                                                                                                              \
+        GPIOA, GPIO_PIN_0                                                                                                          \
+    }
 
 #define USE_RT_DEBUG_ANT_PRPR_TMR_CBK (0)
-#define GPIO_DEBUG_ANT_PRPR_TMR_CBK { GPIOA, GPIO_PIN_0 }
+#define GPIO_DEBUG_ANT_PRPR_TMR_CBK                                                                                                \
+    {                                                                                                                              \
+        GPIOA, GPIO_PIN_0                                                                                                          \
+    }
 
 #define USE_RT_DEBUG_COEX_TMR_FRC_STOP_AIR_GRANT_CBK (0)
-#define GPIO_DEBUG_COEX_TMR_FRC_STOP_AIR_GRANT_CBK { GPIOA, GPIO_PIN_0 }
+#define GPIO_DEBUG_COEX_TMR_FRC_STOP_AIR_GRANT_CBK                                                                                 \
+    {                                                                                                                              \
+        GPIOA, GPIO_PIN_0                                                                                                          \
+    }
 
 #define USE_RT_DEBUG_MLME_RX_EN_TMR_CBK (0)
-#define GPIO_DEBUG_MLME_RX_EN_TMR_CBK { GPIOA, GPIO_PIN_0 }
+#define GPIO_DEBUG_MLME_RX_EN_TMR_CBK                                                                                              \
+    {                                                                                                                              \
+        GPIOA, GPIO_PIN_0                                                                                                          \
+    }
 
 #define USE_RT_DEBUG_MLME_GNRC_TMR_CBK (0)
-#define GPIO_DEBUG_MLME_GNRC_TMR_CBK { GPIOA, GPIO_PIN_0 }
+#define GPIO_DEBUG_MLME_GNRC_TMR_CBK                                                                                               \
+    {                                                                                                                              \
+        GPIOA, GPIO_PIN_0                                                                                                          \
+    }
 
 #define USE_RT_DEBUG_MIB_JOIN_LST_TMR_CBK (0)
-#define GPIO_DEBUG_MIB_JOIN_LST_TMR_CBK { GPIOA, GPIO_PIN_0 }
+#define GPIO_DEBUG_MIB_JOIN_LST_TMR_CBK                                                                                            \
+    {                                                                                                                              \
+        GPIOA, GPIO_PIN_0                                                                                                          \
+    }
 
 #define USE_RT_DEBUG_MLME_PWR_PRES_TMR_CBK (0)
-#define GPIO_DEBUG_MLME_PWR_PRES_TMR_CBK { GPIOA, GPIO_PIN_0 }
+#define GPIO_DEBUG_MLME_PWR_PRES_TMR_CBK                                                                                           \
+    {                                                                                                                              \
+        GPIOA, GPIO_PIN_0                                                                                                          \
+    }
 
 #define USE_RT_DEBUG_PRESISTENCE_TMR_CBK (0)
-#define GPIO_DEBUG_PRESISTENCE_TMR_CBK { GPIOA, GPIO_PIN_0 }
+#define GPIO_DEBUG_PRESISTENCE_TMR_CBK                                                                                             \
+    {                                                                                                                              \
+        GPIOA, GPIO_PIN_0                                                                                                          \
+    }
 
 #define USE_RT_DEBUG_RADIO_PHY_PRDC_CLBK_TMR_CBK (0)
-#define GPIO_DEBUG_RADIO_PHY_PRDC_CLBK_TMR_CBK { GPIOA, GPIO_PIN_0 }
+#define GPIO_DEBUG_RADIO_PHY_PRDC_CLBK_TMR_CBK                                                                                     \
+    {                                                                                                                              \
+        GPIOA, GPIO_PIN_0                                                                                                          \
+    }
 
 #define USE_RT_DEBUG_RADIO_CSMA_TMR_CBK (0)
-#define GPIO_DEBUG_RADIO_CSMA_TMR_CBK { GPIOA, GPIO_PIN_0 }
+#define GPIO_DEBUG_RADIO_CSMA_TMR_CBK                                                                                              \
+    {                                                                                                                              \
+        GPIOA, GPIO_PIN_0                                                                                                          \
+    }
 
 #define USE_RT_DEBUG_RADIO_CSL_RCV_TMR_CBK (0)
-#define GPIO_DEBUG_RADIO_CSL_RCV_TMR_CBK { GPIOA, GPIO_PIN_0 }
+#define GPIO_DEBUG_RADIO_CSL_RCV_TMR_CBK                                                                                           \
+    {                                                                                                                              \
+        GPIOA, GPIO_PIN_0                                                                                                          \
+    }
 
 #define USE_RT_DEBUG_ED_TMR_CBK (0)
-#define GPIO_DEBUG_ED_TMR_CBK { GPIOA, GPIO_PIN_0 }
+#define GPIO_DEBUG_ED_TMR_CBK                                                                                                      \
+    {                                                                                                                              \
+        GPIOA, GPIO_PIN_0                                                                                                          \
+    }
 
 #define USE_RT_DEBUG_DIO_EXT_TMR_CBK (0)
-#define GPIO_DEBUG_DIO_EXT_TMR_CBK { GPIOA, GPIO_PIN_0 }
+#define GPIO_DEBUG_DIO_EXT_TMR_CBK                                                                                                 \
+    {                                                                                                                              \
+        GPIOA, GPIO_PIN_0                                                                                                          \
+    }
 
 #define USE_RT_DEBUG_RCO_CLBR_TMR_CBK (0)
-#define GPIO_DEBUG_RCO_CLBR_TMR_CBK { GPIOA, GPIO_PIN_0 }
+#define GPIO_DEBUG_RCO_CLBR_TMR_CBK                                                                                                \
+    {                                                                                                                              \
+        GPIOA, GPIO_PIN_0                                                                                                          \
+    }
 
 #define USE_RT_DEBUG_ADV_EXT_MNGR_ADV_CBK (0)
-#define GPIO_DEBUG_ADV_EXT_MNGR_ADV_CBK { GPIOA, GPIO_PIN_0 }
+#define GPIO_DEBUG_ADV_EXT_MNGR_ADV_CBK                                                                                            \
+    {                                                                                                                              \
+        GPIOA, GPIO_PIN_0                                                                                                          \
+    }
 
 #define USE_RT_DEBUG_ADV_EXT_MNGR_SCN_CBK (0)
-#define GPIO_DEBUG_ADV_EXT_MNGR_SCN_CBK { GPIOA, GPIO_PIN_0 }
+#define GPIO_DEBUG_ADV_EXT_MNGR_SCN_CBK                                                                                            \
+    {                                                                                                                              \
+        GPIOA, GPIO_PIN_0                                                                                                          \
+    }
 
 #define USE_RT_DEBUG_ADV_EXT_MNGR_SCN_ERR_CBK (0)
-#define GPIO_DEBUG_ADV_EXT_MNGR_SCN_ERR_CBK { GPIOA, GPIO_PIN_0 }
+#define GPIO_DEBUG_ADV_EXT_MNGR_SCN_ERR_CBK                                                                                        \
+    {                                                                                                                              \
+        GPIOA, GPIO_PIN_0                                                                                                          \
+    }
 
 #define USE_RT_DEBUG_ADV_EXT_MNGR_PRDC_SCN_CBK (0)
-#define GPIO_DEBUG_ADV_EXT_MNGR_PRDC_SCN_CBK { GPIOA, GPIO_PIN_0 }
+#define GPIO_DEBUG_ADV_EXT_MNGR_PRDC_SCN_CBK                                                                                       \
+    {                                                                                                                              \
+        GPIOA, GPIO_PIN_0                                                                                                          \
+    }
 
 #define USE_RT_DEBUG_ADV_EXT_MNGR_PRDC_SCN_ERR_CBK (0)
-#define GPIO_DEBUG_ADV_EXT_MNGR_PRDC_SCN_ERR_CBK { GPIOA, GPIO_PIN_0 }
+#define GPIO_DEBUG_ADV_EXT_MNGR_PRDC_SCN_ERR_CBK                                                                                   \
+    {                                                                                                                              \
+        GPIOA, GPIO_PIN_0                                                                                                          \
+    }
 
 #define USE_RT_DEBUG_BIG_ADV_CBK (0)
-#define GPIO_DEBUG_BIG_ADV_CBK { GPIOA, GPIO_PIN_0 }
+#define GPIO_DEBUG_BIG_ADV_CBK                                                                                                     \
+    {                                                                                                                              \
+        GPIOA, GPIO_PIN_0                                                                                                          \
+    }
 
 #define USE_RT_DEBUG_BIG_ADV_ERR_CBK (0)
-#define GPIO_DEBUG_BIG_ADV_ERR_CBK { GPIOA, GPIO_PIN_0 }
+#define GPIO_DEBUG_BIG_ADV_ERR_CBK                                                                                                 \
+    {                                                                                                                              \
+        GPIOA, GPIO_PIN_0                                                                                                          \
+    }
 
 #define USE_RT_DEBUG_BIG_SYNC_CBK (0)
-#define GPIO_DEBUG_BIG_SYNC_CBK { GPIOA, GPIO_PIN_0 }
+#define GPIO_DEBUG_BIG_SYNC_CBK                                                                                                    \
+    {                                                                                                                              \
+        GPIOA, GPIO_PIN_0                                                                                                          \
+    }
 
 #define USE_RT_DEBUG_BIG_SYNC_ERR_CBK (0)
-#define GPIO_DEBUG_BIG_SYNC_ERR_CBK { GPIOA, GPIO_PIN_0 }
+#define GPIO_DEBUG_BIG_SYNC_ERR_CBK                                                                                                \
+    {                                                                                                                              \
+        GPIOA, GPIO_PIN_0                                                                                                          \
+    }
 
 #define USE_RT_DEBUG_ISO_CIS_PKT_TRNSM_RECEIVED_CBK (0)
-#define GPIO_DEBUG_ISO_CIS_PKT_TRNSM_RECEIVED_CBK { GPIOA, GPIO_PIN_0 }
+#define GPIO_DEBUG_ISO_CIS_PKT_TRNSM_RECEIVED_CBK                                                                                  \
+    {                                                                                                                              \
+        GPIOA, GPIO_PIN_0                                                                                                          \
+    }
 
 #define USE_RT_DEBUG_ISO_CIG_ERR_CBK (0)
-#define GPIO_DEBUG_ISO_CIG_ERR_CBK { GPIOA, GPIO_PIN_0 }
+#define GPIO_DEBUG_ISO_CIG_ERR_CBK                                                                                                 \
+    {                                                                                                                              \
+        GPIOA, GPIO_PIN_0                                                                                                          \
+    }
 
 #define USE_RT_DEBUG_CONN_PKT_TRNSM_RECEIVED_CBK (0)
-#define GPIO_DEBUG_CONN_PKT_TRNSM_RECEIVED_CBK { GPIOA, GPIO_PIN_0 }
+#define GPIO_DEBUG_CONN_PKT_TRNSM_RECEIVED_CBK                                                                                     \
+    {                                                                                                                              \
+        GPIOA, GPIO_PIN_0                                                                                                          \
+    }
 
 #define USE_RT_DEBUG_PRDC_CLBR_EXTRL_CBK (0)
-#define GPIO_DEBUG_PRDC_CLBR_EXTRL_CBK { GPIOA, GPIO_PIN_0 }
+#define GPIO_DEBUG_PRDC_CLBR_EXTRL_CBK                                                                                             \
+    {                                                                                                                              \
+        GPIOA, GPIO_PIN_0                                                                                                          \
+    }
 
 #define USE_RT_DEBUG_PTR_PRDC_ADV_SYNC_CBK (0)
-#define GPIO_DEBUG_PTR_PRDC_ADV_SYNC_CBK { GPIOA, GPIO_PIN_0 }
+#define GPIO_DEBUG_PTR_PRDC_ADV_SYNC_CBK                                                                                           \
+    {                                                                                                                              \
+        GPIOA, GPIO_PIN_0                                                                                                          \
+    }
 
 #define USE_RT_DEBUG_NCONN_SCN_CBK (0)
-#define GPIO_DEBUG_NCONN_SCN_CBK { GPIOA, GPIO_PIN_0 }
+#define GPIO_DEBUG_NCONN_SCN_CBK                                                                                                   \
+    {                                                                                                                              \
+        GPIOA, GPIO_PIN_0                                                                                                          \
+    }
 
 #define USE_RT_DEBUG_NCONN_ADV_CBK (0)
-#define GPIO_DEBUG_NCONN_ADV_CBK { GPIOA, GPIO_PIN_0 }
+#define GPIO_DEBUG_NCONN_ADV_CBK                                                                                                   \
+    {                                                                                                                              \
+        GPIOA, GPIO_PIN_0                                                                                                          \
+    }
 
 #define USE_RT_DEBUG_NCONN_INIT_CBK (0)
-#define GPIO_DEBUG_NCONN_INIT_CBK { GPIOA, GPIO_PIN_0 }
+#define GPIO_DEBUG_NCONN_INIT_CBK                                                                                                  \
+    {                                                                                                                              \
+        GPIOA, GPIO_PIN_0                                                                                                          \
+    }
 
 #define USE_RT_DEBUG_ANT_RADIO_CMPLT_EVNT_CBK (0)
-#define GPIO_DEBUG_ANT_RADIO_CMPLT_EVNT_CBK { GPIOA, GPIO_PIN_0 }
+#define GPIO_DEBUG_ANT_RADIO_CMPLT_EVNT_CBK                                                                                        \
+    {                                                                                                                              \
+        GPIOA, GPIO_PIN_0                                                                                                          \
+    }
 
 #define USE_RT_DEBUG_ANT_STACK_EVNT_CBK (0)
-#define GPIO_DEBUG_ANT_STACK_EVNT_CBK { GPIOA, GPIO_PIN_0 }
+#define GPIO_DEBUG_ANT_STACK_EVNT_CBK                                                                                              \
+    {                                                                                                                              \
+        GPIOA, GPIO_PIN_0                                                                                                          \
+    }
 
 #define USE_RT_DEBUG_ADV_EXT_PROCESS_TMOUT_EVNT_CBK (0)
-#define GPIO_DEBUG_ADV_EXT_PROCESS_TMOUT_EVNT_CBK { GPIOA, GPIO_PIN_0 }
+#define GPIO_DEBUG_ADV_EXT_PROCESS_TMOUT_EVNT_CBK                                                                                  \
+    {                                                                                                                              \
+        GPIOA, GPIO_PIN_0                                                                                                          \
+    }
 
 #define USE_RT_DEBUG_ADV_EXT_MNGR_SCN_DUR_EVNT (0)
-#define GPIO_DEBUG_ADV_EXT_MNGR_SCN_DUR_EVNT { GPIOA, GPIO_PIN_0 }
+#define GPIO_DEBUG_ADV_EXT_MNGR_SCN_DUR_EVNT                                                                                       \
+    {                                                                                                                              \
+        GPIOA, GPIO_PIN_0                                                                                                          \
+    }
 
 #define USE_RT_DEBUG_ADV_EXT_MNGR_SCN_PERIODIC_EVNT (0)
-#define GPIO_DEBUG_ADV_EXT_MNGR_SCN_PERIODIC_EVNT { GPIOA, GPIO_PIN_0 }
+#define GPIO_DEBUG_ADV_EXT_MNGR_SCN_PERIODIC_EVNT                                                                                  \
+    {                                                                                                                              \
+        GPIOA, GPIO_PIN_0                                                                                                          \
+    }
 
 #define USE_RT_DEBUG_ADV_EXT_MNGR_PRDC_SCN_TMOUT_EVNT (0)
-#define GPIO_DEBUG_ADV_EXT_MNGR_PRDC_SCN_TMOUT_EVNT { GPIOA, GPIO_PIN_0 }
+#define GPIO_DEBUG_ADV_EXT_MNGR_PRDC_SCN_TMOUT_EVNT                                                                                \
+    {                                                                                                                              \
+        GPIOA, GPIO_PIN_0                                                                                                          \
+    }
 
 #define USE_RT_DEBUG_ADV_EXT_MNGR_PRDC_SCN_CNCEL_EVNT (0)
-#define GPIO_DEBUG_ADV_EXT_MNGR_PRDC_SCN_CNCEL_EVNT { GPIOA, GPIO_PIN_0 }
+#define GPIO_DEBUG_ADV_EXT_MNGR_PRDC_SCN_CNCEL_EVNT                                                                                \
+    {                                                                                                                              \
+        GPIOA, GPIO_PIN_0                                                                                                          \
+    }
 
 #define USE_RT_DEBUG_BIS_MNGR_BIG_TERM_CBK (0)
-#define GPIO_DEBUG_BIS_MNGR_BIG_TERM_CBK { GPIOA, GPIO_PIN_0 }
+#define GPIO_DEBUG_BIS_MNGR_BIG_TERM_CBK                                                                                           \
+    {                                                                                                                              \
+        GPIOA, GPIO_PIN_0                                                                                                          \
+    }
 
 #define USE_RT_DEBUG_BIS_MNGR_SYNC_TMOUT_CBK (0)
-#define GPIO_DEBUG_BIS_MNGR_SYNC_TMOUT_CBK { GPIOA, GPIO_PIN_0 }
+#define GPIO_DEBUG_BIS_MNGR_SYNC_TMOUT_CBK                                                                                         \
+    {                                                                                                                              \
+        GPIOA, GPIO_PIN_0                                                                                                          \
+    }
 
 #define USE_RT_DEBUG_ISOAL_MNGR_SDU_GEN (0)
-#define GPIO_DEBUG_ISOAL_MNGR_SDU_GEN { GPIOA, GPIO_PIN_0 }
+#define GPIO_DEBUG_ISOAL_MNGR_SDU_GEN                                                                                              \
+    {                                                                                                                              \
+        GPIOA, GPIO_PIN_0                                                                                                          \
+    }
 
 #define USE_RT_DEBUG_ISO_MNGR_CIS_PROCESS_EVNT_CBK (0)
-#define GPIO_DEBUG_ISO_MNGR_CIS_PROCESS_EVNT_CBK { GPIOA, GPIO_PIN_0 }
+#define GPIO_DEBUG_ISO_MNGR_CIS_PROCESS_EVNT_CBK                                                                                   \
+    {                                                                                                                              \
+        GPIOA, GPIO_PIN_0                                                                                                          \
+    }
 
 #define USE_RT_DEBUG_CONN_MNGR_PROCESS_EVNT_CLBK (0)
-#define GPIO_DEBUG_CONN_MNGR_PROCESS_EVNT_CLBK { GPIOA, GPIO_PIN_0 }
+#define GPIO_DEBUG_CONN_MNGR_PROCESS_EVNT_CLBK                                                                                     \
+    {                                                                                                                              \
+        GPIOA, GPIO_PIN_0                                                                                                          \
+    }
 
 #define USE_RT_DEBUG_CONN_MNGR_UPDT_CONN_PARAM_CBK (0)
-#define GPIO_DEBUG_CONN_MNGR_UPDT_CONN_PARAM_CBK { GPIOA, GPIO_PIN_0 }
+#define GPIO_DEBUG_CONN_MNGR_UPDT_CONN_PARAM_CBK                                                                                   \
+    {                                                                                                                              \
+        GPIOA, GPIO_PIN_0                                                                                                          \
+    }
 
 #define USE_RT_DEBUG_EVNT_SCHDLR_HW_EVNT_CMPLT (0)
-#define GPIO_DEBUG_EVNT_SCHDLR_HW_EVNT_CMPLT { GPIOA, GPIO_PIN_0 }
+#define GPIO_DEBUG_EVNT_SCHDLR_HW_EVNT_CMPLT                                                                                       \
+    {                                                                                                                              \
+        GPIOA, GPIO_PIN_0                                                                                                          \
+    }
 
 #define USE_RT_DEBUG_HCI_EVENT_HNDLR (0)
-#define GPIO_DEBUG_HCI_EVENT_HNDLR { GPIOA, GPIO_PIN_0 }
+#define GPIO_DEBUG_HCI_EVENT_HNDLR                                                                                                 \
+    {                                                                                                                              \
+        GPIOA, GPIO_PIN_0                                                                                                          \
+    }
 
 #define USE_RT_DEBUG_MLME_TMRS_CBK (0)
-#define GPIO_DEBUG_MLME_TMRS_CBK { GPIOA, GPIO_PIN_0 }
+#define GPIO_DEBUG_MLME_TMRS_CBK                                                                                                   \
+    {                                                                                                                              \
+        GPIOA, GPIO_PIN_0                                                                                                          \
+    }
 
 #define USE_RT_DEBUG_DIRECT_TX_EVNT_CBK (0)
-#define GPIO_DEBUG_DIRECT_TX_EVNT_CBK { GPIOA, GPIO_PIN_0 }
+#define GPIO_DEBUG_DIRECT_TX_EVNT_CBK                                                                                              \
+    {                                                                                                                              \
+        GPIOA, GPIO_PIN_0                                                                                                          \
+    }
 
 #define USE_RT_DEBUG_INDIRECT_PKT_TOUR_CBK (0)
-#define GPIO_DEBUG_INDIRECT_PKT_TOUR_CBK { GPIOA, GPIO_PIN_0 }
+#define GPIO_DEBUG_INDIRECT_PKT_TOUR_CBK                                                                                           \
+    {                                                                                                                              \
+        GPIOA, GPIO_PIN_0                                                                                                          \
+    }
 
 #define USE_RT_DEBUG_RADIO_CSMA_TMR (0)
-#define GPIO_DEBUG_RADIO_CSMA_TMR { GPIOA, GPIO_PIN_0 }
+#define GPIO_DEBUG_RADIO_CSMA_TMR                                                                                                  \
+    {                                                                                                                              \
+        GPIOA, GPIO_PIN_0                                                                                                          \
+    }
 
 #define USE_RT_DEBUG_RAL_SM_DONE_EVNT_CBK (0)
-#define GPIO_DEBUG_RAL_SM_DONE_EVNT_CBK { GPIOB, GPIO_PIN_4 }
+#define GPIO_DEBUG_RAL_SM_DONE_EVNT_CBK                                                                                            \
+    {                                                                                                                              \
+        GPIOB, GPIO_PIN_4                                                                                                          \
+    }
 
 #define USE_RT_DEBUG_ED_TMR_HNDL (0)
-#define GPIO_DEBUG_ED_TMR_HNDL { GPIOA, GPIO_PIN_0 }
+#define GPIO_DEBUG_ED_TMR_HNDL                                                                                                     \
+    {                                                                                                                              \
+        GPIOA, GPIO_PIN_0                                                                                                          \
+    }
 
 #define USE_RT_DEBUG_OS_TMR_EVNT_CBK (0)
-#define GPIO_DEBUG_OS_TMR_EVNT_CBK { GPIOA, GPIO_PIN_0 }
+#define GPIO_DEBUG_OS_TMR_EVNT_CBK                                                                                                 \
+    {                                                                                                                              \
+        GPIOA, GPIO_PIN_0                                                                                                          \
+    }
 
 #define USE_RT_DEBUG_PROFILE_MARKER_PHY_WAKEUP_TIME (0)
-#define GPIO_DEBUG_PROFILE_MARKER_PHY_WAKEUP_TIME { GPIOA, GPIO_PIN_0 }
+#define GPIO_DEBUG_PROFILE_MARKER_PHY_WAKEUP_TIME                                                                                  \
+    {                                                                                                                              \
+        GPIOA, GPIO_PIN_0                                                                                                          \
+    }
 
 #define USE_RT_DEBUG_PROFILE_END_DRIFT_TIME (0)
-#define GPIO_DEBUG_PROFILE_END_DRIFT_TIME { GPIOA, GPIO_PIN_0 }
+#define GPIO_DEBUG_PROFILE_END_DRIFT_TIME                                                                                          \
+    {                                                                                                                              \
+        GPIOA, GPIO_PIN_0                                                                                                          \
+    }
 
 #define USE_RT_DEBUG_PROC_RADIO_RCV (0)
-#define GPIO_DEBUG_PROC_RADIO_RCV { GPIOA, GPIO_PIN_0 }
+#define GPIO_DEBUG_PROC_RADIO_RCV                                                                                                  \
+    {                                                                                                                              \
+        GPIOA, GPIO_PIN_0                                                                                                          \
+    }
 
 #define USE_RT_DEBUG_EVNT_TIME_UPDT (0)
-#define GPIO_DEBUG_EVNT_TIME_UPDT { GPIOA, GPIO_PIN_0 }
+#define GPIO_DEBUG_EVNT_TIME_UPDT                                                                                                  \
+    {                                                                                                                              \
+        GPIOA, GPIO_PIN_0                                                                                                          \
+    }
 
 #define USE_RT_DEBUG_MAC_RECEIVE_DONE (0)
-#define GPIO_DEBUG_MAC_RECEIVE_DONE { GPIOA, GPIO_PIN_0 }
+#define GPIO_DEBUG_MAC_RECEIVE_DONE                                                                                                \
+    {                                                                                                                              \
+        GPIOA, GPIO_PIN_0                                                                                                          \
+    }
 
 #define USE_RT_DEBUG_MAC_TX_DONE (0)
-#define GPIO_DEBUG_MAC_TX_DONE { GPIOA, GPIO_PIN_0 }
+#define GPIO_DEBUG_MAC_TX_DONE                                                                                                     \
+    {                                                                                                                              \
+        GPIOA, GPIO_PIN_0                                                                                                          \
+    }
 
 #define USE_RT_DEBUG_RADIO_APPLY_CSMA (0)
-#define GPIO_DEBUG_RADIO_APPLY_CSMA { GPIOA, GPIO_PIN_0 }
+#define GPIO_DEBUG_RADIO_APPLY_CSMA                                                                                                \
+    {                                                                                                                              \
+        GPIOA, GPIO_PIN_0                                                                                                          \
+    }
 
 #define USE_RT_DEBUG_RADIO_TRANSMIT (0)
-#define GPIO_DEBUG_RADIO_TRANSMIT { GPIOA, GPIO_PIN_0 }
+#define GPIO_DEBUG_RADIO_TRANSMIT                                                                                                  \
+    {                                                                                                                              \
+        GPIOA, GPIO_PIN_0                                                                                                          \
+    }
 
 #define USE_RT_DEBUG_PROC_RADIO_TX (0)
-#define GPIO_DEBUG_PROC_RADIO_TX { GPIOA, GPIO_PIN_0 }
+#define GPIO_DEBUG_PROC_RADIO_TX                                                                                                   \
+    {                                                                                                                              \
+        GPIOA, GPIO_PIN_0                                                                                                          \
+    }
 
 #define USE_RT_DEBUG_RAL_TX_DONE (0)
-#define GPIO_DEBUG_RAL_TX_DONE { GPIOA, GPIO_PIN_0 }
+#define GPIO_DEBUG_RAL_TX_DONE                                                                                                     \
+    {                                                                                                                              \
+        GPIOA, GPIO_PIN_0                                                                                                          \
+    }
 
 #define USE_RT_DEBUG_RAL_TX_DONE_INCREMENT_BACKOFF_COUNT (0)
-#define GPIO_DEBUG_RAL_TX_DONE_INCREMENT_BACKOFF_COUNT { GPIOA, GPIO_PIN_0 }
+#define GPIO_DEBUG_RAL_TX_DONE_INCREMENT_BACKOFF_COUNT                                                                             \
+    {                                                                                                                              \
+        GPIOA, GPIO_PIN_0                                                                                                          \
+    }
 
 #define USE_RT_DEBUG_RAL_TX_DONE_RST_BACKOFF_COUNT (0)
-#define GPIO_DEBUG_RAL_TX_DONE_RST_BACKOFF_COUNT { GPIOA, GPIO_PIN_0 }
+#define GPIO_DEBUG_RAL_TX_DONE_RST_BACKOFF_COUNT                                                                                   \
+    {                                                                                                                              \
+        GPIOA, GPIO_PIN_0                                                                                                          \
+    }
 
 #define USE_RT_DEBUG_RAL_CONTINUE_RX (0)
-#define GPIO_DEBUG_RAL_CONTINUE_RX { GPIOA, GPIO_PIN_0 }
+#define GPIO_DEBUG_RAL_CONTINUE_RX                                                                                                 \
+    {                                                                                                                              \
+        GPIOA, GPIO_PIN_0                                                                                                          \
+    }
 
 #define USE_RT_DEBUG_RAL_PERFORM_CCA (0)
-#define GPIO_DEBUG_RAL_PERFORM_CCA { GPIOA, GPIO_PIN_0 }
+#define GPIO_DEBUG_RAL_PERFORM_CCA                                                                                                 \
+    {                                                                                                                              \
+        GPIOA, GPIO_PIN_0                                                                                                          \
+    }
 
 #define USE_RT_DEBUG_RAL_ENABLE_TRANSMITTER (0)
-#define GPIO_DEBUG_RAL_ENABLE_TRANSMITTER { GPIOA, GPIO_PIN_0 }
+#define GPIO_DEBUG_RAL_ENABLE_TRANSMITTER                                                                                          \
+    {                                                                                                                              \
+        GPIOA, GPIO_PIN_0                                                                                                          \
+    }
 
 #define USE_RT_DEBUG_LLHWC_GET_CH_IDX_ALGO_2 (0)
-#define GPIO_DEBUG_LLHWC_GET_CH_IDX_ALGO_2 { GPIOA, GPIO_PIN_0 }
+#define GPIO_DEBUG_LLHWC_GET_CH_IDX_ALGO_2                                                                                         \
+    {                                                                                                                              \
+        GPIOA, GPIO_PIN_0                                                                                                          \
+    }
 
 /* Application signal selection and GPIO assignment.
    CAN BE MODIFIED BY USER */
 
 #define USE_RT_DEBUG_APP_APPE_INIT (1)
-#define GPIO_DEBUG_APP_APPE_INIT { GPIOA, GPIO_PIN_0 }
+#define GPIO_DEBUG_APP_APPE_INIT                                                                                                   \
+    {                                                                                                                              \
+        GPIOA, GPIO_PIN_0                                                                                                          \
+    }
 
 /********************************/
 /** Debug configuration setup **/
@@ -772,7 +1324,8 @@
 
 #include "stm32wbaxx_hal.h"
 
-typedef struct {
+typedef struct
+{
     GPIO_TypeDef * GPIO_port;
     uint16_t GPIO_pin;
 } st_gpio_debug_t;

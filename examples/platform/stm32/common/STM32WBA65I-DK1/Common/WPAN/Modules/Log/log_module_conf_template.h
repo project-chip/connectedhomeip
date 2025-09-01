@@ -85,7 +85,8 @@ extern "C" {
  *         The user can add its own levels but must NOT add a value to the said
  *         levels. Verbose levels are handled by the UTIL_ADV_TRACE.
  */
-typedef enum {
+typedef enum
+{
     LOG_VERBOSE_INFO = LOG_MODULE_MIN_VERBOSE_LEVEL,
     /* USER CODE BEGIN Log_Verbose_Level_t_0 */
 
@@ -123,7 +124,8 @@ typedef enum {
  *         The user can add its own regions but must NOT add a value to them.
  *         The log module handles the mask on its own.
  */
-typedef enum {
+typedef enum
+{
     LOG_REGION_BLE = LOG_MODULE_MIN_REGION_VALUE,
     LOG_REGION_SYSTEM,
     LOG_REGION_APP,
@@ -138,13 +140,14 @@ typedef enum {
     LOG_REGION_ALL_REGIONS = LOG_MODULE_ALL_REGION_MASK,
 } Log_Region_t;
 
-typedef enum {
-    LOG_COLOR_NONE = 0, /* Initialization */
+typedef enum
+{
+    LOG_COLOR_NONE         = 0,  /* Initialization */
     LOG_COLOR_CODE_DEFAULT = 37, /* White */
-    LOG_COLOR_CODE_RED = 91,
-    LOG_COLOR_CODE_GREEN = 92,
-    LOG_COLOR_CODE_YELLOW = 93,
-    LOG_COLOR_CODE_CYAN = 96,
+    LOG_COLOR_CODE_RED     = 91,
+    LOG_COLOR_CODE_GREEN   = 92,
+    LOG_COLOR_CODE_YELLOW  = 93,
+    LOG_COLOR_CODE_CYAN    = 96,
     /* USER CODE BEGIN Log_Color_t */
 
     /* USER CODE END Log_Color_t */
@@ -158,7 +161,7 @@ typedef enum {
 /* Display 64 bits number for all compiler. */
 /* Example : LOG_INFO_APP( "New Device : " LOG_DISPLAY64() " installed in %d seconds", LOG_NUMBER64( dlDevice ), iTime ); */
 #define LOG_DISPLAY64() "0x%08X%08X"
-#define LOG_NUMBER64(number) (uint32_t) (number >> 32u), (uint32_t) (number)
+#define LOG_NUMBER64(number) (uint32_t)(number >> 32u), (uint32_t) (number)
 
 /* Module API - Log macros for each region */
 /* LOG_REGION_BLE */
@@ -168,17 +171,21 @@ typedef enum {
 #define LOG_WARNING_BLE(...) Log_Module_Print(LOG_VERBOSE_WARNING, LOG_REGION_BLE, __VA_ARGS__)
 #define LOG_DEBUG_BLE(...) Log_Module_Print(LOG_VERBOSE_DEBUG, LOG_REGION_BLE, __VA_ARGS__)
 #else /* (CFG_LOG_SUPPORTED != 0) */
-#define LOG_INFO_BLE(...) \
-    do {                  \
+#define LOG_INFO_BLE(...)                                                                                                          \
+    do                                                                                                                             \
+    {                                                                                                                              \
     } while (0)
-#define LOG_ERROR_BLE(...) \
-    do {                   \
+#define LOG_ERROR_BLE(...)                                                                                                         \
+    do                                                                                                                             \
+    {                                                                                                                              \
     } while (0)
-#define LOG_WARNING_BLE(...) \
-    do {                     \
+#define LOG_WARNING_BLE(...)                                                                                                       \
+    do                                                                                                                             \
+    {                                                                                                                              \
     } while (0)
-#define LOG_DEBUG_BLE(...) \
-    do {                   \
+#define LOG_DEBUG_BLE(...)                                                                                                         \
+    do                                                                                                                             \
+    {                                                                                                                              \
     } while (0)
 #endif /* (CFG_LOG_SUPPORTED != 0) */
 
@@ -202,17 +209,21 @@ typedef enum {
 #define LOG_WARNING_SYSTEM(...) Log_Module_Print(LOG_VERBOSE_WARNING, LOG_REGION_SYSTEM, __VA_ARGS__)
 #define LOG_DEBUG_SYSTEM(...) Log_Module_Print(LOG_VERBOSE_DEBUG, LOG_REGION_SYSTEM, __VA_ARGS__)
 #else /* (CFG_LOG_SUPPORTED != 0) */
-#define LOG_INFO_SYSTEM(...) \
-    do {                     \
+#define LOG_INFO_SYSTEM(...)                                                                                                       \
+    do                                                                                                                             \
+    {                                                                                                                              \
     } while (0)
-#define LOG_ERROR_SYSTEM(...) \
-    do {                      \
+#define LOG_ERROR_SYSTEM(...)                                                                                                      \
+    do                                                                                                                             \
+    {                                                                                                                              \
     } while (0)
-#define LOG_WARNING_SYSTEM(...) \
-    do {                        \
+#define LOG_WARNING_SYSTEM(...)                                                                                                    \
+    do                                                                                                                             \
+    {                                                                                                                              \
     } while (0)
-#define LOG_DEBUG_SYSTEM(...) \
-    do {                      \
+#define LOG_DEBUG_SYSTEM(...)                                                                                                      \
+    do                                                                                                                             \
+    {                                                                                                                              \
     } while (0)
 #endif /* (CFG_LOG_SUPPORTED != 0) */
 
@@ -236,17 +247,21 @@ typedef enum {
 #define LOG_WARNING_APP(...) Log_Module_Print(LOG_VERBOSE_WARNING, LOG_REGION_APP, __VA_ARGS__)
 #define LOG_DEBUG_APP(...) Log_Module_Print(LOG_VERBOSE_DEBUG, LOG_REGION_APP, __VA_ARGS__)
 #else /* (CFG_LOG_SUPPORTED != 0) */
-#define LOG_INFO_APP(...) \
-    do {                  \
+#define LOG_INFO_APP(...)                                                                                                          \
+    do                                                                                                                             \
+    {                                                                                                                              \
     } while (0)
-#define LOG_ERROR_APP(...) \
-    do {                   \
+#define LOG_ERROR_APP(...)                                                                                                         \
+    do                                                                                                                             \
+    {                                                                                                                              \
     } while (0)
-#define LOG_WARNING_APP(...) \
-    do {                     \
+#define LOG_WARNING_APP(...)                                                                                                       \
+    do                                                                                                                             \
+    {                                                                                                                              \
     } while (0)
-#define LOG_DEBUG_APP(...) \
-    do {                   \
+#define LOG_DEBUG_APP(...)                                                                                                         \
+    do                                                                                                                             \
+    {                                                                                                                              \
     } while (0)
 #endif /* (CFG_LOG_SUPPORTED != 0) */
 
@@ -270,17 +285,21 @@ typedef enum {
 #define LOG_WARNING_LINKLAYER(...) Log_Module_Print(LOG_VERBOSE_WARNING, LOG_REGION_LINKLAYER, __VA_ARGS__)
 #define LOG_DEBUG_LINKLAYER(...) Log_Module_Print(LOG_VERBOSE_DEBUG, LOG_REGION_LINKLAYER, __VA_ARGS__)
 #else /* (CFG_LOG_SUPPORTED != 0) */
-#define LOG_INFO_LINKLAYER(...) \
-    do {                        \
+#define LOG_INFO_LINKLAYER(...)                                                                                                    \
+    do                                                                                                                             \
+    {                                                                                                                              \
     } while (0)
-#define LOG_ERROR_LINKLAYER(...) \
-    do {                         \
+#define LOG_ERROR_LINKLAYER(...)                                                                                                   \
+    do                                                                                                                             \
+    {                                                                                                                              \
     } while (0)
-#define LOG_WARNING_LINKLAYER(...) \
-    do {                           \
+#define LOG_WARNING_LINKLAYER(...)                                                                                                 \
+    do                                                                                                                             \
+    {                                                                                                                              \
     } while (0)
-#define LOG_DEBUG_LINKLAYER(...) \
-    do {                         \
+#define LOG_DEBUG_LINKLAYER(...)                                                                                                   \
+    do                                                                                                                             \
+    {                                                                                                                              \
     } while (0)
 #endif /* (CFG_LOG_SUPPORTED != 0) */
 

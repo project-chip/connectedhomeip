@@ -33,14 +33,16 @@
 extern "C" {
 #endif
 /* Exported types ------------------------------------------------------------*/
-typedef enum {
+typedef enum
+{
     NO_CLOCK_CONFIG = 0,
     HSE_16MHZ,
     HSE_32MHZ,
     SYS_PLL,
 } scm_clockconfig_t;
 
-typedef enum {
+typedef enum
+{
     LP,
     RUN,
     HSE16,
@@ -48,30 +50,35 @@ typedef enum {
     PLL,
 } scm_ws_lp_t;
 
-typedef enum {
+typedef enum
+{
     HSEPRE_DISABLE = 0,
     HSEPRE_ENABLE
 } scm_hse_hsepre_t;
 
-typedef enum {
+typedef enum
+{
     SCM_USER_APP,
     SCM_USER_LL_FW,
     SCM_USER_LL_HW_RCO_CLBR,
     TOTAL_CLIENT_NUM, /* To be at the end of the enum */
 } scm_user_id_t;
 
-typedef enum {
+typedef enum
+{
     NO_PLL,
     PLL_INTEGER_MODE,
     PLL_FRACTIONAL_MODE,
 } scm_pll_mode_t;
 
-typedef enum {
+typedef enum
+{
     SCM_RADIO_NOT_ACTIVE = 0,
     SCM_RADIO_ACTIVE,
 } scm_radio_state_t;
 
-typedef struct {
+typedef struct
+{
     uint8_t are_pll_params_initialized;
     scm_pll_mode_t pll_mode;
     uint32_t PLLM;
@@ -83,7 +90,8 @@ typedef struct {
     uint32_t AHB5_PLL1_CLKDivider;
 } scm_pll_config_t;
 
-typedef struct {
+typedef struct
+{
     scm_clockconfig_t targeted_clock_freq;
     uint32_t flash_ws_cfg;
     uint32_t sram_ws_cfg;

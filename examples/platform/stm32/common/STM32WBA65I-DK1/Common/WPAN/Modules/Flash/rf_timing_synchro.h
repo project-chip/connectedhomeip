@@ -30,10 +30,11 @@ extern "C" {
 /* Exported types ------------------------------------------------------------*/
 
 /* RFTS command status */
-typedef enum {
-    RFTS_CMD_OK, /* The RF Timing synchronization command was successfully executed */
+typedef enum
+{
+    RFTS_CMD_OK,            /* The RF Timing synchronization command was successfully executed */
     RFTS_WINDOW_REQ_FAILED, /* The RF Timing synchronization module failed to register the window request */
-    RFTS_WINDOW_REL_ERROR /* An error occurred during the window release procedure */
+    RFTS_WINDOW_REL_ERROR   /* An error occurred during the window release procedure */
 } RFTS_Cmd_Status_t;
 
 /* Exported constants --------------------------------------------------------*/

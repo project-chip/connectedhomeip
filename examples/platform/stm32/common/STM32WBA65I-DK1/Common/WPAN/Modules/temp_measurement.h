@@ -28,7 +28,8 @@
 /**
  * @brief Temperature Measurement command status codes
  */
-typedef enum TEMPMEAS_Cmd_Status {
+typedef enum TEMPMEAS_Cmd_Status
+{
     TEMPMEAS_OK,
     TEMPMEAS_NOK,
     TEMPMEAS_ADC_INIT,

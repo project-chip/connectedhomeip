@@ -35,7 +35,7 @@
 /**
  * @brief Initial value define for configuration tracking number
  */
-#define ADCCTRL_NO_CONFIG (uint32_t) (0x00000000u)
+#define ADCCTRL_NO_CONFIG (uint32_t)(0x00000000u)
 
 /**
  * @brief Init variable out of expected ADC conversion data range

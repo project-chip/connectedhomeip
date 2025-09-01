@@ -108,9 +108,7 @@ extern int otPlatPkaEnable(void);
  * p_x and p_y, and the scalar k. Each parameter must be a vector of 8 x 32-bit
  * words (32 bytes).
  */
-extern void otPlatPkaP256StartEccScalarMul(const uint32_t * k,
-    const uint32_t * p_x,
-    const uint32_t * p_y);
+extern void otPlatPkaP256StartEccScalarMul(const uint32_t * k, const uint32_t * p_x, const uint32_t * p_y);
 
 /*
  * otPlatEndOfOperation, must be called after otPlatEnable()
@@ -131,8 +129,7 @@ extern int otPlatEndOfOperation(void);
  * p_x and p_y, 8 x 32-bit words each (2 times 32 bytes).
  *
  */
-extern void otPlatPkaP256ReadEccScalarMul(uint32_t * p_x,
-    uint32_t * p_y);
+extern void otPlatPkaP256ReadEccScalarMul(uint32_t * p_x, uint32_t * p_y);
 
 /*
  * otPlatPkaMpiInvMod

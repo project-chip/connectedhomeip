@@ -262,8 +262,8 @@ static void HW_IPCC_BLE_AclDataEvtHandler(void)
     return;
 }
 
-__weak void HW_IPCC_BLE_AclDataAckNot(void) {};
-__weak void HW_IPCC_BLE_RxEvtNot(void) {};
+__weak void HW_IPCC_BLE_AclDataAckNot(void){};
+__weak void HW_IPCC_BLE_RxEvtNot(void){};
 
 /******************************************************************************
  * SYSTEM
@@ -301,8 +301,8 @@ static void HW_IPCC_SYS_EvtHandler(void)
     return;
 }
 
-__weak void HW_IPCC_SYS_CmdEvtNot(void) {};
-__weak void HW_IPCC_SYS_EvtNot(void) {};
+__weak void HW_IPCC_SYS_CmdEvtNot(void){};
+__weak void HW_IPCC_SYS_EvtNot(void){};
 
 /******************************************************************************
  * MAC 802.15.4
@@ -348,8 +348,8 @@ static void HW_IPCC_MAC_802_15_4_NotEvtHandler(void)
 
     return;
 }
-__weak void HW_IPCC_MAC_802_15_4_CmdEvtNot(void) {};
-__weak void HW_IPCC_MAC_802_15_4_EvtNot(void) {};
+__weak void HW_IPCC_MAC_802_15_4_CmdEvtNot(void){};
+__weak void HW_IPCC_MAC_802_15_4_EvtNot(void){};
 #endif
 
 /******************************************************************************
@@ -422,9 +422,9 @@ static void HW_IPCC_THREAD_CliNotEvtHandler(void)
     return;
 }
 
-__weak void HW_IPCC_OT_CmdEvtNot(void) {};
-__weak void HW_IPCC_CLI_CmdEvtNot(void) {};
-__weak void HW_IPCC_THREAD_EvtNot(void) {};
+__weak void HW_IPCC_OT_CmdEvtNot(void){};
+__weak void HW_IPCC_CLI_CmdEvtNot(void){};
+__weak void HW_IPCC_THREAD_EvtNot(void){};
 
 #endif /* THREAD_WB */
 
@@ -472,8 +472,8 @@ void HW_IPCC_LLDTESTS_SendM0CmdAck(void)
     LL_C1_IPCC_EnableReceiveChannel(IPCC, HW_IPCC_LLDTESTS_M0_CMD_CHANNEL);
     return;
 }
-__weak void HW_IPCC_LLDTESTS_ReceiveCliRsp(void) {};
-__weak void HW_IPCC_LLDTESTS_ReceiveM0Cmd(void) {};
+__weak void HW_IPCC_LLDTESTS_ReceiveCliRsp(void){};
+__weak void HW_IPCC_LLDTESTS_ReceiveM0Cmd(void){};
 #endif /* LLD_TESTS_WB */
 
 /******************************************************************************
@@ -520,8 +520,8 @@ void HW_IPCC_LLD_BLE_SendM0CmdAck(void)
     // LL_C1_IPCC_EnableReceiveChannel( IPCC, HW_IPCC_LLD_BLE_M0_CMD_CHANNEL );
     return;
 }
-__weak void HW_IPCC_LLD_BLE_ReceiveCliRsp(void) {};
-__weak void HW_IPCC_LLD_BLE_ReceiveM0Cmd(void) {};
+__weak void HW_IPCC_LLD_BLE_ReceiveCliRsp(void){};
+__weak void HW_IPCC_LLD_BLE_ReceiveM0Cmd(void){};
 
 /* Transparent Mode */
 void HW_IPCC_LLD_BLE_SendCmd(void)
@@ -609,9 +609,9 @@ void HW_IPCC_ZIGBEE_SendM4AckToM0Request(void)
     return;
 }
 
-__weak void HW_IPCC_ZIGBEE_RecvAppliAckFromM0(void) {};
-__weak void HW_IPCC_ZIGBEE_RecvM0NotifyToM4(void) {};
-__weak void HW_IPCC_ZIGBEE_RecvM0RequestToM4(void) {};
+__weak void HW_IPCC_ZIGBEE_RecvAppliAckFromM0(void){};
+__weak void HW_IPCC_ZIGBEE_RecvM0NotifyToM4(void){};
+__weak void HW_IPCC_ZIGBEE_RecvM0RequestToM4(void){};
 #endif /* ZIGBEE_WB */
 
 /******************************************************************************
@@ -664,4 +664,4 @@ static void HW_IPCC_TRACES_EvtHandler(void)
     return;
 }
 
-__weak void HW_IPCC_TRACES_EvtNot(void) {};
+__weak void HW_IPCC_TRACES_EvtNot(void){};

@@ -113,12 +113,12 @@ extern "C" {
 #define MBEDTLS_X509_CSR_PARSE_C
 #define MBEDTLS_X509_USE_C
 
-#define MBEDTLS_MPI_WINDOW_SIZE 1 /**< Maximum windows size used. */
-#define MBEDTLS_MPI_MAX_SIZE 32 /**< Maximum number of bytes for usable MPIs. */
-#define MBEDTLS_ECP_MAX_BITS 256 /**< Maximum bit size of groups */
-#define MBEDTLS_ECP_WINDOW_SIZE 2 /**< Maximum window size used */
+#define MBEDTLS_MPI_WINDOW_SIZE 1       /**< Maximum windows size used. */
+#define MBEDTLS_MPI_MAX_SIZE 32         /**< Maximum number of bytes for usable MPIs. */
+#define MBEDTLS_ECP_MAX_BITS 256        /**< Maximum bit size of groups */
+#define MBEDTLS_ECP_WINDOW_SIZE 2       /**< Maximum window size used */
 #define MBEDTLS_ECP_FIXED_POINT_OPTIM 0 /**< Enable fixed-point speed-up */
-#define MBEDTLS_ENTROPY_MAX_SOURCES 2 /**< Maximum number of sources supported */
+#define MBEDTLS_ENTROPY_MAX_SOURCES 2   /**< Maximum number of sources supported */
 
 #if OPENTHREAD_CONFIG_COAP_SECURE_API_ENABLE
 #define MBEDTLS_SSL_MAX_CONTENT_LEN 900 /**< Maximum fragment length in bytes */

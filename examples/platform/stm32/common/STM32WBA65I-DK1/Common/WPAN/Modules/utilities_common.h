@@ -119,13 +119,13 @@ extern "C" {
 #define DIVF(x, y) ((x) / (y))
 
 #undef DIVC
-#define DIVC(x, y) (((x) + (y) - 1) / (y))
+#define DIVC(x, y) (((x) + (y) -1) / (y))
 
 #undef DIVR
 #define DIVR(x, y) (((x) + ((y) / 2)) / (y))
 
 #undef SHRR
-#define SHRR(x, n) ((((x) >> ((n) - 1)) + 1) >> 1)
+#define SHRR(x, n) ((((x) >> ((n) -1)) + 1) >> 1)
 
 #undef BITN
 #define BITN(w, n) (((w)[(n) / 32] >> ((n) % 32)) & 1)

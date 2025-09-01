@@ -53,7 +53,7 @@ extern uint32_t SystemCoreClock;
 #endif
 #ifndef CMSIS_device_header
 #define CMSIS_device_header "stm32wbaxx.h" /* [STM] */
-#endif /* CMSIS_device_header */
+#endif                                     /* CMSIS_device_header */
 
 /*-------------------- STM32WBA specific defines -------------------*/
 #define configENABLE_FPU 0
@@ -156,11 +156,12 @@ See http://www.FreeRTOS.org/RTOS-Cortex-M3-M4.html. */
 /* Normal assert() semantics without relying on the provision of an assert.h
 header file. */
 /* USER CODE BEGIN 1 */
-#define configASSERT(x)           \
-    if ((x) == 0) {               \
-        taskDISABLE_INTERRUPTS(); \
-        for (;;)                  \
-            ;                     \
+#define configASSERT(x)                                                                                                            \
+    if ((x) == 0)                                                                                                                  \
+    {                                                                                                                              \
+        taskDISABLE_INTERRUPTS();                                                                                                  \
+        for (;;)                                                                                                                   \
+            ;                                                                                                                      \
     }
 /* USER CODE END 1 */
 

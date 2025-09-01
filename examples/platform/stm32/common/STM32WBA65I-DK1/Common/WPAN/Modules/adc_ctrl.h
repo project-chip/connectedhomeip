@@ -28,7 +28,8 @@
 /**
  * @brief ADC command status codes
  */
-typedef enum ADCCTRL_Cmd_Status {
+typedef enum ADCCTRL_Cmd_Status
+{
     ADCCTRL_OK,
     ADCCTRL_NOK,
     ADCCTRL_BUSY,
@@ -44,7 +45,8 @@ typedef enum ADCCTRL_Cmd_Status {
 /**
  * @brief  ADC IP state
  */
-typedef enum ADCCTRL_Ip_State {
+typedef enum ADCCTRL_Ip_State
+{
     ADC_OFF,
     ADC_ON
 } ADCCTRL_Ip_State_t;
@@ -52,7 +54,8 @@ typedef enum ADCCTRL_Ip_State {
 /**
  * @brief ADC handle states
  */
-typedef enum ADCCTRL_HandleState {
+typedef enum ADCCTRL_HandleState
+{
     ADCCTRL_HANDLE_NOT_REG,
     ADCCTRL_HANDLE_REG,
 } ADCCTRL_HandleState_t;
@@ -60,7 +63,8 @@ typedef enum ADCCTRL_HandleState {
 /**
  * @brief ADC Init configuration structure - Conversion parameters
  */
-typedef struct ADCCTRL_ConvParameters {
+typedef struct ADCCTRL_ConvParameters
+{
     uint32_t TriggerFrequencyMode; /*!< Set ADC Trigger frequency mode.
                                         This parameter can be a value of @ref ADC_LL_EC_REG_TRIGGER_FREQ */
 
@@ -96,7 +100,8 @@ typedef struct ADCCTRL_ConvParameters {
 /**
  * @brief ADC Init configuration structure - Sequencer parameters
  */
-typedef struct ADCCTRL_SeqParameters {
+typedef struct ADCCTRL_SeqParameters
+{
     uint32_t Setup; /*!< Set ADC sequencer configuration flexibility.
                          This parameter can be a value of @ref ADC_LL_EC_REG_SEQ_MODE */
 
@@ -110,7 +115,8 @@ typedef struct ADCCTRL_SeqParameters {
 /**
  * @brief ADC Init configuration structure - Low power parameters
  */
-typedef struct ADCCTRL_LowPowerParameters {
+typedef struct ADCCTRL_LowPowerParameters
+{
     FunctionalState AutoPowerOff; /*!< Enable or Disable ADC Auto Power OFF mode.
                                        This parameter can be set to ENABLE or DISABLE */
 
@@ -121,7 +127,8 @@ typedef struct ADCCTRL_LowPowerParameters {
 /**
  * @brief ADC Init configuration structure
  */
-typedef struct ADCCTRL_InitConfig {
+typedef struct ADCCTRL_InitConfig
+{
     ADCCTRL_ConvParameters_t ConvParams;
     ADCCTRL_SeqParameters_t SeqParams;
     ADCCTRL_LowPowerParameters_t LowPowerParams;
@@ -130,7 +137,8 @@ typedef struct ADCCTRL_InitConfig {
 /**
  * @brief ADC Channel configuration structure
  */
-typedef struct ADCCTRL_ChannelConfig {
+typedef struct ADCCTRL_ChannelConfig
+{
     uint32_t Channel; /*!< Specify the channel to configure into ADC regular group.
                            This parameter can be a value of @ref ADC_LL_EC_CHANNEL */
 
@@ -145,10 +153,11 @@ typedef struct ADCCTRL_ChannelConfig {
 /**
  * @brief ADC handle typedef
  */
-typedef struct ADCCTRL_Handle {
-    uint32_t Uid; /* Id of the Handle instance */
-    ADCCTRL_HandleState_t State; /* State of the ADC Controller handle */
-    ADCCTRL_InitConfig_t InitConf; /* Init configuration of the ADC */
+typedef struct ADCCTRL_Handle
+{
+    uint32_t Uid;                        /* Id of the Handle instance */
+    ADCCTRL_HandleState_t State;         /* State of the ADC Controller handle */
+    ADCCTRL_InitConfig_t InitConf;       /* Init configuration of the ADC */
     ADCCTRL_ChannelConfig_t ChannelConf; /* Channel configuration of the ADC */
 } ADCCTRL_Handle_t;
 
@@ -180,8 +189,7 @@ ADCCTRL_Cmd_Status_t ADCCTRL_RegisterHandle(ADCCTRL_Handle_t * const p_Handle);
  *
  * @return State of the operation
  */
-ADCCTRL_Cmd_Status_t ADCCTRL_RequestIpState(const ADCCTRL_Handle_t * const p_Handle,
-    const ADCCTRL_Ip_State_t State);
+ADCCTRL_Cmd_Status_t ADCCTRL_RequestIpState(const ADCCTRL_Handle_t * const p_Handle, const ADCCTRL_Ip_State_t State);
 
 /**
  * @brief  Read raw value of the ADC
@@ -191,8 +199,7 @@ ADCCTRL_Cmd_Status_t ADCCTRL_RequestIpState(const ADCCTRL_Handle_t * const p_Han
  *
  * @retval Operation state
  */
-ADCCTRL_Cmd_Status_t ADCCTRL_RequestRawValue(const ADCCTRL_Handle_t * const p_Handle,
-    uint16_t * const p_ReadValue);
+ADCCTRL_Cmd_Status_t ADCCTRL_RequestRawValue(const ADCCTRL_Handle_t * const p_Handle, uint16_t * const p_ReadValue);
 
 /**
  * @brief  Read temperature from ADC temperature sensor
@@ -204,8 +211,7 @@ ADCCTRL_Cmd_Status_t ADCCTRL_RequestRawValue(const ADCCTRL_Handle_t * const p_Ha
  *
  * @retval Operation state
  */
-ADCCTRL_Cmd_Status_t ADCCTRL_RequestTemperature(const ADCCTRL_Handle_t * const p_Handle,
-    uint16_t * const p_ReadValue);
+ADCCTRL_Cmd_Status_t ADCCTRL_RequestTemperature(const ADCCTRL_Handle_t * const p_Handle, uint16_t * const p_ReadValue);
 
 /**
  * @brief  Read Voltage from ADC
@@ -217,8 +223,7 @@ ADCCTRL_Cmd_Status_t ADCCTRL_RequestTemperature(const ADCCTRL_Handle_t * const p
  *
  * @retval Operation state
  */
-ADCCTRL_Cmd_Status_t ADCCTRL_RequestCoreVoltage(const ADCCTRL_Handle_t * const p_Handle,
-    uint16_t * const p_ReadValue);
+ADCCTRL_Cmd_Status_t ADCCTRL_RequestCoreVoltage(const ADCCTRL_Handle_t * const p_Handle, uint16_t * const p_ReadValue);
 
 /**
  * @brief  Read reference Voltage from ADC
@@ -230,8 +235,7 @@ ADCCTRL_Cmd_Status_t ADCCTRL_RequestCoreVoltage(const ADCCTRL_Handle_t * const p
  *
  * @retval Operation state
  */
-ADCCTRL_Cmd_Status_t ADCCTRL_RequestRefVoltage(const ADCCTRL_Handle_t * const p_Handle,
-    uint16_t * const p_ReadValue);
+ADCCTRL_Cmd_Status_t ADCCTRL_RequestRefVoltage(const ADCCTRL_Handle_t * const p_Handle, uint16_t * const p_ReadValue);
 
 /* Exported functions to be implemented by the user ------------------------- */
 /**

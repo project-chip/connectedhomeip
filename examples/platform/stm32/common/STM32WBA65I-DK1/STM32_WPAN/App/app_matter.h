@@ -34,7 +34,8 @@ extern "C" {
 
 /* Exported types ------------------------------------------------------------*/
 
-typedef enum {
+typedef enum
+{
     MATTER_STM_CONN_HANDLE_EVT,
     MATTER_STM_DISCON_HANDLE_EVT,
     MATTER_STM_ACK_INDICATE_EVT,
@@ -45,25 +46,29 @@ typedef enum {
     MATTER_STM_BOOT_REQUEST_EVT,
 } MATTER_STM_Opcode_evt_t;
 
-typedef struct {
+typedef struct
+{
     uint8_t * pPayload;
     uint8_t Length;
 } MATTER_STM_Data_t;
 
-typedef struct {
+typedef struct
+{
     MATTER_STM_Opcode_evt_t Evt_Opcode;
     MATTER_STM_Data_t DataTransfered;
     uint16_t ConnectionHandle;
     uint8_t ServiceInstance;
 } MATTER_App_Notification_evt_t;
 
-typedef struct {
+typedef struct
+{
     uint8_t * Payload;
     uint16_t Length;
     uint16_t connid;
 } BLE_Matter_RX;
 
-typedef struct {
+typedef struct
+{
     uint16_t connid;
     uint8_t notif;
 } BLE_Matter_TXCharCCCD;

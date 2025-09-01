@@ -33,13 +33,15 @@ extern "C" {
 typedef uint32_t FD_Flash_ctrl_bm_t;
 
 /* Flash operation status */
-typedef enum {
+typedef enum
+{
     FD_FLASHOP_SUCCESS,
     FD_FLASHOP_FAILURE
 } FD_FlashOp_Status_t;
 
 /* Flash Driver commands to enable or disable flash access */
-typedef enum {
+typedef enum
+{
     LL_FLASH_ENABLE,
     LL_FLASH_DISABLE,
 } FD_FLASH_Status_t;
@@ -61,7 +63,8 @@ typedef enum {
  *                                    ie: Executing flash operation without the BLE LL.
  *
  */
-typedef enum FD_FlashAccess_bm {
+typedef enum FD_FlashAccess_bm
+{
     /* System flash access bitfield */
     FD_FLASHACCESS_SYSTEM,
     /* RF Timing Synchro flash access bitfield */

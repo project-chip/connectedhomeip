@@ -259,7 +259,7 @@ typedef enum OT_MUST_USE_RESULT otError
  * @returns  A string representation of an otError.
  *
  */
-const char *otThreadErrorToString(otError aError);
+const char * otThreadErrorToString(otError aError);
 
 /**
  * @}

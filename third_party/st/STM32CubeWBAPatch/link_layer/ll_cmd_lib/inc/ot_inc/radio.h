@@ -39,9 +39,9 @@
 
 #include <stdint.h>
 
+#include "crypto.h"
 #include "error.h"
 #include "instance.h"
-#include "crypto.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -79,9 +79,9 @@ enum
     // Per IEEE 802.15.4-2015, 12.3.3 Symbol rate:
     // The O-QPSK PHY symbol rate shall be 25 ksymbol/s when operating in the 868 MHz band and 62.5 ksymbol/s when
     // operating in the 780 MHz, 915 MHz, 2380 MHz, or 2450 MHz band
-    OT_RADIO_SYMBOL_RATE = 62500, ///< The O-QPSK PHY symbol rate when operating in the 780MHz, 915MHz, 2380MHz, 2450MHz
-    OT_RADIO_SYMBOL_TIME = 1000000 * 1 / OT_RADIO_SYMBOL_RATE, ///< Symbol duration time in unit of microseconds
-    OT_RADIO_TEN_SYMBOLS_TIME = 10 * OT_RADIO_SYMBOL_TIME,     ///< Time for 10 symbols in unit of microseconds
+    OT_RADIO_SYMBOL_RATE      = 62500, ///< The O-QPSK PHY symbol rate when operating in the 780MHz, 915MHz, 2380MHz, 2450MHz
+    OT_RADIO_SYMBOL_TIME      = 1000000 * 1 / OT_RADIO_SYMBOL_RATE, ///< Symbol duration time in unit of microseconds
+    OT_RADIO_TEN_SYMBOLS_TIME = 10 * OT_RADIO_SYMBOL_TIME,          ///< Time for 10 symbols in unit of microseconds
 
     OT_RADIO_LQI_NONE      = 0,   ///< LQI measurement not supported
     OT_RADIO_RSSI_INVALID  = 127, ///< Invalid or unknown RSSI value
@@ -226,7 +226,7 @@ typedef struct otMacKeyMaterial
     union
     {
         otMacKeyRef mKeyRef; ///< Reference to the key stored.
-        otMacKey    mKey;    ///< Key stored as literal.
+        otMacKey mKey;       ///< Key stored as literal.
     } mKeyMaterial;
 } otMacKeyMaterial;
 
@@ -255,10 +255,10 @@ typedef struct otRadioIeInfo
  */
 typedef struct otRadioFrame
 {
-    uint8_t *mPsdu; ///< The PSDU.
+    uint8_t * mPsdu; ///< The PSDU.
 
-    uint16_t mLength;  ///< Length of the PSDU.
-    uint8_t  mChannel; ///< Channel used to transmit/receive the frame.
+    uint16_t mLength; ///< Length of the PSDU.
+    uint8_t mChannel; ///< Channel used to transmit/receive the frame.
 
     uint8_t mRadioType; ///< Radio link type - should be ignored by radio driver.
 
@@ -272,8 +272,8 @@ typedef struct otRadioFrame
          */
         struct
         {
-            const otMacKeyMaterial *mAesKey; ///< The key material used for AES-CCM frame security.
-            otRadioIeInfo          *mIeInfo; ///< The pointer to the Header IE(s) related information.
+            const otMacKeyMaterial * mAesKey; ///< The key material used for AES-CCM frame security.
+            otRadioIeInfo * mIeInfo;          ///< The pointer to the Header IE(s) related information.
 
             /**
              * The base time in microseconds for scheduled transmissions
@@ -356,13 +356,13 @@ typedef struct otRadioFrame
             uint64_t mTimestamp;
 
             uint32_t mAckFrameCounter; ///< ACK security frame counter (applicable when `mAckedWithSecEnhAck` is set).
-            uint8_t  mAckKeyId;        ///< ACK security key index (applicable when `mAckedWithSecEnhAck` is set).
-            int8_t   mRssi;            ///< Received signal strength indicator in dBm for received frames.
-            uint8_t  mLqi;             ///< Link Quality Indicator for received frames.
+            uint8_t mAckKeyId;         ///< ACK security key index (applicable when `mAckedWithSecEnhAck` is set).
+            int8_t mRssi;              ///< Received signal strength indicator in dBm for received frames.
+            uint8_t mLqi;              ///< Link Quality Indicator for received frames.
 
             // Flags
             bool mAckedWithFramePending : 1; ///< This indicates if this frame was acknowledged with frame pending set.
-            bool mAckedWithSecEnhAck : 1; ///< This indicates if this frame was acknowledged with secured enhance ACK.
+            bool mAckedWithSecEnhAck : 1;    ///< This indicates if this frame was acknowledged with secured enhance ACK.
         } mRxInfo;
     } mInfo;
 } otRadioFrame;
@@ -402,25 +402,25 @@ typedef enum otRadioState
  */
 typedef struct otRadioCoexMetrics
 {
-    uint32_t mNumGrantGlitch;          ///< Number of grant glitches.
-    uint32_t mNumTxRequest;            ///< Number of tx requests.
-    uint32_t mNumTxGrantImmediate;     ///< Number of tx requests while grant was active.
-    uint32_t mNumTxGrantWait;          ///< Number of tx requests while grant was inactive.
-    uint32_t mNumTxGrantWaitActivated; ///< Number of tx requests while grant was inactive that were ultimately granted.
-    uint32_t mNumTxGrantWaitTimeout;   ///< Number of tx requests while grant was inactive that timed out.
+    uint32_t mNumGrantGlitch;                     ///< Number of grant glitches.
+    uint32_t mNumTxRequest;                       ///< Number of tx requests.
+    uint32_t mNumTxGrantImmediate;                ///< Number of tx requests while grant was active.
+    uint32_t mNumTxGrantWait;                     ///< Number of tx requests while grant was inactive.
+    uint32_t mNumTxGrantWaitActivated;            ///< Number of tx requests while grant was inactive that were ultimately granted.
+    uint32_t mNumTxGrantWaitTimeout;              ///< Number of tx requests while grant was inactive that timed out.
     uint32_t mNumTxGrantDeactivatedDuringRequest; ///< Number of tx that were in progress when grant was deactivated.
     uint32_t mNumTxDelayedGrant;                  ///< Number of tx requests that were not granted within 50us.
     uint32_t mAvgTxRequestToGrantTime;            ///< Average time in usec from tx request to grant.
     uint32_t mNumRxRequest;                       ///< Number of rx requests.
     uint32_t mNumRxGrantImmediate;                ///< Number of rx requests while grant was active.
     uint32_t mNumRxGrantWait;                     ///< Number of rx requests while grant was inactive.
-    uint32_t mNumRxGrantWaitActivated; ///< Number of rx requests while grant was inactive that were ultimately granted.
-    uint32_t mNumRxGrantWaitTimeout;   ///< Number of rx requests while grant was inactive that timed out.
+    uint32_t mNumRxGrantWaitActivated;            ///< Number of rx requests while grant was inactive that were ultimately granted.
+    uint32_t mNumRxGrantWaitTimeout;              ///< Number of rx requests while grant was inactive that timed out.
     uint32_t mNumRxGrantDeactivatedDuringRequest; ///< Number of rx that were in progress when grant was deactivated.
     uint32_t mNumRxDelayedGrant;                  ///< Number of rx requests that were not granted within 50us.
     uint32_t mAvgRxRequestToGrantTime;            ///< Average time in usec from rx request to grant.
     uint32_t mNumRxGrantNone;                     ///< Number of rx requests that completed without receiving grant.
-    bool     mStopped;                            ///< Stats collection stopped due to saturation.
+    bool mStopped;                                ///< Stats collection stopped due to saturation.
 } otRadioCoexMetrics;
 
 /**
@@ -459,7 +459,7 @@ typedef struct otLinkMetrics
  * @returns The radio capability bit vector (see `OT_RADIO_CAP_*` definitions).
  *
  */
-otRadioCaps otPlatRadioGetCaps(otInstance *aInstance);
+otRadioCaps otPlatRadioGetCaps(otInstance * aInstance);
 
 /**
  * Get the radio version string.
@@ -472,7 +472,7 @@ otRadioCaps otPlatRadioGetCaps(otInstance *aInstance);
  * @returns A pointer to the OpenThread radio version.
  *
  */
-const char *otPlatRadioGetVersionString(otInstance *aInstance);
+const char * otPlatRadioGetVersionString(otInstance * aInstance);
 
 /**
  * Get the radio receive sensitivity value.
@@ -482,7 +482,7 @@ const char *otPlatRadioGetVersionString(otInstance *aInstance);
  * @returns The radio receive sensitivity value in dBm.
  *
  */
-int8_t otPlatRadioGetReceiveSensitivity(otInstance *aInstance);
+int8_t otPlatRadioGetReceiveSensitivity(otInstance * aInstance);
 
 /**
  * Gets the factory-assigned IEEE EUI-64 for this interface.
@@ -491,7 +491,7 @@ int8_t otPlatRadioGetReceiveSensitivity(otInstance *aInstance);
  * @param[out] aIeeeEui64  A pointer to the factory-assigned IEEE EUI-64.
  *
  */
-void otPlatRadioGetIeeeEui64(otInstance *aInstance, uint8_t *aIeeeEui64);
+void otPlatRadioGetIeeeEui64(otInstance * aInstance, uint8_t * aIeeeEui64);
 
 /**
  * Set the PAN ID for address filtering.
@@ -500,7 +500,7 @@ void otPlatRadioGetIeeeEui64(otInstance *aInstance, uint8_t *aIeeeEui64);
  * @param[in] aPanId     The IEEE 802.15.4 PAN ID.
  *
  */
-void otPlatRadioSetPanId(otInstance *aInstance, otPanId aPanId);
+void otPlatRadioSetPanId(otInstance * aInstance, otPanId aPanId);
 
 /**
  * Set the Extended Address for address filtering.
@@ -510,7 +510,7 @@ void otPlatRadioSetPanId(otInstance *aInstance, otPanId aPanId);
  *
  *
  */
-void otPlatRadioSetExtendedAddress(otInstance *aInstance, const otExtAddress *aExtAddress);
+void otPlatRadioSetExtendedAddress(otInstance * aInstance, const otExtAddress * aExtAddress);
 
 /**
  * Set the Short Address for address filtering.
@@ -519,7 +519,7 @@ void otPlatRadioSetExtendedAddress(otInstance *aInstance, const otExtAddress *aE
  * @param[in] aShortAddress  The IEEE 802.15.4 Short Address.
  *
  */
-void otPlatRadioSetShortAddress(otInstance *aInstance, otShortAddress aShortAddress);
+void otPlatRadioSetShortAddress(otInstance * aInstance, otShortAddress aShortAddress);
 
 /**
  * Get the radio's transmit power in dBm.
@@ -535,7 +535,7 @@ void otPlatRadioSetShortAddress(otInstance *aInstance, otShortAddress aShortAddr
  * @retval OT_ERROR_NOT_IMPLEMENTED  Transmit power configuration via dBm is not implemented.
  *
  */
-otError otPlatRadioGetTransmitPower(otInstance *aInstance, int8_t *aPower);
+otError otPlatRadioGetTransmitPower(otInstance * aInstance, int8_t * aPower);
 
 /**
  * Set the radio's transmit power in dBm.
@@ -550,7 +550,7 @@ otError otPlatRadioGetTransmitPower(otInstance *aInstance, int8_t *aPower);
  * @retval OT_ERROR_NOT_IMPLEMENTED  Transmit power configuration via dBm is not implemented.
  *
  */
-otError otPlatRadioSetTransmitPower(otInstance *aInstance, int8_t aPower);
+otError otPlatRadioSetTransmitPower(otInstance * aInstance, int8_t aPower);
 
 /**
  * Get the radio's CCA ED threshold in dBm measured at antenna connector per IEEE 802.15.4 - 2015 section 10.1.4.
@@ -563,7 +563,7 @@ otError otPlatRadioSetTransmitPower(otInstance *aInstance, int8_t aPower);
  * @retval OT_ERROR_NOT_IMPLEMENTED  CCA ED threshold configuration via dBm is not implemented.
  *
  */
-otError otPlatRadioGetCcaEnergyDetectThreshold(otInstance *aInstance, int8_t *aThreshold);
+otError otPlatRadioGetCcaEnergyDetectThreshold(otInstance * aInstance, int8_t * aThreshold);
 
 /**
  * Set the radio's CCA ED threshold in dBm measured at antenna connector per IEEE 802.15.4 - 2015 section 10.1.4.
@@ -576,7 +576,7 @@ otError otPlatRadioGetCcaEnergyDetectThreshold(otInstance *aInstance, int8_t *aT
  * @retval OT_ERROR_NOT_IMPLEMENTED  CCA ED threshold configuration via dBm is not implemented.
  *
  */
-otError otPlatRadioSetCcaEnergyDetectThreshold(otInstance *aInstance, int8_t aThreshold);
+otError otPlatRadioSetCcaEnergyDetectThreshold(otInstance * aInstance, int8_t aThreshold);
 
 /**
  * Gets the external FEM's Rx LNA gain in dBm.
@@ -589,7 +589,7 @@ otError otPlatRadioSetCcaEnergyDetectThreshold(otInstance *aInstance, int8_t aTh
  * @retval OT_ERROR_NOT_IMPLEMENTED  External FEM's LNA setting is not implemented.
  *
  */
-otError otPlatRadioGetFemLnaGain(otInstance *aInstance, int8_t *aGain);
+otError otPlatRadioGetFemLnaGain(otInstance * aInstance, int8_t * aGain);
 
 /**
  * Sets the external FEM's Rx LNA gain in dBm.
@@ -601,7 +601,7 @@ otError otPlatRadioGetFemLnaGain(otInstance *aInstance, int8_t *aGain);
  * @retval OT_ERROR_NOT_IMPLEMENTED  External FEM's LNA gain setting is not implemented.
  *
  */
-otError otPlatRadioSetFemLnaGain(otInstance *aInstance, int8_t aGain);
+otError otPlatRadioSetFemLnaGain(otInstance * aInstance, int8_t aGain);
 
 /**
  * Get the status of promiscuous mode.
@@ -612,7 +612,7 @@ otError otPlatRadioSetFemLnaGain(otInstance *aInstance, int8_t aGain);
  * @retval FALSE  Promiscuous mode is disabled.
  *
  */
-bool otPlatRadioGetPromiscuous(otInstance *aInstance);
+bool otPlatRadioGetPromiscuous(otInstance * aInstance);
 
 /**
  * Enable or disable promiscuous mode.
@@ -621,7 +621,7 @@ bool otPlatRadioGetPromiscuous(otInstance *aInstance);
  * @param[in]  aEnable   TRUE to enable or FALSE to disable promiscuous mode.
  *
  */
-void otPlatRadioSetPromiscuous(otInstance *aInstance, bool aEnable);
+void otPlatRadioSetPromiscuous(otInstance * aInstance, bool aEnable);
 
 /**
  * Sets the rx-on-when-idle state to the radio platform.
@@ -657,7 +657,7 @@ void otPlatRadioSetPromiscuous(otInstance *aInstance, bool aEnable);
  * @param[in]  aEnable      TRUE to keep radio in Receive state, FALSE to put to Sleep state during idle periods.
  *
  */
-void otPlatRadioSetRxOnWhenIdle(otInstance *aInstance, bool aEnable);
+void otPlatRadioSetRxOnWhenIdle(otInstance * aInstance, bool aEnable);
 
 /**
  * Update MAC keys and key index
@@ -673,13 +673,8 @@ void otPlatRadioSetRxOnWhenIdle(otInstance *aInstance, bool aEnable);
  * @param[in]   aKeyType     Key Type used.
  *
  */
-void otPlatRadioSetMacKey(otInstance             *aInstance,
-                          uint8_t                 aKeyIdMode,
-                          uint8_t                 aKeyId,
-                          const otMacKeyMaterial *aPrevKey,
-                          const otMacKeyMaterial *aCurrKey,
-                          const otMacKeyMaterial *aNextKey,
-                          otRadioKeyType          aKeyType);
+void otPlatRadioSetMacKey(otInstance * aInstance, uint8_t aKeyIdMode, uint8_t aKeyId, const otMacKeyMaterial * aPrevKey,
+                          const otMacKeyMaterial * aCurrKey, const otMacKeyMaterial * aNextKey, otRadioKeyType aKeyType);
 
 /**
  * Sets the current MAC frame counter value.
@@ -690,7 +685,7 @@ void otPlatRadioSetMacKey(otInstance             *aInstance,
  * @param[in]   aMacFrameCounter  The MAC frame counter value.
  *
  */
-void otPlatRadioSetMacFrameCounter(otInstance *aInstance, uint32_t aMacFrameCounter);
+void otPlatRadioSetMacFrameCounter(otInstance * aInstance, uint32_t aMacFrameCounter);
 
 /**
  * Sets the current MAC frame counter value only if the new given value is larger than the current value.
@@ -701,7 +696,7 @@ void otPlatRadioSetMacFrameCounter(otInstance *aInstance, uint32_t aMacFrameCoun
  * @param[in]   aMacFrameCounter  The MAC frame counter value.
  *
  */
-void otPlatRadioSetMacFrameCounterIfLarger(otInstance *aInstance, uint32_t aMacFrameCounter);
+void otPlatRadioSetMacFrameCounterIfLarger(otInstance * aInstance, uint32_t aMacFrameCounter);
 
 /**
  * Get the current time in microseconds referenced to a continuous monotonic
@@ -725,7 +720,7 @@ void otPlatRadioSetMacFrameCounterIfLarger(otInstance *aInstance, uint32_t aMacF
  * support or radio time is not ready.
  *
  */
-uint64_t otPlatRadioGetNow(otInstance *aInstance);
+uint64_t otPlatRadioGetNow(otInstance * aInstance);
 
 /**
  * Get the bus speed in bits/second between the host and the radio chip.
@@ -736,7 +731,7 @@ uint64_t otPlatRadioGetNow(otInstance *aInstance);
  *          Return 0 when the MAC and above layer and Radio layer resides on the same chip.
  *
  */
-uint32_t otPlatRadioGetBusSpeed(otInstance *aInstance);
+uint32_t otPlatRadioGetBusSpeed(otInstance * aInstance);
 
 /**
  * @}
@@ -765,7 +760,7 @@ uint32_t otPlatRadioGetBusSpeed(otInstance *aInstance);
  * @return  Current state of the radio.
  *
  */
-otRadioState otPlatRadioGetState(otInstance *aInstance);
+otRadioState otPlatRadioGetState(otInstance * aInstance);
 
 /**
  * Enable the radio.
@@ -776,7 +771,7 @@ otRadioState otPlatRadioGetState(otInstance *aInstance);
  * @retval OT_ERROR_FAILED   The radio could not be enabled.
  *
  */
-otError otPlatRadioEnable(otInstance *aInstance);
+otError otPlatRadioEnable(otInstance * aInstance);
 
 /**
  * Disable the radio.
@@ -787,7 +782,7 @@ otError otPlatRadioEnable(otInstance *aInstance);
  * @retval OT_ERROR_INVALID_STATE   The radio was not in sleep state.
  *
  */
-otError otPlatRadioDisable(otInstance *aInstance);
+otError otPlatRadioDisable(otInstance * aInstance);
 
 /**
  * Check whether radio is enabled or not.
@@ -797,7 +792,7 @@ otError otPlatRadioDisable(otInstance *aInstance);
  * @returns TRUE if the radio is enabled, FALSE otherwise.
  *
  */
-bool otPlatRadioIsEnabled(otInstance *aInstance);
+bool otPlatRadioIsEnabled(otInstance * aInstance);
 
 /**
  * Transition the radio from Receive to Sleep (turn off the radio).
@@ -809,7 +804,7 @@ bool otPlatRadioIsEnabled(otInstance *aInstance);
  * @retval OT_ERROR_INVALID_STATE The radio was disabled.
  *
  */
-otError otPlatRadioSleep(otInstance *aInstance);
+otError otPlatRadioSleep(otInstance * aInstance);
 
 /**
  * Transition the radio from Sleep to Receive (turn on the radio).
@@ -821,7 +816,7 @@ otError otPlatRadioSleep(otInstance *aInstance);
  * @retval OT_ERROR_INVALID_STATE The radio was disabled or transmitting.
  *
  */
-otError otPlatRadioReceive(otInstance *aInstance, uint8_t aChannel);
+otError otPlatRadioReceive(otInstance * aInstance, uint8_t aChannel);
 
 /**
  * Schedule a radio reception window at a specific time and duration.
@@ -842,7 +837,7 @@ otError otPlatRadioReceive(otInstance *aInstance, uint8_t aChannel);
  * @retval OT_ERROR_NONE    Successfully scheduled receive window.
  * @retval OT_ERROR_FAILED  The receive window could not be scheduled.
  */
-otError otPlatRadioReceiveAt(otInstance *aInstance, uint8_t aChannel, uint32_t aStart, uint32_t aDuration);
+otError otPlatRadioReceiveAt(otInstance * aInstance, uint8_t aChannel, uint32_t aStart, uint32_t aDuration);
 
 /**
  * The radio driver calls this method to notify OpenThread of a received frame.
@@ -854,7 +849,7 @@ otError otPlatRadioReceiveAt(otInstance *aInstance, uint8_t aChannel, uint32_t a
  *                       OT_ERROR_NO_BUFS when a frame could not be received due to lack of rx buffer space.
  *
  */
-extern void otPlatRadioReceiveDone(otInstance *aInstance, otRadioFrame *aFrame, otError aError);
+extern void otPlatRadioReceiveDone(otInstance * aInstance, otRadioFrame * aFrame, otError aError);
 
 /**
  * The radio driver calls this method to notify OpenThread diagnostics module of a received frame.
@@ -868,7 +863,7 @@ extern void otPlatRadioReceiveDone(otInstance *aInstance, otRadioFrame *aFrame, 
  *                       OT_ERROR_NO_BUFS when a frame could not be received due to lack of rx buffer space.
  *
  */
-extern void otPlatDiagRadioReceiveDone(otInstance *aInstance, otRadioFrame *aFrame, otError aError);
+extern void otPlatDiagRadioReceiveDone(otInstance * aInstance, otRadioFrame * aFrame, otError aError);
 
 /**
  * Get the radio transmit frame buffer.
@@ -880,7 +875,7 @@ extern void otPlatDiagRadioReceiveDone(otInstance *aInstance, otRadioFrame *aFra
  * @returns A pointer to the transmit frame buffer.
  *
  */
-otRadioFrame *otPlatRadioGetTransmitBuffer(otInstance *aInstance);
+otRadioFrame * otPlatRadioGetTransmitBuffer(otInstance * aInstance);
 
 /**
  * Begin the transmit sequence on the radio.
@@ -901,7 +896,7 @@ otRadioFrame *otPlatRadioGetTransmitBuffer(otInstance *aInstance);
  * @retval OT_ERROR_INVALID_STATE The radio was not in the Receive state.
  *
  */
-otError otPlatRadioTransmit(otInstance *aInstance, otRadioFrame *aFrame);
+otError otPlatRadioTransmit(otInstance * aInstance, otRadioFrame * aFrame);
 
 /**
  * The radio driver calls this method to notify OpenThread that the transmission has started.
@@ -913,7 +908,7 @@ otError otPlatRadioTransmit(otInstance *aInstance, otRadioFrame *aFrame);
  * @param[in]  aFrame     A pointer to the frame that is being transmitted.
  *
  */
-extern void otPlatRadioTxStarted(otInstance *aInstance, otRadioFrame *aFrame);
+extern void otPlatRadioTxStarted(otInstance * aInstance, otRadioFrame * aFrame);
 
 /**
  * The radio driver calls this function to notify OpenThread that the transmit operation has completed,
@@ -931,7 +926,7 @@ extern void otPlatRadioTxStarted(otInstance *aInstance, otRadioFrame *aFrame);
  *                        OT_ERROR_ABORT when transmission was aborted for other reasons.
  *
  */
-extern void otPlatRadioTxDone(otInstance *aInstance, otRadioFrame *aFrame, otRadioFrame *aAckFrame, otError aError);
+extern void otPlatRadioTxDone(otInstance * aInstance, otRadioFrame * aFrame, otRadioFrame * aAckFrame, otError aError);
 
 /**
  * The radio driver calls this method to notify OpenThread diagnostics module that the transmission has completed.
@@ -945,7 +940,7 @@ extern void otPlatRadioTxDone(otInstance *aInstance, otRadioFrame *aFrame, otRad
  *                            OT_ERROR_ABORT when transmission was aborted for other reasons.
  *
  */
-extern void otPlatDiagRadioTransmitDone(otInstance *aInstance, otRadioFrame *aFrame, otError aError);
+extern void otPlatDiagRadioTransmitDone(otInstance * aInstance, otRadioFrame * aFrame, otError aError);
 
 /**
  * Get the most recent RSSI measurement.
@@ -955,7 +950,7 @@ extern void otPlatDiagRadioTransmitDone(otInstance *aInstance, otRadioFrame *aFr
  * @returns The RSSI in dBm when it is valid.  127 when RSSI is invalid.
  *
  */
-int8_t otPlatRadioGetRssi(otInstance *aInstance);
+int8_t otPlatRadioGetRssi(otInstance * aInstance);
 
 /**
  * Begin the energy scan sequence on the radio.
@@ -971,7 +966,7 @@ int8_t otPlatRadioGetRssi(otInstance *aInstance);
  * @retval OT_ERROR_NOT_IMPLEMENTED  The radio doesn't support energy scanning.
  *
  */
-otError otPlatRadioEnergyScan(otInstance *aInstance, uint8_t aScanChannel, uint16_t aScanDuration);
+otError otPlatRadioEnergyScan(otInstance * aInstance, uint8_t aScanChannel, uint16_t aScanDuration);
 
 /**
  * The radio driver calls this method to notify OpenThread that the energy scan is complete.
@@ -982,7 +977,7 @@ otError otPlatRadioEnergyScan(otInstance *aInstance, uint8_t aScanChannel, uint1
  * @param[in]  aEnergyScanMaxRssi  The maximum RSSI encountered on the scanned channel.
  *
  */
-extern void otPlatRadioEnergyScanDone(otInstance *aInstance, int8_t aEnergyScanMaxRssi);
+extern void otPlatRadioEnergyScanDone(otInstance * aInstance, int8_t aEnergyScanMaxRssi);
 
 /**
  * Enable/Disable source address match feature.
@@ -1002,7 +997,7 @@ extern void otPlatRadioEnergyScanDone(otInstance *aInstance, int8_t aEnergyScanM
  * @param[in]  aEnable     Enable/disable source address match feature.
  *
  */
-void otPlatRadioEnableSrcMatch(otInstance *aInstance, bool aEnable);
+void otPlatRadioEnableSrcMatch(otInstance * aInstance, bool aEnable);
 
 /**
  * Add a short address to the source address match table.
@@ -1014,7 +1009,7 @@ void otPlatRadioEnableSrcMatch(otInstance *aInstance, bool aEnable);
  * @retval OT_ERROR_NO_BUFS   No available entry in the source match table.
  *
  */
-otError otPlatRadioAddSrcMatchShortEntry(otInstance *aInstance, otShortAddress aShortAddress);
+otError otPlatRadioAddSrcMatchShortEntry(otInstance * aInstance, otShortAddress aShortAddress);
 
 /**
  * Add an extended address to the source address match table.
@@ -1026,7 +1021,7 @@ otError otPlatRadioAddSrcMatchShortEntry(otInstance *aInstance, otShortAddress a
  * @retval OT_ERROR_NO_BUFS   No available entry in the source match table.
  *
  */
-otError otPlatRadioAddSrcMatchExtEntry(otInstance *aInstance, const otExtAddress *aExtAddress);
+otError otPlatRadioAddSrcMatchExtEntry(otInstance * aInstance, const otExtAddress * aExtAddress);
 
 /**
  * Remove a short address from the source address match table.
@@ -1038,7 +1033,7 @@ otError otPlatRadioAddSrcMatchExtEntry(otInstance *aInstance, const otExtAddress
  * @retval OT_ERROR_NO_ADDRESS  The short address is not in source address match table.
  *
  */
-otError otPlatRadioClearSrcMatchShortEntry(otInstance *aInstance, otShortAddress aShortAddress);
+otError otPlatRadioClearSrcMatchShortEntry(otInstance * aInstance, otShortAddress aShortAddress);
 
 /**
  * Remove an extended address from the source address match table.
@@ -1050,7 +1045,7 @@ otError otPlatRadioClearSrcMatchShortEntry(otInstance *aInstance, otShortAddress
  * @retval OT_ERROR_NO_ADDRESS  The extended address is not in source address match table.
  *
  */
-otError otPlatRadioClearSrcMatchExtEntry(otInstance *aInstance, const otExtAddress *aExtAddress);
+otError otPlatRadioClearSrcMatchExtEntry(otInstance * aInstance, const otExtAddress * aExtAddress);
 
 /**
  * Clear all short addresses from the source address match table.
@@ -1058,7 +1053,7 @@ otError otPlatRadioClearSrcMatchExtEntry(otInstance *aInstance, const otExtAddre
  * @param[in]  aInstance   The OpenThread instance structure.
  *
  */
-void otPlatRadioClearSrcMatchShortEntries(otInstance *aInstance);
+void otPlatRadioClearSrcMatchShortEntries(otInstance * aInstance);
 
 /**
  * Clear all the extended/long addresses from source address match table.
@@ -1066,7 +1061,7 @@ void otPlatRadioClearSrcMatchShortEntries(otInstance *aInstance);
  * @param[in]  aInstance   The OpenThread instance structure.
  *
  */
-void otPlatRadioClearSrcMatchExtEntries(otInstance *aInstance);
+void otPlatRadioClearSrcMatchExtEntries(otInstance * aInstance);
 
 /**
  * Get the radio supported channel mask that the device is allowed to be on.
@@ -1076,7 +1071,7 @@ void otPlatRadioClearSrcMatchExtEntries(otInstance *aInstance);
  * @returns The radio supported channel mask.
  *
  */
-uint32_t otPlatRadioGetSupportedChannelMask(otInstance *aInstance);
+uint32_t otPlatRadioGetSupportedChannelMask(otInstance * aInstance);
 
 /**
  * Gets the radio preferred channel mask that the device prefers to form on.
@@ -1086,7 +1081,7 @@ uint32_t otPlatRadioGetSupportedChannelMask(otInstance *aInstance);
  * @returns The radio preferred channel mask.
  *
  */
-uint32_t otPlatRadioGetPreferredChannelMask(otInstance *aInstance);
+uint32_t otPlatRadioGetPreferredChannelMask(otInstance * aInstance);
 
 /**
  * Enable the radio coex.
@@ -1100,7 +1095,7 @@ uint32_t otPlatRadioGetPreferredChannelMask(otInstance *aInstance);
  * @retval OT_ERROR_FAILED   The radio coex could not be enabled.
  *
  */
-otError otPlatRadioSetCoexEnabled(otInstance *aInstance, bool aEnabled);
+otError otPlatRadioSetCoexEnabled(otInstance * aInstance, bool aEnabled);
 
 /**
  * Check whether radio coex is enabled or not.
@@ -1112,7 +1107,7 @@ otError otPlatRadioSetCoexEnabled(otInstance *aInstance, bool aEnabled);
  * @returns TRUE if the radio coex is enabled, FALSE otherwise.
  *
  */
-bool otPlatRadioIsCoexEnabled(otInstance *aInstance);
+bool otPlatRadioIsCoexEnabled(otInstance * aInstance);
 
 /**
  * Get the radio coexistence metrics.
@@ -1125,7 +1120,7 @@ bool otPlatRadioIsCoexEnabled(otInstance *aInstance);
  * @retval OT_ERROR_NONE          Successfully retrieved the coex metrics.
  * @retval OT_ERROR_INVALID_ARGS  @p aCoexMetrics was NULL.
  */
-otError otPlatRadioGetCoexMetrics(otInstance *aInstance, otRadioCoexMetrics *aCoexMetrics);
+otError otPlatRadioGetCoexMetrics(otInstance * aInstance, otRadioCoexMetrics * aCoexMetrics);
 
 /**
  * Enable or disable CSL receiver.
@@ -1142,10 +1137,7 @@ otError otPlatRadioGetCoexMetrics(otInstance *aInstance, otRadioCoexMetrics *aCo
  * @retval  OT_ERROR_NONE            Successfully enabled or disabled CSL.
  *
  */
-otError otPlatRadioEnableCsl(otInstance         *aInstance,
-                             uint32_t            aCslPeriod,
-                             otShortAddress      aShortAddr,
-                             const otExtAddress *aExtAddr);
+otError otPlatRadioEnableCsl(otInstance * aInstance, uint32_t aCslPeriod, otShortAddress aShortAddr, const otExtAddress * aExtAddr);
 
 /**
  * Reset CSL receiver in the platform.
@@ -1159,7 +1151,7 @@ otError otPlatRadioEnableCsl(otInstance         *aInstance,
  * @retval  OT_ERROR_NONE            Successfully disabled CSL.
  *
  */
-otError otPlatRadioResetCsl(otInstance *aInstance);
+otError otPlatRadioResetCsl(otInstance * aInstance);
 
 /**
  * Update CSL sample time in radio driver.
@@ -1175,7 +1167,7 @@ otError otPlatRadioResetCsl(otInstance *aInstance);
  *                               the time when the first symbol of the MHR of
  *                               the frame is expected.
  */
-void otPlatRadioUpdateCslSampleTime(otInstance *aInstance, uint32_t aCslSampleTime);
+void otPlatRadioUpdateCslSampleTime(otInstance * aInstance, uint32_t aCslSampleTime);
 
 /**
  * Get the current estimated worst case accuracy (maximum ± deviation from the
@@ -1195,7 +1187,7 @@ void otPlatRadioUpdateCslSampleTime(otInstance *aInstance, uint32_t aCslSampleTi
  * @returns The current CSL rx/tx scheduling drift, in PPM.
  *
  */
-uint8_t otPlatRadioGetCslAccuracy(otInstance *aInstance);
+uint8_t otPlatRadioGetCslAccuracy(otInstance * aInstance);
 
 /**
  * The fixed uncertainty (i.e. random jitter) of the arrival time of CSL
@@ -1214,7 +1206,7 @@ uint8_t otPlatRadioGetCslAccuracy(otInstance *aInstance);
  * @returns The CSL Uncertainty in units of 10 us.
  *
  */
-uint8_t otPlatRadioGetCslUncertainty(otInstance *aInstance);
+uint8_t otPlatRadioGetCslUncertainty(otInstance * aInstance);
 
 /**
  * Set the max transmit power for a specific channel.
@@ -1229,7 +1221,7 @@ uint8_t otPlatRadioGetCslUncertainty(otInstance *aInstance);
  * @retval  OT_ERROR_NONE             Successfully set max transmit power.
  *
  */
-otError otPlatRadioSetChannelMaxTransmitPower(otInstance *aInstance, uint8_t aChannel, int8_t aMaxPower);
+otError otPlatRadioSetChannelMaxTransmitPower(otInstance * aInstance, uint8_t aChannel, int8_t aMaxPower);
 
 /**
  * Set the region code.
@@ -1246,7 +1238,7 @@ otError otPlatRadioSetChannelMaxTransmitPower(otInstance *aInstance, uint8_t aCh
  * @retval  OT_ERROR_NOT_IMPLEMENTED  The feature is not implemented.
  *
  */
-otError otPlatRadioSetRegion(otInstance *aInstance, uint16_t aRegionCode);
+otError otPlatRadioSetRegion(otInstance * aInstance, uint16_t aRegionCode);
 
 /**
  * Get the region code.
@@ -1263,7 +1255,7 @@ otError otPlatRadioSetRegion(otInstance *aInstance, uint16_t aRegionCode);
  * @retval  OT_ERROR_NOT_IMPLEMENTED  The feature is not implemented.
  *
  */
-otError otPlatRadioGetRegion(otInstance *aInstance, uint16_t *aRegionCode);
+otError otPlatRadioGetRegion(otInstance * aInstance, uint16_t * aRegionCode);
 
 /**
  * Enable/disable or update Enhanced-ACK Based Probing in radio for a specific Initiator.
@@ -1286,10 +1278,8 @@ otError otPlatRadioGetRegion(otInstance *aInstance, uint16_t *aRegionCode);
  * @retval  OT_ERROR_NOT_IMPLEMENTED The feature is not implemented.
  *
  */
-otError otPlatRadioConfigureEnhAckProbing(otInstance         *aInstance,
-                                          otLinkMetrics       aLinkMetrics,
-                                          otShortAddress      aShortAddress,
-                                          const otExtAddress *aExtAddress);
+otError otPlatRadioConfigureEnhAckProbing(otInstance * aInstance, otLinkMetrics aLinkMetrics, otShortAddress aShortAddress,
+                                          const otExtAddress * aExtAddress);
 
 /**
  * Add a calibrated power of the specified channel to the power calibration table.
@@ -1317,11 +1307,8 @@ otError otPlatRadioConfigureEnhAckProbing(otInstance         *aInstance,
  * @retval OT_ERROR_NOT_IMPLEMENTED  This feature is not implemented.
  *
  */
-otError otPlatRadioAddCalibratedPower(otInstance    *aInstance,
-                                      uint8_t        aChannel,
-                                      int16_t        aActualPower,
-                                      const uint8_t *aRawPowerSetting,
-                                      uint16_t       aRawPowerSettingLength);
+otError otPlatRadioAddCalibratedPower(otInstance * aInstance, uint8_t aChannel, int16_t aActualPower,
+                                      const uint8_t * aRawPowerSetting, uint16_t aRawPowerSettingLength);
 
 /**
  * Clear all calibrated powers from the power calibration table.
@@ -1334,7 +1321,7 @@ otError otPlatRadioAddCalibratedPower(otInstance    *aInstance,
  * @retval OT_ERROR_NOT_IMPLEMENTED  This feature is not implemented.
  *
  */
-otError otPlatRadioClearCalibratedPowers(otInstance *aInstance);
+otError otPlatRadioClearCalibratedPowers(otInstance * aInstance);
 
 /**
  * Set the target power for the given channel.
@@ -1355,7 +1342,7 @@ otError otPlatRadioClearCalibratedPowers(otInstance *aInstance);
  * @retval  OT_ERROR_NOT_IMPLEMENTED  The feature is not implemented.
  *
  */
-otError otPlatRadioSetChannelTargetPower(otInstance *aInstance, uint8_t aChannel, int16_t aTargetPower);
+otError otPlatRadioSetChannelTargetPower(otInstance * aInstance, uint8_t aChannel, int16_t aTargetPower);
 
 /**
  * Get the raw power setting for the given channel.
@@ -1380,10 +1367,8 @@ otError otPlatRadioSetChannelTargetPower(otInstance *aInstance, uint8_t aChannel
  * @retval  OT_ERROR_NOT_FOUND     The raw power setting for the @p aChannel was not found.
  *
  */
-extern otError otPlatRadioGetRawPowerSetting(otInstance *aInstance,
-                                             uint8_t     aChannel,
-                                             uint8_t    *aRawPowerSetting,
-                                             uint16_t   *aRawPowerSettingLength);
+extern otError otPlatRadioGetRawPowerSetting(otInstance * aInstance, uint8_t aChannel, uint8_t * aRawPowerSetting,
+                                             uint16_t * aRawPowerSettingLength);
 
 /**
  * @}

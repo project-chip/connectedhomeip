@@ -23,8 +23,7 @@
 
 void BLE_TIMER_Init(void);
 
-uint8_t BLE_TIMER_Start(uint16_t id,
-    uint32_t ms_timeout);
+uint8_t BLE_TIMER_Start(uint16_t id, uint32_t ms_timeout);
 
 void BLE_TIMER_Stop(uint16_t id);
 

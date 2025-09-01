@@ -2,7 +2,8 @@
 /**
  ******************************************************************************
  * @file    power_table.h
- * @brief   This file contains APIs prototypes related to configuring the used power table and the external power amplifier (EPA) parameters
+ * @brief   This file contains APIs prototypes related to configuring the used power table and the external power amplifier (EPA)
+ *parameters
  ******************************************************************************
  * @copy
  * This Synopsys DWC Bluetooth Low Energy Combo Link Layer/MAC software and
@@ -47,29 +48,29 @@ typedef uint8_t (*epa_enable_cb_t)(uint8_t epa_enable);
 /**
  * @brief Structure of one element of the power table.
  */
-typedef struct {
-const uint8_t vddh_pa;			/* VDDHPA supply volatge level */
-const uint8_t internal_pa_code; /* Internal PA code */
-const uint8_t epa_bypass; 		/* External PA Bypass 1: enabled, 0 : disabled */
-const int8_t tx_pwr; 			/* TX Power level in dBm. */
+typedef struct
+{
+    const uint8_t vddh_pa;          /* VDDHPA supply volatge level */
+    const uint8_t internal_pa_code; /* Internal PA code */
+    const uint8_t epa_bypass;       /* External PA Bypass 1: enabled, 0 : disabled */
+    const int8_t tx_pwr;            /* TX Power level in dBm. */
 } power_table_entry;
 
 /**
  * @brief Structure of the power table ID.
  */
-typedef struct _power_table_id_t{
-	const power_table_entry *ptr_tx_power_table;	/* Pointer to the TX_Power table corresponding to the associated "power_table_id". */
-	const uint8_t tx_power_levels_count;			/* Number of TX_Power levels in the selected power table. */
-	const uint8_t g_vdd_ldo_value_1; 				/* Value to be set in PHY register (address: 0x63) to select the TX_Power mode */
-	const uint8_t g_vdd_ldo_value_2;				/* Value to be set in PHY register (address: 0xEA) to select the TX_Power mode */
-	const uint8_t power_table_id;					/* TX_Power table ID */
+typedef struct _power_table_id_t
+{
+    const power_table_entry *
+        ptr_tx_power_table;              /* Pointer to the TX_Power table corresponding to the associated "power_table_id". */
+    const uint8_t tx_power_levels_count; /* Number of TX_Power levels in the selected power table. */
+    const uint8_t g_vdd_ldo_value_1;     /* Value to be set in PHY register (address: 0x63) to select the TX_Power mode */
+    const uint8_t g_vdd_ldo_value_2;     /* Value to be set in PHY register (address: 0xEA) to select the TX_Power mode */
+    const uint8_t power_table_id;        /* TX_Power table ID */
 } power_table_id_t;
-
 
 extern const power_table_id_t ll_tx_power_tables[];
 extern const uint8_t num_of_supported_power_tables;
-
-
 
 /* APIs ----------------------------------------------------------------------*/
 /** @ingroup power_control_functions
@@ -77,7 +78,8 @@ extern const uint8_t num_of_supported_power_tables;
  */
 /**
  * @brief	Used to initialize the EPA parameters. Called during the initialization.
- * 			Note: If an EPA is in use, then a valid callback function shall be passed to LL FW, otherwise the LL FW returns error status.
+ * 			Note: If an EPA is in use, then a valid callback function shall be passed to LL FW, otherwise the LL FW returns
+ * error status.
  *
  * @param  use_epa : [in] 1: External PA exists. 0: There is no External PA.
  * @param  cbk	   : [in] Callback function to actually enable and disable the EPA.

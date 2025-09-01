@@ -37,143 +37,140 @@
 /* Define to prevent recursive inclusion -------------------------------------*/
 #ifndef INCLUDE_EVENT_MANAGER_H_
 #define INCLUDE_EVENT_MANAGER_H_
-#include <stdint.h>
-#include "ll_fw_config.h"
 #include "common_types.h"
+#include "ll_fw_config.h"
+#include <stdint.h>
 
 /* Defination ----------------------------------------------------------------*/
 /*Event manager events*/
-#define EVENT_PENDING		1
-#define HANDLE_IS_FULL		77
-#define NO_EVENT_PENDING	0
+#define EVENT_PENDING 1
+#define HANDLE_IS_FULL 77
+#define NO_EVENT_PENDING 0
 
-
-#define EVENT_NOT_BUSY		0
-#define EVENT_BUSY			1
+#define EVENT_NOT_BUSY 0
+#define EVENT_BUSY 1
 
 #if (NUM_OF_CTSM_EMNGR_HNDLS > 3)
 #error "NUM_OF_CTSM_EMNGR_HNDLS shouldn't exceed 3 !"
 #endif
 
-
-
-typedef uint8_t (*conditional_cbk)(void * em_data , void * caller_data);
-
-
+typedef uint8_t (*conditional_cbk)(void * em_data, void * caller_data);
 
 /**
  * @brief Enum event manager handler types.
  */
-	/* Event Manager IDs */
-typedef enum {
+/* Event Manager IDs */
+typedef enum
+{
 #if SUPPORT_BLE
-	LLHWC_EVENT,
-	PRDC_CLBR_EVENT,
+    LLHWC_EVENT,
+    PRDC_CLBR_EVENT,
 #if ((SUPPORT_MASTER_CONNECTION) || (SUPPORT_SLAVE_CONNECTION))
-	CONN_EVENT, /*connection event handler ID*/
-	CONN_PARAM_UPDATE_EVENT, /* handler for connection parameter update initiated by link layer */
+    CONN_EVENT,              /*connection event handler ID*/
+    CONN_PARAM_UPDATE_EVENT, /* handler for connection parameter update initiated by link layer */
 #if ((SUPPORT_CONNECTED_ISOCHRONOUS) && (SUPPORT_MASTER_CONNECTION))
-	CONN_DATA_LEN_UPDATE_EVENT, /* handler for connection data length update initiated by link layer */
-#endif /*SUPPORT_CONNECTED_ISOCHRONOUS && SUPPORT_MASTER_CONNECTION*/
-#if(SUPPORT_CONNECTED_ISOCHRONOUS &&( SUPPORT_MASTER_CONNECTION || SUPPORT_SLAVE_CONNECTION))
-	CIS_EVENT,
+    CONN_DATA_LEN_UPDATE_EVENT, /* handler for connection data length update initiated by link layer */
+#endif                          /*SUPPORT_CONNECTED_ISOCHRONOUS && SUPPORT_MASTER_CONNECTION*/
+#if (SUPPORT_CONNECTED_ISOCHRONOUS && (SUPPORT_MASTER_CONNECTION || SUPPORT_SLAVE_CONNECTION))
+    CIS_EVENT,
 #endif /*SUPPORT_CONNECTED_ISOCHRONOUS*/
 #endif /* SUPPORT_MASTER_CONNECTION) || (SUPPORT_SLAVE_CONNECTION */
-#if(SUPPORT_BRD_ISOCHRONOUS || SUPPORT_SYNC_ISOCHRONOUS)
-	BIS_TERM_EVENT,
-#if(SUPPORT_SYNC_ISOCHRONOUS)
-	BIS_SYNC_TIMEOUT_EVENT,
+#if (SUPPORT_BRD_ISOCHRONOUS || SUPPORT_SYNC_ISOCHRONOUS)
+    BIS_TERM_EVENT,
+#if (SUPPORT_SYNC_ISOCHRONOUS)
+    BIS_SYNC_TIMEOUT_EVENT,
 #endif /* SUPPORT_SYNC_ISOCHRONOUS */
 #endif /* SUPPORT_BRD_ISOCHRONOUS || SUPPORT_SYNC_ISOCHRONOUS */
 #endif /*SUPPORT_BLE*/
 #if SUPPORT_BLE
-	HCI_HANDLER, /* handler for the HCI events; handling events from Host to HCI*/
-#endif /*SUPPORT_BLE*/
+    HCI_HANDLER, /* handler for the HCI events; handling events from Host to HCI*/
+#endif           /*SUPPORT_BLE*/
 #if SUPPORT_BLE
 #if SUPPORT_LE_EXTENDED_ADVERTISING
-	ADV_TIMEOUT_EVENT, 	/*handler for advertising extended timeout feature */
-	SCN_DURATION_EVENT,	/*handler for extended scanning duration */
-	SCN_PERIOD_EVENT, 	/*handler for extended scanning period */
+    ADV_TIMEOUT_EVENT,  /*handler for advertising extended timeout feature */
+    SCN_DURATION_EVENT, /*handler for extended scanning duration */
+    SCN_PERIOD_EVENT,   /*handler for extended scanning period */
 #if SUPPORT_LE_PERIODIC_ADVERTISING
-	PRDC_SCAN_TIMEOUT_EVENT, /*handler for periodic scan sync timeout */
-	PRDC_SCAN_CANCEL_EVENT,
+    PRDC_SCAN_TIMEOUT_EVENT, /*handler for periodic scan sync timeout */
+    PRDC_SCAN_CANCEL_EVENT,
 #endif /* SUPPORT_LE_PERIODIC_ADVERTISING */
 #if SUPPORT_LE_PAWR_ADVERTISER_ROLE
-	PAWR_SEND_FRST_REQ,
+    PAWR_SEND_FRST_REQ,
 #endif /* SUPPORT_LE_PAWR_ADVERTISER_ROLE */
 #endif /* SUPPORT_LE_EXTENDED_ADVERTISING */
 #endif /*SUPPORT_BLE*/
 #if SUPPORT_COEXISTENCE
-	COEX_TIMER_EVENT,
+    COEX_TIMER_EVENT,
 #endif
 #if SUPPORT_MAC
-	RADIO_MAC_TX_DONE_EVENT,
-	RAL_SM_DONE_EVENT,
-	MAC_SM_DONE_EVENT,
-	ED_TMR_EVENT,
+    RADIO_MAC_TX_DONE_EVENT,
+    RAL_SM_DONE_EVENT,
+    MAC_SM_DONE_EVENT,
+    ED_TMR_EVENT,
 #endif /*SUPPORT_MAC*/
-#if ((SUPPORT_BLE)||(SUPPORT_MAC_HCI_UART)||(SUPPORT_ANT_HCI_UART) || (SUPPORT_AUG_MAC_HCI_UART))
-	HCI_TRANSPORT_HANDLER, /* handler for the HCI transport events; handling events from HCI to Host */
-#endif /*SUPPORT_BLE*/
+#if ((SUPPORT_BLE) || (SUPPORT_MAC_HCI_UART) || (SUPPORT_ANT_HCI_UART) || (SUPPORT_AUG_MAC_HCI_UART))
+    HCI_TRANSPORT_HANDLER, /* handler for the HCI transport events; handling events from HCI to Host */
+#endif                     /*SUPPORT_BLE*/
 #if (SUPPORT_HCI_EVENT_ONLY)
-	GENERIC_EVENT,
+    GENERIC_EVENT,
 #if SUPPORT_SYNC_ISOCHRONOUS || SUPPORT_CONNECTED_ISOCHRONOUS
-	ISO_DATA_EVENT,
+    ISO_DATA_EVENT,
 #endif /* SUPPORT_SYNC_ISOCHRONOUS || SUPPORT_CONNECTED_ISOCHRONOUS */
 #if SUPPORT_MASTER_CONNECTION || SUPPORT_SLAVE_CONNECTION
-	ACL_DATA_EVENT,
+    ACL_DATA_EVENT,
 #endif /* SUPPORT_MASTER_CONNECTION || SUPPORT_SLAVE_CONNECTION */
-#if SUPPORT_EXPLCT_OBSERVER_ROLE || SUPPORT_MASTER_CONNECTION || SUPPORT_SYNC_ISOCHRONOUS  || (SUPPORT_AOA_AOD && SUPPORT_SLAVE_CONNECTION)
-	ADV_REPORT_EVENT,
-#endif /* SUPPORT_EXPLCT_OBSERVER_ROLE || SUPPORT_MASTER_CONNECTION || SUPPORT_SYNC_ISOCHRONOUS  || (SUPPORT_AOA_AOD && SUPPORT_SLAVE_CONNECTION) */
-#if (SUPPORT_CONNECTED_ISOCHRONOUS && (SUPPORT_MASTER_CONNECTION || SUPPORT_SLAVE_CONNECTION) || (SUPPORT_BRD_ISOCHRONOUS) || (SUPPORT_SYNC_ISOCHRONOUS))
-	HCI_SYNC_EVENT,
+#if SUPPORT_EXPLCT_OBSERVER_ROLE || SUPPORT_MASTER_CONNECTION || SUPPORT_SYNC_ISOCHRONOUS ||                                       \
+    (SUPPORT_AOA_AOD && SUPPORT_SLAVE_CONNECTION)
+    ADV_REPORT_EVENT,
+#endif /* SUPPORT_EXPLCT_OBSERVER_ROLE || SUPPORT_MASTER_CONNECTION || SUPPORT_SYNC_ISOCHRONOUS  || (SUPPORT_AOA_AOD &&            \
+          SUPPORT_SLAVE_CONNECTION) */
+#if (SUPPORT_CONNECTED_ISOCHRONOUS && (SUPPORT_MASTER_CONNECTION || SUPPORT_SLAVE_CONNECTION) || (SUPPORT_BRD_ISOCHRONOUS) ||      \
+     (SUPPORT_SYNC_ISOCHRONOUS))
+    HCI_SYNC_EVENT,
 #endif /* SYNC_EVENT */
 #if END_OF_RADIO_ACTIVITY_REPORTING
-	HCI_RADIO_ACTIVITY_EVENT,
+    HCI_RADIO_ACTIVITY_EVENT,
 #endif /* END_OF_RADIO_ACTIVITY_REPORTING */
 #endif /* SUPPORT_HCI_EVENT_ONLY */
-#if (SUPPORT_CHANNEL_SOUNDING &&( SUPPORT_MASTER_CONNECTION || SUPPORT_SLAVE_CONNECTION))
-	CS_EVENT_REMOVE,
+#if (SUPPORT_CHANNEL_SOUNDING && (SUPPORT_MASTER_CONNECTION || SUPPORT_SLAVE_CONNECTION))
+    CS_EVENT_REMOVE,
 #endif /*(SUPPORT_CHANNEL_SOUNDING &&( SUPPORT_MASTER_CONNECTION || SUPPORT_SLAVE_CONNECTION))*/
 #if ((SUPPORT_MAC) && (MAC_LAYER_BUILD))
-	MLME_TIMER_EVENT,
-	DIRECT_DATA_TX_EVENT,
-	INDIRECT_DATA_TIMEOUT_EVENT,
+    MLME_TIMER_EVENT,
+    DIRECT_DATA_TX_EVENT,
+    INDIRECT_DATA_TIMEOUT_EVENT,
 #if SUPPORT_MAC_HCI_UART
-	MAC_HCI_HANDLER,
+    MAC_HCI_HANDLER,
 #endif /* SUPPORT_MAC_HCI_UART */
-#endif/*((SUPPORT_MAC) && (MAC_LAYER_BUILD)) */
-#if ((!SUPPORT_COEXISTENCE) &&  (SUPPORT_OPENTHREAD_1_2 && CONFIG_MAC_CSL_RECEIVER_ENABLE))
-	CSL_RCV_TMR_EVENT,
+#endif /*((SUPPORT_MAC) && (MAC_LAYER_BUILD)) */
+#if ((!SUPPORT_COEXISTENCE) && (SUPPORT_OPENTHREAD_1_2 && CONFIG_MAC_CSL_RECEIVER_ENABLE))
+    CSL_RCV_TMR_EVENT,
 #endif /*((!SUPPORT_COEXISTENCE) &&  (SUPPORT_OPENTHREAD_1_2 && CONFIG_MAC_CSL_RECEIVER_ENABLE))*/
-#if(!SUPPORT_COEXISTENCE && DEFAULT_PHY_CALIBRATION_PERIOD && SUPPORT_MAC)
-	PRDC_CLBR_TMR_EVENT,
+#if (!SUPPORT_COEXISTENCE && DEFAULT_PHY_CALIBRATION_PERIOD && SUPPORT_MAC)
+    PRDC_CLBR_TMR_EVENT,
 #endif
 #if SUPPORT_AUG_MAC_HCI_UART
-	AUG_MAC_HCI_HANDLER,
-#endif/*SUPPORT_AUG_MAC_HCI_UART */
+    AUG_MAC_HCI_HANDLER,
+#endif /*SUPPORT_AUG_MAC_HCI_UART */
 #if SUPPORT_ANT
-	ANT_RADIO_CMPLT_EVENT,
-	ANT_STACK_TASK_EVENT,
+    ANT_RADIO_CMPLT_EVENT,
+    ANT_STACK_TASK_EVENT,
 #if SUPPORT_ANT_HCI_UART
-	ANT_HCI_HANDLER,
+    ANT_HCI_HANDLER,
 #endif /*SUPPORT_ANT_TESTING */
-#endif  /* SUPPORT_ANT */
+#endif /* SUPPORT_ANT */
 #if (NUM_OF_CTSM_EMNGR_HNDLS >= 1)
-	CUSTOM_HANDLE_1,
+    CUSTOM_HANDLE_1,
 #endif
 #if (NUM_OF_CTSM_EMNGR_HNDLS >= 2)
-	CUSTOM_HANDLE_2,
+    CUSTOM_HANDLE_2,
 #endif
 #if (NUM_OF_CTSM_EMNGR_HNDLS >= 3)
-	CUSTOM_HANDLE_3,
+    CUSTOM_HANDLE_3,
 #endif
-	MAX_EM_HANDLE
+    MAX_EM_HANDLE
 } handler_t;
 /* Exported functions ------------------------------------------------------- */
-
-
 
 /**
  * @brief  Used to initialize the event manager component.
@@ -205,8 +202,7 @@ int emngr_reset(void);
  *
  * @retval Status : 0: SUCCESS. Otherwise: FAILED.
  */
-int emngr_handle_init(unsigned char id, unsigned char max,
-	void (*call_back_fun)(void *));
+int emngr_handle_init(unsigned char id, unsigned char max, void (*call_back_fun)(void *));
 
 /**
  * @brief  Used to remove a certain handle from the event manager.
@@ -215,8 +211,7 @@ int emngr_handle_init(unsigned char id, unsigned char max,
  *
  * @retval Status : 0: SUCCESS. Otherwise: FAILED.
  */
-int emngr_handle_remove(
-	unsigned char id);
+int emngr_handle_remove(unsigned char id);
 
 /**
  * @brief  Used to post an event to a certain event manager handle that is identified by the handle ID.
@@ -226,7 +221,7 @@ int emngr_handle_remove(
  *
  * @retval Status : 0: SUCCESS. Otherwise: FAILED.
  */
-int emngr_post_event(unsigned char id, void *event);
+int emngr_post_event(unsigned char id, void * event);
 
 /**
  * @brief  Used to post an event to a certain event manager handle that is identified by the handle ID.
@@ -237,7 +232,7 @@ int emngr_post_event(unsigned char id, void *event);
  *
  * @retval Status : 0: SUCCESS. Otherwise: FAILED.
  */
-int emngr_post_event_first(unsigned char id ,void *event);
+int emngr_post_event_first(unsigned char id, void * event);
 
 /**
  * @brief  Used to get an event from a certain event manager handle that is identified by the handle ID.
@@ -249,7 +244,8 @@ int emngr_post_event_first(unsigned char id ,void *event);
 void * emngr_get_event(unsigned char id);
 
 /**
- * @brief  Used to process an event from a a certain event manager handle that is identified by the handle ID, by first getting the event (in case the handle contains any) then processing it through the associated callback function.
+ * @brief  Used to process an event from a a certain event manager handle that is identified by the handle ID, by first getting the
+ * event (in case the handle contains any) then processing it through the associated callback function.
  *
  * @param  id : [in] ID of the handle whose events are to be processed. [Range: 0 to 255].
  *
@@ -286,14 +282,14 @@ int emngr_get_handle_events(unsigned char id);
 void emngr_set_event_handle_busy(unsigned char id, unsigned char busy_flag);
 
 /**
- * @brief  Used to return the state of the event "busy_flag", which indicates whether the events of a certain handle, identified by the handle ID, are being currently processed.
+ * @brief  Used to return the state of the event "busy_flag", which indicates whether the events of a certain handle, identified by
+ * the handle ID, are being currently processed.
  *
  * @param  id : [in] ID of the handle whose events are being currently processed. [Range: 0 to 255].
  *
  * @retval busy_flag state : 0: EVENT_NOT_BUSY. 1: EVENT_BUSY.
  */
-int emngr_is_event_busy(
-		unsigned char id);
+int emngr_is_event_busy(unsigned char id);
 
 /**
  * @brief  Used to loop through all the registered handles in the event manager and process their events, if any exists.
@@ -314,9 +310,11 @@ void emngr_handle_all_events(void);
 void emngr_handle_event(handler_t id);
 
 /**
- * @brief  Used to return a pointer to the first event in a certain event manager handle, identified by the handle ID, without dequeuing that event.
+ * @brief  Used to return a pointer to the first event in a certain event manager handle, identified by the handle ID, without
+ * dequeuing that event.
  *
- * @param  id : [in] ID of the handle whose first event is to be returned without being removed from the handle queue. [Range: 0 to 255].
+ * @param  id : [in] ID of the handle whose first event is to be returned without being removed from the handle queue. [Range: 0 to
+ * 255].
  *
  * @retval : void Pointer to the first event of the specified handle.
  */
@@ -326,12 +324,12 @@ void * emngr_peak_frst_event(unsigned char id);
  * @brief  Used to delete an event from  a certain event manager handle, identified by the handle ID.
  *
  * @param  id 	: [in] ID of the handle whose one of its events is to be deleted. [Range: 0 to 255].
- * @param  data : [in] Pointer to the event data to be used for searching for the event to be deleted out of all the events in the specified handle.
+ * @param  data : [in] Pointer to the event data to be used for searching for the event to be deleted out of all the events in the
+ * specified handle.
  *
  * @retval handle : Void pointer to the event data of the event node that is being deleted.
  */
-void * emngr_del_event(unsigned char id, void *data);
-
+void * emngr_del_event(unsigned char id, void * data);
 
 /* @breif Used to remove a certain event within a queue that satisfies the condition set by cbk
  * 		  the cbk can delete priv data if it has allocated data.
@@ -341,9 +339,7 @@ void * emngr_del_event(unsigned char id, void *data);
  * @param cbk: [In] A callback function that returns True if the event priv data satisfies a condition
  * @retval True if any event was found and removed
  * */
-uint8_t emngr_remove_conditional_event( uint8_t id, uint8_t only_one_event,
-		void* conditional_data,  conditional_cbk cbk);
-
+uint8_t emngr_remove_conditional_event(uint8_t id, uint8_t only_one_event, void * conditional_data, conditional_cbk cbk);
 
 /*
  * @brief Check if MCU can sleep in the case that all events in the event manager are busy and
@@ -358,8 +354,7 @@ uint8_t emngr_can_mcu_sleep(void);
  * @param conitional_data: [In] Optional pointer to pass to cbk along with priv data
  * @param cbk: [In] A callback function that returns True if the event priv data satisfies a condition
  * */
-uint8_t emngr_process_conditional_event( uint8_t id, uint8_t only_one_event,
-		void* conditional_data,  conditional_cbk cbk);
+uint8_t emngr_process_conditional_event(uint8_t id, uint8_t only_one_event, void * conditional_data, conditional_cbk cbk);
 
 /**
  * @}

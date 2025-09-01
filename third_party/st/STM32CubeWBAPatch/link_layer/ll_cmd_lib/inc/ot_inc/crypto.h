@@ -117,9 +117,9 @@ typedef uint32_t otCryptoKeyRef;
  */
 typedef struct otCryptoKey
 {
-    const uint8_t *mKey;       ///< Pointer to the buffer containing key. NULL indicates to use `mKeyRef`.
-    uint16_t       mKeyLength; ///< The key length in bytes (applicable when `mKey` is not NULL).
-    uint32_t       mKeyRef;    ///< The PSA key ref (requires `mKey` to be NULL).
+    const uint8_t * mKey; ///< Pointer to the buffer containing key. NULL indicates to use `mKeyRef`.
+    uint16_t mKeyLength;  ///< The key length in bytes (applicable when `mKey` is not NULL).
+    uint32_t mKeyRef;     ///< The PSA key ref (requires `mKey` to be NULL).
 } otCryptoKey;
 
 /**
@@ -130,7 +130,7 @@ typedef struct otCryptoKey
  */
 typedef struct otCryptoContext
 {
-    void    *mContext;     ///< Pointer to the context.
+    void * mContext;       ///< Pointer to the context.
     uint16_t mContextSize; ///< The length of the context in bytes.
 } otCryptoContext;
 
@@ -259,13 +259,8 @@ void otPlatCryptoInit(void);
  *       This API is only used by OT core when `OPENTHREAD_CONFIG_PLATFORM_KEY_REFERENCES_ENABLE` is enabled.
  *
  */
-otError otPlatCryptoImportKey(otCryptoKeyRef      *aKeyRef,
-                              otCryptoKeyType      aKeyType,
-                              otCryptoKeyAlgorithm aKeyAlgorithm,
-                              int                  aKeyUsage,
-                              otCryptoKeyStorage   aKeyPersistence,
-                              const uint8_t       *aKey,
-                              size_t               aKeyLen);
+otError otPlatCryptoImportKey(otCryptoKeyRef * aKeyRef, otCryptoKeyType aKeyType, otCryptoKeyAlgorithm aKeyAlgorithm, int aKeyUsage,
+                              otCryptoKeyStorage aKeyPersistence, const uint8_t * aKey, size_t aKeyLen);
 
 /**
  * Export a key stored in PSA ITS.
@@ -282,7 +277,7 @@ otError otPlatCryptoImportKey(otCryptoKeyRef      *aKeyRef,
  * @note This API is only used by OT core when `OPENTHREAD_CONFIG_PLATFORM_KEY_REFERENCES_ENABLE` is enabled.
  *
  */
-otError otPlatCryptoExportKey(otCryptoKeyRef aKeyRef, uint8_t *aBuffer, size_t aBufferLen, size_t *aKeyLen);
+otError otPlatCryptoExportKey(otCryptoKeyRef aKeyRef, uint8_t * aBuffer, size_t aBufferLen, size_t * aKeyLen);
 
 /**
  * Destroy a key stored in PSA ITS.
@@ -323,7 +318,7 @@ bool otPlatCryptoHasKey(otCryptoKeyRef aKeyRef);
  *       mbedtls_md_context_t.
  *
  */
-otError otPlatCryptoHmacSha256Init(otCryptoContext *aContext);
+otError otPlatCryptoHmacSha256Init(otCryptoContext * aContext);
 
 /**
  * Uninitialize the HMAC operation.
@@ -335,7 +330,7 @@ otError otPlatCryptoHmacSha256Init(otCryptoContext *aContext);
  * @retval OT_ERROR_INVALID_ARGS  @p aContext was NULL
  *
  */
-otError otPlatCryptoHmacSha256Deinit(otCryptoContext *aContext);
+otError otPlatCryptoHmacSha256Deinit(otCryptoContext * aContext);
 
 /**
  * Start HMAC operation.
@@ -348,7 +343,7 @@ otError otPlatCryptoHmacSha256Deinit(otCryptoContext *aContext);
  * @retval OT_ERROR_INVALID_ARGS  @p aContext or @p aKey was NULL
  *
  */
-otError otPlatCryptoHmacSha256Start(otCryptoContext *aContext, const otCryptoKey *aKey);
+otError otPlatCryptoHmacSha256Start(otCryptoContext * aContext, const otCryptoKey * aKey);
 
 /**
  * Update the HMAC operation with new input.
@@ -362,7 +357,7 @@ otError otPlatCryptoHmacSha256Start(otCryptoContext *aContext, const otCryptoKey
  * @retval OT_ERROR_INVALID_ARGS  @p aContext or @p aBuf was NULL
  *
  */
-otError otPlatCryptoHmacSha256Update(otCryptoContext *aContext, const void *aBuf, uint16_t aBufLength);
+otError otPlatCryptoHmacSha256Update(otCryptoContext * aContext, const void * aBuf, uint16_t aBufLength);
 
 /**
  * Complete the HMAC operation.
@@ -376,7 +371,7 @@ otError otPlatCryptoHmacSha256Update(otCryptoContext *aContext, const void *aBuf
  * @retval OT_ERROR_INVALID_ARGS  @p aContext or @p aBuf was NULL
  *
  */
-otError otPlatCryptoHmacSha256Finish(otCryptoContext *aContext, uint8_t *aBuf, size_t aBufLength);
+otError otPlatCryptoHmacSha256Finish(otCryptoContext * aContext, uint8_t * aBuf, size_t aBufLength);
 
 /**
  * Initialise the AES operation.
@@ -392,7 +387,7 @@ otError otPlatCryptoHmacSha256Finish(otCryptoContext *aContext, uint8_t *aBuf, s
  *       or mbedtls_aes_context_t.
  *
  */
-otError otPlatCryptoAesInit(otCryptoContext *aContext);
+otError otPlatCryptoAesInit(otCryptoContext * aContext);
 
 /**
  * Set the key for AES operation.
@@ -405,7 +400,7 @@ otError otPlatCryptoAesInit(otCryptoContext *aContext);
  * @retval OT_ERROR_INVALID_ARGS  @p aContext or @p aKey was NULL
  *
  */
-otError otPlatCryptoAesSetKey(otCryptoContext *aContext, const otCryptoKey *aKey);
+otError otPlatCryptoAesSetKey(otCryptoContext * aContext, const otCryptoKey * aKey);
 
 /**
  * Encrypt the given data.
@@ -419,7 +414,7 @@ otError otPlatCryptoAesSetKey(otCryptoContext *aContext, const otCryptoKey *aKey
  * @retval OT_ERROR_INVALID_ARGS  @p aContext or @p aKey or @p aOutput were NULL
  *
  */
-otError otPlatCryptoAesEncrypt(otCryptoContext *aContext, const uint8_t *aInput, uint8_t *aOutput);
+otError otPlatCryptoAesEncrypt(otCryptoContext * aContext, const uint8_t * aInput, uint8_t * aOutput);
 
 /**
  * Free the AES context.
@@ -431,7 +426,7 @@ otError otPlatCryptoAesEncrypt(otCryptoContext *aContext, const uint8_t *aInput,
  * @retval OT_ERROR_INVALID_ARGS  @p aContext was NULL
  *
  */
-otError otPlatCryptoAesFree(otCryptoContext *aContext);
+otError otPlatCryptoAesFree(otCryptoContext * aContext);
 
 /**
  * Initialise the HKDF context.
@@ -446,7 +441,7 @@ otError otPlatCryptoAesFree(otCryptoContext *aContext);
  *       or HmacSha256::Hash
  *
  */
-otError otPlatCryptoHkdfInit(otCryptoContext *aContext);
+otError otPlatCryptoHkdfInit(otCryptoContext * aContext);
 
 /**
  * Perform HKDF Expand step.
@@ -462,11 +457,8 @@ otError otPlatCryptoHkdfInit(otCryptoContext *aContext);
  * @retval OT_ERROR_INVALID_ARGS  @p aContext was NULL
  *
  */
-otError otPlatCryptoHkdfExpand(otCryptoContext *aContext,
-                               const uint8_t   *aInfo,
-                               uint16_t         aInfoLength,
-                               uint8_t         *aOutputKey,
-                               uint16_t         aOutputKeyLength);
+otError otPlatCryptoHkdfExpand(otCryptoContext * aContext, const uint8_t * aInfo, uint16_t aInfoLength, uint8_t * aOutputKey,
+                               uint16_t aOutputKeyLength);
 
 /**
  * Perform HKDF Extract step.
@@ -480,10 +472,8 @@ otError otPlatCryptoHkdfExpand(otCryptoContext *aContext,
  * @retval OT_ERROR_FAILED        HKDF Extract failed.
  *
  */
-otError otPlatCryptoHkdfExtract(otCryptoContext   *aContext,
-                                const uint8_t     *aSalt,
-                                uint16_t           aSaltLength,
-                                const otCryptoKey *aInputKey);
+otError otPlatCryptoHkdfExtract(otCryptoContext * aContext, const uint8_t * aSalt, uint16_t aSaltLength,
+                                const otCryptoKey * aInputKey);
 
 /**
  * Uninitialize the HKDF context.
@@ -495,7 +485,7 @@ otError otPlatCryptoHkdfExtract(otCryptoContext   *aContext,
  * @retval OT_ERROR_INVALID_ARGS  @p aContext was NULL
  *
  */
-otError otPlatCryptoHkdfDeinit(otCryptoContext *aContext);
+otError otPlatCryptoHkdfDeinit(otCryptoContext * aContext);
 
 /**
  * Initialise the SHA-256 operation.
@@ -510,7 +500,7 @@ otError otPlatCryptoHkdfDeinit(otCryptoContext *aContext);
  * @note The platform driver shall point the context to the correct object such as psa_hash_operation_t
  *       or mbedtls_sha256_context.
  */
-otError otPlatCryptoSha256Init(otCryptoContext *aContext);
+otError otPlatCryptoSha256Init(otCryptoContext * aContext);
 
 /**
  * Uninitialize the SHA-256 operation.
@@ -522,7 +512,7 @@ otError otPlatCryptoSha256Init(otCryptoContext *aContext);
  * @retval OT_ERROR_INVALID_ARGS  @p aContext was NULL
  *
  */
-otError otPlatCryptoSha256Deinit(otCryptoContext *aContext);
+otError otPlatCryptoSha256Deinit(otCryptoContext * aContext);
 
 /**
  * Start SHA-256 operation.
@@ -534,7 +524,7 @@ otError otPlatCryptoSha256Deinit(otCryptoContext *aContext);
  * @retval OT_ERROR_INVALID_ARGS  @p aContext was NULL
  *
  */
-otError otPlatCryptoSha256Start(otCryptoContext *aContext);
+otError otPlatCryptoSha256Start(otCryptoContext * aContext);
 
 /**
  * Update SHA-256 operation with new input.
@@ -548,7 +538,7 @@ otError otPlatCryptoSha256Start(otCryptoContext *aContext);
  * @retval OT_ERROR_INVALID_ARGS  @p aContext or @p aBuf was NULL
  *
  */
-otError otPlatCryptoSha256Update(otCryptoContext *aContext, const void *aBuf, uint16_t aBufLength);
+otError otPlatCryptoSha256Update(otCryptoContext * aContext, const void * aBuf, uint16_t aBufLength);
 
 /**
  * Finish SHA-256 operation.
@@ -562,7 +552,7 @@ otError otPlatCryptoSha256Update(otCryptoContext *aContext, const void *aBuf, ui
  * @retval OT_ERROR_INVALID_ARGS  @p aContext or @p aHash was NULL
  *
  */
-otError otPlatCryptoSha256Finish(otCryptoContext *aContext, uint8_t *aHash, uint16_t aHashSize);
+otError otPlatCryptoSha256Finish(otCryptoContext * aContext, uint8_t * aHash, uint16_t aHashSize);
 
 /**
  * Initialize cryptographically-secure pseudorandom number generator (CSPRNG).
@@ -586,7 +576,7 @@ void otPlatCryptoRandomDeinit(void);
  * @retval OT_ERROR_FAILED        Operation failed.
  *
  */
-otError otPlatCryptoRandomGet(uint8_t *aBuffer, uint16_t aSize);
+otError otPlatCryptoRandomGet(uint8_t * aBuffer, uint16_t aSize);
 
 /**
  * Generate and populate the output buffer with a new ECDSA key-pair.
@@ -599,7 +589,7 @@ otError otPlatCryptoRandomGet(uint8_t *aBuffer, uint16_t aSize);
  * @retval OT_ERROR_FAILED        Failed to generate key-pair.
  *
  */
-otError otPlatCryptoEcdsaGenerateKey(otPlatCryptoEcdsaKeyPair *aKeyPair);
+otError otPlatCryptoEcdsaGenerateKey(otPlatCryptoEcdsaKeyPair * aKeyPair);
 
 /**
  * Get the associated public key from the input context.
@@ -612,7 +602,7 @@ otError otPlatCryptoEcdsaGenerateKey(otPlatCryptoEcdsaKeyPair *aKeyPair);
  * @retval OT_ERROR_INVALID_ARGS  The @p aContext is NULL.
  *
  */
-otError otPlatCryptoEcdsaGetPublicKey(const otPlatCryptoEcdsaKeyPair *aKeyPair, otPlatCryptoEcdsaPublicKey *aPublicKey);
+otError otPlatCryptoEcdsaGetPublicKey(const otPlatCryptoEcdsaKeyPair * aKeyPair, otPlatCryptoEcdsaPublicKey * aPublicKey);
 
 /**
  * Calculate the ECDSA signature for a hashed message using the private key from the input context.
@@ -630,9 +620,8 @@ otError otPlatCryptoEcdsaGetPublicKey(const otPlatCryptoEcdsaKeyPair *aKeyPair, 
  * @retval OT_ERROR_INVALID_ARGS  The @p aContext is NULL.
  *
  */
-otError otPlatCryptoEcdsaSign(const otPlatCryptoEcdsaKeyPair *aKeyPair,
-                              const otPlatCryptoSha256Hash   *aHash,
-                              otPlatCryptoEcdsaSignature     *aSignature);
+otError otPlatCryptoEcdsaSign(const otPlatCryptoEcdsaKeyPair * aKeyPair, const otPlatCryptoSha256Hash * aHash,
+                              otPlatCryptoEcdsaSignature * aSignature);
 
 /**
  * Use the key from the input context to verify the ECDSA signature of a hashed message.
@@ -650,9 +639,8 @@ otError otPlatCryptoEcdsaSign(const otPlatCryptoEcdsaKeyPair *aKeyPair,
  * @retval OT_ERROR_NO_BUFS       Failed to allocate buffer for signature verification.
  *
  */
-otError otPlatCryptoEcdsaVerify(const otPlatCryptoEcdsaPublicKey *aPublicKey,
-                                const otPlatCryptoSha256Hash     *aHash,
-                                const otPlatCryptoEcdsaSignature *aSignature);
+otError otPlatCryptoEcdsaVerify(const otPlatCryptoEcdsaPublicKey * aPublicKey, const otPlatCryptoSha256Hash * aHash,
+                                const otPlatCryptoEcdsaSignature * aSignature);
 
 /**
  * Calculate the ECDSA signature for a hashed message using the Key reference passed.
@@ -672,9 +660,8 @@ otError otPlatCryptoEcdsaVerify(const otPlatCryptoEcdsaPublicKey *aPublicKey,
  * @note This API is only used by OT core when `OPENTHREAD_CONFIG_PLATFORM_KEY_REFERENCES_ENABLE` is enabled.
  *
  */
-otError otPlatCryptoEcdsaSignUsingKeyRef(otCryptoKeyRef                aKeyRef,
-                                         const otPlatCryptoSha256Hash *aHash,
-                                         otPlatCryptoEcdsaSignature   *aSignature);
+otError otPlatCryptoEcdsaSignUsingKeyRef(otCryptoKeyRef aKeyRef, const otPlatCryptoSha256Hash * aHash,
+                                         otPlatCryptoEcdsaSignature * aSignature);
 
 /**
  * Get the associated public key from the key reference passed.
@@ -695,7 +682,7 @@ otError otPlatCryptoEcdsaSignUsingKeyRef(otCryptoKeyRef                aKeyRef,
  * @note This API is only used by OT core when `OPENTHREAD_CONFIG_PLATFORM_KEY_REFERENCES_ENABLE` is enabled.
  *
  */
-otError otPlatCryptoEcdsaExportPublicKey(otCryptoKeyRef aKeyRef, otPlatCryptoEcdsaPublicKey *aPublicKey);
+otError otPlatCryptoEcdsaExportPublicKey(otCryptoKeyRef aKeyRef, otPlatCryptoEcdsaPublicKey * aPublicKey);
 
 /**
  * Generate and import a new ECDSA key-pair at reference passed.
@@ -729,9 +716,8 @@ otError otPlatCryptoEcdsaGenerateAndImportKey(otCryptoKeyRef aKeyRef);
  * @note This API is only used by OT core when `OPENTHREAD_CONFIG_PLATFORM_KEY_REFERENCES_ENABLE` is enabled.
  *
  */
-otError otPlatCryptoEcdsaVerifyUsingKeyRef(otCryptoKeyRef                    aKeyRef,
-                                           const otPlatCryptoSha256Hash     *aHash,
-                                           const otPlatCryptoEcdsaSignature *aSignature);
+otError otPlatCryptoEcdsaVerifyUsingKeyRef(otCryptoKeyRef aKeyRef, const otPlatCryptoSha256Hash * aHash,
+                                           const otPlatCryptoEcdsaSignature * aSignature);
 
 /**
  * Perform PKCS#5 PBKDF2 using CMAC (AES-CMAC-PRF-128).
@@ -749,13 +735,8 @@ otError otPlatCryptoEcdsaVerifyUsingKeyRef(otCryptoKeyRef                    aKe
  * @retval OT_ERROR_NOT_CAPABLE   Feature not supported.
  * @retval OT_ERROR_FAILED        Failed to generate key.
  */
-otError otPlatCryptoPbkdf2GenerateKey(const uint8_t *aPassword,
-                                      uint16_t       aPasswordLen,
-                                      const uint8_t *aSalt,
-                                      uint16_t       aSaltLen,
-                                      uint32_t       aIterationCounter,
-                                      uint16_t       aKeyLen,
-                                      uint8_t       *aKey);
+otError otPlatCryptoPbkdf2GenerateKey(const uint8_t * aPassword, uint16_t aPasswordLen, const uint8_t * aSalt, uint16_t aSaltLen,
+                                      uint32_t aIterationCounter, uint16_t aKeyLen, uint8_t * aKey);
 
 /**
  * @}

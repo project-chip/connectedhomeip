@@ -29,11 +29,12 @@ extern "C" {
 /* Enumerated values used for the return of the functions:
  * (warning: this enum must be aligned with BLEPLAT corresponding one)
  */
-enum {
-    BPKA_OK = 0,
-    BPKA_FULL = -1,
-    BPKA_BUSY = -2,
-    BPKA_EOF = -3,
+enum
+{
+    BPKA_OK    = 0,
+    BPKA_FULL  = -1,
+    BPKA_BUSY  = -2,
+    BPKA_EOF   = -3,
     BPKA_ERROR = -5
 };
 
@@ -43,8 +44,7 @@ int BPKA_StartP256Key(const uint32_t * local_private_key);
 
 void BPKA_ReadP256Key(uint32_t * local_public_key);
 
-int BPKA_StartDhKey(const uint32_t * local_private_key,
-    const uint32_t * remote_public_key);
+int BPKA_StartDhKey(const uint32_t * local_private_key, const uint32_t * remote_public_key);
 
 int BPKA_ReadDhKey(uint32_t * dh_key);
 

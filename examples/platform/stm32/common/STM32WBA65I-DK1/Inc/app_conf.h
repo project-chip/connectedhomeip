@@ -71,7 +71,8 @@
  * Define BLE Address Type
  * Bluetooth address types defined in ble_legacy.h
  * if CFG_PRIVACY equals PRIVACY_DISABLED, CFG_BLE_ADDRESS_TYPE has 2 allowed values: GAP_PUBLIC_ADDR or GAP_STATIC_RANDOM_ADDR
- * if CFG_PRIVACY equals PRIVACY_ENABLED, CFG_BLE_ADDRESS_TYPE has 2 allowed values: GAP_RESOLVABLE_PRIVATE_ADDR or GAP_NON_RESOLVABLE_PRIVATE_ADDR
+ * if CFG_PRIVACY equals PRIVACY_ENABLED, CFG_BLE_ADDRESS_TYPE has 2 allowed values: GAP_RESOLVABLE_PRIVATE_ADDR or
+ * GAP_NON_RESOLVABLE_PRIVATE_ADDR
  */
 #define CFG_BLE_ADDRESS_TYPE (GAP_PUBLIC_ADDR)
 
@@ -118,12 +119,18 @@
 /**
  *   Identity root key used to derive IRK and DHK(Legacy)
  */
-#define CFG_BLE_IR { 0x12, 0x34, 0x56, 0x78, 0x9A, 0xBC, 0xDE, 0xF0, 0x12, 0x34, 0x56, 0x78, 0x9A, 0xBC, 0xDE, 0xF0 }
+#define CFG_BLE_IR                                                                                                                 \
+    {                                                                                                                              \
+        0x12, 0x34, 0x56, 0x78, 0x9A, 0xBC, 0xDE, 0xF0, 0x12, 0x34, 0x56, 0x78, 0x9A, 0xBC, 0xDE, 0xF0                             \
+    }
 
 /**
  * Encryption root key used to derive LTK(Legacy) and CSRK
  */
-#define CFG_BLE_ER { 0xFE, 0xDC, 0xBA, 0x09, 0x87, 0x65, 0x43, 0x21, 0xFE, 0xDC, 0xBA, 0x09, 0x87, 0x65, 0x43, 0x21 }
+#define CFG_BLE_ER                                                                                                                 \
+    {                                                                                                                              \
+        0xFE, 0xDC, 0xBA, 0x09, 0x87, 0x65, 0x43, 0x21, 0xFE, 0xDC, 0xBA, 0x09, 0x87, 0x65, 0x43, 0x21                             \
+    }
 
 /* USER CODE BEGIN Generic_Parameters */
 
@@ -173,7 +180,8 @@
 
 /**
  * Size of the storage area for Attribute values
- *  This value depends on the number of attributes used by application. In particular the sum of the following quantities (in octets) should be made for each attribute:
+ *  This value depends on the number of attributes used by application. In particular the sum of the following quantities (in
+ * octets) should be made for each attribute:
  *  - attribute value length
  *  - 5, if UUID is 16 bit; 19, if UUID is 128 bit
  *  - 2, if server configuration descriptor is used
@@ -195,9 +203,8 @@
 /**
  * Number of allocated memory blocks used to transmit and receive data packets
  */
-#define CFG_BLE_MBLOCK_COUNT (BLE_MBLOCKS_CALC(PREP_WRITE_LIST_SIZE,     \
-                                  CFG_BLE_ATT_MTU_MAX, CFG_BLE_NUM_LINK) \
-    + CFG_BLE_MBLOCK_COUNT_MARGIN)
+#define CFG_BLE_MBLOCK_COUNT                                                                                                       \
+    (BLE_MBLOCKS_CALC(PREP_WRITE_LIST_SIZE, CFG_BLE_ATT_MTU_MAX, CFG_BLE_NUM_LINK) + CFG_BLE_MBLOCK_COUNT_MARGIN)
 
 /**
  * Appearance of device set into BLE GAP
@@ -246,7 +253,8 @@
  * Supported requester to the MCU Low Power Manager - can be increased up  to 32
  * It list a bit mapping of all user of the Low Power Manager
  */
-typedef enum {
+typedef enum
+{
     CFG_LPM_APP,
     CFG_LPM_LOG,
     CFG_LPM_LL_DEEPSLEEP,
@@ -337,7 +345,8 @@ extern UART_HandleTypeDef hlpuart1;
  * These are the lists of task id registered to the sequencer
  * Each task id shall be in the range [0:31]
  */
-typedef enum {
+typedef enum
+{
     CFG_TASK_HW_RNG, /* Task linked to chip internal peripheral. */
     CFG_TASH_HW_PKA,
     CFG_TASK_LINK_LAYER, /* Tasks linked to Communications Layers. */
@@ -369,7 +378,8 @@ typedef enum {
 /**
  * This is a bit mapping over 32bits listing all events id supported in the application
  */
-typedef enum {
+typedef enum
+{
     CFG_IDLEEVT_PROC_GAP_COMPLETE,
     CFG_IDLEEVT_PKA_END_OF_OPERATION,
     /* USER CODE BEGIN CFG_IdleEvt_Id_t */
@@ -387,7 +397,8 @@ typedef enum {
  * These are the lists of events id registered to the sequencer
  * Each event id shall be in the range [0:31]
  */
-typedef enum {
+typedef enum
+{
     /* USER CODE BEGIN CFG_Event_Id_t */
 
     /* USER CODE END CFG_Event_Id_t */
@@ -455,13 +466,13 @@ typedef enum {
 #define USE_TEMPERATURE_BASED_RADIO_CALIBRATION (0)
 
 #define RADIO_INTR_NUM RADIO_IRQn /* 2.4GHz RADIO global interrupt */
-#define RADIO_INTR_PRIO_HIGH (5) /* 2.4GHz RADIO interrupt priority when radio is Active */
-#define RADIO_INTR_PRIO_LOW (7) /* 2.4GHz RADIO interrupt priority when radio is Not Active - Sleep Timer Only */
+#define RADIO_INTR_PRIO_HIGH (5)  /* 2.4GHz RADIO interrupt priority when radio is Active */
+#define RADIO_INTR_PRIO_LOW (7)   /* 2.4GHz RADIO interrupt priority when radio is Not Active - Sleep Timer Only */
 
 #if (USE_RADIO_LOW_ISR == 1)
 #define RADIO_SW_LOW_INTR_NUM HASH_IRQn /* Selected interrupt vector for 2.4GHz RADIO low ISR */
-#define RADIO_SW_LOW_INTR_PRIO (15) /* 2.4GHz RADIO low ISR priority */
-#endif /* USE_RADIO_LOW_ISR */
+#define RADIO_SW_LOW_INTR_PRIO (15)     /* 2.4GHz RADIO low ISR priority */
+#endif                                  /* USE_RADIO_LOW_ISR */
 
 /* Link Layer supported number of antennas */
 #define RADIO_NUM_OF_ANTENNAS (4)
@@ -506,8 +517,8 @@ typedef enum {
 #define CFG_AMM_VIRTUAL_STACK_BLE_BUFFER_SIZE (400U)
 #define CFG_AMM_VIRTUAL_APP_BLE (2U)
 #define CFG_AMM_VIRTUAL_APP_BLE_BUFFER_SIZE (200U)
-#define CFG_AMM_POOL_SIZE                    \
-    DIVC(CFG_MM_POOL_SIZE, sizeof(uint32_t)) \
+#define CFG_AMM_POOL_SIZE                                                                                                          \
+    DIVC(CFG_MM_POOL_SIZE, sizeof(uint32_t))                                                                                       \
     +(AMM_VIRTUAL_INFO_ELEMENT_SIZE * CFG_AMM_VIRTUAL_MEMORY_NUMBER)
 
 /* USER CODE BEGIN MEMORY_MANAGER_Configuration */

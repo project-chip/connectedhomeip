@@ -41,20 +41,17 @@
 
 #include "stdint.h"
 /********************* Macros **********************************/
-#define POOL_BLOCK_SIZE 		16
-#define POOL_TOTAL_BLOCKS_SIZE 	10
-#define POOL_INDEX_SIZE 		6
+#define POOL_BLOCK_SIZE 16
+#define POOL_TOTAL_BLOCKS_SIZE 10
+#define POOL_INDEX_SIZE 6
 
 /* Exported  Defines -----------------------------------------------------------*/
 
-#define os_Pool_Def(type) \
-os_pool_def_t os_pool_##type
+#define os_Pool_Def(type) os_pool_def_t os_pool_##type
 
-#define os_Pool(type) \
-&os_pool_##type
+#define os_Pool(type) &os_pool_##type
 
-#define os_Pool_Def_extern(type)   \
-extern os_pool_def_t os_pool_##type
+#define os_Pool_Def_extern(type) extern os_pool_def_t os_pool_##type
 
 /* Exported macros ------------------------------------------------------------*/
 /* Exported types -------------------------------------------------------------*/
@@ -62,116 +59,123 @@ extern os_pool_def_t os_pool_##type
 /**
  * @brief Interrupt status.
  */
-typedef enum int_state {
-	NOT_ACTIVE,
-	LINK_LAYER_INTRPT,
-	LINK_LAYER_LOW_PRIORITY_INTRPT,
-	UART_READ_INTRPT,
-	UART_WRITE_INTRPT,
-	TIMER_INTRPT,
-	MAC_INTRPT,
-	TOTAL_INTERRUPTS
+typedef enum int_state
+{
+    NOT_ACTIVE,
+    LINK_LAYER_INTRPT,
+    LINK_LAYER_LOW_PRIORITY_INTRPT,
+    UART_READ_INTRPT,
+    UART_WRITE_INTRPT,
+    TIMER_INTRPT,
+    MAC_INTRPT,
+    TOTAL_INTERRUPTS
 } int_state_e;
 
 /**
  * @brief Priority used for thread control.
  */
-typedef enum  {
-  os_priority_high,
-  os_priority_normal,
-  os_priority_low,
+typedef enum
+{
+    os_priority_high,
+    os_priority_normal,
+    os_priority_low,
 } os_priority;
 
 /**
  * @brief SW Timer Activity Status.
  */
-typedef enum _sw_timer_activity_status_e {
-	SW_TIMER_NOT_ACTIVE 	 	= 0x00,
-	SW_TIMER_ACTIVE 			= 0x01,
-	SW_TIMER_MAY_BE_NOT_ACTIVE	= 0x02
+typedef enum _sw_timer_activity_status_e
+{
+    SW_TIMER_NOT_ACTIVE        = 0x00,
+    SW_TIMER_ACTIVE            = 0x01,
+    SW_TIMER_MAY_BE_NOT_ACTIVE = 0x02
 } sw_timer_activity_status_e;
 
 /**
  * @brief SW Timer Type.
  */
-typedef enum {
-	os_timer_once = 0,        ///< one-shot timer
-	os_timer_periodic = 1     ///< repeating timer
+typedef enum
+{
+    os_timer_once     = 0, ///< one-shot timer
+    os_timer_periodic = 1  ///< repeating timer
 } os_timer_type;
-
 
 /**
  * @brief SW Timer Priority.
  */
-typedef enum {
-	lw_prio_tmr = 0,        // Low Priority Timer
-	hg_prio_tmr = 1     // High Priority Timer
+typedef enum
+{
+    lw_prio_tmr = 0, // Low Priority Timer
+    hg_prio_tmr = 1  // High Priority Timer
 } os_timer_prio;
-
 
 /**
  * @brief Software Timer State Active, Expired or Stopped
  */
-typedef enum {
-	osTimerActive, 	/**< @brief Active timer : Timer in the list waiting for its time to fire */
-	osTimerExpired, /**< @brief Expired timer: Timer fired and removed form the list, or created and not exist in the list */
-	osTimerStopped 	/**< @brief Stopped timer: Timer stopped and removed form the list */
+typedef enum
+{
+    osTimerActive,  /**< @brief Active timer : Timer in the list waiting for its time to fire */
+    osTimerExpired, /**< @brief Expired timer: Timer fired and removed form the list, or created and not exist in the list */
+    osTimerStopped  /**< @brief Stopped timer: Timer stopped and removed form the list */
 } os_timer_state;
 
 // Thread Management
-typedef void (*os_pthread) (void const *argument);
-typedef void* os_thread_id;
+typedef void (*os_pthread)(void const * argument);
+typedef void * os_thread_id;
 
 // Timer Management
-typedef void (*t_timer_callbk)(const void*);
-typedef void* os_timer_id;
+typedef void (*t_timer_callbk)(const void *);
+typedef void * os_timer_id;
 typedef void (*os_timer_activity_cb_t)(sw_timer_activity_status_e timer_activity);
 typedef struct sw_timer sw_timer_t;
 
 // Mutex Management
-typedef void   os_mutex_def_t;
+typedef void os_mutex_def_t;
 typedef void * os_mutex_id;
 
 // Semaphore Management
-typedef void   os_semaphore_def_t;
+typedef void os_semaphore_def_t;
 typedef void * os_semaphore_id;
 
 /**
  * @brief   Software Timer structure.
  */
-struct sw_timer {
-	sw_timer_t *stnext; 		/**< @brief Next timer in the timers list.      			*/
-	uint32_t vtime; 			/**< @brief value of timer			          				*/
-	uint32_t rtime; 			/**< @brief remain time.				          			*/
-	t_timer_callbk ptimer; 		/**< @brief Timer callback function pointer.    			*/
-	void *argument; 			/**< @brief Timer callback function arguments.  			*/
-	uint16_t overflow_flag : 1;
-	uint16_t frac_time : 5; 	/** < @brief fraction time of period [0:31] in terms of us   			  */
-	uint16_t cycles : 5; 		/** < @brief  cycles [0:31] number of elapsed cycles of periodic timer    */
-	uint16_t rem_time : 5; 		/** < @brief  remainder to be added to the fraction [0:31] in terms of us */
-	uint8_t state; 				/**< @brief Timer State : Active or Expired or Stopped 	*/
-	uint8_t type:1 ; 				/**< @brief Timer Type : one-shot (0) or periodic (1)   */
-	uint8_t prio:1 ; /* used to indicate if this timer ISR should be handled from hg isr in case of allow_lw_isr==1 */
+struct sw_timer
+{
+    sw_timer_t * stnext;   /**< @brief Next timer in the timers list.      			*/
+    uint32_t vtime;        /**< @brief value of timer			          				*/
+    uint32_t rtime;        /**< @brief remain time.				          			*/
+    t_timer_callbk ptimer; /**< @brief Timer callback function pointer.    			*/
+    void * argument;       /**< @brief Timer callback function arguments.  			*/
+    uint16_t overflow_flag : 1;
+    uint16_t frac_time : 5; /** < @brief fraction time of period [0:31] in terms of us   			  */
+    uint16_t cycles : 5;    /** < @brief  cycles [0:31] number of elapsed cycles of periodic timer    */
+    uint16_t rem_time : 5;  /** < @brief  remainder to be added to the fraction [0:31] in terms of us */
+    uint8_t state;          /**< @brief Timer State : Active or Expired or Stopped 	*/
+    uint8_t type : 1;       /**< @brief Timer Type : one-shot (0) or periodic (1)   */
+    uint8_t prio : 1;       /* used to indicate if this timer ISR should be handled from hg isr in case of allow_lw_isr==1 */
 };
 
 /**
  * @brief Memory Block Structure
  */
-typedef struct _mem_blck_t {
-	/*	8 bits					|	 8 bits			| 8 bits	| 8 bits     *
-	 *  Free memory chunk flag 	| sub-pool number	| reserved	| handle_id  */
-	uint32_t flag;
-	struct _mem_blck_t * next;
+typedef struct _mem_blck_t
+{
+    /*	8 bits					|	 8 bits			| 8 bits	| 8 bits     *
+     *  Free memory chunk flag 	| sub-pool number	| reserved	| handle_id  */
+    uint32_t flag;
+    struct _mem_blck_t * next;
 } mem_blck_t;
 
 /**
  * @brief Memory Pool Block Structure
  */
-typedef struct {
-	uint32_t blck_size			: POOL_BLOCK_SIZE; 			/* block size */
-	uint32_t total_blcks		: POOL_TOTAL_BLOCKS_SIZE;	/* total number of blocks */
-	uint32_t indx				: POOL_INDEX_SIZE;			/* pool index (sub-pool number) */
-	mem_blck_t* next_blck; 	/* next free block */
+typedef struct
+{
+    uint32_t blck_size : POOL_BLOCK_SIZE;          /* block size */
+    uint32_t total_blcks : POOL_TOTAL_BLOCKS_SIZE; /* total number of blocks */
+    uint32_t indx : POOL_INDEX_SIZE;               /* pool index (sub-pool number) */
+    mem_blck_t * next_blck;                        /* next free block */
 } os_pool_def_t;
 
 /* Exported functions ---------------------------------------------------------*/
@@ -187,12 +191,7 @@ typedef struct {
  *
  * @retval Handle of the created task
  */
-os_thread_id os_thread_create(
-		os_pthread thread,
-		char* name,
-		os_priority pri,
-		void* argu,
-		uint32_t stack_size);
+os_thread_id os_thread_create(os_pthread thread, char * name, os_priority pri, void * argu, uint32_t stack_size);
 
 /**
  * @brief Registers an interrupt function corresponding to the passed interrupt ID
@@ -200,9 +199,7 @@ os_thread_id os_thread_create(
  * @param ptr_int_hndlr Interrupt function
  * @param int_id 		Interrupt ID
  */
-void intr_hndlr_reg(
-		void (*ptr_int_hndlr)(void),
-		int_state_e int_id);
+void intr_hndlr_reg(void (*ptr_int_hndlr)(void), int_state_e int_id);
 
 /**
  * @brief initialize function to to os_wrapper
@@ -213,7 +210,6 @@ void os_wrapper_init(void);
  * @brief reset function to os_wrapper component
  */
 void os_wrapper_reset(void);
-
 
 /**
  * @brief initialize timer function
@@ -237,11 +233,7 @@ void os_timer_reset(void);
  *
  * @retval timer ID for reference by other functions or NULL in case of error.
  */
-void* os_timer_create(
-	t_timer_callbk p_callbk,
-	os_timer_type type,
-	void *argument);
-
+void * os_timer_create(t_timer_callbk p_callbk, os_timer_type type, void * argument);
 
 /**
  * @brief  set the timer priority
@@ -251,8 +243,7 @@ void* os_timer_create(
  *
  * @retval None
  */
-void os_timer_set_prio(os_timer_id timer_id ,
-		os_timer_prio tmr_prio);
+void os_timer_set_prio(os_timer_id timer_id, os_timer_prio tmr_prio);
 
 /**
  * @brief  get the timer priority
@@ -260,7 +251,6 @@ void os_timer_set_prio(os_timer_id timer_id ,
  * @retval get the priority of the SW timers head
  */
 uint8_t os_timer_is_any_near_sw_timer_hg_prio(void);
-
 
 /**
  * @brief  start a running timer.
@@ -270,9 +260,7 @@ uint8_t os_timer_is_any_near_sw_timer_hg_prio(void);
  *
  * @retval error code.
  */
-int32_t os_timer_start(
-	os_timer_id timer_id,
-	uint32_t steps);
+int32_t os_timer_start(os_timer_id timer_id, uint32_t steps);
 
 /**
  * @brief  start a running timer.
@@ -282,9 +270,7 @@ int32_t os_timer_start(
  *
  * @retval error code.
  */
-int32_t os_timer_start_in_us(
-	os_timer_id timer_id,
-	uint32_t time_us);
+int32_t os_timer_start_in_us(os_timer_id timer_id, uint32_t time_us);
 
 /**
  * @brief	stop a running timer.
@@ -293,8 +279,7 @@ int32_t os_timer_start_in_us(
  *
  * @retval error code.
  */
-int32_t os_timer_stop(
-	os_timer_id timer_id);
+int32_t os_timer_stop(os_timer_id timer_id);
 
 /**
  * @brief	free an allocated timer.
@@ -303,8 +288,7 @@ int32_t os_timer_stop(
  *
  * @retval error code.
  */
-int32_t os_timer_free(
-	os_timer_id timer_id);
+int32_t os_timer_free(os_timer_id timer_id);
 
 /**
  * @brief Stop the timer if it is running and delete it.
@@ -313,8 +297,7 @@ int32_t os_timer_free(
  *
  * @retval status code that indicates the execution status of the function.
  */
-int32_t os_timer_stop_free(
-	os_timer_id *ptr_timer_id);
+int32_t os_timer_stop_free(os_timer_id * ptr_timer_id);
 
 /**
  * @brief  Stop the timer if it is running and start it with the new value.
@@ -324,9 +307,7 @@ int32_t os_timer_stop_free(
  *
  * @retval status code that indicates the execution status of the function.
  */
-int32_t os_timer_set(
-	os_timer_id timer,
-	uint32_t steps);
+int32_t os_timer_set(os_timer_id timer, uint32_t steps);
 
 /**
  * @brief	get the starte of the timer.
@@ -335,8 +316,7 @@ int32_t os_timer_set(
  *
  * @retval os_timer_state. Active , Expired, or stopped
  */
-os_timer_state os_get_tmr_state(
-		os_timer_id timer_id);
+os_timer_state os_get_tmr_state(os_timer_id timer_id);
 /**@}
  * *
  */
@@ -352,8 +332,7 @@ uint32_t os_timer_get_active_sw_timers_number(void);
  *
  * @param	cbk	  : [in] Callback function.
  */
-void os_timer_rgstr_timer_activity_cbk(
-		os_timer_activity_cb_t cbk);
+void os_timer_rgstr_timer_activity_cbk(os_timer_activity_cb_t cbk);
 
 /**
  * @brief	Gets the remaining time of the first time set to fire, if exists
@@ -367,13 +346,12 @@ uint64_t os_timer_get_earliest_time(void);
  *
  * @param  intrpt_fired      current interrupt to be served.
  */
-void os_process_isr(
-	int_state_e intrpt_fired);
+void os_process_isr(int_state_e intrpt_fired);
 
 /**
-*  @ingroup os_wrappers
-*  @{
-*/
+ *  @ingroup os_wrappers
+ *  @{
+ */
 /**
  * @brief  disables system Interrupts
  */
@@ -401,9 +379,7 @@ os_mutex_id os_rcrsv_mutex_create(void);
  *
  * @retval status code , 0 for success
  */
-int32_t os_rcrsv_mutex_wait(
-		os_mutex_id mutex_id,
-		uint32_t millisec);
+int32_t os_rcrsv_mutex_wait(os_mutex_id mutex_id, uint32_t millisec);
 
 /**
  * @brief  Release a mutex
@@ -412,8 +388,7 @@ int32_t os_rcrsv_mutex_wait(
  *
  * @retval status code, 0 for success
  */
-int32_t os_rcrsv_mutex_release(
-		os_mutex_id mutex_id);
+int32_t os_rcrsv_mutex_release(os_mutex_id mutex_id);
 
 //  ==== Semaphore Management Functions ====
 /**
@@ -424,9 +399,7 @@ int32_t os_rcrsv_mutex_release(
  *
  * @retval semaphore id for reference
  */
-os_semaphore_id os_semaphore_create(
-		int32_t max_count,
-		int32_t initial_count);
+os_semaphore_id os_semaphore_create(int32_t max_count, int32_t initial_count);
 
 /**
  * @brief  Wait until a semaphore becomes available
@@ -436,9 +409,7 @@ os_semaphore_id os_semaphore_create(
  *
  * @retval status code, 0 for success
  */
-int32_t os_semaphore_wait(
-		os_semaphore_id semaphore_id,
-		uint32_t millisec);
+int32_t os_semaphore_wait(os_semaphore_id semaphore_id, uint32_t millisec);
 
 /**
  * @brief  Release a semaphore
@@ -447,8 +418,7 @@ int32_t os_semaphore_wait(
  *
  * @retval status code, 0 for success
  */
-int32_t os_semaphore_release(
-		os_semaphore_id semaphore_id);
+int32_t os_semaphore_release(os_semaphore_id semaphore_id);
 
 /**
  * @brief  Release an ISR semaphore
@@ -457,8 +427,7 @@ int32_t os_semaphore_release(
  *
  * @retval status code, 0 for success
  */
-int32_t os_semaphore_release_isr(
-		os_semaphore_id semaphore_id);
+int32_t os_semaphore_release_isr(os_semaphore_id semaphore_id);
 
 /**
  * @}
@@ -472,16 +441,14 @@ int32_t os_semaphore_release_isr(
  *
  * @retval Pointer at the allocated block
  */
-void * os_mem_pool_alloc(
-		os_pool_def_t * pool);
+void * os_mem_pool_alloc(os_pool_def_t * pool);
 
 /**
  * @brief Frees from the passed memory pool
  *
  * @param block Pointer at the block that will be freed
  */
-void os_mem_pool_free(
-		void *block);
+void os_mem_pool_free(void * block);
 
 /**
  * @brief Allocates from the shared memory pool
@@ -490,8 +457,7 @@ void os_mem_pool_free(
  *
  * @retval Pointer at the allocated block
  */
-void* os_shrd_mem_alloc(
-		os_pool_def_t * pool);
+void * os_shrd_mem_alloc(os_pool_def_t * pool);
 
 /**
  * @fn uint8_t os_wrapper_is_rtos_used()

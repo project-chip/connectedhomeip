@@ -88,7 +88,7 @@ typedef struct otInstance otInstance;
  * @sa otInstanceFinalize
  *
  */
-otInstance *otInstanceInit(void *aInstanceBuffer, size_t *aInstanceBufferSize);
+otInstance * otInstanceInit(void * aInstanceBuffer, size_t * aInstanceBufferSize);
 
 /**
  * Initializes the static single instance of the OpenThread library.
@@ -101,7 +101,7 @@ otInstance *otInstanceInit(void *aInstanceBuffer, size_t *aInstanceBufferSize);
  * @returns A pointer to the single OpenThread instance.
  *
  */
-otInstance *otInstanceInitSingle(void);
+otInstance * otInstanceInitSingle(void);
 
 /**
  * Initializes the OpenThread instance.
@@ -118,7 +118,7 @@ otInstance *otInstanceInitSingle(void);
  * @returns  A pointer to the new OpenThread instance.
  *
  */
-otInstance *otInstanceInitMultiple(uint8_t aIdx);
+otInstance * otInstanceInitMultiple(uint8_t aIdx);
 
 /**
  * Gets the instance identifier.
@@ -129,7 +129,7 @@ otInstance *otInstanceInitMultiple(uint8_t aIdx);
  * @returns The instance identifier.
  *
  */
-uint32_t otInstanceGetId(otInstance *aInstance);
+uint32_t otInstanceGetId(otInstance * aInstance);
 
 /**
  * Indicates whether or not the instance is valid/initialized.
@@ -143,7 +143,7 @@ uint32_t otInstanceGetId(otInstance *aInstance);
  * @returns TRUE if the given instance is valid/initialized, FALSE otherwise.
  *
  */
-bool otInstanceIsInitialized(otInstance *aInstance);
+bool otInstanceIsInitialized(otInstance * aInstance);
 
 /**
  * Disables the OpenThread library.
@@ -153,7 +153,7 @@ bool otInstanceIsInitialized(otInstance *aInstance);
  * @param[in] aInstance A pointer to an OpenThread instance.
  *
  */
-void otInstanceFinalize(otInstance *aInstance);
+void otInstanceFinalize(otInstance * aInstance);
 
 /**
  * Returns the current instance uptime (in msec).
@@ -167,7 +167,7 @@ void otInstanceFinalize(otInstance *aInstance);
  * @returns The uptime (number of milliseconds).
  *
  */
-uint64_t otInstanceGetUptime(otInstance *aInstance);
+uint64_t otInstanceGetUptime(otInstance * aInstance);
 
 #define OT_UPTIME_STRING_SIZE 24 ///< Recommended size for string representation of uptime.
 
@@ -187,7 +187,7 @@ uint64_t otInstanceGetUptime(otInstance *aInstance);
  * @param[in]  aSize     The size of @p aBuffer (in bytes). Recommended to use `OT_UPTIME_STRING_SIZE`.
  *
  */
-void otInstanceGetUptimeAsString(otInstance *aInstance, char *aBuffer, uint16_t aSize);
+void otInstanceGetUptimeAsString(otInstance * aInstance, char * aBuffer, uint16_t aSize);
 
 #define OT_CHANGED_IP6_ADDRESS_ADDED (1U << 0)             ///< IPv6 address was added
 #define OT_CHANGED_IP6_ADDRESS_REMOVED (1U << 1)           ///< IPv6 address was removed
@@ -236,7 +236,7 @@ typedef uint32_t otChangedFlags;
  * @param[in]  aContext  A pointer to application-specific context.
  *
  */
-typedef void (*otStateChangedCallback)(otChangedFlags aFlags, void *aContext);
+typedef void (*otStateChangedCallback)(otChangedFlags aFlags, void * aContext);
 
 /**
  * Registers a callback to indicate when certain configuration or state changes within OpenThread.
@@ -250,7 +250,7 @@ typedef void (*otStateChangedCallback)(otChangedFlags aFlags, void *aContext);
  * @retval OT_ERROR_NO_BUFS  Could not add the callback due to resource constraints.
  *
  */
-otError otSetStateChangedCallback(otInstance *aInstance, otStateChangedCallback aCallback, void *aContext);
+otError otSetStateChangedCallback(otInstance * aInstance, otStateChangedCallback aCallback, void * aContext);
 
 /**
  * Removes a callback to indicate when certain configuration or state changes within OpenThread.
@@ -260,7 +260,7 @@ otError otSetStateChangedCallback(otInstance *aInstance, otStateChangedCallback 
  * @param[in]  aContext    A pointer to application-specific context.
  *
  */
-void otRemoveStateChangeCallback(otInstance *aInstance, otStateChangedCallback aCallback, void *aContext);
+void otRemoveStateChangeCallback(otInstance * aInstance, otStateChangedCallback aCallback, void * aContext);
 
 /**
  * Triggers a platform reset.
@@ -271,7 +271,7 @@ void otRemoveStateChangeCallback(otInstance *aInstance, otStateChangedCallback a
  * @param[in]  aInstance  A pointer to an OpenThread instance.
  *
  */
-void otInstanceReset(otInstance *aInstance);
+void otInstanceReset(otInstance * aInstance);
 
 /**
  * Triggers a platform reset to bootloader mode, if supported.
@@ -285,7 +285,7 @@ void otInstanceReset(otInstance *aInstance);
  * @retval OT_ERROR_NOT_CAPABLE  Not capable of resetting to bootloader.
  *
  */
-otError otInstanceResetToBootloader(otInstance *aInstance);
+otError otInstanceResetToBootloader(otInstance * aInstance);
 
 /**
  * Deletes all the settings stored on non-volatile memory, and then triggers a platform reset.
@@ -293,7 +293,7 @@ otError otInstanceResetToBootloader(otInstance *aInstance);
  * @param[in]  aInstance  A pointer to an OpenThread instance.
  *
  */
-void otInstanceFactoryReset(otInstance *aInstance);
+void otInstanceFactoryReset(otInstance * aInstance);
 
 /**
  * Resets the internal states of the OpenThread radio stack.
@@ -305,7 +305,7 @@ void otInstanceFactoryReset(otInstance *aInstance);
  * @param[in]  aInstance  A pointer to an OpenThread instance.
  *
  */
-void otInstanceResetRadioStack(otInstance *aInstance);
+void otInstanceResetRadioStack(otInstance * aInstance);
 
 /**
  * Erases all the OpenThread persistent info (network settings) stored on non-volatile memory.
@@ -317,7 +317,7 @@ void otInstanceResetRadioStack(otInstance *aInstance);
  * @retval OT_ERROR_INVALID_STATE  Device is not in `disabled` state/role.
  *
  */
-otError otInstanceErasePersistentInfo(otInstance *aInstance);
+otError otInstanceErasePersistentInfo(otInstance * aInstance);
 
 /**
  * Gets the OpenThread version string.
@@ -325,7 +325,7 @@ otError otInstanceErasePersistentInfo(otInstance *aInstance);
  * @returns A pointer to the OpenThread version.
  *
  */
-const char *otGetVersionString(void);
+const char * otGetVersionString(void);
 
 /**
  * Gets the OpenThread radio version string.
@@ -335,7 +335,7 @@ const char *otGetVersionString(void);
  * @returns A pointer to the OpenThread radio version.
  *
  */
-const char *otGetRadioVersionString(otInstance *aInstance);
+const char * otGetRadioVersionString(otInstance * aInstance);
 
 /**
  * @}

@@ -32,7 +32,8 @@
 
 #define APP_NAME "Lighting-app"
 
-class AppTask {
+class AppTask
+{
 
 public:
     CHIP_ERROR StartAppTask();
@@ -60,12 +61,13 @@ private:
     static void UpdateLCD(void);
     static void UpdateNvmEventHandler(AppEvent * aEvent);
 
-    enum Function_t {
-        kFunction_NoneSelected = 0,
+    enum Function_t
+    {
+        kFunction_NoneSelected   = 0,
         kFunction_SoftwareUpdate = 0,
-        kFunction_Joiner = 1,
-        kFunction_SaveNvm = 2,
-        kFunction_FactoryReset = 3,
+        kFunction_Joiner         = 1,
+        kFunction_SaveNvm        = 2,
+        kFunction_FactoryReset   = 3,
 
         kFunction_Invalid
     } Function;

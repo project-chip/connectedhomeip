@@ -29,26 +29,27 @@
 namespace chip {
 namespace DeviceLayer {
 
-    /**
-     * Concrete implementation of the PlatformManager singleton object for STM32 platforms.
-     */
+/**
+ * Concrete implementation of the PlatformManager singleton object for STM32 platforms.
+ */
 
-    class DiagnosticDataProviderImpl : public DiagnosticDataProvider {
-    public:
-        static DiagnosticDataProviderImpl & GetDefaultInstance();
+class DiagnosticDataProviderImpl : public DiagnosticDataProvider
+{
+public:
+    static DiagnosticDataProviderImpl & GetDefaultInstance();
 
-        // ===== Methods that implement the PlatformManager abstract interface.
+    // ===== Methods that implement the PlatformManager abstract interface.
 
-        CHIP_ERROR GetCurrentHeapFree(uint64_t & currentHeapFree) override;
-        CHIP_ERROR GetCurrentHeapUsed(uint64_t & currentHeapUsed) override;
-        CHIP_ERROR GetCurrentHeapHighWatermark(uint64_t & currentHeapHighWatermark) override;
-    };
-    /**
-     * Returns the platform-specific implementation of the DiagnosticDataProvider singleton object.
-     *
-     * Applications can use this to gain access to features of the DiagnosticDataProvider
-     * that are specific to the selected platform.
-     */
-    DiagnosticDataProvider & GetDiagnosticDataProviderImpl();
+    CHIP_ERROR GetCurrentHeapFree(uint64_t & currentHeapFree) override;
+    CHIP_ERROR GetCurrentHeapUsed(uint64_t & currentHeapUsed) override;
+    CHIP_ERROR GetCurrentHeapHighWatermark(uint64_t & currentHeapHighWatermark) override;
+};
+/**
+ * Returns the platform-specific implementation of the DiagnosticDataProvider singleton object.
+ *
+ * Applications can use this to gain access to features of the DiagnosticDataProvider
+ * that are specific to the selected platform.
+ */
+DiagnosticDataProvider & GetDiagnosticDataProviderImpl();
 } // namespace DeviceLayer
 } // namespace chip

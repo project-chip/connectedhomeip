@@ -4,7 +4,7 @@
  * @file    ll_intf_cmn.h
  * @brief   This file includes declaration of common interfaces of MAC only and BLE/COEXISTENCE APIs.
  ******************************************************************************
-  * @copy
+ * @copy
  * This Synopsys DWC Bluetooth Low Energy Combo Link Layer/MAC software and
  * associated documentation ( hereinafter the "Software") is an unsupported
  * proprietary work of Synopsys, Inc. unless otherwise expressly agreed to in
@@ -54,10 +54,11 @@
  *
  * @param allow_low_isr : [in] Configuration parameter for the context of the low ISR in the bare-metal model. Range is [0,1].
  * 								0: Low ISR code is executed in the same context of the high ISR.
- * 								1: Low ISR code is executed in the context of the low ISR (by configuring a low priority interrupt that is triggered by FW).
- * @param run_post_evnt_frm_isr : [in] Configuration parameter to decide whether the scheduling of the next BLE event is done in the low ISR context or to be handled by the LL main thread. Range is [0,1].
- * 								0: BLE next event scheduling is handled in the LL main thread.
- * 								1: BLE next event scheduling is handled in the low ISR context.
+ * 								1: Low ISR code is executed in the context of the low ISR (by configuring a low priority
+ * interrupt that is triggered by FW).
+ * @param run_post_evnt_frm_isr : [in] Configuration parameter to decide whether the scheduling of the next BLE event is done in the
+ * low ISR context or to be handled by the LL main thread. Range is [0,1]. 0: BLE next event scheduling is handled in the LL main
+ * thread. 1: BLE next event scheduling is handled in the low ISR context.
  *
  * @retval ble_state_t : Command status
  */
@@ -67,14 +68,16 @@ ble_stat_t ll_intf_cmn_config_ll_ctx_params(uint8_t allow_low_isr, uint8_t run_p
 /*========================================================================================================*/
 #if (USE_NON_ACCURATE_32K_SLEEP_CLK)
 /**
- * @brief Used to select the source that drives the sleep clock, whether to use an external crystal oscillator or an integrated RC oscillator (RCO).
+ * @brief Used to select the source that drives the sleep clock, whether to use an external crystal oscillator or an integrated RC
+ * oscillator (RCO).
  *
- * @param  slp_clk_src 				: [in] Indicate which source to drive the sleep clock. 0: Crystal Oscillator (default). 1: RC0
+ * @param  slp_clk_src 				: [in] Indicate which source to drive the sleep clock. 0: Crystal Oscillator (default).
+ * 1: RC0
  * @param  ptr_slp_clk_freq_value 	: [out] Indicate the nominal frequency value of the sleep clock.
  *
  * @retval ble_stat_t : Command status to be sent to the Host.
  */
-ble_stat_t ll_intf_cmn_le_select_slp_clk_src(uint8_t slp_clk_src, uint16_t *ptr_slp_clk_freq_value);
+ble_stat_t ll_intf_cmn_le_select_slp_clk_src(uint8_t slp_clk_src, uint16_t * ptr_slp_clk_freq_value);
 /*========================================================================================================*/
 /*===============================  LE Set RCO Calibration Event Parameters ===============================*/
 /*========================================================================================================*/
@@ -109,19 +112,19 @@ void ll_intf_cmn_set_temperature_sensor_state(void);
  * @param temperature		:	The current temperature
  * @retval None
  */
-uint32_t  ll_intf_cmn_set_temperature_value(uint32_t temperature);
+uint32_t ll_intf_cmn_set_temperature_value(uint32_t temperature);
 /*========================================================================================================*/
 /*====================================  Random Number Generation Group ===================================*/
 /*========================================================================================================*/
- /**
-  * @brief  Request new random number.
-  *
-  * @param  ptr_rnd	: Pointer to the output random bytes .
-  * @param  len	 	: Number of required random bytes.
-  *
-  * @retval Status.
-  */
-uint32_t ll_intf_cmn_gen_rnd_num(uint8_t *ptr_rnd, uint32_t len);
+/**
+ * @brief  Request new random number.
+ *
+ * @param  ptr_rnd	: Pointer to the output random bytes .
+ * @param  len	 	: Number of required random bytes.
+ *
+ * @retval Status.
+ */
+uint32_t ll_intf_cmn_gen_rnd_num(uint8_t * ptr_rnd, uint32_t len);
 /**
  *
  * @brief A common wrapper for BLE-ECB and MAC-CCM security modes
@@ -141,10 +144,9 @@ uint32_t ll_intf_cmn_gen_rnd_num(uint8_t *ptr_rnd, uint32_t len);
  * @param	security_mode[in]: Hardware security mode.
  * @retval Status
  */
-uint32_t ll_intf_cmn_crypto(uint8_t *ptr_pckt, const uint8_t *ptr_key,
-		uint8_t *ptr_nonce, uint32_t mic_len, uint32_t ad_len, uint32_t md_len,
-		crypto_endian_enum_t key_endian, crypto_endian_enum_t data_endian,
-		security_mode_enum_t security_mode);
+uint32_t ll_intf_cmn_crypto(uint8_t * ptr_pckt, const uint8_t * ptr_key, uint8_t * ptr_nonce, uint32_t mic_len, uint32_t ad_len,
+                            uint32_t md_len, crypto_endian_enum_t key_endian, crypto_endian_enum_t data_endian,
+                            security_mode_enum_t security_mode);
 /*===============  LL Common Interface LE Set Deep Sleep Mode  ===============*/
 /**
  * @brief Switches the controller to and from Deep Sleep mode.
@@ -168,12 +170,10 @@ ble_stat_t ll_intf_cmn_le_set_dp_slp_mode(uint8_t dp_slp_mode);
  *
  * @retval None.
  */
-void ll_intf_cmn_gain_fix_init(
-		uint8_t region_0x1f_val, uint8_t region_0x0f_val,
-		uint8_t region_0x0b_val, uint8_t region_0x09_val,
-		uint8_t r_msur_percent);
+void ll_intf_cmn_gain_fix_init(uint8_t region_0x1f_val, uint8_t region_0x0f_val, uint8_t region_0x0b_val, uint8_t region_0x09_val,
+                               uint8_t r_msur_percent);
 #endif /* SUPPORT_CONFIGURABLE_GAIN_FIX */
 /** @}
-*/
+ */
 
 #endif /* INCLUDE_LL_INTF_CMN_H_ */

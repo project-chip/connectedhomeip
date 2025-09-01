@@ -50,7 +50,8 @@ extern "C" {
 typedef tListNode AMM_VirtualMemoryCallbackHeader_t;
 
 /* Function error enumeration */
-typedef enum AMM_Function_Error {
+typedef enum AMM_Function_Error
+{
     /* No error code */
     AMM_ERROR_OK,
     /* Error that occurred before any check */
@@ -84,7 +85,8 @@ typedef enum AMM_Function_Error {
 /**
  * @brief   Virtual Memory configuration struct
  */
-typedef struct AMM_VirtualMemoryConfig {
+typedef struct AMM_VirtualMemoryConfig
+{
     /* ID of the Virtual Memory */
     uint8_t Id;
     /* Size of the Virtual Memory buffer with a multiple of 32bits.
@@ -100,7 +102,8 @@ typedef struct AMM_VirtualMemoryConfig {
  *
  * @details Structure that handles all the required functions of the Basic Memory Manager.
  */
-typedef struct AMM_BasicMemoryManagerFunctions {
+typedef struct AMM_BasicMemoryManagerFunctions
+{
     /* Basic Memory Manager Init function - Shall be in bytes - */
     void (*Init)(uint32_t * const p_PoolAddr, const uint32_t PoolSize);
     /* Basic Memory Manager Allocate function - Shall be in bytes - */
@@ -115,7 +118,8 @@ typedef struct AMM_BasicMemoryManagerFunctions {
  * @details Structure that contains all the needed parameters to initialize the
  *          Advance Memory Manager.
  */
-typedef struct AMM_InitParameters {
+typedef struct AMM_InitParameters
+{
     /* Address of the pool of memory to manage */
     uint32_t * p_PoolAddr;
     /* Size of the pool with a multiple of 32bits.
@@ -133,7 +137,8 @@ typedef struct AMM_InitParameters {
 /**
  * @brief   Virtual Memory Callback function struct
  */
-typedef struct AMM_VirtualMemoryCallbackFunction {
+typedef struct AMM_VirtualMemoryCallbackFunction
+{
     /* Next and previous callbacks in the list */
     AMM_VirtualMemoryCallbackHeader_t Header;
     /* Callback function pointer to invoke once memory has been freed */
@@ -188,10 +193,8 @@ AMM_Function_Error_t AMM_DeInit(void);
  * @retval AMM_Function_Error_t::AMM_ERROR_BAD_ALLOCATION_SIZE
  * @retval AMM_Function_Error_t::AMM_ERROR_ALLOCATION_FAILED
  */
-AMM_Function_Error_t AMM_Alloc(const uint8_t VirtualMemoryId,
-    const uint32_t BufferSize,
-    uint32_t ** pp_AllocBuffer,
-    AMM_VirtualMemoryCallbackFunction_t * const p_CallBackFunction);
+AMM_Function_Error_t AMM_Alloc(const uint8_t VirtualMemoryId, const uint32_t BufferSize, uint32_t ** pp_AllocBuffer,
+                               AMM_VirtualMemoryCallbackFunction_t * const p_CallBackFunction);
 
 /**
  * @brief  Free the allocated buffer from the Advance Memory Manager Pool

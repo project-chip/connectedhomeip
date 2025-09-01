@@ -37,72 +37,73 @@
 
 namespace chip {
 namespace Inet {
-    class IPAddress;
+class IPAddress;
 } // namespace Inet
 } // namespace chip
 
 namespace chip {
 namespace DeviceLayer {
 
-    /**
-     * Concrete implementation of the ConnectivityManager singleton object for stm32 platforms.
-     */
-    class ConnectivityManagerImpl final : public ConnectivityManager,
-                                          public Internal::GenericConnectivityManagerImpl<ConnectivityManagerImpl>,
-                                          public Internal::GenericConnectivityManagerImpl_UDP<ConnectivityManagerImpl>,
+/**
+ * Concrete implementation of the ConnectivityManager singleton object for stm32 platforms.
+ */
+class ConnectivityManagerImpl final : public ConnectivityManager,
+                                      public Internal::GenericConnectivityManagerImpl<ConnectivityManagerImpl>,
+                                      public Internal::GenericConnectivityManagerImpl_UDP<ConnectivityManagerImpl>,
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
-                                          public Internal::GenericConnectivityManagerImpl_TCP<ConnectivityManagerImpl>,
+                                      public Internal::GenericConnectivityManagerImpl_TCP<ConnectivityManagerImpl>,
 #endif
 #if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
-                                          public Internal::GenericConnectivityManagerImpl_BLE<ConnectivityManagerImpl>,
+                                      public Internal::GenericConnectivityManagerImpl_BLE<ConnectivityManagerImpl>,
 #else
-                                          public Internal::GenericConnectivityManagerImpl_NoBLE<ConnectivityManagerImpl>,
+                                      public Internal::GenericConnectivityManagerImpl_NoBLE<ConnectivityManagerImpl>,
 #endif
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
-                                          public Internal::GenericConnectivityManagerImpl_Thread<ConnectivityManagerImpl>,
+                                      public Internal::GenericConnectivityManagerImpl_Thread<ConnectivityManagerImpl>,
 #else
-                                          public Internal::GenericConnectivityManagerImpl_NoThread<ConnectivityManagerImpl>,
+                                      public Internal::GenericConnectivityManagerImpl_NoThread<ConnectivityManagerImpl>,
 #endif
-                                          public Internal::GenericConnectivityManagerImpl_NoWiFi<ConnectivityManagerImpl> {
-        // Allow the ConnectivityManager interface class to delegate method calls to
-        // the implementation methods provided by this class.
-        friend class ConnectivityManager;
+                                      public Internal::GenericConnectivityManagerImpl_NoWiFi<ConnectivityManagerImpl>
+{
+    // Allow the ConnectivityManager interface class to delegate method calls to
+    // the implementation methods provided by this class.
+    friend class ConnectivityManager;
 
-    private:
-        // ===== Members that implement the ConnectivityManager abstract interface.
+private:
+    // ===== Members that implement the ConnectivityManager abstract interface.
 
-        CHIP_ERROR _Init(void);
-        void _OnPlatformEvent(const ChipDeviceEvent * event);
+    CHIP_ERROR _Init(void);
+    void _OnPlatformEvent(const ChipDeviceEvent * event);
 
-        // ===== Members for internal use by the following friends.
+    // ===== Members for internal use by the following friends.
 
-        friend ConnectivityManager & ConnectivityMgr(void);
-        friend ConnectivityManagerImpl & ConnectivityMgrImpl(void);
+    friend ConnectivityManager & ConnectivityMgr(void);
+    friend ConnectivityManagerImpl & ConnectivityMgrImpl(void);
 
-        static ConnectivityManagerImpl sInstance;
-    };
+    static ConnectivityManagerImpl sInstance;
+};
 
-    /**
-     * Returns the public interface of the ConnectivityManager singleton object.
-     *
-     * Chip applications should use this to access features of the ConnectivityManager object
-     * that are common to all platforms.
-     */
-    inline ConnectivityManager & ConnectivityMgr(void)
-    {
-        return ConnectivityManagerImpl::sInstance;
-    }
+/**
+ * Returns the public interface of the ConnectivityManager singleton object.
+ *
+ * Chip applications should use this to access features of the ConnectivityManager object
+ * that are common to all platforms.
+ */
+inline ConnectivityManager & ConnectivityMgr(void)
+{
+    return ConnectivityManagerImpl::sInstance;
+}
 
-    /**
-     * Returns the platform-specific implementation of the ConnectivityManager singleton object.
-     *
-     * Chip applications can use this to gain access to features of the ConnectivityManager
-     * that are specific to the stm32 platform.
-     */
-    inline ConnectivityManagerImpl & ConnectivityMgrImpl(void)
-    {
-        return ConnectivityManagerImpl::sInstance;
-    }
+/**
+ * Returns the platform-specific implementation of the ConnectivityManager singleton object.
+ *
+ * Chip applications can use this to gain access to features of the ConnectivityManager
+ * that are specific to the stm32 platform.
+ */
+inline ConnectivityManagerImpl & ConnectivityMgrImpl(void)
+{
+    return ConnectivityManagerImpl::sInstance;
+}
 
 } // namespace DeviceLayer
 } // namespace chip

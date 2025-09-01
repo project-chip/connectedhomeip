@@ -25,7 +25,8 @@
 /***************************************************/
 /** Specific application debug signals definition **/
 /***************************************************/
-typedef enum {
+typedef enum
+{
     APP_APPE_INIT,
 } app_debug_signal_t;
 

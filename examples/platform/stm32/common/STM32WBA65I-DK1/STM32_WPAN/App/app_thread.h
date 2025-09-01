@@ -54,17 +54,16 @@ otInstance * APP_THREAD_GetotInstance(void);
 #define MULICAST_FTD_MED "ff03::1"
 #define MULICAST_FTD_BORDER_ROUTER "ff03::2"
 
-#define APP_READ32_REG(base_addr) \
-    (*(volatile uint32_t *) (base_addr))
-#define APP_WRITE32_REG(base_addr, data) \
-    (*(volatile uint32_t *) (base_addr) = (data))
+#define APP_READ32_REG(base_addr) (*(volatile uint32_t *) (base_addr))
+#define APP_WRITE32_REG(base_addr, data) (*(volatile uint32_t *) (base_addr) = (data))
 
 /*
  *  List of all errors tracked by the Thread application
  *  running on M4. Some of these errors may be fatal
  *  or just warnings
  */
-typedef enum {
+typedef enum
+{
     ERR_THREAD_SET_STATE_CB,
     ERR_THREAD_SET_CHANNEL,
     ERR_THREAD_SET_PANID,

@@ -31,14 +31,16 @@ extern "C" {
 /* Exported types ------------------------------------------------------------*/
 
 /* Flash Manager command status */
-typedef enum {
-    FM_OK, /* The Flash Manager is available and a window request is scheduled */
+typedef enum
+{
+    FM_OK,   /* The Flash Manager is available and a window request is scheduled */
     FM_BUSY, /* The Flash Manager is busy and the caller will be called back when it is available */
     FM_ERROR /* An error occurred while processing the command */
 } FM_Cmd_Status_t;
 
 /* Flash operation status */
-typedef enum {
+typedef enum
+{
     FM_OPERATION_COMPLETE, /* The requested flash operation is complete */
     FM_OPERATION_AVAILABLE /* A flash operation can be requested */
 } FM_FlashOp_Status_t;
@@ -46,8 +48,9 @@ typedef enum {
 /**
  * @brief  Flash Manager callback node type to store them in a chained list
  */
-typedef struct FM_CallbackNode {
-    tListNode NodeList; /* Next and previous nodes in the list */
+typedef struct FM_CallbackNode
+{
+    tListNode NodeList;                           /* Next and previous nodes in the list */
     void (*Callback)(FM_FlashOp_Status_t Status); /* Callback function pointer for Flash Manager caller */
 } FM_CallbackNode_t;
 
@@ -55,7 +58,7 @@ typedef struct FM_CallbackNode {
 
 #define TIME_WINDOW_ERASE_DURATION 4000U /* Duration in us of the time window requested for Flash Erase */
 #define TIME_WINDOW_WRITE_DURATION 1000U /* Duration in us of the time window requested for Flash Write */
-#define TIME_WINDOW_MARGIN 100U /* Time margin added so to ensure timeout protection before actual closure */
+#define TIME_WINDOW_MARGIN 100U          /* Time margin added so to ensure timeout protection before actual closure */
 /* As timers use ms, amount below 1000 is removed at conversion */
 #define TIME_WINDOW_ERASE_REQUEST (TIME_WINDOW_ERASE_DURATION + TIME_WINDOW_MARGIN)
 #define TIME_WINDOW_WRITE_REQUEST (TIME_WINDOW_WRITE_DURATION + TIME_WINDOW_MARGIN)

@@ -73,9 +73,7 @@ SNVMA_Cmd_Status_t SNVMA_Init(const uint32_t * p_NvmStartAddress);
  * @retval SNVMA_Cmd_Status_t::SNVMA_ERROR_BUFFER_SIZE
  * @retval SNVMA_Cmd_Status_t::SNVMA_ERROR_NVM_BUFFER_FULL
  */
-SNVMA_Cmd_Status_t SNVMA_Register(const SNVMA_BufferId_t BufferId,
-    const uint32_t * p_BufferAddress,
-    const uint32_t BufferSize);
+SNVMA_Cmd_Status_t SNVMA_Register(const SNVMA_BufferId_t BufferId, const uint32_t * p_BufferAddress, const uint32_t BufferSize);
 
 /**
  * @brief  Restore a user buffer from a NVM
@@ -120,8 +118,7 @@ SNVMA_Cmd_Status_t SNVMA_Restore(const SNVMA_BufferId_t BufferId);
  * @retval SNVMA_Cmd_Status_t::SNVMA_ERROR_BUFFERID_NOT_REGISTERED
  * @retval SNVMA_Cmd_Status_t::SNVMA_ERROR_FLASH_ERROR
  */
-SNVMA_Cmd_Status_t SNVMA_Write(const SNVMA_BufferId_t BufferId,
-    void (*Callback)(SNVMA_Callback_Status_t));
+SNVMA_Cmd_Status_t SNVMA_Write(const SNVMA_BufferId_t BufferId, void (*Callback)(SNVMA_Callback_Status_t));
 
 #ifdef __cplusplus
 }

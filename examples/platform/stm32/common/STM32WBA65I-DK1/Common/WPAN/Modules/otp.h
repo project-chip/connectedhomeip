@@ -40,9 +40,9 @@ extern "C" {
 typedef __PACKED_STRUCT
 {
     uint8_t additional_data[8]; /*!< 64 bits of data to fill OTP slot Ex: MB184510 */
-    uint8_t bd_address[6]; /*!< Bluetooth Device Address*/
-    uint8_t hsetune; /*!< Load capacitance to be applied on HSE pad */
-    uint8_t index; /*!< Structure index */
+    uint8_t bd_address[6];      /*!< Bluetooth Device Address*/
+    uint8_t hsetune;            /*!< Load capacitance to be applied on HSE pad */
+    uint8_t index;              /*!< Structure index */
 }
 OTP_Data_s;
 

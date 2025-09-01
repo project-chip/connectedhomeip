@@ -49,25 +49,26 @@ extern "C" {
 #define BSP_QSPI_DualFlash_t S25FL128S_DualFlash_t
 #define BSP_QSPI_Erase_t S25FL128S_Erase_t
 
-typedef enum {
+typedef enum
+{
     QSPI_ACCESS_NONE = 0, /*!<  Instance not initialized,             */
     QSPI_ACCESS_INDIRECT, /*!<  Instance use indirect mode access     */
-    QSPI_ACCESS_MMP /*!<  Instance use Memory Mapped Mode read  */
+    QSPI_ACCESS_MMP       /*!<  Instance use Memory Mapped Mode read  */
 } BSP_QSPI_Access_t;
 
 typedef struct
 {
-    BSP_QSPI_Access_t IsInitialized; /*!<  Instance access Flash method     */
+    BSP_QSPI_Access_t IsInitialized;    /*!<  Instance access Flash method     */
     BSP_QSPI_Interface_t InterfaceMode; /*!<  Flash Interface mode of Instance */
-    BSP_QSPI_Transfer_t TransferRate; /*!<  Flash Transfer mode of Instance  */
-    uint32_t DualFlashMode; /*!<  Flash dual mode                  */
+    BSP_QSPI_Transfer_t TransferRate;   /*!<  Flash Transfer mode of Instance  */
+    uint32_t DualFlashMode;             /*!<  Flash dual mode                  */
     uint32_t IsMspCallbacksValid;
 } BSP_QSPI_Ctx_t;
 
 typedef struct
 {
     BSP_QSPI_Interface_t InterfaceMode; /*!<  Current Flash Interface mode */
-    BSP_QSPI_Transfer_t TransferRate; /*!<  Current Flash Transfer mode  */
+    BSP_QSPI_Transfer_t TransferRate;   /*!<  Current Flash Transfer mode  */
     BSP_QSPI_DualFlash_t DualFlashMode; /*!<  Dual Flash mode              */
 } BSP_QSPI_Init_t;
 
@@ -98,12 +99,12 @@ typedef struct
 #define QSPI_INSTANCES_NUMBER 1U
 
 /* Definition for QSPI modes */
-#define BSP_QSPI_SPI_MODE (BSP_QSPI_Interface_t) S25FL128S_SPI_MODE /* 1 Cmd Line, 1 Address Line and 1 Data Line    */
+#define BSP_QSPI_SPI_MODE (BSP_QSPI_Interface_t) S25FL128S_SPI_MODE           /* 1 Cmd Line, 1 Address Line and 1 Data Line    */
 #define BSP_QSPI_SPI_1I2O_MODE (BSP_QSPI_Interface_t) S25FL128S_SPI_1I2O_MODE /* 1 Cmd Line, 1 Address Line and 2 Data Lines   */
-#define BSP_QSPI_SPI_2IO_MODE (BSP_QSPI_Interface_t) S25FL128S_SPI_2IO_MODE /* 1 Cmd Line, 2 Address Lines and 2 Data Lines  */
+#define BSP_QSPI_SPI_2IO_MODE (BSP_QSPI_Interface_t) S25FL128S_SPI_2IO_MODE   /* 1 Cmd Line, 2 Address Lines and 2 Data Lines  */
 #define BSP_QSPI_SPI_1I4O_MODE (BSP_QSPI_Interface_t) S25FL128S_SPI_1I4O_MODE /* 1 Cmd Line, 1 Address Line and 4 Data Lines   */
-#define BSP_QSPI_SPI_4IO_MODE (BSP_QSPI_Interface_t) S25FL128S_SPI_4IO_MODE /* 1 Cmd Line, 4 Address Lines and 4 Data Lines  */
-#define BSP_QSPI_QPI_MODE (BSP_QSPI_Interface_t) S25FL128S_QPI_MODE /* 4 Cmd Lines, 4 Address Lines and 4 Data Lines */
+#define BSP_QSPI_SPI_4IO_MODE (BSP_QSPI_Interface_t) S25FL128S_SPI_4IO_MODE   /* 1 Cmd Line, 4 Address Lines and 4 Data Lines  */
+#define BSP_QSPI_QPI_MODE (BSP_QSPI_Interface_t) S25FL128S_QPI_MODE           /* 4 Cmd Lines, 4 Address Lines and 4 Data Lines */
 
 /* Definition for QSPI transfer rates */
 #define BSP_QSPI_STR_TRANSFER (BSP_QSPI_Transfer_t) S25FL128S_STR_TRANSFER /* Single Transfer Rate */

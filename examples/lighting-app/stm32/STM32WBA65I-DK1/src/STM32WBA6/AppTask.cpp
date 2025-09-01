@@ -313,7 +313,7 @@ void AppTask::ButtonEventHandler(ButtonDesc_t * Button)
 {
 
     if (Button->button == B1)
-    {   /* JOY_UP */
+    { /* JOY_UP */
         // Hand off to Functionality handler - depends on duration of press
         AppEvent event;
         event.Type         = AppEvent::kEventType_Timer;
