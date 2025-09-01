@@ -269,7 +269,7 @@ async def connect_wifi_linux(ssid, password) -> ConnectionResult:
             return ConnectionResult(1, f"Connection failed: {final_status}")
 
         # Connection successful, get IP address
-        logger.info(f"connect_wifi_linux: WiFi connected, requesting IP address")
+        logger.info("connect_wifi_linux: WiFi connected, requesting IP address")
 
         # Release any existing DHCP lease and request new one
         await run_command(f"sudo dhclient -r {iface}")
@@ -314,7 +314,7 @@ async def connect_wifi_linux(ssid, password) -> ConnectionResult:
                             ping_stdout, _ = await ping_proc.communicate()
                             if "1 received" in ping_stdout.decode():
                                 logger.info(f"connect_wifi_linux: Connectivity verified to gateway {gateway}")
-                    except:
+                    except Exception:
                         logger.warning("connect_wifi_linux: Could not verify connectivity, but connection appears established")
 
                     return ConnectionResult(0, "")
@@ -420,7 +420,7 @@ async def change_networks(test, cluster, ssid, password, breadcrumb):
                 logger.info(f"change_networks: Waiting {WIFI_WAIT_SECONDS}s before retry")
                 await asyncio.sleep(WIFI_WAIT_SECONDS)
 
-            logger.info(f"change_networks: Sending ConnectNetwork command to DUT")
+            logger.info("change_networks: Sending ConnectNetwork command to DUT")
             try:
                 err = await asyncio.wait_for(
                     test.send_single_cmd(
@@ -432,16 +432,16 @@ async def change_networks(test, cluster, ssid, password, breadcrumb):
                     timeout=COMMAND_TIMEOUT
                 )
                 success = is_network_switch_successful(err)
-                logger.info(f"change_networks: ConnectNetwork command completed successfully")
+                logger.info("change_networks: ConnectNetwork command completed successfully")
             except asyncio.TimeoutError:
                 # Timeout is expected behavior when DUT switches networks
-                logger.info(f"change_networks: ConnectNetwork timeout - this is expected when DUT switches networks")
+                logger.info("change_networks: ConnectNetwork timeout - this is expected when DUT switches networks")
                 success = True  # Treat timeout as success since DUT is switching networks
             except Exception as cmd_e:
                 error_msg = str(cmd_e).lower()
                 # Check if it's a Matter/CHIP internal timeout (also expected during network switch)
                 if "timeout" in error_msg or "commandsender.cpp" in error_msg:
-                    logger.info(f"change_networks: ConnectNetwork timeout - this is expected when DUT switches networks")
+                    logger.info("change_networks: ConnectNetwork timeout - this is expected when DUT switches networks")
                     success = True  # Treat Matter timeout as success since DUT is switching networks
                 else:
                     logger.error(f"change_networks: ConnectNetwork command failed: {cmd_e}")
@@ -450,7 +450,7 @@ async def change_networks(test, cluster, ssid, password, breadcrumb):
             if success:
                 logger.info("change_networks: DUT network switch command sent successfully")
             else:
-                logger.error(f"change_networks: DUT network switch failed, retrying...")
+                logger.error("change_networks: DUT network switch failed, retrying...")
                 continue
 
         except Exception as e:
