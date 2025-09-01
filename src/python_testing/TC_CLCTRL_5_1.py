@@ -140,7 +140,7 @@ class TC_CLCTRL_5_1(MatterBaseTest):
             TestStep("10d", "TH sends command Stop to DUT"),
             TestStep("10e", "TH reads from the DUT the MainState attribute"),
             TestStep("11", "TH sends TestEventTrigger command to General Diagnostic Cluster on Endpoint 0 with EnableKey field set to PIXIT.CLCTRL.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to PIXIT.CLCTRL.TEST_EVENT_TRIGGER for MainState Test Event Clear"),
-            TestStep("12a", "If the CL feature is not supported on the cluster, skip steps 12b to 12d")
+            TestStep("12a", "If the CL feature is not supported on the cluster, skip steps 12b to 12d"),
             TestStep("12b", "TH sends command Calibrate to DUT"),
             TestStep("12c", "TH reads from the DUT the MainState attribute"),
             TestStep("12d", "Wait until TH receives a subscription report with MainState = Stopped.")
