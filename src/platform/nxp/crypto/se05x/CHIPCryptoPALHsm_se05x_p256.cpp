@@ -521,6 +521,7 @@ exit:
 #endif // ENABLE_SE05X_ECDSA_VERIFY
 }
 
+#if ENABLE_SE05X_GENERATE_EC_KEY
 static int add_tlv(uint8_t * buf, size_t buf_index, uint8_t tag, size_t len, uint8_t * val, size_t bufLen)
 {
     VerifyOrReturnError(bufLen >= 2, -1);
@@ -539,6 +540,7 @@ static int add_tlv(uint8_t * buf, size_t buf_index, uint8_t tag, size_t len, uin
 
     return 0;
 }
+#endif // #if ENABLE_SE05X_GENERATE_EC_KEY
 
 /*
  * CSR format used in the below function,
