@@ -59,6 +59,9 @@ def assert_valid_operational_instance_name(instance_name: str) -> None:
 
     Raises:
         TestFailure (AssertionError via mobly.asserts): if constraints are violated.
+
+    Spec:
+        https://github.com/CHIP-Specifications/connectedhomeip-spec/blob/master/src/secure_channel/Discovery.adoc#21-operational-instance-name
     """
     consts = [
         'Contains exactly one hyphen separating two parts',
@@ -110,6 +113,9 @@ def assert_valid_commissionable_instance_name(instance_name: str) -> None:
 
     Raises:
         TestFailure (AssertionError via mobly.asserts): if constraints are violated.
+
+    Spec:
+        https://github.com/CHIP-Specifications/connectedhomeip-spec/blob/master/src/secure_channel/Discovery.adoc#1-commissionable-node-discovery
     """
     consts = [
         'Length must be exactly 16 characters',
@@ -148,6 +154,9 @@ def assert_valid_hostname(hostname: str) -> None:
 
     Raises:
         TestFailure: If `hostname` does not conform to the constraints.
+
+    Spec:
+        https://github.com/CHIP-Specifications/connectedhomeip-spec/blob/master/src/secure_channel/Discovery.adoc#11-host-name-construction
     """
     constraints = [
         "Must start with 12 or 16 uppercase hexadecimal characters [A-F0-9]",
@@ -194,6 +203,12 @@ def assert_valid_long_discriminator_subtype(ld_subtype: str) -> None:
 
     Example:
         "_L3840._sub._matterc._udp.local."
+
+    Raises:
+        TestFailure: If `ld_subtype` does not conform to the constraints.
+
+    Spec:
+        https://github.com/CHIP-Specifications/connectedhomeip-spec/blob/master/src/secure_channel/Discovery.adoc#13-commissioning-subtypes
     """
     constraints = [
         "Must match format '_L<value>._sub.<commissionable-service-type>'",
@@ -251,6 +266,9 @@ def assert_valid_short_discriminator_subtype(sd_subtype: str) -> None:
 
     Raises:
         TestFailure: If `sd_subtype` does not conform to the constraints.
+
+    Spec:
+        https://github.com/CHIP-Specifications/connectedhomeip-spec/blob/master/src/secure_channel/Discovery.adoc#13-commissioning-subtypes
     """
     constraints = [
         "Must match format '_S<value>._sub.<commissionable-service-type>'",
@@ -307,6 +325,12 @@ def assert_valid_vendor_subtype(vendor_subtype: str) -> None:
 
     Example:
         "_V65521._sub._matterc._udp.local."
+
+    Raises:
+        TestFailure: If `vendor_subtype` does not conform to the constraints.
+
+    Spec:
+        https://github.com/CHIP-Specifications/connectedhomeip-spec/blob/master/src/secure_channel/Discovery.adoc#13-commissioning-subtypes
     """
     constraints = [
         "Must match format '_V<value>._sub.<commissionable-service-type>'",
@@ -364,6 +388,9 @@ def assert_valid_devtype_subtype(devtype_subtype: str) -> None:
 
     Raises:
         TestFailure: If `devtype_subtype` does not conform to the constraints.
+
+    Spec:
+        https://github.com/CHIP-Specifications/connectedhomeip-spec/blob/master/src/secure_channel/Discovery.adoc#13-commissioning-subtypes
     """
     constraints = [
         "Must match format '_T<value>._sub.<commissionable-service-type>'",
@@ -432,6 +459,9 @@ def assert_valid_d_key(d_key: str) -> None:
 
     Raises:
         TestFailure: If `d_key` does not conform to the constraints.
+
+    Spec:
+        https://github.com/CHIP-Specifications/connectedhomeip-spec/blob/master/src/secure_channel/Discovery.adoc#15-txt-key-for-discriminator-d
     """
     constraints = [
         "Must be a decimal integer",
@@ -479,6 +509,16 @@ def assert_valid_vp_key(vp_key: str) -> None:
       from the Vendor ID using a '+' character
     - Only one '+' separator is allowed
     - Both Vendor ID and Product ID must be valid decimal integers
+
+    Examples:
+        "123"
+        "132+456"
+
+    Raises:
+        TestFailure: If `vp_key` does not conform to the constraints.
+
+    Spec:
+        https://github.com/CHIP-Specifications/connectedhomeip-spec/blob/master/src/secure_channel/Discovery.adoc#16-txt-key-for-vendor-id-and-product-id-vp
     """
     constraints = [
         "Must contain at least a Vendor ID",
@@ -536,9 +576,6 @@ def assert_valid_cm_key(cm_key: str) -> None:
     Example:
         "2"
 
-    Returns:
-        None
-
     Raises:
         TestFailure: If `cm_key` does not conform to the constraints.
 
@@ -580,9 +617,6 @@ def assert_valid_dt_key(dt_key: str) -> None:
 
     Example:
         "10"
-
-    Returns:
-        None
 
     Raises:
         TestFailure: If `dt_key` does not conform to the constraints.
@@ -632,9 +666,6 @@ def assert_valid_dn_key(dn_key: str) -> None:
     Example:
         "Living Room"
 
-    Returns:
-        None
-
     Raises:
         TestFailure: If `dn_key` does not conform to the constraints.
 
@@ -675,9 +706,6 @@ def assert_valid_ri_key(ri_key: str) -> None:
 
     Example:
         "0A1B2C3D"
-
-    Returns:
-        None
 
     Raises:
         TestFailure: If ri_key does not conform to the constraints.
@@ -721,6 +749,12 @@ def assert_valid_ph_key(ph_key: str) -> None:
 
     Example:
         "33"
+
+    Raises:
+        TestFailure: If `ph_key` does not conform to the constraints.
+
+    Spec:
+        https://github.com/CHIP-Specifications/connectedhomeip-spec/blob/master/src/secure_channel/Discovery.adoc#111-txt-key-for-pairing-hint-ph
     """
     constraints = [
         "Must be a decimal integer without leading zeroes",
@@ -768,9 +802,6 @@ def assert_valid_pi_key(pi_key: str) -> None:
     Example:
         "10"
 
-    Returns:
-        None
-
     Raises:
         TestFailure: If `pi_key` does not conform to the constraints.
 
@@ -814,6 +845,12 @@ def assert_valid_jf_key(jf_key: str) -> None:
 
     Example:
         "14"
+
+    Raises:
+        TestFailure: If `jf_key` does not conform to the constraints.
+
+    Spec:
+        https://github.com/CHIP-Specifications/connectedhomeip-spec/blob/master/src/secure_channel/Discovery.adoc#113-txt-key-for-joint-fabric
     """
     constraints = [
         "Must be a decimal integer without leading zeroes",
@@ -859,6 +896,21 @@ def assert_valid_sii_key(sii_key: str) -> None:
     **Session Idle Interval**
 
     Verify that the TXT record SII key is valid.
+
+    Constraints:
+    - Unsigned integer with units of milliseconds
+    - Encoded as a variable-length decimal number in ASCII encoding
+    - Omitting any leading zeros
+    - Maximum value of 3600000 (1 hour in milliseconds)
+
+    Example:
+        "5300"
+
+    Raises:
+        TestFailure: If `sii_key` does not conform to the constraints.
+
+    Spec:
+        https://github.com/CHIP-Specifications/connectedhomeip-spec/blob/master/src/secure_channel/Discovery.adoc#4-common-txt-keyvalue-pairs
     """
     constraints = [
         "Must be a decimal integer without leading zeroes",
@@ -902,9 +954,6 @@ def assert_valid_sai_key(sai_key: str) -> None:
 
     Example:
         "1250"
-
-    Returns:
-        None
 
     Raises:
         TestFailure: If `sai_key` does not conform to the constraints.
@@ -955,9 +1004,6 @@ def assert_valid_sat_key(sat_key: str) -> None:
     Example:
         "1250"
 
-    Returns:
-        None
-
     Raises:
         TestFailure: If `sat_key` does not conform to the constraints.
 
@@ -1006,6 +1052,20 @@ def assert_valid_t_key(t_key: str, enforce_provisional: bool = True) -> None:
     - Bits 1 and 2 are provisional:
         * If enforce_provisional=True → must not be set
         * If enforce_provisional=False → allowed, only bit 0 must be clear
+
+    Example:
+        "0"
+
+    Args:
+        t_key (str): The value to validate
+        enforce_provisional (bool): Whether to enforce strict prohibition
+                                    of provisional bits 1 and 2 (default: True)
+
+    Raises:
+        TestFailure: If `t_key` does not conform to the constraints.
+
+    Spec:
+        https://github.com/CHIP-Specifications/connectedhomeip-spec/blob/master/src/secure_channel/Discovery.adoc#4-common-txt-keyvalue-pairs
     """
     constraints = [
         "Must be a decimal integer without leading zeroes",
@@ -1043,6 +1103,24 @@ def assert_valid_t_key(t_key: str, enforce_provisional: bool = True) -> None:
 
 @not_none_args
 def assert_valid_icd_key(icd_key: str) -> None:
+    """
+    **Intermittently Connected Device**\n
+    Verify that the TXT record ICD key is valid.
+
+    Constraints:
+    - Encoded as a decimal number in ASCII text
+    - Omitting any leading zeros
+    - Allowed values: 0 or 1
+
+    Example:
+        "1"
+
+    Raises:
+        TestFailure: If `icd_key` does not conform to the constraints.
+
+    Spec:
+        https://github.com/CHIP-Specifications/connectedhomeip-spec/blob/master/src/secure_channel/Discovery.adoc#4-common-txt-keyvalue-pairs
+    """    
     consts = [
         'Encoded as a decimal number in ASCII text',
         'Omitting any leading zeros',
@@ -1085,6 +1163,12 @@ def assert_valid_vendor_id(vendor_id: str) -> None:
 
     Example:
         "123", "54632"
+
+    Raises:
+        TestFailure: If `vendor_id` does not conform to the constraints.
+
+    Spec:
+        https://github.com/CHIP-Specifications/connectedhomeip-spec/blob/master/src/secure_channel/Discovery.adoc#16-txt-key-for-vendor-id-and-product-id-vp
     """
     constraints = [
         "Must be a decimal integer without leading zeroes",
@@ -1125,6 +1209,12 @@ def assert_valid_product_id(product_id: str) -> None:
 
     Example:
         "456", "21387"
+
+    Raises:
+        TestFailure: If `product_id` does not conform to the constraints.
+
+    Spec:
+        https://github.com/CHIP-Specifications/connectedhomeip-spec/blob/master/src/secure_channel/Discovery.adoc#16-txt-key-for-vendor-id-and-product-id-vp
     """
     constraints = [
         "Must be a decimal integer without leading zeroes",
@@ -1164,9 +1254,6 @@ def assert_is_commissionable_type(commissionable_type: str) -> None:
     Constraints:
     - The service type must equal `_matterc._udp.local.`
 
-    Returns:
-        None
-
     Raises:
         TestFailure: If `commissionable_type` does not equal `_matterc._udp.local.`
     """
@@ -1185,9 +1272,6 @@ def assert_is_commissioner_type(commissioner_type: str) -> None:
 
     Constraints:
     - The service type must equal `_matterd._udp.local.`
-
-    Returns:
-        None
 
     Raises:
         TestFailure: If `commissioner_type` does not equal `_matterd._udp.local.`
@@ -1208,9 +1292,6 @@ def assert_is_operational_type(operational_type: str) -> None:
     Constraints:
     - The service type must equal `_matter._tcp.local.`
 
-    Returns:
-        None
-
     Raises:
         TestFailure: If `operational_type` does not equal `_matter._tcp.local.`
     """
@@ -1229,9 +1310,6 @@ def assert_is_border_router_type(border_router_type: str) -> None:
 
     Constraints:
     - The service type must equal `_meshcop._udp.local.`
-
-    Returns:
-        None
 
     Raises:
         TestFailure: If `border_router_type` does not equal `_meshcop._udp.local.`
