@@ -57,7 +57,30 @@ from .crypto import p256keypair
 from .interaction_model import SessionParameters, SessionParametersStruct
 from .native import PyChipError
 
-__all__ = ["ChipDeviceController", "CommissioningParameters"]
+__all__ = ["ChipDeviceController", "CommissioningParameters",
+           "AttributeReadRequest", "AttributeReadRequestList", "SubscriptionTargetList"]
+
+# Type aliases for ReadAttribute method to improve type safety
+AttributeReadRequest = typing.Union[
+    None,  # Empty tuple, all wildcard
+    typing.Tuple[int],  # Endpoint
+    # Wildcard endpoint, Cluster id present
+    typing.Tuple[typing.Type[ClusterObjects.Cluster]],
+    # Wildcard endpoint, Cluster + Attribute present
+    typing.Tuple[typing.Type[ClusterObjects.ClusterAttributeDescriptor]],
+    typing.Tuple[int, typing.Type[ClusterObjects.Cluster]
+                 ],  # Wildcard attribute id
+    # Concrete path
+    typing.Tuple[int, typing.Type[ClusterObjects.ClusterAttributeDescriptor]],
+    ClusterAttribute.TypedAttributePath  # Directly specified attribute path
+]
+
+AttributeReadRequestList = typing.Optional[typing.List[AttributeReadRequest]]
+
+# Type alias for subscription target specifications
+SubscriptionTargetList = typing.List[typing.Tuple[int,
+                                                  typing.Union[ClusterObjects.Cluster, ClusterObjects.ClusterAttributeDescriptor]]]
+
 
 # Defined in $CHIP_ROOT/src/lib/core/CHIPError.h
 CHIP_ERROR_TIMEOUT: int = 50

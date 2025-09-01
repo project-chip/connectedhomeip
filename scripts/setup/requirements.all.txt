@@ -39,7 +39,7 @@ appdirs
 coloredlogs
 watchdog
 build==0.8.0
-mypy==1.10.1
+mypy==1.16.0
 mypy-protobuf==3.5.0
 protobuf==5.28.3
 types-protobuf==5.29.1.20250208
