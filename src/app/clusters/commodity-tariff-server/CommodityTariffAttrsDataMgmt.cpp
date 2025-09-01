@@ -541,8 +541,6 @@ CHIP_ERROR ValidateListEntry(const TariffComponentStruct::Type & entryNewValue, 
 
 CHIP_ERROR ValidateListEntry(const TariffPeriodStruct::Type & entryNewValue, void * aCtx)
 {
-    //std::unordered_set<uint32_t> entryDeIDs;
-    //std::unordered_set<uint32_t> entryTcIDs;
     auto * ctx           = static_cast<TariffUpdateCtx *>(aCtx);
 
     if (!entryNewValue.label.IsNull())
@@ -576,9 +574,6 @@ CHIP_ERROR ValidateListEntry(const TariffPeriodStruct::Type & entryNewValue, voi
     {
         return CHIP_ERROR_DUPLICATE_KEY_ID;
     }
-
-    //ctx->TariffPeriodsDayEntryIDs.merge(entryDeIDs);
-    //ctx->TariffPeriodsTariffComponentIDs.merge(entryTcIDs);
 
     return CHIP_NO_ERROR;
 }

@@ -268,7 +268,7 @@ struct StrToSpan
     /// @param destination Output span to populate
     /// @param maxCount Maximum number of characters to copy (default: unlimited)
     /// @return CHIP_NO_ERROR on success, error code on failure
-    static CHIP_ERROR Copy(const std::string & source, CharSpan & destination, size_t maxCount = std::numeric_limits<size_t>::max())
+    static CHIP_ERROR Copy(const std::string & source, CharSpan & destination, size_t maxCount = CommodityTariffConsts::kDefaultStringValuesMaxBufLength)
     {
         if (source.empty())
         {

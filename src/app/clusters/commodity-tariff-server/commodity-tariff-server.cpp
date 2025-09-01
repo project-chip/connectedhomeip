@@ -22,6 +22,8 @@
 #include <app/ConcreteAttributePath.h>
 #include <app/InteractionModelEngine.h>
 #include <cstdint>
+#include <unordered_set>
+#include <vector>
 
 using namespace chip;
 using namespace chip::app;
@@ -446,20 +448,22 @@ const Structs::TariffPeriodStruct::Type * FindTariffPeriodByDayEntryId(CurrentTa
     return nullptr;
 }
 
-const Structs::TariffPeriodStruct::Type * FindTariffPeriodByTariffComponentId(CurrentTariffAttrsCtx & aCtx, uint32_t componentID)
+std::unordered_set<const Structs::TariffPeriodStruct::Type*> 
+FindTariffPeriodsByTariffComponentId(CurrentTariffAttrsCtx & aCtx, uint32_t componentID)
 {
+    std::unordered_set<const Structs::TariffPeriodStruct::Type*> matchingPeriods;
+    
     for (const auto & period : aCtx.mTariffProvider->GetTariffPeriods().Value())
     {
-        for (const auto & entryID : period.tariffComponentIDs)
+        if (std::find(period.tariffComponentIDs.begin(), 
+                     period.tariffComponentIDs.end(), 
+                     componentID) != period.tariffComponentIDs.end())
         {
-            if (entryID == componentID)
-            {
-                return &period;
-            }
+            matchingPeriods.insert(&period);
         }
     }
-
-    return nullptr;
+    
+    return matchingPeriods;
 }
 
 CHIP_ERROR UpdateTariffComponentAttrsDayEntryById(Instance * aInstance, CurrentTariffAttrsCtx & aCtx, uint32_t dayEntryID,
@@ -680,14 +684,49 @@ void Instance::HandleGetTariffComponent(HandlerContext & ctx, const Commands::Ge
         auto component = Utils::GetCurrNextItemsById<Structs::TariffComponentStruct::Type>(
                              mServerTariffAttrsCtx.TariffComponentsMap, commandData.tariffComponentID)
                              .first;
-        auto period = Utils::FindTariffPeriodByTariffComponentId(mServerTariffAttrsCtx, commandData.tariffComponentID);
 
-        if (component != nullptr && period != nullptr)
+        if (component != nullptr) 
         {
-            response.label           = period->label;
-            response.dayEntryIDs     = period->dayEntryIDs;
+            std::vector<uint32_t> DeIDs;
+            std::string tempLabelString;  // Use std::string to accumulate labels
+            chip::CharSpan respLabel;
+
+            auto matchingPeriods = Utils::FindTariffPeriodsByTariffComponentId(mServerTariffAttrsCtx, commandData.tariffComponentID);
+
+            if (!matchingPeriods.empty()) {
+                bool firstLabel = true;
+
+                DeIDs.reserve(CommodityTariffConsts::kDayEntriesAttrMaxLength);
+
+                for (const auto* period : matchingPeriods) {
+                    if (!period->label.IsNull())
+                    {
+                        std::string periodLabel(period->label.Value().data(), period->label.Value().size());
+                        if (!firstLabel) {
+                            tempLabelString += ";";
+                        }
+                        tempLabelString += periodLabel;
+                        firstLabel = false;
+                    }
+
+                    if (!period->dayEntryIDs.empty())
+                    {
+                        for (const auto& deID : period->dayEntryIDs) {
+                            DeIDs.push_back(deID);
+                        }
+                    }
+                }
+            }
+
+            CommodityTariffAttrsDataMgmt::StrToSpan::Copy(tempLabelString, respLabel);
+
+            response.label           = respLabel;
+            response.dayEntryIDs     = DataModel::List<uint32_t>(DeIDs.data(), DeIDs.size());
             response.tariffComponent = *component;
             status                   = Status::Success;
+
+            DeIDs.clear();
+            tempLabelString.clear();
         }
     }
 
