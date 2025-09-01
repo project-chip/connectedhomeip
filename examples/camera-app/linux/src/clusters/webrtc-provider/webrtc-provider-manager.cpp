@@ -237,15 +237,6 @@ CHIP_ERROR WebRTCProviderManager::HandleProvideOffer(const ProvideOfferRequestAr
     // cluster and update the reference counts.
     AcquireAudioVideoStreams();
 
-    if (mVideoStreamID != 0)
-    {
-        mVideoTrack = mPeerConnection->AddTrack(MediaType::Video);
-    }
-    if (mAudioStreamID != 0)
-    {
-        mAudioTrack = mPeerConnection->AddTrack(MediaType::Audio);
-    }
-
     MoveToState(State::SendingAnswer);
     mPeerConnection->SetRemoteDescription(args.sdp, SDPType::Offer);
     mPeerConnection->CreateAnswer();

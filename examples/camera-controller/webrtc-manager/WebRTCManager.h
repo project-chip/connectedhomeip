@@ -91,7 +91,6 @@ private:
     std::vector<std::string> mLocalCandidates;
 
     std::shared_ptr<rtc::Track> mTrack;
-    std::shared_ptr<rtc::Track> audioTrack;
 
     // Callback to notify when session is established
     SessionEstablishedCallback mSessionEstablishedCallback;
@@ -101,7 +100,6 @@ private:
 
     // UDP socket for RTP forwarding
     int mRTPSocket = -1;
-    int mAudioRTPSocket = -1;
 
     // Close and reset the RTP socket
     void CloseRTPSocket();
