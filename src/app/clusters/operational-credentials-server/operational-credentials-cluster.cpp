@@ -42,7 +42,6 @@ using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::OperationalCredentials;
 using namespace chip::Credentials;
 using namespace chip::Protocols::InteractionModel;
-
 namespace {
 
 constexpr auto kDACCertificate = CertificateChainTypeEnum::kDACCertificate;
@@ -857,6 +856,65 @@ std::optional<DataModel::ActionReturnStatus> HandleSetVIDVerificationStatement(C
     return std::nullopt;
 }
 
+std::optional<DataModel::ActionReturnStatus> HandleRemoveFabric(CommandHandler * commandObj, const ConcreteCommandPath & commandPath, Commands::RemoveFabric::DecodableType & commandData)
+{
+    MATTER_TRACE_SCOPE("RemoveFabric", "OperationalCredentials");
+    auto & fabricBeingRemoved = commandData.fabricIndex;
+
+    ChipLogProgress(Zcl, "OpCreds: Received a RemoveFabric Command for FabricIndex 0x%x",
+                    static_cast<unsigned>(fabricBeingRemoved));
+
+    if (!IsValidFabricIndex(fabricBeingRemoved))
+    {
+        ChipLogError(Zcl, "OpCreds: Failed RemoveFabric due to invalid FabricIndex");
+        commandObj->AddStatus(commandPath, Status::InvalidCommand);
+        return std::nullopt;
+    }
+
+    commandObj->FlushAcksRightAwayOnSlowCommand();
+
+    CHIP_ERROR err = Server::GetInstance().GetFabricTable().Delete(fabricBeingRemoved);
+    SuccessOrExit(err);
+
+    // Notification was already done by FabricTable delegate
+
+exit:
+    // Not using ConvertToNOCResponseStatus here because it's pretty
+    // AddNOC/UpdateNOC specific.
+    if (err == CHIP_ERROR_NOT_FOUND)
+    {
+        ChipLogError(Zcl, "OpCreds: Failed RemoveFabric due to FabricIndex not found locally");
+        SendNOCResponse(commandObj, commandPath, NodeOperationalCertStatusEnum::kInvalidFabricIndex, fabricBeingRemoved,
+                        CharSpan());
+    }
+    else if (err != CHIP_NO_ERROR)
+    {
+        // We have no idea what happened; just report failure.
+        ChipLogError(Zcl, "OpCreds: Failed RemoveFabric due to internal error (err = %" CHIP_ERROR_FORMAT ")", err.Format());
+        StatusIB status(err);
+        commandObj->AddStatus(commandPath, status.mStatus);
+    }
+    else
+    {
+        ChipLogProgress(Zcl, "OpCreds: RemoveFabric successful");
+        SendNOCResponse(commandObj, commandPath, NodeOperationalCertStatusEnum::kOk, fabricBeingRemoved, CharSpan());
+
+        chip::Messaging::ExchangeContext * ec = commandObj->GetExchangeContext();
+        FabricIndex currentFabricIndex        = commandObj->GetAccessingFabricIndex();
+        if (currentFabricIndex == fabricBeingRemoved)
+        {
+            ec->AbortAllOtherCommunicationOnFabric();
+        }
+        else
+        {
+            SessionManager * sessionManager = ec->GetExchangeMgr()->GetSessionManager();
+            sessionManager->ExpireAllSessionsForFabric(fabricBeingRemoved);
+        }
+    }
+    return std::nullopt;
+}
+
+
 std::optional<DataModel::ActionReturnStatus> HandleSignVIDVerificationRequest(CommandHandler * commandObj, const ConcreteCommandPath & commandPath, Commands::SignVIDVerificationRequest::DecodableType & commandData)
 {
     ChipLogProgress(Zcl, "OpCreds: Received a SignVIDVerificationRequest Command for FabricIndex 0x%x",
@@ -1104,7 +1162,6 @@ CHIP_ERROR OperationalCredentialsCluster::GeneratedCommands(const ConcreteCluste
 
 std::optional<DataModel::ActionReturnStatus> OperationalCredentialsCluster::InvokeCommand(const DataModel::InvokeRequest & request, TLV::TLVReader & input_arguments, CommandHandler * handler) 
 {
-    // TODO: Confirm if using the Fabric index directly is needed.
     switch(request.path.mCommandId)
     {
     case OperationalCredentials::Commands::AttestationRequest::Id:
@@ -1142,6 +1199,12 @@ std::optional<DataModel::ActionReturnStatus> OperationalCredentialsCluster::Invo
         OperationalCredentials::Commands::UpdateFabricLabel::DecodableType requestData;
         ReturnErrorOnFailure(requestData.Decode(input_arguments, request.GetAccessingFabricIndex()));
         return HandleUpdateFabricLabel(handler, request.path, requestData);
+    }
+    case OperationalCredentials::Commands::RemoveFabric::Id:
+    {
+        OperationalCredentials::Commands::RemoveFabric::DecodableType requestData;
+        ReturnErrorOnFailure(requestData.Decode(input_arguments));
+        return HandleRemoveFabric(handler, request.path, requestData);
     }
     case OperationalCredentials::Commands::AddTrustedRootCertificate::Id:
     {
