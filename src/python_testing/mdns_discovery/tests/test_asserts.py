@@ -110,21 +110,21 @@ class TestAssertIsCommissionerType(unittest.TestCase):
         # Wrong service type should fail
         wrong = "_matterc._udp.local."
         msg = fail_msg(assert_is_commissioner_type, wrong)
-        self.assertIn("Invalid commissioner", msg)
+        self.assertIn("Invalid commissioner service type", msg)
         self.assertIn(self.EXPECTED, msg)
         self.assertIn(wrong, msg)
 
     def test_invalid_due_to_empty_string(self):
         # Empty string should fail
         msg = fail_msg(assert_is_commissioner_type, "")
-        self.assertIn("Invalid commissioner", msg)
+        self.assertIn("Invalid commissioner service type", msg)
         self.assertIn(self.EXPECTED, msg)
 
     def test_invalid_due_to_partial_match(self):
         # Missing trailing dot should fail
         partial = "_matterd._udp.local"
         msg = fail_msg(assert_is_commissioner_type, partial)
-        self.assertIn("Invalid commissioner", msg)
+        self.assertIn("Invalid commissioner service type", msg)
         self.assertIn(self.EXPECTED, msg)
         self.assertIn(partial, msg)
 
@@ -220,7 +220,7 @@ class TestAssertValidCmKey(unittest.TestCase):
         self.assertIn(self.SET_MSG, msg)
 
 
-class TestCommissionableInstanceName(unittest.TestCase):
+class TestAssertValidCommissionableInstanceName(unittest.TestCase):
     LEN_MSG = 'Length must be exactly 16 characters'
     HEX_MSG = 'Must only contain hexadecimal uppercase characters [A-F0-9]'
 
@@ -922,7 +922,7 @@ class TestAssertValidLongDiscriminatorSubtype(unittest.TestCase):
         self.skipTest("Multiple failures DEC+RNG without FMT are not feasible: strict format forbids leading zeroes.")
 
 
-class TestOperationalInstanceName(unittest.TestCase):
+class TestAssertValidOperationalInstanceName(unittest.TestCase):
     HY_MSG = 'Contains exactly one hyphen separating two parts'
     LEN_MSG = 'Each part is exactly 16 characters long'
     HEX_MSG = 'Each part only contains hexadecimal uppercase characters [A-F0-9]'
