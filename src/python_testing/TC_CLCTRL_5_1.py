@@ -687,9 +687,9 @@ class TC_CLCTRL_5_1(MatterBaseTest):
 
             mainstate = await self.read_clctrl_attribute_expect_success(endpoint=endpoint, attribute=attributes.MainState)
             # Check if the MainState attribute has the expected values
+            logging.info(f"Mainstate: {mainstate}")
             asserts.assert_equal(mainstate, Clusters.ClosureControl.Enums.MainStateEnum.kCalibrating,
                                  "MainState is not in the expected state")
-            logging.info(f"Mainstate: {mainstate}")
 
             # STEP 12d: Wait until the TH receives a subscription report for the MainState attribute
             self.step("12d")
