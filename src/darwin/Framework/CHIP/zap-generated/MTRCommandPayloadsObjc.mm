@@ -34,6 +34,16 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing * error)
+{
+    NSString * errorStr = [NSString stringWithFormat:@"Command payload decoding failed: %s", err.AsString()];
+    MTR_LOG_ERROR("%s", errorStr.UTF8String);
+    if (error != nil) {
+        NSDictionary * userInfo = @ { NSLocalizedFailureReasonErrorKey : NSLocalizedString(errorStr, nil) };
+        *error = [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeSchemaMismatch userInfo:userInfo];
+    }
+}
+
 @implementation MTRIdentifyClusterIdentifyParams
 - (instancetype)init
 {
@@ -356,18 +366,28 @@ NS_ASSUME_NONNULL_BEGIN
         }
     }
 
-    NSString * errorStr = [NSString stringWithFormat:@"Command payload decoding failed: %s", err.AsString()];
-    MTR_LOG_ERROR("%s", errorStr.UTF8String);
-    if (error != nil) {
-        NSDictionary * userInfo = @{ NSLocalizedFailureReasonErrorKey : NSLocalizedString(errorStr, nil) };
-        *error = [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeSchemaMismatch userInfo:userInfo];
-    }
+    LogAndConvertDecodingError(err, error);
     return nil;
 }
 
 @end
 
 @implementation MTRGroupsClusterAddGroupResponseParams (InternalMethods)
+
+- (nullable instancetype)initWithDecodableStruct:(const chip::app::Clusters::Groups::Commands::AddGroupResponse::DecodableType &)decodableStruct
+{
+    if (!(self = [super init])) {
+        return nil;
+    }
+
+    CHIP_ERROR err = [self _setFieldsFromDecodableStruct:decodableStruct];
+    if (err == CHIP_NO_ERROR) {
+        return self;
+    }
+
+    LogAndConvertDecodingError(err, nil);
+    return nil;
+}
 
 - (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::Groups::Commands::AddGroupResponse::DecodableType &)decodableStruct
 {
@@ -549,18 +569,28 @@ NS_ASSUME_NONNULL_BEGIN
         }
     }
 
-    NSString * errorStr = [NSString stringWithFormat:@"Command payload decoding failed: %s", err.AsString()];
-    MTR_LOG_ERROR("%s", errorStr.UTF8String);
-    if (error != nil) {
-        NSDictionary * userInfo = @{ NSLocalizedFailureReasonErrorKey : NSLocalizedString(errorStr, nil) };
-        *error = [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeSchemaMismatch userInfo:userInfo];
-    }
+    LogAndConvertDecodingError(err, error);
     return nil;
 }
 
 @end
 
 @implementation MTRGroupsClusterViewGroupResponseParams (InternalMethods)
+
+- (nullable instancetype)initWithDecodableStruct:(const chip::app::Clusters::Groups::Commands::ViewGroupResponse::DecodableType &)decodableStruct
+{
+    if (!(self = [super init])) {
+        return nil;
+    }
+
+    CHIP_ERROR err = [self _setFieldsFromDecodableStruct:decodableStruct];
+    if (err == CHIP_NO_ERROR) {
+        return self;
+    }
+
+    LogAndConvertDecodingError(err, nil);
+    return nil;
+}
 
 - (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::Groups::Commands::ViewGroupResponse::DecodableType &)decodableStruct
 {
@@ -756,18 +786,28 @@ NS_ASSUME_NONNULL_BEGIN
         }
     }
 
-    NSString * errorStr = [NSString stringWithFormat:@"Command payload decoding failed: %s", err.AsString()];
-    MTR_LOG_ERROR("%s", errorStr.UTF8String);
-    if (error != nil) {
-        NSDictionary * userInfo = @{ NSLocalizedFailureReasonErrorKey : NSLocalizedString(errorStr, nil) };
-        *error = [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeSchemaMismatch userInfo:userInfo];
-    }
+    LogAndConvertDecodingError(err, error);
     return nil;
 }
 
 @end
 
 @implementation MTRGroupsClusterGetGroupMembershipResponseParams (InternalMethods)
+
+- (nullable instancetype)initWithDecodableStruct:(const chip::app::Clusters::Groups::Commands::GetGroupMembershipResponse::DecodableType &)decodableStruct
+{
+    if (!(self = [super init])) {
+        return nil;
+    }
+
+    CHIP_ERROR err = [self _setFieldsFromDecodableStruct:decodableStruct];
+    if (err == CHIP_NO_ERROR) {
+        return self;
+    }
+
+    LogAndConvertDecodingError(err, nil);
+    return nil;
+}
 
 - (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::Groups::Commands::GetGroupMembershipResponse::DecodableType &)decodableStruct
 {
@@ -952,18 +992,28 @@ NS_ASSUME_NONNULL_BEGIN
         }
     }
 
-    NSString * errorStr = [NSString stringWithFormat:@"Command payload decoding failed: %s", err.AsString()];
-    MTR_LOG_ERROR("%s", errorStr.UTF8String);
-    if (error != nil) {
-        NSDictionary * userInfo = @{ NSLocalizedFailureReasonErrorKey : NSLocalizedString(errorStr, nil) };
-        *error = [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeSchemaMismatch userInfo:userInfo];
-    }
+    LogAndConvertDecodingError(err, error);
     return nil;
 }
 
 @end
 
 @implementation MTRGroupsClusterRemoveGroupResponseParams (InternalMethods)
+
+- (nullable instancetype)initWithDecodableStruct:(const chip::app::Clusters::Groups::Commands::RemoveGroupResponse::DecodableType &)decodableStruct
+{
+    if (!(self = [super init])) {
+        return nil;
+    }
+
+    CHIP_ERROR err = [self _setFieldsFromDecodableStruct:decodableStruct];
+    if (err == CHIP_NO_ERROR) {
+        return self;
+    }
+
+    LogAndConvertDecodingError(err, nil);
+    return nil;
+}
 
 - (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::Groups::Commands::RemoveGroupResponse::DecodableType &)decodableStruct
 {
@@ -2700,18 +2750,28 @@ NS_ASSUME_NONNULL_BEGIN
         }
     }
 
-    NSString * errorStr = [NSString stringWithFormat:@"Command payload decoding failed: %s", err.AsString()];
-    MTR_LOG_ERROR("%s", errorStr.UTF8String);
-    if (error != nil) {
-        NSDictionary * userInfo = @{ NSLocalizedFailureReasonErrorKey : NSLocalizedString(errorStr, nil) };
-        *error = [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeSchemaMismatch userInfo:userInfo];
-    }
+    LogAndConvertDecodingError(err, error);
     return nil;
 }
 
 @end
 
 @implementation MTRAccessControlClusterReviewFabricRestrictionsResponseParams (InternalMethods)
+
+- (nullable instancetype)initWithDecodableStruct:(const chip::app::Clusters::AccessControl::Commands::ReviewFabricRestrictionsResponse::DecodableType &)decodableStruct
+{
+    if (!(self = [super init])) {
+        return nil;
+    }
+
+    CHIP_ERROR err = [self _setFieldsFromDecodableStruct:decodableStruct];
+    if (err == CHIP_NO_ERROR) {
+        return self;
+    }
+
+    LogAndConvertDecodingError(err, nil);
+    return nil;
+}
 
 - (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::AccessControl::Commands::ReviewFabricRestrictionsResponse::DecodableType &)decodableStruct
 {
@@ -4104,18 +4164,28 @@ NS_ASSUME_NONNULL_BEGIN
         }
     }
 
-    NSString * errorStr = [NSString stringWithFormat:@"Command payload decoding failed: %s", err.AsString()];
-    MTR_LOG_ERROR("%s", errorStr.UTF8String);
-    if (error != nil) {
-        NSDictionary * userInfo = @{ NSLocalizedFailureReasonErrorKey : NSLocalizedString(errorStr, nil) };
-        *error = [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeSchemaMismatch userInfo:userInfo];
-    }
+    LogAndConvertDecodingError(err, error);
     return nil;
 }
 
 @end
 
 @implementation MTROTASoftwareUpdateProviderClusterQueryImageResponseParams (InternalMethods)
+
+- (nullable instancetype)initWithDecodableStruct:(const chip::app::Clusters::OtaSoftwareUpdateProvider::Commands::QueryImageResponse::DecodableType &)decodableStruct
+{
+    if (!(self = [super init])) {
+        return nil;
+    }
+
+    CHIP_ERROR err = [self _setFieldsFromDecodableStruct:decodableStruct];
+    if (err == CHIP_NO_ERROR) {
+        return self;
+    }
+
+    LogAndConvertDecodingError(err, nil);
+    return nil;
+}
 
 - (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::OtaSoftwareUpdateProvider::Commands::QueryImageResponse::DecodableType &)decodableStruct
 {
@@ -4349,18 +4419,28 @@ NS_ASSUME_NONNULL_BEGIN
         }
     }
 
-    NSString * errorStr = [NSString stringWithFormat:@"Command payload decoding failed: %s", err.AsString()];
-    MTR_LOG_ERROR("%s", errorStr.UTF8String);
-    if (error != nil) {
-        NSDictionary * userInfo = @{ NSLocalizedFailureReasonErrorKey : NSLocalizedString(errorStr, nil) };
-        *error = [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeSchemaMismatch userInfo:userInfo];
-    }
+    LogAndConvertDecodingError(err, error);
     return nil;
 }
 
 @end
 
 @implementation MTROTASoftwareUpdateProviderClusterApplyUpdateResponseParams (InternalMethods)
+
+- (nullable instancetype)initWithDecodableStruct:(const chip::app::Clusters::OtaSoftwareUpdateProvider::Commands::ApplyUpdateResponse::DecodableType &)decodableStruct
+{
+    if (!(self = [super init])) {
+        return nil;
+    }
+
+    CHIP_ERROR err = [self _setFieldsFromDecodableStruct:decodableStruct];
+    if (err == CHIP_NO_ERROR) {
+        return self;
+    }
+
+    LogAndConvertDecodingError(err, nil);
+    return nil;
+}
 
 - (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::OtaSoftwareUpdateProvider::Commands::ApplyUpdateResponse::DecodableType &)decodableStruct
 {
@@ -4756,18 +4836,28 @@ NS_ASSUME_NONNULL_BEGIN
         }
     }
 
-    NSString * errorStr = [NSString stringWithFormat:@"Command payload decoding failed: %s", err.AsString()];
-    MTR_LOG_ERROR("%s", errorStr.UTF8String);
-    if (error != nil) {
-        NSDictionary * userInfo = @{ NSLocalizedFailureReasonErrorKey : NSLocalizedString(errorStr, nil) };
-        *error = [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeSchemaMismatch userInfo:userInfo];
-    }
+    LogAndConvertDecodingError(err, error);
     return nil;
 }
 
 @end
 
 @implementation MTRGeneralCommissioningClusterArmFailSafeResponseParams (InternalMethods)
+
+- (nullable instancetype)initWithDecodableStruct:(const chip::app::Clusters::GeneralCommissioning::Commands::ArmFailSafeResponse::DecodableType &)decodableStruct
+{
+    if (!(self = [super init])) {
+        return nil;
+    }
+
+    CHIP_ERROR err = [self _setFieldsFromDecodableStruct:decodableStruct];
+    if (err == CHIP_NO_ERROR) {
+        return self;
+    }
+
+    LogAndConvertDecodingError(err, nil);
+    return nil;
+}
 
 - (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::GeneralCommissioning::Commands::ArmFailSafeResponse::DecodableType &)decodableStruct
 {
@@ -4938,18 +5028,28 @@ NS_ASSUME_NONNULL_BEGIN
         }
     }
 
-    NSString * errorStr = [NSString stringWithFormat:@"Command payload decoding failed: %s", err.AsString()];
-    MTR_LOG_ERROR("%s", errorStr.UTF8String);
-    if (error != nil) {
-        NSDictionary * userInfo = @{ NSLocalizedFailureReasonErrorKey : NSLocalizedString(errorStr, nil) };
-        *error = [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeSchemaMismatch userInfo:userInfo];
-    }
+    LogAndConvertDecodingError(err, error);
     return nil;
 }
 
 @end
 
 @implementation MTRGeneralCommissioningClusterSetRegulatoryConfigResponseParams (InternalMethods)
+
+- (nullable instancetype)initWithDecodableStruct:(const chip::app::Clusters::GeneralCommissioning::Commands::SetRegulatoryConfigResponse::DecodableType &)decodableStruct
+{
+    if (!(self = [super init])) {
+        return nil;
+    }
+
+    CHIP_ERROR err = [self _setFieldsFromDecodableStruct:decodableStruct];
+    if (err == CHIP_NO_ERROR) {
+        return self;
+    }
+
+    LogAndConvertDecodingError(err, nil);
+    return nil;
+}
 
 - (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::GeneralCommissioning::Commands::SetRegulatoryConfigResponse::DecodableType &)decodableStruct
 {
@@ -5102,18 +5202,28 @@ NS_ASSUME_NONNULL_BEGIN
         }
     }
 
-    NSString * errorStr = [NSString stringWithFormat:@"Command payload decoding failed: %s", err.AsString()];
-    MTR_LOG_ERROR("%s", errorStr.UTF8String);
-    if (error != nil) {
-        NSDictionary * userInfo = @{ NSLocalizedFailureReasonErrorKey : NSLocalizedString(errorStr, nil) };
-        *error = [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeSchemaMismatch userInfo:userInfo];
-    }
+    LogAndConvertDecodingError(err, error);
     return nil;
 }
 
 @end
 
 @implementation MTRGeneralCommissioningClusterCommissioningCompleteResponseParams (InternalMethods)
+
+- (nullable instancetype)initWithDecodableStruct:(const chip::app::Clusters::GeneralCommissioning::Commands::CommissioningCompleteResponse::DecodableType &)decodableStruct
+{
+    if (!(self = [super init])) {
+        return nil;
+    }
+
+    CHIP_ERROR err = [self _setFieldsFromDecodableStruct:decodableStruct];
+    if (err == CHIP_NO_ERROR) {
+        return self;
+    }
+
+    LogAndConvertDecodingError(err, nil);
+    return nil;
+}
 
 - (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::GeneralCommissioning::Commands::CommissioningCompleteResponse::DecodableType &)decodableStruct
 {
@@ -5273,18 +5383,28 @@ NS_ASSUME_NONNULL_BEGIN
         }
     }
 
-    NSString * errorStr = [NSString stringWithFormat:@"Command payload decoding failed: %s", err.AsString()];
-    MTR_LOG_ERROR("%s", errorStr.UTF8String);
-    if (error != nil) {
-        NSDictionary * userInfo = @{ NSLocalizedFailureReasonErrorKey : NSLocalizedString(errorStr, nil) };
-        *error = [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeSchemaMismatch userInfo:userInfo];
-    }
+    LogAndConvertDecodingError(err, error);
     return nil;
 }
 
 @end
 
 @implementation MTRGeneralCommissioningClusterSetTCAcknowledgementsResponseParams (InternalMethods)
+
+- (nullable instancetype)initWithDecodableStruct:(const chip::app::Clusters::GeneralCommissioning::Commands::SetTCAcknowledgementsResponse::DecodableType &)decodableStruct
+{
+    if (!(self = [super init])) {
+        return nil;
+    }
+
+    CHIP_ERROR err = [self _setFieldsFromDecodableStruct:decodableStruct];
+    if (err == CHIP_NO_ERROR) {
+        return self;
+    }
+
+    LogAndConvertDecodingError(err, nil);
+    return nil;
+}
 
 - (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::GeneralCommissioning::Commands::SetTCAcknowledgementsResponse::DecodableType &)decodableStruct
 {
@@ -5459,18 +5579,28 @@ NS_ASSUME_NONNULL_BEGIN
         }
     }
 
-    NSString * errorStr = [NSString stringWithFormat:@"Command payload decoding failed: %s", err.AsString()];
-    MTR_LOG_ERROR("%s", errorStr.UTF8String);
-    if (error != nil) {
-        NSDictionary * userInfo = @{ NSLocalizedFailureReasonErrorKey : NSLocalizedString(errorStr, nil) };
-        *error = [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeSchemaMismatch userInfo:userInfo];
-    }
+    LogAndConvertDecodingError(err, error);
     return nil;
 }
 
 @end
 
 @implementation MTRNetworkCommissioningClusterScanNetworksResponseParams (InternalMethods)
+
+- (nullable instancetype)initWithDecodableStruct:(const chip::app::Clusters::NetworkCommissioning::Commands::ScanNetworksResponse::DecodableType &)decodableStruct
+{
+    if (!(self = [super init])) {
+        return nil;
+    }
+
+    CHIP_ERROR err = [self _setFieldsFromDecodableStruct:decodableStruct];
+    if (err == CHIP_NO_ERROR) {
+        return self;
+    }
+
+    LogAndConvertDecodingError(err, nil);
+    return nil;
+}
 
 - (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::NetworkCommissioning::Commands::ScanNetworksResponse::DecodableType &)decodableStruct
 {
@@ -5920,18 +6050,28 @@ NS_ASSUME_NONNULL_BEGIN
         }
     }
 
-    NSString * errorStr = [NSString stringWithFormat:@"Command payload decoding failed: %s", err.AsString()];
-    MTR_LOG_ERROR("%s", errorStr.UTF8String);
-    if (error != nil) {
-        NSDictionary * userInfo = @{ NSLocalizedFailureReasonErrorKey : NSLocalizedString(errorStr, nil) };
-        *error = [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeSchemaMismatch userInfo:userInfo];
-    }
+    LogAndConvertDecodingError(err, error);
     return nil;
 }
 
 @end
 
 @implementation MTRNetworkCommissioningClusterNetworkConfigResponseParams (InternalMethods)
+
+- (nullable instancetype)initWithDecodableStruct:(const chip::app::Clusters::NetworkCommissioning::Commands::NetworkConfigResponse::DecodableType &)decodableStruct
+{
+    if (!(self = [super init])) {
+        return nil;
+    }
+
+    CHIP_ERROR err = [self _setFieldsFromDecodableStruct:decodableStruct];
+    if (err == CHIP_NO_ERROR) {
+        return self;
+    }
+
+    LogAndConvertDecodingError(err, nil);
+    return nil;
+}
 
 - (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::NetworkCommissioning::Commands::NetworkConfigResponse::DecodableType &)decodableStruct
 {
@@ -6127,18 +6267,28 @@ NS_ASSUME_NONNULL_BEGIN
         }
     }
 
-    NSString * errorStr = [NSString stringWithFormat:@"Command payload decoding failed: %s", err.AsString()];
-    MTR_LOG_ERROR("%s", errorStr.UTF8String);
-    if (error != nil) {
-        NSDictionary * userInfo = @{ NSLocalizedFailureReasonErrorKey : NSLocalizedString(errorStr, nil) };
-        *error = [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeSchemaMismatch userInfo:userInfo];
-    }
+    LogAndConvertDecodingError(err, error);
     return nil;
 }
 
 @end
 
 @implementation MTRNetworkCommissioningClusterConnectNetworkResponseParams (InternalMethods)
+
+- (nullable instancetype)initWithDecodableStruct:(const chip::app::Clusters::NetworkCommissioning::Commands::ConnectNetworkResponse::DecodableType &)decodableStruct
+{
+    if (!(self = [super init])) {
+        return nil;
+    }
+
+    CHIP_ERROR err = [self _setFieldsFromDecodableStruct:decodableStruct];
+    if (err == CHIP_NO_ERROR) {
+        return self;
+    }
+
+    LogAndConvertDecodingError(err, nil);
+    return nil;
+}
 
 - (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::NetworkCommissioning::Commands::ConnectNetworkResponse::DecodableType &)decodableStruct
 {
@@ -6409,18 +6559,28 @@ NS_ASSUME_NONNULL_BEGIN
         }
     }
 
-    NSString * errorStr = [NSString stringWithFormat:@"Command payload decoding failed: %s", err.AsString()];
-    MTR_LOG_ERROR("%s", errorStr.UTF8String);
-    if (error != nil) {
-        NSDictionary * userInfo = @{ NSLocalizedFailureReasonErrorKey : NSLocalizedString(errorStr, nil) };
-        *error = [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeSchemaMismatch userInfo:userInfo];
-    }
+    LogAndConvertDecodingError(err, error);
     return nil;
 }
 
 @end
 
 @implementation MTRNetworkCommissioningClusterQueryIdentityResponseParams (InternalMethods)
+
+- (nullable instancetype)initWithDecodableStruct:(const chip::app::Clusters::NetworkCommissioning::Commands::QueryIdentityResponse::DecodableType &)decodableStruct
+{
+    if (!(self = [super init])) {
+        return nil;
+    }
+
+    CHIP_ERROR err = [self _setFieldsFromDecodableStruct:decodableStruct];
+    if (err == CHIP_NO_ERROR) {
+        return self;
+    }
+
+    LogAndConvertDecodingError(err, nil);
+    return nil;
+}
 
 - (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::NetworkCommissioning::Commands::QueryIdentityResponse::DecodableType &)decodableStruct
 {
@@ -6600,18 +6760,28 @@ NS_ASSUME_NONNULL_BEGIN
         }
     }
 
-    NSString * errorStr = [NSString stringWithFormat:@"Command payload decoding failed: %s", err.AsString()];
-    MTR_LOG_ERROR("%s", errorStr.UTF8String);
-    if (error != nil) {
-        NSDictionary * userInfo = @{ NSLocalizedFailureReasonErrorKey : NSLocalizedString(errorStr, nil) };
-        *error = [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeSchemaMismatch userInfo:userInfo];
-    }
+    LogAndConvertDecodingError(err, error);
     return nil;
 }
 
 @end
 
 @implementation MTRDiagnosticLogsClusterRetrieveLogsResponseParams (InternalMethods)
+
+- (nullable instancetype)initWithDecodableStruct:(const chip::app::Clusters::DiagnosticLogs::Commands::RetrieveLogsResponse::DecodableType &)decodableStruct
+{
+    if (!(self = [super init])) {
+        return nil;
+    }
+
+    CHIP_ERROR err = [self _setFieldsFromDecodableStruct:decodableStruct];
+    if (err == CHIP_NO_ERROR) {
+        return self;
+    }
+
+    LogAndConvertDecodingError(err, nil);
+    return nil;
+}
 
 - (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::DiagnosticLogs::Commands::RetrieveLogsResponse::DecodableType &)decodableStruct
 {
@@ -6879,18 +7049,28 @@ NS_ASSUME_NONNULL_BEGIN
         }
     }
 
-    NSString * errorStr = [NSString stringWithFormat:@"Command payload decoding failed: %s", err.AsString()];
-    MTR_LOG_ERROR("%s", errorStr.UTF8String);
-    if (error != nil) {
-        NSDictionary * userInfo = @{ NSLocalizedFailureReasonErrorKey : NSLocalizedString(errorStr, nil) };
-        *error = [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeSchemaMismatch userInfo:userInfo];
-    }
+    LogAndConvertDecodingError(err, error);
     return nil;
 }
 
 @end
 
 @implementation MTRGeneralDiagnosticsClusterTimeSnapshotResponseParams (InternalMethods)
+
+- (nullable instancetype)initWithDecodableStruct:(const chip::app::Clusters::GeneralDiagnostics::Commands::TimeSnapshotResponse::DecodableType &)decodableStruct
+{
+    if (!(self = [super init])) {
+        return nil;
+    }
+
+    CHIP_ERROR err = [self _setFieldsFromDecodableStruct:decodableStruct];
+    if (err == CHIP_NO_ERROR) {
+        return self;
+    }
+
+    LogAndConvertDecodingError(err, nil);
+    return nil;
+}
 
 - (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::GeneralDiagnostics::Commands::TimeSnapshotResponse::DecodableType &)decodableStruct
 {
@@ -7056,18 +7236,28 @@ NS_ASSUME_NONNULL_BEGIN
         }
     }
 
-    NSString * errorStr = [NSString stringWithFormat:@"Command payload decoding failed: %s", err.AsString()];
-    MTR_LOG_ERROR("%s", errorStr.UTF8String);
-    if (error != nil) {
-        NSDictionary * userInfo = @{ NSLocalizedFailureReasonErrorKey : NSLocalizedString(errorStr, nil) };
-        *error = [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeSchemaMismatch userInfo:userInfo];
-    }
+    LogAndConvertDecodingError(err, error);
     return nil;
 }
 
 @end
 
 @implementation MTRGeneralDiagnosticsClusterPayloadTestResponseParams (InternalMethods)
+
+- (nullable instancetype)initWithDecodableStruct:(const chip::app::Clusters::GeneralDiagnostics::Commands::PayloadTestResponse::DecodableType &)decodableStruct
+{
+    if (!(self = [super init])) {
+        return nil;
+    }
+
+    CHIP_ERROR err = [self _setFieldsFromDecodableStruct:decodableStruct];
+    if (err == CHIP_NO_ERROR) {
+        return self;
+    }
+
+    LogAndConvertDecodingError(err, nil);
+    return nil;
+}
 
 - (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::GeneralDiagnostics::Commands::PayloadTestResponse::DecodableType &)decodableStruct
 {
@@ -7720,18 +7910,28 @@ NS_ASSUME_NONNULL_BEGIN
         }
     }
 
-    NSString * errorStr = [NSString stringWithFormat:@"Command payload decoding failed: %s", err.AsString()];
-    MTR_LOG_ERROR("%s", errorStr.UTF8String);
-    if (error != nil) {
-        NSDictionary * userInfo = @{ NSLocalizedFailureReasonErrorKey : NSLocalizedString(errorStr, nil) };
-        *error = [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeSchemaMismatch userInfo:userInfo];
-    }
+    LogAndConvertDecodingError(err, error);
     return nil;
 }
 
 @end
 
 @implementation MTRTimeSynchronizationClusterSetTimeZoneResponseParams (InternalMethods)
+
+- (nullable instancetype)initWithDecodableStruct:(const chip::app::Clusters::TimeSynchronization::Commands::SetTimeZoneResponse::DecodableType &)decodableStruct
+{
+    if (!(self = [super init])) {
+        return nil;
+    }
+
+    CHIP_ERROR err = [self _setFieldsFromDecodableStruct:decodableStruct];
+    if (err == CHIP_NO_ERROR) {
+        return self;
+    }
+
+    LogAndConvertDecodingError(err, nil);
+    return nil;
+}
 
 - (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::TimeSynchronization::Commands::SetTimeZoneResponse::DecodableType &)decodableStruct
 {
@@ -8500,18 +8700,28 @@ NS_ASSUME_NONNULL_BEGIN
         }
     }
 
-    NSString * errorStr = [NSString stringWithFormat:@"Command payload decoding failed: %s", err.AsString()];
-    MTR_LOG_ERROR("%s", errorStr.UTF8String);
-    if (error != nil) {
-        NSDictionary * userInfo = @{ NSLocalizedFailureReasonErrorKey : NSLocalizedString(errorStr, nil) };
-        *error = [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeSchemaMismatch userInfo:userInfo];
-    }
+    LogAndConvertDecodingError(err, error);
     return nil;
 }
 
 @end
 
 @implementation MTROperationalCredentialsClusterAttestationResponseParams (InternalMethods)
+
+- (nullable instancetype)initWithDecodableStruct:(const chip::app::Clusters::OperationalCredentials::Commands::AttestationResponse::DecodableType &)decodableStruct
+{
+    if (!(self = [super init])) {
+        return nil;
+    }
+
+    CHIP_ERROR err = [self _setFieldsFromDecodableStruct:decodableStruct];
+    if (err == CHIP_NO_ERROR) {
+        return self;
+    }
+
+    LogAndConvertDecodingError(err, nil);
+    return nil;
+}
 
 - (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::OperationalCredentials::Commands::AttestationResponse::DecodableType &)decodableStruct
 {
@@ -8675,18 +8885,28 @@ NS_ASSUME_NONNULL_BEGIN
         }
     }
 
-    NSString * errorStr = [NSString stringWithFormat:@"Command payload decoding failed: %s", err.AsString()];
-    MTR_LOG_ERROR("%s", errorStr.UTF8String);
-    if (error != nil) {
-        NSDictionary * userInfo = @{ NSLocalizedFailureReasonErrorKey : NSLocalizedString(errorStr, nil) };
-        *error = [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeSchemaMismatch userInfo:userInfo];
-    }
+    LogAndConvertDecodingError(err, error);
     return nil;
 }
 
 @end
 
 @implementation MTROperationalCredentialsClusterCertificateChainResponseParams (InternalMethods)
+
+- (nullable instancetype)initWithDecodableStruct:(const chip::app::Clusters::OperationalCredentials::Commands::CertificateChainResponse::DecodableType &)decodableStruct
+{
+    if (!(self = [super init])) {
+        return nil;
+    }
+
+    CHIP_ERROR err = [self _setFieldsFromDecodableStruct:decodableStruct];
+    if (err == CHIP_NO_ERROR) {
+        return self;
+    }
+
+    LogAndConvertDecodingError(err, nil);
+    return nil;
+}
 
 - (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::OperationalCredentials::Commands::CertificateChainResponse::DecodableType &)decodableStruct
 {
@@ -8847,18 +9067,28 @@ NS_ASSUME_NONNULL_BEGIN
         }
     }
 
-    NSString * errorStr = [NSString stringWithFormat:@"Command payload decoding failed: %s", err.AsString()];
-    MTR_LOG_ERROR("%s", errorStr.UTF8String);
-    if (error != nil) {
-        NSDictionary * userInfo = @{ NSLocalizedFailureReasonErrorKey : NSLocalizedString(errorStr, nil) };
-        *error = [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeSchemaMismatch userInfo:userInfo];
-    }
+    LogAndConvertDecodingError(err, error);
     return nil;
 }
 
 @end
 
 @implementation MTROperationalCredentialsClusterCSRResponseParams (InternalMethods)
+
+- (nullable instancetype)initWithDecodableStruct:(const chip::app::Clusters::OperationalCredentials::Commands::CSRResponse::DecodableType &)decodableStruct
+{
+    if (!(self = [super init])) {
+        return nil;
+    }
+
+    CHIP_ERROR err = [self _setFieldsFromDecodableStruct:decodableStruct];
+    if (err == CHIP_NO_ERROR) {
+        return self;
+    }
+
+    LogAndConvertDecodingError(err, nil);
+    return nil;
+}
 
 - (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::OperationalCredentials::Commands::CSRResponse::DecodableType &)decodableStruct
 {
@@ -9131,18 +9361,28 @@ NS_ASSUME_NONNULL_BEGIN
         }
     }
 
-    NSString * errorStr = [NSString stringWithFormat:@"Command payload decoding failed: %s", err.AsString()];
-    MTR_LOG_ERROR("%s", errorStr.UTF8String);
-    if (error != nil) {
-        NSDictionary * userInfo = @{ NSLocalizedFailureReasonErrorKey : NSLocalizedString(errorStr, nil) };
-        *error = [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeSchemaMismatch userInfo:userInfo];
-    }
+    LogAndConvertDecodingError(err, error);
     return nil;
 }
 
 @end
 
 @implementation MTROperationalCredentialsClusterNOCResponseParams (InternalMethods)
+
+- (nullable instancetype)initWithDecodableStruct:(const chip::app::Clusters::OperationalCredentials::Commands::NOCResponse::DecodableType &)decodableStruct
+{
+    if (!(self = [super init])) {
+        return nil;
+    }
+
+    CHIP_ERROR err = [self _setFieldsFromDecodableStruct:decodableStruct];
+    if (err == CHIP_NO_ERROR) {
+        return self;
+    }
+
+    LogAndConvertDecodingError(err, nil);
+    return nil;
+}
 
 - (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::OperationalCredentials::Commands::NOCResponse::DecodableType &)decodableStruct
 {
@@ -9668,18 +9908,28 @@ NS_ASSUME_NONNULL_BEGIN
         }
     }
 
-    NSString * errorStr = [NSString stringWithFormat:@"Command payload decoding failed: %s", err.AsString()];
-    MTR_LOG_ERROR("%s", errorStr.UTF8String);
-    if (error != nil) {
-        NSDictionary * userInfo = @{ NSLocalizedFailureReasonErrorKey : NSLocalizedString(errorStr, nil) };
-        *error = [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeSchemaMismatch userInfo:userInfo];
-    }
+    LogAndConvertDecodingError(err, error);
     return nil;
 }
 
 @end
 
 @implementation MTROperationalCredentialsClusterSignVIDVerificationResponseParams (InternalMethods)
+
+- (nullable instancetype)initWithDecodableStruct:(const chip::app::Clusters::OperationalCredentials::Commands::SignVIDVerificationResponse::DecodableType &)decodableStruct
+{
+    if (!(self = [super init])) {
+        return nil;
+    }
+
+    CHIP_ERROR err = [self _setFieldsFromDecodableStruct:decodableStruct];
+    if (err == CHIP_NO_ERROR) {
+        return self;
+    }
+
+    LogAndConvertDecodingError(err, nil);
+    return nil;
+}
 
 - (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::OperationalCredentials::Commands::SignVIDVerificationResponse::DecodableType &)decodableStruct
 {
@@ -9950,18 +10200,28 @@ NS_ASSUME_NONNULL_BEGIN
         }
     }
 
-    NSString * errorStr = [NSString stringWithFormat:@"Command payload decoding failed: %s", err.AsString()];
-    MTR_LOG_ERROR("%s", errorStr.UTF8String);
-    if (error != nil) {
-        NSDictionary * userInfo = @{ NSLocalizedFailureReasonErrorKey : NSLocalizedString(errorStr, nil) };
-        *error = [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeSchemaMismatch userInfo:userInfo];
-    }
+    LogAndConvertDecodingError(err, error);
     return nil;
 }
 
 @end
 
 @implementation MTRGroupKeyManagementClusterKeySetReadResponseParams (InternalMethods)
+
+- (nullable instancetype)initWithDecodableStruct:(const chip::app::Clusters::GroupKeyManagement::Commands::KeySetReadResponse::DecodableType &)decodableStruct
+{
+    if (!(self = [super init])) {
+        return nil;
+    }
+
+    CHIP_ERROR err = [self _setFieldsFromDecodableStruct:decodableStruct];
+    if (err == CHIP_NO_ERROR) {
+        return self;
+    }
+
+    LogAndConvertDecodingError(err, nil);
+    return nil;
+}
 
 - (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::GroupKeyManagement::Commands::KeySetReadResponse::DecodableType &)decodableStruct
 {
@@ -10215,18 +10475,28 @@ NS_ASSUME_NONNULL_BEGIN
         }
     }
 
-    NSString * errorStr = [NSString stringWithFormat:@"Command payload decoding failed: %s", err.AsString()];
-    MTR_LOG_ERROR("%s", errorStr.UTF8String);
-    if (error != nil) {
-        NSDictionary * userInfo = @{ NSLocalizedFailureReasonErrorKey : NSLocalizedString(errorStr, nil) };
-        *error = [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeSchemaMismatch userInfo:userInfo];
-    }
+    LogAndConvertDecodingError(err, error);
     return nil;
 }
 
 @end
 
 @implementation MTRGroupKeyManagementClusterKeySetReadAllIndicesResponseParams (InternalMethods)
+
+- (nullable instancetype)initWithDecodableStruct:(const chip::app::Clusters::GroupKeyManagement::Commands::KeySetReadAllIndicesResponse::DecodableType &)decodableStruct
+{
+    if (!(self = [super init])) {
+        return nil;
+    }
+
+    CHIP_ERROR err = [self _setFieldsFromDecodableStruct:decodableStruct];
+    if (err == CHIP_NO_ERROR) {
+        return self;
+    }
+
+    LogAndConvertDecodingError(err, nil);
+    return nil;
+}
 
 - (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::GroupKeyManagement::Commands::KeySetReadAllIndicesResponse::DecodableType &)decodableStruct
 {
@@ -10414,18 +10684,28 @@ NS_ASSUME_NONNULL_BEGIN
         }
     }
 
-    NSString * errorStr = [NSString stringWithFormat:@"Command payload decoding failed: %s", err.AsString()];
-    MTR_LOG_ERROR("%s", errorStr.UTF8String);
-    if (error != nil) {
-        NSDictionary * userInfo = @{ NSLocalizedFailureReasonErrorKey : NSLocalizedString(errorStr, nil) };
-        *error = [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeSchemaMismatch userInfo:userInfo];
-    }
+    LogAndConvertDecodingError(err, error);
     return nil;
 }
 
 @end
 
 @implementation MTRICDManagementClusterRegisterClientResponseParams (InternalMethods)
+
+- (nullable instancetype)initWithDecodableStruct:(const chip::app::Clusters::IcdManagement::Commands::RegisterClientResponse::DecodableType &)decodableStruct
+{
+    if (!(self = [super init])) {
+        return nil;
+    }
+
+    CHIP_ERROR err = [self _setFieldsFromDecodableStruct:decodableStruct];
+    if (err == CHIP_NO_ERROR) {
+        return self;
+    }
+
+    LogAndConvertDecodingError(err, nil);
+    return nil;
+}
 
 - (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::IcdManagement::Commands::RegisterClientResponse::DecodableType &)decodableStruct
 {
@@ -10660,18 +10940,28 @@ NS_ASSUME_NONNULL_BEGIN
         }
     }
 
-    NSString * errorStr = [NSString stringWithFormat:@"Command payload decoding failed: %s", err.AsString()];
-    MTR_LOG_ERROR("%s", errorStr.UTF8String);
-    if (error != nil) {
-        NSDictionary * userInfo = @{ NSLocalizedFailureReasonErrorKey : NSLocalizedString(errorStr, nil) };
-        *error = [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeSchemaMismatch userInfo:userInfo];
-    }
+    LogAndConvertDecodingError(err, error);
     return nil;
 }
 
 @end
 
 @implementation MTRICDManagementClusterStayActiveResponseParams (InternalMethods)
+
+- (nullable instancetype)initWithDecodableStruct:(const chip::app::Clusters::IcdManagement::Commands::StayActiveResponse::DecodableType &)decodableStruct
+{
+    if (!(self = [super init])) {
+        return nil;
+    }
+
+    CHIP_ERROR err = [self _setFieldsFromDecodableStruct:decodableStruct];
+    if (err == CHIP_NO_ERROR) {
+        return self;
+    }
+
+    LogAndConvertDecodingError(err, nil);
+    return nil;
+}
 
 - (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::IcdManagement::Commands::StayActiveResponse::DecodableType &)decodableStruct
 {
@@ -11195,18 +11485,28 @@ NS_ASSUME_NONNULL_BEGIN
         }
     }
 
-    NSString * errorStr = [NSString stringWithFormat:@"Command payload decoding failed: %s", err.AsString()];
-    MTR_LOG_ERROR("%s", errorStr.UTF8String);
-    if (error != nil) {
-        NSDictionary * userInfo = @{ NSLocalizedFailureReasonErrorKey : NSLocalizedString(errorStr, nil) };
-        *error = [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeSchemaMismatch userInfo:userInfo];
-    }
+    LogAndConvertDecodingError(err, error);
     return nil;
 }
 
 @end
 
 @implementation MTROvenCavityOperationalStateClusterOperationalCommandResponseParams (InternalMethods)
+
+- (nullable instancetype)initWithDecodableStruct:(const chip::app::Clusters::OvenCavityOperationalState::Commands::OperationalCommandResponse::DecodableType &)decodableStruct
+{
+    if (!(self = [super init])) {
+        return nil;
+    }
+
+    CHIP_ERROR err = [self _setFieldsFromDecodableStruct:decodableStruct];
+    if (err == CHIP_NO_ERROR) {
+        return self;
+    }
+
+    LogAndConvertDecodingError(err, nil);
+    return nil;
+}
 
 - (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::OvenCavityOperationalState::Commands::OperationalCommandResponse::DecodableType &)decodableStruct
 {
@@ -11375,18 +11675,28 @@ NS_ASSUME_NONNULL_BEGIN
         }
     }
 
-    NSString * errorStr = [NSString stringWithFormat:@"Command payload decoding failed: %s", err.AsString()];
-    MTR_LOG_ERROR("%s", errorStr.UTF8String);
-    if (error != nil) {
-        NSDictionary * userInfo = @{ NSLocalizedFailureReasonErrorKey : NSLocalizedString(errorStr, nil) };
-        *error = [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeSchemaMismatch userInfo:userInfo];
-    }
+    LogAndConvertDecodingError(err, error);
     return nil;
 }
 
 @end
 
 @implementation MTROvenModeClusterChangeToModeResponseParams (InternalMethods)
+
+- (nullable instancetype)initWithDecodableStruct:(const chip::app::Clusters::OvenMode::Commands::ChangeToModeResponse::DecodableType &)decodableStruct
+{
+    if (!(self = [super init])) {
+        return nil;
+    }
+
+    CHIP_ERROR err = [self _setFieldsFromDecodableStruct:decodableStruct];
+    if (err == CHIP_NO_ERROR) {
+        return self;
+    }
+
+    LogAndConvertDecodingError(err, nil);
+    return nil;
+}
 
 - (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::OvenMode::Commands::ChangeToModeResponse::DecodableType &)decodableStruct
 {
@@ -11626,18 +11936,28 @@ NS_ASSUME_NONNULL_BEGIN
         }
     }
 
-    NSString * errorStr = [NSString stringWithFormat:@"Command payload decoding failed: %s", err.AsString()];
-    MTR_LOG_ERROR("%s", errorStr.UTF8String);
-    if (error != nil) {
-        NSDictionary * userInfo = @{ NSLocalizedFailureReasonErrorKey : NSLocalizedString(errorStr, nil) };
-        *error = [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeSchemaMismatch userInfo:userInfo];
-    }
+    LogAndConvertDecodingError(err, error);
     return nil;
 }
 
 @end
 
 @implementation MTRLaundryWasherModeClusterChangeToModeResponseParams (InternalMethods)
+
+- (nullable instancetype)initWithDecodableStruct:(const chip::app::Clusters::LaundryWasherMode::Commands::ChangeToModeResponse::DecodableType &)decodableStruct
+{
+    if (!(self = [super init])) {
+        return nil;
+    }
+
+    CHIP_ERROR err = [self _setFieldsFromDecodableStruct:decodableStruct];
+    if (err == CHIP_NO_ERROR) {
+        return self;
+    }
+
+    LogAndConvertDecodingError(err, nil);
+    return nil;
+}
 
 - (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::LaundryWasherMode::Commands::ChangeToModeResponse::DecodableType &)decodableStruct
 {
@@ -11798,18 +12118,28 @@ NS_ASSUME_NONNULL_BEGIN
         }
     }
 
-    NSString * errorStr = [NSString stringWithFormat:@"Command payload decoding failed: %s", err.AsString()];
-    MTR_LOG_ERROR("%s", errorStr.UTF8String);
-    if (error != nil) {
-        NSDictionary * userInfo = @{ NSLocalizedFailureReasonErrorKey : NSLocalizedString(errorStr, nil) };
-        *error = [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeSchemaMismatch userInfo:userInfo];
-    }
+    LogAndConvertDecodingError(err, error);
     return nil;
 }
 
 @end
 
 @implementation MTRRefrigeratorAndTemperatureControlledCabinetModeClusterChangeToModeResponseParams (InternalMethods)
+
+- (nullable instancetype)initWithDecodableStruct:(const chip::app::Clusters::RefrigeratorAndTemperatureControlledCabinetMode::Commands::ChangeToModeResponse::DecodableType &)decodableStruct
+{
+    if (!(self = [super init])) {
+        return nil;
+    }
+
+    CHIP_ERROR err = [self _setFieldsFromDecodableStruct:decodableStruct];
+    if (err == CHIP_NO_ERROR) {
+        return self;
+    }
+
+    LogAndConvertDecodingError(err, nil);
+    return nil;
+}
 
 - (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::RefrigeratorAndTemperatureControlledCabinetMode::Commands::ChangeToModeResponse::DecodableType &)decodableStruct
 {
@@ -11970,18 +12300,28 @@ NS_ASSUME_NONNULL_BEGIN
         }
     }
 
-    NSString * errorStr = [NSString stringWithFormat:@"Command payload decoding failed: %s", err.AsString()];
-    MTR_LOG_ERROR("%s", errorStr.UTF8String);
-    if (error != nil) {
-        NSDictionary * userInfo = @{ NSLocalizedFailureReasonErrorKey : NSLocalizedString(errorStr, nil) };
-        *error = [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeSchemaMismatch userInfo:userInfo];
-    }
+    LogAndConvertDecodingError(err, error);
     return nil;
 }
 
 @end
 
 @implementation MTRRVCRunModeClusterChangeToModeResponseParams (InternalMethods)
+
+- (nullable instancetype)initWithDecodableStruct:(const chip::app::Clusters::RvcRunMode::Commands::ChangeToModeResponse::DecodableType &)decodableStruct
+{
+    if (!(self = [super init])) {
+        return nil;
+    }
+
+    CHIP_ERROR err = [self _setFieldsFromDecodableStruct:decodableStruct];
+    if (err == CHIP_NO_ERROR) {
+        return self;
+    }
+
+    LogAndConvertDecodingError(err, nil);
+    return nil;
+}
 
 - (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::RvcRunMode::Commands::ChangeToModeResponse::DecodableType &)decodableStruct
 {
@@ -12142,18 +12482,28 @@ NS_ASSUME_NONNULL_BEGIN
         }
     }
 
-    NSString * errorStr = [NSString stringWithFormat:@"Command payload decoding failed: %s", err.AsString()];
-    MTR_LOG_ERROR("%s", errorStr.UTF8String);
-    if (error != nil) {
-        NSDictionary * userInfo = @{ NSLocalizedFailureReasonErrorKey : NSLocalizedString(errorStr, nil) };
-        *error = [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeSchemaMismatch userInfo:userInfo];
-    }
+    LogAndConvertDecodingError(err, error);
     return nil;
 }
 
 @end
 
 @implementation MTRRVCCleanModeClusterChangeToModeResponseParams (InternalMethods)
+
+- (nullable instancetype)initWithDecodableStruct:(const chip::app::Clusters::RvcCleanMode::Commands::ChangeToModeResponse::DecodableType &)decodableStruct
+{
+    if (!(self = [super init])) {
+        return nil;
+    }
+
+    CHIP_ERROR err = [self _setFieldsFromDecodableStruct:decodableStruct];
+    if (err == CHIP_NO_ERROR) {
+        return self;
+    }
+
+    LogAndConvertDecodingError(err, nil);
+    return nil;
+}
 
 - (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::RvcCleanMode::Commands::ChangeToModeResponse::DecodableType &)decodableStruct
 {
@@ -12405,18 +12755,28 @@ NS_ASSUME_NONNULL_BEGIN
         }
     }
 
-    NSString * errorStr = [NSString stringWithFormat:@"Command payload decoding failed: %s", err.AsString()];
-    MTR_LOG_ERROR("%s", errorStr.UTF8String);
-    if (error != nil) {
-        NSDictionary * userInfo = @{ NSLocalizedFailureReasonErrorKey : NSLocalizedString(errorStr, nil) };
-        *error = [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeSchemaMismatch userInfo:userInfo];
-    }
+    LogAndConvertDecodingError(err, error);
     return nil;
 }
 
 @end
 
 @implementation MTRDishwasherModeClusterChangeToModeResponseParams (InternalMethods)
+
+- (nullable instancetype)initWithDecodableStruct:(const chip::app::Clusters::DishwasherMode::Commands::ChangeToModeResponse::DecodableType &)decodableStruct
+{
+    if (!(self = [super init])) {
+        return nil;
+    }
+
+    CHIP_ERROR err = [self _setFieldsFromDecodableStruct:decodableStruct];
+    if (err == CHIP_NO_ERROR) {
+        return self;
+    }
+
+    LogAndConvertDecodingError(err, nil);
+    return nil;
+}
 
 - (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::DishwasherMode::Commands::ChangeToModeResponse::DecodableType &)decodableStruct
 {
@@ -13215,18 +13575,28 @@ NS_ASSUME_NONNULL_BEGIN
         }
     }
 
-    NSString * errorStr = [NSString stringWithFormat:@"Command payload decoding failed: %s", err.AsString()];
-    MTR_LOG_ERROR("%s", errorStr.UTF8String);
-    if (error != nil) {
-        NSDictionary * userInfo = @{ NSLocalizedFailureReasonErrorKey : NSLocalizedString(errorStr, nil) };
-        *error = [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeSchemaMismatch userInfo:userInfo];
-    }
+    LogAndConvertDecodingError(err, error);
     return nil;
 }
 
 @end
 
 @implementation MTROperationalStateClusterOperationalCommandResponseParams (InternalMethods)
+
+- (nullable instancetype)initWithDecodableStruct:(const chip::app::Clusters::OperationalState::Commands::OperationalCommandResponse::DecodableType &)decodableStruct
+{
+    if (!(self = [super init])) {
+        return nil;
+    }
+
+    CHIP_ERROR err = [self _setFieldsFromDecodableStruct:decodableStruct];
+    if (err == CHIP_NO_ERROR) {
+        return self;
+    }
+
+    LogAndConvertDecodingError(err, nil);
+    return nil;
+}
 
 - (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::OperationalState::Commands::OperationalCommandResponse::DecodableType &)decodableStruct
 {
@@ -13459,18 +13829,28 @@ NS_ASSUME_NONNULL_BEGIN
         }
     }
 
-    NSString * errorStr = [NSString stringWithFormat:@"Command payload decoding failed: %s", err.AsString()];
-    MTR_LOG_ERROR("%s", errorStr.UTF8String);
-    if (error != nil) {
-        NSDictionary * userInfo = @{ NSLocalizedFailureReasonErrorKey : NSLocalizedString(errorStr, nil) };
-        *error = [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeSchemaMismatch userInfo:userInfo];
-    }
+    LogAndConvertDecodingError(err, error);
     return nil;
 }
 
 @end
 
 @implementation MTRRVCOperationalStateClusterOperationalCommandResponseParams (InternalMethods)
+
+- (nullable instancetype)initWithDecodableStruct:(const chip::app::Clusters::RvcOperationalState::Commands::OperationalCommandResponse::DecodableType &)decodableStruct
+{
+    if (!(self = [super init])) {
+        return nil;
+    }
+
+    CHIP_ERROR err = [self _setFieldsFromDecodableStruct:decodableStruct];
+    if (err == CHIP_NO_ERROR) {
+        return self;
+    }
+
+    LogAndConvertDecodingError(err, nil);
+    return nil;
+}
 
 - (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::RvcOperationalState::Commands::OperationalCommandResponse::DecodableType &)decodableStruct
 {
@@ -13816,18 +14196,28 @@ NS_ASSUME_NONNULL_BEGIN
         }
     }
 
-    NSString * errorStr = [NSString stringWithFormat:@"Command payload decoding failed: %s", err.AsString()];
-    MTR_LOG_ERROR("%s", errorStr.UTF8String);
-    if (error != nil) {
-        NSDictionary * userInfo = @{ NSLocalizedFailureReasonErrorKey : NSLocalizedString(errorStr, nil) };
-        *error = [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeSchemaMismatch userInfo:userInfo];
-    }
+    LogAndConvertDecodingError(err, error);
     return nil;
 }
 
 @end
 
 @implementation MTRScenesManagementClusterAddSceneResponseParams (InternalMethods)
+
+- (nullable instancetype)initWithDecodableStruct:(const chip::app::Clusters::ScenesManagement::Commands::AddSceneResponse::DecodableType &)decodableStruct
+{
+    if (!(self = [super init])) {
+        return nil;
+    }
+
+    CHIP_ERROR err = [self _setFieldsFromDecodableStruct:decodableStruct];
+    if (err == CHIP_NO_ERROR) {
+        return self;
+    }
+
+    LogAndConvertDecodingError(err, nil);
+    return nil;
+}
 
 - (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::ScenesManagement::Commands::AddSceneResponse::DecodableType &)decodableStruct
 {
@@ -14001,18 +14391,28 @@ NS_ASSUME_NONNULL_BEGIN
         }
     }
 
-    NSString * errorStr = [NSString stringWithFormat:@"Command payload decoding failed: %s", err.AsString()];
-    MTR_LOG_ERROR("%s", errorStr.UTF8String);
-    if (error != nil) {
-        NSDictionary * userInfo = @{ NSLocalizedFailureReasonErrorKey : NSLocalizedString(errorStr, nil) };
-        *error = [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeSchemaMismatch userInfo:userInfo];
-    }
+    LogAndConvertDecodingError(err, error);
     return nil;
 }
 
 @end
 
 @implementation MTRScenesManagementClusterViewSceneResponseParams (InternalMethods)
+
+- (nullable instancetype)initWithDecodableStruct:(const chip::app::Clusters::ScenesManagement::Commands::ViewSceneResponse::DecodableType &)decodableStruct
+{
+    if (!(self = [super init])) {
+        return nil;
+    }
+
+    CHIP_ERROR err = [self _setFieldsFromDecodableStruct:decodableStruct];
+    if (err == CHIP_NO_ERROR) {
+        return self;
+    }
+
+    LogAndConvertDecodingError(err, nil);
+    return nil;
+}
 
 - (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::ScenesManagement::Commands::ViewSceneResponse::DecodableType &)decodableStruct
 {
@@ -14273,18 +14673,28 @@ NS_ASSUME_NONNULL_BEGIN
         }
     }
 
-    NSString * errorStr = [NSString stringWithFormat:@"Command payload decoding failed: %s", err.AsString()];
-    MTR_LOG_ERROR("%s", errorStr.UTF8String);
-    if (error != nil) {
-        NSDictionary * userInfo = @{ NSLocalizedFailureReasonErrorKey : NSLocalizedString(errorStr, nil) };
-        *error = [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeSchemaMismatch userInfo:userInfo];
-    }
+    LogAndConvertDecodingError(err, error);
     return nil;
 }
 
 @end
 
 @implementation MTRScenesManagementClusterRemoveSceneResponseParams (InternalMethods)
+
+- (nullable instancetype)initWithDecodableStruct:(const chip::app::Clusters::ScenesManagement::Commands::RemoveSceneResponse::DecodableType &)decodableStruct
+{
+    if (!(self = [super init])) {
+        return nil;
+    }
+
+    CHIP_ERROR err = [self _setFieldsFromDecodableStruct:decodableStruct];
+    if (err == CHIP_NO_ERROR) {
+        return self;
+    }
+
+    LogAndConvertDecodingError(err, nil);
+    return nil;
+}
 
 - (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::ScenesManagement::Commands::RemoveSceneResponse::DecodableType &)decodableStruct
 {
@@ -14440,18 +14850,28 @@ NS_ASSUME_NONNULL_BEGIN
         }
     }
 
-    NSString * errorStr = [NSString stringWithFormat:@"Command payload decoding failed: %s", err.AsString()];
-    MTR_LOG_ERROR("%s", errorStr.UTF8String);
-    if (error != nil) {
-        NSDictionary * userInfo = @{ NSLocalizedFailureReasonErrorKey : NSLocalizedString(errorStr, nil) };
-        *error = [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeSchemaMismatch userInfo:userInfo];
-    }
+    LogAndConvertDecodingError(err, error);
     return nil;
 }
 
 @end
 
 @implementation MTRScenesManagementClusterRemoveAllScenesResponseParams (InternalMethods)
+
+- (nullable instancetype)initWithDecodableStruct:(const chip::app::Clusters::ScenesManagement::Commands::RemoveAllScenesResponse::DecodableType &)decodableStruct
+{
+    if (!(self = [super init])) {
+        return nil;
+    }
+
+    CHIP_ERROR err = [self _setFieldsFromDecodableStruct:decodableStruct];
+    if (err == CHIP_NO_ERROR) {
+        return self;
+    }
+
+    LogAndConvertDecodingError(err, nil);
+    return nil;
+}
 
 - (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::ScenesManagement::Commands::RemoveAllScenesResponse::DecodableType &)decodableStruct
 {
@@ -14613,18 +15033,28 @@ NS_ASSUME_NONNULL_BEGIN
         }
     }
 
-    NSString * errorStr = [NSString stringWithFormat:@"Command payload decoding failed: %s", err.AsString()];
-    MTR_LOG_ERROR("%s", errorStr.UTF8String);
-    if (error != nil) {
-        NSDictionary * userInfo = @{ NSLocalizedFailureReasonErrorKey : NSLocalizedString(errorStr, nil) };
-        *error = [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeSchemaMismatch userInfo:userInfo];
-    }
+    LogAndConvertDecodingError(err, error);
     return nil;
 }
 
 @end
 
 @implementation MTRScenesManagementClusterStoreSceneResponseParams (InternalMethods)
+
+- (nullable instancetype)initWithDecodableStruct:(const chip::app::Clusters::ScenesManagement::Commands::StoreSceneResponse::DecodableType &)decodableStruct
+{
+    if (!(self = [super init])) {
+        return nil;
+    }
+
+    CHIP_ERROR err = [self _setFieldsFromDecodableStruct:decodableStruct];
+    if (err == CHIP_NO_ERROR) {
+        return self;
+    }
+
+    LogAndConvertDecodingError(err, nil);
+    return nil;
+}
 
 - (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::ScenesManagement::Commands::StoreSceneResponse::DecodableType &)decodableStruct
 {
@@ -14885,18 +15315,28 @@ NS_ASSUME_NONNULL_BEGIN
         }
     }
 
-    NSString * errorStr = [NSString stringWithFormat:@"Command payload decoding failed: %s", err.AsString()];
-    MTR_LOG_ERROR("%s", errorStr.UTF8String);
-    if (error != nil) {
-        NSDictionary * userInfo = @{ NSLocalizedFailureReasonErrorKey : NSLocalizedString(errorStr, nil) };
-        *error = [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeSchemaMismatch userInfo:userInfo];
-    }
+    LogAndConvertDecodingError(err, error);
     return nil;
 }
 
 @end
 
 @implementation MTRScenesManagementClusterGetSceneMembershipResponseParams (InternalMethods)
+
+- (nullable instancetype)initWithDecodableStruct:(const chip::app::Clusters::ScenesManagement::Commands::GetSceneMembershipResponse::DecodableType &)decodableStruct
+{
+    if (!(self = [super init])) {
+        return nil;
+    }
+
+    CHIP_ERROR err = [self _setFieldsFromDecodableStruct:decodableStruct];
+    if (err == CHIP_NO_ERROR) {
+        return self;
+    }
+
+    LogAndConvertDecodingError(err, nil);
+    return nil;
+}
 
 - (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::ScenesManagement::Commands::GetSceneMembershipResponse::DecodableType &)decodableStruct
 {
@@ -15104,18 +15544,28 @@ NS_ASSUME_NONNULL_BEGIN
         }
     }
 
-    NSString * errorStr = [NSString stringWithFormat:@"Command payload decoding failed: %s", err.AsString()];
-    MTR_LOG_ERROR("%s", errorStr.UTF8String);
-    if (error != nil) {
-        NSDictionary * userInfo = @{ NSLocalizedFailureReasonErrorKey : NSLocalizedString(errorStr, nil) };
-        *error = [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeSchemaMismatch userInfo:userInfo];
-    }
+    LogAndConvertDecodingError(err, error);
     return nil;
 }
 
 @end
 
 @implementation MTRScenesManagementClusterCopySceneResponseParams (InternalMethods)
+
+- (nullable instancetype)initWithDecodableStruct:(const chip::app::Clusters::ScenesManagement::Commands::CopySceneResponse::DecodableType &)decodableStruct
+{
+    if (!(self = [super init])) {
+        return nil;
+    }
+
+    CHIP_ERROR err = [self _setFieldsFromDecodableStruct:decodableStruct];
+    if (err == CHIP_NO_ERROR) {
+        return self;
+    }
+
+    LogAndConvertDecodingError(err, nil);
+    return nil;
+}
 
 - (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::ScenesManagement::Commands::CopySceneResponse::DecodableType &)decodableStruct
 {
@@ -15913,18 +16363,28 @@ NS_ASSUME_NONNULL_BEGIN
         }
     }
 
-    NSString * errorStr = [NSString stringWithFormat:@"Command payload decoding failed: %s", err.AsString()];
-    MTR_LOG_ERROR("%s", errorStr.UTF8String);
-    if (error != nil) {
-        NSDictionary * userInfo = @{ NSLocalizedFailureReasonErrorKey : NSLocalizedString(errorStr, nil) };
-        *error = [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeSchemaMismatch userInfo:userInfo];
-    }
+    LogAndConvertDecodingError(err, error);
     return nil;
 }
 
 @end
 
 @implementation MTRCommodityPriceClusterGetDetailedPriceResponseParams (InternalMethods)
+
+- (nullable instancetype)initWithDecodableStruct:(const chip::app::Clusters::CommodityPrice::Commands::GetDetailedPriceResponse::DecodableType &)decodableStruct
+{
+    if (!(self = [super init])) {
+        return nil;
+    }
+
+    CHIP_ERROR err = [self _setFieldsFromDecodableStruct:decodableStruct];
+    if (err == CHIP_NO_ERROR) {
+        return self;
+    }
+
+    LogAndConvertDecodingError(err, nil);
+    return nil;
+}
 
 - (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::CommodityPrice::Commands::GetDetailedPriceResponse::DecodableType &)decodableStruct
 {
@@ -16135,18 +16595,28 @@ NS_ASSUME_NONNULL_BEGIN
         }
     }
 
-    NSString * errorStr = [NSString stringWithFormat:@"Command payload decoding failed: %s", err.AsString()];
-    MTR_LOG_ERROR("%s", errorStr.UTF8String);
-    if (error != nil) {
-        NSDictionary * userInfo = @{ NSLocalizedFailureReasonErrorKey : NSLocalizedString(errorStr, nil) };
-        *error = [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeSchemaMismatch userInfo:userInfo];
-    }
+    LogAndConvertDecodingError(err, error);
     return nil;
 }
 
 @end
 
 @implementation MTRCommodityPriceClusterGetDetailedForecastResponseParams (InternalMethods)
+
+- (nullable instancetype)initWithDecodableStruct:(const chip::app::Clusters::CommodityPrice::Commands::GetDetailedForecastResponse::DecodableType &)decodableStruct
+{
+    if (!(self = [super init])) {
+        return nil;
+    }
+
+    CHIP_ERROR err = [self _setFieldsFromDecodableStruct:decodableStruct];
+    if (err == CHIP_NO_ERROR) {
+        return self;
+    }
+
+    LogAndConvertDecodingError(err, nil);
+    return nil;
+}
 
 - (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::CommodityPrice::Commands::GetDetailedForecastResponse::DecodableType &)decodableStruct
 {
@@ -17264,18 +17734,28 @@ NS_ASSUME_NONNULL_BEGIN
         }
     }
 
-    NSString * errorStr = [NSString stringWithFormat:@"Command payload decoding failed: %s", err.AsString()];
-    MTR_LOG_ERROR("%s", errorStr.UTF8String);
-    if (error != nil) {
-        NSDictionary * userInfo = @{ NSLocalizedFailureReasonErrorKey : NSLocalizedString(errorStr, nil) };
-        *error = [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeSchemaMismatch userInfo:userInfo];
-    }
+    LogAndConvertDecodingError(err, error);
     return nil;
 }
 
 @end
 
 @implementation MTREnergyEVSEClusterGetTargetsResponseParams (InternalMethods)
+
+- (nullable instancetype)initWithDecodableStruct:(const chip::app::Clusters::EnergyEvse::Commands::GetTargetsResponse::DecodableType &)decodableStruct
+{
+    if (!(self = [super init])) {
+        return nil;
+    }
+
+    CHIP_ERROR err = [self _setFieldsFromDecodableStruct:decodableStruct];
+    if (err == CHIP_NO_ERROR) {
+        return self;
+    }
+
+    LogAndConvertDecodingError(err, nil);
+    return nil;
+}
 
 - (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::EnergyEvse::Commands::GetTargetsResponse::DecodableType &)decodableStruct
 {
@@ -18076,18 +18556,28 @@ NS_ASSUME_NONNULL_BEGIN
         }
     }
 
-    NSString * errorStr = [NSString stringWithFormat:@"Command payload decoding failed: %s", err.AsString()];
-    MTR_LOG_ERROR("%s", errorStr.UTF8String);
-    if (error != nil) {
-        NSDictionary * userInfo = @{ NSLocalizedFailureReasonErrorKey : NSLocalizedString(errorStr, nil) };
-        *error = [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeSchemaMismatch userInfo:userInfo];
-    }
+    LogAndConvertDecodingError(err, error);
     return nil;
 }
 
 @end
 
 @implementation MTREnergyEVSEModeClusterChangeToModeResponseParams (InternalMethods)
+
+- (nullable instancetype)initWithDecodableStruct:(const chip::app::Clusters::EnergyEvseMode::Commands::ChangeToModeResponse::DecodableType &)decodableStruct
+{
+    if (!(self = [super init])) {
+        return nil;
+    }
+
+    CHIP_ERROR err = [self _setFieldsFromDecodableStruct:decodableStruct];
+    if (err == CHIP_NO_ERROR) {
+        return self;
+    }
+
+    LogAndConvertDecodingError(err, nil);
+    return nil;
+}
 
 - (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::EnergyEvseMode::Commands::ChangeToModeResponse::DecodableType &)decodableStruct
 {
@@ -18248,18 +18738,28 @@ NS_ASSUME_NONNULL_BEGIN
         }
     }
 
-    NSString * errorStr = [NSString stringWithFormat:@"Command payload decoding failed: %s", err.AsString()];
-    MTR_LOG_ERROR("%s", errorStr.UTF8String);
-    if (error != nil) {
-        NSDictionary * userInfo = @{ NSLocalizedFailureReasonErrorKey : NSLocalizedString(errorStr, nil) };
-        *error = [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeSchemaMismatch userInfo:userInfo];
-    }
+    LogAndConvertDecodingError(err, error);
     return nil;
 }
 
 @end
 
 @implementation MTRWaterHeaterModeClusterChangeToModeResponseParams (InternalMethods)
+
+- (nullable instancetype)initWithDecodableStruct:(const chip::app::Clusters::WaterHeaterMode::Commands::ChangeToModeResponse::DecodableType &)decodableStruct
+{
+    if (!(self = [super init])) {
+        return nil;
+    }
+
+    CHIP_ERROR err = [self _setFieldsFromDecodableStruct:decodableStruct];
+    if (err == CHIP_NO_ERROR) {
+        return self;
+    }
+
+    LogAndConvertDecodingError(err, nil);
+    return nil;
+}
 
 - (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::WaterHeaterMode::Commands::ChangeToModeResponse::DecodableType &)decodableStruct
 {
@@ -18420,18 +18920,28 @@ NS_ASSUME_NONNULL_BEGIN
         }
     }
 
-    NSString * errorStr = [NSString stringWithFormat:@"Command payload decoding failed: %s", err.AsString()];
-    MTR_LOG_ERROR("%s", errorStr.UTF8String);
-    if (error != nil) {
-        NSDictionary * userInfo = @{ NSLocalizedFailureReasonErrorKey : NSLocalizedString(errorStr, nil) };
-        *error = [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeSchemaMismatch userInfo:userInfo];
-    }
+    LogAndConvertDecodingError(err, error);
     return nil;
 }
 
 @end
 
 @implementation MTRDeviceEnergyManagementModeClusterChangeToModeResponseParams (InternalMethods)
+
+- (nullable instancetype)initWithDecodableStruct:(const chip::app::Clusters::DeviceEnergyManagementMode::Commands::ChangeToModeResponse::DecodableType &)decodableStruct
+{
+    if (!(self = [super init])) {
+        return nil;
+    }
+
+    CHIP_ERROR err = [self _setFieldsFromDecodableStruct:decodableStruct];
+    if (err == CHIP_NO_ERROR) {
+        return self;
+    }
+
+    LogAndConvertDecodingError(err, nil);
+    return nil;
+}
 
 - (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::DeviceEnergyManagementMode::Commands::ChangeToModeResponse::DecodableType &)decodableStruct
 {
@@ -18985,18 +19495,28 @@ NS_ASSUME_NONNULL_BEGIN
         }
     }
 
-    NSString * errorStr = [NSString stringWithFormat:@"Command payload decoding failed: %s", err.AsString()];
-    MTR_LOG_ERROR("%s", errorStr.UTF8String);
-    if (error != nil) {
-        NSDictionary * userInfo = @{ NSLocalizedFailureReasonErrorKey : NSLocalizedString(errorStr, nil) };
-        *error = [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeSchemaMismatch userInfo:userInfo];
-    }
+    LogAndConvertDecodingError(err, error);
     return nil;
 }
 
 @end
 
 @implementation MTRDoorLockClusterGetWeekDayScheduleResponseParams (InternalMethods)
+
+- (nullable instancetype)initWithDecodableStruct:(const chip::app::Clusters::DoorLock::Commands::GetWeekDayScheduleResponse::DecodableType &)decodableStruct
+{
+    if (!(self = [super init])) {
+        return nil;
+    }
+
+    CHIP_ERROR err = [self _setFieldsFromDecodableStruct:decodableStruct];
+    if (err == CHIP_NO_ERROR) {
+        return self;
+    }
+
+    LogAndConvertDecodingError(err, nil);
+    return nil;
+}
 
 - (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::DoorLock::Commands::GetWeekDayScheduleResponse::DecodableType &)decodableStruct
 {
@@ -19386,18 +19906,28 @@ NS_ASSUME_NONNULL_BEGIN
         }
     }
 
-    NSString * errorStr = [NSString stringWithFormat:@"Command payload decoding failed: %s", err.AsString()];
-    MTR_LOG_ERROR("%s", errorStr.UTF8String);
-    if (error != nil) {
-        NSDictionary * userInfo = @{ NSLocalizedFailureReasonErrorKey : NSLocalizedString(errorStr, nil) };
-        *error = [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeSchemaMismatch userInfo:userInfo];
-    }
+    LogAndConvertDecodingError(err, error);
     return nil;
 }
 
 @end
 
 @implementation MTRDoorLockClusterGetYearDayScheduleResponseParams (InternalMethods)
+
+- (nullable instancetype)initWithDecodableStruct:(const chip::app::Clusters::DoorLock::Commands::GetYearDayScheduleResponse::DecodableType &)decodableStruct
+{
+    if (!(self = [super init])) {
+        return nil;
+    }
+
+    CHIP_ERROR err = [self _setFieldsFromDecodableStruct:decodableStruct];
+    if (err == CHIP_NO_ERROR) {
+        return self;
+    }
+
+    LogAndConvertDecodingError(err, nil);
+    return nil;
+}
 
 - (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::DoorLock::Commands::GetYearDayScheduleResponse::DecodableType &)decodableStruct
 {
@@ -19760,18 +20290,28 @@ NS_ASSUME_NONNULL_BEGIN
         }
     }
 
-    NSString * errorStr = [NSString stringWithFormat:@"Command payload decoding failed: %s", err.AsString()];
-    MTR_LOG_ERROR("%s", errorStr.UTF8String);
-    if (error != nil) {
-        NSDictionary * userInfo = @{ NSLocalizedFailureReasonErrorKey : NSLocalizedString(errorStr, nil) };
-        *error = [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeSchemaMismatch userInfo:userInfo];
-    }
+    LogAndConvertDecodingError(err, error);
     return nil;
 }
 
 @end
 
 @implementation MTRDoorLockClusterGetHolidayScheduleResponseParams (InternalMethods)
+
+- (nullable instancetype)initWithDecodableStruct:(const chip::app::Clusters::DoorLock::Commands::GetHolidayScheduleResponse::DecodableType &)decodableStruct
+{
+    if (!(self = [super init])) {
+        return nil;
+    }
+
+    CHIP_ERROR err = [self _setFieldsFromDecodableStruct:decodableStruct];
+    if (err == CHIP_NO_ERROR) {
+        return self;
+    }
+
+    LogAndConvertDecodingError(err, nil);
+    return nil;
+}
 
 - (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::DoorLock::Commands::GetHolidayScheduleResponse::DecodableType &)decodableStruct
 {
@@ -20202,18 +20742,28 @@ NS_ASSUME_NONNULL_BEGIN
         }
     }
 
-    NSString * errorStr = [NSString stringWithFormat:@"Command payload decoding failed: %s", err.AsString()];
-    MTR_LOG_ERROR("%s", errorStr.UTF8String);
-    if (error != nil) {
-        NSDictionary * userInfo = @{ NSLocalizedFailureReasonErrorKey : NSLocalizedString(errorStr, nil) };
-        *error = [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeSchemaMismatch userInfo:userInfo];
-    }
+    LogAndConvertDecodingError(err, error);
     return nil;
 }
 
 @end
 
 @implementation MTRDoorLockClusterGetUserResponseParams (InternalMethods)
+
+- (nullable instancetype)initWithDecodableStruct:(const chip::app::Clusters::DoorLock::Commands::GetUserResponse::DecodableType &)decodableStruct
+{
+    if (!(self = [super init])) {
+        return nil;
+    }
+
+    CHIP_ERROR err = [self _setFieldsFromDecodableStruct:decodableStruct];
+    if (err == CHIP_NO_ERROR) {
+        return self;
+    }
+
+    LogAndConvertDecodingError(err, nil);
+    return nil;
+}
 
 - (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::DoorLock::Commands::GetUserResponse::DecodableType &)decodableStruct
 {
@@ -20588,18 +21138,28 @@ NS_ASSUME_NONNULL_BEGIN
         }
     }
 
-    NSString * errorStr = [NSString stringWithFormat:@"Command payload decoding failed: %s", err.AsString()];
-    MTR_LOG_ERROR("%s", errorStr.UTF8String);
-    if (error != nil) {
-        NSDictionary * userInfo = @{ NSLocalizedFailureReasonErrorKey : NSLocalizedString(errorStr, nil) };
-        *error = [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeSchemaMismatch userInfo:userInfo];
-    }
+    LogAndConvertDecodingError(err, error);
     return nil;
 }
 
 @end
 
 @implementation MTRDoorLockClusterSetCredentialResponseParams (InternalMethods)
+
+- (nullable instancetype)initWithDecodableStruct:(const chip::app::Clusters::DoorLock::Commands::SetCredentialResponse::DecodableType &)decodableStruct
+{
+    if (!(self = [super init])) {
+        return nil;
+    }
+
+    CHIP_ERROR err = [self _setFieldsFromDecodableStruct:decodableStruct];
+    if (err == CHIP_NO_ERROR) {
+        return self;
+    }
+
+    LogAndConvertDecodingError(err, nil);
+    return nil;
+}
 
 - (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::DoorLock::Commands::SetCredentialResponse::DecodableType &)decodableStruct
 {
@@ -20778,18 +21338,28 @@ NS_ASSUME_NONNULL_BEGIN
         }
     }
 
-    NSString * errorStr = [NSString stringWithFormat:@"Command payload decoding failed: %s", err.AsString()];
-    MTR_LOG_ERROR("%s", errorStr.UTF8String);
-    if (error != nil) {
-        NSDictionary * userInfo = @{ NSLocalizedFailureReasonErrorKey : NSLocalizedString(errorStr, nil) };
-        *error = [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeSchemaMismatch userInfo:userInfo];
-    }
+    LogAndConvertDecodingError(err, error);
     return nil;
 }
 
 @end
 
 @implementation MTRDoorLockClusterGetCredentialStatusResponseParams (InternalMethods)
+
+- (nullable instancetype)initWithDecodableStruct:(const chip::app::Clusters::DoorLock::Commands::GetCredentialStatusResponse::DecodableType &)decodableStruct
+{
+    if (!(self = [super init])) {
+        return nil;
+    }
+
+    CHIP_ERROR err = [self _setFieldsFromDecodableStruct:decodableStruct];
+    if (err == CHIP_NO_ERROR) {
+        return self;
+    }
+
+    LogAndConvertDecodingError(err, nil);
+    return nil;
+}
 
 - (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::DoorLock::Commands::GetCredentialStatusResponse::DecodableType &)decodableStruct
 {
@@ -22315,18 +22885,28 @@ NS_ASSUME_NONNULL_BEGIN
         }
     }
 
-    NSString * errorStr = [NSString stringWithFormat:@"Command payload decoding failed: %s", err.AsString()];
-    MTR_LOG_ERROR("%s", errorStr.UTF8String);
-    if (error != nil) {
-        NSDictionary * userInfo = @{ NSLocalizedFailureReasonErrorKey : NSLocalizedString(errorStr, nil) };
-        *error = [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeSchemaMismatch userInfo:userInfo];
-    }
+    LogAndConvertDecodingError(err, error);
     return nil;
 }
 
 @end
 
 @implementation MTRServiceAreaClusterSelectAreasResponseParams (InternalMethods)
+
+- (nullable instancetype)initWithDecodableStruct:(const chip::app::Clusters::ServiceArea::Commands::SelectAreasResponse::DecodableType &)decodableStruct
+{
+    if (!(self = [super init])) {
+        return nil;
+    }
+
+    CHIP_ERROR err = [self _setFieldsFromDecodableStruct:decodableStruct];
+    if (err == CHIP_NO_ERROR) {
+        return self;
+    }
+
+    LogAndConvertDecodingError(err, nil);
+    return nil;
+}
 
 - (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::ServiceArea::Commands::SelectAreasResponse::DecodableType &)decodableStruct
 {
@@ -22483,18 +23063,28 @@ NS_ASSUME_NONNULL_BEGIN
         }
     }
 
-    NSString * errorStr = [NSString stringWithFormat:@"Command payload decoding failed: %s", err.AsString()];
-    MTR_LOG_ERROR("%s", errorStr.UTF8String);
-    if (error != nil) {
-        NSDictionary * userInfo = @{ NSLocalizedFailureReasonErrorKey : NSLocalizedString(errorStr, nil) };
-        *error = [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeSchemaMismatch userInfo:userInfo];
-    }
+    LogAndConvertDecodingError(err, error);
     return nil;
 }
 
 @end
 
 @implementation MTRServiceAreaClusterSkipAreaResponseParams (InternalMethods)
+
+- (nullable instancetype)initWithDecodableStruct:(const chip::app::Clusters::ServiceArea::Commands::SkipAreaResponse::DecodableType &)decodableStruct
+{
+    if (!(self = [super init])) {
+        return nil;
+    }
+
+    CHIP_ERROR err = [self _setFieldsFromDecodableStruct:decodableStruct];
+    if (err == CHIP_NO_ERROR) {
+        return self;
+    }
+
+    LogAndConvertDecodingError(err, nil);
+    return nil;
+}
 
 - (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::ServiceArea::Commands::SkipAreaResponse::DecodableType &)decodableStruct
 {
@@ -22665,18 +23255,28 @@ NS_ASSUME_NONNULL_BEGIN
         }
     }
 
-    NSString * errorStr = [NSString stringWithFormat:@"Command payload decoding failed: %s", err.AsString()];
-    MTR_LOG_ERROR("%s", errorStr.UTF8String);
-    if (error != nil) {
-        NSDictionary * userInfo = @{ NSLocalizedFailureReasonErrorKey : NSLocalizedString(errorStr, nil) };
-        *error = [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeSchemaMismatch userInfo:userInfo];
-    }
+    LogAndConvertDecodingError(err, error);
     return nil;
 }
 
 @end
 
 @implementation MTRThermostatClusterGetWeeklyScheduleResponseParams (InternalMethods)
+
+- (nullable instancetype)initWithDecodableStruct:(const chip::app::Clusters::Thermostat::Commands::GetWeeklyScheduleResponse::DecodableType &)decodableStruct
+{
+    if (!(self = [super init])) {
+        return nil;
+    }
+
+    CHIP_ERROR err = [self _setFieldsFromDecodableStruct:decodableStruct];
+    if (err == CHIP_NO_ERROR) {
+        return self;
+    }
+
+    LogAndConvertDecodingError(err, nil);
+    return nil;
+}
 
 - (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::Thermostat::Commands::GetWeeklyScheduleResponse::DecodableType &)decodableStruct
 {
@@ -22994,18 +23594,28 @@ NS_ASSUME_NONNULL_BEGIN
         }
     }
 
-    NSString * errorStr = [NSString stringWithFormat:@"Command payload decoding failed: %s", err.AsString()];
-    MTR_LOG_ERROR("%s", errorStr.UTF8String);
-    if (error != nil) {
-        NSDictionary * userInfo = @{ NSLocalizedFailureReasonErrorKey : NSLocalizedString(errorStr, nil) };
-        *error = [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeSchemaMismatch userInfo:userInfo];
-    }
+    LogAndConvertDecodingError(err, error);
     return nil;
 }
 
 @end
 
 @implementation MTRThermostatClusterAddThermostatSuggestionResponseParams (InternalMethods)
+
+- (nullable instancetype)initWithDecodableStruct:(const chip::app::Clusters::Thermostat::Commands::AddThermostatSuggestionResponse::DecodableType &)decodableStruct
+{
+    if (!(self = [super init])) {
+        return nil;
+    }
+
+    CHIP_ERROR err = [self _setFieldsFromDecodableStruct:decodableStruct];
+    if (err == CHIP_NO_ERROR) {
+        return self;
+    }
+
+    LogAndConvertDecodingError(err, nil);
+    return nil;
+}
 
 - (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::Thermostat::Commands::AddThermostatSuggestionResponse::DecodableType &)decodableStruct
 {
@@ -23490,18 +24100,28 @@ NS_ASSUME_NONNULL_BEGIN
         }
     }
 
-    NSString * errorStr = [NSString stringWithFormat:@"Command payload decoding failed: %s", err.AsString()];
-    MTR_LOG_ERROR("%s", errorStr.UTF8String);
-    if (error != nil) {
-        NSDictionary * userInfo = @{ NSLocalizedFailureReasonErrorKey : NSLocalizedString(errorStr, nil) };
-        *error = [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeSchemaMismatch userInfo:userInfo];
-    }
+    LogAndConvertDecodingError(err, error);
     return nil;
 }
 
 @end
 
 @implementation MTRThermostatClusterAtomicResponseParams (InternalMethods)
+
+- (nullable instancetype)initWithDecodableStruct:(const chip::app::Clusters::Thermostat::Commands::AtomicResponse::DecodableType &)decodableStruct
+{
+    if (!(self = [super init])) {
+        return nil;
+    }
+
+    CHIP_ERROR err = [self _setFieldsFromDecodableStruct:decodableStruct];
+    if (err == CHIP_NO_ERROR) {
+        return self;
+    }
+
+    LogAndConvertDecodingError(err, nil);
+    return nil;
+}
 
 - (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::Thermostat::Commands::AtomicResponse::DecodableType &)decodableStruct
 {
@@ -25826,18 +26446,28 @@ NS_ASSUME_NONNULL_BEGIN
         }
     }
 
-    NSString * errorStr = [NSString stringWithFormat:@"Command payload decoding failed: %s", err.AsString()];
-    MTR_LOG_ERROR("%s", errorStr.UTF8String);
-    if (error != nil) {
-        NSDictionary * userInfo = @{ NSLocalizedFailureReasonErrorKey : NSLocalizedString(errorStr, nil) };
-        *error = [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeSchemaMismatch userInfo:userInfo];
-    }
+    LogAndConvertDecodingError(err, error);
     return nil;
 }
 
 @end
 
 @implementation MTRWiFiNetworkManagementClusterNetworkPassphraseResponseParams (InternalMethods)
+
+- (nullable instancetype)initWithDecodableStruct:(const chip::app::Clusters::WiFiNetworkManagement::Commands::NetworkPassphraseResponse::DecodableType &)decodableStruct
+{
+    if (!(self = [super init])) {
+        return nil;
+    }
+
+    CHIP_ERROR err = [self _setFieldsFromDecodableStruct:decodableStruct];
+    if (err == CHIP_NO_ERROR) {
+        return self;
+    }
+
+    LogAndConvertDecodingError(err, nil);
+    return nil;
+}
 
 - (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::WiFiNetworkManagement::Commands::NetworkPassphraseResponse::DecodableType &)decodableStruct
 {
@@ -26051,18 +26681,28 @@ NS_ASSUME_NONNULL_BEGIN
         }
     }
 
-    NSString * errorStr = [NSString stringWithFormat:@"Command payload decoding failed: %s", err.AsString()];
-    MTR_LOG_ERROR("%s", errorStr.UTF8String);
-    if (error != nil) {
-        NSDictionary * userInfo = @{ NSLocalizedFailureReasonErrorKey : NSLocalizedString(errorStr, nil) };
-        *error = [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeSchemaMismatch userInfo:userInfo];
-    }
+    LogAndConvertDecodingError(err, error);
     return nil;
 }
 
 @end
 
 @implementation MTRThreadBorderRouterManagementClusterDatasetResponseParams (InternalMethods)
+
+- (nullable instancetype)initWithDecodableStruct:(const chip::app::Clusters::ThreadBorderRouterManagement::Commands::DatasetResponse::DecodableType &)decodableStruct
+{
+    if (!(self = [super init])) {
+        return nil;
+    }
+
+    CHIP_ERROR err = [self _setFieldsFromDecodableStruct:decodableStruct];
+    if (err == CHIP_NO_ERROR) {
+        return self;
+    }
+
+    LogAndConvertDecodingError(err, nil);
+    return nil;
+}
 
 - (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::ThreadBorderRouterManagement::Commands::DatasetResponse::DecodableType &)decodableStruct
 {
@@ -26534,18 +27174,28 @@ NS_ASSUME_NONNULL_BEGIN
         }
     }
 
-    NSString * errorStr = [NSString stringWithFormat:@"Command payload decoding failed: %s", err.AsString()];
-    MTR_LOG_ERROR("%s", errorStr.UTF8String);
-    if (error != nil) {
-        NSDictionary * userInfo = @{ NSLocalizedFailureReasonErrorKey : NSLocalizedString(errorStr, nil) };
-        *error = [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeSchemaMismatch userInfo:userInfo];
-    }
+    LogAndConvertDecodingError(err, error);
     return nil;
 }
 
 @end
 
 @implementation MTRThreadNetworkDirectoryClusterOperationalDatasetResponseParams (InternalMethods)
+
+- (nullable instancetype)initWithDecodableStruct:(const chip::app::Clusters::ThreadNetworkDirectory::Commands::OperationalDatasetResponse::DecodableType &)decodableStruct
+{
+    if (!(self = [super init])) {
+        return nil;
+    }
+
+    CHIP_ERROR err = [self _setFieldsFromDecodableStruct:decodableStruct];
+    if (err == CHIP_NO_ERROR) {
+        return self;
+    }
+
+    LogAndConvertDecodingError(err, nil);
+    return nil;
+}
 
 - (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::ThreadNetworkDirectory::Commands::OperationalDatasetResponse::DecodableType &)decodableStruct
 {
@@ -26697,18 +27347,28 @@ NS_ASSUME_NONNULL_BEGIN
         }
     }
 
-    NSString * errorStr = [NSString stringWithFormat:@"Command payload decoding failed: %s", err.AsString()];
-    MTR_LOG_ERROR("%s", errorStr.UTF8String);
-    if (error != nil) {
-        NSDictionary * userInfo = @{ NSLocalizedFailureReasonErrorKey : NSLocalizedString(errorStr, nil) };
-        *error = [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeSchemaMismatch userInfo:userInfo];
-    }
+    LogAndConvertDecodingError(err, error);
     return nil;
 }
 
 @end
 
 @implementation MTRChannelClusterChangeChannelResponseParams (InternalMethods)
+
+- (nullable instancetype)initWithDecodableStruct:(const chip::app::Clusters::Channel::Commands::ChangeChannelResponse::DecodableType &)decodableStruct
+{
+    if (!(self = [super init])) {
+        return nil;
+    }
+
+    CHIP_ERROR err = [self _setFieldsFromDecodableStruct:decodableStruct];
+    if (err == CHIP_NO_ERROR) {
+        return self;
+    }
+
+    LogAndConvertDecodingError(err, nil);
+    return nil;
+}
 
 - (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::Channel::Commands::ChangeChannelResponse::DecodableType &)decodableStruct
 {
@@ -27167,18 +27827,28 @@ NS_ASSUME_NONNULL_BEGIN
         }
     }
 
-    NSString * errorStr = [NSString stringWithFormat:@"Command payload decoding failed: %s", err.AsString()];
-    MTR_LOG_ERROR("%s", errorStr.UTF8String);
-    if (error != nil) {
-        NSDictionary * userInfo = @{ NSLocalizedFailureReasonErrorKey : NSLocalizedString(errorStr, nil) };
-        *error = [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeSchemaMismatch userInfo:userInfo];
-    }
+    LogAndConvertDecodingError(err, error);
     return nil;
 }
 
 @end
 
 @implementation MTRChannelClusterProgramGuideResponseParams (InternalMethods)
+
+- (nullable instancetype)initWithDecodableStruct:(const chip::app::Clusters::Channel::Commands::ProgramGuideResponse::DecodableType &)decodableStruct
+{
+    if (!(self = [super init])) {
+        return nil;
+    }
+
+    CHIP_ERROR err = [self _setFieldsFromDecodableStruct:decodableStruct];
+    if (err == CHIP_NO_ERROR) {
+        return self;
+    }
+
+    LogAndConvertDecodingError(err, nil);
+    return nil;
+}
 
 - (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::Channel::Commands::ProgramGuideResponse::DecodableType &)decodableStruct
 {
@@ -27940,18 +28610,28 @@ NS_ASSUME_NONNULL_BEGIN
         }
     }
 
-    NSString * errorStr = [NSString stringWithFormat:@"Command payload decoding failed: %s", err.AsString()];
-    MTR_LOG_ERROR("%s", errorStr.UTF8String);
-    if (error != nil) {
-        NSDictionary * userInfo = @{ NSLocalizedFailureReasonErrorKey : NSLocalizedString(errorStr, nil) };
-        *error = [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeSchemaMismatch userInfo:userInfo];
-    }
+    LogAndConvertDecodingError(err, error);
     return nil;
 }
 
 @end
 
 @implementation MTRTargetNavigatorClusterNavigateTargetResponseParams (InternalMethods)
+
+- (nullable instancetype)initWithDecodableStruct:(const chip::app::Clusters::TargetNavigator::Commands::NavigateTargetResponse::DecodableType &)decodableStruct
+{
+    if (!(self = [super init])) {
+        return nil;
+    }
+
+    CHIP_ERROR err = [self _setFieldsFromDecodableStruct:decodableStruct];
+    if (err == CHIP_NO_ERROR) {
+        return self;
+    }
+
+    LogAndConvertDecodingError(err, nil);
+    return nil;
+}
 
 - (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::TargetNavigator::Commands::NavigateTargetResponse::DecodableType &)decodableStruct
 {
@@ -28800,18 +29480,28 @@ NS_ASSUME_NONNULL_BEGIN
         }
     }
 
-    NSString * errorStr = [NSString stringWithFormat:@"Command payload decoding failed: %s", err.AsString()];
-    MTR_LOG_ERROR("%s", errorStr.UTF8String);
-    if (error != nil) {
-        NSDictionary * userInfo = @{ NSLocalizedFailureReasonErrorKey : NSLocalizedString(errorStr, nil) };
-        *error = [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeSchemaMismatch userInfo:userInfo];
-    }
+    LogAndConvertDecodingError(err, error);
     return nil;
 }
 
 @end
 
 @implementation MTRMediaPlaybackClusterPlaybackResponseParams (InternalMethods)
+
+- (nullable instancetype)initWithDecodableStruct:(const chip::app::Clusters::MediaPlayback::Commands::PlaybackResponse::DecodableType &)decodableStruct
+{
+    if (!(self = [super init])) {
+        return nil;
+    }
+
+    CHIP_ERROR err = [self _setFieldsFromDecodableStruct:decodableStruct];
+    if (err == CHIP_NO_ERROR) {
+        return self;
+    }
+
+    LogAndConvertDecodingError(err, nil);
+    return nil;
+}
 
 - (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::MediaPlayback::Commands::PlaybackResponse::DecodableType &)decodableStruct
 {
@@ -29670,18 +30360,28 @@ NS_ASSUME_NONNULL_BEGIN
         }
     }
 
-    NSString * errorStr = [NSString stringWithFormat:@"Command payload decoding failed: %s", err.AsString()];
-    MTR_LOG_ERROR("%s", errorStr.UTF8String);
-    if (error != nil) {
-        NSDictionary * userInfo = @{ NSLocalizedFailureReasonErrorKey : NSLocalizedString(errorStr, nil) };
-        *error = [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeSchemaMismatch userInfo:userInfo];
-    }
+    LogAndConvertDecodingError(err, error);
     return nil;
 }
 
 @end
 
 @implementation MTRKeypadInputClusterSendKeyResponseParams (InternalMethods)
+
+- (nullable instancetype)initWithDecodableStruct:(const chip::app::Clusters::KeypadInput::Commands::SendKeyResponse::DecodableType &)decodableStruct
+{
+    if (!(self = [super init])) {
+        return nil;
+    }
+
+    CHIP_ERROR err = [self _setFieldsFromDecodableStruct:decodableStruct];
+    if (err == CHIP_NO_ERROR) {
+        return self;
+    }
+
+    LogAndConvertDecodingError(err, nil);
+    return nil;
+}
 
 - (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::KeypadInput::Commands::SendKeyResponse::DecodableType &)decodableStruct
 {
@@ -30179,18 +30879,28 @@ NS_ASSUME_NONNULL_BEGIN
         }
     }
 
-    NSString * errorStr = [NSString stringWithFormat:@"Command payload decoding failed: %s", err.AsString()];
-    MTR_LOG_ERROR("%s", errorStr.UTF8String);
-    if (error != nil) {
-        NSDictionary * userInfo = @{ NSLocalizedFailureReasonErrorKey : NSLocalizedString(errorStr, nil) };
-        *error = [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeSchemaMismatch userInfo:userInfo];
-    }
+    LogAndConvertDecodingError(err, error);
     return nil;
 }
 
 @end
 
 @implementation MTRContentLauncherClusterLauncherResponseParams (InternalMethods)
+
+- (nullable instancetype)initWithDecodableStruct:(const chip::app::Clusters::ContentLauncher::Commands::LauncherResponse::DecodableType &)decodableStruct
+{
+    if (!(self = [super init])) {
+        return nil;
+    }
+
+    CHIP_ERROR err = [self _setFieldsFromDecodableStruct:decodableStruct];
+    if (err == CHIP_NO_ERROR) {
+        return self;
+    }
+
+    LogAndConvertDecodingError(err, nil);
+    return nil;
+}
 
 - (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::ContentLauncher::Commands::LauncherResponse::DecodableType &)decodableStruct
 {
@@ -30702,18 +31412,28 @@ NS_ASSUME_NONNULL_BEGIN
         }
     }
 
-    NSString * errorStr = [NSString stringWithFormat:@"Command payload decoding failed: %s", err.AsString()];
-    MTR_LOG_ERROR("%s", errorStr.UTF8String);
-    if (error != nil) {
-        NSDictionary * userInfo = @{ NSLocalizedFailureReasonErrorKey : NSLocalizedString(errorStr, nil) };
-        *error = [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeSchemaMismatch userInfo:userInfo];
-    }
+    LogAndConvertDecodingError(err, error);
     return nil;
 }
 
 @end
 
 @implementation MTRApplicationLauncherClusterLauncherResponseParams (InternalMethods)
+
+- (nullable instancetype)initWithDecodableStruct:(const chip::app::Clusters::ApplicationLauncher::Commands::LauncherResponse::DecodableType &)decodableStruct
+{
+    if (!(self = [super init])) {
+        return nil;
+    }
+
+    CHIP_ERROR err = [self _setFieldsFromDecodableStruct:decodableStruct];
+    if (err == CHIP_NO_ERROR) {
+        return self;
+    }
+
+    LogAndConvertDecodingError(err, nil);
+    return nil;
+}
 
 - (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::ApplicationLauncher::Commands::LauncherResponse::DecodableType &)decodableStruct
 {
@@ -30869,18 +31589,28 @@ NS_ASSUME_NONNULL_BEGIN
         }
     }
 
-    NSString * errorStr = [NSString stringWithFormat:@"Command payload decoding failed: %s", err.AsString()];
-    MTR_LOG_ERROR("%s", errorStr.UTF8String);
-    if (error != nil) {
-        NSDictionary * userInfo = @{ NSLocalizedFailureReasonErrorKey : NSLocalizedString(errorStr, nil) };
-        *error = [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeSchemaMismatch userInfo:userInfo];
-    }
+    LogAndConvertDecodingError(err, error);
     return nil;
 }
 
 @end
 
 @implementation MTRAccountLoginClusterGetSetupPINResponseParams (InternalMethods)
+
+- (nullable instancetype)initWithDecodableStruct:(const chip::app::Clusters::AccountLogin::Commands::GetSetupPINResponse::DecodableType &)decodableStruct
+{
+    if (!(self = [super init])) {
+        return nil;
+    }
+
+    CHIP_ERROR err = [self _setFieldsFromDecodableStruct:decodableStruct];
+    if (err == CHIP_NO_ERROR) {
+        return self;
+    }
+
+    LogAndConvertDecodingError(err, nil);
+    return nil;
+}
 
 - (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::AccountLogin::Commands::GetSetupPINResponse::DecodableType &)decodableStruct
 {
@@ -31289,18 +32019,28 @@ NS_ASSUME_NONNULL_BEGIN
         }
     }
 
-    NSString * errorStr = [NSString stringWithFormat:@"Command payload decoding failed: %s", err.AsString()];
-    MTR_LOG_ERROR("%s", errorStr.UTF8String);
-    if (error != nil) {
-        NSDictionary * userInfo = @{ NSLocalizedFailureReasonErrorKey : NSLocalizedString(errorStr, nil) };
-        *error = [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeSchemaMismatch userInfo:userInfo];
-    }
+    LogAndConvertDecodingError(err, error);
     return nil;
 }
 
 @end
 
 @implementation MTRContentControlClusterResetPINResponseParams (InternalMethods)
+
+- (nullable instancetype)initWithDecodableStruct:(const chip::app::Clusters::ContentControl::Commands::ResetPINResponse::DecodableType &)decodableStruct
+{
+    if (!(self = [super init])) {
+        return nil;
+    }
+
+    CHIP_ERROR err = [self _setFieldsFromDecodableStruct:decodableStruct];
+    if (err == CHIP_NO_ERROR) {
+        return self;
+    }
+
+    LogAndConvertDecodingError(err, nil);
+    return nil;
+}
 
 - (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::ContentControl::Commands::ResetPINResponse::DecodableType &)decodableStruct
 {
@@ -32086,18 +32826,28 @@ NS_ASSUME_NONNULL_BEGIN
         }
     }
 
-    NSString * errorStr = [NSString stringWithFormat:@"Command payload decoding failed: %s", err.AsString()];
-    MTR_LOG_ERROR("%s", errorStr.UTF8String);
-    if (error != nil) {
-        NSDictionary * userInfo = @{ NSLocalizedFailureReasonErrorKey : NSLocalizedString(errorStr, nil) };
-        *error = [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeSchemaMismatch userInfo:userInfo];
-    }
+    LogAndConvertDecodingError(err, error);
     return nil;
 }
 
 @end
 
 @implementation MTRContentAppObserverClusterContentAppMessageResponseParams (InternalMethods)
+
+- (nullable instancetype)initWithDecodableStruct:(const chip::app::Clusters::ContentAppObserver::Commands::ContentAppMessageResponse::DecodableType &)decodableStruct
+{
+    if (!(self = [super init])) {
+        return nil;
+    }
+
+    CHIP_ERROR err = [self _setFieldsFromDecodableStruct:decodableStruct];
+    if (err == CHIP_NO_ERROR) {
+        return self;
+    }
+
+    LogAndConvertDecodingError(err, nil);
+    return nil;
+}
 
 - (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::ContentAppObserver::Commands::ContentAppMessageResponse::DecodableType &)decodableStruct
 {
@@ -32295,18 +33045,28 @@ NS_ASSUME_NONNULL_BEGIN
         }
     }
 
-    NSString * errorStr = [NSString stringWithFormat:@"Command payload decoding failed: %s", err.AsString()];
-    MTR_LOG_ERROR("%s", errorStr.UTF8String);
-    if (error != nil) {
-        NSDictionary * userInfo = @{ NSLocalizedFailureReasonErrorKey : NSLocalizedString(errorStr, nil) };
-        *error = [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeSchemaMismatch userInfo:userInfo];
-    }
+    LogAndConvertDecodingError(err, error);
     return nil;
 }
 
 @end
 
 @implementation MTRZoneManagementClusterCreateTwoDCartesianZoneResponseParams (InternalMethods)
+
+- (nullable instancetype)initWithDecodableStruct:(const chip::app::Clusters::ZoneManagement::Commands::CreateTwoDCartesianZoneResponse::DecodableType &)decodableStruct
+{
+    if (!(self = [super init])) {
+        return nil;
+    }
+
+    CHIP_ERROR err = [self _setFieldsFromDecodableStruct:decodableStruct];
+    if (err == CHIP_NO_ERROR) {
+        return self;
+    }
+
+    LogAndConvertDecodingError(err, nil);
+    return nil;
+}
 
 - (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::ZoneManagement::Commands::CreateTwoDCartesianZoneResponse::DecodableType &)decodableStruct
 {
@@ -32842,18 +33602,28 @@ NS_ASSUME_NONNULL_BEGIN
         }
     }
 
-    NSString * errorStr = [NSString stringWithFormat:@"Command payload decoding failed: %s", err.AsString()];
-    MTR_LOG_ERROR("%s", errorStr.UTF8String);
-    if (error != nil) {
-        NSDictionary * userInfo = @{ NSLocalizedFailureReasonErrorKey : NSLocalizedString(errorStr, nil) };
-        *error = [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeSchemaMismatch userInfo:userInfo];
-    }
+    LogAndConvertDecodingError(err, error);
     return nil;
 }
 
 @end
 
 @implementation MTRCameraAVStreamManagementClusterAudioStreamAllocateResponseParams (InternalMethods)
+
+- (nullable instancetype)initWithDecodableStruct:(const chip::app::Clusters::CameraAvStreamManagement::Commands::AudioStreamAllocateResponse::DecodableType &)decodableStruct
+{
+    if (!(self = [super init])) {
+        return nil;
+    }
+
+    CHIP_ERROR err = [self _setFieldsFromDecodableStruct:decodableStruct];
+    if (err == CHIP_NO_ERROR) {
+        return self;
+    }
+
+    LogAndConvertDecodingError(err, nil);
+    return nil;
+}
 
 - (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::CameraAvStreamManagement::Commands::AudioStreamAllocateResponse::DecodableType &)decodableStruct
 {
@@ -33147,18 +33917,28 @@ NS_ASSUME_NONNULL_BEGIN
         }
     }
 
-    NSString * errorStr = [NSString stringWithFormat:@"Command payload decoding failed: %s", err.AsString()];
-    MTR_LOG_ERROR("%s", errorStr.UTF8String);
-    if (error != nil) {
-        NSDictionary * userInfo = @{ NSLocalizedFailureReasonErrorKey : NSLocalizedString(errorStr, nil) };
-        *error = [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeSchemaMismatch userInfo:userInfo];
-    }
+    LogAndConvertDecodingError(err, error);
     return nil;
 }
 
 @end
 
 @implementation MTRCameraAVStreamManagementClusterVideoStreamAllocateResponseParams (InternalMethods)
+
+- (nullable instancetype)initWithDecodableStruct:(const chip::app::Clusters::CameraAvStreamManagement::Commands::VideoStreamAllocateResponse::DecodableType &)decodableStruct
+{
+    if (!(self = [super init])) {
+        return nil;
+    }
+
+    CHIP_ERROR err = [self _setFieldsFromDecodableStruct:decodableStruct];
+    if (err == CHIP_NO_ERROR) {
+        return self;
+    }
+
+    LogAndConvertDecodingError(err, nil);
+    return nil;
+}
 
 - (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::CameraAvStreamManagement::Commands::VideoStreamAllocateResponse::DecodableType &)decodableStruct
 {
@@ -33525,18 +34305,28 @@ NS_ASSUME_NONNULL_BEGIN
         }
     }
 
-    NSString * errorStr = [NSString stringWithFormat:@"Command payload decoding failed: %s", err.AsString()];
-    MTR_LOG_ERROR("%s", errorStr.UTF8String);
-    if (error != nil) {
-        NSDictionary * userInfo = @{ NSLocalizedFailureReasonErrorKey : NSLocalizedString(errorStr, nil) };
-        *error = [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeSchemaMismatch userInfo:userInfo];
-    }
+    LogAndConvertDecodingError(err, error);
     return nil;
 }
 
 @end
 
 @implementation MTRCameraAVStreamManagementClusterSnapshotStreamAllocateResponseParams (InternalMethods)
+
+- (nullable instancetype)initWithDecodableStruct:(const chip::app::Clusters::CameraAvStreamManagement::Commands::SnapshotStreamAllocateResponse::DecodableType &)decodableStruct
+{
+    if (!(self = [super init])) {
+        return nil;
+    }
+
+    CHIP_ERROR err = [self _setFieldsFromDecodableStruct:decodableStruct];
+    if (err == CHIP_NO_ERROR) {
+        return self;
+    }
+
+    LogAndConvertDecodingError(err, nil);
+    return nil;
+}
 
 - (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::CameraAvStreamManagement::Commands::SnapshotStreamAllocateResponse::DecodableType &)decodableStruct
 {
@@ -33978,18 +34768,28 @@ NS_ASSUME_NONNULL_BEGIN
         }
     }
 
-    NSString * errorStr = [NSString stringWithFormat:@"Command payload decoding failed: %s", err.AsString()];
-    MTR_LOG_ERROR("%s", errorStr.UTF8String);
-    if (error != nil) {
-        NSDictionary * userInfo = @{ NSLocalizedFailureReasonErrorKey : NSLocalizedString(errorStr, nil) };
-        *error = [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeSchemaMismatch userInfo:userInfo];
-    }
+    LogAndConvertDecodingError(err, error);
     return nil;
 }
 
 @end
 
 @implementation MTRCameraAVStreamManagementClusterCaptureSnapshotResponseParams (InternalMethods)
+
+- (nullable instancetype)initWithDecodableStruct:(const chip::app::Clusters::CameraAvStreamManagement::Commands::CaptureSnapshotResponse::DecodableType &)decodableStruct
+{
+    if (!(self = [super init])) {
+        return nil;
+    }
+
+    CHIP_ERROR err = [self _setFieldsFromDecodableStruct:decodableStruct];
+    if (err == CHIP_NO_ERROR) {
+        return self;
+    }
+
+    LogAndConvertDecodingError(err, nil);
+    return nil;
+}
 
 - (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::CameraAvStreamManagement::Commands::CaptureSnapshotResponse::DecodableType &)decodableStruct
 {
@@ -34921,18 +35721,28 @@ NS_ASSUME_NONNULL_BEGIN
         }
     }
 
-    NSString * errorStr = [NSString stringWithFormat:@"Command payload decoding failed: %s", err.AsString()];
-    MTR_LOG_ERROR("%s", errorStr.UTF8String);
-    if (error != nil) {
-        NSDictionary * userInfo = @{ NSLocalizedFailureReasonErrorKey : NSLocalizedString(errorStr, nil) };
-        *error = [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeSchemaMismatch userInfo:userInfo];
-    }
+    LogAndConvertDecodingError(err, error);
     return nil;
 }
 
 @end
 
 @implementation MTRWebRTCTransportProviderClusterSolicitOfferResponseParams (InternalMethods)
+
+- (nullable instancetype)initWithDecodableStruct:(const chip::app::Clusters::WebRTCTransportProvider::Commands::SolicitOfferResponse::DecodableType &)decodableStruct
+{
+    if (!(self = [super init])) {
+        return nil;
+    }
+
+    CHIP_ERROR err = [self _setFieldsFromDecodableStruct:decodableStruct];
+    if (err == CHIP_NO_ERROR) {
+        return self;
+    }
+
+    LogAndConvertDecodingError(err, nil);
+    return nil;
+}
 
 - (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::WebRTCTransportProvider::Commands::SolicitOfferResponse::DecodableType &)decodableStruct
 {
@@ -35255,18 +36065,28 @@ NS_ASSUME_NONNULL_BEGIN
         }
     }
 
-    NSString * errorStr = [NSString stringWithFormat:@"Command payload decoding failed: %s", err.AsString()];
-    MTR_LOG_ERROR("%s", errorStr.UTF8String);
-    if (error != nil) {
-        NSDictionary * userInfo = @{ NSLocalizedFailureReasonErrorKey : NSLocalizedString(errorStr, nil) };
-        *error = [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeSchemaMismatch userInfo:userInfo];
-    }
+    LogAndConvertDecodingError(err, error);
     return nil;
 }
 
 @end
 
 @implementation MTRWebRTCTransportProviderClusterProvideOfferResponseParams (InternalMethods)
+
+- (nullable instancetype)initWithDecodableStruct:(const chip::app::Clusters::WebRTCTransportProvider::Commands::ProvideOfferResponse::DecodableType &)decodableStruct
+{
+    if (!(self = [super init])) {
+        return nil;
+    }
+
+    CHIP_ERROR err = [self _setFieldsFromDecodableStruct:decodableStruct];
+    if (err == CHIP_NO_ERROR) {
+        return self;
+    }
+
+    LogAndConvertDecodingError(err, nil);
+    return nil;
+}
 
 - (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::WebRTCTransportProvider::Commands::ProvideOfferResponse::DecodableType &)decodableStruct
 {
@@ -36279,18 +37099,28 @@ NS_ASSUME_NONNULL_BEGIN
         }
     }
 
-    NSString * errorStr = [NSString stringWithFormat:@"Command payload decoding failed: %s", err.AsString()];
-    MTR_LOG_ERROR("%s", errorStr.UTF8String);
-    if (error != nil) {
-        NSDictionary * userInfo = @{ NSLocalizedFailureReasonErrorKey : NSLocalizedString(errorStr, nil) };
-        *error = [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeSchemaMismatch userInfo:userInfo];
-    }
+    LogAndConvertDecodingError(err, error);
     return nil;
 }
 
 @end
 
 @implementation MTRPushAVStreamTransportClusterAllocatePushTransportResponseParams (InternalMethods)
+
+- (nullable instancetype)initWithDecodableStruct:(const chip::app::Clusters::PushAvStreamTransport::Commands::AllocatePushTransportResponse::DecodableType &)decodableStruct
+{
+    if (!(self = [super init])) {
+        return nil;
+    }
+
+    CHIP_ERROR err = [self _setFieldsFromDecodableStruct:decodableStruct];
+    if (err == CHIP_NO_ERROR) {
+        return self;
+    }
+
+    LogAndConvertDecodingError(err, nil);
+    return nil;
+}
 
 - (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::PushAvStreamTransport::Commands::AllocatePushTransportResponse::DecodableType &)decodableStruct
 {
@@ -37037,18 +37867,28 @@ NS_ASSUME_NONNULL_BEGIN
         }
     }
 
-    NSString * errorStr = [NSString stringWithFormat:@"Command payload decoding failed: %s", err.AsString()];
-    MTR_LOG_ERROR("%s", errorStr.UTF8String);
-    if (error != nil) {
-        NSDictionary * userInfo = @{ NSLocalizedFailureReasonErrorKey : NSLocalizedString(errorStr, nil) };
-        *error = [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeSchemaMismatch userInfo:userInfo];
-    }
+    LogAndConvertDecodingError(err, error);
     return nil;
 }
 
 @end
 
 @implementation MTRPushAVStreamTransportClusterFindTransportResponseParams (InternalMethods)
+
+- (nullable instancetype)initWithDecodableStruct:(const chip::app::Clusters::PushAvStreamTransport::Commands::FindTransportResponse::DecodableType &)decodableStruct
+{
+    if (!(self = [super init])) {
+        return nil;
+    }
+
+    CHIP_ERROR err = [self _setFieldsFromDecodableStruct:decodableStruct];
+    if (err == CHIP_NO_ERROR) {
+        return self;
+    }
+
+    LogAndConvertDecodingError(err, nil);
+    return nil;
+}
 
 - (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::PushAvStreamTransport::Commands::FindTransportResponse::DecodableType &)decodableStruct
 {
@@ -37416,18 +38256,28 @@ NS_ASSUME_NONNULL_BEGIN
         }
     }
 
-    NSString * errorStr = [NSString stringWithFormat:@"Command payload decoding failed: %s", err.AsString()];
-    MTR_LOG_ERROR("%s", errorStr.UTF8String);
-    if (error != nil) {
-        NSDictionary * userInfo = @{ NSLocalizedFailureReasonErrorKey : NSLocalizedString(errorStr, nil) };
-        *error = [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeSchemaMismatch userInfo:userInfo];
-    }
+    LogAndConvertDecodingError(err, error);
     return nil;
 }
 
 @end
 
 @implementation MTRCommodityTariffClusterGetTariffComponentResponseParams (InternalMethods)
+
+- (nullable instancetype)initWithDecodableStruct:(const chip::app::Clusters::CommodityTariff::Commands::GetTariffComponentResponse::DecodableType &)decodableStruct
+{
+    if (!(self = [super init])) {
+        return nil;
+    }
+
+    CHIP_ERROR err = [self _setFieldsFromDecodableStruct:decodableStruct];
+    if (err == CHIP_NO_ERROR) {
+        return self;
+    }
+
+    LogAndConvertDecodingError(err, nil);
+    return nil;
+}
 
 - (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::CommodityTariff::Commands::GetTariffComponentResponse::DecodableType &)decodableStruct
 {
@@ -37685,18 +38535,28 @@ NS_ASSUME_NONNULL_BEGIN
         }
     }
 
-    NSString * errorStr = [NSString stringWithFormat:@"Command payload decoding failed: %s", err.AsString()];
-    MTR_LOG_ERROR("%s", errorStr.UTF8String);
-    if (error != nil) {
-        NSDictionary * userInfo = @{ NSLocalizedFailureReasonErrorKey : NSLocalizedString(errorStr, nil) };
-        *error = [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeSchemaMismatch userInfo:userInfo];
-    }
+    LogAndConvertDecodingError(err, error);
     return nil;
 }
 
 @end
 
 @implementation MTRCommodityTariffClusterGetDayEntryResponseParams (InternalMethods)
+
+- (nullable instancetype)initWithDecodableStruct:(const chip::app::Clusters::CommodityTariff::Commands::GetDayEntryResponse::DecodableType &)decodableStruct
+{
+    if (!(self = [super init])) {
+        return nil;
+    }
+
+    CHIP_ERROR err = [self _setFieldsFromDecodableStruct:decodableStruct];
+    if (err == CHIP_NO_ERROR) {
+        return self;
+    }
+
+    LogAndConvertDecodingError(err, nil);
+    return nil;
+}
 
 - (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::CommodityTariff::Commands::GetDayEntryResponse::DecodableType &)decodableStruct
 {
@@ -37978,18 +38838,28 @@ NS_ASSUME_NONNULL_BEGIN
         }
     }
 
-    NSString * errorStr = [NSString stringWithFormat:@"Command payload decoding failed: %s", err.AsString()];
-    MTR_LOG_ERROR("%s", errorStr.UTF8String);
-    if (error != nil) {
-        NSDictionary * userInfo = @{ NSLocalizedFailureReasonErrorKey : NSLocalizedString(errorStr, nil) };
-        *error = [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeSchemaMismatch userInfo:userInfo];
-    }
+    LogAndConvertDecodingError(err, error);
     return nil;
 }
 
 @end
 
 @implementation MTRCommissionerControlClusterReverseOpenCommissioningWindowParams (InternalMethods)
+
+- (nullable instancetype)initWithDecodableStruct:(const chip::app::Clusters::CommissionerControl::Commands::ReverseOpenCommissioningWindow::DecodableType &)decodableStruct
+{
+    if (!(self = [super init])) {
+        return nil;
+    }
+
+    CHIP_ERROR err = [self _setFieldsFromDecodableStruct:decodableStruct];
+    if (err == CHIP_NO_ERROR) {
+        return self;
+    }
+
+    LogAndConvertDecodingError(err, nil);
+    return nil;
+}
 
 - (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::CommissionerControl::Commands::ReverseOpenCommissioningWindow::DecodableType &)decodableStruct
 {
@@ -40111,18 +40981,28 @@ NS_ASSUME_NONNULL_BEGIN
         }
     }
 
-    NSString * errorStr = [NSString stringWithFormat:@"Command payload decoding failed: %s", err.AsString()];
-    MTR_LOG_ERROR("%s", errorStr.UTF8String);
-    if (error != nil) {
-        NSDictionary * userInfo = @{ NSLocalizedFailureReasonErrorKey : NSLocalizedString(errorStr, nil) };
-        *error = [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeSchemaMismatch userInfo:userInfo];
-    }
+    LogAndConvertDecodingError(err, error);
     return nil;
 }
 
 @end
 
 @implementation MTRJointFabricAdministratorClusterICACCSRResponseParams (InternalMethods)
+
+- (nullable instancetype)initWithDecodableStruct:(const chip::app::Clusters::JointFabricAdministrator::Commands::ICACCSRResponse::DecodableType &)decodableStruct
+{
+    if (!(self = [super init])) {
+        return nil;
+    }
+
+    CHIP_ERROR err = [self _setFieldsFromDecodableStruct:decodableStruct];
+    if (err == CHIP_NO_ERROR) {
+        return self;
+    }
+
+    LogAndConvertDecodingError(err, nil);
+    return nil;
+}
 
 - (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::JointFabricAdministrator::Commands::ICACCSRResponse::DecodableType &)decodableStruct
 {
@@ -40269,18 +41149,28 @@ NS_ASSUME_NONNULL_BEGIN
         }
     }
 
-    NSString * errorStr = [NSString stringWithFormat:@"Command payload decoding failed: %s", err.AsString()];
-    MTR_LOG_ERROR("%s", errorStr.UTF8String);
-    if (error != nil) {
-        NSDictionary * userInfo = @{ NSLocalizedFailureReasonErrorKey : NSLocalizedString(errorStr, nil) };
-        *error = [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeSchemaMismatch userInfo:userInfo];
-    }
+    LogAndConvertDecodingError(err, error);
     return nil;
 }
 
 @end
 
 @implementation MTRJointFabricAdministratorClusterICACResponseParams (InternalMethods)
+
+- (nullable instancetype)initWithDecodableStruct:(const chip::app::Clusters::JointFabricAdministrator::Commands::ICACResponse::DecodableType &)decodableStruct
+{
+    if (!(self = [super init])) {
+        return nil;
+    }
+
+    CHIP_ERROR err = [self _setFieldsFromDecodableStruct:decodableStruct];
+    if (err == CHIP_NO_ERROR) {
+        return self;
+    }
+
+    LogAndConvertDecodingError(err, nil);
+    return nil;
+}
 
 - (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::JointFabricAdministrator::Commands::ICACResponse::DecodableType &)decodableStruct
 {
@@ -40524,18 +41414,28 @@ NS_ASSUME_NONNULL_BEGIN
         }
     }
 
-    NSString * errorStr = [NSString stringWithFormat:@"Command payload decoding failed: %s", err.AsString()];
-    MTR_LOG_ERROR("%s", errorStr.UTF8String);
-    if (error != nil) {
-        NSDictionary * userInfo = @{ NSLocalizedFailureReasonErrorKey : NSLocalizedString(errorStr, nil) };
-        *error = [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeSchemaMismatch userInfo:userInfo];
-    }
+    LogAndConvertDecodingError(err, error);
     return nil;
 }
 
 @end
 
 @implementation MTRJointFabricAdministratorClusterTransferAnchorResponseParams (InternalMethods)
+
+- (nullable instancetype)initWithDecodableStruct:(const chip::app::Clusters::JointFabricAdministrator::Commands::TransferAnchorResponse::DecodableType &)decodableStruct
+{
+    if (!(self = [super init])) {
+        return nil;
+    }
+
+    CHIP_ERROR err = [self _setFieldsFromDecodableStruct:decodableStruct];
+    if (err == CHIP_NO_ERROR) {
+        return self;
+    }
+
+    LogAndConvertDecodingError(err, nil);
+    return nil;
+}
 
 - (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::JointFabricAdministrator::Commands::TransferAnchorResponse::DecodableType &)decodableStruct
 {
@@ -40845,18 +41745,28 @@ NS_ASSUME_NONNULL_BEGIN
         }
     }
 
-    NSString * errorStr = [NSString stringWithFormat:@"Command payload decoding failed: %s", err.AsString()];
-    MTR_LOG_ERROR("%s", errorStr.UTF8String);
-    if (error != nil) {
-        NSDictionary * userInfo = @{ NSLocalizedFailureReasonErrorKey : NSLocalizedString(errorStr, nil) };
-        *error = [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeSchemaMismatch userInfo:userInfo];
-    }
+    LogAndConvertDecodingError(err, error);
     return nil;
 }
 
 @end
 
 @implementation MTRTLSCertificateManagementClusterProvisionRootCertificateResponseParams (InternalMethods)
+
+- (nullable instancetype)initWithDecodableStruct:(const chip::app::Clusters::TlsCertificateManagement::Commands::ProvisionRootCertificateResponse::DecodableType &)decodableStruct
+{
+    if (!(self = [super init])) {
+        return nil;
+    }
+
+    CHIP_ERROR err = [self _setFieldsFromDecodableStruct:decodableStruct];
+    if (err == CHIP_NO_ERROR) {
+        return self;
+    }
+
+    LogAndConvertDecodingError(err, nil);
+    return nil;
+}
 
 - (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::TlsCertificateManagement::Commands::ProvisionRootCertificateResponse::DecodableType &)decodableStruct
 {
@@ -41008,18 +41918,28 @@ NS_ASSUME_NONNULL_BEGIN
         }
     }
 
-    NSString * errorStr = [NSString stringWithFormat:@"Command payload decoding failed: %s", err.AsString()];
-    MTR_LOG_ERROR("%s", errorStr.UTF8String);
-    if (error != nil) {
-        NSDictionary * userInfo = @{ NSLocalizedFailureReasonErrorKey : NSLocalizedString(errorStr, nil) };
-        *error = [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeSchemaMismatch userInfo:userInfo];
-    }
+    LogAndConvertDecodingError(err, error);
     return nil;
 }
 
 @end
 
 @implementation MTRTLSCertificateManagementClusterFindRootCertificateResponseParams (InternalMethods)
+
+- (nullable instancetype)initWithDecodableStruct:(const chip::app::Clusters::TlsCertificateManagement::Commands::FindRootCertificateResponse::DecodableType &)decodableStruct
+{
+    if (!(self = [super init])) {
+        return nil;
+    }
+
+    CHIP_ERROR err = [self _setFieldsFromDecodableStruct:decodableStruct];
+    if (err == CHIP_NO_ERROR) {
+        return self;
+    }
+
+    LogAndConvertDecodingError(err, nil);
+    return nil;
+}
 
 - (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::TlsCertificateManagement::Commands::FindRootCertificateResponse::DecodableType &)decodableStruct
 {
@@ -41187,18 +42107,28 @@ NS_ASSUME_NONNULL_BEGIN
         }
     }
 
-    NSString * errorStr = [NSString stringWithFormat:@"Command payload decoding failed: %s", err.AsString()];
-    MTR_LOG_ERROR("%s", errorStr.UTF8String);
-    if (error != nil) {
-        NSDictionary * userInfo = @{ NSLocalizedFailureReasonErrorKey : NSLocalizedString(errorStr, nil) };
-        *error = [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeSchemaMismatch userInfo:userInfo];
-    }
+    LogAndConvertDecodingError(err, error);
     return nil;
 }
 
 @end
 
 @implementation MTRTLSCertificateManagementClusterLookupRootCertificateResponseParams (InternalMethods)
+
+- (nullable instancetype)initWithDecodableStruct:(const chip::app::Clusters::TlsCertificateManagement::Commands::LookupRootCertificateResponse::DecodableType &)decodableStruct
+{
+    if (!(self = [super init])) {
+        return nil;
+    }
+
+    CHIP_ERROR err = [self _setFieldsFromDecodableStruct:decodableStruct];
+    if (err == CHIP_NO_ERROR) {
+        return self;
+    }
+
+    LogAndConvertDecodingError(err, nil);
+    return nil;
+}
 
 - (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::TlsCertificateManagement::Commands::LookupRootCertificateResponse::DecodableType &)decodableStruct
 {
@@ -41430,18 +42360,28 @@ NS_ASSUME_NONNULL_BEGIN
         }
     }
 
-    NSString * errorStr = [NSString stringWithFormat:@"Command payload decoding failed: %s", err.AsString()];
-    MTR_LOG_ERROR("%s", errorStr.UTF8String);
-    if (error != nil) {
-        NSDictionary * userInfo = @{ NSLocalizedFailureReasonErrorKey : NSLocalizedString(errorStr, nil) };
-        *error = [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeSchemaMismatch userInfo:userInfo];
-    }
+    LogAndConvertDecodingError(err, error);
     return nil;
 }
 
 @end
 
 @implementation MTRTLSCertificateManagementClusterTLSClientCSRResponseParams (InternalMethods)
+
+- (nullable instancetype)initWithDecodableStruct:(const chip::app::Clusters::TlsCertificateManagement::Commands::TLSClientCSRResponse::DecodableType &)decodableStruct
+{
+    if (!(self = [super init])) {
+        return nil;
+    }
+
+    CHIP_ERROR err = [self _setFieldsFromDecodableStruct:decodableStruct];
+    if (err == CHIP_NO_ERROR) {
+        return self;
+    }
+
+    LogAndConvertDecodingError(err, nil);
+    return nil;
+}
 
 - (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::TlsCertificateManagement::Commands::TLSClientCSRResponse::DecodableType &)decodableStruct
 {
@@ -41715,18 +42655,28 @@ NS_ASSUME_NONNULL_BEGIN
         }
     }
 
-    NSString * errorStr = [NSString stringWithFormat:@"Command payload decoding failed: %s", err.AsString()];
-    MTR_LOG_ERROR("%s", errorStr.UTF8String);
-    if (error != nil) {
-        NSDictionary * userInfo = @{ NSLocalizedFailureReasonErrorKey : NSLocalizedString(errorStr, nil) };
-        *error = [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeSchemaMismatch userInfo:userInfo];
-    }
+    LogAndConvertDecodingError(err, error);
     return nil;
 }
 
 @end
 
 @implementation MTRTLSCertificateManagementClusterFindClientCertificateResponseParams (InternalMethods)
+
+- (nullable instancetype)initWithDecodableStruct:(const chip::app::Clusters::TlsCertificateManagement::Commands::FindClientCertificateResponse::DecodableType &)decodableStruct
+{
+    if (!(self = [super init])) {
+        return nil;
+    }
+
+    CHIP_ERROR err = [self _setFieldsFromDecodableStruct:decodableStruct];
+    if (err == CHIP_NO_ERROR) {
+        return self;
+    }
+
+    LogAndConvertDecodingError(err, nil);
+    return nil;
+}
 
 - (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::TlsCertificateManagement::Commands::FindClientCertificateResponse::DecodableType &)decodableStruct
 {
@@ -41913,18 +42863,28 @@ NS_ASSUME_NONNULL_BEGIN
         }
     }
 
-    NSString * errorStr = [NSString stringWithFormat:@"Command payload decoding failed: %s", err.AsString()];
-    MTR_LOG_ERROR("%s", errorStr.UTF8String);
-    if (error != nil) {
-        NSDictionary * userInfo = @{ NSLocalizedFailureReasonErrorKey : NSLocalizedString(errorStr, nil) };
-        *error = [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeSchemaMismatch userInfo:userInfo];
-    }
+    LogAndConvertDecodingError(err, error);
     return nil;
 }
 
 @end
 
 @implementation MTRTLSCertificateManagementClusterLookupClientCertificateResponseParams (InternalMethods)
+
+- (nullable instancetype)initWithDecodableStruct:(const chip::app::Clusters::TlsCertificateManagement::Commands::LookupClientCertificateResponse::DecodableType &)decodableStruct
+{
+    if (!(self = [super init])) {
+        return nil;
+    }
+
+    CHIP_ERROR err = [self _setFieldsFromDecodableStruct:decodableStruct];
+    if (err == CHIP_NO_ERROR) {
+        return self;
+    }
+
+    LogAndConvertDecodingError(err, nil);
+    return nil;
+}
 
 - (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::TlsCertificateManagement::Commands::LookupClientCertificateResponse::DecodableType &)decodableStruct
 {
@@ -42184,18 +43144,28 @@ NS_ASSUME_NONNULL_BEGIN
         }
     }
 
-    NSString * errorStr = [NSString stringWithFormat:@"Command payload decoding failed: %s", err.AsString()];
-    MTR_LOG_ERROR("%s", errorStr.UTF8String);
-    if (error != nil) {
-        NSDictionary * userInfo = @{ NSLocalizedFailureReasonErrorKey : NSLocalizedString(errorStr, nil) };
-        *error = [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeSchemaMismatch userInfo:userInfo];
-    }
+    LogAndConvertDecodingError(err, error);
     return nil;
 }
 
 @end
 
 @implementation MTRTLSClientManagementClusterProvisionEndpointResponseParams (InternalMethods)
+
+- (nullable instancetype)initWithDecodableStruct:(const chip::app::Clusters::TlsClientManagement::Commands::ProvisionEndpointResponse::DecodableType &)decodableStruct
+{
+    if (!(self = [super init])) {
+        return nil;
+    }
+
+    CHIP_ERROR err = [self _setFieldsFromDecodableStruct:decodableStruct];
+    if (err == CHIP_NO_ERROR) {
+        return self;
+    }
+
+    LogAndConvertDecodingError(err, nil);
+    return nil;
+}
 
 - (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::TlsClientManagement::Commands::ProvisionEndpointResponse::DecodableType &)decodableStruct
 {
@@ -42342,18 +43312,28 @@ NS_ASSUME_NONNULL_BEGIN
         }
     }
 
-    NSString * errorStr = [NSString stringWithFormat:@"Command payload decoding failed: %s", err.AsString()];
-    MTR_LOG_ERROR("%s", errorStr.UTF8String);
-    if (error != nil) {
-        NSDictionary * userInfo = @{ NSLocalizedFailureReasonErrorKey : NSLocalizedString(errorStr, nil) };
-        *error = [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeSchemaMismatch userInfo:userInfo];
-    }
+    LogAndConvertDecodingError(err, error);
     return nil;
 }
 
 @end
 
 @implementation MTRTLSClientManagementClusterFindEndpointResponseParams (InternalMethods)
+
+- (nullable instancetype)initWithDecodableStruct:(const chip::app::Clusters::TlsClientManagement::Commands::FindEndpointResponse::DecodableType &)decodableStruct
+{
+    if (!(self = [super init])) {
+        return nil;
+    }
+
+    CHIP_ERROR err = [self _setFieldsFromDecodableStruct:decodableStruct];
+    if (err == CHIP_NO_ERROR) {
+        return self;
+    }
+
+    LogAndConvertDecodingError(err, nil);
+    return nil;
+}
 
 - (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::TlsClientManagement::Commands::FindEndpointResponse::DecodableType &)decodableStruct
 {
@@ -42591,18 +43571,28 @@ NS_ASSUME_NONNULL_BEGIN
         }
     }
 
-    NSString * errorStr = [NSString stringWithFormat:@"Command payload decoding failed: %s", err.AsString()];
-    MTR_LOG_ERROR("%s", errorStr.UTF8String);
-    if (error != nil) {
-        NSDictionary * userInfo = @{ NSLocalizedFailureReasonErrorKey : NSLocalizedString(errorStr, nil) };
-        *error = [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeSchemaMismatch userInfo:userInfo];
-    }
+    LogAndConvertDecodingError(err, error);
     return nil;
 }
 
 @end
 
 @implementation MTRUnitTestingClusterTestSpecificResponseParams (InternalMethods)
+
+- (nullable instancetype)initWithDecodableStruct:(const chip::app::Clusters::UnitTesting::Commands::TestSpecificResponse::DecodableType &)decodableStruct
+{
+    if (!(self = [super init])) {
+        return nil;
+    }
+
+    CHIP_ERROR err = [self _setFieldsFromDecodableStruct:decodableStruct];
+    if (err == CHIP_NO_ERROR) {
+        return self;
+    }
+
+    LogAndConvertDecodingError(err, nil);
+    return nil;
+}
 
 - (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::UnitTesting::Commands::TestSpecificResponse::DecodableType &)decodableStruct
 {
@@ -42755,18 +43745,28 @@ NS_ASSUME_NONNULL_BEGIN
         }
     }
 
-    NSString * errorStr = [NSString stringWithFormat:@"Command payload decoding failed: %s", err.AsString()];
-    MTR_LOG_ERROR("%s", errorStr.UTF8String);
-    if (error != nil) {
-        NSDictionary * userInfo = @{ NSLocalizedFailureReasonErrorKey : NSLocalizedString(errorStr, nil) };
-        *error = [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeSchemaMismatch userInfo:userInfo];
-    }
+    LogAndConvertDecodingError(err, error);
     return nil;
 }
 
 @end
 
 @implementation MTRUnitTestingClusterTestAddArgumentsResponseParams (InternalMethods)
+
+- (nullable instancetype)initWithDecodableStruct:(const chip::app::Clusters::UnitTesting::Commands::TestAddArgumentsResponse::DecodableType &)decodableStruct
+{
+    if (!(self = [super init])) {
+        return nil;
+    }
+
+    CHIP_ERROR err = [self _setFieldsFromDecodableStruct:decodableStruct];
+    if (err == CHIP_NO_ERROR) {
+        return self;
+    }
+
+    LogAndConvertDecodingError(err, nil);
+    return nil;
+}
 
 - (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::UnitTesting::Commands::TestAddArgumentsResponse::DecodableType &)decodableStruct
 {
@@ -42919,18 +43919,28 @@ NS_ASSUME_NONNULL_BEGIN
         }
     }
 
-    NSString * errorStr = [NSString stringWithFormat:@"Command payload decoding failed: %s", err.AsString()];
-    MTR_LOG_ERROR("%s", errorStr.UTF8String);
-    if (error != nil) {
-        NSDictionary * userInfo = @{ NSLocalizedFailureReasonErrorKey : NSLocalizedString(errorStr, nil) };
-        *error = [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeSchemaMismatch userInfo:userInfo];
-    }
+    LogAndConvertDecodingError(err, error);
     return nil;
 }
 
 @end
 
 @implementation MTRUnitTestingClusterTestSimpleArgumentResponseParams (InternalMethods)
+
+- (nullable instancetype)initWithDecodableStruct:(const chip::app::Clusters::UnitTesting::Commands::TestSimpleArgumentResponse::DecodableType &)decodableStruct
+{
+    if (!(self = [super init])) {
+        return nil;
+    }
+
+    CHIP_ERROR err = [self _setFieldsFromDecodableStruct:decodableStruct];
+    if (err == CHIP_NO_ERROR) {
+        return self;
+    }
+
+    LogAndConvertDecodingError(err, nil);
+    return nil;
+}
 
 - (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::UnitTesting::Commands::TestSimpleArgumentResponse::DecodableType &)decodableStruct
 {
@@ -43098,18 +44108,28 @@ NS_ASSUME_NONNULL_BEGIN
         }
     }
 
-    NSString * errorStr = [NSString stringWithFormat:@"Command payload decoding failed: %s", err.AsString()];
-    MTR_LOG_ERROR("%s", errorStr.UTF8String);
-    if (error != nil) {
-        NSDictionary * userInfo = @{ NSLocalizedFailureReasonErrorKey : NSLocalizedString(errorStr, nil) };
-        *error = [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeSchemaMismatch userInfo:userInfo];
-    }
+    LogAndConvertDecodingError(err, error);
     return nil;
 }
 
 @end
 
 @implementation MTRUnitTestingClusterTestStructArrayArgumentResponseParams (InternalMethods)
+
+- (nullable instancetype)initWithDecodableStruct:(const chip::app::Clusters::UnitTesting::Commands::TestStructArrayArgumentResponse::DecodableType &)decodableStruct
+{
+    if (!(self = [super init])) {
+        return nil;
+    }
+
+    CHIP_ERROR err = [self _setFieldsFromDecodableStruct:decodableStruct];
+    if (err == CHIP_NO_ERROR) {
+        return self;
+    }
+
+    LogAndConvertDecodingError(err, nil);
+    return nil;
+}
 
 - (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::UnitTesting::Commands::TestStructArrayArgumentResponse::DecodableType &)decodableStruct
 {
@@ -43466,18 +44486,28 @@ NS_ASSUME_NONNULL_BEGIN
         }
     }
 
-    NSString * errorStr = [NSString stringWithFormat:@"Command payload decoding failed: %s", err.AsString()];
-    MTR_LOG_ERROR("%s", errorStr.UTF8String);
-    if (error != nil) {
-        NSDictionary * userInfo = @{ NSLocalizedFailureReasonErrorKey : NSLocalizedString(errorStr, nil) };
-        *error = [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeSchemaMismatch userInfo:userInfo];
-    }
+    LogAndConvertDecodingError(err, error);
     return nil;
 }
 
 @end
 
 @implementation MTRUnitTestingClusterTestListInt8UReverseResponseParams (InternalMethods)
+
+- (nullable instancetype)initWithDecodableStruct:(const chip::app::Clusters::UnitTesting::Commands::TestListInt8UReverseResponse::DecodableType &)decodableStruct
+{
+    if (!(self = [super init])) {
+        return nil;
+    }
+
+    CHIP_ERROR err = [self _setFieldsFromDecodableStruct:decodableStruct];
+    if (err == CHIP_NO_ERROR) {
+        return self;
+    }
+
+    LogAndConvertDecodingError(err, nil);
+    return nil;
+}
 
 - (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::UnitTesting::Commands::TestListInt8UReverseResponse::DecodableType &)decodableStruct
 {
@@ -43654,18 +44684,28 @@ NS_ASSUME_NONNULL_BEGIN
         }
     }
 
-    NSString * errorStr = [NSString stringWithFormat:@"Command payload decoding failed: %s", err.AsString()];
-    MTR_LOG_ERROR("%s", errorStr.UTF8String);
-    if (error != nil) {
-        NSDictionary * userInfo = @{ NSLocalizedFailureReasonErrorKey : NSLocalizedString(errorStr, nil) };
-        *error = [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeSchemaMismatch userInfo:userInfo];
-    }
+    LogAndConvertDecodingError(err, error);
     return nil;
 }
 
 @end
 
 @implementation MTRUnitTestingClusterTestEnumsResponseParams (InternalMethods)
+
+- (nullable instancetype)initWithDecodableStruct:(const chip::app::Clusters::UnitTesting::Commands::TestEnumsResponse::DecodableType &)decodableStruct
+{
+    if (!(self = [super init])) {
+        return nil;
+    }
+
+    CHIP_ERROR err = [self _setFieldsFromDecodableStruct:decodableStruct];
+    if (err == CHIP_NO_ERROR) {
+        return self;
+    }
+
+    LogAndConvertDecodingError(err, nil);
+    return nil;
+}
 
 - (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::UnitTesting::Commands::TestEnumsResponse::DecodableType &)decodableStruct
 {
@@ -44088,18 +45128,28 @@ NS_ASSUME_NONNULL_BEGIN
         }
     }
 
-    NSString * errorStr = [NSString stringWithFormat:@"Command payload decoding failed: %s", err.AsString()];
-    MTR_LOG_ERROR("%s", errorStr.UTF8String);
-    if (error != nil) {
-        NSDictionary * userInfo = @{ NSLocalizedFailureReasonErrorKey : NSLocalizedString(errorStr, nil) };
-        *error = [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeSchemaMismatch userInfo:userInfo];
-    }
+    LogAndConvertDecodingError(err, error);
     return nil;
 }
 
 @end
 
 @implementation MTRUnitTestingClusterTestNullableOptionalResponseParams (InternalMethods)
+
+- (nullable instancetype)initWithDecodableStruct:(const chip::app::Clusters::UnitTesting::Commands::TestNullableOptionalResponse::DecodableType &)decodableStruct
+{
+    if (!(self = [super init])) {
+        return nil;
+    }
+
+    CHIP_ERROR err = [self _setFieldsFromDecodableStruct:decodableStruct];
+    if (err == CHIP_NO_ERROR) {
+        return self;
+    }
+
+    LogAndConvertDecodingError(err, nil);
+    return nil;
+}
 
 - (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::UnitTesting::Commands::TestNullableOptionalResponse::DecodableType &)decodableStruct
 {
@@ -44379,18 +45429,28 @@ NS_ASSUME_NONNULL_BEGIN
         }
     }
 
-    NSString * errorStr = [NSString stringWithFormat:@"Command payload decoding failed: %s", err.AsString()];
-    MTR_LOG_ERROR("%s", errorStr.UTF8String);
-    if (error != nil) {
-        NSDictionary * userInfo = @{ NSLocalizedFailureReasonErrorKey : NSLocalizedString(errorStr, nil) };
-        *error = [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeSchemaMismatch userInfo:userInfo];
-    }
+    LogAndConvertDecodingError(err, error);
     return nil;
 }
 
 @end
 
 @implementation MTRUnitTestingClusterTestComplexNullableOptionalResponseParams (InternalMethods)
+
+- (nullable instancetype)initWithDecodableStruct:(const chip::app::Clusters::UnitTesting::Commands::TestComplexNullableOptionalResponse::DecodableType &)decodableStruct
+{
+    if (!(self = [super init])) {
+        return nil;
+    }
+
+    CHIP_ERROR err = [self _setFieldsFromDecodableStruct:decodableStruct];
+    if (err == CHIP_NO_ERROR) {
+        return self;
+    }
+
+    LogAndConvertDecodingError(err, nil);
+    return nil;
+}
 
 - (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::UnitTesting::Commands::TestComplexNullableOptionalResponse::DecodableType &)decodableStruct
 {
@@ -44859,18 +45919,28 @@ NS_ASSUME_NONNULL_BEGIN
         }
     }
 
-    NSString * errorStr = [NSString stringWithFormat:@"Command payload decoding failed: %s", err.AsString()];
-    MTR_LOG_ERROR("%s", errorStr.UTF8String);
-    if (error != nil) {
-        NSDictionary * userInfo = @{ NSLocalizedFailureReasonErrorKey : NSLocalizedString(errorStr, nil) };
-        *error = [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeSchemaMismatch userInfo:userInfo];
-    }
+    LogAndConvertDecodingError(err, error);
     return nil;
 }
 
 @end
 
 @implementation MTRUnitTestingClusterBooleanResponseParams (InternalMethods)
+
+- (nullable instancetype)initWithDecodableStruct:(const chip::app::Clusters::UnitTesting::Commands::BooleanResponse::DecodableType &)decodableStruct
+{
+    if (!(self = [super init])) {
+        return nil;
+    }
+
+    CHIP_ERROR err = [self _setFieldsFromDecodableStruct:decodableStruct];
+    if (err == CHIP_NO_ERROR) {
+        return self;
+    }
+
+    LogAndConvertDecodingError(err, nil);
+    return nil;
+}
 
 - (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::UnitTesting::Commands::BooleanResponse::DecodableType &)decodableStruct
 {
@@ -45063,18 +46133,28 @@ NS_ASSUME_NONNULL_BEGIN
         }
     }
 
-    NSString * errorStr = [NSString stringWithFormat:@"Command payload decoding failed: %s", err.AsString()];
-    MTR_LOG_ERROR("%s", errorStr.UTF8String);
-    if (error != nil) {
-        NSDictionary * userInfo = @{ NSLocalizedFailureReasonErrorKey : NSLocalizedString(errorStr, nil) };
-        *error = [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeSchemaMismatch userInfo:userInfo];
-    }
+    LogAndConvertDecodingError(err, error);
     return nil;
 }
 
 @end
 
 @implementation MTRUnitTestingClusterSimpleStructResponseParams (InternalMethods)
+
+- (nullable instancetype)initWithDecodableStruct:(const chip::app::Clusters::UnitTesting::Commands::SimpleStructResponse::DecodableType &)decodableStruct
+{
+    if (!(self = [super init])) {
+        return nil;
+    }
+
+    CHIP_ERROR err = [self _setFieldsFromDecodableStruct:decodableStruct];
+    if (err == CHIP_NO_ERROR) {
+        return self;
+    }
+
+    LogAndConvertDecodingError(err, nil);
+    return nil;
+}
 
 - (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::UnitTesting::Commands::SimpleStructResponse::DecodableType &)decodableStruct
 {
@@ -45273,18 +46353,28 @@ NS_ASSUME_NONNULL_BEGIN
         }
     }
 
-    NSString * errorStr = [NSString stringWithFormat:@"Command payload decoding failed: %s", err.AsString()];
-    MTR_LOG_ERROR("%s", errorStr.UTF8String);
-    if (error != nil) {
-        NSDictionary * userInfo = @{ NSLocalizedFailureReasonErrorKey : NSLocalizedString(errorStr, nil) };
-        *error = [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeSchemaMismatch userInfo:userInfo];
-    }
+    LogAndConvertDecodingError(err, error);
     return nil;
 }
 
 @end
 
 @implementation MTRUnitTestingClusterTestEmitTestEventResponseParams (InternalMethods)
+
+- (nullable instancetype)initWithDecodableStruct:(const chip::app::Clusters::UnitTesting::Commands::TestEmitTestEventResponse::DecodableType &)decodableStruct
+{
+    if (!(self = [super init])) {
+        return nil;
+    }
+
+    CHIP_ERROR err = [self _setFieldsFromDecodableStruct:decodableStruct];
+    if (err == CHIP_NO_ERROR) {
+        return self;
+    }
+
+    LogAndConvertDecodingError(err, nil);
+    return nil;
+}
 
 - (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::UnitTesting::Commands::TestEmitTestEventResponse::DecodableType &)decodableStruct
 {
@@ -45560,18 +46650,28 @@ NS_ASSUME_NONNULL_BEGIN
         }
     }
 
-    NSString * errorStr = [NSString stringWithFormat:@"Command payload decoding failed: %s", err.AsString()];
-    MTR_LOG_ERROR("%s", errorStr.UTF8String);
-    if (error != nil) {
-        NSDictionary * userInfo = @{ NSLocalizedFailureReasonErrorKey : NSLocalizedString(errorStr, nil) };
-        *error = [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeSchemaMismatch userInfo:userInfo];
-    }
+    LogAndConvertDecodingError(err, error);
     return nil;
 }
 
 @end
 
 @implementation MTRUnitTestingClusterTestEmitTestFabricScopedEventResponseParams (InternalMethods)
+
+- (nullable instancetype)initWithDecodableStruct:(const chip::app::Clusters::UnitTesting::Commands::TestEmitTestFabricScopedEventResponse::DecodableType &)decodableStruct
+{
+    if (!(self = [super init])) {
+        return nil;
+    }
+
+    CHIP_ERROR err = [self _setFieldsFromDecodableStruct:decodableStruct];
+    if (err == CHIP_NO_ERROR) {
+        return self;
+    }
+
+    LogAndConvertDecodingError(err, nil);
+    return nil;
+}
 
 - (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::UnitTesting::Commands::TestEmitTestFabricScopedEventResponse::DecodableType &)decodableStruct
 {
@@ -45867,18 +46967,28 @@ NS_ASSUME_NONNULL_BEGIN
         }
     }
 
-    NSString * errorStr = [NSString stringWithFormat:@"Command payload decoding failed: %s", err.AsString()];
-    MTR_LOG_ERROR("%s", errorStr.UTF8String);
-    if (error != nil) {
-        NSDictionary * userInfo = @{ NSLocalizedFailureReasonErrorKey : NSLocalizedString(errorStr, nil) };
-        *error = [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeSchemaMismatch userInfo:userInfo];
-    }
+    LogAndConvertDecodingError(err, error);
     return nil;
 }
 
 @end
 
 @implementation MTRUnitTestingClusterTestBatchHelperResponseParams (InternalMethods)
+
+- (nullable instancetype)initWithDecodableStruct:(const chip::app::Clusters::UnitTesting::Commands::TestBatchHelperResponse::DecodableType &)decodableStruct
+{
+    if (!(self = [super init])) {
+        return nil;
+    }
+
+    CHIP_ERROR err = [self _setFieldsFromDecodableStruct:decodableStruct];
+    if (err == CHIP_NO_ERROR) {
+        return self;
+    }
+
+    LogAndConvertDecodingError(err, nil);
+    return nil;
+}
 
 - (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::UnitTesting::Commands::TestBatchHelperResponse::DecodableType &)decodableStruct
 {
@@ -46053,18 +47163,28 @@ NS_ASSUME_NONNULL_BEGIN
         }
     }
 
-    NSString * errorStr = [NSString stringWithFormat:@"Command payload decoding failed: %s", err.AsString()];
-    MTR_LOG_ERROR("%s", errorStr.UTF8String);
-    if (error != nil) {
-        NSDictionary * userInfo = @{ NSLocalizedFailureReasonErrorKey : NSLocalizedString(errorStr, nil) };
-        *error = [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeSchemaMismatch userInfo:userInfo];
-    }
+    LogAndConvertDecodingError(err, error);
     return nil;
 }
 
 @end
 
 @implementation MTRUnitTestingClusterStringEchoResponseParams (InternalMethods)
+
+- (nullable instancetype)initWithDecodableStruct:(const chip::app::Clusters::UnitTesting::Commands::StringEchoResponse::DecodableType &)decodableStruct
+{
+    if (!(self = [super init])) {
+        return nil;
+    }
+
+    CHIP_ERROR err = [self _setFieldsFromDecodableStruct:decodableStruct];
+    if (err == CHIP_NO_ERROR) {
+        return self;
+    }
+
+    LogAndConvertDecodingError(err, nil);
+    return nil;
+}
 
 - (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::UnitTesting::Commands::StringEchoResponse::DecodableType &)decodableStruct
 {
@@ -46227,18 +47347,28 @@ NS_ASSUME_NONNULL_BEGIN
         }
     }
 
-    NSString * errorStr = [NSString stringWithFormat:@"Command payload decoding failed: %s", err.AsString()];
-    MTR_LOG_ERROR("%s", errorStr.UTF8String);
-    if (error != nil) {
-        NSDictionary * userInfo = @{ NSLocalizedFailureReasonErrorKey : NSLocalizedString(errorStr, nil) };
-        *error = [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeSchemaMismatch userInfo:userInfo];
-    }
+    LogAndConvertDecodingError(err, error);
     return nil;
 }
 
 @end
 
 @implementation MTRUnitTestingClusterGlobalEchoResponseParams (InternalMethods)
+
+- (nullable instancetype)initWithDecodableStruct:(const chip::app::Clusters::UnitTesting::Commands::GlobalEchoResponse::DecodableType &)decodableStruct
+{
+    if (!(self = [super init])) {
+        return nil;
+    }
+
+    CHIP_ERROR err = [self _setFieldsFromDecodableStruct:decodableStruct];
+    if (err == CHIP_NO_ERROR) {
+        return self;
+    }
+
+    LogAndConvertDecodingError(err, nil);
+    return nil;
+}
 
 - (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::UnitTesting::Commands::GlobalEchoResponse::DecodableType &)decodableStruct
 {
@@ -47708,18 +48838,28 @@ NS_ASSUME_NONNULL_BEGIN
         }
     }
 
-    NSString * errorStr = [NSString stringWithFormat:@"Command payload decoding failed: %s", err.AsString()];
-    MTR_LOG_ERROR("%s", errorStr.UTF8String);
-    if (error != nil) {
-        NSDictionary * userInfo = @{ NSLocalizedFailureReasonErrorKey : NSLocalizedString(errorStr, nil) };
-        *error = [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeSchemaMismatch userInfo:userInfo];
-    }
+    LogAndConvertDecodingError(err, error);
     return nil;
 }
 
 @end
 
 @implementation MTRUnitTestingClusterTestDifferentVendorMeiResponseParams (InternalMethods)
+
+- (nullable instancetype)initWithDecodableStruct:(const chip::app::Clusters::UnitTesting::Commands::TestDifferentVendorMeiResponse::DecodableType &)decodableStruct
+{
+    if (!(self = [super init])) {
+        return nil;
+    }
+
+    CHIP_ERROR err = [self _setFieldsFromDecodableStruct:decodableStruct];
+    if (err == CHIP_NO_ERROR) {
+        return self;
+    }
+
+    LogAndConvertDecodingError(err, nil);
+    return nil;
+}
 
 - (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::UnitTesting::Commands::TestDifferentVendorMeiResponse::DecodableType &)decodableStruct
 {
@@ -47863,18 +49003,28 @@ NS_ASSUME_NONNULL_BEGIN
         }
     }
 
-    NSString * errorStr = [NSString stringWithFormat:@"Command payload decoding failed: %s", err.AsString()];
-    MTR_LOG_ERROR("%s", errorStr.UTF8String);
-    if (error != nil) {
-        NSDictionary * userInfo = @{ NSLocalizedFailureReasonErrorKey : NSLocalizedString(errorStr, nil) };
-        *error = [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeSchemaMismatch userInfo:userInfo];
-    }
+    LogAndConvertDecodingError(err, error);
     return nil;
 }
 
 @end
 
 @implementation MTRSampleMEIClusterAddArgumentsResponseParams (InternalMethods)
+
+- (nullable instancetype)initWithDecodableStruct:(const chip::app::Clusters::SampleMei::Commands::AddArgumentsResponse::DecodableType &)decodableStruct
+{
+    if (!(self = [super init])) {
+        return nil;
+    }
+
+    CHIP_ERROR err = [self _setFieldsFromDecodableStruct:decodableStruct];
+    if (err == CHIP_NO_ERROR) {
+        return self;
+    }
+
+    LogAndConvertDecodingError(err, nil);
+    return nil;
+}
 
 - (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::SampleMei::Commands::AddArgumentsResponse::DecodableType &)decodableStruct
 {
