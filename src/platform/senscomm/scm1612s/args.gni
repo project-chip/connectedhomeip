@@ -40,6 +40,8 @@ chip_enable_ota_requestor = true
 
 #chip_stack_lock_tracking = "none"
 
+chip_build_example_creds = false
+
 custom_toolchain = "${chip_root}/config/senscomm/toolchain:senscomm"
 
 is_debug = false

@@ -37,7 +37,11 @@
 #include <assert.h>
 
 #include <credentials/DeviceAttestationCredsProvider.h>
+#if 0
 #include <credentials/examples/DeviceAttestationCredsExample.h>
+#else
+#include <platform/senscomm/scm1612s/FactoryDataProvider.h>
+#endif
 
 #include <setup_payload/QRCodeSetupPayloadGenerator.h>
 #include <setup_payload/SetupPayload.h>
@@ -110,6 +114,7 @@ chip::app::Clusters::NetworkCommissioning::Instance sWiFiNetworkCommissioningIns
                                                                                       &WiseWiFiDriver::GetInstance());
 #endif
 
+chip::DeviceLayer::FactoryDataProvider mFactoryDataProvider;
 } // namespace
 
 using namespace chip::TLV;
@@ -350,9 +355,20 @@ CHIP_ERROR AppTask::Init()
     (void) initParams.InitializeStaticResourcesBeforeServerInit();
     chip::Server::GetInstance().Init(initParams);
 
+#if CONFIG_SENSCOMM_FACTORY_DATA_EXAMPLE
     // Initialize device attestation config
     SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
-
+#else
+    error = mFactoryDataProvider.Init();
+    if (error != CHIP_NO_ERROR)
+    {
+        ChipLogError(DeviceLayer, "Error initializing FactoryData!");
+        ChipLogError(DeviceLayer, "Check if you have flashed it correctly!");
+    }
+    SetCommissionableDataProvider(&mFactoryDataProvider);
+    SetDeviceAttestationCredentialsProvider(&mFactoryDataProvider);
+    SetDeviceInstanceInfoProvider(&mFactoryDataProvider);
+#endif
     PlatformMgr().UnlockChipStack();
 
     // Create FreeRTOS sw timer for Function Selection.

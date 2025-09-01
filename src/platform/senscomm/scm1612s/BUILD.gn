@@ -74,6 +74,7 @@ static_library("scm1612s") {
   deps = [
       "${chip_root}/src/lib/dnssd:platform_header",
       "${chip_root}/src/platform/logging:headers",
+      "${chip_root}/src/credentials:credentials_header",
     ]
 
   # mDNS
@@ -86,6 +87,13 @@ static_library("scm1612s") {
       "ConnectivityManagerImpl_WIFI.cpp",
       "NetworkCommissioningWiFiDriver.cpp",
       "NetworkCommissioningWiFiDriver.h",
+    ]
+  }
+
+  if (true) {
+    sources += [
+      "FactoryDataProvider.cpp",
+      "FactoryDataProvider.h",
     ]
   }
 }

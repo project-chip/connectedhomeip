@@ -48,18 +48,18 @@
 /**
  * CHIP_DEVICE_CONFIG_DEVICE_VENDOR_ID
  *
- * 0x1373: MediaTek's Vendor Id.
+ * 0x15FE: Senscomm's Vendor Id.
  * 0xFFF1: Common Test Vendor Id.
  */
-#define CHIP_DEVICE_CONFIG_DEVICE_VENDOR_ID 0xFFF1
+#define CHIP_DEVICE_CONFIG_DEVICE_VENDOR_ID 0x15FE
 
 /**
  * CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_ID
  *
- * 0x1000: Genio lighting-app
+ * 0x1612: SCM lighting-app
  * 0x8005: Common test lighting-app
  */
-#define CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_ID 0x8005
+#define CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_ID 0x1612
 
 /**
  * CHIP_DEVICE_CONFIG_DEVICE_HARDWARE_VERSION
