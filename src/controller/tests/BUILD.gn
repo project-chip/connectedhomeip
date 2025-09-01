@@ -32,7 +32,6 @@ chip_test_suite("tests") {
 
   if (chip_device_platform != "mbed" && chip_device_platform != "esp32") {
     test_sources += [
-      "TestDeviceController.cpp",
       "TestEventCaching.cpp",
       "TestEventChunking.cpp",
       "TestEventNumberCaching.cpp",
@@ -45,7 +44,10 @@ chip_test_suite("tests") {
     # SendMessage() to UDP:[::1]:5541 failed: b
     # deactivating since the Fake platform is mostly done to test Platform APIs
     if (chip_device_platform != "fake") {
-      test_sources += [ "TestWriteChunking.cpp" ]
+      test_sources += [
+        "TestDeviceController.cpp",
+        "TestWriteChunking.cpp",
+      ]
     }
 
     # Not supported on efr32.
