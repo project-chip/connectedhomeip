@@ -12844,7 +12844,7 @@ class ChipClusters:
                 "reportable": True,
             },
             0x00000004: {
-                "attributeName": "MinViewport",
+                "attributeName": "MinViewportResolution",
                 "attributeId": 0x00000004,
                 "type": "",
                 "reportable": True,
@@ -13280,6 +13280,7 @@ class ChipClusters:
                     "ICEServers": "ICEServerStruct",
                     "ICETransportPolicy": "str",
                     "metadataEnabled": "bool",
+                    "SFrameConfig": "SFrameStruct",
                 },
             },
             0x00000002: {
@@ -13295,6 +13296,7 @@ class ChipClusters:
                     "ICEServers": "ICEServerStruct",
                     "ICETransportPolicy": "str",
                     "metadataEnabled": "bool",
+                    "SFrameConfig": "SFrameStruct",
                 },
             },
             0x00000004: {
