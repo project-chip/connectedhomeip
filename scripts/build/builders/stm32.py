@@ -66,7 +66,7 @@ class stm32Builder(GnBuilder):
         self.app = app
 
         stm32_chip = self.board.GetIC()
-        
+
         super(stm32Builder, self).__init__(
             root=os.path.join(root, 'examples',
                               app.ExampleName(), 'stm32', stm32_chip),
