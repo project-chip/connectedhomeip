@@ -13,14 +13,13 @@ RUN set -x \
 
 # Download and install android SDK
 RUN set -x \
-    && wget -O /tmp/android-30.zip https://dl.google.com/android/repository/platform-30_r03.zip \
+    && wget -O /tmp/android-34.zip https://dl.google.com/android/repository/platform-34-ext7_r03.zip \
     && mkdir -p /opt/android/sdk/platforms \
     && cd /opt/android/sdk/platforms \
-    && unzip /tmp/android-30.zip \
-    && mv android-11 android-30 \
-    && rm -f /tmp/android-30.zip \
+    && unzip /tmp/android-34.zip \
+    && rm -f /tmp/android-34.zip \
     && chmod -R a+rX /opt/android/sdk \
-    && test -d /opt/android/sdk/platforms/android-30 \
+    && test -d /opt/android/sdk/platforms/android-34 \
     && : # last line
 
 # Download and install android command line tool (for installing `sdkmanager`)
@@ -61,9 +60,9 @@ RUN set -x \
     && export PATH=$ANDROID_NDK_HOME/toolchains/llvm/prebuilt/linux-x86_64/bin:$PATH \
     && cd /tmp && wget https://www.openssl.org/source/openssl-1.1.1t.tar.gz \
     && mkdir -p $OPENSSL_ARMV7 && cd $OPENSSL_ARMV7 && tar xfz /tmp/openssl-1.1.1t.tar.gz \
-    && cd $OPENSSL_ARMV7/openssl-1.1.1t && CC=clang ANDROID_API=26 ./Configure android-arm -U__ANDROID_API__ -D__ANDROID_API__=26 && make -j$(nproc) SHLIB_VERSION_NUMBER= SHLIB_EXT=.so \
+    && cd $OPENSSL_ARMV7/openssl-1.1.1t && CC=clang ANDROID_API=34 ./Configure android-arm -U__ANDROID_API__ -D__ANDROID_API__=34 && make -j$(nproc) SHLIB_VERSION_NUMBER= SHLIB_EXT=.so \
     && mkdir -p $OPENSSL_X86 && cd $OPENSSL_X86 && tar xfz /tmp/openssl-1.1.1t.tar.gz \
-    && cd $OPENSSL_X86/openssl-1.1.1t && CC=clang ANDROID_API=26 ./Configure android-x86 -U__ANDROID_API__ -D__ANDROID_API__=26 && make  -j$(nproc) SHLIB_VERSION_NUMBER= SHLIB_EXT=.so \
+    && cd $OPENSSL_X86/openssl-1.1.1t && CC=clang ANDROID_API=34 ./Configure android-x86 -U__ANDROID_API__ -D__ANDROID_API__=34 && make  -j$(nproc) SHLIB_VERSION_NUMBER= SHLIB_EXT=.so \
     && rm -rf /tmp/openssl-1.1.1t.tar.gz \
     && : # last line
 
