@@ -181,13 +181,10 @@ class TC_MCORE_FS_1_5(MatterBaseTest):
     async def test_TC_MCORE_FS_1_5(self):
 
         # Commissioning - done
-        self.step(0)
+        self.step("precondition")
 
         min_report_interval_sec = 0
         max_report_interval_sec = 30
-
-        # Commissioning
-        self.step("precondition")
 
         self.step(1)
         # Subscribe to the PartsList

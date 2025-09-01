@@ -145,6 +145,10 @@ class TC_MCORE_FS_1_1(MatterBaseTest):
 
     @async_test_body
     async def test_TC_MCORE_FS_1_1(self):
+
+        # Commissioning
+        self.step("precondition")
+
         dut_commissioning_control_endpoint = 0
 
         # Get the list of endpoints on the DUT_FSA_BRIDGE before adding the TH_SERVER_NO_UID.
@@ -172,9 +176,6 @@ class TC_MCORE_FS_1_1(MatterBaseTest):
                 break
 
         asserts.assert_not_equal(dut_commissioning_control_endpoint, 0, "Invalid aggregator endpoint. Cannot proceed with test.")
-
-        # Commissioning
-        self.step("precondition")
 
         self.step(1)
         self.step(2)
