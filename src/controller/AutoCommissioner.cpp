@@ -431,6 +431,16 @@ CommissioningStage AutoCommissioner::GetNextCommissioningStageInternal(Commissio
             {
                 // Perform Scan (kScanNetworks) and collect credentials (kNeedsNetworkCreds) right before configuring network.
                 // This order of steps allows the workflow to return to collect credentials again if network enablement fails.
+
+                // TODO: This is broken when we have multiple network commissioning endpoints
+                // We always end up doing the scan on endpoint 0, even if we have disabled that
+                // endpoint and are trying to use the secondary network commissioning endpoint.
+                // We should probably have separate stages for "scan Thread" and "scan Wi-Fi", which
+                // would allow GetEndpoint() to do the right thing.  The IsScanNeeded() check should
+                // also be changed to check the actual endpoint we are going to try to commission
+                // here, not just "all the endpoints".
+                //
+                // See https://github.com/project-chip/connectedhomeip/issues/40755
                 return CommissioningStage::kScanNetworks;
             }
             ChipLogProgress(Controller, "No NetworkScan enabled or WiFi/Thread endpoint not specified, skipping ScanNetworks");
@@ -614,6 +624,13 @@ Optional<System::Clock::Timeout> AutoCommissioner::GetCommandTimeout(DeviceProxy
         break;
     case CommissioningStage::kThreadNetworkEnable:
         timeout = System::Clock::Seconds16(mDeviceCommissioningInfo.network.thread.minConnectionTime);
+        break;
+    case CommissioningStage::kScanNetworks:
+        // We're not sure which sort of scan we will do, so just use the larger
+        // of the timeouts we might have.  Note that anything we select here is
+        // still clamped to be at least kMinimumCommissioningStepTimeout below.
+        timeout = System::Clock::Seconds16(
+            std::max(mDeviceCommissioningInfo.network.wifi.maxScanTime, mDeviceCommissioningInfo.network.thread.maxScanTime));
         break;
     case CommissioningStage::kSendNOC:
     case CommissioningStage::kSendOpCertSigningRequest:
