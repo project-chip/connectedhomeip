@@ -1180,14 +1180,13 @@ struct TariffUpdateCtx
      * @brief Master set of all valid TariffComponent IDs
      * @details Contains all TariffComponent IDs that exist in the tariff definition
      */
-    std::unordered_map<uint32_t, uint8_t> TariffComponentKeyIDs;
+    std::unordered_map<uint32_t, uint32_t> TariffComponentKeyIDsFeatureMap;
 
     /**
      * @brief TariffComponent IDs referenced by TariffPeriod items
      * @details Collected for validating period->component references
      */
     std::unordered_set<uint32_t> TariffPeriodsTariffComponentIDs;
-    std::map<uint32_t, std::pair<const std::unordered_set<uint32_t>, const std::unordered_set<uint32_t>> >  TariffPeriodsTariffComponentIDsDayEntryIDsMap;
     /// @}
 
     /// @name DayPattern ID Tracking
@@ -1217,10 +1216,6 @@ struct TariffUpdateCtx
      */
     uint32_t TariffUpdateTimestamp;
 };
-
-namespace TariffComponentsDataClass_Utils {
-    CHIP_ERROR ValidateListEntry(const Structs::TariffComponentStruct::Type & entryNewValue, Feature * entryFeatureValue, TariffUpdateCtx * aCtx);
-}
 
 } // namespace CommodityTariff
 } // namespace Clusters

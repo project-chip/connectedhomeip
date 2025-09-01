@@ -398,16 +398,6 @@ CHIP_ERROR ValidateListEntry(const TariffComponentStruct::Type & entryNewValue, 
     BitMask<Feature> entryFeatures;
     auto * ctx           = static_cast<TariffUpdateCtx *>(aCtx);
 
-    uint8_t FeaturesCount = [&entryFeatures]() -> uint8_t {
-        uint8_t count = 0;
-        auto n = entryFeatures.Raw();
-        while (n) {
-            n &= (n - 1);
-            count++;
-        };
-        return count;
-    }();
-
     VerifyOrReturnError(entryNewValue.tariffComponentID > 0, CHIP_ERROR_INVALID_ARGUMENT);
 
     if ( ((ctx->blockMode == BlockModeEnum::kNoBlock) && (!entryNewValue.threshold.IsNull())) ||
@@ -527,13 +517,20 @@ CHIP_ERROR ValidateListEntry(const TariffComponentStruct::Type & entryNewValue, 
         ChipLogDetail(NotSpecified, "Predicted flag set to %s", entryNewValue.predicted.Value() ? "true" : "false");
     }
 
-    if (FeaturesCount > 1)
+    uint8_t featuresCount = 0;
+    auto n = entryFeatures.Raw();
+    while (n) {
+        n &= (n - 1);
+        featuresCount++;
+    };
+
+    if (featuresCount > 1)
     {
         ChipLogError(NotSpecified, "Exactly one feature required for one TariffComponent entry");
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
 
-    if (!ctx->TariffComponentKeyIDs.insert({entryNewValue.tariffComponentID, entryFeatures.Raw()}).second)
+    if (!ctx->TariffComponentKeyIDsFeatureMap.insert({entryNewValue.tariffComponentID, entryFeatures.Raw()}).second)
     {
         ChipLogError(NotSpecified, "Duplicate tariffComponentID found");
         return CHIP_ERROR_DUPLICATE_KEY_ID;
@@ -544,8 +541,8 @@ CHIP_ERROR ValidateListEntry(const TariffComponentStruct::Type & entryNewValue, 
 
 CHIP_ERROR ValidateListEntry(const TariffPeriodStruct::Type & entryNewValue, void * aCtx)
 {
-    std::unordered_set<uint32_t> entryDeIDs;
-    std::unordered_set<uint32_t> entryTcIDs;
+    //std::unordered_set<uint32_t> entryDeIDs;
+    //std::unordered_set<uint32_t> entryTcIDs;
     auto * ctx           = static_cast<TariffUpdateCtx *>(aCtx);
 
     if (!entryNewValue.label.IsNull())
@@ -569,19 +566,19 @@ CHIP_ERROR ValidateListEntry(const TariffPeriodStruct::Type & entryNewValue, voi
         return CHIP_ERROR_INVALID_ARGUMENT;
 
     // Check that the current period item has no duplicated dayEntryIDs
-    if (CommonUtilities::HasDuplicateIDs(entryNewValue.dayEntryIDs, entryDeIDs))
+    if (CommonUtilities::HasDuplicateIDs(entryNewValue.dayEntryIDs, ctx->TariffPeriodsDayEntryIDs))
     {
         return CHIP_ERROR_DUPLICATE_KEY_ID;
     }
 
     // Check that the current period item has no duplicated tariffComponentIDs
-    if (CommonUtilities::HasDuplicateIDs(entryNewValue.tariffComponentIDs, entryTcIDs))
+    if (CommonUtilities::HasDuplicateIDs(entryNewValue.tariffComponentIDs, ctx->TariffPeriodsTariffComponentIDs))
     {
         return CHIP_ERROR_DUPLICATE_KEY_ID;
     }
 
-    ctx->TariffPeriodsDayEntryIDs.merge(entryDeIDs);
-    ctx->TariffPeriodsTariffComponentIDs.merge(entryTcIDs);
+    //ctx->TariffPeriodsDayEntryIDs.merge(entryDeIDs);
+    //ctx->TariffPeriodsTariffComponentIDs.merge(entryTcIDs);
 
     return CHIP_NO_ERROR;
 }
