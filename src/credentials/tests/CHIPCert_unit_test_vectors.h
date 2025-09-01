@@ -51,6 +51,9 @@ UnitTestCertAsset GetNodeA2CertAsset();
 UnitTestCertAsset GetNodeA3CertAsset();
 UnitTestCertAsset GetNodeA4CertAsset();
 UnitTestCertAsset GetNodeB1CertAsset();
+UnitTestCertAsset GetRootJFACertAsset();
+UnitTestCertAsset GetIAJFACertAsset();
+UnitTestCertAsset GetNodeJFACertAsset();
 
 } // namespace TestCerts
 } // namespace chip

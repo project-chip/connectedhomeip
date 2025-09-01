@@ -77,6 +77,25 @@
             "cwd": "${workspaceFolder}"
         },
         {
+            "name": "Run application on localhost (jfa-a)",
+            "type": "lldb",
+            "request": "launch",
+            "program": "${workspaceFolder}/examples/jf-admin-app/linux/out/debug/jfa-app",
+            "args": [
+                "--capabilities",
+                "0x4",
+                "--passcode",
+                "110220033",
+                "--secured-device-port",
+                "5533",
+                "--rpc-server-port",
+                "33033",
+                "--KVS",
+                "jfa_a_kvs"
+            ],
+            "cwd": "${workspaceFolder}/examples/jf-admin-app/linux/out/debug"
+        },
+        {
             "name": "Run application on localhost (jfc-a)",
             "type": "lldb",
             "request": "launch",
@@ -131,7 +150,21 @@
             "name": "Run TestJCMCommissioner",
             "type": "lldb",
             "request": "launch",
-            "program": "${workspaceFolder}/src/controller/tests/out/test/tests/TestJCMCommissioner",
+            "program": "${workspaceFolder}/src/controller/tests/jcm/out/test/tests/TestJCMCommissioner",
+            "cwd": "${workspaceFolder}/src/controller/tests/jcm/out/test/tests"
+        },
+        {
+            "name": "Run TestTrustVerification",
+            "type": "lldb",
+            "request": "launch",
+            "program": "${workspaceFolder}/src/controller/tests/jcm/out/test/tests/TestTrustVerification",
+            "cwd": "${workspaceFolder}/src/controller/tests/jcm/out/test/tests"
+        },
+        {
+            "name": "Run TestCommands",
+            "type": "lldb",
+            "request": "launch",
+            "program": "${workspaceFolder}/src/controller/tests/out/test/tests/TestCommands",
             "cwd": "${workspaceFolder}/src/controller/tests/out/test/tests"
         },
         {

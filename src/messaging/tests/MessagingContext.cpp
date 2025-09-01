@@ -62,10 +62,13 @@ CHIP_ERROR MessagingContext::Init(TransportMgrBase * transport, IOContext * ioCo
     {
         ReturnErrorOnFailure(CreateAliceFabric());
         ReturnErrorOnFailure(CreateBobFabric());
+        ReturnErrorOnFailure(CreateJFAliceFabric());
+        ReturnErrorOnFailure(CreateJFBobFabric());
 
         ReturnErrorOnFailure(CreateSessionBobToAlice());
         ReturnErrorOnFailure(CreateSessionAliceToBob());
         ReturnErrorOnFailure(CreateSessionBobToFriends());
+        ReturnErrorOnFailure(CreateJFSessionBobToAlice());
 
         ReturnErrorOnFailure(CreatePASESessionCharlieToDavid());
         ReturnErrorOnFailure(CreatePASESessionDavidToCharlie());
@@ -120,6 +123,7 @@ void MessagingContext::SetMRPMode(MRPMode mode)
         mpData->mSessionAliceToBob->AsSecureSession()->SetRemoteSessionParameters(GetDefaultMRPConfig());
         mpData->mSessionCharlieToDavid->AsSecureSession()->SetRemoteSessionParameters(GetDefaultMRPConfig());
         mpData->mSessionDavidToCharlie->AsSecureSession()->SetRemoteSessionParameters(GetDefaultMRPConfig());
+        mpData->mJFSessionBobToAlice->AsSecureSession()->SetRemoteSessionParameters(GetDefaultMRPConfig());
 
 #if CONFIG_BUILD_FOR_HOST_UNIT_TEST
         ClearLocalMRPConfigOverride();
@@ -151,6 +155,8 @@ void MessagingContext::SetMRPMode(MRPMode mode)
             MessagingContext::kResponsiveIdleRetransTimeout, MessagingContext::kResponsiveActiveRetransTimeout));
         mpData->mSessionDavidToCharlie->AsSecureSession()->SetRemoteSessionParameters(ReliableMessageProtocolConfig(
             MessagingContext::kResponsiveIdleRetransTimeout, MessagingContext::kResponsiveActiveRetransTimeout));
+        mpData->mJFSessionBobToAlice->AsSecureSession()->SetRemoteSessionParameters(ReliableMessageProtocolConfig(
+            MessagingContext::kResponsiveIdleRetransTimeout, MessagingContext::kResponsiveActiveRetransTimeout));
     }
 }
 
@@ -168,11 +174,32 @@ CHIP_ERROR MessagingContext::CreateBobFabric()
                                                                       &mpData->mBobFabricIndex);
 }
 
+CHIP_ERROR MessagingContext::CreateJFAliceFabric()
+{
+    return mpData->mFabricTable.AddNewFabricForTestIgnoringCollisions(GetRootJFACertAsset().mCert, GetIAJFACertAsset().mCert,
+                                                                      GetNodeJFACertAsset().mCert, GetNodeJFACertAsset().mKey,
+                                                                      &mpData->mJFAliceFabricIndex);
+}
+
+CHIP_ERROR MessagingContext::CreateJFBobFabric()
+{
+    return mpData->mFabricTable.AddNewFabricForTestIgnoringCollisions(GetRootACertAsset().mCert, GetIAA1CertAsset().mCert,
+                                                                      GetNodeA2CertAsset().mCert, GetNodeA2CertAsset().mKey,
+                                                                      &mpData->mJFBobFabricIndex);
+}
+
 CHIP_ERROR MessagingContext::CreateSessionBobToAlice()
 {
     return mpData->mSessionManager.InjectPaseSessionWithTestKey(mpData->mSessionBobToAlice, kBobKeyId,
                                                                 GetAliceFabric()->GetNodeId(), kAliceKeyId, mpData->mBobFabricIndex,
                                                                 mpData->mAliceAddress, CryptoContext::SessionRole::kInitiator);
+}
+
+CHIP_ERROR MessagingContext::CreateJFSessionBobToAlice()
+{
+    return mpData->mSessionManager.InjectPaseSessionWithTestKey(mpData->mJFSessionBobToAlice, kJFBobKeyId,
+                                                                GetJFAliceFabric()->GetNodeId(), kJFAliceKeyId, mpData->mJFBobFabricIndex,
+                                                                mpData->mJFAliceAddress, CryptoContext::SessionRole::kInitiator);
 }
 
 CHIP_ERROR MessagingContext::CreateCASESessionBobToAlice()
@@ -187,6 +214,13 @@ CHIP_ERROR MessagingContext::CreateCASESessionBobToAlice(const CATValues & cats)
     return mpData->mSessionManager.InjectCaseSessionWithTestKey(
         mpData->mSessionBobToAlice, kBobKeyId, kAliceKeyId, GetBobFabric()->GetNodeId(), GetAliceFabric()->GetNodeId(),
         mpData->mBobFabricIndex, mpData->mAliceAddress, CryptoContext::SessionRole::kInitiator, cats);
+}
+
+CHIP_ERROR MessagingContext::CreateJFCASESessionBobToAlice(const CATValues & cats)
+{
+    return mpData->mSessionManager.InjectCaseSessionWithTestKey(
+        mpData->mJFSessionBobToAlice, kBobKeyId, kJFAliceKeyId, GetJFBobFabric()->GetNodeId(), GetJFAliceFabric()->GetNodeId(),
+        mpData->mJFBobFabricIndex, mpData->mJFAliceAddress, CryptoContext::SessionRole::kInitiator, cats);
 }
 
 CHIP_ERROR MessagingContext::CreateSessionAliceToBob()
@@ -257,6 +291,12 @@ SessionHandle MessagingContext::GetSessionDavidToCharlie()
 SessionHandle MessagingContext::GetSessionBobToFriends()
 {
     return SessionHandle(mpData->mSessionBobToFriends.Value());
+}
+
+SessionHandle MessagingContext::GetJFSessionBobToAlice()
+{
+    auto sessionHandle = mpData->mJFSessionBobToAlice.Get();
+    return std::move(sessionHandle.Value());
 }
 
 void MessagingContext::ExpireSessionBobToAlice()

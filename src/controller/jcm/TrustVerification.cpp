@@ -64,6 +64,8 @@ CHIP_ERROR VendorIdVerificationClient::Verify(
     ByteSpan & clientChallengeSpan
 )
 {
+    ReturnLogErrorOnFailure(VerifyNOCCertificateChain(nocSpan, icacSpan, rcacSpan));
+
     P256PublicKeySpan rcacPublicKeySpan;
     ReturnLogErrorOnFailure(ExtractPublicKeyFromChipCert(rcacSpan, rcacPublicKeySpan));
     // Extract the root public key
