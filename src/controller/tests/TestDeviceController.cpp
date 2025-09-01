@@ -39,6 +39,48 @@ chip::Credentials::GroupDataProviderImpl sProvider(5, 8);
 
 namespace {
 
+class FactoryInitParamsSetter
+{
+public:
+    FactoryInitParamsSetter() {
+        // Set all the basic requirement to test DeviceControllerFactory
+        EXPECT_EQ(opCertStore.Init(&cerStorage), CHIP_NO_ERROR);
+
+        // Initialize Group Data Provider
+        sProvider.SetStorageDelegate(&sStorageDelegate);
+        sProvider.SetSessionKeystore(&keystore);
+        sProvider.Init();
+        chip::Credentials::SetGroupDataProvider(&sProvider);
+
+        // Set initials params of factoryInitParams
+        factoryInitParams.sessionKeystore          = &keystore;
+        factoryInitParams.groupDataProvider        = &sProvider;
+        factoryInitParams.opCertStore              = &opCertStore;
+        factoryInitParams.listenPort               = 88;
+        factoryInitParams.fabricTable              = nullptr;
+        factoryInitParams.fabricIndependentStorage = &factoryStorage;
+
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+        factoryInitParams.wifipaf_layer = &wifipaf;
+#endif
+    };
+    ~FactoryInitParamsSetter() {
+        sProvider.Finish();
+        opCertStore.Finish();
+    };
+    chip::Controller::FactoryInitParams GetFactoryInitParams() { return factoryInitParams; };
+protected:
+    chip::TestPersistentStorageDelegate cerStorage;
+    chip::Credentials::PersistentStorageOpCertStore opCertStore;
+    chip::TestPersistentStorageDelegate sStorageDelegate;
+    TestSessionKeystoreImpl keystore;
+    chip::TestPersistentStorageDelegate factoryStorage;
+    chip::Controller::FactoryInitParams factoryInitParams;
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+    chip::WiFiPAF::WiFiPAFLayer wifipaf;
+#endif
+};
+
 // Fabric Table Holder Class handle a Factory Table class to test
 class FabricTableHolder
 {
@@ -85,27 +127,6 @@ public:
         AppContext::SetUp();
         mOldProvider = chip::app::InteractionModelEngine::GetInstance()->SetDataModelProvider(
             &chip::TestDataModel::DispatchTestDataModel::Instance());
-
-        // Set all the basic requirement to test DeviceControllerFactory
-        EXPECT_EQ(opCertStore.Init(&cerStorage), CHIP_NO_ERROR);
-
-        // Initialize Group Data Provider
-        sProvider.SetStorageDelegate(&sStorageDelegate);
-        sProvider.SetSessionKeystore(&keystore);
-        sProvider.Init();
-        chip::Credentials::SetGroupDataProvider(&sProvider);
-
-        // Set initials params of factoryInitParams
-        factoryInitParams.sessionKeystore          = &keystore;
-        factoryInitParams.groupDataProvider        = &sProvider;
-        factoryInitParams.opCertStore              = &opCertStore;
-        factoryInitParams.listenPort               = 88;
-        factoryInitParams.fabricTable              = nullptr;
-        factoryInitParams.fabricIndependentStorage = &factoryStorage;
-
-#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
-        factoryInitParams.wifipaf_layer = &wifipaf;
-#endif
     }
     void TearDown() override
     {
@@ -116,31 +137,17 @@ public:
             provider->Finish();
         }
         AppContext::TearDown();
-        sProvider.Finish();
-        opCertStore.Finish();
     }
 
 protected:
-    chip::Controller::DeviceController device;
-    chip::Controller::DeviceCommissioner commissioner;
-    chip::Controller::SetupParams dParams;
-    chip::TestPersistentStorageDelegate cerStorage;
-    chip::Credentials::PersistentStorageOpCertStore opCertStore;
-    chip::TestPersistentStorageDelegate storage;
-    chip::TestPersistentStorageDelegate sStorageDelegate;
-    TestSessionKeystoreImpl keystore;
-    chip::TestPersistentStorageDelegate factoryStorage;
-    chip::Controller::FactoryInitParams factoryInitParams;
-#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
-    chip::WiFiPAF::WiFiPAFLayer wifipaf;
-#endif
-
+    FactoryInitParamsSetter params;
 private:
     chip::app::DataModel::Provider * mOldProvider = nullptr;
 };
 
 TEST_F(TestDeviceControllerFactory, DeviceControllerFactoryMethods_FailInit)
 {
+    chip::Controller::FactoryInitParams factoryInitParams = params.GetFactoryInitParams();
     // Initialize the ember side server logic
     auto * engine = chip::app::InteractionModelEngine::GetInstance();
     EXPECT_EQ(engine->Init(&GetExchangeManager(), &GetFabricTable(), chip::app::reporting::GetDefaultReportScheduler()),
@@ -155,10 +162,11 @@ TEST_F(TestDeviceControllerFactory, DeviceControllerFactoryMethods_FailInit)
 
     // Free engine before finish
     engine->Shutdown();
-}
+} // DeviceControllerFactoryMethods_FailInit
 
 TEST_F(TestDeviceControllerFactory, DeviceControllerFactoryMethods_DobleInit)
 {
+    chip::Controller::FactoryInitParams factoryInitParams = params.GetFactoryInitParams();
     // Initialize the ember side server logic
     auto * engine = chip::app::InteractionModelEngine::GetInstance();
     EXPECT_EQ(engine->Init(&GetExchangeManager(), &GetFabricTable(), chip::app::reporting::GetDefaultReportScheduler()),
@@ -174,10 +182,15 @@ TEST_F(TestDeviceControllerFactory, DeviceControllerFactoryMethods_DobleInit)
 
     // Free engine before finish
     engine->Shutdown();
-}
+} // DeviceControllerFactoryMethods_DobleInit
 
 TEST_F(TestDeviceControllerFactory, DeviceControllerFactoryMethods_SetupControllerAndCommissioner)
 {
+    chip::Controller::FactoryInitParams factoryInitParams = params.GetFactoryInitParams();
+    chip::TestPersistentStorageDelegate storage;
+    chip::Controller::SetupParams deviceParams;
+    chip::Controller::DeviceCommissioner commissioner;
+    chip::Controller::DeviceController device;
     // Initialize the ember side server logic
     auto * engine = chip::app::InteractionModelEngine::GetInstance();
     EXPECT_EQ(engine->Init(&GetExchangeManager(), &GetFabricTable(), chip::app::reporting::GetDefaultReportScheduler()),
@@ -198,21 +211,24 @@ TEST_F(TestDeviceControllerFactory, DeviceControllerFactoryMethods_SetupControll
 
     EXPECT_EQ(DeviceControllerFactory::GetInstance().Init(factoryInitParams), CHIP_NO_ERROR);
 
-    dParams.controllerVendorId = chip::VendorId::TestVendor1;
-    EXPECT_EQ(DeviceControllerFactory::GetInstance().SetupController(dParams, device), CHIP_NO_ERROR);
-    // SetupCommissioner is expected to fail because dParams does not have a pairingDelegate,
+    deviceParams.controllerVendorId = chip::VendorId::TestVendor1;
+    EXPECT_EQ(DeviceControllerFactory::GetInstance().SetupController(deviceParams, device), CHIP_NO_ERROR);
+    // SetupCommissioner is expected to fail because deviceParams does not have a pairingDelegate,
     // which is required for a commissioner.
-    EXPECT_EQ(DeviceControllerFactory::GetInstance().SetupCommissioner(dParams, commissioner), CHIP_ERROR_INVALID_ARGUMENT);
+    EXPECT_EQ(DeviceControllerFactory::GetInstance().SetupCommissioner(deviceParams, commissioner), CHIP_ERROR_INVALID_ARGUMENT);
 
     EXPECT_TRUE(DeviceControllerFactory::GetInstance().ReleaseSystemState());
     DeviceControllerFactory::GetInstance().Shutdown();
 
     // Free engine before finish
     engine->Shutdown();
-}
+} // DeviceControllerFactoryMethods_SetupControllerAndCommissioner
 
 TEST_F(TestDeviceControllerFactory, DeviceControllerFactoryMethods_RetainAndRelease)
 {
+    chip::Controller::FactoryInitParams factoryInitParams = params.GetFactoryInitParams();
+    chip::TestPersistentStorageDelegate storage;
+    chip::Controller::SetupParams dparams;
     // Initialize the ember side server logic
     auto * engine = chip::app::InteractionModelEngine::GetInstance();
     EXPECT_EQ(engine->Init(&GetExchangeManager(), &GetFabricTable(), chip::app::reporting::GetDefaultReportScheduler()),
@@ -248,6 +264,6 @@ TEST_F(TestDeviceControllerFactory, DeviceControllerFactoryMethods_RetainAndRele
 
     // Free engine before finish
     engine->Shutdown();
-}
+} // DeviceControllerFactoryMethods_RetainAndRelease
 
 } // namespace
