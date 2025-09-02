@@ -134,6 +134,22 @@ public:
     virtual bool ValidateUrl(const std::string & url) = 0;
 
     /**
+     * @brief Validates the provided StreamUsage.
+     *
+     * @param streamUsage The StreamUsage to validate
+     * @return true if StreamUsage is present in the StreamUsagePriorities list, false otherwise
+     */
+    virtual bool ValidateStreamUsage(PushAvStreamTransport::StreamUsageEnum streamUsage) = 0;
+
+    /**
+     * @brief Validates the provided Segment Duration.
+     *
+     * @param segmentDuration The Segment Duration to validate
+     * @return true if Segment Duration is multiple of KeyFrameInterval, false otherwise
+     */
+    virtual bool ValidateSegmentDuration(uint16_t segmentDuration) = 0;
+
+    /**
      * @brief Validates bandwidth requirements against camera's resource management.
      *
      * @param streamUsage The desired usage type for the stream (e.g. live view, recording)

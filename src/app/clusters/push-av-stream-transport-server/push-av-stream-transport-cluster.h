@@ -52,6 +52,11 @@ public:
 
     void SetDelegate(EndpointId aEndpoint, PushAvStreamTransportDelegate * delegate) { mLogic.SetDelegate(aEndpoint, delegate); }
 
+    void SetTLSClientManagementDelegate(EndpointId aEndpoint, TlsClientManagementDelegate * delegate)
+    {
+        mLogic.SetTLSClientManagementDelegate(aEndpoint, delegate);
+    }
+
     CHIP_ERROR Init() { return mLogic.Init(); }
 
     void Deinit() { mLogic.Shutdown(); }
