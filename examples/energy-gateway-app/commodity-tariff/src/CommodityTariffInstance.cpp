@@ -203,64 +203,73 @@ bool CommodityTariffDelegate::TariffDataUpd_CrossValidator(TariffUpdateCtx & Upd
         return false;
     }
 
-    const auto& tariffPeriods = GetTariffPeriods_MgmtObj().GetNewValue().Value();
-    const auto& dayEntries = GetDayEntries_MgmtObj().GetNewValue().Value();
-    const auto& tariffComponents = GetTariffComponents_MgmtObj().GetNewValue().Value();
-    
+    const auto & tariffPeriods    = GetTariffPeriods_MgmtObj().GetNewValue().Value();
+    const auto & dayEntries       = GetDayEntries_MgmtObj().GetNewValue().Value();
+    const auto & tariffComponents = GetTariffComponents_MgmtObj().GetNewValue().Value();
+
     // Create lookup maps with const correctness
-    std::map<uint32_t, const Structs::DayEntryStruct::Type*> dayEntriesMap;
-    std::map<uint32_t, const Structs::TariffComponentStruct::Type*> tariffComponentsMap;
+    std::map<uint32_t, const Structs::DayEntryStruct::Type *> dayEntriesMap;
+    std::map<uint32_t, const Structs::TariffComponentStruct::Type *> tariffComponentsMap;
 
-    CommodityTariffAttrsDataMgmt::ListToMap<Structs::DayEntryStruct::Type, 
-        &Structs::DayEntryStruct::Type::dayEntryID>(dayEntries, dayEntriesMap);
-    
-    CommodityTariffAttrsDataMgmt::ListToMap<Structs::TariffComponentStruct::Type, 
-        &Structs::TariffComponentStruct::Type::tariffComponentID>(tariffComponents, tariffComponentsMap);
+    CommodityTariffAttrsDataMgmt::ListToMap<Structs::DayEntryStruct::Type, &Structs::DayEntryStruct::Type::dayEntryID>(
+        dayEntries, dayEntriesMap);
 
-    struct DeStartDurationPair {
+    CommodityTariffAttrsDataMgmt::ListToMap<Structs::TariffComponentStruct::Type,
+                                            &Structs::TariffComponentStruct::Type::tariffComponentID>(tariffComponents,
+                                                                                                      tariffComponentsMap);
+
+    struct DeStartDurationPair
+    {
         uint16_t startTime;
         uint16_t duration;
-        
-        bool operator==(const DeStartDurationPair& other) const {
+
+        bool operator==(const DeStartDurationPair & other) const
+        {
             return startTime == other.startTime && duration == other.duration;
         }
     };
 
     // Hash function for StartDurationPair
-    struct DeStartDurationPairHash {
-        size_t operator()(const DeStartDurationPair& p) const {
-            return (static_cast<size_t>(p.startTime) << 16) | p.duration;
-        }
+    struct DeStartDurationPairHash
+    {
+        size_t operator()(const DeStartDurationPair & p) const { return (static_cast<size_t>(p.startTime) << 16) | p.duration; }
     };
 
-    for (const auto& period : tariffPeriods) {
-        const auto& deIDs = period.dayEntryIDs;
-        const auto& tcIDs = period.tariffComponentIDs;
-    
+    for (const auto & period : tariffPeriods)
+    {
+        const auto & deIDs = period.dayEntryIDs;
+        const auto & tcIDs = period.tariffComponentIDs;
+
         // Validate Day Entries
         std::unordered_set<DeStartDurationPair, DeStartDurationPairHash> seenStartDurationPairs;
 
-        for (const uint32_t deID : deIDs) {
+        for (const uint32_t deID : deIDs)
+        {
             // Check if DE exists in original context
-            if (UpdCtx.DayEntryKeyIDs.count(deID) == 0) {
+            if (UpdCtx.DayEntryKeyIDs.count(deID) == 0)
+            {
                 return false; // Item not found in original list
             }
 
             // Safe lookup with bounds checking
             const auto dayEntryIt = dayEntriesMap.find(deID);
-            if (dayEntryIt == dayEntriesMap.end()) {
+            if (dayEntryIt == dayEntriesMap.end())
+            {
                 return false; // Day entry not found in map
             }
 
-            const auto* dayEntry = dayEntryIt->second;
-            
+            const auto * dayEntry = dayEntryIt->second;
+
             DeStartDurationPair pair;
             pair.startTime = dayEntry->startTime;
-            pair.duration = dayEntry->duration.HasValue() ? dayEntry->duration.Value() : CommodityTariffConsts::kDayEntryDurationLimit;
+            pair.duration =
+                dayEntry->duration.HasValue() ? dayEntry->duration.Value() : CommodityTariffConsts::kDayEntryDurationLimit;
 
             // Check for duplicates
-            if (!seenStartDurationPairs.insert(pair).second) {
-                ChipLogError(NotSpecified, "Duplicated startTime/duration (%u/%u) in  DayEntries of same TariffPeriod", pair.startTime,  pair.duration);
+            if (!seenStartDurationPairs.insert(pair).second)
+            {
+                ChipLogError(NotSpecified, "Duplicated startTime/duration (%u/%u) in  DayEntries of same TariffPeriod",
+                             pair.startTime, pair.duration);
                 return false; // Found duplicate startTime/duration combination
             }
         }
@@ -268,34 +277,41 @@ bool CommodityTariffDelegate::TariffDataUpd_CrossValidator(TariffUpdateCtx & Upd
         // Validate Tariff Components
         std::unordered_map<uint32_t, std::unordered_set<int64_t>> seenFeatureThresholdPairs;
 
-        for (const uint32_t tcID : tcIDs) {
+        for (const uint32_t tcID : tcIDs)
+        {
             // Check if TC exists in original context
             const auto featureIt = UpdCtx.TariffComponentKeyIDsFeatureMap.find(tcID);
-            if (featureIt == UpdCtx.TariffComponentKeyIDsFeatureMap.end()) {
+            if (featureIt == UpdCtx.TariffComponentKeyIDsFeatureMap.end())
+            {
                 return false; // Item not found in original list
             }
             // Safe lookup with bounds checking
             const auto tariffComponentIt = tariffComponentsMap.find(tcID);
-            if (tariffComponentIt == tariffComponentsMap.end()) {
+            if (tariffComponentIt == tariffComponentsMap.end())
+            {
                 return false; // Tariff component not found in map
             }
 
-            const auto* tariffComponent = tariffComponentIt->second;
-            const uint32_t featureID = featureIt->second;
+            const auto * tariffComponent = tariffComponentIt->second;
+            const uint32_t featureID     = featureIt->second;
 
             // Skip if threshold is null or featureID is 0
-            if (tariffComponent->threshold.IsNull() || ( tariffComponent->predicted.HasValue() &&  (tariffComponent->predicted.Value() == true) ) || featureID == 0) {
+            if (tariffComponent->threshold.IsNull() ||
+                (tariffComponent->predicted.HasValue() && (tariffComponent->predicted.Value() == true)) || featureID == 0)
+            {
                 continue;
             }
 
             const int64_t thresholdValue = tariffComponent->threshold.Value();
 
             // Find or create the set for this feature
-            auto& thresholdSet = seenFeatureThresholdPairs[featureID];
-            
+            auto & thresholdSet = seenFeatureThresholdPairs[featureID];
+
             // Check for duplicate threshold for this feature
-            if (!thresholdSet.insert(thresholdValue).second) {
-                ChipLogError(NotSpecified, "Duplicated threshold value %" PRIi64 "per feature %" PRIu32 "of same TariffPeriod", thresholdValue,  featureID);
+            if (!thresholdSet.insert(thresholdValue).second)
+            {
+                ChipLogError(NotSpecified, "Duplicated threshold value %" PRIi64 "per feature %" PRIu32 "of same TariffPeriod",
+                             thresholdValue, featureID);
                 return false; // Found duplicate feature/threshold combination
             }
         }
