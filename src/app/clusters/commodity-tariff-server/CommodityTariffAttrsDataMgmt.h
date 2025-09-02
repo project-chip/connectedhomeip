@@ -314,6 +314,16 @@ void ListToMap(const DataModel::List<T> & aList, std::map<uint32_t, const T *> &
     }
 }
 
+template <typename T, auto X>
+void ListToMap(const DataModel::List<T> & aList, std::unordered_map<uint32_t, const T *> & aMap)
+{
+    for (const auto & item : aList)
+    {
+        // Insert into map with specified entry as key
+        aMap.emplace(item.*X, &item);
+    }
+}
+
 template <typename T>
 CHIP_ERROR ValidateListEntry(const T & entryNewValue, void * aCtx);
 
