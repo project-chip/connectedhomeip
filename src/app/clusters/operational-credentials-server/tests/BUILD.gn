@@ -20,9 +20,7 @@ import("${chip_root}/build/chip/chip_test_suite.gni")
 chip_test_suite("tests") {
   output_name = "libTestOperationalCredentialsCluster"
 
-  test_sources = [
-    "TestOperationalCredentials.cpp",
-  ]
+  test_sources = [ "TestOperationalCredentials.cpp" ]
 
   cflags = [ "-Wconversion" ]
 
