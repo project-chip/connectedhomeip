@@ -1108,6 +1108,9 @@ class CommodityTariffTestBaseHelper(MatterBaseTest):
             List[cluster.Structs.TariffComponentStruct]: List of TariffComponentStruct entities with specified TariffComponentIDs.
         """
 
+        if self.tariffComponentsValue is None:
+            self.tariffComponentsValue = await self.read_single_attribute_check_success(endpoint=self.get_endpoint(), cluster=cluster, attribute=cluster.Attributes.TariffComponents)
+
         return [tariff_component for tariff_component in self.tariffComponentsValue if tariff_component.tariffComponentID in tariff_components_IDs]
 
     async def get_day_entry_IDs_from_day_entries_attribute(self, tariff_components: List[cluster.Structs.DayEntryStruct]) -> List[int]:
