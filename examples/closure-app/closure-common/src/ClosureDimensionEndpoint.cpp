@@ -50,7 +50,13 @@ Status ClosureDimensionDelegate::HandleStep(const StepDirectionEnum & direction,
 CHIP_ERROR ClosureDimensionEndpoint::Init()
 {
     ClusterConformance conformance;
-    conformance.FeatureMap().Set(Feature::kPositioning).Set(Feature::kSpeed);
+    conformance.FeatureMap()
+        .Set(Feature::kPositioning)
+        .Set(Feature::kMotionLatching)
+        .Set(Feature::kUnit)
+        .Set(Feature::kLimitation)
+        .Set(Feature::kSpeed)
+        .Set(Feature::kRotation);
 
     ClusterInitParameters clusterInitParameters;
     clusterInitParameters.translationDirection = TranslationDirectionEnum::kDownward;
