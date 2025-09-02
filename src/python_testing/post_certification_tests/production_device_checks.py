@@ -189,8 +189,10 @@ class DclCheck(MatterBaseTest, BasicCompositionTests):
         logging.info(f'{entry[key]}')
 
     def steps_Compliance(self):
-        return [TestStep(1, "Query the version information for this software version", "DCL entry exists"),
-                TestStep(2, "Check if device VID/PID/SoftwareVersion are listed in the DCL compliance info schema", "Listing found")]
+        return [TestStep(1, "Query the information about all software versions for this PID/VID", "DCL entry exists"),
+                TestStep(2, "Query the compliance information for the specified software versions",
+                            "Check at least one compliance entry exists for the specified software versions"
+                            "For each compliance entry the corresponding certified model entry exists")]
 
     def test_Compliance(self):
         self.step(1)
@@ -214,13 +216,13 @@ class DclCheck(MatterBaseTest, BasicCompositionTests):
                     f"{self.url}/dcl/compliance/certified-models/{self.vid}/{self.pid}/{software_version}/matter").json()
                 asserts.assert_true(cert_model_key in certified_model_entry.keys(),
                                     f"Unable to find certified model entry for {vid_pid_sv_str}")
-                break
         asserts.assert_true(found_versions,
                             f"Unable to find at least one compliance entry for the versions {software_versions}")
 
     def steps_CertifiedModel(self):
-        return [TestStep(1, "Query the version information for this software version", "DCL entry exists"),
-                TestStep(2, "Check if device VID/PID/SoftwareVersion are listed in the DCL certified model schema", "Listing found")]
+        return [TestStep(1, "Query the information about all software versions for this PID/VID", "DCL entry exists"),
+                TestStep(2, "Query the certified version information for the specified software versions",
+                            "Check at least one certified model entry exists for the specified software versions")]
 
     def test_CertifiedModel(self):
         self.step(1)
