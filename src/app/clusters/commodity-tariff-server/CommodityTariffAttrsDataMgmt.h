@@ -26,7 +26,9 @@
 #include <atomic>
 #include <cassert>
 #include <map>
+#include <set>
 #include <string>
+#include <unordered_map>
 #include <unordered_set>
 
 namespace chip {
@@ -268,7 +270,8 @@ struct StrToSpan
     /// @param destination Output span to populate
     /// @param maxCount Maximum number of characters to copy (default: unlimited)
     /// @return CHIP_NO_ERROR on success, error code on failure
-    static CHIP_ERROR Copy(const std::string & source, CharSpan & destination, size_t maxCount = std::numeric_limits<size_t>::max())
+    static CHIP_ERROR Copy(const std::string & source, CharSpan & destination,
+                           size_t maxCount = CommodityTariffConsts::kDefaultStringValuesMaxBufLength)
     {
         if (source.empty())
         {
@@ -300,6 +303,29 @@ struct StrToSpan
         }
     }
 };
+
+template <typename T, auto X>
+void ListToMap(const DataModel::List<T> & aList, std::map<uint32_t, const T *> & aMap)
+{
+    for (const auto & item : aList)
+    {
+        // Insert into map with specified entry as key
+        aMap.emplace(item.*X, &item);
+    }
+}
+
+template <typename T, auto X>
+void ListToMap(const DataModel::List<T> & aList, std::unordered_map<uint32_t, const T *> & aMap)
+{
+    for (const auto & item : aList)
+    {
+        // Insert into map with specified entry as key
+        aMap.emplace(item.*X, &item);
+    }
+}
+
+template <typename T>
+CHIP_ERROR ValidateListEntry(const T & entryNewValue, void * aCtx);
 
 /// @brief Type trait for nullable types
 template <typename U>
@@ -1125,6 +1151,8 @@ namespace CommodityTariff {
  */
 struct TariffUpdateCtx
 {
+    BlockModeEnum blockMode;
+
     /**
      * @brief Reference to the tariff's start timestamp
      * @note This is a reference to allow validation against the actual attribute value
@@ -1146,16 +1174,17 @@ struct TariffUpdateCtx
     std::unordered_set<uint32_t> DayPatternsDayEntryIDs;
 
     /**
+     * @brief DayEntry IDs referenced by IndividualDays items
+     * @details Collected separately for reference validation
+     */
+    std::unordered_set<uint32_t> IndividualDaysDayEntryIDs;
+
+    /**
      * @brief DayEntry IDs referenced by TariffPeriod items
      * @details Collected separately for reference validation
      */
     std::unordered_set<uint32_t> TariffPeriodsDayEntryIDs;
 
-    /**
-     * @brief DayEntry IDs referenced by IndividualDays items
-     * @details Collected separately for reference validation
-     */
-    std::unordered_set<uint32_t> IndividualDaysDayEntryIDs;
     /// @}
 
     /// @name TariffComponent ID Tracking
@@ -1164,7 +1193,7 @@ struct TariffUpdateCtx
      * @brief Master set of all valid TariffComponent IDs
      * @details Contains all TariffComponent IDs that exist in the tariff definition
      */
-    std::unordered_set<uint32_t> TariffComponentKeyIDs;
+    std::unordered_map<uint32_t, uint32_t> TariffComponentKeyIDsFeatureMap;
 
     /**
      * @brief TariffComponent IDs referenced by TariffPeriod items
@@ -1200,6 +1229,7 @@ struct TariffUpdateCtx
      */
     uint32_t TariffUpdateTimestamp;
 };
+
 } // namespace CommodityTariff
 } // namespace Clusters
 } // namespace app
