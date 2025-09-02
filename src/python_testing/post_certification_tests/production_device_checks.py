@@ -189,18 +189,34 @@ class DclCheck(MatterBaseTest, BasicCompositionTests):
         logging.info(f'{entry[key]}')
 
     def steps_Compliance(self):
-        return [TestStep(1, "Check if device VID/PID/SoftwareVersion are listed in the DCL compliance info schema", "Listing found")]
+        return [TestStep(1, "Query the version information for this software version", "DCL entry exists"),
+                TestStep(2, "Check if device VID/PID/SoftwareVersion are listed in the DCL compliance info schema", "Listing found")]
 
     def test_Compliance(self):
         self.step(1)
-        key = 'complianceInfo'
-        entry = requests.get(
-            f"{self.url}/dcl/compliance/compliance-info/{self.vid}/{self.pid}/{self.software_version}/matter").json()
-        asserts.assert_true(key in entry.keys(),
-                            f"Unable to find compliance entry for {self.vid_pid_sv_str}")
-        logging.info(
-            f'Found compliance info for {self.vid_pid_sv_str} in the DCL:')
-        logging.info(f'{entry[key]}')
+        software_versions = self.get_versions_and_assert_all_keys_exist()
+
+        self.step(2)
+        found_versions = []
+        for software_version in software_versions:
+            vid_pid_sv_str = f'{self.vid_pid_str} software version = {software_version}'
+            key = 'complianceInfo'
+            sub_key = 'softwareVersion'
+            cert_model_key = 'certifiedModel'
+            entry = requests.get(
+                f"{self.url}/dcl/compliance/compliance-info/{self.vid}/{self.pid}/{software_version}/matter").json()
+            if key in entry.keys() and entry[key][sub_key] == software_version:
+                found_versions.append(software_version)
+                logging.info(
+                    f'Found compliance info for {vid_pid_sv_str} in the DCL:')
+                logging.info(f'{entry[key]}')
+                certified_model_entry = requests.get(
+                    f"{self.url}/dcl/compliance/certified-models/{self.vid}/{self.pid}/{software_version}/matter").json()
+                asserts.assert_true(cert_model_key in certified_model_entry.keys(),
+                                    f"Unable to find certified model entry for {vid_pid_sv_str}")
+                break
+        asserts.assert_true(found_versions,
+                            f"Unable to find at least one compliance entry for the versions {software_versions}")
 
     def steps_CertifiedModel(self):
         return [TestStep(1, "Query the version information for this software version", "DCL entry exists"),
@@ -373,7 +389,7 @@ class TestConfig(object):
         self.admin_storage = f'admin_storage_{tmp_uuid}.json'
         global_test_params = {'use_pase_only': True, 'post_cert_test': True}
         self.config = MatterTestConfig(endpoint=0, dut_node_ids=[
-                                       1], global_test_params=global_test_params, storage_path=self.admin_storage)
+            1], global_test_params=global_test_params, storage_path=self.admin_storage)
         if code_type == SetupCodeType.QR:
             self.config.qr_code_content = [code]
         else:
