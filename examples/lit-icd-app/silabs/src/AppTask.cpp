@@ -116,12 +116,14 @@ void AppTask::ApplicationEventHandler(AppEvent * aEvent)
     VerifyOrReturn(aEvent->Type == AppEvent::kEventType_Button);
     VerifyOrReturn(aEvent->ButtonEvent.Action == static_cast<uint8_t>(SilabsPlatform::ButtonAction::ButtonPressed));
 
-    // Simple Application logic that toggles the BoleanState StateValue attribute.
+    // Simple Application logic that toggles the BooleanState StateValue attribute.
     // DO NOT COPY for product logic. LIT ICD app is a test app with very simple application logic to enable testing.
     // The goal of the app is just to enable testing of LIT ICD features without impacting product sample apps.
     PlatformMgr().ScheduleWork([](intptr_t) {
-        auto state = chip::app::Clusters::BooleanState::GetStateValue();
-        chip::app::Clusters::BooleanState::SetStateValue(!state);
+        bool state{ false };
+        chip::app::Clusters::BooleanState::GetStateValue(1, state);
+        EventNumber eventNumber;
+        chip::app::Clusters::BooleanState::SetStateValue(1, !state, eventNumber);
     });
 }
 

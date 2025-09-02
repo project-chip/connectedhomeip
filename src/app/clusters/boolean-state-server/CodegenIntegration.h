@@ -22,11 +22,9 @@
 
 namespace chip::app::Clusters::BooleanState {
 
-void SetStateValue(const Attributes::StateValue::TypeInfo::Type & stateValue);
+CHIP_ERROR SetStateValue(EndpointId endpointId, const Attributes::StateValue::TypeInfo::Type & stateValue,
+                         EventNumber & eventNumber);
 
-Attributes::StateValue::TypeInfo::Type GetStateValue();
-
-CHIP_ERROR
-LogEvent(BooleanState::Attributes::StateValue::TypeInfo::Type stateValue, EventNumber & eventNumber);
+CHIP_ERROR GetStateValue(EndpointId endpointId, Attributes::StateValue::TypeInfo::Type & stateValue);
 
 } // namespace chip::app::Clusters::BooleanState

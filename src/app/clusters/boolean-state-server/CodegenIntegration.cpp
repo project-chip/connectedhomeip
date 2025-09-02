@@ -17,6 +17,9 @@
  */
 
 #include "CodegenIntegration.h"
+#include <app/clusters/boolean-state-server/boolean-state-cluster.h>
+#include <app/static-cluster-config/BooleanState.h>
+#include <app/util/attribute-storage.h>
 #include <data-model-providers/codegen/CodegenDataModelProvider.h>
 
 using namespace chip;
@@ -27,64 +30,74 @@ using namespace chip::app::Clusters::BooleanState::Attributes;
 
 namespace {
 
-LazyRegisteredServerCluster<BooleanStateCluster> gServer;
+constexpr size_t kBooleanStateFixedClusterCount = BooleanState::StaticApplicationConfig::kFixedClusterConfig.size();
+constexpr size_t kBooleanStateMaxClusterCount   = kBooleanStateFixedClusterCount + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT;
 
-constexpr EndpointId kEndpointWithBooleanState = 1;
+LazyRegisteredServerCluster<BooleanStateCluster> gServers[kBooleanStateFixedClusterCount];
 
-bool ValidEndpointForBooleanState(EndpointId endpoint)
+// Find the 0-based array index corresponding to the given endpoint id.
+// Log an error if not found.
+bool FindEndpointWithLog(EndpointId endpointId, uint16_t & outArrayIndex)
 {
-    if (endpoint != kEndpointWithBooleanState)
+    uint16_t arrayIndex = emberAfGetClusterServerEndpointIndex(endpointId, BooleanState::Id, kBooleanStateFixedClusterCount);
+
+    if (arrayIndex >= kBooleanStateMaxClusterCount)
     {
-        ChipLogError(AppServer, "BooleanState cluster invalid endpoint");
+        ChipLogError(AppServer, "Could not find endpoint index for endpoint %u", endpointId);
         return false;
     }
+    outArrayIndex = arrayIndex;
+
     return true;
 }
 
 } // namespace
 
-void emberAfBooleanStateClusterServerInitCallback(EndpointId endpoint)
+void emberAfBooleanStateClusterServerInitCallback(EndpointId endpointId)
 {
-    VerifyOrReturn(ValidEndpointForBooleanState(endpoint));
+    uint16_t arrayIndex = 0;
+    VerifyOrReturn(FindEndpointWithLog(endpointId, arrayIndex));
 
-    gServer.Create(endpoint);
-
-    CHIP_ERROR err = CodegenDataModelProvider::Instance().Registry().Register(gServer.Registration());
+    gServers[arrayIndex].Create(endpointId);
+    CHIP_ERROR err = CodegenDataModelProvider::Instance().Registry().Register(gServers[arrayIndex].Registration());
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(AppServer, "BooleanState cluster error registration");
+        ChipLogError(AppServer, "Failed to register BooleanState cluster on endpoint %u: %" CHIP_ERROR_FORMAT, endpointId,
+                     err.Format());
     }
 }
 
-void MatterBooleanStateClusterServerShutdownCallback(EndpointId endpoint)
+void MatterBooleanStateClusterServerShutdownCallback(EndpointId endpointId)
 {
-    VerifyOrReturn(ValidEndpointForBooleanState(endpoint));
+    uint16_t arrayIndex = 0;
+    VerifyOrReturn(FindEndpointWithLog(endpointId, arrayIndex));
 
-    CHIP_ERROR err = CodegenDataModelProvider::Instance().Registry().Unregister(&gServer.Cluster());
+    CHIP_ERROR err = CodegenDataModelProvider::Instance().Registry().Unregister(&gServers[arrayIndex].Cluster());
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(AppServer, "BooleanState unregister error");
+        ChipLogError(AppServer, "Failed to unregister BooleanState cluster on endpoint %u: %" CHIP_ERROR_FORMAT, endpointId,
+                     err.Format());
     }
-
-    gServer.Destroy();
+    gServers[arrayIndex].Destroy();
 }
 
 namespace chip::app::Clusters::BooleanState {
 
-void SetStateValue(const StateValue::TypeInfo::Type & stateValue)
+CHIP_ERROR SetStateValue(EndpointId endpointId, const StateValue::TypeInfo::Type & stateValue, EventNumber & eventNumber)
 {
-    gServer.Cluster().SetStateValue(stateValue);
+    uint16_t arrayIndex = 0;
+    VerifyOrReturnError(FindEndpointWithLog(endpointId, arrayIndex), CHIP_ERROR_INVALID_ARGUMENT);
+
+    return gServers[arrayIndex].Cluster().SetStateValue(stateValue, eventNumber);
 }
 
-Attributes::StateValue::TypeInfo::Type GetStateValue()
+CHIP_ERROR GetStateValue(EndpointId endpointId, Attributes::StateValue::TypeInfo::Type & stateValue)
 {
-    return gServer.Cluster().GetStateValue();
-}
+    uint16_t arrayIndex = 0;
+    VerifyOrReturnError(FindEndpointWithLog(endpointId, arrayIndex), CHIP_ERROR_INVALID_ARGUMENT);
 
-CHIP_ERROR
-LogEvent(BooleanState::Attributes::StateValue::TypeInfo::Type stateValue, EventNumber & eventNumber)
-{
-    return gServer.Cluster().LogEvent(stateValue, eventNumber);
+    stateValue = gServers[arrayIndex].Cluster().GetStateValue();
+    return CHIP_NO_ERROR;
 }
 
 } // namespace chip::app::Clusters::BooleanState

@@ -201,13 +201,15 @@ void AppTask::AppTaskMain(void * pvParameter)
             if (APP_EVENT_CONTACT_SENSOR_TRUE & appEvent)
             {
                 stateValueAttrValue = 1;
-                app::Clusters::BooleanState::SetStateValue(stateValueAttrValue);
+                EventNumber eventNumber;
+                app::Clusters::BooleanState::SetStateValue(1, stateValueAttrValue, eventNumber);
             }
 
             if (APP_EVENT_CONTACT_SENSOR_FALSE & appEvent)
             {
                 stateValueAttrValue = 0;
-                app::Clusters::BooleanState::SetStateValue(stateValueAttrValue);
+                EventNumber eventNumber;
+                app::Clusters::BooleanState::SetStateValue(1, stateValueAttrValue, eventNumber);
             }
 
             PlatformMgr().UnlockChipStack();

@@ -14,9 +14,8 @@
  *    limitations under the License.
  */
 
-#include <pw_unit_test/framework.h>
-
 #include <app/clusters/boolean-state-server/boolean-state-cluster.h>
+#include <pw_unit_test/framework.h>
 
 #include <app/clusters/testing/AttributeTesting.h>
 #include <app/server-cluster/AttributeListBuilder.h>
@@ -38,7 +37,7 @@ struct TestBooleanStateCluster : public ::testing::Test
     static void TearDownTestSuite() { Platform::MemoryShutdown(); }
 };
 
-constexpr EndpointId kEndpoint = 1;
+constexpr size_t kBooleanStateFixedClusterCount = 2;
 
 class BooleanStateClusterTest
 {
@@ -86,55 +85,65 @@ public:
 
 TEST_F(TestBooleanStateCluster, AttributeTest)
 {
-    BooleanStateClusterTest(kEndpoint).Check([](BooleanStateCluster & booleanState) {
-        ReadOnlyBufferBuilder<DataModel::AttributeEntry> attributes;
-        ASSERT_EQ(booleanState.Attributes(ConcreteClusterPath(kEndpoint, BooleanState::Id), attributes), CHIP_NO_ERROR);
+    for (EndpointId endpoint = 0; endpoint < kBooleanStateFixedClusterCount; ++endpoint)
+    {
+        BooleanStateClusterTest(endpoint).Check([&](BooleanStateCluster & booleanState) {
+            ReadOnlyBufferBuilder<DataModel::AttributeEntry> attributes;
+            ASSERT_EQ(booleanState.Attributes(ConcreteClusterPath(endpoint, BooleanState::Id), attributes), CHIP_NO_ERROR);
 
-        ReadOnlyBufferBuilder<DataModel::AttributeEntry> expected;
-        AttributeListBuilder listBuilder(expected);
-        ASSERT_EQ(listBuilder.Append(Span(BooleanState::Attributes::kMandatoryMetadata), {}), CHIP_NO_ERROR);
-        ASSERT_TRUE(Testing::EqualAttributeSets(attributes.TakeBuffer(), expected.TakeBuffer()));
-    });
+            ReadOnlyBufferBuilder<DataModel::AttributeEntry> expected;
+            AttributeListBuilder listBuilder(expected);
+            ASSERT_EQ(listBuilder.Append(Span(BooleanState::Attributes::kMandatoryMetadata), {}), CHIP_NO_ERROR);
+            ASSERT_TRUE(Testing::EqualAttributeSets(attributes.TakeBuffer(), expected.TakeBuffer()));
+        });
+    }
 }
 
 TEST_F(TestBooleanStateCluster, ReadAttributeTest)
 {
-    BooleanStateClusterTest(kEndpoint).Check([](BooleanStateCluster & booleanState) {
-        DataModel::ReadAttributeRequest request;
-        request.path.mEndpointId  = kEndpoint;
-        request.path.mClusterId   = BooleanState::Id;
-        request.path.mAttributeId = Globals::Attributes::ClusterRevision::Id;
+    for (EndpointId endpoint = 0; endpoint < kBooleanStateFixedClusterCount; ++endpoint)
+    {
+        BooleanStateClusterTest(endpoint).Check([&](BooleanStateCluster & booleanState) {
+            DataModel::ReadAttributeRequest request;
+            request.path.mEndpointId  = endpoint;
+            request.path.mClusterId   = BooleanState::Id;
+            request.path.mAttributeId = Globals::Attributes::ClusterRevision::Id;
 
-        ReadAttribute readAttribute(booleanState);
-        readAttribute(request);
-        EXPECT_TRUE(readAttribute.GetStatus().IsSuccess());
+            ReadAttribute readAttribute(booleanState);
+            readAttribute(request);
+            EXPECT_TRUE(readAttribute.GetStatus().IsSuccess());
 
-        request.path.mAttributeId = FeatureMap::Id;
-        readAttribute(request);
-        EXPECT_TRUE(readAttribute.GetStatus().IsSuccess());
+            request.path.mAttributeId = FeatureMap::Id;
+            readAttribute(request);
+            EXPECT_TRUE(readAttribute.GetStatus().IsSuccess());
 
-        request.path.mAttributeId = StateValue::Id;
-        readAttribute(request);
-        EXPECT_TRUE(readAttribute.GetStatus().IsSuccess());
+            request.path.mAttributeId = StateValue::Id;
+            readAttribute(request);
+            EXPECT_TRUE(readAttribute.GetStatus().IsSuccess());
 
-        request.path.mAttributeId = 0xFFFF;
-        readAttribute(request);
-        EXPECT_TRUE(readAttribute.GetStatus().IsError());
-    });
+            request.path.mAttributeId = 0xFFFF;
+            readAttribute(request);
+            EXPECT_TRUE(readAttribute.GetStatus().IsError());
+        });
+    }
 }
 
 TEST_F(TestBooleanStateCluster, StateValue)
 {
-    BooleanStateClusterTest(kEndpoint).Check([](BooleanStateCluster & booleanState) {
-        StateValue::TypeInfo::Type stateValue = false;
-        booleanState.SetStateValue(stateValue);
-        StateValue::TypeInfo::Type stateVal;
-        stateVal = booleanState.GetStateValue();
-        ASSERT_EQ(stateVal, stateValue);
+    for (EndpointId endpoint = 0; endpoint < kBooleanStateFixedClusterCount; ++endpoint)
+    {
+        BooleanStateClusterTest(endpoint).Check([](BooleanStateCluster & booleanState) {
+            StateValue::TypeInfo::Type stateValue = false;
+            EventNumber eventNumber;
+            booleanState.SetStateValue(stateValue, eventNumber);
+            StateValue::TypeInfo::Type stateVal;
+            stateVal = booleanState.GetStateValue();
+            EXPECT_EQ(stateVal, stateValue);
 
-        stateValue = true;
-        booleanState.SetStateValue(stateValue);
-        stateVal = booleanState.GetStateValue();
-        ASSERT_EQ(stateVal, stateValue);
-    });
+            stateValue = true;
+            booleanState.SetStateValue(stateValue, eventNumber);
+            stateVal = booleanState.GetStateValue();
+            EXPECT_EQ(stateVal, stateValue);
+        });
+    }
 }

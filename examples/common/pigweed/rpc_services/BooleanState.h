@@ -41,9 +41,8 @@ public:
         {
             DeviceLayer::StackLock lock;
 
-            // Update attribute first, then emit StateChange event only on success.
-            app::Clusters::BooleanState::SetStateValue(newState);
-            RETURN_STATUS_IF_NOT_OK(app::Clusters::BooleanState::LogEvent(newState, eventNumber));
+            EventNumber eventNumber;
+            RETURN_STATUS_IF_NOT_OK(app::Clusters::BooleanState::SetStateValue(endpointId, newState, eventNumber));
         }
 
         response.event_number = static_cast<uint64_t>(eventNumber);
@@ -52,11 +51,12 @@ public:
 
     virtual pw::Status Get(const chip_rpc_BooleanStateGetRequest & request, chip_rpc_BooleanStateGetResponse & response)
     {
-        bool state_value = false;
+        EndpointId endpointId = request.endpoint_id;
+        bool state_value{ false };
 
         {
             DeviceLayer::StackLock lock;
-            state_value = app::Clusters::BooleanState::GetStateValue();
+            app::Clusters::BooleanState::GetStateValue(endpointId, state_value);
         }
 
         response.state.state_value = state_value;
