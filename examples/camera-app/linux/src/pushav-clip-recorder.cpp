@@ -44,7 +44,11 @@ PushAVClipRecorder::PushAVClipRecorder(ClipInfoStruct & aClipInfo, AudioInfoStru
     mClipInfo(aClipInfo),
     mAudioInfo(aAudioInfo), mVideoInfo(aVideoInfo), mUploader(aUploader)
 {
-
+    mFormatContext        = nullptr;
+    mInputFormatContext   = nullptr;
+    mVideoStream          = nullptr;
+    mAudioStream          = nullptr;
+    mAudioEncoderContext  = nullptr;
     mVideoInfo.mVideoPts  = 0;
     mVideoInfo.mVideoDts  = 0;
     mAudioInfo.mAudioPts  = 0;
@@ -52,6 +56,13 @@ PushAVClipRecorder::PushAVClipRecorder(ClipInfoStruct & aClipInfo, AudioInfoStru
     int streamIndex       = 0;
     mMetadataSet          = false;
     mDeinitializeRecorder = false;
+    mUploadedInitSegment  = false;
+    mUploadMPD            = false;
+    mAudioFragment        = 1;
+    mVideoFragment        = 1;
+    mCurrentClipStartPts  = AV_NOPTS_VALUE;
+    mFoundFirstIFramePts  = -1;
+    currentPts            = AV_NOPTS_VALUE;
     if (mClipInfo.mHasVideo)
     {
         mVideoInfo.mVideoStreamIndex = streamIndex++;
@@ -73,9 +84,9 @@ PushAVClipRecorder::PushAVClipRecorder(ClipInfoStruct & aClipInfo, AudioInfoStru
 
 PushAVClipRecorder::~PushAVClipRecorder()
 {
+    Stop();
     if (mWorkerThread.joinable())
     {
-        Stop();
         mWorkerThread.join();
     }
 }
@@ -229,6 +240,7 @@ void PushAVClipRecorder::Stop()
     if (GetRecorderStatus())
     {
         SetRecorderStatus(false);
+        mCondition.notify_one();
         while (!mVideoQueue.empty())
         {
             av_packet_free(&mVideoQueue.front());
@@ -348,7 +360,13 @@ int PushAVClipRecorder::StartClipRecording()
     while (GetRecorderStatus())
     {
         std::unique_lock<std::mutex> lock(mQueueMutex);
-        mCondition.wait(lock, [this] { return !mVideoQueue.empty() || !mAudioQueue.empty(); });
+        mCondition.wait(
+            lock, [this] { return !mVideoQueue.empty() || !mAudioQueue.empty() || !GetRecorderStatus() || mDeinitializeRecorder; });
+        if (!GetRecorderStatus() || mDeinitializeRecorder)
+        {
+            ChipLogProgress(Camera, "Recorder thread received stop signal for ID: %s", mClipInfo.mRecorderId.c_str());
+            break; // Exit loop
+        }
         ProcessBuffersAndWrite();
     }
 
