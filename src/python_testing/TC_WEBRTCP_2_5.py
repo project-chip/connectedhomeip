@@ -162,7 +162,7 @@ class TC_WebRTCProvider_2_5(MatterBaseTest, WEBRTCPTestBase):
             try:
                 resp = await self.send_single_cmd(cmd=cmd, endpoint=endpoint, payloadCapability=ChipDeviceCtrl.TransportPayloadCapability.LARGE_PAYLOAD)
                 asserts.assert_equal(type(resp), Clusters.WebRTCTransportProvider.Commands.SolicitOfferResponse,
-                             "Incorrect response type")                
+                                     "Incorrect response type")
             except InteractionModelError as e:
                 asserts.assert_equal(e.status, Status.Success, "Unexpected error on an expected success scenario")
 
@@ -187,9 +187,11 @@ class TC_WebRTCProvider_2_5(MatterBaseTest, WEBRTCPTestBase):
             try:
                 resp = await self.send_single_cmd(cmd=cmd, endpoint=endpoint, payloadCapability=ChipDeviceCtrl.TransportPayloadCapability.LARGE_PAYLOAD)
                 asserts.assert_equal(type(resp), Clusters.WebRTCTransportProvider.Commands.SolicitOfferResponse,
-                             "Incorrect response type")                
-                asserts.assert_equal(resp.videoStreamID, videoStreamID, "VideoStreamID in the response does not match that allocated")
-                asserts.assert_equal(resp.audioStreamID, audioStreamID, "AudioStreamID in the response does not match that allocated")
+                                     "Incorrect response type")
+                asserts.assert_equal(resp.videoStreamID, videoStreamID,
+                                     "VideoStreamID in the response does not match that allocated")
+                asserts.assert_equal(resp.audioStreamID, audioStreamID,
+                                     "AudioStreamID in the response does not match that allocated")
             except InteractionModelError as e:
                 asserts.assert_equal(e.status, Status.Success, "Unexpected error on an expected success scenario")
         else:
