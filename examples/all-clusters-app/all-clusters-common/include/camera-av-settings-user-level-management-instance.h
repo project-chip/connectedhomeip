@@ -45,7 +45,7 @@ public:
     virtual void DefaultViewportUpdated(Globals::Structs::ViewportStruct::Type aViewport) override;
 
     // To be invoked by the Camera App once a physical PTZ action has been completed.  This is expected to be a discrete period of
-    // time after a request is made for PTZ via the HAL.  This results on the request command receiving an appropriate status
+    // time after a request is made for PTZ via the HAL.  This results in the request command receiving an appropriate status
     // response.
     void OnPhysicalMoveCompleted(Protocols::InteractionModel::Status status);
 
