@@ -544,13 +544,13 @@ CHIP_ERROR ValidateListEntry(const TariffPeriodStruct::Type & entryNewValue, voi
     if (entryNewValue.tariffComponentIDs.empty() || entryNewValue.tariffComponentIDs.size() > kTariffPeriodItemMaxIDs)
         return CHIP_ERROR_INVALID_ARGUMENT;
 
-    // Check that the current period item has no duplicated dayEntryIDs
+    // Checks that dayEntryIDs references has no duplicates among another TP entries
     if (CommonUtilities::HasDuplicateIDs(entryNewValue.dayEntryIDs, ctx->TariffPeriodsDayEntryIDs))
     {
         return CHIP_ERROR_DUPLICATE_KEY_ID;
     }
 
-    // Check that the current period item has no duplicated tariffComponentIDs
+    // Checks that the current period item has no duplicated tariffComponentIDs
     if (CommonUtilities::HasDuplicateIDs(entryNewValue.tariffComponentIDs, entryTcIDs))
     {
         return CHIP_ERROR_DUPLICATE_KEY_ID;
