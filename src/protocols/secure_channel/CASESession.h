@@ -542,8 +542,8 @@ private:
     void InvalidateIfPendingEstablishmentOnFabric(FabricIndex fabricIndex);
 
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
-    static void HandleConnectionAttemptComplete(Transport::ActiveTCPConnectionState * conn, CHIP_ERROR conErr);
-    static void HandleConnectionClosed(Transport::ActiveTCPConnectionState * conn, CHIP_ERROR conErr);
+    static void HandleConnectionAttemptComplete(Transport::ActiveTCPConnectionHolder & conn, CHIP_ERROR conErr);
+    static void HandleConnectionClosed(Transport::ActiveTCPConnectionState & conn, CHIP_ERROR conErr);
 
     // Context to pass down when connecting to peer
     Transport::AppTCPConnectionCallbackCtxt mTCPConnCbCtxt;
@@ -554,7 +554,7 @@ private:
     // invocation of the callbacks when the connection is established/closed.
     //
     // This pointer must be nulled out when the connection is closed.
-    Transport::ActiveTCPConnectionState * mPeerConnState = nullptr;
+    Transport::ActiveTCPConnectionHolder mPeerConnState;
 #endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
 
 #if CONFIG_BUILD_FOR_HOST_UNIT_TEST

@@ -302,8 +302,8 @@ public:
     // latter is about to be marked active. It is also used to reset the
     // connection to a nullptr when the connection is lost and the session
     // is marked as Defunct.
-    ActiveTCPConnectionState * GetTCPConnection() const { return mTCPConnection; }
-    void SetTCPConnection(ActiveTCPConnectionState * conn) { mTCPConnection = conn; }
+    ActiveTCPConnectionHolder GetTCPConnection() const { return const_cast<Session *>(this)->mTCPConnection; }
+    void SetTCPConnection(ActiveTCPConnectionHolder & conn) { mTCPConnection = conn; }
 #endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
 
     void NotifySessionHang()
@@ -352,7 +352,7 @@ private:
     // as that of the underlying connection with the peer.
     // It would remain as a nullptr for all sessions that are not set up over
     // a TCP connection.
-    ActiveTCPConnectionState * mTCPConnection = nullptr;
+    ActiveTCPConnectionHolder mTCPConnection;
 #endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
 };
 
