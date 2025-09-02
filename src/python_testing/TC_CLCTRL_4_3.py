@@ -706,8 +706,8 @@ class TC_CLCTRL_4_3(MatterBaseTest):
                 logging.error(f"MoveTo command with Speed = CurrentSpeed failed: {e}")
                 asserts.assert_equal(e.status, Status.Success,
                                      f"Expected Success status for MoveTo with Speed = CurrentSpeed, but got: {e}")
-            sub_handler.reset()    
-            
+            sub_handler.reset()
+
         else:
             logging.info("Skipping steps 10b to 10i as Speed feature is not supported")
             self.mark_step_range_skipped("10b", "10i")
