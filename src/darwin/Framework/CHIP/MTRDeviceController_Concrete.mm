@@ -114,7 +114,11 @@ using namespace chip::Tracing::DarwinFramework;
 // Whether we should be advertising our operational identity when we are not suspended.
 @property (nonatomic, readonly) BOOL shouldAdvertiseOperational;
 
-@property (atomic, readwrite, nullable) MTRCommissioningOperation * currentCommissioning;
+@property (atomic, readwrite, nullable, weak) MTRCommissioningOperation * currentCommissioning;
+
+// Make sure MTRCommissioningOperation we create internally stay alive until
+// they are stopped.
+@property (atomic, readwrite, nullable) MTRCommissioningOperation * currentInternalCommissioning;
 
 @end
 
@@ -882,6 +886,10 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
     MTR_LOG("%@ starting new commissioning %@", self, commissioning);
     self.currentCommissioning = commissioning;
 
+    if (commissioning.isInternallyCreated) {
+        self.currentInternalCommissioning = commissioning;
+    }
+
     // Capture in a block variable to avoid losing granularity for metrics,
     // when translating CHIP_ERROR to NSError
     __block CHIP_ERROR errorCode = CHIP_NO_ERROR;
@@ -931,6 +939,13 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
         // already, and then we don't need to worry about the device controller
         // delegate.
         [self syncRunOnWorkQueue:block error:nil];
+    }
+
+    // Generally, we would expect self.currentInternalCommissioning to be equal
+    // to commissioning if and only if self.currentCommissioning is equal to
+    // it.  But just in case, have this as a separate check.
+    if (self.currentInternalCommissioning == commissioning) {
+        self.currentInternalCommissioning = nil;
     }
 }
 
@@ -1043,9 +1058,13 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
     // keep behaving that way.
     params.preventNetworkScans = YES;
 
-    return [self _commissionNodeWithID:(NSNumber *) nodeID
-                   commissioningParams:params
-                                 error:error];
+    BOOL ok = [self _commissionNodeWithID:(NSNumber *) nodeID
+                      commissioningParams:params
+                                    error:error];
+    if (ok) {
+        currentCommissioning.isWaitingAfterPASEEstablished = NO;
+    }
+    return ok;
 }
 
 - (BOOL)commission:(MTRCommissioningOperation *)commissioning
@@ -1284,14 +1303,14 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
     auto * currentCommissioning = self.currentCommissioning;
     if (currentCommissioning && !currentCommissioning.isInternallyCreated) {
         MTR_LOG_ERROR("Trying to cancelCommissioningForNodeID 0x%016llX (%@) when using MTRCommissioningOperation; call ignored",
-                      nodeID.unsignedLongLongValue, nodeID);
+            nodeID.unsignedLongLongValue, nodeID);
         if (error) {
             *error = [MTRError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE];
         }
         return NO;
     }
 
-    return [self _cancelCommissioningForNodeID:nodeID error:error];
+    return [self _cancelCommissioning:currentCommissioning forNodeID:nodeID error:error];
 }
 
 - (BOOL)stopCommissioning:(MTRCommissioningOperation *)commissioning forCommissioningID:(NSNumber *)commissioningID
@@ -1302,20 +1321,36 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
         return NO;
     }
 
-    return [self _cancelCommissioningForNodeID:commissioningID error:nil];
+    return [self _cancelCommissioning:currentCommissioning forNodeID:commissioningID error:nil];
 }
 
-- (BOOL)_cancelCommissioningForNodeID:(NSNumber *)nodeID error:(NSError * __autoreleasing *)error
+- (BOOL)_cancelCommissioning:(MTRCommissioningOperation *)commissioning forNodeID:(NSNumber *)nodeID error:(NSError * __autoreleasing *)error
 {
+    BOOL isWaitingAfterPASEEstablished = commissioning.isWaitingAfterPASEEstablished;
     auto block = ^BOOL {
         self->_operationalCredentialsDelegate->ResetDeviceID();
         auto errorCode = self->_cppCommissioner->StopPairing([nodeID unsignedLongLongValue]);
         // Emit metric on status of cancel
         MATTER_LOG_METRIC(kMetricCancelCommissioning, errorCode);
-        return ![MTRDeviceController_Concrete checkForError:errorCode logMsg:kDeviceControllerErrorStopPairing error:error];
+        BOOL ok = ![MTRDeviceController_Concrete checkForError:errorCode logMsg:kDeviceControllerErrorStopPairing error:error];
+        if (ok && isWaitingAfterPASEEstablished) {
+            // If we are not actually in the middle of either PASE establishment
+            // or active commissioning on the C++ side, there will be no
+            // notifications when we StopPairing.  Provide the
+            // OnCommissioningComplete notification ourselves.
+            MTR_LOG("%@ Notifying commissioning complete manually because %@ is being canceled while waiting after PASE establishment",
+                self, commissioning);
+            self->_deviceControllerDelegateBridge->OnCommissioningComplete(nodeID.unsignedLongLongValue,
+                CHIP_ERROR_CANCELLED);
+        }
+        return ok;
     };
 
-    return [self syncRunOnWorkQueueWithBoolReturnValue:block error:error];
+    BOOL ok = [self syncRunOnWorkQueueWithBoolReturnValue:block error:error];
+    if (ok && isWaitingAfterPASEEstablished) {
+        commissioning.isWaitingAfterPASEEstablished = NO;
+    }
+    return ok;
 }
 
 - (BOOL)startBrowseForCommissionables:(id<MTRCommissionableBrowserDelegate>)delegate queue:(dispatch_queue_t)queue

@@ -260,6 +260,7 @@ static inline void emitMetricForSetupPayload(NSString * payload)
     // commissioning ourselves if not.
     if ([strongDelegate respondsToSelector:@selector(commissioning:paseSessionEstablishmentComplete:)]) {
         dispatch_async(_delegateQueue, ^{
+            self.isWaitingAfterPASEEstablished = YES;
             [strongDelegate commissioning:self paseSessionEstablishmentComplete:error];
         });
 

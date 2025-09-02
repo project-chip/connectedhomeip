@@ -177,6 +177,35 @@ typedef void (^AttestationHandler)(dispatch_block_t);
 
 @end
 
+typedef void (^PASEEstalishedHandler)(MTRCommissioningOperation * commissioning, NSError * _Nullable error);
+
+@interface MTRPairingTestsCommissioningDelegateWithPASEHandler : MTRPairingTestsCommissioningDelegate
+- (instancetype)initWithExpectation:(XCTestExpectation *)expectation
+                            handler:(PASEEstalishedHandler)handler;
+@property (nonatomic, readonly) PASEEstalishedHandler paseEstablishedHandler;
+@end
+
+@implementation MTRPairingTestsCommissioningDelegateWithPASEHandler
+- (instancetype)initWithExpectation:(XCTestExpectation *)expectation
+                            handler:(PASEEstalishedHandler)handler
+{
+    if (!(self = [super initWithExpectation:expectation])) {
+        return nil;
+    }
+
+    _paseEstablishedHandler = handler;
+    return self;
+}
+
+- (void)commissioning:(MTRCommissioningOperation *)commissioning
+    paseSessionEstablishmentComplete:(NSError * _Nullable)error
+{
+    _paseEstablishedHandler(commissioning, error);
+}
+@end
+
+typedef BOOL (^CommissioningSessionHandler)(NSError * _Nullable error);
+
 @interface MTRPairingTestControllerDelegate : NSObject <MTRDeviceControllerDelegate>
 @property (nonatomic, strong) XCTestExpectation * expectation;
 @property (nonatomic, nullable) id<MTRDeviceAttestationDelegate> attestationDelegate;
@@ -185,6 +214,10 @@ typedef void (^AttestationHandler)(dispatch_block_t);
 @property (nullable) NSArray<MTRAttributeRequestPath *> * extraAttributesToRead;
 @property (nullable) NSError * commissioningCompleteError;
 @property (nonatomic) BOOL failAllCallbacks;
+
+// If commissioningSessionHandler is not nil and returns NO, don't commission
+// after setting up the commissioning session.
+@property (nonatomic, readwrite, nullable) CommissioningSessionHandler commissioningSessionHandler;
 @end
 
 @implementation MTRPairingTestControllerDelegate
@@ -197,6 +230,7 @@ typedef void (^AttestationHandler)(dispatch_block_t);
         _expectation = expectation;
         _attestationDelegate = attestationDelegate;
         _failSafeExtension = failSafeExtension;
+        _failAllCallbacks = NO;
     }
     return self;
 }
@@ -208,6 +242,10 @@ typedef void (^AttestationHandler)(dispatch_block_t);
     }
 
     XCTAssertNil(error);
+
+    if (self.commissioningSessionHandler && !self.commissioningSessionHandler(error)) {
+        return;
+    }
 
     __auto_type * params = [[MTRCommissioningParameters alloc] init];
     params.deviceAttestationDelegate = self.attestationDelegate;
@@ -805,7 +843,32 @@ typedef void (^AttestationHandler)(dispatch_block_t);
     [self waitForExpectations:@[ expectation ] timeout:kPairingTimeoutInSeconds];
 }
 
-- (void)test015_CommissioningWhileCommissioningOperationInProgress
+- (void)test015_CommissioningOperationStopAfterPASE
+{
+    [self startServerApp];
+
+    dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.pairing", DISPATCH_QUEUE_SERIAL_WITH_AUTORELEASE_POOL);
+
+    __auto_type * params = [[MTRCommissioningParameters alloc] init];
+
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Commissioning stopped"];
+    __auto_type * commissioningDelegate = [[MTRPairingTestsCommissioningDelegateWithPASEHandler alloc] initWithExpectation:expectation
+                                                                                                                   handler:^(MTRCommissioningOperation * commissioning, NSError * _Nullable error) {
+                                                                                                                       [commissioning stop];
+                                                                                                                   }];
+    commissioningDelegate.expectFailure = YES;
+
+    __auto_type * commissioning = [[MTRCommissioningOperation alloc] initWithParameters:params
+                                                                           setupPayload:kOnboardingPayload
+                                                                               delegate:commissioningDelegate
+                                                                                  queue:callbackQueue];
+
+    [commissioning startWithController:sController];
+
+    [self waitForExpectations:@[ expectation ] timeout:kPairingTimeoutInSeconds];
+}
+
+- (void)test016_CommissioningWhileCommissioningOperationInProgress
 {
     // Make sure there are two separate apps, so we don't get errors just
     // because discovery/PASE fails.
@@ -868,7 +931,7 @@ typedef void (^AttestationHandler)(dispatch_block_t);
     [self waitForExpectations:@[ expectation ] timeout:kPairingTimeoutInSeconds];
 }
 
-- (void)test016_CommissioningWhileSetupCommissioningSessionInProgress
+- (void)test017_CommissioningWhileSetupCommissioningSessionInProgress
 {
     // Make sure there are two separate apps, so we don't get errors just
     // because discovery/PASE fails.
@@ -926,6 +989,91 @@ typedef void (^AttestationHandler)(dispatch_block_t);
                                                                                   queue:callbackQueue];
     [commissioning startWithController:sController];
     [self waitForExpectations:@[ expectation ] timeout:kPairingTimeoutInSeconds];
+}
+
+- (void)test018_CommissionAfterStopWhenCommissioningSessionSetUp
+{
+    // Make sure there are two separate apps, so we don't get errors just
+    // because discovery/PASE fails.
+    [self startServerAppWithPayload:kOnboardingPayload1];
+    [self startServerAppWithPayload:kOnboardingPayload2];
+
+    dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.pairing", DISPATCH_QUEUE_SERIAL_WITH_AUTORELEASE_POOL);
+
+    __auto_type * attestationDelegate = [[NoOpAttestationDelegate alloc] initWithExpectation:nil
+                                                                          blockCommissioning:NO];
+
+    XCTestExpectation * expectation1 = [self expectationWithDescription:@"Commissioning 1 completed"];
+    __auto_type * controllerDelegate1 = [[MTRPairingTestControllerDelegate alloc] initWithExpectation:expectation1
+                                                                                  attestationDelegate:attestationDelegate
+                                                                                    failSafeExtension:nil];
+    __auto_type nodeIDForFirstCommissioning = ++sDeviceId;
+    XCTestExpectation * pausedExpectation = [self expectationWithDescription:@"Commissioning 1 paused"];
+    controllerDelegate1.commissioningSessionHandler = ^BOOL(NSError * _Nullable error) {
+        XCTAssertNil(error);
+        [pausedExpectation fulfill];
+        return NO;
+    };
+    [sController setDeviceControllerDelegate:controllerDelegate1 queue:callbackQueue];
+    self.controllerDelegate = controllerDelegate1;
+
+    NSError * error;
+    __auto_type * payload = [MTRSetupPayload setupPayloadWithOnboardingPayload:kOnboardingPayload1 error:&error];
+    XCTAssertNil(error);
+    XCTAssertNotNil(payload);
+
+    XCTAssertTrue([sController setupCommissioningSessionWithPayload:payload newNodeID:@(nodeIDForFirstCommissioning) error:&error]);
+    XCTAssertNil(error);
+
+    [self waitForExpectations:@[ pausedExpectation ] timeout:kPairingTimeoutInSeconds];
+
+    // An attempt to start another commissioning now should fail, since we are
+    // in the middle of a commissioning already.
+    XCTestExpectation * expectation2 = [self expectationWithDescription:@"Commissioning 2 compelete"];
+    __auto_type * controllerDelegate2 = [[MTRPairingTestControllerDelegate alloc] initWithExpectation:expectation2
+                                                                                  attestationDelegate:attestationDelegate
+                                                                                    failSafeExtension:nil];
+    [sController setDeviceControllerDelegate:controllerDelegate2 queue:callbackQueue];
+    self.controllerDelegate = controllerDelegate2;
+
+    payload = [MTRSetupPayload setupPayloadWithOnboardingPayload:kOnboardingPayload2 error:&error];
+    XCTAssertNil(error);
+    XCTAssertNotNil(payload);
+
+    BOOL ok = [sController setupCommissioningSessionWithPayload:payload newNodeID:@(++sDeviceId) error:&error];
+    // The error is delivered async.
+    XCTAssertNil(error);
+    XCTAssertTrue(ok);
+
+    [self waitForExpectations:@[ expectation2 ] timeout:kPairingTimeoutInSeconds];
+    XCTAssertNotNil(controllerDelegate2.commissioningCompleteError);
+
+    // Stopping the old commissioning and starting a new one should work,
+    // though.  We have to reset the original controller delegate to get
+    // notified about it, though.
+    [sController setDeviceControllerDelegate:controllerDelegate1 queue:callbackQueue];
+    self.controllerDelegate = controllerDelegate1;
+    ok = [sController cancelCommissioningForNodeID:@(nodeIDForFirstCommissioning) error:&error];
+    XCTAssertNil(error);
+    XCTAssertTrue(ok);
+
+    [self waitForExpectations:@[ expectation1 ] timeout:kPairingTimeoutInSeconds];
+    // Should have failed first commissioning (we canceled it).
+    XCTAssertNotNil(controllerDelegate1.commissioningCompleteError);
+
+    XCTestExpectation * expectation3 = [self expectationWithDescription:@"Commissioning 3 compelete"];
+    __auto_type * controllerDelegate3 = [[MTRPairingTestControllerDelegate alloc] initWithExpectation:expectation3
+                                                                                  attestationDelegate:attestationDelegate
+                                                                                    failSafeExtension:nil];
+    [sController setDeviceControllerDelegate:controllerDelegate3 queue:callbackQueue];
+    self.controllerDelegate = controllerDelegate3;
+
+    ok = [sController setupCommissioningSessionWithPayload:payload newNodeID:@(++sDeviceId) error:&error];
+    XCTAssertNil(error);
+    XCTAssertTrue(ok);
+
+    [self waitForExpectations:@[ expectation3 ] timeout:kPairingTimeoutInSeconds];
+    XCTAssertNil(controllerDelegate3.commissioningCompleteError);
 }
 
 @end

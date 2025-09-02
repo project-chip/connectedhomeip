@@ -306,7 +306,7 @@ NS_ASSUME_NONNULL_BEGIN
  * Note: This is atomic because it might get read/set from both the Matter queue
  * and whatever queues our API clients are running on.
  */
-@property (atomic, readonly, nullable) MTRCommissioningOperation * currentCommissioning;
+@property (atomic, readonly, nullable, weak) MTRCommissioningOperation * currentCommissioning;
 
 @end
 

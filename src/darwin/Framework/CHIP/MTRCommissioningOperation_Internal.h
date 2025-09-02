@@ -37,6 +37,16 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (nonatomic, readonly, assign) BOOL isInternallyCreated;
 
+// True if the commissioning is waiting to resume after PASE has been
+// established and the delegate chose to be notified about that.
+//
+// This is currently only true if isInternallyCreated, and is readwrite because
+// MTRDeviceController_Concrete helps maintain this state.
+//
+// This property should generally be written on client queues only, not on the
+// Matter queue.
+@property (nonatomic, readwrite, assign) BOOL isWaitingAfterPASEEstablished;
+
 @end
 
 NS_ASSUME_NONNULL_END
