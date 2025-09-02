@@ -57,7 +57,7 @@ CHIP_ERROR ContactSensorApp::AppTask::ProcessSetStateClusterHandler(void)
 {
     bool val{ false };
     BooleanState::GetStateValue(APP_DEVICE_TYPE_ENDPOINT, val);
-    EventNumber eventNumber;
+    chip::EventNumber eventNumber;
     return BooleanState::SetStateValue(APP_DEVICE_TYPE_ENDPOINT, !val, eventNumber);
 }
 

@@ -32,7 +32,7 @@ void BooleanState::UpdateState()
 {
     if (mTargetState.HasValue())
     {
-        EventNumber eventNumber;
+        chip::EventNumber eventNumber;
         chip::app::Clusters::BooleanState::SetStateValue(mEndpointId, mTargetState.Value(), eventNumber);
         mTargetState.ClearValue();
     }
