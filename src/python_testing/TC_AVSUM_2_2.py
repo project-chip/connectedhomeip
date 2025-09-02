@@ -62,11 +62,11 @@ class TC_AVSUM_2_2(MatterBaseTest, AVSUMTestBase):
             TestStep(2, "Read and verify MPTZPosition attribute."),
             TestStep(3, "Send an MPTZSetPosition command with no fields. Verify failure response"),
             TestStep(4, "Establish a subscription to the MovementState attribute"),
-            TestStep(5, "If Pan is supported, read and verify the PanMin attribute. If not skip to step 8"),
+            TestStep(5, "If Pan is supported, read and verify the PanMin attribute. If not skip to step 15"),
             TestStep(6, "Read and verify the PanMax attribute."),
             TestStep(7, "Create a valid value for a Pan"),
             TestStep(8, "Set the new Pan value via the MPTZSetPosition command. Verify success response."),
-            TestStep(9, "Once the MovementState has returned to Idle, read MPTZPosition. Verify the Pan value is that set in Step 8."),
+            TestStep(9, "Once the MovementState has returned to Idle, read MPTZPosition. Verify the Pan value is that set in Step 8. Verify that Tilt and Zoom are unchanged."),
             TestStep(10, "If PIXIT.CANBEMADEBUSY is set, place the DUT into a state where it cannot accept a command. Else jump to step 12."),
             TestStep(11, "Send an MPTZSetPositionCommand with the previously set Pan value. Verify failure response."),
             TestStep(12, "Create an invalid value for a Pan."),
@@ -76,14 +76,14 @@ class TC_AVSUM_2_2(MatterBaseTest, AVSUMTestBase):
             TestStep(16, "Read and verify the TiltMax attribute."),
             TestStep(17, "Create a valid value for a Tilt different from the initial value."),
             TestStep(18, "Set the new Tilt value via the MPTZSetPosition command. Verify success response."),
-            TestStep(19, "One the MovementState has returned to Idle, read MPTZPosition. Verify the Tilt value is that set in Step 18."),
+            TestStep(19, "Once the MovementState has returned to Idle, read MPTZPosition. Verify the Tilt value is that set in Step 18. Verify that Pan and Zoom are unchanged."),
             TestStep(20, "Create an invalid value for a Tilt."),
             TestStep(21, "Set the invalid value via the MPTZSetPosition command. Verify failure response."),
             TestStep(22, "Read MPTZPosition. Verify the Tilt value is that set in Step 18."),
             TestStep(23, "If Zoom is supported, read and verify the ZoomMax attribute."),
             TestStep(24, "Create a valid value for Zoom."),
             TestStep(25, "Set the new Zoom value via the MPTZSetPosition command. Verify success response."),
-            TestStep(26, "Once the MovementState has returned to Idle, read MPTZPosition. Verify the Zoom value is that set in Step 25."),
+            TestStep(26, "Once the MovementState has returned to Idle, read MPTZPosition. Verify the Zoom value is that set in Step 25. Verify that Pan and Tilt are unchanged."),
             TestStep(27, "Create an invalid value for a Zoom."),
             TestStep(28, "Set the invalid value via the MPTZSetPosition command. Verify failure response."),
             TestStep(29, "Read MPTZPosition. Verify the Zoom value is that set in Step 25."),
@@ -120,9 +120,9 @@ class TC_AVSUM_2_2(MatterBaseTest, AVSUMTestBase):
         asserts.assert_in(attributes.MPTZPosition.attribute_id, attribute_list,
                           "MPTZPosition attribute is mandatory if the command is supported.")
         mptzposition_dut = await self.read_avsum_attribute_expect_success(endpoint, attributes.MPTZPosition)
-        initialPan = mptzposition_dut.pan
-        initialTilt = mptzposition_dut.tilt
-        initialZoom = mptzposition_dut.zoom
+        currentPan = mptzposition_dut.pan
+        currentTilt = mptzposition_dut.tilt
+        currentZoom = mptzposition_dut.zoom
 
         self.step(3)
         await self.send_null_mptz_set_position_command(endpoint, expected_status=Status.InvalidCommand)
@@ -156,7 +156,7 @@ class TC_AVSUM_2_2(MatterBaseTest, AVSUMTestBase):
             # Create new Value for Pan
             while True:
                 newPan = random.randint(pan_min_dut, pan_max_dut)
-                if newPan != initialPan:
+                if newPan != currentPan:
                     break
 
             sub_handler.reset()
@@ -169,6 +169,9 @@ class TC_AVSUM_2_2(MatterBaseTest, AVSUMTestBase):
             sub_handler.await_all_expected_report_matches([movement_state_match], timeout_sec=10)
             newpan_mptzposition_dut = await self.read_avsum_attribute_expect_success(endpoint, attributes.MPTZPosition)
             asserts.assert_equal(newpan_mptzposition_dut.pan, newPan, "Received Pan does not match set Pan")
+            asserts.assert_equal(newpan_mptzposition_dut.tilt, currentTilt, "Tilt unexpectedly changed when only changing Pan")
+            asserts.assert_equal(newpan_mptzposition_dut.zoom, currentZoom, "Zoom unexpectedly changed when only changing Pan")
+            currentPan = newPan
 
             self.step(10)
             # PIXIT check
@@ -225,7 +228,7 @@ class TC_AVSUM_2_2(MatterBaseTest, AVSUMTestBase):
             # Create new Value for Tilt
             while True:
                 newTilt = random.randint(tilt_min_dut, tilt_max_dut)
-                if newTilt != initialTilt:
+                if newTilt != currentTilt:
                     break
 
             sub_handler.reset()
@@ -238,6 +241,9 @@ class TC_AVSUM_2_2(MatterBaseTest, AVSUMTestBase):
             sub_handler.await_all_expected_report_matches([movement_state_match], timeout_sec=self.default_timeout)
             newtilt_mptzposition_dut = await self.read_avsum_attribute_expect_success(endpoint, attributes.MPTZPosition)
             asserts.assert_equal(newtilt_mptzposition_dut.tilt, newTilt, "Received Tilt does not match set Tilt")
+            asserts.assert_equal(newtilt_mptzposition_dut.pan, currentPan, "Pan unexpectedly changed when only changing Tilt")
+            asserts.assert_equal(newtilt_mptzposition_dut.zoom, currentZoom, "Zoom unexpectedly changed when only changing Tilt")
+            currentTilt = newTilt
 
             self.step(20)
             # Create an out of range value for Tilt, verify failure
@@ -272,7 +278,7 @@ class TC_AVSUM_2_2(MatterBaseTest, AVSUMTestBase):
             # Create new Value for Zoom
             while True:
                 newZoom = random.randint(2, zoom_max_dut)
-                if newZoom != initialZoom:
+                if newZoom != currentZoom:
                     break
 
             sub_handler.reset()
@@ -297,6 +303,8 @@ class TC_AVSUM_2_2(MatterBaseTest, AVSUMTestBase):
             # Verify no change in the Zoom value
             newzoom_mptzposition_dut = await self.read_avsum_attribute_expect_success(endpoint, attributes.MPTZPosition)
             asserts.assert_equal(newzoom_mptzposition_dut.zoom, newZoom, "Received Zoom does not match set Zoom")
+            asserts.assert_equal(newzoom_mptzposition_dut.pan, currentPan, "Pan unexpectedly changed when only changing Zoom")
+            asserts.assert_equal(newzoom_mptzposition_dut.tilt, currentTilt, "Tilt unexpectedly changed when only changing Zoom")
         else:
             self.skip_step(23)
             self.skip_step(24)
