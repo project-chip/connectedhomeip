@@ -54,12 +54,6 @@ D_OK_SINGLE = bytes.fromhex(
 
 
 class TC_ACL_2_10(MatterBaseTest):
-    async def read_currentfabricindex(self, th: ChipDeviceCtrl) -> int:
-        cluster = Clusters.Objects.OperationalCredentials
-        attribute = Clusters.OperationalCredentials.Attributes.CurrentFabricIndex
-        current_fabric_index = await self.read_single_attribute_check_success(dev_ctrl=th, endpoint=0, cluster=cluster, attribute=attribute)
-        return current_fabric_index
-
     def desc_TC_ACL_2_10(self) -> str:
         return "[TC-ACL-2.10] Persistence"
 
@@ -135,8 +129,12 @@ class TC_ACL_2_10(MatterBaseTest):
         logging.info("CurrentFabricIndex F2: %s", str(f2))
 
         self.step(5)
-        # TH1 writes ACL attribute with 2 elements
+        # Saving initial ACL to use later during test step 17
         acl_attribute = Clusters.AccessControl.Attributes.Acl
+        acl_cluster = Clusters.AccessControl
+        original_acl = await self.read_single_attribute_check_success(dev_ctrl=self.th1, endpoint=0, cluster=acl_cluster, attribute=acl_attribute)
+
+        # TH1 writes ACL attribute with 2 elements
         two_element_acl_th1 = [
             # Admin entry (unchanged)
             Clusters.AccessControl.Structs.AccessControlEntryStruct(
@@ -255,7 +253,7 @@ class TC_ACL_2_10(MatterBaseTest):
         # TH1 reads DUT Endpoint 0 AccessControl cluster ACL attribute
         # Result is SUCCESS, value is list of AccessControlExtensionStruct
         # containing 2 elements; must not contain an element with fabricIndex F2
-        acl_cluster = Clusters.AccessControl
+        #acl_cluster = Clusters.AccessControl
         result1 = await self.read_single_attribute_check_success(dev_ctrl=self.th1, endpoint=0, cluster=acl_cluster, attribute=acl_attribute)
         logging.info("TH1 read result: %s", str(result1))
         asserts.assert_equal(len(result1), 2,
@@ -307,8 +305,7 @@ class TC_ACL_2_10(MatterBaseTest):
 
         self.step(14)
         # TH1 removes fabric `F2` from DUT
-        fabric_idx_cr2_2 = await self.read_currentfabricindex(th=self.th2)
-        removeFabricCmd2 = Clusters.OperationalCredentials.Commands.RemoveFabric(fabric_idx_cr2_2)
+        removeFabricCmd2 = Clusters.OperationalCredentials.Commands.RemoveFabric(f2)
         await self.th1.SendCommand(nodeid=self.dut_node_id, endpoint=0, payload=removeFabricCmd2)
 
         self.step(15)
@@ -341,16 +338,9 @@ class TC_ACL_2_10(MatterBaseTest):
 
         # Step 17: Write minimum required ACL (admin only)
         self.step(17)
-        acl_original = [Clusters.AccessControl.Structs.AccessControlEntryStruct(
-            privilege=Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kAdminister,
-            authMode=Clusters.AccessControl.Enums.AccessControlEntryAuthModeEnum.kCase,
-            subjects=[self.th1.nodeId],
-            targets=NullValue,
-            fabricIndex=f1
-        )]
         result = await self.th1.WriteAttribute(
             self.dut_node_id,
-            [(0, acl_attribute(value=acl_original))]
+            [(0, acl_attribute(value=original_acl))]
         )
         asserts.assert_equal(result[0].Status, Status.Success,
                              "Write admin-only ACL should succeed")
