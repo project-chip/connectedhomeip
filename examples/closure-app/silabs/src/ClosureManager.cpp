@@ -712,8 +712,8 @@ void ClosureManager::HandleClosureMotionAction()
                 if (mClosureEndpoint1CurrentState.Value().position.Value().Value() == CurrentPositionEnum::kFullyClosed)
                 {
                     mClosureEndpoint1CurrentState.Value().secureState.SetNonNull(true);
-                } 
-                else 
+                }
+                else
                 {
                     mClosureEndpoint1CurrentState.Value().secureState.SetNonNull(false);
                 }
