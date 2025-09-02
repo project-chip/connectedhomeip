@@ -177,17 +177,17 @@ typedef void (^AttestationHandler)(dispatch_block_t);
 
 @end
 
-typedef void (^PASEEstalishedHandler)(MTRCommissioningOperation * commissioning, NSError * _Nullable error);
+typedef void (^PASEEstablishedHandler)(MTRCommissioningOperation * commissioning, NSError * _Nullable error);
 
 @interface MTRPairingTestsCommissioningDelegateWithPASEHandler : MTRPairingTestsCommissioningDelegate
 - (instancetype)initWithExpectation:(XCTestExpectation *)expectation
-                            handler:(PASEEstalishedHandler)handler;
-@property (nonatomic, readonly) PASEEstalishedHandler paseEstablishedHandler;
+                            handler:(PASEEstablishedHandler)handler;
+@property (nonatomic, readonly) PASEEstablishedHandler paseEstablishedHandler;
 @end
 
 @implementation MTRPairingTestsCommissioningDelegateWithPASEHandler
 - (instancetype)initWithExpectation:(XCTestExpectation *)expectation
-                            handler:(PASEEstalishedHandler)handler
+                            handler:(PASEEstablishedHandler)handler
 {
     if (!(self = [super initWithExpectation:expectation])) {
         return nil;
@@ -1029,7 +1029,7 @@ typedef BOOL (^CommissioningSessionHandler)(NSError * _Nullable error);
 
     // An attempt to start another commissioning now should fail, since we are
     // in the middle of a commissioning already.
-    XCTestExpectation * expectation2 = [self expectationWithDescription:@"Commissioning 2 compelete"];
+    XCTestExpectation * expectation2 = [self expectationWithDescription:@"Commissioning 2 complete"];
     __auto_type * controllerDelegate2 = [[MTRPairingTestControllerDelegate alloc] initWithExpectation:expectation2
                                                                                   attestationDelegate:attestationDelegate
                                                                                     failSafeExtension:nil];
@@ -1061,7 +1061,7 @@ typedef BOOL (^CommissioningSessionHandler)(NSError * _Nullable error);
     // Should have failed first commissioning (we canceled it).
     XCTAssertNotNil(controllerDelegate1.commissioningCompleteError);
 
-    XCTestExpectation * expectation3 = [self expectationWithDescription:@"Commissioning 3 compelete"];
+    XCTestExpectation * expectation3 = [self expectationWithDescription:@"Commissioning 3 complete"];
     __auto_type * controllerDelegate3 = [[MTRPairingTestControllerDelegate alloc] initWithExpectation:expectation3
                                                                                   attestationDelegate:attestationDelegate
                                                                                     failSafeExtension:nil];

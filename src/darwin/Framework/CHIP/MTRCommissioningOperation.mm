@@ -298,7 +298,7 @@ static inline void emitMetricForSetupPayload(NSString * payload)
     MTRDeviceController_Concrete * strongController = _controller;
 
     // Null out the delegate, so we don't notify based on any internal cleanups
-    // we happend to do.
+    // we happened to do.
     _delegate = nil;
 
     dispatch_async(_delegateQueue, ^{

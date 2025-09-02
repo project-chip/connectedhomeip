@@ -1074,7 +1074,7 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
 {
     auto * currentCommissioning = self.currentCommissioning;
     if (commissioning != currentCommissioning) {
-        MTR_LOG_ERROR("%@ trying to start comissioning %@ but current commmissioning is %@", self, commissioning, currentCommissioning);
+        MTR_LOG_ERROR("%@ trying to start commissioning %@ but current commissioning is %@", self, commissioning, currentCommissioning);
         if (error) {
             *error = [MTRError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE];
         }

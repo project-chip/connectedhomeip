@@ -100,7 +100,7 @@ MTR_PROVISIONALLY_AVAILABLE
                completion:(void (^)(NSData * operationalDataset))completion;
 
 /**
- * Notification that a particular comissioning stage has been reached.
+ * Notification that a particular commissioning stage has been reached.
  */
 - (void)commissioning:(MTRCommissioningOperation *)commissioning reachedCommissioningStage:(MTRCommissioningStage)stage;
 
