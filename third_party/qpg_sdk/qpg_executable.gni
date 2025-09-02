@@ -251,6 +251,8 @@ template("qpg_executable") {
         "${chip_root}/third_party/qpg_sdk:qpg_bootloader",
       ]
     }
+  } else {
+    print("OTA Requestor disabled for ${app_name} from ${project_dir}")
   }
 
   hexmerge("$output_merged_hex") {
