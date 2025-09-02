@@ -57,7 +57,7 @@ class cc32xxBuilder(GnBuilder):
 
     def GnBuildArgs(self):
         args = [
-            'ti_sysconfig_root="%s"' % os.environ['TI_SYSCONFIG_ROOT_CC32XX'],
+            'ti_sysconfig_root="%s"' % os.environ['TI_SYSCONFIG_ROOT'],
         ]
 
         return args
