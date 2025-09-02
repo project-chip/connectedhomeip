@@ -203,18 +203,29 @@ class DclCheck(MatterBaseTest, BasicCompositionTests):
         logging.info(f'{entry[key]}')
 
     def steps_CertifiedModel(self):
-        return [TestStep(1, "Check if device VID/PID/SoftwareVersion are listed in the DCL certified model schema", "Listing found")]
+        return [TestStep(1, "Query the version information for this software version", "DCL entry exists"),
+                TestStep(2, "Check if device VID/PID/SoftwareVersion are listed in the DCL certified model schema", "Listing found")]
 
     def test_CertifiedModel(self):
         self.step(1)
-        key = 'certifiedModel'
-        entry = requests.get(
-            f"{self.url}/dcl/compliance/certified-models/{self.vid}/{self.pid}/{self.software_version}/matter").json()
-        asserts.assert_true(key in entry.keys(),
-                            f"Unable to find certified model entry for {self.vid_pid_sv_str}")
-        logging.info(
-            f'Found certified model for {self.vid_pid_sv_str} in the DCL:')
-        logging.info(f'{entry[key]}')
+        software_versions = self.get_versions_and_assert_all_keys_exist()
+
+        self.step(2)
+        found_versions = []
+        for software_version in software_versions:
+            vid_pid_sv_str = f'{self.vid_pid_str} software version = {software_version}'
+            key = 'certifiedModel'
+            sub_key = 'softwareVersion'
+            entry = requests.get(
+                f"{self.url}/dcl/compliance/certified-models/{self.vid}/{self.pid}/{software_version}/matter").json()
+            if key in entry.keys() and entry[key][sub_key] == software_version:
+                found_versions.append(software_version)
+                logging.info(
+                    f'Found certified model for {vid_pid_sv_str} in the DCL:')
+                logging.info(f'{entry[key]}')
+                break
+        asserts.assert_true(found_versions,
+                            f"Unable to find at least one certified model entry for the versions {software_versions}")
 
     def steps_AllSoftwareVersions(self):
         return [TestStep(1, "Query the version information for this software version", "DCL entry exists"),
