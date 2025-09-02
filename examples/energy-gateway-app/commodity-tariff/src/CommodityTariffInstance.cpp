@@ -309,7 +309,7 @@ bool CommodityTariffDelegate::TariffDataUpd_CrossValidator(TariffUpdateCtx & Upd
             // Check for duplicate threshold for this feature
             if (!thresholdSet.insert(thresholdValue).second)
             {
-                ChipLogError(NotSpecified, "Duplicated threshold value %" PRIi64 "per feature %" PRIu32 "of same TariffPeriod",
+                ChipLogError(NotSpecified, "Duplicated threshold value among TCs for the 0x%x feature in the same tariff period",
                              thresholdValue, featureID);
                 return false; // Found duplicate feature/threshold combination
             }
