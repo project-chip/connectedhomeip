@@ -21,7 +21,7 @@ interfaces working as Bluetooth LE central and peripheral, respectively.
 
 1. Build `bluez` project from sources by completing the following steps:
 
-    ```
+    ```bash
     sudo apt-get update
     sudo apt-get install libtool m4 automake autotools-dev libudev-dev libical-dev libreadline-dev
 
@@ -35,19 +35,19 @@ interfaces working as Bluetooth LE central and peripheral, respectively.
 
 2. Run bluetoothd:
 
-    ```
+    ```bash
     sudo ./src/bluetoothd --experimental --debug &
     ```
 
 3. Bring up two virtual Bluetooth LE interfaces:
 
-    ```
+    ```bash
     sudo ./emulator/btvirt -L -l2
     ```
 
     You can find the virtual interface by running `hciconfig` command:
 
-    ```
+    ```console
     $ hciconfig
 
     hci2:	Type: Primary  Bus: Virtual
@@ -69,16 +69,16 @@ interfaces working as Bluetooth LE central and peripheral, respectively.
     For example, add `--ble-controller=2` to use the virtual interface `hci2`
     listed above.
 
-    ```
-    chip-repl --ble-controller=2
+    ```bash
+    matter-repl --ble-controller=2
     ```
 
 <hr>
 
 ## Debugging with gdb
 
-You can run the chip-repl under GDB for debugging, however, since the Matter SDK
-library is a dynamic library, you cannot read the symbols unless it is fully
+You can run the matter-repl under GDB for debugging, however, since the Matter
+SDK library is a dynamic library, you cannot read the symbols unless it is fully
 loaded.
 
 The following block is a example debug session using GDB:
@@ -86,8 +86,8 @@ The following block is a example debug session using GDB:
 ```
 # GDB cannot run scripts directly
 # so you need to run Python3 with the path of device controller REPL
-# Here, we use the feature from bash to get the path of chip-repl without typing it.
-$ gdb --args python3 `which chip-repl`
+# Here, we use the feature from bash to get the path of matter-repl without typing it.
+$ gdb --args python3 `which matter-repl`
 GNU gdb (GDB) 14.2
 Copyright (C) 2023 Free Software Foundation, Inc.
 License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
@@ -126,7 +126,7 @@ library, let run the Matter device controller first.
 
 ```
 (gdb) run
-Starting program: /home/sag/projects/project-chip/connectedhomeip/out/venv/bin/python3 /home/sag/projects/project-chip/connectedhomeip/out/venv/bin/chip-repl
+Starting program: /home/sag/projects/project-chip/connectedhomeip/out/venv/bin/python3 /home/sag/projects/project-chip/connectedhomeip/out/venv/bin/matter-repl
 [Thread debugging using libthread_db enabled]
 Using host libthread_db library "/usr/lib/libthread_db.so.1".
 Python 3.11.9 (main, Apr 29 2024, 11:59:58) [GCC 13.2.1 20240417]
@@ -141,9 +141,7 @@ InitBLE 0[1716395111.776809][364405:364405] CHIP:DL: writing settings to file (/
 [1716395111.777555][364405:364405] CHIP:DL: Found the primary Ethernet interface:eno2
 [1716395111.777868][364405:364405] CHIP:DL: Got WiFi interface: wlp7s0
 [1716395111.777877][364405:364405] CHIP:DL: Failed to reset WiFi statistic counts
-────────────────────────────────────────────────────────────────────────────────────────────────────────── Matter REPL ──────────────────────────────────────────────────────────────────────────────────────────────────────────
-
-
+───────────────────────────────────────────────────────────────────── Matter REPL ──────────────────────────────────────────────────────────────────────
 
             Welcome to the Matter Python REPL!
 
@@ -152,8 +150,7 @@ InitBLE 0[1716395111.776809][364405:364405] CHIP:DL: writing settings to file (/
             To get more information on a particular object/class, you can pass
             that into matterhelp() as well.
 
-
-─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
 2024-05-22 18:25:11 allenwind PersistentStorage[364405] WARNING Initializing persistent storage from file: /tmp/repl-storage.json
 2024-05-22 18:25:11 allenwind PersistentStorage[364405] WARNING Loading configuration from /tmp/repl-storage.json...
 2024-05-22 18:25:11 allenwind CertificateAuthorityManager[364405] WARNING Loading certificate authorities from storage...
@@ -162,14 +159,13 @@ InitBLE 0[1716395111.776809][364405:364405] CHIP:DL: writing settings to file (/
 2024-05-22 18:25:11 allenwind FabricAdmin[364405] WARNING New FabricAdmin: FabricId: 0x0000000000000001, VendorId = 0xFFF1
 2024-05-22 18:25:11 allenwind FabricAdmin[364405] WARNING Allocating new controller with CaIndex: 1, FabricId: 0x0000000000000001, NodeId: 0x000000000001B669, CatTags: []
 
-
 The following objects have been created:
-        certificateAuthorityManager:    Manages a list of CertificateAuthority instances.
-        caList:                         The list of CertificateAuthority instances.
-        caList:                 A specific FabricAdmin object at index m for the nth CertificateAuthority instance.
 
+        certificateAuthorityManager:    Manages a list of CertificateAuthority instances
+        caList:                         The list of CertificateAuthority instances
+        caList[n].adminList[m]:         A specific FabricAdmin object at index m for the nth CertificateAuthority instance
+        devCtrl:                        Default Matter Device Controller (nodeId=0x000000000001B669) to manage caList[0].adminList[0] (fabricId=1)
 
-Default CHIP Device Controller (NodeId: 112233): has been initialized to manage caList[0].adminList[0] (FabricId = 1), and is available as devCtrl
 
 In [1]:
 ```
