@@ -1858,7 +1858,7 @@ void CameraAVStreamMgmtServer::HandleVideoStreamModify(HandlerContext & ctx,
     VerifyOrReturn((HasFeature(Feature::kOnScreenDisplay) == commandData.OSDEnabled.HasValue()),
                    ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::InvalidCommand));
 
-    if (!ValidateVideoStreamForModifyOrDeallocate(videoStreamID, ctx))
+    if (!ValidateVideoStreamForModifyOrDeallocate(videoStreamID, ctx, /* isDeallocate = */ false))
     {
         return;
     }
@@ -1879,7 +1879,7 @@ void CameraAVStreamMgmtServer::HandleVideoStreamDeallocate(HandlerContext & ctx,
 {
     auto & videoStreamID = commandData.videoStreamID;
 
-    if (!ValidateVideoStreamForModifyOrDeallocate(videoStreamID, ctx))
+    if (!ValidateVideoStreamForModifyOrDeallocate(videoStreamID, ctx, /* isDeallocate = */ true))
     {
         return;
     }
@@ -2122,7 +2122,7 @@ void CameraAVStreamMgmtServer::HandleSnapshotStreamModify(HandlerContext & ctx,
         ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::InvalidCommand);
     });
 
-    if (!ValidateSnapshotStreamForModifyOrDeallocate(snapshotStreamID, ctx))
+    if (!ValidateSnapshotStreamForModifyOrDeallocate(snapshotStreamID, ctx, /* isDeallocate = */ false))
     {
         return;
     }
@@ -2142,7 +2142,7 @@ void CameraAVStreamMgmtServer::HandleSnapshotStreamDeallocate(HandlerContext & c
 {
     auto & snapshotStreamID = commandData.snapshotStreamID;
 
-    if (!ValidateSnapshotStreamForModifyOrDeallocate(snapshotStreamID, ctx))
+    if (!ValidateSnapshotStreamForModifyOrDeallocate(snapshotStreamID, ctx, /* isDeallocate = */ true))
     {
         return;
     }
@@ -2288,22 +2288,27 @@ bool CameraAVStreamMgmtServer::ValidateSnapshotStreamId(const DataModel::Nullabl
     return true;
 }
 
-bool CameraAVStreamMgmtServer::ValidateVideoStreamForModifyOrDeallocate(const uint16_t videoStreamID, HandlerContext & ctx)
+bool CameraAVStreamMgmtServer::ValidateVideoStreamForModifyOrDeallocate(const uint16_t videoStreamID, HandlerContext & ctx,
+                                                                        bool isDeallocate)
 {
-    return ValidateStreamForModifyOrDeallocateImpl(mAllocatedVideoStreams, videoStreamID, ctx, "Video",
-                                                   [](const VideoStreamStruct & s) { return s.videoStreamID; });
+    return ValidateStreamForModifyOrDeallocateImpl(
+        mAllocatedVideoStreams, videoStreamID, ctx, "Video", [](const VideoStreamStruct & s) { return s.videoStreamID; },
+        isDeallocate);
 }
 
 bool CameraAVStreamMgmtServer::ValidateAudioStreamForDeallocate(const uint16_t audioStreamID, HandlerContext & ctx)
 {
-    return ValidateStreamForModifyOrDeallocateImpl(mAllocatedAudioStreams, audioStreamID, ctx, "Audio",
-                                                   [](const AudioStreamStruct & s) { return s.audioStreamID; });
+    return ValidateStreamForModifyOrDeallocateImpl(
+        mAllocatedAudioStreams, audioStreamID, ctx, "Audio", [](const AudioStreamStruct & s) { return s.audioStreamID; },
+        /* isDeallocate = */ true);
 }
 
-bool CameraAVStreamMgmtServer::ValidateSnapshotStreamForModifyOrDeallocate(const uint16_t snapshotStreamID, HandlerContext & ctx)
+bool CameraAVStreamMgmtServer::ValidateSnapshotStreamForModifyOrDeallocate(const uint16_t snapshotStreamID, HandlerContext & ctx,
+                                                                           bool isDeallocate)
 {
-    return ValidateStreamForModifyOrDeallocateImpl(mAllocatedSnapshotStreams, snapshotStreamID, ctx, "Snapshot",
-                                                   [](const SnapshotStreamStruct & s) { return s.snapshotStreamID; });
+    return ValidateStreamForModifyOrDeallocateImpl(
+        mAllocatedSnapshotStreams, snapshotStreamID, ctx, "Snapshot",
+        [](const SnapshotStreamStruct & s) { return s.snapshotStreamID; }, isDeallocate);
 }
 
 } // namespace CameraAvStreamManagement

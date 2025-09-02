@@ -619,7 +619,7 @@ private:
 
     template <typename StreamContainer, typename IdGetter>
     bool ValidateStreamForModifyOrDeallocateImpl(StreamContainer & streams, uint16_t streamID, HandlerContext & ctx,
-                                                 const char * streamTypeName, IdGetter id_getter)
+                                                 const char * streamTypeName, IdGetter id_getter, bool isDeallocate)
     {
         auto it = std::find_if(streams.begin(), streams.end(), [&](const auto & stream) { return id_getter(stream) == streamID; });
 
@@ -630,7 +630,7 @@ private:
             return false;
         }
 
-        if (it->referenceCount > 0)
+        if (isDeallocate && it->referenceCount > 0)
         {
             ChipLogError(Zcl, "CameraAVStreamMgmt[ep=%d]: %s stream with ID: %u still in use", mEndpointId, streamTypeName,
                          streamID);
@@ -647,6 +647,29 @@ private:
                              streamID);
                 ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Protocols::InteractionModel::Status::DynamicConstraintError);
                 return false;
+            }
+        }
+
+        // For SnapshotStreamModify, check against the corresponding
+        // SnapshotStreamStruct for requiresHardwareEncoder.
+        if constexpr (std::is_same_v<StreamType, SnapshotStreamStruct>)
+        {
+            if (!isDeallocate)
+            {
+                auto sn_capab_it =
+                    std::find_if(mSnapshotCapabilitiesList.begin(), mSnapshotCapabilitiesList.end(), [&](const auto & capability) {
+                        return capability.imageCodec == it->imageCodec && capability.maxFrameRate > it->frameRate;
+                    });
+                if (sn_capab_it != mSnapshotCapabilitiesList.end() && sn_capab_it->requiresHardwareEncoder.HasValue() &&
+                    !sn_capab_it->requiresHardwareEncoder.Value())
+                {
+                    ChipLogError(Zcl,
+                                 "CameraAVStreamMgmt[ep=%d]: Snapshot stream with ID: %u based off an underlying video stream and "
+                                 "not modifiable",
+                                 mEndpointId, streamID);
+                    ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Protocols::InteractionModel::Status::DynamicConstraintError);
+                    return false;
+                }
             }
         }
 
@@ -725,11 +748,11 @@ private:
 
     bool ValidateSnapshotStreamId(const DataModel::Nullable<uint16_t> & snapshotStreamID, HandlerContext & ctx);
 
-    bool ValidateVideoStreamForModifyOrDeallocate(const uint16_t videoStreamID, HandlerContext & ctx);
+    bool ValidateVideoStreamForModifyOrDeallocate(const uint16_t videoStreamID, HandlerContext & ctx, bool isDeallocate);
 
     bool ValidateAudioStreamForDeallocate(const uint16_t audioStreamID, HandlerContext & ctx);
 
-    bool ValidateSnapshotStreamForModifyOrDeallocate(const uint16_t snapshotStreamID, HandlerContext & ctx);
+    bool ValidateSnapshotStreamForModifyOrDeallocate(const uint16_t snapshotStreamID, HandlerContext & ctx, bool isDeallocate);
 };
 
 } // namespace CameraAvStreamManagement
