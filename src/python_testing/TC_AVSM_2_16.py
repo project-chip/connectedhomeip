@@ -64,18 +64,18 @@ class TC_AVSM_2_16(MatterBaseTest, AVSMTestBase):
             TestStep("precondition", "DUT commissioned and allocated audio and video streams", is_commissioning=True),
             TestStep(
                 1,
-                "TH reads FeatureMap attribute from CameraAVStreamManagement Cluster on TH_SERVER",
+                "TH reads FeatureMap attribute from CameraAVStreamManagement Cluster on DUT",
                 "Verify VDO is supported.",
             ),
             TestStep(
                 2,
-                "TH reads AllocatedVideoStreams attribute from CameraAVStreamManagement Cluster on TH_SERVER",
+                "TH reads AllocatedVideoStreams attribute from CameraAVStreamManagement Cluster on DUT",
                 "Verify the number of allocated video streams in the list is 1.",
                 "Store StreamID as aVideoStreamID.Store ReferenceCount as aVideoRefCount",
             ),
             TestStep(
                 3,
-                "TH reads AllocatedAudioStreams attribute from CameraAVStreamManagement Cluster on TH_SERVER",
+                "TH reads AllocatedAudioStreams attribute from CameraAVStreamManagement Cluster on DUT",
                 "Verify the number of allocated audio streams in the list is 1.",
                 "Store StreamID as aAudioStreamID.Store ReferenceCount as aAudioRefCount",
             ),
@@ -86,12 +86,12 @@ class TC_AVSM_2_16(MatterBaseTest, AVSMTestBase):
             ),
             TestStep(
                 5,
-                "H reads `AllocatedVideoStreams` attribute from CameraAVStreamManagement Cluster on TH_SERVER.",
+                "H reads `AllocatedVideoStreams` attribute from CameraAVStreamManagement Cluster on DUT.",
                 "Verify that the reference count of the VideoStream for `aVideoStreamID` is equal to `aVideoRefCount` + 1.",
             ),
             TestStep(
                 6,
-                "H reads `AllocatedAudioStreams` attribute from CameraAVStreamManagement Cluster on TH_SERVER.",
+                "H reads `AllocatedAudioStreams` attribute from CameraAVStreamManagement Cluster on DUT.",
                 "Verify that the reference count of the AudioStream for `aAudioStreamID` is equal to `aAudioRefCount` + 1.",
             ),
             TestStep(
@@ -110,12 +110,12 @@ class TC_AVSM_2_16(MatterBaseTest, AVSMTestBase):
             ),
             TestStep(
                 10,
-                "H reads `AllocatedVideoStreams` attribute from CameraAVStreamManagement Cluster on TH_SERVER.",
+                "H reads `AllocatedVideoStreams` attribute from CameraAVStreamManagement Cluster on DUT.",
                 "Verify that the reference count of the VideoStream for `aVideoStreamID` is equal to `aVideoRefCount.",
             ),
             TestStep(
                 11,
-                "H reads `AllocatedAudioStreams` attribute from CameraAVStreamManagement Cluster on TH_SERVER.",
+                "H reads `AllocatedAudioStreams` attribute from CameraAVStreamManagement Cluster on DUT.",
                 "Verify that the reference count of the AudioStream for `aAudioStreamID` is equal to `aAudioRefCount.",
             ),
             TestStep(
@@ -130,19 +130,19 @@ class TC_AVSM_2_16(MatterBaseTest, AVSMTestBase):
             ),
             TestStep(
                 14,
-                "TH reads AllocatedVideoStreams attribute from CameraAVStreamManagement Cluster on TH_SERVER",
+                "TH reads AllocatedVideoStreams attribute from CameraAVStreamManagement Cluster on DUT",
                 "Verify the number of allocated video streams in the list is 0.",
             ),
             TestStep(
                 15,
-                "TH reads AllocatedAudioStreams attribute from CameraAVStreamManagement Cluster on TH_SERVER",
+                "TH reads AllocatedAudioStreams attribute from CameraAVStreamManagement Cluster on DUT",
                 "Verify the number of allocated audio streams in the list is 0.",
             ),
         ]
 
     @run_if_endpoint_matches(
-        has_feature(Clusters.CameraAvStreamManagement, Clusters.CameraAvStreamManagement.Bitmaps.Feature.kVideo)
-    )
+        has_feature(Clusters.CameraAvStreamManagement, Clusters.CameraAvStreamManagement.Bitmaps.Feature.kVideo) and
+        has_feature(Clusters.CameraAvStreamManagement, Clusters.CameraAvStreamManagement.Bitmaps.Feature.kAudio))
     async def test_TC_AVSM_2_16(self):
         endpoint = self.get_endpoint(default=1)
         cluster = Clusters.CameraAvStreamManagement
@@ -174,7 +174,7 @@ class TC_AVSM_2_16(MatterBaseTest, AVSMTestBase):
             endpoint=endpoint, cluster=cluster, attribute=attr.AllocatedAudioStreams
         )
         logger.info(f"Rx'd AllocatedAudioStreams: {aAllocatedAudioStreams}")
-        asserts.assert_equal(len(aAllocatedVideoStreams), 1, "The number of allocated audio streams in the list is not 1")
+        asserts.assert_equal(len(aAllocatedAudioStreams), 1, "The number of allocated audio streams in the list is not 1")
         aAudioStreamID = aAllocatedAudioStreams[0].audioStreamID
         aAudioRefCount = aAllocatedAudioStreams[0].referenceCount
 
@@ -296,8 +296,8 @@ class TC_AVSM_2_16(MatterBaseTest, AVSMTestBase):
         aAllocatedAudioStreams = await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=cluster, attribute=attr.AllocatedAudioStreams
         )
-        logger.info(f"Rx'd AllocatedAudioStreams: {aAllocatedVideoStreams}")
-        asserts.assert_equal(len(aAllocatedVideoStreams), 0, "The number of allocated audio streams in the list is not 0")
+        logger.info(f"Rx'd AllocatedAudioStreams: {aAllocatedAudioStreams}")
+        asserts.assert_equal(len(aAllocatedAudioStreams), 0, "The number of allocated audio streams in the list is not 0")
 
 
 if __name__ == "__main__":
