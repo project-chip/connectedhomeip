@@ -24,7 +24,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-MTR_UNSTABLE_API
+MTR_PROVISIONALLY_AVAILABLE
 @protocol MTRCommissioningDelegate <NSObject>
 @optional
 /**

@@ -21,7 +21,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-MTR_UNSTABLE_API
+MTR_PROVISIONALLY_AVAILABLE
 @interface MTRCommissioningOperation : NSObject
 /**
  * Initialized via initWithParameters:setupPayload:delegate:queue:
