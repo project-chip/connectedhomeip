@@ -15,15 +15,15 @@
  *    limitations under the License.
  */
 #include <app/clusters/operational-credentials-server/operational-credentials-cluster.h>
-#include <data-model-providers/codegen/ClusterIntegration.h>
 #include <app/static-cluster-config/OperationalCredentials.h>
+#include <data-model-providers/codegen/ClusterIntegration.h>
 
-#include <app/server/Server.h>
 #include <app/EventLogging.h>
-#include <app/server/Dnssd.h>
 #include <app/InteractionModelEngine.h>
-#include <app/util/attribute-storage.h>
 #include <app/reporting/reporting.h>
+#include <app/server/Dnssd.h>
+#include <app/server/Server.h>
+#include <app/util/attribute-storage.h>
 
 using namespace chip;
 using namespace chip::app;
@@ -109,7 +109,6 @@ void FailSafeCleanup(const chip::DeviceLayer::ChipDeviceEvent * event)
         app::DnssdServer::Instance().StartServer();
     }
 }
-
 
 void OnPlatformEventHandler(const chip::DeviceLayer::ChipDeviceEvent * event, intptr_t arg)
 {

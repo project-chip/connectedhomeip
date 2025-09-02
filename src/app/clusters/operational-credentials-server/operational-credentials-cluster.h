@@ -26,7 +26,7 @@ namespace Clusters {
 class OperationalCredentialsCluster : public DefaultServerCluster
 {
 public:
-    OperationalCredentialsCluster(EndpointId endpoint) : DefaultServerCluster({endpoint, OperationalCredentials::Id}) { };
+    OperationalCredentialsCluster(EndpointId endpoint) : DefaultServerCluster({ endpoint, OperationalCredentials::Id }){};
 
     // Server cluster implementation
     DataModel::ActionReturnStatus ReadAttribute(const DataModel::ReadAttributeRequest & request,
@@ -38,7 +38,6 @@ public:
     CHIP_ERROR GeneratedCommands(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<CommandId> & builder) override;
     CHIP_ERROR Attributes(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder) override;
 };
-
 
 } // namespace Clusters
 } // namespace app
