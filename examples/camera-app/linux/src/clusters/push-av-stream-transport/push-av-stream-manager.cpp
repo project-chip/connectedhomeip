@@ -152,7 +152,6 @@ Protocols::InteractionModel::Status PushAvStreamTransportManager::DeallocatePush
         ChipLogError(Camera, "PushAvStreamTransportManager, failed to find Connection :[%u]", connectionID);
         return Status::NotFound;
     }
-    mTransportMap[connectionID].reset();
     mMediaController->UnregisterTransport(mTransportMap[connectionID].get());
     mTransportMap.erase(connectionID);
     mTransportOptionsMap.erase(connectionID);
