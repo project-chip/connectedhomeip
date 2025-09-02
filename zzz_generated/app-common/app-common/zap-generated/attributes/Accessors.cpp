@@ -34274,18 +34274,18 @@ namespace ApplicationName {
 
 Protocols::InteractionModel::Status Get(EndpointId endpoint, chip::MutableCharSpan & value)
 {
-    uint8_t zclString[254 + 1];
+    uint8_t zclString[256 + 2];
     Protocols::InteractionModel::Status status =
         emberAfReadAttribute(endpoint, Clusters::ApplicationBasic::Id, Id, zclString, sizeof(zclString));
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    size_t length = emberAfStringLength(zclString);
-    if (length == NumericAttributeTraits<uint8_t>::kNullValue)
+    size_t length = emberAfLongStringLength(zclString);
+    if (length == NumericAttributeTraits<uint16_t>::kNullValue)
     {
         return Protocols::InteractionModel::Status::ConstraintError;
     }
 
-    VerifyOrReturnError(value.size() == 254, Protocols::InteractionModel::Status::InvalidDataType);
-    memcpy(value.data(), &zclString[1], 254);
+    VerifyOrReturnError(value.size() == 256, Protocols::InteractionModel::Status::InvalidDataType);
+    memcpy(value.data(), &zclString[2], 256);
     value.reduce_size(length);
     return status;
 }
@@ -34293,26 +34293,26 @@ Protocols::InteractionModel::Status Get(EndpointId endpoint, chip::MutableCharSp
 Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::CharSpan value, MarkAttributeDirty markDirty)
 {
 
-    static_assert(254 < NumericAttributeTraits<uint8_t>::kNullValue, "value.size() might be too big");
-    VerifyOrReturnError(value.size() <= 254, Protocols::InteractionModel::Status::ConstraintError);
-    uint8_t zclString[254 + 1];
-    auto length = static_cast<uint8_t>(value.size());
-    Encoding::Put8(zclString, length);
-    memcpy(&zclString[1], value.data(), value.size());
+    static_assert(256 < NumericAttributeTraits<uint16_t>::kNullValue, "value.size() might be too big");
+    VerifyOrReturnError(value.size() <= 256, Protocols::InteractionModel::Status::ConstraintError);
+    uint8_t zclString[256 + 2];
+    auto length = static_cast<uint16_t>(value.size());
+    Encoding::LittleEndian::Put16(zclString, length);
+    memcpy(&zclString[2], value.data(), value.size());
     return emberAfWriteAttribute(ConcreteAttributePath(endpoint, Clusters::ApplicationBasic::Id, Id),
-                                 EmberAfWriteDataInput(zclString, ZCL_CHAR_STRING_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
+                                 EmberAfWriteDataInput(zclString, ZCL_LONG_CHAR_STRING_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::CharSpan value)
 {
 
-    static_assert(254 < NumericAttributeTraits<uint8_t>::kNullValue, "value.size() might be too big");
-    VerifyOrReturnError(value.size() <= 254, Protocols::InteractionModel::Status::ConstraintError);
-    uint8_t zclString[254 + 1];
-    auto length = static_cast<uint8_t>(value.size());
-    Encoding::Put8(zclString, length);
-    memcpy(&zclString[1], value.data(), value.size());
-    return emberAfWriteAttribute(endpoint, Clusters::ApplicationBasic::Id, Id, zclString, ZCL_CHAR_STRING_ATTRIBUTE_TYPE);
+    static_assert(256 < NumericAttributeTraits<uint16_t>::kNullValue, "value.size() might be too big");
+    VerifyOrReturnError(value.size() <= 256, Protocols::InteractionModel::Status::ConstraintError);
+    uint8_t zclString[256 + 2];
+    auto length = static_cast<uint16_t>(value.size());
+    Encoding::LittleEndian::Put16(zclString, length);
+    memcpy(&zclString[2], value.data(), value.size());
+    return emberAfWriteAttribute(endpoint, Clusters::ApplicationBasic::Id, Id, zclString, ZCL_LONG_CHAR_STRING_ATTRIBUTE_TYPE);
 }
 
 } // namespace ApplicationName

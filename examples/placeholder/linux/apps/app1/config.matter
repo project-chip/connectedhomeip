@@ -8541,7 +8541,7 @@ cluster ApplicationBasic = 1293 {
 
   readonly attribute optional char_string<32> vendorName = 0;
   readonly attribute optional vendor_id vendorID = 1;
-  readonly attribute char_string<254> applicationName = 2;
+  readonly attribute long_char_string<256> applicationName = 2;
   readonly attribute optional int16u productID = 3;
   readonly attribute ApplicationStruct application = 4;
   readonly attribute ApplicationStatusEnum status = 5;
@@ -8572,7 +8572,7 @@ cluster ApplicationBasic = 1293 {
 
   readonly attribute optional char_string<32> vendorName = 0;
   readonly attribute optional vendor_id vendorID = 1;
-  readonly attribute char_string<254> applicationName = 2;
+  readonly attribute long_char_string<256> applicationName = 2;
   readonly attribute optional int16u productID = 3;
   readonly attribute ApplicationStruct application = 4;
   readonly attribute ApplicationStatusEnum status = 5;

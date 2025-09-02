@@ -78,7 +78,7 @@ struct TypeInfo
     static constexpr ClusterId GetClusterId() { return Clusters::ApplicationBasic::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ApplicationName::Id; }
     static constexpr bool MustUseTimedWrite() { return false; }
-    static constexpr size_t MaxLength() { return 254; }
+    static constexpr size_t MaxLength() { return 256; }
 };
 } // namespace ApplicationName
 namespace ProductID {
