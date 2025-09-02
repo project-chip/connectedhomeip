@@ -446,21 +446,20 @@ const Structs::TariffPeriodStruct::Type * FindTariffPeriodByDayEntryId(CurrentTa
     return nullptr;
 }
 
-std::unordered_set<const Structs::TariffPeriodStruct::Type*> 
-FindTariffPeriodsByTariffComponentId(CurrentTariffAttrsCtx & aCtx, uint32_t componentID)
+std::unordered_set<const Structs::TariffPeriodStruct::Type *> FindTariffPeriodsByTariffComponentId(CurrentTariffAttrsCtx & aCtx,
+                                                                                                   uint32_t componentID)
 {
-    std::unordered_set<const Structs::TariffPeriodStruct::Type*> matchingPeriods;
-    
+    std::unordered_set<const Structs::TariffPeriodStruct::Type *> matchingPeriods;
+
     for (const auto & period : aCtx.mTariffProvider->GetTariffPeriods().Value())
     {
-        if (std::find(period.tariffComponentIDs.begin(), 
-                     period.tariffComponentIDs.end(), 
-                     componentID) != period.tariffComponentIDs.end())
+        if (std::find(period.tariffComponentIDs.begin(), period.tariffComponentIDs.end(), componentID) !=
+            period.tariffComponentIDs.end())
         {
             matchingPeriods.insert(&period);
         }
     }
-    
+
     return matchingPeriods;
 }
 
@@ -539,7 +538,8 @@ static void AttrsCtxInit(Delegate & aTariffProvider, CurrentTariffAttrsCtx & aCt
         aTariffProvider.GetDayPatterns().Value(), aCtx.DayPatternsMap);
     CommodityTariffAttrsDataMgmt::ListToMap<Structs::DayEntryStruct::Type, &Structs::DayEntryStruct::Type::dayEntryID>(
         aTariffProvider.GetDayEntries().Value(), aCtx.DayEntriesMap);
-    CommodityTariffAttrsDataMgmt::ListToMap<Structs::TariffComponentStruct::Type, &Structs::TariffComponentStruct::Type::tariffComponentID>(
+    CommodityTariffAttrsDataMgmt::ListToMap<Structs::TariffComponentStruct::Type,
+                                            &Structs::TariffComponentStruct::Type::tariffComponentID>(
         aTariffProvider.GetTariffComponents().Value(), aCtx.TariffComponentsMap);
 }
 
@@ -683,23 +683,27 @@ void Instance::HandleGetTariffComponent(HandlerContext & ctx, const Commands::Ge
                              mServerTariffAttrsCtx.TariffComponentsMap, commandData.tariffComponentID)
                              .first;
 
-        if (component != nullptr) 
+        if (component != nullptr)
         {
             std::vector<uint32_t> DeIDs;
             std::string tempLabelString;
 
-            auto matchingPeriods = Utils::FindTariffPeriodsByTariffComponentId(mServerTariffAttrsCtx, commandData.tariffComponentID);
+            auto matchingPeriods =
+                Utils::FindTariffPeriodsByTariffComponentId(mServerTariffAttrsCtx, commandData.tariffComponentID);
 
-            if (!matchingPeriods.empty()) {
+            if (!matchingPeriods.empty())
+            {
                 bool firstLabel = true;
 
                 DeIDs.reserve(CommodityTariffConsts::kDayEntriesAttrMaxLength);
 
-                for (const auto* period : matchingPeriods) {
+                for (const auto * period : matchingPeriods)
+                {
                     if (!period->label.IsNull())
                     {
                         std::string periodLabel(period->label.Value().data(), period->label.Value().size());
-                        if (!firstLabel) {
+                        if (!firstLabel)
+                        {
                             tempLabelString += "; ";
                         }
                         tempLabelString += periodLabel;
@@ -708,7 +712,8 @@ void Instance::HandleGetTariffComponent(HandlerContext & ctx, const Commands::Ge
 
                     if (!period->dayEntryIDs.empty())
                     {
-                        for (const auto& deID : period->dayEntryIDs) {
+                        for (const auto & deID : period->dayEntryIDs)
+                        {
                             DeIDs.push_back(deID);
                         }
                     }

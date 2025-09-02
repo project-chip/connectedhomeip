@@ -26,10 +26,10 @@
 #include <atomic>
 #include <cassert>
 #include <map>
-#include <string>
 #include <set>
-#include <unordered_set>
+#include <string>
 #include <unordered_map>
+#include <unordered_set>
 
 namespace chip {
 
@@ -270,7 +270,8 @@ struct StrToSpan
     /// @param destination Output span to populate
     /// @param maxCount Maximum number of characters to copy (default: unlimited)
     /// @return CHIP_NO_ERROR on success, error code on failure
-    static CHIP_ERROR Copy(const std::string & source, CharSpan & destination, size_t maxCount = CommodityTariffConsts::kDefaultStringValuesMaxBufLength)
+    static CHIP_ERROR Copy(const std::string & source, CharSpan & destination,
+                           size_t maxCount = CommodityTariffConsts::kDefaultStringValuesMaxBufLength)
     {
         if (source.empty())
         {
@@ -1166,7 +1167,7 @@ struct TariffUpdateCtx
      * @brief DayEntry IDs referenced by IndividualDays items
      * @details Collected separately for reference validation
      */
-    std::unordered_set<uint32_t> IndividualDaysDayEntryIDs;    
+    std::unordered_set<uint32_t> IndividualDaysDayEntryIDs;
 
     /**
      * @brief DayEntry IDs referenced by TariffPeriod items
