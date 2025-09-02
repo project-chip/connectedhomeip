@@ -23,10 +23,13 @@ namespace chip {
 namespace app {
 namespace Clusters {
 
-class OperationalCredentialsCluster : public DefaultServerCluster
+class OperationalCredentialsCluster : public DefaultServerCluster, chip::FabricTable::Delegate
 {
 public:
     OperationalCredentialsCluster(EndpointId endpoint) : DefaultServerCluster({ endpoint, OperationalCredentials::Id }){};
+
+    CHIP_ERROR Startup(ServerClusterContext & context) override;
+    void Shutdown() override;
 
     // Server cluster implementation
     DataModel::ActionReturnStatus ReadAttribute(const DataModel::ReadAttributeRequest & request,
@@ -37,6 +40,12 @@ public:
                                 ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder) override;
     CHIP_ERROR GeneratedCommands(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<CommandId> & builder) override;
     CHIP_ERROR Attributes(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder) override;
+
+    // FabricTable delegate
+    void FabricWillBeRemoved(const FabricTable & fabricTable, FabricIndex fabricIndex) override;
+    void OnFabricRemoved(const FabricTable & fabricTable, FabricIndex fabricIndex) override;
+    void OnFabricUpdated(const FabricTable & fabricTable, FabricIndex fabricIndex) override;
+    void OnFabricCommitted(const FabricTable & fabricTable, FabricIndex fabricIndex) override;
 };
 
 } // namespace Clusters
