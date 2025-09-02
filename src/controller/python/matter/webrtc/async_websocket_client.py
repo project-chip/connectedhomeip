@@ -9,7 +9,7 @@ import websockets
 from .types import WebSocketMessage
 
 logger = logging.getLogger(__name__)
-logging.basicConfig(level=logging.DEBUG)
+logger.setLevel(logging.INFO)
 
 
 class AsyncWebSocketClient:
@@ -25,12 +25,12 @@ class AsyncWebSocketClient:
         try:
             self.websocket = await websockets.connect(self.uri)
             self.running = True
-            logging.debug(f"Connected to {self.uri}")
+            logger.debug(f"Connected to {self.uri}")
             self.tasks.append(asyncio.create_task(self._send_loop()))
             self.tasks.append(asyncio.create_task(self._receive_loop()))
 
         except Exception as e:
-            logging.error(f"Failed to connect to {self.uri}: {e}")
+            logger.error(f"Failed to connect to {self.uri}: {e}")
             raise e
 
     async def _send_loop(self):
@@ -39,30 +39,30 @@ class AsyncWebSocketClient:
                 message = await self.send_queue.get()
                 if self.websocket:
                     await self.websocket.send(message)
-                    logging.debug(f"Sent message: {message}")
+                    logger.debug(f"Sent message: {message}")
 
             except websockets.exceptions.ConnectionClosed:
-                logging.error("Websocket connection closed")
+                logger.error("Websocket connection closed")
                 break
 
             except Exception as e:
-                logging.error(f"Error in send loop: {e}")
+                logger.error(f"Error in send loop: {e}")
 
     async def _receive_loop(self):
         while self.running:
             try:
                 if self.websocket:
                     message = await self.websocket.recv()
-                    logging.debug(f"Received message: {message}")
+                    logger.debug(f"Received message: {message}")
                     if self.message_handler:
                         self.message_handler(message)
 
             except websockets.exceptions.ConnectionClosed:
-                logging.error("Websocket connection closed")
+                logger.error("Websocket connection closed")
                 break
 
             except Exception as e:
-                logging.error(f"Error in receive loop: {e}")
+                logger.error(f"Error in receive loop: {e}")
 
     def send_message(self, message: Any):
         if not self.running:
@@ -84,4 +84,4 @@ class AsyncWebSocketClient:
         if self.websocket:
             await self.websocket.close()
             self.websocket = None
-            logging.debug(f"Disconnected from {self.uri}")
+            logger.debug(f"Disconnected from {self.uri}")

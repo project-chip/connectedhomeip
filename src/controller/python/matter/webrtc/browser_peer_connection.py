@@ -114,7 +114,7 @@ class BrowserPeerConnection(BrowserWebRTCClient):
             self._ice_candidates.candidates.append(candidate)
         return self._ice_candidates.candidates
 
-    async def set_remote_ice_candidates(self, remote_candidates: list[str]) -> None:
+    async def set_remote_ice_candidates(self, remote_candidates: list[IceCandidate]) -> None:
         """Sets the remote ICE candidates for the WebRTC peer connection.
 
         Args:
@@ -216,7 +216,7 @@ class BrowserPeerConnection(BrowserWebRTCClient):
         logging.debug("Waiting for remote answer")
         return await self._remote_events[Events.ANSWER].get(timeout_s)
 
-    async def get_remote_ice_candidates(self, timeout_s: Optional[int] = None) -> tuple[int, list[str]]:
+    async def get_remote_ice_candidates(self, timeout_s: Optional[int] = None) -> tuple[int, list[IceCandidate]]:
         """Waits for a remote SDP answer to be received through a matter command.
 
         Args:

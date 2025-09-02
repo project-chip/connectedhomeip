@@ -94,7 +94,7 @@ class TC_WEBRTC_1_3(MatterBaseTest, WebRTCTestHelper):
         return "[TC-WEBRTC-1.3] Validate Deferred Offer Flow for Battery-Powered Camera in Standby Mode"
 
     def pics_TC_WEBRTC_1_3(self) -> list[str]:
-        return ["WEBRTCR", "WEBRTCP"]
+        return ["WEBRTCR.C", "WEBRTCP.S"]
 
     @property
     def default_timeout(self) -> int:
@@ -155,7 +155,7 @@ class TC_WEBRTC_1_3(MatterBaseTest, WebRTCTestHelper):
         ice_session_id, remote_candidates = await webrtc_peer.get_remote_ice_candidates(timeout_s=30)
         asserts.assert_equal(ice_session_id, session_id, "Invalid session id")
         asserts.assert_true(len(remote_candidates) > 0, "Invalid ice candidates received")
-        webrtc_peer.set_remote_ice_candidates([cand.candidate for cand in remote_candidates])
+        webrtc_peer.set_remote_ice_candidates(remote_candidates)
 
         self.step(6)
         if not await webrtc_peer.check_for_session_establishment():

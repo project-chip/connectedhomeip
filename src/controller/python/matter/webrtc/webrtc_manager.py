@@ -71,10 +71,16 @@ class WebRTCManager(WebRTCRequestorNativeBindings):
             self._peerconnection_map[node_id] = peer
             return self._peerconnection_map[node_id]
 
-    async def create_browser_peer(self, node_id: int, fabric_index: int, endpoint: int) -> BrowserPeerConnection:
+    async def create_browser_peer(
+        self, media_direction: dict[str, str], node_id: int, fabric_index: int, endpoint: int
+    ) -> BrowserPeerConnection:
         """Creates a new PeerConnection instance and associates it with the given node_id.
 
         Args:
+            media_direction (dict[key, value]): Direction for peer transceivers.
+                example: {"audio": "sendrecv", "video": "sendrecv"}
+                key: audio|video
+                value: sendrecv|sendonly|recvonly
             node_id (int): Peer node id.
             fabric_index (int): The local fabric index.
             endpoint (int): The peer endpoint id.
@@ -92,7 +98,7 @@ class WebRTCManager(WebRTCRequestorNativeBindings):
         peer = BrowserPeerConnection(node_id, fabric_index, endpoint, self.ws_client, self.event_loop)
         with self._lock:
             self._peerconnection_map[node_id] = peer
-        await peer.create_peer_connection()
+        await peer.create_peer_connection(media_direction)
         return peer
 
     def session_id_created(self, session_id: int, node_id: int) -> None:

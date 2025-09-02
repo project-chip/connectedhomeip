@@ -97,7 +97,7 @@ class TC_WEBRTC_1_2(MatterBaseTest, WebRTCTestHelper):
         return "[TC-WEBRTC-1.2] Validate that providing an existing WebRTC session ID with an SDP Offer successfully triggers the re-offer flow"
 
     def pics_TC_WEBRTC_1_2(self) -> list[str]:
-        return ["WEBRTCR", "WEBRTCP"]
+        return ["WEBRTCR.C", "WEBRTCP.S"]
 
     @property
     def default_timeout(self) -> int:
@@ -227,7 +227,7 @@ async def establish_webrtc_session(webrtc_manager, webrtc_peer, endpoint, ctrl, 
     )
 
     ice_session_id, remote_candidates = await webrtc_peer.get_remote_ice_candidates()
-    webrtc_peer.set_remote_ice_candidates([cand.candidate for cand in remote_candidates])
+    webrtc_peer.set_remote_ice_candidates(remote_candidates)
 
     return await webrtc_peer.check_for_session_establishment()
 

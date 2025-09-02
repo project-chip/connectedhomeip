@@ -111,14 +111,14 @@ class LibdatachannelPeerConnection(LibdatachannelWebRTCClient):
         self._ice_candidates.gathering_complete = True
         return self._ice_candidates.candidates
 
-    def set_remote_ice_candidates(self, remote_candidates: list[str]) -> None:
+    def set_remote_ice_candidates(self, remote_candidates: list[IceCandidate]) -> None:
         """Sets the remote ICE candidates for the WebRTC peer connection.
 
         Args:
             remote_candidates (list[str]): A list of remote ICE candidates to be set.
         """
         for candidate in remote_candidates:
-            self.add_ice_candidate(candidate, "video")
+            self.add_ice_candidate(candidate.candidate, candidate.sdpMid or "video")
 
     async def get_local_answer(self, timeout_sec: Optional[int] = None) -> str:
         """Fetches the local SDP answer for the WebRTC peer connection.

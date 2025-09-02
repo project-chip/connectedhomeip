@@ -89,7 +89,7 @@ class TC_WEBRTC_1_1(MatterBaseTest, WebRTCTestHelper):
         return "[TC-WEBRTC-1.1] Validate that setting an SDP Offer successfully initiates a new WebRTC session"
 
     def pics_TC_WEBRTC_1_1(self) -> list[str]:
-        return ["WEBRTCR", "WEBRTCP"]
+        return ["WEBRTCR.C", "WEBRTCP.S"]
 
     @property
     def default_timeout(self) -> int:
@@ -166,7 +166,7 @@ class TC_WEBRTC_1_1(MatterBaseTest, WebRTCTestHelper):
         asserts.assert_equal(session_id, ice_session_id, "ProvideIceCandidates invoked with wrong session id")
         asserts.assert_true(len(remote_candidates) > 0, "Invalid remote ice candidates received")
 
-        webrtc_peer.set_remote_ice_candidates([cand.candidate for cand in remote_candidates])
+        webrtc_peer.set_remote_ice_candidates(remote_candidates)
 
         self.step(6)
         if not await webrtc_peer.check_for_session_establishment():

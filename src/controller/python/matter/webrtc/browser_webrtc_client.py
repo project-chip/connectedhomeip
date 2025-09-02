@@ -31,23 +31,25 @@ class BrowserWebRTCClient:
         self._event_callbacks_without_parameter = ("GATHERING_STATE_COMPLETE",)
         self.id = id
 
-    async def create_peer_connection(self):
+    async def create_peer_connection(self, media_direction: dict[str, str]):
         event = "CREATE_PEER_CONNECTION"
-        return await self.send_message(event)
+        return await self.send_message(event, media_direction)
 
     async def close_peer_connection(self):
         event = "CLOSE_PEER_CONNECTION"
-        return await self.send_message(event)
+        self.ws_client.send_message(WebSocketMessage(type=event, sessionId=self.id))
 
-    async def create_offer(self):
+    async def create_offer(self) -> str:
         event = "CREATE_OFFER"
         offer_sdp = await self.send_message(event)
         self.event_callbacks["OFFER"](offer_sdp)
+        return offer_sdp
 
-    async def create_answer(self):
+    async def create_answer(self) -> str:
         event = "CREATE_ANSWER"
         answer_sdp = await self.send_message(event)
         self.event_callbacks["ANSWER"](answer_sdp)
+        return answer_sdp
 
     async def set_remote_description(self, sdp: str, type: str):
         event = f"SET_REMOTE_{type.upper()}"
@@ -58,8 +60,8 @@ class BrowserWebRTCClient:
         return await self.send_message(event, candidates)
 
     def on_local_description(self, callback):
-        self.event_callbacks["OFFER"] = lambda desc: callback(desc, "offer")
-        self.event_callbacks["ANSWER"] = lambda desc: callback(desc, "answer")
+        self.event_callbacks["OFFER"] = lambda sdp: callback(sdp, "offer")
+        self.event_callbacks["ANSWER"] = lambda sdp: callback(sdp, "answer")
 
     def on_ice_candidate(self, callback):
         self.event_callbacks["LOCAL_ICE_CANDIDATES"] = callback
@@ -79,12 +81,12 @@ class BrowserWebRTCClient:
     def on_state_change(self, callback):
         self.event_callbacks["PEER_CONNECTION_STATE"] = callback
 
-    async def send_message(self, event, value=None):
+    async def send_message(self, event, value=None) -> Any:
         self.pending_cmd_responses[event] = self.event_loop.create_future()
         self.ws_client.send_message(WebSocketMessage(type=event, sessionId=self.id, data=value))
         return await self.pending_cmd_responses[event]
 
-    def handle_messsage(self, message: Any):
+    def handle_messsage(self, message: Any) -> None:
         ws_message = self.parse_messsage(message)
 
         if ws_message.type in self.pending_cmd_responses:
@@ -94,7 +96,7 @@ class BrowserWebRTCClient:
         else:
             raise RuntimeError("Unknown event received from server")
 
-    def handle_messsage_event(self, message: WebSocketMessage):
+    def handle_messsage_event(self, message: WebSocketMessage) -> None:
         callback = self.event_callbacks[message.type]
         if message.type in self._event_callbacks_without_parameter:
             callback()
@@ -104,12 +106,11 @@ class BrowserWebRTCClient:
         else:
             callback(message.data)
 
-    def handle_cmd_event(self, message: WebSocketMessage):
+    def handle_cmd_event(self, message: WebSocketMessage) -> None:
         if message.error:
             self.pending_cmd_responses[message.type].set_exception(Exception(message.error))
         else:
             self.pending_cmd_responses[message.type].set_result(message.data)
-        return
 
     def parse_messsage(self, message: dict[str, Any]) -> WebSocketMessage:
         if not self.validate_message(message):
@@ -121,6 +122,6 @@ class BrowserWebRTCClient:
         if not isinstance(message, dict):
             return False
         valid_keys = ("data", "error", "type", "sessionId")
-        if len(valid_keys) != len(message.keys()):
+        if len(message.keys()) < len(valid_keys):
             return False
         return all([key in message for key in valid_keys])
