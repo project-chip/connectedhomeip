@@ -206,7 +206,6 @@ fi
 
 # Set ccache environment variables
 export CCACHE_NOHASHDIR=1
-export CCACHE_IGNOREOPTIONS="-I* -fmacro-prefix-map=*"
 export CCACHE_PREFIX_CPP="$_CHIP_ROOT/scripts/helpers/ccache-prefix-cpp.sh"
 export CCACHE_BASEDIR="$_CHIP_ROOT"
 export CCACHE_SLOPPINESS=time_macros
