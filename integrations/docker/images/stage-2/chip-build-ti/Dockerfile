@@ -10,7 +10,14 @@ RUN set -x \
     && rm -rf /var/lib/apt/lists/ \
     && : # last line
 
-# Install Sysconfig
+# Install Sysconfig for CC32XX
+RUN set -x \
+    && wget https://dr-download.ti.com/software-development/ide-configuration-compiler-or-debugger/MD-nsUM6f7Vvb/1.18.1.3343/sysconfig-1.18.1_3343-setup.run \
+    && chmod +x sysconfig-1.18.1_3343-setup.run \
+    && ./sysconfig-1.18.1_3343-setup.run --mode unattended \
+    && : # last line
+
+# Install Sysconfig for other device families
 RUN set -x \
     && wget https://dr-download.ti.com/software-development/ide-configuration-compiler-or-debugger/MD-nsUM6f7Vvb/1.22.0.3893/sysconfig-1.22.0_3893-setup.run \
     && chmod +x sysconfig-1.22.0_3893-setup.run \
@@ -18,3 +25,4 @@ RUN set -x \
     && : # last line
 
 ENV TI_SYSCONFIG_ROOT=/opt/ti/sysconfig_1.22.0
+ENV TI_SYSCONFIG_ROOT_CC32XX=/opt/ti/sysconfig_1.18.1
