@@ -426,12 +426,12 @@ CHIP_ERROR ValidateListEntry(const TariffComponentStruct::Type & entryNewValue, 
 
         entryFeatures.Set(CommodityTariff::Feature::kPricing);
     }
-    else if (CommonUtilities::HasFeatureInCtx(ctx, CommodityTariff::Feature::kPricing))
+    /*else if (CommonUtilities::HasFeatureInCtx(ctx, CommodityTariff::Feature::kPricing))
     {
         // If Pricing feature is enabled but no price provided, that's only acceptable
         // if the field is explicitly set to null (which we already checked above)
         return CHIP_ERROR_INVALID_ARGUMENT;
-    }
+    }*/
     // Else: No price provided and feature not enabled - valid case
 
     // Validate friendlyCredit field
@@ -456,12 +456,12 @@ CHIP_ERROR ValidateListEntry(const TariffComponentStruct::Type & entryNewValue, 
 
         entryFeatures.Set(CommodityTariff::Feature::kAuxiliaryLoad);
     }
-    else if (CommonUtilities::HasFeatureInCtx(ctx, CommodityTariff::Feature::kAuxiliaryLoad))
+    /*else if (CommonUtilities::HasFeatureInCtx(ctx, CommodityTariff::Feature::kAuxiliaryLoad))
     {
         // AUXLD feature enabled but no auxiliaryLoad provided (or explicitly null)
         ChipLogError(NotSpecified, "The auxiliaryLoad field must be provided and non-null when AUXLD feature is enabled");
         return CHIP_ERROR_INVALID_ARGUMENT;
-    }
+    }*/
 
     // Validate peakPeriod field
     if (entryNewValue.peakPeriod.HasValue())
@@ -476,12 +476,12 @@ CHIP_ERROR ValidateListEntry(const TariffComponentStruct::Type & entryNewValue, 
 
         entryFeatures.Set(CommodityTariff::Feature::kPeakPeriod);
     }
-    else if (CommonUtilities::HasFeatureInCtx(ctx, CommodityTariff::Feature::kPeakPeriod))
+    /*else if (CommonUtilities::HasFeatureInCtx(ctx, CommodityTariff::Feature::kPeakPeriod))
     {
         // PEAKP feature enabled but no peakPeriod provided (or explicitly null)
         ChipLogError(NotSpecified, "The peakPeriod field must be provided and non-null when PEAKP feature is enabled");
         return CHIP_ERROR_INVALID_ARGUMENT;
-    }
+    }*/
 
     // Validate powerThreshold field
     if (entryNewValue.powerThreshold.HasValue())
@@ -542,6 +542,7 @@ CHIP_ERROR ValidateListEntry(const TariffComponentStruct::Type & entryNewValue, 
 CHIP_ERROR ValidateListEntry(const TariffPeriodStruct::Type & entryNewValue, void * aCtx)
 {
     auto * ctx           = static_cast<TariffUpdateCtx *>(aCtx);
+    std::unordered_set<uint32_t> entryTcIDs;
 
     if (!entryNewValue.label.IsNull())
     {
@@ -570,10 +571,13 @@ CHIP_ERROR ValidateListEntry(const TariffPeriodStruct::Type & entryNewValue, voi
     }
 
     // Check that the current period item has no duplicated tariffComponentIDs
-    if (CommonUtilities::HasDuplicateIDs(entryNewValue.tariffComponentIDs, ctx->TariffPeriodsTariffComponentIDs))
+ if (CommonUtilities::HasDuplicateIDs(entryNewValue.tariffComponentIDs, entryTcIDs))
     {
         return CHIP_ERROR_DUPLICATE_KEY_ID;
     }
+
+    //ctx->TariffPeriodsDayEntryIDs.merge(entryDeIDs);
+    ctx->TariffPeriodsTariffComponentIDs.merge(entryTcIDs);
 
     return CHIP_NO_ERROR;
 }

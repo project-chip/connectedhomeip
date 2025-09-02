@@ -22,8 +22,6 @@
 #include <app/ConcreteAttributePath.h>
 #include <app/InteractionModelEngine.h>
 #include <cstdint>
-#include <unordered_set>
-#include <vector>
 
 using namespace chip;
 using namespace chip::app;
@@ -688,8 +686,7 @@ void Instance::HandleGetTariffComponent(HandlerContext & ctx, const Commands::Ge
         if (component != nullptr) 
         {
             std::vector<uint32_t> DeIDs;
-            std::string tempLabelString;  // Use std::string to accumulate labels
-            chip::CharSpan respLabel;
+            std::string tempLabelString;
 
             auto matchingPeriods = Utils::FindTariffPeriodsByTariffComponentId(mServerTariffAttrsCtx, commandData.tariffComponentID);
 
@@ -703,7 +700,7 @@ void Instance::HandleGetTariffComponent(HandlerContext & ctx, const Commands::Ge
                     {
                         std::string periodLabel(period->label.Value().data(), period->label.Value().size());
                         if (!firstLabel) {
-                            tempLabelString += ";";
+                            tempLabelString += "; ";
                         }
                         tempLabelString += periodLabel;
                         firstLabel = false;
@@ -718,15 +715,14 @@ void Instance::HandleGetTariffComponent(HandlerContext & ctx, const Commands::Ge
                 }
             }
 
-            CommodityTariffAttrsDataMgmt::StrToSpan::Copy(tempLabelString, respLabel);
+            std::sort(DeIDs.begin(), DeIDs.end());
 
-            response.label           = respLabel;
+            response.label           = chip::CharSpan(tempLabelString.data(), tempLabelString.size());
             response.dayEntryIDs     = DataModel::List<uint32_t>(DeIDs.data(), DeIDs.size());
             response.tariffComponent = *component;
             status                   = Status::Success;
 
-            DeIDs.clear();
-            tempLabelString.clear();
+            ctx.mCommandHandler.AddResponse(ctx.mRequestPath, response);
         }
     }
 
@@ -735,8 +731,6 @@ void Instance::HandleGetTariffComponent(HandlerContext & ctx, const Commands::Ge
         ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);
         return;
     }
-
-    ctx.mCommandHandler.AddResponse(ctx.mRequestPath, response);
 }
 
 void Instance::HandleGetDayEntry(HandlerContext & ctx, const Commands::GetDayEntry::DecodableType & commandData)

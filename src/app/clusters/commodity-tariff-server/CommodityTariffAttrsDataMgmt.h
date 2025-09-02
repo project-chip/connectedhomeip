@@ -27,6 +27,7 @@
 #include <cassert>
 #include <map>
 #include <string>
+#include <set>
 #include <unordered_set>
 
 namespace chip {
