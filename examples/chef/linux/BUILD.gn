@@ -40,6 +40,7 @@ chip_data_model("chef-data-model") {
 
 executable("${sample_name}") {
   sources = [
+    "${chip_root}/src/app/clusters/boolean-state-server/CodegenIntegration.cpp",
     "${project_dir}/common/DeviceTypes.cpp",
     "${project_dir}/common/chef-air-quality.cpp",
     "${project_dir}/common/chef-concentration-measurement.cpp",
@@ -75,7 +76,6 @@ executable("${sample_name}") {
     "${project_dir}/common/clusters/window-covering/chef-window-covering.cpp",
     "${project_dir}/common/stubs.cpp",
     "${project_dir}/linux/main.cpp",
-    "${chip_root}/src/app/clusters/boolean-state-server/CodegenIntegration.cpp",
   ]
 
   deps = [
