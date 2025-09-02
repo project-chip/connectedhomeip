@@ -53,10 +53,14 @@ CHIP_ERROR CameraAVStreamManager::ValidateStreamUsage(StreamUsageEnum streamUsag
                                                       Optional<DataModel::Nullable<uint16_t>> & audioStreamId)
 {
     // The server ensures that at least one stream Id has a value, and that there are streams allocated
-    // If a stream id(s) are provided, ensure that the requested Stream Usage matches the allocation
-    // If they're Null, look for a stream ID that matches the usage
-    bool matchedVideoStream = false;
-    bool matchedAudioStream = false;
+    // If a stream id(s) are provided, it's sufficient to have verified that the provide usage is supported by the camera.
+    // If they're Null, look for a stream ID that matches the usage. A match does not need to be exact. 
+    bool exactlyMatchedVideoStream = false;
+    bool looselyMatchedVideoStream = false;
+    uint16_t looseVideoStreamID;
+    bool exactlyMatchedAudioStream = false;
+    bool looselyMatchedAudioStream = false;
+    uint16_t looseAudioStreamID;
 
     // Is the requested stream usage supported by the camera?
     auto myStreamUsages = GetCameraAVStreamMgmtServer()->GetSupportedStreamUsages();
@@ -70,6 +74,8 @@ CHIP_ERROR CameraAVStreamManager::ValidateStreamUsage(StreamUsageEnum streamUsag
     if (videoStreamId.HasValue())
     {
         const std::vector<VideoStreamStruct> & allocatedVideoStreams = GetCameraAVStreamMgmtServer()->GetAllocatedVideoStreams();
+
+        // If no Video ID is provided, match to an allocated ID. Exact is preferred if found.  We know the stream requested is in supported streams.
         if (videoStreamId.Value().IsNull())
         {
             for (const auto & stream : allocatedVideoStreams)
@@ -77,27 +83,26 @@ CHIP_ERROR CameraAVStreamManager::ValidateStreamUsage(StreamUsageEnum streamUsag
                 if (stream.streamUsage == streamUsage)
                 {
                     videoStreamId.Emplace(stream.videoStreamID);
-                    matchedVideoStream = true;
+                    exactlyMatchedVideoStream = true;
                     break;
                 }
+
+                looselyMatchedVideoStream = true;
+                looseVideoStreamID = stream.videoStreamID;
             }
         }
         else
         {
-            for (const auto & stream : allocatedVideoStreams)
-            {
-                if (stream.videoStreamID == videoStreamId.Value().Value())
-                {
-                    matchedVideoStream = (stream.streamUsage == streamUsage);
-                    break;
-                }
-            }
+            // We've been provided with a stream ID, and we know the stream usage is supported by the camera, classify as an exact match
+            exactlyMatchedVideoStream = true;
         }
     }
 
     if (audioStreamId.HasValue())
     {
         const std::vector<AudioStreamStruct> & allocatedAudioStreams = GetCameraAVStreamMgmtServer()->GetAllocatedAudioStreams();
+                
+        // If no Audio ID is provided, match to an allocated ID. Exact is preferred if found.  We know the stream requested is in supported streams.
         if (audioStreamId.Value().IsNull())
         {
             for (const auto & stream : allocatedAudioStreams)
@@ -105,29 +110,33 @@ CHIP_ERROR CameraAVStreamManager::ValidateStreamUsage(StreamUsageEnum streamUsag
                 if (stream.streamUsage == streamUsage)
                 {
                     audioStreamId.Emplace(stream.audioStreamID);
-                    matchedAudioStream = true;
+                    exactlyMatchedAudioStream = true;
                     break;
                 }
+
+                looselyMatchedAudioStream = true;
+                looseAudioStreamID = stream.audioStreamID;
             }
         }
         else
         {
-            for (const auto & stream : allocatedAudioStreams)
-            {
-                if (stream.audioStreamID == audioStreamId.Value().Value())
-                {
-                    matchedAudioStream = (stream.streamUsage == streamUsage);
-                    break;
-                }
-            }
+            // We've been provided with a stream ID, and we know the stream usage is supported by the camera, classify as an exact match
+            exactlyMatchedAudioStream = true;
         }
     }
 
-    // Failure if a stream has value (actual or Null) and there's no match for either stream type
-    if ((audioStreamId.HasValue() && !matchedAudioStream) || (videoStreamId.HasValue() && !matchedVideoStream))
+    // If we have a loose match and no exact match, update the provided stream IDs with the loose match values
+    //
+    if (looselyMatchedAudioStream && !exactlyMatchedAudioStream)
     {
-        return CHIP_ERROR_NOT_FOUND;
+        audioStreamId.Emplace(looseAudioStreamID);
     }
+    
+    if (looselyMatchedVideoStream && !exactlyMatchedVideoStream)
+    {
+        videoStreamId.Emplace(looseVideoStreamID);
+    }
+
     return CHIP_NO_ERROR;
 }
 

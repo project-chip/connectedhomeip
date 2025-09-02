@@ -359,7 +359,7 @@ void WebRTCTransportProviderServer::HandleSolicitOffer(HandlerContext & ctx, con
     // Prepare the arguments for the delegate.
     Delegate::OfferRequestArgs args;
     uint16_t sessionId;
-    CHIP_ERROR err = GenerateSessionId(sessionId);
+    err = GenerateSessionId(sessionId);
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(Zcl, "HandleSolicitOffer: Cannot generate session ID: %" CHIP_ERROR_FORMAT, err.Format());
