@@ -191,7 +191,7 @@ void ClosureControlEndpoint::OnStopMotionActionComplete()
         }
         else
         {
-            overallCurrentState.Value().position = position;
+            overallCurrentState.Value().position    = position;
             overallCurrentState.Value().secureState = false;
         }
 
@@ -329,7 +329,7 @@ void ClosureControlEndpoint::OnPanelMotionActionComplete()
     }
     else
     {
-        overallCurrentState.Value().position = position;
+        overallCurrentState.Value().position    = position;
         overallCurrentState.Value().secureState = false;
     }
 
