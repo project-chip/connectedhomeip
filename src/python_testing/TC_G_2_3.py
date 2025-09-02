@@ -277,7 +277,7 @@ class TC_G_2_3(MatterBaseTest):
         try:
             await th1.SendCommand(self.dut_node_id, self.matter_test_config.endpoint, Clusters.Groups.Commands.AddGroupIfIdentifying(kGroupId7, kGroupNameGp7))
         except Exception as e:
-            logging.exception("Error while sending command AddGroupIfIdentify %s", e)
+            asserts.assert_true(False, f'Error while sending command AddGroupIfIdentify {e}')
 
         self.step("13")
         groupTableList: List[Clusters.GroupKeyManagement.Attributes.GroupTable] = await self.read_single_attribute(
@@ -307,7 +307,7 @@ class TC_G_2_3(MatterBaseTest):
                     self.matter_test_config.endpoint,
                     Clusters.Groups.Commands.AddGroupIfIdentifying(kGroupId, f"Gp{kGroupId}"))
         except Exception as e:
-            logging.exception("Error while sending command AddGroupIfIdentify %s", e)
+            asserts.assert_true(False, f'Error while sending command AddGroupIfIdentify {e}')
 
         self.step("16a")
         GroupKeyMapStruct = Clusters.GroupKeyManagement.Structs.GroupKeyMapStruct
