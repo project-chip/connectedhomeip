@@ -71,7 +71,7 @@ choices.
 2. Launch the REPL.
 
     ```shell
-    sudo out/python_env/bin/chip-repl
+    sudo out/python_env/bin/matter-repl
     ```
 
 > By default, the REPL points to `/tmp/repl-storage.json` for persistent
