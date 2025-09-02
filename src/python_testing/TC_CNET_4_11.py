@@ -84,7 +84,6 @@ async def run_command(command: str) -> str:
     except Exception as e:
         logger.error(f"run_command: Command execution failed: {command} - {e}")
         return ""
-        return ""
 
 
 async def detect_wifi_iface():
@@ -125,13 +124,11 @@ async def wpa_command(iface, cmd):
 
 async def scan_and_find_ssid(iface, target_ssid, retries=MAX_RETRIES, delay=RETRY_DELAY_SECONDS):
     """Scans and searches for SSID with retries"""
-    logger.info(f"scan_and_find_ssid: Scanning for {target_ssid} on {iface}")
 
     retry = 0
     while retry < retries:
         retry += 1
         try:
-            logger.debug(f"scan_and_find_ssid: Scan attempt {retry}/{retries}")
             await wpa_command(iface, "SCAN")
             await asyncio.sleep(delay)
 
@@ -140,10 +137,7 @@ async def scan_and_find_ssid(iface, target_ssid, retries=MAX_RETRIES, delay=RETR
 
             for line in scan_lines:
                 if line.endswith(f"\t{target_ssid}"):
-                    logger.info(f"scan_and_find_ssid: Found {target_ssid} on attempt {retry}")
                     return True
-
-            logger.warning(f"scan_and_find_ssid: SSID {target_ssid} not found on attempt {retry}")
 
         except Exception as e:
             logger.error(f"scan_and_find_ssid: Scan attempt {retry} failed: {e}")
@@ -166,8 +160,6 @@ async def connect_wifi_linux(ssid, password) -> ConnectionResult:
     if not iface:
         logger.error("connect_wifi_linux: No WiFi interface found")
         return ConnectionResult(1, "No WiFi interface found")
-
-    logger.info(f"connect_wifi_linux: Connecting to {ssid} on interface {iface}")
 
     try:
         # Scan to ensure SSID is available
@@ -222,14 +214,11 @@ async def connect_wifi_linux(ssid, password) -> ConnectionResult:
         await wpa_command(iface, f"SELECT_NETWORK {net_id}")
         await wpa_command(iface, "REASSOCIATE")
 
-        # Wait for connection with multiple attempts
         retry = 0
         timeout = CONNECTION_TIMEOUT
 
         while retry < MAX_RETRIES:
             retry += 1
-            logger.info(f"connect_wifi_linux: Connection attempt {retry}/{MAX_RETRIES}")
-
             start_time = time.time()
             connected = False
 
@@ -237,7 +226,6 @@ async def connect_wifi_linux(ssid, password) -> ConnectionResult:
                 status = await wpa_command(iface, "STATUS")
 
                 if "wpa_state=COMPLETED" in status:
-                    logger.info(f"connect_wifi_linux: WiFi association completed for {ssid}")
                     connected = True
                     break
                 elif "wpa_state=4WAY_HANDSHAKE" in status:
@@ -269,8 +257,6 @@ async def connect_wifi_linux(ssid, password) -> ConnectionResult:
             return ConnectionResult(1, f"Connection failed: {final_status}")
 
         # Connection successful, get IP address
-        logger.info("connect_wifi_linux: WiFi connected, requesting IP address")
-
         # Release any existing DHCP lease and request new one
         await run_command(f"sudo dhclient -r {iface}")
         await asyncio.sleep(1)
@@ -292,9 +278,6 @@ async def connect_wifi_linux(ssid, password) -> ConnectionResult:
             if "inet " in output:
                 ip_match = re.search(r'inet\s+(\S+)', output)
                 if ip_match:
-                    ip_info = ip_match.group(1)
-                    logger.info(f"connect_wifi_linux: Connected to {ssid} with IP {ip_info}")
-
                     # Test connectivity to gateway
                     try:
                         gateway_proc = await asyncio.create_subprocess_exec(
@@ -313,7 +296,7 @@ async def connect_wifi_linux(ssid, password) -> ConnectionResult:
                             )
                             ping_stdout, _ = await ping_proc.communicate()
                             if "1 received" in ping_stdout.decode():
-                                logger.info(f"connect_wifi_linux: Connectivity verified to gateway {gateway}")
+                                pass  # Connectivity verified
                     except Exception:
                         logger.warning("connect_wifi_linux: Could not verify connectivity, but connection appears established")
 
@@ -413,14 +396,10 @@ async def change_networks(test, cluster, ssid, password, breadcrumb):
     retry = 0
     while retry < MAX_RETRIES:
         retry += 1
-        logger.info(f"change_networks: Attempt {retry}/{MAX_RETRIES}")
-
         try:
             if retry > 1:
-                logger.info(f"change_networks: Waiting {WIFI_WAIT_SECONDS}s before retry")
                 await asyncio.sleep(WIFI_WAIT_SECONDS)
 
-            logger.info("change_networks: Sending ConnectNetwork command to DUT")
             try:
                 err = await asyncio.wait_for(
                     test.send_single_cmd(
@@ -435,21 +414,17 @@ async def change_networks(test, cluster, ssid, password, breadcrumb):
                 logger.info("change_networks: ConnectNetwork command completed successfully")
             except asyncio.TimeoutError:
                 # Timeout is expected behavior when DUT switches networks
-                logger.info("change_networks: ConnectNetwork timeout - this is expected when DUT switches networks")
                 success = True  # Treat timeout as success since DUT is switching networks
             except Exception as cmd_e:
                 error_msg = str(cmd_e).lower()
                 # Check if it's a Matter/CHIP internal timeout (also expected during network switch)
                 if "timeout" in error_msg or "commandsender.cpp" in error_msg:
-                    logger.info("change_networks: ConnectNetwork timeout - this is expected when DUT switches networks")
                     success = True  # Treat Matter timeout as success since DUT is switching networks
                 else:
                     logger.error(f"change_networks: ConnectNetwork command failed: {cmd_e}")
                     success = False
 
-            if success:
-                logger.info("change_networks: DUT network switch command sent successfully")
-            else:
+            if not success:
                 logger.error("change_networks: DUT network switch failed, retrying...")
                 continue
 
@@ -458,7 +433,6 @@ async def change_networks(test, cluster, ssid, password, breadcrumb):
             continue
 
         # Wait for DUT to change networks
-        logger.info(f"change_networks: Waiting {WIFI_WAIT_SECONDS}s for DUT to change networks")
         await asyncio.sleep(WIFI_WAIT_SECONDS)
 
         logger.info(f"change_networks: Changing TH network to {ssid}")
@@ -468,7 +442,6 @@ async def change_networks(test, cluster, ssid, password, breadcrumb):
                 timeout=NETWORK_CHANGE_TIMEOUT
             )
             if result and result.returncode == 0:
-                logger.info(f"change_networks: TH successfully connected to {ssid}")
                 # Extra wait for network stabilization after TH connects
                 logger.info("change_networks: Waiting additional 3s for network stabilization...")
                 await asyncio.sleep(3)
@@ -548,7 +521,6 @@ class TC_CNET_4_11(MatterBaseTest):
 
         while retry < MAX_RETRIES:
             retry += 1
-            logger.info(f" --- verify_operational_network: Trying to verify operational network: {retry}/{MAX_RETRIES}")
             try:
                 # Use extended timeout for mDNS discovery, especially on first attempt after network change
                 if retry == 1:
@@ -567,7 +539,6 @@ class TC_CNET_4_11(MatterBaseTest):
                 )
 
                 if networks and len(networks) > 0:
-                    logger.info(f" --- verify_operational_network: networks: {networks}")
                     # Check if we have any connected network
                     for network in networks:
                         if network.connected:
@@ -588,7 +559,6 @@ class TC_CNET_4_11(MatterBaseTest):
             else:
                 retry_delay = RETRY_DELAY_SECONDS  # Final retry: 5s
 
-            logger.info(f"verify_operational_network: Waiting {retry_delay}s before retry...")
             await asyncio.sleep(retry_delay)
         else:
             asserts.fail(f" --- verify_operational_network: Could not read networks after {MAX_RETRIES} retries.")
