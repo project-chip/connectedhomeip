@@ -172,11 +172,11 @@ DataModel::ActionReturnStatus ResourceMonitoringCluster::ReadHepaFilterMonitorin
 // Implements the read functionality for non-standard attributes.
 DataModel::ActionReturnStatus ResourceMonitoringCluster::ReadAttribute(const DataModel::ReadAttributeRequest & request, AttributeValueEncoder & encoder)
 {
-    if (mClusterId == HepaFilterMonitoring::Id)
+    if (mPath.mClusterId == HepaFilterMonitoring::Id)
     {
         return ReadHepaFilterMonitoringAttribute(request, encoder);
     }
-    else if (mClusterId == ActivatedCarbonFilterMonitoring::Id)
+    else if (mPath.mClusterId == ActivatedCarbonFilterMonitoring::Id)
     {
         return ReadActivatedCarbonFilterMonitoringAttribute(request, encoder);
     }
@@ -255,11 +255,11 @@ chip::Protocols::InteractionModel::Status ResourceMonitoringCluster::UpdateCondi
     mCondition    = newCondition;
     if (mCondition != oldConditionattr)
     {
-        if (mClusterId == HepaFilterMonitoring::Id) {
+        if (mPath.mClusterId == HepaFilterMonitoring::Id) {
             NotifyAttributeChanged(HepaFilterMonitoring::Attributes::Condition::Id);
         } 
 
-        if (mClusterId == ActivatedCarbonFilterMonitoring::Id) {
+        if (mPath.mClusterId == ActivatedCarbonFilterMonitoring::Id) {
             NotifyAttributeChanged(ActivatedCarbonFilterMonitoring::Attributes::Condition::Id);
         }
     }
@@ -292,11 +292,11 @@ chip::Protocols::InteractionModel::Status ResourceMonitoringCluster::UpdateInPla
     mInPlaceIndicator        = newInPlaceIndicator;
     if (mInPlaceIndicator != oldInPlaceIndicator)
     {
-        if (mClusterId == HepaFilterMonitoring::Id) {
+        if (mPath.mClusterId == HepaFilterMonitoring::Id) {
             NotifyAttributeChanged(HepaFilterMonitoring::Attributes::InPlaceIndicator::Id);   
         }
         
-        if (mClusterId == ActivatedCarbonFilterMonitoring::Id) {
+        if (mPath.mClusterId == ActivatedCarbonFilterMonitoring::Id) {
             NotifyAttributeChanged(ActivatedCarbonFilterMonitoring::Attributes::InPlaceIndicator::Id);   
         }
     }
@@ -310,15 +310,15 @@ chip::Protocols::InteractionModel::Status ResourceMonitoringCluster::UpdateLastC
     mLastChangedTime        = aNewLastChangedTime;
     if (mLastChangedTime != oldLastchangedTime)
     {
-        if (mClusterId == HepaFilterMonitoring::Id) {
+        if (mPath.mClusterId == HepaFilterMonitoring::Id) {
             chip::app::GetSafeAttributePersistenceProvider()->WriteScalarValue(
-                ConcreteAttributePath(mEndpointId, mClusterId, HepaFilterMonitoring::Attributes::LastChangedTime::Id), mLastChangedTime);
+                ConcreteAttributePath(mPath.mEndpointId, mPath.mClusterId, HepaFilterMonitoring::Attributes::LastChangedTime::Id), mLastChangedTime);
             NotifyAttributeChanged(HepaFilterMonitoring::Attributes::LastChangedTime::Id);
         }
 
-        if (mClusterId == ActivatedCarbonFilterMonitoring::Id) {
+        if (mPath.mClusterId == ActivatedCarbonFilterMonitoring::Id) {
             chip::app::GetSafeAttributePersistenceProvider()->WriteScalarValue(
-                ConcreteAttributePath(mEndpointId, mClusterId, ActivatedCarbonFilterMonitoring::Attributes::LastChangedTime::Id), mLastChangedTime);
+                ConcreteAttributePath(mPath.mEndpointId, mPath.mClusterId, ActivatedCarbonFilterMonitoring::Attributes::LastChangedTime::Id), mLastChangedTime);
             NotifyAttributeChanged(ActivatedCarbonFilterMonitoring::Attributes::LastChangedTime::Id);
         }
     }
@@ -330,13 +330,13 @@ void ResourceMonitoringCluster::LoadPersistentAttributes()
 {
     CHIP_ERROR err;
 
-    if (mClusterId == HepaFilterMonitoring::Id) {
+    if (mPath.mClusterId == HepaFilterMonitoring::Id) {
         err = chip::app::GetSafeAttributePersistenceProvider()->ReadScalarValue(
-            ConcreteAttributePath(mEndpointId, mClusterId, HepaFilterMonitoring::Attributes::LastChangedTime::Id), mLastChangedTime);
+            ConcreteAttributePath(mPath.mEndpointId, mPath.mClusterId, HepaFilterMonitoring::Attributes::LastChangedTime::Id), mLastChangedTime);
     } 
-    else if (mClusterId == ActivatedCarbonFilterMonitoring::Id) {
+    else if (mPath.mClusterId == ActivatedCarbonFilterMonitoring::Id) {
         err = chip::app::GetSafeAttributePersistenceProvider()->ReadScalarValue(
-            ConcreteAttributePath(mEndpointId, mClusterId, ActivatedCarbonFilterMonitoring::Attributes::LastChangedTime::Id), mLastChangedTime);
+            ConcreteAttributePath(mPath.mEndpointId, mPath.mClusterId, ActivatedCarbonFilterMonitoring::Attributes::LastChangedTime::Id), mLastChangedTime);
     }
 
     
