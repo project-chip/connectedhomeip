@@ -41,7 +41,6 @@ from mobly import asserts
 from TC_AVSMTestBase import AVSMTestBase
 
 import matter.clusters as Clusters
-from matter import ChipDeviceCtrl
 from matter.ChipDeviceCtrl import TransportPayloadCapability
 from matter.clusters import Objects, WebRTCTransportProvider
 from matter.clusters.Types import NullValue
@@ -256,7 +255,7 @@ class TC_AVSM_2_16(MatterBaseTest, AVSMTestBase):
 
         self.step(9)
         cmd = Clusters.WebRTCTransportProvider.Commands.EndSession(webRTCSessionID=aSessionID)
-        resp = await self.send_single_cmd(cmd=cmd, endpoint=endpoint)
+        await self.send_single_cmd(cmd=cmd, endpoint=endpoint)
 
         self.step(10)
         aAllocatedVideoStreams = await self.read_single_attribute_check_success(
