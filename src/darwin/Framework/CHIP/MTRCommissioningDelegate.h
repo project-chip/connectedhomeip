@@ -24,6 +24,23 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+typedef NS_ENUM(NSInteger, MTRCommissioningStage) {
+    // Possible stages that can be reached during commissioning.  The order of
+    // these stages is not guaranteed to be anything in particular, or to match
+    // the numeric order of this enum.  There are no guarantees that any
+    // particular stage will in fact be reached, unless documented otherwise.
+
+    // The commissionee has received network credentials.  This will never be reached
+    // during on-network commissioning.
+    MTRCommissioningStageProvisionedNetworkCredentials = 1,
+
+    // The commissioning operation is about to ask the commissionee to do a Wi-Fi network scan.
+    MTRCommissioningStageWiFiScanStart = 2,
+
+    // The commissioning operation is about to ask the commissionee to do a Thread network scan.
+    MTRCommissioningStageThreadScanStart = 3,
+} MTR_PROVISIONALLY_AVAILABLE;
+
 MTR_PROVISIONALLY_AVAILABLE
 @protocol MTRCommissioningDelegate <NSObject>
 @optional
@@ -83,12 +100,9 @@ MTR_PROVISIONALLY_AVAILABLE
                completion:(void (^)(NSData * operationalDataset))completion;
 
 /**
- * Notification that network credentials have been successfully communicated
- * to the commissionee and it's going to try to join that network.  Note that
- * for commissionees that are already on-network this notification will not
- * happen.
+ * Notification that a particular comissioning stage has been reached.
  */
-- (void)commissioningProvisionedNetworkCredentials:(MTRCommissioningOperation *)commissioning;
+- (void)commissioning:(MTRCommissioningOperation *)commissioning reachedCommissioningStage:(MTRCommissioningStage)stage;
 
 /**
  * Notification that commissioning has failed.
@@ -104,9 +118,6 @@ MTR_PROVISIONALLY_AVAILABLE
     succeededForNodeID:(NSNumber *)nodeID
                metrics:(MTRMetrics *)metrics;
 
-// TODO: Need some kind of progress marker or more notifications, if we want to
-// support HAPAccessoryServerPairingProgressStateNetworkScanStart notifications
-// in our client?
 @end
 
 NS_ASSUME_NONNULL_END
