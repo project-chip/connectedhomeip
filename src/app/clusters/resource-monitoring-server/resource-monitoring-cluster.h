@@ -104,8 +104,8 @@ public:
     bool GetInPlaceIndicator() const;
     DataModel::Nullable<uint32_t> GetLastChangedTime() const;
 
-    EndpointId GetEndpointId() const { return mEndpointId; }
-    ClusterId GetClusterId() const { return mClusterId; }
+    EndpointId GetEndpointId() const { return mPath.mEndpointId; }
+    ClusterId GetClusterId() const { return mPath.mClusterId; }
 
     std::optional<DataModel::ActionReturnStatus> InvokeCommand(const DataModel::InvokeRequest & request,
                                                                chip::TLV::TLVReader & input_arguments,
@@ -145,9 +145,6 @@ private:
     uint32_t mFeatureMap;
     
     bool mResetConditionCommandSupported{false};
-
-    ClusterId mClusterId{};
-    EndpointId mEndpointId{};
 };
 
 class ResourceMonitoringDelegate
