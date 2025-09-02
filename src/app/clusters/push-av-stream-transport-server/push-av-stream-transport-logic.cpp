@@ -51,14 +51,7 @@ PushAvStreamTransportServerLogic::PushAvStreamTransportServerLogic(EndpointId aE
                                                                      PushAvStreamTransport::IngestMethodsEnum::kCMAFIngest } }
 {}
 
-PushAvStreamTransportServerLogic::~PushAvStreamTransportServerLogic()
-{
-    for (const auto & timerContext : mTimerContexts)
-    {
-        DeviceLayer::SystemLayer().CancelTimer(PushAVStreamTransportDeallocateCallback, static_cast<void *>(timerContext.get()));
-    }
-    Shutdown();
-}
+PushAvStreamTransportServerLogic::~PushAvStreamTransportServerLogic() {}
 
 CHIP_ERROR PushAvStreamTransportServerLogic::Init()
 {
@@ -66,7 +59,13 @@ CHIP_ERROR PushAvStreamTransportServerLogic::Init()
     return CHIP_NO_ERROR;
 }
 
-void PushAvStreamTransportServerLogic::Shutdown() {}
+void PushAvStreamTransportServerLogic::Shutdown()
+{
+    for (const auto & timerContext : mTimerContexts)
+    {
+        DeviceLayer::SystemLayer().CancelTimer(PushAVStreamTransportDeallocateCallback, static_cast<void *>(timerContext.get()));
+    }
+}
 
 bool PushAvStreamTransportServerLogic::HasFeature(Feature feature) const
 {
