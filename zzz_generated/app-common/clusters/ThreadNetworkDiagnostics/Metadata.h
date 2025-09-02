@@ -5,6 +5,7 @@
 #pragma once
 
 #include <app/data-model-provider/MetadataTypes.h>
+#include <array>
 #include <lib/core/DataModelTypes.h>
 
 #include <cstdint>
@@ -19,6 +20,7 @@ namespace ThreadNetworkDiagnostics {
 inline constexpr uint32_t kRevision = 3;
 
 namespace Attributes {
+
 namespace Channel {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(Channel::Id, BitFlags<DataModel::AttributeQualityFlags>(),
                                                           Access::Privilege::kView, std::nullopt);
@@ -289,16 +291,49 @@ namespace Rloc16 {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(Rloc16::Id, BitFlags<DataModel::AttributeQualityFlags>(),
                                                           Access::Privilege::kView, std::nullopt);
 } // namespace Rloc16
+constexpr std::array<DataModel::AttributeEntry, 19> kMandatoryMetadata = {
+    Channel::kMetadataEntry,
+    RoutingRole::kMetadataEntry,
+    NetworkName::kMetadataEntry,
+    PanId::kMetadataEntry,
+    ExtendedPanId::kMetadataEntry,
+    MeshLocalPrefix::kMetadataEntry,
+    NeighborTable::kMetadataEntry,
+    RouteTable::kMetadataEntry,
+    PartitionId::kMetadataEntry,
+    Weighting::kMetadataEntry,
+    DataVersion::kMetadataEntry,
+    StableDataVersion::kMetadataEntry,
+    LeaderRouterId::kMetadataEntry,
+    SecurityPolicy::kMetadataEntry,
+    ChannelPage0Mask::kMetadataEntry,
+    OperationalDatasetComponents::kMetadataEntry,
+    ActiveNetworkFaultsList::kMetadataEntry,
+    ExtAddress::kMetadataEntry,
+    Rloc16::kMetadataEntry,
+
+};
 
 } // namespace Attributes
 
 namespace Commands {
+
 namespace ResetCounts {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(ResetCounts::Id, BitFlags<DataModel::CommandQualityFlags>(),
                                                                 Access::Privilege::kManage);
 } // namespace ResetCounts
 
 } // namespace Commands
+
+namespace Events {
+namespace ConnectionStatus {
+inline constexpr DataModel::EventEntry kMetadataEntry{ Access::Privilege::kView };
+} // namespace ConnectionStatus
+namespace NetworkFaultChange {
+inline constexpr DataModel::EventEntry kMetadataEntry{ Access::Privilege::kView };
+} // namespace NetworkFaultChange
+
+} // namespace Events
 } // namespace ThreadNetworkDiagnostics
 } // namespace Clusters
 } // namespace app

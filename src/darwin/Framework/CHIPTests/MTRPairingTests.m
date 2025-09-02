@@ -19,6 +19,7 @@
 
 #import "MTRDefines_Internal.h"
 #import "MTRErrorTestUtils.h"
+#import "MTRSecureCodingTestHelpers.h"
 #import "MTRTestCase+ServerAppRunner.h"
 #import "MTRTestCase.h"
 #import "MTRTestDeclarations.h"
@@ -90,6 +91,9 @@ static MTRTestKeys * sTestKeys = nil;
     XCTAssertEqualObjects(attestationDeviceInfo.productID, @(0x8001));
     XCTAssertEqualObjects(attestationDeviceInfo.basicInformationVendorID, @(0xFFF1));
     XCTAssertEqualObjects(attestationDeviceInfo.basicInformationProductID, @(0x8000));
+    XCTAssertEqualObjects(attestationDeviceInfo.certificateDeclaration,
+        attestationDeviceInfo.certificationDeclaration);
+    XCTAssertNotNil(attestationDeviceInfo.certificationDeclaration);
 
     if (_callback) {
         _callback();
@@ -107,6 +111,7 @@ static MTRTestKeys * sTestKeys = nil;
 @property (nonatomic, nullable) id<MTRDeviceAttestationDelegate> attestationDelegate;
 @property (nonatomic, nullable) NSNumber * failSafeExtension;
 @property (nonatomic) BOOL shouldReadEndpointInformation;
+@property (nullable) NSArray<MTRAttributeRequestPath *> * extraAttributesToRead;
 @property (nullable) NSError * commissioningCompleteError;
 @end
 
@@ -132,6 +137,7 @@ static MTRTestKeys * sTestKeys = nil;
     params.deviceAttestationDelegate = self.attestationDelegate;
     params.failSafeTimeout = self.failSafeExtension;
     params.readEndpointInformation = self.shouldReadEndpointInformation;
+    params.extraAttributesToRead = self.extraAttributesToRead;
 
     NSError * commissionError = nil;
     XCTAssertTrue([controller commissionNodeWithID:@(sDeviceId) commissioningParams:params error:&commissionError],
@@ -144,6 +150,11 @@ static MTRTestKeys * sTestKeys = nil;
 {
     XCTAssertNotNil(info.productIdentity);
     XCTAssertEqualObjects(info.productIdentity.vendorID, /* Test Vendor 1 */ @0xFFF1);
+
+    NSError * decodeError;
+    id roundTrippedInfo = RoundTripEncodable(info, &decodeError);
+    XCTAssertNil(decodeError);
+    XCTAssertEqualObjects(info, roundTrippedInfo);
 
     if (self.shouldReadEndpointInformation) {
         XCTAssertNotNil(info.endpointsById);
@@ -161,8 +172,11 @@ static MTRTestKeys * sTestKeys = nil;
 
         // There is currently no convenient way to initialize an MTRCommissioneeInfo
         // object from basic ObjC data types, so we do some unit testing here.
-        NSData * data = [NSKeyedArchiver archivedDataWithRootObject:info requiringSecureCoding:YES error:NULL];
-        MTRCommissioneeInfo * decoded = [NSKeyedUnarchiver unarchivedObjectOfClass:MTRCommissioneeInfo.class fromData:data error:NULL];
+        NSError * err;
+        NSData * data = [NSKeyedArchiver archivedDataWithRootObject:info requiringSecureCoding:YES error:&err];
+        XCTAssertNil(err);
+        MTRCommissioneeInfo * decoded = [NSKeyedUnarchiver unarchivedObjectOfClass:MTRCommissioneeInfo.class fromData:data error:&err];
+        XCTAssertNil(err);
         XCTAssertNotNil(decoded);
         XCTAssertTrue([decoded isEqual:info]);
         XCTAssertEqualObjects(decoded.productIdentity, info.productIdentity);
@@ -171,6 +185,41 @@ static MTRTestKeys * sTestKeys = nil;
     } else {
         XCTAssertNil(info.endpointsById);
         XCTAssertNil(info.rootEndpoint);
+    }
+
+    // In all cases, we should have the network commissioning feature maps in
+    // the list.
+    __auto_type isNetworkCommissioningFeatureMap = ^(MTRAttributePath * path) {
+        return [path.cluster isEqual:@(MTRClusterIDTypeNetworkCommissioningID)] &&
+            [path.attribute isEqual:@(MTRAttributeIDTypeGlobalAttributeFeatureMapID)];
+    };
+    NSUInteger networkCommissioningFeatureMapCount = 0;
+    for (MTRAttributePath * path in info.attributes) {
+        if (isNetworkCommissioningFeatureMap(path)) {
+            ++networkCommissioningFeatureMapCount;
+        }
+    }
+    XCTAssertGreaterThan(networkCommissioningFeatureMapCount, 0);
+
+    if (self.extraAttributesToRead) {
+        // The attributes we tried to read should really have worked.
+        XCTAssertNotNil(info.attributes);
+        XCTAssertEqual(info.attributes.count, 2 + networkCommissioningFeatureMapCount);
+        for (MTRAttributePath * path in info.attributes) {
+            if (isNetworkCommissioningFeatureMap(path)) {
+                // We checked for these already.
+                continue;
+            }
+
+            XCTAssertEqualObjects(path.endpoint, @(0));
+            if ([path.cluster isEqual:@(MTRClusterIDTypeDescriptorID)]) {
+                XCTAssertEqualObjects(path.attribute, @(MTRAttributeIDTypeGlobalAttributeAttributeListID));
+            } else if ([path.cluster isEqual:@(MTRClusterIDTypeBasicInformationID)]) {
+                XCTAssertEqualObjects(path.attribute, @(MTRAttributeIDTypeClusterBasicInformationAttributeVendorNameID));
+            } else {
+                XCTFail("Unexpected cluster id %@", path.cluster);
+            }
+        }
     }
 }
 
@@ -502,6 +551,37 @@ static MTRTestKeys * sTestKeys = nil;
 
     // Endpoint info is validated by MTRPairingTestControllerDelegate
     controllerDelegate.shouldReadEndpointInformation = YES;
+
+    dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.pairing", DISPATCH_QUEUE_SERIAL_WITH_AUTORELEASE_POOL);
+    [sController setDeviceControllerDelegate:controllerDelegate queue:callbackQueue];
+    self.controllerDelegate = controllerDelegate;
+
+    NSError * error;
+    __auto_type * payload = [MTRSetupPayload setupPayloadWithOnboardingPayload:kOnboardingPayload error:&error];
+    XCTAssertTrue([sController setupCommissioningSessionWithPayload:payload newNodeID:@(++sDeviceId) error:&error]);
+    XCTAssertNil(error);
+
+    [self waitForExpectations:@[ expectation ] timeout:kPairingTimeoutInSeconds];
+    XCTAssertNil(controllerDelegate.commissioningCompleteError);
+}
+
+- (void)test010_PairWithReadingExtraAttributes
+{
+    [self startServerApp];
+
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Commissioning Complete"];
+    __auto_type * controllerDelegate = [[MTRPairingTestControllerDelegate alloc] initWithExpectation:expectation
+                                                                                 attestationDelegate:nil
+                                                                                   failSafeExtension:nil];
+
+    controllerDelegate.extraAttributesToRead = @[
+        [MTRAttributeRequestPath requestPathWithEndpointID:@(0)
+                                                 clusterID:@(MTRClusterIDTypeDescriptorID)
+                                               attributeID:@(MTRAttributeIDTypeGlobalAttributeAttributeListID)],
+        [MTRAttributeRequestPath requestPathWithEndpointID:@(0)
+                                                 clusterID:@(MTRClusterIDTypeBasicInformationID)
+                                               attributeID:@(MTRAttributeIDTypeClusterBasicInformationAttributeVendorNameID)],
+    ];
 
     dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.pairing", DISPATCH_QUEUE_SERIAL_WITH_AUTORELEASE_POOL);
     [sController setDeviceControllerDelegate:controllerDelegate queue:callbackQueue];
