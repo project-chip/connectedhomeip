@@ -90,7 +90,7 @@ enum CommissioningStage : uint8_t
     kConfigureTCAcknowledgments,      ///< Send SetTCAcknowledgements (0x30:6) command to the device
     kCleanup,                         ///< Call delegates with status, free memory, clear timers and state/
 #if CHIP_DEVICE_CONFIG_ENABLE_NFC_BASED_COMMISSIONING
-    kUnpoweredPhaseComplete,          ///< Commissioning completed until connect network for unpowered commissioning (NFC)
+    kUnpoweredPhaseComplete, ///< Commissioning completed until connect network for unpowered commissioning (NFC)
 #endif
 };
 

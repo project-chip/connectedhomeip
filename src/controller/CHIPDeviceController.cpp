@@ -638,7 +638,7 @@ void DeviceCommissioner::ReleaseCommissioneeDevice(CommissioneeDeviceProxy * dev
 #endif
 
 #if CHIP_DEVICE_CONFIG_ENABLE_NFC_BASED_COMMISSIONING
-    Nfc::NFCReaderTransport* readerTransport = DeviceLayer::Internal::NFCCommissioningMgr().GetNFCReaderTransport();
+    Nfc::NFCReaderTransport * readerTransport = DeviceLayer::Internal::NFCCommissioningMgr().GetNFCReaderTransport();
     if (readerTransport)
     {
         ChipLogProgress(Controller, "Stopping discovery of all NFC tags");
@@ -1102,9 +1102,11 @@ CHIP_ERROR DeviceCommissioner::ContinueCommissioningAfterUnpoweredPhaseComplete(
 
     // Setup device being commissioned
     CommissioneeDeviceProxy * device = nullptr;
-    if (!mDeviceBeingCommissioned) {
+    if (!mDeviceBeingCommissioned)
+    {
         device = mCommissioneeDevicePool.CreateObject();
-        if (!device) return CHIP_ERROR_NO_MEMORY;
+        if (!device)
+            return CHIP_ERROR_NO_MEMORY;
 
         Transport::PeerAddress peerAddress = Transport::PeerAddress::UDP(Inet::IPAddress::Any);
         device->Init(GetControllerDeviceInitParams(), remoteDeviceId, peerAddress);
@@ -1118,7 +1120,8 @@ CHIP_ERROR DeviceCommissioner::ContinueCommissioningAfterUnpoweredPhaseComplete(
 
     MATTER_LOG_METRIC_BEGIN(kMetricDeviceCommissioningOperationalSetup);
     CHIP_ERROR err = mDefaultCommissioner->StartCommissioning(this, device);
-    if (err != CHIP_NO_ERROR) {
+    if (err != CHIP_NO_ERROR)
+    {
         MATTER_LOG_METRIC_END(kMetricDeviceCommissioningOperationalSetup, err);
     }
     return err;
