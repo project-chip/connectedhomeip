@@ -1050,7 +1050,8 @@ chip::Protocols::InteractionModel::Status ClosureManager::OnStepCommand(const St
         mClosureEndpoint1Target.SetNonNull(GenericOverallTargetState{});
     }
 
-    mClosureEndpoint1Target.Value().position = NullOptional; // Reset position to Null
+    mClosureEndpoint1Target.Value().position.SetValue(
+        DataModel::NullNullable); // Set position to Null as it cannot represent panel position change.
 
     VerifyOrReturnValue(mClosureEndpoint1.GetLogic().SetOverallTargetState(mClosureEndpoint1Target) == CHIP_NO_ERROR,
                         Status::Failure, ChipLogError(AppServer, "Failed to set overall target for Step command"));
