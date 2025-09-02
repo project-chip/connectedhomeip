@@ -185,7 +185,7 @@ CHIP_ERROR ReadNOCs(AttributeValueEncoder & aEncoder)
 
             // ICAC and VVSC are mutually exclusive. ICAC is nullable, VVSC is optional.
             ReturnErrorOnFailure(fabricTable.FetchICACert(fabricIndex, icacOrVvscSpan));
-            if (!icacOrVvscSpan.empty()) 
+            if (!icacOrVvscSpan.empty())
             {
                 nocStruct.icac.SetNonNull(icacOrVvscSpan);
             }
@@ -1128,7 +1128,7 @@ DataModel::ActionReturnStatus OperationalCredentialsCluster::ReadAttribute(const
     }
 }
 
-CHIP_ERROR OperationalCredentialsCluster::AcceptedCommands(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder) 
+CHIP_ERROR OperationalCredentialsCluster::AcceptedCommands(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder)
 {
     static constexpr DataModel::AcceptedCommandEntry kAcceptedCommands[] = {
         Commands::AttestationRequest::kMetadataEntry,
@@ -1159,7 +1159,7 @@ CHIP_ERROR OperationalCredentialsCluster::GeneratedCommands(const ConcreteCluste
     return builder.ReferenceExisting(kGeneratedCommands);
 }
 
-std::optional<DataModel::ActionReturnStatus> OperationalCredentialsCluster::InvokeCommand(const DataModel::InvokeRequest & request, TLV::TLVReader & input_arguments, CommandHandler * handler) 
+std::optional<DataModel::ActionReturnStatus> OperationalCredentialsCluster::InvokeCommand(const DataModel::InvokeRequest & request, TLV::TLVReader & input_arguments, CommandHandler * handler)
 {
     switch(request.path.mCommandId)
     {
