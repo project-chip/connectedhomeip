@@ -42,8 +42,12 @@ from TC_AVSMTestBase import AVSMTestBase
 
 import matter.clusters as Clusters
 from matter import ChipDeviceCtrl
+from matter.ChipDeviceCtrl import TransportPayloadCapability
 from matter.interaction_model import InteractionModelError, Status
+from matter.clusters import Objects, WebRTCTransportProvider
+from matter.clusters.Types import NullValue
 from matter.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main, has_feature, run_if_endpoint_matches
+from matter.webrtc import PeerConnection, WebRTCManager
 
 logger = logging.getLogger(__name__)
 
@@ -77,8 +81,8 @@ class TC_AVSM_2_16(MatterBaseTest, AVSMTestBase):
             ),
             TestStep(
                 4,
-                "TH establishes a WeRTC session via the SolicitOffer command using aVideoStreamID and aAudioStreamID.",
-                "Verify the SolicitOfferResponse. Store the SessionID as aSessionID",
+                "TH establishes a WeRTC session via a ProvideOffer/Answer exchange using aVideoStreamID and aAudioStreamID.",
+                "Verify the ProvideOfferResponse. Store the SessionID as aSessionID",
             ),
             TestStep(
                 5,
@@ -175,13 +179,37 @@ class TC_AVSM_2_16(MatterBaseTest, AVSMTestBase):
         aAudioRefCount = aAllocatedAudioStreams[0].referenceCount
 
         self.step(4)
-        # Send valid SolicitOffer command
-        cmd = Clusters.WebRTCTransportProvider.Commands.SolicitOffer(
-            streamUsage=3, originatingEndpointID=endpoint, videoStreamID=aVideoStreamID, audioStreamID=aAudioStreamID)
-        resp = await self.send_single_cmd(cmd=cmd, endpoint=endpoint, payloadCapability=ChipDeviceCtrl.TransportPayloadCapability.LARGE_PAYLOAD)
-        asserts.assert_equal(type(resp), Clusters.WebRTCTransportProvider.Commands.SolicitOfferResponse,
-                             "Incorrect response type")
-        aSessionID = resp.webRTCSessionID
+        # Establish WebRTC via Provide Offer/Answer
+        webrtc_manager = WebRTCManager(event_loop=self.event_loop)
+        webrtc_peer: PeerConnection = webrtc_manager.create_peer(
+            node_id=self.dut_node_id, fabric_index=self.default_controller.GetFabricIndexInternal(), endpoint=endpoint)
+
+        webrtc_peer.create_offer()
+        offer = await webrtc_peer.get_local_offer()
+
+        provide_offer_response: WebRTCTransportProvider.Commands.ProvideOfferResponse = await webrtc_peer.send_command(
+            cmd=WebRTCTransportProvider.Commands.ProvideOffer(
+                webRTCSessionID=NullValue,
+                sdp=offer,
+                streamUsage=Objects.Globals.Enums.StreamUsageEnum.kLiveView,
+                videoStreamID=aVideoStreamID,
+                audioStreamID=aAudioStreamID,
+                originatingEndpointID=1,
+            ),
+            endpoint=endpoint,
+            payloadCapability=TransportPayloadCapability.LARGE_PAYLOAD,
+        )
+        aSessionID = provide_offer_response.webRTCSessionID
+        asserts.assert_true(aSessionID >= 0, "Invalid response")
+
+        webrtc_manager.session_id_created(aSessionID, self.dut_node_id)
+        answer_sessionId, answer = await webrtc_peer.get_remote_answer()
+
+        asserts.assert_equal(aSessionID, answer_sessionId, "ProvideAnswer invoked with wrong session id")
+        asserts.assert_true(len(answer) > 0, "Invalid answer SDP received")
+
+        webrtc_peer.set_remote_answer(answer)
+
 
         self.step(5)
         aAllocatedVideoStreams = await self.read_single_attribute_check_success(
@@ -250,14 +278,12 @@ class TC_AVSM_2_16(MatterBaseTest, AVSMTestBase):
             await self.send_single_cmd(endpoint=endpoint, cmd=commands.VideoStreamDeallocate(videoStreamID=(aVideoStreamID)))
         except InteractionModelError as e:
             asserts.assert_equal(e.status, Status.Success, "Unexpected error returned")
-            pass
 
         self.step(13)
         try:
-            await self.send_single_cmd(endpoint=endpoint, cmd=commands.AudioStreamDeallocate(videoStreamID=(aAudioStreamID)))
+            await self.send_single_cmd(endpoint=endpoint, cmd=commands.AudioStreamDeallocate(audioStreamID=(aAudioStreamID)))
         except InteractionModelError as e:
             asserts.assert_equal(e.status, Status.Success, "Unexpected error returned")
-            pass
 
         self.step(14)
         aAllocatedVideoStreams = await self.read_single_attribute_check_success(
