@@ -208,8 +208,8 @@ bool CommodityTariffDelegate::TariffDataUpd_CrossValidator(TariffUpdateCtx & Upd
     const auto & tariffComponents = GetTariffComponents_MgmtObj().GetNewValue().Value();
 
     // Create lookup maps with const correctness
-    std::map<uint32_t, const Structs::DayEntryStruct::Type *> dayEntriesMap;
-    std::map<uint32_t, const Structs::TariffComponentStruct::Type *> tariffComponentsMap;
+    std::unordered_map<uint32_t, const Structs::DayEntryStruct::Type *> dayEntriesMap;
+    std::unordered_map<uint32_t, const Structs::TariffComponentStruct::Type *> tariffComponentsMap;
 
     CommodityTariffAttrsDataMgmt::ListToMap<Structs::DayEntryStruct::Type, &Structs::DayEntryStruct::Type::dayEntryID>(
         dayEntries, dayEntriesMap);
@@ -296,8 +296,7 @@ bool CommodityTariffDelegate::TariffDataUpd_CrossValidator(TariffUpdateCtx & Upd
             const uint32_t featureID     = featureIt->second;
 
             // Skip if threshold is null or featureID is 0
-            if (tariffComponent->threshold.IsNull() ||
-                (tariffComponent->predicted.HasValue() && (tariffComponent->predicted.Value() == true)) || featureID == 0)
+            if (tariffComponent->threshold.IsNull() || tariffComponent->predicted.ValueOr(false) || featureID == 0)
             {
                 continue;
             }
