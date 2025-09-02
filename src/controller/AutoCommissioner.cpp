@@ -498,7 +498,7 @@ CommissioningStage AutoCommissioner::GetNextCommissioningStageInternal(Commissio
 
             // If the transport is NFC, move to unpowered phase complete to end the first phase of commissioning
             auto transportType = mCommissioneeDeviceProxy->GetSecureSession().Value()->AsSecureSession()->GetPeerAddress().GetTransportType();
-            return (transportType == Transport::Type::kNfc || mDeviceCommissioningInfo.general.isCommissioningWithoutPower) ? CommissioningStage::kUnpoweredPhaseComplete : CommissioningStage::kFindOperationalForStayActive;
+            return (transportType == Transport::Type::kNfc && mDeviceCommissioningInfo.general.isCommissioningWithoutPower) ? CommissioningStage::kUnpoweredPhaseComplete : CommissioningStage::kFindOperationalForStayActive;
         }
 #else
         return CommissioningStage::kFindOperationalForStayActive;
