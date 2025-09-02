@@ -970,7 +970,7 @@ class TC_CNET_4_11(MatterBaseTest):
         # 2. Connected is of type bool and is TRUE
         await self.find_network_and_assert(networks, wifi_2nd_ap_ssid)
 
-        # TH changes its Wi-Fi connection back to PIXIT.CNET.WIFI_1ST_ACCESSPOINT_SSID
+        # TH changes its Wi-Fi connection back to PIXIT.CNET.WIFI_1ST_ACCESSPOINT_SSID.
         await connect_host_wifi(wifi_1st_ap_ssid, wifi_1st_ap_credentials)
 
 
