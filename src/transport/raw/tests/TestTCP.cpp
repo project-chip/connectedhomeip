@@ -129,6 +129,11 @@ public:
                       CHIP_NO_ERROR);
         }
 
+        if (transCtxt)
+        {
+            incoming = transCtxt->conn;
+        }
+
         ChipLogProgress(Inet, "Message Receive Handler called");
 
         mReceiveHandlerCallCount++;
@@ -216,6 +221,9 @@ public:
         });
 
         CHIP_ERROR err = tcp.TCPConnect(Transport::PeerAddress::TCP(addr, port), nullptr, refHolder);
+        EXPECT_EQ(err, CHIP_NO_ERROR);
+
+        err = tcp.TCPConnect(Transport::PeerAddress::TCP(addr, port), &gAppTCPConnCbCtxt, refHolder);
         EXPECT_EQ(err, CHIP_NO_ERROR);
 
         // Should be able to send a message to itself by just calling send.
