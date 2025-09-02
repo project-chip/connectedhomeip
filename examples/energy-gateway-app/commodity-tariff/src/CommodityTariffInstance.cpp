@@ -256,10 +256,11 @@ bool CommodityTariffDelegate::TariffDataUpd_CrossValidator(TariffUpdateCtx & Upd
             
             DeStartDurationPair pair;
             pair.startTime = dayEntry->startTime;
-            pair.duration = dayEntry->duration.HasValue() ? dayEntry->duration.Value() : 0;
+            pair.duration = dayEntry->duration.HasValue() ? dayEntry->duration.Value() : CommodityTariffConsts::kDayEntryDurationLimit;
 
             // Check for duplicates
             if (!seenStartDurationPairs.insert(pair).second) {
+                ChipLogError(NotSpecified, "Duplicated startTime/duration (%u/%u) in  DayEntries of same TariffPeriod", pair.startTime,  pair.duration);
                 return false; // Found duplicate startTime/duration combination
             }
         }
@@ -283,7 +284,7 @@ bool CommodityTariffDelegate::TariffDataUpd_CrossValidator(TariffUpdateCtx & Upd
             const uint32_t featureID = featureIt->second;
 
             // Skip if threshold is null or featureID is 0
-            if (tariffComponent->threshold.IsNull() || featureID == 0) {
+            if (tariffComponent->threshold.IsNull() || ( tariffComponent->predicted.HasValue() &&  (tariffComponent->predicted.Value() == true) ) || featureID == 0) {
                 continue;
             }
 
@@ -294,6 +295,7 @@ bool CommodityTariffDelegate::TariffDataUpd_CrossValidator(TariffUpdateCtx & Upd
             
             // Check for duplicate threshold for this feature
             if (!thresholdSet.insert(thresholdValue).second) {
+                ChipLogError(NotSpecified, "Duplicated threshold value %" PRIi64 "per feature %" PRIu32 "of same TariffPeriod", thresholdValue,  featureID);
                 return false; // Found duplicate feature/threshold combination
             }
         }

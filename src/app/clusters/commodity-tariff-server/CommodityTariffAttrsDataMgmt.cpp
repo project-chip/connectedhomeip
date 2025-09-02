@@ -400,8 +400,7 @@ CHIP_ERROR ValidateListEntry(const TariffComponentStruct::Type & entryNewValue, 
 
     VerifyOrReturnError(entryNewValue.tariffComponentID > 0, CHIP_ERROR_INVALID_ARGUMENT);
 
-    if ( ((ctx->blockMode == BlockModeEnum::kNoBlock) && (!entryNewValue.threshold.IsNull())) ||
-        ((ctx->blockMode != BlockModeEnum::kNoBlock) && (entryNewValue.threshold.IsNull())) )
+    if ((ctx->blockMode == BlockModeEnum::kNoBlock) == !entryNewValue.threshold.IsNull())
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
@@ -426,13 +425,6 @@ CHIP_ERROR ValidateListEntry(const TariffComponentStruct::Type & entryNewValue, 
 
         entryFeatures.Set(CommodityTariff::Feature::kPricing);
     }
-    /*else if (CommonUtilities::HasFeatureInCtx(ctx, CommodityTariff::Feature::kPricing))
-    {
-        // If Pricing feature is enabled but no price provided, that's only acceptable
-        // if the field is explicitly set to null (which we already checked above)
-        return CHIP_ERROR_INVALID_ARGUMENT;
-    }*/
-    // Else: No price provided and feature not enabled - valid case
 
     // Validate friendlyCredit field
     if (entryNewValue.friendlyCredit.HasValue())
@@ -456,12 +448,6 @@ CHIP_ERROR ValidateListEntry(const TariffComponentStruct::Type & entryNewValue, 
 
         entryFeatures.Set(CommodityTariff::Feature::kAuxiliaryLoad);
     }
-    /*else if (CommonUtilities::HasFeatureInCtx(ctx, CommodityTariff::Feature::kAuxiliaryLoad))
-    {
-        // AUXLD feature enabled but no auxiliaryLoad provided (or explicitly null)
-        ChipLogError(NotSpecified, "The auxiliaryLoad field must be provided and non-null when AUXLD feature is enabled");
-        return CHIP_ERROR_INVALID_ARGUMENT;
-    }*/
 
     // Validate peakPeriod field
     if (entryNewValue.peakPeriod.HasValue())
@@ -476,12 +462,6 @@ CHIP_ERROR ValidateListEntry(const TariffComponentStruct::Type & entryNewValue, 
 
         entryFeatures.Set(CommodityTariff::Feature::kPeakPeriod);
     }
-    /*else if (CommonUtilities::HasFeatureInCtx(ctx, CommodityTariff::Feature::kPeakPeriod))
-    {
-        // PEAKP feature enabled but no peakPeriod provided (or explicitly null)
-        ChipLogError(NotSpecified, "The peakPeriod field must be provided and non-null when PEAKP feature is enabled");
-        return CHIP_ERROR_INVALID_ARGUMENT;
-    }*/
 
     // Validate powerThreshold field
     if (entryNewValue.powerThreshold.HasValue())
