@@ -210,7 +210,6 @@ class TC_AVSM_2_16(MatterBaseTest, AVSMTestBase):
 
         webrtc_peer.set_remote_answer(answer)
 
-
         self.step(5)
         aAllocatedVideoStreams = await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=cluster, attribute=attr.AllocatedVideoStreams
