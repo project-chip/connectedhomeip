@@ -52,7 +52,6 @@ static constexpr size_t kPrivateKeyBlobLength = Crypto::kP256_PrivateKey_Length 
 #define CHIP_CRYPTO_PAL_PRIVATE(x) x
 #endif
 
-
 static inline const mbedtls_ecp_keypair * to_const_keypair(const P256KeypairContext * context)
 {
     return SafePointerCast<const mbedtls_ecp_keypair *>(context);
