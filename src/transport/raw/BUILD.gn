@@ -18,9 +18,7 @@ import("${chip_root}/src/inet/inet.gni")
 import("${chip_root}/src/platform/device.gni")
 
 source_set("nfc-application-delegate") {
-  sources = [
-    "NfcApplicationDelegate.h",
-  ]
+  sources = [ "NfcApplicationDelegate.h" ]
 }
 
 static_library("raw") {

@@ -163,9 +163,7 @@ static_library("Darwin") {
       "NFCCommissioningManagerImpl.h",
     ]
 
-    deps += [
-      "${chip_root}/src/transport/raw:nfc-application-delegate",
-    ]
+    deps += [ "${chip_root}/src/transport/raw:nfc-application-delegate" ]
   }
 }
 
