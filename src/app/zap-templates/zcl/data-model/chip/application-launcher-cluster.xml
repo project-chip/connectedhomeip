@@ -77,10 +77,6 @@ Alchemy: v1.5.41
 
   <struct name="ApplicationStruct">
     <cluster code="0x050c"/>
-    <!-- Application Basic Cluster should have its own ApplicationStruct, but
-         ZAP does not support that right now.  Luckily, the two struct
-         definitions are identical, but if that ever stops being the case, we
-         will need to stop using a single definition with two cluster codes -->
     <item fieldId="0" name="CatalogVendorID" type="int16u"/>
     <item fieldId="1" name="ApplicationID" type="char_string"/>
   </struct>
