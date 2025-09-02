@@ -324,35 +324,39 @@ class CommodityTariffTestBaseHelper(MatterBaseTest):
 
         # if SETRF.S.F01(FCRED) feature is enabled
         if await self.feature_guard(cluster=cluster, endpoint=endpoint, feature_int=cluster.Bitmaps.Feature.kFriendlyCredit):
-            # checks FriendlyCredit field must be bool
-            matter_asserts.assert_valid_bool(struct.friendlyCredit, 'FriendlyCredit')
+            if struct.friendlyCredit is not None:
+                # checks FriendlyCredit field must be bool
+                matter_asserts.assert_valid_bool(struct.friendlyCredit, 'FriendlyCredit')
         else:  # if SETRF.S.F01(FCRED) feature is disabled
             asserts.assert_is_none(struct.friendlyCredit, "FriendlyCredit must be None")
 
         # if SETRF.S.F02(AUXLD) feature is enabled
         if await self.feature_guard(cluster=cluster, endpoint=endpoint, feature_int=cluster.Bitmaps.Feature.kAuxiliaryLoad):
-            # checks AuxiliaryLoad field must be of type AuxiliaryLoadSwitchSettingsStruct
-            asserts.assert_true(isinstance(
-                struct.auxiliaryLoad, cluster.Structs.AuxiliaryLoadSwitchSettingsStruct), "struct.auxiliaryLoad must be of type AuxiliaryLoadSwitchSettingsStruct")
-            await self.checkAuxiliaryLoadSwitchSettingsStruct(cluster=cluster, struct=struct.auxiliaryLoad)
+            if struct.auxiliaryLoad is not None:
+                # checks AuxiliaryLoad field must be of type AuxiliaryLoadSwitchSettingsStruct
+                asserts.assert_true(isinstance(
+                    struct.auxiliaryLoad, cluster.Structs.AuxiliaryLoadSwitchSettingsStruct), "AuxiliaryLoad must be of type AuxiliaryLoadSwitchSettingsStruct")
+                await self.checkAuxiliaryLoadSwitchSettingsStruct(cluster=cluster, struct=struct.auxiliaryLoad)
         else:  # if SETRF.S.F02(AUXLD) feature is disabled
             asserts.assert_is_none(struct.auxiliaryLoad, "AuxiliaryLoad must be None")
 
         # if SETRF.S.F03(PEAKP) feature is enabled
         if await self.feature_guard(cluster=cluster, endpoint=endpoint, feature_int=cluster.Bitmaps.Feature.kPeakPeriod):
-            # checks PeakPeriod field must be of type PeakPeriodStruct
-            asserts.assert_true(isinstance(
-                struct.peakPeriod, cluster.Structs.PeakPeriodStruct), "PeakPeriod must be of type PeakPeriodStruct")
-            await self.checkPeakPeriodStruct(cluster=cluster, struct=struct.peakPeriod)
+            if struct.peakPeriod is not None:
+                # checks PeakPeriod field must be of type PeakPeriodStruct
+                asserts.assert_true(isinstance(
+                    struct.peakPeriod, cluster.Structs.PeakPeriodStruct), "PeakPeriod must be of type PeakPeriodStruct")
+                await self.checkPeakPeriodStruct(cluster=cluster, struct=struct.peakPeriod)
         else:  # if SETRF.S.F03(PEAKP) feature is disabled
             asserts.assert_is_none(struct.peakPeriod, "PeakPeriod must be None")
 
         # if SETRF.S.F04(PWRTHLD) feature is enabled
         if await self.feature_guard(cluster=cluster, endpoint=endpoint, feature_int=cluster.Bitmaps.Feature.kPowerThreshold):
-            # checks PowerThreshold field must be of type PowerThresholdStruct
-            asserts.assert_true(isinstance(
-                struct.powerThreshold, Globals.Structs.PowerThresholdStruct), "PowerThreshold must be of type PowerThresholdStruct")
-            await self.checkPowerThresholdStruct(struct=struct.powerThreshold)
+            if struct.powerThreshold is not None:
+                # checks PowerThreshold field must be of type PowerThresholdStruct
+                asserts.assert_true(isinstance(
+                    struct.powerThreshold, Globals.Structs.PowerThresholdStruct), "PowerThreshold must be of type PowerThresholdStruct")
+                await self.checkPowerThresholdStruct(struct=struct.powerThreshold)
         else:  # if SETRF.S.F04(PWRTHLD) feature is disabled
             asserts.assert_is_none(struct.powerThreshold, "PowerThreshold must be None")
 
@@ -876,8 +880,11 @@ class CommodityTariffTestBaseHelper(MatterBaseTest):
                 self.tariffPeriodsValue, cluster.Structs.TariffPeriodStruct, "TariffPeriods attribute must contain TariffPeriodStruct elements")
 
             # check each TariffPeriodStruct
-            for item in self.tariffPeriodsValue:
-                await self.checkTariffPeriodStruct(struct=item)
+            for tariff_period in self.tariffPeriodsValue:
+
+                await self.checkTariffPeriodStruct(struct=tariff_period)
+
+                await self.validate_tariff_component_ID_uniqueness_for_features(await self.get_tariff_components_by_its_IDs(tariff_period.tariffComponentIDs))
 
     async def check_current_tariff_components_attribute(self, endpoint: int, attribute_value: Optional[List[cluster.Structs.TariffComponentStruct]] = None) -> None:
         """Validate CurrentTariffComponents attribute.
@@ -1380,7 +1387,6 @@ class CommodityTariffTestBaseHelper(MatterBaseTest):
 
         # flags to check specific feature fields in mask
         features_fields_flags = {
-            "default": 0,
             "price": 1 << 0,
             "friendlyCredit": 1 << 1,
             "auxiliaryLoad": 1 << 2,
@@ -1407,8 +1413,9 @@ class CommodityTariffTestBaseHelper(MatterBaseTest):
 
             # iterate over all feature flags
             for feature_flag in features_fields_flags.keys():
-                current_component_features_flags |= features_fields_flags[getattr(
-                    tariff_component, feature_flag, "default")]  # set corresponding flag about usage
+
+                current_component_features_flags |= features_fields_flags[feature_flag] if getattr(
+                    tariff_component, feature_flag, None) is not None else current_component_features_flags | 0
 
             # validate that there are no duplicate feature fields (comparing bitwise AND with current component feature flags mask and
             # feature mask for current threshold value in groups_by_threshold_field)

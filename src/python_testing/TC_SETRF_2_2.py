@@ -183,7 +183,7 @@ class TC_SETRF_2_2(CommodityTariffTestBaseHelper):
 
         self.step("7")
         # TH sends command GetTariffComponent command with absent TariffComponentID value, expects NOT_FOUND status code
-        absentTariffComponentID = self.generate_unique_uint32_for_IDs(tariffComponentIDs)
+        absentTariffComponentID = await self.generate_unique_uint32_for_IDs(tariffComponentIDs)
         try:
             command = Clusters.CommodityTariff.Commands.GetTariffComponent(
                 tariffComponentID=absentTariffComponentID)
@@ -219,7 +219,7 @@ class TC_SETRF_2_2(CommodityTariffTestBaseHelper):
 
         self.step("10")
         # TH sends command GetDayEntry command with DayEntryID field set to an absent value, expects NOT_FOUND status code
-        absentDayEntryID = self.generate_unique_uint32_for_IDs(dayEntryIDs)
+        absentDayEntryID = await self.generate_unique_uint32_for_IDs(dayEntryIDs)
         try:
             command = Clusters.CommodityTariff.Commands.GetDayEntry(dayEntryID=absentDayEntryID)
             result: cluster.Commands.GetDayEntryResponse = await self.send_single_cmd(cmd=command, endpoint=endpoint, timedRequestTimeoutMs=3000)
