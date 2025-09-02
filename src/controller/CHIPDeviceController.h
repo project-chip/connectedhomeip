@@ -630,7 +630,6 @@ public:
     CHIP_ERROR ContinueCommissioningAfterUnpoweredPhaseComplete(NodeId remoteDeviceId);
 #endif
 
-
     CHIP_ERROR GetDeviceBeingCommissioned(NodeId deviceId, CommissioneeDeviceProxy ** device);
 
     /**

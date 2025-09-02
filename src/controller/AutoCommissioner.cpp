@@ -488,18 +488,21 @@ CommissioningStage AutoCommissioner::GetNextCommissioningStageInternal(Commissio
         return CommissioningStage::kEvictPreviousCaseSessions;
     case CommissioningStage::kEvictPreviousCaseSessions:
 #if CHIP_DEVICE_CONFIG_ENABLE_NFC_BASED_COMMISSIONING
+    {
+        // If there is no secure session, means commissioning has been continued after the unpowered phase was completed
+        // In such case, move on setup the CASE session over operational network
+        if (!mCommissioneeDeviceProxy->GetSecureSession().HasValue())
         {
-            // If there is no secure session, means commissioning has been continued after the unpowered phase was completed
-            // In such case, move on setup the CASE session over operational network
-            if (!mCommissioneeDeviceProxy->GetSecureSession().HasValue())
-            {
-                return CommissioningStage::kFindOperationalForStayActive;
-            }
-
-            // If the transport is NFC, move to unpowered phase complete to end the first phase of commissioning
-            auto transportType = mCommissioneeDeviceProxy->GetSecureSession().Value()->AsSecureSession()->GetPeerAddress().GetTransportType();
-            return (transportType == Transport::Type::kNfc && mDeviceCommissioningInfo.general.isCommissioningWithoutPower) ? CommissioningStage::kUnpoweredPhaseComplete : CommissioningStage::kFindOperationalForStayActive;
+            return CommissioningStage::kFindOperationalForStayActive;
         }
+
+        // If the transport is NFC, move to unpowered phase complete to end the first phase of commissioning
+        auto transportType =
+            mCommissioneeDeviceProxy->GetSecureSession().Value()->AsSecureSession()->GetPeerAddress().GetTransportType();
+        return (transportType == Transport::Type::kNfc && mDeviceCommissioningInfo.general.isCommissioningWithoutPower)
+            ? CommissioningStage::kUnpoweredPhaseComplete
+            : CommissioningStage::kFindOperationalForStayActive;
+    }
 #else
         return CommissioningStage::kFindOperationalForStayActive;
 #endif
@@ -600,7 +603,9 @@ CHIP_ERROR AutoCommissioner::StartCommissioning(DeviceCommissioner * commissione
 #if CHIP_DEVICE_CONFIG_ENABLE_NFC_BASED_COMMISSIONING
     // Proxy is expected to have a valid secure session before starting to commission. However, in case of continuing
     // commissioning post unpowered phase, allow proceeding if the stage is evict secure CASE sessions
-    if (proxy == nullptr || (!proxy->GetSecureSession().HasValue() && commissioner->GetCommissioningStage() != CommissioningStage::kEvictPreviousCaseSessions))
+    if (proxy == nullptr ||
+        (!proxy->GetSecureSession().HasValue() &&
+         commissioner->GetCommissioningStage() != CommissioningStage::kEvictPreviousCaseSessions))
     {
         ChipLogError(Controller, "Device proxy secure session error");
         return CHIP_ERROR_INVALID_ARGUMENT;
@@ -616,12 +621,13 @@ CHIP_ERROR AutoCommissioner::StartCommissioning(DeviceCommissioner * commissione
     mCommissioner            = commissioner;
     mCommissioneeDeviceProxy = proxy;
 
-    // When commissioning is started after unpowered phase, there will be no secure session since the CASE session first needs to be setup
-    // over operational network. Hence assume transport is UDP in such case.
+    // When commissioning is started after unpowered phase, there will be no secure session since the CASE session first needs to be
+    // setup over operational network. Hence assume transport is UDP in such case.
     auto transportType = Transport::Type::kUdp;
     if (mCommissioneeDeviceProxy->GetSecureSession().HasValue())
     {
-        transportType = mCommissioneeDeviceProxy->GetSecureSession().Value()->AsSecureSession()->GetPeerAddress().GetTransportType();
+        transportType =
+            mCommissioneeDeviceProxy->GetSecureSession().Value()->AsSecureSession()->GetPeerAddress().GetTransportType();
     }
 
     mNeedsNetworkSetup = (transportType == Transport::Type::kBle);

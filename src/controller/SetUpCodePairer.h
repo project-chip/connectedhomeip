@@ -94,7 +94,8 @@ enum class DiscoveryType : uint8_t
 
 class DLL_EXPORT SetUpCodePairer : public DevicePairingDelegate
 #if CHIP_DEVICE_CONFIG_ENABLE_NFC_BASED_COMMISSIONING
-                                   , public Nfc::NFCReaderTransportDelegate
+    ,
+                                   public Nfc::NFCReaderTransportDelegate
 #endif
 {
 public:
@@ -128,7 +129,7 @@ private:
 
 #if CHIP_DEVICE_CONFIG_ENABLE_NFC_BASED_COMMISSIONING
     // Nfc::NFCReaderTransportDelegate implementation
-    void OnTagDiscovered(const chip::Nfc::NFCTag::Identifier& identifer) override;
+    void OnTagDiscovered(const chip::Nfc::NFCTag::Identifier & identifer) override;
     void OnTagDiscoveryFailed(CHIP_ERROR error) override;
 #endif
 
