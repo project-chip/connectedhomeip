@@ -1054,6 +1054,9 @@ CameraError CameraDevice::SetSoftLivestreamPrivacyModeEnabled(bool softLivestrea
 {
     mSoftLivestreamPrivacyModeEnabled = softLivestreamPrivacyMode;
 
+    // Notify WebRTCProviderManager about change
+    mWebRTCProviderManager.LiveStreamPrivacyModeChanged(softLivestreamPrivacyMode);
+
     return CameraError::SUCCESS;
 }
 
@@ -1307,6 +1310,11 @@ ChimeDelegate & CameraDevice::GetChimeDelegate()
 }
 
 WebRTCTransportProvider::Delegate & CameraDevice::GetWebRTCProviderDelegate()
+{
+    return mWebRTCProviderManager;
+}
+
+WebRTCTransportProvider::WebRTCTransportProviderController & CameraDevice::GetWebRTCProviderController()
 {
     return mWebRTCProviderManager;
 }
