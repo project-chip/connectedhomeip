@@ -1012,6 +1012,63 @@ class MatterBaseTest(base_test.BaseTestClass):
                 logging.info("========= EOF on STDIN =========")
                 return None
 
+    def user_verify_two_way_talk(self,
+                                 prompt_msg: str) -> None:
+        """Show Two Way Talk Verification Prompt and wait for user validation.
+           This method will be executed only when TC is running in TH.
+
+        Args:
+            prompt_msg (str): Message for TH UI prompt and input function.
+            Indicates what is expected from the user.
+
+        Returns:
+            Returns nothing indicating success so the test can go on.
+
+        Raises:
+            TestError: Indicating video validation step failed.
+        """
+        # Only run when TC is being executed in TH
+        if self.runner_hook and hasattr(self.runner_hook, 'show_two_way_talk_prompt'):
+            self.runner_hook.show_two_way_talk_prompt(msg=prompt_msg)
+
+            logging.info("========= USER PROMPT for Two Way Talk Validation =========")
+
+            try:
+                result = input()
+                if result != '1':  # User did not select 'PASS'
+                    raise TestError("Two way talk validation failed")
+            except EOFError:
+                logging.info("========= EOF on STDIN =========")
+                return None
+
+    def user_verify_push_av_stream(self, prompt_msg: str) -> None:
+        """Show Push AV Stream Verification Prompt and wait for user validation.
+           This method will be executed only when TC is running in TH.
+
+        Args:
+            prompt_msg (str): Message for TH UI prompt and input function.
+            Indicates what is expected from the user.
+
+        Returns:
+            Returns nothing indicating success so the test can go on.
+
+        Raises:
+            TestError: Indicating video validation step failed.
+        """
+        # Only run when TC is being executed in TH
+        if self.runner_hook and hasattr(self.runner_hook, 'show_push_av_stream_prompt'):
+            self.runner_hook.show_push_av_stream_prompt(msg=prompt_msg)
+
+            logging.info("========= USER PROMPT for Push AV Stream Validation =========")
+
+            try:
+                result = input()
+                if result != '1':  # User did not select 'PASS'
+                    raise TestError("Push AV Stream validation failed")
+            except EOFError:
+                logging.info("========= EOF on STDIN =========")
+                return None
+
 
 def _async_runner(body, self: MatterBaseTest, *args, **kwargs):
     """Runs an async function within the test's event loop with a timeout.
