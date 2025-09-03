@@ -21,6 +21,7 @@ import random
 from mobly import asserts
 
 import matter.clusters as Clusters
+from matter.clusters.Types import Nullable
 from matter import ChipDeviceCtrl
 from matter.interaction_model import InteractionModelError, Status
 
@@ -185,7 +186,9 @@ class PAVSTTestBase:
             asserts.fail(f"Audio Stream with ID {audioStreamID} not found as expected")
 
     async def allocate_one_pushav_transport(self, endpoint, triggerType=Clusters.PushAvStreamTransport.Enums.TransportTriggerTypeEnum.kContinuous,
-                                            trigger_Options=None):
+                                            trigger_Options=None, ingestMethod=Clusters.PushAvStreamTransport.Enums.IngestMethodsEnum.kCMAFIngest,
+                                            url="https://localhost:1234/streams/1", stream_Usage=None, container_Options=None,
+                                            videoStream_ID=None, audioStream_ID=None, expected_cluster_status=None):
         endpoint = self.get_endpoint(default=1)
         cluster = Clusters.PushAvStreamTransport
 
@@ -209,6 +212,33 @@ class PAVSTTestBase:
         )
         asserts.assert_greater(len(aStreamUsagePriorities), 0, "StreamUsagePriorities is empty")
 
+        streamUsage = aStreamUsagePriorities[0]
+        if (stream_Usage is not None):
+            streamUsage = stream_Usage
+
+        videoStreamID = aAllocatedVideoStream
+        if (videoStream_ID is not None):
+            if (videoStream_ID == Nullable()):
+                videoStreamID = videoStream_ID
+            else:
+                videoStreamID = aAllocatedVideoStream + 1
+
+        audioStreamID = aAllocatedAudioStream
+        if (audioStream_ID is not None):
+            if (audioStream_ID == Nullable()):
+                audioStreamID = audioStream_ID
+            else:
+                audioStreamID = aAllocatedAudioStream + 1
+
+        containerOptions = {
+            "containerType": cluster.Enums.ContainerFormatEnum.kCmaf,
+            "CMAFContainerOptions": {"CMAFInterface": cluster.Enums.CMAFInterfaceEnum.kInterface1, "chunkDuration": 4, "segmentDuration": 3,
+                                     "sessionGroup": 3, "trackName": ""},
+            }
+
+        if (container_Options is not None):
+            containerOptions = container_Options
+
         triggerOptions = {"triggerType": triggerType}
         if (trigger_Options is not None):
             triggerOptions = trigger_Options
@@ -217,18 +247,14 @@ class PAVSTTestBase:
             await self.send_single_cmd(
                 cmd=cluster.Commands.AllocatePushTransport(
                     {
-                        "streamUsage": aStreamUsagePriorities[0],
-                        "videoStreamID": aAllocatedVideoStream,
-                        "audioStreamID": aAllocatedAudioStream,
+                        "streamUsage": streamUsage,
+                        "videoStreamID": videoStreamID,
+                        "audioStreamID": audioStreamID,
                         "endpointID": endpoint,
-                        "url": "https://localhost:1234/streams/1",
+                        "url": url,
                         "triggerOptions": triggerOptions,
-                        "ingestMethod": cluster.Enums.IngestMethodsEnum.kCMAFIngest,
-                        "containerOptions": {
-                            "containerType": cluster.Enums.ContainerFormatEnum.kCmaf,
-                            "CMAFContainerOptions": {"CMAFInterface": cluster.Enums.CMAFInterfaceEnum.kInterface1, "chunkDuration": 4, "segmentDuration": 3,
-                                                     "sessionGroup": 3, "trackName": ""},
-                        },
+                        "ingestMethod": ingestMethod,
+                        "containerOptions": containerOptions,
                         "expiryTime": 5,
                     }
                 ),
@@ -237,6 +263,12 @@ class PAVSTTestBase:
             return Status.Success
         except InteractionModelError as e:
             asserts.assert_not_equal(e.status, Status.Success, "Unexpected error returned")
+            if (expected_cluster_status is not None):
+                asserts.assert_true(
+                    e.clusterStatus == expected_cluster_status, "Unexpected error returned"
+                )
+                return e.clusterStatus
+            return e.status
         pass
 
     async def check_and_delete_all_push_av_transports(self, endpoint, attribute):

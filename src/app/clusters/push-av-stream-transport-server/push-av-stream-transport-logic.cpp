@@ -541,6 +541,40 @@ PushAvStreamTransportServerLogic::HandleAllocatePushTransport(CommandHandler & h
     Commands::AllocatePushTransportResponse::Type response;
     auto & transportOptions = commandData.transportOptions;
 
+    IngestMethodsEnum ingestMethod = commandData.transportOptions.ingestMethod;
+
+    bool isFormatSupported = false;
+
+    for (auto & supportsFormat : mSupportedFormats)
+    {
+        if ((supportsFormat.ingestMethod == ingestMethod) &&
+            (supportsFormat.containerFormat == commandData.transportOptions.containerOptions.containerType))
+        {
+            isFormatSupported = true;
+        }
+    }
+
+    if (isFormatSupported == false)
+    {
+        auto status = to_underlying(StatusCodeEnum::kInvalidCombination);
+        ChipLogError(Zcl,
+                     "HandleAllocatePushTransport[ep=%d]: Invalid Ingest Method and Container Format Combination : (Ingest Method: "
+                     "%02X and Container Format: %02X)",
+                     mEndpointId, to_underlying(ingestMethod),
+                     to_underlying(commandData.transportOptions.containerOptions.containerType));
+        handler.AddClusterSpecificFailure(commandPath, status);
+        return std::nullopt;
+    }
+
+    /*Spec issue for invalid Trigger Type: https://github.com/CHIP-Specifications/connectedhomeip-spec/issues/11701*/
+    if (transportOptions.triggerOptions.triggerType == TransportTriggerTypeEnum::kUnknownEnumValue)
+    {
+        auto status = to_underlying(StatusCodeEnum::kInvalidTriggerType);
+        ChipLogError(Zcl, "HandleAllocatePushTransport[ep=%d]: Invalid Trigger type", mEndpointId);
+        handler.AddClusterSpecificFailure(commandPath, status);
+        return std::nullopt;
+    }
+
     Status transportOptionsValidityStatus = ValidateIncomingTransportOptions(transportOptions);
 
     VerifyOrDo(transportOptionsValidityStatus == Status::Success, {
@@ -571,46 +605,12 @@ PushAvStreamTransportServerLogic::HandleAllocatePushTransport(CommandHandler & h
         return std::nullopt;
     }
 
-    IngestMethodsEnum ingestMethod = commandData.transportOptions.ingestMethod;
-
-    bool isFormatSupported = false;
-
-    for (auto & supportsFormat : mSupportedFormats)
-    {
-        if ((supportsFormat.ingestMethod == ingestMethod) &&
-            (supportsFormat.containerFormat == commandData.transportOptions.containerOptions.containerType))
-        {
-            isFormatSupported = true;
-        }
-    }
-
-    if (isFormatSupported == false)
-    {
-        auto status = to_underlying(StatusCodeEnum::kInvalidCombination);
-        ChipLogError(Zcl,
-                     "HandleAllocatePushTransport[ep=%d]: Invalid Ingest Method and Container Format Combination : (Ingest Method: "
-                     "%02X and Container Format: %02X)",
-                     mEndpointId, to_underlying(ingestMethod),
-                     to_underlying(commandData.transportOptions.containerOptions.containerType));
-        handler.AddClusterSpecificFailure(commandPath, status);
-        return std::nullopt;
-    }
-
     bool isValidUrl = mDelegate->ValidateUrl(std::string(transportOptions.url.data(), transportOptions.url.size()));
 
     if (isValidUrl == false)
     {
         auto status = to_underlying(StatusCodeEnum::kInvalidURL);
         ChipLogError(Zcl, "HandleAllocatePushTransport[ep=%d]: Invalid Url", mEndpointId);
-        handler.AddClusterSpecificFailure(commandPath, status);
-        return std::nullopt;
-    }
-
-    /*Spec issue for invalid Trigger Type: https://github.com/CHIP-Specifications/connectedhomeip-spec/issues/11701*/
-    if (transportOptions.triggerOptions.triggerType == TransportTriggerTypeEnum::kUnknownEnumValue)
-    {
-        auto status = to_underlying(StatusCodeEnum::kInvalidTriggerType);
-        ChipLogError(Zcl, "HandleAllocatePushTransport[ep=%d]: Invalid Trigger type", mEndpointId);
         handler.AddClusterSpecificFailure(commandPath, status);
         return std::nullopt;
     }
@@ -670,6 +670,9 @@ PushAvStreamTransportServerLogic::HandleAllocatePushTransport(CommandHandler & h
 
             if (!delegateStatus.IsSuccess())
             {
+                auto cluster_status = to_underlying(StatusCodeEnum::kInvalidStream);
+                ChipLogError(Zcl, "HandleAllocatePushTransport[ep=%d]: Invalid Video Stream ", mEndpointId);
+                handler.AddClusterSpecificFailure(commandPath, cluster_status);
                 handler.AddStatus(commandPath, delegateStatus);
                 return std::nullopt;
             }
@@ -700,6 +703,9 @@ PushAvStreamTransportServerLogic::HandleAllocatePushTransport(CommandHandler & h
 
             if (!delegateStatus.IsSuccess())
             {
+                auto cluster_status = to_underlying(StatusCodeEnum::kInvalidStream);
+                ChipLogError(Zcl, "HandleAllocatePushTransport[ep=%d]: Invalid Audio Stream ", mEndpointId);
+                handler.AddClusterSpecificFailure(commandPath, cluster_status);
                 handler.AddStatus(commandPath, delegateStatus);
                 return std::nullopt;
             }

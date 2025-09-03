@@ -35,14 +35,17 @@
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
 
-from mobly import asserts
+import logging
 
 import matter.clusters as Clusters
-from matter.interaction_model import InteractionModelError, Status
-from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+from matter.interaction_model import Status
+from matter.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main, has_cluster, run_if_endpoint_matches
+from mobly import asserts
+from TC_PAVSTTestBase import PAVSTTestBase
 
+logger = logging.getLogger(__name__)
 
-class TC_PAVST_2_2(MatterBaseTest):
+class TC_PAVST_2_2(MatterBaseTest, PAVSTTestBase):
     def desc_TC_PAVST_2_2(self) -> str:
         return "[TC-PAVST-2.2] Attributes with Server as DUT"
 
@@ -67,104 +70,62 @@ class TC_PAVST_2_2(MatterBaseTest):
                      "Verify the number of PushAV Connections is 1. Verify that the TransportOptions field in the TransportConfiguration struct is present."),
         ]
 
-    @async_test_body
+    @run_if_endpoint_matches(has_cluster(Clusters.PushAvStreamTransport))
     async def test_TC_PAVST_2_2(self):
         endpoint = self.get_endpoint(default=1)
         pvcluster = Clusters.PushAvStreamTransport
-        avcluster = Clusters.Objects.CameraAvStreamManagement
         pvattr = Clusters.PushAvStreamTransport.Attributes
-        avattr = Clusters.Objects.CameraAvStreamManagement.Attributes
 
         self.step(1)
-        if self.pics_guard(self.check_pics("PAVST.S")):
-            transport_configs = await self.read_single_attribute_check_success(
-                endpoint=endpoint, cluster=pvcluster, attribute=pvattr.CurrentConnections
-            )
-            for config in transport_configs:
-                if config.ConnectionID != 0:
-                    try:
-                        await self.send_single_cmd(cmd=pvcluster.Commands.DeallocatePushTransport(ConnectionID=config.ConnectionID),
-                                                   endpoint=endpoint)
-                    except InteractionModelError as e:
-                        asserts.assert_true(e.status == Status.Success, "Unexpected error returned")
+        status = await self.check_and_delete_all_push_av_transports(endpoint, pvattr)
+        asserts.assert_equal(
+            status, Status.Success, "Status must be SUCCESS!"
+        )
 
         self.step(2)
-        if self.pics_guard(self.check_pics("PAVST.S")):
-            supported_formats = await self.read_single_attribute_check_success(
-                endpoint=endpoint, cluster=pvcluster, attribute=pvattr.SupportedFormats
-            )
-            asserts.assert_greater_equal(len(supported_formats, 1), "SupportedFormats must not be empty!")
-            for format in supported_formats:
-                validContainerformat = format.ContainerFormat == pvcluster.ContainerFormatEnum.kCmaf
-                isValidIngestMethod = format.IngestMethod == pvcluster.IngestMethodEnum.kCMAFIngest
-                asserts.assert_true((validContainerformat & isValidIngestMethod),
-                                    "(ContainerFormat & IngestMethod) must be defined values!")
+        supported_formats = await self.read_single_attribute_check_success(
+            endpoint=endpoint, cluster=pvcluster, attribute=pvattr.SupportedFormats
+        )
+        asserts.assert_greater_equal(len(supported_formats), 1, "SupportedFormats must not be empty!")
+        for format in supported_formats:
+            validContainerformat = format.containerFormat == pvcluster.Enums.ContainerFormatEnum.kCmaf
+            isValidIngestMethod = format.ingestMethod == pvcluster.Enums.IngestMethodsEnum.kCMAFIngest
+            asserts.assert_true((validContainerformat & isValidIngestMethod),
+                                "(ContainerFormat & IngestMethod) must be defined values!")
 
         self.step(3)
-        if self.pics_guard(self.check_pics("AVSM.S")):
-            await self.send_single_cmd(cmd=Clusters.CameraAvStreamManagement.Commands.VideoStreamAllocate(
-                streamUsage=0,
-                videoCodec=0,
-                minFrameRate=30,
-                maxFrameRate=120,
-                minResolution=Clusters.CameraAvStreamManagement.Structs.VideoResolutionStruct(width=400, height=300),
-                maxResolution=Clusters.CameraAvStreamManagement.Structs.VideoResolutionStruct(width=1920, height=1080),
-                minBitRate=20000,
-                maxBitRate=150000,
-                minFragmentLen=2000,
-                maxFragmentLen=8000
-            ),
-                endpoint=endpoint)
-
-            aAllocatedVideoStreams = await self.read_single_attribute_check_success(
-                endpoint=endpoint, cluster=avcluster, attribute=avattr.AllocatedVideoStreams
-            )
-            asserts.assert_greater_equal(len(aAllocatedVideoStreams), 1, "AllocatedVideoStreams must not be empty")
+        aAllocatedVideoStreams = await self.allocate_one_video_stream()
+        asserts.assert_greater_equal(
+            len(aAllocatedVideoStreams),
+            1,
+            "AllocatedVideoStreams must not be empty",
+        )
 
         self.step(4)
-        if self.pics_guard(self.check_pics("AVSM.S")):
-            await self.send_single_cmd(cmd=Clusters.CameraAvStreamManagement.Commands.AudioStreamAllocate(
-                streamUsage=0,
-                audioCodec=0,
-                channelCount=2,
-                sampleRate=48000,
-                bitRate=96000,
-                bitDepth=16
-            ),
-                endpoint=endpoint)
-
-            aAllocatedAudioStreams = await self.read_single_attribute_check_success(
-                endpoint=endpoint, cluster=avcluster, attribute=avattr.AllocatedAudioStreams
-            )
-            asserts.assert_greater_equal(len(aAllocatedAudioStreams), 1, "AllocatedAudioStreams must not be empty")
+        aAllocatedAudioStreams = await self.allocate_one_audio_stream()
+        asserts.assert_greater_equal(
+            len(aAllocatedAudioStreams),
+            1,
+            "AllocatedAudioStreams must not be empty",
+        )
 
         self.step(5)
-        if self.pics_guard(self.check_pics("PAVST.S")):
-            await self.send_single_cmd(cmd=pvcluster.Commands.AllocatePushTransport(
-                {"streamUsage": 0,
-                 "videoStreamID": 1,
-                 "audioStreamID": 1,
-                 "endpointID": 1,
-                 "url": "https://localhost:1234/streams/1",
-                 "triggerOptions": {"triggerType": 2},
-                 "ingestMethod": 0,
-                 "containerFormat": 0,
-                 "containerOptions": {"containerType": 0, "CMAFContainerOptions": {"chunkDuration": 4}},
-                 "expiryTime": 5
-                 }), endpoint=endpoint)
+        status = await self.allocate_one_pushav_transport(endpoint)
+        asserts.assert_equal(
+            status, Status.Success, "Push AV Transport should be allocated successfully"
+        )
 
         self.step(6)
-        if self.pics_guard(self.check_pics("PAVST.S")):
-            current_connections = await self.read_single_attribute_check_success(
-                endpoint=endpoint, cluster=pvcluster, attribute=pvcluster.Attributes.CurrentConnections
-            )
-            asserts.assert_equal(len(current_connections), 1, "TransportConfigurations must be 1")
+        current_connections = await self.read_single_attribute_check_success(
+            endpoint=endpoint, cluster=pvcluster, attribute=pvcluster.Attributes.CurrentConnections
+        )
+        asserts.assert_equal(len(current_connections), 1, "TransportConfigurations must be 1")
+
         self.step(7)
-        if self.pics_guard(self.check_pics("PAVST.S")):
-            current_connections = await self.read_single_attribute_check_success(
-                endpoint=endpoint, cluster=pvcluster, attribute=pvcluster.Attributes.CurrentConnections
-            )
-            asserts.assert_equal(len(current_connections), 1, "TransportConfigurations must be 1")
+        current_connections = await self.read_single_attribute_check_success(
+            endpoint=endpoint, cluster=pvcluster, attribute=pvcluster.Attributes.CurrentConnections
+        )
+        asserts.assert_equal(len(current_connections), 1, "TransportConfigurations must be 1")
 
 
 if __name__ == "__main__":

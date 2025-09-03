@@ -39,15 +39,16 @@ import logging
 import time
 
 from mobly import asserts
+from TC_PAVSTTestBase import PAVSTTestBase
 
 import matter.clusters as Clusters
 from matter.interaction_model import InteractionModelError, Status
-from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+from matter.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main, has_cluster, run_if_endpoint_matches
 
 logger = logging.getLogger(__name__)
 
 
-class TC_PAVST_2_9(MatterBaseTest):
+class TC_PAVST_2_9(MatterBaseTest, PAVSTTestBase):
     def desc_TC_PAVST_2_9(self) -> str:
         return "[TC-PAVST-2.9] Validate Transport allocation with an ExpiryTime with Server as DUT"
 
@@ -74,13 +75,11 @@ class TC_PAVST_2_9(MatterBaseTest):
                      "Verify the number of PushAV Connections is 0."),
         ]
 
-    @async_test_body
+    @run_if_endpoint_matches(has_cluster(Clusters.PushAvStreamTransport))
     async def test_TC_PAVST_2_9(self):
         endpoint = self.get_endpoint(default=1)
         pvcluster = Clusters.PushAvStreamTransport
-        avcluster = Clusters.Objects.CameraAvStreamManagement
         pvattr = Clusters.PushAvStreamTransport.Attributes
-        avattr = Clusters.Objects.CameraAvStreamManagement.Attributes
 
         # Commission DUT - already done
 
@@ -97,42 +96,40 @@ class TC_PAVST_2_9(MatterBaseTest):
                     asserts.assert_true(e.status == Status.Success, "Unexpected error returned")
 
         self.step(2)
-        aSupportedIngestMethods = await self.read_single_attribute_check_success(
-            endpoint=endpoint, cluster=pvcluster, attribute=pvattr.SupportedIngestMethods
+        aSupportedFormat = await self.read_single_attribute_check_success(
+            endpoint=endpoint, cluster=pvcluster, attribute=pvattr.SupportedFormats
         )
+        aSupportedIngestMethods = list({fmt.ingestMethod for fmt in aSupportedFormat})
         logger.info(f"SupportedIngestMethods: {aSupportedIngestMethods}")
 
         self.step(3)
         aSupportedFormats = await self.read_single_attribute_check_success(
-            endpoint=endpoint, cluster=pvcluster, attribute=pvattr.SupportedContainerFormats
+            endpoint=endpoint, cluster=pvcluster, attribute=pvattr.SupportedFormats
         )
+        aSupportedContainerFormats = list({fmt.containerFormat for fmt in aSupportedFormat})
         logger.info(f"SupportedContainerFormats: {aSupportedFormats}")
 
         self.step(4)
-        aAllocatedVideoStreams = await self.read_single_attribute_check_success(
-            endpoint=endpoint, cluster=avcluster, attribute=avattr.AllocatedVideoStreams
+        aAllocatedVideoStreams = await self.allocate_one_video_stream()
+        asserts.assert_greater_equal(
+            len(aAllocatedVideoStreams),
+            1,
+            "AllocatedVideoStreams must not be empty",
         )
-        logger.info(f"AllocatedVideoStreams: {aAllocatedVideoStreams}")
 
         self.step(5)
-        aAllocatedAudioStreams = await self.read_single_attribute_check_success(
-            endpoint=endpoint, cluster=avcluster, attribute=avattr.AllocatedAudioStreams
+        aAllocatedAudioStreams = await self.allocate_one_audio_stream()
+        asserts.assert_greater_equal(
+            len(aAllocatedAudioStreams),
+            1,
+            "AllocatedAudioStreams must not be empty",
         )
-        logger.info(f"AllocatedAudioStreams: {aAllocatedAudioStreams}")
 
         self.step(6)
-        await self.send_single_cmd(cmd=pvcluster.Commands.AllocatePushTransport(
-            {"streamUsage": 0,
-             "videoStreamID": 1,
-             "audioStreamID": 1,
-             "endpointID": 1,
-             "url": "https://localhost:1234/streams/1",
-             "triggerOptions": {"triggerType": 2},
-             "ingestMethod": 0,
-             "containerFormat": 0,
-             "containerOptions": {"containerType": 0, "CMAFContainerOptions": {"chunkDuration": 4}},
-             "expiryTime": 5
-             }), endpoint=endpoint)
+        status = await self.allocate_one_pushav_transport(endpoint)
+        asserts.assert_equal(
+            status, Status.Success, "Push AV Transport should be allocated successfully"
+        )
 
         self.step(7)
         transport_configs = await self.read_single_attribute_check_success(
