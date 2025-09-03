@@ -91,6 +91,15 @@ jobs:
                     out/artifacts/nxp-mcxw71-freertos-lock-app/chip-mcxw71-lock-example.elf \
                     /tmp/bloat_reports/
 
+            - name: Build MCXW72 examples
+              run: |
+                  scripts/run_in_build_env.sh "\
+                      ./scripts/build/build_examples.py \
+                      --target nxp-mcxw72-freertos-contact-sensor-low-power \
+                      --target nxp-mcxw72-freertos-lock-app \
+                      build \
+                  "
+
             - name: clean build
               run: rm -rf ./out
 
