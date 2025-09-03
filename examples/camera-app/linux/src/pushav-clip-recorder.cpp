@@ -159,7 +159,9 @@ bool PushAVClipRecorder::IsH264IFrame(const uint8_t * data, unsigned int length)
         }
     } while (idx < (length - 4));
 
-    if (foundSps == 1 && foundPps == 1 && foundIdr == 1)
+    // If we found an IDR frame, it's an I-frame regardless of SPS/PPS presence
+    // SPS/PPS may have been sent in previous packets or out-of-band
+    if (foundIdr == 1)
     {
         ret = true;
     }
@@ -175,6 +177,7 @@ AVPacket * PushAVClipRecorder::CreatePacket(const uint8_t * data, int size, bool
         ChipLogError(Camera, "ERROR: AVPacket allocation failed!");
         return nullptr;
     }
+
     packet->data = static_cast<uint8_t *>(av_malloc(static_cast<size_t>(size)));
     if (!packet->data)
     {
@@ -182,8 +185,10 @@ AVPacket * PushAVClipRecorder::CreatePacket(const uint8_t * data, int size, bool
         av_packet_free(&packet);
         return nullptr;
     }
+
     memcpy(packet->data, data, static_cast<size_t>(size));
     packet->size = size;
+
     if (isVideo)
     {
         if (IsH264IFrame(data, static_cast<unsigned int>(size)))
@@ -192,12 +197,14 @@ AVPacket * PushAVClipRecorder::CreatePacket(const uint8_t * data, int size, bool
             packet->flags        = AV_PKT_FLAG_KEY;
             ChipLogProgress(Camera, "Found I-frame at PTS: %ld", mVideoInfo.mVideoPts);
         }
+
         if (mFoundFirstIFramePts < 0)
         {
             ChipLogError(Camera, "ERROR: First frame is not an I-frame. Dropping packet.");
             av_packet_free(&packet);
             return nullptr;
         }
+
         packet->pts          = mVideoInfo.mVideoPts;
         packet->dts          = mVideoInfo.mVideoDts;
         packet->stream_index = mVideoInfo.mVideoStreamIndex;
@@ -220,6 +227,7 @@ AVPacket * PushAVClipRecorder::CreatePacket(const uint8_t * data, int size, bool
         mAudioInfo.mAudioDts += mAudioInfo.mAudioFrameDuration;
         mAudioInfo.mAudioPts += mAudioInfo.mAudioFrameDuration;
     }
+
     return (mFoundFirstIFramePts < 0) ? nullptr : packet;
 }
 
