@@ -27,9 +27,6 @@ assert(chip_device_platform == "stm32wb")
 if (chip_crypto == "platform") {
   import("//build_overrides/mbedtls.gni")
 }
-if (chip_enable_openthread) {
-  import("//build_overrides/openthread.gni")
-}
 
 static_library("stm32wb") {
   friend = [ ":lighting_app" ]
