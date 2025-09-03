@@ -20,6 +20,7 @@
 
 #include "push-av-stream-transport-delegate.h"
 #include <app/clusters/tls-client-management-server/tls-client-management-server.h>
+#include <app/clusters/tls-certificate-management-server/tls-certificate-management-server.h>
 
 namespace chip {
 namespace app {
@@ -31,6 +32,9 @@ void SetDelegate(chip::EndpointId endpointId, PushAvStreamTransportDelegate * de
 
 /// Sets the given TLS Client Management delegate on an endpoint configured via code-generation
 void SetTLSClientManagementDelegate(chip::EndpointId endpointId, TlsClientManagementDelegate * delegate);
+
+/// Sets the given TLS Certificate Management delegate on an endpoint configured via code-generation
+void SetTlsCertificateManagementDelegate(chip::EndpointId endpointId, TlsCertificateManagementDelegate * delegate);
 
 } // namespace PushAvStreamTransport
 } // namespace Clusters

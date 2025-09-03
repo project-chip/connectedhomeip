@@ -22,6 +22,7 @@
 #include <algorithm>
 #include <atomic>
 #include <condition_variable>
+#include <functional>
 #include <memory>
 #include <mutex>
 #include <queue>
@@ -138,6 +139,8 @@ public:
      */
     void PushPacket(const char * data, size_t size, bool isVideo);
 
+    void SetOnStopCallback(std::function<void()> cb) { mOnStopCallback = std::move(cb); }
+
     std::atomic<bool> mDeinitializeRecorder{ false }; ///< Deinitialization flag
     ClipInfoStruct mClipInfo;                         ///< Clip configuration parameters
     void SetRecorderStatus(bool status);              ///< Sets the recorder status
@@ -164,6 +167,8 @@ private:
 
     std::queue<AVPacket *> mAudioQueue;
     std::queue<AVPacket *> mVideoQueue;
+
+    std::function<void()> mOnStopCallback;
 
     int mAudioFragment           = 1;
     int mVideoFragment           = 1;
