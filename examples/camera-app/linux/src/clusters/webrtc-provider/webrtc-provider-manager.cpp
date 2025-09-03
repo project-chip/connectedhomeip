@@ -545,43 +545,53 @@ void WebRTCProviderManager::OnDeviceConnected(void * context, Messaging::Exchang
     WebRTCProviderManager * self = reinterpret_cast<WebRTCProviderManager *>(context);
     VerifyOrReturn(self != nullptr, ChipLogError(Camera, "OnDeviceConnected:: context is null"));
 
-    NodeId peerId      = sessionHandle->GetPeer().GetNodeId();
-    uint16_t sessionId = self->mSessionIdMap[peerId];
-
-    WebrtcTransport * transport = self->GetTransport(sessionId);
+    WebrtcTransport * transport = nullptr;
+    uint16_t sessionId          = 0;
     if (transport == nullptr)
     {
         return;
     }
-    // ChipLogProgress(Camera, "CASE session established, sending command with Command Type: %d...",
-    //                 static_cast<int>(self->mCommandType));
 
-    CHIP_ERROR err = CHIP_NO_ERROR;
-
-    switch (transport->GetCommandType())
+    for (auto & mapEntry : self->mWebrtcTransportMap)
     {
-    case WebrtcTransport::CommandType::kOffer:
-        err = self->SendOfferCommand(exchangeMgr, sessionHandle);
-        transport->MoveToState(WebrtcTransport::State::Idle);
-        break;
+        sessionId = mapEntry.first;
+        transport = (WebrtcTransport *) mapEntry.second.get();
 
-    case WebrtcTransport::CommandType::kAnswer:
-        err = self->SendAnswerCommand(exchangeMgr, sessionHandle);
-        transport->MoveToState(WebrtcTransport::State::Idle);
-        break;
-    case WebrtcTransport::CommandType::kICECandidates:
-        err = self->SendICECandidatesCommand(exchangeMgr, sessionHandle);
-        transport->MoveToState(WebrtcTransport::State::Idle);
-        break;
+        if (transport == nullptr)
+        {
+            continue;
+        }
 
-    default:
-        err = CHIP_ERROR_INVALID_ARGUMENT;
-        break;
-    }
+        ChipLogProgress(Camera, "CASE session established, sending command with Command Type: %d, for sessionID: %u",
+                        static_cast<int>(transport->GetCommandType()), sessionId);
 
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogError(Camera, "OnDeviceConnected::SendCommand failed: %" CHIP_ERROR_FORMAT, err.Format());
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        switch (transport->GetCommandType())
+        {
+        case WebrtcTransport::CommandType::kOffer:
+            err = self->SendOfferCommand(exchangeMgr, sessionHandle, sessionId);
+            transport->MoveToState(WebrtcTransport::State::Idle);
+            break;
+
+        case WebrtcTransport::CommandType::kAnswer:
+            err = self->SendAnswerCommand(exchangeMgr, sessionHandle, sessionId);
+            transport->MoveToState(WebrtcTransport::State::Idle);
+            break;
+        case WebrtcTransport::CommandType::kICECandidates:
+            err = self->SendICECandidatesCommand(exchangeMgr, sessionHandle, sessionId);
+            transport->MoveToState(WebrtcTransport::State::Idle);
+            break;
+
+        default:
+            err = CHIP_ERROR_INVALID_ARGUMENT;
+            break;
+        }
+
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(Camera, "OnDeviceConnected::SendCommand failed: %" CHIP_ERROR_FORMAT, err.Format());
+        }
     }
 }
 
@@ -603,7 +613,8 @@ WebrtcTransport * WebRTCProviderManager::GetTransport(uint16_t sessionId)
     return transport;
 }
 
-CHIP_ERROR WebRTCProviderManager::SendOfferCommand(Messaging::ExchangeManager & exchangeMgr, const SessionHandle & sessionHandle)
+CHIP_ERROR WebRTCProviderManager::SendOfferCommand(Messaging::ExchangeManager & exchangeMgr, const SessionHandle & sessionHandle,
+                                                   uint16_t sessionId)
 {
     auto onSuccess = [](const ConcreteCommandPath & commandPath, const StatusIB & status, const auto & dataResponse) {
         ChipLogProgress(Camera, "Offer command succeeds");
@@ -611,7 +622,6 @@ CHIP_ERROR WebRTCProviderManager::SendOfferCommand(Messaging::ExchangeManager & 
 
     auto onFailure = [](CHIP_ERROR error) { ChipLogError(Camera, "Offer command failed: %" CHIP_ERROR_FORMAT, error.Format()); };
 
-    uint16_t sessionId          = mSessionIdMap[sessionHandle->GetPeer().GetNodeId()];
     WebrtcTransport * transport = GetTransport(sessionId);
     if (transport == nullptr)
     {
@@ -676,7 +686,8 @@ void WebRTCProviderManager::OnConnectionStateChanged(bool connected, const uint1
     }
 }
 
-CHIP_ERROR WebRTCProviderManager::SendAnswerCommand(Messaging::ExchangeManager & exchangeMgr, const SessionHandle & sessionHandle)
+CHIP_ERROR WebRTCProviderManager::SendAnswerCommand(Messaging::ExchangeManager & exchangeMgr, const SessionHandle & sessionHandle,
+                                                    uint16_t sessionId)
 {
     auto onSuccess = [](const ConcreteCommandPath & commandPath, const StatusIB & status, const auto & dataResponse) {
         ChipLogProgress(Camera, "Answer command succeeds");
@@ -684,7 +695,6 @@ CHIP_ERROR WebRTCProviderManager::SendAnswerCommand(Messaging::ExchangeManager &
 
     auto onFailure = [](CHIP_ERROR error) { ChipLogError(Camera, "Answer command failed: %" CHIP_ERROR_FORMAT, error.Format()); };
 
-    uint16_t sessionId          = mSessionIdMap[sessionHandle->GetPeer().GetNodeId()];
     WebrtcTransport * transport = GetTransport(sessionId);
     if (transport == nullptr)
     {
@@ -708,7 +718,7 @@ CHIP_ERROR WebRTCProviderManager::SendAnswerCommand(Messaging::ExchangeManager &
 }
 
 CHIP_ERROR WebRTCProviderManager::SendICECandidatesCommand(Messaging::ExchangeManager & exchangeMgr,
-                                                           const SessionHandle & sessionHandle)
+                                                           const SessionHandle & sessionHandle, uint16_t sessionId)
 {
     auto onSuccess = [](const ConcreteCommandPath & commandPath, const StatusIB & status, const auto & dataResponse) {
         ChipLogProgress(Camera, "ICECandidates command succeeds");
@@ -718,7 +728,6 @@ CHIP_ERROR WebRTCProviderManager::SendICECandidatesCommand(Messaging::ExchangeMa
         ChipLogError(Camera, "ICECandidates command failed: %" CHIP_ERROR_FORMAT, error.Format());
     };
 
-    uint16_t sessionId          = mSessionIdMap[sessionHandle->GetPeer().GetNodeId()];
     WebrtcTransport * transport = GetTransport(sessionId);
     if (transport == nullptr)
     {
