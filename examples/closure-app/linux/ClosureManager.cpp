@@ -751,16 +751,16 @@ void ClosureManager::HandlePanelSetTargetAction(EndpointId endpointId)
                                ChipLogError(AppServer, "Failed to get overall current state for Endpoint 1"));
                 VerifyOrReturn(!ep1OverallCurrentState.IsNull(),
                                ChipLogError(AppServer, "Overall current state is not set for Endpoint 1"));
-    
+
                 // In Real application, this would be replaced with actual latch logic.
                 ChipLogProgress(AppServer, "Performing latch action");
-    
+
                 ep1OverallCurrentState.Value().latch.SetValue(DataModel::MakeNullable(true));
                 mClosureEndpoint1.GetLogic().SetOverallCurrentState(ep1OverallCurrentState);
-    
+
                 panelCurrentState.Value().latch.SetValue(DataModel::MakeNullable(true));
                 ep->GetLogic().SetCurrentState(panelCurrentState);
-    
+
                 ChipLogProgress(AppServer, "Latch action completed");
             }
         }
