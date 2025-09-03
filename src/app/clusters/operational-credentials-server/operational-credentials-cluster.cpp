@@ -16,11 +16,13 @@
  */
 #include <app/clusters/operational-credentials-server/operational-credentials-cluster.h>
 
+#include <app/EventLogging.h>
+#include <app/InteractionModelEngine.h>
+#include <app/data-model-provider/MetadataTypes.h>
 #include <app/reporting/reporting.h>
 #include <app/server-cluster/AttributeListBuilder.h>
 #include <app/server/Dnssd.h>
 #include <app/server/Server.h>
-#include <app/data-model-provider/MetadataTypes.h>
 #include <clusters/OperationalCredentials/AttributeIds.h>
 #include <clusters/OperationalCredentials/Commands.h>
 #include <clusters/OperationalCredentials/Enums.h>
@@ -31,8 +33,6 @@
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <lib/support/CodeUtils.h>
 #include <tracing/macros.h>
-#include <app/InteractionModelEngine.h>
-#include <app/EventLogging.h>
 
 /****************************************************************************
  * @file
@@ -1115,7 +1115,7 @@ void NotifyFabricTableChanged()
 {
     // Opcreds cluster is always on Endpoint 0
     MatterReportingAttributeChangeCallback(0, OperationalCredentials::Id,
-                                            OperationalCredentials::Attributes::CommissionedFabrics::Id);
+                                           OperationalCredentials::Attributes::CommissionedFabrics::Id);
     MatterReportingAttributeChangeCallback(0, OperationalCredentials::Id, OperationalCredentials::Attributes::Fabrics::Id);
 }
 
@@ -1336,7 +1336,7 @@ void OperationalCredentialsCluster::FabricWillBeRemoved(const FabricTable & fabr
 
     auto allEndpoints = endpointBuilder.TakeBuffer();
 
-    for(const auto & ep : allEndpoints)
+    for (const auto & ep : allEndpoints)
     {
         ReadOnlyBufferBuilder<DataModel::ServerClusterEntry> clusterBuilder;
 
@@ -1344,9 +1344,9 @@ void OperationalCredentialsCluster::FabricWillBeRemoved(const FabricTable & fabr
 
         auto allClusters = clusterBuilder.TakeBuffer();
 
-        for(const auto & cluster : allClusters)
+        for (const auto & cluster : allClusters)
         {
-            if(cluster.clusterId == BasicInformation::Id)
+            if (cluster.clusterId == BasicInformation::Id)
             {
                 BasicInformation::Events::Leave::Type event;
                 event.fabricIndex = fabricIndex;
@@ -1387,7 +1387,7 @@ void OperationalCredentialsCluster::OnFabricRemoved(const FabricTable & fabricTa
 
 void OperationalCredentialsCluster::OnFabricUpdated(const FabricTable & fabricTable, FabricIndex fabricIndex)
 {
-     NotifyFabricTableChanged();
+    NotifyFabricTableChanged();
 }
 
 void OperationalCredentialsCluster::OnFabricCommitted(const FabricTable & fabricTable, FabricIndex fabricIndex)
