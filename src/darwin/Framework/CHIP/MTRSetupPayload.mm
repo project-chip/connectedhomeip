@@ -260,7 +260,7 @@ MTR_DIRECT_MEMBERS
 
     _payload = payloads[0];
     if (payloads.size() > 1) {
-        _concatenatedQRCode = qrCode;
+        _concatenatedQRCode = [qrCode copy];
     }
     return CHIP_NO_ERROR;
 }
