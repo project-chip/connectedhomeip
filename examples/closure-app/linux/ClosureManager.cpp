@@ -409,7 +409,6 @@ chip::Protocols::InteractionModel::Status ClosureManager::OnSetTargetCommand(con
         endpointId == kClosurePanelEndpoint2 ? mClosurePanelEndpoint2 : mClosurePanelEndpoint3;
     ClosureDimension::ClusterConformance mClosurePanelConformance = mClosurePanelEndpoint.GetLogic().GetConformance();
 
-
     if (position.HasValue() && mClosurePanelConformance.HasFeature(ClosureDimension::Feature::kPositioning))
     {
         // Set overallTargetState position to NullOptional as panel position change cannot be represented in OverallTarget.
@@ -895,10 +894,10 @@ void ClosureManager::HandleClosureMotionAction()
                    ChipLogError(AppServer, "MoveToCommand failed due to Null value Target state on Endpoint 3"));
 
     // check if closure (endpoint 1) need unlatch before starting the motion action if Latching feature is supported.
-    if(mClosureEndpoint1.GetLogic().GetConformance().HasFeature(ClosureControl::Feature::kMotionLatching))
+    if (mClosureEndpoint1.GetLogic().GetConformance().HasFeature(ClosureControl::Feature::kMotionLatching))
     {
         if (ep1CurrentState.Value().latch.HasValue() && !ep1CurrentState.Value().latch.Value().IsNull() &&
-        ep1TargetState.Value().latch.HasValue() && !ep1TargetState.Value().latch.Value().IsNull())
+            ep1TargetState.Value().latch.HasValue() && !ep1TargetState.Value().latch.Value().IsNull())
         {
             // If currently latched (true) and target is unlatched (false), unlatch first before moving
             if (ep1CurrentState.Value().latch.Value().Value() && !ep1TargetState.Value().latch.Value().Value())
