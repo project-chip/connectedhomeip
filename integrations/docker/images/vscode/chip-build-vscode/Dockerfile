@@ -53,6 +53,7 @@ COPY --from=nxpzephyr /opt/nxp-zephyr/zephyrproject/ /opt/nxp-zephyr/zephyrproje
 COPY --from=imx /opt/fsl-imx-xwayland /opt/fsl-imx-xwayland
 
 COPY --from=ti /opt/ti/sysconfig_1.22.0 /opt/ti/sysconfig_1.22.0
+COPY --from=ti /opt/ti/sysconfig_1.18.1 /opt/ti/sysconfig_1.18.1
 
 COPY --from=bouffalolab /opt/bouffalolab_sdk /opt/bouffalolab_sdk
 
@@ -125,6 +126,7 @@ ENV SYSROOT_AARCH64=/opt/ubuntu-24.04-aarch64-sysroot
 ENV TELINK_ZEPHYR_BASE=/opt/telink/zephyrproject/zephyr
 ENV TELINK_ZEPHYR_SDK_DIR=/opt/telink/zephyr-sdk-0.17.0
 ENV TI_SYSCONFIG_ROOT=/opt/ti/sysconfig_1.22.0
+ENV TI_SYSCONFIG_ROOT_CC32XX=/opt/ti/sysconfig_1.18.1
 ENV ZEPHYR_BASE=/opt/NordicSemiconductor/nrfconnect/zephyr
 ENV ZEPHYR_SDK_INSTALL_DIR=/opt/NordicSemiconductor/nRF5_tools/zephyr-sdk/toolchains/latest
 ENV ZEPHYR_TOOLCHAIN_VARIANT=gnuarmemb
