@@ -582,7 +582,7 @@ Protocols::InteractionModel::Status HandleWriteBridgedDeviceBasicAttribute(Devic
         return Protocols::InteractionModel::Status::InvalidValue;
     }
 
-    dev->SetName(std::string{reinterpret_cast<const char *>(buffer + 1), len}.c_str());
+    dev->SetName(std::string{ reinterpret_cast<const char *>(buffer + 1), len }.c_str());
 
     HandleDeviceStatusChanged(dev, Device::kChanged_Name);
 
