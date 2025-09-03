@@ -162,14 +162,8 @@ void WebrtcTransport::AddTracks()
 {
     if (mPeerConnection != nullptr)
     {
-        if (mRequestArgs.videoStreamId != 0)
-        {
-            mVideoTrack = mPeerConnection->AddTrack(MediaType::Video);
-        }
-        if (mRequestArgs.audioStreamId != 0)
-        {
-            mAudioTrack = mPeerConnection->AddTrack(MediaType::Audio);
-        }
+        mVideoTrack = mPeerConnection->AddTrack(MediaType::Video);
+        mAudioTrack = mPeerConnection->AddTrack(MediaType::Audio);
     }
 }
 
