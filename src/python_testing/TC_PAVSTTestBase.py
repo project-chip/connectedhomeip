@@ -21,8 +21,8 @@ import random
 from mobly import asserts
 
 import matter.clusters as Clusters
-from matter.clusters.Types import Nullable
 from matter import ChipDeviceCtrl
+from matter.clusters.Types import Nullable
 from matter.interaction_model import InteractionModelError, Status
 
 logger = logging.getLogger(__name__)
