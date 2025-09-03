@@ -19,13 +19,11 @@
 #pragma once
 #include <app-common/zap-generated/cluster-enums.h>
 #include <app/clusters/push-av-stream-transport-server/push-av-stream-transport-cluster.h>
-
+#include <app/clusters/tls-certificate-management-server/tls-certificate-management-server.h>
 #include <camera-device-interface.h>
+#include <functional>
 #include <media-controller.h>
 #include <pushav-transport.h>
-#include <app/clusters/tls-client-management-server/tls-client-management-server.h>
-#include <app/clusters/tls-certificate-management-server/tls-certificate-management-server.h>
-
 #include <unordered_map>
 #include <vector>
 
@@ -50,16 +48,10 @@ class PushAvStreamTransportManager : public PushAvStreamTransportDelegate
 public:
     PushAvStreamTransportManager() = default;
     ~PushAvStreamTransportManager();
-    void SetTlsClientManagementDelegate(TlsClientManagementDelegate * aTLSClientManagementDelegate)
-    {
-        mTLSClientManagementDelegate  = aTLSClientManagementDelegate;
-    }
-    void SetTlsCertificateManagementDelegate(TlsCertificateManagementDelegate * aTLSClientManagementDelegate ){
-        mTlsCertificateManagementDelegate  = aTLSClientManagementDelegate;
-    }
     void Init();
     void SetMediaController(MediaController * mediaController);
     void SetCameraDevice(CameraDeviceInterface * cameraDevice);
+    void SetOnRecorderStoppedCallback(std::function<void(uint16_t, PushAvStreamTransport::TransportTriggerTypeEnum)> cb);
 
     // Add missing override keywords and fix signatures
     Protocols::InteractionModel::Status AllocatePushTransport(const TransportOptionsStruct & transportOptions,
@@ -76,6 +68,13 @@ public:
     Protocols::InteractionModel::Status ManuallyTriggerTransport(
         const uint16_t connectionID, TriggerActivationReasonEnum activationReason,
         const Optional<Structs::TransportMotionTriggerTimeControlStruct::DecodableType> & timeControl) override;
+
+    void SetTLSCerts(TlsCertificateManagement::Commands::FindClientCertificateResponse::Type aClientCert,
+                     TlsCertificateManagement::Commands::FindRootCertificateResponse::Type aRootCert)
+    {
+        mClientCert = aClientCert;
+        mRootCert   = aRootCert;
+    }
 
     bool ValidateUrl(const std::string & url) override;
 
@@ -107,6 +106,8 @@ public:
 
     CHIP_ERROR PersistentAttributesLoadedCallback() override;
 
+    void OnZoneTriggeredEvent(u_int16_t zoneId);
+
 private:
     std::vector<PushAvStream> pushavStreams;
     MediaController * mMediaController    = nullptr;
@@ -116,8 +117,22 @@ private:
     VideoStreamStruct mVideoStreamParams;
     std::unordered_map<uint16_t, std::unique_ptr<PushAVTransport>> mTransportMap; // map for the transport objects
     std::unordered_map<uint16_t, TransportOptionsStruct> mTransportOptionsMap;    // map for the transport options
-    TlsClientManagementDelegate * mTLSClientManagementDelegate = nullptr;
-    TlsCertificateManagementDelegate * mTlsCertificateManagementDelegate = nullptr;
+
+    double mTotalUsedBandwidthMbps = 0.0; // Tracks the total bandwidth used by all active transports
+
+    std::function<void(uint16_t, PushAvStreamTransport::TransportTriggerTypeEnum)> mOnRecorderStoppedCb;
+
+    TlsCertificateManagement::Commands::FindClientCertificateResponse::Type mClientCert;
+    TlsCertificateManagement::Commands::FindRootCertificateResponse::Type mRootCert;
+
+    /**
+     * @brief Calculates the total bandwidth in Mbps for the given video and audio stream IDs.
+     * @param videoStreamId Optional nullable video stream ID.
+     * @param audioStreamId Optional nullable audio stream ID.
+     * @param outBandwidthMbps Output parameter for the calculated bandwidth in Mbps.
+     */
+    void GetBandwidthForStreams(const Optional<DataModel::Nullable<uint16_t>> & videoStreamId,
+                                const Optional<DataModel::Nullable<uint16_t>> & audioStreamId, double & outBandwidthMbps);
 };
 
 } // namespace PushAvStreamTransport

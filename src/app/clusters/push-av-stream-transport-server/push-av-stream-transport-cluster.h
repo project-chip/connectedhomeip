@@ -54,6 +54,11 @@ public:
 
     void SetTLSClientManagementDelegate(TlsClientManagementDelegate * delegate) { mLogic.SetTLSClientManagementDelegate(delegate); }
 
+    void SetTlsCertificateManagementDelegate(EndpointId aEndpoint, TlsCertificateManagementDelegate * delegate)
+    {
+        mLogic.SetTlsCertificateManagementDelegate(aEndpoint, delegate);
+    }
+
     CHIP_ERROR Init() { return mLogic.Init(); }
 
     void Shutdown() override

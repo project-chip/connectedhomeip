@@ -6,8 +6,10 @@
 #include <app/clusters/push-av-stream-transport-server/constants.h>
 #include <app/clusters/push-av-stream-transport-server/push-av-stream-transport-delegate.h>
 #include <app/clusters/push-av-stream-transport-server/push-av-stream-transport-storage.h>
+#include <app/clusters/tls-certificate-management-server/tls-certificate-management-server.h>
 #include <app/clusters/tls-client-management-server/tls-client-management-server.h>
 #include <app/server-cluster/DefaultServerCluster.h>
+#include <functional>
 #include <protocols/interaction_model/StatusCode.h>
 #include <vector>
 
@@ -30,12 +32,18 @@ public:
             return;
         }
         mDelegate->SetEndpointId(aEndpoint);
-        if(mTLSClientManagementDelegate!=nullptr){
-            mDelegate->SetTlsClientManagementDelegate(mTLSClientManagementDelegate);
-        }
+        mDelegate->SetOnRecorderStoppedCallback(
+            [this](uint16_t connectionID, PushAvStreamTransport::TransportTriggerTypeEnum triggerType) {
+                GeneratePushTransportEndEvent(connectionID, triggerType,
+                                              Optional<PushAvStreamTransport::TriggerActivationReasonEnum>());
+            });
     }
 
-    void SetTLSClientManagementDelegate(TlsClientManagementDelegate * delegate)
+    void SetOnRecorderStoppedCallback(std::function<void((uint16_t, PushAvStreamTransport::TransportTriggerTypeEnum))> cb)
+    {
+        mOnRecorderStoppedCb = std ::move(cb);
+    }
+    void SetTLSClientManagementDelegate(EndpointId aEndpoint, TlsClientManagementDelegate * delegate)
     {
         mTLSClientManagementDelegate = delegate;
         if (mTLSClientManagementDelegate == nullptr)
@@ -43,11 +51,18 @@ public:
             ChipLogError(Zcl, "Push AV Stream Transport : Trying to set TLS Client Management delegate to null");
             return;
         }
-        if(mDelegate!=nullptr){
-            mDelegate->SetTlsClientManagementDelegate(delegate);
-        }
     }
 
+    void SetTlsCertificateManagementDelegate(EndpointId aEndpoint, TlsCertificateManagementDelegate * delegate)
+    {
+        mTlsCertificateManagementDelegate = delegate;
+        if (mTlsCertificateManagementDelegate == nullptr)
+        {
+            ChipLogError(Zcl, "Push AV Stream Transport [ep=%d]: Trying to set TLS Certificate Management delegate to null",
+                         aEndpoint);
+            return;
+        }
+    }
     enum class UpsertResultEnum : uint8_t
     {
         kInserted = 0x00,
@@ -112,8 +127,12 @@ public:
                                   const Optional<PushAvStreamTransport::TriggerActivationReasonEnum> activationReason);
 
 private:
-    PushAvStreamTransportDelegate * mDelegate                  = nullptr;
-    TlsClientManagementDelegate * mTLSClientManagementDelegate = nullptr;
+    PushAvStreamTransportDelegate * mDelegate                            = nullptr;
+    TlsClientManagementDelegate * mTLSClientManagementDelegate           = nullptr;
+    TlsCertificateManagementDelegate * mTlsCertificateManagementDelegate = nullptr;
+
+    std::function<void((uint16_t, PushAvStreamTransport::TransportTriggerTypeEnum))> mOnRecorderStoppedCb;
+
     /// Convenience method that returns if the internal delegate is null and will log
     /// an error if the check returns true
     bool IsNullDelegateWithLogging(EndpointId endpointIdForLogging);

@@ -44,7 +44,7 @@ class ZoneMgmtServer;
 
 struct TwoDCartesianZoneStorage : TwoDCartesianZoneStruct
 {
-    TwoDCartesianZoneStorage(){};
+    TwoDCartesianZoneStorage() {};
 
     TwoDCartesianZoneStorage(const CharSpan & aName, ZoneUseEnum aUse, const std::vector<TwoDCartesianVertexStruct> & aVertices,
                              Optional<CharSpan> aColor)
@@ -87,7 +87,7 @@ struct TwoDCartesianZoneStorage : TwoDCartesianZoneStruct
 
 struct ZoneInformationStorage : ZoneInformationStruct
 {
-    ZoneInformationStorage(){};
+    ZoneInformationStorage() {};
 
     ZoneInformationStorage(const uint16_t & aZoneID, ZoneTypeEnum aZoneType, ZoneSourceEnum aZoneSource,
                            const Optional<TwoDCartesianZoneStorage> & aTwoDCartZoneStorage)

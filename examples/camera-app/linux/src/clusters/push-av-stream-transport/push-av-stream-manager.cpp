@@ -66,12 +66,24 @@ void PushAvStreamTransportManager::SetCameraDevice(CameraDeviceInterface * aCame
 Protocols::InteractionModel::Status
 PushAvStreamTransportManager::AllocatePushTransport(const TransportOptionsStruct & transportOptions, const uint16_t connectionID)
 {
-
+    if (mCameraDevice == nullptr)
+    {
+        ChipLogError(Camera, "CameraDeviceInterface not initialized for AllocatePushTransport");
+        return Status::Failure;
+    }
     mTransportOptionsMap[connectionID] = transportOptions;
 
     ChipLogProgress(Camera, "PushAvStreamTransportManager, Create PushAV Transport for Connection: [%u]", connectionID);
     mTransportMap[connectionID] =
         std::make_unique<PushAVTransport>(transportOptions, connectionID, mAudioStreamParams, mVideoStreamParams);
+
+    auto triggerType = transportOptions.triggerOptions.triggerType;
+    mTransportMap[connectionID]->SetOnRecorderStoppedCallback([this, connectionID, triggerType]() {
+        if (mOnRecorderStoppedCb)
+        {
+            mOnRecorderStoppedCb(connectionID, triggerType);
+        }
+    });
 
     if (mMediaController == nullptr)
     {
@@ -83,61 +95,46 @@ PushAvStreamTransportManager::AllocatePushTransport(const TransportOptionsStruct
     mMediaController->RegisterTransport(mTransportMap[connectionID].get(), transportOptions.videoStreamID.Value().Value(),
                                         transportOptions.audioStreamID.Value().Value());
 
+    double newTransportBandwidthMbps = 0.0;
+    GetBandwidthForStreams(transportOptions.videoStreamID, transportOptions.audioStreamID, newTransportBandwidthMbps);
+
+    mTransportMap[connectionID].get()->SetCurrentlyUsedBandwidthMbps(newTransportBandwidthMbps);
+    mTotalUsedBandwidthMbps += newTransportBandwidthMbps;
+    ChipLogDetail(Camera,
+                  "AllocatePushTransport: Transport for connection %u allocated successfully. "
+                  "New transport bandwidth: %.2f Mbps. Total used bandwidth: %.2f Mbps.",
+                  connectionID, newTransportBandwidthMbps, mTotalUsedBandwidthMbps);
+
     // mMediaController->SetPreRollLength(mTransportMap[connectionID].get(), mTransportMap[connectionID].get()->GetPreRollLength());
+    if (transportOptions.triggerOptions.triggerType == TransportTriggerTypeEnum::kMotion &&
+        transportOptions.triggerOptions.motionZones.HasValue())
+    {
+        std::vector<std::pair<uint16_t, uint8_t>> zoneSensitivityList;
+
+        auto motionZones = transportOptions.triggerOptions.motionZones.Value().Value();
+        for (const auto & zoneOption : motionZones)
+        {
+            if (zoneOption.sensitivity.HasValue())
+            {
+                zoneSensitivityList.push_back({ zoneOption.zone.Value(), zoneOption.sensitivity.Value() });
+            }
+            else
+            {
+                zoneSensitivityList.push_back(
+                    { zoneOption.zone.Value(), transportOptions.triggerOptions.motionSensitivity.Value().Value() });
+            }
+        }
+
+        if (!zoneSensitivityList.empty())
+        {
+            mTransportMap[connectionID].get()->SetZoneSensitivityList(zoneSensitivityList);
+        }
+    }
+
 #ifdef TLS_CLUSTER_ENABLED
-    // TODO: get TLS endpointId from PAVST cluster
-    auto & tlsClientManager = mCameraDevice->GetTLSClientMgmtDelegate();
-    auto & tlsCertManager   = mCameraDevice->GetTLSCertMgmtDelegate();
-
-    if (!tlsClientManager || !tlsClientManager)
-    {
-        ChipLogError(Camera, "Failed to get TLS cluster handlers");
-        return;
-    }
-
-    // Get TLS endpoint information
-    TLSClientManagement::Commands::FindEndpointResponse::Type endpointResponse;
-    CHIP_ERROR err = tlsClientManager->FindEndpoint(mConnectionID, endpointResponse);
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogError(Camera, "Failed to find TLS endpoint for connection %u: %" CHIP_ERROR_FORMAT, mConnectionID, err.Format());
-        return;
-    }
-    auto endpoint = endpointResponse.endpoint;
-
-    // Get root certificate
-    TLSCertificateManagement::Commands::FindRootCertificateResponse::Type rootCertResponse;
-    rootCertResponse.CertificateDetails = DataModel::List<TLSCertificateManagement::Structs::TLSCertStruct::Type>();
-    err                                 = tlsCertManager->FindRootCertificate(endpoint.CAID, rootCertResponse);
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogError(Camera, "Failed to find root certificate for CAID %u: %" CHIP_ERROR_FORMAT, endpoint.CAID, err.Format());
-        return;
-    }
-    auto rootCert = rootCertResponse.CertificateDetails[0].Certificate;
-
-    // Get client certificate details if configured
-    if (endpoint.CCDID != NullOptional)
-    {
-        chip::app::Clusters::TLSCertificateManagement::Commands::FindClientCertificateResponse::Type clientCertResponse;
-        err = tlsCertManager->FindClientCertificate(endpoint.CCDID.Value(), clientCertResponse);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogError(Camera, "Failed to find client certificate for CCDID %u: %" CHIP_ERROR_FORMAT, endpoint.CCDID.Value(),
-                         err.Format());
-            return;
-        }
-        auto clientCert = clientCertResponse.CertificateDetails[0].ClientCertificate;
-
-        // Get private key from secure storage
-        auto mDevKey = GetPrivateKeyFromSecureStorage(endpoint.CCDID.Value());
-        if (mCertPath.mDevKey.empty())
-        {
-            ChipLogError(Camera, "Failed to get private key for CCDID %u", endpoint.CCDID.Value());
-            return;
-        }
-    }
-    mTransportMap[connectionID].get()->SetTLSCertPath(rootCert, clientCert, mDevKey);
+    // TODO: Add support to use in memory certificate mClientCert, mRootCert
+    // TODO: Find a way to get client key / dev.key
+    // mTransportMap[connectionID].get()->SetTLSCertPath(rootCert, clientCert, mDevKey);
 #else
     mTransportMap[connectionID].get()->SetTLSCertPath("/tmp/pavstest/certs/server/root.pem", "/tmp/pavstest/certs/device/dev.pem",
                                                       "/tmp/pavstest/certs/device/dev.key");
@@ -152,6 +149,7 @@ Protocols::InteractionModel::Status PushAvStreamTransportManager::DeallocatePush
         ChipLogError(Camera, "PushAvStreamTransportManager, failed to find Connection :[%u]", connectionID);
         return Status::NotFound;
     }
+    mTotalUsedBandwidthMbps -= mTransportMap[connectionID].get()->GetCurrentlyUsedBandwidthMbps();
     mMediaController->UnregisterTransport(mTransportMap[connectionID].get());
     mTransportMap.erase(connectionID);
     mTransportOptionsMap.erase(connectionID);
@@ -167,6 +165,17 @@ PushAvStreamTransportManager::ModifyPushTransport(const uint16_t connectionID, c
         ChipLogError(Camera, "PushAvStreamTransportManager, failed to find Connection :[%u]", connectionID);
         return Status::NotFound;
     }
+    double newTransportBandwidthMbps = 0.0;
+    GetBandwidthForStreams(transportOptions.videoStreamID, transportOptions.audioStreamID, newTransportBandwidthMbps);
+
+    mTotalUsedBandwidthMbps -= mTransportMap[connectionID].get()->GetCurrentlyUsedBandwidthMbps();
+
+    mTransportMap[connectionID].get()->SetCurrentlyUsedBandwidthMbps(newTransportBandwidthMbps);
+    mTotalUsedBandwidthMbps += newTransportBandwidthMbps;
+    ChipLogDetail(Camera,
+                  "AllocatePushTransport: Transport for connection %u allocated successfully. "
+                  "New transport bandwidth: %.2f Mbps. Total used bandwidth: %.2f Mbps.",
+                  connectionID, newTransportBandwidthMbps, mTotalUsedBandwidthMbps);
 
     mTransportOptionsMap[connectionID] = transportOptions;
     mTransportMap[connectionID].get()->ModifyPushTransport(transportOptions);
@@ -227,13 +236,87 @@ Protocols::InteractionModel::Status PushAvStreamTransportManager::ManuallyTrigge
     return Status::Success;
 }
 
+void PushAvStreamTransportManager::GetBandwidthForStreams(const Optional<DataModel::Nullable<uint16_t>> & videoStreamId,
+                                                          const Optional<DataModel::Nullable<uint16_t>> & audioStreamId,
+                                                          double & outBandwidthMbps)
+{
+    outBandwidthMbps = 0.0;
+
+    if (videoStreamId.HasValue() && !videoStreamId.Value().IsNull())
+    {
+        uint16_t vStreamId = videoStreamId.Value().Value();
+
+        auto & availableVideoStreams = mCameraDevice->GetCameraHALInterface().GetAvailableVideoStreams();
+        for (const VideoStream & stream : availableVideoStreams)
+        {
+            if (stream.videoStreamParams.videoStreamID == vStreamId)
+            {
+                outBandwidthMbps += (stream.videoStreamParams.maxBitRate / 1000000.0);
+                ChipLogProgress(Camera, "GetBandwidthForStreams: VideoStream %u maxBitRate: %u bps (%.2f Mbps)", vStreamId,
+                                stream.videoStreamParams.maxBitRate, (stream.videoStreamParams.maxBitRate / 1000000.0));
+                break;
+            }
+        }
+    }
+
+    if (audioStreamId.HasValue() && !audioStreamId.Value().IsNull())
+    {
+        uint16_t aStreamId = audioStreamId.Value().Value();
+
+        auto & availableAudioStreams = mCameraDevice->GetCameraHALInterface().GetAvailableAudioStreams();
+        for (const AudioStream & stream : availableAudioStreams)
+        {
+            if (stream.audioStreamParams.audioStreamID == aStreamId)
+            {
+                outBandwidthMbps += (stream.audioStreamParams.bitRate / 1000000.0);
+                ChipLogProgress(Camera, "GetBandwidthForStreams: AudioStream %u bitRate: %u bps (%.2f Mbps)", aStreamId,
+                                stream.audioStreamParams.bitRate, (stream.audioStreamParams.bitRate / 1000000.0));
+                break;
+            }
+        }
+    }
+
+    return;
+}
+
 Protocols::InteractionModel::Status
 PushAvStreamTransportManager::ValidateBandwidthLimit(StreamUsageEnum streamUsage,
                                                      const Optional<DataModel::Nullable<uint16_t>> & videoStreamId,
                                                      const Optional<DataModel::Nullable<uint16_t>> & audioStreamId)
 {
-    // TODO: Validates the requested stream usage against the camera's resource management.
-    // Returning Status::Success to pass through checks in the Server Implementation.
+    if (mCameraDevice == nullptr)
+    {
+        ChipLogError(Camera, "CameraDeviceInterface not initialized for ValidateBandwidthLimit");
+        return Status::Failure;
+    }
+
+    double newStreamBandwidthMbps = 0.0;
+    GetBandwidthForStreams(videoStreamId, audioStreamId, newStreamBandwidthMbps);
+    uint32_t maxNetworkBandwidthMbps = mCameraDevice->GetCameraHALInterface().GetMaxNetworkBandwidth();
+
+    double projectedTotalBandwidthMbps = mTotalUsedBandwidthMbps + newStreamBandwidthMbps;
+
+    ChipLogProgress(Camera,
+                    "ValidateBandwidthLimit: For streamUsage %u. New stream bandwidth: %.2f Mbps. "
+                    "Currently used bandwidth: %.2f Mbps. Projected total: %.2f Mbps. Max allowed: %u Mbps.",
+                    static_cast<uint16_t>(streamUsage), newStreamBandwidthMbps, mTotalUsedBandwidthMbps,
+                    projectedTotalBandwidthMbps, maxNetworkBandwidthMbps);
+
+    if (projectedTotalBandwidthMbps > maxNetworkBandwidthMbps)
+    {
+        ChipLogError(Camera,
+                     "ValidateBandwidthLimit: ResourceExhausted for streamUsage %u. "
+                     "Projected total bandwidth (%.2f Mbps) would exceed maximum network bandwidth (%u Mbps). "
+                     "New stream requires %.2f Mbps, currently %.2f Mbps is in use.",
+                     static_cast<uint16_t>(streamUsage), projectedTotalBandwidthMbps, maxNetworkBandwidthMbps,
+                     newStreamBandwidthMbps, mTotalUsedBandwidthMbps);
+        return Status::ResourceExhausted;
+    }
+
+    ChipLogProgress(Camera,
+                    "ValidateBandwidthLimit: Success for streamUsage %u. "
+                    "Allocating this stream would keep bandwidth usage within limits.",
+                    static_cast<uint16_t>(streamUsage));
     return Status::Success;
 }
 
@@ -427,4 +510,18 @@ PushAvStreamTransportManager::PersistentAttributesLoadedCallback()
     ChipLogProgress(Zcl, "Push AV Stream Transport Persistent attributes loaded");
 
     return CHIP_NO_ERROR;
+}
+
+void PushAvStreamTransportManager::OnZoneTriggeredEvent(u_int16_t zoneId)
+{
+    for (auto & pavst : mTransportMap)
+    {
+        int connectionId = pavst.first;
+        ChipLogError(Camera, "PushAV sending trigger to connection ID %d", connectionId);
+
+        if (mTransportOptionsMap[connectionId].triggerOptions.triggerType == TransportTriggerTypeEnum::kMotion)
+        {
+            pavst.second->TriggerTransport(TriggerActivationReasonEnum::kAutomation, zoneId, 10);
+        }
+    }
 }

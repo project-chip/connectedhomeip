@@ -22,7 +22,6 @@
 #include "pushav-clip-recorder.h"
 #include "transport.h"
 #include "uploader/pushav-uploader.h"
-
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/cluster-enums.h>
 #include <app-common/zap-generated/cluster-objects.h>
@@ -31,6 +30,7 @@
 #include <app/AttributeAccessInterface.h>
 #include <app/CommandHandlerInterface.h>
 #include <app/clusters/push-av-stream-transport-server/constants.h>
+#include <functional>
 #include <memory>
 #include <protocols/interaction_model/StatusCode.h>
 #include <thread>
@@ -68,7 +68,8 @@ public:
     // Set Transport status
     void SetTransportStatus(chip::app::Clusters::PushAvStreamTransport::TransportStatusEnum status);
 
-    void TriggerTransport(chip::app::Clusters::PushAvStreamTransport::TriggerActivationReasonEnum activationReason);
+    void TriggerTransport(chip::app::Clusters::PushAvStreamTransport::TriggerActivationReasonEnum activationReason, int zoneId = -1,
+                          int senstivity = 5);
 
     // Get Transport status
     bool GetTransportStatus()
@@ -84,9 +85,25 @@ public:
     bool HandleTriggerDetected();
 
     void InitializeRecorder();
+
     bool CanSendPacketsToRecorder();
+
     void readFromFile(char * filename, uint8_t ** videoBuffer, size_t * videoBufferBytes);
+
     void SetTLSCertPath(std::string rootCert, std::string devCert, std::string devKey);
+
+    void SetOnRecorderStoppedCallback(std::function<void()> cb) { mOnRecorderStoppedCb = std ::move(cb); }
+
+    void SetZoneSensitivityList(std::vector<std::pair<uint16_t, uint8_t>> zoneSensitivityList)
+    {
+        mZoneSensitivityList = zoneSensitivityList;
+    }
+
+    void SetCurrentlyUsedBandwidthMbps(double currentlyUsedBandwidthMbps)
+    {
+        mCurrentlyUsedBandwidthMbps = currentlyUsedBandwidthMbps;
+    }
+    double GetCurrentlyUsedBandwidthMbps() { return mCurrentlyUsedBandwidthMbps; }
 
 private:
     bool mHasAugmented                            = false;
@@ -98,8 +115,11 @@ private:
     PushAVClipRecorder::AudioInfoStruct mAudioInfo;
     PushAVClipRecorder::VideoInfoStruct mVideoInfo;
     PushAVUploader::PushAVCertPath mCertPath;
-    AudioStreamStruct mAudioStreamParams;
-    VideoStreamStruct mVideoStreamParams;
+    AudioStreamStruct audioStreamParams;
+    VideoStreamStruct videoStreamParams;
+    std::vector<std::pair<uint16_t, uint8_t>> mZoneSensitivityList;
+    std::function<void()> mOnRecorderStoppedCb;
+    void OnRecorderStopped();
 
     // Dummy implementation to indicate if video can be sent
     bool mCanSendVideo = false;
@@ -111,4 +131,5 @@ private:
     chip::app::Clusters::PushAvStreamTransport::TransportStatusEnum mTransportStatus;
     chip::app::Clusters::PushAvStreamTransport::TransportTriggerTypeEnum mTransportTriggerType;
     uint16_t mConnectionID;
+    double mCurrentlyUsedBandwidthMbps = 0.0;
 };

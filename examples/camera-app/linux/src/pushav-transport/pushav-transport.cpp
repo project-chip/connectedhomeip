@@ -21,9 +21,8 @@
 using namespace chip::app::Clusters::PushAvStreamTransport;
 
 PushAVTransport::PushAVTransport(const TransportOptionsStruct & transportOptions, const uint16_t connectionID,
-                                 AudioStreamStruct & audioStreamParams, VideoStreamStruct & videoStreamParams) :
-    mAudioStreamParams(audioStreamParams),
-    mVideoStreamParams(videoStreamParams)
+                                 AudioStreamStruct aAudioStreamParams, VideoStreamStruct aVideoStreamParams) :
+    audioStreamParams(aAudioStreamParams), videoStreamParams(aVideoStreamParams)
 {
     ConfigureRecorderSettings(transportOptions, audioStreamParams, videoStreamParams);
     mConnectionID    = connectionID;
@@ -215,7 +214,8 @@ void PushAVTransport::InitializeRecorder()
     {
         ChipLogError(Camera, "Recorder already initialized");
     }
-    mClipInfo.mClipId++;
+    clipInfo.mClipId++;
+    recorder->SetOnStopCallback([this]() { this->OnRecorderStopped(); });
 }
 
 PushAVTransport::~PushAVTransport()
@@ -225,6 +225,14 @@ PushAVTransport::~PushAVTransport()
     mCanSendAudio = false;
     mRecorder.reset();
     mUploader.reset();
+}
+
+void PushAVTransport::OnRecorderStopped()
+{
+    if (mOnRecorderStoppedCb)
+    {
+        mOnRecorderStoppedCb();
+    }
 }
 
 bool InBlindPeriod(std::chrono::steady_clock::time_point blindStartTime, uint16_t blindDuration)
@@ -287,10 +295,10 @@ bool PushAVTransport::HandleTriggerDetected()
     return true;
 }
 
-void PushAVTransport::TriggerTransport(TriggerActivationReasonEnum activationReason)
+void PushAVTransport::TriggerTransport(TriggerActivationReasonEnum activationReason, int zoneId, int sensitivity)
 {
-    ChipLogProgress(Camera, "PushAVTransport trigger transport, activation reason: [%u]", (uint16_t) activationReason);
-
+    ChipLogProgress(Camera, "PushAVTransport trigger transport, activation reason: [%u], ZoneId: [%d], Sensitivity: [%d]",
+                    (uint16_t) activationReason, zoneId, sensitivity);
     if (mTransportTriggerType == TransportTriggerTypeEnum::kCommand)
     {
         if (HandleTriggerDetected())
@@ -309,25 +317,46 @@ void PushAVTransport::TriggerTransport(TriggerActivationReasonEnum activationRea
     }
     else if (mTransportTriggerType == TransportTriggerTypeEnum::kMotion)
     {
-        if (HandleTriggerDetected())
+        bool zoneFound = false; // Zone found flag
+        for (auto zone : mZoneSensitivityList)
         {
-            ChipLogError(Camera, "PushAVTransport command/motion transport trigger received. Clip duration [%d seconds]",
-                         mRecorder->mClipInfo.mInitialDuration);
+            if (zone.first == zoneId)
+            {
+                zoneFound = true;
+                if (zone.second > sensitivity)
+                {
+                    ChipLogProgress(Camera, "PushAVTransport motion transport trigger received but ignored due to sensitivity");
+                }
+                else
+                {
+                    if (HandleTriggerDetected())
+                    {
+                        ChipLogError(Camera,
+                                     "PushAVTransport command/motion transport trigger received. Clip duration [%d seconds]",
+                                     recorder->mClipInfo.mInitialDuration);
+                    }
+                    else
+                    {
+                        ChipLogError(Camera,
+                                     "PushAVTransport command/motion transport trigger received but ignored due to blind period. "
+                                     "Clip duration. "
+                                     "Clip duration [%d seconds]",
+                                     recorder->mClipInfo.mInitialDuration);
+                    }
+                }
+                break;
+            }
         }
-        else
+        if (!zoneFound)
         {
-            ChipLogError(
-                Camera,
-                "PushAVTransport command/motion transport trigger received but ignored due to blind period. Clip duration. "
-                "Clip duration [%d seconds]",
-                mRecorder->mClipInfo.mInitialDuration);
+            ChipLogProgress(Camera, "PushAVTransport motion transport trigger received but ignored due to unknown zone id");
         }
-    }
 
-    else if (mTransportTriggerType == TransportTriggerTypeEnum::kContinuous)
-    {
-        ChipLogProgress(Camera, "PushAVTransport continuous transport trigger received. No action needed");
-        return;
+        else if (mTransportTriggerType == TransportTriggerTypeEnum::kContinuous)
+        {
+            ChipLogProgress(Camera, "PushAVTransport continuous transport trigger received. No action needed");
+            return;
+        }
     }
 }
 
@@ -430,7 +459,8 @@ bool PushAVTransport::CanSendPacketsToRecorder()
     }
     if (mRecorder->mDeinitializeRecorder.load()) // Current clip is completed, Next clip will start on trigger
     {
-        mRecorder.reset();
+        ChipLogProgress(Camera, "Current clip is completed, Next clip will start on trigger");
+        recorder.reset();
         InitializeRecorder();
         mStreaming = false;
         return false;
@@ -496,13 +526,13 @@ void PushAVTransport::readFromFile(char * filename, uint8_t ** videoBuffer, size
 // Implementation of CanSendVideo method
 bool PushAVTransport::CanSendVideo()
 {
-    return mCanSendVideo;
+    return IsStreaming();
 }
 
 // Dummy implementation of CanfSendAudio method
 bool PushAVTransport::CanSendAudio()
 {
-    return mCanSendAudio;
+    return IsStreaming();
 }
 
 void PushAVTransport::ModifyPushTransport(const TransportOptionsStorage & transportOptions)
