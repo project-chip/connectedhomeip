@@ -106,7 +106,7 @@ class TC_PAVST_2_9(MatterBaseTest, PAVSTTestBase):
         aSupportedFormats = await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=pvcluster, attribute=pvattr.SupportedFormats
         )
-        aSupportedContainerFormats = list({fmt.containerFormat for fmt in aSupportedFormat})
+        aSupportedContainerFormats = list({fmt.containerFormat for fmt in aSupportedFormats})
         logger.info(f"SupportedContainerFormats: {aSupportedContainerFormats}")
 
         self.step(4)
