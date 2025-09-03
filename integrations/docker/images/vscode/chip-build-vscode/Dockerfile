@@ -46,8 +46,7 @@ COPY --from=crosscompile /opt/ubuntu-24.04-aarch64-sysroot /opt/ubuntu-24.04-aar
 
 COPY --from=ameba /opt/ameba /opt/ameba
 
-COPY --from=realtekzephyr /opt/realtek-zephyr/zephyr-sdk-0.16.8/ /opt/realtek-zephyr/zephyr-sdk-0.16.8/
-COPY --from=realtekzephyr /opt/realtek-zephyr/zephyr-rtk-project/ /opt/realtek-zephyr/zephyr-rtk-project/
+COPY --from=realtekzephyr /opt/realtek-zephyr/ /opt/realtek-zephyr/
 
 COPY --from=nxp /opt/nxp /opt/nxp
 
