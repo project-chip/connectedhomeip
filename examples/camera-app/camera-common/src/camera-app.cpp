@@ -16,6 +16,7 @@
  *    limitations under the License.
  */
 #include "camera-app.h"
+#include "tls-client-management-instance.h"
 #include <app/clusters/push-av-stream-transport-server/CodegenIntegration.h>
 
 using namespace chip;
@@ -45,6 +46,9 @@ CameraApp::CameraApp(chip::EndpointId aClustersEndpoint, CameraDeviceInterface *
         std::make_unique<WebRTCTransportProviderServer>(mCameraDevice->GetWebRTCProviderDelegate(), mEndpoint);
 
     Clusters::PushAvStreamTransport::SetDelegate(mEndpoint, &(mCameraDevice->GetPushAVTransportDelegate()));
+
+    Clusters::PushAvStreamTransport::SetTLSClientManagementDelegate(chip::EndpointId(1),
+                                                                    &Clusters::TlsClientManagementCommandDelegate::GetInstance());
 
     // Fetch all initialization parameters for CameraAVStreamMgmt Server
     BitFlags<CameraAvStreamManagement::Feature> avsmFeatures;
