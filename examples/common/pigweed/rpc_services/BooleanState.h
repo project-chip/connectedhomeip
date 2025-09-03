@@ -41,7 +41,6 @@ public:
         EndpointId endpointId = request.endpoint_id;
         bool newState         = request.state_value;
 
-        EventNumber eventNumber;
         {
             DeviceLayer::StackLock lock;
 

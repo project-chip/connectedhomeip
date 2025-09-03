@@ -73,7 +73,7 @@ CHIP_ERROR ContactSensorApp::AppTask::ProcessSetStateClusterHandler(void)
         return booleanState->SetStateValue(!val, eventNumber);
     }
 
-    return CHIP_INVALID_ARGUMENT;
+    return CHIP_ERROR_INVALID_ARGUMENT;
 }
 
 chip::NXP::App::AppTaskBase & chip::NXP::App::GetAppTask()
