@@ -26,10 +26,10 @@ config:
         defaultValue: 123
     applicationId:
         type: char_string
-        defaultValue: "exampleid"
+        defaultValue: "applicationId"
     DataValue:
         type: octet_string
-        defaultValue: "CSA"
+        defaultValue: "data"
     #ApplicationBasic cluster endpoint
     ApplicationBasic.Endpoint: 3
 
