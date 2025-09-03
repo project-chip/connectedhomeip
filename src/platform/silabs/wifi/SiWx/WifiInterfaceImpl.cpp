@@ -72,13 +72,13 @@ extern "C" {
 using namespace chip::DeviceLayer::Silabs;
 using WiFiBandEnum = chip::app::Clusters::NetworkCommissioning::WiFiBandEnum;
 
-// TODO : Temporary work-around for wifi-init failure in 917NCP ACX module boards.
-// Can be removed after Wiseconnect fixes region code for all ACX module boards.
-#if defined(EXP_BOARD)
-#define REGION_CODE IGNORE_REGION
-#else
+// The REGION_CODE macro defines the regulatory region for the Wi-Fi device.
+// The default value is 'US'. Users can override this macro to specify a different region code.
+// The region code must match one of the values defined in the 'sl_wifi_region_code_t' enum,
+// which is located in 'wifi-sdk/inc/sl_wifi_constants.h'. Example values include US, EU, JP, etc.
+#ifndef REGION_CODE
 #define REGION_CODE US
-#endif
+#endif // !REGION_CODE
 
 // TODO: This needs to be refactored so we don't need the global object
 WfxRsi_t wfx_rsi;
@@ -717,7 +717,7 @@ sl_status_t WifiInterfaceImpl::JoinWifiNetwork(void)
 
     status = sl_net_up(SL_NET_WIFI_CLIENT_INTERFACE, SL_NET_DEFAULT_WIFI_CLIENT_PROFILE_ID);
 
-    if (!(wfx_rsi.dev_state.Has(WifiState::kStationConnecting)))
+    if (!(wfx_rsi.dev_state.Has(WifiInterface::WifiState::kStationConnecting)))
     {
         // TODO: Remove this check once the sl_net_up is fixed, sl_net_up is not completely synchronous
         // and issue is mostly seen on OPEN access points
@@ -730,7 +730,7 @@ sl_status_t WifiInterfaceImpl::JoinWifiNetwork(void)
         status = SL_STATUS_FAIL;
     }
 
-    if (status == SL_STATUS_OK || status == SL_STATUS_IN_PROGRESS)
+    if (status == SL_STATUS_OK)
     {
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
         // Remove High performance request that might have been added during the connect/retry process
@@ -756,7 +756,7 @@ sl_status_t WifiInterfaceImpl::JoinCallback(sl_wifi_event_t event, char * result
     sl_status_t status = SL_STATUS_OK;
     // If the failed event is encountered when sl_net_up is in-progress,
     // we ignore it and wait for the sl_net_up to complete.
-    if (wfx_rsi.dev_state.Has(WifiState::kStationConnecting))
+    if (wfx_rsi.dev_state.Has(WifiInterface::WifiState::kStationConnecting))
     {
         wfx_rsi.dev_state.Clear(WifiState::kStationConnecting);
         if (SL_WIFI_CHECK_IF_EVENT_FAILED(event))
@@ -767,6 +767,7 @@ sl_status_t WifiInterfaceImpl::JoinCallback(sl_wifi_event_t event, char * result
             return SL_STATUS_IN_PROGRESS;
         }
     }
+
     if (SL_WIFI_CHECK_IF_EVENT_FAILED(event))
     {
         status = *reinterpret_cast<sl_status_t *>(result);
