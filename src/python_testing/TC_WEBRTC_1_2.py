@@ -172,7 +172,7 @@ class TC_WEBRTC_1_2(MatterBaseTest, WebRTCTestHelper):
         ice_session_id, remote_candidates = await webrtc_peer.get_remote_ice_candidates()
         asserts.assert_equal(prev_sessionid, ice_session_id, "ProvideIceCandidates invoked with wrong session id")
         asserts.assert_true(len(remote_candidates) > 0, "Invalid remote ice candidates received")
-        webrtc_peer.set_remote_ice_candidates([cand.candidate for cand in remote_candidates])
+        webrtc_peer.set_remote_ice_candidates(remote_candidates)
 
         self.step(7)
         if not webrtc_peer.is_session_connected():
