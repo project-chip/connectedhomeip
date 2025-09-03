@@ -213,7 +213,7 @@ MTR_DIRECT_MEMBERS
 
     // When we are initialized from a concatenated QR code, we store the
     // original string and prevent mutation, instead of re-serializing from
-    // _payload (which in that sitation no longer represents all the information
+    // _payload (which in that situation no longer represents all the information
     // in the original string).
     NSString * _Nullable _concatenatedQRCode;
 }
@@ -612,8 +612,8 @@ MTR_DIRECT_MEMBERS
     MTRSetupPayload * other = object;
 
     bool hasConcatenatedQRCode = (_concatenatedQRCode != nil);
-    bool otherHasConcatenatedCRCode = (other->_concatenatedQRCode != nil);
-    if (hasConcatenatedQRCode != otherHasConcatenatedCRCode) {
+    bool otherHasConcatenatedQRCode = (other->_concatenatedQRCode != nil);
+    if (hasConcatenatedQRCode != otherHasConcatenatedQRCode) {
         return NO;
     }
 

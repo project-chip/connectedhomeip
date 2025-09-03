@@ -353,31 +353,6 @@
     XCTAssertEqualObjects(newPayload.serialNumber, payload.serialNumber);
 }
 
-- (void)_testSerialNumberRoundTrip:(NSString *)payloadString
-{
-    NSError * error;
-    MTRSetupPayload * payload =
-        [MTRSetupPayload setupPayloadWithOnboardingPayload:payloadString
-                                                     error:&error];
-    XCTAssertNil(error);
-    XCTAssertNotNil(payload);
-
-    XCTAssertEqualObjects(payload.serialNumber, @"123456789");
-
-    NSString * serialNumber = @"12345";
-    payload.serialNumber = serialNumber;
-
-    NSString * qrCode = [payload qrCodeString:&error];
-    XCTAssertNil(error);
-    XCTAssertNotNil(qrCode);
-
-    MTRSetupPayload * newPayload = [MTRSetupPayload setupPayloadWithOnboardingPayload:qrCode error:&error];
-    XCTAssertNil(error);
-    XCTAssertNotNil(newPayload);
-
-    XCTAssertEqualObjects(newPayload.serialNumber, serialNumber);
-}
-
 - (void)test31129 // https://github.com/project-chip/connectedhomeip/issues/31129
 {
     MTRSetupPayload * payload = [[MTRSetupPayload alloc] initWithSetupPasscode:@99999998 discriminator:@3840];
