@@ -127,7 +127,7 @@ class TC_PAVST_2_3(MatterBaseTest, PAVSTTestBase):
         aMaxZones = []
         aProvisionedEndpoints = []
         aConnectionID = ""
-        
+
         self.step(1)
         status = await self.check_and_delete_all_push_av_transports(endpoint, pvattr)
         asserts.assert_equal(
@@ -168,7 +168,7 @@ class TC_PAVST_2_3(MatterBaseTest, PAVSTTestBase):
         )
         asserts.assert_equal(len(current_connections), 1, "TransportConfigurations must be 1")
         aConnectionID = current_connections[0].connectionID
-        asserts.assert_equal(current_connections[0].transportStatus, 
+        asserts.assert_equal(current_connections[0].transportStatus,
                              pvcluster.Enums.TransportStatusEnum.kInactive, "TransportStatus must be Inactive")
 
         self.step(7)
@@ -229,16 +229,15 @@ class TC_PAVST_2_3(MatterBaseTest, PAVSTTestBase):
         try:
             zoneList = [{"zone": 14, "sensitivity": 4}]
             triggerOptions = {"triggerType": pvcluster.Enums.TransportTriggerTypeEnum.kMotion,
-                        "maxPreRollLen": 4000,
-                        "motionZones": zoneList,
-                        "motionTimeControl": {"initialDuration": 1, "augmentationDuration": 1,"maxDuration": 1, "blindDuration": 1}}
+                              "maxPreRollLen": 4000,
+                              "motionZones": zoneList,
+                              "motionTimeControl": {"initialDuration": 1, "augmentationDuration": 1, "maxDuration": 1, "blindDuration": 1}}
             status = await self.allocate_one_pushav_transport(endpoint, trigger_Options=triggerOptions, expected_cluster_status=pvcluster.Enums.StatusCodeEnum.kInvalidZone)
             asserts.assert_equal(status, pvcluster.Enums.StatusCodeEnum.kInvalidZone,
-                                "DUT must responds with Status Code InvalidZone.")
+                                 "DUT must responds with Status Code InvalidZone.")
         except InteractionModelError as e:
             asserts.assert_equal(e.clusterStatus, pvcluster.Enums.StatusCodeEnum.kInvalidZone,
-                                "DUT must responds with Status Code InvalidZone.")
-            
+                                 "DUT must responds with Status Code InvalidZone.")
 
         self.step(15)
         status = await self.allocate_one_pushav_transport(endpoint, videoStream_ID=-1,
@@ -258,27 +257,27 @@ class TC_PAVST_2_3(MatterBaseTest, PAVSTTestBase):
                 endpoint=endpoint, cluster=avcluster, attribute=avattr.StreamUsagePriorities
             )
             asserts.assert_greater(len(aStreamUsagePriorities), 0, "StreamUsagePriorities is empty")
-        
+
             streamUsage = aStreamUsagePriorities[0]
             containerOptions = {
-            "containerType": pvcluster.Enums.ContainerFormatEnum.kCmaf,
-            "CMAFContainerOptions": {"CMAFInterface": pvcluster.Enums.CMAFInterfaceEnum.kInterface1, "chunkDuration": 4, "segmentDuration": 3,
-                                     "sessionGroup": 3, "trackName": ""},
+                "containerType": pvcluster.Enums.ContainerFormatEnum.kCmaf,
+                "CMAFContainerOptions": {"CMAFInterface": pvcluster.Enums.CMAFInterfaceEnum.kInterface1, "chunkDuration": 4, "segmentDuration": 3,
+                                         "sessionGroup": 3, "trackName": ""},
             }
             status = await self.send_single_cmd(cmd=pvcluster.Commands.AllocatePushTransport(
                 {"streamUsage": streamUsage,
-                "endpointID": endpoint,
-                "url": "https://localhost:1234/streams/1",
-                "triggerOptions": {"triggerType": pvcluster.Enums.TransportTriggerTypeEnum.kContinuous},
-                "ingestMethod": pvcluster.Enums.IngestMethodsEnum.kCMAFIngest,
-                "containerOptions": containerOptions,
-                "expiryTime": 5
-                }), endpoint=endpoint)
+                 "endpointID": endpoint,
+                 "url": "https://localhost:1234/streams/1",
+                 "triggerOptions": {"triggerType": pvcluster.Enums.TransportTriggerTypeEnum.kContinuous},
+                 "ingestMethod": pvcluster.Enums.IngestMethodsEnum.kCMAFIngest,
+                 "containerOptions": containerOptions,
+                 "expiryTime": 5
+                 }), endpoint=endpoint)
             asserts.assert_equal(status, Status.InvalidCommand,
-                                "DUT must  responds with Status Code InvalidCommand.")
+                                 "DUT must  responds with Status Code InvalidCommand.")
         except InteractionModelError as e:
             asserts.assert_equal(e.status, Status.InvalidCommand,
-                                "DUT must  responds with Status Code InvalidCommand.")
+                                 "DUT must  responds with Status Code InvalidCommand.")
 
         self.step(18)
         status = await self.allocate_one_pushav_transport(endpoint, videoStream_ID=Nullable(), audioStream_ID=Nullable())
@@ -286,15 +285,15 @@ class TC_PAVST_2_3(MatterBaseTest, PAVSTTestBase):
                              "DUT must  responds with Status Code Success.")
 
         self.step(19)
-        zoneList = [{"zone": 1, "sensitivity": 4},{"zone": 2, "sensitivity": 4},{"zone": 3, "sensitivity": 4},{"zone": 4, "sensitivity": 4},{"zone": 5, "sensitivity": 4},{"zone": 6, "sensitivity": 4},
-                    {"zone": 7, "sensitivity": 4},{"zone": 8, "sensitivity": 4},{"zone": 9, "sensitivity": 4},{"zone": 10, "sensitivity": 4},{"zone": 11, "sensitivity": 4},{"zone": 12, "sensitivity": 4}]
+        zoneList = [{"zone": 1, "sensitivity": 4}, {"zone": 2, "sensitivity": 4}, {"zone": 3, "sensitivity": 4}, {"zone": 4, "sensitivity": 4}, {"zone": 5, "sensitivity": 4}, {"zone": 6, "sensitivity": 4},
+                    {"zone": 7, "sensitivity": 4}, {"zone": 8, "sensitivity": 4}, {"zone": 9, "sensitivity": 4}, {"zone": 10, "sensitivity": 4}, {"zone": 11, "sensitivity": 4}, {"zone": 12, "sensitivity": 4}]
         triggerOptions = {"triggerType": pvcluster.Enums.TransportTriggerTypeEnum.kMotion,
-                        "maxPreRollLen": 4000,
-                        "motionZones": zoneList,
-                        "motionTimeControl": {"initialDuration": 1, "augmentationDuration": 1,"maxDuration": 1, "blindDuration": 1}}
+                          "maxPreRollLen": 4000,
+                          "motionZones": zoneList,
+                          "motionTimeControl": {"initialDuration": 1, "augmentationDuration": 1, "maxDuration": 1, "blindDuration": 1}}
         status = await self.allocate_one_pushav_transport(endpoint, trigger_Options=triggerOptions)
         asserts.assert_equal(status, Status.ConstraintError,
-                                "DUT must  responds with Status code ConstraintError")
+                             "DUT must  responds with Status code ConstraintError")
 
         self.step(20)
         zoneList = []
@@ -351,12 +350,12 @@ class TC_PAVST_2_3(MatterBaseTest, PAVSTTestBase):
         )
         status = await self.psvt_deallocate_push_transport(cmd)
         asserts.assert_true(status == Status.Success,
-        "DUT responds with SUCCESS status code.")
+                            "DUT responds with SUCCESS status code.")
         zoneList = []
         triggerOptions = {"triggerType": pvcluster.Enums.TransportTriggerTypeEnum.kMotion,
-                           "maxPreRollLen": 4000,
-                           "motionZones": zoneList,
-                           "motionTimeControl": {"initialDuration": 1, "augmentationDuration": 1,"maxDuration": 1, "blindDuration": 1}}
+                          "maxPreRollLen": 4000,
+                          "motionZones": zoneList,
+                          "motionTimeControl": {"initialDuration": 1, "augmentationDuration": 1, "maxDuration": 1, "blindDuration": 1}}
 
         status = await self.allocate_one_pushav_transport(endpoint, trigger_Options=triggerOptions)
         asserts.assert_equal(status, Status.Success,

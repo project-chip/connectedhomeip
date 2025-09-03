@@ -45,6 +45,7 @@ from TC_PAVSTTestBase import PAVSTTestBase
 
 logger = logging.getLogger(__name__)
 
+
 class TC_PAVST_2_2(MatterBaseTest, PAVSTTestBase):
     def desc_TC_PAVST_2_2(self) -> str:
         return "[TC-PAVST-2.2] Attributes with Server as DUT"

@@ -87,7 +87,7 @@ class TC_PAVST_2_1(MatterBaseTest):
         )
         for config in transport_configs:
             isValidTransportStatus = (config.TransportStatus == cluster.TransportStatusEnum.kActive |
-                                        config.TransportStatus == cluster.TransportStatusEnum.kInactive)
+                                      config.TransportStatus == cluster.TransportStatusEnum.kInactive)
             asserts.assert_true(isValidTransportStatus, "TransportStatus must be a defined value!")
 
 
