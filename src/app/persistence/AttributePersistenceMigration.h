@@ -21,7 +21,6 @@
 #include <app/persistence/AttributePersistence.h>
 
 namespace chip::app {
-CHIP_ERROR MigrateFromSafeAttributePersistanceProvider(EndpointId endpointId, ClusterId clusterId,
-    Span<AttributeId> attributes, MutableByteSpan & buffer,
-    PersistentStorageDelegate & storageDelegate);
+CHIP_ERROR MigrateFromSafeAttributePersistanceProvider(EndpointId endpointId, ClusterId clusterId, Span<AttributeId> attributes,
+                                                       MutableByteSpan & buffer, PersistentStorageDelegate & storageDelegate);
 }

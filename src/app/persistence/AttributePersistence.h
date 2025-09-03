@@ -34,12 +34,10 @@ namespace chip::app {
 /// have known (strong) types and their load/decode logic is often
 /// similar and reusable. This class implements the logic of handling
 /// such attributes, so that it can be reused across cluster implementations.
-class AttributePersistence {
+class AttributePersistence
+{
 public:
-    AttributePersistence(AttributePersistenceProvider & provider)
-        : mProvider(provider)
-    {
-    }
+    AttributePersistence(AttributePersistenceProvider & provider) : mProvider(provider) {}
 
     /// Loads a native-endianness stored value of type `T` into `value` from the persistence provider.
     ///
@@ -102,7 +100,7 @@ private:
     /// Error reason for load failure is logged (or nothing logged in case "Value not found" is the
     /// reason for the load failure).
     bool InternalRawLoadNativeEndianValue(const ConcreteAttributePath & path, void * data, const void * valueOnLoadFailure,
-        size_t size);
+                                          size_t size);
 };
 
 } // namespace chip::app
