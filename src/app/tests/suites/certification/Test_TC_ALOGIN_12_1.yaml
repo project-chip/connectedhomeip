@@ -93,6 +93,10 @@ tests:
                 value: setupPIN
               - name: "Node"
                 value: nodeId
+      response:
+          values:
+              - name: "Status"
+                value: 0
 
     - label: "Step 3: TH sends a Logout command to the DUT."
       PICS: ALOGIN.S.C03.Rsp && PICS_SKIP_SAMPLE_APP
@@ -102,3 +106,7 @@ tests:
           values:
               - name: "Node"
                 value: nodeId
+      response:
+          values:
+              - name: "Status"
+                value: 0
