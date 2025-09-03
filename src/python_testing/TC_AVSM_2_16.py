@@ -297,6 +297,8 @@ class TC_AVSM_2_16(MatterBaseTest, AVSMTestBase):
         logger.info(f"Rx'd AllocatedAudioStreams: {aAllocatedAudioStreams}")
         asserts.assert_equal(len(aAllocatedAudioStreams), 0, "The number of allocated audio streams in the list is not 0")
 
+        webrtc_manager.close_all()
+
 
 if __name__ == "__main__":
     default_matter_test_main()
