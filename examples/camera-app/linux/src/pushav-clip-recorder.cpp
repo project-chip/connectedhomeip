@@ -116,8 +116,6 @@ bool PushAVClipRecorder::IsH264IFrame(const uint8_t * data, unsigned int length)
 {
     unsigned int idx = 0;
     int frameType    = 0;
-    int foundSps     = 0;
-    int foundPps     = 0;
     int foundIdr     = 0;
     bool ret         = false;
 
@@ -135,15 +133,7 @@ bool PushAVClipRecorder::IsH264IFrame(const uint8_t * data, unsigned int length)
             else if ((data[idx + 2] == 0x00) && (data[idx + 3] == 0x01))
                 frameType = data[idx + 4] & 0x1f;
 
-            if (frameType == 7)
-            {
-                foundSps = 1;
-            }
-            else if (frameType == 8)
-            {
-                foundPps = 1;
-            }
-            else if (frameType == 5)
+            if (frameType == 5)
             {
                 foundIdr = 1;
                 break;
@@ -159,9 +149,8 @@ bool PushAVClipRecorder::IsH264IFrame(const uint8_t * data, unsigned int length)
         }
     } while (idx < (length - 4));
 
-    // If we found an IDR frame, it's an I-frame regardless of SPS/PPS presence.
-    // SPS/PPS (Sequence Parameter Set/Picture Parameter Set) may have been sent in previous packets,
-    // or may be provided out-of-band (e.g., sent separately during stream initialization or as part of codec configuration).
+    // If we found an IDR frame, it's an I-frame regardless of SPS/PPS presence
+    // SPS/PPS may have been sent in previous packets or out-of-band
     if (foundIdr == 1)
     {
         ret = true;
