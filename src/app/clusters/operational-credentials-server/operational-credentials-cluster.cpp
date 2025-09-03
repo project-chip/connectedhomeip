@@ -20,6 +20,7 @@
 #include <app/server-cluster/AttributeListBuilder.h>
 #include <app/server/Dnssd.h>
 #include <app/server/Server.h>
+#include <app/data-model-provider/MetadataTypes.h>
 #include <clusters/OperationalCredentials/AttributeIds.h>
 #include <clusters/OperationalCredentials/Commands.h>
 #include <clusters/OperationalCredentials/Enums.h>
@@ -30,7 +31,6 @@
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <lib/support/CodeUtils.h>
 #include <tracing/macros.h>
-#include <app/util/attribute-storage.h>
 #include <app/InteractionModelEngine.h>
 #include <app/EventLogging.h>
 
@@ -1192,13 +1192,13 @@ CHIP_ERROR OperationalCredentialsCluster::Startup(ServerClusterContext & context
 {
     ReturnErrorOnFailure(DefaultServerCluster::Startup(context));
     Server::GetInstance().GetFabricTable().AddFabricDelegate(this);
-    PlatformMgrImpl().AddEventHandler(OnPlatformEventHandler);
+    DeviceLayer::PlatformMgrImpl().AddEventHandler(OnPlatformEventHandler);
     return CHIP_NO_ERROR;
 }
 
 void OperationalCredentialsCluster::Shutdown()
 {
-    PlatformMgrImpl().RemoveEventHandler(OnPlatformEventHandler);
+    DeviceLayer::PlatformMgrImpl().RemoveEventHandler(OnPlatformEventHandler);
     Server::GetInstance().GetFabricTable().RemoveFabricDelegate(this);
     DefaultServerCluster::Shutdown();
 }
@@ -1329,16 +1329,34 @@ std::optional<DataModel::ActionReturnStatus> OperationalCredentialsCluster::Invo
 void OperationalCredentialsCluster::FabricWillBeRemoved(const FabricTable & fabricTable, FabricIndex fabricIndex)
 {
     // The Leave event SHOULD be emitted by a Node prior to permanently leaving the Fabric.
-    for (auto endpoint : EnabledEndpointsWithServerCluster(BasicInformation::Id))
-    {
-        // If Basic cluster is implemented on this endpoint
-        BasicInformation::Events::Leave::Type event;
-        event.fabricIndex = fabricIndex;
-        EventNumber eventNumber;
+    ReadOnlyBufferBuilder<DataModel::EndpointEntry> endpointBuilder;
+    DataModel::Provider * provider = InteractionModelEngine::GetInstance()->GetDataModelProvider();
 
-        if (CHIP_NO_ERROR != LogEvent(event, endpoint, eventNumber))
+    provider->Endpoints(endpointBuilder);
+
+    auto allEndpoints = endpointBuilder.TakeBuffer();
+
+    for(const auto & ep : allEndpoints)
+    {
+        ReadOnlyBufferBuilder<DataModel::ServerClusterEntry> clusterBuilder;
+
+        provider->ServerClusters(ep.id, clusterBuilder);
+
+        auto allClusters = clusterBuilder.TakeBuffer();
+
+        for(const auto & cluster : allClusters)
         {
-            ChipLogError(Zcl, "OpCredsFabricTableDelegate: Failed to record Leave event");
+            if(cluster.clusterId == BasicInformation::Id)
+            {
+                BasicInformation::Events::Leave::Type event;
+                event.fabricIndex = fabricIndex;
+                EventNumber eventNumber;
+
+                if (CHIP_NO_ERROR != LogEvent(event, ep.id, eventNumber))
+                {
+                    ChipLogError(Zcl, "OpCredsFabricTableDelegate: Failed to record Leave event");
+                }
+            }
         }
     }
 
