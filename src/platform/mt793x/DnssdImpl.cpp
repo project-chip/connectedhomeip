@@ -338,7 +338,8 @@ CHIP_ERROR ChipDnssdBrowse(const char * type, DnssdServiceProtocol protocol, chi
     int ret = snprintf(ServiceType, sizeof(ServiceType), "%s.%s", type, GetProtocolString(protocol));
     if (ret < 0 || static_cast<size_t>(ret) >= sizeof(ServiceType))
     {
-        ChipLogError(ServiceProvisioning, "ServiceType truncated or snprintf error: type=%s protocol=%s", StringOrNullMarker(type), GetProtocolString(protocol));
+        ChipLogError(ServiceProvisioning, "ServiceType truncated or snprintf error: type=%s protocol=%s", StringOrNullMarker(type), 
+                     GetProtocolString(protocol));
         error = CHIP_ERROR_INVALID_ARGUMENT;
         return error;
     }
