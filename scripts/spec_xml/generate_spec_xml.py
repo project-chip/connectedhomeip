@@ -40,28 +40,23 @@ except ModuleNotFoundError:
 
 
 CURRENT_IN_PROGRESS_DEFINES = [
+    "access-closure",
     "cameras",
     "closures",
-    "device-location",
-    "endpointuniqueid",
-    "energy-drlc",
+    "electrical-grid-conditions",
     "energy-mtrid",
     "energy-price",
     "energy-tariff",
-    "hrap-2",
-    "hrap-tbrd",
-    "hvac-preset-suggestions",
-    "hvac-thermostat-events",
     "irrigation-system",
-    "metering network-recovery",
+    "metering",
     "nfcCommissioning",
-    "paftp",
+    "q-phase-2",
+    "q-phase-3",
     "rvc-direct-mode",
-    "rvc-moreopstates",
-    "rvc-vacthenmop",
+    "rvc-go-home",
     "soil-sensor",
-    "thermostat-controller",
-    "tls",
+    "temperature-sensor-with-screen",
+    "tls"
 ]
 
 
