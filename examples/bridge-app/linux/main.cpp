@@ -582,9 +582,7 @@ Protocols::InteractionModel::Status HandleWriteBridgedDeviceBasicAttribute(Devic
         return Protocols::InteractionModel::Status::InvalidValue;
     }
 
-    std::string label(reinterpret_cast<const char *>(buffer + 1), len);
-
-    dev->SetName(label.c_str());
+    dev->SetName(std::string{reinterpret_cast<const char *>(buffer + 1),  len}.c_str());
 
     HandleDeviceStatusChanged(dev, Device::kChanged_Name);
 
@@ -740,7 +738,7 @@ Protocols::InteractionModel::Status emberAfExternalAttributeWriteCallback(Endpoi
         }
         else if ((dev->IsReachable()) && (clusterId == BridgedDeviceBasicInformation::Id))
         {
-            ret = HandleWriteBridgedDeviceBasicAttribute(static_cast<Device *>(dev), attributeMetadata->attributeId, buffer);
+            ret = HandleWriteBridgedDeviceBasicAttribute(dev, attributeMetadata->attributeId, buffer);
         }
     }
 
