@@ -132,7 +132,7 @@ public:
         ReturnErrorOnFailure(SetAttribute(adminFabricIndexPath, static_cast<FabricIndex>(fabricIndex)));
 
         // Setup trusted root certificates
-         uint8_t rcacBuf[Credentials::kMaxCHIPCertLength];
+        uint8_t rcacBuf[Credentials::kMaxCHIPCertLength];
         MutableByteSpan rcacSpan{ rcacBuf };
         ReturnErrorOnFailure(fabricTable.FetchRootCert(fabricIndex, rcacSpan));
         chip::ByteSpan rcacCertsData[] = { rcacSpan };
@@ -328,7 +328,7 @@ public:
         FabricTable & fabricTable = mMessagingContext.GetFabricTable();
 
         // Sign the VID verification request.
-        SessionHandle sessionHandle = mMessagingContext.GetSessionBobToAlice();
+        SessionHandle sessionHandle = mMessagingContext.GetJFSessionAToB();
         ByteSpan attestationChallengeSpan = sessionHandle->AsSecureSession()->GetCryptoContext().GetAttestationChallenge();
         FabricTable::SignVIDVerificationResponseData responseData;
         CHIP_ERROR err = fabricTable.SignVIDVerificationRequest(dataRequest.fabricIndex, dataRequest.clientChallenge, attestationChallengeSpan, responseData);

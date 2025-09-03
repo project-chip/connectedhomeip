@@ -267,8 +267,8 @@ public:
                           JCMTrustVerificationError error);
     void OnAskUserForConsent(JCMDeviceCommissioner & commissioner, JCMTrustVerificationInfo & info);
     CHIP_ERROR OnLookupOperationalTrustAnchor(
-        VendorId vendorID, 
-        CertificateKeyId subjectKeyId,
+        VendorId vendorID,
+        CertificateKeyId & subjectKeyId,
         ByteSpan & globallyTrustedRoot);
 
 private:

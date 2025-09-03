@@ -214,7 +214,7 @@ private:
         const ByteSpan & rcacSpan,
         const ByteSpan & icacSpan,
         const ByteSpan & nocSpan,
-        const ByteSpan & clientChallengeSpan,
+        const ByteSpan clientChallengeSpan,
         const SignVIDVerificationResponse::DecodableType responseData);
 };
 

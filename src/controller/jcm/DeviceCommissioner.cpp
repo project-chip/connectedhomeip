@@ -426,8 +426,6 @@ CHIP_ERROR DeviceCommissioner::OnLookupOperationalTrustAnchor(
 
 TrustVerificationError DeviceCommissioner::PerformVendorIDVerificationProcedure()
 {
-    ChipLogProgress(Controller, "Performing vendor ID verification for vendor ID: %u", mInfo.adminVendorId);
-
     ByteSpan rcacSpan = mInfo.adminRCAC.Span();
     ByteSpan icacSpan = mInfo.adminICAC.Span();
     ByteSpan nocSpan = mInfo.adminNOC.Span();

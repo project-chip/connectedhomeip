@@ -931,7 +931,7 @@ void PairingCommand::OnAskUserForConsent(JCMDeviceCommissioner & commissioner, J
 // TODO: Complete DCL lookup implementation
 CHIP_ERROR PairingCommand::OnLookupOperationalTrustAnchor(
         VendorId vendorID, 
-        CertificateKeyId subjectKeyId,
+        CertificateKeyId & subjectKeyId,
         ByteSpan & globallyTrustedRootSpan)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;

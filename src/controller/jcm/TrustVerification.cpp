@@ -63,7 +63,7 @@ CHIP_ERROR VendorIdVerificationClient::Verify(
     const ByteSpan & rcacSpan,
     const ByteSpan & icacSpan,
     const ByteSpan & nocSpan,
-    const ByteSpan & clientChallengeSpan,
+    const ByteSpan clientChallengeSpan,
     const SignVIDVerificationResponse::DecodableType responseData
 )
 {
@@ -155,13 +155,17 @@ CHIP_ERROR VendorIdVerificationClient::VerifyVendorId(
     request.fabricIndex = fabricIndex;
     request.clientChallenge = clientChallengeSpan;
 
-    auto onSuccessCb = [this, deviceProxy, fabricIndex, vendorID, rcacSpan, icacSpan, nocSpan, clientChallengeSpan](const app::ConcreteCommandPath & aPath, const app::StatusIB & aStatus,
+    auto onSuccessCb = [this, deviceProxy, fabricIndex, vendorID, rcacSpan, icacSpan, nocSpan, kClientChallenge](const app::ConcreteCommandPath & aPath, const app::StatusIB & aStatus,
                                      const decltype(request)::ResponseType & responseData) {
-        CHIP_ERROR err = this->Verify(deviceProxy, fabricIndex, vendorID, rcacSpan, icacSpan, nocSpan, clientChallengeSpan, responseData);
+        ChipLogProgress(Controller, "Successfully received SignVIDVerificationResponse");
+        ByteSpan clientChallenge{ kClientChallenge };
+        CHIP_ERROR err = this->Verify(deviceProxy, fabricIndex, vendorID, rcacSpan, icacSpan, nocSpan, clientChallenge, responseData);
+        ChipLogProgress(Controller, "Vendor ID verification completed with result: %s", ErrorStr(err));
         this->OnVendorIdVerficationComplete(err);
     };
 
     auto onFailureCb = [this](CHIP_ERROR err) {
+        ChipLogError(Controller, "Failed to receive SignVIDVerificationResponse: %s", ErrorStr(err));
         this->OnVendorIdVerficationComplete(err);
     };
 
