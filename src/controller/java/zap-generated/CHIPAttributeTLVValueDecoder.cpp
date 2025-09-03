@@ -41363,8 +41363,8 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                                                                            jnivalue, value);
             return value;
         }
-        case Attributes::MinViewport::Id: {
-            using TypeInfo = Attributes::MinViewport::TypeInfo;
+        case Attributes::MinViewportResolution::Id: {
+            using TypeInfo = Attributes::MinViewportResolution::TypeInfo;
             TypeInfo::DecodableType cppValue;
             *aError = app::DataModel::Decode(aReader, cppValue);
             if (*aError != CHIP_NO_ERROR)

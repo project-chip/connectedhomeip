@@ -25,7 +25,7 @@
 #       --commissioning-method on-network
 #       --discriminator 1234
 #       --passcode 20202021
-#       --timeout 60
+#       --timeout 30
 #       --endpoint 1
 #       --hex-arg enableKey:000102030405060708090a0b0c0d0e0f
 #       --trace-to json:${TRACE_TEST_JSON}.json
@@ -68,11 +68,6 @@ def current_latch_matcher(current_latch: bool) -> AttributeMatcher:
 
 
 class TC_CLCTRL_6_1(MatterBaseTest):
-    @property
-    def default_timeout(self) -> int:
-        # This test has potentially 45s waits, so set the timeout to 60
-        return 60
-
     async def read_clctrl_attribute_expect_success(self, endpoint, attribute):
         cluster = Clusters.Objects.ClosureControl
         return await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attribute)

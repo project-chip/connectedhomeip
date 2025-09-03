@@ -584,7 +584,9 @@ CHIP_ERROR WebRTCProviderManager::SendOfferCommand(Messaging::ExchangeManager & 
     command.sdp             = CharSpan::fromCharString(mLocalSdp.c_str());
 
     // Now invoke the command using the found session handle
-    return Controller::InvokeCommandRequest(&exchangeMgr, sessionHandle, mOriginatingEndpointId, command, onSuccess, onFailure);
+    return Controller::InvokeCommandRequest(&exchangeMgr, sessionHandle, mOriginatingEndpointId, command, onSuccess, onFailure,
+                                            /* timedInvokeTimeoutMs = */ NullOptional, /* responseTimeout = */ NullOptional,
+                                            /* outCancelFn = */ nullptr, /*allowLargePayload = */ true);
 }
 
 void WebRTCProviderManager::OnLocalDescription(const std::string & sdp, SDPType type)
@@ -659,7 +661,9 @@ CHIP_ERROR WebRTCProviderManager::SendAnswerCommand(Messaging::ExchangeManager &
     command.sdp             = CharSpan::fromCharString(mLocalSdp.c_str());
 
     // Now invoke the command using the found session handle
-    return Controller::InvokeCommandRequest(&exchangeMgr, sessionHandle, mOriginatingEndpointId, command, onSuccess, onFailure);
+    return Controller::InvokeCommandRequest(&exchangeMgr, sessionHandle, mOriginatingEndpointId, command, onSuccess, onFailure,
+                                            /* timedInvokeTimeoutMs = */ NullOptional, /* responseTimeout = */ NullOptional,
+                                            /* outCancelFn = */ nullptr, /*allowLargePayload = */ true);
 }
 
 CHIP_ERROR WebRTCProviderManager::SendICECandidatesCommand(Messaging::ExchangeManager & exchangeMgr,
@@ -693,7 +697,9 @@ CHIP_ERROR WebRTCProviderManager::SendICECandidatesCommand(Messaging::ExchangeMa
     command.ICECandidates = DataModel::List<const ICECandidateStruct>(iceCandidateStructList.data(), iceCandidateStructList.size());
 
     // Now invoke the command using the found session handle
-    return Controller::InvokeCommandRequest(&exchangeMgr, sessionHandle, mOriginatingEndpointId, command, onSuccess, onFailure);
+    return Controller::InvokeCommandRequest(&exchangeMgr, sessionHandle, mOriginatingEndpointId, command, onSuccess, onFailure,
+                                            /* timedInvokeTimeoutMs = */ NullOptional, /* responseTimeout = */ NullOptional,
+                                            /* outCancelFn = */ nullptr, /*allowLargePayload = */ true);
 }
 
 CHIP_ERROR WebRTCProviderManager::AcquireAudioVideoStreams()

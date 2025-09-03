@@ -745,6 +745,9 @@ struct NetworkClusterInfo
 {
     EndpointId endpoint = kInvalidEndpointId;
     app::Clusters::NetworkCommissioning::Attributes::ConnectMaxTimeSeconds::TypeInfo::DecodableType minConnectionTime = 0;
+    // maxScanTime == 0 means we don't know; normal commissioning step timeouts
+    // will apply in that case.
+    app::Clusters::NetworkCommissioning::Attributes::ScanMaxTimeSeconds::TypeInfo::DecodableType maxScanTime = 0;
 };
 struct NetworkClusters
 {

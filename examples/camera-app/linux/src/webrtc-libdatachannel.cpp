@@ -25,6 +25,8 @@ namespace {
 // Constants
 constexpr int kVideoH264PayloadType = 96;
 constexpr int kVideoBitRate         = 3000;
+constexpr int kSSRC                 = 42;
+constexpr int kMaxFragmentSize      = 1188; // 1200 (max packet size) - 12 (RTP header size)
 
 rtc::Description::Type SDPTypeToRtcType(SDPType type)
 {
@@ -104,13 +106,38 @@ const char * GetGatheringStateStr(rtc::PeerConnection::GatheringState state)
 class LibDataChannelTrack : public WebRTCTrack
 {
 public:
-    LibDataChannelTrack(std::shared_ptr<rtc::Track> track) : mTrack(track) {}
+    LibDataChannelTrack(std::shared_ptr<rtc::Track> track) : mTrack(track) { InitH264Packetizer(); }
+    // Initialize libdatachannel's RTP packetizer for H.264
+    void InitH264Packetizer()
+    {
+        // 90 kHz clock for H.264
+        mRtpCfg = std::make_shared<rtc::RtpPacketizationConfig>(kSSRC, "videosrc", kVideoH264PayloadType,
+                                                                rtc::H264RtpPacketizer::ClockRate);
+
+        // Setting MTU size to 1200 as default size used in the libdatachannel is 1400
+        // Pick separator:
+        // - StartSequence : for Annex-B (00 00 01 / 00 00 00 01)
+        // - Length : for 4-byte length-prefixed NAL units
+        mPacketizer = std::make_shared<rtc::H264RtpPacketizer>(rtc::NalUnit::Separator::StartSequence, mRtpCfg, kMaxFragmentSize);
+
+        // RTCP helpers (recommended)
+        mSr   = std::make_shared<rtc::RtcpSrReporter>(mRtpCfg);
+        mNack = std::make_shared<rtc::RtcpNackResponder>();
+        mPacketizer->addToChain(mSr);
+        mPacketizer->addToChain(mNack);
+
+        // Attach handler chain to the sending track
+        mTrack->setMediaHandler(mPacketizer);
+    }
 
     void SendData(const char * data, size_t size) override
     {
         if (mTrack && mTrack->isOpen())
         {
-            mTrack->send(reinterpret_cast<const std::byte *>(data), size);
+            // Feed RAW H.264 access unit. Packetizer does NAL split, FU-A/STAP-A, RTP headers, marker bit, SR/NACK.
+            rtc::binary frame(size);
+            std::memcpy(frame.data(), data, size);
+            mTrack->send(std::move(frame));
         }
         else
         {
@@ -132,6 +159,10 @@ public:
 
 private:
     std::shared_ptr<rtc::Track> mTrack;
+    std::shared_ptr<rtc::RtpPacketizationConfig> mRtpCfg;
+    std::shared_ptr<rtc::H264RtpPacketizer> mPacketizer;
+    std::shared_ptr<rtc::RtcpSrReporter> mSr;
+    std::shared_ptr<rtc::RtcpNackResponder> mNack;
 };
 
 class LibDataChannelPeerConnection : public WebRTCPeerConnection

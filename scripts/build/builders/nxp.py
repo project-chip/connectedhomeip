@@ -52,6 +52,7 @@ class NxpBoard(Enum):
     RT1170 = auto()
     RW61X = auto()
     MCXW71 = auto()
+    MCXW72 = auto()
 
     def Name(self, os_env):
         if self == NxpBoard.RT1060:
@@ -65,6 +66,8 @@ class NxpBoard(Enum):
                 return 'rw61x'
         elif self == NxpBoard.MCXW71:
             return 'mcxw71'
+        elif self == NxpBoard.MCXW72:
+            return 'mcxw72'
         else:
             raise Exception('Unknown board type: %r' % self)
 
@@ -80,6 +83,8 @@ class NxpBoard(Enum):
                 return 'rt/rw61x'
         elif self == NxpBoard.MCXW71:
             return 'mcxw71'
+        elif self == NxpBoard.MCXW72:
+            return 'mcxw72'
         else:
             raise Exception('Unknown board type: %r' % self)
 
@@ -234,6 +239,11 @@ class NxpBuilder(GnBuilder):
             case NxpBoard.MCXW71:
                 if board_variant is NxpBoardVariant.FRDM:
                     return "frdmmcxw71"
+                else:
+                    return "mcxw71evk"
+            case NxpBoard.MCXW72:
+                if board_variant is NxpBoardVariant.FRDM:
+                    return "frdmmcxw72"
                 else:
                     return "mcxw72evk"
 

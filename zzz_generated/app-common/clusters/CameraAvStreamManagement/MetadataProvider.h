@@ -31,8 +31,8 @@ struct ClusterMetadataProvider<DataModel::AttributeEntry, Clusters::CameraAvStre
             return VideoSensorParams::kMetadataEntry;
         case NightVisionUsesInfrared::Id:
             return NightVisionUsesInfrared::kMetadataEntry;
-        case MinViewport::Id:
-            return MinViewport::kMetadataEntry;
+        case MinViewportResolution::Id:
+            return MinViewportResolution::kMetadataEntry;
         case RateDistortionTradeOffPoints::Id:
             return RateDistortionTradeOffPoints::kMetadataEntry;
         case MaxContentBufferSize::Id:

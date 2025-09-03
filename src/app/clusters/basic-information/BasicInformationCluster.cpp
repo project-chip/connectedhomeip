@@ -448,7 +448,6 @@ void BasicInformationCluster::OnStartUp(uint32_t softwareVersion)
 
     DataModel::EventsGenerator & eventsGenerator = mContext->interactionContext.eventsGenerator;
     eventsGenerator.GenerateEvent(event, kRootEndpointId);
-    eventsGenerator.ScheduleUrgentEventDeliverySync();
 }
 
 void BasicInformationCluster::OnShutDown()

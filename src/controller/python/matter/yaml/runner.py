@@ -741,7 +741,7 @@ class NotImplementedAction(BaseAction):
 class ReplTestRunner:
     '''Test runner to encode/decode values from YAML test Parser for executing the TestStep.
 
-    Uses ChipDeviceController from chip-repl to execute parsed YAML TestSteps.
+    Uses ChipDeviceController from matter-repl to execute parsed YAML TestSteps.
     '''
 
     def __init__(self, test_spec_definition, certificate_authority_manager, alpha_dev_ctrl):
@@ -834,7 +834,7 @@ class ReplTestRunner:
         try:
             return DefaultPseudoCluster(test_step)
         except ActionCreationError as e:
-            logger.warn(f"Failed create default pseudo cluster: {e}")
+            logger.warning(f"Failed to create default pseudo cluster: {e}")
             return None
 
     def encode(self, request) -> Optional[BaseAction]:
@@ -870,7 +870,7 @@ class ReplTestRunner:
             action = self._default_pseudo_cluster(request)
 
         if action is None:
-            logger.warn(f"Failed to parse {request.label}")
+            logger.warning(f"Failed to parse {request.label}")
         return action
 
     def decode(self, result: _ActionResult):

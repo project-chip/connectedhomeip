@@ -357,12 +357,12 @@ jobs:
                      --all-clusters-app ./out/linux-x64-all-clusters-${BUILD_VARIANT}/chip-all-clusters-app \
                   "
 
-            - name: Run Tests using chip-repl (skip slow)
+            - name: Run Tests using matter-repl (skip slow)
               if: github.event_name == 'pull_request'
               run: |
                   ./scripts/run_in_python_env.sh out/venv \
                   "./scripts/tests/run_test_suite.py \
-                     --runner chip_repl_python \
+                     --runner matter_repl_python \
                      --exclude-tags MANUAL \
                      --exclude-tags FLAKY \
                      --exclude-tags IN_DEVELOPMENT \
@@ -385,12 +385,12 @@ jobs:
                      --energy-gateway-app ./out/linux-x64-energy-gateway-${BUILD_VARIANT}/chip-energy-gateway-app \
                      --energy-management-app ./out/linux-x64-energy-management-${BUILD_VARIANT}/chip-energy-management-app \
                   "
-            - name: Run Tests using chip-repl (including slow)
+            - name: Run Tests using matter-repl (including slow)
               if: github.event_name == 'push'
               run: |
                   ./scripts/run_in_python_env.sh out/venv \
                   "./scripts/tests/run_test_suite.py \
-                     --runner chip_repl_python \
+                     --runner matter_repl_python \
                      run \
                      --iterations 1 \
                      --test-timeout-seconds 120 \
@@ -863,10 +863,10 @@ jobs:
                   ln -s linux-x64-all-clusters-${BUILD_VARIANT}-clang-test out/linux-x64-all-clusters
 
                   scripts/run_in_python_env.sh out/venv \
-                  "jupyter execute docs/development_controllers/chip-repl/Matter_REPL_Intro.ipynb \
-                  docs/development_controllers/chip-repl/Matter_Basic_Interactions.ipynb \
-                  docs/development_controllers/chip-repl/Matter_Access_Control.ipynb \
-                  docs/development_controllers/chip-repl/Matter_Multi_Fabric_Commissioning.ipynb \
+                  "jupyter execute docs/development_controllers/matter-repl/Matter_REPL_Intro.ipynb \
+                  docs/development_controllers/matter-repl/Matter_Basic_Interactions.ipynb \
+                  docs/development_controllers/matter-repl/Matter_Access_Control.ipynb \
+                  docs/development_controllers/matter-repl/Matter_Multi_Fabric_Commissioning.ipynb \
                   "
 
             - name: Uploading core files

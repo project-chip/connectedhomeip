@@ -152,7 +152,6 @@ Protocols::InteractionModel::Status PushAvStreamTransportManager::DeallocatePush
         ChipLogError(Camera, "PushAvStreamTransportManager, failed to find Connection :[%u]", connectionID);
         return Status::NotFound;
     }
-    mTransportMap[connectionID].reset();
     mMediaController->UnregisterTransport(mTransportMap[connectionID].get());
     mTransportMap.erase(connectionID);
     mTransportOptionsMap.erase(connectionID);
@@ -238,7 +237,19 @@ PushAvStreamTransportManager::ValidateBandwidthLimit(StreamUsageEnum streamUsage
     return Status::Success;
 }
 
-bool PushAvStreamTransportManager::ValidateUrl(std::string url)
+bool PushAvStreamTransportManager::ValidateStreamUsage(StreamUsageEnum streamUsage)
+{
+    // TODO: if StreamUsage is present in the StreamUsagePriorities list, return true, false otherwise
+    return true;
+}
+
+bool PushAvStreamTransportManager::ValidateSegmentDuration(uint16_t segmentDuration)
+{
+    // TODO: if Segment Duration is multiple of KeyFrameInterval, return true, false otherwise
+    return true;
+}
+
+bool PushAvStreamTransportManager::ValidateUrl(const std::string & url)
 {
     const std::string https = "https://";
 
