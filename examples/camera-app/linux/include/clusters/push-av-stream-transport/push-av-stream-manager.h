@@ -23,6 +23,8 @@
 #include <camera-device-interface.h>
 #include <media-controller.h>
 #include <pushav-transport.h>
+#include <app/clusters/tls-client-management-server/tls-client-management-server.h>
+#include <app/clusters/tls-certificate-management-server/tls-certificate-management-server.h>
 
 #include <unordered_map>
 #include <vector>
@@ -48,7 +50,13 @@ class PushAvStreamTransportManager : public PushAvStreamTransportDelegate
 public:
     PushAvStreamTransportManager() = default;
     ~PushAvStreamTransportManager();
-
+    void SetTlsClientManagementDelegate(TlsClientManagementDelegate * aTLSClientManagementDelegate)
+    {
+        mTLSClientManagementDelegate  = aTLSClientManagementDelegate;
+    }
+    void SetTlsCertificateManagementDelegate(TlsCertificateManagementDelegate * aTLSClientManagementDelegate ){
+        mTlsCertificateManagementDelegate  = aTLSClientManagementDelegate;
+    }
     void Init();
     void SetMediaController(MediaController * mediaController);
     void SetCameraDevice(CameraDeviceInterface * cameraDevice);
@@ -108,6 +116,8 @@ private:
     VideoStreamStruct mVideoStreamParams;
     std::unordered_map<uint16_t, std::unique_ptr<PushAVTransport>> mTransportMap; // map for the transport objects
     std::unordered_map<uint16_t, TransportOptionsStruct> mTransportOptionsMap;    // map for the transport options
+    TlsClientManagementDelegate * mTLSClientManagementDelegate = nullptr;
+    TlsCertificateManagementDelegate * mTlsCertificateManagementDelegate = nullptr;
 };
 
 } // namespace PushAvStreamTransport

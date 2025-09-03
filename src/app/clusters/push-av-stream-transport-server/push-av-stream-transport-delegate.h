@@ -23,6 +23,7 @@
 #include <app/clusters/push-av-stream-transport-server/push-av-stream-transport-storage.h>
 #include <protocols/interaction_model/StatusCode.h>
 #include <vector>
+#include <app/clusters/tls-client-management-server/tls-client-management-server.h>
 
 namespace chip {
 namespace app {
@@ -259,6 +260,16 @@ public:
      * @return CHIP_ERROR indicating success or failure
      */
     virtual CHIP_ERROR PersistentAttributesLoadedCallback() = 0;
+
+    /**
+     * @brief Sets TlsClientManagementDelegate to PushAvStreamTransportDelegate.
+     *
+     * @param aTLSClientManagementDelegate The pointer to TLS Client Management Delegate
+     */
+    virtual void SetTlsClientManagementDelegate(TlsClientManagementDelegate * aTLSClientManagementDelegate) = 0;
+
+protected:
+    EndpointId mEndpointId = kInvalidEndpointId;
 };
 } // namespace Clusters
 } // namespace app

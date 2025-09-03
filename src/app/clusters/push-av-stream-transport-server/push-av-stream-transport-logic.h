@@ -29,6 +29,10 @@ public:
             ChipLogError(Zcl, "Push AV Stream Transport : Trying to set delegate to null");
             return;
         }
+        mDelegate->SetEndpointId(aEndpoint);
+        if(mTLSClientManagementDelegate!=nullptr){
+            mDelegate->SetTlsClientManagementDelegate(mTLSClientManagementDelegate);
+        }
     }
 
     void SetTLSClientManagementDelegate(TlsClientManagementDelegate * delegate)
@@ -38,6 +42,9 @@ public:
         {
             ChipLogError(Zcl, "Push AV Stream Transport : Trying to set TLS Client Management delegate to null");
             return;
+        }
+        if(mDelegate!=nullptr){
+            mDelegate->SetTlsClientManagementDelegate(delegate);
         }
     }
 
