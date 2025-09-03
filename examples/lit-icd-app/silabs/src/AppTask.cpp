@@ -35,7 +35,6 @@
 
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/ids/Clusters.h>
-#include <app/clusters/boolean-state-server/CodegenIntegration.h>
 #include <app/server/Server.h>
 #include <app/util/attribute-storage.h>
 #include <assert.h>
@@ -45,6 +44,10 @@
 #include <setup_payload/OnboardingCodesUtil.h>
 #include <setup_payload/QRCodeSetupPayloadGenerator.h>
 #include <setup_payload/SetupPayload.h>
+
+// TODO: Ideally we should not depend on the codegen integration
+// It would be best if we could use generic cluster API instead
+#include <app/clusters/boolean-state-server/CodegenIntegration.h>
 
 /**********************************************************
  * Defines and Constants
@@ -121,9 +124,13 @@ void AppTask::ApplicationEventHandler(AppEvent * aEvent)
     // The goal of the app is just to enable testing of LIT ICD features without impacting product sample apps.
     PlatformMgr().ScheduleWork([](intptr_t) {
         bool state{ false };
-        chip::app::Clusters::BooleanState::GetStateValue(1, state);
-        EventNumber eventNumber;
-        chip::app::Clusters::BooleanState::SetStateValue(1, !state, eventNumber);
+        auto booleanState = chip::app::Clusters::BooleanState::GetClusterForEndpointIndex(1);
+        if (booleanState != nullptr)
+        {
+            state = booleanState->GetStateValue();
+            EventNumber eventNumber;
+            booleanState->SetStateValue(!state, eventNumber);
+        }
     });
 }
 

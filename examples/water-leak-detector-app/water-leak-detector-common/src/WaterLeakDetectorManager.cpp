@@ -19,9 +19,12 @@
 #include "WaterLeakDetectorManager.h"
 
 #include <app-common/zap-generated/attributes/Accessors.h>
-#include <app/clusters/boolean-state-server/CodegenIntegration.h>
 #include <lib/core/ErrorStr.h>
 #include <lib/support/logging/CHIPLogging.h>
+
+// TODO: Ideally we should not depend on the codegen integration
+// It would be best if we could use generic cluster API instead
+#include <app/clusters/boolean-state-server/CodegenIntegration.h>
 
 using namespace chip;
 using namespace chip::app;
@@ -42,7 +45,11 @@ void WaterLeakDetectorManager::InitInstance(EndpointId endpoint)
 
 void WaterLeakDetectorManager::OnLeakDetected(bool detected)
 {
-    EventNumber eventNumber;
-    chip::app::Clusters::BooleanState::SetStateValue(mEndpointId, detected, eventNumber);
-    ChipLogDetail(NotSpecified, "Leak status updated to: %d", detected);
+    auto booleanState = BooleanState::GetClusterForEndpointIndex(mEndpointId);
+    if (booleanState != nullptr)
+    {
+        EventNumber eventNumber;
+        booleanState->SetStateValue(detected, eventNumber);
+        ChipLogDetail(NotSpecified, "Leak status updated to: %d", detected);
+    }
 }

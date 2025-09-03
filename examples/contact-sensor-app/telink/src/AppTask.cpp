@@ -20,6 +20,9 @@
 #include "LEDManager.h"
 
 #include <app-common/zap-generated/attributes/Accessors.h>
+
+// TODO: Ideally we should not depend on the codegen integration
+// It would be best if we could use generic cluster API instead
 #include <app/clusters/boolean-state-server/CodegenIntegration.h>
 
 #include <zephyr/kernel.h>
@@ -81,8 +84,12 @@ void AppTask::UpdateClusterStateInternal(intptr_t arg)
 
     ChipLogProgress(NotSpecified, "StateValue::Set : %d", newValue);
 
-    EventNumber eventNumber;
-    app::Clusters::BooleanState::SetStateValue(1, newValue, eventNumber);
+    auto booleanState = chip::app::Clusters::BooleanState::GetClusterForEndpointIndex(1);
+    if (booleanState != nullptr)
+    {
+        EventNumber eventNumber;
+        booleanState->SetStateValue(newValue, eventNumber);
+    }
 }
 
 void AppTask::ContactActionEventHandler(AppEvent * aEvent)
@@ -134,7 +141,12 @@ void AppTask::UpdateDeviceState(void)
 void AppTask::UpdateDeviceStateInternal(intptr_t arg)
 {
     bool stateValueAttrValue{ false };
-    app::Clusters::BooleanState::GetStateValue(1, stateValueAttrValue);
+
+    auto booleanState = chip::app::Clusters::BooleanState::GetClusterForEndpointIndex(1);
+    if (booleanState != nullptr)
+    {
+        stateValueAttrValue = booleanState->GetStateValue();
+    }
 
     LedManager::getInstance().setLed(LedManager::EAppLed_App0, stateValueAttrValue);
 }

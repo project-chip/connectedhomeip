@@ -21,8 +21,11 @@
 
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app/InteractionModelEngine.h>
-#include <app/clusters/boolean-state-server/CodegenIntegration.h>
 #include <platform/CHIPDeviceLayer.h>
+
+// TODO: Ideally we should not depend on the codegen integration
+// It would be best if we could use generic cluster API instead
+#include <app/clusters/boolean-state-server/CodegenIntegration.h>
 
 #ifndef APP_DEVICE_TYPE_ENDPOINT
 #define APP_DEVICE_TYPE_ENDPOINT 1
@@ -49,16 +52,28 @@ ContactSensorApp::AppTask & ContactSensorApp::AppTask::GetDefaultInstance()
 bool ContactSensorApp::AppTask::CheckStateClusterHandler(void)
 {
     bool val{ false };
-    BooleanState::GetStateValue(APP_DEVICE_TYPE_ENDPOINT, val);
+    auto booleanState = BooleanState::GetClusterForEndpointIndex(APP_DEVICE_TYPE_ENDPOINT);
+    if (booleanState != nullptr)
+    {
+        val = booleanState->GetStateValue();
+    }
     return val;
 }
 
 CHIP_ERROR ContactSensorApp::AppTask::ProcessSetStateClusterHandler(void)
 {
     bool val{ false };
-    BooleanState::GetStateValue(APP_DEVICE_TYPE_ENDPOINT, val);
-    chip::EventNumber eventNumber;
-    return BooleanState::SetStateValue(APP_DEVICE_TYPE_ENDPOINT, !val, eventNumber);
+
+    auto booleanState = BooleanState::GetClusterForEndpointIndex(APP_DEVICE_TYPE_ENDPOINT);
+    if (booleanState != nullptr)
+    {
+        val = booleanState->GetStateValue();
+
+        chip::EventNumber eventNumber;
+        return booleanState->SetStateValue(!val, eventNumber);
+    }
+
+    return CHIP_INVALID_ARGUMENT;
 }
 
 chip::NXP::App::AppTaskBase & chip::NXP::App::GetAppTask()

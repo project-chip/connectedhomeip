@@ -22,9 +22,6 @@
 
 namespace chip::app::Clusters::BooleanState {
 
-CHIP_ERROR SetStateValue(EndpointId endpointId, const Attributes::StateValue::TypeInfo::Type & stateValue,
-                         EventNumber & eventNumber);
-
-CHIP_ERROR GetStateValue(EndpointId endpointId, Attributes::StateValue::TypeInfo::Type & stateValue);
+BooleanStateCluster * GetClusterForEndpointIndex(EndpointId endpointId);
 
 } // namespace chip::app::Clusters::BooleanState

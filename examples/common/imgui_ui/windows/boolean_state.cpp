@@ -22,6 +22,9 @@
 
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/cluster-enums.h>
+
+// TODO: Ideally we should not depend on the codegen integration
+// It would be best if we could use generic cluster API instead
 #include <app/clusters/boolean-state-server/CodegenIntegration.h>
 
 namespace example {
@@ -30,14 +33,18 @@ namespace Windows {
 
 void BooleanState::UpdateState()
 {
-    if (mTargetState.HasValue())
+    auto booleanState = chip::app::Clusters::BooleanState::GetClusterForEndpointIndex(mEndpointId);
+    if (booleanState != nullptr)
     {
-        chip::EventNumber eventNumber;
-        chip::app::Clusters::BooleanState::SetStateValue(mEndpointId, mTargetState.Value(), eventNumber);
-        mTargetState.ClearValue();
-    }
+        if (mTargetState.HasValue())
+        {
+            chip::EventNumber eventNumber;
+            booleanState->SetStateValue(mTargetState.Value(), eventNumber);
+            mTargetState.ClearValue();
+        }
 
-    chip::app::Clusters::BooleanState::GetStateValue(mEndpointId, mState);
+        mState = booleanState->GetStateValue();
+    }
 }
 
 void BooleanState::Render()

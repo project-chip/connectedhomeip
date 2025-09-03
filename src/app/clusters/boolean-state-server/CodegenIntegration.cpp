@@ -83,21 +83,12 @@ void MatterBooleanStateClusterServerShutdownCallback(EndpointId endpointId)
 
 namespace chip::app::Clusters::BooleanState {
 
-CHIP_ERROR SetStateValue(EndpointId endpointId, const StateValue::TypeInfo::Type & stateValue, EventNumber & eventNumber)
+BooleanStateCluster * GetClusterForEndpointIndex(EndpointId endpointId)
 {
     uint16_t arrayIndex = 0;
-    VerifyOrReturnError(FindEndpointWithLog(endpointId, arrayIndex), CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(FindEndpointWithLog(endpointId, arrayIndex), nullptr);
 
-    return gServers[arrayIndex].Cluster().SetStateValue(stateValue, eventNumber);
-}
-
-CHIP_ERROR GetStateValue(EndpointId endpointId, Attributes::StateValue::TypeInfo::Type & stateValue)
-{
-    uint16_t arrayIndex = 0;
-    VerifyOrReturnError(FindEndpointWithLog(endpointId, arrayIndex), CHIP_ERROR_INVALID_ARGUMENT);
-
-    stateValue = gServers[arrayIndex].Cluster().GetStateValue();
-    return CHIP_NO_ERROR;
+    return &gServers[arrayIndex].Cluster();
 }
 
 } // namespace chip::app::Clusters::BooleanState

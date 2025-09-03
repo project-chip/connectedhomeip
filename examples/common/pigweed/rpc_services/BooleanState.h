@@ -22,8 +22,11 @@
 #include "boolean_state_service/boolean_state_service.rpc.pb.h"
 #include "pigweed/rpc_services/internal/StatusUtils.h"
 #include <app-common/zap-generated/attributes/Accessors.h>
-#include <app/clusters/boolean-state-server/CodegenIntegration.h>
 #include <platform/PlatformManager.h>
+
+// TODO: Ideally we should not depend on the codegen integration
+// It would be best if we could use generic cluster API instead
+#include <app/clusters/boolean-state-server/CodegenIntegration.h>
 
 namespace chip {
 namespace rpc {
@@ -35,14 +38,19 @@ public:
 
     virtual pw::Status Set(const chip_rpc_BooleanStateSetRequest & request, chip_rpc_BooleanStateSetResponse & response)
     {
-        bool newState = request.state_value;
+        EndpointId endpointId = request.endpoint_id;
+        bool newState         = request.state_value;
 
         EventNumber eventNumber;
         {
             DeviceLayer::StackLock lock;
 
-            EventNumber eventNumber;
-            RETURN_STATUS_IF_NOT_OK(app::Clusters::BooleanState::SetStateValue(endpointId, newState, eventNumber));
+            auto booleanState = app::Clusters::BooleanState::GetClusterForEndpointIndex(endpointId);
+            if (booleanState != nullptr)
+            {
+                EventNumber eventNumber;
+                RETURN_STATUS_IF_NOT_OK(booleanState->SetStateValue(newState, eventNumber));
+            }
         }
 
         response.event_number = static_cast<uint64_t>(eventNumber);
@@ -56,7 +64,12 @@ public:
 
         {
             DeviceLayer::StackLock lock;
-            app::Clusters::BooleanState::GetStateValue(endpointId, state_value);
+
+            auto booleanState = app::Clusters::BooleanState::GetClusterForEndpointIndex(endpointId);
+            if (booleanState != nullptr)
+            {
+                state_value = booleanState->GetStateValue();
+            }
         }
 
         response.state.state_value = state_value;

@@ -19,8 +19,11 @@
 #include "DeviceWithDisplay.h"
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/ids/Clusters.h>
-#include <app/clusters/boolean-state-server/CodegenIntegration.h>
 #include <setup_payload/QRCodeSetupPayloadGenerator.h>
+
+// TODO: Ideally we should not depend on the codegen integration
+// It would be best if we could use generic cluster API instead
+#include <app/clusters/boolean-state-server/CodegenIntegration.h>
 
 #include <string>
 #include <tuple>
@@ -540,8 +543,12 @@ void SetupPretendDevices()
     AddEndpoint("External");
     AddCluster("Contact Sensor");
     AddAttribute("Contact", "true");
-    EventNumber eventNumber;
-    app::Clusters::BooleanState::SetStateValue(1, true, eventNumber);
+    auto booleanState = app::Clusters::BooleanState::GetClusterForEndpointIndex(1);
+    if (booleanState != nullptr)
+    {
+        EventNumber eventNumber;
+        booleanState->SetStateValue(true, eventNumber);
+    }
 
     AddDevice("Thermostat");
     AddEndpoint("1");

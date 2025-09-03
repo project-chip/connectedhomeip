@@ -18,7 +18,6 @@
 
 #include <app-common/zap-generated/attributes/Accessors.h>
 
-#include <app/clusters/boolean-state-server/CodegenIntegration.h>
 #include <app/server/Dnssd.h>
 #include <app/server/Server.h>
 #include <credentials/DeviceAttestationCredsProvider.h>
@@ -26,6 +25,10 @@
 #include <platform/bouffalolab/common/DiagnosticDataProviderImpl.h>
 #include <setup_payload/OnboardingCodesUtil.h>
 #include <system/SystemClock.h>
+
+// TODO: Ideally we should not depend on the codegen integration
+// It would be best if we could use generic cluster API instead
+#include <app/clusters/boolean-state-server/CodegenIntegration.h>
 
 #if HEAP_MONITORING
 #include "MemMonitoring.h"
@@ -201,15 +204,25 @@ void AppTask::AppTaskMain(void * pvParameter)
             if (APP_EVENT_CONTACT_SENSOR_TRUE & appEvent)
             {
                 stateValueAttrValue = 1;
-                EventNumber eventNumber;
-                app::Clusters::BooleanState::SetStateValue(1, stateValueAttrValue, eventNumber);
+
+                auto booleanState = app::Clusters::BooleanState::GetClusterForEndpointIndex(1);
+                if (booleanState != nullptr)
+                {
+                    EventNumber eventNumber;
+                    booleanState->SetStateValue(stateValueAttrValue, eventNumber);
+                }
             }
 
             if (APP_EVENT_CONTACT_SENSOR_FALSE & appEvent)
             {
                 stateValueAttrValue = 0;
-                EventNumber eventNumber;
-                app::Clusters::BooleanState::SetStateValue(1, stateValueAttrValue, eventNumber);
+
+                auto booleanState = app::Clusters::BooleanState::GetClusterForEndpointIndex(1);
+                if (booleanState != nullptr)
+                {
+                    EventNumber eventNumber;
+                    booleanState->SetStateValue(stateValueAttrValue, eventNumber);
+                }
             }
 
             PlatformMgr().UnlockChipStack();
