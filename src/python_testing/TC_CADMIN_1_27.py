@@ -30,7 +30,6 @@
 #       --trace-to json:${TRACE_TEST_JSON}.json
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 #     factory-reset: true
-#     quiet: true
 # === END CI TEST ARGUMENTS ===
 
 import base64
@@ -38,6 +37,7 @@ import logging
 import os
 import random
 import tempfile
+import time
 from configparser import ConfigParser
 
 from mobly import asserts
@@ -50,12 +50,13 @@ from matter.testing.apps import AppServerSubprocess, JFControllerSubprocess
 from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 
 
-class TC_JCM_1_1(MatterBaseTest):
+class TC_CADMIN_1_27(MatterBaseTest):
 
     @async_test_body
     async def setup_class(self):
         super().setup_class()
 
+        # self.captured_lines = []
         self.fabric_a_ctrl = None
         self.storage_fabric_a = self.user_params.get("fabric_a_storage", None)
         self.fabric_b_ctrl = None
@@ -99,7 +100,7 @@ class TC_JCM_1_1(MatterBaseTest):
         self.jfadmin_fabric_a_passcode = random.randint(110220011, 110220999)
         self.jfctrl_fabric_a_vid = random.randint(0x0001, 0xFFF0)
 
-        # Start Fabric A JF-Administrator App
+        # Start Fabric A JF-Administrator App (DUT)
         self.fabric_a_admin = AppServerSubprocess(
             jfa_server_app,
             storage_dir=self.storage_fabric_a,
@@ -150,6 +151,23 @@ class TC_JCM_1_1(MatterBaseTest):
         }
         # Extract CATs to be provided to the Python Controller later
         self.ecoACATs = base64.b64decode(jfcStorage.get("Default", "CommissionerCATs"))[::-1].hex().strip('0')
+
+        self.thserver_fabric_a_passcode = random.randint(110220011, 110220999)
+        self.fabric_a_server_app = AppServerSubprocess(
+            self.th_server_app,
+            storage_dir=self.storage_fabric_a,
+            port=random.randint(5001, 5999),
+            discriminator=random.randint(0, 4095),
+            passcode=self.thserver_fabric_a_passcode,
+            extra_args=["--capabilities", "0x04"])
+        self.fabric_a_server_app.start(
+            expected_output="Server initialization complete",
+            timeout=10)
+
+        self.fabric_a_ctrl.send(
+            message=f"pairing onnetwork 2 {self.thserver_fabric_a_passcode}",
+            expected_output="[CTL] Commissioning complete for node ID 0x0000000000000002: success",
+            timeout=10)
 
         #####################################################################################################################################
         #
@@ -211,6 +229,23 @@ class TC_JCM_1_1(MatterBaseTest):
         # Extract CATs to be provided to the Python Controller later
         self.ecoBCATs = base64.b64decode(jfcStorage.get("Default", "CommissionerCATs"))[::-1].hex().strip('0')
 
+        self.thserver_fabric_b_passcode = random.randint(110220011, 110220999)
+        self.fabric_b_server_app = AppServerSubprocess(
+            self.th_server_app,
+            storage_dir=self.storage_fabric_b,
+            port=random.randint(5001, 5999),
+            discriminator=random.randint(0, 4095),
+            passcode=self.thserver_fabric_b_passcode,
+            extra_args=["--capabilities", "0x04"])
+        self.fabric_b_server_app.start(
+            expected_output="Server initialization complete",
+            timeout=10)
+
+        self.fabric_b_ctrl.send(
+            message=f"pairing onnetwork 22 {self.thserver_fabric_b_passcode}",
+            expected_output="[CTL] Commissioning complete for node ID 0x0000000000000016: success",
+            timeout=10)
+
     def teardown_class(self):
         # Stop all Subprocesses that were started in this test case
         if self.fabric_a_admin is not None:
@@ -225,23 +260,36 @@ class TC_JCM_1_1(MatterBaseTest):
             self.fabric_a_server_app.terminate()
         if self.fabric_b_server_app is not None:
             self.fabric_b_server_app.terminate()
+        if self.th3_fabric_a_server_app is not None:
+            self.th3_fabric_a_server_app.terminate()
 
         super().teardown_class()
 
-    def steps_TC_JCM_1_1(self) -> list[TestStep]:
+    def steps_TC_CADMIN_1_27(self) -> list[TestStep]:
+        # Steps 1 and 2 from Test Plan are done in setup class
         return [
-            TestStep("1", "Verify VID on the JFAdmin app on both Ecosystems",
-                     "Expect the VID to be the one configured by the jfc-app on each fabric"),
-            TestStep("2", "Verify NOCs of both JF-Admin apps from Ecosystem A and Ecosystem B have the Anchor CAT and Administrator CAT",
+            TestStep("1", "[PRECONDITION 2] Verify NOCs of both JF-Admin apps from Ecosystem A and Ecosystem B have the Anchor CAT and Administrator CAT",
                      "Expect each Admin app to generate the correct CATs"),
+            TestStep("2", "[PRECONDITION 3] Verify VID on the JFAdmin app on both Ecosystems",
+                     "Expect the VID to be the one configured by the jfc-app on each fabric"),
             TestStep("3", "Commission a server app in Ecosystem A",
                      "Check the correct Vendor ID and Administrator CATs have been installed on the server app"),
             TestStep("4", "Commission a server app in Ecosystem B",
-                     "Check the correct Vendor ID and Administrator CATs have been installed on the server app")
+                     "Check the correct Vendor ID and Administrator CATs have been installed on the server app"),
+            TestStep("5", "Open Joint Commissioning Window on Ecosystem B Administrator",
+                     "OCJW is executed with success"),
+            TestStep("6", "[Test Plan steps 4-10] DUT start the Joint Commissioning Method with Ecosystem B Administrator",
+                     "EcoB Admin is successfully commissioned into Fabric A"),
+            TestStep("7", "EcoA CTRL read ProductID from EcoB Harness device",
+                     "Verify value is in range [1,65534]"),
+            TestStep("8", "EcoA CTRL commission a new Harness device TH3 into Joint Fabric",
+                     "TH3 is commissioned with success"),
+            TestStep("9", "EcoA CTRL read ProductID from EcoB TH3 device",
+                     "Verify value is in range [1,65534]")
         ]
 
     @async_test_body
-    async def test_TC_JCM_1_1(self):
+    async def test_TC_CADMIN_1_27(self):
 
         # Creating a Controller for Ecosystem A
         _fabric_a_persistent_storage = VolatileTemporaryPersistentStorage(
@@ -268,23 +316,6 @@ class TC_JCM_1_1(MatterBaseTest):
             catTags=[int(self.ecoBCATs, 16)])
 
         self.step("1")
-        response = await devCtrlEcoA.ReadAttribute(
-            nodeid=1, attributes=[(0, Clusters.OperationalCredentials.Attributes.Fabrics)],
-            returnClusterObject=True)
-        asserts.assert_equal(
-            self.jfctrl_fabric_a_vid,
-            response[0][Clusters.OperationalCredentials].fabrics[0].vendorID,
-            "JF-Admin App on Ecosystem A doesn't have the correct VID")
-
-        response = await devCtrlEcoB.ReadAttribute(
-            nodeid=11, attributes=[(0, Clusters.OperationalCredentials.Attributes.Fabrics)],
-            returnClusterObject=True)
-        asserts.assert_equal(
-            self.jfctrl_fabric_b_vid,
-            response[0][Clusters.OperationalCredentials].fabrics[0].vendorID,
-            "JF-Admin App on Ecosystem A doesn't have the correct VID")
-
-        self.step("2")
         response = await devCtrlEcoA.ReadAttribute(
             nodeid=1, attributes=[(0, Clusters.OperationalCredentials.Attributes.NOCs)],
             returnClusterObject=True)
@@ -334,24 +365,24 @@ class TC_JCM_1_1(MatterBaseTest):
                 break
         asserts.assert_true(_found, "Anchor ICAC (jf-anchor-icac) not found in Admin App ICAC Subject field on Ecosystem A")
 
+        self.step("2")
+        response = await devCtrlEcoA.ReadAttribute(
+            nodeid=1, attributes=[(0, Clusters.OperationalCredentials.Attributes.Fabrics)],
+            returnClusterObject=True)
+        asserts.assert_equal(
+            self.jfctrl_fabric_a_vid,
+            response[0][Clusters.OperationalCredentials].fabrics[0].vendorID,
+            "JF-Admin App on Ecosystem A doesn't have the correct VID")
+
+        response = await devCtrlEcoB.ReadAttribute(
+            nodeid=11, attributes=[(0, Clusters.OperationalCredentials.Attributes.Fabrics)],
+            returnClusterObject=True)
+        asserts.assert_equal(
+            self.jfctrl_fabric_b_vid,
+            response[0][Clusters.OperationalCredentials].fabrics[0].vendorID,
+            "JF-Admin App on Ecosystem A doesn't have the correct VID")
+
         self.step("3")
-        self.thserver_fabric_a_passcode = random.randint(110220011, 110220999)
-        self.fabric_a_server_app = AppServerSubprocess(
-            self.th_server_app,
-            storage_dir=self.storage_fabric_a,
-            port=random.randint(5001, 5999),
-            discriminator=random.randint(0, 4095),
-            passcode=self.thserver_fabric_a_passcode,
-            extra_args=["--capabilities", "0x04"])
-        self.fabric_a_server_app.start(
-            expected_output="Server initialization complete",
-            timeout=10)
-
-        self.fabric_a_ctrl.send(
-            message=f"pairing onnetwork 2 {self.thserver_fabric_a_passcode}",
-            expected_output="[CTL] Commissioning complete for node ID 0x0000000000000002: success",
-            timeout=10)
-
         response = await devCtrlEcoA.ReadAttribute(
             nodeid=2, attributes=[(0, Clusters.OperationalCredentials.Attributes.Fabrics)],
             returnClusterObject=True)
@@ -369,23 +400,6 @@ class TC_JCM_1_1(MatterBaseTest):
             "EcoA Server App Subjects field has wrong value")
 
         self.step("4")
-        self.thserver_fabric_b_passcode = random.randint(110220011, 110220999)
-        self.fabric_b_server_app = AppServerSubprocess(
-            self.th_server_app,
-            storage_dir=self.storage_fabric_b,
-            port=random.randint(5001, 5999),
-            discriminator=random.randint(0, 4095),
-            passcode=self.thserver_fabric_b_passcode,
-            extra_args=["--capabilities", "0x04"])
-        self.fabric_b_server_app.start(
-            expected_output="Server initialization complete",
-            timeout=10)
-
-        self.fabric_b_ctrl.send(
-            message=f"pairing onnetwork 22 {self.thserver_fabric_b_passcode}",
-            expected_output="[CTL] Commissioning complete for node ID 0x0000000000000016: success",
-            timeout=10)
-
         response = await devCtrlEcoB.ReadAttribute(
             nodeid=22, attributes=[(0, Clusters.OperationalCredentials.Attributes.Fabrics)],
             returnClusterObject=True)
@@ -401,6 +415,58 @@ class TC_JCM_1_1(MatterBaseTest):
             int('0xFFFFFFFD'+self.ecoBCATs, 16),
             response[0][Clusters.AccessControl].acl[0].subjects[0],
             "EcoA Server App Subjects field has wrong value")
+
+        self.step("5")
+        try:
+            response = await devCtrlEcoB.OpenJointCommissioningWindow(
+                nodeid=11,
+                endpointId=1,
+                timeout=400,
+                iteration=random.randint(1000, 100000),
+                discriminator=random.randint(0, 4095)
+            )
+        except Exception as e:
+            asserts.assert_true(False, f'Exception {e} occured during OJCW')
+
+        self.step("6")
+        _nodeID = 15
+        self.fabric_a_ctrl.send(
+            message=f"pairing onnetwork {_nodeID} {response.setupPinCode} --jcm true",
+            expected_output=f"[JF] Joint Commissioning Method (nodeId={_nodeID}) success",
+            timeout=10)
+
+        self.step("7")
+        # TODO: Uncomment step once https://github.com/project-chip/connectedhomeip/issues/40836 is fixed
+        # response = await devCtrlEcoA.ReadAttribute(
+        #     nodeid=22, attributes=[(0, Clusters.BasicInformation.Attributes.ProductID)],
+        #     returnClusterObject=True)
+        # asserts.assert_in(response[0][Clusters.BasicInformation].productID,
+        #                   range(1, 65535), "Invalid Product ID for node 22 on Joint Fabric")
+
+        self.step("8")
+        self.th3_server_fabric_a_passcode = random.randint(110220011, 110220999)
+        self.th3_fabric_a_server_app = AppServerSubprocess(
+            self.th_server_app,
+            storage_dir=self.storage_fabric_a,
+            port=random.randint(5001, 5999),
+            discriminator=random.randint(0, 4095),
+            passcode=self.th3_server_fabric_a_passcode,
+            extra_args=["--capabilities", "0x04"])
+        self.th3_fabric_a_server_app.start(
+            expected_output="Server initialization complete",
+            timeout=10)
+
+        self.fabric_a_ctrl.send(
+            message=f"pairing onnetwork 3 {self.th3_server_fabric_a_passcode}",
+            expected_output="[CTL] Commissioning complete for node ID 0x0000000000000003: success",
+            timeout=10)
+
+        self.step("9")
+        response = await devCtrlEcoA.ReadAttribute(
+            nodeid=3, attributes=[(0, Clusters.BasicInformation.Attributes.ProductID)],
+            returnClusterObject=True)
+        asserts.assert_in(response[0][Clusters.BasicInformation].productID,
+                          range(1, 65535), "Invalid Product ID for node 3 on Ecosystem B")
 
         # Shutdown the Python Controllers started at the beginning of this script
         devCtrlEcoA.Shutdown()

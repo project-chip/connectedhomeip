@@ -29,7 +29,6 @@
 #       --trace-to json:${TRACE_TEST_JSON}.json
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 #     factory-reset: true
-#     quiet: true
 # === END CI TEST ARGUMENTS ===
 
 import base64
@@ -49,7 +48,7 @@ from matter.testing.apps import AppServerSubprocess, JFControllerSubprocess
 from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 
 
-class TC_JCM_1_2(MatterBaseTest):
+class TC_CADMIN_1_28(MatterBaseTest):
 
     @async_test_body
     async def setup_class(self):
@@ -59,6 +58,8 @@ class TC_JCM_1_2(MatterBaseTest):
         self.storage_fabric_a = self.user_params.get("fabric_a_storage", None)
         self.fabric_b_ctrl = None
         self.storage_fabric_b = self.user_params.get("fabric_b_storage", None)
+        self.fabric_a_server_app = None
+        self.fabric_b_server_app = None
 
         jfc_server_app = self.user_params.get("jfc_server_app", None)
         if not jfc_server_app:
@@ -71,6 +72,12 @@ class TC_JCM_1_2(MatterBaseTest):
             asserts.fail("This test requires a Joint Fabrics Admin app. Specify app path with --string-arg jfa_server_app:<path_to_app>")
         if not os.path.exists(jfa_server_app):
             asserts.fail(f"The path {jfa_server_app} does not exist")
+
+        self.th_server_app = self.user_params.get("th_server_app", None)
+        if not self.th_server_app:
+            asserts.fail("This test requires a TH Server app. Specify app path with --string-arg th_server_app:<path_to_app>")
+        if not os.path.exists(self.th_server_app):
+            asserts.fail(f"The path {self.th_server_app} does not exist")
 
         # Create a temporary storage directory for both ecosystems to keep KVS files if not already provided by user.
         if self.storage_fabric_a is None:
@@ -143,6 +150,23 @@ class TC_JCM_1_2(MatterBaseTest):
         # Extract CATs to be provided to the Python Controller later
         self.ecoACATs = base64.b64decode(jfcStorage.get("Default", "CommissionerCATs"))[::-1].hex().strip('0')
 
+        self.thserver_fabric_a_passcode = random.randint(110220011, 110220999)
+        self.fabric_a_server_app = AppServerSubprocess(
+            self.th_server_app,
+            storage_dir=self.storage_fabric_a,
+            port=random.randint(5001, 5999),
+            discriminator=random.randint(0, 4095),
+            passcode=self.thserver_fabric_a_passcode,
+            extra_args=["--capabilities", "0x04"])
+        self.fabric_a_server_app.start(
+            expected_output="Server initialization complete",
+            timeout=10)
+
+        self.fabric_a_ctrl.send(
+            message=f"pairing onnetwork 2 {self.thserver_fabric_a_passcode}",
+            expected_output="[CTL] Commissioning complete for node ID 0x0000000000000002: success",
+            timeout=10)
+
         #####################################################################################################################################
         #
         # Initialize Ecosystem B
@@ -204,6 +228,23 @@ class TC_JCM_1_2(MatterBaseTest):
         # Extract CATs to be provided to the Python Controller later
         self.ecoBCATs = base64.b64decode(jfcStorage.get("Default", "CommissionerCATs"))[::-1].hex().strip('0')
 
+        self.thserver_fabric_b_passcode = random.randint(110220011, 110220999)
+        self.fabric_b_server_app = AppServerSubprocess(
+            self.th_server_app,
+            storage_dir=self.storage_fabric_b,
+            port=random.randint(5001, 5999),
+            discriminator=random.randint(0, 4095),
+            passcode=self.thserver_fabric_b_passcode,
+            extra_args=["--capabilities", "0x04"])
+        self.fabric_b_server_app.start(
+            expected_output="Server initialization complete",
+            timeout=10)
+
+        self.fabric_b_ctrl.send(
+            message=f"pairing onnetwork 22 {self.thserver_fabric_b_passcode}",
+            expected_output="[CTL] Commissioning complete for node ID 0x0000000000000016: success",
+            timeout=10)
+
     def teardown_class(self):
         # Stop all Subprocesses that were started in this test case
         if self.fabric_a_admin is not None:
@@ -214,21 +255,28 @@ class TC_JCM_1_2(MatterBaseTest):
             self.fabric_a_ctrl.terminate()
         if self.fabric_b_ctrl is not None:
             self.fabric_b_ctrl.terminate()
+        if self.fabric_a_server_app is not None:
+            self.fabric_a_server_app.terminate()
+        if self.fabric_b_server_app is not None:
+            self.fabric_b_server_app.terminate()
 
         super().teardown_class()
 
-    def steps_TC_JCM_1_2(self) -> list[TestStep]:
+    def steps_TC_CADMIN_1_28(self) -> list[TestStep]:
+        # Steps 1 and 2 from Test Plan are done in setup class
         return [
             TestStep("1", "On Ecosystem B, use jfc-app for opening a joint commissioning window in jfa-app using Python Controller"
                      "Check this Commissioning Window opens successfully with correct parameters"),
-            TestStep("2", "On Ecosystem A, use jfc-app for commissioning jfa-app at EcosystemB using Python Controller"
+            TestStep("2", "[Test Plan steps 4-8] On Ecosystem A, use jfc-app for commissioning jfa-app at EcosystemB using Python Controller"
                      "Verify Joint Commissioning completes successfully with --jcm functionality"),
             TestStep("3", "On jfc-app@EcoB used a non-filtered fabric read for reading the NOC from Fabric Index=2"
-                     "Parse the NOC bytes and Checked that it contains the Administrator CAT")
+                     "Parse the NOC bytes and Checked that it contains the Administrator CAT"),
+            TestStep("4", "EcoA CTRL read ProductID from EcoB Harness device",
+                     "Verify value is in range [1,65534]"),
         ]
 
     @async_test_body
-    async def test_TC_JCM_1_2(self):
+    async def test_TC_CADMIN_1_28(self):
 
         # Creating a Controller for Ecosystem A
         _fabric_a_persistent_storage = VolatileTemporaryPersistentStorage(
@@ -299,6 +347,14 @@ class TC_JCM_1_2(MatterBaseTest):
             returnClusterObject=True)
         asserts.assert_not_equal(int('fffe0001', 16), response[0][Clusters.AccessControl].acl[0].subjects,
                                  "Anchor CAT not found in Subject field of JF-Admin on Fabric A(Joint Fabric)")
+
+        self.step("4")
+        # TODO: Uncomment step once https://github.com/project-chip/connectedhomeip/issues/40836 is fixed
+        # response = await devCtrlEcoA.ReadAttribute(
+        #     nodeid=22, attributes=[(0, Clusters.BasicInformation.Attributes.ProductID)],
+        #     returnClusterObject=True)
+        # asserts.assert_in(response[0][Clusters.BasicInformation].productID,
+        #                   range(1, 65535), "Invalid Product ID for node 22 on Joint Fabric")
 
         devCtrlEcoA.Shutdown()
         devCtrlEcoB.Shutdown()
