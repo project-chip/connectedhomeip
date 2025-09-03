@@ -362,7 +362,7 @@ class TC_CLCTRL_6_1(MatterBaseTest):
         self.step("4b")
 
         # Wait for the OperationalError event to be emitted
-        data = event_sub_handler.wait_for_event_type_and_return_data(
+        data = event_sub_handler.wait_for_event_type_report(
             Clusters.ClosureControl.Events.OperationalError, timeout_sec=timeout)
         logging.info(f"-> OperationalError event last received: {data.errorState}")
 
@@ -417,7 +417,7 @@ class TC_CLCTRL_6_1(MatterBaseTest):
             logging.info("Waiting for OverallCurrentState.Position to be FullyOpened and the corresponding MovementCompleted event.")
             sub_handler.await_all_expected_report_matches(expected_matchers=[current_position_matcher(Clusters.ClosureControl.Enums.CurrentPositionEnum.kFullyOpened)],
                                                           timeout_sec=timeout)
-            event_sub_handler.wait_for_event_type_and_return_data(
+            event_sub_handler.wait_for_event_type_report(
                 Clusters.ClosureControl.Events.MovementCompleted, timeout_sec=timeout)
 
             # STEP 5d: TH sends command MoveTo with Position = MoveToFullyClosed
@@ -439,7 +439,7 @@ class TC_CLCTRL_6_1(MatterBaseTest):
             logging.info("Waiting for OverallCurrentState.Position to be FullyClosed and the corresponding MovementCompleted event.")
             sub_handler.await_all_expected_report_matches(expected_matchers=[current_position_matcher(Clusters.ClosureControl.Enums.CurrentPositionEnum.kFullyClosed)],
                                                           timeout_sec=timeout)
-            event_sub_handler.wait_for_event_type_and_return_data(
+            event_sub_handler.wait_for_event_type_report(
                 Clusters.ClosureControl.Events.MovementCompleted, timeout_sec=timeout)
 
             # STEP 5f: TH reads from the DUT the MainState attribute
@@ -479,7 +479,7 @@ class TC_CLCTRL_6_1(MatterBaseTest):
             self.step("6c")
 
             # Wait for the EngageStateChanged event to be emitted
-            data = event_sub_handler.wait_for_event_type_and_return_data(
+            data = event_sub_handler.wait_for_event_type_report(
                 Clusters.ClosureControl.Events.EngageStateChanged, timeout_sec=timeout)
 
             asserts.assert_false(data.engageValue, f"Unexpected event data: {data.engageValue}")
@@ -499,7 +499,7 @@ class TC_CLCTRL_6_1(MatterBaseTest):
             self.step("6e")
 
             # Wait for the EngageStateChanged event to be emitted
-            data = event_sub_handler.wait_for_event_type_and_return_data(
+            data = event_sub_handler.wait_for_event_type_report(
                 Clusters.ClosureControl.Events.EngageStateChanged, timeout_sec=timeout)
 
             asserts.assert_true(data.engageValue, f"Unexpected event data: {data.engageValue}")
@@ -549,7 +549,7 @@ class TC_CLCTRL_6_1(MatterBaseTest):
             self.step("7d")
 
             # Wait for the SecureStateChanged event to be emitted
-            data = event_sub_handler.wait_for_event_type_and_return_data(
+            data = event_sub_handler.wait_for_event_type_report(
                 Clusters.ClosureControl.Events.SecureStateChanged, timeout_sec=timeout)
             asserts.assert_false(data.secureValue, f"Unexpected event data: {data.secureValue}")
 
@@ -570,7 +570,7 @@ class TC_CLCTRL_6_1(MatterBaseTest):
             self.step("7f")
 
             # Wait for the SecureStateChanged event to be emitted
-            data = event_sub_handler.wait_for_event_type_and_return_data(
+            data = event_sub_handler.wait_for_event_type_report(
                 Clusters.ClosureControl.Events.SecureStateChanged, timeout_sec=timeout)
             asserts.assert_true(data.secureValue, f"Unexpected event data: {data.secureValue}")
 
@@ -634,7 +634,7 @@ class TC_CLCTRL_6_1(MatterBaseTest):
             self.step("8g")
 
             # Wait for the SecureStateChanged event to be emitted
-            data = event_sub_handler.wait_for_event_type_and_return_data(
+            data = event_sub_handler.wait_for_event_type_report(
                 Clusters.ClosureControl.Events.SecureStateChanged, timeout_sec=timeout)
             asserts.assert_true(data.secureValue, f"Unexpected event data: {data.secureValue}")
 
@@ -680,7 +680,7 @@ class TC_CLCTRL_6_1(MatterBaseTest):
             self.step("8l")
 
             # Wait for the SecureStateChanged event to be emitted
-            data = event_sub_handler.wait_for_event_type_and_return_data(
+            data = event_sub_handler.wait_for_event_type_report(
                 Clusters.ClosureControl.Events.SecureStateChanged, timeout_sec=timeout)
             asserts.assert_false(data.secureValue, f"Unexpected event data: {data.secureValue}")
 
@@ -735,7 +735,7 @@ class TC_CLCTRL_6_1(MatterBaseTest):
             self.step("9f")
 
             # Wait for the SecureStateChanged event to be emitted
-            data = event_sub_handler.wait_for_event_type_and_return_data(
+            data = event_sub_handler.wait_for_event_type_report(
                 Clusters.ClosureControl.Events.SecureStateChanged, timeout_sec=timeout)
             asserts.assert_true(data.secureValue, f"Unexpected event data: {data.secureValue}")
 
@@ -794,7 +794,7 @@ class TC_CLCTRL_6_1(MatterBaseTest):
             self.step("9l")
 
             # Wait for the SecureStateChanged event to be emitted
-            data = event_sub_handler.wait_for_event_type_and_return_data(
+            data = event_sub_handler.wait_for_event_type_report(
                 Clusters.ClosureControl.Events.SecureStateChanged, timeout_sec=timeout)
             asserts.assert_false(data.secureValue, f"Unexpected event data: {data.secureValue}")
 

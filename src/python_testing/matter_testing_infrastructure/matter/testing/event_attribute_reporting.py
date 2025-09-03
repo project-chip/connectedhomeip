@@ -131,7 +131,7 @@ class EventSubscriptionHandler:
 
         asserts.fail(f"Event reported when not expected {res}")
 
-    def wait_for_event_type_and_return_data(self, event_type: ClusterObjects.ClusterEvent, timeout_sec: float) -> Optional[Any]:
+    def wait_for_event_type_report(self, event_type: ClusterObjects.ClusterEvent, timeout_sec: float) -> Optional[Any]:
         """
         Waits for a specific event type from the event subscription handler within the timeout period.
 
