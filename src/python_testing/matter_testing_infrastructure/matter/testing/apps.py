@@ -15,8 +15,35 @@
 import os
 import signal
 import tempfile
+from dataclasses import dataclass
+from typing import Optional, Union
 
+import matter.clusters as Clusters
+from matter.ChipDeviceCtrl import ChipDeviceController
+from matter.clusters.Types import NullValue
 from matter.testing.tasks import Subprocess
+
+
+@dataclass
+class OtaImagePath:
+    """Represents a path to a single OTA image file."""
+    path: str
+
+    @property
+    def ota_args(self) -> list[str]:
+        """Return the command line arguments for this OTA image path."""
+        return ["--filepath", self.path]
+
+
+@dataclass
+class ImageListPath:
+    """Represents a path to a file containing a list of OTA images."""
+    path: str
+
+    @property
+    def ota_args(self) -> list[str]:
+        """Return the command line arguments for this image list path."""
+        return ["--otaImageList", self.path]
 
 
 class AppServerSubprocess(Subprocess):
@@ -27,27 +54,36 @@ class AppServerSubprocess(Subprocess):
 
     def __init__(self, app: str, storage_dir: str, discriminator: int,
                  passcode: int, port: int = 5540, extra_args: list[str] = []):
+        # Create a temporary KVS file and keep the descriptor to avoid leaks.
         self.kvs_fd, kvs_path = tempfile.mkstemp(dir=storage_dir, prefix="kvs-app-")
+        try:
+            # Build the command list
+            command = [app]
+            if extra_args:
+                command.extend(extra_args)
 
-        # Build the command list
-        command = [app]
-        if extra_args:
-            command.extend(extra_args)
+            command.extend([
+                "--KVS", kvs_path,
+                '--secured-device-port', str(port),
+                "--discriminator", str(discriminator),
+                "--passcode", str(passcode)
+            ])
 
-        command.extend([
-            "--KVS", kvs_path,
-            '--secured-device-port', str(port),
-            "--discriminator", str(discriminator),
-            "--passcode", str(passcode)
-        ])
-
-        # Start the server application
-        super().__init__(*command,  # Pass the constructed command list
-                         output_cb=lambda line, is_stderr: self.PREFIX + line)
+            # Start the server application
+            super().__init__(*command,  # Pass the constructed command list
+                             output_cb=lambda line, is_stderr: self.PREFIX + line)
+        except Exception:
+            # Do not leak KVS file descriptor on failure
+            os.close(self.kvs_fd)
+            raise
 
     def __del__(self):
         # Do not leak KVS file descriptor.
-        os.close(self.kvs_fd)
+        if hasattr(self, "kvs_fd"):
+            try:
+                os.close(self.kvs_fd)
+            except OSError:
+                pass
 
 
 class IcdAppServerSubprocess(AppServerSubprocess):
@@ -102,3 +138,81 @@ class JFControllerSubprocess(Subprocess):
         # Start the server application
         super().__init__(*command,  # Pass the constructed command list
                          output_cb=lambda line, is_stderr: self.PREFIX + line)
+
+
+class OTAProviderSubprocess(AppServerSubprocess):
+    """Wrapper class for starting an OTA Provider application server in a subprocess."""
+
+    DEFAULT_ADMIN_NODE_ID = 112233
+
+    # Prefix for log messages from the OTA provider application.
+    PREFIX = b"[OTA-PROVIDER]"
+
+    def __init__(self, app: str, storage_dir: str, discriminator: int,
+                 passcode: int, ota_source: Union[OtaImagePath, ImageListPath],
+                 port: int = 5541, extra_args: list[str] = []):
+        """Initialize the OTA Provider subprocess.
+
+        Args:
+            app: Path to the chip-ota-provider-app executable
+            storage_dir: Directory for persistent storage
+            discriminator: Discriminator for commissioning
+            passcode: Passcode for commissioning
+            port: UDP port for secure connections (default: 5541)
+            ota_source: Either OtaImagePath or ImageListPath specifying the OTA image source
+            extra_args: Additional command line arguments
+        """
+
+        # Build OTA-specific arguments using the ota_source property
+        combined_extra_args = ota_source.ota_args + extra_args
+
+        # Initialize with the combined arguments
+        super().__init__(app=app, storage_dir=storage_dir, discriminator=discriminator,
+                         passcode=passcode, port=port, extra_args=combined_extra_args)
+
+    def create_acl_entry(self, dev_ctrl: ChipDeviceController, provider_node_id: int, requestor_node_id: Optional[int] = None):
+        """Create ACL entries to allow OTA requestors to access the provider.
+
+        Args:
+            dev_ctrl: Device controller for sending commands
+            provider_node_id: Node ID of the OTA provider
+            requestor_node_id: Optional specific requestor node ID for targeted access
+
+        Returns:
+            Result of the ACL write operation
+        """
+        # Standard ACL entry for OTA Provider cluster
+        admin_node_id = dev_ctrl.nodeId if hasattr(dev_ctrl, 'nodeId') else self.DEFAULT_ADMIN_NODE_ID
+        requestor_subjects = [requestor_node_id] if requestor_node_id else NullValue
+
+        # Create ACL entries using proper struct constructors
+        acl_entries = [
+            # Admin entry
+            Clusters.AccessControl.Structs.AccessControlEntryStruct(  # type: ignore
+                privilege=Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kAdminister,  # type: ignore
+                authMode=Clusters.AccessControl.Enums.AccessControlEntryAuthModeEnum.kCase,  # type: ignore
+                subjects=[admin_node_id],  # type: ignore
+                targets=NullValue
+            ),
+            # Operate entry
+            Clusters.AccessControl.Structs.AccessControlEntryStruct(  # type: ignore
+                privilege=Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kOperate,  # type: ignore
+                authMode=Clusters.AccessControl.Enums.AccessControlEntryAuthModeEnum.kCase,  # type: ignore
+                subjects=requestor_subjects,  # type: ignore
+                targets=[
+                    Clusters.AccessControl.Structs.AccessControlTargetStruct(  # type: ignore
+                        cluster=Clusters.OtaSoftwareUpdateProvider.id,  # type: ignore
+                        endpoint=NullValue,
+                        deviceType=NullValue
+                    )
+                ],
+            )
+        ]
+
+        # Create the attribute descriptor for the ACL attribute
+        acl_attribute = Clusters.AccessControl.Attributes.Acl(acl_entries)
+
+        return dev_ctrl.WriteAttribute(
+            nodeid=provider_node_id,
+            attributes=[(0, acl_attribute)]
+        )
