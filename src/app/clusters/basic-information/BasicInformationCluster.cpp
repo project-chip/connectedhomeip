@@ -18,6 +18,7 @@
 
 #include <app/InteractionModelEngine.h>
 #include <app/persistence/AttributePersistence.h>
+#include <app/persistence/AttributePersistenceMigration.h>
 #include <app/persistence/AttributePersistenceProvider.h>
 #include <app/persistence/PascalString.h>
 #include <app/server-cluster/AttributeListBuilder.h>
@@ -417,10 +418,12 @@ CHIP_ERROR BasicInformationCluster::Startup(ServerClusterContext & context)
 
     AttributePersistence persistence(context.attributeStorage);
 
-    char buffer[255];
-    persistence.MigrateFromSafeAttributePersistanceProvider(
-        kRootEndpointId, BasicInformation::Id, { NodeLabel::Id, LocalConfigDisabled::Id },
-        { Attributes::NodeLabel::Id, Attributes::LocalConfigDisabled::Id }, buffer, context.storage);
+    AttributeId attributesToUpdate[] = { NodeLabel::Id, LocalConfigDisabled::Id, Attributes::NodeLabel::Id,
+                                         Attributes::LocalConfigDisabled::Id };
+    unsigned char buffer[255];
+    MutableByteSpan bsBuffer(buffer);
+    MigrateFromSafeAttributePersistanceProvider(kRootEndpointId, BasicInformation::Id, Span(attributesToUpdate), bsBuffer,
+                                                context.storage);
 
     (void) persistence.LoadString({ kRootEndpointId, BasicInformation::Id, Attributes::NodeLabel::Id }, mNodeLabel);
     // Specialization because some platforms `#define` true/false as 1/0 and we get;

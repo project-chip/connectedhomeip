@@ -17,10 +17,8 @@
 
 #include <app/AttributeValueDecoder.h>
 #include <app/ConcreteAttributePath.h>
-#include <app/DefaultSafeAttributePersistenceProvider.h>
 #include <app/data-model-provider/ActionReturnStatus.h>
 #include <app/persistence/AttributePersistenceProvider.h>
-#include <app/persistence/DefaultAttributePersistenceProvider.h>
 #include <app/persistence/String.h>
 #include <lib/core/CHIPEncoding.h>
 #include <lib/support/DefaultStorageKeyAllocator.h>
@@ -36,10 +34,12 @@ namespace chip::app {
 /// have known (strong) types and their load/decode logic is often
 /// similar and reusable. This class implements the logic of handling
 /// such attributes, so that it can be reused across cluster implementations.
-class AttributePersistence
-{
+class AttributePersistence {
 public:
-    AttributePersistence(AttributePersistenceProvider & provider) : mProvider(provider) {}
+    AttributePersistence(AttributePersistenceProvider & provider)
+        : mProvider(provider)
+    {
+    }
 
     /// Loads a native-endianness stored value of type `T` into `value` from the persistence provider.
     ///
@@ -93,44 +93,6 @@ public:
     /// not use internal classes directly.
     CHIP_ERROR StoreString(const ConcreteAttributePath & path, const Storage::Internal::ShortString & value);
 
-    // Only available in little endian for the moment
-    CHIP_ERROR MigrateFromSafeAttributePersistanceProvider(EndpointId endpointId, ClusterId clusterId,
-                                                           const ReadOnlyBuffer<AttributeId> & attributes, MutableByteSpan & buffer,
-                                                           PersistentStorageDelegate & storageDelegate)
-    {
-
-        ChipError err;
-        DefaultSafeAttributePersistenceProvider safeProvider;
-        safeProvider.Init(&storageDelegate);
-        DefaultAttributePersistenceProvider normProvider;
-        normProvider.Init(&storageDelegate);
-
-        for (auto attr : attributes)
-        {
-            // We make a copy of the buffer so it can be resized
-            MutableByteSpan copyOfBuffer = buffer;
-
-            auto safePath = DefaultStorageKeyAllocator::SafeAttributeValue(endpointId, clusterId, attr);
-            auto attrPath = ConcreteAttributePath(endpointId, clusterId, attr);
-            // Read Value, will resize copyOfBuffer to read size
-            err = safeProvider.SafeReadValue(attrPath, copyOfBuffer);
-            if (err == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND)
-            {
-                // The value does not exist
-                continue;
-            }
-            else if (err != CHIP_NO_ERROR)
-            {
-                // ChipLogError(Unspecified, "Error reading attribute %s - %" CHIP_ERROR_FORMAT, safePath.KeyName(), err);
-                continue;
-            }
-
-            ReturnErrorOnFailure(normProvider.WriteValue(attrPath, copyOfBuffer));
-            // do nothing with this error
-            err = safeProvider.SafeDeleteValue(attrPath);
-        }
-    }
-
 private:
     AttributePersistenceProvider & mProvider;
 
@@ -140,7 +102,7 @@ private:
     /// Error reason for load failure is logged (or nothing logged in case "Value not found" is the
     /// reason for the load failure).
     bool InternalRawLoadNativeEndianValue(const ConcreteAttributePath & path, void * data, const void * valueOnLoadFailure,
-                                          size_t size);
+        size_t size);
 };
 
 } // namespace chip::app
