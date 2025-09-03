@@ -45,7 +45,7 @@ namespace CommodityMetering {
 
 // Some constraints for lists limitation
 constexpr uint8_t kMaxTariffComponentIDsPerMeteredQuantityEntry = 128;
-constexpr uint8_t kMaximumMeteredQuantitiesMinValue = 1;
+constexpr uint8_t kMaximumMeteredQuantitiesMinValue             = 1;
 namespace {
 
 inline bool operator==(const Span<const uint32_t> & a, const Span<const uint32_t> & b)
@@ -86,7 +86,7 @@ template <typename T>
 struct SpanCopier
 {
     static CHIP_ERROR Copy(const Span<const T> & source, DataModel::List<const T> & destination,
-                     size_t maxElements = std::numeric_limits<size_t>::max())
+                           size_t maxElements = std::numeric_limits<size_t>::max())
     {
 
         if (!destination.empty())
@@ -167,7 +167,8 @@ static CHIP_ERROR CopyMeteredQuantityEntry(const Structs::MeteredQuantityStruct:
 {
     dest.quantity = src.quantity;
 
-    return SpanCopier<uint32_t>::Copy(src.tariffComponentIDs, dest.tariffComponentIDs, kMaxTariffComponentIDsPerMeteredQuantityEntry);
+    return SpanCopier<uint32_t>::Copy(src.tariffComponentIDs, dest.tariffComponentIDs,
+                                      kMaxTariffComponentIDsPerMeteredQuantityEntry);
 }
 
 CHIP_ERROR Instance::SetMeteredQuantity(const DataModel::Nullable<DataModel::List<Structs::MeteredQuantityStruct::Type>> & newValue)

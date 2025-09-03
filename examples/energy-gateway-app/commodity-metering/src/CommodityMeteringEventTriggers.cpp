@@ -34,8 +34,10 @@ static constexpr uint32_t TariffComponents2[] = { 3333, 4444, 5555 };
 
 // Non-constexpr storage for the actual data
 static const Structs::MeteredQuantityStruct::Type Data[] = {
-    { .tariffComponentIDs = DataModel::List(TariffComponents1, MATTER_ARRAY_SIZE(TariffComponents1)), .quantity = MATTER_ARRAY_SIZE(TariffComponents1) },
-    { .tariffComponentIDs = DataModel::List(TariffComponents2, MATTER_ARRAY_SIZE(TariffComponents2)), .quantity = MATTER_ARRAY_SIZE(TariffComponents2) }
+    { .tariffComponentIDs = DataModel::List(TariffComponents1, MATTER_ARRAY_SIZE(TariffComponents1)),
+      .quantity           = MATTER_ARRAY_SIZE(TariffComponents1) },
+    { .tariffComponentIDs = DataModel::List(TariffComponents2, MATTER_ARRAY_SIZE(TariffComponents2)),
+      .quantity           = MATTER_ARRAY_SIZE(TariffComponents2) }
 };
 } // namespace Sample1
 
@@ -44,8 +46,10 @@ static constexpr uint32_t TariffComponents1[] = { 7777 };
 static constexpr uint32_t TariffComponents2[] = { 8888, 9999 };
 
 static const Structs::MeteredQuantityStruct::Type Data[] = {
-    { .tariffComponentIDs = DataModel::List(TariffComponents1, MATTER_ARRAY_SIZE(TariffComponents1)), .quantity = MATTER_ARRAY_SIZE(TariffComponents1) },
-    { .tariffComponentIDs = DataModel::List(TariffComponents2, MATTER_ARRAY_SIZE(TariffComponents2)), .quantity = MATTER_ARRAY_SIZE(TariffComponents2) }
+    { .tariffComponentIDs = DataModel::List(TariffComponents1, MATTER_ARRAY_SIZE(TariffComponents1)),
+      .quantity           = MATTER_ARRAY_SIZE(TariffComponents1) },
+    { .tariffComponentIDs = DataModel::List(TariffComponents2, MATTER_ARRAY_SIZE(TariffComponents2)),
+      .quantity           = MATTER_ARRAY_SIZE(TariffComponents2) }
 };
 } // namespace Sample2
 } // namespace MeteredQuantitySamples
@@ -55,6 +59,7 @@ namespace {
 class TestDataManager
 {
     static constexpr size_t MAX_MQ_SAMPLES = 2;
+
 private:
     Instance * mInstance = nullptr;
 
