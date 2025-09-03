@@ -25,7 +25,7 @@
 #       --commissioning-method on-network
 #       --discriminator 1234
 #       --passcode 20202021
-#       --timeout 120
+#       --timeout 30
 #       --endpoint 1
 #       --trace-to json:${TRACE_TEST_JSON}.json
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
@@ -69,11 +69,6 @@ def current_latch_matcher(current_latch: bool) -> AttributeMatcher:
 
 
 class TC_CLCTRL_3_1(MatterBaseTest):
-    @property
-    def default_timeout(self) -> int:
-        # Default timeout for this test case is 120 seconds, multiple calibrates can take a while
-        return 120
-
     async def read_clctrl_attribute_expect_success(self, endpoint, attribute):
         cluster = Clusters.Objects.ClosureControl
         return await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attribute)
