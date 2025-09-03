@@ -43,7 +43,7 @@ from TC_PAVSTTestBase import PAVSTTestBase
 import matter.clusters as Clusters
 from matter.clusters.Types import Nullable
 from matter.interaction_model import InteractionModelError, Status
-from matter.testing.matter_testing import (MatterBaseTest, TestStep, async_test_body, default_matter_test_main)
+from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 
 logger = logging.getLogger(__name__)
 
