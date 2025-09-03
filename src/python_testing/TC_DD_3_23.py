@@ -14,6 +14,8 @@
 # limitations under the License.
 
 import chip.clusters as Clusters
+import chip  # Pour chip.NodeId
+from chip import ChipDeviceCtrl  # Pour DiscoveryType
 from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 
 class TC_DD_3_23(MatterBaseTest):
@@ -28,7 +30,26 @@ class TC_DD_3_23(MatterBaseTest):
     @async_test_body
     async def test_TC_DD_3_23(self):
         self.step(0)
-        print("Hello World")
+        print("Perform commissioning")
+        # Work on-going!
+        # For the moment it is configured for BLE commissioning
+        setup_payload: str = "MT:4CT9142C00KA0648G00"
+        node_id: chip.NodeId = 1
+        useNFC: bool = False
+
+        print(f"Setup payload: {setup_payload}")
+        print(f"NodeId: {node_id}")
+        print(f"useNFC: {useNFC}")
+
+        try:
+            await self.default_controller.CommissionWithCode(
+                setupPayload=setup_payload,
+                nodeid=node_id,
+                discoveryType=ChipDeviceCtrl.DiscoveryType.DISCOVERY_ALL,
+                useNFC=useNFC
+            )
+        except Exception as e:
+            print(f"Failure! {e}")
 
 if __name__ == "__main__":
     default_matter_test_main()
