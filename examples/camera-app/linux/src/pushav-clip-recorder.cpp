@@ -30,6 +30,10 @@ extern "C" {
 #include <libavutil/timestamp.h>
 }
 
+#ifndef LIBAVCODEC_VERSION_INT
+#error "LIBAVCODEC_VERSION_INT not defined. Please use a version of FFmpeg/libavcodec that defines this macro."
+#endif
+
 #define IS_H264_FRAME_NALU_HEAD(frame)                                                                                             \
     (((frame)[0] == 0x00) && ((frame)[1] == 0x00) && (((frame)[2] == 0x01) || (((frame)[2] == 0x00) && ((frame)[3] == 0x01))))
 
@@ -40,7 +44,11 @@ PushAVClipRecorder::PushAVClipRecorder(ClipInfoStruct & aClipInfo, AudioInfoStru
     mClipInfo(aClipInfo),
     mAudioInfo(aAudioInfo), mVideoInfo(aVideoInfo), mUploader(aUploader)
 {
-
+    mFormatContext        = nullptr;
+    mInputFormatContext   = nullptr;
+    mVideoStream          = nullptr;
+    mAudioStream          = nullptr;
+    mAudioEncoderContext  = nullptr;
     mVideoInfo.mVideoPts  = 0;
     mVideoInfo.mVideoDts  = 0;
     mAudioInfo.mAudioPts  = 0;
@@ -48,6 +56,13 @@ PushAVClipRecorder::PushAVClipRecorder(ClipInfoStruct & aClipInfo, AudioInfoStru
     int streamIndex       = 0;
     mMetadataSet          = false;
     mDeinitializeRecorder = false;
+    mUploadedInitSegment  = false;
+    mUploadMPD            = false;
+    mAudioFragment        = 1;
+    mVideoFragment        = 1;
+    mCurrentClipStartPts  = AV_NOPTS_VALUE;
+    mFoundFirstIFramePts  = -1;
+    currentPts            = AV_NOPTS_VALUE;
     if (mClipInfo.mHasVideo)
     {
         mVideoInfo.mVideoStreamIndex = streamIndex++;
@@ -69,9 +84,9 @@ PushAVClipRecorder::PushAVClipRecorder(ClipInfoStruct & aClipInfo, AudioInfoStru
 
 PushAVClipRecorder::~PushAVClipRecorder()
 {
+    Stop();
     if (mWorkerThread.joinable())
     {
-        Stop();
         mWorkerThread.join();
     }
 }
@@ -225,6 +240,7 @@ void PushAVClipRecorder::Stop()
     if (GetRecorderStatus())
     {
         SetRecorderStatus(false);
+        mCondition.notify_one();
         while (!mVideoQueue.empty())
         {
             av_packet_free(&mVideoQueue.front());
@@ -344,7 +360,13 @@ int PushAVClipRecorder::StartClipRecording()
     while (GetRecorderStatus())
     {
         std::unique_lock<std::mutex> lock(mQueueMutex);
-        mCondition.wait(lock, [this] { return !mVideoQueue.empty() || !mAudioQueue.empty(); });
+        mCondition.wait(
+            lock, [this] { return !mVideoQueue.empty() || !mAudioQueue.empty() || !GetRecorderStatus() || mDeinitializeRecorder; });
+        if (!GetRecorderStatus() || mDeinitializeRecorder)
+        {
+            ChipLogProgress(Camera, "Recorder thread received stop signal for ID: %s", mClipInfo.mRecorderId.c_str());
+            break; // Exit loop
+        }
         ProcessBuffersAndWrite();
     }
 
@@ -391,12 +413,21 @@ int PushAVClipRecorder::AddStreamToOutput(AVMediaType type)
             Stop();
             return -1;
         }
-        mAudioEncoderContext->sample_rate    = mAudioInfo.mSampleRate;
+
+        mAudioEncoderContext->sample_rate = mAudioInfo.mSampleRate;
+
+#if LIBAVCODEC_VERSION_INT < AV_VERSION_INT(59, 37, 100)
+        ChipLogProgress(Camera, "PushAVClipRecorder using FFMPEG version < 5.1");
         mAudioEncoderContext->channels       = mAudioInfo.mChannels;
         mAudioEncoderContext->channel_layout = static_cast<uint64_t>(av_get_default_channel_layout(mAudioEncoderContext->channels));
-        mAudioEncoderContext->bit_rate       = mAudioInfo.mBitRate;
-        mAudioEncoderContext->sample_fmt     = audioCodec->sample_fmts[0];
-        mAudioEncoderContext->time_base      = (AVRational){ 1, mAudioInfo.mSampleRate };
+#else
+        ChipLogProgress(Camera, "PushAVClipRecorder using FFMPEG version >= 5.1");
+        av_channel_layout_default(&mAudioEncoderContext->ch_layout, mAudioInfo.mChannels);
+#endif
+
+        mAudioEncoderContext->bit_rate              = mAudioInfo.mBitRate;
+        mAudioEncoderContext->sample_fmt            = audioCodec->sample_fmts[0];
+        mAudioEncoderContext->time_base             = (AVRational){ 1, mAudioInfo.mSampleRate };
         mAudioEncoderContext->strict_std_compliance = FF_COMPLIANCE_EXPERIMENTAL;
         AVDictionary * opts                         = NULL;
         av_dict_set(&opts, "strict", "experimental", 0);
@@ -600,8 +631,9 @@ void PushAVClipRecorder::CleanupOutput()
 
 void PushAVClipRecorder::FinalizeCurrentClip(int reason)
 {
-    int64_t clipLengthInPTS    = currentPts - mCurrentClipStartPts;
-    const int64_t clipDuration = mClipInfo.mInitialDuration * AV_TIME_BASE_Q.den;
+    int64_t clipLengthInPTS = currentPts - mCurrentClipStartPts;
+    // Final duration has to be (clipDuration + preRollLen) seconds
+    const int64_t clipDuration = (mClipInfo.mInitialDuration + (mClipInfo.mPreRollLength / 1000)) * AV_TIME_BASE_Q.den;
     // Pre-calculate common path components
     const std::string prefix   = mClipInfo.mRecorderId + "_clip_" + std::to_string(mClipInfo.mClipId);
     const std::string basePath = mClipInfo.mOutputPath + prefix;

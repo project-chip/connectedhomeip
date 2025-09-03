@@ -25,7 +25,7 @@
 #       --commissioning-method on-network
 #       --discriminator 1234
 #       --passcode 20202021
-#       --timeout 60
+#       --timeout 30
 #       --endpoint 1
 #       --hex-arg enableKey:000102030405060708090a0b0c0d0e0f
 #       --trace-to json:${TRACE_TEST_JSON}.json
@@ -37,13 +37,14 @@
 import logging
 import time
 
-import chip.clusters as Clusters
-from chip.clusters.Types import NullValue
-from chip.interaction_model import InteractionModelError, Status
-from chip.testing.event_attribute_reporting import AttributeSubscriptionHandler, EventSubscriptionHandler
-from chip.testing.matter_testing import (AttributeMatcher, AttributeValue, MatterBaseTest, TestStep, async_test_body,
-                                         default_matter_test_main)
 from mobly import asserts
+
+import matter.clusters as Clusters
+from matter.clusters.Types import NullValue
+from matter.interaction_model import InteractionModelError, Status
+from matter.testing.event_attribute_reporting import AttributeSubscriptionHandler, EventSubscriptionHandler
+from matter.testing.matter_testing import (AttributeMatcher, AttributeValue, MatterBaseTest, TestStep, async_test_body,
+                                           default_matter_test_main)
 
 triggerError = 0x0104000000000000
 triggerDisengaged = 0x0104000000000002
@@ -67,11 +68,6 @@ def current_latch_matcher(current_latch: bool) -> AttributeMatcher:
 
 
 class TC_CLCTRL_6_1(MatterBaseTest):
-    @property
-    def default_timeout(self) -> int:
-        # This test has potentially 45s waits, so set the timeout to 60
-        return 60
-
     async def read_clctrl_attribute_expect_success(self, endpoint, attribute):
         cluster = Clusters.Objects.ClosureControl
         return await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attribute)
@@ -295,7 +291,7 @@ class TC_CLCTRL_6_1(MatterBaseTest):
 
                     logging.info("Unlatch the DUT manually to set OverallCurrentState.Latch to False")
                     # Simulating manual unlatching by waiting for user input
-                    self.wait_for_user_input(promt_msg="Press Enter after unlatching the DUT...")
+                    self.wait_for_user_input(prompt_msg="Press Enter after unlatching the DUT..")
                     logging.info("Manual unlatching completed.")
                 else:
                     logging.info("LatchControlModes Bit 1 is 1 (RemoteUnlatching = True), proceeding to step 3f")
@@ -626,7 +622,7 @@ class TC_CLCTRL_6_1(MatterBaseTest):
 
                 logging.info("Latch the DUT manually to set OverallCurrentState.Latch to True")
                 # Simulating manual latching by waiting for user input
-                self.wait_for_user_input(promt_msg="Press Enter after latching the DUT...")
+                self.wait_for_user_input(prompt_msg="Press Enter after latching the DUT...")
                 logging.info("Manual latching completed.")
             else:
                 logging.info("LatchControlModes Bit 0 is 1 (RemoteLatching = True), proceeding to step 8c")
@@ -677,7 +673,7 @@ class TC_CLCTRL_6_1(MatterBaseTest):
 
                 logging.info("Unlatch the DUT manually to set OverallCurrentState.Latch to False")
                 # Simulating manual unlatching by waiting for user input
-                self.wait_for_user_input(promt_msg="Press Enter after unlatching the DUT...")
+                self.wait_for_user_input(prompt_msg="Press Enter after unlatching the DUT...")
                 logging.info("Manual unlatching completed.")
             else:
                 logging.info("LatchControlModes Bit 1 is 1 (RemoteUnlatching = True), proceeding to step 8i")
@@ -730,7 +726,7 @@ class TC_CLCTRL_6_1(MatterBaseTest):
 
                 logging.info("Latch the DUT manually to set OverallCurrentState.Latch to True")
                 # Simulating manual latching by waiting for user input
-                self.wait_for_user_input(promt_msg="Press Enter after latching the DUT...")
+                self.wait_for_user_input(prompt_msg="Press Enter after latching the DUT...")
                 logging.info("Manual latching completed.")
             else:
                 logging.info("LatchControlModes Bit 0 is 1 (RemoteLatching = True), proceeding to step 9c")
@@ -774,7 +770,7 @@ class TC_CLCTRL_6_1(MatterBaseTest):
 
                 logging.info("Unlatch the DUT manually to set OverallCurrentState.Latch to False")
                 # Simulating manual unlatching by waiting for user input
-                self.wait_for_user_input(promt_msg="Press Enter after unlatching the DUT...")
+                self.wait_for_user_input(prompt_msg="Press Enter after unlatching the DUT...")
                 logging.info("Manual unlatching completed.")
             else:
                 logging.info("LatchControlModes Bit 1 is 1 (RemoteUnlatching = True), proceeding to step 9h")

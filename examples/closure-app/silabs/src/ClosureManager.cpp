@@ -23,6 +23,7 @@
 #include "ClosureDimensionEndpoint.h"
 
 #include <app-common/zap-generated/cluster-objects.h>
+#include <app/server/Server.h>
 #include <app/util/attribute-storage.h>
 #include <lib/support/TimeUtils.h>
 #include <platform/CHIPDeviceLayer.h>
@@ -36,10 +37,10 @@ using namespace chip::app::Clusters::ClosureControl;
 using namespace chip::app::Clusters::ClosureDimension;
 
 namespace {
-constexpr uint32_t kDefaultCountdownTimeSeconds   = 10;    // 10 seconds
-constexpr uint32_t kCalibrateTimerMs              = 10000; // 10 seconds
-constexpr uint32_t kMotionCountdownTimeMs         = 1000;  // 1 second for each motion.
-constexpr chip::Percent100ths kMotionPositionStep = 1000;  // 10% of the total range per motion interval.
+constexpr uint32_t kDefaultCountdownTimeSeconds   = 10;   // 10 seconds
+constexpr uint32_t kCalibrateCountdownTimeMs      = 3000; // 3 seconds
+constexpr uint32_t kMotionCountdownTimeMs         = 1000; // 1 second for each motion.
+constexpr chip::Percent100ths kMotionPositionStep = 2000; // 20% of the total range per motion interval.
 
 // Define the Namespace and Tag for the endpoint
 // Derived from https://github.com/CHIP-Specifications/connectedhomeip-spec/blob/master/src/namespaces/Namespace-Closure.adoc
@@ -114,6 +115,21 @@ void ClosureManager::Init()
     VerifyOrDie(SetClosurePanelInitialState(mClosurePanelEndpoint3) == CHIP_NO_ERROR);
     ChipLogProgress(AppServer, "Initial state for Closure Panel Endpoint 3 set successfully");
 
+    TestEventTriggerDelegate * pTestEventDelegate = Server::GetInstance().GetTestEventTriggerDelegate();
+
+    if (pTestEventDelegate != nullptr)
+    {
+        CHIP_ERROR err = pTestEventDelegate->AddHandler(&mClosureEndpoint1.GetDelegate());
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(AppServer, "Failed to add handler for delegate: %s", chip::ErrorStr(err));
+        }
+    }
+    else
+    {
+        ChipLogError(AppServer, "TestEventTriggerDelegate is null, cannot add handler for delegate");
+    }
+
     DeviceLayer::PlatformMgr().UnlockChipStack();
 }
 
@@ -152,7 +168,7 @@ CHIP_ERROR ClosureManager::SetClosurePanelInitialState(ClosureDimensionEndpoint 
     ReturnErrorOnFailure(closurePanelEndpoint.GetLogic().SetTargetState(targetState));
 
     ReturnErrorOnFailure(closurePanelEndpoint.GetLogic().SetResolution(Percent100ths(100)));
-    ReturnErrorOnFailure(closurePanelEndpoint.GetLogic().SetStepValue(1000));
+    ReturnErrorOnFailure(closurePanelEndpoint.GetLogic().SetStepValue(2000));
     ReturnErrorOnFailure(closurePanelEndpoint.GetLogic().SetUnit(ClosureUnitEnum::kMillimeter));
     ReturnErrorOnFailure(closurePanelEndpoint.GetLogic().SetUnitRange(
         ClosureDimension::Structs::UnitRangeStruct::Type{ .min = static_cast<int16_t>(0), .max = static_cast<int16_t>(10000) }));
@@ -211,7 +227,7 @@ void ClosureManager::InitiateAction(AppEvent * event)
         ChipLogDetail(AppServer, "Initiating calibration action");
         // Timer used in sample application to simulate the calibration process.
         // In a real application, this would be replaced with actual calibration logic.
-        instance.StartTimer(kCalibrateTimerMs);
+        instance.StartTimer(kCalibrateCountdownTimeMs);
         break;
     case Action_t::MOVE_TO_ACTION:
         ChipLogDetail(AppServer, "Initiating move to action");
@@ -224,7 +240,7 @@ void ClosureManager::InitiateAction(AppEvent * event)
         ChipLogDetail(AppServer, "Initiating unlatch action");
         // Unlatch action check is a prerequisite for the move to action.
         // In a real application, this would be replaced with actual unlatch logic.
-        PlatformMgr().ScheduleWork([](intptr_t) { ClosureManager::GetInstance().HandleClosureUnlatchAction(); });
+        instance.StartTimer(kMotionCountdownTimeMs);
         break;
     case Action_t::SET_TARGET_ACTION:
         ChipLogDetail(AppServer, "Initiating set target action");
@@ -293,6 +309,9 @@ void ClosureManager::HandleClosureActionCompleteEvent(AppEvent * event)
         break;
     case Action_t::MOVE_TO_ACTION:
         PlatformMgr().ScheduleWork([](intptr_t) { ClosureManager::GetInstance().HandleClosureMotionAction(); });
+        break;
+    case Action_t::UNLATCH_ACTION:
+        PlatformMgr().ScheduleWork([](intptr_t) { ClosureManager::GetInstance().HandleClosureUnlatchAction(); });
         break;
     case Action_t::SET_TARGET_ACTION:
         PlatformMgr().ScheduleWork([](intptr_t) {
@@ -516,16 +535,16 @@ chip::Protocols::InteractionModel::Status ClosureManager::OnMoveToCommand(const 
             mClosurePanelEndpoint3Position = static_cast<Percent100ths>(0);
             break;
         case TargetPositionEnum::kMoveToPedestrianPosition:
-            mClosurePanelEndpoint2Position = static_cast<Percent100ths>(3000);
-            mClosurePanelEndpoint3Position = static_cast<Percent100ths>(3000);
+            mClosurePanelEndpoint2Position = static_cast<Percent100ths>(6000);
+            mClosurePanelEndpoint3Position = static_cast<Percent100ths>(6000);
             break;
         case TargetPositionEnum::kMoveToSignaturePosition:
-            mClosurePanelEndpoint2Position = static_cast<Percent100ths>(2000);
-            mClosurePanelEndpoint3Position = static_cast<Percent100ths>(2000);
+            mClosurePanelEndpoint2Position = static_cast<Percent100ths>(4000);
+            mClosurePanelEndpoint3Position = static_cast<Percent100ths>(4000);
             break;
         case TargetPositionEnum::kMoveToVentilationPosition:
-            mClosurePanelEndpoint2Position = static_cast<Percent100ths>(1000);
-            mClosurePanelEndpoint3Position = static_cast<Percent100ths>(1000);
+            mClosurePanelEndpoint2Position = static_cast<Percent100ths>(2000);
+            mClosurePanelEndpoint3Position = static_cast<Percent100ths>(2000);
             break;
         default:
             ChipLogError(AppServer, "Invalid target position received in OnMoveToCommand");
@@ -1083,7 +1102,11 @@ void ClosureManager::HandlePanelStepAction(EndpointId endpointId)
         }
         else
         {
-            nextCurrentPosition = std::max(static_cast<chip::Percent100ths>(currentPosition - stepValue), targetPosition);
+            // Underflow protection: if currentPosition <= stepValue, set to 0.
+            chip::Percent100ths decreasedCurrentPosition = (currentPosition > stepValue)
+                ? static_cast<chip::Percent100ths>(currentPosition - stepValue)
+                : static_cast<chip::Percent100ths>(0);
+            nextCurrentPosition                          = std::max(decreasedCurrentPosition, targetPosition);
         }
 
         panelCurrentState.Value().position.SetValue(DataModel::MakeNullable(nextCurrentPosition));
@@ -1138,14 +1161,18 @@ bool ClosureManager::GetPanelNextPosition(const GenericDimensionStateStruct & cu
 
     if (currentPosition < targetPosition)
     {
-        // Increment position by 1000 units, capped at target.
+        // Increment position by 2000 units, capped at target.
+        // No overflow handling needed due to currentposition max value is 10000
         nextPosition.SetNonNull(std::min(static_cast<chip::Percent100ths>(currentPosition + kMotionPositionStep), targetPosition));
     }
     else if (currentPosition > targetPosition)
     {
-        // Moving down: Decreasing the current position by a step of 1000 units,
+        // Handling overflow for CurrentPosition
+        chip::Percent100ths newCurrentPosition =
+            (currentPosition > kMotionPositionStep) ? currentPosition - kMotionPositionStep : 0;
+        // Moving down: Decreasing the current position by a step of 2000 units,
         // ensuring it does not go below the target position.
-        nextPosition.SetNonNull(std::max(static_cast<chip::Percent100ths>(currentPosition - kMotionPositionStep), targetPosition));
+        nextPosition.SetNonNull(std::max(newCurrentPosition, targetPosition));
     }
     else
     {

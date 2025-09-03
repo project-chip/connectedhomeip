@@ -26,8 +26,11 @@
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
 #include <platform/FreeRTOS/GenericThreadStackManagerImpl_FreeRTOS.hpp>
+#if CHIP_SYSTEM_CONFIG_USE_LWIP
+#include <platform/OpenThread/GenericThreadStackManagerImpl_OpenThread_LwIP.cpp>
+#else
 #include <platform/OpenThread/GenericThreadStackManagerImpl_OpenThread.hpp>
-
+#endif
 #include "os_task.h"
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CHIPPlatformMemory.h>
@@ -36,6 +39,18 @@
 #include <platform/OpenThread/OpenThreadUtils.h>
 #include <platform/ThreadStackManager.h>
 #include <platforms/openthread-system.h>
+
+#if DLPS_EN
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+void BEE_RadioExternalWakeup(void);
+
+#ifdef __cplusplus
+}
+#endif
+#endif
 
 extern void otSysInit(int argc, char * argv[]);
 
@@ -49,6 +64,26 @@ ThreadStackManagerImpl ThreadStackManagerImpl::sInstance;
 CHIP_ERROR ThreadStackManagerImpl::_InitThreadStack(void)
 {
     return InitThreadStack(NULL);
+}
+
+void ThreadStackManagerImpl::_LockThreadStack(void)
+{
+    xSemaphoreTake(sInstance.mThreadStackLock, portMAX_DELAY);
+#if DLPS_EN
+    // Wake up the radio before accessing the Thread stack to ensure it's
+    // responsive, as part of the Deep Low Power State (DLPS) management.
+    BEE_RadioExternalWakeup();
+#endif
+}
+
+bool ThreadStackManagerImpl::_TryLockThreadStack(void)
+{
+    return xSemaphoreTake(sInstance.mThreadStackLock, 0) == pdTRUE;
+}
+
+void ThreadStackManagerImpl::_UnlockThreadStack(void)
+{
+    xSemaphoreGive(sInstance.mThreadStackLock);
 }
 
 CHIP_ERROR ThreadStackManagerImpl::InitThreadStack(otInstance * otInst)
@@ -65,9 +100,13 @@ CHIP_ERROR ThreadStackManagerImpl::InitThreadStack(otInstance * otInst)
     ChipLogProgress(DeviceLayer, "GenericThreadStackManagerImpl_FreeRTOS<ThreadStackManagerImpl>::DoInit");
     err = GenericThreadStackManagerImpl_FreeRTOS<ThreadStackManagerImpl>::DoInit();
     SuccessOrExit(err);
+#if CHIP_SYSTEM_CONFIG_USE_LWIP
+    ChipLogProgress(DeviceLayer, "GenericThreadStackManagerImpl_OpenThread_LwIP<ThreadStackManagerImpl>::DoInit");
+    err = GenericThreadStackManagerImpl_OpenThread_LwIP<ThreadStackManagerImpl>::DoInit(otInst);
+#else
     ChipLogProgress(DeviceLayer, "GenericThreadStackManagerImpl_OpenThread<ThreadStackManagerImpl>::DoInit");
     err = GenericThreadStackManagerImpl_OpenThread<ThreadStackManagerImpl>::DoInit(otInst);
-    SuccessOrExit(err);
+#endif
 
 exit:
     return err;

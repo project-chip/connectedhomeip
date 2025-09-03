@@ -623,7 +623,8 @@ CHIP_ERROR FactoryDataProvider::GetHardwareVersion(uint16_t & hardwareVersion)
     }
     else
     {
-        err = CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+        hardwareVersion = CHIP_DEVICE_CONFIG_DEFAULT_DEVICE_HARDWARE_VERSION;
+        err             = CHIP_NO_ERROR;
     }
 
     return err;

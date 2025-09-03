@@ -28,7 +28,7 @@ config:
 tests:
     - label: "Note"
       verification: |
-          Chip-repl commands used below are an example to verify the DUT as client test cases. For certification test, we expect DUT should have a capability or way to run the equivalent command.
+          matter-repl commands used below are an example to verify the DUT as client test cases. For certification test, we expect DUT should have a capability or way to run the equivalent command.
       disabled: true
 
     - label:
@@ -225,10 +225,10 @@ tests:
           the request."
       verification: |
           Product maker needs to provide instructions for how to trigger the command on the DUT that is capable of fitting into a single InvokeResponseMessage. For comparison, the DUT behavior for this
-          test step can be simulated using chip-repl (when DUT is a commissioner/Client).
+          test step can be simulated using matter-repl (when DUT is a commissioner/Client).
           The cluster used in the below command is an example, User can use any supported chip cluster/attribute/command. Note in this example the unique path is created by using 2 different endpoints.
 
-          `await devCtrl.SendBatchCommands(0x12344321, [chip.clusters.Command.InvokeRequestInfo(1, chip.clusters.OnOff.Commands.Toggle()), chip.clusters.Command.InvokeRequestInfo(2, chip.clusters.OnOff.Commands.Toggle())])`
+          `await devCtrl.SendBatchCommands(0x12344321, [matter.clusters.Command.InvokeRequestInfo(1, matter.clusters.OnOff.Commands.Toggle()), matter.clusters.Command.InvokeRequestInfo(2, matter.clusters.OnOff.Commands.Toggle())])`
 
           On TH(all-clusters-app), Verify that the EndpointIDs, CommandIDs, ClusterIDs in the InvokeRequestMessage (as below) matching with the data sent in the above command
 
@@ -288,10 +288,10 @@ tests:
           response to the second CommandDataIB in the InvokeRequestMessage."
       verification: |
           Product maker needs to provide instructions for how to trigger the command this on the DUT that is capable of fitting into a single InvokeResponseMessage. For comparison, the DUT behavior for this
-          test step can be simulated using chip-repl (when DUT is a commissioner/Client).
+          test step can be simulated using matter-repl (when DUT is a commissioner/Client).
           The cluster used in the below command is an example, User can use any supported chip cluster/attribute/command. Note in this example the unique path is created by using 2 different endpoints.
 
-          `await devCtrl.SendBatchCommands(0x12344321, [chip.clusters.Command.InvokeRequestInfo(1, chip.clusters.OnOff.Commands.Toggle()), chip.clusters.Command.InvokeRequestInfo(2, chip.clusters.OnOff.Commands.Toggle())])`
+          `await devCtrl.SendBatchCommands(0x12344321, [matter.clusters.Command.InvokeRequestInfo(1, matter.clusters.OnOff.Commands.Toggle()), matter.clusters.Command.InvokeRequestInfo(2, matter.clusters.OnOff.Commands.Toggle())])`
 
           * Verify DUT doesn't crash by seeing next step execute.
           * On TH(all-clusters-app), Verify following logs are seen:
@@ -311,10 +311,10 @@ tests:
           response to the first CommandDataIB in the InvokeRequestMessage."
       verification: |
           Product maker needs to provide instructions for how to trigger the command this on the DUT that is capable of fitting into a single InvokeResponseMessage. For comparison, the DUT behavior for this
-          test step can be simulated using chip-repl (when DUT is a commissioner/Client).
+          test step can be simulated using matter-repl (when DUT is a commissioner/Client).
           The cluster used in the below command is an example, User can use any supported chip cluster/attribute/command. Note in this example the unique path is created by using 2 different endpoints.
 
-          `await devCtrl.SendBatchCommands(0x12344321, [chip.clusters.Command.InvokeRequestInfo(1, chip.clusters.OnOff.Commands.Toggle()), chip.clusters.Command.InvokeRequestInfo(2, chip.clusters.OnOff.Commands.Toggle())])`
+          `await devCtrl.SendBatchCommands(0x12344321, [matter.clusters.Command.InvokeRequestInfo(1, matter.clusters.OnOff.Commands.Toggle()), matter.clusters.Command.InvokeRequestInfo(2, matter.clusters.OnOff.Commands.Toggle())])`
 
           * Verify DUT doesn't crash by seeing next step execute.
           * On TH(all-clusters-app), Verify following logs are seen:
@@ -334,10 +334,10 @@ tests:
           second CommandDataIB will intentionally be left out."
       verification: |
           Product maker needs to provide instructions for how to trigger the command this on the DUT that is capable of fitting into a single InvokeResponseMessage. For comparison, the DUT behavior for this
-          test step can be simulated using chip-repl (when DUT is a commissioner/Client).
+          test step can be simulated using matter-repl (when DUT is a commissioner/Client).
           The cluster used in the below command is an example, User can use any supported chip cluster/attribute/command. Note in this example the unique path is created by using 2 different endpoints.
 
-          `await devCtrl.SendBatchCommands(0x12344321, [chip.clusters.Command.InvokeRequestInfo(1, chip.clusters.OnOff.Commands.Toggle()), chip.clusters.Command.InvokeRequestInfo(2, chip.clusters.OnOff.Commands.Toggle())])`
+          `await devCtrl.SendBatchCommands(0x12344321, [matter.clusters.Command.InvokeRequestInfo(1, matter.clusters.OnOff.Commands.Toggle()), matter.clusters.Command.InvokeRequestInfo(2, matter.clusters.OnOff.Commands.Toggle())])`
 
           * Verify DUT doesn't crash by seeing next step execute.
           * On TH(all-clusters-app), Verify following logs are seen:
@@ -353,10 +353,10 @@ tests:
           invoke request."
       verification: |
           Product maker needs to provide instructions for how to trigger the command this on the DUT that is capable of fitting into a single InvokeResponseMessage. For comparison, the DUT behavior for this
-          test step can be simulated using chip-repl (when DUT is a commissioner/Client).
+          test step can be simulated using matter-repl (when DUT is a commissioner/Client).
           The cluster used in the below command is an example, User can use any supported chip cluster/attribute/command. Note in this example the unique path is created by using 2 different endpoints.
 
-          `await devCtrl.SendCommand(0x12344321, 1, chip.clusters.OnOff.Commands.Toggle())`
+          `await devCtrl.SendCommand(0x12344321, 1, matter.clusters.OnOff.Commands.Toggle())`
 
           On TH(all-clusters-app), Verify that we recieves an InvokeRequestMessage that contains a single InvokeRequests
 

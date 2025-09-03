@@ -208,6 +208,11 @@ Protocols::InteractionModel::Status CameraAVStreamManager::SnapshotStreamDealloc
     return Status::Success;
 }
 
+void CameraAVStreamManager::OnVideoStreamAllocated(const VideoStreamStruct & allocatedStream, StreamAllocationAction action)
+{
+    ChipLogProgress(Zcl, "Video stream has been allocated");
+}
+
 void CameraAVStreamManager::OnStreamUsagePrioritiesChanged()
 {
     ChipLogProgress(Zcl, "Stream usage priorities changed");

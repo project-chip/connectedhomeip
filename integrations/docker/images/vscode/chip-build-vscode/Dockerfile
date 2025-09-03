@@ -13,7 +13,6 @@ FROM ghcr.io/project-chip/chip-build-nxp:${VERSION} AS nxp
 FROM ghcr.io/project-chip/chip-build-nxp-zephyr:${VERSION} AS nxpzephyr
 FROM ghcr.io/project-chip/chip-build-imx:${VERSION} AS imx
 FROM ghcr.io/project-chip/chip-build-ti:${VERSION} AS ti
-FROM ghcr.io/project-chip/chip-build-openiotsdk:${VERSION} AS openiotsdk
 FROM ghcr.io/project-chip/chip-build-bouffalolab:${VERSION} AS bouffalolab
 FROM ghcr.io/project-chip/chip-build-asr:${VERSION} AS asr
 FROM ghcr.io/project-chip/chip-build-nuttx:${VERSION} AS nuttx
@@ -32,7 +31,7 @@ COPY --from=nrf /opt/NordicSemiconductor/nRF5_tools /opt/NordicSemiconductor/nRF
 COPY --from=nrf /opt/NordicSemiconductor/nrfconnect /opt/NordicSemiconductor/nrfconnect
 
 COPY --from=android /opt/android/sdk /opt/android/sdk
-COPY --from=android /opt/android/android-ndk-r23c /opt/android/android-ndk-r23c
+COPY --from=android /opt/android/android-ndk-r28c /opt/android/android-ndk-r28c
 COPY --from=android /usr/lib/kotlinc /usr/lib/kotlinc
 
 COPY --from=psoc6 /opt/Tools/ModusToolbox /opt/Tools/ModusToolbox
@@ -54,8 +53,7 @@ COPY --from=nxpzephyr /opt/nxp-zephyr/zephyrproject/ /opt/nxp-zephyr/zephyrproje
 COPY --from=imx /opt/fsl-imx-xwayland /opt/fsl-imx-xwayland
 
 COPY --from=ti /opt/ti/sysconfig_1.22.0 /opt/ti/sysconfig_1.22.0
-
-COPY --from=openiotsdk /opt/FVP_Corstone_SSE-300/ /opt/FVP_Corstone_SSE-300/
+COPY --from=ti /opt/ti/sysconfig_1.18.1 /opt/ti/sysconfig_1.18.1
 
 COPY --from=bouffalolab /opt/bouffalolab_sdk /opt/bouffalolab_sdk
 
@@ -71,18 +69,18 @@ COPY --from=nuttx /opt/nuttx /opt/nuttx
 # into the 'licenses' subfolder. This allows any user (in particular
 # 'vscode' to accept licenses)
 RUN set -x \
-    && mkdir -p /opt/android/sdk/licenses \
-    && chmod -R a+w /opt/android/sdk/licenses \
-    && : # last line
+  && mkdir -p /opt/android/sdk/licenses \
+  && chmod -R a+w /opt/android/sdk/licenses \
+  && : # last line
 
 # mbedos requirements are generally just PIP packages
 RUN set -x \
-    && pip3 install --break-system-packages --no-cache-dir -U mbed-cli==1.10.5 mbed-tools==7.44.0 \
-    && : # last line
+  && pip3 install --break-system-packages --no-cache-dir -U mbed-cli==1.10.5 mbed-tools==7.44.0 \
+  && : # last line
 RUN set -x \
-    && mbed config -G GCC_ARM_PATH /opt/mbed-os-toolchain/gcc-arm-none-eabi-9-2019-q4-major/bin/ \
-    && mbed toolchain -G -s GCC_ARM \
-    && : # last line
+  && mbed config -G GCC_ARM_PATH /opt/mbed-os-toolchain/gcc-arm-none-eabi-9-2019-q4-major/bin/ \
+  && mbed toolchain -G -s GCC_ARM \
+  && : # last line
 
 # Required for the Tizen SDK:
 #   - zip
@@ -91,23 +89,23 @@ RUN set -x \
 #   - telnet
 #   - srecord
 # For java builds:
-#   - openjdk-11-jdk
+#   - openjdk-17-jdk
 RUN set -x \
-    && apt-get update \
-    && DEBIAN_FRONTEND=noninteractive apt-get install -fy --no-install-recommends \
-    zip \
-    expect \
-    telnet \
-    srecord \
-    openjdk-11-jdk \
-    && apt-get clean \
-    && rm -rf /var/lib/apt/lists/ \
-    && : # last line
+  && apt-get update \
+  && DEBIAN_FRONTEND=noninteractive apt-get install -fy --no-install-recommends \
+  zip \
+  expect \
+  telnet \
+  srecord \
+  openjdk-17-jdk \
+  && apt-get clean \
+  && rm -rf /var/lib/apt/lists/ \
+  && : # last line
 
 ENV PATH=$PATH:/usr/lib/kotlinc/bin
 ENV AMEBA_PATH=/opt/ameba/ambd_sdk_with_chip_non_NDA
 ENV ANDROID_HOME=/opt/android/sdk
-ENV ANDROID_NDK_HOME=/opt/android/android-ndk-r23c
+ENV ANDROID_NDK_HOME=/opt/android/android-ndk-r28c
 ENV CY_TOOLS_PATHS="/opt/Tools/ModusToolbox/tools_3.2"
 ENV SILABS_BOARD=BRD4186C
 # Keep GSDK_ROOT name until rename transition to SISDK is completed
@@ -119,7 +117,7 @@ ENV WIFI_SDK_ROOT=/opt/silabs/wifi_sdk
 ENV IDF_PATH=/opt/espressif/esp-idf/
 ENV IDF_TOOLS_PATH=/opt/espressif/tools
 ENV IMX_SDK_ROOT=/opt/fsl-imx-xwayland/6.1-langdale
-ENV JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64
+ENV JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64
 ENV NRF5_TOOLS_ROOT=/opt/NordicSemiconductor/nRF5_tools
 ENV OPENOCD_PATH=/opt/openocd/
 ENV QEMU_ESP32=/opt/espressif/qemu/qemu-system-xtensa
@@ -128,6 +126,7 @@ ENV SYSROOT_AARCH64=/opt/ubuntu-24.04-aarch64-sysroot
 ENV TELINK_ZEPHYR_BASE=/opt/telink/zephyrproject/zephyr
 ENV TELINK_ZEPHYR_SDK_DIR=/opt/telink/zephyr-sdk-0.17.0
 ENV TI_SYSCONFIG_ROOT=/opt/ti/sysconfig_1.22.0
+ENV TI_SYSCONFIG_ROOT_CC32XX=/opt/ti/sysconfig_1.18.1
 ENV ZEPHYR_BASE=/opt/NordicSemiconductor/nrfconnect/zephyr
 ENV ZEPHYR_SDK_INSTALL_DIR=/opt/NordicSemiconductor/nRF5_tools/zephyr-sdk/toolchains/latest
 ENV ZEPHYR_TOOLCHAIN_VARIANT=gnuarmemb

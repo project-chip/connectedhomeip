@@ -1503,7 +1503,7 @@
               "storageOption": "External",
               "singleton": 0,
               "bounded": 0,
-              "defaultValue": "1",
+              "defaultValue": "2",
               "reportable": 1,
               "minInterval": 0,
               "maxInterval": 65344,
@@ -3449,7 +3449,7 @@
               "side": "server",
               "type": "int16u",
               "included": 1,
-              "storageOption": "RAM",
+              "storageOption": "External",
               "singleton": 0,
               "bounded": 0,
               "defaultValue": "1",
@@ -6139,7 +6139,7 @@
       "profileId": 259,
       "endpointId": 2,
       "networkId": 0,
-      "parentEndpointIdentifier": null
+      "parentEndpointIdentifier": 1
     },
     {
       "endpointTypeName": "Anonymous Endpoint Type",
@@ -6147,7 +6147,7 @@
       "profileId": 259,
       "endpointId": 3,
       "networkId": 0,
-      "parentEndpointIdentifier": null
+      "parentEndpointIdentifier": 1
     }
   ]
 }
