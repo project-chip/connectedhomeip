@@ -133,7 +133,7 @@ async def main(setup_code, yaml_path, node_id, pics_file):
                 _CLUSTER_XML_DIRECTORY_PATH + '/chip/*.xml',
             ])
 
-            # Parsing YAML test and setting up chip-repl yamltests runner.
+            # Parsing YAML test and setting up matter-repl yamltests runner.
             parser_config = TestParserConfig(pics_file, clusters_definitions)
             yaml = TestParser(yaml_path, parser_config)
             runner = ReplTestRunner(
