@@ -312,7 +312,6 @@ jobs:
                         --target linux-x64-network-manager-${BUILD_VARIANT} \
                         --target linux-x64-energy-gateway-${BUILD_VARIIANT} \
                         --target linux-x64-energy-management-${BUILD_VARIANT} \
-                        --target linux-x64-tv-app-${BUILD_VARIANT} \
                         build \
                         --copy-artifacts-to objdir-clone \
                      "
