@@ -86,7 +86,6 @@ def current_latch_matcher(current_latch: bool) -> AttributeMatcher:
 class TC_CLCTRL_4_1(MatterBaseTest):
     @property
     def default_timeout(self) -> int:
-        # This test has potentially 45s waits, to set the timeout to 45
         return 45
 
     async def read_clctrl_attribute_expect_success(self, endpoint, attribute):
