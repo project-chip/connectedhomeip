@@ -47,7 +47,7 @@ CameraApp::CameraApp(chip::EndpointId aClustersEndpoint, CameraDeviceInterface *
 
     Clusters::PushAvStreamTransport::SetDelegate(mEndpoint, &(mCameraDevice->GetPushAVTransportDelegate()));
 
-    Clusters::PushAvStreamTransport::SetTLSClientManagementDelegate(chip::EndpointId(1),
+    Clusters::PushAvStreamTransport::SetTLSClientManagementDelegate(mEndpoint,
                                                                     &Clusters::TlsClientManagementCommandDelegate::GetInstance());
 
     // Fetch all initialization parameters for CameraAVStreamMgmt Server
