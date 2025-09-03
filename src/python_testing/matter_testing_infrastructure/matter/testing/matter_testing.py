@@ -1601,7 +1601,6 @@ async def _get_all_matching_endpoints(self: MatterBaseTest, accept_function: End
     return matching
 
 # TODO(#37537): Remove these temporary aliases after transition period
-type_matches = matchers.is_type
 utc_time_in_matter_epoch = timeoperations.utc_time_in_matter_epoch
 utc_datetime_from_matter_epoch_us = timeoperations.utc_datetime_from_matter_epoch_us
 utc_datetime_from_posix_time_ms = timeoperations.utc_datetime_from_posix_time_ms
