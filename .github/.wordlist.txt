@@ -425,7 +425,6 @@ DevKitC
 DevKitM
 devtype
 df
-dff
 dfe
 DFILE
 dfu
