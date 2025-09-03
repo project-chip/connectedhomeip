@@ -19,9 +19,7 @@
 #include <CommodityMeteringMain.h>
 #include <app/clusters/commodity-metering-server/CommodityMeteringTestEventTriggerHandler.h>
 
-#include <array>
 #include <cstdint>
-#include <vector>
 
 using namespace chip;
 using namespace chip::app;
@@ -31,31 +29,32 @@ using namespace chip::app::Clusters::CommodityMetering;
 namespace MeteredQuantitySamples {
 // Define component arrays as constexpr
 namespace Sample1 {
-static constexpr uint32_t TariffComponents1[] = { 0x5001, 0x5003 };
-static constexpr uint32_t TariffComponents2[] = { 0x5002, 0x5003, 0x5004 };
+static constexpr uint32_t TariffComponents1[] = { 1111, 2222 };
+static constexpr uint32_t TariffComponents2[] = { 3333, 4444, 5555 };
 
 // Non-constexpr storage for the actual data
 static const Structs::MeteredQuantityStruct::Type Data[] = {
-    { .tariffComponentIDs = DataModel::List(TariffComponents1, MATTER_ARRAY_SIZE(TariffComponents1)), .quantity = 3500 },
-    { .tariffComponentIDs = DataModel::List(TariffComponents2, MATTER_ARRAY_SIZE(TariffComponents2)), .quantity = -2000 }
+    { .tariffComponentIDs = DataModel::List(TariffComponents1, MATTER_ARRAY_SIZE(TariffComponents1)), .quantity = MATTER_ARRAY_SIZE(TariffComponents1) },
+    { .tariffComponentIDs = DataModel::List(TariffComponents2, MATTER_ARRAY_SIZE(TariffComponents2)), .quantity = MATTER_ARRAY_SIZE(TariffComponents2) }
 };
 } // namespace Sample1
 
 namespace Sample2 {
-static constexpr uint32_t TariffComponents1[] = { 0x6001 };
-static constexpr uint32_t TariffComponents2[] = { 0x6002, 0x6003 };
+static constexpr uint32_t TariffComponents1[] = { 7777 };
+static constexpr uint32_t TariffComponents2[] = { 8888, 9999 };
 
 static const Structs::MeteredQuantityStruct::Type Data[] = {
-    { .tariffComponentIDs = DataModel::List(TariffComponents1, MATTER_ARRAY_SIZE(TariffComponents1)), .quantity = 4200 },
-    { .tariffComponentIDs = DataModel::List(TariffComponents2, MATTER_ARRAY_SIZE(TariffComponents2)), .quantity = -1500 }
+    { .tariffComponentIDs = DataModel::List(TariffComponents1, MATTER_ARRAY_SIZE(TariffComponents1)), .quantity = MATTER_ARRAY_SIZE(TariffComponents1) },
+    { .tariffComponentIDs = DataModel::List(TariffComponents2, MATTER_ARRAY_SIZE(TariffComponents2)), .quantity = MATTER_ARRAY_SIZE(TariffComponents2) }
 };
 } // namespace Sample2
 } // namespace MeteredQuantitySamples
 
 namespace {
 
-class OldCommodityMeteringAttributes
+class TestDataManager
 {
+    static constexpr size_t MAX_MQ_SAMPLES = 2;
 private:
     Instance * mInstance = nullptr;
 
@@ -64,7 +63,7 @@ private:
     DataModel::Nullable<Globals::TariffUnitEnum> mTariffUnit;
     DataModel::Nullable<uint16_t> mMaximumMeteredQuantities;
 
-    std::array<const Structs::MeteredQuantityStruct::Type, 2> GetMeteredQuantityDataSample(uint8_t presetIdx)
+    std::array<const Structs::MeteredQuantityStruct::Type, MAX_MQ_SAMPLES> GetMeteredQuantityDataSample(uint8_t presetIdx)
     {
         switch (presetIdx)
         {
@@ -80,7 +79,7 @@ private:
     void SaveMeteredQuantity(const DataModel::Nullable<DataModel::List<Structs::MeteredQuantityStruct::Type>> & newValue)
     {
         // Clear existing data if any
-        mMeteredQuantity.SetNull();
+        ClearMeteredQuantity();
 
         if (!newValue.IsNull())
         {
@@ -197,34 +196,34 @@ private:
         if (mTariffUnit.IsNull() || (mTariffUnit.Value() == Globals::TariffUnitEnum::kKWh))
         {
             mTariffUnit.SetNonNull(Globals::TariffUnitEnum::kKVAh);
-            mMaximumMeteredQuantities.SetNonNull(3);
+            mMaximumMeteredQuantities.SetNonNull(MAX_MQ_SAMPLES + 1);
         }
         else
         {
             mTariffUnit.SetNonNull(Globals::TariffUnitEnum::kKWh);
-            mMaximumMeteredQuantities.SetNonNull(2);
+            mMaximumMeteredQuantities.SetNonNull(MAX_MQ_SAMPLES);
         }
 
         auto MQSampleArray =
             GetMeteredQuantityDataSample(static_cast<uint8_t>(mTariffUnit.Value() == Globals::TariffUnitEnum::kKWh));
 
-        std::vector<Structs::MeteredQuantityStruct::Type> tempCopy(MQSampleArray.begin(), MQSampleArray.end());
+        std::array<Structs::MeteredQuantityStruct::Type, MAX_MQ_SAMPLES> mqBuffer;
 
-        DataModel::List<Structs::MeteredQuantityStruct::Type> tmpList(tempCopy.data(), tempCopy.size());
+        std::copy(MQSampleArray.begin(), MQSampleArray.begin() + MAX_MQ_SAMPLES, mqBuffer.data());
+
+        DataModel::List<Structs::MeteredQuantityStruct::Type> tmpList(mqBuffer.data(), MAX_MQ_SAMPLES);
         DataModel::Nullable<DataModel::List<Structs::MeteredQuantityStruct::Type>> nullableList;
-
         nullableList.SetNonNull(std::move(tmpList));
+
         mInstance->SetMaximumMeteredQuantities(mMaximumMeteredQuantities);
         mInstance->SetMeteredQuantity(nullableList);
         mInstance->SetMeteredQuantityTimestamp(mMeteredQuantityTimestamp);
         mInstance->SetTariffUnit(mTariffUnit);
-
-        tempCopy.clear();
     }
 
 public:
-    OldCommodityMeteringAttributes(){};
-    ~OldCommodityMeteringAttributes() = default;
+    TestDataManager(){};
+    ~TestDataManager() = default;
 
     void Update()
     {
@@ -243,7 +242,7 @@ public:
     }
 };
 
-OldCommodityMeteringAttributes mOldCommodityMeteringAttributes;
+TestDataManager mTestDataManager;
 } // namespace
 
 bool HandleCommodityMeteringTestEventTrigger(uint64_t eventTrigger)
@@ -254,11 +253,11 @@ bool HandleCommodityMeteringTestEventTrigger(uint64_t eventTrigger)
     {
     case CommodityMeteringTrigger::kAttributesValueUpdate:
         ChipLogProgress(Support, "[CommodityMetering-Test-Event] => Attributes value update");
-        mOldCommodityMeteringAttributes.Update();
+        mTestDataManager.Update();
         break;
     case CommodityMeteringTrigger::kAttributesValueUpdateClear:
         ChipLogProgress(Support, "[CommodityMetering-Test-Event] => Attributes value clear");
-        mOldCommodityMeteringAttributes.Clear();
+        mTestDataManager.Clear();
         break;
     default:
         return false;
