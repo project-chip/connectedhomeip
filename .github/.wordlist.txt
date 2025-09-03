@@ -455,7 +455,6 @@ DM
 DMG
 DMM
 DMTT
-dn
 DNS
 Dnsmasq
 dnsmasqd
