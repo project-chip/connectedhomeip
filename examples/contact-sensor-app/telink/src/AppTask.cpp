@@ -85,11 +85,9 @@ void AppTask::UpdateClusterStateInternal(intptr_t arg)
     ChipLogProgress(NotSpecified, "StateValue::Set : %d", newValue);
 
     auto booleanState = chip::app::Clusters::BooleanState::GetClusterForEndpointIndex(1);
-    if (booleanState != nullptr)
-    {
-        EventNumber eventNumber;
-        booleanState->SetStateValue(newValue, eventNumber);
-    }
+    VerifyOrReturn(booleanState != nullptr);
+    EventNumber eventNumber;
+    booleanState->SetStateValue(newValue, eventNumber);
 }
 
 void AppTask::ContactActionEventHandler(AppEvent * aEvent)
@@ -140,14 +138,9 @@ void AppTask::UpdateDeviceState(void)
 
 void AppTask::UpdateDeviceStateInternal(intptr_t arg)
 {
-    bool stateValueAttrValue{ false };
-
     auto booleanState = chip::app::Clusters::BooleanState::GetClusterForEndpointIndex(1);
-    if (booleanState != nullptr)
-    {
-        stateValueAttrValue = booleanState->GetStateValue();
-    }
-
+    VerifyOrReturn(booleanState != nullptr);
+    auto stateValueAttrValue = booleanState->GetStateValue();
     LedManager::getInstance().setLed(LedManager::EAppLed_App0, stateValueAttrValue);
 }
 

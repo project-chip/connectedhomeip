@@ -34,17 +34,16 @@ namespace Windows {
 void BooleanState::UpdateState()
 {
     auto booleanState = chip::app::Clusters::BooleanState::GetClusterForEndpointIndex(mEndpointId);
-    if (booleanState != nullptr)
-    {
-        if (mTargetState.HasValue())
-        {
-            chip::EventNumber eventNumber;
-            booleanState->SetStateValue(mTargetState.Value(), eventNumber);
-            mTargetState.ClearValue();
-        }
+    VerifyOrReturn(booleanState != nullptr);
 
-        mState = booleanState->GetStateValue();
+    if (mTargetState.HasValue())
+    {
+        chip::EventNumber eventNumber;
+        booleanState->SetStateValue(mTargetState.Value(), eventNumber);
+        mTargetState.ClearValue();
     }
+
+    mState = booleanState->GetStateValue();
 }
 
 void BooleanState::Render()

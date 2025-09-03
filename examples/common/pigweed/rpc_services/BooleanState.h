@@ -41,15 +41,13 @@ public:
         EndpointId endpointId = request.endpoint_id;
         bool newState         = request.state_value;
 
+        EventNumber eventNumber;
         {
             DeviceLayer::StackLock lock;
 
             auto booleanState = app::Clusters::BooleanState::GetClusterForEndpointIndex(endpointId);
-            if (booleanState != nullptr)
-            {
-                EventNumber eventNumber;
-                RETURN_STATUS_IF_NOT_OK(booleanState->SetStateValue(newState, eventNumber));
-            }
+            VerifyOrReturnError(booleanState != nullptr, pw::Status::InvalidArgument());
+            RETURN_STATUS_IF_NOT_OK(booleanState->SetStateValue(newState, eventNumber));
         }
 
         response.event_number = static_cast<uint64_t>(eventNumber);
@@ -65,10 +63,8 @@ public:
             DeviceLayer::StackLock lock;
 
             auto booleanState = app::Clusters::BooleanState::GetClusterForEndpointIndex(endpointId);
-            if (booleanState != nullptr)
-            {
-                state_value = booleanState->GetStateValue();
-            }
+            VerifyOrReturnError(booleanState != nullptr, pw::Status::InvalidArgument());
+            state_value = booleanState->GetStateValue();
         }
 
         response.state.state_value = state_value;
