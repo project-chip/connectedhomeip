@@ -571,24 +571,22 @@ Protocols::InteractionModel::Status HandleWriteBridgedDeviceBasicAttribute(Devic
 {
     ChipLogProgress(DeviceLayer, "HandleWriteBridgedDeviceBasicAttribute: attrId=%d", attributeId);
 
-    if ((attributeId == chip::app::Clusters::BridgedDeviceBasicInformation::Attributes::NodeLabel::Id) && (dev->IsReachable()))
-    {
-        const uint8_t len = emberAfStringLength(buffer);
-        if (len > static_cast<uint8_t>(kNodeLabelSize))
-        {
-            return Protocols::InteractionModel::Status::InvalidValue;
-        }
-
-        std::string label(reinterpret_cast<const char *>(buffer + 1), reinterpret_cast<const char *>(buffer + 1) + len);
-
-        dev->SetName(label.c_str());
-
-        HandleDeviceStatusChanged(dev, Device::kChanged_Name);
-    }
-    else
+    if (attributeId != chip::app::Clusters::BridgedDeviceBasicInformation::Attributes::NodeLabel::Id)
     {
         return Protocols::InteractionModel::Status::Failure;
     }
+
+    const uint8_t len = emberAfStringLength(buffer);
+    if (len > kNodeLabelSize)
+    {
+        return Protocols::InteractionModel::Status::InvalidValue;
+    }
+
+    std::string label(reinterpret_cast<const char *>(buffer + 1), len);
+
+    dev->SetName(label.c_str());
+
+    HandleDeviceStatusChanged(dev, Device::kChanged_Name);
 
     return Protocols::InteractionModel::Status::Success;
 }
