@@ -20,7 +20,7 @@
 #import <Matter/MTRMetrics.h>
 #import <Matter/MTRStructsObjc.h>
 
-@class MTRCommissioningOperation; // Can't be imported, since it needs to reference us.
+@class MTRCommissioningOperation;
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -76,12 +76,14 @@ MTR_PROVISIONALLY_AVAILABLE
  * commissionee should use, or until commissioning is stopped.  The provided
  * credentials are allowed to be nil for an open Wi-Fi network.
  *
- * Exactly one of networks and error will be non-nil.
+ * * error will be non-nil if a scan was attempted and failed.
+ * * networks will be non-nil if a scan was attempted and succeeded.
+ * * Both error and networks will be nil if no scan was performed.
  */
 - (void)commissioning:(MTRCommissioningOperation *)commissioning
-    scannedWiFiNetworks:(nullable NSArray<MTRNetworkCommissioningClusterWiFiInterfaceScanResultStruct *> *)networks
-                  error:(nullable NSError *)error
-             completion:(void (^)(NSData * ssid, NSData * _Nullable credentials))completion;
+    needsWiFiNetworkSelectionWithScanResults:(nullable NSArray<MTRNetworkCommissioningClusterWiFiInterfaceScanResultStruct *> *)networks
+                                       error:(nullable NSError *)error
+                                  completion:(void (^)(NSData * ssid, NSData * _Nullable credentials))completion;
 
 /**
  * Callback that gets called for a commissionee that supports Thread if Thread
@@ -92,12 +94,14 @@ MTR_PROVISIONALLY_AVAILABLE
  * until the completion is invoked with the operational dataset the commissionee
  * should use, or until commissioning is stopped.
  *
- * Exactly one of networks and error will be non-nil.
+ * * error will be non-nil if a scan was attempted and failed.
+ * * networks will be non-nil if a scan was attempted and succeeded.
+ * * Both error and networks will be nil if no scan was performed.
  */
 - (void)commissioning:(MTRCommissioningOperation *)commissioning
-    scannedThreadNetworks:(nullable NSArray<MTRNetworkCommissioningClusterThreadInterfaceScanResultStruct *> *)networks
-                    error:(nullable NSError *)error
-               completion:(void (^)(NSData * operationalDataset))completion;
+    needsThreadNetworkSelectionWithScanResults:(nullable NSArray<MTRNetworkCommissioningClusterThreadInterfaceScanResultStruct *> *)networks
+                                         error:(nullable NSError *)error
+                                    completion:(void (^)(NSData * operationalDataset))completion;
 
 /**
  * Notification that a particular commissioning stage has been reached.

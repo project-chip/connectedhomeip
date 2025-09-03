@@ -15,6 +15,7 @@
  */
 
 #import <Foundation/Foundation.h>
+#import <Matter/MTRCommissioningDelegate.h>
 #import <Matter/MTRCommissioningOperation.h>
 #import <Matter/MTRCommissioningParameters.h>
 #import <Matter/MTRDeviceController.h>
@@ -22,7 +23,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@protocol MTRCommissioningDelegate_Internal <NSObject>
+@protocol MTRCommissioningDelegate_Internal <MTRCommissioningDelegate>
 @required
 
 /**

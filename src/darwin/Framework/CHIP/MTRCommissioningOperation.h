@@ -30,9 +30,9 @@ MTR_PROVISIONALLY_AVAILABLE
 + (instancetype)new NS_UNAVAILABLE;
 
 /**
- * Prepare to do a new commissioning of a device with the given parameters and
- * the given setup payload (QR code, manual pairing code, etc).  Returns nil if
- * the payload is not valid.
+ * Prepare to commission a device with the given parameters and the given setup
+ * payload (QR code, manual pairing code, etc).  Returns nil if the payload is
+ * not valid.
  *
  * The deviceAttestationDelegate property of MTRCommissioningParameters will be
  * ignored. Device attestation notifications will be delivered to the

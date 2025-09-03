@@ -37,7 +37,7 @@ using namespace chip;
 using namespace chip::Tracing::DarwinFramework;
 
 @interface MTRCommissioningOperationDeviceAttestationDelegate : NSObject <MTRDeviceAttestationDelegate>
-@property (nonatomic, readwrite, weak) MTRCommissioningOperation * commissioningOperation;
+@property (nonatomic, weak) MTRCommissioningOperation * commissioningOperation;
 @end
 
 @interface MTRCommissioningOperation () <MTRDeviceControllerDelegate_Internal>
@@ -98,11 +98,8 @@ using namespace chip::Tracing::DarwinFramework;
     _delegate = delegate;
     _delegateQueue = queue;
 
-    // Set an attestation delegate on the parameters, but avoid a reference
-    // loop, so don't set ourselves directly.
-    auto * attestationDelegate = [[MTRCommissioningOperationDeviceAttestationDelegate alloc] init];
-    attestationDelegate.commissioningOperation = self;
-    _parameters.deviceAttestationDelegate = attestationDelegate;
+    // Don't hold on to the provided attestation delegate, which we never use.
+    _parameters.deviceAttestationDelegate = nil;
 
     return self;
 }
@@ -213,27 +210,22 @@ static inline void emitMetricForSetupPayload(NSString * payload)
 
     MTR_LOG("%@ Device commissioning failed with controller %@ metrics %@", self, strongController, metrics);
 
-    id<MTRCommissioningDelegate> strongDelegate = _delegate;
-    id<MTRCommissioningDelegate_Internal> strongInternalDelegate = [self _internalDelegate];
+    id<MTRCommissioningDelegate_Internal> strongDelegate = [self _internalDelegate];
 
     // Null out the delegate, so we don't notify based on any internal cleanups
     // we happen to do.
     _delegate = nil;
 
     dispatch_async(_delegateQueue, ^{
-        if ([strongInternalDelegate respondsToSelector:@selector(commissioning:failedWithError:forDeviceID:metrics:)]) {
-            [strongInternalDelegate commissioning:self failedWithError:error forDeviceID:commissioningID metrics:metrics];
+        if ([strongDelegate respondsToSelector:@selector(commissioning:failedWithError:forDeviceID:metrics:)]) {
+            [strongDelegate commissioning:self failedWithError:error forDeviceID:commissioningID metrics:metrics];
         } else if ([strongDelegate respondsToSelector:@selector(commissioning:failedWithError:metrics:)]) {
             [strongDelegate commissioning:self failedWithError:error metrics:metrics];
         }
-
-        // No matter what, notify our controller that we are done.  This is not
-        // ideal, because if the delegate queue is suspended we will never clear
-        // our state on the MTRDeviceController.  But we want this part to come
-        // after the delegate notification when the delegate is the controller
-        // itself.  Try to figure out a better way to do this.
-        [strongController commissioningDone:self];
     });
+
+    // No matter what, notify our controller that we are done.
+    [strongController commissioningDone:self];
 }
 
 - (id<MTRCommissioningDelegate_Internal>)_internalDelegate
@@ -273,6 +265,12 @@ static inline void emitMetricForSetupPayload(NSString * payload)
         return;
     }
 
+    // We want to use ourselves as an attestation delegate on the parameters,
+    // but to avoid a reference loop, don't set ourselves directly.
+    auto * attestationDelegate = [[MTRCommissioningOperationDeviceAttestationDelegate alloc] init];
+    attestationDelegate.commissioningOperation = self;
+    _parameters.deviceAttestationDelegate = attestationDelegate;
+
     NSError * commissionError;
     BOOL ok = [strongController commission:self withCommissioningID:_commissioningID commissioningParams:_parameters error:&commissionError];
     if (!ok) {
@@ -305,14 +303,10 @@ static inline void emitMetricForSetupPayload(NSString * payload)
         if ([strongDelegate respondsToSelector:@selector(commissioning:succeededForNodeID:metrics:)]) {
             [strongDelegate commissioning:self succeededForNodeID:nodeID metrics:metrics];
         }
-
-        // No matter what, notify our controller that we are done.  This is not
-        // ideal, because if the delegate queue is suspended we will never clear
-        // our state on the MTRDeviceController.  But we want this part to come
-        // after the delegate notification when the delegate is the controller
-        // itself.  Try to figure out a better way to do this.
-        [strongController commissioningDone:self];
     });
+
+    // No matter what, notify our controller that we are done.
+    [strongController commissioningDone:self];
 }
 
 // No need to implement deprecated or less-information versions of
@@ -337,11 +331,10 @@ static inline void emitMetricForSetupPayload(NSString * payload)
 
 - (void)controller:(MTRDeviceController *)controller commissioneeHasReceivedNetworkCredentials:(NSNumber *)nodeID
 {
-    id<MTRCommissioningDelegate> strongDelegate = _delegate;
-    id<MTRCommissioningDelegate_Internal> strongInternalDelegate = [self _internalDelegate];
+    id<MTRCommissioningDelegate_Internal> strongDelegate = [self _internalDelegate];
     dispatch_async(_delegateQueue, ^{
-        if ([strongInternalDelegate respondsToSelector:@selector(commissioning:provisionedNetworkCredentialsForDeviceID:)]) {
-            [strongInternalDelegate commissioning:self provisionedNetworkCredentialsForDeviceID:nodeID];
+        if ([strongDelegate respondsToSelector:@selector(commissioning:provisionedNetworkCredentialsForDeviceID:)]) {
+            [strongDelegate commissioning:self provisionedNetworkCredentialsForDeviceID:nodeID];
         } else if ([strongDelegate respondsToSelector:@selector(commissioning:reachedCommissioningStage:)]) {
             [strongDelegate commissioning:self reachedCommissioningStage:MTRCommissioningStageProvisionedNetworkCredentials];
         }
@@ -362,7 +355,7 @@ static inline void emitMetricForSetupPayload(NSString * payload)
     id<MTRCommissioningDelegate> strongDelegate = _delegate;
     dispatch_async(_delegateQueue, ^{
         mtr_weakify(self);
-        [strongDelegate commissioning:self scannedWiFiNetworks:networks error:error completion:^(NSData * ssid, NSData * _Nullable credentials) {
+        [strongDelegate commissioning:self needsWiFiNetworkSelectionWithScanResults:networks error:error completion:^(NSData * ssid, NSData * _Nullable credentials) {
             mtr_strongify(self);
 
             if (!self) {
@@ -400,7 +393,7 @@ static inline void emitMetricForSetupPayload(NSString * payload)
     id<MTRCommissioningDelegate> strongDelegate = _delegate;
     dispatch_async(_delegateQueue, ^{
         mtr_weakify(self);
-        [strongDelegate commissioning:self scannedThreadNetworks:networks error:error completion:^(NSData * operationalDataset) {
+        [strongDelegate commissioning:self needsThreadNetworkSelectionWithScanResults:networks error:error completion:^(NSData * operationalDataset) {
             mtr_strongify(self);
 
             if (!self) {

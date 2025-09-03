@@ -924,29 +924,36 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
 
 - (void)commissioningDone:(MTRCommissioningOperation *)commissioning
 {
-    if (self.currentCommissioning == commissioning) {
-        MTR_LOG("%@ stopping commissioning %@", self, commissioning);
-        self.currentCommissioning = nil;
+    // Ensure that we do the work below (including nulling out
+    // currentCommissioning) after our delegate callbacks for success/failure of
+    // commissioning have been called, in cases when we are the
+    // MTRCommissioningDelegate.  The queue needs to match the one we use for
+    // MTRCommissioningOperation in those cases.
+    dispatch_async(_commissioningQueue, ^{
+        if (self.currentCommissioning == commissioning) {
+            MTR_LOG("%@ stopping commissioning %@", self, commissioning);
+            self.currentCommissioning = nil;
 
-        // Reset ourselves as the device controller delegate, so we can
-        // correctly handle the commissioning codepaths that don't use
-        // MTRCommissioningOperation yet.
-        auto block = ^{
-            self->_deviceControllerDelegateBridge->setDelegate(self, self, self->_chipWorkQueue);
-        };
+            // Reset ourselves as the device controller delegate, so we can
+            // correctly handle the commissioning codepaths that don't use
+            // MTRCommissioningOperation yet.
+            auto block = ^{
+                self->_deviceControllerDelegateBridge->setDelegate(self, self, self->_chipWorkQueue);
+            };
 
-        // We don't care whether this fails.  If it fails, we are shut down
-        // already, and then we don't need to worry about the device controller
-        // delegate.
-        [self syncRunOnWorkQueue:block error:nil];
-    }
+            // We don't care whether this fails.  If it fails, we are shut down
+            // already, and then we don't need to worry about the device controller
+            // delegate.
+            [self syncRunOnWorkQueue:block error:nil];
+        }
 
-    // Generally, we would expect self.currentInternalCommissioning to be equal
-    // to commissioning if and only if self.currentCommissioning is equal to
-    // it.  But just in case, have this as a separate check.
-    if (self.currentInternalCommissioning == commissioning) {
-        self.currentInternalCommissioning = nil;
-    }
+        // Generally, we would expect self.currentInternalCommissioning to be equal
+        // to commissioning if and only if self.currentCommissioning is equal to
+        // it.  But just in case, have this as a separate check.
+        if (self.currentInternalCommissioning == commissioning) {
+            self.currentInternalCommissioning = nil;
+        }
+    });
 }
 
 - (BOOL)setupCommissioningSessionWithDiscoveredDevice:(MTRCommissionableBrowserResult *)discoveredDevice
