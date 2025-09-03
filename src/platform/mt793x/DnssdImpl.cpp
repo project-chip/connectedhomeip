@@ -335,9 +335,13 @@ CHIP_ERROR ChipDnssdBrowse(const char * type, DnssdServiceProtocol protocol, chi
 
     (void) addressType;
     ChipLogProgress(ServiceProvisioning, "ChipDnssdBrowse %s", StringOrNullMarker(type));
-    strcpy(ServiceType, type);
-    strcat(ServiceType, ".");
-    strcat(ServiceType, GetProtocolString(protocol));
+    int ret = snprintf(ServiceType, sizeof(ServiceType), "%s.%s", type, GetProtocolString(protocol));
+    if (ret < 0 || static_cast<size_t>(ret) >= sizeof(ServiceType))
+    {
+        ChipLogError(ServiceProvisioning, "ServiceType truncated or snprintf error: type=%s protocol=%s", StringOrNullMarker(type), GetProtocolString(protocol));
+        error = CHIP_ERROR_INVALID_ARGUMENT;
+        return error;
+    }
     err = DNSServiceBrowse(&BrowseClient, 0, 0, ServiceType, SERVICE_DOMAIN, ChipDNSServiceBrowseReply, (void *) callback);
     ChipLogProgress(ServiceProvisioning, "DNSServiceBrowse %d", (int) err);
     if (err)
