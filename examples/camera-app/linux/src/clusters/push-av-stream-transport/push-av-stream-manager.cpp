@@ -237,6 +237,18 @@ PushAvStreamTransportManager::ValidateBandwidthLimit(StreamUsageEnum streamUsage
     return Status::Success;
 }
 
+bool PushAvStreamTransportManager::ValidateStreamUsage(StreamUsageEnum streamUsage)
+{
+    // TODO: if StreamUsage is present in the StreamUsagePriorities list, return true, false otherwise
+    return true;
+}
+
+bool PushAvStreamTransportManager::ValidateSegmentDuration(uint16_t segmentDuration)
+{
+    // TODO: if Segment Duration is multiple of KeyFrameInterval, return true, false otherwise
+    return true;
+}
+
 bool PushAvStreamTransportManager::ValidateUrl(const std::string & url)
 {
     const std::string https = "https://";
