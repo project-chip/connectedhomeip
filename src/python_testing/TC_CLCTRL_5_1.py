@@ -290,7 +290,7 @@ class TC_CLCTRL_5_1(MatterBaseTest):
             main_state = await self.read_clctrl_attribute_expect_success(endpoint, attributes.MainState)
             logging.info(f"MainState: {main_state}")
             asserts.assert_equal(main_state, Clusters.ClosureControl.Enums.MainStateEnum.kStopped,
-                                  "MainState is not in the expected state")
+                                 "MainState is not in the expected state")
 
         else:
             logging.info("Motion Latching feature not supported, skipping steps 3b to 3j")
