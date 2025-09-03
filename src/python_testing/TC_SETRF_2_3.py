@@ -72,28 +72,29 @@ class TC_SETRF_2_3(CommodityTariffTestBaseHelper):
 
         steps = [
             TestStep("1", "Commission DUT to TH (can be skipped if done in a preceding test).",
-                     "DUT is commissioned to TH", is_commissioning=True),
+                     "DUT is commissioning to TH.", is_commissioning=True),
             TestStep("2", "TH reads TestEventTriggersEnabled attribute from General Diagnostics Cluster.",
                      "Value has to be 1 (True)."),
-            TestStep("3", "TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 with EnableKey field set to PIXIT.SETRF.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to PIXIT.SETRF.TEST_EVENT_TRIGGER for Test Event Attributes Value Set Test Event.", "Verify DUT responds w/ status SUCCESS(0x00)."),
+            TestStep("3", "TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 with EnableKey field set to PIXIT.SETRF.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to PIXIT.SETRF.TEST_EVENT_TRIGGER for Test Event Attributes Value Set Test Event.",
+                     "Verify DUT responds w/ status SUCCESS(0x00)."),
             TestStep("4", "TH reads from the DUT the CurrentDayEntryDate attribute.", """
                      - Verify that the DUT response contains a value of epoch-s type;
                      - Store the value as currentDayEntryDateValue;
                      - Define day of week based on currentDayEntryDateValue epoch-s value. Store the defined value as currentDayEntryDayofWeekValue with DayPatternDayOfWeekBitmap type."""),
             TestStep("5", "TH reads from the DUT the CurrentDay attribute.", """
-                          - Verify that the DUT response contains a value of DayStruct type;
-                          - Store the value as currentDayValue;
-                          - Store Date field value as dateCurrentValue;
-                          - Store DayType field value as dayTypeCurrentValue;
-                          - Store DayEntryIDs field value as dayEntryIDsCurrentValue"""),
+                     - Verify that the DUT response contains a value of DayStruct type;
+                     - Store the value as currentDayValue;
+                     - Store Date field value as dateCurrentValue;
+                     - Store DayType field value as dayTypeCurrentValue;
+                     - Store DayEntryIDs field value as dayEntryIDsCurrentValue"""),
             TestStep("6", "If dayTypeCurrentValue equals 3 (Event), TH reads from the DUT the IndividualDays attribute.", """
-                          - Verify that the DUT response contains a value that is a list of DayStruct entries with list length less or equal 50;
-                          - For each entry:
-                            - If Date field value equals dateCurrentValue, verify that Date field value is unique in the entries list, DayType field value equals dayTypeCurrentValue and DayEntryIDs field value equals dayEntryIDsCurrentValue."""),
+                     - Verify that the DUT response contains a value that is a list of DayStruct entries with list length less or equal 50;
+                     - For each entry:
+                        - If Date field value equals dateCurrentValue, verify that Date field value is unique in the entries list, DayType field value equals dayTypeCurrentValue and DayEntryIDs field value equals dayEntryIDsCurrentValue."""),
             TestStep("7a", "If dayTypeCurrentValue does NOT equal 3 (Event), TH reads from the DUT the CalendarPeriods attribute.", """
-                          - Verify that the DUT response contains a value that is a list of CalendarPeriodStruct entries with list length in range 1 - 4;
-                          - Check the list in revers order and store DayPatternIDs field value as dayPatternIDsCurrentValue for the first entity that fits the condition:
-                            - StartDate field value is less than currentDayEntryDateValue."""),
+                     - Verify that the DUT response contains a value that is a list of CalendarPeriodStruct entries with list length in range 1 - 4;
+                     - Check the list in revers order and store DayPatternIDs field value as dayPatternIDsCurrentValue for the first entity that fits the condition:
+                        - StartDate field value is less than currentDayEntryDateValue."""),
             TestStep("7b", "TH reads from the DUT the DayPatterns attribute.", """
                      - Verify that the DUT response contains a value that is a list of DayPatternStruct entries with list length less or equal 28;
                      - For each entry:
@@ -102,91 +103,57 @@ class TC_SETRF_2_3(CommodityTariffTestBaseHelper):
                      - Verify that the DUT response contains a value that is a list of TariffComponentStruct entries with list length less or equal 20;
                      - Store the value as currentTariffComponentsValue;
                      - For each entry store TariffComponentID field value in tariffComponentIDsCurrentValue list."""),
-            TestStep("9", "TH reads from the DUT the TariffPeriods attribute.", """
-                          - Verify that the DUT response contains a list of TariffPeriodStruct entries with list length in range 1-672;
-                          - For each entry:
-                            - If TariffComponentIDs field value equals tariffComponentIDsCurrentValue, verify that DayEntryIDs field value equals dayEntryIDsCurrentValue."""),
-            TestStep("10", "TH reads from the DUT the TariffComponents attribute.", """
-                          - Verify that the DUT response contains a null or a list of TariffComponentStruct entries with list length in range 1-672;
-                          - For each entry:
-                            - If TariffComponentID equals any from tariffComponentIDsCurrentValue, save the entry value in tariffComponentsCurrentValue list;
-                            - Verify that tariffComponentsCurrentValue matches currentTariffComponentsValue."""),
-            TestStep("11", "TH reads from the DUT the NextDayEntryDate attribute.", """
-                          - Verify that the DUT response contains a value of epoch-s type;
-                          - Store the value as nextDayEntryDateValue;
-                          - Convert nextDayEntryDateValue epoch-s value to a DayPatternDayOfWeekBitmap type value and store as nextDayEntryDayofWeekValue."""),
-            TestStep("12", "TH reads from the DUT the NextDay attribute.", """
-                     - Verify that the DUT response contains a value of DayStruct type;
-                     - Store the value as nextDayValue;
-                     - Store Date field value as dateNextValue;
-                     - Store DayType field value as dayTypeNextValue;
-                     - Store DayEntryIDs field value as dayEntryIDsNextValue;
-                     - nextDayValue does NOT match currentDayValue."""),
-            TestStep("13", "If dayTypeNextValue equals 3 (Event), TH reads from the DUT the IndividualDays attribute.", """
-                          - Verify that the DUT response contains a value that is a list of DayStruct entries with list length less or equal 50;
-                          - For each entry:
-                            - If Date field value equals dayTypeNextValue, verify that Date field value is unique in the entries list, DayType field value equals dayTypeNextValue and DayEntryIDs field value equals dayEntryIDsNextValue."""),
-            TestStep("14a", "If dayTypeNextValue does NOT equal 3 (Event), TH reads from the DUT the CalendarPeriods attribute.", """
-                          - Verify that the DUT response contains a value that is a list of CalendarPeriodStruct entries with list length in range 1 - 4;
-                          - Check the list in revers order and store DayPatternIDs field value as dayPatternIDsNextValue for the first entity that fits the condition:
-                            - StartDate field value is less than nextDayEntryDateValue."""),
-            TestStep("14b", "TH reads from the DUT the DayPatterns attribute.", """
-                     - Verify that the DUT response contains a value that is a list of DayPatternStruct entries with list length less or equal 28;
+            TestStep("9", "TH reads from the DUT the TariffComponents attribute.", """
+                     - Verify that the DUT response contains a null or a list of TariffComponentStruct entries with list length in range 1-672;
                      - For each entry:
-                        - If DayPatternID field value is included in dayPatternIDsNextValue and bitwise AND DaysOfWeek field value and nextDayEntryDayofWeekValue equals nextDayEntryDayofWeekValue, verify that DayEntryIDs field value equals dayEntryIDsNextValue."""),
-            TestStep("15", "TH reads from the DUT the NextTariffComponents attribute.", """
-                          - Verify that the DUT response contains a value that is a list of TariffComponentStruct entries with list length less or equal 20;
-                          - Store the value as nextTariffComponentsValue;
-                          - For each entry store TariffComponentID field value in tariffComponentIDsNextValue list."""),
-            TestStep("16", "TH reads from the DUT the TariffPeriods attribute.", """
-                          - Verify that the DUT response contains a list of TariffPeriodStruct entries with list length in range 1-672;
-                          - For each entry:
-                            - If TariffComponentIDs field value equals tariffComponentIDsNextValue, verify that DayEntryIDs field value equals dayEntryIDsNextValue."""),
-            TestStep("17", "TH reads from the DUT the TariffComponents attribute.", """
-                          - Verify that the DUT response contains a null or a list of TariffComponentStruct entries with list length in range 1-672;
-                          - For each entry:
-                            - If TariffComponentID equals any from tariffComponentIDsNextValue, save the entry value in tariffComponentsNextValue list;
-                            - Verify that tariffComponentsNextValue matches nextTariffComponentsValue."""),
-            TestStep("18", "TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 with EnableKey field set to PIXIT.SETRF.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to PIXIT.SETRF.TEST_EVENT_TRIGGER for Change Time Test Event.", """
-                          Verify DUT responds w/ status SUCCESS(0x00)."""),
-            TestStep("19", "TH reads from the DUT the CurrentDayEntryDate attribute.", """
-                          - Verify that the DUT response contains a value of epoch-s type;
-                          - The value does NOT match the currentDayEntryDateValue;
-                          - The value matches the nextDayEntryDateValue;
-                          - Store the value as currentDayEntryDateValue."""),
-            TestStep("20", "TH reads from the DUT the CurrentDay attribute.", """
+                        - If TariffComponentID equals any from tariffComponentIDsCurrentValue, save the entry value in tariffComponentsCurrentValue list;
+                        - Verify that tariffComponentsCurrentValue matches currentTariffComponentsValue."""),
+            TestStep("10", "TH reads from the DUT the NextDayEntryDate attribute.", """
+                     - Verify that the DUT response contains a value of epoch-s type;
+                     - Store the value as nextDayEntryDateValue."""),
+            TestStep("11", "TH reads from the DUT the NextDay attribute.", """
+                     - Verify that the DUT response contains a value of DayStruct type;
+                     - Store the value as nextDayValue."""),
+            TestStep("12", "TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 with EnableKey field set to PIXIT.SETRF.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to PIXIT.SETRF.TEST_EVENT_TRIGGER for Change Time Test Event.", """
+                     Verify DUT responds w/ status SUCCESS(0x00)."""),
+            TestStep("13", "TH reads from the DUT the CurrentDayEntryDate attribute.", """
+                     - Verify that the DUT response contains a value of epoch-s type;
+                     - The value does NOT match the currentDayEntryDateValue;
+                     - The value matches the nextDayEntryDateValue;
+                     - Store the value as currentDayEntryDateValue."""),
+            TestStep("14", "TH reads from the DUT the CurrentDay attribute.", """
                      - Verify that the DUT response contains a value of DayStruct type;
                      - The value matches the currentDayValue;
                      - Store the value as currentDayValue."""),
-            TestStep("21", "TH reads from the DUT the NextDayEntryDate attribute.", """
+            TestStep("15", "TH reads from the DUT the NextDayEntryDate attribute.", """
                      - Verify that the DUT response contains a value of epoch-s type;
                      - The value does NOT match the nextDayEntryDateValue;
                      - The value does NOT match currentDayEntryDateValue;
                      - Store the value as nextDayEntryDateValue."""),
-            TestStep("22", "TH reads from the DUT the NextDay attribute.", """
+            TestStep("16", "TH reads from the DUT the NextDay attribute.", """
                      - Verify that the DUT response contains a value of DayStruct type;
                      - The value does NOT match currentDayValue and matches the nextDayValue;
                      - Store the value as nextDayValue."""),
-            TestStep("23", "TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 with EnableKey field set to PIXIT.SETRF.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to PIXIT.SETRF.TEST_EVENT_TRIGGER for Change Day Test Event.", """
+            TestStep("17", "TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 with EnableKey field set to PIXIT.SETRF.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to PIXIT.SETRF.TEST_EVENT_TRIGGER for Change Day Test Event.", """
                      Verify DUT responds w/ status SUCCESS(0x00)."""),
-            TestStep("24", "TH reads from the DUT the CurrentDayEntryDate attribute.", """
+            TestStep("18", "TH reads from the DUT the CurrentDayEntryDate attribute.", """
                      - Verify that the DUT response contains a value of epoch-s type;
                      - The value does NOT match the currentDayEntryDateValue;
                      - The value does NOT match the nextDayEntryDateValue."""),
-            TestStep("25", "TH reads from the DUT the CurrentDay attribute.", """
+            TestStep("19", "TH reads from the DUT the CurrentDay attribute.", """
                      - Verify that the DUT response contains a value of DayStruct type;
                      - The value does NOT match the currentDayValue;
                      - The value matches nextDayValue;
                      - Store the value as currentDayValue."""),
-            TestStep("26", "TH reads from the DUT the NextDayEntryDate attribute.", """
+            TestStep("20", "TH reads from the DUT the NextDayEntryDate attribute.", """
                      - Verify that the DUT response contains a value of epoch-s type;
                      - The value does NOT match currentDayEntryDateValue;
                      - The value does NOT match the nextDayEntryDateValue."""),
-            TestStep("27", "TH reads from the DUT the NextDay attribute.", """
+            TestStep("21", "TH reads from the DUT the NextDay attribute.", """
                      - Verify that the DUT response contains a value of DayStruct type;
                      - The value does NOT match the nextDayValue;
                      - The value does NOT match the currentDayValue."""),
-            TestStep("28", "TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 with EnableKey field set to PIXIT.SETRF.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to PIXIT.SETRF.TEST_EVENT_TRIGGER for Test Event Clear.", """
+            TestStep("22", "TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 with EnableKey field set to PIXIT.SETRF.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to PIXIT.SETRF.TEST_EVENT_TRIGGER for Test Event Clear.", """
                      Verify DUT responds w/ status SUCCESS(0x00)."""),
         ]
 
@@ -200,17 +167,11 @@ class TC_SETRF_2_3(CommodityTariffTestBaseHelper):
 
         # Variables that will be used in the test to store intermediate values
         currentDayEntryDayofWeekValue: int = None
-        nextDayEntryDayofWeekValue: int = None
         dateCurrentValue: int = None
         dayTypeCurrentValue: cluster.Enums.DayTypeEnum = None
         dayEntryIDsCurrentValue: List[int] = []
-        dateNextValue: int = None
-        dayTypeNextValue: cluster.Enums.DayTypeEnum = None
-        dayEntryIDsNextValue: List[int] = []
         tariffComponentIDsCurrentValue: List[int] = []
-        tariffComponentIDsNextValue: List[int] = []
         tariffComponentsCurrentValue: List[cluster.Structs.TariffComponentStruct] = []
-        tariffComponentsNextValue: List[cluster.Structs.TariffComponentStruct] = []
         dayPatternIDsCurrentValue: List[int] = []
 
         self.step("1")
@@ -228,7 +189,7 @@ class TC_SETRF_2_3(CommodityTariffTestBaseHelper):
         # TH reads CurrentDayEntryDate attribute, expects a epoch-s. Define day of week based on CurrentDayEntryDate attribute value.
         self.currentDayEntryDateValue = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.CurrentDayEntryDate)
         await self.check_current_day_entry_date_attribute(endpoint, self.currentDayEntryDateValue)
-        currentDayEntryDayofWeekValue = await self.get_day_of_week_from_current_day_entry_date(self.currentDayEntryDateValue)
+        currentDayEntryDayofWeekValue = await self.get_day_of_week_from_day_entry_date(self.currentDayEntryDateValue)
 
         self.step("5")
         # TH reads CurrentDay attribute, expects a CurrentDayStruct
@@ -260,13 +221,6 @@ class TC_SETRF_2_3(CommodityTariffTestBaseHelper):
             self.calendarPeriodsValue = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.CalendarPeriods)
             await self.check_calendar_periods_attribute(endpoint, self.calendarPeriodsValue)
             dayPatternIDsCurrentValue = await self.get_day_pattern_IDs_for_active_calendar_period(next=False)
-            # if len(self.calendarPeriodsValue) == 1:
-            #     dayPatternIDsCurrentValue = self.calendarPeriodsValue[0].dayPatternIDs
-            # else:
-            #     for period in self.calendarPeriodsValue[::-1]:
-            #         if period.startDate < self.currentDayEntryDateValue:
-            #             dayPatternIDsCurrentValue = period.dayPatternIDs
-            #             break
 
             self.step("7b")
             # we search DayPattern that corresponds to day of week defined on step 4 and compare DayEntryIDs from CurrentDay and found DayPattern
@@ -276,16 +230,6 @@ class TC_SETRF_2_3(CommodityTariffTestBaseHelper):
                                                                                     day_of_week=currentDayEntryDayofWeekValue,
                                                                                     list_of_day_entry_IDs=dayEntryIDsCurrentValue,
                                                                                     current_or_next="Current")
-            # for dayPattern in self.dayPatternsValue:
-            #     if dayPattern.dayPatternID in dayPatternIDsCurrentValue:
-            #         if (dayPattern.daysOfWeek & currentDayEntryDayofWeekValue) == currentDayEntryDayofWeekValue:
-            #             asserts.assert_equal(sorted(dayPattern.dayEntryIDs), sorted(dayEntryIDsCurrentValue),
-            #                                  "DayEntryIDs from DayPatterns must be equal to DayEntryIDs from CurrentDay.")
-            #             day_pattern_found = True
-            #             break
-
-            # if not day_pattern_found:
-            #     asserts.fail("DayPattern not found for CurrentDayEntryDate attribute value.")
 
         self.step("8")
         # TH reads CurrentTariffComponents attribute, expects a list of TariffComponentStruct. Gets TariffComponentIDs from CurrentTariffComponents.
@@ -295,17 +239,6 @@ class TC_SETRF_2_3(CommodityTariffTestBaseHelper):
             tariffComponentIDsCurrentValue.append(component.tariffComponentID)
 
         self.step("9")
-        # TH reads TariffPeriods attribute, expects a list of TariffPeriodStruct. Define TariffPeriod corresponding to active TariffComponents.
-        # Checks DayEntryIDs from defined TariffPeriod against DayEntryIDs from CurrentDay.
-        self.tariffPeriodsValue = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.TariffPeriods)
-        await self.check_tariff_periods_attribute(endpoint, self.tariffPeriodsValue)
-        for tariffPeriod in self.tariffPeriodsValue:
-            if sorted(tariffPeriod.tariffComponentIDs) == sorted(tariffComponentIDsCurrentValue):
-                asserts.assert_equal(sorted(tariffPeriod.dayEntryIDs), sorted(dayEntryIDsCurrentValue),
-                                     "DayEntryIDs from TariffPeriods must be equal to DayEntryIDs from CurrentDay.")
-                break
-
-        self.step("10")
         # TH reads TariffComponents attribute, expects a list of TariffComponentStruct. Gets TariffComponents that correspond to TariffComponentIDs from CurrentTariffComponents.
         # Verifies that all TariffComponentStruct entries from CurrentTariffComponents are present in TariffComponents.
         self.tariffComponentsValue = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.TariffComponents)
@@ -317,102 +250,21 @@ class TC_SETRF_2_3(CommodityTariffTestBaseHelper):
         asserts.assert_equal(sorted(tariffComponentsCurrentValue), sorted(self.currentTariffComponentsValue),
                              "All TariffComponentStruct entries from CurrentTariffComponents must be presented in TariffComponents.")
 
-        self.step("11")
+        self.step("10")
+        # TH reads NextDayEntryDate attribute, expects a epoch-s
         self.nextDayEntryDateValue = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.NextDayEntryDate)
         await self.check_next_day_entry_date_attribute(endpoint, self.nextDayEntryDateValue)
-        nextDayEntryDayofWeekValue = await self.get_day_of_week_from_current_day_entry_date(self.nextDayEntryDateValue)
 
-        self.step("12")
+        self.step("11")
         # TH reads NextDay attribute, expects a NextDayStruct
         self.nextDayValue = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.NextDay)
         await self.check_next_day_attribute(endpoint, self.nextDayValue)
-        # This split storing is necessary to correspond the Test Plan description
-        dateNextValue = self.nextDayValue.date
-        dayTypeNextValue = self.nextDayValue.dayType
-        dayEntryIDsNextValue = self.nextDayValue.dayEntryIDs
-        asserts.assert_not_equal(self.currentDayValue, self.nextDayValue, "NextDay must not be equal to CurrentDay.")
 
-        if dayTypeCurrentValue == 3:  # If NextDay has Event type.
-            # we check NextDay against corresponding DayStruct from IndividualDays
-            self.step("13")
-            self.individualDaysValue = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.IndividualDays)
-            await self.check_individual_days_attribute(endpoint, self.individualDaysValue)
-            for day in self.individualDaysValue:
-                if day.date == dateNextValue:
-                    asserts.assert_equal(day.dayType, dayTypeNextValue,
-                                         "DayType from NextDay must be equal to DayType from IndividualDays.")
-                    asserts.assert_equal(day.dayEntryIDs, dayEntryIDsNextValue,
-                                         "DayEntryIDs from IndividualDays must be equal to DayEntryIDs from NextDay.")
-            # Steps 14a and 14b can be skipped if NextDay is Event
-            self.skip_step("14a")
-            self.skip_step("14b")
-        else:  # If NextDay is not Event
-            self.skip_step("13")
-            # we need to define active CalendarPeriod and get DayPatternIDs for this period
-            self.step("14a")
-            self.calendarPeriodsValue = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.CalendarPeriods)
-            await self.check_calendar_periods_attribute(endpoint, self.calendarPeriodsValue)
-            dayPatternIDsNextValue = await self.get_day_pattern_IDs_for_active_calendar_period(next=True)
-            # if len(self.calendarPeriodsValue) == 1:
-            #     dayPatternIDsNextValue = self.calendarPeriodsValue[0].dayPatternIDs
-            # else:
-            #     for period in self.calendarPeriodsValue[::-1]:
-            #         if period.startDate < self.nextDayEntryDateValue:
-            #             dayPatternIDsNextValue = period.dayPatternIDs
-            #             break
-
-            self.step("14b")
-            # we search DayPattern that corresponds to day of week defined on step 12 and compare DayEntryIDs from NextDay and found DayPattern
-            self.dayPatternsValue = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.DayPatterns)
-            await self.check_day_patterns_attribute(endpoint, self.dayPatternsValue)
-            await self.search_day_pattern_for_given_day_of_week_check_day_entry_IDs(
-                dayPatternIDsNextValue, nextDayEntryDayofWeekValue, dayEntryIDsNextValue, "Next")
-            # for dayPattern in self.dayPatternsValue:
-            #     if dayPattern.dayPatternID in dayPatternIDsNextValue:
-            #         if (dayPattern.daysOfWeek & nextDayEntryDayofWeekValue) == nextDayEntryDayofWeekValue:
-            #             asserts.assert_equal(sorted(dayPattern.dayEntryIDs), sorted(dayEntryIDsNextValue),
-            #                                  "DayEntryIDs from DayPatterns must be equal to DayEntryIDs from NextDay.")
-            #             day_pattern_found = True
-            #             break
-
-            # if not day_pattern_found:
-            #     asserts.fail("DayPattern not found for NextDayEntryDate attribute value.")
-
-        self.step("15")
-        # TH reads NextTariffComponents attribute, expects a list of TariffComponentStruct. Gets TariffComponentIDs from NextTariffComponents.
-        self.nextTariffComponentsValue = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.NextTariffComponents)
-        await self.check_next_tariff_components_attribute(endpoint, self.nextTariffComponentsValue)
-        for component in self.nextTariffComponentsValue:
-            tariffComponentIDsNextValue.append(component.tariffComponentID)
-
-        self.step("16")
-        # TH reads TariffPeriods attribute, expects a list of TariffPeriodStruct. Define TariffPeriod corresponding to active TariffComponents.
-        # Checks DayEntryIDs from defined TariffPeriod against DayEntryIDs from NextDay.
-        self.tariffPeriodsValue = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.TariffPeriods)
-        await self.check_tariff_periods_attribute(endpoint, self.tariffPeriodsValue)
-        for tariffPeriod in self.tariffPeriodsValue:
-            if sorted(tariffPeriod.tariffComponentIDs) == sorted(tariffComponentIDsNextValue):
-                asserts.assert_equal(sorted(tariffPeriod.dayEntryIDs), sorted(dayEntryIDsNextValue),
-                                     "DayEntryIDs from TariffPeriods must be equal to DayEntryIDs from NextDay.")
-                break
-
-        self.step("17")
-        # TH reads TariffComponents attribute, expects a list of TariffComponentStruct. Gets TariffComponents that correspond to TariffComponentIDs from NextTariffComponents.
-        # Verifies that all TariffComponentStruct entries from NextTariffComponents are present in TariffComponents.
-        self.tariffComponentsValue = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.TariffComponents)
-        await self.check_tariff_components_attribute(endpoint, self.tariffComponentsValue)
-        for component in self.tariffComponentsValue:
-            if component.tariffComponentID in tariffComponentIDsNextValue:
-                tariffComponentsNextValue.append(component)
-
-        asserts.assert_equal(sorted(tariffComponentsNextValue), sorted(self.nextTariffComponentsValue),
-                             "All TariffComponentStruct entries from NextTariffComponents must be presented in TariffComponents.")
-
-        self.step("18")
+        self.step("12")
         # TH sends TestEventTrigger for Change Time Test Event.
         await self.send_test_event_trigger_change_time()
 
-        self.step("19")
+        self.step("13")
         # TH reads CurrentDayEntryDate attribute, expects a epoch-s. Checks that CurrentDayEntryDate changed after TestEventTrigger Change Time Test Event.
         # Checks that CurrentDayEntryDate is equal to NextDayEntryDate (previously read) after TestEventTrigger Change Time Test Event.
         currentDayEntryDateValue_previous = self.currentDayEntryDateValue
@@ -423,7 +275,7 @@ class TC_SETRF_2_3(CommodityTariffTestBaseHelper):
         asserts.assert_equal(self.currentDayEntryDateValue, self.nextDayEntryDateValue,
                              "CurrentDayEntryDate must be equal to NextDayEntryDate after TestEventTrigger.")
 
-        self.step("20")
+        self.step("14")
         # TH reads CurrentDay attribute, expects a DayStruct. Checks that CurrentDay did not change after TestEventTrigger Change Time Test Event.
         currentDayValue_previous = self.currentDayValue
         self.currentDayValue = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.CurrentDay)
@@ -431,7 +283,7 @@ class TC_SETRF_2_3(CommodityTariffTestBaseHelper):
         asserts.assert_equal(self.currentDayValue, currentDayValue_previous,
                              "CurrentDay must not change after TestEventTrigger for Change Time Test Event.")
 
-        self.step("21")
+        self.step("15")
         # TH reads NextDayEntryDate attribute, expects a epoch-s. Checks that NextDayEntryDate changed after TestEventTrigger Change Time Test Event.
         nextDayEntryDateValue_previous = self.nextDayEntryDateValue
         self.nextDayEntryDateValue = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.NextDayEntryDate)
@@ -439,7 +291,7 @@ class TC_SETRF_2_3(CommodityTariffTestBaseHelper):
         asserts.assert_not_equal(self.nextDayEntryDateValue, nextDayEntryDateValue_previous,
                                  "NextDayEntryDate must change after TestEventTrigger for Change Time Test Event.")
 
-        self.step("22")
+        self.step("16")
         # TH reads NextDay attribute, expects a DayStruct. Checks that NextDay did not change after TestEventTrigger Change Time Test Event.
         nextDayValue_previous = self.nextDayValue
         self.nextDayValue = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.NextDay)
@@ -449,11 +301,11 @@ class TC_SETRF_2_3(CommodityTariffTestBaseHelper):
         asserts.assert_not_equal(self.nextDayValue, self.currentDayValue,
                                  "NextDay must not be equal to CurrentDay after TestEventTrigger for Change Time Test Event.")
 
-        self.step("23")
+        self.step("17")
         # TH sends TestEventTrigger for Change Day Test Event.
         await self.send_test_event_trigger_change_day()
 
-        self.step("24")
+        self.step("18")
         # TH reads CurrentDayEntryDate attribute, expects a epoch-s. Checks that CurrentDayEntryDate changed after TestEventTrigger for Change Day Test Event.
         # Checks that CurrentDayEntryDate is not equal to NextDayEntryDate (previously read) after TestEventTrigger for Change Day Test Event.
         currentDayEntryDateValue_previous = self.currentDayEntryDateValue
@@ -464,7 +316,7 @@ class TC_SETRF_2_3(CommodityTariffTestBaseHelper):
         asserts.assert_not_equal(self.currentDayEntryDateValue, self.nextDayEntryDateValue,
                                  "CurrentDayEntryDate must be not equal to NextDayEntryDate after TestEventTrigger for Change Day Test Event.")
 
-        self.step("25")
+        self.step("19")
         # TH reads CurrentDay attribute, expects a DayStruct. Checks that CurrentDay changed after TestEventTrigger for Change Day Test Event.
         # Checks that CurrentDay is equal to NextDay (previously read) after TestEventTrigger for Change Day Test Event.
         currentDayValue_previous = self.currentDayValue
@@ -475,7 +327,7 @@ class TC_SETRF_2_3(CommodityTariffTestBaseHelper):
         asserts.assert_equal(self.currentDayValue, self.nextDayValue,
                              "CurrentDay must be equal to NextDay after TestEventTrigger for Change Day Test Event.")
 
-        self.step("26")
+        self.step("20")
         # TH reads NextDayEntryDate attribute, expects a epoch-s. Checks that NextDayEntryDate changed after TestEventTrigger for Change Day Test Event.
         # Checks that NextDayEntryDate is not equal to CurrentDayEntryDate after TestEventTrigger for Change Day Test Event.
         nextDayEntryDateValue_previous = self.nextDayEntryDateValue
@@ -486,7 +338,7 @@ class TC_SETRF_2_3(CommodityTariffTestBaseHelper):
         asserts.assert_not_equal(self.nextDayEntryDateValue, self.currentDayEntryDateValue,
                                  "NextDayEntryDate must not be equal to CurrentDayEntryDate after TestEventTrigger for Change Day Test Event.")
 
-        self.step("27")
+        self.step("21")
         # TH reads NextDay attribute, expects a DayStruct. Checks that NextDay changed after TestEventTrigger for Change Day Test Event.
         # Checks that NextDay is not equal to CurrentDay after TestEventTrigger for Change Day Test Event.
         nextDayValue_previous = self.nextDayValue
@@ -497,7 +349,7 @@ class TC_SETRF_2_3(CommodityTariffTestBaseHelper):
         asserts.assert_not_equal(self.nextDayValue, self.currentDayValue,
                                  "NextDay must not be equal to CurrentDay after TestEventTrigger for Change Day Test Event.")
 
-        self.step("28")
+        self.step("22")
         await self.send_test_event_trigger_clear()
 
 

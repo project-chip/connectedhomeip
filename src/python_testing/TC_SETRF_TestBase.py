@@ -1043,7 +1043,7 @@ class CommodityTariffTestBaseHelper(MatterBaseTest):
 
         return day_patterns_IDs
 
-    async def get_day_of_week_from_current_day_entry_date(self, current_day_entry_date: int) -> int:
+    async def get_day_of_week_from_day_entry_date(self, day_entry_date: int) -> int:
 
         weekDays = {
             0: cluster.Bitmaps.DayPatternDayOfWeekBitmap.kMonday,
@@ -1055,8 +1055,8 @@ class CommodityTariffTestBaseHelper(MatterBaseTest):
             6: cluster.Bitmaps.DayPatternDayOfWeekBitmap.kSunday
         }
 
-        current_day_entry_date_epoch = await self.convert_matter_time_to_posix_epoch_time(current_day_entry_date)
-        dayOfWeek = datetime.datetime.fromtimestamp(current_day_entry_date_epoch).weekday()
+        day_entry_date_epoch = await self.convert_matter_time_to_posix_epoch_time(day_entry_date)
+        dayOfWeek = datetime.datetime.fromtimestamp(day_entry_date_epoch).weekday()
 
         return weekDays[dayOfWeek]
 
