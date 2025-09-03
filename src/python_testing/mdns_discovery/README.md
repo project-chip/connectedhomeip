@@ -247,8 +247,8 @@ assert_valid_dn_key("Kitchen")
 
 ### ✅ Available assert functions
 
-|                      |                                           |
-| -------------------- | ----------------------------------------- |
+|                        |                                             |
+| ---------------------- | ------------------------------------------- |
 | `assert_valid_d_key`   | `assert_valid_commissionable_instance_name` |
 | `assert_valid_vp_key`  | `assert_valid_operational_instance_name`    |
 | `assert_valid_cm_key`  | `assert_valid_short_discriminator_subtype`  |
