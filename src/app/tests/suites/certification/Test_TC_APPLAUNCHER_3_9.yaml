@@ -89,4 +89,5 @@ tests:
       attribute: "Status"
       response:
           constraints:
-              anyOf: [0, 2] # STOPPED (0) or ACTIVE_HIDDEN (2) as per spec
+              # STOPPED (0) or ACTIVE_HIDDEN (2) as per spec
+              anyOf: [0, 2]
