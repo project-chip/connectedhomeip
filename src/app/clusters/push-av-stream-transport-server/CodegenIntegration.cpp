@@ -77,12 +77,6 @@ void MatterPushAvStreamTransportClusterServerShutdownCallback(EndpointId endpoin
 {
     IntegrationDelegate integrationDelegate;
 
-    ChipLogProgress(AppServer, "Shutting Down Push AV Stream Transport on endpoint %u", endpointId);
-    uint16_t arrayIndex =
-        emberAfGetClusterServerEndpointIndex(endpointId, PushAvStreamTransport::Id, kPushAvStreamTransportFixedClusterCount);
-
-    gServers[arrayIndex].Cluster().Deinit();
-
     CodegenClusterIntegration::UnregisterServer(
         {
             .endpointId                      = endpointId,

@@ -59,7 +59,7 @@ public:
 
     CHIP_ERROR Init() { return mLogic.Init(); }
 
-    void Deinit() { mLogic.Shutdown(); }
+    void Shutdown() { mLogic.Shutdown(); }
 
     DataModel::ActionReturnStatus ReadAttribute(const DataModel::ReadAttributeRequest & request,
                                                 AttributeValueEncoder & encoder) override;
