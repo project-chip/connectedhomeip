@@ -35,21 +35,20 @@ class TC_DD_3_23(MatterBaseTest):
         # For the moment it is configured for BLE commissioning
         setup_payload: str = "MT:4CT9142C00KA0648G00"
         node_id: chip.NodeId = 1
-        useNFC: bool = False
+        #useNFC: bool = False
 
         print(f"Setup payload: {setup_payload}")
         print(f"NodeId: {node_id}")
-        print(f"useNFC: {useNFC}")
+        #print(f"useNFC: {useNFC}")
 
         try:
+        # Argument to add later:                useNFC=useNFC
             await self.default_controller.CommissionWithCode(
                 setupPayload=setup_payload,
                 nodeid=node_id,
-                discoveryType=ChipDeviceCtrl.DiscoveryType.DISCOVERY_ALL,
-                useNFC=useNFC
-            )
+                discoveryType=ChipDeviceCtrl.DiscoveryType.DISCOVERY_ALL)
         except Exception as e:
-            print(f"Failure! {e}")
+            self.fail(f"Commissioning failed with exception: {e}")
 
 if __name__ == "__main__":
     default_matter_test_main()
