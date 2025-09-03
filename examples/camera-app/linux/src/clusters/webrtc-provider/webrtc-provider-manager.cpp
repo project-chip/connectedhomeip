@@ -277,26 +277,6 @@ CHIP_ERROR WebRTCProviderManager::HandleProvideAnswer(uint16_t sessionId, const 
         return CHIP_ERROR_INCORRECT_STATE;
     }
 
-    WebrtcTransport::RequestArgs requestArgs = {
-        0,
-    };
-    requestArgs.sessionId = sessionId;
-    if (transport == nullptr)
-    {
-        chip::ScopedNodeId peerId; // CHK
-        mWebrtcTransportMap[sessionId] = std::unique_ptr<WebrtcTransport>(new WebrtcTransport());
-        // mSessionIdMap[peerId]      = sessionId;
-        transport = mWebrtcTransportMap[sessionId].get();
-        transport->SetCallbacks(
-            [this](const std::string & sdp, SDPType type, const uint16_t sessionId) {
-                this->OnLocalDescription(sdp, type, sessionId);
-            },
-            [this](bool connected, const uint16_t sessionId) { this->OnConnectionStateChanged(connected, sessionId); });
-    }
-    transport->SetRequestArgs(requestArgs);
-    transport->Start();
-    AcquireAudioVideoStreams(sessionId);
-
     transport->GetPeerConnection()->SetRemoteDescription(sdpAnswer, SDPType::Answer);
 
     transport->MoveToState(WebrtcTransport::State::SendingICECandidates);
@@ -547,10 +527,6 @@ void WebRTCProviderManager::OnDeviceConnected(void * context, Messaging::Exchang
 
     WebrtcTransport * transport = nullptr;
     uint16_t sessionId          = 0;
-    if (transport == nullptr)
-    {
-        return;
-    }
 
     for (auto & mapEntry : self->mWebrtcTransportMap)
     {
@@ -712,7 +688,8 @@ CHIP_ERROR WebRTCProviderManager::SendAnswerCommand(Messaging::ExchangeManager &
 
     WebrtcTransport::RequestArgs requestArgs = transport->GetRequestArgs();
     // Now invoke the command using the found session handle
-    return Controller::InvokeCommandRequest(&exchangeMgr, sessionHandle, requestArgs.originatingEndpointId, command, onSuccess, onFailure,
+    return Controller::InvokeCommandRequest(&exchangeMgr, sessionHandle, requestArgs.originatingEndpointId, command, onSuccess,
+                                            onFailure,
                                             /* timedInvokeTimeoutMs = */ NullOptional, /* responseTimeout = */ NullOptional,
                                             /* outCancelFn = */ nullptr, /*allowLargePayload = */ true);
 }
@@ -756,7 +733,8 @@ CHIP_ERROR WebRTCProviderManager::SendICECandidatesCommand(Messaging::ExchangeMa
 
     WebrtcTransport::RequestArgs requestArgs = transport->GetRequestArgs();
     // Now invoke the command using the found session handle
-    return Controller::InvokeCommandRequest(&exchangeMgr, sessionHandle, requestArgs.originatingEndpointId, command, onSuccess, onFailure,
+    return Controller::InvokeCommandRequest(&exchangeMgr, sessionHandle, requestArgs.originatingEndpointId, command, onSuccess,
+                                            onFailure,
                                             /* timedInvokeTimeoutMs = */ NullOptional, /* responseTimeout = */ NullOptional,
                                             /* outCancelFn = */ nullptr, /*allowLargePayload = */ true);
 }
