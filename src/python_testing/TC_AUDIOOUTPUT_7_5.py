@@ -12,6 +12,8 @@
 #       --discriminator 1234
 #       --passcode 20202021
 #       --endpoint 1
+#     factory-reset: true
+#     quiet: true
 # === END CI TEST ARGUMENTS ===
 
 import logging
