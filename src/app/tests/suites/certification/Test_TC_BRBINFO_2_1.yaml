@@ -160,7 +160,6 @@ tests:
               type: char_string
               maxLength: 32
 
-    #Issue https://github.com/project-chip/connectedhomeip/issues/23509
     - label: "Step 18: TH writes NodeLabel from the DUT."
       PICS: BRBINFO.S.A0005 && PICS_USER_PROMPT
       verification: |
