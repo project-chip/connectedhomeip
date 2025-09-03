@@ -13,6 +13,16 @@
 # limitations under the License.
 import("//build_overrides/chip.gni")
 
-group("tls-client-management-server") {
+source_set("tls-client-management-server") {
+  sources = [ "tls-client-management-server.h" ]
+
+  public_deps = [
+    "${chip_root}/src/app/",
+    "${chip_root}/src/app/server",
+    "${chip_root}/src/app/server-cluster",
+    "${chip_root}/src/lib/core:types",
+    "${chip_root}/zzz_generated/app-common/clusters/TlsClientManagement",
+  ]
+
   deps = [ "${chip_root}/src/app/clusters/tls-certificate-management-server:certificate-table" ]
 }
