@@ -107,7 +107,7 @@ class TC_PAVST_2_9(MatterBaseTest, PAVSTTestBase):
             endpoint=endpoint, cluster=pvcluster, attribute=pvattr.SupportedFormats
         )
         aSupportedContainerFormats = list({fmt.containerFormat for fmt in aSupportedFormat})
-        logger.info(f"SupportedContainerFormats: {aSupportedFormats}")
+        logger.info(f"SupportedContainerFormats: {aSupportedContainerFormats}")
 
         self.step(4)
         aAllocatedVideoStreams = await self.allocate_one_video_stream()
