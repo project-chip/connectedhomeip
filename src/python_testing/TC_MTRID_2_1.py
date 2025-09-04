@@ -111,7 +111,7 @@ class TC_MTRID_2_1(MeterIdentificationTestBaseHelper):
         await self.check_meter_serial_number_attribute(endpoint)
 
         # Checks if ProtocolVersion attribute is supported
-        if self.attribute_guard(endpoint=endpoint, attribute=cluster.Attributes.ProtocolVersion):
+        if await self.attribute_guard(endpoint=endpoint, attribute=cluster.Attributes.ProtocolVersion):
 
             self.step("5")
 
@@ -130,13 +130,13 @@ class TC_MTRID_2_1(MeterIdentificationTestBaseHelper):
             else:  # attribute is not supported at all
                 self.skip_step("5")
 
-        # Checks if PowerThreshold attribute is supported
-        if self.attribute_guard(endpoint=endpoint, attribute=cluster.Attributes.PowerThreshold):
+        # Checks if PowerThreshold feature is supported
+        if await self.feature_guard(endpoint=endpoint, cluster=cluster, feature_int=cluster.Bitmaps.Feature.kPowerThreshold):
 
             self.step("6")
 
             if not self.check_pics("MTRID.S.A0004"):
-                logger.warning("PowerThreshold attribute is actually supported by DUT, but PICS MTRID.S.A0004 is False")
+                logger.warning("PowerThreshold feature is actually supported by DUT, but PICS MTRID.S.A0004 is False")
 
             # TH reads PowerThreshold attribute, expects a null or a value of PowerThresholdStruct type
             await self.check_power_threshold_attribute(endpoint)
@@ -146,7 +146,7 @@ class TC_MTRID_2_1(MeterIdentificationTestBaseHelper):
             if self.check_pics("MTRID.S.A0004"):
                 self.step("6")
                 asserts.fail(
-                    "PICS file does not correspond to real DUT functionality. PowerThreshold is not actually supported, but MTRID.S.A0004 is True.")
+                    "PICS file does not correspond to real DUT functionality. PowerThreshold feature is not actually supported, but MTRID.S.A0004 is True.")
             else:
                 self.skip_step("6")
 
