@@ -123,6 +123,10 @@ not_automated:
     - name: TC_WEBRTCPTestBase.py
       reason:
           Shared code for the WebRTC Provider Cluster, not a standalone test.
+    - name: TC_PAVSTTestBase.py
+      reason:
+          Shared code for Push AV Cluster tests (TC_PAVST_*), not a standalone
+          test.
     - name: TC_PAVST_2_1.py
       reason:
           Depends on PushAV cluster. Will be enabled once local tests are fully
@@ -132,6 +136,26 @@ not_automated:
           Depends on PushAV cluster. Will be enabled once local tests are fully
           verified.
     - name: TC_PAVST_2_3.py
+      reason:
+          Depends on PushAV cluster. Will be enabled once local tests are fully
+          verified.
+    - name: TC_PAVST_2_4.py
+      reason:
+          Depends on PushAV cluster. Will be enabled once local tests are fully
+          verified.
+    - name: TC_PAVST_2_5.py
+      reason:
+          Depends on PushAV cluster. Will be enabled once local tests are fully
+          verified.
+    - name: TC_PAVST_2_6.py
+      reason:
+          Depends on PushAV cluster. Will be enabled once local tests are fully
+          verified.
+    - name: TC_PAVST_2_7.py
+      reason:
+          Depends on PushAV cluster. Will be enabled once local tests are fully
+          verified.
+    - name: TC_PAVST_2_8.py
       reason:
           Depends on PushAV cluster. Will be enabled once local tests are fully
           verified.
@@ -177,5 +201,4 @@ slow_tests:
     - { name: TC_TIMESYNC_2_12.py, duration: 20 seconds }
     - { name: TC_TIMESYNC_2_7.py, duration: 20 seconds }
     - { name: TC_TIMESYNC_2_8.py, duration: 1.5 minutes }
-    - { name: TC_CLCTRL_3_1.py, duration: 45 seconds }
-    - { name: TC_CLCTRL_6_1.py, duration: 45 seconds }
+    - { name: TC_CLCTRL_4_1.py, duration: 45 seconds }
