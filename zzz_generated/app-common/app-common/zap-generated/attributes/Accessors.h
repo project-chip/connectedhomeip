@@ -5431,6 +5431,17 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, int16_t value);
 Protocols::InteractionModel::Status Set(EndpointId endpoint, int16_t value, MarkAttributeDirty markDirty);
 } // namespace PanMax
 
+namespace MovementState {
+Protocols::InteractionModel::Status
+Get(EndpointId endpoint,
+    chip::app::Clusters::CameraAvSettingsUserLevelManagement::PhysicalMovementEnum * value); // PhysicalMovementEnum
+Protocols::InteractionModel::Status Set(EndpointId endpoint,
+                                        chip::app::Clusters::CameraAvSettingsUserLevelManagement::PhysicalMovementEnum value);
+Protocols::InteractionModel::Status Set(EndpointId endpoint,
+                                        chip::app::Clusters::CameraAvSettingsUserLevelManagement::PhysicalMovementEnum value,
+                                        MarkAttributeDirty markDirty);
+} // namespace MovementState
+
 namespace FeatureMap {
 Protocols::InteractionModel::Status Get(EndpointId endpoint, uint32_t * value); // bitmap32
 Protocols::InteractionModel::Status Set(EndpointId endpoint, uint32_t value);
