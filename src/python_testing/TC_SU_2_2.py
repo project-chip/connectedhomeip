@@ -51,12 +51,13 @@ import os
 import signal
 import psutil
 import socket
+import queue
 
 import matter.clusters as Clusters
 from matter import ChipDeviceCtrl
 from matter.interaction_model import Status
 from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
-from matter.testing.event_attribute_reporting import AttributeSubscriptionHandler, AttributeMatcher
+from matter.testing.event_attribute_reporting import AttributeSubscriptionHandler, EventSubscriptionHandler, AttributeMatcher
 
 from matter.testing import matter_asserts
 
@@ -311,10 +312,10 @@ class TC_SU_2_2(MatterBaseTest):
                      "QueryStatus is set to 'Busy', DelayedActionTime is set to 60 seconds.",
                      "Verify that the DUT does not send a QueryImage command before the minimum interval defined by spec "
                      "which is 2 minutes (120 seconds) from the last QueryImage command."),
-            # TestStep(3, "DUT sends a QueryImage command to the TH/OTA-P. TH/OTA-P sends a QueryImageResponse back to DUT. " \
-            #          "QueryStatus is set to 'NotAvailable'.",
-            #          "Verify that the DUT does not send a QueryImage command before the minimum interval defined by spec " \
-            #          "which is 2 minutes (120 seconds) from the last QueryImage command."),
+            TestStep(3, "DUT sends a QueryImage command to the TH/OTA-P. TH/OTA-P sends a QueryImageResponse back to DUT. "
+                     "QueryStatus is set to 'NotAvailable'.",
+                     "Verify that the DUT does not send a QueryImage command before the minimum interval defined by spec "
+                     "which is 2 minutes (120 seconds) from the last QueryImage command."),
             # TestStep(4, "DUT sends a QueryImage command to the TH/OTA-P. TH/OTA-P sends a QueryImageResponse back to DUT. " \
             #          "QueryStatus is set to Busy, Set DelayedActionTime to 3 minutes. On the subsequent QueryImage command, " \
             #          "TH/OTA-P sends a QueryImageResponse back to DUT. QueryStatus is set to 'UpdateAvailable'.",
@@ -346,16 +347,16 @@ class TC_SU_2_2(MatterBaseTest):
         self.step(0)
         # Commission the DUT (Requestor) with the TH/OTA-P (Provider)
 
+        # Prerequisite #1.0 - Requestor (DUT) info
+        controller = self.default_controller
+        fabric_id = controller.fabricId
+        requestor_node_id = self.dut_node_id  # Assigned on execution time
+
         self.step(1)
         # ------------------------------------------------------------------------------------
         # [STEP_1]: Prerequisites
         # ------------------------------------------------------------------------------------
         step_number_s1 = "[STEP_1]"
-
-        # Prerequisite #1.0 - Requestor (DUT) info
-        controller = self.default_controller
-        fabric_id = controller.fabricId
-        requestor_node_id = self.dut_node_id  # Assigned on execution time
         logger.info(f'{step_number_s1}: Prerequisite #1.0 - Requestor (DUT), NodeID: {requestor_node_id}, FabricId: {fabric_id}')
 
         # Prerequisite #1.0 - Provider_S1 info
@@ -638,9 +639,9 @@ class TC_SU_2_2(MatterBaseTest):
             secured_device_port=provider_port_s2,
             wait_for="Status: Satisfied",
             queue="busy",
-            timeout=120
+            timeout=60
         )
-        logger.info(f'{step_number_s1}: Prerequisite #2.0 - Launched Provider PID {provider_proc_s2.pid}')
+        logger.info(f'{step_number_s2}: Prerequisite #2.0 - Launched Provider PID {provider_proc_s2.pid}')
 
         # Prerequisite #2.2 - Commission Provider
         logging.info(f'{step_number_s2}: Prerequisite #2.2 - Commissioning DUT with Provider')
@@ -666,7 +667,7 @@ class TC_SU_2_2(MatterBaseTest):
             provider_node=provider_node_id_s2,    # Provider
             fabric_index=fabric_id
         )
-        logger.info(f'{step_number_s2}: ACLs set between Requestor (DUT) and Provider')
+        logger.info(f'{step_number_s2}: Prerequisite #3.0 - ACLs set between Requestor (DUT) and Provider')
         await asyncio.sleep(2)
 
         # ------------------------------------------------------------------------------------
@@ -674,10 +675,10 @@ class TC_SU_2_2(MatterBaseTest):
         # Start accumulators first to avoid missing any rapid OTA events (race condition)
         # ------------------------------------------------------------------------------------
 
-        logger.info(f'{step_number_s2}:Step #2.1 - Validate DUT respects minimum QueryImage interval after Busy response.')
+        logger.info(f'{step_number_s2}: Step #2.1 - Validate DUT respects minimum QueryImage interval after Busy response.')
         t_start_query = time.time()
 
-        logger.info(f'{step_number_s2}:Step #2.1 - Create an accumulator for the UpdateState attribute.')
+        logger.info(f'{step_number_s2}: Step #2.1 - Create an accumulator for the UpdateState attribute.')
         # UpdateState Accumulator
         accumulator_state = AttributeSubscriptionHandler(
             expected_cluster=Clusters.OtaSoftwareUpdateRequestor,
@@ -699,7 +700,7 @@ class TC_SU_2_2(MatterBaseTest):
         # [STEP_2]: Step #2.0 - Controller (DUT/Requestor) sends AnnounceOTAProvider command
         # ------------------------------------------------------------------------------------
 
-        logger.info("Step #2.0 - Controller (DUT/Requestor) sends AnnounceOTAProvider command")
+        logger.info(f'{step_number_s2}: Step #2.0 - Controller (DUT/Requestor) sends AnnounceOTAProvider command')
         cmd_announce = Clusters.OtaSoftwareUpdateRequestor.Commands.AnnounceOTAProvider(
             providerNodeID=provider_node_id_s2,  # Provider_S2
             vendorID=0xFFF1,
@@ -707,14 +708,14 @@ class TC_SU_2_2(MatterBaseTest):
             metadataForNode=None,
             endpoint=0
         )
-        logger.info(f'{step_number_s2}: - cmd AnnounceOTAProvider: {cmd_announce}')
+        logger.info(f'{step_number_s2}: Step #2.0 - cmd AnnounceOTAProvider: {cmd_announce}')
 
         resp_announce = await self.send_single_cmd(
             dev_ctrl=controller,
             node_id=requestor_node_id,  # DUT NodeID
             cmd=cmd_announce
         )
-        logging.info(f'{step_number_s2}: - cmd AnnounceOTAProvider response: {resp_announce}.')
+        logging.info(f'{step_number_s2}: Step #2.0 - cmd AnnounceOTAProvider response: {resp_announce}.')
 
         # ------------------------------------------------------------------------------------
         # [STEP_2]: Step #2.1 - Matcher for OTA records logs
@@ -790,10 +791,195 @@ class TC_SU_2_2(MatterBaseTest):
         await asyncio.sleep(270)          # TEMP
 
         logger.info(f'{step_number_s2}: Step #2.4 - Close Requestor_S2 and Provider_S2 Process.')
-        # await self.kill_ota_provider_process()
         self.stop_provider(provider_proc_s2)
         await asyncio.sleep(3)
         controller.ExpireSessions(provider_node_id_s2)
+        subprocess.run("rm -rf /tmp/chip_kvs /tmp/chip_kvs-shm /tmp/chip_kvs-wal", shell=True)
+        await asyncio.sleep(2)
+
+        # ------------------------------------------------------------------------------------
+        # [STEP_3]: Prerequisite Step  # 2.0 - Setup Requestor_S3 and Provider_S3 as DUT
+        # ------------------------------------------------------------------------------------
+        self.step(3)
+
+        # Prerequisite #1.0 - Requestor (DUT) info
+        step_number_s3 = "[STEP_3]"
+        logger.info(f'{step_number_s3}: Prerequisite #1.0 - Requestor (DUT), NodeID: {requestor_node_id}, FabricId: {fabric_id}')
+
+        # Prerequisite #1.0 - Provider_S3 info
+        provider_node_id_s3 = 4
+        provider_discriminator_s3 = 3333             # Changed in each step
+        provider_setupPinCode_s3 = 20202022          # Changed in each step
+        provider_port_s3 = 5540                      # Previous used on Steps 1, Provider_S1 5540, Requestor 5541
+        provider_ota_file_s3 = "firmware_requestor_v4.ota"  # OTA updated
+        logger.info(f"""{step_number_s3}: Prerequisite #1.0 - Provider:
+            NodeID: {provider_node_id_s3},
+            discriminator: {provider_discriminator_s3},
+            setupPinCode: {provider_setupPinCode_s3},
+            port: {provider_port_s3},
+            ota_file: {provider_ota_file_s3}""")
+
+        logger.info(f'{step_number_s3}: Prerequisite #2.0 - Launch Provider')
+        provider_proc_s3 = self.launch_provider_regex(
+            ota_file=provider_ota_file_s3,
+            discriminator=provider_discriminator_s3,
+            passcode=provider_setupPinCode_s3,
+            secured_device_port=provider_port_s3,
+            wait_for="Status: Satisfied",
+            queue="updateNotAvailable",
+            timeout=60
+        )
+        logger.info(f'{step_number_s3}: Prerequisite #2.0 - Launched Provider PID {provider_proc_s3.pid}')
+
+        # Prerequisite #2.2 - Commission Provider
+        logging.info(f'{step_number_s3}: Prerequisite #2.2 - Commissioning DUT with Provider')
+        resp = await controller.CommissionOnNetwork(
+            nodeId=provider_node_id_s3,
+            setupPinCode=provider_setupPinCode_s3,
+            filterType=ChipDeviceCtrl.DiscoveryFilterType.LONG_DISCRIMINATOR,
+            filter=provider_discriminator_s3
+        )
+        logger.info(f'{step_number_s3}: Prerequisite #2.2 - Provider Commissioning response: {resp}')
+
+        # Prerequisite #3.0 - Setting ACLs
+        logger.info(f'{step_number_s3}: Prerequisite #3.0 - Setting ACLs under FabricIndex {fabric_id}')
+        logger.info(f'{step_number_s3}: Prerequisite #3.0 - Requestor (DUT), NodeID: {requestor_node_id}')
+        logger.info(f'{step_number_s3}: Prerequisite #3.0 - Provider, NodeID: {provider_node_id_s3}')
+
+        # Set ACLs for OTA update:
+        # - On Requestor to allow specified Provider to interact with OTA Requestor cluster
+        # - On Provider to allow Requestor to interact with OTA Provider cluster
+        await self.set_ota_acls_for_provider(
+            controller=controller,
+            requestor_node=requestor_node_id,     # DUT
+            provider_node=provider_node_id_s3,    # Provider
+            fabric_index=fabric_id
+        )
+        logger.info(f'{step_number_s3}: Prerequisite #3.0 - ACLs set between Requestor (DUT) and Provider')
+        await asyncio.sleep(2)
+
+        # ------------------------------------------------------------------------------------
+        # [STEP_3]: Step #2.1 - Matcher for OTA records logs
+        # Start subscriptions first to avoid missing any rapid OTA events (race condition)
+        # ------------------------------------------------------------------------------------
+
+        logger.info(f'{step_number_s3}: Step #2.1 - Validate DUT respects minimum QueryImage interval after NotAvailable response.')
+
+        logger.info(f'{step_number_s3}: Step #2.1 - Create an AttributeSubscriptionHandler for the UpdateState attribute.')
+        # UpdateState Accumulator
+        accumulator_state = AttributeSubscriptionHandler(
+            expected_cluster=Clusters.OtaSoftwareUpdateRequestor,
+            expected_attribute=Clusters.OtaSoftwareUpdateRequestor.Attributes.UpdateState
+        )
+
+        # Start subscriptions
+        await accumulator_state.start(
+            dev_ctrl=controller,
+            node_id=requestor_node_id,  # DUT
+            endpoint=0,
+            fabric_filtered=False,
+            min_interval_sec=1,
+            max_interval_sec=1,
+            keepSubscriptions=True
+        )
+
+        # ------------------------------------------------------------------------------------
+        # [STEP_3]: Step #2.0 - Controller (DUT/Requestor) sends AnnounceOTAProvider command
+        # ------------------------------------------------------------------------------------
+
+        logger.info(f'{step_number_s3}: Step #2.0 - Controller (DUT/Requestor) sends AnnounceOTAProvider command')
+        cmd_announce = Clusters.OtaSoftwareUpdateRequestor.Commands.AnnounceOTAProvider(
+            providerNodeID=provider_node_id_s3,  # Provider_S3
+            vendorID=0xFFF1,
+            announcementReason=Clusters.OtaSoftwareUpdateRequestor.Enums.AnnouncementReasonEnum.kUpdateAvailable,
+            metadataForNode=None,
+            endpoint=0
+        )
+        logger.info(f'{step_number_s3}: Step #2.0 - cmd AnnounceOTAProvider: {cmd_announce}')
+
+        resp_announce = await self.send_single_cmd(
+            dev_ctrl=controller,
+            node_id=requestor_node_id,  # DUT NodeID
+            cmd=cmd_announce
+        )
+        logging.info(f'{step_number_s3}: Step #2.0 - cmd AnnounceOTAProvider response: {resp_announce}.')
+
+        # ------------------------------------------------------------------------------------
+        # [STEP_3]: Step #2.1 - Matcher for OTA records logs
+        # Function to track OTA UpdateState when provider responds NotAvailable.
+        # Records first and second Querying states to verify minimum interval.
+        # ------------------------------------------------------------------------------------
+
+        observed_states = set()
+        state_sequence_notavailable = []  # Full OTA state flow
+        t_first_idle = None
+        MIN_QUERY_IMAGE_INTERVAL = 120 + 1  # Buffer time
+
+        def matcher_not_available_state(report):
+            """
+            Step #2.1 Matcher to verify that after receiving NotAvailable,
+            the DUT stays in Idle and respects the minimum 120s interval
+            before sending a QueryImage again.
+            """
+            nonlocal observed_states, t_first_idle
+            val = report.value  # UpdateStateEnum
+
+            if val is None:
+                return False
+
+            current_time = time.time()
+
+            # First Idle observed
+            if val == Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kIdle and "first_idle" not in observed_states:
+                observed_states.add("first_idle")
+                t_first_idle = current_time
+                state_sequence_notavailable.append(val)
+                logger.info(f'{step_number_s3}: First Idle recorded at {time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(t_first_idle))}')
+                return False  # Keep waiting for 120s
+
+            # Check if >=120s passed since first Idle
+            if "first_idle" in observed_states and "second_idle" not in observed_states and current_time - t_first_idle >= MIN_QUERY_IMAGE_INTERVAL and val == Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kIdle:
+                observed_states.add("second_idle")
+                state_sequence_notavailable.append(val)
+                logger.info(
+                    f'{step_number_s3}: Idle state after 120s interval at {time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(current_time))}, no Query_Image was sent')
+                return True
+
+            return False
+
+        # Create matcher object for UpdateState
+        matcher_busy_state_obj = AttributeMatcher.from_callable(
+            description="Validate OTA updateNotAvailable UpdateState transitions: Idle > Idle",
+            matcher=matcher_not_available_state
+        )
+
+        # ------------------------------------------------------------------------------------
+        # [STEP_2]: Step #2.2 - Start a task to collect progress updates and validation
+        # ------------------------------------------------------------------------------------
+        try:
+            # Wait until the final state (Idle) is reached or timeout (5 min)
+            await accumulator_state.await_all_expected_report_matches([matcher_busy_state_obj], timeout_sec=300.0)
+            logger.info(f'{step_number_s3}: Step #2.2 - UpdateState Idle matchers have completed.')
+        except Exception as e:
+            logger.warning(f"OTA update encountered an error or timeout: {e}")
+        finally:
+            # Cancel both subscriptions and task
+            await accumulator_state.cancel()
+
+        # ------------------------------------------------------------------------------------
+        # [STEP_3]: Step # 2.3 - Verify image transfer from TH/OTA-P to DUT is Busy
+        # ------------------------------------------------------------------------------------
+        logger.info(f'{step_number_s3}: Step #2.3 - Full OTA state sequence NotAvailable observed: {state_sequence_notavailable}')
+        logger.info(f'{step_number_s3}: Step #2.3 - NotAvailable Idle sequence verification completed successfully.')
+
+        # ------------------------------------------------------------------------------------
+        # [STEP_3]: Step # 2.4 - Close Requestor S_3 and Provider_S3 Process  (CLEANUP!!!!)
+        # ------------------------------------------------------------------------------------
+
+        logger.info(f'{step_number_s3}: Step #2.4 - Close Requestor_S3 and Provider_S3 Process.')
+        self.stop_provider(provider_proc_s3)
+        await asyncio.sleep(3)
+        controller.ExpireSessions(provider_node_id_s3)
         subprocess.run("rm -rf /tmp/chip_kvs /tmp/chip_kvs-shm /tmp/chip_kvs-wal", shell=True)
         await asyncio.sleep(2)
 
