@@ -55,50 +55,6 @@ class TariffPeriodsDataClass;
 class IndividualDaysDataClass;
 class CalendarPeriodsDataClass;
 
-class Delegate;
-
-/**
- * @struct CurrentTariffAttrsCtx
- * @brief Context for current tariff attributes
- */
-struct CurrentTariffAttrsCtx
-{
-    Delegate * mTariffProvider;
-    EndpointId mEndpointId;
-
-    // Using fixed-size arrays instead of std::map for static allocation
-    struct DayPatternEntry
-    {
-        uint32_t key;
-        const Structs::DayPatternStruct::Type * value;
-    };
-
-    struct DayEntryEntry
-    {
-        uint32_t key;
-        const Structs::DayEntryStruct::Type * value;
-    };
-
-    struct TariffComponentEntry
-    {
-        uint32_t key;
-        const Structs::TariffComponentStruct::Type * value;
-    };
-
-    // You'll need to define appropriate maximum sizes for these arrays
-    static constexpr size_t MAX_DAY_PATTERNS = 16;
-    static constexpr size_t MAX_DAY_ENTRIES = 32;
-    static constexpr size_t MAX_TARIFF_COMPONENTS = 16;
-
-    DayPatternEntry DayPatternsMap[MAX_DAY_PATTERNS];
-    DayEntryEntry DayEntriesMap[MAX_DAY_ENTRIES];
-    TariffComponentEntry TariffComponentsMap[MAX_TARIFF_COMPONENTS];
-
-    size_t dayPatternsCount = 0;
-    size_t dayEntriesCount = 0;
-    size_t tariffComponentsCount = 0;
-};
-
 /**
  * @class Delegate
  * @brief Core tariff data management and processing class
@@ -344,9 +300,16 @@ public:
 
     void TariffTimeAttrsSync() { UpdateCurrentAttrs(); }
 
+    /**
+     * @struct CurrentTariffAttrsCtx
+     * @brief Context for current tariff attributes
+     */
+    struct CurrentTariffAttrsCtx
+    {
+        Delegate * mTariffProvider;
+        EndpointId mEndpointId;
+    };
 private:
-    CurrentTariffAttrsCtx mServerTariffAttrsCtx;
-
     Delegate & mDelegate;
     BitMask<Feature> mFeature;
 
@@ -371,11 +334,20 @@ private:
     DataModel::Nullable<uint32_t> & GetCurrentDayEntryDate() { return mCurrentDayEntryDate; }
     DataModel::Nullable<uint32_t> & GetNextDayEntryDate() { return mNextDayEntryDate; }
 
+    template <typename T>
+    CHIP_ERROR SetValue(T & currValue, T & newValue, uint32_t attrId);
+
+    CHIP_ERROR SetCurrentDay(DataModel::Nullable<Structs::DayStruct::Type>  & newValue) { return SetValue(mCurrentDay, newValue, Attributes::CurrentDay::Id); }
+    CHIP_ERROR SetNextDay(DataModel::Nullable<Structs::DayStruct::Type>  & newValue) { return SetValue(mNextDay, newValue, Attributes::NextDay::Id); }
+    CHIP_ERROR SetCurrentDayEntry(DataModel::Nullable<Structs::DayEntryStruct::Type> & newValue) { return SetValue(mCurrentDayEntry, newValue, Attributes::CurrentDayEntry::Id); }
+    CHIP_ERROR SetNextDayEntry(DataModel::Nullable<Structs::DayEntryStruct::Type> & newValue) { return SetValue(mNextDayEntry, newValue, Attributes::NextDayEntry::Id); }
+    CHIP_ERROR SetCurrentDayEntryDate(DataModel::Nullable<uint32_t> & newValue) { return SetValue(mCurrentDayEntryDate, newValue, Attributes::CurrentDayEntryDate::Id); }
+    CHIP_ERROR SetNextDayEntryDate(DataModel::Nullable<uint32_t> & newValue) { return SetValue(mNextDayEntryDate, newValue, Attributes::NextDayEntryDate::Id); }
+
     DataModel::Nullable<DataModel::List<Structs::TariffComponentStruct::Type>> & GetCurrentTariffComponents() { return mCurrentTariffComponents_MgmtObj.GetValue(); }
     DataModel::Nullable<DataModel::List<Structs::TariffComponentStruct::Type>> & GetNextTariffComponents() { return mNextTariffComponents_MgmtObj.GetValue(); }
 
-    template <typename T>
-    CHIP_ERROR SetValue(T & currValue, T & newValue, uint32_t attrId);
+    CurrentTariffAttrsCtx mServerTariffAttrsCtx;
 
     void TariffDataUpdatedCb(bool is_erased, const AttributeId* aUpdatedAttrIds, size_t aCount);
     void ResetCurrentAttributes();

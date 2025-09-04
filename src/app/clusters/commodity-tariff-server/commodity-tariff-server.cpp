@@ -295,16 +295,56 @@ void Instance::TariffDataUpdatedCb(bool is_erased, const AttributeId* aUpdatedAt
 }
 
 namespace Utils {
+
+using CurrentTariffAttrsCtx = CommodityTariff::Instance::CurrentTariffAttrsCtx;
+
+static constexpr uint32_t kNotFoundPattern = 0xffffffff;
+
 template <typename T>
-std::pair<const T *, const T *> GetCurrNextItemsById(const std::map<uint32_t, const T *> & aMap, uint32_t aId)
+uint32_t GetIdFromEntry(const T & aEntry)
 {
-    auto current = aMap.find(aId);
-    auto next    = aMap.upper_bound(aId); // Gets element after aId
+    return kNotFoundPattern;
+}
 
-    const T * currentPtr = (current != aMap.end()) ? current->second : nullptr;
-    const T * nextPtr    = (next != aMap.end()) ? next->second : nullptr;
+template <>
+uint32_t GetIdFromEntry<Structs::DayEntryStruct::Type>(const Structs::DayEntryStruct::Type & aEntry)
+{
+    return aEntry.dayEntryID;
+}
 
-    return { currentPtr, nextPtr };
+template <>
+uint32_t GetIdFromEntry<Structs::DayPatternStruct::Type>(const Structs::DayPatternStruct::Type & aEntry)
+{
+    return aEntry.dayPatternID;
+}
+
+template <>
+uint32_t GetIdFromEntry<Structs::TariffComponentStruct::Type>(const Structs::TariffComponentStruct::Type & aEntry)
+{
+    return aEntry.tariffComponentID;
+}
+
+
+
+template <typename T>
+const T * GetListEntryById(const DataModel::List<const T> & aList, uint32_t aId)
+{
+    for (size_t i = 0; i < aList.size(); ++i)
+    {
+        const T & item = aList[i];
+        uint32_t itemId = GetIdFromEntry(item);
+
+        if (itemId == aId) // Replace 'id' with the actual field name
+        {
+            return &item;
+        }
+        // If list is sorted by ID and we've passed the target, break early
+        if (itemId > aId)
+        {
+            break;
+        }
+    }
+    return nullptr;
 }
 
 DayPatternDayOfWeekBitmap GetDayOfWeek(uint32_t timestamp)
@@ -362,7 +402,7 @@ Structs::DayStruct::Type FindDay(CurrentTariffAttrsCtx & aCtx, uint32_t timestam
         {
             for (const auto & patternID : period->dayPatternIDs)
             {
-                auto * pattern = GetCurrNextItemsById<Structs::DayPatternStruct::Type>(aCtx.DayPatternsMap, patternID).first;
+                auto * pattern = GetListEntryById<Structs::DayPatternStruct::Type>(aCtx.mTariffProvider->GetDayPatterns().Value(), patternID);
                 if ((pattern != nullptr) && pattern->daysOfWeek.Has(GetDayOfWeek(timestamp)))
                 {
                     defaultDay.date        = DayStartTS;
@@ -396,11 +436,13 @@ FindDayEntry(CurrentTariffAttrsCtx & aCtx, const DataModel::List<const uint32_t>
 
     for (const auto & entryID : dayEntryIDs)
     {
-        auto [current, next] = GetCurrNextItemsById<Structs::DayEntryStruct::Type>(aCtx.DayEntriesMap, entryID);
+        const auto * current = GetListEntryById<Structs::DayEntryStruct::Type>(aCtx.mTariffProvider->GetDayEntries().Value(), entryID);
         if (current == nullptr)
         {
             continue;
         }
+
+        const auto * next = GetListEntryById<Structs::DayEntryStruct::Type>(aCtx.mTariffProvider->GetDayEntries().Value(), entryID + 1);
 
         // Default: Current entry lasts until end of day
         uint16_t duration = (kDayEntryDurationLimit - current->startTime);
@@ -474,21 +516,22 @@ CHIP_ERROR UpdateTariffComponentAttrsDayEntryById(Instance * aInstance, CurrentT
 {
     CHIP_ERROR err                                   = CHIP_NO_ERROR;
     const Structs::TariffPeriodStruct::Type * period = FindTariffPeriodByDayEntryId(aCtx, dayEntryID);
-    std::vector<Structs::TariffComponentStruct::Type> tempVector;
+    
+    // Use a fixed-size array with maximum expected components
+    constexpr size_t MAX_COMPONENTS = 16; // Adjust this based on your maximum expected components
+    std::array<Structs::TariffComponentStruct::Type, MAX_COMPONENTS> tempArray;
+    size_t componentCount = 0;
 
     if (period == nullptr)
     {
         return CHIP_ERROR_NOT_FOUND;
     }
     const DataModel::List<const uint32_t> & componentIDs = period->tariffComponentIDs;
-    const size_t componentCount                          = period->tariffComponentIDs.size();
-
-    tempVector.reserve(componentCount);
 
     for (const auto & entryID : componentIDs)
     {
         Structs::TariffComponentStruct::Type entry;
-        auto current = GetCurrNextItemsById<Structs::TariffComponentStruct::Type>(aCtx.TariffComponentsMap, entryID).first;
+        auto current = GetListEntryById<Structs::TariffComponentStruct::Type>(aCtx.mTariffProvider->GetTariffComponents().Value(), entryID);
         if (current == nullptr)
         {
             err = CHIP_ERROR_NOT_FOUND;
@@ -511,11 +554,11 @@ CHIP_ERROR UpdateTariffComponentAttrsDayEntryById(Instance * aInstance, CurrentT
             }
             entry.label = MakeOptional(tmpNullLabel);
         }
-        tempVector.push_back(entry);
+        tempArray[componentCount++] = entry;
     }
 
     err = mgmtObj.SetNewValue(
-        MakeNullable(DataModel::List<Structs::TariffComponentStruct::Type>(tempVector.data(), tempVector.size())));
+        MakeNullable(DataModel::List<Structs::TariffComponentStruct::Type>(tempArray.data(), componentCount)));
     SuccessOrExit(err);
 
     err = mgmtObj.UpdateBegin(nullptr);
@@ -527,33 +570,24 @@ CHIP_ERROR UpdateTariffComponentAttrsDayEntryById(Instance * aInstance, CurrentT
     }
 
 exit:
-    for (auto & entry : tempVector)
+    for (size_t i = 0; i < componentCount; i++)
     {
-        mgmtObj.CleanupExtListEntry(entry);
+        mgmtObj.CleanupExtListEntry(tempArray[i]);
     }
 
     return err;
 }
 } // namespace Utils
 
+using CurrentTariffAttrsCtx = CommodityTariff::Instance::CurrentTariffAttrsCtx;
+
 static void AttrsCtxInit(Delegate & aTariffProvider, CurrentTariffAttrsCtx & aCtx)
 {
     aCtx.mTariffProvider = &aTariffProvider;
-
-    CommodityTariffAttrsDataMgmt::ListToMap<Structs::DayPatternStruct::Type, &Structs::DayPatternStruct::Type::dayPatternID>(
-        aTariffProvider.GetDayPatterns().Value(), aCtx.DayPatternsMap);
-    CommodityTariffAttrsDataMgmt::ListToMap<Structs::DayEntryStruct::Type, &Structs::DayEntryStruct::Type::dayEntryID>(
-        aTariffProvider.GetDayEntries().Value(), aCtx.DayEntriesMap);
-    CommodityTariffAttrsDataMgmt::ListToMap<Structs::TariffComponentStruct::Type,
-                                            &Structs::TariffComponentStruct::Type::tariffComponentID>(
-        aTariffProvider.GetTariffComponents().Value(), aCtx.TariffComponentsMap);
 }
 
 static void AttrsCtxDeinit(CurrentTariffAttrsCtx & aCtx)
 {
-    aCtx.DayPatternsMap.clear();
-    aCtx.DayEntriesMap.clear();
-    aCtx.TariffComponentsMap.clear();
     aCtx.mTariffProvider = nullptr;
 }
 
@@ -685,14 +719,15 @@ void Instance::HandleGetTariffComponent(HandlerContext & ctx, const Commands::Ge
     else
     {
         status         = Status::NotFound;
-        auto component = Utils::GetCurrNextItemsById<Structs::TariffComponentStruct::Type>(
-                             mServerTariffAttrsCtx.TariffComponentsMap, commandData.tariffComponentID)
-                             .first;
+        auto component = Utils::GetListEntryById<Structs::TariffComponentStruct::Type>(
+                             mServerTariffAttrsCtx.mTariffProvider->GetTariffComponents().Value(), commandData.tariffComponentID);
 
         if (component != nullptr)
         {
-            std::vector<uint32_t> DeIDs;
-            std::string tempLabelString;
+            std::array<uint32_t, CommodityTariffConsts::kDayEntriesAttrMaxLength> deIDsArray;
+            size_t deIDsCount = 0;
+            std::array<char, kDefaultStringValuesMaxBufLength> labelBuffer;
+            size_t labelLength = 0;
 
             auto matchingPeriods =
                 Utils::FindTariffPeriodsByTariffComponentId(mServerTariffAttrsCtx, commandData.tariffComponentID);
@@ -701,35 +736,59 @@ void Instance::HandleGetTariffComponent(HandlerContext & ctx, const Commands::Ge
             {
                 bool firstLabel = true;
 
-                DeIDs.reserve(CommodityTariffConsts::kDayEntriesAttrMaxLength);
-
                 for (const auto * period : matchingPeriods)
                 {
                     if (!period->label.IsNull())
                     {
-                        std::string periodLabel(period->label.Value().data(), period->label.Value().size());
+                        const auto & periodLabel = period->label.Value();
+                        const size_t periodLabelLength = periodLabel.size();
+                        
+                        // Add separator if not the first label
                         if (!firstLabel)
                         {
-                            tempLabelString += "; ";
+                            if (labelLength + 2 < CommodityTariffConsts::kDefaultStringValuesMaxBufLength) // Space for "; "
+                            {
+                                labelBuffer[labelLength++] = ';';
+                                labelBuffer[labelLength++] = ' ';
+                            }
+                            else
+                            {
+                                ChipLogError(NotSpecified, "Label buffer full, truncating");
+                                break;
+                            }
                         }
-                        tempLabelString += periodLabel;
+                        
+                        // Copy period label to buffer
+                        size_t copyLength = std::min(periodLabelLength, CommodityTariffConsts::kDefaultStringValuesMaxBufLength - labelLength);
+                        if (copyLength > 0)
+                        {
+                            memcpy(labelBuffer.data() + labelLength, periodLabel.data(), copyLength);
+                            labelLength += copyLength;
+                        }
+                        
                         firstLabel = false;
+                        
+                        if (labelLength >= CommodityTariffConsts::kDefaultStringValuesMaxBufLength)
+                        {
+                            ChipLogError(NotSpecified, "Label buffer full, truncating");
+                            break;
+                        }
                     }
 
                     if (!period->dayEntryIDs.empty())
                     {
                         for (const auto & deID : period->dayEntryIDs)
                         {
-                            DeIDs.push_back(deID);
+                            deIDsArray[deIDsCount++] = deID;
                         }
                     }
                 }
             }
 
-            std::sort(DeIDs.begin(), DeIDs.end());
+            std::sort(deIDsArray.begin(), deIDsArray.begin() + deIDsCount);
 
-            response.label           = chip::CharSpan(tempLabelString.data(), tempLabelString.size());
-            response.dayEntryIDs     = DataModel::List<uint32_t>(DeIDs.data(), DeIDs.size());
+            response.label           = chip::CharSpan(labelBuffer.data(), labelLength);
+            response.dayEntryIDs     = DataModel::List<uint32_t>(deIDsArray.data(), deIDsCount);
             response.tariffComponent = *component;
             status                   = Status::Success;
 
@@ -757,8 +816,7 @@ void Instance::HandleGetDayEntry(HandlerContext & ctx, const Commands::GetDayEnt
     {
         status = Status::NotFound;
         auto entry =
-            Utils::GetCurrNextItemsById<Structs::DayEntryStruct::Type>(mServerTariffAttrsCtx.DayEntriesMap, commandData.dayEntryID)
-                .first;
+            Utils::GetListEntryById<Structs::DayEntryStruct::Type>(mServerTariffAttrsCtx.mTariffProvider->GetDayEntries().Value(), commandData.dayEntryID);
 
         if (entry != nullptr)
         {
