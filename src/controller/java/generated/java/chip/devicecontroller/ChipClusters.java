@@ -59299,6 +59299,7 @@ public class ChipClusters {
     private static final long TILT_MAX_ATTRIBUTE_ID = 6L;
     private static final long PAN_MIN_ATTRIBUTE_ID = 7L;
     private static final long PAN_MAX_ATTRIBUTE_ID = 8L;
+    private static final long MOVEMENT_STATE_ATTRIBUTE_ID = 9L;
     private static final long GENERATED_COMMAND_LIST_ATTRIBUTE_ID = 65528L;
     private static final long ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID = 65529L;
     private static final long ATTRIBUTE_LIST_ATTRIBUTE_ID = 65531L;
@@ -59747,6 +59748,32 @@ public class ChipClusters {
             callback.onSuccess(value);
           }
         }, PAN_MAX_ATTRIBUTE_ID, minInterval, maxInterval);
+    }
+
+    public void readMovementStateAttribute(
+        IntegerAttributeCallback callback) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, MOVEMENT_STATE_ATTRIBUTE_ID);
+
+      readAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, MOVEMENT_STATE_ATTRIBUTE_ID, true);
+    }
+
+    public void subscribeMovementStateAttribute(
+        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, MOVEMENT_STATE_ATTRIBUTE_ID);
+
+      subscribeAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, MOVEMENT_STATE_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
     public void readGeneratedCommandListAttribute(
