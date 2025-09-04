@@ -47,13 +47,13 @@ public:
     }
     void SetBreadcrumb(uint64_t value) { mCommissioner->mDeviceCommissioningInfo.general.breadcrumb = value; }
     void SetUTCRequirements(bool requiresUTC) { mCommissioner->mDeviceCommissioningInfo.requiresUTC = requiresUTC; }
-    bool AccessIsScanNeeded() { return mCommissioner->IsScanNeeded(); }
-    bool AccessIsSecondaryNetworkSupported() const { return mCommissioner->IsSecondaryNetworkSupported(); }
+    bool IsScanNeeded() { return mCommissioner->IsScanNeeded(); }
+    bool IsSecondaryNetworkSupported() const { return mCommissioner->IsSecondaryNetworkSupported(); }
     Controller::ReadCommissioningInfo & GetDeviceCommissioningInfo() { return mCommissioner->mDeviceCommissioningInfo; }
-    void AccessResetTryingSecondaryNetwork() { mCommissioner->ResetTryingSecondaryNetwork(); }
+    void ResetTryingSecondaryNetwork() { mCommissioner->ResetTryingSecondaryNetwork(); }
 
-    bool AccessTryingSecondaryNetwork() { return mCommissioner->TryingSecondaryNetwork(); }
-    void AccessTrySecondaryNetwork() { mCommissioner->TrySecondaryNetwork(); }
+    bool TryingSecondaryNetwork() { return mCommissioner->TryingSecondaryNetwork(); }
+    void TrySecondaryNetwork() { mCommissioner->TrySecondaryNetwork(); }
 
     Controller::CommissioningStage GetNextCommissioningStageNetworkSetup(Controller::CommissioningStage currentStage,
                                                                          CHIP_ERROR & lastErr)
