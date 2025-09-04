@@ -283,7 +283,7 @@ TEST(TestAttributePersistence, TestArithmeticValidationSuccess)
     const ConcreteAttributePath path(1, 2, 3);
     constexpr uint32_t kValueToStore = 50;
     constexpr uint32_t kOtherValue   = 99;
-    uint32_t valueRead = 0;
+    uint32_t valueRead               = 0;
 
     // Create a validator that accepts values between 1 and 100
     auto rangeValidator = [](uint32_t value) -> CHIP_ERROR {
@@ -321,7 +321,7 @@ TEST(TestAttributePersistence, TestArithmeticValidationFailure)
     const ConcreteAttributePath path(1, 2, 3);
     constexpr uint32_t kInvalidValue = 150; // Outside the valid range
     constexpr uint32_t kOtherValue   = 99;
-    uint32_t valueRead = 0;
+    uint32_t valueRead               = 0;
 
     // Create a validator that only accepts values between 1 and 100
     auto rangeValidator = [](uint32_t value) -> CHIP_ERROR {
@@ -358,14 +358,12 @@ TEST(TestAttributePersistence, TestArithmeticValidationErrorPropagation)
 
     const ConcreteAttributePath path(1, 2, 3);
     constexpr uint32_t kTestValue = 42;
-    uint32_t valueRead = 0;
+    uint32_t valueRead            = 0;
 
     // Test different error types are properly propagated
     {
         // Custom error validator
-        auto customErrorValidator = [](uint32_t value) -> CHIP_ERROR {
-            return CHIP_ERROR_INVALID_ARGUMENT;
-        };
+        auto customErrorValidator = [](uint32_t value) -> CHIP_ERROR { return CHIP_ERROR_INVALID_ARGUMENT; };
 
         WriteOperation writeOp(path);
         AttributeValueDecoder decoder = writeOp.DecoderFor(kTestValue);
@@ -375,9 +373,7 @@ TEST(TestAttributePersistence, TestArithmeticValidationErrorPropagation)
 
     {
         // Different custom error validator
-        auto anotherErrorValidator = [](uint32_t value) -> CHIP_ERROR {
-            return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
-        };
+        auto anotherErrorValidator = [](uint32_t value) -> CHIP_ERROR { return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE; };
 
         WriteOperation writeOp(path);
         AttributeValueDecoder decoder = writeOp.DecoderFor(kTestValue);
@@ -475,7 +471,7 @@ TEST(TestAttributePersistence, TestValidationWithoutValidator)
     const ConcreteAttributePath path(1, 2, 3);
     constexpr uint32_t kValueToStore = 42;
     constexpr uint32_t kOtherValue   = 99;
-    uint32_t valueRead = 0;
+    uint32_t valueRead               = 0;
 
     // Test that the function works correctly without a validator (backward compatibility)
     {
