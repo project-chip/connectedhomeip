@@ -147,6 +147,9 @@ void TCPBase::Close()
 
 ActiveTCPConnectionState * TCPBase::AllocateConnection(Inet::TCPEndPoint * endpoint, const PeerAddress & address)
 {
+    // If a peer initiates a connection through HandleIncomingConnection but the connection is never claimed
+    // in ProcessSingleMessage, we'll be left with a dangling ActiveTCPConnectionState which can be
+    // reclaimed.  Don't try to reclaim these connections unless we're out of space
     for (int reclaim = 0; reclaim < 1; reclaim++)
     {
         for (size_t i = 0; i < mActiveConnectionsSize; i++)
@@ -161,7 +164,7 @@ ActiveTCPConnectionState * TCPBase::AllocateConnection(Inet::TCPEndPoint * endpo
             }
         }
 
-        // Verify that previously-unclaimed connections are released
+        // Out of space; reclaim connections that were never claimed by ProcessSingleMessage
         for (size_t i = 0; i < mActiveConnectionsSize; i++)
         {
             ActiveTCPConnectionHolder releaseUnclaimed(&mActiveConnections[i]);

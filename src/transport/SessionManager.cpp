@@ -819,7 +819,7 @@ void SessionManager::UnauthenticatedMessageDispatch(const PacketHeader & partial
         {
             if (sessionConn != ctxt->conn)
             {
-                ChipLogError(Inet, "Data received over %p for wrong connection %p. Dropping it!",
+                ChipLogError(Inet, "Unauthenticated data received over %p for wrong connection %p. Dropping it!",
                              static_cast<const void *>(sessionConn), static_cast<const void *>(ctxt->conn));
                 return;
             }
@@ -908,7 +908,7 @@ void SessionManager::SecureUnicastMessageDispatch(const PacketHeader & partialPa
         {
             if (sessionConn != ctxt->conn)
             {
-                ChipLogError(Inet, "Data received over %p for wrong connection %p. Dropping it!",
+                ChipLogError(Inet, "Unicast data received over %p for wrong connection %p. Dropping it!",
                              static_cast<const void *>(sessionConn), static_cast<const void *>(ctxt->conn));
                 return;
             }
