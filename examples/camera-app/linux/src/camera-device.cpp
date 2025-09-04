@@ -1014,6 +1014,13 @@ CameraError CameraDevice::SetHDRMode(bool hdrMode)
     return CameraError::SUCCESS;
 }
 
+CameraError CameraDevice::SetStreamUsagePriorities(std::vector<StreamUsageEnum> streamUsagePriorities)
+{
+    mStreamUsagePriorities = streamUsagePriorities;
+
+    return CameraError::SUCCESS;
+}
+
 std::vector<StreamUsageEnum> & CameraDevice::GetSupportedStreamUsages()
 {
     static std::vector<StreamUsageEnum> supportedStreamUsage = { StreamUsageEnum::kLiveView, StreamUsageEnum::kRecording };
