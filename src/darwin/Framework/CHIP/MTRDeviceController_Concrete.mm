@@ -924,36 +924,43 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
 
 - (void)commissioningDone:(MTRCommissioningOperation *)commissioning
 {
-    // Ensure that we do the work below (including nulling out
-    // currentCommissioning) after our delegate callbacks for success/failure of
-    // commissioning have been called, in cases when we are the
-    // MTRCommissioningDelegate.  The queue needs to match the one we use for
-    // MTRCommissioningOperation in those cases.
-    dispatch_async(_commissioningQueue, ^{
-        if (self.currentCommissioning == commissioning) {
-            MTR_LOG("%@ stopping commissioning %@", self, commissioning);
-            self.currentCommissioning = nil;
+    if (commissioning.isInternallyCreated) {
+        // Do nothing; we will handle this when we get the actual
+        // succeeded/failed delegate notifications, which we are guaranteed to
+        // get for an internal commissioning. This avoids us nulling out
+        // self.currentCommissioning before we get those notifications and
+        // failing to propagate them to our delegates correctly.
+        return;
+    }
 
-            // Reset ourselves as the device controller delegate, so we can
-            // correctly handle the commissioning codepaths that don't use
-            // MTRCommissioningOperation yet.
-            auto block = ^{
-                self->_deviceControllerDelegateBridge->setDelegate(self, self, self->_chipWorkQueue);
-            };
+    [self _commissioningDone:commissioning];
+}
 
-            // We don't care whether this fails.  If it fails, we are shut down
-            // already, and then we don't need to worry about the device controller
-            // delegate.
-            [self syncRunOnWorkQueue:block error:nil];
-        }
+- (void)_commissioningDone:(MTRCommissioningOperation *)commissioning
+{
+    if (self.currentCommissioning == commissioning) {
+        MTR_LOG("%@ stopping commissioning %@", self, commissioning);
+        self.currentCommissioning = nil;
 
-        // Generally, we would expect self.currentInternalCommissioning to be equal
-        // to commissioning if and only if self.currentCommissioning is equal to
-        // it.  But just in case, have this as a separate check.
-        if (self.currentInternalCommissioning == commissioning) {
-            self.currentInternalCommissioning = nil;
-        }
-    });
+        // Reset ourselves as the device controller delegate, so we can
+        // correctly handle the commissioning codepaths that don't use
+        // MTRCommissioningOperation yet.
+        auto block = ^{
+            self->_deviceControllerDelegateBridge->setDelegate(self, self, self->_chipWorkQueue);
+        };
+
+        // We don't care whether this fails.  If it fails, we are shut down
+        // already, and then we don't need to worry about the device controller
+        // delegate.
+        [self syncRunOnWorkQueue:block error:nil];
+    }
+
+    // Generally, we would expect self.currentInternalCommissioning to be equal
+    // to commissioning if and only if self.currentCommissioning is equal to
+    // it.  But just in case, have this as a separate check.
+    if (self.currentInternalCommissioning == commissioning) {
+        self.currentInternalCommissioning = nil;
+    }
 }
 
 - (BOOL)setupCommissioningSessionWithDiscoveredDevice:(MTRCommissionableBrowserResult *)discoveredDevice
@@ -2128,6 +2135,16 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
         return;
     }
 
+    if (commissioning.isInternallyCreated) {
+        // Make sure we do _commissioningDone for this commissioning (which we
+        // skipped doing in commissioningDone), before we notify our delegates.
+        //
+        // Note that doing this after the currentCommissioning check is OK,
+        // since _commissioningDone is a no-op if the commissioning is not the
+        // current one.
+        [self _commissioningDone:commissioning];
+    }
+
     [self controller:self commissioningComplete:nil nodeID:nodeID metrics:metrics];
 }
 
@@ -2188,6 +2205,13 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
     // on through.  The node ID will let API consumers who happen do call
     // setupPayloadWithOnboardingPayload twice disambiguate which one failed, if
     // they care to do that.
+
+    if (commissioning.isInternallyCreated) {
+        // Make sure we do _commissioningDone for this commissioning (which we
+        // skipped doing in commissioningDone), before we notify our delegates.
+        [self _commissioningDone:commissioning];
+    }
+
     [self controller:self commissioningComplete:error nodeID:deviceID metrics:metrics];
 }
 

@@ -216,6 +216,14 @@ static inline void emitMetricForSetupPayload(NSString * payload)
     // we happen to do.
     _delegate = nil;
 
+    // No matter what, notify our controller that we are done. Do this before
+    // we dispath our notifications, so that in cases when the controller is not
+    // our delegate its state has been updated before our delegate tries to
+    // start a new commissioning, which it might want to do from the failure
+    // callback. If the controller _is_ our delegate, it will ignore this call
+    // until it gets the delegate callbacks.
+    [strongController commissioningDone:self];
+
     dispatch_async(_delegateQueue, ^{
         if ([strongDelegate respondsToSelector:@selector(commissioning:failedWithError:forDeviceID:metrics:)]) {
             [strongDelegate commissioning:self failedWithError:error forDeviceID:commissioningID metrics:metrics];
@@ -223,9 +231,6 @@ static inline void emitMetricForSetupPayload(NSString * payload)
             [strongDelegate commissioning:self failedWithError:error metrics:metrics];
         }
     });
-
-    // No matter what, notify our controller that we are done.
-    [strongController commissioningDone:self];
 }
 
 - (id<MTRCommissioningDelegate_Internal>)_internalDelegate
@@ -299,14 +304,19 @@ static inline void emitMetricForSetupPayload(NSString * payload)
     // we happened to do.
     _delegate = nil;
 
+    // No matter what, notify our controller that we are done. Do this before
+    // we dispath our notifications, so that in cases when the controller is not
+    // our delegate its state has been updated before our delegate tries to
+    // start a new commissioning, which it might want to do from the success
+    // callback. If the controller _is_ our delegate, it will ignore this call
+    // until it gets the delegate callbacks.
+    [strongController commissioningDone:self];
+
     dispatch_async(_delegateQueue, ^{
         if ([strongDelegate respondsToSelector:@selector(commissioning:succeededForNodeID:metrics:)]) {
             [strongDelegate commissioning:self succeededForNodeID:nodeID metrics:metrics];
         }
     });
-
-    // No matter what, notify our controller that we are done.
-    [strongController commissioningDone:self];
 }
 
 // No need to implement deprecated or less-information versions of
