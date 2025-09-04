@@ -284,8 +284,8 @@ def run(controller_nodeid, device_nodeid, address, timeout, discriminator, setup
         return
 
     logger.info("Test Parameters:")
-    logger.info(f"\tController NodeId: {controller_nodeid}")
-    logger.info(f"\tDevice NodeId:     {device_nodeid}")
+    logger.info(f"\tController NodeId: 0x{controller_nodeid:016X}")
+    logger.info(f"\tDevice NodeId:     0x{device_nodeid:016X}")
     logger.info(f"\tTest Timeout:      {timeout}s")
     logger.info(f"\tDiscriminator:     {discriminator}")
     logger.info(f"\tEnabled Tests:     {enable_test}")
