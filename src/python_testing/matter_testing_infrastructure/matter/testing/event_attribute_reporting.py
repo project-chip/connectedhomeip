@@ -131,6 +131,33 @@ class EventSubscriptionHandler:
 
         asserts.fail(f"Event reported when not expected {res}")
 
+    def wait_for_event_type_report(self, event_type: ClusterObjects.ClusterEvent, timeout_sec: float) -> Optional[Any]:
+        """
+        Waits for a specific event type from the event subscription handler within the timeout period.
+
+        Parameters:
+            event_type (ClusterObjects.ClusterEvent): The expected event type to wait for.
+            timeout_sec (float): The maximum time to wait for the event, in seconds.
+
+        Returns:
+            The event data (from EventReadResult.Data) when the expected event is received, or fails on timeout.
+        """
+        event_queue = self.event_queue
+        start_time = time.time()
+        while True:
+            remaining = timeout_sec - (time.time() - start_time)
+            if remaining <= 0:
+                asserts.fail(f"Timeout waiting for event {event_type}.")
+            try:
+                event = event_queue.get(block=True, timeout=remaining)
+            except queue.Empty:
+                asserts.fail(f"Timeout waiting for event {event_type}.")
+            if event.Header.EventId == event_type.event_id:
+                logging.info(f"Event {event_type.__name__} received: {event}")
+                return event.Data
+            else:
+                logging.info(f"Received other event: {event.Header.EventId}, ignoring and waiting for {event_type.__name__}.")
+
     def get_last_event(self) -> Optional[Any]:
         """Flush entire queue, returning last (newest) event only."""
         last_event: Optional[Any] = None

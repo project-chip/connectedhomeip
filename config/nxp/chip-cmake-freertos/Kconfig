@@ -208,12 +208,64 @@ config CHIP_WIFI_CONNECTION_RECOVERY_JITTER
 		a random jitter interval is added to it to avoid periodicity. The random jitter is selected
 		within range [-JITTER; +JITTER].
 
-# Secure Element
+# Secure Element Configurations
+
 config CHIP_SE05X
 	bool "Enable Secure Element support"
 	select SE05X_LIB
 	help
 		Enable SE05x Secure element for offloading crypto operations.
+
+if CHIP_SE05X
+
+config CHIP_SE05X_SPAKE_VERIFIER
+	bool "Enable SE05x Secure element for offloading spake verifier"
+	help
+		Enable SE05x Secure element for offloading spake verifier.
+
+config CHIP_SE05X_SPAKE_PROVER
+	bool "Enable SE05x Secure element for offloading spake prover"
+	help
+		Enable SE05x Secure element for offloading spake prover.
+
+config CHIP_SE05X_RND_GEN
+	bool "Enable SE05x Secure element for offloading random number generation"
+	help
+		Enable SE05x Secure element for offloading random number generation.
+
+config CHIP_SE05X_GENERATE_EC_KEY
+	bool "Enable SE05x Secure element for EC key Generate"
+	default y
+	help
+		Enable SE05x Secure element for EC key Generate.
+
+config CHIP_SE05X_ECDSA_VERIFY
+	bool "Enable SE05x Secure element for ECDSA Verify"
+	default y
+	help
+		Enable SE05x Secure element for ECDSA Verify.
+
+config CHIP_SE05X_PBKDF2_SHA256
+	bool "Enable SE05x Secure element for PBKDF2_SHA256"
+	help
+		Enable SE05x Secure element for PBKDF2_SHA256.
+
+config CHIP_SE05X_HKDF_SHA256
+	bool "Enable SE05x Secure element for HKDF_SHA256"
+	help
+		Enable SE05x Secure element for HKDF_SHA256.
+
+config CHIP_SE05X_HMAC_SHA256
+	bool "Enable SE05x Secure element for HMAC_SHA256"
+	help
+		Enable SE05x Secure element for HMAC_SHA256.
+
+config CHIP_SE05X_DEVICE_ATTESTATION
+	bool "Enable SE05x Secure element for offloading Device attestation Sign"
+	help
+		Enable SE05x Secure element for offloading Device attestation Sign.
+
+endif # CHIP_SE05X
 
 # Thread network features
 

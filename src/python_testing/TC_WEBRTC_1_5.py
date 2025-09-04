@@ -85,7 +85,7 @@ class TC_WEBRTC_1_5(MatterBaseTest):
         return steps
 
     def desc_TC_WEBRTC_1_5(self) -> str:
-        return "[TC-WEBRTC-1.3] Validate Deferred Offer Flow for Battery-Powered Camera in Standby Mode."
+        return "[TC-WEBRTC-1.5] Validate Deferred Offer Flow for Battery-Powered Camera in Standby Mode."
 
     def pics_TC_WEBRTC_1_5(self) -> list[str]:
         return ["WEBRTCR", "WEBRTCP"]

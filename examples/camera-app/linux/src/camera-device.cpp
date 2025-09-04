@@ -418,8 +418,9 @@ GstElement * CameraDevice::CreateSnapshotPipeline(const std::string & device, in
     return nullptr; // Here to avoid compiler warnings, should never reach this point.
 }
 
-// Helper function to create a GStreamer pipeline that ingests MJPEG frames coming
-// from the camera, converted to H.264, and sent to media controller via app sink.
+// Helper function to create a GStreamer pipeline that captures raw video frames from
+// the camera, converts them to I420 format, encodes to H.264, and sends the encoded
+// stream to the media controller via app sink.
 GstElement * CameraDevice::CreateVideoPipeline(const std::string & device, int width, int height, int framerate,
                                                CameraError & error)
 {
@@ -472,8 +473,8 @@ GstElement * CameraDevice::CreateVideoPipeline(const std::string & device, int w
     g_object_set(capsfilter2, "caps", caps2, nullptr);
     gst_caps_unref(caps2);
 
-    // Configure encoder for low‑latency
-    g_object_set(x264enc, "tune", 0, "speed-preset", 1, "key-int-max", framerate * 1, nullptr);
+    // Configure encoder for low‑latency and force IDR at start
+    g_object_set(x264enc, "tune", 0, "speed-preset", 1, "key-int-max", framerate * 1, "insert-vui", TRUE, nullptr);
 
     // Configure appsink for receiving H.264 buffers data
     g_object_set(appsink, "emit-signals", TRUE, nullptr);
@@ -1009,6 +1010,13 @@ uint16_t CameraDevice::GetCurrentFrameRate()
 CameraError CameraDevice::SetHDRMode(bool hdrMode)
 {
     mHDREnabled = hdrMode;
+
+    return CameraError::SUCCESS;
+}
+
+CameraError CameraDevice::SetStreamUsagePriorities(std::vector<StreamUsageEnum> streamUsagePriorities)
+{
+    mStreamUsagePriorities = streamUsagePriorities;
 
     return CameraError::SUCCESS;
 }
