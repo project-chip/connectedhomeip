@@ -983,6 +983,23 @@ class MatterBaseTest(base_test.BaseTestClass):
                 logging.info("========= EOF on STDIN =========")
                 return None
 
+    def _user_verify_prompt(self, prompt_msg: str, hook_method_name: str, validation_name: str, error_message: str) -> None:
+        """Helper to show a prompt and wait for user validation in TH."""
+        # Only run when TC is being executed in TH
+        if self.runner_hook and hasattr(self.runner_hook, hook_method_name):
+            hook_method = getattr(self.runner_hook, hook_method_name)
+            hook_method(msg=prompt_msg)
+
+            logging.info(f"========= USER PROMPT for {validation_name} =========")
+
+            try:
+                result = input()
+                if result != '1':  # User did not select 'PASS'
+                    raise TestError(error_message)
+            except EOFError:
+                logging.info("========= EOF on STDIN =========")
+                return None
+
     def user_verify_video_stream(self,
                                  prompt_msg: str) -> None:
         """Show Video Verification Prompt and wait for user validation.
@@ -998,19 +1015,12 @@ class MatterBaseTest(base_test.BaseTestClass):
         Raises:
             TestError: Indicating video validation step failed.
         """
-        # Only run when TC is being executed in TH
-        if self.runner_hook and hasattr(self.runner_hook, 'show_video_prompt'):
-            self.runner_hook.show_video_prompt(msg=prompt_msg)
-
-            logging.info("========= USER PROMPT for Video Stream Validation =========")
-
-            try:
-                result = input()
-                if result != '1':  # User did not select 'PASS'
-                    raise TestError("Video stream validation failed")
-            except EOFError:
-                logging.info("========= EOF on STDIN =========")
-                return None
+        self._user_verify_prompt(
+            prompt_msg=prompt_msg,
+            hook_method_name='show_video_prompt',
+            validation_name='Video Stream Validation',
+            error_message='Video stream validation failed'
+        )
 
     def user_verify_two_way_talk(self,
                                  prompt_msg: str) -> None:
@@ -1025,21 +1035,14 @@ class MatterBaseTest(base_test.BaseTestClass):
             Returns nothing indicating success so the test can go on.
 
         Raises:
-            TestError: Indicating video validation step failed.
+            TestError: Indicating Two Way Talk validation step failed.
         """
-        # Only run when TC is being executed in TH
-        if self.runner_hook and hasattr(self.runner_hook, 'show_two_way_talk_prompt'):
-            self.runner_hook.show_two_way_talk_prompt(msg=prompt_msg)
-
-            logging.info("========= USER PROMPT for Two Way Talk Validation =========")
-
-            try:
-                result = input()
-                if result != '1':  # User did not select 'PASS'
-                    raise TestError("Two way talk validation failed")
-            except EOFError:
-                logging.info("========= EOF on STDIN =========")
-                return None
+        self._user_verify_prompt(
+            prompt_msg=prompt_msg,
+            hook_method_name='show_two_way_talk_prompt',
+            validation_name='Two Way Talk Validation',
+            error_message='Two way talk validation failed'
+        )
 
     def user_verify_push_av_stream(self, prompt_msg: str) -> None:
         """Show Push AV Stream Verification Prompt and wait for user validation.
@@ -1053,21 +1056,14 @@ class MatterBaseTest(base_test.BaseTestClass):
             Returns nothing indicating success so the test can go on.
 
         Raises:
-            TestError: Indicating video validation step failed.
+            TestError: Indicating Push AV Stream validation step failed.
         """
-        # Only run when TC is being executed in TH
-        if self.runner_hook and hasattr(self.runner_hook, 'show_push_av_stream_prompt'):
-            self.runner_hook.show_push_av_stream_prompt(msg=prompt_msg)
-
-            logging.info("========= USER PROMPT for Push AV Stream Validation =========")
-
-            try:
-                result = input()
-                if result != '1':  # User did not select 'PASS'
-                    raise TestError("Push AV Stream validation failed")
-            except EOFError:
-                logging.info("========= EOF on STDIN =========")
-                return None
+        self._user_verify_prompt(
+            prompt_msg=prompt_msg,
+            hook_method_name='show_push_av_stream_prompt',
+            validation_name='Push AV Stream Validation',
+            error_message='Push AV Stream validation failed'
+        )
 
 
 def _async_runner(body, self: MatterBaseTest, *args, **kwargs):
