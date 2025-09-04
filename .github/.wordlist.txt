@@ -1059,6 +1059,7 @@ optionOverride
 optionsMask
 optionsOverride
 orgs
+Orchestrator
 OSS
 OTA
 OTADownloader
@@ -1263,6 +1264,7 @@ RGB
 riscv
 rloc
 rmw
+rnd
 rodata
 Rollershade
 rootfs

@@ -91,6 +91,9 @@ static MTRTestKeys * sTestKeys = nil;
     XCTAssertEqualObjects(attestationDeviceInfo.productID, @(0x8001));
     XCTAssertEqualObjects(attestationDeviceInfo.basicInformationVendorID, @(0xFFF1));
     XCTAssertEqualObjects(attestationDeviceInfo.basicInformationProductID, @(0x8000));
+    XCTAssertEqualObjects(attestationDeviceInfo.certificateDeclaration,
+        attestationDeviceInfo.certificationDeclaration);
+    XCTAssertNotNil(attestationDeviceInfo.certificationDeclaration);
 
     if (_callback) {
         _callback();
@@ -184,11 +187,30 @@ static MTRTestKeys * sTestKeys = nil;
         XCTAssertNil(info.rootEndpoint);
     }
 
+    // In all cases, we should have the network commissioning feature maps in
+    // the list.
+    __auto_type isNetworkCommissioningFeatureMap = ^(MTRAttributePath * path) {
+        return [path.cluster isEqual:@(MTRClusterIDTypeNetworkCommissioningID)] &&
+            [path.attribute isEqual:@(MTRAttributeIDTypeGlobalAttributeFeatureMapID)];
+    };
+    NSUInteger networkCommissioningFeatureMapCount = 0;
+    for (MTRAttributePath * path in info.attributes) {
+        if (isNetworkCommissioningFeatureMap(path)) {
+            ++networkCommissioningFeatureMapCount;
+        }
+    }
+    XCTAssertGreaterThan(networkCommissioningFeatureMapCount, 0);
+
     if (self.extraAttributesToRead) {
         // The attributes we tried to read should really have worked.
         XCTAssertNotNil(info.attributes);
-        XCTAssertEqual(info.attributes.count, 2);
+        XCTAssertEqual(info.attributes.count, 2 + networkCommissioningFeatureMapCount);
         for (MTRAttributePath * path in info.attributes) {
+            if (isNetworkCommissioningFeatureMap(path)) {
+                // We checked for these already.
+                continue;
+            }
+
             XCTAssertEqualObjects(path.endpoint, @(0));
             if ([path.cluster isEqual:@(MTRClusterIDTypeDescriptorID)]) {
                 XCTAssertEqualObjects(path.attribute, @(MTRAttributeIDTypeGlobalAttributeAttributeListID));

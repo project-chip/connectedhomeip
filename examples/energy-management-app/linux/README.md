@@ -19,11 +19,11 @@ details.
     -   [Device Tracing](#device-tracing)
     -   [Python Test Cases](#python-test-cases)
         -   [Running the test cases:](#running-the-test-cases)
-    -   [CHIP-REPL Interaction](#chip-repl-interaction)
-        -   [Building chip-repl:](#building-chip-repl)
+    -   [MATTER-REPL Interaction](#matter-repl-interaction)
+        -   [Building matter-repl:](#building-matter-repl)
         -   [Activating python virtual env](#activating-python-virtual-env)
-        -   [Interacting with CHIP-REPL and the example app](#interacting-with-chip-repl-and-the-example-app)
-        -   [Using chip-repl to Fake a charging session](#using-chip-repl-to-fake-a-charging-session)
+        -   [Interacting with matter-repl and the example app](#interacting-with-matter-repl-and-the-example-app)
+        -   [Using matter-repl to Fake a charging session](#using-matter-repl-to-fake-a-charging-session)
     -   [Water Heater App: Interaction using the chip-tool and TestEventTriggers](#water-heater-app-interaction-using-the-chip-tool-and-testeventtriggers)
 
 <hr>
@@ -136,8 +136,8 @@ Obtain tracing json file.
 
 ## Python Test Cases
 
-When you want to test this cluster you can use chip-repl or chip-tool by hand.
-CHIP-REPL is slightly easier to interact with when dealing with some of the
+When you want to test this cluster you can use matter-repl or chip-tool by hand.
+MATTER-REPL is slightly easier to interact with when dealing with some of the
 complex structures.
 
 There are several test scripts provided for EVSE (in
@@ -222,13 +222,13 @@ step. That is also why the evse.bin is deleted before running
 chip-energy-management-app as this is where the app stores the matter persistent
 data (e.g. fabric info).
 
-## CHIP-REPL Interaction
+## MATTER-REPL Interaction
 
--   See chip-repl documentation in:
-    -   [Working with Python CHIP Controller](../../../docs/development_controllers/chip-repl/python_chip_controller_building.md)
-    -   [Matter_REPL_Intro](https://github.com/project-chip/connectedhomeip/blob/master/docs/development_controllers/chip-repl/Matter_REPL_Intro.ipynb)
+-   See matter-repl documentation in:
+    -   [Working with Python CHIP Controller](../../../docs/development_controllers/matter-repl/python_chip_controller_building.md)
+    -   [Matter_REPL_Intro](https://github.com/project-chip/connectedhomeip/blob/master/docs/development_controllers/matter-repl/Matter_REPL_Intro.ipynb)
 
-### Building chip-repl:
+### Building matter-repl:
 
 ```bash
     $ ./build_python.sh -i <path_to_out_folder>
@@ -242,7 +242,7 @@ data (e.g. fabric info).
     $ source <path_to_out_folder>/bin/activate
 ```
 
-### Interacting with CHIP-REPL and the example app
+### Interacting with matter-repl and the example app
 
 -   Step 1: Launch the example app
 
@@ -250,13 +250,13 @@ data (e.g. fabric info).
     $ ./chip-energy-management-app --enable-key 000102030405060708090a0b0c0d0e0f --application evse
 ```
 
--   Step 2: Launch CHIP-REPL
+-   Step 2: Launch matter-repl
 
 ```bash
-    $ chip-repl
+    $ matter-repl
 ```
 
--   Step 3: (In chip-repl) Commissioning OnNetwork
+-   Step 3: (In matter-repl) Commissioning OnNetwork
 
 ```python
     await devCtrl.CommissionOnNetwork(1234,20202021)   # Commission with NodeID 1234
@@ -265,7 +265,7 @@ Commissioning complete
 Out[2]: <matter.native.PyChipError object at 0x7f2432b16140>
 ```
 
--   Step 4: (In chip-repl) Read EVSE attributes
+-   Step 4: (In matter-repl) Read EVSE attributes
 
 ```python
     # Read from NodeID 1234, Endpoint 1, all attributes on EnergyEvse cluster
@@ -393,7 +393,7 @@ Attribute Changed:
 Note that you can omit the `chargingEnabledUntil` argument and it will charge
 indefinitely.
 
-### Using chip-repl to Fake a charging session
+### Using matter-repl to Fake a charging session
 
 If you haven't implemented a real EVSE but want to simulate plugging in an EV
 then you can use a few of the test event triggers to simulate these scenarios.
@@ -407,7 +407,7 @@ The test event triggers values can be found in:
 -   0x0099000000000004 - Simulates the EVSE requesting power
 
 To send a test event trigger to the app, use the following commands (in
-chip-repl):
+matter-repl):
 
 ```python
     # send 1st event trigger to 'install' the EVSE on a 32A supply

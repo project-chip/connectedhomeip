@@ -21,7 +21,7 @@
 #include "camera-avsettingsuserlevel-manager.h"
 #include "camera-device-interface.h"
 #include "chime-manager.h"
-#include "push-av-stream-transport-delegate-impl.h"
+#include "push-av-stream-manager.h"
 #include "webrtc-provider-manager.h"
 #include "zone-manager.h"
 
@@ -87,7 +87,7 @@ public:
     chip::app::Clusters::CameraAvStreamManagement::CameraAVStreamMgmtDelegate & GetCameraAVStreamMgmtDelegate() override;
     chip::app::Clusters::CameraAvStreamManagement::CameraAVStreamController & GetCameraAVStreamMgmtController() override;
     chip::app::Clusters::CameraAvSettingsUserLevelManagement::Delegate & GetCameraAVSettingsUserLevelMgmtDelegate() override;
-    chip::app::Clusters::PushAvStreamTransportDelegate & GetPushAVDelegate() override;
+    chip::app::Clusters::PushAvStreamTransportDelegate & GetPushAVTransportDelegate() override;
     chip::app::Clusters::ZoneManagement::Delegate & GetZoneManagementDelegate() override;
 
     MediaController & GetMediaController() override;
@@ -107,7 +107,7 @@ public:
     CameraError CaptureSnapshot(const chip::app::DataModel::Nullable<uint16_t> streamID, const VideoResolutionStruct & resolution,
                                 ImageSnapshot & outImageSnapshot) override;
 
-    CameraError StartVideoStream(uint16_t streamID) override;
+    CameraError StartVideoStream(const VideoStreamStruct & allocatedStream) override;
 
     // Stop video stream
     CameraError StopVideoStream(uint16_t streamID) override;
@@ -171,6 +171,7 @@ public:
     std::vector<StreamUsageEnum> & GetSupportedStreamUsages() override;
 
     std::vector<StreamUsageEnum> & GetStreamUsagePriorities() override { return mStreamUsagePriorities; }
+    CameraError SetStreamUsagePriorities(std::vector<StreamUsageEnum> streamUsagePriorities) override;
 
     // Sets the Default Camera Viewport
     CameraError SetViewport(const chip::app::Clusters::Globals::Structs::ViewportStruct::Type & viewPort) override;
@@ -286,6 +287,7 @@ public:
     CameraError SetPan(int16_t aPan) override;
     CameraError SetTilt(int16_t aTilt) override;
     CameraError SetZoom(uint8_t aZoom) override;
+    CameraError SetPhysicalPTZ(chip::Optional<int16_t> aPan, chip::Optional<int16_t> aTilt, chip::Optional<uint8_t> aZoom) override;
 
     std::vector<VideoStream> & GetAvailableVideoStreams() override { return mVideoStreams; }
 
