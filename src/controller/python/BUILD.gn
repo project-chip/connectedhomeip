@@ -333,13 +333,14 @@ matter_python_wheel_action("matter-core") {
   py_package_reqs = [
     "coloredlogs",
     "construct",
-    "dacite",
-    "rich",
-    "pyyaml",
-    "ipdb",
-    "deprecation",
     "cryptography",
+    "dacite",
+    "deprecation",
     "ecdsa",
+    "ipdb",
+    "matter-clusters",
+    "pyyaml",
+    "rich",
   ]
 
   if (current_cpu == "x64") {
@@ -407,8 +408,8 @@ matter_python_wheel_action("matter-clusters") {
   ]
 
   py_package_reqs = [
-    "dacite",
     "aenum",
+    "dacite",
   ]
 
   py_package_name = "${chip_python_package_prefix}-clusters"
@@ -417,8 +418,8 @@ matter_python_wheel_action("matter-clusters") {
   output_name = "${py_package_name}-${chip_python_version}-py3-none-${py_platform_tag}.whl"
 }
 
-matter_python_wheel_action("chip-repl") {
-  py_scripts = [ "chip-repl.py" ]
+matter_python_wheel_action("matter-repl") {
+  py_scripts = [ "matter-repl.py" ]
 
   py_manifest_files = [
     {
@@ -426,7 +427,7 @@ matter_python_wheel_action("chip-repl") {
       sources = [
         "matter/ChipBluezMgr.py",
         "matter/ChipCoreBluetoothMgr.py",
-        "matter/ChipReplStartup.py",
+        "matter/ReplStartup.py",
       ]
       sources += py_scripts
     },
@@ -456,6 +457,7 @@ matter_python_wheel_action("chip-repl") {
     "pyobjc-framework-corebluetooth ; sys_platform==\"darwin\"",
     "dbus-python==1.2.18 ; sys_platform==\"linux\"",
     "pygobject==3.50.0 ; sys_platform==\"linux\"",
+    "matter-core",
   ]
 
   py_package_name = "${chip_python_package_prefix}-repl"
