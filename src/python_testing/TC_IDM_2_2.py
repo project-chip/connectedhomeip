@@ -44,7 +44,6 @@ import time
 from mobly import asserts
 
 import matter.clusters as Clusters
-from matter import ChipDeviceCtrl
 from matter.clusters import ClusterObjects as ClusterObjects
 from matter.clusters.Attribute import AttributePath
 from matter.exceptions import ChipStackError
