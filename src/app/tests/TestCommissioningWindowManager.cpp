@@ -450,6 +450,7 @@ TEST_F(TestCommissioningWindowManager, TestOnPlatformEventFailSafeTimerExpired)
 
     commissionMgr.OnPlatformEvent(&event);
     EXPECT_TRUE(commissionMgr.IsCommissioningWindowOpen());
+    EXPECT_EQ(commissionMgr.GetCommissioningMode(), chip::Dnssd::CommissioningMode::kEnabledBasic);
     commissionMgr.CloseCommissioningWindow();
     EXPECT_EQ(commissionMgr.GetCommissioningMode(), chip::Dnssd::CommissioningMode::kDisabled);
 }
@@ -461,29 +462,33 @@ TEST_F(TestCommissioningWindowManager, TestOnPlatformEventFailSafeTimerExpiredPA
     auto access                                = chip::Test::CommissioningWindowManagerTestAccess(&commissionMgr);
     auto & sessionMgr                          = Server::GetInstance().GetSecureSessionManager();
 
-    auto & PASESession                       = access.GetPASESession();
+    auto & paseSession                       = access.GetPASESession();
     uint16_t localSessionId                  = 1;
     chip::NodeId peerNodeId                  = chip::kUndefinedNodeId;
     uint16_t peerSessionId                   = 2;
     chip::FabricIndex fabricIndex            = chip::kUndefinedFabricIndex;
     chip::Transport::PeerAddress peerAddress = chip::Transport::PeerAddress::UDP(
-        chip::Inet::IPAddress::Loopback(chip::Inet::IPAddressType::kAny), 5540); // 5540 is a port number assigned to Matter by IANA
+        chip::Inet::IPAddress::Loopback(chip::Inet::IPAddressType::kAny), CHIP_PORT);
 
     auto role = chip::CryptoContext::SessionRole::kResponder;
 
+    EXPECT_EQ(commissionMgr.OpenBasicCommissioningWindow(commissionMgr.MaxCommissioningTimeout(),
+                                                         CommissioningWindowAdvertisement::kDnssdOnly),
+              CHIP_NO_ERROR);
+
     // Inject a fake PASE session into SessionManager
-    CHIP_ERROR err = sessionMgr.InjectPaseSessionWithTestKey(PASESession, localSessionId, peerNodeId, peerSessionId, fabricIndex,
+    CHIP_ERROR err = sessionMgr.InjectPaseSessionWithTestKey(paseSession, localSessionId, peerNodeId, peerSessionId, fabricIndex,
                                                              peerAddress, role);
     EXPECT_EQ(err, CHIP_NO_ERROR);
-    EXPECT_TRUE(PASESession.Get().HasValue());
-    EXPECT_TRUE(PASESession->AsSecureSession()->IsActiveSession());
+    EXPECT_TRUE(paseSession.Get().HasValue());
+    EXPECT_TRUE(paseSession->AsSecureSession()->IsActiveSession());
 
-    chip::DeviceLayer::ChipDeviceEvent event;
-    event.Type = chip::DeviceLayer::DeviceEventType::kFailSafeTimerExpired;
+    auto event = CreateEvent(chip::DeviceLayer::DeviceEventType::kFailSafeTimerExpired);
 
     commissionMgr.OnPlatformEvent(&event);
     // Verify that PASE Session was evicted after failsafe timer expiration
-    EXPECT_FALSE(PASESession.Get().HasValue());
+    EXPECT_FALSE(paseSession.Get().HasValue());
+    commissionMgr.CloseCommissioningWindow();
     EXPECT_EQ(commissionMgr.GetCommissioningMode(), chip::Dnssd::CommissioningMode::kDisabled);
 }
 
@@ -516,7 +521,7 @@ TEST_F(TestCommissioningWindowManager, TestOnPlatformEventOperationalNetworkEnab
 }
 
 // Verify that BLE advertising is stopped when all BLE connections are closed
-TEST_F(TestCommissioningWindowManager, TestOnPlatformEventCloseCloseAllBleConnections)
+TEST_F(TestCommissioningWindowManager, TestOnPlatformEventCloseAllBleConnections)
 {
     CommissioningWindowManager & commissionMgr = Server::GetInstance().GetCommissioningWindowManager();
 
