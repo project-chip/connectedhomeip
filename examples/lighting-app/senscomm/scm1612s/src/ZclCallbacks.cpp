@@ -29,10 +29,55 @@
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app/ConcreteAttributePath.h>
 #include <app/util/af-types.h>
+#include <app/util/attribute-storage.h>
 #include <lib/support/logging/CHIPLogging.h>
+#include <platform/CHIPDeviceLayer.h>
 
 using namespace ::chip;
 using namespace ::chip::app::Clusters;
+
+TimerHandle_t identifyTimer = nullptr;
+
+typedef struct _Identify_Timer
+{
+    EndpointId ep;
+    uint16_t identifyTimerCount;
+} Identify_Time_t;
+Identify_Time_t id_time[MAX_ENDPOINT_COUNT];
+
+void IdentifyTimerHandler(System::Layer * systemLayer, void * appState)
+{
+    using namespace Identify::Attributes;
+
+    Identify_Time_t * pidt = (Identify_Time_t *) appState;
+
+    if (pidt->identifyTimerCount)
+    {
+        pidt->identifyTimerCount--;
+        // TODO: Only count down for type 0, need to do related periheral's handles according to identify type.
+        IdentifyTime::Set(pidt->ep, pidt->identifyTimerCount);
+        DeviceLayer::SystemLayer().StartTimer(System::Clock::Seconds16(1), IdentifyTimerHandler, pidt);
+    }
+}
+
+static void OnIdentifyPostAttributeChangeCallback(EndpointId endpointId, AttributeId attributeId, uint8_t * value)
+{
+    using namespace Identify::Attributes;
+
+    VerifyOrExit(attributeId == IdentifyTime::Id, ChipLogError(Zcl, "Unhandled Attribute ID: '0x%04lx", attributeId));
+    VerifyOrExit((endpointId < MAX_ENDPOINT_COUNT),ChipLogError(Zcl, "EndPoint > max: [%u, %u]", endpointId, MAX_ENDPOINT_COUNT));
+
+    if (id_time[endpointId].identifyTimerCount != *value)
+    {
+        id_time[endpointId].ep                 = endpointId;
+        id_time[endpointId].identifyTimerCount = *value;
+        // TODO: change the timeout value according to identify type.
+        DeviceLayer::SystemLayer().StartTimer(System::Clock::Seconds16(1), IdentifyTimerHandler, &id_time[endpointId]);
+    }
+
+exit:
+    return;
+}
 
 void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & attributePath, uint8_t type, uint16_t size,
                                        uint8_t * value)
@@ -132,6 +177,7 @@ void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & 
     {
         ChipLogProgress(Zcl, "Identify attribute ID: " ChipLogFormatMEI " Type: %u Value: %u, length %u",
                         ChipLogValueMEI(attributeId), type, *value, size);
+        OnIdentifyPostAttributeChangeCallback(endpoint, attributeId, value);
     }
 }
 
