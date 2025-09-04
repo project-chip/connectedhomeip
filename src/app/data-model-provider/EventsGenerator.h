@@ -52,28 +52,6 @@ private:
 std::optional<EventNumber> GenerateEvent(const EventOptions & eventOptions, EventsGenerator & generator,
                                          EventLoggingDelegate & delegate, bool isFabricSensitiveEvent);
 
-template <typename G, typename T>
-std::optional<EventNumber> GenerateEvent(G & generator, const T & aEventData, EndpointId aEndpoint)
-{
-    internal::SimpleEventPayloadWriter<T> eventPayloadWriter(aEventData);
-
-    constexpr bool isFabricScoped = DataModel::IsFabricScoped<T>::value;
-
-    FabricIndex fabricIndex = kUndefinedFabricIndex;
-    if constexpr (isFabricScoped)
-    {
-        fabricIndex = aEventData.GetFabricIndex();
-    }
-
-    EventOptions eventOptions;
-
-    eventOptions.mPath        = ConcreteEventPath(aEndpoint, aEventData.GetClusterId(), aEventData.GetEventId());
-    eventOptions.mPriority    = aEventData.GetPriorityLevel();
-    eventOptions.mFabricIndex = fabricIndex;
-
-    return GenerateEvent(eventOptions, generator, eventPayloadWriter, isFabricScoped);
-}
-
 } // namespace internal
 
 /// Exposes event generation capabilities.
@@ -84,6 +62,16 @@ class EventsGenerator
 {
 public:
     virtual ~EventsGenerator() = default;
+
+    /// Scnedule event delivery to happen immediately (and synchronously).
+    ///
+    /// Use when it is imperative that some events are to be delivered because
+    /// they will not be delivered soon after (e.g. device shutdown events or
+    /// fabric removal events).
+    ///
+    /// This can be done either for a specific fabric, identified by the provided
+    /// FabricIndex, or across all fabrics if no FabricIndex is provided.
+    virtual void ScheduleUrgentEventDeliverySync(std::optional<FabricIndex> fabricIndex = std::nullopt) = 0;
 
     /// Generates the given event.
     ///
@@ -99,7 +87,9 @@ public:
     template <typename T>
     std::optional<EventNumber> GenerateEvent(const T & eventData, EndpointId endpointId)
     {
-        return internal::GenerateEvent(*this, eventData, endpointId);
+        internal::SimpleEventPayloadWriter<T> eventPayloadWriter(eventData);
+        constexpr bool isFabricSensitiveEvent = DataModel::IsFabricScoped<T>::value;
+        return internal::GenerateEvent({ endpointId, eventData }, *this, eventPayloadWriter, isFabricSensitiveEvent);
     }
 };
 

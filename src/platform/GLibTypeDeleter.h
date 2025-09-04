@@ -20,6 +20,7 @@
 #include <memory>
 
 #include <gio/gio.h>
+#include <gio/gunixfdlist.h>
 #include <glib.h>
 
 namespace chip {
@@ -148,6 +149,12 @@ template <>
 struct GAutoPtrDeleter<GSource>
 {
     using deleter = GSourceDeleter;
+};
+
+template <>
+struct GAutoPtrDeleter<GUnixFDList>
+{
+    using deleter = GObjectDeleter;
 };
 
 template <>

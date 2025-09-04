@@ -20,6 +20,7 @@
 
 #include "camera-avstream-controller.h"
 #include "camera-device-interface.h"
+#include <app/clusters/camera-av-stream-management-server/camera-av-stream-management-server.h>
 #include <app/util/config.h>
 #include <vector>
 
@@ -55,6 +56,8 @@ public:
 
     Protocols::InteractionModel::Status SnapshotStreamDeallocate(const uint16_t streamID) override;
 
+    void OnVideoStreamAllocated(const VideoStreamStruct & allocatedStream, StreamAllocationAction action) override;
+
     void OnStreamUsagePrioritiesChanged() override;
 
     void OnAttributeChanged(AttributeId attributeId) override;
@@ -73,8 +76,8 @@ public:
     LoadAllocatedSnapshotStreams(std::vector<SnapshotStreamStruct> & allocatedSnapshotStreams) override;
 
     CHIP_ERROR
-    ValidateStreamUsage(StreamUsageEnum streamUsage, const Optional<DataModel::Nullable<uint16_t>> & videoStreamId,
-                        const Optional<DataModel::Nullable<uint16_t>> & audioStreamId) override;
+    ValidateStreamUsage(StreamUsageEnum streamUsage, Optional<DataModel::Nullable<uint16_t>> & videoStreamId,
+                        Optional<DataModel::Nullable<uint16_t>> & audioStreamId) override;
 
     CHIP_ERROR
     ValidateVideoStreamID(uint16_t videoStreamId) override;
