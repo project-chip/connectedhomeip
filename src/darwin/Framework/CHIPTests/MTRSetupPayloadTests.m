@@ -62,6 +62,27 @@
     XCTAssertEqual(payload.discoveryCapabilities, MTRDiscoveryCapabilitiesSoftAP);
 }
 
+- (void)testOnboardingPayloadParser_QRCode_Concatenated_NoError
+{
+    __auto_type * concatenatedQRCode = @"MT:M5L90MP500K64J00000*M5L90MP500OC8010000";
+
+    NSError * error;
+    MTRSetupPayload * payload = [MTRSetupPayload setupPayloadWithOnboardingPayload:concatenatedQRCode error:&error];
+
+    XCTAssertNotNil(payload);
+    XCTAssertNil(error);
+
+    XCTAssertFalse(payload.hasShortDiscriminator);
+    XCTAssertEqual(payload.discriminator.unsignedIntegerValue, 128);
+    XCTAssertEqual(payload.setupPasscode.unsignedIntegerValue, 2048);
+    XCTAssertEqual(payload.vendorID.unsignedIntegerValue, 12);
+    XCTAssertEqual(payload.productID.unsignedIntegerValue, 1);
+    XCTAssertEqual(payload.commissioningFlow, MTRCommissioningFlowStandard);
+    XCTAssertEqual(payload.version.unsignedIntegerValue, 0);
+    XCTAssertEqual(payload.discoveryCapabilities, MTRDiscoveryCapabilitiesSoftAP);
+    XCTAssertEqualObjects(payload.qrCodeString, concatenatedQRCode);
+}
+
 - (void)testOnboardingPayloadParser_QRCode_WrongVersion
 {
     // Same as testOnboardingPayloadParser_QRCode_NoError, but with version set to 5.
@@ -307,6 +328,31 @@
     XCTAssertEqualObjects(newPayload.serialNumber, serialNumber);
 }
 
+- (void)testSerialNumberRoundTripConcatenated
+{
+    NSError * error;
+    MTRSetupPayload * payload =
+        [MTRSetupPayload setupPayloadWithOnboardingPayload:@"MT:M5L90MP500K64J0A33P0SET70.QT52B.E23-WZE0WISA0DK5N1K8SQ1RYCU1O0*M5L90MP500K64J00000"
+                                                     error:&error];
+    XCTAssertNil(error);
+    XCTAssertNotNil(payload);
+
+    XCTAssertEqualObjects(payload.serialNumber, @"123456789");
+
+    // NOTE: Don't try writing serialNumber, since we don't support that for
+    // concatenated QR codes.
+
+    NSString * qrCode = [payload qrCodeString:&error];
+    XCTAssertNil(error);
+    XCTAssertNotNil(qrCode);
+
+    MTRSetupPayload * newPayload = [MTRSetupPayload setupPayloadWithOnboardingPayload:qrCode error:&error];
+    XCTAssertNil(error);
+    XCTAssertNotNil(newPayload);
+
+    XCTAssertEqualObjects(newPayload.serialNumber, payload.serialNumber);
+}
+
 - (void)test31129 // https://github.com/project-chip/connectedhomeip/issues/31129
 {
     MTRSetupPayload * payload = [[MTRSetupPayload alloc] initWithSetupPasscode:@99999998 discriminator:@3840];
@@ -330,7 +376,9 @@
              @"34970112332",
              @"641286075300001000016",
              @"MT:M5L90MP500K64J00000",
-             @"MT:M5L90MP500K64J0A33P0SET70.QT52B.E23-WZE0WISA0DK5N1K8SQ1RYCU1O0"
+             @"MT:M5L90MP500K64J0A33P0SET70.QT52B.E23-WZE0WISA0DK5N1K8SQ1RYCU1O0",
+             @"MT:M5L90MP500K64J00000*M5L90MP500K64J0A33P0SET70.QT52B.E23-WZE0WISA0DK5N1K8SQ1RYCU1O0",
+             @"MT:M5L90MP500K64J0A33P0SET70.QT52B.E23-WZE0WISA0DK5N1K8SQ1RYCU1O0*M5L90MP500K64J00000",
          ]) {
         MTRSetupPayload * payload = [MTRSetupPayload setupPayloadWithOnboardingPayload:string error:&error];
         XCTAssertNotNil(payload, @"Error: %@", error);
@@ -420,6 +468,20 @@
     copy.serialNumber = @"555-123";
     XCTAssertFalse([copy isEqual:payload]);
     payload.serialNumber = @"555-123";
+    XCTAssertTrue([copy isEqual:payload]);
+    XCTAssertEqual(payload.hash, copy.hash);
+}
+
+- (void)testCopyingAndEqualityConcatenated
+{
+    MTRSetupPayload * payload = [[MTRSetupPayload alloc] initWithPayload:@"MT:M5L90MP500K64J0A33P0SET70.QT52B.E23-WZE0WISA0DK5N1K8SQ1RYCU1O0*M5L90MP500K64J00000"];
+    XCTAssertFalse(payload.hasShortDiscriminator); // came from a QR code
+    XCTAssert(payload.discriminator.integerValue > 0xf); // can't "accidentally" round-trip through a short discriminator
+
+    MTRSetupPayload * copy = [payload copy];
+    XCTAssertNotIdentical(payload, copy); // MTRSetupPayload is mutable, must be a new object
+
+    XCTAssertTrue([payload isEqual:copy]);
     XCTAssertTrue([copy isEqual:payload]);
     XCTAssertEqual(payload.hash, copy.hash);
 }
