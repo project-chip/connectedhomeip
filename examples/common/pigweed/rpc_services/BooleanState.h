@@ -24,6 +24,7 @@
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <platform/PlatformManager.h>
 
+#if MATTER_DM_BOOLEAN_STATE_CLUSTER_SERVER_ENDPOINT_COUNT > 0
 // TODO: Ideally we should not depend on the codegen integration
 // It would be best if we could use generic cluster API instead
 #include <app/clusters/boolean-state-server/CodegenIntegration.h>
@@ -74,3 +75,4 @@ public:
 
 } // namespace rpc
 } // namespace chip
+#endif // MATTER_DM_BOOLEAN_STATE_CLUSTER_SERVER_ENDPOINT_COUNT
