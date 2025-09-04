@@ -1230,6 +1230,60 @@ struct TariffUpdateCtx
     uint32_t TariffUpdateTimestamp;
 };
 
+/**
+ * @defgroup tariff_attributes Commodity Tariff Attribute Definitions
+ * @{
+ */
+
+/**
+ * @def COMMODITY_TARIFF_PRIMARY_ATTRIBUTES
+ * @brief Macro defining Primary attributes for Commodity Tariff
+ *
+ * Primary attributes represent the fundamental tariff configuration that can only
+ * be changed by authorized tariff updates. These are typically set by utility providers.
+ */
+#define COMMODITY_TARIFF_PRIMARY_ATTRIBUTES                                                                                        \
+    X(TariffUnit, DataModel::Nullable<Globals::TariffUnitEnum>)                                                                    \
+    X(StartDate, DataModel::Nullable<uint32_t>)                                                                                    \
+    X(DefaultRandomizationOffset, DataModel::Nullable<int16_t>)                                                                    \
+    X(DefaultRandomizationType, DataModel::Nullable<DayEntryRandomizationTypeEnum>)                                                \
+    X(TariffInfo, DataModel::Nullable<Structs::TariffInformationStruct::Type>)                                                     \
+    X(DayEntries, DataModel::Nullable<DataModel::List<Structs::DayEntryStruct::Type>>)                                             \
+    X(DayPatterns, DataModel::Nullable<DataModel::List<Structs::DayPatternStruct::Type>>)                                          \
+    X(TariffComponents, DataModel::Nullable<DataModel::List<Structs::TariffComponentStruct::Type>>)                                \
+    X(TariffPeriods, DataModel::Nullable<DataModel::List<Structs::TariffPeriodStruct::Type>>)                                      \
+    X(IndividualDays, DataModel::Nullable<DataModel::List<Structs::DayStruct::Type>>)                                              \
+    X(CalendarPeriods, DataModel::Nullable<DataModel::List<Structs::CalendarPeriodStruct::Type>>)
+
+/**
+ * @def X(attrName, attrType)
+ * @brief Generates attribute-specific management classes
+ *
+ * For each attribute in COMMODITY_TARIFF_PRIMARY_ATTRIBUTES, creates a dedicated class that:
+ * - Inherits from CTC_BaseDataClass<attrType>
+ * - Provides type-specific storage management
+ * - Enables attribute-specific validation
+ *
+ * Example generated class:
+ * @code
+ * class TariffUnitDataClass : public CTC_BaseDataClass<Nullable<Globals::TariffUnitEnum>> {
+ * public:
+ *     TariffUnitDataClass(Nullable<Globals::TariffUnitEnum>& storage)
+ *         : CTC_BaseDataClass(storage) {}
+ * };
+ * @endcode
+ */
+#define X(attrName, attrType)                                                                                                      \
+    class attrName##DataClass : public CommodityTariffAttrsDataMgmt::CTC_BaseDataClass<attrType>                                   \
+    {                                                                                                                              \
+    public:                                                                                                                        \
+        attrName##DataClass() : CTC_BaseDataClass<attrType>(Attributes::attrName::Id) {}                                           \
+        ~attrName##DataClass() override = default;                                                                                 \
+    };
+COMMODITY_TARIFF_PRIMARY_ATTRIBUTES
+#undef X
+#undef COMMODITY_TARIFF_PRIMARY_ATTRIBUTES
+
 } // namespace CommodityTariff
 } // namespace Clusters
 } // namespace app
