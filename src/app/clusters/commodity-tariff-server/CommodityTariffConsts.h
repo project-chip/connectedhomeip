@@ -21,6 +21,7 @@
 #include <cstddef>
 #include <cstdint>
 namespace CommodityTariffConsts {
+static constexpr size_t kMaxPrimaryTariffAttrsCount = 11;
 static constexpr size_t kDefaultStringValuesMaxBufLength = 128u;
 static constexpr size_t kDefaultListAttrMaxLength        = 672u;
 constexpr uint16_t kMaxCurrencyValue                     = 999; // From spec

@@ -266,17 +266,23 @@ void Instance::ResetCurrentAttributes()
     mNextTariffComponents_MgmtObj.Cleanup();
 }
 
-void Instance::TariffDataUpdatedCb(bool is_erased, std::vector<AttributeId> & aUpdatedAttrIds)
+void Instance::TariffDataUpdatedCb(bool is_erased, const AttributeId* aUpdatedAttrIds, size_t aCount)
 {
-    for (const auto & attr_id : aUpdatedAttrIds)
+    // Process each updated attribute
+    for (size_t i = 0; i < aCount; i++)
     {
-        AttributeUpdCb(attr_id);
+        AttributeUpdCb(aUpdatedAttrIds[i]);
     }
 
     DeinitCurrentAttrs();
 
-    if (mDelegate.GetTariffUnit().IsNull() || mDelegate.GetStartDate().IsNull() || mDelegate.GetTariffInfo().IsNull() ||
-        mDelegate.GetDayEntries().IsNull() || mDelegate.GetTariffPeriods().IsNull() || mDelegate.GetTariffComponents().IsNull())
+    // Check if essential tariff data is available
+    if (mDelegate.GetTariffUnit().IsNull() || 
+        mDelegate.GetStartDate().IsNull() || 
+        mDelegate.GetTariffInfo().IsNull() ||
+        mDelegate.GetDayEntries().IsNull() || 
+        mDelegate.GetTariffPeriods().IsNull() || 
+        mDelegate.GetTariffComponents().IsNull())
     {
         ChipLogError(NotSpecified, "Seems the new tariff is unavailable - skip the current/next attrs init");
         return;
