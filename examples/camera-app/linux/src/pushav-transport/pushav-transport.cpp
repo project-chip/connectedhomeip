@@ -88,9 +88,9 @@ void PrintTransportSettings(PushAVClipRecorder::ClipInfoStruct clipInfo, PushAVC
 }
 
 void PushAVTransport::ConfigureRecorderSettings(const TransportOptionsStruct & transportOptions,
-                                                AudioStreamStruct audioStreamParams, VideoStreamStruct videoStreamParams)
+                                                AudioStreamStruct & audioStreamParams, VideoStreamStruct & videoStreamParams)
 {
-    bool debug = false; // Set this to true for debug purpose
+    bool debug = false; // Set this to true for debug purposes
 
     if (debug)
     {
@@ -136,11 +136,7 @@ void PushAVTransport::ConfigureRecorderSettings(const TransportOptionsStruct & t
     mClipInfo.mInputTimeBase = { 1, 1000000 };
 
     uint8_t audioCodec = static_cast<uint8_t>(audioStreamParams.audioCodec);
-    if (audioStreamParams.channelCount == 0)
-    {
-        audioStreamParams.channelCount = 1;
-    }
-    mAudioInfo.mChannels = audioStreamParams.channelCount;
+    mAudioInfo.mChannels = (audioStreamParams.channelCount == 0) ? 1 : audioStreamParams.channelCount;
 
     if (audioCodec == 0)
     {
@@ -509,7 +505,7 @@ bool PushAVTransport::CanSendAudio()
     return mCanSendAudio;
 }
 
-void PushAVTransport::ModifyPushTransport(const TransportOptionsStorage transportOptions)
+void PushAVTransport::ModifyPushTransport(const TransportOptionsStorage & transportOptions)
 {
     ConfigureRecorderSettings(transportOptions, mAudioStreamParams, mVideoStreamParams);
 }

@@ -76,9 +76,9 @@ public:
     } // 0:Active 1:Inactive
 
     void ConfigureRecorderSettings(const chip::app::Clusters::PushAvStreamTransport::TransportOptionsStruct & transportOptions,
-                                   AudioStreamStruct audioStreamParams, VideoStreamStruct videoStreamParams);
+                                   AudioStreamStruct & audioStreamParams, VideoStreamStruct & videoStreamParams);
 
-    void ModifyPushTransport(const chip::app::Clusters::PushAvStreamTransport::TransportOptionsStorage transportOptions);
+    void ModifyPushTransport(const chip::app::Clusters::PushAvStreamTransport::TransportOptionsStorage & transportOptions);
 
     bool HandleTriggerDetected();
 
