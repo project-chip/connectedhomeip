@@ -341,15 +341,15 @@ TEST_F(AutoCommissionerTest, NextStageConfigureTCAcknowledgments)
 TEST_F(AutoCommissionerTest, TrySecondaryNetwork_confirm_true)
 {
     AutoCommissionerTestAccess privateConfigCommissioner(&mCommissioner);
-    privateConfigCommissioner.AccessTrySecondaryNetwork();
-    EXPECT_EQ(privateConfigCommissioner.AccessTryingSecondaryNetwork(), true);
+    privateConfigCommissioner.TrySecondaryNetwork();
+    EXPECT_EQ(privateConfigCommissioner.TryingSecondaryNetwork(), true);
 }
 
 TEST_F(AutoCommissionerTest, ResetTryingSecondaryNetwork_confirm_false)
 {
     AutoCommissionerTestAccess privateConfigCommissioner(&mCommissioner);
-    privateConfigCommissioner.AccessResetTryingSecondaryNetwork();
-    EXPECT_EQ(privateConfigCommissioner.AccessTryingSecondaryNetwork(), false);
+    privateConfigCommissioner.ResetTryingSecondaryNetwork();
+    EXPECT_EQ(privateConfigCommissioner.TryingSecondaryNetwork(), false);
 }
 TEST_F(AutoCommissionerTest, IsScanNeededCombinations)
 {
@@ -382,7 +382,7 @@ TEST_F(AutoCommissionerTest, IsScanNeededCombinations)
         commissioningInfo.network.wifi.endpoint   = c.wifiEndpoint;
         commissioningInfo.network.thread.endpoint = c.threadEndpoint;
 
-        bool result = privateConfigCommissioner.AccessIsScanNeeded();
+        bool result = privateConfigCommissioner.IsScanNeeded();
 
         if (result != c.expected)
         {
@@ -434,7 +434,7 @@ TEST_F(AutoCommissionerTest, IsSecondaryNetworkSupportedCombinations)
         commissioningInfo.network.wifi.endpoint   = c.wifiEndpoint;
         commissioningInfo.network.thread.endpoint = c.threadEndpoint;
 
-        bool result = privateConfigCommissioner.AccessIsSecondaryNetworkSupported();
+        bool result = privateConfigCommissioner.IsSecondaryNetworkSupported();
         if (result != c.expected)
         {
             ChipLogError(Test,
