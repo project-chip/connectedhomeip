@@ -254,6 +254,7 @@ class TC_CLCTRL_4_4(MatterBaseTest):
             self.step("4d")
             sub_handler.await_all_expected_report_matches(expected_matchers=[current_position_matcher(
                 Clusters.ClosureControl.Enums.CurrentPositionEnum.kFullyClosed)], timeout_sec=timeout)
+            sub_handler.reset()
 
         self.step("4e")
         try:
