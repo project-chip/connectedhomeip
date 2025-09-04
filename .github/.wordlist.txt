@@ -425,7 +425,6 @@ DevKitC
 DevKitM
 devtype
 df
-dff
 dfe
 DFILE
 dfu
@@ -700,7 +699,6 @@ HydrogenSulphideConcentrationMeasurement
 IasAce
 IasWd
 iaszone
-IB
 ibb
 ICA
 ICAC
