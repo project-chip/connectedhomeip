@@ -105,6 +105,26 @@ public:
     void TrySecondaryNetwork() { mCommissioner->TrySecondaryNetwork(); }
 
     bool TryingSecondaryNetwork() const { return mCommissioner->TryingSecondaryNetwork(); }
+    Controller::CommissioningStage GetNextCommissioningStageNetworkSetup(Controller::CommissioningStage currentStage,
+                                                                         CHIP_ERROR & lastErr)
+    {
+        return mCommissioner->GetNextCommissioningStageNetworkSetup(currentStage, lastErr);
+    }
+
+    EndpointId GetEndpoint(const Controller::CommissioningStage & stage) const { return mCommissioner->GetEndpoint(stage); }
+
+    void CleanupCommissioning() { mCommissioner->CleanupCommissioning(); }
+    const ByteSpan GetDAC() { return mCommissioner->GetDAC(); }
+    const ByteSpan GetPAI() { return mCommissioner->GetPAI(); }
+    CommissioneeDeviceProxy * GetCommissioneeDeviceProxy() { return mCommissioner->GetCommissioneeDeviceProxy(); }
+    OperationalDeviceProxy GetOperationalDeviceProxy() { return mCommissioner->mOperationalDeviceProxy; }
+    bool GetNeedsDST() { return mCommissioner->mNeedsDST; }
+    Optional<System::Clock::Timeout> GetCommandTimeout(DeviceProxy * device, Controller::CommissioningStage stage) const
+    {
+        return mCommissioner->GetCommandTimeout(device, stage);
+    }
+
+    void SetDeviceCommissioneeProxy(CommissioneeDeviceProxy * device) { mCommissioner->mCommissioneeDeviceProxy = device; }
 
 private:
     Controller::AutoCommissioner * mCommissioner = nullptr;
