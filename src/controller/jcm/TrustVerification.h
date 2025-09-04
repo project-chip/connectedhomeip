@@ -20,7 +20,6 @@
 #include <cstdint>
 #include <string>
 
-#include <app/DeviceProxy.h>
 #include <app-common/zap-generated/cluster-objects.h>
 #include <credentials/CHIPCert.h>
 #include <credentials/FabricTable.h>
@@ -29,6 +28,9 @@
 #include <lib/core/CHIPError.h>
 #include <lib/core/CHIPVendorIdentifiers.hpp>
 #include <lib/support/DLLUtil.h>
+#include <messaging/ExchangeMgr.h>
+
+#include <functional>
 
 namespace chip {
 namespace Controller {
@@ -39,6 +41,7 @@ using namespace ::chip::app;
 using namespace ::chip::app::Clusters::OperationalCredentials::Commands;
 using namespace ::chip::Credentials;
 using namespace ::chip::Crypto;
+using namespace ::chip::Messaging;
 
 struct TrustVerificationInfo
 {
@@ -186,8 +189,12 @@ class DLL_EXPORT VendorIdVerificationClient {
 public:
     virtual ~VendorIdVerificationClient() = default;
 
+    // Used to obtain SessionHandles from VerifyVendorId callers. SessionHandles cannot be stored, so we must retrieve them dynamically with a callback.
+    using SessionGetterFunc = std::function<Optional<SessionHandle>()>;
+
     CHIP_ERROR VerifyVendorId(
-        DeviceProxy * deviceProxy,
+        ExchangeManager * exchangeMgr,
+        const SessionGetterFunc getSession,
         const FabricIndex & fabricIndex,
         const VendorId & vendorID,
         const ByteSpan & rcacSpan,
@@ -208,7 +215,8 @@ private:
         const ByteSpan & rcacSpan);
 
     CHIP_ERROR Verify(
-        DeviceProxy * deviceProxy,
+        ExchangeManager * exchangeMgr,
+        const SessionGetterFunc getSession,
         const FabricIndex & fabricIndex,
         const VendorId & vendorID,
         const ByteSpan & rcacSpan,

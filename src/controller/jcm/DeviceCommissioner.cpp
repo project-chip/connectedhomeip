@@ -430,8 +430,11 @@ TrustVerificationError DeviceCommissioner::PerformVendorIDVerificationProcedure(
     ByteSpan icacSpan = mInfo.adminICAC.Span();
     ByteSpan nocSpan = mInfo.adminNOC.Span();
 
+    auto getSession = [this]() { return this->mDeviceProxy->GetSecureSession(); };
+
     CHIP_ERROR err = VerifyVendorId(
-        mDeviceProxy, 
+        mDeviceProxy->GetExchangeManager(),
+        getSession,
         mInfo.adminFabricIndex, 
         mInfo.adminVendorId, 
         rcacSpan, 

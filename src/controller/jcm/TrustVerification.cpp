@@ -57,7 +57,8 @@ CHIP_ERROR VendorIdVerificationClient::VerifyNOCCertificateChain(
 }
 
 CHIP_ERROR VendorIdVerificationClient::Verify(
-    DeviceProxy * deviceProxy, 
+    ExchangeManager * exchangeMgr, 
+    const SessionGetterFunc getSession,
     const FabricIndex & fabricIndex, 
     const VendorId & vendorID, 
     const ByteSpan & rcacSpan,
@@ -87,7 +88,7 @@ CHIP_ERROR VendorIdVerificationClient::Verify(
     MutableByteSpan vidVerificationTbsSpan{ vidVerificationStatementBuffer };
 
     // Retrieve attestation challenge
-    ByteSpan attestationChallengeSpan = deviceProxy->GetSecureSession().Value()->AsSecureSession()->GetCryptoContext().GetAttestationChallenge();
+    ByteSpan attestationChallengeSpan = getSession().Value()->AsSecureSession()->GetCryptoContext().GetAttestationChallenge();
     ReturnLogErrorOnFailure(GenerateVendorIdVerificationToBeSigned(fabricIndex, clientChallengeSpan, attestationChallengeSpan,
                                                             vendorFabricBindingMessageSpan, vidVerificationStatementSpan,
                                                             vidVerificationTbsSpan));
@@ -135,7 +136,8 @@ CHIP_ERROR VendorIdVerificationClient::Verify(
 }
 
 CHIP_ERROR VendorIdVerificationClient::VerifyVendorId(
-    DeviceProxy * deviceProxy,
+    ExchangeManager * exchangeMgr,
+    const SessionGetterFunc getSession,
     const FabricIndex & fabricIndex,
     const VendorId & vendorID,
     const ByteSpan & rcacSpan,
@@ -155,11 +157,11 @@ CHIP_ERROR VendorIdVerificationClient::VerifyVendorId(
     request.fabricIndex = fabricIndex;
     request.clientChallenge = clientChallengeSpan;
 
-    auto onSuccessCb = [this, deviceProxy, fabricIndex, vendorID, rcacSpan, icacSpan, nocSpan, kClientChallenge](const app::ConcreteCommandPath & aPath, const app::StatusIB & aStatus,
+    auto onSuccessCb = [this, exchangeMgr, getSession, fabricIndex, vendorID, rcacSpan, icacSpan, nocSpan, kClientChallenge](const app::ConcreteCommandPath & aPath, const app::StatusIB & aStatus,
                                      const decltype(request)::ResponseType & responseData) {
         ChipLogProgress(Controller, "Successfully received SignVIDVerificationResponse");
         ByteSpan clientChallenge{ kClientChallenge };
-        CHIP_ERROR err = this->Verify(deviceProxy, fabricIndex, vendorID, rcacSpan, icacSpan, nocSpan, clientChallenge, responseData);
+        CHIP_ERROR err = this->Verify(exchangeMgr, getSession, fabricIndex, vendorID, rcacSpan, icacSpan, nocSpan, clientChallenge, responseData);
         ChipLogProgress(Controller, "Vendor ID verification completed with result: %s", ErrorStr(err));
         this->OnVendorIdVerficationComplete(err);
     };
@@ -169,7 +171,7 @@ CHIP_ERROR VendorIdVerificationClient::VerifyVendorId(
         this->OnVendorIdVerficationComplete(err);
     };
 
-    CHIP_ERROR err = InvokeCommandRequest(deviceProxy->GetExchangeManager(), deviceProxy->GetSecureSession().Value(), 
+    CHIP_ERROR err = InvokeCommandRequest(exchangeMgr, getSession().Value(), 
                                             kRootEndpointId, request,
                                             onSuccessCb, onFailureCb);
     if (err != CHIP_NO_ERROR)
