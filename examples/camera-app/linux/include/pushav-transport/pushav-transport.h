@@ -40,8 +40,9 @@ class PushAVTransport : public Transport
 {
 public:
     PushAVTransport(const chip::app::Clusters::PushAvStreamTransport::TransportOptionsStruct & transportOptions,
-                    const uint16_t connectionID, AudioStreamStruct audioStreamParams, VideoStreamStruct videoStreamParams);
+                    const uint16_t connectionID, AudioStreamStruct & audioStreamParams, VideoStreamStruct & videoStreamParams);
     ~PushAVTransport() override;
+
     // Send video data for a given stream ID
     void SendVideo(const char * data, size_t size, uint16_t videoStreamID) override;
 
