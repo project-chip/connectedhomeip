@@ -125,7 +125,6 @@ class TC_IDM_2_2(MatterBaseTest, BasicCompositionTests):
         return read_request
 
     def verify_read_response(self, read_response: dict, attribute_path: list):
-
         """Verify the response from a read request.
 
         Args:
