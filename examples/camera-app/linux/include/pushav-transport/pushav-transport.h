@@ -92,7 +92,12 @@ public:
 
     void SetTLSCertPath(std::string rootCert, std::string devCert, std::string devKey);
 
+    void SetTLSCert(std::vector<uint8_t> bufferRootCert, std::vector<uint8_t> bufferClientCert,
+                    std::vector<uint8_t> bufferClientCertKey);
+
     void SetOnRecorderStoppedCallback(std::function<void()> cb) { mOnRecorderStoppedCb = std ::move(cb); }
+
+    void SetOnStartCallback(std::function<void()> cb) { mOnStartCallback = std::move(cb); }
 
     void SetZoneSensitivityList(std::vector<std::pair<uint16_t, uint8_t>> zoneSensitivityList)
     {
@@ -115,10 +120,12 @@ private:
     PushAVClipRecorder::AudioInfoStruct mAudioInfo;
     PushAVClipRecorder::VideoInfoStruct mVideoInfo;
     PushAVUploader::PushAVCertPath mCertPath;
+    PushAVUploader::CertificatesInfo mCertBuffer;
     AudioStreamStruct audioStreamParams;
     VideoStreamStruct videoStreamParams;
     std::vector<std::pair<uint16_t, uint8_t>> mZoneSensitivityList;
     std::function<void()> mOnRecorderStoppedCb;
+    std::function<void()> mOnStartCallback;
     void OnRecorderStopped();
 
     // Dummy implementation to indicate if video can be sent

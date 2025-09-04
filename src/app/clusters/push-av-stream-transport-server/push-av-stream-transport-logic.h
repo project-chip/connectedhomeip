@@ -32,6 +32,11 @@ public:
             return;
         }
         mDelegate->SetEndpointId(aEndpoint);
+        mDelegate->SetOnRecorderStartedCallback(
+            [this](uint16_t connectionID, PushAvStreamTransport::TransportTriggerTypeEnum triggerType) {
+                GeneratePushTransportBeginEvent(connectionID, triggerType,
+                                                Optional<PushAvStreamTransport::TriggerActivationReasonEnum>());
+            });
         mDelegate->SetOnRecorderStoppedCallback(
             [this](uint16_t connectionID, PushAvStreamTransport::TransportTriggerTypeEnum triggerType) {
                 GeneratePushTransportEndEvent(connectionID, triggerType,
@@ -43,6 +48,12 @@ public:
     {
         mOnRecorderStoppedCb = std ::move(cb);
     }
+
+    void SetOnRecorderStartedCallback(std::function<void(uint16_t, PushAvStreamTransport::TransportTriggerTypeEnum)> cb)
+    {
+        mOnRecorderStartedCb = std ::move(cb);
+    }
+
     void SetTLSClientManagementDelegate(EndpointId aEndpoint, TlsClientManagementDelegate * delegate)
     {
         mTLSClientManagementDelegate = delegate;
@@ -131,7 +142,8 @@ private:
     TlsClientManagementDelegate * mTLSClientManagementDelegate           = nullptr;
     TlsCertificateManagementDelegate * mTlsCertificateManagementDelegate = nullptr;
 
-    std::function<void((uint16_t, PushAvStreamTransport::TransportTriggerTypeEnum))> mOnRecorderStoppedCb;
+    std::function<void(uint16_t, PushAvStreamTransport::TransportTriggerTypeEnum)> mOnRecorderStoppedCb;
+    std::function<void(uint16_t, PushAvStreamTransport::TransportTriggerTypeEnum)> mOnRecorderStartedCb;
 
     /// Convenience method that returns if the internal delegate is null and will log
     /// an error if the check returns true

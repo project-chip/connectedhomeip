@@ -52,6 +52,7 @@ public:
     void SetMediaController(MediaController * mediaController);
     void SetCameraDevice(CameraDeviceInterface * cameraDevice);
     void SetOnRecorderStoppedCallback(std::function<void(uint16_t, PushAvStreamTransport::TransportTriggerTypeEnum)> cb);
+    void SetOnRecorderStartedCallback(std::function<void(uint16_t, PushAvStreamTransport::TransportTriggerTypeEnum)> cb);
 
     // Add missing override keywords and fix signatures
     Protocols::InteractionModel::Status AllocatePushTransport(const TransportOptionsStruct & transportOptions,
@@ -69,11 +70,19 @@ public:
         const uint16_t connectionID, TriggerActivationReasonEnum activationReason,
         const Optional<Structs::TransportMotionTriggerTimeControlStruct::DecodableType> & timeControl) override;
 
-    void SetTLSCerts(TlsCertificateManagement::Commands::FindClientCertificateResponse::Type aClientCert,
-                     TlsCertificateManagement::Commands::FindRootCertificateResponse::Type aRootCert)
+    void SetTLSCerts(Tls::CertificateTable::BufferedClientCert clientCertEntry,
+                     Tls::CertificateTable::BufferedRootCert rootCertEntry) override
     {
-        mClientCert = aClientCert;
-        mRootCert   = aRootCert;
+
+        auto rootSpan = rootCertEntry.GetCert().certificate.Value();
+        bufferRootCert.assign(rootSpan.data(), rootSpan.data() + rootSpan.size());
+
+        auto clientSpan = clientCertEntry.GetCert().clientCertificate.Value();
+        bufferClientCert.assign(clientSpan.data(), clientSpan.data() + clientSpan.size());
+
+        auto * clientKeyPtr = clientCertEntry.mCertWithKey.key.Bytes();
+        auto clientKeyLen   = clientCertEntry.mCertWithKey.key.Length();
+        bufferClientCertKey.assign(clientKeyPtr, clientKeyPtr + clientKeyLen);
     }
 
     bool ValidateUrl(const std::string & url) override;
@@ -121,9 +130,11 @@ private:
     double mTotalUsedBandwidthMbps = 0.0; // Tracks the total bandwidth used by all active transports
 
     std::function<void(uint16_t, PushAvStreamTransport::TransportTriggerTypeEnum)> mOnRecorderStoppedCb;
+    std::function<void(uint16_t, PushAvStreamTransport::TransportTriggerTypeEnum)> mOnRecorderStartedCb;
 
-    TlsCertificateManagement::Commands::FindClientCertificateResponse::Type mClientCert;
-    TlsCertificateManagement::Commands::FindRootCertificateResponse::Type mRootCert;
+    std::vector<uint8_t> bufferRootCert;
+    std::vector<uint8_t> bufferClientCert;
+    std::vector<uint8_t> bufferClientCertKey;
 
     /**
      * @brief Calculates the total bandwidth in Mbps for the given video and audio stream IDs.
