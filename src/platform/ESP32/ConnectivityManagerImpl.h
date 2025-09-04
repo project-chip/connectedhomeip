@@ -138,6 +138,9 @@ private:
     void OnStationDisconnected(void);
     void ChangeWiFiStationState(WiFiStationState newState);
     static void DriveStationState(::chip::System::Layer * aLayer, void * aAppState);
+#ifdef CONFIG_ENABLE_ESP_DIAGNOSTICS_TRACE
+    void LogWiFiInfo(void);
+#endif // CONFIG_ENABLE_ESP_DIAGNOSTICS_TRACE
 
     void UpdateInternetConnectivityState(void);
     void OnStationIPv4AddressAvailable(const ip_event_got_ip_t & got_ip);
