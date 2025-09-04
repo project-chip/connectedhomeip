@@ -103,7 +103,7 @@ struct TestDacOnlyPartialAttestationVerifier : public ::testing::Test
                             size_t challengeDataLen)
     {
         uint8_t tlvBuf[128];
-        size_t tlvLen;
+        size_t tlvLen = 0;
         chip::Crypto::P256ECDSASignature signature;
 
         // Create signed attestation data
@@ -397,7 +397,7 @@ TEST_F(TestDacOnlyPartialAttestationVerifier, TestWithMismatchedNonce)
     uint8_t expectedNonce[32]   = { 0x99, 0x88, 0x77 };
 
     uint8_t tlvBuf[128];
-    size_t tlvLen;
+    size_t tlvLen = 0;
     chip::Crypto::P256ECDSASignature signature;
 
     // Create signed attestation data with mismatched nonce in elements
@@ -421,7 +421,7 @@ TEST_F(TestDacOnlyPartialAttestationVerifier, TestWithMismatchedNonce)
 TEST_F(TestDacOnlyPartialAttestationVerifier, TestWithInvalidPAAFormat)
 {
     uint8_t tlvBuf[128];
-    size_t tlvLen;
+    size_t tlvLen = 0;
     chip::Crypto::P256ECDSASignature signature;
 
     CHIP_ERROR err = CreateSignedAttestationData(tlvBuf, tlvLen, signature, ByteSpan(kTestCDData), ByteSpan(kTestNonceData),
