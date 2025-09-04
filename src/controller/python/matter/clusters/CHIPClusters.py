@@ -12844,7 +12844,7 @@ class ChipClusters:
                 "reportable": True,
             },
             0x00000004: {
-                "attributeName": "MinViewport",
+                "attributeName": "MinViewportResolution",
                 "attributeId": 0x00000004,
                 "type": "",
                 "reportable": True,
@@ -13233,6 +13233,12 @@ class ChipClusters:
                 "type": "int",
                 "reportable": True,
             },
+            0x00000009: {
+                "attributeName": "MovementState",
+                "attributeId": 0x00000009,
+                "type": "int",
+                "reportable": True,
+            },
             0x0000FFF8: {
                 "attributeName": "GeneratedCommandList",
                 "attributeId": 0x0000FFF8,
@@ -13280,6 +13286,7 @@ class ChipClusters:
                     "ICEServers": "ICEServerStruct",
                     "ICETransportPolicy": "str",
                     "metadataEnabled": "bool",
+                    "SFrameConfig": "SFrameStruct",
                 },
             },
             0x00000002: {
@@ -13295,6 +13302,7 @@ class ChipClusters:
                     "ICEServers": "ICEServerStruct",
                     "ICETransportPolicy": "str",
                     "metadataEnabled": "bool",
+                    "SFrameConfig": "SFrameStruct",
                 },
             },
             0x00000004: {

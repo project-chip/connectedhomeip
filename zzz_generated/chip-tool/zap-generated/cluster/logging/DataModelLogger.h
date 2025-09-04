@@ -485,6 +485,9 @@ static CHIP_ERROR
 LogValue(const char * label, size_t indent,
          const chip::app::Clusters::CameraAvSettingsUserLevelManagement::Structs::DPTZStruct::DecodableType & value);
 
+static CHIP_ERROR LogValue(const char * label, size_t indent,
+                           const chip::app::Clusters::WebRTCTransportProvider::Structs::SFrameStruct::DecodableType & value);
+
 static CHIP_ERROR
 LogValue(const char * label, size_t indent,
          const chip::app::Clusters::PushAvStreamTransport::Structs::TransportMotionTriggerTimeControlStruct::DecodableType & value);

@@ -35,6 +35,8 @@
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
 
+import random
+
 from mobly import asserts
 from TC_AVSUMTestBase import AVSUMTestBase
 
@@ -57,11 +59,14 @@ class TC_AVSUM_2_5(MatterBaseTest, AVSUMTestBase):
             TestStep(5, "If the size of MPTZPresets is greater than MaxPresets, fail"),
             TestStep(6, "Via the MPTZSavePreset command, create a new saved preset with PresetID of MaxPresets, name of 'newpreset'"),
             TestStep(7, "Read the value of MPTZPresets. Ensure it has an entry for a PresetID of MaxPresets with a name 'newpreset' that matches the saved MPTZPosition"),
-            TestStep(8, "Verify there is space in the preset list, if not, skip to step 12"),
-            TestStep(9, "Save a new Preset via the MPTZSavePreset command, name 'newpreset-2', do not provide a PresetID"),
-            TestStep(10, "Read the value of MPTZPresets. Ensure it has an entry with a name 'newpreset-2' that matches the saved MPTZPosition"),
-            TestStep(11, "Repeatedly send MPTZSavePreset commands till the number of presets equals MaxPresets"),
-            TestStep(12, "Save a new Preset via the MPTZSavePreset command, name 'newpreset-fail', do not provide a PresetID. Verify Resource Exhausted failure. End the test case."),
+            TestStep(8, "Create new values of Pan, Tilt, and Zoom (as supported), update these on the DUT via MPTZSetPosition"),
+            TestStep(9, "Save the Preset ID created in step 6"),
+            TestStep(10, "Read the value of MPTZPresets. Ensure it has an entry for a PresetID of MaxPresets with a name 'newpreset' that matches the saved MPTZPosition from step 8"),
+            TestStep(11, "Verify there is space in the preset list, if not, skip to step 15"),
+            TestStep(12, "Save a new Preset via the MPTZSavePreset command, name 'newpreset-2', do not provide a PresetID"),
+            TestStep(13, "Read the value of MPTZPresets. Ensure it has an entry with a name 'newpreset-2' that matches the saved MPTZPosition. Verify that all PresetIDs are unique."),
+            TestStep(14, "Repeatedly send MPTZSavePreset commands till the number of presets equals MaxPresets"),
+            TestStep(15, "Save a new Preset via the MPTZSavePreset command, name 'newpreset-fail', do not provide a PresetID. Verify Resource Exhausted failure. End the test case."),
         ]
         return steps
 
@@ -117,14 +122,74 @@ class TC_AVSUM_2_5(MatterBaseTest, AVSUMTestBase):
         if not match_found:
             asserts.assert_fail("No matching preset found for saved preset ID")
 
-        # make sure there is space is the preset list
+        # Create a new value of MPTZPosition based on supported features
         self.step(8)
+        feature_map = await self.read_avsum_attribute_expect_success(endpoint, attributes.FeatureMap)
+        self.has_feature_mpan = (feature_map & cluster.Bitmaps.Feature.kMechanicalPan) != 0
+        self.has_feature_mtilt = (feature_map & cluster.Bitmaps.Feature.kMechanicalTilt) != 0
+        self.has_feature_mzoom = (feature_map & cluster.Bitmaps.Feature.kMechanicalZoom) != 0
+        currentPan = mptzposition_dut.pan
+        currentTilt = mptzposition_dut.tilt
+        currentZoom = mptzposition_dut.zoom
+        newPan = newTilt = newZoom = None
+
+        if self.has_feature_mpan:
+            pan_min_dut = await self.read_avsum_attribute_expect_success(endpoint, attributes.PanMin)
+            pan_max_dut = await self.read_avsum_attribute_expect_success(endpoint, attributes.PanMax)
+
+            # Create new Value for Pan
+            while True:
+                newPan = random.randint(pan_min_dut+1, pan_max_dut)
+                if newPan != currentPan:
+                    break
+
+        if self.has_feature_mtilt:
+            tilt_min_dut = await self.read_avsum_attribute_expect_success(endpoint, attributes.TiltMin)
+            tilt_max_dut = await self.read_avsum_attribute_expect_success(endpoint, attributes.TiltMax)
+
+            # Create new Value for Tilt
+            while True:
+                newTilt = random.randint(tilt_min_dut+1, tilt_max_dut)
+                if newTilt != currentTilt:
+                    break
+
+        if self.has_feature_mzoom:
+            zoom_max_dut = await self.read_avsum_attribute_expect_success(endpoint, attributes.ZoomMax)
+
+            # Create new Value for Zoom
+            while True:
+                newZoom = random.randint(2, zoom_max_dut)
+                if newZoom != currentZoom:
+                    break
+
+        await self.send_mptz_set_position_command(endpoint, newPan, newTilt, newZoom)
+        mptzposition_dut = await self.read_avsum_attribute_expect_success(endpoint, attributes.MPTZPosition)
+
+        self.step(9)
+        await self.send_save_preset_command(endpoint, name, presetID=max_presets_dut)
+
+        self.step(10)
+        mptz_presets_dut = await self.read_avsum_attribute_expect_success(endpoint, attributes.MPTZPresets)
+
+        match_found = False
+        for mptzpreset in mptz_presets_dut:
+            if mptzpreset.presetID == max_presets_dut:
+                # verify that the values match
+                self.verify_preset_matches(mptzpreset, mptzposition_dut)
+                match_found = True
+                break
+
+        if not match_found:
+            asserts.assert_fail("Preset contents don't match expected updated values for the saved Preset ID")
+
+        # make sure there is space is the preset list
+        self.step(11)
         if len(mptz_presets_dut) < max_presets_dut:
             name = "newpreset-2"
-            self.step(9)
+            self.step(12)
             await self.send_save_preset_command(endpoint, name)
 
-            self.step(10)
+            self.step(13)
             mptz_presets_dut = await self.read_avsum_attribute_expect_success(endpoint, attributes.MPTZPresets)
 
             match_found = False
@@ -140,20 +205,20 @@ class TC_AVSUM_2_5(MatterBaseTest, AVSUMTestBase):
                 asserts.assert_fail("No matching preset found for saved preset")
 
             # fill the preset list to its max allowed number of values
-            self.step(11)
+            self.step(14)
             count = len(mptz_presets_dut)
             while count < max_presets_dut:
                 name = "newpreset-"+str(count)
                 await self.send_save_preset_command(endpoint, name)
                 count += 1
         else:
-            self.skip_step(9)
-            self.skip_step(10)
-            self.skip_step(11)
+            self.skip_step(12)
+            self.skip_step(13)
+            self.skip_step(14)
 
         # presets should now be full
         name = "newpreset-fail"
-        self.step(12)
+        self.step(15)
         await self.send_save_preset_command(endpoint, name, expected_status=Status.ResourceExhausted)
 
 

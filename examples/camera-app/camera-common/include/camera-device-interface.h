@@ -166,7 +166,7 @@ public:
         virtual CameraError CaptureSnapshot(const chip::app::DataModel::Nullable<uint16_t> streamID,
                                             const VideoResolutionStruct & resolution, ImageSnapshot & outImageSnapshot) = 0;
         // Start video stream
-        virtual CameraError StartVideoStream(uint16_t streamID) = 0;
+        virtual CameraError StartVideoStream(const VideoStreamStruct & allocatedStream) = 0;
 
         // Stop video stream
         virtual CameraError StopVideoStream(uint16_t streamID) = 0;
@@ -252,9 +252,9 @@ public:
         // This also sets the default priority of the stream usages.
         virtual std::vector<StreamUsageEnum> & GetSupportedStreamUsages() = 0;
 
-        // Get stream usage priorities as an ordered list. This is expected to
-        // be a subset of the SupportedStreamUsages.
-        virtual std::vector<StreamUsageEnum> & GetStreamUsagePriorities() = 0;
+        // Get/Set stream usage priorities as an ordered list. This is a subset of the SupportedStreamUsages.
+        virtual std::vector<StreamUsageEnum> & GetStreamUsagePriorities()                                = 0;
+        virtual CameraError SetStreamUsagePriorities(std::vector<StreamUsageEnum> streamUsagePriorities) = 0;
 
         // Get/Set soft recording privacy mode
         virtual CameraError SetSoftRecordingPrivacyModeEnabled(bool softRecordingPrivacyMode) = 0;
@@ -340,9 +340,11 @@ public:
         virtual bool GetStatusLightEnabled()                               = 0;
 
         // Set Pan, Tilt, and Zoom
-        virtual CameraError SetPan(int16_t aPan)   = 0;
-        virtual CameraError SetTilt(int16_t aTilt) = 0;
-        virtual CameraError SetZoom(uint8_t aZoom) = 0;
+        virtual CameraError SetPan(int16_t aPan)                          = 0;
+        virtual CameraError SetTilt(int16_t aTilt)                        = 0;
+        virtual CameraError SetZoom(uint8_t aZoom)                        = 0;
+        virtual CameraError SetPhysicalPTZ(chip::Optional<int16_t> aPan, chip::Optional<int16_t> aTilt,
+                                           chip::Optional<uint8_t> aZoom) = 0;
 
         // Get device defined limits for Pan, Tilt, and Zoom
         virtual int16_t GetPanMin()  = 0;
