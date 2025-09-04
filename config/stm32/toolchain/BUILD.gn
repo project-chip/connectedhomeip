@@ -20,6 +20,5 @@ import("${build_root}/toolchain/arm_gcc/arm_toolchain.gni")
 arm_toolchain("stm32_lighting_app") {
   toolchain_args = {
     current_os = "freertos"
-    import("${chip_root}/examples/lighting-app/stm32/args.gni")
   }
 }
