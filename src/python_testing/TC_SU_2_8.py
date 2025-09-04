@@ -44,9 +44,9 @@ class TC_SU_2_8(MatterBaseTest):
     def steps_TC_SU_2_8(self) -> list[TestStep]:
         steps = [
             TestStep(0, "Commissioning, already done.", is_commissioning=True),
-            TestStep(1, "DUT tries to send a QueryImage command to TH1/OTA-P.",
-                     "Write default OTA provider using an invalid node id."),
-            TestStep(2, "TH1/OTA-P does not respond with QueryImageResponse and sends QueryImage command to TH2/OTA-P.",
+            TestStep(1, "Configure DefaultOTAProviders with invalid node ID. DUT tries to send a QueryImage command to TH1/OTA-P.",
+                     "TH1/OTA-P does not respond."),
+            TestStep(2, "DUT sends QueryImage command to TH2/OTA-P.",
                      "Subscribe to events for OtaSoftwareUpdateRequestor cluster and verify StateTransition changes from idle to quering, then to downloading and finally to applying. Also check if the targetSoftwareVersion is 2."),
         ]
         return steps
@@ -100,23 +100,23 @@ class TC_SU_2_8(MatterBaseTest):
     @async_test_body
     async def test_TC_SU_2_8(self):
 
-        # Commissioning constants
+        # TH variables
         P1_NODE_ID = 10
-        P1_DISCRIMINATOR = 1111
         P2_NODE_ID = 11
+        P1_DISCRIMINATOR = 1111
         P2_DISCRIMINATOR = P1_DISCRIMINATOR
         OTA_PROVIDER_PASSCODE = 20202021
 
-        # Variables for commissioning TH1-OTA Provider
+        # Variables for TH1-OTA Provider
         p1_node = P1_NODE_ID
 
-        # Variables for commissioning TH2-OTA Provider
+        # Variables for TH2-OTA Provider
         p2_node = P2_NODE_ID
         p2_disc = P2_DISCRIMINATOR
 
         p_pass = OTA_PROVIDER_PASSCODE
 
-        # Commissioning TH1-OTA Provider / TH2-OTA Provider
+        # Commissioning TH-OTA Provider
         self.step(0)
 
         endpoint = self.get_endpoint(default=0)
@@ -132,6 +132,7 @@ class TC_SU_2_8(MatterBaseTest):
         logging.info(f"TH1 fabric id: {th1.fabricId}.")
         logging.info(f"TH2 fabric id: {fabric_id_th2}.")
 
+        # Create TH2
         logging.info("Setting up TH2.")
         th2_certificate_auth = self.certificate_authority_manager.NewCertificateAuthority()
         th2_fabric_admin = th2_certificate_auth.NewFabricAdmin(vendorId=vendor_id, fabricId=fabric_id_th2)
@@ -142,6 +143,7 @@ class TC_SU_2_8(MatterBaseTest):
 
         dut_node_id_th2 = 2
 
+        # Commission TH2/DUT (requestor)
         resp = await th2.CommissionOnNetwork(
             nodeId=dut_node_id_th2,
             setupPinCode=params.commissioningParameters.setupPinCode,
@@ -171,10 +173,10 @@ class TC_SU_2_8(MatterBaseTest):
         if fabric_id_th2 == th1.fabricId:
             raise AssertionError(f"Fabric IDs are the same for TH1: {th1.fabricId} and TH2: {fabric_id_th2}.")
 
-        # DUT tries to send a QueryImage command to TH1/OTA-P.
+        # Configure DefaultOTAProviders with invalid node ID. DUT tries to send a QueryImage command to TH1/OTA-P.
         self.step(1)
 
-        # Write defaul OTA providers TH1
+        # Write default OTA providers TH1 with p1_node which does not exist
         await self._write_default_providers(th1, endpoint, p1_node)
 
         default_ota_providers = await self.read_single_attribute_check_success(
@@ -187,13 +189,15 @@ class TC_SU_2_8(MatterBaseTest):
 
         logging.info(f"Default OTA Providers: {default_ota_providers}.")
 
-        await self._write_default_providers(th2, endpoint, p2_node)
-
         # Do not announce TH1-OTA Provider
-        # await self._announce(th1, vendor_id, p1_node, endpoint)
 
-        # TH1/OTA-P does not respond with QueryImageResponse and sends QueryImage command to TH2/OTA-P.
+        # ADD SUBSCRIPTION
+
+        # DUT sends QueryImage command to TH2/OTA-P.
         self.step(2)
+
+        # Write default OTA providers TH2
+        await self._write_default_providers(th2, endpoint, p2_node)
 
         # Write defaul OTA providers TH2
         default_ota_providers = await self.read_single_attribute_check_success(
@@ -206,13 +210,14 @@ class TC_SU_2_8(MatterBaseTest):
 
         logging.info(f"Default OTA Providers: {default_ota_providers}.")
 
-        await self._announce(th2, vendor_id, p2_node, endpoint)
-
-        # Read Events
+        # Subscribe to events
         target_version = 2
         event_cb = EventSubscriptionHandler(expected_cluster=Clusters.Objects.OtaSoftwareUpdateRequestor)
         await event_cb.start(dev_ctrl=th2, node_id=dut_node_id, endpoint=endpoint,
                              fabric_filtered=False, min_interval_sec=0, max_interval_sec=5000)
+
+        # Announce after subscription
+        await self._announce(th2, vendor_id, p2_node, endpoint)
 
         event_1 = event_cb.wait_for_event_report(Clusters.Objects.OtaSoftwareUpdateRequestor.Events.StateTransition, 5000)
 
