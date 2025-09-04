@@ -99,6 +99,17 @@ source_set("public_headers") {
   }
 }
 
+cryptopal_sources = [
+  "CHIPCryptoPALOpenSSL.cpp",
+  "CHIPCryptoPALOpenSSL.h",
+]
+
+if (chip_with_trusty_os) {
+  cryptopal_sources += [ "P256KeyPair_TrustyImpl.cpp" ]
+} else {
+  cryptopal_sources += [ "P256KeyPair_Openssl.cpp" ]
+}
+
 if (chip_crypto == "openssl") {
   import("${build_root}/config/linux/pkg_config.gni")
 
@@ -107,17 +118,7 @@ if (chip_crypto == "openssl") {
   }
 
   source_set("cryptopal_openssl") {
-    sources = [
-      "CHIPCryptoPALOpenSSL.cpp",
-      "CHIPCryptoPALOpenSSL.h",
-    ]
-
-    if (chip_with_trusty_os) {
-      sources += [ "P256KeyPair_TrustyImpl.cpp" ]
-    } else {
-      sources += [ "P256KeyPair_Openssl.cpp" ]
-    }
-
+    sources = cryptopal_sources
     public_configs = [ ":openssl_config" ]
     public_deps = [ ":public_headers" ]
   }
@@ -126,17 +127,7 @@ if (chip_crypto == "openssl") {
 
   source_set("cryptopal_boringssl") {
     # BoringSSL is close enough to OpenSSL that it uses same PAL, with minor #ifdef differences
-    sources = [
-      "CHIPCryptoPALOpenSSL.cpp",
-      "CHIPCryptoPALOpenSSL.h",
-    ]
-
-    if (chip_with_trusty_os) {
-      sources += [ "P256KeyPair_TrustyImpl.cpp" ]
-    } else {
-      sources += [ "P256KeyPair_Openssl.cpp" ]
-    }
-
+    sources = cryptopal_sources
     public_deps = [
       ":public_headers",
       "${boringssl_root}:boringssl",
