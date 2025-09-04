@@ -18,11 +18,12 @@
 
 import logging
 
-import chip.clusters as Clusters
-from chip import ChipDeviceCtrl
-from chip.interaction_model import Status
-from chip.testing.event_attribute_reporting import EventSubscriptionHandler
-from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+import matter.clusters as Clusters
+from matter.clusters.Types import NullValue
+from matter import ChipDeviceCtrl
+from matter.interaction_model import Status
+from matter.testing.event_attribute_reporting import EventSubscriptionHandler
+from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from mobly import asserts
 
 
@@ -221,12 +222,17 @@ class TC_SU_2_8(MatterBaseTest):
 
         event_1 = event_cb.wait_for_event_report(Clusters.Objects.OtaSoftwareUpdateRequestor.Events.StateTransition, 5000)
 
-        await self.check_event_status(event=event_1, previous_state=Clusters.Objects.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kQuerying,
-                                      next_state=Clusters.Objects.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kDownloading, software_version=target_version)
+        await self.check_event_status(event=event_1, previous_state=Clusters.Objects.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kIdle,
+                                      next_state=Clusters.Objects.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kQuerying, software_version=NullValue)
 
         event_2 = event_cb.wait_for_event_report(Clusters.Objects.OtaSoftwareUpdateRequestor.Events.StateTransition, 5000)
 
-        await self.check_event_status(event=event_2, previous_state=Clusters.Objects.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kDownloading,
+        await self.check_event_status(event=event_2, previous_state=Clusters.Objects.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kQuerying,
+                                      next_state=Clusters.Objects.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kDownloading, software_version=target_version)
+
+        event_3 = event_cb.wait_for_event_report(Clusters.Objects.OtaSoftwareUpdateRequestor.Events.StateTransition, 5000)
+
+        await self.check_event_status(event=event_3, previous_state=Clusters.Objects.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kDownloading,
                                       next_state=Clusters.Objects.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kApplying, software_version=target_version)
 
 
