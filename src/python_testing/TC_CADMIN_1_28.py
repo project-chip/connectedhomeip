@@ -24,6 +24,7 @@
 # test-runner-runs:
 #   run1:
 #     script-args: >
+#       --string-arg th_server_app:${ALL_CLUSTERS_APP}
 #       --string-arg jfa_server_app:${JF_ADMIN_APP}
 #       --string-arg jfc_server_app:${JF_CONTROL_APP}
 #       --trace-to json:${TRACE_TEST_JSON}.json
