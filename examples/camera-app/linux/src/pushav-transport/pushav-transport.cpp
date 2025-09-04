@@ -135,7 +135,7 @@ void PushAVTransport::ConfigureRecorderSettings(const TransportOptionsStruct & t
     mClipInfo.mOutputPath    = "/tmp/";
     mClipInfo.mInputTimeBase = { 1, 1000000 };
 
-    uint8_t audioCodec = static_cast<uint8_t>(audioStreamParams.audioCodec);
+    uint8_t audioCodec   = static_cast<uint8_t>(audioStreamParams.audioCodec);
     mAudioInfo.mChannels = (audioStreamParams.channelCount == 0) ? 1 : audioStreamParams.channelCount;
 
     if (audioCodec == 0)
