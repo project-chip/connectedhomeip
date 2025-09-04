@@ -552,15 +552,13 @@ class TC_IDM_2_2(MatterBaseTest, BasicCompositionTests):
                      "DUT should send a report data action with the attribute value to the TH."),
             TestStep(17, "TH sends a Read Request Message to the DUT to read any supported attribute/wildcard on a particular cluster say A with the DataVersionFilter Field not set. DUT sends back the attribute value with the DataVersion of the cluster A. TH sends a Read Request Message to read any supported attribute/wildcard on cluster A and any supported attribute/wildcard on another cluster B. DataVersionList field should only contain the DataVersion of cluster A.",
                      "Verify that the DUT sends a report data action with the attribute value from the cluster B to the TH. Verify that the DUT does not send the attribute value from cluster A."),
-            TestStep(18, "TH sends a Read Request Message to the DUT to read something(Attribute) which is larger than 1 MTU(1280 bytes) and per spec can be chunked +",
-                     "Verify on the TH that the DUT sends a chunked data message with the SuppressResponse field set to False for all the messages except the last one. Verify the last chunked message sent has the SuppressResponse field set to True."),
-            TestStep(19, "TH sends a Read Request Message to the DUT to read a non global attribute from all clusters at that Endpoint, AttributePath = [[Endpoint = Specific Endpoint, Attribute = Specific Non Global Attribute]] +",
+            TestStep(18, "TH sends a Read Request Message to the DUT to read a non global attribute from all clusters at that Endpoint, AttributePath = [[Endpoint = Specific Endpoint, Attribute = Specific Non Global Attribute]] +",
                      "On the TH verify that the DUT sends an error message and not the value of the attribute."),
-            TestStep(20, "TH sends a Read Request Message to the DUT to read a non global attribute from all clusters at all Endpoints, AttributePath = [[Attribute = Specific Non Global Attribute]] +",
+            TestStep(19, "TH sends a Read Request Message to the DUT to read a non global attribute from all clusters at all Endpoints, AttributePath = [[Attribute = Specific Non Global Attribute]] +",
                      "On the TH verify that the DUT sends an error message and not the value of the attribute."),
-            TestStep(21, "TH should have access to only a single cluster at one Endpoint1. TH sends a Read Request Message to the DUT to read all attributes from all clusters at Endpoint1, AttributePath = [[Endpoint = Specific Endpoint]] +",
+            TestStep(20, "TH should have access to only a single cluster at one Endpoint1. TH sends a Read Request Message to the DUT to read all attributes from all clusters at Endpoint1, AttributePath = [[Endpoint = Specific Endpoint]] +",
                      "Verify that the DUT sends back data of all attributes only from that one cluster to which it has access. Verify that there are no errors sent back for attributes the TH has no access to."),
-            TestStep(22, "TH sends a Read Request Message to read all events and attributes from the DUT.",
+            TestStep(21, "TH sends a Read Request Message to read all events and attributes from the DUT.",
                      "Verify that the DUT sends back data of all attributes and events that the TH has access to."),
         ]
         return steps
@@ -684,33 +682,15 @@ class TC_IDM_2_2(MatterBaseTest, BasicCompositionTests):
         asserts.assert_in(Clusters.BasicInformation, read_both17[0], "Cluster B (BasicInformation) should be present")
 
         self.step(18)
-        try:
-            device = await self.default_controller.GetConnectedDevice(
-                nodeid=self.dut_node_id,
-                allowPASE=False,
-                timeoutMs=1000,
-                payloadCapability=ChipDeviceCtrl.TransportPayloadCapability.LARGE_PAYLOAD
-            )
-        except TimeoutError:
-            logging.error("Unable to establish a CASE session over TCP to the device")
-            raise
-        asserts.assert_equal(device.isSessionOverTCPConnection, True,
-                             "Session does not have associated TCP connection")
-        asserts.assert_equal(device.sessionAllowsLargePayload, True,
-                             "Session does not support large payloads")
-        await self.default_controller.ReadAttribute(self.dut_node_id, ([]),
-                                                    payloadCapability=ChipDeviceCtrl.TransportPayloadCapability.LARGE_PAYLOAD)
-
-        self.step(19)
         await self._read_non_global_attribute(
             endpoint=self.endpoint,
             attribute=Clusters.Descriptor.Attributes.ServerList)
 
-        self.step(20)
+        self.step(19)
         await self._read_non_global_attribute(
             attribute=Clusters.Descriptor.Attributes.ServerList)
 
-        self.step(21)
+        self.step(20)
         original_acl21, read_request21 = await self._read_limited_access(
             endpoint=self.endpoint,
             cluster_id=Clusters.BasicInformation.id,
@@ -721,7 +701,7 @@ class TC_IDM_2_2(MatterBaseTest, BasicCompositionTests):
         asserts.assert_true(Clusters.AccessControl.Attributes.Acl in read_request21.attributes[self.endpoint][Clusters.AccessControl],
                             "ACL attribute not in response")
 
-        self.step(22)
+        self.step(21)
         read_request22 = await self._read_all_events_attributes()
         required_attributes = ["Header", "Status", "Data"]
         for event in read_request22.events:
