@@ -77,6 +77,13 @@ enum class StreamAllocationAction
     kReuse          // Reusing existing stream without changes - no action needed
 };
 
+enum class StreamType
+{
+    kAudio,
+    kVideo,
+    kSnapshot
+};
+
 class CameraAVStreamMgmtServer;
 
 // ImageSnapshot response data for a CaptureSnapshot command.
@@ -545,6 +552,21 @@ public:
 
     CHIP_ERROR UpdateSnapshotStreamRefCount(uint16_t snapshotStreamId, bool shouldIncrement);
 
+    constexpr const char * StreamTypeToString(StreamType type)
+    {
+        switch (type)
+        {
+        case StreamType::kVideo:
+            return "Video";
+        case StreamType::kAudio:
+            return "Audio";
+        case StreamType::kSnapshot:
+            return "Snapshot";
+        default:
+            return "Unknown";
+        }
+    };
+
 private:
     CameraAVStreamMgmtDelegate & mDelegate;
     EndpointId mEndpointId;
@@ -619,32 +641,33 @@ private:
 
     template <typename StreamContainer, typename IdGetter>
     bool ValidateStreamForModifyOrDeallocateImpl(StreamContainer & streams, uint16_t streamID, HandlerContext & ctx,
-                                                 const char * streamTypeName, IdGetter id_getter, bool isDeallocate)
+                                                 StreamType streamType, IdGetter id_getter, bool isDeallocate)
     {
         auto it = std::find_if(streams.begin(), streams.end(), [&](const auto & stream) { return id_getter(stream) == streamID; });
 
         if (it == streams.end())
         {
-            ChipLogError(Zcl, "CameraAVStreamMgmt[ep=%d]: %s stream with ID: %u not found", mEndpointId, streamTypeName, streamID);
+            ChipLogError(Zcl, "CameraAVStreamMgmt[ep=%d]: %s stream with ID: %u not found", mEndpointId,
+                         StreamTypeToString(streamType), streamID);
             ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Protocols::InteractionModel::Status::NotFound);
             return false;
         }
 
         if (isDeallocate && it->referenceCount > 0)
         {
-            ChipLogError(Zcl, "CameraAVStreamMgmt[ep=%d]: %s stream with ID: %u still in use", mEndpointId, streamTypeName,
-                         streamID);
+            ChipLogError(Zcl, "CameraAVStreamMgmt[ep=%d]: %s stream with ID: %u still in use", mEndpointId,
+                         StreamTypeToString(streamType), streamID);
             ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Protocols::InteractionModel::Status::InvalidInState);
             return false;
         }
 
-        using StreamType = typename StreamContainer::value_type;
-        if constexpr (std::is_same_v<StreamType, VideoStreamStruct> || std::is_same_v<StreamType, AudioStreamStruct>)
+        using StreamValueType = typename StreamContainer::value_type;
+        if constexpr (std::is_same_v<StreamValueType, VideoStreamStruct> || std::is_same_v<StreamValueType, AudioStreamStruct>)
         {
             if (it->streamUsage == Globals::StreamUsageEnum::kInternal)
             {
-                ChipLogError(Zcl, "CameraAVStreamMgmt[ep=%d]: %s stream with ID: %u is Internal", mEndpointId, streamTypeName,
-                             streamID);
+                ChipLogError(Zcl, "CameraAVStreamMgmt[ep=%d]: %s stream with ID: %u is Internal", mEndpointId,
+                             StreamTypeToString(streamType), streamID);
                 ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Protocols::InteractionModel::Status::DynamicConstraintError);
                 return false;
             }
@@ -652,7 +675,7 @@ private:
 
         // For SnapshotStreamModify, check against the corresponding
         // SnapshotStreamStruct for requiresHardwareEncoder.
-        if constexpr (std::is_same_v<StreamType, SnapshotStreamStruct>)
+        if constexpr (std::is_same_v<StreamValueType, SnapshotStreamStruct>)
         {
             if (!isDeallocate)
             {

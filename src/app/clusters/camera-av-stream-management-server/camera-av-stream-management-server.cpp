@@ -2292,14 +2292,14 @@ bool CameraAVStreamMgmtServer::ValidateVideoStreamForModifyOrDeallocate(const ui
                                                                         bool isDeallocate)
 {
     return ValidateStreamForModifyOrDeallocateImpl(
-        mAllocatedVideoStreams, videoStreamID, ctx, "Video", [](const VideoStreamStruct & s) { return s.videoStreamID; },
+        mAllocatedVideoStreams, videoStreamID, ctx, StreamType::kVideo, [](const VideoStreamStruct & s) { return s.videoStreamID; },
         isDeallocate);
 }
 
 bool CameraAVStreamMgmtServer::ValidateAudioStreamForDeallocate(const uint16_t audioStreamID, HandlerContext & ctx)
 {
     return ValidateStreamForModifyOrDeallocateImpl(
-        mAllocatedAudioStreams, audioStreamID, ctx, "Audio", [](const AudioStreamStruct & s) { return s.audioStreamID; },
+        mAllocatedAudioStreams, audioStreamID, ctx, StreamType::kAudio, [](const AudioStreamStruct & s) { return s.audioStreamID; },
         /* isDeallocate = */ true);
 }
 
@@ -2307,7 +2307,7 @@ bool CameraAVStreamMgmtServer::ValidateSnapshotStreamForModifyOrDeallocate(const
                                                                            bool isDeallocate)
 {
     return ValidateStreamForModifyOrDeallocateImpl(
-        mAllocatedSnapshotStreams, snapshotStreamID, ctx, "Snapshot",
+        mAllocatedSnapshotStreams, snapshotStreamID, ctx, StreamType::kSnapshot,
         [](const SnapshotStreamStruct & s) { return s.snapshotStreamID; }, isDeallocate);
 }
 
