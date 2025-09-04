@@ -43,9 +43,6 @@ struct TestDeviceAttestationVerifier : public ::testing::Test
 // Test that GetDeviceAttestationVerifier returns the default stub when reset
 TEST_F(TestDeviceAttestationVerifier, ReturnsDefaultStubAfterReset)
 {
-    // Explicitly reset to the default stub verifier before the test
-    SetDeviceAttestationVerifier(nullptr);
-
     // Ensure the returned verifier is not null
     DeviceAttestationVerifier * verifier = GetDeviceAttestationVerifier();
     ASSERT_NE(verifier, nullptr);
@@ -54,9 +51,6 @@ TEST_F(TestDeviceAttestationVerifier, ReturnsDefaultStubAfterReset)
 // Test VerifyAttestationInformation with the default stub verifier
 TEST_F(TestDeviceAttestationVerifier, StubVerifierVerifyAttestationInformation)
 {
-    // Explicitly reset to the default stub verifier before the test
-    SetDeviceAttestationVerifier(nullptr);
-
     // Prepare dummy attestation data
     uint8_t testData[8] = { 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08 };
     ByteSpan testSpan(testData);
@@ -82,9 +76,6 @@ TEST_F(TestDeviceAttestationVerifier, StubVerifierVerifyAttestationInformation)
 // Test ValidateCertificationDeclarationSignature with the default stub verifier
 TEST_F(TestDeviceAttestationVerifier, StubVerifierValidateCertificationDeclarationSignature)
 {
-    // Explicitly reset to the default stub verifier before the test
-    SetDeviceAttestationVerifier(nullptr);
-
     // Prepare dummy attestation data
     uint8_t testData[8] = { 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08 };
     ByteSpan testSpan(testData);
@@ -99,9 +90,6 @@ TEST_F(TestDeviceAttestationVerifier, StubVerifierValidateCertificationDeclarati
 // Test ValidateCertificateDeclarationPayload with the default stub verifier
 TEST_F(TestDeviceAttestationVerifier, StubVerifierValidateCertificateDeclarationPayload)
 {
-    // Explicitly reset to the default stub verifier before the test
-    SetDeviceAttestationVerifier(nullptr);
-
     // Prepare dummy attestation data
     uint8_t testData[8] = { 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08 };
     ByteSpan testSpan(testData);
@@ -120,9 +108,6 @@ TEST_F(TestDeviceAttestationVerifier, StubVerifierValidateCertificateDeclaration
 // Test VerifyNodeOperationalCSRInformation with the default stub verifier
 TEST_F(TestDeviceAttestationVerifier, StubVerifierVerifyNodeOperationalCSRInformation)
 {
-    // Explicitly reset to the default stub verifier before the test
-    SetDeviceAttestationVerifier(nullptr);
-
     // Prepare dummy attestation data
     uint8_t testData[8] = { 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08 };
     ByteSpan testSpan(testData);
