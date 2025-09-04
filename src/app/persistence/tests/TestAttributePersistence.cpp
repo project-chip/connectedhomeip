@@ -336,7 +336,7 @@ TEST(TestAttributePersistence, TestArithmeticValidationFailure)
     {
         WriteOperation writeOp(path);
         AttributeValueDecoder decoder = writeOp.DecoderFor(kInvalidValue);
-        EXPECT_EQ(persistence.DecodeAndStoreNativeEndianValue(path, decoder, valueRead, rangeValidator), 
+        EXPECT_EQ(persistence.DecodeAndStoreNativeEndianValue(path, decoder, valueRead, rangeValidator),
                   CHIP_IM_GLOBAL_STATUS(ConstraintError));
     }
 
@@ -369,7 +369,7 @@ TEST(TestAttributePersistence, TestArithmeticValidationErrorPropagation)
 
         WriteOperation writeOp(path);
         AttributeValueDecoder decoder = writeOp.DecoderFor(kTestValue);
-        EXPECT_EQ(persistence.DecodeAndStoreNativeEndianValue(path, decoder, valueRead, customErrorValidator), 
+        EXPECT_EQ(persistence.DecodeAndStoreNativeEndianValue(path, decoder, valueRead, customErrorValidator),
                   CHIP_ERROR_INVALID_ARGUMENT);
     }
 
@@ -381,7 +381,7 @@ TEST(TestAttributePersistence, TestArithmeticValidationErrorPropagation)
 
         WriteOperation writeOp(path);
         AttributeValueDecoder decoder = writeOp.DecoderFor(kTestValue);
-        EXPECT_EQ(persistence.DecodeAndStoreNativeEndianValue(path, decoder, valueRead, anotherErrorValidator), 
+        EXPECT_EQ(persistence.DecodeAndStoreNativeEndianValue(path, decoder, valueRead, anotherErrorValidator),
                   CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
     }
 }
@@ -452,7 +452,7 @@ TEST(TestAttributePersistence, TestEnumCustomValidationFailure)
     {
         WriteOperation writeOp(path);
         AttributeValueDecoder decoder = writeOp.DecoderFor(CalendarTypeEnum::kPersian);
-        EXPECT_EQ(persistence.DecodeAndStoreNativeEndianValue(path, decoder, valueRead, restrictiveValidator), 
+        EXPECT_EQ(persistence.DecodeAndStoreNativeEndianValue(path, decoder, valueRead, restrictiveValidator),
                   CHIP_IM_GLOBAL_STATUS(ConstraintError));
     }
 
