@@ -548,50 +548,38 @@ PushAvStreamTransportServerLogic::HandleAllocatePushTransport(CommandHandler & h
     Commands::AllocatePushTransportResponse::Type response;
     auto & transportOptions = commandData.transportOptions;
 
-    TlsClientManagementDelegate::EndpointStructType TLSEndpoint;
-    if (mTLSClientManagementDelegate != nullptr)
-    {
-        Status tlsEndpointValidityStatus = mTLSClientManagementDelegate->FindProvisionedEndpointByID(
-            commandPath.mEndpointId, handler.GetAccessingFabricIndex(), commandData.transportOptions.endpointID, TLSEndpoint);
+    // TlsClientManagementDelegate::EndpointStructType TLSEndpoint;
+    // if (mTLSClientManagementDelegate != nullptr)
+    // {
+    //     Status tlsEndpointValidityStatus = mTLSClientManagementDelegate->FindProvisionedEndpointByID(
+    //         commandPath.mEndpointId, handler.GetAccessingFabricIndex(), commandData.transportOptions.endpointID, TLSEndpoint);
 
-        VerifyOrDo(tlsEndpointValidityStatus == Status::Success, {
-            ChipLogError(Zcl, "HandleAllocatePushTransport[ep=%d]: TLSEndpointID of command data is not valid/Provisioned",
-                         mEndpointId);
-            auto status = to_underlying(StatusCodeEnum::kInvalidTLSEndpoint);
-            handler.AddClusterSpecificFailure(commandPath, status);
-            return std::nullopt;
-        });
+    // VerifyOrDo(tlsEndpointValidityStatus == Status::Success, {
+    //     ChipLogError(Zcl, "HandleAllocatePushTransport[ep=%d]: TLSEndpointID of command data is not valid/Provisioned",
+    //                  mEndpointId);
+    //     auto status = to_underlying(StatusCodeEnum::kInvalidTLSEndpoint);
+    //     handler.AddClusterSpecificFailure(commandPath, status);
+    //     return std::nullopt;
+    // });
 
-        TlsCertificateManagement::Commands::FindClientCertificateResponse::Type clientCert;
-        TlsCertificateManagement::Commands::FindRootCertificateResponse::Type rootCert;
-        CHIP_ERROR result;
-        result = mTlsCertificateManagementDelegate->FindClientCert(
-            commandPath.mEndpointId, handler.GetAccessingFabricIndex(), TLSEndpoint.ccdid.Value(),
-            [&](auto & certificate) -> CHIP_ERROR {
-                TlsCertificateManagement::Commands::FindClientCertificateResponse::Type clientCertResponse;
-                DataModel::List<const TlsCertificateManagement::Structs::TLSClientCertificateDetailStruct::Type> details(
-                    &certificate, 1);
-                clientCertResponse.certificateDetails = details;
-                clientCert                            = std::move(clientCertResponse);
-                return CHIP_NO_ERROR;
-            });
+    //     PersistentStore<CHIP_CONFIG_TLS_PERSISTED_ROOT_CERT_BYTES> rootCertBuffer;
+    //     PersistentStore<CHIP_CONFIG_TLS_PERSISTED_CLIENT_CERT_BYTES> clientCertBuffer;
+    //     Tls::CertificateTable::BufferedClientCert clientCertEntry(clientCertBuffer);
+    //     Tls::CertificateTable::BufferedRootCert rootCertEntry(rootCertBuffer);
 
-        result = mTlsCertificateManagementDelegate->FindRootCert(
-            commandPath.mEndpointId, handler.GetAccessingFabricIndex(), TLSEndpoint.caid, [&](auto & certificate) -> CHIP_ERROR {
-                TlsCertificateManagement::Commands::FindRootCertificateResponse::Type rootCertResponse;
-                DataModel::List<const TlsCertificateManagement::Structs::TLSCertStruct::Type> details(&certificate, 1);
-                rootCertResponse.certificateDetails = details;
-                rootCert                            = std::move(rootCertResponse);
-                return CHIP_NO_ERROR;
-            });
-    }
-    else
-    {
-        ChipLogError(Zcl, "HandleAllocatePushTransport[ep=%d]: TLS Client Management Delegate is not set", mEndpointId);
-        auto status = to_underlying(StatusCodeEnum::kInvalidTLSEndpoint);
-        handler.AddClusterSpecificFailure(commandPath, status);
-        return std::nullopt;
-    }
+    //     auto & table = mTlsCertificateManagementDelegate->GetCertificateTable();
+    //     table.GetClientCertificateEntry(handler.GetAccessingFabricIndex(), TLSEndpoint.ccdid.Value(), clientCertEntry);
+    //     table.GetRootCertificateEntry(handler.GetAccessingFabricIndex(), TLSEndpoint.caid, rootCertEntry);
+
+    //     mDelegate->SetTLSCerts(clientCertEntry, rootCertEntry);
+    // }
+    // else
+    // {
+    // ChipLogError(Zcl, "HandleAllocatePushTransport[ep=%d]: TLS Client Management Delegate is not set", mEndpointId);
+    // auto status = to_underlying(StatusCodeEnum::kInvalidTLSEndpoint);
+    // handler.AddClusterSpecificFailure(commandPath, status);
+    // return std::nullopt;
+    // }
 
     // here add check for valid zoneid
     if ((transportOptions.triggerOptions.triggerType == TransportTriggerTypeEnum::kMotion) &&

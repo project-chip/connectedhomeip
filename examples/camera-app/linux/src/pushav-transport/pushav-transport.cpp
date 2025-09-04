@@ -268,9 +268,13 @@ bool PushAVTransport::HandleTriggerDetected()
     {
         // Start new recording
         ChipLogError(Camera, "PushAVTransport starting new recording");
-        mHasAugmented                       = false;
-        mRecorder->mClipInfo.activationTime = std::chrono::steady_clock::now();
-        mRecorder->Start();
+        hasAugmented                       = false;
+        recorder->mClipInfo.activationTime = std::chrono::steady_clock::now();
+        recorder->Start();
+        if (mOnStartCallback)
+        {
+            mOnStartCallback();
+        }
         mStreaming = true;
     }
     else
@@ -366,6 +370,13 @@ void PushAVTransport::SetTLSCertPath(std::string rootCert, std::string devCert, 
     mCertPath.mDevCert  = devCert;
     mCertPath.mDevKey   = devKey;
 }
+void PushAVTransport::SetTLSCert(std::vector<uint8_t> bufferRootCert, std::vector<uint8_t> bufferClientCert,
+                                 std::vector<uint8_t> bufferClientCertKey)
+{
+    mCertBuffer.mRootCertBuffer   = bufferRootCert;
+    mCertBuffer.mClientCertBuffer = bufferClientCert;
+    mCertBuffer.mClientKeyBuffer  = bufferClientCertKey;
+}
 void PushAVTransport::SetTransportStatus(TransportStatusEnum status)
 {
     if (mTransportStatus == status)
@@ -379,13 +390,17 @@ void PushAVTransport::SetTransportStatus(TransportStatusEnum status)
     {
         ChipLogProgress(Camera, "PushAVTransport transport status changed to active");
 
-        mUploader = std::make_unique<PushAVUploader>(mCertPath);
-        mUploader->Start();
+        uploader = std::make_unique<PushAVUploader>(mCertPath, mCertBuffer);
+        uploader->Start();
         InitializeRecorder();
 
         if (mTransportTriggerType == TransportTriggerTypeEnum::kContinuous)
         {
-            mRecorder->Start();
+            recorder->Start();
+            if (mOnStartCallback)
+            {
+                mOnStartCallback();
+            }
             mStreaming = true;
             if (IsStreaming())
             {

@@ -283,8 +283,10 @@ public:
     virtual void
     SetOnRecorderStoppedCallback(std::function<void(uint16_t, PushAvStreamTransport::TransportTriggerTypeEnum)> cb) = 0;
 
-    virtual void SetTLSCerts(TlsCertificateManagement::Commands::FindClientCertificateResponse::Type aClientCert,
-                             TlsCertificateManagement::Commands::FindRootCertificateResponse::Type aRootCert) = 0;
+    virtual void
+    SetOnRecorderStartedCallback(std::function<void(uint16_t, PushAvStreamTransport::TransportTriggerTypeEnum)> cb) = 0;
+    virtual void SetTLSCerts(Tls::CertificateTable::BufferedClientCert clientCertEntry,
+                             Tls::CertificateTable::BufferedRootCert rootCertEntry)                                 = 0;
 
 protected:
     EndpointId mEndpointId = kInvalidEndpointId;

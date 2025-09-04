@@ -84,7 +84,12 @@ PushAvStreamTransportManager::AllocatePushTransport(const TransportOptionsStruct
             mOnRecorderStoppedCb(connectionID, triggerType);
         }
     });
-
+    mTransportMap[connectionID]->SetOnStartCallback([this, connectionID, triggerType]() {
+        if (mOnRecorderStartedCb)
+        {
+            mOnRecorderStartedCb(connectionID, triggerType);
+        }
+    });
     if (mMediaController == nullptr)
     {
         ChipLogError(Camera, "PushAvStreamTransportManager: MediaController is not set");
@@ -132,9 +137,7 @@ PushAvStreamTransportManager::AllocatePushTransport(const TransportOptionsStruct
     }
 
 #ifdef TLS_CLUSTER_ENABLED
-    // TODO: Add support to use in memory certificate mClientCert, mRootCert
-    // TODO: Find a way to get client key / dev.key
-    // mTransportMap[connectionID].get()->SetTLSCertPath(rootCert, clientCert, mDevKey);
+    mTransportMap[connectionID].get()->SetTLSCert(bufferRootCert, bufferClientCert, bufferClientCertKey);
 #else
     mTransportMap[connectionID].get()->SetTLSCertPath("/tmp/pavstest/certs/server/root.pem", "/tmp/pavstest/certs/device/dev.pem",
                                                       "/tmp/pavstest/certs/device/dev.key");
@@ -404,6 +407,18 @@ Protocols::InteractionModel::Status PushAvStreamTransportManager::SelectAudioStr
     }
 
     return Status::Failure;
+}
+
+void PushAvStreamTransportManager::SetOnRecorderStoppedCallback(
+    std::function<void(uint16_t, PushAvStreamTransport::TransportTriggerTypeEnum)> cb)
+{
+    mOnRecorderStoppedCb = std::move(cb);
+}
+
+void PushAvStreamTransportManager::SetOnRecorderStartedCallback(
+    std::function<void(uint16_t, PushAvStreamTransport::TransportTriggerTypeEnum)> cb)
+{
+    mOnRecorderStartedCb = std::move(cb);
 }
 
 Protocols::InteractionModel::Status PushAvStreamTransportManager::ValidateZoneId(uint16_t zoneId)

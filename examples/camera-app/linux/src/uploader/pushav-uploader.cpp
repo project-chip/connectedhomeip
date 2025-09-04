@@ -21,7 +21,9 @@
 #include <iostream>
 #include <lib/support/logging/CHIPLogging.h>
 
-PushAVUploader::PushAVUploader(PushAVCertPath certPath) : mCertPath(certPath), mIsRunning(false) {}
+PushAVUploader::PushAVUploader(PushAVCertPath certPath, PushAVCertBuffer certBuffer) :
+    mCertPath(certPath), mCertBuffer(certBuffer), mIsRunning(false)
+{}
 
 PushAVUploader::~PushAVUploader()
 {
@@ -160,9 +162,19 @@ void PushAVUploader::UploadData(std::pair<std::string, std::string> data)
     curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, true);
     curl_easy_setopt(curl, CURLOPT_SSL_VERIFYHOST, 2L);
     curl_easy_setopt(curl, CURLOPT_INFILESIZE_LARGE, static_cast<curl_off_t>(size));
+#ifdef TLS_CLUSTER_ENABLED
+    curl_blob rootBlob   = { mCertBuffer.mRootCertBuffer.data(), mCertBuffer.mRootCertBuffer.size(), CURL_BLOB_COPY };
+    curl_blob clientBlob = { mCertBuffer.mClientCertBuffer.data(), mCertBuffer.mClientCertBuffer.size(), CURL_BLOB_COPY };
+    curl_blob keyBlob    = { mCertBuffer.mClientKeyBuffer.data(), mCertBuffer.mClientKeyBuffer.size(), CURL_BLOB_COPY };
+
+    curl_easy_setopt(curl, CURLOPT_CAINFO_BLOB, &rootBlob);
+    curl_easy_setopt(curl, CURLOPT_SSLCERT_BLOB, &clientBlob);
+    curl_easy_setopt(curl, CURLOPT_SSLKEY_BLOB, &keyBlob);
+#else
     curl_easy_setopt(curl, CURLOPT_CAINFO, mCertPath.mRootCert.c_str());
     curl_easy_setopt(curl, CURLOPT_SSLCERT, mCertPath.mDevCert.c_str());
     curl_easy_setopt(curl, CURLOPT_SSLKEY, mCertPath.mDevKey.c_str());
+#endif
     curl_easy_setopt(curl, CURLOPT_UPLOAD, 1L);
     curl_easy_setopt(curl, CURLOPT_READFUNCTION, PushAvUploadCb);
     curl_easy_setopt(curl, CURLOPT_READDATA, &upload);
