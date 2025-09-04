@@ -1332,7 +1332,7 @@ void OperationalCredentialsCluster::FabricWillBeRemoved(const FabricTable & fabr
     ReadOnlyBufferBuilder<DataModel::EndpointEntry> endpointBuilder;
     DataModel::Provider * provider = InteractionModelEngine::GetInstance()->GetDataModelProvider();
 
-    provider->Endpoints(endpointBuilder);
+    ReturnOnFailure(provider->Endpoints(endpointBuilder));
 
     auto allEndpoints = endpointBuilder.TakeBuffer();
 
@@ -1340,7 +1340,7 @@ void OperationalCredentialsCluster::FabricWillBeRemoved(const FabricTable & fabr
     {
         ReadOnlyBufferBuilder<DataModel::ServerClusterEntry> clusterBuilder;
 
-        provider->ServerClusters(ep.id, clusterBuilder);
+        ReturnOnFailure(provider->ServerClusters(ep.id, clusterBuilder));
 
         auto allClusters = clusterBuilder.TakeBuffer();
 
