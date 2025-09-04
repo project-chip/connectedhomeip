@@ -50,7 +50,7 @@ logger = logging.getLogger(__name__)
 
 class TC_PAVST_2_3(MatterBaseTest, PAVSTTestBase):
     def desc_TC_PAVST_2_3(self) -> str:
-        return "[TC-PAVST-2.3] Attributes with Server as DUT"
+        return "[TC-PAVST-2.3] Allocate PushAV Transport with Server as DUT"
 
     def pics_TC_PAVST_2_3(self):
         return ["PAVST.S"]
@@ -80,7 +80,7 @@ class TC_PAVST_2_3(MatterBaseTest, PAVSTTestBase):
             TestStep(11, "TH sends the AllocatePushTransport command with a combination of IngestMethod and ContainerFormat not in aSupportedFormats.",
                      "DUT responds with Status Code InvalidCombination."),
             TestStep(12, "DUT responds with Status Code InvalidURL.",
-                     "Store value as aMaxZones."),
+                     "DUT responds with Status Code InvalidURL."),
             TestStep(13, "TH sends the AllocatePushTransport command with an invalid TriggerType in the TransportTriggerOptions struct field.",
                      "DUT responds with Status Code InvalidTriggerType."),
             TestStep(14, "If the zone management cluster is present on this endpoint, TH sends the AllocatePushTransport command with an invalid ZoneID that is not present in aZones.",
@@ -201,7 +201,6 @@ class TC_PAVST_2_3(MatterBaseTest, PAVSTTestBase):
                  "url": "https://localhost:1234/streams/1",
                  "triggerOptions": {"triggerType": 2},
                  "ingestMethod": 0,
-                 "containerFormat": 0,
                  "containerOptions": {"containerType": 0, "CMAFContainerOptions": {"chunkDuration": 4}},
                  "expiryTime": 5
                  }), endpoint=endpoint)

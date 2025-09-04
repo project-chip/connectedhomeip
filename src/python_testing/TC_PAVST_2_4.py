@@ -49,7 +49,7 @@ logger = logging.getLogger(__name__)
 
 class TC_PAVST_2_4(MatterBaseTest, PAVSTTestBase):
     def desc_TC_PAVST_2_4(self) -> str:
-        return "[TC-PAVST-2.4] Attributes with Server as DUT"
+        return "[TC-PAVST-2.4] Modify PushAV Transport with Server as DUT"
 
     def pics_TC_PAVST_2_4(self):
         return ["PAVST.S"]
@@ -78,13 +78,13 @@ class TC_PAVST_2_4(MatterBaseTest, PAVSTTestBase):
             ),
             TestStep(
                 5,
-                "TH1 sends the ModifyPushTransport command with ConnectionID != aConnectionID.",
-                "DUT responds with NOT_FOUND status code.",
+                "TH1 sends the ModifyPushTransport command with ConnectionID = aConnectionID and aTransportOptions, with ExpiryTime incremented by 120 in aTransportOptions",
+                "DUT responds with SUCCESS  status code.",
             ),
             TestStep(
                 6,
                 "TH1 Reads CurrentConnections attribute from PushAV Stream Transport Cluster on DUT over a large-payload session.",
-                "Verify the number of PushAV Connections in the list is 1. Store the TransportOptions and ConnectionID in the corresponding TransportConfiguration as aTransportOptions and aConnectionID.",
+                "Verify that ConnectionID == aConnectionID and ExpiryTime in TransportConfiguration.TransportOptions is incremented by 120.",
             )
         ]
 

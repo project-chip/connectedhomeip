@@ -49,7 +49,7 @@ logger = logging.getLogger(__name__)
 
 class TC_PAVST_2_2(MatterBaseTest, PAVSTTestBase):
     def desc_TC_PAVST_2_2(self) -> str:
-        return "[TC-PAVST-2.2] Attributes with Server as DUT"
+        return " [TC-PAVST-2.2] Verify reading CurrentConnections attribute over transports MRP and TCP with Server as DUT"
 
     def pics_TC_PAVST_2_2(self):
         return ["PAVST.S"]

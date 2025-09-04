@@ -50,7 +50,7 @@ logger = logging.getLogger(__name__)
 
 class TC_PAVST_2_8(MatterBaseTest, PAVSTTestBase):
     def desc_TC_PAVST_2_8(self) -> str:
-        return "[TC-PAVST-2.8] Attributes with Server as DUT"
+        return "[TC-PAVST-2.8] Validate FindTransport command with Server as DUT"
 
     def pics_TC_PAVST_2_8(self):
         return ["PAVST.S"]

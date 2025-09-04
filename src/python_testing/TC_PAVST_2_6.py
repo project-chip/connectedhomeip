@@ -49,7 +49,7 @@ logger = logging.getLogger(__name__)
 
 class TC_PAVST_2_6(MatterBaseTest, PAVSTTestBase):
     def desc_TC_PAVST_2_6(self) -> str:
-        return "[TC-PAVST-2.5] Attributes with Server as DUT"
+        return "[TC-PAVST-2.6] Validate SetTransportStatus command with Server as DUT"
 
     def pics_TC_PAVST_2_6(self):
         return ["PAVST.S"]
@@ -68,23 +68,23 @@ class TC_PAVST_2_6(MatterBaseTest, PAVSTTestBase):
             ),
             TestStep(
                 3,
-                "TH1 sends the DeallocatePushTransport command with ConnectionID != aConnectionID.",
+                "TH1 sends the SetTransportStatus  command with ConnectionID != aConnectionID.",
                 "DUT responds with NOT_FOUND status code.",
             ),
             TestStep(
                 4,
-                "TH2 sends the DeallocatePushTransport command with ConnectionID = aConnectionID.",
+                "TH2 sends the SetTransportStatus  command with ConnectionID = aConnectionID.",
                 "DUT responds with NOT_FOUND status code.",
             ),
             TestStep(
                 5,
-                "TH1 sends the DeallocatePushTransport command with ConnectionID = aConnectionID.",
+                "TH1 sends the SetTransportStatus  command with ConnectionID = aConnectionID.",
                 "DUT responds with SUCCESS status code.",
             ),
             TestStep(
                 6,
                 "TH1 Reads CurrentConnections attribute from PushAV Stream Transport Cluster on DUT.",
-                "Verify the number of PushAV Connections is 0.",
+                "Verify that the TransportStatus is set to !aTransportStatus in the TransportConfiguration corresponding to aConnectionID.",
             )
         ]
 

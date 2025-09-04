@@ -49,7 +49,7 @@ logger = logging.getLogger(__name__)
 
 class TC_PAVST_2_7(MatterBaseTest, PAVSTTestBase):
     def TC_PAVST_2_7(self) -> str:
-        return "[TC-PAVST-2.5] Attributes with Server as DUT"
+        return "[TC-PAVST-2.7] Manually Trigger PushAV Transport Flow with Server as DUT"
 
     def pics_TC_PAVST_2_7(self):
         return ["PAVST.S"]
@@ -206,9 +206,11 @@ class TC_PAVST_2_7(MatterBaseTest, PAVSTTestBase):
             "DUT responds with SUCCESS status code.")
 
         self.step(6)
+        timeControl = {"initialDuration": 1, "augmentationDuration": 1, "maxDuration": 1, "blindDuration": 1}
         cmd = pvcluster.Commands.ManuallyTriggerTransport(
             connectionID=aConnectionID,
-            activationReason=pvcluster.Enums.TriggerActivationReasonEnum.kEmergency
+            activationReason=pvcluster.Enums.TriggerActivationReasonEnum.kEmergency,
+            timeControl=timeControl
         )
         status = await self.psvt_manually_trigger_transport(cmd, expected_cluster_status=pvcluster.Enums.StatusCodeEnum.kInvalidTransportStatus)
         asserts.assert_true(
@@ -227,9 +229,11 @@ class TC_PAVST_2_7(MatterBaseTest, PAVSTTestBase):
             "DUT responds with SUCCESS status code.")
 
         self.step(8)
+        timeControl = {"initialDuration": 1, "augmentationDuration": 1, "maxDuration": 1, "blindDuration": 1}
         cmd = pvcluster.Commands.ManuallyTriggerTransport(
             connectionID=aConnectionID,
-            activationReason=pvcluster.Enums.TriggerActivationReasonEnum.kEmergency
+            activationReason=pvcluster.Enums.TriggerActivationReasonEnum.kEmergency,
+            timeControl=timeControl
         )
         status = await self.psvt_manually_trigger_transport(cmd, expected_cluster_status=pvcluster.Enums.StatusCodeEnum.kInvalidTriggerType)
         asserts.assert_true(
