@@ -21,6 +21,11 @@ PICS:
     - MCORE.ROLE.COMMISSIONEE
     - MCORE.DD.NFC
 
+config:
+    nodeId: 0x12344321
+    cluster: "Basic Information"
+    endpoint: 0
+
 tests:
     - label: "Preconditions"
       verification: |
@@ -77,7 +82,7 @@ tests:
       disabled: true
 
     - label: "Step 4b: If needed, activate tag detection in TH NFC reader,
-             then bring in TH NFC reader close to the DUT’s NFC tag.
+             then bring in TH NFC reader close to the DUT’s NFC tag."
       verification: |
             The tag is detected,
             the content is read,
