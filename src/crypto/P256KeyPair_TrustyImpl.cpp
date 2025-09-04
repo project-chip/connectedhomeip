@@ -49,7 +49,7 @@ CHIP_ERROR P256Keypair::ECDSA_sign_msg(const uint8_t * msg, const size_t msg_len
     static_assert(P256ECDSASignature::Capacity() >= kP256_ECDSA_Signature_Length_Raw, "P256ECDSASignature must be large enough");
     VerifyOrExit(mInitialized, error = CHIP_ERROR_UNINITIALIZED);
 
-    rc = trusty_matter.P256KeypairECSignMsg(p256_handler, digest, kSHA256_Hash_Length, sig, sig_size);
+    rc = trusty_matter.P256KeypairECSignMsg(mP256Handler, digest, kSHA256_Hash_Length, sig, sig_size);
     VerifyOrExit(rc == MATTER_ERROR_OK, error = CHIP_ERROR_INTERNAL);
     VerifyOrExit(sig_size == kP256_ECDSA_Signature_Length_Raw, error = CHIP_ERROR_INTERNAL);
 
@@ -66,7 +66,7 @@ CHIP_ERROR P256Keypair::ECDH_derive_secret(const P256PublicKey & remote_public_k
     int result;
     size_t out_buf_length = 0;
 
-    result = trusty_matter.P256KeypairECDH_derive_secret(p256_handler, Uint8::to_const_uchar(remote_public_key),
+    result = trusty_matter.P256KeypairECDH_derive_secret(mP256Handler, Uint8::to_const_uchar(remote_public_key),
                                                          remote_public_key.Length(), out_secret.Bytes(), out_buf_length);
     VerifyOrExit(result == MATTER_ERROR_OK, error = CHIP_ERROR_INTERNAL);
     VerifyOrExit((out_buf_length > 0), error = CHIP_ERROR_INTERNAL);
@@ -82,7 +82,7 @@ CHIP_ERROR P256Keypair::Initialize(ECPKeyTarget key_target)
     uint8_t public_key[kP256_PublicKey_Length];
     int rc = 0;
 
-    rc = trusty_matter.P256KeypairInitialize(p256_handler, fabricIndex, public_key);
+    rc = trusty_matter.P256KeypairInitialize(mP256Handler, mFabricIndex, public_key);
     VerifyOrExit(rc == MATTER_ERROR_OK, error = CHIP_ERROR_INTERNAL);
 
     memcpy(Uint8::to_uchar(mPublicKey), public_key, kP256_PublicKey_Length);
@@ -99,7 +99,7 @@ CHIP_ERROR P256Keypair::Serialize(P256SerializedKeypair & output) const
     uint8_t privkey[kP256_PrivateKey_Length];
     int rc = 0;
 
-    rc = trusty_matter.P256KeypairSerialize(p256_handler, privkey);
+    rc = trusty_matter.P256KeypairSerialize(mP256Handler, privkey);
     VerifyOrExit(rc == MATTER_ERROR_OK, error = CHIP_ERROR_INTERNAL);
 
     {
@@ -129,7 +129,7 @@ CHIP_ERROR P256Keypair::Deserialize(P256SerializedKeypair & input)
     bbuf.Put(input.ConstBytes(), mPublicKey.Length());
     VerifyOrExit(bbuf.Fit(), error = CHIP_ERROR_NO_MEMORY);
 
-    rc = trusty_matter.P256KeypairDeserialize(p256_handler, pubkey, mPublicKey.Length(), privkey, kP256_PrivateKey_Length);
+    rc = trusty_matter.P256KeypairDeserialize(mP256Handler, pubkey, mPublicKey.Length(), privkey, kP256_PrivateKey_Length);
     VerifyOrExit(rc == MATTER_ERROR_OK, error = CHIP_ERROR_INTERNAL);
 
     mInitialized = true;
@@ -141,12 +141,12 @@ exit:
 void P256Keypair::Clear()
 {
     mInitialized = false;
-    p256_handler = 0;
+    mP256Handler = 0;
 }
 
 P256Keypair::~P256Keypair()
 {
-    trusty_matter.P256KeypairDestroy(p256_handler);
+    trusty_matter.P256KeypairDestroy(mP256Handler);
     Clear();
 }
 
@@ -157,7 +157,7 @@ CHIP_ERROR P256Keypair::NewCertificateSigningRequest(uint8_t * out_csr, size_t &
 
     VerifyOrExit(mInitialized, error = CHIP_ERROR_UNINITIALIZED);
 
-    rc = trusty_matter.P256KeypairNewCSR(p256_handler, out_csr, csr_length);
+    rc = trusty_matter.P256KeypairNewCSR(mP256Handler, out_csr, csr_length);
     VerifyOrExit(rc == MATTER_ERROR_OK, error = CHIP_ERROR_INTERNAL);
 
 exit:

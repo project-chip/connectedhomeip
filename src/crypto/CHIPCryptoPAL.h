@@ -631,8 +631,8 @@ public:
     void Clear();
 
 #if CHIP_CRYPTO_TRUSTY_OS
-    uint64_t p256_handler = 0;
-    uint8_t fabricIndex   = 0;
+    uint64_t mP256Handler = 0;
+    uint8_t mFabricIndex  = 0;
 #endif
 
 protected:
