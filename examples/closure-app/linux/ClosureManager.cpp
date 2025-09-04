@@ -909,7 +909,7 @@ void ClosureManager::HandleClosureMotionAction()
         // If currently latched (false) and target is unlatched (true), unlatch first before moving
         if (!ep1CurrentState.Value().latch.Value().Value() && ep1TargetState.Value().latch.Value().Value())
         {
-            // In Real application, this would be replaced with actual unlatch logic.
+            // In Real application, this would be replaced with actual latch logic.
             ChipLogProgress(AppServer, "Performing latch action");
             ep1CurrentState.Value().latch.SetValue(DataModel::MakeNullable(true));
             if (ep1CurrentState.Value().position.HasValue() && !ep1CurrentState.Value().position.Value().IsNull())

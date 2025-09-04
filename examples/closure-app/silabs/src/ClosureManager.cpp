@@ -704,7 +704,7 @@ void ClosureManager::HandleClosureMotionAction()
         if (!mClosureEndpoint1CurrentState.Value().latch.Value().Value() &&
             mClosureEndpoint1TargetState.Value().latch.Value().Value())
         {
-            // In Real application, this would be replaced with actual unlatch logic.
+            // In Real application, this would be replaced with actual latch logic.
             ChipLogProgress(AppServer, "Performing latch action");
             mClosureEndpoint1CurrentState.Value().latch.SetValue(DataModel::MakeNullable(true));
             if (mClosureEndpoint1CurrentState.Value().position.HasValue() &&
