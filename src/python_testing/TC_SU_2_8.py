@@ -45,8 +45,10 @@ class TC_SU_2_8(MatterBaseTest):
     def steps_TC_SU_2_8(self) -> list[TestStep]:
         steps = [
             TestStep(0, "Commissioning, already done.", is_commissioning=True),
-            TestStep(1, "DUT tries to send a QueryImage command to TH1/OTA-P."),
-            TestStep(2, "TH1/OTA-P does not respond with QueryImageResponse and sends QueryImage command to TH2/OTA-P."),
+            TestStep(1, "DUT tries to send a QueryImage command to TH1/OTA-P.",
+                     "Write default OTA provider using an invalid node id."),
+            TestStep(2, "TH1/OTA-P does not respond with QueryImageResponse and sends QueryImage command to TH2/OTA-P.",
+                     "Subscribe to events for OtaSoftwareUpdateRequestor cluster and verify StateTransition changes from idle to quering, then to downloading and finally to applying. Also check if the targetSoftwareVersion is 2."),
         ]
         return steps
 
@@ -85,31 +87,6 @@ class TC_SU_2_8(MatterBaseTest):
         resp = await self.send_single_cmd(cmd=cmd, dev_ctrl=controller)
         logging.info(f"Announce resp: {resp}.")
 
-    async def check_state_remains_idle(self, endpoint: int, idle):
-        """
-        Poll UpdateState and checks it remains the same.
-        """
-
-        max_wait = 30
-        interval = 3
-        elapsed = 0
-
-        while elapsed < max_wait:
-            state = await self.read_single_attribute_check_success(
-                node_id=self.dut_node_id,
-                endpoint=endpoint,
-                attribute=Clusters.Objects.OtaSoftwareUpdateRequestor.Attributes.UpdateState,
-                cluster=Clusters.Objects.OtaSoftwareUpdateRequestor
-            )
-
-            logging.info(f"[{elapsed}s] UpdateState = {state.name}.")
-
-            if state != idle:
-                raise AssertionError(f"DUT did change expected OTA state from {idle} to {state.name}.")
-
-            time.sleep(interval)
-            elapsed += interval
-
     async def check_event_status(self, event, previous_state, next_state, software_version):
         logging.info(f"State Transition: {event}")
 
@@ -128,14 +105,15 @@ class TC_SU_2_8(MatterBaseTest):
         P1_NODE_ID = 10
         P1_DISCRIMINATOR = 1111
         P2_NODE_ID = 11
+        P2_DISCRIMINATOR = P1_DISCRIMINATOR
         OTA_PROVIDER_PASSCODE = 20202021
 
         # Variables for commissioning TH1-OTA Provider
         p1_node = P1_NODE_ID
-        p1_disc = P1_DISCRIMINATOR
 
         # Variables for commissioning TH2-OTA Provider
         p2_node = P2_NODE_ID
+        p2_disc = P2_DISCRIMINATOR
 
         p_pass = OTA_PROVIDER_PASSCODE
 
@@ -174,31 +152,17 @@ class TC_SU_2_8(MatterBaseTest):
 
         logging.info(f"TH2 commissioned: {resp}.")
 
-        # Commissioning Provider-TH1
-
-        logging.info("Commissioning OTA Provider to TH1")
-
-        resp = await th1.CommissionOnNetwork(
-            nodeId=p1_node,
-            setupPinCode=p_pass,
-            filterType=ChipDeviceCtrl.DiscoveryFilterType.LONG_DISCRIMINATOR,
-            filter=p1_disc
-        )
-
-        logging.info(f"Commissioning response: {resp}.")
+        # Do not commissioning Provider-TH1
 
         # Commissioning Provider-TH2
-
-        logging.info("Openning commissioning window on DUT.")
-        params = await self.open_commissioning_window(th1, p1_node)
 
         logging.info("Commissioning OTA Provider to TH2")
 
         resp = await th2.CommissionOnNetwork(
             nodeId=p2_node,
-            setupPinCode=params.commissioningParameters.setupPinCode,
+            setupPinCode=p_pass,
             filterType=ChipDeviceCtrl.DiscoveryFilterType.LONG_DISCRIMINATOR,
-            filter=params.randomDiscriminator
+            filter=p2_disc
         )
 
         logging.info(f"Commissioning response: {resp}.")
@@ -208,6 +172,10 @@ class TC_SU_2_8(MatterBaseTest):
         if fabric_id_th2 == th1.fabricId:
             raise AssertionError(f"Fabric IDs are the same for TH1: {th1.fabricId} and TH2: {fabric_id_th2}.")
 
+        # DUT tries to send a QueryImage command to TH1/OTA-P.
+        self.step(1)
+
+        # Write defaul OTA providers TH1
         await self._write_default_providers(th1, endpoint, p1_node)
 
         default_ota_providers = await self.read_single_attribute_check_success(
@@ -222,6 +190,13 @@ class TC_SU_2_8(MatterBaseTest):
 
         await self._write_default_providers(th2, endpoint, p2_node)
 
+        # Do not announce TH1-OTA Provider
+        # await self._announce(th1, vendor_id, p1_node, endpoint)
+
+        # TH1/OTA-P does not respond with QueryImageResponse and sends QueryImage command to TH2/OTA-P.
+        self.step(2)
+
+        # Write defaul OTA providers TH2
         default_ota_providers = await self.read_single_attribute_check_success(
             node_id=self.dut_node_id,
             endpoint=endpoint,
@@ -231,21 +206,6 @@ class TC_SU_2_8(MatterBaseTest):
         )
 
         logging.info(f"Default OTA Providers: {default_ota_providers}.")
-
-        # DUT tries to send a QueryImage command to TH1/OTA-P.
-        self.step(1)
-
-        # Do not announce TH1-OTA Provider
-        # await self._announce(th1, vendor_id, p1_node, endpoint)
-
-        # Add sleep time so the Provider will respond with Idle state since it has no permissions for update
-        time.sleep(5)
-
-        # Check state remains as kIdle for TH1-OTA Provider
-        await self.check_state_remains_idle(endpoint, Clusters.Objects.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kIdle)
-
-        # TH1/OTA-P does not respond with QueryImageResponse and sends QueryImage command to TH2/OTA-P.
-        self.step(2)
 
         await self._announce(th2, vendor_id, p2_node, endpoint)
 
