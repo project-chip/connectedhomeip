@@ -31,8 +31,6 @@
 namespace chip {
 namespace Crypto {
 
-matter::TrustyMatter trusty_matter;
-
 CHIP_ERROR P256Keypair::ECDSA_sign_msg(const uint8_t * msg, const size_t msg_length, P256ECDSASignature & out_signature) const
 {
     CHIP_ERROR error = CHIP_NO_ERROR;
