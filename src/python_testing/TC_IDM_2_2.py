@@ -120,9 +120,9 @@ class TC_IDM_2_2(MatterBaseTest, BasicCompositionTests):
                 raise
 
         logging.info(f"Reading attribute Here: {attribute_path}")
-        read_request = await self.read_attribute(attribute_path)
-        self.verify_read_response(read_request, attribute_path)
-        return read_request
+        read_response = await self.read_attribute(attribute_path)
+        self.verify_read_response(read_response, attribute_path)
+        return read_response
 
     def verify_read_response(self, read_response: dict, attribute_path: list):
         """Verify the response from a read request.
@@ -295,7 +295,7 @@ class TC_IDM_2_2(MatterBaseTest, BasicCompositionTests):
             self.default_controller.Read(self.dut_node_id, [()]),
             timeout=120.0
         )
-        self._verify_empty_tuple([()], read_request)
+        self._verify_empty_wildcard([()], read_request)
         return read_request
 
     async def _read_global_attribute_all_endpoints(self, attribute_id):
@@ -489,7 +489,7 @@ class TC_IDM_2_2(MatterBaseTest, BasicCompositionTests):
             dataVersionFilters=data_version_filter_1)
         return read_request, filtered_read
 
-    def _verify_empty_tuple(self, attr_path, read_request):
+    def _verify_empty_wildcard(self, attr_path, read_request):
         """Verify read response for empty tuple path (all attributes from all clusters on all endpoints).
 
         This method is based on Austin's implementation in PR #34003.
