@@ -2043,8 +2043,7 @@ CHIP_ERROR BLEManagerImpl::ConfigureBle(uint32_t aAdapterId, bool aIsCentral)
     return CHIP_NO_ERROR;
 }
 
-void BLEManagerImpl::OnDeviceScanned(const struct ble_hs_adv_fields & fields, const ble_addr_t & addr,
-                                     const chip::Ble::ChipBLEDeviceIdentificationInfo & info)
+void BLEManagerImpl::OnDeviceScanned(const ble_addr_t & addr, const chip::Ble::ChipBLEDeviceIdentificationInfo & info)
 {
 
     if (mBLEScanConfig.mBleScanState == BleScanState::kScanForDiscriminator)
