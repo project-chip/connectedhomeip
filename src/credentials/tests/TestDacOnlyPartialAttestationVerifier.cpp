@@ -48,25 +48,6 @@ static void OnAttestationInformationVerificationCallback(void * context, const D
 
 } // namespace
 
-/**
- * Helper function to load a P256 keypair from raw private and public key byte spans.
- * Combines the public and private key data into a serialized keypair format,
- * then deserializes it into the provided keypair object.
- *
- * @param private_key ByteSpan containing the raw private key bytes.
- * @param public_key ByteSpan containing the raw public key bytes.
- * @param keypair Reference to a P256Keypair object to populate.
- * @return CHIP_ERROR indicating success or failure of the operation.
- */
-CHIP_ERROR HazardousOperationLoadKeypairFromRaw(ByteSpan private_key, ByteSpan public_key, Crypto::P256Keypair & keypair)
-{
-    Crypto::P256SerializedKeypair serialized_keypair;
-    ReturnErrorOnFailure(serialized_keypair.SetLength(private_key.size() + public_key.size()));
-    memcpy(serialized_keypair.Bytes(), public_key.data(), public_key.size());
-    memcpy(serialized_keypair.Bytes() + public_key.size(), private_key.data(), private_key.size());
-    return keypair.Deserialize(serialized_keypair);
-}
-
 static CHIP_ERROR CreateSignedAttestationData(uint8_t * tlvBuffer, size_t & tlvLen, chip::Crypto::P256ECDSASignature & signature,
                                               const ByteSpan & cdData, const ByteSpan & nonceData, const ByteSpan & privateKey,
                                               const ByteSpan & publicKey, const uint8_t * challengeData, size_t challengeDataLen);
@@ -163,7 +144,7 @@ static CHIP_ERROR CreateSignedAttestationData(uint8_t * tlvBuffer, size_t & tlvL
 
     // Load keypair and sign the data
     chip::Crypto::P256Keypair keypair;
-    ReturnErrorOnFailure(HazardousOperationLoadKeypairFromRaw(privateKey, publicKey, keypair));
+    ReturnErrorOnFailure(keypair.HazardousOperationLoadKeypairFromRaw(privateKey, publicKey));
     ReturnErrorOnFailure(keypair.ECDSA_sign_msg(toSign, tlvLen + challengeDataLen, signature));
 
     return CHIP_NO_ERROR;
@@ -371,8 +352,8 @@ TEST_F(TestDacOnlyPartialAttestationVerifier, TestWithMalformedAttestationElemen
 
     // Load a valid keypair for signing
     chip::Crypto::P256Keypair keypair;
-    CHIP_ERROR err = HazardousOperationLoadKeypairFromRaw(ByteSpan(TestCerts::sTestCert_DAC_FFF1_8000_0004_PrivateKey),
-                                                          ByteSpan(TestCerts::sTestCert_DAC_FFF1_8000_0004_PublicKey), keypair);
+    CHIP_ERROR err = keypair.HazardousOperationLoadKeypairFromRaw(ByteSpan(TestCerts::sTestCert_DAC_FFF1_8000_0004_PrivateKey),
+                                                                  ByteSpan(TestCerts::sTestCert_DAC_FFF1_8000_0004_PublicKey));
     ASSERT_EQ(err, CHIP_NO_ERROR);
 
     // Sign the concatenated data
