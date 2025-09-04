@@ -23,7 +23,7 @@ config:
     endpoint: 3
     TempAccountIdentifier:
         type: char_string
-        defaultValue: "1234efgh5678abcd"
+        defaultValue: "1111"
     catalogVendorId:
         type: int16u
         defaultValue: 123
@@ -60,11 +60,11 @@ tests:
                 value: 0
 
     - label:
-          'Step 1: TH sends a GetSetupPIN command to the DUT with a
+          "Step 1: TH sends a GetSetupPIN command to the DUT with a
           TempAccountIdentifier field. This field SHALL specify the client’s
           Temporary Account Identifier. The length of this field SHALL be
-          between 16 and 100 characters (e.g., "1234efgh5678abcd") to protect
-          the account holder against password guessing attacks.'
+          between 16 and 100 characters (e.g., '1234efgh5678abcd') to protect
+          the account holder against password guessing attacks."
       PICS: ALOGIN.S.C00.Rsp && PICS_SKIP_SAMPLE_APP
       command: "GetSetupPIN"
       timedInteractionTimeoutMs: 10000
@@ -80,8 +80,8 @@ tests:
                     minLength: 8
 
     - label:
-          "Step 2: TH sends a Login command to the DUT using the same
-          TempAccountIdentifier from Step 1 and the SetupPIN received in Step 1"
+          "Step 2: TH sends a Login command to the DUT with test values provided
+          by the product maker."
       PICS: ALOGIN.S.C02.Rsp && PICS_SKIP_SAMPLE_APP
       command: "Login"
       timedInteractionTimeoutMs: 10000
@@ -93,12 +93,10 @@ tests:
                 value: setupPIN
               - name: "Node"
                 value: nodeId
-      response:
-          values:
-              - name: "Status"
-                value: 0
 
-    - label: "Step 3: TH sends a Logout command to the DUT."
+    - label:
+          "Step 3: TH sends a Logout command to the DUT with test values
+          provided by the product maker."
       PICS: ALOGIN.S.C03.Rsp && PICS_SKIP_SAMPLE_APP
       command: "Logout"
       timedInteractionTimeoutMs: 10000
@@ -106,7 +104,3 @@ tests:
           values:
               - name: "Node"
                 value: nodeId
-      response:
-          values:
-              - name: "Status"
-                value: 0
