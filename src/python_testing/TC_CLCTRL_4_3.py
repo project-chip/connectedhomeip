@@ -559,7 +559,7 @@ class TC_CLCTRL_4_3(MatterBaseTest):
                 try:
                     await self.send_single_cmd(endpoint=endpoint, cmd=Clusters.ClosureControl.Commands.MoveTo(latch=current_latch), timedRequestTimeoutMs=1000)
                     logging.error("MoveTo command with Latch = CurrentLatch should have failed but succeeded")
-                    asserts.assert_true(False, "MoveTo command with Latch = CurrentLatch should have failed but succeeded")
+                    asserts.assert_fail("MoveTo command with Latch = CurrentLatch should have failed but succeeded")
                 except InteractionModelError as e:
                     logging.info(f"Exception caught for MoveTo with Latch = CurrentLatch: {e}")
                     asserts.assert_equal(e.status, Status.InvalidInState,
