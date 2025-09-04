@@ -219,7 +219,7 @@ private:
 
         std::array<Structs::MeteredQuantityStruct::Type, MAX_MQ_SAMPLES> mqBuffer;
 
-        std::copy_n(MQSamplePair.first.begin(), MQSamplePair.second, mqBuffer.data());
+        std::copy(MQSamplePair.first.begin(), MQSamplePair.first.begin() + static_cast<std::ptrdiff_t>(MQSamplePair.second), mqBuffer.data());
 
         DataModel::List<Structs::MeteredQuantityStruct::Type> tmpList(mqBuffer.data(), MQSamplePair.second);
         DataModel::Nullable<DataModel::List<Structs::MeteredQuantityStruct::Type>> nullableList;
