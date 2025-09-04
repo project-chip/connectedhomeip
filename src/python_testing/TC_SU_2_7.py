@@ -626,10 +626,7 @@ class TC_SU_2_7(MatterBaseTest):
 
         state_transition_event_handler = EventSubscriptionHandler(
             expected_cluster=self.ota_req, expected_event_id=self.ota_req.Events.StateTransition.event_id)
-        update_applied_event_handler = EventSubscriptionHandler(
-            expected_cluster=self.ota_req, expected_event_id=self.ota_req.Events.VersionApplied.event_id)
         await state_transition_event_handler.start(controller, requestor_node_id, endpoint=0, min_interval_sec=0, max_interval_sec=5000)
-        await update_applied_event_handler.start(controller, requestor_node_id, endpoint=0, min_interval_sec=0, max_interval_sec=5000)
         await self._write_acl_rules(controller=controller, endpoint=0, node_id=provider_data['node_id'])
         await self._write_ota_providers(controller=controller, provider_node_id=provider_data['node_id'], endpoint=0)
         await self._announce_ota_provider(controller, provider_data['node_id'], requestor_node_id)
@@ -647,14 +644,16 @@ class TC_SU_2_7(MatterBaseTest):
         logger.info(f"Event report: {event_report}")
         asserts.assert_equal(event_report.newState, self.ota_req.Enums.UpdateStateEnum.kDelayedOnApply,
                              f"Event status is not {self.ota_req.Enums.UpdateStateEnum.kDelayedOnApply}")
+        await state_transition_event_handler.cancel()
+        event = self.ota_req.Events.VersionApplied
+        cb = EventSubscriptionHandler(expected_cluster_id=event.cluster_id, expected_event_id=event.event_id)
+        urgent = 1
+        subscription = await controller.ReadEvent(nodeid=requestor_node_id, events=[(0, event, urgent)], reportInterval=[0, 60*3], autoResubscribe=True)
+        subscription.SetEventUpdateCallback(callback=cb)
 
         self.step(7)
-        event_report = update_applied_event_handler.wait_for_event_report(self.ota_req.Events.VersionApplied, timeout_sec=60*4)
-        logger.info(f"Applying Transition report: {event_report}")
-
-        await state_transition_event_handler.cancel()
-        await update_applied_event_handler.cancel()
-        await asyncio.sleep(100)
+        result = cb.wait_for_event_report(event, 60*3)
+        logger(f"REsult {result}")
         await self._verify_version_applied_basic_information(controller=controller, node_id=provider_data['node_id'], target_version=update_software_version)
 
 
