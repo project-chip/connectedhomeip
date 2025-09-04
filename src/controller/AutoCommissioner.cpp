@@ -600,23 +600,18 @@ CHIP_ERROR AutoCommissioner::StartCommissioning(DeviceCommissioner * commissione
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
 
-#if CHIP_DEVICE_CONFIG_ENABLE_NFC_BASED_COMMISSIONING
     // Proxy is expected to have a valid secure session before starting to commission. However, in case of continuing
     // commissioning post unpowered phase, allow proceeding if the stage is evict secure CASE sessions
-    if (proxy == nullptr ||
-        (!proxy->GetSecureSession().HasValue() &&
-         commissioner->GetCommissioningStage() != CommissioningStage::kEvictPreviousCaseSessions))
-    {
-        ChipLogError(Controller, "Device proxy secure session error");
-        return CHIP_ERROR_INVALID_ARGUMENT;
-    }
-#else
-    if (proxy == nullptr || !proxy->GetSecureSession().HasValue())
-    {
-        ChipLogError(Controller, "Device proxy secure session error");
-        return CHIP_ERROR_INVALID_ARGUMENT;
-    }
+    if (proxy == nullptr
+        || (!proxy->GetSecureSession().HasValue()
+#if CHIP_DEVICE_CONFIG_ENABLE_NFC_BASED_COMMISSIONING
+        && commissioner->GetCommissioningStage() != CommissioningStage::kEvictPreviousCaseSessions
 #endif
+       ))
+    {
+        ChipLogError(Controller, "Device proxy secure session error");
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
     mStopCommissioning       = false;
     mCommissioner            = commissioner;
     mCommissioneeDeviceProxy = proxy;
