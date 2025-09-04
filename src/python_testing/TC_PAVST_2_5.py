@@ -49,7 +49,7 @@ logger = logging.getLogger(__name__)
 
 class TC_PAVST_2_5(MatterBaseTest, PAVSTTestBase):
     def desc_TC_PAVST_2_5(self) -> str:
-        return "[TC-PAVST-2.5] Attributes with Server as DUT"
+        return "[TC-PAVST-2.5] Deallocate PushAV Transport with Server as DUT"
 
     def pics_TC_PAVST_2_5(self):
         return ["PAVST.S"]
