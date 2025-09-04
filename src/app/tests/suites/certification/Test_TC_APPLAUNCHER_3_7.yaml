@@ -49,7 +49,7 @@ tests:
       arguments:
           values:
               - name: "Data"
-                value: DataValue
+                value: "DataValue"
               - name: "Application"
                 value:
                     {
@@ -61,15 +61,24 @@ tests:
               - name: "Status"
                 value: 0
               - name: "Data"
-                value: DataValue
+                value: "DataValue"
 
-    - label: "Step 1b: TH reads the Status attribute"
-      endpoint: ApplicationBasic.Endpoint
-      cluster: "Application Basic"
-      command: "readAttribute"
-      attribute: "Status"
-      response:
-          value: 1
+    - label:
+          "Step 1b: TH reads the Status attribute from application Basic cluster"
+      verification: |
+          ./chip-tool applicationbasic read status 1 3
+           On the TH (chip-tool), verify that the status is 1, which indicates the current running state of the application (1 = running, visible to the user, and the active target for input)           [1646143551275] [87039:3765756] CHIP: [TOO] Endpoint: 3 Cluster: 0x0000_050D Attribute 0x0000_0005DataVersion: 4144987298
+           [1646143551276] [87039:3765756] CHIP: [TOO]   Status: 1
+           [1646143551276] [87039:3765756] CHIP: [EM] Sending Standalone Ack for MessageCounter:15738567 on exchange 6358i
+           [1646143551276] [87039:3765756] CHIP: [IN] Prepared secure message 0x70000e773560 to 0x0000000000000001 (1)  of type
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"
 
     - label:
           "Step 2a: TH sends a LaunchApp command to DUT to launch an app which
@@ -78,7 +87,7 @@ tests:
       arguments:
           values:
               - name: "Data"
-                value: DataValue
+                value: "DataValue"
               - name: "Application"
                 value:
                     {
@@ -89,8 +98,6 @@ tests:
           values:
               - name: "Status"
                 value: 1
-              - name: "Data"
-                value: DataValue
 
     - label: "Step 2b: TH reads the Status attribute"
       endpoint: ApplicationBasic.Endpoint
@@ -98,4 +105,4 @@ tests:
       command: "readAttribute"
       attribute: "Status"
       response:
-          value: 1
+          value: 0
