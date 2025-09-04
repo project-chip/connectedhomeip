@@ -178,6 +178,7 @@ Davis, CA 95616, USA
           <mandatoryConform/>
         </otherwiseConform>
       </field>
+      <access fabricScoped="true"/>
     </struct>
   </dataTypes>
   <attributes>

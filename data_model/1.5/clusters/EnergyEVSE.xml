@@ -57,11 +57,12 @@ Davis, CA 95616, USA
 
 :xrefstyle: basic
 -->
-<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0099" name="Energy EVSE Cluster" revision="3">
+<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0099" name="Energy EVSE Cluster" revision="4">
   <revisionHistory>
     <revision revision="1" summary="Initial revision"/>
     <revision revision="2" summary="Updates after 0.7 Ballot review"/>
     <revision revision="3" summary="Added Q quality for SessionDuration, SessionEnergyCharged and SessionEnergyDischarged. Updates to V2X and associated areas. Make PREF mandatory."/>
+    <revision revision="4" summary="Sync with SDK revision number"/>
   </revisionHistory>
   <clusterIds>
     <clusterId id="0x0099" name="Energy EVSE"/>

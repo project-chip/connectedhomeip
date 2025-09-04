@@ -195,6 +195,13 @@ Davis, CA 95616, USA
         <feature name="TC"/>
       </mandatoryConform>
     </attribute>
+    <attribute id="0x000C" name="IsCommissioningWithoutPower" type="bool" default="false">
+      <access read="true" readPrivilege="view"/>
+      <otherwiseConform>
+        <provisionalConform/>
+        <optionalConform/>
+      </otherwiseConform>
+    </attribute>
   </attributes>
   <commands>
     <command id="0x00" name="ArmFailSafe" direction="commandToServer" response="ArmFailSafeResponse">

@@ -94,12 +94,7 @@ Davis, CA 95616, USA
       <optionalConform/>
     </feature>
     <feature bit="3" code="SCH" name="ScheduleConfiguration" summary="Supports remote configuration of a weekly schedule of setpoint transitions">
-      <otherwiseConform>
-        <optionalConform>
-          <condition name="Zigbee"/>
-        </optionalConform>
-        <deprecateConform/>
-      </otherwiseConform>
+      <deprecateConform/>
     </feature>
     <feature bit="4" code="SB" name="Setback" summary="Supports configurable setback (or span)">
       <optionalConform/>
@@ -746,7 +741,7 @@ Davis, CA 95616, USA
         <desc/>
       </constraint>
     </attribute>
-    <attribute id="0x0007" name="PICoolingDemand" type="uint8" default="">
+    <attribute id="0x0007" name="PICoolingDemand" type="uint8">
       <access read="true" readPrivilege="view"/>
       <quality reportable="true"/>
       <optionalConform>
@@ -759,7 +754,7 @@ Davis, CA 95616, USA
         </between>
       </constraint>
     </attribute>
-    <attribute id="0x0008" name="PIHeatingDemand" type="uint8" default="">
+    <attribute id="0x0008" name="PIHeatingDemand" type="uint8">
       <access read="true" readPrivilege="view"/>
       <quality reportable="true"/>
       <optionalConform>
@@ -930,7 +925,7 @@ Davis, CA 95616, USA
         <desc/>
       </constraint>
     </attribute>
-    <attribute id="0x0020" name="StartOfWeek" type="StartOfWeekEnum" default="">
+    <attribute id="0x0020" name="StartOfWeek" type="StartOfWeekEnum">
       <access read="true" readPrivilege="view"/>
       <quality persistence="fixed"/>
       <mandatoryConform>
@@ -978,7 +973,7 @@ Davis, CA 95616, USA
         <desc/>
       </constraint>
     </attribute>
-    <attribute id="0x0029" name="ThermostatRunningState" type="RelayStateBitmap" default="">
+    <attribute id="0x0029" name="ThermostatRunningState" type="RelayStateBitmap">
       <access read="true" readPrivilege="view"/>
       <optionalConform/>
       <constraint>

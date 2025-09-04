@@ -57,13 +57,14 @@ Davis, CA 95616, USA
 
 :xrefstyle: basic
 -->
-<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0202" name="Fan Control Cluster" revision="5">
+<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0202" name="Fan Control Cluster" revision="6">
   <revisionHistory>
     <revision revision="1" summary="Mandatory global ClusterRevision attribute added"/>
     <revision revision="2" summary="New data model format and notation; Percent, speed and motion settings; General cleanup"/>
     <revision revision="3" summary="Addition of AirflowDirection and Step command"/>
     <revision revision="4" summary="Change conformance for FanModeSequenceEnum"/>
     <revision revision="5" summary="Clarified attribute usage, added conformance column"/>
+    <revision revision="6" summary="Added Q quality for PercentCurrent and SpeedCurrent"/>
   </revisionHistory>
   <clusterIds>
     <clusterId id="0x0202" name="Fan Control"/>
@@ -215,6 +216,7 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x0003" name="PercentCurrent" type="percent">
       <access read="true" readPrivilege="view"/>
+      <quality quieterReporting="true"/>
       <mandatoryConform/>
       <constraint>
         <max value="100"/>
@@ -247,7 +249,7 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x0006" name="SpeedCurrent" type="uint8">
       <access read="true" readPrivilege="view"/>
-      <quality reportable="true"/>
+      <quality reportable="true" quieterReporting="true"/>
       <mandatoryConform>
         <feature name="SPD"/>
       </mandatoryConform>

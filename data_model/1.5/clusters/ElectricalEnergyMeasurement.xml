@@ -57,9 +57,10 @@ Davis, CA 95616, USA
 
 :xrefstyle: basic
 -->
-<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0091" name="Electrical Energy Measurement Cluster" revision="1">
+<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0091" name="Electrical Energy Measurement Cluster" revision="2">
   <revisionHistory>
     <revision revision="1" summary="Initial revision"/>
+    <revision revision="2" summary="Added support for apparent and reactive energy measurement"/>
   </revisionHistory>
   <clusterIds>
     <clusterId id="0x0091" name="Electrical Energy Measurement"/>
@@ -78,8 +79,73 @@ Davis, CA 95616, USA
     <feature bit="3" code="PERE" name="PeriodicEnergy" summary="Measurements are periodic">
       <optionalConform choice="b" more="true" min="1"/>
     </feature>
+    <feature bit="4" code="APPE" name="ApparentEnergy" summary="Measurements report apparent energy">
+      <otherwiseConform>
+        <provisionalConform/>
+        <optionalConform/>
+      </otherwiseConform>
+    </feature>
+    <feature bit="5" code="REAE" name="ReactiveEnergy" summary="Measurements report reactive energy">
+      <otherwiseConform>
+        <provisionalConform/>
+        <optionalConform/>
+      </otherwiseConform>
+    </feature>
   </features>
   <dataTypes>
+    <enum name="MeasurementTypeEnum">
+      <item value="0" name="Unspecified">
+        <mandatoryConform/>
+      </item>
+      <item value="1" name="Voltage" summary="Voltage in millivolts (mV)">
+        <mandatoryConform/>
+      </item>
+      <item value="2" name="ActiveCurrent" summary="Active current in milliamps (mA)">
+        <mandatoryConform/>
+      </item>
+      <item value="3" name="ReactiveCurrent" summary="Reactive current in milliamps (mA)">
+        <mandatoryConform/>
+      </item>
+      <item value="4" name="ApparentCurrent" summary="Apparent current in milliamps (mA)">
+        <mandatoryConform/>
+      </item>
+      <item value="5" name="ActivePower" summary="Active power in milliwatts (mW)">
+        <mandatoryConform/>
+      </item>
+      <item value="6" name="ReactivePower" summary="Reactive power in millivolt-amps reactive (mVAR)">
+        <mandatoryConform/>
+      </item>
+      <item value="7" name="ApparentPower" summary="Apparent power in millivolt-amps (mVA)">
+        <mandatoryConform/>
+      </item>
+      <item value="8" name="RMSVoltage" summary="Root mean squared voltage in millivolts (mV)">
+        <mandatoryConform/>
+      </item>
+      <item value="9" name="RMSCurrent" summary="Root mean squared current in milliamps (mA)">
+        <mandatoryConform/>
+      </item>
+      <item value="10" name="RMSPower" summary="Root mean squared power in milliwatts (mW)">
+        <mandatoryConform/>
+      </item>
+      <item value="11" name="Frequency" summary="AC frequency in millihertz (mHz)">
+        <mandatoryConform/>
+      </item>
+      <item value="12" name="PowerFactor" summary="Power Factor ratio in +/- 1/100ths of a percent.">
+        <mandatoryConform/>
+      </item>
+      <item value="13" name="NeutralCurrent" summary="AC neutral current in milliamps (mA)">
+        <mandatoryConform/>
+      </item>
+      <item value="14" name="ElectricalEnergy" summary="Electrical energy in milliwatt-hours (mWh)">
+        <mandatoryConform/>
+      </item>
+      <item value="15" name="ReactiveEnergy" summary="Reactive power in millivolt-amp-hours reactive (mVARh)">
+        <mandatoryConform/>
+      </item>
+      <item value="16" name="ApparentEnergy" summary="Apparent power in millivolt-amp-hours (mVAh)">
+        <mandatoryConform/>
+      </item>
+    </enum>
     <struct name="CumulativeEnergyResetStruct">
       <field id="0" name="ImportedResetTimestamp" type="epoch-s" default="null">
         <quality nullable="true"/>
@@ -122,7 +188,15 @@ Davis, CA 95616, USA
       <field id="2" name="EndTimestamp" type="epoch-s">
         <describedConform/>
         <constraint>
-          <min value="StartTimestamp + 1"/>
+          <min>
+            <compute>
+              <operation>add</operation>
+              <left>
+                <field name="StartTimestamp"/>
+              </left>
+              <right value="1"/>
+            </compute>
+          </min>
         </constraint>
       </field>
       <field id="3" name="StartSystime" type="systime-ms">
@@ -131,13 +205,167 @@ Davis, CA 95616, USA
       <field id="4" name="EndSystime" type="systime-ms">
         <describedConform/>
         <constraint>
-          <min value="StartSystime + 1"/>
+          <min>
+            <compute>
+              <operation>add</operation>
+              <left>
+                <field name="StartSystime"/>
+              </left>
+              <right value="1"/>
+            </compute>
+          </min>
+        </constraint>
+      </field>
+      <field id="5" name="ApparentEnergy" type="energy-mVAh">
+        <otherwiseConform>
+          <provisionalConform/>
+          <mandatoryConform>
+            <feature name="APPE"/>
+          </mandatoryConform>
+        </otherwiseConform>
+        <constraint>
+          <between>
+            <from value="0"/>
+            <to value="4611686018427387904"/>
+          </between>
+        </constraint>
+      </field>
+      <field id="6" name="ReactiveEnergy" type="energy-mVARh">
+        <otherwiseConform>
+          <provisionalConform/>
+          <mandatoryConform>
+            <feature name="REAE"/>
+          </mandatoryConform>
+        </otherwiseConform>
+        <constraint>
+          <between>
+            <from value="0"/>
+            <to value="4611686018427387904"/>
+          </between>
+        </constraint>
+      </field>
+    </struct>
+    <struct name="MeasurementAccuracyRangeStruct">
+      <field id="0" name="RangeMin" type="int64">
+        <mandatoryConform/>
+        <constraint>
+          <between>
+            <from value="-4611686018427387904"/>
+            <to value="4611686018427387904"/>
+          </between>
+        </constraint>
+      </field>
+      <field id="1" name="RangeMax" type="int64">
+        <mandatoryConform/>
+        <constraint>
+          <between>
+            <from value="-4611686018427387904"/>
+            <to value="4611686018427387904"/>
+          </between>
+        </constraint>
+      </field>
+      <field id="2" name="PercentMax" type="percent100ths">
+        <optionalConform choice="a" more="true" min="1"/>
+      </field>
+      <field id="3" name="PercentMin" type="percent100ths">
+        <optionalConform>
+          <field name="PercentMax"/>
+        </optionalConform>
+        <constraint>
+          <max>
+            <field name="PercentTypical"/>
+          </max>
+        </constraint>
+      </field>
+      <field id="4" name="PercentTypical" type="percent100ths">
+        <optionalConform>
+          <field name="PercentMin"/>
+        </optionalConform>
+        <constraint>
+          <between>
+            <from>
+              <field name="PercentMin"/>
+            </from>
+            <to>
+              <field name="PercentMax"/>
+            </to>
+          </between>
+        </constraint>
+      </field>
+      <field id="5" name="FixedMax" type="uint64">
+        <optionalConform choice="a" more="true" min="1"/>
+        <constraint>
+          <max>
+            <compute>
+              <operation>subtract</operation>
+              <left value="4611686018427387904"/>
+              <right value="1"/>
+            </compute>
+          </max>
+        </constraint>
+      </field>
+      <field id="6" name="FixedMin" type="uint64">
+        <optionalConform>
+          <field name="FixedMax"/>
+        </optionalConform>
+        <constraint>
+          <max>
+            <field name="FixedMax"/>
+          </max>
+        </constraint>
+      </field>
+      <field id="7" name="FixedTypical" type="uint64">
+        <optionalConform>
+          <field name="FixedMin"/>
+        </optionalConform>
+        <constraint>
+          <between>
+            <from>
+              <field name="FixedMin"/>
+            </from>
+            <to>
+              <field name="FixedMax"/>
+            </to>
+          </between>
+        </constraint>
+      </field>
+    </struct>
+    <struct name="MeasurementAccuracyStruct">
+      <field id="0" name="MeasurementType" type="MeasurementTypeEnum">
+        <mandatoryConform/>
+      </field>
+      <field id="1" name="Measured" type="bool">
+        <mandatoryConform/>
+      </field>
+      <field id="2" name="MinMeasuredValue" type="int64">
+        <mandatoryConform/>
+        <constraint>
+          <between>
+            <from value="-4611686018427387904"/>
+            <to value="4611686018427387904"/>
+          </between>
+        </constraint>
+      </field>
+      <field id="3" name="MaxMeasuredValue" type="int64">
+        <mandatoryConform/>
+        <constraint>
+          <between>
+            <from value="-4611686018427387904"/>
+            <to value="4611686018427387904"/>
+          </between>
+        </constraint>
+      </field>
+      <field id="4" name="AccuracyRanges" type="list">
+        <entry type="MeasurementAccuracyRangeStruct"/>
+        <mandatoryConform/>
+        <constraint>
+          <minCount value="1"/>
         </constraint>
       </field>
     </struct>
   </dataTypes>
   <attributes>
-    <attribute id="0x0000" name="Accuracy" type="">
+    <attribute id="0x0000" name="Accuracy" type="MeasurementAccuracyStruct">
       <access read="true" readPrivilege="view"/>
       <quality persistence="fixed"/>
       <mandatoryConform/>

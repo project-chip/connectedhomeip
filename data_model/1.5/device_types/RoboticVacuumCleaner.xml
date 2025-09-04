@@ -78,7 +78,7 @@ Davis, CA 95616, USA
     <cluster id="0x0061" name="RVC Operational State" side="server">
       <mandatoryConform/>
       <events>
-        <event name="OperationCompletion">
+        <event id="0x0001" name="OperationCompletion">
           <mandatoryConform/>
         </event>
       </events>

@@ -108,7 +108,7 @@ Davis, CA 95616, USA
       <quality persistence="fixed"/>
       <mandatoryConform/>
       <constraint>
-        <desc/>
+        <maxLength value="256"/>
       </constraint>
     </attribute>
     <attribute id="0x0003" name="ProductID" type="uint16">

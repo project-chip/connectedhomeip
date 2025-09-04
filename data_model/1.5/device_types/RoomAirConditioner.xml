@@ -57,10 +57,11 @@ Davis, CA 95616, USA
 
 :xrefstyle: basic
 -->
-<deviceType xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd devicetype devicetype.xsd" id="0x0072" name="Room Air Conditioner" revision="2">
+<deviceType xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd devicetype devicetype.xsd" id="0x0072" name="Room Air Conditioner" revision="3">
   <revisionHistory>
     <revision revision="1" summary="Initial revision"/>
     <revision revision="2" summary="Thermostat User Interface Configuration cluster added; Updated the Scenes cluster to Scenes Management with Cluster ID: 0x0062"/>
+    <revision revision="3" summary="Added filter monitoring clusters"/>
   </revisionHistory>
   <classification class="simple" scope="endpoint"/>
   <clusters>
@@ -73,12 +74,18 @@ Davis, CA 95616, USA
     <cluster id="0x0006" name="On/Off" side="server">
       <mandatoryConform/>
       <features>
-        <feature code="" name="DeadFrontBehavior">
+        <feature code="DF">
           <mandatoryConform/>
         </feature>
       </features>
     </cluster>
     <cluster id="0x0062" name="Scenes Management" side="server">
+      <optionalConform/>
+    </cluster>
+    <cluster id="0x0071" name="HEPA Filter Monitoring" side="server">
+      <optionalConform/>
+    </cluster>
+    <cluster id="0x0072" name="Activated Carbon Filter Monitoring" side="server">
       <optionalConform/>
     </cluster>
     <cluster id="0x0201" name="Thermostat" side="server">

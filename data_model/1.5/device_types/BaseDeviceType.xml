@@ -97,7 +97,7 @@ Davis, CA 95616, USA
     <cluster id="0x001D" name="Descriptor" side="server">
       <mandatoryConform/>
       <features>
-        <feature code="" name="TagList">
+        <feature code="TAGLIST">
           <mandatoryConform>
             <condition name="Duplicate"/>
           </mandatoryConform>

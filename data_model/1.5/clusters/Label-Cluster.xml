@@ -82,7 +82,7 @@ Davis, CA 95616, USA
     </struct>
   </dataTypes>
   <attributes>
-    <attribute id="0x0000" name="LabelList" type="list" default="empty">
+    <attribute id="0x0000" name="LabelList" type="list">
       <entry type="LabelStruct"/>
       <mandatoryConform/>
     </attribute>

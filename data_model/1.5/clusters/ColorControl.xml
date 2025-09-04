@@ -57,7 +57,7 @@ Davis, CA 95616, USA
 
 :xrefstyle: basic
 -->
-<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0300" name="Color Control Cluster" revision="7">
+<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0300" name="Color Control Cluster" revision="8">
   <revisionHistory>
     <revision revision="1" summary="Mandatory global ClusterRevision attribute added; CCB 2028"/>
     <revision revision="2" summary="Added Options attribute, CCB 2085 2104 2124 2230; ZLO 1.0"/>
@@ -66,6 +66,7 @@ Davis, CA 95616, USA
     <revision revision="5" summary="New data model format and notation, FeatureMap support"/>
     <revision revision="6" summary="Added clarifications to Scenes support for Matter"/>
     <revision revision="7" summary="Added Q quality for CurrentHue, CurrentSaturation, CurrentX, CurrentY, ColorTemperatureMireds, EnhancedCurrentHue and RemainingTime attributes. Added clarifications for behavior related to Step values. Added constraints on minimum acceptable color temperature values in mireds."/>
+    <revision revision="8" summary="Change WhitePoint* and ColorPoint* attributes from RW to R (CCB 2490, TCR 11893)"/>
   </revisionHistory>
   <clusterIds>
     <clusterId id="0x0300" name="Color Control"/>
@@ -289,11 +290,11 @@ Davis, CA 95616, USA
         <max value="65279"/>
       </constraint>
     </attribute>
-    <attribute id="0x0005" name="DriftCompensation" type="DriftCompensationEnum" default="">
+    <attribute id="0x0005" name="DriftCompensation" type="DriftCompensationEnum">
       <access read="true" readPrivilege="view"/>
       <optionalConform/>
     </attribute>
-    <attribute id="0x0006" name="CompensationText" type="string" default="">
+    <attribute id="0x0006" name="CompensationText" type="string">
       <access read="true" readPrivilege="view"/>
       <optionalConform/>
       <constraint>
@@ -601,73 +602,73 @@ Davis, CA 95616, USA
       </otherwiseConform>
     </attribute>
     <attribute id="0x0030" name="WhitePointX" type="uint16">
-      <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
+      <access read="true" readPrivilege="view"/>
       <optionalConform/>
       <constraint>
         <max value="65279"/>
       </constraint>
     </attribute>
     <attribute id="0x0031" name="WhitePointY" type="uint16">
-      <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
+      <access read="true" readPrivilege="view"/>
       <optionalConform/>
       <constraint>
         <max value="65279"/>
       </constraint>
     </attribute>
     <attribute id="0x0032" name="ColorPointRX" type="uint16">
-      <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
+      <access read="true" readPrivilege="view"/>
       <optionalConform/>
       <constraint>
         <max value="65279"/>
       </constraint>
     </attribute>
     <attribute id="0x0033" name="ColorPointRY" type="uint16">
-      <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
+      <access read="true" readPrivilege="view"/>
       <optionalConform/>
       <constraint>
         <max value="65279"/>
       </constraint>
     </attribute>
     <attribute id="0x0034" name="ColorPointRIntensity" type="uint8">
-      <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
+      <access read="true" readPrivilege="view"/>
       <quality nullable="true"/>
       <optionalConform/>
     </attribute>
     <attribute id="0x0036" name="ColorPointGX" type="uint16">
-      <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
+      <access read="true" readPrivilege="view"/>
       <optionalConform/>
       <constraint>
         <max value="65279"/>
       </constraint>
     </attribute>
     <attribute id="0x0037" name="ColorPointGY" type="uint16">
-      <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
+      <access read="true" readPrivilege="view"/>
       <optionalConform/>
       <constraint>
         <max value="65279"/>
       </constraint>
     </attribute>
     <attribute id="0x0038" name="ColorPointGIntensity" type="uint8">
-      <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
+      <access read="true" readPrivilege="view"/>
       <quality nullable="true"/>
       <optionalConform/>
     </attribute>
     <attribute id="0x003A" name="ColorPointBX" type="uint16">
-      <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
+      <access read="true" readPrivilege="view"/>
       <optionalConform/>
       <constraint>
         <max value="65279"/>
       </constraint>
     </attribute>
     <attribute id="0x003B" name="ColorPointBY" type="uint16">
-      <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
+      <access read="true" readPrivilege="view"/>
       <optionalConform/>
       <constraint>
         <max value="65279"/>
       </constraint>
     </attribute>
     <attribute id="0x003C" name="ColorPointBIntensity" type="uint8">
-      <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
+      <access read="true" readPrivilege="view"/>
       <quality nullable="true"/>
       <optionalConform/>
     </attribute>

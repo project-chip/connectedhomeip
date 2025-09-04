@@ -149,7 +149,9 @@ Davis, CA 95616, USA
         <quality nullable="true"/>
         <mandatoryConform/>
         <constraint>
-          <maxCount value="SubjectsPerAccessControlEntry"/>
+          <maxCount>
+            <attribute name="SubjectsPerAccessControlEntry" cluster="Access Control"/>
+          </maxCount>
         </constraint>
       </field>
       <field id="4" name="Targets" type="list">
@@ -157,7 +159,9 @@ Davis, CA 95616, USA
         <quality nullable="true"/>
         <mandatoryConform/>
         <constraint>
-          <maxCount value="TargetsPerAccessControlEntry"/>
+          <maxCount>
+            <attribute name="TargetsPerAccessControlEntry" cluster="Access Control"/>
+          </maxCount>
         </constraint>
       </field>
     </struct>
@@ -393,7 +397,7 @@ Davis, CA 95616, USA
       <field id="1" name="UpdateTimestamp" type="epoch-s">
         <mandatoryConform/>
       </field>
-      <field id="2" name="FailureCode" type="" default="SUCCESS">
+      <field id="2" name="FailureCode" type="status" default="SUCCESS">
         <mandatoryConform/>
       </field>
     </struct>

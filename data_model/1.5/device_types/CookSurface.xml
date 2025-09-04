@@ -67,7 +67,7 @@ Davis, CA 95616, USA
     <cluster id="0x0006" name="On/Off" side="server">
       <optionalConform/>
       <features>
-        <feature code="" name="OffOnly">
+        <feature code="OFFONLY">
           <mandatoryConform/>
         </feature>
       </features>
@@ -75,10 +75,10 @@ Davis, CA 95616, USA
     <cluster id="0x0056" name="Temperature Control" side="server">
       <optionalConform choice="a" more="true" min="1"/>
       <features>
-        <feature code="" name="TemperatureLevel">
+        <feature code="TL">
           <mandatoryConform/>
         </feature>
-        <feature code="" name="TemperatureNumber">
+        <feature code="TN">
           <disallowConform/>
         </feature>
       </features>

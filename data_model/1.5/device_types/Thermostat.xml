@@ -80,23 +80,10 @@ Davis, CA 95616, USA
     <cluster id="0x0201" name="Thermostat" side="server">
       <mandatoryConform/>
       <features>
-        <feature code="" name="ScheduleConfiguration">
+        <feature code="SCH">
           <disallowConform/>
         </feature>
       </features>
-      <attributes>
-        <attribute code="" name="AlarmMask">
-          <disallowConform/>
-        </attribute>
-      </attributes>
-      <commands>
-        <command id="0x0004" name="GetRelayStatusLog">
-          <disallowConform/>
-        </command>
-        <command id="0x0001" name="GetRelayStatusLogResponse">
-          <disallowConform/>
-        </command>
-      </commands>
     </cluster>
     <cluster id="0x0202" name="Fan Control" side="client">
       <optionalConform/>

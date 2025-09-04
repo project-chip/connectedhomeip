@@ -114,7 +114,7 @@ Davis, CA 95616, USA
       <item value="0x4A" name="DirtyWaterTankFull" summary="The device has detected that its dirty water tank is full">
         <mandatoryConform/>
       </item>
-      <item value="0x4B" name="DirtyWaterTankMissing" summary="The device has detected that its dirty water is missing">
+      <item value="0x4B" name="DirtyWaterTankMissing" summary="The device has detected that its dirty water tank is missing">
         <mandatoryConform/>
       </item>
       <item value="0x4C" name="WheelsJammed" summary="The device has detected that one or more wheels are jammed by an object">

@@ -89,10 +89,10 @@ Davis, CA 95616, USA
     <cluster id="0x0202" name="Fan Control" side="server">
       <optionalConform/>
       <features>
-        <feature code="" name="Wind">
+        <feature code="WND">
           <disallowConform/>
         </feature>
-        <feature code="" name="AirflowDirection">
+        <feature code="DIR">
           <disallowConform/>
         </feature>
       </features>

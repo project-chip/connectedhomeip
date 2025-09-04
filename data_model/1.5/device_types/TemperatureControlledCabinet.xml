@@ -84,7 +84,7 @@ Davis, CA 95616, USA
         </command>
       </commands>
       <events>
-        <event name="OperationCompletion">
+        <event id="0x0001" name="OperationCompletion">
           <mandatoryConform/>
         </event>
       </events>
@@ -94,7 +94,7 @@ Davis, CA 95616, USA
         <condition name="Heater"/>
       </optionalConform>
       <features>
-        <feature code="" name="OnOff">
+        <feature code="DEPONOFF">
           <disallowConform/>
         </feature>
       </features>
@@ -109,7 +109,7 @@ Davis, CA 95616, USA
         <condition name="Cooler"/>
       </optionalConform>
       <features>
-        <feature code="" name="OnOff">
+        <feature code="DEPONOFF">
           <disallowConform/>
         </feature>
       </features>
@@ -122,10 +122,10 @@ Davis, CA 95616, USA
     <cluster id="0x0056" name="Temperature Control" side="server">
       <mandatoryConform/>
       <features>
-        <feature code="" name="TemperatureNumber">
+        <feature code="TN">
           <mandatoryConform/>
         </feature>
-        <feature code="" name="TemperatureLevel">
+        <feature code="TL">
           <disallowConform/>
         </feature>
       </features>

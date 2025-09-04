@@ -70,7 +70,7 @@ Davis, CA 95616, USA
     <cluster id="0x0006" name="On/Off" side="server">
       <optionalConform/>
       <features>
-        <feature code="" name="DeadFrontBehavior">
+        <feature code="DF">
           <mandatoryConform/>
         </feature>
       </features>
@@ -81,7 +81,7 @@ Davis, CA 95616, USA
     <cluster id="0x0059" name="Dishwasher Mode" side="server">
       <optionalConform/>
       <features>
-        <feature code="" name="OnOff">
+        <feature code="DEPONOFF">
           <disallowConform/>
         </feature>
       </features>

@@ -102,7 +102,15 @@ Davis, CA 95616, USA
       <mandatoryConform/>
       <constraint>
         <between>
-          <from value="MinMeasuredValue + 1"/>
+          <from>
+            <compute>
+              <operation>add</operation>
+              <left>
+                <attribute name="MinMeasuredValue"/>
+              </left>
+              <right value="1"/>
+            </compute>
+          </from>
           <to value="32767"/>
         </between>
       </constraint>
@@ -149,7 +157,15 @@ Davis, CA 95616, USA
       </mandatoryConform>
       <constraint>
         <between>
-          <from value="MinScaledValue + 1"/>
+          <from>
+            <compute>
+              <operation>add</operation>
+              <left>
+                <attribute name="MinScaledValue"/>
+              </left>
+              <right value="1"/>
+            </compute>
+          </from>
           <to value="32767"/>
         </between>
       </constraint>

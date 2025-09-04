@@ -80,7 +80,7 @@ Davis, CA 95616, USA
     <cluster id="0x0006" name="On/Off" side="server">
       <mandatoryConform/>
       <features>
-        <feature code="" name="Lighting">
+        <feature code="LT">
           <mandatoryConform/>
         </feature>
       </features>
@@ -88,10 +88,10 @@ Davis, CA 95616, USA
     <cluster id="0x0008" name="Level Control" side="server">
       <mandatoryConform/>
       <features>
-        <feature code="" name="OnOff">
+        <feature code="OO">
           <mandatoryConform/>
         </feature>
-        <feature code="" name="Lighting">
+        <feature code="LT">
           <mandatoryConform/>
         </feature>
       </features>
@@ -127,19 +127,19 @@ Davis, CA 95616, USA
     <cluster id="0x0300" name="Color Control" side="server">
       <mandatoryConform/>
       <features>
-        <feature code="" name="HueSaturation">
+        <feature code="HS">
           <optionalConform/>
         </feature>
-        <feature code="" name="EnhancedHue">
+        <feature code="EHUE">
           <optionalConform/>
         </feature>
-        <feature code="" name="ColorLoop">
+        <feature code="CL">
           <optionalConform/>
         </feature>
-        <feature code="XY" name="XY">
+        <feature code="XY">
           <mandatoryConform/>
         </feature>
-        <feature code="" name="ColorTemperature">
+        <feature code="CT">
           <mandatoryConform/>
         </feature>
       </features>

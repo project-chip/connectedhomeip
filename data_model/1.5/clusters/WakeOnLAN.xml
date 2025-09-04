@@ -81,6 +81,9 @@ Davis, CA 95616, USA
       <constraint>
         <desc/>
       </constraint>
+      <constraint>
+        <allowed value="16"/>
+      </constraint>
     </attribute>
   </attributes>
 </cluster>

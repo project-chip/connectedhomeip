@@ -73,7 +73,7 @@ Davis, CA 95616, USA
       <quality singleton="true"/>
       <mandatoryConform/>
       <features>
-        <feature code="MNGD" name="MNGD">
+        <feature code="MNGD">
           <optionalConform>
             <condition name="ManagedAclAllowed"/>
           </optionalConform>
@@ -172,7 +172,7 @@ Davis, CA 95616, USA
         </orTerm>
       </mandatoryConform>
       <features>
-        <feature code="" name="LongIdleTimeSupport">
+        <feature code="LITS">
           <mandatoryConform>
             <condition name="LIT"/>
           </mandatoryConform>

@@ -78,7 +78,7 @@ Davis, CA 95616, USA
     <cluster id="0x0006" name="On/Off" side="server">
       <mandatoryConform/>
       <features>
-        <feature code="" name="Lighting">
+        <feature code="LT">
           <mandatoryConform/>
         </feature>
       </features>
@@ -86,10 +86,10 @@ Davis, CA 95616, USA
     <cluster id="0x0008" name="Level Control" side="server">
       <optionalConform/>
       <features>
-        <feature code="" name="OnOff">
+        <feature code="OO">
           <mandatoryConform/>
         </feature>
-        <feature code="" name="Lighting">
+        <feature code="LT">
           <mandatoryConform/>
         </feature>
       </features>

@@ -108,7 +108,7 @@ Davis, CA 95616, USA
         <condition name="ContentAppPlatform"/>
       </mandatoryConform>
       <features>
-        <feature code="" name="ApplicationPlatform">
+        <feature code="AP">
           <mandatoryConform/>
         </feature>
       </features>
