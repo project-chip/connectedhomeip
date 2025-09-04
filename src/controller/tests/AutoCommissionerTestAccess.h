@@ -48,8 +48,8 @@ public:
     void SetBreadcrumb(uint64_t value) { mCommissioner->mDeviceCommissioningInfo.general.breadcrumb = value; }
     void SetUTCRequirements(bool requiresUTC) { mCommissioner->mDeviceCommissioningInfo.requiresUTC = requiresUTC; }
 
-    CHIP_ERROR CallNOCChainGenerated(ByteSpan noc, ByteSpan icac, ByteSpan rcac, Crypto::IdentityProtectionKeySpan ipk,
-                                     NodeId adminSubject)
+    CHIP_ERROR NOCChainGenerated(ByteSpan noc, ByteSpan icac, ByteSpan rcac, Crypto::IdentityProtectionKeySpan ipk,
+                                 NodeId adminSubject)
     {
         return mCommissioner->NOCChainGenerated(noc, icac, rcac, ipk, adminSubject);
     }
