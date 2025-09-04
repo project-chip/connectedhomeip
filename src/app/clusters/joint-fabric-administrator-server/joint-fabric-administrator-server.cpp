@@ -32,6 +32,7 @@
 #include <app/reporting/reporting.h>
 #include <app/server/Server.h>
 #include <app/util/attribute-storage.h>
+#include <controller/jcm/JCMCommissionee.h>
 #include <credentials/CHIPCert.h>
 #include <credentials/CertificationDeclaration.h>
 #include <credentials/DeviceAttestationConstructor.h>
@@ -84,6 +85,8 @@ private:
     void HandleAddICAC(HandlerContext & ctx, const Commands::AddICAC::DecodableType & commandData);
     void HandleTransferAnchorRequest(HandlerContext & ctx, const Commands::TransferAnchorRequest::DecodableType & commandData);
     void HandleTransferAnchorComplete(HandlerContext & ctx, const Commands::TransferAnchorComplete::DecodableType & commandData);
+
+    static void OnTrustVerificationCompletion(CHIP_ERROR err);
 };
 
 JointFabricAdministratorGlobalInstance gJointFabricAdministratorGlobalInstance;
@@ -211,12 +214,20 @@ void JointFabricAdministratorGlobalInstance::HandleAnnounceJointFabricAdministra
                     commandData.endpointID);
 
     auto nonDefaultStatus = Status::Success;
+    chip::Controller::JCM::JCMCommissionee jcmCommissionee;
+
     VerifyOrExit(commandData.endpointID != kInvalidEndpointId, nonDefaultStatus = Status::ConstraintError);
 
-    Server::GetInstance().GetJointFabricAdministrator().SetPeerJFAdminClusterEndpointId(commandData.endpointID);
+    // Server::GetInstance().GetJointFabricAdministrator().SetPeerJFAdminClusterEndpointId(commandData.endpointID);
 
-    /* TODO: execute Fabric Table Vendor ID Verification */
+    // FabricIndex fabricIndex       = ctx.mCommandHandler.GetAccessingFabricIndex();
+    // const FabricInfo * fabricInfo = Server::GetInstance().GetFabricTable().FindFabricWithIndex(fabricIndex);
 
+    // auto onCompleteTrustVerification = []
+    // VerifyOrExit(jcmCommissionee.StartJCMTrustVerification(ctx, commandData.endpointID) == CHIP_NO_ERROR,
+    //              nonDefaultStatus = Status::Failure);
+
+    // TODO: Get rid of exit since we need to make an async handle
 exit:
     ctx.mCommandHandler.AddStatus(ctx.mRequestPath, nonDefaultStatus);
 }
