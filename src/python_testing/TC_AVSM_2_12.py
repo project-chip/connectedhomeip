@@ -263,7 +263,7 @@ class TC_AVSM_2_12(MatterBaseTest):
                 logger.info(f"Rx'd NightVisionIllum: {nightVisionIllum}")
 
                 self.step(15)
-                nightVisionIllumToWrite = (nightVision + 1) % 3
+                nightVisionIllumToWrite = (nightVisionIllum + 1) % 3
                 result = await self.write_single_attribute(attr.NightVisionIllum(nightVisionIllumToWrite),
                                                            endpoint_id=endpoint)
                 asserts.assert_equal(result, Status.Success, "Error when trying to write NightVisionIllum")
@@ -531,7 +531,7 @@ class TC_AVSM_2_12(MatterBaseTest):
                 imageFlipVerticalNew = await self.read_single_attribute_check_success(
                     endpoint=endpoint, cluster=cluster, attribute=attr.ImageFlipVertical)
                 logger.info(f"Rx'd ImageFlipVertical: {imageFlipVerticalNew}")
-                asserts.assert_equal(imageFlipVerticalNew, not imageFlipVertical, "Value does not match what was written for ImageFlipvertical in step 42")
+                asserts.assert_equal(imageFlipVerticalNew, not imageFlipVertical, "Value does not match what was written for ImageFlipVertical in step 42")
             else:
                 self.skip_step(41)
                 self.skip_step(42)
