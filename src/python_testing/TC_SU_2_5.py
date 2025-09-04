@@ -141,9 +141,9 @@ class TC_SU_2_5(MatterBaseTest):
         if before >= 0 and after >= 0:
             delta = after - before
             # In this scenario we expect 1 ApplyUpdateRequest (the normal flow)
-            assert delta == 1, f"Se esperaban 1 ApplyUpdateRequest; encontrados {delta} (before={before}, after={after})"
+            assert delta == 1, f"Expected 1 ApplyUpdateRequest; found {delta} (before={before}, after={after})"
         else:
-            logging.warning("No se pudo validar ApplyUpdateRequest (log del provider no disponible).")
+            logging.warning("Couldn't verify ApplyUpdateRequest (provider log not available).")
 
         # ===== Steps 2–5: without changes (placeholders) =====
 
