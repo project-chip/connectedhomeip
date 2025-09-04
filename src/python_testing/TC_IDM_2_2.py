@@ -128,7 +128,7 @@ class TC_IDM_2_2(MatterBaseTest, BasicCompositionTests):
         """Verify the response from a read request.
 
         Args:
-            read_request: The read request response to verify
+            read_response: The read response to verify
             attribute_path: The original attribute path that was read
 
         Raises:
@@ -136,32 +136,32 @@ class TC_IDM_2_2(MatterBaseTest, BasicCompositionTests):
         """
         if not attribute_path or not attribute_path[0]:
             # Empty path - verify all endpoints and clusters
-            self.verify_all_endpoints_clusters(read_request)
+            self.verify_all_endpoints_clusters(read_response)
             return
 
         if isinstance(attribute_path[0], tuple):
-            self.verify_specific_path(read_request, attribute_path[0])
+            self.verify_specific_path(read_response, attribute_path[0])
         elif isinstance(attribute_path[0], type):
-            self.verify_cluster_path(read_request, attribute_path[0])
+            self.verify_cluster_path(read_response, attribute_path[0])
         elif isinstance(attribute_path[0], AttributePath):
-            self.verify_attribute_path(read_request, attribute_path[0])
+            self.verify_attribute_path(read_response, attribute_path[0])
 
-    def verify_all_endpoints_clusters(self, read_request: dict):
+    def verify_all_endpoints_clusters(self, read_response: dict):
         """Verify read response for all endpoints and clusters.
 
         Args:
-            read_request: The read request response to verify
+            read_response: The read response to verify
 
         Raises:
             AssertionError if verification fails
         """
-        for endpoint in read_request.tlvAttributes:
+        for endpoint in read_response.tlvAttributes:
             # Assert PartsList is always present
             asserts.assert_in(
                 Clusters.Descriptor.Attributes.PartsList.attribute_id,
-                read_request.tlvAttributes[endpoint][Clusters.Descriptor.id],
+                read_response.tlvAttributes[endpoint][Clusters.Descriptor.id],
                 "PartsList attribute should always be present")
-            parts_list = read_request.tlvAttributes[endpoint][Clusters.Descriptor.id][
+            parts_list = read_response.tlvAttributes[endpoint][Clusters.Descriptor.id][
                 Clusters.Descriptor.Attributes.PartsList.attribute_id]
             if Clusters.Descriptor.Attributes.PartsList in self.endpoints[endpoint][Clusters.Descriptor]:
                 asserts.assert_equal(parts_list, self.endpoints[endpoint][Clusters.Descriptor][
@@ -169,27 +169,27 @@ class TC_IDM_2_2(MatterBaseTest, BasicCompositionTests):
                     "Parts list is not the expected value")
 
             # Server list matches returned clusters
-            returned_clusters = sorted(list(read_request.tlvAttributes[endpoint].keys()))
-            server_list = sorted(read_request.tlvAttributes[endpoint][Clusters.Descriptor.id][
+            returned_clusters = sorted(list(read_response.tlvAttributes[endpoint].keys()))
+            server_list = sorted(read_response.tlvAttributes[endpoint][Clusters.Descriptor.id][
                 Clusters.Descriptor.Attributes.ServerList.attribute_id])
             asserts.assert_equal(returned_clusters, server_list,
                                  f"Cluster list and server list do not match for endpoint {endpoint}")
 
             # Attribute lists
-            for cluster in read_request.tlvAttributes[endpoint]:
-                returned_attrs = sorted([x for x in read_request.tlvAttributes[endpoint][cluster].keys()
+            for cluster in read_response.tlvAttributes[endpoint]:
+                returned_attrs = sorted([x for x in read_response.tlvAttributes[endpoint][cluster].keys()
                                          if x != Clusters.UnitTesting.Attributes.WriteOnlyInt8u.attribute_id])
-                attr_list = sorted([x for x in read_request.tlvAttributes[endpoint][cluster][
+                attr_list = sorted([x for x in read_response.tlvAttributes[endpoint][cluster][
                     ClusterObjects.ALL_CLUSTERS[cluster].Attributes.AttributeList.attribute_id]
                     if x != Clusters.UnitTesting.Attributes.WriteOnlyInt8u.attribute_id])
                 asserts.assert_equal(returned_attrs, attr_list,
                                      f"Mismatch for {cluster} at endpoint {endpoint}")
 
-    def verify_specific_path(self, read_request: dict, path: tuple):
+    def verify_specific_path(self, read_response: dict, path: tuple):
         """Verify read response for a specific path.
 
         Args:
-            read_request: The read request response to verify
+            read_response: The read response to verify
             path: The specific path that was read (endpoint, cluster, attribute) or (endpoint, cluster)
 
         Raises:
@@ -205,14 +205,14 @@ class TC_IDM_2_2(MatterBaseTest, BasicCompositionTests):
 
         # Handle case where endpoint is None (read from all endpoints)
         if endpoint is None:
-            for ep in read_request.tlvAttributes:
-                self._verify_single_endpoint_path(read_request, ep, attribute)
+            for ep in read_response.tlvAttributes:
+                self._verify_single_endpoint_path(read_response, ep, attribute)
         else:
-            self._verify_single_endpoint_path(read_request, endpoint, attribute)
+            self._verify_single_endpoint_path(read_response, endpoint, attribute)
 
     def _verify_single_endpoint_path(
         self,
-        read_request: dict,
+        read_response: dict,
         endpoint: int,
         attribute: Clusters.ClusterObjects.ClusterAttributeDescriptor
     ) -> None:
@@ -222,42 +222,42 @@ class TC_IDM_2_2(MatterBaseTest, BasicCompositionTests):
         against the actual clusters returned, regardless of what was originally read.
 
         Args:
-            read_request: The read request response to verify
+            read_response: The read response to verify
             endpoint: The endpoint to verify
             attribute: The specific attribute (if any)
         Raises:
             AssertionError if verification fails
         """
         # Use Descriptor cluster's ServerList to validate the endpoint data
-        server_list = read_request.tlvAttributes[endpoint][Clusters.Descriptor.id][
+        server_list = read_response.tlvAttributes[endpoint][Clusters.Descriptor.id][
             Clusters.Descriptor.Attributes.ServerList.attribute_id]
         asserts.assert_equal(sorted(server_list), sorted([x.id for x in self.endpoints[endpoint]]))
 
-    def verify_cluster_path(self, read_request: dict, cluster: ClusterObjects.Cluster):
+    def verify_cluster_path(self, read_response: dict, cluster: ClusterObjects.Cluster):
         """Verify read response for a cluster path.
 
         Args:
-            read_request: The read request response to verify
+            read_response: The read response to verify
             cluster: The cluster that was read
 
         Raises:
             AssertionError if verification fails
         """
-        for endpoint in read_request.tlvAttributes:
-            cluster_ids = list(read_request.tlvAttributes[endpoint].keys())
+        for endpoint in read_response.tlvAttributes:
+            cluster_ids = list(read_response.tlvAttributes[endpoint].keys())
             asserts.assert_in(cluster.id, cluster_ids)
 
-            returned_attributes = read_request.tlvAttributes[endpoint][cluster.id][
+            returned_attributes = read_response.tlvAttributes[endpoint][cluster.id][
                 cluster.Attributes.AttributeList.attribute_id]
             asserts.assert_equal(sorted(returned_attributes),
-                                 sorted(read_request.tlvAttributes[endpoint][cluster.id].keys()),
+                                 sorted(read_response.tlvAttributes[endpoint][cluster.id].keys()),
                                  "Expected attribute list doesn't match")
 
-    def verify_attribute_path(self, read_request: dict, path: AttributePath):
+    def verify_attribute_path(self, read_response: dict, path: AttributePath):
         """Verify read response for an attribute path.
 
         Args:
-            read_request: The read request response to verify
+            read_response: The read response to verify
             path: The attribute path that was read
 
         Raises:
@@ -268,10 +268,10 @@ class TC_IDM_2_2(MatterBaseTest, BasicCompositionTests):
 
         for endpoint in endpoint_list:
             asserts.assert_in(Clusters.Descriptor.id,
-                              read_request.tlvAttributes[endpoint].keys(),
+                              read_response.tlvAttributes[endpoint].keys(),
                               "Descriptor cluster not in output")
             asserts.assert_in(Clusters.Descriptor.Attributes.AttributeList.attribute_id,
-                              read_request.tlvAttributes[endpoint][Clusters.Descriptor.id],
+                              read_response.tlvAttributes[endpoint][Clusters.Descriptor.id],
                               "AttributeList not in output")
 
     async def _read_single_attribute(self, endpoint, cluster, attribute):
