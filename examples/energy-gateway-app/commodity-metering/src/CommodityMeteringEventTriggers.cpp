@@ -71,14 +71,18 @@ private:
     DataModel::Nullable<Globals::TariffUnitEnum> mTariffUnit;
     DataModel::Nullable<uint16_t> mMaximumMeteredQuantities;
 
-    std::pair<std::array<const Structs::MeteredQuantityStruct::Type, MAX_MQ_SAMPLES>, size_t> GetMeteredQuantityDataSample(uint8_t presetIdx)
+    std::pair<std::array<const Structs::MeteredQuantityStruct::Type, MAX_MQ_SAMPLES>, size_t>
+    GetMeteredQuantityDataSample(uint8_t presetIdx)
     {
         switch (presetIdx)
         {
         case 0:
-            return {{ MeteredQuantitySamples::Sample1::Data[0], MeteredQuantitySamples::Sample1::Data[1] }, MATTER_ARRAY_SIZE(MeteredQuantitySamples::Sample1::Data)};
+            return { { MeteredQuantitySamples::Sample1::Data[0], MeteredQuantitySamples::Sample1::Data[1] },
+                     MATTER_ARRAY_SIZE(MeteredQuantitySamples::Sample1::Data) };
         case 1:
-            return {{ MeteredQuantitySamples::Sample2::Data[0], MeteredQuantitySamples::Sample2::Data[1], MeteredQuantitySamples::Sample2::Data[2] }, MATTER_ARRAY_SIZE(MeteredQuantitySamples::Sample2::Data)};
+            return { { MeteredQuantitySamples::Sample2::Data[0], MeteredQuantitySamples::Sample2::Data[1],
+                       MeteredQuantitySamples::Sample2::Data[2] },
+                     MATTER_ARRAY_SIZE(MeteredQuantitySamples::Sample2::Data) };
         default:
             return {}; // Return empty array
         }
