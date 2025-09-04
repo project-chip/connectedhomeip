@@ -191,7 +191,7 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
         SuccessOrExit(err);
     }
 
-    SuccessOrExit(err = mAccessControl.Init(initParams.accessDelegate, sDeviceTypeResolver));
+    SuccessOrExit(err = mAccessControl.Init(initParams.accessDelegate, initParams.groupcastAccessDelegate, sDeviceTypeResolver));
     Access::SetAccessControl(mAccessControl);
 
 #if CHIP_CONFIG_USE_ACCESS_RESTRICTIONS

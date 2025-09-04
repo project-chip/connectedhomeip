@@ -431,7 +431,7 @@ public:
      * @return CHIP_NO_ERROR on success, CHIP_ERROR_INCORRECT_STATE if called more than once,
      *         CHIP_ERROR_INVALID_ARGUMENT if delegate is null, or other fatal error.
      */
-    CHIP_ERROR Init(AccessControl::Delegate * delegate, DeviceTypeResolver & deviceTypeResolver);
+    CHIP_ERROR Init(AccessControl::Delegate * delegate, AccessControl::Delegate * groupcast, DeviceTypeResolver & deviceTypeResolver);
 
     /**
      * Deinitialize the access control module. Must be called when finished.
@@ -694,6 +694,7 @@ private:
 
 private:
     Delegate * mDelegate = nullptr;
+    Delegate * mGroupcastDelegate = nullptr;
 
     DeviceTypeResolver * mDeviceTypeResolver = nullptr;
 

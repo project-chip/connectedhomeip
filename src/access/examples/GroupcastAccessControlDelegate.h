@@ -1,6 +1,6 @@
-/**
+/*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2021 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -14,9 +14,27 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-
 #pragma once
 
+#include <access/AccessControl.h>
+#include <lib/core/CHIPPersistentStorageDelegate.h>
+
 namespace chip {
-namespace Multicast {} // namespace Multicast
+namespace Access {
+namespace Groupcast {
+
+/**
+ * @brief Get a global instance of the access control delegate implemented in this module.
+ *
+ * NOTE: This function should be followed by an ::Init() method call. This function does
+ *       not manage lifecycle considerations.
+ *
+ * @return a pointer to the AccessControl::Delegate singleton.
+ */
+
+AccessControl::Delegate * GetAccessControlDelegate(PersistentStorageDelegate *storage = nullptr);
+
+
+} // namespace Groupcast
+} // namespace Access
 } // namespace chip

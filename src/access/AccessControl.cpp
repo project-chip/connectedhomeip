@@ -24,6 +24,7 @@
 #include "AccessControl.h"
 
 #include <lib/core/Global.h>
+#include <access/examples/ExtendedAccessControlDelegate.h>
 
 namespace chip {
 namespace Access {
@@ -197,21 +198,19 @@ char GetRequestTypeStringForLogging(RequestType requestType)
 Global<AccessControl::Entry::Delegate> AccessControl::Entry::mDefaultDelegate;
 Global<AccessControl::EntryIterator::Delegate> AccessControl::EntryIterator::mDefaultDelegate;
 
-CHIP_ERROR AccessControl::Init(AccessControl::Delegate * delegate, DeviceTypeResolver & deviceTypeResolver)
+CHIP_ERROR AccessControl::Init(AccessControl::Delegate * delegate, AccessControl::Delegate * groupcast, DeviceTypeResolver & deviceTypeResolver)
 {
     VerifyOrReturnError(!IsInitialized(), CHIP_ERROR_INCORRECT_STATE);
-
     ChipLogProgress(DataManagement, "AccessControl: initializing");
+    VerifyOrReturnError(nullptr != delegate, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(nullptr != groupcast, CHIP_ERROR_INVALID_ARGUMENT);
 
-    VerifyOrReturnError(delegate != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-    CHIP_ERROR retval = delegate->Init();
-    if (retval == CHIP_NO_ERROR)
-    {
-        mDelegate           = delegate;
-        mDeviceTypeResolver = &deviceTypeResolver;
-    }
+    mDelegate = new ExtendedAccessControlDelegate(delegate, groupcast);
+    VerifyOrReturnError(nullptr != mDelegate, CHIP_ERROR_NO_MEMORY);
+    ReturnErrorOnFailure(mDelegate->Init());
 
-    return retval;
+    mDeviceTypeResolver = &deviceTypeResolver;
+    return CHIP_NO_ERROR;
 }
 
 void AccessControl::Finish()
@@ -219,6 +218,7 @@ void AccessControl::Finish()
     VerifyOrReturn(IsInitialized());
     ChipLogProgress(DataManagement, "AccessControl: finishing");
     mDelegate->Finish();
+    delete mDelegate;
     mDelegate = nullptr;
 }
 

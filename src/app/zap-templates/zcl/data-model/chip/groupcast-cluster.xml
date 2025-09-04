@@ -21,7 +21,7 @@ limitations under the License.
     <cluster code="0x0064"/>
     <item fieldId="0" name="GroupId" type="group_id"/>
     <item fieldId="1" name="Endpoints" type="endpoint_no" array="true"/>
-    <item fieldId="2" name="KeyHash" type="int32u"/>
+    <item fieldId="2" name="KeyId" type="int32u"/>
   </struct>
 
   <cluster>
@@ -53,42 +53,47 @@ limitations under the License.
     <command source="client" code="0x00" name="JoinGroup" isFabricScoped="true" optional="false" cli="zcl Groupcast JoinGroup">
       <description>Instructs the server to join a multicast group.</description>
       <arg name="GroupId" type="group_id"/>
-      <arg name="Endpoints" type="endpoint_no" array="true"/>
+      <arg name="Endpoints" type="endpoint_no" array="true" minLength="1"/>
       <arg name="Key" type="octet_string" length="16"/>
+      <arg name="KeyId" type="int32u"/>
       <arg name="GracePeriod" type="epoch_s"/>
       <access op="invoke" privilege="administer"/>
-      <mandatoryConform/>
-    </command>
-
-    <command source="server" code="0x81" name="JoinGroupResponse" optional="false" disableDefaultResponse="true">
-      <description>Response to JoinGroup</description>
-      <arg name="Address" type="octet_string" length="16"/>
       <mandatoryConform/>
     </command>
 
     <command source="client" code="0x01" name="LeaveGroup" isFabricScoped="true" optional="false" cli="zcl Groupcast LeaveGroup">
       <description>Request that the server withdraws specific endpoints from a specific group.</description>
       <arg name="GroupId" type="group_id"/>
-      <arg name="Endpoints" type="endpoint_no" array="true"/>
+      <arg name="Endpoints" type="endpoint_no" array="true" minLength="1" />
       <access op="invoke" privilege="administer"/>
       <mandatoryConform/>
     </command>
 
-    <command source="client" code="0x02" name="LeaveAllGroups" isFabricScoped="true" optional="false" cli="zcl Groupcast LeaveAllGroups">
-      <description>Requests that the server withdraws itself from all groups of this client’s fabric.</description>
+    <command source="server" code="0x02" name="LeaveGroupResponse" optional="false" disableDefaultResponse="true">
+      <description>Response to JoinGroup</description>
+      <arg name="GroupId" type="group_id"/>
       <arg name="Endpoints" type="endpoint_no" array="true"/>
-      <access op="invoke" privilege="administer"/>
+      <arg name="ListTooLarge" type="bool" default="false"/>
       <mandatoryConform/>
     </command>
 
     <command source="client" code="0x03" name="UpdateGroupKey" isFabricScoped="true" optional="false" cli="zcl Groupcast UpdateGroupKey">
-      <description>Allows a fabric maintainer to update the operational key for an existing group.</description>
+      <description>Update the group operational key for an existing group ID that the server is a member of.</description>
       <arg name="GroupId" type="group_id"/>
       <arg name="Key" type="octet_string" length="16"/>
+      <arg name="KeyId" type="int32u"/>
       <arg name="GracePeriod" type="epoch_s"/>
       <access op="invoke" privilege="administer"/>
       <mandatoryConform/>
     </command>
+
+    <command source="client" code="0x04" name="ExpireGracePeriod" isFabricScoped="true" optional="false" cli="zcl Groupcast ExpireGracePeriod">
+      <description>Allows a fabric maintainer to update the operational key for an existing group.</description>
+      <arg name="GroupId" type="group_id"/>
+      <access op="invoke" privilege="administer"/>
+      <mandatoryConform/>
+    </command>
+
   </cluster>
 
 </configurator>

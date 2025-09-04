@@ -22,6 +22,7 @@
 
 #include <access/AccessControl.h>
 #include <access/examples/ExampleAccessControlDelegate.h>
+#include <access/examples/GroupcastAccessControlDelegate.h>
 #include <app/CASEClientPool.h>
 #include <app/CASESessionManager.h>
 #include <app/DefaultSafeAttributePersistenceProvider.h>
@@ -175,6 +176,7 @@ struct ServerInitParams
     // Access control delegate: MUST be injected. Used to look up access control rules. Must be
     // initialized before being provided.
     Access::AccessControl::Delegate * accessDelegate = nullptr;
+    Access::AccessControl::Delegate * groupcastAccessDelegate = nullptr;
     // ACL storage: MUST be injected. Used to store ACL entries in persistent storage. Must NOT
     // be initialized before being provided.
     app::AclStorage * aclStorage = nullptr;
@@ -311,6 +313,7 @@ struct CommonCaseDeviceServerInitParams : public ServerInitParams
 
         // Inject access control delegate
         this->accessDelegate = Access::Examples::GetAccessControlDelegate();
+        this->groupcastAccessDelegate = Access::Groupcast::GetAccessControlDelegate(this->persistentStorageDelegate);
 
         // Inject ACL storage. (Don't initialize it.)
         this->aclStorage = &sAclStorage;

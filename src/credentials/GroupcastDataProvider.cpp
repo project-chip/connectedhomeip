@@ -126,7 +126,9 @@ CHIP_ERROR GroupEntry::GetActiveKey(GroupKey & key)
 // GroupList
 //
 
-struct GroupList : public PersistentArray<CHIP_CONFIG_MAX_FABRICS, kPersistentBufferMax, GroupEntry>
+static constexpr size_t kMaxMembershipCount = CHIP_CONFIG_MAX_FABRICS; // TODO
+
+struct GroupList : public PersistentArray<kMaxMembershipCount, kPersistentBufferMax, GroupEntry>
 {
     GroupList(FabricIndex fabric, PersistentStorageDelegate * storage) :
         PersistentArray<CHIP_CONFIG_MAX_FABRICS, kPersistentBufferMax, GroupEntry>(storage), mFabric(fabric)
@@ -392,7 +394,7 @@ CHIP_ERROR DataProvider::Initialize(PersistentStorageDelegate * storage, chip::C
 
 uint8_t DataProvider::GetMaxMembershipCount()
 {
-    return 0; //TODO
+    return kMaxMembershipCount;
 }
 
 CHIP_ERROR DataProvider::JoinGroup(chip::FabricIndex fabric_idx,

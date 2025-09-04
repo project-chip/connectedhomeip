@@ -172,6 +172,7 @@ public:
     }
 
     static StorageKeyName GroupcastMembership(chip::FabricIndex fabric) { return StorageKeyName::Formatted("f/%x/gc", fabric); }
+    static StorageKeyName GroupcastAccess(chip::FabricIndex fabric) { return StorageKeyName::Formatted("f/%x/ga", fabric); }
 
     static StorageKeyName AttributeValue(EndpointId endpointId, ClusterId clusterId, AttributeId attributeId)
     {
