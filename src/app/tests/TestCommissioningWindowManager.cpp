@@ -409,19 +409,24 @@ TEST_F(TestCommissioningWindowManager, TestCheckCommissioningWindowManagerEnhanc
     chip::DeviceLayer::PlatformMgr().RunEventLoop();
 }
 
+chip::DeviceLayer::ChipDeviceEvent CreateEvent(uint16_t eventType)
+{
+    chip::DeviceLayer::ChipDeviceEvent event;
+    event.Type = eventType;
+    return event;
+}
+
 // Verify that the commissioning window is closed when commissioning has completed
 TEST_F(TestCommissioningWindowManager, TestOnPlatformEventCommissioningComplete)
 {
     CommissioningWindowManager & commissionMgr = Server::GetInstance().GetCommissioningWindowManager();
-    chip::Test::CommissioningWindowManagerTestAccess access(&commissionMgr);
 
     EXPECT_EQ(commissionMgr.OpenBasicCommissioningWindow(commissionMgr.MaxCommissioningTimeout(),
                                                          CommissioningWindowAdvertisement::kDnssdOnly),
               CHIP_NO_ERROR);
     EXPECT_TRUE(commissionMgr.IsCommissioningWindowOpen());
 
-    chip::DeviceLayer::ChipDeviceEvent event;
-    event.Type = chip::DeviceLayer::DeviceEventType::kCommissioningComplete;
+    auto event = CreateEvent(chip::DeviceLayer::DeviceEventType::kCommissioningComplete);
 
     commissionMgr.OnPlatformEvent(&event);
     EXPECT_FALSE(commissionMgr.IsCommissioningWindowOpen());
@@ -441,8 +446,7 @@ TEST_F(TestCommissioningWindowManager, TestOnPlatformEventFailSafeTimerExpired)
                                                          CommissioningWindowAdvertisement::kDnssdOnly),
               CHIP_NO_ERROR);
 
-    chip::DeviceLayer::ChipDeviceEvent event;
-    event.Type = chip::DeviceLayer::DeviceEventType::kFailSafeTimerExpired;
+    auto event = CreateEvent(chip::DeviceLayer::DeviceEventType::kFailSafeTimerExpired);
 
     commissionMgr.OnPlatformEvent(&event);
     EXPECT_TRUE(commissionMgr.IsCommissioningWindowOpen());
@@ -488,8 +492,7 @@ TEST_F(TestCommissioningWindowManager, TestOnPlatformEventOperationalNetworkEnab
 {
     CommissioningWindowManager & commissionMgr = Server::GetInstance().GetCommissioningWindowManager();
 
-    chip::DeviceLayer::ChipDeviceEvent event;
-    event.Type = chip::DeviceLayer::DeviceEventType::kOperationalNetworkEnabled;
+    auto event = CreateEvent(chip::DeviceLayer::DeviceEventType::kOperationalNetworkEnabled);
 
     commissionMgr.OnPlatformEvent(&event);
     EXPECT_EQ(chip::app::DnssdServer::Instance().AdvertiseOperational(), CHIP_NO_ERROR);
@@ -503,8 +506,7 @@ TEST_F(TestCommissioningWindowManager, TestOnPlatformEventOperationalNetworkEnab
     // Stopping DNS-SD server to trigger AdvertiseOperational() failure
     chip::app::DnssdServer::Instance().StopServer();
 
-    chip::DeviceLayer::ChipDeviceEvent event;
-    event.Type = chip::DeviceLayer::DeviceEventType::kOperationalNetworkEnabled;
+    auto event = CreateEvent(chip::DeviceLayer::DeviceEventType::kOperationalNetworkEnabled);
 
     commissionMgr.OnPlatformEvent(&event);
     // This should attempt to start operational advertising, which will fail
@@ -518,8 +520,7 @@ TEST_F(TestCommissioningWindowManager, TestOnPlatformEventCloseCloseAllBleConnec
 {
     CommissioningWindowManager & commissionMgr = Server::GetInstance().GetCommissioningWindowManager();
 
-    chip::DeviceLayer::ChipDeviceEvent event;
-    event.Type = chip::DeviceLayer::DeviceEventType::kCloseAllBleConnections;
+    auto event = CreateEvent(chip::DeviceLayer::DeviceEventType::kCloseAllBleConnections);
 
     commissionMgr.OnPlatformEvent(&event);
     EXPECT_FALSE(chip::DeviceLayer::ConnectivityMgr().IsBLEAdvertisingEnabled());
