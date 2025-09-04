@@ -80,13 +80,16 @@ class TC_COMMTR_3_1(CommodityMeteringTestBaseHelper):
                      - DUT replies a uint16 value or null;
                      - Value is saved as MaxMeteredQuantitiesValue."""),
             TestStep("4", "TH reads MeteredQuantity attribute.", """
-                     - DUT replies a list of MeteredQuantityStruct entries or null;
+                     - DUT replies a list of MeteredQuantityStruct entries with length less or equal MaximumMeteredQuantitiesValue from step 2, or null;
+                     - For each entry:
+                        - TariffComponentIDs field has a list of uint32 value with length less or equal 128;
+                        - Quantity field has an int64 value;
                      - Value is saved as MeteredQuantityValue."""),
             TestStep("5", "TH reads MeteredQuantityTimestamp attribute.", """
                      - DUT replies a epoch-s value, or null;
                      - Value is saved as MeteredQuantityTimestampValue."""),
             TestStep("6", "TH reads TariffUnit attribute.", """
-                     - DUT replies a TariffUnitEnum value or null;
+                     - DUT replies a TariffUnitEnum value in range 0-1, or null;
                      - Value is saved as TariffUnitValue."""),
             TestStep("7", "TH reads TestEventTriggersEnabled attribute from General Diagnostics Cluster.", "Values is True."),
             TestStep("8", """TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 with EnableKey field set to PIXIT.COMMTR.TEST_EVENT_TRIGGER_KEY 
