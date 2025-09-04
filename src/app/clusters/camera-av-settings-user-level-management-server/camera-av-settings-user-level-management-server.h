@@ -51,20 +51,7 @@ constexpr uint8_t kDefaultZoom = 1;
 constexpr size_t kMptzPositionStructMaxSerializedSize =
     TLV::EstimateStructOverhead(sizeof(int16_t), sizeof(int16_t), sizeof(uint8_t));
 
-class Delegate;
-
-enum class OptionalAttributes : uint32_t
-{
-    kMptzPosition = 0x0001,
-    kMaxPresets   = 0x0002,
-    kMptzPresets  = 0x0004,
-    kDptzStreams  = 0x0008,
-    kZoomMax      = 0x0010,
-    kTiltMin      = 0x0020,
-    kTiltMax      = 0x0040,
-    kPanMin       = 0x0080,
-    kPanMax       = 0x0100,
-};
+class CameraAvSettingsUserLevelMgmtServer;
 
 struct MPTZPresetHelper
 {
@@ -95,7 +82,186 @@ public:
     void SetMptzPosition(MPTZStructType aPosition) { mMptzPosition = aPosition; }
 };
 
-class CameraAvSettingsUserLevelMgmtServer : public AttributeAccessInterface, public CommandHandlerInterface
+class PhysicalPTZCallback
+{
+public:
+    PhysicalPTZCallback()                                                               = default;
+    virtual ~PhysicalPTZCallback()                                                      = default;
+    virtual void OnPhysicalMovementComplete(Protocols::InteractionModel::Status status) = 0;
+};
+
+/** @brief
+ *  Defines interfaces for implementing application-specific logic for various aspects of the CameraAvUserSettingsManagement
+ * Cluster. Specifically, it defines interfaces for the interaction with manual and digital pan, tilt, and zoom functions.
+ */
+class Delegate
+{
+public:
+    Delegate()          = default;
+    virtual ~Delegate() = default;
+
+    /**
+     * Allows the delegate to perform any specific functions such as timer cancellation on a shutdown, this is invoked prior to
+     * the destructor, it shall not be invoked as part of the destructor.
+     */
+    virtual void ShutdownApp() = 0;
+
+    /**
+     * Allows the delegate to determine whether a change in MPTZ is possible given current device status
+     */
+    virtual bool CanChangeMPTZ() = 0;
+
+    /**
+     * DPTZ Stream handling. Invoked on the delegate by an app, providing to the delegate the id of an
+     * allocated or deallocated stream, or the viewport when the device level viewport is updated.
+     * The delegate shall invoke the appropriate MoveCapableVideoStream methods on its instance of the server
+     */
+    virtual void VideoStreamAllocated(uint16_t aStreamID)                                 = 0;
+    virtual void VideoStreamDeallocated(uint16_t aStreamID)                               = 0;
+    virtual void DefaultViewportUpdated(Globals::Structs::ViewportStruct::Type aViewport) = 0;
+
+    /**
+     * Delegate command handlers
+     */
+
+    /**
+     * Allows any needed app handling given provided and already validated pan, tilt, and zoom values that are to be set based on
+     * reception of an MPTZSetPosition command. Returns a failure status if the physical device cannot realize these values.  The
+     * app shall not block on actual physical execution of the command, rather return success on initiation of the movement.  On
+     * conclusion of the movement the app shall invoke the provided callback, at which time the server will update the server held
+     * attribute values for PTZ, if the motion succeeded.
+     * @param aPan  The validated value of the pan that is to be set
+     * @param aTilt The validated value of the tilt that is to be set
+     * @param aZoom The validated value of the zoom that is to be set
+     * @param callback The callback to be invoked once the physical movement of the camera has completed.
+     *                 It is the delegate's responsibility to ensure liveness of this server cluster instance before invocation of
+     * the callback, which needs to take place in the Matter threading context.
+     */
+    virtual Protocols::InteractionModel::Status MPTZSetPosition(Optional<int16_t> aPan, Optional<int16_t> aTilt,
+                                                                Optional<uint8_t> aZoom, PhysicalPTZCallback * callback) = 0;
+
+    /**
+     * Allows any needed app handling given provided and already validated pan, tilt, and zoom values that are to be set based on
+     * reception of an MPTZRelativeMove command.  The server has already validated the received relative values, and provides the
+     * app with the new, requested settings for PTZ. Returns a failure status if the physical device cannot realize these values.
+     * The app shall not block on actual physical execution of the command, rather return success on initiation of the movement.  On
+     * conclusion of the movement the app shall invoke the provided callback, at which time the server will update the server held
+     * attribute values for PTZ, if the motion succeeded.
+     * @param aPan  The validated value of the pan that is to be set
+     * @param aTilt The validated value of the tilt that is to be set
+     * @param aZoom The validated value of the zoom that is to be set
+     * @param callback The callback to be invoked once the physical movement of the camera has completed.
+     *                 It is the delegate's responsibility to ensure liveness of this server cluster instance before invocation of
+     * the callback. which needs to take place in the Matter threading context.
+     */
+    virtual Protocols::InteractionModel::Status MPTZRelativeMove(Optional<int16_t> aPan, Optional<int16_t> aTilt,
+                                                                 Optional<uint8_t> aZoom, PhysicalPTZCallback * callback) = 0;
+
+    /**
+     * Allows any needed app handling given provided and already validated pan, tilt, and zoom values that are to be set based on
+     * reception of an MPTZMoveToPreset command.  The server has already ensured the requested preset ID exists, and obtained the
+     * values for PTZ defined by that preset. Returns a failure status if the physical device cannot realize these values. The app
+     * shall not block on actual physical execution of the command, rather return success on initiation of the movement.  On
+     * conclusion of the movement the app shall invoke the provided callback, at which time the server will update the server held
+     * attribute values for PTZ assuming success. Within the provided callback the server will update the server held attribute
+     * values for PTZ, if the motion succeeded.
+     * @param aPreset The preset ID associated with the provided PTZ values
+     * @param aPan    The value for Pan associated with the preset
+     * @param aTilt   The value for Tilt associated with the preset
+     * @param aZoom   The value for Zoom associated with the preset
+     * @param callback The callback to be invoked once the physical movement of the camera has completed.
+     *                 it is the delegate's responsibility to ensure liveness of this server cluster instance before invocation of
+     * the callback. which needs to take place in the Matter threading context.
+     */
+    virtual Protocols::InteractionModel::Status MPTZMoveToPreset(uint8_t aPreset, Optional<int16_t> aPan, Optional<int16_t> aTilt,
+                                                                 Optional<uint8_t> aZoom, PhysicalPTZCallback * callback) = 0;
+
+    /**
+     * Informs the delegate that a request has been made to save the current PTZ values in a new (or updated) preset ID.
+     * The preset ID is provided, the delegate is already aware of the current PTZ values that will be saved. Allows any needed app
+     * handling and the possibility that the request is rejected depending on device state. On a success response the server will
+     * save the current values of PTZ against the preset ID.
+     * @param aPreset The preset ID that will be used for the saved values
+     */
+    virtual Protocols::InteractionModel::Status MPTZSavePreset(uint8_t aPreset) = 0;
+
+    /**
+     * Informs the delegate that a request has been made to remove the preset indicated. Allows any needed app handling and the
+     * possibility that the request is rejected depending on device state. On a success response the server will erases the
+     * indicated preset and its associated values.
+     * @param aPreset The preset ID that will be used for the saved values
+     */
+    virtual Protocols::InteractionModel::Status MPTZRemovePreset(uint8_t aPreset) = 0;
+
+    /**
+     * Informs the delegate that a request has been made to change the Viewport associated with the provided video stream ID. The
+     * server has already ensured that the video stream ID is for a valid video stream. The app needs to work with its AV Stream
+     * Managament instance to validate the stream ID, the provided new Viewport, ensure that the command is posssible, and apply the
+     * command logic to the camera.
+     * @param aVideoStreamID The ID for the videa stream that is subject to change
+     * @param aViewport      The new values of Viewport that are to be set
+     */
+    virtual Protocols::InteractionModel::Status DPTZSetViewport(uint16_t aVideoStreamID,
+                                                                Globals::Structs::ViewportStruct::Type aViewport) = 0;
+    /**
+     * Informs the delegate that a request has been made to digitally alter the current rendered stream. The server has already
+     * validated that the Zoom Delta (if provided) is in range, and that the video stream ID is valid. The app needs to work with
+     * its AV Stream Managament instance to validate the stream ID, ensure that the command is posssible, and apply the command
+     * logic to the camera.
+     * @param aVideoStreamID The ID for the videa stream that is subject to change
+     * @param aDeltaX        Number of pixels to move in the X plane
+     * @param aDeltaY        Number of pixels to move in the Y plane
+     * @param aZoomDelta     Relative change of digital zoom
+     */
+    virtual Protocols::InteractionModel::Status DPTZRelativeMove(uint16_t aVideoStreamID, Optional<int16_t> aDeltaX,
+                                                                 Optional<int16_t> aDeltaY, Optional<int8_t> aZoomDelta,
+                                                                 Globals::Structs::ViewportStruct::Type & aViewport) = 0;
+
+    /**
+     *  @brief Callback into the delegate once persistent attributes managed by
+     *  the Cluster have been loaded from Storage.
+     */
+    virtual CHIP_ERROR PersistentAttributesLoadedCallback() = 0;
+
+    /**
+     *  Delegate functions to load the Presets and DPTZRelativeMove valid set of video stream IDs.
+     *  The delegate application is responsible for creating and persisting this data. The overall
+     *  application is already handling the persistence of the allocated video streams themselves.
+     *  hese Load APIs would be used to load the known presets and stream ids into the cluster
+     *  server list, at initialization.
+     */
+    virtual CHIP_ERROR LoadMPTZPresets(std::vector<MPTZPresetHelper> & mptzPresetHelpers) = 0;
+    virtual CHIP_ERROR LoadDPTZStreams(std::vector<DPTZStruct> & dptzStreams)             = 0;
+
+private:
+    friend class CameraAvSettingsUserLevelMgmtServer;
+
+    CameraAvSettingsUserLevelMgmtServer * mServer = nullptr;
+
+    // Sets the Server pointer
+    void SetServer(CameraAvSettingsUserLevelMgmtServer * aServer) { mServer = aServer; }
+
+protected:
+    CameraAvSettingsUserLevelMgmtServer * GetServer() const { return mServer; }
+};
+
+enum class OptionalAttributes : uint32_t
+{
+    kMptzPosition  = 0x0001,
+    kMaxPresets    = 0x0002,
+    kMptzPresets   = 0x0004,
+    kDptzStreams   = 0x0008,
+    kZoomMax       = 0x0010,
+    kTiltMin       = 0x0020,
+    kTiltMax       = 0x0040,
+    kPanMin        = 0x0080,
+    kPanMax        = 0x0100,
+    kMovementState = 0x0200,
+};
+
+class CameraAvSettingsUserLevelMgmtServer : public AttributeAccessInterface,
+                                            public CommandHandlerInterface,
+                                            public PhysicalPTZCallback
 {
 public:
     /**
@@ -113,6 +279,9 @@ public:
     ~CameraAvSettingsUserLevelMgmtServer() override;
 
     CHIP_ERROR Init();
+
+    // Handle any dynamic cleanup required prior to the destructor being called on an app shutdown.  To be invoked by
+    // an app as part of its own shutdown sequence and prior to the destruction of the app/delegate.
     void Shutdown();
 
     bool HasFeature(Feature aFeature) const;
@@ -192,6 +361,12 @@ public:
 
     EndpointId GetEndpointId() { return AttributeAccessInterface::GetEndpointId().Value(); }
 
+    // Physical PTZ Interface
+    void OnPhysicalMovementComplete(Protocols::InteractionModel::Status status) override;
+
+    // Is a command already being processed
+    bool IsMoving() const { return mMovementState == PhysicalMovementEnum::kMoving; }
+
 private:
     Delegate & mDelegate;
     EndpointId mEndpointId;
@@ -215,6 +390,13 @@ private:
 
     std::vector<MPTZPresetHelper> mMptzPresetHelpers;
     std::vector<DPTZStruct> mDptzStreams;
+
+    PhysicalMovementEnum mMovementState;
+
+    // Holding variables for values subject to successful physical movement
+    Optional<int16_t> mTargetPan;
+    Optional<int16_t> mTargetTilt;
+    Optional<uint8_t> mTargetZoom;
 
     // Attribute handler interface
     CHIP_ERROR Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder) override;
@@ -252,139 +434,13 @@ private:
     bool KnownVideoStreamID(uint16_t aVideoStreamID);
 
     /**
+     * Mutator for MovementState, only accessible by the server instance
+     */
+    void SetMovementState(PhysicalMovementEnum aMovementState);
+    /**
      * Helper function for attribute handlers to mark the attribute as dirty
      */
     void MarkDirty(AttributeId aAttributeId);
-};
-
-/** @brief
- *  Defines interfaces for implementing application-specific logic for various aspects of the CameraAvUserSettingsManagement
- * Cluster. Specifically, it defines interfaces for the interaction with manual and digital pan, tilt, and zoom functions.
- */
-class Delegate
-{
-public:
-    Delegate()          = default;
-    virtual ~Delegate() = default;
-
-    /**
-     * Allows the delegate to determine whether a change in MPTZ is possible given current device status
-     */
-    virtual bool CanChangeMPTZ() = 0;
-
-    /**
-     * DPTZ Stream handling. Invoked on the delegate by an app, providing to the delegate the id of an
-     * allocated or deallocated stream, or the viewport when the device level viewport is updated.
-     * The delegate shall invoke the appropriate MoveCapableVideoStream methods on its instance of the server
-     */
-    virtual void VideoStreamAllocated(uint16_t aStreamID)                                 = 0;
-    virtual void VideoStreamDeallocated(uint16_t aStreamID)                               = 0;
-    virtual void DefaultViewportUpdated(Globals::Structs::ViewportStruct::Type aViewport) = 0;
-
-    /**
-     * Delegate command handlers
-     */
-
-    /**
-     * Allows any needed app handling given provided and already validated pan, tilt, and zoom values that are to be set based on
-     * receoption of an MPTZSetPosition command. Returns a failure status if the physical device cannot realize these values. On a
-     * success response the server will update the server held attribute values for PTZ.
-     * @param aPan  The validated value of the pan that is to be set
-     * @param aTilt The validated value of the tilt that is to be set
-     * @param aZoom The validated value of the zoom that is to be set
-     */
-    virtual Protocols::InteractionModel::Status MPTZSetPosition(Optional<int16_t> aPan, Optional<int16_t> aTilt,
-                                                                Optional<uint8_t> aZoom) = 0;
-
-    /**
-     * Allows any needed app handling given provided and already validated pan, tilt, and zoom values that are to be set based on
-     * receoption of an MPTZRelativeMove command.  The server has already validated the received relative values, and provides the
-     * app with the new, requested settings for PTZ. Returns a failure status if the physical device cannot realize these values. On
-     * a success response the server will update the server held attribute values for PTZ.
-     * @param aPan  The validated value of the pan that is to be set
-     * @param aTilt The validated value of the tilt that is to be set
-     * @param aZoom The validated value of the zoom that is to be set
-     */
-    virtual Protocols::InteractionModel::Status MPTZRelativeMove(Optional<int16_t> aPan, Optional<int16_t> aTilt,
-                                                                 Optional<uint8_t> aZoom) = 0;
-
-    /**
-     * Allows any needed app handling given provided and already validated pan, tilt, and zoom values that are to be set based on
-     * receoption of an MPTZMoveToPreset command.  The server has already ensured the requested preset ID exists, and obtained the
-     * values for PTZ defined by that preset. Returns a failure status if the physical device cannot realize these values. On
-     * a success response the server will update the server held attribute values for PTZ.
-     * @param aPreset The preset ID associated with the provided PTZ values
-     * @param aPan    The value for Pan associated with the preset
-     * @param aTilt   The value for Tilt associated with the preset
-     * @param aZoom   The value for Zoom associated with the preset
-     */
-    virtual Protocols::InteractionModel::Status MPTZMoveToPreset(uint8_t aPreset, Optional<int16_t> aPan, Optional<int16_t> aTilt,
-                                                                 Optional<uint8_t> aZoom) = 0;
-
-    /**
-     * Informs the delegate that a request has been made to save the current PTZ values in a new (or updated) preset ID.
-     * The preset ID is provided, the delegate is already aware of the current PTZ values that will be saved. Allows any needed app
-     * handling and the possibility that the request is rejected depending on device state. On a success response the server will
-     * save the current values of PTZ against the preset ID.
-     * @param aPreset The preset ID that will be used for the saved values
-     */
-    virtual Protocols::InteractionModel::Status MPTZSavePreset(uint8_t aPreset) = 0;
-
-    /**
-     * Informs the delegate that a request has been made to remove the preset indicated. Allows any needed app handling and the
-     * possibility that the request is rejected depending on device state. On a success response the server will erases the
-     * indicated preset and its associated values.
-     * @param aPreset The preset ID that will be used for the saved values
-     */
-    virtual Protocols::InteractionModel::Status MPTZRemovePreset(uint8_t aPreset) = 0;
-
-    /**
-     * Informs the delegate that a request has been made to change the Viewport associated with the provided video stream ID. The
-     * server has already ensured that the video stream ID is for a valid video stream. The app needs to work with its AV Stream
-     * Managament instance to validate the stream ID, the provided new Viewport, ensure that the command is posssible, and apply the
-     * command logic to the camera.
-     * @param aVideoStreamID The ID for the videa stream that is subject to change
-     * @param aViewport      The new values of Viewport that are to be set
-     */
-    virtual Protocols::InteractionModel::Status DPTZSetViewport(uint16_t aVideoStreamID,
-                                                                Globals::Structs::ViewportStruct::Type aViewport) = 0;
-    /**
-     * Informs the delegate that a request has been made to digitally alter the current rendered stream. The server has already
-     * validated that the Zoom Delta (if provided) is in range, and that the video stream ID is valid. The app needs to work with
-     * its AV Stream Managament instance to validate the stream ID, ensure that the command is posssible, and apply the command
-     * logic to the camera.
-     * @param aVideoStreamID The ID for the videa stream that is subject to change
-     * @param aDeltaX        Number of pixels to move in the X plane
-     * @param aDeltaY        Number of pixels to move in the Y plane
-     * @param aZoomDelta     Relative change of digital zoom
-     */
-    virtual Protocols::InteractionModel::Status DPTZRelativeMove(uint16_t aVideoStreamID, Optional<int16_t> aDeltaX,
-                                                                 Optional<int16_t> aDeltaY, Optional<int8_t> aZoomDelta,
-                                                                 Globals::Structs::ViewportStruct::Type & aViewport) = 0;
-
-    /**
-     *  @brief Callback into the delegate once persistent attributes managed by
-     *  the Cluster have been loaded from Storage.
-     */
-    virtual CHIP_ERROR PersistentAttributesLoadedCallback() = 0;
-
-    /**
-     *  Delegate functions to load the Presets and DPTZRelativeMove valid set of video stream IDs.
-     *  The delegate application is responsible for creating and persisting this data. The overall
-     *  application is already handling the persistence of the allocated video streams themselves.
-     *  hese Load APIs would be used to load the known presets and stream ids into the cluster
-     *  server list, at initialization.
-     */
-    virtual CHIP_ERROR LoadMPTZPresets(std::vector<MPTZPresetHelper> & mptzPresetHelpers) = 0;
-    virtual CHIP_ERROR LoadDPTZStreams(std::vector<DPTZStruct> & dptzStreams)             = 0;
-
-    CameraAvSettingsUserLevelMgmtServer * mServer = nullptr;
-
-    // Sets the Server pointer
-    void SetServer(CameraAvSettingsUserLevelMgmtServer * aServer) { mServer = aServer; }
-
-protected:
-    CameraAvSettingsUserLevelMgmtServer * GetServer() const { return mServer; }
 };
 
 } // namespace CameraAvSettingsUserLevelManagement
