@@ -29,8 +29,8 @@ using namespace chip::app::Clusters::CommodityMetering;
 namespace MeteredQuantitySamples {
 // Define component arrays as constexpr
 namespace Sample1 {
-static constexpr uint32_t TariffComponents1[] = { 1111, 2222 };
-static constexpr uint32_t TariffComponents2[] = { 3333, 4444, 5555 };
+static constexpr uint32_t TariffComponents1[] = { 1011, 1012 };
+static constexpr uint32_t TariffComponents2[] = { 1021, 1022, 1023 };
 
 // Non-constexpr storage for the actual data
 static const Structs::MeteredQuantityStruct::Type Data[] = {
@@ -42,14 +42,17 @@ static const Structs::MeteredQuantityStruct::Type Data[] = {
 } // namespace Sample1
 
 namespace Sample2 {
-static constexpr uint32_t TariffComponents1[] = { 7777 };
-static constexpr uint32_t TariffComponents2[] = { 8888, 9999 };
+static constexpr uint32_t TariffComponents1[] = { 2011 };
+static constexpr uint32_t TariffComponents2[] = { 2021, 2023 };
+static constexpr uint32_t TariffComponents3[] = { 2031, 2032, 2033 };
 
 static const Structs::MeteredQuantityStruct::Type Data[] = {
     { .tariffComponentIDs = DataModel::List(TariffComponents1, MATTER_ARRAY_SIZE(TariffComponents1)),
       .quantity           = MATTER_ARRAY_SIZE(TariffComponents1) },
     { .tariffComponentIDs = DataModel::List(TariffComponents2, MATTER_ARRAY_SIZE(TariffComponents2)),
-      .quantity           = MATTER_ARRAY_SIZE(TariffComponents2) }
+      .quantity           = MATTER_ARRAY_SIZE(TariffComponents2) },
+    { .tariffComponentIDs = DataModel::List(TariffComponents3, MATTER_ARRAY_SIZE(TariffComponents2)),
+      .quantity           = MATTER_ARRAY_SIZE(TariffComponents3) }
 };
 } // namespace Sample2
 } // namespace MeteredQuantitySamples
@@ -58,7 +61,7 @@ namespace {
 
 class TestDataManager
 {
-    static constexpr size_t MAX_MQ_SAMPLES = 2;
+    static constexpr size_t MAX_MQ_SAMPLES = 4;
 
 private:
     Instance * mInstance = nullptr;
@@ -68,14 +71,14 @@ private:
     DataModel::Nullable<Globals::TariffUnitEnum> mTariffUnit;
     DataModel::Nullable<uint16_t> mMaximumMeteredQuantities;
 
-    std::array<const Structs::MeteredQuantityStruct::Type, MAX_MQ_SAMPLES> GetMeteredQuantityDataSample(uint8_t presetIdx)
+    std::pair<std::array<const Structs::MeteredQuantityStruct::Type, MAX_MQ_SAMPLES>, size_t> GetMeteredQuantityDataSample(uint8_t presetIdx)
     {
         switch (presetIdx)
         {
         case 0:
-            return { MeteredQuantitySamples::Sample1::Data[0], MeteredQuantitySamples::Sample1::Data[1] };
+            return {{ MeteredQuantitySamples::Sample1::Data[0], MeteredQuantitySamples::Sample1::Data[1] }, MATTER_ARRAY_SIZE(MeteredQuantitySamples::Sample1::Data)};
         case 1:
-            return { MeteredQuantitySamples::Sample2::Data[0], MeteredQuantitySamples::Sample2::Data[1] };
+            return {{ MeteredQuantitySamples::Sample2::Data[0], MeteredQuantitySamples::Sample2::Data[1], MeteredQuantitySamples::Sample2::Data[2] }, MATTER_ARRAY_SIZE(MeteredQuantitySamples::Sample2::Data)};
         default:
             return {}; // Return empty array
         }
@@ -201,24 +204,24 @@ private:
         if (mTariffUnit.IsNull() || (mTariffUnit.Value() == Globals::TariffUnitEnum::kKWh))
         {
             mTariffUnit.SetNonNull(Globals::TariffUnitEnum::kKVAh);
-            mMaximumMeteredQuantities.SetNonNull(MAX_MQ_SAMPLES + 1);
         }
         else
         {
             mTariffUnit.SetNonNull(Globals::TariffUnitEnum::kKWh);
-            mMaximumMeteredQuantities.SetNonNull(MAX_MQ_SAMPLES);
         }
 
-        auto MQSampleArray =
+        auto MQSamplePair =
             GetMeteredQuantityDataSample(static_cast<uint8_t>(mTariffUnit.Value() == Globals::TariffUnitEnum::kKWh));
 
         std::array<Structs::MeteredQuantityStruct::Type, MAX_MQ_SAMPLES> mqBuffer;
 
-        std::copy(MQSampleArray.begin(), MQSampleArray.begin() + MAX_MQ_SAMPLES, mqBuffer.data());
+        std::copy(MQSamplePair.first.begin(), MQSamplePair.first.begin() + MQSamplePair.second, mqBuffer.data());
 
-        DataModel::List<Structs::MeteredQuantityStruct::Type> tmpList(mqBuffer.data(), MAX_MQ_SAMPLES);
+        DataModel::List<Structs::MeteredQuantityStruct::Type> tmpList(mqBuffer.data(), MQSamplePair.second);
         DataModel::Nullable<DataModel::List<Structs::MeteredQuantityStruct::Type>> nullableList;
         nullableList.SetNonNull(std::move(tmpList));
+
+        mMaximumMeteredQuantities.SetNonNull(MQSamplePair.second);
 
         mInstance->SetMaximumMeteredQuantities(mMaximumMeteredQuantities);
         mInstance->SetMeteredQuantity(nullableList);
