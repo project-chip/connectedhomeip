@@ -151,8 +151,8 @@ class TC_CADMIN(CADMINBaseTest):
         self.step(5)
         # TH_CR1 reads the Fabrics attribute
         th1_fabric_info = await self.get_fabrics(th=self.th1)
-        th1_cam_rcac = TLVReader(base64.b64decode(
-            self.certificate_authority_manager.activeCaList[0]._persistentStorage._jsonData["sdk-config"]["f/1/r"])).get()["Any"][9]
+        th1_cam_rcac_bytes = self.certificate_authority_manager.activeCaList[0]._persistentStorage.GetSdkKey("f/1/r")
+        th1_cam_rcac = TLVReader(th1_cam_rcac_bytes).get()["Any"][9]
         if th1_fabric_info[0].rootPublicKey != th1_cam_rcac:
             asserts.fail("Public keys from fabric and certs for TH1 are not the same.")
         if th1_fabric_info[0].nodeID != self.dut_node_id:
@@ -180,12 +180,20 @@ class TC_CADMIN(CADMINBaseTest):
             await self.read_nl_attr(dut_node_id=self.dut_node_id, th=self.th2, attr_val=self.nl_attribute)
 
             self.step(9)
-            # TH_CR2 opens a commissioning window on DUT_CE for 180 seconds using ECM
-            await self.th2.OpenCommissioningWindow(nodeid=self.dut_node_id, timeout=180, iteration=1000, discriminator=0, option=1)
+            # TH_CR2 opens a commissioning window on DUT_CE for 180 seconds using ECM and monitors until it closes
+            params, window_status_accumulator = await self.open_commissioning_window_with_subscription_monitoring(
+                th=self.th2,
+                timeout=180,
+                node_id=self.dut_node_id,
+                discriminator=0,
+                iteration=1000
+            )
+
             results = await self.monitor_commissioning_window_closure_with_subscription(
                 th=self.th2,
                 node_id=self.dut_node_id,
-                expected_duration_seconds=180
+                expected_duration_seconds=180,
+                window_status_accumulator=window_status_accumulator
             )
             asserts.assert_true(results['window_closed'], "Window should have closed")
             asserts.assert_true(results['timing_valid'], "Window should have closed within timing constraints")
@@ -193,15 +201,14 @@ class TC_CADMIN(CADMINBaseTest):
             self.step(10)
             # TH_CR2 opens a commissioning window on DUT_CE using ECM
             self.discriminator = random.randint(0, 4095)
-            # params2 = await self.openCommissioningWindow(dev_ctrl=self.th2, node_id=self.dut_node_id)
-            params2 = await self.th2.OpenCommissioningWindow(nodeid=self.dut_node_id, timeout=self.max_window_duration, iteration=1000, discriminator=1234, option=1)
+            params2 = await self.th2.OpenCommissioningWindow(nodeid=self.dut_node_id, timeout=self.max_window_duration, iteration=1000, discriminator=self.discriminator, option=1)
 
             self.step(11)
             # TH_CR1 starts a commissioning process with DUT_CE before the timeout from step 10
             try:
                 await self.th1.CommissionOnNetwork(
                     nodeId=self.dut_node_id, setupPinCode=params2.setupPinCode,
-                    filterType=ChipDeviceCtrl.DiscoveryFilterType.LONG_DISCRIMINATOR, filter=1234)
+                    filterType=ChipDeviceCtrl.DiscoveryFilterType.LONG_DISCRIMINATOR, filter=self.discriminator)
             except ChipStackError as e:  # chipstack-ok: This disables ChipStackError linter check. Error occurs if a NOC for the fabric already exists, which may depend on device state. Can not use assert_raises because it not always fails
                 asserts.assert_equal(e.err, 0x0000007E,
                                      "Expected to return Trying to add NOC for fabric that already exists")

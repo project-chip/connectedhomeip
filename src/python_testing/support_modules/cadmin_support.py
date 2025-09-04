@@ -125,17 +125,17 @@ class CADMINBaseTest(MatterBaseTest):
         window_status_accumulator: AttributeSubscriptionHandler,
         is_open_expected: bool,
         timeout_sec: float = 10.0
-    ) -> bool:
+    ) -> None:
         """
-        Wait for window status to change to expected value.
+        Wait for window status to change to expected value, asserting on timeout.
 
         Args:
             window_status_accumulator: The subscription accumulator
             is_open_expected: Expected window status (False=closed, True=open)
             timeout_sec: Timeout in seconds
 
-        Returns:
-            True if status changed to expected value, False if timeout
+        Raises:
+            AssertionError: If the window status doesn't change to expected value within timeout
         """
         status_name = "CLOSED" if not is_open_expected else "OPEN"
         logging.info(f"Waiting for window status to change to {status_name} (status={is_open_expected})")
@@ -149,11 +149,10 @@ class CADMINBaseTest(MatterBaseTest):
         try:
             window_status_accumulator.await_all_expected_report_matches([status_match], timeout_sec=timeout_sec)
             logging.info(f"✅ Window status changed to {status_name} (status={is_open_expected})")
-            return True
         except asyncio.TimeoutError as e:
-            logging.error(f"❌ Timeout waiting for window status {is_open_expected} ({status_name}): {e}")
-            logging.error(f"Timeout occurred after {timeout_sec}s")
-            return False
+            error_msg = f"Timeout waiting for window status {is_open_expected} ({status_name}) after {timeout_sec}s: {e}"
+            logging.error(f"❌ {error_msg}")
+            asserts.fail(error_msg)
 
     def log_timing_results(self, results: dict[str, Any], test_step: str = ""):
         """
@@ -166,10 +165,10 @@ class CADMINBaseTest(MatterBaseTest):
         step_prefix = f"[{test_step}] " if test_step else ""
 
         logging.info(f"{step_prefix}=== COMMISSIONING WINDOW TIMING RESULTS ===")
-        logging.info(f"{step_prefix}Window closed: {'✅ YES' if results['window_closed'] else '❌ NO'}")
+        logging.info(f"{step_prefix}Window closed: ✅ YES")
         logging.info(f"{step_prefix}Timing valid: {'✅ YES' if results['timing_valid'] else '❌ NO'}")
 
-        if results['window_closed'] and results['actual_duration_seconds'] is not None:
+        if results['actual_duration_seconds'] is not None:
             actual = results['actual_duration_seconds']
             expected = results['expected_duration_seconds']
             max_allowed = results['max_allowed_duration_seconds']
@@ -203,7 +202,8 @@ class CADMINBaseTest(MatterBaseTest):
         node_id: int,
         expected_duration_seconds: int,
         min_interval_sec: int = 0,
-        max_interval_sec: int = 30
+        max_interval_sec: int = 30,
+        window_status_accumulator: Optional[AttributeSubscriptionHandler] = None
     ) -> dict[str, Any]:
         """
         Monitor commissioning window closure using subscription (replaces hardcoded sleep).
@@ -233,36 +233,21 @@ class CADMINBaseTest(MatterBaseTest):
         logging.info(f"Expected closure by: {start_time + timedelta(seconds=expected_duration_seconds)}")
         logging.info(f"Latest acceptable closure: {start_time + timedelta(seconds=max_allowed_duration)}")
 
-        # Create subscription to window status
-        window_status_accumulator = await self.create_window_status_subscription(
-            th=th,
-            node_id=node_id,
-            min_interval_sec=min_interval_sec,
-            max_interval_sec=max_interval_sec
-        )
-
         try:
-            # Wait for window to close (status = 0)
-            window_closed = await self.wait_for_window_status_change(
+            # Wait for window to close (status = 0) - will assert on timeout
+            await self.wait_for_window_status_change(
                 window_status_accumulator=window_status_accumulator,
                 is_open_expected=False,
                 timeout_sec=monitoring_timeout
             )
 
-            # Calculate actual duration
+            # Calculate actual duration - window definitely closed if we get here
             end_time = datetime.now()
-            actual_duration = None
-            if window_closed:
-                actual_duration = (end_time - start_time).total_seconds()
+            actual_duration = (end_time - start_time).total_seconds()
 
             # Verify timing
-            timing_valid = True
-            if not window_closed:
-                timing_valid = False
-                logging.error("❌ WINDOW DID NOT CLOSE WITHIN EXPECTED TIME")
-                logging.error(f"Monitoring timed out after {monitoring_timeout}s")
-            elif actual_duration > max_allowed_duration:
-                timing_valid = False
+            timing_valid = actual_duration <= max_allowed_duration
+            if not timing_valid:
                 logging.error("❌ WINDOW CLOSED TOO LATE")
                 logging.error(f"Expected: {expected_duration_seconds}s")
                 logging.error(f"Actual: {actual_duration:.2f}s")
@@ -270,7 +255,7 @@ class CADMINBaseTest(MatterBaseTest):
                 logging.error(f"Over by: {actual_duration - max_allowed_duration:.2f}s")
 
             results = {
-                'window_closed': window_closed,
+                'window_closed': True,  # Always true if we reach this point
                 'expected_duration_seconds': expected_duration_seconds,
                 'actual_duration_seconds': actual_duration,
                 'clock_skew_ms': clock_skew_ms,
@@ -280,50 +265,14 @@ class CADMINBaseTest(MatterBaseTest):
                 'end_time': end_time
             }
 
-            # Log results prominently
+            # Log results
             self.log_timing_results(results)
 
-            return results
-
         finally:
-            # Clean up subscription
-            await window_status_accumulator.cancel()
-
-    async def open_commissioning_window_with_full_args(
-        self,
-        dev_ctrl: ChipDeviceCtrl,
-        timeout: int,
-        node_id: int,
-        discriminator: int = None,
-        commissioning_option: CommissioningWindowOption = CommissioningWindowOption.TOKEN_WITH_RANDOM_PIN,
-        iteration: int = 10000
-    ) -> CustomCommissioningParameters:
-        """
-        Open a commissioning window with the specified parameters.
-
-        Args:
-            th: Controller to use
-            timeout: Window timeout in seconds
-            node_id: Target node ID
-            discriminator: Optional discriminator value
-            commissioning_option: Commissioning window option (CommissioningWindowOption, default: TOKEN_WITH_RANDOM_PIN)
-                - ORIGINAL_SETUP_CODE (0): Original commissioning window (PASE)
-                - TOKEN_WITH_RANDOM_PIN (1): Enhanced commissioning window (ECM)
-            iteration: Number of iterations (default: 10000)
-        """
-        try:
-            comm_params = await dev_ctrl.OpenCommissioningWindow(
-                nodeid=node_id,
-                timeout=timeout,
-                iteration=iteration,
-                discriminator=discriminator if discriminator is not None else random.randint(0, 4095),
-                option=commissioning_option.value
-            )
-            params = CustomCommissioningParameters(comm_params, discriminator)
-            return params
-        except Exception as e:
-            logging.exception('Error running OpenCommissioningWindow %s', e)
-            asserts.fail('Failed to open commissioning window')
+            # Clean up subscription accumulator and return results
+            if window_status_accumulator is not None:
+                await window_status_accumulator.cancel()
+            return results
 
     async def open_commissioning_window_with_subscription_monitoring(
         self,
@@ -362,15 +311,19 @@ class CADMINBaseTest(MatterBaseTest):
             max_interval_sec=max_interval_sec
         )
 
-        # Open the commissioning window
-        params = await self.open_commissioning_window_with_full_args(
-            dev_ctrl=th,
-            timeout=timeout,
-            node_id=node_id,
-            discriminator=discriminator,
-            commissioning_option=commissioning_option,
-            iteration=iteration
-        )
+        try:
+            comm_params = await th.OpenCommissioningWindow(
+                nodeid=node_id,
+                timeout=timeout,
+                iteration=iteration,
+                discriminator=discriminator if discriminator is not None else random.randint(0, 4095),
+                option=commissioning_option.value
+            )
+            params = CustomCommissioningParameters(comm_params, discriminator)
+
+        except Exception as e:
+            logging.exception('Error running OpenCommissioningWindow %s', e)
+            asserts.fail('Failed to open commissioning window')
 
         return params, window_status_accumulator
 
