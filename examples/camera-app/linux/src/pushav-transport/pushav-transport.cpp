@@ -107,7 +107,7 @@ void PushAVTransport::ConfigureRecorderSettings(const TransportOptionsStruct & t
     {
         mClipInfo.mHasAudio    = true;
         mClipInfo.mHasVideo    = true;
-        mClipInfo.mUrl         = std::string(transportOptions.url.data(), transportOptions.url.size());
+        mClipInfo.mUrl         = std::string(transportOptions.url.begin(), transportOptions.url.end());
         mClipInfo.mTriggerType = static_cast<int>(transportOptions.triggerOptions.triggerType);
         if (transportOptions.triggerOptions.maxPreRollLen.HasValue())
         {
