@@ -6,6 +6,9 @@ handlers:
     - url: /conformance/
       static_files: html/conformance_report.html
       upload: html/conformance_report.html
+    - url: /memory/
+      static_files: html/memory_report.html
+      upload: html/memory_report.html
     - url: /(.*)
       static_files: html/\1
       upload: html/(.*)
