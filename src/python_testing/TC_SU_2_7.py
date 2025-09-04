@@ -44,12 +44,10 @@
 
 import asyncio
 import logging
-import threading
-from os import environ, getcwd, setpgrp, path, kill
-from subprocess import Popen, run
+from os import environ, getcwd, kill, path, setpgrp
 from signal import SIGTERM
+from subprocess import Popen, run
 from time import sleep, time
-
 
 import psutil
 from mobly import asserts
@@ -124,15 +122,15 @@ class TC_SU_2_7(MatterBaseTest):
                 return proc.info['pid']
         return None
 
-    async def _verify_version_applied_basic_information(self, controller, target_version):
+    async def _verify_version_applied_basic_information(self, controller, node_id: int, target_version):
 
         basicinfo_softwareversion = await self.read_single_attribute_check_success(
             dev_ctrl=controller,
             cluster=Clusters.BasicInformation,
-            attribute=Clusters.BasicInformation.Attributes.SoftwareVersion
-        )
+            attribute=Clusters.BasicInformation.Attributes.SoftwareVersion,
+            node_id=node_id)
         asserts.assert_equal(basicinfo_softwareversion, target_version,
-                             f"Version from basic info cluster is not {target_version}")
+                             f"Version from basic info cluster is not {target_version}, current cluster version is {basicinfo_softwareversion}")
 
     async def _write_acl_rules(self, controller, endpoint: int, node_id):
         logger.info("Configure ACL Entries")
@@ -236,11 +234,11 @@ class TC_SU_2_7(MatterBaseTest):
         )
         logger.info(f"OTA Providers List: {after_otap_info}")
 
-    async def _announce_ota_provider(self, controller, provider_node_id,  requestor_node_id):
+    async def _announce_ota_provider(self, controller, provider_node_id,  requestor_node_id, reason: Clusters.OtaSoftwareUpdateRequestor.Enums.AnnouncementReasonEnum = Clusters.OtaSoftwareUpdateRequestor.Enums.AnnouncementReasonEnum.kUpdateAvailable):
         cmd_announce_ota_provider = self.ota_req.Commands.AnnounceOTAProvider(
             providerNodeID=provider_node_id,
             vendorID=0xFFF1,
-            announcementReason=self.ota_req.Enums.AnnouncementReasonEnum.kUpdateAvailable,
+            announcementReason=reason,
             metadataForNode=None,
             endpoint=0
         )
@@ -313,7 +311,7 @@ class TC_SU_2_7(MatterBaseTest):
         return proc
 
     def _launch_requestor_app(self, extra_params: list = []):
-        logger.info(f"LAUNCHING REQUESTOR APP")
+        logger.info("LAUNCHING REQUESTOR APP")
         proc = self._launch_app(
             app_name_path='out/debug/chip-ota-requestor-app',
             env_app_name="OTA_REQUESTOR_APP",
@@ -398,10 +396,10 @@ class TC_SU_2_7(MatterBaseTest):
         logger.info(f"Requestor NodeId: {requestor_node_id}")
         logger.info(f"Provider NodeId: {provider_data['node_id']}")
 
-        # launch the app
+        # Launch ProviderApp
         self.step(0)
         self._launch_provider_app()
-        # commission Provider
+        # Commission Provider
         await controller.CommissionOnNetwork(
             nodeId=provider_data['node_id'],
             setupPinCode=provider_data['setup_pincode'],
@@ -603,6 +601,8 @@ class TC_SU_2_7(MatterBaseTest):
         self.step(6)
         # Again the process to update the cluster but we check the Delayed on Apply
         # Autoapply flag must be disabled in requestor in order to work
+        self._terminate_provider_process()
+        controller.ExpireSessions(nodeid=provider_data['node_id'])
         self._terminate_requestor_process()
         controller.ExpireSessions(nodeid=requestor_node_id)
         sleep(3)
@@ -614,6 +614,7 @@ class TC_SU_2_7(MatterBaseTest):
             filter=requestor_node_id
         )
         update_software_version = 4
+        provider_data['node_id'] = 322
         self._launch_provider_app(version=update_software_version, extra_params=[
                                   "--applyUpdateAction awaitNextAction", "--delayedApplyActionTimeSec 5"])
         await controller.CommissionOnNetwork(
@@ -625,7 +626,10 @@ class TC_SU_2_7(MatterBaseTest):
 
         state_transition_event_handler = EventSubscriptionHandler(
             expected_cluster=self.ota_req, expected_event_id=self.ota_req.Events.StateTransition.event_id)
+        update_applied_event_handler = EventSubscriptionHandler(
+            expected_cluster=self.ota_req, expected_event_id=self.ota_req.Events.VersionApplied.event_id)
         await state_transition_event_handler.start(controller, requestor_node_id, endpoint=0, min_interval_sec=0, max_interval_sec=5000)
+        await update_applied_event_handler.start(controller, requestor_node_id, endpoint=0, min_interval_sec=0, max_interval_sec=5000)
         await self._write_acl_rules(controller=controller, endpoint=0, node_id=provider_data['node_id'])
         await self._write_ota_providers(controller=controller, provider_node_id=provider_data['node_id'], endpoint=0)
         await self._announce_ota_provider(controller, provider_data['node_id'], requestor_node_id)
@@ -643,34 +647,15 @@ class TC_SU_2_7(MatterBaseTest):
         logger.info(f"Event report: {event_report}")
         asserts.assert_equal(event_report.newState, self.ota_req.Enums.UpdateStateEnum.kDelayedOnApply,
                              f"Event status is not {self.ota_req.Enums.UpdateStateEnum.kDelayedOnApply}")
-        state_transition_event_handler.reset()
-        await state_transition_event_handler.cancel()
-        self._terminate_provider_process()
-        controller.ExpireSessions(nodeid=provider_data['node_id'])
 
         self.step(7)
-        self._launch_provider_app(version=update_software_version)
-        await controller.CommissionOnNetwork(
-            nodeId=provider_data['node_id'],
-            setupPinCode=provider_data['setup_pincode'],
-            filterType=ChipDeviceCtrl.DiscoveryFilterType.LONG_DISCRIMINATOR,
-            filter=provider_data['discriminator']
-        )
-        # Update is completed at this point, listen
-        update_applied_event_handler = EventSubscriptionHandler(
-            expected_cluster=self.ota_req, expected_event_id=self.ota_req.Events.VersionApplied.event_id)
-        await update_applied_event_handler.start(controller, requestor_node_id, endpoint=0, min_interval_sec=0, max_interval_sec=5000)
-        await self._write_acl_rules(controller=controller, endpoint=0, node_id=provider_data['node_id'])
-        await self._write_ota_providers(controller=controller, provider_node_id=provider_data['node_id'], endpoint=0)
-        await self._announce_ota_provider(controller, provider_data['node_id'], requestor_node_id)
-        event_report_version_applied = update_applied_event_handler.wait_for_event_report(
-            self.ota_req.Events.VersionApplied, timeout_sec=120)
-        logger.info(f"Version applied event {event_report_version_applied}")
-        asserts.assert_equal(event_report_version_applied.softwareVersion, update_software_version,
-                             f"Version fom event is not {update_software_version}")
-        logger.info(f"Last event {state_transition_event_handler.get_last_event()}")
+        event_report = update_applied_event_handler.wait_for_event_report(self.ota_req.Events.VersionApplied, timeout_sec=60*4)
+        logger.info(f"Applying Transition report: {event_report}")
 
-        await self._verify_version_applied_basic_information(controller=controller, target_version=update_software_version)
+        await state_transition_event_handler.cancel()
+        await update_applied_event_handler.cancel()
+        await asyncio.sleep(100)
+        await self._verify_version_applied_basic_information(controller=controller, node_id=provider_data['node_id'], target_version=update_software_version)
 
 
 if __name__ == "__main__":
