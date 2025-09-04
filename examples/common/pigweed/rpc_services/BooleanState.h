@@ -28,6 +28,7 @@
 // TODO: Ideally we should not depend on the codegen integration
 // It would be best if we could use generic cluster API instead
 #include <app/clusters/boolean-state-server/CodegenIntegration.h>
+#endif
 
 namespace chip {
 namespace rpc {
@@ -39,6 +40,7 @@ public:
 
     virtual pw::Status Set(const chip_rpc_BooleanStateSetRequest & request, chip_rpc_BooleanStateSetResponse & response)
     {
+#if MATTER_DM_BOOLEAN_STATE_CLUSTER_SERVER_ENDPOINT_COUNT > 0
         EndpointId endpointId = request.endpoint_id;
         bool newState         = request.state_value;
 
@@ -53,10 +55,14 @@ public:
 
         response.event_number = static_cast<uint64_t>(eventNumber);
         return pw::OkStatus();
+#else
+        return pw::Status::InvalidArgument();
+#endif
     }
 
     virtual pw::Status Get(const chip_rpc_BooleanStateGetRequest & request, chip_rpc_BooleanStateGetResponse & response)
     {
+#if MATTER_DM_BOOLEAN_STATE_CLUSTER_SERVER_ENDPOINT_COUNT > 0
         EndpointId endpointId = request.endpoint_id;
         bool state_value{ false };
 
@@ -70,9 +76,11 @@ public:
 
         response.state.state_value = state_value;
         return pw::OkStatus();
+#else
+        return pw::Status::InvalidArgument();
+#endif
     }
 };
 
 } // namespace rpc
 } // namespace chip
-#endif // MATTER_DM_BOOLEAN_STATE_CLUSTER_SERVER_ENDPOINT_COUNT
