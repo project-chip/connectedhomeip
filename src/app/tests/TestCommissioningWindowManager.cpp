@@ -462,13 +462,13 @@ TEST_F(TestCommissioningWindowManager, TestOnPlatformEventFailSafeTimerExpiredPA
     auto access                                = chip::Test::CommissioningWindowManagerTestAccess(&commissionMgr);
     auto & sessionMgr                          = Server::GetInstance().GetSecureSessionManager();
 
-    auto & paseSession                       = access.GetPASESession();
-    uint16_t localSessionId                  = 1;
-    chip::NodeId peerNodeId                  = chip::kUndefinedNodeId;
-    uint16_t peerSessionId                   = 2;
-    chip::FabricIndex fabricIndex            = chip::kUndefinedFabricIndex;
-    chip::Transport::PeerAddress peerAddress = chip::Transport::PeerAddress::UDP(
-        chip::Inet::IPAddress::Loopback(chip::Inet::IPAddressType::kAny), CHIP_PORT);
+    auto & paseSession            = access.GetPASESession();
+    uint16_t localSessionId       = 1;
+    chip::NodeId peerNodeId       = chip::kUndefinedNodeId;
+    uint16_t peerSessionId        = 2;
+    chip::FabricIndex fabricIndex = chip::kUndefinedFabricIndex;
+    chip::Transport::PeerAddress peerAddress =
+        chip::Transport::PeerAddress::UDP(chip::Inet::IPAddress::Loopback(chip::Inet::IPAddressType::kAny), CHIP_PORT);
 
     auto role = chip::CryptoContext::SessionRole::kResponder;
 
