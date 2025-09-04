@@ -16,9 +16,9 @@
  *    limitations under the License.
  */
 
-#include <esp_log.h>
 #include <lib/support/CHIPMemString.h>
-#include <tracing/esp32_diagnostic_trace/Counter.h>
+#include <system/SystemClock.h>
+#include <tracing/esp32_diagnostics/Counter.h>
 
 namespace chip {
 namespace Tracing {
@@ -45,7 +45,7 @@ CHIP_ERROR ESPDiagnosticCounter::ReportMetrics(const char * label, CircularDiagn
     Platform::CopyString(entry.label, label);
     entry.uintValue                = GetInstanceCount(label);
     entry.type                     = Diagnostics::ValueType::kUnsignedInteger;
-    entry.timestamps_ms_since_boot = esp_log_timestamp();
+    entry.timestamps_ms_since_boot = static_cast<uint32_t>(chip::System::SystemClock().GetMonotonicMilliseconds64().count());
 
     return storageInstance->Store(entry);
 }
