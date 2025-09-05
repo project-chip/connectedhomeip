@@ -322,10 +322,9 @@ CHIP_ERROR CommodityTariffDelegate::TariffDataUpd_CrossValidator(TariffUpdateCtx
             // Check for duplicate threshold for this feature
             if (!thresholdSet.insert(thresholdValue).second)
             {
-                ChipLogError(AppServer,
-                             "Duplicate threshold value %" PRId64 " for feature 0x%" PRIx32
-                             " found among TariffComponents in the same tariff period",
-                             thresholdValue, featureID);
+                ChipLogError(NotSpecified,
+                             "Duplicated threshold value among TCs for the 0x%" PRIx32 " feature in the same tariff period",
+                             featureID);
                 return CHIP_ERROR_DUPLICATE_KEY_ID; // Found duplicate feature/threshold combination
             }
         }
