@@ -21,8 +21,7 @@
 #include <app/util/attribute-table.h>
 #include <app/util/endpoint-config-api.h>
 #include <data-model-providers/codegen/CodegenDataModelProvider.h>
-
-#include <codegen/CodegenProcessingConfig.h>
+#include <data-model-providers/codegen/CodegenProcessingConfig.h>
 
 #include <limits>
 
