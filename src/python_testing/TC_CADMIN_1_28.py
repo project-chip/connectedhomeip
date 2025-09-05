@@ -49,7 +49,7 @@ from matter.testing.apps import AppServerSubprocess, JFControllerSubprocess
 from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 
 
-class TC_JCM_1_1(MatterBaseTest):
+class TC_CADMIN_1_28(MatterBaseTest):
 
     @async_test_body
     async def setup_class(self):
@@ -96,6 +96,7 @@ class TC_JCM_1_1(MatterBaseTest):
         #
         #####################################################################################################################################
         self.jfadmin_fabric_a_passcode = random.randint(110220011, 110220999)
+        self.jfadmin_fabric_a_discriminator = random.randint(0, 4095)
         self.jfctrl_fabric_a_vid = random.randint(0x0001, 0xFFF0)
 
         # Start Fabric A JF-Administrator App
@@ -103,7 +104,7 @@ class TC_JCM_1_1(MatterBaseTest):
             jfa_server_app,
             storage_dir=self.storage_fabric_a,
             port=random.randint(5001, 5999),
-            discriminator=random.randint(0, 4095),
+            discriminator=self.jfadmin_fabric_a_discriminator,
             passcode=self.jfadmin_fabric_a_passcode,
             extra_args=["--capabilities", "0x04", "--rpc-server-port", "33033"])
         self.fabric_a_admin.start(
@@ -150,12 +151,30 @@ class TC_JCM_1_1(MatterBaseTest):
         # Extract CATs to be provided to the Python Controller later
         self.ecoACATs = base64.b64decode(jfcStorage.get("Default", "CommissionerCATs"))[::-1].hex().strip('0')
 
+        self.thserver_fabric_a_passcode = random.randint(110220011, 110220999)
+        self.fabric_a_server_app = AppServerSubprocess(
+            self.th_server_app,
+            storage_dir=self.storage_fabric_a,
+            port=random.randint(5001, 5999),
+            discriminator=random.randint(0, 4095),
+            passcode=self.thserver_fabric_a_passcode,
+            extra_args=["--capabilities", "0x04"])
+        self.fabric_a_server_app.start(
+            expected_output="Server initialization complete",
+            timeout=10)
+
+        self.fabric_a_ctrl.send(
+            message=f"pairing onnetwork 2 {self.thserver_fabric_a_passcode}",
+            expected_output="[CTL] Commissioning complete for node ID 0x0000000000000002: success",
+            timeout=10)
+
         #####################################################################################################################################
         #
         # Initialize Ecosystem B
         #
         #####################################################################################################################################
         self.jfadmin_fabric_b_passcode = random.randint(110220011, 110220999)
+        self.jfadmin_fabric_b_discriminator = random.randint(0, 4095)
         self.jfctrl_fabric_b_vid = random.randint(0x0001, 0xFFF0)
 
         # Start Fabric B JF-Administrator App
@@ -163,7 +182,7 @@ class TC_JCM_1_1(MatterBaseTest):
             jfa_server_app,
             storage_dir=self.storage_fabric_b,
             port=random.randint(5001, 5999),
-            discriminator=random.randint(0, 4095),
+            discriminator=self.jfadmin_fabric_b_discriminator,
             passcode=self.jfadmin_fabric_b_passcode,
             extra_args=["--capabilities", "0x04", "--rpc-server-port", "33055"])
         self.fabric_b_admin.start(
@@ -210,164 +229,6 @@ class TC_JCM_1_1(MatterBaseTest):
         # Extract CATs to be provided to the Python Controller later
         self.ecoBCATs = base64.b64decode(jfcStorage.get("Default", "CommissionerCATs"))[::-1].hex().strip('0')
 
-    def teardown_class(self):
-        # Stop all Subprocesses that were started in this test case
-        if self.fabric_a_admin is not None:
-            self.fabric_a_admin.terminate()
-        if self.fabric_b_admin is not None:
-            self.fabric_b_admin.terminate()
-        if self.fabric_a_ctrl is not None:
-            self.fabric_a_ctrl.terminate()
-        if self.fabric_b_ctrl is not None:
-            self.fabric_b_ctrl.terminate()
-        if self.fabric_a_server_app is not None:
-            self.fabric_a_server_app.terminate()
-        if self.fabric_b_server_app is not None:
-            self.fabric_b_server_app.terminate()
-
-        super().teardown_class()
-
-    def steps_TC_JCM_1_1(self) -> list[TestStep]:
-        return [
-            TestStep("1", "Verify VID on the JFAdmin app on both Ecosystems",
-                     "Expect the VID to be the one configured by the jfc-app on each fabric"),
-            TestStep("2", "Verify NOCs of both JF-Admin apps from Ecosystem A and Ecosystem B have the Anchor CAT and Administrator CAT",
-                     "Expect each Admin app to generate the correct CATs"),
-            TestStep("3", "Commission a server app in Ecosystem A",
-                     "Check the correct Vendor ID and Administrator CATs have been installed on the server app"),
-            TestStep("4", "Commission a server app in Ecosystem B",
-                     "Check the correct Vendor ID and Administrator CATs have been installed on the server app")
-        ]
-
-    @async_test_body
-    async def test_TC_JCM_1_1(self):
-
-        # Creating a Controller for Ecosystem A
-        _fabric_a_persistent_storage = VolatileTemporaryPersistentStorage(
-            self.ecoACtrlStorage['repl-config'], self.ecoACtrlStorage['sdk-config'])
-        _certAuthorityManagerA = CertificateAuthority.CertificateAuthorityManager(
-            chipStack=self.matter_stack._chip_stack,
-            persistentStorage=_fabric_a_persistent_storage)
-        _certAuthorityManagerA.LoadAuthoritiesFromStorage()
-        devCtrlEcoA = _certAuthorityManagerA.activeCaList[0].adminList[0].NewController(
-            nodeId=101,
-            paaTrustStorePath=str(self.matter_test_config.paa_trust_store_path),
-            catTags=[int(self.ecoACATs, 16)])
-
-        # Creating a Controller for Ecosystem B
-        _fabric_b_persistent_storage = VolatileTemporaryPersistentStorage(
-            self.ecoBCtrlStorage['repl-config'], self.ecoBCtrlStorage['sdk-config'])
-        _certAuthorityManagerB = CertificateAuthority.CertificateAuthorityManager(
-            chipStack=self.matter_stack._chip_stack,
-            persistentStorage=_fabric_b_persistent_storage)
-        _certAuthorityManagerB.LoadAuthoritiesFromStorage()
-        devCtrlEcoB = _certAuthorityManagerB.activeCaList[0].adminList[0].NewController(
-            nodeId=201,
-            paaTrustStorePath=str(self.matter_test_config.paa_trust_store_path),
-            catTags=[int(self.ecoBCATs, 16)])
-
-        self.step("1")
-        response = await devCtrlEcoA.ReadAttribute(
-            nodeid=1, attributes=[(0, Clusters.OperationalCredentials.Attributes.Fabrics)],
-            returnClusterObject=True)
-        asserts.assert_equal(
-            self.jfctrl_fabric_a_vid,
-            response[0][Clusters.OperationalCredentials].fabrics[0].vendorID,
-            "JF-Admin App on Ecosystem A doesn't have the correct VID")
-
-        response = await devCtrlEcoB.ReadAttribute(
-            nodeid=11, attributes=[(0, Clusters.OperationalCredentials.Attributes.Fabrics)],
-            returnClusterObject=True)
-        asserts.assert_equal(
-            self.jfctrl_fabric_b_vid,
-            response[0][Clusters.OperationalCredentials].fabrics[0].vendorID,
-            "JF-Admin App on Ecosystem A doesn't have the correct VID")
-
-        self.step("2")
-        response = await devCtrlEcoA.ReadAttribute(
-            nodeid=1, attributes=[(0, Clusters.OperationalCredentials.Attributes.NOCs)],
-            returnClusterObject=True)
-        # Search Administrator CAT (FFFF0001) and Anchor CAT (FFFD0001) in JF-Admin NOC on Ecoystem A
-        noc_tlv_data = matter.tlv.TLVReader(response[0][Clusters.OperationalCredentials].NOCs[0].noc).get()
-        _admin_cat_found = False
-        _anchor_cat_found = False
-        for _tag, _value in noc_tlv_data['Any'][6]:
-            if _tag == 22 and _value == int(self.ecoACATs, 16):
-                _admin_cat_found = True
-            elif _tag == 22 and _value == int("FFFE0001", 16):
-                _anchor_cat_found = True
-            if _admin_cat_found and _anchor_cat_found:
-                break
-        asserts.assert_true(_admin_cat_found, "Administrator CAT not found in Admin App NOC on Ecosystem A")
-        asserts.assert_true(_anchor_cat_found, "Anchor CAT not found in Admin App NOC on Ecosystem A")
-        # Search jf-anchor-cat in Subject field of JF-Admin ICAC on Ecoystem A
-        icac_tlv_data = matter.tlv.TLVReader(response[0][Clusters.OperationalCredentials].NOCs[0].icac).get()
-        _found = False
-        for _tag, _value in icac_tlv_data['Any'][6]:
-            if _tag == 8 and _value == 'jf-anchor-icac':
-                _found = True
-                break
-        asserts.assert_true(_found, "Anchor ICAC (jf-anchor-icac) not found in Admin App ICAC Subject field on Ecosystem A")
-        response = await devCtrlEcoB.ReadAttribute(
-            nodeid=11, attributes=[(0, Clusters.OperationalCredentials.Attributes.NOCs)],
-            returnClusterObject=True)
-        # Search Administrator CAT (FFFF0001) and Anchor CAT (FFFD0001) in JF-Admin NOC on Ecoystem A
-        noc_tlv_data = matter.tlv.TLVReader(response[0][Clusters.OperationalCredentials].NOCs[0].noc).get()
-        _admin_cat_found = False
-        _anchor_cat_found = False
-        for _tag, _value in noc_tlv_data['Any'][6]:
-            if _tag == 22 and _value == int(self.ecoBCATs, 16):
-                _admin_cat_found = True
-            elif _tag == 22 and _value == int("FFFE0001", 16):
-                _anchor_cat_found = True
-            if _admin_cat_found and _anchor_cat_found:
-                break
-        asserts.assert_true(_admin_cat_found, "Administrator CAT not found in Admin App NOC on Ecosystem A")
-        asserts.assert_true(_anchor_cat_found, "Anchor CAT not found in Admin App NOC on Ecosystem A")
-        # Search jf-anchor-cat in Subject field of JF-Admin ICAC on Ecoystem A
-        icac_tlv_data = matter.tlv.TLVReader(response[0][Clusters.OperationalCredentials].NOCs[0].icac).get()
-        _found = False
-        for _tag, _value in icac_tlv_data['Any'][6]:
-            if _tag == 8 and _value == 'jf-anchor-icac':
-                _found = True
-                break
-        asserts.assert_true(_found, "Anchor ICAC (jf-anchor-icac) not found in Admin App ICAC Subject field on Ecosystem A")
-
-        self.step("3")
-        self.thserver_fabric_a_passcode = random.randint(110220011, 110220999)
-        self.fabric_a_server_app = AppServerSubprocess(
-            self.th_server_app,
-            storage_dir=self.storage_fabric_a,
-            port=random.randint(5001, 5999),
-            discriminator=random.randint(0, 4095),
-            passcode=self.thserver_fabric_a_passcode,
-            extra_args=["--capabilities", "0x04"])
-        self.fabric_a_server_app.start(
-            expected_output="Server initialization complete",
-            timeout=10)
-
-        self.fabric_a_ctrl.send(
-            message=f"pairing onnetwork 2 {self.thserver_fabric_a_passcode}",
-            expected_output="[CTL] Commissioning complete for node ID 0x0000000000000002: success",
-            timeout=10)
-
-        response = await devCtrlEcoA.ReadAttribute(
-            nodeid=2, attributes=[(0, Clusters.OperationalCredentials.Attributes.Fabrics)],
-            returnClusterObject=True)
-        asserts.assert_equal(
-            self.jfctrl_fabric_a_vid,
-            response[0][Clusters.OperationalCredentials].fabrics[0].vendorID,
-            "JF-Admin App on Ecosystem A doesn't have the correct VID")
-
-        response = await devCtrlEcoA.ReadAttribute(
-            nodeid=2, attributes=[(0, Clusters.AccessControl.Attributes.Acl)],
-            returnClusterObject=True)
-        asserts.assert_equal(
-            int('0xFFFFFFFD'+self.ecoACATs, 16),
-            response[0][Clusters.AccessControl].acl[0].subjects[0],
-            "EcoA Server App Subjects field has wrong value")
-
-        self.step("4")
         self.thserver_fabric_b_passcode = random.randint(110220011, 110220999)
         self.fabric_b_server_app = AppServerSubprocess(
             self.th_server_app,
@@ -385,23 +246,117 @@ class TC_JCM_1_1(MatterBaseTest):
             expected_output="[CTL] Commissioning complete for node ID 0x0000000000000016: success",
             timeout=10)
 
-        response = await devCtrlEcoB.ReadAttribute(
-            nodeid=22, attributes=[(0, Clusters.OperationalCredentials.Attributes.Fabrics)],
-            returnClusterObject=True)
-        asserts.assert_equal(
-            self.jfctrl_fabric_b_vid,
-            response[0][Clusters.OperationalCredentials].fabrics[0].vendorID,
-            "JF-Admin App on Ecosystem A doesn't have the correct VID")
+    def teardown_class(self):
+        # Stop all Subprocesses that were started in this test case
+        if self.fabric_a_admin is not None:
+            self.fabric_a_admin.terminate()
+        if self.fabric_b_admin is not None:
+            self.fabric_b_admin.terminate()
+        if self.fabric_a_ctrl is not None:
+            self.fabric_a_ctrl.terminate()
+        if self.fabric_b_ctrl is not None:
+            self.fabric_b_ctrl.terminate()
+        if self.fabric_a_server_app is not None:
+            self.fabric_a_server_app.terminate()
+        if self.fabric_b_server_app is not None:
+            self.fabric_b_server_app.terminate()
 
-        response = await devCtrlEcoB.ReadAttribute(
-            nodeid=22, attributes=[(0, Clusters.AccessControl.Attributes.Acl)],
-            returnClusterObject=True)
-        asserts.assert_equal(
-            int('0xFFFFFFFD'+self.ecoBCATs, 16),
-            response[0][Clusters.AccessControl].acl[0].subjects[0],
-            "EcoA Server App Subjects field has wrong value")
+        super().teardown_class()
 
-        # Shutdown the Python Controllers started at the beginning of this script
+    def steps_TC_CADMIN_1_28(self) -> list[TestStep]:
+        # Steps 1 and 2 from Test Plan are done in setup class
+        return [
+            TestStep("1", "On Ecosystem B, use jfc-app for opening a joint commissioning window in jfa-app using Python Controller"
+                     "Check this Commissioning Window opens successfully with correct parameters"),
+            TestStep("2", "[Test Plan steps 4-8] On Ecosystem A, use jfc-app for commissioning jfa-app at EcosystemB using Python Controller"
+                     "Verify Joint Commissioning completes successfully with --jcm functionality"),
+            TestStep("3", "On jfc-app@EcoB used a non-filtered fabric read for reading the NOC from Fabric Index=2"
+                     "Parse the NOC bytes and Checked that it contains the Administrator CAT"),
+            TestStep("4", "EcoA CTRL read ProductID from EcoB Harness device",
+                     "Verify value is in range [1,65534]"),
+        ]
+
+    @async_test_body
+    async def test_TC_CADMIN_1_28(self):
+
+        # Creating a Controller for Ecosystem A
+        _fabric_a_persistent_storage = VolatileTemporaryPersistentStorage(
+            self.ecoACtrlStorage['repl-config'], self.ecoACtrlStorage['sdk-config'])
+        _certAuthorityManagerA = CertificateAuthority.CertificateAuthorityManager(
+            chipStack=self.matter_stack._chip_stack,
+            persistentStorage=_fabric_a_persistent_storage)
+        _certAuthorityManagerA.LoadAuthoritiesFromStorage()
+        devCtrlEcoA = _certAuthorityManagerA.activeCaList[0].adminList[0].NewController(
+            nodeId=101,
+            paaTrustStorePath=str(self.matter_test_config.paa_trust_store_path),
+            catTags=[int(self.ecoACATs, 16), int('fffe0001', 16)])
+
+        # Creating a Controller for Ecosystem B
+        _fabric_b_persistent_storage = VolatileTemporaryPersistentStorage(
+            self.ecoBCtrlStorage['repl-config'], self.ecoBCtrlStorage['sdk-config'])
+        _certAuthorityManagerB = CertificateAuthority.CertificateAuthorityManager(
+            chipStack=self.matter_stack._chip_stack,
+            persistentStorage=_fabric_b_persistent_storage)
+        _certAuthorityManagerB.LoadAuthoritiesFromStorage()
+        devCtrlEcoB = _certAuthorityManagerB.activeCaList[0].adminList[0].NewController(
+            nodeId=201,
+            paaTrustStorePath=str(self.matter_test_config.paa_trust_store_path),
+            catTags=[int(self.ecoBCATs, 16)])
+
+        self.step("1")
+        try:
+            response = await devCtrlEcoB.OpenJointCommissioningWindow(
+                nodeid=11,
+                endpointId=1,
+                timeout=400,
+                iteration=random.randint(1000, 100000),
+                discriminator=random.randint(0, 4095)
+            )
+        except Exception as e:
+            asserts.assert_true(False, f'Exception {e} occured during OJCW')
+
+        self.step("2")
+        _nodeID = 15
+        self.fabric_a_ctrl.send(
+            message=f"pairing onnetwork {_nodeID} {response.setupPinCode} --jcm true",
+            expected_output=f"[JF] Joint Commissioning Method (nodeId={_nodeID}) success",
+            timeout=10)
+
+        self.step("3")
+        # Read JF-Admin NOC on Ecoystem B using jfc-app@EcoB
+        response = await devCtrlEcoB.ReadAttribute(
+            nodeid=11, attributes=[(0, Clusters.OperationalCredentials.Attributes.NOCs)], fabricFiltered=False,
+            returnClusterObject=True)
+
+        fabricIndex2_noc = None
+        for _nocs in response[0][Clusters.OperationalCredentials].NOCs:
+            if _nocs.fabricIndex == 2:
+                fabricIndex2_noc = _nocs.noc
+        asserts.assert_is_not_none(fabricIndex2_noc, "No NOC on fabric index 2 found!")
+
+        # Search Administrator CAT (FFFF0001) in JF-Admin NOC on Ecosystem B
+        noc_tlv_data = matter.tlv.TLVReader(fabricIndex2_noc).get()
+        _admin_cat_found = False
+        for _tag, _value in noc_tlv_data['Any'][6]:
+            if _tag == 22 and _value == int(self.ecoBCATs, 16):
+                _admin_cat_found = True
+                break
+        asserts.assert_true(_admin_cat_found, "Administrator CAT not found in Admin App NOC on Ecosystem B")
+
+        response = await devCtrlEcoA.ReadAttribute(
+            nodeid=15, attributes=[(0, Clusters.AccessControl.Attributes.Acl)],
+            returnClusterObject=True)
+        asserts.assert_not_equal(int('fffe0001', 16), response[0][Clusters.AccessControl].acl[0].subjects,
+                                 "Anchor CAT not found in Subject field of JF-Admin on Fabric A(Joint Fabric)")
+
+        self.step("4")
+        # TODO: Uncomment step once https://github.com/project-chip/connectedhomeip/issues/40836 is fixed
+        # response = await devCtrlEcoA.ReadAttribute(
+        #     nodeid=22, attributes=[(0, Clusters.BasicInformation.Attributes.ProductID)],
+        #     returnClusterObject=True)
+        # asserts.assert_in(response[0][Clusters.BasicInformation].productID,
+        #                   range(1, 65535), "Invalid Product ID for node 22 on Joint Fabric")
+
         devCtrlEcoA.Shutdown()
         devCtrlEcoB.Shutdown()
 
