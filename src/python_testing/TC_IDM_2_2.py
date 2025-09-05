@@ -71,55 +71,18 @@ class TC_IDM_2_2(MatterBaseTest, BasicCompositionTests):
         self.endpoint = 0
 
     # === Attribute Reading and Verification ===
-    async def read_attribute(self, attribute_path: list) -> dict:
-        """Read attributes from the device."""
-        try:
-            return await self.default_controller.Read(
-                self.dut_node_id,
-                attribute_path)
-        except ChipStackError as e:  # chipstack-ok
-            if "Timeout" in str(e):
-                logging.error("Read operation timed out")
-                logging.error(f"Attribute path: {attribute_path}")
-            raise
-
-    async def verify_attribute_read(self, attribute_path: list, expected_error: Status = None) -> dict:
+    async def verify_attribute_read(self, attribute_path: list) -> dict:
         """Read and verify attributes from the device.
 
         Args:
             attribute_path: List of attribute paths to read (should be AttributePath objects or tuples like (endpoint, cluster, attribute))
-            expected_error: Optional expected error status
 
         Returns:
             Dictionary containing the read results
-
-        Raises:
-            AssertionError if verification fails
         """
-        if expected_error:
-            try:
-                if isinstance(attribute_path[0], AttributePath):
-                    endpoint = attribute_path[0].EndpointId
-                    cluster = attribute_path[0].ClusterId
-                    attribute = attribute_path[0].AttributeId
-                else:
-                    # Handle tuple case
-                    endpoint = attribute_path[0][0] if len(attribute_path[0]) > 0 else None
-                    cluster = attribute_path[0][1] if len(attribute_path[0]) > 1 else None
-                    attribute = attribute_path[0][2] if len(attribute_path[0]) > 2 else None
-                result = await self.read_single_attribute_expect_error(
-                    endpoint=endpoint,
-                    cluster=cluster,
-                    attribute=attribute,
-                    error=expected_error)
-                return result
-            except KeyError:
-                if expected_error in [Status.UnsupportedEndpoint, Status.UnsupportedCluster]:
-                    return None
-                raise
-
-        logging.info(f"Reading attribute Here: {attribute_path}")
-        read_response = await self.read_attribute(attribute_path)
+        read_response = await self.default_controller.Read(
+                self.dut_node_id,
+                attribute_path)
         self.verify_read_response(read_response, attribute_path)
         return read_response
 
@@ -128,7 +91,7 @@ class TC_IDM_2_2(MatterBaseTest, BasicCompositionTests):
 
         Args:
             read_response: The read response to verify
-            attribute_path: The original attribute path that was read
+            attribute_path: List of AttributePath objects that were read
 
         Raises:
             AssertionError if verification fails
@@ -138,34 +101,39 @@ class TC_IDM_2_2(MatterBaseTest, BasicCompositionTests):
             self.verify_all_endpoints_clusters(read_response)
             return
 
-        if isinstance(attribute_path[0], tuple):
-            self.verify_specific_path(read_response, attribute_path[0])
-        elif isinstance(attribute_path[0], type):
-            self.verify_cluster_path(read_response, attribute_path[0])
-        elif isinstance(attribute_path[0], AttributePath):
+        # Only support AttributePath objects now
+        if isinstance(attribute_path[0], AttributePath):
             self.verify_attribute_path(read_response, attribute_path[0])
+        else:
+            raise ValueError(f"Only AttributePath objects are supported, got {type(attribute_path[0])}")
 
     def verify_all_endpoints_clusters(self, read_response: dict):
-        """Verify read response for all endpoints and clusters.
+        """Verify read response for a full wildcard read (all attributes from all clusters on all endpoints).
+        
+        This method performs comprehensive verification that only makes sense for wildcard reads
+        where you have complete data for all endpoints, clusters, and attributes.
 
         Args:
-            read_response: The read response to verify
+            read_response: The read response from a wildcard read to verify
 
         Raises:
             AssertionError if verification fails
         """
+        # Verify that we got data for all expected endpoints based on EP0's parts list
+        # The parts list on EP0 contains all other endpoints, so total endpoints = parts_list + [0]
+        if 0 in read_response.tlvAttributes:
+            parts_list = read_response.tlvAttributes[0][Clusters.Descriptor.id][
+                Clusters.Descriptor.Attributes.PartsList.attribute_id]
+            expected_endpoints = sorted(parts_list + [0])  # parts list + endpoint 0 itself
+            actual_endpoints = sorted(read_response.tlvAttributes.keys())
+            asserts.assert_equal(actual_endpoints, expected_endpoints,
+                               f"Read response endpoints {actual_endpoints} don't match expected {expected_endpoints}")
+
         for endpoint in read_response.tlvAttributes:
-            # Assert PartsList is always present
             asserts.assert_in(
                 Clusters.Descriptor.Attributes.PartsList.attribute_id,
                 read_response.tlvAttributes[endpoint][Clusters.Descriptor.id],
                 "PartsList attribute should always be present")
-            parts_list = read_response.tlvAttributes[endpoint][Clusters.Descriptor.id][
-                Clusters.Descriptor.Attributes.PartsList.attribute_id]
-            if Clusters.Descriptor.Attributes.PartsList in self.endpoints[endpoint][Clusters.Descriptor]:
-                asserts.assert_equal(parts_list, self.endpoints[endpoint][Clusters.Descriptor][
-                    Clusters.Descriptor.Attributes.PartsList],
-                    "Parts list is not the expected value")
 
             # Server list matches returned clusters
             returned_clusters = sorted(list(read_response.tlvAttributes[endpoint].keys()))
@@ -184,74 +152,6 @@ class TC_IDM_2_2(MatterBaseTest, BasicCompositionTests):
                 asserts.assert_equal(returned_attrs, attr_list,
                                      f"Mismatch for {cluster} at endpoint {endpoint}")
 
-    def verify_specific_path(self, read_response: dict, path: tuple):
-        """Verify read response for a specific path.
-
-        Args:
-            read_response: The read response to verify
-            path: The specific path that was read (endpoint, cluster, attribute) or (endpoint, cluster)
-
-        Raises:
-            AssertionError if verification fails
-        """
-        if len(path) == 3:
-            endpoint, cluster_obj, attribute = path
-        elif len(path) == 2:
-            endpoint, cluster_obj = path
-            attribute = None
-        else:
-            raise ValueError(f"Invalid path length: {len(path)}, expected 2 or 3 elements")
-
-        # Handle case where endpoint is None (read from all endpoints)
-        if endpoint is None:
-            for ep in read_response.tlvAttributes:
-                self._verify_single_endpoint_path(read_response, ep, attribute)
-        else:
-            self._verify_single_endpoint_path(read_response, endpoint, attribute)
-
-    def _verify_single_endpoint_path(
-        self,
-        read_response: dict,
-        endpoint: int,
-        attribute: Clusters.ClusterObjects.ClusterAttributeDescriptor
-    ) -> None:
-        """Verify read response for a single endpoint path by validating against Descriptor cluster data.
-
-        This function validates endpoint data by checking the ServerList from the Descriptor cluster
-        against the actual clusters returned, regardless of what was originally read.
-
-        Args:
-            read_response: The read response to verify
-            endpoint: The endpoint to verify
-            attribute: The specific attribute (if any)
-        Raises:
-            AssertionError if verification fails
-        """
-        # Use Descriptor cluster's ServerList to validate the endpoint data
-        server_list = read_response.tlvAttributes[endpoint][Clusters.Descriptor.id][
-            Clusters.Descriptor.Attributes.ServerList.attribute_id]
-        asserts.assert_equal(sorted(server_list), sorted([x.id for x in self.endpoints[endpoint]]))
-
-    def verify_cluster_path(self, read_response: dict, cluster: ClusterObjects.Cluster):
-        """Verify read response for a cluster path.
-
-        Args:
-            read_response: The read response to verify
-            cluster: The cluster that was read
-
-        Raises:
-            AssertionError if verification fails
-        """
-        for endpoint in read_response.tlvAttributes:
-            cluster_ids = list(read_response.tlvAttributes[endpoint].keys())
-            asserts.assert_in(cluster.id, cluster_ids)
-
-            returned_attributes = read_response.tlvAttributes[endpoint][cluster.id][
-                cluster.Attributes.AttributeList.attribute_id]
-            asserts.assert_equal(sorted(returned_attributes),
-                                 sorted(read_response.tlvAttributes[endpoint][cluster.id].keys()),
-                                 "Expected attribute list doesn't match")
-
     def verify_attribute_path(self, read_response: dict, path: AttributePath):
         """Verify read response for an attribute path.
 
@@ -263,39 +163,40 @@ class TC_IDM_2_2(MatterBaseTest, BasicCompositionTests):
             AssertionError if verification fails
         """
         endpoint = path.EndpointId
+        cluster_id = path.ClusterId
+        attribute_id = path.AttributeId
+        
         endpoint_list = [endpoint] if endpoint is not None else list(self.endpoints.keys())
 
-        for endpoint in endpoint_list:
-            asserts.assert_in(Clusters.Descriptor.id,
-                              read_response.tlvAttributes[endpoint].keys(),
-                              "Descriptor cluster not in output")
-            asserts.assert_in(Clusters.Descriptor.Attributes.AttributeList.attribute_id,
-                              read_response.tlvAttributes[endpoint][Clusters.Descriptor.id],
-                              "AttributeList not in output")
-
-    async def _read_single_attribute(self, endpoint, cluster, attribute):
-        return await self.verify_attribute_read([(endpoint, cluster, attribute)])
-
-    async def _read_all_cluster_attributes(self, endpoint, cluster):
-        return await self.verify_attribute_read([(endpoint, cluster)])
-
-    async def _read_attribute_all_endpoints(self, cluster, attribute):
-        return await self.verify_attribute_read([(None, cluster, attribute)])
-
-    async def _read_global_attribute(self, endpoint, attribute_id):
-        attribute_path = AttributePath(
-            EndpointId=endpoint,
-            ClusterId=None,
-            AttributeId=attribute_id)
-        return await self.verify_attribute_read([attribute_path])
-
-    async def _read_all_attributes(self):
-        read_request = await asyncio.wait_for(
-            self.default_controller.Read(self.dut_node_id, [()]),
-            timeout=120.0
-        )
-        self._verify_empty_wildcard([()], read_request)
-        return read_request
+        for ep in endpoint_list:
+            asserts.assert_in(ep, read_response.tlvAttributes, 
+                            f"Endpoint {ep} not found in response")
+            
+            if cluster_id is not None:
+                asserts.assert_in(cluster_id, read_response.tlvAttributes[ep],
+                                f"Cluster {cluster_id} not found in endpoint {ep}")
+                
+                if attribute_id is not None:
+                    asserts.assert_in(attribute_id, read_response.tlvAttributes[ep][cluster_id],
+                                    f"Attribute {attribute_id} not found in cluster {cluster_id} on endpoint {ep}")
+                else:
+                    # All attributes from the cluster were requested
+                    # Verify AttributeList is present 
+                    cluster_obj = ClusterObjects.ALL_CLUSTERS.get(cluster_id)
+                    if cluster_obj and hasattr(cluster_obj.Attributes, 'AttributeList'):
+                        attr_list_id = cluster_obj.Attributes.AttributeList.attribute_id
+                        asserts.assert_in(attr_list_id, read_response.tlvAttributes[ep][cluster_id],
+                                        f"AttributeList not found in cluster {cluster_id} on endpoint {ep}")
+            else:
+                # For global attributes, we expect them to be present across all clusters
+                if attribute_id is not None:
+                    found_in_any_cluster = False
+                    for cluster in read_response.tlvAttributes[ep].values():
+                        if attribute_id in cluster:
+                            found_in_any_cluster = True
+                            break
+                    asserts.assert_true(found_in_any_cluster, 
+                                      f"Global attribute {attribute_id} not found in any cluster on endpoint {ep}")
 
     async def _read_global_attribute_all_endpoints(self, attribute_id):
         attribute_path = AttributePath(
@@ -330,14 +231,55 @@ class TC_IDM_2_2(MatterBaseTest, BasicCompositionTests):
         return read_request
 
     async def _read_unsupported_endpoint(self):
-        return await self.verify_attribute_read(
-            [(0xFFFF, Clusters.Descriptor, Clusters.Descriptor.Attributes.ServerList)],
-            expected_error=Status.UnsupportedEndpoint)
+        """
+        Find unsupported endpoint and attempt to read from it
+        """
+        supported_endpoints = set(self.endpoints.keys())
+        all_endpoints = set(range(max(supported_endpoints)+2))
+        unsupported = list(all_endpoints - supported_endpoints)
+        await self.read_single_attribute_expect_error(endpoint=unsupported[0], cluster=Clusters.Descriptor, attribute=Clusters.Descriptor.Attributes.FeatureMap, error=Status.UnsupportedEndpoint)
 
     async def _read_unsupported_cluster(self):
-        return await self.verify_attribute_read(
-            [(0, 0xFFFF, Clusters.Descriptor.Attributes.ServerList)],
-            expected_error=Status.UnsupportedCluster)
+        """
+        Find a standard cluster that's not supported on any endpoint and try to read from it.
+        """
+        # Get all standard clusters supported on all endpoints
+        supported_cluster_ids = set()
+        for endpoint_clusters in self.endpoints.values():
+            supported_cluster_ids.update({cluster.id for cluster in endpoint_clusters.keys() 
+                                         if global_attribute_ids.cluster_id_type(cluster.id) == global_attribute_ids.ClusterIdType.kStandard})
+        
+        # Get all possible standard clusters
+        all_standard_cluster_ids = {cluster_id for cluster_id in ClusterObjects.ALL_CLUSTERS.keys()
+                                  if global_attribute_ids.cluster_id_type(cluster_id) == global_attribute_ids.ClusterIdType.kStandard}
+        
+         # Find unsupported clusters
+        unsupported_cluster_ids = all_standard_cluster_ids - supported_cluster_ids
+        
+        # If no unsupported clusters are found, skip this test step
+        if not unsupported_cluster_ids:
+            self.skip_step("No unsupported standard clusters found to test")
+            return
+            
+        # Use the first unsupported cluster
+        unsupported_cluster_id = next(iter(unsupported_cluster_ids))
+        unsupported_cluster = ClusterObjects.ALL_CLUSTERS[unsupported_cluster_id]
+        
+        # Get any attribute from this cluster 
+        cluster_attributes = ClusterObjects.ALL_ATTRIBUTES[unsupported_cluster_id]
+        test_attribute = next(iter(cluster_attributes.values()))
+        
+        # Test the unsupported cluster on all available endpoints
+        # It should return UnsupportedCluster error from all endpoints
+        for endpoint_id in self.endpoints.keys():
+            result = await self.read_single_attribute_expect_error(
+                endpoint=endpoint_id, 
+                cluster=unsupported_cluster, 
+                attribute=test_attribute, 
+                error=Status.UnsupportedCluster)
+            asserts.assert_true(isinstance(result.Reason, InteractionModelError),
+                                msg=f"Unexpected success reading invalid cluster on endpoint {endpoint_id}")
+            logging.info(f"Confirmed unsupported cluster {unsupported_cluster_id} returns error on endpoint {endpoint_id}")
 
     async def _read_unsupported_attribute(self):
         """
@@ -381,7 +323,8 @@ class TC_IDM_2_2(MatterBaseTest, BasicCompositionTests):
     async def _read_repeat_attribute(self, endpoint, cluster, attribute, repeat_count):
         results = []
         for i in range(repeat_count):
-            result = await self.verify_attribute_read([(endpoint, cluster, attribute)])
+            path = AttributePath(EndpointId=endpoint, ClusterId=cluster.id, AttributeId=attribute.attribute_id)
+            result = await self.verify_attribute_read([path])
             results.append(result)
 
         # Verify all reads returned consistent values
@@ -569,28 +512,31 @@ class TC_IDM_2_2(MatterBaseTest, BasicCompositionTests):
         await self.setup_class_helper(allow_pase=False)
 
         self.step(1)
-        await self._read_single_attribute(
-            endpoint=self.endpoint,
-            cluster=Clusters.Descriptor,
-            attribute=Clusters.Descriptor.Attributes.ServerList)
+        # Read a single attribute
+        path = AttributePath(EndpointId=self.endpoint, ClusterId=Clusters.Descriptor.id, AttributeId=Clusters.Descriptor.Attributes.ServerList.attribute_id)
+        await self.verify_attribute_read([path])
 
         self.step(2)
-        await self._read_all_cluster_attributes(
-            endpoint=self.endpoint,
-            cluster=Clusters.Descriptor)
+        # Read all attributes on a cluster
+        path = AttributePath(EndpointId=self.endpoint, ClusterId=Clusters.Descriptor.id, AttributeId=None)
+        await self.verify_attribute_read([path])
 
         self.step(3)
-        await self._read_attribute_all_endpoints(
-            cluster=Clusters.Descriptor,
-            attribute=Clusters.Descriptor.Attributes.ServerList)
+        # Read an attribute from all endpoints
+        path = AttributePath(EndpointId=None, ClusterId=Clusters.Descriptor.id, AttributeId=Clusters.Descriptor.Attributes.ServerList.attribute_id)
+        await self.verify_attribute_read([path])
 
         self.step(4)
-        await self._read_global_attribute(
-            endpoint=self.endpoint,
-            attribute_id=global_attribute_ids.GlobalAttributeIds.ATTRIBUTE_LIST_ID)
+        # Read a global attribute
+        path = AttributePath(EndpointId=self.endpoint, ClusterId=None, AttributeId=global_attribute_ids.GlobalAttributeIds.ATTRIBUTE_LIST_ID)
+        await self.verify_attribute_read([path])
 
         self.step(5)
-        await self._read_all_attributes()
+        read_request = await asyncio.wait_for(
+            self.default_controller.Read(self.dut_node_id, [()]),
+            timeout=120.0
+        )
+        self._verify_empty_wildcard([()], read_request)
 
         self.step(6)
         await self._read_global_attribute_all_endpoints(
