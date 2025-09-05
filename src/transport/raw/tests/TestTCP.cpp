@@ -223,7 +223,7 @@ public:
         CHIP_ERROR err = tcp.TCPConnect(Transport::PeerAddress::TCP(addr, port), nullptr, refHolder);
         EXPECT_EQ(err, CHIP_NO_ERROR);
 
-        err = tcp.TCPConnect(Transport::PeerAddress::TCP(addr, port), &gAppTCPConnCbCtxt, refHolder);
+        err = tcp.TCPConnect(Transport::PeerAddress::TCP(addr, port), nullptr, refHolder);
         EXPECT_EQ(err, CHIP_NO_ERROR);
 
         // Should be able to send a message to itself by just calling send.
