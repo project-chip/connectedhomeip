@@ -23,9 +23,9 @@
 #include <platform/ESP32/ESP32Config.h>
 #include <platform/ESP32/ESP32SecureCertDACProvider.h>
 
-#ifdef CONFIG_USE_ESP32_ECDSA_PERIPHERAL
+#if defined(CONFIG_USE_ESP32_ECDSA_PERIPHERAL) || defined(CONFIG_USE_ESP32_TEE_SECURE_STORAGE)
 #include <platform/ESP32/ESP32CHIPCryptoPAL.h>
-#endif // CONFIG_USE_ESP32_ECDSA_PERIPHERAL
+#endif // CONFIG_USE_ESP32_ECDSA_PERIPHERAL || CONFIG_USE_ESP32_TEE_SECURE_STORAGE
 
 #define TAG "dac_provider"
 
@@ -130,8 +130,9 @@ CHIP_ERROR ESP32SecureCertDACProvider ::SignWithDeviceAttestationKey(const ByteS
     // This flow is for devices supporting ECDSA peripheral
     if (keyType == ESP_SECURE_CERT_ECDSA_PERIPHERAL_KEY)
     {
-#ifdef CONFIG_USE_ESP32_ECDSA_PERIPHERAL
         Crypto::ESP32P256Keypair keypair;
+
+#ifdef CONFIG_USE_ESP32_ECDSA_PERIPHERAL
         uint8_t efuseBlockId;
 
         esp_err = esp_secure_cert_get_priv_key_efuse_id(&efuseBlockId);
@@ -144,13 +145,23 @@ CHIP_ERROR ESP32SecureCertDACProvider ::SignWithDeviceAttestationKey(const ByteS
         VerifyOrReturnError(chipError == CHIP_NO_ERROR, chipError,
                             ESP_LOGE(TAG, "Failed to initialize the keypair err:%" CHIP_ERROR_FORMAT, chipError.Format()));
 
+#elif defined(CONFIG_USE_ESP32_TEE_SECURE_STORAGE)
+        const char * key_id = chip::DeviceLayer::Internal::ESP32Config::kConfigKey_DACPrivateKey.Name;
+
+        ESP_LOGD(TAG, "TEE secure storage key id: %s", key_id);
+
+        chipError = keypair.InitializeFromTEE(chip::Crypto::ECPKeyTarget::ECDSA, key_id);
+        VerifyOrReturnError(chipError == CHIP_NO_ERROR, chipError,
+                            ESP_LOGE(TAG, "Failed to initialize the keypair err:%" CHIP_ERROR_FORMAT, chipError.Format()));
+
+#else
+        return CHIP_ERROR_INCORRECT_STATE;
+#endif // CONFIG_USE_ESP32_ECDSA_PERIPHERAL
+
         chipError = keypair.ECDSA_sign_msg(messageToSign.data(), messageToSign.size(), signature);
         VerifyOrReturnError(
             chipError == CHIP_NO_ERROR, chipError,
             ESP_LOGE(TAG, "Failed to sign with device attestation key, err:%" CHIP_ERROR_FORMAT, chipError.Format()));
-#else
-        return CHIP_ERROR_INCORRECT_STATE;
-#endif // CONFIG_USE_ESP32_ECDSA_PERIPHERAL
     }
     else // This flow is for devices which do not support ECDSA peripheral
     {
