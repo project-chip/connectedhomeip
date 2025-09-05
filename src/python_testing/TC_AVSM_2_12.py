@@ -36,7 +36,6 @@
 # === END CI TEST ARGUMENTS ===
 
 import logging
-
 import random
 
 from mobly import asserts
