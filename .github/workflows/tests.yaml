@@ -927,7 +927,7 @@ jobs:
             TSAN_OPTIONS: "halt_on_error=1"
 
         if: github.actor != 'restyled-io[bot]'
-        runs-on: ${{ github.event_name == 'schedule' && 'macos-13' || 'macos-15' }}
+        runs-on: ${{ matrix.os }}
 
         steps:
             - name: Checkout
