@@ -42,7 +42,7 @@ public:
     CommodityTariffInstance(EndpointId aEndpointId, CommodityTariffDelegate & aDelegate, Feature aFeature) :
         CommodityTariff::Instance(aEndpointId, aDelegate, aFeature)
     {
-        mDelegate = &aDelegate;
+        mCommodityTariffDelegate = &aDelegate;
     }
 
     // Delete copy constructor and assignment operator.
@@ -54,13 +54,13 @@ public:
     void Shutdown();
     CHIP_ERROR AppInit();
 
-    CommodityTariffDelegate * GetDelegate() { return mDelegate; };
+    CommodityTariffDelegate * GetDelegate() { return mCommodityTariffDelegate; };
 
     void ActivateTariffTimeTracking(uint32_t timestamp);
     void TariffTimeTrackingSetOffset(uint32_t offset);
 
 private:
-    CommodityTariffDelegate * mDelegate;
+    CommodityTariffDelegate * mCommodityTariffDelegate;
     uint32_t TimestampNow    = 0;
     uint32_t TestTimeOverlay = 0;
 
