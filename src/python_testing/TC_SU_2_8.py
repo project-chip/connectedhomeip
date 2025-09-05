@@ -16,8 +16,8 @@
 #
 
 
+import asyncio
 import logging
-import time
 
 from mobly import asserts
 
@@ -194,7 +194,15 @@ class TC_SU_2_8(MatterBaseTest):
 
         # Do not announce TH1-OTA Provider
 
-        # To avoid the DUT/requestor enter an invalid state, there is no sleep time here and the test step 2 starts right away.
+        # To avoid the DUT/requestor enter an invalid state, there is a show sleep time and then the DefaultOTAProviders is cleaned to avoid future attempts.
+        await asyncio.sleep(5)
+
+        logging.info("Cleaning DefaultOTAProviders.")
+        resp = await th1.WriteAttribute(
+            dut_node_id,
+            [(endpoint, Clusters.Objects.OtaSoftwareUpdateRequestor.Attributes.DefaultOTAProviders([]))]
+        )
+        asserts.assert_equal(resp[0].Status, Status.Success, "Clean DefaultOTAProviders failed.")
 
         # DUT sends QueryImage command to TH2/OTA-P.
         self.step(2)
@@ -204,7 +212,7 @@ class TC_SU_2_8(MatterBaseTest):
 
         # Write defaul OTA providers TH2
         default_ota_providers = await self.read_single_attribute_check_success(
-            node_id=self.dut_node_id,
+            node_id=dut_node_id_th2,
             endpoint=endpoint,
             attribute=Clusters.Objects.OtaSoftwareUpdateRequestor.Attributes.DefaultOTAProviders,
             cluster=Clusters.Objects.OtaSoftwareUpdateRequestor,
@@ -216,10 +224,10 @@ class TC_SU_2_8(MatterBaseTest):
         # Subscribe to events
         target_version = 2
         event_cb = EventSubscriptionHandler(expected_cluster=Clusters.Objects.OtaSoftwareUpdateRequestor)
-        await event_cb.start(dev_ctrl=th2, node_id=dut_node_id, endpoint=endpoint,
+        await event_cb.start(dev_ctrl=th2, node_id=dut_node_id_th2, endpoint=endpoint,
                              fabric_filtered=False, min_interval_sec=0, max_interval_sec=5)
 
-        time.sleep(5)
+        await asyncio.sleep(5)
 
         # Announce after subscription
         await self._announce(th2, vendor_id, p2_node, endpoint)
