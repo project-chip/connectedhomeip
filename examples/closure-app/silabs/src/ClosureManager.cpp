@@ -785,27 +785,28 @@ void ClosureManager::HandleClosureMotionAction()
             if (!mClosureEndpoint1CurrentState.Value().latch.Value().Value() &&
                 mClosureEndpoint1TargetState.Value().latch.Value().Value())
             {
-            // In Real application, this would be replaced with actual latch logic.
-            ChipLogProgress(AppServer, "Performing latch action");
-            mClosureEndpoint1CurrentState.Value().latch.SetValue(DataModel::MakeNullable(true));
-            if (mClosureEndpoint1CurrentState.Value().position.HasValue() &&
-                !mClosureEndpoint1CurrentState.Value().position.Value().IsNull())
-            {
-                if (mClosureEndpoint1CurrentState.Value().position.Value().Value() == CurrentPositionEnum::kFullyClosed)
+                // In Real application, this would be replaced with actual latch logic.
+                ChipLogProgress(AppServer, "Performing latch action");
+                mClosureEndpoint1CurrentState.Value().latch.SetValue(DataModel::MakeNullable(true));
+                if (mClosureEndpoint1CurrentState.Value().position.HasValue() &&
+                    !mClosureEndpoint1CurrentState.Value().position.Value().IsNull())
                 {
-                    mClosureEndpoint1CurrentState.Value().secureState.SetNonNull(true);
+                    if (mClosureEndpoint1CurrentState.Value().position.Value().Value() == CurrentPositionEnum::kFullyClosed)
+                    {
+                        mClosureEndpoint1CurrentState.Value().secureState.SetNonNull(true);
+                    }
+                    else
+                    {
+                        mClosureEndpoint1CurrentState.Value().secureState.SetNonNull(false);
+                    }
                 }
-                else
-                {
-                    mClosureEndpoint1CurrentState.Value().secureState.SetNonNull(false);
-                }
+                instance.mClosureEndpoint1.GetLogic().SetOverallCurrentState(mClosureEndpoint1CurrentState);
+                mClosurePanelEndpoint2CurrentState.Value().latch.SetValue(DataModel::MakeNullable(true));
+                instance.mClosurePanelEndpoint2.GetLogic().SetCurrentState(mClosurePanelEndpoint2CurrentState);
+                mClosurePanelEndpoint3CurrentState.Value().latch.SetValue(DataModel::MakeNullable(true));
+                instance.mClosurePanelEndpoint3.GetLogic().SetCurrentState(mClosurePanelEndpoint3CurrentState);
+                ChipLogProgress(AppServer, "latched action complete");
             }
-            instance.mClosureEndpoint1.GetLogic().SetOverallCurrentState(mClosureEndpoint1CurrentState);
-            mClosurePanelEndpoint2CurrentState.Value().latch.SetValue(DataModel::MakeNullable(true));
-            instance.mClosurePanelEndpoint2.GetLogic().SetCurrentState(mClosurePanelEndpoint2CurrentState);
-            mClosurePanelEndpoint3CurrentState.Value().latch.SetValue(DataModel::MakeNullable(true));
-            instance.mClosurePanelEndpoint3.GetLogic().SetCurrentState(mClosurePanelEndpoint3CurrentState);
-            ChipLogProgress(AppServer, "latched action complete");
         }
     }
 
