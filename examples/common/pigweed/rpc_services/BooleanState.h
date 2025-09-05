@@ -50,7 +50,7 @@ public:
 
             auto booleanState = app::Clusters::BooleanState::GetClusterForEndpointIndex(endpointId);
             VerifyOrReturnError(booleanState != nullptr, pw::Status::InvalidArgument());
-            RETURN_STATUS_IF_NOT_OK(booleanState->SetStateValue(newState, eventNumber));
+            booleanState->SetStateValue(newState, &eventNumber);
         }
 
         response.event_number = static_cast<uint64_t>(eventNumber);

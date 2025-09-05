@@ -208,8 +208,7 @@ void AppTask::AppTaskMain(void * pvParameter)
                 auto booleanState = app::Clusters::BooleanState::GetClusterForEndpointIndex(1);
                 if (booleanState != nullptr)
                 {
-                    EventNumber eventNumber;
-                    booleanState->SetStateValue(stateValueAttrValue, eventNumber);
+                    booleanState->SetStateValue(stateValueAttrValue);
                 }
             }
 
@@ -220,8 +219,7 @@ void AppTask::AppTaskMain(void * pvParameter)
                 auto booleanState = app::Clusters::BooleanState::GetClusterForEndpointIndex(1);
                 if (booleanState != nullptr)
                 {
-                    EventNumber eventNumber;
-                    booleanState->SetStateValue(stateValueAttrValue, eventNumber);
+                    booleanState->SetStateValue(stateValueAttrValue);
                 }
             }
 

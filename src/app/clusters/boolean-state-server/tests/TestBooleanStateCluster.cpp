@@ -133,15 +133,18 @@ TEST_F(TestBooleanStateCluster, StateValue)
     for (EndpointId endpoint = 0; endpoint < kBooleanStateFixedClusterCount; ++endpoint)
     {
         BooleanStateClusterTest(endpoint).Check([](BooleanStateCluster & booleanState) {
-            StateValue::TypeInfo::Type stateValue = false;
-            EventNumber eventNumber;
-            booleanState.SetStateValue(stateValue, eventNumber);
-            StateValue::TypeInfo::Type stateVal;
-            stateVal = booleanState.GetStateValue();
+            bool stateValue = false;
+            booleanState.SetStateValue(stateValue);
+            auto stateVal = booleanState.GetStateValue();
             EXPECT_EQ(stateVal, stateValue);
 
             stateValue = true;
-            booleanState.SetStateValue(stateValue, eventNumber);
+            booleanState.SetStateValue(stateValue);
+            stateVal = booleanState.GetStateValue();
+            EXPECT_EQ(stateVal, stateValue);
+
+            stateValue = false;
+            booleanState.SetStateValue(stateValue);
             stateVal = booleanState.GetStateValue();
             EXPECT_EQ(stateVal, stateValue);
         });

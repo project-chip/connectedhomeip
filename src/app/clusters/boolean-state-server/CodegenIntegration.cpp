@@ -20,6 +20,7 @@
 #include <app/clusters/boolean-state-server/boolean-state-cluster.h>
 #include <app/static-cluster-config/BooleanState.h>
 #include <app/util/attribute-storage.h>
+#include <data-model-providers/codegen/ClusterIntegration.h>
 #include <data-model-providers/codegen/CodegenDataModelProvider.h>
 
 using namespace chip;
@@ -35,60 +36,74 @@ constexpr size_t kBooleanStateMaxClusterCount   = kBooleanStateFixedClusterCount
 
 LazyRegisteredServerCluster<BooleanStateCluster> gServers[kBooleanStateFixedClusterCount];
 
-// Find the 0-based array index corresponding to the given endpoint id.
-// Log an error if not found.
-bool FindEndpointWithLog(EndpointId endpointId, uint16_t & outArrayIndex)
+class IntegrationDelegate : public CodegenClusterIntegration::Delegate
 {
-    uint16_t arrayIndex = emberAfGetClusterServerEndpointIndex(endpointId, BooleanState::Id, kBooleanStateFixedClusterCount);
-
-    if (arrayIndex >= kBooleanStateMaxClusterCount)
+public:
+    ServerClusterRegistration & CreateRegistration(EndpointId endpointId, unsigned emberEndpointIndex,
+                                                   uint32_t optionalAttributeBits, uint32_t featureMap) override
     {
-        ChipLogError(AppServer, "Could not find endpoint index for endpoint %u", endpointId);
-        return false;
+        gServers[emberEndpointIndex].Create(endpointId);
+        return gServers[emberEndpointIndex].Registration();
     }
-    outArrayIndex = arrayIndex;
 
-    return true;
-}
+    ServerClusterInterface & FindRegistration(unsigned emberEndpointIndex) override
+    {
+        return gServers[emberEndpointIndex].Cluster();
+    }
+
+    void ReleaseRegistration(unsigned emberEndpointIndex) override { gServers[emberEndpointIndex].Destroy(); }
+};
 
 } // namespace
 
 void emberAfBooleanStateClusterServerInitCallback(EndpointId endpointId)
 {
-    uint16_t arrayIndex = 0;
-    VerifyOrReturn(FindEndpointWithLog(endpointId, arrayIndex));
+    IntegrationDelegate integrationDelegate;
 
-    gServers[arrayIndex].Create(endpointId);
-    CHIP_ERROR err = CodegenDataModelProvider::Instance().Registry().Register(gServers[arrayIndex].Registration());
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogError(AppServer, "Failed to register BooleanState cluster on endpoint %u: %" CHIP_ERROR_FORMAT, endpointId,
-                     err.Format());
-    }
+    // register a singleton server (root endpoint only)
+    CodegenClusterIntegration::RegisterServer(
+        {
+            .endpointId                      = endpointId,
+            .clusterId                       = BooleanState::Id,
+            .fixedClusterServerEndpointCount = kBooleanStateFixedClusterCount,
+            .maxEndpointCount                = kBooleanStateMaxClusterCount,
+            .fetchFeatureMap                 = false,
+            .fetchOptionalAttributes         = false,
+        },
+        integrationDelegate);
 }
 
 void MatterBooleanStateClusterServerShutdownCallback(EndpointId endpointId)
 {
-    uint16_t arrayIndex = 0;
-    VerifyOrReturn(FindEndpointWithLog(endpointId, arrayIndex));
+    IntegrationDelegate integrationDelegate;
 
-    CHIP_ERROR err = CodegenDataModelProvider::Instance().Registry().Unregister(&gServers[arrayIndex].Cluster());
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogError(AppServer, "Failed to unregister BooleanState cluster on endpoint %u: %" CHIP_ERROR_FORMAT, endpointId,
-                     err.Format());
-    }
-    gServers[arrayIndex].Destroy();
+    // register a singleton server (root endpoint only)
+    CodegenClusterIntegration::UnregisterServer(
+        {
+            .endpointId                      = endpointId,
+            .clusterId                       = BooleanState::Id,
+            .fixedClusterServerEndpointCount = kBooleanStateFixedClusterCount,
+            .maxEndpointCount                = kBooleanStateMaxClusterCount,
+        },
+        integrationDelegate);
 }
 
 namespace chip::app::Clusters::BooleanState {
 
 BooleanStateCluster * GetClusterForEndpointIndex(EndpointId endpointId)
 {
-    uint16_t arrayIndex = 0;
-    VerifyOrReturnError(FindEndpointWithLog(endpointId, arrayIndex), nullptr);
+    IntegrationDelegate integrationDelegate;
 
-    return &gServers[arrayIndex].Cluster();
+    ServerClusterInterface * booleanState = CodegenClusterIntegration::GetClusterForEndpointIndex(
+        {
+            .endpointId                      = endpointId,
+            .clusterId                       = BooleanState::Id,
+            .fixedClusterServerEndpointCount = kBooleanStateFixedClusterCount,
+            .maxEndpointCount                = kBooleanStateMaxClusterCount,
+        },
+        integrationDelegate);
+
+    return dynamic_cast<BooleanStateCluster *>(booleanState);
 }
 
 } // namespace chip::app::Clusters::BooleanState

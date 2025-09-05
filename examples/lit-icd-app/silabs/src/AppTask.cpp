@@ -126,8 +126,7 @@ void AppTask::ApplicationEventHandler(AppEvent * aEvent)
         auto booleanState = chip::app::Clusters::BooleanState::GetClusterForEndpointIndex(1);
         VerifyOrReturn(booleanState != nullptr);
         auto state = booleanState->GetStateValue();
-        EventNumber eventNumber;
-        booleanState->SetStateValue(!state, eventNumber);
+        booleanState->SetStateValue(!state);
     });
 }
 

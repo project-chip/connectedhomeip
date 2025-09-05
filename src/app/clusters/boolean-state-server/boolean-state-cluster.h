@@ -31,12 +31,12 @@ public:
                                                 AttributeValueEncoder & encoder) override;
     CHIP_ERROR Attributes(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder) override;
 
-    CHIP_ERROR SetStateValue(const BooleanState::Attributes::StateValue::TypeInfo::Type & stateValue, EventNumber & eventNumber);
+    void SetStateValue(bool stateValue, EventNumber * eventNumber = nullptr);
 
-    BooleanState::Attributes::StateValue::TypeInfo::Type GetStateValue() const;
+    bool GetStateValue() const { return mStateValue; }
 
 protected:
-    BooleanState::Attributes::StateValue::TypeInfo::Type mStateValue;
+    bool mStateValue;
 };
 
 } // namespace chip::app::Clusters

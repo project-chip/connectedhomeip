@@ -681,8 +681,7 @@ void SetupPretendDevices()
     auto booleanState = app::Clusters::BooleanState::GetClusterForEndpointIndex(1);
     if (booleanState != nullptr)
     {
-        EventNumber eventNumber;
-        booleanState->SetStateValue(true, eventNumber);
+        booleanState->SetStateValue(true);
     }
 
     AddDevice("Thermostat");

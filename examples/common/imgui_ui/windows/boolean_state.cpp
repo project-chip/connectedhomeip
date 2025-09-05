@@ -38,8 +38,7 @@ void BooleanState::UpdateState()
 
     if (mTargetState.HasValue())
     {
-        chip::EventNumber eventNumber;
-        booleanState->SetStateValue(mTargetState.Value(), eventNumber);
+        booleanState->SetStateValue(mTargetState.Value());
         mTargetState.ClearValue();
     }
 

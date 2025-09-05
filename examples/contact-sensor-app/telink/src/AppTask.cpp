@@ -86,8 +86,7 @@ void AppTask::UpdateClusterStateInternal(intptr_t arg)
 
     auto booleanState = chip::app::Clusters::BooleanState::GetClusterForEndpointIndex(1);
     VerifyOrReturn(booleanState != nullptr);
-    EventNumber eventNumber;
-    booleanState->SetStateValue(newValue, eventNumber);
+    booleanState->SetStateValue(newValue);
 }
 
 void AppTask::ContactActionEventHandler(AppEvent * aEvent)
