@@ -210,7 +210,7 @@ class TC_SU_2_8(MatterBaseTest):
         # Write default OTA providers TH2
         await self._write_default_providers(th2, endpoint, p2_node, dut_node_id_th2)
 
-        # Write defaul OTA providers TH2
+        # Write default OTA providers TH2
         default_ota_providers = await self.read_single_attribute_check_success(
             node_id=dut_node_id_th2,
             endpoint=endpoint,
