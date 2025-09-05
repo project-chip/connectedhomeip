@@ -143,7 +143,6 @@ class TC_ICDM_3_1(MatterBaseTest):
             self.step(1)
             featureMap = await self._read_icdm_attribute_expect_success(attributes.FeatureMap)
             if featureMap & features.kCheckInProtocolSupport == 0:
-                asserts.assert_fail("WHAT THE FUCK")
                 self.mark_all_remaining_steps_skipped("2a")
                 return
 
