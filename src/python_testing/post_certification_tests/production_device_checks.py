@@ -191,7 +191,7 @@ class DclCheck(MatterBaseTest, BasicCompositionTests):
     def steps_Compliance(self):
         return [TestStep(1, "Query the information about all software versions for this PID/VID", "DCL entry exists"),
                 TestStep(2, "Query the compliance information for the specified software versions",
-                            "Check at least one compliance entry exists for the specified software versions"
+                            "Check at least one compliance entry exists for the specified software versions. "
                             "For each compliance entry the corresponding certified model entry exists")]
 
     def test_Compliance(self):
@@ -229,7 +229,7 @@ class DclCheck(MatterBaseTest, BasicCompositionTests):
         software_versions = self.get_versions_and_assert_all_keys_exist()
 
         self.step(2)
-        found_versions = []
+        is_found = False
         for software_version in software_versions:
             vid_pid_sv_str = f'{self.vid_pid_str} software version = {software_version}'
             key = 'certifiedModel'
@@ -237,12 +237,12 @@ class DclCheck(MatterBaseTest, BasicCompositionTests):
             entry = requests.get(
                 f"{self.url}/dcl/compliance/certified-models/{self.vid}/{self.pid}/{software_version}/matter").json()
             if key in entry.keys() and entry[key][sub_key] == software_version:
-                found_versions.append(software_version)
+                is_found = True
                 logging.info(
                     f'Found certified model for {vid_pid_sv_str} in the DCL:')
                 logging.info(f'{entry[key]}')
                 break
-        asserts.assert_true(found_versions,
+        asserts.assert_true(is_found,
                             f"Unable to find at least one certified model entry for the versions {software_versions}")
 
     def steps_AllSoftwareVersions(self):
