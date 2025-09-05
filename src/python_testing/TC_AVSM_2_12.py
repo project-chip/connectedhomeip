@@ -137,6 +137,24 @@ class TC_AVSM_2_12(MatterBaseTest):
                      "DUT responds with a SUCCESS status code."),
             TestStep(46, "TH reads LocalVideoRecordingEnabled attribute.",
                      "Verify that the value is the same as was written in Step 45."),
+            TestStep(47, "TH reads LocalSnapshotRecordingEnabled attribute.",
+                     "Verify that the DUT response contains a bool value. Store value as aLocalSnapshotRecordingEnabled"),
+            TestStep(48, "TH writes LocalSnapshotRecordingEnabled attribute with value set to !aLocalSnapshotRecordingEnabled.",
+                     "DUT responds with a SUCCESS status code."),
+            TestStep(49, "TH reads LocalSnapshotRecordingEnabled attribute.",
+                     "Verify that the value is the same as was written in Step 48."),
+            TestStep(50, "TH reads StatusLightEnabled attribute.",
+                     "Verify that the DUT response contains a bool value. Store value as aStatusLightEnabled"),
+            TestStep(51, "TH writes StatusLightEnabled attribute with value set to !aStatusLightEnabled.",
+                     "DUT responds with a SUCCESS status code."),
+            TestStep(52, "TH reads StatusLightEnabled attribute.",
+                     "Verify that the value is the same as was written in Step 51."),
+            TestStep(53, "TH reads StatusLightBrightness attribute.",
+                     "Verify that the DUT response contains a ThreeLevelAutoEnum value. Store value as aStatusLightBrightness"),
+            TestStep(54, "TH writes StatusLightBrightness attribute with a new valud enum value.",
+                     "DUT responds with a SUCCESS status code."),
+            TestStep(55, "TH reads StatusLightBrightness attribute.",
+                     "Verify that the value is the same as was written in Step 54."),
         ]
 
     @run_if_endpoint_matches(has_cluster(Clusters.CameraAvStreamManagement))
@@ -160,6 +178,7 @@ class TC_AVSM_2_12(MatterBaseTest):
         self.hdrSupported = aFeatureMap & cluster.Bitmaps.Feature.kHighDynamicRange
         self.nightVisionSupported = aFeatureMap & cluster.Bitmaps.Feature.kNightVision
         self.imagecControlSupported = aFeatureMap & cluster.Bitmaps.Feature.kImageControl
+        self.snapshotSupported = aFeatureMap & cluster.Bitmaps.Feature.kSnapshot
 
         if self.hdrSupported:
             self.step(2)
@@ -567,12 +586,81 @@ class TC_AVSM_2_12(MatterBaseTest):
             )
             logger.info(f"Rx'd LocalVideoRecordingEnabled: {localVideoRecordingEnabledNew}")
             asserts.assert_equal(localVideoRecordingEnabledNew, not localVideoRecordingEnabled,
-                                 "Value does not match what was written in step 45")
+                                 "Value does not match what was written for LocalVideoRecordingEnabled in step 45")
         else:
             self.skip_step(44)
             self.skip_step(45)
             self.skip_step(46)
 
+        if self.snapshotSupported and self.localStorageSupported:
+            self.step(47)
+            localSnapshotRecordingEnabled = await self.read_single_attribute_check_success(
+                endpoint=endpoint, cluster=cluster, attribute=attr.LocalSnapshotRecordingEnabled
+            )
+            logger.info(f"Rx'd LocalSnapshotRecordingEnabled: {localSnapshotRecordingEnabled}")
+
+            self.step(48)
+            result = await self.write_single_attribute(attr.LocalSnapshotRecordingEnabled(not localSnapshotRecordingEnabled),
+                                                       endpoint_id=endpoint)
+            asserts.assert_equal(result, Status.Success, "Error when trying to write LocalSnapshotRecordingEnabled")
+            logger.info(f"Tx'd LocalSnapshotRecordingEnabled: {not localSnapshotRecordingEnabled}")
+
+            self.step(49)
+            localSnapshotRecordingEnabledNew = await self.read_single_attribute_check_success(
+                endpoint=endpoint, cluster=cluster, attribute=attr.LocalSnapshotRecordingEnabled
+            )
+            logger.info(f"Rx'd LocalSnapshotRecordingEnabled: {localSnapshotRecordingEnabledNew}")
+            asserts.assert_equal(localSnapshotRecordingEnabledNew, not localSnapshotRecordingEnabled,
+                                 "Value does not match what was written for LocalSnapshotRecordingEnabled in step 48")
+        else:
+            self.skip_step(47)
+            self.skip_step(48)
+            self.skip_step(49)
+
+        if await self.attribute_guard(endpoint=endpoint, attribute=attr.StatusLightEnabled):
+            self.step(50)
+            statusLightEnabled = await self.read_single_attribute_check_success(
+                endpoint=endpoint, cluster=cluster, attribute=attr.StatusLightEnabled)
+            logger.info(f"Rx'd StatusLightEnabled: {statusLightEnabled}")
+
+            self.step(51)
+            result = await self.write_single_attribute(attr.StatusLightEnabled(not statusLightEnabled),
+                                                       endpoint_id=endpoint)
+            asserts.assert_equal(result, Status.Success, "Error when trying to write StatusLightEnabled")
+            logger.info(f"Tx'd StatusLightEnabled: {not statusLightEnabled}")
+
+            self.step(52)
+            statusLightEnabledNew = await self.read_single_attribute_check_success(
+                endpoint=endpoint, cluster=cluster, attribute=attr.StatusLightEnabled)
+            logger.info(f"Rx'd StatusLightEnabled: {statusLightEnabledNew}")
+            asserts.assert_equal(statusLightEnabledNew, not statusLightEnabled, "Value does not match what was written for StatusLightEnabled in step 51")
+        else:
+            self.skip_step(50)
+            self.skip_step(51)
+            self.skip_step(52)
+
+        if await self.attribute_guard(endpoint=endpoint, attribute=attr.StatusLightBrightness):
+            self.step(53)
+            statusLightBrightness = await self.read_single_attribute_check_success(
+                endpoint=endpoint, cluster=cluster, attribute=attr.StatusLightBrightness)
+            logger.info(f"Rx'd StatusLightBrightness: {statusLightBrightness}")
+
+            self.step(54)
+            statusLightBrightnessToWrite = (statusLightBrightness + 1) % 4
+            result = await self.write_single_attribute(attr.StatusLightBrightness(statusLightBrightnessToWrite),
+                                                       endpoint_id=endpoint)
+            asserts.assert_equal(result, Status.Success, "Error when trying to write StatusLightBrightness")
+            logger.info(f"Tx'd StatusLightBrightness: {statusLightBrightnessToWrite}")
+
+            self.step(55)
+            statusLightBrightnessNew = await self.read_single_attribute_check_success(
+                endpoint=endpoint, cluster=cluster, attribute=attr.StatusLightBrightness)
+            logger.info(f"Rx'd StatusLightBrightness: {statusLightBrightnessNew}")
+            asserts.assert_equal(statusLightBrightnessNew, statusLightBrightnessToWrite, "Value does not match what was written for StatusLightBrightness in step 54")
+        else:
+            self.skip_step(53)
+            self.skip_step(54)
+            self.skip_step(55)
 
 if __name__ == "__main__":
     default_matter_test_main()
