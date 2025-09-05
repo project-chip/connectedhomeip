@@ -163,7 +163,6 @@ class TC_ICDM_3_1(MatterBaseTest):
                     await self._send_single_icdm_command(commands.UnregisterClient(checkInNodeID=client.checkInNodeID))
                 except InteractionModelError as e:
                     asserts.assert_fail(f"Unexpected error returned : {e}")
-                    pass
 
             # Step 4: Read ClientsSupportedPerFabric
             self.step(4)
@@ -183,7 +182,6 @@ class TC_ICDM_3_1(MatterBaseTest):
                     clientType=clientTypeEnum.kEphemeral))
             except InteractionModelError as e:
                 asserts.assert_fail(f"Unexpected error returned : {e}")
-                pass
 
             # Validate response contains the ICDCounter
             asserts.assert_greater_equal(response.ICDCounter, icdCounter,
@@ -226,7 +224,6 @@ class TC_ICDM_3_1(MatterBaseTest):
                             clientType=client["clientType"]))
                     except InteractionModelError as e:
                         asserts.assert_fail(f"Unexpected error returned : {e}")
-                        pass
 
                     # Validate response contains the ICDCounter
                     asserts.assert_greater_equal(response.ICDCounter, icdCounter,
@@ -270,7 +267,6 @@ class TC_ICDM_3_1(MatterBaseTest):
                 await self._send_single_icdm_command(commands.UnregisterClient(checkInNodeID=kStep2CheckInNodeId))
             except InteractionModelError as e:
                 asserts.assert_fail(f"Unexpected error returned : {e}")
-                pass
 
             # Step 13: Read RegisteredClients, verify Step 6 client is not present
             self.step(13)
@@ -286,7 +282,6 @@ class TC_ICDM_3_1(MatterBaseTest):
                     await self._send_single_icdm_command(commands.UnregisterClient(checkInNodeID=client["checkInNodeID"]))
                 except InteractionModelError as e:
                     asserts.assert_fail(f"Unexpected error returned : {e}")
-                    pass
 
                 registeredClients = await self._read_icdm_attribute_expect_success(attributes.RegisteredClients)
                 for remainingClient in registeredClients:
@@ -313,7 +308,6 @@ class TC_ICDM_3_1(MatterBaseTest):
                     await self._send_single_icdm_command(commands.UnregisterClient(checkInNodeID=client.checkInNodeID))
             except InteractionModelError as e:
                 asserts.assert_fail(f"Unexpected error returned : {e}")
-                pass
             finally:
                 self.send_test_event_triggers(eventTrigger=ICDTestEventTriggerOperations.kRemoveActiveModeReq)
 
