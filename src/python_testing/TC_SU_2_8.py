@@ -48,7 +48,7 @@ class TC_SU_2_8(MatterBaseTest):
         steps = [
             TestStep(0, "Commissioning, already done.", is_commissioning=True),
             TestStep(1, "Configure DefaultOTAProviders with invalid node ID. DUT tries to send a QueryImage command to TH1/OTA-P.",
-                     "TH1/OTA-P does not respond with QueryImage response command."),
+                     "TH1/OTA-P does not respond with QueryImage response command. StateTransition goes from idle to querying, then a download error happends and finally it goes back to idle."),
             TestStep(2, "DUT sends QueryImage command to TH2/OTA-P.",
                      "Subscribe to events for OtaSoftwareUpdateRequestor cluster and verify StateTransition reaches downloading state. Also check if the targetSoftwareVersion is 2."),
         ]
@@ -186,8 +186,29 @@ class TC_SU_2_8(MatterBaseTest):
 
         # Do not announce TH1-OTA Provider
 
-        # To avoid the DUT/requestor enter an invalid state, there is a show sleep time and then the DefaultOTAProviders is cleaned to avoid future attempts.
-        await asyncio.sleep(5)
+        idle = Clusters.Objects.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kIdle
+        querying = Clusters.Objects.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kQuerying
+        downloading = Clusters.Objects.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kDownloading
+
+        # Expect events idle to querying, downloadError and then back to idle
+        event_cb = EventSubscriptionHandler(expected_cluster=Clusters.Objects.OtaSoftwareUpdateRequestor)
+        await event_cb.start(dev_ctrl=th2, node_id=dut_node_id_th2, endpoint=endpoint,
+                             fabric_filtered=False, min_interval_sec=0, max_interval_sec=5)
+
+        querying_event = event_cb.wait_for_event_report(
+            Clusters.Objects.OtaSoftwareUpdateRequestor.Events.StateTransition, 5000)
+        asserts.assert_equal(querying, querying_event.newState,
+                             f"New state is {querying_event.newState} and it should be {querying}")
+
+        download_error = event_cb.wait_for_event_report(
+            Clusters.Objects.OtaSoftwareUpdateRequestor.Events.DownloadError, 50000)
+
+        logging.info(f"Download Error: {download_error}")
+
+        idle_event = event_cb.wait_for_event_report(
+            Clusters.Objects.OtaSoftwareUpdateRequestor.Events.StateTransition, 50000)
+        asserts.assert_equal(idle, idle_event.newState,
+                             f"New state is {idle_event.newState} and it should be {idle}")
 
         logging.info("Cleaning DefaultOTAProviders.")
         resp = await th1.WriteAttribute(
@@ -227,14 +248,12 @@ class TC_SU_2_8(MatterBaseTest):
         event_idle_to_querying = event_cb.wait_for_event_report(
             Clusters.Objects.OtaSoftwareUpdateRequestor.Events.StateTransition, 5000)
 
-        await self.check_event_status(event=event_idle_to_querying, previous_state=Clusters.Objects.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kIdle,
-                                      next_state=Clusters.Objects.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kQuerying, software_version=NullValue)
+        await self.check_event_status(event=event_idle_to_querying, previous_state=idle, next_state=querying, software_version=NullValue)
 
         event_querying_to_downloading = event_cb.wait_for_event_report(
             Clusters.Objects.OtaSoftwareUpdateRequestor.Events.StateTransition, 5000)
 
-        await self.check_event_status(event=event_querying_to_downloading, previous_state=Clusters.Objects.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kQuerying,
-                                      next_state=Clusters.Objects.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kDownloading, software_version=target_version)
+        await self.check_event_status(event=event_querying_to_downloading, previous_state=querying, next_state=downloading, software_version=target_version)
 
 
 if __name__ == "__main__":
