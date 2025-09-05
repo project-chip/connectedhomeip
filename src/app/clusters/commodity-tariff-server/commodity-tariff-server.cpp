@@ -609,7 +609,7 @@ void Instance::UpdateCurrentAttrs()
 
     if (mServerTariffAttrsCtx.mTariffProvider == nullptr)
     {
-        ChipLogError(NotSpecified, "The tariff is not active");
+        ChipLogError(NotSpecified, "The tariff is not available");
         return;
     }
 
@@ -630,7 +630,7 @@ void Instance::UpdateDayInformation(uint32_t now)
     // Find current day
     if (!Utils::DayIsValid(&currentDay.Value()))
     {
-        ChipLogError(NotSpecified, "The mCurrentDay can't be Null if tariff is active!");
+        ChipLogError(NotSpecified, "The mCurrentDay data is invalid");
         return;
     }
 
@@ -715,7 +715,7 @@ void Instance::HandleGetTariffComponent(HandlerContext & ctx, const Commands::Ge
 
     if (mServerTariffAttrsCtx.mTariffProvider == nullptr)
     {
-        ChipLogError(NotSpecified, "The tariff is not active");
+        ChipLogError(NotSpecified, "The tariff is not available");
     }
     else
     {
@@ -793,8 +793,19 @@ void Instance::HandleGetTariffComponent(HandlerContext & ctx, const Commands::Ge
 
             std::sort(deIDsArray.begin(), deIDsArray.begin() + deIDsCount);
 
-            response.label           = chip::CharSpan(labelBuffer.data(), labelLength);
-            response.dayEntryIDs     = DataModel::List<uint32_t>(deIDsArray.data(), deIDsCount);
+            response.label.SetNull();
+            response.dayEntryIDs     = DataModel::List<uint32_t>();
+
+            if (labelLength > 0)
+            {
+                response.label.SetNonNull(chip::CharSpan(labelBuffer.data(), labelLength));
+            }
+
+            if (deIDsCount > 0)
+            {
+                response.dayEntryIDs = DataModel::List<uint32_t>(deIDsArray.data(), deIDsCount);
+            }
+
             response.tariffComponent = *component;
             status                   = Status::Success;
 
@@ -816,7 +827,7 @@ void Instance::HandleGetDayEntry(HandlerContext & ctx, const Commands::GetDayEnt
 
     if (mServerTariffAttrsCtx.mTariffProvider == nullptr)
     {
-        ChipLogError(NotSpecified, "The tariff is not active");
+        ChipLogError(NotSpecified, "The tariff is not available");
     }
     else
     {

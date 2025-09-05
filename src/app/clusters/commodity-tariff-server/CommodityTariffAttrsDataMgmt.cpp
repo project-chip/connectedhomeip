@@ -496,20 +496,6 @@ CHIP_ERROR ValidateListEntry(const TariffComponentStruct::Type & entryNewValue, 
         ChipLogDetail(NotSpecified, "Predicted flag set to %s", entryNewValue.predicted.Value() ? "true" : "false");
     }
 
-    uint8_t featuresCount = 0;
-    auto n                = entryFeatures.Raw();
-    while (n)
-    {
-        n &= (n - 1);
-        featuresCount++;
-    };
-
-    if (featuresCount > 1)
-    {
-        ChipLogError(NotSpecified, "Exactly one feature required for one TariffComponent entry");
-        return CHIP_ERROR_INVALID_ARGUMENT;
-    }
-
     if (!ctx->TariffComponentKeyIDsFeatureMap.insert({ entryNewValue.tariffComponentID, entryFeatures.Raw() }).second)
     {
         ChipLogError(NotSpecified, "Duplicate tariffComponentID found");
