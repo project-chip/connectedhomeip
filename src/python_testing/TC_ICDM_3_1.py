@@ -44,10 +44,9 @@
 
 import logging
 import os
-
-from mobly import asserts
 from enum import IntEnum
 
+from mobly import asserts
 
 import matter.clusters as Clusters
 from matter.interaction_model import InteractionModelError, Status
