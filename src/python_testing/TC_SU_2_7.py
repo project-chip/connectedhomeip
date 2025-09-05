@@ -47,7 +47,7 @@ import logging
 from os import environ, getcwd, kill, path, setpgrp
 from signal import SIGTERM
 from subprocess import Popen, run
-from time import sleep, time
+from time import sleep
 
 import psutil
 from mobly import asserts
@@ -369,7 +369,7 @@ class TC_SU_2_7(MatterBaseTest):
     async def test_TC_SU_2_7(self):
 
         #### Apps to run for this test case ###
-        # Terminal 1: ./out/debug/chip-ota-requestor-app --discriminator 123 --passcode 2123 --secured-device-port 5540 --autoApplyImage --KVS /tmp/chip_kvs_requestor --autoApplyImage
+        # Terminal 1: ./out/debug/chip-ota-requestor-app --discriminator 123 --passcode 2123 --secured-device-port 5540 --KVS /tmp/chip_kvs_requestor --a
         # Terminal 2: ./out/debug/chip-ota-provider-app --filepath firmware_requestor_v2.min.ota  --discriminator 321 --passcode 2321 --secured-device-port 5541
         # Terminal 3: python3 src/python_testing/TC_SU_2_7.py --commissioning-method on-network --passcode 2123 --discriminator 123 --endpoint 0 --nodeId 123
         ###
@@ -606,7 +606,7 @@ class TC_SU_2_7(MatterBaseTest):
         self._terminate_requestor_process()
         controller.ExpireSessions(nodeid=requestor_node_id)
         sleep(3)
-        self._launch_requestor_app(extra_params=["--autoApplyImage"])
+        self._launch_requestor_app(extra_params=["-a"])
         await controller.CommissionOnNetwork(
             nodeId=requestor_node_id,
             setupPinCode=requestor_setup_pincode,
@@ -644,17 +644,31 @@ class TC_SU_2_7(MatterBaseTest):
         logger.info(f"Event report: {event_report}")
         asserts.assert_equal(event_report.newState, self.ota_req.Enums.UpdateStateEnum.kDelayedOnApply,
                              f"Event status is not {self.ota_req.Enums.UpdateStateEnum.kDelayedOnApply}")
+        event_report = state_transition_event_handler.wait_for_event_report(self.ota_req.Events.StateTransition, timeout_sec=60*3)
+        asserts.assert_equal(event_report.newState, self.ota_req.Enums.UpdateStateEnum.kApplying,
+                             f"Event status is not {self.ota_req.Enums.UpdateStateEnum.kApplying}")
         await state_transition_event_handler.cancel()
-        event = self.ota_req.Events.VersionApplied
-        cb = EventSubscriptionHandler(expected_cluster_id=event.cluster_id, expected_event_id=event.event_id)
-        urgent = 1
-        subscription = await controller.ReadEvent(nodeid=requestor_node_id, events=[(0, event, urgent)], reportInterval=[0, 60*3], autoResubscribe=True)
-        subscription.SetEventUpdateCallback(callback=cb)
 
         self.step(7)
-        result = cb.wait_for_event_report(event, 60*3)
-        logger(f"REsult {result}")
-        await self._verify_version_applied_basic_information(controller=controller, node_id=provider_data['node_id'], target_version=update_software_version)
+        await asyncio.sleep(30)
+        urgent = 1
+        version_applied_event = Clusters.OtaSoftwareUpdateRequestor.Events.VersionApplied
+        events_response = await controller.ReadEvent(
+            requestor_node_id,
+            events=[(0, version_applied_event, urgent)],
+            fabricFiltered=True
+        )
+        logger.info(f"Events gathered {events_response}")
+        if len(events_response) == 0:
+            asserts.fail("Failed to read the Version Applied Event")
+        # just one event should be in the list
+        version_applied_event_data = events_response[0].Data
+
+        logger.info(f"Events reponse {events_response}")
+        asserts.assert_equal(update_software_version, version_applied_event_data.softwareVersion,
+                             f"Software version from VersionAppliedEvent is not {update_software_version}")
+        asserts.assert_is_not_none(version_applied_event_data.productID, "Product ID from VersionApplied Event is None")
+        await self._verify_version_applied_basic_information(controller=controller, node_id=requestor_node_id, target_version=update_software_version)
 
 
 if __name__ == "__main__":
