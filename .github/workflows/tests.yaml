@@ -34,6 +34,8 @@ on:
                 required: false
                 default: ''
                 type: string
+    schedule:
+        - cron: '0 2 * * *' # Daily at 2 AM UTC, run job on older macOS versions as well
 
 concurrency:
     group: ${{ github.ref }}-${{ github.workflow }}-${{ (github.event_name == 'pull_request' && github.event.number) || (github.event_name == 'workflow_dispatch' && github.run_number) || github.sha }}
@@ -437,7 +439,7 @@ jobs:
             matrix:
                 build_variant: [no-ble-no-shell-asan-clang, no-ble-no-shell-tsan-clang]
                 chip_tool: [""]
-                os: [macos-13, macos-14, macos-15]
+                os: ${{ github.event_name == 'schedule' && fromJSON('["macos-13", "macos-14", "macos-15"]') || fromJSON('["macos-15"]') }}
                 include:
                     - os: macos-13
                       arch: x64     # observed, not configured
@@ -915,7 +917,7 @@ jobs:
             TSAN_OPTIONS: "halt_on_error=1"
 
         if: github.actor != 'restyled-io[bot]'
-        runs-on: macos-13
+        runs-on: ${{ github.event_name == 'schedule' && 'macos-13' || 'macos-15' }}
 
         steps:
             - name: Checkout

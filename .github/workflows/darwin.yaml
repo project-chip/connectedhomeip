@@ -22,6 +22,8 @@ on:
     pull_request:
     merge_group:
     workflow_dispatch:
+    schedule:
+        - cron: '0 2 * * *' # Daily at 2 AM UTC, run job on older macOS versions as well
 
 concurrency:
     group:
@@ -40,7 +42,7 @@ jobs:
         runs-on: ${{ matrix.os }}
         strategy:
             matrix:
-                os: [macos-13, macos-14, macos-15]
+                os: ${{ github.event_name == 'schedule' && fromJSON('["macos-13", "macos-14", "macos-15"]') || fromJSON('["macos-15"]') }}
                 options: # We don't need a full matrix
                     - flavor: macos-release
                       arguments: -sdk macosx -configuration Release
@@ -78,7 +80,7 @@ jobs:
         runs-on: ${{ matrix.os }}
         strategy:
             matrix:
-                os: [macos-13, macos-14, macos-15]
+                os: ${{ github.event_name == 'schedule' && fromJSON('["macos-13", "macos-14", "macos-15"]') || fromJSON('["macos-15"]') }}
                 options: # We don't need a full matrix
                     - flavor: asan
                       arguments:
