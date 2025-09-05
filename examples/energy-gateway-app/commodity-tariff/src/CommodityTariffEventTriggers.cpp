@@ -173,7 +173,7 @@ bool HandleCommodityTariffTestEventTrigger(uint64_t eventTrigger)
         SetTestEventTrigger_TimeShift24h();
         break;
     case CommodityTariffTrigger::kTimeShift4h:
-        ChipLogProgress(Support, "[CommodityTariff-Test-Event] => Forced DayEntry Forward");
+        ChipLogProgress(Support, "[CommodityTariff-Test-Event] => Forced FourHours Forward");
         SetTestEventTrigger_TimeShift4h();
         break;
     case CommodityTariffTrigger::kTimeShiftDisable:
