@@ -51,6 +51,8 @@ qpg_sdk("sdk") {
 
 qpg_executable("thermostat") {
   output_name = "chip-${qpg_target_ic}-thermostat-example.out"
+  app_name = "thermostaticRadiatorValve"
+  project_dir = qpg_project_dir
 
   sources = [
     "${chip_root}/examples/thermostat/thermostat-common/src/thermostat-delegate-impl.cpp",
