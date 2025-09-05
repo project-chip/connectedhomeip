@@ -159,6 +159,7 @@ public:
     void Close() override;
 
     CHIP_ERROR SendMessage(const PeerAddress & address, System::PacketBufferHandle && msgBuf) override;
+    CHIP_ERROR SendMessage(const ActiveTCPConnectionHolder & connection, System::PacketBufferHandle && msgBuf);
 
     /*
      * Connect to the given peerAddress over TCP.
@@ -229,14 +230,13 @@ private:
     /**
      * Sends the specified message once a connection has been established.
      *
-     * @param existing - an already-existing connection, otherwise an empty holder
-     * @param addr - what peer to connect to
+     * @param existing - an already-existing connection; must not be empty
      * @param msg - what buffer to send once a connection has been established.
      *
      * Ownership of msg is taken over and will be freed at some unspecified time
      * in the future (once connection succeeds/fails).
      */
-    CHIP_ERROR SendAfterConnect(ActiveTCPConnectionHolder & existing, const PeerAddress & addr, System::PacketBufferHandle && msg);
+    CHIP_ERROR SendAfterConnect(const ActiveTCPConnectionHolder & existing, System::PacketBufferHandle && msg);
 
     /**
      * Process a single received buffer from the specified peer address.
@@ -307,6 +307,7 @@ private:
 
     void InitEndpoint(Inet::TCPEndPoint * endpoint);
     CHIP_ERROR TryResetConnection(ActiveTCPConnectionState & connection);
+    CHIP_ERROR PrepareBuffer(System::PacketBufferHandle & msgBuf);
 
     Inet::TCPEndPoint * mListenSocket = nullptr;                       ///< TCP socket used by the transport
     Inet::IPAddressType mEndpointType = Inet::IPAddressType::kUnknown; ///< Socket listening type
