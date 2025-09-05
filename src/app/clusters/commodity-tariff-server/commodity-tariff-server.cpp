@@ -434,8 +434,9 @@ FindDayEntry(CurrentTariffAttrsCtx & aCtx, const DataModel::List<const uint32_t>
     const Structs::DayEntryStruct::Type * nextPtr    = nullptr;
     *CurrentEntryMinutesRemain                       = 0;
 
-    for (uint16_t i = 0; i < dayEntryIDs.size(); i++)
+    for (size_t i = 0; i < dayEntryIDs.size(); i++)
     {
+        nextPtr = nullptr;
         currentPtr = GetListEntryById<Structs::DayEntryStruct::Type>(aCtx.mTariffProvider->GetDayEntries().Value(), dayEntryIDs[i]);
         if (currentPtr == nullptr)
         {
@@ -445,6 +446,10 @@ FindDayEntry(CurrentTariffAttrsCtx & aCtx, const DataModel::List<const uint32_t>
         if (i + 1 < dayEntryIDs.size())
         {
             nextPtr = GetListEntryById<Structs::DayEntryStruct::Type>(aCtx.mTariffProvider->GetDayEntries().Value(), dayEntryIDs[i + 1]);
+        }
+        else
+        {
+            nextPtr = nullptr;
         }
 
         // Default: Current entry lasts until end of day
