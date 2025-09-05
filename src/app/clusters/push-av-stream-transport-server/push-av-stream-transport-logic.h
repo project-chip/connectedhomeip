@@ -6,6 +6,7 @@
 #include <app/clusters/push-av-stream-transport-server/constants.h>
 #include <app/clusters/push-av-stream-transport-server/push-av-stream-transport-delegate.h>
 #include <app/clusters/push-av-stream-transport-server/push-av-stream-transport-storage.h>
+#include <app/clusters/tls-client-management-server/tls-client-management-server.h>
 #include <app/server-cluster/DefaultServerCluster.h>
 #include <protocols/interaction_model/StatusCode.h>
 #include <vector>
@@ -20,15 +21,24 @@ public:
     PushAvStreamTransportServerLogic(EndpointId aEndpoint, BitFlags<PushAvStreamTransport::Feature> aFeatures);
     ~PushAvStreamTransportServerLogic();
 
-    void SetDelegate(EndpointId aEndpoint, PushAvStreamTransportDelegate * delegate)
+    void SetDelegate(PushAvStreamTransportDelegate * delegate)
     {
         mDelegate = delegate;
         if (mDelegate == nullptr)
         {
-            ChipLogError(Zcl, "Push AV Stream Transport [ep=%d]: Trying to set delegate to null", aEndpoint);
+            ChipLogError(Zcl, "Push AV Stream Transport : Trying to set delegate to null");
             return;
         }
-        mDelegate->SetEndpointId(aEndpoint);
+    }
+
+    void SetTLSClientManagementDelegate(TlsClientManagementDelegate * delegate)
+    {
+        mTLSClientManagementDelegate = delegate;
+        if (mTLSClientManagementDelegate == nullptr)
+        {
+            ChipLogError(Zcl, "Push AV Stream Transport : Trying to set TLS Client Management delegate to null");
+            return;
+        }
     }
 
     enum class UpsertResultEnum : uint8_t
@@ -95,8 +105,8 @@ public:
                                   const Optional<PushAvStreamTransport::TriggerActivationReasonEnum> activationReason);
 
 private:
-    PushAvStreamTransportDelegate * mDelegate = nullptr;
-
+    PushAvStreamTransportDelegate * mDelegate                  = nullptr;
+    TlsClientManagementDelegate * mTLSClientManagementDelegate = nullptr;
     /// Convenience method that returns if the internal delegate is null and will log
     /// an error if the check returns true
     bool IsNullDelegateWithLogging(EndpointId endpointIdForLogging);

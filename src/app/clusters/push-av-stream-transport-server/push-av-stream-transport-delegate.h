@@ -40,8 +40,6 @@ public:
 
     virtual ~PushAvStreamTransportDelegate() = default;
 
-    void SetEndpointId(EndpointId aEndpoint) { mEndpointId = aEndpoint; }
-
     /**
      * @brief Handles stream transport allocation with the provided transport configuration option.
      *
@@ -132,6 +130,22 @@ public:
      * @return true if URL is valid, false otherwise
      */
     virtual bool ValidateUrl(const std::string & url) = 0;
+
+    /**
+     * @brief Validates the provided StreamUsage.
+     *
+     * @param streamUsage The StreamUsage to validate
+     * @return true if StreamUsage is present in the StreamUsagePriorities list, false otherwise
+     */
+    virtual bool ValidateStreamUsage(PushAvStreamTransport::StreamUsageEnum streamUsage) = 0;
+
+    /**
+     * @brief Validates the provided Segment Duration.
+     *
+     * @param segmentDuration The Segment Duration to validate
+     * @return true if Segment Duration is multiple of KeyFrameInterval, false otherwise
+     */
+    virtual bool ValidateSegmentDuration(uint16_t segmentDuration) = 0;
 
     /**
      * @brief Validates bandwidth requirements against camera's resource management.
@@ -228,9 +242,6 @@ public:
      * @return CHIP_ERROR indicating success or failure
      */
     virtual CHIP_ERROR PersistentAttributesLoadedCallback() = 0;
-
-protected:
-    EndpointId mEndpointId = kInvalidEndpointId;
 };
 } // namespace Clusters
 } // namespace app

@@ -90,6 +90,7 @@ ASR
 AssertionError
 AST
 ASYNC
+AsyncZeroconfServiceTypes
 ATL
 ATLs
 atomics
@@ -856,6 +857,7 @@ localhost
 LocalizationConfiguration
 localstatedir
 LockingState
+lookups
 LogEvent
 loopback
 LowPower
@@ -1260,6 +1262,7 @@ RGB
 riscv
 rloc
 rmw
+rnd
 rodata
 Rollershade
 rootfs
@@ -1411,6 +1414,7 @@ SubscribeResponse
 SubscriptionId
 substeps
 subtype
+subtypes
 sudo
 SulfateConcentrationMeasurement
 SulfurDioxideConcentrationMeasurement
@@ -1690,6 +1694,7 @@ zclwrite
 ZephyrConfig
 zephyrproject
 zhengyaohan
+Zeroconf
 Zigbee
 zigbeealliance
 zigbeethread
