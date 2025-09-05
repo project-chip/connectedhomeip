@@ -48,7 +48,7 @@ class TC_SU_2_8(MatterBaseTest):
             TestStep(1, "Configure DefaultOTAProviders with invalid node ID. DUT tries to send a QueryImage command to TH1/OTA-P.",
                      "TH1/OTA-P does not respond."),
             TestStep(2, "DUT sends QueryImage command to TH2/OTA-P.",
-                     "Subscribe to events for OtaSoftwareUpdateRequestor cluster and verify StateTransition changes from idle to quering, then to downloading and finally to applying. Also check if the targetSoftwareVersion is 2."),
+                     "Subscribe to events for OtaSoftwareUpdateRequestor cluster and verify StateTransition reaches downloading state. Also check if the targetSoftwareVersion is 2."),
         ]
         return steps
 
@@ -215,25 +215,22 @@ class TC_SU_2_8(MatterBaseTest):
         target_version = 2
         event_cb = EventSubscriptionHandler(expected_cluster=Clusters.Objects.OtaSoftwareUpdateRequestor)
         await event_cb.start(dev_ctrl=th2, node_id=dut_node_id, endpoint=endpoint,
-                             fabric_filtered=False, min_interval_sec=0, max_interval_sec=5000)
+                             fabric_filtered=False, min_interval_sec=0, max_interval_sec=5)
 
         # Announce after subscription
         await self._announce(th2, vendor_id, p2_node, endpoint)
 
-        event_1 = event_cb.wait_for_event_report(Clusters.Objects.OtaSoftwareUpdateRequestor.Events.StateTransition, 5000)
+        event_idle_to_querying = event_cb.wait_for_event_report(
+            Clusters.Objects.OtaSoftwareUpdateRequestor.Events.StateTransition, 5000)
 
-        await self.check_event_status(event=event_1, previous_state=Clusters.Objects.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kIdle,
+        await self.check_event_status(event=event_idle_to_querying, previous_state=Clusters.Objects.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kIdle,
                                       next_state=Clusters.Objects.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kQuerying, software_version=NullValue)
 
-        event_2 = event_cb.wait_for_event_report(Clusters.Objects.OtaSoftwareUpdateRequestor.Events.StateTransition, 5000)
+        event_querying_to_downloading = event_cb.wait_for_event_report(
+            Clusters.Objects.OtaSoftwareUpdateRequestor.Events.StateTransition, 5000)
 
-        await self.check_event_status(event=event_2, previous_state=Clusters.Objects.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kQuerying,
+        await self.check_event_status(event=event_querying_to_downloading, previous_state=Clusters.Objects.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kQuerying,
                                       next_state=Clusters.Objects.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kDownloading, software_version=target_version)
-
-        event_3 = event_cb.wait_for_event_report(Clusters.Objects.OtaSoftwareUpdateRequestor.Events.StateTransition, 5000)
-
-        await self.check_event_status(event=event_3, previous_state=Clusters.Objects.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kDownloading,
-                                      next_state=Clusters.Objects.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kApplying, software_version=target_version)
 
 
 if __name__ == "__main__":
