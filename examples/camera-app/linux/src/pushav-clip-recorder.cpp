@@ -308,11 +308,14 @@ int PushAVClipRecorder::SetupOutput(const std::string & outputPrefix, const std:
     {
         ChipLogError(Camera, "ERROR: Output context is null");
     }
+    double segSeconds = static_cast<double>(mClipInfo.mSegmentDuration) / 1000.0;
+    int fragMillis    = static_cast<int>(segSeconds);
     // Set DASH/CMAF options
     av_opt_set(mFormatContext->priv_data, "increment_tc", "1", 0);
     av_opt_set(mFormatContext->priv_data, "use_timeline", "1", 0);
     av_opt_set(mFormatContext->priv_data, "movflags", "+cmaf+dash+delay_moov+skip_sidx+skip_trailer+frag_custom", 0);
-    av_opt_set(mFormatContext->priv_data, "seg_duration", std::to_string(mClipInfo.mChunkDuration).c_str(), 0);
+    av_opt_set(mFormatContext->priv_data, "seg_duration", std::to_string(segSeconds).c_str(), 0);
+    av_opt_set(mFormatContext->priv_data, "frag_duration", std::to_string(fragMillis).c_str(), 0);
     av_opt_set(mFormatContext->priv_data, "init_seg_name", initSegPattern.c_str(), 0);
     av_opt_set(mFormatContext->priv_data, "media_seg_name", mediaSegPattern.c_str(), 0);
     av_opt_set_int(mFormatContext->priv_data, "use_template", 1, 0);
@@ -389,7 +392,7 @@ int PushAVClipRecorder::AddStreamToOutput(AVMediaType type)
         mVideoStream->codecpar->codec_tag = 0;
         mVideoStream->codecpar->width     = mVideoInfo.mWidth;
         mVideoStream->codecpar->height    = mVideoInfo.mHeight;
-        mVideoStream->avg_frame_rate      = (AVRational) { mVideoInfo.mFrameRate, 1 };
+        mVideoStream->avg_frame_rate      = (AVRational){ mVideoInfo.mFrameRate, 1 };
     }
     else if (type == AVMEDIA_TYPE_AUDIO)
     {
@@ -428,7 +431,7 @@ int PushAVClipRecorder::AddStreamToOutput(AVMediaType type)
 
         mAudioEncoderContext->bit_rate              = mAudioInfo.mBitRate;
         mAudioEncoderContext->sample_fmt            = audioCodec->sample_fmts[0];
-        mAudioEncoderContext->time_base             = (AVRational) { 1, mAudioInfo.mSampleRate };
+        mAudioEncoderContext->time_base             = (AVRational){ 1, mAudioInfo.mSampleRate };
         mAudioEncoderContext->strict_std_compliance = FF_COMPLIANCE_EXPERIMENTAL;
         AVDictionary * opts                         = NULL;
         av_dict_set(&opts, "strict", "experimental", 0);

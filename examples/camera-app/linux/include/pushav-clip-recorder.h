@@ -71,7 +71,8 @@ public:
         uint32_t mMaxClipDuration;                            ///< Maximum clip duration in seconds
         uint16_t mInitialDuration;                            ///< Initial clip duration in seconds
         uint16_t mAugmentationDuration;                       ///< Duration increment on motion detect
-        uint16_t mChunkDuration;                              ///< Segment duration in seconds
+        uint16_t mChunkDuration;                              ///< Chunk duration  milliseconds
+        uint16_t mSegmentDuration;                            ///< Segment duration in milliseconds
         uint16_t mBlindDuration;                              ///< Duration without recording after motion stop
         uint16_t mPreRollLength;                              ///< Pre-roll length in seconds
         std::string mRecorderId;                              ///< Unique recorder identifier

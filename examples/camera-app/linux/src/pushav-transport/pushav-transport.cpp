@@ -60,7 +60,8 @@ void PrintTransportSettings(PushAVClipRecorder::ClipInfoStruct clipInfo, PushAVC
     ChipLogProgress(Camera, "Initial Duration: %d sec", clipInfo.mInitialDuration);
     ChipLogProgress(Camera, "Augmentation Duration: %d sec", clipInfo.mAugmentationDuration);
     ChipLogProgress(Camera, "Max Clip Duration: %d sec", clipInfo.mMaxClipDuration);
-    ChipLogProgress(Camera, "Chunk Duration: %d sec", clipInfo.mChunkDuration);
+    ChipLogProgress(Camera, "Chunk Duration: %d ms", clipInfo.mChunkDuration);
+    ChipLogProgress(Camera, "Segment Duration: %d ms", clipInfo.mSegmentDuration);
     ChipLogProgress(Camera, "Blind Duration: %d sec", clipInfo.mBlindDuration);
     ChipLogProgress(Camera, "PreRoll Length: %d ", clipInfo.mPreRollLength);
     ChipLogProgress(Camera, "URL: %s", clipInfo.mUrl.c_str());
@@ -93,6 +94,7 @@ void PushAVTransport::ConfigureRecorderSettings(const TransportOptionsStruct & t
 
     if (debug)
     {
+<<<<<<< HEAD
         mClipInfo.mInitialDuration      = 20;
         mClipInfo.mAugmentationDuration = 10;
         mClipInfo.mBlindDuration        = 5;
@@ -133,6 +135,50 @@ void PushAVTransport::ConfigureRecorderSettings(const TransportOptionsStruct & t
     mClipInfo.mClipId        = 0;
     mClipInfo.mOutputPath    = "/tmp/";
     mClipInfo.mInputTimeBase = { 1, 1000000 };
+=======
+        clipInfo.mHasAudio    = true;
+        clipInfo.mHasVideo    = true;
+        clipInfo.mUrl         = std::string(transportOptions.url.data(), transportOptions.url.size());
+        clipInfo.mTriggerType = static_cast<int>(transportOptions.triggerOptions.triggerType);
+        if (transportOptions.triggerOptions.maxPreRollLen.HasValue())
+        {
+            clipInfo.mPreRollLength = transportOptions.triggerOptions.maxPreRollLen.Value();
+        }
+        else
+        {
+            clipInfo.mPreRollLength = 0; // Default pre roll length is zero
+        }
+        if (transportOptions.triggerOptions.motionTimeControl.HasValue())
+        {
+            clipInfo.mInitialDuration      = transportOptions.triggerOptions.motionTimeControl.Value().initialDuration;
+            clipInfo.mAugmentationDuration = transportOptions.triggerOptions.motionTimeControl.Value().augmentationDuration;
+            clipInfo.mMaxClipDuration      = transportOptions.triggerOptions.motionTimeControl.Value().maxDuration;
+            clipInfo.mBlindDuration        = transportOptions.triggerOptions.motionTimeControl.Value().blindDuration;
+        }
+        if (transportOptions.containerOptions.CMAFContainerOptions.HasValue())
+        {
+            clipInfo.mChunkDuration   = transportOptions.containerOptions.CMAFContainerOptions.Value().chunkDuration;
+            clipInfo.mSegmentDuration = transportOptions.containerOptions.CMAFContainerOptions.Value().segmentDuration;
+        }
+    }
+    else
+    {
+        clipInfo.mInitialDuration      = 20;
+        clipInfo.mAugmentationDuration = 10;
+        clipInfo.mBlindDuration        = 5;
+        clipInfo.mMaxClipDuration      = 30;
+        clipInfo.mChunkDuration        = 1000;
+        clipInfo.mSegmentDuration      = 4000;
+        clipInfo.mTriggerType          = 0;
+        clipInfo.mPreRollLength        = 0;
+        clipInfo.mUrl                  = "https://localhost:1234/streams/1/";
+    }
+
+    mTransportTriggerType   = transportOptions.triggerOptions.triggerType;
+    clipInfo.mClipId        = 0;
+    clipInfo.mOutputPath    = "/tmp/";
+    clipInfo.mInputTimeBase = { 1, 1000000 };
+>>>>>>> 5fb677eae7 (Updated url handling and clip segment duration)
 
     uint8_t audioCodec   = static_cast<uint8_t>(audioStreamParams.audioCodec);
     mAudioInfo.mChannels = (audioStreamParams.channelCount == 0) ? 1 : audioStreamParams.channelCount;
