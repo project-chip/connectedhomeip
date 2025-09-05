@@ -36,22 +36,6 @@ using namespace chip::Credentials;
 using namespace chip::TestCerts;
 using chip::Credentials::Examples::TestHarnessDACProvider;
 
-namespace {
-
-// Callback function to capture attestation verification results
-static void OnAttestationInformationVerificationCallback(void * context, const DeviceAttestationVerifier::AttestationInfo & info,
-                                                         AttestationVerificationResult result)
-{
-    AttestationVerificationResult * pResult = reinterpret_cast<AttestationVerificationResult *>(context);
-    *pResult                                = result;
-}
-
-} // namespace
-
-static CHIP_ERROR CreateSignedAttestationData(uint8_t * tlvBuffer, size_t & tlvLen, chip::Crypto::P256ECDSASignature & signature,
-                                              const ByteSpan & cdData, const ByteSpan & nonceData, const ByteSpan & privateKey,
-                                              const ByteSpan & publicKey, const uint8_t * challengeData, size_t challengeDataLen);
-
 struct TestDacOnlyPartialAttestationVerifier : public ::testing::Test
 {
     static void SetUpTestSuite() { ASSERT_EQ(chip::Platform::MemoryInit(), CHIP_NO_ERROR); }
@@ -68,6 +52,32 @@ struct TestDacOnlyPartialAttestationVerifier : public ::testing::Test
     static constexpr uint8_t kTestNonceData[32]           = { 0x0A, 0x0B, 0x0C };
     static constexpr uint8_t kTestCDData[32]              = { 0x11, 0x22, 0x33 };
 
+private:
+    static void OnAttestationInformationVerificationCallback(void * context,
+                                                             const DeviceAttestationVerifier::AttestationInfo & info,
+                                                             AttestationVerificationResult result);
+
+    static CHIP_ERROR ConstructAttestationElementsTLV(uint8_t * tlvBuffer, size_t bufferSize, const ByteSpan & cdData,
+                                                      const ByteSpan & nonceData, size_t & tlvLen);
+
+    static CHIP_ERROR CreateSignedAttestationData(uint8_t * tlvBuffer, size_t & tlvLen,
+                                                  chip::Crypto::P256ECDSASignature & signature, const ByteSpan & cdData,
+                                                  const ByteSpan & nonceData, const ByteSpan & privateKey,
+                                                  const ByteSpan & publicKey, const uint8_t * challengeData,
+                                                  size_t challengeDataLen);
+
+protected:
+    CHIP_ERROR CreateSignedAttestationDataForTest(uint8_t * tlvBuffer, size_t & tlvLen,
+                                                  chip::Crypto::P256ECDSASignature & signature, const ByteSpan & cdData,
+                                                  const ByteSpan & nonceData, const ByteSpan & privateKey,
+                                                  const ByteSpan & publicKey, const uint8_t * challengeData,
+                                                  size_t challengeDataLen)
+    {
+        return CreateSignedAttestationData(tlvBuffer, tlvLen, signature, cdData, nonceData, privateKey, publicKey, challengeData,
+                                           challengeDataLen);
+    }
+
+public:
     void SetUp() override { attestationResult = AttestationVerificationResult::kSuccess; }
 
     // Create attestation verification result variable
@@ -75,7 +85,7 @@ struct TestDacOnlyPartialAttestationVerifier : public ::testing::Test
     PartialDACVerifier verifier;
     AttestationVerificationResult attestationResult = AttestationVerificationResult::kSuccess;
     Callback::Callback<DeviceAttestationVerifier::OnAttestationInformationVerification> attestationCallback{
-        OnAttestationInformationVerificationCallback, &attestationResult
+        &TestDacOnlyPartialAttestationVerifier::OnAttestationInformationVerificationCallback, &attestationResult
     };
 
     // Helper method to run a DAC validity test with specified keys and certificate.
@@ -104,9 +114,18 @@ struct TestDacOnlyPartialAttestationVerifier : public ::testing::Test
     }
 };
 
+// Callback function to capture attestation verification results
+void TestDacOnlyPartialAttestationVerifier::OnAttestationInformationVerificationCallback(
+    void * context, const DeviceAttestationVerifier::AttestationInfo & info, AttestationVerificationResult result)
+{
+    AttestationVerificationResult * pResult = reinterpret_cast<AttestationVerificationResult *>(context);
+    *pResult                                = result;
+}
+
 // Helper function to construct TLV attestation elements structure
-static CHIP_ERROR ConstructAttestationElementsTLV(uint8_t * tlvBuffer, size_t bufferSize, const ByteSpan & cdData,
-                                                  const ByteSpan & nonceData, size_t & tlvLen)
+CHIP_ERROR TestDacOnlyPartialAttestationVerifier::ConstructAttestationElementsTLV(uint8_t * tlvBuffer, size_t bufferSize,
+                                                                                  const ByteSpan & cdData,
+                                                                                  const ByteSpan & nonceData, size_t & tlvLen)
 {
     // Construct TLV structure representing attestation elements that would be signed by device
     chip::TLV::TLVWriter writer;
@@ -127,9 +146,10 @@ static CHIP_ERROR ConstructAttestationElementsTLV(uint8_t * tlvBuffer, size_t bu
 }
 
 // Helper function to create signed attestation data using standard test parameters.
-static CHIP_ERROR CreateSignedAttestationData(uint8_t * tlvBuffer, size_t & tlvLen, chip::Crypto::P256ECDSASignature & signature,
-                                              const ByteSpan & cdData, const ByteSpan & nonceData, const ByteSpan & privateKey,
-                                              const ByteSpan & publicKey, const uint8_t * challengeData, size_t challengeDataLen)
+CHIP_ERROR TestDacOnlyPartialAttestationVerifier::CreateSignedAttestationData(
+    uint8_t * tlvBuffer, size_t & tlvLen, chip::Crypto::P256ECDSASignature & signature, const ByteSpan & cdData,
+    const ByteSpan & nonceData, const ByteSpan & privateKey, const ByteSpan & publicKey, const uint8_t * challengeData,
+    size_t challengeDataLen)
 {
     // Construct TLV attestation elements
     ReturnErrorOnFailure(ConstructAttestationElementsTLV(tlvBuffer, sizeof(uint8_t) * 128, cdData, nonceData, tlvLen));
@@ -385,10 +405,10 @@ TEST_F(TestDacOnlyPartialAttestationVerifier, TestWithMismatchedNonce)
     chip::Crypto::P256ECDSASignature signature;
 
     // Create signed attestation data with mismatched nonce in elements
-    CHIP_ERROR err = CreateSignedAttestationData(tlvBuf, tlvLen, signature, ByteSpan(kTestCDData), ByteSpan(nonceInElements),
-                                                 ByteSpan(TestCerts::sTestCert_DAC_FFF1_8000_0004_PrivateKey),
-                                                 ByteSpan(TestCerts::sTestCert_DAC_FFF1_8000_0004_PublicKey), kTestChallengeData,
-                                                 sizeof(kTestChallengeData));
+    CHIP_ERROR err = CreateSignedAttestationDataForTest(tlvBuf, tlvLen, signature, ByteSpan(kTestCDData), ByteSpan(nonceInElements),
+                                                        ByteSpan(TestCerts::sTestCert_DAC_FFF1_8000_0004_PrivateKey),
+                                                        ByteSpan(TestCerts::sTestCert_DAC_FFF1_8000_0004_PublicKey),
+                                                        kTestChallengeData, sizeof(kTestChallengeData));
     ASSERT_EQ(err, CHIP_NO_ERROR);
 
     // Prepare AttestationInfo with valid certificates and keys, but mismatched nonce
@@ -408,10 +428,10 @@ TEST_F(TestDacOnlyPartialAttestationVerifier, TestWithInvalidPAAFormat)
     size_t tlvLen = 0;
     chip::Crypto::P256ECDSASignature signature;
 
-    CHIP_ERROR err = CreateSignedAttestationData(tlvBuf, tlvLen, signature, ByteSpan(kTestCDData), ByteSpan(kTestNonceData),
-                                                 ByteSpan(TestCerts::sTestCert_DAC_FFF1_8000_0004_PrivateKey),
-                                                 ByteSpan(TestCerts::sTestCert_DAC_FFF1_8000_0004_PublicKey), kTestChallengeData,
-                                                 sizeof(kTestChallengeData));
+    CHIP_ERROR err = CreateSignedAttestationDataForTest(tlvBuf, tlvLen, signature, ByteSpan(kTestCDData), ByteSpan(kTestNonceData),
+                                                        ByteSpan(TestCerts::sTestCert_DAC_FFF1_8000_0004_PrivateKey),
+                                                        ByteSpan(TestCerts::sTestCert_DAC_FFF1_8000_0004_PublicKey),
+                                                        kTestChallengeData, sizeof(kTestChallengeData));
     ASSERT_EQ(err, CHIP_NO_ERROR);
 
     // Prepare AttestationInfo with valid DAC and PAI, but invalid PAA
