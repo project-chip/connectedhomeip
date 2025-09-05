@@ -112,7 +112,7 @@ void SetDelegate(EndpointId endpointId, PushAvStreamTransportDelegate * delegate
         return;
     }
 
-    gServers[arrayIndex].Cluster().SetDelegate(endpointId, delegate);
+    gServers[arrayIndex].Cluster().SetDelegate(delegate);
     gServers[arrayIndex].Cluster().Init();
 }
 
@@ -131,7 +131,7 @@ void SetTLSClientManagementDelegate(EndpointId endpointId, TlsClientManagementDe
         ChipLogError(AppServer, "Push AV Stream transport is NOT yet constructed. Cannot set TLS Client Management delegate");
         return;
     }
-    gServers[arrayIndex].Cluster().SetTLSClientManagementDelegate(endpointId, delegate);
+    gServers[arrayIndex].Cluster().SetTLSClientManagementDelegate(delegate);
 }
 
 } // namespace PushAvStreamTransport

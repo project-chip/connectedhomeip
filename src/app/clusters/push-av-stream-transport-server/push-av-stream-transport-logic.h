@@ -21,23 +21,22 @@ public:
     PushAvStreamTransportServerLogic(EndpointId aEndpoint, BitFlags<PushAvStreamTransport::Feature> aFeatures);
     ~PushAvStreamTransportServerLogic();
 
-    void SetDelegate(EndpointId aEndpoint, PushAvStreamTransportDelegate * delegate)
+    void SetDelegate(PushAvStreamTransportDelegate * delegate)
     {
         mDelegate = delegate;
         if (mDelegate == nullptr)
         {
-            ChipLogError(Zcl, "Push AV Stream Transport [ep=%d]: Trying to set delegate to null", aEndpoint);
+            ChipLogError(Zcl, "Push AV Stream Transport : Trying to set delegate to null");
             return;
         }
-        mDelegate->SetEndpointId(aEndpoint);
     }
 
-    void SetTLSClientManagementDelegate(EndpointId aEndpoint, TlsClientManagementDelegate * delegate)
+    void SetTLSClientManagementDelegate(TlsClientManagementDelegate * delegate)
     {
         mTLSClientManagementDelegate = delegate;
         if (mTLSClientManagementDelegate == nullptr)
         {
-            ChipLogError(Zcl, "Push AV Stream Transport [ep=%d]: Trying to set TLS Client Management delegate to null", aEndpoint);
+            ChipLogError(Zcl, "Push AV Stream Transport : Trying to set TLS Client Management delegate to null");
             return;
         }
     }
