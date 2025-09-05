@@ -63,7 +63,7 @@ CHIP_ERROR ConfigurationManagerImpl::Init()
     CHIP_ERROR err;
 
     // Initialize the generic implementation base class.
-    err = Internal::GenericConfigurationManagerImpl<SilabsConfig>::Init();
+    err = GenericConfigurationManagerImpl<SilabsConfig>::Init();
     SuccessOrExit(err);
 
     IncreaseBootCount();
@@ -104,8 +104,16 @@ CHIP_ERROR ConfigurationManagerImpl::IncreaseBootCount(void)
 CHIP_ERROR ConfigurationManagerImpl::GetBootReason(uint32_t & bootReason)
 {
     // rebootCause is obtained at bootup.
+    uint32_t rebootCause = Silabs::GetPlatform().GetRebootCause();
+
+    // Before looking into the bootloader reboot cause, check if we performed a matter update
+    if (rebootCause == to_underlying(BootReasonType::kSoftwareUpdateCompleted))
+    {
+        bootReason = to_underlying(BootReasonType::kSoftwareUpdateCompleted);
+        return CHIP_NO_ERROR;
+    }
+
     BootReasonType matterBootCause;
-    [[maybe_unused]] uint32_t rebootCause = Silabs::GetPlatform().GetRebootCause();
 
 #if defined(_RMU_RSTCAUSE_MASK)
     if (rebootCause & RMU_RSTCAUSE_PORST || rebootCause & RMU_RSTCAUSE_EXTRST) // PowerOn or External pin reset
@@ -156,14 +164,6 @@ CHIP_ERROR ConfigurationManagerImpl::GetBootReason(uint32_t & bootReason)
     matterBootCause = BootReasonType::kUnspecified;
 #endif
 
-#if !SLI_SI91X_MCU_INTERFACE
-    BootloaderResetCause_t testBootReason = bootloader_getResetReason();
-    if (matterBootCause == BootReasonType::kSoftwareReset && testBootReason.reason == BOOTLOADER_RESET_REASON_BOOTLOAD &&
-        testBootReason.signature == BOOTLOADER_RESET_SIGNATURE_VALID)
-    {
-        matterBootCause = BootReasonType::kSoftwareUpdateCompleted;
-    }
-#endif
     bootReason = to_underlying(matterBootCause);
     return CHIP_NO_ERROR;
 }
