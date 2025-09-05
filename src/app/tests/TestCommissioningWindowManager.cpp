@@ -429,8 +429,8 @@ TEST_F(TestCommissioningWindowManager, TestOnPlatformEventCommissioningComplete)
     auto event = CreateEvent(chip::DeviceLayer::DeviceEventType::kCommissioningComplete);
 
     commissionMgr.OnPlatformEvent(&event);
-    // When the commissioning has completed (kCommissioningComplete event) OnPlatformEvent cleans up, closes active sessions and the commissioning window is closed
-    // The device should no longer be discoverable or accept new commissioners
+    // When the commissioning has completed (kCommissioningComplete event) OnPlatformEvent cleans up, closes active sessions and the
+    // commissioning window is closed The device should no longer be discoverable or accept new commissioners
     EXPECT_FALSE(commissionMgr.IsCommissioningWindowOpen());
 
 // When BLE is enabled
