@@ -247,6 +247,18 @@ public:
     /// a clear decision if the callback should or should not be invoked.
     virtual CHIP_ERROR CancelLookup(Impl::NodeLookupHandle & handle, FailureCallback cancel_method) = 0;
 
+#if CHIP_DEVICE_ENABLE_CASE_DNS_CACHE
+    // cache node address
+    virtual CHIP_ERROR CacheNode(NodeId nodeId, const ResolveResult & result) = 0;
+
+    // retrieve cached address
+    virtual CHIP_ERROR GetCachedNodeAddress(NodeId nodeId, ResolveResult & result) = 0;
+
+    // remove cached address
+    virtual CHIP_ERROR RemoveCachedNodeAddress(NodeId nodeId) = 0;
+
+#endif // CHIP_DEVICE_ENABLE_CASE_DNS_CACHE
+
     /// Shut down any active resolves
     ///
     /// Will immediately fail any scheduled resolve calls and will refuse to register
