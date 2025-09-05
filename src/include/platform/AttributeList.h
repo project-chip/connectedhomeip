@@ -40,6 +40,7 @@ public:
         const T & operator*() const;
         Iterator & operator++();
         bool operator!=(const Iterator & other) const;
+        bool operator==(const Iterator & other) const;
 
     private:
         const AttributeList<T, N> * mAttributeListPtr;
@@ -129,6 +130,12 @@ template <typename T, size_t N>
 inline bool AttributeList<T, N>::Iterator::operator!=(const AttributeList<T, N>::Iterator & other) const
 {
     return mIndex != other.mIndex;
+}
+
+template <typename T, size_t N>
+inline bool AttributeList<T, N>::Iterator::operator==(const AttributeList<T, N>::Iterator & other) const
+{
+    return mIndex == other.mIndex;  
 }
 
 } // namespace DeviceLayer
