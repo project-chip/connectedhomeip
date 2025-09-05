@@ -96,11 +96,16 @@ ClusterStatusCode TlsClientManagementCommandDelegate::ProvisionEndpoint(
 
         endpointStruct.endpointID = mNextId++;
         provisioned->fabric       = fabric;
+        endpointID                = endpointStruct.endpointID;
     }
     // Updating existing value
     else if (provisioned == nullptr || provisioned->fabric != fabric)
     {
         return ClusterStatusCode(Status::NotFound);
+    }
+    else
+    {
+        endpointID = provisionReq.endpointID.Value();
     }
 
     auto & endpointStruct = provisioned->payload;
