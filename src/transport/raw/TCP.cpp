@@ -241,13 +241,12 @@ ActiveTCPConnectionHolder TCPBase::FindInUseConnection(const Inet::TCPEndPoint *
     return nullptr;
 }
 
-CHIP_ERROR TCPBase::SendMessage(const Transport::PeerAddress & address, System::PacketBufferHandle && msgBuf)
+CHIP_ERROR TCPBase::PrepareBuffer(System::PacketBufferHandle & msgBuf)
 {
     // Sent buffer data format is:
     //    - packet size as a uint32_t
     //    - actual data
 
-    VerifyOrReturnError(address.GetTransportType() == Type::kTcp, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(mState == TCPState::kInitialized, CHIP_ERROR_INCORRECT_STATE);
     VerifyOrReturnError(kPacketSizeBytes + msgBuf->DataLength() <= System::PacketBuffer::kLargeBufMaxSizeWithoutReserve,
                         CHIP_ERROR_INVALID_ARGUMENT);
@@ -260,6 +259,14 @@ CHIP_ERROR TCPBase::SendMessage(const Transport::PeerAddress & address, System::
     uint8_t * output = msgBuf->Start();
     LittleEndian::Write32(output, static_cast<uint32_t>(msgBuf->DataLength() - kPacketSizeBytes));
 
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR TCPBase::SendMessage(const Transport::PeerAddress & address, System::PacketBufferHandle && msgBuf)
+{
+    VerifyOrReturnError(address.GetTransportType() == Type::kTcp, CHIP_ERROR_INVALID_ARGUMENT);
+    ReturnErrorOnFailure(PrepareBuffer(msgBuf));
+
     // Must find a previously-established connection with an owning reference
     auto connection = FindInUseConnection(address);
     VerifyOrReturnError(!connection.IsNull(), CHIP_ERROR_INCORRECT_STATE);
@@ -268,7 +275,20 @@ CHIP_ERROR TCPBase::SendMessage(const Transport::PeerAddress & address, System::
         return connection->mEndPoint->Send(std::move(msgBuf));
     }
 
-    return SendAfterConnect(connection, address, std::move(msgBuf));
+    return SendAfterConnect(connection, std::move(msgBuf));
+}
+
+CHIP_ERROR TCPBase::SendMessage(const ActiveTCPConnectionHolder & connection, System::PacketBufferHandle && msgBuf)
+{
+    VerifyOrReturnError(!connection.IsNull(), CHIP_ERROR_INVALID_ARGUMENT);
+    ReturnErrorOnFailure(PrepareBuffer(msgBuf));
+
+    if (connection->IsConnected())
+    {
+        return connection->mEndPoint->Send(std::move(msgBuf));
+    }
+
+    return SendAfterConnect(connection, std::move(msgBuf));
 }
 
 CHIP_ERROR TCPBase::StartConnect(const PeerAddress & addr, Transport::AppTCPConnectionCallbackCtxt * appState,
@@ -329,10 +349,12 @@ CHIP_ERROR TCPBase::StartConnect(const PeerAddress & addr, Transport::AppTCPConn
 #endif
 }
 
-CHIP_ERROR TCPBase::SendAfterConnect(ActiveTCPConnectionHolder & existing, const PeerAddress & addr,
-                                     System::PacketBufferHandle && msg)
+CHIP_ERROR TCPBase::SendAfterConnect(const ActiveTCPConnectionHolder & existing, System::PacketBufferHandle && msg)
 {
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
+    VerifyOrReturnError(!existing.IsNull(), CHIP_ERROR_INCORRECT_STATE);
+    const PeerAddress & addr = existing->mPeerAddr;
+
     // This will initiate a connection to the specified peer
     bool alreadyConnecting = false;
 

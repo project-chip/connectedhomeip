@@ -47,6 +47,7 @@
 using namespace chip;
 using namespace chip::Test;
 using namespace chip::Inet;
+using namespace chip::Transport;
 
 namespace {
 
@@ -61,8 +62,12 @@ constexpr NodeId kSourceNodeId      = 123654;
 constexpr NodeId kDestinationNodeId = 111222333;
 constexpr uint32_t kMessageCounter  = 18;
 
-const char PAYLOAD[]          = "Hello!";
-const char messageSize_TEST[] = "\x00\x00\x00\x00";
+const char PAYLOAD[]            = "Hello!";
+const char PAYLOAD_RESPONSE[]   = "Howdy!";
+const char PAYLOAD_B[]          = "Yo!";
+const char PAYLOAD_B_RESPONSE[] = "Hi!";
+const char messageSize_TEST[]   = "\x00\x00\x00\x00";
+const size_t kMaxIncoming       = 2;
 
 uint16_t GetRandomPort()
 {
@@ -72,11 +77,12 @@ uint16_t GetRandomPort()
 class MockTransportMgrDelegate : public chip::TransportMgrDelegate
 {
 public:
-    chip::Transport::ActiveTCPConnectionHolder refHolder;
-    chip::Transport::ActiveTCPConnectionHolder incoming;
-    chip::Transport::ActiveTCPConnectionHolder activeTCPConnState;
+    ActiveTCPConnectionHolder refHolder;
+    ActiveTCPConnectionHolder incoming[kMaxIncoming];
+    ActiveTCPConnectionHolder activeTCPConnState;
 
-    typedef int (*MessageReceivedCallback)(const uint8_t * message, size_t length, int count, void * data);
+    using MessageReceivedCallback =
+        std::function<CHIP_ERROR(const uint8_t * message, size_t length, int count, ActiveTCPConnectionHolder & conn, void * data)>;
 
     MockTransportMgrDelegate(IOContext * inContext) : mIOContext(inContext), mCallback(nullptr), mCallbackData(nullptr) {}
     ~MockTransportMgrDelegate() override {}
@@ -86,6 +92,7 @@ public:
         mCallback     = callback;
         mCallbackData = callback_data;
     }
+
     void OnMessageReceived(const Transport::PeerAddress & source, System::PacketBufferHandle && msgBuf,
                            Transport::MessageTransportContext * transCtxt = nullptr) override
     {
@@ -93,14 +100,33 @@ public:
 
         EXPECT_EQ(packetHeader.DecodeAndConsume(msgBuf), CHIP_NO_ERROR);
 
-        if (mCallback)
-        {
-            EXPECT_EQ(mCallback(msgBuf->Start(), msgBuf->DataLength(), mReceiveHandlerCallCount, mCallbackData), 0);
-        }
-
+        ActiveTCPConnectionHolder connection;
         if (transCtxt)
         {
-            incoming = transCtxt->conn;
+            // Store a reference to the connection so it's not auto-disconnected
+            ActiveTCPConnectionHolder * available = nullptr;
+            for (size_t i = 0; i < kMaxIncoming; i++)
+            {
+                if (incoming[i] == transCtxt->conn)
+                {
+                    available = &incoming[i];
+                    break;
+                }
+                if (incoming[i].IsNull())
+                {
+                    available = &incoming[i];
+                }
+            }
+            ASSERT_NE(available, nullptr);
+
+            *available = transCtxt->conn;
+            connection = *available;
+        }
+
+        if (mCallback)
+        {
+            EXPECT_EQ(mCallback(msgBuf->Start(), msgBuf->DataLength(), mReceiveHandlerCallCount, connection, mCallbackData),
+                      CHIP_NO_ERROR);
         }
 
         ChipLogProgress(Inet, "Message Receive Handler called");
@@ -108,9 +134,9 @@ public:
         mReceiveHandlerCallCount++;
     }
 
-    void HandleConnectionAttemptComplete(chip::Transport::ActiveTCPConnectionHolder & conn, CHIP_ERROR conErr) override
+    void HandleConnectionAttemptComplete(ActiveTCPConnectionHolder & conn, CHIP_ERROR conErr) override
     {
-        chip::Transport::AppTCPConnectionCallbackCtxt * appConnCbCtxt = nullptr;
+        AppTCPConnectionCallbackCtxt * appConnCbCtxt = nullptr;
         VerifyOrReturn(!conn.IsNull());
 
         mHandleConnectionCompleteCalled = true;
@@ -127,9 +153,9 @@ public:
         }
     }
 
-    void HandleConnectionClosed(chip::Transport::ActiveTCPConnectionState & conn, CHIP_ERROR conErr) override
+    void HandleConnectionClosed(ActiveTCPConnectionState & conn, CHIP_ERROR conErr) override
     {
-        chip::Transport::AppTCPConnectionCallbackCtxt * appConnCbCtxt = nullptr;
+        AppTCPConnectionCallbackCtxt * appConnCbCtxt = nullptr;
 
         mHandleConnectionCloseCalled = true;
         appConnCbCtxt                = conn.mAppState;
@@ -150,19 +176,8 @@ public:
         CHIP_ERROR err = tcp.Init(
             Transport::TcpListenParameters(mIOContext->GetTCPEndPointManager()).SetAddressType(addr.Type()).SetListenPort(port));
 
-        // retry a few times in case the port is somehow in use.
-        // this is a WORKAROUND for flaky testing if we run tests very fast after each other.
-        // in that case, a port could be in a WAIT state.
-        //
-        // What may be happening:
-        //   - We call InitializeMessageTest several times in this unit test
-        //   - closing sockets takes a while (FIN-wait or similar)
-        //   - trying InitializeMessageTest to take the same port right after may fail
-        //
-        // The tests may be run with a 0 port (to self select an active port) however I have not
-        // validated that this works and we need a followup for it
-        //
-        // TODO: stop using fixed ports.
+        // retry a few times in case the port is somehow in use; shouldn't happen generally
+        // as we pick a random port
         for (int i = 0; (i < 50) && (err != CHIP_NO_ERROR); i++)
         {
             ChipLogProgress(NotSpecified, "RETRYING tcp initialization");
@@ -182,29 +197,119 @@ public:
         mHandleConnectionCloseCalled    = false;
     }
 
-    void SingleMessageTest(TCPImpl & tcp, const IPAddress & addr, uint16_t port)
+    template <size_t N>
+    CHIP_ERROR BufferWithHeader(uint32_t messageCounter, chip::System::PacketBufferHandle & buffer, const char (&payload)[N])
     {
-        chip::System::PacketBufferHandle buffer = chip::System::PacketBufferHandle::NewWithData(PAYLOAD, sizeof(PAYLOAD));
-        ASSERT_FALSE(buffer.IsNull());
+        buffer = chip::System::PacketBufferHandle::NewWithData(payload, N * sizeof(char));
+        VerifyOrReturnError(!buffer.IsNull(), CHIP_ERROR_NO_MEMORY);
 
         PacketHeader header;
-        header.SetSourceNodeId(kSourceNodeId).SetDestinationNodeId(kDestinationNodeId).SetMessageCounter(kMessageCounter);
+        header.SetSourceNodeId(kSourceNodeId).SetDestinationNodeId(kDestinationNodeId).SetMessageCounter(messageCounter);
 
-        SetCallback([](const uint8_t * message, size_t length, int count, void * data) { return memcmp(message, data, length); },
-                    const_cast<void *>(static_cast<const void *>(PAYLOAD)));
+        return header.EncodeBeforeData(buffer);
+    }
 
-        CHIP_ERROR err = header.EncodeBeforeData(buffer);
-        EXPECT_EQ(err, CHIP_NO_ERROR);
+    void SingleMessageTest(TCPImpl & tcp, const IPAddress & addr, uint16_t port)
+    {
+        SetCallback([](const uint8_t * message, size_t length, int count, ActiveTCPConnectionHolder & conn, void * data) {
+            return memcmp(message, PAYLOAD, length) == 0 ? CHIP_NO_ERROR : CHIP_ERROR_INCORRECT_STATE;
+        });
 
-        err = tcp.TCPConnect(Transport::PeerAddress::TCP(addr, port), nullptr, refHolder);
+        CHIP_ERROR err = tcp.TCPConnect(Transport::PeerAddress::TCP(addr, port), nullptr, refHolder);
         EXPECT_EQ(err, CHIP_NO_ERROR);
 
         // Should be able to send a message to itself by just calling send.
+        chip::System::PacketBufferHandle buffer;
+        err = BufferWithHeader(kMessageCounter, buffer, PAYLOAD);
+        EXPECT_EQ(err, CHIP_NO_ERROR);
         err = tcp.SendMessage(Transport::PeerAddress::TCP(addr, port), std::move(buffer));
         EXPECT_EQ(err, CHIP_NO_ERROR);
 
         mIOContext->DriveIOUntil(chip::System::Clock::Seconds16(5), [this]() { return mReceiveHandlerCallCount != 0; });
         EXPECT_EQ(mReceiveHandlerCallCount, 1);
+
+        SetCallback(nullptr);
+    }
+
+    void MultipleConnectionTest(TCPImpl & tcp, const IPAddress & addr, uint16_t port)
+    {
+        ActiveTCPConnectionHolder firstConnection;
+        ActiveTCPConnectionHolder secondConnection;
+        bool firstMessageReceived   = false;
+        bool firstResponseReceived  = false;
+        bool secondMessageReceived  = false;
+        bool secondResponseReceived = false;
+        SetCallback(
+            [&](const uint8_t * message, size_t length, int count, ActiveTCPConnectionHolder & conn, void * data) -> CHIP_ERROR {
+                if (memcmp(message, PAYLOAD, length) == 0)
+                {
+                    firstMessageReceived = true;
+
+                    chip::System::PacketBufferHandle firstResponse;
+                    ReturnErrorOnFailure(BufferWithHeader(kMessageCounter + 2, firstResponse, PAYLOAD_RESPONSE));
+
+                    // First message, respond with first response
+                    ReturnErrorOnFailure(tcp.SendMessage(conn, std::move(firstResponse)));
+                }
+                else if (memcmp(message, PAYLOAD_RESPONSE, length) == 0)
+                {
+                    firstResponseReceived = true;
+                    VerifyOrReturnError(conn == firstConnection, CHIP_ERROR_INCORRECT_STATE);
+                }
+                else if (memcmp(message, PAYLOAD_B, length) == 0)
+                {
+                    secondMessageReceived = true;
+
+                    chip::System::PacketBufferHandle secondResponse;
+                    ReturnErrorOnFailure(BufferWithHeader(kMessageCounter + 3, secondResponse, PAYLOAD_B_RESPONSE));
+
+                    // Second message, respond with second response
+                    ReturnErrorOnFailure(tcp.SendMessage(conn, std::move(secondResponse)));
+                }
+                else if (memcmp(message, PAYLOAD_B_RESPONSE, length) == 0)
+                {
+                    secondResponseReceived = true;
+                    VerifyOrReturnValue(conn == secondConnection, CHIP_ERROR_INCORRECT_STATE);
+                }
+                else
+                {
+                    return CHIP_ERROR_INCORRECT_STATE;
+                }
+                return CHIP_NO_ERROR;
+            });
+
+        CHIP_ERROR err = tcp.TCPConnect(Transport::PeerAddress::TCP(addr, port), nullptr, firstConnection);
+        EXPECT_EQ(err, CHIP_NO_ERROR);
+
+        // Send the first message with expectation it is against first connection
+        {
+            chip::System::PacketBufferHandle firstMessage;
+            err = BufferWithHeader(kMessageCounter, firstMessage, PAYLOAD);
+            EXPECT_EQ(err, CHIP_NO_ERROR);
+            err = tcp.SendMessage(Transport::PeerAddress::TCP(addr, port), std::move(firstMessage));
+            EXPECT_EQ(err, CHIP_NO_ERROR);
+        }
+
+        err = tcp.TCPConnect(Transport::PeerAddress::TCP(addr, port), nullptr, secondConnection);
+        EXPECT_EQ(err, CHIP_NO_ERROR);
+
+        // Send the second message with the expectation it is against the second connection
+        // (the only way this works is if these 2 are the same connection, keyed off of PeerAddress
+        // as otherwise it would be unreasonable to expect correct mapping from SendMessage call)
+        {
+            chip::System::PacketBufferHandle secondMessage;
+            err = BufferWithHeader(kMessageCounter + 1, secondMessage, PAYLOAD_B);
+            EXPECT_EQ(err, CHIP_NO_ERROR);
+            err = tcp.SendMessage(Transport::PeerAddress::TCP(addr, port), std::move(secondMessage));
+            EXPECT_EQ(err, CHIP_NO_ERROR);
+        }
+
+        mIOContext->DriveIOUntil(chip::System::Clock::Seconds16(10), [this]() { return mReceiveHandlerCallCount >= 4; });
+
+        EXPECT_TRUE(firstMessageReceived);
+        EXPECT_TRUE(firstResponseReceived);
+        EXPECT_TRUE(secondMessageReceived);
+        EXPECT_TRUE(secondResponseReceived);
 
         SetCallback(nullptr);
     }
@@ -250,7 +355,10 @@ public:
         // Disconnect and wait for seeing peer close
         activeTCPConnState.Release();
         refHolder.Release();
-        incoming.Release();
+        for (size_t i = 0; i < kMaxIncoming; i++)
+        {
+            incoming[i].Release();
+        }
         mIOContext->DriveIOUntil(chip::System::Clock::Seconds16(5), [&tcp]() { return !tcp.HasActiveConnections(); });
         EXPECT_EQ(tcp.HasActiveConnections(), false);
     }
@@ -261,13 +369,11 @@ public:
         return mTransportMgrBase.TCPConnect(peerAddress, appState, peerConnState);
     }
 
-    using OnTCPConnectionReceivedCallback = void (*)(void * context, chip::Transport::ActiveTCPConnectionState * conn);
+    using OnTCPConnectionReceivedCallback = void (*)(void * context, ActiveTCPConnectionState * conn);
 
-    using OnTCPConnectionCompleteCallback = void (*)(void * context, chip::Transport::ActiveTCPConnectionState * conn,
-                                                     CHIP_ERROR conErr);
+    using OnTCPConnectionCompleteCallback = void (*)(void * context, ActiveTCPConnectionState * conn, CHIP_ERROR conErr);
 
-    using OnTCPConnectionClosedCallback = void (*)(void * context, chip::Transport::ActiveTCPConnectionState * conn,
-                                                   CHIP_ERROR conErr);
+    using OnTCPConnectionClosedCallback = void (*)(void * context, ActiveTCPConnectionState * conn, CHIP_ERROR conErr);
 
     void SetConnectionCallbacks(OnTCPConnectionCompleteCallback connCompleteCb, OnTCPConnectionClosedCallback connClosedCb,
                                 OnTCPConnectionReceivedCallback connReceivedCb)
@@ -469,6 +575,17 @@ protected:
         gMockTransportMgrDelegate.DisconnectTest(tcp);
     }
 
+    void CheckMultipleConnectionTest(const IPAddress & addr)
+    {
+        TCPImpl tcp;
+
+        uint16_t port = GetRandomPort();
+        MockTransportMgrDelegate gMockTransportMgrDelegate(mIOContext);
+        gMockTransportMgrDelegate.InitializeMessageTest(tcp, addr, port);
+        gMockTransportMgrDelegate.MultipleConnectionTest(tcp, addr, port);
+        gMockTransportMgrDelegate.DisconnectTest(tcp);
+    }
+
     void ConnectToSelfTest(const IPAddress & addr)
     {
         TCPImpl tcp;
@@ -515,26 +632,27 @@ protected:
     }
 
     // Callback used by CheckProcessReceivedBuffer.
-    static int TestDataCallbackCheck(const uint8_t * message, size_t length, int count, void * data)
+    static CHIP_ERROR TestDataCallbackCheck(const uint8_t * message, size_t length, int count,
+                                            ActiveTCPConnectionHolder & connection, void * data)
     {
         if (data == nullptr)
         {
-            return -1;
+            return CHIP_ERROR_INCORRECT_STATE;
         }
         TestData * currentData = static_cast<TestData *>(data) + count;
         if (currentData->mPayload == nullptr)
         {
-            return -2;
+            return CHIP_ERROR_INCORRECT_STATE;
         }
         if (currentData->mMessageLength != length)
         {
-            return -3;
+            return CHIP_ERROR_INCORRECT_STATE;
         }
         if (memcmp(currentData->mPayload + currentData->mMessageOffset, message, length) != 0)
         {
-            return -4;
+            return CHIP_ERROR_INCORRECT_STATE;
         }
-        return 0;
+        return CHIP_NO_ERROR;
     }
 };
 
@@ -551,6 +669,13 @@ TEST_F(TestTCP, CheckMessageTest4)
     IPAddress addr;
     IPAddress::FromString("127.0.0.1", addr);
     CheckMessageTest(addr);
+}
+
+TEST_F(TestTCP, CheckMultipleConnectionTest4)
+{
+    IPAddress addr;
+    IPAddress::FromString("127.0.0.1", addr);
+    CheckMultipleConnectionTest(addr);
 }
 #endif
 
@@ -594,6 +719,13 @@ TEST_F(TestTCP, CheckMessageTest6)
     CheckMessageTest(addr);
 }
 
+TEST_F(TestTCP, CheckMultipleConnectionTest6)
+{
+    IPAddress addr;
+    IPAddress::FromString("::1", addr);
+    CheckMultipleConnectionTest(addr);
+}
+
 #if INET_CONFIG_ENABLE_IPV4
 TEST_F(TestTCP, ConnectToSelfTest4)
 {
@@ -616,13 +748,6 @@ TEST_F(TestTCP, HandleConnCompleteCalledTest4)
     HandleConnCompleteTest(addr);
 }
 #endif // INET_CONFIG_ENABLE_IPV4
-
-TEST_F(TestTCP, ConnectToSelfTest6)
-{
-    IPAddress addr;
-    IPAddress::FromString("::1", addr);
-    ConnectToSelfTest(addr);
-}
 
 TEST_F(TestTCP, ConnectSendMessageThenCloseTest6)
 {
