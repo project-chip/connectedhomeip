@@ -35,7 +35,7 @@ using namespace CommodityTariffConsts;
     {                                                                                                                              \
         if (!(expr))                                                                                                               \
         {                                                                                                                          \
-            ChipLogError(AppServer, __VA_ARGS__);                                                                               \
+            ChipLogError(AppServer, __VA_ARGS__);                                                                                  \
             VerifyOrReturnError(expr, code);                                                                                       \
         }                                                                                                                          \
     } while (false)
@@ -558,7 +558,7 @@ template <>
 CHIP_ERROR CTC_BaseDataClass<DataModel::Nullable<Globals::TariffUnitEnum>>::ValidateNewValue()
 {
     VerifyOrReturnError(EnsureKnownEnumValue(GetNewValueRef().Value()) != Globals::TariffUnitEnum::kUnknownEnumValue,
-                            CHIP_ERROR_INVALID_ARGUMENT);
+                        CHIP_ERROR_INVALID_ARGUMENT);
     return CHIP_NO_ERROR;
 }
 
@@ -597,7 +597,7 @@ template <>
 CHIP_ERROR CTC_BaseDataClass<DataModel::Nullable<DayEntryRandomizationTypeEnum>>::ValidateNewValue()
 {
     VerifyOrReturnError(EnsureKnownEnumValue(GetNewValueRef().Value()) != DayEntryRandomizationTypeEnum::kUnknownEnumValue,
-                            CHIP_ERROR_INVALID_ARGUMENT);
+                        CHIP_ERROR_INVALID_ARGUMENT);
     return CHIP_NO_ERROR;
 }
 

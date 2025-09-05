@@ -142,7 +142,8 @@ CHIP_ERROR CommodityTariffDelegate::TariffDataUpd_CrossValidator(TariffUpdateCtx
     {
         if (UpdCtx.TariffComponentKeyIDsFeatureMap.find(item) == UpdCtx.TariffComponentKeyIDsFeatureMap.end())
         {
-            ChipLogError(AppServer, "TariffComponent ID %u referenced from TariffPeriods doesn't exist in main TariffComponents list", item);
+            ChipLogError(AppServer,
+                         "TariffComponent ID %u referenced from TariffPeriods doesn't exist in main TariffComponents list", item);
             return CHIP_ERROR_KEY_NOT_FOUND; // The item not found in original list
         }
     }
@@ -173,7 +174,8 @@ CHIP_ERROR CommodityTariffDelegate::TariffDataUpd_CrossValidator(TariffUpdateCtx
         {
             if (!UpdCtx.DayEntryKeyIDs.count(item))
             {
-                ChipLogError(AppServer, "DayEntry ID %u referenced from IndividualDays doesn't exist in main DayEntries list", item);
+                ChipLogError(AppServer, "DayEntry ID %u referenced from IndividualDays doesn't exist in main DayEntries list",
+                             item);
                 return CHIP_ERROR_KEY_NOT_FOUND; // The item not found in original list
             }
 
@@ -196,7 +198,8 @@ CHIP_ERROR CommodityTariffDelegate::TariffDataUpd_CrossValidator(TariffUpdateCtx
         {
             if (!UpdCtx.DayPatternKeyIDs.count(item))
             {
-                ChipLogError(AppServer, "DayPattern ID %u referenced from CalendarPeriods doesn't exist in main DayPatterns list", item);
+                ChipLogError(AppServer, "DayPattern ID %u referenced from CalendarPeriods doesn't exist in main DayPatterns list",
+                             item);
                 return CHIP_ERROR_KEY_NOT_FOUND; // The item not found in original list
             }
         }
@@ -276,7 +279,8 @@ CHIP_ERROR CommodityTariffDelegate::TariffDataUpd_CrossValidator(TariffUpdateCtx
             // Check for duplicates
             if (!seenStartDurationPairs.insert(pair).second)
             {
-                ChipLogError(AppServer, "Duplicate startTime/duration combination (%u/%u) found in DayEntries of the same TariffPeriod",
+                ChipLogError(AppServer,
+                             "Duplicate startTime/duration combination (%u/%u) found in DayEntries of the same TariffPeriod",
                              pair.startTime, pair.duration);
                 return CHIP_ERROR_DUPLICATE_KEY_ID; // Found duplicate startTime/duration combination
             }
@@ -319,7 +323,8 @@ CHIP_ERROR CommodityTariffDelegate::TariffDataUpd_CrossValidator(TariffUpdateCtx
             if (!thresholdSet.insert(thresholdValue).second)
             {
                 ChipLogError(AppServer,
-                             "Duplicate threshold value %" PRId64 " for feature 0x%" PRIx32 " found among TariffComponents in the same tariff period",
+                             "Duplicate threshold value %" PRId64 " for feature 0x%" PRIx32
+                             " found among TariffComponents in the same tariff period",
                              thresholdValue, featureID);
                 return CHIP_ERROR_DUPLICATE_KEY_ID; // Found duplicate feature/threshold combination
             }

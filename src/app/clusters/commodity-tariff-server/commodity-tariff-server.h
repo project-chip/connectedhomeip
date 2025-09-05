@@ -33,8 +33,8 @@
 #include <app/ConcreteAttributePath.h>
 #include <app/InteractionModelEngine.h>
 #include <app/reporting/reporting.h>
-#include <cstdint>
 #include <array>
+#include <cstdint>
 #include <functional>
 
 namespace chip {
@@ -71,7 +71,7 @@ public:
     virtual ~Delegate() = default;
 
     void SetEndpointId(EndpointId aEndpoint) { mEndpointId = aEndpoint; }
-    
+
     /**
      * @brief Set the current feature map for this tariff instance
      * @param aFeature The current feature map value
@@ -80,7 +80,7 @@ public:
 
     bool HasFeature(Feature aFeature) { return mFeature.Has(aFeature); }
 
-    void SetTariffUpdCb(std::function<void(bool, const AttributeId*, size_t)> cb) { mTariffDataUpdatedCb = cb; }
+    void SetTariffUpdCb(std::function<void(bool, const AttributeId *, size_t)> cb) { mTariffDataUpdatedCb = cb; }
 
     /**
      * @brief Process incoming tariff data updates
@@ -135,14 +135,32 @@ public:
     DataModel::Nullable<Globals::TariffUnitEnum> & GetTariffUnit() { return mTariffUnit_MgmtObj.GetValue(); }
     DataModel::Nullable<uint32_t> & GetStartDate() { return mStartDate_MgmtObj.GetValue(); }
     DataModel::Nullable<int16_t> & GetDefaultRandomizationOffset() { return mDefaultRandomizationOffset_MgmtObj.GetValue(); }
-    DataModel::Nullable<DayEntryRandomizationTypeEnum> & GetDefaultRandomizationType() { return mDefaultRandomizationType_MgmtObj.GetValue(); }
+    DataModel::Nullable<DayEntryRandomizationTypeEnum> & GetDefaultRandomizationType()
+    {
+        return mDefaultRandomizationType_MgmtObj.GetValue();
+    }
     DataModel::Nullable<Structs::TariffInformationStruct::Type> & GetTariffInfo() { return mTariffInfo_MgmtObj.GetValue(); }
     DataModel::Nullable<DataModel::List<Structs::DayEntryStruct::Type>> & GetDayEntries() { return mDayEntries_MgmtObj.GetValue(); }
-    DataModel::Nullable<DataModel::List<Structs::DayPatternStruct::Type>> & GetDayPatterns() { return mDayPatterns_MgmtObj.GetValue(); }
-    DataModel::Nullable<DataModel::List<Structs::TariffComponentStruct::Type>> & GetTariffComponents() { return mTariffComponents_MgmtObj.GetValue(); }
-    DataModel::Nullable<DataModel::List<Structs::TariffPeriodStruct::Type>> & GetTariffPeriods() { return mTariffPeriods_MgmtObj.GetValue(); }
-    DataModel::Nullable<DataModel::List<Structs::DayStruct::Type>> & GetIndividualDays() { return mIndividualDays_MgmtObj.GetValue(); }
-    DataModel::Nullable<DataModel::List<Structs::CalendarPeriodStruct::Type>> & GetCalendarPeriods() { return mCalendarPeriods_MgmtObj.GetValue(); }
+    DataModel::Nullable<DataModel::List<Structs::DayPatternStruct::Type>> & GetDayPatterns()
+    {
+        return mDayPatterns_MgmtObj.GetValue();
+    }
+    DataModel::Nullable<DataModel::List<Structs::TariffComponentStruct::Type>> & GetTariffComponents()
+    {
+        return mTariffComponents_MgmtObj.GetValue();
+    }
+    DataModel::Nullable<DataModel::List<Structs::TariffPeriodStruct::Type>> & GetTariffPeriods()
+    {
+        return mTariffPeriods_MgmtObj.GetValue();
+    }
+    DataModel::Nullable<DataModel::List<Structs::DayStruct::Type>> & GetIndividualDays()
+    {
+        return mIndividualDays_MgmtObj.GetValue();
+    }
+    DataModel::Nullable<DataModel::List<Structs::CalendarPeriodStruct::Type>> & GetCalendarPeriods()
+    {
+        return mCalendarPeriods_MgmtObj.GetValue();
+    }
 
     // Management object accessors
     TariffUnitDataClass & GetTariffUnit_MgmtObj() { return mTariffUnit_MgmtObj; }
@@ -163,17 +181,28 @@ public:
         size_t updatedCount = 0;
 
         // Check each attribute and collect updated ones
-        if (mTariffUnit_MgmtObj.Cleanup()) updatedAttrIds[updatedCount++] = mTariffUnit_MgmtObj.GetAttrId();
-        if (mStartDate_MgmtObj.Cleanup()) updatedAttrIds[updatedCount++] = mStartDate_MgmtObj.GetAttrId();
-        if (mDefaultRandomizationOffset_MgmtObj.Cleanup()) updatedAttrIds[updatedCount++] = mDefaultRandomizationOffset_MgmtObj.GetAttrId();
-        if (mDefaultRandomizationType_MgmtObj.Cleanup()) updatedAttrIds[updatedCount++] = mDefaultRandomizationType_MgmtObj.GetAttrId();
-        if (mTariffInfo_MgmtObj.Cleanup()) updatedAttrIds[updatedCount++] = mTariffInfo_MgmtObj.GetAttrId();
-        if (mDayEntries_MgmtObj.Cleanup()) updatedAttrIds[updatedCount++] = mDayEntries_MgmtObj.GetAttrId();
-        if (mDayPatterns_MgmtObj.Cleanup()) updatedAttrIds[updatedCount++] = mDayPatterns_MgmtObj.GetAttrId();
-        if (mTariffComponents_MgmtObj.Cleanup()) updatedAttrIds[updatedCount++] = mTariffComponents_MgmtObj.GetAttrId();
-        if (mTariffPeriods_MgmtObj.Cleanup()) updatedAttrIds[updatedCount++] = mTariffPeriods_MgmtObj.GetAttrId();
-        if (mIndividualDays_MgmtObj.Cleanup()) updatedAttrIds[updatedCount++] = mIndividualDays_MgmtObj.GetAttrId();
-        if (mCalendarPeriods_MgmtObj.Cleanup()) updatedAttrIds[updatedCount++] = mCalendarPeriods_MgmtObj.GetAttrId();
+        if (mTariffUnit_MgmtObj.Cleanup())
+            updatedAttrIds[updatedCount++] = mTariffUnit_MgmtObj.GetAttrId();
+        if (mStartDate_MgmtObj.Cleanup())
+            updatedAttrIds[updatedCount++] = mStartDate_MgmtObj.GetAttrId();
+        if (mDefaultRandomizationOffset_MgmtObj.Cleanup())
+            updatedAttrIds[updatedCount++] = mDefaultRandomizationOffset_MgmtObj.GetAttrId();
+        if (mDefaultRandomizationType_MgmtObj.Cleanup())
+            updatedAttrIds[updatedCount++] = mDefaultRandomizationType_MgmtObj.GetAttrId();
+        if (mTariffInfo_MgmtObj.Cleanup())
+            updatedAttrIds[updatedCount++] = mTariffInfo_MgmtObj.GetAttrId();
+        if (mDayEntries_MgmtObj.Cleanup())
+            updatedAttrIds[updatedCount++] = mDayEntries_MgmtObj.GetAttrId();
+        if (mDayPatterns_MgmtObj.Cleanup())
+            updatedAttrIds[updatedCount++] = mDayPatterns_MgmtObj.GetAttrId();
+        if (mTariffComponents_MgmtObj.Cleanup())
+            updatedAttrIds[updatedCount++] = mTariffComponents_MgmtObj.GetAttrId();
+        if (mTariffPeriods_MgmtObj.Cleanup())
+            updatedAttrIds[updatedCount++] = mTariffPeriods_MgmtObj.GetAttrId();
+        if (mIndividualDays_MgmtObj.Cleanup())
+            updatedAttrIds[updatedCount++] = mIndividualDays_MgmtObj.GetAttrId();
+        if (mCalendarPeriods_MgmtObj.Cleanup())
+            updatedAttrIds[updatedCount++] = mCalendarPeriods_MgmtObj.GetAttrId();
 
         if (mTariffDataUpdatedCb != nullptr && updatedCount > 0)
         {
@@ -198,18 +227,29 @@ private:
     // Primary attrs update pipeline methods
     bool TariffDataUpd_Init(TariffUpdateCtx & UpdCtx)
     {
-        if (mTariffUnit_MgmtObj.UpdateBegin(&UpdCtx) != CHIP_NO_ERROR) return false;
-        if (mStartDate_MgmtObj.UpdateBegin(&UpdCtx) != CHIP_NO_ERROR) return false;
-        if (mDefaultRandomizationOffset_MgmtObj.UpdateBegin(&UpdCtx) != CHIP_NO_ERROR) return false;
-        if (mDefaultRandomizationType_MgmtObj.UpdateBegin(&UpdCtx) != CHIP_NO_ERROR) return false;
-        if (mTariffInfo_MgmtObj.UpdateBegin(&UpdCtx) != CHIP_NO_ERROR) return false;
-        if (mDayEntries_MgmtObj.UpdateBegin(&UpdCtx) != CHIP_NO_ERROR) return false;
-        if (mDayPatterns_MgmtObj.UpdateBegin(&UpdCtx) != CHIP_NO_ERROR) return false;
-        if (mTariffComponents_MgmtObj.UpdateBegin(&UpdCtx) != CHIP_NO_ERROR) return false;
-        if (mTariffPeriods_MgmtObj.UpdateBegin(&UpdCtx) != CHIP_NO_ERROR) return false;
-        if (mIndividualDays_MgmtObj.UpdateBegin(&UpdCtx) != CHIP_NO_ERROR) return false;
-        if (mCalendarPeriods_MgmtObj.UpdateBegin(&UpdCtx) != CHIP_NO_ERROR) return false;
-        
+        if (mTariffUnit_MgmtObj.UpdateBegin(&UpdCtx) != CHIP_NO_ERROR)
+            return false;
+        if (mStartDate_MgmtObj.UpdateBegin(&UpdCtx) != CHIP_NO_ERROR)
+            return false;
+        if (mDefaultRandomizationOffset_MgmtObj.UpdateBegin(&UpdCtx) != CHIP_NO_ERROR)
+            return false;
+        if (mDefaultRandomizationType_MgmtObj.UpdateBegin(&UpdCtx) != CHIP_NO_ERROR)
+            return false;
+        if (mTariffInfo_MgmtObj.UpdateBegin(&UpdCtx) != CHIP_NO_ERROR)
+            return false;
+        if (mDayEntries_MgmtObj.UpdateBegin(&UpdCtx) != CHIP_NO_ERROR)
+            return false;
+        if (mDayPatterns_MgmtObj.UpdateBegin(&UpdCtx) != CHIP_NO_ERROR)
+            return false;
+        if (mTariffComponents_MgmtObj.UpdateBegin(&UpdCtx) != CHIP_NO_ERROR)
+            return false;
+        if (mTariffPeriods_MgmtObj.UpdateBegin(&UpdCtx) != CHIP_NO_ERROR)
+            return false;
+        if (mIndividualDays_MgmtObj.UpdateBegin(&UpdCtx) != CHIP_NO_ERROR)
+            return false;
+        if (mCalendarPeriods_MgmtObj.UpdateBegin(&UpdCtx) != CHIP_NO_ERROR)
+            return false;
+
         return true;
     }
 
@@ -221,17 +261,28 @@ private:
         size_t updatedCount = 0;
 
         // Check each attribute and collect updated ones
-        if (mTariffUnit_MgmtObj.UpdateFinish(is_success)) updatedAttrIds[updatedCount++] = mTariffUnit_MgmtObj.GetAttrId();
-        if (mStartDate_MgmtObj.UpdateFinish(is_success)) updatedAttrIds[updatedCount++] = mStartDate_MgmtObj.GetAttrId();
-        if (mDefaultRandomizationOffset_MgmtObj.UpdateFinish(is_success)) updatedAttrIds[updatedCount++] = mDefaultRandomizationOffset_MgmtObj.GetAttrId();
-        if (mDefaultRandomizationType_MgmtObj.UpdateFinish(is_success)) updatedAttrIds[updatedCount++] = mDefaultRandomizationType_MgmtObj.GetAttrId();
-        if (mTariffInfo_MgmtObj.UpdateFinish(is_success)) updatedAttrIds[updatedCount++] = mTariffInfo_MgmtObj.GetAttrId();
-        if (mDayEntries_MgmtObj.UpdateFinish(is_success)) updatedAttrIds[updatedCount++] = mDayEntries_MgmtObj.GetAttrId();
-        if (mDayPatterns_MgmtObj.UpdateFinish(is_success)) updatedAttrIds[updatedCount++] = mDayPatterns_MgmtObj.GetAttrId();
-        if (mTariffComponents_MgmtObj.UpdateFinish(is_success)) updatedAttrIds[updatedCount++] = mTariffComponents_MgmtObj.GetAttrId();
-        if (mTariffPeriods_MgmtObj.UpdateFinish(is_success)) updatedAttrIds[updatedCount++] = mTariffPeriods_MgmtObj.GetAttrId();
-        if (mIndividualDays_MgmtObj.UpdateFinish(is_success)) updatedAttrIds[updatedCount++] = mIndividualDays_MgmtObj.GetAttrId();
-        if (mCalendarPeriods_MgmtObj.UpdateFinish(is_success)) updatedAttrIds[updatedCount++] = mCalendarPeriods_MgmtObj.GetAttrId();
+        if (mTariffUnit_MgmtObj.UpdateFinish(is_success))
+            updatedAttrIds[updatedCount++] = mTariffUnit_MgmtObj.GetAttrId();
+        if (mStartDate_MgmtObj.UpdateFinish(is_success))
+            updatedAttrIds[updatedCount++] = mStartDate_MgmtObj.GetAttrId();
+        if (mDefaultRandomizationOffset_MgmtObj.UpdateFinish(is_success))
+            updatedAttrIds[updatedCount++] = mDefaultRandomizationOffset_MgmtObj.GetAttrId();
+        if (mDefaultRandomizationType_MgmtObj.UpdateFinish(is_success))
+            updatedAttrIds[updatedCount++] = mDefaultRandomizationType_MgmtObj.GetAttrId();
+        if (mTariffInfo_MgmtObj.UpdateFinish(is_success))
+            updatedAttrIds[updatedCount++] = mTariffInfo_MgmtObj.GetAttrId();
+        if (mDayEntries_MgmtObj.UpdateFinish(is_success))
+            updatedAttrIds[updatedCount++] = mDayEntries_MgmtObj.GetAttrId();
+        if (mDayPatterns_MgmtObj.UpdateFinish(is_success))
+            updatedAttrIds[updatedCount++] = mDayPatterns_MgmtObj.GetAttrId();
+        if (mTariffComponents_MgmtObj.UpdateFinish(is_success))
+            updatedAttrIds[updatedCount++] = mTariffComponents_MgmtObj.GetAttrId();
+        if (mTariffPeriods_MgmtObj.UpdateFinish(is_success))
+            updatedAttrIds[updatedCount++] = mTariffPeriods_MgmtObj.GetAttrId();
+        if (mIndividualDays_MgmtObj.UpdateFinish(is_success))
+            updatedAttrIds[updatedCount++] = mIndividualDays_MgmtObj.GetAttrId();
+        if (mCalendarPeriods_MgmtObj.UpdateFinish(is_success))
+            updatedAttrIds[updatedCount++] = mCalendarPeriods_MgmtObj.GetAttrId();
 
         if (updatedCount > 0)
         {
@@ -250,7 +301,7 @@ private:
 protected:
     EndpointId mEndpointId = 0; ///< Associated Matter endpoint ID
     BitMask<Feature> mFeature;
-    std::function<void(bool, const AttributeId*, size_t)> mTariffDataUpdatedCb;
+    std::function<void(bool, const AttributeId *, size_t)> mTariffDataUpdatedCb;
     bool DelayedTariffUpdateIsActive = false;
 };
 
@@ -279,7 +330,7 @@ public:
         /* set the base class delegates endpointId */
         mDelegate.SetEndpointId(aEndpointId);
         mEndpointId = aEndpointId;
-        mDelegate.SetTariffUpdCb([this](bool is_erased, const AttributeId* updatedAttrIds, size_t count) {
+        mDelegate.SetTariffUpdCb([this](bool is_erased, const AttributeId * updatedAttrIds, size_t count) {
             this->TariffDataUpdatedCb(is_erased, updatedAttrIds, count);
         });
         mDelegate.SetFeatures(aFeature);
@@ -309,6 +360,7 @@ public:
         Delegate * mTariffProvider;
         EndpointId mEndpointId;
     };
+
 private:
     Delegate & mDelegate;
     BitMask<Feature> mFeature;
@@ -337,19 +389,43 @@ private:
     template <typename T>
     CHIP_ERROR SetValue(T & currValue, T & newValue, uint32_t attrId);
 
-    CHIP_ERROR SetCurrentDay(DataModel::Nullable<Structs::DayStruct::Type>  & newValue) { return SetValue(mCurrentDay, newValue, Attributes::CurrentDay::Id); }
-    CHIP_ERROR SetNextDay(DataModel::Nullable<Structs::DayStruct::Type>  & newValue) { return SetValue(mNextDay, newValue, Attributes::NextDay::Id); }
-    CHIP_ERROR SetCurrentDayEntry(DataModel::Nullable<Structs::DayEntryStruct::Type> & newValue) { return SetValue(mCurrentDayEntry, newValue, Attributes::CurrentDayEntry::Id); }
-    CHIP_ERROR SetNextDayEntry(DataModel::Nullable<Structs::DayEntryStruct::Type> & newValue) { return SetValue(mNextDayEntry, newValue, Attributes::NextDayEntry::Id); }
-    CHIP_ERROR SetCurrentDayEntryDate(DataModel::Nullable<uint32_t> & newValue) { return SetValue(mCurrentDayEntryDate, newValue, Attributes::CurrentDayEntryDate::Id); }
-    CHIP_ERROR SetNextDayEntryDate(DataModel::Nullable<uint32_t> & newValue) { return SetValue(mNextDayEntryDate, newValue, Attributes::NextDayEntryDate::Id); }
+    CHIP_ERROR SetCurrentDay(DataModel::Nullable<Structs::DayStruct::Type> & newValue)
+    {
+        return SetValue(mCurrentDay, newValue, Attributes::CurrentDay::Id);
+    }
+    CHIP_ERROR SetNextDay(DataModel::Nullable<Structs::DayStruct::Type> & newValue)
+    {
+        return SetValue(mNextDay, newValue, Attributes::NextDay::Id);
+    }
+    CHIP_ERROR SetCurrentDayEntry(DataModel::Nullable<Structs::DayEntryStruct::Type> & newValue)
+    {
+        return SetValue(mCurrentDayEntry, newValue, Attributes::CurrentDayEntry::Id);
+    }
+    CHIP_ERROR SetNextDayEntry(DataModel::Nullable<Structs::DayEntryStruct::Type> & newValue)
+    {
+        return SetValue(mNextDayEntry, newValue, Attributes::NextDayEntry::Id);
+    }
+    CHIP_ERROR SetCurrentDayEntryDate(DataModel::Nullable<uint32_t> & newValue)
+    {
+        return SetValue(mCurrentDayEntryDate, newValue, Attributes::CurrentDayEntryDate::Id);
+    }
+    CHIP_ERROR SetNextDayEntryDate(DataModel::Nullable<uint32_t> & newValue)
+    {
+        return SetValue(mNextDayEntryDate, newValue, Attributes::NextDayEntryDate::Id);
+    }
 
-    DataModel::Nullable<DataModel::List<Structs::TariffComponentStruct::Type>> & GetCurrentTariffComponents() { return mCurrentTariffComponents_MgmtObj.GetValue(); }
-    DataModel::Nullable<DataModel::List<Structs::TariffComponentStruct::Type>> & GetNextTariffComponents() { return mNextTariffComponents_MgmtObj.GetValue(); }
+    DataModel::Nullable<DataModel::List<Structs::TariffComponentStruct::Type>> & GetCurrentTariffComponents()
+    {
+        return mCurrentTariffComponents_MgmtObj.GetValue();
+    }
+    DataModel::Nullable<DataModel::List<Structs::TariffComponentStruct::Type>> & GetNextTariffComponents()
+    {
+        return mNextTariffComponents_MgmtObj.GetValue();
+    }
 
     CurrentTariffAttrsCtx mServerTariffAttrsCtx;
 
-    void TariffDataUpdatedCb(bool is_erased, const AttributeId* aUpdatedAttrIds, size_t aCount);
+    void TariffDataUpdatedCb(bool is_erased, const AttributeId * aUpdatedAttrIds, size_t aCount);
     void ResetCurrentAttributes();
 
     // AttributeAccessInterface implementation

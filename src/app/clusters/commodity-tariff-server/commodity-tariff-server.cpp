@@ -266,7 +266,7 @@ void Instance::ResetCurrentAttributes()
     mNextTariffComponents_MgmtObj.Cleanup();
 }
 
-void Instance::TariffDataUpdatedCb(bool is_erased, const AttributeId* aUpdatedAttrIds, size_t aCount)
+void Instance::TariffDataUpdatedCb(bool is_erased, const AttributeId * aUpdatedAttrIds, size_t aCount)
 {
     // Process each updated attribute
     for (size_t i = 0; i < aCount; i++)
@@ -277,12 +277,8 @@ void Instance::TariffDataUpdatedCb(bool is_erased, const AttributeId* aUpdatedAt
     DeinitCurrentAttrs();
 
     // Check if essential tariff data is available
-    if (mDelegate.GetTariffUnit().IsNull() || 
-        mDelegate.GetStartDate().IsNull() || 
-        mDelegate.GetTariffInfo().IsNull() ||
-        mDelegate.GetDayEntries().IsNull() || 
-        mDelegate.GetTariffPeriods().IsNull() || 
-        mDelegate.GetTariffComponents().IsNull())
+    if (mDelegate.GetTariffUnit().IsNull() || mDelegate.GetStartDate().IsNull() || mDelegate.GetTariffInfo().IsNull() ||
+        mDelegate.GetDayEntries().IsNull() || mDelegate.GetTariffPeriods().IsNull() || mDelegate.GetTariffComponents().IsNull())
     {
         ChipLogError(AppServer, "Seems the new tariff is unavailable - skip the current/next attrs init");
         return;
@@ -324,14 +320,12 @@ uint32_t GetIdFromEntry<Structs::TariffComponentStruct::Type>(const Structs::Tar
     return aEntry.tariffComponentID;
 }
 
-
-
 template <typename T>
 const T * GetListEntryById(const DataModel::List<const T> & aList, uint32_t aId)
 {
     for (size_t i = 0; i < aList.size(); ++i)
     {
-        const T & item = aList[i];
+        const T & item  = aList[i];
         uint32_t itemId = GetIdFromEntry(item);
 
         if (itemId == aId) // Replace 'id' with the actual field name
@@ -402,7 +396,8 @@ Structs::DayStruct::Type FindDay(CurrentTariffAttrsCtx & aCtx, uint32_t timestam
         {
             for (const auto & patternID : period->dayPatternIDs)
             {
-                auto * pattern = GetListEntryById<Structs::DayPatternStruct::Type>(aCtx.mTariffProvider->GetDayPatterns().Value(), patternID);
+                auto * pattern =
+                    GetListEntryById<Structs::DayPatternStruct::Type>(aCtx.mTariffProvider->GetDayPatterns().Value(), patternID);
                 if ((pattern != nullptr) && pattern->daysOfWeek.Has(GetDayOfWeek(timestamp)))
                 {
                     defaultDay.date        = DayStartTS;
@@ -436,7 +431,7 @@ FindDayEntry(CurrentTariffAttrsCtx & aCtx, const DataModel::List<const uint32_t>
 
     for (size_t i = 0; i < dayEntryIDs.size(); i++)
     {
-        nextPtr = nullptr;
+        nextPtr    = nullptr;
         currentPtr = GetListEntryById<Structs::DayEntryStruct::Type>(aCtx.mTariffProvider->GetDayEntries().Value(), dayEntryIDs[i]);
         if (currentPtr == nullptr)
         {
@@ -445,7 +440,8 @@ FindDayEntry(CurrentTariffAttrsCtx & aCtx, const DataModel::List<const uint32_t>
 
         if (i + 1 < dayEntryIDs.size())
         {
-            nextPtr = GetListEntryById<Structs::DayEntryStruct::Type>(aCtx.mTariffProvider->GetDayEntries().Value(), dayEntryIDs[i + 1]);
+            nextPtr =
+                GetListEntryById<Structs::DayEntryStruct::Type>(aCtx.mTariffProvider->GetDayEntries().Value(), dayEntryIDs[i + 1]);
         }
         else
         {
@@ -522,7 +518,7 @@ CHIP_ERROR UpdateTariffComponentAttrsDayEntryById(Instance * aInstance, CurrentT
 {
     CHIP_ERROR err                                   = CHIP_NO_ERROR;
     const Structs::TariffPeriodStruct::Type * period = FindTariffPeriodByDayEntryId(aCtx, dayEntryID);
-    
+
     // Use a fixed-size array with maximum expected components
     constexpr size_t MAX_COMPONENTS = 16; // Adjust this based on your maximum expected components
     std::array<Structs::TariffComponentStruct::Type, MAX_COMPONENTS> tempArray;
@@ -537,7 +533,8 @@ CHIP_ERROR UpdateTariffComponentAttrsDayEntryById(Instance * aInstance, CurrentT
     for (const auto & entryID : componentIDs)
     {
         Structs::TariffComponentStruct::Type entry;
-        auto current = GetListEntryById<Structs::TariffComponentStruct::Type>(aCtx.mTariffProvider->GetTariffComponents().Value(), entryID);
+        auto current =
+            GetListEntryById<Structs::TariffComponentStruct::Type>(aCtx.mTariffProvider->GetTariffComponents().Value(), entryID);
         if (current == nullptr)
         {
             err = CHIP_ERROR_NOT_FOUND;
@@ -563,8 +560,8 @@ CHIP_ERROR UpdateTariffComponentAttrsDayEntryById(Instance * aInstance, CurrentT
         tempArray[componentCount++] = entry;
     }
 
-    err = mgmtObj.SetNewValue(
-        MakeNullable(DataModel::List<Structs::TariffComponentStruct::Type>(tempArray.data(), componentCount)));
+    err =
+        mgmtObj.SetNewValue(MakeNullable(DataModel::List<Structs::TariffComponentStruct::Type>(tempArray.data(), componentCount)));
     SuccessOrExit(err);
 
     err = mgmtObj.UpdateBegin(nullptr);
@@ -726,7 +723,7 @@ void Instance::HandleGetTariffComponent(HandlerContext & ctx, const Commands::Ge
     {
         status         = Status::NotFound;
         auto component = Utils::GetListEntryById<Structs::TariffComponentStruct::Type>(
-                             mServerTariffAttrsCtx.mTariffProvider->GetTariffComponents().Value(), commandData.tariffComponentID);
+            mServerTariffAttrsCtx.mTariffProvider->GetTariffComponents().Value(), commandData.tariffComponentID);
 
         if (component != nullptr)
         {
@@ -746,9 +743,9 @@ void Instance::HandleGetTariffComponent(HandlerContext & ctx, const Commands::Ge
                 {
                     if (!period->label.IsNull())
                     {
-                        const auto & periodLabel = period->label.Value();
+                        const auto & periodLabel       = period->label.Value();
                         const size_t periodLabelLength = periodLabel.size();
-                        
+
                         // Add separator if not the first label
                         if (!firstLabel)
                         {
@@ -763,17 +760,18 @@ void Instance::HandleGetTariffComponent(HandlerContext & ctx, const Commands::Ge
                                 break;
                             }
                         }
-                        
+
                         // Copy period label to buffer
-                        size_t copyLength = std::min(periodLabelLength, CommodityTariffConsts::kDefaultStringValuesMaxBufLength - labelLength);
+                        size_t copyLength =
+                            std::min(periodLabelLength, CommodityTariffConsts::kDefaultStringValuesMaxBufLength - labelLength);
                         if (copyLength > 0)
                         {
                             memcpy(labelBuffer.data() + labelLength, periodLabel.data(), copyLength);
                             labelLength += copyLength;
                         }
-                        
+
                         firstLabel = false;
-                        
+
                         if (labelLength >= CommodityTariffConsts::kDefaultStringValuesMaxBufLength)
                         {
                             ChipLogError(AppServer, "Label buffer full, truncating");
@@ -799,7 +797,7 @@ void Instance::HandleGetTariffComponent(HandlerContext & ctx, const Commands::Ge
             std::sort(deIDsArray.begin(), deIDsArray.begin() + deIDsCount);
 
             response.label.SetNull();
-            response.dayEntryIDs     = DataModel::List<uint32_t>();
+            response.dayEntryIDs = DataModel::List<uint32_t>();
 
             if (labelLength > 0)
             {
@@ -836,9 +834,9 @@ void Instance::HandleGetDayEntry(HandlerContext & ctx, const Commands::GetDayEnt
     }
     else
     {
-        status = Status::NotFound;
-        auto entry =
-            Utils::GetListEntryById<Structs::DayEntryStruct::Type>(mServerTariffAttrsCtx.mTariffProvider->GetDayEntries().Value(), commandData.dayEntryID);
+        status     = Status::NotFound;
+        auto entry = Utils::GetListEntryById<Structs::DayEntryStruct::Type>(
+            mServerTariffAttrsCtx.mTariffProvider->GetDayEntries().Value(), commandData.dayEntryID);
 
         if (entry != nullptr)
         {
