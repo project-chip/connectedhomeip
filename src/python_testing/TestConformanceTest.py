@@ -397,7 +397,7 @@ class TestConformanceTest(MatterBaseTest, DeviceConformanceTests):
         for cluster in root_node_restricted_clusters:
             self.endpoints[0][cluster] = {}
         problems = self.check_root_node_restricted_clusters()
-        asserts.assert_equal(len(problems), 0, f"Unexpected problem with all clusters on EP0")
+        asserts.assert_equal(len(problems), 0, "Unexpected problem with all clusters on EP0")
 
         # Adding on ep 1 should cause errors
         self.endpoints[1] = {}
@@ -405,7 +405,7 @@ class TestConformanceTest(MatterBaseTest, DeviceConformanceTests):
             self.endpoints[1][cluster] = {}
         problems = self.check_root_node_restricted_clusters()
         asserts.assert_equal(len(problems), len(root_node_restricted_clusters),
-                             f"Did not see expected problems with all clusters on EP1")
+                             "Did not see expected problems with all clusters on EP1")
 
 
 if __name__ == "__main__":
