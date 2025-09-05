@@ -61,10 +61,8 @@ public:
                                          OnCompletionFunc onCompletion);
 
 protected:
-    CHIP_ERROR OnLookupOperationalTrustAnchor(
-        VendorId vendorID,
-        CertificateKeyId & subjectKeyId,
-        ByteSpan & globallyTrustedRootSpan) override;
+    CHIP_ERROR OnLookupOperationalTrustAnchor(VendorId vendorID, CertificateKeyId & subjectKeyId,
+                                              ByteSpan & globallyTrustedRootSpan) override;
     void OnVendorIdVerficationComplete(const CHIP_ERROR & err) override;
 
 private:

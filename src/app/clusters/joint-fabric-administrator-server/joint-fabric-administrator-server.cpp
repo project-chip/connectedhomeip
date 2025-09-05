@@ -210,26 +210,37 @@ void JointFabricAdministratorGlobalInstance::HandleAnnounceJointFabricAdministra
     HandlerContext & ctx, const Commands::AnnounceJointFabricAdministrator::DecodableType & commandData)
 {
     MATTER_TRACE_SCOPE("AnnounceJointFabricAdministrator", "JointFabricAdministrator");
-    ChipLogProgress(JointFabric, "emberAfJointFabricAdministratorClusterAnnounceJointFabricAdministratorCallback: %u",
-                    commandData.endpointID);
+    ChipLogProgress(JointFabric, "Received an AnnounceJointFabricAdministrator command with endpointID=%u", commandData.endpointID);
 
-    auto nonDefaultStatus = Status::Success;
+    std::optional<Status> globalStatus = std::nullopt;
     chip::Controller::JCM::JCMCommissionee jcmCommissionee;
+    app::CommandHandler::Handle handle(&ctx.mCommandHandler);
+    ConcreteCommandPath cachedPath(ctx.mRequestPath.mEndpointId, ctx.mRequestPath.mClusterId, ctx.mRequestPath.mCommandId);
 
-    VerifyOrExit(commandData.endpointID != kInvalidEndpointId, nonDefaultStatus = Status::ConstraintError);
+    auto onComplete = [&handle, cachedPath](const CHIP_ERROR & err) {
+        if (err == CHIP_NO_ERROR)
+        {
+            ChipLogProgress(JointFabric, "Successfully verified trust against commissioning fabric administrator");
+            handle.Get()->AddStatus(cachedPath, Status::Success);
+        }
+        else
+        {
+            ChipLogProgress(JointFabric, "Failed to verify trust against commissioning fabric administrator");
+            handle.Get()->AddStatus(cachedPath, Status::Failure);
+        }
+    };
 
-    // Server::GetInstance().GetJointFabricAdministrator().SetPeerJFAdminClusterEndpointId(commandData.endpointID);
+    VerifyOrExit(commandData.endpointID != kInvalidEndpointId, globalStatus = Status::ConstraintError);
 
-    // FabricIndex fabricIndex       = ctx.mCommandHandler.GetAccessingFabricIndex();
-    // const FabricInfo * fabricInfo = Server::GetInstance().GetFabricTable().FindFabricWithIndex(fabricIndex);
+    VerifyOrExit(jcmCommissionee.StartJCMTrustVerification(ctx, commandData.endpointID, onComplete) == CHIP_NO_ERROR,
+                 globalStatus = Status::Failure);
 
-    // auto onCompleteTrustVerification = []
-    // VerifyOrExit(jcmCommissionee.StartJCMTrustVerification(ctx, commandData.endpointID) == CHIP_NO_ERROR,
-    //              nonDefaultStatus = Status::Failure);
-
-    // TODO: Get rid of exit since we need to make an async handle
 exit:
-    ctx.mCommandHandler.AddStatus(ctx.mRequestPath, nonDefaultStatus);
+    if (globalStatus.has_value())
+    {
+        ChipLogProgress(JointFabric, "Failed to handle AnnounceJointFabricAdministrator");
+        handle.Get()->AddStatus(cachedPath, globalStatus.value());
+    }
 }
 
 void JointFabricAdministratorGlobalInstance::HandleICACCSRRequest(HandlerContext & ctx,

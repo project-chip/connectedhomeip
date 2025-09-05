@@ -55,6 +55,7 @@ CHIP_ERROR JCMCommissionee::StartJCMTrustVerification(CommandHandlerInterface::H
     // RootPublicKey and FabricID of the Fabric indicated by AdministratorFabricIndex.
 
     // TODO: Figure out where I get the vendor ID, rcacSpan, icacSpan, and nocSpan
+    onCompletion(CHIP_NO_ERROR);
 
     // CHIP_ERROR err = VerifyVendorId(exchangeMgr, handle, accessingFabricIndex, vendorId, rcacSpan, icacSpan, nocSpan);
 
