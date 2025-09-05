@@ -35,7 +35,7 @@ using namespace CommodityTariffConsts;
     {                                                                                                                              \
         if (!(expr))                                                                                                               \
         {                                                                                                                          \
-            ChipLogError(NotSpecified, __VA_ARGS__);                                                                               \
+            ChipLogError(AppServer, __VA_ARGS__);                                                                                  \
             VerifyOrReturnError(expr, code);                                                                                       \
         }                                                                                                                          \
     } while (false)
@@ -367,7 +367,7 @@ CHIP_ERROR ValidateListEntry(const DayEntryStruct::Type & entryNewValue, void * 
     // Check for duplicate IDs
     if (!ctx->DayEntryKeyIDs.insert(entryNewValue.dayEntryID).second)
     {
-        ChipLogError(NotSpecified, "Duplicate dayEntryID found");
+        ChipLogError(AppServer, "Duplicate dayEntryID found");
         return CHIP_ERROR_DUPLICATE_KEY_ID;
     }
 
@@ -384,7 +384,7 @@ CHIP_ERROR ValidateListEntry(const DayEntryStruct::Type & entryNewValue, void * 
         }
         else
         {
-            ChipLogError(NotSpecified, "If the RNDM feature is enabled, the randomization* field is required!");
+            ChipLogError(AppServer, "If the RNDM feature is enabled, the randomization* field is required!");
             return CHIP_ERROR_INVALID_ARGUMENT;
         }
     }
@@ -496,23 +496,9 @@ CHIP_ERROR ValidateListEntry(const TariffComponentStruct::Type & entryNewValue, 
         ChipLogDetail(NotSpecified, "Predicted flag set to %s", entryNewValue.predicted.Value() ? "true" : "false");
     }
 
-    uint8_t featuresCount = 0;
-    auto n                = entryFeatures.Raw();
-    while (n)
-    {
-        n &= (n - 1);
-        featuresCount++;
-    };
-
-    if (featuresCount > 1)
-    {
-        ChipLogError(NotSpecified, "Exactly one feature required for one TariffComponent entry");
-        return CHIP_ERROR_INVALID_ARGUMENT;
-    }
-
     if (!ctx->TariffComponentKeyIDsFeatureMap.insert({ entryNewValue.tariffComponentID, entryFeatures.Raw() }).second)
     {
-        ChipLogError(NotSpecified, "Duplicate tariffComponentID found");
+        ChipLogError(AppServer, "Duplicate tariffComponentID found");
         return CHIP_ERROR_DUPLICATE_KEY_ID;
     }
 
@@ -533,7 +519,7 @@ CHIP_ERROR ValidateListEntry(const TariffPeriodStruct::Type & entryNewValue, voi
         }
         if (labelSpan.empty())
         {
-            ChipLogError(NotSpecified, "TariffPeriod label must not be empty if present");
+            ChipLogError(AppServer, "TariffPeriod label must not be empty if present");
             return CHIP_ERROR_INVALID_ARGUMENT;
         }
     }
@@ -571,12 +557,22 @@ CHIP_ERROR CTC_BaseDataClass<T>::ValidateNewValue()
 template <>
 CHIP_ERROR CTC_BaseDataClass<DataModel::Nullable<Globals::TariffUnitEnum>>::ValidateNewValue()
 {
+    VerifyOrReturnError(EnsureKnownEnumValue(GetNewValueRef().Value()) != Globals::TariffUnitEnum::kUnknownEnumValue,
+                        CHIP_ERROR_INVALID_ARGUMENT);
     return CHIP_NO_ERROR;
 }
 
 template <>
 CHIP_ERROR CTC_BaseDataClass<DataModel::Nullable<int16_t>>::ValidateNewValue()
 {
+    if (mAttrId == Clusters::CommodityTariff::Attributes::DefaultRandomizationOffset::Id)
+    {
+        if (CommonUtilities::HasFeatureInCtx(static_cast<TariffUpdateCtx *>(mAuxData), CommodityTariff::Feature::kRandomization))
+        {
+            ChipLogDetail(NotSpecified, "DefaultRandomizationOffset: %u", GetNewValueRef().Value());
+        }
+    }
+
     return CHIP_NO_ERROR;
 }
 
@@ -600,6 +596,8 @@ CHIP_ERROR CTC_BaseDataClass<DataModel::Nullable<uint32_t>>::ValidateNewValue()
 template <>
 CHIP_ERROR CTC_BaseDataClass<DataModel::Nullable<DayEntryRandomizationTypeEnum>>::ValidateNewValue()
 {
+    VerifyOrReturnError(EnsureKnownEnumValue(GetNewValueRef().Value()) != DayEntryRandomizationTypeEnum::kUnknownEnumValue,
+                        CHIP_ERROR_INVALID_ARGUMENT);
     return CHIP_NO_ERROR;
 }
 
@@ -673,7 +671,7 @@ CHIP_ERROR CTC_BaseDataClass<DataModel::Nullable<DataModel::List<DayEntryStruct:
     // Validate list length
     if (newList.size() == 0 || newList.size() > kDayEntriesAttrMaxLength)
     {
-        ChipLogError(NotSpecified, "Incorrect DayEntries length");
+        ChipLogError(AppServer, "Incorrect DayEntries length");
         return CHIP_ERROR_INVALID_LIST_LENGTH;
     }
 
@@ -706,7 +704,7 @@ CHIP_ERROR CTC_BaseDataClass<DataModel::Nullable<DataModel::List<DayPatternStruc
     // Validate list length
     if (newList.size() == 0 || newList.size() > kDayPatternsAttrMaxLength)
     {
-        ChipLogError(NotSpecified, "Incorrect dayPatterns length");
+        ChipLogError(AppServer, "Incorrect dayPatterns length");
         return CHIP_ERROR_INVALID_LIST_LENGTH;
     }
 
@@ -715,7 +713,7 @@ CHIP_ERROR CTC_BaseDataClass<DataModel::Nullable<DataModel::List<DayPatternStruc
     {
         if (!ctx->DayPatternKeyIDs.insert(item.dayPatternID).second)
         {
-            ChipLogError(NotSpecified, "Duplicate dayPatternID found");
+            ChipLogError(AppServer, "Duplicate dayPatternID found");
             return CHIP_ERROR_DUPLICATE_KEY_ID;
         }
 
@@ -734,7 +732,7 @@ CHIP_ERROR CTC_BaseDataClass<DataModel::Nullable<DataModel::List<DayPatternStruc
 
     if (!(isValidSingleRotatingDay || isValidFullWeekCoverage))
     {
-        ChipLogError(NotSpecified, "Invalid day pattern coverage");
+        ChipLogError(AppServer, "Invalid day pattern coverage");
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
 
@@ -787,7 +785,7 @@ CHIP_ERROR CTC_BaseDataClass<DataModel::Nullable<DataModel::List<TariffPeriodStr
     // Validate list length
     if (newList.size() == 0 || newList.size() > kTariffPeriodsAttrMaxLength)
     {
-        ChipLogError(NotSpecified, "Incorrect TariffPeriods length");
+        ChipLogError(AppServer, "Incorrect TariffPeriods length");
         return CHIP_ERROR_INVALID_LIST_LENGTH;
     }
 
@@ -821,7 +819,7 @@ CHIP_ERROR CTC_BaseDataClass<DataModel::Nullable<DataModel::List<DayStruct::Type
     // Validate list length
     if (newList.size() == 0 || newList.size() > kIndividualDaysAttrMaxLength)
     {
-        ChipLogError(NotSpecified, "Incorrect IndividualDays length");
+        ChipLogError(AppServer, "Incorrect IndividualDays length");
         return CHIP_ERROR_INVALID_LIST_LENGTH;
     }
 
@@ -831,7 +829,7 @@ CHIP_ERROR CTC_BaseDataClass<DataModel::Nullable<DataModel::List<DayStruct::Type
         // Check date ordering
         if (item.date <= previousDate)
         {
-            ChipLogError(NotSpecified, "IndividualDays must be ordered by date");
+            ChipLogError(AppServer, "IndividualDays must be ordered by date");
             return CHIP_ERROR_INVALID_ARGUMENT;
         }
 
@@ -850,7 +848,7 @@ CHIP_ERROR CTC_BaseDataClass<DataModel::Nullable<DataModel::List<DayStruct::Type
         // Check for duplicates
         if (CommonUtilities::HasDuplicateIDs(item.dayEntryIDs, ctx->IndividualDaysDayEntryIDs))
         {
-            ChipLogError(NotSpecified, "Duplicate dayEntryID found");
+            ChipLogError(AppServer, "Duplicate dayEntryID found");
             return CHIP_ERROR_DUPLICATE_KEY_ID;
         }
 
@@ -890,7 +888,7 @@ CHIP_ERROR CTC_BaseDataClass<DataModel::Nullable<DataModel::List<CalendarPeriodS
         // Validate dayPatternIDs count
         if (item.dayPatternIDs.empty() || item.dayPatternIDs.size() > kCalendarPeriodItemMaxDayPatternIDs)
         {
-            ChipLogError(NotSpecified, "DayPatternIDs count must be between 1 and %" PRIu32,
+            ChipLogError(AppServer, "DayPatternIDs count must be between 1 and %" PRIu32,
                          (uint32_t) kCalendarPeriodItemMaxDayPatternIDs);
             return CHIP_ERROR_INVALID_ARGUMENT;
         }
@@ -898,7 +896,7 @@ CHIP_ERROR CTC_BaseDataClass<DataModel::Nullable<DataModel::List<CalendarPeriodS
         // Check for duplicate dayPatternIDs
         if (CommonUtilities::HasDuplicateIDs(item.dayPatternIDs, CalendarPeriodsDayPatternIDs))
         {
-            ChipLogError(NotSpecified, "Duplicate dayPatternID found in CalendarPeriods");
+            ChipLogError(AppServer, "Duplicate dayPatternID found in CalendarPeriods");
             return CHIP_ERROR_DUPLICATE_KEY_ID;
         }
 
@@ -908,7 +906,7 @@ CHIP_ERROR CTC_BaseDataClass<DataModel::Nullable<DataModel::List<CalendarPeriodS
             // Case 1: Invalid - tariff start date is 0 but item has a positive start date
             if (tariffStartDate.Value() == 0 && (!item.startDate.IsNull() && item.startDate.Value() > 0))
             {
-                ChipLogError(NotSpecified,
+                ChipLogError(AppServer,
                              "The first StartDate in CalendarPeriods can't have a value if the StartDate of tariff is 0");
                 return CHIP_ERROR_INVALID_ARGUMENT;
             }
@@ -916,7 +914,7 @@ CHIP_ERROR CTC_BaseDataClass<DataModel::Nullable<DataModel::List<CalendarPeriodS
             // Case 2: Invalid - tariff has positive start date but item has no valid start date
             if (tariffStartDate.Value() > 0 && (item.startDate.IsNull() || item.startDate.Value() == 0))
             {
-                ChipLogError(NotSpecified,
+                ChipLogError(AppServer,
                              "The first StartDate in CalendarPeriods can't be not set if the StartDate of tariff is specified");
                 return CHIP_ERROR_INVALID_ARGUMENT;
             }
@@ -930,14 +928,14 @@ CHIP_ERROR CTC_BaseDataClass<DataModel::Nullable<DataModel::List<CalendarPeriodS
         // Subsequent items must have non-null StartDate
         if (item.startDate.IsNull())
         {
-            ChipLogError(NotSpecified, "Only first CalendarPeriodStruct can have null StartDate");
+            ChipLogError(AppServer, "Only first CalendarPeriodStruct can have null StartDate");
             return CHIP_ERROR_INVALID_ARGUMENT;
         }
 
         // Validate StartDate ordering
         if (!previousStartDate.IsNull() && !item.startDate.IsNull() && item.startDate.Value() <= previousStartDate.Value())
         {
-            ChipLogError(NotSpecified, "CalendarPeriodStructs must be in increasing StartDate order");
+            ChipLogError(AppServer, "CalendarPeriodStructs must be in increasing StartDate order");
             return CHIP_ERROR_INVALID_ARGUMENT;
         }
 

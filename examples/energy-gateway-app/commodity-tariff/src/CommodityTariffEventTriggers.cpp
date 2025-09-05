@@ -42,70 +42,68 @@ static const TariffDataSet & GetNextPreset()
     return preset;
 }
 
-#define COMMODITY_TARIFF_ATTRIBUTES_REQ                                                                                            \
-    X(TariffUnit)                                                                                                                  \
-    X(StartDate)                                                                                                                   \
-    X(TariffInfo)                                                                                                                  \
-    X(DayEntries)                                                                                                                  \
-    X(TariffComponents)                                                                                                            \
-    X(TariffPeriods)
-
-#define COMMODITY_TARIFF_ATTRIBUTES_OPT                                                                                            \
-    X(DefaultRandomizationOffset)                                                                                                  \
-    X(DefaultRandomizationType)                                                                                                    \
-    X(DayPatterns)                                                                                                                 \
-    X(IndividualDays)                                                                                                              \
-    X(CalendarPeriods)
-
 void SetTestEventTrigger_TariffDataUpdated()
 {
     const TariffDataSet & tariff_preset = GetNextPreset();
     CommodityTariffDelegate * dg        = GetCommodityTariffDelegate();
     CommodityTariffInstance * instance  = GetCommodityTariffInstance();
-    CHIP_ERROR err                      = CHIP_NO_ERROR;
 
-    auto process_attribute = [&](auto & mgmt_obj, const auto & preset_value, const char * name, bool is_required) {
+    auto process_attribute = [](auto & mgmt_obj, const auto & preset_value, const char * name, bool is_required) -> CHIP_ERROR {
         if (!preset_value.IsNull())
         {
-            err = mgmt_obj.SetNewValue(preset_value);
+            CHIP_ERROR err = mgmt_obj.SetNewValue(preset_value);
             if (err != CHIP_NO_ERROR)
             {
-                ChipLogError(NotSpecified, "Unable to load tariff data for the \"%s\" field", name);
-                return false;
+                ChipLogError(AppServer, "Unable to load tariff data for \"%s\": %" CHIP_ERROR_FORMAT, name, err.Format());
+                return err;
             }
         }
         else if (is_required)
         {
-            ChipLogError(NotSpecified, "Invalid tariff data: the mandatory field \"%s\" is not present", name);
-            err = CHIP_ERROR_INVALID_ARGUMENT;
-            return false;
+            ChipLogError(AppServer, "Invalid tariff data: mandatory field \"%s\" not present", name);
+            return CHIP_ERROR_INVALID_ARGUMENT;
         }
-        return true;
+        return CHIP_NO_ERROR;
     };
 
-#define X(attrName)                                                                                                                \
-    if (!process_attribute(dg->Get##attrName##_MgmtObj(), tariff_preset.attrName, #attrName, true))                                \
-    {                                                                                                                              \
-        return;                                                                                                                    \
-    }
-    COMMODITY_TARIFF_ATTRIBUTES_REQ
-#undef X
+    // Process mandatory attributes
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    err            = process_attribute(dg->GetTariffUnit_MgmtObj(), tariff_preset.TariffUnit, "TariffUnit", true);
+    if (err != CHIP_NO_ERROR)
+        return;
 
-#define X(attrName)                                                                                                                \
-    if (!process_attribute(dg->Get##attrName##_MgmtObj(), tariff_preset.attrName, #attrName, false))                               \
-    {                                                                                                                              \
-        return;                                                                                                                    \
-    }
-    COMMODITY_TARIFF_ATTRIBUTES_OPT
-#undef X
+    err = process_attribute(dg->GetStartDate_MgmtObj(), tariff_preset.StartDate, "StartDate", true);
+    if (err != CHIP_NO_ERROR)
+        return;
+
+    err = process_attribute(dg->GetTariffInfo_MgmtObj(), tariff_preset.TariffInfo, "TariffInfo", true);
+    if (err != CHIP_NO_ERROR)
+        return;
+
+    err = process_attribute(dg->GetDayEntries_MgmtObj(), tariff_preset.DayEntries, "DayEntries", true);
+    if (err != CHIP_NO_ERROR)
+        return;
+
+    err = process_attribute(dg->GetTariffComponents_MgmtObj(), tariff_preset.TariffComponents, "TariffComponents", true);
+    if (err != CHIP_NO_ERROR)
+        return;
+
+    err = process_attribute(dg->GetTariffPeriods_MgmtObj(), tariff_preset.TariffPeriods, "TariffPeriods", true);
+    if (err != CHIP_NO_ERROR)
+        return;
+
+    // Process optional attributes
+    process_attribute(dg->GetDefaultRandomizationOffset_MgmtObj(), tariff_preset.DefaultRandomizationOffset,
+                      "DefaultRandomizationOffset", false);
+    process_attribute(dg->GetDefaultRandomizationType_MgmtObj(), tariff_preset.DefaultRandomizationType, "DefaultRandomizationType",
+                      false);
+    process_attribute(dg->GetDayPatterns_MgmtObj(), tariff_preset.DayPatterns, "DayPatterns", false);
+    process_attribute(dg->GetIndividualDays_MgmtObj(), tariff_preset.IndividualDays, "IndividualDays", false);
+    process_attribute(dg->GetCalendarPeriods_MgmtObj(), tariff_preset.CalendarPeriods, "CalendarPeriods", false);
 
     instance->ActivateTariffTimeTracking(tariff_preset.TariffTestTimestamp);
-
     dg->TariffDataUpdate(tariff_preset.TariffTestTimestamp);
 }
-
-#undef COMMODITY_TARIFF_ATTRIBUTES_REQ
-#undef COMMODITY_TARIFF_ATTRIBUTES_OPT
 
 void SetTestEventTrigger_TariffDataClear()
 {
