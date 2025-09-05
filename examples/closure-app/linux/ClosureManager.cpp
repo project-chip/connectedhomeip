@@ -513,7 +513,8 @@ chip::Protocols::InteractionModel::Status ClosureManager::OnStepCommand(const St
         ep1Target.SetNonNull(GenericOverallTargetState{});
     }
 
-    ep1Target.Value().position = NullOptional; // Reset position to Null
+    ep1Target.Value().position.SetValue(
+        DataModel::NullNullable); // Set position to Null as it cannot represent panel position change.
 
     VerifyOrReturnValue(mClosureEndpoint1.GetLogic().SetOverallTargetState(ep1Target) == CHIP_NO_ERROR, Status::Failure,
                         ChipLogError(AppServer, "Failed to set overall target for Step command"));
@@ -664,6 +665,7 @@ void ClosureManager::HandlePanelUnlatchAction(EndpointId endpointId)
         ChipLogProgress(AppServer, "Performing unlatch action");
 
         ep1OverallCurrentState.Value().latch.SetValue(DataModel::MakeNullable(false));
+        ep1OverallCurrentState.Value().secureState.SetNonNull(false);
         mClosureEndpoint1.GetLogic().SetOverallCurrentState(ep1OverallCurrentState);
 
         panelCurrentState.Value().latch.SetValue(false);
@@ -767,8 +769,9 @@ void ClosureManager::HandlePanelSetTargetAction(EndpointId endpointId)
                 // In Real application, this would be replaced with actual latch logic.
                 ChipLogProgress(AppServer, "Performing latch action");
 
-                ep1OverallCurrentState.Value().latch.SetValue(DataModel::MakeNullable(true));
-                mClosureEndpoint1.GetLogic().SetOverallCurrentState(ep1OverallCurrentState);
+            ep1OverallCurrentState.Value().latch.SetValue(DataModel::MakeNullable(true));
+            ep1OverallCurrentState.Value().secureState.SetNonNull(false);
+            mClosureEndpoint1.GetLogic().SetOverallCurrentState(ep1OverallCurrentState);
 
                 panelCurrentState.Value().latch.SetValue(DataModel::MakeNullable(true));
                 ep->GetLogic().SetCurrentState(panelCurrentState);
@@ -915,16 +918,16 @@ void ClosureManager::HandleClosureMotionAction()
             // If currently latched (true) and target is unlatched (false), unlatch first before moving
             if (ep1CurrentState.Value().latch.Value().Value() && !ep1TargetState.Value().latch.Value().Value())
             {
-                // In Real application, this would be replaced with actual unlatch logic.
-                ChipLogProgress(AppServer, "Performing unlatch action");
-                ep1CurrentState.Value().latch.SetValue(DataModel::MakeNullable(false));
-                instance.mClosureEndpoint1.GetLogic().SetOverallCurrentState(ep1CurrentState);
-                ep2CurrentState.Value().latch.SetValue(DataModel::MakeNullable(false));
-                instance.mClosurePanelEndpoint2.GetLogic().SetCurrentState(ep2CurrentState);
-                ep3CurrentState.Value().latch.SetValue(DataModel::MakeNullable(false));
-                instance.mClosurePanelEndpoint3.GetLogic().SetCurrentState(ep3CurrentState);
-                ChipLogProgress(AppServer, "Unlatched action completed");
-            }
+            // In Real application, this would be replaced with actual unlatch logic.
+            ChipLogProgress(AppServer, "Performing unlatch action");
+            ep1CurrentState.Value().latch.SetValue(DataModel::MakeNullable(false));
+            ep1CurrentState.Value().secureState.SetNonNull(false);
+            instance.mClosureEndpoint1.GetLogic().SetOverallCurrentState(ep1CurrentState);
+            ep2CurrentState.Value().latch.SetValue(DataModel::MakeNullable(false));
+            instance.mClosurePanelEndpoint2.GetLogic().SetCurrentState(ep2CurrentState);
+            ep3CurrentState.Value().latch.SetValue(DataModel::MakeNullable(false));
+            instance.mClosurePanelEndpoint3.GetLogic().SetCurrentState(ep3CurrentState);
+            ChipLogProgress(AppServer, "Unlatched action completed");
         }
     }
 
@@ -987,16 +990,26 @@ void ClosureManager::HandleClosureMotionAction()
             // If currently latched (false) and target is unlatched (true), unlatch first before moving
             if (!ep1CurrentState.Value().latch.Value().Value() && ep1TargetState.Value().latch.Value().Value())
             {
-                // In Real application, this would be replaced with actual unlatch logic.
-                ChipLogProgress(AppServer, "Performing latch action");
-                ep1CurrentState.Value().latch.SetValue(DataModel::MakeNullable(true));
-                instance.mClosureEndpoint1.GetLogic().SetOverallCurrentState(ep1CurrentState);
-                ep2CurrentState.Value().latch.SetValue(DataModel::MakeNullable(true));
-                instance.mClosurePanelEndpoint2.GetLogic().SetCurrentState(ep2CurrentState);
-                ep3CurrentState.Value().latch.SetValue(DataModel::MakeNullable(true));
-                instance.mClosurePanelEndpoint3.GetLogic().SetCurrentState(ep3CurrentState);
-                ChipLogProgress(AppServer, "latched action complete");
+            // In Real application, this would be replaced with actual latch logic.
+            ChipLogProgress(AppServer, "Performing latch action");
+            ep1CurrentState.Value().latch.SetValue(DataModel::MakeNullable(true));
+            if (ep1CurrentState.Value().position.HasValue() && !ep1CurrentState.Value().position.Value().IsNull())
+            {
+                if (ep1CurrentState.Value().position.Value().Value() == CurrentPositionEnum::kFullyClosed)
+                {
+                    ep1CurrentState.Value().secureState.SetNonNull(true);
+                }
+                else
+                {
+                    ep1CurrentState.Value().secureState.SetNonNull(false);
+                }
             }
+            instance.mClosureEndpoint1.GetLogic().SetOverallCurrentState(ep1CurrentState);
+            ep2CurrentState.Value().latch.SetValue(DataModel::MakeNullable(true));
+            instance.mClosurePanelEndpoint2.GetLogic().SetCurrentState(ep2CurrentState);
+            ep3CurrentState.Value().latch.SetValue(DataModel::MakeNullable(true));
+            instance.mClosurePanelEndpoint3.GetLogic().SetCurrentState(ep3CurrentState);
+            ChipLogProgress(AppServer, "latched action complete");
         }
     }
 
@@ -1025,7 +1038,7 @@ bool ClosureManager::GetPanelNextPosition(const GenericDimensionStateStruct & cu
     }
     else if (currentPosition > targetPosition)
     {
-        // Handling overflow for CurrentPosition
+        // Handling underflow for CurrentPosition
         chip::Percent100ths newCurrentPosition =
             (currentPosition > kMotionPositionStep) ? currentPosition - kMotionPositionStep : 0;
         // Moving down: Decreasing the current position by a step of 2000 units,
