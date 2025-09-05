@@ -104,14 +104,16 @@ struct TestDacOnlyPartialAttestationVerifier : public ::testing::Test
     }
 };
 
-// Helper method to construct TLV attestation elements structure
+// Helper function to construct TLV attestation elements structure
 static CHIP_ERROR ConstructAttestationElementsTLV(uint8_t * tlvBuffer, size_t bufferSize, const ByteSpan & cdData,
                                                   const ByteSpan & nonceData, size_t & tlvLen)
 {
+    // Construct TLV structure representing attestation elements that would be signed by device
     chip::TLV::TLVWriter writer;
     writer.Init(tlvBuffer, bufferSize);
     chip::TLV::TLVType outerType;
 
+    // Add attestation elements to the TLV structure
     ReturnErrorOnFailure(writer.StartContainer(chip::TLV::AnonymousTag(), chip::TLV::kTLVType_Structure, outerType));
     writer.Put(chip::TLV::ContextTag(1), cdData);
     writer.Put(chip::TLV::ContextTag(2), nonceData);
@@ -124,7 +126,7 @@ static CHIP_ERROR ConstructAttestationElementsTLV(uint8_t * tlvBuffer, size_t bu
     return CHIP_NO_ERROR;
 }
 
-// Helper method to create signed attestation data using standard test parameters.
+// Helper function to create signed attestation data using standard test parameters.
 static CHIP_ERROR CreateSignedAttestationData(uint8_t * tlvBuffer, size_t & tlvLen, chip::Crypto::P256ECDSASignature & signature,
                                               const ByteSpan & cdData, const ByteSpan & nonceData, const ByteSpan & privateKey,
                                               const ByteSpan & publicKey, const uint8_t * challengeData, size_t challengeDataLen)
@@ -133,7 +135,7 @@ static CHIP_ERROR CreateSignedAttestationData(uint8_t * tlvBuffer, size_t & tlvL
     ReturnErrorOnFailure(ConstructAttestationElementsTLV(tlvBuffer, sizeof(uint8_t) * 128, cdData, nonceData, tlvLen));
 
     // Concatenate TLV and challenge data for signing
-    constexpr size_t kMaxToSignSize = 128 + 64; // 128 for TLV, 64 for challengeData (adjust if needed)
+    constexpr size_t kMaxToSignSize = 128 + 64; // 128 for TLV, 64 for challengeData
     if (tlvLen + challengeDataLen > kMaxToSignSize)
     {
         return CHIP_ERROR_BUFFER_TOO_SMALL;
@@ -374,6 +376,7 @@ TEST_F(TestDacOnlyPartialAttestationVerifier, TestWithMalformedAttestationElemen
 // Test case verifies that nonce in attestation elements does not match the expected nonce
 TEST_F(TestDacOnlyPartialAttestationVerifier, TestWithMismatchedNonce)
 {
+    // The actual contents do not represent real or meaningful data.
     uint8_t nonceInElements[32] = { 0x55, 0x66, 0x77, 0x88 };
     uint8_t expectedNonce[32]   = { 0x99, 0x88, 0x77 };
 
@@ -411,6 +414,7 @@ TEST_F(TestDacOnlyPartialAttestationVerifier, TestWithInvalidPAAFormat)
                                                  sizeof(kTestChallengeData));
     ASSERT_EQ(err, CHIP_NO_ERROR);
 
+    // Prepare AttestationInfo with valid DAC and PAI, but invalid PAA
     DeviceAttestationVerifier::AttestationInfo validInfo(
         ByteSpan(tlvBuf, tlvLen), ByteSpan(kTestChallengeData), ByteSpan(signature.ConstBytes(), signature.Length()),
         TestCerts::sTestCert_PAI_FFF1_8000_Cert, TestCerts::sTestCert_DAC_FFF1_8000_0004_Cert, ByteSpan(kTestNonceData),
