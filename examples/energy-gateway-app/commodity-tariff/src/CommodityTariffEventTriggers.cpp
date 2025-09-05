@@ -68,29 +68,35 @@ void SetTestEventTrigger_TariffDataUpdated()
 
     // Process mandatory attributes
     CHIP_ERROR err = CHIP_NO_ERROR;
-    err = process_attribute(dg->GetTariffUnit_MgmtObj(), tariff_preset.TariffUnit, "TariffUnit", true);
-    if (err != CHIP_NO_ERROR) return;
-    
+    err            = process_attribute(dg->GetTariffUnit_MgmtObj(), tariff_preset.TariffUnit, "TariffUnit", true);
+    if (err != CHIP_NO_ERROR)
+        return;
+
     err = process_attribute(dg->GetStartDate_MgmtObj(), tariff_preset.StartDate, "StartDate", true);
-    if (err != CHIP_NO_ERROR) return;
-    
+    if (err != CHIP_NO_ERROR)
+        return;
+
     err = process_attribute(dg->GetTariffInfo_MgmtObj(), tariff_preset.TariffInfo, "TariffInfo", true);
-    if (err != CHIP_NO_ERROR) return;
-    
+    if (err != CHIP_NO_ERROR)
+        return;
+
     err = process_attribute(dg->GetDayEntries_MgmtObj(), tariff_preset.DayEntries, "DayEntries", true);
-    if (err != CHIP_NO_ERROR) return;
-    
+    if (err != CHIP_NO_ERROR)
+        return;
+
     err = process_attribute(dg->GetTariffComponents_MgmtObj(), tariff_preset.TariffComponents, "TariffComponents", true);
-    if (err != CHIP_NO_ERROR) return;
-    
+    if (err != CHIP_NO_ERROR)
+        return;
+
     err = process_attribute(dg->GetTariffPeriods_MgmtObj(), tariff_preset.TariffPeriods, "TariffPeriods", true);
-    if (err != CHIP_NO_ERROR) return;
+    if (err != CHIP_NO_ERROR)
+        return;
 
     // Process optional attributes
     process_attribute(dg->GetDefaultRandomizationOffset_MgmtObj(), tariff_preset.DefaultRandomizationOffset,
-                     "DefaultRandomizationOffset", false);
-    process_attribute(dg->GetDefaultRandomizationType_MgmtObj(), tariff_preset.DefaultRandomizationType,
-                     "DefaultRandomizationType", false);
+                      "DefaultRandomizationOffset", false);
+    process_attribute(dg->GetDefaultRandomizationType_MgmtObj(), tariff_preset.DefaultRandomizationType, "DefaultRandomizationType",
+                      false);
     process_attribute(dg->GetDayPatterns_MgmtObj(), tariff_preset.DayPatterns, "DayPatterns", false);
     process_attribute(dg->GetIndividualDays_MgmtObj(), tariff_preset.IndividualDays, "IndividualDays", false);
     process_attribute(dg->GetCalendarPeriods_MgmtObj(), tariff_preset.CalendarPeriods, "CalendarPeriods", false);
