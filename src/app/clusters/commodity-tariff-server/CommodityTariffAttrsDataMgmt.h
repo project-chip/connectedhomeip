@@ -832,7 +832,7 @@ public:
         }
         else
         {
-            ChipLogError(NotSpecified, "The value of attr %" PRIu32 " is not valid!", mAttrId);
+            ChipLogError(AppServer, "The value of attr %" PRIu32 " is not valid!", mAttrId);
         }
 
         return err;

@@ -284,7 +284,7 @@ void Instance::TariffDataUpdatedCb(bool is_erased, const AttributeId* aUpdatedAt
         mDelegate.GetTariffPeriods().IsNull() || 
         mDelegate.GetTariffComponents().IsNull())
     {
-        ChipLogError(NotSpecified, "Seems the new tariff is unavailable - skip the current/next attrs init");
+        ChipLogError(AppServer, "Seems the new tariff is unavailable - skip the current/next attrs init");
         return;
     }
 
@@ -603,13 +603,13 @@ void Instance::UpdateCurrentAttrs()
     uint32_t now = GetCurrentTimestamp();
     if (!now)
     {
-        ChipLogError(NotSpecified, "The timestamp value can't be zero!");
+        ChipLogError(AppServer, "The timestamp value can't be zero!");
         return;
     }
 
     if (mServerTariffAttrsCtx.mTariffProvider == nullptr)
     {
-        ChipLogError(NotSpecified, "The tariff is not available");
+        ChipLogError(AppServer, "The tariff is not available");
         return;
     }
 
@@ -630,7 +630,7 @@ void Instance::UpdateDayInformation(uint32_t now)
     // Find current day
     if (!Utils::DayIsValid(&currentDay.Value()))
     {
-        ChipLogError(NotSpecified, "The mCurrentDay data is invalid");
+        ChipLogError(AppServer, "The mCurrentDay data is invalid");
         return;
     }
 
@@ -673,7 +673,7 @@ void Instance::UpdateDayEntryInformation(uint32_t now)
             Utils::UpdateTariffComponentAttrsDayEntryById(this, mServerTariffAttrsCtx, currentEntry->dayEntryID,
                                                           mCurrentTariffComponents_MgmtObj))
         {
-            ChipLogError(NotSpecified, "Unable to update the CurrentTariffComponents attribute!");
+            ChipLogError(AppServer, "Unable to update the CurrentTariffComponents attribute!");
         }
         ChipLogDetail(NotSpecified, "UpdateCurrentAttrs: current day entry: %u", tmpDayEntry.Value().dayEntryID);
     }
@@ -692,7 +692,7 @@ void Instance::UpdateDayEntryInformation(uint32_t now)
             Utils::UpdateTariffComponentAttrsDayEntryById(this, mServerTariffAttrsCtx, nextEntry->dayEntryID,
                                                           mNextTariffComponents_MgmtObj))
         {
-            ChipLogError(NotSpecified, "Unable to update the NextTariffComponents attribute!");
+            ChipLogError(AppServer, "Unable to update the NextTariffComponents attribute!");
         }
         ChipLogDetail(NotSpecified, "UpdateCurrentAttrs: next day entry: %u", tmpDayEntry.Value().dayEntryID);
         tmpDate.SetNonNull(mCurrentDayEntryDate.Value() + currentEntryMinutesRemain * 60);
@@ -715,7 +715,7 @@ void Instance::HandleGetTariffComponent(HandlerContext & ctx, const Commands::Ge
 
     if (mServerTariffAttrsCtx.mTariffProvider == nullptr)
     {
-        ChipLogError(NotSpecified, "The tariff is not available");
+        ChipLogError(AppServer, "The tariff is not available");
     }
     else
     {
@@ -754,7 +754,7 @@ void Instance::HandleGetTariffComponent(HandlerContext & ctx, const Commands::Ge
                             }
                             else
                             {
-                                ChipLogError(NotSpecified, "Label buffer full, truncating");
+                                ChipLogError(AppServer, "Label buffer full, truncating");
                                 break;
                             }
                         }
@@ -771,7 +771,7 @@ void Instance::HandleGetTariffComponent(HandlerContext & ctx, const Commands::Ge
                         
                         if (labelLength >= CommodityTariffConsts::kDefaultStringValuesMaxBufLength)
                         {
-                            ChipLogError(NotSpecified, "Label buffer full, truncating");
+                            ChipLogError(AppServer, "Label buffer full, truncating");
                             break;
                         }
                     }
@@ -782,7 +782,7 @@ void Instance::HandleGetTariffComponent(HandlerContext & ctx, const Commands::Ge
                         {
                             if (deIDsCount >= CommodityTariffConsts::kDayEntriesAttrMaxLength)
                             {
-                                ChipLogError(NotSpecified, "Day entry ID buffer full, truncating");
+                                ChipLogError(AppServer, "Day entry ID buffer full, truncating");
                                 break;
                             }
                             deIDsArray[deIDsCount++] = deID;
@@ -827,7 +827,7 @@ void Instance::HandleGetDayEntry(HandlerContext & ctx, const Commands::GetDayEnt
 
     if (mServerTariffAttrsCtx.mTariffProvider == nullptr)
     {
-        ChipLogError(NotSpecified, "The tariff is not available");
+        ChipLogError(AppServer, "The tariff is not available");
     }
     else
     {

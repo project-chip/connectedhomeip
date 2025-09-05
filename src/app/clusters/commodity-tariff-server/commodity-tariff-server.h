@@ -99,11 +99,11 @@ public:
 
         if (!(is_success = TariffDataUpd_Init(UpdCtx)))
         {
-            ChipLogError(NotSpecified, "EGW-CTC: New tariff data rejected due to internal inconsistencies");
+            ChipLogError(AppServer, "EGW-CTC: New tariff data rejected due to internal inconsistencies");
         }
-        else if (!(is_success = TariffDataUpd_CrossValidator(UpdCtx)))
+        else if (CHIP_NO_ERROR != TariffDataUpd_CrossValidator(UpdCtx))
         {
-            ChipLogError(NotSpecified, "EGW-CTC: New tariff data rejected due to some cross-fields inconsistencies");
+            ChipLogError(AppServer, "EGW-CTC: New tariff data rejected due to some cross-fields inconsistencies");
         }
         else
         {
@@ -213,7 +213,7 @@ private:
         return true;
     }
 
-    virtual bool TariffDataUpd_CrossValidator(TariffUpdateCtx & UpdCtx) { return true; }
+    virtual CHIP_ERROR TariffDataUpd_CrossValidator(TariffUpdateCtx & UpdCtx) { return CHIP_NO_ERROR; }
 
     void TariffDataUpd_Finish(bool is_success)
     {
