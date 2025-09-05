@@ -113,7 +113,7 @@ struct ConcreteDataAttributePath : public ConcreteAttributePath
 
     ConcreteDataAttributePath() {}
 
-    ConcreteDataAttributePath(const ConcreteAttributePath & path) : ConcreteAttributePath(path) {}
+    explicit ConcreteDataAttributePath(const ConcreteAttributePath & path) : ConcreteAttributePath(path) {}
 
     ConcreteDataAttributePath(EndpointId aEndpointId, ClusterId aClusterId, AttributeId aAttributeId) :
         ConcreteAttributePath(aEndpointId, aClusterId, aAttributeId)
