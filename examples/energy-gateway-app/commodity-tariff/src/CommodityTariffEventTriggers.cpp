@@ -175,7 +175,7 @@ bool HandleCommodityTariffTestEventTrigger(uint64_t eventTrigger)
         SetTestEventTrigger_TimeShift4h();
         break;
     case CommodityTariffTrigger::kTimeShiftDisable:
-        ChipLogProgress(Support, "[CommodityTariff-Test-Event] => Time Shift Disabled");  
+        ChipLogProgress(Support, "[CommodityTariff-Test-Event] => Time Shift Disabled");
         SetTestEventTrigger_TimeShiftDisable();
         break;
     default:
