@@ -81,8 +81,8 @@ class TC_IDM_2_2(MatterBaseTest, BasicCompositionTests):
             Dictionary containing the read results
         """
         read_response = await self.default_controller.Read(
-                self.dut_node_id,
-                attribute_path)
+            self.dut_node_id,
+            attribute_path)
         self.verify_read_response(read_response, attribute_path)
         return read_response
 
@@ -109,7 +109,7 @@ class TC_IDM_2_2(MatterBaseTest, BasicCompositionTests):
 
     def verify_all_endpoints_clusters(self, read_response: dict):
         """Verify read response for a full wildcard read (all attributes from all clusters on all endpoints).
-        
+
         This method performs comprehensive verification that only makes sense for wildcard reads
         where you have complete data for all endpoints, clusters, and attributes.
 
@@ -127,7 +127,7 @@ class TC_IDM_2_2(MatterBaseTest, BasicCompositionTests):
             expected_endpoints = sorted(parts_list + [0])  # parts list + endpoint 0 itself
             actual_endpoints = sorted(read_response.tlvAttributes.keys())
             asserts.assert_equal(actual_endpoints, expected_endpoints,
-                               f"Read response endpoints {actual_endpoints} don't match expected {expected_endpoints}")
+                                 f"Read response endpoints {actual_endpoints} don't match expected {expected_endpoints}")
 
         for endpoint in read_response.tlvAttributes:
             asserts.assert_in(
@@ -165,28 +165,28 @@ class TC_IDM_2_2(MatterBaseTest, BasicCompositionTests):
         endpoint = path.EndpointId
         cluster_id = path.ClusterId
         attribute_id = path.AttributeId
-        
+
         endpoint_list = [endpoint] if endpoint is not None else list(self.endpoints.keys())
 
         for ep in endpoint_list:
-            asserts.assert_in(ep, read_response.tlvAttributes, 
-                            f"Endpoint {ep} not found in response")
-            
+            asserts.assert_in(ep, read_response.tlvAttributes,
+                              f"Endpoint {ep} not found in response")
+
             if cluster_id is not None:
                 asserts.assert_in(cluster_id, read_response.tlvAttributes[ep],
-                                f"Cluster {cluster_id} not found in endpoint {ep}")
-                
+                                  f"Cluster {cluster_id} not found in endpoint {ep}")
+
                 if attribute_id is not None:
                     asserts.assert_in(attribute_id, read_response.tlvAttributes[ep][cluster_id],
-                                    f"Attribute {attribute_id} not found in cluster {cluster_id} on endpoint {ep}")
+                                      f"Attribute {attribute_id} not found in cluster {cluster_id} on endpoint {ep}")
                 else:
                     # All attributes from the cluster were requested
-                    # Verify AttributeList is present 
+                    # Verify AttributeList is present
                     cluster_obj = ClusterObjects.ALL_CLUSTERS.get(cluster_id)
                     if cluster_obj and hasattr(cluster_obj.Attributes, 'AttributeList'):
                         attr_list_id = cluster_obj.Attributes.AttributeList.attribute_id
                         asserts.assert_in(attr_list_id, read_response.tlvAttributes[ep][cluster_id],
-                                        f"AttributeList not found in cluster {cluster_id} on endpoint {ep}")
+                                          f"AttributeList not found in cluster {cluster_id} on endpoint {ep}")
             else:
                 # For global attributes, we expect them to be present across all clusters
                 if attribute_id is not None:
@@ -195,8 +195,8 @@ class TC_IDM_2_2(MatterBaseTest, BasicCompositionTests):
                         if attribute_id in cluster:
                             found_in_any_cluster = True
                             break
-                    asserts.assert_true(found_in_any_cluster, 
-                                      f"Global attribute {attribute_id} not found in any cluster on endpoint {ep}")
+                    asserts.assert_true(found_in_any_cluster,
+                                        f"Global attribute {attribute_id} not found in any cluster on endpoint {ep}")
 
     async def _read_global_attribute_all_endpoints(self, attribute_id):
         attribute_path = AttributePath(
@@ -235,7 +235,7 @@ class TC_IDM_2_2(MatterBaseTest, BasicCompositionTests):
         Find unsupported endpoint and attempt to read from it
         """
         supported_endpoints = set(self.endpoints.keys())
-        all_endpoints = set(range(max(supported_endpoints)+2))
+        all_endpoints = set(range(max(supported_endpoints) + 2))
         unsupported = list(all_endpoints - supported_endpoints)
         await self.read_single_attribute_expect_error(endpoint=unsupported[0], cluster=Clusters.Descriptor, attribute=Clusters.Descriptor.Attributes.FeatureMap, error=Status.UnsupportedEndpoint)
 
@@ -246,36 +246,36 @@ class TC_IDM_2_2(MatterBaseTest, BasicCompositionTests):
         # Get all standard clusters supported on all endpoints
         supported_cluster_ids = set()
         for endpoint_clusters in self.endpoints.values():
-            supported_cluster_ids.update({cluster.id for cluster in endpoint_clusters.keys() 
-                                         if global_attribute_ids.cluster_id_type(cluster.id) == global_attribute_ids.ClusterIdType.kStandard})
-        
+            supported_cluster_ids.update({cluster.id for cluster in endpoint_clusters.keys(
+            ) if global_attribute_ids.cluster_id_type(cluster.id) == global_attribute_ids.ClusterIdType.kStandard})
+
         # Get all possible standard clusters
-        all_standard_cluster_ids = {cluster_id for cluster_id in ClusterObjects.ALL_CLUSTERS.keys()
-                                  if global_attribute_ids.cluster_id_type(cluster_id) == global_attribute_ids.ClusterIdType.kStandard}
-        
-         # Find unsupported clusters
+        all_standard_cluster_ids = {cluster_id for cluster_id in ClusterObjects.ALL_CLUSTERS.keys(
+        ) if global_attribute_ids.cluster_id_type(cluster_id) == global_attribute_ids.ClusterIdType.kStandard}
+
+        # Find unsupported clusters
         unsupported_cluster_ids = all_standard_cluster_ids - supported_cluster_ids
-        
+
         # If no unsupported clusters are found, skip this test step
         if not unsupported_cluster_ids:
             self.skip_step("No unsupported standard clusters found to test")
             return
-            
+
         # Use the first unsupported cluster
         unsupported_cluster_id = next(iter(unsupported_cluster_ids))
         unsupported_cluster = ClusterObjects.ALL_CLUSTERS[unsupported_cluster_id]
-        
-        # Get any attribute from this cluster 
+
+        # Get any attribute from this cluster
         cluster_attributes = ClusterObjects.ALL_ATTRIBUTES[unsupported_cluster_id]
         test_attribute = next(iter(cluster_attributes.values()))
-        
+
         # Test the unsupported cluster on all available endpoints
         # It should return UnsupportedCluster error from all endpoints
         for endpoint_id in self.endpoints.keys():
             result = await self.read_single_attribute_expect_error(
-                endpoint=endpoint_id, 
-                cluster=unsupported_cluster, 
-                attribute=test_attribute, 
+                endpoint=endpoint_id,
+                cluster=unsupported_cluster,
+                attribute=test_attribute,
                 error=Status.UnsupportedCluster)
             asserts.assert_true(isinstance(result.Reason, InteractionModelError),
                                 msg=f"Unexpected success reading invalid cluster on endpoint {endpoint_id}")
@@ -513,7 +513,8 @@ class TC_IDM_2_2(MatterBaseTest, BasicCompositionTests):
 
         self.step(1)
         # Read a single attribute
-        path = AttributePath(EndpointId=self.endpoint, ClusterId=Clusters.Descriptor.id, AttributeId=Clusters.Descriptor.Attributes.ServerList.attribute_id)
+        path = AttributePath(EndpointId=self.endpoint, ClusterId=Clusters.Descriptor.id,
+                             AttributeId=Clusters.Descriptor.Attributes.ServerList.attribute_id)
         await self.verify_attribute_read([path])
 
         self.step(2)
@@ -523,12 +524,16 @@ class TC_IDM_2_2(MatterBaseTest, BasicCompositionTests):
 
         self.step(3)
         # Read an attribute from all endpoints
-        path = AttributePath(EndpointId=None, ClusterId=Clusters.Descriptor.id, AttributeId=Clusters.Descriptor.Attributes.ServerList.attribute_id)
+        path = AttributePath(EndpointId=None, ClusterId=Clusters.Descriptor.id,
+                             AttributeId=Clusters.Descriptor.Attributes.ServerList.attribute_id)
         await self.verify_attribute_read([path])
 
         self.step(4)
         # Read a global attribute
-        path = AttributePath(EndpointId=self.endpoint, ClusterId=None, AttributeId=global_attribute_ids.GlobalAttributeIds.ATTRIBUTE_LIST_ID)
+        path = AttributePath(
+            EndpointId=self.endpoint,
+            ClusterId=None,
+            AttributeId=global_attribute_ids.GlobalAttributeIds.ATTRIBUTE_LIST_ID)
         await self.verify_attribute_read([path])
 
         self.step(5)
