@@ -37,7 +37,10 @@
 
 import logging
 
+from mobly import asserts
+
 import matter.clusters as Clusters
+from matter.testing import matter_asserts
 from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 
 logger = logging.getLogger(__name__)
@@ -157,281 +160,462 @@ class TC_AVSM_2_1(MatterBaseTest):
         # Commission DUT - already done
 
         self.step(2)
-        if self.pics_guard(self.check_pics("AVSM.S.A0000")):
+        if await self.attribute_guard(endpoint=endpoint, attribute=attr.MaxConcurrentEncoders):
             value = await self.read_single_attribute_check_success(
                 endpoint=endpoint, cluster=cluster, attribute=attr.MaxConcurrentEncoders
             )
             logger.info(f"Rx'd MaxConcurrentEncoders: {value}")
+            asserts.assert_is_not_none(value, "MaxConcurrentEncoders is None")
+            matter_asserts.assert_valid_uint8(value, "MaxConcurrentEncoders")
 
         self.step(3)
-        if self.pics_guard(self.check_pics("AVSM.S.A0001")):
+        if await self.attribute_guard(endpoint=endpoint, attribute=attr.MaxEncodedPixelRate):
             value = await self.read_single_attribute_check_success(
                 endpoint=endpoint, cluster=cluster, attribute=attr.MaxEncodedPixelRate
             )
             logger.info(f"Rx'd MaxEncodedPixelRate: {value}")
+            asserts.assert_is_not_none(value, "MaxEncodedPixelRate is None")
+            matter_asserts.assert_valid_uint32(value, "MaxEncodedPixelRate")
 
         self.step(4)
-        if self.pics_guard(self.check_pics("AVSM.S.A0002")):
-            value = await self.read_single_attribute_check_success(
+        if await self.attribute_guard(endpoint=endpoint, attribute=attr.VideoSensorParams):
+            videoSensorParams = await self.read_single_attribute_check_success(
                 endpoint=endpoint, cluster=cluster, attribute=attr.VideoSensorParams
             )
-            logger.info(f"Rx'd VideoSensorParams: {value}")
+            logger.info(f"Rx'd VideoSensorParams: {videoSensorParams}")
+            asserts.assert_is_not_none(videoSensorParams, "VideoSensorParams is None")
+            self.assert_video_sensor_params_struct(videoSensorParams)
 
         self.step(5)
-        if self.pics_guard(self.check_pics("AVSM.S.A0003")):
+        if await self.attribute_guard(endpoint=endpoint, attribute=attr.NightVisionUsesInfrared):
             value = await self.read_single_attribute_check_success(
                 endpoint=endpoint, cluster=cluster, attribute=attr.NightVisionUsesInfrared
             )
             logger.info(f"Rx'd NightVisionUsesInfrared: {value}")
+            asserts.assert_is_not_none(value, "NightVisionUsesInfrared is None")
 
         self.step(6)
-        if self.pics_guard(self.check_pics("AVSM.S.A0004")):
-            value = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attr.MinViewportResolution)
-            logger.info(f"Rx'd MinViewportResolution: {value}")
+        if await self.attribute_guard(endpoint=endpoint, attribute=attr.MinViewportResolution):
+            minViewportResolution = await self.read_single_attribute_check_success(
+                endpoint=endpoint, cluster=cluster, attribute=attr.MinViewportResolution
+            )
+            logger.info(f"Rx'd MinViewportResolution: {minViewportResolution}")
+            asserts.assert_is_not_none(minViewportResolution, "MinViewportResolution is None")
+            self.assert_video_resolution_struct(minViewportResolution)
 
         self.step(7)
-        if self.pics_guard(self.check_pics("AVSM.S.A0005")):
-            value = await self.read_single_attribute_check_success(
+        if await self.attribute_guard(endpoint=endpoint, attribute=attr.RateDistortionTradeOffPoints):
+            rateDistortionTradeOffPoints = await self.read_single_attribute_check_success(
                 endpoint=endpoint, cluster=cluster, attribute=attr.RateDistortionTradeOffPoints
             )
-            logger.info(f"Rx'd RateDistortionTradeOffPoints: {value}")
+            logger.info(f"Rx'd RateDistortionTradeOffPoints: {rateDistortionTradeOffPoints}")
+            asserts.assert_is_not_none(rateDistortionTradeOffPoints, "RateDistortionTradeOffPoints is None")
+            matter_asserts.assert_all(
+                rateDistortionTradeOffPoints,
+                lambda x: self.assert_rate_distortion_trade_off_point_struct(x),
+                "RateDistortionTradeOffPoints has invalid entry",
+            )
 
         self.step(8)
-        if self.pics_guard(self.check_pics("AVSM.S.A0006")):
+        if await self.attribute_guard(endpoint=endpoint, attribute=attr.MaxContentBufferSize):
             value = await self.read_single_attribute_check_success(
                 endpoint=endpoint, cluster=cluster, attribute=attr.MaxContentBufferSize
             )
             logger.info(f"Rx'd MaxContentBufferSize: {value}")
+            matter_asserts.assert_valid_uint32(value, "MaxContentBufferSize")
 
         self.step(9)
-        if self.pics_guard(self.check_pics("AVSM.S.A0007")):
-            value = await self.read_single_attribute_check_success(
+        if await self.attribute_guard(endpoint=endpoint, attribute=attr.MicrophoneCapabilities):
+            microphoneCapabilities = await self.read_single_attribute_check_success(
                 endpoint=endpoint, cluster=cluster, attribute=attr.MicrophoneCapabilities
             )
-            logger.info(f"Rx'd MicrophoneCapabilities: {value}")
+            logger.info(f"Rx'd MicrophoneCapabilities: {microphoneCapabilities}")
+            asserts.assert_is_not_none(microphoneCapabilities, "MicrophoneCapabilities is None")
+            self.assert_audio_capabilities_struct(microphoneCapabilities)
 
         self.step(10)
-        if self.pics_guard(self.check_pics("AVSM.S.A0008")):
-            value = await self.read_single_attribute_check_success(
+        if await self.attribute_guard(endpoint=endpoint, attribute=attr.SpeakerCapabilities):
+            speakerCapabilities = await self.read_single_attribute_check_success(
                 endpoint=endpoint, cluster=cluster, attribute=attr.SpeakerCapabilities
             )
-            logger.info(f"Rx'd SpeakerCapabilities: {value}")
+            logger.info(f"Rx'd SpeakerCapabilities: {speakerCapabilities}")
+            asserts.assert_is_not_none(speakerCapabilities, "SpeakerCapabilities is None")
+            self.assert_audio_capabilities_struct(speakerCapabilities)
 
         self.step(11)
-        if self.pics_guard(self.check_pics("AVSM.S.A0009")):
+        if await self.attribute_guard(endpoint=endpoint, attribute=attr.TwoWayTalkSupport):
             value = await self.read_single_attribute_check_success(
                 endpoint=endpoint, cluster=cluster, attribute=attr.TwoWayTalkSupport
             )
             logger.info(f"Rx'd TwoWayTalkSupport: {value}")
+            asserts.assert_is_not_none(value, "TwoWayTalkSupport is None")
+            asserts.assert_in(
+                value,
+                cluster.Enums.TwoWayTalkSupportTypeEnum,
+                "TwoWayTalkSupport is not a valid TwoWayTalkSupportTypeEnum",
+            )
 
         self.step(12)
-        if self.pics_guard(self.check_pics("AVSM.S.A000A")):
-            value = await self.read_single_attribute_check_success(
+        if await self.attribute_guard(endpoint=endpoint, attribute=attr.SnapshotCapabilities):
+            snapshotCapabilities = await self.read_single_attribute_check_success(
                 endpoint=endpoint, cluster=cluster, attribute=attr.SnapshotCapabilities
             )
-            logger.info(f"Rx'd SnapshotCapabilities: {value}")
+            logger.info(f"Rx'd SnapshotCapabilities: {snapshotCapabilities}")
+            asserts.assert_is_not_none(snapshotCapabilities, "SnapshotCapabilities is None")
+            matter_asserts.assert_all(
+                snapshotCapabilities,
+                lambda x: self.assert_snapshot_capabilities_struct(x),
+                "SnapshotCapabilities has invalid entry",
+            )
 
         self.step(13)
-        if self.pics_guard(self.check_pics("AVSM.S.A000B")):
+        if await self.attribute_guard(endpoint=endpoint, attribute=attr.MaxNetworkBandwidth):
             value = await self.read_single_attribute_check_success(
                 endpoint=endpoint, cluster=cluster, attribute=attr.MaxNetworkBandwidth
             )
             logger.info(f"Rx'd MaxNetworkBandwidth: {value}")
+            matter_asserts.assert_valid_uint32(value, "MaxNetworkBandwidth")
 
         self.step(14)
-        if self.pics_guard(self.check_pics("AVSM.S.A000C")):
+        if await self.attribute_guard(endpoint=endpoint, attribute=attr.CurrentFrameRate):
             value = await self.read_single_attribute_check_success(
                 endpoint=endpoint, cluster=cluster, attribute=attr.CurrentFrameRate
             )
             logger.info(f"Rx'd CurrentFrameRate: {value}")
+            asserts.assert_is_not_none(value, "CurrentFrameRate is None")
+            matter_asserts.assert_valid_uint16(value, "CurrentFrameRate")
 
         self.step(15)
-        if self.pics_guard(self.check_pics("AVSM.S.A000D")):
+        if await self.attribute_guard(endpoint=endpoint, attribute=attr.HDRModeEnabled):
             value = await self.read_single_attribute_check_success(
                 endpoint=endpoint, cluster=cluster, attribute=attr.HDRModeEnabled
             )
             logger.info(f"Rx'd HDRModeEnabled: {value}")
+            asserts.assert_is_not_none(value, "HDRModeEnabled is None")
 
         self.step(16)
-        if self.pics_guard(self.check_pics("AVSM.S.A000E")):
-            value = await self.read_single_attribute_check_success(
+        if await self.attribute_guard(endpoint=endpoint, attribute=attr.SupportedStreamUsages):
+            supportedStreamUsages = await self.read_single_attribute_check_success(
                 endpoint=endpoint, cluster=cluster, attribute=attr.SupportedStreamUsages
             )
-            logger.info(f"Rx'd SupportedStreamUsages: {value}")
+            logger.info(f"Rx'd SupportedStreamUsages: {supportedStreamUsages}")
+            matter_asserts.assert_all(
+                supportedStreamUsages,
+                lambda x: self.assert_enum(
+                    x, Clusters.Globals.Enums.StreamUsageEnum, "SupportedStreamUsage not a valid StreamUsageEnum"
+                ),
+                "StreamUsage is not a valid StreamUsageEnum",
+            )
 
         self.step(17)
-        if self.pics_guard(self.check_pics("AVSM.S.A000F")):
+        if await self.attribute_guard(endpoint=endpoint, attribute=attr.AllocatedVideoStreams):
             value = await self.read_single_attribute_check_success(
                 endpoint=endpoint, cluster=cluster, attribute=attr.AllocatedVideoStreams
             )
             logger.info(f"Rx'd AllocatedVideoStreams: {value}")
+            asserts.assert_is_not_none(value, "AllocatedVideoStreams is None")
+            # TODO assert struct fields of list - currently list is empty as nothing allocated
 
         self.step(18)
-        if self.pics_guard(self.check_pics("AVSM.S.A0010")):
+        if await self.attribute_guard(endpoint=endpoint, attribute=attr.AllocatedAudioStreams):
             value = await self.read_single_attribute_check_success(
                 endpoint=endpoint, cluster=cluster, attribute=attr.AllocatedAudioStreams
             )
             logger.info(f"Rx'd AllocatedAudioStreams: {value}")
+            asserts.assert_is_not_none(value, "AllocatedAudioStreams is None")
+            # TODO assert struct fields of list - currently list is empty as nothing allocated
 
         self.step(19)
-        if self.pics_guard(self.check_pics("AVSM.S.A0011")):
+        if await self.attribute_guard(endpoint=endpoint, attribute=attr.AllocatedSnapshotStreams):
             value = await self.read_single_attribute_check_success(
                 endpoint=endpoint, cluster=cluster, attribute=attr.AllocatedSnapshotStreams
             )
             logger.info(f"Rx'd AllocatedSnapshotStreams: {value}")
+            asserts.assert_is_not_none(value, "AllocatedSnapshotStreams is None")
+            # TODO assert struct fields of list - currently list is empty as nothing allocated
 
         self.step(20)
-        if self.pics_guard(self.check_pics("AVSM.S.A0012")):
-            value = await self.read_single_attribute_check_success(
+        if await self.attribute_guard(endpoint=endpoint, attribute=attr.StreamUsagePriorities):
+            streamUsagePriorities = await self.read_single_attribute_check_success(
                 endpoint=endpoint, cluster=cluster, attribute=attr.StreamUsagePriorities
             )
-            logger.info(f"Rx'd StreamUsagePrioritiesList: {value}")
+            logger.info(f"Rx'd StreamUsagePrioritiesList: {streamUsagePriorities}")
+            matter_asserts.assert_all(
+                streamUsagePriorities,
+                lambda x: self.assert_enum(
+                    x, Clusters.Globals.Enums.StreamUsageEnum, "StreamUsagePriority not a valid StreamUsageEnum"
+                ),
+                "StreamUsage is not a valid StreamUsageEnum",
+            )
 
         self.step(21)
-        if self.pics_guard(self.check_pics("AVSM.S.A0013")):
+        if await self.attribute_guard(endpoint=endpoint, attribute=attr.SoftRecordingPrivacyModeEnabled):
             value = await self.read_single_attribute_check_success(
                 endpoint=endpoint, cluster=cluster, attribute=attr.SoftRecordingPrivacyModeEnabled
             )
             logger.info(f"Rx'd SoftRecordingPrivacyModeEnabled: {value}")
+            asserts.assert_is_not_none(value, "SoftRecordingPrivacyModeEnabled is None")
 
         self.step(22)
-        if self.pics_guard(self.check_pics("AVSM.S.A0014")):
+        if await self.attribute_guard(endpoint=endpoint, attribute=attr.SoftLivestreamPrivacyModeEnabled):
             value = await self.read_single_attribute_check_success(
                 endpoint=endpoint, cluster=cluster, attribute=attr.SoftLivestreamPrivacyModeEnabled
             )
             logger.info(f"Rx'd SoftLivestreamPrivacyModeEnabled: {value}")
+            asserts.assert_is_not_none(value, "SoftLivestreamPrivacyModeEnabled is None")
 
         self.step(23)
-        if self.pics_guard(self.check_pics("AVSM.S.A0015")):
+        if await self.attribute_guard(endpoint=endpoint, attribute=attr.HardPrivacyModeOn):
             value = await self.read_single_attribute_check_success(
                 endpoint=endpoint, cluster=cluster, attribute=attr.HardPrivacyModeOn
             )
             logger.info(f"Rx'd HardPrivacyModeOn: {value}")
+            asserts.assert_is_not_none(value, "HardPrivacyModeOn is None")
 
         self.step(24)
-        if self.pics_guard(self.check_pics("AVSM.S.A0016")):
+        if await self.attribute_guard(endpoint=endpoint, attribute=attr.NightVision):
             value = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attr.NightVision)
             logger.info(f"Rx'd NightVision: {value}")
+            asserts.assert_is_not_none(value, "NightVision is None")
+            asserts.assert_in(
+                value,
+                cluster.Enums.TriStateAutoEnum,
+                "NightVision is not a valid TriStateAutoEnum",
+            )
 
         self.step(25)
-        if self.pics_guard(self.check_pics("AVSM.S.A0017")):
+        if await self.attribute_guard(endpoint=endpoint, attribute=attr.NightVisionIllum):
             value = await self.read_single_attribute_check_success(
                 endpoint=endpoint, cluster=cluster, attribute=attr.NightVisionIllum
             )
             logger.info(f"Rx'd NightVisionIllum: {value}")
+            asserts.assert_is_not_none(value, "NightVisionIllum is None")
+            asserts.assert_in(
+                value,
+                cluster.Enums.TriStateAutoEnum,
+                "NightVisionIllum is not a valid TriStateAutoEnum",
+            )
 
         self.step(26)
-        if self.pics_guard(self.check_pics("AVSM.S.A0018")):
-            value = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attr.Viewport)
-            logger.info(f"Rx'd Viewport: {value}")
+        if await self.attribute_guard(endpoint=endpoint, attribute=attr.Viewport):
+            viewport = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attr.Viewport)
+            logger.info(f"Rx'd Viewport: {viewport}")
+            asserts.assert_is_not_none(viewport, "Viewport is None")
+            self.assert_viewport_struct(viewport)
 
         self.step(27)
-        if self.pics_guard(self.check_pics("AVSM.S.A0019")):
+        if await self.attribute_guard(endpoint=endpoint, attribute=attr.SpeakerMuted):
             value = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attr.SpeakerMuted)
             logger.info(f"Rx'd SpeakerMuted: {value}")
+            asserts.assert_is_not_none(value, "SpeakerMuted is None")
 
         self.step(28)
-        if self.pics_guard(self.check_pics("AVSM.S.A001A")):
+        if await self.attribute_guard(endpoint=endpoint, attribute=attr.SpeakerVolumeLevel):
             value = await self.read_single_attribute_check_success(
                 endpoint=endpoint, cluster=cluster, attribute=attr.SpeakerVolumeLevel
             )
             logger.info(f"Rx'd SpeakerVolumeLevel: {value}")
+            asserts.assert_is_not_none(value, "SpeakerVolumeLevel is None")
+            matter_asserts.assert_valid_uint8(value, "SpeakerVolumeLevel")
+            # TODO asserts depend on reading SpeakerMaxLevel and SpeakerMinLevel first
 
         self.step(29)
-        if self.pics_guard(self.check_pics("AVSM.S.A001B")):
-            value = await self.read_single_attribute_check_success(
+        if await self.attribute_guard(endpoint=endpoint, attribute=attr.SpeakerMaxLevel):
+            speakerMaxLevel = await self.read_single_attribute_check_success(
                 endpoint=endpoint, cluster=cluster, attribute=attr.SpeakerMaxLevel
             )
-            logger.info(f"Rx'd SpeakerMaxLevel: {value}")
+            logger.info(f"Rx'd SpeakerMaxLevel: {speakerMaxLevel}")
+            asserts.assert_is_not_none(speakerMaxLevel, "SpeakerMaxLevel is None")
+            matter_asserts.assert_valid_uint8(speakerMaxLevel, "SpeakerMaxLevel")
+            asserts.assert_less_equal(speakerMaxLevel, 254, "SpeakerMaxLevel is > 254")
 
         self.step(30)
-        if self.pics_guard(self.check_pics("AVSM.S.A001C")):
-            value = await self.read_single_attribute_check_success(
+        if await self.attribute_guard(endpoint=endpoint, attribute=attr.SpeakerMinLevel):
+            speakerMinLevel = await self.read_single_attribute_check_success(
                 endpoint=endpoint, cluster=cluster, attribute=attr.SpeakerMinLevel
             )
-            logger.info(f"Rx'd SpeakerMinLevel: {value}")
+            logger.info(f"Rx'd SpeakerMinLevel: {speakerMinLevel}")
+            asserts.assert_is_not_none(speakerMinLevel, "SpeakerMinLevel is None")
+            matter_asserts.assert_valid_uint8(speakerMinLevel, "SpeakerMinLevel")
+            asserts.assert_less_equal(speakerMinLevel, speakerMaxLevel, "SpeakerMinLevel is > SpeakerMaxLevel")
 
         self.step(31)
-        if self.pics_guard(self.check_pics("AVSM.S.A001D")):
+        if await self.attribute_guard(endpoint=endpoint, attribute=attr.MicrophoneMuted):
             value = await self.read_single_attribute_check_success(
                 endpoint=endpoint, cluster=cluster, attribute=attr.MicrophoneMuted
             )
             logger.info(f"Rx'd MicrophoneMuted: {value}")
+            asserts.assert_is_not_none(value, "MicrophoneMuted is None")
 
         self.step(32)
-        if self.pics_guard(self.check_pics("AVSM.S.A001E")):
+        if await self.attribute_guard(endpoint=endpoint, attribute=attr.MicrophoneVolumeLevel):
             value = await self.read_single_attribute_check_success(
                 endpoint=endpoint, cluster=cluster, attribute=attr.MicrophoneVolumeLevel
             )
             logger.info(f"Rx'd MicrophoneVolumeLevel: {value}")
+            asserts.assert_is_not_none(value, "MicrophoneVolumeLevel is None")
+            matter_asserts.assert_valid_uint8(value, "MicrophoneVolumeLevel")
+            # TODO asserts depend on reading MicrophoneMaxLevel and MicrophoneMinLevel first
 
         self.step(33)
-        if self.pics_guard(self.check_pics("AVSM.S.A001F")):
-            value = await self.read_single_attribute_check_success(
+        if await self.attribute_guard(endpoint=endpoint, attribute=attr.MicrophoneMaxLevel):
+            microphoneMaxLevel = await self.read_single_attribute_check_success(
                 endpoint=endpoint, cluster=cluster, attribute=attr.MicrophoneMaxLevel
             )
-            logger.info(f"Rx'd MicrophoneMaxLevel: {value}")
+            logger.info(f"Rx'd MicrophoneMaxLevel: {microphoneMaxLevel}")
+            asserts.assert_is_not_none(microphoneMaxLevel, "MicrophoneMaxLevel is None")
+            matter_asserts.assert_valid_uint8(microphoneMaxLevel, "MicrophoneMaxLevel")
+            asserts.assert_less_equal(microphoneMaxLevel, 254, "MicrophoneMaxLevel is > 254")
 
         self.step(34)
-        if self.pics_guard(self.check_pics("AVSM.S.A0020")):
-            value = await self.read_single_attribute_check_success(
+        if await self.attribute_guard(endpoint=endpoint, attribute=attr.MicrophoneMinLevel):
+            microphoneMinLevel = await self.read_single_attribute_check_success(
                 endpoint=endpoint, cluster=cluster, attribute=attr.MicrophoneMinLevel
             )
-            logger.info(f"Rx'd MicrophoneMinLevel: {value}")
+            logger.info(f"Rx'd MicrophoneMinLevel: {microphoneMinLevel}")
+            asserts.assert_is_not_none(microphoneMinLevel, "MicrophoneMinLevel is None")
+            matter_asserts.assert_valid_uint8(microphoneMinLevel, "MicrophoneMinLevel")
+            asserts.assert_less_equal(microphoneMinLevel, microphoneMaxLevel, "MicrophoneMinLevel is > MicrophoneMaxLevel")
 
         self.step(35)
-        if self.pics_guard(self.check_pics("AVSM.S.A0021")):
+        if await self.attribute_guard(endpoint=endpoint, attribute=attr.MicrophoneAGCEnabled):
             value = await self.read_single_attribute_check_success(
                 endpoint=endpoint, cluster=cluster, attribute=attr.MicrophoneAGCEnabled
             )
             logger.info(f"Rx'd MicrophoneAGCEnabled: {value}")
+            asserts.assert_is_not_none(value, "MicrophoneAGCEnabled is None")
 
         self.step(36)
-        if self.pics_guard(self.check_pics("AVSM.S.A0022")):
+        if await self.attribute_guard(endpoint=endpoint, attribute=attr.ImageRotation):
             value = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attr.ImageRotation)
             logger.info(f"Rx'd ImageRotation: {value}")
+            asserts.assert_is_not_none(value, "ImageRotation is None")
+            matter_asserts.assert_valid_uint16(value, "ImageRotation")
+            asserts.assert_less_equal(value, 359, "ImageRotation is > 359")
 
         self.step(37)
-        if self.pics_guard(self.check_pics("AVSM.S.A0023")):
+        if await self.attribute_guard(endpoint=endpoint, attribute=attr.ImageFlipHorizontal):
             value = await self.read_single_attribute_check_success(
                 endpoint=endpoint, cluster=cluster, attribute=attr.ImageFlipHorizontal
             )
             logger.info(f"Rx'd ImageFlipHorizontal: {value}")
+            asserts.assert_is_not_none(value, "ImageFlipHorizontal is None")
 
         self.step(38)
-        if self.pics_guard(self.check_pics("AVSM.S.A0024")):
+        if await self.attribute_guard(endpoint=endpoint, attribute=attr.ImageFlipVertical):
             value = await self.read_single_attribute_check_success(
                 endpoint=endpoint, cluster=cluster, attribute=attr.ImageFlipVertical
             )
             logger.info(f"Rx'd ImageFlipVertical: {value}")
+            asserts.assert_is_not_none(value, "ImageFlipVertical is None")
 
         self.step(39)
-        if self.pics_guard(self.check_pics("AVSM.S.A0025")):
+        if await self.attribute_guard(endpoint=endpoint, attribute=attr.LocalVideoRecordingEnabled):
             value = await self.read_single_attribute_check_success(
                 endpoint=endpoint, cluster=cluster, attribute=attr.LocalVideoRecordingEnabled
             )
             logger.info(f"Rx'd LocalVideoRecordingEnabled: {value}")
+            asserts.assert_is_not_none(value, "LocalVideoRecordingEnabled is None")
 
         self.step(40)
-        if self.pics_guard(self.check_pics("AVSM.S.A0026")):
+        if await self.attribute_guard(endpoint=endpoint, attribute=attr.LocalSnapshotRecordingEnabled):
             value = await self.read_single_attribute_check_success(
                 endpoint=endpoint, cluster=cluster, attribute=attr.LocalSnapshotRecordingEnabled
             )
             logger.info(f"Rx'd LocalSnapshotRecordingEnabled: {value}")
+            asserts.assert_is_not_none(value, "LocalSnapshotRecordingEnabled is None")
 
         self.step(41)
-        if self.pics_guard(self.check_pics("AVSM.S.A0027")):
+        if await self.attribute_guard(endpoint=endpoint, attribute=attr.StatusLightEnabled):
             value = await self.read_single_attribute_check_success(
                 endpoint=endpoint, cluster=cluster, attribute=attr.StatusLightEnabled
             )
             logger.info(f"Rx'd StatusLightEnabled: {value}")
+            asserts.assert_is_not_none(value, "StatusLightEnabled is None")
 
         self.step(42)
-        if self.pics_guard(self.check_pics("AVSM.S.A0028")):
+        if await self.attribute_guard(endpoint=endpoint, attribute=attr.StatusLightBrightness):
             value = await self.read_single_attribute_check_success(
                 endpoint=endpoint, cluster=cluster, attribute=attr.StatusLightBrightness
             )
             logger.info(f"Rx'd StatusLightBrightness: {value}")
+            asserts.assert_is_not_none(value, "StatusLightBrightness is None")
+            asserts.assert_in(
+                value,
+                Clusters.Globals.Enums.ThreeLevelAutoEnum,
+                "StatusLightBrightness is not a valid ThreeLevelAutoEnum",
+            )
+
+    def assert_video_sensor_params_struct(
+        self, videoSensorParams: Clusters.CameraAvStreamManagement.Structs.VideoSensorParamsStruct
+    ) -> bool:
+        asserts.assert_greater_equal(videoSensorParams.sensorWidth, 64, "SensorWidth is less than 64")
+        asserts.assert_greater_equal(videoSensorParams.sensorHeight, 64, "SensorHeight is less than 64")
+        asserts.assert_greater_equal(videoSensorParams.maxFPS, 1, "MaxFPS is less than 1")
+        if videoSensorParams.maxHDRFPS is not None:
+            matter_asserts.assert_int_in_range(
+                videoSensorParams.maxHDRFPS,
+                1,
+                videoSensorParams.maxFPS,
+                "MaxHDRFPS is not between 1 and MaxFPS",
+            )
+        return True
+
+    def assert_video_resolution_struct(
+        self, videoResolution: Clusters.CameraAvStreamManagement.Structs.VideoResolutionStruct
+    ) -> bool:
+        asserts.assert_greater_equal(videoResolution.width, 1, "Width is less than 1")
+        asserts.assert_greater_equal(videoResolution.height, 1, "Height is less than 1")
+        return True
+
+    def assert_rate_distortion_trade_off_point_struct(
+        self, rateDistortionTradeOffPoints: Clusters.CameraAvStreamManagement.Structs.RateDistortionTradeOffPointsStruct
+    ) -> bool:
+        asserts.assert_in(
+            rateDistortionTradeOffPoints.codec,
+            Clusters.CameraAvStreamManagement.Enums.VideoCodecEnum,
+            "Codec is not a valid VideoCodecEnum",
+        )
+        self.assert_video_resolution_struct(rateDistortionTradeOffPoints.resolution)
+        asserts.assert_greater_equal(rateDistortionTradeOffPoints.minBitRate, 1, "MinBitRate is less than 1")
+        return True
+
+    def assert_audio_capabilities_struct(
+        self, audioCapabilities: Clusters.CameraAvStreamManagement.Structs.AudioCapabilitiesStruct
+    ) -> bool:
+        asserts.assert_greater_equal(audioCapabilities.maxNumberOfChannels, 1, "MaxNumberOfChannels is less than 1")
+        asserts.assert_greater_equal(len(audioCapabilities.supportedCodecs), 1, "SupportedCodecs list is empty")
+        matter_asserts.assert_all(
+            audioCapabilities.supportedCodecs,
+            lambda x: self.assert_enum(
+                x, Clusters.CameraAvStreamManagement.Enums.AudioCodecEnum, "SupportedCodec not a valid AudioCodecEnum"
+            ),
+            "SupportedCodec contains an entry that is not a valid AudioCodecEnum",
+        )
+        asserts.assert_greater_equal(len(audioCapabilities.supportedSampleRates), 1, "SupportedSampleRates list is empty")
+        asserts.assert_greater_equal(len(audioCapabilities.supportedBitDepths), 1, "SupportedBitDepths list is empty")
+        # TODO assert supportedSampleRates and supportedBitDepths list values - is this needed?
+        return True
+
+    def assert_snapshot_capabilities_struct(
+        self, snapshotCapabilities: Clusters.CameraAvStreamManagement.Structs.SnapshotCapabilitiesStruct
+    ) -> bool:
+        self.assert_video_resolution_struct(snapshotCapabilities.resolution)
+        asserts.assert_greater_equal(snapshotCapabilities.maxFrameRate, 1, "MaxFrameRate is less than 1")
+        asserts.assert_in(
+            snapshotCapabilities.imageCodec,
+            Clusters.CameraAvStreamManagement.Enums.ImageCodecEnum,
+            "ImageCodec is not a valid ImageCodecEnum",
+        )
+        return True
+
+    def assert_viewport_struct(self, viewport: Clusters.Globals.Structs.ViewportStruct) -> bool:
+        # No constraints
+        return True
+
+    def assert_enum(self, member, enum, msg) -> bool:
+        asserts.assert_in(member, enum, msg)
+        return True
 
 
 if __name__ == "__main__":

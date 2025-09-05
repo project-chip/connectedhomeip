@@ -59,6 +59,10 @@ namespace PanMax {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(PanMax::Id, BitFlags<DataModel::AttributeQualityFlags>(),
                                                           Access::Privilege::kView, std::nullopt);
 } // namespace PanMax
+namespace MovementState {
+inline constexpr DataModel::AttributeEntry kMetadataEntry(MovementState::Id, BitFlags<DataModel::AttributeQualityFlags>(),
+                                                          Access::Privilege::kView, std::nullopt);
+} // namespace MovementState
 constexpr std::array<DataModel::AttributeEntry, 0> kMandatoryMetadata = {
 
 };
