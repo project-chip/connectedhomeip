@@ -42,19 +42,6 @@ namespace app {
 namespace Clusters {
 namespace CommodityTariff {
 
-// Forward declarations for attribute classes
-class TariffUnitDataClass;
-class StartDateDataClass;
-class DefaultRandomizationOffsetDataClass;
-class DefaultRandomizationTypeDataClass;
-class TariffInfoDataClass;
-class DayEntriesDataClass;
-class DayPatternsDataClass;
-class TariffComponentsDataClass;
-class TariffPeriodsDataClass;
-class IndividualDaysDataClass;
-class CalendarPeriodsDataClass;
-
 /**
  * @class Delegate
  * @brief Core tariff data management and processing class

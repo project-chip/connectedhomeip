@@ -121,12 +121,6 @@ CHIP_ERROR CommodityTariffDelegate::TariffDataUpd_CrossValidator(TariffUpdateCtx
         UpdCtx.TariffStartTimestamp = GetStartDate_MgmtObj().GetNewValue().Value();
     }
 
-    assert(!UpdCtx.DayEntryKeyIDs.empty());
-    assert(!UpdCtx.TariffComponentKeyIDsFeatureMap.empty());
-
-    assert(!UpdCtx.TariffPeriodsDayEntryIDs.empty());        // Something went wrong if TariffPeriods has no DayEntries IDs
-    assert(!UpdCtx.TariffPeriodsTariffComponentIDs.empty()); // Something went wrong if TariffPeriods has no TariffComponents IDs
-
     // Checks that all DayEntryIDs in Tariff Periods are in main DayEntries list:
     for (const auto & item : UpdCtx.TariffPeriodsDayEntryIDs)
     {
@@ -150,9 +144,6 @@ CHIP_ERROR CommodityTariffDelegate::TariffDataUpd_CrossValidator(TariffUpdateCtx
 
     if (GetDayPatterns_MgmtObj().IsValid())
     {
-        assert(!UpdCtx.DayPatternKeyIDs.empty());
-        assert(!UpdCtx.DayPatternsDayEntryIDs.empty()); // Something went wrong if DP has no DE IDs
-
         // Checks that all DP_DEs are in main DE list:
         for (const auto & item : UpdCtx.DayPatternsDayEntryIDs)
         {
@@ -166,9 +157,6 @@ CHIP_ERROR CommodityTariffDelegate::TariffDataUpd_CrossValidator(TariffUpdateCtx
 
     if (GetIndividualDays_MgmtObj().IsValid() && (GetIndividualDays_MgmtObj().HasNewValue()))
     {
-
-        assert(!UpdCtx.IndividualDaysDayEntryIDs.empty()); // Something went wrong if IndividualDays has no DE IDs
-
         // Checks that all ID_DE_IDs are in main DE list:
         for (const auto & item : UpdCtx.IndividualDaysDayEntryIDs)
         {
@@ -191,9 +179,7 @@ CHIP_ERROR CommodityTariffDelegate::TariffDataUpd_CrossValidator(TariffUpdateCtx
 
     if (GetCalendarPeriods_MgmtObj().IsValid() && (GetCalendarPeriods_MgmtObj().HasNewValue()))
     {
-        assert(!UpdCtx.CalendarPeriodsDayPatternIDs.empty()); // Something went wrong if CP has no DP IDs
-
-        // Checks that all ID_DE_IDs are in main DE list:
+        // Checks that all DayPatternIDs are in main DayPattern list:
         for (const auto & item : UpdCtx.CalendarPeriodsDayPatternIDs)
         {
             if (!UpdCtx.DayPatternKeyIDs.count(item))
