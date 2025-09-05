@@ -298,7 +298,7 @@ namespace Utils {
 
 using CurrentTariffAttrsCtx = CommodityTariff::Instance::CurrentTariffAttrsCtx;
 
-static constexpr uint32_t kNotFoundPattern = 0xffffffff;
+static constexpr uint32_t kNotFoundPattern = UINT32_MAX;
 
 template <typename T>
 uint32_t GetIdFromEntry(const T & aEntry)
@@ -434,43 +434,44 @@ FindDayEntry(CurrentTariffAttrsCtx & aCtx, const DataModel::List<const uint32_t>
     const Structs::DayEntryStruct::Type * nextPtr    = nullptr;
     *CurrentEntryMinutesRemain                       = 0;
 
-    for (const auto & entryID : dayEntryIDs)
+    for (uint16_t i = 0; i < dayEntryIDs.size(); i++)
     {
-        const auto * current = GetListEntryById<Structs::DayEntryStruct::Type>(aCtx.mTariffProvider->GetDayEntries().Value(), entryID);
-        if (current == nullptr)
+        currentPtr = GetListEntryById<Structs::DayEntryStruct::Type>(aCtx.mTariffProvider->GetDayEntries().Value(), dayEntryIDs[i]);
+        if (currentPtr == nullptr)
         {
             continue;
         }
 
-        const auto * next = GetListEntryById<Structs::DayEntryStruct::Type>(aCtx.mTariffProvider->GetDayEntries().Value(), entryID + 1);
+        if (i + 1 < dayEntryIDs.size())
+        {
+            nextPtr = GetListEntryById<Structs::DayEntryStruct::Type>(aCtx.mTariffProvider->GetDayEntries().Value(), dayEntryIDs[i + 1]);
+        }
 
         // Default: Current entry lasts until end of day
-        uint16_t duration = (kDayEntryDurationLimit - current->startTime);
+        uint16_t duration = (kDayEntryDurationLimit - currentPtr->startTime);
 
-        if (current->duration.HasValue())
+        if (currentPtr->duration.HasValue())
         {
-            duration = current->duration.Value();
+            duration = currentPtr->duration.Value();
         }
-        else if (next != nullptr && next->startTime < kDayEntryDurationLimit)
+        else if (nextPtr != nullptr && nextPtr->startTime < kDayEntryDurationLimit)
         {
-            if (next->startTime <= current->startTime)
+            if (nextPtr->startTime <= currentPtr->startTime)
             {
                 // Next entry is on the following day
-                duration = static_cast<uint16_t>((kDayEntryDurationLimit - current->startTime) + next->startTime);
+                duration = static_cast<uint16_t>((kDayEntryDurationLimit - currentPtr->startTime) + nextPtr->startTime);
             }
             else
             {
                 // Next entry is on the same day
-                duration = next->startTime - current->startTime;
+                duration = nextPtr->startTime - currentPtr->startTime;
             }
         }
 
         // Check if current entry matches the current time
-        if (current->startTime <= minutesSinceMidnight && (current->startTime + duration) > minutesSinceMidnight)
+        if (currentPtr->startTime <= minutesSinceMidnight && (currentPtr->startTime + duration) > minutesSinceMidnight)
         {
-            currentPtr                 = current;
-            nextPtr                    = next;
-            *CurrentEntryMinutesRemain = static_cast<uint16_t>(duration - (minutesSinceMidnight - current->startTime));
+            *CurrentEntryMinutesRemain = static_cast<uint16_t>(duration - (minutesSinceMidnight - currentPtr->startTime));
             break;
         }
     }
@@ -779,6 +780,11 @@ void Instance::HandleGetTariffComponent(HandlerContext & ctx, const Commands::Ge
                     {
                         for (const auto & deID : period->dayEntryIDs)
                         {
+                            if (deIDsCount >= CommodityTariffConsts::kDayEntriesAttrMaxLength)
+                            {
+                                ChipLogError(NotSpecified, "Day entry ID buffer full, truncating");
+                                break;
+                            }
                             deIDsArray[deIDsCount++] = deID;
                         }
                     }
