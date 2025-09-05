@@ -912,17 +912,16 @@ jobs:
         strategy:
             matrix:
                 os: ${{ github.event_name == 'schedule' && fromJSON('["macos-13", "macos-14", "macos-15"]') || fromJSON('["macos-15"]') }}
-                build_variant: [no-ble-no-wifi-tsan-clang]
                 include:
                 - os: macos-13
                   arch: x64     # observed, not configured
-                  dry-run: false
+                  build_variant: [no-ble-no-wifi-tsan-clang]
                 - os: macos-14
                   arch: arm64   # observed, not configured
-                  dry-run: true
+                  build_variant: [no-ble-no-wifi-tsan-clang]
                 - os: macos-15
                   arch: arm64   # observed, not configured
-                  dry-run: true
+                  build_variant: [no-ble-no-wifi-tsan-clang]
         env:
             BUILD_VARIANT: ${{matrix.build_variant}}
             TSAN_OPTIONS: "halt_on_error=1"
