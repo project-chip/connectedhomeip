@@ -40,8 +40,6 @@ public:
 
     virtual ~PushAvStreamTransportDelegate() = default;
 
-    void SetEndpointId(EndpointId aEndpoint) { mEndpointId = aEndpoint; }
-
     /**
      * @brief Handles stream transport allocation with the provided transport configuration option.
      *
@@ -244,9 +242,6 @@ public:
      * @return CHIP_ERROR indicating success or failure
      */
     virtual CHIP_ERROR PersistentAttributesLoadedCallback() = 0;
-
-protected:
-    EndpointId mEndpointId = kInvalidEndpointId;
 };
 } // namespace Clusters
 } // namespace app
