@@ -704,9 +704,21 @@ void ClosureManager::HandleClosureMotionAction()
         if (!mClosureEndpoint1CurrentState.Value().latch.Value().Value() &&
             mClosureEndpoint1TargetState.Value().latch.Value().Value())
         {
-            // In Real application, this would be replaced with actual unlatch logic.
+            // In Real application, this would be replaced with actual latch logic.
             ChipLogProgress(AppServer, "Performing latch action");
             mClosureEndpoint1CurrentState.Value().latch.SetValue(DataModel::MakeNullable(true));
+            if (mClosureEndpoint1CurrentState.Value().position.HasValue() &&
+                !mClosureEndpoint1CurrentState.Value().position.Value().IsNull())
+            {
+                if (mClosureEndpoint1CurrentState.Value().position.Value().Value() == CurrentPositionEnum::kFullyClosed)
+                {
+                    mClosureEndpoint1CurrentState.Value().secureState.SetNonNull(true);
+                }
+                else
+                {
+                    mClosureEndpoint1CurrentState.Value().secureState.SetNonNull(false);
+                }
+            }
             instance.mClosureEndpoint1.GetLogic().SetOverallCurrentState(mClosureEndpoint1CurrentState);
             mClosurePanelEndpoint2CurrentState.Value().latch.SetValue(DataModel::MakeNullable(true));
             instance.mClosurePanelEndpoint2.GetLogic().SetCurrentState(mClosurePanelEndpoint2CurrentState);
@@ -867,6 +879,7 @@ void ClosureManager::HandlePanelSetTargetAction(EndpointId endpointId)
             ChipLogProgress(AppServer, "Performing latch action");
 
             mClosureEndpoint1OverallCurrentState.Value().latch.SetValue(DataModel::MakeNullable(true));
+            mClosureEndpoint1OverallCurrentState.Value().secureState.SetNonNull(false);
             mClosureEndpoint1.GetLogic().SetOverallCurrentState(mClosureEndpoint1OverallCurrentState);
 
             panelCurrentState.Value().latch.SetValue(DataModel::MakeNullable(true));
@@ -928,6 +941,7 @@ void ClosureManager::HandleClosureUnlatchAction()
             // In Real application, this would be replaced with actual unlatch logic.
             ChipLogProgress(AppServer, "Performing unlatch action");
             mClosureEndpoint1CurrentState.Value().latch.SetValue(DataModel::MakeNullable(false));
+            mClosureEndpoint1CurrentState.Value().secureState.SetNonNull(false);
             instance.mClosureEndpoint1.GetLogic().SetOverallCurrentState(mClosureEndpoint1CurrentState);
             mClosurePanelEndpoint2CurrentState.Value().latch.SetValue(DataModel::MakeNullable(false));
             instance.mClosurePanelEndpoint2.GetLogic().SetCurrentState(mClosurePanelEndpoint2CurrentState);
@@ -979,6 +993,7 @@ void ClosureManager::HandlePanelUnlatchAction(EndpointId endpointId)
         ChipLogProgress(AppServer, "Performing unlatch action");
 
         mClosureEndpoint1OverallCurrentState.Value().latch.SetValue(DataModel::MakeNullable(false));
+        mClosureEndpoint1OverallCurrentState.Value().secureState.SetNonNull(false);
         mClosureEndpoint1.GetLogic().SetOverallCurrentState(mClosureEndpoint1OverallCurrentState);
 
         panelCurrentState.Value().latch.SetValue(false);
@@ -1035,7 +1050,8 @@ chip::Protocols::InteractionModel::Status ClosureManager::OnStepCommand(const St
         mClosureEndpoint1Target.SetNonNull(GenericOverallTargetState{});
     }
 
-    mClosureEndpoint1Target.Value().position = NullOptional; // Reset position to Null
+    mClosureEndpoint1Target.Value().position.SetValue(
+        DataModel::NullNullable); // Set position to Null as it cannot represent panel position change.
 
     VerifyOrReturnValue(mClosureEndpoint1.GetLogic().SetOverallTargetState(mClosureEndpoint1Target) == CHIP_NO_ERROR,
                         Status::Failure, ChipLogError(AppServer, "Failed to set overall target for Step command"));
@@ -1167,7 +1183,7 @@ bool ClosureManager::GetPanelNextPosition(const GenericDimensionStateStruct & cu
     }
     else if (currentPosition > targetPosition)
     {
-        // Handling overflow for CurrentPosition
+        // Handling underflow for CurrentPosition
         chip::Percent100ths newCurrentPosition =
             (currentPosition > kMotionPositionStep) ? currentPosition - kMotionPositionStep : 0;
         // Moving down: Decreasing the current position by a step of 2000 units,

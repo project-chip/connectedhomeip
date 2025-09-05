@@ -212,6 +212,7 @@ void Engine::RunMainLoop()
         if (ReadLine(line, CHIP_SHELL_MAX_LINE_SIZE) == 0u)
         {
             // Stop loop in case of empty read (Ctrl-D).
+            Platform::MemoryFree(line);
             break;
         }
 #if CONFIG_DEVICE_LAYER
