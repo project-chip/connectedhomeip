@@ -70,13 +70,13 @@ void SetTestEventTrigger_TariffDataUpdated()
             err = mgmt_obj.SetNewValue(preset_value);
             if (err != CHIP_NO_ERROR)
             {
-                ChipLogError(NotSpecified, "Unable to load tariff data for the \"%s\" field", name);
+                ChipLogError(AppServer, "Unable to load tariff data for the \"%s\" field", name);
                 return false;
             }
         }
         else if (is_required)
         {
-            ChipLogError(NotSpecified, "Invalid tariff data: the mandatory field \"%s\" is not present", name);
+            ChipLogError(AppServer, "Invalid tariff data: the mandatory field \"%s\" is not present", name);
             err = CHIP_ERROR_INVALID_ARGUMENT;
             return false;
         }

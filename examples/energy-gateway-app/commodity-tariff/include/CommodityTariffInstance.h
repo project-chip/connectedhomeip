@@ -33,7 +33,7 @@ public:
     CommodityTariffDelegate();
     ~CommodityTariffDelegate() = default;
 
-    bool TariffDataUpd_CrossValidator(TariffUpdateCtx & UpdCtx) override;
+    CHIP_ERROR TariffDataUpd_CrossValidator(TariffUpdateCtx & UpdCtx) override;
 };
 
 class CommodityTariffInstance : public Instance

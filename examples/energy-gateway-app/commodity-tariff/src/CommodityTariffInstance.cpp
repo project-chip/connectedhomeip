@@ -91,29 +91,29 @@ void CommodityTariffInstance::Shutdown()
     Instance::Shutdown();
 }
 
-bool CommodityTariffDelegate::TariffDataUpd_CrossValidator(TariffUpdateCtx & UpdCtx)
+CHIP_ERROR CommodityTariffDelegate::TariffDataUpd_CrossValidator(TariffUpdateCtx & UpdCtx)
 {
     bool DayEntriesData_is_available = false;
 
     if (!GetTariffInfo_MgmtObj().IsValid())
     {
-        ChipLogError(NotSpecified, "TariffInfo not present!");
-        return false;
+        ChipLogError(AppServer, "TariffInfo management object is not present or invalid");
+        return CHIP_ERROR_INVALID_ARGUMENT;
     }
     else if (!GetDayEntries_MgmtObj().IsValid())
     {
-        ChipLogError(NotSpecified, "DayEntries not present!");
-        return false;
+        ChipLogError(AppServer, "DayEntries management object is not present or invalid");
+        return CHIP_ERROR_INVALID_ARGUMENT;
     }
     else if (!GetTariffComponents_MgmtObj().IsValid())
     {
-        ChipLogError(NotSpecified, "TariffComponents not present!");
-        return false;
+        ChipLogError(AppServer, "TariffComponents management object is not present or invalid");
+        return CHIP_ERROR_INVALID_ARGUMENT;
     }
     else if (!GetTariffPeriods_MgmtObj().IsValid())
     {
-        ChipLogError(NotSpecified, "TariffPeriods not present!");
-        return false;
+        ChipLogError(AppServer, "TariffPeriods management object is not present or invalid");
+        return CHIP_ERROR_INVALID_ARGUMENT;
     }
 
     if (GetStartDate_MgmtObj().HasNewValue())
@@ -132,7 +132,8 @@ bool CommodityTariffDelegate::TariffDataUpd_CrossValidator(TariffUpdateCtx & Upd
     {
         if (!UpdCtx.DayEntryKeyIDs.count(item))
         {
-            return false; // The item not found in original list
+            ChipLogError(AppServer, "DayEntry ID %u referenced from TariffPeriods doesn't exist in main DayEntries list", item);
+            return CHIP_ERROR_KEY_NOT_FOUND; // The item not found in original list
         }
     }
 
@@ -141,7 +142,8 @@ bool CommodityTariffDelegate::TariffDataUpd_CrossValidator(TariffUpdateCtx & Upd
     {
         if (UpdCtx.TariffComponentKeyIDsFeatureMap.find(item) == UpdCtx.TariffComponentKeyIDsFeatureMap.end())
         {
-            return false; // The item not found in original list
+            ChipLogError(AppServer, "TariffComponent ID %u referenced from TariffPeriods doesn't exist in main TariffComponents list", item);
+            return CHIP_ERROR_KEY_NOT_FOUND; // The item not found in original list
         }
     }
 
@@ -155,7 +157,8 @@ bool CommodityTariffDelegate::TariffDataUpd_CrossValidator(TariffUpdateCtx & Upd
         {
             if (!UpdCtx.DayEntryKeyIDs.count(item))
             {
-                return false; // The item not found in original list
+                ChipLogError(AppServer, "DayEntry ID %u referenced from DayPatterns doesn't exist in main DayEntries list", item);
+                return CHIP_ERROR_KEY_NOT_FOUND; // The item not found in original list
             }
         }
     }
@@ -170,12 +173,14 @@ bool CommodityTariffDelegate::TariffDataUpd_CrossValidator(TariffUpdateCtx & Upd
         {
             if (!UpdCtx.DayEntryKeyIDs.count(item))
             {
-                return false; // The item not found in original list
+                ChipLogError(AppServer, "DayEntry ID %u referenced from IndividualDays doesn't exist in main DayEntries list", item);
+                return CHIP_ERROR_KEY_NOT_FOUND; // The item not found in original list
             }
 
             if (UpdCtx.DayPatternsDayEntryIDs.count(item))
             {
-                return false; // If same item from ID list has found in DP list
+                ChipLogError(AppServer, "DayEntry ID %u is duplicated - found in both IndividualDays and DayPatterns lists", item);
+                return CHIP_ERROR_DUPLICATE_KEY_ID; // If same item from ID list has found in DP list
             }
         }
 
@@ -191,7 +196,8 @@ bool CommodityTariffDelegate::TariffDataUpd_CrossValidator(TariffUpdateCtx & Upd
         {
             if (!UpdCtx.DayPatternKeyIDs.count(item))
             {
-                return false; // The item not found in original list
+                ChipLogError(AppServer, "DayPattern ID %u referenced from CalendarPeriods doesn't exist in main DayPatterns list", item);
+                return CHIP_ERROR_KEY_NOT_FOUND; // The item not found in original list
             }
         }
 
@@ -200,8 +206,8 @@ bool CommodityTariffDelegate::TariffDataUpd_CrossValidator(TariffUpdateCtx & Upd
 
     if (!DayEntriesData_is_available)
     {
-        ChipLogError(NotSpecified, "Both IndividualDays and CalendarPeriods are not present!");
-        return false;
+        ChipLogError(AppServer, "Both IndividualDays and CalendarPeriods are not present or have no valid data");
+        return CHIP_ERROR_INVALID_DATA_LIST;
     }
 
     const auto & tariffPeriods    = GetTariffPeriods_MgmtObj().GetNewValue().Value();
@@ -249,14 +255,15 @@ bool CommodityTariffDelegate::TariffDataUpd_CrossValidator(TariffUpdateCtx & Upd
             // Check if DE exists in original context
             if (UpdCtx.DayEntryKeyIDs.count(deID) == 0)
             {
-                return false; // Item not found in original list
+                ChipLogError(AppServer, "DayEntry ID %u doesn't exist in validation context", deID);
+                return CHIP_ERROR_KEY_NOT_FOUND; // Item not found in original list
             }
 
-            // Safe lookup with bounds checking
             const auto dayEntryIt = dayEntriesMap.find(deID);
             if (dayEntryIt == dayEntriesMap.end())
             {
-                return false; // Day entry not found in map
+                ChipLogError(AppServer, "Unable to find DayEntry with ID %u in the parsed data map", deID);
+                return CHIP_ERROR_KEY_NOT_FOUND; // Day entry not found in map
             }
 
             const auto * dayEntry = dayEntryIt->second;
@@ -269,9 +276,9 @@ bool CommodityTariffDelegate::TariffDataUpd_CrossValidator(TariffUpdateCtx & Upd
             // Check for duplicates
             if (!seenStartDurationPairs.insert(pair).second)
             {
-                ChipLogError(NotSpecified, "Duplicated startTime/duration (%u/%u) in  DayEntries of same TariffPeriod",
+                ChipLogError(AppServer, "Duplicate startTime/duration combination (%u/%u) found in DayEntries of the same TariffPeriod",
                              pair.startTime, pair.duration);
-                return false; // Found duplicate startTime/duration combination
+                return CHIP_ERROR_DUPLICATE_KEY_ID; // Found duplicate startTime/duration combination
             }
         }
 
@@ -284,13 +291,14 @@ bool CommodityTariffDelegate::TariffDataUpd_CrossValidator(TariffUpdateCtx & Upd
             const auto featureIt = UpdCtx.TariffComponentKeyIDsFeatureMap.find(tcID);
             if (featureIt == UpdCtx.TariffComponentKeyIDsFeatureMap.end())
             {
-                return false; // Item not found in original list
+                ChipLogError(AppServer, "TariffComponent ID %u not found in validation context feature map", tcID);
+                return CHIP_ERROR_KEY_NOT_FOUND; // Item not found in original list
             }
-            // Safe lookup with bounds checking
             const auto tariffComponentIt = tariffComponentsMap.find(tcID);
             if (tariffComponentIt == tariffComponentsMap.end())
             {
-                return false; // Tariff component not found in map
+                ChipLogError(AppServer, "Unable to find TariffComponent with ID %u in the parsed data map", tcID);
+                return CHIP_ERROR_KEY_NOT_FOUND; // Tariff component not found in map
             }
 
             const auto * tariffComponent = tariffComponentIt->second;
@@ -310,14 +318,15 @@ bool CommodityTariffDelegate::TariffDataUpd_CrossValidator(TariffUpdateCtx & Upd
             // Check for duplicate threshold for this feature
             if (!thresholdSet.insert(thresholdValue).second)
             {
-                ChipLogError(NotSpecified,
-                             "Duplicated threshold value among TCs for the 0x%" PRIx32 " feature in the same tariff period",
-                             featureID);
-                return false; // Found duplicate feature/threshold combination
+                ChipLogError(AppServer,
+                             "Duplicate threshold value %" PRId64 " for feature 0x%" PRIx32 " found among TariffComponents in the same tariff period",
+                             thresholdValue, featureID);
+                return CHIP_ERROR_DUPLICATE_KEY_ID; // Found duplicate feature/threshold combination
             }
         }
     }
-    return true;
+
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR CommodityTariffInstance::AppInit()
