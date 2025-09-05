@@ -169,7 +169,7 @@ void webrtc_client_set_state_change_callback(WebRTCClientHandle handle, OnStateC
 /**
  * @brief Creates a new WebRTC provider client instance.
  *
- * Initializes a new WebRTC provider  client and returns a handle to it.
+ * Initializes a new WebRTC provider client and returns a handle to it.
  *
  * @return WebRTCClientHandle Opaque handle to the created provider client instance.
  */
