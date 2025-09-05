@@ -31,15 +31,6 @@ using namespace chip::DeviceLayer::Internal;
 namespace {
 static constexpr uint32_t kDACPrivateKeySize = 32;
 static constexpr uint32_t kDACPublicKeySize  = 65;
-
-CHIP_ERROR LoadKeypairFromRaw(ByteSpan privateKey, ByteSpan publicKey, Crypto::P256Keypair & keypair)
-{
-    Crypto::P256SerializedKeypair serializedKeypair;
-    ReturnErrorOnFailure(serializedKeypair.SetLength(privateKey.size() + publicKey.size()));
-    memcpy(serializedKeypair.Bytes(), publicKey.data(), publicKey.size());
-    memcpy(serializedKeypair.Bytes() + publicKey.size(), privateKey.data(), privateKey.size());
-    return keypair.Deserialize(serializedKeypair);
-}
 } // namespace
 
 CHIP_ERROR ASRFactoryDataProvider::Init()
@@ -330,7 +321,7 @@ CHIP_ERROR ASRFactoryDataProvider::SignWithDeviceAttestationKey(const ByteSpan &
         0xaa, 0xb6, 0x00, 0xae, 0x8a, 0xe8, 0xaa, 0xb7, 0xd7, 0x36, 0x27, 0xc2, 0x17, 0xb7, 0xc2, 0x04,
         0x70, 0x9c, 0xa6, 0x94, 0x6a, 0xf5, 0xf2, 0xf7, 0x53, 0x08, 0x33, 0xa5, 0x2b, 0x44, 0xfb, 0xff,
     };
-    ReturnErrorOnFailure(LoadKeypairFromRaw(ByteSpan{ kDacPrivateKey }, ByteSpan{ kDacPublicKey }, keypair));
+    ReturnErrorOnFailure(keypair.HazardousOperationLoadKeypairFromRaw(ByteSpan{ kDacPrivateKey }, ByteSpan{ kDacPublicKey }));
 #else
     return CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND;
 #endif
@@ -341,7 +332,8 @@ CHIP_ERROR ASRFactoryDataProvider::SignWithDeviceAttestationKey(const ByteSpan &
     size_t pubKeyLen  = sizeof(pubKeyBuf);
     ReturnErrorOnFailure(ASRConfig::ReadFactoryConfigValue(ASR_DAC_KEY_PARTITION, privKeyBuf, privKeyLen, privKeyLen));
     ReturnErrorOnFailure(ASRConfig::ReadFactoryConfigValue(ASR_DAC_PUB_KEY_PARTITION, pubKeyBuf, pubKeyLen, pubKeyLen));
-    ReturnErrorOnFailure(LoadKeypairFromRaw(ByteSpan(privKeyBuf, privKeyLen), ByteSpan(pubKeyBuf, pubKeyLen), keypair));
+    ReturnErrorOnFailure(
+        keypair.HazardousOperationLoadKeypairFromRaw(ByteSpan(privKeyBuf, privKeyLen), ByteSpan(pubKeyBuf, pubKeyLen)));
 #endif
 
     ReturnErrorOnFailure(keypair.ECDSA_sign_msg(messageToSign.data(), messageToSign.size(), signature));
