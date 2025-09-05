@@ -21,6 +21,7 @@ on:
             - 'v*-branch'
     pull_request:
     merge_group:
+    workflow_dispatch:
 
 concurrency:
     group: ${{ github.ref }}-${{ github.workflow }}-${{ (github.event_name == 'pull_request' && github.event.number) || (github.event_name == 'workflow_dispatch' && github.run_number) || github.sha }}
@@ -39,7 +40,9 @@ jobs:
         defaults:
             run:
                 shell: sh
-        if: github.actor != 'restyled-io[bot]'
+        if: |
+            github.actor != 'restyled-io[bot]' &&
+            (github.event_name != 'pull_request' || github.event.pull_request.draft == false)
 
         steps:
             - name: Checkout
