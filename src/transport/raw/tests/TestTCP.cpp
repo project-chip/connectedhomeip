@@ -131,7 +131,30 @@ public:
 
         if (transCtxt)
         {
-            incoming = transCtxt->conn;
+            // Store a reference to the connection so it's not auto-disconnected
+            ActiveTCPConnectionHolder * available = nullptr;
+            for (size_t i = 0; i < kMaxIncoming; i++)
+            {
+                if (incoming[i] == transCtxt->conn)
+                {
+                    available = &incoming[i];
+                    break;
+                }
+                if (incoming[i].IsNull())
+                {
+                    available = &incoming[i];
+                }
+            }
+            ASSERT_NE(available, nullptr);
+
+            *available = transCtxt->conn;
+            connection = *available;
+        }
+
+        if (mCallback)
+        {
+            EXPECT_EQ(mCallback(msgBuf->Start(), msgBuf->DataLength(), mReceiveHandlerCallCount, connection, mCallbackData),
+                      CHIP_NO_ERROR);
         }
 
         ChipLogProgress(Inet, "Message Receive Handler called");
@@ -223,7 +246,9 @@ public:
         CHIP_ERROR err = tcp.TCPConnect(Transport::PeerAddress::TCP(addr, port), nullptr, refHolder);
         EXPECT_EQ(err, CHIP_NO_ERROR);
 
-        err = tcp.TCPConnect(Transport::PeerAddress::TCP(addr, port), nullptr, refHolder);
+        // Should be able to send a message to itself by just calling send.
+        chip::System::PacketBufferHandle buffer;
+        err = BufferWithHeader(kMessageCounter, buffer, PAYLOAD);
         EXPECT_EQ(err, CHIP_NO_ERROR);
 
         // Should be able to send a message to itself by just calling send.
