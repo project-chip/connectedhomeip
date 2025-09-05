@@ -263,15 +263,29 @@ class TC_OPCREDS_3_4(MatterBaseTest):
         asserts.assert_equal(resp.statusCode, opcreds.Enums.NodeOperationalCertStatusEnum.kInvalidNOC,
                              "NOCResponse with the StatusCode InvalidNOC")
 
+        cmd = Clusters.GeneralCommissioning.Commands.ArmFailSafe(0)
+        resp = await self.send_single_cmd(dev_ctrl=self.default_controller, node_id=self.dut_node_id, cmd=cmd)
+        asserts.assert_equal(resp.errorCode, Clusters.GeneralCommissioning.Enums.CommissioningErrorEnum.kOk,
+                             "Failure status returned from arm failsafe")
+
+        cmd = Clusters.GeneralCommissioning.Commands.ArmFailSafe(900)
+        resp = await self.send_single_cmd(dev_ctrl=self.default_controller, node_id=self.dut_node_id, cmd=cmd)
+        asserts.assert_equal(resp.errorCode, Clusters.GeneralCommissioning.Enums.CommissioningErrorEnum.kOk,
+                             "Failure status returned from arm failsafe")
+
         self.step(21)
+        cmd = opcreds.Commands.CSRRequest(CSRNonce=random.randbytes(32), isForUpdateNOC=False)
+        csr_not_update = await self.send_single_cmd(dev_ctrl=self.default_controller, node_id=self.dut_node_id, cmd=cmd)
         cmd = opcreds.Commands.AddTrustedRootCertificate(new_root_cert)
         resp = await self.send_single_cmd(dev_ctrl=self.default_controller, node_id=self.dut_node_id, cmd=cmd)
 
         self.step(22)
         cmd = opcreds.Commands.UpdateNOC(NOCValue=noc_update_new_root, ICACValue=icac_update_new_root)
-        resp = await self.send_single_cmd(dev_ctrl=self.default_controller, node_id=self.dut_node_id, cmd=cmd)
-        asserts.assert_equal(resp.statusCode, opcreds.Enums.NodeOperationalCertStatusEnum.kMissingCsr,
-                             "Failure status returned from UpdateNOC")
+        try:
+            resp = await self.send_single_cmd(dev_ctrl=self.default_controller, node_id=self.dut_node_id, cmd=cmd)
+            asserts.fail("Unexpected error sending UpdateNOC command")
+        except InteractionModelError as e:
+            asserts.assert_equal(e.status, Status.ConstraintError, "Failure status returned from UpdateNOC")
 
         self.step(23)
         cmd = Clusters.GeneralCommissioning.Commands.ArmFailSafe(0)
