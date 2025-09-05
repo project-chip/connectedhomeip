@@ -47,7 +47,7 @@ CameraApp::CameraApp(chip::EndpointId aClustersEndpoint, CameraDeviceInterface *
 
     Clusters::PushAvStreamTransport::SetDelegate(mEndpoint, &(mCameraDevice->GetPushAVTransportDelegate()));
 
-    Clusters::PushAvStreamTransport::SetTLSClientManagementDelegate(chip::EndpointId(1),
+    Clusters::PushAvStreamTransport::SetTLSClientManagementDelegate(mEndpoint,
                                                                     &Clusters::TlsClientManagementCommandDelegate::GetInstance());
 
     // Fetch all initialization parameters for CameraAVStreamMgmt Server
@@ -159,7 +159,8 @@ CameraApp::CameraApp(chip::EndpointId aClustersEndpoint, CameraDeviceInterface *
         CameraAvSettingsUserLevelManagement::OptionalAttributes::kTiltMin,
         CameraAvSettingsUserLevelManagement::OptionalAttributes::kTiltMax,
         CameraAvSettingsUserLevelManagement::OptionalAttributes::kPanMin,
-        CameraAvSettingsUserLevelManagement::OptionalAttributes::kPanMax);
+        CameraAvSettingsUserLevelManagement::OptionalAttributes::kPanMax,
+        CameraAvSettingsUserLevelManagement::OptionalAttributes::kMovementState);
     const uint8_t appMaxPresets = 5;
 
     // Instantiate the CameraAVSettingsUserLevelMgmt Server
@@ -273,6 +274,13 @@ void CameraApp::InitCameraDeviceClusters()
     mZoneMgmtServerPtr->Init();
 }
 
+void CameraApp::ShutdownCameraDeviceClusters()
+{
+    ChipLogDetail(Camera, "CameraAppShutdown: Shutting down Camera device clusters");
+    mAVSettingsUserLevelMgmtServerPtr->Shutdown();
+    mWebRTCTransportProviderPtr->Shutdown();
+}
+
 static constexpr EndpointId kCameraEndpointId = 1;
 
 Platform::UniquePtr<CameraApp> gCameraApp;
@@ -288,5 +296,6 @@ void CameraAppInit(CameraDeviceInterface * cameraDevice)
 void CameraAppShutdown()
 {
     ChipLogDetail(Camera, "CameraAppShutdown: Shutting down Camera app");
+    gCameraApp.get()->ShutdownCameraDeviceClusters();
     gCameraApp = nullptr;
 }
