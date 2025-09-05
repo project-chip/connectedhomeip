@@ -926,13 +926,9 @@ protected:
             {
                 is_neq = CompareStructValue(a.Value(), b.Value());
             }
-            else if constexpr (IsNumeric<WrappedType>::value || IsEnum<WrappedType>::value)
-            {
-                is_neq = (a.Value() != b.Value());
-            }
             else
             {
-                static_assert(false, "Unexpected Nullable wrapped type");
+                is_neq = (a.Value() != b.Value());
             }
         }
 
