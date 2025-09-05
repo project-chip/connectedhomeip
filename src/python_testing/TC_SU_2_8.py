@@ -139,12 +139,12 @@ class TC_SU_2_8(MatterBaseTest):
         logging.info("Setting up TH2.")
         th2_certificate_auth = self.certificate_authority_manager.NewCertificateAuthority()
         th2_fabric_admin = th2_certificate_auth.NewFabricAdmin(vendorId=vendor_id, fabricId=fabric_id_th2)
-        th2 = th2_fabric_admin.NewController(nodeId=2, useTestCommissioner=True)
+        th2 = th2_fabric_admin.NewController(nodeId=3, useTestCommissioner=True)
 
-        logging.info("Openning commissioning window on DUT.")
+        logging.info("Opening commissioning window on DUT.")
         params = await self.open_commissioning_window(th1, dut_node_id)
 
-        dut_node_id_th2 = 2
+        dut_node_id_th2 = dut_node_id
 
         # Commission TH2/DUT (requestor)
         resp = await th2.CommissionOnNetwork(
