@@ -224,7 +224,12 @@ combination with JLinkRTTClient as follows:
 
 If the binary was built with this option or if you're using the Siwx917 WiFi
 SoC, the logs and the CLI (if enabled) will be available on the serial console.
-This console required a baudrate of **921600** with CTS/RTS.
+
+This console required a baudrate of **115200** with CTS/RTS. This is the default
+configuration of Silicon Labs dev kits.
+
+**HOWEVER** the console will required a baudrate of **921600** with CTS/RTS if
+the verbose mode is selected (--verbose)
 
 #### Configuring the VCOM
 
@@ -232,7 +237,7 @@ This console required a baudrate of **921600** with CTS/RTS.
     Studio)[https://community.silabs.com/s/article/wstk-virtual-com-port-baudrate-setting?language=en_US]
 -   Using commander-cli
     ```
-    commander vcom config --baudrate 921600 --handshake none
+    commander vcom config --baudrate 921600 --handshake rtscts
     ```
 
 ### Using the console
