@@ -132,179 +132,195 @@ class TC_ICDM_3_1(MatterBaseTest):
 
     @async_test_body
     async def test_TC_ICDM_3_1(self):
+
         cluster = Clusters.Objects.IcdManagement
         attributes = cluster.Attributes
 
         # Step 0: Commissioning (already done)
         self.step(0)
 
-        # Step 1: FeatureMap check (skip if not supported)
-        self.step(1)
-        featureMap = await self._read_icdm_attribute_expect_success(attributes.FeatureMap)
-        if featureMap & features.kCheckInProtocolSupport > 0:
-            self.mark_all_remaining_steps_skipped("2a")
-            return
-
-        # Step 2a: Read TestEventTriggersEnabled from General Diagnostics Cluster
-        self.step("2a")
-        self.check_test_event_triggers_enabled()
-
-        # Step 2b: Send TestEventTrigger command to General Diagnostics Cluster
-        self.step("2b")
-        self.send_test_event_triggers(eventTrigger=ICDTestEventTriggerOperations.kAddActiveModeReq)
-
-        # Step 3: Read RegisteredClients, clear if not empty
-        self.step(3)
-        registeredClients = await self._read_icdm_attribute_expect_success(attributes.RegisteredClients)
-        for client in registeredClients:
-            try:
-                await self._send_single_icdm_command(commands.UnregisterClient(checkInNodeID=client.checkInNodeID))
-            except InteractionModelError as e:
-                asserts.assert_equal(e.status, Status.Success, "Unexpected error returned")
-                pass
-
-        # Step 4: Read ClientsSupportedPerFabric
-        self.step(4)
-        clientsSupportedPerFabric = await self._read_icdm_attribute_expect_success(attributes.ClientsSupportedPerFabric)
-
-        # Step 5: Read ICDCounter
-        self.step(5)
-        icdCounter = await self._read_icdm_attribute_expect_success(attributes.ICDCounter)
-
-        # Step 6: RegisterClient (Ephemeral)
-        self.step(6)
         try:
-            response = await self._send_single_icdm_command(commands.RegisterClient(
-                checkInNodeID=kStep2CheckInNodeId,
-                monitoredSubject=kStep2MonitoredSubjectStep2,
-                key=kStep2Key,
-                clientType=clientTypeEnum.kEphemeral))
-        except InteractionModelError as e:
-            asserts.assert_equal(e.status, Status.Success, "Unexpected error returned")
-            pass
+            # Step 1: FeatureMap check (skip if not supported)
+            self.step(1)
+            featureMap = await self._read_icdm_attribute_expect_success(attributes.FeatureMap)
+            if featureMap & features.kCheckInProtocolSupport == 0:
+                asserts.assert_fail("WHAT THE FUCK")
+                self.mark_all_remaining_steps_skipped("2a")
+                return
 
-        # Validate response contains the ICDCounter
-        asserts.assert_greater_equal(response.ICDCounter, icdCounter,
-                                     "The ICDCounter in the response does not match the read ICDCounter.")
+            # Step 2a: Read TestEventTriggersEnabled from General Diagnostics Cluster
+            self.step("2a")
+            self.check_test_event_triggers_enabled()
 
-        # Step 7: Read RegisteredClients, verify entry
-        self.step(7)
-        registeredClients = await self._read_icdm_attribute_expect_success(attributes.RegisteredClients)
+            # Step 2b: Send TestEventTrigger command to General Diagnostics Cluster
+            self.step("2b")
+            self.send_test_event_triggers(eventTrigger=ICDTestEventTriggerOperations.kAddActiveModeReq)
 
-        # Validate list size
-        asserts.assert_equal(len(registeredClients), 1,
-                             "The expected length of RegisteredClients is 1. List has the wrong size.")
-
-        # Validate entry values
-        asserts.assert_equal(
-            registeredClients[0].checkInNodeID, kStep2CheckInNodeId, "The read attribute does not match the registered value.")
-        asserts.assert_equal(
-            registeredClients[0].monitoredSubject, kStep2MonitoredSubjectStep2, "The read attribute does not match the registered value.")
-        asserts.assert_equal(
-            registeredClients[0].clientType, clientTypeEnum.kEphemeral, "The read attribute does not match the registered value.")
-
-        # Step 8: Fill RegisteredClients to ClientsSupportedPerFabric with Permanent clients
-        self.step(8)
-        if len(registeredClients) < clientsSupportedPerFabric:
-            newClients = []
-            # Generate new clients data
-            for i in range(clientsSupportedPerFabric - len(registeredClients)):
-                newClients.append({
-                    "checkInNodeID": i + 1,
-                    "monitoredSubject": i + 1,
-                    "key": os.urandom(16),
-                    "clientType": clientTypeEnum.kPermanent
-                })
-            for client in newClients:
+            # Step 3: Read RegisteredClients, clear if not empty
+            self.step(3)
+            registeredClients = await self._read_icdm_attribute_expect_success(attributes.RegisteredClients)
+            for client in registeredClients:
                 try:
-                    response = await self._send_single_icdm_command(commands.RegisterClient(
-                        checkInNodeID=client["checkInNodeID"],
-                        monitoredSubject=client["monitoredSubject"],
-                        key=client["key"],
-                        clientType=client["clientType"]))
+                    await self._send_single_icdm_command(commands.UnregisterClient(checkInNodeID=client.checkInNodeID))
                 except InteractionModelError as e:
                     asserts.assert_equal(e.status, Status.Success, "Unexpected error returned")
                     pass
-                # Validate response contains the ICDCounter
-                asserts.assert_greater_equal(response.ICDCounter, icdCounter,
-                                             "The ICDCounter in the response does not match the read ICDCounter.")
 
-        # Step 9: Read RegisteredClients
-        self.step(9)
-        registeredClients = await self._read_icdm_attribute_expect_success(attributes.RegisteredClients)
+            # Step 4: Read ClientsSupportedPerFabric
+            self.step(4)
+            clientsSupportedPerFabric = await self._read_icdm_attribute_expect_success(attributes.ClientsSupportedPerFabric)
 
-        # Validate list size
-        asserts.assert_equal(len(registeredClients[1:]), len(newClients),
-                             "The expected length of RegisteredClients is clientsSupportedPerFabric. List has the wrong size.")
+            # Step 5: Read ICDCounter
+            self.step(5)
+            icdCounter = await self._read_icdm_attribute_expect_success(attributes.ICDCounter)
 
-        for client, expectedClient in zip(registeredClients[1:], newClients):
-            asserts.assert_equal(
-                client.checkInNodeID, expectedClient["checkInNodeID"], "The read attribute does not match the registered value.")
-            asserts.assert_equal(
-                client.monitoredSubject, expectedClient["monitoredSubject"], "The read attribute does not match the registered value.")
-            asserts.assert_equal(
-                client.clientType, expectedClient["clientType"], "The read attribute does not match the registered value.")
-
-        # Step 10: RegisterClient with a different CheckInNodeID (should fail RESOURCE_EXHAUSTED)
-        self.step(10)
-        try:
-            await self._send_single_icdm_command(commands.RegisterClient(
-                checkInNodeID=0xFFFF,
-                monitoredSubject=0xFFFF,
-                key=os.urandom(16),
-                clientType=clientTypeEnum.kPermanent))
-        except InteractionModelError as e:
-            asserts.assert_equal(e.status, Status.ResourceExhausted, "Unexpected error returned")
-            pass
-
-        # Step 11: UnregisterClient with CheckInNodeID from Step 10 (should fail NOT_FOUND)
-        self.step(11)
-        try:
-            await self._send_single_icdm_command(commands.UnregisterClient(checkInNodeID=0xFFFF))
-        except InteractionModelError as e:
-            asserts.assert_equal(e.status, Status.NotFound, "Unexpected error returned")
-            pass
-
-        # Step 12: UnregisterClient with CheckInNodeID from Step 6
-        self.step(12)
-        try:
-            await self._send_single_icdm_command(commands.UnregisterClient(checkInNodeID=kStep2CheckInNodeId))
-        except InteractionModelError as e:
-            asserts.assert_equal(e.status, Status.Success, "Unexpected error returned")
-            pass
-
-        # Step 13: Read RegisteredClients, verify Step 6 client is not present
-        self.step(13)
-        registeredClients = await self._read_icdm_attribute_expect_success(attributes.RegisteredClients)
-        for client in registeredClients:
-            asserts.assert_not_equal(client.checkInNodeID, kStep2CheckInNodeId,
-                                     "CheckInNodeID was unregistered. It should not be present in the attribute list.")
-
-        # Step 14: Repeat Step 12-13 for remaining clients from Step 8
-        self.step(14)
-        for client in newClients:
+            # Step 6: RegisterClient (Ephemeral)
+            self.step(6)
             try:
-                await self._send_single_icdm_command(commands.UnregisterClient(checkInNodeID=client["checkInNodeID"]))
+                response = await self._send_single_icdm_command(commands.RegisterClient(
+                    checkInNodeID=kStep2CheckInNodeId,
+                    monitoredSubject=kStep2MonitoredSubjectStep2,
+                    key=kStep2Key,
+                    clientType=clientTypeEnum.kEphemeral))
             except InteractionModelError as e:
                 asserts.assert_equal(e.status, Status.Success, "Unexpected error returned")
                 pass
+
+            # Validate response contains the ICDCounter
+            asserts.assert_greater_equal(response.ICDCounter, icdCounter,
+                                         "The ICDCounter in the response does not match the read ICDCounter.")
+
+            # Step 7: Read RegisteredClients, verify entry
+            self.step(7)
             registeredClients = await self._read_icdm_attribute_expect_success(attributes.RegisteredClients)
-            for remainingClient in registeredClients:
-                asserts.assert_not_equal(
-                    remainingClient.checkInNodeID, client["checkInNodeID"], "CheckInNodeID was unregistered. It should not be present in the attribute list.")
 
-        # Step 15: Read RegisteredClients, should be empty
-        self.step(15)
-        registeredClients = await self._read_icdm_attribute_expect_success(attributes.RegisteredClients)
-        asserts.assert_true(not registeredClients, "This list should be empty. An element did not get deleted.")
+            # Validate list size
+            asserts.assert_equal(len(registeredClients), 1,
+                                 "The expected length of RegisteredClients is 1. List has the wrong size.")
 
-        # Step 16: UnregisterClient with CheckInNodeID from Step 6 (should fail NOT_FOUND)
-        self.step(16)
-        try:
-            await self._send_single_icdm_command(commands.UnregisterClient(checkInNodeID=kStep2CheckInNodeId))
-        except InteractionModelError as e:
-            asserts.assert_equal(e.status, Status.NotFound, "Unexpected error returned")
-            pass
+            # Validate entry values
+            asserts.assert_equal(
+                registeredClients[0].checkInNodeID, kStep2CheckInNodeId, "The read attribute does not match the registered value.")
+            asserts.assert_equal(
+                registeredClients[0].monitoredSubject, kStep2MonitoredSubjectStep2, "The read attribute does not match the registered value.")
+            asserts.assert_equal(
+                registeredClients[0].clientType, clientTypeEnum.kEphemeral, "The read attribute does not match the registered value.")
+
+            # Step 8: Fill RegisteredClients to ClientsSupportedPerFabric with Permanent clients
+            self.step(8)
+            if len(registeredClients) < clientsSupportedPerFabric:
+                newClients = []
+                # Generate new clients data
+                for i in range(clientsSupportedPerFabric - len(registeredClients)):
+                    newClients.append({
+                        "checkInNodeID": i + 1,
+                        "monitoredSubject": i + 1,
+                        "key": os.urandom(16),
+                        "clientType": clientTypeEnum.kPermanent
+                    })
+                for client in newClients:
+                    try:
+                        response = await self._send_single_icdm_command(commands.RegisterClient(
+                            checkInNodeID=client["checkInNodeID"],
+                            monitoredSubject=client["monitoredSubject"],
+                            key=client["key"],
+                            clientType=client["clientType"]))
+                    except InteractionModelError as e:
+                        asserts.assert_equal(e.status, Status.Success, "Unexpected error returned")
+                        pass
+                    # Validate response contains the ICDCounter
+                    asserts.assert_greater_equal(response.ICDCounter, icdCounter,
+                                                 "The ICDCounter in the response does not match the read ICDCounter.")
+
+            # Step 9: Read RegisteredClients
+            self.step(9)
+            registeredClients = await self._read_icdm_attribute_expect_success(attributes.RegisteredClients)
+
+            # Validate list size
+            asserts.assert_equal(len(registeredClients[1:]), len(newClients),
+                                 "The expected length of RegisteredClients is clientsSupportedPerFabric. List has the wrong size.")
+
+            for client, expectedClient in zip(registeredClients[1:], newClients):
+                asserts.assert_equal(
+                    client.checkInNodeID, expectedClient["checkInNodeID"], "The read attribute does not match the registered value.")
+                asserts.assert_equal(
+                    client.monitoredSubject, expectedClient["monitoredSubject"], "The read attribute does not match the registered value.")
+                asserts.assert_equal(
+                    client.clientType, expectedClient["clientType"], "The read attribute does not match the registered value.")
+
+            # Step 10: RegisterClient with a different CheckInNodeID (should fail RESOURCE_EXHAUSTED)
+            self.step(10)
+            try:
+                await self._send_single_icdm_command(commands.RegisterClient(
+                    checkInNodeID=0xFFFF,
+                    monitoredSubject=0xFFFF,
+                    key=os.urandom(16),
+                    clientType=clientTypeEnum.kPermanent))
+            except InteractionModelError as e:
+                asserts.assert_equal(e.status, Status.ResourceExhausted, "Unexpected error returned")
+                pass
+
+            # Step 11: UnregisterClient with CheckInNodeID from Step 10 (should fail NOT_FOUND)
+            self.step(11)
+            try:
+                await self._send_single_icdm_command(commands.UnregisterClient(checkInNodeID=0xFFFF))
+            except InteractionModelError as e:
+                asserts.assert_equal(e.status, Status.NotFound, "Unexpected error returned")
+                pass
+
+            # Step 12: UnregisterClient with CheckInNodeID from Step 6
+            self.step(12)
+            try:
+                await self._send_single_icdm_command(commands.UnregisterClient(checkInNodeID=kStep2CheckInNodeId))
+            except InteractionModelError as e:
+                asserts.assert_equal(e.status, Status.Success, "Unexpected error returned")
+                pass
+
+            # Step 13: Read RegisteredClients, verify Step 6 client is not present
+            self.step(13)
+            registeredClients = await self._read_icdm_attribute_expect_success(attributes.RegisteredClients)
+            for client in registeredClients:
+                asserts.assert_not_equal(client.checkInNodeID, kStep2CheckInNodeId,
+                                         "CheckInNodeID was unregistered. It should not be present in the attribute list.")
+
+            # Step 14: Repeat Step 12-13 for remaining clients from Step 8
+            self.step(14)
+            for client in newClients:
+                try:
+                    await self._send_single_icdm_command(commands.UnregisterClient(checkInNodeID=client["checkInNodeID"]))
+                except InteractionModelError as e:
+                    asserts.assert_equal(e.status, Status.Success, "Unexpected error returned")
+                    pass
+                registeredClients = await self._read_icdm_attribute_expect_success(attributes.RegisteredClients)
+                for remainingClient in registeredClients:
+                    asserts.assert_not_equal(
+                        remainingClient.checkInNodeID, client["checkInNodeID"], "CheckInNodeID was unregistered. It should not be present in the attribute list.")
+
+            # Step 15: Read RegisteredClients, should be empty
+            self.step(15)
+            registeredClients = await self._read_icdm_attribute_expect_success(attributes.RegisteredClients)
+            asserts.assert_true(not registeredClients, "This list should be empty. An element did not get deleted.")
+
+            # Step 16: UnregisterClient with CheckInNodeID from Step 6 (should fail NOT_FOUND)
+            self.step(16)
+            try:
+                await self._send_single_icdm_command(commands.UnregisterClient(checkInNodeID=kStep2CheckInNodeId))
+            except InteractionModelError as e:
+                asserts.assert_equal(e.status, Status.NotFound, "Unexpected error returned")
+                pass
+
+        finally:
+            # Post-Condition Steps
+
+            registeredClients = await self._read_icdm_attribute_expect_success(attributes.RegisteredClients)
+            for client in registeredClients:
+                try:
+                    await self._send_single_icdm_command(commands.UnregisterClient(checkInNodeID=client.checkInNodeID))
+                except InteractionModelError as e:
+                    asserts.assert_equal(e.status, Status.Success, "Unexpected error returned")
+                    pass
+
+            self.send_test_event_triggers(eventTrigger=ICDTestEventTriggerOperations.kRemoveActiveModeReq)
 
 
 if __name__ == "__main__":
