@@ -193,7 +193,7 @@ class PAVSTIUtils:
     # ----------------------------------------------------------------------
 
     async def send_provision_root_command(
-        self, certificate: bytes, expected_status: Status = Status.Success
+        self, endpoint: int, certificate: bytes, expected_status: Status = Status.Success
     ) -> Union[
         Clusters.TlsCertificateManagement.Commands.ProvisionRootCertificateResponse,
         InteractionModelError,
@@ -203,7 +203,7 @@ class PAVSTIUtils:
                 cmd=Clusters.TlsCertificateManagement.Commands.ProvisionRootCertificate(
                     certificate=certificate
                 ),
-                endpoint=self.endpoint,
+                endpoint=endpoint,
                 payloadCapability=ChipDeviceCtrl.TransportPayloadCapability.LARGE_PAYLOAD,
             )
 
@@ -220,14 +220,14 @@ class PAVSTIUtils:
             return e
 
     async def send_remove_root_command(
-        self, caid: int, expected_status: Status = Status.Success
+        self, endpoint: int, caid: int, expected_status: Status = Status.Success
     ) -> InteractionModelError:
         try:
             result = await self.send_single_cmd(
                 cmd=Clusters.TlsCertificateManagement.Commands.RemoveRootCertificate(
                     caid=caid
                 ),
-                endpoint=self.endpoint,
+                endpoint=endpoint,
                 payloadCapability=ChipDeviceCtrl.TransportPayloadCapability.LARGE_PAYLOAD,
             )
             return result
@@ -236,7 +236,7 @@ class PAVSTIUtils:
             return e
 
     async def send_csr_command(
-        self, nonce: bytes, expected_status: Status = Status.Success
+        self, endpoint: int, nonce: bytes, expected_status: Status = Status.Success
     ) -> Union[
         Clusters.TlsCertificateManagement.Commands.TLSClientCSRResponse,
         InteractionModelError,
@@ -246,7 +246,7 @@ class PAVSTIUtils:
                 cmd=Clusters.TlsCertificateManagement.Commands.TLSClientCSR(
                     nonce=nonce
                 ),
-                endpoint=self.endpoint,
+                endpoint=endpoint,
                 payloadCapability=ChipDeviceCtrl.TransportPayloadCapability.LARGE_PAYLOAD,
             )
 
@@ -263,7 +263,7 @@ class PAVSTIUtils:
             return e
 
     async def send_provision_client_command(
-        self, certificate: bytes, ccdid: int, expected_status: Status = Status.Success
+        self, endpoint: int, certificate: bytes, ccdid: int, expected_status: Status = Status.Success
     ) -> InteractionModelError:
         try:
             result = await self.send_single_cmd(
@@ -273,8 +273,7 @@ class PAVSTIUtils:
                         clientCertificate=certificate
                     ),
                 ),
-                endpoint=self.endpoint,
-                node_id=self.node_id,
+                endpoint=endpoint,
                 payloadCapability=ChipDeviceCtrl.TransportPayloadCapability.LARGE_PAYLOAD,
             )
             return result
@@ -324,11 +323,11 @@ class PAVSTIUtils:
     ) -> int:
         """Perform provisioning steps to set up TLS endpoint."""
         root_cert_der = server.get_root_cert()
-        prc_result = await self.send_provision_root_command(certificate=root_cert_der)
+        prc_result = await self.send_provision_root_command(endpoint=endpoint, certificate=root_cert_der)
         self.assert_valid_caid(prc_result.caid)
 
         csr_nonce = random.randbytes(32)
-        csr_result = await self.send_csr_command(nonce=csr_nonce)
+        csr_result = await self.send_csr_command(endpoint=endpoint, nonce=csr_nonce)
         self.assert_valid_ccdid(csr_result.ccdid)
         self.assert_valid_csr(csr_result, csr_nonce)
 
@@ -336,7 +335,7 @@ class PAVSTIUtils:
         device_cert_der = server.get_device_certificate()
 
         await self.send_provision_client_command(
-            certificate=device_cert_der, ccdid=csr_result.ccdid
+            endpoint=endpoint, certificate=device_cert_der, ccdid=csr_result.ccdid
         )
         result = await self.send_provision_tls_endpoint_command(
             endpoint=endpoint,
