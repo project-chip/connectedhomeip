@@ -8345,6 +8345,10 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
             result = @"PanMax";
             break;
 
+        case MTRAttributeIDTypeClusterCameraAVSettingsUserLevelManagementAttributeMovementStateID:
+            result = @"MovementState";
+            break;
+
         case MTRAttributeIDTypeClusterCameraAVSettingsUserLevelManagementAttributeGeneratedCommandListID:
             result = @"GeneratedCommandList";
             break;

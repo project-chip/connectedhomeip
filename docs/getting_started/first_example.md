@@ -28,10 +28,10 @@ for testing.
 interactive shell. More information on chip-tool can be found in the
 [chip-tool guide](../development_controllers/chip-tool/chip_tool_guide.md).
 
-[chip-repl](../../src/controller/python/chip-repl.py) is a shell for the python
-controller. The chip-repl is part of the python controller framework, often used
-for testing. More information about the python controller can be found in the
-[python testing](../testing/python.md) documentation.
+[matter-repl](../../src/controller/python/matter-repl.py) is a shell for the
+python controller. The matter-repl is part of the python controller framework,
+often used for testing. More information about the python controller can be
+found in the [python testing](../testing/python.md) documentation.
 
 ## Building your first demo app (lighting)
 

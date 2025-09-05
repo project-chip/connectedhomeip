@@ -17,7 +17,7 @@
  */
 
 #include "EnergyGatewayAppCommonMain.h"
-#include "CommodityMeteringInstance.h"
+#include "CommodityMeteringMain.h"
 #include "CommodityPriceMain.h"
 #include "ElectricalGridConditionsMain.h"
 #include "MeterIdentificationInstance.h"
@@ -71,6 +71,7 @@ void ElectricalEnergyTariffInit()
 {
     EndpointId kElectricalEnergyTariffEndpointId = 1;
 
+    VerifyOrDie(CommodityMeteringInit(kElectricalEnergyTariffEndpointId) == CHIP_NO_ERROR);
     VerifyOrDie(CommodityPriceInit(kElectricalEnergyTariffEndpointId) == CHIP_NO_ERROR);
     VerifyOrDie(ElectricalGridConditionsInit(kElectricalEnergyTariffEndpointId) == CHIP_NO_ERROR);
 
