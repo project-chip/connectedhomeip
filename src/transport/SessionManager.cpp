@@ -685,18 +685,7 @@ void SessionManager::HandleConnectionReceived(Transport::ActiveTCPConnectionStat
 void SessionManager::HandleConnectionAttemptComplete(Transport::ActiveTCPConnectionHolder & conn, CHIP_ERROR conErr)
 {
     VerifyOrReturn(!conn.IsNull());
-
-    Transport::AppTCPConnectionCallbackCtxt * appTCPConnCbCtxt = conn->mAppState;
-    if (appTCPConnCbCtxt == nullptr)
-    {
-        return;
-    }
-
-    if (appTCPConnCbCtxt->connCompleteCb != nullptr)
-    {
-        appTCPConnCbCtxt->connCompleteCb(conn, conErr);
-    }
-    else
+    if (mConnDelegate == nullptr || !mConnDelegate->OnTCPConnectionAttemptComplete(conn, conErr))
     {
         char peerAddrBuf[chip::Transport::PeerAddress::kMaxToStringSize];
         conn->mPeerAddr.ToString(peerAddrBuf);
@@ -707,19 +696,7 @@ void SessionManager::HandleConnectionAttemptComplete(Transport::ActiveTCPConnect
 
 void SessionManager::HandleConnectionClosed(Transport::ActiveTCPConnectionState & conn, CHIP_ERROR conErr)
 {
-    Transport::ActiveTCPConnectionHolder holder(&conn);
-    MarkSecureSessionOverTCPForEviction(holder, conErr);
-
-    // TODO: A mechanism to mark an unauthenticated session as unusable when
-    // the underlying connection is broken. Issue #32323
-
-    Transport::AppTCPConnectionCallbackCtxt * appTCPConnCbCtxt = conn.mAppState;
-    VerifyOrReturn(appTCPConnCbCtxt != nullptr);
-
-    if (appTCPConnCbCtxt->connClosedCb != nullptr)
-    {
-        appTCPConnCbCtxt->connClosedCb(conn, conErr);
-    }
+    MarkSecureSessionOverTCPForEviction(conn, conErr);
 }
 
 CHIP_ERROR SessionManager::TCPConnect(const PeerAddress & peerAddress, Transport::AppTCPConnectionCallbackCtxt * appState,
@@ -1308,7 +1285,7 @@ Optional<SessionHandle> SessionManager::FindSecureSessionForNode(ScopedNodeId pe
 }
 
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
-void SessionManager::MarkSecureSessionOverTCPForEviction(Transport::ActiveTCPConnectionHolder & conn, CHIP_ERROR conErr)
+void SessionManager::MarkSecureSessionOverTCPForEviction(Transport::ActiveTCPConnectionState & conn, CHIP_ERROR conErr)
 {
     // Mark the corresponding secure sessions for eviction
     mSecureSessions.ForEachSession([&](auto session) {
@@ -1319,7 +1296,7 @@ void SessionManager::MarkSecureSessionOverTCPForEviction(Transport::ActiveTCPCon
             // closure.
             if (mConnDelegate != nullptr)
             {
-                mConnDelegate->OnTCPConnectionClosed(handle, conErr);
+                mConnDelegate->OnTCPConnectionClosed(conn, handle, conErr);
             }
 
             // Mark session for eviction.

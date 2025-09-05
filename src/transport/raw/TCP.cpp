@@ -150,7 +150,7 @@ ActiveTCPConnectionState * TCPBase::AllocateConnection(Inet::TCPEndPoint * endpo
     // If a peer initiates a connection through HandleIncomingConnection but the connection is never claimed
     // in ProcessSingleMessage, we'll be left with a dangling ActiveTCPConnectionState which can be
     // reclaimed.  Don't try to reclaim these connections unless we're out of space
-    for (int reclaim = 0; reclaim < 1; reclaim++)
+    for (int reclaim = 0; reclaim < 2; reclaim++)
     {
         for (size_t i = 0; i < mActiveConnectionsSize; i++)
         {
@@ -283,7 +283,29 @@ CHIP_ERROR TCPBase::StartConnect(const PeerAddress & addr, Transport::AppTCPConn
 
     InitEndpoint(endPoint);
 
-    ActiveTCPConnectionHolder activeConnection = AllocateConnection(endPoint, addr);
+    ActiveTCPConnectionHolder activeConnection = FindInUseConnection(addr);
+    // Re-use existing connection to peer if already connected
+    if (!activeConnection.IsNull())
+    {
+        if (appState != nullptr)
+        {
+            // We do not support parallel attempts to connect to peer when setting appState
+            VerifyOrReturnError(activeConnection->mConnectionState == TCPState::kConnected &&
+                                    activeConnection->mAppState == nullptr,
+                                CHIP_ERROR_INCORRECT_STATE);
+            activeConnection->mAppState = appState;
+        }
+        outPeerConnState = activeConnection;
+
+        if (activeConnection->mConnectionState == TCPState::kConnected)
+        {
+            HandleConnectionAttemptComplete(activeConnection, CHIP_NO_ERROR);
+        }
+
+        return CHIP_NO_ERROR;
+    }
+
+    activeConnection = AllocateConnection(endPoint, addr);
     VerifyOrReturnError(!activeConnection.IsNull(), CHIP_ERROR_NO_MEMORY);
     activeConnection->mAppState        = appState;
     activeConnection->mConnectionState = TCPState::kConnecting;

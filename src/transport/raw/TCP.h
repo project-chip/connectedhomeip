@@ -211,7 +211,7 @@ private:
     friend class TCPBaseTestAccess;
 
     /**
-     * Allocate an initialize a connection from the pool.
+     * Allocate and initialize a connection from the pool.
      */
     ActiveTCPConnectionState * AllocateConnection(Inet::TCPEndPoint * endpoint, const PeerAddress & address);
     /**

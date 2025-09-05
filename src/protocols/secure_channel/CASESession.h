@@ -542,11 +542,9 @@ private:
     void InvalidateIfPendingEstablishmentOnFabric(FabricIndex fabricIndex);
 
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
-    static void HandleConnectionAttemptComplete(Transport::ActiveTCPConnectionHolder & conn, CHIP_ERROR conErr);
-    static void HandleConnectionClosed(Transport::ActiveTCPConnectionState & conn, CHIP_ERROR conErr);
+    void HandleConnectionAttemptComplete(Transport::ActiveTCPConnectionHolder & conn, CHIP_ERROR conErr) override;
+    void HandleConnectionClosed(const Transport::ActiveTCPConnectionState & conn, CHIP_ERROR conErr) override;
 
-    // Context to pass down when connecting to peer
-    Transport::AppTCPConnectionCallbackCtxt mTCPConnCbCtxt;
     // Pointer to the underlying TCP connection state. Returned by the
     // TCPConnect() method (on the connection Initiator side) when an
     // ActiveTCPConnectionState object is allocated. This connection

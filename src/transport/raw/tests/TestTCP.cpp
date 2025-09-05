@@ -53,7 +53,6 @@ namespace {
 constexpr size_t kMaxTcpActiveConnectionCount = 4;
 constexpr size_t kMaxTcpPendingPackets        = 4;
 constexpr size_t kPacketSizeBytes             = sizeof(uint32_t);
-chip::Transport::AppTCPConnectionCallbackCtxt gAppTCPConnCbCtxt;
 
 using TCPImpl    = Transport::TCP<kMaxTcpActiveConnectionCount, kMaxTcpPendingPackets>;
 using TestAccess = Transport::TCPBaseTestAccess<kMaxTcpActiveConnectionCount, kMaxTcpPendingPackets>;
@@ -181,11 +180,6 @@ public:
         mReceiveHandlerCallCount        = 0;
         mHandleConnectionCompleteCalled = false;
         mHandleConnectionCloseCalled    = false;
-
-        gAppTCPConnCbCtxt.appContext     = nullptr;
-        gAppTCPConnCbCtxt.connReceivedCb = nullptr;
-        gAppTCPConnCbCtxt.connCompleteCb = nullptr;
-        gAppTCPConnCbCtxt.connClosedCb   = nullptr;
     }
 
     void SingleMessageTest(TCPImpl & tcp, const IPAddress & addr, uint16_t port)
@@ -202,7 +196,7 @@ public:
         CHIP_ERROR err = header.EncodeBeforeData(buffer);
         EXPECT_EQ(err, CHIP_NO_ERROR);
 
-        err = tcp.TCPConnect(Transport::PeerAddress::TCP(addr, port), &gAppTCPConnCbCtxt, refHolder);
+        err = tcp.TCPConnect(Transport::PeerAddress::TCP(addr, port), nullptr, refHolder);
         EXPECT_EQ(err, CHIP_NO_ERROR);
 
         // Should be able to send a message to itself by just calling send.
@@ -218,7 +212,7 @@ public:
     void ConnectTest(TCPImpl & tcp, const IPAddress & addr, uint16_t port)
     {
         // Connect and wait for seeing active connection
-        CHIP_ERROR err = tcp.TCPConnect(Transport::PeerAddress::TCP(addr, port), &gAppTCPConnCbCtxt, activeTCPConnState);
+        CHIP_ERROR err = tcp.TCPConnect(Transport::PeerAddress::TCP(addr, port), nullptr, activeTCPConnState);
         EXPECT_EQ(err, CHIP_NO_ERROR);
 
         mIOContext->DriveIOUntil(chip::System::Clock::Seconds16(5), [&tcp]() { return tcp.HasActiveConnections(); });
@@ -229,7 +223,7 @@ public:
     {
         // Connect and wait for seeing active connection and connection complete
         // handler being called.
-        CHIP_ERROR err = tcp.TCPConnect(Transport::PeerAddress::TCP(addr, port), &gAppTCPConnCbCtxt, activeTCPConnState);
+        CHIP_ERROR err = tcp.TCPConnect(Transport::PeerAddress::TCP(addr, port), nullptr, activeTCPConnState);
         EXPECT_EQ(err, CHIP_NO_ERROR);
 
         mIOContext->DriveIOUntil(chip::System::Clock::Seconds16(5), [this]() { return mHandleConnectionCompleteCalled; });
@@ -240,7 +234,7 @@ public:
     {
         // Connect and wait for seeing active connection and connection complete
         // handler being called.
-        CHIP_ERROR err = tcp.TCPConnect(Transport::PeerAddress::TCP(addr, port), &gAppTCPConnCbCtxt, activeTCPConnState);
+        CHIP_ERROR err = tcp.TCPConnect(Transport::PeerAddress::TCP(addr, port), nullptr, activeTCPConnState);
         EXPECT_EQ(err, CHIP_NO_ERROR);
 
         mIOContext->DriveIOUntil(chip::System::Clock::Seconds16(5), [this]() { return mHandleConnectionCompleteCalled; });

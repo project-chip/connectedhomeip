@@ -401,12 +401,6 @@ void CASESession::Clear()
     mFabricsTable = nullptr;
     mFabricIndex  = kUndefinedFabricIndex;
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
-    // Clear the context object.
-    mTCPConnCbCtxt.appContext     = nullptr;
-    mTCPConnCbCtxt.connCompleteCb = nullptr;
-    mTCPConnCbCtxt.connClosedCb   = nullptr;
-    mTCPConnCbCtxt.connReceivedCb = nullptr;
-
     if (!mPeerConnState.IsNull())
     {
         // Set the app state callback object in the Connection state to null
@@ -453,11 +447,6 @@ CHIP_ERROR CASESession::Init(SessionManager & sessionManager, Credentials::Certi
     mValidContext.mRequiredKeyPurposes.Set(KeyPurposeFlags::kServerAuth);
     mValidContext.mValidityPolicy = policy;
 
-#if INET_CONFIG_ENABLE_TCP_ENDPOINT
-    mTCPConnCbCtxt.appContext     = this;
-    mTCPConnCbCtxt.connCompleteCb = HandleConnectionAttemptComplete;
-    mTCPConnCbCtxt.connClosedCb   = HandleConnectionClosed;
-#endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
     return CHIP_NO_ERROR;
 }
 
@@ -550,8 +539,10 @@ CHIP_ERROR CASESession::EstablishSession(SessionManager & sessionManager, Fabric
     if (peerAddress.GetTransportType() == Transport::Type::kTcp)
     {
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
-        err = sessionManager.TCPConnect(peerAddress, &mTCPConnCbCtxt, mPeerConnState);
+        err = sessionManager.TCPConnect(peerAddress, nullptr, mPeerConnState);
         SuccessOrExit(err);
+#else
+        err = CHIP_ERROR_NOT_IMPLEMENTED;
 #endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
     }
     else
@@ -678,53 +669,40 @@ CHIP_ERROR CASESession::RecoverInitiatorIpk()
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
 void CASESession::HandleConnectionAttemptComplete(Transport::ActiveTCPConnectionHolder & conn, CHIP_ERROR err)
 {
-    VerifyOrReturn(!conn.IsNull());
-    // conn->mAppState should not be NULL. SessionManager has already checked
-    // before calling this callback.
-    VerifyOrDie(conn->mAppState != nullptr);
+    VerifyOrReturn(conn == mPeerConnState);
 
     char peerAddrBuf[chip::Transport::PeerAddress::kMaxToStringSize];
     conn->mPeerAddr.ToString(peerAddrBuf);
 
-    CASESession * caseSession = reinterpret_cast<CASESession *>(conn->mAppState->appContext);
-    VerifyOrReturn(caseSession != nullptr);
+    auto ConnectionCleanup = [](CASESession * s) {
+        s->mExchangeCtxt.Value()->GetSessionHandle()->AsUnauthenticatedSession()->ReleaseTCPConnection();
+        s->mSecureSessionHolder.Get().Value()->AsSecureSession()->ReleaseTCPConnection();
+        s->Clear();
+    };
+    std::unique_ptr<CASESession, decltype(ConnectionCleanup)> connectionHolder(this, ConnectionCleanup);
 
-    // Exit and disconnect if connection setup encountered an error.
-    SuccessOrExit(err);
+    // Bail if connection setup encountered an error.
+    LogAndReturnOnFailure(err, SecureChannel, "Connection establishment failed with peer at %s", peerAddrBuf);
 
     ChipLogDetail(SecureChannel, "TCP Connection established with %s before session establishment", peerAddrBuf);
 
     // Associate the connection with the current unauthenticated session for the
     // CASE exchange.
-    caseSession->mExchangeCtxt.Value()->GetSessionHandle()->AsUnauthenticatedSession()->SetTCPConnection(conn);
+    mExchangeCtxt.Value()->GetSessionHandle()->AsUnauthenticatedSession()->SetTCPConnection(conn);
 
     // Associate the connection with the current secure session that is being
     // set up.
-    caseSession->mSecureSessionHolder.Get().Value()->AsSecureSession()->SetTCPConnection(conn);
+    mSecureSessionHolder.Get().Value()->AsSecureSession()->SetTCPConnection(conn);
 
     // Send Sigma1 after connection is established for sessions over TCP
-    err = caseSession->SendSigma1();
-    SuccessOrExit(err);
+    LogAndReturnOnFailure(SendSigma1(), SecureChannel, "Sigma1 failed to peer %s", peerAddrBuf);
 
-exit:
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogError(SecureChannel, "Connection establishment failed with peer at %s: %" CHIP_ERROR_FORMAT, peerAddrBuf,
-                     err.Format());
-
-        caseSession->Clear();
-    }
+    connectionHolder.release();
 }
 
-void CASESession::HandleConnectionClosed(Transport::ActiveTCPConnectionState & conn, CHIP_ERROR conErr)
+void CASESession::HandleConnectionClosed(const Transport::ActiveTCPConnectionState & conn, CHIP_ERROR conErr)
 {
-    // conn->mAppState should not be NULL. SessionManager has already checked
-    // before calling this callback.
-    VerifyOrDie(conn.mAppState != nullptr);
-
-    CASESession * caseSession = reinterpret_cast<CASESession *>(conn.mAppState->appContext);
-    VerifyOrReturn(caseSession != nullptr);
-
+    VerifyOrReturn(conn == mPeerConnState);
     // Drop our pointer to the now-invalid connection state.
     //
     // Since the connection is closed, message sends over the ExchangeContext
@@ -733,7 +711,7 @@ void CASESession::HandleConnectionClosed(Transport::ActiveTCPConnectionState & c
     // Additionally, SessionManager notifies (via ExchangeMgr) all ExchangeContexts on the
     // connection closures for the attached sessions and the ExchangeContexts
     // can close proactively if that's appropriate.
-    caseSession->mPeerConnState.Release();
+    mPeerConnState.Release();
     ChipLogDetail(SecureChannel, "TCP Connection for this session has closed");
 }
 #endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
