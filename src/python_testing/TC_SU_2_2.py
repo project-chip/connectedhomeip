@@ -232,6 +232,8 @@ class TC_SU_2_2(MatterBaseTest):
         )
         logger.info(f'Prerequisite #3.2 - ACLs current privileges on Provider with node {provider_node}: {acl_current_provider}')
 
+        return acl_original_provider
+
     async def add_single_ota_provider(self, controller, requestor_node_id: int, provider_node_id: int):
         """
         Adds a single OTA provider to the Requestor's DefaultOTAProviders attribute.
@@ -316,11 +318,11 @@ class TC_SU_2_2(MatterBaseTest):
                      "QueryStatus is set to 'NotAvailable'.",
                      "Verify that the DUT does not send a QueryImage command before the minimum interval defined by spec "
                      "which is 2 minutes (120 seconds) from the last QueryImage command."),
-            # TestStep(4, "DUT sends a QueryImage command to the TH/OTA-P. TH/OTA-P sends a QueryImageResponse back to DUT. " \
-            #          "QueryStatus is set to Busy, Set DelayedActionTime to 3 minutes. On the subsequent QueryImage command, " \
-            #          "TH/OTA-P sends a QueryImageResponse back to DUT. QueryStatus is set to 'UpdateAvailable'.",
-            #          "Verify that the DUT waits for at least the time mentioned in the DelayedActionTime (3 minutes) before issuing another QueryImage command to the TH/OTA-P."
-            #          "Verify that there is a transfer of the software image after the second QueryImageResponse with UpdateAvailable status from the TH/OTA-P to the DUT."),
+            TestStep(4, "DUT sends a QueryImage command to the TH/OTA-P. TH/OTA-P sends a QueryImageResponse back to DUT. "
+                     "QueryStatus is set to Busy, Set DelayedActionTime to 3 minutes. On the subsequent QueryImage command, "
+                     "TH/OTA-P sends a QueryImageResponse back to DUT. QueryStatus is set to 'UpdateAvailable'.",
+                     "Verify that the DUT waits for at least the time mentioned in the DelayedActionTime (3 minutes) before issuing another QueryImage command to the TH/OTA-P."
+                     "Verify that there is a transfer of the software image after the second QueryImageResponse with UpdateAvailable status from the TH/OTA-P to the DUT."),
             # TestStep(5, "DUT sends a QueryImage command to the TH/OTA-P. TH/OTA-P sends a QueryImageResponse back to DUT. QueryStatus is set to 'UpdateAvailable'",
             #          "ImageURI should have the https url from where the image can be downloaded.",
             #          "Verify that the DUT queries the https url and downloads the software image."),
@@ -402,7 +404,7 @@ class TC_SU_2_2(MatterBaseTest):
         # Set ACLs for OTA update:
         # - On Requestor to allow specified Provider to interact with OTA Requestor cluster
         # - On Provider to allow Requestor to interact with OTA Provider cluster
-        await self.set_ota_acls_for_provider(
+        original_provider_acls_s1 = await self.set_ota_acls_for_provider(
             controller,
             requestor_node=requestor_node_id,
             provider_node=provider_node_id_s1,
@@ -599,15 +601,24 @@ class TC_SU_2_2(MatterBaseTest):
         # ------------------------------------------------------------------------------------
         # [STEP_1]: Step #1.4 - Close Provider_S1 Process  (CLEANUP!!!!)
         # ------------------------------------------------------------------------------------
-        logger.info(f'{step_number_s1}:Step #1.4 - Close Provider Process')
-        self.stop_provider(provider_proc)
-
-        await asyncio.sleep(3)
+        logger.info(f'{step_number_s1}: Step #1.4 - Clean Close Provider_S1 Process')
 
         # Expire sessions
         controller.ExpireSessions(provider_node_id_s1)
+        await asyncio.sleep(1)
+
+        # Clean Provider ACL
+        await self.write_acl(controller, provider_node_id_s1, original_provider_acls_s1)
+        logger.info(f'{step_number_s1}: Step #1.4 - Cleaned ACLs on Provider {provider_node_id_s1}, restored original entries')
+        await asyncio.sleep(1)
+
+        # Kill Provider
+        self.stop_provider(provider_proc)
+        await asyncio.sleep(1)
+
+        # Delete KVS files
         subprocess.run("rm -rf /tmp/chip_kvs /tmp/chip_kvs-shm /tmp/chip_kvs-wal", shell=True)
-        await asyncio.sleep(3)
+        await asyncio.sleep(1)
 
         self.step(2)
         # ------------------------------------------------------------------------------------
@@ -661,7 +672,7 @@ class TC_SU_2_2(MatterBaseTest):
         # Set ACLs for OTA update:
         # - On Requestor to allow specified Provider to interact with OTA Requestor cluster
         # - On Provider to allow Requestor to interact with OTA Provider cluster
-        await self.set_ota_acls_for_provider(
+        original_provider_acls_s2 = await self.set_ota_acls_for_provider(
             controller=controller,
             requestor_node=requestor_node_id,     # DUT
             provider_node=provider_node_id_s2,    # Provider
@@ -790,12 +801,24 @@ class TC_SU_2_2(MatterBaseTest):
 
         await asyncio.sleep(270)          # TEMP
 
-        logger.info(f'{step_number_s2}: Step #2.4 - Close Requestor_S2 and Provider_S2 Process.')
-        self.stop_provider(provider_proc_s2)
-        await asyncio.sleep(3)
+        logger.info(f'{step_number_s2}: Step #2.4 - Clean Close Provider_S2 Process.')
+
+        # Expire sessions
         controller.ExpireSessions(provider_node_id_s2)
+        await asyncio.sleep(1)
+
+        # Clean Provider ACL
+        await self.write_acl(controller, provider_node_id_s2, original_provider_acls_s2)
+        logger.info(f'{step_number_s2}: Step #2.4 - Cleaned ACLs on Provider {provider_node_id_s2}, restored original entries')
+        await asyncio.sleep(1)
+
+        # Kill provider
+        self.stop_provider(provider_proc_s2)
+        await asyncio.sleep(1)
+
+        # Delete KVS files
         subprocess.run("rm -rf /tmp/chip_kvs /tmp/chip_kvs-shm /tmp/chip_kvs-wal", shell=True)
-        await asyncio.sleep(2)
+        await asyncio.sleep(1)
 
         # ------------------------------------------------------------------------------------
         # [STEP_3]: Prerequisite Step  # 2.0 - Setup Requestor_S3 and Provider_S3 as DUT
@@ -849,7 +872,7 @@ class TC_SU_2_2(MatterBaseTest):
         # Set ACLs for OTA update:
         # - On Requestor to allow specified Provider to interact with OTA Requestor cluster
         # - On Provider to allow Requestor to interact with OTA Provider cluster
-        await self.set_ota_acls_for_provider(
+        original_provider_acls_s3 = await self.set_ota_acls_for_provider(
             controller=controller,
             requestor_node=requestor_node_id,     # DUT
             provider_node=provider_node_id_s3,    # Provider
@@ -954,7 +977,7 @@ class TC_SU_2_2(MatterBaseTest):
         )
 
         # ------------------------------------------------------------------------------------
-        # [STEP_2]: Step #2.2 - Start a task to collect progress updates and validation
+        # [STEP_3]: Step #2.2 - Start a task to collect progress updates and validation
         # ------------------------------------------------------------------------------------
         try:
             # Wait until the final state (Idle) is reached or timeout (5 min)
@@ -976,12 +999,225 @@ class TC_SU_2_2(MatterBaseTest):
         # [STEP_3]: Step # 2.4 - Close Requestor S_3 and Provider_S3 Process  (CLEANUP!!!!)
         # ------------------------------------------------------------------------------------
 
-        logger.info(f'{step_number_s3}: Step #2.4 - Close Requestor_S3 and Provider_S3 Process.')
-        self.stop_provider(provider_proc_s3)
-        await asyncio.sleep(3)
+        logger.info(f'{step_number_s3}: Step #2.4 - Clean Close Provider_S3 Process.')
+
+        # Expire sessions
         controller.ExpireSessions(provider_node_id_s3)
+        await asyncio.sleep(1)
+
+        # Clean Provider ACL
+        await self.write_acl(controller, provider_node_id_s3, original_provider_acls_s3)
+        logger.info(f'{step_number_s3}: Step #2.4 - Cleaned ACLs on Provider {provider_node_id_s3}, restored original entries')
+        await asyncio.sleep(1)
+
+        # Kill Provider
+        self.stop_provider(provider_proc_s3)
+        await asyncio.sleep(1)
+
+        # Delete KVS file
         subprocess.run("rm -rf /tmp/chip_kvs /tmp/chip_kvs-shm /tmp/chip_kvs-wal", shell=True)
+        await asyncio.sleep(1)
+
+        # ------------------------------------------------------------------------------------
+        # [STEP_4]: Prerequisite Step  # 2.0 - Setup Requestor and Provider_S4 as DUT
+        # ------------------------------------------------------------------------------------
+        self.step(4)
+
+        # Prerequisite #1.0 - Requestor (DUT) info
+        step_number_s4 = "[STEP_4]"
+        logger.info(f'{step_number_s4}: Prerequisite #1.0 - Requestor (DUT), NodeID: {requestor_node_id}, FabricId: {fabric_id}')
+
+        # Prerequisite #1.0 - Provider_S4 info
+        provider_node_id_s4 = 5
+        provider_discriminator_s4 = 1114             # Changed in each step
+        provider_setupPinCode_s4 = 20202022          # Changed in each step
+        provider_port_s4 = 5540                      # Previous used on Steps 1, Provider_S1 5540, Requestor 5541
+        provider_ota_file_s4 = "firmware_requestor_v4.ota"
+        logger.info(f"""{step_number_s4}: Prerequisite #1.0 - Provider:
+            NodeID: {provider_node_id_s4},
+            discriminator: {provider_discriminator_s4},
+            setupPinCode: {provider_setupPinCode_s4},
+            port: {provider_port_s4},
+            ota_file: {provider_ota_file_s4}""")
+
+        logger.info(f'{step_number_s4}: Prerequisite #2.0 - Launch Provider')
+        provider_proc_s4 = self.launch_provider_regex(
+            ota_file=provider_ota_file_s4,
+            discriminator=provider_discriminator_s4,
+            passcode=provider_setupPinCode_s4,
+            secured_device_port=provider_port_s4,
+            wait_for="Status: Satisfied",
+            queue="busy",
+            timeout=180
+        )
+        logger.info(f'{step_number_s4}: Prerequisite #2.0 - Launched Provider PID {provider_proc_s4.pid}')
+
+        # Prerequisite #2.2 - Commission Provider
+        logging.info(f'{step_number_s4}: Prerequisite #2.2 - Commissioning DUT with Provider')
+        resp = await controller.CommissionOnNetwork(
+            nodeId=provider_node_id_s4,
+            setupPinCode=provider_setupPinCode_s4,
+            filterType=ChipDeviceCtrl.DiscoveryFilterType.LONG_DISCRIMINATOR,
+            filter=provider_discriminator_s4
+        )
+        logger.info(f'{step_number_s4}: Prerequisite #2.2 - Provider Commissioning response: {resp}')
+
+        # Prerequisite #3.0 - Setting ACLs
+        logger.info(f'{step_number_s4}: Prerequisite #3.0 - Setting ACLs under FabricIndex {fabric_id}')
+        logger.info(f'{step_number_s4}: Prerequisite #3.0 - Requestor (DUT), NodeID: {requestor_node_id}')
+        logger.info(f'{step_number_s4}: Prerequisite #3.0 - Provider, NodeID: {provider_node_id_s4}')
+
+        # Set ACLs for OTA update:
+        # - On Requestor to allow specified Provider to interact with OTA Requestor cluster
+        # - On Provider to allow Requestor to interact with OTA Provider cluster
+        original_provider_acls_s4 = await self.set_ota_acls_for_provider(
+            controller=controller,
+            requestor_node=requestor_node_id,     # DUT
+            provider_node=provider_node_id_s4,    # Provider
+            fabric_index=fabric_id
+        )
+        logger.info(f'{step_number_s4}: Prerequisite #3.0 - ACLs set between Requestor (DUT) and Provider')
         await asyncio.sleep(2)
+
+        # ------------------------------------------------------------------------------------
+        # [STEP_4]: Step #2.1 - Matcher for OTA records logs
+        # Start Subscribe first to avoid missing any rapid OTA events (race condition)
+        # DUT should respect a 180s DelayedActionTime after Busy response before retrying QueryImage
+        # ------------------------------------------------------------------------------------
+        logger.info(
+            f'{step_number_s4}: Step #2.1 - Create a subscription for the UpdateState attribute (expect Busy → Downloading transition after 180s).')
+        t_start_query = time.time()
+
+        subscription_state_180s = AttributeSubscriptionHandler(
+            expected_cluster=Clusters.OtaSoftwareUpdateRequestor,
+            expected_attribute=Clusters.OtaSoftwareUpdateRequestor.Attributes.UpdateState
+        )
+
+        # Start subscriptions
+        await subscription_state_180s.start(
+            dev_ctrl=controller,
+            node_id=requestor_node_id,  # DUT
+            endpoint=0,
+            fabric_filtered=False,
+            min_interval_sec=1,
+            max_interval_sec=1,
+            keepSubscriptions=True
+        )
+
+        # ------------------------------------------------------------------------------------
+        # [STEP_4]: Step #2.0 - Controller sends AnnounceOTAProvider command
+        # ------------------------------------------------------------------------------------
+
+        logger.info(f'{step_number_s4}: Step #2.0 - Controller sends AnnounceOTAProvider command')
+        cmd_announce = Clusters.OtaSoftwareUpdateRequestor.Commands.AnnounceOTAProvider(
+            providerNodeID=provider_node_id_s4,  # Provider_S2
+            vendorID=0xFFF1,
+            announcementReason=Clusters.OtaSoftwareUpdateRequestor.Enums.AnnouncementReasonEnum.kUpdateAvailable,
+            metadataForNode=None,
+            endpoint=0
+        )
+        logger.info(f'{step_number_s4}: Step #2.0 - cmd AnnounceOTAProvider: {cmd_announce}')
+
+        resp_announce = await self.send_single_cmd(
+            dev_ctrl=controller,
+            node_id=requestor_node_id,  # DUT NodeID
+            cmd=cmd_announce
+        )
+        logging.info(f'{step_number_s4}: Step #2.0 - cmd AnnounceOTAProvider response: {resp_announce}.')
+
+        # ------------------------------------------------------------------------------------
+        # [STEP_4]: Step #2.1 - Matcher for OTA records logs
+        # Track OTA UpdateState: observed states expect kDelayedOnQuery (Busy) > Downloading after ~180s delay
+        # ------------------------------------------------------------------------------------
+
+        observed_states = set()
+        state_sequence = []  # Full OTA state flow
+        final_downloading_seen = False
+
+        def busy_state_delayed_update_180s(report):
+            """
+            Step #2.1 Matcher for 180s DelayedActionTime:
+            Expect UpdateState to go from kDelayedOnQuery (Busy) to Downloading after ~180s.
+            """
+            nonlocal observed_states, final_downloading_seen, state_sequence
+            global t_start_downloading
+            val = report.value
+
+            if val is None:
+                return False
+
+            if val == Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kDelayedOnQuery:  # 3
+                if val not in observed_states:
+                    observed_states.add(val)
+                    state_sequence.append(val)
+                    logger.info(f'{step_number_s4}: Step #2.1 - UpdateState recorded: {val}')
+
+            elif val == Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kDownloading:   # 4
+                if not final_downloading_seen:  # log only once
+                    final_downloading_seen = True
+                    state_sequence.append(val)
+                    t_start_downloading = time.time()
+                    logger.info(
+                        f'{step_number_s4}:Step #2.1 - OTA UpdateState sequence transitioned to Downloading after Busy (expect ~180s).')
+            # Return True only when Downloading is reached
+            return final_downloading_seen
+
+        # Create matcher object for UpdateState (expect Busy → Downloading transition after 180s).
+        matcher_busy_state_delayed_180s_obj = AttributeMatcher.from_callable(
+            description="Validate OTA Busy UpdateState transitions after 180s delay: kDelayedOnQuery > Downloading",
+            matcher=busy_state_delayed_update_180s
+        )
+
+        # ------------------------------------------------------------------------------------
+        # [STEP_4]: Step #2.2 - Start a task to collect progress updates and validation
+        # (Busy→Downloading after 180s)
+        # ------------------------------------------------------------------------------------
+        try:
+            # Wait until the final state (Idle) is reached or timeout (20 min)
+            await subscription_state_180s.await_all_expected_report_matches([matcher_busy_state_delayed_180s_obj], timeout_sec=300.0)
+            logger.info(f'{step_number_s4}: Step #2.2 - UpdateState Busy > Downloading transition (180s) successfully observed.')
+        except Exception as e:
+            logger.warning(f"OTA update encountered an error or timeout: {e}")
+        finally:
+            # Cancel both subscriptions and task
+            await subscription_state_180s.cancel()
+
+        # ------------------------------------------------------------------------------------
+        # [STEP_4]: Step # 2.3 - Verify image transfer from TH/OTA-P to DUT from Busy → Downloading
+        # # Validate that DUT respects 180s DelayedActionTime and that image transfer starts after Downloading
+        # ------------------------------------------------------------------------------------
+        logger.info(f'{step_number_s4}: Step #2.3 - Full OTA state sequence observed: {state_sequence}')
+        logger.info(f'{step_number_s4}: Step #2.3 - Time Start as Busy: {t_start_query}, Time Start Downloading: {t_start_downloading}')
+        delayed_action_time = t_start_downloading - t_start_query
+        logger.info(f'{step_number_s4}: Step #2.3 - Observed delay:: {delayed_action_time:.2f} s.')
+
+        asserts.assert_true(delayed_action_time >= 180,
+                            f"Expected delay >= 180 seconds, but got {delayed_action_time:.2f} seconds")
+
+        # ------------------------------------------------------------------------------------
+        # [STEP_4]: Step # 2.4 - Close Requestor and Provider_S4 Process  (CLEANUP!!!!)
+        # ------------------------------------------------------------------------------------
+
+        await asyncio.sleep(270)          # TEMP
+
+        logger.info(f'{step_number_s4}: Step #2.4 - Clean Close Provider_S4 Process.')
+
+        # Expire sessions
+        controller.ExpireSessions(provider_node_id_s4)
+        await asyncio.sleep(1)
+
+        # Clean Provider ACL
+        await self.write_acl(controller, provider_node_id_s4, original_provider_acls_s4)
+        logger.info(f'{step_number_s4}: Step #2.4 - Cleaned ACLs on Provider {provider_node_id_s4}, restored original entries')
+        await asyncio.sleep(1)
+
+        # Kill Provider
+        self.stop_provider(provider_proc_s4)
+        await asyncio.sleep(1)
+
+        # Delete KVS files
+        subprocess.run("rm -rf /tmp/chip_kvs /tmp/chip_kvs-shm /tmp/chip_kvs-wal", shell=True)
+        await asyncio.sleep(1)
 
 
 if __name__ == "__main__":
