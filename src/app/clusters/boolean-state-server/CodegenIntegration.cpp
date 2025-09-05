@@ -103,7 +103,7 @@ BooleanStateCluster * GetClusterForEndpointIndex(EndpointId endpointId)
         },
         integrationDelegate);
 
-    return dynamic_cast<BooleanStateCluster *>(booleanState);
+    return static_cast<BooleanStateCluster *>(booleanState);
 }
 
 } // namespace chip::app::Clusters::BooleanState
