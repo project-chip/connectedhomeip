@@ -17,6 +17,7 @@
 
 
 import logging
+import time
 
 from mobly import asserts
 
@@ -47,7 +48,7 @@ class TC_SU_2_8(MatterBaseTest):
         steps = [
             TestStep(0, "Commissioning, already done.", is_commissioning=True),
             TestStep(1, "Configure DefaultOTAProviders with invalid node ID. DUT tries to send a QueryImage command to TH1/OTA-P.",
-                     "TH1/OTA-P does not respond."),
+                     "TH1/OTA-P does not respond with QueryImage response command."),
             TestStep(2, "DUT sends QueryImage command to TH2/OTA-P.",
                      "Subscribe to events for OtaSoftwareUpdateRequestor cluster and verify StateTransition reaches downloading state. Also check if the targetSoftwareVersion is 2."),
         ]
@@ -58,16 +59,16 @@ class TC_SU_2_8(MatterBaseTest):
         fabric_index = controller.fabricId
         return ProviderLoc(providerNodeID=provider_node_id, endpoint=endpoint, fabricIndex=fabric_index)
 
-    async def _write_default_providers(self, controller, endpoint, node_id):
+    async def _write_default_providers(self, controller, endpoint, provider_node_id, dut_node_id):
         """
         Write default OTA providers.
         """
 
-        prov = self._make_provider_location(controller, node_id, endpoint)
+        prov = self._make_provider_location(controller, provider_node_id, endpoint)
 
         logging.info("Writing DefaultOTAProviders.")
         resp = await controller.WriteAttribute(
-            self.dut_node_id,
+            dut_node_id,
             [(endpoint, Clusters.Objects.OtaSoftwareUpdateRequestor.Attributes.DefaultOTAProviders([prov]))]
         )
         asserts.assert_equal(resp[0].Status, Status.Success, "Write DefaultOTAProviders failed.")
@@ -179,7 +180,7 @@ class TC_SU_2_8(MatterBaseTest):
         self.step(1)
 
         # Write default OTA providers TH1 with p1_node which does not exist
-        await self._write_default_providers(th1, endpoint, p1_node)
+        await self._write_default_providers(th1, endpoint, p1_node, dut_node_id)
 
         default_ota_providers = await self.read_single_attribute_check_success(
             node_id=self.dut_node_id,
@@ -193,13 +194,13 @@ class TC_SU_2_8(MatterBaseTest):
 
         # Do not announce TH1-OTA Provider
 
-        # ADD SUBSCRIPTION
+        # To avoid the DUT/requestor enter an invalid state, there is no sleep time here and the test step 2 starts right away.
 
         # DUT sends QueryImage command to TH2/OTA-P.
         self.step(2)
 
         # Write default OTA providers TH2
-        await self._write_default_providers(th2, endpoint, p2_node)
+        await self._write_default_providers(th2, endpoint, p2_node, dut_node_id_th2)
 
         # Write defaul OTA providers TH2
         default_ota_providers = await self.read_single_attribute_check_success(
@@ -217,6 +218,8 @@ class TC_SU_2_8(MatterBaseTest):
         event_cb = EventSubscriptionHandler(expected_cluster=Clusters.Objects.OtaSoftwareUpdateRequestor)
         await event_cb.start(dev_ctrl=th2, node_id=dut_node_id, endpoint=endpoint,
                              fabric_filtered=False, min_interval_sec=0, max_interval_sec=5)
+
+        time.sleep(5)
 
         # Announce after subscription
         await self._announce(th2, vendor_id, p2_node, endpoint)
