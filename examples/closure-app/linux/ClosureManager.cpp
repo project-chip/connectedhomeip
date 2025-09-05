@@ -142,17 +142,24 @@ CHIP_ERROR ClosureManager::SetClosureControlInitialState(ClosureControlEndpoint 
     Optional<DataModel::Nullable<CurrentPositionEnum>> currentPosition =
         conformance.HasFeature(ClosureControl::Feature::kPositioning)
         ? MakeOptional(DataModel::MakeNullable(CurrentPositionEnum::kFullyClosed))
-        : NullNullable;
+        : NullOptional;
     Optional<DataModel::Nullable<bool>> currentLatch = conformance.HasFeature(ClosureControl::Feature::kMotionLatching)
         ? MakeOptional(DataModel::MakeNullable(true))
-        : NullNullable;
+        : NullOptional;
     Optional<Globals::ThreeLevelAutoEnum> speed =
         conformance.HasFeature(ClosureControl::Feature::kSpeed) ? MakeOptional(Globals::ThreeLevelAutoEnum::kAuto) : NullOptional;
     DataModel::Nullable<GenericOverallCurrentState> overallState(
         GenericOverallCurrentState(currentPosition, currentLatch, speed, DataModel::MakeNullable(true)));
     ReturnErrorOnFailure(closureControlEndpoint.GetLogic().SetOverallCurrentState(overallState));
 
-    DataModel::Nullable<GenericOverallTargetState> overallTarget(GenericOverallTargetState(NullNullable, NullNullable, speed));
+    Optional<DataModel::Nullable<TargetPositionEnum>> targetPosition =
+        conformance.HasFeature(ClosureControl::Feature::kPositioning)
+        ? MakeOptional(DataModel::NullNullable)
+        : NullOptional;
+    Optional<DataModel::Nullable<bool>> targetLatch = conformance.HasFeature(ClosureControl::Feature::kMotionLatching)
+        ? MakeOptional(DataModel::NullNullable)
+        : NullOptional;
+    DataModel::Nullable<GenericOverallTargetState> overallTarget(GenericOverallTargetState(targetPosition, targetLatch, speed));
     ReturnErrorOnFailure(closureControlEndpoint.GetLogic().SetOverallTargetState(overallTarget));
 
     if (conformance.HasFeature(ClosureControl::Feature::kPositioning) &&
@@ -180,17 +187,23 @@ CHIP_ERROR ClosureManager::SetClosurePanelInitialState(ClosureDimensionEndpoint 
 
     Optional<DataModel::Nullable<Percent100ths>> currentPosition = conformance.HasFeature(ClosureDimension::Feature::kPositioning)
         ? MakeOptional(DataModel::MakeNullable<Percent100ths>(10000))
-        : NullNullable;
+        : NullOptional;
     Optional<DataModel::Nullable<bool>> currentLatch = conformance.HasFeature(ClosureDimension::Feature::kMotionLatching)
         ? MakeOptional(DataModel::MakeNullable(true))
-        : NullNullable;
+        : NullOptional;
     Optional<Globals::ThreeLevelAutoEnum> speed =
         conformance.HasFeature(ClosureDimension::Feature::kSpeed) ? MakeOptional(Globals::ThreeLevelAutoEnum::kAuto) : NullOptional;
     DataModel::Nullable<GenericDimensionStateStruct> currentState(
         GenericDimensionStateStruct(currentPosition, currentLatch, speed));
     ReturnErrorOnFailure(closurePanelEndpoint.GetLogic().SetCurrentState(currentState));
 
-    DataModel::Nullable<GenericDimensionStateStruct> targetState(GenericDimensionStateStruct(NullNullable, NullNullable, speed));
+    Optional<DataModel::Nullable<Percent100ths>> targetPosition = conformance.HasFeature(ClosureDimension::Feature::kPositioning)
+        ? MakeOptional(DataModel::NullNullable)
+        : NullOptional;
+    Optional<DataModel::Nullable<bool>> targetLatch = conformance.HasFeature(ClosureDimension::Feature::kMotionLatching)
+        ? MakeOptional(DataModel::NullNullable)
+        : NullOptional;
+    DataModel::Nullable<GenericDimensionStateStruct> targetState(GenericDimensionStateStruct(targetPosition, targetLatch, speed));
     ReturnErrorOnFailure(closurePanelEndpoint.GetLogic().SetTargetState(targetState));
 
     if (conformance.HasFeature(ClosureDimension::Feature::kPositioning))
