@@ -103,27 +103,21 @@ class TC_SU_2_8(MatterBaseTest):
     @async_test_body
     async def test_TC_SU_2_8(self):
 
-        # TH variables
-        P1_NODE_ID = 10
-        P2_NODE_ID = 11
-        P1_DISCRIMINATOR = 1111
-        P2_DISCRIMINATOR = P1_DISCRIMINATOR
-        OTA_PROVIDER_PASSCODE = 20202021
-
         # Variables for TH1-OTA Provider
-        p1_node = P1_NODE_ID
+        p1_node = 10
 
         # Variables for TH2-OTA Provider
-        p2_node = P2_NODE_ID
-        p2_disc = P2_DISCRIMINATOR
+        p2_node = 11
+        p2_disc = 1111
 
-        p_pass = OTA_PROVIDER_PASSCODE
+        p_pass = 20202021
 
         # Commissioning TH-OTA Provider
         self.step(0)
 
         endpoint = self.get_endpoint(default=0)
         dut_node_id = self.dut_node_id
+        dut_node_id_th2 = self.dut_node_id
         th1 = self.default_controller
         fabric_id_th2 = th1.fabricId + 1
         vendor_id = 0xFFF1
@@ -139,12 +133,10 @@ class TC_SU_2_8(MatterBaseTest):
         logging.info("Setting up TH2.")
         th2_certificate_auth = self.certificate_authority_manager.NewCertificateAuthority()
         th2_fabric_admin = th2_certificate_auth.NewFabricAdmin(vendorId=vendor_id, fabricId=fabric_id_th2)
-        th2 = th2_fabric_admin.NewController(nodeId=3, useTestCommissioner=True)
+        th2 = th2_fabric_admin.NewController(nodeId=2, useTestCommissioner=True)
 
         logging.info("Opening commissioning window on DUT.")
         params = await self.open_commissioning_window(th1, dut_node_id)
-
-        dut_node_id_th2 = dut_node_id
 
         # Commission TH2/DUT (requestor)
         resp = await th2.CommissionOnNetwork(
