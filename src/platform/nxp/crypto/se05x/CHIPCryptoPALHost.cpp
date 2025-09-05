@@ -1175,6 +1175,7 @@ CHIP_ERROR ExtractPubkeyFromX509Cert(const ByteSpan & certificate, Crypto::P256P
                  error = CHIP_ERROR_INVALID_ARGUMENT);
 
     keypair = mbedtls_pk_ec(mbed_cert.CHIP_CRYPTO_PAL_PRIVATE_X509(pk));
+    VerifyOrExit(keypair != nullptr, error = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(keypair->CHIP_CRYPTO_PAL_PRIVATE(grp).id == MapECPGroupId(pubkey.Type()), error = CHIP_ERROR_INVALID_ARGUMENT);
     // Copy the public key from the cert in raw point format
     result =
