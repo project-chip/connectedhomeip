@@ -234,6 +234,7 @@ config DYNAMIC_INTERRUPTS
     default y
 
 config RISCV_MTVEC_VECTORED_MODE
+	bool
     default n
 
 config CHIP_OTA_REQUESTOR
