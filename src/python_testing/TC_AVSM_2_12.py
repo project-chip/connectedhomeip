@@ -641,7 +641,8 @@ class TC_AVSM_2_12(MatterBaseTest):
             statusLightEnabledNew = await self.read_single_attribute_check_success(
                 endpoint=endpoint, cluster=cluster, attribute=attr.StatusLightEnabled)
             logger.info(f"Rx'd StatusLightEnabled: {statusLightEnabledNew}")
-            asserts.assert_equal(statusLightEnabledNew, not statusLightEnabled, "Value does not match what was written for StatusLightEnabled in step 51")
+            asserts.assert_equal(statusLightEnabledNew, not statusLightEnabled,
+                                 "Value does not match what was written for StatusLightEnabled in step 51")
         else:
             self.skip_step(50)
             self.skip_step(51)
@@ -664,11 +665,13 @@ class TC_AVSM_2_12(MatterBaseTest):
             statusLightBrightnessNew = await self.read_single_attribute_check_success(
                 endpoint=endpoint, cluster=cluster, attribute=attr.StatusLightBrightness)
             logger.info(f"Rx'd StatusLightBrightness: {statusLightBrightnessNew}")
-            asserts.assert_equal(statusLightBrightnessNew, statusLightBrightnessToWrite, "Value does not match what was written for StatusLightBrightness in step 54")
+            asserts.assert_equal(statusLightBrightnessNew, statusLightBrightnessToWrite,
+                                 "Value does not match what was written for StatusLightBrightness in step 54")
         else:
             self.skip_step(53)
             self.skip_step(54)
             self.skip_step(55)
+
 
 if __name__ == "__main__":
     default_matter_test_main()
