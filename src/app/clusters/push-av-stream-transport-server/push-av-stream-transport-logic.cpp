@@ -301,10 +301,12 @@ Status PushAvStreamTransportServerLogic::ValidateIncomingTransportOptions(
         {
             auto & motionZonesList = triggerOptions.motionZones;
             auto iter              = motionZonesList.Value().Value().begin();
+            int zoneSize           = 0;
 
             while (iter.Next())
             {
                 auto & transportZoneOption = iter.GetValue();
+                zoneSize += 1;
 
                 if (mFeatures.Has(Feature::kPerZoneSensitivity))
                 {
@@ -329,6 +331,12 @@ Status PushAvStreamTransportServerLogic::ValidateIncomingTransportOptions(
                                                      mEndpointId));
                 }
             }
+
+            bool isValidZoneSize = mDelegate->ValidateMotionZoneSize(zoneSize);
+            VerifyOrReturnValue(isValidZoneSize, Status::ConstraintError,
+                                ChipLogError(Zcl,
+                                             "Transport Options verification from command data[ep=%d]: Invalid Motion Zone Size ",
+                                             mEndpointId));
 
             if (iter.GetStatus() != CHIP_NO_ERROR)
             {
@@ -603,6 +611,27 @@ PushAvStreamTransportServerLogic::HandleAllocatePushTransport(CommandHandler & h
         auto status = to_underlying(StatusCodeEnum::kInvalidTLSEndpoint);
         handler.AddClusterSpecificFailure(commandPath, status);
         return std::nullopt;
+    }
+
+    // here add check for valid zoneid
+    if ((transportOptions.triggerOptions.triggerType == TransportTriggerTypeEnum::kMotion) &&
+        (transportOptions.triggerOptions.motionZones.HasValue()) && (!transportOptions.triggerOptions.motionZones.Value().IsNull()))
+    {
+
+        auto & motionZonesList = transportOptions.triggerOptions.motionZones;
+        auto iter              = motionZonesList.Value().Value().begin();
+        while (iter.Next())
+        {
+            auto & transportZoneOption = iter.GetValue();
+            Status zoneIdStatus        = mDelegate->ValidateZoneId(transportZoneOption.zone.Value());
+            if (zoneIdStatus != Status::Success)
+            {
+                auto status = to_underlying(StatusCodeEnum::kInvalidZone);
+                ChipLogError(Zcl, "HandleAllocatePushTransport[ep=%d]: Invalid ZoneId", mEndpointId);
+                handler.AddClusterSpecificFailure(commandPath, status);
+                return std::nullopt;
+            }
+        }
     }
 
     bool isValidUrl = mDelegate->ValidateUrl(std::string(transportOptions.url.data(), transportOptions.url.size()));

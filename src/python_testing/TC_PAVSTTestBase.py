@@ -188,7 +188,7 @@ class PAVSTTestBase:
     async def allocate_one_pushav_transport(self, endpoint, triggerType=Clusters.PushAvStreamTransport.Enums.TransportTriggerTypeEnum.kContinuous,
                                             trigger_Options=None, ingestMethod=Clusters.PushAvStreamTransport.Enums.IngestMethodsEnum.kCMAFIngest,
                                             url="https://localhost:1234/streams/1", stream_Usage=None, container_Options=None,
-                                            videoStream_ID=None, audioStream_ID=None, expected_cluster_status=None):
+                                            videoStream_ID=None, audioStream_ID=None, expected_cluster_status=None, tlsEndPoint=1, expiryTime=10):
         endpoint = self.get_endpoint(default=1)
         cluster = Clusters.PushAvStreamTransport
 
@@ -250,12 +250,12 @@ class PAVSTTestBase:
                         "streamUsage": streamUsage,
                         "videoStreamID": videoStreamID,
                         "audioStreamID": audioStreamID,
-                        "endpointID": endpoint,
+                        "endpointID": tlsEndPoint,
                         "url": url,
                         "triggerOptions": triggerOptions,
                         "ingestMethod": ingestMethod,
                         "containerOptions": containerOptions,
-                        "expiryTime": 5,
+                        "expiryTime": expiryTime,
                     }
                 ),
                 endpoint=endpoint,

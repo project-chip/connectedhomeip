@@ -39,23 +39,43 @@ import logging
 
 from mobly import asserts
 from TC_PAVSTTestBase import PAVSTTestBase
+from TC_PAVSTI_Utils import PAVSTIUtils, PushAvServerProcess
 
 import matter.clusters as Clusters
 from matter.interaction_model import Status
-from matter.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main, has_cluster, run_if_endpoint_matches
+from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main, has_cluster, run_if_endpoint_matches
 
 logger = logging.getLogger(__name__)
 
 
-class TC_PAVST_2_2(MatterBaseTest, PAVSTTestBase):
+class TC_PAVST_2_2(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
     def desc_TC_PAVST_2_2(self) -> str:
         return " [TC-PAVST-2.2] Verify reading CurrentConnections attribute over transports MRP and TCP with Server as DUT"
 
     def pics_TC_PAVST_2_2(self):
         return ["PAVST.S"]
 
+    @async_test_body
+    async def setup_class(self):
+        th_server_app = self.user_params.get("th_server_app_path", None)
+        if th_server_app:
+            self.server = PushAvServerProcess(server_path=th_server_app)
+        else:
+            self.server = PushAvServerProcess()
+        self.server.start(
+            expected_output="Running on https://0.0.0.0:1234",
+            timeout=30,
+        )
+        super().setup_class()
+
+    def teardown_class(self):
+        if self.server is not None:
+            self.server.terminate()
+        super().teardown_class()
+
     def steps_TC_PAVST_2_2(self) -> list[TestStep]:
         return [
+            TestStep("precondition", "Commissioning, already done", is_commissioning=True),
             TestStep(1, "TH Reads CurrentConnections attribute from PushAV Stream Transport Cluster on DUT",
                      "Verify the number of PushAV Connections in the list is 0. If not 0, issue DeAllocatePushAVTransport with `ConnectionID to remove any connections."),
             TestStep(2, "TH Reads SupportedFormats attribute from PushAV Stream Transport Cluster on DUT",
@@ -75,8 +95,14 @@ class TC_PAVST_2_2(MatterBaseTest, PAVSTTestBase):
     @run_if_endpoint_matches(has_cluster(Clusters.PushAvStreamTransport))
     async def test_TC_PAVST_2_2(self):
         endpoint = self.get_endpoint(default=1)
+        self.endpoint = endpoint
+        self.node_id = self.dut_node_id
         pvcluster = Clusters.PushAvStreamTransport
         pvattr = Clusters.PushAvStreamTransport.Attributes
+
+        self.step("precondition")
+        tlsEndpointId = await self.precondition_provision_tls_endpoint(endpoint=endpoint, server=self.server)
+        uploadStreamId = self.server.create_stream()
 
         self.step(1)
         status = await self.check_and_delete_all_push_av_transports(endpoint, pvattr)
@@ -112,7 +138,7 @@ class TC_PAVST_2_2(MatterBaseTest, PAVSTTestBase):
         )
 
         self.step(5)
-        status = await self.allocate_one_pushav_transport(endpoint)
+        status = await self.allocate_one_pushav_transport(endpoint, tlsEndPoint=tlsEndpointId, url=f"https://localhost:1234/streams/{uploadStreamId}")
         asserts.assert_equal(
             status, Status.Success, "Push AV Transport should be allocated successfully"
         )
