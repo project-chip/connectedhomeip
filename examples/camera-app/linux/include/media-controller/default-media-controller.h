@@ -19,6 +19,7 @@
 
 #pragma once
 
+#include "pushav-prerollbuffer.h"
 #include <media-controller.h>
 #include <mutex>
 #include <vector>
@@ -39,8 +40,12 @@ public:
     // if the transport is ready.
     void DistributeVideo(const char * data, size_t size, uint16_t videoStreamID) override;
     void DistributeAudio(const char * data, size_t size, uint16_t audioStreamID) override;
+    void SetPreRollLength(Transport * transport, uint16_t PreRollBufferLength) override;
 
 private:
-    std::vector<Connection> mConnections;
-    std::mutex mConnectionsMutex;
+    // TODO: Look into ways to fetch from camera-device
+    PreRollBuffer preRollBuffer{ 4096 };
+    std::vector<Connection> connections;
+    std::mutex connectionsMutex;
+    std::unordered_map<Transport *, BufferSink *> sinkMap; // map of transport to sink
 };
