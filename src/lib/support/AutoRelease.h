@@ -46,8 +46,6 @@ public:
     inline const Releasable * operator->() const { return mReleasable; }
     inline const Releasable & operator*() const { return *mReleasable; }
     inline Releasable & operator*() { return *mReleasable; }
-    inline operator const Releasable *() const { return mReleasable; }
-    inline operator Releasable *() { return mReleasable; }
 
     inline bool IsNull() const { return mReleasable == nullptr; }
 
@@ -58,7 +56,13 @@ public:
         mReleasable = nullptr;
     }
 
-private:
+    void Set(Releasable * releasable)
+    {
+        Release();
+        mReleasable = releasable;
+    }
+
+protected:
     Releasable * mReleasable = nullptr;
 };
 

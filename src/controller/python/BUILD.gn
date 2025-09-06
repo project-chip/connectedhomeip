@@ -103,6 +103,7 @@ shared_library("ChipDeviceCtrl") {
         "matter/webrtc/WebRTCTransportCluster.cpp",
       ]
     }
+    defines += [ "CHIP_CONFIG_MAX_ACTIVE_TCP_CONNECTIONS=20" ]
     defines += [ "CHIP_CONFIG_MAX_GROUPS_PER_FABRIC=50" ]
     defines += [ "CHIP_CONFIG_MAX_GROUP_KEYS_PER_FABRIC=50" ]
 
