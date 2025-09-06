@@ -612,14 +612,16 @@ PushAvStreamTransportServerLogic::HandleAllocatePushTransport(CommandHandler & h
 
         auto & motionZonesList = transportOptions.triggerOptions.motionZones;
         auto iter              = motionZonesList.Value().Value().begin();
-        uint16_t zonesize=0;
+        uint16_t zonesize      = 0;
         auto itsz              = motionZonesList.Value().Value().begin();
         while (itsz.Next())
         {
-            zonesize+=1;
+            zonesize += 1;
         }
         bool isValidZoneSize = mDelegate->ValidateMotionZoneSize(zonesize);
-        VerifyOrReturnValue(isValidZoneSize, Status::ConstraintError,ChipLogError(Zcl, "Transport Options verification from command data[ep=%d]: Invalid Motion Zone Size ", mEndpointId));
+        VerifyOrReturnValue(
+            isValidZoneSize, Status::ConstraintError,
+            ChipLogError(Zcl, "Transport Options verification from command data[ep=%d]: Invalid Motion Zone Size ", mEndpointId));
 
         while (iter.Next())
         {
