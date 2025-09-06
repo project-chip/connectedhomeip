@@ -9,6 +9,7 @@ FROM ghcr.io/project-chip/chip-build-infineon:${VERSION} AS psoc6
 FROM ghcr.io/project-chip/chip-build-tizen-qemu:${VERSION} AS tizen
 FROM ghcr.io/project-chip/chip-build-crosscompile:${VERSION} AS crosscompile
 FROM ghcr.io/project-chip/chip-build-ameba:${VERSION} AS ameba
+FROM ghcr.io/project-chip/chip-build-realtek-zephyr:${VERSION} AS realtekzephyr
 FROM ghcr.io/project-chip/chip-build-nxp:${VERSION} AS nxp
 FROM ghcr.io/project-chip/chip-build-nxp-zephyr:${VERSION} AS nxpzephyr
 FROM ghcr.io/project-chip/chip-build-imx:${VERSION} AS imx
@@ -44,6 +45,8 @@ COPY --from=tizen /opt/tizen-sdk /opt/tizen-sdk
 COPY --from=crosscompile /opt/ubuntu-24.04-aarch64-sysroot /opt/ubuntu-24.04-aarch64-sysroot
 
 COPY --from=ameba /opt/ameba /opt/ameba
+
+COPY --from=realtekzephyr /opt/realtek-zephyr/ /opt/realtek-zephyr/
 
 COPY --from=nxp /opt/nxp /opt/nxp
 
@@ -134,6 +137,8 @@ ENV ZEPHYR_NXP_BASE=/opt/nxp-zephyr/zephyrproject/zephyr
 ENV ZEPHYR_NXP_SDK_INSTALL_DIR=/opt/nxp-zephyr/zephyr-sdk-0.17.0
 ENV NXP_UPDATE_SDK_SCRIPT_DOCKER=/opt/nxp/nxp_matter_support/scripts/update_nxp_sdk.py
 ENV NXP_SDK_PATH=/opt/nxp
+ENV ZEPHYR_REALTEK_BASE=/opt/realtek-zephyr/zephyr-rtk-project/zephyr
+ENV ZEPHYR_REALTEK_SDK_INSTALL_DIR=/opt/realtek-zephyr/zephyr-sdk-0.16.8
 
 # Places bootstrap files there instead of the default one which is `.environment`.
 # NOTE: This directory is NOT persistent.
