@@ -1,4 +1,3 @@
-
 /**
  *
  *    Copyright (c) 2025 Project CHIP Authors
@@ -34,156 +33,14 @@
 #include <app/ConcreteAttributePath.h>
 #include <app/InteractionModelEngine.h>
 #include <app/reporting/reporting.h>
+#include <array>
 #include <cstdint>
+#include <functional>
 
 namespace chip {
 namespace app {
 namespace Clusters {
 namespace CommodityTariff {
-
-typedef uint32_t epoch_s; ///< Type alias for epoch timestamps in seconds
-
-/**
- * @defgroup tariff_attributes Commodity Tariff Attribute Definitions
- * @{
- */
-
-/**
- * @def COMMODITY_TARIFF_PRIMARY_ATTRIBUTES
- * @brief Macro defining Primary attributes for Commodity Tariff
- *
- * Primary attributes represent the fundamental tariff configuration that can only
- * be changed by authorized tariff updates. These are typically set by utility providers.
- */
-#define COMMODITY_TARIFF_PRIMARY_SCALAR_ATTRS                                                                                      \
-    X(TariffUnit, DataModel::Nullable<Globals::TariffUnitEnum>)                                                                    \
-    X(StartDate, DataModel::Nullable<uint32_t>)                                                                                    \
-    X(DefaultRandomizationOffset, DataModel::Nullable<int16_t>)                                                                    \
-    X(DefaultRandomizationType, DataModel::Nullable<DayEntryRandomizationTypeEnum>)
-
-#define COMMODITY_TARIFF_PRIMARY_COMPLEX_ATTRIBUTES                                                                                \
-    X(TariffInfo, DataModel::Nullable<Structs::TariffInformationStruct::Type>)                                                     \
-    X(DayEntries, DataModel::Nullable<DataModel::List<Structs::DayEntryStruct::Type>>)                                             \
-    X(DayPatterns, DataModel::Nullable<DataModel::List<Structs::DayPatternStruct::Type>>)                                          \
-    X(TariffComponents, DataModel::Nullable<DataModel::List<Structs::TariffComponentStruct::Type>>)                                \
-    X(TariffPeriods, DataModel::Nullable<DataModel::List<Structs::TariffPeriodStruct::Type>>)                                      \
-    X(IndividualDays, DataModel::Nullable<DataModel::List<Structs::DayStruct::Type>>)                                              \
-    X(CalendarPeriods, DataModel::Nullable<DataModel::List<Structs::CalendarPeriodStruct::Type>>)
-
-#define COMMODITY_TARIFF_PRIMARY_ATTRIBUTES                                                                                        \
-    COMMODITY_TARIFF_PRIMARY_SCALAR_ATTRS                                                                                          \
-    COMMODITY_TARIFF_PRIMARY_COMPLEX_ATTRIBUTES
-
-/**
- * @def COMMODITY_TARIFF_CURRENT_ATTRIBUTES
- * @brief Macro defining Current attributes for Commodity Tariff
- *
- * Current attributes represent the dynamically changing state of the tariff system,
- * automatically updated based on time context and primary attribute values.
- */
-#define COMMODITY_TARIFF_CURRENT_SINGLE_ATTRIBUTES                                                                                 \
-    X(CurrentDay, DataModel::Nullable<Structs::DayStruct::Type>)                                                                   \
-    X(NextDay, DataModel::Nullable<Structs::DayStruct::Type>)                                                                      \
-    X(CurrentDayEntry, DataModel::Nullable<Structs::DayEntryStruct::Type>)                                                         \
-    X(NextDayEntry, DataModel::Nullable<Structs::DayEntryStruct::Type>)                                                            \
-    X(CurrentDayEntryDate, DataModel::Nullable<uint32_t>)                                                                          \
-    X(NextDayEntryDate, DataModel::Nullable<uint32_t>)
-
-#define COMMODITY_TARIFF_CURRENT_LIST_ATTRIBUTES                                                                                   \
-    X(CurrentTariffComponents, DataModel::Nullable<DataModel::List<Structs::TariffComponentStruct::Type>>)                         \
-    X(NextTariffComponents, DataModel::Nullable<DataModel::List<Structs::TariffComponentStruct::Type>>)
-
-#define COMMODITY_TARIFF_CURRENT_ATTRIBUTES                                                                                        \
-    COMMODITY_TARIFF_CURRENT_SINGLE_ATTRIBUTES                                                                                     \
-    COMMODITY_TARIFF_CURRENT_LIST_ATTRIBUTES
-
-/** @} */ // end of tariff_attributes
-
-/**
- * @defgroup attribute_management Attribute Management Classes
- * @brief Macro-generated classes for type-safe attribute management
- *
- * These templates provide consistent attribute handling with:
- * - Type safety
- * - Change detection
- * - Validation
- * - Memory management
- * @{
- */
-
-/**
- * @def X(attrName, attrType)
- * @brief Generates attribute-specific management classes
- *
- * For each attribute in COMMODITY_TARIFF_PRIMARY_ATTRIBUTES, creates a dedicated class that:
- * - Inherits from CTC_BaseDataClass<attrType>
- * - Provides type-specific storage management
- * - Enables attribute-specific validation
- *
- * Example generated class:
- * @code
- * class TariffUnitDataClass : public CTC_BaseDataClass<Nullable<Globals::TariffUnitEnum>> {
- * public:
- *     TariffUnitDataClass(Nullable<Globals::TariffUnitEnum>& storage)
- *         : CTC_BaseDataClass(storage) {}
- * };
- * @endcode
- */
-#define X(attrName, attrType)                                                                                                      \
-    class attrName##DataClass : public CommodityTariffAttrsDataMgmt::CTC_BaseDataClass<attrType>                                   \
-    {                                                                                                                              \
-    public:                                                                                                                        \
-        attrName##DataClass() : CTC_BaseDataClass<attrType>(Attributes::attrName::Id) {}                                           \
-        ~attrName##DataClass() override = default;                                                                                 \
-                                                                                                                                   \
-    protected:                                                                                                                     \
-        CHIP_ERROR Validate(const ValueType & aValue) const override;                                                              \
-    };
-COMMODITY_TARIFF_PRIMARY_SCALAR_ATTRS
-#undef X
-
-#define X(attrName, attrType)                                                                                                      \
-    class attrName##DataClass : public CommodityTariffAttrsDataMgmt::CTC_BaseDataClass<attrType>                                   \
-    {                                                                                                                              \
-    public:                                                                                                                        \
-        attrName##DataClass() : CTC_BaseDataClass<attrType>(Attributes::attrName::Id) {}                                           \
-        ~attrName##DataClass() override = default;                                                                                 \
-        void CleanupExtEntry(PayloadType & entry)                                                                                  \
-        {                                                                                                                          \
-            CleanupStructValue(entry);                                                                                             \
-        }                                                                                                                          \
-                                                                                                                                   \
-    protected:                                                                                                                     \
-        CHIP_ERROR Validate(const ValueType & aValue) const override;                                                              \
-        bool CompareStructValue(const PayloadType & source, const PayloadType & destination) const override;                       \
-        void CleanupStructValue(PayloadType & aValue) override;                                                                    \
-    };
-COMMODITY_TARIFF_PRIMARY_COMPLEX_ATTRIBUTES
-#undef X
-
-/** @} */ // end of attribute_management
-
-struct TariffUpdateCtx
-{
-    /* DayEntryIDs */
-    std::unordered_set<uint32_t> DayEntryKeyIDs; /* Master - IDs of all given DayEntry items */
-
-    std::unordered_set<uint32_t> DayPatternsDayEntryIDs;    /* IDs mentioned in DayPattern items */
-    std::unordered_set<uint32_t> TariffPeriodsDayEntryIDs;  /* IDs mentioned in TariffPeriod items */
-    std::unordered_set<uint32_t> IndividualDaysDayEntryIDs; /* IDs mentioned in IndividualDays items */
-
-    /* TariffComponentIDs */
-    std::unordered_set<uint32_t> TariffComponentKeyIDs;           /* Master - IDs of all given TariffComponent items */
-    std::unordered_set<uint32_t> TariffPeriodsTariffComponentIDs; /* IDs mentioned in TariffPeriods items */
-
-    /* DayPatternsIDs */
-    std::unordered_set<uint32_t> DayPatternKeyIDs;             /* Master - IDs of all given DayPattern items */
-    std::unordered_set<uint32_t> CalendarPeriodsDayPatternIDs; /* IDs mentioned in CalendarPeriods items */
-
-    BitMask<Feature> mFeature;
-    EndpointId mEndpoint;
-    bool mAnyHasChanged = false;
-};
 
 /**
  * @class Delegate
@@ -201,6 +58,7 @@ public:
     virtual ~Delegate() = default;
 
     void SetEndpointId(EndpointId aEndpoint) { mEndpointId = aEndpoint; }
+
     /**
      * @brief Set the current feature map for this tariff instance
      * @param aFeature The current feature map value
@@ -209,7 +67,7 @@ public:
 
     bool HasFeature(Feature aFeature) { return mFeature.Has(aFeature); }
 
-    void SetTariffUpdCb(std::function<void(bool)> cb) { mTariffDataUpdatedCb = cb; }
+    void SetTariffUpdCb(std::function<void(bool, const AttributeId *, size_t)> cb) { mTariffDataUpdatedCb = cb; }
 
     /**
      * @brief Process incoming tariff data updates
@@ -219,123 +77,220 @@ public:
      * 2. Cross-field validation (TariffDataUpd_CrossValidator)
      * 3. Commit or abort (TariffDataUpd_Commit/Abort)
      */
-    void TariffDataUpdate()
+    void TariffDataUpdate(uint32_t aNowTimestamp)
     {
-        TariffUpdateCtx UpdCtx = { .mFeature = mFeature, .mEndpoint = mEndpointId };
+        TariffUpdateCtx UpdCtx = { .TariffStartTimestamp  = GetStartDate_MgmtObj().GetNewValue(),
+                                   .blockMode             = static_cast<BlockModeEnum>(0),
+                                   .mFeature              = mFeature,
+                                   .TariffUpdateTimestamp = aNowTimestamp };
+        bool is_success        = false;
 
-        if (!TariffDataUpd_Init(UpdCtx))
+        if (!(is_success = TariffDataUpd_Init(UpdCtx)))
         {
-            ChipLogError(NotSpecified, "EGW-CTC: New tariff data rejected due to internal inconsistencies");
+            ChipLogError(AppServer, "EGW-CTC: New tariff data rejected due to internal inconsistencies");
         }
-        else if (!TariffDataUpd_CrossValidator(UpdCtx))
+        else if (CHIP_NO_ERROR != TariffDataUpd_CrossValidator(UpdCtx))
         {
-            ChipLogError(NotSpecified, "EGW-CTC: New tariff data rejected due to some cross-fields inconsistencies");
+            ChipLogError(AppServer, "EGW-CTC: New tariff data rejected due to some cross-fields inconsistencies");
         }
         else
         {
-            TariffDataUpd_Commit();
-
-            if (UpdCtx.mAnyHasChanged)
+            if (!UpdCtx.TariffStartTimestamp.IsNull() && (UpdCtx.TariffStartTimestamp.Value() > UpdCtx.TariffUpdateTimestamp))
             {
-                ChipLogProgress(NotSpecified, "EGW-CTC: Tariff data applied");
-
-                if (mTariffDataUpdatedCb != nullptr)
-                {
-                    mTariffDataUpdatedCb(false);
-                }
+                DelayedTariffUpdateIsActive = true;
+                return;
             }
-            else
-            {
-                ChipLogProgress(NotSpecified, "EGW-CTC: Tariff data does not change");
-            }
+        }
 
+        TariffDataUpd_Finish(is_success);
+    }
+
+    void TryToactivateDelayedTariff(uint32_t now)
+    {
+        if (!DelayedTariffUpdateIsActive)
+        {
             return;
         }
 
-        TariffDataUpd_Abort();
+        if (now >= GetStartDate_MgmtObj().GetNewValue().Value())
+        {
+            TariffDataUpd_Finish(true);
+            DelayedTariffUpdateIsActive = false;
+        }
     }
 
-    // Attribute accessors
-#define X(attrName, attrType)                                                                                                      \
-    attrType & Get##attrName() { return m##attrName##_MgmtObj.GetValue(); }
-    COMMODITY_TARIFF_PRIMARY_ATTRIBUTES
-#undef X
+    // Attribute accessors - manually defined for each attribute
+    DataModel::Nullable<Globals::TariffUnitEnum> & GetTariffUnit() { return mTariffUnit_MgmtObj.GetValue(); }
+    DataModel::Nullable<uint32_t> & GetStartDate() { return mStartDate_MgmtObj.GetValue(); }
+    DataModel::Nullable<int16_t> & GetDefaultRandomizationOffset() { return mDefaultRandomizationOffset_MgmtObj.GetValue(); }
+    DataModel::Nullable<DayEntryRandomizationTypeEnum> & GetDefaultRandomizationType()
+    {
+        return mDefaultRandomizationType_MgmtObj.GetValue();
+    }
+    DataModel::Nullable<Structs::TariffInformationStruct::Type> & GetTariffInfo() { return mTariffInfo_MgmtObj.GetValue(); }
+    DataModel::Nullable<DataModel::List<Structs::DayEntryStruct::Type>> & GetDayEntries() { return mDayEntries_MgmtObj.GetValue(); }
+    DataModel::Nullable<DataModel::List<Structs::DayPatternStruct::Type>> & GetDayPatterns()
+    {
+        return mDayPatterns_MgmtObj.GetValue();
+    }
+    DataModel::Nullable<DataModel::List<Structs::TariffComponentStruct::Type>> & GetTariffComponents()
+    {
+        return mTariffComponents_MgmtObj.GetValue();
+    }
+    DataModel::Nullable<DataModel::List<Structs::TariffPeriodStruct::Type>> & GetTariffPeriods()
+    {
+        return mTariffPeriods_MgmtObj.GetValue();
+    }
+    DataModel::Nullable<DataModel::List<Structs::DayStruct::Type>> & GetIndividualDays()
+    {
+        return mIndividualDays_MgmtObj.GetValue();
+    }
+    DataModel::Nullable<DataModel::List<Structs::CalendarPeriodStruct::Type>> & GetCalendarPeriods()
+    {
+        return mCalendarPeriods_MgmtObj.GetValue();
+    }
 
-#define X(attrName, attrType)                                                                                                      \
-    attrName##DataClass & Get##attrName##_MgmtObj() { return m##attrName##_MgmtObj; }
-    COMMODITY_TARIFF_PRIMARY_ATTRIBUTES
-#undef X
+    // Management object accessors
+    TariffUnitDataClass & GetTariffUnit_MgmtObj() { return mTariffUnit_MgmtObj; }
+    StartDateDataClass & GetStartDate_MgmtObj() { return mStartDate_MgmtObj; }
+    DefaultRandomizationOffsetDataClass & GetDefaultRandomizationOffset_MgmtObj() { return mDefaultRandomizationOffset_MgmtObj; }
+    DefaultRandomizationTypeDataClass & GetDefaultRandomizationType_MgmtObj() { return mDefaultRandomizationType_MgmtObj; }
+    TariffInfoDataClass & GetTariffInfo_MgmtObj() { return mTariffInfo_MgmtObj; }
+    DayEntriesDataClass & GetDayEntries_MgmtObj() { return mDayEntries_MgmtObj; }
+    DayPatternsDataClass & GetDayPatterns_MgmtObj() { return mDayPatterns_MgmtObj; }
+    TariffComponentsDataClass & GetTariffComponents_MgmtObj() { return mTariffComponents_MgmtObj; }
+    TariffPeriodsDataClass & GetTariffPeriods_MgmtObj() { return mTariffPeriods_MgmtObj; }
+    IndividualDaysDataClass & GetIndividualDays_MgmtObj() { return mIndividualDays_MgmtObj; }
+    CalendarPeriodsDataClass & GetCalendarPeriods_MgmtObj() { return mCalendarPeriods_MgmtObj; }
 
     void CleanupTariffData()
     {
-#define X(attrName, attrType) m##attrName##_MgmtObj.Cleanup();
-        COMMODITY_TARIFF_PRIMARY_ATTRIBUTES
-#undef X
-        if (mTariffDataUpdatedCb != nullptr)
+        AttributeId updatedAttrIds[CommodityTariffConsts::kMaxPrimaryTariffAttrsCount];
+        size_t updatedCount = 0;
+
+        // Check each attribute and collect updated ones
+        if (mTariffUnit_MgmtObj.Cleanup())
+            updatedAttrIds[updatedCount++] = mTariffUnit_MgmtObj.GetAttrId();
+        if (mStartDate_MgmtObj.Cleanup())
+            updatedAttrIds[updatedCount++] = mStartDate_MgmtObj.GetAttrId();
+        if (mDefaultRandomizationOffset_MgmtObj.Cleanup())
+            updatedAttrIds[updatedCount++] = mDefaultRandomizationOffset_MgmtObj.GetAttrId();
+        if (mDefaultRandomizationType_MgmtObj.Cleanup())
+            updatedAttrIds[updatedCount++] = mDefaultRandomizationType_MgmtObj.GetAttrId();
+        if (mTariffInfo_MgmtObj.Cleanup())
+            updatedAttrIds[updatedCount++] = mTariffInfo_MgmtObj.GetAttrId();
+        if (mDayEntries_MgmtObj.Cleanup())
+            updatedAttrIds[updatedCount++] = mDayEntries_MgmtObj.GetAttrId();
+        if (mDayPatterns_MgmtObj.Cleanup())
+            updatedAttrIds[updatedCount++] = mDayPatterns_MgmtObj.GetAttrId();
+        if (mTariffComponents_MgmtObj.Cleanup())
+            updatedAttrIds[updatedCount++] = mTariffComponents_MgmtObj.GetAttrId();
+        if (mTariffPeriods_MgmtObj.Cleanup())
+            updatedAttrIds[updatedCount++] = mTariffPeriods_MgmtObj.GetAttrId();
+        if (mIndividualDays_MgmtObj.Cleanup())
+            updatedAttrIds[updatedCount++] = mIndividualDays_MgmtObj.GetAttrId();
+        if (mCalendarPeriods_MgmtObj.Cleanup())
+            updatedAttrIds[updatedCount++] = mCalendarPeriods_MgmtObj.GetAttrId();
+
+        if (mTariffDataUpdatedCb != nullptr && updatedCount > 0)
         {
-            mTariffDataUpdatedCb(true);
+            mTariffDataUpdatedCb(true, updatedAttrIds, updatedCount);
         }
     }
 
 private:
     // Primary attribute storage and management
-#define X(attrName, attrType) attrName##DataClass m##attrName##_MgmtObj{};
-    COMMODITY_TARIFF_PRIMARY_ATTRIBUTES
-#undef X
-
-    static void TariffDataUpd_AttrChangeCb(uint32_t aAttrId, void * CbCtx)
-    {
-        TariffUpdateCtx * UpdCtx = (TariffUpdateCtx *) CbCtx;
-        ChipLogProgress(NotSpecified, "EGW-CTC: The value for attribute (Id %d) updated", aAttrId);
-        MatterReportingAttributeChangeCallback(UpdCtx->mEndpoint, CommodityTariff::Id, aAttrId);
-        UpdCtx->mAnyHasChanged = true;
-    }
+    TariffUnitDataClass mTariffUnit_MgmtObj{};
+    StartDateDataClass mStartDate_MgmtObj{};
+    DefaultRandomizationOffsetDataClass mDefaultRandomizationOffset_MgmtObj{};
+    DefaultRandomizationTypeDataClass mDefaultRandomizationType_MgmtObj{};
+    TariffInfoDataClass mTariffInfo_MgmtObj{};
+    DayEntriesDataClass mDayEntries_MgmtObj{};
+    DayPatternsDataClass mDayPatterns_MgmtObj{};
+    TariffComponentsDataClass mTariffComponents_MgmtObj{};
+    TariffPeriodsDataClass mTariffPeriods_MgmtObj{};
+    IndividualDaysDataClass mIndividualDays_MgmtObj{};
+    CalendarPeriodsDataClass mCalendarPeriods_MgmtObj{};
 
     // Primary attrs update pipeline methods
     bool TariffDataUpd_Init(TariffUpdateCtx & UpdCtx)
     {
-#define X(attrName, attrType)                                                                                                      \
-    if (m##attrName##_MgmtObj.UpdateBegin(&UpdCtx, TariffDataUpd_AttrChangeCb, true) != CHIP_NO_ERROR)                             \
-    {                                                                                                                              \
-        return false;                                                                                                              \
-    }
-        COMMODITY_TARIFF_PRIMARY_ATTRIBUTES
-#undef X
+        if (mTariffUnit_MgmtObj.UpdateBegin(&UpdCtx) != CHIP_NO_ERROR)
+            return false;
+        if (mStartDate_MgmtObj.UpdateBegin(&UpdCtx) != CHIP_NO_ERROR)
+            return false;
+        if (mDefaultRandomizationOffset_MgmtObj.UpdateBegin(&UpdCtx) != CHIP_NO_ERROR)
+            return false;
+        if (mDefaultRandomizationType_MgmtObj.UpdateBegin(&UpdCtx) != CHIP_NO_ERROR)
+            return false;
+        if (mTariffInfo_MgmtObj.UpdateBegin(&UpdCtx) != CHIP_NO_ERROR)
+            return false;
+        if (mDayEntries_MgmtObj.UpdateBegin(&UpdCtx) != CHIP_NO_ERROR)
+            return false;
+        if (mDayPatterns_MgmtObj.UpdateBegin(&UpdCtx) != CHIP_NO_ERROR)
+            return false;
+        if (mTariffComponents_MgmtObj.UpdateBegin(&UpdCtx) != CHIP_NO_ERROR)
+            return false;
+        if (mTariffPeriods_MgmtObj.UpdateBegin(&UpdCtx) != CHIP_NO_ERROR)
+            return false;
+        if (mIndividualDays_MgmtObj.UpdateBegin(&UpdCtx) != CHIP_NO_ERROR)
+            return false;
+        if (mCalendarPeriods_MgmtObj.UpdateBegin(&UpdCtx) != CHIP_NO_ERROR)
+            return false;
+
         return true;
     }
 
-    virtual bool TariffDataUpd_CrossValidator(TariffUpdateCtx & UpdCtx) { return true; }
+    virtual CHIP_ERROR TariffDataUpd_CrossValidator(TariffUpdateCtx & UpdCtx) { return CHIP_NO_ERROR; }
 
-    void TariffDataUpd_Commit()
+    void TariffDataUpd_Finish(bool is_success)
     {
-#define X(attrName, attrType) m##attrName##_MgmtObj.UpdateCommit();
-        COMMODITY_TARIFF_PRIMARY_ATTRIBUTES
-#undef X
-    }
+        AttributeId updatedAttrIds[CommodityTariffConsts::kMaxPrimaryTariffAttrsCount];
+        size_t updatedCount = 0;
 
-    void TariffDataUpd_Abort()
-    {
-#define X(attrName, attrType) m##attrName##_MgmtObj.UpdateEnd();
-        COMMODITY_TARIFF_PRIMARY_ATTRIBUTES
-#undef X
+        // Check each attribute and collect updated ones
+        if (mTariffUnit_MgmtObj.UpdateFinish(is_success))
+            updatedAttrIds[updatedCount++] = mTariffUnit_MgmtObj.GetAttrId();
+        if (mStartDate_MgmtObj.UpdateFinish(is_success))
+            updatedAttrIds[updatedCount++] = mStartDate_MgmtObj.GetAttrId();
+        if (mDefaultRandomizationOffset_MgmtObj.UpdateFinish(is_success))
+            updatedAttrIds[updatedCount++] = mDefaultRandomizationOffset_MgmtObj.GetAttrId();
+        if (mDefaultRandomizationType_MgmtObj.UpdateFinish(is_success))
+            updatedAttrIds[updatedCount++] = mDefaultRandomizationType_MgmtObj.GetAttrId();
+        if (mTariffInfo_MgmtObj.UpdateFinish(is_success))
+            updatedAttrIds[updatedCount++] = mTariffInfo_MgmtObj.GetAttrId();
+        if (mDayEntries_MgmtObj.UpdateFinish(is_success))
+            updatedAttrIds[updatedCount++] = mDayEntries_MgmtObj.GetAttrId();
+        if (mDayPatterns_MgmtObj.UpdateFinish(is_success))
+            updatedAttrIds[updatedCount++] = mDayPatterns_MgmtObj.GetAttrId();
+        if (mTariffComponents_MgmtObj.UpdateFinish(is_success))
+            updatedAttrIds[updatedCount++] = mTariffComponents_MgmtObj.GetAttrId();
+        if (mTariffPeriods_MgmtObj.UpdateFinish(is_success))
+            updatedAttrIds[updatedCount++] = mTariffPeriods_MgmtObj.GetAttrId();
+        if (mIndividualDays_MgmtObj.UpdateFinish(is_success))
+            updatedAttrIds[updatedCount++] = mIndividualDays_MgmtObj.GetAttrId();
+        if (mCalendarPeriods_MgmtObj.UpdateFinish(is_success))
+            updatedAttrIds[updatedCount++] = mCalendarPeriods_MgmtObj.GetAttrId();
+
+        if (updatedCount > 0)
+        {
+            ChipLogProgress(NotSpecified, "EGW-CTC: Tariff data applied");
+            if (mTariffDataUpdatedCb != nullptr)
+            {
+                mTariffDataUpdatedCb(false, updatedAttrIds, updatedCount);
+            }
+        }
+        else
+        {
+            ChipLogProgress(NotSpecified, "EGW-CTC: Tariff data does not change");
+        }
     }
 
 protected:
     EndpointId mEndpointId = 0; ///< Associated Matter endpoint ID
     BitMask<Feature> mFeature;
-    std::function<void(bool)> mTariffDataUpdatedCb;
-};
-
-struct CurrentTariffAttrsCtx
-{
-    Delegate * mTariffProvider;
-    EndpointId mEndpointId;
-
-    std::map<uint32_t, const Structs::DayPatternStruct::Type *> DayPatternsMap;
-    std::map<uint32_t, const Structs::DayEntryStruct::Type *> DayEntriesMap;
-    std::map<uint32_t, const Structs::TariffComponentStruct::Type *> TariffComponentsMap;
-
-    uint32_t mForwardAlarmTriggerTime;
+    std::function<void(bool, const AttributeId *, size_t)> mTariffDataUpdatedCb;
+    bool DelayedTariffUpdateIsActive = false;
 };
 
 /**
@@ -363,7 +318,9 @@ public:
         /* set the base class delegates endpointId */
         mDelegate.SetEndpointId(aEndpointId);
         mEndpointId = aEndpointId;
-        mDelegate.SetTariffUpdCb([this](bool is_erased) { this->TariffDataUpdatedCb(is_erased); });
+        mDelegate.SetTariffUpdCb([this](bool is_erased, const AttributeId * updatedAttrIds, size_t count) {
+            this->TariffDataUpdatedCb(is_erased, updatedAttrIds, count);
+        });
         mDelegate.SetFeatures(aFeature);
     }
 
@@ -374,29 +331,90 @@ public:
 
     bool HasFeature(Feature aFeature) const;
 
-    void TariffComponentUpd_AttrChangeCb(uint32_t aAttrId, void * CbCtx);
+    void AttributeUpdCb(AttributeId aAttrId)
+    {
+        ChipLogProgress(NotSpecified, "EGW-CTC: The value for attribute (Id %" PRIu32 ") updated", aAttrId);
+        MatterReportingAttributeChangeCallback(mEndpointId, CommodityTariff::Id, aAttrId);
+    }
+
+    void TariffTimeAttrsSync() { UpdateCurrentAttrs(); }
 
     /**
-     * @brief Passes the specified time offset value to the context variable that is used to override the real-time stamp.
-     * In depends on the time shift value may triggered DaysUpdating or DayEntryUpdating event handling.
+     * @struct CurrentTariffAttrsCtx
+     * @brief Context for current tariff attributes
      */
-    void SetupTimeShiftOffset(uint32_t offset);
-
-private:
-    enum class UpdateEventCode
+    struct CurrentTariffAttrsCtx
     {
-        TariffErased,
-        TariffUpdated,
-        DaysUpdating,
-        DayEntryUpdating
+        Delegate * mTariffProvider;
+        EndpointId mEndpointId;
     };
 
-    CurrentTariffAttrsCtx mServerTariffAttrsCtx;
-
+private:
     Delegate & mDelegate;
     BitMask<Feature> mFeature;
 
     EndpointId mEndpointId;
+
+    // Current attributes storage
+    DataModel::Nullable<Structs::DayStruct::Type> mCurrentDay;
+    DataModel::Nullable<Structs::DayStruct::Type> mNextDay;
+    DataModel::Nullable<Structs::DayEntryStruct::Type> mCurrentDayEntry;
+    DataModel::Nullable<Structs::DayEntryStruct::Type> mNextDayEntry;
+    DataModel::Nullable<uint32_t> mCurrentDayEntryDate;
+    DataModel::Nullable<uint32_t> mNextDayEntryDate;
+
+    TariffComponentsDataClass mCurrentTariffComponents_MgmtObj{};
+    TariffComponentsDataClass mNextTariffComponents_MgmtObj{};
+
+    // Attribute accessors
+    DataModel::Nullable<Structs::DayStruct::Type> & GetCurrentDay() { return mCurrentDay; }
+    DataModel::Nullable<Structs::DayStruct::Type> & GetNextDay() { return mNextDay; }
+    DataModel::Nullable<Structs::DayEntryStruct::Type> & GetCurrentDayEntry() { return mCurrentDayEntry; }
+    DataModel::Nullable<Structs::DayEntryStruct::Type> & GetNextDayEntry() { return mNextDayEntry; }
+    DataModel::Nullable<uint32_t> & GetCurrentDayEntryDate() { return mCurrentDayEntryDate; }
+    DataModel::Nullable<uint32_t> & GetNextDayEntryDate() { return mNextDayEntryDate; }
+
+    template <typename T>
+    CHIP_ERROR SetValue(T & currValue, T & newValue, uint32_t attrId);
+
+    CHIP_ERROR SetCurrentDay(DataModel::Nullable<Structs::DayStruct::Type> & newValue)
+    {
+        return SetValue(mCurrentDay, newValue, Attributes::CurrentDay::Id);
+    }
+    CHIP_ERROR SetNextDay(DataModel::Nullable<Structs::DayStruct::Type> & newValue)
+    {
+        return SetValue(mNextDay, newValue, Attributes::NextDay::Id);
+    }
+    CHIP_ERROR SetCurrentDayEntry(DataModel::Nullable<Structs::DayEntryStruct::Type> & newValue)
+    {
+        return SetValue(mCurrentDayEntry, newValue, Attributes::CurrentDayEntry::Id);
+    }
+    CHIP_ERROR SetNextDayEntry(DataModel::Nullable<Structs::DayEntryStruct::Type> & newValue)
+    {
+        return SetValue(mNextDayEntry, newValue, Attributes::NextDayEntry::Id);
+    }
+    CHIP_ERROR SetCurrentDayEntryDate(DataModel::Nullable<uint32_t> & newValue)
+    {
+        return SetValue(mCurrentDayEntryDate, newValue, Attributes::CurrentDayEntryDate::Id);
+    }
+    CHIP_ERROR SetNextDayEntryDate(DataModel::Nullable<uint32_t> & newValue)
+    {
+        return SetValue(mNextDayEntryDate, newValue, Attributes::NextDayEntryDate::Id);
+    }
+
+    DataModel::Nullable<DataModel::List<Structs::TariffComponentStruct::Type>> & GetCurrentTariffComponents()
+    {
+        return mCurrentTariffComponents_MgmtObj.GetValue();
+    }
+    DataModel::Nullable<DataModel::List<Structs::TariffComponentStruct::Type>> & GetNextTariffComponents()
+    {
+        return mNextTariffComponents_MgmtObj.GetValue();
+    }
+
+    CurrentTariffAttrsCtx mServerTariffAttrsCtx;
+
+    void TariffDataUpdatedCb(bool is_erased, const AttributeId * aUpdatedAttrIds, size_t aCount);
+    void ResetCurrentAttributes();
 
     // AttributeAccessInterface implementation
     CHIP_ERROR Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder) override;
@@ -408,31 +426,23 @@ private:
     void HandleGetDayEntry(HandlerContext & ctx, const Commands::GetDayEntry::DecodableType & commandData);
     void HandleGetTariffComponent(HandlerContext & ctx, const Commands::GetTariffComponent::DecodableType & commandData);
 
-    // Current attributes storage
-#define X(attrName, attrType)                                                                                                      \
-    attrType m##attrName;                                                                                                          \
-    attrType & Get##attrName() { return m##attrName; }                                                                             \
-    CHIP_ERROR Set##attrName(attrType & newValue) { return SetValue(m##attrName, newValue, Attributes::attrName::Id); }
-    COMMODITY_TARIFF_CURRENT_SINGLE_ATTRIBUTES
-#undef X
-
-#define X(attrName, attrType)                                                                                                      \
-    TariffComponentsDataClass m##attrName##_MgmtObj{};                                                                             \
-    attrType & Get##attrName() { return m##attrName##_MgmtObj.GetValue(); }
-    COMMODITY_TARIFF_CURRENT_LIST_ATTRIBUTES
-#undef X
-
-    template <typename T>
-    CHIP_ERROR SetValue(T & currValue, T & newValue, uint32_t attrId);
-
-    void TariffDataUpdatedCb(bool is_erased);
-    void ResetCurrentAttributes();
-
     // Current attrs (time depended) update methods
-    void UpdateCurrentAttrs(UpdateEventCode aEvt);
-    void ScheduleTariffActivation(uint32_t delay);
-    void ScheduleMidnightUpdate();
-    void ScheduleDayEntryUpdate(uint16_t minutesSinceMidnight);
+    void InitCurrentAttrs();
+    void UpdateCurrentAttrs();
+    void UpdateDayInformation(uint32_t now);
+    void UpdateDayEntryInformation(uint32_t now);
+    void DeinitCurrentAttrs();
+
+protected:
+    virtual uint32_t GetCurrentTimestamp()
+    {
+        System::Clock::Microseconds64 utcTimeUnix;
+        uint64_t chipEpochTime;
+        System::SystemClock().GetClock_RealTime(utcTimeUnix);
+        UnixEpochToChipEpochMicros(utcTimeUnix.count(), chipEpochTime);
+
+        return static_cast<uint32_t>(chipEpochTime / chip::kMicrosecondsPerSecond);
+    };
 };
 
 } // namespace CommodityTariff
