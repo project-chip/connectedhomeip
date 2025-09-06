@@ -232,7 +232,7 @@ private:
      * @param aZoneMgmtServer  A pointer to the ZoneMgmtServer object related to this delegate object.
      */
     void SetZoneMgmtServer(ZoneMgmtServer * aZoneMgmtServer) { mZoneMgmtServer = aZoneMgmtServer; }
-    
+
 };
 
 class ZoneMgmtServer : public CommandHandlerInterface, public AttributeAccessInterface
