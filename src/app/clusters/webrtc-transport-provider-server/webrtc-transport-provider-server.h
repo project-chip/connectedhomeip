@@ -320,6 +320,12 @@ public:
      */
     const std::vector<WebRTCSessionStruct> & GetCurrentSessions() const { return mCurrentSessions; }
 
+    /**
+     * @brief Removes a WebRTC session given a session ID.
+     *
+     */
+    void RemoveSession(uint16_t sessionId);
+
 private:
     enum class UpsertResultEnum : uint8_t
     {
@@ -334,7 +340,6 @@ private:
     WebRTCSessionStruct * FindSession(uint16_t sessionId);
     WebRTCSessionStruct * CheckForMatchingSession(HandlerContext & ctx, uint16_t sessionId);
     UpsertResultEnum UpsertSession(const WebRTCSessionStruct & session);
-    void RemoveSession(uint16_t sessionId);
     CHIP_ERROR GenerateSessionId(uint16_t & outSessionId);
 
     // Command Handlers

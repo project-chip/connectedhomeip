@@ -56,6 +56,7 @@ class LibdatachannelPeerConnection(LibdatachannelWebRTCClient):
             Events.OFFER: AsyncEventQueue(loop=event_loop),
             Events.ANSWER: AsyncEventQueue(loop=event_loop),
             Events.ICE_CANDIDATE: AsyncEventQueue(loop=event_loop),
+            Events.END: AsyncEventQueue(loop=event_loop),
         }
 
         # local events to capture local events from webrtc client library
@@ -229,6 +230,22 @@ class LibdatachannelPeerConnection(LibdatachannelWebRTCClient):
         logging.debug("waiting for remote iceCandidates")
         return await self._remote_events[Events.ICE_CANDIDATE].get(timeout_s)
 
+    async def get_remote_end(self, timeout: int | None = None) -> tuple[int, int]:
+        """Waits for a remote WebRTC End Session to be received through a matter command.
+
+        Args:
+            timeout (int | None): The maximum time in seconds to wait for a remote offer.
+            If None, the function will wait indefinitely.
+
+        Returns:
+            tuple[int, int]: A tuple containing the session ID and the end reason.
+
+        Raises:
+            asyncio.TimeoutError: If no remote offer is received within the specified timeout period.
+        """
+        logging.debug("waiting for remote End session")
+        return await self._remote_events[Events.END].get(timeout)
+
     async def check_for_session_establishment(self) -> bool:
         """Monitors the peer connection state and determines if a session has been successfully established.
 
@@ -315,3 +332,7 @@ class LibdatachannelPeerConnection(LibdatachannelWebRTCClient):
     def on_remote_ice_candidates(self, sessionId: int, candidates: list[str]) -> None:
         """Callback function called when a remote ICE candidates are received through a matter command."""
         self._remote_events[Events.ICE_CANDIDATE].put((sessionId, candidates))
+
+    def on_remote_end(self, sessionId: int, reason: int) -> None:
+        """Callback function called when a remote END session is received through a matter command."""
+        self._remote_events[Events.END].put((sessionId, reason))

@@ -36,6 +36,7 @@ public:
         kOffer         = 1,
         kAnswer        = 2,
         kICECandidates = 3,
+        kEnd           = 4,
     };
 
     enum class State : uint8_t
@@ -44,6 +45,7 @@ public:
         SendingOffer,         ///< Sending Offer command from camera
         SendingAnswer,        ///< Sending Answer command from camera
         SendingICECandidates, ///< Sending ICECandidates command from camera
+        SendingEnd,           ///< Sending End command from camera
     };
 
     struct RequestArgs
