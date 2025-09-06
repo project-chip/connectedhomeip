@@ -27,6 +27,9 @@ namespace AddressResolve {
 namespace Impl {
 
 inline constexpr uint8_t kNodeLookupResultsLen = CHIP_CONFIG_MDNS_RESOLVE_LOOKUP_RESULTS;
+#if CHIP_DEVICE_ENABLE_CASE_DNS_CACHE
+inline constexpr uint8_t kMaxCacheSize = 16;
+#endif // CHIP_DEVICE_ENABLE_CASE_DNS_CACHE
 
 enum class NodeLookupResult
 {
@@ -174,6 +177,16 @@ public:
     CHIP_ERROR LookupNode(const NodeLookupRequest & request, Impl::NodeLookupHandle & handle) override;
     CHIP_ERROR TryNextResult(Impl::NodeLookupHandle & handle) override;
     CHIP_ERROR CancelLookup(Impl::NodeLookupHandle & handle, FailureCallback cancel_method) override;
+
+#if CHIP_DEVICE_ENABLE_CASE_DNS_CACHE
+    virtual CHIP_ERROR CacheNode(NodeId nodeId, const ResolveResult & result) override;
+
+    virtual CHIP_ERROR GetCachedNodeAddress(NodeId nodeId, ResolveResult & result) override;
+
+    virtual CHIP_ERROR RemoveCachedNodeAddress(NodeId nodeId) override;
+
+#endif // CHIP_DEVICE_ENABLE_CASE_DNS_CACHE
+
     void Shutdown() override;
 
     // Dnssd::OperationalResolveDelegate
@@ -203,6 +216,22 @@ private:
     System::Layer * mSystemLayer = nullptr;
     Time::TimeSource<Time::Source::kSystem> mTimeSource;
     IntrusiveList<NodeLookupHandle> mActiveLookups;
+
+#if CHIP_DEVICE_ENABLE_CASE_DNS_CACHE
+    // Cache entry structure
+    struct CacheEntry
+    {
+        NodeId nodeId;
+        ResolveResult result;
+    };
+
+    // Fixed-size cache array
+    CacheEntry mCache[kMaxCacheSize];
+    // Number of valid entries in cache
+    size_t mCacheCount = 0;
+    // Index for next insertion (for FIFO replacement)
+    size_t mNextCacheIndex = 0;
+#endif // CHIP_DEVICE_ENABLE_CASE_DNS_CACHE
 };
 
 } // namespace Impl

@@ -40,6 +40,7 @@
 #include <credentials/CHIPCert.h>
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <crypto/CHIPCryptoPAL.h>
+#include <lib/address_resolve/AddressResolve.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/core/CHIPEncoding.h>
 #include <lib/core/CHIPSafeCasts.h>
@@ -97,6 +98,9 @@ using namespace chip::Encoding;
 #if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY
 using namespace chip::Protocols::UserDirectedCommissioning;
 #endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY
+
+using chip::AddressResolve::Resolver;
+using chip::AddressResolve::ResolveResult;
 
 DeviceController::DeviceController()
 {
@@ -710,6 +714,7 @@ CHIP_ERROR DeviceCommissioner::EstablishPASEConnection(NodeId remoteDeviceId, co
     return mSetUpCodePairer.PairDevice(remoteDeviceId, setUpCode, SetupCodePairerBehaviour::kPaseOnly, discoveryType,
                                        resolutionData);
 }
+using chip::AddressResolve::ResolveResult;
 
 CHIP_ERROR DeviceCommissioner::EstablishPASEConnection(NodeId remoteDeviceId, RendezvousParameters & params)
 {
@@ -747,6 +752,14 @@ CHIP_ERROR DeviceCommissioner::EstablishPASEConnection(NodeId remoteDeviceId, Re
     {
         peerAddress = Transport::PeerAddress::UDP(params.GetPeerAddress().GetIPAddress(), params.GetPeerAddress().GetPort(),
                                                   params.GetPeerAddress().GetInterface());
+#if CHIP_DEVICE_ENABLE_CASE_DNS_CACHE
+        ResolveResult result;
+        result.address = params.GetPeerAddress();
+        result.mrpRemoteConfig = params.GetMRPConfig();
+        result.supportsTcpClient = params.GetPeerAddress().GetTransportType() == Transport::Type::kTcp;
+        result.supportsTcpServer = params.GetPeerAddress().GetTransportType() == Transport::Type::kTcp;
+        Resolver::Instance().CacheNode(remoteDeviceId, result);
+#endif // CHIP_DEVICE_ENABLE_CASE_DNS_CACHE
     }
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
     else if (params.GetPeerAddress().GetTransportType() == Transport::Type::kWiFiPAF)
