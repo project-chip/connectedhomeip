@@ -74,6 +74,10 @@ public:
 
     Protocols::InteractionModel::Status ValidateAudioStream(uint16_t audioStreamId) override;
 
+    Protocols::InteractionModel::Status ValidateZoneId(uint16_t zoneId) override;
+
+    bool ValidateMotionZoneSize(uint16_t zoneSize) override;
+
     PushAvStreamTransportStatusEnum GetTransportBusyStatus(const uint16_t connectionID) override;
 
     void OnAttributeChanged(AttributeId attributeId) override;
