@@ -35,7 +35,11 @@ public:
     CHIP_ERROR SignWithDeviceAttestationKey(const ByteSpan & message_to_sign, MutableByteSpan & out_signature_buffer) override;
 
 private:
-    matter::TrustyMatter trusty_matter;
+    matter::TrustyMatter & GetTrustyMatter()
+    {
+        static matter::TrustyMatter instance;
+        return instance;
+    }
 };
 
 } // namespace Trusty
