@@ -673,7 +673,6 @@ PushAvStreamTransportServerLogic::HandleAllocatePushTransport(CommandHandler & h
                 auto cluster_status = to_underlying(StatusCodeEnum::kInvalidStream);
                 ChipLogError(Zcl, "HandleAllocatePushTransport[ep=%d]: Invalid Video Stream ", mEndpointId);
                 handler.AddClusterSpecificFailure(commandPath, cluster_status);
-                handler.AddStatus(commandPath, delegateStatus);
                 return std::nullopt;
             }
         }
@@ -706,7 +705,6 @@ PushAvStreamTransportServerLogic::HandleAllocatePushTransport(CommandHandler & h
                 auto cluster_status = to_underlying(StatusCodeEnum::kInvalidStream);
                 ChipLogError(Zcl, "HandleAllocatePushTransport[ep=%d]: Invalid Audio Stream ", mEndpointId);
                 handler.AddClusterSpecificFailure(commandPath, cluster_status);
-                handler.AddStatus(commandPath, delegateStatus);
                 return std::nullopt;
             }
         }
