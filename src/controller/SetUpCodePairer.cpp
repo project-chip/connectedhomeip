@@ -30,6 +30,7 @@
 #include <lib/dnssd/Resolver.h>
 #include <lib/support/CodeUtils.h>
 #include <memory>
+#include <platform/internal/NFCCommissioningManager.h>
 #include <system/SystemClock.h>
 #include <tracing/metric_event.h>
 #include <vector>
@@ -126,6 +127,20 @@ CHIP_ERROR SetUpCodePairer::Connect()
             else if (err != CHIP_NO_ERROR)
             {
                 ChipLogError(Controller, "Failed to start commissionable node discovery over Wi-Fi PAF: %" CHIP_ERROR_FORMAT,
+                             err.Format());
+            }
+        }
+        if (ShouldDiscoverUsing(RendezvousInformationFlag::kNFC))
+        {
+            CHIP_ERROR err = StartDiscoveryOverNFC();
+            if ((CHIP_ERROR_NOT_IMPLEMENTED == err) || (CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE == err))
+            {
+                ChipLogProgress(Controller,
+                                "Skipping commissionable node discovery over NFC since not supported by the controller!");
+            }
+            else if (err != CHIP_NO_ERROR)
+            {
+                ChipLogError(Controller, "Failed to start commissionable node discovery over NFC: %" CHIP_ERROR_FORMAT,
                              err.Format());
             }
         }
@@ -296,6 +311,66 @@ CHIP_ERROR SetUpCodePairer::StopDiscoveryOverWiFiPAF()
     mWaitingForDiscovery[kWiFiPAFTransport] = false;
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
     DeviceLayer::ConnectivityMgr().WiFiPAFCancelIncompleteSubscribe();
+#endif
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR SetUpCodePairer::StartDiscoveryOverNFC()
+{
+#if CHIP_DEVICE_CONFIG_ENABLE_NFC_BASED_COMMISSIONING
+    if (mSetupPayloads.size() != 1)
+    {
+        ChipLogError(Controller, "NFC commissioning does not support concatenated QR codes yet.");
+        return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+    }
+
+    auto & payload = mSetupPayloads[0];
+
+    ChipLogProgress(Controller, "Starting commissionable node discovery over NFC");
+    VerifyOrReturnError(mCommissioner != nullptr, CHIP_ERROR_INCORRECT_STATE);
+
+    const SetupDiscriminator connDiscriminator(payload.discriminator);
+    VerifyOrReturnValue(!connDiscriminator.IsShortDiscriminator(), CHIP_ERROR_INVALID_ARGUMENT,
+                        ChipLogError(Controller, "Error, Long discriminator is required"));
+    chip::Nfc::NFCTag::Identifier identifier  = { .discriminator = payload.discriminator.GetLongValue() };
+    Nfc::NFCReaderTransport * readerTransport = DeviceLayer::Internal::NFCCommissioningMgr().GetNFCReaderTransport();
+    if (!readerTransport)
+    {
+        ChipLogError(Controller, "Commissionable node discovery over NFC since there is no valid NFC reader transport");
+        return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+    }
+
+    readerTransport->SetDelegate(this);
+    CHIP_ERROR err = readerTransport->StartDiscoveringTagMatchingAddress(identifier);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Controller, "Commissionable node discovery over NFC failed, err = %" CHIP_ERROR_FORMAT, err.Format());
+    }
+    else
+    {
+        mWaitingForDiscovery[kNFCTransport] = true;
+    }
+    return err;
+#else
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+#endif // CHIP_DEVICE_CONFIG_ENABLE_NFC_BASED_COMMISSIONING
+}
+
+CHIP_ERROR SetUpCodePairer::StopDiscoveryOverNFC()
+{
+#if CHIP_DEVICE_CONFIG_ENABLE_NFC_BASED_COMMISSIONING
+    mWaitingForDiscovery[kNFCTransport] = false;
+
+    Nfc::NFCReaderTransport * readerTransport = DeviceLayer::Internal::NFCCommissioningMgr().GetNFCReaderTransport();
+    if (!readerTransport)
+    {
+        ChipLogError(Controller,
+                     "Failed to stop commissionable node discovery over NFC since there is no valid NFC reader transport");
+        return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+    }
+
+    ChipLogProgress(Controller, "Stopping commissionable node discovery over NFC by removing delegate");
+    readerTransport->SetDelegate(nullptr);
 #endif
     return CHIP_NO_ERROR;
 }
@@ -478,6 +553,29 @@ void SetUpCodePairer::OnWiFiPAFSubscribeError(void * appState, CHIP_ERROR err)
 }
 #endif
 
+#if CHIP_DEVICE_CONFIG_ENABLE_NFC_BASED_COMMISSIONING
+void SetUpCodePairer::OnTagDiscovered(const chip::Nfc::NFCTag::Identifier & identifier)
+{
+    ChipLogProgress(Controller, "Discovered device to be commissioned over NFC, Identifier: %u", identifier.discriminator);
+
+    mWaitingForDiscovery[kNFCTransport] = false;
+    auto param                          = SetUpCodePairerParameters();
+    param.SetPeerAddress(Transport::PeerAddress(Transport::PeerAddress::NFC(identifier.discriminator)));
+    // TODO: This needs to support concatenated QR codes and set the relevant
+    // long discriminator on param.
+    //
+    // See https://github.com/project-chip/connectedhomeip/issues/39134
+    mDiscoveredParameters.emplace_back(param);
+    ConnectToDiscoveredDevice();
+}
+
+void SetUpCodePairer::OnTagDiscoveryFailed(CHIP_ERROR error)
+{
+    ChipLogError(Controller, "Commissionable node discovery over NFC failed: %" CHIP_ERROR_FORMAT, error.Format());
+    mWaitingForDiscovery[kNFCTransport] = false;
+}
+#endif
+
 bool SetUpCodePairer::IdIsPresent(uint16_t vendorOrProductID)
 {
     return vendorOrProductID != kNotAvailable;
@@ -614,6 +712,7 @@ void SetUpCodePairer::StopAllDiscoveryAttempts()
     LogErrorOnFailure(StopDiscoveryOverBLE());
     LogErrorOnFailure(StopDiscoveryOverDNSSD());
     LogErrorOnFailure(StopDiscoveryOverWiFiPAF());
+    LogErrorOnFailure(StopDiscoveryOverNFC());
 
     // Just in case any of those failed to reset the waiting state properly.
     for (auto & waiting : mWaitingForDiscovery)
