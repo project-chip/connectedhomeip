@@ -511,6 +511,11 @@ class MatterBaseTest(base_test.BaseTestClass):
         except AttributeError:
             return None
 
+    def get_restart_flag_file(self) -> Optional[str]:
+        if self.matter_test_config.restart_flag_file is None:
+            return None
+        return str(self.matter_test_config.restart_flag_file)
+
     def get_test_pics(self, test: str) -> list[str]:
         ''' Retrieves a list of top-level PICS that should be checked before running this test
 
