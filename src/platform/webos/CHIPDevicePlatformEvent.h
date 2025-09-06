@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020-2022 Project CHIP Authors
+ *    Copyright (c) 2020 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -23,6 +23,7 @@
 
 #pragma once
 
+#include <lib/core/CHIPError.h>
 #include <platform/CHIPDeviceEvent.h>
 #include <system/SystemPacketBuffer.h>
 
@@ -44,7 +45,27 @@ enum PublicPlatformSpecificEventTypes
  */
 enum InternalPlatformSpecificEventTypes
 {
+    kPlatformLinuxEvent = kRange_InternalPlatformSpecific,
+    kPlatformLinuxBLEAdapterAdded,
+    kPlatformLinuxBLEAdapterRemoved,
+    kPlatformLinuxBLECentralConnected,
+    kPlatformLinuxBLECentralConnectFailed,
+    kPlatformLinuxBLEWriteComplete,
+    kPlatformLinuxBLESubscribeOpComplete,
+    kPlatformLinuxBLEIndicationReceived,
+    kPlatformLinuxBLEC1WriteEvent,
+    kPlatformLinuxBLEOutOfBuffersEvent,
+    kPlatformLinuxBLEPeripheralRegisterAppComplete,
+    kPlatformLinuxBLEPeripheralAdvStartComplete,
+    kPlatformLinuxBLEPeripheralAdvStopComplete,
+    kPlatformLinuxBLEPeripheralAdvReleased,
+};
+
+enum InternalPlatformSpecificWbsEventTypes
+{
     kPlatformWebOSEvent = kRange_InternalPlatformSpecific,
+    kPlatformWebOSBLEAdapterAdded,
+    kPlatformWebOSBLEAdapterRemoved,
     kPlatformWebOSBLECentralConnected,
     kPlatformWebOSBLECentralConnectFailed,
     kPlatformWebOSBLEWriteComplete,
@@ -53,20 +74,24 @@ enum InternalPlatformSpecificEventTypes
     kPlatformWebOSBLEC1WriteEvent,
     kPlatformWebOSBLEOutOfBuffersEvent,
     kPlatformWebOSBLEPeripheralRegisterAppComplete,
-    kPlatformWebOSBLEPeripheralAdvConfiguredComplete,
     kPlatformWebOSBLEPeripheralAdvStartComplete,
-    kPlatformWebOSBLEPeripheralAdvStopComplete
+    kPlatformWebOSBLEPeripheralAdvStopComplete,
+    kPlatformWebOSBLEPeripheralAdvReleased,
 };
-
 } // namespace DeviceEventType
 
 /**
- * Represents platform-specific event information for webOS platforms.
+ * Represents platform-specific event information for Linux platforms.
  */
 struct ChipDevicePlatformEvent
 {
     union
     {
+        struct
+        {
+            unsigned int mAdapterId;
+            char mAdapterAddress[18];
+        } BLEAdapter;
         struct
         {
             BLE_CONNECTION_OBJECT mConnection;
@@ -91,23 +116,15 @@ struct ChipDevicePlatformEvent
         } BLEIndicationReceived;
         struct
         {
-            bool mIsSuccess;
-            void * mpAppstate;
+            CHIP_ERROR mError;
         } BLEPeripheralRegisterAppComplete;
         struct
         {
-            bool mIsSuccess;
-            void * mpAppstate;
-        } BLEPeripheralAdvConfiguredComplete;
-        struct
-        {
-            bool mIsSuccess;
-            void * mpAppstate;
+            CHIP_ERROR mError;
         } BLEPeripheralAdvStartComplete;
         struct
         {
-            bool mIsSuccess;
-            void * mpAppstate;
+            CHIP_ERROR mError;
         } BLEPeripheralAdvStopComplete;
     };
 };
