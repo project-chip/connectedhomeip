@@ -48,7 +48,7 @@ from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_b
 logger = logging.getLogger(__name__)
 
 
-class TC_PAVST_2_4(MatterBaseTest, PAVSTTestBase,PAVSTIUtils):
+class TC_PAVST_2_4(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
     def desc_TC_PAVST_2_4(self) -> str:
         return "[TC-PAVST-2.4] Modify PushAV Transport with Server as DUT"
 

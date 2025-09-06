@@ -54,7 +54,7 @@ class TC_PAVST_2_7(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
 
     def pics_TC_PAVST_2_7(self):
         return ["PAVST.S"]
-    
+
     @async_test_body
     async def setup_class(self):
         th_server_app = self.user_params.get("th_server_app_path", None)

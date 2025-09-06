@@ -74,7 +74,6 @@ class TC_PAVST_2_9(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
             self.server.terminate()
         super().teardown_class()
 
-
     def steps_TC_PAVST_2_9(self) -> list[TestStep]:
         return [
             TestStep("precondition", "Commissioning, already done", is_commissioning=True),
