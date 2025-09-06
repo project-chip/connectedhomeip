@@ -119,13 +119,13 @@ const char * StageToString(CommissioningStage stage)
         return "ThreadNetworkEnable";
 
     case kEvictPreviousCaseSessions:
-        return "kEvictPreviousCaseSessions";
+        return "EvictPreviousCaseSessions";
 
     case kFindOperationalForStayActive:
-        return "kFindOperationalForStayActive";
+        return "FindOperationalForStayActive";
 
     case kFindOperationalForCommissioningComplete:
-        return "kFindOperationalForCommissioningComplete";
+        return "FindOperationalForCommissioningComplete";
 
     case kICDSendStayActive:
         return "ICDSendStayActive";
