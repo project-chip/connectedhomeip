@@ -232,7 +232,7 @@ class TC_SU_2_2(MatterBaseTest):
         )
         logger.info(f'Prerequisite #3.2 - ACLs current privileges on Provider with node {provider_node}: {acl_current_provider}')
 
-        return acl_original_provider
+        return acl_original_requestor, acl_original_provider
 
     async def add_single_ota_provider(self, controller, requestor_node_id: int, provider_node_id: int):
         """
@@ -404,7 +404,7 @@ class TC_SU_2_2(MatterBaseTest):
         # Set ACLs for OTA update:
         # - On Requestor to allow specified Provider to interact with OTA Requestor cluster
         # - On Provider to allow Requestor to interact with OTA Provider cluster
-        original_provider_acls_s1 = await self.set_ota_acls_for_provider(
+        original_requestor_acls_s1, original_provider_acls_s1 = await self.set_ota_acls_for_provider(
             controller,
             requestor_node=requestor_node_id,
             provider_node=provider_node_id_s1,
@@ -603,13 +603,18 @@ class TC_SU_2_2(MatterBaseTest):
         # ------------------------------------------------------------------------------------
         logger.info(f'{step_number_s1}: Step #1.4 - Clean Close Provider_S1 Process')
 
+        # Clean Provider ACL
+        await self.write_acl(controller, provider_node_id_s1, original_provider_acls_s1)
+        logger.info(f'{step_number_s1}: Step #1.4 - Cleaned ACLs on Provider {provider_node_id_s1}, restored original entries')
+        await asyncio.sleep(1)
+
         # Expire sessions
         controller.ExpireSessions(provider_node_id_s1)
         await asyncio.sleep(1)
 
-        # Clean Provider ACL
-        await self.write_acl(controller, provider_node_id_s1, original_provider_acls_s1)
-        logger.info(f'{step_number_s1}: Step #1.4 - Cleaned ACLs on Provider {provider_node_id_s1}, restored original entries')
+        # Clean Requestor ACL
+        await self.write_acl(controller, requestor_node_id, original_requestor_acls_s1)
+        logger.info(f'Cleaned ACLs on Requestor {requestor_node_id}, restored original entries')
         await asyncio.sleep(1)
 
         # Kill Provider
@@ -672,7 +677,7 @@ class TC_SU_2_2(MatterBaseTest):
         # Set ACLs for OTA update:
         # - On Requestor to allow specified Provider to interact with OTA Requestor cluster
         # - On Provider to allow Requestor to interact with OTA Provider cluster
-        original_provider_acls_s2 = await self.set_ota_acls_for_provider(
+        original_requestor_acls_s2, original_provider_acls_s2 = await self.set_ota_acls_for_provider(
             controller=controller,
             requestor_node=requestor_node_id,     # DUT
             provider_node=provider_node_id_s2,    # Provider
@@ -803,13 +808,18 @@ class TC_SU_2_2(MatterBaseTest):
 
         logger.info(f'{step_number_s2}: Step #2.4 - Clean Close Provider_S2 Process.')
 
+        # Clean Provider ACL
+        await self.write_acl(controller, provider_node_id_s2, original_provider_acls_s2)
+        logger.info(f'{step_number_s2}: Step #2.4 - Cleaned ACLs on Provider {provider_node_id_s2}, restored original entries')
+        await asyncio.sleep(1)
+
         # Expire sessions
         controller.ExpireSessions(provider_node_id_s2)
         await asyncio.sleep(1)
 
-        # Clean Provider ACL
-        await self.write_acl(controller, provider_node_id_s2, original_provider_acls_s2)
-        logger.info(f'{step_number_s2}: Step #2.4 - Cleaned ACLs on Provider {provider_node_id_s2}, restored original entries')
+        # Clean Requestor ACL
+        await self.write_acl(controller, requestor_node_id, original_requestor_acls_s2)
+        logger.info(f'Cleaned ACLs on Requestor {requestor_node_id}, restored original entries')
         await asyncio.sleep(1)
 
         # Kill provider
@@ -872,7 +882,7 @@ class TC_SU_2_2(MatterBaseTest):
         # Set ACLs for OTA update:
         # - On Requestor to allow specified Provider to interact with OTA Requestor cluster
         # - On Provider to allow Requestor to interact with OTA Provider cluster
-        original_provider_acls_s3 = await self.set_ota_acls_for_provider(
+        original_requestor_acls_s3, original_provider_acls_s3 = await self.set_ota_acls_for_provider(
             controller=controller,
             requestor_node=requestor_node_id,     # DUT
             provider_node=provider_node_id_s3,    # Provider
@@ -1001,13 +1011,18 @@ class TC_SU_2_2(MatterBaseTest):
 
         logger.info(f'{step_number_s3}: Step #2.4 - Clean Close Provider_S3 Process.')
 
+        # Clean Provider ACL
+        await self.write_acl(controller, provider_node_id_s3, original_provider_acls_s3)
+        logger.info(f'{step_number_s3}: Step #2.4 - Cleaned ACLs on Provider {provider_node_id_s3}, restored original entries')
+        await asyncio.sleep(1)
+
         # Expire sessions
         controller.ExpireSessions(provider_node_id_s3)
         await asyncio.sleep(1)
 
-        # Clean Provider ACL
-        await self.write_acl(controller, provider_node_id_s3, original_provider_acls_s3)
-        logger.info(f'{step_number_s3}: Step #2.4 - Cleaned ACLs on Provider {provider_node_id_s3}, restored original entries')
+        # Clean Requestor ACL
+        await self.write_acl(controller, requestor_node_id, original_requestor_acls_s3)
+        logger.info(f'Cleaned ACLs on Requestor {requestor_node_id}, restored original entries')
         await asyncio.sleep(1)
 
         # Kill Provider
@@ -1032,7 +1047,7 @@ class TC_SU_2_2(MatterBaseTest):
         provider_discriminator_s4 = 1114             # Changed in each step
         provider_setupPinCode_s4 = 20202022          # Changed in each step
         provider_port_s4 = 5540                      # Previous used on Steps 1, Provider_S1 5540, Requestor 5541
-        provider_ota_file_s4 = "firmware_requestor_v4.ota"
+        provider_ota_file_s4 = "firmware_requestor_v5.ota"
         logger.info(f"""{step_number_s4}: Prerequisite #1.0 - Provider:
             NodeID: {provider_node_id_s4},
             discriminator: {provider_discriminator_s4},
@@ -1070,7 +1085,7 @@ class TC_SU_2_2(MatterBaseTest):
         # Set ACLs for OTA update:
         # - On Requestor to allow specified Provider to interact with OTA Requestor cluster
         # - On Provider to allow Requestor to interact with OTA Provider cluster
-        original_provider_acls_s4 = await self.set_ota_acls_for_provider(
+        original_requestor_acls_s4, original_provider_acls_s4 = await self.set_ota_acls_for_provider(
             controller=controller,
             requestor_node=requestor_node_id,     # DUT
             provider_node=provider_node_id_s4,    # Provider
@@ -1133,13 +1148,42 @@ class TC_SU_2_2(MatterBaseTest):
         observed_states = set()
         state_sequence = []  # Full OTA state flow
         final_downloading_seen = False
+        final_idle_seen = False
+
+        # def busy_state_delayed_update_180s(report):
+        #     """
+        #     Step #2.1 Matcher for 180s DelayedActionTime:
+        #     Expect UpdateState to go from kDelayedOnQuery (Busy) to Downloading after ~180s.
+        #     """
+        #     nonlocal observed_states, final_downloading_seen, state_sequence
+        #     global t_start_downloading
+        #     val = report.value
+
+        #     if val is None:
+        #         return False
+
+        #     if val == Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kDelayedOnQuery:  # 3
+        #         if val not in observed_states:
+        #             observed_states.add(val)
+        #             state_sequence.append(val)
+        #             logger.info(f'{step_number_s4}: Step #2.1 - UpdateState recorded: {val}')
+
+        #     elif val == Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kDownloading:   # 4
+        #         if not final_downloading_seen:  # log only once
+        #             final_downloading_seen = True
+        #             state_sequence.append(val)
+        #             t_start_downloading = time.time()
+        #             logger.info(
+        #                 f'{step_number_s4}:Step #2.1 - OTA UpdateState sequence transitioned to Downloading after Busy (expect ~180s).')
+        #     # Return True only when Downloading is reached
+        #     return final_downloading_seen
 
         def busy_state_delayed_update_180s(report):
             """
             Step #2.1 Matcher for 180s DelayedActionTime:
             Expect UpdateState to go from kDelayedOnQuery (Busy) to Downloading after ~180s.
             """
-            nonlocal observed_states, final_downloading_seen, state_sequence
+            nonlocal observed_states, final_downloading_seen, final_idle_seen, state_sequence
             global t_start_downloading
             val = report.value
 
@@ -1157,10 +1201,18 @@ class TC_SU_2_2(MatterBaseTest):
                     final_downloading_seen = True
                     state_sequence.append(val)
                     t_start_downloading = time.time()
+                    logger.info(f'{step_number_s4}: Step #2.1 - UpdateState recorded: {val}')
                     logger.info(
-                        f'{step_number_s4}:Step #2.1 - OTA UpdateState sequence transitioned to Downloading after Busy (expect ~180s).')
-            # Return True only when Downloading is reached
-            return final_downloading_seen
+                        f'{step_number_s4}: Step #2.1 - OTA UpdateState sequence transitioned to Downloading after Busy (expect ~180s).')
+
+            elif val == Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kIdle:  # 1
+                if not final_idle_seen:  # log only once
+                    final_idle_seen = True
+                    # state_sequence.append(val)
+                    logger.info(f'{step_number_s4}: Step #2.1 - UpdateState recorded: {val}')
+                    logger.info(f'{step_number_s4}: Step #2.1 - OTA UpdateState sequence complete, final state is Idle')
+            # Return True only when Idle is reached
+            return final_idle_seen
 
         # Create matcher object for UpdateState (expect Busy → Downloading transition after 180s).
         matcher_busy_state_delayed_180s_obj = AttributeMatcher.from_callable(
@@ -1196,19 +1248,37 @@ class TC_SU_2_2(MatterBaseTest):
 
         # ------------------------------------------------------------------------------------
         # [STEP_4]: Step # 2.4 - Close Requestor and Provider_S4 Process  (CLEANUP!!!!)
+        #
+        # The order here is critical to avoid permission errors (ACL) and dangling sessions:
+        #
+        # 1. Clean Provider ACL > while the Provider is still alive, restore its original ACLs.
+        # 2. Expire Provider Sessions > explicitly invalidate active sessions to prevent leaks.
+        # 3. Clean Requestor ACL > restore the Requestor’s ACLs (always accessible).
+        # 4. Kill Provider Process > terminate the Provider process once everything is cleaned.
+        # 5. Delete KVS files > remove any leftover state on disk to ensure a fresh start.
+        #
+        # Note: If we kill the Provider before step 1 or 2, it would no longer be possible
+        # to clean its ACLs or expire sessions, which can cause errors such as
+        # "CHIP Error 0x00000032: Timeout" or "Exhausted resources".
+
         # ------------------------------------------------------------------------------------
 
-        await asyncio.sleep(270)          # TEMP
+        # await asyncio.sleep(270)          # TEMP
 
         logger.info(f'{step_number_s4}: Step #2.4 - Clean Close Provider_S4 Process.')
+
+        # Clean Provider ACL
+        await self.write_acl(controller, provider_node_id_s4, original_provider_acls_s4)
+        logger.info(f'{step_number_s4}: Step #2.4 - Cleaned ACLs on Provider {provider_node_id_s4}, restored original entries')
+        await asyncio.sleep(1)
 
         # Expire sessions
         controller.ExpireSessions(provider_node_id_s4)
         await asyncio.sleep(1)
 
-        # Clean Provider ACL
-        await self.write_acl(controller, provider_node_id_s4, original_provider_acls_s4)
-        logger.info(f'{step_number_s4}: Step #2.4 - Cleaned ACLs on Provider {provider_node_id_s4}, restored original entries')
+        # Clean Requestor ACL
+        await self.write_acl(controller, requestor_node_id, original_requestor_acls_s4)
+        logger.info(f'Cleaned ACLs on Requestor {requestor_node_id}, restored original entries')
         await asyncio.sleep(1)
 
         # Kill Provider
