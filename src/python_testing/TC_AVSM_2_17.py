@@ -39,7 +39,6 @@ import logging
 
 from mobly import asserts
 from TC_AVSMTestBase import AVSMTestBase
-from TC_WEBRTC_Utils import WebRTCTestHelper
 
 import matter.clusters as Clusters
 from matter import ChipDeviceCtrl
