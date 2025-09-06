@@ -47,7 +47,7 @@ import logging
 from os import environ, getcwd, kill, path, setpgrp
 from signal import SIGTERM
 from subprocess import Popen, run
-from time import sleep
+from time import sleep, time
 
 import psutil
 from mobly import asserts
@@ -648,9 +648,13 @@ class TC_SU_2_7(MatterBaseTest):
         asserts.assert_equal(event_report.newState, self.ota_req.Enums.UpdateStateEnum.kApplying,
                              f"Event status is not {self.ota_req.Enums.UpdateStateEnum.kApplying}")
         await state_transition_event_handler.cancel()
-
         self.step(7)
-        await asyncio.sleep(30)
+        # Status idle should be present after restart
+        # event_report = state_transition_event_handler.wait_for_event_report(self.ota_req.Events.StateTransition, timeout_sec=60*1)
+        # asserts.assert_equal(event_report.newState, self.ota_req.Enums.UpdateStateEnum.kIdle,
+        #                      "Status idle waas not present after restart")
+
+        await asyncio.sleep(60)
         urgent = 1
         version_applied_event = Clusters.OtaSoftwareUpdateRequestor.Events.VersionApplied
         events_response = await controller.ReadEvent(
@@ -659,12 +663,13 @@ class TC_SU_2_7(MatterBaseTest):
             fabricFiltered=True
         )
         logger.info(f"Events gathered {events_response}")
-        if len(events_response) == 0:
+        # Only UpdateAppliedEvent should be in the list
+        if len(events_response) != 1:
             asserts.fail("Failed to read the Version Applied Event")
-        # just one event should be in the list
+
         version_applied_event_data = events_response[0].Data
 
-        logger.info(f"Events reponse {events_response}")
+        logger.info(f"UpdateAppliedEvent response: {events_response}")
         asserts.assert_equal(update_software_version, version_applied_event_data.softwareVersion,
                              f"Software version from VersionAppliedEvent is not {update_software_version}")
         asserts.assert_is_not_none(version_applied_event_data.productID, "Product ID from VersionApplied Event is None")
