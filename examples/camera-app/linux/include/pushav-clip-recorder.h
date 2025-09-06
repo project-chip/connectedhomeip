@@ -22,6 +22,7 @@
 #include <algorithm>
 #include <atomic>
 #include <condition_variable>
+#include <functional>
 #include <memory>
 #include <mutex>
 #include <queue>
@@ -70,7 +71,8 @@ public:
         uint32_t mMaxClipDuration;                            ///< Maximum clip duration in seconds
         uint16_t mInitialDuration;                            ///< Initial clip duration in seconds
         uint16_t mAugmentationDuration;                       ///< Duration increment on motion detect
-        uint16_t mChunkDuration;                              ///< Segment duration in seconds
+        uint16_t mChunkDuration;                              ///< Chunk duration  milliseconds
+        uint16_t mSegmentDuration;                            ///< Segment duration in milliseconds
         uint16_t mBlindDuration;                              ///< Duration without recording after motion stop
         uint16_t mPreRollLength;                              ///< Pre-roll length in seconds
         std::string mRecorderId;                              ///< Unique recorder identifier
@@ -138,6 +140,8 @@ public:
      */
     void PushPacket(const char * data, size_t size, bool isVideo);
 
+    void SetOnStopCallback(std::function<void()> cb) { mOnStopCallback = std::move(cb); }
+
     std::atomic<bool> mDeinitializeRecorder{ false }; ///< Deinitialization flag
     ClipInfoStruct mClipInfo;                         ///< Clip configuration parameters
     void SetRecorderStatus(bool status);              ///< Sets the recorder status
@@ -164,6 +168,8 @@ private:
 
     std::queue<AVPacket *> mAudioQueue;
     std::queue<AVPacket *> mVideoQueue;
+
+    std::function<void()> mOnStopCallback;
 
     int mAudioFragment           = 1;
     int mVideoFragment           = 1;

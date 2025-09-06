@@ -16,6 +16,7 @@
  *    limitations under the License.
  */
 #include "camera-app.h"
+#include "tls-certificate-management-instance.h"
 #include "tls-client-management-instance.h"
 #include <app/clusters/push-av-stream-transport-server/CodegenIntegration.h>
 
@@ -50,6 +51,8 @@ CameraApp::CameraApp(chip::EndpointId aClustersEndpoint, CameraDeviceInterface *
     Clusters::PushAvStreamTransport::SetTLSClientManagementDelegate(mEndpoint,
                                                                     &Clusters::TlsClientManagementCommandDelegate::GetInstance());
 
+    Clusters::PushAvStreamTransport::SetTlsCertificateManagementDelegate(
+        chip::EndpointId(1), &Clusters::TlsCertificateManagementCommandDelegate::getInstance());
     // Fetch all initialization parameters for CameraAVStreamMgmt Server
     BitFlags<CameraAvStreamManagement::Feature> avsmFeatures;
     BitFlags<CameraAvStreamManagement::OptionalAttribute> avsmOptionalAttrs;

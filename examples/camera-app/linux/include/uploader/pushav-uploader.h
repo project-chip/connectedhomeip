@@ -35,14 +35,21 @@ typedef struct UploadDataInfo
 class PushAVUploader
 {
 public:
-    typedef struct CertificatesInfo
+    typedef struct CertificatesPathInfo
     {
         std::string mRootCert;
         std::string mDevCert;
         std::string mDevKey;
     } PushAVCertPath;
 
-    PushAVUploader(PushAVCertPath certPath);
+    typedef struct CertificatesInfo
+    {
+        std::vector<uint8_t> mRootCertBuffer;
+        std::vector<uint8_t> mClientCertBuffer;
+        std::vector<uint8_t> mClientKeyBuffer;
+    } PushAVCertBuffer;
+
+    PushAVUploader(PushAVCertPath certPath, PushAVCertBuffer certBuffer);
     ~PushAVUploader();
 
     void Start();
@@ -58,6 +65,7 @@ private:
     void ProcessQueue();
     void UploadData(std::pair<std::string, std::string> data);
     PushAVCertPath mCertPath;
+    PushAVCertBuffer mCertBuffer;
     std::queue<std::pair<std::string, std::string>> mAvData;
     std::mutex mQueueMutex;
     std::atomic<bool> mIsRunning;

@@ -19,11 +19,11 @@
 #pragma once
 #include <app-common/zap-generated/cluster-enums.h>
 #include <app/clusters/push-av-stream-transport-server/push-av-stream-transport-cluster.h>
-
+#include <app/clusters/tls-certificate-management-server/tls-certificate-management-server.h>
 #include <camera-device-interface.h>
+#include <functional>
 #include <media-controller.h>
 #include <pushav-transport.h>
-
 #include <unordered_map>
 #include <vector>
 
@@ -48,10 +48,11 @@ class PushAvStreamTransportManager : public PushAvStreamTransportDelegate
 public:
     PushAvStreamTransportManager() = default;
     ~PushAvStreamTransportManager();
-
     void Init();
     void SetMediaController(MediaController * mediaController);
     void SetCameraDevice(CameraDeviceInterface * cameraDevice);
+    void SetOnRecorderStoppedCallback(std::function<void(uint16_t, PushAvStreamTransport::TransportTriggerTypeEnum)> cb);
+    void SetOnRecorderStartedCallback(std::function<void(uint16_t, PushAvStreamTransport::TransportTriggerTypeEnum)> cb);
 
     // Add missing override keywords and fix signatures
     Protocols::InteractionModel::Status AllocatePushTransport(const TransportOptionsStruct & transportOptions,
@@ -69,6 +70,21 @@ public:
         const uint16_t connectionID, TriggerActivationReasonEnum activationReason,
         const Optional<Structs::TransportMotionTriggerTimeControlStruct::DecodableType> & timeControl) override;
 
+    void SetTLSCerts(Tls::CertificateTable::BufferedClientCert clientCertEntry,
+                     Tls::CertificateTable::BufferedRootCert rootCertEntry) override
+    {
+
+        auto rootSpan = rootCertEntry.GetCert().certificate.Value();
+        bufferRootCert.assign(rootSpan.data(), rootSpan.data() + rootSpan.size());
+
+        auto clientSpan = clientCertEntry.GetCert().clientCertificate.Value();
+        bufferClientCert.assign(clientSpan.data(), clientSpan.data() + clientSpan.size());
+
+        auto * clientKeyPtr = clientCertEntry.mCertWithKey.key.Bytes();
+        auto clientKeyLen   = clientCertEntry.mCertWithKey.key.Length();
+        bufferClientCertKey.assign(clientKeyPtr, clientKeyPtr + clientKeyLen);
+    }
+
     bool ValidateUrl(const std::string & url) override;
 
     bool ValidateStreamUsage(StreamUsageEnum streamUsage) override;
@@ -78,6 +94,10 @@ public:
     Protocols::InteractionModel::Status
     ValidateBandwidthLimit(StreamUsageEnum streamUsage, const Optional<DataModel::Nullable<uint16_t>> & videoStreamId,
                            const Optional<DataModel::Nullable<uint16_t>> & audioStreamId) override;
+
+    Protocols::InteractionModel::Status ValidateZoneId(uint16_t zoneId) override;
+
+    bool ValidateMotionZoneSize(uint16_t zoneSize) override;
 
     Protocols::InteractionModel::Status SelectVideoStream(StreamUsageEnum streamUsage, uint16_t & videoStreamId) override;
 
@@ -95,6 +115,8 @@ public:
 
     CHIP_ERROR PersistentAttributesLoadedCallback() override;
 
+    void OnZoneTriggeredEvent(u_int16_t zoneId);
+
 private:
     std::vector<PushAvStream> pushavStreams;
     MediaController * mMediaController    = nullptr;
@@ -104,6 +126,24 @@ private:
     VideoStreamStruct mVideoStreamParams;
     std::unordered_map<uint16_t, std::unique_ptr<PushAVTransport>> mTransportMap; // map for the transport objects
     std::unordered_map<uint16_t, TransportOptionsStruct> mTransportOptionsMap;    // map for the transport options
+
+    double mTotalUsedBandwidthMbps = 0.0; // Tracks the total bandwidth used by all active transports
+
+    std::function<void(uint16_t, PushAvStreamTransport::TransportTriggerTypeEnum)> mOnRecorderStoppedCb;
+    std::function<void(uint16_t, PushAvStreamTransport::TransportTriggerTypeEnum)> mOnRecorderStartedCb;
+
+    std::vector<uint8_t> bufferRootCert;
+    std::vector<uint8_t> bufferClientCert;
+    std::vector<uint8_t> bufferClientCertKey;
+
+    /**
+     * @brief Calculates the total bandwidth in Mbps for the given video and audio stream IDs.
+     * @param videoStreamId Optional nullable video stream ID.
+     * @param audioStreamId Optional nullable audio stream ID.
+     * @param outBandwidthMbps Output parameter for the calculated bandwidth in Mbps.
+     */
+    void GetBandwidthForStreams(const Optional<DataModel::Nullable<uint16_t>> & videoStreamId,
+                                const Optional<DataModel::Nullable<uint16_t>> & audioStreamId, double & outBandwidthMbps);
 };
 
 } // namespace PushAvStreamTransport

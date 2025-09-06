@@ -301,11 +301,12 @@ Status PushAvStreamTransportServerLogic::ValidateIncomingTransportOptions(
         {
             auto & motionZonesList = triggerOptions.motionZones;
             auto iter              = motionZonesList.Value().Value().begin();
+            int zoneSize           = 0;
 
             while (iter.Next())
             {
                 auto & transportZoneOption = iter.GetValue();
-
+                zoneSize += 1;
                 if (mFeatures.Has(Feature::kPerZoneSensitivity))
                 {
                     VerifyOrReturnValue(
@@ -329,6 +330,12 @@ Status PushAvStreamTransportServerLogic::ValidateIncomingTransportOptions(
                                                      mEndpointId));
                 }
             }
+
+            bool isValidZoneSize = mDelegate->ValidateMotionZoneSize(zoneSize);
+            VerifyOrReturnValue(isValidZoneSize, Status::ConstraintError,
+                                ChipLogError(Zcl,
+                                             "Transport Options verification from command data[ep=%d]: Invalid Motion Zone Size ",
+                                             mEndpointId));
 
             if (iter.GetStatus() != CHIP_NO_ERROR)
             {
@@ -541,35 +548,38 @@ PushAvStreamTransportServerLogic::HandleAllocatePushTransport(CommandHandler & h
     Commands::AllocatePushTransportResponse::Type response;
     auto & transportOptions = commandData.transportOptions;
 
-    Status transportOptionsValidityStatus = ValidateIncomingTransportOptions(transportOptions);
+    // TlsClientManagementDelegate::EndpointStructType TLSEndpoint;
+    // if (mTLSClientManagementDelegate != nullptr)
+    // {
+    //     Status tlsEndpointValidityStatus = mTLSClientManagementDelegate->FindProvisionedEndpointByID(
+    //         commandPath.mEndpointId, handler.GetAccessingFabricIndex(), commandData.transportOptions.endpointID, TLSEndpoint);
 
-    VerifyOrDo(transportOptionsValidityStatus == Status::Success, {
-        ChipLogError(Zcl, "HandleAllocatePushTransport[ep=%d]: TransportOptions of command data is not Valid", mEndpointId);
-        handler.AddStatus(commandPath, transportOptionsValidityStatus);
-        return std::nullopt;
-    });
+    // VerifyOrDo(tlsEndpointValidityStatus == Status::Success, {
+    //     ChipLogError(Zcl, "HandleAllocatePushTransport[ep=%d]: TLSEndpointID of command data is not valid/Provisioned",
+    //                  mEndpointId);
+    //     auto status = to_underlying(StatusCodeEnum::kInvalidTLSEndpoint);
+    //     handler.AddClusterSpecificFailure(commandPath, status);
+    //     return std::nullopt;
+    // });
 
-    TlsClientManagementDelegate::EndpointStructType TLSEndpoint;
-    if (mTLSClientManagementDelegate != nullptr)
-    {
-        Status tlsEndpointValidityStatus = mTLSClientManagementDelegate->FindProvisionedEndpointByID(
-            commandPath.mEndpointId, handler.GetAccessingFabricIndex(), commandData.transportOptions.endpointID, TLSEndpoint);
+    //     PersistentStore<CHIP_CONFIG_TLS_PERSISTED_ROOT_CERT_BYTES> rootCertBuffer;
+    //     PersistentStore<CHIP_CONFIG_TLS_PERSISTED_CLIENT_CERT_BYTES> clientCertBuffer;
+    //     Tls::CertificateTable::BufferedClientCert clientCertEntry(clientCertBuffer);
+    //     Tls::CertificateTable::BufferedRootCert rootCertEntry(rootCertBuffer);
 
-        VerifyOrDo(tlsEndpointValidityStatus == Status::Success, {
-            ChipLogError(Zcl, "HandleAllocatePushTransport[ep=%d]: TLSEndpointID of command data is not valid/Provisioned",
-                         mEndpointId);
-            auto status = to_underlying(StatusCodeEnum::kInvalidTLSEndpoint);
-            handler.AddClusterSpecificFailure(commandPath, status);
-            return std::nullopt;
-        });
-    }
-    else
-    {
-        ChipLogError(Zcl, "HandleAllocatePushTransport[ep=%d]: TLS Client Management Delegate is not set", mEndpointId);
-        auto status = to_underlying(StatusCodeEnum::kInvalidTLSEndpoint);
-        handler.AddClusterSpecificFailure(commandPath, status);
-        return std::nullopt;
-    }
+    //     auto & table = mTlsCertificateManagementDelegate->GetCertificateTable();
+    //     table.GetClientCertificateEntry(handler.GetAccessingFabricIndex(), TLSEndpoint.ccdid.Value(), clientCertEntry);
+    //     table.GetRootCertificateEntry(handler.GetAccessingFabricIndex(), TLSEndpoint.caid, rootCertEntry);
+
+    //     mDelegate->SetTLSCerts(clientCertEntry, rootCertEntry);
+    // }
+    // else
+    // {
+    // ChipLogError(Zcl, "HandleAllocatePushTransport[ep=%d]: TLS Client Management Delegate is not set", mEndpointId);
+    // auto status = to_underlying(StatusCodeEnum::kInvalidTLSEndpoint);
+    // handler.AddClusterSpecificFailure(commandPath, status);
+    // return std::nullopt;
+    // }
 
     IngestMethodsEnum ingestMethod = commandData.transportOptions.ingestMethod;
 
@@ -596,21 +606,49 @@ PushAvStreamTransportServerLogic::HandleAllocatePushTransport(CommandHandler & h
         return std::nullopt;
     }
 
-    bool isValidUrl = mDelegate->ValidateUrl(std::string(transportOptions.url.data(), transportOptions.url.size()));
+    /*Spec issue for invalid Trigger Type: https://github.com/CHIP-Specifications/connectedhomeip-spec/issues/11701*/
+    if (transportOptions.triggerOptions.triggerType == TransportTriggerTypeEnum::kUnknownEnumValue)
 
-    if (isValidUrl == false)
     {
-        auto status = to_underlying(StatusCodeEnum::kInvalidURL);
-        ChipLogError(Zcl, "HandleAllocatePushTransport[ep=%d]: Invalid Url", mEndpointId);
+        auto status = to_underlying(StatusCodeEnum::kInvalidTriggerType);
+        ChipLogError(Zcl, "HandleAllocatePushTransport[ep=%d]: Invalid Trigger type", mEndpointId);
         handler.AddClusterSpecificFailure(commandPath, status);
         return std::nullopt;
     }
 
-    /*Spec issue for invalid Trigger Type: https://github.com/CHIP-Specifications/connectedhomeip-spec/issues/11701*/
-    if (transportOptions.triggerOptions.triggerType == TransportTriggerTypeEnum::kUnknownEnumValue)
+    Status transportOptionsValidityStatus = ValidateIncomingTransportOptions(transportOptions);
+
+    VerifyOrDo(transportOptionsValidityStatus == Status::Success, {
+        ChipLogError(Zcl, "HandleAllocatePushTransport[ep=%d]: TransportOptions of command data is not Valid", mEndpointId);
+        handler.AddStatus(commandPath, transportOptionsValidityStatus);
+        return std::nullopt;
+    });
+
+    // here add check for invalid zoneid
+    if ((transportOptions.triggerOptions.triggerType == TransportTriggerTypeEnum::kMotion) &&
+        (transportOptions.triggerOptions.motionZones.HasValue()) && (!transportOptions.triggerOptions.motionZones.Value().IsNull()))
     {
-        auto status = to_underlying(StatusCodeEnum::kInvalidTriggerType);
-        ChipLogError(Zcl, "HandleAllocatePushTransport[ep=%d]: Invalid Trigger type", mEndpointId);
+
+        auto & motionZonesList = transportOptions.triggerOptions.motionZones;
+        auto iter              = motionZonesList.Value().Value().begin();
+        while (iter.Next())
+        {
+            auto & transportZoneOption = iter.GetValue();
+            Status zoneIdStatus        = mDelegate->ValidateZoneId(transportZoneOption.zone.Value());
+            if (zoneIdStatus != Status::Success)
+            {
+                auto status = to_underlying(StatusCodeEnum::kInvalidZone);
+                ChipLogError(Zcl, "HandleAllocatePushTransport[ep=%d]: Invalid ZoneId", mEndpointId);
+                handler.AddClusterSpecificFailure(commandPath, status);
+                return std::nullopt;
+            }
+        }
+    }
+    bool isValidUrl = mDelegate->ValidateUrl(std::string(transportOptions.url.data(), transportOptions.url.size()));
+    if (isValidUrl == false)
+    {
+        auto status = to_underlying(StatusCodeEnum::kInvalidURL);
+        ChipLogError(Zcl, "HandleAllocatePushTransport[ep=%d]: Invalid Url", mEndpointId);
         handler.AddClusterSpecificFailure(commandPath, status);
         return std::nullopt;
     }
@@ -657,6 +695,9 @@ PushAvStreamTransportServerLogic::HandleAllocatePushTransport(CommandHandler & h
 
             if (!delegateStatus.IsSuccess())
             {
+                auto cluster_status = to_underlying(StatusCodeEnum::kInvalidStream);
+                ChipLogError(Zcl, "HandleAllocatePushTransport[ep=%d]: Invalid Video Stream ", mEndpointId);
+                handler.AddClusterSpecificFailure(commandPath, cluster_status);
                 handler.AddStatus(commandPath, delegateStatus);
                 return std::nullopt;
             }
@@ -670,6 +711,9 @@ PushAvStreamTransportServerLogic::HandleAllocatePushTransport(CommandHandler & h
 
             if (!delegateStatus.IsSuccess())
             {
+                auto cluster_status = to_underlying(StatusCodeEnum::kInvalidStream);
+                ChipLogError(Zcl, "HandleAllocatePushTransport[ep=%d]: Invalid Audio Stream ", mEndpointId);
+                handler.AddClusterSpecificFailure(commandPath, cluster_status);
                 handler.AddStatus(commandPath, delegateStatus);
                 return std::nullopt;
             }

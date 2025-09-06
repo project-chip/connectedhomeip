@@ -44,7 +44,7 @@ class ZoneMgmtServer;
 
 struct TwoDCartesianZoneStorage : TwoDCartesianZoneStruct
 {
-    TwoDCartesianZoneStorage(){};
+    TwoDCartesianZoneStorage() {};
 
     TwoDCartesianZoneStorage(const CharSpan & aName, ZoneUseEnum aUse, const std::vector<TwoDCartesianVertexStruct> & aVertices,
                              Optional<CharSpan> aColor)
@@ -87,7 +87,7 @@ struct TwoDCartesianZoneStorage : TwoDCartesianZoneStruct
 
 struct ZoneInformationStorage : ZoneInformationStruct
 {
-    ZoneInformationStorage(){};
+    ZoneInformationStorage() {};
 
     ZoneInformationStorage(const uint16_t & aZoneID, ZoneTypeEnum aZoneType, ZoneSourceEnum aZoneSource,
                            const Optional<TwoDCartesianZoneStorage> & aTwoDCartZoneStorage)
@@ -217,6 +217,8 @@ public:
 
     virtual CHIP_ERROR LoadTriggers(std::vector<ZoneTriggerControlStruct> & aTriggers) = 0;
 
+    ZoneMgmtServer * GetZoneMgmtServer() const { return mZoneMgmtServer; }
+
 private:
     friend class ZoneMgmtServer;
 
@@ -230,9 +232,6 @@ private:
      * @param aZoneMgmtServer  A pointer to the ZoneMgmtServer object related to this delegate object.
      */
     void SetZoneMgmtServer(ZoneMgmtServer * aZoneMgmtServer) { mZoneMgmtServer = aZoneMgmtServer; }
-
-protected:
-    ZoneMgmtServer * GetZoneMgmtServer() const { return mZoneMgmtServer; }
 };
 
 class ZoneMgmtServer : public CommandHandlerInterface, public AttributeAccessInterface
