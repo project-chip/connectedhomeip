@@ -208,6 +208,7 @@
             "ConfigurationVersion"
         ],
         "Bridged Device Basic Information": ["ProductAppearance"],
+        "Binding": ["Binding", "FeatureMap", "ClusterRevision"],
         "Chime": ["SelectedChime", "Enabled"],
         "Closure Control": [
             "CountdownTime",
