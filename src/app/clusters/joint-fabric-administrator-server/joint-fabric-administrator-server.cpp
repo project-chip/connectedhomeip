@@ -213,7 +213,6 @@ void JointFabricAdministratorGlobalInstance::HandleAnnounceJointFabricAdministra
     ChipLogProgress(JointFabric, "Received an AnnounceJointFabricAdministrator command with endpointID=%u", commandData.endpointID);
 
     std::optional<Status> globalStatus = std::nullopt;
-    chip::Controller::JCM::JCMCommissionee jcmCommissionee;
     app::CommandHandler::Handle handle(&ctx.mCommandHandler);
     ConcreteCommandPath cachedPath(ctx.mRequestPath.mEndpointId, ctx.mRequestPath.mClusterId, ctx.mRequestPath.mCommandId);
 
@@ -232,9 +231,12 @@ void JointFabricAdministratorGlobalInstance::HandleAnnounceJointFabricAdministra
 
     VerifyOrExit(commandData.endpointID != kInvalidEndpointId, globalStatus = Status::ConstraintError);
 
-    VerifyOrExit(jcmCommissionee.StartJCMTrustVerification(ctx, commandData.endpointID, onComplete) == CHIP_NO_ERROR,
-                 globalStatus = Status::Failure);
-
+    // Scope the next section so that we can instantiate the JCMCommissionee without VerifyOrExit messing with
+    // construction/destruction.
+    {
+        chip::Controller::JCM::JCMCommissionee jcmCommissionee(handle, commandData.endpointID, onComplete);
+        VerifyOrExit(jcmCommissionee.VerifyTrustAgainstCommissionerAdmin() == CHIP_NO_ERROR, globalStatus = Status::Failure);
+    }
 exit:
     if (globalStatus.has_value())
     {

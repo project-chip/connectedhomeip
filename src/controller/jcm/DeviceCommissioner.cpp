@@ -498,40 +498,6 @@ void DeviceCommissioner::PerformTrustVerificationStage(
     }
 }
 
-void DeviceCommissioner::TrustVerificationStageFinished(
-    const TrustVerificationStage & completedStage,
-    const TrustVerificationError & error)
-{
-    ChipLogProgress(Controller, "JCM: Trust Verification Stage Finished: %s", EnumToString(completedStage).c_str());
-
-    if (mTrustVerificationDelegate != nullptr)
-    {
-        mTrustVerificationDelegate->OnProgressUpdate(*this, completedStage, mInfo, error);
-    }
-
-    if (error != TrustVerificationError::kSuccess)
-    {
-        OnTrustVerificationComplete(error);
-        return;
-    }
-
-    if (completedStage == TrustVerificationStage::kComplete || completedStage == TrustVerificationStage::kError)
-    {
-        ChipLogProgress(Controller, "JCM: Trust Verification already complete or error");
-        OnTrustVerificationComplete(error);
-        return;
-    }
-
-    auto nextStage = GetNextTrustVerificationStage(completedStage);
-    if (nextStage == TrustVerificationStage::kError)
-    {
-        OnTrustVerificationComplete(TrustVerificationError::kInternalError);
-        return;
-    }
-
-    PerformTrustVerificationStage(nextStage);
-}
-
 TrustVerificationStage DeviceCommissioner::GetNextTrustVerificationStage(
     const TrustVerificationStage & currentStage)
 {

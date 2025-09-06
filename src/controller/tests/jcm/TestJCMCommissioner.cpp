@@ -59,11 +59,8 @@ void InitDataModelHandler() {}
 class MockTrustVerificationDelegate : public TrustVerificationDelegate
 {
 public:
-    void OnProgressUpdate(
-        DeviceCommissioner & commissioner, 
-        TrustVerificationStage stage, 
-        TrustVerificationInfo & info,
-        TrustVerificationError error) override
+    void OnProgressUpdate(TrustVerificationStateMachine & stateMachine, TrustVerificationStage stage, TrustVerificationInfo & info,
+                          TrustVerificationError error) override
     {
         mProgressUpdates++;
         mLastStage = stage;
@@ -71,13 +68,11 @@ public:
         mRemoteAdminTrustedRoot = info.adminRCAC.Span();
     }
 
-    void OnAskUserForConsent(
-        DeviceCommissioner & commissioner, 
-        TrustVerificationInfo & info) override
+    void OnAskUserForConsent(TrustVerificationStateMachine & stateMachine, TrustVerificationInfo & info) override
     {
         mAskedForConsent = true;
         mLastVendorId    = info.adminVendorId;
-        commissioner.ContinueAfterUserConsent(mShouldConsent);
+        stateMachine.ContinueAfterUserConsent(mShouldConsent);
     }
 
     CHIP_ERROR OnLookupOperationalTrustAnchor(
