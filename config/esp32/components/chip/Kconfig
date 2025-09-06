@@ -231,10 +231,12 @@ menu "CHIP Core"
 
         config ENABLE_ROUTE_HOOK
             bool "Enable route hook"
-            depends on LWIP_HOOK_IP6_ROUTE_DEFAULT && LWIP_HOOK_ND6_GET_GW_DEFAULT
+            depends on LWIP_HOOK_IP6_ROUTE_DEFAULT && LWIP_HOOK_ND6_GET_GW_DEFAULT && !LWIP_IPV6_ND6_ROUTE_INFO_OPTION_SUPPORT
             default y
             help
                 Enable this option to use LwIP default IPv6 route hook for Route Information Option(RIO) feature.
+                This option is unavailable if LWIP_IPV6_ND6_ROUTE_INFO_OPTION_SUPPORT is enabled.
+                In that case, RIO is handled directly by LwIP.
 
         config ENABLE_ENDPOINT_QUEUE_FILTER
             bool "Enable UDP Endpoint queue filter for mDNS Broadcast packets"
