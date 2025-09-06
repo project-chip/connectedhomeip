@@ -301,12 +301,10 @@ Status PushAvStreamTransportServerLogic::ValidateIncomingTransportOptions(
         {
             auto & motionZonesList = triggerOptions.motionZones;
             auto iter              = motionZonesList.Value().Value().begin();
-            int zoneSize           = 0;
 
             while (iter.Next())
             {
                 auto & transportZoneOption = iter.GetValue();
-                zoneSize += 1;
 
                 if (mFeatures.Has(Feature::kPerZoneSensitivity))
                 {
@@ -331,12 +329,6 @@ Status PushAvStreamTransportServerLogic::ValidateIncomingTransportOptions(
                                                      mEndpointId));
                 }
             }
-
-            bool isValidZoneSize = mDelegate->ValidateMotionZoneSize(zoneSize);
-            VerifyOrReturnValue(isValidZoneSize, Status::ConstraintError,
-                                ChipLogError(Zcl,
-                                             "Transport Options verification from command data[ep=%d]: Invalid Motion Zone Size ",
-                                             mEndpointId));
 
             if (iter.GetStatus() != CHIP_NO_ERROR)
             {
@@ -620,6 +612,15 @@ PushAvStreamTransportServerLogic::HandleAllocatePushTransport(CommandHandler & h
 
         auto & motionZonesList = transportOptions.triggerOptions.motionZones;
         auto iter              = motionZonesList.Value().Value().begin();
+        uint16_t zonesize=0;
+        auto itsz              = motionZonesList.Value().Value().begin();
+        while (itsz.Next())
+        {
+            zonesize+=1;
+        }
+        bool isValidZoneSize = mDelegate->ValidateMotionZoneSize(zonesize);
+        VerifyOrReturnValue(isValidZoneSize, Status::ConstraintError,ChipLogError(Zcl, "Transport Options verification from command data[ep=%d]: Invalid Motion Zone Size ", mEndpointId));
+
         while (iter.Next())
         {
             auto & transportZoneOption = iter.GetValue();
