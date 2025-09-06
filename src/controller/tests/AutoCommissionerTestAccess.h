@@ -47,6 +47,13 @@ public:
     }
     void SetBreadcrumb(uint64_t value) { mCommissioner->mDeviceCommissioningInfo.general.breadcrumb = value; }
     void SetUTCRequirements(bool requiresUTC) { mCommissioner->mDeviceCommissioningInfo.requiresUTC = requiresUTC; }
+    bool IsScanNeeded() { return mCommissioner->IsScanNeeded(); }
+    bool IsSecondaryNetworkSupported() const { return mCommissioner->IsSecondaryNetworkSupported(); }
+    Controller::ReadCommissioningInfo & GetDeviceCommissioningInfo() { return mCommissioner->mDeviceCommissioningInfo; }
+    void ResetTryingSecondaryNetwork() { mCommissioner->ResetTryingSecondaryNetwork(); }
+
+    bool TryingSecondaryNetwork() { return mCommissioner->TryingSecondaryNetwork(); }
+    void TrySecondaryNetwork() { mCommissioner->TrySecondaryNetwork(); }
 
 private:
     Controller::AutoCommissioner * mCommissioner = nullptr;
