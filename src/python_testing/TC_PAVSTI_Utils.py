@@ -15,10 +15,15 @@
 #    limitations under the License.
 #
 
+import ipaddress
+import logging
+import os
 import random
+import shutil
 import tempfile
 from typing import Optional, Union
 
+import psutil
 import requests
 from cryptography import x509
 from cryptography.hazmat.primitives import hashes, serialization
@@ -51,11 +56,17 @@ class PushAvServerProcess(Subprocess):
 
     def __init__(
         self,
-        server_path: str = DEFAULT_SERVER_PATH,
+        server_path: str | None,
         port: int = 1234,
         host: str = "0.0.0.0",
     ):
-        self._working_directory = tempfile.TemporaryDirectory(prefix="pavs-")
+        if server_path is None:
+            logging.error("No path provided for Push AV Server, using the default path for TH: {DEFAULT_SERVER_PATH}")
+            server_path = self.DEFAULT_SERVER_PATH
+        self._working_directory = os.path.join(tempfile.gettempdir(), "pavstest")
+        if os.path.exists(self._working_directory):
+            shutil.rmtree(self._working_directory)
+        os.makedirs(self._working_directory)
         self.host = host
         self.port = port
         self.base_url = f"https://{self.host}:{self.port}"
@@ -66,7 +77,7 @@ class PushAvServerProcess(Subprocess):
                 "--host",
                 str(self.host),
                 "--working-directory",
-                self._working_directory.name,
+                self._working_directory,
             ]
         )
 
@@ -78,7 +89,8 @@ class PushAvServerProcess(Subprocess):
 
     def __del__(self):
         try:
-            self._working_directory.cleanup()
+            if os.path.exists(self._working_directory):
+                shutil.rmtree(self._working_directory)
         except Exception:
             pass
 
@@ -118,6 +130,13 @@ class PushAvServerProcess(Subprocess):
         """Request the server to create a new stream."""
         response = self._post_json("/streams")
         return response["stream_id"]
+    
+    def create_key_pair(self) -> None:
+        """
+        This method is a work around to create keys for camera-app
+        as currently it tries to access from /tmp/pavstest/
+        """
+        self._post_json("/certs/dev/keypair")
 
 
 class PAVSTIUtils:
@@ -193,7 +212,7 @@ class PAVSTIUtils:
     # ----------------------------------------------------------------------
 
     async def send_provision_root_command(
-        self, endpoint: int, certificate: bytes, expected_status: Status = Status.Success
+        self, endpoint: int, certificate: bytes, expected_status: Status=Status.Success
     ) -> Union[
         Clusters.TlsCertificateManagement.Commands.ProvisionRootCertificateResponse,
         InteractionModelError,
@@ -263,7 +282,7 @@ class PAVSTIUtils:
             return e
 
     async def send_provision_client_command(
-        self, endpoint: int, certificate: bytes, ccdid: int, expected_status: Status = Status.Success
+        self, endpoint: int, certificate: bytes, ccdid: int, expected_status: Status=Status.Success
     ) -> InteractionModelError:
         try:
             result = await self.send_single_cmd(
@@ -287,8 +306,8 @@ class PAVSTIUtils:
         hostname: bytes,
         port: uint,
         caid: uint,
-        ccdid: Union[Nullable, uint] = NullValue,
-        expected_status: Status = Status.Success,
+        ccdid: Union[Nullable, uint]=NullValue,
+        expected_status: Status=Status.Success,
     ) -> Union[
         Clusters.TlsClientManagement.Commands.ProvisionEndpointResponse,
         InteractionModelError,
@@ -318,10 +337,41 @@ class PAVSTIUtils:
     # Precondition setup
     # ----------------------------------------------------------------------
 
+    def _get_private_ip(self):
+        candidates = {"192": [], "10": []}
+
+        for iface, addrs in psutil.net_if_addrs().items():
+            for addr in addrs:
+                if addr.family.name == 'AF_INET':
+                    ip = addr.address
+                    ip_obj = ipaddress.ip_address(ip)
+                    if ip_obj.is_private:
+                        if ip.startswith("192.168."):
+                            candidates["192"].append(ip)
+                        elif ip.startswith("10."):
+                            candidates["10"].append(ip)
+
+        if candidates["192"]:
+            return candidates["192"][0]
+        if candidates["10"]:
+            return candidates["10"][0]
+
+        raise RuntimeError("No private IP found, specify using --string-arg host_ip <IPv4>")
+
     async def precondition_provision_tls_endpoint(
-        self, endpoint: int, server: PushAvServerProcess
+        self, endpoint: int, server: PushAvServerProcess, host_ip: str | None
     ) -> int:
         """Perform provisioning steps to set up TLS endpoint."""
+        if(host_ip is None):
+            # If no host ip specified, try to get private ip
+            # this is mainly required when running TCs in Test Harness
+            logging.error("No host_ip provided in test arguments")
+            host_ip = self._get_private_ip()
+            logging.info(f"Using IP: {host_ip} as hostname to provision TLS Endpoint")
+
+        # Create Kep Pair for camera as it currently tries to access it from /tmp/pavstest when uploading.
+        # TODO: Remove once camera-app supports TLS
+        server.create_key_pair()
         root_cert_der = server.get_root_cert()
         prc_result = await self.send_provision_root_command(endpoint=endpoint, certificate=root_cert_der)
         self.assert_valid_caid(prc_result.caid)
@@ -339,10 +389,10 @@ class PAVSTIUtils:
         )
         result = await self.send_provision_tls_endpoint_command(
             endpoint=endpoint,
-            hostname=b"localhost",
+            hostname=host_ip.encode('utf-8'),
             port=1234,
             expected_status=Status.Success,
             caid=prc_result.caid,
             ccdid=csr_result.ccdid,
         )
-        return result.endpointID
+        return result.endpointID, host_ip
