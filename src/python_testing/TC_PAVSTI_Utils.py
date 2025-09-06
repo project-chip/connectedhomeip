@@ -47,7 +47,7 @@ class PushAvServerProcess(Subprocess):
 
     # By default this points to the push_av_server in Test Harness
     # TCs utilizing this should expect th_server_app_path otherwise
-    DEFAULT_SERVER_PATH = "/root/apps/push_av_server/server.py"
+    DEFAULT_SERVER_PATH = "src/tools/push_av_server/server.py"
 
     def __init__(
         self,
