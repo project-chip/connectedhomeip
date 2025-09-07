@@ -326,6 +326,20 @@ public:
         return Status::Success;
     }
 
+    Protocols::InteractionModel::Status ValidateZoneId(uint16_t zoneId) override
+    {
+        // TODO: Validate zoneId from the allocated zones
+        // Returning Status::Success to pass through checks in the Server Implementation.
+        return Status::Success;
+    }
+
+    bool ValidateMotionZoneSize(uint16_t zoneSize) override
+    {
+        // TODO: Validate motion zone size
+        // Returning true to pass through checks in the Server Implementation.
+        return true;
+    }
+
     PushAvStreamTransportStatusEnum GetTransportBusyStatus(const uint16_t connectionID) override
     {
         for (PushAvStream & stream : pushavStreams)
@@ -635,8 +649,8 @@ TEST_F(TestPushAVStreamTransportServerLogic, Test_AllocateTransport_AllocateTran
     EXPECT_EQ(server.GetLogic().HandleAllocatePushTransport(commandHandler, kCommandPath, commandData), std::nullopt);
 
     // Set the delegate to the server logic
-    server.GetLogic().SetDelegate(1, &mockDelegate);
-    server.GetLogic().SetTLSClientManagementDelegate(1, &tlsClientManagementDelegate);
+    server.GetLogic().SetDelegate(&mockDelegate);
+    server.GetLogic().SetTLSClientManagementDelegate(&tlsClientManagementDelegate);
     EXPECT_EQ(server.GetLogic().HandleAllocatePushTransport(commandHandler, kCommandPath, commandData), std::nullopt);
 
     EXPECT_EQ(server.GetLogic().mCurrentConnections.size(), (size_t) 1);
@@ -1019,8 +1033,8 @@ TEST_F(MockEventLogging, Test_AllocateTransport_ModifyTransport_FindTransport_Fi
     commandData.transportOptions = transportOptions;
 
     // Set the delegate to the server logic
-    server.GetLogic().SetDelegate(1, &mockDelegate);
-    server.GetLogic().SetTLSClientManagementDelegate(1, &tlsClientManagementDelegate);
+    server.GetLogic().SetDelegate(&mockDelegate);
+    server.GetLogic().SetTLSClientManagementDelegate(&tlsClientManagementDelegate);
     EXPECT_EQ(server.GetLogic().HandleAllocatePushTransport(commandHandler, kCommandPath, commandData), std::nullopt);
 
     EXPECT_EQ(server.GetLogic().mCurrentConnections.size(), (size_t) 1);
@@ -1353,8 +1367,8 @@ TEST_F(MockEventLogging, Test_AllocateTransport_SetTransportStatus_ManuallyTrigg
     Commands::AllocatePushTransport::DecodableType commandData;
     commandData.transportOptions = transportOptions;
 
-    server.GetLogic().SetDelegate(1, &mockDelegate);
-    server.GetLogic().SetTLSClientManagementDelegate(1, &tlsClientManagementDelegate);
+    server.GetLogic().SetDelegate(&mockDelegate);
+    server.GetLogic().SetTLSClientManagementDelegate(&tlsClientManagementDelegate);
     EXPECT_EQ(server.GetLogic().HandleAllocatePushTransport(commandHandler, kCommandPath, commandData), std::nullopt);
     EXPECT_EQ(server.GetLogic().mCurrentConnections.size(), (size_t) 1);
 
