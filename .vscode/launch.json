@@ -44,7 +44,7 @@
             "pid": "${command:pickProcess}"
         },
         {
-            "name": "Run application (chip-tool)",
+            "name": "Run application (Darwin x64)",
             "type": "lldb",
             "request": "launch",
             "program": "${workspaceFolder}/examples/chip-tool/out/debug/chip-tool",
@@ -75,76 +75,6 @@
                 "0"
             ],
             "cwd": "${workspaceFolder}"
-        },
-        {
-            "name": "Run application on localhost (jfa-a)",
-            "type": "lldb",
-            "request": "launch",
-            "program": "${workspaceFolder}/examples/jf-admin-app/linux/out/debug/jfa-app",
-            "args": [
-                "--capabilities",
-                "0x4",
-                "--passcode",
-                "110220033",
-                "--secured-device-port",
-                "5533",
-                "--rpc-server-port",
-                "33033",
-                "--KVS",
-                "jfa_a_kvs"
-            ],
-            "cwd": "${workspaceFolder}/examples/jf-admin-app/linux/out/debug"
-        },
-        {
-            "name": "Run application on localhost (jfc-a)",
-            "type": "lldb",
-            "request": "launch",
-            "program": "${workspaceFolder}/examples/jf-control-app/out/debug/jfc-app",
-            "args": [
-                "--rpc-server-ip",
-                "127.0.0.1",
-                "--rpc-server-port",
-                "33033",
-                "--storage-directory",
-                "./jfc_a_storage_directory",
-                "--commissioner-vendor-id",
-                "0xFFF1"
-            ],
-            "cwd": "${workspaceFolder}/examples/jf-control-app/out/debug"
-        },
-        {
-            "name": "Run application (jfc-a)",
-            "type": "lldb",
-            "request": "launch",
-            "program": "${workspaceFolder}/examples/jf-control-app/out/debug/jfc-app",
-            "args": [
-                "--rpc-server-ip",
-                "192.168.1.64",
-                "--rpc-server-port",
-                "33033",
-                "--storage-directory",
-                "./jfc_a_storage_directory",
-                "--commissioner-vendor-id",
-                "0xFFF1"
-            ],
-            "cwd": "${workspaceFolder}/examples/jf-control-app/out/debug"
-        },
-        {
-            "name": "Run application (jfc-b)",
-            "type": "lldb",
-            "request": "launch",
-            "program": "${workspaceFolder}/examples/jf-control-app/out/debug/jfc-app",
-            "args": [
-                "--rpc-server-ip",
-                "192.168.1.64",
-                "--rpc-server-port",
-                "33055",
-                "--storage-directory",
-                "./jfc_b_storage_directory",
-                "--commissioner-vendor-id",
-                "0xFFF2"
-            ],
-            "cwd": "${workspaceFolder}/examples/jf-control-app/out/debug"
         },
         {
             "name": "Run TestFabricTable",
