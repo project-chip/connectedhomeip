@@ -40,8 +40,6 @@ public:
 
     virtual ~PushAvStreamTransportDelegate() = default;
 
-    void SetEndpointId(EndpointId aEndpoint) { mEndpointId = aEndpoint; }
-
     /**
      * @brief Handles stream transport allocation with the provided transport configuration option.
      *
@@ -134,6 +132,22 @@ public:
     virtual bool ValidateUrl(const std::string & url) = 0;
 
     /**
+     * @brief Validates the provided StreamUsage.
+     *
+     * @param streamUsage The StreamUsage to validate
+     * @return true if StreamUsage is present in the StreamUsagePriorities list, false otherwise
+     */
+    virtual bool ValidateStreamUsage(PushAvStreamTransport::StreamUsageEnum streamUsage) = 0;
+
+    /**
+     * @brief Validates the provided Segment Duration.
+     *
+     * @param segmentDuration The Segment Duration to validate
+     * @return true if Segment Duration is multiple of KeyFrameInterval, false otherwise
+     */
+    virtual bool ValidateSegmentDuration(uint16_t segmentDuration) = 0;
+
+    /**
      * @brief Validates bandwidth requirements against camera's resource management.
      *
      * @param streamUsage The desired usage type for the stream (e.g. live view, recording)
@@ -191,6 +205,23 @@ public:
     virtual Protocols::InteractionModel::Status ValidateAudioStream(uint16_t audioStreamId) = 0;
 
     /**
+     * @brief Validates that the zone corresponding to zoneId exists.
+     *
+     * @param zoneId Identifier for the requested zone
+     * @return Status::Success if zone exists;
+     *         Status::InvalidZone if no zone with zoneId exists
+     */
+    virtual Protocols::InteractionModel::Status ValidateZoneId(uint16_t zoneId) = 0;
+
+    /**
+     * @brief Validates size of motion zone List.
+     *
+     * @param zoneSize Size for the requested zone list
+     * @return true if URL is valid, false otherwise
+     */
+    virtual bool ValidateMotionZoneSize(uint16_t zoneSize) = 0;
+
+    /**
      * @brief Gets the status of the transport.
      *
      * @param connectionID The connectionID of the stream transport to check status
@@ -228,9 +259,6 @@ public:
      * @return CHIP_ERROR indicating success or failure
      */
     virtual CHIP_ERROR PersistentAttributesLoadedCallback() = 0;
-
-protected:
-    EndpointId mEndpointId = kInvalidEndpointId;
 };
 } // namespace Clusters
 } // namespace app

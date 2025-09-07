@@ -30,10 +30,34 @@ constexpr int kVideoBitRate         = 3000;
 constexpr const char * kStreamDestIp    = "127.0.0.1";
 constexpr uint16_t kVideoStreamDestPort = 5000;
 
+const char * GetPeerConnectionStateStr(rtc::PeerConnection::State state)
+{
+    switch (state)
+    {
+    case rtc::PeerConnection::State::New:
+        return "New";
+
+    case rtc::PeerConnection::State::Connecting:
+        return "Connecting";
+
+    case rtc::PeerConnection::State::Connected:
+        return "Connected";
+
+    case rtc::PeerConnection::State::Disconnected:
+        return "Disconnected";
+
+    case rtc::PeerConnection::State::Failed:
+        return "Failed";
+
+    case rtc::PeerConnection::State::Closed:
+        return "Closed";
+    }
+    return "Invalid";
+};
+
 WebRTCClient::WebRTCClient()
 {
-    mPeerConnection          = nullptr;
-    mTransportProviderClient = std::make_unique<WebRTCTransportProviderClient>();
+    mPeerConnection = nullptr;
 }
 
 WebRTCClient::~WebRTCClient()
@@ -84,7 +108,7 @@ CHIP_ERROR WebRTCClient::CreatePeerConnection(const std::string & stunUrl)
 
     mPeerConnection->onStateChange([this](rtc::PeerConnection::State state) {
         if (mStateChangeCallback)
-            mStateChangeCallback(static_cast<int>(state));
+            mStateChangeCallback(GetPeerConnectionStateStr(state));
         if (state == rtc::PeerConnection::State::Disconnected || state == rtc::PeerConnection::State::Failed ||
             state == rtc::PeerConnection::State::Closed)
         {
@@ -221,14 +245,14 @@ const char * WebRTCClient::GetLocalSessionDescriptionInternal()
     return mLocalDescription.c_str();
 }
 
-int WebRTCClient::GetPeerConnectionState()
+const char * WebRTCClient::GetPeerConnectionState()
 {
     if (mPeerConnection == nullptr)
     {
-        return -1; // Invalid state
+        return "Invalid";
     }
 
-    return static_cast<int>(mPeerConnection->state());
+    return GetPeerConnectionStateStr(mPeerConnection->state());
 }
 
 void WebRTCClient::OnLocalDescription(std::function<void(const std::string &, const std::string &)> callback)
@@ -246,28 +270,9 @@ void WebRTCClient::OnGatheringComplete(std::function<void()> callback)
     mGatheringCompleteCallback = callback;
 }
 
-void WebRTCClient::OnStateChange(std::function<void(int)> callback)
+void WebRTCClient::OnStateChange(std::function<void(const char *)> callback)
 {
     mStateChangeCallback = callback;
-}
-
-void WebRTCClient::WebRTCProviderClientInit(uint64_t nodeId, uint8_t fabricIndex, uint16_t endpoint)
-{
-    mTransportProviderClient->Init(nodeId, fabricIndex, endpoint);
-}
-
-PyChipError WebRTCClient::SendCommand(void * appContext, uint16_t endpointId, uint32_t clusterId, uint32_t commandId,
-                                      const uint8_t * payload, size_t length)
-{
-    return mTransportProviderClient->SendCommand(appContext, endpointId, clusterId, commandId, payload, length);
-}
-
-void WebRTCClient::WebRTCProviderClientInitCallbacks(OnCommandSenderResponseCallback onCommandSenderResponseCallback,
-                                                     OnCommandSenderErrorCallback onCommandSenderErrorCallback,
-                                                     OnCommandSenderDoneCallback onCommandSenderDoneCallback)
-{
-    mTransportProviderClient->InitCallbacks(onCommandSenderResponseCallback, onCommandSenderErrorCallback,
-                                            onCommandSenderDoneCallback);
 }
 
 } // namespace webrtc
