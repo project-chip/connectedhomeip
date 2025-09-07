@@ -127,42 +127,6 @@ not_automated:
       reason:
           Shared code for Push AV Cluster tests (TC_PAVST_*), not a standalone
           test.
-    - name: TC_PAVST_2_1.py
-      reason:
-          Depends on PushAV cluster. Will be enabled once local tests are fully
-          verified.
-    - name: TC_PAVST_2_2.py
-      reason:
-          Depends on PushAV cluster. Will be enabled once local tests are fully
-          verified.
-    - name: TC_PAVST_2_3.py
-      reason:
-          Depends on PushAV cluster. Will be enabled once local tests are fully
-          verified.
-    - name: TC_PAVST_2_4.py
-      reason:
-          Depends on PushAV cluster. Will be enabled once local tests are fully
-          verified.
-    - name: TC_PAVST_2_5.py
-      reason:
-          Depends on PushAV cluster. Will be enabled once local tests are fully
-          verified.
-    - name: TC_PAVST_2_6.py
-      reason:
-          Depends on PushAV cluster. Will be enabled once local tests are fully
-          verified.
-    - name: TC_PAVST_2_7.py
-      reason:
-          Depends on PushAV cluster. Will be enabled once local tests are fully
-          verified.
-    - name: TC_PAVST_2_8.py
-      reason:
-          Depends on PushAV cluster. Will be enabled once local tests are fully
-          verified.
-    - name: TC_PAVST_2_9.py
-      reason:
-          Depends on PushAV cluster. Will be enabled once local tests are fully
-          verified.
     - name: TC_PAVSTI_1_1.py
       reason:
           Depends on TLS Certification Management cluster. Will be enabled once
