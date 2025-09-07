@@ -22,9 +22,7 @@
 #include <app/ClusterStateCache.h>
 #include <app/OperationalSessionSetup.h>
 #include <controller/CommissioneeDeviceProxy.h>
-#if CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
 #include <controller/jcm/TrustVerification.h> // nogncheck
-#endif                                        // CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
 #include <credentials/attestation_verifier/DeviceAttestationDelegate.h>
 #include <credentials/attestation_verifier/DeviceAttestationVerifier.h>
 #include <crypto/CHIPCryptoPAL.h>
@@ -555,7 +553,6 @@ public:
         return *this;
     }
 
-#if CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
     // Check for Joint Commissioning Method
     Optional<bool> GetUseJCM() const { return mUseJCM; }
 
@@ -565,7 +562,6 @@ public:
         mUseJCM = MakeOptional(useJCM);
         return *this;
     }
-#endif // CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
 
     ICDRegistrationStrategy GetICDRegistrationStrategy() const { return mICDRegistrationStrategy; }
     CommissioningParameters & SetICDRegistrationStrategy(ICDRegistrationStrategy icdRegistrationStrategy)
@@ -878,12 +874,8 @@ public:
      */
     struct CommissioningReport
         : Variant<RequestedCertificate, AttestationResponse, CSRResponse, NocChain, OperationalNodeFoundData, ReadCommissioningInfo,
-                  AttestationErrorInfo, CommissioningErrorInfo, NetworkCommissioningStatusInfo, TimeZoneResponseInfo
-#if CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
-                  ,
-                  JCM::TrustVerificationError
-#endif // CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
-                  >
+                  AttestationErrorInfo, CommissioningErrorInfo, NetworkCommissioningStatusInfo, TimeZoneResponseInfo,
+                  JCM::TrustVerificationError>
     {
         CommissioningReport() : stageCompleted(CommissioningStage::kError) {}
         CommissioningStage stageCompleted;

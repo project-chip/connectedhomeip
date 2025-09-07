@@ -58,16 +58,18 @@ CHIP_ERROR VendorIdVerificationClient::VerifyNOCCertificateChain(
 
 CHIP_ERROR VendorIdVerificationClient::Verify(
     DeviceProxy * deviceProxy, 
-    const FabricIndex & fabricIndex, 
-    const VendorId & vendorID, 
-    const ByteSpan & rcacSpan,
-    const ByteSpan & icacSpan,
-    const ByteSpan & nocSpan,
+    TrustVerificationInfo * info,
     const ByteSpan clientChallengeSpan,
     const SignVIDVerificationResponse::DecodableType responseData
 )
 {
     // Steps 1-9 have already been completed prior to the response callback
+    const FabricIndex fabricIndex = info->adminFabricIndex;
+    const VendorId vendorID       = info->adminVendorId;
+    const FabricId fabricId       = info->adminFabricId;
+    auto rcacSpan                 = info->adminRCAC.Span();
+    auto icacSpan                 = info->adminICAC.Span();
+    auto nocSpan                  = info->adminNOC.Span();
 
     // Extract the root public key
     P256PublicKeySpan rcacPublicKeySpan;
@@ -78,8 +80,12 @@ CHIP_ERROR VendorIdVerificationClient::Verify(
     // Locally generate the vendor_fabric_binding_message
     uint8_t vendorFabricBindingMessageBuffer[kVendorFabricBindingMessageV1Size];
     MutableByteSpan vendorFabricBindingMessageSpan{ vendorFabricBindingMessageBuffer };
-    ReturnLogErrorOnFailure(Crypto::GenerateVendorFabricBindingMessage(FabricBindingVersion::kVersion1, rcacPublicKey,
-                  fabricIndex, vendorID, vendorFabricBindingMessageSpan));
+    ReturnLogErrorOnFailure(Crypto::GenerateVendorFabricBindingMessage(
+        FabricBindingVersion::kVersion1,
+        rcacPublicKey,
+        fabricId,
+        vendorID,
+        vendorFabricBindingMessageSpan));
 
     // Locally generate the vendor_id_verification_tbs message
     ByteSpan vidVerificationStatementSpan;
@@ -92,18 +98,18 @@ CHIP_ERROR VendorIdVerificationClient::Verify(
                                                             vendorFabricBindingMessageSpan, vidVerificationStatementSpan,
                                                             vidVerificationTbsSpan));
 
-    // 10. Given the subject public key associated with the fabric being verified, validate that Crypto_Verify(noc_public_key,
-    // vendor_id_verification_tbs, signature) succeeds, otherwise the procedure terminates as failed.
-    ByteSpan signatureSpan = responseData.signature;
-    VerifyOrReturnError(signatureSpan.size() >= P256ECDSASignature::Capacity(), CHIP_ERROR_BUFFER_TOO_SMALL);
-
     P256PublicKeySpan nocPublicKeySpan;
     ReturnLogErrorOnFailure(ExtractPublicKeyFromChipCert(nocSpan, nocPublicKeySpan));
 
     P256PublicKey nocPublicKey(nocPublicKeySpan);
+
+    // 10. Given the subject public key associated with the fabric being verified, validate that Crypto_Verify(noc_public_key,
+    // vendor_id_verification_tbs, signature) succeeds, otherwise the procedure terminates as failed.
+    VerifyOrReturnError(responseData.signature.size() >= P256ECDSASignature::Capacity(), CHIP_ERROR_BUFFER_TOO_SMALL);
     P256ECDSASignature signature;
-    memcpy(signature.Bytes(), signatureSpan.data(), signature.Capacity());
+    memcpy(signature.Bytes(), responseData.signature.data(), signature.Capacity());
     signature.SetLength(signature.Capacity());
+       
     ReturnLogErrorOnFailure(nocPublicKey.ECDSA_validate_msg_signature(vidVerificationTbsSpan.data(), vidVerificationTbsSpan.size(), signature));
 
     // 11. Verify that the NOC chain is valid using Crypto_VerifyChain() against the entire chain reconstructed from both the
@@ -136,13 +142,9 @@ CHIP_ERROR VendorIdVerificationClient::Verify(
 
 CHIP_ERROR VendorIdVerificationClient::VerifyVendorId(
     DeviceProxy * deviceProxy,
-    const FabricIndex & fabricIndex,
-    const VendorId & vendorID,
-    const ByteSpan & rcacSpan,
-    const ByteSpan & icacSpan,
-    const ByteSpan & nocSpan)
+    TrustVerificationInfo * info)
 {
-    ChipLogProgress(Controller, "Performing vendor ID verification for vendor ID: %u", vendorID);
+    ChipLogProgress(Controller, "Performing vendor ID verification for vendor ID: %u", info->adminVendorId);
 
     // Generate a 32-octet random challenge
     uint8_t kClientChallenge[32];
@@ -152,21 +154,21 @@ CHIP_ERROR VendorIdVerificationClient::VerifyVendorId(
 
     // The selected fabric information that matches the Fabrics attribute whose VendorID field to be verified 
     // is in the JCMTrustVerificationInfo info
-    request.fabricIndex = fabricIndex;
+    request.fabricIndex = info->adminFabricIndex;
     request.clientChallenge = clientChallengeSpan;
 
-    auto onSuccessCb = [this, deviceProxy, fabricIndex, vendorID, rcacSpan, icacSpan, nocSpan, kClientChallenge](const app::ConcreteCommandPath & aPath, const app::StatusIB & aStatus,
+    auto onSuccessCb = [&, deviceProxy, info, kClientChallenge](const app::ConcreteCommandPath & aPath, const app::StatusIB & aStatus,
                                      const decltype(request)::ResponseType & responseData) {
         ChipLogProgress(Controller, "Successfully received SignVIDVerificationResponse");
         ByteSpan clientChallenge{ kClientChallenge };
-        CHIP_ERROR err = this->Verify(deviceProxy, fabricIndex, vendorID, rcacSpan, icacSpan, nocSpan, clientChallenge, responseData);
+        CHIP_ERROR err = Verify(deviceProxy, info, clientChallenge, responseData);
         ChipLogProgress(Controller, "Vendor ID verification completed with result: %s", ErrorStr(err));
-        this->OnVendorIdVerficationComplete(err);
+        OnVendorIdVerficationComplete(err);
     };
 
-    auto onFailureCb = [this](CHIP_ERROR err) {
+    auto onFailureCb = [&](CHIP_ERROR err) {
         ChipLogError(Controller, "Failed to receive SignVIDVerificationResponse: %s", ErrorStr(err));
-        this->OnVendorIdVerficationComplete(err);
+        OnVendorIdVerficationComplete(err);
     };
 
     CHIP_ERROR err = InvokeCommandRequest(deviceProxy->GetExchangeManager(), deviceProxy->GetSecureSession().Value(), 

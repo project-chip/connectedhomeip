@@ -97,7 +97,6 @@ public:
     bool mAskedForConsent              = false;
     bool mLookedUpOperationalTrustAnchor = false;
     bool mShouldConsent                = true;
-    bool mAskedForVendorIdVerification = false;
     CHIP_ERROR mVerifyVendorIdError    = CHIP_NO_ERROR;
     VendorId mLastVendorId             = VendorId::Common;
     ByteSpan mRemoteAdminTrustedRoot;
@@ -231,25 +230,6 @@ public:
         return CHIP_NO_ERROR;
     }
 
-    std::vector<uint8_t> hexStringToBytes(
-        const std::string & hex_string)
-    {
-        std::vector<uint8_t> bytes;
-
-        if (hex_string.length() % 2 != 0)
-        {
-            return bytes;
-        }
-
-        for (size_t i = 0; i < hex_string.length(); i += 2)
-        {
-            std::string byte_str = hex_string.substr(i, 2);
-            uint8_t byte         = static_cast<uint8_t>(std::stoul(byte_str, nullptr, 16));
-            bytes.push_back(byte);
-        }
-        return bytes;
-    }
-
 private:
     MockClusterStateCacheCallback mClusterStateCacheCallback;
 };
@@ -293,10 +273,10 @@ public:
 class TestVendorIDVerificationDataModel : public CodegenDataModelProvider
 {
 public:
-    TestVendorIDVerificationDataModel(MessagingContext & messagingContext) :
+    TestVendorIDVerificationDataModel(MessagingContext * messagingContext) :
         mMessagingContext(messagingContext) {}
 
-    static TestVendorIDVerificationDataModel & Instance(MessagingContext & messagingContext)
+    static TestVendorIDVerificationDataModel & Instance(MessagingContext * messagingContext)
     {
         static TestVendorIDVerificationDataModel instance(messagingContext);
         return instance;
@@ -325,12 +305,13 @@ public:
             aRequest.path.mEndpointId, ChipLogValueMEI(aRequest.path.mClusterId), ChipLogValueMEI(aRequest.path.mCommandId));
 
         // Get the fabric table.
-        FabricTable & fabricTable = mMessagingContext.GetFabricTable();
+        FabricTable & fabricTable = mMessagingContext->GetFabricTable();
 
         // Sign the VID verification request.
-        SessionHandle sessionHandle = mMessagingContext.GetJFSessionAToB();
+        SessionHandle sessionHandle = mMessagingContext->GetJFSessionAToB();
         ByteSpan attestationChallengeSpan = sessionHandle->AsSecureSession()->GetCryptoContext().GetAttestationChallenge();
         FabricTable::SignVIDVerificationResponseData responseData;
+
         CHIP_ERROR err = fabricTable.SignVIDVerificationRequest(dataRequest.fabricIndex, dataRequest.clientChallenge, attestationChallengeSpan, responseData);
         if (err != CHIP_NO_ERROR)
         {
@@ -350,7 +331,7 @@ public:
     }
 
 private:
-    MessagingContext & mMessagingContext;
+    MessagingContext * mMessagingContext;
 };
 
 const chip::Test::MockNodeConfig & TestMockNodeConfig()
@@ -409,7 +390,7 @@ protected:
     void SetUp() override
     {
         AppContext::SetUp();
-        mOldProvider = InteractionModelEngine::GetInstance()->SetDataModelProvider(&TestVendorIDVerificationDataModel::Instance(*this));
+        mOldProvider = InteractionModelEngine::GetInstance()->SetDataModelProvider(&TestVendorIDVerificationDataModel::Instance(this));
         SetMockNodeConfig(TestMockNodeConfig());
 
         mDeviceCommissioner = new TestableDeviceCommissioner();
@@ -482,7 +463,7 @@ TEST_F_FROM_FIXTURE(TestCommissioner, TestTrustVerificationStageFinishedProgress
     EXPECT_EQ(mTrustVerificationDelegate.mLastStage, TrustVerificationStage::kComplete);
     EXPECT_EQ(mTrustVerificationDelegate.mLastError, TrustVerificationError::kSuccess);
     EXPECT_TRUE(mTrustVerificationDelegate.mAskedForConsent);
-    EXPECT_TRUE(mTrustVerificationDelegate.mAskedForVendorIdVerification);
+    EXPECT_TRUE(mTrustVerificationDelegate.mLookedUpOperationalTrustAnchor);
     EXPECT_EQ(mTrustVerificationDelegate.mLastVendorId, chip::VendorId(65521));
 }
 

@@ -188,11 +188,7 @@ public:
 
     CHIP_ERROR VerifyVendorId(
         DeviceProxy * deviceProxy,
-        const FabricIndex & fabricIndex,
-        const VendorId & vendorID,
-        const ByteSpan & rcacSpan,
-        const ByteSpan & icacSpan,
-        const ByteSpan & nocSpan);
+        TrustVerificationInfo * info);
 
 protected:
     virtual CHIP_ERROR OnLookupOperationalTrustAnchor(
@@ -209,11 +205,7 @@ private:
 
     CHIP_ERROR Verify(
         DeviceProxy * deviceProxy,
-        const FabricIndex & fabricIndex,
-        const VendorId & vendorID,
-        const ByteSpan & rcacSpan,
-        const ByteSpan & icacSpan,
-        const ByteSpan & nocSpan,
+        TrustVerificationInfo * info,
         const ByteSpan clientChallengeSpan,
         const SignVIDVerificationResponse::DecodableType responseData);
 };

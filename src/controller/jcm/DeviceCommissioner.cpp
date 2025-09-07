@@ -426,17 +426,9 @@ CHIP_ERROR DeviceCommissioner::OnLookupOperationalTrustAnchor(
 
 TrustVerificationError DeviceCommissioner::PerformVendorIDVerificationProcedure()
 {
-    ByteSpan rcacSpan = mInfo.adminRCAC.Span();
-    ByteSpan icacSpan = mInfo.adminICAC.Span();
-    ByteSpan nocSpan = mInfo.adminNOC.Span();
-
     CHIP_ERROR err = VerifyVendorId(
         mDeviceProxy, 
-        mInfo.adminFabricIndex, 
-        mInfo.adminVendorId, 
-        rcacSpan, 
-        icacSpan, 
-        nocSpan
+        &mInfo
     );
     if (err != CHIP_NO_ERROR)
     {
