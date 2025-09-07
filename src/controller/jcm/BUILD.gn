@@ -25,12 +25,15 @@ source_set("jcm") {
     "AutoCommissioner.h",
     "DeviceCommissioner.cpp",
     "DeviceCommissioner.h",
+    "JCMCommissionee.cpp",
+    "JCMCommissionee.h",
     "TrustVerification.cpp",
     "TrustVerification.h",
   ]
   public_deps = [
     "${chip_root}/src/app",
     "${chip_root}/src/controller:controller",
+    "${chip_root}/src/credentials:credentials",
   ]
 }
 

@@ -32,6 +32,7 @@
 #include <app/reporting/reporting.h>
 #include <app/server/Server.h>
 #include <app/util/attribute-storage.h>
+#include <controller/jcm/JCMCommissionee.h>
 #include <credentials/CHIPCert.h>
 #include <credentials/CertificationDeclaration.h>
 #include <credentials/DeviceAttestationConstructor.h>
@@ -84,6 +85,8 @@ private:
     void HandleAddICAC(HandlerContext & ctx, const Commands::AddICAC::DecodableType & commandData);
     void HandleTransferAnchorRequest(HandlerContext & ctx, const Commands::TransferAnchorRequest::DecodableType & commandData);
     void HandleTransferAnchorComplete(HandlerContext & ctx, const Commands::TransferAnchorComplete::DecodableType & commandData);
+
+    static void OnTrustVerificationCompletion(CHIP_ERROR err);
 };
 
 JointFabricAdministratorGlobalInstance gJointFabricAdministratorGlobalInstance;
@@ -207,18 +210,39 @@ void JointFabricAdministratorGlobalInstance::HandleAnnounceJointFabricAdministra
     HandlerContext & ctx, const Commands::AnnounceJointFabricAdministrator::DecodableType & commandData)
 {
     MATTER_TRACE_SCOPE("AnnounceJointFabricAdministrator", "JointFabricAdministrator");
-    ChipLogProgress(JointFabric, "emberAfJointFabricAdministratorClusterAnnounceJointFabricAdministratorCallback: %u",
-                    commandData.endpointID);
+    ChipLogProgress(JointFabric, "Received an AnnounceJointFabricAdministrator command with endpointID=%u", commandData.endpointID);
 
-    auto nonDefaultStatus = Status::Success;
-    VerifyOrExit(commandData.endpointID != kInvalidEndpointId, nonDefaultStatus = Status::ConstraintError);
+    std::optional<Status> globalStatus = std::nullopt;
+    app::CommandHandler::Handle handle(&ctx.mCommandHandler);
+    ConcreteCommandPath cachedPath(ctx.mRequestPath.mEndpointId, ctx.mRequestPath.mClusterId, ctx.mRequestPath.mCommandId);
 
-    Server::GetInstance().GetJointFabricAdministrator().SetPeerJFAdminClusterEndpointId(commandData.endpointID);
+    auto onComplete = [&handle, cachedPath](const CHIP_ERROR & err) {
+        if (err == CHIP_NO_ERROR)
+        {
+            ChipLogProgress(JointFabric, "Successfully verified trust against commissioning fabric administrator");
+            handle.Get()->AddStatus(cachedPath, Status::Success);
+        }
+        else
+        {
+            ChipLogProgress(JointFabric, "Failed to verify trust against commissioning fabric administrator");
+            handle.Get()->AddStatus(cachedPath, Status::Failure);
+        }
+    };
 
-    /* TODO: execute Fabric Table Vendor ID Verification */
+    VerifyOrExit(commandData.endpointID != kInvalidEndpointId, globalStatus = Status::ConstraintError);
 
+    // Scope the next section so that we can instantiate the JCMCommissionee without VerifyOrExit messing with
+    // construction/destruction.
+    {
+        chip::Controller::JCM::JCMCommissionee jcmCommissionee(handle, commandData.endpointID, onComplete);
+        VerifyOrExit(jcmCommissionee.VerifyTrustAgainstCommissionerAdmin() == CHIP_NO_ERROR, globalStatus = Status::Failure);
+    }
 exit:
-    ctx.mCommandHandler.AddStatus(ctx.mRequestPath, nonDefaultStatus);
+    if (globalStatus.has_value())
+    {
+        ChipLogProgress(JointFabric, "Failed to handle AnnounceJointFabricAdministrator");
+        handle.Get()->AddStatus(cachedPath, globalStatus.value());
+    }
 }
 
 void JointFabricAdministratorGlobalInstance::HandleICACCSRRequest(HandlerContext & ctx,

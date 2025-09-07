@@ -20,7 +20,6 @@
 #include <cstdint>
 #include <string>
 
-#include <app/DeviceProxy.h>
 #include <app-common/zap-generated/cluster-objects.h>
 #include <credentials/CHIPCert.h>
 #include <credentials/FabricTable.h>
@@ -29,6 +28,9 @@
 #include <lib/core/CHIPError.h>
 #include <lib/core/CHIPVendorIdentifiers.hpp>
 #include <lib/support/DLLUtil.h>
+#include <messaging/ExchangeMgr.h>
+
+#include <functional>
 
 namespace chip {
 namespace Controller {
@@ -39,6 +41,7 @@ using namespace ::chip::app;
 using namespace ::chip::app::Clusters::OperationalCredentials::Commands;
 using namespace ::chip::Credentials;
 using namespace ::chip::Crypto;
+using namespace ::chip::Messaging;
 
 struct TrustVerificationInfo
 {
@@ -77,18 +80,25 @@ enum class TrustVerificationError : uint16_t
     kTrustVerificationDelegateNotSet = 103,
     kUserDeniedConsent               = 104,
     kVendorIdVerificationFailed      = 105,
+    kReadAdminFabricIndexFailed      = 106,
+    kAdministratorIdMismatched       = 107,
 
     kInternalError = 200,
 };
 
-class DeviceCommissioner;
+class TrustVerificationStateMachine;
 
 enum TrustVerificationStage : uint8_t
 {
     kIdle,
+
     kVerifyingAdministratorInformation,
     kPerformingVendorIDVerification,
     kAskingUserForConsent,
+    kStoringEndpointID,
+    kReadingCommissionerAdminFabricIndex,
+    kCrossCheckingAdministratorIds,
+
     kComplete,
     kError,
 };
@@ -118,6 +128,12 @@ inline std::string EnumToString(TrustVerificationError error)
         return "TRUST_VERIFICATION_DELEGATE_NOT_SET";
     case TrustVerificationError::kUserDeniedConsent:
         return "USER_DENIED_CONSENT";
+    case TrustVerificationError::kVendorIdVerificationFailed:
+        return "VENDOR_ID_VERIFICATION_FAILED";
+    case TrustVerificationError::kReadAdminFabricIndexFailed:
+        return "READ_ADMIN_FABRIC_INDEX_FAILED";
+    case TrustVerificationError::kAdministratorIdMismatched:
+        return "ADMINISTRATOR_ID_MISMATCHED";
     case TrustVerificationError::kInternalError:
         return "INTERNAL_ERROR";
 
@@ -145,6 +161,12 @@ inline std::string EnumToString(TrustVerificationStage stage)
         return "PERFORMING_VENDOR_ID_VERIFICATION_PROCEDURE";
     case kAskingUserForConsent:
         return "ASKING_USER_FOR_CONSENT";
+    case kStoringEndpointID:
+        return "STORING_ENDPOINT_ID";
+    case kReadingCommissionerAdminFabricIndex:
+        return "READING_COMMISSIONER_ADMIN_FABRIC_INDEX";
+    case kCrossCheckingAdministratorIds:
+        return "CROSS_CHECKING_ADMINISTRATOR_IDS";
     case kComplete:
         return "COMPLETE";
     case kError:
@@ -165,18 +187,11 @@ class DLL_EXPORT TrustVerificationDelegate
 public:
     virtual ~TrustVerificationDelegate() = default;
 
-    virtual void OnProgressUpdate(
-        DeviceCommissioner & commissioner,
-        TrustVerificationStage stage,
-        TrustVerificationInfo & info,
-        TrustVerificationError error) = 0;
-    virtual void OnAskUserForConsent(
-        DeviceCommissioner & commissioner,
-        TrustVerificationInfo & info) = 0;
-    virtual CHIP_ERROR OnLookupOperationalTrustAnchor(
-        VendorId vendorID,
-        CertificateKeyId & subjectKeyId,
-        ByteSpan & globallyTrustedRootSpan) = 0;
+    virtual void OnProgressUpdate(TrustVerificationStateMachine & stateMachine, TrustVerificationStage stage,
+                                  TrustVerificationInfo & info, TrustVerificationError error)                    = 0;
+    virtual void OnAskUserForConsent(TrustVerificationStateMachine & stateMachine, TrustVerificationInfo & info) = 0;
+    virtual CHIP_ERROR OnLookupOperationalTrustAnchor(VendorId vendorID, CertificateKeyId & subjectKeyId,
+                                                      ByteSpan & globallyTrustedRootSpan)                        = 0;
 };
 
 /**
@@ -186,8 +201,12 @@ class DLL_EXPORT VendorIdVerificationClient {
 public:
     virtual ~VendorIdVerificationClient() = default;
 
+    // Used to obtain SessionHandles from VerifyVendorId callers. SessionHandles cannot be stored, so we must retrieve them dynamically with a callback.
+    using SessionGetterFunc = std::function<Optional<SessionHandle>()>;
+
     CHIP_ERROR VerifyVendorId(
-        DeviceProxy * deviceProxy,
+        ExchangeManager * exchangeMgr,
+        const SessionGetterFunc getSession,
         TrustVerificationInfo * info);
 
 protected:
@@ -204,10 +223,54 @@ private:
         const ByteSpan & rcacSpan);
 
     CHIP_ERROR Verify(
-        DeviceProxy * deviceProxy,
+        ExchangeManager * exchangeMgr,
+        const SessionGetterFunc getSession,
         TrustVerificationInfo * info,
         const ByteSpan clientChallengeSpan,
         const SignVIDVerificationResponse::DecodableType responseData);
+};
+
+class DLL_EXPORT TrustVerificationStateMachine
+{
+public:
+    virtual ~TrustVerificationStateMachine() = default;
+
+    void RegisterTrustVerificationDelegate(TrustVerificationDelegate * trustVerificationDelegate);
+
+    /*
+     * ContinueAfterUserConsent is a method that continues the JCM trust verification process after the user has
+     * provided consent or denied it. If the user grants consent, the trust verification process will continue;
+     * otherwise, it will terminate with an error.
+     *
+     * @param consent A boolean indicating whether the user granted consent (true) or denied it (false).
+     */
+    virtual void ContinueAfterUserConsent(const bool & consent) {}
+
+protected:
+    virtual TrustVerificationStage GetNextTrustVerificationStage(const TrustVerificationStage & currentStage) = 0;
+    virtual void PerformTrustVerificationStage(const TrustVerificationStage & nextStage)                      = 0;
+
+    void StartTrustVerification();
+    void TrustVerificationStageFinished(const TrustVerificationStage & completedStage, const TrustVerificationError & error);
+
+    /*
+     * OnTrustVerificationComplete is a callback method that is called when the JCM trust verification process is complete.
+     * It will handle the result of the trust verification and report it to the commissioning delegate.
+     *
+     * @param result The result of the JCM trust verification process.
+     */
+    virtual void OnTrustVerificationComplete(TrustVerificationError error) {}
+
+    // JCM trust verification info
+    // This structure contains the information needed for JCM trust verification
+    // such as the administrator fabric index, endpoint ID, and vendor ID
+    // It is used to store the results of the trust verification process
+    // and is passed to the JCM trust verification delegate
+    // when the trust verification process is complete
+    TrustVerificationInfo mInfo;
+
+    // Trust verification delegate for the commissioning client
+    TrustVerificationDelegate * mTrustVerificationDelegate = nullptr;
 };
 
 } // namespace JCM

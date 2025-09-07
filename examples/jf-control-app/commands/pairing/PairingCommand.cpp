@@ -44,7 +44,8 @@ using namespace ::chip;
 using namespace ::chip::Controller;
 using namespace chip::Credentials;
 
-using JCMDeviceCommissioner     = chip::Controller::JCM::DeviceCommissioner;
+using JCMDeviceCommissioner = chip::Controller::JCM::DeviceCommissioner;
+using JCMTrustVerificationStateMachine = chip::Controller::JCM::TrustVerificationStateMachine;
 using JCMTrustVerificationStage = chip::Controller::JCM::TrustVerificationStage;
 using JCMTrustVerificationError = chip::Controller::JCM::TrustVerificationError;
 using JCMTrustVerificationInfo  = chip::Controller::JCM::TrustVerificationInfo;
@@ -72,7 +73,7 @@ CHIP_ERROR PairingCommand::SetAnchorNodeId(NodeId value)
 
 CHIP_ERROR PairingCommand::RunCommand()
 {
-    chip::Controller::JCM::DeviceCommissioner & commissioner = static_cast<JCMDeviceCommissioner &>(CurrentCommissioner());
+    JCMDeviceCommissioner & commissioner = static_cast<JCMDeviceCommissioner &>(CurrentCommissioner());
     commissioner.RegisterPairingDelegate(this);
     commissioner.RegisterTrustVerificationDelegate(this);
 
@@ -914,18 +915,18 @@ void PairingCommand::OnDeviceAttestationCompleted(Controller::DeviceCommissioner
     }
 }
 
-void PairingCommand::OnProgressUpdate(JCMDeviceCommissioner & commissioner, JCMTrustVerificationStage stage,
+void PairingCommand::OnProgressUpdate(JCMTrustVerificationStateMachine & stateMachine, JCMTrustVerificationStage stage,
                                       JCMTrustVerificationInfo & info, JCMTrustVerificationError error)
 {
     mRemoteAdminTrustedRoot = info.adminRCAC.Span();
     ChipLogProgress(Controller, "JCM: Trust Verification progress: %d", static_cast<int>(stage));
 }
 
-void PairingCommand::OnAskUserForConsent(JCMDeviceCommissioner & commissioner, JCMTrustVerificationInfo & info)
+void PairingCommand::OnAskUserForConsent(JCMTrustVerificationStateMachine & stateMachine, JCMTrustVerificationInfo & info)
 {
     ChipLogProgress(Controller, "Asking user for consent for vendor ID: %u", info.adminVendorId);
 
-    commissioner.ContinueAfterUserConsent(true);
+    stateMachine.ContinueAfterUserConsent(true);
 }
 
 // TODO: Complete DCL lookup implementation

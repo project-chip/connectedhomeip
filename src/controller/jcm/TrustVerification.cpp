@@ -57,7 +57,8 @@ CHIP_ERROR VendorIdVerificationClient::VerifyNOCCertificateChain(
 }
 
 CHIP_ERROR VendorIdVerificationClient::Verify(
-    DeviceProxy * deviceProxy, 
+    ExchangeManager * exchangeMgr, 
+    const SessionGetterFunc getSession,
     TrustVerificationInfo * info,
     const ByteSpan clientChallengeSpan,
     const SignVIDVerificationResponse::DecodableType responseData
@@ -93,7 +94,7 @@ CHIP_ERROR VendorIdVerificationClient::Verify(
     MutableByteSpan vidVerificationTbsSpan{ vidVerificationStatementBuffer };
 
     // Retrieve attestation challenge
-    ByteSpan attestationChallengeSpan = deviceProxy->GetSecureSession().Value()->AsSecureSession()->GetCryptoContext().GetAttestationChallenge();
+    ByteSpan attestationChallengeSpan = getSession().Value()->AsSecureSession()->GetCryptoContext().GetAttestationChallenge();
     ReturnLogErrorOnFailure(GenerateVendorIdVerificationToBeSigned(fabricIndex, clientChallengeSpan, attestationChallengeSpan,
                                                             vendorFabricBindingMessageSpan, vidVerificationStatementSpan,
                                                             vidVerificationTbsSpan));
@@ -141,7 +142,8 @@ CHIP_ERROR VendorIdVerificationClient::Verify(
 }
 
 CHIP_ERROR VendorIdVerificationClient::VerifyVendorId(
-    DeviceProxy * deviceProxy,
+    ExchangeManager * exchangeMgr,
+    const SessionGetterFunc getSession,
     TrustVerificationInfo * info)
 {
     ChipLogProgress(Controller, "Performing vendor ID verification for vendor ID: %u", info->adminVendorId);
@@ -157,11 +159,11 @@ CHIP_ERROR VendorIdVerificationClient::VerifyVendorId(
     request.fabricIndex = info->adminFabricIndex;
     request.clientChallenge = clientChallengeSpan;
 
-    auto onSuccessCb = [&, deviceProxy, info, kClientChallenge](const app::ConcreteCommandPath & aPath, const app::StatusIB & aStatus,
+    auto onSuccessCb = [&, exchangeMgr, getSession, info, kClientChallenge](const app::ConcreteCommandPath & aPath, const app::StatusIB & aStatus,
                                      const decltype(request)::ResponseType & responseData) {
         ChipLogProgress(Controller, "Successfully received SignVIDVerificationResponse");
         ByteSpan clientChallenge{ kClientChallenge };
-        CHIP_ERROR err = Verify(deviceProxy, info, clientChallenge, responseData);
+        CHIP_ERROR err = Verify(exchangeMgr, getSession, info, clientChallenge, responseData);
         ChipLogProgress(Controller, "Vendor ID verification completed with result: %s", ErrorStr(err));
         OnVendorIdVerficationComplete(err);
     };
@@ -171,7 +173,7 @@ CHIP_ERROR VendorIdVerificationClient::VerifyVendorId(
         OnVendorIdVerficationComplete(err);
     };
 
-    CHIP_ERROR err = InvokeCommandRequest(deviceProxy->GetExchangeManager(), deviceProxy->GetSecureSession().Value(), 
+    CHIP_ERROR err = InvokeCommandRequest(exchangeMgr, getSession().Value(), 
                                             kRootEndpointId, request,
                                             onSuccessCb, onFailureCb);
     if (err != CHIP_NO_ERROR)
@@ -181,6 +183,50 @@ CHIP_ERROR VendorIdVerificationClient::VerifyVendorId(
     }
 
     return CHIP_NO_ERROR;
+}
+
+void TrustVerificationStateMachine::RegisterTrustVerificationDelegate(TrustVerificationDelegate * trustVerificationDelegate)
+{
+    ChipLogProgress(Controller, "JCM: Setting trust verification delegate");
+    mTrustVerificationDelegate = trustVerificationDelegate;
+}
+
+void TrustVerificationStateMachine::StartTrustVerification()
+{
+    PerformTrustVerificationStage(GetNextTrustVerificationStage(kIdle));
+}
+
+void TrustVerificationStateMachine::TrustVerificationStageFinished(const TrustVerificationStage & completedStage,
+                                                                   const TrustVerificationError & error)
+{
+    ChipLogProgress(Controller, "JCM: Trust Verification Stage Finished: %s", EnumToString(completedStage).c_str());
+
+    if (mTrustVerificationDelegate != nullptr)
+    {
+        mTrustVerificationDelegate->OnProgressUpdate(*this, completedStage, mInfo, error);
+    }
+
+    if (error != TrustVerificationError::kSuccess)
+    {
+        OnTrustVerificationComplete(error);
+        return;
+    }
+
+    if (completedStage == TrustVerificationStage::kComplete || completedStage == TrustVerificationStage::kError)
+    {
+        ChipLogProgress(Controller, "JCM: Trust Verification already complete or error");
+        OnTrustVerificationComplete(error);
+        return;
+    }
+
+    auto nextStage = GetNextTrustVerificationStage(completedStage);
+    if (nextStage == TrustVerificationStage::kError)
+    {
+        OnTrustVerificationComplete(TrustVerificationError::kInternalError);
+        return;
+    }
+
+    PerformTrustVerificationStage(nextStage);
 }
 
 } // namespace JCM

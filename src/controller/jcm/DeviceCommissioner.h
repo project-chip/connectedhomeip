@@ -45,19 +45,13 @@ namespace JCM {
  * implements the JCM trust verification process.
  */
 class DeviceCommissioner : public chip::Controller::DeviceCommissioner,
-                           public VendorIdVerificationClient
+                           public VendorIdVerificationClient,
+                           public TrustVerificationStateMachine
 {
 public:
     // The constructor initializes the DeviceCommissioner with a reference to this device commissioner
     DeviceCommissioner() {}
     ~DeviceCommissioner() {}
-
-    void RegisterTrustVerificationDelegate(
-        TrustVerificationDelegate * trustVerificationDelegate)
-    {
-        ChipLogProgress(Controller, "JCM: Setting trust verification delegate");
-        mTrustVerificationDelegate = trustVerificationDelegate;
-    }
 
     /*
      * StartJCMTrustVerification is a method that initiates the JCM trust verification process for the device.
@@ -76,8 +70,7 @@ public:
      *
      * @param consent A boolean indicating whether the user granted consent (true) or denied it (false).
      */
-    void ContinueAfterUserConsent(
-        const bool & consent);
+    void ContinueAfterUserConsent(const bool & consent) override;
 
     /**
      * ContinueAfterLookupOperationalTrustAnchor is a method that continues the JCM trust verification process after the
@@ -134,13 +127,8 @@ private:
     void ContinueAfterVendorIDVerification(
         const CHIP_ERROR & err);
 
-    TrustVerificationStage GetNextTrustVerificationStage(
-        const TrustVerificationStage & currentStage);
-    void PerformTrustVerificationStage(
-        const TrustVerificationStage & nextStage);
-    void TrustVerificationStageFinished(
-        const TrustVerificationStage & completedStage,
-        const TrustVerificationError & error);
+    TrustVerificationStage GetNextTrustVerificationStage(const TrustVerificationStage & currentStage) override;
+    void PerformTrustVerificationStage(const TrustVerificationStage & nextStage) override;
 
     /*
      * OnTrustVerificationComplete is a callback method that is called when the JCM trust verification process is complete.
@@ -151,16 +139,6 @@ private:
     virtual void OnTrustVerificationComplete(
         TrustVerificationError error);
 
-    // Trust verification delegate for the commissioning client
-    TrustVerificationDelegate * mTrustVerificationDelegate = nullptr;
-
-    // JCM trust verification info
-    // This structure contains the information needed for JCM trust verification
-    // such as the administrator fabric index, endpoint ID, and vendor ID
-    // It is used to store the results of the trust verification process
-    // and is passed to the JCM trust verification delegate
-    // when the trust verification process is complete
-    TrustVerificationInfo mInfo;
     // Device proxy for the device being commissioned
     DeviceProxy *mDeviceProxy;
 

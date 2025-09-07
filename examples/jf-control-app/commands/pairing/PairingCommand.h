@@ -35,6 +35,7 @@ using namespace ::chip;
 using namespace ::chip::Credentials;
 
 using JCMDeviceCommissioner        = chip::Controller::JCM::DeviceCommissioner;
+using JCMTrustVerificationStateMachine = chip::Controller::JCM::TrustVerificationStateMachine;
 using JCMTrustVerificationDelegate = chip::Controller::JCM::TrustVerificationDelegate;
 using JCMTrustVerificationStage    = chip::Controller::JCM::TrustVerificationStage;
 using JCMTrustVerificationError    = chip::Controller::JCM::TrustVerificationError;
@@ -263,9 +264,9 @@ public:
                                       chip::Credentials::AttestationVerificationResult attestationResult) override;
 
     /////////// JCMTrustVerificationDelegate /////////
-    void OnProgressUpdate(JCMDeviceCommissioner & commissioner, JCMTrustVerificationStage stage, JCMTrustVerificationInfo & info,
+    void OnProgressUpdate(JCMTrustVerificationStateMachine & stateMachine, JCMTrustVerificationStage stage, JCMTrustVerificationInfo & info,
                           JCMTrustVerificationError error);
-    void OnAskUserForConsent(JCMDeviceCommissioner & commissioner, JCMTrustVerificationInfo & info);
+    void OnAskUserForConsent(JCMTrustVerificationStateMachine & stateMachine, JCMTrustVerificationInfo & info);
     CHIP_ERROR OnLookupOperationalTrustAnchor(
         VendorId vendorID,
         CertificateKeyId & subjectKeyId,
