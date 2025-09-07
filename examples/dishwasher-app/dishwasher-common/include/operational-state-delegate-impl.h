@@ -94,7 +94,8 @@ private:
         GenericOperationalState(to_underlying(OperationalStateEnum::kError)),
     };
 
-    app::DataModel::List<const GenericOperationalState> mOperationalStateList = Span<const GenericOperationalState>(dishwasherOpStateList);
+    app::DataModel::List<const GenericOperationalState> mOperationalStateList =
+        Span<const GenericOperationalState>(dishwasherOpStateList);
     const Span<const CharSpan> mOperationalPhaseList;
 };
 
