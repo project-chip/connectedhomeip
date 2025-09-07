@@ -21,29 +21,38 @@
 #include <cstring>
 #include <lib/support/logging/CHIPLogging.h>
 
-PreRollBuffer::PreRollBuffer(size_t maxTotalBytes) : maxTotalBytes(maxTotalBytes) {}
+PreRollBuffer::PreRollBuffer() : mMaxTotalBytes(4096), mContentBufferSize(0) {}
 
+void PreRollBuffer::SetMaxTotalBytes(size_t size)
+{
+    ChipLogProgress(Camera, "Setting max total bytes to %zu", size);
+    mMaxTotalBytes = size;
+    TrimBuffer();
+}
 void PreRollBuffer::PushFrameToBuffer(const std::string & streamKey, const char * data, size_t size)
 {
+    TrimBuffer();
+    std::lock_guard<std::mutex> lock(mBufferMutex);
     auto frame       = std::make_shared<PreRollFrame>();
     frame->streamKey = streamKey;
     frame->data      = std::make_unique<char[]>(size);
     memcpy(frame->data.get(), data, size);
     frame->size  = size;
     frame->ptsMs = NowMs();
-    auto & queue = buffers[streamKey]; // Get or create the queue for this stream key
+    auto & queue = mBuffers[streamKey]; // Get or create the queue for this stream key
     queue.push_back(frame);
-    contentBufferSize += size; // Track total bytes in buffer for all streams
-    TrimBuffer();
+    mContentBufferSize += size; // Track total bytes in buffer for all streams
+    mBufferMutex.unlock();
     PushBufferToTransport(); // Automatically flush after each frame push
 }
 
 void PreRollBuffer::PushBufferToTransport()
 {
+    std::lock_guard<std::mutex> lock(mBufferMutex);
     int64_t currentTime = NowMs();
     std::vector<BufferSink *> sinksToRemove;
 
-    for (auto & [sink, streamKeys] : sinkSubscriptions)
+    for (auto & [sink, streamKeys] : mSinkSubscriptions)
     {
         if (!sink->transport)
         {
@@ -51,18 +60,21 @@ void PreRollBuffer::PushBufferToTransport()
             continue;
         }
 
-        int64_t minTimeToDeliver = (sink->requestedPreBufferLengthMs == 0 && sink->transport->CanSendVideo())
-            ? currentTime - sink->minKeyframeIntervalMs
-            : currentTime - sink->requestedPreBufferLengthMs;
+        // Determine the cutoff time for frame delivery.
+        // If requestedPreBufferLengthMs is 0, it implies live mode. In this case, we use minKeyframeIntervalMs
+        // to ensure we have at least a keyframe's worth of data, if available.
+        // Otherwise, we use the configured pre-buffer length.
+        int64_t minTimeToDeliver = (sink->requestedPreBufferLengthMs == 0) ? currentTime - sink->minKeyframeIntervalMs
+                                                                           : currentTime - sink->requestedPreBufferLengthMs;
+
         for (const std::string & streamKey : streamKeys)
         {
-            auto it = buffers.find(streamKey);
-            if (it == buffers.end())
+            auto it = mBuffers.find(streamKey);
+            if (it == mBuffers.end())
             {
                 // No frames for this stream key yet
                 continue;
             }
-
             for (const auto & frame : it->second)
             {
                 if (frame->ptsMs < minTimeToDeliver)
@@ -75,9 +87,10 @@ void PreRollBuffer::PushBufferToTransport()
                 }
                 else
                 {
-                    // Frame is not older than the requested prebuffer length and hasn't been delivered to this sink yet
+                    //  Frame is not older than the requested prebuffer length and hasn't been delivered to this sink yet
                     if (streamKey[0] == 'a' && sink->transport->CanSendAudio())
                     {
+                        ChipLogProgress(Camera, "Sending audio frame %s", streamKey.c_str());
                         sink->transport->SendAudio(frame->data.get(), frame->size,
                                                    static_cast<uint16_t>(std::stoi(streamKey.substr(1))));
                     }
@@ -88,7 +101,7 @@ void PreRollBuffer::PushBufferToTransport()
                     }
                     else
                     {
-                        continue; // Cannot send
+                        continue; // Cannot send or unknown stream key prefix
                     }
                     // Mark as delivered to this sink to avoid duplicate delivery
                     frame->deliveredTo.insert(sink);
@@ -96,7 +109,7 @@ void PreRollBuffer::PushBufferToTransport()
             }
         }
     }
-
+    mBufferMutex.unlock();
     // Remove sinks with no valid senders
     for (BufferSink * sink : sinksToRemove)
     {
@@ -106,23 +119,28 @@ void PreRollBuffer::PushBufferToTransport()
 
 void PreRollBuffer::RegisterTransportToBuffer(BufferSink * sink, const std::unordered_set<std::string> & streamKeys)
 {
-    sinkSubscriptions[sink] = streamKeys;
+    std::lock_guard<std::mutex> lock(mBufferMutex);
+    ChipLogProgress(Camera, "Registering transport to buffer %p", sink);
+    mSinkSubscriptions[sink] = streamKeys;
 }
 
 void PreRollBuffer::DeregisterTransportFromBuffer(BufferSink * sink)
 {
-    sinkSubscriptions.erase(sink);
+    std::lock_guard<std::mutex> lock(mBufferMutex);
+    ChipLogProgress(Camera, "Deregistering transport from buffer %p", sink);
+    mSinkSubscriptions.erase(sink);
 }
 
 void PreRollBuffer::TrimBuffer()
 {
-    while (contentBufferSize > maxTotalBytes)
+    std::lock_guard<std::mutex> lock(mBufferMutex);
+    while (mContentBufferSize > mMaxTotalBytes)
     {
         std::shared_ptr<PreRollFrame> oldest = nullptr;
         std::string oldestStreamKey;
 
         // Find the oldest frame across all buffers
-        for (auto & [streamKey, buffer] : buffers)
+        for (auto & [streamKey, buffer] : mBuffers)
         {
             if (!buffer.empty())
             {
@@ -137,10 +155,9 @@ void PreRollBuffer::TrimBuffer()
 
         if (oldest)
         {
-            // Remove it
-
-            buffers[oldestStreamKey].pop_front();
-            maxTotalBytes -= oldest->size;
+            // Remove oldest from buffer
+            mBuffers[oldestStreamKey].pop_front();
+            mContentBufferSize -= oldest->size;
         }
         else
         {

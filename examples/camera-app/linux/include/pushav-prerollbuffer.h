@@ -18,12 +18,13 @@
 
 #pragma once
 
+#include "transport.h"
 #include <chrono>
 #include <deque>
 #include <functional>
 #include <memory>
+#include <mutex>
 #include <string>
-#include <transport.h>
 #include <unordered_map>
 #include <unordered_set>
 struct BufferSink
@@ -45,19 +46,22 @@ struct PreRollFrame
 class PreRollBuffer
 {
 public:
-    PreRollBuffer(size_t maxTotalBytes);
+    PreRollBuffer();
     void PushFrameToBuffer(const std::string & streamKey, const char * data, size_t size);
     void RegisterTransportToBuffer(BufferSink * sink, const std::unordered_set<std::string> & streamKeys);
     void DeregisterTransportFromBuffer(BufferSink * sink);
+    void SetMaxTotalBytes(size_t size);
     int64_t NowMs() const;
 
 private:
     void PushBufferToTransport();
     void TrimBuffer();
 
-    size_t maxTotalBytes;
-    size_t contentBufferSize;
+    std::mutex mBufferMutex; // Single mutex protecting all shared data
 
-    std::unordered_map<std::string, std::deque<std::shared_ptr<PreRollFrame>>> buffers;
-    std::unordered_map<BufferSink *, std::unordered_set<std::string>> sinkSubscriptions;
+    size_t mMaxTotalBytes;
+    size_t mContentBufferSize;
+
+    std::unordered_map<std::string, std::deque<std::shared_ptr<PreRollFrame>>> mBuffers;
+    std::unordered_map<BufferSink *, std::unordered_set<std::string>> mSinkSubscriptions;
 };

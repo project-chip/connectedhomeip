@@ -16,65 +16,93 @@
  *    limitations under the License.
  */
 #include "default-media-controller.h"
+#include "camera-device.h"
 #include "pushav-prerollbuffer.h"
 #include <algorithm>
 #include <lib/support/logging/CHIPLogging.h>
+
+void DefaultMediaController::SetCameraDevice(Camera::CameraDevice * device)
+{
+    mCameraDevice = device;
+    if (mCameraDevice)
+    {
+        size_t bufferSize = mCameraDevice->GetPreRollBufferSize();
+        mPreRollBuffer.SetMaxTotalBytes(bufferSize * 1000);
+        ChipLogProgress(Camera, "PreRollBuffer size set to %zu bytes from CameraDevice.", bufferSize);
+    }
+    else
+    {
+        // Handle case where device is null, perhaps revert to a default or log an error
+        ChipLogError(Camera, "CameraDevice is null in DefaultMediaController::SetCameraDevice. PreRollBuffer size not set.");
+        mPreRollBuffer.SetMaxTotalBytes(509600); // Fallback to a small default
+    }
+}
 
 void DefaultMediaController::RegisterTransport(Transport * transport, uint16_t videoStreamID, uint16_t audioStreamID)
 {
     ChipLogProgress(Camera, "Registering transport: videoStreamID=%u, audioStreamID=%u", videoStreamID, audioStreamID);
 
-    std::lock_guard<std::mutex> lock(connectionsMutex);
-    connections.push_back({ transport, videoStreamID, audioStreamID });
+    std::lock_guard<std::mutex> lock(mConnectionsMutex);
+    mConnections.push_back({ transport, videoStreamID, audioStreamID });
 
     auto * bufferSink                      = new BufferSink();
     bufferSink->transport                  = transport;
-    bufferSink->requestedPreBufferLengthMs = 0;    // by default give only live stream
-    bufferSink->minKeyframeIntervalMs      = 1000; // TODO:get values from camera-device
+    bufferSink->requestedPreBufferLengthMs = 0; // by default give only live stream
+
+    if (mCameraDevice)
+    {
+        bufferSink->minKeyframeIntervalMs = mCameraDevice->GetMinKeyframeIntervalMs();
+        ChipLogProgress(Camera, "MinKeyframeIntervalMs set to %lld ms from CameraDevice.",
+                        static_cast<long long>(bufferSink->minKeyframeIntervalMs));
+    }
+    else
+    {
+        bufferSink->minKeyframeIntervalMs = 1000; // Fallback default if CameraDevice not set
+        ChipLogError(Camera, "CameraDevice not set in DefaultMediaController. Using default MinKeyframeIntervalMs.");
+    }
 
     std::unordered_set<std::string> streamKeys;
     streamKeys.insert("a" + std::to_string(audioStreamID));
     streamKeys.insert("v" + std::to_string(videoStreamID));
 
-    preRollBuffer.RegisterTransportToBuffer(bufferSink, streamKeys);
-    sinkMap[transport] = bufferSink;
-    ChipLogProgress(Camera, "Transport registered successfully. Total connections: %u", (unsigned) connections.size());
+    mPreRollBuffer.RegisterTransportToBuffer(bufferSink, streamKeys);
+    mSinkMap[transport] = bufferSink;
+    ChipLogProgress(Camera, "Transport registered successfully. Total connections: %u", (unsigned) mConnections.size());
 }
 
 void DefaultMediaController::UnregisterTransport(Transport * transport)
 {
-    std::lock_guard<std::mutex> lock(connectionsMutex);
-    connections.erase(std::remove_if(connections.begin(), connections.end(),
-                                     [transport](const Connection & c) { return c.transport == transport; }),
-                      connections.end());
-    auto it = sinkMap.find(transport);
-    if (it != sinkMap.end())
+    std::lock_guard<std::mutex> lock(mConnectionsMutex);
+    mConnections.erase(std::remove_if(mConnections.begin(), mConnections.end(),
+                                      [transport](const Connection & c) { return c.transport == transport; }),
+                       mConnections.end());
+    auto it = mSinkMap.find(transport);
+    if (it != mSinkMap.end())
     {
-        preRollBuffer.DeregisterTransportFromBuffer(it->second);
+        mPreRollBuffer.DeregisterTransportFromBuffer(it->second);
         delete it->second;
-        sinkMap.erase(it);
+        mSinkMap.erase(it);
         ChipLogProgress(Camera, "Sink deregistered for transport.");
     }
 }
 
 void DefaultMediaController::DistributeVideo(const char * data, size_t size, uint16_t videoStreamID)
 {
-
     std::string streamKey = "v" + std::to_string(videoStreamID);
-    preRollBuffer.PushFrameToBuffer(streamKey, data, size);
+    mPreRollBuffer.PushFrameToBuffer(streamKey, data, size);
 }
 
 void DefaultMediaController::DistributeAudio(const char * data, size_t size, uint16_t audioStreamID)
 {
     std::string streamKey = "a" + std::to_string(audioStreamID);
-    preRollBuffer.PushFrameToBuffer(streamKey, data, size);
+    mPreRollBuffer.PushFrameToBuffer(streamKey, data, size);
 }
 
 void DefaultMediaController::SetPreRollLength(Transport * transport, uint16_t preRollBufferLength)
 
 {
-    auto it = sinkMap.find(transport);
-    if (it != sinkMap.end() && it->second != nullptr)
+    auto it = mSinkMap.find(transport);
+    if (it != mSinkMap.end() && it->second != nullptr)
     {
         it->second->requestedPreBufferLengthMs = preRollBufferLength;
         ChipLogProgress(Camera, "Delay updated for transport to %u ms", preRollBufferLength);
