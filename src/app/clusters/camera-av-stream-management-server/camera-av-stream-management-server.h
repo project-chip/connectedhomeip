@@ -183,6 +183,17 @@ public:
      */
     virtual Protocols::InteractionModel::Status AudioStreamDeallocate(const uint16_t streamID) = 0;
 
+    struct SnapshotStreamAllocateArgs
+    {
+        ImageCodecEnum imageCodec;
+        uint16_t maxFrameRate;
+        Structs::VideoResolutionStruct::Type minResolution;
+        Structs::VideoResolutionStruct::Type maxResolution;
+        uint8_t quality;
+        Optional<bool> watermarkEnabled;
+        Optional<bool> OSDEnabled;
+    };
+
     /**
      *   @brief Handle Command Delegate for Snapshot stream allocation.
      *
@@ -197,7 +208,7 @@ public:
      *   produced; otherwise, the command SHALL be rejected with an appropriate
      *   error.
      */
-    virtual Protocols::InteractionModel::Status SnapshotStreamAllocate(const SnapshotStreamStruct & allocateArgs,
+    virtual Protocols::InteractionModel::Status SnapshotStreamAllocate(const SnapshotStreamAllocateArgs & allocateArgs,
                                                                        uint16_t & outStreamID) = 0;
 
     /**
@@ -542,7 +553,7 @@ public:
     CHIP_ERROR AddSnapshotStream(const SnapshotStreamStruct & snapshotStream);
 
     CHIP_ERROR UpdateSnapshotStreamRangeParams(SnapshotStreamStruct & snapshotStreamToUpdate,
-                                               const SnapshotStreamStruct & snapshotStream);
+                                               const CameraAVStreamMgmtDelegate::SnapshotStreamAllocateArgs & snapshotStream);
 
     CHIP_ERROR RemoveSnapshotStream(uint16_t snapshotStreamId);
 
