@@ -18,13 +18,29 @@
 # See https://github.com/project-chip/connectedhomeip/blob/master/docs/testing/python.md#defining-the-ci-test-arguments
 # for details about the block below.
 #
+# === BEGIN CI TEST ARGUMENTS ===
+# test-runner-runs:
+#   run1:
+#     app: ${ALL_CLUSTERS_APP}
+#     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
+#     script-args: >
+#       --storage-path admin_storage.json
+#       --commissioning-method on-network
+#       --discriminator 1234
+#       --passcode 20202021
+#       --PICS src/app/tests/suites/certification/ci-pics-values
+#       --trace-to json:${TRACE_TEST_JSON}.json
+#       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+#     factory-reset: true
+#     quiet: true
+# === END CI TEST ARGUMENTS ===
 
 import logging
 
 from mobly import asserts
 
 import matter.clusters as Clusters
-from matter.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main, has_feature, run_if_endpoint_matches
+from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 
 kRootEndpointId = 0
 kSecondaryNetworkInterfaceDeviceTypeId = 0x0019
@@ -43,14 +59,14 @@ class TC_CNET_1_4(MatterBaseTest):
         return '[TC-CNET-1.4] Verification for Secondary Network Interface [DUT-Server]'
 
     def pics_TC_CNET_1_4(self):
-        return ['CNET.S.F00']
+        return ['CNET.S']
 
     # Override default timeout.
     @property
     def default_timeout(self) -> int:
         return 200
 
-    @run_if_endpoint_matches(has_feature(Clusters.NetworkCommissioning, Clusters.NetworkCommissioning.Bitmaps.Feature.kWiFiNetworkInterface))
+    @async_test_body
     async def test_TC_CNET_1_4(self):
         # Commissioning is already done
         self.step(1)
