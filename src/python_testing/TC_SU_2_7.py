@@ -264,7 +264,6 @@ class TC_SU_2_7(MatterBaseTest):
         Returns:
             int: PID of the process
         """
-        sleep(5)
         base_path = getcwd()
         app_path = ''
         # Verify if the env variable for the ota provider is available
@@ -280,7 +279,8 @@ class TC_SU_2_7(MatterBaseTest):
         process = Popen(args=str_cmd, shell=True, stdout=open(log, 'a'),
                         stderr=open(f"{getcwd()}/{log}.err", 'a'), preexec_fn=setpgrp)
         logger.info(f"Launched app {env_app_name} with pid {process.pid}")
-        sleep(5)
+        # Wait app to startup
+        sleep(3)
         return process
 
     def _launch_provider_app(self, version: int = 2, extra_params: list = []):
@@ -349,6 +349,8 @@ class TC_SU_2_7(MatterBaseTest):
             self.current_provider_app_proc.terminate()
             run("rm -rf /tmp/chip_kvs_provider*", shell=True)
             self.current_provider_app_proc = None
+            # Wait SIGTERM
+            sleep(2)
 
     def _terminate_requestor_process(self):
         if self.current_requestor_app_proc is not None:
@@ -357,8 +359,9 @@ class TC_SU_2_7(MatterBaseTest):
         else:
             kill(self.current_requestor_app_pid, SIGTERM)
             self.current_requestor_app_pid = None
-
         run("rm -rf /tmp/chip_kvs_requestor*", shell=True)
+        # Wait SIGTERM
+        sleep(2)
 
     @async_test_body
     async def teardown_test(self):
@@ -438,12 +441,10 @@ class TC_SU_2_7(MatterBaseTest):
         await state_transition_event_handler.cancel()
         self._terminate_provider_process()
         controller.ExpireSessions(nodeid=provider_data['node_id'])
-        sleep(3)
 
         self.step(2)
         self._launch_provider_app(
             extra_params=["--delayedQueryActionTimeSec 60", "--queryImageStatus  busy"])
-        sleep(3)
         await controller.CommissionOnNetwork(
             nodeId=provider_data['node_id'],
             setupPinCode=provider_data['setup_pincode'],
@@ -467,11 +468,9 @@ class TC_SU_2_7(MatterBaseTest):
         logger.info(f"About close the provider app with proc {self.current_provider_app_proc.pid}")
         self._terminate_provider_process()
         controller.ExpireSessions(nodeid=provider_data['node_id'])
-        sleep(3)
 
         self.step(3)
         self._launch_provider_app()
-        await asyncio.sleep(5)
         await controller.CommissionOnNetwork(
             nodeId=provider_data['node_id'],
             setupPinCode=provider_data['setup_pincode'],
@@ -485,7 +484,7 @@ class TC_SU_2_7(MatterBaseTest):
         await state_transition_event_handler.start(controller, requestor_node_id, endpoint=0, min_interval_sec=0, max_interval_sec=60*6)
         # This step we need to Kill the provider PID before the announcement
         self._kill_provider_process()
-        sleep(3)
+        sleep(1)
         await self._announce_ota_provider(controller, provider_data['node_id'], requestor_node_id)
         event_report = state_transition_event_handler.wait_for_event_report(self.ota_req.Events.StateTransition, timeout_sec=60*5)
         logger.info(f"Event response after killing app: {event_report}")
@@ -497,7 +496,6 @@ class TC_SU_2_7(MatterBaseTest):
         state_transition_event_handler.reset()
         await state_transition_event_handler.cancel()
         controller.ExpireSessions(nodeid=provider_data['node_id'])
-        sleep(3)
 
         self.step(4)
         # Need to launch the requestor with -c true
@@ -572,6 +570,7 @@ class TC_SU_2_7(MatterBaseTest):
         logger.info(f"Event report Downloading {event_report}")
         asserts.assert_equal(event_report.newState, self.ota_req.Enums.UpdateStateEnum.kDownloading)
         # Wait some time to let it download some data and then Kill the current process and remove kvs files
+        logger.info("Wait 10 seconds to allow download some data")
         sleep(10)
         self._kill_provider_process()
         time_middle = time()
@@ -605,7 +604,6 @@ class TC_SU_2_7(MatterBaseTest):
         controller.ExpireSessions(nodeid=provider_data['node_id'])
         self._terminate_requestor_process()
         controller.ExpireSessions(nodeid=requestor_node_id)
-        sleep(3)
         self._launch_requestor_app(extra_params=["-a"])
         await controller.CommissionOnNetwork(
             nodeId=requestor_node_id,
@@ -623,10 +621,14 @@ class TC_SU_2_7(MatterBaseTest):
             filterType=ChipDeviceCtrl.DiscoveryFilterType.LONG_DISCRIMINATOR,
             filter=provider_data['discriminator']
         )
-
+        # EventHandlers
         state_transition_event_handler = EventSubscriptionHandler(
             expected_cluster=self.ota_req, expected_event_id=self.ota_req.Events.StateTransition.event_id)
         await state_transition_event_handler.start(controller, requestor_node_id, endpoint=0, min_interval_sec=0, max_interval_sec=5000)
+        basicinformation_handler = EventSubscriptionHandler(
+            expected_cluster=Clusters.BasicInformation, expected_event_id=Clusters.BasicInformation.Events.ShutDown.event_id)
+        await basicinformation_handler.start(controller, requestor_node_id, endpoint=0, min_interval_sec=0, max_interval_sec=5000)
+
         await self._write_acl_rules(controller=controller, endpoint=0, node_id=provider_data['node_id'])
         await self._write_ota_providers(controller=controller, provider_node_id=provider_data['node_id'], endpoint=0)
         await self._announce_ota_provider(controller, provider_data['node_id'], requestor_node_id)
@@ -644,17 +646,14 @@ class TC_SU_2_7(MatterBaseTest):
         logger.info(f"Event report: {event_report}")
         asserts.assert_equal(event_report.newState, self.ota_req.Enums.UpdateStateEnum.kDelayedOnApply,
                              f"Event status is not {self.ota_req.Enums.UpdateStateEnum.kDelayedOnApply}")
-        event_report = state_transition_event_handler.wait_for_event_report(self.ota_req.Events.StateTransition, timeout_sec=60*3)
-        asserts.assert_equal(event_report.newState, self.ota_req.Enums.UpdateStateEnum.kApplying,
-                             f"Event status is not {self.ota_req.Enums.UpdateStateEnum.kApplying}")
+        # Wait for Restart or ShutdownEvent
+        shutdown_event = basicinformation_handler.wait_for_event_report(Clusters.BasicInformation.Events.ShutDown, timeout_sec=60*4)
+        logger.info(f"Shutting down {shutdown_event}")
         await state_transition_event_handler.cancel()
-        self.step(7)
-        # Status idle should be present after restart
-        # event_report = state_transition_event_handler.wait_for_event_report(self.ota_req.Events.StateTransition, timeout_sec=60*1)
-        # asserts.assert_equal(event_report.newState, self.ota_req.Enums.UpdateStateEnum.kIdle,
-        #                      "Status idle waas not present after restart")
+        await basicinformation_handler.cancel()
 
-        await asyncio.sleep(60)
+        self.step(7)
+        await asyncio.sleep(5)
         urgent = 1
         version_applied_event = Clusters.OtaSoftwareUpdateRequestor.Events.VersionApplied
         events_response = await controller.ReadEvent(
