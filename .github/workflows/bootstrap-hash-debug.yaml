@@ -1,0 +1,26 @@
+name: Bootstrap Hash Debug
+
+on:
+  workflow_dispatch:
+    inputs:
+      platform:
+        description: "Platform name (optional)"
+        required: false
+        default: none
+
+jobs:
+  macos-bootstrap-debug:
+    name: macOS Bootstrap Debug
+    runs-on: macos-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Run bootstrap (debug)
+        id: bootstrap
+        uses: ./.github/actions/bootstrap
+        with:
+          platform: ${{ inputs.platform }}
+
+      - name: Echo cache-hit output
+        run: echo "cache-hit=${{ steps.bootstrap.outputs.cache-hit }}"
