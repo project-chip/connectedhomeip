@@ -117,9 +117,9 @@ class TC_SETRF_2_1(CommodityTariffTestBaseHelper):
                             - Store the field value randomizationTypeValue;
                         - RandomizationOffset field:
                             - Verify that entry does NOT contain RandomizationOffset fields if SETRF.S.F05(RNDM) is False;
-                            - If SETRF.S.F05(RNDM) and randomizationTypeValue is 0x01 (Fixed) and RandomizationOffset field is presented, it has int16 value;
-                            - If SETRF.S.F05(RNDM) and randomizationTypeValue is 0x04 (RandomNegative) and RandomizationOffset field is presented, it has a int16 value less or equal 0;
-                            - If SETRF.S.F05(RNDM) and randomizationTypeValue is 0x00 (None), 0x02 (Random) or 0x03 (RandomPositive) and RandomizationOffset field is presented, it has a int16 value greater or equal 0."""),
+                            - If SETRF.S.F05(RNDM) and randomizationTypeValue is 0x01 (Fixed) and RandomizationOffset field is presented, it has an int16 value;
+                            - If SETRF.S.F05(RNDM) and randomizationTypeValue is 0x04 (RandomNegative) and RandomizationOffset field is presented, it has an int16 value less or equal 0;
+                            - If SETRF.S.F05(RNDM) and randomizationTypeValue is 0x00 (None), 0x02 (Random) or 0x03 (RandomPositive) and RandomizationOffset field is presented, it has an int16 value greater or equal 0."""),
             TestStep("7", "TH reads from the DUT the DayPatterns attribute.", """
                      - If tariffInfoValue equals null, Verify that the DUT response contains a null;
                      - If tariffInfoValue does NOT equal null, Verify that the DUT response contains a null or a value that is a list of DayPatternStruct entries with list length less or equal 28;
@@ -160,9 +160,9 @@ class TC_SETRF_2_1(CommodityTariffTestBaseHelper):
                         - Store the field value randomizationTypeValue;
                      - RandomizationOffset field:
                         - Verify that entry does NOT contain RandomizationOffset fields if SETRF.S.F05(RNDM) is False;
-                        - If SETRF.S.F05(RNDM) and randomizationTypeValue is 0x01 (Fixed) and RandomizationOffset field is presented, it has int16 value;
-                        - If SETRF.S.F05(RNDM) and randomizationTypeValue is 0x04 (RandomNegative) and RandomizationOffset field is presented, it has a int16 value less or equal 0;
-                        - If SETRF.S.F05(RNDM) and randomizationTypeValue is 0x00 (None), 0x02 (Random) or 0x03 (RandomPositive) and RandomizationOffset field is presented, it has a int16 value greater or equal 0."""),
+                        - If SETRF.S.F05(RNDM) and randomizationTypeValue is 0x01 (Fixed) and RandomizationOffset field is presented, it has an int16 value;
+                        - If SETRF.S.F05(RNDM) and randomizationTypeValue is 0x04 (RandomNegative) and RandomizationOffset field is presented, it has an int16 value less or equal 0;
+                        - If SETRF.S.F05(RNDM) and randomizationTypeValue is 0x00 (None), 0x02 (Random) or 0x03 (RandomPositive) and RandomizationOffset field is presented, it has an int16 value greater or equal 0."""),
             TestStep("12", "TH reads from the DUT the CurrentDayEntryDate attribute.", """
                      - If tariffInfoValue equals null, Verify that the DUT response contains a null;
                      - If tariffInfoValue does NOT equal null, Verify that the DUT response contains a null or a value of epoch-s type;
