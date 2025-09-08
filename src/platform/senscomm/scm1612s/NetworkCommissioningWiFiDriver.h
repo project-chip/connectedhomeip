@@ -122,6 +122,7 @@ public:
     void OnScanWiFiNetworkDone();
     void UpdateWiFiAuthmode();
     CHIP_ERROR SetLastDisconnectReason(const ChipDeviceEvent * event);
+    int16_t GetLastDisconnectReason();
     static WiseWiFiDriver & GetInstance()
     {
         static WiseWiFiDriver instance;
@@ -136,6 +137,7 @@ private:
     WiFiNetwork mStagingNetwork = {};
     ScanCallback * mpScanCallback;
     ConnectCallback * mpConnectCallback;
+    int16_t lastDisconnectedReason;
 };
 
 } // namespace NetworkCommissioning

@@ -26,6 +26,7 @@
 #include <platform/internal/BLEManager.h>
 #include <platform/senscomm/scm1612s/NetworkCommissioningWiFiDriver.h>
 #include <platform/senscomm/scm1612s/CHIPDevicePlatformConfig.h>
+#include <platform/senscomm/scm1612s/DiagnosticDataProviderImpl.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/logging/CHIPLogging.h>
 
@@ -739,6 +740,16 @@ void ConnectivityManagerImpl::OnStationConnected()
     (void) PlatformMgr().PostEvent(&event);
 
     UpdateInternetConnectivityState(false, false, NULL);
+
+    // Change DGWIFI connection-status event value
+    WiFiDiagnosticsDelegate * delegate = GetDiagnosticDataProviderImpl().GetWiFiDiagnosticsDelegate();
+    if (delegate) 
+    {
+        // Only update DGWIFI connection-status 
+        delegate->OnConnectionStatusChanged(
+            chip::to_underlying(chip::app::Clusters::WiFiNetworkDiagnostics::ConnectionStatusEnum::kConnected));
+
+    }
 }
 
 void ConnectivityManagerImpl::OnStationDisconnected()
@@ -754,6 +765,22 @@ void ConnectivityManagerImpl::OnStationDisconnected()
     (void) PlatformMgr().PostEvent(&event);
 
     UpdateInternetConnectivityState(false, false, NULL);
+
+    // for TH TC DG-WIFI 2-2
+    // already set outside
+    // NetworkCommissioning::WiseWiFiDriver::GetInstance().SetLastDisconnectReason(NULL);
+    uint16_t reason = NetworkCommissioning::WiseWiFiDriver::GetInstance().GetLastDisconnectReason();
+    // Did not report by wise sdk yet
+    uint8_t associationFailureCause =
+        chip::to_underlying(chip::app::Clusters::WiFiNetworkDiagnostics::AssociationFailureCauseEnum::kUnknown);
+    WiFiDiagnosticsDelegate * delegate = GetDiagnosticDataProviderImpl().GetWiFiDiagnosticsDelegate();
+    if (delegate) 
+    {
+        delegate->OnDisconnectionDetected(reason);
+        delegate->OnAssociationFailureDetected(associationFailureCause, reason);
+        delegate->OnConnectionStatusChanged(
+            chip::to_underlying(chip::app::Clusters::WiFiNetworkDiagnostics::ConnectionStatusEnum::kNotConnected));
+    }
 }
 
 void ConnectivityManagerImpl::DriveStationState(::chip::System::Layer * aLayer, void * aAppState)

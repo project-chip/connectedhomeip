@@ -275,7 +275,14 @@ void WiseWiFiDriver::OnConnectWiFiNetwork()
 
 CHIP_ERROR WiseWiFiDriver::SetLastDisconnectReason(const ChipDeviceEvent * event)
 {
+    // todo: confirm the reason details ?
+    lastDisconnectedReason = event->Platform.SCMSystemEvent.event.event_info.disconnected.reason;
     return CHIP_NO_ERROR;
+}
+
+int16_t WiseWiFiDriver::GetLastDisconnectReason()
+{
+    return lastDisconnectedReason;
 }
 
 void WiseWiFiDriver::ConnectNetwork(ByteSpan networkId, ConnectCallback * callback)
