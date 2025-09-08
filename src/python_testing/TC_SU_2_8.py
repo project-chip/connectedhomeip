@@ -112,7 +112,14 @@ class TC_SU_2_8(MatterBaseTest):
 
         p_pass = 20202021
 
-        # Commissioning TH-OTA Provider
+        # States
+        idle = Clusters.Objects.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kIdle
+        querying = Clusters.Objects.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kQuerying
+        downloading = Clusters.Objects.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kDownloading
+
+        target_version = 2
+
+        # Commissioning step
         self.step(0)
 
         endpoint = self.get_endpoint(default=0)
@@ -171,6 +178,10 @@ class TC_SU_2_8(MatterBaseTest):
         # Configure DefaultOTAProviders with invalid node ID. DUT tries to send a QueryImage command to TH1/OTA-P.
         self.step(1)
 
+        event_cb = EventSubscriptionHandler(expected_cluster=Clusters.Objects.OtaSoftwareUpdateRequestor)
+        await event_cb.start(dev_ctrl=th2, node_id=dut_node_id_th2, endpoint=endpoint,
+                             fabric_filtered=False, min_interval_sec=0, max_interval_sec=5)
+
         # Write default OTA providers TH1 with p1_node which does not exist
         await self._write_default_providers(th1, endpoint, p1_node, dut_node_id)
 
@@ -186,15 +197,7 @@ class TC_SU_2_8(MatterBaseTest):
 
         # Do not announce TH1-OTA Provider
 
-        idle = Clusters.Objects.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kIdle
-        querying = Clusters.Objects.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kQuerying
-        downloading = Clusters.Objects.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kDownloading
-
         # Expect events idle to querying, downloadError and then back to idle
-        event_cb = EventSubscriptionHandler(expected_cluster=Clusters.Objects.OtaSoftwareUpdateRequestor)
-        await event_cb.start(dev_ctrl=th2, node_id=dut_node_id_th2, endpoint=endpoint,
-                             fabric_filtered=False, min_interval_sec=0, max_interval_sec=5)
-
         querying_event = event_cb.wait_for_event_report(
             Clusters.Objects.OtaSoftwareUpdateRequestor.Events.StateTransition, 5000)
         asserts.assert_equal(querying, querying_event.newState,
@@ -220,6 +223,11 @@ class TC_SU_2_8(MatterBaseTest):
         # DUT sends QueryImage command to TH2/OTA-P.
         self.step(2)
 
+        # Subscribe to events
+        event_cb = EventSubscriptionHandler(expected_cluster=Clusters.Objects.OtaSoftwareUpdateRequestor)
+        await event_cb.start(dev_ctrl=th2, node_id=dut_node_id_th2, endpoint=endpoint,
+                             fabric_filtered=False, min_interval_sec=0, max_interval_sec=5)
+
         # Write default OTA providers TH2
         await self._write_default_providers(th2, endpoint, p2_node, dut_node_id_th2)
 
@@ -233,14 +241,6 @@ class TC_SU_2_8(MatterBaseTest):
         )
 
         logging.info(f"Default OTA Providers: {default_ota_providers}.")
-
-        # Subscribe to events
-        target_version = 2
-        event_cb = EventSubscriptionHandler(expected_cluster=Clusters.Objects.OtaSoftwareUpdateRequestor)
-        await event_cb.start(dev_ctrl=th2, node_id=dut_node_id_th2, endpoint=endpoint,
-                             fabric_filtered=False, min_interval_sec=0, max_interval_sec=5)
-
-        await asyncio.sleep(5)
 
         # Announce after subscription
         await self._announce(th2, vendor_id, p2_node, endpoint)
