@@ -30,7 +30,6 @@ constexpr int kMaxFragmentSize      = 1188; // 1200 (max packet size) - 12 (RTP 
 constexpr int kAudioBitRate         = 64000;
 constexpr int kOpusPayloadType      = 111;
 constexpr int kAudioSSRC            = 43;
-constexpr int kMidExtId             = 3; // Extmap-ID for MID header extension
 
 rtc::Description::Type SDPTypeToRtcType(SDPType type)
 {
