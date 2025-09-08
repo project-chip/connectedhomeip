@@ -135,7 +135,7 @@ inline bool AttributeList<T, N>::Iterator::operator!=(const AttributeList<T, N>:
 template <typename T, size_t N>
 inline bool AttributeList<T, N>::Iterator::operator==(const AttributeList<T, N>::Iterator & other) const
 {
-    return mIndex == other.mIndex;  
+    return mIndex == other.mIndex;
 }
 
 } // namespace DeviceLayer

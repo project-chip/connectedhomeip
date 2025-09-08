@@ -72,10 +72,10 @@ TEST_F(TestAttributeList, TestIterator)
 
     EXPECT_EQ(list.add(10), CHIP_NO_ERROR);
     EXPECT_NE(list.begin(), list.end());
-    
+
     EXPECT_EQ(list.add(20), CHIP_NO_ERROR);
     EXPECT_NE(list.begin(), list.end());
-    
+
     EXPECT_EQ(list.add(30), CHIP_NO_ERROR);
     EXPECT_NE(list.begin(), list.end());
 
@@ -83,7 +83,7 @@ TEST_F(TestAttributeList, TestIterator)
 
     auto it = list.begin();
     EXPECT_EQ(*it, 10);
-    
+
     ++it;
     EXPECT_NE(it, list.end());
     EXPECT_EQ(*it, 20);
