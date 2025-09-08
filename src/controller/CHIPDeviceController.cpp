@@ -1086,7 +1086,7 @@ DeviceCommissioner::ContinueCommissioningAfterDeviceAttestation(DeviceProxy * de
 }
 
 #if CHIP_DEVICE_CONFIG_ENABLE_NFC_BASED_COMMISSIONING
-CHIP_ERROR DeviceCommissioner::ContinueCommissioningAfterUnpoweredPhaseComplete(NodeId remoteDeviceId)
+CHIP_ERROR DeviceCommissioner::ContinueCommissioningAfterConnectNetworkRequest(NodeId remoteDeviceId)
 {
     MATTER_TRACE_SCOPE("continueCommissioningAfterUnpoweredPhaseComplete", "DeviceCommissioner");
 
@@ -1115,7 +1115,7 @@ CHIP_ERROR DeviceCommissioner::ContinueCommissioningAfterUnpoweredPhaseComplete(
 
     mDefaultCommissioner->SetOperationalCredentialsDelegate(mOperationalCredentialsDelegate);
 
-    ChipLogProgress(Controller, "Continuing commissioning after unpowered phase complete for device ID 0x" ChipLogFormatX64,
+    ChipLogProgress(Controller, "Continuing commissioning after connect to network complete for device ID 0x" ChipLogFormatX64,
                     ChipLogValueX64(remoteDeviceId));
 
     MATTER_LOG_METRIC_BEGIN(kMetricDeviceCommissioningOperationalSetup);

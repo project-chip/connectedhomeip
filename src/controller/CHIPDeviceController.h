@@ -623,11 +623,11 @@ public:
     /**
      * @brief
      *   This method instructs the commissioner to proceed to the commissioning complete stage for a device
-     *   that had previously completed the unpowered stage phase of commissioning.
+     *   that had previously being commissioned until request to connect to network.
      *
      * @param[in] remoteDeviceId        The remote device Id.
      */
-    CHIP_ERROR ContinueCommissioningAfterUnpoweredPhaseComplete(NodeId remoteDeviceId);
+    CHIP_ERROR ContinueCommissioningAfterConnectNetworkRequest(NodeId remoteDeviceId);
 #endif
 
     CHIP_ERROR GetDeviceBeingCommissioned(NodeId deviceId, CommissioneeDeviceProxy ** device);
