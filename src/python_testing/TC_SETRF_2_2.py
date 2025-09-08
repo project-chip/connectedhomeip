@@ -188,7 +188,8 @@ class TC_SETRF_2_2(CommodityTariffTestBaseHelper):
             command = Clusters.CommodityTariff.Commands.GetTariffComponent(
                 tariffComponentID=absentTariffComponentID)
             result: cluster.Commands.GetTariffComponentResponse = await self.send_single_cmd(cmd=command, endpoint=endpoint, timedRequestTimeoutMs=3000)
-            asserts.fail("Unexpected command success on an absent TariffComponent")  # If other error is returned
+            # We expect an exception (InteractionModelError) with NOT_FOUND error, so the line below should not be reached.
+            asserts.fail("Unexpected command success on an absent TariffComponent")
         except InteractionModelError as err:
             asserts.assert_equal(
                 err.status, Status.NotFound, "Unexpected error returned"
@@ -223,6 +224,7 @@ class TC_SETRF_2_2(CommodityTariffTestBaseHelper):
         try:
             command = Clusters.CommodityTariff.Commands.GetDayEntry(dayEntryID=absentDayEntryID)
             result: cluster.Commands.GetDayEntryResponse = await self.send_single_cmd(cmd=command, endpoint=endpoint, timedRequestTimeoutMs=3000)
+            # We expect an exception (InteractionModelError) with NOT_FOUND error, so the line below should not be reached.
             asserts.fail("Unexpected command success on an absent DayEntry")
         except InteractionModelError as err:
             asserts.assert_equal(
