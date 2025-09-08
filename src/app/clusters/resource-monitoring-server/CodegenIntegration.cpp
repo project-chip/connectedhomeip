@@ -61,7 +61,6 @@ bool findEndpointWithLog(EndpointId endpointId, ClusterId clusterId, uint16_t & 
 template <typename T>
 void CreateConcreteResourceMonitoringCluster(uint16_t arrayIndex, EndpointId endpointId, ClusterId clusterId, T * gServers)
 {
-    uint32_t rawFeatureMap{0};
 
     /*
     if (clusterId == HepaFilterMonitoring::Id) 
@@ -90,7 +89,7 @@ void CreateConcreteResourceMonitoringCluster(uint16_t arrayIndex, EndpointId end
     gServers[arrayIndex].Create(
         endpointId,
         clusterId,
-        rawFeatureMap,
+        BitFlags<ResourceMonitoring::Feature>{ 0 },
         chip::app::Clusters::ResourceMonitoring::DegradationDirectionEnum::kDown,
         true /* ResetCondition command supported */);
 }

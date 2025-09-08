@@ -16,36 +16,86 @@
 
 #include <pw_unit_test/framework.h>
 
-#include <app/clusters/resource-monitoring-server/resource-monitoring-logic.h>
+#include <app/clusters/resource-monitoring-server/resource-monitoring-cluster-proxy.h>
 
 #include <app/clusters/testing/AttributeTesting.h>
-#include <app/server-cluster/DefaultServerCluster.h>
-#include <lib/core/CHIPError.h>
-#include <lib/support/ReadOnlyBuffer.h>
 
-#include <clusters/TimeFormatLocalization/Attributes.h>
-#include <lib/core/TLV.h>
-#include <lib/core/TLVDebug.h>
-#include <lib/core/TLVUtilities.h>
+#include <optional>
+#include <functional>
+#include <type_traits>
+
 
 
 using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;
+using namespace chip::app::Clusters::SoilMeasurement;
+using namespace chip::app::Clusters::SoilMeasurement::Attributes;
 
 namespace {
+
+
+template <typename OPT, typename... ARGS>
+auto dispatch_to_optional_fn(OPT const & opt, ARGS &&... args) -> decltype(std::invoke(*opt, std::forward<ARGS>(args)...))
+{
+    using ReturnType = decltype(std::invoke(*opt, std::forward<ARGS>(args)...));
+
+    if constexpr (std::is_invocable_v<std::decay_t<decltype(*opt)>, ARGS...>) {
+
+        if (opt.has_value()) {
+            
+            return std::invoke(*opt, std::forward<ARGS>(args)...);
+        
+        }
+    }
+
+    return ReturnType{};
+}
+
+struct MockDelegate : public ResourceMonitoring::ResourceMonitoringDelegate
+{
+    CHIP_ERROR Init() { 
+        return dispatch_to_optional_fn(mInit);
+    };
+
+    Protocols::InteractionModel::Status OnResetCondition(){
+        return dispatch_to_optional_fn(mOnResetCondition);
+    };
+
+    Protocols::InteractionModel::Status PreResetCondition(){
+        return dispatch_to_optional_fn(mPreResetCondition);
+    };
+
+    Protocols::InteractionModel::Status PostResetCondition(){
+        return dispatch_to_optional_fn(mPostResetCondition);
+    };
+
+    std::optional<std::function<CHIP_ERROR()>> mInit;
+    std::optional<std::function<Protocols::InteractionModel::Status()>> mOnResetCondition;
+    std::optional<std::function<Protocols::InteractionModel::Status()>> mPreResetCondition;
+    std::optional<std::function<Protocols::InteractionModel::Status()>> mPostResetCondition;
+};
 
 struct TestResourceMonitoringCluster : public ::testing::Test
 {
     static void SetUpTestSuite() { ASSERT_EQ(chip::Platform::MemoryInit(), CHIP_NO_ERROR); }
     static void TearDownTestSuite() { chip::Platform::MemoryShutdown(); }
+
+    MockDelegate mDelegate;
 };
+
+constexpr EndpointId kEndpointWitResourceMonitoring = 1;
+
 
 TEST_F(TestResourceMonitoringCluster, AttributeTest)
 {
-    {
-        ASSERT_FALSE(true);
-    }
+    auto hepa_cluster = ResourceMonitoring::ResourceMonitoringClusterProxy<HepaFilterMonitoring::Id>(
+        EndpointId{kEndpointWitResourceMonitoring},
+        HepaFilterMonitoring::Id,
+        BitFlags<ResourceMonitoring::Feature>{ 0 },
+        ResourceMonitoring::Attributes::DegradationDirection::TypeInfo::Type::kUp,
+        true
+    );
 }
 
 } // namespace
