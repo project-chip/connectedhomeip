@@ -13,7 +13,7 @@ class TestAttributeList : public ::testing::Test
 TEST_F(TestAttributeList, TestEmpty)
 {
     AttributeList<int, 5> list;
-    EXPECT_EQ(list.size(), (size_t) 0);
+    EXPECT_EQ(list.size(), 0u);
     EXPECT_EQ(list.begin(), list.end());
 
     // This will abort/die
@@ -26,22 +26,22 @@ TEST_F(TestAttributeList, TestAddAndOverflow)
     AttributeList<int, 5> list;
 
     EXPECT_EQ(list.add(10), CHIP_NO_ERROR);
-    EXPECT_EQ(list.size(), (size_t) 1);
+    EXPECT_EQ(list.size(), 1u);
 
     EXPECT_EQ(list.add(20), CHIP_NO_ERROR);
-    EXPECT_EQ(list.size(), (size_t) 2);
+    EXPECT_EQ(list.size(), 2u);
 
     EXPECT_EQ(list.add(30), CHIP_NO_ERROR);
-    EXPECT_EQ(list.size(), (size_t) 3);
+    EXPECT_EQ(list.size(), 3u);
 
     EXPECT_EQ(list.add(40), CHIP_NO_ERROR);
-    EXPECT_EQ(list.size(), (size_t) 4);
+    EXPECT_EQ(list.size(), 4u);
 
     EXPECT_EQ(list.add(50), CHIP_NO_ERROR);
-    EXPECT_EQ(list.size(), (size_t) 5);
+    EXPECT_EQ(list.size(), 5u);
 
     EXPECT_EQ(list.add(60), CHIP_ERROR_NO_MEMORY);
-    EXPECT_EQ(list.size(), (size_t) 5);
+    EXPECT_EQ(list.size(), 5u);
 }
 
 // Test operator[]
@@ -53,7 +53,7 @@ TEST_F(TestAttributeList, TestIndexing)
     EXPECT_EQ(list.add(20), CHIP_NO_ERROR);
     EXPECT_EQ(list.add(30), CHIP_NO_ERROR);
 
-    ASSERT_EQ(list.size(), (size_t) 3);
+    ASSERT_EQ(list.size(), 3u);
 
     EXPECT_EQ(list[0], 10);
     EXPECT_EQ(list[1], 20);
@@ -76,7 +76,7 @@ TEST_F(TestAttributeList, TestIterator)
     EXPECT_EQ(list.add(20), CHIP_NO_ERROR);
     EXPECT_EQ(list.add(30), CHIP_NO_ERROR);
 
-    ASSERT_EQ(list.size(), (size_t) 3);
+    ASSERT_EQ(list.size(), 3u);
 
     auto it = list.begin();
     EXPECT_EQ(*it, 10);
