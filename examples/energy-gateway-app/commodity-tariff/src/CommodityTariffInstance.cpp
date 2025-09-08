@@ -126,7 +126,7 @@ CHIP_ERROR CommodityTariffDelegate::TariffDataUpd_CrossValidator(TariffUpdateCtx
     {
         if (!UpdCtx.DayEntryKeyIDs.count(item))
         {
-            ChipLogError(AppServer, "DayEntry ID %u referenced from TariffPeriods doesn't exist in main DayEntries list", item);
+            ChipLogError(AppServer, "DayEntry ID%" PRIu32 "referenced from TariffPeriods doesn't exist in main DayEntries list", item);
             return CHIP_ERROR_KEY_NOT_FOUND; // The item not found in original list
         }
     }
@@ -137,7 +137,7 @@ CHIP_ERROR CommodityTariffDelegate::TariffDataUpd_CrossValidator(TariffUpdateCtx
         if (UpdCtx.TariffComponentKeyIDsFeatureMap.find(item) == UpdCtx.TariffComponentKeyIDsFeatureMap.end())
         {
             ChipLogError(AppServer,
-                         "TariffComponent ID %u referenced from TariffPeriods doesn't exist in main TariffComponents list", item);
+                         "TariffComponent ID%" PRIu32 "referenced from TariffPeriods doesn't exist in main TariffComponents list", item);
             return CHIP_ERROR_KEY_NOT_FOUND; // The item not found in original list
         }
     }
@@ -149,7 +149,7 @@ CHIP_ERROR CommodityTariffDelegate::TariffDataUpd_CrossValidator(TariffUpdateCtx
         {
             if (!UpdCtx.DayEntryKeyIDs.count(item))
             {
-                ChipLogError(AppServer, "DayEntry ID %u referenced from DayPatterns doesn't exist in main DayEntries list", item);
+                ChipLogError(AppServer, "DayEntry ID%" PRIu32 "referenced from DayPatterns doesn't exist in main DayEntries list", item);
                 return CHIP_ERROR_KEY_NOT_FOUND; // The item not found in original list
             }
         }
@@ -162,14 +162,14 @@ CHIP_ERROR CommodityTariffDelegate::TariffDataUpd_CrossValidator(TariffUpdateCtx
         {
             if (!UpdCtx.DayEntryKeyIDs.count(item))
             {
-                ChipLogError(AppServer, "DayEntry ID %u referenced from IndividualDays doesn't exist in main DayEntries list",
+                ChipLogError(AppServer, "DayEntry ID%" PRIu32 "referenced from IndividualDays doesn't exist in main DayEntries list",
                              item);
                 return CHIP_ERROR_KEY_NOT_FOUND; // The item not found in original list
             }
 
             if (UpdCtx.DayPatternsDayEntryIDs.count(item))
             {
-                ChipLogError(AppServer, "DayEntry ID %u is duplicated - found in both IndividualDays and DayPatterns lists", item);
+                ChipLogError(AppServer, "DayEntry ID%" PRIu32 "is duplicated - found in both IndividualDays and DayPatterns lists", item);
                 return CHIP_ERROR_DUPLICATE_KEY_ID; // If same item from ID list has found in DP list
             }
         }
@@ -184,7 +184,7 @@ CHIP_ERROR CommodityTariffDelegate::TariffDataUpd_CrossValidator(TariffUpdateCtx
         {
             if (!UpdCtx.DayPatternKeyIDs.count(item))
             {
-                ChipLogError(AppServer, "DayPattern ID %u referenced from CalendarPeriods doesn't exist in main DayPatterns list",
+                ChipLogError(AppServer, "DayPattern ID%" PRIu32 "referenced from CalendarPeriods doesn't exist in main DayPatterns list",
                              item);
                 return CHIP_ERROR_KEY_NOT_FOUND; // The item not found in original list
             }
@@ -244,14 +244,14 @@ CHIP_ERROR CommodityTariffDelegate::TariffDataUpd_CrossValidator(TariffUpdateCtx
             // Check if DE exists in original context
             if (UpdCtx.DayEntryKeyIDs.count(deID) == 0)
             {
-                ChipLogError(AppServer, "DayEntry ID %u doesn't exist in validation context", deID);
+                ChipLogError(AppServer, "DayEntry ID%" PRIu32 "doesn't exist in validation context", deID);
                 return CHIP_ERROR_KEY_NOT_FOUND; // Item not found in original list
             }
 
             const auto dayEntryIt = dayEntriesMap.find(deID);
             if (dayEntryIt == dayEntriesMap.end())
             {
-                ChipLogError(AppServer, "Unable to find DayEntry with ID %u in the parsed data map", deID);
+                ChipLogError(AppServer, "Unable to find DayEntry with ID%" PRIu32 "in the parsed data map", deID);
                 return CHIP_ERROR_KEY_NOT_FOUND; // Day entry not found in map
             }
 
@@ -281,13 +281,13 @@ CHIP_ERROR CommodityTariffDelegate::TariffDataUpd_CrossValidator(TariffUpdateCtx
             const auto featureIt = UpdCtx.TariffComponentKeyIDsFeatureMap.find(tcID);
             if (featureIt == UpdCtx.TariffComponentKeyIDsFeatureMap.end())
             {
-                ChipLogError(AppServer, "TariffComponent ID %u not found in validation context feature map", tcID);
+                ChipLogError(AppServer, "TariffComponent ID%" PRIu32 "not found in validation context feature map", tcID);
                 return CHIP_ERROR_KEY_NOT_FOUND; // Item not found in original list
             }
             const auto tariffComponentIt = tariffComponentsMap.find(tcID);
             if (tariffComponentIt == tariffComponentsMap.end())
             {
-                ChipLogError(AppServer, "Unable to find TariffComponent with ID %u in the parsed data map", tcID);
+                ChipLogError(AppServer, "Unable to find TariffComponent with ID%" PRIu32 "in the parsed data map", tcID);
                 return CHIP_ERROR_KEY_NOT_FOUND; // Tariff component not found in map
             }
 

@@ -79,8 +79,8 @@ public:
      */
     void TariffDataUpdate(uint32_t aNowTimestamp)
     {
-        TariffUpdateCtx UpdCtx = { .TariffStartTimestamp  = GetStartDate_MgmtObj().GetNewValue(),
-                                   .blockMode             = static_cast<BlockModeEnum>(0),
+        TariffUpdateCtx UpdCtx = { .blockMode             = static_cast<BlockModeEnum>(0),
+                                   .TariffStartTimestamp  = GetStartDate_MgmtObj().GetNewValue(),
                                    .mFeature              = mFeature,
                                    .TariffUpdateTimestamp = aNowTimestamp };
         bool is_success        = false;
