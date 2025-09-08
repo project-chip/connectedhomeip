@@ -205,6 +205,23 @@ public:
     virtual Protocols::InteractionModel::Status ValidateAudioStream(uint16_t audioStreamId) = 0;
 
     /**
+     * @brief Validates that the zone corresponding to zoneId exists.
+     *
+     * @param zoneId Identifier for the requested zone
+     * @return Status::Success if zone exists;
+     *         Status::InvalidZone if no zone with zoneId exists
+     */
+    virtual Protocols::InteractionModel::Status ValidateZoneId(uint16_t zoneId) = 0;
+
+    /**
+     * @brief Validates size of motion zone List.
+     *
+     * @param zoneSize Size for the requested zone list
+     * @return true if URL is valid, false otherwise
+     */
+    virtual bool ValidateMotionZoneSize(uint16_t zoneSize) = 0;
+
+    /**
      * @brief Gets the status of the transport.
      *
      * @param connectionID The connectionID of the stream transport to check status
