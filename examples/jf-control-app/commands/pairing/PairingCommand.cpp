@@ -30,8 +30,8 @@
 #include <credentials/FabricTable.h>
 #include <crypto/CHIPCryptoPAL.h>
 #include <lib/core/CHIPSafeCasts.h>
-#include <lib/support/CodeUtils.h>
 #include <lib/dnssd/Advertiser.h>
+#include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <protocols/secure_channel/PASESession.h>
 
@@ -44,11 +44,11 @@ using namespace ::chip;
 using namespace ::chip::Controller;
 using namespace chip::Credentials;
 
-using JCMDeviceCommissioner = chip::Controller::JCM::DeviceCommissioner;
+using JCMDeviceCommissioner            = chip::Controller::JCM::DeviceCommissioner;
 using JCMTrustVerificationStateMachine = chip::Controller::JCM::TrustVerificationStateMachine;
-using JCMTrustVerificationStage = chip::Controller::JCM::TrustVerificationStage;
-using JCMTrustVerificationError = chip::Controller::JCM::TrustVerificationError;
-using JCMTrustVerificationInfo  = chip::Controller::JCM::TrustVerificationInfo;
+using JCMTrustVerificationStage        = chip::Controller::JCM::TrustVerificationStage;
+using JCMTrustVerificationError        = chip::Controller::JCM::TrustVerificationError;
+using JCMTrustVerificationInfo         = chip::Controller::JCM::TrustVerificationInfo;
 
 NodeId PairingCommand::GetAnchorNodeId()
 {
@@ -930,10 +930,8 @@ void PairingCommand::OnAskUserForConsent(JCMTrustVerificationStateMachine & stat
 }
 
 // TODO: Complete DCL lookup implementation
-CHIP_ERROR PairingCommand::OnLookupOperationalTrustAnchor(
-        VendorId vendorID,
-        CertificateKeyId & subjectKeyId,
-        ByteSpan & globallyTrustedRootSpan)
+CHIP_ERROR PairingCommand::OnLookupOperationalTrustAnchor(VendorId vendorID, CertificateKeyId & subjectKeyId,
+                                                          ByteSpan & globallyTrustedRootSpan)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 

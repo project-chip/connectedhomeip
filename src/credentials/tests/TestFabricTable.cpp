@@ -3313,17 +3313,14 @@ TEST_F(TestFabricTable, JFVidVerificationWorksWithoutVvsUsingTestCerts)
     EXPECT_EQ(fabricTable.FabricCount(), 0);
 
     FabricIndex kFabricIndex = kUndefinedFabricIndex;
-    fabricTable.AddNewFabricForTestIgnoringCollisions(
-        TestCerts::GetJFBRootCertAsset().mCert,
-        TestCerts::GetJFBIACertAsset().mCert,
-        TestCerts::GetJFBNodeCertAsset().mCert,
-        TestCerts::GetJFBNodeCertAsset().mKey,
-        &kFabricIndex);
+    fabricTable.AddNewFabricForTestIgnoringCollisions(TestCerts::GetJFBRootCertAsset().mCert, TestCerts::GetJFBIACertAsset().mCert,
+                                                      TestCerts::GetJFBNodeCertAsset().mCert, TestCerts::GetJFBNodeCertAsset().mKey,
+                                                      &kFabricIndex);
 
     EXPECT_EQ(fabricTable.FabricCount(), 1);
 
     const FabricInfo * fabricInfo = fabricTable.FindFabricWithIndex(kFabricIndex);
-    VendorId kVendorId = fabricInfo->GetVendorId();
+    VendorId kVendorId            = fabricInfo->GetVendorId();
 
     FabricTable::SignVIDVerificationResponseData responseData;
     {
@@ -3346,41 +3343,28 @@ TEST_F(TestFabricTable, JFVidVerificationWorksWithoutVvsUsingTestCerts)
 
         uint8_t kVendorFabricBindingMessageBuffer[Crypto::kVendorFabricBindingMessageV1Size];
         MutableByteSpan kVendorFabricBindingMessageSpan{ kVendorFabricBindingMessageBuffer };
-        ASSERT_EQ(Crypto::GenerateVendorFabricBindingMessage(
-            Crypto::FabricBindingVersion::kVersion1,
-            kTrustedCAPublicKeySpan,
-            kFabricIndex, kVendorId,
-            kVendorFabricBindingMessageSpan),
-            CHIP_NO_ERROR);
+        ASSERT_EQ(Crypto::GenerateVendorFabricBindingMessage(Crypto::FabricBindingVersion::kVersion1, kTrustedCAPublicKeySpan,
+                                                             kFabricIndex, kVendorId, kVendorFabricBindingMessageSpan),
+                  CHIP_NO_ERROR);
 
         ByteSpan kVidVerificationStatementSpan;
         uint8_t kExpectedUnderlyingTbsBuffer[Crypto::kVendorIdVerificationTbsV1MaxSize];
         MutableByteSpan kExpectedUnderlyingTbs{ kExpectedUnderlyingTbsBuffer };
-        ASSERT_EQ(Crypto::GenerateVendorIdVerificationToBeSigned(
-            kFabricIndex,
-            kClientChallengeSpan,
-            kAttestationChallengeSpan,
-            kVendorFabricBindingMessageSpan,
-            kVidVerificationStatementSpan,
-            kExpectedUnderlyingTbs),
-            CHIP_NO_ERROR);
+        ASSERT_EQ(Crypto::GenerateVendorIdVerificationToBeSigned(kFabricIndex, kClientChallengeSpan, kAttestationChallengeSpan,
+                                                                 kVendorFabricBindingMessageSpan, kVidVerificationStatementSpan,
+                                                                 kExpectedUnderlyingTbs),
+                  CHIP_NO_ERROR);
 
-        ASSERT_EQ( fabricTable.SignVIDVerificationRequest(
-            kFabricIndex,
-            kClientChallengeSpan,
-            kAttestationChallengeSpan,
-            responseData),
+        ASSERT_EQ(
+            fabricTable.SignVIDVerificationRequest(kFabricIndex, kClientChallengeSpan, kAttestationChallengeSpan, responseData),
             CHIP_NO_ERROR);
 
         EXPECT_EQ(responseData.fabricBindingVersion, to_underlying(Crypto::FabricBindingVersion::kVersion1));
         EXPECT_EQ(responseData.fabricIndex, kFabricIndex);
 
-        EXPECT_EQ(VerifySignatureWithNocPublicKey(
-            fabricTable,
-            kFabricIndex,
-            ByteSpan{ kExpectedUnderlyingTbs },
-            responseData.signature.Span()),
-            CHIP_NO_ERROR);
+        EXPECT_EQ(VerifySignatureWithNocPublicKey(fabricTable, kFabricIndex, ByteSpan{ kExpectedUnderlyingTbs },
+                                                  responseData.signature.Span()),
+                  CHIP_NO_ERROR);
     }
 }
 

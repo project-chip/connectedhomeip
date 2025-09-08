@@ -47,15 +47,9 @@ public:
     void TestTrustVerificationInfoCleanup();
 
 protected:
-    void SetUp() override
-    {
-        AppContext::SetUp();
-    }
+    void SetUp() override { AppContext::SetUp(); }
 
-    void TearDown() override
-    {
-        AppContext::TearDown();
-    }
+    void TearDown() override { AppContext::TearDown(); }
 };
 
 TEST_F_FROM_FIXTURE(TestTrustVerification, TestEnumToStringError)
@@ -77,10 +71,8 @@ TEST_F_FROM_FIXTURE(TestTrustVerification, TestEnumToStringError)
 TEST_F_FROM_FIXTURE(TestTrustVerification, TestEnumToStringStage)
 {
     EXPECT_EQ(EnumToString(kIdle), std::string("IDLE"));
-    EXPECT_EQ(EnumToString(kVerifyingAdministratorInformation),
-              std::string("VERIFYING_ADMINISTRATOR_INFORMATION"));
-    EXPECT_EQ(EnumToString(kPerformingVendorIDVerification),
-              std::string("PERFORMING_VENDOR_ID_VERIFICATION_PROCEDURE"));
+    EXPECT_EQ(EnumToString(kVerifyingAdministratorInformation), std::string("VERIFYING_ADMINISTRATOR_INFORMATION"));
+    EXPECT_EQ(EnumToString(kPerformingVendorIDVerification), std::string("PERFORMING_VENDOR_ID_VERIFICATION_PROCEDURE"));
     EXPECT_EQ(EnumToString(kAskingUserForConsent), std::string("ASKING_USER_FOR_CONSENT"));
     EXPECT_EQ(EnumToString(kComplete), std::string("COMPLETE"));
     EXPECT_EQ(EnumToString(kError), std::string("ERROR"));
@@ -91,7 +83,7 @@ TEST_F_FROM_FIXTURE(TestTrustVerification, TestTrustVerificationInfoCleanup)
     TrustVerificationInfo info;
 
     // Set non-defaults
-    info.adminEndpointId   = 5;
+    info.adminEndpointId  = 5;
     info.adminFabricIndex = 7;
     info.adminVendorId    = VendorId::TestVendor1;
     info.adminFabricId    = static_cast<FabricId>(0xdeadbeef);

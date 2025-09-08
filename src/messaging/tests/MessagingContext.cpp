@@ -199,7 +199,6 @@ CHIP_ERROR MessagingContext::CreateSessionBobToAlice()
                                                                 mpData->mAliceAddress, CryptoContext::SessionRole::kInitiator);
 }
 
-
 CHIP_ERROR MessagingContext::CreateCASESessionBobToAlice()
 {
     return mpData->mSessionManager.InjectCaseSessionWithTestKey(
@@ -237,9 +236,9 @@ CHIP_ERROR MessagingContext::CreateCASESessionAliceToBob(const CATValues & cats)
 
 CHIP_ERROR MessagingContext::CreateJFSessionAToB()
 {
-    return mpData->mSessionManager.InjectPaseSessionWithTestKey(mpData->mJFSessionAToB, kJFAKeyId,
-                                                                GetJFBFabric()->GetNodeId(), kJFBKeyId, mpData->mJFAFabricIndex,
-                                                                mpData->mJFBAddress, CryptoContext::SessionRole::kInitiator);
+    return mpData->mSessionManager.InjectPaseSessionWithTestKey(mpData->mJFSessionAToB, kJFAKeyId, GetJFBFabric()->GetNodeId(),
+                                                                kJFBKeyId, mpData->mJFAFabricIndex, mpData->mJFBAddress,
+                                                                CryptoContext::SessionRole::kInitiator);
 }
 
 CHIP_ERROR MessagingContext::CreateJFCASESessionAToB()
@@ -258,9 +257,9 @@ CHIP_ERROR MessagingContext::CreateJFCASESessionAToB(const CATValues & cats)
 
 CHIP_ERROR MessagingContext::CreateJFSessionBToA()
 {
-    return mpData->mSessionManager.InjectPaseSessionWithTestKey(mpData->mJFSessionBToA, kJFBKeyId,
-                                                                GetJFAFabric()->GetNodeId(), kJFAKeyId, mpData->mJFBFabricIndex,
-                                                                mpData->mJFAAddress, CryptoContext::SessionRole::kResponder);
+    return mpData->mSessionManager.InjectPaseSessionWithTestKey(mpData->mJFSessionBToA, kJFBKeyId, GetJFAFabric()->GetNodeId(),
+                                                                kJFAKeyId, mpData->mJFBFabricIndex, mpData->mJFAAddress,
+                                                                CryptoContext::SessionRole::kResponder);
 }
 
 CHIP_ERROR MessagingContext::CreateJFCASESessionBToA()

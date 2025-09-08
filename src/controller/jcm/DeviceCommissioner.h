@@ -60,8 +60,7 @@ public:
      *
      * @return CHIP_ERROR indicating success or failure of the operation.
      */
-    CHIP_ERROR StartJCMTrustVerification(
-        DeviceProxy *proxy) override;
+    CHIP_ERROR StartJCMTrustVerification(DeviceProxy * proxy) override;
 
     /*
      * ContinueAfterUserConsent is a method that continues the JCM trust verification process after the user has
@@ -78,30 +77,22 @@ public:
      *
      * @param globallyTrustedRootSpan A ByteSpan representing the globally trusted root public key.
      */
-    void ContinueAfterLookupOperationalTrustAnchor(
-        const CHIP_ERROR err,
-        const ByteSpan globallyTrustedRootSpan);
+    void ContinueAfterLookupOperationalTrustAnchor(const CHIP_ERROR err, const ByteSpan globallyTrustedRootSpan);
 
     /*
      * GetTrustVerificationInfo is a method that returns the JCM trust verification information.
      */
     TrustVerificationInfo & GetTrustVerificationInfo() { return mInfo; }
 
-    bool HasValidCommissioningMode(
-        const Dnssd::CommissionNodeData & nodeData) override;
+    bool HasValidCommissioningMode(const Dnssd::CommissionNodeData & nodeData) override;
 
 protected:
     // Override ParseExtraCommissioningInfo to parse JCM administrator info
     CHIP_ERROR ParseExtraCommissioningInfo(ReadCommissioningInfo & info, const CommissioningParameters & params) override;
     // Override CleanupCommissioning to clean up JCM trust verification state
-    void CleanupCommissioning(
-        DeviceProxy * proxy,
-        NodeId nodeId,
-        const CompletionStatus & completionStatus) override;
-    CHIP_ERROR OnLookupOperationalTrustAnchor(
-        VendorId vendorID,
-        CertificateKeyId & subjectKeyId,
-        ByteSpan & globallyTrustedRootSpan) override;
+    void CleanupCommissioning(DeviceProxy * proxy, NodeId nodeId, const CompletionStatus & completionStatus) override;
+    CHIP_ERROR OnLookupOperationalTrustAnchor(VendorId vendorID, CertificateKeyId & subjectKeyId,
+                                              ByteSpan & globallyTrustedRootSpan) override;
     void OnVendorIdVerficationComplete(const CHIP_ERROR & err) override;
 
 private:
@@ -112,9 +103,7 @@ private:
 
     // JCM commissioning trust verification steps
     TrustVerificationError VerifyAdministratorInformation();
-    CHIP_ERROR OnSignVIDVerificationSuccessCb(
-        const ByteSpan & signatureSpan,
-        const ByteSpan & clientChallengeSpan);
+    CHIP_ERROR OnSignVIDVerificationSuccessCb(const ByteSpan & signatureSpan, const ByteSpan & clientChallengeSpan);
     TrustVerificationError PerformVendorIDVerificationProcedure();
     TrustVerificationError AskUserForConsent();
 
@@ -124,8 +113,7 @@ private:
      *
      * @param err The error code indicating the result of the vendor ID verification. CHIP_NO_ERROR if successful.
      */
-    void ContinueAfterVendorIDVerification(
-        const CHIP_ERROR & err);
+    void ContinueAfterVendorIDVerification(const CHIP_ERROR & err);
 
     TrustVerificationStage GetNextTrustVerificationStage(const TrustVerificationStage & currentStage) override;
     void PerformTrustVerificationStage(const TrustVerificationStage & nextStage) override;
@@ -136,11 +124,10 @@ private:
      *
      * @param result The result of the JCM trust verification process.
      */
-    virtual void OnTrustVerificationComplete(
-        TrustVerificationError error);
+    virtual void OnTrustVerificationComplete(TrustVerificationError error);
 
     // Device proxy for the device being commissioned
-    DeviceProxy *mDeviceProxy;
+    DeviceProxy * mDeviceProxy;
 
     friend class TestCommissioner;
 };

@@ -17,16 +17,16 @@
 
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
-#include <app/data-model-provider/Context.h>
 #include <app/InteractionModelEngine.h>
+#include <app/data-model-provider/Context.h>
 #include <app/tests/AppTestContext.h>
 #include <app/tests/test-interaction-model-api.h>
 #include <controller/CommissioningDelegate.h>
 #include <controller/jcm/AutoCommissioner.h>
 #include <controller/jcm/DeviceCommissioner.h>
 #include <controller/tests/data_model/DataModelFixtures.h>
-#include <credentials/tests/CHIPCert_unit_test_vectors.h>
 #include <credentials/CHIPCert.h>
+#include <credentials/tests/CHIPCert_unit_test_vectors.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/core/CHIPError.h>
 #include <lib/support/TestPersistentStorageDelegate.h>
@@ -63,8 +63,8 @@ public:
                           TrustVerificationError error) override
     {
         mProgressUpdates++;
-        mLastStage = stage;
-        mLastError = error;
+        mLastStage              = stage;
+        mLastError              = error;
         mRemoteAdminTrustedRoot = info.adminRCAC.Span();
     }
 
@@ -75,48 +75,38 @@ public:
         stateMachine.ContinueAfterUserConsent(mShouldConsent);
     }
 
-    CHIP_ERROR OnLookupOperationalTrustAnchor(
-        VendorId vendorID,
-        CertificateKeyId & subjectKeyId,
-        ByteSpan & globallyTrustedRootSpan)
+    CHIP_ERROR OnLookupOperationalTrustAnchor(VendorId vendorID, CertificateKeyId & subjectKeyId,
+                                              ByteSpan & globallyTrustedRootSpan)
     {
         mLookedUpOperationalTrustAnchor = true;
-        globallyTrustedRootSpan = mRemoteAdminTrustedRoot;
+        globallyTrustedRootSpan         = mRemoteAdminTrustedRoot;
 
         return CHIP_NO_ERROR;
     }
 
-    int mProgressUpdates               = 0;
-    TrustVerificationStage mLastStage  = TrustVerificationStage::kIdle;
-    TrustVerificationError mLastError  = TrustVerificationError::kSuccess;
-    bool mAskedForConsent              = false;
+    int mProgressUpdates                 = 0;
+    TrustVerificationStage mLastStage    = TrustVerificationStage::kIdle;
+    TrustVerificationError mLastError    = TrustVerificationError::kSuccess;
+    bool mAskedForConsent                = false;
     bool mLookedUpOperationalTrustAnchor = false;
-    bool mShouldConsent                = true;
-    CHIP_ERROR mVerifyVendorIdError    = CHIP_NO_ERROR;
-    VendorId mLastVendorId             = VendorId::Common;
+    bool mShouldConsent                  = true;
+    CHIP_ERROR mVerifyVendorIdError      = CHIP_NO_ERROR;
+    VendorId mLastVendorId               = VendorId::Common;
     ByteSpan mRemoteAdminTrustedRoot;
 };
 
 class MockClusterStateCache : public ClusterStateCache
 {
 public:
-    MockClusterStateCache(
-    ) : ClusterStateCache(mClusterStateCacheCallback) {}
+    MockClusterStateCache() : ClusterStateCache(mClusterStateCacheCallback) {}
 
     class MockClusterStateCacheCallback : public ClusterStateCache::Callback
     {
         void OnDone(ReadClient *) override {}
-        void OnAttributeData(
-            const ConcreteDataAttributePath & aPath,
-            TLV::TLVReader * apData,
-            const StatusIB & aStatus) override {}
+        void OnAttributeData(const ConcreteDataAttributePath & aPath, TLV::TLVReader * apData, const StatusIB & aStatus) override {}
     };
 
-    CHIP_ERROR SetUp(
-        const FabricTable & fabricTable,
-        const FabricIndex fabricIndex,
-        const NodeId nodeId
-    )
+    CHIP_ERROR SetUp(const FabricTable & fabricTable, const FabricIndex fabricIndex, const NodeId nodeId)
     {
         const FabricInfo * fabricInfo = fabricTable.FindFabricWithIndex(fabricIndex);
 
@@ -182,9 +172,7 @@ public:
     void TearDown() { ClearEventCache(); }
 
     template <typename AttrType>
-    CHIP_ERROR SetAttribute(
-        const ConcreteAttributePath & path,
-        const AttrType data)
+    CHIP_ERROR SetAttribute(const ConcreteAttributePath & path, const AttrType data)
     {
         Platform::ScopedMemoryBufferWithSize<uint8_t> handle;
         handle.Calloc(3000);
@@ -204,9 +192,7 @@ public:
     }
 
     template <typename AttrType>
-    CHIP_ERROR SetAttributeForWrite(
-        const ConcreteAttributePath & path,
-        const AttrType data)
+    CHIP_ERROR SetAttributeForWrite(const ConcreteAttributePath & path, const AttrType data)
     {
         Platform::ScopedMemoryBufferWithSize<uint8_t> handle;
         handle.Calloc(3000);
@@ -232,12 +218,11 @@ private:
 class MockDeviceProxy : public DeviceProxy, public SessionDelegate
 {
 public:
-    MockDeviceProxy(
-        Messaging::ExchangeManager * exchangeManager,
-        const SessionHandle & session, NodeId nodeId) :
-        mExchangeManager(exchangeManager), mSecureSession(*this), mRemoteNodeId(nodeId) {
-            mSecureSession.Grab(session);
-        }
+    MockDeviceProxy(Messaging::ExchangeManager * exchangeManager, const SessionHandle & session, NodeId nodeId) :
+        mExchangeManager(exchangeManager), mSecureSession(*this), mRemoteNodeId(nodeId)
+    {
+        mSecureSession.Grab(session);
+    }
     void Disconnect() override {}
     NodeId GetDeviceId() const override { return mRemoteNodeId; }
     Messaging::ExchangeManager * GetExchangeManager() const override { return mExchangeManager; }
@@ -268,8 +253,7 @@ public:
 class TestVendorIDVerificationDataModel : public CodegenDataModelProvider
 {
 public:
-    TestVendorIDVerificationDataModel(MessagingContext * messagingContext) :
-        mMessagingContext(messagingContext) {}
+    TestVendorIDVerificationDataModel(MessagingContext * messagingContext) : mMessagingContext(messagingContext) {}
 
     static TestVendorIDVerificationDataModel & Instance(MessagingContext * messagingContext)
     {
@@ -278,11 +262,11 @@ public:
     }
 
     std::optional<DataModel::ActionReturnStatus> InvokeCommand(const DataModel::InvokeRequest & aRequest,
-                                                               chip::TLV::TLVReader & aReader,
-                                                               CommandHandler * aHandler) override
+                                                               chip::TLV::TLVReader & aReader, CommandHandler * aHandler) override
     {
         if (aRequest.path.mClusterId != Clusters::OperationalCredentials::Id ||
-            aRequest.path.mCommandId != Clusters::OperationalCredentials::Commands::SignVIDVerificationRequest::Type::GetCommandId())
+            aRequest.path.mCommandId !=
+                Clusters::OperationalCredentials::Commands::SignVIDVerificationRequest::Type::GetCommandId())
         {
             aHandler->AddStatus(aRequest.path, Protocols::InteractionModel::Status::UnsupportedCommand, "Invalid cluster/command");
             return std::nullopt; // handler status is set by the dispatch
@@ -297,17 +281,19 @@ public:
         }
 
         ChipLogDetail(Controller, "Received Cluster Command: Endpoint=%x Cluster=" ChipLogFormatMEI " Command=" ChipLogFormatMEI,
-            aRequest.path.mEndpointId, ChipLogValueMEI(aRequest.path.mClusterId), ChipLogValueMEI(aRequest.path.mCommandId));
+                      aRequest.path.mEndpointId, ChipLogValueMEI(aRequest.path.mClusterId),
+                      ChipLogValueMEI(aRequest.path.mCommandId));
 
         // Get the fabric table.
         FabricTable & fabricTable = mMessagingContext->GetFabricTable();
 
         // Sign the VID verification request.
-        SessionHandle sessionHandle = mMessagingContext->GetJFSessionAToB();
+        SessionHandle sessionHandle       = mMessagingContext->GetJFSessionAToB();
         ByteSpan attestationChallengeSpan = sessionHandle->AsSecureSession()->GetCryptoContext().GetAttestationChallenge();
         FabricTable::SignVIDVerificationResponseData responseData;
 
-        CHIP_ERROR err = fabricTable.SignVIDVerificationRequest(dataRequest.fabricIndex, dataRequest.clientChallenge, attestationChallengeSpan, responseData);
+        CHIP_ERROR err = fabricTable.SignVIDVerificationRequest(dataRequest.fabricIndex, dataRequest.clientChallenge,
+                                                                attestationChallengeSpan, responseData);
         if (err != CHIP_NO_ERROR)
         {
             aHandler->AddStatus(aRequest.path, Protocols::InteractionModel::Status::Failure);
@@ -385,14 +371,15 @@ protected:
     void SetUp() override
     {
         AppContext::SetUp();
-        mOldProvider = InteractionModelEngine::GetInstance()->SetDataModelProvider(&TestVendorIDVerificationDataModel::Instance(this));
+        mOldProvider =
+            InteractionModelEngine::GetInstance()->SetDataModelProvider(&TestVendorIDVerificationDataModel::Instance(this));
         SetMockNodeConfig(TestMockNodeConfig());
 
         mDeviceCommissioner = new TestableDeviceCommissioner();
         mDeviceCommissioner->RegisterTrustVerificationDelegate(&mTrustVerificationDelegate);
-        SessionHandle session = GetJFSessionAToB();
-        NodeId jfbNodeId = GetJFBFabric()->GetNodeId();
-        mDeviceProxy = new MockDeviceProxy(&GetExchangeManager(), session, jfbNodeId);
+        SessionHandle session             = GetJFSessionAToB();
+        NodeId jfbNodeId                  = GetJFBFabric()->GetNodeId();
+        mDeviceProxy                      = new MockDeviceProxy(&GetExchangeManager(), session, jfbNodeId);
         mDeviceCommissioner->mDeviceProxy = mDeviceProxy;
 
 #if CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC

@@ -197,37 +197,27 @@ public:
 /**
  * A client that handles Vendor ID verification for a specific device.
  */
-class DLL_EXPORT VendorIdVerificationClient {
+class DLL_EXPORT VendorIdVerificationClient
+{
 public:
     virtual ~VendorIdVerificationClient() = default;
 
-    // Used to obtain SessionHandles from VerifyVendorId callers. SessionHandles cannot be stored, so we must retrieve them dynamically with a callback.
+    // Used to obtain SessionHandles from VerifyVendorId callers. SessionHandles cannot be stored, so we must retrieve them
+    // dynamically with a callback.
     using SessionGetterFunc = std::function<Optional<SessionHandle>()>;
 
-    CHIP_ERROR VerifyVendorId(
-        ExchangeManager * exchangeMgr,
-        const SessionGetterFunc getSession,
-        TrustVerificationInfo * info);
+    CHIP_ERROR VerifyVendorId(ExchangeManager * exchangeMgr, const SessionGetterFunc getSession, TrustVerificationInfo * info);
 
 protected:
-    virtual CHIP_ERROR OnLookupOperationalTrustAnchor(
-        VendorId vendorID,
-        CertificateKeyId & subjectKeyId,
-        ByteSpan & globallyTrustedRootSpan) = 0;
-    virtual void OnVendorIdVerficationComplete(const CHIP_ERROR & err) = 0;
+    virtual CHIP_ERROR OnLookupOperationalTrustAnchor(VendorId vendorID, CertificateKeyId & subjectKeyId,
+                                                      ByteSpan & globallyTrustedRootSpan) = 0;
+    virtual void OnVendorIdVerficationComplete(const CHIP_ERROR & err)                    = 0;
 
 private:
-    CHIP_ERROR VerifyNOCCertificateChain(
-        const ByteSpan & nocSpan,
-        const ByteSpan & icacSpan,
-        const ByteSpan & rcacSpan);
+    CHIP_ERROR VerifyNOCCertificateChain(const ByteSpan & nocSpan, const ByteSpan & icacSpan, const ByteSpan & rcacSpan);
 
-    CHIP_ERROR Verify(
-        ExchangeManager * exchangeMgr,
-        const SessionGetterFunc getSession,
-        TrustVerificationInfo * info,
-        const ByteSpan clientChallengeSpan,
-        const SignVIDVerificationResponse::DecodableType responseData);
+    CHIP_ERROR Verify(ExchangeManager * exchangeMgr, const SessionGetterFunc getSession, TrustVerificationInfo * info,
+                      const ByteSpan clientChallengeSpan, const SignVIDVerificationResponse::DecodableType responseData);
 };
 
 class DLL_EXPORT TrustVerificationStateMachine

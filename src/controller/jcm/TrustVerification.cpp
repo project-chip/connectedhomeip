@@ -31,10 +31,8 @@ namespace chip {
 namespace Controller {
 namespace JCM {
 
-CHIP_ERROR VendorIdVerificationClient::VerifyNOCCertificateChain(
-    const ByteSpan & nocSpan,
-    const ByteSpan  & icacSpan,
-    const ByteSpan & rcacSpan)
+CHIP_ERROR VendorIdVerificationClient::VerifyNOCCertificateChain(const ByteSpan & nocSpan, const ByteSpan & icacSpan,
+                                                                 const ByteSpan & rcacSpan)
 {
     ValidationContext validContext;
 
@@ -56,13 +54,9 @@ CHIP_ERROR VendorIdVerificationClient::VerifyNOCCertificateChain(
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR VendorIdVerificationClient::Verify(
-    ExchangeManager * exchangeMgr,
-    const SessionGetterFunc getSession,
-    TrustVerificationInfo * info,
-    const ByteSpan clientChallengeSpan,
-    const SignVIDVerificationResponse::DecodableType responseData
-)
+CHIP_ERROR VendorIdVerificationClient::Verify(ExchangeManager * exchangeMgr, const SessionGetterFunc getSession,
+                                              TrustVerificationInfo * info, const ByteSpan clientChallengeSpan,
+                                              const SignVIDVerificationResponse::DecodableType responseData)
 {
     // Steps 1-9 have already been completed prior to the response callback
     const FabricIndex fabricIndex = info->adminFabricIndex;
@@ -81,12 +75,8 @@ CHIP_ERROR VendorIdVerificationClient::Verify(
     // Locally generate the vendor_fabric_binding_message
     uint8_t vendorFabricBindingMessageBuffer[kVendorFabricBindingMessageV1Size];
     MutableByteSpan vendorFabricBindingMessageSpan{ vendorFabricBindingMessageBuffer };
-    ReturnLogErrorOnFailure(Crypto::GenerateVendorFabricBindingMessage(
-        FabricBindingVersion::kVersion1,
-        rcacPublicKey,
-        fabricId,
-        vendorID,
-        vendorFabricBindingMessageSpan));
+    ReturnLogErrorOnFailure(Crypto::GenerateVendorFabricBindingMessage(FabricBindingVersion::kVersion1, rcacPublicKey, fabricId,
+                                                                       vendorID, vendorFabricBindingMessageSpan));
 
     // Locally generate the vendor_id_verification_tbs message
     ByteSpan vidVerificationStatementSpan;
@@ -96,8 +86,8 @@ CHIP_ERROR VendorIdVerificationClient::Verify(
     // Retrieve attestation challenge
     ByteSpan attestationChallengeSpan = getSession().Value()->AsSecureSession()->GetCryptoContext().GetAttestationChallenge();
     ReturnLogErrorOnFailure(GenerateVendorIdVerificationToBeSigned(fabricIndex, clientChallengeSpan, attestationChallengeSpan,
-                                                            vendorFabricBindingMessageSpan, vidVerificationStatementSpan,
-                                                            vidVerificationTbsSpan));
+                                                                   vendorFabricBindingMessageSpan, vidVerificationStatementSpan,
+                                                                   vidVerificationTbsSpan));
 
     P256PublicKeySpan nocPublicKeySpan;
     ReturnLogErrorOnFailure(ExtractPublicKeyFromChipCert(nocSpan, nocPublicKeySpan));
@@ -111,7 +101,8 @@ CHIP_ERROR VendorIdVerificationClient::Verify(
     memcpy(signature.Bytes(), responseData.signature.data(), signature.Capacity());
     signature.SetLength(signature.Capacity());
 
-    ReturnLogErrorOnFailure(nocPublicKey.ECDSA_validate_msg_signature(vidVerificationTbsSpan.data(), vidVerificationTbsSpan.size(), signature));
+    ReturnLogErrorOnFailure(
+        nocPublicKey.ECDSA_validate_msg_signature(vidVerificationTbsSpan.data(), vidVerificationTbsSpan.size(), signature));
 
     // 11. Verify that the NOC chain is valid using Crypto_VerifyChain() against the entire chain reconstructed from both the
     // NOCs and TrustedRootCertificates attribute entries whose FabricIndex field matches the fabric being verified.
@@ -137,14 +128,13 @@ CHIP_ERROR VendorIdVerificationClient::Verify(
     // associated with the candidate fabric. If the chain is not valid, the procedure terminates as failed.
     ReturnLogErrorOnFailure(VerifyNOCCertificateChain(nocSpan, icacSpan, globallyTrustedRootSpan));
 
-    // 13. Given that all prior steps succeeded, the candidate fabric’s VendorID SHALL be deemed authentic and err should be CHIP_NO_ERROR.
+    // 13. Given that all prior steps succeeded, the candidate fabric’s VendorID SHALL be deemed authentic and err should be
+    // CHIP_NO_ERROR.
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR VendorIdVerificationClient::VerifyVendorId(
-    ExchangeManager * exchangeMgr,
-    const SessionGetterFunc getSession,
-    TrustVerificationInfo * info)
+CHIP_ERROR VendorIdVerificationClient::VerifyVendorId(ExchangeManager * exchangeMgr, const SessionGetterFunc getSession,
+                                                      TrustVerificationInfo * info)
 {
     ChipLogProgress(Controller, "Performing vendor ID verification for vendor ID: %u", info->adminVendorId);
 
@@ -156,11 +146,12 @@ CHIP_ERROR VendorIdVerificationClient::VerifyVendorId(
 
     // The selected fabric information that matches the Fabrics attribute whose VendorID field to be verified
     // is in the JCMTrustVerificationInfo info
-    request.fabricIndex = info->adminFabricIndex;
+    request.fabricIndex     = info->adminFabricIndex;
     request.clientChallenge = clientChallengeSpan;
 
-    auto onSuccessCb = [&, exchangeMgr, getSession, info, kClientChallenge](const app::ConcreteCommandPath & aPath, const app::StatusIB & aStatus,
-                                     const decltype(request)::ResponseType & responseData) {
+    auto onSuccessCb = [&, exchangeMgr, getSession, info, kClientChallenge](const app::ConcreteCommandPath & aPath,
+                                                                            const app::StatusIB & aStatus,
+                                                                            const decltype(request)::ResponseType & responseData) {
         ChipLogProgress(Controller, "Successfully received SignVIDVerificationResponse");
         ByteSpan clientChallenge{ kClientChallenge };
         CHIP_ERROR err = Verify(exchangeMgr, getSession, info, clientChallenge, responseData);
@@ -173,9 +164,7 @@ CHIP_ERROR VendorIdVerificationClient::VerifyVendorId(
         OnVendorIdVerficationComplete(err);
     };
 
-    CHIP_ERROR err = InvokeCommandRequest(exchangeMgr, getSession().Value(),
-                                            kRootEndpointId, request,
-                                            onSuccessCb, onFailureCb);
+    CHIP_ERROR err = InvokeCommandRequest(exchangeMgr, getSession().Value(), kRootEndpointId, request, onSuccessCb, onFailureCb);
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(Controller, "Failed to send SignVIDVerificationRequest: %s", ErrorStr(err));

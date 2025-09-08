@@ -222,8 +222,8 @@ private:
 
         FabricIndex mAliceFabricIndex = kUndefinedFabricIndex;
         FabricIndex mBobFabricIndex   = kUndefinedFabricIndex;
-        FabricIndex mJFAFabricIndex = kUndefinedFabricIndex;
-        FabricIndex mJFBFabricIndex = kUndefinedFabricIndex;
+        FabricIndex mJFAFabricIndex   = kUndefinedFabricIndex;
+        FabricIndex mJFBFabricIndex   = kUndefinedFabricIndex;
         GroupId mFriendsGroupId       = 0x0101;
         Transport::PeerAddress mAliceAddress;
         Transport::PeerAddress mBobAddress;

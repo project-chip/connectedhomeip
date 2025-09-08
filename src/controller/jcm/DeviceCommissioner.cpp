@@ -41,8 +41,7 @@ namespace JCM {
 /*
  * DeviceCommissioner public interface and override implementation
  */
-CHIP_ERROR DeviceCommissioner::StartJCMTrustVerification(
-    DeviceProxy *proxy)
+CHIP_ERROR DeviceCommissioner::StartJCMTrustVerification(DeviceProxy * proxy)
 {
     TrustVerificationError error = TrustVerificationError::kSuccess;
 
@@ -60,8 +59,7 @@ CHIP_ERROR DeviceCommissioner::StartJCMTrustVerification(
     return CHIP_NO_ERROR;
 }
 
-void DeviceCommissioner::ContinueAfterUserConsent(
-    const bool & consent)
+void DeviceCommissioner::ContinueAfterUserConsent(const bool & consent)
 {
     TrustVerificationError error = TrustVerificationError::kSuccess;
 
@@ -73,9 +71,7 @@ void DeviceCommissioner::ContinueAfterUserConsent(
     TrustVerificationStageFinished(TrustVerificationStage::kAskingUserForConsent, error);
 }
 
-
-void DeviceCommissioner::ContinueAfterVendorIDVerification(
-    const CHIP_ERROR & err)
+void DeviceCommissioner::ContinueAfterVendorIDVerification(const CHIP_ERROR & err)
 {
     TrustVerificationError error = TrustVerificationError::kSuccess;
 
@@ -87,8 +83,7 @@ void DeviceCommissioner::ContinueAfterVendorIDVerification(
     TrustVerificationStageFinished(TrustVerificationStage::kPerformingVendorIDVerification, error);
 }
 
-CHIP_ERROR DeviceCommissioner::ParseAdminFabricIndexAndEndpointId(
-    const ReadCommissioningInfo & info)
+CHIP_ERROR DeviceCommissioner::ParseAdminFabricIndexAndEndpointId(const ReadCommissioningInfo & info)
 {
     auto attributeCache = info.attributes;
 
@@ -139,8 +134,7 @@ CHIP_ERROR DeviceCommissioner::ParseAdminFabricIndexAndEndpointId(
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR DeviceCommissioner::ParseOperationalCredentials(
-    const ReadCommissioningInfo & info)
+CHIP_ERROR DeviceCommissioner::ParseOperationalCredentials(const ReadCommissioningInfo & info)
 {
     auto attributeCache = info.attributes;
 
@@ -260,8 +254,7 @@ CHIP_ERROR DeviceCommissioner::ParseOperationalCredentials(
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR DeviceCommissioner::ParseTrustedRoot(
-    const ReadCommissioningInfo & info)
+CHIP_ERROR DeviceCommissioner::ParseTrustedRoot(const ReadCommissioningInfo & info)
 {
     auto attributeCache = info.attributes;
 
@@ -333,9 +326,7 @@ CHIP_ERROR DeviceCommissioner::ParseTrustedRoot(
     return err;
 }
 
-CHIP_ERROR DeviceCommissioner::ParseExtraCommissioningInfo(
-    ReadCommissioningInfo & info,
-    const CommissioningParameters & params)
+CHIP_ERROR DeviceCommissioner::ParseExtraCommissioningInfo(ReadCommissioningInfo & info, const CommissioningParameters & params)
 {
     using namespace OperationalCredentials::Attributes;
 
@@ -405,16 +396,13 @@ TrustVerificationError DeviceCommissioner::VerifyAdministratorInformation()
     return TrustVerificationError::kSuccess;
 }
 
-void DeviceCommissioner::OnVendorIdVerficationComplete(
-    const CHIP_ERROR & err)
+void DeviceCommissioner::OnVendorIdVerficationComplete(const CHIP_ERROR & err)
 {
     ContinueAfterVendorIDVerification(err);
 }
 
-CHIP_ERROR DeviceCommissioner::OnLookupOperationalTrustAnchor(
-    VendorId vendorID,
-    CertificateKeyId & subjectKeyId,
-    ByteSpan & globallyTrustedRootSpan)
+CHIP_ERROR DeviceCommissioner::OnLookupOperationalTrustAnchor(VendorId vendorID, CertificateKeyId & subjectKeyId,
+                                                              ByteSpan & globallyTrustedRootSpan)
 {
     if (mTrustVerificationDelegate != nullptr)
     {
@@ -428,11 +416,7 @@ TrustVerificationError DeviceCommissioner::PerformVendorIDVerificationProcedure(
 {
     auto getSession = [this]() { return this->mDeviceProxy->GetSecureSession(); };
 
-    CHIP_ERROR err = VerifyVendorId(
-        mDeviceProxy->GetExchangeManager(),
-        getSession,
-        &mInfo
-    );
+    CHIP_ERROR err = VerifyVendorId(mDeviceProxy->GetExchangeManager(), getSession, &mInfo);
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(Controller, "Failed to send Verify VendorId: %s", ErrorStr(err));
@@ -456,8 +440,7 @@ TrustVerificationError DeviceCommissioner::AskUserForConsent()
     return TrustVerificationError::kAsync; // Indicate that this is an async operation
 }
 
-void DeviceCommissioner::PerformTrustVerificationStage(
-    const TrustVerificationStage & nextStage)
+void DeviceCommissioner::PerformTrustVerificationStage(const TrustVerificationStage & nextStage)
 {
     TrustVerificationError error = TrustVerificationError::kSuccess;
 
@@ -490,8 +473,7 @@ void DeviceCommissioner::PerformTrustVerificationStage(
     }
 }
 
-TrustVerificationStage DeviceCommissioner::GetNextTrustVerificationStage(
-    const TrustVerificationStage & currentStage)
+TrustVerificationStage DeviceCommissioner::GetNextTrustVerificationStage(const TrustVerificationStage & currentStage)
 {
     TrustVerificationStage nextStage = TrustVerificationStage::kIdle;
 
@@ -518,8 +500,7 @@ TrustVerificationStage DeviceCommissioner::GetNextTrustVerificationStage(
     return nextStage;
 }
 
-void DeviceCommissioner::OnTrustVerificationComplete(
-    TrustVerificationError error)
+void DeviceCommissioner::OnTrustVerificationComplete(TrustVerificationError error)
 {
     if (error == TrustVerificationError::kSuccess)
     {
@@ -538,18 +519,14 @@ void DeviceCommissioner::OnTrustVerificationComplete(
     }
 }
 
-void DeviceCommissioner::CleanupCommissioning(
-    DeviceProxy * proxy,
-    NodeId nodeId,
-    const CompletionStatus & completionStatus)
+void DeviceCommissioner::CleanupCommissioning(DeviceProxy * proxy, NodeId nodeId, const CompletionStatus & completionStatus)
 {
     chip::Controller::DeviceCommissioner::CleanupCommissioning(proxy, nodeId, completionStatus);
 
     mInfo.Cleanup();
 }
 
-bool DeviceCommissioner::HasValidCommissioningMode(
-    const Dnssd::CommissionNodeData & nodeData)
+bool DeviceCommissioner::HasValidCommissioningMode(const Dnssd::CommissionNodeData & nodeData)
 {
     if (GetCommissioningParameters().HasValue() && GetCommissioningParameters().Value().GetUseJCM().ValueOr(false))
     {
