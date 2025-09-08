@@ -52,14 +52,7 @@ PushAvStreamTransportServerLogic::PushAvStreamTransportServerLogic(EndpointId aE
                                                                      PushAvStreamTransport::IngestMethodsEnum::kCMAFIngest } }
 {}
 
-PushAvStreamTransportServerLogic::~PushAvStreamTransportServerLogic()
-{
-    for (const auto & timerContext : mTimerContexts)
-    {
-        DeviceLayer::SystemLayer().CancelTimer(PushAVStreamTransportDeallocateCallback, static_cast<void *>(timerContext.get()));
-    }
-    Shutdown();
-}
+PushAvStreamTransportServerLogic::~PushAvStreamTransportServerLogic() {}
 
 CHIP_ERROR PushAvStreamTransportServerLogic::Init()
 {
@@ -67,7 +60,13 @@ CHIP_ERROR PushAvStreamTransportServerLogic::Init()
     return CHIP_NO_ERROR;
 }
 
-void PushAvStreamTransportServerLogic::Shutdown() {}
+void PushAvStreamTransportServerLogic::Shutdown()
+{
+    for (const auto & timerContext : mTimerContexts)
+    {
+        DeviceLayer::SystemLayer().CancelTimer(PushAVStreamTransportDeallocateCallback, static_cast<void *>(timerContext.get()));
+    }
+}
 
 bool PushAvStreamTransportServerLogic::HasFeature(Feature feature) const
 {
@@ -542,6 +541,40 @@ PushAvStreamTransportServerLogic::HandleAllocatePushTransport(CommandHandler & h
     Commands::AllocatePushTransportResponse::Type response;
     auto & transportOptions = commandData.transportOptions;
 
+    IngestMethodsEnum ingestMethod = commandData.transportOptions.ingestMethod;
+
+    bool isFormatSupported = false;
+
+    for (auto & supportsFormat : mSupportedFormats)
+    {
+        if ((supportsFormat.ingestMethod == ingestMethod) &&
+            (supportsFormat.containerFormat == commandData.transportOptions.containerOptions.containerType))
+        {
+            isFormatSupported = true;
+        }
+    }
+
+    if (isFormatSupported == false)
+    {
+        auto status = to_underlying(StatusCodeEnum::kInvalidCombination);
+        ChipLogError(Zcl,
+                     "HandleAllocatePushTransport[ep=%d]: Invalid Ingest Method and Container Format Combination : (Ingest Method: "
+                     "%02X and Container Format: %02X)",
+                     mEndpointId, to_underlying(ingestMethod),
+                     to_underlying(commandData.transportOptions.containerOptions.containerType));
+        handler.AddClusterSpecificFailure(commandPath, status);
+        return std::nullopt;
+    }
+
+    /*Spec issue for invalid Trigger Type: https://github.com/CHIP-Specifications/connectedhomeip-spec/issues/11701*/
+    if (transportOptions.triggerOptions.triggerType == TransportTriggerTypeEnum::kUnknownEnumValue)
+    {
+        auto status = to_underlying(StatusCodeEnum::kInvalidTriggerType);
+        ChipLogError(Zcl, "HandleAllocatePushTransport[ep=%d]: Invalid Trigger type", mEndpointId);
+        handler.AddClusterSpecificFailure(commandPath, status);
+        return std::nullopt;
+    }
+
     Status transportOptionsValidityStatus = ValidateIncomingTransportOptions(transportOptions);
 
     VerifyOrDo(transportOptionsValidityStatus == Status::Success, {
@@ -572,29 +605,36 @@ PushAvStreamTransportServerLogic::HandleAllocatePushTransport(CommandHandler & h
         return std::nullopt;
     }
 
-    IngestMethodsEnum ingestMethod = commandData.transportOptions.ingestMethod;
-
-    bool isFormatSupported = false;
-
-    for (auto & supportsFormat : mSupportedFormats)
+    // here add check for valid zoneid
+    if ((transportOptions.triggerOptions.triggerType == TransportTriggerTypeEnum::kMotion) &&
+        (transportOptions.triggerOptions.motionZones.HasValue()) && (!transportOptions.triggerOptions.motionZones.Value().IsNull()))
     {
-        if ((supportsFormat.ingestMethod == ingestMethod) &&
-            (supportsFormat.containerFormat == commandData.transportOptions.containerOptions.containerType))
+
+        auto & motionZonesList = transportOptions.triggerOptions.motionZones;
+        auto iter              = motionZonesList.Value().Value().begin();
+        uint16_t zonesize      = 0;
+        auto itsz              = motionZonesList.Value().Value().begin();
+        while (itsz.Next())
         {
-            isFormatSupported = true;
+            zonesize += 1;
         }
-    }
+        bool isValidZoneSize = mDelegate->ValidateMotionZoneSize(zonesize);
+        VerifyOrReturnValue(
+            isValidZoneSize, Status::ConstraintError,
+            ChipLogError(Zcl, "Transport Options verification from command data[ep=%d]: Invalid Motion Zone Size ", mEndpointId));
 
-    if (isFormatSupported == false)
-    {
-        auto status = to_underlying(StatusCodeEnum::kInvalidCombination);
-        ChipLogError(Zcl,
-                     "HandleAllocatePushTransport[ep=%d]: Invalid Ingest Method and Container Format Combination : (Ingest Method: "
-                     "%02X and Container Format: %02X)",
-                     mEndpointId, to_underlying(ingestMethod),
-                     to_underlying(commandData.transportOptions.containerOptions.containerType));
-        handler.AddClusterSpecificFailure(commandPath, status);
-        return std::nullopt;
+        while (iter.Next())
+        {
+            auto & transportZoneOption = iter.GetValue();
+            Status zoneIdStatus        = mDelegate->ValidateZoneId(transportZoneOption.zone.Value());
+            if (zoneIdStatus != Status::Success)
+            {
+                auto status = to_underlying(StatusCodeEnum::kInvalidZone);
+                ChipLogError(Zcl, "HandleAllocatePushTransport[ep=%d]: Invalid ZoneId", mEndpointId);
+                handler.AddClusterSpecificFailure(commandPath, status);
+                return std::nullopt;
+            }
+        }
     }
 
     bool isValidUrl = mDelegate->ValidateUrl(std::string(transportOptions.url.data(), transportOptions.url.size()));
@@ -603,15 +643,6 @@ PushAvStreamTransportServerLogic::HandleAllocatePushTransport(CommandHandler & h
     {
         auto status = to_underlying(StatusCodeEnum::kInvalidURL);
         ChipLogError(Zcl, "HandleAllocatePushTransport[ep=%d]: Invalid Url", mEndpointId);
-        handler.AddClusterSpecificFailure(commandPath, status);
-        return std::nullopt;
-    }
-
-    /*Spec issue for invalid Trigger Type: https://github.com/CHIP-Specifications/connectedhomeip-spec/issues/11701*/
-    if (transportOptions.triggerOptions.triggerType == TransportTriggerTypeEnum::kUnknownEnumValue)
-    {
-        auto status = to_underlying(StatusCodeEnum::kInvalidTriggerType);
-        ChipLogError(Zcl, "HandleAllocatePushTransport[ep=%d]: Invalid Trigger type", mEndpointId);
         handler.AddClusterSpecificFailure(commandPath, status);
         return std::nullopt;
     }
@@ -671,7 +702,9 @@ PushAvStreamTransportServerLogic::HandleAllocatePushTransport(CommandHandler & h
 
             if (!delegateStatus.IsSuccess())
             {
-                handler.AddStatus(commandPath, delegateStatus);
+                auto cluster_status = to_underlying(StatusCodeEnum::kInvalidStream);
+                ChipLogError(Zcl, "HandleAllocatePushTransport[ep=%d]: Invalid Video Stream ", mEndpointId);
+                handler.AddClusterSpecificFailure(commandPath, cluster_status);
                 return std::nullopt;
             }
         }
@@ -701,7 +734,9 @@ PushAvStreamTransportServerLogic::HandleAllocatePushTransport(CommandHandler & h
 
             if (!delegateStatus.IsSuccess())
             {
-                handler.AddStatus(commandPath, delegateStatus);
+                auto cluster_status = to_underlying(StatusCodeEnum::kInvalidStream);
+                ChipLogError(Zcl, "HandleAllocatePushTransport[ep=%d]: Invalid Audio Stream ", mEndpointId);
+                handler.AddClusterSpecificFailure(commandPath, cluster_status);
                 return std::nullopt;
             }
         }

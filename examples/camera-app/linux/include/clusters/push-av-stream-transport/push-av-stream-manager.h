@@ -79,6 +79,10 @@ public:
     ValidateBandwidthLimit(StreamUsageEnum streamUsage, const Optional<DataModel::Nullable<uint16_t>> & videoStreamId,
                            const Optional<DataModel::Nullable<uint16_t>> & audioStreamId) override;
 
+    Protocols::InteractionModel::Status ValidateZoneId(uint16_t zoneId) override;
+
+    bool ValidateMotionZoneSize(uint16_t zoneSize) override;
+
     Protocols::InteractionModel::Status SelectVideoStream(StreamUsageEnum streamUsage, uint16_t & videoStreamId) override;
 
     Protocols::InteractionModel::Status SelectAudioStream(StreamUsageEnum streamUsage, uint16_t & audioStreamId) override;
