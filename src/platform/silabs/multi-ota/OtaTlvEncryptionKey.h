@@ -13,7 +13,6 @@ namespace Silabs {
 namespace OtaTlvEncryptionKey {
 
 static constexpr uint32_t kAES_KeyId_Default = (PSA_KEY_ID_USER_MIN + 2);
-
 class OtaTlvEncryptionKey
 {
 public:
