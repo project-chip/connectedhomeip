@@ -150,8 +150,8 @@ TEST_F(TestDeviceAttestationVerifier, CheckForRevokedDACChainSuccess)
     AttestationVerificationResult result = AttestationVerificationResult::kInternalError;
     chip::Callback::Callback<DeviceAttestationVerifier::OnAttestationInformationVerification> callback(
         [](void * context, const DeviceAttestationVerifier::AttestationInfo &, AttestationVerificationResult verificationResult) {
-            AttestationVerificationResult * result = static_cast<AttestationVerificationResult *>(context);
-            *result                                = verificationResult;
+            AttestationVerificationResult * resultPtr = static_cast<AttestationVerificationResult *>(context);
+            *resultPtr                                = verificationResult;
         },
         &result);
 
@@ -185,8 +185,8 @@ TEST_F(TestDeviceAttestationVerifier, CheckForRevokedDACChainEmptyRevocationData
     AttestationVerificationResult result = AttestationVerificationResult::kInternalError;
     chip::Callback::Callback<DeviceAttestationVerifier::OnAttestationInformationVerification> callback(
         [](void * context, const DeviceAttestationVerifier::AttestationInfo &, AttestationVerificationResult verificationResult) {
-            AttestationVerificationResult * result = static_cast<AttestationVerificationResult *>(context);
-            *result                                = verificationResult;
+            AttestationVerificationResult * resultPtr = static_cast<AttestationVerificationResult *>(context);
+            *resultPtr                                = verificationResult;
         },
         &result);
 
@@ -220,8 +220,8 @@ TEST_F(TestDeviceAttestationVerifier, CheckForRevokedDACChainNoDelegate)
     AttestationVerificationResult result = AttestationVerificationResult::kInternalError;
     chip::Callback::Callback<DeviceAttestationVerifier::OnAttestationInformationVerification> callback(
         [](void * context, const DeviceAttestationVerifier::AttestationInfo &, AttestationVerificationResult verificationResult) {
-            AttestationVerificationResult * result = static_cast<AttestationVerificationResult *>(context);
-            *result                                = verificationResult;
+            AttestationVerificationResult * resultPtr = static_cast<AttestationVerificationResult *>(context);
+            *resultPtr                                = verificationResult;
         },
         &result);
 
