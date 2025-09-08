@@ -39,13 +39,13 @@ class ResourceMonitoringClusterProxy : public ResourceMonitoringCluster
     ResourceMonitoringClusterProxy(
         EndpointId aEndpointId,
         ClusterId aClusterId,
-        uint32_t aFeatureMap,
+        const BitFlags<ResourceMonitoring::Feature> enabledFeatures,
         ResourceMonitoring::Attributes::DegradationDirection::TypeInfo::Type aDegradationDirection,
         bool aResetConditionCommandSupported
     ): ResourceMonitoringCluster(
         aEndpointId,
         aClusterId,
-        aFeatureMap,
+        enabledFeatures,
         aDegradationDirection,
         aResetConditionCommandSupported
     )
