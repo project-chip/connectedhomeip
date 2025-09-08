@@ -6,6 +6,18 @@
         {
             "path": "./upgrade-rules/cluster-api-maturity-upgrade.js",
             "priority": 100
+        },
+        {
+            "path": "./upgrade-rules/attribute-upgrades-for-clusters.js",
+            "priority": 100
+        },
+        {
+            "path": "./upgrade-rules/event-upgrades-for-clusters.js",
+            "priority": 100
+        },
+        {
+            "path": "./upgrade-rules/command-upgrades-for-clusters.js",
+            "priority": 100
         }
     ]
 }

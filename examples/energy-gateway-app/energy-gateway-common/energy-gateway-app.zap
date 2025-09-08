@@ -3013,13 +3013,6 @@
               "mfgCode": null,
               "side": "server",
               "included": 1
-            },
-            {
-              "name": "ForecastChange",
-              "code": 1,
-              "mfgCode": null,
-              "side": "server",
-              "included": 1
             }
           ]
         },
@@ -3165,13 +3158,6 @@
             {
               "name": "CurrentConditionsChanged",
               "code": 0,
-              "mfgCode": null,
-              "side": "server",
-              "included": 1
-            },
-            {
-              "name": "ForecastConditionsChanged",
-              "code": 1,
               "mfgCode": null,
               "side": "server",
               "included": 1

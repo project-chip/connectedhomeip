@@ -364,7 +364,7 @@ limitations under the License.
         </notTerm>
       </optionalConform>
     </attribute>
-    <attribute side="server" code="0x0011" name="OccupiedCoolingSetpoint" define="OCCUPIED_COOLING_SETPOINT" type="temperature" min="-27315" max="0x7FFF" writable="true" default="2600" optional="true">
+    <attribute side="server" code="0x0011" name="OccupiedCoolingSetpoint" define="OCCUPIED_COOLING_SETPOINT" type="temperature" min="-27315" writable="true" default="2600" optional="true">
       <mandatoryConform>
         <feature name="COOL"/>
       </mandatoryConform>

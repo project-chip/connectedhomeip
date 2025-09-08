@@ -1,0 +1,9 @@
+upgrade_results:
+  - message: >
+      ManufacturerExtension attribute of Mode Select cluster on endpoint 1 is no
+      longer available.
+    status: automatic
+  - message: >
+      Stop command of Oven Cavity Operational State cluster on endpoint 1 is no
+      longer available.
+    status: automatic
