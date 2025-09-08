@@ -110,13 +110,13 @@ const char * GetGatheringStateStr(rtc::PeerConnection::GatheringState state)
 class LibDataChannelTrack : public WebRTCTrack
 {
 public:
-    LibDataChannelTrack(std::shared_ptr<rtc::Track> track) : mTrack(track) { InitH264Packetizer(); }
+    LibDataChannelTrack(std::shared_ptr<rtc::Track> track) : mTrack(track) {}
     // Initialize libdatachannel's RTP packetizer for H.264
     void InitH264Packetizer()
     {
         // 90 kHz clock for H.264
         mRtpCfg      = std::make_shared<rtc::RtpPacketizationConfig>(kSSRC, "videosrc", kVideoH264PayloadType,
-                                                                rtc::H264RtpPacketizer::ClockRate);
+                                                                     rtc::H264RtpPacketizer::ClockRate);
         mRtpCfg->mid = mTrack->description().mid();
 
         // Setting MTU size to 1200 as default size used in the libdatachannel is 1400
@@ -155,18 +155,16 @@ public:
     {
         if (mTrack && mTrack->isOpen())
         {
-            if (!mInitDone)
+            const std::string kind = mTrack->description().type();
+            if (kind == "video" && !mVideoInitDone)
             {
-                const std::string kind = mTrack->description().type();
-                if (kind == "video")
-                {
-                    InitH264Packetizer();
-                }
-                if (kind == "audio")
-                {
-                    InitOpusPacketizer();
-                }
-                mInitDone = true; // Only init once per track
+                InitH264Packetizer();
+                mVideoInitDone = true;
+            }
+            else if (kind == "audio" && !mAudioInitDone)
+            {
+                InitOpusPacketizer();
+                mAudioInitDone = true;
             }
             // Feed RAW H.264 access unit. Packetizer does NAL split, FU-A/STAP-A, RTP headers, marker bit, SR/NACK.
             rtc::binary frame(size);
@@ -193,7 +191,8 @@ public:
 
 private:
     // Lazy-init state
-    bool mInitDone = false;
+    bool mAudioInitDone = false;
+    bool mVideoInitDone = false;
 
     std::shared_ptr<rtc::Track> mTrack;
 
@@ -281,18 +280,17 @@ public:
             rtc::Description::Video vMedia("video", rtc::Description::Direction::SendOnly);
             vMedia.addH264Codec(kVideoH264PayloadType);
             vMedia.setBitrate(kVideoBitRate);
-            vMedia.addSSRC(kSSRC, "camera", "camstream", "camera");
+            vMedia.addSSRC(kSSRC, "video-stream", "stream1", "video-stream");
             auto track = mPeerConnection->addTrack(vMedia);
             return std::make_shared<LibDataChannelTrack>(track);
         }
 
-        // TODO: Add audio track support
         if (mediaType == MediaType::Audio)
         {
             rtc::Description::Audio aMedia("audio", rtc::Description::Direction::SendOnly);
             aMedia.addOpusCodec(kOpusPayloadType);
             aMedia.setBitrate(kAudioBitRate);
-            aMedia.addSSRC(kAudioSSRC, "mic", "camstream", "mic");
+            aMedia.addSSRC(kAudioSSRC, "audio-stream", "stream1", "audio-stream");
             auto track = mPeerConnection->addTrack(aMedia);
             return std::make_shared<LibDataChannelTrack>(track);
         }

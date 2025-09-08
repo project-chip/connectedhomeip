@@ -585,7 +585,7 @@ GstElement * CameraDevice::CreateAudioPipeline(const std::string & device, int c
 
     // Create GstCaps for the audio source
     GstCaps * caps = gst_caps_new_simple("audio/x-raw", "format", G_TYPE_STRING, "S16LE", "rate", G_TYPE_INT, sampleRate,
-                                         "channels", G_TYPE_INT, 1, nullptr);
+                                         "channels", G_TYPE_INT, channels, nullptr);
     g_object_set(acaps, "caps", caps, nullptr);
     gst_caps_unref(caps);
 
@@ -856,7 +856,7 @@ CameraError CameraDevice::StartAudioStream(uint16_t streamID)
     GstElement * appsink = gst_bin_get_by_name(GST_BIN(audioPipeline), "appsink");
     if (appsink)
     {
-        AppSinkContext * context      = new AppSinkContext{ this, streamID };
+        AudioAppSinkContext * context = new AudioAppSinkContext{ this, streamID };
         GstAppSinkCallbacks callbacks = { nullptr, nullptr, OnNewAudioSampleFromAppSink };
         gst_app_sink_set_callbacks(GST_APP_SINK(appsink), &callbacks, context, DestroyAudioAppSinkContext);
         gst_object_unref(appsink);
