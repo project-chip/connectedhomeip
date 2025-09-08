@@ -289,15 +289,15 @@ class TC_SETRF_3_1(CommodityTariffTestBaseHelper):
                                 - Verify that if PriceLevel field is presented it has int16 type;
                         - FriendlyCredit field:
                             - Verify that entry does NOT contain FriendlyCredit field if SETRF.S.F01(FCRED) is False;
-                            - If SETRF.S.F01(FCRED) and FriendlyCredit field is presented it has type bool;
+                            - If SETRF.S.F01(FCRED) is True and FriendlyCredit field is presented it has type bool;
                         - AuxiliaryLoad field:
                             - Verify that entry does NOT contain AuxiliaryLoad field if SETRF.S.F02(AUXLD) is False;
-                            - If SETRF.S.F02(AUXLD) and AuxiliaryLoad field is presented it has AuxiliaryLoadSwitchSettingsStruct type;
+                            - If SETRF.S.F02(AUXLD) is True and AuxiliaryLoad field is presented it has AuxiliaryLoadSwitchSettingsStruct type;
                                 - Verify that Number field has uint8 type;
                                 - Verify that RequiredState field has AuxiliaryLoadSettingEnum type. Value has to be between a range of 0 - 2;
                         - PeakPeriod field:
                             - Verify that entry does NOT contain PeakPeriod field if SETRF.S.F03(PEAKP) is False;
-                            - If SETRF.S.F03(PEAKP) and PeakPeriod field is presented it has PeakPeriodStruct type;
+                            - If SETRF.S.F03(PEAKP) is True and PeakPeriod field is presented it has PeakPeriodStruct type;
                                 - Verify that Severity field has PeakPeriodSeverityEnum type. Value has to be between a range of 0 - 3;
                                 - Verify that PeakPeriod field has uint16 type and value greater or equal 1;
                         - PowerThreshold field:
@@ -335,15 +335,15 @@ class TC_SETRF_3_1(CommodityTariffTestBaseHelper):
                                 - Verify that if PriceLevel field is presented it has int16 type;
                         - FriendlyCredit field:
                             - Verify that entry does NOT contain FriendlyCredit field if SETRF.S.F01(FCRED) is False;
-                            - If SETRF.S.F01(FCRED) and FriendlyCredit field is presented it has type bool;
+                            - If SETRF.S.F01(FCRED) is True and FriendlyCredit field is presented it has type bool;
                         - AuxiliaryLoad field:
                             - Verify that entry does NOT contain AuxiliaryLoad field if SETRF.S.F02(AUXLD) is False;
-                            - If SETRF.S.F02(AUXLD) and AuxiliaryLoad field is presented it has AuxiliaryLoadSwitchSettingsStruct type;
+                            - If SETRF.S.F02(AUXLD) is True and AuxiliaryLoad field is presented it has AuxiliaryLoadSwitchSettingsStruct type;
                                 - Verify that Number field has uint8 type;
                                 - Verify that RequiredState field has AuxiliaryLoadSettingEnum type. Value has to be between a range of 0 - 2;
                         - PeakPeriod field:
                             - Verify that entry does NOT contain PeakPeriod field if SETRF.S.F03(PEAKP) is False;
-                            - If SETRF.S.F03(PEAKP) and PeakPeriod field is presented it has PeakPeriodStruct type;
+                            - If SETRF.S.F03(PEAKP) is True and PeakPeriod field is presented it has PeakPeriodStruct type;
                                 - Verify that Severity field has PeakPeriodSeverityEnum type. Value has to be between a range of 0 - 3;
                                 - Verify that PeakPeriod field has uint16 type and value greater or equal 1;
                         - PowerThreshold field:
@@ -373,15 +373,15 @@ class TC_SETRF_3_1(CommodityTariffTestBaseHelper):
                                 - Verify that if PriceLevel field is presented it has int16 type;
                         - FriendlyCredit field:
                             - Verify that entry does NOT contain FriendlyCredit field if SETRF.S.F01(FCRED) is False;
-                            - If SETRF.S.F01(FCRED) and FriendlyCredit field is presented it has type bool;
+                            - If SETRF.S.F01(FCRED) is True and FriendlyCredit field is presented it has type bool;
                         - AuxiliaryLoad field:
                             - Verify that entry does NOT contain AuxiliaryLoad field if SETRF.S.F02(AUXLD) is False;
-                            - If SETRF.S.F02(AUXLD) and AuxiliaryLoad field is presented it has AuxiliaryLoadSwitchSettingsStruct type;
+                            - If SETRF.S.F02(AUXLD) is True and AuxiliaryLoad field is presented it has AuxiliaryLoadSwitchSettingsStruct type;
                                 - Verify that Number field has uint8 type;
                                 - Verify that RequiredState field has AuxiliaryLoadSettingEnum type. Value has to be between a range of 0 - 2;
                         - PeakPeriod field:
                             - Verify that entry does NOT contain PeakPeriod field if SETRF.S.F03(PEAKP) is False;
-                            - If SETRF.S.F03(PEAKP) and PeakPeriod field is presented it has PeakPeriodStruct type;
+                            - If SETRF.S.F03(PEAKP) is True and PeakPeriod field is presented it has PeakPeriodStruct type;
                                 - Verify that Severity field has PeakPeriodSeverityEnum type. Value has to be between a range of 0 - 3;
                                 - Verify that PeakPeriod field has uint16 type and value greater or equal 1;
                         - PowerThreshold field:
