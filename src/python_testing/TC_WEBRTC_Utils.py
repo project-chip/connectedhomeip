@@ -35,12 +35,17 @@ class WebRTCTestHelper:
                 endpoint=endpoint, attribute=attrs.MicrophoneCapabilities
             )
             aBitRate = 0
-            match aMicrophoneCapabilities.supportedCodecs[0]:
+            codec = aMicrophoneCapabilities.supportedCodecs[0]
+            match codec:
                 case CameraAvStreamManagement.Enums.AudioCodecEnum.kOpus:
                     aBitRate = 30000
 
                 case CameraAvStreamManagement.Enums.AudioCodecEnum.kAacLc:
                     aBitRate = 40000
+
+                case _:
+                    aBitRate = 30000
+                    logging.warning(f"Using default bitrate {aBitRate} for unhandled codec {codec}")
 
             adoStreamAllocateCmd = CameraAvStreamManagement.Commands.AudioStreamAllocate(
                 streamUsage=aStreamUsagePriorities[0],

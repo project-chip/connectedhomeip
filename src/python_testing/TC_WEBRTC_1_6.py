@@ -154,11 +154,13 @@ class TC_WEBRTC_1_6(MatterBaseTest, WebRTCTestHelper):
         if dut_has_vdo_feature:
             self.step(2)
             aVideoStreamID = await self.allocate_video_stream(endpoint)
+            asserts.assert_is_not_none(aVideoStreamID, "Failed to allocate video stream")
         else:
             self.skip_step(2)
 
         self.step(3)
         aAudioStreamID = await self.allocate_audio_stream(endpoint)
+        asserts.assert_is_not_none(aAudioStreamID, "Failed to allocate audio stream")
 
         self.step(4)
         offer = await webrtc_peer.create_offer()
