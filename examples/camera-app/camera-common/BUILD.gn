@@ -41,12 +41,14 @@ source_set("camera-lib") {
     "include/camera-device-interface.h",
     "include/media-controller/media-controller.h",
     "include/transport/transport.h",
+    "include/webrtc-provider-controller/webrtc-provider-controller.h",
     "src/camera-app.cpp",
   ]
 
   include_dirs = [
     "include",
     "include/camera-avstream-controller",
+    "include/webrtc-provider-controller",
     "include/media-controller",
     "include/transport",
     "${chip_root}/examples/all-clusters-app/all-clusters-common/include",
