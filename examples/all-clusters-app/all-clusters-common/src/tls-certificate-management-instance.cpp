@@ -92,16 +92,18 @@ struct RefEncodableClientCert
     {
         VerifyOrReturnError(certificate != nullptr, CHIP_ERROR_INTERNAL);
 
-        if (src.clientCertificate.HasValue())
+        if (!src.clientCertificate.Value().IsNull())
         {
             MutableByteSpan targetBytes(certBytes);
             ReturnErrorOnFailure(CopySpanToMutableSpan(src.clientCertificate.Value().Value(), targetBytes));
             certificate->clientCertificate.SetValue(Nullable<ByteSpan>(targetBytes));
+        } else {
+            certificate->clientCertificate.SetValue(Nullable<ByteSpan>());
         }
 
         if (src.intermediateCertificates.HasValue())
         {
-            auto srcIter = src.intermediateCertificates.Value().Value().begin();
+            auto srcIter = src.intermediateCertificates.Value().begin();
             uint8_t i    = 0;
             while (srcIter.Next())
             {
@@ -112,10 +114,8 @@ struct RefEncodableClientCert
             }
             ReturnErrorOnFailure(srcIter.GetStatus());
             certificate->intermediateCertificates.SetValue(List<ByteSpan>(intermediateCerts.data(), i));
-        }
-        else
-        {
-            certificate->intermediateCertificates.ClearValue();
+        } else {
+            certificate->intermediateCertificates.SetValue(List<ByteSpan>());
         }
 
         certificate->fabricIndex = fabric;

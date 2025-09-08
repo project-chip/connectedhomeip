@@ -36,9 +36,9 @@
 import datetime
 import random
 import string
-import test_plan_support
 from typing import Optional, Union
 
+import test_plan_support
 from cryptography import x509
 from cryptography.hazmat.primitives import hashes, serialization
 from cryptography.hazmat.primitives.asymmetric import ec, rsa, utils
@@ -54,11 +54,12 @@ import matter.clusters as Clusters
 from matter import ChipDeviceCtrl
 from matter.clusters.Types import Nullable, NullValue
 from matter.interaction_model import InteractionModelError, Status
-from matter.testing.conversions import hex_from_bytes
 from matter.testing import matter_asserts
+from matter.testing.conversions import hex_from_bytes
 from matter.testing.matter_testing import (MatterBaseTest, TestStep, default_matter_test_main, has_cluster, run_if_endpoint_matches,
                                            type_matches)
 from matter.utils import CommissioningBuildingBlocks
+
 
 class TC_TLSCERT(MatterBaseTest):
     def __init__(self, *args, **kwargs):
@@ -269,7 +270,6 @@ class TC_TLSCERT(MatterBaseTest):
             cluster = Clusters.TlsCertificateManagement
             return await self.test.read_single_attribute_check_success(endpoint=self.endpoint, dev_ctrl=self.dev_ctrl, node_id=self.node_id, cluster=cluster, attribute=attribute)
 
-
         async def read_root_certs_attribute_as_map(self, attribute):
             attribute_certs = await self.read_tls_cert_attribute(attribute)
             matter_asserts.assert_list(attribute_certs, "Expected list")
@@ -279,7 +279,7 @@ class TC_TLSCERT(MatterBaseTest):
             return found_certs
 
         async def send_remove_fabric_command(self, fabric_index: int):
-            resp = await self.send_single_cmd(cmd=Clusters.OperationalCredentials.Commands.RemoveFabric(fabric_index), endpoint=0, dev_ctrl=self.dev_ctrl)
+            resp = await self.test.send_single_cmd(cmd=Clusters.OperationalCredentials.Commands.RemoveFabric(fabric_index), endpoint=0, dev_ctrl=self.dev_ctrl)
             asserts.assert_equal(
                 resp.statusCode, Clusters.OperationalCredentials.Enums.NodeOperationalCertStatusEnum.kOk)
 
@@ -288,15 +288,20 @@ class TC_TLSCERT(MatterBaseTest):
             self.cr1_cmd = cr1_cmd
             self.cr2_cmd = cr2_cmd
 
-    def get_common_substeps(self, step_prefix : string = "1") -> list[TestStep]:
+    def get_common_substeps(self, step_prefix: string = "1") -> list[TestStep]:
         return [
             TestStep(f'{step_prefix}.1', test_plan_support.commission_if_required('CR1'), is_commissioning=True),
-            TestStep(f'{step_prefix}.2', "CR1 reads ProvisionedRootCertificates attribute using a fabric-filtered read", "A list of TLSCertStruct. Store all resulting CAID in caidToClean."),
-            TestStep(f'{step_prefix}.3', "CR1 sends RemoveRootCertificate command with CAID set to caidToClean[i] for all entries returned", test_plan_support.verify_success()),
-            TestStep(f'{step_prefix}.4', "CR1 reads ProvisionedClientCertificates attribute using a fabric-filtered read", "A list of TLSClientCertificateDetailStruct. Store all resulting CCDID in ccdidToClean."),
-            TestStep(f'{step_prefix}.5', "CR1 sends RemoveClientCertificate command with CCDID set to ccdidToClean[i] for all entries returned.", test_plan_support.verify_success()),
+            TestStep(f'{step_prefix}.2', "CR1 reads ProvisionedRootCertificates attribute using a fabric-filtered read",
+                     "A list of TLSCertStruct. Store all resulting CAID in caidToClean."),
+            TestStep(
+                f'{step_prefix}.3', "CR1 sends RemoveRootCertificate command with CAID set to caidToClean[i] for all entries returned", test_plan_support.verify_success()),
+            TestStep(f'{step_prefix}.4', "CR1 reads ProvisionedClientCertificates attribute using a fabric-filtered read",
+                     "A list of TLSClientCertificateDetailStruct. Store all resulting CCDID in ccdidToClean."),
+            TestStep(
+                f'{step_prefix}.5', "CR1 sends RemoveClientCertificate command with CCDID set to ccdidToClean[i] for all entries returned.", test_plan_support.verify_success()),
         ]
-    async def common_setup(self, step_prefix : string = "1") -> TargetedFabric:
+
+    async def common_setup(self, step_prefix: string = "1") -> TargetedFabric:
         self.step(f'{step_prefix}.1')
         attributes = Clusters.TlsCertificateManagement.Attributes
         endpoint = self.get_endpoint(default=1)
@@ -320,14 +325,14 @@ class TC_TLSCERT(MatterBaseTest):
 
         return cr1_cmd
 
-    def get_two_fabric_substeps(self, step_prefix : string = "1") -> list[TestStep]:
+    def get_two_fabric_substeps(self, step_prefix: string = "1") -> list[TestStep]:
         return [
             *self.get_common_substeps(f'{step_prefix}.1'),
             TestStep(f'{step_prefix}.2', test_plan_support.open_commissioning_window()),
             TestStep(f'{step_prefix}.3', test_plan_support.commission_from_existing('CR1', 'CR2')),
         ]
 
-    async def common_two_fabric_setup(self, step_prefix : string = "1") -> TwoFabricData:
+    async def common_two_fabric_setup(self, step_prefix: string = "1") -> TwoFabricData:
         cr1_cmd = await self.common_setup(f'{step_prefix}.1')
         cr1 = self.default_controller
         endpoint = self.get_endpoint(default=1)
@@ -347,7 +352,7 @@ class TC_TLSCERT(MatterBaseTest):
         fabric_index_cr2 = noc_resp.fabricIndex
 
         cr2_cmd = self.TargetedFabric(self, endpoint=endpoint, dev_ctrl=cr2, node_id=cr2_dut_node_id, fabric_index=fabric_index_cr2)
-        return self.TwoFabricData(cr1_cmd = cr1_cmd, cr2_cmd = cr2_cmd)
+        return self.TwoFabricData(cr1_cmd=cr1_cmd, cr2_cmd=cr2_cmd)
 
     def desc_TC_TLSCERT_2_2(self) -> str:
         return "[TC-TLSCERT-3.1] ProvisionRootCertificate command basic insertion and modification"
@@ -361,9 +366,9 @@ class TC_TLSCERT(MatterBaseTest):
             TestStep(4, "CR1 Reads ProvisionedRootCertificates attribute using a fabric-filtered read on Large Message-capable transport",
                      "Verify result is a list of TLSCertStruct with one entry. The entry should have CAID equal to myCaid[0] and Certificate equal to myRootCert[0]"),
             TestStep(5, "CR1 Reads ProvisionedRootCertificates attribute using a fabric-filtered read",
-                     "Verify result a list of TLSCertStruct with one entry. The entry should have CAID equal to myCaid[0] and Certificate not populated (null)" ),
+                     "Verify result a list of TLSCertStruct with one entry. The entry should have CAID equal to myCaid[0] and Certificate not populated (null)"),
             TestStep(6, "CR2 Reads ProvisionedRootCertificates attribute using a fabric-filtered read",
-                     "Verify result is an empty list" ),
+                     "Verify result is an empty list"),
             TestStep(7, "CR1 sends ProvisionRootCertificate command with null CAID and Certificate set to myRootCert[0]",
                      test_plan_support.verify_status(Status.AlreadyExists)),
             TestStep(8, "CR1 Reads ProvisionedRootCertificates attribute using a fabric-filtered read on Large Message-capable transport",
@@ -373,7 +378,7 @@ class TC_TLSCERT(MatterBaseTest):
             TestStep(10, "CR1 sends ProvisionRootCertificate command with CAID set to myCaid[0] and Certificate set to myRootCert[1]",
                      "Verify returned TLSCAID value equal to myCaid[0]"),
             TestStep(11, "CR2 Reads ProvisionedRootCertificates attribute using a fabric-filtered read",
-                     "Verify result is an empty list" ),
+                     "Verify result is an empty list"),
             TestStep(12, "CR1 sends FindRootCertificate command with null CAID",
                      "Verify result is a list of TLSCertStruct with one entry. The entry should have CAID equal to myCaid[0] and Certificate equal to myRootCert[1]"),
             TestStep(13, "CR2 sends FindRootCertificate command with null CAID",
@@ -411,7 +416,7 @@ class TC_TLSCERT(MatterBaseTest):
         self.step(3)
         response = await cr1_cmd.send_provision_root_command(certificate=my_root_cert[0])
         self.assert_valid_caid(response.caid)
-        my_caid = [response.caid]
+        my_caid = [response.caid, None, None]
 
         self.step(4)
         found_certs = await cr1_cmd.read_root_certs_attribute_as_map(attributes.ProvisionedRootCertificates)
@@ -432,7 +437,7 @@ class TC_TLSCERT(MatterBaseTest):
         matter_asserts.assert_list(attribute_certs, "Expected empty list", max_length=0)
 
         self.step(7)
-        await cr1_cmd.send_provision_root_command(certificate=my_root_cert[0], expected_status = Status.AlreadyExists)
+        await cr1_cmd.send_provision_root_command(certificate=my_root_cert[0], expected_status=Status.AlreadyExists)
 
         self.step(8)
         # Must close session so we don't re-use large payload session
@@ -474,17 +479,17 @@ class TC_TLSCERT(MatterBaseTest):
         my_caid[1] = response.caid
 
         self.step(16)
-        await cr2_cmd.send_provision_root_command(certificate=my_root_cert[2], caid=my_caid[1], expected_status = Status.AlreadyExists)
+        await cr2_cmd.send_provision_root_command(certificate=my_root_cert[2], caid=my_caid[1], expected_status=Status.AlreadyExists)
 
         self.step(17)
         found_certs = await cr1_cmd.read_root_certs_attribute_as_map(attributes.ProvisionedRootCertificates)
-        asserts.assert_in(response.caid, found_certs, "ProvisionedRootCertificates should contain provisioned root cert")
+        asserts.assert_in(my_caid[0], found_certs, "ProvisionedRootCertificates should contain provisioned root cert")
         asserts.assert_equal(len(found_certs), 1, "Expected 1 certificate")
         asserts.assert_equal(found_certs[my_caid[0]].certificate, my_root_cert[1], "Expected matching certificate detail")
 
         self.step(18)
         found_certs = await cr2_cmd.read_root_certs_attribute_as_map(attributes.ProvisionedRootCertificates)
-        asserts.assert_in(response.caid, found_certs, "ProvisionedRootCertificates should contain provisioned root cert")
+        asserts.assert_in(my_caid[1], found_certs, "ProvisionedRootCertificates should contain provisioned root cert")
         asserts.assert_equal(len(found_certs), 1, "Expected 1 certificate")
         asserts.assert_equal(found_certs[my_caid[1]].certificate, my_root_cert[2], "Expected matching certificate detail")
 
@@ -505,128 +510,128 @@ class TC_TLSCERT(MatterBaseTest):
 
         self.step(22)
         await cr1_cmd.send_remove_fabric_command(cr2_cmd.fabric_index)
-    #
-    # def desc_TC_TLSCERT_2_9(self) -> str:
-    #     return "[TC-TLSCERT-3.1.8] ProvisionClientCertificate command verification"
-    #
-    # def steps_TC_TLSCERT_2_9(self) -> list[TestStep]:
-    #     steps = [
-    #         *self.get_two_fabric_substeps(),
-    #         TestStep(2, "Create two distinct, valid, self-signed, DER-encoded x509 certificates"),
-    #         TestStep(3, "Sends the ClientCSR command"),
-    #         TestStep(7, "Validates the CSR and nonce signature"),
-    #         TestStep(8, "Sends the ProvisionClientCertificate command to the TlsCertificateManagement cluster",
-    #                  "Verify that the DUT sends ProvisionClientCertificateResponse."),
-    #         TestStep(9, "Sends another ProvisionClientCertificate command to the TlsCertificateManagement cluster",
-    #                  "Verify a new ID is generated."),
-    #         TestStep(10, "Read ProvisionedClientCertificates to from CR1"),
-    #         TestStep(11, "Read ProvisionedClientCertificates to from CR2"),
-    #         TestStep(12, "Read ProvisionedClientCertificates to make sure certificates from step 2 and 3 are present"),
-    #         TestStep(13, "Sends the FindClientCertificate command specifying a CCDID from step 2",
-    #                  "Verify the DUT sends FindClientCertificateResponse with both certificates"),
-    #         TestStep(14, "Sends the FindClientCertificate command specifying a CCDID from step 3",
-    #                  "Verify the DUT sends FindClientCertificateResponse with both certificates"),
-    #         TestStep(15, "Sends the FindClientCertificate command specifying null for CCDID",
-    #                  "Verify the DUT sends FindClientCertificateResponse with both certificates"),
-    #         TestStep(16, "Sends the RemoveClientCertificate for both certificates added",
-    #                  "Verify the DUT sends success status"),
-    #     ]
-    #     return steps
-    #
-    # @run_if_endpoint_matches(has_cluster(Clusters.TlsCertificateManagement))
-    # async def test_TC_TLSCERT_2_9(self):
-    #     attributes = Clusters.TlsCertificateManagement.Attributes
-    #
-    #     setup_data = await self.common_two_fabric_setup()
-    #     cr1_cmd = setup_data.cr1_cmd
-    #     cr2_cmd = setup_data.cr2_cmd
-    #
-    #     self.step(2)
-    #
-    #     first_nonce = random.randbytes(32)
-    #     second_nonce = random.randbytes(32)
-    #
-    #     self.step(3)
-    #     response = await cr1_cmd.send_csr_command(nonce=first_nonce)
-    #     self.assert_valid_ccdid(response.ccdid)
-    #
-    #     self.step(7)
-    #     first_csr = self.assert_valid_csr(response, first_nonce)
-    #     first_cert = self.gen_cert(public_key=first_csr.public_key())
-    #
-    #     self.step(8)
-    #     await cr1_cmd.send_provision_client_command(ccdid=response.ccdid, certificate=first_cert)
-    #
-    #     self.step(9)
-    #     if not self.skip_cr2:
-    #         response2 = await cr2_cmd.send_csr_command(nonce=second_nonce)
-    #         self.assert_valid_ccdid(response2.ccdid)
-    #         second_csr = self.assert_valid_csr(response2, second_nonce)
-    #         asserts.assert_not_equal(response.ccdid, response2.ccdid, "CCDID should be unique")
-    #         second_cert = self.gen_cert(public_key=second_csr.public_key())
-    #
-    #         await cr2_cmd.send_provision_client_command(ccdid=response2.ccdid, certificate=second_cert)
-    #
-    #     self.step(10)
-    #     attribute_certs = await cr1_cmd.read_tls_cert_attribute(attributes.ProvisionedClientCertificates)
-    #     asserts.assert_greater_equal(len(attribute_certs), 1, "Expected at least 1 certificate")
-    #     found_certs = dict()
-    #     # Python controller is using TCP, which supports large payloads; need a way to test
-    #     # over MRP that certificate is not present
-    #     for cert in attribute_certs:
-    #         found_certs[cert.ccdid] = cert.clientCertificate
-    #     asserts.assert_in(response.ccdid, found_certs, "ProvisionedClientCertificates should contain provisioned client cert")
-    #     asserts.assert_equal(found_certs[response.ccdid], first_cert, "Expected matching certificate detail")
-    #
-    #     self.step(11)
-    #     if not self.skip_cr2:
-    #         attribute_certs = await cr2_cmd.read_tls_cert_attribute(attribute=attributes.ProvisionedClientCertificates)
-    #         asserts.assert_greater_equal(len(attribute_certs), 1, "Expected at least 1 certificate")
-    #         found_certs = dict()
-    #         # Python controller is using TCP, which supports large payloads; need a way to test
-    #         # over MRP that certificate is not present
-    #         for cert in attribute_certs:
-    #             found_certs[cert.ccdid] = cert.clientCertificate
-    #         asserts.assert_in(response2.ccdid, found_certs, "ProvisionedClientCertificates should contain provisioned client cert")
-    #         asserts.assert_equal(found_certs[response2.ccdid], second_cert, "Expected matching certificate detail")
-    #
-    #     self.step(12)
-    #     find_response = await cr1_cmd.send_find_client_command(ccdid=response.ccdid)
-    #     asserts.assert_equal(len(find_response.certificateDetails), 1, "Expected single certificate")
-    #     asserts.assert_equal(find_response.certificateDetails[0].clientCertificate, first_cert)
-    #
-    #     self.step(13)
-    #     if not self.skip_cr2:
-    #         find_response2 = await cr2_cmd.send_find_client_command(ccdid=response.ccdid)
-    #         asserts.assert_equal(len(find_response2.certificateDetails), 1, "Expected single certificate")
-    #         asserts.assert_equal(find_response2.certificateDetails[0].clientCertificate,
-    #                              second_cert, "Expected matching certificate detail")
-    #
-    #     self.step(14)
-    #     find_all_response = await cr1_cmd.send_find_client_command()
-    #     asserts.assert_greater_equal(len(find_all_response.certificateDetails), 1, "Expected at least 1 certificate")
-    #     found_certs = dict()
-    #     for cert in find_all_response.certificateDetails:
-    #         found_certs[cert.ccdid] = cert.clientCertificate
-    #     asserts.assert_in(response.ccdid, found_certs, "FindClientCertificate should contain provisioned client cert")
-    #     asserts.assert_equal(found_certs[response.ccdid], first_cert, "Expected matching certificate detail")
-    #
-    #     self.step(15)
-    #     if not self.skip_cr2:
-    #         find_all_response = await cr2_cmd.send_find_client_command()
-    #         asserts.assert_greater_equal(len(find_all_response.certificateDetails), 1, "Expected at least 1 certificate")
-    #         found_certs = dict()
-    #         for cert in find_all_response.certificateDetails:
-    #             found_certs[cert.ccdid] = cert.clientCertificate
-    #         asserts.assert_in(response2.ccdid, found_certs, "FindClientCertificate should contain provisioned client cert")
-    #         asserts.assert_equal(found_certs[response2.ccdid], second_cert, "Expected matching certificate detail")
-    #
-    #     self.step(16)
-    #     await cr1_cmd.send_remove_client_command(ccdid=response.ccdid)
-    #     if not self.skip_cr2:
-    #         await cr2_cmd.send_remove_client_command(ccdid=response2.ccdid)
-    #     await cr1_cmd.send_remove_fabric_command(cr2_cmd.fabric_index)
-    #
+
+    def desc_TC_TLSCERT_2_9(self) -> str:
+        return "[TC-TLSCERT-3.1.8] ProvisionClientCertificate command verification"
+
+    def steps_TC_TLSCERT_2_9(self) -> list[TestStep]:
+        steps = [
+            *self.get_two_fabric_substeps(),
+            TestStep(2, "Create two distinct, valid, self-signed, DER-encoded x509 certificates"),
+            TestStep(3, "Sends the ClientCSR command"),
+            TestStep(7, "Validates the CSR and nonce signature"),
+            TestStep(8, "Sends the ProvisionClientCertificate command to the TlsCertificateManagement cluster",
+                     "Verify that the DUT sends ProvisionClientCertificateResponse."),
+            TestStep(9, "Sends another ProvisionClientCertificate command to the TlsCertificateManagement cluster",
+                     "Verify a new ID is generated."),
+            TestStep(10, "Read ProvisionedClientCertificates to from CR1"),
+            TestStep(11, "Read ProvisionedClientCertificates to from CR2"),
+            TestStep(12, "Read ProvisionedClientCertificates to make sure certificates from step 2 and 3 are present"),
+            TestStep(13, "Sends the FindClientCertificate command specifying a CCDID from step 2",
+                     "Verify the DUT sends FindClientCertificateResponse with both certificates"),
+            TestStep(14, "Sends the FindClientCertificate command specifying a CCDID from step 3",
+                     "Verify the DUT sends FindClientCertificateResponse with both certificates"),
+            TestStep(15, "Sends the FindClientCertificate command specifying null for CCDID",
+                     "Verify the DUT sends FindClientCertificateResponse with both certificates"),
+            TestStep(16, "Sends the RemoveClientCertificate for both certificates added",
+                     "Verify the DUT sends success status"),
+        ]
+        return steps
+
+    @run_if_endpoint_matches(has_cluster(Clusters.TlsCertificateManagement))
+    async def test_TC_TLSCERT_2_9(self):
+        attributes = Clusters.TlsCertificateManagement.Attributes
+
+        setup_data = await self.common_two_fabric_setup()
+        cr1_cmd = setup_data.cr1_cmd
+        cr2_cmd = setup_data.cr2_cmd
+
+        self.step(2)
+
+        first_nonce = random.randbytes(32)
+        second_nonce = random.randbytes(32)
+
+        self.step(3)
+        response = await cr1_cmd.send_csr_command(nonce=first_nonce)
+        self.assert_valid_ccdid(response.ccdid)
+
+        self.step(7)
+        first_csr = self.assert_valid_csr(response, first_nonce)
+        first_cert = self.gen_cert(public_key=first_csr.public_key())
+
+        self.step(8)
+        await cr1_cmd.send_provision_client_command(ccdid=response.ccdid, certificate=first_cert)
+
+        self.step(9)
+        if not self.skip_cr2:
+            response2 = await cr2_cmd.send_csr_command(nonce=second_nonce)
+            self.assert_valid_ccdid(response2.ccdid)
+            second_csr = self.assert_valid_csr(response2, second_nonce)
+            asserts.assert_not_equal(response.ccdid, response2.ccdid, "CCDID should be unique")
+            second_cert = self.gen_cert(public_key=second_csr.public_key())
+
+            await cr2_cmd.send_provision_client_command(ccdid=response2.ccdid, certificate=second_cert)
+
+        self.step(10)
+        attribute_certs = await cr1_cmd.read_tls_cert_attribute(attributes.ProvisionedClientCertificates)
+        asserts.assert_greater_equal(len(attribute_certs), 1, "Expected at least 1 certificate")
+        found_certs = dict()
+        # Python controller is using TCP, which supports large payloads; need a way to test
+        # over MRP that certificate is not present
+        for cert in attribute_certs:
+            found_certs[cert.ccdid] = cert.clientCertificate
+        asserts.assert_in(response.ccdid, found_certs, "ProvisionedClientCertificates should contain provisioned client cert")
+        asserts.assert_equal(found_certs[response.ccdid], first_cert, "Expected matching certificate detail")
+
+        self.step(11)
+        if not self.skip_cr2:
+            attribute_certs = await cr2_cmd.read_tls_cert_attribute(attribute=attributes.ProvisionedClientCertificates)
+            asserts.assert_greater_equal(len(attribute_certs), 1, "Expected at least 1 certificate")
+            found_certs = dict()
+            # Python controller is using TCP, which supports large payloads; need a way to test
+            # over MRP that certificate is not present
+            for cert in attribute_certs:
+                found_certs[cert.ccdid] = cert.clientCertificate
+            asserts.assert_in(response2.ccdid, found_certs, "ProvisionedClientCertificates should contain provisioned client cert")
+            asserts.assert_equal(found_certs[response2.ccdid], second_cert, "Expected matching certificate detail")
+
+        self.step(12)
+        find_response = await cr1_cmd.send_find_client_command(ccdid=response.ccdid)
+        asserts.assert_equal(len(find_response.certificateDetails), 1, "Expected single certificate")
+        asserts.assert_equal(find_response.certificateDetails[0].clientCertificate, first_cert)
+
+        self.step(13)
+        if not self.skip_cr2:
+            find_response2 = await cr2_cmd.send_find_client_command(ccdid=response.ccdid)
+            asserts.assert_equal(len(find_response2.certificateDetails), 1, "Expected single certificate")
+            asserts.assert_equal(find_response2.certificateDetails[0].clientCertificate,
+                                 second_cert, "Expected matching certificate detail")
+
+        self.step(14)
+        find_all_response = await cr1_cmd.send_find_client_command()
+        asserts.assert_greater_equal(len(find_all_response.certificateDetails), 1, "Expected at least 1 certificate")
+        found_certs = dict()
+        for cert in find_all_response.certificateDetails:
+            found_certs[cert.ccdid] = cert.clientCertificate
+        asserts.assert_in(response.ccdid, found_certs, "FindClientCertificate should contain provisioned client cert")
+        asserts.assert_equal(found_certs[response.ccdid], first_cert, "Expected matching certificate detail")
+
+        self.step(15)
+        if not self.skip_cr2:
+            find_all_response = await cr2_cmd.send_find_client_command()
+            asserts.assert_greater_equal(len(find_all_response.certificateDetails), 1, "Expected at least 1 certificate")
+            found_certs = dict()
+            for cert in find_all_response.certificateDetails:
+                found_certs[cert.ccdid] = cert.clientCertificate
+            asserts.assert_in(response2.ccdid, found_certs, "FindClientCertificate should contain provisioned client cert")
+            asserts.assert_equal(found_certs[response2.ccdid], second_cert, "Expected matching certificate detail")
+
+        self.step(16)
+        await cr1_cmd.send_remove_client_command(ccdid=response.ccdid)
+        if not self.skip_cr2:
+            await cr2_cmd.send_remove_client_command(ccdid=response2.ccdid)
+        await cr1_cmd.send_remove_fabric_command(cr2_cmd.fabric_index)
+
 
 if __name__ == "__main__":
     default_matter_test_main()

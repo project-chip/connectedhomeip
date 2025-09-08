@@ -22,6 +22,7 @@
 #include <stdlib.h>
 
 using namespace chip;
+using namespace chip::app::DataModel;
 using namespace chip::app::Storage;
 using namespace chip::app::Storage::Data;
 using namespace chip::app::Clusters::Tls;
@@ -642,6 +643,8 @@ CHIP_ERROR CertificateTableImpl::PrepareClientCertificate(FabricIndex fabric, co
 
     ClientCertWithKey certWithKey;
     certWithKey.detail.ccdid = localId;
+    certWithKey.detail.clientCertificate.SetValue(Nullable<ByteSpan>());
+
     keyPair.Serialize(certWithKey.key);
     CertificateId certId(localId);
     return mClientCertificates.SetTableEntry(fabric, certId, certWithKey, buffer);
