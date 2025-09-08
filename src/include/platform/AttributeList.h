@@ -129,13 +129,13 @@ inline typename AttributeList<T, N>::Iterator & AttributeList<T, N>::Iterator::o
 template <typename T, size_t N>
 inline bool AttributeList<T, N>::Iterator::operator!=(const AttributeList<T, N>::Iterator & other) const
 {
-    return mIndex != other.mIndex;
+    return !(*this == other);
 }
 
 template <typename T, size_t N>
 inline bool AttributeList<T, N>::Iterator::operator==(const AttributeList<T, N>::Iterator & other) const
 {
-    return mIndex == other.mIndex;
+    return mAttributeListPtr == other.mAttributeListPtr && mIndex == other.mIndex;;
 }
 
 } // namespace DeviceLayer
