@@ -16,7 +16,6 @@
 #
 
 
-import asyncio
 import logging
 
 from mobly import asserts
