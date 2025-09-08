@@ -354,7 +354,7 @@ class TC_SETRF_3_1(CommodityTariffTestBaseHelper):
                                 - Verify that PowerThresholdSource field has PowerThresholdSourceEnum type. Value has to be between a range of 0 - 2."""),
             TestStep("40", "TH reads from the DUT the NextTariffComponents attribute.", """
                      - If tariffInfoValue equals null, Verify that the DUT response contains a null;
-                     - If tariffInfoValue does NOT equal null, Verify that the DUT response contains a null or a value that is a list  of  TariffComponentStruct entries  with  list  length  less  or equal 20;
+                     - If tariffInfoValue does NOT equal null, Verify that the DUT response contains a null or a value that is a list of TariffComponentStruct entries with list length less or equal 20;
                      - The value does NOT match the nextTariffComponentsValue;
                      - For each entry:
                         - Verify that TariffComponentID field has uint32 type;
