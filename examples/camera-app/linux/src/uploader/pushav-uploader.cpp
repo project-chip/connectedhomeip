@@ -17,17 +17,139 @@
  */
 
 #include "pushav-uploader.h"
+#include <cstring>
 #include <fstream>
+#include <iomanip>
 #include <iostream>
 #include <lib/support/logging/CHIPLogging.h>
+#include <openssl/bio.h>
+#include <openssl/pem.h>
+#include <openssl/x509.h>
+#include <vector>`
 
-PushAVUploader::PushAVUploader(PushAVCertPath certPath, PushAVCertBuffer certBuffer) :
-    mCertPath(certPath), mCertBuffer(certBuffer), mIsRunning(false)
-{}
+PushAVUploader::PushAVUploader() : mIsRunning(false) {}
 
 PushAVUploader::~PushAVUploader()
 {
     Stop();
+}
+
+// Helper function to convert certificate from DER format to PEM format
+std::string DerCertToPem(const std::vector<uint8_t> & derData)
+{
+    const unsigned char * p = derData.data();
+    X509 * cert             = d2i_X509(nullptr, &p, derData.size());
+    if (!cert)
+    {
+        ChipLogError(Camera, "Failed to parse DER certificate");
+    }
+
+    BIO * bio = BIO_new(BIO_s_mem());
+    if (!bio)
+    {
+        X509_free(cert);
+        ChipLogError(Camera, "Failed to allocate BIO");
+    }
+
+    if (!PEM_write_bio_X509(bio, cert))
+    {
+        BIO_free(bio);
+        X509_free(cert);
+        ChipLogError(Camera, "Failed to write PEM certificate");
+    }
+
+    BUF_MEM * bptr;
+    BIO_get_mem_ptr(bio, &bptr);
+    std::string pem(bptr->data, bptr->length);
+
+    BIO_free(bio);
+    X509_free(cert);
+
+    return pem;
+}
+
+// Helper function to convert vector of bytes to hex string representation
+std::string vectorToHexString(const std::vector<uint8_t> & vec)
+{
+    std::ostringstream oss;
+    for (size_t i = 0; i < vec.size(); ++i)
+    {
+        oss << std::hex << std::setw(2) << std::setfill('0') << static_cast<int>(vec[i]);
+        if ((i + 1) % 16 == 0)
+        {
+            oss << "\n";
+        }
+        else if (i != vec.size() - 1)
+        {
+            oss << " ";
+        }
+    }
+    return oss.str();
+}
+
+// Helper function to convert RSA private key from DER format to PEM format
+std::string ConvertRSAPrivateKey_DER_to_PEM(const std::vector<uint8_t> & derData)
+{
+    const unsigned char * p = derData.data();
+
+    // Parse DER into RSA structure
+    RSA * rsa = d2i_RSAPrivateKey(nullptr, &p, derData.size());
+    if (!rsa)
+    {
+        ChipLogError(Camera, "Failed to parse DER RSA private key");
+        return "";
+    }
+
+    // Write PEM to memory BIO
+    BIO * bio = BIO_new(BIO_s_mem());
+    if (!PEM_write_bio_RSAPrivateKey(bio, rsa, nullptr, nullptr, 0, nullptr, nullptr))
+    {
+        ChipLogError(Camera, "Failed to convert to PEM format") BIO_free(bio);
+        RSA_free(rsa);
+        return "";
+    }
+
+    // Extract PEM string
+    char * pemData = nullptr;
+    long pemLen    = BIO_get_mem_data(bio, &pemData);
+    std::string pemStr(pemData, pemLen);
+
+    BIO_free(bio);
+    RSA_free(rsa);
+
+    return pemStr;
+}
+
+// Helper function to read and print file content to log
+std::string readAndPrintFile(const std::string & filePath)
+{
+    std::ifstream file(filePath, std::ios::binary);
+    if (!file.is_open())
+    {
+        ChipLogDetail(Camera, "Failed to open file: %s", filePath.c_str());
+        return "";
+    }
+
+    // Read the entire file content
+    std::string fileContent((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
+
+    // Print the file content
+    ChipLogDetail(Camera, "File:%s", filePath.c_str());
+    ChipLogDetail(Camera, "Content:%s", fileContent.c_str());
+
+    file.close();
+    return fileContent;
+}
+
+void SaveCertToFile(const std::string & certData, const std::string & filePath)
+{
+    std::ofstream out(filePath, std::ios::binary);
+    if (!out)
+    {
+        ChipLogDetail(Camera, "Failed to open file: %s", filePath.c_str());
+    }
+    out.write(certData.data(), certData.size());
+    out.close();
 }
 
 void PushAVUploader::ProcessQueue()
@@ -163,14 +285,40 @@ void PushAVUploader::UploadData(std::pair<std::string, std::string> data)
     curl_easy_setopt(curl, CURLOPT_SSL_VERIFYHOST, 2L);
     curl_easy_setopt(curl, CURLOPT_INFILESIZE_LARGE, static_cast<curl_off_t>(size));
 #ifdef TLS_CLUSTER_ENABLED
-    curl_blob rootBlob   = { mCertBuffer.mRootCertBuffer.data(), mCertBuffer.mRootCertBuffer.size(), CURL_BLOB_COPY };
-    curl_blob clientBlob = { mCertBuffer.mClientCertBuffer.data(), mCertBuffer.mClientCertBuffer.size(), CURL_BLOB_COPY };
-    curl_blob keyBlob    = { mCertBuffer.mClientKeyBuffer.data(), mCertBuffer.mClientKeyBuffer.size(), CURL_BLOB_COPY };
 
-    curl_easy_setopt(curl, CURLOPT_CAINFO_BLOB, &rootBlob);
-    curl_easy_setopt(curl, CURLOPT_SSLCERT_BLOB, &clientBlob);
-    curl_easy_setopt(curl, CURLOPT_SSLKEY_BLOB, &keyBlob);
+    // TODO: The logic to provide DER-formatted certificates and keys in memory (blob) format to curl is currently unstable. As a
+    // temporary workaround, PEM-format files are being provided as input to curl.
+
+    auto rootCertPEM           = derCertToPem(mCertBuffer.mRootCertBuffer);
+    auto clientCertPEM         = derCertToPem(mCertBuffer.mClientCertBuffer);
+    std::string derKeyToPemstr = ConvertRSAPrivateKey_DER_to_PEM(mCertBuffer.mClientKeyBuffer);
+
+    SaveCertToFile(rootCertPEM, "  /tmp/root.pem");
+    SaveCertToFile(clientCertPEM, "/tmp/dev.pem");
+
+    // Logic to save DER format to file
+    std::string key(mCertBuffer.mClientKeyBuffer.begin(), mCertBuffer.mClientKeyBuffer.end());
+    SaveCertToFile(key, "/tmp/dev.key");
+
+    // Logic to save PEM format to file
+    // SaveCertToFile(derKeyToPemstr, "/tmp/dev.key");
+
+    curl_easy_setopt(curl, CURLOPT_CAINFO, " /tmp/root.pem");
+    curl_easy_setopt(curl, CURLOPT_SSLCERT, "/tmp/dev.pem");
+    curl_easy_setopt(curl, CURLOPT_SSLKEY, " /tmp/dev.key");
+    curl_easy_setopt(curl, CURLOPT_SSLKEYTYPE, "DER"); // Required when key is given in DER format
+
+    //  curl_blob rootBlob   = { mCertBuffer.mRootCertBuffer.data(), mCertBuffer.mRootCertBuffer.size(), CURL_BLOB_COPY };
+    //  curl_blob clientBlob = { mCertBuffer.mClientCertBuffer.data(), mCertBuffer.mClientCertBuffer.size(), CURL_BLOB_COPY };
+    //  curl_blob keyBlob    = { mCertBuffer.mClientKeyBuffer.data(), mCertBuffer.mClientKeyBuffer.size(), CURL_BLOB_COPY };
+
+    // curl_easy_setopt(curl, CURLOPT_CAINFO_BLOB, &rootBlob);
+    // curl_easy_setopt(curl, CURLOPT_SSLCERT_BLOB, &clientBlob);
+    // curl_easy_setopt(curl, CURLOPT_SSLCERTTYPE, "DER");
+    // curl_easy_setopt(curl, CURLOPT_SSLKEY_BLOB, &keyBlob);
+    // curl_easy_setopt(curl, CURLOPT_SSLKEYTYPE, "DER");
 #else
+    // TODO: The else block is for testing purpose. It should be removed once the TLS cluster integration is stable.
     curl_easy_setopt(curl, CURLOPT_CAINFO, mCertPath.mRootCert.c_str());
     curl_easy_setopt(curl, CURLOPT_SSLCERT, mCertPath.mDevCert.c_str());
     curl_easy_setopt(curl, CURLOPT_SSLKEY, mCertPath.mDevKey.c_str());

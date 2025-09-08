@@ -31,7 +31,7 @@ public:
             ChipLogError(Zcl, "Push AV Stream Transport : Trying to set delegate to null");
             return;
         }
-        mDelegate->SetEndpointId(aEndpoint);
+
         mDelegate->SetOnRecorderStartedCallback(
             [this](uint16_t connectionID, PushAvStreamTransport::TransportTriggerTypeEnum triggerType) {
                 GeneratePushTransportBeginEvent(connectionID, triggerType,
@@ -54,7 +54,7 @@ public:
         mOnRecorderStartedCb = std ::move(cb);
     }
 
-    void SetTLSClientManagementDelegate(EndpointId aEndpoint, TlsClientManagementDelegate * delegate)
+    void SetTLSClientManagementDelegate(TlsClientManagementDelegate * delegate)
     {
         mTLSClientManagementDelegate = delegate;
         if (mTLSClientManagementDelegate == nullptr)

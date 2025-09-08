@@ -137,8 +137,10 @@ PushAvStreamTransportManager::AllocatePushTransport(const TransportOptionsStruct
     }
 
 #ifdef TLS_CLUSTER_ENABLED
+    ChipLogDetail(Camera, "PushAvStreamTransportManager: TLS Cluster enabled, using default certs");
     mTransportMap[connectionID].get()->SetTLSCert(bufferRootCert, bufferClientCert, bufferClientCertKey);
 #else
+    // TODO: The else block is for testing purpose. It should be removed once the TLS cluster integration is stable.
     mTransportMap[connectionID].get()->SetTLSCertPath("/tmp/pavstest/certs/server/root.pem", "/tmp/pavstest/certs/device/dev.pem",
                                                       "/tmp/pavstest/certs/device/dev.key");
 #endif
@@ -168,6 +170,7 @@ PushAvStreamTransportManager::ModifyPushTransport(const uint16_t connectionID, c
         ChipLogError(Camera, "PushAvStreamTransportManager, failed to find Connection :[%u]", connectionID);
         return Status::NotFound;
     }
+
     double newTransportBandwidthMbps = 0.0;
     GetBandwidthForStreams(transportOptions.videoStreamID, transportOptions.audioStreamID, newTransportBandwidthMbps);
 
@@ -175,6 +178,7 @@ PushAvStreamTransportManager::ModifyPushTransport(const uint16_t connectionID, c
 
     mTransportMap[connectionID].get()->SetCurrentlyUsedBandwidthMbps(newTransportBandwidthMbps);
     mTotalUsedBandwidthMbps += newTransportBandwidthMbps;
+
     ChipLogDetail(Camera,
                   "AllocatePushTransport: Transport for connection %u allocated successfully. "
                   "New transport bandwidth: %.2f Mbps. Total used bandwidth: %.2f Mbps.",
@@ -409,18 +413,6 @@ Protocols::InteractionModel::Status PushAvStreamTransportManager::SelectAudioStr
     return Status::Failure;
 }
 
-void PushAvStreamTransportManager::SetOnRecorderStoppedCallback(
-    std::function<void(uint16_t, PushAvStreamTransport::TransportTriggerTypeEnum)> cb)
-{
-    mOnRecorderStoppedCb = std::move(cb);
-}
-
-void PushAvStreamTransportManager::SetOnRecorderStartedCallback(
-    std::function<void(uint16_t, PushAvStreamTransport::TransportTriggerTypeEnum)> cb)
-{
-    mOnRecorderStartedCb = std::move(cb);
-}
-
 Protocols::InteractionModel::Status PushAvStreamTransportManager::ValidateZoneId(uint16_t zoneId)
 {
     if (mCameraDevice == nullptr)
@@ -527,6 +519,16 @@ PushAvStreamTransportManager::PersistentAttributesLoadedCallback()
     return CHIP_NO_ERROR;
 }
 
+void PushAvStreamTransportManager::SetOnRecorderStoppedCallback(
+    std::function<void(uint16_t, PushAvStreamTransport::TransportTriggerTypeEnum)> cb)
+{
+    mOnRecorderStoppedCb = std::move(cb);
+}
+void PushAvStreamTransportManager::SetOnRecorderStartedCallback(
+    std::function<void(uint16_t, PushAvStreamTransport::TransportTriggerTypeEnum)> cb)
+{
+    mOnRecorderStartedCb = std::move(cb);
+}
 void PushAvStreamTransportManager::OnZoneTriggeredEvent(u_int16_t zoneId)
 {
     for (auto & pavst : mTransportMap)

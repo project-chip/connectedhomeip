@@ -199,23 +199,6 @@ public:
     virtual Protocols::InteractionModel::Status ValidateVideoStream(uint16_t videoStreamId) = 0;
 
     /**
-     * @brief Validates that the zone corresponding to zoneId exists.
-     *
-     * @param zoneId Identifier for the requested zone
-     * @return Status::Success if zone exists;
-     *         Status::InvalidZone if no zone with zoneId exists
-     */
-    virtual Protocols::InteractionModel::Status ValidateZoneId(uint16_t zoneId) = 0;
-
-    /**
-     * @brief Validates size of motion zone List.
-     *
-     * @param zoneSize Size for the requested zone list
-     * @return true if URL is valid, false otherwise
-     */
-    virtual bool ValidateMotionZoneSize(uint16_t zoneSize) = 0;
-
-    /**
      * @brief Validates that the audio stream corresponding to audioStreamID is allocated.
      *
      * @param audioStreamId Identifier for the requested audio stream
@@ -285,11 +268,9 @@ public:
 
     virtual void
     SetOnRecorderStartedCallback(std::function<void(uint16_t, PushAvStreamTransport::TransportTriggerTypeEnum)> cb) = 0;
-    virtual void SetTLSCerts(Tls::CertificateTable::BufferedClientCert clientCertEntry,
-                             Tls::CertificateTable::BufferedRootCert rootCertEntry)                                 = 0;
 
-protected:
-    EndpointId mEndpointId = kInvalidEndpointId;
+    virtual void SetTLSCerts(Tls::CertificateTable::BufferedClientCert & clientCertEntry,
+                             Tls::CertificateTable::BufferedRootCert & rootCertEntry) = 0;
 };
 } // namespace Clusters
 } // namespace app

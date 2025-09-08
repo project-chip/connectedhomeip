@@ -157,6 +157,8 @@ private:
     VideoInfoStruct mVideoInfo; ///< Video stream parameters
     /// @}
 
+    std::function<void()> mOnStopCallback;
+
     AVFormatContext * mFormatContext;
     AVFormatContext * mInputFormatContext;
     AVStream * mVideoStream;
@@ -168,8 +170,6 @@ private:
 
     std::queue<AVPacket *> mAudioQueue;
     std::queue<AVPacket *> mVideoQueue;
-
-    std::function<void()> mOnStopCallback;
 
     int mAudioFragment           = 1;
     int mVideoFragment           = 1;

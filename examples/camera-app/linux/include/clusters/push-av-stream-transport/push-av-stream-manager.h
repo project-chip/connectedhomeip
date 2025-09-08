@@ -21,7 +21,10 @@
 #include <app/clusters/push-av-stream-transport-server/push-av-stream-transport-cluster.h>
 #include <app/clusters/tls-certificate-management-server/tls-certificate-management-server.h>
 #include <camera-device-interface.h>
+#include <credentials/CHIPCert.h>
+#include <crypto/CHIPCryptoPAL.h>
 #include <functional>
+#include <iomanip>
 #include <media-controller.h>
 #include <pushav-transport.h>
 #include <unordered_map>
@@ -48,6 +51,7 @@ class PushAvStreamTransportManager : public PushAvStreamTransportDelegate
 public:
     PushAvStreamTransportManager() = default;
     ~PushAvStreamTransportManager();
+
     void Init();
     void SetMediaController(MediaController * mediaController);
     void SetCameraDevice(CameraDeviceInterface * cameraDevice);
@@ -70,19 +74,24 @@ public:
         const uint16_t connectionID, TriggerActivationReasonEnum activationReason,
         const Optional<Structs::TransportMotionTriggerTimeControlStruct::DecodableType> & timeControl) override;
 
-    void SetTLSCerts(Tls::CertificateTable::BufferedClientCert clientCertEntry,
-                     Tls::CertificateTable::BufferedRootCert rootCertEntry) override
+    void SetTLSCerts(Tls::CertificateTable::BufferedClientCert & clientCertEntry,
+                     Tls::CertificateTable::BufferedRootCert & rootCertEntry) override
+
     {
-
         auto rootSpan = rootCertEntry.GetCert().certificate.Value();
-        bufferRootCert.assign(rootSpan.data(), rootSpan.data() + rootSpan.size());
-
+        mBufferRootCert.assign(rootSpan.data(), rootSpan.data() + rootSpan.size());
         auto clientSpan = clientCertEntry.GetCert().clientCertificate.Value();
-        bufferClientCert.assign(clientSpan.data(), clientSpan.data() + clientSpan.size());
 
-        auto * clientKeyPtr = clientCertEntry.mCertWithKey.key.Bytes();
-        auto clientKeyLen   = clientCertEntry.mCertWithKey.key.Length();
-        bufferClientCertKey.assign(clientKeyPtr, clientKeyPtr + clientKeyLen);
+        mBufferClientCert.assign(clientSpan.data(), clientSpan.data() + clientSpan.size());
+        uint8_t buffer[Credentials::kP256ECPrivateKeyDERLength];
+
+        MutableByteSpan keypairDer(buffer);
+        Credentials::ConvertECDSAKeypairRawToDER(clientCertEntry.mCertWithKey.key, keypairDer);
+        mBufferClientCertKey.assign(keypairDer.data(), keypairDer.data() + keypairDer.size());
+
+        // TODO: Handle Intermediate certificates and use for chain validation if needed. For now just log it.
+        ChipLogError(Camera, "Intermediate certificate size %b",
+                     clientCertEntry.mCertWithKey.detail.intermediateCertificates.HasValue());
     }
 
     bool ValidateUrl(const std::string & url) override;
@@ -132,9 +141,9 @@ private:
     std::function<void(uint16_t, PushAvStreamTransport::TransportTriggerTypeEnum)> mOnRecorderStoppedCb;
     std::function<void(uint16_t, PushAvStreamTransport::TransportTriggerTypeEnum)> mOnRecorderStartedCb;
 
-    std::vector<uint8_t> bufferRootCert;
-    std::vector<uint8_t> bufferClientCert;
-    std::vector<uint8_t> bufferClientCertKey;
+    std::vector<uint8_t> mBufferRootCert;
+    std::vector<uint8_t> mBufferClientCert;
+    std::vector<uint8_t> mBufferClientCertKey;
 
     /**
      * @brief Calculates the total bandwidth in Mbps for the given video and audio stream IDs.

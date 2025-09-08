@@ -49,7 +49,7 @@ public:
         std::vector<uint8_t> mClientKeyBuffer;
     } PushAVCertBuffer;
 
-    PushAVUploader(PushAVCertPath certPath, PushAVCertBuffer certBuffer);
+    PushAVUploader();
     ~PushAVUploader();
 
     void Start();
@@ -60,6 +60,9 @@ public:
         std::lock_guard<std::mutex> lock(mQueueMutex);
         return mAvData.size();
     }
+
+    void setCertificateBuffer(const PushAVCertBuffer & certBuffer) { mCertBuffer = certBuffer; }
+    void setCertificatePath(const PushAVCertPath & certPath) { mCertPath = certPath; }
 
 private:
     void ProcessQueue();

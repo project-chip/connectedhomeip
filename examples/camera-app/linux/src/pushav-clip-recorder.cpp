@@ -248,10 +248,6 @@ void PushAVClipRecorder::Stop()
             av_packet_free(&mAudioQueue.front());
             mAudioQueue.pop();
         }
-        if (mOnStopCallback)
-        {
-            mOnStopCallback();
-        }
     }
     else
     {

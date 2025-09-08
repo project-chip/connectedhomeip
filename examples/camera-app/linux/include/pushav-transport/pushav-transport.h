@@ -70,7 +70,6 @@ public:
 
     void TriggerTransport(chip::app::Clusters::PushAvStreamTransport::TriggerActivationReasonEnum activationReason, int zoneId = -1,
                           int senstivity = 5);
-
     // Get Transport status
     bool GetTransportStatus()
     {
@@ -108,6 +107,7 @@ public:
     {
         mCurrentlyUsedBandwidthMbps = currentlyUsedBandwidthMbps;
     }
+
     double GetCurrentlyUsedBandwidthMbps() { return mCurrentlyUsedBandwidthMbps; }
 
 private:
@@ -121,8 +121,8 @@ private:
     PushAVClipRecorder::VideoInfoStruct mVideoInfo;
     PushAVUploader::PushAVCertPath mCertPath;
     PushAVUploader::CertificatesInfo mCertBuffer;
-    AudioStreamStruct audioStreamParams;
-    VideoStreamStruct videoStreamParams;
+    AudioStreamStruct mAudioStreamParams;
+    VideoStreamStruct mVideoStreamParams;
     std::vector<std::pair<uint16_t, uint8_t>> mZoneSensitivityList;
     std::function<void()> mOnRecorderStoppedCb;
     std::function<void()> mOnStartCallback;
