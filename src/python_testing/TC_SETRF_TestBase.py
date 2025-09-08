@@ -61,7 +61,7 @@ class CommodityTariffTestBaseHelper(MatterBaseTest):
     nextDayEntryDateValue: int = None
 
     # Fields
-    BlockModeValue: cluster.Enums.BlockModeEnum = None
+    blockModeValue: cluster.Enums.BlockModeEnum = None
 
     # Other
     dayEntryIDsEvents: List[int] = []
@@ -362,7 +362,7 @@ class CommodityTariffTestBaseHelper(MatterBaseTest):
 
         # checks Threshold field must be int64 or null
         # All Threshold fields on TariffComponentStruct in a tariff whose BlockMode field is set to NoBlock SHALL be null.
-        if self.BlockModeValue == 0:
+        if self.blockModeValue == 0:
             asserts.assert_equal(struct.threshold, NullValue, "Threshold field must be Null if BlockMode is 0.")
         else:
             if struct.threshold is not NullValue:
@@ -415,7 +415,7 @@ class CommodityTariffTestBaseHelper(MatterBaseTest):
         if struct.blockMode is not NullValue:
             matter_asserts.assert_valid_enum(
                 struct.blockMode, "BlockMode attribute must return a BlockModeEnum", cluster.Enums.BlockModeEnum)
-            self.BlockModeValue = struct.blockMode
+            self.blockModeValue = struct.blockMode
 
     async def checkTariffPeriodStruct(self,
                                       struct: Clusters.CommodityTariff.Structs.TariffPeriodStruct = None) -> None:
