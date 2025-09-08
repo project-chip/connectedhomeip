@@ -93,7 +93,7 @@ class TC_SETRF_2_3(CommodityTariffTestBaseHelper):
                         - If Date field value equals dateCurrentValue, verify that Date field value is unique in the entries list, DayType field value equals dayTypeCurrentValue and DayEntryIDs field value equals dayEntryIDsCurrentValue."""),
             TestStep("7a", "If dayTypeCurrentValue does NOT equal 3 (Event), TH reads from the DUT the CalendarPeriods attribute.", """
                      - Verify that the DUT response contains a value that is a list of CalendarPeriodStruct entries with list length in range 1 - 4;
-                     - Check the list in revers order and store DayPatternIDs field value as dayPatternIDsCurrentValue for the first entity that fits the condition:
+                     - Check the list in reverse order and store DayPatternIDs field value as dayPatternIDsCurrentValue for the first entity that fits the condition:
                         - StartDate field value is less than currentDayEntryDateValue."""),
             TestStep("7b", "TH reads from the DUT the DayPatterns attribute.", """
                      - Verify that the DUT response contains a value that is a list of DayPatternStruct entries with list length less or equal 28;
