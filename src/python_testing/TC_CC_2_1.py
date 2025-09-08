@@ -39,12 +39,14 @@ import logging
 from enum import Enum
 from typing import Optional
 
-import chip.clusters as Clusters
-from chip.clusters import Attribute
-from chip.clusters import ClusterObjects as ClusterObjects
-from chip.testing import matter_asserts
-from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main, has_attribute
 from mobly import asserts
+
+import matter.clusters as Clusters
+from matter.clusters import Attribute
+from matter.clusters import ClusterObjects as ClusterObjects
+from matter.clusters.Types import NullValue
+from matter.testing import matter_asserts
+from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main, has_attribute
 
 logger = logging.getLogger(__name__)
 
@@ -173,7 +175,7 @@ class TC_CC_2_1(MatterBaseTest):
                 logger.warning(f"PrimaryN<X,Y,Intensity> with index {pindex} was not found in the cluster.")
         return numberofprimaries
 
-    async def _verify_attribute(self, attribute: Attribute, data_type: ValueTypesEnum, enum_range: Optional[list] = None, min_len: Optional[int] = None, max_len: Optional[int] = None):
+    async def _verify_attribute(self, attribute: Attribute, data_type: ValueTypesEnum, enum_range: Optional[list] = None, min_len: Optional[int] = None, max_len: Optional[int] = None, nullable: bool = False):
         """Verify the attribute exists and value is the specific type of value.
 
         Args:
@@ -190,6 +192,9 @@ class TC_CC_2_1(MatterBaseTest):
             # it is so retrieve the value to check the type.
             attr_val = await self.read_single_attribute_check_success(cluster=self.cluster, attribute=attribute, endpoint=self.endpoint)
             logger.info(f"Current value for {attribute} is {attr_val}")
+            if nullable and attr_val is NullValue:
+                logger.info("Value is NULL (ok)")
+                return attr_val
             if data_type == ValueTypesEnum.UINT8:
                 logger.info("Checking is uint8")
                 matter_asserts.assert_valid_uint8(attr_val, "Is not uint8")
@@ -317,7 +322,7 @@ class TC_CC_2_1(MatterBaseTest):
         # Manual check
         if await self.attribute_guard(endpoint=self.endpoint, attribute=self.attributes.StartUpColorTemperatureMireds):
             sctmr_val = await self.read_single_attribute_check_success(cluster=self.cluster, endpoint=self.endpoint, attribute=self.attributes.StartUpColorTemperatureMireds)
-            asserts.assert_true(sctmr_val is None or (sctmr_val >= 1) and (sctmr_val <= 65279), "Value is out of range.")
+            asserts.assert_true(sctmr_val is NullValue or ((sctmr_val >= 1) and (sctmr_val <= 65279)), "Value is out of range.")
 
         # NumberOfPrimaries will be used to verify Primary<n>[X|Y|Intensity]
         # Number of primaries cant be 0, it should be greater or equal than 1.
@@ -326,9 +331,9 @@ class TC_CC_2_1(MatterBaseTest):
 
         self.step(24)
         # Read NumberOfPrimaries from the cluster.
-        number_of_primaries_value = await self._verify_attribute(self.attributes.NumberOfPrimaries, ValueTypesEnum.UINT8, min_len=0, max_len=6)
-        if number_of_primaries_value == 0:
-            logger.info("NumberOfPrimaries is 0 skipping steps 25 through 42.")
+        number_of_primaries_value = await self._verify_attribute(self.attributes.NumberOfPrimaries, ValueTypesEnum.UINT8, min_len=0, max_len=6, nullable=True)
+        if number_of_primaries_value is NullValue or number_of_primaries_value == 0:
+            logger.info("NumberOfPrimaries is Null or 0 - skipping steps 25 through 42.")
             for i in range(25, 43):
                 self.skip_step(i)
         else:
@@ -359,7 +364,7 @@ class TC_CC_2_1(MatterBaseTest):
                 await self._verify_attribute(getattr(self.attributes, f"Primary{primariesindex}Y"), ValueTypesEnum.UINT16, max_len=65279)
                 current_step += 1
                 self.step(current_step)
-                await self._verify_attribute(getattr(self.attributes, f"Primary{primariesindex}Intensity"), ValueTypesEnum.UINT8)
+                await self._verify_attribute(getattr(self.attributes, f"Primary{primariesindex}Intensity"), ValueTypesEnum.UINT8, nullable=True)
 
         # No more check numberofprimaries at this point
         self.step(43)
@@ -375,7 +380,7 @@ class TC_CC_2_1(MatterBaseTest):
         await self._verify_attribute(self.attributes.ColorPointRY, ValueTypesEnum.UINT16, max_len=65279)
 
         self.step(47)
-        await self._verify_attribute(self.attributes.ColorPointRIntensity, ValueTypesEnum.UINT8)
+        await self._verify_attribute(self.attributes.ColorPointRIntensity, ValueTypesEnum.UINT8, nullable=True)
 
         self.step(48)
         await self._verify_attribute(self.attributes.ColorPointGX, ValueTypesEnum.UINT16, max_len=65279)
@@ -384,7 +389,7 @@ class TC_CC_2_1(MatterBaseTest):
         await self._verify_attribute(self.attributes.ColorPointGY, ValueTypesEnum.UINT16, max_len=65279)
 
         self.step(50)
-        await self._verify_attribute(self.attributes.ColorPointGIntensity, ValueTypesEnum.UINT8)
+        await self._verify_attribute(self.attributes.ColorPointGIntensity, ValueTypesEnum.UINT8, nullable=True)
 
         self.step(51)
         await self._verify_attribute(self.attributes.ColorPointBX, ValueTypesEnum.UINT16, max_len=65279)
@@ -393,7 +398,7 @@ class TC_CC_2_1(MatterBaseTest):
         await self._verify_attribute(self.attributes.ColorPointBY, ValueTypesEnum.UINT16, max_len=65279)
 
         self.step(53)
-        await self._verify_attribute(self.attributes.ColorPointBIntensity, ValueTypesEnum.UINT8)
+        await self._verify_attribute(self.attributes.ColorPointBIntensity, ValueTypesEnum.UINT8, nullable=True)
 
 
 if __name__ == "__main__":

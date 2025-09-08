@@ -62,7 +62,9 @@ Davis, CA 95616, USA
     <revision revision="1" summary="Based on the ZCL Scenes Cluster, Updated the Cluster ID to 0x0062, the name to Scenes Management, removed the provisional status; Removed attributes SceneCount, CurrentScene, CurrentGroup, SceneValid, and NameSupport; Removed Explicit, TableSize and FabricScenes features; Removed EnhancedAddScene, EnhancedAddSceneResponse, EnhancedViewScene, EnhancedViewSceneResponse; TransitionTime field changed milliseconds in AddScene, ViewSceneResponse and RecallScene"/>
   </revisionHistory>
   <clusterIds>
-    <clusterId id="0x0062" name="Scenes Management"/>
+    <clusterId id="0x0062" name="Scenes Management">
+      <provisionalConform/>
+    </clusterId>
   </clusterIds>
   <classification hierarchy="base" role="application" picsCode="S" scope="Endpoint"/>
   <features>

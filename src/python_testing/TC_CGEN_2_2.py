@@ -41,12 +41,13 @@ import logging
 import random
 import time
 
-import chip.clusters as Clusters
-from chip import ChipDeviceCtrl
-from chip.exceptions import ChipStackException
-from chip.interaction_model import InteractionModelError
-from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from mobly import asserts
+
+import matter.clusters as Clusters
+from matter import ChipDeviceCtrl
+from matter.exceptions import ChipStackException
+from matter.interaction_model import InteractionModelError
+from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 
 logger = logging.getLogger(__name__)
 
@@ -98,13 +99,13 @@ class TC_CGEN_2_2(MatterBaseTest):
 
         Step 3: Sends an ArmFailSafe command to the DUT and verifies the response.
         Step 4: Reads the Breadcrumb attribute from the DUT and verifies its value.
-        Step 5: Generates a new CSR (Certificate Signing Request) to update the root certificate, 
+        Step 5: Generates a new CSR (Certificate Signing Request) to update the root certificate,
                 issues the new certificates, and adds the new root certificate to the DUT.
         Step 10: If is_first_run is False, repeats steps #3, #4 and #5 on step #10.
 
 
         Args:
-            failsafe_duration (int): The duration in seconds for which the failsafe remains active. 
+            failsafe_duration (int): The duration in seconds for which the failsafe remains active.
                                 This should be less than the DUT MaxCumulativeFailsafeSeconds
             is_first_run (bool): A flag to control whether the step should be executed or skipped.
 
@@ -225,11 +226,11 @@ class TC_CGEN_2_2(MatterBaseTest):
     def steps_TC_CGEN_2_2(self) -> list[TestStep]:
         steps = [
             TestStep(0, 'Commissioning, already done', is_commissioning=True),
-            TestStep(1, '''TH1 reads the TrustedRootCertificates attribute from the Node Operational Credentials cluster 
+            TestStep(1, '''TH1 reads the TrustedRootCertificates attribute from the Node Operational Credentials cluster
                      and saves the number of list items as numTrustedRootsOriginal.'''),
-            TestStep(2, '''TH1 reads the BasicCommissioningInfo attribute 
+            TestStep(2, '''TH1 reads the BasicCommissioningInfo attribute
                      and saves the MaxCumulativeFailsafeSeconds as maxFailsafe.'''),
-            TestStep('2a', '''The failsafe timer is set based on PIXIT.CGEN.FailsafeExpiryLengthSeconds if provided; 
+            TestStep('2a', '''The failsafe timer is set based on PIXIT.CGEN.FailsafeExpiryLengthSeconds if provided;
                      otherwise, it defaults to 20 seconds, ensuring flexibility and preventing delays in test execution.'''),
             TestStep('3-5', 'TH1 execute function run_steps_3_to_5 to run steps #3 through #5.'),
             TestStep(3, '''TH1 sends ArmFailSafe command to the DUT with ExpiryLengthSeconds field set to PIXIT.CGEN.FailsafeExpiryLengthSeconds
@@ -238,7 +239,7 @@ class TC_CGEN_2_2(MatterBaseTest):
             TestStep(5, '''TH1 generates a new TrustedRootCertificate that is different from the previously commissioned TrustedRootCertificate for TH1.
                      TH1 sends an AddTrustedRootCertificate command to the Node Operational Credentials cluster to install this new certificate.'''),
             TestStep(6, 'TH1 reads the TrustedRootCertificate attribute.'),
-            TestStep(7, '''TH1 sends an ArmFailSafe command to the DUT with ExpiryLengthSeconds field set to 1 and the Breadcrumb value as 2. 
+            TestStep(7, '''TH1 sends an ArmFailSafe command to the DUT with ExpiryLengthSeconds field set to 1 and the Breadcrumb value as 2.
                      TH1 then waits 1 seconds to ensure the failsafe timer has expired'''),
             TestStep('8-9', 'TH1 execute function run_steps_8_to_9 to run steps #8 through #9.'),
             TestStep(8, 'TH1 reads the TrustedRootCertificates attribute from the Node Operational Credentials cluster.'),
@@ -691,7 +692,7 @@ class TC_CGEN_2_2(MatterBaseTest):
         if self.is_pics_sdk_ci_only:
             # In CI environment, bypass the wait for the failsafe expiration to avoid unnecessary delays.
             logger.info(f'Step #38: {run_type} - Bypass steps from #38 onward ONLY in CI.')
-            self.skip_all_remaining_steps(39)
+            self.mark_all_remaining_steps_skipped(39)
             return
         else:
             t_start = time.time()

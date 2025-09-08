@@ -23,7 +23,7 @@
 # test-runner-runs:
 #   run1:
 #     app: ${CHIP_RVC_APP}
-#     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
+#     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json --app-pipe /tmp/sear_1_3_fifo
 #     script-args: >
 #       --storage-path admin_storage.json
 #       --commissioning-method on-network
@@ -31,7 +31,7 @@
 #       --passcode 20202021
 #       --PICS examples/rvc-app/rvc-common/pics/rvc-app-pics-values
 #       --endpoint 1
-#       --app-pipe_prefix /tmp/chip_rvc_fifo_
+#       --app-pipe /tmp/sear_1_3_fifo
 #       --json-arg PIXIT.SEAR.VALID_AREAS:'[7, 1234567]'
 #       --trace-to json:${TRACE_TEST_JSON}.json
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
@@ -41,9 +41,10 @@
 
 import logging
 
-import chip.clusters as Clusters
-from chip.testing.matter_testing import MatterBaseTest, async_test_body, default_matter_test_main
 from mobly import asserts
+
+import matter.clusters as Clusters
+from matter.testing.matter_testing import MatterBaseTest, async_test_body, default_matter_test_main
 
 
 class TC_SEAR_1_3(MatterBaseTest):

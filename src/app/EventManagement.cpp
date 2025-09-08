@@ -21,12 +21,12 @@
 #include <access/SubjectDescriptor.h>
 #include <app/EventManagement.h>
 #include <app/InteractionModelEngine.h>
-#include <app/RequiredPrivilege.h>
-#include <assert.h>
-#include <inttypes.h>
 #include <lib/core/TLVUtilities.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
+
+#include <cassert>
+#include <cinttypes>
 
 using namespace chip::TLV;
 
@@ -552,13 +552,15 @@ CHIP_ERROR EventManagement::CheckEventContext(EventLoadOutContext * eventLoadOut
 
     ReturnErrorOnFailure(ret);
 
+    DataModel::EventEntry eventInfo;
+    ReturnErrorOnFailure(InteractionModelEngine::GetInstance()->GetDataModelProvider()->EventInfo(path, eventInfo));
+
     Access::RequestPath requestPath{ .cluster     = event.mClusterId,
                                      .endpoint    = event.mEndpointId,
                                      .requestType = Access::RequestType::kEventReadRequest,
                                      .entityId    = event.mEventId };
-    Access::Privilege requestPrivilege = RequiredPrivilege::ForReadEvent(path);
     CHIP_ERROR accessControlError =
-        Access::GetAccessControl().Check(eventLoadOutContext->mSubjectDescriptor, requestPath, requestPrivilege);
+        Access::GetAccessControl().Check(eventLoadOutContext->mSubjectDescriptor, requestPath, eventInfo.readPrivilege);
     if (accessControlError != CHIP_NO_ERROR)
     {
         VerifyOrReturnError((accessControlError == CHIP_ERROR_ACCESS_DENIED) ||
@@ -857,6 +859,11 @@ CHIP_ERROR EventManagement::GenerateEvent(EventLoggingDelegate * eventPayloadWri
                                           EventNumber & generatedEventNumber)
 {
     return LogEvent(eventPayloadWriter, options, generatedEventNumber);
+}
+
+void EventManagement::ScheduleUrgentEventDeliverySync(std::optional<FabricIndex> fabricIndex)
+{
+    mpEventReporter->ScheduleUrgentEventDeliverySync(FromStdOptional(fabricIndex));
 }
 
 void CircularEventBuffer::Init(uint8_t * apBuffer, uint32_t aBufferLength, CircularEventBuffer * apPrev,

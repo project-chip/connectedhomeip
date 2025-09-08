@@ -22,6 +22,9 @@
 #include <app/ClusterStateCache.h>
 #include <app/OperationalSessionSetup.h>
 #include <controller/CommissioneeDeviceProxy.h>
+#if CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
+#include <controller/jcm/TrustVerification.h> // nogncheck
+#endif                                        // CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
 #include <credentials/attestation_verifier/DeviceAttestationDelegate.h>
 #include <credentials/attestation_verifier/DeviceAttestationVerifier.h>
 #include <crypto/CHIPCryptoPAL.h>
@@ -51,6 +54,7 @@ enum CommissioningStage : uint8_t
     kSendAttestationRequest,     ///< Send AttestationRequest (0x3E:0) command to the device
     kAttestationVerification,    ///< Verify AttestationResponse (0x3E:1) validity
     kAttestationRevocationCheck, ///< Verify Revocation Status of device's DAC chain
+    kJCMTrustVerification,       ///< Perform JCM trust verification steps
     kSendOpCertSigningRequest,   ///< Send CSRRequest (0x3E:4) command to the device
     kValidateCSR,                ///< Verify CSRResponse (0x3E:5) validity
     kGenerateNOCChain,           ///< TLV encode Node Operational Credentials (NOC) chain certs
@@ -84,7 +88,7 @@ enum CommissioningStage : uint8_t
     kRemoveWiFiNetworkConfig,         ///< Remove Wi-Fi network config.
     kRemoveThreadNetworkConfig,       ///< Remove Thread network config.
     kConfigureTCAcknowledgments,      ///< Send SetTCAcknowledgements (0x30:6) command to the device
-    kCleanup,                         ///< Call delegates with status, free memory, clear timers and state
+    kCleanup,                         ///< Call delegates with status, free memory, clear timers and state/
 };
 
 enum class ICDRegistrationStrategy : uint8_t
@@ -551,6 +555,18 @@ public:
         return *this;
     }
 
+#if CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
+    // Check for Joint Commissioning Method
+    Optional<bool> GetUseJCM() const { return mUseJCM; }
+
+    // Set the Joint Commissioning Method
+    CommissioningParameters & SetUseJCM(bool useJCM)
+    {
+        mUseJCM = MakeOptional(useJCM);
+        return *this;
+    }
+#endif // CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
+
     ICDRegistrationStrategy GetICDRegistrationStrategy() const { return mICDRegistrationStrategy; }
     CommissioningParameters & SetICDRegistrationStrategy(ICDRegistrationStrategy icdRegistrationStrategy)
     {
@@ -679,6 +695,8 @@ private:
     ICDRegistrationStrategy mICDRegistrationStrategy = ICDRegistrationStrategy::kIgnore;
     bool mCheckForMatchingFabric                     = false;
     Span<const app::AttributePathParams> mExtraReadPaths;
+
+    Optional<bool> mUseJCM;
 };
 
 struct RequestedCertificate
@@ -727,6 +745,9 @@ struct NetworkClusterInfo
 {
     EndpointId endpoint = kInvalidEndpointId;
     app::Clusters::NetworkCommissioning::Attributes::ConnectMaxTimeSeconds::TypeInfo::DecodableType minConnectionTime = 0;
+    // maxScanTime == 0 means we don't know; normal commissioning step timeouts
+    // will apply in that case.
+    app::Clusters::NetworkCommissioning::Attributes::ScanMaxTimeSeconds::TypeInfo::DecodableType maxScanTime = 0;
 };
 struct NetworkClusters
 {
@@ -838,6 +859,7 @@ public:
      * kSendAttestationRequest: AttestationResponse
      * kAttestationVerification: AttestationErrorInfo if there is an error
      * kAttestationRevocationCheck: AttestationErrorInfo if there is an error
+     * kJCMTrustVerification: JCMTrustVerificationError if there is an error
      * kSendOpCertSigningRequest: CSRResponse
      * kGenerateNOCChain: NocChain
      * kSendTrustedRootCert: None
@@ -856,7 +878,12 @@ public:
      */
     struct CommissioningReport
         : Variant<RequestedCertificate, AttestationResponse, CSRResponse, NocChain, OperationalNodeFoundData, ReadCommissioningInfo,
-                  AttestationErrorInfo, CommissioningErrorInfo, NetworkCommissioningStatusInfo, TimeZoneResponseInfo>
+                  AttestationErrorInfo, CommissioningErrorInfo, NetworkCommissioningStatusInfo, TimeZoneResponseInfo
+#if CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
+                  ,
+                  JCM::TrustVerificationError
+#endif // CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
+                  >
     {
         CommissioningReport() : stageCompleted(CommissioningStage::kError) {}
         CommissioningStage stageCompleted;

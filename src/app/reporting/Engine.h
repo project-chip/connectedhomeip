@@ -125,14 +125,6 @@ public:
 
     uint64_t GetDirtySetGeneration() const { return mDirtyGeneration; }
 
-    /**
-     * Schedule event delivery to happen immediately and run reporting to get
-     * those reports into messages and on the wire.  This can be done either for
-     * a specific fabric, identified by the provided FabricIndex, or across all
-     * fabrics if no FabricIndex is provided.
-     */
-    void ScheduleUrgentEventDeliverySync(Optional<FabricIndex> fabricIndex = NullOptional);
-
 #if CONFIG_BUILD_FOR_HOST_UNIT_TEST
     size_t GetGlobalDirtySetSize() { return mGlobalDirtySet.Allocated(); }
 #endif
@@ -168,6 +160,15 @@ private:
                                                        bool * apHasMoreChunks, bool * apHasEncodedData);
     CHIP_ERROR BuildSingleReportDataEventReports(ReportDataMessage::Builder & reportDataBuilder, ReadHandler * apReadHandler,
                                                  bool aBufferIsUsed, bool * apHasMoreChunks, bool * apHasEncodedData);
+
+    /**
+     * Encodes StatusIB event reports for non-wildcard paths that fail to be validated:
+     *   - invalid paths (invalid endpoint/cluster id)
+     *   - failure to validate ACL (cannot fetch ACL requirement or ACL failure)
+     *
+     * Returns CHIP_NO_ERROR if encoding succeeds, returns error code on a fatal error (generally failure to encode EventStatusIB
+     * values).
+     */
     CHIP_ERROR CheckAccessDeniedEventPaths(TLV::TLVWriter & aWriter, bool & aHasEncodedData, ReadHandler * apReadHandler);
 
     // If version match, it means don't send, if version mismatch, it means send.
@@ -180,9 +181,9 @@ private:
 
     /**
      *  EventReporter implementation.
-     *
      */
     CHIP_ERROR NewEventGenerated(ConcreteEventPath & aPath, uint32_t aBytesConsumed) override;
+    void ScheduleUrgentEventDeliverySync(Optional<FabricIndex> fabricIndex = NullOptional) override;
 
     /**
      * Send Report via ReadHandler

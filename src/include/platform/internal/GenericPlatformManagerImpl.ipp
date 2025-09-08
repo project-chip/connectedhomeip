@@ -33,6 +33,7 @@
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 #include <platform/internal/EventLogging.h>
 #include <platform/internal/GenericPlatformManagerImpl.h>
+#include <platform/internal/NFCCommissioningManager.h>
 
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CodeUtils.h>
@@ -127,6 +128,16 @@ CHIP_ERROR GenericPlatformManagerImpl<ImplClass>::_InitChipStack()
         ChipLogError(DeviceLayer, "NFC onboarding payload manager initialization failed: %" CHIP_ERROR_FORMAT, err.Format()));
 #endif
 
+    // Initialize the CHIP NFC manager for NFC-based Commissioning
+#if CHIP_DEVICE_CONFIG_ENABLE_NFC_BASED_COMMISSIONING
+    err = NFCCommissioningMgr().Init();
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(DeviceLayer, "NFC-based Commissioning Manager initialization failed: %" CHIP_ERROR_FORMAT, err.Format());
+    }
+    SuccessOrExit(err);
+#endif
+
     // TODO Initialize CHIP Event Logging.
 
     // TODO Initialize the Time Sync Manager object.
@@ -156,6 +167,11 @@ void GenericPlatformManagerImpl<ImplClass>::_Shutdown()
     ChipLogProgress(DeviceLayer, "WiFi-PAF Layer shutdown");
     WiFiPAF::WiFiPAFLayer::GetWiFiPAFLayer().Shutdown(
         [](uint32_t id, WiFiPAF::WiFiPafRole role) { DeviceLayer::ConnectivityMgr().WiFiPAFShutdown(id, role); });
+#endif
+
+#if CHIP_DEVICE_CONFIG_ENABLE_NFC_BASED_COMMISSIONING
+    ChipLogProgress(DeviceLayer, "NFCCommissioningMgr shutdown");
+    NFCCommissioningMgr().Shutdown();
 #endif
 
     ChipLogProgress(DeviceLayer, "System Layer shutdown");

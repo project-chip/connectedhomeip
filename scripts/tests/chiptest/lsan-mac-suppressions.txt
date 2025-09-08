@@ -74,3 +74,12 @@ leak:CRYPTO_set_thread_local
 # Not our leaks, clearly:
 leak:CFXNotificationRegistrarFind
 leak:NSManagedObjectModel
+
+# These leaks are triggered when using Network.framework.
+# The cleanup code correctly sets the associated objects to nullptr,
+# so they should have been released by ARC.
+# However, LeakSanitizer reports them as leaks, likely due to internal Network.framework retention.
+leak:nw_parameters_create_secure_udp
+leak:nw_path_create_evaluator_for_listener
+leak:nw_listener_handle_new_path_on_queue
+leak:nw_endpoint_create_host

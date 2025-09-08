@@ -54,6 +54,7 @@ config("chip_examples_project_config") {
     "-Wl,--wrap=_realloc_r",
     "-Wl,--wrap=_free_r",
     "-Wl,--wrap=_calloc_r",
+    "-Wl,--wrap=main",
   ]
 }
 
@@ -110,10 +111,6 @@ config("efr32-common-config") {
     defines += [ "HEAP_MONITORING" ]
   }
 
-  if (chip_enable_multi_ota_requestor) {
-    defines += [ "CHIP_DEVICE_CONFIG_ENABLE_MULTI_OTA_REQUESTOR=1" ]
-  }
-
   ldflags = [
     "-Wl,--no-warn-rwx-segment",
     "-fno-lto",
@@ -122,6 +119,7 @@ config("efr32-common-config") {
 
 source_set("efr32-common") {
   deps = [
+    "${chip_root}/src/app/clusters/network-commissioning:network-commissioning",
     "${chip_root}/src/app/clusters/software-diagnostics-server:software-fault-listener",
     "${silabs_common_plat_dir}/provision:storage",
   ]
@@ -186,6 +184,11 @@ source_set("efr32-common") {
       "${chip_root}/third_party/openthread:openthread",
       "${chip_root}/third_party/openthread:openthread-platform",
     ]
+  }
+
+  if (sl_enable_rgb_led) {
+    sources += [ "${silabs_common_plat_dir}/led/RGBLEDWidget.cpp" ]
+    include_dirs = [ "${silabs_common_plat_dir}/rgb_led" ]
   }
 
   if (chip_build_libshell) {

@@ -18,12 +18,12 @@
 
 #pragma once
 
+#include "camera-avstream-controller.h"
 #include "camera-device-interface.h"
 #include <app/clusters/camera-av-stream-management-server/camera-av-stream-management-server.h>
 #include <app/util/config.h>
 #include <vector>
 
-constexpr uint16_t kInvalidStreamID = 65500;
 namespace chip {
 namespace app {
 namespace Clusters {
@@ -32,7 +32,7 @@ namespace CameraAvStreamManagement {
 /**
  * The application delegate to define the options & implement commands.
  */
-class CameraAVStreamManager : public CameraAVStreamMgmtDelegate
+class CameraAVStreamManager : public CameraAVStreamMgmtDelegate, public CameraAVStreamController
 {
 public:
     Protocols::InteractionModel::Status VideoStreamAllocate(const VideoStreamStruct & allocateArgs,
@@ -56,7 +56,9 @@ public:
 
     Protocols::InteractionModel::Status SnapshotStreamDeallocate(const uint16_t streamID) override;
 
-    void OnRankedStreamPrioritiesChanged() override;
+    void OnVideoStreamAllocated(const VideoStreamStruct & allocatedStream, StreamAllocationAction action) override;
+
+    void OnStreamUsagePrioritiesChanged() override;
 
     void OnAttributeChanged(AttributeId attributeId) override;
 
@@ -73,7 +75,28 @@ public:
     CHIP_ERROR
     LoadAllocatedSnapshotStreams(std::vector<SnapshotStreamStruct> & allocatedSnapshotStreams) override;
 
+    CHIP_ERROR
+    ValidateStreamUsage(StreamUsageEnum streamUsage, Optional<DataModel::Nullable<uint16_t>> & videoStreamId,
+                        Optional<DataModel::Nullable<uint16_t>> & audioStreamId) override;
+
+    CHIP_ERROR
+    ValidateVideoStreamID(uint16_t videoStreamId) override;
+
+    CHIP_ERROR
+    ValidateAudioStreamID(uint16_t audioStreamId) override;
+
+    CHIP_ERROR
+    IsPrivacyModeActive(bool & isActive) override;
+
+    bool HasAllocatedVideoStreams() override;
+
+    bool HasAllocatedAudioStreams() override;
+
     CHIP_ERROR PersistentAttributesLoadedCallback() override;
+
+    CHIP_ERROR OnTransportAcquireAudioVideoStreams(uint16_t audioStreamID, uint16_t videoStreamID) override;
+
+    CHIP_ERROR OnTransportReleaseAudioVideoStreams(uint16_t audioStreamID, uint16_t videoStreamID) override;
 
     CameraAVStreamManager()  = default;
     ~CameraAVStreamManager() = default;

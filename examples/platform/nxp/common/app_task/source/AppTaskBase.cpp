@@ -56,6 +56,11 @@
 #if CONFIG_NET_L2_OPENTHREAD
 #include <inet/EndPointStateOpenThread.h>
 #include <lib/support/ThreadOperationalDataset.h>
+#include <platform/OpenThread/GenericNetworkCommissioningThreadDriver.h>
+#endif
+
+#if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
+#include "BLEApplicationManager.h"
 #endif
 
 #if CONFIG_CHIP_APP_WIFI_CONNECT_AT_BOOT
@@ -109,6 +114,10 @@
 #define CONFIG_THREAD_DEVICE_TYPE kThreadDeviceType_Router
 #endif
 
+#if CHIP_CONFIG_SYNCHRONOUS_REPORTS_ENABLED
+#include <app/reporting/SynchronizedReportSchedulerImpl.h>
+#endif
+
 using namespace chip;
 using namespace chip::TLV;
 using namespace ::chip::Credentials;
@@ -118,6 +127,11 @@ using namespace ::chip::app::Clusters;
 
 #if CONFIG_DEVICE_INFO_PROVIDER_IMPL
 chip::DeviceLayer::DeviceInfoProviderImpl gExampleDeviceInfoProvider;
+#endif
+
+#if CONFIG_NET_L2_OPENTHREAD
+app::Clusters::NetworkCommissioning::InstanceAndDriver<DeviceLayer::NetworkCommissioning::GenericThreadDriver>
+    sThreadNetworkDriver(CHIP_DEVICE_CONFIG_THREAD_NETWORK_ENDPOINT_ID /*endpointId*/);
 #endif
 
 #if CONFIG_CHIP_WIFI || CHIP_DEVICE_CONFIG_ENABLE_WPA
@@ -161,6 +175,13 @@ void UnlockOpenThreadTask(void)
 void chip::NXP::App::AppTaskBase::InitServer(intptr_t arg)
 {
     GetAppTask().PreInitMatterServerInstance();
+
+#if CHIP_CONFIG_SYNCHRONOUS_REPORTS_ENABLED
+    // Report scheduler and timer delegate instance
+    static chip::app::DefaultTimerDelegate sTimerDelegate;
+    static chip::app::reporting::SynchronizedReportSchedulerImpl sReportScheduler(&sTimerDelegate);
+    initParams.reportScheduler = &sReportScheduler;
+#endif
 
 #if CONFIG_CHIP_TEST_EVENT && CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
     static OTATestEventTriggerDelegate testEventTriggerDelegate{ ByteSpan(sTestEventTriggerEnableKey) };
@@ -284,6 +305,7 @@ CHIP_ERROR chip::NXP::App::AppTaskBase::Init()
         ChipLogError(DeviceLayer, "Error during ThreadStackMgr().InitThreadStack()");
         return err;
     }
+    sThreadNetworkDriver.Init();
 
     err = ConnectivityMgr().SetThreadDeviceType(ConnectivityManager::CONFIG_THREAD_DEVICE_TYPE);
     if (err != CHIP_NO_ERROR)
@@ -424,6 +446,11 @@ void chip::NXP::App::AppTaskBase::SwitchCommissioningStateHandler(void)
 
 void chip::NXP::App::AppTaskBase::FactoryResetHandler(void)
 {
+#if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
+    /* Trigger factory reset for BLEApplicationManager */
+    chip::NXP::App::BleAppMgr().FactoryReset();
+#endif
+
     /* Emit the ShutDown event before factory reset */
     chip::Server::GetInstance().GenerateShutDownEvent();
     chip::Server::GetInstance().ScheduleFactoryReset();

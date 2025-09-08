@@ -684,7 +684,7 @@ public:
         // Initialize Scene Table
         SceneTable * sceneTable = scenes::GetSceneTableImpl();
         ASSERT_NE(sceneTable, nullptr);
-        ASSERT_EQ(sceneTable->Init(mpTestStorage), CHIP_NO_ERROR);
+        ASSERT_EQ(sceneTable->Init(*mpTestStorage), CHIP_NO_ERROR);
         SetMockNodeConfig(SceneMockNodeConfig);
     }
 
@@ -696,6 +696,8 @@ public:
         sceneTable->Finish();
         delete mpTestStorage;
         delete mpSceneHandler;
+        mpTestStorage  = nullptr;
+        mpSceneHandler = nullptr;
         chip::Platform::MemoryShutdown();
     }
 
@@ -2118,6 +2120,7 @@ TEST_F(TestSceneTable, TestOTAChanges)
 {
     SceneTable * sceneTable = scenes::GetSceneTableImpl(kTestEndpoint1, defaultTestTableSize);
     ASSERT_NE(nullptr, sceneTable);
+    ASSERT_NE(nullptr, mpTestStorage);
 
     // Reset test
     ResetSceneTable(sceneTable);
@@ -2163,7 +2166,7 @@ TEST_F(TestSceneTable, TestOTAChanges)
 
     // Create a scene table with a greater capacity than the original one (Max allowed capacity from gen_config.h)
     TestSceneTableImpl ExpandedSceneTable(scenes::kMaxScenesPerFabric, scenes::kMaxScenesPerEndpoint);
-    EXPECT_EQ(CHIP_NO_ERROR, ExpandedSceneTable.Init(mpTestStorage));
+    EXPECT_EQ(CHIP_NO_ERROR, ExpandedSceneTable.Init(*mpTestStorage));
     ExpandedSceneTable.SetEndpoint(kTestEndpoint1);
 
     EXPECT_EQ(CHIP_NO_ERROR, ExpandedSceneTable.GetRemainingCapacity(kFabric1, fabric_capacity));
@@ -2201,11 +2204,11 @@ TEST_F(TestSceneTable, TestOTAChanges)
 
     // Test failure to init a SceneTable with sizes above the defined max scenes per fabric or globaly
     TestSceneTableImpl SceneTableTooManyPerFabric(scenes::kMaxScenesPerFabric + 1, scenes::kMaxScenesPerEndpoint);
-    EXPECT_EQ(CHIP_ERROR_INVALID_INTEGER_VALUE, SceneTableTooManyPerFabric.Init(mpTestStorage));
+    EXPECT_EQ(CHIP_ERROR_INVALID_INTEGER_VALUE, SceneTableTooManyPerFabric.Init(*mpTestStorage));
     SceneTableTooManyPerFabric.Finish();
 
     TestSceneTableImpl SceneTableTooManyGlobal(scenes::kMaxScenesPerFabric, scenes::kMaxScenesPerEndpoint + 1);
-    EXPECT_EQ(CHIP_ERROR_INVALID_INTEGER_VALUE, SceneTableTooManyGlobal.Init(mpTestStorage));
+    EXPECT_EQ(CHIP_ERROR_INVALID_INTEGER_VALUE, SceneTableTooManyGlobal.Init(*mpTestStorage));
     SceneTableTooManyGlobal.Finish();
 
     // Create a new table with a lower limit of scenes per fabric
@@ -2213,7 +2216,7 @@ TEST_F(TestSceneTable, TestOTAChanges)
     uint8_t newTableSize       = defaultTestTableSize - 2;
     uint8_t capacityDifference = static_cast<uint8_t>(scenes::kMaxScenesPerFabric - newCapacity);
     TestSceneTableImpl ReducedSceneTable(newCapacity, newTableSize);
-    EXPECT_EQ(CHIP_NO_ERROR, ReducedSceneTable.Init(mpTestStorage));
+    EXPECT_EQ(CHIP_NO_ERROR, ReducedSceneTable.Init(*mpTestStorage));
     ReducedSceneTable.SetEndpoint(kTestEndpoint1);
 
     // Global count should not have been modified

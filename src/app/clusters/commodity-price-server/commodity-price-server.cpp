@@ -24,6 +24,7 @@
 #include <app/InteractionModelEngine.h>
 #include <app/reporting/reporting.h>
 #include <app/util/attribute-storage.h>
+#include <clusters/CommodityPrice/Metadata.h>
 
 using namespace chip;
 using namespace chip::app;
@@ -112,18 +113,17 @@ CHIP_ERROR Instance::Read(const ConcreteReadAttributePath & aPath, AttributeValu
 }
 
 // CommandHandlerInterface
-CHIP_ERROR Instance::EnumerateAcceptedCommands(const ConcreteClusterPath & cluster, CommandIdCallback callback, void * context)
+CHIP_ERROR Instance::RetrieveAcceptedCommands(const ConcreteClusterPath & cluster,
+                                              ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder)
 {
     using namespace Commands;
-
-    VerifyOrExit(callback(GetDetailedPriceRequest::Id, context) == Loop::Continue, /**/);
+    ReturnErrorOnFailure(builder.EnsureAppendCapacity(kAcceptedCommandsCount));
+    ReturnErrorOnFailure(builder.Append(GetDetailedPriceRequest::kMetadataEntry));
 
     if (HasFeature(Feature::kForecasting))
     {
-        VerifyOrExit(callback(GetDetailedForecastRequest::Id, context) == Loop::Continue, /**/);
+        ReturnErrorOnFailure(builder.Append(GetDetailedForecastRequest::kMetadataEntry));
     }
-
-exit:
     return CHIP_NO_ERROR;
 }
 
@@ -245,6 +245,15 @@ Instance::GetDetailedForecastRequest(BitMask<CommodityPriceDetailBitmap> details
 
     size_t count      = 0;
     size_t bufferSize = mPriceForecast.size();
+
+    if (bufferSize == 0)
+    {
+        /* Special case when no forecast entries exist - calling calloc(0) returns NULL
+           and results in an error on some platforms */
+        forecastList = DataModel::List<const Structs::CommodityPriceStruct::Type>();
+
+        return CHIP_NO_ERROR;
+    }
 
     if (!forecastBuffer.Calloc(bufferSize))
     {

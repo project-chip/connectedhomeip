@@ -17,28 +17,11 @@
  */
 
 #include <lib/core/TLV.h>
-#include <platform/internal/CHIPDeviceLayerInternal.h>
 #include <platform/silabs/multi-ota/OTAFactoryDataProcessor.h>
 
 namespace chip {
 
 using namespace ::chip::DeviceLayer::Silabs;
-
-CHIP_ERROR OTAFactoryDataProcessor::Init()
-{
-    mAccumulator.Init(mLength);
-
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR OTAFactoryDataProcessor::Clear()
-{
-    OTATlvProcessor::ClearInternal();
-    mAccumulator.Clear();
-    mPayload.Clear();
-
-    return CHIP_NO_ERROR;
-}
 
 CHIP_ERROR OTAFactoryDataProcessor::ProcessInternal(ByteSpan & block)
 {
@@ -46,8 +29,8 @@ CHIP_ERROR OTAFactoryDataProcessor::ProcessInternal(ByteSpan & block)
 
     ReturnErrorOnFailure(mAccumulator.Accumulate(block));
 #ifdef SL_MATTER_ENABLE_OTA_ENCRYPTION
-    MutableByteSpan mBlock = MutableByteSpan(mAccumulator.data(), mAccumulator.GetThreshold());
-    OTATlvProcessor::vOtaProcessInternalEncryption(mBlock);
+    MutableByteSpan byteBlock = MutableByteSpan(mAccumulator.data(), mAccumulator.GetThreshold());
+    OTATlvProcessor::vOtaProcessInternalEncryption(byteBlock);
 #endif
     error = DecodeTlv();
 
@@ -79,13 +62,15 @@ CHIP_ERROR OTAFactoryDataProcessor::ApplyAction()
 exit:
     if (error != CHIP_NO_ERROR)
     {
-        ChipLogError(SoftwareUpdate, "Failed to update factory data. Error: %s", ErrorStr(error));
+        ChipLogError(SoftwareUpdate, "Failed to update factory data. Error: %" CHIP_ERROR_FORMAT, error.Format());
     }
     else
     {
-        ChipLogProgress(SoftwareUpdate, "Factory data update finished.");
+        error = Provision::Manager::GetInstance().GetStorage().Commit();
+        VerifyOrReturnError(error == CHIP_NO_ERROR, error,
+                            ChipLogError(SoftwareUpdate, "Failed to commit factory data. Error: %s", ErrorStr(error)));
     }
-
+    ChipLogProgress(SoftwareUpdate, "Factory data update finished.");
     return error;
 }
 

@@ -16,6 +16,7 @@
  */
 
 #include <app-common/zap-generated/attributes/Accessors.h>
+#include <app/reporting/reporting.h>
 #include <app/util/config.h>
 #include <map>
 #include <string>
@@ -25,6 +26,7 @@
 using namespace chip;
 using namespace chip::app;
 using namespace chip::app::DataModel;
+using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::MediaPlayback;
 
 using chip::CharSpan;
@@ -164,6 +166,7 @@ void MediaPlaybackManager::HandleStop(CommandResponseHelper<Commands::PlaybackRe
     HandleSetCurrentState(PlaybackStateEnum::kNotPlaying);
     HandleSetPlaybackSpeed(0);
     mPlaybackPosition = { 0, chip::app::DataModel::Nullable<uint64_t>(0) };
+    MatterReportingAttributeChangeCallback(mEndpoint, MediaPlayback::Id, MediaPlayback::Attributes::SampledPosition::Id);
 
     Commands::PlaybackResponse::Type response;
     response.data   = chip::MakeOptional(CharSpan::fromCharString("data response"));
@@ -206,6 +209,7 @@ void MediaPlaybackManager::HandlePrevious(CommandResponseHelper<Commands::Playba
     HandleSetCurrentState(PlaybackStateEnum::kPlaying);
     HandleSetPlaybackSpeed(1);
     mPlaybackPosition = { 0, chip::app::DataModel::Nullable<uint64_t>(0) };
+    MatterReportingAttributeChangeCallback(mEndpoint, MediaPlayback::Id, MediaPlayback::Attributes::SampledPosition::Id);
 
     Commands::PlaybackResponse::Type response;
     response.data   = chip::MakeOptional(CharSpan::fromCharString("data response"));
@@ -250,6 +254,7 @@ void MediaPlaybackManager::HandleSkipBackward(CommandResponseHelper<Commands::Pl
                                 ? mPlaybackPosition.position.Value() - deltaPositionMilliseconds
                                 : 0);
     mPlaybackPosition    = { 0, chip::app::DataModel::Nullable<uint64_t>(newPosition) };
+    MatterReportingAttributeChangeCallback(mEndpoint, MediaPlayback::Id, MediaPlayback::Attributes::SampledPosition::Id);
 
     Commands::PlaybackResponse::Type response;
     response.data   = chip::MakeOptional(CharSpan::fromCharString("data response"));
@@ -263,6 +268,7 @@ void MediaPlaybackManager::HandleSkipForward(CommandResponseHelper<Commands::Pla
     uint64_t newPosition = mPlaybackPosition.position.Value() + deltaPositionMilliseconds;
     newPosition          = newPosition > mDuration ? mDuration : newPosition;
     mPlaybackPosition    = { 0, chip::app::DataModel::Nullable<uint64_t>(newPosition) };
+    MatterReportingAttributeChangeCallback(mEndpoint, MediaPlayback::Id, MediaPlayback::Attributes::SampledPosition::Id);
 
     Commands::PlaybackResponse::Type response;
     response.data   = chip::MakeOptional(CharSpan::fromCharString("data response"));
@@ -283,6 +289,7 @@ void MediaPlaybackManager::HandleSeek(CommandResponseHelper<Commands::PlaybackRe
     else
     {
         mPlaybackPosition = { 0, chip::app::DataModel::Nullable<uint64_t>(positionMilliseconds) };
+        MatterReportingAttributeChangeCallback(mEndpoint, MediaPlayback::Id, MediaPlayback::Attributes::SampledPosition::Id);
 
         Commands::PlaybackResponse::Type response;
         response.data   = chip::MakeOptional(CharSpan::fromCharString("data response"));
@@ -296,6 +303,7 @@ void MediaPlaybackManager::HandleNext(CommandResponseHelper<Commands::PlaybackRe
     HandleSetCurrentState(PlaybackStateEnum::kPlaying);
     HandleSetPlaybackSpeed(1);
     mPlaybackPosition = { 0, chip::app::DataModel::Nullable<uint64_t>(0) };
+    MatterReportingAttributeChangeCallback(mEndpoint, MediaPlayback::Id, MediaPlayback::Attributes::SampledPosition::Id);
 
     Commands::PlaybackResponse::Type response;
     response.data   = chip::MakeOptional(CharSpan::fromCharString("data response"));
@@ -306,6 +314,7 @@ void MediaPlaybackManager::HandleNext(CommandResponseHelper<Commands::PlaybackRe
 void MediaPlaybackManager::HandleStartOver(CommandResponseHelper<Commands::PlaybackResponse::Type> & helper)
 {
     mPlaybackPosition = { 0, chip::app::DataModel::Nullable<uint64_t>(0) };
+    MatterReportingAttributeChangeCallback(mEndpoint, MediaPlayback::Id, MediaPlayback::Attributes::SampledPosition::Id);
 
     Commands::PlaybackResponse::Type response;
     response.data   = chip::MakeOptional(CharSpan::fromCharString("data response"));

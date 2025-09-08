@@ -172,7 +172,7 @@ tests:
       command: "readAttribute"
       attribute: "SpecificationVersion"
       response:
-          # For now all-clusters-app has a version 1.5.
+          # For now all-clusters-app has a version 1.5
           value: 0x01050000
 
     - label: "Read the Max Paths Per Invoke value"

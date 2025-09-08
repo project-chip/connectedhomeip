@@ -803,6 +803,15 @@ static BOOL AttributeIsSpecifiedInGeneralCommissioningCluster(AttributeId aAttri
     case Attributes::TCUpdateDeadline::Id: {
         return YES;
     }
+    case Attributes::RecoveryIdentifier::Id: {
+        return YES;
+    }
+    case Attributes::NetworkRecoveryReason::Id: {
+        return YES;
+    }
+    case Attributes::IsCommissioningWithoutPower::Id: {
+        return YES;
+    }
     case Attributes::GeneratedCommandList::Id: {
         return YES;
     }
@@ -3576,10 +3585,13 @@ static BOOL AttributeIsSpecifiedInClosureControlCluster(AttributeId aAttributeId
     case Attributes::CurrentErrorList::Id: {
         return YES;
     }
-    case Attributes::OverallState::Id: {
+    case Attributes::OverallCurrentState::Id: {
         return YES;
     }
-    case Attributes::OverallTarget::Id: {
+    case Attributes::OverallTargetState::Id: {
+        return YES;
+    }
+    case Attributes::LatchControlModes::Id: {
         return YES;
     }
     case Attributes::GeneratedCommandList::Id: {
@@ -3610,7 +3622,7 @@ static BOOL AttributeIsSpecifiedInClosureDimensionCluster(AttributeId aAttribute
     case Attributes::CurrentState::Id: {
         return YES;
     }
-    case Attributes::Target::Id: {
+    case Attributes::TargetState::Id: {
         return YES;
     }
     case Attributes::Resolution::Id: {
@@ -3638,6 +3650,9 @@ static BOOL AttributeIsSpecifiedInClosureDimensionCluster(AttributeId aAttribute
         return YES;
     }
     case Attributes::ModulationType::Id: {
+        return YES;
+    }
+    case Attributes::LatchControlModes::Id: {
         return YES;
     }
     case Attributes::GeneratedCommandList::Id: {
@@ -3980,6 +3995,18 @@ static BOOL AttributeIsSpecifiedInThermostatCluster(AttributeId aAttributeId)
         return YES;
     }
     case Attributes::SetpointHoldExpiryTimestamp::Id: {
+        return YES;
+    }
+    case Attributes::MaxThermostatSuggestions::Id: {
+        return YES;
+    }
+    case Attributes::ThermostatSuggestions::Id: {
+        return YES;
+    }
+    case Attributes::CurrentThermostatSuggestion::Id: {
+        return YES;
+    }
+    case Attributes::ThermostatSuggestionNotFollowingReason::Id: {
         return YES;
     }
     case Attributes::GeneratedCommandList::Id: {
@@ -5815,7 +5842,10 @@ static BOOL AttributeIsSpecifiedInZoneManagementCluster(AttributeId aAttributeId
 {
     using namespace Clusters::ZoneManagement;
     switch (aAttributeId) {
-    case Attributes::SupportedZoneSources::Id: {
+    case Attributes::MaxUserDefinedZones::Id: {
+        return YES;
+    }
+    case Attributes::MaxZones::Id: {
         return YES;
     }
     case Attributes::Zones::Id: {
@@ -5824,7 +5854,13 @@ static BOOL AttributeIsSpecifiedInZoneManagementCluster(AttributeId aAttributeId
     case Attributes::Triggers::Id: {
         return YES;
     }
+    case Attributes::SensitivityMax::Id: {
+        return YES;
+    }
     case Attributes::Sensitivity::Id: {
+        return YES;
+    }
+    case Attributes::TwoDCartesianMax::Id: {
         return YES;
     }
     case Attributes::GeneratedCommandList::Id: {
@@ -5864,7 +5900,7 @@ static BOOL AttributeIsSpecifiedInCameraAVStreamManagementCluster(AttributeId aA
     case Attributes::NightVisionUsesInfrared::Id: {
         return YES;
     }
-    case Attributes::MinViewport::Id: {
+    case Attributes::MinViewportResolution::Id: {
         return YES;
     }
     case Attributes::RateDistortionTradeOffPoints::Id: {
@@ -5906,7 +5942,7 @@ static BOOL AttributeIsSpecifiedInCameraAVStreamManagementCluster(AttributeId aA
     case Attributes::AllocatedSnapshotStreams::Id: {
         return YES;
     }
-    case Attributes::RankedVideoStreamPrioritiesList::Id: {
+    case Attributes::StreamUsagePriorities::Id: {
         return YES;
     }
     case Attributes::SoftRecordingPrivacyModeEnabled::Id: {
@@ -6025,6 +6061,9 @@ static BOOL AttributeIsSpecifiedInCameraAVSettingsUserLevelManagementCluster(Att
         return YES;
     }
     case Attributes::PanMax::Id: {
+        return YES;
+    }
+    case Attributes::MovementState::Id: {
         return YES;
     }
     case Attributes::GeneratedCommandList::Id: {
@@ -6523,7 +6562,10 @@ static BOOL AttributeIsSpecifiedInCommodityMeteringCluster(AttributeId aAttribut
     case Attributes::MeteredQuantityTimestamp::Id: {
         return YES;
     }
-    case Attributes::MeasurementType::Id: {
+    case Attributes::TariffUnit::Id: {
+        return YES;
+    }
+    case Attributes::MaximumMeteredQuantities::Id: {
         return YES;
     }
     case Attributes::GeneratedCommandList::Id: {
@@ -6696,6 +6738,9 @@ static BOOL AttributeIsSpecifiedInUnitTestingCluster(AttributeId aAttributeId)
         return YES;
     }
     case Attributes::GlobalStruct::Id: {
+        return YES;
+    }
+    case Attributes::UnsupportedAttributeRequiringAdminPrivilege::Id: {
         return YES;
     }
     case Attributes::Unsupported::Id: {

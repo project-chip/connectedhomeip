@@ -142,6 +142,7 @@ template("chip_data_model") {
     deps = [
       ":${_data_model_name}_codegen_generate",
       "${chip_root}/src/app/common:ids",
+      "${chip_root}/src/app/common:metadata",
       "${chip_root}/src/lib/support:span",
       "${chip_root}/src/protocols/interaction_model",
     ]
@@ -160,6 +161,7 @@ template("chip_data_model") {
         "${chip_root}/src/app/common:cluster-objects",
         "${chip_root}/src/app/common:enums",
         "${chip_root}/src/app/common:ids",
+        "${chip_root}/src/app/common:metadata",
         "${chip_root}/src/lib/core",
         "${chip_root}/src/lib/support",
       ]
@@ -184,7 +186,6 @@ template("chip_data_model") {
     }
 
     sources += [
-      "${_app_root}/clusters/basic-information/basic-information.h",
       "${_app_root}/clusters/color-control-server/color-control-server.h",
       "${_app_root}/clusters/door-lock-server/door-lock-server.h",
       "${_app_root}/clusters/groups-server/groups-server.h",
@@ -284,14 +285,16 @@ template("chip_data_model") {
       "${chip_root}/src/access",
       "${chip_root}/src/app",
       "${chip_root}/src/app:attribute-persistence",
+      "${chip_root}/src/app:required-privileges",
       "${chip_root}/src/app/cluster-building-blocks",
       "${chip_root}/src/app/common:attribute-type",
       "${chip_root}/src/app/common:cluster-objects",
       "${chip_root}/src/app/common:enums",
+      "${chip_root}/src/app/persistence",
+      "${chip_root}/src/app/persistence:default",
       "${chip_root}/src/app/server",
       "${chip_root}/src/app/storage:fabric-table",
       "${chip_root}/src/app/util:types",
-      "${chip_root}/src/app/util/persistence",
       "${chip_root}/src/lib/core",
       "${chip_root}/src/lib/support",
       "${chip_root}/src/protocols/secure_channel",

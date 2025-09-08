@@ -192,7 +192,6 @@ private:
         System::PacketBufferTLVReader reader;
         reader.Init(std::move(payload));
         ReturnErrorOnFailure(response.Init(reader));
-        StatusIB status;
         ReturnErrorOnFailure(response.GetStatus(mLastStatus));
         return CHIP_NO_ERROR;
     }
@@ -240,9 +239,9 @@ void TestWriteInteraction::AddAttributeDataIB(WriteClient & aWriteClient, Encodi
 {
     AttributePathParams attributePathParams;
     bool attributeValue              = true;
-    attributePathParams.mEndpointId  = 2;
-    attributePathParams.mClusterId   = 3;
-    attributePathParams.mAttributeId = 4;
+    attributePathParams.mEndpointId  = kTestEndpointId;
+    attributePathParams.mClusterId   = Clusters::UnitTesting::Id;
+    attributePathParams.mAttributeId = Clusters::UnitTesting::Attributes::Boolean::Id;
 
     switch (encoding)
     {
@@ -479,9 +478,9 @@ TEST_F(TestWriteInteraction, TestWriteRoundtripWithClusterObjects)
         System::PacketBufferHandle buf = System::PacketBufferHandle::New(System::PacketBuffer::kMaxSize);
 
         AttributePathParams attributePathParams;
-        attributePathParams.mEndpointId  = 2;
-        attributePathParams.mClusterId   = 3;
-        attributePathParams.mAttributeId = 4;
+        attributePathParams.mEndpointId  = kTestEndpointId;
+        attributePathParams.mClusterId   = Clusters::UnitTesting::Id;
+        attributePathParams.mAttributeId = Clusters::UnitTesting::Attributes::Boolean::Id;
 
         const uint8_t byteSpanData[]     = { 0xde, 0xad, 0xbe, 0xef };
         static const char charSpanData[] = "a simple test string";
@@ -570,13 +569,14 @@ TEST_F(TestWriteInteraction, TestWriteRoundtripWithClusterObjectsVersionMatch)
     System::PacketBufferHandle buf = System::PacketBufferHandle::New(System::PacketBuffer::kMaxSize);
 
     AttributePathParams attributePathParams;
-    attributePathParams.mEndpointId  = 2;
-    attributePathParams.mClusterId   = 3;
-    attributePathParams.mAttributeId = 4;
+    attributePathParams.mEndpointId  = kTestEndpointId;
+    attributePathParams.mClusterId   = Clusters::UnitTesting::Id;
+    attributePathParams.mAttributeId = Clusters::UnitTesting::Attributes::Boolean::Id;
 
     DataModel::Nullable<app::Clusters::UnitTesting::Structs::SimpleStruct::Type> dataTx;
 
     Optional<DataVersion> version(kAcceptedDataVersion);
+    chip::Test::SetVersionTo(kAcceptedDataVersion);
 
     EXPECT_EQ(writeClient.EncodeAttribute(attributePathParams, dataTx, version), CHIP_NO_ERROR);
 
@@ -614,9 +614,9 @@ TEST_F(TestWriteInteraction, TestWriteRoundtripWithClusterObjectsVersionMismatch
     System::PacketBufferHandle buf = System::PacketBufferHandle::New(System::PacketBuffer::kMaxSize);
 
     AttributePathParams attributePathParams;
-    attributePathParams.mEndpointId  = 2;
-    attributePathParams.mClusterId   = 3;
-    attributePathParams.mAttributeId = 4;
+    attributePathParams.mEndpointId  = kTestEndpointId;
+    attributePathParams.mClusterId   = Clusters::UnitTesting::Id;
+    attributePathParams.mAttributeId = Clusters::UnitTesting::Attributes::Boolean::Id;
 
     app::Clusters::UnitTesting::Structs::SimpleStruct::Type dataTxValue;
     dataTxValue.a = 12;
@@ -624,6 +624,8 @@ TEST_F(TestWriteInteraction, TestWriteRoundtripWithClusterObjectsVersionMismatch
     DataModel::Nullable<app::Clusters::UnitTesting::Structs::SimpleStruct::Type> dataTx;
     dataTx.SetNonNull(dataTxValue);
     Optional<DataVersion> version(chip::Test::kRejectedDataVersion);
+    chip::Test::SetVersionTo(kAcceptedDataVersion);
+    static_assert(kAcceptedDataVersion != kRejectedDataVersion);
 
     EXPECT_EQ(writeClient.EncodeAttribute(attributePathParams, dataTx, version), CHIP_NO_ERROR);
 

@@ -1469,6 +1469,18 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
             result = @"TCUpdateDeadline";
             break;
 
+        case MTRAttributeIDTypeClusterGeneralCommissioningAttributeRecoveryIdentifierID:
+            result = @"RecoveryIdentifier";
+            break;
+
+        case MTRAttributeIDTypeClusterGeneralCommissioningAttributeNetworkRecoveryReasonID:
+            result = @"NetworkRecoveryReason";
+            break;
+
+        case MTRAttributeIDTypeClusterGeneralCommissioningAttributeIsCommissioningWithoutPowerID:
+            result = @"IsCommissioningWithoutPower";
+            break;
+
         case MTRAttributeIDTypeClusterGeneralCommissioningAttributeGeneratedCommandListID:
             result = @"GeneratedCommandList";
             break;
@@ -5089,12 +5101,16 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
             result = @"CurrentErrorList";
             break;
 
-        case MTRAttributeIDTypeClusterClosureControlAttributeOverallStateID:
-            result = @"OverallState";
+        case MTRAttributeIDTypeClusterClosureControlAttributeOverallCurrentStateID:
+            result = @"OverallCurrentState";
             break;
 
-        case MTRAttributeIDTypeClusterClosureControlAttributeOverallTargetID:
-            result = @"OverallTarget";
+        case MTRAttributeIDTypeClusterClosureControlAttributeOverallTargetStateID:
+            result = @"OverallTargetState";
+            break;
+
+        case MTRAttributeIDTypeClusterClosureControlAttributeLatchControlModesID:
+            result = @"LatchControlModes";
             break;
 
         case MTRAttributeIDTypeClusterClosureControlAttributeGeneratedCommandListID:
@@ -5133,8 +5149,8 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
             result = @"CurrentState";
             break;
 
-        case MTRAttributeIDTypeClusterClosureDimensionAttributeTargetID:
-            result = @"Target";
+        case MTRAttributeIDTypeClusterClosureDimensionAttributeTargetStateID:
+            result = @"TargetState";
             break;
 
         case MTRAttributeIDTypeClusterClosureDimensionAttributeResolutionID:
@@ -5171,6 +5187,10 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
 
         case MTRAttributeIDTypeClusterClosureDimensionAttributeModulationTypeID:
             result = @"ModulationType";
+            break;
+
+        case MTRAttributeIDTypeClusterClosureDimensionAttributeLatchControlModesID:
+            result = @"LatchControlModes";
             break;
 
         case MTRAttributeIDTypeClusterClosureDimensionAttributeGeneratedCommandListID:
@@ -5623,6 +5643,22 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
 
         case MTRAttributeIDTypeClusterThermostatAttributeSetpointHoldExpiryTimestampID:
             result = @"SetpointHoldExpiryTimestamp";
+            break;
+
+        case MTRAttributeIDTypeClusterThermostatAttributeMaxThermostatSuggestionsID:
+            result = @"MaxThermostatSuggestions";
+            break;
+
+        case MTRAttributeIDTypeClusterThermostatAttributeThermostatSuggestionsID:
+            result = @"ThermostatSuggestions";
+            break;
+
+        case MTRAttributeIDTypeClusterThermostatAttributeCurrentThermostatSuggestionID:
+            result = @"CurrentThermostatSuggestion";
+            break;
+
+        case MTRAttributeIDTypeClusterThermostatAttributeThermostatSuggestionNotFollowingReasonID:
+            result = @"ThermostatSuggestionNotFollowingReason";
             break;
 
         case MTRAttributeIDTypeClusterThermostatAttributeGeneratedCommandListID:
@@ -8017,8 +8053,12 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
         switch (attributeID) {
 
             // Cluster ZoneManagement attributes
-        case MTRAttributeIDTypeClusterZoneManagementAttributeSupportedZoneSourcesID:
-            result = @"SupportedZoneSources";
+        case MTRAttributeIDTypeClusterZoneManagementAttributeMaxUserDefinedZonesID:
+            result = @"MaxUserDefinedZones";
+            break;
+
+        case MTRAttributeIDTypeClusterZoneManagementAttributeMaxZonesID:
+            result = @"MaxZones";
             break;
 
         case MTRAttributeIDTypeClusterZoneManagementAttributeZonesID:
@@ -8029,8 +8069,16 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
             result = @"Triggers";
             break;
 
+        case MTRAttributeIDTypeClusterZoneManagementAttributeSensitivityMaxID:
+            result = @"SensitivityMax";
+            break;
+
         case MTRAttributeIDTypeClusterZoneManagementAttributeSensitivityID:
             result = @"Sensitivity";
+            break;
+
+        case MTRAttributeIDTypeClusterZoneManagementAttributeTwoDCartesianMaxID:
+            result = @"TwoDCartesianMax";
             break;
 
         case MTRAttributeIDTypeClusterZoneManagementAttributeGeneratedCommandListID:
@@ -8081,8 +8129,8 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
             result = @"NightVisionUsesInfrared";
             break;
 
-        case MTRAttributeIDTypeClusterCameraAVStreamManagementAttributeMinViewportID:
-            result = @"MinViewport";
+        case MTRAttributeIDTypeClusterCameraAVStreamManagementAttributeMinViewportResolutionID:
+            result = @"MinViewportResolution";
             break;
 
         case MTRAttributeIDTypeClusterCameraAVStreamManagementAttributeRateDistortionTradeOffPointsID:
@@ -8137,8 +8185,8 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
             result = @"AllocatedSnapshotStreams";
             break;
 
-        case MTRAttributeIDTypeClusterCameraAVStreamManagementAttributeRankedVideoStreamPrioritiesListID:
-            result = @"RankedVideoStreamPrioritiesList";
+        case MTRAttributeIDTypeClusterCameraAVStreamManagementAttributeStreamUsagePrioritiesID:
+            result = @"StreamUsagePriorities";
             break;
 
         case MTRAttributeIDTypeClusterCameraAVStreamManagementAttributeSoftRecordingPrivacyModeEnabledID:
@@ -8295,6 +8343,10 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
 
         case MTRAttributeIDTypeClusterCameraAVSettingsUserLevelManagementAttributePanMaxID:
             result = @"PanMax";
+            break;
+
+        case MTRAttributeIDTypeClusterCameraAVSettingsUserLevelManagementAttributeMovementStateID:
+            result = @"MovementState";
             break;
 
         case MTRAttributeIDTypeClusterCameraAVSettingsUserLevelManagementAttributeGeneratedCommandListID:
@@ -8941,8 +8993,12 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
             result = @"MeteredQuantityTimestamp";
             break;
 
-        case MTRAttributeIDTypeClusterCommodityMeteringAttributeMeasurementTypeID:
-            result = @"MeasurementType";
+        case MTRAttributeIDTypeClusterCommodityMeteringAttributeTariffUnitID:
+            result = @"TariffUnit";
+            break;
+
+        case MTRAttributeIDTypeClusterCommodityMeteringAttributeMaximumMeteredQuantitiesID:
+            result = @"MaximumMeteredQuantities";
             break;
 
         case MTRAttributeIDTypeClusterCommodityMeteringAttributeGeneratedCommandListID:
@@ -9171,6 +9227,10 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
 
         case MTRAttributeIDTypeClusterUnitTestingAttributeGlobalStructID:
             result = @"GlobalStruct";
+            break;
+
+        case MTRAttributeIDTypeClusterUnitTestingAttributeUnsupportedAttributeRequiringAdminPrivilegeID:
+            result = @"UnsupportedAttributeRequiringAdminPrivilege";
             break;
 
         case MTRAttributeIDTypeClusterUnitTestingAttributeUnsupportedID:
@@ -10966,6 +11026,14 @@ NSString * MTRRequestCommandNameForID(MTRClusterIDType clusterID, MTRCommandIDTy
             result = @"SetActivePresetRequest";
             break;
 
+        case MTRCommandIDTypeClusterThermostatCommandAddThermostatSuggestionID:
+            result = @"AddThermostatSuggestion";
+            break;
+
+        case MTRCommandIDTypeClusterThermostatCommandRemoveThermostatSuggestionID:
+            result = @"RemoveThermostatSuggestion";
+            break;
+
         case MTRCommandIDTypeClusterThermostatCommandAtomicRequestID:
             result = @"AtomicRequest";
             break;
@@ -11672,12 +11740,16 @@ NSString * MTRRequestCommandNameForID(MTRClusterIDType clusterID, MTRCommandIDTy
             result = @"UpdateTwoDCartesianZone";
             break;
 
-        case MTRCommandIDTypeClusterZoneManagementCommandGetTwoDCartesianZoneID:
-            result = @"GetTwoDCartesianZone";
-            break;
-
         case MTRCommandIDTypeClusterZoneManagementCommandRemoveZoneID:
             result = @"RemoveZone";
+            break;
+
+        case MTRCommandIDTypeClusterZoneManagementCommandCreateOrUpdateTriggerID:
+            result = @"CreateOrUpdateTrigger";
+            break;
+
+        case MTRCommandIDTypeClusterZoneManagementCommandRemoveTriggerID:
+            result = @"RemoveTrigger";
             break;
 
         default:
@@ -12242,6 +12314,10 @@ NSString * MTRRequestCommandNameForID(MTRClusterIDType clusterID, MTRCommandIDTy
 
         case MTRCommandIDTypeClusterUnitTestingCommandGlobalEchoRequestID:
             result = @"GlobalEchoRequest";
+            break;
+
+        case MTRCommandIDTypeClusterUnitTestingCommandTestCheckCommandFlagsID:
+            result = @"TestCheckCommandFlags";
             break;
 
         case MTRCommandIDTypeClusterUnitTestingCommandTestDifferentVendorMeiRequestID:
@@ -13316,6 +13392,10 @@ NSString * MTRResponseCommandNameForID(MTRClusterIDType clusterID, MTRCommandIDT
             result = @"GetWeeklyScheduleResponse";
             break;
 
+        case MTRCommandIDTypeClusterThermostatCommandAddThermostatSuggestionResponseID:
+            result = @"AddThermostatSuggestionResponse";
+            break;
+
         case MTRCommandIDTypeClusterThermostatCommandAtomicResponseID:
             result = @"AtomicResponse";
             break;
@@ -13764,10 +13844,6 @@ NSString * MTRResponseCommandNameForID(MTRClusterIDType clusterID, MTRCommandIDT
 
         case MTRCommandIDTypeClusterZoneManagementCommandCreateTwoDCartesianZoneResponseID:
             result = @"CreateTwoDCartesianZoneResponse";
-            break;
-
-        case MTRCommandIDTypeClusterZoneManagementCommandGetTwoDCartesianZoneResponseID:
-            result = @"GetTwoDCartesianZoneResponse";
             break;
 
         default:
@@ -15391,6 +15467,39 @@ NSString * MTREventNameForID(MTRClusterIDType clusterID, MTREventIDType eventID)
     case MTRClusterIDTypeThermostatID:
 
         switch (eventID) {
+
+            // Cluster Thermostat events
+        case MTREventIDTypeClusterThermostatEventSystemModeChangeID:
+            result = @"SystemModeChange";
+            break;
+
+        case MTREventIDTypeClusterThermostatEventLocalTemperatureChangeID:
+            result = @"LocalTemperatureChange";
+            break;
+
+        case MTREventIDTypeClusterThermostatEventOccupancyChangeID:
+            result = @"OccupancyChange";
+            break;
+
+        case MTREventIDTypeClusterThermostatEventSetpointChangeID:
+            result = @"SetpointChange";
+            break;
+
+        case MTREventIDTypeClusterThermostatEventRunningStateChangeID:
+            result = @"RunningStateChange";
+            break;
+
+        case MTREventIDTypeClusterThermostatEventRunningModeChangeID:
+            result = @"RunningModeChange";
+            break;
+
+        case MTREventIDTypeClusterThermostatEventActiveScheduleChangeID:
+            result = @"ActiveScheduleChange";
+            break;
+
+        case MTREventIDTypeClusterThermostatEventActivePresetChangeID:
+            result = @"ActivePresetChange";
+            break;
 
         default:
             result = [NSString stringWithFormat:@"<Unknown eventID %u>", eventID];

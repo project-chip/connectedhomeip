@@ -17,8 +17,7 @@
 
 #include <lib/core/DataModelTypes.h>
 
-constexpr chip::EndpointId kOtaProviderDynamicEndpointId     = 0;
-constexpr chip::EndpointId kWebRTCRequesterDynamicEndpointId = 1;
+constexpr chip::EndpointId kOtaProviderDynamicEndpointId = 0;
 
 namespace chip {
 namespace app {

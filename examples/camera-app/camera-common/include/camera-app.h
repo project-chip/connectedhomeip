@@ -37,6 +37,9 @@ public:
     // Initialize all the camera device clusters.
     void InitCameraDeviceClusters();
 
+    // Shutdown all the camera device clusters
+    void ShutdownCameraDeviceClusters();
+
 private:
     chip::EndpointId mEndpoint;
     CameraDeviceInterface * mCameraDevice;
@@ -47,6 +50,7 @@ private:
     std::unique_ptr<chip::app::Clusters::CameraAvStreamManagement::CameraAVStreamMgmtServer> mAVStreamMgmtServerPtr;
     std::unique_ptr<chip::app::Clusters::CameraAvSettingsUserLevelManagement::CameraAvSettingsUserLevelMgmtServer>
         mAVSettingsUserLevelMgmtServerPtr;
+    std::unique_ptr<chip::app::Clusters::ZoneManagement::ZoneMgmtServer> mZoneMgmtServerPtr;
 
     // Helper to set attribute defaults for CameraAVStreamMgmt
     void InitializeCameraAVStreamMgmt();

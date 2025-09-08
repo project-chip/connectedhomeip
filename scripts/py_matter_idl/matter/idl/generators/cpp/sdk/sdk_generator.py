@@ -85,6 +85,10 @@ def response_struct(s: Struct) -> bool:
     return s.code is not None
 
 
+def is_optional(attribute: Attribute) -> bool:
+    return attribute.definition.is_optional
+
+
 class SdkGenerator(CodeGenerator):
     """
     Generation of cpp code for application implementation for matter.
@@ -102,6 +106,7 @@ class SdkGenerator(CodeGenerator):
         self.jinja_env.filters['name_for_id_usage'] = name_for_id_usage
         self.jinja_env.tests['global_attribute'] = global_attribute
         self.jinja_env.tests['response_struct'] = response_struct
+        self.jinja_env.tests['is_optional'] = is_optional
 
     def internal_render_all(self):
         """
@@ -117,20 +122,30 @@ class SdkGenerator(CodeGenerator):
             },
         )
 
+        self.internal_render_one_output(
+            template_path="MetadataQuery.h.jinja",
+            output_file_name="MetadataQuery.h",
+            vars={
+                "clusters": self.idl.clusters,
+                "input_name": self.idl.parse_file_name,
+            },
+        )
+
         for cluster in self.idl.clusters:
 
             build_targets = {
                 "Build.jinja": "BUILD.gn",
 
                 # contains `*Entry` items for attributes and commands
-                "ClusterMetadataHeader.jinja": "Metadata.h",
+                "Metadata.h.jinja": "Metadata.h",
+                "MetadataProvider.h.jinja": "MetadataProvider.h",
 
                 # contains id definitions
-                "AttributeIds.jinja": "AttributeIds.h",
-                "ClusterId.jinja": "ClusterId.h",
-                "CommandIds.jinja": "CommandIds.h",
-                "EventIds.jinja": "EventIds.h",
-                "Ids.jinja": "Ids.h",
+                "AttributeIds.h.jinja": "AttributeIds.h",
+                "ClusterId.h.jinja": "ClusterId.h",
+                "CommandIds.h.jinja": "CommandIds.h",
+                "EventIds.h.jinja": "EventIds.h",
+                "Ids.h.jinja": "Ids.h",
             }
 
             for template_path, output_file in build_targets.items():

@@ -73,15 +73,17 @@ class CameraAvStreamManagementCluster(
     object SubscriptionEstablished : VideoSensorParamsAttributeSubscriptionState()
   }
 
-  class MinViewportAttribute(val value: CameraAvStreamManagementClusterVideoResolutionStruct?)
+  class MinViewportResolutionAttribute(
+    val value: CameraAvStreamManagementClusterVideoResolutionStruct?
+  )
 
-  sealed class MinViewportAttributeSubscriptionState {
+  sealed class MinViewportResolutionAttributeSubscriptionState {
     data class Success(val value: CameraAvStreamManagementClusterVideoResolutionStruct?) :
-      MinViewportAttributeSubscriptionState()
+      MinViewportResolutionAttributeSubscriptionState()
 
-    data class Error(val exception: Exception) : MinViewportAttributeSubscriptionState()
+    data class Error(val exception: Exception) : MinViewportResolutionAttributeSubscriptionState()
 
-    object SubscriptionEstablished : MinViewportAttributeSubscriptionState()
+    object SubscriptionEstablished : MinViewportResolutionAttributeSubscriptionState()
   }
 
   class RateDistortionTradeOffPointsAttribute(
@@ -189,16 +191,14 @@ class CameraAvStreamManagementCluster(
     object SubscriptionEstablished : AllocatedSnapshotStreamsAttributeSubscriptionState()
   }
 
-  class RankedVideoStreamPrioritiesListAttribute(val value: List<UByte>?)
+  class StreamUsagePrioritiesAttribute(val value: List<UByte>)
 
-  sealed class RankedVideoStreamPrioritiesListAttributeSubscriptionState {
-    data class Success(val value: List<UByte>?) :
-      RankedVideoStreamPrioritiesListAttributeSubscriptionState()
+  sealed class StreamUsagePrioritiesAttributeSubscriptionState {
+    data class Success(val value: List<UByte>) : StreamUsagePrioritiesAttributeSubscriptionState()
 
-    data class Error(val exception: Exception) :
-      RankedVideoStreamPrioritiesListAttributeSubscriptionState()
+    data class Error(val exception: Exception) : StreamUsagePrioritiesAttributeSubscriptionState()
 
-    object SubscriptionEstablished : RankedVideoStreamPrioritiesListAttributeSubscriptionState()
+    object SubscriptionEstablished : StreamUsagePrioritiesAttributeSubscriptionState()
   }
 
   class ViewportAttribute(val value: CameraAvStreamManagementClusterViewportStruct?)
@@ -339,8 +339,7 @@ class CameraAvStreamManagementCluster(
     maxResolution: CameraAvStreamManagementClusterVideoResolutionStruct,
     minBitRate: UInt,
     maxBitRate: UInt,
-    minFragmentLen: UShort,
-    maxFragmentLen: UShort,
+    keyFrameInterval: UShort,
     watermarkEnabled: Boolean?,
     OSDEnabled: Boolean?,
     timedInvokeTimeout: Duration? = null,
@@ -374,18 +373,15 @@ class CameraAvStreamManagementCluster(
     val TAG_MAX_BIT_RATE_REQ: Int = 7
     tlvWriter.put(ContextSpecificTag(TAG_MAX_BIT_RATE_REQ), maxBitRate)
 
-    val TAG_MIN_FRAGMENT_LEN_REQ: Int = 8
-    tlvWriter.put(ContextSpecificTag(TAG_MIN_FRAGMENT_LEN_REQ), minFragmentLen)
+    val TAG_KEY_FRAME_INTERVAL_REQ: Int = 8
+    tlvWriter.put(ContextSpecificTag(TAG_KEY_FRAME_INTERVAL_REQ), keyFrameInterval)
 
-    val TAG_MAX_FRAGMENT_LEN_REQ: Int = 9
-    tlvWriter.put(ContextSpecificTag(TAG_MAX_FRAGMENT_LEN_REQ), maxFragmentLen)
-
-    val TAG_WATERMARK_ENABLED_REQ: Int = 10
+    val TAG_WATERMARK_ENABLED_REQ: Int = 9
     watermarkEnabled?.let {
       tlvWriter.put(ContextSpecificTag(TAG_WATERMARK_ENABLED_REQ), watermarkEnabled)
     }
 
-    val TAG_OSD_ENABLED_REQ: Int = 11
+    val TAG_OSD_ENABLED_REQ: Int = 10
     OSDEnabled?.let { tlvWriter.put(ContextSpecificTag(TAG_OSD_ENABLED_REQ), OSDEnabled) }
     tlvWriter.endStructure()
 
@@ -1088,7 +1084,7 @@ class CameraAvStreamManagementCluster(
     }
   }
 
-  suspend fun readMinViewportAttribute(): MinViewportAttribute {
+  suspend fun readMinViewportResolutionAttribute(): MinViewportResolutionAttribute {
     val ATTRIBUTE_ID: UInt = 4u
 
     val attributePath =
@@ -1110,7 +1106,7 @@ class CameraAvStreamManagementCluster(
         it.path.attributeId == ATTRIBUTE_ID
       }
 
-    requireNotNull(attributeData) { "Minviewport attribute not found in response" }
+    requireNotNull(attributeData) { "Minviewportresolution attribute not found in response" }
 
     // Decode the TLV data into the appropriate type
     val tlvReader = TlvReader(attributeData.data)
@@ -1121,13 +1117,13 @@ class CameraAvStreamManagementCluster(
         null
       }
 
-    return MinViewportAttribute(decodedValue)
+    return MinViewportResolutionAttribute(decodedValue)
   }
 
-  suspend fun subscribeMinViewportAttribute(
+  suspend fun subscribeMinViewportResolutionAttribute(
     minInterval: Int,
     maxInterval: Int,
-  ): Flow<MinViewportAttributeSubscriptionState> {
+  ): Flow<MinViewportResolutionAttributeSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 4u
     val attributePaths =
       listOf(
@@ -1146,7 +1142,7 @@ class CameraAvStreamManagementCluster(
       when (subscriptionState) {
         is SubscriptionState.SubscriptionErrorNotification -> {
           emit(
-            MinViewportAttributeSubscriptionState.Error(
+            MinViewportResolutionAttributeSubscriptionState.Error(
               Exception(
                 "Subscription terminated with error code: ${subscriptionState.terminationCause}"
               )
@@ -1159,7 +1155,9 @@ class CameraAvStreamManagementCluster(
               .filterIsInstance<ReadData.Attribute>()
               .firstOrNull { it.path.attributeId == ATTRIBUTE_ID }
 
-          requireNotNull(attributeData) { "Minviewport attribute not found in Node State update" }
+          requireNotNull(attributeData) {
+            "Minviewportresolution attribute not found in Node State update"
+          }
 
           // Decode the TLV data into the appropriate type
           val tlvReader = TlvReader(attributeData.data)
@@ -1170,10 +1168,10 @@ class CameraAvStreamManagementCluster(
               null
             }
 
-          decodedValue?.let { emit(MinViewportAttributeSubscriptionState.Success(it)) }
+          decodedValue?.let { emit(MinViewportResolutionAttributeSubscriptionState.Success(it)) }
         }
         SubscriptionState.SubscriptionEstablished -> {
-          emit(MinViewportAttributeSubscriptionState.SubscriptionEstablished)
+          emit(MinViewportResolutionAttributeSubscriptionState.SubscriptionEstablished)
         }
       }
     }
@@ -2518,8 +2516,7 @@ class CameraAvStreamManagementCluster(
     }
   }
 
-  suspend fun readRankedVideoStreamPrioritiesListAttribute():
-    RankedVideoStreamPrioritiesListAttribute {
+  suspend fun readStreamUsagePrioritiesAttribute(): StreamUsagePrioritiesAttribute {
     val ATTRIBUTE_ID: UInt = 18u
 
     val attributePath =
@@ -2541,32 +2538,26 @@ class CameraAvStreamManagementCluster(
         it.path.attributeId == ATTRIBUTE_ID
       }
 
-    requireNotNull(attributeData) {
-      "Rankedvideostreamprioritieslist attribute not found in response"
-    }
+    requireNotNull(attributeData) { "Streamusagepriorities attribute not found in response" }
 
     // Decode the TLV data into the appropriate type
     val tlvReader = TlvReader(attributeData.data)
-    val decodedValue: List<UByte>? =
-      if (tlvReader.isNextTag(AnonymousTag)) {
-        buildList<UByte> {
-          tlvReader.enterArray(AnonymousTag)
-          while (!tlvReader.isEndOfContainer()) {
-            add(tlvReader.getUByte(AnonymousTag))
-          }
-          tlvReader.exitContainer()
+    val decodedValue: List<UByte> =
+      buildList<UByte> {
+        tlvReader.enterArray(AnonymousTag)
+        while (!tlvReader.isEndOfContainer()) {
+          add(tlvReader.getUByte(AnonymousTag))
         }
-      } else {
-        null
+        tlvReader.exitContainer()
       }
 
-    return RankedVideoStreamPrioritiesListAttribute(decodedValue)
+    return StreamUsagePrioritiesAttribute(decodedValue)
   }
 
-  suspend fun subscribeRankedVideoStreamPrioritiesListAttribute(
+  suspend fun subscribeStreamUsagePrioritiesAttribute(
     minInterval: Int,
     maxInterval: Int,
-  ): Flow<RankedVideoStreamPrioritiesListAttributeSubscriptionState> {
+  ): Flow<StreamUsagePrioritiesAttributeSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 18u
     val attributePaths =
       listOf(
@@ -2585,7 +2576,7 @@ class CameraAvStreamManagementCluster(
       when (subscriptionState) {
         is SubscriptionState.SubscriptionErrorNotification -> {
           emit(
-            RankedVideoStreamPrioritiesListAttributeSubscriptionState.Error(
+            StreamUsagePrioritiesAttributeSubscriptionState.Error(
               Exception(
                 "Subscription terminated with error code: ${subscriptionState.terminationCause}"
               )
@@ -2599,30 +2590,24 @@ class CameraAvStreamManagementCluster(
               .firstOrNull { it.path.attributeId == ATTRIBUTE_ID }
 
           requireNotNull(attributeData) {
-            "Rankedvideostreamprioritieslist attribute not found in Node State update"
+            "Streamusagepriorities attribute not found in Node State update"
           }
 
           // Decode the TLV data into the appropriate type
           val tlvReader = TlvReader(attributeData.data)
-          val decodedValue: List<UByte>? =
-            if (tlvReader.isNextTag(AnonymousTag)) {
-              buildList<UByte> {
-                tlvReader.enterArray(AnonymousTag)
-                while (!tlvReader.isEndOfContainer()) {
-                  add(tlvReader.getUByte(AnonymousTag))
-                }
-                tlvReader.exitContainer()
+          val decodedValue: List<UByte> =
+            buildList<UByte> {
+              tlvReader.enterArray(AnonymousTag)
+              while (!tlvReader.isEndOfContainer()) {
+                add(tlvReader.getUByte(AnonymousTag))
               }
-            } else {
-              null
+              tlvReader.exitContainer()
             }
 
-          decodedValue?.let {
-            emit(RankedVideoStreamPrioritiesListAttributeSubscriptionState.Success(it))
-          }
+          emit(StreamUsagePrioritiesAttributeSubscriptionState.Success(decodedValue))
         }
         SubscriptionState.SubscriptionEstablished -> {
-          emit(RankedVideoStreamPrioritiesListAttributeSubscriptionState.SubscriptionEstablished)
+          emit(StreamUsagePrioritiesAttributeSubscriptionState.SubscriptionEstablished)
         }
       }
     }

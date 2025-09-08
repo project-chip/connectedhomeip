@@ -19,15 +19,54 @@
 #pragma once
 
 #include "transport.h"
-#include <rtc/rtc.hpp>
+#include "webrtc-abstract.h"
+#include <lib/core/DataModelTypes.h>
+#include <lib/core/ScopedNodeId.h>
+
+using OnTransportLocalDescriptionCallback = std::function<void(const std::string & sdp, SDPType type, const int16_t sessionId)>;
+using OnTransportConnectionStateCallback  = std::function<void(bool connected, const int16_t sessionId)>;
 
 // Derived class for WebRTC transport
 class WebrtcTransport : public Transport
 {
 public:
-    WebrtcTransport(uint16_t sessionID, uint64_t nodeID, std::shared_ptr<rtc::PeerConnection> mPeerConnection);
+    enum class CommandType : uint8_t
+    {
+        kUndefined     = 0,
+        kOffer         = 1,
+        kAnswer        = 2,
+        kICECandidates = 3,
+    };
+
+    enum class State : uint8_t
+    {
+        Idle,                 ///< Default state, no communication initiated yet
+        SendingOffer,         ///< Sending Offer command from camera
+        SendingAnswer,        ///< Sending Answer command from camera
+        SendingICECandidates, ///< Sending ICECandidates command from camera
+    };
+
+    struct RequestArgs
+    {
+        uint16_t sessionId;
+        uint16_t videoStreamId;
+        uint16_t audioStreamId;
+        chip::NodeId peerNodeId;
+        chip::FabricIndex fabricIndex;
+        chip::EndpointId originatingEndpointId;
+        chip::ScopedNodeId peerId;
+    };
+
+    WebrtcTransport();
 
     ~WebrtcTransport();
+
+    void SetCallbacks(OnTransportLocalDescriptionCallback onLocalDescription, OnTransportConnectionStateCallback onConnectionState);
+
+    void MoveToState(const State targetState);
+    const char * GetStateStr() const;
+
+    State GetState() { return mState; }
 
     // Send video data for a given stream ID
     void SendVideo(const char * data, size_t size, uint16_t videoStreamID) override;
@@ -44,17 +83,59 @@ public:
     // Indicates that the transport is ready to send audio data
     bool CanSendAudio() override;
 
-private:
-    // Transport is registered after peer connection is established for receiving the video and audio buffers.
-    // Hence keeping the default values as true for canSendVideo, canSendAudio
-    bool mCanSendVideo = true;
-    bool mCanSendAudio = true;
+    // Takes care of creation WebRTC peer connection and registering the necessary callbacks
+    void Start();
 
-    uint16_t mSessionID;
-    uint64_t mNodeID;
-    uint32_t mAudioSampleTimestamp;
-    uint32_t mVideoSampleTimestamp;
-    std::shared_ptr<rtc::PeerConnection> mPeerConnection;
-    std::shared_ptr<rtc::Track> mVideoTrack;
-    std::shared_ptr<rtc::Track> mAudioTrack;
+    // Stops WebRTC peer connection and cleanup
+    void Stop();
+
+    void AddTracks();
+
+    // Set video track for the transport
+    void SetVideoTrack(std::shared_ptr<WebRTCTrack> videoTrack);
+
+    // Set audio track for the transport
+    void SetAudioTrack(std::shared_ptr<WebRTCTrack> audioTrack);
+
+    std::shared_ptr<WebRTCPeerConnection> GetPeerConnection() { return mPeerConnection; }
+
+    std::string GetLocalDescription() { return mLocalSdp; }
+
+    void SetSdpAnswer(std::string localSdp) { mLocalSdp = localSdp; }
+
+    std::vector<std::string> GetCandidates() { return mLocalCandidates; }
+
+    void SetCandidates(std::vector<std::string> candidates) { mLocalCandidates = candidates; }
+
+    void AddRemoteCandidate(const std::string & candidate, const std::string & mid);
+
+    bool ClosePeerConnection();
+
+    void SetCommandType(const CommandType commandtype);
+
+    CommandType GetCommandType() { return mCommandType; }
+
+    // WebRTC Callbacks
+    void OnLocalDescription(const std::string & sdp, SDPType type);
+    void OnICECandidate(const std::string & candidate);
+    void OnConnectionStateChanged(bool connected);
+    void OnTrack(std::shared_ptr<WebRTCTrack> track);
+
+    void SetRequestArgs(const RequestArgs & args);
+    RequestArgs & GetRequestArgs();
+
+private:
+    CommandType mCommandType = CommandType::kUndefined;
+    State mState             = State::Idle;
+
+    std::shared_ptr<WebRTCPeerConnection> mPeerConnection;
+    std::shared_ptr<WebRTCTrack> mVideoTrack;
+    std::shared_ptr<WebRTCTrack> mAudioTrack;
+    std::string mLocalSdp;
+    SDPType mLocalSdpType;
+    std::vector<std::string> mLocalCandidates;
+
+    RequestArgs mRequestArgs;
+    OnTransportLocalDescriptionCallback mOnLocalDescription = nullptr;
+    OnTransportConnectionStateCallback mOnConnectionState   = nullptr;
 };

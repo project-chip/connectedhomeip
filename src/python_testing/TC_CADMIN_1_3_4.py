@@ -24,6 +24,7 @@
 #       --commissioning-method on-network
 #       --discriminator 1234
 #       --passcode 20202021
+#       --endpoint 0
 #       --trace-to json:${TRACE_TEST_JSON}.json
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 #     factory-reset: true
@@ -36,6 +37,7 @@
 #       --storage-path admin_storage.json
 #       --discriminator 1234
 #       --passcode 20202021
+#       --endpoint 0
 #       --trace-to json:${TRACE_TEST_JSON}.json
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 #     factory-reset: false
@@ -43,29 +45,24 @@
 # === END CI TEST ARGUMENTS ===
 
 import asyncio
-import base64
 import logging
 import random
 from time import sleep
 
-import chip.clusters as Clusters
-from chip import ChipDeviceCtrl
-from chip.exceptions import ChipStackError
-from chip.tlv import TLVReader
-from matter_testing_infrastructure.chip.testing.matter_testing import (MatterBaseTest, TestStep, async_test_body,
-                                                                       default_matter_test_main)
 from mobly import asserts
-from support_modules.cadmin_support import CADMINSupport
+from support_modules.cadmin_support import CADMINBaseTest
+
+import matter.clusters as Clusters
+from matter import ChipDeviceCtrl
+from matter.exceptions import ChipStackError
+from matter.testing.matter_testing import TestStep, default_matter_test_main, has_cluster, has_feature, run_if_endpoint_matches
+from matter.tlv import TLVReader
 
 opcreds = Clusters.OperationalCredentials
 nonce = random.randbytes(32)
 
 
-class TC_CADMIN(MatterBaseTest):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.support = CADMINSupport(self)
-
+class TC_CADMIN(CADMINBaseTest):
     async def combined_commission_val_steps(self, commission_type: str):
         """
         Combined test function for commissioning tests.
@@ -106,13 +103,13 @@ class TC_CADMIN(MatterBaseTest):
 
         self.step("3b")
         if commission_type == "ECM":
-            service = await self.support.wait_for_correct_cm_value(
+            service = await self.wait_for_correct_cm_value(
                 expected_cm_value=2,
                 expected_discriminator=1234
             )
             logging.info(f"Successfully found service with CM={service.txt_record.get('CM')}, D={service.txt_record.get('D')}")
         elif commission_type == "BCM":
-            service = await self.support.wait_for_correct_cm_value(
+            service = await self.wait_for_correct_cm_value(
                 expected_cm_value=1,
                 expected_discriminator=setupPayloadInfo[0].filter_value
             )
@@ -121,8 +118,8 @@ class TC_CADMIN(MatterBaseTest):
         self.step("3c")
         BI_cluster = Clusters.BasicInformation
         self.nl_attribute = BI_cluster.Attributes.NodeLabel
-        await self.support.write_nl_attr(dut_node_id=self.dut_node_id, th=self.th1, attr_val=self.nl_attribute)
-        await self.support.read_nl_attr(dut_node_id=self.dut_node_id, th=self.th1, attr_val=self.nl_attribute)
+        await self.write_nl_attr(dut_node_id=self.dut_node_id, th=self.th1, attr_val=self.nl_attribute)
+        await self.read_nl_attr(dut_node_id=self.dut_node_id, th=self.th1, attr_val=self.nl_attribute)
 
         self.step(4)
         # Establishing TH2
@@ -152,9 +149,9 @@ class TC_CADMIN(MatterBaseTest):
 
         self.step(5)
         # TH_CR1 reads the Fabrics attribute
-        th1_fabric_info = await self.support.get_fabrics(th=self.th1)
-        th1_cam_rcac = TLVReader(base64.b64decode(
-            self.certificate_authority_manager.activeCaList[0]._persistentStorage._jsonData["sdk-config"]["f/1/r"])).get()["Any"][9]
+        th1_fabric_info = await self.get_fabrics(th=self.th1)
+        th1_cam_rcac = TLVReader(
+            self.certificate_authority_manager.activeCaList[0]._persistentStorage.GetSdkKey("f/1/r")).get()["Any"][9]
         if th1_fabric_info[0].rootPublicKey != th1_cam_rcac:
             asserts.fail("Public keys from fabric and certs for TH1 are not the same.")
         if th1_fabric_info[0].nodeID != self.dut_node_id:
@@ -162,7 +159,7 @@ class TC_CADMIN(MatterBaseTest):
 
         self.step(6)
         # TH_CR2 reads the Fabrics attribute
-        th2_fabric_info = await self.support.get_fabrics(th=self.th2)
+        th2_fabric_info = await self.get_fabrics(th=self.th2)
         if th2_fabric_info[0].rootPublicKey != th2_rcac_decoded:
             asserts.fail("Public keys from fabric and certs for TH2 are not the same.")
         if th2_fabric_info[0].nodeID != self.dut_node_id:
@@ -171,15 +168,15 @@ class TC_CADMIN(MatterBaseTest):
         if commission_type == "ECM":
             self.step(7)
             # TH_CR1 writes and reads the Basic Information Cluster’s NodeLabel mandatory attribute of DUT_CE
-            await self.support.write_nl_attr(dut_node_id=self.dut_node_id, th=self.th1, attr_val=self.nl_attribute)
-            await self.support.read_nl_attr(dut_node_id=self.dut_node_id, th=self.th1, attr_val=self.nl_attribute)
+            await self.write_nl_attr(dut_node_id=self.dut_node_id, th=self.th1, attr_val=self.nl_attribute)
+            await self.read_nl_attr(dut_node_id=self.dut_node_id, th=self.th1, attr_val=self.nl_attribute)
 
             self.step(8)
             # TH_CR2 writes and reads the Basic Information Cluster’s NodeLabel mandatory attribute of DUT_CE
-            val = await self.support.read_nl_attr(dut_node_id=self.dut_node_id, th=self.th2, attr_val=self.nl_attribute)
+            val = await self.read_nl_attr(dut_node_id=self.dut_node_id, th=self.th2, attr_val=self.nl_attribute)
             self.print_step("basic information cluster node label attr value", val)
-            await self.support.write_nl_attr(dut_node_id=self.dut_node_id, th=self.th2, attr_val=self.nl_attribute)
-            await self.support.read_nl_attr(dut_node_id=self.dut_node_id, th=self.th2, attr_val=self.nl_attribute)
+            await self.write_nl_attr(dut_node_id=self.dut_node_id, th=self.th2, attr_val=self.nl_attribute)
+            await self.read_nl_attr(dut_node_id=self.dut_node_id, th=self.th2, attr_val=self.nl_attribute)
 
             self.step(9)
             # TH_CR2 opens a commissioning window on DUT_CE for 180 seconds using ECM
@@ -215,7 +212,7 @@ class TC_CADMIN(MatterBaseTest):
                 await self.th1.CommissionOnNetwork(
                     nodeId=self.dut_node_id, setupPinCode=params2.setupPinCode,
                     filterType=ChipDeviceCtrl.DiscoveryFilterType.LONG_DISCRIMINATOR, filter=1234)
-            except ChipStackError as e:
+            except ChipStackError as e:  # chipstack-ok: This disables ChipStackError linter check. Error occurs if a NOC for the fabric already exists, which may depend on device state. Can not use assert_raises because it not always fails
                 asserts.assert_equal(e.err,  0x0000007E,
                                      "Expected to return Trying to add NOC for fabric that already exists")
             """
@@ -281,7 +278,7 @@ class TC_CADMIN(MatterBaseTest):
         ]
 
     def pics_TC_CADMIN_1_4(self) -> list[str]:
-        return ["CADMIN.S"]
+        return ["CADMIN.S.F00"]
 
     def steps_TC_CADMIN_1_4(self) -> list[TestStep]:
         return [
@@ -302,11 +299,11 @@ class TC_CADMIN(MatterBaseTest):
                      "TH_CR1 removes TH_CR2 fabric using th2_idx")
         ]
 
-    @async_test_body
+    @run_if_endpoint_matches(has_cluster(Clusters.AdministratorCommissioning))
     async def test_TC_CADMIN_1_3(self):
         await self.combined_commission_val_steps(commission_type="ECM")
 
-    @async_test_body
+    @run_if_endpoint_matches(has_feature(cluster=Clusters.AdministratorCommissioning, feature=Clusters.AdministratorCommissioning.Bitmaps.Feature.kBasic))
     async def test_TC_CADMIN_1_4(self):
         await self.combined_commission_val_steps(commission_type="BCM")
 
