@@ -116,7 +116,7 @@ public:
     {
         // 90 kHz clock for H.264
         mRtpCfg      = std::make_shared<rtc::RtpPacketizationConfig>(kSSRC, "videosrc", kVideoH264PayloadType,
-                                                                     rtc::H264RtpPacketizer::ClockRate);
+                                                                rtc::H264RtpPacketizer::ClockRate);
         mRtpCfg->mid = mTrack->description().mid();
 
         // Setting MTU size to 1200 as default size used in the libdatachannel is 1400
