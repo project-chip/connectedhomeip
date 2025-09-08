@@ -25,6 +25,7 @@
 #     script-args: >
 #       --storage-path admin_storage.json
 #       --string-arg th_server_app_path:${PUSH_AV_SERVER}
+#       --string-arg host_ip:localhost
 #       --commissioning-method on-network
 #       --discriminator 1234
 #       --passcode 20202021
@@ -150,7 +151,8 @@ class TC_PAVST_2_3(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
         aConnectionID = ""
 
         self.step("precondition")
-        tlsEndpointId = await self.precondition_provision_tls_endpoint(endpoint=endpoint, server=self.server)
+        host_ip = self.user_params.get("host_ip", None)
+        tlsEndpointId, host_ip = await self.precondition_provision_tls_endpoint(endpoint=endpoint, server=self.server, host_ip=host_ip)
         uploadStreamId = self.server.create_stream()
 
         self.step(1)
@@ -182,7 +184,7 @@ class TC_PAVST_2_3(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
         )
 
         self.step(5)
-        status = await self.allocate_one_pushav_transport(endpoint, tlsEndPoint=tlsEndpointId, url=f"https://localhost:1234/streams/{uploadStreamId}")
+        status = await self.allocate_one_pushav_transport(endpoint, tlsEndPoint=tlsEndpointId, url=f"https://{host_ip}:1234/streams/{uploadStreamId}")
         asserts.assert_equal(
             status, Status.Success, "Push AV Transport should be allocated successfully"
         )
@@ -222,7 +224,7 @@ class TC_PAVST_2_3(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
                  "videoStreamID": 1,
                  "audioStreamID": 1,
                  "endpointID": 5,
-                 "url": "https://localhost:1234/streams/1",
+                 "url": "https://{host_ip}:1234/streams/1",
                  "triggerOptions": {"triggerType": 2},
                  "ingestMethod": 0,
                  "containerOptions": {"containerType": 0, "CMAFContainerOptions": {"chunkDuration": 4}},
@@ -234,20 +236,20 @@ class TC_PAVST_2_3(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
         self.step(11)
         status = await self.allocate_one_pushav_transport(endpoint, ingestMethod=pvcluster.Enums.IngestMethodsEnum.kUnknownEnumValue,
                                                           expected_cluster_status=pvcluster.Enums.StatusCodeEnum.kInvalidCombination,
-                                                          tlsEndPoint=tlsEndpointId, url=f"https://localhost:1234/streams/{uploadStreamId}")
+                                                          tlsEndPoint=tlsEndpointId, url=f"https://{host_ip}:1234/streams/{uploadStreamId}")
         asserts.assert_equal(status, pvcluster.Enums.StatusCodeEnum.kInvalidCombination,
                              "DUT must  responds with Status Code InvalidCombination.")
 
         self.step(12)
         status = await self.allocate_one_pushav_transport(endpoint, expected_cluster_status=pvcluster.Enums.StatusCodeEnum.kInvalidURL,
-                                                          tlsEndPoint=tlsEndpointId, url=f"https:/localhost:1234/streams/{uploadStreamId}")
+                                                          tlsEndPoint=tlsEndpointId, url=f"https:/{host_ip}:1234/streams/{uploadStreamId}")
         asserts.assert_equal(status, pvcluster.Enums.StatusCodeEnum.kInvalidURL,
                              "DUT must  responds with Status Code InvalidURL.")
 
         self.step(13)
         status = await self.allocate_one_pushav_transport(endpoint, triggerType=pvcluster.Enums.TransportTriggerTypeEnum.kUnknownEnumValue,
                                                           expected_cluster_status=pvcluster.Enums.StatusCodeEnum.kInvalidTriggerType,
-                                                          tlsEndPoint=tlsEndpointId, url=f"https://localhost:1234/streams/{uploadStreamId}")
+                                                          tlsEndPoint=tlsEndpointId, url=f"https://{host_ip}:1234/streams/{uploadStreamId}")
         asserts.assert_equal(status, pvcluster.Enums.StatusCodeEnum.kInvalidTriggerType,
                              "DUT must  responds with Status Code InvalidTriggerType.")
 
@@ -259,7 +261,7 @@ class TC_PAVST_2_3(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
                               "motionZones": zoneList,
                               "motionTimeControl": {"initialDuration": 1, "augmentationDuration": 1, "maxDuration": 1, "blindDuration": 1}}
             status = await self.allocate_one_pushav_transport(endpoint, trigger_Options=triggerOptions, expected_cluster_status=pvcluster.Enums.StatusCodeEnum.kInvalidZone,
-                                                              tlsEndPoint=tlsEndpointId, url=f"https://localhost:1234/streams/{uploadStreamId}")
+                                                              tlsEndPoint=tlsEndpointId, url=f"https://{host_ip}:1234/streams/{uploadStreamId}")
             asserts.assert_equal(status, pvcluster.Enums.StatusCodeEnum.kInvalidZone,
                                  "DUT must responds with Status Code InvalidZone.")
         except InteractionModelError as e:
@@ -269,14 +271,14 @@ class TC_PAVST_2_3(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
         self.step(15)
         status = await self.allocate_one_pushav_transport(endpoint, videoStream_ID=-1,
                                                           expected_cluster_status=pvcluster.Enums.StatusCodeEnum.kInvalidStream,
-                                                          tlsEndPoint=tlsEndpointId, url=f"https://localhost:1234/streams/{uploadStreamId}")
+                                                          tlsEndPoint=tlsEndpointId, url=f"https://{host_ip}:1234/streams/{uploadStreamId}")
         asserts.assert_equal(status, pvcluster.Enums.StatusCodeEnum.kInvalidStream,
                              "DUT must  responds with Status Code InvalidStream.")
 
         self.step(16)
         status = await self.allocate_one_pushav_transport(endpoint, audioStream_ID=-1,
                                                           expected_cluster_status=pvcluster.Enums.StatusCodeEnum.kInvalidStream,
-                                                          tlsEndPoint=tlsEndpointId, url=f"https://localhost:1234/streams/{uploadStreamId}")
+                                                          tlsEndPoint=tlsEndpointId, url=f"https://{host_ip}:1234/streams/{uploadStreamId}")
         asserts.assert_equal(status, pvcluster.Enums.StatusCodeEnum.kInvalidStream,
                              "DUT must  responds with Status Code InvalidStream.")
 
@@ -296,7 +298,7 @@ class TC_PAVST_2_3(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
             status = await self.send_single_cmd(cmd=pvcluster.Commands.AllocatePushTransport(
                 {"streamUsage": streamUsage,
                  "endpointID": endpoint,
-                 "url": "https://localhost:1234/streams/1",
+                 "url": "https://{host_ip}:1234/streams/1",
                  "triggerOptions": {"triggerType": pvcluster.Enums.TransportTriggerTypeEnum.kContinuous},
                  "ingestMethod": pvcluster.Enums.IngestMethodsEnum.kCMAFIngest,
                  "containerOptions": containerOptions,
@@ -310,7 +312,7 @@ class TC_PAVST_2_3(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
 
         self.step(18)
         status = await self.allocate_one_pushav_transport(endpoint, videoStream_ID=Nullable(), audioStream_ID=Nullable(),
-                                                          tlsEndPoint=tlsEndpointId, url=f"https://localhost:1234/streams/{uploadStreamId}")
+                                                          tlsEndPoint=tlsEndpointId, url=f"https://{host_ip}:1234/streams/{uploadStreamId}")
         asserts.assert_equal(status, Status.Success,
                              "DUT must  responds with Status Code Success.")
 
@@ -322,7 +324,7 @@ class TC_PAVST_2_3(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
                           "motionZones": zoneList,
                           "motionTimeControl": {"initialDuration": 1, "augmentationDuration": 1, "maxDuration": 1, "blindDuration": 1}}
         status = await self.allocate_one_pushav_transport(endpoint, trigger_Options=triggerOptions,
-                                                          tlsEndPoint=tlsEndpointId, url=f"https://localhost:1234/streams/{uploadStreamId}")
+                                                          tlsEndPoint=tlsEndpointId, url=f"https://{host_ip}:1234/streams/{uploadStreamId}")
         asserts.assert_equal(status, Status.ConstraintError,
                              "DUT must  responds with Status code ConstraintError")
 
@@ -332,7 +334,7 @@ class TC_PAVST_2_3(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
                           "motionTimeControl": {"initialDuration": 1, "augmentationDuration": 1, "maxDuration": 1, "blindDuration": 1},
                           "motionSensitivity": 3,
                           "motionZones": zoneList}
-        status = await self.allocate_one_pushav_transport(endpoint, trigger_Options=triggerOptions, tlsEndPoint=tlsEndpointId, url=f"https://localhost:1234/streams/{uploadStreamId}")
+        status = await self.allocate_one_pushav_transport(endpoint, trigger_Options=triggerOptions, tlsEndPoint=tlsEndpointId, url=f"https://{host_ip}:1234/streams/{uploadStreamId}")
         asserts.assert_equal(status, Status.InvalidCommand,
                              "DUT must  responds with Status Code InvalidCommand.")
 
@@ -342,7 +344,7 @@ class TC_PAVST_2_3(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
                           "motionTimeControl": {"initialDuration": 1, "augmentationDuration": 1, "maxDuration": 1, "blindDuration": 1},
                           "motionSensitivity": 11,
                           "motionZones": zoneList}
-        status = await self.allocate_one_pushav_transport(endpoint, trigger_Options=triggerOptions, tlsEndPoint=tlsEndpointId, url=f"https://localhost:1234/streams/{uploadStreamId}")
+        status = await self.allocate_one_pushav_transport(endpoint, trigger_Options=triggerOptions, tlsEndPoint=tlsEndpointId, url=f"https://{host_ip}:1234/streams/{uploadStreamId}")
         asserts.assert_equal(status, Status.InvalidCommand,
                              "DUT must  responds with Status Code InvalidCommand.")
 
@@ -351,7 +353,7 @@ class TC_PAVST_2_3(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
         triggerOptions = {"triggerType": pvcluster.Enums.TransportTriggerTypeEnum.kMotion,
                           "motionZones": zoneList,
                           "motionSensitivity": 3}
-        status = await self.allocate_one_pushav_transport(endpoint, trigger_Options=triggerOptions, tlsEndPoint=tlsEndpointId, url=f"https://localhost:1234/streams/{uploadStreamId}")
+        status = await self.allocate_one_pushav_transport(endpoint, trigger_Options=triggerOptions, tlsEndPoint=tlsEndpointId, url=f"https://{host_ip}:1234/streams/{uploadStreamId}")
         asserts.assert_equal(status, Status.InvalidCommand,
                              "DUT must  responds with Status Code InvalidCommand.")
 
@@ -361,7 +363,7 @@ class TC_PAVST_2_3(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
                           "motionZones": zoneList,
                           "motionSensitivity": 3,
                           "motionTimeControl": {"initialDuration": 0, "augmentationDuration": 1, "maxDuration": 1, "blindDuration": 1}}
-        status = await self.allocate_one_pushav_transport(endpoint, trigger_Options=triggerOptions, tlsEndPoint=tlsEndpointId, url=f"https://localhost:1234/streams/{uploadStreamId}")
+        status = await self.allocate_one_pushav_transport(endpoint, trigger_Options=triggerOptions, tlsEndPoint=tlsEndpointId, url=f"https://{host_ip}:1234/streams/{uploadStreamId}")
         asserts.assert_equal(status, Status.ConstraintError,
                              "DUT must  responds with Status code ConstraintError")
 
@@ -371,7 +373,7 @@ class TC_PAVST_2_3(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
                           "motionZones": zoneList,
                           "motionSensitivity": 3,
                           "motionTimeControl": {"initialDuration": 1, "augmentationDuration": 1, "maxDuration": 0, "blindDuration": 1}}
-        status = await self.allocate_one_pushav_transport(endpoint, trigger_Options=triggerOptions, tlsEndPoint=tlsEndpointId, url=f"https://localhost:1234/streams/{uploadStreamId}")
+        status = await self.allocate_one_pushav_transport(endpoint, trigger_Options=triggerOptions, tlsEndPoint=tlsEndpointId, url=f"https://{host_ip}:1234/streams/{uploadStreamId}")
         asserts.assert_equal(status, Status.ConstraintError,
                              "DUT must  responds with Status code ConstraintError")
 
@@ -388,7 +390,7 @@ class TC_PAVST_2_3(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
                           "motionZones": zoneList,
                           "motionTimeControl": {"initialDuration": 1, "augmentationDuration": 1, "maxDuration": 1, "blindDuration": 1}}
 
-        status = await self.allocate_one_pushav_transport(endpoint, trigger_Options=triggerOptions, tlsEndPoint=tlsEndpointId, url=f"https://localhost:1234/streams/{uploadStreamId}")
+        status = await self.allocate_one_pushav_transport(endpoint, trigger_Options=triggerOptions, tlsEndPoint=tlsEndpointId, url=f"https://{host_ip}:1234/streams/{uploadStreamId}")
         asserts.assert_equal(status, Status.Success,
                              "DUT must  responds with Status Code Success.")
         current_connections = await self.read_single_attribute_check_success(
@@ -408,19 +410,19 @@ class TC_PAVST_2_3(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
                           "maxPreRollLen": 4000,
                           "motionZones": zoneList,
                           "motionTimeControl": {"initialDuration": 1, "augmentationDuration": 1, "maxDuration": 1, "blindDuration": 1}}
-        status = await self.allocate_one_pushav_transport(endpoint, trigger_Options=triggerOptions, tlsEndPoint=tlsEndpointId, url=f"https://localhost:1234/streams/{uploadStreamId}")
+        status = await self.allocate_one_pushav_transport(endpoint, trigger_Options=triggerOptions, tlsEndPoint=tlsEndpointId, url=f"https://{host_ip}:1234/streams/{uploadStreamId}")
         asserts.assert_equal(status, Status.Success,
                              "DUT must  responds with Status Code Success.")
 
         self.step(27)
         status = await self.allocate_one_pushav_transport(endpoint, stream_Usage=Clusters.Globals.Enums.StreamUsageEnum.kUnknownEnumValue,
-                                                          tlsEndPoint=tlsEndpointId, url=f"https://localhost:1234/streams/{uploadStreamId}")
+                                                          tlsEndPoint=tlsEndpointId, url=f"https://{host_ip}:1234/streams/{uploadStreamId}")
         asserts.assert_equal(status, Status.ConstraintError,
                              "DUT must  responds with Status code ConstraintError")
 
         self.step(28)
         containerOptions = {"containerType": pvcluster.Enums.ContainerFormatEnum.kCmaf}
-        status = await self.allocate_one_pushav_transport(endpoint, container_Options=containerOptions, tlsEndPoint=tlsEndpointId, url=f"https://localhost:1234/streams/{uploadStreamId}")
+        status = await self.allocate_one_pushav_transport(endpoint, container_Options=containerOptions, tlsEndPoint=tlsEndpointId, url=f"https://{host_ip}:1234/streams/{uploadStreamId}")
         asserts.assert_equal(status, Status.InvalidCommand,
                              "DUT must  responds with Status code InvalidCommand")
 

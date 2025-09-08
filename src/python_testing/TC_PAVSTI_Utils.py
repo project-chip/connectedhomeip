@@ -359,7 +359,7 @@ class PAVSTIUtils:
         raise RuntimeError("No private IP found, specify using --string-arg host_ip <IPv4>")
 
     async def precondition_provision_tls_endpoint(
-        self, endpoint: int, server: PushAvServerProcess, host_ip: str | None
+        self, endpoint: int, server: PushAvServerProcess, host_ip: str | None = None
     ) -> int:
         """Perform provisioning steps to set up TLS endpoint."""
         if host_ip is None:

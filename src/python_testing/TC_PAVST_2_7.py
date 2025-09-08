@@ -25,6 +25,7 @@
 #     script-args: >
 #       --storage-path admin_storage.json
 #       --string-arg th_server_app_path:${PUSH_AV_SERVER}
+#       --string-arg host_ip:localhost
 #       --commissioning-method on-network
 #       --discriminator 1234
 #       --passcode 20202021
@@ -150,7 +151,8 @@ class TC_PAVST_2_7(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
         aConnectionID = ""
 
         self.step("precondition")
-        tlsEndpointId = await self.precondition_provision_tls_endpoint(endpoint=endpoint, server=self.server)
+        host_ip = self.user_params.get("host_ip", None)
+        tlsEndpointId, host_ip = await self.precondition_provision_tls_endpoint(endpoint=endpoint, server=self.server, host_ip=host_ip)
         uploadStreamId = self.server.create_stream()
 
         self.step(1)
@@ -175,7 +177,7 @@ class TC_PAVST_2_7(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
         )
 
         status = await self.allocate_one_pushav_transport(endpoint, triggerType=pvcluster.Enums.TransportTriggerTypeEnum.kContinuous,
-                                                          tlsEndPoint=tlsEndpointId, url=f"https://localhost:1234/streams/{uploadStreamId}")
+                                                          tlsEndPoint=tlsEndpointId, url=f"https://{host_ip}:1234/streams/{uploadStreamId}")
         asserts.assert_equal(
             status, Status.Success, "Push AV Transport should be allocated successfully"
         )
@@ -290,7 +292,7 @@ class TC_PAVST_2_7(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
                           "maxPreRollLen": 4000, }
 
         status = await self.allocate_one_pushav_transport(endpoint, trigger_Options=triggerOptions, tlsEndPoint=tlsEndpointId,
-                                                          url=f"https://localhost:1234/streams/{uploadStreamId}")
+                                                          url=f"https://{host_ip}:1234/streams/{uploadStreamId}")
         asserts.assert_equal(
             status, Status.Success, "Push AV Transport should be allocated successfully"
         )
