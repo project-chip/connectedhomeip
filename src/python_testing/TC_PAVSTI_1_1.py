@@ -223,7 +223,7 @@ class TC_PAVSTI_1_1(MatterBaseTest, AVSMTestBase, PAVSTIUtils):
                     "containerOptions": {
                         "containerType": pushavCluster.Enums.ContainerFormatEnum.kCmaf,
                         # TODO: Currently camera-app treats chunkDuration as seconds, revert to ms once fixed.
-                        "CMAFContainerOptions": {"CMAFInterface": 0, "segmentDuration": 4000, "chunkDuration": 2000, "sessionGroup": 1, "trackName": "media"},
+                        "CMAFContainerOptions": {"CMAFInterface": 0, "segmentDuration": 4000, "chunkDuration": 2, "sessionGroup": 1, "trackName": "media"},
                     },
                 }
             ),
