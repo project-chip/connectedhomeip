@@ -1,0 +1,11 @@
+{
+    "version": 1,
+    "description": "Upgrade Rules for Zigbee .zap files",
+    "category": "matter",
+    "upgradeRuleScripts": [
+        {
+            "path": "./upgrade-rules/cluster-api-maturity-upgrade.js",
+            "priority": 100
+        }
+    ]
+}

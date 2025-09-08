@@ -1,0 +1,5 @@
+upgrade_results:
+    - message: >
+          Thread Border Router Management cluster on endpoint 1 is no longer
+          provisional.
+      status: automatic
