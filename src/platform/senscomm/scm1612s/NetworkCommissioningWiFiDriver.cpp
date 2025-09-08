@@ -366,7 +366,7 @@ void WiseWiFiDriver::OnScanWiFiNetworkDone()
     // Since this is the dynamic memory allocation, restrict it to a configured limit
     ap_number = std::min(static_cast<uint16_t>(CHIP_DEVICE_CONFIG_MAX_SCAN_NETWORKS_RESULTS), ap_number);
 
-    std::unique_ptr<scm_wifi_ap_info[]> ap_buffer_ptr(new scm_wifi_ap_info[ap_number]);
+    std::unique_ptr<scm_wifi_ap_info[]> ap_buffer_ptr(new scm_wifi_ap_info[ap_number]());
     if (ap_buffer_ptr == NULL)
     {
         ChipLogError(DeviceLayer, "can't malloc memory for ap_list_buffer");
@@ -377,9 +377,9 @@ void WiseWiFiDriver::OnScanWiFiNetworkDone()
     scm_wifi_ap_info * ap_list_buffer = ap_buffer_ptr.get();
     if (scm_wifi_sta_scan_results(ap_list_buffer, &num, ap_number) == WISE_OK)
     {
-        if (CHIP_NO_ERROR == DeviceLayer::SystemLayer().ScheduleLambda([ap_number, ap_list_buffer]() {
+        if (CHIP_NO_ERROR == DeviceLayer::SystemLayer().ScheduleLambda([num, ap_list_buffer]() {
                 std::unique_ptr<scm_wifi_ap_info[]> auto_free(ap_list_buffer);
-                WiseScanResponseIterator iter(ap_number, ap_list_buffer);
+                WiseScanResponseIterator iter(num, ap_list_buffer);
                 if (GetInstance().mpScanCallback)
                 {
                     GetInstance().mpScanCallback->OnFinished(Status::kSuccess, CharSpan(), &iter);
