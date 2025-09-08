@@ -110,6 +110,10 @@ public:
 
     double GetCurrentlyUsedBandwidthMbps() { return mCurrentlyUsedBandwidthMbps; }
 
+    void ConfigureRecorderTimeSetting(
+        const chip::app::Clusters::PushAvStreamTransport::Structs::TransportMotionTriggerTimeControlStruct::DecodableType &
+            timeControl);
+
 private:
     bool mHasAugmented                            = false;
     bool mStreaming                               = false;

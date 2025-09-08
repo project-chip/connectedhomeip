@@ -136,9 +136,9 @@ PushAvStreamTransportManager::AllocatePushTransport(const TransportOptionsStruct
         }
     }
 
-#ifdef TLS_CLUSTER_ENABLED
+#ifndef TLS_CLUSTER_ENABLED
     ChipLogDetail(Camera, "PushAvStreamTransportManager: TLS Cluster enabled, using default certs");
-    mTransportMap[connectionID].get()->SetTLSCert(bufferRootCert, bufferClientCert, bufferClientCertKey);
+    mTransportMap[connectionID].get()->SetTLSCert(mBufferRootCert, mBufferClientCert, mBufferClientCertKey);
 #else
     // TODO: The else block is for testing purpose. It should be removed once the TLS cluster integration is stable.
     mTransportMap[connectionID].get()->SetTLSCertPath("/tmp/pavstest/certs/server/root.pem", "/tmp/pavstest/certs/device/dev.pem",
@@ -238,6 +238,10 @@ Protocols::InteractionModel::Status PushAvStreamTransportManager::ManuallyTrigge
     }
 
     ChipLogProgress(Camera, "PushAvStreamTransportManager, Trigger PushAV Transport for Connection: [%u]", connectionID);
+    if (timeControl.HasValue())
+    {
+        mTransportMap[connectionID]->ConfigureRecorderTimeSetting(timeControl.Value());
+    }
     mTransportMap[connectionID]->TriggerTransport(activationReason);
 
     return Status::Success;
@@ -541,4 +545,24 @@ void PushAvStreamTransportManager::OnZoneTriggeredEvent(u_int16_t zoneId)
             pavst.second->TriggerTransport(TriggerActivationReasonEnum::kAutomation, zoneId, 10);
         }
     }
+}
+
+void PushAvStreamTransportManager::SetTLSCerts(Tls::CertificateTable::BufferedClientCert & clientCertEntry,
+                                               Tls::CertificateTable::BufferedRootCert & rootCertEntry)
+
+{
+    auto rootSpan = rootCertEntry.GetCert().certificate.Value();
+    mBufferRootCert.assign(rootSpan.data(), rootSpan.data() + rootSpan.size());
+
+    auto clientSpan = clientCertEntry.GetCert().clientCertificate.Value();
+    mBufferClientCert.assign(clientSpan.data(), clientSpan.data() + clientSpan.size());
+
+    uint8_t buffer[Credentials::kP256ECPrivateKeyDERLength];
+    MutableByteSpan keypairDer(buffer);
+    Credentials::ConvertECDSAKeypairRawToDER(clientCertEntry.mCertWithKey.key, keypairDer);
+    mBufferClientCertKey.assign(keypairDer.data(), keypairDer.data() + keypairDer.size());
+
+    // TODO: Handle Intermediate certificates and use for chain validation if needed. For now just log it.
+    ChipLogDetail(Camera, "Intermediate certificate size %b",
+                  clientCertEntry.mCertWithKey.detail.intermediateCertificates.HasValue());
 }

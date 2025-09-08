@@ -600,10 +600,19 @@ PushAvStreamTransportServerLogic::HandleAllocatePushTransport(CommandHandler & h
         PersistentStore<CHIP_CONFIG_TLS_PERSISTED_CLIENT_CERT_BYTES> clientCertBuffer;
         Tls::CertificateTable::BufferedClientCert clientCertEntry(clientCertBuffer);
         Tls::CertificateTable::BufferedRootCert rootCertEntry(rootCertBuffer);
-        auto & table = mTlsCertificateManagementDelegate->GetCertificateTable();
-        table.GetClientCertificateEntry(handler.GetAccessingFabricIndex(), TLSEndpoint.ccdid.Value(), clientCertEntry);
-        table.GetRootCertificateEntry(handler.GetAccessingFabricIndex(), TLSEndpoint.caid, rootCertEntry);
-        mDelegate->SetTLSCerts(clientCertEntry, rootCertEntry);
+
+        if (mTlsCertificateManagementDelegate != nullptr)
+        {
+            auto & table = mTlsCertificateManagementDelegate->GetCertificateTable();
+            table.GetClientCertificateEntry(handler.GetAccessingFabricIndex(), TLSEndpoint.ccdid.Value(), clientCertEntry);
+            table.GetRootCertificateEntry(handler.GetAccessingFabricIndex(), TLSEndpoint.caid, rootCertEntry);
+            mDelegate->SetTLSCerts(clientCertEntry, rootCertEntry);
+        }
+        else
+        {
+            // For tests, create empty cert entries
+            mDelegate->SetTLSCerts(clientCertEntry, rootCertEntry);
+        }
     }
     else
     {

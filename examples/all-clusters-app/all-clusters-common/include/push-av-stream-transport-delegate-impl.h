@@ -86,6 +86,22 @@ public:
 
     CHIP_ERROR PersistentAttributesLoadedCallback() override;
 
+    void SetOnRecorderStoppedCallback(std::function<void(uint16_t, PushAvStreamTransport::TransportTriggerTypeEnum)> cb) override
+    {
+        // Store callback if needed for implementation
+    }
+
+    void SetOnRecorderStartedCallback(std::function<void(uint16_t, PushAvStreamTransport::TransportTriggerTypeEnum)> cb) override
+    {
+        // Store callback if needed for implementation
+    }
+
+    void SetTLSCerts(Tls::CertificateTable::BufferedClientCert & clientCertEntry,
+                     Tls::CertificateTable::BufferedRootCert & rootCertEntry) override
+    {
+        // Handle TLS certificates if needed for implementation
+    }
+
     void Init();
     PushAvStreamTransportManager()  = default;
     ~PushAvStreamTransportManager() = default;

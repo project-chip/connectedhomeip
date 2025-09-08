@@ -25,7 +25,7 @@
 #include <openssl/bio.h>
 #include <openssl/pem.h>
 #include <openssl/x509.h>
-#include <vector>`
+#include <vector>
 
 PushAVUploader::PushAVUploader() : mIsRunning(false) {}
 
@@ -41,7 +41,8 @@ std::string DerCertToPem(const std::vector<uint8_t> & derData)
     X509 * cert             = d2i_X509(nullptr, &p, derData.size());
     if (!cert)
     {
-        ChipLogError(Camera, "Failed to parse DER certificate");
+        ChipLogError(Camera, "Failed to parse DER certificate of size: %ld", derData.size());
+        return "";
     }
 
     BIO * bio = BIO_new(BIO_s_mem());
@@ -49,6 +50,7 @@ std::string DerCertToPem(const std::vector<uint8_t> & derData)
     {
         X509_free(cert);
         ChipLogError(Camera, "Failed to allocate BIO");
+        return "";
     }
 
     if (!PEM_write_bio_X509(bio, cert))
@@ -56,6 +58,7 @@ std::string DerCertToPem(const std::vector<uint8_t> & derData)
         BIO_free(bio);
         X509_free(cert);
         ChipLogError(Camera, "Failed to write PEM certificate");
+        return "";
     }
 
     BUF_MEM * bptr;
@@ -96,7 +99,7 @@ std::string ConvertRSAPrivateKey_DER_to_PEM(const std::vector<uint8_t> & derData
     RSA * rsa = d2i_RSAPrivateKey(nullptr, &p, derData.size());
     if (!rsa)
     {
-        ChipLogError(Camera, "Failed to parse DER RSA private key");
+        ChipLogError(Camera, "Failed to parse DER RSA private key of size: %ld", derData.size());
         return "";
     }
 
@@ -284,13 +287,13 @@ void PushAVUploader::UploadData(std::pair<std::string, std::string> data)
     curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, true);
     curl_easy_setopt(curl, CURLOPT_SSL_VERIFYHOST, 2L);
     curl_easy_setopt(curl, CURLOPT_INFILESIZE_LARGE, static_cast<curl_off_t>(size));
-#ifdef TLS_CLUSTER_ENABLED
+#ifndef TLS_CLUSTER_ENABLED
 
     // TODO: The logic to provide DER-formatted certificates and keys in memory (blob) format to curl is currently unstable. As a
     // temporary workaround, PEM-format files are being provided as input to curl.
 
-    auto rootCertPEM           = derCertToPem(mCertBuffer.mRootCertBuffer);
-    auto clientCertPEM         = derCertToPem(mCertBuffer.mClientCertBuffer);
+    auto rootCertPEM           = DerCertToPem(mCertBuffer.mRootCertBuffer);
+    auto clientCertPEM         = DerCertToPem(mCertBuffer.mClientCertBuffer);
     std::string derKeyToPemstr = ConvertRSAPrivateKey_DER_to_PEM(mCertBuffer.mClientKeyBuffer);
 
     SaveCertToFile(rootCertPEM, "  /tmp/root.pem");
@@ -314,9 +317,7 @@ void PushAVUploader::UploadData(std::pair<std::string, std::string> data)
 
     // curl_easy_setopt(curl, CURLOPT_CAINFO_BLOB, &rootBlob);
     // curl_easy_setopt(curl, CURLOPT_SSLCERT_BLOB, &clientBlob);
-    // curl_easy_setopt(curl, CURLOPT_SSLCERTTYPE, "DER");
     // curl_easy_setopt(curl, CURLOPT_SSLKEY_BLOB, &keyBlob);
-    // curl_easy_setopt(curl, CURLOPT_SSLKEYTYPE, "DER");
 #else
     // TODO: The else block is for testing purpose. It should be removed once the TLS cluster integration is stable.
     curl_easy_setopt(curl, CURLOPT_CAINFO, mCertPath.mRootCert.c_str());

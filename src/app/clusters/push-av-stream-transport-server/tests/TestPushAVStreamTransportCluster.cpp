@@ -371,8 +371,26 @@ public:
         return CHIP_NO_ERROR;
     }
 
+    void SetOnRecorderStoppedCallback(std::function<void(uint16_t, PushAvStreamTransport::TransportTriggerTypeEnum)> cb) override
+    {
+        mOnRecorderStoppedCallback = cb;
+    }
+
+    void SetOnRecorderStartedCallback(std::function<void(uint16_t, PushAvStreamTransport::TransportTriggerTypeEnum)> cb) override
+    {
+        mOnRecorderStartedCallback = cb;
+    }
+
+    void SetTLSCerts(Tls::CertificateTable::BufferedClientCert & clientCertEntry,
+                     Tls::CertificateTable::BufferedRootCert & rootCertEntry) override
+    {
+        // No-op implementation for tests
+    }
+
 private:
     std::vector<Clusters::PushAvStreamTransport::PushAvStream> pushavStreams;
+    std::function<void(uint16_t, PushAvStreamTransport::TransportTriggerTypeEnum)> mOnRecorderStoppedCallback;
+    std::function<void(uint16_t, PushAvStreamTransport::TransportTriggerTypeEnum)> mOnRecorderStartedCallback;
 };
 
 class TestTlsClientManagementDelegate : public TlsClientManagementDelegate

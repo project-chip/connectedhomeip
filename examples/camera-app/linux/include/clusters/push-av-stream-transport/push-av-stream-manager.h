@@ -75,24 +75,7 @@ public:
         const Optional<Structs::TransportMotionTriggerTimeControlStruct::DecodableType> & timeControl) override;
 
     void SetTLSCerts(Tls::CertificateTable::BufferedClientCert & clientCertEntry,
-                     Tls::CertificateTable::BufferedRootCert & rootCertEntry) override
-
-    {
-        auto rootSpan = rootCertEntry.GetCert().certificate.Value();
-        mBufferRootCert.assign(rootSpan.data(), rootSpan.data() + rootSpan.size());
-        auto clientSpan = clientCertEntry.GetCert().clientCertificate.Value();
-
-        mBufferClientCert.assign(clientSpan.data(), clientSpan.data() + clientSpan.size());
-        uint8_t buffer[Credentials::kP256ECPrivateKeyDERLength];
-
-        MutableByteSpan keypairDer(buffer);
-        Credentials::ConvertECDSAKeypairRawToDER(clientCertEntry.mCertWithKey.key, keypairDer);
-        mBufferClientCertKey.assign(keypairDer.data(), keypairDer.data() + keypairDer.size());
-
-        // TODO: Handle Intermediate certificates and use for chain validation if needed. For now just log it.
-        ChipLogError(Camera, "Intermediate certificate size %b",
-                     clientCertEntry.mCertWithKey.detail.intermediateCertificates.HasValue());
-    }
+                     Tls::CertificateTable::BufferedRootCert & rootCertEntry) override;
 
     bool ValidateUrl(const std::string & url) override;
 

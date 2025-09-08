@@ -88,6 +88,21 @@ void PrintTransportSettings(PushAVClipRecorder::ClipInfoStruct clipInfo, PushAVC
     ChipLogProgress(Camera, "Bit Rate: %d bps", videoInfo.mBitRate);
 }
 
+void PushAVTransport::ConfigureRecorderTimeSetting(
+    const chip::app::Clusters::PushAvStreamTransport::Structs::TransportMotionTriggerTimeControlStruct::DecodableType & timeControl)
+{
+    mClipInfo.mInitialDuration      = timeControl.initialDuration;
+    mClipInfo.mAugmentationDuration = timeControl.augmentationDuration;
+    mClipInfo.mMaxClipDuration      = timeControl.maxDuration;
+    mClipInfo.mBlindDuration        = timeControl.blindDuration;
+    ChipLogDetail(Camera, "PushAVTransport ConfigureRecorderTimeSetting done");
+    ChipLogDetail(Camera, "Initial Duration: %d sec", mClipInfo.mInitialDuration);
+    ChipLogDetail(Camera, "Augmentation Duration: %d sec", mClipInfo.mAugmentationDuration);
+    ChipLogDetail(Camera, "Max Clip Duration: %d sec", mClipInfo.mMaxClipDuration);
+    ChipLogDetail(Camera, "Blind Duration: %d sec", mClipInfo.mBlindDuration);
+    mRecorder->mClipInfo = mClipInfo;
+}
+
 void PushAVTransport::ConfigureRecorderSettings(const TransportOptionsStruct & transportOptions,
                                                 AudioStreamStruct & audioStreamParams, VideoStreamStruct & videoStreamParams)
 {
@@ -121,10 +136,7 @@ void PushAVTransport::ConfigureRecorderSettings(const TransportOptionsStruct & t
         }
         if (transportOptions.triggerOptions.motionTimeControl.HasValue())
         {
-            mClipInfo.mInitialDuration      = transportOptions.triggerOptions.motionTimeControl.Value().initialDuration;
-            mClipInfo.mAugmentationDuration = transportOptions.triggerOptions.motionTimeControl.Value().augmentationDuration;
-            mClipInfo.mMaxClipDuration      = transportOptions.triggerOptions.motionTimeControl.Value().maxDuration;
-            mClipInfo.mBlindDuration        = transportOptions.triggerOptions.motionTimeControl.Value().blindDuration;
+            ConfigureRecorderTimeSetting(transportOptions.triggerOptions.motionTimeControl.Value());
         }
         if (transportOptions.containerOptions.CMAFContainerOptions.HasValue())
         {
@@ -257,16 +269,20 @@ bool InBlindPeriod(std::chrono::steady_clock::time_point blindStartTime, uint16_
 
 bool PushAVTransport::HandleTriggerDetected()
 {
-    int64_t elapsed;
-    auto now = std::chrono::steady_clock::now();
+    int64_t elapsed = 0;
+    auto now        = std::chrono::steady_clock::now();
 
     if (InBlindPeriod(mBlindStartTime, mRecorder->mClipInfo.mBlindDuration))
     {
         return false;
     }
 
-    elapsed = std::chrono::duration_cast<std::chrono::seconds>(now - mRecorder->mClipInfo.activationTime).count();
-    ChipLogError(Camera, "PushAVTransport HandleTriggerDetected elapsed: %ld", elapsed);
+    if (mRecorder->mClipInfo.activationTime != std::chrono::steady_clock::time_point())
+    {
+        elapsed = std::chrono::duration_cast<std::chrono::seconds>(now - mRecorder->mClipInfo.activationTime).count();
+    }
+
+    ChipLogDetail(Camera, "PushAVTransport HandleTriggerDetected elapsed: %ld", elapsed);
 
     if (!mRecorder->GetRecorderStatus())
     {
@@ -372,10 +388,6 @@ void PushAVTransport::SetTLSCertPath(std::string rootCert, std::string devCert, 
     mCertPath.mRootCert = rootCert;
     mCertPath.mDevCert  = devCert;
     mCertPath.mDevKey   = devKey;
-    if (mUploader.get() != nullptr)
-    {
-        mUploader->setCertificatePath(mCertPath);
-    }
 }
 
 void PushAVTransport::SetTLSCert(std::vector<uint8_t> bufferRootCert, std::vector<uint8_t> bufferClientCert,
@@ -384,10 +396,6 @@ void PushAVTransport::SetTLSCert(std::vector<uint8_t> bufferRootCert, std::vecto
     mCertBuffer.mRootCertBuffer   = bufferRootCert;
     mCertBuffer.mClientCertBuffer = bufferClientCert;
     mCertBuffer.mClientKeyBuffer  = bufferClientCertKey;
-    if (mUploader.get() != nullptr)
-    {
-        mUploader->setCertificateBuffer(mCertBuffer);
-    }
 }
 
 void PushAVTransport::SetTransportStatus(TransportStatusEnum status)
@@ -404,6 +412,8 @@ void PushAVTransport::SetTransportStatus(TransportStatusEnum status)
         ChipLogProgress(Camera, "PushAVTransport transport status changed to active");
 
         mUploader = std::make_unique<PushAVUploader>();
+        mUploader->setCertificateBuffer(mCertBuffer);
+        mUploader->setCertificatePath(mCertPath);
         mUploader->Start();
         InitializeRecorder();
 
