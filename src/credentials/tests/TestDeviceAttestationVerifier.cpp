@@ -22,6 +22,7 @@
 #include <credentials/DeviceAttestationConstructor.h>
 #include <credentials/attestation_verifier/DefaultDeviceAttestationVerifier.h>
 #include <credentials/attestation_verifier/DeviceAttestationVerifier.h>
+#include <credentials/attestation_verifier/TestDACRevocationDelegateImpl.h>
 #include <credentials/tests/CHIPAttCert_test_vectors.h>
 #include <credentials/tests/CHIPCert_unit_test_vectors.h>
 #include <crypto/CHIPCryptoPAL.h>
@@ -122,4 +123,108 @@ TEST_F(TestDeviceAttestationVerifier, SetRevocationDelegate)
 
     // Check the initial state of the revocation delegate
     EXPECT_EQ(verifier.SetRevocationDelegate(nullptr), CHIP_NO_ERROR);
+}
+
+// Test CheckForRevokedDACChain with successful revocation check
+TEST_F(TestDeviceAttestationVerifier, CheckForRevokedDACChainSuccess)
+{
+    // Create a minimal AttestationTrustStore with a dummy certificate
+    static uint8_t dummyCert[1]       = { 0x00 };
+    static const ByteSpan certSpans[] = { ByteSpan(dummyCert) };
+    ArrayAttestationTrustStore trustStore(certSpans, 1);
+    DefaultDACVerifier verifier(&trustStore);
+
+    // Create a test revocation delegate that returns success (no revocation data set)
+    TestDACRevocationDelegateImpl revocationDelegate;
+    verifier.SetRevocationDelegate(&revocationDelegate);
+
+    // Prepare dummy attestation data
+    uint8_t testData[8] = { 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08 };
+    ByteSpan testSpan(testData);
+
+    // Create AttestationInfo using the constructor with all required arguments
+    DeviceAttestationVerifier::AttestationInfo attestationInfo(testSpan, testSpan, testSpan, testSpan, testSpan, testSpan,
+                                                               VendorId(0x1234), 0x5678);
+
+    // Test that the callback is called with success result
+    AttestationVerificationResult result = AttestationVerificationResult::kInternalError;
+    chip::Callback::Callback<DeviceAttestationVerifier::OnAttestationInformationVerification> callback(
+        [](void * context, const DeviceAttestationVerifier::AttestationInfo &, AttestationVerificationResult verificationResult) {
+            AttestationVerificationResult * result = static_cast<AttestationVerificationResult *>(context);
+            *result                                = verificationResult;
+        },
+        &result);
+
+    verifier.CheckForRevokedDACChain(attestationInfo, &callback);
+    EXPECT_EQ(result, AttestationVerificationResult::kSuccess);
+}
+
+// Test CheckForRevokedDACChain with empty revocation data (should return success)
+TEST_F(TestDeviceAttestationVerifier, CheckForRevokedDACChainEmptyRevocationData)
+{
+    // Create a minimal AttestationTrustStore with a dummy certificate
+    static uint8_t dummyCert[1]       = { 0x00 };
+    static const ByteSpan certSpans[] = { ByteSpan(dummyCert) };
+    ArrayAttestationTrustStore trustStore(certSpans, 1);
+    DefaultDACVerifier verifier(&trustStore);
+
+    // Create a test revocation delegate with empty revocation data
+    TestDACRevocationDelegateImpl revocationDelegate;
+    revocationDelegate.SetDeviceAttestationRevocationData("[]"); // Empty revocation list
+    verifier.SetRevocationDelegate(&revocationDelegate);
+
+    // Prepare dummy attestation data
+    uint8_t testData[8] = { 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08 };
+    ByteSpan testSpan(testData);
+
+    // Create AttestationInfo using the constructor with all required arguments
+    DeviceAttestationVerifier::AttestationInfo attestationInfo(testSpan, testSpan, testSpan, testSpan, testSpan, testSpan,
+                                                               VendorId(0x1234), 0x5678);
+
+    // Test that the callback is called with success result (empty revocation list)
+    AttestationVerificationResult result = AttestationVerificationResult::kInternalError;
+    chip::Callback::Callback<DeviceAttestationVerifier::OnAttestationInformationVerification> callback(
+        [](void * context, const DeviceAttestationVerifier::AttestationInfo &, AttestationVerificationResult verificationResult) {
+            AttestationVerificationResult * result = static_cast<AttestationVerificationResult *>(context);
+            *result                                = verificationResult;
+        },
+        &result);
+
+    verifier.CheckForRevokedDACChain(attestationInfo, &callback);
+    EXPECT_EQ(result, AttestationVerificationResult::kSuccess);
+
+    // Clean up
+    revocationDelegate.ClearDeviceAttestationRevocationData();
+}
+
+// Test CheckForRevokedDACChain without revocation delegate (should skip checks)
+TEST_F(TestDeviceAttestationVerifier, CheckForRevokedDACChainNoDelegate)
+{
+    // Create a minimal AttestationTrustStore with a dummy certificate
+    static uint8_t dummyCert[1]       = { 0x00 };
+    static const ByteSpan certSpans[] = { ByteSpan(dummyCert) };
+    ArrayAttestationTrustStore trustStore(certSpans, 1);
+    DefaultDACVerifier verifier(&trustStore);
+
+    // Don't set a revocation delegate (should be nullptr by default)
+
+    // Prepare dummy attestation data
+    uint8_t testData[8] = { 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08 };
+    ByteSpan testSpan(testData);
+
+    // Create AttestationInfo using the constructor with all required arguments
+    DeviceAttestationVerifier::AttestationInfo attestationInfo(testSpan, testSpan, testSpan, testSpan, testSpan, testSpan,
+                                                               VendorId(0x1234), 0x5678);
+
+    // Test that the callback is called with success result (skipped)
+    AttestationVerificationResult result = AttestationVerificationResult::kInternalError;
+    chip::Callback::Callback<DeviceAttestationVerifier::OnAttestationInformationVerification> callback(
+        [](void * context, const DeviceAttestationVerifier::AttestationInfo &, AttestationVerificationResult verificationResult) {
+            AttestationVerificationResult * result = static_cast<AttestationVerificationResult *>(context);
+            *result                                = verificationResult;
+        },
+        &result);
+
+    verifier.CheckForRevokedDACChain(attestationInfo, &callback);
+    EXPECT_EQ(result, AttestationVerificationResult::kSuccess);
 }
