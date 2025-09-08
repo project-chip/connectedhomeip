@@ -25,7 +25,7 @@ PreRollBuffer::PreRollBuffer() : mMaxTotalBytes(4096), mContentBufferSize(0) {}
 
 void PreRollBuffer::SetMaxTotalBytes(size_t size)
 {
-    ChipLogProgress(Camera, "Setting max total bytes to %zu", size);
+    ChipLogProgress(Camera, "Setting max total bytes to %ld", size);
     mMaxTotalBytes = size;
     TrimBuffer();
 }
