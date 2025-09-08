@@ -101,7 +101,7 @@ TEST_F(TestAttributeList, TestRangeBasedFor)
     EXPECT_EQ(list.add(30), CHIP_NO_ERROR);
 
     int expected_values[] = { 10, 20, 30 };
-    int i = 0;
+    int i                 = 0;
     for (const auto & val : list)
     {
         ASSERT_LT(i, 3);
