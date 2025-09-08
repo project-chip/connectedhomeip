@@ -21,6 +21,7 @@
 #include <app/CommandHandlerInterface.h>
 #include <app/ConcreteAttributePath.h>
 #include <app/ConcreteClusterPath.h>
+#include <app/server-cluster/OptionalAttributeSet.h>
 #include <app/clusters/resource-monitoring-server/replacement-product-list-manager.h>
 #include <app/clusters/resource-monitoring-server/resource-monitoring-cluster-objects.h>
 #include <app/data-model/Nullable.h>
@@ -28,6 +29,7 @@
 #include <lib/core/CHIPError.h>
 #include <lib/core/DataModelTypes.h>
 #include <protocols/interaction_model/StatusCode.h>
+#include <clusters/HepaFilterMonitoring/Enums.h>
 #include <stdint.h>
 
 namespace chip {
@@ -44,6 +46,10 @@ class ResourceMonitoringCluster : public DefaultServerCluster
 
 public:
 
+    using OptionalAttributeSet = chip::app::OptionalAttributeSet<
+        EthernetNetworkDiagnostics::Attributes::CarrierDetect::Id, EthernetNetworkDiagnostics::Attributes::FullDuplex::Id,
+        EthernetNetworkDiagnostics::Attributes::PHYRate::Id, EthernetNetworkDiagnostics::Attributes::TimeSinceReset::Id>;
+
      /**
      * Creates a resource monitoring cluster object. The Init() method needs to be called for this instance to be registered and
      * called by the interaction model at the appropriate times.
@@ -57,7 +63,7 @@ public:
     ResourceMonitoringCluster(
         EndpointId aEndpointId,
         ClusterId aClusterId,
-        uint32_t aFeatureMap,
+        const BitFlags<ResourceMonitoring::Feature> enabledFeatures,
         ResourceMonitoring::Attributes::DegradationDirection::TypeInfo::Type aDegradationDirection,
         bool aResetConditionCommandSupported
     );
@@ -82,6 +88,15 @@ public:
      * @return false    If the feature is not supported.
      */
     bool HasFeature(ResourceMonitoring::Feature aFeature) const;
+
+    /**
+     * Checks if the given attribute is supported by the cluster.
+     * @param attributeId  The aAttributeId to check.
+     *
+     * @return true     If the attribute is supported.
+     * @return false    If the attribute is not supported.
+     */
+    bool HasOptionalAttribute(AttributeId aAttributeId) const;
 
     Protocols::InteractionModel::Status UpdateCondition(uint8_t newCondition);
     Protocols::InteractionModel::Status UpdateChangeIndication(chip::app::Clusters::ResourceMonitoring::ChangeIndicationEnum newChangeIndication);
@@ -142,9 +157,11 @@ private:
     bool mInPlaceIndicator                         = true;
     DataModel::Nullable<uint32_t> mLastChangedTime;
     ReplacementProductListManager * mReplacementProductListManager = nullptr;
-    uint32_t mFeatureMap;
     
     bool mResetConditionCommandSupported{false};
+
+    const BitFlags<ResourceMonitoring::Feature> mEnabledFeatures;
+    const OptionalAttributeSet mOptionalAttributeSet;
 };
 
 class ResourceMonitoringDelegate
