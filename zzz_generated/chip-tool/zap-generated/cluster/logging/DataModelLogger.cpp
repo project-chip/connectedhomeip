@@ -21001,10 +21001,10 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("NightVisionUsesInfrared", 1, value);
         }
-        case CameraAvStreamManagement::Attributes::MinViewport::Id: {
+        case CameraAvStreamManagement::Attributes::MinViewportResolution::Id: {
             chip::app::Clusters::CameraAvStreamManagement::Structs::VideoResolutionStruct::DecodableType value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("MinViewport", 1, value);
+            return DataModelLogger::LogValue("MinViewportResolution", 1, value);
         }
         case CameraAvStreamManagement::Attributes::RateDistortionTradeOffPoints::Id: {
             chip::app::DataModel::DecodableList<
@@ -21275,6 +21275,11 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             int16_t value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("PanMax", 1, value);
+        }
+        case CameraAvSettingsUserLevelManagement::Attributes::MovementState::Id: {
+            chip::app::Clusters::CameraAvSettingsUserLevelManagement::PhysicalMovementEnum value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("MovementState", 1, value);
         }
         case CameraAvSettingsUserLevelManagement::Attributes::GeneratedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;

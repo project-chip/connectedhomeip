@@ -70,6 +70,20 @@ constexpr size_t kArrayTlvOverhead = 2;
 
 constexpr size_t kStreamUsagePrioritiesTlvSize = kArrayTlvOverhead + kStreamUsageTlvSize * kNumOfStreamUsageTypes;
 
+enum class StreamAllocationAction
+{
+    kNewAllocation, // Fresh stream allocation - always start
+    kModification,  // Existing stream with parameter changes - restart if active
+    kReuse          // Reusing existing stream without changes - no action needed
+};
+
+enum class StreamType
+{
+    kAudio,
+    kVideo,
+    kSnapshot
+};
+
 class CameraAVStreamMgmtServer;
 
 // ImageSnapshot response data for a CaptureSnapshot command.
@@ -106,6 +120,15 @@ public:
      */
     virtual Protocols::InteractionModel::Status VideoStreamAllocate(const VideoStreamStruct & allocateArgs,
                                                                     uint16_t & outStreamID) = 0;
+
+    /**
+     *   @brief Called after the server has finalized video stream allocation and narrowed parameters.
+     *          This is where the actual video stream should be started using the final allocated parameters.
+     *
+     *   @param allocatedStream   The finalized video stream with narrowed parameters from the server.
+     *   @param action           Action indicating how to handle the stream: new allocation, modification, or reuse.
+     */
+    virtual void OnVideoStreamAllocated(const VideoStreamStruct & allocatedStream, StreamAllocationAction action) = 0;
 
     /**
      *   @brief Handle Command Delegate for Video stream modification.
@@ -422,7 +445,7 @@ public:
 
     bool GetNightVisionUsesInfrared() const { return mNightVisionUsesInfrared; }
 
-    const VideoResolutionStruct & GetMinViewport() const { return mMinViewPort; }
+    const VideoResolutionStruct & GetMinViewportResolution() const { return mMinViewPortResolution; }
 
     const std::vector<RateDistortionTradeOffStruct> & GetRateDistortionTradeOffPoints() const
     {
@@ -507,7 +530,8 @@ public:
 
     CHIP_ERROR AddVideoStream(const VideoStreamStruct & videoStream);
 
-    CHIP_ERROR UpdateVideoStreamRangeParams(VideoStreamStruct & videoStreamToUpdate, const VideoStreamStruct & videoStream);
+    CHIP_ERROR UpdateVideoStreamRangeParams(VideoStreamStruct & videoStreamToUpdate, const VideoStreamStruct & videoStream,
+                                            bool & wasModified);
 
     CHIP_ERROR RemoveVideoStream(uint16_t videoStreamId);
 
@@ -528,6 +552,21 @@ public:
 
     CHIP_ERROR UpdateSnapshotStreamRefCount(uint16_t snapshotStreamId, bool shouldIncrement);
 
+    constexpr const char * StreamTypeToString(StreamType type)
+    {
+        switch (type)
+        {
+        case StreamType::kVideo:
+            return "Video";
+        case StreamType::kAudio:
+            return "Audio";
+        case StreamType::kSnapshot:
+            return "Snapshot";
+        default:
+            return "Unknown";
+        }
+    };
+
 private:
     CameraAVStreamMgmtDelegate & mDelegate;
     EndpointId mEndpointId;
@@ -539,7 +578,7 @@ private:
     const uint32_t mMaxEncodedPixelRate;
     const VideoSensorParamsStruct mVideoSensorParams;
     const bool mNightVisionUsesInfrared;
-    const VideoResolutionStruct mMinViewPort;
+    const VideoResolutionStruct mMinViewPortResolution;
     const std::vector<RateDistortionTradeOffStruct> mRateDistortionTradeOffPointsList;
     const uint32_t mMaxContentBufferSize;
     const AudioCapabilitiesStruct mMicrophoneCapabilities;
@@ -598,6 +637,66 @@ private:
             MatterReportingAttributeChangeCallback(path);
         }
         return CHIP_NO_ERROR;
+    }
+
+    template <typename StreamContainer, typename IdGetter>
+    bool ValidateStreamForModifyOrDeallocateImpl(StreamContainer & streams, uint16_t streamID, HandlerContext & ctx,
+                                                 StreamType streamType, IdGetter id_getter, bool isDeallocate)
+    {
+        auto it = std::find_if(streams.begin(), streams.end(), [&](const auto & stream) { return id_getter(stream) == streamID; });
+
+        if (it == streams.end())
+        {
+            ChipLogError(Zcl, "CameraAVStreamMgmt[ep=%d]: %s stream with ID: %u not found", mEndpointId,
+                         StreamTypeToString(streamType), streamID);
+            ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Protocols::InteractionModel::Status::NotFound);
+            return false;
+        }
+
+        if (isDeallocate && it->referenceCount > 0)
+        {
+            ChipLogError(Zcl, "CameraAVStreamMgmt[ep=%d]: %s stream with ID: %u still in use", mEndpointId,
+                         StreamTypeToString(streamType), streamID);
+            ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Protocols::InteractionModel::Status::InvalidInState);
+            return false;
+        }
+
+        using StreamValueType = typename StreamContainer::value_type;
+        if constexpr (std::is_same_v<StreamValueType, VideoStreamStruct> || std::is_same_v<StreamValueType, AudioStreamStruct>)
+        {
+            if (it->streamUsage == Globals::StreamUsageEnum::kInternal)
+            {
+                ChipLogError(Zcl, "CameraAVStreamMgmt[ep=%d]: %s stream with ID: %u is Internal", mEndpointId,
+                             StreamTypeToString(streamType), streamID);
+                ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Protocols::InteractionModel::Status::DynamicConstraintError);
+                return false;
+            }
+        }
+
+        // For SnapshotStreamModify, check against the corresponding
+        // SnapshotStreamStruct for requiresHardwareEncoder.
+        if constexpr (std::is_same_v<StreamValueType, SnapshotStreamStruct>)
+        {
+            if (!isDeallocate)
+            {
+                auto sn_capab_it =
+                    std::find_if(mSnapshotCapabilitiesList.begin(), mSnapshotCapabilitiesList.end(), [&](const auto & capability) {
+                        return capability.imageCodec == it->imageCodec && capability.maxFrameRate > it->frameRate;
+                    });
+                if (sn_capab_it != mSnapshotCapabilitiesList.end() && sn_capab_it->requiresHardwareEncoder.HasValue() &&
+                    !sn_capab_it->requiresHardwareEncoder.Value())
+                {
+                    ChipLogError(Zcl,
+                                 "CameraAVStreamMgmt[ep=%d]: Snapshot stream with ID: %u based off an underlying video stream and "
+                                 "not modifiable",
+                                 mEndpointId, streamID);
+                    ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Protocols::InteractionModel::Status::DynamicConstraintError);
+                    return false;
+                }
+            }
+        }
+
+        return true;
     }
 
     bool IsBitDepthValid(uint8_t bitDepth) { return (bitDepth == 8 || bitDepth == 16 || bitDepth == 24 || bitDepth == 32); }
@@ -671,6 +770,12 @@ private:
     bool CheckSnapshotStreamsAvailability(HandlerContext & ctx);
 
     bool ValidateSnapshotStreamId(const DataModel::Nullable<uint16_t> & snapshotStreamID, HandlerContext & ctx);
+
+    bool ValidateVideoStreamForModifyOrDeallocate(const uint16_t videoStreamID, HandlerContext & ctx, bool isDeallocate);
+
+    bool ValidateAudioStreamForDeallocate(const uint16_t audioStreamID, HandlerContext & ctx);
+
+    bool ValidateSnapshotStreamForModifyOrDeallocate(const uint16_t snapshotStreamID, HandlerContext & ctx, bool isDeallocate);
 };
 
 } // namespace CameraAvStreamManagement

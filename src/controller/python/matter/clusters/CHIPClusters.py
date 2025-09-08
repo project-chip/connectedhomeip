@@ -12844,7 +12844,7 @@ class ChipClusters:
                 "reportable": True,
             },
             0x00000004: {
-                "attributeName": "MinViewport",
+                "attributeName": "MinViewportResolution",
                 "attributeId": 0x00000004,
                 "type": "",
                 "reportable": True,
@@ -13230,6 +13230,12 @@ class ChipClusters:
             0x00000008: {
                 "attributeName": "PanMax",
                 "attributeId": 0x00000008,
+                "type": "int",
+                "reportable": True,
+            },
+            0x00000009: {
+                "attributeName": "MovementState",
+                "attributeId": 0x00000009,
                 "type": "int",
                 "reportable": True,
             },
