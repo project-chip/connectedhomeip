@@ -573,13 +573,13 @@ Protocols::InteractionModel::Status HandleWriteBridgedDeviceBasicAttribute(Devic
 
     if (attributeId != chip::app::Clusters::BridgedDeviceBasicInformation::Attributes::NodeLabel::Id)
     {
-        return Protocols::InteractionModel::Status::Failure;
+        return Protocols::InteractionModel::Status::UnsupportedWrite;
     }
 
     const uint8_t len = emberAfStringLength(buffer);
     if (len > kNodeLabelSize)
     {
-        return Protocols::InteractionModel::Status::InvalidValue;
+        return Protocols::InteractionModel::Status::ConstraintError;
     }
 
     dev->SetName(std::string{ reinterpret_cast<const char *>(buffer + 1), len }.c_str());
