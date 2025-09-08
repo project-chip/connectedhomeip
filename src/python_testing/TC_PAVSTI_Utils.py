@@ -61,7 +61,7 @@ class PushAvServerProcess(Subprocess):
         host: str = "0.0.0.0",
     ):
         if server_path is None:
-            logging.error("No path provided for Push AV Server, using the default path for TH: {DEFAULT_SERVER_PATH}")
+            logging.error(f"No path provided for Push AV Server, using the default path for TH: {self.DEFAULT_SERVER_PATH}")
             server_path = self.DEFAULT_SERVER_PATH
         self._working_directory = os.path.join(tempfile.gettempdir(), "pavstest")
         if os.path.exists(self._working_directory):
@@ -362,7 +362,7 @@ class PAVSTIUtils:
         self, endpoint: int, server: PushAvServerProcess, host_ip: str | None
     ) -> int:
         """Perform provisioning steps to set up TLS endpoint."""
-        if (host_ip is None):
+        if host_ip is None:
             # If no host ip specified, try to get private ip
             # this is mainly required when running TCs in Test Harness
             logging.error("No host_ip provided in test arguments")

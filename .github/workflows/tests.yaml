@@ -795,7 +795,7 @@ jobs:
               run: >-
                   ./scripts/run_in_python_env.sh out/venv \
                   "python3 -m pip install -r src/tools/push_av_server/requirements.txt \
-                    patch -d $(pip show hypercorn | grep "Location: " | sed "s/Location: //") -p0 < src/tools/push_av_server/hypercorn.patch \
+                    && patch -d $(pip show hypercorn | grep "Location: " | sed "s/Location: //") -p0 < src/tools/push_av_server/hypercorn.patch \
                   "
 
             - name: Generate an argument environment file
