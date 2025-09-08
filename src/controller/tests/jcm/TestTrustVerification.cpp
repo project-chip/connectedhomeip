@@ -15,14 +15,50 @@
  *    limitations under the License.
  */
 
-#include <pw_unit_test/framework.h>
-
+#include <app/tests/AppTestContext.h>
 #include <controller/jcm/TrustVerification.h>
+#include <lib/support/tests/ExtraPwTestMacros.h>
+#include <pw_unit_test/framework.h>
 
 using namespace chip;
 using namespace chip::Controller::JCM;
 
-TEST(TestTrustVerification, EnumToStringError)
+class TestTrustVerification : public chip::Test::AppContext
+{
+public:
+    // Performs shared setup for all tests in the test suite.  Run once for the whole suite.
+    static void SetUpTestSuite()
+    {
+        ASSERT_EQ(Platform::MemoryInit(), CHIP_NO_ERROR);
+
+        chip::Test::AppContext::SetUpTestSuite();
+    }
+
+    // Performs shared teardown for all tests in the test suite.  Run once for the whole suite.
+    static void TearDownTestSuite()
+    {
+        AppContext::TearDownTestSuite();
+
+        Platform::MemoryShutdown();
+    }
+
+    void TestEnumToStringError();
+    void TestEnumToStringStage();
+    void TestTrustVerificationInfoCleanup();
+
+protected:
+    void SetUp() override
+    {
+        AppContext::SetUp();
+    }
+
+    void TearDown() override
+    {
+        AppContext::TearDown();
+    }
+};
+
+TEST_F_FROM_FIXTURE(TestTrustVerification, TestEnumToStringError)
 {
     EXPECT_EQ(EnumToString(TrustVerificationError::kSuccess), std::string("SUCCESS"));
     EXPECT_EQ(EnumToString(TrustVerificationError::kAsync), std::string("ASYNC_OPERATION"));
@@ -34,14 +70,11 @@ TEST(TestTrustVerification, EnumToStringError)
     EXPECT_EQ(EnumToString(TrustVerificationError::kTrustVerificationDelegateNotSet),
               std::string("TRUST_VERIFICATION_DELEGATE_NOT_SET"));
     EXPECT_EQ(EnumToString(TrustVerificationError::kUserDeniedConsent), std::string("USER_DENIED_CONSENT"));
-
-    // Note: kVendorIdVerificationFailed is intentionally not handled in the switch in the header; ensure behavior is defined
-    EXPECT_EQ(EnumToString(TrustVerificationError::kVendorIdVerificationFailed), std::string("UNKNOWN_ERROR"));
-
+    EXPECT_EQ(EnumToString(TrustVerificationError::kVendorIdVerificationFailed), std::string("VENDOR_ID_VERIFICATION_FAILED"));  
     EXPECT_EQ(EnumToString(TrustVerificationError::kInternalError), std::string("INTERNAL_ERROR"));
 }
 
-TEST(TestTrustVerification, EnumToStringStage)
+TEST_F_FROM_FIXTURE(TestTrustVerification, TestEnumToStringStage)
 {
     EXPECT_EQ(EnumToString(kIdle), std::string("IDLE"));
     EXPECT_EQ(EnumToString(kVerifyingAdministratorInformation),
@@ -53,7 +86,7 @@ TEST(TestTrustVerification, EnumToStringStage)
     EXPECT_EQ(EnumToString(kError), std::string("ERROR"));
 }
 
-TEST(TestTrustVerification, TrustVerificationInfoCleanup)
+TEST_F_FROM_FIXTURE(TestTrustVerification, TestTrustVerificationInfoCleanup)
 {
     TrustVerificationInfo info;
 

@@ -366,6 +366,7 @@ void MessagingContext::ExpireJFSessionAToB()
         mpData->mJFSessionAToB.Get().Value()->AsSecureSession()->MarkForEviction();
     }
 }
+
 void MessagingContext::ExpireJFSessionBToA()
 {
     if (mpData->mJFSessionBToA)

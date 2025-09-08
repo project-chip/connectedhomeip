@@ -15,9 +15,9 @@
  *    limitations under the License.
  */
 
-#include <app/data-model-provider/Context.h>
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
+#include <app/data-model-provider/Context.h>
 #include <app/InteractionModelEngine.h>
 #include <app/tests/AppTestContext.h>
 #include <app/tests/test-interaction-model-api.h>

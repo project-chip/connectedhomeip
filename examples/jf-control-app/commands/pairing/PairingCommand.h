@@ -350,6 +350,4 @@ private:
     void PersistIcdInfo();
     CHIP_ERROR SetAnchorNodeId(NodeId value);
     NodeId GetAnchorNodeId();
-
-    CHIP_ERROR OnLookupOperationTrustAnchor(ByteSpan & globallyTrustedRoot);
 };
