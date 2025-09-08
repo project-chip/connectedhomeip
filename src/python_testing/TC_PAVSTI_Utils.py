@@ -130,7 +130,7 @@ class PushAvServerProcess(Subprocess):
         """Request the server to create a new stream."""
         response = self._post_json("/streams")
         return response["stream_id"]
-    
+
     def create_key_pair(self) -> None:
         """
         This method is a work around to create keys for camera-app
@@ -212,7 +212,7 @@ class PAVSTIUtils:
     # ----------------------------------------------------------------------
 
     async def send_provision_root_command(
-        self, endpoint: int, certificate: bytes, expected_status: Status=Status.Success
+        self, endpoint: int, certificate: bytes, expected_status: Status = Status.Success
     ) -> Union[
         Clusters.TlsCertificateManagement.Commands.ProvisionRootCertificateResponse,
         InteractionModelError,
@@ -282,7 +282,7 @@ class PAVSTIUtils:
             return e
 
     async def send_provision_client_command(
-        self, endpoint: int, certificate: bytes, ccdid: int, expected_status: Status=Status.Success
+        self, endpoint: int, certificate: bytes, ccdid: int, expected_status: Status = Status.Success
     ) -> InteractionModelError:
         try:
             result = await self.send_single_cmd(
@@ -306,8 +306,8 @@ class PAVSTIUtils:
         hostname: bytes,
         port: uint,
         caid: uint,
-        ccdid: Union[Nullable, uint]=NullValue,
-        expected_status: Status=Status.Success,
+        ccdid: Union[Nullable, uint] = NullValue,
+        expected_status: Status = Status.Success,
     ) -> Union[
         Clusters.TlsClientManagement.Commands.ProvisionEndpointResponse,
         InteractionModelError,
@@ -362,7 +362,7 @@ class PAVSTIUtils:
         self, endpoint: int, server: PushAvServerProcess, host_ip: str | None
     ) -> int:
         """Perform provisioning steps to set up TLS endpoint."""
-        if(host_ip is None):
+        if (host_ip is None):
             # If no host ip specified, try to get private ip
             # this is mainly required when running TCs in Test Harness
             logging.error("No host_ip provided in test arguments")
