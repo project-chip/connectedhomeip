@@ -390,18 +390,18 @@ Endpoint: 0 Cluster: 0x0000_001F Attribute 0x0000_0000DataVersion: 2578401041
 
 <hr>
 
-## Managing ACLs Using Chip-repl
+## Managing ACLs Using matter-repl
 
 ### Usage
 
 This section provides examples of commands and ACL output for different
-operations with the CHIP-repl.
+operations with the matter-repl.
 
 #### Entire List
 
 See the important notes in the
 [Managing ACLs using CHIP-Tool](#managing-acls-using-chip-tool) section, as they
-also apply to the CHIP-repl.
+also apply to the matter-repl.
 
 ### Null Fields
 
@@ -418,14 +418,14 @@ normally the case.
 
 The `ACL` attribute is fabric-scoped, so each ACL has a fabric index.
 
-The CHIP-repl ignores it when performing the actual write. Because null fields
+The matter-repl ignores it when performing the actual write. Because null fields
 can be omitted, simply do not provide it when writing ACLs.
 
 When reading ACLs, the proper fabric index is shown.
 
 #### Enums and Identifiers
 
-The CHIP-repl accepts numerical values for enums and identifiers, but it also
+The matter-repl accepts numerical values for enums and identifiers, but it also
 accepts strongly typed values:
 
 The privileges are:
@@ -452,11 +452,11 @@ Some typical clusters:
 ### Examples
 
 This section provides examples of commands and ACL output for different
-operations with the CHIP-repl.
+operations with the matter-repl.
 
 #### Automatically Installed ACL
 
-After commissioning with chip-repl, assuming `CaseAdminNode` is 1, the
+After commissioning with matter-repl, assuming `CaseAdminNode` is 1, the
 automatically installed ACL is:
 
 ```
