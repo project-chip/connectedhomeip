@@ -88,4 +88,3 @@ tests:
             the content is read,
             it contains the same payload than saved in step 3.a
       disabled: true
-
