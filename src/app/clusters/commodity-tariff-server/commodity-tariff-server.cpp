@@ -427,7 +427,7 @@ FindDayEntry(CurrentTariffAttrsCtx & aCtx, const DataModel::List<const uint32_t>
 {
     const Structs::DayEntryStruct::Type * currentPtr = nullptr;
     const Structs::DayEntryStruct::Type * nextPtr    = nullptr;
-    *CurrentEntryMinutesRemain                       = 0;
+    *currentEntryMinutesRemain                       = 0;
 
     for (size_t i = 0; i < dayEntryIDs.size(); i++)
     {
@@ -472,7 +472,7 @@ FindDayEntry(CurrentTariffAttrsCtx & aCtx, const DataModel::List<const uint32_t>
         // Check if current entry matches the current time
         if (currentPtr->startTime <= minutesSinceMidnight && (currentPtr->startTime + duration) > minutesSinceMidnight)
         {
-            *CurrentEntryMinutesRemain = static_cast<uint16_t>(duration - (minutesSinceMidnight - currentPtr->startTime));
+            *currentEntryMinutesRemain = static_cast<uint16_t>(duration - (minutesSinceMidnight - currentPtr->startTime));
             break;
         }
     }
@@ -794,7 +794,7 @@ void Instance::HandleGetTariffComponent(HandlerContext & ctx, const Commands::Ge
                 }
             }
 
-            std::sort(deIDsArray.begin(), deIDsArray.begin() + deIDsCount);
+            std::sort(deIDsArray.begin(), std::next(deIDsArray.begin(), static_cast<std::ptrdiff_t>(deIDsCount)));
 
             response.label.SetNull();
             response.dayEntryIDs = DataModel::List<uint32_t>();
