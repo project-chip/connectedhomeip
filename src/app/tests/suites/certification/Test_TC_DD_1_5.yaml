@@ -34,10 +34,9 @@ tests:
       disabled: true
 
     - label:
-          "Step 1: Keep the DUT in packaging,
-          if needed, activate tag detection in TH NFC reader,
-          then bring in TH NFC reader at contact
-          over all sides of the DUT packaging."
+          "Step 1: Keep the DUT in packaging, if needed, activate tag detection
+          in TH NFC reader, then bring in TH NFC reader at contact over all
+          sides of the DUT packaging."
       verification: |
           Onboarding Payload is not readable from the tag:
           Either the tag is not detected,
@@ -45,16 +44,15 @@ tests:
       disabled: true
 
     - label:
-          "Step 2a: Unpack DUT from its packaging,
-          locate NFC tag, and, if needed,
-          follow instructions to activate the NFC tag."
+          "Step 2a: Unpack DUT from its packaging, locate NFC tag, and, if
+          needed, follow instructions to activate the NFC tag."
       verification: |
           NFC tag is ready (will be verified in next step)
       disabled: true
 
     - label:
-          "Step 2b: If needed, activate tag detection in TH NFC reader,
-          then bring in TH NFC reader close to the DUT’s NFC tag."
+          "Step 2b: If needed, activate tag detection in TH NFC reader, then
+          bring in TH NFC reader close to the DUT’s NFC tag."
       verification: |
           1. The tag is detected,
           2. the content is read,
@@ -63,28 +61,29 @@ tests:
       disabled: true
 
     - label:
-          "Step 3a: Save the NFC tag onboarding content,
-          then scan the DUT’s QR code"
+          "Step 3a: Save the NFC tag onboarding content, then scan the DUT’s QR
+          code"
       verification: |
           The onboarding payload is the same in QR code and NFC tag.
       disabled: true
 
-    - label:
-          "Step 3b: Scan the DUT’s QR code."
+    - label: "Step 3b: Scan the DUT’s QR code."
       verification: |
           The onboarding payload is exactly the same in QR code and NFC tag.
       disabled: true
 
-    - label: "Step 4a: Using a tag writing application such as NFC Tool,
-             try to write a new NDEF in the tag."
+    - label:
+          "Step 4a: Using a tag writing application such as NFC Tool, try to
+          write a new NDEF in the tag."
       verification: |
-            Write fails
+          Write fails
       disabled: true
 
-    - label: "Step 4b: If needed, activate tag detection in TH NFC reader,
-             then bring in TH NFC reader close to the DUT’s NFC tag."
+    - label:
+          "Step 4b: If needed, activate tag detection in TH NFC reader, then
+          bring in TH NFC reader close to the DUT’s NFC tag."
       verification: |
-            The tag is detected,
-            the content is read,
-            it contains the same payload than saved in step 3.a
+          The tag is detected,
+          the content is read,
+          it contains the same payload than saved in step 3.a
       disabled: true
