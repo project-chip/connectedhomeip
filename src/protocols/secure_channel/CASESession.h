@@ -545,7 +545,7 @@ private:
     void HandleConnectionAttemptComplete(Transport::ActiveTCPConnectionHolder & conn, CHIP_ERROR conErr) override;
     void HandleConnectionClosed(const Transport::ActiveTCPConnectionState & conn, CHIP_ERROR conErr) override;
 
-    // Pointer to the underlying TCP connection state. Returned by the
+    // Reference holder to the underlying TCP connection state. Returned by the
     // TCPConnect() method (on the connection Initiator side) when an
     // ActiveTCPConnectionState object is allocated. This connection
     // context is used on the CASE Initiator side to facilitate the

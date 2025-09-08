@@ -685,17 +685,31 @@ void SessionManager::HandleConnectionReceived(Transport::ActiveTCPConnectionStat
 void SessionManager::HandleConnectionAttemptComplete(Transport::ActiveTCPConnectionHolder & conn, CHIP_ERROR conErr)
 {
     VerifyOrReturn(!conn.IsNull());
-    if (mConnDelegate == nullptr || !mConnDelegate->OnTCPConnectionAttemptComplete(conn, conErr))
+
+    Transport::AppTCPConnectionCallbackCtxt * appTCPConnCbCtxt = conn->mAppState;
+    bool callbackHandled                                       = false;
+    if (appTCPConnCbCtxt != nullptr && appTCPConnCbCtxt->connCompleteCb != nullptr)
+    {
+        appTCPConnCbCtxt->connCompleteCb(conn, conErr);
+        callbackHandled = true;
+    }
+
+    if ((mConnDelegate == nullptr || !mConnDelegate->OnTCPConnectionAttemptComplete(conn, conErr)) && !callbackHandled)
     {
         char peerAddrBuf[chip::Transport::PeerAddress::kMaxToStringSize];
         conn->mPeerAddr.ToString(peerAddrBuf);
 
-        ChipLogProgress(Inet, "TCP Connection established with peer %s, but no registered handler. Disconnecting.", peerAddrBuf);
+        ChipLogProgress(Inet, "TCP Connection established with peer %s, but no registered handler.", peerAddrBuf);
     }
 }
 
 void SessionManager::HandleConnectionClosed(Transport::ActiveTCPConnectionState & conn, CHIP_ERROR conErr)
 {
+    Transport::AppTCPConnectionCallbackCtxt * appTCPConnCbCtxt = conn.mAppState;
+    if (appTCPConnCbCtxt != nullptr && appTCPConnCbCtxt->connClosedCb != nullptr)
+    {
+        appTCPConnCbCtxt->connClosedCb(conn, conErr);
+    }
     MarkSecureSessionOverTCPForEviction(conn, conErr);
 }
 
