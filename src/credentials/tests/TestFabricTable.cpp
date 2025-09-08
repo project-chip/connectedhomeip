@@ -3314,9 +3314,9 @@ TEST_F(TestFabricTable, JFVidVerificationWorksWithoutVvsUsingTestCerts)
 
     FabricIndex kFabricIndex = kUndefinedFabricIndex;
     fabricTable.AddNewFabricForTestIgnoringCollisions(
-        TestCerts::GetJFBRootCertAsset().mCert, 
+        TestCerts::GetJFBRootCertAsset().mCert,
         TestCerts::GetJFBIACertAsset().mCert,
-        TestCerts::GetJFBNodeCertAsset().mCert, 
+        TestCerts::GetJFBNodeCertAsset().mCert,
         TestCerts::GetJFBNodeCertAsset().mKey,
         &kFabricIndex);
 
@@ -3347,7 +3347,7 @@ TEST_F(TestFabricTable, JFVidVerificationWorksWithoutVvsUsingTestCerts)
         uint8_t kVendorFabricBindingMessageBuffer[Crypto::kVendorFabricBindingMessageV1Size];
         MutableByteSpan kVendorFabricBindingMessageSpan{ kVendorFabricBindingMessageBuffer };
         ASSERT_EQ(Crypto::GenerateVendorFabricBindingMessage(
-            Crypto::FabricBindingVersion::kVersion1, 
+            Crypto::FabricBindingVersion::kVersion1,
             kTrustedCAPublicKeySpan,
             kFabricIndex, kVendorId,
             kVendorFabricBindingMessageSpan),
@@ -3357,18 +3357,18 @@ TEST_F(TestFabricTable, JFVidVerificationWorksWithoutVvsUsingTestCerts)
         uint8_t kExpectedUnderlyingTbsBuffer[Crypto::kVendorIdVerificationTbsV1MaxSize];
         MutableByteSpan kExpectedUnderlyingTbs{ kExpectedUnderlyingTbsBuffer };
         ASSERT_EQ(Crypto::GenerateVendorIdVerificationToBeSigned(
-            kFabricIndex, 
-            kClientChallengeSpan, 
+            kFabricIndex,
+            kClientChallengeSpan,
             kAttestationChallengeSpan,
-            kVendorFabricBindingMessageSpan, 
+            kVendorFabricBindingMessageSpan,
             kVidVerificationStatementSpan,
             kExpectedUnderlyingTbs),
             CHIP_NO_ERROR);
 
         ASSERT_EQ( fabricTable.SignVIDVerificationRequest(
-            kFabricIndex, 
-            kClientChallengeSpan, 
-            kAttestationChallengeSpan, 
+            kFabricIndex,
+            kClientChallengeSpan,
+            kAttestationChallengeSpan,
             responseData),
             CHIP_NO_ERROR);
 
@@ -3376,8 +3376,8 @@ TEST_F(TestFabricTable, JFVidVerificationWorksWithoutVvsUsingTestCerts)
         EXPECT_EQ(responseData.fabricIndex, kFabricIndex);
 
         EXPECT_EQ(VerifySignatureWithNocPublicKey(
-            fabricTable, 
-            kFabricIndex, 
+            fabricTable,
+            kFabricIndex,
             ByteSpan{ kExpectedUnderlyingTbs },
             responseData.signature.Span()),
             CHIP_NO_ERROR);

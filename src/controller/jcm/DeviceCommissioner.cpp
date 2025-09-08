@@ -421,7 +421,7 @@ CHIP_ERROR DeviceCommissioner::OnLookupOperationalTrustAnchor(
         return mTrustVerificationDelegate->OnLookupOperationalTrustAnchor(vendorID, subjectKeyId, globallyTrustedRootSpan);
     }
 
-    return CHIP_ERROR_INTERNAL; 
+    return CHIP_ERROR_INTERNAL;
 }
 
 TrustVerificationError DeviceCommissioner::PerformVendorIDVerificationProcedure()

@@ -76,8 +76,8 @@ public:
     }
 
     CHIP_ERROR OnLookupOperationalTrustAnchor(
-        VendorId vendorID, 
-        CertificateKeyId & subjectKeyId, 
+        VendorId vendorID,
+        CertificateKeyId & subjectKeyId,
         ByteSpan & globallyTrustedRootSpan)
     {
         mLookedUpOperationalTrustAnchor = true;
@@ -107,8 +107,8 @@ public:
     {
         void OnDone(ReadClient *) override {}
         void OnAttributeData(
-            const ConcreteDataAttributePath & aPath, 
-            TLV::TLVReader * apData, 
+            const ConcreteDataAttributePath & aPath,
+            TLV::TLVReader * apData,
             const StatusIB & aStatus) override {}
     };
 
@@ -168,7 +168,7 @@ public:
         MutableByteSpan nocSpan{ nocBuf };
         ReturnErrorOnFailure(fabricTable.FetchNOCCert(fabricIndex, nocSpan));
         nocStruct.noc = nocSpan;
-        
+
         OperationalCredentials::Structs::NOCStruct::Type nocListData[1] = { nocStruct };
         DataModel::List<OperationalCredentials::Structs::NOCStruct::Type> nocsList;
         nocsList = nocListData;
@@ -183,7 +183,7 @@ public:
 
     template <typename AttrType>
     CHIP_ERROR SetAttribute(
-        const ConcreteAttributePath & path, 
+        const ConcreteAttributePath & path,
         const AttrType data)
     {
         Platform::ScopedMemoryBufferWithSize<uint8_t> handle;
@@ -205,7 +205,7 @@ public:
 
     template <typename AttrType>
     CHIP_ERROR SetAttributeForWrite(
-        const ConcreteAttributePath & path, 
+        const ConcreteAttributePath & path,
         const AttrType data)
     {
         Platform::ScopedMemoryBufferWithSize<uint8_t> handle;
@@ -233,7 +233,7 @@ class MockDeviceProxy : public DeviceProxy, public SessionDelegate
 {
 public:
     MockDeviceProxy(
-        Messaging::ExchangeManager * exchangeManager, 
+        Messaging::ExchangeManager * exchangeManager,
         const SessionHandle & session, NodeId nodeId) :
         mExchangeManager(exchangeManager), mSecureSession(*this), mRemoteNodeId(nodeId) {
             mSecureSession.Grab(session);

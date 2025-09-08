@@ -32,8 +32,8 @@ namespace Controller {
 namespace JCM {
 
 CHIP_ERROR VendorIdVerificationClient::VerifyNOCCertificateChain(
-    const ByteSpan & nocSpan, 
-    const ByteSpan  & icacSpan, 
+    const ByteSpan & nocSpan,
+    const ByteSpan  & icacSpan,
     const ByteSpan & rcacSpan)
 {
     ValidationContext validContext;
@@ -57,7 +57,7 @@ CHIP_ERROR VendorIdVerificationClient::VerifyNOCCertificateChain(
 }
 
 CHIP_ERROR VendorIdVerificationClient::Verify(
-    ExchangeManager * exchangeMgr, 
+    ExchangeManager * exchangeMgr,
     const SessionGetterFunc getSession,
     TrustVerificationInfo * info,
     const ByteSpan clientChallengeSpan,
@@ -110,7 +110,7 @@ CHIP_ERROR VendorIdVerificationClient::Verify(
     P256ECDSASignature signature;
     memcpy(signature.Bytes(), responseData.signature.data(), signature.Capacity());
     signature.SetLength(signature.Capacity());
-       
+
     ReturnLogErrorOnFailure(nocPublicKey.ECDSA_validate_msg_signature(vidVerificationTbsSpan.data(), vidVerificationTbsSpan.size(), signature));
 
     // 11. Verify that the NOC chain is valid using Crypto_VerifyChain() against the entire chain reconstructed from both the
@@ -118,12 +118,12 @@ CHIP_ERROR VendorIdVerificationClient::Verify(
     // If the chain is not valid, the procedure terminates as failed.
     ReturnLogErrorOnFailure(VerifyNOCCertificateChain(nocSpan, icacSpan, rcacSpan));
 
-    // 12a If the VIDVerificationStatement field was present in the entry in Fabrics whose VendorID is being verified 
+    // 12a If the VIDVerificationStatement field was present in the entry in Fabrics whose VendorID is being verified
     // (Not currently supported)
     // 12b. Otherwise (i.e VIDVerificationStatement not used):
-    // 12bi. Look-up the entry in the Operational Trust Anchors Schema under the expected VendorID (VID field) 
-    // being verified whose IsRoot field is true and whose SubjectKeyID matches the SubjectKeyID field value of 
-    // the TrustedRootCertificates attribute entry whose FabricIndex field matches the fabric being verified 
+    // 12bi. Look-up the entry in the Operational Trust Anchors Schema under the expected VendorID (VID field)
+    // being verified whose IsRoot field is true and whose SubjectKeyID matches the SubjectKeyID field value of
+    // the TrustedRootCertificates attribute entry whose FabricIndex field matches the fabric being verified
     // (i.e. the RCAC of the candidate fabric)
     ChipCertificateData certData;
     // Decode root cert with default (null) options
@@ -131,9 +131,9 @@ CHIP_ERROR VendorIdVerificationClient::Verify(
     ByteSpan globallyTrustedRootSpan;
     ReturnLogErrorOnFailure(OnLookupOperationalTrustAnchor(vendorID, certData.mSubjectKeyId, globallyTrustedRootSpan));
 
-    // 12bii. Verify that the NOC chain is valid using Crypto_VerifyChain() against the entire chain reconstructed 
-    // from the NOCs attribute entry whose FabricIndex field matches the fabric being verified, but populating 
-    // the trusted root with the GloballyTrustedRoot certificate rather than the value in TrustedRootCertificates 
+    // 12bii. Verify that the NOC chain is valid using Crypto_VerifyChain() against the entire chain reconstructed
+    // from the NOCs attribute entry whose FabricIndex field matches the fabric being verified, but populating
+    // the trusted root with the GloballyTrustedRoot certificate rather than the value in TrustedRootCertificates
     // associated with the candidate fabric. If the chain is not valid, the procedure terminates as failed.
     ReturnLogErrorOnFailure(VerifyNOCCertificateChain(nocSpan, icacSpan, globallyTrustedRootSpan));
 
@@ -154,7 +154,7 @@ CHIP_ERROR VendorIdVerificationClient::VerifyVendorId(
     ByteSpan clientChallengeSpan{ kClientChallenge };
     chip::app::Clusters::OperationalCredentials::Commands::SignVIDVerificationRequest::Type request;
 
-    // The selected fabric information that matches the Fabrics attribute whose VendorID field to be verified 
+    // The selected fabric information that matches the Fabrics attribute whose VendorID field to be verified
     // is in the JCMTrustVerificationInfo info
     request.fabricIndex = info->adminFabricIndex;
     request.clientChallenge = clientChallengeSpan;
@@ -173,7 +173,7 @@ CHIP_ERROR VendorIdVerificationClient::VerifyVendorId(
         OnVendorIdVerficationComplete(err);
     };
 
-    CHIP_ERROR err = InvokeCommandRequest(exchangeMgr, getSession().Value(), 
+    CHIP_ERROR err = InvokeCommandRequest(exchangeMgr, getSession().Value(),
                                             kRootEndpointId, request,
                                             onSuccessCb, onFailureCb);
     if (err != CHIP_NO_ERROR)

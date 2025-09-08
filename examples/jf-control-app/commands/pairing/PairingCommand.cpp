@@ -931,7 +931,7 @@ void PairingCommand::OnAskUserForConsent(JCMTrustVerificationStateMachine & stat
 
 // TODO: Complete DCL lookup implementation
 CHIP_ERROR PairingCommand::OnLookupOperationalTrustAnchor(
-        VendorId vendorID, 
+        VendorId vendorID,
         CertificateKeyId & subjectKeyId,
         ByteSpan & globallyTrustedRootSpan)
 {

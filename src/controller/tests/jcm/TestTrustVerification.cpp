@@ -70,7 +70,7 @@ TEST_F_FROM_FIXTURE(TestTrustVerification, TestEnumToStringError)
     EXPECT_EQ(EnumToString(TrustVerificationError::kTrustVerificationDelegateNotSet),
               std::string("TRUST_VERIFICATION_DELEGATE_NOT_SET"));
     EXPECT_EQ(EnumToString(TrustVerificationError::kUserDeniedConsent), std::string("USER_DENIED_CONSENT"));
-    EXPECT_EQ(EnumToString(TrustVerificationError::kVendorIdVerificationFailed), std::string("VENDOR_ID_VERIFICATION_FAILED"));  
+    EXPECT_EQ(EnumToString(TrustVerificationError::kVendorIdVerificationFailed), std::string("VENDOR_ID_VERIFICATION_FAILED"));
     EXPECT_EQ(EnumToString(TrustVerificationError::kInternalError), std::string("INTERNAL_ERROR"));
 }
 
