@@ -636,14 +636,14 @@ void Instance::UpdateDayInformation(uint32_t now)
         return;
     }
 
-    ChipLogDetail(NotSpecified, "UpdateCurrentAttrs: current day date: %u", currentDay.Value().date);
+    ChipLogDetail(AppServer, "UpdateCurrentAttrs: current day date: %u", currentDay.Value().date);
     SetCurrentDay(currentDay);
 
     nextDay.SetNonNull(Utils::FindDay(mServerTariffAttrsCtx, (now + (kSecondsPerDay - now % kSecondsPerDay)) + 1));
 
     if (Utils::DayIsValid(&nextDay.Value()))
     {
-        ChipLogDetail(NotSpecified, "UpdateCurrentAttrs: next day date: %u", nextDay.Value().date);
+        ChipLogDetail(AppServer, "UpdateCurrentAttrs: next day date: %u", nextDay.Value().date);
         SetNextDay(nextDay);
     }
 }
@@ -677,7 +677,7 @@ void Instance::UpdateDayEntryInformation(uint32_t now)
         {
             ChipLogError(AppServer, "Unable to update the CurrentTariffComponents attribute!");
         }
-        ChipLogDetail(NotSpecified, "UpdateCurrentAttrs: current day entry: %u", tmpDayEntry.Value().dayEntryID);
+        ChipLogDetail(AppServer, "UpdateCurrentAttrs: current day entry: %u", tmpDayEntry.Value().dayEntryID);
     }
 
     SetCurrentDayEntry(tmpDayEntry);
@@ -696,7 +696,7 @@ void Instance::UpdateDayEntryInformation(uint32_t now)
         {
             ChipLogError(AppServer, "Unable to update the NextTariffComponents attribute!");
         }
-        ChipLogDetail(NotSpecified, "UpdateCurrentAttrs: next day entry: %u", tmpDayEntry.Value().dayEntryID);
+        ChipLogDetail(AppServer, "UpdateCurrentAttrs: next day entry: %u", tmpDayEntry.Value().dayEntryID);
         tmpDate.SetNonNull(mCurrentDayEntryDate.Value() + currentEntryMinutesRemain * 60);
     }
 
