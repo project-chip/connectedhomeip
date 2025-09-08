@@ -4,3 +4,5 @@ pyasn1_modules
 zeroconf
 langcodes
 requests
+pyscard
+ndeflib
