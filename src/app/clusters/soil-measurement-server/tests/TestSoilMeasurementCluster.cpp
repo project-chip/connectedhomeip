@@ -87,7 +87,7 @@ public:
 TEST_F(TestSoilMeasurementCluster, AttributeTest)
 {
     SoilMeasurementClusterTest(kEndpointWithSoilMeasurement, kDefaultSoilMoistureMeasurementLimits)
-        .Check([&](SoilMeasurementClusterLocal & soilMeasurement) {
+        .Check([](SoilMeasurementClusterLocal & soilMeasurement) {
             ReadOnlyBufferBuilder<DataModel::AttributeEntry> attributes;
             ASSERT_EQ(
                 soilMeasurement.Attributes(ConcreteClusterPath(kEndpointWithSoilMeasurement, SoilMeasurement::Id), attributes),
@@ -103,7 +103,7 @@ TEST_F(TestSoilMeasurementCluster, AttributeTest)
 TEST_F(TestSoilMeasurementCluster, SoilMoistureMeasuredValue)
 {
     SoilMeasurementClusterTest(kEndpointWithSoilMeasurement, kDefaultSoilMoistureMeasurementLimits)
-        .Check([&](SoilMeasurementClusterLocal & soilMeasurement) {
+        .Check([](SoilMeasurementClusterLocal & soilMeasurement) {
             SoilMoistureMeasuredValue::TypeInfo::Type measuredValue;
             measuredValue.SetNull();
             ASSERT_EQ(soilMeasurement.GetSoilMoistureMeasuredValue(), measuredValue);
@@ -127,7 +127,7 @@ TEST_F(TestSoilMeasurementCluster, SoilMoistureMeasuredValue)
 TEST_F(TestSoilMeasurementCluster, SoilMoistureMeasurementLimits)
 {
     SoilMeasurementClusterTest(kEndpointWithSoilMeasurement, kDefaultSoilMoistureMeasurementLimits)
-        .Check([&](SoilMeasurementClusterLocal & soilMeasurement) {
+        .Check([](SoilMeasurementClusterLocal & soilMeasurement) {
             const auto & measurementLimits = soilMeasurement.GetSoilMoistureMeasurementLimits();
             ASSERT_EQ(measurementLimits.measurementType, kDefaultSoilMoistureMeasurementLimits.measurementType);
             ASSERT_EQ(measurementLimits.measured, kDefaultSoilMoistureMeasurementLimits.measured);
