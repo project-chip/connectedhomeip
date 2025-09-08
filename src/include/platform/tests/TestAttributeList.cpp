@@ -74,10 +74,7 @@ TEST_F(TestAttributeList, TestIterator)
     EXPECT_NE(list.begin(), list.end());
 
     EXPECT_EQ(list.add(20), CHIP_NO_ERROR);
-    EXPECT_NE(list.begin(), list.end());
-
     EXPECT_EQ(list.add(30), CHIP_NO_ERROR);
-    EXPECT_NE(list.begin(), list.end());
 
     ASSERT_EQ(list.size(), (size_t) 3);
 
@@ -94,6 +91,42 @@ TEST_F(TestAttributeList, TestIterator)
     ++it;
     EXPECT_EQ(it, list.end());
 };
+
+// Test range-based for loop
+TEST_F(TestAttributeList, TestRangeBasedFor)
+{
+    AttributeList<int, 5> list;
+    EXPECT_EQ(list.add(10), CHIP_NO_ERROR);
+    EXPECT_EQ(list.add(20), CHIP_NO_ERROR);
+    EXPECT_EQ(list.add(30), CHIP_NO_ERROR);
+
+    int expected_values[] = { 10, 20, 30 };
+    int i = 0;
+    for (const auto & val : list)
+    {
+        ASSERT_LT(i, 3);
+        EXPECT_EQ(val, expected_values[i]);
+        i++;
+    }
+    EXPECT_EQ(i, 3);
+}
+
+// Test iterators from different lists
+TEST_F(TestAttributeList, TestIteratorFromDifferentLists)
+{
+    AttributeList<int, 5> list1;
+    AttributeList<int, 5> list2;
+
+    // Both iterators will have index 0, but point to different lists.
+    // They should not be equal.
+    EXPECT_NE(list1.begin(), list2.begin());
+
+    EXPECT_EQ(list1.add(10), CHIP_NO_ERROR);
+    EXPECT_EQ(list2.add(20), CHIP_NO_ERROR);
+
+    // Both iterators will have index 0, but point to different lists.
+    EXPECT_NE(list1.begin(), list2.begin());
+}
 
 } // namespace DeviceLayer
 } // namespace chip
