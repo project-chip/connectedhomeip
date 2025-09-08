@@ -40,16 +40,13 @@ namespace {
 constexpr int kVideoH264PayloadType = 96; // 96 is just the first value in the dynamic RTP payload‑type range (96‑127).
 constexpr int kVideoBitRate         = 3000;
 
-constexpr int kSSRC                        = 42;
 constexpr const char * kStreamGstDestIp    = "127.0.0.1";
 constexpr uint16_t kVideoStreamGstDestPort = 5000;
 
 // Constants for Audio
 constexpr int kAudioBitRate                = 64000;
 constexpr int kOpusPayloadType             = 111;
-constexpr int kAudioSSRC                   = 43;
 constexpr uint16_t kAudioStreamGstDestPort = 5001;
-constexpr int kMidExtId                    = 7;
 
 const char * GetPeerConnectionStateStr(rtc::PeerConnection::State state)
 {
