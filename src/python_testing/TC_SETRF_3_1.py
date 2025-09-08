@@ -448,28 +448,28 @@ class TC_SETRF_3_1(CommodityTariffTestBaseHelper):
         await self.check_start_date_attribute(endpoint, StartDateValue)
 
         self.step("6")
+        # TH reads IndividualDays attribute, expects a list of DayStruct
+        IndividualDaysValue = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster,
+                                                                             attribute=cluster.Attributes.IndividualDays)
+        await self.check_individual_days_attribute(endpoint, IndividualDaysValue)
+
+        self.step("7")
         # TH reads DayEntries attribute, expects a list of DayEntryStruct
         DayEntriesValue = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster,
                                                                          attribute=cluster.Attributes.DayEntries)
         await self.check_day_entries_attribute(endpoint, DayEntriesValue)
 
-        self.step("7")
+        self.step("8")
         # TH reads DayPatterns attribute, expects a list of DayPatternStruct
         DayPatternsValue = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster,
                                                                           attribute=cluster.Attributes.DayPatterns)
         await self.check_day_patterns_attribute(endpoint, DayPatternsValue)
 
-        self.step("8")
+        self.step("9")
         # TH reads CalendarPeriods attribute, expects a list of CalendarPeriodStruct sorted by StartDate field in increasing order
         CalendarPeriodsValue = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster,
                                                                               attribute=cluster.Attributes.CalendarPeriods)
         await self.check_calendar_periods_attribute(endpoint, CalendarPeriodsValue)
-
-        self.step("9")
-        # TH reads IndividualDays attribute, expects a list of DayStruct
-        IndividualDaysValue = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster,
-                                                                             attribute=cluster.Attributes.IndividualDays)
-        await self.check_individual_days_attribute(endpoint, IndividualDaysValue)
 
         self.step("10")
         # TH reads CurrentDay attribute, expects a DayStruct
@@ -598,27 +598,27 @@ class TC_SETRF_3_1(CommodityTariffTestBaseHelper):
         await self.verify_reporting(subscription_handler.attribute_reports, cluster.Attributes.StartDate, "StartDate", StartDateValue)
 
         self.step("27")
+        await self.check_individual_days_attribute(
+            endpoint, subscription_handler.attribute_reports[cluster.Attributes.IndividualDays][0].value)
+        await self.verify_reporting(subscription_handler.attribute_reports,
+                                    cluster.Attributes.IndividualDays, "IndividualDays", IndividualDaysValue)
+
+        self.step("28")
         await self.check_day_entries_attribute(
             endpoint, subscription_handler.attribute_reports[cluster.Attributes.DayEntries][0].value)
         await self.verify_reporting(subscription_handler.attribute_reports, cluster.Attributes.DayEntries, "DayEntries", DayEntriesValue)
 
-        self.step("28")
+        self.step("29")
         await self.check_day_patterns_attribute(
             endpoint, subscription_handler.attribute_reports[cluster.Attributes.DayPatterns][0].value)
         await self.verify_reporting(subscription_handler.attribute_reports,
                                     cluster.Attributes.DayPatterns, "DayPatterns", DayPatternsValue)
 
-        self.step("29")
+        self.step("30")
         await self.check_calendar_periods_attribute(
             endpoint, subscription_handler.attribute_reports[cluster.Attributes.CalendarPeriods][0].value)
         await self.verify_reporting(subscription_handler.attribute_reports,
                                     cluster.Attributes.CalendarPeriods, "CalendarPeriods", CalendarPeriodsValue)
-
-        self.step("30")
-        await self.check_individual_days_attribute(
-            endpoint, subscription_handler.attribute_reports[cluster.Attributes.IndividualDays][0].value)
-        await self.verify_reporting(subscription_handler.attribute_reports,
-                                    cluster.Attributes.IndividualDays, "IndividualDays", IndividualDaysValue)
 
         self.step("31")
         await self.check_current_day_attribute(
