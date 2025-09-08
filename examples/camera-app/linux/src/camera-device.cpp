@@ -54,6 +54,13 @@ struct VideoAppSinkContext
     uint16_t videoStreamID;
 };
 
+// Context structure to pass both CameraDevice and audioStreamID to the callback
+struct AudioAppSinkContext
+{
+    CameraDevice * device;
+    uint16_t audioStreamID;
+};
+
 // Using Gstreamer video test source's ball animation pattern for the live streaming visual verification.
 // Refer https://gstreamer.freedesktop.org/documentation/videotestsrc/index.html?gi-language=c#GstVideoTestSrcPattern
 
@@ -98,6 +105,46 @@ void DestroyVideoAppSinkContext(gpointer user_data)
 {
     VideoAppSinkContext * context = static_cast<VideoAppSinkContext *>(user_data);
     delete context;
+}
+static GstFlowReturn OnNewAudioSampleFromAppSink(GstAppSink * appsink, gpointer user_data)
+{
+    auto * context     = static_cast<AudioAppSinkContext *>(user_data);
+    auto * self        = context->device;
+    auto audioStreamID = context->audioStreamID;
+
+    GstSample * sample = gst_app_sink_pull_sample(appsink);
+    if (!sample)
+        return GST_FLOW_ERROR;
+
+    GstBuffer * buffer = gst_sample_get_buffer(sample);
+    if (!buffer)
+    {
+        gst_sample_unref(sample);
+        return GST_FLOW_ERROR;
+    }
+
+    // opusenc sends codec headers at start; ignore them
+    if (GST_BUFFER_FLAG_IS_SET(buffer, GST_BUFFER_FLAG_HEADER))
+    {
+        gst_sample_unref(sample);
+        return GST_FLOW_OK;
+    }
+
+    GstMapInfo map;
+    if (gst_buffer_map(buffer, &map, GST_MAP_READ))
+    {
+        // Send raw Opus frames to the media controller
+        self->GetMediaController().DistributeAudio(reinterpret_cast<const char *>(map.data), map.size, audioStreamID);
+        gst_buffer_unmap(buffer, &map);
+    }
+
+    gst_sample_unref(sample);
+    return GST_FLOW_OK;
+}
+
+static void DestroyAudioAppSinkContext(gpointer user_data)
+{
+    delete static_cast<AudioAppSinkContext *>(user_data);
 }
 
 } // namespace
@@ -499,32 +546,29 @@ GstElement * CameraDevice::CreateVideoPipeline(const std::string & device, int w
 // Helper function to create a GStreamer pipeline
 GstElement * CameraDevice::CreateAudioPipeline(const std::string & device, int channels, int sampleRate, CameraError & error)
 {
+    // Pipeline: source → capsfilter → audioconvert → audioresample → opusenc → appsink
     GstElement * pipeline = gst_pipeline_new("audio-pipeline");
 
-    GstElement * capsfilter   = gst_element_factory_make("capsfilter", "filter");
-    GstElement * audioconvert = gst_element_factory_make("audioconvert", "audio-convert");
-    GstElement * opusenc      = gst_element_factory_make("opusenc", "opus-encoder");
-    GstElement * rtpopuspay   = gst_element_factory_make("rtpopuspay", "rtpopuspay");
-    GstElement * udpsink      = gst_element_factory_make("udpsink", "udpsink");
-
-    GstElement * source = nullptr;
-    // Create elements
 #ifdef AV_STREAM_GST_USE_TEST_SRC
-    source = gst_element_factory_make("audiotestsrc", "source");
+    GstElement * source = gst_element_factory_make("audiotestsrc", "source");
+    g_object_set(source, "wave", 0, "is-live", TRUE, nullptr); // beep 0
 #else
-    source = gst_element_factory_make("pulsesrc", "source");
+    GstElement * source = gst_element_factory_make("pulsesrc", "source");
+    // g_object_set(source, "device", device.c_str(), nullptr);
 #endif
 
-    // Check for any nullptr among the created elements
+    GstElement * acaps   = gst_element_factory_make("capsfilter", "acaps");
+    GstElement * aconv   = gst_element_factory_make("audioconvert", "aconv");
+    GstElement * ares    = gst_element_factory_make("audioresample", "ares");
+    GstElement * opusenc = gst_element_factory_make("opusenc", "opus");
+    GstElement * appsink = gst_element_factory_make("appsink", "appsink");
+
+    // Check creations (same helpers you already use for video)
     const std::vector<std::pair<GstElement *, const char *>> elements = {
-        { pipeline, "pipeline" },          //
-        { source, "source" },              //
-        { capsfilter, "filter" },          //
-        { audioconvert, "audio-convert" }, //
-        { opusenc, "opus-encoder" },       //
-        { rtpopuspay, "rtpopuspay" },      //
-        { udpsink, "udpsink" }             //
+        { pipeline, "pipeline" }, { source, "source" },   { acaps, "acaps" },     { aconv, "aconv" },
+        { ares, "ares" },         { opusenc, "opusenc" }, { appsink, "appsink" },
     };
+
     const bool isElementFactoryMakeFailed = GstreamerPipepline::isGstElementsNull(elements);
 
     // If any element creation failed, log the error and unreference the elements
@@ -533,30 +577,30 @@ GstElement * CameraDevice::CreateAudioPipeline(const std::string & device, int c
         ChipLogError(Camera, "Not all elements could be created.");
 
         // Unreference the elements that were created
-        GstreamerPipepline::unrefGstElements(pipeline, source, capsfilter, audioconvert, opusenc, rtpopuspay, udpsink);
+        GstreamerPipepline::unrefGstElements(pipeline, source, acaps, aconv, ares, opusenc, appsink);
 
         error = CameraError::ERROR_INIT_FAILED;
         return nullptr;
     }
 
     // Create GstCaps for the audio source
-    GstCaps * caps = gst_caps_new_simple("audio/x-raw", "channels", G_TYPE_INT, channels, "rate", G_TYPE_INT, sampleRate, nullptr);
-    g_object_set(capsfilter, "caps", caps, nullptr);
+    GstCaps * caps = gst_caps_new_simple("audio/x-raw", "format", G_TYPE_STRING, "S16LE", "rate", G_TYPE_INT, sampleRate,
+                                         "channels", G_TYPE_INT, 1, nullptr);
+    g_object_set(acaps, "caps", caps, nullptr);
     gst_caps_unref(caps);
 
-    // Set udpsink properties
-    g_object_set(udpsink, "host", STREAM_GST_DEST_IP, "port", AUDIO_STREAM_GST_DEST_PORT, nullptr);
+    // Match controller expectations: Opus @ 64 kbps (kAudioBitrate)
+    g_object_set(opusenc, "bitrate", 64000, "frame-size", 20, "inband-fec", FALSE, "dtx", FALSE, nullptr);
 
-    // Add elements to the pipeline
-    gst_bin_add_many(GST_BIN(pipeline), source, capsfilter, audioconvert, opusenc, rtpopuspay, udpsink, nullptr);
+    // Emit samples to your appsink callback (DistributeAudio → packetizer)
+    g_object_set(appsink, "emit-signals", TRUE, nullptr);
+    g_object_set(source, "do-timestamp", TRUE, nullptr);
 
-    // Link elements
-    if (!gst_element_link_many(source, capsfilter, audioconvert, opusenc, rtpopuspay, udpsink, nullptr))
+    // Build and link
+    gst_bin_add_many(GST_BIN(pipeline), source, acaps, aconv, ares, opusenc, appsink, nullptr);
+    if (!gst_element_link_many(source, acaps, aconv, ares, opusenc, appsink, nullptr))
     {
-        ChipLogError(Camera, "Elements could not be linked.");
-
-        // The pipeline will unref all added elements automatically when you unref the pipeline.
-        gst_object_unref(pipeline);
+        ChipLogError(Camera, "CreateAudioPipeline: link failed");
         error = CameraError::ERROR_INIT_FAILED;
         return nullptr;
     }
@@ -808,6 +852,16 @@ CameraError CameraDevice::StartAudioStream(uint16_t streamID)
         return CameraError::ERROR_AUDIO_STREAM_START_FAILED;
     }
 
+    // Get the appsink and set up callback
+    GstElement * appsink = gst_bin_get_by_name(GST_BIN(audioPipeline), "appsink");
+    if (appsink)
+    {
+        AppSinkContext * context      = new AppSinkContext{ this, streamID };
+        GstAppSinkCallbacks callbacks = { nullptr, nullptr, OnNewAudioSampleFromAppSink };
+        gst_app_sink_set_callbacks(GST_APP_SINK(appsink), &callbacks, context, DestroyAudioAppSinkContext);
+        gst_object_unref(appsink);
+    }
+
     // Start the pipeline
     GstStateChangeReturn result = gst_element_set_state(audioPipeline, GST_STATE_PLAYING);
     if (result == GST_STATE_CHANGE_FAILURE)
@@ -816,6 +870,10 @@ CameraError CameraDevice::StartAudioStream(uint16_t streamID)
         gst_object_unref(audioPipeline);
         it->audioContext = nullptr;
         return CameraError::ERROR_AUDIO_STREAM_START_FAILED;
+    }
+    else
+    {
+        ChipLogProgress(Camera, "Audio Pipeline reached playing state");
     }
 
     // Wait for the pipeline to reach the PLAYING state

@@ -39,9 +39,16 @@ namespace {
 constexpr int kVideoH264PayloadType = 96; // 96 is just the first value in the dynamic RTP payload‑type range (96‑127).
 constexpr int kVideoBitRate         = 3000;
 
-constexpr const char * kStreamGstDestIp                      = "127.0.0.1";
-constexpr uint16_t kVideoStreamGstDestPort                   = 5000;
-constexpr chip::EndpointId kWebRTCRequesterDynamicEndpointId = 1;
+constexpr int kSSRC                        = 42;
+constexpr const char * kStreamGstDestIp    = "127.0.0.1";
+constexpr uint16_t kVideoStreamGstDestPort = 5000;
+
+// Constants for Audio
+constexpr int kAudioBitRate                = 64000;
+constexpr int kOpusPayloadType             = 111;
+constexpr int kAudioSSRC                   = 43;
+constexpr uint16_t kAudioStreamGstDestPort = 5001;
+constexpr int kMidExtId                    = 7;
 
 const char * GetPeerConnectionStateStr(rtc::PeerConnection::State state)
 {
@@ -233,6 +240,7 @@ void WebRTCManager::Disconnect()
 
     // Reset track
     mTrack.reset();
+    audioTrack.reset();
 
     // Clear state
     mCurrentVideoStreamId = 0;
@@ -308,7 +316,14 @@ CHIP_ERROR WebRTCManager::Connnect(Controller::DeviceCommissioner & commissioner
     mRTPSocket = socket(AF_INET, SOCK_DGRAM, 0);
     if (mRTPSocket == -1)
     {
-        ChipLogError(Camera, "Failed to create RTP socket: %s", strerror(errno));
+        ChipLogError(Camera, "Failed to create RTP Video socket: %s", strerror(errno));
+        return CHIP_ERROR_POSIX(errno);
+    }
+
+    mAudioRTPSocket = socket(AF_INET, SOCK_DGRAM, 0);
+    if (mAudioRTPSocket == -1)
+    {
+        ChipLogError(Camera, "Failed to create RTP Audio socket: %s", strerror(errno));
         return CHIP_ERROR_POSIX(errno);
     }
 
@@ -330,6 +345,29 @@ CHIP_ERROR WebRTCManager::Connnect(Controller::DeviceCommissioner & commissioner
             // This is an RTP packet
             sendto(mRTPSocket, reinterpret_cast<const char *>(message.data()), size_t(message.size()), 0,
                    reinterpret_cast<const struct sockaddr *>(&addr), sizeof(addr));
+        },
+        nullptr);
+
+    // For Audio
+    sockaddr_in audioAddr     = {};
+    audioAddr.sin_family      = AF_INET;
+    audioAddr.sin_addr.s_addr = inet_addr(kStreamGstDestIp);
+    audioAddr.sin_port        = htons(kAudioStreamGstDestPort);
+
+    rtc::Description::Audio audioMedia("audio", rtc::Description::Direction::RecvOnly);
+    audioMedia.addOpusCodec(kOpusPayloadType);
+    audioMedia.setBitrate(kAudioBitRate);
+    audioTrack = mPeerConnection->addTrack(audioMedia);
+
+    auto audioSession = std::make_shared<rtc::RtcpReceivingSession>();
+    audioTrack->setMediaHandler(audioSession);
+
+    audioTrack->onMessage(
+        [this, audioAddr](rtc::binary message) {
+            // This is an RTP Audio packet
+            ChipLogProgress(Camera, "Audio packets size: [%u]", static_cast<unsigned int>(message.size()));
+            sendto(mAudioRTPSocket, reinterpret_cast<const char *>(message.data()), static_cast<size_t>(message.size()), 0,
+                   reinterpret_cast<const struct sockaddr *>(&audioAddr), sizeof(audioAddr));
         },
         nullptr);
 
