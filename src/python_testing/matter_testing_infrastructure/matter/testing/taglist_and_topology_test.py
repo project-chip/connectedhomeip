@@ -18,7 +18,7 @@
 import functools
 from collections import defaultdict
 from dataclasses import dataclass, field
-from typing import Any, Dict, List, Set, Tuple
+from typing import Any, Dict, List, Set, Tuple, TypeAlias
 
 import matter.clusters as Clusters
 from matter.clusters.Types import Nullable
@@ -220,7 +220,7 @@ class EndpointTree:
     is_tree_root: bool = False
 
 
-type TreeDict = dict[int, EndpointTree]
+TreeDict: TypeAlias = dict[int, EndpointTree]
 
 
 def build_tree_for_graph(endpoints: dict[int, Any]) -> tuple[TreeDict, list[ProblemNotice]]:
