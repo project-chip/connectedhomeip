@@ -80,9 +80,9 @@ class CommodityTariffTestBaseHelper(MatterBaseTest):
             randomization_offset (int): Value of RandomizationOffset field of DayEntryStruct or defaultRandomizationOffset attribute.
         """
 
-        if randomization_type == 1:
+        if randomization_type == cluster.Enums.DayEntryRandomizationTypeEnum.kFixed:
             matter_asserts.assert_valid_int16(randomization_offset, 'RandomizationOffset must be int16 type value.')
-        elif randomization_type == 4:
+        elif randomization_type == cluster.Enums.DayEntryRandomizationTypeEnum.kRandomNegative:
             matter_asserts.assert_valid_int16(randomization_offset, 'RandomizationOffset must be int16 type value.')
             asserts.assert_less_equal(randomization_offset, 0, "RandomizationOffset must be less than 0.")
         else:
