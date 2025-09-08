@@ -179,9 +179,9 @@ class TC_SETRF_2_1(CommodityTariffTestBaseHelper):
                         - Store the field value randomizationTypeValue;
                      - RandomizationOffset field: 
                         - Verify that entry does NOT contain RandomizationOffset fields if SETRF.S.F05(RNDM) is False;
-                        - If SETRF.S.F05(RNDM) and randomizationTypeValue is 0x01 (Fixed) and RandomizationOffset field is presented, it has int16 value;
-                        - If SETRF.S.F05(RNDM) and randomizationTypeValue is 0x04 (RandomNegative) and RandomizationOffset field is presented, it has a int16 value less or equal 0;
-                        - If SETRF.S.F05(RNDM) and randomizationTypeValue is 0x00 (None), 0x02 (Random) or 0x03 (RandomPositive) and RandomizationOffset field is presented, it has a int16 value greater or equal 0."""),
+                        - If SETRF.S.F05(RNDM) and randomizationTypeValue is 0x01 (Fixed) and RandomizationOffset field is presented, it has an int16 value;
+                        - If SETRF.S.F05(RNDM) and randomizationTypeValue is 0x04 (RandomNegative) and RandomizationOffset field is presented, it has an int16 value less or equal 0;
+                        - If SETRF.S.F05(RNDM) and randomizationTypeValue is 0x00 (None), 0x02 (Random) or 0x03 (RandomPositive) and RandomizationOffset field is presented, it has an int16 value greater or equal 0."""),
             TestStep("14", "TH reads from the DUT the NextDayEntryDate attribute.", """
                      - If tariffInfoValue equals null, Verify that the DUT response contains a null;
                      - If tariffInfoValue does NOT equal null, Verify that the DUT response contains a null or an epoch-s value greater than currentDayEntryDateValue;"""),
@@ -312,9 +312,9 @@ class TC_SETRF_2_1(CommodityTariffTestBaseHelper):
                      - If tariffInfoValue equals null, Verify that the DUT response contains a null;
                      - If defaultRandomizationTypeValue is null, Verify that the DUT response contains a null;
                      - Verify that the DUT response contains a null if tariffInfoValue equals null;
-                     - If defaultRandomizationTypeValue is 0x01 (Fixed), Verify that the DUT response contains a int16 value;
-                     - If defaultRandomizationTypeValue is 0x04 (RandomNegative), Verify that the DUT response contains a int16 value less or equal 0;
-                     - If defaultRandomizationTypeValue is 0x00 (None), 0x02 (Random) or 0x03 (RandomPositive), Verify that the DUT response contains a int16 value greater or equal 0."""),
+                     - If defaultRandomizationTypeValue is 0x01 (Fixed), Verify that the DUT response contains an int16 value;
+                     - If defaultRandomizationTypeValue is 0x04 (RandomNegative), Verify that the DUT response contains an int16 value less or equal 0;
+                     - If defaultRandomizationTypeValue is 0x00 (None), 0x02 (Random) or 0x03 (RandomPositive), Verify that the DUT response contains an int16 value greater or equal 0."""),
         ]
 
         return steps
