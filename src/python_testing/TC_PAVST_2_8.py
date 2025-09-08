@@ -24,6 +24,7 @@
 #     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
 #     script-args: >
 #       --storage-path admin_storage.json
+#       --string-arg th_server_app_path:${PUSH_AV_SERVER}
 #       --commissioning-method on-network
 #       --discriminator 1234
 #       --passcode 20202021
@@ -60,10 +61,7 @@ class TC_PAVST_2_8(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
     @async_test_body
     async def setup_class(self):
         th_server_app = self.user_params.get("th_server_app_path", None)
-        if th_server_app:
-            self.server = PushAvServerProcess(server_path=th_server_app)
-        else:
-            self.server = PushAvServerProcess()
+        self.server = PushAvServerProcess(server_path=th_server_app)
         self.server.start(
             expected_output="Running on https://0.0.0.0:1234",
             timeout=30,
