@@ -81,6 +81,9 @@ def verify_csr_pase() -> str:
 def verify_unsupported_access() -> str:
     return ("Verify that the DUT responds with UNSUPPORTED_ACCESS")
 
+def verify_invalid_command() -> str:
+    return ("Verify that the DUT responds with INVALID_COMMAND")
+
 
 class TC_OPCREDS_3_4(MatterBaseTest):
     def desc_TC_OPCREDS_3_4(self):
@@ -107,9 +110,9 @@ class TC_OPCREDS_3_4(MatterBaseTest):
                 TestStep(
                     9, f"TH1 {send_command('UpdateNOC')} to the Node Operational Credentials cluster", None, verify_constraint_error()),
                 TestStep(
-                    10, f"TH1 sends {send_command ('ArmFailSafe')} command to the DUT with the ExpiryLengthSeconds field set to 0", None, verify_armfailsafe_response()),
+                    10, f"TH1 sends {send_command('ArmFailSafe')} command to the DUT with the ExpiryLengthSeconds field set to 0", None, verify_armfailsafe_response()),
                 TestStep(
-                    11, f"TH1 sends {send_command ('ArmFailSafe')} command to the DUT with the ExpiryLengthSeconds field set to 900", None, verify_armfailsafe_response()),
+                    11, f"TH1 sends {send_command('ArmFailSafe')} command to the DUT with the ExpiryLengthSeconds field set to 900", None, verify_armfailsafe_response()),
                 TestStep(
                     12, f"TH1 {send_command('CSRequest')} with the IsForUpdateNOC field set to true", None, verify_csr_not_update()),
                 TestStep(
@@ -124,19 +127,21 @@ class TC_OPCREDS_3_4(MatterBaseTest):
                 TestStep(19, "TH1 generates a new NOC and ICAC"),
                 TestStep(
                     20, f"TH1 {send_command('UpdateNOC')} to the Node Operational Credentials cluster", None, verify_noc_response("InvalidNOC")),
+                TestStep(21, f"TH1 sends {send_command('ArmFailSafe')} command to the DUT with the ExpiryLengthSeconds field set to 0", None, verify_armfailsafe_response()),
+                TestStep(22, f"TH1 sends {send_command('ArmFailSafe')} command to the DUT with the ExpiryLengthSeconds field set to 900", None, verify_armfailsafe_response()),
+                TestStep(23, f"TH1 {send_command('CSRRequest')} with the IsForUpdateNOC field set to false", None, verify_csr_not_update()),
                 TestStep(
-                    21, f"TH1 {send_command('AddTrustedRootCertificate')} to DUT again with the RootCACertificate field set to new_root_cert"),
+                    24, f"TH1 {send_command('AddTrustedRootCertificate')} to DUT again with the RootCACertificate field set to new_root_cert"),
                 TestStep(
-                    22, f"TH1 {send_command('UpdateNOC')} to the Node Operational Credentials cluster", None, verify_constraint_error()),
+                    25, f"TH1 {send_command('UpdateNOC')} to the Node Operational Credentials cluster", None, verify_constraint_error()),
                 TestStep(
-                    23, f"TH1 {send_command('ArmFailSafe')} to the DUT with the ExpiryLengthSeconds field set to 0", None, verify_armfailsafe_response()),
-                TestStep(24, f"TH1 {send_command('OpenCommissioningWindow')} to the DUT"),
+                    26, f"TH1 {send_command('ArmFailSafe')} to the DUT with the ExpiryLengthSeconds field set to 0", None, verify_armfailsafe_response()),
+                TestStep(27, f"TH1 {send_command('OpenCommissioningWindow')} to the DUT"),
                 TestStep(
-                    25, f"TH1 connects to the DUT over PASE and {send_command('ArmFailSafe')} to the DUT with the ExpiryLengthSeconds field set to 900. Steps 24-26 are all performed over the PASE connection.", None, verify_armfailsafe_response()),
+                    28, f"TH1 connects to the DUT over PASE and {send_command('ArmFailSafe')} to the DUT with the ExpiryLengthSeconds field set to 900. Steps 29-30 are all performed over the PASE connection.", None, verify_armfailsafe_response()),
+                TestStep(29, f"TH1 sends {send_command ('ArmFailSafe')} command to the DUT with the ExpiryLengthSeconds field set to 0", None, verify_armfailsafe_response()),
                 TestStep(
-                    26, f"TH1 {send_command('CSRequest')} over PASE with the IsForUpdateNOC field set to true", None, verify_csr_pase()),
-                TestStep(27, "TH1 generates a new NOC chain with ICAC with the following properties: new NOC and ICAC using icac_pase"),
-                TestStep(28, f"TH1 {send_command('UpdateNOC')} to the Node Operational Credentials cluster over PASE", None, verify_unsupported_access())]
+                    30, f"TH1 {send_command('CSRequest')} over PASE with the IsForUpdateNOC field set to true", None, verify_invalid_command())]
 
     @async_test_body
     async def test_TC_OPCREDS_3_4(self):
@@ -263,23 +268,27 @@ class TC_OPCREDS_3_4(MatterBaseTest):
         asserts.assert_equal(resp.statusCode, opcreds.Enums.NodeOperationalCertStatusEnum.kInvalidNOC,
                              "NOCResponse with the StatusCode InvalidNOC")
 
+        self.step(21)
         cmd = Clusters.GeneralCommissioning.Commands.ArmFailSafe(0)
         resp = await self.send_single_cmd(dev_ctrl=self.default_controller, node_id=self.dut_node_id, cmd=cmd)
         asserts.assert_equal(resp.errorCode, Clusters.GeneralCommissioning.Enums.CommissioningErrorEnum.kOk,
                              "Failure status returned from arm failsafe")
 
+        self.step(22)
         cmd = Clusters.GeneralCommissioning.Commands.ArmFailSafe(900)
         resp = await self.send_single_cmd(dev_ctrl=self.default_controller, node_id=self.dut_node_id, cmd=cmd)
         asserts.assert_equal(resp.errorCode, Clusters.GeneralCommissioning.Enums.CommissioningErrorEnum.kOk,
                              "Failure status returned from arm failsafe")
 
-        self.step(21)
+        self.step(23)
         cmd = opcreds.Commands.CSRRequest(CSRNonce=random.randbytes(32), isForUpdateNOC=False)
         csr_not_update = await self.send_single_cmd(dev_ctrl=self.default_controller, node_id=self.dut_node_id, cmd=cmd)
+
+        self.step(24)
         cmd = opcreds.Commands.AddTrustedRootCertificate(new_root_cert)
         resp = await self.send_single_cmd(dev_ctrl=self.default_controller, node_id=self.dut_node_id, cmd=cmd)
 
-        self.step(22)
+        self.step(25)
         cmd = opcreds.Commands.UpdateNOC(NOCValue=noc_update_new_root, ICACValue=icac_update_new_root)
         try:
             resp = await self.send_single_cmd(dev_ctrl=self.default_controller, node_id=self.dut_node_id, cmd=cmd)
@@ -287,39 +296,31 @@ class TC_OPCREDS_3_4(MatterBaseTest):
         except InteractionModelError as e:
             asserts.assert_equal(e.status, Status.ConstraintError, "Failure status returned from UpdateNOC")
 
-        self.step(23)
+        self.step(26)
         cmd = Clusters.GeneralCommissioning.Commands.ArmFailSafe(0)
         resp = await self.send_single_cmd(dev_ctrl=self.default_controller, node_id=self.dut_node_id, cmd=cmd)
         asserts.assert_equal(resp.errorCode, Clusters.GeneralCommissioning.Enums.CommissioningErrorEnum.kOk,
                              "Failure status returned from arm failsafe")
 
-        self.step(24)
+        self.step(27)
         resp = await self.open_commissioning_window()
 
-        self.step(25)
+        self.step(28)
         await self.default_controller.FindOrEstablishPASESession(setupCode=resp.commissioningParameters.setupQRCode, nodeid=self.dut_node_id)
 
+        self.step(29)
         cmd = Clusters.GeneralCommissioning.Commands.ArmFailSafe(900)
         resp = await self.send_single_cmd(dev_ctrl=self.default_controller, node_id=self.dut_node_id, cmd=cmd)
         asserts.assert_equal(resp.errorCode, Clusters.GeneralCommissioning.Enums.CommissioningErrorEnum.kOk,
                              "Error code status returned from arm failsafe")
 
-        self.step(26)
-        cmd = opcreds.Commands.CSRRequest(CSRNonce=random.randbytes(32))
-        csr_pase = await self.send_single_cmd(dev_ctrl=self.default_controller, node_id=self.dut_node_id, cmd=cmd)
-
-        self.step(27)
-        new_noc_chain = await self.default_controller.IssueNOCChain(csr_pase, self.dut_node_id)
-        noc_pase = csr_pase.NOCSRElements
-        icac_pase = new_noc_chain.icacBytes
-
-        self.step(28)
-        cmd = opcreds.Commands.UpdateNOC(NOCValue=noc_pase, ICACValue=icac_pase)
+        self.step(30)
+        cmd = opcreds.Commands.CSRRequest(CSRNonce=random.randbytes(32), isForUpdateNOC=True)
         try:
             await self.send_single_cmd(dev_ctrl=self.default_controller, node_id=self.dut_node_id, cmd=cmd)
-            asserts.fail("Unexpected error sending UpdateNOC command")
+            asserts.fail("Unexpected error sending CSRRequest command")
         except InteractionModelError as e:
-            asserts.assert_equal(e.status, Status.UnsupportedAccess, "Failure status returned from UpdateNOC")
+            asserts.assert_equal(e.status, Status.InvalidCommand, "Failure status returned from CSRRequest")
 
 
 if __name__ == "__main__":
