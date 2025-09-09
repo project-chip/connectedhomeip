@@ -91,3 +91,6 @@ class MatterTestConfig:
     dac_revocation_set_path: Optional[pathlib.Path] = None
 
     legacy: bool = False
+
+    # Restart flag file for rebooting the DUT during test runs
+    restart_flag_file: Optional[pathlib.Path] = None

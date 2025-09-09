@@ -48,7 +48,7 @@ using namespace Camera;
 namespace {
 
 // Context structure to pass both CameraDevice and videoStreamID to the callback
-struct AppSinkContext
+struct VideoAppSinkContext
 {
     CameraDevice * device;
     uint16_t videoStreamID;
@@ -62,11 +62,11 @@ const int kBallAnimationPattern = 18;
 #endif
 
 // Callback function for GStreamer app sink
-GstFlowReturn OnNewSampleFromAppSink(GstAppSink * appsink, gpointer user_data)
+GstFlowReturn OnNewVideoSampleFromAppSink(GstAppSink * appsink, gpointer user_data)
 {
-    AppSinkContext * context = static_cast<AppSinkContext *>(user_data);
-    CameraDevice * self      = context->device;
-    uint16_t videoStreamID   = context->videoStreamID;
+    VideoAppSinkContext * context = static_cast<VideoAppSinkContext *>(user_data);
+    CameraDevice * self           = context->device;
+    uint16_t videoStreamID        = context->videoStreamID;
 
     GstSample * sample = gst_app_sink_pull_sample(appsink);
     if (sample == nullptr)
@@ -94,9 +94,9 @@ GstFlowReturn OnNewSampleFromAppSink(GstAppSink * appsink, gpointer user_data)
 }
 
 // Cleanup function for the context
-void DestroyAppSinkContext(gpointer user_data)
+void DestroyVideoAppSinkContext(gpointer user_data)
 {
-    AppSinkContext * context = static_cast<AppSinkContext *>(user_data);
+    VideoAppSinkContext * context = static_cast<VideoAppSinkContext *>(user_data);
     delete context;
 }
 
@@ -586,16 +586,77 @@ CameraError CameraDevice::SetV4l2Control(uint32_t controlId, int value)
     return CameraError::SUCCESS;
 }
 
+// Find the closest allocated snapshot stream with resolution >= requested, or closest possible
+bool CameraDevice::MatchClosestSnapshotParams(const VideoResolutionStruct & requested, VideoResolutionStruct & matchedResolution,
+                                              ImageCodecEnum & matchedCodec)
+{
+    int64_t requestedPixels = static_cast<int64_t>(requested.width) * requested.height;
+    int64_t bestDiff        = std::numeric_limits<int64_t>::max();
+    int64_t bestGEQDiff     = std::numeric_limits<int64_t>::max();
+
+    const SnapshotStream * bestStream    = nullptr;
+    const SnapshotStream * bestGEQStream = nullptr;
+
+    for (const auto & stream : mSnapshotStreams)
+    {
+        int64_t streamPixels = static_cast<int64_t>(stream.snapshotStreamParams.minResolution.width) *
+            stream.snapshotStreamParams.minResolution.height;
+        int64_t diff    = streamPixels - requestedPixels;
+        int64_t absDiff = std::abs(diff);
+
+        // Candidate 1: First stream with resolution >= requested
+        if (diff >= 0 && diff < bestGEQDiff)
+        {
+            bestGEQDiff   = diff;
+            bestGEQStream = &stream;
+        }
+
+        // Candidate 2: Closest stream (absolute difference)
+        if (absDiff < bestDiff)
+        {
+            bestDiff   = absDiff;
+            bestStream = &stream;
+        }
+    }
+
+    const SnapshotStream * chosen = bestGEQStream ? bestGEQStream : bestStream;
+    if (chosen)
+    {
+        matchedResolution = chosen->snapshotStreamParams.minResolution;
+        matchedCodec      = chosen->snapshotStreamParams.imageCodec;
+        return true;
+    }
+    return false;
+}
+
 CameraError CameraDevice::CaptureSnapshot(const chip::app::DataModel::Nullable<uint16_t> streamID,
                                           const VideoResolutionStruct & resolution, ImageSnapshot & outImageSnapshot)
 {
-    uint16_t streamId = streamID.IsNull() ? 1 : streamID.Value();
-    auto it           = std::find_if(mSnapshotStreams.begin(), mSnapshotStreams.end(),
-                                     [streamId](const SnapshotStream & s) { return s.snapshotStreamParams.snapshotStreamID == streamId; });
-    if (it == mSnapshotStreams.end())
+    VideoResolutionStruct matchedRes;
+    ImageCodecEnum matchedCodec;
+
+    if (streamID.IsNull())
     {
-        ChipLogError(Camera, "Snapshot streamID : %u not found", streamId);
-        return CameraError::ERROR_CAPTURE_SNAPSHOT_FAILED;
+        if (!MatchClosestSnapshotParams(resolution, matchedRes, matchedCodec))
+        {
+            ChipLogError(Camera, "No matching snapshot stream found for requested resolution %ux%u", resolution.width,
+                         resolution.height);
+            return CameraError::ERROR_CAPTURE_SNAPSHOT_FAILED;
+        }
+    }
+    else
+    {
+        uint16_t streamId = streamID.Value();
+        auto it           = std::find_if(mSnapshotStreams.begin(), mSnapshotStreams.end(), [streamId](const SnapshotStream & s) {
+            return s.snapshotStreamParams.snapshotStreamID == streamId;
+        });
+        if (it == mSnapshotStreams.end())
+        {
+            ChipLogError(Camera, "Snapshot stream not found for stream ID %u", streamId);
+            return CameraError::ERROR_CAPTURE_SNAPSHOT_FAILED;
+        }
+        matchedRes   = it->snapshotStreamParams.minResolution;
+        matchedCodec = it->snapshotStreamParams.imageCodec;
     }
 
     // Read from image file stored from snapshot stream.
@@ -621,9 +682,8 @@ CameraError CameraDevice::CaptureSnapshot(const chip::app::DataModel::Nullable<u
 
     file.close();
 
-    outImageSnapshot.imageRes.width  = it->snapshotStreamParams.minResolution.width;
-    outImageSnapshot.imageRes.height = it->snapshotStreamParams.minResolution.height;
-    outImageSnapshot.imageCodec      = it->snapshotStreamParams.imageCodec;
+    outImageSnapshot.imageRes   = matchedRes;
+    outImageSnapshot.imageCodec = matchedCodec;
 
     return CameraError::SUCCESS;
 }
@@ -654,9 +714,9 @@ CameraError CameraDevice::StartVideoStream(const VideoStreamStruct & allocatedSt
     GstElement * appsink = gst_bin_get_by_name(GST_BIN(videoPipeline), "appsink");
     if (appsink)
     {
-        AppSinkContext * context      = new AppSinkContext{ this, streamID };
-        GstAppSinkCallbacks callbacks = { nullptr, nullptr, OnNewSampleFromAppSink };
-        gst_app_sink_set_callbacks(GST_APP_SINK(appsink), &callbacks, context, DestroyAppSinkContext);
+        VideoAppSinkContext * context = new VideoAppSinkContext{ this, streamID };
+        GstAppSinkCallbacks callbacks = { nullptr, nullptr, OnNewVideoSampleFromAppSink };
+        gst_app_sink_set_callbacks(GST_APP_SINK(appsink), &callbacks, context, DestroyVideoAppSinkContext);
         gst_object_unref(appsink);
     }
 
@@ -738,7 +798,7 @@ CameraError CameraDevice::StartAudioStream(uint16_t streamID)
     int channels   = it->audioStreamParams.channelCount;
     int sampleRate = static_cast<int>(it->audioStreamParams.sampleRate);
 
-    // Create Gstreamer video pipeline
+    // Create Gstreamer audio pipeline
     CameraError error          = CameraError::SUCCESS;
     GstElement * audioPipeline = CreateAudioPipeline("/dev/audio0", channels, sampleRate, error);
     if (audioPipeline == nullptr)
@@ -800,6 +860,28 @@ CameraError CameraDevice::StopAudioStream(uint16_t streamID)
     }
 
     return CameraError::SUCCESS;
+}
+
+// Allocate snapshot stream
+CameraError CameraDevice::AllocateSnapshotStream(const CameraAVStreamMgmtDelegate::SnapshotStreamAllocateArgs & args,
+                                                 uint16_t & outStreamID)
+{
+
+    if (AddSnapshotStream(args, outStreamID))
+    {
+        auto it = std::find_if(mSnapshotStreams.begin(), mSnapshotStreams.end(), [outStreamID](const SnapshotStream & s) {
+            return s.snapshotStreamParams.snapshotStreamID == outStreamID;
+        });
+        if (it == mSnapshotStreams.end())
+        {
+            ChipLogError(Camera, "Snapshot stream with ID %u not found", outStreamID);
+            return CameraError::ERROR_RESOURCE_EXHAUSTED;
+        }
+        it->isAllocated = true;
+        ChipLogProgress(Camera, "Allocated snapshot stream with ID: %u", outStreamID);
+        return CameraError::SUCCESS;
+    }
+    return CameraError::ERROR_RESOURCE_EXHAUSTED;
 }
 
 // Start snapshot stream
@@ -1054,6 +1136,9 @@ CameraError CameraDevice::SetSoftLivestreamPrivacyModeEnabled(bool softLivestrea
 {
     mSoftLivestreamPrivacyModeEnabled = softLivestreamPrivacyMode;
 
+    // Notify WebRTCProviderManager about change
+    mWebRTCProviderManager.LiveStreamPrivacyModeChanged(softLivestreamPrivacyMode);
+
     return CameraError::SUCCESS;
 }
 
@@ -1284,21 +1369,63 @@ void CameraDevice::InitializeAudioStreams()
 void CameraDevice::InitializeSnapshotStreams()
 {
     // Create single snapshot stream with typical supported parameters
-    SnapshotStream snapshotStream = { {
-                                          1 /* Id */,
-                                          ImageCodecEnum::kJpeg,
-                                          kSnapshotStreamFrameRate /* FrameRate */,
-                                          { kMinResolutionWidth, kMinResolutionHeight } /* MinResolution*/,
-                                          { kMaxResolutionWidth, kMaxResolutionHeight } /* MaxResolution */,
-                                          90 /* Quality */,
-                                          0 /* RefCount */,
-                                          false /* EncodedPixels */,
-                                          false /* HardwareEncoder */
-                                      },
+    uint16_t streamId;
+    AddSnapshotStream({ ImageCodecEnum::kJpeg,
+                        kSnapshotStreamFrameRate /* FrameRate */,
+                        { kMinResolutionWidth, kMinResolutionHeight } /* MinResolution*/,
+                        { kMaxResolutionWidth, kMaxResolutionHeight } /* MaxResolution */,
+                        90 /* Quality */ },
+                      streamId);
+}
+
+bool CameraDevice::AddSnapshotStream(const CameraAVStreamMgmtDelegate::SnapshotStreamAllocateArgs & snapshotStreamAllocateArgs,
+                                     uint16_t & outStreamID)
+{
+    constexpr uint16_t kMaxSnapshotStreams = std::numeric_limits<uint16_t>::max();
+
+    if (mSnapshotStreams.size() >= kMaxSnapshotStreams)
+    {
+        ChipLogError(Camera, "Maximum number of snapshot streams reached. Cannot a allocate new one");
+        return false;
+    }
+
+    uint16_t streamId = 0;
+    for (const auto & s : mSnapshotStreams)
+    {
+        // Find the highest existing stream ID.
+        if (s.snapshotStreamParams.snapshotStreamID > streamId)
+        {
+            streamId = s.snapshotStreamParams.snapshotStreamID;
+        }
+    }
+
+    // Find a unique stream id, starting from the last used one above, incrementing and wrapping at 65535.
+    for (uint16_t attempts = 0; attempts < kMaxSnapshotStreams; ++attempts)
+    {
+        auto found = std::find_if(mSnapshotStreams.begin(), mSnapshotStreams.end(), [streamId](const SnapshotStream & s) {
+            return s.snapshotStreamParams.snapshotStreamID == streamId;
+        });
+        if (found == mSnapshotStreams.end())
+        {
+            break;
+        }
+        if (attempts == kMaxSnapshotStreams - 1)
+        {
+            ChipLogError(Camera, "No available slot for stream allocation");
+            return false;
+        }
+        streamId = static_cast<uint16_t>((streamId + 1) % kMaxSnapshotStreams); // Wraps to 0 after max-1
+    }
+
+    outStreamID                   = streamId;
+    SnapshotStream snapshotStream = { { streamId, snapshotStreamAllocateArgs.imageCodec, snapshotStreamAllocateArgs.maxFrameRate,
+                                        snapshotStreamAllocateArgs.minResolution, snapshotStreamAllocateArgs.maxResolution,
+                                        snapshotStreamAllocateArgs.quality, 0 /* RefCount */ },
                                       false,
                                       nullptr };
 
     mSnapshotStreams.push_back(snapshotStream);
+    return true;
 }
 
 ChimeDelegate & CameraDevice::GetChimeDelegate()
@@ -1307,6 +1434,11 @@ ChimeDelegate & CameraDevice::GetChimeDelegate()
 }
 
 WebRTCTransportProvider::Delegate & CameraDevice::GetWebRTCProviderDelegate()
+{
+    return mWebRTCProviderManager;
+}
+
+WebRTCTransportProvider::WebRTCTransportProviderController & CameraDevice::GetWebRTCProviderController()
 {
     return mWebRTCProviderManager;
 }
