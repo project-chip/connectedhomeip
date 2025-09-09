@@ -96,12 +96,9 @@ Davis, CA 95616, USA
       <entry type="TempUnitEnum"/>
       <access read="true" readPrivilege="view"/>
       <quality persistence="fixed"/>
-      <otherwiseConform>
-        <provisionalConform/>
-        <mandatoryConform>
-          <feature name="TEMP"/>
-        </mandatoryConform>
-      </otherwiseConform>
+      <mandatoryConform>
+        <feature name="TEMP"/>
+      </mandatoryConform>
       <constraint>
         <countBetween>
           <from value="2"/>
