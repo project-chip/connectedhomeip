@@ -716,7 +716,7 @@ CHIP_ERROR CTC_BaseDataClass<DataModel::Nullable<DataModel::List<DayPatternStruc
     }
 
     // Validate week coverage
-    const bool isValidSingleRotatingDay = (!daysOfWeekMask && newList.size() == 1);
+    const bool isValidSingleRotatingDay = (!daysOfWeekMask && !newList.empty());
     const bool isValidFullWeekCoverage  = (daysOfWeekMask == kFullWeekMask);
 
     if (!(isValidSingleRotatingDay || isValidFullWeekCoverage))
