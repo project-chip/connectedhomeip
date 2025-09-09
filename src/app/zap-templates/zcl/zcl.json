@@ -206,6 +206,7 @@
             "MaxPathsPerInvoke",
             "ConfigurationVersion"
         ],
+        "Boolean State": ["ClusterRevision", "FeatureMap", "StateValue"],
         "Bridged Device Basic Information": ["ProductAppearance"],
         "Chime": ["SelectedChime", "Enabled"],
         "Closure Control": [
@@ -305,7 +306,8 @@
             "PacketTxCount",
             "TxErrCount",
             "CollisionCount",
-            "OverrunCount"
+            "OverrunCount",
+            "ClusterRevision"
         ],
         "General Commissioning": [
             "RegulatoryConfig",
@@ -762,7 +764,7 @@
         "Service Area": ["CurrentArea", "EstimatedEndTime", "FeatureMap"],
         "Camera AV Stream Management": [
             "VideoSensorParams",
-            "MinViewport",
+            "MinViewportResolution",
             "MicrophoneCapabilities",
             "SpeakerCapabilities",
             "Viewport",

@@ -59,7 +59,7 @@ class MatterTestConfig:
 
     wifi_ssid: Optional[str] = None
     wifi_passphrase: Optional[str] = None
-    thread_operational_dataset: Optional[str] = None
+    thread_operational_dataset: Optional[bytes] = None
 
     pics: dict[str, bool] = field(default_factory=dict)
 
@@ -91,3 +91,6 @@ class MatterTestConfig:
     dac_revocation_set_path: Optional[pathlib.Path] = None
 
     legacy: bool = False
+
+    # Restart flag file for rebooting the DUT during test runs
+    restart_flag_file: Optional[pathlib.Path] = None
