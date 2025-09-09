@@ -337,7 +337,7 @@ public:
         MatterReportingAttributeChangeCallback(mEndpointId, CommodityTariff::Id, aAttrId);
     }
 
-    void TariffTimeAttrsSync() { UpdateCurrentAttrs(); }
+    void TariffTimeAttrsSync();
 
     /**
      * @struct CurrentTariffAttrsCtx
@@ -428,9 +428,9 @@ private:
 
     // Current attrs (time depended) update methods
     void InitCurrentAttrs();
-    void UpdateCurrentAttrs();
-    void UpdateDayInformation(uint32_t now);
-    void UpdateDayEntryInformation(uint32_t now);
+    CHIP_ERROR UpdateCurrentAttrs();
+    CHIP_ERROR UpdateDayInformation(uint32_t now);
+    CHIP_ERROR UpdateDayEntryInformation(uint32_t now);
     void DeinitCurrentAttrs();
 
 protected:

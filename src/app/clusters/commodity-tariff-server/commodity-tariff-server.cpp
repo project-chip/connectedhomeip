@@ -597,32 +597,47 @@ static void AttrsCtxDeinit(CurrentTariffAttrsCtx & aCtx)
 void Instance::InitCurrentAttrs()
 {
     AttrsCtxInit(mDelegate, mServerTariffAttrsCtx);
-    UpdateCurrentAttrs();
+    CHIP_ERROR err = UpdateCurrentAttrs();
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(AppServer, "Failed to initialize current attributes: %" CHIP_ERROR_FORMAT, err.Format());
+    }
 }
 
-void Instance::UpdateCurrentAttrs()
+void Instance::TariffTimeAttrsSync()
+{
+    CHIP_ERROR err = UpdateCurrentAttrs();
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(AppServer, "Failed to sync tariff time attributes: %" CHIP_ERROR_FORMAT, err.Format());
+    }
+}
+
+CHIP_ERROR Instance::UpdateCurrentAttrs()
 {
     uint32_t matterEpochNow_s = GetCurrentTimestamp();
     if (!matterEpochNow_s)
     {
         ChipLogError(AppServer, "The timestamp value can't be zero!");
-        return;
+        return CHIP_ERROR_INVALID_TIME;
     }
 
     if (mServerTariffAttrsCtx.mTariffProvider == nullptr)
     {
         ChipLogError(AppServer, "The tariff is not available");
-        return;
+        return CHIP_ERROR_NOT_FOUND;
     }
 
     // Update day information
-    UpdateDayInformation(matterEpochNow_s);
+    ReturnErrorOnFailure(UpdateDayInformation(matterEpochNow_s));
 
     // Update day entry information
-    UpdateDayEntryInformation(matterEpochNow_s);
+    ReturnErrorOnFailure(UpdateDayEntryInformation(matterEpochNow_s));
+
+    return CHIP_NO_ERROR;
 }
 
-void Instance::UpdateDayInformation(uint32_t matterEpochNow_s)
+CHIP_ERROR Instance::UpdateDayInformation(uint32_t matterEpochNow_s)
 {
     DataModel::Nullable<Structs::DayStruct::Type> currentDay;
     DataModel::Nullable<Structs::DayStruct::Type> nextDay;
@@ -633,7 +648,7 @@ void Instance::UpdateDayInformation(uint32_t matterEpochNow_s)
     if (!Utils::DayIsValid(&currentDay.Value()))
     {
         ChipLogError(AppServer, "The mCurrentDay data is invalid");
-        return;
+        return CHIP_ERROR_INTERNAL;
     }
 
     ChipLogDetail(AppServer, "UpdateCurrentAttrs: current day date: %u", currentDay.Value().date);
@@ -646,13 +661,15 @@ void Instance::UpdateDayInformation(uint32_t matterEpochNow_s)
         ChipLogDetail(AppServer, "UpdateCurrentAttrs: next day date: %u", nextDay.Value().date);
         SetNextDay(nextDay);
     }
+
+    return CHIP_NO_ERROR;
 }
 
-void Instance::UpdateDayEntryInformation(uint32_t matterEpochNow_s)
+CHIP_ERROR Instance::UpdateDayEntryInformation(uint32_t matterEpochNow_s)
 {
     if (mCurrentDay.IsNull())
     {
-        return;
+        return CHIP_ERROR_INTERNAL;
     }
 
     const uint16_t minutesSinceMidnight = static_cast<uint16_t>((matterEpochNow_s % kSecondsPerDay) / 60);
@@ -671,12 +688,9 @@ void Instance::UpdateDayEntryInformation(uint32_t matterEpochNow_s)
         tmpDayEntry.SetNonNull(*currentEntry);
         tmpDate.SetNonNull(mCurrentDay.Value().date + (currentEntry->startTime * 60));
 
-        if (CHIP_NO_ERROR !=
+        ReturnErrorOnFailure(
             Utils::UpdateTariffComponentAttrsDayEntryById(this, mServerTariffAttrsCtx, currentEntry->dayEntryID,
-                                                          mCurrentTariffComponents_MgmtObj))
-        {
-            ChipLogError(AppServer, "Unable to update the CurrentTariffComponents attribute!");
-        }
+                                                          mCurrentTariffComponents_MgmtObj));
         ChipLogDetail(AppServer, "UpdateCurrentAttrs: current day entry: %u", tmpDayEntry.Value().dayEntryID);
     }
 
@@ -690,18 +704,17 @@ void Instance::UpdateDayEntryInformation(uint32_t matterEpochNow_s)
     if (nextEntry != nullptr)
     {
         tmpDayEntry.SetNonNull(*nextEntry);
-        if (CHIP_NO_ERROR !=
+        ReturnErrorOnFailure(
             Utils::UpdateTariffComponentAttrsDayEntryById(this, mServerTariffAttrsCtx, nextEntry->dayEntryID,
-                                                          mNextTariffComponents_MgmtObj))
-        {
-            ChipLogError(AppServer, "Unable to update the NextTariffComponents attribute!");
-        }
+                                                          mNextTariffComponents_MgmtObj));
         ChipLogDetail(AppServer, "UpdateCurrentAttrs: next day entry: %u", tmpDayEntry.Value().dayEntryID);
         tmpDate.SetNonNull(mCurrentDayEntryDate.Value() + currentEntryMinutesRemain * 60);
     }
 
     SetNextDayEntry(tmpDayEntry);
     SetNextDayEntryDate(tmpDate);
+
+    return CHIP_NO_ERROR;
 }
 
 void Instance::DeinitCurrentAttrs()
