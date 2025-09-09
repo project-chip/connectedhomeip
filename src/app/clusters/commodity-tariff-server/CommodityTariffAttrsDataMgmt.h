@@ -485,7 +485,7 @@ class CTC_BaseDataClassBase
 public:
     virtual ~CTC_BaseDataClassBase() = default;
     
-    // Common interface that doesn't depend on template parameter
+    // Common interface
     virtual bool IsValid() const = 0;
     virtual bool HasValue() const = 0;
     virtual bool HasNewValue() const = 0;
@@ -494,6 +494,11 @@ public:
     virtual bool UpdateFinish(bool aUpdateAllow) = 0;
     virtual bool Cleanup() = 0;
     virtual AttributeId GetAttrId() const = 0;
+    
+    // Type-erased methods for generic access
+    virtual CHIP_ERROR GetValueAsVoid(void* & outValue) = 0;
+    virtual CHIP_ERROR GetNewValueAsVoid(void* & outValue) = 0;
+    virtual CHIP_ERROR SetNewValueFromVoid(const void* value) = 0;
 };
 
 template <typename T>
@@ -915,6 +920,27 @@ public:
      */
     AttributeId GetAttrId() const override { return mAttrId; }
 
+    // Type-erased implementations
+    CHIP_ERROR GetValueAsVoid(void* & outValue) override
+    {
+        outValue = static_cast<void*>(&GetValueRef());
+        return CHIP_NO_ERROR;
+    }
+    
+    CHIP_ERROR GetNewValueAsVoid(void* & outValue) override
+    {
+        outValue = static_cast<void*>(&GetNewValueRef());
+        return CHIP_NO_ERROR;
+    }
+    
+    CHIP_ERROR SetNewValueFromVoid(const void* value) override
+    {
+        if (value == nullptr) {
+            return CHIP_ERROR_INVALID_ARGUMENT;
+        }
+        const ValueType* typedValue = static_cast<const ValueType*>(value);
+        return SetNewValue(*typedValue);
+    }
 private:
     /**
      * @brief Gets reference to active value storage

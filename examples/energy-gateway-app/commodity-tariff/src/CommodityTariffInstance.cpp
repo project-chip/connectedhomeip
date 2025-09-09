@@ -93,16 +93,17 @@ void CommodityTariffInstance::Shutdown()
 
 void CommodityTariffDelegate::TariffDataUpdate(uint32_t aNowTimestamp)
 {
+
     TariffUpdateCtx UpdCtx = { .blockMode             = static_cast<BlockModeEnum>(0),
-                               .TariffStartTimestamp  = GetStartDate_MgmtObj().GetNewValue(),
+                               .TariffStartTimestamp  = static_cast<StartDateDataClass&>(GetMgmtObj(CommodityTariffAttrTypeEnum::kStartDate)).GetNewValue(),
                                .mFeature              = mFeature,
                                .TariffUpdateTimestamp = aNowTimestamp };
-    bool is_success        = false;
-    if (CHIP_NO_ERROR != TariffDataUpd_Init(UpdCtx))
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    if (CHIP_NO_ERROR != (err = TariffDataUpd_Init(UpdCtx)))
     {
         ChipLogError(AppServer, "EGW-CTC: New tariff data rejected due to internal inconsistencies");
     }
-    else if (CHIP_NO_ERROR != TariffDataUpd_CrossValidator(UpdCtx))
+    else if (CHIP_NO_ERROR != (err = TariffDataUpd_CrossValidator(UpdCtx)))
     {
         ChipLogError(AppServer, "EGW-CTC: New tariff data rejected due to some cross-fields inconsistencies");
     }
@@ -114,23 +115,23 @@ void CommodityTariffDelegate::TariffDataUpdate(uint32_t aNowTimestamp)
             return;
         }
     }
-    TariffDataUpd_Finish(is_success);
+    TariffDataUpd_Finish(err == CHIP_NO_ERROR);
 }
 
 CHIP_ERROR CommodityTariffDelegate::TariffDataUpd_Init(TariffUpdateCtx & UpdCtx)
 {
-    ReturnErrorOnFailure(GetTariffUnit_MgmtObj().UpdateBegin(&UpdCtx));
-    ReturnErrorOnFailure(GetStartDate_MgmtObj().UpdateBegin(&UpdCtx));
-    ReturnErrorOnFailure(GetDefaultRandomizationOffset_MgmtObj().UpdateBegin(&UpdCtx));
-    ReturnErrorOnFailure(GetDefaultRandomizationType_MgmtObj().UpdateBegin(&UpdCtx));
-    ReturnErrorOnFailure(GetTariffInfo_MgmtObj().UpdateBegin(&UpdCtx));
-    ReturnErrorOnFailure(GetDayEntries_MgmtObj().UpdateBegin(&UpdCtx));
-    ReturnErrorOnFailure(GetDayPatterns_MgmtObj().UpdateBegin(&UpdCtx));
-    ReturnErrorOnFailure(GetTariffComponents_MgmtObj().UpdateBegin(&UpdCtx));
-    ReturnErrorOnFailure(GetTariffPeriods_MgmtObj().UpdateBegin(&UpdCtx));
-    ReturnErrorOnFailure(GetIndividualDays_MgmtObj().UpdateBegin(&UpdCtx));
-    ReturnErrorOnFailure(GetCalendarPeriods_MgmtObj().UpdateBegin(&UpdCtx));
-
+    for (uint8_t iter = 0; iter < CommodityTariffAttrTypeEnum::kAttrMax; iter++)
+    {
+        CommodityTariffAttrTypeEnum attr = static_cast<CommodityTariffAttrTypeEnum>(iter);
+        auto & mgmtObj = GetMgmtObj(attr);
+        CHIP_ERROR err = mgmtObj.UpdateBegin(&UpdCtx);
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(NotSpecified, "EGW-CTC: UpdateBegin failed for attribute %d: %" CHIP_ERROR_FORMAT, 
+                         iter, err.Format());
+            return err;
+        }
+    }
     return CHIP_NO_ERROR;
 }
 
@@ -138,30 +139,30 @@ CHIP_ERROR CommodityTariffDelegate::TariffDataUpd_CrossValidator(TariffUpdateCtx
 {
     bool DayEntriesData_is_available = false;
 
-    if (!GetTariffInfo_MgmtObj().IsValid())
+    if (!GetMgmtObj(CommodityTariffAttrTypeEnum::kTariffInfo).IsValid())
     {
         ChipLogError(AppServer, "TariffInfo management object is not present or invalid");
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
-    else if (!GetDayEntries_MgmtObj().IsValid())
+    else if (!GetMgmtObj(CommodityTariffAttrTypeEnum::kDayEntries).IsValid())
     {
         ChipLogError(AppServer, "DayEntries management object is not present or invalid");
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
-    else if (!GetTariffComponents_MgmtObj().IsValid())
+    else if (!GetMgmtObj(CommodityTariffAttrTypeEnum::kTariffComponents).IsValid())
     {
         ChipLogError(AppServer, "TariffComponents management object is not present or invalid");
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
-    else if (!GetTariffPeriods_MgmtObj().IsValid())
+    else if (!GetMgmtObj(CommodityTariffAttrTypeEnum::kTariffPeriods).IsValid())
     {
         ChipLogError(AppServer, "TariffPeriods management object is not present or invalid");
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
 
-    if (GetStartDate_MgmtObj().HasNewValue())
+    if (GetMgmtObj(CommodityTariffAttrTypeEnum::kStartDate).HasNewValue())
     {
-        UpdCtx.TariffStartTimestamp = GetStartDate_MgmtObj().GetNewValue().Value();
+        UpdCtx.TariffStartTimestamp = static_cast<StartDateDataClass&>(GetMgmtObj(CommodityTariffAttrTypeEnum::kStartDate)).GetNewValue().Value();
     }
 
     // Checks that all DayEntryIDs in Tariff Periods are in main DayEntries list:
@@ -187,7 +188,7 @@ CHIP_ERROR CommodityTariffDelegate::TariffDataUpd_CrossValidator(TariffUpdateCtx
         }
     }
 
-    if (GetDayPatterns_MgmtObj().IsValid())
+    if (GetMgmtObj(CommodityTariffAttrTypeEnum::kDayPatterns).IsValid())
     {
         // Checks that all DP_DEs are in main DE list:
         for (const auto & item : UpdCtx.DayPatternsDayEntryIDs)
@@ -201,7 +202,7 @@ CHIP_ERROR CommodityTariffDelegate::TariffDataUpd_CrossValidator(TariffUpdateCtx
         }
     }
 
-    if (GetIndividualDays_MgmtObj().IsValid() && (GetIndividualDays_MgmtObj().HasNewValue()))
+    if (GetMgmtObj(CommodityTariffAttrTypeEnum::kIndividualDays).IsValid() && (GetMgmtObj(CommodityTariffAttrTypeEnum::kIndividualDays).HasNewValue()))
     {
         // Checks that all ID_DE_IDs are in main DE list:
         for (const auto & item : UpdCtx.IndividualDaysDayEntryIDs)
@@ -224,7 +225,7 @@ CHIP_ERROR CommodityTariffDelegate::TariffDataUpd_CrossValidator(TariffUpdateCtx
         DayEntriesData_is_available = true;
     }
 
-    if (GetCalendarPeriods_MgmtObj().IsValid() && (GetCalendarPeriods_MgmtObj().HasNewValue()))
+    if (GetMgmtObj(CommodityTariffAttrTypeEnum::kCalendarPeriods).IsValid() && (GetMgmtObj(CommodityTariffAttrTypeEnum::kCalendarPeriods).HasNewValue()))
     {
         // Checks that all DayPatternIDs are in main DayPattern list:
         for (const auto & item : UpdCtx.CalendarPeriodsDayPatternIDs)
@@ -247,9 +248,9 @@ CHIP_ERROR CommodityTariffDelegate::TariffDataUpd_CrossValidator(TariffUpdateCtx
         return CHIP_ERROR_INVALID_DATA_LIST;
     }
 
-    const auto & tariffPeriods    = GetTariffPeriods_MgmtObj().GetNewValue().Value();
-    const auto & dayEntries       = GetDayEntries_MgmtObj().GetNewValue().Value();
-    const auto & tariffComponents = GetTariffComponents_MgmtObj().GetNewValue().Value();
+    const auto & tariffPeriods    = static_cast<TariffPeriodsDataClass&>(GetMgmtObj(CommodityTariffAttrTypeEnum::kTariffPeriods)).GetNewValue().Value();
+    const auto & dayEntries       = static_cast<DayEntriesDataClass&>(GetMgmtObj(CommodityTariffAttrTypeEnum::kDayEntries)).GetNewValue().Value();
+    const auto & tariffComponents = static_cast<TariffComponentsDataClass&>(GetMgmtObj(CommodityTariffAttrTypeEnum::kTariffComponents)).GetNewValue().Value();
 
     // Create lookup maps with const correctness
     std::unordered_map<uint32_t, const Structs::DayEntryStruct::Type *> dayEntriesMap;
@@ -382,7 +383,7 @@ void CommodityTariffDelegate::TariffDataUpd_Finish(bool is_success)
         }
     }
 
-    if (updatedCount > 0)
+    if (mTariffDataUpdatedCb != nullptr && updatedCount > 0)
     {
         ChipLogProgress(NotSpecified, "EGW-CTC: Tariff data applied");
         if (mTariffDataUpdatedCb != nullptr)
@@ -403,7 +404,7 @@ void CommodityTariffDelegate::TryToactivateDelayedTariff(uint32_t now)
         return;
     }
 
-    if (now >= GetStartDate_MgmtObj().GetNewValue().Value())
+    if (now >= static_cast<StartDateDataClass&>(GetMgmtObj(CommodityTariffAttrTypeEnum::kStartDate)).GetNewValue().Value())
     {
         TariffDataUpd_Finish(true);
         DelayedTariffUpdateIsActive = false;
@@ -415,29 +416,23 @@ void CommodityTariffDelegate::CleanupTariffData()
     AttributeId updatedAttrIds[CommodityTariffAttrTypeEnum::kAttrMax];
     size_t updatedCount = 0;
 
-    // Check each attribute and collect updated ones
-    if (GetMgmtObj(CommodityTariffAttrTypeEnum::kTariffUnit).Cleanup())
-        updatedAttrIds[updatedCount++] = GetTariffUnit_MgmtObj().GetAttrId();
-    if (GetStartDate_MgmtObj().Cleanup())
-        updatedAttrIds[updatedCount++] = GetStartDate_MgmtObj().GetAttrId();
-    if (GetDefaultRandomizationOffset_MgmtObj().Cleanup())
-        updatedAttrIds[updatedCount++] = GetDefaultRandomizationOffset_MgmtObj().GetAttrId();
-    if (GetDefaultRandomizationType_MgmtObj().Cleanup())
-        updatedAttrIds[updatedCount++] = GetDefaultRandomizationType_MgmtObj().GetAttrId();
-    if (GetTariffInfo_MgmtObj().Cleanup())
-        updatedAttrIds[updatedCount++] = GetTariffInfo_MgmtObj().GetAttrId();
-    if (GetDayEntries_MgmtObj().Cleanup())
-        updatedAttrIds[updatedCount++] = GetDayEntries_MgmtObj().GetAttrId();
-    if (GetDayPatterns_MgmtObj().Cleanup())
-        updatedAttrIds[updatedCount++] = GetDayPatterns_MgmtObj().GetAttrId();
-    if (GetTariffComponents_MgmtObj().Cleanup())
-        updatedAttrIds[updatedCount++] = GetTariffComponents_MgmtObj().GetAttrId();
-    if (GetTariffPeriods_MgmtObj().Cleanup())
-        updatedAttrIds[updatedCount++] = GetTariffPeriods_MgmtObj().GetAttrId();
-    if (GetIndividualDays_MgmtObj().Cleanup())
-        updatedAttrIds[updatedCount++] = GetIndividualDays_MgmtObj().GetAttrId();
-    if (GetCalendarPeriods_MgmtObj().Cleanup())
-        updatedAttrIds[updatedCount++] = GetCalendarPeriods_MgmtObj().GetAttrId();
+    for (uint8_t iter = 0; iter < CommodityTariffAttrTypeEnum::kAttrMax; iter++)
+    {
+        CommodityTariffAttrTypeEnum attr = static_cast<CommodityTariffAttrTypeEnum>(iter);
+        auto & mgmtObj = GetMgmtObj(attr);
+        if (mgmtObj.Cleanup())
+        {
+            if (updatedCount < CommodityTariffAttrTypeEnum::kAttrMax)
+            {
+                updatedAttrIds[updatedCount++] = mgmtObj.GetAttrId();
+            }
+            else
+            {
+                ChipLogError(NotSpecified, "EGW-CTC: Too many cleaned up attributes");
+                break;
+            }
+        }
+    }
 
     if (mTariffDataUpdatedCb != nullptr && updatedCount > 0)
     {

@@ -19,6 +19,7 @@
 #include <CommodityTariffMain.h>
 #include <CommodityTariffSamples.h>
 #include <app/clusters/commodity-tariff-server/CommodityTariffTestEventTriggerHandler.h>
+#include <CommodityTariffInstance.h>
 
 using namespace chip;
 using namespace chip::app;
@@ -48,10 +49,13 @@ void SetTestEventTrigger_TariffDataUpdated()
     CommodityTariffDelegate * dg        = GetCommodityTariffDelegate();
     CommodityTariffInstance * instance  = GetCommodityTariffInstance();
 
-    auto process_attribute = [](auto & mgmt_obj, const auto & preset_value, const char * name, bool is_required) -> CHIP_ERROR {
+    using namespace chip::app::CommodityTariffAttrsDataMgmt;
+    using CommodityTariffAttrTypeEnum = chip::app::Clusters::CommodityTariff::CommodityTariffDelegate::CommodityTariffAttrTypeEnum;
+
+    auto process_attribute = [](auto & mgmt_obj, const auto preset_value, const char * name, bool is_required) -> CHIP_ERROR {
         if (!preset_value.IsNull())
         {
-            CHIP_ERROR err = mgmt_obj.SetNewValue(preset_value);
+            CHIP_ERROR err = mgmt_obj.SetNewValueFromVoid(&preset_value);
             if (err != CHIP_NO_ERROR)
             {
                 ChipLogError(AppServer, "Unable to load tariff data for \"%s\": %" CHIP_ERROR_FORMAT, name, err.Format());
@@ -66,40 +70,40 @@ void SetTestEventTrigger_TariffDataUpdated()
         return CHIP_NO_ERROR;
     };
 
+    // Process optional attributes
+    process_attribute(dg->GetMgmtObj(CommodityTariffAttrTypeEnum::kDefaultRandomizationOffset), tariff_preset.DefaultRandomizationOffset,
+                      "DefaultRandomizationOffset", false);
+    process_attribute(dg->GetMgmtObj(CommodityTariffAttrTypeEnum::kDefaultRandomizationType), tariff_preset.DefaultRandomizationType, "DefaultRandomizationType",
+                      false);
+    process_attribute(dg->GetMgmtObj(CommodityTariffAttrTypeEnum::kDayPatterns), tariff_preset.DayPatterns, "DayPatterns", false);
+    process_attribute(dg->GetMgmtObj(CommodityTariffAttrTypeEnum::kIndividualDays), tariff_preset.IndividualDays, "IndividualDays", false);
+    process_attribute(dg->GetMgmtObj(CommodityTariffAttrTypeEnum::kCalendarPeriods), tariff_preset.CalendarPeriods, "CalendarPeriods", false);
+
     // Process mandatory attributes
     CHIP_ERROR err = CHIP_NO_ERROR;
-    err            = process_attribute(dg->GetTariffUnit_MgmtObj(), tariff_preset.TariffUnit, "TariffUnit", true);
+    err = process_attribute(dg->GetMgmtObj(CommodityTariffAttrTypeEnum::kTariffUnit), tariff_preset.TariffUnit, "TariffUnit", true);
     if (err != CHIP_NO_ERROR)
         return;
 
-    err = process_attribute(dg->GetStartDate_MgmtObj(), tariff_preset.StartDate, "StartDate", true);
+    err = process_attribute(dg->GetMgmtObj(CommodityTariffAttrTypeEnum::kStartDate), tariff_preset.StartDate, "StartDate", true);
     if (err != CHIP_NO_ERROR)
         return;
 
-    err = process_attribute(dg->GetTariffInfo_MgmtObj(), tariff_preset.TariffInfo, "TariffInfo", true);
+    err = process_attribute(dg->GetMgmtObj(CommodityTariffAttrTypeEnum::kTariffInfo), tariff_preset.TariffInfo, "TariffInfo", true);
     if (err != CHIP_NO_ERROR)
         return;
 
-    err = process_attribute(dg->GetDayEntries_MgmtObj(), tariff_preset.DayEntries, "DayEntries", true);
+    err = process_attribute(dg->GetMgmtObj(CommodityTariffAttrTypeEnum::kDayEntries), tariff_preset.DayEntries, "DayEntries", true);
     if (err != CHIP_NO_ERROR)
         return;
 
-    err = process_attribute(dg->GetTariffComponents_MgmtObj(), tariff_preset.TariffComponents, "TariffComponents", true);
+    err = process_attribute(dg->GetMgmtObj(CommodityTariffAttrTypeEnum::kTariffComponents), tariff_preset.TariffComponents, "TariffComponents", true);
     if (err != CHIP_NO_ERROR)
         return;
 
-    err = process_attribute(dg->GetTariffPeriods_MgmtObj(), tariff_preset.TariffPeriods, "TariffPeriods", true);
+    err = process_attribute(dg->GetMgmtObj(CommodityTariffAttrTypeEnum::kTariffPeriods), tariff_preset.TariffPeriods, "TariffPeriods", true);
     if (err != CHIP_NO_ERROR)
         return;
-
-    // Process optional attributes
-    process_attribute(dg->GetDefaultRandomizationOffset_MgmtObj(), tariff_preset.DefaultRandomizationOffset,
-                      "DefaultRandomizationOffset", false);
-    process_attribute(dg->GetDefaultRandomizationType_MgmtObj(), tariff_preset.DefaultRandomizationType, "DefaultRandomizationType",
-                      false);
-    process_attribute(dg->GetDayPatterns_MgmtObj(), tariff_preset.DayPatterns, "DayPatterns", false);
-    process_attribute(dg->GetIndividualDays_MgmtObj(), tariff_preset.IndividualDays, "IndividualDays", false);
-    process_attribute(dg->GetCalendarPeriods_MgmtObj(), tariff_preset.CalendarPeriods, "CalendarPeriods", false);
 
     instance->ActivateTariffTimeTracking(tariff_preset.TariffTestTimestamp);
     dg->TariffDataUpdate(tariff_preset.TariffTestTimestamp);

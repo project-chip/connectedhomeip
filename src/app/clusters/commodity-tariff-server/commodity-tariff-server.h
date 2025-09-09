@@ -100,19 +100,6 @@ public:
         return mCalendarPeriods_MgmtObj.GetValue();
     }
 
-    // Management object accessors
-    TariffUnitDataClass & GetTariffUnit_MgmtObj() { return mTariffUnit_MgmtObj; }
-    StartDateDataClass & GetStartDate_MgmtObj() { return mStartDate_MgmtObj; }
-    DefaultRandomizationOffsetDataClass & GetDefaultRandomizationOffset_MgmtObj() { return mDefaultRandomizationOffset_MgmtObj; }
-    DefaultRandomizationTypeDataClass & GetDefaultRandomizationType_MgmtObj() { return mDefaultRandomizationType_MgmtObj; }
-    TariffInfoDataClass & GetTariffInfo_MgmtObj() { return mTariffInfo_MgmtObj; }
-    DayEntriesDataClass & GetDayEntries_MgmtObj() { return mDayEntries_MgmtObj; }
-    DayPatternsDataClass & GetDayPatterns_MgmtObj() { return mDayPatterns_MgmtObj; }
-    TariffComponentsDataClass & GetTariffComponents_MgmtObj() { return mTariffComponents_MgmtObj; }
-    TariffPeriodsDataClass & GetTariffPeriods_MgmtObj() { return mTariffPeriods_MgmtObj; }
-    IndividualDaysDataClass & GetIndividualDays_MgmtObj() { return mIndividualDays_MgmtObj; }
-    CalendarPeriodsDataClass & GetCalendarPeriods_MgmtObj() { return mCalendarPeriods_MgmtObj; }
-
     enum CommodityTariffAttrTypeEnum {
         kTariffUnit,
         kStartDate,
@@ -133,36 +120,8 @@ public:
      * @param aType The attribute type enum to retrieve
      * @return Reference to the corresponding management object
      */
-    CommodityTariffAttrsDataMgmt::CTC_BaseDataClassBase & GetMgmtObj(CommodityTariffAttrTypeEnum aType)
-    {
-        switch (aType) {
-        case CommodityTariffAttrTypeEnum::kTariffUnit:
-            return mTariffUnit_MgmtObj;
-        case CommodityTariffAttrTypeEnum::kStartDate:
-            return mStartDate_MgmtObj;
-        case CommodityTariffAttrTypeEnum::kDefaultRandomizationOffset:
-            return mDefaultRandomizationOffset_MgmtObj;
-        case CommodityTariffAttrTypeEnum::kDefaultRandomizationType:
-            return mDefaultRandomizationType_MgmtObj;
-        case CommodityTariffAttrTypeEnum::kTariffInfo:
-            return mTariffInfo_MgmtObj;
-        case CommodityTariffAttrTypeEnum::kDayEntries:
-            return mDayEntries_MgmtObj;
-        case CommodityTariffAttrTypeEnum::kDayPatterns:
-            return mDayPatterns_MgmtObj;
-        case CommodityTariffAttrTypeEnum::kTariffComponents:
-            return mTariffComponents_MgmtObj;
-        case CommodityTariffAttrTypeEnum::kTariffPeriods:
-            return mTariffPeriods_MgmtObj;
-        case CommodityTariffAttrTypeEnum::kIndividualDays:
-            return mIndividualDays_MgmtObj;
-        case CommodityTariffAttrTypeEnum::kCalendarPeriods:
-            return mCalendarPeriods_MgmtObj;
-        default:
-            VerifyOrDieWithMsg(false, AppServer, "Unknown management attribute type");
-            return mTariffUnit_MgmtObj; // return something to satisfy compiler
-        }
-    }
+    CommodityTariffAttrsDataMgmt::CTC_BaseDataClassBase & GetMgmtObj(CommodityTariffAttrTypeEnum aType);
+
 private:
     // Primary attribute storage and management
     TariffUnitDataClass mTariffUnit_MgmtObj{};

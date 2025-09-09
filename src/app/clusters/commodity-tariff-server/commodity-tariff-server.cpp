@@ -866,6 +866,37 @@ void Instance::HandleGetDayEntry(HandlerContext & ctx, const Commands::GetDayEnt
     ctx.mCommandHandler.AddResponse(ctx.mRequestPath, response);
 }
 
+CommodityTariffAttrsDataMgmt::CTC_BaseDataClassBase & Delegate::GetMgmtObj(CommodityTariffAttrTypeEnum aType)
+{
+    switch (aType) {
+    case CommodityTariffAttrTypeEnum::kTariffUnit:
+        return mTariffUnit_MgmtObj;
+    case CommodityTariffAttrTypeEnum::kStartDate:
+        return mStartDate_MgmtObj;
+    case CommodityTariffAttrTypeEnum::kDefaultRandomizationOffset:
+        return mDefaultRandomizationOffset_MgmtObj;
+    case CommodityTariffAttrTypeEnum::kDefaultRandomizationType:
+        return mDefaultRandomizationType_MgmtObj;
+    case CommodityTariffAttrTypeEnum::kTariffInfo:
+        return mTariffInfo_MgmtObj;
+    case CommodityTariffAttrTypeEnum::kDayEntries:
+        return mDayEntries_MgmtObj;
+    case CommodityTariffAttrTypeEnum::kDayPatterns:
+        return mDayPatterns_MgmtObj;
+    case CommodityTariffAttrTypeEnum::kTariffComponents:
+        return mTariffComponents_MgmtObj;
+    case CommodityTariffAttrTypeEnum::kTariffPeriods:
+        return mTariffPeriods_MgmtObj;
+    case CommodityTariffAttrTypeEnum::kIndividualDays:
+        return mIndividualDays_MgmtObj;
+    case CommodityTariffAttrTypeEnum::kCalendarPeriods:
+        return mCalendarPeriods_MgmtObj;
+    default:
+        VerifyOrDieWithMsg(false, AppServer, "Unknown management attribute type");
+        return mTariffUnit_MgmtObj; // return something to satisfy compiler
+    }
+}
+
 } // namespace CommodityTariff
 } // namespace Clusters
 } // namespace app
