@@ -75,11 +75,13 @@ NFCMessage & NFCMessage::operator=(NFCMessage && other) noexcept
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 NFCTag::NFCTag(const Identifier & identifier, size_t simpleADPUMaxTxSize, size_t simpleADPUMaxRxSize) :
-    mID(identifier), mType4SimpleADPUMaxTxSize(std::min(simpleADPUMaxTxSize, kMaxADPUSize)), mType4SimpleADPUMaxRxSize(std::min(simpleADPUMaxRxSize, kMaxADPUSize))
+    mID(identifier), mType4SimpleADPUMaxTxSize(std::min(simpleADPUMaxTxSize, kMaxADPUSize)),
+    mType4SimpleADPUMaxRxSize(std::min(simpleADPUMaxRxSize, kMaxADPUSize))
 {}
 
 NFCTag::NFCTag(Identifier && identifier, size_t simpleADPUMaxTxSize, size_t simpleADPUMaxRxSize) :
-    mID(std::move(identifier)), mType4SimpleADPUMaxTxSize(std::min(simpleADPUMaxTxSize, kMaxADPUSize)), mType4SimpleADPUMaxRxSize(std::min(simpleADPUMaxRxSize, kMaxADPUSize))
+    mID(std::move(identifier)), mType4SimpleADPUMaxTxSize(std::min(simpleADPUMaxTxSize, kMaxADPUSize)),
+    mType4SimpleADPUMaxRxSize(std::min(simpleADPUMaxRxSize, kMaxADPUSize))
 {}
 
 NFCTag::~NFCTag() {}
@@ -100,7 +102,8 @@ static inline System::PacketBufferHandle MakeResponse(uint8_t * response, size_t
     System::PacketBufferHandle buffer;
     if (response && responseLen > 0)
     {
-        buffer = System::PacketBufferHandle::NewWithData(reinterpret_cast<const uint8_t *>(response), static_cast<size_t>(responseLen));
+        buffer =
+            System::PacketBufferHandle::NewWithData(reinterpret_cast<const uint8_t *>(response), static_cast<size_t>(responseLen));
     }
     return buffer;
 }
@@ -366,7 +369,8 @@ void NFCTag::ResetChainedResponseBuffer()
 
 CHIP_ERROR NFCTag::AddDataToChainedResponseBuffer(uint8_t * data, size_t dataLen)
 {
-    if (!data) return CHIP_ERROR_INVALID_ARGUMENT;
+    if (!data)
+        return CHIP_ERROR_INVALID_ARGUMENT;
 
     // Check that mChainedResponseBuffer will not overflow
     VerifyOrReturnLogError((mChainedResponseLength + dataLen) <= sizeof(mChainedResponseBuffer), CHIP_ERROR_MESSAGE_TOO_LONG);
