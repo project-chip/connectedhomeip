@@ -72,7 +72,8 @@ WebRTCTransportProviderServer::WebRTCTransportProviderServer(Delegate & delegate
 
 WebRTCTransportProviderServer::~WebRTCTransportProviderServer()
 {
-    Shutdown();
+    CommandHandlerInterfaceRegistry::Instance().UnregisterCommandHandler(this);
+    AttributeAccessInterfaceRegistry::Instance().Unregister(this);
 }
 
 CHIP_ERROR WebRTCTransportProviderServer::Init()
@@ -81,12 +82,6 @@ CHIP_ERROR WebRTCTransportProviderServer::Init()
     VerifyOrReturnError(AttributeAccessInterfaceRegistry::Instance().Register(this), CHIP_ERROR_INCORRECT_STATE);
 
     return CHIP_NO_ERROR;
-}
-
-void WebRTCTransportProviderServer::Shutdown()
-{
-    CommandHandlerInterfaceRegistry::Instance().UnregisterCommandHandler(this);
-    AttributeAccessInterfaceRegistry::Instance().Unregister(this);
 }
 
 // AttributeAccessInterface
@@ -224,30 +219,41 @@ WebRTCSessionStruct * WebRTCTransportProviderServer::CheckForMatchingSession(Han
     return session;
 }
 
-uint16_t WebRTCTransportProviderServer::GenerateSessionId()
+CHIP_ERROR WebRTCTransportProviderServer::GenerateSessionId(uint16_t & outSessionId)
 {
-    static uint16_t lastSessionId = 1;
+    static uint16_t nextSessionId = 0;
+    uint16_t candidateId          = 0;
 
-    do
+    // Try at most kMaxSessionId+1 attempts to find a free ID
+    // This ensures we never loop infinitely even if all IDs are somehow in use
+    for (uint16_t attempts = 0; attempts <= kMaxSessionId; attempts++)
     {
-        uint16_t candidateId = lastSessionId++;
+        candidateId = nextSessionId++;
 
         // Handle wrap-around per spec
-        if (lastSessionId > kMaxSessionId)
+        if (nextSessionId > kMaxSessionId)
         {
-            lastSessionId = 1;
+            nextSessionId = 0;
         }
 
         if (FindSession(candidateId) == nullptr)
         {
-            return candidateId;
+            outSessionId = candidateId;
+            return CHIP_NO_ERROR;
         }
-    } while (true);
+    }
+
+    // All session IDs are in use
+    ChipLogError(Zcl, "All session IDs are in use! Cannot generate new session ID.");
+    return CHIP_IM_GLOBAL_STATUS(ResourceExhausted);
 }
 
 // Command Handlers
 void WebRTCTransportProviderServer::HandleSolicitOffer(HandlerContext & ctx, const Commands::SolicitOffer::DecodableType & req)
 {
+    auto videoStreamID = req.videoStreamID;
+    auto audioStreamID = req.audioStreamID;
+
     // Validate the streamUsage field against the allowed enum values.
     if (req.streamUsage == StreamUsageEnum::kUnknownEnumValue)
     {
@@ -335,12 +341,30 @@ void WebRTCTransportProviderServer::HandleSolicitOffer(HandlerContext & ctx, con
         }
     }
 
+    // Check resource management and stream priorities. If the IDs are null the delegate will populate with
+    // a stream that matches the stream usage
+    CHIP_ERROR err = mDelegate.ValidateStreamUsage(req.streamUsage, videoStreamID, audioStreamID);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Zcl, "HandleSolicitOffer: Cannot provide the stream usage requested");
+        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::DynamicConstraintError);
+        return;
+    }
+
     // Prepare the arguments for the delegate.
     Delegate::OfferRequestArgs args;
-    args.sessionId             = GenerateSessionId();
+    uint16_t sessionId;
+    err = GenerateSessionId(sessionId);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Zcl, "HandleSolicitOffer: Cannot generate session ID: %" CHIP_ERROR_FORMAT, err.Format());
+        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Protocols::InteractionModel::ClusterStatusCode(err));
+        return;
+    }
+    args.sessionId             = sessionId;
     args.streamUsage           = req.streamUsage;
-    args.videoStreamId         = req.videoStreamID;
-    args.audioStreamId         = req.audioStreamID;
+    args.videoStreamId         = videoStreamID;
+    args.audioStreamId         = audioStreamID;
     args.peerNodeId            = GetNodeIdFromCtx(ctx.mCommandHandler);
     args.fabricIndex           = ctx.mCommandHandler.GetAccessingFabricIndex();
     args.originatingEndpointId = req.originatingEndpointID;
@@ -538,16 +562,24 @@ void WebRTCTransportProviderServer::HandleProvideOffer(HandlerContext & ctx, con
         }
 
         // Check resource management and stream priorities
-        CHIP_ERROR err = mDelegate.ValidateStreamUsage(req.streamUsage, req.videoStreamID, req.audioStreamID);
+        CHIP_ERROR err = mDelegate.ValidateStreamUsage(req.streamUsage, videoStreamID, audioStreamID);
         if (err != CHIP_NO_ERROR)
         {
-            ChipLogError(Zcl, "HandleProvideOffer: Cannot meet resource management conditions");
-            ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ResourceExhausted);
+            ChipLogError(Zcl, "HandleProvideOffer: Cannot provide stream usage requested");
+            ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::DynamicConstraintError);
             return;
         }
 
-        // Generate new sessiond id
-        args.sessionId = GenerateSessionId();
+        // Generate new session id
+        uint16_t sessionId;
+        err = GenerateSessionId(sessionId);
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(Zcl, "HandleProvideOffer: Cannot generate session ID: %" CHIP_ERROR_FORMAT, err.Format());
+            ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Protocols::InteractionModel::ClusterStatusCode(err));
+            return;
+        }
+        args.sessionId = sessionId;
     }
 
     args.streamUsage           = req.streamUsage;

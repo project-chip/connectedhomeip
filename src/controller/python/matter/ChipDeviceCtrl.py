@@ -57,7 +57,30 @@ from .crypto import p256keypair
 from .interaction_model import SessionParameters, SessionParametersStruct
 from .native import PyChipError
 
-__all__ = ["ChipDeviceController", "CommissioningParameters"]
+__all__ = ["ChipDeviceController", "CommissioningParameters",
+           "AttributeReadRequest", "AttributeReadRequestList", "SubscriptionTargetList"]
+
+# Type aliases for ReadAttribute method to improve type safety
+AttributeReadRequest = typing.Union[
+    None,  # Empty tuple, all wildcard
+    typing.Tuple[int],  # Endpoint
+    # Wildcard endpoint, Cluster id present
+    typing.Tuple[typing.Type[ClusterObjects.Cluster]],
+    # Wildcard endpoint, Cluster + Attribute present
+    typing.Tuple[typing.Type[ClusterObjects.ClusterAttributeDescriptor]],
+    typing.Tuple[int, typing.Type[ClusterObjects.Cluster]
+                 ],  # Wildcard attribute id
+    # Concrete path
+    typing.Tuple[int, typing.Type[ClusterObjects.ClusterAttributeDescriptor]],
+    ClusterAttribute.TypedAttributePath  # Directly specified attribute path
+]
+
+AttributeReadRequestList = typing.Optional[typing.List[AttributeReadRequest]]
+
+# Type alias for subscription target specifications
+SubscriptionTargetList = typing.List[typing.Tuple[int,
+                                                  typing.Union[ClusterObjects.Cluster, ClusterObjects.ClusterAttributeDescriptor]]]
+
 
 # Defined in $CHIP_ROOT/src/lib/core/CHIPError.h
 CHIP_ERROR_TIMEOUT: int = 50
@@ -495,7 +518,7 @@ class ChipDeviceControllerBase():
         def HandleOpenWindowComplete(nodeid: int, setupPinCode: int, setupManualCode: bytes,
                                      setupQRCode: bytes, err: PyChipError) -> None:
             if err.is_success:
-                LOGGER.info("Open Commissioning Window complete setting nodeid {} pincode to {}".format(nodeid, setupPinCode))
+                LOGGER.info("Open Commissioning Window complete setting node ID 0x%016X pincode to %d", nodeid, setupPinCode)
                 commissioningParameters = CommissioningParameters(
                     setupPinCode=setupPinCode, setupManualCode=setupManualCode.decode(), setupQRCode=setupQRCode.decode())
             else:
@@ -512,7 +535,7 @@ class ChipDeviceControllerBase():
 
         def HandleUnpairDeviceComplete(nodeid: int, err: PyChipError):
             if err.is_success:
-                LOGGER.info("Succesfully unpaired device with nodeid {}".format(nodeid))
+                LOGGER.info("Successfully unpaired device with node ID 0x%016X", nodeid)
             else:
                 LOGGER.warning("Failed to unpair device: {}".format(err))
 
@@ -1579,6 +1602,7 @@ class ChipDeviceControllerBase():
         Raises:
             InteractionModelError on error
         '''
+        LOGGER.debug("Sending command %s to node ID 0x%016X", payload, nodeid)
         self.CheckIsActive()
 
         eventLoop = asyncio.get_running_loop()
@@ -1785,6 +1809,10 @@ class ChipDeviceControllerBase():
         '''
         Sets up the system to expect a node to initiate a BDX transfer. The transfer will send data here.
 
+        If no BDX transfer is initiated, the caller must cancel the returned future to avoid interfering with other BDX transfers.
+        For example, the Diagnostic Logs clusters won't start a BDX transfer when the log is small so the future must be cancelled to allow later
+        attempts to retrieve logs to succeed.
+
         Returns:
             a future that will yield a BdxTransfer with the init message from the transfer.
 
@@ -1802,6 +1830,8 @@ class ChipDeviceControllerBase():
     def TestOnlyPrepareToSendBdxData(self, data: bytes) -> asyncio.Future:
         '''
         Sets up the system to expect a node to initiate a BDX transfer. The transfer will send data to the node.
+
+        If no BDX transfer is initiated, the caller must cancel the returned future to avoid interfering with other BDX transfers.
 
         Returns:
             A future that will yield a BdxTransfer with the init message from the transfer.

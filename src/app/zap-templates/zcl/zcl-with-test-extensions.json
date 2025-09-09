@@ -180,11 +180,14 @@
             "AdminVendorId"
         ],
         "Basic Information": [
+            "FeatureMap",
+            "ClusterRevision",
             "DataModelRevision",
             "VendorName",
             "VendorID",
             "ProductName",
             "ProductID",
+            "NodeLabel",
             "Location",
             "HardwareVersion",
             "HardwareVersionString",
@@ -195,12 +198,16 @@
             "ProductURL",
             "ProductLabel",
             "SerialNumber",
+            "LocalConfigDisabled",
+            "Reachable",
             "UniqueID",
             "CapabilityMinima",
             "ProductAppearance",
             "SpecificationVersion",
-            "MaxPathsPerInvoke"
+            "MaxPathsPerInvoke",
+            "ConfigurationVersion"
         ],
+        "Boolean State": ["ClusterRevision", "FeatureMap", "StateValue"],
         "Bridged Device Basic Information": ["ProductAppearance"],
         "Chime": ["SelectedChime", "Enabled"],
         "Closure Control": [
@@ -300,7 +307,8 @@
             "PacketTxCount",
             "TxErrCount",
             "CollisionCount",
-            "OverrunCount"
+            "OverrunCount",
+            "ClusterRevision"
         ],
         "General Commissioning": [
             "RegulatoryConfig",
@@ -757,7 +765,7 @@
         "Service Area": ["CurrentArea", "EstimatedEndTime", "FeatureMap"],
         "Camera AV Stream Management": [
             "VideoSensorParams",
-            "MinViewport",
+            "MinViewportResolution",
             "MicrophoneCapabilities",
             "SpeakerCapabilities",
             "Viewport",
@@ -796,9 +804,15 @@
         "Soil Measurement": [
             "SoilMoistureMeasurementLimits",
             "SoilMoistureMeasuredValue",
-            "ClusterRevision"
+            "ClusterRevision",
+            "FeatureMap"
         ],
         "Unit Localization": ["TemperatureUnit"],
+        "TLS Certificate Management": [
+            "ClusterRevision",
+            "MaxRootCertificates",
+            "MaxClientCertificates"
+        ],
         "TLS Client Management": ["ClusterRevision", "MaxProvisioned"],
         "Thermostat": [
             "MaxThermostatSuggestions",

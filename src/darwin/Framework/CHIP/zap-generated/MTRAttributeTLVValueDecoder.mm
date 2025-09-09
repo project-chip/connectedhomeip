@@ -17644,8 +17644,8 @@ static id _Nullable DecodeAttributeValueForCameraAVStreamManagementCluster(Attri
         value = [NSNumber numberWithBool:cppValue];
         return value;
     }
-    case Attributes::MinViewport::Id: {
-        using TypeInfo = Attributes::MinViewport::TypeInfo;
+    case Attributes::MinViewportResolution::Id: {
+        using TypeInfo = Attributes::MinViewportResolution::TypeInfo;
         TypeInfo::DecodableType cppValue;
         *aError = DataModel::Decode(aReader, cppValue);
         if (*aError != CHIP_NO_ERROR) {
@@ -17954,8 +17954,7 @@ static id _Nullable DecodeAttributeValueForCameraAVStreamManagementCluster(Attri
                 newElement_0.maxResolution.height = [NSNumber numberWithUnsignedShort:entry_0.maxResolution.height];
                 newElement_0.minBitRate = [NSNumber numberWithUnsignedInt:entry_0.minBitRate];
                 newElement_0.maxBitRate = [NSNumber numberWithUnsignedInt:entry_0.maxBitRate];
-                newElement_0.minKeyFrameInterval = [NSNumber numberWithUnsignedShort:entry_0.minKeyFrameInterval];
-                newElement_0.maxKeyFrameInterval = [NSNumber numberWithUnsignedShort:entry_0.maxKeyFrameInterval];
+                newElement_0.keyFrameInterval = [NSNumber numberWithUnsignedShort:entry_0.keyFrameInterval];
                 if (entry_0.watermarkEnabled.HasValue()) {
                     newElement_0.watermarkEnabled = [NSNumber numberWithBool:entry_0.watermarkEnabled.Value()];
                 } else {
@@ -18519,6 +18518,17 @@ static id _Nullable DecodeAttributeValueForCameraAVSettingsUserLevelManagementCl
         value = [NSNumber numberWithShort:cppValue];
         return value;
     }
+    case Attributes::MovementState::Id: {
+        using TypeInfo = Attributes::MovementState::TypeInfo;
+        TypeInfo::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+        NSNumber * _Nonnull value;
+        value = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue)];
+        return value;
+    }
     default: {
         // Not a known CameraAVSettingsUserLevelManagement attribute.
         break;
@@ -18561,11 +18571,7 @@ static id _Nullable DecodeAttributeValueForWebRTCTransportProviderCluster(Attrib
                 } else {
                     newElement_0.audioStreamID = [NSNumber numberWithUnsignedShort:entry_0.audioStreamID.Value()];
                 }
-                if (entry_0.metadataEnabled.HasValue()) {
-                    newElement_0.metadataEnabled = [NSNumber numberWithBool:entry_0.metadataEnabled.Value()];
-                } else {
-                    newElement_0.metadataEnabled = nil;
-                }
+                newElement_0.metadataEnabled = [NSNumber numberWithBool:entry_0.metadataEnabled];
                 newElement_0.fabricIndex = [NSNumber numberWithUnsignedChar:entry_0.fabricIndex];
                 [array_0 addObject:newElement_0];
             }
@@ -18620,11 +18626,7 @@ static id _Nullable DecodeAttributeValueForWebRTCTransportRequestorCluster(Attri
                 } else {
                     newElement_0.audioStreamID = [NSNumber numberWithUnsignedShort:entry_0.audioStreamID.Value()];
                 }
-                if (entry_0.metadataEnabled.HasValue()) {
-                    newElement_0.metadataEnabled = [NSNumber numberWithBool:entry_0.metadataEnabled.Value()];
-                } else {
-                    newElement_0.metadataEnabled = nil;
-                }
+                newElement_0.metadataEnabled = [NSNumber numberWithBool:entry_0.metadataEnabled];
                 newElement_0.fabricIndex = [NSNumber numberWithUnsignedChar:entry_0.fabricIndex];
                 [array_0 addObject:newElement_0];
             }
