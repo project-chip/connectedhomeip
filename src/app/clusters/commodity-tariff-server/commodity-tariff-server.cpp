@@ -602,8 +602,8 @@ void Instance::InitCurrentAttrs()
 
 void Instance::UpdateCurrentAttrs()
 {
-    uint32_t now = GetCurrentTimestamp();
-    if (!now)
+    uint32_t matterEpochNow_s = GetCurrentTimestamp();
+    if (!matterEpochNow_s)
     {
         ChipLogError(AppServer, "The timestamp value can't be zero!");
         return;
@@ -616,18 +616,18 @@ void Instance::UpdateCurrentAttrs()
     }
 
     // Update day information
-    UpdateDayInformation(now);
+    UpdateDayInformation(matterEpochNow_s);
 
     // Update day entry information
-    UpdateDayEntryInformation(now);
+    UpdateDayEntryInformation(matterEpochNow_s);
 }
 
-void Instance::UpdateDayInformation(uint32_t now)
+void Instance::UpdateDayInformation(uint32_t matterEpochNow_s)
 {
     DataModel::Nullable<Structs::DayStruct::Type> currentDay;
     DataModel::Nullable<Structs::DayStruct::Type> nextDay;
 
-    currentDay.SetNonNull(Utils::FindDay(mServerTariffAttrsCtx, now));
+    currentDay.SetNonNull(Utils::FindDay(mServerTariffAttrsCtx, matterEpochNow_s));
 
     // Find current day
     if (!Utils::DayIsValid(&currentDay.Value()))
@@ -639,7 +639,7 @@ void Instance::UpdateDayInformation(uint32_t now)
     ChipLogDetail(AppServer, "UpdateCurrentAttrs: current day date: %u", currentDay.Value().date);
     SetCurrentDay(currentDay);
 
-    nextDay.SetNonNull(Utils::FindDay(mServerTariffAttrsCtx, (now + (kSecondsPerDay - now % kSecondsPerDay)) + 1));
+    nextDay.SetNonNull(Utils::FindDay(mServerTariffAttrsCtx, (matterEpochNow_s + (kSecondsPerDay - matterEpochNow_s % kSecondsPerDay)) + 1));
 
     if (Utils::DayIsValid(&nextDay.Value()))
     {
@@ -648,14 +648,14 @@ void Instance::UpdateDayInformation(uint32_t now)
     }
 }
 
-void Instance::UpdateDayEntryInformation(uint32_t now)
+void Instance::UpdateDayEntryInformation(uint32_t matterEpochNow_s)
 {
     if (mCurrentDay.IsNull())
     {
         return;
     }
 
-    const uint16_t minutesSinceMidnight = static_cast<uint16_t>((now % kSecondsPerDay) / 60);
+    const uint16_t minutesSinceMidnight = static_cast<uint16_t>((matterEpochNow_s % kSecondsPerDay) / 60);
     uint16_t currentEntryMinutesRemain  = 0;
     auto & currentDayEntryIDs           = mCurrentDay.Value().dayEntryIDs;
 
