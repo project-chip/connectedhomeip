@@ -92,7 +92,11 @@ using namespace chip::app::Clusters::CommodityTariff::Structs;
 template <typename T>
 CHIP_ERROR CTC_BaseDataClass<T>::CopyData(const StructType & input, StructType & output)
 {
-    return CHIP_NO_ERROR;
+    // Log error since this base implementation doesn't do anything meaningful
+    ChipLogError(DataManagement, "CopyData() called on base class - this should be overridden!");
+
+    // Return appropriate error code
+    return CHIP_ERROR_NOT_IMPLEMENTED;
 }
 
 template <>
@@ -341,7 +345,11 @@ CHIP_ERROR CTC_BaseDataClass<DataModel::Nullable<DataModel::List<CalendarPeriodS
 template <typename T>
 CHIP_ERROR ValidateListEntry(const T & entryNewValue, void * aCtx)
 {
-    return CHIP_NO_ERROR;
+    // Log error since this base implementation doesn't do anything meaningful
+    ChipLogError(DataManagement, "CopyData() called on base class - this should be overridden!");
+
+    // Return appropriate error code
+    return CHIP_ERROR_NOT_IMPLEMENTED;
 }
 
 CHIP_ERROR ValidateListEntry(const DayPatternStruct::Type & entryNewValue, void * aCtx)
@@ -551,7 +559,11 @@ CHIP_ERROR ValidateListEntry(const TariffPeriodStruct::Type & entryNewValue, voi
 template <typename T>
 CHIP_ERROR CTC_BaseDataClass<T>::ValidateNewValue()
 {
-    return CHIP_NO_ERROR;
+    // Log error since this base implementation doesn't do anything meaningful
+    ChipLogError(DataManagement, "CopyData() called on base class - this should be overridden!");
+
+    // Return appropriate error code
+    return CHIP_ERROR_NOT_IMPLEMENTED;
 }
 
 template <>
