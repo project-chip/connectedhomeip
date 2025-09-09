@@ -28,7 +28,7 @@ tests:
       verification: |
           1. The Cluster and Commands should be based on the cluster implementation on the DUT.
           2. The cluster used in the below command is an example, User can use any supported chip cluster/attribute/command.
-          3. Test Step 23 cannot be executed with the current SDK
+          3. Test Step 5 cannot be executed with the current SDK
       disabled: true
 
     - label:
@@ -84,7 +84,7 @@ tests:
       disabled: true
 
     - label:
-          "Step 14: TH sends the WriteRequestMessage to the DUT to write any
+          "Step 2: TH sends the WriteRequestMessage to the DUT to write any
           attribute on an unsupported Endpoint. DUT responds with the Write
           Response action"
       verification: |
@@ -126,7 +126,7 @@ tests:
       disabled: true
 
     - label:
-          "Step 15: TH sends the WriteRequestMessage to the DUT to write any
+          "Step 3: TH sends the WriteRequestMessage to the DUT to write any
           attribute on an unsupported cluster. DUT responds with the Write
           Response action"
       verification: |
@@ -169,7 +169,7 @@ tests:
       disabled: true
 
     - label:
-          "Step 16: TH sends the WriteRequestMessage to the DUT to write an
+          "Step 4: TH sends the WriteRequestMessage to the DUT to write an
           unsupported attribute DUT responds with the Write Response action"
       verification: |
           The cluster used in the below command is an example, User can use any supported chip cluster/attribute/command.
@@ -209,7 +209,7 @@ tests:
       disabled: true
 
     - label:
-          "Step 23: TH sends the WriteRequestMessage to the DUT to modify the
+          "Step 5: TH sends the WriteRequestMessage to the DUT to modify the
           value of one attribute and Set SuppressResponse to True. +"
       verification: |
           Out of Scope
@@ -217,7 +217,7 @@ tests:
       disabled: true
 
     - label:
-          "Step 24: TH sends a ReadRequest message to the DUT to read any
+          "Step 6: TH sends a ReadRequest message to the DUT to read any
           attribute on any cluster. DUT returns with a report data action with
           the attribute values and the dataversion of the cluster. TH sends a
           WriteRequestMessage to the DUT to modify the value of one attribute
@@ -290,7 +290,7 @@ tests:
       disabled: true
 
     - label:
-          "Step 25: TH sends a ReadRequest message to the DUT to read any
+          "Step 7: TH sends a ReadRequest message to the DUT to read any
           attribute on any cluster. DUT returns with a report data action with
           the attribute values and the dataversion of the cluster. TH sends a
           WriteRequestMessage to the DUT to modify the value of one attribute no
@@ -388,7 +388,7 @@ tests:
       disabled: true
 
     - label:
-          "Step 26: TH sends the WriteRequestMessage to the DUT to modify the
+          "Step 8: TH sends the WriteRequestMessage to the DUT to modify the
           value of a specific attribute data that needs Timed Write transaction
           to write and this action is not part of a Timed Write transaction."
       verification: |
