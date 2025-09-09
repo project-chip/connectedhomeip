@@ -432,7 +432,7 @@ class TC_TSTAT_4_2(MatterBaseTest):
                 test_presets.remove(builtInPreset)
 
                 # Send the AtomicRequest begin command
-                await self.send_atomic_request_begin_command(timeout=5000, expected_timeout=3000)
+                await self.send_atomic_request_begin_command()
 
                 # Write to the presets attribute after calling AtomicRequest command
                 await self.write_presets(endpoint=endpoint, presets=test_presets)
