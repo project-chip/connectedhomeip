@@ -26,6 +26,7 @@
 #include <app/AttributeAccessInterfaceRegistry.h>
 #include <app/ConcreteAttributePath.h>
 #include <app/EventLogging.h>
+#include <app/persistence/String.h>
 #include <app/reporting/reporting.h>
 #include <app/util/af-types.h>
 #include <app/util/attribute-storage.h>
@@ -36,6 +37,7 @@
 #include <credentials/examples/DeviceAttestationCredsExample.h>
 #include <lib/core/CHIPError.h>
 #include <lib/support/CHIPMem.h>
+#include <lib/support/Span.h>
 #include <lib/support/ZclString.h>
 #include <platform/CommissionableDataProvider.h>
 #include <setup_payload/QRCodeSetupPayloadGenerator.h>
@@ -62,6 +64,7 @@ using namespace chip::Inet;
 using namespace chip::Transport;
 using namespace chip::DeviceLayer;
 using namespace chip::app::Clusters;
+using namespace chip::app::Storage;
 
 // These variables need to be in global scope for bridged-actions-stub.cpp to access them
 std::vector<Room *> gRooms;
@@ -577,12 +580,17 @@ Protocols::InteractionModel::Status HandleWriteBridgedDeviceBasicAttribute(Devic
     }
 
     const uint8_t len = emberAfStringLength(buffer);
+
     if (len > kNodeLabelSize)
     {
         return Protocols::InteractionModel::Status::ConstraintError;
     }
 
-    dev->SetName(std::string{ reinterpret_cast<const char *>(buffer + 1), len }.c_str());
+    chip::Span<char> full(reinterpret_cast<char *>(buffer), static_cast<size_t>(len) + 1);
+    ShortPascalString pascal(full);
+    auto content = pascal.Content();
+
+    dev->SetName(content.data());
 
     HandleDeviceStatusChanged(dev, Device::kChanged_Name);
 
