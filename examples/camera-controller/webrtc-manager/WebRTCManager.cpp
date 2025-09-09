@@ -341,6 +341,7 @@ CHIP_ERROR WebRTCManager::Connnect(Controller::DeviceCommissioner & commissioner
     mTrack->onMessage(
         [this, addr](rtc::binary message) {
             // This is an RTP packet
+            ChipLogProgress(Camera, "Video packets size: [%u]", static_cast<unsigned int>(message.size()));
             sendto(mRTPSocket, reinterpret_cast<const char *>(message.data()), size_t(message.size()), 0,
                    reinterpret_cast<const struct sockaddr *>(&addr), sizeof(addr));
         },

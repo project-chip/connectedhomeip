@@ -35,6 +35,8 @@
 #define SNAPSHOT_FILE_PATH "./capture_snapshot.jpg"
 // Timeout for video pipeline to go to playing state.
 #define VIDEO_PIPELINE_PLAY_TIMEOUT 5
+// Framesize for audio pipeline
+#define AUDIO_FRAMESIZE 20
 
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::Chime;
@@ -544,7 +546,7 @@ GstElement * CameraDevice::CreateVideoPipeline(const std::string & device, int w
 }
 
 // Helper function to create a GStreamer pipeline
-GstElement * CameraDevice::CreateAudioPipeline(const std::string & device, int channels, int sampleRate, CameraError & error)
+GstElement * CameraDevice::CreateAudioPipeline(const std::string & device, int channels, int sampleRate, int bitRate, CameraError & error)
 {
     // Pipeline: source → capsfilter → audioconvert → audioresample → opusenc → appsink
     GstElement * pipeline = gst_pipeline_new("audio-pipeline");
@@ -590,7 +592,7 @@ GstElement * CameraDevice::CreateAudioPipeline(const std::string & device, int c
     gst_caps_unref(caps);
 
     // Match controller expectations: Opus @ 64 kbps (kAudioBitrate)
-    g_object_set(opusenc, "bitrate", 64000, "frame-size", 20, "inband-fec", FALSE, "dtx", FALSE, nullptr);
+    g_object_set(opusenc, "bitrate", bitRate, "frame-size", AUDIO_FRAMESIZE, "inband-fec", FALSE, "dtx", FALSE, nullptr);
 
     // Emit samples to your appsink callback (DistributeAudio → packetizer)
     g_object_set(appsink, "emit-signals", TRUE, nullptr);
@@ -841,10 +843,11 @@ CameraError CameraDevice::StartAudioStream(uint16_t streamID)
 
     int channels   = it->audioStreamParams.channelCount;
     int sampleRate = static_cast<int>(it->audioStreamParams.sampleRate);
+    int bitRate = static_cast<int>(it->audioStreamParams.bitRate);
 
     // Create Gstreamer audio pipeline
     CameraError error          = CameraError::SUCCESS;
-    GstElement * audioPipeline = CreateAudioPipeline("/dev/audio0", channels, sampleRate, error);
+    GstElement * audioPipeline = CreateAudioPipeline("/dev/audio0", channels, sampleRate, bitRate, error);
     if (audioPipeline == nullptr)
     {
         ChipLogError(Camera, "Failed to create audio pipeline.");

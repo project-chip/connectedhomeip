@@ -233,11 +233,11 @@ void WebrtcTransport::OnTrack(std::shared_ptr<WebRTCTrack> track)
     if (track->GetType() == "video")
     {
         ChipLogProgress(Camera, "Video track updated from remote peer");
-        SetVideoTrack(track);
+        // SetVideoTrack(track);
     }
     else if (track->GetType() == "audio")
     {
         ChipLogProgress(Camera, "audio track updated from remote peer");
-        SetAudioTrack(track);
+        // SetAudioTrack(track);
     }
 }
