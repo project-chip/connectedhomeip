@@ -16,10 +16,10 @@
  *    limitations under the License.
  */
 
+#include <CommodityTariffInstance.h>
 #include <CommodityTariffMain.h>
 #include <CommodityTariffSamples.h>
 #include <app/clusters/commodity-tariff-server/CommodityTariffTestEventTriggerHandler.h>
-#include <CommodityTariffInstance.h>
 
 using namespace chip;
 using namespace chip::app;
@@ -71,13 +71,15 @@ void SetTestEventTrigger_TariffDataUpdated()
     };
 
     // Process optional attributes
-    process_attribute(dg->GetMgmtObj(CommodityTariffAttrTypeEnum::kDefaultRandomizationOffset), tariff_preset.DefaultRandomizationOffset,
-                      "DefaultRandomizationOffset", false);
-    process_attribute(dg->GetMgmtObj(CommodityTariffAttrTypeEnum::kDefaultRandomizationType), tariff_preset.DefaultRandomizationType, "DefaultRandomizationType",
-                      false);
+    process_attribute(dg->GetMgmtObj(CommodityTariffAttrTypeEnum::kDefaultRandomizationOffset),
+                      tariff_preset.DefaultRandomizationOffset, "DefaultRandomizationOffset", false);
+    process_attribute(dg->GetMgmtObj(CommodityTariffAttrTypeEnum::kDefaultRandomizationType),
+                      tariff_preset.DefaultRandomizationType, "DefaultRandomizationType", false);
     process_attribute(dg->GetMgmtObj(CommodityTariffAttrTypeEnum::kDayPatterns), tariff_preset.DayPatterns, "DayPatterns", false);
-    process_attribute(dg->GetMgmtObj(CommodityTariffAttrTypeEnum::kIndividualDays), tariff_preset.IndividualDays, "IndividualDays", false);
-    process_attribute(dg->GetMgmtObj(CommodityTariffAttrTypeEnum::kCalendarPeriods), tariff_preset.CalendarPeriods, "CalendarPeriods", false);
+    process_attribute(dg->GetMgmtObj(CommodityTariffAttrTypeEnum::kIndividualDays), tariff_preset.IndividualDays, "IndividualDays",
+                      false);
+    process_attribute(dg->GetMgmtObj(CommodityTariffAttrTypeEnum::kCalendarPeriods), tariff_preset.CalendarPeriods,
+                      "CalendarPeriods", false);
 
     // Process mandatory attributes
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -97,11 +99,13 @@ void SetTestEventTrigger_TariffDataUpdated()
     if (err != CHIP_NO_ERROR)
         return;
 
-    err = process_attribute(dg->GetMgmtObj(CommodityTariffAttrTypeEnum::kTariffComponents), tariff_preset.TariffComponents, "TariffComponents", true);
+    err = process_attribute(dg->GetMgmtObj(CommodityTariffAttrTypeEnum::kTariffComponents), tariff_preset.TariffComponents,
+                            "TariffComponents", true);
     if (err != CHIP_NO_ERROR)
         return;
 
-    err = process_attribute(dg->GetMgmtObj(CommodityTariffAttrTypeEnum::kTariffPeriods), tariff_preset.TariffPeriods, "TariffPeriods", true);
+    err = process_attribute(dg->GetMgmtObj(CommodityTariffAttrTypeEnum::kTariffPeriods), tariff_preset.TariffPeriods,
+                            "TariffPeriods", true);
     if (err != CHIP_NO_ERROR)
         return;
 

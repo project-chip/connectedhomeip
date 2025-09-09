@@ -100,7 +100,8 @@ public:
         return mCalendarPeriods_MgmtObj.GetValue();
     }
 
-    enum CommodityTariffAttrTypeEnum {
+    enum CommodityTariffAttrTypeEnum
+    {
         kTariffUnit,
         kStartDate,
         kDefaultRandomizationOffset,
@@ -135,6 +136,7 @@ private:
     TariffPeriodsDataClass mTariffPeriods_MgmtObj{};
     IndividualDaysDataClass mIndividualDays_MgmtObj{};
     CalendarPeriodsDataClass mCalendarPeriods_MgmtObj{};
+
 protected:
     EndpointId mEndpointId = 0; ///< Associated Matter endpoint ID
     BitMask<Feature> mFeature;

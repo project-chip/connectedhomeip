@@ -209,7 +209,7 @@ struct SpanCopier
     /// @param maxCount Maximum number of elements to copy (default: unlimited)
     /// @return CHIP_NO_ERROR if copy succeeded, error code on failure
     static CHIP_ERROR Copy(const Span<const T> & source, DataModel::List<const T> & destination,
-                     size_t maxCount = std::numeric_limits<size_t>::max())
+                           size_t maxCount = std::numeric_limits<size_t>::max())
     {
         if (source.empty())
         {
@@ -239,7 +239,7 @@ struct SpanCopier<char>
     /// @param maxCount Maximum number of characters to copy (default: unlimited)
     /// @return CHIP_NO_ERROR if copy succeeded, error code on failure
     static CHIP_ERROR Copy(const CharSpan & source, DataModel::Nullable<CharSpan> & destination,
-                     size_t maxCount = std::numeric_limits<size_t>::max())
+                           size_t maxCount = std::numeric_limits<size_t>::max())
     {
         if (source.size() > maxCount)
         {
@@ -484,21 +484,21 @@ class CTC_BaseDataClassBase
 {
 public:
     virtual ~CTC_BaseDataClassBase() = default;
-    
+
     // Common interface
-    virtual bool IsValid() const = 0;
-    virtual bool HasValue() const = 0;
-    virtual bool HasNewValue() const = 0;
-    virtual CHIP_ERROR MarkAsAssigned() = 0;
+    virtual bool IsValid() const                   = 0;
+    virtual bool HasValue() const                  = 0;
+    virtual bool HasNewValue() const               = 0;
+    virtual CHIP_ERROR MarkAsAssigned()            = 0;
     virtual CHIP_ERROR UpdateBegin(void * aUpdCtx) = 0;
-    virtual bool UpdateFinish(bool aUpdateAllow) = 0;
-    virtual bool Cleanup() = 0;
-    virtual AttributeId GetAttrId() const = 0;
-    
+    virtual bool UpdateFinish(bool aUpdateAllow)   = 0;
+    virtual bool Cleanup()                         = 0;
+    virtual AttributeId GetAttrId() const          = 0;
+
     // Type-erased methods for generic access
-    virtual CHIP_ERROR GetValueAsVoid(void* & outValue) = 0;
-    virtual CHIP_ERROR GetNewValueAsVoid(void* & outValue) = 0;
-    virtual CHIP_ERROR SetNewValueFromVoid(const void* value) = 0;
+    virtual CHIP_ERROR GetValueAsVoid(void *& outValue)        = 0;
+    virtual CHIP_ERROR GetNewValueAsVoid(void *& outValue)     = 0;
+    virtual CHIP_ERROR SetNewValueFromVoid(const void * value) = 0;
 };
 
 template <typename T>
@@ -921,26 +921,28 @@ public:
     AttributeId GetAttrId() const override { return mAttrId; }
 
     // Type-erased implementations
-    CHIP_ERROR GetValueAsVoid(void* & outValue) override
+    CHIP_ERROR GetValueAsVoid(void *& outValue) override
     {
-        outValue = static_cast<void*>(&GetValueRef());
+        outValue = static_cast<void *>(&GetValueRef());
         return CHIP_NO_ERROR;
     }
-    
-    CHIP_ERROR GetNewValueAsVoid(void* & outValue) override
+
+    CHIP_ERROR GetNewValueAsVoid(void *& outValue) override
     {
-        outValue = static_cast<void*>(&GetNewValueRef());
+        outValue = static_cast<void *>(&GetNewValueRef());
         return CHIP_NO_ERROR;
     }
-    
-    CHIP_ERROR SetNewValueFromVoid(const void* value) override
+
+    CHIP_ERROR SetNewValueFromVoid(const void * value) override
     {
-        if (value == nullptr) {
+        if (value == nullptr)
+        {
             return CHIP_ERROR_INVALID_ARGUMENT;
         }
-        const ValueType* typedValue = static_cast<const ValueType*>(value);
+        const ValueType * typedValue = static_cast<const ValueType *>(value);
         return SetNewValue(*typedValue);
     }
+
 private:
     /**
      * @brief Gets reference to active value storage
@@ -1298,63 +1300,91 @@ public:
 class DefaultRandomizationOffsetDataClass : public CommodityTariffAttrsDataMgmt::CTC_BaseDataClass<DataModel::Nullable<int16_t>>
 {
 public:
-    DefaultRandomizationOffsetDataClass() : CTC_BaseDataClass<DataModel::Nullable<int16_t>>(Attributes::DefaultRandomizationOffset::Id) {}
+    DefaultRandomizationOffsetDataClass() :
+        CTC_BaseDataClass<DataModel::Nullable<int16_t>>(Attributes::DefaultRandomizationOffset::Id)
+    {}
     ~DefaultRandomizationOffsetDataClass() override = default;
 };
 
-class DefaultRandomizationTypeDataClass : public CommodityTariffAttrsDataMgmt::CTC_BaseDataClass<DataModel::Nullable<DayEntryRandomizationTypeEnum>>
+class DefaultRandomizationTypeDataClass
+    : public CommodityTariffAttrsDataMgmt::CTC_BaseDataClass<DataModel::Nullable<DayEntryRandomizationTypeEnum>>
 {
 public:
-    DefaultRandomizationTypeDataClass() : CTC_BaseDataClass<DataModel::Nullable<DayEntryRandomizationTypeEnum>>(Attributes::DefaultRandomizationType::Id) {}
+    DefaultRandomizationTypeDataClass() :
+        CTC_BaseDataClass<DataModel::Nullable<DayEntryRandomizationTypeEnum>>(Attributes::DefaultRandomizationType::Id)
+    {}
     ~DefaultRandomizationTypeDataClass() override = default;
 };
 
-class TariffInfoDataClass : public CommodityTariffAttrsDataMgmt::CTC_BaseDataClass<DataModel::Nullable<Structs::TariffInformationStruct::Type>>
+class TariffInfoDataClass
+    : public CommodityTariffAttrsDataMgmt::CTC_BaseDataClass<DataModel::Nullable<Structs::TariffInformationStruct::Type>>
 {
 public:
-    TariffInfoDataClass() : CTC_BaseDataClass<DataModel::Nullable<Structs::TariffInformationStruct::Type>>(Attributes::TariffInfo::Id) {}
+    TariffInfoDataClass() :
+        CTC_BaseDataClass<DataModel::Nullable<Structs::TariffInformationStruct::Type>>(Attributes::TariffInfo::Id)
+    {}
     ~TariffInfoDataClass() override = default;
 };
 
-class DayEntriesDataClass : public CommodityTariffAttrsDataMgmt::CTC_BaseDataClass<DataModel::Nullable<DataModel::List<Structs::DayEntryStruct::Type>>>
+class DayEntriesDataClass
+    : public CommodityTariffAttrsDataMgmt::CTC_BaseDataClass<DataModel::Nullable<DataModel::List<Structs::DayEntryStruct::Type>>>
 {
 public:
-    DayEntriesDataClass() : CTC_BaseDataClass<DataModel::Nullable<DataModel::List<Structs::DayEntryStruct::Type>>>(Attributes::DayEntries::Id) {}
+    DayEntriesDataClass() :
+        CTC_BaseDataClass<DataModel::Nullable<DataModel::List<Structs::DayEntryStruct::Type>>>(Attributes::DayEntries::Id)
+    {}
     ~DayEntriesDataClass() override = default;
 };
 
-class DayPatternsDataClass : public CommodityTariffAttrsDataMgmt::CTC_BaseDataClass<DataModel::Nullable<DataModel::List<Structs::DayPatternStruct::Type>>>
+class DayPatternsDataClass
+    : public CommodityTariffAttrsDataMgmt::CTC_BaseDataClass<DataModel::Nullable<DataModel::List<Structs::DayPatternStruct::Type>>>
 {
 public:
-    DayPatternsDataClass() : CTC_BaseDataClass<DataModel::Nullable<DataModel::List<Structs::DayPatternStruct::Type>>>(Attributes::DayPatterns::Id) {}
+    DayPatternsDataClass() :
+        CTC_BaseDataClass<DataModel::Nullable<DataModel::List<Structs::DayPatternStruct::Type>>>(Attributes::DayPatterns::Id)
+    {}
     ~DayPatternsDataClass() override = default;
 };
 
-class TariffComponentsDataClass : public CommodityTariffAttrsDataMgmt::CTC_BaseDataClass<DataModel::Nullable<DataModel::List<Structs::TariffComponentStruct::Type>>>
+class TariffComponentsDataClass : public CommodityTariffAttrsDataMgmt::CTC_BaseDataClass<
+                                      DataModel::Nullable<DataModel::List<Structs::TariffComponentStruct::Type>>>
 {
 public:
-    TariffComponentsDataClass() : CTC_BaseDataClass<DataModel::Nullable<DataModel::List<Structs::TariffComponentStruct::Type>>>(Attributes::TariffComponents::Id) {}
+    TariffComponentsDataClass() :
+        CTC_BaseDataClass<DataModel::Nullable<DataModel::List<Structs::TariffComponentStruct::Type>>>(
+            Attributes::TariffComponents::Id)
+    {}
     ~TariffComponentsDataClass() override = default;
 };
 
-class TariffPeriodsDataClass : public CommodityTariffAttrsDataMgmt::CTC_BaseDataClass<DataModel::Nullable<DataModel::List<Structs::TariffPeriodStruct::Type>>>
+class TariffPeriodsDataClass : public CommodityTariffAttrsDataMgmt::CTC_BaseDataClass<
+                                   DataModel::Nullable<DataModel::List<Structs::TariffPeriodStruct::Type>>>
 {
 public:
-    TariffPeriodsDataClass() : CTC_BaseDataClass<DataModel::Nullable<DataModel::List<Structs::TariffPeriodStruct::Type>>>(Attributes::TariffPeriods::Id) {}
+    TariffPeriodsDataClass() :
+        CTC_BaseDataClass<DataModel::Nullable<DataModel::List<Structs::TariffPeriodStruct::Type>>>(Attributes::TariffPeriods::Id)
+    {}
     ~TariffPeriodsDataClass() override = default;
 };
 
-class IndividualDaysDataClass : public CommodityTariffAttrsDataMgmt::CTC_BaseDataClass<DataModel::Nullable<DataModel::List<Structs::DayStruct::Type>>>
+class IndividualDaysDataClass
+    : public CommodityTariffAttrsDataMgmt::CTC_BaseDataClass<DataModel::Nullable<DataModel::List<Structs::DayStruct::Type>>>
 {
 public:
-    IndividualDaysDataClass() : CTC_BaseDataClass<DataModel::Nullable<DataModel::List<Structs::DayStruct::Type>>>(Attributes::IndividualDays::Id) {}
+    IndividualDaysDataClass() :
+        CTC_BaseDataClass<DataModel::Nullable<DataModel::List<Structs::DayStruct::Type>>>(Attributes::IndividualDays::Id)
+    {}
     ~IndividualDaysDataClass() override = default;
 };
 
-class CalendarPeriodsDataClass : public CommodityTariffAttrsDataMgmt::CTC_BaseDataClass<DataModel::Nullable<DataModel::List<Structs::CalendarPeriodStruct::Type>>>
+class CalendarPeriodsDataClass : public CommodityTariffAttrsDataMgmt::CTC_BaseDataClass<
+                                     DataModel::Nullable<DataModel::List<Structs::CalendarPeriodStruct::Type>>>
 {
 public:
-    CalendarPeriodsDataClass() : CTC_BaseDataClass<DataModel::Nullable<DataModel::List<Structs::CalendarPeriodStruct::Type>>>(Attributes::CalendarPeriods::Id) {}
+    CalendarPeriodsDataClass() :
+        CTC_BaseDataClass<DataModel::Nullable<DataModel::List<Structs::CalendarPeriodStruct::Type>>>(
+            Attributes::CalendarPeriods::Id)
+    {}
     ~CalendarPeriodsDataClass() override = default;
 };
 

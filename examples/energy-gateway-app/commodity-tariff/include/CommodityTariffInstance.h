@@ -44,10 +44,10 @@ public:
     void TariffDataUpdate(uint32_t aNowTimestamp);
 
     // Primary attrs update pipeline methods
-    CHIP_ERROR  TariffDataUpd_Init(TariffUpdateCtx & UpdCtx);
+    CHIP_ERROR TariffDataUpd_Init(TariffUpdateCtx & UpdCtx);
     CHIP_ERROR TariffDataUpd_CrossValidator(TariffUpdateCtx & UpdCtx);
-    void TariffDataUpd_Finish(bool is_success);    
-    
+    void TariffDataUpd_Finish(bool is_success);
+
     void TryToactivateDelayedTariff(uint32_t now);
     void CleanupTariffData();
 };

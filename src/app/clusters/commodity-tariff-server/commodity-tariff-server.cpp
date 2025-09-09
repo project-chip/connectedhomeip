@@ -548,8 +548,9 @@ CHIP_ERROR UpdateTariffComponentAttrsDayEntryById(Instance * aInstance, CurrentT
             if (!current->label.Value().IsNull())
             {
                 chip::CharSpan srcLabelSpan = current->label.Value().Value();
-                if (CHIP_NO_ERROR != (err = CommodityTariffAttrsDataMgmt::SpanCopier<char>::Copy(current->label.Value().Value(), tmpNullLabel,
-                                                                          srcLabelSpan.size())))
+                if (CHIP_NO_ERROR !=
+                    (err = CommodityTariffAttrsDataMgmt::SpanCopier<char>::Copy(current->label.Value().Value(), tmpNullLabel,
+                                                                                srcLabelSpan.size())))
                 {
                     goto exit;
                 }
@@ -653,7 +654,8 @@ CHIP_ERROR Instance::UpdateDayInformation(uint32_t matterEpochNow_s)
     ChipLogDetail(AppServer, "UpdateCurrentAttrs: current day date: %u", currentDay.Value().date);
     SetCurrentDay(currentDay);
 
-    nextDay.SetNonNull(Utils::FindDay(mServerTariffAttrsCtx, (matterEpochNow_s + (kSecondsPerDay - matterEpochNow_s % kSecondsPerDay)) + 1));
+    nextDay.SetNonNull(
+        Utils::FindDay(mServerTariffAttrsCtx, (matterEpochNow_s + (kSecondsPerDay - matterEpochNow_s % kSecondsPerDay)) + 1));
 
     if (Utils::DayIsValid(&nextDay.Value()))
     {
@@ -687,9 +689,8 @@ CHIP_ERROR Instance::UpdateDayEntryInformation(uint32_t matterEpochNow_s)
         tmpDayEntry.SetNonNull(*currentEntry);
         tmpDate.SetNonNull(mCurrentDay.Value().date + (currentEntry->startTime * 60));
 
-        ReturnErrorOnFailure(
-            Utils::UpdateTariffComponentAttrsDayEntryById(this, mServerTariffAttrsCtx, currentEntry->dayEntryID,
-                                                          mCurrentTariffComponents_MgmtObj));
+        ReturnErrorOnFailure(Utils::UpdateTariffComponentAttrsDayEntryById(this, mServerTariffAttrsCtx, currentEntry->dayEntryID,
+                                                                           mCurrentTariffComponents_MgmtObj));
         ChipLogDetail(AppServer, "UpdateCurrentAttrs: current day entry: %u", tmpDayEntry.Value().dayEntryID);
     }
 
@@ -703,9 +704,8 @@ CHIP_ERROR Instance::UpdateDayEntryInformation(uint32_t matterEpochNow_s)
     if (nextEntry != nullptr)
     {
         tmpDayEntry.SetNonNull(*nextEntry);
-        ReturnErrorOnFailure(
-            Utils::UpdateTariffComponentAttrsDayEntryById(this, mServerTariffAttrsCtx, nextEntry->dayEntryID,
-                                                          mNextTariffComponents_MgmtObj));
+        ReturnErrorOnFailure(Utils::UpdateTariffComponentAttrsDayEntryById(this, mServerTariffAttrsCtx, nextEntry->dayEntryID,
+                                                                           mNextTariffComponents_MgmtObj));
         ChipLogDetail(AppServer, "UpdateCurrentAttrs: next day entry: %u", tmpDayEntry.Value().dayEntryID);
         tmpDate.SetNonNull(mCurrentDayEntryDate.Value() + currentEntryMinutesRemain * 60);
     }
@@ -868,7 +868,8 @@ void Instance::HandleGetDayEntry(HandlerContext & ctx, const Commands::GetDayEnt
 
 CommodityTariffAttrsDataMgmt::CTC_BaseDataClassBase & Delegate::GetMgmtObj(CommodityTariffAttrTypeEnum aType)
 {
-    switch (aType) {
+    switch (aType)
+    {
     case CommodityTariffAttrTypeEnum::kTariffUnit:
         return mTariffUnit_MgmtObj;
     case CommodityTariffAttrTypeEnum::kStartDate:
