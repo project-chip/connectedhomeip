@@ -228,6 +228,16 @@ class TC_ACL_2_10(MatterBaseTest):
         if not restart_flag_file:
             # No restart flag file: ask user to manually reboot
             self.wait_for_user_input(prompt_msg="Reboot the DUT. Press Enter when ready.\n")
+
+            # After manual reboot, expire sessions and allow time for device to be ready
+            logging.info("Expiring sessions after manual device reboot")
+            self.th1.ExpireSessions(self.dut_node_id)
+            self.th2.ExpireSessions(self.dut_node_id)
+            
+            # Wait for device to be fully ready after reboot
+            time.sleep(2)
+            logging.info("Manual device reboot completed")
+            
         else:
             try:
                 # Create the restart flag file to signal the test runner
