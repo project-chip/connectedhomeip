@@ -70,7 +70,7 @@
 #endif
 
 #define APP_FUNCTION_BUTTON 0
-#define APP_EVSE_SWITCH 1
+#define APP_CONTROL_BUTTON 1
 
 namespace {
 
@@ -299,7 +299,7 @@ void AppTask::ButtonEventHandler(uint8_t button, uint8_t btnAction)
     button_event.Type               = AppEvent::kEventType_Button;
     button_event.ButtonEvent.Action = btnAction;
 
-    if (button == APP_EVSE_SWITCH && btnAction == static_cast<uint8_t>(SilabsPlatform::ButtonAction::ButtonPressed))
+    if (button == APP_CONTROL_BUTTON && btnAction == static_cast<uint8_t>(SilabsPlatform::ButtonAction::ButtonPressed))
     {
         button_event.Handler = EnergyManagementActionEventHandler;
         AppTask::GetAppTask().PostEvent(&button_event);
