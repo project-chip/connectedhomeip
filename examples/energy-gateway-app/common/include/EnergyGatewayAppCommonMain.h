@@ -18,6 +18,5 @@
 
 #pragma once
 
-void ElectricalEnergyTariffSetTariffFile(const char * aFile);
 void ElectricalEnergyTariffInit();
 void ElectricalEnergyTariffShutdown();
