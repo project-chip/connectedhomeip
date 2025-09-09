@@ -46,7 +46,7 @@ from matter.clusters import Objects, WebRTCTransportProvider
 from matter.clusters.Types import NullValue
 from matter.interaction_model import InteractionModelError, Status
 from matter.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main, has_feature, run_if_endpoint_matches
-from matter.webrtc import PeerConnection, WebRTCManager
+from matter.webrtc import LibdatachannelPeerConnection, WebRTCManager
 
 logger = logging.getLogger(__name__)
 
@@ -180,7 +180,7 @@ class TC_AVSM_2_16(MatterBaseTest, AVSMTestBase):
         self.step(4)
         # Establish WebRTC via Provide Offer/Answer
         webrtc_manager = WebRTCManager(event_loop=self.event_loop)
-        webrtc_peer: PeerConnection = webrtc_manager.create_peer(
+        webrtc_peer: LibdatachannelPeerConnection = webrtc_manager.create_peer(
             node_id=self.dut_node_id, fabric_index=self.default_controller.GetFabricIndexInternal(), endpoint=endpoint)
 
         webrtc_peer.create_offer()
@@ -297,7 +297,7 @@ class TC_AVSM_2_16(MatterBaseTest, AVSMTestBase):
         logger.info(f"Rx'd AllocatedAudioStreams: {aAllocatedAudioStreams}")
         asserts.assert_equal(len(aAllocatedAudioStreams), 0, "The number of allocated audio streams in the list is not 0")
 
-        webrtc_manager.close_all()
+        await webrtc_manager.close_all()
 
 
 if __name__ == "__main__":

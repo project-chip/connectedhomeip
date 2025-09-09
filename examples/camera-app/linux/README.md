@@ -6,7 +6,10 @@ Linux.
 
 ---
 
--   [Building the Example Application](#building-the-example-application)
+- [CHIP Linux Camera Example App](#chip-linux-camera-example-app)
+  - [Building the Example Application](#building-the-example-application)
+    - [1. Prerequisites](#1-prerequisites)
+    - [2. Building](#2-building)
 
 ---
 

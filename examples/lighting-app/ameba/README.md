@@ -4,13 +4,13 @@ This example demonstrates the Matter Lighting application on Ameba platform.
 
 ---
 
--   [CHIP Ameba Lighting Example](#chip-ameba-lighting-example)
-    -   [Supported Device](#supported-device)
-    -   [Building the Example Application](#building-the-example-application)
-    -   [Commissioning](#commissioning)
-        -   [BLE mode](#ble-mode)
-        -   [IP mode](#ip-mode)
-    -   [Cluster control](#cluster-control)
+- [CHIP Ameba Lighting Example](#chip-ameba-lighting-example)
+  - [Supported Device](#supported-device)
+  - [Building the Example Application](#building-the-example-application)
+  - [Commissioning](#commissioning)
+    - [BLE mode](#ble-mode)
+    - [IP mode](#ip-mode)
+  - [Cluster Control](#cluster-control)
 
 ---
 
