@@ -20,6 +20,7 @@
 
 #include <app/tests/suites/credentials/TestHarnessDACProvider.h>
 #include <controller/CommissioneeDeviceProxy.h>
+#include <controller/OperationalCredentialsDelegate.h>
 #include <credentials/DeviceAttestationConstructor.h>
 #include <credentials/attestation_verifier/DacOnlyPartialAttestationVerifier.h>
 #include <credentials/attestation_verifier/DeviceAttestationVerifier.h>
@@ -46,11 +47,11 @@ struct TestDacOnlyPartialAttestationVerifier : public ::testing::Test
 
     // The following test data uses arbitrary values solely for test structure;
     // the actual contents do not represent real or meaningful data.
-    static constexpr uint8_t kTestAttestationElements[32] = { 0x01, 0x02, 0x03 };
-    static constexpr uint8_t kTestChallengeData[32]       = { 0x04, 0x05, 0x06 };
-    static constexpr uint8_t kTestSignatureData[64]       = { 0x07, 0x08, 0x09 };
-    static constexpr uint8_t kTestNonceData[32]           = { 0x0A, 0x0B, 0x0C };
-    static constexpr uint8_t kTestCDData[32]              = { 0x11, 0x22, 0x33 };
+    static constexpr uint8_t kTestAttestationElements[32]                                       = { 0x01, 0x02, 0x03 };
+    static constexpr uint8_t kTestChallengeData[32]                                             = { 0x04, 0x05, 0x06 };
+    static constexpr uint8_t kTestSignatureData[chip::Crypto::kP256_ECDSA_Signature_Length_Raw] = { 0x07, 0x08, 0x09 };
+    static constexpr uint8_t kTestNonceData[kAttestationNonceLength]                            = { 0x0A, 0x0B, 0x0C };
+    static constexpr uint8_t kTestCDData[32]                                                    = { 0x11, 0x22, 0x33 };
 
 private:
     static void OnAttestationInformationVerificationCallback(void * context,
@@ -397,8 +398,8 @@ TEST_F(TestDacOnlyPartialAttestationVerifier, TestWithMalformedAttestationElemen
 TEST_F(TestDacOnlyPartialAttestationVerifier, TestWithMismatchedNonce)
 {
     // The actual contents do not represent real or meaningful data.
-    uint8_t nonceInElements[32] = { 0x55, 0x66, 0x77, 0x88 };
-    uint8_t expectedNonce[32]   = { 0x99, 0x88, 0x77 };
+    uint8_t nonceInElements[kAttestationNonceLength] = { 0x55, 0x66, 0x77, 0x88 };
+    uint8_t expectedNonce[kAttestationNonceLength]   = { 0x99, 0x88, 0x77 };
 
     uint8_t tlvBuf[128];
     size_t tlvLen = 0;
