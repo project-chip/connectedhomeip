@@ -548,10 +548,9 @@ CHIP_ERROR UpdateTariffComponentAttrsDayEntryById(Instance * aInstance, CurrentT
             if (!current->label.Value().IsNull())
             {
                 chip::CharSpan srcLabelSpan = current->label.Value().Value();
-                if (!CommodityTariffAttrsDataMgmt::SpanCopier<char>::Copy(current->label.Value().Value(), tmpNullLabel,
-                                                                          srcLabelSpan.size()))
+                if (CHIP_NO_ERROR != (err = CommodityTariffAttrsDataMgmt::SpanCopier<char>::Copy(current->label.Value().Value(), tmpNullLabel,
+                                                                          srcLabelSpan.size())))
                 {
-                    err = CHIP_ERROR_NO_MEMORY;
                     goto exit;
                 }
             }

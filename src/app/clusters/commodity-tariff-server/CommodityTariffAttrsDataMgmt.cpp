@@ -110,18 +110,12 @@ CHIP_ERROR CTC_BaseDataClass<DataModel::Nullable<TariffInformationStruct::Type>>
 
     if (!input.tariffLabel.IsNull())
     {
-        if (!SpanCopier<char>::Copy(input.tariffLabel.Value(), output.tariffLabel, input.tariffLabel.Value().size()))
-        {
-            return CHIP_ERROR_NO_MEMORY;
-        }
+        ReturnErrorOnFailure(SpanCopier<char>::Copy(input.tariffLabel.Value(), output.tariffLabel, input.tariffLabel.Value().size()));
     }
 
     if (!input.providerName.IsNull())
     {
-        if (!SpanCopier<char>::Copy(input.providerName.Value(), output.providerName, input.providerName.Value().size()))
-        {
-            return CHIP_ERROR_NO_MEMORY;
-        }
+        ReturnErrorOnFailure(SpanCopier<char>::Copy(input.providerName.Value(), output.providerName, input.providerName.Value().size()));
     }
 
     if (input.currency.HasValue())
@@ -247,10 +241,7 @@ CHIP_ERROR CTC_BaseDataClass<DataModel::Nullable<DataModel::List<TariffComponent
         output.label.Value().SetNull();
         if (!input.label.Value().IsNull())
         {
-            if (!SpanCopier<char>::Copy(input.label.Value().Value(), output.label.Value(), input.label.Value().Value().size()))
-            {
-                return CHIP_ERROR_NO_MEMORY;
-            }
+            ReturnErrorOnFailure(SpanCopier<char>::Copy(input.label.Value().Value(), output.label.Value(), input.label.Value().Value().size()));
         }
     }
 
@@ -270,23 +261,14 @@ CHIP_ERROR CTC_BaseDataClass<DataModel::Nullable<DataModel::List<TariffPeriodStr
     output.label.SetNull();
     if (!input.label.IsNull())
     {
-        if (!SpanCopier<char>::Copy(input.label.Value(), output.label, input.label.Value().size()))
-        {
-            return CHIP_ERROR_NO_MEMORY;
-        }
+        ReturnErrorOnFailure(SpanCopier<char>::Copy(input.label.Value(), output.label, input.label.Value().size()));
     }
 
-    if (!SpanCopier<uint32_t>::Copy(chip::Span<const uint32_t>(input.dayEntryIDs.data(), input.dayEntryIDs.size()),
-                                    output.dayEntryIDs, kTariffPeriodItemMaxIDs))
-    {
-        return CHIP_ERROR_NO_MEMORY;
-    }
+    ReturnErrorOnFailure(SpanCopier<uint32_t>::Copy(chip::Span<const uint32_t>(input.dayEntryIDs.data(), input.dayEntryIDs.size()),
+                                               output.dayEntryIDs, input.dayEntryIDs.size()));
 
-    if (!SpanCopier<uint32_t>::Copy(chip::Span<const uint32_t>(input.tariffComponentIDs.data(), input.tariffComponentIDs.size()),
-                                    output.tariffComponentIDs, kTariffPeriodItemMaxIDs))
-    {
-        return CHIP_ERROR_NO_MEMORY;
-    }
+    ReturnErrorOnFailure(SpanCopier<uint32_t>::Copy(chip::Span<const uint32_t>(input.tariffComponentIDs.data(), input.tariffComponentIDs.size()),
+                                               output.tariffComponentIDs, input.tariffComponentIDs.size()));
 
     return CHIP_NO_ERROR;
 }
@@ -298,12 +280,8 @@ CHIP_ERROR CTC_BaseDataClass<DataModel::Nullable<DataModel::List<DayPatternStruc
     output.dayPatternID = input.dayPatternID;
     output.daysOfWeek   = input.daysOfWeek;
 
-    if (!SpanCopier<uint32_t>::Copy(chip::Span<const uint32_t>(input.dayEntryIDs.data(), input.dayEntryIDs.size()),
-                                    output.dayEntryIDs, kDayPatternItemMaxDayEntryIDs))
-    {
-        return CHIP_ERROR_NO_MEMORY;
-    }
-
+    ReturnErrorOnFailure(SpanCopier<uint32_t>::Copy(chip::Span<const uint32_t>(input.dayEntryIDs.data(), input.dayEntryIDs.size()),
+                                               output.dayEntryIDs, input.dayEntryIDs.size()));
     return CHIP_NO_ERROR;
 }
 
@@ -314,11 +292,8 @@ CHIP_ERROR CTC_BaseDataClass<DataModel::Nullable<DataModel::List<DayStruct::Type
     output.date    = input.date;
     output.dayType = input.dayType;
 
-    if (!SpanCopier<uint32_t>::Copy(chip::Span<const uint32_t>(input.dayEntryIDs.data(), input.dayEntryIDs.size()),
-                                    output.dayEntryIDs, kDayStructItemMaxDayEntryIDs))
-    {
-        return CHIP_ERROR_NO_MEMORY;
-    }
+    ReturnErrorOnFailure(SpanCopier<uint32_t>::Copy(chip::Span<const uint32_t>(input.dayEntryIDs.data(), input.dayEntryIDs.size()),
+                                               output.dayEntryIDs, input.dayEntryIDs.size()));
 
     return CHIP_NO_ERROR;
 }
@@ -333,11 +308,8 @@ CHIP_ERROR CTC_BaseDataClass<DataModel::Nullable<DataModel::List<CalendarPeriodS
         output.startDate.SetNonNull(input.startDate.Value());
     }
 
-    if (!SpanCopier<uint32_t>::Copy(chip::Span<const uint32_t>(input.dayPatternIDs.data(), input.dayPatternIDs.size()),
-                                    output.dayPatternIDs, kCalendarPeriodItemMaxDayPatternIDs))
-    {
-        return CHIP_ERROR_NO_MEMORY;
-    }
+    ReturnErrorOnFailure(SpanCopier<uint32_t>::Copy(chip::Span<const uint32_t>(input.dayPatternIDs.data(), input.dayPatternIDs.size()),
+                                               output.dayPatternIDs, input.dayPatternIDs.size()));
 
     return CHIP_NO_ERROR;
 }

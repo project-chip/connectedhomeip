@@ -207,25 +207,25 @@ struct SpanCopier
     /// @param source Input span to copy from
     /// @param destination Output list to populate
     /// @param maxCount Maximum number of elements to copy (default: unlimited)
-    /// @return true if copy succeeded, false on memory allocation failure
-    static bool Copy(const Span<const T> & source, DataModel::List<const T> & destination,
+    /// @return CHIP_NO_ERROR if copy succeeded, error code on failure
+    static CHIP_ERROR Copy(const Span<const T> & source, DataModel::List<const T> & destination,
                      size_t maxCount = std::numeric_limits<size_t>::max())
     {
         if (source.empty())
         {
             destination = DataModel::List<const T>();
-            return true;
+            return CHIP_NO_ERROR;
         }
 
         const size_t elementsToCopy = std::min(source.size(), maxCount);
         auto * buffer               = static_cast<T *>(Platform::MemoryCalloc(elementsToCopy, sizeof(T)));
 
         if (!buffer)
-            return false;
+            return CHIP_ERROR_NO_MEMORY;
 
         std::copy(source.begin(), source.begin() + elementsToCopy, buffer);
         destination = DataModel::List<const T>(Span<const T>(buffer, elementsToCopy));
-        return true;
+        return CHIP_NO_ERROR;
     }
 };
 
@@ -237,28 +237,28 @@ struct SpanCopier<char>
     /// @param source Input span to copy from
     /// @param destination Output span to populate
     /// @param maxCount Maximum number of characters to copy (default: unlimited)
-    /// @return true if copy succeeded, false on memory allocation or size limit failure
-    static bool Copy(const CharSpan & source, DataModel::Nullable<CharSpan> & destination,
+    /// @return CHIP_NO_ERROR if copy succeeded, error code on failure
+    static CHIP_ERROR Copy(const CharSpan & source, DataModel::Nullable<CharSpan> & destination,
                      size_t maxCount = std::numeric_limits<size_t>::max())
     {
         if (source.size() > maxCount)
         {
-            return false;
+            return CHIP_ERROR_INVALID_STRING_LENGTH;
         }
 
         if (source.empty())
         {
             destination.SetNull();
-            return true;
+            return CHIP_NO_ERROR;
         }
 
         char * buffer = static_cast<char *>(Platform::MemoryCalloc(1, source.size()));
         if (!buffer)
-            return false;
+            return CHIP_ERROR_NO_MEMORY;
 
         std::copy(source.begin(), source.end(), buffer);
         destination.SetNonNull(CharSpan(buffer, source.size()));
-        return true;
+        return CHIP_NO_ERROR;
     }
 };
 
