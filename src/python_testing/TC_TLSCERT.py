@@ -236,10 +236,10 @@ class TC_TLSCERT(MatterBaseTest):
                 return e
 
         async def send_csr_command(
-                self, nonce: bytes,
+                self, nonce: bytes, ccdid: Union[Nullable, int] = NullValue,
                 expected_status: Status = Status.Success) -> Union[Clusters.TlsCertificateManagement.Commands.ClientCSRResponse, InteractionModelError]:
             try:
-                result = await self.test.send_single_cmd(cmd=Clusters.TlsCertificateManagement.Commands.ClientCSR(nonce=nonce),
+                result = await self.test.send_single_cmd(cmd=Clusters.TlsCertificateManagement.Commands.ClientCSR(ccdid=ccdid, nonce=nonce),
                                                          endpoint=self.endpoint, dev_ctrl=self.dev_ctrl, node_id=self.node_id, payloadCapability=ChipDeviceCtrl.TransportPayloadCapability.LARGE_PAYLOAD)
 
                 asserts.assert_true(type_matches(result, Clusters.TlsCertificateManagement.Commands.ClientCSRResponse),
@@ -687,14 +687,14 @@ class TC_TLSCERT(MatterBaseTest):
         asserts.assert_equal(found_certs[my_ccdid[2]], my_client_cert[2], "Expected matching certificate detail")
 
         self.step(16)
-        response = await cr1_cmd.send_csr_command(nonce=my_nonce[3])
+        response = await cr1_cmd.send_csr_command(ccdid=my_ccdid[0], nonce=my_nonce[3])
         self.assert_valid_ccdid(response.ccdid)
         my_ccdid[3] = response.ccdid
         my_csr[3] = self.assert_valid_csr(response, my_nonce[3])
         my_client_cert[3] = self.gen_cert_with_key(root, public_key=my_csr[3].public_key())
 
         self.step(17)
-        await cr2_cmd.send_provision_client_command(ccdid=my_ccdid[0], certificate=my_client_cert[3])
+        await cr1_cmd.send_provision_client_command(ccdid=my_ccdid[0], certificate=my_client_cert[3])
 
         self.step(18)
         found_certs = await cr1_cmd.send_find_client_command_as_map()

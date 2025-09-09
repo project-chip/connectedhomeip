@@ -613,7 +613,8 @@ CHIP_ERROR CertificateTableImpl::GetRootCertificateCount(FabricIndex fabric, uin
 }
 
 CHIP_ERROR CertificateTableImpl::PrepareClientCertificate(FabricIndex fabric, const ByteSpan & nonce, ClientBuffer & buffer,
-                                                          TLSCCDID & id, MutableByteSpan & csr, MutableByteSpan & nonceSignature)
+                                                          Optional<TLSCCDID> & id, MutableByteSpan & csr,
+                                                          MutableByteSpan & nonceSignature)
 {
     VerifyOrReturnError(IsInitialized(), CHIP_ERROR_INTERNAL);
 
@@ -621,7 +622,17 @@ CHIP_ERROR CertificateTableImpl::PrepareClientCertificate(FabricIndex fabric, co
 
     Crypto::P256Keypair keyPair;
 
-    ReturnErrorOnFailure(keyPair.Initialize(Crypto::ECPKeyTarget::ECDSA));
+    if (id.HasValue())
+    {
+        ClientCertWithKey certWithKey;
+        CertificateId localId(id.Value());
+        ReturnErrorOnFailure(mClientCertificates.GetTableEntry(fabric, localId, certWithKey, buffer));
+        ReturnErrorOnFailure(keyPair.Deserialize(certWithKey.key));
+    }
+    else
+    {
+        ReturnErrorOnFailure(keyPair.Initialize(Crypto::ECPKeyTarget::ECDSA));
+    }
 
     size_t csrLen = csr.size();
     ReturnErrorOnFailure(keyPair.NewCertificateSigningRequest(csr.data(), csrLen));
@@ -631,6 +642,11 @@ CHIP_ERROR CertificateTableImpl::PrepareClientCertificate(FabricIndex fabric, co
     ReturnErrorOnFailure(keyPair.ECDSA_sign_msg(nonce.data(), nonce.size(), signatureBuffer));
     ReturnErrorOnFailure(CopySpanToMutableSpan(signatureBuffer.Span(), nonceSignature));
 
+    if (id.HasValue())
+    {
+        return CHIP_NO_ERROR;
+    }
+
     // Find a usable ID
     GlobalCertificateData globalData(mEndpointId);
     ReturnErrorOnFailure(globalData.Load(mStorage));
@@ -639,13 +655,13 @@ CHIP_ERROR CertificateTableImpl::PrepareClientCertificate(FabricIndex fabric, co
     TLSCCDID localId = 0;
     ReturnErrorOnFailure(globalData.GetNextClientCertificateId(fabric, localId));
     ReturnErrorOnFailure(globalData.Save(mStorage));
-    id = localId;
+    id.SetValue(localId);
 
     ClientCertWithKey certWithKey;
     certWithKey.detail.ccdid = localId;
     certWithKey.detail.clientCertificate.SetValue(Nullable<ByteSpan>());
 
-    keyPair.Serialize(certWithKey.key);
+    ReturnErrorOnFailure(keyPair.Serialize(certWithKey.key));
     CertificateId certId(localId);
     return mClientCertificates.SetTableEntry(fabric, certId, certWithKey, buffer);
 }

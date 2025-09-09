@@ -97,7 +97,9 @@ struct RefEncodableClientCert
             MutableByteSpan targetBytes(certBytes);
             ReturnErrorOnFailure(CopySpanToMutableSpan(src.clientCertificate.Value().Value(), targetBytes));
             certificate->clientCertificate.SetValue(Nullable<ByteSpan>(targetBytes));
-        } else {
+        }
+        else
+        {
             certificate->clientCertificate.SetValue(Nullable<ByteSpan>());
         }
 
@@ -114,7 +116,9 @@ struct RefEncodableClientCert
             }
             ReturnErrorOnFailure(srcIter.GetStatus());
             certificate->intermediateCertificates.SetValue(List<ByteSpan>(intermediateCerts.data(), i));
-        } else {
+        }
+        else
+        {
             certificate->intermediateCertificates.SetValue(List<ByteSpan>());
         }
 
@@ -285,9 +289,14 @@ Status TlsCertificateManagementCommandDelegate::GenerateClientCsr(EndpointId mat
 
     ClientCsrResponseType csrResponse;
     UniquePtr<InlineBufferedClientCert> certBuffer(New<InlineBufferedClientCert>());
-    auto result = mCertificateTable.PrepareClientCertificate(fabric, request.nonce, certBuffer->buffer, csrResponse.ccdid, csr,
-                                                             nonceSignature);
-    VerifyOrReturnValue(result == CHIP_NO_ERROR, Status::Failure);
+    Optional<TLSCCDID> id;
+    if (!request.ccdid.IsNull())
+    {
+        id.SetValue(request.ccdid.Value());
+    }
+    auto result = mCertificateTable.PrepareClientCertificate(fabric, request.nonce, certBuffer->buffer, id, csr, nonceSignature);
+    ReturnValueOnFailure(result, Status::Failure);
+    csrResponse.ccdid          = id.Value();
     csrResponse.csr            = csr;
     csrResponse.nonceSignature = nonceSignature;
     return loadedCallback(csrResponse);
@@ -304,7 +313,7 @@ ClusterStatusCode TlsCertificateManagementCommandDelegate::ProvisionClientCert(E
     details.intermediateCertificates.SetValue(provisionReq.intermediateCertificates);
     details.SetFabricIndex(fabric);
     auto result = mCertificateTable.UpdateClientCertificateEntry(fabric, provisionReq.ccdid, certBuffer->buffer, details);
-    VerifyOrReturnValue(result == CHIP_NO_ERROR, ClusterStatusCode(Status::Failure));
+    ReturnValueOnFailure(result, ClusterStatusCode(Status::Failure));
     return ClusterStatusCode(Status::Success);
 }
 
@@ -381,7 +390,7 @@ TlsCertificateManagementCommandDelegate::LookupClientCertByFingerprint(EndpointI
         while (iterator.Next(certBuffer->mCertWithKey))
         {
             const auto & cert = certBuffer->GetCert();
-            if (!cert.clientCertificate.HasValue())
+            if (cert.clientCertificate.Value().IsNull())
             {
                 continue;
             }

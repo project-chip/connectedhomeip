@@ -95,7 +95,7 @@ public:
     CHIP_ERROR RemoveRootCertificate(FabricIndex fabric, TLSCAID id) override;
     CHIP_ERROR GetRootCertificateCount(FabricIndex fabric, uint8_t & outCount) override;
 
-    CHIP_ERROR PrepareClientCertificate(FabricIndex fabric, const ByteSpan & nonce, ClientBuffer & buffer, TLSCCDID & id,
+    CHIP_ERROR PrepareClientCertificate(FabricIndex fabric, const ByteSpan & nonce, ClientBuffer & buffer, Optional<TLSCCDID> & id,
                                         MutableByteSpan & csr, MutableByteSpan & nonceSignature) override;
     CHIP_ERROR UpdateClientCertificateEntry(FabricIndex fabric_index, TLSCCDID id, ClientBuffer & buffer,
                                             const ClientCertStruct & entry) override;

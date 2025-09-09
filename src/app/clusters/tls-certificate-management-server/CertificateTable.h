@@ -140,12 +140,14 @@ public:
 
       * @param nonce[in] the nonce to be used for creating nonceSignature
       * @param buffer[in] a temporary buffer for temporary serialization, if necessary
-      * @param id[out] the generated ID for the client certificate
+      * @param id[in/out] the pre-existing generated ID for the client certificate if present (in), or a generated ID as an output
+      if not
       * @param csr[out] a DER-encoded certificate signing request using the newly-created key pair
       * @param nonceSignature[out] a nonce signature
       */
-    virtual CHIP_ERROR PrepareClientCertificate(FabricIndex fabric, const ByteSpan & nonce, ClientBuffer & buffer, TLSCCDID & id,
-                                                MutableByteSpan & csr, MutableByteSpan & nonceSignature) = 0;
+    virtual CHIP_ERROR PrepareClientCertificate(FabricIndex fabric, const ByteSpan & nonce, ClientBuffer & buffer,
+                                                Optional<TLSCCDID> & id, MutableByteSpan & csr,
+                                                MutableByteSpan & nonceSignature) = 0;
 
     /**
      * @brief Updates the existing client certificate. If the certificate was created via PrepareClientCertificate but not yet
