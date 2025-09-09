@@ -546,7 +546,8 @@ GstElement * CameraDevice::CreateVideoPipeline(const std::string & device, int w
 }
 
 // Helper function to create a GStreamer pipeline
-GstElement * CameraDevice::CreateAudioPipeline(const std::string & device, int channels, int sampleRate, int bitRate, CameraError & error)
+GstElement * CameraDevice::CreateAudioPipeline(const std::string & device, int channels, int sampleRate, int bitRate,
+                                               CameraError & error)
 {
     // Pipeline: source → capsfilter → audioconvert → audioresample → opusenc → appsink
     GstElement * pipeline = gst_pipeline_new("audio-pipeline");
@@ -843,7 +844,7 @@ CameraError CameraDevice::StartAudioStream(uint16_t streamID)
 
     int channels   = it->audioStreamParams.channelCount;
     int sampleRate = static_cast<int>(it->audioStreamParams.sampleRate);
-    int bitRate = static_cast<int>(it->audioStreamParams.bitRate);
+    int bitRate    = static_cast<int>(it->audioStreamParams.bitRate);
 
     // Create Gstreamer audio pipeline
     CameraError error          = CameraError::SUCCESS;
