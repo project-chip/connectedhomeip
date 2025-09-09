@@ -264,6 +264,7 @@ void CameraApp::InitCameraDeviceClusters()
 {
     // Initialize Cluster Servers
     mWebRTCTransportProviderPtr->Init();
+    mCameraDevice->GetWebRTCProviderController().SetWebRTCTransportProvider(std::move(mWebRTCTransportProviderPtr));
 
     mChimeServerPtr->Init();
 
