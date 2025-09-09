@@ -48,7 +48,7 @@ using namespace Camera;
 namespace {
 
 // Context structure to pass both CameraDevice and videoStreamID to the callback
-struct AppSinkContext
+struct VideoAppSinkContext
 {
     CameraDevice * device;
     uint16_t videoStreamID;
@@ -62,11 +62,11 @@ const int kBallAnimationPattern = 18;
 #endif
 
 // Callback function for GStreamer app sink
-GstFlowReturn OnNewSampleFromAppSink(GstAppSink * appsink, gpointer user_data)
+GstFlowReturn OnNewVideoSampleFromAppSink(GstAppSink * appsink, gpointer user_data)
 {
-    AppSinkContext * context = static_cast<AppSinkContext *>(user_data);
-    CameraDevice * self      = context->device;
-    uint16_t videoStreamID   = context->videoStreamID;
+    VideoAppSinkContext * context = static_cast<VideoAppSinkContext *>(user_data);
+    CameraDevice * self           = context->device;
+    uint16_t videoStreamID        = context->videoStreamID;
 
     GstSample * sample = gst_app_sink_pull_sample(appsink);
     if (sample == nullptr)
@@ -94,9 +94,9 @@ GstFlowReturn OnNewSampleFromAppSink(GstAppSink * appsink, gpointer user_data)
 }
 
 // Cleanup function for the context
-void DestroyAppSinkContext(gpointer user_data)
+void DestroyVideoAppSinkContext(gpointer user_data)
 {
-    AppSinkContext * context = static_cast<AppSinkContext *>(user_data);
+    VideoAppSinkContext * context = static_cast<VideoAppSinkContext *>(user_data);
     delete context;
 }
 
@@ -714,9 +714,9 @@ CameraError CameraDevice::StartVideoStream(const VideoStreamStruct & allocatedSt
     GstElement * appsink = gst_bin_get_by_name(GST_BIN(videoPipeline), "appsink");
     if (appsink)
     {
-        AppSinkContext * context      = new AppSinkContext{ this, streamID };
-        GstAppSinkCallbacks callbacks = { nullptr, nullptr, OnNewSampleFromAppSink };
-        gst_app_sink_set_callbacks(GST_APP_SINK(appsink), &callbacks, context, DestroyAppSinkContext);
+        VideoAppSinkContext * context = new VideoAppSinkContext{ this, streamID };
+        GstAppSinkCallbacks callbacks = { nullptr, nullptr, OnNewVideoSampleFromAppSink };
+        gst_app_sink_set_callbacks(GST_APP_SINK(appsink), &callbacks, context, DestroyVideoAppSinkContext);
         gst_object_unref(appsink);
     }
 
@@ -798,7 +798,7 @@ CameraError CameraDevice::StartAudioStream(uint16_t streamID)
     int channels   = it->audioStreamParams.channelCount;
     int sampleRate = static_cast<int>(it->audioStreamParams.sampleRate);
 
-    // Create Gstreamer video pipeline
+    // Create Gstreamer audio pipeline
     CameraError error          = CameraError::SUCCESS;
     GstElement * audioPipeline = CreateAudioPipeline("/dev/audio0", channels, sampleRate, error);
     if (audioPipeline == nullptr)
