@@ -4,16 +4,16 @@ This example demonstrates Matter Light-Switch application on Ameba platform.
 
 ---
 
-- [CHIP Ameba Light Switch Example](#chip-ameba-light-switch-example)
-  - [Supported Device](#supported-device)
-  - [Building the Example Application](#building-the-example-application)
-  - [Commissioning](#commissioning)
-    - [BLE mode](#ble-mode)
-    - [IP mode](#ip-mode)
-  - [Cluster Control](#cluster-control)
-  - [Running RPC Console](#running-rpc-console)
-  - [Running Matter Shell](#running-matter-shell)
-  - [Binding and Controlling a Lighting Device](#binding-and-controlling-a-lighting-device)
+-   [CHIP Ameba Light Switch Example](#chip-ameba-light-switch-example)
+    -   [Supported Device](#supported-device)
+    -   [Building the Example Application](#building-the-example-application)
+    -   [Commissioning](#commissioning)
+        -   [BLE mode](#ble-mode)
+        -   [IP mode](#ip-mode)
+    -   [Cluster control](#cluster-control)
+    -   [Running RPC Console](#running-rpc-console)
+    -   [Running Matter Shell](#running-matter-shell)
+    -   [Binding and Controlling a Lighting Device](#binding-and-controlling-a-lighting-device)
 
 ---
 

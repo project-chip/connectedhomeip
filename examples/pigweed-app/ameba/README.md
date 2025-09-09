@@ -21,9 +21,9 @@ following features are available:
 
 ---
 
-- [CHIP Ameba Pigweed Example Application](#chip-ameba-pigweed-example-application)
-  - [Building the Example Application](#building-the-example-application)
-  - [Testing the Example Application](#testing-the-example-application)
+-   [CHIP Ameba Pigweed Example Application](#chip-ameba-pigweed-example-application)
+    -   [Building the Example Application](#building-the-example-application)
+    -   [Testing the Example Application](#testing-the-example-application)
 
 ---
 

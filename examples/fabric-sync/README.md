@@ -14,11 +14,10 @@ This doc is tested on **Ubuntu 22.04 LTS (aarch64)**
 
 <hr>
 
-- [Matter Linux Fabric Sync Example](#matter-linux-fabric-sync-example)
-  - [Theory of Operation](#theory-of-operation)
-    - [Dynamic Endpoints](#dynamic-endpoints)
-  - [Building](#building)
-  - [Running the Complete Example on Ubuntu](#running-the-complete-example-on-ubuntu)
+-   [Matter Linux Fabric Sync Example](#matter-linux-fabric-sync-example)
+    -   [Theory of Operation](#theory-of-operation)
+    -   [Building](#building)
+    -   [Running the Complete Example on Ubuntu](#running-the-complete-example-on-ubuntu)
 
 <hr>
 

@@ -5,16 +5,16 @@ control.
 
 ---
 
-- [CHIP Ameba All Clusters Example](#chip-ameba-all-clusters-example)
-  - [Supported Device](#supported-device)
-  - [Building the Example Application](#building-the-example-application)
-  - [Commissioning](#commissioning)
-    - [BLE mode](#ble-mode)
-    - [IP mode](#ip-mode)
-  - [Cluster Control](#cluster-control)
-  - [Running RPC Console](#running-rpc-console)
-  - [Running Matter Shell](#running-matter-shell)
-  - [Binding and Controlling a Device](#binding-and-controlling-a-device)
+-   [CHIP Ameba All Clusters Example](#chip-ameba-all-clusters-example)
+    -   [Supported Device](#supported-device)
+    -   [Building the Example Application](#building-the-example-application)
+    -   [Commissioning](#commissioning)
+        -   [BLE mode](#ble-mode)
+        -   [IP mode](#ip-mode)
+    -   [Cluster control](#cluster-control)
+    -   [Running RPC Console](#running-rpc-console)
+    -   [Running Matter Shell](#running-matter-shell)
+    -   [Binding and Controlling a Device](#binding-and-controlling-a-device)
 
 ---
 
