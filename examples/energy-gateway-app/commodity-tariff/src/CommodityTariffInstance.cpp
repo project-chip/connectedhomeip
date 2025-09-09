@@ -369,31 +369,19 @@ CHIP_ERROR CommodityTariffDelegate::TariffDataUpd_CrossValidator(TariffUpdateCtx
 
 void CommodityTariffDelegate::TariffDataUpd_Finish(bool is_success)
 {
-    AttributeId updatedAttrIds[CommodityTariffConsts::kMaxPrimaryTariffAttrsCount];
+    AttributeId updatedAttrIds[CommodityTariffAttrTypeEnum::kAttrMax];
     size_t updatedCount = 0;
-    // Check each attribute and collect updated ones
-    if (GetTariffUnit_MgmtObj().UpdateFinish(is_success))
-        updatedAttrIds[updatedCount++] = GetTariffUnit_MgmtObj().GetAttrId();
-    if (GetStartDate_MgmtObj().UpdateFinish(is_success))
-        updatedAttrIds[updatedCount++] = GetStartDate_MgmtObj().GetAttrId();
-    if (GetDefaultRandomizationOffset_MgmtObj().UpdateFinish(is_success))
-        updatedAttrIds[updatedCount++] = GetDefaultRandomizationOffset_MgmtObj().GetAttrId();
-    if (GetDefaultRandomizationType_MgmtObj().UpdateFinish(is_success))
-        updatedAttrIds[updatedCount++] = GetDefaultRandomizationType_MgmtObj().GetAttrId();
-    if (GetTariffInfo_MgmtObj().UpdateFinish(is_success))
-        updatedAttrIds[updatedCount++] = GetTariffInfo_MgmtObj().GetAttrId();
-    if (GetDayEntries_MgmtObj().UpdateFinish(is_success))
-        updatedAttrIds[updatedCount++] = GetDayEntries_MgmtObj().GetAttrId();
-    if (GetDayPatterns_MgmtObj().UpdateFinish(is_success))
-        updatedAttrIds[updatedCount++] = GetDayPatterns_MgmtObj().GetAttrId();
-    if (GetTariffComponents_MgmtObj().UpdateFinish(is_success))
-        updatedAttrIds[updatedCount++] = GetTariffComponents_MgmtObj().GetAttrId();
-    if (GetTariffPeriods_MgmtObj().UpdateFinish(is_success))
-        updatedAttrIds[updatedCount++] = GetTariffPeriods_MgmtObj().GetAttrId();
-    if (GetIndividualDays_MgmtObj().UpdateFinish(is_success))
-        updatedAttrIds[updatedCount++] = GetIndividualDays_MgmtObj().GetAttrId();
-    if (GetCalendarPeriods_MgmtObj().UpdateFinish(is_success))
-        updatedAttrIds[updatedCount++] = GetCalendarPeriods_MgmtObj().GetAttrId();
+
+    for (uint8_t iter = 0; iter < CommodityTariffAttrTypeEnum::kAttrMax; iter++)
+    {
+        CommodityTariffAttrTypeEnum attr = static_cast<CommodityTariffAttrTypeEnum>(iter);
+        auto & mgmtObj = GetMgmtObj(attr);
+        if (mgmtObj.UpdateFinish(is_success))
+        {
+            updatedAttrIds[updatedCount++] = mgmtObj.GetAttrId();
+        }
+    }
+
     if (updatedCount > 0)
     {
         ChipLogProgress(NotSpecified, "EGW-CTC: Tariff data applied");
@@ -424,11 +412,11 @@ void CommodityTariffDelegate::TryToactivateDelayedTariff(uint32_t now)
 
 void CommodityTariffDelegate::CleanupTariffData()
 {
-    AttributeId updatedAttrIds[CommodityTariffConsts::kMaxPrimaryTariffAttrsCount];
+    AttributeId updatedAttrIds[CommodityTariffAttrTypeEnum::kAttrMax];
     size_t updatedCount = 0;
 
     // Check each attribute and collect updated ones
-    if (GetTariffUnit_MgmtObj().Cleanup())
+    if (GetMgmtObj(CommodityTariffAttrTypeEnum::kTariffUnit).Cleanup())
         updatedAttrIds[updatedCount++] = GetTariffUnit_MgmtObj().GetAttrId();
     if (GetStartDate_MgmtObj().Cleanup())
         updatedAttrIds[updatedCount++] = GetStartDate_MgmtObj().GetAttrId();

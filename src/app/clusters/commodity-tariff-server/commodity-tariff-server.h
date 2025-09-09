@@ -113,6 +113,56 @@ public:
     IndividualDaysDataClass & GetIndividualDays_MgmtObj() { return mIndividualDays_MgmtObj; }
     CalendarPeriodsDataClass & GetCalendarPeriods_MgmtObj() { return mCalendarPeriods_MgmtObj; }
 
+    enum CommodityTariffAttrTypeEnum {
+        kTariffUnit,
+        kStartDate,
+        kDefaultRandomizationOffset,
+        kDefaultRandomizationType,
+        kTariffInfo,
+        kDayEntries,
+        kDayPatterns,
+        kTariffComponents,
+        kTariffPeriods,
+        kIndividualDays,
+        kCalendarPeriods,
+        kAttrMax
+    };
+
+    /**
+     * @brief Get the management object for a given attribute type enum
+     * @param aType The attribute type enum to retrieve
+     * @return Reference to the corresponding management object
+     */
+    CommodityTariffAttrsDataMgmt::CTC_BaseDataClassBase & GetMgmtObj(CommodityTariffAttrTypeEnum aType)
+    {
+        switch (aType) {
+        case CommodityTariffAttrTypeEnum::kTariffUnit:
+            return mTariffUnit_MgmtObj;
+        case CommodityTariffAttrTypeEnum::kStartDate:
+            return mStartDate_MgmtObj;
+        case CommodityTariffAttrTypeEnum::kDefaultRandomizationOffset:
+            return mDefaultRandomizationOffset_MgmtObj;
+        case CommodityTariffAttrTypeEnum::kDefaultRandomizationType:
+            return mDefaultRandomizationType_MgmtObj;
+        case CommodityTariffAttrTypeEnum::kTariffInfo:
+            return mTariffInfo_MgmtObj;
+        case CommodityTariffAttrTypeEnum::kDayEntries:
+            return mDayEntries_MgmtObj;
+        case CommodityTariffAttrTypeEnum::kDayPatterns:
+            return mDayPatterns_MgmtObj;
+        case CommodityTariffAttrTypeEnum::kTariffComponents:
+            return mTariffComponents_MgmtObj;
+        case CommodityTariffAttrTypeEnum::kTariffPeriods:
+            return mTariffPeriods_MgmtObj;
+        case CommodityTariffAttrTypeEnum::kIndividualDays:
+            return mIndividualDays_MgmtObj;
+        case CommodityTariffAttrTypeEnum::kCalendarPeriods:
+            return mCalendarPeriods_MgmtObj;
+        default:
+            VerifyOrDieWithMsg(false, AppServer, "Unknown management attribute type");
+            return mTariffUnit_MgmtObj; // return something to satisfy compiler
+        }
+    }
 private:
     // Primary attribute storage and management
     TariffUnitDataClass mTariffUnit_MgmtObj{};

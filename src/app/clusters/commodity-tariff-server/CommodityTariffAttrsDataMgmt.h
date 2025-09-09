@@ -480,8 +480,24 @@ using ExtractNestedType_t = typename ExtractNestedType<U>::type;
  * @note UpdateFinish() must always be called to complete the update process,
  *       even if validation fails or the update is aborted.
  */
+class CTC_BaseDataClassBase
+{
+public:
+    virtual ~CTC_BaseDataClassBase() = default;
+    
+    // Common interface that doesn't depend on template parameter
+    virtual bool IsValid() const = 0;
+    virtual bool HasValue() const = 0;
+    virtual bool HasNewValue() const = 0;
+    virtual CHIP_ERROR MarkAsAssigned() = 0;
+    virtual CHIP_ERROR UpdateBegin(void * aUpdCtx) = 0;
+    virtual bool UpdateFinish(bool aUpdateAllow) = 0;
+    virtual bool Cleanup() = 0;
+    virtual AttributeId GetAttrId() const = 0;
+};
+
 template <typename T>
-class CTC_BaseDataClass
+class CTC_BaseDataClass : public CTC_BaseDataClassBase
 {
     /// @brief Internal storage states
     enum class StorageState : uint8_t
@@ -562,19 +578,19 @@ public:
      * @brief Check if current update is validated
      * @return true if in kValidated state, false otherwise
      */
-    bool IsValid() const { return (mUpdateState.load() == UpdateState::kValidated); }
+    bool IsValid() const override { return (mUpdateState.load() == UpdateState::kValidated); }
 
     /**
      * @brief Check if active storage contains valid data
      * @return true if storage is in kHold state, false otherwise
      */
-    bool HasValue() const { return (mHoldState[mActiveValueIdx.load()] == StorageState::kHold); }
+    bool HasValue() const override { return (mHoldState[mActiveValueIdx.load()] == StorageState::kHold); }
 
     /**
      * @brief Check if new value storage contains valid data
      * @return true if new storage is in kHold state, false otherwise
      */
-    bool HasNewValue() const { return (mHoldState[1 - mActiveValueIdx.load()] == StorageState::kHold); }
+    bool HasNewValue() const override { return (mHoldState[1 - mActiveValueIdx.load()] == StorageState::kHold); }
 
     /**
      * @brief Prepares a new list value for modification
@@ -784,7 +800,7 @@ public:
      *
      * @post Transitions state to kAssigned if successful
      */
-    CHIP_ERROR MarkAsAssigned()
+    CHIP_ERROR MarkAsAssigned() override
     {
         if (mUpdateState.load() != UpdateState::kInitialized)
         {
@@ -805,7 +821,7 @@ public:
      * @post On success, transitions state to kValidated
      * @note If aUpdCtx is nullptr, skips context validation
      */
-    CHIP_ERROR UpdateBegin(void * aUpdCtx)
+    CHIP_ERROR UpdateBegin(void * aUpdCtx) override
     {
         /* Skip if the attribute object has no new attached data */
         if (mUpdateState.load() == UpdateState::kIdle)
@@ -846,7 +862,7 @@ public:
      * @post Always transitions state to kIdle
      * @note Performs cleanup of unused storage
      */
-    bool UpdateFinish(bool aUpdateAllow)
+    bool UpdateFinish(bool aUpdateAllow) override
     {
         bool ret = false;
         /* Skip if the attribute object has no new attached data */
@@ -873,7 +889,7 @@ public:
      * @brief Full cleanup of all value storage
      * @return true if active value was changed, false otherwise
      */
-    bool Cleanup()
+    bool Cleanup() override
     {
         bool ret = false;
         if (HasValue())
@@ -897,7 +913,7 @@ public:
      * @brief Gets the attribute ID
      * @return The attribute ID this instance manages
      */
-    AttributeId GetAttrId() { return mAttrId; }
+    AttributeId GetAttrId() const override { return mAttrId; }
 
 private:
     /**
