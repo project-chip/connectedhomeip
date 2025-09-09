@@ -91,6 +91,49 @@ void CommodityTariffInstance::Shutdown()
     Instance::Shutdown();
 }
 
+void CommodityTariffDelegate::TariffDataUpdate(uint32_t aNowTimestamp)
+{
+    TariffUpdateCtx UpdCtx = { .blockMode             = static_cast<BlockModeEnum>(0),
+                               .TariffStartTimestamp  = GetStartDate_MgmtObj().GetNewValue(),
+                               .mFeature              = mFeature,
+                               .TariffUpdateTimestamp = aNowTimestamp };
+    bool is_success        = false;
+    if (CHIP_NO_ERROR != TariffDataUpd_Init(UpdCtx))
+    {
+        ChipLogError(AppServer, "EGW-CTC: New tariff data rejected due to internal inconsistencies");
+    }
+    else if (CHIP_NO_ERROR != TariffDataUpd_CrossValidator(UpdCtx))
+    {
+        ChipLogError(AppServer, "EGW-CTC: New tariff data rejected due to some cross-fields inconsistencies");
+    }
+    else
+    {
+        if (!UpdCtx.TariffStartTimestamp.IsNull() && (UpdCtx.TariffStartTimestamp.Value() > UpdCtx.TariffUpdateTimestamp))
+        {
+            DelayedTariffUpdateIsActive = true;
+            return;
+        }
+    }
+    TariffDataUpd_Finish(is_success);
+}
+
+CHIP_ERROR CommodityTariffDelegate::TariffDataUpd_Init(TariffUpdateCtx & UpdCtx)
+{
+    ReturnErrorOnFailure(GetTariffUnit_MgmtObj().UpdateBegin(&UpdCtx));
+    ReturnErrorOnFailure(GetStartDate_MgmtObj().UpdateBegin(&UpdCtx));
+    ReturnErrorOnFailure(GetDefaultRandomizationOffset_MgmtObj().UpdateBegin(&UpdCtx));
+    ReturnErrorOnFailure(GetDefaultRandomizationType_MgmtObj().UpdateBegin(&UpdCtx));
+    ReturnErrorOnFailure(GetTariffInfo_MgmtObj().UpdateBegin(&UpdCtx));
+    ReturnErrorOnFailure(GetDayEntries_MgmtObj().UpdateBegin(&UpdCtx));
+    ReturnErrorOnFailure(GetDayPatterns_MgmtObj().UpdateBegin(&UpdCtx));
+    ReturnErrorOnFailure(GetTariffComponents_MgmtObj().UpdateBegin(&UpdCtx));
+    ReturnErrorOnFailure(GetTariffPeriods_MgmtObj().UpdateBegin(&UpdCtx));
+    ReturnErrorOnFailure(GetIndividualDays_MgmtObj().UpdateBegin(&UpdCtx));
+    ReturnErrorOnFailure(GetCalendarPeriods_MgmtObj().UpdateBegin(&UpdCtx));
+
+    return CHIP_NO_ERROR;
+}
+
 CHIP_ERROR CommodityTariffDelegate::TariffDataUpd_CrossValidator(TariffUpdateCtx & UpdCtx)
 {
     bool DayEntriesData_is_available = false;
@@ -322,6 +365,96 @@ CHIP_ERROR CommodityTariffDelegate::TariffDataUpd_CrossValidator(TariffUpdateCtx
     }
 
     return CHIP_NO_ERROR;
+}
+
+void CommodityTariffDelegate::TariffDataUpd_Finish(bool is_success)
+{
+    AttributeId updatedAttrIds[CommodityTariffConsts::kMaxPrimaryTariffAttrsCount];
+    size_t updatedCount = 0;
+    // Check each attribute and collect updated ones
+    if (GetTariffUnit_MgmtObj().UpdateFinish(is_success))
+        updatedAttrIds[updatedCount++] = GetTariffUnit_MgmtObj().GetAttrId();
+    if (GetStartDate_MgmtObj().UpdateFinish(is_success))
+        updatedAttrIds[updatedCount++] = GetStartDate_MgmtObj().GetAttrId();
+    if (GetDefaultRandomizationOffset_MgmtObj().UpdateFinish(is_success))
+        updatedAttrIds[updatedCount++] = GetDefaultRandomizationOffset_MgmtObj().GetAttrId();
+    if (GetDefaultRandomizationType_MgmtObj().UpdateFinish(is_success))
+        updatedAttrIds[updatedCount++] = GetDefaultRandomizationType_MgmtObj().GetAttrId();
+    if (GetTariffInfo_MgmtObj().UpdateFinish(is_success))
+        updatedAttrIds[updatedCount++] = GetTariffInfo_MgmtObj().GetAttrId();
+    if (GetDayEntries_MgmtObj().UpdateFinish(is_success))
+        updatedAttrIds[updatedCount++] = GetDayEntries_MgmtObj().GetAttrId();
+    if (GetDayPatterns_MgmtObj().UpdateFinish(is_success))
+        updatedAttrIds[updatedCount++] = GetDayPatterns_MgmtObj().GetAttrId();
+    if (GetTariffComponents_MgmtObj().UpdateFinish(is_success))
+        updatedAttrIds[updatedCount++] = GetTariffComponents_MgmtObj().GetAttrId();
+    if (GetTariffPeriods_MgmtObj().UpdateFinish(is_success))
+        updatedAttrIds[updatedCount++] = GetTariffPeriods_MgmtObj().GetAttrId();
+    if (GetIndividualDays_MgmtObj().UpdateFinish(is_success))
+        updatedAttrIds[updatedCount++] = GetIndividualDays_MgmtObj().GetAttrId();
+    if (GetCalendarPeriods_MgmtObj().UpdateFinish(is_success))
+        updatedAttrIds[updatedCount++] = GetCalendarPeriods_MgmtObj().GetAttrId();
+    if (updatedCount > 0)
+    {
+        ChipLogProgress(NotSpecified, "EGW-CTC: Tariff data applied");
+        if (mTariffDataUpdatedCb != nullptr)
+        {
+            mTariffDataUpdatedCb(false, updatedAttrIds, updatedCount);
+        }
+    }
+    else
+    {
+        ChipLogProgress(NotSpecified, "EGW-CTC: Tariff data does not change");
+    }
+}
+
+void CommodityTariffDelegate::TryToactivateDelayedTariff(uint32_t now)
+{
+    if (!DelayedTariffUpdateIsActive)
+    {
+        return;
+    }
+
+    if (now >= GetStartDate_MgmtObj().GetNewValue().Value())
+    {
+        TariffDataUpd_Finish(true);
+        DelayedTariffUpdateIsActive = false;
+    }
+}
+
+void CommodityTariffDelegate::CleanupTariffData()
+{
+    AttributeId updatedAttrIds[CommodityTariffConsts::kMaxPrimaryTariffAttrsCount];
+    size_t updatedCount = 0;
+
+    // Check each attribute and collect updated ones
+    if (GetTariffUnit_MgmtObj().Cleanup())
+        updatedAttrIds[updatedCount++] = GetTariffUnit_MgmtObj().GetAttrId();
+    if (GetStartDate_MgmtObj().Cleanup())
+        updatedAttrIds[updatedCount++] = GetStartDate_MgmtObj().GetAttrId();
+    if (GetDefaultRandomizationOffset_MgmtObj().Cleanup())
+        updatedAttrIds[updatedCount++] = GetDefaultRandomizationOffset_MgmtObj().GetAttrId();
+    if (GetDefaultRandomizationType_MgmtObj().Cleanup())
+        updatedAttrIds[updatedCount++] = GetDefaultRandomizationType_MgmtObj().GetAttrId();
+    if (GetTariffInfo_MgmtObj().Cleanup())
+        updatedAttrIds[updatedCount++] = GetTariffInfo_MgmtObj().GetAttrId();
+    if (GetDayEntries_MgmtObj().Cleanup())
+        updatedAttrIds[updatedCount++] = GetDayEntries_MgmtObj().GetAttrId();
+    if (GetDayPatterns_MgmtObj().Cleanup())
+        updatedAttrIds[updatedCount++] = GetDayPatterns_MgmtObj().GetAttrId();
+    if (GetTariffComponents_MgmtObj().Cleanup())
+        updatedAttrIds[updatedCount++] = GetTariffComponents_MgmtObj().GetAttrId();
+    if (GetTariffPeriods_MgmtObj().Cleanup())
+        updatedAttrIds[updatedCount++] = GetTariffPeriods_MgmtObj().GetAttrId();
+    if (GetIndividualDays_MgmtObj().Cleanup())
+        updatedAttrIds[updatedCount++] = GetIndividualDays_MgmtObj().GetAttrId();
+    if (GetCalendarPeriods_MgmtObj().Cleanup())
+        updatedAttrIds[updatedCount++] = GetCalendarPeriods_MgmtObj().GetAttrId();
+
+    if (mTariffDataUpdatedCb != nullptr && updatedCount > 0)
+    {
+        mTariffDataUpdatedCb(true, updatedAttrIds, updatedCount);
+    }
 }
 
 CHIP_ERROR CommodityTariffInstance::AppInit()

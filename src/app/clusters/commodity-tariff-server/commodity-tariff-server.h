@@ -69,56 +69,6 @@ public:
 
     void SetTariffUpdCb(std::function<void(bool, const AttributeId *, size_t)> cb) { mTariffDataUpdatedCb = cb; }
 
-    /**
-     * @brief Process incoming tariff data updates
-     *
-     * This method implements a three-phase update process:
-     * 1. Initial validation (TariffDataUpd_Init)
-     * 2. Cross-field validation (TariffDataUpd_CrossValidator)
-     * 3. Commit or abort (TariffDataUpd_Commit/Abort)
-     */
-    void TariffDataUpdate(uint32_t aNowTimestamp)
-    {
-        TariffUpdateCtx UpdCtx = { .blockMode             = static_cast<BlockModeEnum>(0),
-                                   .TariffStartTimestamp  = GetStartDate_MgmtObj().GetNewValue(),
-                                   .mFeature              = mFeature,
-                                   .TariffUpdateTimestamp = aNowTimestamp };
-        bool is_success        = false;
-
-        if (!(is_success = TariffDataUpd_Init(UpdCtx)))
-        {
-            ChipLogError(AppServer, "EGW-CTC: New tariff data rejected due to internal inconsistencies");
-        }
-        else if (CHIP_NO_ERROR != TariffDataUpd_CrossValidator(UpdCtx))
-        {
-            ChipLogError(AppServer, "EGW-CTC: New tariff data rejected due to some cross-fields inconsistencies");
-        }
-        else
-        {
-            if (!UpdCtx.TariffStartTimestamp.IsNull() && (UpdCtx.TariffStartTimestamp.Value() > UpdCtx.TariffUpdateTimestamp))
-            {
-                DelayedTariffUpdateIsActive = true;
-                return;
-            }
-        }
-
-        TariffDataUpd_Finish(is_success);
-    }
-
-    void TryToactivateDelayedTariff(uint32_t now)
-    {
-        if (!DelayedTariffUpdateIsActive)
-        {
-            return;
-        }
-
-        if (now >= GetStartDate_MgmtObj().GetNewValue().Value())
-        {
-            TariffDataUpd_Finish(true);
-            DelayedTariffUpdateIsActive = false;
-        }
-    }
-
     // Attribute accessors - manually defined for each attribute
     DataModel::Nullable<Globals::TariffUnitEnum> & GetTariffUnit() { return mTariffUnit_MgmtObj.GetValue(); }
     DataModel::Nullable<uint32_t> & GetStartDate() { return mStartDate_MgmtObj.GetValue(); }
@@ -163,41 +113,6 @@ public:
     IndividualDaysDataClass & GetIndividualDays_MgmtObj() { return mIndividualDays_MgmtObj; }
     CalendarPeriodsDataClass & GetCalendarPeriods_MgmtObj() { return mCalendarPeriods_MgmtObj; }
 
-    void CleanupTariffData()
-    {
-        AttributeId updatedAttrIds[CommodityTariffConsts::kMaxPrimaryTariffAttrsCount];
-        size_t updatedCount = 0;
-
-        // Check each attribute and collect updated ones
-        if (mTariffUnit_MgmtObj.Cleanup())
-            updatedAttrIds[updatedCount++] = mTariffUnit_MgmtObj.GetAttrId();
-        if (mStartDate_MgmtObj.Cleanup())
-            updatedAttrIds[updatedCount++] = mStartDate_MgmtObj.GetAttrId();
-        if (mDefaultRandomizationOffset_MgmtObj.Cleanup())
-            updatedAttrIds[updatedCount++] = mDefaultRandomizationOffset_MgmtObj.GetAttrId();
-        if (mDefaultRandomizationType_MgmtObj.Cleanup())
-            updatedAttrIds[updatedCount++] = mDefaultRandomizationType_MgmtObj.GetAttrId();
-        if (mTariffInfo_MgmtObj.Cleanup())
-            updatedAttrIds[updatedCount++] = mTariffInfo_MgmtObj.GetAttrId();
-        if (mDayEntries_MgmtObj.Cleanup())
-            updatedAttrIds[updatedCount++] = mDayEntries_MgmtObj.GetAttrId();
-        if (mDayPatterns_MgmtObj.Cleanup())
-            updatedAttrIds[updatedCount++] = mDayPatterns_MgmtObj.GetAttrId();
-        if (mTariffComponents_MgmtObj.Cleanup())
-            updatedAttrIds[updatedCount++] = mTariffComponents_MgmtObj.GetAttrId();
-        if (mTariffPeriods_MgmtObj.Cleanup())
-            updatedAttrIds[updatedCount++] = mTariffPeriods_MgmtObj.GetAttrId();
-        if (mIndividualDays_MgmtObj.Cleanup())
-            updatedAttrIds[updatedCount++] = mIndividualDays_MgmtObj.GetAttrId();
-        if (mCalendarPeriods_MgmtObj.Cleanup())
-            updatedAttrIds[updatedCount++] = mCalendarPeriods_MgmtObj.GetAttrId();
-
-        if (mTariffDataUpdatedCb != nullptr && updatedCount > 0)
-        {
-            mTariffDataUpdatedCb(true, updatedAttrIds, updatedCount);
-        }
-    }
-
 private:
     // Primary attribute storage and management
     TariffUnitDataClass mTariffUnit_MgmtObj{};
@@ -211,81 +126,6 @@ private:
     TariffPeriodsDataClass mTariffPeriods_MgmtObj{};
     IndividualDaysDataClass mIndividualDays_MgmtObj{};
     CalendarPeriodsDataClass mCalendarPeriods_MgmtObj{};
-
-    // Primary attrs update pipeline methods
-    bool TariffDataUpd_Init(TariffUpdateCtx & UpdCtx)
-    {
-        if (mTariffUnit_MgmtObj.UpdateBegin(&UpdCtx) != CHIP_NO_ERROR)
-            return false;
-        if (mStartDate_MgmtObj.UpdateBegin(&UpdCtx) != CHIP_NO_ERROR)
-            return false;
-        if (mDefaultRandomizationOffset_MgmtObj.UpdateBegin(&UpdCtx) != CHIP_NO_ERROR)
-            return false;
-        if (mDefaultRandomizationType_MgmtObj.UpdateBegin(&UpdCtx) != CHIP_NO_ERROR)
-            return false;
-        if (mTariffInfo_MgmtObj.UpdateBegin(&UpdCtx) != CHIP_NO_ERROR)
-            return false;
-        if (mDayEntries_MgmtObj.UpdateBegin(&UpdCtx) != CHIP_NO_ERROR)
-            return false;
-        if (mDayPatterns_MgmtObj.UpdateBegin(&UpdCtx) != CHIP_NO_ERROR)
-            return false;
-        if (mTariffComponents_MgmtObj.UpdateBegin(&UpdCtx) != CHIP_NO_ERROR)
-            return false;
-        if (mTariffPeriods_MgmtObj.UpdateBegin(&UpdCtx) != CHIP_NO_ERROR)
-            return false;
-        if (mIndividualDays_MgmtObj.UpdateBegin(&UpdCtx) != CHIP_NO_ERROR)
-            return false;
-        if (mCalendarPeriods_MgmtObj.UpdateBegin(&UpdCtx) != CHIP_NO_ERROR)
-            return false;
-
-        return true;
-    }
-
-    virtual CHIP_ERROR TariffDataUpd_CrossValidator(TariffUpdateCtx & UpdCtx) { return CHIP_NO_ERROR; }
-
-    void TariffDataUpd_Finish(bool is_success)
-    {
-        AttributeId updatedAttrIds[CommodityTariffConsts::kMaxPrimaryTariffAttrsCount];
-        size_t updatedCount = 0;
-
-        // Check each attribute and collect updated ones
-        if (mTariffUnit_MgmtObj.UpdateFinish(is_success))
-            updatedAttrIds[updatedCount++] = mTariffUnit_MgmtObj.GetAttrId();
-        if (mStartDate_MgmtObj.UpdateFinish(is_success))
-            updatedAttrIds[updatedCount++] = mStartDate_MgmtObj.GetAttrId();
-        if (mDefaultRandomizationOffset_MgmtObj.UpdateFinish(is_success))
-            updatedAttrIds[updatedCount++] = mDefaultRandomizationOffset_MgmtObj.GetAttrId();
-        if (mDefaultRandomizationType_MgmtObj.UpdateFinish(is_success))
-            updatedAttrIds[updatedCount++] = mDefaultRandomizationType_MgmtObj.GetAttrId();
-        if (mTariffInfo_MgmtObj.UpdateFinish(is_success))
-            updatedAttrIds[updatedCount++] = mTariffInfo_MgmtObj.GetAttrId();
-        if (mDayEntries_MgmtObj.UpdateFinish(is_success))
-            updatedAttrIds[updatedCount++] = mDayEntries_MgmtObj.GetAttrId();
-        if (mDayPatterns_MgmtObj.UpdateFinish(is_success))
-            updatedAttrIds[updatedCount++] = mDayPatterns_MgmtObj.GetAttrId();
-        if (mTariffComponents_MgmtObj.UpdateFinish(is_success))
-            updatedAttrIds[updatedCount++] = mTariffComponents_MgmtObj.GetAttrId();
-        if (mTariffPeriods_MgmtObj.UpdateFinish(is_success))
-            updatedAttrIds[updatedCount++] = mTariffPeriods_MgmtObj.GetAttrId();
-        if (mIndividualDays_MgmtObj.UpdateFinish(is_success))
-            updatedAttrIds[updatedCount++] = mIndividualDays_MgmtObj.GetAttrId();
-        if (mCalendarPeriods_MgmtObj.UpdateFinish(is_success))
-            updatedAttrIds[updatedCount++] = mCalendarPeriods_MgmtObj.GetAttrId();
-
-        if (updatedCount > 0)
-        {
-            ChipLogProgress(NotSpecified, "EGW-CTC: Tariff data applied");
-            if (mTariffDataUpdatedCb != nullptr)
-            {
-                mTariffDataUpdatedCb(false, updatedAttrIds, updatedCount);
-            }
-        }
-        else
-        {
-            ChipLogProgress(NotSpecified, "EGW-CTC: Tariff data does not change");
-        }
-    }
-
 protected:
     EndpointId mEndpointId = 0; ///< Associated Matter endpoint ID
     BitMask<Feature> mFeature;
