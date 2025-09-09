@@ -344,7 +344,7 @@ void TlsCertificateManagementServer::HandleGenerateClientCsr(HandlerContext & ct
         VerifyOrDieWithMsg(response.ccdid <= kMaxClientCertId, NotSpecified, "Spec requires CCDID to be <= kMaxClientCertId");
         VerifyOrDieWithMsg(response.csr.size() <= 3000, NotSpecified, "Spec requires csr.size() to be <= 3000");
         VerifyOrDieWithMsg(response.nonceSignature.size() <= kMaxSignatureBytes, NotSpecified,
-                           "Spec requires nonceSignature.size() to be < kMaxClientCertId");
+                           "Spec requires nonceSignature.size() to be < kMaxSignatureBytes");
         ctx.mCommandHandler.AddResponse(ctx.mRequestPath, response);
         return Status::Success;
     });
