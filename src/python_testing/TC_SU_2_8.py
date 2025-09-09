@@ -47,7 +47,7 @@ class TC_SU_2_8(MatterBaseTest):
         steps = [
             TestStep(0, "Commissioning, already done.", is_commissioning=True),
             TestStep(1, "Configure DefaultOTAProviders with invalid node ID. DUT tries to send a QueryImage command to TH1/OTA-P.",
-                     "TH1/OTA-P does not respond with QueryImage response command. StateTransition goes from idle to querying, then a download error happends and finally it goes back to idle."),
+                     "TH1/OTA-P does not respond with QueryImage response command. StateTransition goes from idle to querying, then a download error happens and finally it goes back to idle."),
             TestStep(2, "DUT sends QueryImage command to TH2/OTA-P.",
                      "Subscribe to events for OtaSoftwareUpdateRequestor cluster and verify StateTransition reaches downloading state. Also check if the targetSoftwareVersion is 2."),
         ]
