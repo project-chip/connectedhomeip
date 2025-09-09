@@ -30,8 +30,8 @@ using namespace chip::app::Clusters::LocalizationConfiguration;
 using namespace chip::app::Clusters::LocalizationConfiguration::Attributes;
 using chip::Protocols::InteractionModel::Status;
 
-// for fixed endpoint, this file is ever only included IF software diagnostics is enabled and that MUST happen only on endpoint 0
-// the static assert is skipped in case of dynamic endpoints.
+// for fixed endpoint, this file is ever only included IF localization configuration is enabled and that MUST happen only on
+// endpoint 0 the static assert is skipped in case of dynamic endpoints.
 static_assert((LocalizationConfiguration::StaticApplicationConfig::kFixedClusterConfig.size() == 1 &&
                LocalizationConfiguration::StaticApplicationConfig::kFixedClusterConfig[0].endpointNumber == kRootEndpointId) ||
               LocalizationConfiguration::StaticApplicationConfig::kFixedClusterConfig.size() == 0);
@@ -65,13 +65,15 @@ void emberAfLocalizationConfigurationClusterServerInitCallback(EndpointId endpoi
                      err.Format());
     }
 
-    char tempBuf[Attributes::ActiveLocale::TypeInfo::MaxLength()];
-    MutableCharSpan validLocale(tempBuf);
-
-    // If the active locale is not supported, set the first supported locale.
-    if (!gServer.Cluster().GetLogic().IsSupportedLocale(activeLocale, validLocale))
+    // If the active locale is not supported, set the default supported locale.
+    if (!gServer.Cluster().GetLogic().IsSupportedLocale(activeLocale))
     {
-        gServer.Cluster().GetLogic().SetActiveLocale(validLocale);
+        char tempBuf[Attributes::ActiveLocale::TypeInfo::MaxLength()];
+        MutableCharSpan validLocale(tempBuf);
+        if (DeviceLayer::GetDeviceInfoProvider()->GetDefaultLocale(validLocale))
+        {
+            gServer.Cluster().GetLogic().SetActiveLocale(validLocale);
+        }
     }
 }
 

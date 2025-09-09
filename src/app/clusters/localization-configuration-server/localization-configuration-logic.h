@@ -62,13 +62,10 @@ public:
     /*
      * Check if a locale is supported.
      *
-     * For backward compatibility, if the locale is not a supported locale, the validLocale will have the first supported locale.
-     *
      * @param newLangTag The locale to check.
-     * @param validLocale The valid locale if the newLangTag is supported.
      * @return true if the locale is supported, false otherwise.
      */
-    bool IsSupportedLocale(CharSpan newLangTag, MutableCharSpan & validLocale);
+    bool IsSupportedLocale(CharSpan newLangTag);
 
 private:
     Storage::String<35> mActiveLocale;
