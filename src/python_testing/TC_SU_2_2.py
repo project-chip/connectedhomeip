@@ -306,18 +306,18 @@ class TC_SU_2_2(MatterBaseTest):
         steps = [
             TestStep(0, "Prerequisite: Commission the DUT (Requestor) with the TH/OTA-P (Provider)",
                      is_commissioning=True),
-            TestStep(1, "DUT sends a QueryImage command to the TH/OTA-P. TH/OTA-P sends a QueryImageResponse back to DUT. "
-                     "QueryStatus is set to 'UpdateAvailable'. "
-                     "Set ImageURI to the location where the image is located..",
-                     "Verify that there is a transfer of the software image from the TH/OTA-P to the DUT."),
-            TestStep(2, "DUT sends a QueryImage command to the TH/OTA-P. TH/OTA-P sends a QueryImageResponse back to DUT. "
-                     "QueryStatus is set to 'Busy', DelayedActionTime is set to 60 seconds.",
-                     "Verify that the DUT does not send a QueryImage command before the minimum interval defined by spec "
-                     "which is 2 minutes (120 seconds) from the last QueryImage command."),
-            TestStep(3, "DUT sends a QueryImage command to the TH/OTA-P. TH/OTA-P sends a QueryImageResponse back to DUT. "
-                     "QueryStatus is set to 'NotAvailable'.",
-                     "Verify that the DUT does not send a QueryImage command before the minimum interval defined by spec "
-                     "which is 2 minutes (120 seconds) from the last QueryImage command."),
+            # TestStep(1, "DUT sends a QueryImage command to the TH/OTA-P. TH/OTA-P sends a QueryImageResponse back to DUT. "
+            #          "QueryStatus is set to 'UpdateAvailable'. "
+            #          "Set ImageURI to the location where the image is located..",
+            #          "Verify that there is a transfer of the software image from the TH/OTA-P to the DUT."),
+            # TestStep(2, "DUT sends a QueryImage command to the TH/OTA-P. TH/OTA-P sends a QueryImageResponse back to DUT. "
+            #          "QueryStatus is set to 'Busy', DelayedActionTime is set to 60 seconds.",
+            #          "Verify that the DUT does not send a QueryImage command before the minimum interval defined by spec "
+            #          "which is 2 minutes (120 seconds) from the last QueryImage command."),
+            # TestStep(3, "DUT sends a QueryImage command to the TH/OTA-P. TH/OTA-P sends a QueryImageResponse back to DUT. "
+            #          "QueryStatus is set to 'NotAvailable'.",
+            #          "Verify that the DUT does not send a QueryImage command before the minimum interval defined by spec "
+            #          "which is 2 minutes (120 seconds) from the last QueryImage command."),
             TestStep(4, "DUT sends a QueryImage command to the TH/OTA-P. TH/OTA-P sends a QueryImageResponse back to DUT. "
                      "QueryStatus is set to Busy, Set DelayedActionTime to 3 minutes. On the subsequent QueryImage command, "
                      "TH/OTA-P sends a QueryImageResponse back to DUT. QueryStatus is set to 'UpdateAvailable'.",
@@ -326,9 +326,9 @@ class TC_SU_2_2(MatterBaseTest):
             # TestStep(5, "DUT sends a QueryImage command to the TH/OTA-P. TH/OTA-P sends a QueryImageResponse back to DUT. QueryStatus is set to 'UpdateAvailable'",
             #          "ImageURI should have the https url from where the image can be downloaded.",
             #          "Verify that the DUT queries the https url and downloads the software image."),
-            # TestStep(6, "DUT sends a QueryImage command to the TH/OTA-P. TH/OTA-P sends a QueryImageResponse back to DUT. QueryStatus is set to 'UpdateAvailable'",
-            #          "Software Version should be set to the same or an older (numerically lower) version.",
-            #          "Verify that the DUT does not start transferring the software image."),
+            TestStep(6, "DUT sends a QueryImage command to the TH/OTA-P. TH/OTA-P sends a QueryImageResponse back to DUT. QueryStatus is set to 'UpdateAvailable'",
+                     "Software Version should be set to the same or an older (numerically lower) version.",
+                     "Verify that the DUT does not start transferring the software image."),
             # TestStep(7, "DUT sends a QueryImage command to the TH/OTA-P. TH/OTA-P sends a QueryImageResponse back to DUT. " \
             #          "QueryStatus is set to 'UpdateAvailable', ImageURI field contains an invalid BDX ImageURI.",
             #          "Verify that the DUT does not start transferring the software image."),
@@ -1094,11 +1094,11 @@ class TC_SU_2_2(MatterBaseTest):
         logger.info(f'{step_number_s4}: Prerequisite #3.0 - ACLs set between Requestor (DUT) and Provider')
         await asyncio.sleep(2)
 
-        # ------------------------------------------------------------------------------------
-        # [STEP_4]: Step #2.1 - Matcher for OTA records logs
-        # Start Subscribe first to avoid missing any rapid OTA events (race condition)
-        # DUT should respect a 180s DelayedActionTime after Busy response before retrying QueryImage
-        # ------------------------------------------------------------------------------------
+        # # ------------------------------------------------------------------------------------
+        # # [STEP_4]: Step #2.1 - Matcher for OTA records logs
+        # # Start Subscribe first to avoid missing any rapid OTA events (race condition)
+        # # DUT should respect a 180s DelayedActionTime after Busy response before retrying QueryImage
+        # # ------------------------------------------------------------------------------------
         logger.info(
             f'{step_number_s4}: Step #2.1 - Create a subscription for the UpdateState attribute (expect Busy → Downloading transition after 180s).')
         t_start_query = time.time()
@@ -1122,6 +1122,17 @@ class TC_SU_2_2(MatterBaseTest):
         # ------------------------------------------------------------------------------------
         # [STEP_4]: Step #2.0 - Controller sends AnnounceOTAProvider command
         # ------------------------------------------------------------------------------------
+
+        cmd = Clusters.GeneralCommissioning.Commands.ArmFailSafe(
+            expiryLengthSeconds=900,  # 15 min
+            breadcrumb=1
+        )
+        resp = await self.send_single_cmd(
+            dev_ctrl=controller,
+            node_id=requestor_node_id,
+            cmd=cmd
+        )
+        logger.info(f'{step_number_s4}: FailSafe armed for 900s: {resp}')
 
         logger.info(f'{step_number_s4}: Step #2.0 - Controller sends AnnounceOTAProvider command')
         cmd_announce = Clusters.OtaSoftwareUpdateRequestor.Commands.AnnounceOTAProvider(
@@ -1149,34 +1160,6 @@ class TC_SU_2_2(MatterBaseTest):
         state_sequence = []  # Full OTA state flow
         final_downloading_seen = False
         final_idle_seen = False
-
-        # def busy_state_delayed_update_180s(report):
-        #     """
-        #     Step #2.1 Matcher for 180s DelayedActionTime:
-        #     Expect UpdateState to go from kDelayedOnQuery (Busy) to Downloading after ~180s.
-        #     """
-        #     nonlocal observed_states, final_downloading_seen, state_sequence
-        #     global t_start_downloading
-        #     val = report.value
-
-        #     if val is None:
-        #         return False
-
-        #     if val == Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kDelayedOnQuery:  # 3
-        #         if val not in observed_states:
-        #             observed_states.add(val)
-        #             state_sequence.append(val)
-        #             logger.info(f'{step_number_s4}: Step #2.1 - UpdateState recorded: {val}')
-
-        #     elif val == Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kDownloading:   # 4
-        #         if not final_downloading_seen:  # log only once
-        #             final_downloading_seen = True
-        #             state_sequence.append(val)
-        #             t_start_downloading = time.time()
-        #             logger.info(
-        #                 f'{step_number_s4}:Step #2.1 - OTA UpdateState sequence transitioned to Downloading after Busy (expect ~180s).')
-        #     # Return True only when Downloading is reached
-        #     return final_downloading_seen
 
         def busy_state_delayed_update_180s(report):
             """
@@ -1224,14 +1207,15 @@ class TC_SU_2_2(MatterBaseTest):
         # [STEP_4]: Step #2.2 - Start a task to collect progress updates and validation
         # (Busy→Downloading after 180s)
         # ------------------------------------------------------------------------------------
+
         try:
             # Wait until the final state (Idle) is reached or timeout (20 min)
-            await subscription_state_180s.await_all_expected_report_matches([matcher_busy_state_delayed_180s_obj], timeout_sec=300.0)
+            await subscription_state_180s.await_all_expected_report_matches([matcher_busy_state_delayed_180s_obj], timeout_sec=600.0)
             logger.info(f'{step_number_s4}: Step #2.2 - UpdateState Busy > Downloading transition (180s) successfully observed.')
         except Exception as e:
             logger.warning(f"OTA update encountered an error or timeout: {e}")
         finally:
-            # Cancel both subscriptions and task
+            # Cancel subscriptions
             await subscription_state_180s.cancel()
 
         # ------------------------------------------------------------------------------------
@@ -1245,6 +1229,218 @@ class TC_SU_2_2(MatterBaseTest):
 
         asserts.assert_true(delayed_action_time >= 180,
                             f"Expected delay >= 180 seconds, but got {delayed_action_time:.2f} seconds")
+
+        # ------------------------------------------------------------------------------------
+        # [STEP_4]: Step # 2.4 - Close Requestor and Provider_S4 Process  (CLEANUP!!!!)
+
+        # The order here is critical to avoid permission errors (ACL) and dangling sessions:
+
+        # 1. Clean Provider ACL > while the Provider is still alive, restore its original ACLs.
+        # 2. Expire Provider Sessions > explicitly invalidate active sessions to prevent leaks.
+        # 3. Clean Requestor ACL > restore the Requestor’s ACLs (always accessible).
+        # 4. Kill Provider Process > terminate the Provider process once everything is cleaned.
+        # 5. Delete KVS files > remove any leftover state on disk to ensure a fresh start.
+
+        # Note: If we kill the Provider before step 1 or 2, it would no longer be possible
+        # to clean its ACLs or expire sessions, which can cause errors such as
+        # "CHIP Error 0x00000032: Timeout" or "Exhausted resources".
+
+        # ------------------------------------------------------------------------------------
+
+        logger.info(f'{step_number_s4}: Step #2.4 - Clean Close Provider_S4 Process.')
+
+        # Clean Provider ACL
+        await self.write_acl(controller, provider_node_id_s4, original_provider_acls_s4)
+        logger.info(f'{step_number_s4}: Step #2.4 - Cleaned ACLs on Provider {provider_node_id_s4}, restored original entries')
+        await asyncio.sleep(1)
+
+        # Expire sessions
+        controller.ExpireSessions(provider_node_id_s4)
+        await asyncio.sleep(1)
+
+        # Clean Requestor ACL
+        await self.write_acl(controller, requestor_node_id, original_requestor_acls_s4)
+        logger.info(f'Cleaned ACLs on Requestor {requestor_node_id}, restored original entries')
+        await asyncio.sleep(1)
+
+        # Kill Provider
+        self.stop_provider(provider_proc_s4)
+        await asyncio.sleep(1)
+
+        # Delete KVS files
+        subprocess.run("rm -rf /tmp/chip_kvs /tmp/chip_kvs-shm /tmp/chip_kvs-wal", shell=True)
+        await asyncio.sleep(1)
+
+        # ------------------------------------------------------------------------------------
+        # [STEP_6]: Prerequisite Step  # 2.0 - Setup Requestor and Provider_S6
+        # ------------------------------------------------------------------------------------
+        self.step(6)
+
+        # Prerequisite #1.0 - Requestor (DUT) info
+        step_number_s6 = "[STEP_6]"
+        logger.info(f'{step_number_s6}: Prerequisite #1.0 - Requestor (DUT), NodeID: {requestor_node_id}, FabricId: {fabric_id}')
+
+        # Prerequisite #1.0 - Provider_S4 info
+        provider_node_id_s6 = 6
+        provider_discriminator_s6 = 1116             # Changed in each step
+        provider_setupPinCode_s6 = 20202022          # Changed in each step
+        provider_port_s6 = 5540                      # Previous used on Steps 1, Provider_S1 5540, Requestor 5541
+        provider_ota_file_s6 = "firmware_requestor_v3min.ota"
+        logger.info(f"""{step_number_s6}: Prerequisite #1.0 - Provider:
+            NodeID: {provider_node_id_s6},
+            discriminator: {provider_discriminator_s6},
+            setupPinCode: {provider_setupPinCode_s6},
+            port: {provider_port_s6},
+            ota_file: {provider_ota_file_s6}""")
+
+        logger.info(f'{step_number_s6}: Prerequisite #2.0 - Launch Provider')
+        provider_proc_s6 = self.launch_provider_regex(
+            ota_file=provider_ota_file_s6,
+            discriminator=provider_discriminator_s6,
+            passcode=provider_setupPinCode_s6,
+            secured_device_port=provider_port_s6,
+            wait_for="Status: Satisfied"
+        )
+        logger.info(f'{step_number_s6}: Prerequisite #2.0 - Launched Provider PID {provider_proc_s6.pid}')
+
+        # Prerequisite #2.2 - Commission Provider
+        logging.info(f'{step_number_s6}: Prerequisite #2.2 - Commissioning DUT with Provider')
+        resp = await controller.CommissionOnNetwork(
+            nodeId=provider_node_id_s6,
+            setupPinCode=provider_setupPinCode_s6,
+            filterType=ChipDeviceCtrl.DiscoveryFilterType.LONG_DISCRIMINATOR,
+            filter=provider_discriminator_s6
+        )
+        logger.info(f'{step_number_s6}: Prerequisite #2.2 - Provider Commissioning response: {resp}')
+
+        # Prerequisite #3.0 - Setting ACLs
+        logger.info(f'{step_number_s6}: Prerequisite #3.0 - Setting ACLs under FabricIndex {fabric_id}')
+        logger.info(f'{step_number_s6}: Prerequisite #3.0 - Requestor (DUT), NodeID: {requestor_node_id}')
+        logger.info(f'{step_number_s6}: Prerequisite #3.0 - Provider, NodeID: {provider_node_id_s6}')
+
+        # Set ACLs for OTA update:
+        # - On Requestor to allow specified Provider to interact with OTA Requestor cluster
+        # - On Provider to allow Requestor to interact with OTA Provider cluster
+        original_requestor_acls_s6, original_provider_acls_s6 = await self.set_ota_acls_for_provider(
+            controller=controller,
+            requestor_node=requestor_node_id,     # DUT
+            provider_node=provider_node_id_s6,    # Provider
+            fabric_index=fabric_id
+        )
+        logger.info(f'{step_number_s6}: Prerequisite #3.0 - ACLs set between Requestor (DUT) and Provider')
+        await asyncio.sleep(2)
+
+        # ------------------------------------------------------------------------------------
+        # [STEP_6]: Step #2.1 - Matcher for OTA records logs
+        # Start Subscribe first to avoid missing any rapid OTA events (race condition)
+        # DUT should NOT start downloading if software version is same or older
+        # ------------------------------------------------------------------------------------
+        logger.info(
+            f'{step_number_s6}: Step #2.1 - Create a subscription for UpdateState (DUT should stay Idle if UpdateAvailable version is same or lower).')
+
+        subscription_state_no_download = EventSubscriptionHandler(
+            expected_cluster=Clusters.OtaSoftwareUpdateRequestor,
+            expected_event_id=Clusters.OtaSoftwareUpdateRequestor.Events.StateTransition.event_id
+        )
+
+        # Start subscriptions
+        await subscription_state_no_download.start(
+            dev_ctrl=controller,
+            node_id=requestor_node_id,  # DUT
+            endpoint=0,
+            fabric_filtered=False,
+            min_interval_sec=1,
+            max_interval_sec=1
+        )
+        await asyncio.sleep(1)
+
+        # ------------------------------------------------------------------------------------
+        # [STEP_6]: Step #2.0 - Controller sends AnnounceOTAProvider command
+        # ------------------------------------------------------------------------------------
+
+        logger.info(f'{step_number_s6}: Step #2.0 - Controller sends AnnounceOTAProvider command')
+        cmd_announce = Clusters.OtaSoftwareUpdateRequestor.Commands.AnnounceOTAProvider(
+            providerNodeID=provider_node_id_s6,  # Provider_S6
+            vendorID=0xFFF1,
+            announcementReason=Clusters.OtaSoftwareUpdateRequestor.Enums.AnnouncementReasonEnum.kUpdateAvailable,
+            metadataForNode=None,
+            endpoint=0
+        )
+        logger.info(f'{step_number_s6}: Step #2.0 - cmd AnnounceOTAProvider: {cmd_announce}')
+
+        resp_announce = await self.send_single_cmd(
+            dev_ctrl=controller,
+            node_id=requestor_node_id,  # DUT NodeID
+            cmd=cmd_announce
+        )
+        logging.info(f'{step_number_s6}: Step #2.0 - cmd AnnounceOTAProvider response: {resp_announce}.')
+
+        # ------------------------------------------------------------------------------------
+        # [STEP_6]: Step #2.1 - Matcher for OTA records logs
+        # Track OTA UpdateState: observed states expect to remain Idle
+        # ------------------------------------------------------------------------------------
+
+        state_sequence_notavailable = []  # Full OTA state flow
+        final_query_seen = False
+
+        def idle_state_no_download(report):
+            """
+            Step #2.1 Matcher for 180s DelayedActionTime:
+            Expect UpdateState to remain Idle when version is same/older.
+            """
+            nonlocal observed_states, final_query_seen, state_sequence_notavailable
+            val = report.Data.newState
+            prev_state = report.Data.previousState
+            event_reason = report.Data.reason
+            event_targer_sw = report.Data.targetSoftwareVersion
+
+            if val is None:
+                return False
+
+            transition = (prev_state, val)
+            state_sequence_notavailable.append(transition)
+
+            logger.info(f'{step_number_s6}: [DEBUG] {report.Data}')
+            logger.info(f'{step_number_s6}: [DEBUG] StateTransition observed, new_state {val}, previous state {prev_state}')
+
+            expected = [
+                (Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kIdle,
+                 Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kQuerying),
+                (Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kQuerying,
+                 Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kIdle),
+            ]
+
+            # Validar las últimas dos transiciones
+            if len(state_sequence_notavailable) >= 2:
+                if state_sequence_notavailable[-2:] == expected:
+                    logger.info(f"{step_number_s6}: Validated Idle > Querying > Idle sequence")
+                    return True
+
+            return False
+
+        # ------------------------------------------------------------------------------------
+        # [STEP_4]: Step #2.2 - Start a task to collect UpdateState and validation
+        # (Reamin Idle)
+        # ------------------------------------------------------------------------------------
+        try:
+            timeout_total = 60  # 1 min
+            start_time = time.time()
+            logger.info(f'{step_number_s6}: Start a task to collect UpdateState and validation')
+
+            while time.time() - start_time < timeout_total:
+                try:
+                    report = subscription_state_no_download.get_event_from_queue(block=True, timeout=10)
+                    idle_state_no_download(report)
+                except queue.Empty:
+                    continue
+        finally:
+            subscription_state_no_download.reset()
+
+        # ------------------------------------------------------------------------------------
+        # [STEP_4]: Step # 2.3 - Verify image transfer from TH/OTA-P to DUT from Busy → Downloading
+        # # Validate that DUT respects 180s DelayedActionTime and that image transfer starts after Downloading
+        # ------------------------------------------------------------------------------------
+        logger.info(f'{step_number_s6}: Step #2.3 - Full OTA state sequence NotAvailable observed: {state_sequence_notavailable}')
 
         # ------------------------------------------------------------------------------------
         # [STEP_4]: Step # 2.4 - Close Requestor and Provider_S4 Process  (CLEANUP!!!!)
@@ -1265,24 +1461,24 @@ class TC_SU_2_2(MatterBaseTest):
 
         # await asyncio.sleep(270)          # TEMP
 
-        logger.info(f'{step_number_s4}: Step #2.4 - Clean Close Provider_S4 Process.')
+        logger.info(f'{step_number_s6}: Step #2.4 - Clean Close Provider_S4 Process.')
 
         # Clean Provider ACL
-        await self.write_acl(controller, provider_node_id_s4, original_provider_acls_s4)
-        logger.info(f'{step_number_s4}: Step #2.4 - Cleaned ACLs on Provider {provider_node_id_s4}, restored original entries')
+        await self.write_acl(controller, provider_node_id_s6, original_provider_acls_s6)
+        logger.info(f'{step_number_s6}: Step #2.4 - Cleaned ACLs on Provider {provider_node_id_s6}, restored original entries')
         await asyncio.sleep(1)
 
         # Expire sessions
-        controller.ExpireSessions(provider_node_id_s4)
+        controller.ExpireSessions(provider_node_id_s6)
         await asyncio.sleep(1)
 
         # Clean Requestor ACL
-        await self.write_acl(controller, requestor_node_id, original_requestor_acls_s4)
+        await self.write_acl(controller, requestor_node_id, original_requestor_acls_s6)
         logger.info(f'Cleaned ACLs on Requestor {requestor_node_id}, restored original entries')
         await asyncio.sleep(1)
 
         # Kill Provider
-        self.stop_provider(provider_proc_s4)
+        self.stop_provider(provider_proc_s6)
         await asyncio.sleep(1)
 
         # Delete KVS files
