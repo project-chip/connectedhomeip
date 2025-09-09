@@ -36,7 +36,7 @@
 import datetime
 import random
 import string
-from typing import Optional, Union
+from typing import List, Optional, Union
 
 import test_plan_support
 from cryptography import x509
@@ -62,16 +62,36 @@ from matter.utils import CommissioningBuildingBlocks
 
 
 class TC_TLSCERT(MatterBaseTest):
+    class CertWithKey:
+        def __init__(self, cert: bytes, key: rsa.RSAPrivateKey):
+            self.cert = cert
+            self.key = key
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-    def gen_cert(self, public_key: bytes | None = None) -> bytes:
+    def get_key(self) -> rsa.RSAPrivateKey:
         # Start generating the root certificate
-        root_key = rsa.generate_private_key(
+        return rsa.generate_private_key(
             public_exponent=65537, key_size=2048
         )
+
+    def gen_cert(self, public_key: bytes | None = None) -> bytes:
+        return self.gen_cert_with_key(self.get_key(), public_key)
+
+    def gen_cert_chain(self, root: rsa.RSAPrivateKey, length: int):
+        signer = root
+        result = []
+        for i in range(length):
+            key = self.get_key()
+            cert = self.gen_cert_with_key(signer, key.public_key())
+            result.append(self.CertWithKey(cert, key))
+            signer = key
+        return result
+
+    def gen_cert_with_key(self, signer: rsa.RSAPrivateKey, public_key: bytes | None = None) -> bytes:
         if not public_key:
-            public_key = root_key.public_key()
+            public_key = signer.public_key()
 
         rand_suffix = "".join(
             random.choices(string.ascii_letters + string.digits, k=16)
@@ -114,11 +134,11 @@ class TC_TLSCERT(MatterBaseTest):
             )
             .add_extension(
                 x509.SubjectKeyIdentifier.from_public_key(
-                    root_key.public_key()
+                    signer.public_key()
                 ),
                 critical=False,
             )
-            .sign(root_key, hashes.SHA256())
+            .sign(signer, hashes.SHA256())
         )
         return cert.public_bytes(serialization.Encoding.DER)
 
@@ -230,10 +250,10 @@ class TC_TLSCERT(MatterBaseTest):
                 return e
 
         async def send_provision_client_command(
-                self, certificate: bytes, ccdid: int,
+                self, certificate: bytes, ccdid: int, intermediates: List[bytes] = [],
                 expected_status: Status = Status.Success) -> InteractionModelError:
             try:
-                result = await self.test.send_single_cmd(cmd=Clusters.TlsCertificateManagement.Commands.ProvisionClientCertificate(ccdid=ccdid, clientCertificate=certificate),
+                result = await self.test.send_single_cmd(cmd=Clusters.TlsCertificateManagement.Commands.ProvisionClientCertificate(ccdid=ccdid, clientCertificate=certificate, intermediateCertificates=intermediates),
                                                          endpoint=self.endpoint, dev_ctrl=self.dev_ctrl, node_id=self.node_id, payloadCapability=ChipDeviceCtrl.TransportPayloadCapability.LARGE_PAYLOAD)
 
                 return result
@@ -270,12 +290,29 @@ class TC_TLSCERT(MatterBaseTest):
             cluster = Clusters.TlsCertificateManagement
             return await self.test.read_single_attribute_check_success(endpoint=self.endpoint, dev_ctrl=self.dev_ctrl, node_id=self.node_id, cluster=cluster, attribute=attribute)
 
-        async def read_root_certs_attribute_as_map(self, attribute):
-            attribute_certs = await self.read_tls_cert_attribute(attribute)
+        async def read_root_certs_attribute_as_map(self):
+            attribute_certs = await self.read_tls_cert_attribute(Clusters.TlsCertificateManagement.Attributes.ProvisionedRootCertificates)
             matter_asserts.assert_list(attribute_certs, "Expected list")
             found_certs = dict()
             for cert in attribute_certs:
                 found_certs[cert.caid] = cert
+            return found_certs
+
+        async def read_client_certs_attribute_as_map(self):
+            attribute_certs = await self.read_tls_cert_attribute(Clusters.TlsCertificateManagement.Attributes.ProvisionedClientCertificates)
+            matter_asserts.assert_list(attribute_certs, "Expected list")
+            found_certs = dict()
+            for cert in attribute_certs:
+                found_certs[cert.ccdid] = cert
+            return found_certs
+
+        async def send_find_client_command_as_map(
+                self,
+                expected_status: Status = Status.Success):
+            find_all_response = self.send_find_client_command(expected_status=expected_status)
+            found_certs = dict()
+            for cert in find_all_response.certificateDetails:
+                found_certs[cert.ccdid] = cert.clientCertificate
             return found_certs
 
         async def send_remove_fabric_command(self, fabric_index: int):
@@ -397,7 +434,7 @@ class TC_TLSCERT(MatterBaseTest):
                      "Verify result is a list of TLSCertStruct with one entry. The entry should have CAID equal to myCaid[0] and Certificate equal to myRootCert[1]"),
             TestStep(20, "CR2 sends FindRootCertificate command with null CAID",
                      "Verify result is a list of TLSCertStruct with one entry. The entry should have CAID equal to myCaid[1] and Certificate equal to myRootCert[2]"),
-            TestStep(21, "CR1 sends RemoveRootCertificate command with CAID set to myCaid[0].",
+            TestStep(21, "CR1 sends RemoveRootCertificate command with CAID set to my_caid[0]",
                      test_plan_support.verify_success()),
             TestStep(22, test_plan_support.remove_fabric('CR2', 'CR1'), test_plan_support.verify_success()),
         ]
@@ -419,7 +456,7 @@ class TC_TLSCERT(MatterBaseTest):
         my_caid = [response.caid, None, None]
 
         self.step(4)
-        found_certs = await cr1_cmd.read_root_certs_attribute_as_map(attributes.ProvisionedRootCertificates)
+        found_certs = await cr1_cmd.read_root_certs_attribute_as_map()
         asserts.assert_in(response.caid, found_certs, "ProvisionedRootCertificates should contain provisioned root cert")
         asserts.assert_equal(len(found_certs), 1, "Expected 1 certificate")
         asserts.assert_equal(found_certs[my_caid[0]].certificate, my_root_cert[0], "Expected matching certificate detail")
@@ -427,7 +464,7 @@ class TC_TLSCERT(MatterBaseTest):
         self.step(5)
         # Must close session so we don't re-use large payload session
         self.default_controller.ExpireSessions(self.dut_node_id)
-        found_certs = await cr1_cmd.read_root_certs_attribute_as_map(attributes.ProvisionedRootCertificates)
+        found_certs = await cr1_cmd.read_root_certs_attribute_as_map()
         asserts.assert_in(response.caid, found_certs, "ProvisionedRootCertificates should contain provisioned root cert")
         asserts.assert_equal(len(found_certs), 1, "Expected 1 certificate")
         asserts.assert_is_none(found_certs[my_caid[0]].certificate, "Expected no certificate over non-Large-Transport")
@@ -442,7 +479,7 @@ class TC_TLSCERT(MatterBaseTest):
         self.step(8)
         # Must close session so we don't re-use large payload session
         self.default_controller.ExpireSessions(self.dut_node_id)
-        found_certs = await cr1_cmd.read_root_certs_attribute_as_map(attributes.ProvisionedRootCertificates)
+        found_certs = await cr1_cmd.read_root_certs_attribute_as_map()
         asserts.assert_in(response.caid, found_certs, "ProvisionedRootCertificates should contain provisioned root cert")
         asserts.assert_equal(len(found_certs), 1, "Expected 1 certificate")
         asserts.assert_is_none(found_certs[my_caid[0]].certificate, "Expected no certificate over non-Large-Transport")
@@ -482,13 +519,13 @@ class TC_TLSCERT(MatterBaseTest):
         await cr2_cmd.send_provision_root_command(certificate=my_root_cert[2], caid=my_caid[1], expected_status=Status.AlreadyExists)
 
         self.step(17)
-        found_certs = await cr1_cmd.read_root_certs_attribute_as_map(attributes.ProvisionedRootCertificates)
+        found_certs = await cr1_cmd.read_root_certs_attribute_as_map()
         asserts.assert_in(my_caid[0], found_certs, "ProvisionedRootCertificates should contain provisioned root cert")
         asserts.assert_equal(len(found_certs), 1, "Expected 1 certificate")
         asserts.assert_equal(found_certs[my_caid[0]].certificate, my_root_cert[1], "Expected matching certificate detail")
 
         self.step(18)
-        found_certs = await cr2_cmd.read_root_certs_attribute_as_map(attributes.ProvisionedRootCertificates)
+        found_certs = await cr2_cmd.read_root_certs_attribute_as_map()
         asserts.assert_in(my_caid[1], found_certs, "ProvisionedRootCertificates should contain provisioned root cert")
         asserts.assert_equal(len(found_certs), 1, "Expected 1 certificate")
         asserts.assert_equal(found_certs[my_caid[1]].certificate, my_root_cert[2], "Expected matching certificate detail")
@@ -517,24 +554,47 @@ class TC_TLSCERT(MatterBaseTest):
     def steps_TC_TLSCERT_2_9(self) -> list[TestStep]:
         steps = [
             *self.get_two_fabric_substeps(),
-            TestStep(2, "Create two distinct, valid, self-signed, DER-encoded x509 certificates"),
-            TestStep(3, "Sends the ClientCSR command"),
-            TestStep(7, "Validates the CSR and nonce signature"),
-            TestStep(8, "Sends the ProvisionClientCertificate command to the TlsCertificateManagement cluster",
-                     "Verify that the DUT sends ProvisionClientCertificateResponse."),
-            TestStep(9, "Sends another ProvisionClientCertificate command to the TlsCertificateManagement cluster",
-                     "Verify a new ID is generated."),
-            TestStep(10, "Read ProvisionedClientCertificates to from CR1"),
-            TestStep(11, "Read ProvisionedClientCertificates to from CR2"),
-            TestStep(12, "Read ProvisionedClientCertificates to make sure certificates from step 2 and 3 are present"),
-            TestStep(13, "Sends the FindClientCertificate command specifying a CCDID from step 2",
-                     "Verify the DUT sends FindClientCertificateResponse with both certificates"),
-            TestStep(14, "Sends the FindClientCertificate command specifying a CCDID from step 3",
-                     "Verify the DUT sends FindClientCertificateResponse with both certificates"),
-            TestStep(15, "Sends the FindClientCertificate command specifying null for CCDID",
-                     "Verify the DUT sends FindClientCertificateResponse with both certificates"),
-            TestStep(16, "Sends the RemoveClientCertificate for both certificates added",
-                     "Verify the DUT sends success status"),
+            TestStep(2, "Populate my_nonce[] with 4 distinct, random 32-octet values"),
+            TestStep(3, "CR1 sends TLSClientCSR command with Nonce set to my_nonce[i], for each i in [0..1]",
+                     "Verify the fields CCDID, CSR and Nonce with types TLSCCDID, octstr and octstr respectively. Store TLSCCDID in my_ccdid[i] and CSR in my_csr[i]."),
+            TestStep(4, "CR2 sends sends TLSClientCSR command with Nonce set to my_nonce[2]",
+                     "Verify the fields CCDID, CSR and Nonce with types TLSCCDID, octstr and octstr respectively. Store TLSCCDID in my_ccdid[2] and CSR in my_csr[2]."),
+            TestStep(5, "Populate my_intermediate_certs_1 with 10 DER-encoded x509 certificates that form a certificate chain up to (but not including) a root"),
+            TestStep(6, "Populate my_intermediate_certs_2 with 1 DER-encoded x509 certificates that form a certificate chain up to (but not including) a root"),
+            TestStep(7, "Populate my_client_cert[] with 3 distinct, valid, DER-encoded x509 certificates using each respective public key from my_csr[i], signed by signed by [a root, my_intermediate_certs_1[0], my_intermediate_certs_2[0]]"),
+            TestStep(
+                8, "CR1 sends ProvisionClientCertificate command with CCDID set to my_ccdid[0] and ClientCertificate set to my_client_cert[0]", test_plan_support.verify_success()),
+            TestStep(
+                9, "CR1 sends ProvisionClientCertificate command with CCDID set to my_ccdid[1], ClientCertificate set to my_client_cert[1], and IntermediateCertificates set to my_intermediate_certs_1", test_plan_support.verify_success()),
+            TestStep(
+                10, "CR2 sends ProvisionClientCertificate command with CCDID set to my_ccdid[2], ClientCertificate set to my_client_cert[2], and IntermediateCertificates set to my_intermediate_certs_2", test_plan_support.verify_success()),
+            TestStep(11, "CR1 reads ProvisionedClientCertificates attribute using a fabric-filtered read on Large Message-capable transport",
+                     "Verify a list of TLSClientCertificateDetailStruct with two entries corresponding to my_ccdid[0..1]. The ClientCertificate value should be set to my_client_cert[0..1] and IntermediateCertificates set to my_intermediate_certs_1 for my my_ccdid[1]."),
+            TestStep(12, "CR2 reads ProvisionedClientCertificates attribute using a fabric-filtered read on Large Message-capable transport",
+                     "Verify a list of TLSClientCertificateDetailStruct with one entry corresponding to my_ccdid[2]. The ClientCertificate value should be set to my_client_cert[2] and IntermediateCertificates set to my_intermediate_certs_2."),
+            TestStep(13, "CR1 reads ProvisionedClientCertificates attribute using a fabric-filtered read",
+                     "Verify a list of TLSClientCertificateDetailStruct with two entries corresponding to my_ccdid[0..1]. The ClientCertificate and IntermediateCertificates values should not be populated (non-present)."),
+            TestStep(14, "CR1 sends FindClientCertificate command with null CCDID",
+                     "Verify a list of TLSClientCertificateDetailStruct with two entries. The entries should correspond to my_client_cert[0..1]"),
+            TestStep(15, "CR2 sends FindClientCertificate command with null CCDID",
+                     "Verify a  list of TLSClientCertificateDetailStruct with one entry. The entry should correspond to my_client_cert[2]"),
+            TestStep(16, "CR1 sends TLSClientCSR command with CCDID set to my_ccdid[0] and Nonce set to my_nonce[3]",
+                     "the fields CCDID, CSR and Nonce with types TLSCCDID, octstr and octstr respectively. CCDID should equal my_ccdid[0]. The public key of the resulting CSR should be equal to the public key in my_csr[0]. NonceSignature should be a signature of my_nonce[3] using public key in CSR"),
+            TestStep(
+                17, "CR1 sends ProvisionClientCertificate command with CCDID set to my_ccdid[0] and ClientCertificateDetails set to my_client_cert[3]", test_plan_support.verify_success()),
+            TestStep(18, "CR1 reads ProvisionedClientCertificates attribute using a fabric-filtered read on Large Message-capable transport",
+                     "Verify a list of TLSClientCertificateDetailStruct with two entries. The entries should correspond to my_client_cert[0,3]"),
+            TestStep(19, "CR2 reads ProvisionedClientCertificates attribute using a fabric-filtered read on Large Message-capable transport",
+                     "Verify a list of TLSClientCertificateDetailStruct with one entry. The entry should correspond to my_client_cert[2]"),
+            TestStep(20, "CR1 sends FindClientCertificate command with CCDID set to my_ccdid[0]",
+                     "Verify a list of TLSClientCertificateDetailStruct with one entry. The entry should correspond to my_client_cert[3]"),
+            TestStep(21, "CR2 sends FindClientCertificate command with CCDID set to my_ccdid[2]",
+                     "Verify a list of TLSClientCertificateDetailStruct with one entry. The entry should correspond to my_client_cert[2]"),
+            TestStep(22, "CR1 sends ProvisionClientCertificate command with CCDID set to my_ccdid[0] and ClientCertificate set to my_client_cert[2]", test_plan_support.verify_status(
+                Status.AlreadyExists)),
+            TestStep(23, "CR1 sends RemoveClientCertificate command with CCDID set to my_ccdid[0]",
+                     test_plan_support.verify_success()),
+            TestStep(24, test_plan_support.remove_fabric('CR2', 'CR1'), test_plan_support.verify_success()),
         ]
         return steps
 
@@ -547,89 +607,128 @@ class TC_TLSCERT(MatterBaseTest):
         cr2_cmd = setup_data.cr2_cmd
 
         self.step(2)
-
-        first_nonce = random.randbytes(32)
-        second_nonce = random.randbytes(32)
+        my_nonce = [random.randbytes(32), random.randbytes(32), random.randbytes(32), random.randbytes(32)]
+        my_ccdid = [None, None, None]
+        my_csr = [None, None, None, None]
 
         self.step(3)
-        response = await cr1_cmd.send_csr_command(nonce=first_nonce)
+        for i in range(2):
+            response = await cr1_cmd.send_csr_command(nonce=my_nonce[i])
+            self.assert_valid_ccdid(response.ccdid)
+            my_ccdid[i] = response.ccdid
+            my_csr[i] = self.assert_valid_csr(response, my_nonce[i])
+            if i > 1:
+                asserts.assert_not_equal(my_ccdid[i-1], my_ccdid[i], "CCDID should be unique")
+
+        self.step(4)
+        response = await cr2_cmd.send_csr_command(nonce=my_nonce[2])
         self.assert_valid_ccdid(response.ccdid)
+        my_ccdid[2] = response.ccdid
+        my_csr[2] = self.assert_valid_csr(response, my_nonce[2])
+
+        self.step(5)
+        # Don't have to use the same root, but may as well
+        root = self.get_key()
+        certs_with_key_1 = self.gen_cert_chain(root, 10)
+        my_intermediate_certs_1 = [x.cert for x in certs_with_key_1]
+
+        self.step(6)
+        certs_with_key_2 = self.gen_cert_chain(root, 1)
+        my_intermediate_certs_2 = [x.cert for x in certs_with_key_2]
+        signers = [root, certs_with_key_1[0].key, certs_with_key_2[0].key]
 
         self.step(7)
-        first_csr = self.assert_valid_csr(response, first_nonce)
-        first_cert = self.gen_cert(public_key=first_csr.public_key())
+        my_client_cert = [None, None, None, None]
+        for i in range(3):
+            my_client_cert[i] = self.gen_cert_with_key(signers[i], public_key=my_csr[i].public_key())
 
         self.step(8)
-        await cr1_cmd.send_provision_client_command(ccdid=response.ccdid, certificate=first_cert)
+        await cr1_cmd.send_provision_client_command(ccdid=my_ccdid[0], certificate=my_client_cert[0])
 
         self.step(9)
-        if not self.skip_cr2:
-            response2 = await cr2_cmd.send_csr_command(nonce=second_nonce)
-            self.assert_valid_ccdid(response2.ccdid)
-            second_csr = self.assert_valid_csr(response2, second_nonce)
-            asserts.assert_not_equal(response.ccdid, response2.ccdid, "CCDID should be unique")
-            second_cert = self.gen_cert(public_key=second_csr.public_key())
-
-            await cr2_cmd.send_provision_client_command(ccdid=response2.ccdid, certificate=second_cert)
+        await cr1_cmd.send_provision_client_command(ccdid=my_ccdid[1], certificate=my_client_cert[1], intermediates=my_intermediate_certs_1)
 
         self.step(10)
-        attribute_certs = await cr1_cmd.read_tls_cert_attribute(attributes.ProvisionedClientCertificates)
-        asserts.assert_greater_equal(len(attribute_certs), 1, "Expected at least 1 certificate")
-        found_certs = dict()
-        # Python controller is using TCP, which supports large payloads; need a way to test
-        # over MRP that certificate is not present
-        for cert in attribute_certs:
-            found_certs[cert.ccdid] = cert.clientCertificate
-        asserts.assert_in(response.ccdid, found_certs, "ProvisionedClientCertificates should contain provisioned client cert")
-        asserts.assert_equal(found_certs[response.ccdid], first_cert, "Expected matching certificate detail")
+        await cr2_cmd.send_provision_client_command(ccdid=my_ccdid[2], certificate=my_client_cert[2], intermediates=my_intermediate_certs_2)
 
         self.step(11)
-        if not self.skip_cr2:
-            attribute_certs = await cr2_cmd.read_tls_cert_attribute(attribute=attributes.ProvisionedClientCertificates)
-            asserts.assert_greater_equal(len(attribute_certs), 1, "Expected at least 1 certificate")
-            found_certs = dict()
-            # Python controller is using TCP, which supports large payloads; need a way to test
-            # over MRP that certificate is not present
-            for cert in attribute_certs:
-                found_certs[cert.ccdid] = cert.clientCertificate
-            asserts.assert_in(response2.ccdid, found_certs, "ProvisionedClientCertificates should contain provisioned client cert")
-            asserts.assert_equal(found_certs[response2.ccdid], second_cert, "Expected matching certificate detail")
+        found_certs = await cr1_cmd.read_client_certs_attribute_as_map()
+        asserts.assert_equal(len(found_certs), 2, "Expected 2 certificates")
+        for i in range(2):
+            asserts.assert_in(my_ccdid[i], found_certs, "ProvisionedClientCertificates should contain provisioned client cert")
+            asserts.assert_equal(found_certs[my_ccdid[i]], my_client_cert[i], "Expected matching certificate detail")
 
         self.step(12)
-        find_response = await cr1_cmd.send_find_client_command(ccdid=response.ccdid)
-        asserts.assert_equal(len(find_response.certificateDetails), 1, "Expected single certificate")
-        asserts.assert_equal(find_response.certificateDetails[0].clientCertificate, first_cert)
+        found_certs = await cr2_cmd.read_client_certs_attribute_as_map()
+        asserts.assert_equal(len(found_certs), 1, "Expected 1 certificate")
+        asserts.assert_in(my_ccdid[2], found_certs, "ProvisionedClientCertificates should contain provisioned client cert")
+        asserts.assert_equal(found_certs[my_ccdid[2]], my_client_cert[2], "Expected matching certificate detail")
 
         self.step(13)
-        if not self.skip_cr2:
-            find_response2 = await cr2_cmd.send_find_client_command(ccdid=response.ccdid)
-            asserts.assert_equal(len(find_response2.certificateDetails), 1, "Expected single certificate")
-            asserts.assert_equal(find_response2.certificateDetails[0].clientCertificate,
-                                 second_cert, "Expected matching certificate detail")
+        # Must close session so we don't re-use large payload session
+        self.default_controller.ExpireSessions(self.dut_node_id)
+        found_certs = await cr1_cmd.read_client_certs_attribute_as_map()
+        asserts.assert_equal(len(found_certs), 2, "Expected 2 certificates")
+        for i in range(2):
+            asserts.assert_in(my_ccdid[i], found_certs, "ProvisionedClientCertificates should contain provisioned client cert")
+            asserts.assert_is_none(found_certs[my_ccdid[i]].certificate, "Expected no certificate over non-Large-Transport")
 
         self.step(14)
-        find_all_response = await cr1_cmd.send_find_client_command()
-        asserts.assert_greater_equal(len(find_all_response.certificateDetails), 1, "Expected at least 1 certificate")
-        found_certs = dict()
-        for cert in find_all_response.certificateDetails:
-            found_certs[cert.ccdid] = cert.clientCertificate
-        asserts.assert_in(response.ccdid, found_certs, "FindClientCertificate should contain provisioned client cert")
-        asserts.assert_equal(found_certs[response.ccdid], first_cert, "Expected matching certificate detail")
+        found_certs = await cr1_cmd.send_find_client_command_as_map()
+        asserts.assert_equal(len(found_certs), 2, "Expected 2 certificates")
+        for i in range(2):
+            asserts.assert_in(my_ccdid[i], found_certs, "FindClientCertificate should contain provisioned client cert")
+            asserts.assert_equal(found_certs[my_ccdid[i]], my_client_cert[i], "Expected matching certificate detail")
 
         self.step(15)
-        if not self.skip_cr2:
-            find_all_response = await cr2_cmd.send_find_client_command()
-            asserts.assert_greater_equal(len(find_all_response.certificateDetails), 1, "Expected at least 1 certificate")
-            found_certs = dict()
-            for cert in find_all_response.certificateDetails:
-                found_certs[cert.ccdid] = cert.clientCertificate
-            asserts.assert_in(response2.ccdid, found_certs, "FindClientCertificate should contain provisioned client cert")
-            asserts.assert_equal(found_certs[response2.ccdid], second_cert, "Expected matching certificate detail")
+        found_certs = await cr2_cmd.send_find_client_command_as_map()
+        asserts.assert_equal(len(find_all_response.certificateDetails), 1, "Expected 1 certificate")
+        asserts.assert_in(my_ccdid[2], found_certs, "FindClientCertificate should contain provisioned client cert")
+        asserts.assert_equal(found_certs[my_ccdid[2]], my_client_cert[2], "Expected matching certificate detail")
 
         self.step(16)
+        response = await cr1_cmd.send_csr_command(nonce=my_nonce[3])
+        self.assert_valid_ccdid(response.ccdid)
+        my_ccdid[3] = response.ccdid
+        my_csr[3] = self.assert_valid_csr(response, my_nonce[3])
+        my_client_cert[3] = self.gen_cert_with_key(root, public_key=my_csr[3].public_key())
+
+        self.step(17)
+        await cr2_cmd.send_provision_client_command(ccdid=my_ccdid[0], certificate=my_client_cert[3])
+
+        self.step(18)
+        found_certs = await cr1_cmd.send_find_client_command_as_map()
+        asserts.assert_equal(len(found_certs), 2, "Expected 2 certificates")
+        expected_certs = [my_client_cert[0], my_client_cert[3]]
+        for i in range(2):
+            asserts.assert_in(my_ccdid[i], found_certs, "FindClientCertificate should contain provisioned client cert")
+            asserts.assert_equal(found_certs[my_ccdid[i]], expected_certs[i], "Expected matching certificate detail")
+
+        self.step(19)
+        found_certs = await cr2_cmd.send_find_client_command_as_map()
+        asserts.assert_equal(len(find_all_response.certificateDetails), 1, "Expected 1 certificate")
+        asserts.assert_in(my_ccdid[2], found_certs, "FindClientCertificate should contain provisioned client cert")
+        asserts.assert_equal(found_certs[my_ccdid[2]], my_client_cert[2], "Expected matching certificate detail")
+
+        self.step(20)
+        found_certs = await cr1_cmd.send_find_client_command(ccdid=my_ccdid[0])
+        asserts.assert_equal(len(found_certs), 1, "Expected 1 certificate")
+        asserts.assert_in(my_ccdid[0], found_certs, "FindClientCertificate should contain provisioned client cert")
+        asserts.assert_equal(found_certs[my_ccdid[0]], my_client_cert[3], "Expected matching certificate detail")
+
+        self.step(21)
+        found_certs = await cr2_cmd.send_find_client_command(ccdid=my_ccdid[2])
+        asserts.assert_equal(len(found_certs), 1, "Expected single certificate")
+        asserts.assert_in(my_ccdid[2], found_certs, "FindClientCertificate should contain provisioned client cert")
+        asserts.assert_equal(found_certs[my_ccdid[2]], my_client_cert[2], "Expected matching certificate detail")
+
+        self.step(22)
+        await cr1_cmd.send_provision_client_command(ccdid=my_ccdid[0], certificate=my_client_cert[2])
+
+        self.step(23)
         await cr1_cmd.send_remove_client_command(ccdid=response.ccdid)
-        if not self.skip_cr2:
-            await cr2_cmd.send_remove_client_command(ccdid=response2.ccdid)
+
+        self.step(24)
         await cr1_cmd.send_remove_fabric_command(cr2_cmd.fabric_index)
 
 
