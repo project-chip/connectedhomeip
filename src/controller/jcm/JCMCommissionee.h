@@ -78,8 +78,7 @@ private:
     CommandHandler::Handle & mCommandHandle;
     OnCompletionFunc mOnCompletion;
 
-    // Trust Verification Stages
-
+    /// Trust Verification Stages
     // Ecosystem B Administrator SHALL save the value of the EndpointID
     TrustVerificationError StoreEndpointId();
     // Ecosystem B Administrator SHALL read the AdministratorFabricIndex attribute of the Joint Fabric Administrator cluster
@@ -91,6 +90,9 @@ private:
     // Ecosystem B Administrator SHALL check that the RootPublicKey and FabricID of the accessing fabric (found in the
     // FabricDescriptorStruct) match the RootPublicKey and FabricID of the Fabric indicated by AdministratorFabricIndex.
     TrustVerificationError CrossCheckAdministratorIds();
+    /// End Trust Verification Stages
+
+    TrustVerificationError ParseCommissionerAdminInfo();
 };
 
 } // namespace JCM
