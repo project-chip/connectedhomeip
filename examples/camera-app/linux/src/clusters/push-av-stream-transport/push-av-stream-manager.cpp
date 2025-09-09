@@ -136,7 +136,7 @@ PushAvStreamTransportManager::AllocatePushTransport(const TransportOptionsStruct
         }
     }
 
-#ifndef TLS_CLUSTER_ENABLED
+#ifdef TLS_CLUSTER_ENABLED
     ChipLogDetail(Camera, "PushAvStreamTransportManager: TLS Cluster enabled, using default certs");
     mTransportMap[connectionID].get()->SetTLSCert(mBufferRootCert, mBufferClientCert, mBufferClientCertKey);
 #else

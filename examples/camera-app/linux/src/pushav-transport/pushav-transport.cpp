@@ -100,7 +100,10 @@ void PushAVTransport::ConfigureRecorderTimeSetting(
     ChipLogDetail(Camera, "Augmentation Duration: %d sec", mClipInfo.mAugmentationDuration);
     ChipLogDetail(Camera, "Max Clip Duration: %d sec", mClipInfo.mMaxClipDuration);
     ChipLogDetail(Camera, "Blind Duration: %d sec", mClipInfo.mBlindDuration);
-    mRecorder->mClipInfo = mClipInfo;
+    if (mRecorder.get() != nullptr)
+    {
+        mRecorder->mClipInfo = mClipInfo;
+    }
 }
 
 void PushAVTransport::ConfigureRecorderSettings(const TransportOptionsStruct & transportOptions,

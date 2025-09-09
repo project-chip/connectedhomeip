@@ -287,7 +287,7 @@ void PushAVUploader::UploadData(std::pair<std::string, std::string> data)
     curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, true);
     curl_easy_setopt(curl, CURLOPT_SSL_VERIFYHOST, 2L);
     curl_easy_setopt(curl, CURLOPT_INFILESIZE_LARGE, static_cast<curl_off_t>(size));
-#ifndef TLS_CLUSTER_ENABLED
+#ifdef TLS_CLUSTER_ENABLED
 
     // TODO: The logic to provide DER-formatted certificates and keys in memory (blob) format to curl is currently unstable. As a
     // temporary workaround, PEM-format files are being provided as input to curl.
