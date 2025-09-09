@@ -708,16 +708,19 @@ CHIP_ERROR TCPBase::TCPConnect(const PeerAddress & address, Transport::AppTCPCon
 
 void TCPBase::TCPDisconnect(ActiveTCPConnectionState & conn, bool shouldAbort)
 {
+    // If there are still active references, we need to notify them of connection closure
+    SuppressCallback suppressCallback = (conn.GetReferenceCount() > 0) ? SuppressCallback::No : SuppressCallback::Yes;
+
     // This call should be able to disconnect the connection either when it is
     // already established, or when it is being set up.
     if ((conn.IsConnected() && shouldAbort) || conn.IsConnecting())
     {
-        CloseConnectionInternal(conn, CHIP_ERROR_CONNECTION_ABORTED, SuppressCallback::Yes);
+        CloseConnectionInternal(conn, CHIP_ERROR_CONNECTION_ABORTED, suppressCallback);
     }
 
     if (conn.IsConnected() && !shouldAbort)
     {
-        CloseConnectionInternal(conn, CHIP_NO_ERROR, SuppressCallback::Yes);
+        CloseConnectionInternal(conn, CHIP_NO_ERROR, suppressCallback);
     }
 }
 

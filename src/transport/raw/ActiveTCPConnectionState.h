@@ -36,6 +36,10 @@
 namespace chip {
 namespace Transport {
 
+// Forward declaration of friend class for test access.
+template <size_t kActiveConnectionsSize, size_t kPendingPacketSize>
+class TCPBaseTestAccess;
+
 /**
  *  The State of the TCP connection
  */
@@ -75,8 +79,6 @@ struct ActiveTCPConnectionState
 
     inline bool operator==(const ActiveTCPConnectionHolder & other) const;
     inline bool operator!=(const ActiveTCPConnectionHolder & other) const;
-    // Associated endpoint.
-    Inet::TCPEndPoint * mEndPoint;
 
     // Peer Node Address
     PeerAddress mPeerAddr;
@@ -101,11 +103,22 @@ struct ActiveTCPConnectionState
     uint16_t mTCPKeepAliveIntervalSecs = CHIP_CONFIG_TCP_KEEPALIVE_INTERVAL_SECS;
     uint16_t mTCPMaxNumKeepAliveProbes = CHIP_CONFIG_MAX_TCP_KEEPALIVE_PROBES;
 
+    // This is bad and should not normally be done; we are explicitly closing the TCP connection
+    // instead of gracefully releasing our reference, which will theoretically cause anyone
+    // holding a reference (who should have a listener for connection closing) to release their reference
+    void ForceDisconnect() { mReleaseConnection(*this); }
+
 private:
-    friend class TCPBase;
     template <size_t kActiveConnectionsSize, size_t kPendingPacketSize>
     friend class TCP;
+    friend class TCPBase;
     friend class ActiveTCPConnectionStateDeleter<ActiveTCPConnectionState>;
+    // Allow tests to access private members.
+    template <size_t kActiveConnectionsSize, size_t kPendingPacketSize>
+    friend class TCPBaseTestAccess;
+
+    // Associated endpoint.
+    Inet::TCPEndPoint * mEndPoint;
     ReleaseFnType mReleaseConnection;
 
     void Init(Inet::TCPEndPoint * endPoint, const PeerAddress & peerAddr, ReleaseFnType releaseConnection)
