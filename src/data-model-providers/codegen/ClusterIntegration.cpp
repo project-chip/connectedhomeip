@@ -147,4 +147,17 @@ void CodegenClusterIntegration::UnregisterServer(const UnregisterServerOptions &
     delegate.ReleaseRegistration(emberEndpointIndex);
 }
 
+ServerClusterInterface * CodegenClusterIntegration::GetClusterForEndpointIndex(const GetClusterForEndpointIndexOptions & options,
+                                                                               Delegate & delegate)
+{
+    uint16_t emberEndpointIndex;
+    if (!findEndpointWithLog(options.endpointId, options.clusterId, options.fixedClusterServerEndpointCount,
+                             options.maxEndpointCount, emberEndpointIndex))
+    {
+        return nullptr;
+    }
+
+    return &delegate.FindRegistration(emberEndpointIndex);
+}
+
 } // namespace chip::app
