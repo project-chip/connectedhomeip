@@ -31,6 +31,7 @@
 #include <protocols/interaction_model/StatusCode.h>
 
 static constexpr uint16_t kMaxConnectionId = 65535; // This is also invalid connectionID
+static constexpr uint16_t kMaxEndpointId   = 65534;
 
 using namespace chip;
 using namespace chip::app;
@@ -51,14 +52,7 @@ PushAvStreamTransportServerLogic::PushAvStreamTransportServerLogic(EndpointId aE
                                                                      PushAvStreamTransport::IngestMethodsEnum::kCMAFIngest } }
 {}
 
-PushAvStreamTransportServerLogic::~PushAvStreamTransportServerLogic()
-{
-    for (const auto & timerContext : mTimerContexts)
-    {
-        DeviceLayer::SystemLayer().CancelTimer(PushAVStreamTransportDeallocateCallback, static_cast<void *>(timerContext.get()));
-    }
-    Shutdown();
-}
+PushAvStreamTransportServerLogic::~PushAvStreamTransportServerLogic() {}
 
 CHIP_ERROR PushAvStreamTransportServerLogic::Init()
 {
@@ -66,7 +60,13 @@ CHIP_ERROR PushAvStreamTransportServerLogic::Init()
     return CHIP_NO_ERROR;
 }
 
-void PushAvStreamTransportServerLogic::Shutdown() {}
+void PushAvStreamTransportServerLogic::Shutdown()
+{
+    for (const auto & timerContext : mTimerContexts)
+    {
+        DeviceLayer::SystemLayer().CancelTimer(PushAVStreamTransportDeallocateCallback, static_cast<void *>(timerContext.get()));
+    }
+}
 
 bool PushAvStreamTransportServerLogic::HasFeature(Feature feature) const
 {
@@ -273,6 +273,10 @@ Status PushAvStreamTransportServerLogic::ValidateIncomingTransportOptions(
         transportOptions.videoStreamID.HasValue() || transportOptions.audioStreamID.HasValue(), Status::InvalidCommand,
         ChipLogError(Zcl, "Transport Options verification from command data[ep=%d]: Missing videoStreamID and audioStreamID",
                      mEndpointId));
+    VerifyOrReturnValue(transportOptions.endpointID <= kMaxEndpointId, Status::ConstraintError,
+                        ChipLogError(Zcl,
+                                     "Transport Options verification from command data[ep=%d]: EndpointID field Constraint Error",
+                                     mEndpointId));
 
     VerifyOrReturnValue(transportOptions.url.size() >= kMinUrlLength && transportOptions.url.size() <= kMaxUrlLength,
                         Status::ConstraintError,
@@ -427,6 +431,43 @@ Status PushAvStreamTransportServerLogic::ValidateIncomingTransportOptions(
                                          "Transport Options verification from command data[ep=%d]: Missing CMAF Container Options ",
                                          mEndpointId));
 
+        CMAFInterfaceEnum cmafInterface = containerOptions.CMAFContainerOptions.Value().CMAFInterface;
+
+        VerifyOrReturnValue(
+            cmafInterface == CMAFInterfaceEnum::kInterface1 || cmafInterface == CMAFInterfaceEnum::kInterface2DASH ||
+                cmafInterface == CMAFInterfaceEnum::kInterface2HLS,
+            Status::ConstraintError,
+            ChipLogError(Zcl,
+                         "Transport Options verification from command data[ep=%d]: CMAF Container Options CMAFInterface not valid",
+                         mEndpointId));
+
+        uint16_t segmentDuration = containerOptions.CMAFContainerOptions.Value().segmentDuration;
+
+        VerifyOrReturnValue(segmentDuration >= kMinSegmentDuration && segmentDuration <= kMaxSegmentDuration,
+                            Status::ConstraintError,
+                            ChipLogError(Zcl,
+                                         "Transport Options verification from command data[ep=%d]: CMAF Container Options Segment "
+                                         "Duration field not within allowed range",
+                                         mEndpointId));
+
+        uint16_t chunkDuration = containerOptions.CMAFContainerOptions.Value().chunkDuration;
+
+        VerifyOrReturnValue(chunkDuration >= 0 && chunkDuration <= segmentDuration / 2, Status::ConstraintError,
+                            ChipLogError(Zcl,
+                                         "Transport Options verification from command data[ep=%d]: CMAF Container Options Chunk "
+                                         "Duration field not within allowed range",
+                                         mEndpointId));
+
+        VerifyOrReturnValue(
+            containerOptions.CMAFContainerOptions.Value().trackName.size() >= 1 &&
+                containerOptions.CMAFContainerOptions.Value().trackName.size() <= kMaxTrackNameLength,
+            Status::ConstraintError,
+            ChipLogError(Zcl,
+                         "Transport Options verification from command data[ep=%d]: CMAF Container Options Track Name "
+                         "Error, actual length: %" PRIu32 " not "
+                         "within expected range of 1 to 16",
+                         mEndpointId, static_cast<uint32_t>(containerOptions.CMAFContainerOptions.Value().trackName.size())));
+
         if (containerOptions.CMAFContainerOptions.Value().CENCKey.HasValue())
         {
             VerifyOrReturnValue(
@@ -500,16 +541,6 @@ PushAvStreamTransportServerLogic::HandleAllocatePushTransport(CommandHandler & h
     Commands::AllocatePushTransportResponse::Type response;
     auto & transportOptions = commandData.transportOptions;
 
-    Status transportOptionsValidityStatus = ValidateIncomingTransportOptions(transportOptions);
-
-    VerifyOrDo(transportOptionsValidityStatus == Status::Success, {
-        ChipLogError(Zcl, "HandleAllocatePushTransport[ep=%d]: TransportOptions of command data is not Valid", mEndpointId);
-        handler.AddStatus(commandPath, transportOptionsValidityStatus);
-        return std::nullopt;
-    });
-
-    // Todo: TLSEndpointID Validation
-
     IngestMethodsEnum ingestMethod = commandData.transportOptions.ingestMethod;
 
     bool isFormatSupported = false;
@@ -535,6 +566,77 @@ PushAvStreamTransportServerLogic::HandleAllocatePushTransport(CommandHandler & h
         return std::nullopt;
     }
 
+    /*Spec issue for invalid Trigger Type: https://github.com/CHIP-Specifications/connectedhomeip-spec/issues/11701*/
+    if (transportOptions.triggerOptions.triggerType == TransportTriggerTypeEnum::kUnknownEnumValue)
+    {
+        auto status = to_underlying(StatusCodeEnum::kInvalidTriggerType);
+        ChipLogError(Zcl, "HandleAllocatePushTransport[ep=%d]: Invalid Trigger type", mEndpointId);
+        handler.AddClusterSpecificFailure(commandPath, status);
+        return std::nullopt;
+    }
+
+    Status transportOptionsValidityStatus = ValidateIncomingTransportOptions(transportOptions);
+
+    VerifyOrDo(transportOptionsValidityStatus == Status::Success, {
+        ChipLogError(Zcl, "HandleAllocatePushTransport[ep=%d]: TransportOptions of command data is not Valid", mEndpointId);
+        handler.AddStatus(commandPath, transportOptionsValidityStatus);
+        return std::nullopt;
+    });
+
+    TlsClientManagementDelegate::EndpointStructType TLSEndpoint;
+    if (mTLSClientManagementDelegate != nullptr)
+    {
+        Status tlsEndpointValidityStatus = mTLSClientManagementDelegate->FindProvisionedEndpointByID(
+            commandPath.mEndpointId, handler.GetAccessingFabricIndex(), commandData.transportOptions.endpointID, TLSEndpoint);
+
+        VerifyOrDo(tlsEndpointValidityStatus == Status::Success, {
+            ChipLogError(Zcl, "HandleAllocatePushTransport[ep=%d]: TLSEndpointID of command data is not valid/Provisioned",
+                         mEndpointId);
+            auto status = to_underlying(StatusCodeEnum::kInvalidTLSEndpoint);
+            handler.AddClusterSpecificFailure(commandPath, status);
+            return std::nullopt;
+        });
+    }
+    else
+    {
+        ChipLogError(Zcl, "HandleAllocatePushTransport[ep=%d]: TLS Client Management Delegate is not set", mEndpointId);
+        auto status = to_underlying(StatusCodeEnum::kInvalidTLSEndpoint);
+        handler.AddClusterSpecificFailure(commandPath, status);
+        return std::nullopt;
+    }
+
+    // here add check for valid zoneid
+    if ((transportOptions.triggerOptions.triggerType == TransportTriggerTypeEnum::kMotion) &&
+        (transportOptions.triggerOptions.motionZones.HasValue()) && (!transportOptions.triggerOptions.motionZones.Value().IsNull()))
+    {
+
+        auto & motionZonesList = transportOptions.triggerOptions.motionZones;
+        auto iter              = motionZonesList.Value().Value().begin();
+        uint16_t zonesize      = 0;
+        auto itsz              = motionZonesList.Value().Value().begin();
+        while (itsz.Next())
+        {
+            zonesize += 1;
+        }
+        bool isValidZoneSize = mDelegate->ValidateMotionZoneSize(zonesize);
+        VerifyOrReturnValue(
+            isValidZoneSize, Status::ConstraintError,
+            ChipLogError(Zcl, "Transport Options verification from command data[ep=%d]: Invalid Motion Zone Size ", mEndpointId));
+
+        while (iter.Next())
+        {
+            auto & transportZoneOption = iter.GetValue();
+            Status zoneIdStatus        = mDelegate->ValidateZoneId(transportZoneOption.zone.Value());
+            if (zoneIdStatus != Status::Success)
+            {
+                auto status = to_underlying(StatusCodeEnum::kInvalidZone);
+                ChipLogError(Zcl, "HandleAllocatePushTransport[ep=%d]: Invalid ZoneId", mEndpointId);
+                handler.AddClusterSpecificFailure(commandPath, status);
+                return std::nullopt;
+            }
+        }
+    }
+
     bool isValidUrl = mDelegate->ValidateUrl(std::string(transportOptions.url.data(), transportOptions.url.size()));
 
     if (isValidUrl == false)
@@ -545,16 +647,17 @@ PushAvStreamTransportServerLogic::HandleAllocatePushTransport(CommandHandler & h
         return std::nullopt;
     }
 
-    /*Spec issue for invalid Trigger Type: https://github.com/CHIP-Specifications/connectedhomeip-spec/issues/11701*/
-    if (transportOptions.triggerOptions.triggerType == TransportTriggerTypeEnum::kUnknownEnumValue)
+    bool isValidStreamUsage = mDelegate->ValidateStreamUsage(transportOptions.streamUsage);
+    if (isValidStreamUsage == false)
     {
-        auto status = to_underlying(StatusCodeEnum::kInvalidTriggerType);
-        ChipLogError(Zcl, "HandleAllocatePushTransport[ep=%d]: Invalid Trigger type", mEndpointId);
+        auto status = to_underlying(StatusCodeEnum::kInvalidStreamUsage);
+        ChipLogError(Zcl, "HandleAllocatePushTransport[ep=%d]: StreamUsage not present in the StreamUsagePriorities list",
+                     mEndpointId);
         handler.AddClusterSpecificFailure(commandPath, status);
         return std::nullopt;
     }
 
-    // Todo:Validate ZoneId
+    // Todo:Validate MotionZones
 
     // Validate Bandwidth Requirement
     Status status = mDelegate->ValidateBandwidthLimit(transportOptions.streamUsage, transportOptions.videoStreamID,
@@ -599,7 +702,9 @@ PushAvStreamTransportServerLogic::HandleAllocatePushTransport(CommandHandler & h
 
             if (!delegateStatus.IsSuccess())
             {
-                handler.AddStatus(commandPath, delegateStatus);
+                auto cluster_status = to_underlying(StatusCodeEnum::kInvalidStream);
+                ChipLogError(Zcl, "HandleAllocatePushTransport[ep=%d]: Invalid Video Stream ", mEndpointId);
+                handler.AddClusterSpecificFailure(commandPath, cluster_status);
                 return std::nullopt;
             }
         }
@@ -629,10 +734,22 @@ PushAvStreamTransportServerLogic::HandleAllocatePushTransport(CommandHandler & h
 
             if (!delegateStatus.IsSuccess())
             {
-                handler.AddStatus(commandPath, delegateStatus);
+                auto cluster_status = to_underlying(StatusCodeEnum::kInvalidStream);
+                ChipLogError(Zcl, "HandleAllocatePushTransport[ep=%d]: Invalid Audio Stream ", mEndpointId);
+                handler.AddClusterSpecificFailure(commandPath, cluster_status);
                 return std::nullopt;
             }
         }
+    }
+
+    bool isValidSegmentDuration =
+        mDelegate->ValidateSegmentDuration(transportOptions.containerOptions.CMAFContainerOptions.Value().segmentDuration);
+    if (isValidSegmentDuration == false)
+    {
+        auto segmentDurationStatus = to_underlying(StatusCodeEnum::kInvalidOptions);
+        ChipLogError(Zcl, "HandleAllocatePushTransport[ep=%d]: Segment Duration not within allowed range", mEndpointId);
+        handler.AddClusterSpecificFailure(commandPath, segmentDurationStatus);
+        return std::nullopt;
     }
 
     uint16_t connectionID = GenerateConnectionID();
