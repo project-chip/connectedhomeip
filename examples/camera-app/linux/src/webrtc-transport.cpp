@@ -117,6 +117,9 @@ const char * WebrtcTransport::GetStateStr() const
 
     case State::SendingICECandidates:
         return "SendingICECandidates";
+
+    case State::SendingEnd:
+        return "SendingEnd";
     }
     return "N/A";
 }
