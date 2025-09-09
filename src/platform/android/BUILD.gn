@@ -91,6 +91,7 @@ static_library("android") {
     "${chip_root}/src/app/common:metadata",
     "${chip_root}/src/lib/dnssd:platform_header",
     "${chip_root}/src/setup_payload",
+    "${chip_root}/src/transport/raw:nfc-application-delegate",
   ]
 
   public_deps = [ "${chip_root}/src/platform:platform_base" ]
