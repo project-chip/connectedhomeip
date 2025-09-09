@@ -96,3 +96,12 @@
 #ifndef CHIP_CONFIG_FREERTOS_USE_STATIC_QUEUE
 #define CHIP_CONFIG_FREERTOS_USE_STATIC_QUEUE 1
 #endif
+
+// ==================== Other Configuration Overrides ====================
+
+#ifndef CHIP_CONFIG_RMP_DEFAULT_MAX_RETRANS
+/*
+ * Increasing the default value to 10 to handle potential scenario where there is latency with the radio used
+ */
+#define CHIP_CONFIG_RMP_DEFAULT_MAX_RETRANS 10
+#endif

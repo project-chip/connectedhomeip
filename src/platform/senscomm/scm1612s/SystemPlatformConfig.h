@@ -40,7 +40,7 @@ struct ChipDeviceEvent;
 // ========== Platform-specific Configuration Overrides =========
 
 #ifndef CHIP_SYSTEM_CONFIG_NUM_TIMERS
-#define CHIP_SYSTEM_CONFIG_NUM_TIMERS 16
+#define CHIP_SYSTEM_CONFIG_NUM_TIMERS 20
 #endif // CHIP_SYSTEM_CONFIG_NUM_TIMERS
 
 #define CHIP_CONFIG_MDNS_CACHE_SIZE 4
