@@ -23,10 +23,7 @@ namespace chip::app::Clusters {
 
 Protocols::InteractionModel::Status LocalizationConfigurationServerLogic::SetActiveLocale(CharSpan activeLocale)
 {
-    char validLocaleBuffer[35];
-    MutableCharSpan validLocale{ validLocaleBuffer };
-
-    if (!IsSupportedLocale(activeLocale, validLocale))
+    if (!IsSupportedLocale(activeLocale))
     {
         return Protocols::InteractionModel::Status::ConstraintError;
     }
@@ -66,10 +63,9 @@ CHIP_ERROR LocalizationConfigurationServerLogic::ReadSupportedLocales(AttributeV
     return err;
 }
 
-bool LocalizationConfigurationServerLogic::IsSupportedLocale(CharSpan newLangTag, MutableCharSpan & validLocale)
+bool LocalizationConfigurationServerLogic::IsSupportedLocale(CharSpan newLangTag)
 {
     DeviceLayer::DeviceInfoProvider::SupportedLocalesIterator * it;
-    bool firstValidLocale = false;
     if ((it = mDeviceInfoProvider.IterateSupportedLocales()))
     {
         CharSpan outLocale;
@@ -80,15 +76,6 @@ bool LocalizationConfigurationServerLogic::IsSupportedLocale(CharSpan newLangTag
             {
                 it->Release();
                 return true;
-            }
-            /*
-             * For backward compatibility, if the newLangTag is not found, we need to find the first valid locale.
-             * This is used to set the active locale to the first valid locale if the newLangTag is not found.
-             */
-            if (!firstValidLocale)
-            {
-                CopyCharSpanToMutableCharSpan(outLocale, validLocale);
-                firstValidLocale = true;
             }
         }
 
