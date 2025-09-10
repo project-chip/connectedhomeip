@@ -136,7 +136,7 @@ PushAvStreamTransportManager::AllocatePushTransport(const TransportOptionsStruct
         }
     }
 
-#ifdef TLS_CLUSTER_ENABLED
+#ifndef TLS_CLUSTER_NOT_ENABLED
     ChipLogDetail(Camera, "PushAvStreamTransportManager: TLS Cluster enabled, using default certs");
     mTransportMap[connectionID].get()->SetTLSCert(mBufferRootCert, mBufferClientCert, mBufferClientCertKey);
 #else
@@ -549,7 +549,6 @@ void PushAvStreamTransportManager::OnZoneTriggeredEvent(u_int16_t zoneId)
 
 void PushAvStreamTransportManager::SetTLSCerts(Tls::CertificateTable::BufferedClientCert & clientCertEntry,
                                                Tls::CertificateTable::BufferedRootCert & rootCertEntry)
-
 {
     auto rootSpan = rootCertEntry.GetCert().certificate.Value();
     mBufferRootCert.assign(rootSpan.data(), rootSpan.data() + rootSpan.size());
@@ -557,9 +556,32 @@ void PushAvStreamTransportManager::SetTLSCerts(Tls::CertificateTable::BufferedCl
     auto clientSpan = clientCertEntry.GetCert().clientCertificate.Value();
     mBufferClientCert.assign(clientSpan.data(), clientSpan.data() + clientSpan.size());
 
-    uint8_t buffer[Credentials::kP256ECPrivateKeyDERLength];
-    MutableByteSpan keypairDer(buffer);
-    Credentials::ConvertECDSAKeypairRawToDER(clientCertEntry.mCertWithKey.key, keypairDer);
+    const ByteSpan rawKeySpan = clientCertEntry.mCertWithKey.key.Span();
+    if (rawKeySpan.size() != Crypto::kP256_PublicKey_Length + Crypto::kP256_PrivateKey_Length)
+    {
+        ChipLogError(Camera, "Raw key pair has incorrect size: %zu (expected %zu)", rawKeySpan.size(),
+                     static_cast<size_t>(Crypto::kP256_PublicKey_Length + Crypto::kP256_PrivateKey_Length));
+        return;
+    }
+
+    Crypto::P256SerializedKeypair rawSerializedKeypair;
+    if (rawSerializedKeypair.SetLength(rawKeySpan.size()) != CHIP_NO_ERROR)
+    {
+        ChipLogError(Camera, "Failed to set length for serialized keypair");
+        return;
+    }
+    memcpy(rawSerializedKeypair.Bytes(), rawKeySpan.data(), rawKeySpan.size());
+
+    uint8_t derBuffer[Credentials::kP256ECPrivateKeyDERLength];
+    MutableByteSpan keypairDer(derBuffer);
+
+    CHIP_ERROR err = Credentials::ConvertECDSAKeypairRawToDER(rawSerializedKeypair, keypairDer);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Camera, "Failed to convert raw keypair to DER: %" CHIP_ERROR_FORMAT, err.Format());
+        return;
+    }
+
     mBufferClientCertKey.assign(keypairDer.data(), keypairDer.data() + keypairDer.size());
 
     // TODO: Handle Intermediate certificates and use for chain validation if needed. For now just log it.

@@ -90,25 +90,34 @@ std::string vectorToHexString(const std::vector<uint8_t> & vec)
     return oss.str();
 }
 
-// Helper function to convert RSA private key from DER format to PEM format
-std::string ConvertRSAPrivateKey_DER_to_PEM(const std::vector<uint8_t> & derData)
+// Helper function to convert ECDSA private key from DER format to PEM format
+std::string ConvertECDSAPrivateKey_DER_to_PEM(const std::vector<uint8_t> & derData)
 {
     const unsigned char * p = derData.data();
 
-    // Parse DER into RSA structure
-    RSA * rsa = d2i_RSAPrivateKey(nullptr, &p, derData.size());
-    if (!rsa)
+    EVP_PKEY * pkey = d2i_AutoPrivateKey(nullptr, &p, derData.size());
+    if (!pkey)
     {
-        ChipLogError(Camera, "Failed to parse DER RSA private key of size: %ld", derData.size());
+        ChipLogError(Camera, "Failed to parse DER ECDSA private key of size: %ld", derData.size());
         return "";
     }
 
     // Write PEM to memory BIO
     BIO * bio = BIO_new(BIO_s_mem());
-    if (!PEM_write_bio_RSAPrivateKey(bio, rsa, nullptr, nullptr, 0, nullptr, nullptr))
+    if (!bio)
     {
-        ChipLogError(Camera, "Failed to convert to PEM format") BIO_free(bio);
-        RSA_free(rsa);
+        EVP_PKEY_free(pkey);
+        ChipLogError(Camera, "Failed to allocate BIO");
+        return "";
+    }
+
+    // Use PEM_write_bio_PrivateKey to write the EVP_PKEY in PEM format.
+    // This function handles the key type automatically.
+    if (!PEM_write_bio_PrivateKey(bio, pkey, nullptr, nullptr, 0, nullptr, nullptr))
+    {
+        BIO_free(bio);
+        EVP_PKEY_free(pkey);
+        ChipLogError(Camera, "Failed to convert ECDSA key to PEM format");
         return "";
     }
 
@@ -118,7 +127,7 @@ std::string ConvertRSAPrivateKey_DER_to_PEM(const std::vector<uint8_t> & derData
     std::string pemStr(pemData, pemLen);
 
     BIO_free(bio);
-    RSA_free(rsa);
+    EVP_PKEY_free(pkey);
 
     return pemStr;
 }
@@ -287,29 +296,24 @@ void PushAVUploader::UploadData(std::pair<std::string, std::string> data)
     curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, true);
     curl_easy_setopt(curl, CURLOPT_SSL_VERIFYHOST, 2L);
     curl_easy_setopt(curl, CURLOPT_INFILESIZE_LARGE, static_cast<curl_off_t>(size));
-#ifdef TLS_CLUSTER_ENABLED
+#ifndef TLS_CLUSTER_NOT_ENABLED
 
     // TODO: The logic to provide DER-formatted certificates and keys in memory (blob) format to curl is currently unstable. As a
     // temporary workaround, PEM-format files are being provided as input to curl.
 
     auto rootCertPEM           = DerCertToPem(mCertBuffer.mRootCertBuffer);
     auto clientCertPEM         = DerCertToPem(mCertBuffer.mClientCertBuffer);
-    std::string derKeyToPemstr = ConvertRSAPrivateKey_DER_to_PEM(mCertBuffer.mClientKeyBuffer);
+    std::string derKeyToPemstr = ConvertECDSAPrivateKey_DER_to_PEM(mCertBuffer.mClientKeyBuffer);
 
-    SaveCertToFile(rootCertPEM, "  /tmp/root.pem");
+    SaveCertToFile(rootCertPEM, "/tmp/root.pem");
     SaveCertToFile(clientCertPEM, "/tmp/dev.pem");
 
-    // Logic to save DER format to file
-    std::string key(mCertBuffer.mClientKeyBuffer.begin(), mCertBuffer.mClientKeyBuffer.end());
-    SaveCertToFile(key, "/tmp/dev.key");
-
     // Logic to save PEM format to file
-    // SaveCertToFile(derKeyToPemstr, "/tmp/dev.key");
+    SaveCertToFile(derKeyToPemstr, "/tmp/dev.key");
 
-    curl_easy_setopt(curl, CURLOPT_CAINFO, " /tmp/root.pem");
+    curl_easy_setopt(curl, CURLOPT_CAINFO, "/tmp/root.pem");
     curl_easy_setopt(curl, CURLOPT_SSLCERT, "/tmp/dev.pem");
-    curl_easy_setopt(curl, CURLOPT_SSLKEY, " /tmp/dev.key");
-    curl_easy_setopt(curl, CURLOPT_SSLKEYTYPE, "DER"); // Required when key is given in DER format
+    curl_easy_setopt(curl, CURLOPT_SSLKEY, "/tmp/dev.key");
 
     //  curl_blob rootBlob   = { mCertBuffer.mRootCertBuffer.data(), mCertBuffer.mRootCertBuffer.size(), CURL_BLOB_COPY };
     //  curl_blob clientBlob = { mCertBuffer.mClientCertBuffer.data(), mCertBuffer.mClientCertBuffer.size(), CURL_BLOB_COPY };
