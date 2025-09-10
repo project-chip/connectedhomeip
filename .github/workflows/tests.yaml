@@ -437,7 +437,6 @@ jobs:
 
         strategy:
             matrix:
-                build_variant: [no-ble-no-shell-asan-clang, no-ble-no-shell-tsan-clang]
                 chip_tool: [""]
                 include:
                     - os: macos-13
