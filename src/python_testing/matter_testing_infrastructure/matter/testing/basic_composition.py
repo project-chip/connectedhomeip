@@ -31,7 +31,8 @@ from mobly import asserts
 
 import matter.clusters as Clusters
 import matter.tlv
-from matter.ChipDeviceCtrl import ChipDeviceController, TLVJsonConverter
+from matter.ChipDeviceCtrl import ChipDeviceController
+from matter.MatterTlvJson import TLVJsonConverter
 from matter.clusters.Attribute import AttributeCache, ValueDecodeFailure
 from matter.testing.conformance import ConformanceException
 from matter.testing.matter_testing import MatterTestConfig, ProblemNotice
