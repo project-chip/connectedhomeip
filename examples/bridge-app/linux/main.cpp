@@ -574,7 +574,7 @@ Protocols::InteractionModel::Status HandleWriteBridgedDeviceBasicAttribute(Devic
 {
     ChipLogProgress(DeviceLayer, "HandleWriteBridgedDeviceBasicAttribute: attrId=%d", attributeId);
 
-    if (attributeId != chip::app::Clusters::BridgedDeviceBasicInformation::Attributes::NodeLabel::Id)
+    if (attributeId != BridgedDeviceBasicInformation::Attributes::NodeLabel::Id)
     {
         return Protocols::InteractionModel::Status::UnsupportedWrite;
     }
