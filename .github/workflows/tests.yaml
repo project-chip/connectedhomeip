@@ -595,7 +595,12 @@ jobs:
                 build-variant: ${{ matrix.build_variant }}
 
             - name: Build python env
-              run: scripts/run_in_build_env.sh './scripts/build_python.sh --install_virtual_env out/venv --enable-ccache'
+              run: |
+                  ./scripts/run_in_build_env.sh \
+                    "./scripts/build_python.sh \
+                      --install_virtual_env out/venv \
+                      $([ "${DISABLE_CCACHE}" != "true" ] && echo --enable-ccache)\
+                    "
 
             - name: Build linux-x64-all-clusters
               env:
