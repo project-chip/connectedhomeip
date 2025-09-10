@@ -147,7 +147,7 @@ Protocols::InteractionModel::Status CameraAVStreamManager::AudioStreamDeallocate
     return Status::Success;
 }
 
-Protocols::InteractionModel::Status CameraAVStreamManager::SnapshotStreamAllocate(const SnapshotStreamStruct & allocateArgs,
+Protocols::InteractionModel::Status CameraAVStreamManager::SnapshotStreamAllocate(const SnapshotStreamAllocateArgs & allocateArgs,
                                                                                   uint16_t & outStreamID)
 {
     outStreamID = kInvalidStreamID;
@@ -206,6 +206,11 @@ Protocols::InteractionModel::Status CameraAVStreamManager::SnapshotStreamDealloc
     }
 
     return Status::Success;
+}
+
+void CameraAVStreamManager::OnVideoStreamAllocated(const VideoStreamStruct & allocatedStream, StreamAllocationAction action)
+{
+    ChipLogProgress(Zcl, "Video stream has been allocated");
 }
 
 void CameraAVStreamManager::OnStreamUsagePrioritiesChanged()

@@ -17540,7 +17540,7 @@ public class ClusterIDMapping {
             MaxEncodedPixelRate(1L),
             VideoSensorParams(2L),
             NightVisionUsesInfrared(3L),
-            MinViewport(4L),
+            MinViewportResolution(4L),
             RateDistortionTradeOffPoints(5L),
             MaxContentBufferSize(6L),
             MicrophoneCapabilities(7L),
@@ -17865,6 +17865,7 @@ public class ClusterIDMapping {
             TiltMax(6L),
             PanMin(7L),
             PanMax(8L),
+            MovementState(9L),
             GeneratedCommandList(65528L),
             AcceptedCommandList(65529L),
             AttributeList(65531L),
@@ -18158,7 +18159,7 @@ public class ClusterIDMapping {
                 }
                 throw new NoSuchFieldError();
             }
-        }public enum SolicitOfferCommandField {StreamUsage(0),OriginatingEndpointID(1),VideoStreamID(2),AudioStreamID(3),ICEServers(4),ICETransportPolicy(5),MetadataEnabled(6),;
+        }public enum SolicitOfferCommandField {StreamUsage(0),OriginatingEndpointID(1),VideoStreamID(2),AudioStreamID(3),ICEServers(4),ICETransportPolicy(5),MetadataEnabled(6),SFrameConfig(7),;
                     private final int id;
                     SolicitOfferCommandField(int id) {
                         this.id = id;
@@ -18175,7 +18176,7 @@ public class ClusterIDMapping {
                         }
                         throw new NoSuchFieldError();
                     }
-                }public enum ProvideOfferCommandField {WebRTCSessionID(0),Sdp(1),StreamUsage(2),OriginatingEndpointID(3),VideoStreamID(4),AudioStreamID(5),ICEServers(6),ICETransportPolicy(7),MetadataEnabled(8),;
+                }public enum ProvideOfferCommandField {WebRTCSessionID(0),Sdp(1),StreamUsage(2),OriginatingEndpointID(3),VideoStreamID(4),AudioStreamID(5),ICEServers(6),ICETransportPolicy(7),MetadataEnabled(8),SFrameConfig(9),;
                     private final int id;
                     ProvideOfferCommandField(int id) {
                         this.id = id;
