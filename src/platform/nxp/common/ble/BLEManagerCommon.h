@@ -57,14 +57,14 @@ struct BLECallbackDelegate
     using InitAppCallback    = void (*)(void);
     using ConnectionCallback = void (*)(deviceId_t id, gapConnectionEvent_t * event);
     using GapGenericCallback = void (*)(gapGenericEvent_t * event);
-    using GapAdvDataCallback = gapAdStructure_t* (*)(uint8_t* size);
+    using GapAdvDataCallback = gapAdStructure_t * (*) (uint8_t * size);
     using GattServerCallback = void (*)(deviceId_t id, gattServerEvent_t * event);
 
-    InitAppCallback appInitCallback = nullptr;
-    ConnectionCallback connCallback = nullptr;
-    GapGenericCallback gapCallback  = nullptr;
+    InitAppCallback appInitCallback       = nullptr;
+    ConnectionCallback connCallback       = nullptr;
+    GapGenericCallback gapCallback        = nullptr;
     GapAdvDataCallback gapAdvDataCallback = nullptr;
-    GattServerCallback gattCallback = nullptr;
+    GattServerCallback gattCallback       = nullptr;
 };
 
 typedef enum service_mode_t
@@ -151,7 +151,7 @@ protected:
         BLE_KW_MSG_APP_EV_CB,
     } blekw_msg_type_t;
 
-    typedef void* blekw_callback_param_t;
+    typedef void * blekw_callback_param_t;
     typedef void (*blekw_callback_handler_t)(blekw_callback_param_t param);
 
     typedef struct hk_ble_kw_msg_s
@@ -254,13 +254,12 @@ protected:
     static BLEManagerCommon::ble_err_t blekw_stop_advertising(void);
     static void blekw_gap_advertising_cb(gapAdvertisingEvent_t * pAdvertisingEvent);
     static void blekw_gap_connection_cb(deviceId_t deviceId, gapConnectionEvent_t * pConnectionEvent);
-    static gapAdStructure_t* blekw_default_adv_data_cb(uint8_t *size);
+    static gapAdStructure_t * blekw_default_adv_data_cb(uint8_t * size);
     static void blekw_start_connection_timeout(void);
     static void blekw_stop_connection_timeout(void);
     static CHIP_ERROR blekw_stop_connection_internal(BLE_CONNECTION_OBJECT conId);
 
 public:
-
     typedef enum
     {
         BLE_MSG_APP_EV_CB = blekw_msg_type_t::BLE_KW_MSG_APP_EV_CB,
@@ -276,7 +275,7 @@ public:
     BLECallbackDelegate callbackDelegate;
     void RegisterAppCallbacks(BLECallbackDelegate::InitAppCallback appInitCallback = nullptr,
                               BLECallbackDelegate::ConnectionCallback connCallback = nullptr,
-                              BLECallbackDelegate::GapGenericCallback gapCallback = nullptr,
+                              BLECallbackDelegate::GapGenericCallback gapCallback  = nullptr,
                               BLECallbackDelegate::GattServerCallback gattCallback = nullptr);
 
     void RegisterAdvDataCallback(BLECallbackDelegate::GapAdvDataCallback gapAdvDataCallback);

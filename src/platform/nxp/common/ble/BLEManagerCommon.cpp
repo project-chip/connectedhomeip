@@ -469,7 +469,7 @@ BLEManagerCommon::ble_err_t BLEManagerCommon::blekw_start_advertising(gapAdverti
     EventBits_t eventBits;
 
     /* Random address must be used only in matter commissioning, not in subsequent connections */
-    if(!ConfigurationMgr().IsFullyProvisioned())
+    if (!ConfigurationMgr().IsFullyProvisioned())
     {
         /************* Create and set the device address *************/
         if (gBleSuccess_c != Gap_CreateRandomDeviceAddress(NULL, NULL))
@@ -1353,17 +1353,17 @@ void BLEManagerCommon::blekw_gatt_server_cb(deviceId_t deviceId, gattServerEvent
 }
 
 /*
-* free the pointer
-*/
-gapAdStructure_t* BLEManagerCommon::blekw_default_adv_data_cb(uint8_t *size)
+ * free the pointer
+ */
+gapAdStructure_t * BLEManagerCommon::blekw_default_adv_data_cb(uint8_t * size)
 {
     static uint8_t advPayload[BLEKW_MAX_ADV_DATA_LEN] = { 0 };
-    static uint8_t advDataFlags = (gLeGeneralDiscoverableMode_c | gBrEdrNotSupported_c);
-    ChipBLEDeviceIdentificationInfo mDeviceIdInfo = { 0 };
-    uint8_t mDeviceIdInfoLength                   = 0;
-    CHIP_ERROR err = CHIP_NO_ERROR;
+    static uint8_t advDataFlags                       = (gLeGeneralDiscoverableMode_c | gBrEdrNotSupported_c);
+    ChipBLEDeviceIdentificationInfo mDeviceIdInfo     = { 0 };
+    uint8_t mDeviceIdInfoLength                       = 0;
+    CHIP_ERROR err                                    = CHIP_NO_ERROR;
 
-    gapAdStructure_t* adv_data = (gapAdStructure_t*) malloc(BLEKW_ADV_MAX_NO * sizeof(gapAdStructure_t));
+    gapAdStructure_t * adv_data = (gapAdStructure_t *) malloc(BLEKW_ADV_MAX_NO * sizeof(gapAdStructure_t));
 
     *size = BLEKW_ADV_MAX_NO;
 
@@ -1447,7 +1447,8 @@ exit:
     return err;
 }
 
-CHIP_ERROR BLEManagerCommon::AddBleAppMsgHandler(pub_ble_msg_type_t type, blekw_callback_handler_t handler, blekw_callback_param_t param)
+CHIP_ERROR BLEManagerCommon::AddBleAppMsgHandler(pub_ble_msg_type_t type, blekw_callback_handler_t handler,
+                                                 blekw_callback_param_t param)
 {
     CHIP_ERROR err    = CHIP_NO_ERROR;
     blekw_msg_t * msg = NULL;
