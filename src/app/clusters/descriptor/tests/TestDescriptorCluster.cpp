@@ -42,7 +42,8 @@ struct TestDescriptorCluster : public ::testing::Test
     static void TearDownTestSuite() { chip::Platform::MemoryShutdown(); }
 };
 
-TEST_F(TestDescriptorCluster, CompileTest) {
+TEST_F(TestDescriptorCluster, CompileTest)
+{
     DescriptorCluster cluster(1, BitFlags<Descriptor::Feature>(0));
     ASSERT_EQ(cluster.GetClusterFlags({ 1, Descriptor::Id }), BitFlags<ClusterQualityFlags>());
 }
@@ -74,8 +75,8 @@ TEST_F(TestDescriptorCluster, AttributesTest)
     ASSERT_EQ(expectedBuilder2.ReferenceExisting(DefaultServerCluster::GlobalAttributes()), CHIP_NO_ERROR);
 
     ASSERT_EQ(expectedBuilder2.AppendElements(Descriptor::Attributes::kMandatoryMetadata), CHIP_NO_ERROR);
-    ASSERT_EQ(expectedBuilder2.AppendElements({Descriptor::Attributes::TagList::kMetadataEntry}), CHIP_NO_ERROR);
+    ASSERT_EQ(expectedBuilder2.AppendElements({ Descriptor::Attributes::TagList::kMetadataEntry }), CHIP_NO_ERROR);
     ASSERT_TRUE(Testing::EqualAttributeSets(attributesBuilder2.TakeBuffer(), expectedBuilder2.TakeBuffer()));
 }
 
-}
+} // namespace
