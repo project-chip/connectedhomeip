@@ -586,7 +586,7 @@ Protocols::InteractionModel::Status HandleWriteBridgedDeviceBasicAttribute(Devic
     }
 
     CharSpan nameSpan = CharSpan::fromZclString(buffer);
-    std::string name(nameSpan.data(), nameSpan.size());    
+    std::string name(nameSpan.data(), nameSpan.size());
     dev->SetName(name.c_str());
 
     HandleDeviceStatusChanged(dev, Device::kChanged_Name);
