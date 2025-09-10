@@ -519,6 +519,7 @@ Protocols::InteractionModel::Status DispatchServerCommand(CommandHandler * apCom
 
 } // namespace Groups
 
+
 namespace HepaFilterMonitoring {
 
 Protocols::InteractionModel::Status DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandPath & aCommandPath,
@@ -535,6 +536,7 @@ Protocols::InteractionModel::Status DispatchServerCommand(CommandHandler * apCom
             if (TLVError == CHIP_NO_ERROR)
             {
                 wasHandled = emberAfHepaFilterMonitoringClusterResetConditionCallback(apCommandObj, aCommandPath, commandData);
+
             }
             break;
         }
@@ -1464,15 +1466,9 @@ void DispatchSingleClusterCommand(const ConcreteCommandPath & aCommandPath, TLV:
     case Clusters::Groups::Id:
         errorStatus = Clusters::Groups::DispatchServerCommand(apCommandObj, aCommandPath, aReader);
         break;
-<<<<<<< HEAD
-=======
     case Clusters::HepaFilterMonitoring::Id:
         errorStatus = Clusters::HepaFilterMonitoring::DispatchServerCommand(apCommandObj, aCommandPath, aReader);
         break;
-    case Clusters::Identify::Id:
-        errorStatus = Clusters::Identify::DispatchServerCommand(apCommandObj, aCommandPath, aReader);
-        break;
->>>>>>> 1129ad4805 (duplicated emberAf* functions for ActivatedCarbon and HEPA.)
     case Clusters::LevelControl::Id:
         errorStatus = Clusters::LevelControl::DispatchServerCommand(apCommandObj, aCommandPath, aReader);
         break;
