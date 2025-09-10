@@ -607,12 +607,12 @@ jobs:
                   ./scripts/run_in_build_env.sh \
                     "./scripts/build_python.sh \
                       --install_virtual_env out/venv \
-                      $([ "${DISABLE_CCACHE}" != "true" ] && echo --enable-ccache)\
+                      $([ "${DISABLE_CCACHE}" != "true" ] && echo --enable-ccache) \
                     "
 
             - name: Set pw_launcher ccache flag
               run: |
-                if [ "${{ env.DISABLE_CCACHE }}" = "true" ]; then
+                if [ "${DISABLE_CCACHE}" = "true" ]; then
                   echo "CCACHE_PW_LAUNCHER_FLAG=" >> $GITHUB_ENV
                 else
                   echo "CCACHE_PW_LAUNCHER_FLAG=--pw-command-launcher=ccache" >> $GITHUB_ENV
