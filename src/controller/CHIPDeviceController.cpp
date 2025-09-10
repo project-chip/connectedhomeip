@@ -1088,7 +1088,7 @@ DeviceCommissioner::ContinueCommissioningAfterDeviceAttestation(DeviceProxy * de
 #if CHIP_DEVICE_CONFIG_ENABLE_NFC_BASED_COMMISSIONING
 CHIP_ERROR DeviceCommissioner::ContinueCommissioningAfterConnectNetworkRequest(NodeId remoteDeviceId)
 {
-    MATTER_TRACE_SCOPE("continueCommissioningAfterUnpoweredPhaseComplete", "DeviceCommissioner");
+    MATTER_TRACE_SCOPE("continueCommissioningAfterConnectNetworkRequest", "DeviceCommissioner");
 
     if (mDefaultCommissioner == nullptr)
     {
