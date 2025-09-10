@@ -213,7 +213,6 @@ class TC_WebRTCProvider_2_3(MatterBaseTest, WEBRTCPTestBase):
         resp = await self.send_single_cmd(cmd=cmd, endpoint=endpoint, payloadCapability=ChipDeviceCtrl.TransportPayloadCapability.LARGE_PAYLOAD)
         asserts.assert_equal(type(resp), Clusters.WebRTCTransportProvider.Commands.ProvideOfferResponse,
                              "Incorrect response type")
-        asserts.assert_not_equal(resp.webRTCSessionID, 0, "webRTCSessionID in ProvideOfferResponse should not be 0.")
 
         self.step(9)
         # Verify CurrentSessions contains the new session

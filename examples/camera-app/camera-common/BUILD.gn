@@ -22,29 +22,41 @@ config("config") {
 chip_data_model("camera-common") {
   zap_file = "camera-app.zap"
   is_server = true
+
+  public_deps = [
+    "${chip_root}/src/app/clusters/tls-certificate-management-server",
+    "${chip_root}/src/app/clusters/tls-certificate-management-server:certificate-table",
+    "${chip_root}/src/crypto",
+  ]
 }
 
 source_set("camera-lib") {
   public_configs = [ ":config" ]
 
   sources = [
+    "${chip_root}/examples/all-clusters-app/all-clusters-common/src/tls-certificate-management-instance.cpp",
+    "${chip_root}/examples/all-clusters-app/all-clusters-common/src/tls-client-management-instance.cpp",
     "include/camera-app.h",
     "include/camera-avstream-controller/camera-avstream-controller.h",
     "include/camera-device-interface.h",
     "include/media-controller/media-controller.h",
     "include/transport/transport.h",
+    "include/webrtc-provider-controller/webrtc-provider-controller.h",
     "src/camera-app.cpp",
   ]
 
   include_dirs = [
     "include",
     "include/camera-avstream-controller",
+    "include/webrtc-provider-controller",
     "include/media-controller",
     "include/transport",
+    "${chip_root}/examples/all-clusters-app/all-clusters-common/include",
   ]
 
   deps = [
     "${chip_root}/examples/camera-app/camera-common",
+    "${chip_root}/src/app/clusters/push-av-stream-transport-server",
     "${chip_root}/src/lib",
   ]
 }

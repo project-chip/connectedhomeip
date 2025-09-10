@@ -30,19 +30,9 @@ CHIP_ERROR TransportMgrBase::SendMessage(const Transport::PeerAddress & address,
 
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
 CHIP_ERROR TransportMgrBase::TCPConnect(const Transport::PeerAddress & address, Transport::AppTCPConnectionCallbackCtxt * appState,
-                                        Transport::ActiveTCPConnectionState ** peerConnState)
+                                        Transport::ActiveTCPConnectionHolder & peerConnState)
 {
     return mTransport->TCPConnect(address, appState, peerConnState);
-}
-
-void TransportMgrBase::TCPDisconnect(const Transport::PeerAddress & address)
-{
-    mTransport->TCPDisconnect(address);
-}
-
-void TransportMgrBase::TCPDisconnect(Transport::ActiveTCPConnectionState * conn, bool shouldAbort)
-{
-    mTransport->TCPDisconnect(conn, shouldAbort);
 }
 #endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
 
@@ -99,7 +89,7 @@ void TransportMgrBase::HandleMessageReceived(const Transport::PeerAddress & peer
 }
 
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
-void TransportMgrBase::HandleConnectionReceived(Transport::ActiveTCPConnectionState * conn)
+void TransportMgrBase::HandleConnectionReceived(Transport::ActiveTCPConnectionState & conn)
 {
     if (mSessionManager != nullptr)
     {
@@ -107,49 +97,24 @@ void TransportMgrBase::HandleConnectionReceived(Transport::ActiveTCPConnectionSt
     }
     else
     {
-        Transport::TCPBase * tcp = reinterpret_cast<Transport::TCPBase *>(conn->mEndPoint->mAppState);
-
-        // Close connection here since no upper layer is interested in the
-        // connection.
-        if (tcp)
-        {
-            tcp->TCPDisconnect(conn, /* shouldAbort = */ true);
-        }
+        // Close connection here since no upper layer is interested in the connection.
+        Transport::ActiveTCPConnectionHolder releaseConnection(&conn);
     }
 }
 
-void TransportMgrBase::HandleConnectionAttemptComplete(Transport::ActiveTCPConnectionState * conn, CHIP_ERROR conErr)
+void TransportMgrBase::HandleConnectionAttemptComplete(Transport::ActiveTCPConnectionHolder & conn, CHIP_ERROR conErr)
 {
     if (mSessionManager != nullptr)
     {
         mSessionManager->HandleConnectionAttemptComplete(conn, conErr);
     }
-    else
-    {
-        Transport::TCPBase * tcp = reinterpret_cast<Transport::TCPBase *>(conn->mEndPoint->mAppState);
-
-        // Close connection here since no upper layer is interested in the
-        // connection.
-        if (tcp)
-        {
-            tcp->TCPDisconnect(conn, /* shouldAbort = */ true);
-        }
-    }
 }
 
-void TransportMgrBase::HandleConnectionClosed(Transport::ActiveTCPConnectionState * conn, CHIP_ERROR conErr)
+void TransportMgrBase::HandleConnectionClosed(Transport::ActiveTCPConnectionState & conn, CHIP_ERROR conErr)
 {
     if (mSessionManager != nullptr)
     {
         mSessionManager->HandleConnectionClosed(conn, conErr);
-    }
-    else
-    {
-        Transport::TCPBase * tcp = reinterpret_cast<Transport::TCPBase *>(conn->mEndPoint->mAppState);
-        if (tcp)
-        {
-            tcp->TCPDisconnect(conn, /* shouldAbort = */ true);
-        }
     }
 }
 #endif // INET_CONFIG_ENABLE_TCP_ENDPOINT

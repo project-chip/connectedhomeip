@@ -2231,57 +2231,59 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
 {
     MTR_LOG("%@ handling report end", self);
 
-    os_unfair_lock_lock(&self->_lock);
+    uint64_t newUpdateDelay;
+    BOOL timeSynchronizationLossDetected;
+    {
+        std::lock_guard lock(_lock);
 
-    _receivingReport = NO;
-    _receivingPrimingReport = NO;
-    _estimatedStartTimeFromGeneralDiagnosticsUpTime = nil;
+        _receivingReport = NO;
+        _receivingPrimingReport = NO;
+        _estimatedStartTimeFromGeneralDiagnosticsUpTime = nil;
 
-    [self _commitPendingDataVersions];
-    [self _scheduleClusterDataPersistence];
+        [self _commitPendingDataVersions];
+        [self _scheduleClusterDataPersistence];
 
-    // After the handling of the report, if we detected a device configuration change, notify the delegate
-    // of the same.
-    if (_deviceConfigurationChanged) {
-        [self _callDelegatesWithBlock:^(id<MTRDeviceDelegate> delegate) {
-            if ([delegate respondsToSelector:@selector(deviceConfigurationChanged:)]) {
-                [delegate deviceConfigurationChanged:self];
+        // After the handling of the report, if we detected a device configuration change, notify the delegate
+        // of the same.
+        if (_deviceConfigurationChanged) {
+            [self _callDelegatesWithBlock:^(id<MTRDeviceDelegate> delegate) {
+                if ([delegate respondsToSelector:@selector(deviceConfigurationChanged:)]) {
+                    [delegate deviceConfigurationChanged:self];
+                }
+            }];
+            [self _notifyDelegateOfPrivateInternalPropertiesChanges];
+            _deviceConfigurationChanged = NO;
+        }
+
+        // Do this after the _deviceConfigurationChanged check, so that we don't
+        // call deviceConfigurationChanged: immediately after telling our delegate
+        // we are now primed.
+        //
+        // TODO: Maybe we shouldn't dispatch deviceConfigurationChanged: for the
+        // initial priming bits?
+        if (!_deviceCachePrimed) {
+            // This is the end of the priming sequence of data reports, so we have
+            // all the data for the device now.
+            _deviceCachePrimed = YES;
+            [self _callDelegateDeviceCachePrimed];
+            [self _notifyDelegateOfPrivateInternalPropertiesChanges];
+        }
+
+        // For unit testing only
+#ifdef DEBUG
+        [self _callDelegatesWithBlock:^(id testDelegate) {
+            if ([testDelegate respondsToSelector:@selector(unitTestReportEndForDevice:)]) {
+                [testDelegate unitTestReportEndForDevice:self];
             }
         }];
-        [self _notifyDelegateOfPrivateInternalPropertiesChanges];
-        _deviceConfigurationChanged = NO;
-    }
-
-    // Do this after the _deviceConfigurationChanged check, so that we don't
-    // call deviceConfigurationChanged: immediately after telling our delegate
-    // we are now primed.
-    //
-    // TODO: Maybe we shouldn't dispatch deviceConfigurationChanged: for the
-    // initial priming bits?
-    if (!_deviceCachePrimed) {
-        // This is the end of the priming sequence of data reports, so we have
-        // all the data for the device now.
-        _deviceCachePrimed = YES;
-        [self _callDelegateDeviceCachePrimed];
-        [self _notifyDelegateOfPrivateInternalPropertiesChanges];
-    }
-
-// For unit testing only
-#ifdef DEBUG
-    [self _callDelegatesWithBlock:^(id testDelegate) {
-        if ([testDelegate respondsToSelector:@selector(unitTestReportEndForDevice:)]) {
-            [testDelegate unitTestReportEndForDevice:self];
-        }
-    }];
 #endif
 
-    uint64_t newUpdateDelay = [self timeUpdateShortDelayInSeconds];
+        newUpdateDelay = [self timeUpdateShortDelayInSeconds];
 
-    BOOL timeSynchronizationLossDetected = _timeSynchronizationLossDetected;
+        timeSynchronizationLossDetected = _timeSynchronizationLossDetected;
+    }
 
-    os_unfair_lock_unlock(&self->_lock);
-
-    os_unfair_lock_lock(&self->_timeSyncLock);
+    std::lock_guard timeSyncLock(_timeSyncLock);
 
     // If we haven't scheduled a time update, then time synchronization will be
     // handled by us eventually scheduling that update (e.g. when subscription
@@ -2297,8 +2299,6 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
         self.timeUpdateTimer = nil;
         [self _scheduleNextUpdate:newUpdateDelay];
     }
-
-    os_unfair_lock_unlock(&self->_timeSyncLock);
 }
 
 - (void)_handleCASESessionEstablished:(const SessionHandle &)session

@@ -43,12 +43,12 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: ghcr.io/project-chip/chip-build-nxp:154
+            image: ghcr.io/project-chip/chip-build-nxp:165
             volumes:
                 - "/tmp/bloat_reports:/tmp/bloat_reports"
         steps:
             - name: Checkout
-              uses: actions/checkout@v4
+              uses: actions/checkout@v5
             - name: Checkout submodules & Bootstrap
               uses: ./.github/actions/checkout-submodules-and-bootstrap
               with:
@@ -90,6 +90,15 @@ jobs:
                     nxp mcxw71+release lock \
                     out/artifacts/nxp-mcxw71-freertos-lock-app/chip-mcxw71-lock-example.elf \
                     /tmp/bloat_reports/
+
+            - name: Build MCXW72 examples
+              run: |
+                  scripts/run_in_build_env.sh "\
+                      ./scripts/build/build_examples.py \
+                      --target nxp-mcxw72-freertos-contact-sensor-low-power \
+                      --target nxp-mcxw72-freertos-lock-app \
+                      build \
+                  "
 
             - name: clean build
               run: rm -rf ./out
@@ -177,11 +186,11 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: ghcr.io/project-chip/chip-build-nxp-zephyr:154
+            image: ghcr.io/project-chip/chip-build-nxp-zephyr:165
 
         steps:
             - name: Checkout
-              uses: actions/checkout@v4
+              uses: actions/checkout@v5
             - name: Checkout submodules & Bootstrap
               uses: ./.github/actions/checkout-submodules-and-bootstrap
               with:
