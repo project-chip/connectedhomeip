@@ -62,21 +62,21 @@ private:
     static CHIP_ERROR ConstructAttestationElementsTLV(uint8_t * tlvBuffer, size_t bufferSize, const ByteSpan & cdData,
                                                       const ByteSpan & nonceData, size_t & tlvLen);
 
-    static CHIP_ERROR CreateSignedAttestationData(uint8_t * tlvBuffer, size_t & tlvLen,
+    static CHIP_ERROR CreateSignedAttestationData(uint8_t * tlvBuffer, size_t tlvBufferSize, size_t & tlvLen,
                                                   chip::Crypto::P256ECDSASignature & signature, const ByteSpan & cdData,
                                                   const ByteSpan & nonceData, const ByteSpan & privateKey,
                                                   const ByteSpan & publicKey, const uint8_t * challengeData,
                                                   size_t challengeDataLen);
 
 protected:
-    CHIP_ERROR CreateSignedAttestationDataForTest(uint8_t * tlvBuffer, size_t & tlvLen,
+    CHIP_ERROR CreateSignedAttestationDataForTest(uint8_t * tlvBuffer, size_t tlvBufferSize, size_t & tlvLen,
                                                   chip::Crypto::P256ECDSASignature & signature, const ByteSpan & cdData,
                                                   const ByteSpan & nonceData, const ByteSpan & privateKey,
                                                   const ByteSpan & publicKey, const uint8_t * challengeData,
                                                   size_t challengeDataLen)
     {
-        return CreateSignedAttestationData(tlvBuffer, tlvLen, signature, cdData, nonceData, privateKey, publicKey, challengeData,
-                                           challengeDataLen);
+        return CreateSignedAttestationData(tlvBuffer, tlvBufferSize, tlvLen, signature, cdData, nonceData, privateKey, publicKey,
+                                           challengeData, challengeDataLen);
     }
 
 public:
@@ -100,8 +100,8 @@ public:
         chip::Crypto::P256ECDSASignature signature;
 
         // Create signed attestation data
-        CHIP_ERROR err = CreateSignedAttestationData(tlvBuf, tlvLen, signature, cdData, nonceData, privateKey, publicKey,
-                                                     challengeData, challengeDataLen);
+        CHIP_ERROR err = CreateSignedAttestationData(tlvBuf, sizeof(tlvBuf), tlvLen, signature, cdData, nonceData, privateKey,
+                                                     publicKey, challengeData, challengeDataLen);
         ASSERT_EQ(err, CHIP_NO_ERROR);
 
         // Set up attestation info with the generated TLV and signature
@@ -135,6 +135,17 @@ CHIP_ERROR TestDacOnlyPartialAttestationVerifier::ConstructAttestationElementsTL
     chip::TLV::TLVType outerType;
 
     // Add attestation elements to the TLV structure
+
+    // Attestation Elements TLV
+    // attestation-elements => STRUCTURE [ tag-order ]
+    // {
+    //   certification_declaration[1]      : OCTET STRING,
+    //   attestation_nonce[2]              : OCTET STRING [ length 32 ],
+    //   timestamp[3]                      : UNSIGNED INTEGER [ range 32-bits ],
+    //   firmware_information[4, optional] : OCTET STRING,
+    // }
+    // Reference: Matter 1.4 Core Specification — 11.18.4.6. Attestation Elements
+
     ReturnErrorOnFailure(writer.StartContainer(chip::TLV::AnonymousTag(), chip::TLV::kTLVType_Structure, outerType));
     writer.Put(chip::TLV::ContextTag(1), cdData);
     writer.Put(chip::TLV::ContextTag(2), nonceData);
@@ -149,16 +160,16 @@ CHIP_ERROR TestDacOnlyPartialAttestationVerifier::ConstructAttestationElementsTL
 
 // Helper function to create signed attestation data using standard test parameters.
 CHIP_ERROR TestDacOnlyPartialAttestationVerifier::CreateSignedAttestationData(
-    uint8_t * tlvBuffer, size_t & tlvLen, chip::Crypto::P256ECDSASignature & signature, const ByteSpan & cdData,
-    const ByteSpan & nonceData, const ByteSpan & privateKey, const ByteSpan & publicKey, const uint8_t * challengeData,
-    size_t challengeDataLen)
+    uint8_t * tlvBuffer, size_t tlvBufferSize, size_t & tlvLen, chip::Crypto::P256ECDSASignature & signature,
+    const ByteSpan & cdData, const ByteSpan & nonceData, const ByteSpan & privateKey, const ByteSpan & publicKey,
+    const uint8_t * challengeData, size_t challengeDataLen)
 {
     // Construct TLV attestation elements
-    ReturnErrorOnFailure(ConstructAttestationElementsTLV(tlvBuffer, sizeof(uint8_t) * 128, cdData, nonceData, tlvLen));
+    ReturnErrorOnFailure(ConstructAttestationElementsTLV(tlvBuffer, tlvBufferSize, cdData, nonceData, tlvLen));
 
     // Concatenate TLV and challenge data for signing
     constexpr size_t kMaxToSignSize = 128 + 64; // 128 for TLV, 64 for challengeData
-    uint8_t toSign[kMaxToSignSize];
+    uint8_t toSign[kMaxToSignSize]  = { 0 };
     chip::Encoding::BufferWriter writer(toSign, sizeof(toSign));
     writer.Put(tlvBuffer, tlvLen).Put(challengeData, challengeDataLen);
     if (!writer.Fit())
@@ -370,7 +381,7 @@ TEST_F(TestDacOnlyPartialAttestationVerifier, TestWithMalformedAttestationElemen
                                                  0x70, 0x80, 0x90, 0xA0, 0xB0, 0xC0, 0xD0, 0xE0, 0xF0, 0x0F };
 
     // Concatenate attestationElements + attestationChallenge for signing
-    uint8_t toSign[sizeof(malformedAttestationElements) + sizeof(kTestChallengeData)];
+    uint8_t toSign[sizeof(malformedAttestationElements) + sizeof(kTestChallengeData)] = { 0 };
     chip::Encoding::BufferWriter writer(toSign, sizeof(toSign));
     writer.Put(malformedAttestationElements, sizeof(malformedAttestationElements))
         .Put(kTestChallengeData, sizeof(kTestChallengeData));
@@ -409,10 +420,10 @@ TEST_F(TestDacOnlyPartialAttestationVerifier, TestWithMismatchedNonce)
     chip::Crypto::P256ECDSASignature signature;
 
     // Create signed attestation data with mismatched nonce in elements
-    CHIP_ERROR err = CreateSignedAttestationDataForTest(tlvBuf, tlvLen, signature, ByteSpan(kTestCDData), ByteSpan(nonceInElements),
-                                                        ByteSpan(TestCerts::sTestCert_DAC_FFF1_8000_0004_PrivateKey),
-                                                        ByteSpan(TestCerts::sTestCert_DAC_FFF1_8000_0004_PublicKey),
-                                                        kTestChallengeData, sizeof(kTestChallengeData));
+    CHIP_ERROR err = CreateSignedAttestationDataForTest(
+        tlvBuf, sizeof(tlvBuf), tlvLen, signature, ByteSpan(kTestCDData), ByteSpan(nonceInElements),
+        ByteSpan(TestCerts::sTestCert_DAC_FFF1_8000_0004_PrivateKey), ByteSpan(TestCerts::sTestCert_DAC_FFF1_8000_0004_PublicKey),
+        kTestChallengeData, sizeof(kTestChallengeData));
     ASSERT_EQ(err, CHIP_NO_ERROR);
 
     // Prepare AttestationInfo with valid certificates and keys, but mismatched nonce
@@ -432,10 +443,10 @@ TEST_F(TestDacOnlyPartialAttestationVerifier, TestWithInvalidPAAFormat)
     size_t tlvLen = 0;
     chip::Crypto::P256ECDSASignature signature;
 
-    CHIP_ERROR err = CreateSignedAttestationDataForTest(tlvBuf, tlvLen, signature, ByteSpan(kTestCDData), ByteSpan(kTestNonceData),
-                                                        ByteSpan(TestCerts::sTestCert_DAC_FFF1_8000_0004_PrivateKey),
-                                                        ByteSpan(TestCerts::sTestCert_DAC_FFF1_8000_0004_PublicKey),
-                                                        kTestChallengeData, sizeof(kTestChallengeData));
+    CHIP_ERROR err = CreateSignedAttestationDataForTest(
+        tlvBuf, sizeof(tlvBuf), tlvLen, signature, ByteSpan(kTestCDData), ByteSpan(kTestNonceData),
+        ByteSpan(TestCerts::sTestCert_DAC_FFF1_8000_0004_PrivateKey), ByteSpan(TestCerts::sTestCert_DAC_FFF1_8000_0004_PublicKey),
+        kTestChallengeData, sizeof(kTestChallengeData));
     ASSERT_EQ(err, CHIP_NO_ERROR);
 
     // Prepare AttestationInfo with valid DAC and PAI, but invalid PAA
