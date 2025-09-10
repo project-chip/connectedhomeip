@@ -88,9 +88,17 @@ source_set("chip_config_header") {
     "${chip_root}/src/system:system_config_header",
   ]
 
+  if (chip_enable_nfc_based_commissioning) {
+    public_deps += [ "${chip_root}/src/nfc:nfc_config_header" ]
+  }
+
   deps = [ ":chip_buildconfig" ]
 
   allow_circular_includes_from = [ "${chip_root}/src/ble:ble_config_header" ]
+
+  if (chip_enable_nfc_based_commissioning) {
+    allow_circular_includes_from += [ "${chip_root}/src/nfc:nfc_config_header" ]
+  }
 }
 
 source_set("error") {
@@ -203,6 +211,11 @@ static_library("core") {
     "${chip_root}/src/inet",
     "${chip_root}/src/system",
   ]
+
+  if (chip_enable_nfc_based_commissioning) {
+    public_deps += [ "${chip_root}/src/nfc" ]
+    allow_circular_includes_from += [ "${chip_root}/src/nfc" ]
+  }
 }
 
 source_set("vectortlv") {

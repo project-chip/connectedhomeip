@@ -445,6 +445,10 @@ if (chip_device_platform != "none" && chip_device_platform != "external") {
       "${chip_root}/src/ble:ble_config_header",
       "${chip_root}/src/system:system_config_header",
     ]
+
+    if (chip_enable_nfc_based_commissioning) {
+      visibility += [ "${chip_root}/src/nfc:nfc_config_header" ]
+    }
   }
 } else if (chip_device_platform == "none") {
   buildconfig_header("platform_buildconfig") {
@@ -556,6 +560,10 @@ if (chip_device_platform != "none") {
       "PlatformEventSupport.cpp",
       "RuntimeOptionsProvider.cpp",
     ]
+
+    if (chip_enable_nfc_based_commissioning) {
+      sources += [ "../include/platform/internal/NFCCommissioningManager.h" ]
+    }
 
     if (current_os == "zephyr") {
       if (chip_system_config_use_sockets) {
