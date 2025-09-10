@@ -149,9 +149,9 @@ Clean up any existing configurations (first-time pairing only):
 sudo rm -rf /tmp/chip_*
 ```
 
-#### Video Format (YUYV Only)
+#### Video Format (`YUYV` Only)
 
-This demo supports only the uncompressed YUYV 4:2:2 pixel format for capture.
+This demo supports only the uncompressed `YUYV` pixel format for capture.
 
 Identify the correct video device first (examples: `video0`, `video1`). You can
 list devices and verify the format support with:
