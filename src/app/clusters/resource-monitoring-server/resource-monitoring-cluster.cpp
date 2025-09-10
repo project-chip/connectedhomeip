@@ -99,89 +99,37 @@ DataModel::ActionReturnStatus ResourceMonitoringCluster::WriteImpl(const DataMod
     }
 }
 
-DataModel::ActionReturnStatus ResourceMonitoringCluster::ReadActivatedCarbonFilterMonitoringAttribute(
-    const DataModel::ReadAttributeRequest & request, AttributeValueEncoder & encoder)
-{
-    switch (request.path.mAttributeId)
-    {
-        case ActivatedCarbonFilterMonitoring::Attributes::Condition::Id: {
-            return encoder.Encode(mCondition);
-        }
-
-        case ActivatedCarbonFilterMonitoring::Attributes::FeatureMap::Id: {
-            return encoder.Encode(mEnabledFeatures);
-        }
-        case ActivatedCarbonFilterMonitoring::Attributes::DegradationDirection::Id: {
-            return encoder.Encode(mDegradationDirection);
-        }
-        case ActivatedCarbonFilterMonitoring::Attributes::ChangeIndication::Id: {
-            return encoder.Encode(mChangeIndication);
-        }
-        case ActivatedCarbonFilterMonitoring::Attributes::InPlaceIndicator::Id: {
-            return encoder.Encode(mInPlaceIndicator);
-        }
-        case ActivatedCarbonFilterMonitoring::Attributes::LastChangedTime::Id: {
-            return encoder.Encode(mLastChangedTime);
-        }
-        case ActivatedCarbonFilterMonitoring::Attributes::ReplacementProductList::Id: {
-            return DataModel::ActionReturnStatus{ReadReplaceableProductList(encoder)};
-        }
-        case ActivatedCarbonFilterMonitoring::Attributes::ClusterRevision::Id: {
-            return encoder.Encode(HepaFilterMonitoring::kRevision);
-        }
-        default:
-            return Protocols::InteractionModel::Status::UnsupportedAttribute;
-    }
-}
-
-DataModel::ActionReturnStatus ResourceMonitoringCluster::ReadHepaFilterMonitoringAttribute(
-    const DataModel::ReadAttributeRequest & request, AttributeValueEncoder & encoder)
-{
-    switch (request.path.mAttributeId)
-    {
-        case HepaFilterMonitoring::Attributes::Condition::Id: {
-            return encoder.Encode(mCondition);
-        }
-        case HepaFilterMonitoring::Attributes::FeatureMap::Id: {
-            return encoder.Encode(mEnabledFeatures);
-        }
-        case HepaFilterMonitoring::Attributes::DegradationDirection::Id: {
-            return encoder.Encode(mDegradationDirection);
-        }
-        case HepaFilterMonitoring::Attributes::ChangeIndication::Id: {
-            return encoder.Encode(mChangeIndication);
-        }
-        case HepaFilterMonitoring::Attributes::InPlaceIndicator::Id: {
-            return encoder.Encode(mInPlaceIndicator);
-        }
-        case HepaFilterMonitoring::Attributes::LastChangedTime::Id: {
-            return encoder.Encode(mLastChangedTime);
-        }
-        case HepaFilterMonitoring::Attributes::ReplacementProductList::Id: {
-            return DataModel::ActionReturnStatus{ReadReplaceableProductList(encoder)};
-        }
-        case HepaFilterMonitoring::Attributes::ClusterRevision::Id: {
-            return encoder.Encode(HepaFilterMonitoring::kRevision);
-        }
-        default:
-            return Protocols::InteractionModel::Status::UnsupportedAttribute;
-    }
-}
-
 // Implements the read functionality for non-standard attributes.
 DataModel::ActionReturnStatus ResourceMonitoringCluster::ReadAttribute(const DataModel::ReadAttributeRequest & request, AttributeValueEncoder & encoder)
 {
-    if (mPath.mClusterId == HepaFilterMonitoring::Id)
+     switch (request.path.mAttributeId)
     {
-        return ReadHepaFilterMonitoringAttribute(request, encoder);
-    }
-    else if (mPath.mClusterId == ActivatedCarbonFilterMonitoring::Id)
-    {
-        return ReadActivatedCarbonFilterMonitoringAttribute(request, encoder);
-    }
-    else
-    {
-        return Protocols::InteractionModel::Status::UnsupportedCluster;
+        case ResourceMonitoring::Attributes::Condition::Id:
+            return encoder.Encode(mCondition);
+
+        case ResourceMonitoring::Attributes::FeatureMap::Id:
+            return encoder.Encode(mEnabledFeatures);
+        
+        case ResourceMonitoring::Attributes::DegradationDirection::Id:
+            return encoder.Encode(mDegradationDirection);
+
+        case ResourceMonitoring::Attributes::ChangeIndication::Id:
+            return encoder.Encode(mChangeIndication);
+
+        case ResourceMonitoring::Attributes::InPlaceIndicator::Id:
+            return encoder.Encode(mInPlaceIndicator);
+
+        case ResourceMonitoring::Attributes::LastChangedTime::Id:
+            return encoder.Encode(mLastChangedTime);
+
+        case ResourceMonitoring::Attributes::ReplacementProductList::Id:
+            return DataModel::ActionReturnStatus{ReadReplaceableProductList(encoder)};
+
+        case ResourceMonitoring::Attributes::ClusterRevision::Id:
+            return encoder.Encode(HepaFilterMonitoring::kRevision);
+
+        default:
+            return Protocols::InteractionModel::Status::UnsupportedAttribute;
     }
 
 }
