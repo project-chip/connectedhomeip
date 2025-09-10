@@ -611,7 +611,12 @@ jobs:
                     "
 
             - name: Set pw_launcher ccache flag
-              run: echo "CCACHE_PW_LAUNCHER_FLAG=${{ env.DISABLE_CCACHE == 'true' && '' || '--pw-command-launcher=ccache' }}" >> $GITHUB_ENV
+              run: |
+                if [ "${{ env.DISABLE_CCACHE }}" = "true" ]; then
+                  echo "CCACHE_PW_LAUNCHER_FLAG=" >> $GITHUB_ENV
+                else
+                  echo "CCACHE_PW_LAUNCHER_FLAG=--pw-command-launcher=ccache" >> $GITHUB_ENV
+                fi
 
             - name: Build linux-x64-all-clusters
               env:
