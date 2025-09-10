@@ -64,13 +64,13 @@ class TLVJsonConverter():
         cache = AttributeCache()
         for endpoint_id_str, endpoint in json_tlv.items():
             endpoint_id = int(endpoint_id_str, 0)
-            for cluster_id_str, cluster in endpoint.items():
-                s = cluster_id_str.split(':')
-                cluster_id = int(s[0])
-                for attribute_id_str, attribute in cluster.items():
-                    s = attribute_id_str.split(':')
-                    attribute_id = int(s[0])
-                    json_str = json.dumps({attribute_id_str: attribute}, indent=2)
+            for cluster_id_and_type_str, cluster in endpoint.items():
+                cluster_id_str, _ = cluster_id_and_type_str.split(':', 2)
+                cluster_id = int(cluster_id_str)
+                for attribute_id_and_type_str, attribute in cluster.items():
+                    attribute_id_str, _ = attribute_id_and_type_str.split(':', 2)
+                    attribute_id = int(attribute_id_str)
+                    json_str = json.dumps({attribute_id_and_type_str: attribute}, indent=2)
                     tmp = self._attribute_to_tlv(json_str)
                     path = AttributePath(EndpointId=endpoint_id, ClusterId=cluster_id, AttributeId=attribute_id)
                     # Each of these attributes contains only one item
