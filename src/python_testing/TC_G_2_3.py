@@ -273,10 +273,7 @@ class TC_G_2_3(MatterBaseTest):
         self.step("12")
         kGroupId7 = 7
         kGroupNameGp7 = "Gp7"
-        try:
-            await th1.SendCommand(self.dut_node_id, self.matter_test_config.endpoint, Clusters.Groups.Commands.AddGroupIfIdentifying(kGroupId7, kGroupNameGp7))
-        except Exception as e:
-            asserts.assert_true(False, f'Error while sending command AddGroupIfIdentify {e}')
+        resp = await th1.SendCommand(self.dut_node_id, self.matter_test_config.endpoint, Clusters.Groups.Commands.AddGroupIfIdentifying(kGroupId7, kGroupNameGp7))
 
         self.step("13")
         groupTableList: List[Clusters.GroupKeyManagement.Attributes.GroupTable] = await self.read_single_attribute(
@@ -310,17 +307,17 @@ class TC_G_2_3(MatterBaseTest):
 
         self.step("16a")
         GroupKeyMapStruct = Clusters.GroupKeyManagement.Structs.GroupKeyMapStruct
-        groupKeyMapStruct = [GroupKeyMapStruct(groupId=i, groupKeySetID=kGroupKeySetID) for i in range(6, maxgroups+1)]
+        groupKeyMapStruct = [GroupKeyMapStruct(groupId=i, groupKeySetID=kGroupKeySetID) for i in range(6+maxgroups, 6+maxgroups+1)]
         resp = await th1.WriteAttribute(self.dut_node_id, [(0, Clusters.GroupKeyManagement.Attributes.GroupKeyMap(groupKeyMapStruct))])
         asserts.assert_equal(resp[0].Status, Status.Success, "GroupKeyMap attribute write failed")
 
         self.step("16b")
-        kGroupId13 = 13
+        unkownGroupId = 18
         try:
-            await th1.SendCommand(self.dut_node_id, self.matter_test_config.endpoint, Clusters.Groups.Commands.AddGroupIfIdentifying(kGroupId13))
-            asserts.fail("Unexpected success call to sending command AddGroupIfIdentifying")
+            await th1.SendCommand(self.dut_node_id, self.matter_test_config.endpoint, Clusters.Groups.Commands.AddGroupIfIdentifying(unkownGroupId))
+            asserts.fail("Unexpected success to sending command AddGroupIfIdentifying")
         except InteractionModelError as e:
-            asserts.assert_equal(e.status, Status.UnsupportedAccess,
+            asserts.assert_equal(e.status, Status.ResourceExhausted,
                                  "Unexpected error response from command AddGroupIfIdentifying")
 
         self.step("17")
