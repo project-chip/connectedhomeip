@@ -139,12 +139,6 @@ private:
     
     CHIP_ERROR ReadReplaceableProductList(AttributeValueEncoder & encoder);
 
-    DataModel::ActionReturnStatus ReadHepaFilterMonitoringAttribute(
-    const DataModel::ReadAttributeRequest & request, AttributeValueEncoder & encoder);
-
-    DataModel::ActionReturnStatus ReadActivatedCarbonFilterMonitoringAttribute(
-    const DataModel::ReadAttributeRequest & request, AttributeValueEncoder & encoder);
-
     DataModel::ActionReturnStatus WriteImpl(const DataModel::WriteAttributeRequest & request,
                                            AttributeValueDecoder & decoder);
 
