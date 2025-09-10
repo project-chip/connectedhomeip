@@ -38,29 +38,21 @@ CHIP_ERROR LoadKeypairFromRaw(ByteSpan privateKey, ByteSpan publicKey, Crypto::P
     return keypair.Deserialize(serializedKeypair);
 }
 
-CHIP_ERROR GetFactoryData(uint8_t * buf, const void * const data, const size_t len)
+void GetFactoryData(uint8_t * buf, const void * const data, const size_t len)
 {
-    VerifyOrReturnError(data, CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND);
+    assert(data != nullptr);
+    uint32_t offset = (uint32_t) ((uint8_t *) data - (uint8_t *) chip::DeviceLayer::mFactoryDataBuffer);
 
     const struct device * mFlashDevice = DEVICE_DT_GET(DT_CHOSEN(zephyr_flash_controller));
-    uint32_t offset                    = (uint32_t) ((uint8_t *) data - (uint8_t *) chip::DeviceLayer::mFactoryDataBuffer);
-
-    int ret = flash_read(mFlashDevice, FIXED_PARTITION_OFFSET(factory_partition) + offset, buf, len);
-    if (ret != 0)
-    {
-        return CHIP_ERROR_READ_FAILED;
-    }
-    return CHIP_NO_ERROR;
+    int ret                            = flash_read(mFlashDevice, FIXED_PARTITION_OFFSET(factory_partition) + offset, buf, len);
+    assert(ret == 0);
 }
 
 CHIP_ERROR GetFactoryDataString(const FactoryDataString & str, char * buf, size_t bufSize)
 {
     VerifyOrReturnError(bufSize >= str.len + 1, CHIP_ERROR_BUFFER_TOO_SMALL);
 
-    if (GetFactoryData((uint8_t *) buf, str.data, str.len) != CHIP_NO_ERROR)
-    {
-        return CHIP_ERROR_READ_FAILED;
-    }
+    GetFactoryData((uint8_t *) buf, str.data, str.len);
     buf[str.len] = 0;
 
     return CHIP_NO_ERROR;
@@ -90,6 +82,16 @@ CHIP_ERROR FactoryDataProvider<FlashFactoryData>::Init()
         return error;
     }
 
+    uint8_t * ptr = nullptr;
+
+    ptr = (uint8_t *) malloc(sizeof(uint8_t) * FIXED_PARTITION_SIZE(factory_partition));
+    if (ptr == nullptr)
+    {
+        ChipLogError(DeviceLayer, "Failed to malloc the mFactoryDataBuffer");
+        return CHIP_ERROR_NO_MEMORY;
+    }
+    mFactoryDataBuffer = ptr;
+
     error = mFlashFactoryData.GetFactoryDataPartition(factoryData, factoryDataSize);
 
     if (error != CHIP_NO_ERROR)
@@ -105,7 +107,7 @@ CHIP_ERROR FactoryDataProvider<FlashFactoryData>::Init()
     }
 
     // Release the memory of mFactoryDataBuffer after complete parse
-    free(chip::DeviceLayer::mFactoryDataBuffer);
+    free(ptr);
 
     // Check if factory data version is correct
     if (mFactoryData.version != CONFIG_CHIP_FACTORY_DATA_VERSION)
@@ -183,7 +185,15 @@ CHIP_ERROR FactoryDataProvider<FlashFactoryData>::SignWithDeviceAttestationKey(c
     VerifyOrReturnError(mFactoryData.dac_priv_key.data, CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND);
 
     // Get the dac cert from flash.
-    uint8_t * P_DACCert = (uint8_t *) malloc(sizeof(uint8_t) * mFactoryData.dac_cert.len);
+    uint8_t * P_DACCert = nullptr;
+
+    P_DACCert = (uint8_t *) malloc(sizeof(uint8_t) * mFactoryData.dac_cert.len);
+    if (P_DACCert == nullptr)
+    {
+        ChipLogError(DeviceLayer, "Failed to malloc the P_DACCert");
+        return CHIP_ERROR_NO_MEMORY;
+    }
+
     GetFactoryData(P_DACCert, mFactoryData.dac_cert.data, mFactoryData.dac_cert.len);
 
     // Extract public key from DAC cert.
@@ -199,7 +209,15 @@ CHIP_ERROR FactoryDataProvider<FlashFactoryData>::SignWithDeviceAttestationKey(c
     }
 
     // Get the dac priv key from flash.
-    uint8_t * P_DACPrivKey = (uint8_t *) malloc(sizeof(uint8_t) * mFactoryData.dac_priv_key.len);
+    uint8_t * P_DACPrivKey = nullptr;
+
+    P_DACPrivKey = (uint8_t *) malloc(sizeof(uint8_t) * mFactoryData.dac_priv_key.len);
+    if (P_DACPrivKey == nullptr)
+    {
+        ChipLogError(DeviceLayer, "Failed to malloc the P_DACPrivKey");
+        return CHIP_ERROR_NO_MEMORY;
+    }
+
     GetFactoryData(P_DACPrivKey, mFactoryData.dac_priv_key.data, mFactoryData.dac_priv_key.len);
 
     // Load keypair from raw.
@@ -374,7 +392,15 @@ CHIP_ERROR FactoryDataProvider<FlashFactoryData>::GetEnableKey(MutableByteSpan &
     VerifyOrReturnError(mFactoryData.enable_key.data, CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND);
     VerifyOrReturnError(enableKey.size() >= mFactoryData.enable_key.len / 2, CHIP_ERROR_BUFFER_TOO_SMALL);
 
-    uint8_t * P_EnableKey = (uint8_t *) malloc(sizeof(uint8_t) * mFactoryData.enable_key.len);
+    uint8_t * P_EnableKey = nullptr;
+
+    P_EnableKey = (uint8_t *) malloc(sizeof(uint8_t) * mFactoryData.enable_key.len);
+    if (P_EnableKey == nullptr)
+    {
+        ChipLogError(DeviceLayer, "Failed to malloc the P_EnableKey");
+        return CHIP_ERROR_NO_MEMORY;
+    }
+
     GetFactoryData(P_EnableKey, mFactoryData.enable_key.data, mFactoryData.enable_key.len);
     Encoding::HexToBytes((const char *) P_EnableKey, mFactoryData.enable_key.len, enableKey.data(), enableKey.size());
     free(P_EnableKey);
