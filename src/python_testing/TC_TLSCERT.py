@@ -556,7 +556,7 @@ class TC_TLSCERT(MatterBaseTest):
         await cr1_cmd.send_remove_fabric_command(cr2_cmd.fabric_index)
 
     def desc_TC_TLSCERT_2_9(self) -> str:
-        return "[TC-TLSCERT-3.1.8] ProvisionClientCertificate command verification"
+        return "[TC-TLSCERT-2.9] ProvisionClientCertificate command verification"
 
     def pics_TC_TLSCERT_2_9(self):
         """ This function returns a list of PICS for this test case that must be True for the test to be run"""
@@ -612,7 +612,6 @@ class TC_TLSCERT(MatterBaseTest):
 
     @run_if_endpoint_matches(has_cluster(Clusters.TlsCertificateManagement))
     async def test_TC_TLSCERT_2_9(self):
-        attributes = Clusters.TlsCertificateManagement.Attributes
 
         setup_data = await self.common_two_fabric_setup()
         cr1_cmd = setup_data.cr1_cmd
