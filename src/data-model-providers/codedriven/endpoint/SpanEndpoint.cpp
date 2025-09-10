@@ -45,6 +45,14 @@ SpanEndpoint::Builder & SpanEndpoint::Builder::SetDeviceTypes(Span<const DataMod
     return *this;
 }
 
+#if CHIP_CONFIG_USE_ENDPOINT_UNIQUE_ID
+SpanEndpoint::Builder & SpanEndpoint::Builder::SetEndpointUniqueId(MutableCharSpan endpointUniqueId) const
+{
+    mEndpointUniqueId = endpointUniqueId;
+    return *this;
+}
+#endif
+
 SpanEndpoint SpanEndpoint::Builder::Build()
 {
     return SpanEndpoint(mClientClusters, mSemanticTags, mDeviceTypes);
@@ -65,6 +73,13 @@ CHIP_ERROR SpanEndpoint::ClientClusters(ReadOnlyBufferBuilder<ClusterId> & out) 
 {
     return out.ReferenceExisting(mClientClusters);
 }
+
+#if CHIP_CONFIG_USE_ENDPOINT_UNIQUE_ID
+MutableCharSpan SpanEndpoint::EndpointUniqueId() const
+{
+    return mEndpointUniqueId;
+}
+#endif
 
 // Private constructor for Builder
 SpanEndpoint::SpanEndpoint(const Span<const ClusterId> & clientClusters, const Span<const SemanticTag> & semanticTags,

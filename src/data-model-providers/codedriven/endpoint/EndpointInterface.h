@@ -47,6 +47,10 @@ public:
 
     virtual CHIP_ERROR ClientClusters(ReadOnlyBufferBuilder<ClusterId> & out) const = 0;
 
+#if CHIP_CONFIG_USE_ENDPOINT_UNIQUE_ID
+    virtual MutableCharSpan EndpointUniqueID() const = 0;
+#endif
+
     /**
      * @brief Populates the provided buffer with pointers to all ServerClusterInterface instances
      *        hosted on this endpoint. The returned pointers shall be valid as long as the
