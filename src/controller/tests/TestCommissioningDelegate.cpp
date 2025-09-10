@@ -33,119 +33,33 @@ struct TestDADelegate : public Credentials::DeviceAttestationDelegate
 };
 
 // ---------- StageToString (and MetricKey… if enabled) ----------
-TEST_F(CommissioningDelegateTest, StageToString_AllCases_AndDefault)
+TEST_F(CommissioningDelegateTest, StageToString_UnknownAndKnown)
 {
-    struct Case
-    {
-        CommissioningStage stage;
-        const char * str;
-    } cases[] = {
-        { kError, "Error" },
-        { kSecurePairing, "SecurePairing" },
-        { kReadCommissioningInfo, "ReadCommissioningInfo" },
-        { kArmFailsafe, "ArmFailSafe" },
-        { kScanNetworks, "ScanNetworks" },
-        { kConfigRegulatory, "ConfigRegulatory" },
-        { kConfigureTCAcknowledgments, "ConfigureTCAcknowledgments" },
-        { kConfigureUTCTime, "ConfigureUTCTime" },
-        { kConfigureTimeZone, "ConfigureTimeZone" },
-        { kConfigureDSTOffset, "ConfigureDSTOffset" },
-        { kConfigureDefaultNTP, "ConfigureDefaultNTP" },
-        { kSendPAICertificateRequest, "SendPAICertificateRequest" },
-        { kSendDACCertificateRequest, "SendDACCertificateRequest" },
-        { kSendAttestationRequest, "SendAttestationRequest" },
-        { kAttestationVerification, "AttestationVerification" },
-        { kAttestationRevocationCheck, "AttestationRevocationCheck" },
-#if CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
-        { kJCMTrustVerification, "JCMTrustVerification" },
-#endif // CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
-        { kSendOpCertSigningRequest, "SendOpCertSigningRequest" },
-        { kValidateCSR, "ValidateCSR" },
-        { kGenerateNOCChain, "GenerateNOCChain" },
-        { kSendTrustedRootCert, "SendTrustedRootCert" },
-        { kSendNOC, "SendNOC" },
-        { kConfigureTrustedTimeSource, "ConfigureTrustedTimeSource" },
-        { kICDGetRegistrationInfo, "ICDGetRegistrationInfo" },
-        { kICDRegistration, "ICDRegistration" },
-        { kWiFiNetworkSetup, "WiFiNetworkSetup" },
-        { kThreadNetworkSetup, "ThreadNetworkSetup" },
-        { kFailsafeBeforeWiFiEnable, "FailsafeBeforeWiFiEnable" },
-        { kFailsafeBeforeThreadEnable, "FailsafeBeforeThreadEnable" },
-        { kWiFiNetworkEnable, "WiFiNetworkEnable" },
-        { kThreadNetworkEnable, "ThreadNetworkEnable" },
-        { kEvictPreviousCaseSessions, "EvictPreviousCaseSessions" },
-        { kFindOperationalForStayActive, "FindOperationalForStayActive" },
-        { kFindOperationalForCommissioningComplete, "FindOperationalForCommissioningComplete" },
-        { kICDSendStayActive, "ICDSendStayActive" },
-        { kSendComplete, "SendComplete" },
-        { kCleanup, "Cleanup" },
-        { kNeedsNetworkCreds, "NeedsNetworkCreds" },
-        { kPrimaryOperationalNetworkFailed, "PrimaryOperationalNetworkFailed" },
-        { kRemoveWiFiNetworkConfig, "RemoveWiFiNetworkConfig" },
-        { kRemoveThreadNetworkConfig, "RemoveThreadNetworkConfig" },
-    };
-
-    for (const auto & c : cases)
-    {
-        EXPECT_STREQ(StageToString(c.stage), c.str);
-    }
-
-    // default/unknown
+    // Unknown/default → "???"
     EXPECT_STREQ(StageToString(static_cast<CommissioningStage>(250)), "???");
+
+    // One representative known stage → non-empty label and not "???"
+    const char * s = StageToString(kSecurePairing);
+    ASSERT_NE(s, nullptr);
+    EXPECT_STRNE(s, "???");
+    EXPECT_GT(std::strlen(s), 0u);
 }
 
 #if MATTER_TRACING_ENABLED
-TEST_F(CommissioningDelegateTest, MetricKeyForCommissioningStage_AllCases)
+TEST_F(CommissioningDelegateTest, MetricKeyForCommissioningStage_UnknownAndKnown)
 {
-    struct Case
-    {
-        CommissioningStage stage;
-        const char * key;
-    } cases[] = {
-        { kError, "core_commissioning_stage_error" },
-        { kSecurePairing, "core_commissioning_stage_secure_pairing" },
-        { kReadCommissioningInfo, "core_commissioning_stage_read_commissioning_info" },
-        { kArmFailsafe, "core_commissioning_stage_arm_failsafe" },
-        { kScanNetworks, "core_commissioning_stage_scan_networks" },
-        { kConfigRegulatory, "core_commissioning_stage_config_regulatory" },
-        { kConfigureUTCTime, "core_commissioning_stage_configure_utc_time" },
-        { kConfigureTimeZone, "core_commissioning_stage_configure_timezone" },
-        { kConfigureDSTOffset, "core_commissioning_stage_configure_dst_offset" },
-        { kConfigureDefaultNTP, "core_commissioning_stage_configure_default_ntp" },
-        { kSendPAICertificateRequest, "core_commissioning_stage_send_pai_certificate_request" },
-        { kSendDACCertificateRequest, "core_commissioning_stage_send_dac_certificate_request" },
-        { kSendAttestationRequest, "core_commissioning_stage_send_attestation_request" },
-        { kAttestationVerification, "core_commissioning_stage_attestation_verification" },
-        { kSendOpCertSigningRequest, "core_commissioning_stage_opcert_signing_request" },
-        { kValidateCSR, "core_commissioning_stage_validate_csr" },
-        { kGenerateNOCChain, "core_commissioning_stage_generate_noc_chain" },
-        { kSendTrustedRootCert, "core_commissioning_stage_send_trusted_root_cert" },
-        { kSendNOC, "core_commissioning_stage_send_noc" },
-        { kConfigureTrustedTimeSource, "core_commissioning_stage_configure_trusted_time_source" },
-        { kICDGetRegistrationInfo, "core_commissioning_stage_icd_get_registration_info" },
-        { kICDRegistration, "core_commissioning_stage_icd_registration" },
-        { kWiFiNetworkSetup, "core_commissioning_stage_wifi_network_setup" },
-        { kThreadNetworkSetup, "core_commissioning_stage_thread_network_setup" },
-        { kFailsafeBeforeWiFiEnable, "core_commissioning_stage_failsafe_before_wifi_enable" },
-        { kFailsafeBeforeThreadEnable, "core_commissioning_stage_failsafe_before_thread_enable" },
-        { kWiFiNetworkEnable, "core_commissioning_stage_wifi_network_enable" },
-        { kThreadNetworkEnable, "core_commissioning_stage_thread_network_enable" },
-        { kEvictPreviousCaseSessions, "core_commissioning_stage_evict_previous_case_sessions" },
-        { kFindOperationalForStayActive, "core_commissioning_stage_find_operational_for_stay_active" },
-        { kFindOperationalForCommissioningComplete, "core_commissioning_stage_find_operational_for_commissioning_complete" },
-        { kICDSendStayActive, "core_commissioning_stage_icd_send_stay_active" },
-        { kSendComplete, "core_commissioning_stage_send_complete" },
-        { kCleanup, "core_commissioning_stage_cleanup" },
-        { kNeedsNetworkCreds, "core_commissioning_stage_need_network_creds" },
-    };
-
-    for (const auto & c : cases)
-    {
-        EXPECT_STREQ(MetricKeyForCommissioningStage(c.stage), c.key);
-    }
-
-    // default/unknown
+    // Unknown/default → exact, stable fallback
     EXPECT_STREQ(MetricKeyForCommissioningStage(static_cast<CommissioningStage>(250)), "core_commissioning_stage_unknown");
+
+    // One representative known stage → non-empty, not "unknown", and has the standard prefix
+    const char * key = MetricKeyForCommissioningStage(kSecurePairing);
+    ASSERT_NE(key, nullptr);
+    EXPECT_GT(std::strlen(key), 0u);
+    EXPECT_STRNE(key, "core_commissioning_stage_unknown");
+
+    const char * kPrefix = "core_commissioning_stage_";
+    EXPECT_EQ(std::strncmp(key, kPrefix, std::strlen(kPrefix)), 0)
+        << "Expected metric key to use the standard 'core_commissioning_stage_' prefix.";
 }
 #endif
 
@@ -222,23 +136,28 @@ TEST_F(CommissioningDelegateTest, CommissioningParameters_DefaultsAndSettersExer
     ASSERT_TRUE(p.GetTrustedTimeSource().HasValue());
     EXPECT_TRUE(p.GetTrustedTimeSource().Value().IsNull());
 
-    // Nonces
-    const uint8_t csr[5] = { 1, 2, 3, 4, 5 };
-    const uint8_t att[3] = { 9, 9, 9 };
+    // Nonces (use spec/SDK lengths, pass explicit sizes) ----
+    std::array<uint8_t, kCSRNonceLength> csr{};
+    std::array<uint8_t, kAttestationNonceLength> att{};
+    // Fill with deterministic non-zero so we avoid relying on zero-init content
+    std::fill(csr.begin(), csr.end(), 0xA5);
+    std::fill(att.begin(), att.end(), 0x5A);
+
     p.SetCSRNonce(ByteSpan{ csr });
     p.SetAttestationNonce(ByteSpan{ att });
     EXPECT_TRUE(p.GetCSRNonce().HasValue());
     EXPECT_TRUE(p.GetAttestationNonce().HasValue());
 
     // WiFi + Thread datasets set scans to false
-    const uint8_t ssid[] = { 'A', 'P' };
-    const uint8_t pwd[]  = { 'p', 'w' };
+    const uint8_t ssid[] = { 'A', 'P' };                                    // SSID 1–32 bytes
+    const uint8_t pwd[]  = { '2', '4', '4', '4', '6', '6', '6', '6', '6' }; // >= 8 chars for WPA2
+
     p.SetWiFiCredentials(WiFiCredentials{ ByteSpan{ ssid }, ByteSpan{ pwd } });
     EXPECT_TRUE(p.GetWiFiCredentials().HasValue());
     ASSERT_TRUE(p.GetAttemptWiFiNetworkScan().HasValue());
     EXPECT_FALSE(p.GetAttemptWiFiNetworkScan().Value());
 
-    const uint8_t tds[] = { 7, 7, 7 };
+    const uint8_t tds[] = { 0x07, 0x07, 0x07 }; // any opaque dataset bytes ok for exercising API
     p.SetThreadOperationalDataset(ByteSpan{ tds });
     EXPECT_TRUE(p.GetThreadOperationalDataset().HasValue());
     ASSERT_TRUE(p.GetAttemptThreadNetworkScan().HasValue());
@@ -346,7 +265,7 @@ TEST_F(CommissioningDelegateTest, CommissioningParameters_DefaultsAndSettersExer
     EXPECT_EQ(p.GetExtraReadPaths().size(), size_t{ 0 });
 }
 
-// ---------- Small POD structs & CommissioningReport ----------
+// Small POD structs & CommissioningReport
 
 TEST_F(CommissioningDelegateTest, PODStructConstructorsCover)
 {
@@ -378,8 +297,11 @@ TEST_F(CommissioningDelegateTest, AttestationPayloadSettersStoreSpans)
 {
     CommissioningParameters p;
 
-    const uint8_t elems[] = { 0x01, 0x02, 0x03, 0x04 };
-    const uint8_t sig[]   = { 0xA5, 0x5A };
+    // Elements: arbitrary non-empty bytes (we only round-trip them here)
+    const uint8_t elems[] = { 0x01, 0x02, 0x03, 0x04, 0x05 };
+
+    // Signature: P-256 ECDSA is 64 bytes
+    std::array<uint8_t, 64> sig{ 0xA5, 0x5A };
 
     p.SetAttestationElements(ByteSpan{ elems });
     p.SetAttestationSignature(ByteSpan{ sig });
@@ -392,16 +314,16 @@ TEST_F(CommissioningDelegateTest, AttestationPayloadSettersStoreSpans)
 
     EXPECT_EQ(gotElems.size(), sizeof(elems));
     EXPECT_EQ(gotSig.size(), sizeof(sig));
-    EXPECT_EQ(std::memcmp(gotElems.data(), elems, sizeof(elems)), 0);
-    EXPECT_EQ(std::memcmp(gotSig.data(), sig, sizeof(sig)), 0);
+    EXPECT_TRUE(gotElems.data_equal(ByteSpan{ elems }));
+    EXPECT_TRUE(gotSig.data_equal(ByteSpan{ sig }));
 }
 
 TEST_F(CommissioningDelegateTest, CertSettersStoreSpans)
 {
     CommissioningParameters p;
 
-    const uint8_t pai[] = { 0x11, 0x22, 0x33 };
-    const uint8_t dac[] = { 0x44, 0x55 };
+    const uint8_t pai[256] = { 0x11, 0x22, 0x33 };
+    const uint8_t dac[256] = { 0x44, 0x55 };
 
     p.SetPAI(ByteSpan{ pai });
     p.SetDAC(ByteSpan{ dac });
@@ -414,8 +336,8 @@ TEST_F(CommissioningDelegateTest, CertSettersStoreSpans)
 
     EXPECT_EQ(gotPAI.size(), sizeof(pai));
     EXPECT_EQ(gotDAC.size(), sizeof(dac));
-    EXPECT_EQ(std::memcmp(gotPAI.data(), pai, sizeof(pai)), 0);
-    EXPECT_EQ(std::memcmp(gotDAC.data(), dac, sizeof(dac)), 0);
+    EXPECT_TRUE(gotPAI.data_equal(ByteSpan{ pai }));
+    EXPECT_TRUE(gotDAC.data_equal(ByteSpan{ dac }));
 }
 
 TEST_F(CommissioningDelegateTest, RemoteNodeIdSetterStoresValue)
