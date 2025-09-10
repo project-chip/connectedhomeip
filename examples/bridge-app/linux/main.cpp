@@ -585,7 +585,7 @@ Protocols::InteractionModel::Status HandleWriteBridgedDeviceBasicAttribute(Devic
         return Protocols::InteractionModel::Status::ConstraintError;
     }
 
-    chip::CharSpan nameSpan = chip::CharSpan::fromZclString(buffer);
+    CharSpan nameSpan = CharSpan::fromZclString(buffer);
     std::string name(nameSpan.data(), nameSpan.size());    
     dev->SetName(name.c_str());
 
