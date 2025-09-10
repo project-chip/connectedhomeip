@@ -42,8 +42,8 @@ public:
         return gServers[emberEndpointIndex].Registration();
     }
 
-    ServerClusterInterface & FindRegistration(unsigned emberEndpointIndex) override { 
-        return gServers[emberEndpointIndex].Cluster(); 
+    ServerClusterInterface & FindRegistration(unsigned emberEndpointIndex) override {
+        return gServers[emberEndpointIndex].Cluster();
     }
     void ReleaseRegistration(unsigned emberEndpointIndex) override { gServers[emberEndpointIndex].Destroy(); }
 };
