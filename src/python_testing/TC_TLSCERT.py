@@ -56,8 +56,8 @@ from matter.clusters.Types import Nullable, NullValue
 from matter.interaction_model import InteractionModelError, Status
 from matter.testing import matter_asserts
 from matter.testing.conversions import hex_from_bytes
-from matter.testing.matter_testing import (MatterBaseTest, TestStep, default_matter_test_main, has_cluster, run_if_endpoint_matches,
-                                           matchers)
+from matter.testing.matter_testing import (MatterBaseTest, TestStep, default_matter_test_main, has_cluster, matchers,
+                                           run_if_endpoint_matches)
 from matter.tlv import TLVWriter
 from matter.utils import CommissioningBuildingBlocks
 
