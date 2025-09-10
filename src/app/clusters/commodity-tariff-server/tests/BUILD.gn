@@ -11,16 +11,25 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
 import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
+import("//build_overrides/pigweed.gni")
 
-source_set("commodity-tariff-server") {
-  sources = [
-    "CommodityTariffAttrsDataMgmt.cpp",
-    "CommodityTariffAttrsDataMgmt.h",
-    "CommodityTariffConsts.h",
+import("${chip_root}/build/chip/chip_test_suite.gni")
+
+chip_test_suite("tests") {
+  output_name = "TestCommodityTariffBaseDataClass"
+
+  test_sources = [ "TestCommodityTariffBaseDataClass.cpp" ]
+
+  sources = []
+
+  cflags = [ "-Wconversion" ]
+
+  public_deps = [
+    "${chip_root}/src/app/clusters/commodity-tariff-server",
+    "${chip_root}/src/app/clusters/testing",
+    "${chip_root}/src/lib/support",
   ]
-
-  public_deps =
-      [ "${chip_root}/zzz_generated/app-common/clusters/CommodityTariff" ]
 }
