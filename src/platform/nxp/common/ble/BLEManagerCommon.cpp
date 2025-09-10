@@ -1355,7 +1355,7 @@ void BLEManagerCommon::blekw_gatt_server_cb(deviceId_t deviceId, gattServerEvent
 gapAdStructure_t * BLEManagerCommon::blekw_default_adv_data_cb(uint8_t * size)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-    gapAdStructure_t* adv_data;
+    gapAdStructure_t * adv_data;
     static uint8_t advPayload[BLEKW_MAX_ADV_DATA_LEN] = { 0 };
     static uint8_t advDataFlags                       = (gLeGeneralDiscoverableMode_c | gBrEdrNotSupported_c);
     ChipBLEDeviceIdentificationInfo mDeviceIdInfo     = { 0 };
@@ -1378,7 +1378,7 @@ gapAdStructure_t * BLEManagerCommon::blekw_default_adv_data_cb(uint8_t * size)
         return nullptr;
     }
 
-    adv_data = (gapAdStructure_t*) malloc(BLEKW_ADV_MAX_NO * sizeof(gapAdStructure_t));
+    adv_data = (gapAdStructure_t *) malloc(BLEKW_ADV_MAX_NO * sizeof(gapAdStructure_t));
 
     adv_data[0].length = *size;
     adv_data[0].adType = gAdFlags_c;
