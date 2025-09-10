@@ -1229,7 +1229,7 @@ class MatterBaseTest(base_test.BaseTestClass):
                 logging.info("========= EOF on STDIN =========")
                 return None
 
-    def _user_verify_prompt(self, prompt_msg: str, hook_method_name: str, validation_name: str, error_message: str) -> None:
+    def _user_verify_prompt(self, prompt_msg: str, hook_method_name: str, validation_name: str, error_message: str) -> bool:
         """Helper to show a prompt and wait for user validation in TH."""
         # Only run when TC is being executed in TH
         if self.runner_hook and hasattr(self.runner_hook, hook_method_name):
@@ -1244,7 +1244,9 @@ class MatterBaseTest(base_test.BaseTestClass):
                     raise TestError(error_message)
             except EOFError:
                 logging.info("========= EOF on STDIN =========")
-                return None
+            return False
+        else:
+            return True  # Indicating skipped
 
     def user_verify_video_stream(self,
                                  prompt_msg: str) -> None:
@@ -1290,7 +1292,7 @@ class MatterBaseTest(base_test.BaseTestClass):
             error_message='Two way talk validation failed'
         )
 
-    def user_verify_push_av_stream(self, prompt_msg: str) -> None:
+    def user_verify_push_av_stream(self, prompt_msg: str) -> bool:
         """Show Push AV Stream Verification Prompt and wait for user validation.
            This method will be executed only when TC is running in TH.
 
@@ -1299,17 +1301,18 @@ class MatterBaseTest(base_test.BaseTestClass):
             Indicates what is expected from the user.
 
         Returns:
-            Returns nothing indicating success so the test can go on.
+            True if validation was skipped, False otherwise.
 
         Raises:
             TestError: Indicating Push AV Stream validation step failed.
         """
-        self._user_verify_prompt(
+        skipped = self._user_verify_prompt(
             prompt_msg=prompt_msg,
             hook_method_name='show_push_av_stream_prompt',
             validation_name='Push AV Stream Validation',
             error_message='Push AV Stream validation failed'
         )
+        return skipped
 
 
 def _async_runner(body, self: MatterBaseTest, *args, **kwargs):
