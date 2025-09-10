@@ -111,10 +111,10 @@ void emberAfHepaFilterMonitoringClusterShutdownCallback(EndpointId endpointId)
         integrationDelegate);
 }
 
-void emberAfHepaFilterMonitoringClusterResetConditionCallback(chip::app::CommandHandler*, chip::app::ConcreteCommandPath const&, chip::app::Clusters::HepaFilterMonitoring::Commands::ResetCondition::DecodableType const&)
-{
-    // The actual command handling is done in ResourceMonitoringCluster::InvokeCommand
-}
+// void emberAfHepaFilterMonitoringClusterResetConditionCallback(chip::app::CommandHandler*, chip::app::ConcreteCommandPath const&, chip::app::Clusters::HepaFilterMonitoring::Commands::ResetCondition::DecodableType const&)
+// {
+//     // The actual command handling is done in ResourceMonitoringCluster::InvokeCommand
+// }
 
 //
 // Activated Carbon Filter Monitoring Cluster
@@ -150,9 +150,9 @@ void emberAfActivatedCarbonMonitoringClusterShutdownCallback(EndpointId endpoint
     integrationDelegate);
 }
 
-void emberAfActivatedCarbonFilterMonitoringClusterResetConditionCallback(chip::app::CommandHandler*, chip::app::ConcreteCommandPath const&, chip::app::Clusters::ActivatedCarbonFilterMonitoring::Commands::ResetCondition::DecodableType const&){
-    // The actual command handling is done in ResourceMonitoringCluster::InvokeCommand
-}
+// void emberAfActivatedCarbonFilterMonitoringClusterResetConditionCallback(chip::app::CommandHandler*, chip::app::ConcreteCommandPath const&, chip::app::Clusters::ActivatedCarbonFilterMonitoring::Commands::ResetCondition::DecodableType const&){
+//     // The actual command handling is done in ResourceMonitoringCluster::InvokeCommand
+// }
 
 namespace chip {
 namespace app {
