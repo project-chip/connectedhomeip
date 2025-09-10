@@ -57,7 +57,7 @@ struct BLECallbackDelegate
     using InitAppCallback    = void (*)(void);
     using ConnectionCallback = void (*)(deviceId_t id, gapConnectionEvent_t * event);
     using GapGenericCallback = void (*)(gapGenericEvent_t * event);
-    using GapAdvDataCallback = gapAdStructure_t * (*) (uint8_t * size);
+    using GapAdvDataCallback = gapAdStructure_t * (*) (uint8_t * size); ///< The returned pointer must be freed by the caller.
     using GattServerCallback = void (*)(deviceId_t id, gattServerEvent_t * event);
 
     InitAppCallback appInitCallback       = nullptr;
