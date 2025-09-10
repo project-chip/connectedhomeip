@@ -2,8 +2,8 @@
  *
  *    Copyright (c) 2025 Project CHIP Authors
  *
- *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
+ *    Licensed under the Apache License, Version 2.0 (the "License");
  *    You may obtain a copy of the License at
  *
  *        http://www.apache.org/licenses/LICENSE-2.0
@@ -18,16 +18,13 @@
 /**
  *    @file
  *          Provides an implementation of the NFCCommissioningManager singleton object
- *          for the Android platforms.
+ *          for the Darwin platforms.
  */
 
 #pragma once
 
-#include <jni.h>
-
-#include <transport/raw/NfcApplicationDelegate.h>
-
 #include <platform/internal/NFCCommissioningManager.h>
+#include <transport/raw/NfcApplicationDelegate.h>
 
 #if CHIP_DEVICE_CONFIG_ENABLE_NFC_BASED_COMMISSIONING
 
@@ -36,7 +33,7 @@ namespace DeviceLayer {
 namespace Internal {
 
 /**
- * Concrete implementation of the NFCCommissioningManagerImpl singleton object for the Linux platforms.
+ * Concrete implementation of the NFCCommissioningManagerImpl singleton object for the Darwin platforms.
  */
 class NFCCommissioningManagerImpl final : public NFCCommissioningManager, private Nfc::NfcApplicationDelegate
 {
@@ -45,11 +42,7 @@ class NFCCommissioningManagerImpl final : public NFCCommissioningManager, privat
     friend NFCCommissioningManager;
 
 public:
-    void InitializeWithObject(jobject managerObject);
-
-    CHIP_ERROR OnNfcTagResponse(const Transport::PeerAddress & address, System::PacketBufferHandle && buffer);
-    CHIP_ERROR OnNfcTagError(const Transport::PeerAddress & address);
-
+    NFCCommissioningManagerImpl() {}
     // ===== Members that implement virtual methods on NfcApplicationDelegate.
 
     void SetNFCBase(Transport::NFCBase * nfcBase) override;
@@ -63,45 +56,17 @@ private:
 
     CHIP_ERROR _Init();
     void _Shutdown();
-    Nfc::NFCReaderTransport * _GetNFCReaderTransport() const { return nullptr; }
-    void _SetNFCReaderTransport(Nfc::NFCReaderTransport * readerTransport) {}
+    Nfc::NFCReaderTransport * _GetNFCReaderTransport() const { return mReaderTransport.get(); }
+    void _SetNFCReaderTransport(Nfc::NFCReaderTransport * readerTransport);
 
     // ===== Members for internal use by the following friends.
 
     friend NFCCommissioningManager & NFCCommissioningMgr();
     friend NFCCommissioningManagerImpl & NFCCommissioningMgrImpl();
 
-    static NFCCommissioningManagerImpl sInstance;
-
-    chip::JniGlobalReference mNFCCommissioningManagerObject;
-    jmethodID mInitMethod           = nullptr;
-    jmethodID mShutdownMethod       = nullptr;
-    jmethodID mSendToNfcTagCallback = nullptr;
-
     Transport::NFCBase * mNFCBase = nullptr;
+    std::unique_ptr<chip::Nfc::NFCReaderTransport> mReaderTransport;
 };
-
-/**
- * Returns a reference to the public interface of the NFCCommissioningManager singleton object.
- *
- * Internal components should use this to access features of the NFCCommissioningManager object
- * that are common to all platforms.
- */
-inline NFCCommissioningManager & NFCCommissioningMgr()
-{
-    return NFCCommissioningManagerImpl::sInstance;
-}
-
-/**
- * Returns the platform-specific implementation of the NFCCommissioningManager singleton object.
- *
- * Internal components can use this to gain access to features of the NFCCommissioningManager
- * that are specific to the Linux platforms.
- */
-inline NFCCommissioningManagerImpl & NFCCommissioningMgrImpl()
-{
-    return NFCCommissioningManagerImpl::sInstance;
-}
 
 } // namespace Internal
 } // namespace DeviceLayer
