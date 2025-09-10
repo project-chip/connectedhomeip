@@ -90,7 +90,6 @@ void PreRollBuffer::PushBufferToTransport()
                     //  Frame is not older than the requested prebuffer length and hasn't been delivered to this sink yet
                     if (streamKey[0] == 'a' && sink->transport->CanSendAudio())
                     {
-                        ChipLogProgress(Camera, "Sending audio frame %s", streamKey.c_str());
                         sink->transport->SendAudio(frame->data.get(), frame->size,
                                                    static_cast<uint16_t>(std::stoi(streamKey.substr(1))));
                     }
