@@ -30,7 +30,7 @@ namespace {
 static constexpr size_t kDescriptorFixedClusterCount = Descriptor::StaticApplicationConfig::kFixedClusterConfig.size();
 static constexpr size_t kDescriptorMaxClusterCount   = kDescriptorFixedClusterCount + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT;
 
-LazyRegisteredServerCluster<DescriptorCluster> gServer;
+LazyRegisteredServerCluster<DescriptorCluster> gServers[kDescriptorFixedClusterCount];
 
 class IntegrationDelegate : public CodegenClusterIntegration::Delegate
 {
@@ -38,12 +38,14 @@ public:
     ServerClusterRegistration & CreateRegistration(EndpointId endpointId, unsigned emberEndpointIndex,
                                                    uint32_t optionalAttributeBits, uint32_t featureMap) override
     {
-        gServer.Create(endpointId, BitFlags<Descriptor::Feature>(featureMap));
-        return gServer.Registration();
+        gServers[emberEndpointIndex].Create(endpointId, BitFlags<Descriptor::Feature>(featureMap));
+        return gServers[emberEndpointIndex].Registration();
     }
 
-    ServerClusterInterface & FindRegistration(unsigned emberEndpointIndex) override { return gServer.Cluster(); }
-    void ReleaseRegistration(unsigned emberEndpointIndex) override { gServer.Destroy(); }
+    ServerClusterInterface & FindRegistration(unsigned emberEndpointIndex) override { 
+        return gServers[emberEndpointIndex].Cluster(); 
+    }
+    void ReleaseRegistration(unsigned emberEndpointIndex) override { gServers[emberEndpointIndex].Destroy(); }
 };
 } // namespace
 
