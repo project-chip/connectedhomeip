@@ -64,6 +64,7 @@ public:
         EndpointId aEndpointId,
         ClusterId aClusterId,
         const BitFlags<ResourceMonitoring::Feature> enabledFeatures,
+        OptionalAttributeSet optionalAttributeSet,
         ResourceMonitoring::Attributes::DegradationDirection::TypeInfo::Type aDegradationDirection,
         bool aResetConditionCommandSupported
     );

@@ -31,4 +31,4 @@ void SetDelegate(chip::EndpointId endpointId, chip::ClusterId clusterId, Resourc
 } // namespace ResourceMonitoring
 } // namespace Clusters
 } // namespace app
-} // namespace chiiiiiiip
+} // namespace chip

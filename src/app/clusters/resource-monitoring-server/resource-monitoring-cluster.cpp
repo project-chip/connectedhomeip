@@ -49,13 +49,15 @@ ResourceMonitoringCluster::ResourceMonitoringCluster(
     EndpointId aEndpointId,
     ClusterId aClusterId,
     const BitFlags<ResourceMonitoring::Feature> enabledFeatures,
+    OptionalAttributeSet optionalAttributeSet,
     ResourceMonitoring::Attributes::DegradationDirection::TypeInfo::Type aDegradationDirection,
     bool aResetConditionCommandSupported
 ) :    
     DefaultServerCluster(ConcreteClusterPath(aEndpointId, aClusterId)),
     mDegradationDirection(aDegradationDirection),
     mResetConditionCommandSupported(aResetConditionCommandSupported),
-    mEnabledFeatures(enabledFeatures)
+    mEnabledFeatures(enabledFeatures),
+    mOptionalAttributeSet(optionalAttributeSet)
 {}
 
 

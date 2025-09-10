@@ -87,12 +87,18 @@ struct TestResourceMonitoringCluster : public ::testing::Test
 constexpr EndpointId kEndpointWitResourceMonitoring = 1;
 
 
+using namespace HepaFilterMonitoring::Attributes;
+
+
 TEST_F(TestResourceMonitoringCluster, AttributeTest)
 {
+    uint32_t optionalBits = Condition::Id | DegradationDirection::Id | InPlaceIndicator::Id | LastChangedTime::Id;    
+
     auto hepa_cluster = ResourceMonitoring::ResourceMonitoringClusterProxy<HepaFilterMonitoring::Id>(
         EndpointId{kEndpointWitResourceMonitoring},
         HepaFilterMonitoring::Id,
         BitFlags<ResourceMonitoring::Feature>{ 0 },
+        OptionalAttributeSet{ optionalBits },
         ResourceMonitoring::Attributes::DegradationDirection::TypeInfo::Type::kUp,
         true
     );

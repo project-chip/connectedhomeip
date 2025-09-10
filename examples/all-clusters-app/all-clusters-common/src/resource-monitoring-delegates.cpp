@@ -28,13 +28,17 @@ using namespace chip::app::Clusters::ActivatedCarbonFilterMonitoring;
 using namespace chip::app::Clusters::HepaFilterMonitoring;
 using chip::Protocols::InteractionModel::Status;
 
-
 constexpr BitFlags<ResourceMonitoring::Feature> gHepaFilterEnabledFeatures{
     ResourceMonitoring::Feature::kCondition,
     ResourceMonitoring::Feature::kWarning,
     ResourceMonitoring::Feature::kReplacementProductList
 };
 
+constexpr uint32_t gOptionalBits = 
+    ResourceMonitoring::Attributes::Condition::Id | 
+    ResourceMonitoring::Attributes::DegradationDirection::Id | 
+    ResourceMonitoring::Attributes::InPlaceIndicator::Id | 
+    ResourceMonitoring::Attributes::LastChangedTime::Id;
 
 constexpr BitFlags<ResourceMonitoring::Feature> gActivatedCarbonEnabledFeatures{
     ResourceMonitoring::Feature::kCondition,
@@ -43,7 +47,7 @@ constexpr BitFlags<ResourceMonitoring::Feature> gActivatedCarbonEnabledFeatures{
 };
 
 static ActivatedCarbonFilterMonitoringDelegate * gActivatedCarbonFilterDelegate = nullptr;
-static ResourceMonitoring::ActivatedCarbonFilterMonitoringCluster * gActivatedCarbonFilterInstance            = nullptr;
+static ResourceMonitoring::ActivatedCarbonFilterMonitoringCluster * gActivatedCarbonFilterInstance = nullptr;
 
 static HepaFilterMonitoringDelegate * gHepaFilterDelegate = nullptr;
 static ResourceMonitoring::HepaFilterMonitoringCluster * gHepaFilterInstance = nullptr;
@@ -131,6 +135,7 @@ void emberAfActivatedCarbonFilterMonitoringClusterInitCallback(chip::EndpointId 
         endpoint,
         ActivatedCarbonFilterMonitoring::Id,
         gActivatedCarbonEnabledFeatures,
+        OptionalAttributeSet{ gOptionalBits },
         ResourceMonitoring::DegradationDirectionEnum::kDown,
         true
     );
@@ -149,6 +154,7 @@ void emberAfHepaFilterMonitoringClusterInitCallback(chip::EndpointId endpoint)
         endpoint, 
         HepaFilterMonitoring::Id,
         gHepaFilterEnabledFeatures,
+        OptionalAttributeSet{ gOptionalBits },
         ResourceMonitoring::DegradationDirectionEnum::kDown, 
         true
     );
