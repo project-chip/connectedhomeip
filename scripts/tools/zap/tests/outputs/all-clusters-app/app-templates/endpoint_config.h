@@ -3407,7 +3407,7 @@
   0x00000002 /* FindRootCertificate */, \
   0x00000004 /* LookupRootCertificate */, \
   0x00000006 /* RemoveRootCertificate */, \
-  0x00000007 /* TLSClientCSR */, \
+  0x00000007 /* ClientCSR */, \
   0x00000009 /* ProvisionClientCertificate */, \
   0x0000000A /* FindClientCertificate */, \
   0x0000000C /* LookupClientCertificate */, \
@@ -3417,7 +3417,7 @@
   0x00000001 /* ProvisionRootCertificateResponse */, \
   0x00000003 /* FindRootCertificateResponse */, \
   0x00000005 /* LookupRootCertificateResponse */, \
-  0x00000008 /* TLSClientCSRResponse */, \
+  0x00000008 /* ClientCSRResponse */, \
   0x0000000B /* FindClientCertificateResponse */, \
   0x0000000D /* LookupClientCertificateResponse */, \
   chip::kInvalidCommandId /* end of list */, \
