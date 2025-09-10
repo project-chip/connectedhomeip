@@ -19,6 +19,8 @@
 #include <app/static-cluster-config/ActivatedCarbonFilterMonitoring.h>
 #include <app/util/attribute-storage.h>
 #include <data-model-providers/codegen/CodegenDataModelProvider.h>
+#include <data-model-providers/codegen/ClusterIntegration.h>
+
 
 #include <array>
 #include <cstdint>
@@ -35,64 +37,42 @@ static constexpr size_t kResourceMonitoringFixedClusterCount =
     HepaFilterMonitoring::StaticApplicationConfig::kFixedClusterConfig.size();
 static constexpr size_t kResourceMonitoringMaxClusterCount = kResourceMonitoringFixedClusterCount + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT;
 
-LazyRegisteredServerCluster<ResourceMonitoring::HepaFilterMonitoringCluster> hepa_gServers[kResourceMonitoringMaxClusterCount];
+LazyRegisteredServerCluster<ResourceMonitoring::ResourceMonitoringCluster> gServers[kResourceMonitoringMaxClusterCount];
 
-LazyRegisteredServerCluster<ResourceMonitoring::ActivatedCarbonFilterMonitoringCluster> activatedCarbon_gServers[kResourceMonitoringMaxClusterCount];
 
-// Find the 0-based array index corresponding to the given {endpoint id, cluster id}.
-// Log an error if not found.
-bool findEndpointWithLog(EndpointId endpointId, ClusterId clusterId, uint16_t & outArrayIndex)
+template <ClusterId CLUSTER_ID>
+class IntegrationDelegate : public CodegenClusterIntegration::Delegate
 {
-
-    uint16_t arrayIndex =
-        emberAfGetClusterServerEndpointIndex(endpointId, clusterId, kResourceMonitoringFixedClusterCount);
-
-    if (arrayIndex >= kResourceMonitoringMaxClusterCount)
+    static_assert(CLUSTER_ID == HepaFilterMonitoring::Id || CLUSTER_ID == ActivatedCarbonFilterMonitoring::Id,
+                  "IntegrationDelegate can only be instantiated for HepaFilterMonitoring or ActivatedCarbonFilterMonitoring");
+public:
+    ServerClusterRegistration & CreateRegistration(EndpointId endpointId, unsigned emberEndpointIndex,
+                                                   uint32_t optionalAttributeBits, uint32_t featureMap) override
     {
-        ChipLogError(AppServer, "Cound not find endpoint index for endpoint %u", endpointId);
-        return false;
+        // Create OptionalAttributeSet from optionalAttributeBits
+        ResourceMonitoring::ResourceMonitoringCluster::OptionalAttributeSet optionalAttributeSet(optionalAttributeBits);
+
+        // Create the cluster with all required parameters
+        gServers[emberEndpointIndex].Create(
+            endpointId,
+            CLUSTER_ID,
+            BitFlags<ResourceMonitoring::Feature>(featureMap),
+            optionalAttributeSet,
+            chip::app::Clusters::ResourceMonitoring::DegradationDirectionEnum::kDown,
+            true // ResetCondition command supported
+        );
+
+        return gServers[emberEndpointIndex].Registration();
     }
 
-    outArrayIndex = arrayIndex;
-
-    return true;
-}
-
-template <typename T>
-void CreateConcreteResourceMonitoringCluster(uint16_t arrayIndex, EndpointId endpointId, ClusterId clusterId, T * gServers)
-{
-
-    /*
-    if (clusterId == HepaFilterMonitoring::Id) 
+    ServerClusterInterface & FindRegistration(unsigned emberEndpointIndex) override
     {
-        if (HepaFilterMonitoring::Attributes::FeatureMap::Get(endpointId, &rawFeatureMap) != Status::Success)
-        {
-            ChipLogError(AppServer, "Failed to get feature map for endpoint %u cluster %u", endpointId, clusterId);
-            rawFeatureMap = 0;
-        }
+        return gServers[emberEndpointIndex].Cluster();
     }
-    else if (clusterId == ActivatedCarbonFilterMonitoring::Id) 
-    {      
-        if (ActivatedCarbonFilterMonitoring::Attributes::FeatureMap::Get(endpointId, &rawFeatureMap) != Status::Success)
-        {
-            ChipLogError(AppServer, "Failed to get feature map for endpoint %u cluster %u", endpointId, clusterId);
-            rawFeatureMap = 0;
-        }
-    }
-    else 
-    {
-        ChipLogError(AppServer, "Invalid cluster id: %u for Resource Monitoring on endpoint: %u", clusterId, endpointId);
-        return;
-    }
-    */
+    void ReleaseRegistration(unsigned emberEndpointIndex) override { gServers[emberEndpointIndex].Destroy(); }
+};
 
-    gServers[arrayIndex].Create(
-        endpointId,
-        clusterId,
-        BitFlags<ResourceMonitoring::Feature>{ 0 },
-        chip::app::Clusters::ResourceMonitoring::DegradationDirectionEnum::kDown,
-        true /* ResetCondition command supported */);
-}
+
 
 } // namespace
 
@@ -100,38 +80,35 @@ void CreateConcreteResourceMonitoringCluster(uint16_t arrayIndex, EndpointId end
 // HEPA Filter Monitoring Cluster
 //
 
-void emberAfHepaFilterMonitoringClusterServerInitCallback(EndpointId endpointId )
+void emberAfHepaFilterMonitoringClusterServerInitCallback(EndpointId endpointId)
 {
-    uint16_t arrayIndex = 0;
-    if (!findEndpointWithLog(endpointId, HepaFilterMonitoring::Id, arrayIndex))
-    {
-        return;
-    }
 
-    // this call performs creation of concrete cluster object on gServers[arrayIndex]
-    CreateConcreteResourceMonitoringCluster(arrayIndex, endpointId, HepaFilterMonitoring::Id, hepa_gServers);
+    IntegrationDelegate<HepaFilterMonitoring::Id> integrationDelegate;
 
-    CHIP_ERROR err = CodegenDataModelProvider::Instance().Registry().Register(hepa_gServers[arrayIndex].Registration());
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogError(AppServer, "Failed to register Resource Monitoring on endpoint %u: %" CHIP_ERROR_FORMAT, endpointId, err.Format());
-    }
+    CodegenClusterIntegration::RegisterServer(
+        {
+            .endpointId                      = endpointId,
+            .clusterId                       = HepaFilterMonitoring::Id,
+            .fixedClusterServerEndpointCount = kResourceMonitoringFixedClusterCount,
+            .maxEndpointCount                = kResourceMonitoringMaxClusterCount,
+            .fetchFeatureMap                 = true,
+            .fetchOptionalAttributes         = true,
+        },
+        integrationDelegate);
 }
 
 void emberAfHepaFilterMonitoringClusterShutdownCallback(EndpointId endpointId)
 {
-    uint16_t arrayIndex = 0;
-    if (!findEndpointWithLog(endpointId, HepaFilterMonitoring::Id, arrayIndex))
-    {
-        return;
-    }
+    IntegrationDelegate<HepaFilterMonitoring::Id> integrationDelegate;
 
-    CHIP_ERROR err = CodegenDataModelProvider::Instance().Registry().Unregister(&hepa_gServers[arrayIndex].Cluster());
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogError(AppServer, "Failed to unregister Resource Monitoring on endpoint %u: %" CHIP_ERROR_FORMAT, endpointId, err.Format());
-    }
-    hepa_gServers[arrayIndex].Destroy();
+    CodegenClusterIntegration::UnregisterServer(
+        {
+            .endpointId                      = endpointId,
+            .clusterId                       = HepaFilterMonitoring::Id,
+            .fixedClusterServerEndpointCount = kResourceMonitoringFixedClusterCount,
+            .maxEndpointCount                = kResourceMonitoringMaxClusterCount,
+        },
+        integrationDelegate);
 }
 
 void emberAfHepaFilterMonitoringClusterResetConditionCallback(chip::app::CommandHandler*, chip::app::ConcreteCommandPath const&, chip::app::Clusters::HepaFilterMonitoring::Commands::ResetCondition::DecodableType const&)
@@ -145,36 +122,32 @@ void emberAfHepaFilterMonitoringClusterResetConditionCallback(chip::app::Command
      
 void emberAfActivatedCarbonFilterMonitoringClusterServerInitCallback(EndpointId endpointId )
 {
-    uint16_t arrayIndex = 0;
-    if (!findEndpointWithLog(endpointId, ActivatedCarbonFilterMonitoring::Id, arrayIndex))
-    {
-        return;
-    }
+    IntegrationDelegate<ActivatedCarbonFilterMonitoring::Id> integrationDelegate;
 
-    // this call performs creation of concrete cluster object on gServers[arrayIndex]
-    CreateConcreteResourceMonitoringCluster(arrayIndex, endpointId, ActivatedCarbonFilterMonitoring::Id, activatedCarbon_gServers);
-
-    CHIP_ERROR err = CodegenDataModelProvider::Instance().Registry().Register(activatedCarbon_gServers[arrayIndex].Registration());
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogError(AppServer, "Failed to register Resource Monitoring on endpoint %u: %" CHIP_ERROR_FORMAT, endpointId, err.Format());
-    }
+    CodegenClusterIntegration::RegisterServer(
+        {
+            .endpointId                      = endpointId,
+            .clusterId                       = ActivatedCarbonFilterMonitoring::Id,
+            .fixedClusterServerEndpointCount = kResourceMonitoringFixedClusterCount,
+            .maxEndpointCount                = kResourceMonitoringMaxClusterCount,
+            .fetchFeatureMap                 = true,
+            .fetchOptionalAttributes         = true,
+        },
+        integrationDelegate);
 }
 
 void emberAfActivatedCarbonMonitoringClusterShutdownCallback(EndpointId endpointId)
 {
-    uint16_t arrayIndex = 0;
-    if (!findEndpointWithLog(endpointId, ActivatedCarbonFilterMonitoring::Id, arrayIndex))
+    IntegrationDelegate<ActivatedCarbonFilterMonitoring::Id> integrationDelegate;
+    
+    CodegenClusterIntegration::UnregisterServer(
     {
-        return;
-    }
-
-    CHIP_ERROR err = CodegenDataModelProvider::Instance().Registry().Unregister(&activatedCarbon_gServers[arrayIndex].Cluster());
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogError(AppServer, "Failed to unregister Resource Monitoring on endpoint %u: %" CHIP_ERROR_FORMAT, endpointId, err.Format());
-    }
-    activatedCarbon_gServers[arrayIndex].Destroy();
+        .endpointId                      = endpointId,
+        .clusterId                       = HepaFilterMonitoring::Id,
+        .fixedClusterServerEndpointCount = kResourceMonitoringFixedClusterCount,
+        .maxEndpointCount                = kResourceMonitoringMaxClusterCount,
+    },
+    integrationDelegate);
 }
 
 void emberAfActivatedCarbonFilterMonitoringClusterResetConditionCallback(chip::app::CommandHandler*, chip::app::ConcreteCommandPath const&, chip::app::Clusters::ActivatedCarbonFilterMonitoring::Commands::ResetCondition::DecodableType const&){
@@ -188,22 +161,22 @@ namespace ResourceMonitoring {
 
 void SetDelegate(EndpointId endpointId, ClusterId clusterId, ResourceMonitoringDelegate * delegate)
 {
-    uint16_t arrayIndex = 0;
-    if (!findEndpointWithLog(endpointId, clusterId, arrayIndex))
-    {
-        return;
-    }
+    // uint16_t arrayIndex = 0;
+    // if (!findEndpointWithLog(endpointId, clusterId, arrayIndex))
+    // {
+    //     return;
+    // }
 
-    if (clusterId == HepaFilterMonitoring::Id) 
-    {
-        hepa_gServers[arrayIndex].Cluster().SetDelegate(delegate);
-        return;
-    } 
-    else if (clusterId == ActivatedCarbonFilterMonitoring::Id) 
-    {
-        activatedCarbon_gServers[arrayIndex].Cluster().SetDelegate(delegate);
-        return;
-    }
+    // if (clusterId == HepaFilterMonitoring::Id) 
+    // {
+    //     hepa_gServers[arrayIndex].Cluster().SetDelegate(delegate);
+    //     return;
+    // } 
+    // else if (clusterId == ActivatedCarbonFilterMonitoring::Id) 
+    // {
+    //     activatedCarbon_gServers[arrayIndex].Cluster().SetDelegate(delegate);
+    //     return;
+    // }
     
 }
 
