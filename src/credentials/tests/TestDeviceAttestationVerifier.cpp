@@ -44,18 +44,18 @@ struct TestDeviceAttestationVerifier : public ::testing::Test
 // Test that AttestationDeviceInfo correctly copies fields from AttestationInfo
 TEST_F(TestDeviceAttestationVerifier, AttestationDeviceInfoCopiesFields)
 {
-    // Prepare minimal data for PAI, DAC and other required fields
-    uint8_t paiData[3]   = { 0x01, 0x02, 0x03 };
-    uint8_t dacData[5]   = { 0x10, 0x11, 0x12, 0x13, 0x14 };
-    uint8_t nonceData[4] = { 0x21, 0x22, 0x23, 0x24 };
-
-    ByteSpan paiSpan(paiData);
-    ByteSpan dacSpan(dacData);
+    // Use real DER test vectors for PAI/DAC and a valid 32-byte nonce
+    const ByteSpan paiSpan = TestCerts::sTestCert_PAI_FFF1_8000_Cert;
+    const ByteSpan dacSpan = TestCerts::sTestCert_DAC_FFF1_8000_0004_Cert;
+    uint8_t nonceData[32]  = {
+        0xe0, 0x42, 0x1b, 0x91, 0xc6, 0xfd, 0xcd, 0xb4, 0x0e, 0x2a, 0x4d, 0x2c, 0xf3, 0x1d, 0xb2, 0xb4,
+        0xe1, 0x8b, 0x41, 0x1b, 0x1d, 0x3a, 0xd4, 0xd1, 0x2a, 0x9d, 0x90, 0xaa, 0x8e, 0x52, 0xfa, 0xe2,
+    };
     ByteSpan nonceSpan(nonceData);
 
     // Prepare attestation elements TLV with a minimal CertificateDeclaration
-    uint8_t cdData[6] = { 0xAA, 0xBB, 0xCC, 0xDD, 0xEE, 0xFF };
-    uint8_t tlvBuf[64];
+    uint8_t cdData[32] = { 0xAA, 0xBB, 0xCC, 0xDD, 0xEE, 0xFF };
+    uint8_t tlvBuf[128];
     chip::TLV::TLVWriter writer;
     writer.Init(tlvBuf, sizeof(tlvBuf));
     chip::TLV::TLVType outerType;
