@@ -283,8 +283,7 @@ CHIP_ERROR chip::Zephyr::App::AppTaskBase::Init()
 #if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
     if (err == CHIP_NO_ERROR)
     {
-        /* If an update is under test make it permanent */
-        OTARequestorInitiator::Instance().HandleSelfTest();
+        OTARequestorInitiator::Instance().InitOTA(reinterpret_cast<intptr_t>(&OTARequestorInitiator::Instance()));
     }
 #endif
 
