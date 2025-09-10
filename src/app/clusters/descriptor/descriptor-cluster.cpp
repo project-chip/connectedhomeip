@@ -189,12 +189,6 @@ DataModel::ActionReturnStatus DescriptorCluster::ReadAttribute(const DataModel::
     switch (request.path.mAttributeId)
     {
     case FeatureMap::Id: {
-        ReadOnlyBufferBuilder<DataModel::Provider::SemanticTag> semanticTagsList;
-        CHIP_ERROR err = mContext->provider.SemanticTags(request.path.mEndpointId, semanticTagsList);
-        if (err == CHIP_NO_ERROR && !semanticTagsList.IsEmpty())
-        {
-            mFeatureFlags.Set(Descriptor::Feature::kTagList);
-        }
         return encoder.Encode(mFeatureFlags);
     }
     case ClusterRevision::Id:

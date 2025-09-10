@@ -22,12 +22,11 @@
 #include <clusters/Descriptor/Structs.h>
 
 #include <initializer_list>
-#include <vector>
 
 namespace chip::app::Clusters {
 
 /// Exposes mandatory attributes for the descriptor clusters (it does NOT implement
-/// optional bits through optional attribute set, currently using ifdef to maintain previous funcitonality.)
+/// optional bits through optional attribute set, currently using ifdef to maintain previous functionality.)
 class DescriptorCluster : public DefaultServerCluster
 {
 public:
