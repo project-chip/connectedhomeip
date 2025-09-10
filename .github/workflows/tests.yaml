@@ -788,6 +788,30 @@ jobs:
                   --pw-command-launcher=ccache build --copy-artifacts-to objdir-clone
                   && rm -rf out/linux-x64-closure-${BUILD_VARIANT}-tsan-clang-test"
 
+            - name: Build linux-x64-requestor-app
+              env:
+                  CCACHE_DIR: "${GITHUB_WORKSPACE}/.ccache"
+              run: >-
+                  ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py
+                  --target linux-x64-ota-requestor-${BUILD_VARIANT}-tsan-clang-test
+                  --pw-command-launcher=ccache build --copy-artifacts-to objdir-clone
+                  && rm -rf linux-x64-ota-requestor-${BUILD_VARIANT}-tsan-clang-test"
+
+            - name: Build linux-x64-provider-app
+              env:
+                  CCACHE_DIR: "${GITHUB_WORKSPACE}/.ccache"
+              run: >-
+                  ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py
+                  --target linux-x64-ota-provider-${BUILD_VARIANT}-tsan-clang-test
+                  --pw-command-launcher=ccache build --copy-artifacts-to objdir-clone
+                  && rm -rf linux-x64-ota-provider-${BUILD_VARIANT}-tsan-clang-test"
+
+            - name: Build Software Update ota images with new version.
+              env:
+                  CCACHE_DIR: "${GITHUB_WORKSPACE}/.ccache"
+              run: >- 
+                  ./scripts/run_in_build_env.sh "./scripts/build/build_ota_images.py"
+
             - name: ccache stats
               run: ccache -s
 
@@ -816,11 +840,18 @@ jobs:
                   echo "FABRIC_SYNC_APP: objdir-clone/linux-x64-fabric-sync-${BUILD_VARIANT}-clang/fabric-sync" >> /tmp/test_env.yaml
                   echo "LIGHTING_APP_NO_UNIQUE_ID: objdir-clone/linux-x64-light-data-model-no-unique-id-${BUILD_VARIANT}-clang/chip-lighting-app" >> /tmp/test_env.yaml
                   echo "TERMS_AND_CONDITIONS_APP: objdir-clone/linux-x64-terms-and-conditions/chip-terms-and-conditions-app" >> /tmp/test_env.yaml
+                  echo "OTA_PROVIDER_APP: objdir-clone/linux-x64-ota-provider-${BUILD_VARIANT}-tsan-clang-test/chip-ota-provider-app" >> /tmp/test_env.yaml
+                  echo "OTA_REQUESTOR_APP: objdir-clone/linux-x64-ota-requestor-${BUILD_VARIANT}-tsan-clang-test/chip-ota-requestor-app" >> /tmp/test_env.yaml
                   echo "TRACE_APP: out/trace_data/app-{SCRIPT_BASE_NAME}" >> /tmp/test_env.yaml
                   echo "JF_CONTROL_APP: objdir-clone/linux-x64-jf-control-app/jfc-app" >> /tmp/test_env.yaml
                   echo "JF_ADMIN_APP: objdir-clone/linux-x64-jf-admin-app/jfa-app" >> /tmp/test_env.yaml
                   echo "CLOSURE_APP: objdir-clone/linux-x64-closure-${BUILD_VARIANT}-tsan-clang-test/closure-app" >> /tmp/test_env.yaml
                   echo "PUSH_AV_SERVER: src/tools/push_av_server/server.py" >> /tmp/test_env.yaml
+
+                  # SU OTA Images
+                  echo "SU_OTA_PROVIDER_V2: out/su_ota_images_min/chip-ota-requestor-app_v2.min.ota"
+                  echo "SU_OTA_PROVIDER_V3: out/su_ota_images_min/chip-ota-requestor-app_v3.min.ota"
+                  echo "SU_OTA_PROVIDER_V4: out/su_ota_images_min/chip-ota-requestor-app_v4.min.ota"
 
                   # Generic trace setups after applications
                   echo "TRACE_TEST_JSON: out/trace_data/test-{SCRIPT_BASE_NAME}" >> /tmp/test_env.yaml
