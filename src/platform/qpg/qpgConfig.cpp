@@ -33,6 +33,7 @@
 
 #include "FreeRTOS.h"
 #include "qvCHIP.h"
+#include "qvOta.h"
 
 namespace chip {
 namespace DeviceLayer {
@@ -211,7 +212,7 @@ CHIP_ERROR QPGConfig::FactoryResetConfig(void)
     {
         ClearConfigValue(key);
     }
-    qvCHIP_OtaResetProgressInfo();
+    qvOta_ResetProgressInfo();
 
     return CHIP_NO_ERROR;
 }
