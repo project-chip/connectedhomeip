@@ -34,7 +34,7 @@ static constexpr size_t kDescriptorMaxClusterCount =
 
 LazyRegisteredServerCluster<DescriptorCluster> gServer;
 
-class IntegrationDelegate : public CodegenClusterIntegration::Delegate 
+class IntegrationDelegate : public CodegenClusterIntegration::Delegate
 {
 public:
     ServerClusterRegistration & CreateRegistration(EndpointId endpointId, unsigned emberEndpointIndex,
