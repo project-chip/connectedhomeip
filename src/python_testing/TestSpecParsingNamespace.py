@@ -330,7 +330,8 @@ class TestSpecParsingNamespace(MatterBaseTest):
 
         added_1_4_to_1_5 = set(one_five.keys()) - set(one_four.keys())
         added_names_1_4_to_1_5 = {one_five[id].name for id in added_1_4_to_1_5}
-        expected_added_1_4_to_1_5 = {'Closure', 'Closure Window', 'Closure Covering', 'Commodity Tariff Commodity', 'Closure Panel', 'Commodity Tariff Flow', 'Common Position', 'Commodity Tariff Chronology', 'Closure Cabinet'}
+        expected_added_1_4_to_1_5 = {'Closure', 'Closure Window', 'Closure Covering', 'Commodity Tariff Commodity',
+                                     'Closure Panel', 'Commodity Tariff Flow', 'Common Position', 'Commodity Tariff Chronology', 'Closure Cabinet'}
         asserts.assert_equal(added_names_1_4_to_1_5, expected_added_1_4_to_1_5,
                              f"Expected only 'Closure', 'Closure Window', 'Closure Covering', 'Commodity Tariff Commodity', 'Closure Panel', 'Commodity Tariff Flow', 'Common Position', 'Commodity Tariff Chronology', 'Closure Cabinet' to be added from 1.4 to 1.5, but got: {added_names_1_4_to_1_5}")
 
@@ -342,10 +343,11 @@ class TestSpecParsingNamespace(MatterBaseTest):
             removed_names_1_4_1_to_1_5,
             expected_removed_1_4_1_to_1_5,
             f"Expected no namespaces to be removed from 1.4.1 to 1.5, but got: {removed_names_1_4_1_to_1_5}")
-        
+
         added_1_4_1_to_1_5 = set(one_five.keys()) - set(one_four_one.keys())
         added_names_1_4_1_to_1_5 = {one_five[id].name for id in added_1_4_1_to_1_5}
-        expected_added_1_4_1_to_1_5 = {'Closure', 'Closure Window', 'Closure Covering', 'Commodity Tariff Commodity', 'Closure Panel', 'Commodity Tariff Flow', 'Common Position', 'Commodity Tariff Chronology', 'Closure Cabinet'}
+        expected_added_1_4_1_to_1_5 = {'Closure', 'Closure Window', 'Closure Covering', 'Commodity Tariff Commodity',
+                                       'Closure Panel', 'Commodity Tariff Flow', 'Common Position', 'Commodity Tariff Chronology', 'Closure Cabinet'}
         asserts.assert_equal(added_names_1_4_1_to_1_5, expected_added_1_4_1_to_1_5,
                              f"Expected only 'Closure', 'Closure Window', 'Closure Covering', 'Commodity Tariff Commodity', 'Closure Panel', 'Commodity Tariff Flow', 'Common Position', 'Commodity Tariff Chronology', 'Closure Cabinet' to be added from 1.4.1 to 1.5, but got: {added_names_1_4_1_to_1_5}")
 
@@ -360,7 +362,8 @@ class TestSpecParsingNamespace(MatterBaseTest):
 
         added_1_4_2_to_1_5 = set(one_five.keys()) - set(one_four_two.keys())
         added_names_1_4_2_to_1_5 = {one_five[id].name for id in added_1_4_2_to_1_5}
-        expected_added_1_4_2_to_1_5 ={'Closure Window', 'Commodity Tariff Chronology', 'Closure Cabinet', 'Closure', 'Commodity Tariff Commodity', 'Commodity Tariff Flow', 'Closure Covering', 'Closure Panel'}
+        expected_added_1_4_2_to_1_5 = {'Closure Window', 'Commodity Tariff Chronology', 'Closure Cabinet',
+                                       'Closure', 'Commodity Tariff Commodity', 'Commodity Tariff Flow', 'Closure Covering', 'Closure Panel'}
         asserts.assert_equal(added_names_1_4_2_to_1_5, expected_added_1_4_2_to_1_5,
                              f"Expected only 'Closure Window', 'Commodity Tariff Chronology', 'Closure Cabinet', 'Closure', 'Commodity Tariff Commodity', 'Commodity Tariff Flow', 'Closure Covering', 'Closure Panel' to be added from 1.4.2 to 1.5, but got: {added_names_1_4_2_to_1_5}")
 
