@@ -346,7 +346,8 @@ CHIP_ERROR NFCTag::SelectMatterApplet()
         else
         {
             ChipLogError(DeviceLayer, "Response to Select Matter AID cmd is too small (%lu bytes), 0x%x, 0x%x, 0x%x, 0x%x",
-                         receivedLength, dataReceived[0], dataReceived[1], dataReceived[2], dataReceived[3]);
+                         static_cast<unsigned long>(receivedLength), dataReceived[0], dataReceived[1], dataReceived[2],
+                         dataReceived[3]);
             result = CHIP_ERROR_INVALID_MESSAGE_LENGTH;
         }
     }
@@ -431,7 +432,8 @@ CHIP_ERROR NFCTag::Transceive(const char * commandName, uint8_t * sendBuffer, si
 
     if ((result == CHIP_NO_ERROR) && (*recvLength >= 2))
     {
-        ChipLogDetail(DeviceLayer, "Transceive succeeded and %lu bytes were received from tag %u", *recvLength, mDiscriminator);
+        ChipLogDetail(DeviceLayer, "Transceive succeeded and %lu bytes were received from tag %u",
+                      static_cast<unsigned long>(*recvLength), mDiscriminator);
     }
     else
     {
