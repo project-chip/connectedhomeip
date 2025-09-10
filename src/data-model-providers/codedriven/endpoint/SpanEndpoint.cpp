@@ -56,7 +56,7 @@ SpanEndpoint::Builder & SpanEndpoint::Builder::SetEndpointUniqueId(MutableCharSp
 SpanEndpoint SpanEndpoint::Builder::Build()
 {
 #if CHIP_CONFIG_USE_ENDPOINT_UNIQUE_ID
-    return SpanEndpoint(mClientClusters, mSemanticTags, mDeviceTypes, mEndpointUniqueId); 
+    return SpanEndpoint(mClientClusters, mSemanticTags, mDeviceTypes, mEndpointUniqueId);
 #else
     return SpanEndpoint(mClientClusters, mSemanticTags, mDeviceTypes);
 #endif
