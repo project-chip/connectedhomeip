@@ -925,7 +925,6 @@ jobs:
 
         strategy:
             matrix:
-                os: ${{ github.event_name == 'schedule' && fromJSON('["macos-13", "macos-14", "macos-15"]') || fromJSON('["macos-15"]') }}
                 include:
                 - os: macos-13
                   arch: x64     # observed, not configured
