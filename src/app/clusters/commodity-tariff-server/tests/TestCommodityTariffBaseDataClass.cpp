@@ -478,15 +478,12 @@ CHIP_ERROR CTC_BaseDataClass<ComplexType>::CopyData(const StructType & input, St
     // Copy nested list
     if (input.nestedList)
     {
-        output.nestedList = static_cast<DataModel::List<uint32_t> *>(Platform::MemoryCalloc(1, sizeof(DataModel::List<uint32_t>)));
+        output.nestedList = new DataModel::List<uint32_t>();
         if (!output.nestedList)
         {
             Platform::MemoryFree(output.dynamicString);
             return CHIP_ERROR_NO_MEMORY;
         }
-
-        output.nestedList->~List<uint32_t>(); // Properly destruct before placement new
-        new (output.nestedList) DataModel::List<uint32_t>();
 
         if (input.nestedList->size() > 0)
         {
@@ -494,7 +491,7 @@ CHIP_ERROR CTC_BaseDataClass<ComplexType>::CopyData(const StructType & input, St
             if (!buffer)
             {
                 Platform::MemoryFree(output.dynamicString);
-                Platform::MemoryFree(output.nestedList);
+                delete output.nestedList;
                 return CHIP_ERROR_NO_MEMORY;
             }
             for (size_t i = 0; i < input.nestedList->size(); i++)
@@ -535,7 +532,7 @@ void CTC_BaseDataClass<ComplexType>::CleanupStruct(StructType & value)
         {
             Platform::MemoryFree(value.nestedList->data());
         }
-        Platform::MemoryFree(value.nestedList);
+        delete value.nestedList;
         value.nestedList = nullptr;
     }
 
@@ -556,12 +553,10 @@ TEST_F(TestCommodityTariffBaseDataClass, NullableListOfResourceStructs_CreationA
     newList[0].dynamicString = static_cast<char *>(Platform::MemoryCalloc(10, 1));
     strcpy(newList[0].dynamicString, "test1");
 
-    newList[0].nestedList = static_cast<DataModel::List<uint32_t> *>(Platform::MemoryCalloc(1, sizeof(DataModel::List<uint32_t>)));
-    new (newList[0].nestedList) DataModel::List<uint32_t>();
-    auto * nestedBuffer1   = static_cast<uint32_t *>(Platform::MemoryCalloc(2, sizeof(uint32_t)));
-    nestedBuffer1[0]       = 100;
-    nestedBuffer1[1]       = 200;
-    *newList[0].nestedList = DataModel::List<uint32_t>(nestedBuffer1, 2);
+    auto * nestedBuffer1  = static_cast<uint32_t *>(Platform::MemoryCalloc(2, sizeof(uint32_t)));
+    nestedBuffer1[0]      = 100;
+    nestedBuffer1[1]      = 200;
+    newList[0].nestedList = new DataModel::List<uint32_t>(nestedBuffer1, 2);
 
     // Second struct
     newList[1].id            = 2;
@@ -594,11 +589,10 @@ TEST_F(TestCommodityTariffBaseDataClass, NullableListOfResourceStructs_SetNewVal
     testStruct.dynamicString  = static_cast<char *>(Platform::MemoryCalloc(20, 1));
     strcpy(testStruct.dynamicString, "dynamic_content");
 
-    testStruct.nestedList  = new DataModel::List<uint32_t>();
-    auto * nestedBuffer    = static_cast<uint32_t *>(Platform::MemoryCalloc(2, sizeof(uint32_t)));
-    nestedBuffer[0]        = 100;
-    nestedBuffer[1]        = 200;
-    *testStruct.nestedList = DataModel::List<uint32_t>(nestedBuffer, 2);
+    auto * nestedBuffer   = static_cast<uint32_t *>(Platform::MemoryCalloc(2, sizeof(uint32_t)));
+    nestedBuffer[0]       = 100;
+    nestedBuffer[1]       = 200;
+    testStruct.nestedList = new DataModel::List<uint32_t>(nestedBuffer, 2);
 
     sourceValue.SetNonNull(DataModel::List<ResourceStruct>(&testStruct, 1ul));
 
