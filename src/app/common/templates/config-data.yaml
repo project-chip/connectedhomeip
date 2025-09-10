@@ -74,6 +74,7 @@ CommandHandlerInterfaceOnlyClusters:
     - Soil Measurement
     - Basic Information
     - Boolean State
+    - Descriptor
 
 # We need a more configurable way of deciding which clusters have which init functions....
 # See https://github.com/project-chip/connectedhomeip/issues/4369
@@ -101,6 +102,7 @@ ClustersWithInitFunctions:
     - Thermostat
     - Time Format Localization
     - Wi-Fi Network Diagnostics
+    - Descriptor
 
 ClustersWithAttributeChangedFunctions:
     - Bridged Device Basic Information
