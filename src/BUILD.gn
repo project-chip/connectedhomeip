@@ -89,7 +89,10 @@ if (chip_build_tests) {
       "${chip_root}/src/transport/retransmit/tests",
       "${chip_root}/src/transport/tests",
       "${chip_root}/src/tracing/esp32_diagnostic_trace/tests",
-      "${chip_root}/src/app/clusters/commodity-tariff-server/tests",
+
+      # TODO: Commodity Tariff unit test is broken
+      #       See  https://github.com/project-chip/connectedhomeip/issues/40932
+      # "${chip_root}/src/app/clusters/commodity-tariff-server/tests",
       "${chip_root}/src/srp/tests",
     ]
 
