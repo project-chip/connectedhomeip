@@ -68,7 +68,7 @@ _submodules_need_updating() {
   )
 
   for submodule_path in "${_SUBMODULE_PATHS[@]}"; do
-    if git submodule status "$submodule_path" | grep -E '^-' >/dev/null 2>&1; then 
+    if git submodule status "$submodule_path" | grep -E '^-' >/dev/null 2>&1; then
       echo "git shows that $submodule_path has changes"
       unset _SUBMODULE_PATHS
       return 0 # Success
@@ -206,10 +206,7 @@ fi
 
 # Set ccache environment variables
 export CCACHE_NOHASHDIR=1
-export CCACHE_PREFIX_CPP="$_CHIP_ROOT/scripts/helpers/ccache-prefix-cpp.sh"
 export CCACHE_BASEDIR="$_CHIP_ROOT"
-export CCACHE_SLOPPINESS=time_macros
-export CCACHE_COMPILERCHECK=content
 
 unset -f _bootstrap_or_activate
 unset -f _install_additional_pip_requirements
