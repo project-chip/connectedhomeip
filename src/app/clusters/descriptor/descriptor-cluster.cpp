@@ -179,7 +179,7 @@ CHIP_ERROR DescriptorCluster::Attributes(const ConcreteClusterPath & path,
         { true, EndpointUniqueID::kMetadataEntry },
 #endif
     };
-    
+
     return listBuilder.Append(Span(Descriptor::Attributes::kMandatoryMetadata), Span(optionalAttributeEntries));
 }
 
