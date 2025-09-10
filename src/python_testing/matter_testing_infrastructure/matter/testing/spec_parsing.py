@@ -36,8 +36,8 @@ from matter.testing.conformance import (OPTIONAL_CONFORM, TOP_LEVEL_CONFORMANCE_
                                         parse_callable_from_xml)
 from matter.testing.global_attribute_ids import GlobalAttributeIds
 from matter.testing.problem_notices import (AttributePathLocation, ClusterPathLocation, CommandPathLocation, DeviceTypePathLocation,
-                                            EventPathLocation, FeaturePathLocation, NamespacePathLocation,
-                                            ProblemNotice, ProblemSeverity, UnknownProblemLocation)
+                                            EventPathLocation, FeaturePathLocation, NamespacePathLocation, ProblemNotice,
+                                            ProblemSeverity, UnknownProblemLocation)
 from matter.tlv import uint
 
 # Type alias maintained for constants access; actual values are ints at runtime
