@@ -57,6 +57,8 @@ jobs:
             LSAN_OPTIONS: detect_leaks=1
             DISABLE_CCACHE: true
             CCACHE_KEY_SUFFIX: ${{ github.event_name == 'workflow_dispatch' && inputs.cache_suffix || '' }}
+            PW_CCACHE_STATUS: ${{ env.DISABLE_CCACHE == 'true' && '' || 'ccache' }}
+
 
         if: github.actor != 'restyled-io[bot]'
         runs-on: ubuntu-latest
@@ -281,7 +283,7 @@ jobs:
                         --target linux-x64-network-manager-${BUILD_VARIANT} \
                         --target linux-x64-energy-gateway-${BUILD_VARIANT} \
                         --target linux-x64-energy-management-${BUILD_VARIANT} \
-                        --pw-command-launcher=ccache \
+                        --pw-command-launcher=${PW_CCACHE_STATUS} \
                         build \
                         --copy-artifacts-to objdir-clone \
                      "
@@ -560,6 +562,8 @@ jobs:
             TSAN_OPTIONS: "halt_on_error=1 suppressions=scripts/tests/chiptest/tsan-linux-suppressions.txt"
             BUILD_VARIANT: ${{matrix.build_variant}}
             DISABLE_CCACHE: true
+            PW_CCACHE_STATUS: ${{ env.DISABLE_CCACHE == 'true' && '' || 'ccache' }}
+
 
         runs-on: ubuntu-latest
 
@@ -609,7 +613,7 @@ jobs:
               run: >-
                   ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py
                   --target linux-x64-all-clusters-${BUILD_VARIANT}-tsan-clang-test
-                  --pw-command-launcher=ccache build --copy-artifacts-to objdir-clone
+                  --pw-command-launcher=${PW_CCACHE_STATUS} build --copy-artifacts-to objdir-clone
                   && rm -rf out/linux-x64-all-clusters-${BUILD_VARIANT}-tsan-clang-test
                   "
             # TODO: determine why some apps are tsan and some are not (and does that add runtime overhead? )
@@ -619,7 +623,7 @@ jobs:
               run: >-
                   ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py
                   --target linux-x64-bridge-${BUILD_VARIANT}-tsan-clang-test
-                  --pw-command-launcher=ccache build --copy-artifacts-to objdir-clone
+                  --pw-command-launcher=${PW_CCACHE_STATUS} build --copy-artifacts-to objdir-clone
                   && rm -rf out/linux-x64-bridge-${BUILD_VARIANT}-tsan-clang-test"
 
             - name: Build linux-x64-lock
@@ -628,7 +632,7 @@ jobs:
               run: >-
                   ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py
                   --target linux-x64-lock-${BUILD_VARIANT}-tsan-clang-test
-                  --pw-command-launcher=ccache build --copy-artifacts-to objdir-clone
+                  --pw-command-launcher=${PW_CCACHE_STATUS} build --copy-artifacts-to objdir-clone
                   && rm -rf out/linux-x64-lock-${BUILD_VARIANT}-tsan-clang-test"
 
             - name: Build linux-x64-lit-icd
@@ -637,7 +641,7 @@ jobs:
               run: >-
                   ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py
                   --target linux-x64-lit-icd-${BUILD_VARIANT}-tsan-clang-test
-                  --pw-command-launcher=ccache build --copy-artifacts-to objdir-clone
+                  --pw-command-launcher=${PW_CCACHE_STATUS} build --copy-artifacts-to objdir-clone
                   && rm -rf out/linux-x64-lit-icd-${BUILD_VARIANT}-tsan-clang-test"
 
             - name: Build linux-x64-air-purifier
@@ -646,7 +650,7 @@ jobs:
               run: >-
                   ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py
                   --target linux-x64-air-purifier-${BUILD_VARIANT}-tsan-clang-test
-                  --pw-command-launcher=ccache build --copy-artifacts-to objdir-clone
+                  --pw-command-launcher=${PW_CCACHE_STATUS} build --copy-artifacts-to objdir-clone
                   && rm -rf out/linux-x64-air-purifier-${BUILD_VARIANT}-tsan-clang-test"
 
             - name: Build linux-x64-energy-gateway
@@ -655,7 +659,7 @@ jobs:
               run: >-
                   ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py
                   --target linux-x64-energy-gateway-${BUILD_VARIANT}-tsan-clang-test
-                  --pw-command-launcher=ccache build --copy-artifacts-to objdir-clone
+                  --pw-command-launcher=${PW_CCACHE_STATUS} build --copy-artifacts-to objdir-clone
                   && rm -rf out/linux-x64-energy-gateway-${BUILD_VARIANT}-tsan-clang-test"
 
             - name: Build linux-x64-energy-management
@@ -664,7 +668,7 @@ jobs:
               run: >-
                   ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py
                   --target linux-x64-energy-management-${BUILD_VARIANT}-tsan-clang-test
-                  --pw-command-launcher=ccache build --copy-artifacts-to objdir-clone
+                  --pw-command-launcher=${PW_CCACHE_STATUS} build --copy-artifacts-to objdir-clone
                   && rm -rf out/linux-x64-energy-management-${BUILD_VARIANT}-tsan-clang-test"
 
             - name: Build linux-x64-microwave-oven
@@ -673,7 +677,7 @@ jobs:
               run: >-
                   ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py
                   --target linux-x64-microwave-oven-${BUILD_VARIANT}-tsan-clang-test
-                  --pw-command-launcher=ccache build --copy-artifacts-to objdir-clone
+                  --pw-command-launcher=${PW_CCACHE_STATUS} build --copy-artifacts-to objdir-clone
                   && rm -rf out/linux-x64-microwave-oven-${BUILD_VARIANT}-tsan-clang-test"
 
             - name: Build linux-x64-rvc
@@ -682,7 +686,7 @@ jobs:
               run: >-
                   ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py
                   --target linux-x64-rvc-${BUILD_VARIANT}-tsan-clang-test
-                  --pw-command-launcher=ccache build --copy-artifacts-to objdir-clone
+                  --pw-command-launcher=${PW_CCACHE_STATUS} build --copy-artifacts-to objdir-clone
                   && rm -rf out/linux-x64-rvc-${BUILD_VARIANT}-tsan-clang-test"
 
             - name: Build linux-x64-network-manager
@@ -691,7 +695,7 @@ jobs:
               run: >-
                   ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py
                   --target linux-x64-network-manager-${BUILD_VARIANT}-tsan-clang-test
-                  --pw-command-launcher=ccache build --copy-artifacts-to objdir-clone
+                  --pw-command-launcher=${PW_CCACHE_STATUS} build --copy-artifacts-to objdir-clone
                   && rm -rf out/linux-x64-network-manager-${BUILD_VARIANT}-tsan-clang-test"
 
             - name: Build linux-x64-fabric-admin-rpc
@@ -700,7 +704,7 @@ jobs:
               run: >-
                   ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py
                   --target linux-x64-fabric-admin-rpc-${BUILD_VARIANT}-clang
-                  --pw-command-launcher=ccache build --copy-artifacts-to objdir-clone
+                  --pw-command-launcher=${PW_CCACHE_STATUS} build --copy-artifacts-to objdir-clone
                   && rm -rf out/linux-x64-fabric-admin-rpc-${BUILD_VARIANT}-clang"
 
             - name: Build linux-x64-fabric-bridge-rpc
@@ -709,7 +713,7 @@ jobs:
               run: >-
                   ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py
                   --target linux-x64-fabric-bridge-rpc-${BUILD_VARIANT}-clang
-                  --pw-command-launcher=ccache build --copy-artifacts-to objdir-clone
+                  --pw-command-launcher=${PW_CCACHE_STATUS} build --copy-artifacts-to objdir-clone
                   && rm -rf out/linux-x64-fabric-bridge-rpc-${BUILD_VARIANT}-clang"
 
             - name: Build linux-x64-fabric-sync
@@ -718,7 +722,7 @@ jobs:
               run: >-
                   ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py
                   --target linux-x64-fabric-sync-${BUILD_VARIANT}-clang
-                  --pw-command-launcher=ccache build --copy-artifacts-to objdir-clone
+                  --pw-command-launcher=${PW_CCACHE_STATUS} build --copy-artifacts-to objdir-clone
                   && rm -rf out/linux-x64-fabric-sync-${BUILD_VARIANT}-clang"
 
             # TODO: camera app needs clang support
@@ -728,7 +732,7 @@ jobs:
               run: >-
                   ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py
                   --target linux-x64-camera
-                  --pw-command-launcher=ccache build --copy-artifacts-to objdir-clone
+                  --pw-command-launcher=${PW_CCACHE_STATUS} build --copy-artifacts-to objdir-clone
                   && rm -rf out/linux-x64-camera"
 
             - name: Build linux-x64-camera-controller
@@ -737,7 +741,7 @@ jobs:
               run: >-
                   ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py
                   --target linux-x64-camera-controller
-                  --pw-command-launcher=ccache build --copy-artifacts-to objdir-clone
+                  --pw-command-launcher=${PW_CCACHE_STATUS} build --copy-artifacts-to objdir-clone
                   && rm -rf out/linux-x64-camera-controller"
 
             - name: Build linux-x64-light-data-model-no-unique-id
@@ -746,7 +750,7 @@ jobs:
               run: >-
                   ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py
                   --target linux-x64-light-data-model-no-unique-id-${BUILD_VARIANT}-clang
-                  --pw-command-launcher=ccache build --copy-artifacts-to objdir-clone
+                  --pw-command-launcher=${PW_CCACHE_STATUS} build --copy-artifacts-to objdir-clone
                   && rm -rf out/linux-x64-light-data-model-no-unique-id-${BUILD_VARIANT}-clang"
 
             - name: Build linux-x64-terms-and-conditions
@@ -755,7 +759,7 @@ jobs:
               run: >-
                   ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py
                   --target linux-x64-terms-and-conditions
-                  --pw-command-launcher=ccache build --copy-artifacts-to objdir-clone
+                  --pw-command-launcher=${PW_CCACHE_STATUS} build --copy-artifacts-to objdir-clone
                   && rm -rf out/linux-x64-terms-and-conditions"
 
             - name: Build linux-x64-python-bindings
@@ -764,7 +768,7 @@ jobs:
               run: >-
                   ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py
                   --target linux-x64-python-bindings-webrtc
-                  --pw-command-launcher=ccache build --copy-artifacts-to objdir-clone
+                  --pw-command-launcher=${PW_CCACHE_STATUS} build --copy-artifacts-to objdir-clone
                   && rm -rf out/linux-x64-python-bindings-webrtc"
 
             - name: Build linux-x64-jf-control-app
@@ -773,7 +777,7 @@ jobs:
               run: >-
                   ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py
                   --target linux-x64-jf-control-app
-                  --pw-command-launcher=ccache build --copy-artifacts-to objdir-clone
+                  --pw-command-launcher=${PW_CCACHE_STATUS} build --copy-artifacts-to objdir-clone
                   && rm -rf out/linux-x64-jf-control-app"
 
             - name: Build linux-x64-jf-admin-app
@@ -782,7 +786,7 @@ jobs:
               run: >-
                   ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py
                   --target linux-x64-jf-admin-app
-                  --pw-command-launcher=ccache build --copy-artifacts-to objdir-clone
+                  --pw-command-launcher=${PW_CCACHE_STATUS} build --copy-artifacts-to objdir-clone
                   && rm -rf out/linux-x64-jf-admin-app"
 
             - name: Build linux-x64-closure-app
@@ -791,7 +795,7 @@ jobs:
               run: >-
                   ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py
                   --target linux-x64-closure-${BUILD_VARIANT}-tsan-clang-test
-                  --pw-command-launcher=ccache build --copy-artifacts-to objdir-clone
+                  --pw-command-launcher=${PW_CCACHE_STATUS} build --copy-artifacts-to objdir-clone
                   && rm -rf out/linux-x64-closure-${BUILD_VARIANT}-tsan-clang-test"
 
             - name: ccache stats
