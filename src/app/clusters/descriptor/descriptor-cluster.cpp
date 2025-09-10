@@ -233,8 +233,8 @@ DataModel::ActionReturnStatus DescriptorCluster::ReadAttribute(const DataModel::
     case EndpointUniqueID::Id: {
         char buffer[chip::app::Clusters::Descriptor::Attributes::EndpointUniqueID::TypeInfo::MaxLength()] = { 0 };
         MutableCharSpan epUniqueId(buffer);
-        ReturnErrorOnFailure(mContext->provider.EndpointUniqueID(endpoint, epUniqueId));
-        return aEncoder.Encode(epUniqueId);
+        ReturnErrorOnFailure(mContext->provider.EndpointUniqueID(request.path.mEndpointId, epUniqueId));
+        return encoder.Encode(epUniqueId);
     }
 #endif
     default:
