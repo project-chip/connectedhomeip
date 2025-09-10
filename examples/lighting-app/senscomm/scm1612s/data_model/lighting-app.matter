@@ -1834,7 +1834,6 @@ endpoint 1 {
     ram      attribute clusterRevision default = 4;
 
     handle command Identify;
-    handle command TriggerEffect;
   }
 
   server cluster Groups {
@@ -1860,15 +1859,15 @@ endpoint 1 {
 
   server cluster OnOff {
     persist  attribute onOff default = 0x00;
-    ram      attribute globalSceneControl default = 1;
-    ram      attribute onTime default = 0;
-    ram      attribute offWaitTime default = 0;
-    ram      attribute startUpOnOff;
+    ram      attribute globalSceneControl default = 0x01;
+    ram      attribute onTime default = 0x0000;
+    ram      attribute offWaitTime default = 0x0000;
+    persist  attribute startUpOnOff default = 0xFF;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute eventList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 0;
+    ram      attribute featureMap default = 0x1;
     ram      attribute clusterRevision default = 6;
 
     handle command Off;
@@ -1882,16 +1881,16 @@ endpoint 1 {
   server cluster LevelControl {
     ram      attribute currentLevel default = 0x00;
     ram      attribute remainingTime default = 0x0000;
-    ram      attribute minLevel default = 0x00;
+    ram      attribute minLevel default = 0x1;
     ram      attribute maxLevel default = 0xFE;
     ram      attribute options default = 0x00;
-    ram      attribute onLevel;
+    ram      attribute onLevel default = 0x1;
     ram      attribute startUpCurrentLevel;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute eventList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 0;
+    ram      attribute featureMap default = 0x3;
     ram      attribute clusterRevision default = 5;
 
     handle command MoveToLevel;
@@ -1926,7 +1925,7 @@ endpoint 1 {
     ram      attribute options default = 0x00;
     ram      attribute numberOfPrimaries;
     ram      attribute enhancedColorMode default = 0x01;
-    ram      attribute colorCapabilities default = 0x0000;
+    ram      attribute colorCapabilities default = 0x0018;
     ram      attribute colorTempPhysicalMinMireds default = 0x0000;
     ram      attribute colorTempPhysicalMaxMireds default = 0xFEFF;
     ram      attribute coupleColorTempToLevelMinMireds;
@@ -1935,7 +1934,7 @@ endpoint 1 {
     callback attribute acceptedCommandList;
     callback attribute eventList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 0;
+    ram      attribute featureMap default = 0x18;
     ram      attribute clusterRevision default = 6;
 
     handle command MoveToColor;
