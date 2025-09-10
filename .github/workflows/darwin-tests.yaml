@@ -39,6 +39,7 @@ jobs:
     strategy:
       matrix:
         build_variant: [no-ble-no-shell-asan-clang]
+        os: [macos-13, macos-14, macos-15]
     env:
       BUILD_VARIANT: ${{matrix.build_variant}}
 
@@ -52,7 +53,7 @@ jobs:
       LSAN_OPTIONS: detect_leaks=1 malloc_context_size=40 suppressions=scripts/tests/chiptest/lsan-mac-suppressions.txt
 
     if: github.actor != 'restyled-io[bot]'
-    runs-on: macos-13
+    runs-on: ${{matrix.os}}
 
     steps:
       - name: Checkout
