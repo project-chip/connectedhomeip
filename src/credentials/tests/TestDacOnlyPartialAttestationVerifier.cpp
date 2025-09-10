@@ -29,6 +29,7 @@
 #include <crypto/CHIPCryptoPAL.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/CHIPVendorIdentifiers.hpp>
+#include <lib/support/BufferWriter.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/Span.h>
 
@@ -157,18 +158,18 @@ CHIP_ERROR TestDacOnlyPartialAttestationVerifier::CreateSignedAttestationData(
 
     // Concatenate TLV and challenge data for signing
     constexpr size_t kMaxToSignSize = 128 + 64; // 128 for TLV, 64 for challengeData
-    if (tlvLen + challengeDataLen > kMaxToSignSize)
+    uint8_t toSign[kMaxToSignSize];
+    chip::Encoding::BufferWriter writer(toSign, sizeof(toSign));
+    writer.Put(tlvBuffer, tlvLen).Put(challengeData, challengeDataLen);
+    if (!writer.Fit())
     {
         return CHIP_ERROR_BUFFER_TOO_SMALL;
     }
-    uint8_t toSign[kMaxToSignSize];
-    memcpy(toSign, tlvBuffer, tlvLen);
-    memcpy(toSign + tlvLen, challengeData, challengeDataLen);
 
     // Load keypair and sign the data
     chip::Crypto::P256Keypair keypair;
     ReturnErrorOnFailure(keypair.HazardousOperationLoadKeypairFromRaw(privateKey, publicKey));
-    ReturnErrorOnFailure(keypair.ECDSA_sign_msg(toSign, tlvLen + challengeDataLen, signature));
+    ReturnErrorOnFailure(keypair.ECDSA_sign_msg(toSign, writer.Needed(), signature));
 
     return CHIP_NO_ERROR;
 }
@@ -370,8 +371,10 @@ TEST_F(TestDacOnlyPartialAttestationVerifier, TestWithMalformedAttestationElemen
 
     // Concatenate attestationElements + attestationChallenge for signing
     uint8_t toSign[sizeof(malformedAttestationElements) + sizeof(kTestChallengeData)];
-    memcpy(toSign, malformedAttestationElements, sizeof(malformedAttestationElements));
-    memcpy(toSign + sizeof(malformedAttestationElements), kTestChallengeData, sizeof(kTestChallengeData));
+    chip::Encoding::BufferWriter writer(toSign, sizeof(toSign));
+    writer.Put(malformedAttestationElements, sizeof(malformedAttestationElements))
+        .Put(kTestChallengeData, sizeof(kTestChallengeData));
+    ASSERT_TRUE(writer.Fit());
 
     // Load a valid keypair for signing
     chip::Crypto::P256Keypair keypair;
@@ -381,7 +384,7 @@ TEST_F(TestDacOnlyPartialAttestationVerifier, TestWithMalformedAttestationElemen
 
     // Sign the concatenated data
     chip::Crypto::P256ECDSASignature signature;
-    err = keypair.ECDSA_sign_msg(toSign, sizeof(toSign), signature);
+    err = keypair.ECDSA_sign_msg(toSign, writer.Needed(), signature);
     ASSERT_EQ(err, CHIP_NO_ERROR);
 
     // Prepare AttestationInfo with valid certificates and keys, but malformed attestationElements
