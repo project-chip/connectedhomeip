@@ -27,10 +27,8 @@ using namespace chip::app::Clusters::Descriptor;
 
 namespace {
 
-static constexpr size_t kDescriptorFixedClusterCount =
-    Descriptor::StaticApplicationConfig::kFixedClusterConfig.size();
-static constexpr size_t kDescriptorMaxClusterCount =
-    kDescriptorFixedClusterCount + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT;
+static constexpr size_t kDescriptorFixedClusterCount = Descriptor::StaticApplicationConfig::kFixedClusterConfig.size();
+static constexpr size_t kDescriptorMaxClusterCount   = kDescriptorFixedClusterCount + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT;
 
 LazyRegisteredServerCluster<DescriptorCluster> gServer;
 
