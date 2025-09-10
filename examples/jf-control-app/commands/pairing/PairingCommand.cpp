@@ -724,10 +724,7 @@ void PairingCommand::OnCommissioningComplete(NodeId nodeId, CHIP_ERROR err)
             memcpy(request.trustedIcacPublicKeyB.bytes, adminICACPKSpan.data(), adminICACPKSpan.size());
             request.trustedIcacPublicKeyB.size = Crypto::kP256_PublicKey_Length;
 
-            for (size_t i = 0; i < Crypto::kP256_PublicKey_Length; ++i)
-            {
-                ChipLogProgress(JointFabric, "trustedIcacPublicKeyB[%li] = %02X", i, request.trustedIcacPublicKeyB.bytes[i]);
-            }
+            request.peerAdminJFAdminClusterEndpointId = info.adminEndpointId;
 
             auto call = rpcClient.TransferOwnership(request, OnRPCTransferDone);
             if (!call.active())

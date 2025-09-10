@@ -95,7 +95,7 @@ class TC_CADMIN_1_28(MatterBaseTest):
         # Initialize Ecosystem A
         #
         #####################################################################################################################################
-        self.jfadmin_fabric_a_passcode = random.randint(110220011, 110220999)
+        self.jfadmin_fabric_a_passcode = random.randint(11022011, 11022099)
         self.jfadmin_fabric_a_discriminator = random.randint(0, 4095)
         self.jfctrl_fabric_a_vid = random.randint(0x0001, 0xFFF0)
 
@@ -123,9 +123,9 @@ class TC_CADMIN_1_28(MatterBaseTest):
 
         # Commission JF-ADMIN app with JF-Controller on Fabric A
         self.fabric_a_ctrl.send(
-            message=f"pairing onnetwork 1 {self.jfadmin_fabric_a_passcode} --anchor true",
+            message=f"pairing onnetwork-long 1 {self.jfadmin_fabric_a_passcode} {self.jfadmin_fabric_a_discriminator} --anchor true",
             expected_output="[JF] Anchor Administrator (nodeId=1) commissioned with success",
-            timeout=10)
+            timeout=30)
 
         # Extract the Ecosystem A certificates and inject them in the storage that will be provided to a new Python Controller later
         jfcStorage = ConfigParser()
@@ -151,12 +151,13 @@ class TC_CADMIN_1_28(MatterBaseTest):
         # Extract CATs to be provided to the Python Controller later
         self.ecoACATs = base64.b64decode(jfcStorage.get("Default", "CommissionerCATs"))[::-1].hex().strip('0')
 
-        self.thserver_fabric_a_passcode = random.randint(110220011, 110220999)
+        self.thserver_fabric_a_passcode = random.randint(11022011, 11022099)
+        self.theserver_fabric_b_discriminator = random.randint(0, 4095)
         self.fabric_a_server_app = AppServerSubprocess(
             self.th_server_app,
             storage_dir=self.storage_fabric_a,
             port=random.randint(5001, 5999),
-            discriminator=random.randint(0, 4095),
+            discriminator=self.theserver_fabric_b_discriminator,
             passcode=self.thserver_fabric_a_passcode,
             extra_args=["--capabilities", "0x04"])
         self.fabric_a_server_app.start(
@@ -164,16 +165,16 @@ class TC_CADMIN_1_28(MatterBaseTest):
             timeout=10)
 
         self.fabric_a_ctrl.send(
-            message=f"pairing onnetwork 2 {self.thserver_fabric_a_passcode}",
+            message=f"pairing onnetwork-long 2 {self.thserver_fabric_a_passcode} {self.theserver_fabric_b_discriminator}",
             expected_output="[CTL] Commissioning complete for node ID 0x0000000000000002: success",
-            timeout=10)
+            timeout=30)
 
         #####################################################################################################################################
         #
         # Initialize Ecosystem B
         #
         #####################################################################################################################################
-        self.jfadmin_fabric_b_passcode = random.randint(110220011, 110220999)
+        self.jfadmin_fabric_b_passcode = random.randint(11022011, 11022099)
         self.jfadmin_fabric_b_discriminator = random.randint(0, 4095)
         self.jfctrl_fabric_b_vid = random.randint(0x0001, 0xFFF0)
 
@@ -201,9 +202,9 @@ class TC_CADMIN_1_28(MatterBaseTest):
 
         # Commission JF-ADMIN app with JF-Controller on Fabric B
         self.fabric_b_ctrl.send(
-            message=f"pairing onnetwork 11 {self.jfadmin_fabric_b_passcode} --anchor true",
+            message=f"pairing onnetwork-long 11 {self.jfadmin_fabric_b_passcode} {self.jfadmin_fabric_b_discriminator} --anchor true",
             expected_output="[JF] Anchor Administrator (nodeId=11) commissioned with success",
-            timeout=10)
+            timeout=30)
 
         # Extract the Ecosystem B certificates and inject them in the storage that will be provided to a new Python Controller later
         jfcStorage = ConfigParser()
@@ -229,12 +230,13 @@ class TC_CADMIN_1_28(MatterBaseTest):
         # Extract CATs to be provided to the Python Controller later
         self.ecoBCATs = base64.b64decode(jfcStorage.get("Default", "CommissionerCATs"))[::-1].hex().strip('0')
 
-        self.thserver_fabric_b_passcode = random.randint(110220011, 110220999)
+        self.thserver_fabric_b_passcode = random.randint(11022011, 11022099)
+        self.theserver_fabric_b_discriminator = random.randint(0, 4095)
         self.fabric_b_server_app = AppServerSubprocess(
             self.th_server_app,
             storage_dir=self.storage_fabric_b,
             port=random.randint(5001, 5999),
-            discriminator=random.randint(0, 4095),
+            discriminator=self.theserver_fabric_b_discriminator,
             passcode=self.thserver_fabric_b_passcode,
             extra_args=["--capabilities", "0x04"])
         self.fabric_b_server_app.start(
@@ -242,9 +244,9 @@ class TC_CADMIN_1_28(MatterBaseTest):
             timeout=10)
 
         self.fabric_b_ctrl.send(
-            message=f"pairing onnetwork 22 {self.thserver_fabric_b_passcode}",
+            message=f"pairing onnetwork-long 22 {self.thserver_fabric_b_passcode} {self.theserver_fabric_b_discriminator}",
             expected_output="[CTL] Commissioning complete for node ID 0x0000000000000016: success",
-            timeout=10)
+            timeout=30)
 
     def teardown_class(self):
         # Stop all Subprocesses that were started in this test case
