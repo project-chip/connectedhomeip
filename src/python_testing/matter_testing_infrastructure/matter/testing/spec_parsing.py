@@ -159,11 +159,6 @@ class XmlDeviceTypeClusterRequirements:
         return f'{self.name}: {str(self.conformance)}'
 
 
-"""
-XML namespaces and XML Tags dataclass implementation below this line
-"""
-
-
 @dataclass
 class XmlNamespace:
     """Represents a namespace definition from XML"""
@@ -187,11 +182,6 @@ class XmlTag:
     def __str__(self) -> str:
         desc = f" - {self.description}" if self.description else ""
         return f"{self.name}{desc}"
-
-
-"""
-XML namespaces and XML Tags implementation above this line
-"""
 
 
 @dataclass
@@ -882,11 +872,6 @@ def combine_derived_clusters_with_base(xml_clusters: dict[uint, XmlCluster], pur
             xml_clusters[id] = new
 
 
-"""
-Added XML namespace parsing functions below
-"""
-
-
 def parse_namespace(et: ElementTree.Element) -> tuple[XmlNamespace, list[ProblemNotice]]:
     """Parse a single namespace XML definition"""
     problems: list[ProblemNotice] = []
@@ -968,13 +953,9 @@ def build_xml_namespaces(data_model_directory: typing.Union[PrebuiltDataModelDir
     found_xmls = 0
 
     try:
-        # Handle both zip files and directories
-        if isinstance(namespace_dir, zipfile.Path):
-            filenames = [f for f in namespace_dir.iterdir() if str(f).endswith('.xml')]
-        else:
-            filenames = [f for f in namespace_dir.iterdir() if f.name.endswith('.xml')]
-
-        for filename in filenames:
+        for filename in namespace_dir.iterdir():
+            if not filename.name.endswith('.xml'):
+                continue
             logging.info('Parsing file %s', str(filename))
             found_xmls += 1
 
@@ -1027,10 +1008,6 @@ def build_xml_namespaces(data_model_directory: typing.Union[PrebuiltDataModelDir
 
     return namespaces, problems
 
-
-"""
-Added XML namespace parsing functions above
-"""
 
 def parse_single_device_type(root: ElementTree.Element, cluster_definition_xml: dict[uint, XmlCluster]) -> tuple[dict[int, XmlDeviceType], list[ProblemNotice]]:
     problems: list[ProblemNotice] = []
