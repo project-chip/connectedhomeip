@@ -422,7 +422,7 @@ TEST_F(TestCommissioningWindowManager, TestOnPlatformEventCommissioningComplete)
     CommissioningWindowManager & commissionMgr = Server::GetInstance().GetCommissioningWindowManager();
 
     EXPECT_EQ(commissionMgr.OpenBasicCommissioningWindow(commissionMgr.MaxCommissioningTimeout(),
-                                                         CommissioningWindowAdvertisement::kDnssdOnly),
+                                                         CommissioningWindowAdvertisement::kAllSupported),
               CHIP_NO_ERROR);
     EXPECT_TRUE(commissionMgr.IsCommissioningWindowOpen());
 
@@ -432,6 +432,7 @@ TEST_F(TestCommissioningWindowManager, TestOnPlatformEventCommissioningComplete)
     // When the commissioning has completed (kCommissioningComplete event) OnPlatformEvent cleans up, closes active sessions and the
     // commissioning window is closed The device should no longer be discoverable or accept new commissioners
     EXPECT_FALSE(commissionMgr.IsCommissioningWindowOpen());
+    EXPECT_EQ(commissionMgr.GetCommissioningMode(), chip::Dnssd::CommissioningMode::kDisabled);
 
 // When BLE is enabled
 #if CONFIG_NETWORK_LAYER_BLE && CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION
@@ -439,7 +440,8 @@ TEST_F(TestCommissioningWindowManager, TestOnPlatformEventCommissioningComplete)
 #endif
 }
 
-// Verify that the when fail-safe timer expires commissioning mode is disabled
+// Verify that on normal failsafe timer expiry the commissioning window remains open
+// The explicit CloseConnection() call is for cleanup and also checks that the commissioning mode changes to kDisabled
 TEST_F(TestCommissioningWindowManager, TestOnPlatformEventFailSafeTimerExpired)
 {
     CommissioningWindowManager & commissionMgr = Server::GetInstance().GetCommissioningWindowManager();
@@ -527,6 +529,8 @@ TEST_F(TestCommissioningWindowManager, TestOnPlatformEventCloseAllBleConnections
 {
     CommissioningWindowManager & commissionMgr = Server::GetInstance().GetCommissioningWindowManager();
 
+    // ensure that BLE advertisement is enabled
+    // EXPECT_TRUE(chip::DeviceLayer::ConnectivityMgr().IsBLEAdvertisingEnabled());
     auto event = CreateEvent(chip::DeviceLayer::DeviceEventType::kCloseAllBleConnections);
 
     commissionMgr.OnPlatformEvent(&event);
