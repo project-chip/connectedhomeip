@@ -61,6 +61,9 @@ public:
         Builder & SetSemanticTags(Span<const SemanticTag> semanticTags);
         Builder & SetDeviceTypes(Span<const DataModel::DeviceTypeEntry> deviceTypes);
 
+#if CHIP_CONFIG_USE_ENDPOINT_UNIQUE_ID
+        Builder & SetEndpointUniqueId(MutableCharSpan endpointUniqueId);
+#endif
         SpanEndpoint Build();
 
     private:
@@ -85,6 +88,10 @@ public:
     CHIP_ERROR DeviceTypes(ReadOnlyBufferBuilder<DataModel::DeviceTypeEntry> & out) const override;
     CHIP_ERROR ClientClusters(ReadOnlyBufferBuilder<ClusterId> & out) const override;
 
+#if CHIP_CONFIG_USE_ENDPOINT_UNIQUE_ID
+    MutableCharSpan EndpointUniqueID();
+#endif
+
 private:
     // Private constructor for Builder
     SpanEndpoint(const Span<const ClusterId> & clientClusters, const Span<const SemanticTag> & semanticTags,
@@ -94,6 +101,10 @@ private:
     Span<const DataModel::DeviceTypeEntry> mDeviceTypes;
     Span<const SemanticTag> mSemanticTags;
     Span<const ClusterId> mClientClusters;
+
+#if CHIP_CONFIG_USE_ENDPOINT_UNIQUE_ID
+    MutableCharSpan mEndpointUniqueId;
+#endif
 };
 
 } // namespace app
