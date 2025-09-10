@@ -585,11 +585,9 @@ Protocols::InteractionModel::Status HandleWriteBridgedDeviceBasicAttribute(Devic
         return Protocols::InteractionModel::Status::ConstraintError;
     }
 
-    chip::Span<char> full(reinterpret_cast<char *>(buffer), static_cast<size_t>(len) + 1);
-    ShortPascalString pascal(full);
-    auto content = pascal.Content();
-
-    dev->SetName(content.data());
+    chip::CharSpan nameSpan = chip::CharSpan::fromZclString(buffer);
+    std::string name(nameSpan.data(), nameSpan.size());    
+    dev->SetName(name.c_str());
 
     HandleDeviceStatusChanged(dev, Device::kChanged_Name);
 
