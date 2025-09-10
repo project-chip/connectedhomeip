@@ -569,10 +569,9 @@ Protocols::InteractionModel::Status HandleWriteOnOffAttribute(DeviceOnOff * dev,
     return Protocols::InteractionModel::Status::Success;
 }
 
-Protocols::InteractionModel::Status HandleWriteBridgedDeviceBasicAttribute(Device * dev, AttributeId attributeId,
-                                                                           uint8_t * buffer)
+Protocols::InteractionModel::Status HandleWriteBridgedDeviceBasicAttribute(Device * dev, AttributeId attributeId, uint8_t * buffer)
 {
-    ChipLogProgress(DeviceLayer, "HandleWriteBridgedDeviceBasicAttribute: attrId=%d", attributeId);
+    ChipLogProgress(DeviceLayer, "HandleWriteBridgedDeviceBasicAttribute: attrId=" ChipLogFormatMEI, ChipLogValueMEI(attributeId));
 
     if (attributeId != BridgedDeviceBasicInformation::Attributes::NodeLabel::Id)
     {
