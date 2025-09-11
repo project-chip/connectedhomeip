@@ -256,7 +256,7 @@ public:
     void SetInstance(Instance * aInstance) { mInstance = aInstance; }
 
 private:
-    Instance * mInstance = nullptr;    
+    Instance * mInstance = nullptr;
 
 protected:
     /**
