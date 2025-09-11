@@ -63,7 +63,6 @@ std::optional<DataModel::ActionReturnStatus> DiagnosticLogsCluster::InvokeComman
         auto protocol = commandData.requestedProtocol;
         if (intent == IntentEnum::kUnknownEnumValue || protocol == TransferProtocolEnum::kUnknownEnumValue)
         {
-            handler->AddStatus(request.path, Status::InvalidCommand);
             return Status::InvalidCommand;
         }
         if (protocol == TransferProtocolEnum::kResponsePayload)
@@ -73,7 +72,7 @@ std::optional<DataModel::ActionReturnStatus> DiagnosticLogsCluster::InvokeComman
         return HandleLogRequestForBdx(handler, request.path, commandData.intent, commandData.transferFileDesignator);
     }
     default:
-        return Protocols::InteractionModel::Status::UnsupportedCommand;
+        return Status::UnsupportedCommand;
     }
 }
 
