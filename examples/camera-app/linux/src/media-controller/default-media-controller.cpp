@@ -45,9 +45,12 @@ void DefaultMediaController::RegisterTransport(Transport * transport, uint16_t v
     std::lock_guard<std::mutex> lock(mConnectionsMutex);
     mConnections.push_back({ transport, videoStreamID, audioStreamID });
 
-    auto * bufferSink                      = new BufferSink();
-    bufferSink->transport                  = transport;
-    bufferSink->requestedPreBufferLengthMs = 0; // by default give only live stream
+    auto * bufferSink     = new BufferSink();
+    bufferSink->transport = transport;
+    // 0: Deliver with the minimum I-frame duration
+    // 1: Deliver with a delay of up to 1 ms (default)
+    // Other values: Deliver with the specified delay
+    bufferSink->requestedPreBufferLengthMs = 1;
 
     if (mCameraDevice)
     {
