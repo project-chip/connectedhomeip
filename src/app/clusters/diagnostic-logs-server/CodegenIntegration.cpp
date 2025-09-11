@@ -34,12 +34,9 @@ using namespace chip::app::Clusters::DiagnosticLogs;
 using namespace chip::Protocols::InteractionModel;
 
 namespace {
-static constexpr size_t kDiagnosticLogsFixedClusterCount = DiagnosticLogs::StaticApplicationConfig::kFixedClusterConfig.size();
 
-static constexpr size_t kDiagnosticLogsMaxClusterCount =
-    kDiagnosticLogsFixedClusterCount + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT;
-
-LazyRegisteredServerCluster<DiagnosticLogsCluster> gServers[kDiagnosticLogsMaxClusterCount];
+LazyRegisteredServerCluster<DiagnosticLogsCluster> gDiagnosticLogsCluster;
+DiagnosticLogsProviderDelegate * gDiagnosticLogsProviderDelegate = nullptr;
 
 class IntegrationDelegate : public CodegenClusterIntegration::Delegate
 {
@@ -47,15 +44,16 @@ public:
     ServerClusterRegistration & CreateRegistration(EndpointId endpointId, unsigned emberEndpointIndex,
                                                    uint32_t optionalAttributeBits, uint32_t featureMap) override
     {
-        gServers[emberEndpointIndex].Create(endpointId);
-        return gServers[emberEndpointIndex].Registration();
+        gDiagnosticLogsCluster.Create(endpointId);
+        if (gDiagnosticLogsProviderDelegate != nullptr)
+        {
+            gDiagnosticLogsCluster.Cluster().SetDelegate(gDiagnosticLogsProviderDelegate);
+        }
+        return gDiagnosticLogsCluster.Registration();
     }
 
-    ServerClusterInterface & FindRegistration(unsigned emberEndpointIndex) override
-    {
-        return gServers[emberEndpointIndex].Cluster();
-    }
-    void ReleaseRegistration(unsigned emberEndpointIndex) override { gServers[emberEndpointIndex].Destroy(); }
+    ServerClusterInterface & FindRegistration(unsigned emberEndpointIndex) override { return gDiagnosticLogsCluster.Cluster(); }
+    void ReleaseRegistration(unsigned emberEndpointIndex) override { gDiagnosticLogsCluster.Destroy(); }
 };
 
 } // namespace
@@ -66,12 +64,13 @@ void emberAfDiagnosticLogsClusterServerInitCallback(EndpointId endpoint)
 
     CodegenClusterIntegration::RegisterServer(
         {
-            .endpointId                      = endpoint,
-            .clusterId                       = DiagnosticLogs::Id,
-            .fixedClusterServerEndpointCount = kDiagnosticLogsFixedClusterCount,
-            .maxEndpointCount                = kDiagnosticLogsMaxClusterCount,
-            .fetchFeatureMap                 = false,
-            .fetchOptionalAttributes         = false,
+            .endpointId = endpoint,
+            .clusterId  = DiagnosticLogs::Id,
+            .fixedClusterServerEndpointCount =
+                1, // Diagnostic logs are device-wide functionality, so we only need one cluster instance
+            .maxEndpointCount        = 1,
+            .fetchFeatureMap         = false,
+            .fetchOptionalAttributes = false,
         },
         integrationDelegate);
 }
@@ -82,10 +81,11 @@ void MatterDiagnosticLogsClusterServerShutdownCallback(EndpointId endpointId)
 
     CodegenClusterIntegration::UnregisterServer(
         {
-            .endpointId                      = endpointId,
-            .clusterId                       = DiagnosticLogs::Id,
-            .fixedClusterServerEndpointCount = kDiagnosticLogsFixedClusterCount,
-            .maxEndpointCount                = kDiagnosticLogsMaxClusterCount,
+            .endpointId = endpointId,
+            .clusterId  = DiagnosticLogs::Id,
+            .fixedClusterServerEndpointCount =
+                1, // Diagnostic logs are device-wide functionality, so we only need one cluster instance
+            .maxEndpointCount = 1,
         },
         integrationDelegate);
 }
@@ -107,10 +107,10 @@ DiagnosticLogsServer & DiagnosticLogsServer::Instance()
 
 void DiagnosticLogsServer::SetDiagnosticLogsProviderDelegate(EndpointId endpoint, DiagnosticLogsProviderDelegate * delegate)
 {
-    uint16_t arrayIndex = emberAfGetClusterServerEndpointIndex(endpoint, DiagnosticLogs::Id, kDiagnosticLogsFixedClusterCount);
-    VerifyOrReturn(arrayIndex < kDiagnosticLogsMaxClusterCount);
-
-    gServers[arrayIndex].Cluster().SetDelegate(endpoint, delegate);
+    VerifyOrReturn(endpoint == kRootEndpointId,
+                   ChipLogError(DeviceLayer, "DiagnosticLogsProviderDelegate can only be set on root endpoint"));
+    VerifyOrReturn(delegate != nullptr, ChipLogError(DeviceLayer, "DiagnosticLogsProviderDelegate cannot be nullptr"));
+    gDiagnosticLogsProviderDelegate = delegate;
 }
 
 } // namespace DiagnosticLogs

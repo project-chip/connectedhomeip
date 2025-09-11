@@ -30,27 +30,13 @@ class DiagnosticLogsProviderLogic
 {
 public:
     /**
-     * Initialize the diagnostic logs provider logic
-     *
-     * @param ServerEndpointCount The number of server endpoints for the diagnostic logs cluster
-     */
-    void Init(size_t serverEndpointCount);
-
-    ~DiagnosticLogsProviderLogic()
-    {
-        delete[] mDiagnosticLogsProviderDelegateTable;
-        mDiagnosticLogsProviderDelegateTable = nullptr;
-        mDiagnosticLogsServerEndpointCount   = 0;
-    }
-
-    /**
      * Set the default delegate of the diagnostic logs cluster for the specified endpoint
      *
      * @param endpoint ID of the endpoint
      *
      * @param delegate The log provider delegate at the endpoint
      */
-    void SetDelegate(EndpointId endpoint, chip::app::Clusters::DiagnosticLogs::DiagnosticLogsProviderDelegate * delegate);
+    void SetDelegate(DiagnosticLogs::DiagnosticLogsProviderDelegate * delegate) { mDelegate = delegate; }
 
     /**
      * Handles the request to download diagnostic logs of type specified in the intent argument for protocol type ResponsePayload
@@ -73,16 +59,7 @@ public:
                                                                         Optional<CharSpan> transferFileDesignator);
 
 private:
-    chip::app::Clusters::DiagnosticLogs::DiagnosticLogsProviderDelegate ** mDiagnosticLogsProviderDelegateTable = nullptr;
-    size_t mDiagnosticLogsServerEndpointCount                                                                   = 0;
-    /**
-     * Get the delegate for the specified endpoint
-     *
-     * @param endpoint The endpoint to get the delegate for
-     *
-     * @return The delegate for the specified endpoint
-     */
-    chip::app::Clusters::DiagnosticLogs::DiagnosticLogsProviderDelegate * GetDelegate(EndpointId endpoint);
+    DiagnosticLogs::DiagnosticLogsProviderDelegate * mDelegate = nullptr;
 };
 
 } // namespace Clusters

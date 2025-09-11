@@ -29,8 +29,6 @@ class DiagnosticLogsCluster : public DefaultServerCluster, public DiagnosticLogs
 public:
     DiagnosticLogsCluster(EndpointId endpointId) : DefaultServerCluster({ endpointId, DiagnosticLogs::Id }) {}
 
-    void Init(size_t serverEndpointCount) { DiagnosticLogsProviderLogic::Init(serverEndpointCount); }
-
     // Server cluster implementation
     DataModel::ActionReturnStatus ReadAttribute(const DataModel::ReadAttributeRequest & request,
                                                 AttributeValueEncoder & encoder) override;
