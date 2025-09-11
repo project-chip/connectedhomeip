@@ -191,6 +191,26 @@ Protocols::InteractionModel::Status PushAvStreamTransportManager::SetTransportSt
         return Status::Failure;
     }
 
+    if (transportStatus == TransportStatusEnum::kActive)
+    {
+        auto & avsmController = mCameraDevice->GetCameraAVStreamMgmtController();
+        bool isActive;
+        CHIP_ERROR status = avsmController.IsPrivacyModeActive(isActive);
+        if (status == CHIP_NO_ERROR)
+        {
+            if (isActive)
+            {
+                ChipLogError(Camera, "PushAvStreamTransportManager, Cannot set transport status to Active as privacy mode is enabled.");
+                return Status::InvalidInState;
+            }
+        }
+        else
+        {
+            ChipLogError(Camera, "PushAvStreamTransportManager, Failed to retrieve Privacy Mode Status from AVStreamMgmtController.");
+            return Status::Failure;
+        }
+    }
+
     for (uint16_t connectionID : connectionIDList)
     {
         if (mTransportMap.find(connectionID) == mTransportMap.end())
