@@ -264,7 +264,7 @@ class TC_PAVST_2_3(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
             status = await self.allocate_one_pushav_transport(endpoint, trigger_Options=triggerOptions, tlsEndPoint=tlsEndpointId, url=f"https://{host_ip}:1234/streams/{uploadStreamId}")
             asserts.assert_equal(status, Status.Success, "DUT should respond with Status Code Success with a Null Zone.")
         except InteractionModelError as e:
-            asserts.assert_fail("Unexptected error when setting a Zone that is Null (meaning all Zones).")
+            asserts.assert_fail(f"Unexpected error when setting a Zone that is Null (meaning all Zones). Error received {e.status}")
 
         self.step(15)
         try:
