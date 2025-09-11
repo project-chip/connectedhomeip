@@ -19842,7 +19842,7 @@ public class ClusterIDMapping {
             FindRootCertificate(2L),
             LookupRootCertificate(4L),
             RemoveRootCertificate(6L),
-            TLSClientCSR(7L),
+            ClientCSR(7L),
             ProvisionClientCertificate(9L),
             FindClientCertificate(10L),
             LookupClientCertificate(12L),
@@ -19932,24 +19932,24 @@ public class ClusterIDMapping {
                         }
                         throw new NoSuchFieldError();
                     }
-                }public enum TLSClientCSRCommandField {Nonce(0),;
+                }public enum ClientCSRCommandField {Nonce(0),Ccdid(1),;
                     private final int id;
-                    TLSClientCSRCommandField(int id) {
+                    ClientCSRCommandField(int id) {
                         this.id = id;
                     }
 
                     public int getID() {
                         return id;
                     }
-                    public static TLSClientCSRCommandField value(int id) throws NoSuchFieldError {
-                        for (TLSClientCSRCommandField field : TLSClientCSRCommandField.values()) {
+                    public static ClientCSRCommandField value(int id) throws NoSuchFieldError {
+                        for (ClientCSRCommandField field : ClientCSRCommandField.values()) {
                         if (field.getID() == id) {
                             return field;
                         }
                         }
                         throw new NoSuchFieldError();
                     }
-                }public enum ProvisionClientCertificateCommandField {Ccdid(0),ClientCertificateDetails(1),;
+                }public enum ProvisionClientCertificateCommandField {Ccdid(0),ClientCertificate(1),IntermediateCertificates(2),;
                     private final int id;
                     ProvisionClientCertificateCommandField(int id) {
                         this.id = id;

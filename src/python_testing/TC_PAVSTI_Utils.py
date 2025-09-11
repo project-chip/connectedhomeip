@@ -21,7 +21,7 @@ import os
 import random
 import shutil
 import tempfile
-from typing import Optional, Union
+from typing import List, Optional, Union
 
 import psutil
 import requests
@@ -41,7 +41,7 @@ from matter.interaction_model import InteractionModelError, Status
 from matter.testing.conversions import hex_from_bytes
 from matter.testing.matter_testing import type_matches
 from matter.testing.tasks import Subprocess
-from matter.tlv import TLVWriter, uint
+from matter.tlv import uint
 
 
 class PushAvServerProcess(Subprocess):
@@ -150,11 +150,8 @@ class PAVSTIUtils:
         asserts.assert_greater_equal(ccdid, 0, "Invalid CCDID returned")
         asserts.assert_less_equal(ccdid, 65534, "Invalid CCDID returned")
 
-    def assert_valid_csr(
-        self,
-        response: Clusters.TlsCertificateManagement.Commands.TLSClientCSRResponse,
-        nonce: bytes,
-    ) -> None:
+    def assert_valid_csr(self, response: Clusters.TlsCertificateManagement.Commands.ClientCSRResponse, nonce: bytes):
+        # Verify der encoded and PKCS #10 (rfc2986 is PKCS #10) - next two requirements
         try:
             temp, _ = der_decoder(response.csr, asn1Spec=rfc2986.CertificationRequest())
         except PyAsn1Error:
@@ -164,48 +161,30 @@ class PAVSTIUtils:
         # Verify public key is 256 bytes
         csr = x509.load_der_x509_csr(response.csr)
         csr_pubkey = csr.public_key()
-
-        # Ensure key size is 256 bits
         asserts.assert_equal(csr_pubkey.key_size, 256, "Incorrect key size")
 
-        # Ensure signature algorithm is ecdsa-with-SHA256
-        signature_algorithm = dict(layer1["signatureAlgorithm"])["algorithm"]
-        asserts.assert_equal(
-            signature_algorithm,
-            rfc5480.ecdsa_with_SHA256,
-            "CSR specifies incorrect signature key algorithm",
-        )
+        # Verify signature algorithm is ecdsa-with-SHA256
+        signature_algorithm = dict(layer1['signatureAlgorithm'])['algorithm']
+        asserts.assert_equal(signature_algorithm, rfc5480.ecdsa_with_SHA256, "CSR specifies incorrect signature key algorithm")
 
-        # Validate signature
-        asserts.assert_true(csr.is_signature_valid, "CSR signature is invalid")
+        # Verify signature is valid
+        asserts.assert_true(csr.is_signature_valid, "Signature is invalid")
 
-        # Verify response.nonce is octet string of length 32
+        # Verify response.nonceSignature is octet string of length 32
         try:
-            # response.nonce is an octet string if it can be converted to an int
-            int(hex_from_bytes(response.nonce), 16)
+            # response.nonceSignature is an octet string if it can be converted to an int
+            int(hex_from_bytes(response.nonceSignature), 16)
         except ValueError:
-            asserts.fail("Returned CSR nonce is not an octet string")
+            asserts.fail("Returned CSR nonceSignature is not an octet string")
 
-        # Verify response.nonce is valid signature
-        nocsr_elements = dict(
-            [
-                (1, response.csr),
-                (2, nonce),
-            ]
-        )
-        writer = TLVWriter()
-        writer.put(None, nocsr_elements)
-
+        # Verify response.nonceSignature is valid signature
         baselen = curve_by_name("NIST256p").baselen
-        signature_raw_r = int(hex_from_bytes(response.nonce[:baselen]), 16)
-        signature_raw_s = int(hex_from_bytes(response.nonce[baselen:]), 16)
+        signature_raw_r = int(hex_from_bytes(response.nonceSignature[:baselen]), 16)
+        signature_raw_s = int(hex_from_bytes(response.nonceSignature[baselen:]), 16)
 
-        nocsr_signature = utils.encode_dss_signature(signature_raw_r, signature_raw_s)
-        csr_pubkey.verify(
-            signature=nocsr_signature,
-            data=writer.encoding,
-            signature_algorithm=ec.ECDSA(hashes.SHA256()),
-        )
+        nonceSignature = utils.encode_dss_signature(signature_raw_r, signature_raw_s)
+        csr_pubkey.verify(signature=nonceSignature, data=nonce, signature_algorithm=ec.ECDSA(hashes.SHA256()))
+        return csr
 
     # ----------------------------------------------------------------------
     # Command helpers
@@ -257,12 +236,12 @@ class PAVSTIUtils:
     async def send_csr_command(
         self, endpoint: int, nonce: bytes, expected_status: Status = Status.Success
     ) -> Union[
-        Clusters.TlsCertificateManagement.Commands.TLSClientCSRResponse,
+        Clusters.TlsCertificateManagement.Commands.ClientCSRResponse,
         InteractionModelError,
     ]:
         try:
             result = await self.send_single_cmd(
-                cmd=Clusters.TlsCertificateManagement.Commands.TLSClientCSR(
+                cmd=Clusters.TlsCertificateManagement.Commands.ClientCSR(
                     nonce=nonce
                 ),
                 endpoint=endpoint,
@@ -272,7 +251,7 @@ class PAVSTIUtils:
             asserts.assert_true(
                 type_matches(
                     result,
-                    Clusters.TlsCertificateManagement.Commands.TLSClientCSRResponse,
+                    Clusters.TlsCertificateManagement.Commands.ClientCSRResponse,
                 ),
                 "Unexpected return type for TLSClientCSR",
             )
@@ -282,19 +261,12 @@ class PAVSTIUtils:
             return e
 
     async def send_provision_client_command(
-        self, endpoint: int, certificate: bytes, ccdid: int, expected_status: Status = Status.Success
-    ) -> InteractionModelError:
+            self, endpoint: int, certificate: bytes, ccdid: int, intermediates: List[bytes] = [],
+            expected_status: Status = Status.Success) -> InteractionModelError:
         try:
-            result = await self.send_single_cmd(
-                cmd=Clusters.TlsCertificateManagement.Commands.ProvisionClientCertificate(
-                    ccdid=ccdid,
-                    clientCertificateDetails=Clusters.TlsCertificateManagement.Structs.TLSClientCertificateDetailStruct(
-                        clientCertificate=certificate
-                    ),
-                ),
-                endpoint=endpoint,
-                payloadCapability=ChipDeviceCtrl.TransportPayloadCapability.LARGE_PAYLOAD,
-            )
+            result = await self.send_single_cmd(cmd=Clusters.TlsCertificateManagement.Commands.ProvisionClientCertificate(ccdid=ccdid, clientCertificate=certificate, intermediateCertificates=intermediates),
+                                                endpoint=endpoint, payloadCapability=ChipDeviceCtrl.TransportPayloadCapability.LARGE_PAYLOAD)
+
             return result
         except InteractionModelError as e:
             asserts.assert_equal(e.status, expected_status, "Unexpected error returned")

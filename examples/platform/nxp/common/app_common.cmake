@@ -85,7 +85,7 @@ if (CONFIG_CHIP_APP_BLE_MANAGER)
         target_sources(app PRIVATE
             ${EXAMPLE_PLATFORM_NXP_COMMON_DIR}/app_ble/source/NXPHostBLEApplicationManager.cpp
         )
-    else()
+    elseif(CONFIG_CHIP_APP_BLE_MANAGER_EMPTY)
         target_sources(app PRIVATE
             ${EXAMPLE_PLATFORM_NXP_COMMON_DIR}/app_ble/source/BLEApplicationManagerEmpty.cpp
         )
