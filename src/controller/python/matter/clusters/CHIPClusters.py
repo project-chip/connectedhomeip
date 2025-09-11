@@ -12844,7 +12844,7 @@ class ChipClusters:
                 "reportable": True,
             },
             0x00000004: {
-                "attributeName": "MinViewport",
+                "attributeName": "MinViewportResolution",
                 "attributeId": 0x00000004,
                 "type": "",
                 "reportable": True,
@@ -13230,6 +13230,12 @@ class ChipClusters:
             0x00000008: {
                 "attributeName": "PanMax",
                 "attributeId": 0x00000008,
+                "type": "int",
+                "reportable": True,
+            },
+            0x00000009: {
+                "attributeName": "MovementState",
+                "attributeId": 0x00000009,
                 "type": "int",
                 "reportable": True,
             },
@@ -14293,9 +14299,10 @@ class ChipClusters:
             },
             0x00000007: {
                 "commandId": 0x00000007,
-                "commandName": "TLSClientCSR",
+                "commandName": "ClientCSR",
                 "args": {
                     "nonce": "bytes",
+                    "ccdid": "int",
                 },
             },
             0x00000009: {
@@ -14303,7 +14310,8 @@ class ChipClusters:
                 "commandName": "ProvisionClientCertificate",
                 "args": {
                     "ccdid": "int",
-                    "clientCertificateDetails": "TLSClientCertificateDetailStruct",
+                    "clientCertificate": "bytes",
+                    "intermediateCertificates": "bytes",
                 },
             },
             0x0000000A: {
