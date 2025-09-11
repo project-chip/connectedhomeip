@@ -601,7 +601,6 @@ void ConnectivityManagerImpl::OnStationDisconnected()
     {
         switch (reason)
         {
-        case RTW_NO_ERROR:
         case RTW_NONE_NETWORK:
             associationFailureCause =
                 chip::to_underlying(chip::app::Clusters::WiFiNetworkDiagnostics::AssociationFailureCauseEnum::kSsidNotFound);
@@ -612,18 +611,16 @@ void ConnectivityManagerImpl::OnStationDisconnected()
                 chip::to_underlying(chip::app::Clusters::WiFiNetworkDiagnostics::AssociationFailureCauseEnum::kAssociationFailed);
             delegate->OnAssociationFailureDetected(associationFailureCause, reason);
             break;
+#if defined(CONFIG_PLATFORM_8710C)
+        case RTW_4WAY_HANDSHAKE_TIMEOUT:
+#endif
         case RTW_WRONG_PASSWORD:
             associationFailureCause = chip::to_underlying(
                 chip::app::Clusters::WiFiNetworkDiagnostics::AssociationFailureCauseEnum::kAuthenticationFailed);
             delegate->OnAssociationFailureDetected(associationFailureCause, reason);
             break;
-#if defined(CONFIG_PLATFORM_8710C)
-        case RTW_4WAY_HANDSHAKE_TIMEOUT:
-#endif
         case RTW_DHCP_FAIL:
         case RTW_UNKNOWN:
-            break;
-
         default:
             delegate->OnAssociationFailureDetected(associationFailureCause, reason);
             break;
@@ -631,6 +628,11 @@ void ConnectivityManagerImpl::OnStationDisconnected()
         delegate->OnDisconnectionDetected(reason);
         delegate->OnConnectionStatusChanged(
             chip::to_underlying(chip::app::Clusters::WiFiNetworkDiagnostics::ConnectionStatusEnum::kNotConnected));
+    }
+
+    if (reason != RTW_NO_ERROR)
+    {
+        NetworkCommissioning::AmebaWiFiDriver::GetInstance().OnConnectWiFiNetworkFailed(reason);
     }
 
     UpdateInternetConnectivityState();
