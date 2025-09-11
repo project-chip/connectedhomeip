@@ -73,7 +73,7 @@ public:
 void emberAfAdministratorCommissioningClusterServerInitCallback(EndpointId endpointId)
 {
     // The implementation of the server we use here is only for the RootNode (i.e. endpoint 0)
-    // singleton. Other fabric sync will need their own implementations and would be added
+    // singleton. Other uses (e.g. fabric sync) will need their own implementations and would be added
     // separately.
     VerifyOrReturn(endpointId == kRootEndpointId);
 
