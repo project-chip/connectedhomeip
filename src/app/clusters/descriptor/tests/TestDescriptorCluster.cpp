@@ -19,13 +19,13 @@
 #include <app/clusters/testing/AttributeTesting.h>
 #include <app/data-model-provider/MetadataTypes.h>
 #include <app/server-cluster/DefaultServerCluster.h>
+#include <app/server-cluster/testing/TestServerClusterContext.h>
 #include <clusters/Descriptor/Enums.h>
 #include <clusters/Descriptor/Metadata.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/StringBuilderAdapters.h>
 #include <lib/support/ReadOnlyBuffer.h>
 #include <platform/DiagnosticDataProvider.h>
-#include <app/server-cluster/testing/TestServerClusterContext.h>
 
 #include <cmath>
 
