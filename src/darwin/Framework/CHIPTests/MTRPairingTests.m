@@ -315,9 +315,12 @@ typedef BOOL (^CommissioningSessionHandler)(NSError * _Nullable error);
     for (MTRAttributePath * path in info.attributes) {
         if (isNetworkCommissioningFeatureMap(path)) {
             ++networkCommissioningFeatureMapCount;
+            XCTAssertNotNil(info.networkCommissioningFeatureMaps[path.endpoint]);
         }
     }
     XCTAssertGreaterThan(networkCommissioningFeatureMapCount, 0);
+
+    XCTAssertEqual(networkCommissioningFeatureMapCount, info.networkCommissioningFeatureMaps.count);
 
     if (self.extraAttributesToRead) {
         // The attributes we tried to read should really have worked.
