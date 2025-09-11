@@ -528,6 +528,7 @@ void DeviceCommissioner::CleanupCommissioning(DeviceProxy * proxy, NodeId nodeId
 
 bool DeviceCommissioner::HasValidCommissioningMode(const Dnssd::CommissionNodeData & nodeData)
 {
+#if CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
     if (GetCommissioningParameters().HasValue() && GetCommissioningParameters().Value().GetUseJCM().ValueOr(false))
     {
         if (nodeData.commissioningMode != to_underlying(Dnssd::CommissioningMode::kEnabledJointFabric))
@@ -543,6 +544,9 @@ bool DeviceCommissioner::HasValidCommissioningMode(const Dnssd::CommissionNodeDa
     }
 
     return true;
+#else
+    return false;
+#endif // CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
 }
 
 } // namespace JCM

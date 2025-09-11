@@ -553,6 +553,7 @@ public:
         return *this;
     }
 
+#if CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
     // Check for Joint Commissioning Method
     Optional<bool> GetUseJCM() const { return mUseJCM; }
 
@@ -562,6 +563,7 @@ public:
         mUseJCM = MakeOptional(useJCM);
         return *this;
     }
+#endif // CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
 
     ICDRegistrationStrategy GetICDRegistrationStrategy() const { return mICDRegistrationStrategy; }
     CommissioningParameters & SetICDRegistrationStrategy(ICDRegistrationStrategy icdRegistrationStrategy)

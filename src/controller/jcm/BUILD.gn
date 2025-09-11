@@ -36,7 +36,3 @@ source_set("jcm") {
     "${chip_root}/src/credentials:credentials",
   ]
 }
-
-static_library("jcm_commissioner") {
-  output_name = "libJCMCommissioner"
-}
