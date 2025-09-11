@@ -161,7 +161,7 @@ void WebrtcTransport::Stop()
     }
 }
 
-void WebrtcTransport::AddTracks(std::string videoMid, std::string audioMid)
+void WebrtcTransport::AddTracks(const std::string & videoMid, const std::string & audioMid)
 {
     if (mPeerConnection != nullptr)
     {
@@ -174,14 +174,14 @@ void WebrtcTransport::AddTracks(std::string videoMid, std::string audioMid)
 void WebrtcTransport::SetVideoTrack(std::shared_ptr<WebRTCTrack> videoTrack)
 {
     ChipLogProgress(Camera, "Setting video track for sessionID: %u", mRequestArgs.sessionId);
-    mVideoTrack = videoTrack;
+    mRemoteVideoTrack = videoTrack;
 }
 
 // Implementation of SetAudioTrack method
 void WebrtcTransport::SetAudioTrack(std::shared_ptr<WebRTCTrack> audioTrack)
 {
     ChipLogProgress(Camera, "Setting audio track for sessionID: %u", mRequestArgs.sessionId);
-    mAudioTrack = audioTrack;
+    mRemoteAudioTrack = audioTrack;
 }
 
 void WebrtcTransport::AddRemoteCandidate(const std::string & candidate, const std::string & mid)

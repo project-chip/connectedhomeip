@@ -93,7 +93,7 @@ public:
     // Stops WebRTC peer connection and cleanup
     void Stop();
 
-    void AddTracks(std::string videoMid = "video", std::string audioMid = "audio");
+    void AddTracks(const std::string videoMid = "video", const std::string audioMid = "audio");
 
     // Set video track for the transport
     void SetVideoTrack(std::shared_ptr<WebRTCTrack> videoTrack);
