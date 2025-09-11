@@ -958,11 +958,6 @@ void AllClustersAppCommandHandler::OnSoilMoistureChange(EndpointId endpointId, D
     {
         ChipLogDetail(NotSpecified, "Set SoilMoisture value to null");
     }
-    else if (soilMoisture.Value() > 100)
-    {
-        ChipLogDetail(NotSpecified, "Invalid SoilMoisture value");
-        return;
-    }
     else
     {
         ChipLogDetail(NotSpecified, "Set SoilMoisture value to %u", soilMoisture.Value());

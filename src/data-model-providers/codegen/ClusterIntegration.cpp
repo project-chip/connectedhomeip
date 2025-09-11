@@ -21,8 +21,7 @@
 #include <app/util/attribute-table.h>
 #include <app/util/endpoint-config-api.h>
 #include <data-model-providers/codegen/CodegenDataModelProvider.h>
-
-#include <codegen/CodegenProcessingConfig.h>
+#include <data-model-providers/codegen/CodegenProcessingConfig.h>
 
 #include <limits>
 
@@ -146,6 +145,19 @@ void CodegenClusterIntegration::UnregisterServer(const UnregisterServerOptions &
     }
 
     delegate.ReleaseRegistration(emberEndpointIndex);
+}
+
+ServerClusterInterface * CodegenClusterIntegration::GetClusterForEndpointIndex(const GetClusterForEndpointIndexOptions & options,
+                                                                               Delegate & delegate)
+{
+    uint16_t emberEndpointIndex;
+    if (!findEndpointWithLog(options.endpointId, options.clusterId, options.fixedClusterServerEndpointCount,
+                             options.maxEndpointCount, emberEndpointIndex))
+    {
+        return nullptr;
+    }
+
+    return &delegate.FindRegistration(emberEndpointIndex);
 }
 
 } // namespace chip::app

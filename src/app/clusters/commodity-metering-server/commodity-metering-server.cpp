@@ -45,7 +45,7 @@ namespace CommodityMetering {
 
 // Some constraints for lists limitation
 constexpr uint8_t kMaxTariffComponentIDsPerMeteredQuantityEntry = 128;
-
+constexpr uint8_t kMaximumMeteredQuantitiesMinValue             = 1;
 namespace {
 
 inline bool operator==(const Span<const uint32_t> & a, const Span<const uint32_t> & b)
@@ -85,26 +85,32 @@ bool NullableListsEqual(const DataModel::Nullable<DataModel::List<T>> & a, const
 template <typename T>
 struct SpanCopier
 {
-    static bool Copy(const chip::Span<const T> & source, DataModel::List<const T> & destination,
-                     size_t maxElements = std::numeric_limits<size_t>::max())
+    static CHIP_ERROR Copy(const Span<const T> & source, DataModel::List<const T> & destination,
+                           size_t maxElements = std::numeric_limits<size_t>::max())
     {
+
+        if (!destination.empty())
+        {
+            return CHIP_ERROR_IN_USE;
+        }
+
         if (source.empty())
         {
             destination = DataModel::List<const T>();
-            return true;
+            return CHIP_NO_ERROR;
         }
 
         size_t elementsToCopy = std::min(source.size(), maxElements);
-        auto * buffer         = static_cast<T *>(chip::Platform::MemoryCalloc(elementsToCopy, sizeof(T)));
+        auto * buffer         = static_cast<T *>(Platform::MemoryCalloc(elementsToCopy, sizeof(T)));
 
         if (!buffer)
         {
-            return false;
+            return CHIP_ERROR_NO_MEMORY;
         }
 
         std::copy(source.begin(), source.begin() + elementsToCopy, buffer);
-        destination = DataModel::List<const T>(chip::Span<const T>(buffer, elementsToCopy));
-        return true;
+        destination = DataModel::List<const T>(buffer, elementsToCopy);
+        return CHIP_NO_ERROR;
     }
 };
 } // namespace
@@ -161,12 +167,8 @@ static CHIP_ERROR CopyMeteredQuantityEntry(const Structs::MeteredQuantityStruct:
 {
     dest.quantity = src.quantity;
 
-    if (!SpanCopier<uint32_t>::Copy(src.tariffComponentIDs, dest.tariffComponentIDs, kMaxTariffComponentIDsPerMeteredQuantityEntry))
-    {
-        return CHIP_ERROR_NO_MEMORY;
-    }
-
-    return CHIP_NO_ERROR;
+    return SpanCopier<uint32_t>::Copy(src.tariffComponentIDs, dest.tariffComponentIDs,
+                                      kMaxTariffComponentIDsPerMeteredQuantityEntry);
 }
 
 CHIP_ERROR Instance::SetMeteredQuantity(const DataModel::Nullable<DataModel::List<Structs::MeteredQuantityStruct::Type>> & newValue)
@@ -295,7 +297,7 @@ CHIP_ERROR Instance::SetMaximumMeteredQuantities(DataModel::Nullable<uint16_t> n
         {
             ChipLogDetail(AppServer, "MaximumMeteredQuantities updated to Null");
         }
-        else if (newValue.Value() >= 1)
+        else if (newValue.Value() >= kMaximumMeteredQuantitiesMinValue)
         {
             ChipLogDetail(AppServer, "MaximumMeteredQuantities updated to %lu", static_cast<unsigned long int>(newValue.Value()));
         }
