@@ -52,7 +52,7 @@ public:
         ///   - IF AND ONLY IF  optional attribute load is requested that optionalAttributeBits are
         ///    loaded from ember according to supported attributes
         ///   - IF AND ONLY IF feature map loading is requested, that the feature map for the
-        ///     underlying cluster ID has been loaded.
+        ///     underlying cluster ID and endpoint has been loaded.
         ///
         /// NOTE: optionalAttributeBits is intended for low id attributes since it supports attribute bits up to 31 only. It is
         ///       intended for use with `OptionalAttributeSet` and NOT all clusters support this. Specific examples:
