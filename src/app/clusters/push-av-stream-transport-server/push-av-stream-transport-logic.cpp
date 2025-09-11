@@ -573,7 +573,7 @@ PushAvStreamTransportServerLogic::HandleAllocatePushTransport(CommandHandler & h
         return std::nullopt;
     }
 
-    // ImgestMethod has alread beem validated against the constraints above, this is handling the subsequent required spec logic 
+    // ImgestMethod has alread beem validated against the constraints above, this is handling the subsequent required spec logic
     // to cross-reference use against the ContainerType
     IngestMethodsEnum ingestMethod = commandData.transportOptions.ingestMethod;
 
@@ -639,7 +639,7 @@ PushAvStreamTransportServerLogic::HandleAllocatePushTransport(CommandHandler & h
         {
             auto & transportZoneOption = iter.GetValue();
 
-            // The Zone can be Null, meaning this trigger applies to all zones, if not null, verify with the delegate that the 
+            // The Zone can be Null, meaning this trigger applies to all zones, if not null, verify with the delegate that the
             // ZoneID (in the ZoneManagement cluster instance) is valid
             if (!transportZoneOption.zone.IsNull())
             {
