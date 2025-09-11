@@ -739,6 +739,10 @@
         (EmberAfGenericClusterFunction) emberAfTimeFormatLocalizationClusterServerInitCallback,                                    \
         (EmberAfGenericClusterFunction) MatterTimeFormatLocalizationClusterServerPreAttributeChangedCallback,                      \
     };                                                                                                                             \
+    const EmberAfGenericClusterFunction chipFuncArrayDiagnosticLogsServer[] = {                                                    \
+        (EmberAfGenericClusterFunction) emberAfDiagnosticLogsClusterServerInitCallback,                                            \
+        (EmberAfGenericClusterFunction) MatterDiagnosticLogsClusterServerShutdownCallback,                                         \
+    };                                                                                                                             \
     const EmberAfGenericClusterFunction chipFuncArrayGeneralDiagnosticsServer[] = {                                                \
         (EmberAfGenericClusterFunction) emberAfGeneralDiagnosticsClusterServerInitCallback,                                        \
         (EmberAfGenericClusterFunction) MatterGeneralDiagnosticsClusterServerShutdownCallback,                                     \
@@ -1101,8 +1105,8 @@
       .attributes = ZAP_ATTRIBUTE_INDEX(68), \
       .attributeCount = 2, \
       .clusterSize = 6, \
-      .mask = ZAP_CLUSTER_MASK(SERVER), \
-      .functions = NULL, \
+      .mask = ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(INIT_FUNCTION) | ZAP_CLUSTER_MASK(SHUTDOWN_FUNCTION), \
+      .functions = chipFuncArrayDiagnosticLogsServer, \
       .acceptedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 21 ), \
       .generatedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 23 ), \
       .eventList = nullptr, \

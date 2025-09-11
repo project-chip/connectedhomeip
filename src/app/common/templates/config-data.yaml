@@ -105,6 +105,7 @@ ClustersWithInitFunctions:
     - Time Format Localization
     - Wi-Fi Network Diagnostics
     - Fixed Label
+    - Diagnostic Logs
 
 ClustersWithAttributeChangedFunctions:
     - Bridged Device Basic Information
@@ -134,6 +135,7 @@ ClustersWithShutdownFunctions:
     - Thermostat
     - Wi-Fi Network Diagnostics
     - Fixed Label
+    - Diagnostic Logs
 
 ClustersWithPreAttributeChangeFunctions:
     - Door Lock

@@ -64,7 +64,7 @@ std::optional<DataModel::ActionReturnStatus> DiagnosticLogsCluster::InvokeComman
         if (intent == IntentEnum::kUnknownEnumValue || protocol == TransferProtocolEnum::kUnknownEnumValue)
         {
             handler->AddStatus(request.path, Status::InvalidCommand);
-            return std::nullopt;
+            return Status::InvalidCommand;
         }
         if (protocol == TransferProtocolEnum::kResponsePayload)
         {
@@ -75,7 +75,6 @@ std::optional<DataModel::ActionReturnStatus> DiagnosticLogsCluster::InvokeComman
     default:
         return Protocols::InteractionModel::Status::UnsupportedCommand;
     }
-    return std::nullopt;
 }
 
 CHIP_ERROR DiagnosticLogsCluster::AcceptedCommands(const ConcreteClusterPath & path,
