@@ -331,7 +331,7 @@ void TlsCertificateManagementServer::HandleGenerateClientCsr(HandlerContext & ct
 {
     ChipLogDetail(Zcl, "TlsCertificateManagement: ClientCSR");
 
-    VerifyOrReturn(req.nonce.size() <= kMaxNonceBytes, ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ConstraintError));
+    VerifyOrReturn(req.nonce.size() == kMaxNonceBytes, ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ConstraintError));
 
     auto fabric = ctx.mCommandHandler.GetAccessingFabricIndex();
     uint8_t numClientCerts;
