@@ -89,10 +89,9 @@ DiagnosticLogsProviderLogic::HandleLogRequestForBdx(CommandHandler * commandObj,
 {
     // If the RequestedProtocol is set to BDX and there is no TransferFileDesignator the command SHALL fail with a Status Code of
     // INVALID_COMMAND.
-    VerifyOrReturnError(transferFileDesignator.HasValue(), std::nullopt, commandObj->AddStatus(path, Status::InvalidCommand));
+    VerifyOrReturnError(transferFileDesignator.HasValue(), Status::InvalidCommand);
 
-    VerifyOrReturnError(transferFileDesignator.Value().size() <= kMaxFileDesignatorLen, std::nullopt,
-                        commandObj->AddStatus(path, Status::ConstraintError));
+    VerifyOrReturnError(transferFileDesignator.Value().size() <= kMaxFileDesignatorLen, Status::ConstraintError);
     // If there is no delegate, there is no mechanism to read the logs. Assume those are empty and return NoLogs
     VerifyOrReturnError(nullptr != mDelegate, std::nullopt, AddResponse(commandObj, path, StatusEnum::kNoLogs));
 
