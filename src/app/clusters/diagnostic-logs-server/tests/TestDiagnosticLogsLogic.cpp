@@ -38,10 +38,10 @@ using chip::Protocols::InteractionModel::Status;
 
 static constexpr EndpointId kEndpoint0 = 0;
 
-class FakeCommandHandler : public CommandHandler
+class MockCommandHandler : public CommandHandler
 {
 public:
-    ~FakeCommandHandler() override {}
+    ~MockCommandHandler() override {}
 
     struct ResponseRecord
     {
@@ -152,7 +152,7 @@ private:
     uint16_t bufferSize        = 0;
 };
 
-static Commands::RetrieveLogsResponse::DecodableType DecodeRetrieveLogsResponse(const FakeCommandHandler::ResponseRecord & rec)
+static Commands::RetrieveLogsResponse::DecodableType DecodeRetrieveLogsResponse(const MockCommandHandler::ResponseRecord & rec)
 {
     TLV::TLVReader reader;
     reader.Init(rec.encodedData->Start(), static_cast<uint32_t>(rec.encodedData->DataLength()));
@@ -183,12 +183,12 @@ struct TestDiagnosticLogsLogic : public ::testing::Test
 TEST_F(TestDiagnosticLogsLogic, ResponsePayload_NoDelegate_NoLogs)
 {
     DiagnosticLogsProviderLogic logic;
-    logic.Init(1);
 
     const ConcreteCommandPath kPath{ kEndpoint0, DiagnosticLogs::Id, DiagnosticLogs::Commands::RetrieveLogsRequest::Id };
 
-    FakeCommandHandler handler;
-    EXPECT_EQ(logic.HandleLogRequestForResponsePayload(&handler, kPath, DiagnosticLogs::IntentEnum::kEndUserSupport), std::nullopt);
+    MockCommandHandler handler;
+    EXPECT_EQ(logic.HandleLogRequestForResponsePayload(&handler, kPath, DiagnosticLogs::IntentEnum::kEndUserSupport),
+              Status::InvalidCommand);
     EXPECT_EQ(handler.GetResponse().commandId, DiagnosticLogs::Commands::RetrieveLogsResponse::Id);
     auto decoded = DecodeRetrieveLogsResponse(handler.GetResponse());
     EXPECT_EQ(decoded.status, DiagnosticLogs::StatusEnum::kNoLogs);
@@ -197,16 +197,16 @@ TEST_F(TestDiagnosticLogsLogic, ResponsePayload_NoDelegate_NoLogs)
 TEST_F(TestDiagnosticLogsLogic, ResponsePayload_WithDelegate_Success)
 {
     DiagnosticLogsProviderLogic logic;
-    logic.Init(1);
 
     MockDelegate delegate;
     uint8_t buffer[100];
     delegate.SetDiagnosticBuffer(buffer, sizeof(buffer));
-    logic.SetDelegate(kEndpoint0, &delegate);
+    logic.SetDelegate(&delegate);
 
     const ConcreteCommandPath kPath{ kEndpoint0, DiagnosticLogs::Id, DiagnosticLogs::Commands::RetrieveLogsRequest::Id };
-    FakeCommandHandler handler;
-    EXPECT_EQ(logic.HandleLogRequestForResponsePayload(&handler, kPath, DiagnosticLogs::IntentEnum::kEndUserSupport), std::nullopt);
+    MockCommandHandler handler;
+    EXPECT_EQ(logic.HandleLogRequestForResponsePayload(&handler, kPath, DiagnosticLogs::IntentEnum::kEndUserSupport),
+              Status::InvalidCommand);
     EXPECT_EQ(handler.GetResponse().commandId, DiagnosticLogs::Commands::RetrieveLogsResponse::Id);
     auto decoded = DecodeRetrieveLogsResponse(handler.GetResponse());
     EXPECT_EQ(decoded.status, DiagnosticLogs::StatusEnum::kSuccess);
@@ -218,18 +218,17 @@ TEST_F(TestDiagnosticLogsLogic, ResponsePayload_WithDelegate_Success)
 TEST_F(TestDiagnosticLogsLogic, Bdx_WithDelegate_kExhausted)
 {
     DiagnosticLogsProviderLogic logic;
-    logic.Init(1);
 
     MockDelegate delegate;
     uint8_t buffer[1024];
     delegate.SetDiagnosticBuffer(buffer, sizeof(buffer));
-    logic.SetDelegate(kEndpoint0, &delegate);
+    logic.SetDelegate(&delegate);
 
     const ConcreteCommandPath kPath{ kEndpoint0, DiagnosticLogs::Id, DiagnosticLogs::Commands::RetrieveLogsRequest::Id };
-    FakeCommandHandler handler;
+    MockCommandHandler handler;
     EXPECT_EQ(logic.HandleLogRequestForBdx(&handler, kPath, DiagnosticLogs::IntentEnum::kEndUserSupport,
                                            MakeOptional(CharSpan::fromCharString("enduser.log"))),
-              std::nullopt);
+              Status::InvalidCommand);
     EXPECT_EQ(handler.GetResponse().commandId, DiagnosticLogs::Commands::RetrieveLogsResponse::Id);
     auto decoded = DecodeRetrieveLogsResponse(handler.GetResponse());
     EXPECT_EQ(decoded.status, DiagnosticLogs::StatusEnum::kExhausted);
@@ -240,18 +239,17 @@ TEST_F(TestDiagnosticLogsLogic, Bdx_WithDelegate_kExhausted)
 TEST_F(TestDiagnosticLogsLogic, Bdx_WithDelegate_kExhausted_with_buffer_greater_than_kMaxLogContentSize)
 {
     DiagnosticLogsProviderLogic logic;
-    logic.Init(1);
 
     MockDelegate delegate;
     uint8_t buffer[2048];
     delegate.SetDiagnosticBuffer(buffer, sizeof(buffer));
-    logic.SetDelegate(kEndpoint0, &delegate);
+    logic.SetDelegate(&delegate);
 
     const ConcreteCommandPath kPath{ kEndpoint0, DiagnosticLogs::Id, DiagnosticLogs::Commands::RetrieveLogsRequest::Id };
-    FakeCommandHandler handler;
+    MockCommandHandler handler;
     EXPECT_EQ(logic.HandleLogRequestForBdx(&handler, kPath, DiagnosticLogs::IntentEnum::kEndUserSupport,
                                            MakeOptional(CharSpan::fromCharString("enduser.log"))),
-              std::nullopt);
+              Status::InvalidCommand);
     EXPECT_EQ(handler.GetResponse().commandId, DiagnosticLogs::Commands::RetrieveLogsResponse::Id);
     auto decoded = DecodeRetrieveLogsResponse(handler.GetResponse());
     EXPECT_EQ(decoded.status, DiagnosticLogs::StatusEnum::kExhausted);
