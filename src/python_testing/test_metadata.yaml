@@ -65,6 +65,8 @@ not_automated:
       reason: Shared code for TC_EGC, not a standalone test
     - name: TC_SEPRTestBase.py
       reason: Shared code for TC_SEPR, not a standalone test
+    - name: TC_SETRF_TestBase.py
+      reason: Shared code for TC_SETRF, not a standalone test
     - name: TC_COMMTR_TestBase.py
       reason: Shared code for TC_COMMTR, not a standalone test
     - name: TC_MTRIDTestBase.py
@@ -118,6 +120,8 @@ not_automated:
           local tests are fully verified.
     - name: TC_WEBRTC_Utils.py
       reason: Helper methods for WebRTC TCs, not a standalone test.
+    - name: TC_WEBRTC_1_6.py
+      reason: Depends on a browser peer for webrtc. CI is not supported.
     - name: TC_CHIMETestBase.py
       reason: Shared code for the Chime Cluster, not a standalone test.
     - name: TC_WEBRTCPTestBase.py
