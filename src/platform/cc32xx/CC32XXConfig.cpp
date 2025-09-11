@@ -516,11 +516,13 @@ CHIP_ERROR CC32XXConfig::WriteKVSToNV()
     if (ret < 0)
     {
         cc32xxLog("could not write in Linked List to NV, error %d", ret);
+        delete[] list;
         return CHIP_ERROR_PERSISTED_STORAGE_FAILED;
     }
 
     else
     {
+        delete[] list;
         return CHIP_NO_ERROR;
     }
     // return error
