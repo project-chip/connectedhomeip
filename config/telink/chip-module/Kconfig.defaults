@@ -175,6 +175,9 @@ config BT_HCI_TX_STACK_SIZE
 config BT_DEVICE_NAME_GATT_WRITABLE
     default n
 
+config BT_HOST_CRYPTO
+    default n
+
 if SOC_RISCV_TELINK_B9X || SOC_RISCV_TELINK_TLX
 
 config TL_BLE_CTRL_THREAD_STACK_SIZE
@@ -197,7 +200,6 @@ choice TL_BLE_CTRL_MAC_TYPE
 endchoice
 
 endif # SOC_RISCV_TELINK_B9X || SOC_RISCV_TELINK_TLX
-
 
 endif # BT
 
@@ -505,11 +507,6 @@ config MBEDTLS_X509_CSR_WRITE_C
 config PSA_WANT_KEY_TYPE_ECC_PUBLIC_KEY
     bool "PSA_WANT_KEY_TYPE_ECC_PUBLIC_KEY"
     default y
-
-# Disable PSA usage
-config MBEDTLS_USE_PSA_CRYPTO
-    bool "MBEDTLS_USE_PSA_CRYPTO"
-    default n
 
 config MBEDTLS_PSA_STATIC_KEY_SLOTS
     bool "MBEDTLS_PSA_STATIC_KEY_SLOTS"
