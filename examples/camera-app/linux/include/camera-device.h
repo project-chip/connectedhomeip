@@ -282,6 +282,10 @@ public:
 
     uint8_t GetDetectionSensitivity() override { return mDetectionSensitivity; }
 
+    size_t GetPreRollBufferSize();
+
+    int64_t GetMinKeyframeIntervalMs();
+
     CameraError SetDetectionSensitivity(uint8_t aSensitivity) override;
 
     CameraError CreateZoneTrigger(const chip::app::Clusters::ZoneManagement::ZoneTriggerControlStruct & zoneTrigger) override;
