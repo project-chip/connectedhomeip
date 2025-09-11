@@ -99,10 +99,10 @@ public:
      */
     bool HasOptionalAttribute(AttributeId aAttributeId) const;
 
-    Protocols::InteractionModel::Status UpdateCondition(uint8_t newCondition);
-    Protocols::InteractionModel::Status UpdateChangeIndication(chip::app::Clusters::ResourceMonitoring::ChangeIndicationEnum newChangeIndication);
-    Protocols::InteractionModel::Status UpdateInPlaceIndicator(bool newInPlaceIndicator);
-    Protocols::InteractionModel::Status UpdateLastChangedTime(DataModel::Nullable<uint32_t> newLastChangedTime);
+    void UpdateCondition(uint8_t newCondition);
+    void UpdateChangeIndication(chip::app::Clusters::ResourceMonitoring::ChangeIndicationEnum newChangeIndication);
+    void UpdateInPlaceIndicator(bool newInPlaceIndicator);
+    void UpdateLastChangedTime(DataModel::Nullable<uint32_t> newLastChangedTime);
 
     /**
      * Sets delegate to passed ResourceMonitoringDelegate pointer. If this is not nullptr, subsequent action is to set instance
