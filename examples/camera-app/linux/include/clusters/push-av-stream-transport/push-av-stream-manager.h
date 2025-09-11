@@ -19,6 +19,7 @@
 #pragma once
 #include <app-common/zap-generated/cluster-enums.h>
 #include <app/clusters/push-av-stream-transport-server/push-av-stream-transport-cluster.h>
+#include <app/clusters/push-av-stream-transport-server/push-av-stream-transport-logic.h>
 #include <app/clusters/tls-certificate-management-server/tls-certificate-management-server.h>
 #include <camera-device-interface.h>
 #include <credentials/CHIPCert.h>
@@ -55,8 +56,7 @@ public:
     void Init();
     void SetMediaController(MediaController * mediaController);
     void SetCameraDevice(CameraDeviceInterface * cameraDevice);
-    void SetOnRecorderStoppedCallback(std::function<void(uint16_t, PushAvStreamTransport::TransportTriggerTypeEnum)> cb) override;
-    void SetOnRecorderStartedCallback(std::function<void(uint16_t, PushAvStreamTransport::TransportTriggerTypeEnum)> cb) override;
+    void SetPushAvStreamTransportServer(PushAvStreamTransportServerLogic * server);
 
     // Add missing override keywords and fix signatures
     Protocols::InteractionModel::Status AllocatePushTransport(const TransportOptionsStruct & transportOptions,
@@ -107,12 +107,13 @@ public:
 
     CHIP_ERROR PersistentAttributesLoadedCallback() override;
 
-    void OnZoneTriggeredEvent(u_int16_t zoneId);
+    void OnZoneTriggeredEvent(uint16_t zoneId);
 
 private:
     std::vector<PushAvStream> pushavStreams;
-    MediaController * mMediaController    = nullptr;
-    CameraDeviceInterface * mCameraDevice = nullptr;
+    MediaController * mMediaController                              = nullptr;
+    CameraDeviceInterface * mCameraDevice                           = nullptr;
+    PushAvStreamTransportServerLogic * mPushAvStreamTransportServer = nullptr;
 
     AudioStreamStruct mAudioStreamParams;
     VideoStreamStruct mVideoStreamParams;
@@ -120,9 +121,6 @@ private:
     std::unordered_map<uint16_t, TransportOptionsStruct> mTransportOptionsMap;    // map for the transport options
 
     double mTotalUsedBandwidthMbps = 0.0; // Tracks the total bandwidth used by all active transports
-
-    std::function<void(uint16_t, PushAvStreamTransport::TransportTriggerTypeEnum)> mOnRecorderStoppedCb;
-    std::function<void(uint16_t, PushAvStreamTransport::TransportTriggerTypeEnum)> mOnRecorderStartedCb;
 
     std::vector<uint8_t> mBufferRootCert;
     std::vector<uint8_t> mBufferClientCert;

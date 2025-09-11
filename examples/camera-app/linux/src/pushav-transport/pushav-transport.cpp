@@ -234,7 +234,6 @@ void PushAVTransport::InitializeRecorder()
         ChipLogError(Camera, "Recorder already initialized");
     }
     mClipInfo.mClipId++;
-    mRecorder->SetOnStopCallback([this]() { this->OnRecorderStopped(); });
 }
 
 PushAVTransport::~PushAVTransport()
@@ -244,14 +243,6 @@ PushAVTransport::~PushAVTransport()
     mCanSendAudio = false;
     mRecorder.reset();
     mUploader.reset();
-}
-
-void PushAVTransport::OnRecorderStopped()
-{
-    if (mOnRecorderStoppedCb)
-    {
-        mOnRecorderStoppedCb();
-    }
 }
 
 bool InBlindPeriod(std::chrono::steady_clock::time_point blindStartTime, uint16_t blindDuration)
@@ -293,11 +284,11 @@ bool PushAVTransport::HandleTriggerDetected()
         ChipLogError(Camera, "PushAVTransport starting new recording");
         mHasAugmented                       = false;
         mRecorder->mClipInfo.activationTime = std::chrono::steady_clock::now();
+        // Set the cluster server reference and connection info for direct API calls
+        mRecorder->SetPushAvStreamTransportServer(mPushAvStreamTransportServer);
+        mRecorder->SetConnectionInfo(mConnectionID, mTransportTriggerType,
+                                     chip::Optional<chip::app::Clusters::PushAvStreamTransport::TriggerActivationReasonEnum>());
         mRecorder->Start();
-        if (mOnStartCallback)
-        {
-            mOnStartCallback();
-        }
         mStreaming = true;
     }
     else
@@ -328,18 +319,19 @@ void PushAVTransport::TriggerTransport(TriggerActivationReasonEnum activationRea
                     (uint16_t) activationReason, zoneId, sensitivity);
     if (mTransportTriggerType == TransportTriggerTypeEnum::kCommand)
     {
+        mRecorder->SetConnectionInfo(mConnectionID, mTransportTriggerType, chip::MakeOptional(activationReason));
         if (HandleTriggerDetected())
         {
             ChipLogError(Camera, "PushAVTransport command/motion transport trigger received. Clip duration [%d seconds]",
                          mRecorder->mClipInfo.mInitialDuration);
+            // Begin event already generated at cluster server
         }
         else
         {
-            ChipLogError(
-                Camera,
-                "PushAVTransport command/motion transport trigger received but ignored due to blind period. Clip duration. "
-                "Clip duration [%d seconds]",
-                mRecorder->mClipInfo.mInitialDuration);
+            ChipLogError(Camera,
+                         "PushAVTransport command/motion transport trigger received but ignored due to blind period. Clip duration "
+                         "[%d seconds]",
+                         mRecorder->mClipInfo.mInitialDuration);
         }
     }
     else if (mTransportTriggerType == TransportTriggerTypeEnum::kMotion)
@@ -361,6 +353,16 @@ void PushAVTransport::TriggerTransport(TriggerActivationReasonEnum activationRea
                         ChipLogError(Camera,
                                      "PushAVTransport command/motion transport trigger received. Clip duration [%d seconds]",
                                      mRecorder->mClipInfo.mInitialDuration);
+                        if (mPushAvStreamTransportServer != nullptr)
+                        {
+                            mPushAvStreamTransportServer->NotifyTransportStarted(
+                                mConnectionID, mTransportTriggerType,
+                                chip::Optional<chip::app::Clusters::PushAvStreamTransport::TriggerActivationReasonEnum>());
+                        }
+                        else
+                        {
+                            ChipLogError(Camera, "PushAvStreamTransportServer is null for connection %u", mConnectionID);
+                        }
                     }
                     else
                     {
@@ -424,15 +426,25 @@ void PushAVTransport::SetTransportStatus(TransportStatusEnum status)
 
         if (mTransportTriggerType == TransportTriggerTypeEnum::kContinuous)
         {
+            // Set the cluster server reference and connection info for direct API calls
+            mRecorder->SetPushAvStreamTransportServer(mPushAvStreamTransportServer);
+            mRecorder->SetConnectionInfo(mConnectionID, mTransportTriggerType,
+                                         chip::Optional<chip::app::Clusters::PushAvStreamTransport::TriggerActivationReasonEnum>());
             mRecorder->Start();
             mStreaming = true;
             if (IsStreaming())
             {
                 ChipLogProgress(Camera, "Ready to stream");
-            }
-            if (mOnStartCallback)
-            {
-                mOnStartCallback();
+                if (mPushAvStreamTransportServer != nullptr)
+                {
+                    mPushAvStreamTransportServer->NotifyTransportStarted(
+                        mConnectionID, mTransportTriggerType,
+                        chip::Optional<chip::app::Clusters::PushAvStreamTransport::TriggerActivationReasonEnum>());
+                }
+                else
+                {
+                    ChipLogError(Camera, "PushAvStreamTransportServer is null for connection %u", mConnectionID);
+                }
             }
         }
         else
@@ -500,10 +512,10 @@ bool PushAVTransport::CanSendPacketsToRecorder()
     {
         return false;
     }
-    if (mRecorder->mDeinitializeRecorder.load()) // Current clip is completed, Next clip will start on trigger
+    if (mRecorder->mDeinitializeRecorder.load())
     {
         ChipLogProgress(Camera, "Current clip is completed, Next clip will start on trigger");
-        mRecorder.reset();
+        mRecorder.reset(); // Redundant cleanup to make sure no dangling pointer left
         InitializeRecorder();
         mStreaming = false;
         return false;

@@ -1191,6 +1191,42 @@ Status PushAvStreamTransportServerLogic::GeneratePushTransportEndEvent(const uin
     return Status::Success;
 }
 
+Status PushAvStreamTransportServerLogic::NotifyTransportStarted(uint16_t connectionID, TransportTriggerTypeEnum triggerType,
+                                                                Optional<TriggerActivationReasonEnum> activationReason)
+{
+    ChipLogProgress(Zcl, "NotifyTransportStarted called for connectionID %u with triggerType %u", connectionID,
+                    to_underlying(triggerType));
+
+    // Validate that the connection exists
+    TransportConfigurationStorage * transportConfig = FindStreamTransportConnection(connectionID);
+    if (transportConfig == nullptr)
+    {
+        ChipLogError(Zcl, "NotifyTransportStarted: ConnectionID %u not found", connectionID);
+        return Status::NotFound;
+    }
+
+    // Generate the PushTransportBegin event
+    return GeneratePushTransportBeginEvent(connectionID, triggerType, activationReason);
+}
+
+Status PushAvStreamTransportServerLogic::NotifyTransportStopped(uint16_t connectionID, TransportTriggerTypeEnum triggerType,
+                                                                Optional<TriggerActivationReasonEnum> activationReason)
+{
+    ChipLogProgress(Zcl, "NotifyTransportStopped called for connectionID %u with triggerType %u", connectionID,
+                    to_underlying(triggerType));
+
+    // Validate that the connection exists
+    TransportConfigurationStorage * transportConfig = FindStreamTransportConnection(connectionID);
+    if (transportConfig == nullptr)
+    {
+        ChipLogError(Zcl, "NotifyTransportStopped: ConnectionID %u not found", connectionID);
+        return Status::NotFound;
+    }
+
+    // Generate the PushTransportEnd event
+    return GeneratePushTransportEndEvent(connectionID, triggerType, activationReason);
+}
+
 } // namespace Clusters
 } // namespace app
 } // namespace chip

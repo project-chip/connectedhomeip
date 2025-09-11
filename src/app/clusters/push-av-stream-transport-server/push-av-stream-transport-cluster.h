@@ -54,9 +54,9 @@ public:
 
     void SetTLSClientManagementDelegate(TlsClientManagementDelegate * delegate) { mLogic.SetTLSClientManagementDelegate(delegate); }
 
-    void SetTlsCertificateManagementDelegate(EndpointId aEndpoint, TlsCertificateManagementDelegate * delegate)
+    void SetTlsCertificateManagementDelegate(TlsCertificateManagementDelegate * delegate)
     {
-        mLogic.SetTlsCertificateManagementDelegate(aEndpoint, delegate);
+        mLogic.SetTlsCertificateManagementDelegate(delegate);
     }
 
     CHIP_ERROR Init() { return mLogic.Init(); }

@@ -63,6 +63,11 @@ void PushAvStreamTransportManager::SetCameraDevice(CameraDeviceInterface * aCame
     mCameraDevice = aCameraDevice;
 }
 
+void PushAvStreamTransportManager::SetPushAvStreamTransportServer(PushAvStreamTransportServerLogic * server)
+{
+    mPushAvStreamTransportServer = server;
+}
+
 Protocols::InteractionModel::Status
 PushAvStreamTransportManager::AllocatePushTransport(const TransportOptionsStruct & transportOptions, const uint16_t connectionID)
 {
@@ -77,19 +82,8 @@ PushAvStreamTransportManager::AllocatePushTransport(const TransportOptionsStruct
     mTransportMap[connectionID] =
         std::make_unique<PushAVTransport>(transportOptions, connectionID, mAudioStreamParams, mVideoStreamParams);
 
-    auto triggerType = transportOptions.triggerOptions.triggerType;
-    mTransportMap[connectionID]->SetOnRecorderStoppedCallback([this, connectionID, triggerType]() {
-        if (mOnRecorderStoppedCb)
-        {
-            mOnRecorderStoppedCb(connectionID, triggerType);
-        }
-    });
-    mTransportMap[connectionID]->SetOnStartCallback([this, connectionID, triggerType]() {
-        if (mOnRecorderStartedCb)
-        {
-            mOnRecorderStartedCb(connectionID, triggerType);
-        }
-    });
+    mTransportMap[connectionID]->SetPushAvStreamTransportServer(mPushAvStreamTransportServer);
+
     if (mMediaController == nullptr)
     {
         ChipLogError(Camera, "PushAvStreamTransportManager: MediaController is not set");
@@ -110,7 +104,6 @@ PushAvStreamTransportManager::AllocatePushTransport(const TransportOptionsStruct
                   "New transport bandwidth: %.2f Mbps. Total used bandwidth: %.2f Mbps.",
                   connectionID, newTransportBandwidthMbps, mTotalUsedBandwidthMbps);
 
-    // mMediaController->SetPreRollLength(mTransportMap[connectionID].get(), mTransportMap[connectionID].get()->GetPreRollLength());
     if (transportOptions.triggerOptions.triggerType == TransportTriggerTypeEnum::kMotion &&
         transportOptions.triggerOptions.motionZones.HasValue())
     {
@@ -181,7 +174,7 @@ PushAvStreamTransportManager::ModifyPushTransport(const uint16_t connectionID, c
     mTotalUsedBandwidthMbps += newTransportBandwidthMbps;
 
     ChipLogDetail(Camera,
-                  "AllocatePushTransport: Transport for connection %u allocated successfully. "
+                  "ModifyPushTransport: Transport for connection %u allocated successfully. "
                   "New transport bandwidth: %.2f Mbps. Total used bandwidth: %.2f Mbps.",
                   connectionID, newTransportBandwidthMbps, mTotalUsedBandwidthMbps);
 
@@ -524,17 +517,7 @@ PushAvStreamTransportManager::PersistentAttributesLoadedCallback()
     return CHIP_NO_ERROR;
 }
 
-void PushAvStreamTransportManager::SetOnRecorderStoppedCallback(
-    std::function<void(uint16_t, PushAvStreamTransport::TransportTriggerTypeEnum)> cb)
-{
-    mOnRecorderStoppedCb = std::move(cb);
-}
-void PushAvStreamTransportManager::SetOnRecorderStartedCallback(
-    std::function<void(uint16_t, PushAvStreamTransport::TransportTriggerTypeEnum)> cb)
-{
-    mOnRecorderStartedCb = std::move(cb);
-}
-void PushAvStreamTransportManager::OnZoneTriggeredEvent(u_int16_t zoneId)
+void PushAvStreamTransportManager::OnZoneTriggeredEvent(uint16_t zoneId)
 {
     for (auto & pavst : mTransportMap)
     {

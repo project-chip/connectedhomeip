@@ -30,6 +30,7 @@
 #include <app/AttributeAccessInterface.h>
 #include <app/CommandHandlerInterface.h>
 #include <app/clusters/push-av-stream-transport-server/constants.h>
+#include <app/clusters/push-av-stream-transport-server/push-av-stream-transport-logic.h>
 #include <functional>
 #include <memory>
 #include <protocols/interaction_model/StatusCode.h>
@@ -69,7 +70,7 @@ public:
     void SetTransportStatus(chip::app::Clusters::PushAvStreamTransport::TransportStatusEnum status);
 
     void TriggerTransport(chip::app::Clusters::PushAvStreamTransport::TriggerActivationReasonEnum activationReason, int zoneId = -1,
-                          int senstivity = 5);
+                          int sensitivity = 5);
     // Get Transport status
     bool GetTransportStatus()
     {
@@ -94,10 +95,6 @@ public:
     void SetTLSCert(std::vector<uint8_t> bufferRootCert, std::vector<uint8_t> bufferClientCert,
                     std::vector<uint8_t> bufferClientCertKey, std::vector<std::vector<uint8_t>> bufferIntermediateCerts);
 
-    void SetOnRecorderStoppedCallback(std::function<void()> cb) { mOnRecorderStoppedCb = std ::move(cb); }
-
-    void SetOnStartCallback(std::function<void()> cb) { mOnStartCallback = std::move(cb); }
-
     void SetZoneSensitivityList(std::vector<std::pair<uint16_t, uint8_t>> zoneSensitivityList)
     {
         mZoneSensitivityList = zoneSensitivityList;
@@ -110,15 +107,23 @@ public:
 
     double GetCurrentlyUsedBandwidthMbps() { return mCurrentlyUsedBandwidthMbps; }
 
+    // Set the cluster server reference for direct API calls
+    void SetPushAvStreamTransportServer(chip::app::Clusters::PushAvStreamTransportServerLogic * server)
+    {
+        mPushAvStreamTransportServer = server;
+    }
+
     void ConfigureRecorderTimeSetting(
         const chip::app::Clusters::PushAvStreamTransport::Structs::TransportMotionTriggerTimeControlStruct::DecodableType &
             timeControl);
 
 private:
-    bool mHasAugmented                            = false;
-    bool mStreaming                               = false;
-    std::unique_ptr<PushAVClipRecorder> mRecorder = nullptr;
-    std::unique_ptr<PushAVUploader> mUploader     = nullptr;
+    bool mHasAugmented                                                                   = false;
+    bool mStreaming                                                                      = false;
+    std::unique_ptr<PushAVClipRecorder> mRecorder                                        = nullptr;
+    std::unique_ptr<PushAVUploader> mUploader                                            = nullptr;
+    chip::app::Clusters::PushAvStreamTransportServerLogic * mPushAvStreamTransportServer = nullptr;
+
     std::chrono::steady_clock::time_point mBlindStartTime;
     PushAVClipRecorder::ClipInfoStruct mClipInfo;
     PushAVClipRecorder::AudioInfoStruct mAudioInfo;
@@ -128,9 +133,6 @@ private:
     AudioStreamStruct mAudioStreamParams;
     VideoStreamStruct mVideoStreamParams;
     std::vector<std::pair<uint16_t, uint8_t>> mZoneSensitivityList;
-    std::function<void()> mOnRecorderStoppedCb;
-    std::function<void()> mOnStartCallback;
-    void OnRecorderStopped();
 
     // Dummy implementation to indicate if video can be sent
     bool mCanSendVideo = false;
@@ -138,7 +140,6 @@ private:
     // Dummy implementation to indicate if audio can be sent
     bool mCanSendAudio = false;
 
-    // Enum indicating the type of trigger used to start the transport
     chip::app::Clusters::PushAvStreamTransport::TransportStatusEnum mTransportStatus;
     chip::app::Clusters::PushAvStreamTransport::TransportTriggerTypeEnum mTransportTriggerType;
     uint16_t mConnectionID;

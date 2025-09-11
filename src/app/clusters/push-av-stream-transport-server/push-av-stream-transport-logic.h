@@ -31,28 +31,40 @@ public:
             ChipLogError(Zcl, "Push AV Stream Transport : Trying to set delegate to null");
             return;
         }
-
-        mDelegate->SetOnRecorderStartedCallback(
-            [this](uint16_t connectionID, PushAvStreamTransport::TransportTriggerTypeEnum triggerType) {
-                GeneratePushTransportBeginEvent(connectionID, triggerType,
-                                                Optional<PushAvStreamTransport::TriggerActivationReasonEnum>());
-            });
-        mDelegate->SetOnRecorderStoppedCallback(
-            [this](uint16_t connectionID, PushAvStreamTransport::TransportTriggerTypeEnum triggerType) {
-                GeneratePushTransportEndEvent(connectionID, triggerType,
-                                              Optional<PushAvStreamTransport::TriggerActivationReasonEnum>());
-            });
+        mDelegate->SetPushAvStreamTransportServer(this);
     }
 
-    void SetOnRecorderStoppedCallback(std::function<void((uint16_t, PushAvStreamTransport::TransportTriggerTypeEnum))> cb)
-    {
-        mOnRecorderStoppedCb = std ::move(cb);
-    }
+    /**
+     * @brief API for application layer to notify when transport has started
+     *
+     * This should be called by the application layer when a transport begins streaming.
+     * It will generate the appropriate PushTransportBegin event.
+     *
+     * @param connectionID The connection ID of the transport that started
+     * @param triggerType The type of trigger that started the transport
+     * @param activationReason Optional reason for the activation
+     * @return Status::Success if event was generated successfully, failure otherwise
+     */
+    Protocols::InteractionModel::Status
+    NotifyTransportStarted(uint16_t connectionID, PushAvStreamTransport::TransportTriggerTypeEnum triggerType,
+                           Optional<PushAvStreamTransport::TriggerActivationReasonEnum> activationReason =
+                               Optional<PushAvStreamTransport::TriggerActivationReasonEnum>());
 
-    void SetOnRecorderStartedCallback(std::function<void(uint16_t, PushAvStreamTransport::TransportTriggerTypeEnum)> cb)
-    {
-        mOnRecorderStartedCb = std ::move(cb);
-    }
+    /**
+     * @brief API for application layer to notify when transport has stopped
+     *
+     * This should be called by the application layer when a transport stops streaming.
+     * It will generate the appropriate PushTransportEnd event.
+     *
+     * @param connectionID The connection ID of the transport that stopped
+     * @param triggerType The type of trigger that started the transport
+     * @param activationReason Optional reason for the deactivation
+     * @return Status::Success if event was generated successfully, failure otherwise
+     */
+    Protocols::InteractionModel::Status
+    NotifyTransportStopped(uint16_t connectionID, PushAvStreamTransport::TransportTriggerTypeEnum triggerType,
+                           Optional<PushAvStreamTransport::TriggerActivationReasonEnum> activationReason =
+                               Optional<PushAvStreamTransport::TriggerActivationReasonEnum>());
 
     void SetTLSClientManagementDelegate(TlsClientManagementDelegate * delegate)
     {
@@ -64,13 +76,12 @@ public:
         }
     }
 
-    void SetTlsCertificateManagementDelegate(EndpointId aEndpoint, TlsCertificateManagementDelegate * delegate)
+    void SetTlsCertificateManagementDelegate(TlsCertificateManagementDelegate * delegate)
     {
         mTlsCertificateManagementDelegate = delegate;
         if (mTlsCertificateManagementDelegate == nullptr)
         {
-            ChipLogError(Zcl, "Push AV Stream Transport [ep=%d]: Trying to set TLS Certificate Management delegate to null",
-                         aEndpoint);
+            ChipLogError(Zcl, "Push AV Stream Transport: Trying to set TLS Certificate Management delegate to null");
             return;
         }
     }
@@ -141,9 +152,6 @@ private:
     PushAvStreamTransportDelegate * mDelegate                            = nullptr;
     TlsClientManagementDelegate * mTLSClientManagementDelegate           = nullptr;
     TlsCertificateManagementDelegate * mTlsCertificateManagementDelegate = nullptr;
-
-    std::function<void(uint16_t, PushAvStreamTransport::TransportTriggerTypeEnum)> mOnRecorderStoppedCb;
-    std::function<void(uint16_t, PushAvStreamTransport::TransportTriggerTypeEnum)> mOnRecorderStartedCb;
 
     /// Convenience method that returns if the internal delegate is null and will log
     /// an error if the check returns true

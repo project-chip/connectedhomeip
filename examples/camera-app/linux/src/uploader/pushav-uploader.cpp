@@ -25,6 +25,7 @@
 #include <openssl/bio.h>
 #include <openssl/pem.h>
 #include <openssl/x509.h>
+#include <sys/stat.h>
 #include <vector>
 
 PushAVUploader::PushAVUploader() : mIsRunning(false) {}
@@ -159,9 +160,16 @@ void SaveCertToFile(const std::string & certData, const std::string & filePath)
     if (!out)
     {
         ChipLogDetail(Camera, "Failed to open file: %s", filePath.c_str());
+        return;
     }
     out.write(certData.data(), certData.size());
     out.close();
+
+    // Set file permissions to read/write for owner only (0600)
+    if (chmod(filePath.c_str(), S_IRUSR | S_IWUSR) != 0)
+    {
+        ChipLogError(Camera, "Failed to set permissions for file: %s", filePath.c_str());
+    }
 }
 
 void PushAVUploader::ProcessQueue()

@@ -149,7 +149,7 @@ void SetTlsCertificateManagementDelegate(EndpointId endpointId, TlsCertificateMa
         ChipLogError(AppServer, "Push AV Stream transport is NOT yet constructed. Cannot set TLS Certificate Management delegate");
         return;
     }
-    gServers[arrayIndex].Cluster().SetTlsCertificateManagementDelegate(endpointId, delegate);
+    gServers[arrayIndex].Cluster().SetTlsCertificateManagementDelegate(delegate);
 }
 } // namespace PushAvStreamTransport
 } // namespace Clusters
