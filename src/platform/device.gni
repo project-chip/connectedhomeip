@@ -242,12 +242,18 @@ declare_args() {
         "<platform/" + _chip_device_layer + "/InetPlatformConfig.h>"
     chip_system_platform_config_include =
         "<platform/" + _chip_device_layer + "/SystemPlatformConfig.h>"
+
+    if (chip_enable_nfc_based_commissioning) {
+      chip_nfc_platform_config_include =
+          "<platform/" + _chip_device_layer + "/NfcConfig.h>"
+    }
   } else {
     chip_ble_platform_config_include = ""
     chip_device_platform_config_include = ""
     chip_platform_config_include = ""
     chip_inet_platform_config_include = ""
     chip_system_platform_config_include = ""
+    chip_nfc_platform_config_include = ""
   }
 
   # always overridable, default to nothing

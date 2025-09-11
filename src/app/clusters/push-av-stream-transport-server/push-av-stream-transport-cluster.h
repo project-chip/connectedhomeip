@@ -50,11 +50,17 @@ public:
 
     PushAvStreamTransportServerLogic & GetLogic() { return mLogic; }
 
-    void SetDelegate(EndpointId aEndpoint, PushAvStreamTransportDelegate * delegate) { mLogic.SetDelegate(aEndpoint, delegate); }
+    void SetDelegate(PushAvStreamTransportDelegate * delegate) { mLogic.SetDelegate(delegate); }
+
+    void SetTLSClientManagementDelegate(TlsClientManagementDelegate * delegate) { mLogic.SetTLSClientManagementDelegate(delegate); }
 
     CHIP_ERROR Init() { return mLogic.Init(); }
 
-    void Deinit() { mLogic.Shutdown(); }
+    void Shutdown() override
+    {
+        DefaultServerCluster::Shutdown();
+        mLogic.Shutdown();
+    }
 
     DataModel::ActionReturnStatus ReadAttribute(const DataModel::ReadAttributeRequest & request,
                                                 AttributeValueEncoder & encoder) override;
