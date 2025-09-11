@@ -627,7 +627,7 @@ PushAvStreamTransportServerLogic::HandleAllocatePushTransport(CommandHandler & h
 
         auto & motionZonesList = transportOptions.triggerOptions.motionZones;
         auto iter              = motionZonesList.Value().Value().begin();
-        size_t zoneSize = 0;
+        size_t zoneSize        = 0;
         motionZonesList.Value().Value().ComputeSize(&zoneSize);
 
         bool isValidZoneSize = mDelegate->ValidateMotionZoneSize(zoneSize);
@@ -643,7 +643,7 @@ PushAvStreamTransportServerLogic::HandleAllocatePushTransport(CommandHandler & h
             // ZoneID (in the ZoneManagement cluster instance) is valid
             if (!transportZoneOption.zone.IsNull())
             {
-                Status zoneIdStatus        = mDelegate->ValidateZoneId(transportZoneOption.zone.Value());
+                Status zoneIdStatus = mDelegate->ValidateZoneId(transportZoneOption.zone.Value());
                 if (zoneIdStatus != Status::Success)
                 {
                     auto status = to_underlying(StatusCodeEnum::kInvalidZone);
