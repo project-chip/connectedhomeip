@@ -59,6 +59,9 @@ config PTHREAD_IPC
     bool
     default n
 
+config POSIX_API
+    default y if ZEPHYR_VERSION_3_3
+
 config POSIX_MAX_FDS
     int
     default 16
