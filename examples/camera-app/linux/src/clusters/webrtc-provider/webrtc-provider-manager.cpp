@@ -54,6 +54,11 @@ void WebRTCProviderManager::SetMediaController(MediaController * mediaController
     mMediaController = mediaController;
 }
 
+void WebRTCProviderManager::SetWebRTCTransportProvider(std::unique_ptr<WebRTCTransportProviderServer> aWebRTCTransportProvider)
+{
+    mWebRTCTransportProvider = std::move(aWebRTCTransportProvider);
+}
+
 CHIP_ERROR WebRTCProviderManager::HandleSolicitOffer(const OfferRequestArgs & args, WebRTCSessionStruct & outSession,
                                                      bool & outDeferredOffer)
 {
@@ -237,6 +242,7 @@ CHIP_ERROR WebRTCProviderManager::HandleProvideOffer(const ProvideOfferRequestAr
 
     transport->SetRequestArgs(requestArgs);
     transport->Start();
+    transport->AddTracks();
 
     // Acquire the Video and Audio Streams from the CameraAVStreamManagement
     // cluster and update the reference counts.
@@ -491,6 +497,33 @@ void WebRTCProviderManager::ScheduleAnswerSend(uint16_t sessionId)
     });
 }
 
+void WebRTCProviderManager::ScheduleEndSend(uint16_t sessionId)
+{
+    ChipLogProgress(Camera, "ScheduleEndSend called.");
+
+    DeviceLayer::SystemLayer().ScheduleLambda([this, sessionId]() {
+        WebrtcTransport * transport = GetTransport(sessionId);
+        if (transport == nullptr)
+        {
+            return;
+        }
+
+        WebrtcTransport::RequestArgs requestArgs = transport->GetRequestArgs();
+        chip::ScopedNodeId peerId                = requestArgs.peerId;
+        ChipLogProgress(Camera, "Sending End command to node " ChipLogFormatX64, ChipLogValueX64(peerId.GetNodeId()));
+
+        transport->SetCommandType(WebrtcTransport::CommandType::kEnd);
+
+        // Attempt to find or establish a CASE session to the target PeerId.
+        CASESessionManager * caseSessionMgr = Server::GetInstance().GetCASESessionManager();
+        VerifyOrDie(caseSessionMgr != nullptr);
+
+        // WebRTC Answer requires a large payload session establishment.
+        caseSessionMgr->FindOrEstablishSession(peerId, &mOnConnectedCallback, &mOnConnectionFailureCallback,
+                                               TransportPayloadCapability::kLargePayload);
+    });
+}
+
 void WebRTCProviderManager::ScheduleICECandidatesSend(uint16_t sessionId)
 {
     ChipLogProgress(Camera, "ScheduleICECandidatesSend called.");
@@ -527,13 +560,14 @@ void WebRTCProviderManager::OnDeviceConnected(void * context, Messaging::Exchang
     WebrtcTransport * transport = nullptr;
     uint16_t sessionId          = 0;
 
-    for (auto & mapEntry : self->mWebrtcTransportMap)
+    for (auto it = self->mWebrtcTransportMap.begin(); it != self->mWebrtcTransportMap.end();)
     {
-        sessionId = mapEntry.first;
-        transport = (WebrtcTransport *) mapEntry.second.get();
+        sessionId = it->first;
+        transport = (WebrtcTransport *) it->second.get();
 
         if (transport == nullptr)
         {
+            ++it;
             continue;
         }
 
@@ -557,7 +591,28 @@ void WebRTCProviderManager::OnDeviceConnected(void * context, Messaging::Exchang
             err = self->SendICECandidatesCommand(exchangeMgr, sessionHandle, sessionId);
             transport->MoveToState(WebrtcTransport::State::Idle);
             break;
+        case WebrtcTransport::CommandType::kEnd:
+            if (self->mSoftLiveStreamPrivacyEnabled)
+            {
+                err = self->SendEndCommand(exchangeMgr, sessionHandle, sessionId, WebRTCEndReasonEnum::kPrivacyMode);
+                // Release the Video and Audio Streams from the CameraAVStreamManagement
+                // cluster and update the reference counts.
+                self->ReleaseAudioVideoStreams(sessionId);
+                WebrtcTransport * transport = self->GetTransport(sessionId);
+                if (transport != nullptr)
+                {
+                    self->mMediaController->UnregisterTransport(transport);
+                    WebrtcTransport::RequestArgs args = transport->GetRequestArgs();
+                    self->mSessionIdMap.erase(args.peerNodeId);
+                    // remove from current sessions list
+                    self->mWebRTCTransportProvider->RemoveSession(sessionId);
+                }
 
+                it = self->mWebrtcTransportMap.erase(it);
+                continue;
+            }
+            transport->MoveToState(WebrtcTransport::State::Idle);
+            break;
         default:
             err = CHIP_ERROR_INVALID_ARGUMENT;
             break;
@@ -567,6 +622,7 @@ void WebRTCProviderManager::OnDeviceConnected(void * context, Messaging::Exchang
         {
             ChipLogError(Camera, "OnDeviceConnected::SendCommand failed: %" CHIP_ERROR_FORMAT, err.Format());
         }
+        ++it;
     }
 }
 
@@ -586,6 +642,36 @@ WebrtcTransport * WebRTCProviderManager::GetTransport(uint16_t sessionId)
     }
 
     return transport;
+}
+
+void WebRTCProviderManager::LiveStreamPrivacyModeChanged(bool privacyModeEnabled)
+{
+    mSoftLiveStreamPrivacyEnabled = privacyModeEnabled;
+
+    if (privacyModeEnabled)
+    {
+        WebrtcTransport * transport = nullptr;
+        uint16_t sessionId          = 0;
+        for (auto & mapEntry : mWebrtcTransportMap)
+        {
+            sessionId = mapEntry.first;
+
+            transport = (WebrtcTransport *) mapEntry.second.get();
+
+            if (transport == nullptr)
+            {
+                continue;
+            }
+
+            transport->MoveToState(WebrtcTransport::State::SendingEnd);
+
+            ScheduleEndSend(sessionId);
+        }
+    }
+    else
+    {
+        ChipLogProgress(Camera, "Privacy mode is disabled");
+    }
 }
 
 CHIP_ERROR WebRTCProviderManager::SendOfferCommand(Messaging::ExchangeManager & exchangeMgr, const SessionHandle & sessionHandle,
@@ -729,6 +815,36 @@ CHIP_ERROR WebRTCProviderManager::SendICECandidatesCommand(Messaging::ExchangeMa
 
     command.webRTCSessionID = sessionId;
     command.ICECandidates = DataModel::List<const ICECandidateStruct>(iceCandidateStructList.data(), iceCandidateStructList.size());
+
+    WebrtcTransport::RequestArgs requestArgs = transport->GetRequestArgs();
+    // Now invoke the command using the found session handle
+    return Controller::InvokeCommandRequest(&exchangeMgr, sessionHandle, requestArgs.originatingEndpointId, command, onSuccess,
+                                            onFailure,
+                                            /* timedInvokeTimeoutMs = */ NullOptional, /* responseTimeout = */ NullOptional,
+                                            /* outCancelFn = */ nullptr, /*allowLargePayload = */ true);
+}
+
+CHIP_ERROR WebRTCProviderManager::SendEndCommand(Messaging::ExchangeManager & exchangeMgr, const SessionHandle & sessionHandle,
+                                                 uint16_t sessionId, WebRTCEndReasonEnum endReason)
+{
+    auto onSuccess = [](const ConcreteCommandPath & commandPath, const StatusIB & status, const auto & dataResponse) {
+        ChipLogProgress(Camera, "End command succeeds");
+    };
+
+    auto onFailure = [](CHIP_ERROR error) { ChipLogError(Camera, "End command failed: %" CHIP_ERROR_FORMAT, error.Format()); };
+
+    WebrtcTransport * transport = GetTransport(sessionId);
+    if (transport == nullptr)
+    {
+        ChipLogError(Camera, "WebTransport not found for the sessionId: %u", sessionId);
+        return CHIP_ERROR_INTERNAL;
+    }
+
+    // Build the command
+    WebRTCTransportRequestor::Commands::End::Type command;
+
+    command.webRTCSessionID = sessionId;
+    command.reason          = endReason;
 
     WebrtcTransport::RequestArgs requestArgs = transport->GetRequestArgs();
     // Now invoke the command using the found session handle

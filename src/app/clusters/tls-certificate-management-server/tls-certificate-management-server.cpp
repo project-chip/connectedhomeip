@@ -42,11 +42,12 @@ using namespace chip::app::Clusters::TlsCertificateManagement::Commands;
 using namespace chip::app::Clusters::TlsCertificateManagement::Structs;
 using namespace chip::app::Clusters::TlsCertificateManagement::Attributes;
 using chip::Protocols::InteractionModel::Status;
-using Protocols::InteractionModel::ClusterStatusCode;
 
 static constexpr uint16_t kSpecMaxCertBytes            = 3000;
 static constexpr uint16_t kSpecMaxFingerprintBytes     = 64;
 static constexpr uint16_t kMaxIntermediateCertificates = 10;
+static constexpr uint16_t kMaxNonceBytes               = 32;
+static constexpr uint16_t kMaxSignatureBytes           = 128;
 
 TlsCertificateManagementServer::TlsCertificateManagementServer(EndpointId endpointId, TlsCertificateManagementDelegate & delegate,
                                                                CertificateTable & certificateTable, uint8_t maxRootCertificates,
@@ -177,8 +178,8 @@ void TlsCertificateManagementServer::InvokeCommand(HandlerContext & ctx)
         CommandHandlerInterface::HandleCommand<RemoveRootCertificate::DecodableType>(
             ctx, [this](HandlerContext & innerCtx, const auto & req) { HandleRemoveRootCertificate(innerCtx, req); });
         break;
-    case TLSClientCSR::Id:
-        CommandHandlerInterface::HandleCommand<TLSClientCSR::DecodableType>(
+    case ClientCSR::Id:
+        CommandHandlerInterface::HandleCommand<ClientCSR::DecodableType>(
             ctx, [this](HandlerContext & innerCtx, const auto & req) { HandleGenerateClientCsr(innerCtx, req); });
         break;
     case ProvisionClientCertificate::Id:
@@ -216,8 +217,7 @@ void TlsCertificateManagementServer::HandleProvisionRootCertificate(HandlerConte
         });
     if (lookupResult != CHIP_ERROR_NOT_FOUND)
     {
-        ctx.mCommandHandler.AddStatus(ctx.mRequestPath,
-                                      ClusterStatusCode::ClusterSpecificFailure(StatusCodeEnum::kCertificateAlreadyInstalled));
+        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::AlreadyExists);
         return;
     }
 
@@ -327,11 +327,11 @@ void TlsCertificateManagementServer::HandleRemoveRootCertificate(HandlerContext 
     ctx.mCommandHandler.AddStatus(ctx.mRequestPath, result);
 }
 
-void TlsCertificateManagementServer::HandleGenerateClientCsr(HandlerContext & ctx, const TLSClientCSR::DecodableType & req)
+void TlsCertificateManagementServer::HandleGenerateClientCsr(HandlerContext & ctx, const ClientCSR::DecodableType & req)
 {
-    ChipLogDetail(Zcl, "TlsCertificateManagement: TLSClientCSR");
+    ChipLogDetail(Zcl, "TlsCertificateManagement: ClientCSR");
 
-    VerifyOrReturn(req.nonce.size() <= 128, ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ConstraintError));
+    VerifyOrReturn(req.nonce.size() <= kMaxNonceBytes, ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ConstraintError));
 
     auto fabric = ctx.mCommandHandler.GetAccessingFabricIndex();
     uint8_t numClientCerts;
@@ -343,7 +343,8 @@ void TlsCertificateManagementServer::HandleGenerateClientCsr(HandlerContext & ct
     auto status = mDelegate.GenerateClientCsr(ctx.mRequestPath.mEndpointId, fabric, req, [&](auto & response) -> Status {
         VerifyOrDieWithMsg(response.ccdid <= kMaxClientCertId, NotSpecified, "Spec requires CCDID to be <= kMaxClientCertId");
         VerifyOrDieWithMsg(response.csr.size() <= 3000, NotSpecified, "Spec requires csr.size() to be <= 3000");
-        VerifyOrDieWithMsg(response.nonce.size() <= 128, NotSpecified, "Spec requires nonce.size() to be < kMaxClientCertId");
+        VerifyOrDieWithMsg(response.nonceSignature.size() <= kMaxSignatureBytes, NotSpecified,
+                           "Spec requires nonceSignature.size() to be < kMaxSignatureBytes");
         ctx.mCommandHandler.AddResponse(ctx.mRequestPath, response);
         return Status::Success;
     });
@@ -360,21 +361,17 @@ void TlsCertificateManagementServer::HandleProvisionClientCertificate(HandlerCon
     ChipLogDetail(Zcl, "TlsCertificateManagement: ProvisionClientCertificate");
 
     VerifyOrReturn(req.ccdid <= kMaxClientCertId, ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ConstraintError));
-    const auto & detail = req.clientCertificateDetails;
-    VerifyOrReturn(!detail.clientCertificate.HasValue() || detail.clientCertificate.Value().size() <= kSpecMaxCertBytes,
+    VerifyOrReturn(req.clientCertificate.size() <= kSpecMaxCertBytes,
                    ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ConstraintError));
-    if (detail.intermediateCertificates.HasValue())
-    {
-        size_t intermediateSize;
-        VerifyOrReturn(detail.intermediateCertificates.Value().ComputeSize(&intermediateSize) == CHIP_NO_ERROR,
-                       ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::InvalidCommand));
-        VerifyOrReturn(intermediateSize <= kMaxIntermediateCertificates,
-                       ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ConstraintError));
-    }
+    size_t intermediateSize;
+    VerifyOrReturn(req.intermediateCertificates.ComputeSize(&intermediateSize) == CHIP_NO_ERROR,
+                   ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::InvalidCommand));
+    VerifyOrReturn(intermediateSize <= kMaxIntermediateCertificates,
+                   ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ConstraintError));
 
     auto fabric = ctx.mCommandHandler.GetAccessingFabricIndex();
     DataModel::Nullable<Tls::TLSCCDID> foundId;
-    auto lookupResult = mDelegate.LookupClientCert(ctx.mRequestPath.mEndpointId, fabric, detail.clientCertificate.Value(),
+    auto lookupResult = mDelegate.LookupClientCert(ctx.mRequestPath.mEndpointId, fabric, req.clientCertificate,
                                                    [&](auto & certificate) -> CHIP_ERROR {
                                                        foundId = certificate.ccdid;
                                                        return CHIP_NO_ERROR;

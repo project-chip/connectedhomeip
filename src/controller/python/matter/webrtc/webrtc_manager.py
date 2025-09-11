@@ -215,6 +215,7 @@ class WebRTCManager(WebRTCRequestorNativeBindings):
             return -1
         # Deleting PeerConnection will take care of cleanup
         asyncio.run_coroutine_threadsafe(WebRTCManager.remove_peer(sessionId), peer.event_loop).result(timeout=10)
+        peer.on_remote_end(sessionId, reason)
         return 0
 
     def handle_ws_message(self, message):

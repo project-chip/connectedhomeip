@@ -39,6 +39,7 @@ class Events(Enum):
     ANSWER = auto()
     ICE_CANDIDATE = auto()
     PEER_CONNECTION_STATE = auto()
+    END = auto()
 
 
 class IceCandidateStruct(Structure):
