@@ -18,11 +18,12 @@
 /**
  *    @file
  *          Utilities for accessing parameters of the network interface and the wireless
- *          statistics(extracted from /proc/net/wireless) on webOS platforms.
+ *          statistics(extracted from /proc/net/wireless) on Linux platforms.
  */
 
 #pragma once
 
+#include <platform/DiagnosticDataProvider.h>
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
 #include <linux/types.h> /* for "caddr_t" et al      */
@@ -36,6 +37,7 @@ static constexpr uint16_t kWiFi_BAND_2_4_GHZ      = 2400;
 static constexpr uint16_t kWiFi_BAND_5_0_GHZ      = 5000;
 static constexpr char kWpaSupplicantServiceName[] = "fi.w1.wpa_supplicant1";
 static constexpr char kWpaSupplicantObjectPath[]  = "/fi/w1/wpa_supplicant1";
+static constexpr char kWpaSupplicantBlobUnknown[] = "fi.w1.wpa_supplicant1.BlobUnknown";
 
 class ConnectivityUtils
 {
@@ -44,6 +46,8 @@ public:
     static uint8_t MapFrequencyToChannel(const uint16_t frequency);
     static app::Clusters::GeneralDiagnostics::InterfaceTypeEnum GetInterfaceConnectionType(const char * ifname);
     static CHIP_ERROR GetInterfaceHardwareAddrs(const char * ifname, uint8_t * buf, size_t bufSize);
+    static CHIP_ERROR GetInterfaceIPv4Addrs(const char * ifname, uint8_t & size, NetworkInterface * ifp);
+    static CHIP_ERROR GetInterfaceIPv6Addrs(const char * ifname, uint8_t & size, NetworkInterface * ifp);
     static CHIP_ERROR GetWiFiInterfaceName(char * ifname, size_t bufSize);
     static CHIP_ERROR GetWiFiChannelNumber(const char * ifname, uint16_t & channelNumber);
     static CHIP_ERROR GetWiFiRssi(const char * ifname, int8_t & rssi);

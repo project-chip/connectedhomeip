@@ -34,7 +34,7 @@
 #pragma once
 
 #include <mutex>
-#include <platform/webos/CHIPWebOSStorageIni.h>
+#include <platform/webos/CHIPLinuxStorageIni.h>
 #include <string>
 
 #ifndef FATCONFDIR

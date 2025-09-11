@@ -29,7 +29,7 @@
 
 #include <lib/core/CHIPEncoding.h>
 #include <lib/support/CodeUtils.h>
-#include <platform/webos/CHIPWebOSStorage.h>
+#include <platform/webos/CHIPLinuxStorage.h>
 #include <platform/webos/PosixConfig.h>
 
 namespace chip {
@@ -64,19 +64,16 @@ const PosixConfig::Key PosixConfig::kConfigKey_VendorId              = { kConfig
 const PosixConfig::Key PosixConfig::kConfigKey_ProductId             = { kConfigNamespace_ChipFactory, "product-id" };
 
 // Keys stored in the Chip-config namespace
-const PosixConfig::Key PosixConfig::kConfigKey_FabricId           = { kConfigNamespace_ChipConfig, "fabric-id" };
-const PosixConfig::Key PosixConfig::kConfigKey_ServiceConfig      = { kConfigNamespace_ChipConfig, "service-config" };
-const PosixConfig::Key PosixConfig::kConfigKey_PairedAccountId    = { kConfigNamespace_ChipConfig, "account-id" };
-const PosixConfig::Key PosixConfig::kConfigKey_ServiceId          = { kConfigNamespace_ChipConfig, "service-id" };
-const PosixConfig::Key PosixConfig::kConfigKey_FabricSecret       = { kConfigNamespace_ChipConfig, "fabric-secret" };
-const PosixConfig::Key PosixConfig::kConfigKey_GroupKeyIndex      = { kConfigNamespace_ChipConfig, "group-key-index" };
-const PosixConfig::Key PosixConfig::kConfigKey_LastUsedEpochKeyId = { kConfigNamespace_ChipConfig, "last-ek-id" };
-const PosixConfig::Key PosixConfig::kConfigKey_FailSafeArmed      = { kConfigNamespace_ChipConfig, "fail-safe-armed" };
-const PosixConfig::Key PosixConfig::kConfigKey_RegulatoryLocation = { kConfigNamespace_ChipConfig, "regulatory-location" };
-const PosixConfig::Key PosixConfig::kConfigKey_CountryCode        = { kConfigNamespace_ChipConfig, "country-code" };
-const PosixConfig::Key PosixConfig::kConfigKey_Breadcrumb         = { kConfigNamespace_ChipConfig, "breadcrumb" };
-const PosixConfig::Key PosixConfig::kConfigKey_LocationCapability = { kConfigNamespace_ChipConfig, "location-capability" };
-const PosixConfig::Key PosixConfig::kConfigKey_UniqueId           = { kConfigNamespace_ChipFactory, "unique-id" };
+const PosixConfig::Key PosixConfig::kConfigKey_ServiceConfig        = { kConfigNamespace_ChipConfig, "service-config" };
+const PosixConfig::Key PosixConfig::kConfigKey_PairedAccountId      = { kConfigNamespace_ChipConfig, "account-id" };
+const PosixConfig::Key PosixConfig::kConfigKey_ServiceId            = { kConfigNamespace_ChipConfig, "service-id" };
+const PosixConfig::Key PosixConfig::kConfigKey_LastUsedEpochKeyId   = { kConfigNamespace_ChipConfig, "last-ek-id" };
+const PosixConfig::Key PosixConfig::kConfigKey_FailSafeArmed        = { kConfigNamespace_ChipConfig, "fail-safe-armed" };
+const PosixConfig::Key PosixConfig::kConfigKey_RegulatoryLocation   = { kConfigNamespace_ChipConfig, "regulatory-location" };
+const PosixConfig::Key PosixConfig::kConfigKey_CountryCode          = { kConfigNamespace_ChipConfig, "country-code" };
+const PosixConfig::Key PosixConfig::kConfigKey_LocationCapability   = { kConfigNamespace_ChipConfig, "location-capability" };
+const PosixConfig::Key PosixConfig::kConfigKey_ConfigurationVersion = { kConfigNamespace_ChipConfig, "configuration-version" };
+const PosixConfig::Key PosixConfig::kConfigKey_UniqueId             = { kConfigNamespace_ChipFactory, "unique-id" };
 
 // Keys stored in the Chip-counters namespace
 const PosixConfig::Key PosixConfig::kCounterKey_RebootCount           = { kConfigNamespace_ChipCounters, "reboot-count" };
@@ -84,9 +81,6 @@ const PosixConfig::Key PosixConfig::kCounterKey_UpTime                = { kConfi
 const PosixConfig::Key PosixConfig::kCounterKey_TotalOperationalHours = { kConfigNamespace_ChipCounters,
                                                                           "total-operational-hours" };
 const PosixConfig::Key PosixConfig::kCounterKey_BootReason            = { kConfigNamespace_ChipCounters, "boot-reason" };
-
-// Prefix used for NVS keys that contain Chip group encryption keys.
-const char PosixConfig::kGroupKeyNamePrefix[] = "gk-";
 
 ChipLinuxStorage * PosixConfig::GetStorageForNamespace(Key key)
 {
@@ -506,14 +500,14 @@ CHIP_ERROR PosixConfig::ClearNamespace(const char * ns)
     err = storage->ClearAll();
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(DeviceLayer, "Storage ClearAll failed: %" CHIP_ERROR_FORMAT, err.Format());
+        ChipLogError(DeviceLayer, "Storage ClearAll failed: %s", ErrorStr(err));
     }
     SuccessOrExit(err);
 
     err = storage->Commit();
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(DeviceLayer, "Storage Commit failed: %" CHIP_ERROR_FORMAT, err.Format());
+        ChipLogError(DeviceLayer, "Storage Commit failed: %s", ErrorStr(err));
     }
 
 exit:
@@ -538,14 +532,14 @@ CHIP_ERROR PosixConfig::FactoryResetConfig()
     err = storage->ClearAll();
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(DeviceLayer, "Storage ClearAll failed: %" CHIP_ERROR_FORMAT, err.Format());
+        ChipLogError(DeviceLayer, "Storage ClearAll failed: %s", ErrorStr(err));
     }
     SuccessOrExit(err);
 
     err = storage->Commit();
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(DeviceLayer, "Storage Commit failed: %" CHIP_ERROR_FORMAT, err.Format());
+        ChipLogError(DeviceLayer, "Storage Commit failed: %s", ErrorStr(err));
     }
 
 exit:
@@ -570,14 +564,14 @@ CHIP_ERROR PosixConfig::FactoryResetCounters()
     err = storage->ClearAll();
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(DeviceLayer, "Storage ClearAll failed: %" CHIP_ERROR_FORMAT, err.Format());
+        ChipLogError(DeviceLayer, "Storage ClearAll failed: %s", ErrorStr(err));
     }
     SuccessOrExit(err);
 
     err = storage->Commit();
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(DeviceLayer, "Storage Commit failed: %" CHIP_ERROR_FORMAT, err.Format());
+        ChipLogError(DeviceLayer, "Storage Commit failed: %s", ErrorStr(err));
     }
 
 exit:

@@ -23,7 +23,7 @@
 
 #pragma once
 
-#include <platform/webos/CHIPWebOSStorage.h>
+#include <platform/webos/CHIPLinuxStorage.h>
 
 namespace chip {
 namespace DeviceLayer {
