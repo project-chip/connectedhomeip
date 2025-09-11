@@ -113,7 +113,7 @@ def build_ota_images(vendor_id, product_id, max_range, out_prefix):
         # build the ota image
         logging.info("Adding the ota headers into the binary file")
         ota_image_path = f"{base_path}/{out_prefix}/chip-ota-requestor-app_v{version}.min.ota"
-        cmd_build_ota = f'python3 {base_path}/src/app/ota_image_tool.py create -v {vendor_id} -p {product_id} -vn {version} -vs "{version}.0" -da sha256 {base_path}/out/release_min/chip-ota-requestor-app.min {ota_image_path}'
+        cmd_build_ota = f'python3 {base_path}/src/app/ota_image_tool.py create -v {vendor_id} -p {product_id} -vn {version} -vs "{version}.0" -da sha256 {base_path}/{out_prefix}/chip-ota-requestor-app.min {ota_image_path}'
         status = os.system(cmd_build_ota)
         if status != 0:
             print("Failed to build the ota image")
