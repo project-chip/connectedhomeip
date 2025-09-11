@@ -808,7 +808,7 @@
             "FeatureMap"
         ],
         "Unit Localization": ["TemperatureUnit"],
-	"User Label": ["LabelList", "ClusterRevision", "FeatureMap"],
+        "User Label": ["LabelList", "ClusterRevision", "FeatureMap"],
         "TLS Certificate Management": [
             "ClusterRevision",
             "MaxRootCertificates",
