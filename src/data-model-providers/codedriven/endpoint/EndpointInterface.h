@@ -48,7 +48,7 @@ public:
     virtual CHIP_ERROR ClientClusters(ReadOnlyBufferBuilder<ClusterId> & out) const = 0;
 
 #if CHIP_CONFIG_USE_ENDPOINT_UNIQUE_ID
-    virtual MutableCharSpan EndpointUniqueID() const = 0;
+    virtual CharSpan EndpointUniqueID() const = 0;
 #endif
 
     /**
