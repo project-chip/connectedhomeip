@@ -383,6 +383,7 @@ CameraDevice::CameraDevice()
     // Set the CameraDevice interface in ZoneManager
     mZoneManager.SetCameraDevice(this);
     mPushAVTransportManager.SetCameraDevice(this);
+    mMediaController.SetCameraDevice(this);
 }
 
 CameraDevice::~CameraDevice()
@@ -1534,4 +1535,14 @@ ZoneManagement::Delegate & CameraDevice::GetZoneManagementDelegate()
 MediaController & CameraDevice::GetMediaController()
 {
     return mMediaController;
+}
+
+size_t CameraDevice::GetPreRollBufferSize()
+{
+    return kMaxContentBufferSizeBytes;
+}
+
+int64_t CameraDevice::GetMinKeyframeIntervalMs()
+{
+    return kKeyFrameIntervalMsec;
 }
