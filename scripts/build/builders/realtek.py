@@ -164,6 +164,19 @@ class RealtekBuilder(Builder):
             flags.append("-DENABLE_SHELL=OFF")
         return " ".join(flags)
 
+    def get_cmd_prefixes(self):
+        if not self._runner.dry_run:
+            # Zephyr base
+            if 'ZEPHYR_REALTEK_BASE' not in os.environ:
+                raise Exception("Realtek builds require ZEPHYR_REALTEK_BASE")
+
+        cmd = 'export ZEPHYR_BASE="$ZEPHYR_REALTEK_BASE"\n'
+
+        if 'ZEPHYR_REALTEK_SDK_INSTALL_DIR' in os.environ:
+            cmd += 'export ZEPHYR_SDK_INSTALL_DIR="$ZEPHYR_REALTEK_SDK_INSTALL_DIR"\n'
+
+        return cmd
+
     def generate(self):
         if self.os_env == RtkOsUsed.FREERTOS:
             cmd = 'arm-none-eabi-gcc -D BUILD_BANK=0 -E -P -x c {ot_src_dir}/src/bee4/{board_name}/app.ld -o {ot_src_dir}/src/bee4/{board_name}/app.ld.gen'.format(
@@ -186,7 +199,9 @@ class RealtekBuilder(Builder):
             cleanup_cmd = ['rm', '-rf', f"{self.root}/third_party/openthread/ot-realtek/src/bee4/{self.board.BoardName}/*.gen"]
             self._Execute(cleanup_cmd, title='Cleaning up generated files')
         else:
-            cmd = 'west build -b rtl8762gn_evb -d {out_folder} {example_folder}'.format(
+            cmd = self.get_cmd_prefixes()
+            cmd += '\nsource "$ZEPHYR_BASE/zephyr-env.sh"'
+            cmd += '\nwest build -b rtl87x2g_evb -d {out_folder} {example_folder} --pristine'.format(
                 out_folder=self.output_dir,
                 example_folder=self.app.BuildRoot(self.root, self.os_env))
             self._Execute(['bash', '-c', cmd], title='Building ' + self.identifier)

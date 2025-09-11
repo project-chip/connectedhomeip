@@ -46,21 +46,19 @@ Please visit the supported Operating Systems list in
 sudo apt-get install git gcc g++ pkg-config libssl-dev libdbus-1-dev libglib2.0-dev libavahi-client-dev ninja-build python3-venv python3-dev python3-pip unzip libgirepository1.0-dev libcairo2-dev libreadline-dev
 ```
 
--   Step 1: get Realtek zephyr package
+-   Step 1: Pull docker image
 
     ```bash
-    west init -m https://github.com/rtkconnectivity/realtek-zephyr-project ~/zephyr-rtk-project
-    cd ~/zephyr-rtk-project
-    west update
+    $ docker pull ghcr.io/project-chip/chip-build-realtek-zephyr:167
     ```
 
--   Step 2: navigate to matter directory:
+-   Step 2: Run docker container:
 
     ```bash
-    $ cd ../modules/lib/connectedhomeip
+    $ docker run -it -v ${CHIP_DIR}:/root/chip ghcr.io/project-chip/chip-build-realtek-zephyr:167
     ```
 
--   Step 3: activate local environment
+-   Step 3: Activate build environment
 
     ```bash
     $ source ./scripts/activate.sh
