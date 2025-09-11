@@ -249,14 +249,14 @@ public:
      */
     virtual void HandleChangeToMode(uint8_t NewMode, ModeBase::Commands::ChangeToModeResponse::Type & response) = 0;
 
-private:
-    Instance * mInstance = nullptr;
-
     /**
      * This method is used by the SDK to set the instance pointer. This is done during the instantiation of an Instance object.
      * @param aInstance A pointer to the Instance object related to this delegate object.
      */
     void SetInstance(Instance * aInstance) { mInstance = aInstance; }
+
+private:
+    Instance * mInstance = nullptr;    
 
 protected:
     /**
