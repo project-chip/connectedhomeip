@@ -1662,19 +1662,11 @@
               "isEnabled": 1
             },
             {
-              "name": "LeaveAllGroups",
+              "name": "UpdateGroupKey",
               "code": 3,
               "mfgCode": null,
               "source": "client",
               "isIncoming": 0,
-              "isEnabled": 1
-            },
-            {
-              "name": "JoinGroupResponse",
-              "code": 129,
-              "mfgCode": null,
-              "source": "server",
-              "isIncoming": 1,
               "isEnabled": 1
             }
           ]

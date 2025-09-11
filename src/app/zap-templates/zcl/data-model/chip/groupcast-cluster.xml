@@ -61,7 +61,7 @@ limitations under the License.
       <mandatoryConform/>
     </command>
 
-    <command source="client" code="0x01" name="LeaveGroup" isFabricScoped="true" optional="false" cli="zcl Groupcast LeaveGroup">
+    <command source="client" code="0x01" name="LeaveGroup" isFabricScoped="true" optional="false" response="LeaveGroupResponse" cli="zcl Groupcast LeaveGroup">
       <description>Request that the server withdraws specific endpoints from a specific group.</description>
       <arg name="GroupId" type="group_id"/>
       <arg name="Endpoints" type="endpoint_no" array="true" minLength="1" />
@@ -69,12 +69,11 @@ limitations under the License.
       <mandatoryConform/>
     </command>
 
-    <command source="server" code="0x02" name="LeaveGroupResponse" optional="false" disableDefaultResponse="true">
+    <command source="server" code="0x02" name="LeaveGroupResponse" optional="false" disableDefaultResponse="true" isFabricScoped="true">
       <description>Response to JoinGroup</description>
       <arg name="GroupId" type="group_id"/>
       <arg name="Endpoints" type="endpoint_no" array="true"/>
-      <arg name="ListTooLarge" type="bool" default="false"/>
-      <mandatoryConform/>
+      <arg name="ListTooLarge" type="boolean" default="0"/>
     </command>
 
     <command source="client" code="0x03" name="UpdateGroupKey" isFabricScoped="true" optional="false" cli="zcl Groupcast UpdateGroupKey">
