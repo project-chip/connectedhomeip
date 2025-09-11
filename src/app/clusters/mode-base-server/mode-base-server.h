@@ -250,8 +250,6 @@ public:
     virtual void HandleChangeToMode(uint8_t NewMode, ModeBase::Commands::ChangeToModeResponse::Type & response) = 0;
 
 private:
-    friend class Instance;
-
     Instance * mInstance = nullptr;
 
     /**
