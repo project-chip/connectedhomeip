@@ -67,7 +67,7 @@ public:
         virtual ServerClusterRegistration & CreateRegistration(EndpointId endpointId, unsigned emberEndpointIndex,
                                                                uint32_t optionalAttributeBits, uint32_t featureMap) = 0;
 
-        /// Find the previously created cluster on the given index.
+        /// Find the previously created cluster at the given index.
         ///
         /// It should return the given interface IF AND ONLY IF it is valid.
         /// This will be called after CreateRegistration or as part of finding an existing
