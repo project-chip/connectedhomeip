@@ -296,14 +296,8 @@ class TC_G_2_3(MatterBaseTest):
         self.step("15")
         startGroupId = 8
         groupList = [startGroupId + i for i in range(maxgroups - 2)]
-        try:
-            for kGroupId in groupList:
-                await th1.SendCommand(
-                    self.dut_node_id,
-                    self.matter_test_config.endpoint,
-                    Clusters.Groups.Commands.AddGroupIfIdentifying(kGroupId, f"Gp{kGroupId}"))
-        except Exception as e:
-            asserts.assert_true(False, f'Error while sending command AddGroupIfIdentify {e}')
+        for kGroupId in groupList:
+            await th1.SendCommand(self.dut_node_id, self.matter_test_config.endpoint, Clusters.Groups.Commands.AddGroupIfIdentifying(kGroupId, f"Gp{kGroupId}"))
 
         self.step("16a")
         GroupKeyMapStruct = Clusters.GroupKeyManagement.Structs.GroupKeyMapStruct
