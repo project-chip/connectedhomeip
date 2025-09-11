@@ -161,12 +161,12 @@ void WebrtcTransport::Stop()
     }
 }
 
-void WebrtcTransport::AddTracks()
+void WebrtcTransport::AddTracks(std::string videoMid, std::string audioMid)
 {
     if (mPeerConnection != nullptr)
     {
-        mVideoTrack = mPeerConnection->AddTrack(MediaType::Video);
-        mAudioTrack = mPeerConnection->AddTrack(MediaType::Audio);
+        mVideoTrack = mPeerConnection->AddTrack(MediaType::Video, videoMid);
+        mAudioTrack = mPeerConnection->AddTrack(MediaType::Audio, audioMid);
     }
 }
 

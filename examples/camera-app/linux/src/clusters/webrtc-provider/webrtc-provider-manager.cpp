@@ -282,7 +282,12 @@ CHIP_ERROR WebRTCProviderManager::HandleProvideOffer(const ProvideOfferRequestAr
 
     transport->SetRequestArgs(requestArgs);
     transport->Start();
-    transport->AddTracks();
+    std::string audioMid = ExtractMidFromSdp(args.sdp, "audio");
+    std::string videoMid = ExtractMidFromSdp(args.sdp, "video");
+
+    ChipLogProgress(Camera, "Extracted audioMid: %s, videoMid: %s", audioMid.c_str(), videoMid.c_str());
+
+    transport->AddTracks(videoMid, audioMid);
 
     // Acquire the Video and Audio Streams from the CameraAVStreamManagement
     // cluster and update the reference counts.

@@ -23,6 +23,8 @@
 #include <lib/core/DataModelTypes.h>
 #include <lib/core/ScopedNodeId.h>
 
+#include <string>
+
 using OnTransportLocalDescriptionCallback = std::function<void(const std::string & sdp, SDPType type, const int16_t sessionId)>;
 using OnTransportConnectionStateCallback  = std::function<void(bool connected, const int16_t sessionId)>;
 
@@ -91,7 +93,7 @@ public:
     // Stops WebRTC peer connection and cleanup
     void Stop();
 
-    void AddTracks();
+    void AddTracks(std::string videoMid = "video", std::string audioMid = "audio");
 
     // Set video track for the transport
     void SetVideoTrack(std::shared_ptr<WebRTCTrack> videoTrack);
@@ -133,6 +135,8 @@ private:
     std::shared_ptr<WebRTCPeerConnection> mPeerConnection;
     std::shared_ptr<WebRTCTrack> mVideoTrack;
     std::shared_ptr<WebRTCTrack> mAudioTrack;
+    std::shared_ptr<WebRTCTrack> mRemoteVideoTrack;
+    std::shared_ptr<WebRTCTrack> mRemoteAudioTrack;
     std::string mLocalSdp;
     SDPType mLocalSdpType;
     std::vector<std::string> mLocalCandidates;
