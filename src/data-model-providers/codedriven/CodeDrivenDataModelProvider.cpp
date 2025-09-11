@@ -247,8 +247,8 @@ CHIP_ERROR CodeDrivenDataModelProvider::EndpointUniqueID(EndpointId endpointId, 
 {
     EndpointInterface * endpoint = GetEndpointInterface(endpointId);
     VerifyOrReturnError(endpoint != nullptr, CHIP_IM_GLOBAL_STATUS(UnsupportedEndpoint));
-    EndpointUniqueId = endpoint->EndpointUniqueID();
-    return CHIP_NO_ERROR;
+    CharSpan uniqueId = endpoint->EndpointUniqueID();
+    return CopyCharSpanToMutableCharSpan(uniqueId, EndpointUniqueId);
 }
 #endif
 

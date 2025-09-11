@@ -62,7 +62,7 @@ public:
         Builder & SetDeviceTypes(Span<const DataModel::DeviceTypeEntry> deviceTypes);
 
 #if CHIP_CONFIG_USE_ENDPOINT_UNIQUE_ID
-        Builder & SetEndpointUniqueId(MutableCharSpan endpointUniqueId);
+        Builder & SetEndpointUniqueId(CharSpan endpointUniqueId);
 #endif
         SpanEndpoint Build();
 
@@ -72,7 +72,7 @@ public:
         Span<const DataModel::DeviceTypeEntry> mDeviceTypes;
 
 #if CHIP_CONFIG_USE_ENDPOINT_UNIQUE_ID
-        MutableCharSpan mEndpointUniqueId;
+        CharSpan mEndpointUniqueId;
 #endif
     };
 
@@ -93,14 +93,14 @@ public:
     CHIP_ERROR ClientClusters(ReadOnlyBufferBuilder<ClusterId> & out) const override;
 
 #if CHIP_CONFIG_USE_ENDPOINT_UNIQUE_ID
-    MutableCharSpan EndpointUniqueID() const override;
+    CharSpan EndpointUniqueID() const override;
 #endif
 
 private:
     // Private constructor for Builder
 #if CHIP_CONFIG_USE_ENDPOINT_UNIQUE_ID
     SpanEndpoint(const Span<const ClusterId> & clientClusters, const Span<const SemanticTag> & semanticTags,
-                 const Span<const DataModel::DeviceTypeEntry> & deviceTypes, const MutableCharSpan & uniqueEndpointId);
+                 const Span<const DataModel::DeviceTypeEntry> & deviceTypes, const CharSpan & uniqueEndpointId);
 #else
     SpanEndpoint(const Span<const ClusterId> & clientClusters, const Span<const SemanticTag> & semanticTags,
                  const Span<const DataModel::DeviceTypeEntry> & deviceTypes);
@@ -112,7 +112,7 @@ private:
     Span<const ClusterId> mClientClusters;
 
 #if CHIP_CONFIG_USE_ENDPOINT_UNIQUE_ID
-    MutableCharSpan mEndpointUniqueId;
+    CharSpan mEndpointUniqueId;
 #endif
 };
 
