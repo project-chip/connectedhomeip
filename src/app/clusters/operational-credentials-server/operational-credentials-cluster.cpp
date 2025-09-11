@@ -34,10 +34,6 @@
 #include <lib/support/CodeUtils.h>
 #include <tracing/macros.h>
 
-/****************************************************************************
- * @file
- * @brief Implementation for the Operational Credentials Cluster
- ***************************************************************************/
 
 using namespace chip;
 using namespace chip::app;
