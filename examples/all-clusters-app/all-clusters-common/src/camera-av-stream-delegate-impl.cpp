@@ -147,7 +147,7 @@ Protocols::InteractionModel::Status CameraAVStreamManager::AudioStreamDeallocate
     return Status::Success;
 }
 
-Protocols::InteractionModel::Status CameraAVStreamManager::SnapshotStreamAllocate(const SnapshotStreamStruct & allocateArgs,
+Protocols::InteractionModel::Status CameraAVStreamManager::SnapshotStreamAllocate(const SnapshotStreamAllocateArgs & allocateArgs,
                                                                                   uint16_t & outStreamID)
 {
     outStreamID = kInvalidStreamID;
