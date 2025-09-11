@@ -35,6 +35,7 @@ using namespace chip::Protocols::InteractionModel;
 
 namespace {
 
+// Diagnostic logs cluster is a device-wide cluster, so we only need one cluster instance.
 LazyRegisteredServerCluster<DiagnosticLogsCluster> gDiagnosticLogsCluster;
 DiagnosticLogsProviderDelegate * gDiagnosticLogsProviderDelegate = nullptr;
 
