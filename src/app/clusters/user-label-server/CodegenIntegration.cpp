@@ -1,0 +1,126 @@
+/*
+ *
+ *    Copyright (c) 2025 Project CHIP Authors
+ *    All rights reserved.
+ *
+ *    Licensed under the Apache License, Version 2.0 (the "License");
+ *    you may not use this file except in compliance with the License.
+ *    You may obtain a copy of the License at
+ *
+ *        http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *    Unless required by applicable law or agreed to in writing, software
+ *    distributed under the License is distributed on an "AS IS" BASIS,
+ *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *    See the License for the specific language governing permissions and
+ *    limitations under the License.
+ */
+
+#include <app/clusters/user-label-server/user-label-cluster.h>
+#include <app/server/Server.h>
+#include <app/static-cluster-config/UserLabel.h>
+#include <app/util/attribute-storage.h>
+#include <data-model-providers/codegen/ClusterIntegration.h>
+#include <data-model-providers/codegen/CodegenDataModelProvider.h>
+
+using namespace chip;
+using namespace chip::app;
+using namespace chip::app::Clusters;
+using namespace chip::app::Clusters::UserLabel;
+using namespace chip::app::Clusters::UserLabel::Attributes;
+
+namespace {
+
+constexpr size_t kUserLabelFixedClusterCount = UserLabel::StaticApplicationConfig::kFixedClusterConfig.size();
+constexpr size_t kUserLabelMaxClusterCount   = kUserLabelFixedClusterCount + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT;
+
+LazyRegisteredServerCluster<UserLabelCluster> gServers[kUserLabelMaxClusterCount];
+
+class IntegrationDelegate : public CodegenClusterIntegration::Delegate
+{
+public:
+    ServerClusterRegistration & CreateRegistration(EndpointId endpointId, unsigned emberEndpointIndex,
+                                                   uint32_t optionalAttributeBits, uint32_t featureMap) override
+    {
+        gServers[emberEndpointIndex].Create(endpointId);
+        return gServers[emberEndpointIndex].Registration();
+    }
+
+    ServerClusterInterface & FindRegistration(unsigned emberEndpointIndex) override
+    {
+        return gServers[emberEndpointIndex].Cluster();
+    }
+
+    void ReleaseRegistration(unsigned emberEndpointIndex) override { gServers[emberEndpointIndex].Destroy(); }
+};
+
+class UserLabelFabricTableDelegate : public chip::FabricTable::Delegate
+{
+public:
+    // Gets called when a fabric is deleted
+    void OnFabricRemoved(const FabricTable & fabricTable, FabricIndex fabricIndex) override
+    {
+        // If the FabricIndex matches the last remaining entry in the Fabrics list, then the device SHALL delete all Matter
+        // related data on the node which was created since it was commissioned.
+        if (Server::GetInstance().GetFabricTable().FabricCount() == 0)
+        {
+            ChipLogProgress(Zcl, "UserLabel: Last Fabric index 0x%x was removed", static_cast<unsigned>(fabricIndex));
+
+            // Delete all user label data on the node which was added since it was commissioned.
+            DeviceLayer::DeviceInfoProvider * provider = DeviceLayer::GetDeviceInfoProvider();
+            if (provider)
+            {
+                for (auto endpoint : EnabledEndpointsWithServerCluster(UserLabel::Id))
+                {
+                    // If UserLabel cluster is implemented on this endpoint
+                    if (CHIP_NO_ERROR != provider->ClearUserLabelList(endpoint))
+                    {
+                        ChipLogError(Zcl, "UserLabel::Failed to clear UserLabelList for endpoint:%d", endpoint);
+                    }
+                }
+            }
+        }
+    }
+};
+
+UserLabelFabricTableDelegate gUserLabelFabricDelegate;
+
+} // namespace
+
+void emberAfUserLabelClusterServerInitCallback(EndpointId endpointId)
+{
+    IntegrationDelegate integrationDelegate;
+
+    // register a singleton server (root endpoint only)
+    CodegenClusterIntegration::RegisterServer(
+        {
+            .endpointId                      = endpointId,
+            .clusterId                       = UserLabel::Id,
+            .fixedClusterServerEndpointCount = kUserLabelFixedClusterCount,
+            .maxEndpointCount                = kUserLabelMaxClusterCount,
+            .fetchFeatureMap                 = false,
+            .fetchOptionalAttributes         = false,
+        },
+        integrationDelegate);
+
+    Server::GetInstance().GetFabricTable().AddFabricDelegate(&gUserLabelFabricDelegate);
+}
+
+void MatterUserLabelClusterServerShutdownCallback(EndpointId endpointId)
+{
+    Server::GetInstance().GetFabricTable().RemoveFabricDelegate(&gUserLabelFabricDelegate);
+
+    IntegrationDelegate integrationDelegate;
+
+    // register a singleton server (root endpoint only)
+    CodegenClusterIntegration::UnregisterServer(
+        {
+            .endpointId                      = endpointId,
+            .clusterId                       = UserLabel::Id,
+            .fixedClusterServerEndpointCount = kUserLabelFixedClusterCount,
+            .maxEndpointCount                = kUserLabelMaxClusterCount,
+        },
+        integrationDelegate);
+}
+
+void MatterUserLabelPluginServerInitCallback() {}
