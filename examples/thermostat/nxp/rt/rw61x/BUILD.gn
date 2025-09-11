@@ -194,6 +194,7 @@ rt_executable("thermostat") {
     "${common_example_dir}/device_callbacks/include",
     "${common_example_dir}/app_task/include",
     "${common_example_dir}/factory_data/include",
+    "${common_example_dir}/operational_keystore/include",
   ]
 
   sources += [
@@ -203,6 +204,7 @@ rt_executable("thermostat") {
     "${common_example_dir}/device_manager/source/CHIPDeviceManager.cpp",
     "${common_example_dir}/icd/source/ICDUtil.cpp",
     "${common_example_dir}/matter_button/source/ButtonRegistrationEmpty.cpp",
+    "${common_example_dir}/operational_keystore/source/OperationalKeystoreS50.cpp",
   ]
 
   deps = [
@@ -211,6 +213,9 @@ rt_executable("thermostat") {
     "${chip_root}/src/platform/logging:default",
     "${chip_root}/src/setup_payload:onboarding-codes-utils",
   ]
+
+  # Operational key secure storage
+  defines += [ "CONFIG_OPERATIONAL_KEYSTORE=1" ]
 
   if (nxp_enable_matter_cli) {
     defines += [ "ENABLE_CHIP_SHELL" ]

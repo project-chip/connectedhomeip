@@ -4323,8 +4323,8 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "VideoSensorParams";
         case chip::app::Clusters::CameraAvStreamManagement::Attributes::NightVisionUsesInfrared::Id:
             return "NightVisionUsesInfrared";
-        case chip::app::Clusters::CameraAvStreamManagement::Attributes::MinViewport::Id:
-            return "MinViewport";
+        case chip::app::Clusters::CameraAvStreamManagement::Attributes::MinViewportResolution::Id:
+            return "MinViewportResolution";
         case chip::app::Clusters::CameraAvStreamManagement::Attributes::RateDistortionTradeOffPoints::Id:
             return "RateDistortionTradeOffPoints";
         case chip::app::Clusters::CameraAvStreamManagement::Attributes::MaxContentBufferSize::Id:
@@ -4432,6 +4432,8 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "PanMin";
         case chip::app::Clusters::CameraAvSettingsUserLevelManagement::Attributes::PanMax::Id:
             return "PanMax";
+        case chip::app::Clusters::CameraAvSettingsUserLevelManagement::Attributes::MovementState::Id:
+            return "MovementState";
         case chip::app::Clusters::CameraAvSettingsUserLevelManagement::Attributes::GeneratedCommandList::Id:
             return "GeneratedCommandList";
         case chip::app::Clusters::CameraAvSettingsUserLevelManagement::Attributes::AcceptedCommandList::Id:
@@ -6309,8 +6311,8 @@ char const * AcceptedCommandIdToText(chip::ClusterId cluster, chip::CommandId id
             return "LookupRootCertificate";
         case chip::app::Clusters::TlsCertificateManagement::Commands::RemoveRootCertificate::Id:
             return "RemoveRootCertificate";
-        case chip::app::Clusters::TlsCertificateManagement::Commands::TLSClientCSR::Id:
-            return "TLSClientCSR";
+        case chip::app::Clusters::TlsCertificateManagement::Commands::ClientCSR::Id:
+            return "ClientCSR";
         case chip::app::Clusters::TlsCertificateManagement::Commands::ProvisionClientCertificate::Id:
             return "ProvisionClientCertificate";
         case chip::app::Clusters::TlsCertificateManagement::Commands::FindClientCertificate::Id:
@@ -6953,8 +6955,8 @@ char const * GeneratedCommandIdToText(chip::ClusterId cluster, chip::CommandId i
             return "FindRootCertificateResponse";
         case chip::app::Clusters::TlsCertificateManagement::Commands::LookupRootCertificateResponse::Id:
             return "LookupRootCertificateResponse";
-        case chip::app::Clusters::TlsCertificateManagement::Commands::TLSClientCSRResponse::Id:
-            return "TLSClientCSRResponse";
+        case chip::app::Clusters::TlsCertificateManagement::Commands::ClientCSRResponse::Id:
+            return "ClientCSRResponse";
         case chip::app::Clusters::TlsCertificateManagement::Commands::FindClientCertificateResponse::Id:
             return "FindClientCertificateResponse";
         case chip::app::Clusters::TlsCertificateManagement::Commands::LookupClientCertificateResponse::Id:

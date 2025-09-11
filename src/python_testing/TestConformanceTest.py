@@ -116,7 +116,7 @@ def create_onoff_endpoint(endpoint: int) -> dict[int, dict[int, dict[int, Any]]]
     return endpoint_tlv
 
 
-class TestConformanceSupport(MatterBaseTest, DeviceConformanceTests):
+class TestConformanceTest(MatterBaseTest, DeviceConformanceTests):
     def setup_class(self):
         # Latest fully qualified version
         # TODO: It might be good to find a way to run this against each directory.
@@ -371,6 +371,41 @@ class TestConformanceSupport(MatterBaseTest, DeviceConformanceTests):
         expected_location = CommandPathLocation(endpoint_id=0, cluster_id=cluster_id, command_id=ocw_cmd_id)
         run_check_with_expected_failure(msg_suffix, expected_location, ProblemType.kMandatoryNotPresent)
         self.endpoints_tlv[0][cluster_id][accepted_cmd_id] = old_cmds
+
+    def test_root_node_restricted_clusters(self):
+        def check_cluster(cluster):
+            self.endpoints = {0: {cluster: {}}}
+            problems = self.check_root_node_restricted_clusters()
+            asserts.assert_equal(len(problems), 0, f"Unexpected problem with {cluster} on EP0")
+
+            self.endpoints[1] = {cluster: {}}
+            problems = self.check_root_node_restricted_clusters()
+            asserts.assert_equal(len(problems), 1, f"Did not see expected problem with {cluster} on EP1")
+
+            # random endpoint
+            self.endpoints[13] = {cluster: {}}
+            problems = self.check_root_node_restricted_clusters()
+            asserts.assert_equal(len(problems), 2, f"Did not see both endpoint problems listed with {cluster}")
+
+        root_node_restricted_clusters = [Clusters.AccessControl, Clusters.TimeSynchronization,
+                                         Clusters.TlsCertificateManagement, Clusters.TlsClientManagement]
+        for cluster in root_node_restricted_clusters:
+            check_cluster(cluster)
+
+        # check all together on EP0
+        self.endpoints = {0: {}}
+        for cluster in root_node_restricted_clusters:
+            self.endpoints[0][cluster] = {}
+        problems = self.check_root_node_restricted_clusters()
+        asserts.assert_equal(len(problems), 0, "Unexpected problem with all clusters on EP0")
+
+        # Adding on ep 1 should cause errors
+        self.endpoints[1] = {}
+        for cluster in root_node_restricted_clusters:
+            self.endpoints[1][cluster] = {}
+        problems = self.check_root_node_restricted_clusters()
+        asserts.assert_equal(len(problems), len(root_node_restricted_clusters),
+                             "Did not see expected problems with all clusters on EP1")
 
 
 if __name__ == "__main__":

@@ -158,6 +158,24 @@ void ZoneManager::OnZoneTriggerTimeout(chip::System::Layer * systemLayer, void *
 
     for (auto trigCtxtIter = zoneManager->mTriggerContexts.begin(); trigCtxtIter != zoneManager->mTriggerContexts.end();)
     {
+        if (trigCtxtIter->triggerState == TriggerState::InBlindDuration)
+        {
+            trigCtxtIter->remainingBlindDuration--;
+
+            if (trigCtxtIter->remainingBlindDuration > 0)
+            {
+                trigCtxtIter++;
+            }
+            else
+            {
+                // Remove the trigger context after the expiry of the
+                // blindDuration
+                trigCtxtIter = zoneManager->mTriggerContexts.erase(trigCtxtIter);
+            }
+
+            continue;
+        }
+
         // Advance time since initial trigger by the timer timeout period
         trigCtxtIter->timeSinceInitialTrigger += kTimerPeriod;
 
@@ -168,8 +186,8 @@ void ZoneManager::OnZoneTriggerTimeout(chip::System::Layer * systemLayer, void *
                             trigCtxtIter->triggerCtrl.zoneID);
             zoneManager->GetZoneMgmtServer()->GenerateZoneStoppedEvent(trigCtxtIter->triggerCtrl.zoneID,
                                                                        ZoneEventStoppedReasonEnum::kActionStopped);
+            // Set the triggerState to BlindDuration
             trigCtxtIter->triggerState = TriggerState::InBlindDuration;
-            trigCtxtIter               = zoneManager->mTriggerContexts.erase(trigCtxtIter);
         }
         else if (trigCtxtIter->timeSinceInitialTrigger > trigCtxtIter->triggerCtrl.maxDuration)
         {
@@ -178,8 +196,8 @@ void ZoneManager::OnZoneTriggerTimeout(chip::System::Layer * systemLayer, void *
                             trigCtxtIter->triggerCtrl.zoneID);
             zoneManager->GetZoneMgmtServer()->GenerateZoneStoppedEvent(trigCtxtIter->triggerCtrl.zoneID,
                                                                        ZoneEventStoppedReasonEnum::kTimeout);
+            // Set the triggerState to BlindDuration
             trigCtxtIter->triggerState = TriggerState::InBlindDuration;
-            trigCtxtIter               = zoneManager->mTriggerContexts.erase(trigCtxtIter);
         }
         else
         {
@@ -217,6 +235,7 @@ void ZoneManager::OnZoneTriggeredEvent(uint16_t zoneId,
         trigCtxt.triggerDetectedDuration     = trigger.Value().initialDuration;
         trigCtxt.prevTriggerDetectedDuration = trigCtxt.triggerDetectedDuration;
         trigCtxt.triggerCtrl                 = trigger.Value();
+        trigCtxt.remainingBlindDuration      = trigger.Value().blindDuration;
         trigCtxt.triggerCount                = 1;
         mTriggerContexts.push_back(trigCtxt);
 
@@ -225,6 +244,10 @@ void ZoneManager::OnZoneTriggeredEvent(uint16_t zoneId,
     }
     else
     {
+        // Nothing to do for zone if it is in blindDuration
+        VerifyOrReturn(foundTrigCtxt->triggerState != TriggerState::InBlindDuration,
+                       ChipLogProgress(Camera, "Ignoring ZoneTriggered event for zone in BlindDuration"));
+
         // Zone has already been triggered at least once.
         foundTrigCtxt->triggerCount++;
         // Spec logic for advancing triggerDetectedDuration

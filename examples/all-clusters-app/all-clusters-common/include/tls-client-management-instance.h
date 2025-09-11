@@ -62,6 +62,8 @@ public:
                                                                                  uint16_t endpointID) override;
 
     static inline TlsClientManagementCommandDelegate & GetInstance() { return instance; }
+
+    uint16_t GetEndpointId(Provisioned * provisioned);
 };
 
 } // namespace Clusters

@@ -39,7 +39,7 @@ using ICECandidateStruct       = chip::app::Clusters::Globals::Structs::ICECandi
 using StreamUsageEnum          = chip::app::Clusters::Globals::StreamUsageEnum;
 using WebRTCEndReasonEnum      = chip::app::Clusters::Globals::WebRTCEndReasonEnum;
 
-class WebRTCProviderManager : public Delegate
+class WebRTCProviderManager : public Delegate, public WebRTCTransportProviderController
 {
 public:
     WebRTCProviderManager() :
@@ -53,6 +53,8 @@ public:
     void CloseConnection();
 
     void SetMediaController(MediaController * mediaController);
+
+    void SetWebRTCTransportProvider(std::unique_ptr<WebRTCTransportProviderServer> webRTCTransportProvider) override;
 
     CHIP_ERROR HandleSolicitOffer(const OfferRequestArgs & args, WebRTCSessionStruct & outSession,
                                   bool & outDeferredOffer) override;
@@ -69,8 +71,8 @@ public:
                                 chip::app::DataModel::Nullable<uint16_t> audioStreamID) override;
 
     CHIP_ERROR ValidateStreamUsage(StreamUsageEnum streamUsage,
-                                   const chip::Optional<chip::app::DataModel::Nullable<uint16_t>> & videoStreamId,
-                                   const chip::Optional<chip::app::DataModel::Nullable<uint16_t>> & audioStreamId) override;
+                                   chip::Optional<chip::app::DataModel::Nullable<uint16_t>> & videoStreamId,
+                                   chip::Optional<chip::app::DataModel::Nullable<uint16_t>> & audioStreamId) override;
 
     void SetCameraDevice(CameraDeviceInterface * aCameraDevice);
 
@@ -84,43 +86,34 @@ public:
 
     bool HasAllocatedAudioStreams() override;
 
+    void LiveStreamPrivacyModeChanged(bool privacyModeEnabled);
+
 private:
-    enum class CommandType : uint8_t
-    {
-        kUndefined     = 0,
-        kOffer         = 1,
-        kAnswer        = 2,
-        kICECandidates = 3,
-    };
+    void ScheduleOfferSend(uint16_t sessionId);
 
-    enum class State : uint8_t
-    {
-        Idle,                 ///< Default state, no communication initiated yet
-        SendingOffer,         ///< Sending Offer command from camera
-        SendingAnswer,        ///< Sending Answer command from camera
-        SendingICECandidates, ///< Sending ICECandidates command from camera
-    };
+    void ScheduleICECandidatesSend(uint16_t sessionId);
 
-    void MoveToState(const State targetState);
-    const char * GetStateStr() const;
+    void ScheduleAnswerSend(uint16_t sessionId);
 
-    void ScheduleOfferSend();
-
-    void ScheduleICECandidatesSend();
-
-    void ScheduleAnswerSend();
+    void ScheduleEndSend(uint16_t sessionId);
 
     void RegisterWebrtcTransport(uint16_t sessionId);
 
-    CHIP_ERROR SendOfferCommand(chip::Messaging::ExchangeManager & exchangeMgr, const chip::SessionHandle & sessionHandle);
+    CHIP_ERROR SendOfferCommand(chip::Messaging::ExchangeManager & exchangeMgr, const chip::SessionHandle & sessionHandle,
+                                uint16_t sessionId);
 
-    CHIP_ERROR SendAnswerCommand(chip::Messaging::ExchangeManager & exchangeMgr, const chip::SessionHandle & sessionHandle);
+    CHIP_ERROR SendAnswerCommand(chip::Messaging::ExchangeManager & exchangeMgr, const chip::SessionHandle & sessionHandle,
+                                 uint16_t sessionId);
 
-    CHIP_ERROR SendICECandidatesCommand(chip::Messaging::ExchangeManager & exchangeMgr, const chip::SessionHandle & sessionHandle);
+    CHIP_ERROR SendICECandidatesCommand(chip::Messaging::ExchangeManager & exchangeMgr, const chip::SessionHandle & sessionHandle,
+                                        uint16_t sessionId);
 
-    CHIP_ERROR AcquireAudioVideoStreams();
+    CHIP_ERROR SendEndCommand(chip::Messaging::ExchangeManager & exchangeMgr, const chip::SessionHandle & sessionHandle,
+                              uint16_t sessionId, WebRTCEndReasonEnum endReason);
 
-    CHIP_ERROR ReleaseAudioVideoStreams();
+    CHIP_ERROR AcquireAudioVideoStreams(uint16_t sessionId);
+
+    CHIP_ERROR ReleaseAudioVideoStreams(uint16_t sessionId);
 
     static void OnDeviceConnected(void * context, chip::Messaging::ExchangeManager & exchangeMgr,
                                   const chip::SessionHandle & sessionHandle);
@@ -128,42 +121,27 @@ private:
     static void OnDeviceConnectionFailure(void * context, const chip::ScopedNodeId & peerId, CHIP_ERROR error);
 
     // WebRTC Callbacks
-    void OnLocalDescription(const std::string & sdp, SDPType type);
-    void OnICECandidate(const std::string & candidate);
-    void OnConnectionStateChanged(bool connected);
-    void OnTrack(std::shared_ptr<WebRTCTrack> track);
+    void OnLocalDescription(const std::string & sdp, SDPType type, const uint16_t sessionId);
+    void OnConnectionStateChanged(bool connected, const uint16_t sessionId);
 
-    std::shared_ptr<WebRTCPeerConnection> mPeerConnection;
-    std::shared_ptr<WebRTCTrack> mVideoTrack;
-    std::shared_ptr<WebRTCTrack> mAudioTrack;
-
-    chip::ScopedNodeId mPeerId;
-    chip::EndpointId mOriginatingEndpointId;
-
-    CommandType mCommandType = CommandType::kUndefined;
-
-    State mState = State::Idle;
-
-    uint16_t mCurrentSessionId = 0;
-    std::string mLocalSdp;
-
-    // Each string in this vector represents a local ICE candidate used to facilitate the negotiation
-    // of peer-to-peer connections through NATs (Network Address Translators) and firewalls.
-    std::vector<std::string> mLocalCandidates;
+    WebrtcTransport * GetTransport(uint16_t sessionId);
 
     chip::Callback::Callback<chip::OnDeviceConnected> mOnConnectedCallback;
     chip::Callback::Callback<chip::OnDeviceConnectionFailure> mOnConnectionFailureCallback;
 
     std::unordered_map<uint16_t, std::unique_ptr<WebrtcTransport>> mWebrtcTransportMap;
-
-    uint16_t mVideoStreamID;
-    uint16_t mAudioStreamID;
+    // This is to retrieve the sessionIds for a given NodeId
+    std::unordered_map<NodeId, uint16_t> mSessionIdMap;
 
     MediaController * mMediaController = nullptr;
+
+    std::unique_ptr<WebRTCTransportProviderServer> mWebRTCTransportProvider = nullptr;
 
     // Handle to the Camera Device interface. For accessing other
     // clusters, if required.
     CameraDeviceInterface * mCameraDevice = nullptr;
+
+    bool mSoftLiveStreamPrivacyEnabled = false;
 };
 
 } // namespace WebRTCTransportProvider

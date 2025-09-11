@@ -192,9 +192,8 @@ CHIP_ERROR CryptoContext::GetAdditionalAuthData(const PacketHeader & header, uin
 }
 
 CHIP_ERROR CryptoContext::Encrypt(const uint8_t * input, size_t input_length, uint8_t * output, ConstNonceView nonce,
-                                  PacketHeader & header, MessageAuthenticationCode & mac) const
+                                  const PacketHeader & header, MessageAuthenticationCode & mac) const
 {
-
     const size_t taglen = header.MICTagLength();
 
     VerifyOrDie(taglen <= kMaxTagLen);
@@ -224,7 +223,7 @@ CHIP_ERROR CryptoContext::Encrypt(const uint8_t * input, size_t input_length, ui
             AES_CCM_encrypt(input, input_length, AAD, aadLen, mEncryptionKey, nonce.data(), nonce.size(), output, tag, taglen));
     }
 
-    mac.SetTag(&header, tag, taglen);
+    mac.SetTag(tag, taglen);
 
     return CHIP_NO_ERROR;
 }

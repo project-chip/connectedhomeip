@@ -46,6 +46,8 @@ class TestSpecParsingSelection(MatterBaseTest, DeviceConformanceTests):
                              "Incorrect directory selected for 1.4.1")
         asserts.assert_equal(dm_from_spec_version(0x01040200), PrebuiltDataModelDirectory.k1_4_2,
                              "Incorrect directory selected for 1.4.2")
+        asserts.assert_equal(dm_from_spec_version(0x01050000), PrebuiltDataModelDirectory.k1_5,
+                             "Incorrect directory selected for 1.5")
 
         # 1.2 doesn't include a specification revision field, so this should error
         with asserts.assert_raises(ConformanceException, "Expected assertion was not raised for spec version 1.2"):
@@ -161,7 +163,13 @@ class TestSpecParsingSelection(MatterBaseTest, DeviceConformanceTests):
         # 1.4.2 is OK if TC is off
         self._run_conformance_against_device(spec_version=0x01040200, tc_enabled=False,
                                              expect_success_conformance=True, expect_success_revisions=True)
+        # 1.5 is OK if TC is off
+        self._run_conformance_against_device(spec_version=0x01050000, tc_enabled=False,
+                                             expect_success_conformance=True, expect_success_revisions=True)
 
+        # 1.5 is OK if TC is on
+        self._run_conformance_against_device(spec_version=0x01050000, tc_enabled=True,
+                                             expect_success_conformance=True, expect_success_revisions=True)
         # 1.4.2 is OK if TC is on
         self._run_conformance_against_device(spec_version=0x01040200, tc_enabled=True,
                                              expect_success_conformance=True, expect_success_revisions=True)

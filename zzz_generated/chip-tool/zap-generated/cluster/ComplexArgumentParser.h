@@ -789,6 +789,11 @@ static CHIP_ERROR Setup(const char * label,
 
 static void Finalize(chip::app::Clusters::CameraAvSettingsUserLevelManagement::Structs::DPTZStruct::Type & request);
 
+static CHIP_ERROR Setup(const char * label, chip::app::Clusters::WebRTCTransportProvider::Structs::SFrameStruct::Type & request,
+                        Json::Value & value);
+
+static void Finalize(chip::app::Clusters::WebRTCTransportProvider::Structs::SFrameStruct::Type & request);
+
 static CHIP_ERROR
 Setup(const char * label,
       chip::app::Clusters::PushAvStreamTransport::Structs::TransportMotionTriggerTimeControlStruct::Type & request,

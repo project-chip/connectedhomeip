@@ -10147,6 +10147,39 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
+@implementation MTRWebRTCTransportProviderClusterSFrameStruct
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _cipherSuite = @(0);
+
+        _baseKey = [NSData data];
+
+        _kid = [NSData data];
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRWebRTCTransportProviderClusterSFrameStruct alloc] init];
+
+    other.cipherSuite = self.cipherSuite;
+    other.baseKey = self.baseKey;
+    other.kid = self.kid;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: cipherSuite:%@; baseKey:%@; kid:%@; >", NSStringFromClass([self class]), _cipherSuite, [_baseKey base64EncodedStringWithOptions:0], [_kid base64EncodedStringWithOptions:0]];
+    return descriptionString;
+}
+
+@end
+
 @implementation MTRPushAVStreamTransportClusterTransportMotionTriggerTimeControlStruct
 - (instancetype)init
 {

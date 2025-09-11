@@ -272,6 +272,24 @@ choice CHIP_OTA_REQUEST_UPGRADE_TYPE
 
 endchoice
 
+config CHIP_NXP_MULTIPLE_BLE_CONNECTIONS
+	bool "Use Multiple BLE connections after commissioning"
+	depends on CHIP_NXP_PLATFORM_MCXW71 || CHIP_NXP_PLATFORM_MCXW72
+	help
+	  Enable app usage of Multiple BLE connections after commissioning.
+
+config CHIP_NXP_BLE_PAIRING
+	bool "Enable BLE Pairing"
+	default y if CHIP_NXP_MULTIPLE_BLE_CONNECTIONS
+	help
+	  Enable BLE Pairing for Multiple BLE connections after commissioning.
+
+config CHIP_NXP_BLE_BONDING
+	bool "Enable BLE Bonding"
+	default y if CHIP_NXP_MULTIPLE_BLE_CONNECTIONS
+	help
+	  Enable BLE Bonding for Multiple BLE connections after commissioning.
+
 config NXP_USE_SMU2_STATIC
 	bool "Use SMU2"
 	depends on CHIP_NXP_PLATFORM_MCXW71 || CHIP_NXP_PLATFORM_MCXW72

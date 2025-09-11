@@ -66,69 +66,83 @@ public:
     SoilMoistureMeasuredValue::TypeInfo::Type GetSoilMoistureMeasuredValue() const { return mSoilMoistureMeasuredValue; }
 };
 
+class SoilMeasurementClusterTest
+{
+    SoilMeasurementClusterLocal soilMeasurement;
+
+public:
+    template <typename... Args>
+    SoilMeasurementClusterTest(Args &&... args) : soilMeasurement(std::forward<Args>(args)...)
+    {}
+
+    template <typename F>
+    void Check(F check)
+    {
+        check(soilMeasurement);
+    }
+};
+
 } // namespace
 
 TEST_F(TestSoilMeasurementCluster, AttributeTest)
 {
-    {
-        SoilMeasurementClusterLocal soilMeasurement(kEndpointWithSoilMeasurement, kDefaultSoilMoistureMeasurementLimits);
+    SoilMeasurementClusterTest(kEndpointWithSoilMeasurement, kDefaultSoilMoistureMeasurementLimits)
+        .Check([](SoilMeasurementClusterLocal & soilMeasurement) {
+            ReadOnlyBufferBuilder<DataModel::AttributeEntry> attributes;
+            ASSERT_EQ(
+                soilMeasurement.Attributes(ConcreteClusterPath(kEndpointWithSoilMeasurement, SoilMeasurement::Id), attributes),
+                CHIP_NO_ERROR);
 
-        ReadOnlyBufferBuilder<DataModel::AttributeEntry> attributes;
-        ASSERT_EQ(soilMeasurement.Attributes(ConcreteClusterPath(kEndpointWithSoilMeasurement, SoilMeasurement::Id), attributes),
-                  CHIP_NO_ERROR);
-
-        ReadOnlyBufferBuilder<DataModel::AttributeEntry> expected;
-        AttributeListBuilder listBuilder(expected);
-        ASSERT_EQ(listBuilder.Append(Span(SoilMeasurement::Attributes::kMandatoryMetadata), {}), CHIP_NO_ERROR);
-        ASSERT_TRUE(Testing::EqualAttributeSets(attributes.TakeBuffer(), expected.TakeBuffer()));
-    }
+            ReadOnlyBufferBuilder<DataModel::AttributeEntry> expected;
+            AttributeListBuilder listBuilder(expected);
+            ASSERT_EQ(listBuilder.Append(Span(SoilMeasurement::Attributes::kMandatoryMetadata), {}), CHIP_NO_ERROR);
+            ASSERT_TRUE(Testing::EqualAttributeSets(attributes.TakeBuffer(), expected.TakeBuffer()));
+        });
 }
 
 TEST_F(TestSoilMeasurementCluster, SoilMoistureMeasuredValue)
 {
-    {
-        SoilMeasurementClusterLocal soilMeasurement(kEndpointWithSoilMeasurement, kDefaultSoilMoistureMeasurementLimits);
+    SoilMeasurementClusterTest(kEndpointWithSoilMeasurement, kDefaultSoilMoistureMeasurementLimits)
+        .Check([](SoilMeasurementClusterLocal & soilMeasurement) {
+            SoilMoistureMeasuredValue::TypeInfo::Type measuredValue;
+            measuredValue.SetNull();
+            ASSERT_EQ(soilMeasurement.GetSoilMoistureMeasuredValue(), measuredValue);
 
-        SoilMoistureMeasuredValue::TypeInfo::Type measuredValue;
-        measuredValue.SetNull();
-        ASSERT_EQ(soilMeasurement.GetSoilMoistureMeasuredValue(), measuredValue);
+            measuredValue = 50;
+            ASSERT_EQ(soilMeasurement.SetSoilMoistureMeasuredValue(measuredValue), CHIP_NO_ERROR);
+            ASSERT_EQ(soilMeasurement.GetSoilMoistureMeasuredValue(), measuredValue);
 
-        measuredValue = 50;
-        ASSERT_EQ(soilMeasurement.SetSoilMoistureMeasuredValue(measuredValue), CHIP_NO_ERROR);
-        ASSERT_EQ(soilMeasurement.GetSoilMoistureMeasuredValue(), measuredValue);
+            measuredValue = 101;
+            ASSERT_EQ(soilMeasurement.SetSoilMoistureMeasuredValue(measuredValue), CHIP_ERROR_INVALID_ARGUMENT);
 
-        measuredValue = 101;
-        ASSERT_EQ(soilMeasurement.SetSoilMoistureMeasuredValue(measuredValue), CHIP_ERROR_INVALID_ARGUMENT);
+            measuredValue = -1;
+            ASSERT_EQ(soilMeasurement.SetSoilMoistureMeasuredValue(measuredValue), CHIP_ERROR_INVALID_ARGUMENT);
 
-        measuredValue = -1;
-        ASSERT_EQ(soilMeasurement.SetSoilMoistureMeasuredValue(measuredValue), CHIP_ERROR_INVALID_ARGUMENT);
-
-        measuredValue.SetNull();
-        ASSERT_EQ(soilMeasurement.SetSoilMoistureMeasuredValue(measuredValue), CHIP_NO_ERROR);
-        ASSERT_EQ(soilMeasurement.GetSoilMoistureMeasuredValue(), measuredValue);
-    }
+            measuredValue.SetNull();
+            ASSERT_EQ(soilMeasurement.SetSoilMoistureMeasuredValue(measuredValue), CHIP_NO_ERROR);
+            ASSERT_EQ(soilMeasurement.GetSoilMoistureMeasuredValue(), measuredValue);
+        });
 }
 
 TEST_F(TestSoilMeasurementCluster, SoilMoistureMeasurementLimits)
 {
-    {
-        SoilMeasurementClusterLocal soilMeasurement(kEndpointWithSoilMeasurement, kDefaultSoilMoistureMeasurementLimits);
+    SoilMeasurementClusterTest(kEndpointWithSoilMeasurement, kDefaultSoilMoistureMeasurementLimits)
+        .Check([](SoilMeasurementClusterLocal & soilMeasurement) {
+            const auto & measurementLimits = soilMeasurement.GetSoilMoistureMeasurementLimits();
+            ASSERT_EQ(measurementLimits.measurementType, kDefaultSoilMoistureMeasurementLimits.measurementType);
+            ASSERT_EQ(measurementLimits.measured, kDefaultSoilMoistureMeasurementLimits.measured);
+            ASSERT_EQ(measurementLimits.minMeasuredValue, kDefaultSoilMoistureMeasurementLimits.minMeasuredValue);
+            ASSERT_EQ(measurementLimits.maxMeasuredValue, kDefaultSoilMoistureMeasurementLimits.maxMeasuredValue);
 
-        const auto & measurementLimits = soilMeasurement.GetSoilMoistureMeasurementLimits();
-        ASSERT_EQ(measurementLimits.measurementType, kDefaultSoilMoistureMeasurementLimits.measurementType);
-        ASSERT_EQ(measurementLimits.measured, kDefaultSoilMoistureMeasurementLimits.measured);
-        ASSERT_EQ(measurementLimits.minMeasuredValue, kDefaultSoilMoistureMeasurementLimits.minMeasuredValue);
-        ASSERT_EQ(measurementLimits.maxMeasuredValue, kDefaultSoilMoistureMeasurementLimits.maxMeasuredValue);
-
-        const auto & accuracyRange = measurementLimits.accuracyRanges[0];
-        const auto & defaultRange  = kDefaultSoilMoistureMeasurementLimits.accuracyRanges[0];
-        ASSERT_EQ(accuracyRange.rangeMin, defaultRange.rangeMin);
-        ASSERT_EQ(accuracyRange.rangeMax, defaultRange.rangeMax);
-        ASSERT_EQ(accuracyRange.percentMax.Value(), defaultRange.percentMax.Value());
-        ASSERT_FALSE(accuracyRange.percentMin.HasValue());
-        ASSERT_FALSE(accuracyRange.percentTypical.HasValue());
-        ASSERT_FALSE(accuracyRange.fixedMax.HasValue());
-        ASSERT_FALSE(accuracyRange.fixedMin.HasValue());
-        ASSERT_FALSE(accuracyRange.fixedTypical.HasValue());
-    }
+            const auto & accuracyRange = measurementLimits.accuracyRanges[0];
+            const auto & defaultRange  = kDefaultSoilMoistureMeasurementLimits.accuracyRanges[0];
+            ASSERT_EQ(accuracyRange.rangeMin, defaultRange.rangeMin);
+            ASSERT_EQ(accuracyRange.rangeMax, defaultRange.rangeMax);
+            ASSERT_EQ(accuracyRange.percentMax.Value(), defaultRange.percentMax.Value());
+            ASSERT_FALSE(accuracyRange.percentMin.HasValue());
+            ASSERT_FALSE(accuracyRange.percentTypical.HasValue());
+            ASSERT_FALSE(accuracyRange.fixedMax.HasValue());
+            ASSERT_FALSE(accuracyRange.fixedMin.HasValue());
+            ASSERT_FALSE(accuracyRange.fixedTypical.HasValue());
+        });
 }

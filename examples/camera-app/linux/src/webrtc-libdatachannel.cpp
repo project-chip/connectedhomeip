@@ -25,6 +25,11 @@ namespace {
 // Constants
 constexpr int kVideoH264PayloadType = 96;
 constexpr int kVideoBitRate         = 3000;
+constexpr int kSSRC                 = 42;
+constexpr int kMaxFragmentSize      = 1188; // 1200 (max packet size) - 12 (RTP header size)
+constexpr int kAudioBitRate         = 64000;
+constexpr int kOpusPayloadType      = 111;
+constexpr int kAudioSSRC            = 43;
 
 rtc::Description::Type SDPTypeToRtcType(SDPType type)
 {
@@ -105,12 +110,65 @@ class LibDataChannelTrack : public WebRTCTrack
 {
 public:
     LibDataChannelTrack(std::shared_ptr<rtc::Track> track) : mTrack(track) {}
+    // Initialize libdatachannel's RTP packetizer for H.264
+    void InitH264Packetizer()
+    {
+        // 90 kHz clock for H.264
+        mRtpCfg      = std::make_shared<rtc::RtpPacketizationConfig>(kSSRC, "videosrc", kVideoH264PayloadType,
+                                                                rtc::H264RtpPacketizer::ClockRate);
+        mRtpCfg->mid = mTrack->description().mid();
+
+        // Setting MTU size to 1200 as default size used in the libdatachannel is 1400
+        // Pick separator:
+        // - StartSequence : for Annex-B (00 00 01 / 00 00 00 01)
+        // - Length : for 4-byte length-prefixed NAL units
+        mPacketizer = std::make_shared<rtc::H264RtpPacketizer>(rtc::NalUnit::Separator::StartSequence, mRtpCfg, kMaxFragmentSize);
+
+        // RTCP helpers (recommended)
+        mSr   = std::make_shared<rtc::RtcpSrReporter>(mRtpCfg);
+        mNack = std::make_shared<rtc::RtcpNackResponder>();
+        mPacketizer->addToChain(mSr);
+        mPacketizer->addToChain(mNack);
+
+        // Attach handler chain to the sending track
+        mTrack->setMediaHandler(mPacketizer);
+    }
+
+    void InitOpusPacketizer()
+    {
+        mRtpCfgAudio = std::make_shared<rtc::RtpPacketizationConfig>(kAudioSSRC, "mic", kOpusPayloadType,
+                                                                     rtc::OpusRtpPacketizer::DefaultClockRate);
+
+        mRtpCfgAudio->mid = mTrack->description().mid();
+
+        mOpusPacketizer = std::make_shared<rtc::OpusRtpPacketizer>(mRtpCfgAudio);
+        mOpusSr         = std::make_shared<rtc::RtcpSrReporter>(mRtpCfgAudio);
+        mOpusNack       = std::make_shared<rtc::RtcpNackResponder>();
+        mOpusPacketizer->addToChain(mOpusSr);
+        mOpusPacketizer->addToChain(mOpusNack);
+
+        mTrack->setMediaHandler(mOpusPacketizer);
+    }
 
     void SendData(const char * data, size_t size) override
     {
         if (mTrack && mTrack->isOpen())
         {
-            mTrack->send(reinterpret_cast<const std::byte *>(data), size);
+            const std::string kind = mTrack->description().type();
+            if (kind == "video" && !mVideoInitDone)
+            {
+                InitH264Packetizer();
+                mVideoInitDone = true;
+            }
+            else if (kind == "audio" && !mAudioInitDone)
+            {
+                InitOpusPacketizer();
+                mAudioInitDone = true;
+            }
+            // Feed RAW H.264 access unit. Packetizer does NAL split, FU-A/STAP-A, RTP headers, marker bit, SR/NACK.
+            rtc::binary frame(size);
+            std::memcpy(frame.data(), data, size);
+            mTrack->send(std::move(frame));
         }
         else
         {
@@ -131,7 +189,23 @@ public:
     }
 
 private:
+    // Lazy-init state
+    bool mAudioInitDone = false;
+    bool mVideoInitDone = false;
+
     std::shared_ptr<rtc::Track> mTrack;
+
+    // For Video
+    std::shared_ptr<rtc::RtpPacketizationConfig> mRtpCfg;
+    std::shared_ptr<rtc::H264RtpPacketizer> mPacketizer;
+    std::shared_ptr<rtc::RtcpSrReporter> mSr;
+    std::shared_ptr<rtc::RtcpNackResponder> mNack;
+
+    // For audio
+    std::shared_ptr<rtc::RtpPacketizationConfig> mRtpCfgAudio;
+    std::shared_ptr<rtc::OpusRtpPacketizer> mOpusPacketizer;
+    std::shared_ptr<rtc::RtcpSrReporter> mOpusSr;
+    std::shared_ptr<rtc::RtcpNackResponder> mOpusNack;
 };
 
 class LibDataChannelPeerConnection : public WebRTCPeerConnection
@@ -202,15 +276,23 @@ public:
     {
         if (mediaType == MediaType::Video)
         {
-            rtc::Description::Video media("video", rtc::Description::Direction::SendOnly);
-            media.addH264Codec(kVideoH264PayloadType);
-            media.setBitrate(kVideoBitRate);
-            auto track = mPeerConnection->addTrack(media);
+            rtc::Description::Video vMedia("video", rtc::Description::Direction::SendOnly);
+            vMedia.addH264Codec(kVideoH264PayloadType);
+            vMedia.setBitrate(kVideoBitRate);
+            vMedia.addSSRC(kSSRC, "video-stream", "stream1", "video-stream");
+            auto track = mPeerConnection->addTrack(vMedia);
             return std::make_shared<LibDataChannelTrack>(track);
         }
 
-        // TODO: Add audio track support
-        ChipLogProgress(Camera, "Audio track support is not yet implemented");
+        if (mediaType == MediaType::Audio)
+        {
+            rtc::Description::Audio aMedia("audio", rtc::Description::Direction::SendOnly);
+            aMedia.addOpusCodec(kOpusPayloadType);
+            aMedia.setBitrate(kAudioBitRate);
+            aMedia.addSSRC(kAudioSSRC, "audio-stream", "stream1", "audio-stream");
+            auto track = mPeerConnection->addTrack(aMedia);
+            return std::make_shared<LibDataChannelTrack>(track);
+        }
         return nullptr;
     }
 

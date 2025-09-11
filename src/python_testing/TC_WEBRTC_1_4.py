@@ -44,7 +44,7 @@ from test_plan_support import commission_if_required
 from matter.ChipDeviceCtrl import TransportPayloadCapability
 from matter.clusters import Objects, WebRTCTransportProvider
 from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
-from matter.webrtc import PeerConnection, WebRTCManager
+from matter.webrtc import LibdatachannelPeerConnection, WebRTCManager
 
 
 class TC_WEBRTC_1_4(MatterBaseTest, WebRTCTestHelper):
@@ -96,7 +96,7 @@ class TC_WEBRTC_1_4(MatterBaseTest, WebRTCTestHelper):
         return "[TC-WEBRTC-1.4] Validate Non-Deferred Offer Flow for Battery-Powered Camera in Standby Mode"
 
     def pics_TC_WEBRTC_1_4(self) -> list[str]:
-        return ["WEBRTCR", "WEBRTCP"]
+        return ["WEBRTCR.C", "WEBRTCP.S"]
 
     @property
     def default_timeout(self) -> int:
@@ -108,7 +108,7 @@ class TC_WEBRTC_1_4(MatterBaseTest, WebRTCTestHelper):
 
         endpoint = self.get_endpoint(default=1)
         webrtc_manager = WebRTCManager(event_loop=self.event_loop)
-        webrtc_peer: PeerConnection = webrtc_manager.create_peer(
+        webrtc_peer: LibdatachannelPeerConnection = webrtc_manager.create_peer(
             node_id=self.dut_node_id, fabric_index=self.default_controller.GetFabricIndexInternal(), endpoint=endpoint
         )
 
@@ -140,7 +140,7 @@ class TC_WEBRTC_1_4(MatterBaseTest, WebRTCTestHelper):
 
         self.step(2)
         # TH should immediately get Offer from DUT
-        offer_sessionId, remote_offer_sdp = await webrtc_peer.get_remote_offer(timeout=5)
+        offer_sessionId, remote_offer_sdp = await webrtc_peer.get_remote_offer(timeout_s=5)
         asserts.assert_equal(offer_sessionId, session_id, "Invalid session id")
         asserts.assert_true(len(remote_offer_sdp) > 0, "Invalid offer sdp received")
 
@@ -169,7 +169,7 @@ class TC_WEBRTC_1_4(MatterBaseTest, WebRTCTestHelper):
         )
 
         self.step(6)
-        ice_session_id, remote_candidates = await webrtc_peer.get_remote_ice_candidates(timeout=30)
+        ice_session_id, remote_candidates = await webrtc_peer.get_remote_ice_candidates(timeout_s=30)
         asserts.assert_equal(ice_session_id, session_id, "Invalid session id")
         asserts.assert_true(len(remote_candidates) > 0, "Invalid ice candidates received")
         webrtc_peer.set_remote_ice_candidates(remote_candidates)
@@ -191,7 +191,7 @@ class TC_WEBRTC_1_4(MatterBaseTest, WebRTCTestHelper):
             payloadCapability=TransportPayloadCapability.LARGE_PAYLOAD,
         )
 
-        webrtc_manager.close_all()
+        await webrtc_manager.close_all()
 
 
 if __name__ == "__main__":

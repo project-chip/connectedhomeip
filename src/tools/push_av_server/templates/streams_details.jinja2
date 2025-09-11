@@ -29,6 +29,8 @@
         <div class="center">
             {% if type == 'cert' %}
             <pre><code>{{cert}}</code></pre>
+            {% elif type == 'details' %}
+            <pre><code>{{details}}</code></pre>
             {% else %}
             <div>
                 <video controls src="/streams/{{stream_id}}/{{file_path}}"></video>

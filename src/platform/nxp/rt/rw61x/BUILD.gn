@@ -110,6 +110,16 @@ static_library("nxp_platform") {
     "${chip_root}/src/app/common:ids",
   ]
 
+  if (nxp_crypto_impl == "") {
+    # Default Operational key secure storage
+    sources += [
+      "../../common/crypto/PersistentStorageOpKeystoreBase.cpp",
+      "../../common/crypto/PersistentStorageOpKeystoreBase.h",
+      "../../common/crypto/S50/PersistentStorageOpKeystoreS50.cpp",
+      "../../common/crypto/S50/PersistentStorageOpKeystoreS50.h",
+    ]
+  }
+
   if (nxp_nvm_component == "nvm_fwk" || nxp_nvm_component == "littlefs") {
     sources += [
       "../../common/NXPConfig.cpp",
