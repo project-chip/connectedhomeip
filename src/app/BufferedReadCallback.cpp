@@ -120,7 +120,12 @@ CHIP_ERROR BufferedReadCallback::BufferListItem(TLV::TLVReader & reader)
     handle = System::PacketBufferHandle::New(chip::app::kMaxSecureSduLengthBytes);
     VerifyOrReturnError(!handle.IsNull(), CHIP_ERROR_NO_MEMORY);
 
+#if INET_CONFIG_ENABLE_TCP_ENDPOINT
+    // Support chained buffer
+    writer.Init(std::move(handle), true);
+#else
     writer.Init(std::move(handle), false);
+#endif
 
     ReturnErrorOnFailure(writer.CopyElement(TLV::AnonymousTag(), reader));
     ReturnErrorOnFailure(writer.Finalize(&handle));

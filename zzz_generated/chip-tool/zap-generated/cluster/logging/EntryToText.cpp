@@ -6311,8 +6311,8 @@ char const * AcceptedCommandIdToText(chip::ClusterId cluster, chip::CommandId id
             return "LookupRootCertificate";
         case chip::app::Clusters::TlsCertificateManagement::Commands::RemoveRootCertificate::Id:
             return "RemoveRootCertificate";
-        case chip::app::Clusters::TlsCertificateManagement::Commands::TLSClientCSR::Id:
-            return "TLSClientCSR";
+        case chip::app::Clusters::TlsCertificateManagement::Commands::ClientCSR::Id:
+            return "ClientCSR";
         case chip::app::Clusters::TlsCertificateManagement::Commands::ProvisionClientCertificate::Id:
             return "ProvisionClientCertificate";
         case chip::app::Clusters::TlsCertificateManagement::Commands::FindClientCertificate::Id:
@@ -6955,8 +6955,8 @@ char const * GeneratedCommandIdToText(chip::ClusterId cluster, chip::CommandId i
             return "FindRootCertificateResponse";
         case chip::app::Clusters::TlsCertificateManagement::Commands::LookupRootCertificateResponse::Id:
             return "LookupRootCertificateResponse";
-        case chip::app::Clusters::TlsCertificateManagement::Commands::TLSClientCSRResponse::Id:
-            return "TLSClientCSRResponse";
+        case chip::app::Clusters::TlsCertificateManagement::Commands::ClientCSRResponse::Id:
+            return "ClientCSRResponse";
         case chip::app::Clusters::TlsCertificateManagement::Commands::FindClientCertificateResponse::Id:
             return "FindClientCertificateResponse";
         case chip::app::Clusters::TlsCertificateManagement::Commands::LookupClientCertificateResponse::Id:
