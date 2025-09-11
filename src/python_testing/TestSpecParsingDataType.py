@@ -29,7 +29,7 @@ from matter.tlv import uint
 class TestSpecParsingDataType(MatterBaseTest):
     def setup_class(self):
         # Get the latest fully qualified release for testing
-        self.xml_clusters, self.xml_cluster_problems = build_xml_clusters(PrebuiltDataModelDirectory.k1_4_2)
+        self.xml_clusters, self.xml_cluster_problems = build_xml_clusters(PrebuiltDataModelDirectory.k1_5)
 
         # Setup templates for testing struct, enum, and bitmap data types
         self.cluster_id = 0xABCD
@@ -595,7 +595,7 @@ class TestSpecParsingDataType(MatterBaseTest):
         asserts.assert_equal(max_count_field.constraints.get("maxCountAttribute"), "MaxItems", "Attribute reference incorrect")
 
     def test_XML_clusters_data_types(self):
-        """Test data types from clusters in the 1.4.1 cluster spec XML files"""
+        """Test data types from clusters in the 1.5 cluster spec XML files"""
         # First, find a cluster with enums to test
         enum_found = False
         struct_found = False
@@ -692,6 +692,7 @@ class TestSpecParsingDataType(MatterBaseTest):
         one_four, _ = build_xml_clusters(PrebuiltDataModelDirectory.k1_4)
         one_four_one, _ = build_xml_clusters(PrebuiltDataModelDirectory.k1_4_1)
         one_four_two, _ = build_xml_clusters(PrebuiltDataModelDirectory.k1_4_2)
+        one_five, _ = build_xml_clusters(PrebuiltDataModelDirectory.k1_5)
 
         # Sample cluster ID to check for data types (Basic Information)
         cluster_id = uint(Clusters.BasicInformation.id)
@@ -701,14 +702,17 @@ class TestSpecParsingDataType(MatterBaseTest):
         asserts.assert_true(cluster_id in one_four, "Basic Information cluster not found in 1.4")
         asserts.assert_true(cluster_id in one_four_one, "Basic Information cluster not found in 1.4.1")
         asserts.assert_true(cluster_id in one_four_two, "Basic Information cluster not found in 1.4.2")
+        asserts.assert_true(cluster_id in one_five, "Basic Information cluster not found in 1.5")
 
         # Compare struct counts (should generally increase or stay the same over versions)
-        asserts.assert_less_equal(len(one_three[cluster_id].structs), len(one_four_two[cluster_id].structs),
-                                  "1.4.2 should have at least as many structs as 1.3")
-        asserts.assert_less_equal(len(one_four[cluster_id].structs), len(one_four_two[cluster_id].structs),
-                                  "1.4.2 should have at least as many structs as 1.4")
-        asserts.assert_less_equal(len(one_four_one[cluster_id].structs), len(one_four_two[cluster_id].structs),
-                                  "1.4.2 should have at least as many structs as 1.4.1")
+        asserts.assert_less_equal(len(one_three[cluster_id].structs), len(one_five[cluster_id].structs),
+                                  "1.5 should have at least as many structs as 1.3")
+        asserts.assert_less_equal(len(one_four[cluster_id].structs), len(one_five[cluster_id].structs),
+                                  "1.5 should have at least as many structs as 1.4")
+        asserts.assert_less_equal(len(one_four_one[cluster_id].structs), len(one_five[cluster_id].structs),
+                                  "1.5 should have at least as many structs as 1.4.1")
+        asserts.assert_less_equal(len(one_four_two[cluster_id].structs), len(one_five[cluster_id].structs),
+                                  "1.5 should have at least as many structs as 1.4.2")
 
     def test_find_complex_bitmaps(self):
         """Find and test bitmaps with multi-bit fields in the data model"""
@@ -814,7 +818,7 @@ class TestSpecParsingDataType(MatterBaseTest):
             asserts.assert_true(hasattr(first_component, 'conformance'), "Component missing 'conformance' attribute")
 
     def test_xml_datatype_component_fields(self):
-        """Test the additional fields in XmlDataTypeComponent using 1.4.1 cluster spec XML files"""
+        """Test the additional fields in XmlDataTypeComponent using 1.5 cluster spec XML files"""
 
         # Statistics to track coverage
         clusters_examined = 0
@@ -945,9 +949,9 @@ class TestSpecParsingDataType(MatterBaseTest):
         else:
             self.print_step("XML Analysis", "No fields with constraints found in XML")
 
-    def test_exhaustive_all_fields_in_1_4_2(self):
-        """Comprehensive test: validate every field in every XML for version 1.4.2, accumulate all issues, and fail at the end if any are found."""
-        xml_clusters, problems = build_xml_clusters(PrebuiltDataModelDirectory.k1_4_2)
+    def test_exhaustive_all_fields_in_1_5(self):
+        """Comprehensive test: validate every field in every XML for version 1.5, accumulate all issues, and fail at the end if any are found."""
+        xml_clusters, problems = build_xml_clusters(PrebuiltDataModelDirectory.k1_5)
         issues = []
         if problems:
             issues.extend([f"Parsing problem: {p}" for p in problems])

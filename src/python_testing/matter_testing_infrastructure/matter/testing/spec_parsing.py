@@ -243,7 +243,7 @@ DEVICE_TYPE_NAME_FIXES = {0x010b: 'Dimmable Plug-In Unit', 0x010a: 'On/Off Plug-
 
 # fuzzy match to name because some of the old specs weren't careful here
 def _fuzzy_name(to_fuzz: str):
-    to_fuzz = re.sub("\(.*?\)|\[.*?\]", "", to_fuzz)
+    to_fuzz = re.sub(r"\(.*?\)|\[.*?\]", "", to_fuzz)
     return to_fuzz.lower().strip().replace(' ', '').replace('/', '')
 
 
@@ -455,7 +455,7 @@ class ClusterParser:
             'item', 'value'), DataTypeEnum.kBitmap: ComponentTag('bitfield', 'bit')}
         components = {}
         struct_name = struct.attrib['name']
-        location = ClusterPathLocation(0, self._cluster_id)
+        location = ClusterPathLocation(0, int(self._cluster_id) if self._cluster_id is not None else 0)
         for xml_field in list(struct):
             if xml_field.tag != component_tags[component_type].tag:
                 continue
@@ -506,7 +506,7 @@ class ClusterParser:
 
                     # Handle child elements like maxCount
                     max_count = constraint.find('./maxCount')
-                    if max_count is not None:
+                    if max_count is not None and max_count.text is not None:
                         constraints['maxCount'] = max_count.text
                         # If maxCount references an attribute, store that reference
                         attr_element = max_count.find('./attribute')
@@ -545,7 +545,7 @@ class ClusterParser:
                 try:
                     name = element.attrib['name']
                 except KeyError:
-                    location = ClusterPathLocation(0, self._cluster_id)
+                    location = ClusterPathLocation(0, int(self._cluster_id) if self._cluster_id is not None else 0)
                     self._problems.append(ProblemNotice("Spec XML Parsing", location=location,
                                           severity=ProblemSeverity.WARNING, problem=f"Struct {element} with no id or name"))
                     continue
@@ -674,7 +674,11 @@ class ClusterParser:
                           accepted_commands=self.parse_commands(CommandType.ACCEPTED),
                           generated_commands=self.parse_commands(CommandType.GENERATED),
                           unknown_commands=self.parse_unknown_commands(),
-                          events=self.parse_events(), pics=self._pics if self._pics is not None else "", is_provisional=self._is_provisional)
+                          events=self.parse_events(),
+                          structs=self._parse_data_type(DataTypeEnum.kStruct),
+                          enums=self._parse_data_type(DataTypeEnum.kEnum),
+                          bitmaps=self._parse_data_type(DataTypeEnum.kBitmap),
+                          pics=self._pics if self._pics is not None else "", is_provisional=self._is_provisional)
 
     def get_problems(self) -> list[ProblemNotice]:
         return self._problems
