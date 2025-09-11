@@ -342,7 +342,7 @@ Protocols::InteractionModel::Status PushAvStreamTransportManager::ValidateZoneId
     return Status::Failure;
 }
 
-bool PushAvStreamTransportManager::ValidateMotionZoneSize(uint16_t zoneSize)
+bool PushAvStreamTransportManager::ValidateMotionZoneSize(size_t zoneSize)
 {
     if (mCameraDevice == nullptr)
     {

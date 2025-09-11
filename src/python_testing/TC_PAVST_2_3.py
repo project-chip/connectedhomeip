@@ -44,7 +44,7 @@ from TC_PAVSTI_Utils import PAVSTIUtils, PushAvServerProcess
 from TC_PAVSTTestBase import PAVSTTestBase
 
 import matter.clusters as Clusters
-from matter.clusters.Types import Nullable
+from matter.clusters.Types import Nullable, NullValue
 from matter.interaction_model import InteractionModelError, Status
 from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 
@@ -96,8 +96,8 @@ class TC_PAVST_2_3(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
                      "Store value as aProvisionedEndpoints."),
             TestStep(10, "TH sends the AllocatePushTransport command with a TLSEndpointID not in aProvisionedEndpoints in the TransportOptions struct.",
                      "DUT responds with Status Code InvalidTLSEndpoint."),
-            TestStep(11, "TH sends the AllocatePushTransport command with a combination of IngestMethod and ContainerFormat not in aSupportedFormats.",
-                     "DUT responds with Status Code InvalidCombination."),
+            TestStep(11, "TH sends the AllocatePushTransport command with an invalid IngestMethod.",
+                     "DUT responds with Status Code ConstraintError."),
             TestStep(12, "DUT responds with Status Code InvalidURL.",
                      "DUT responds with Status Code InvalidURL."),
             TestStep(13, "TH sends the AllocatePushTransport command with an invalid TriggerType in the TransportTriggerOptions struct field.",
@@ -231,29 +231,39 @@ class TC_PAVST_2_3(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
                  "expiryTime": 5
                  }), endpoint=endpoint)
             asserts.assert_equal(status, pvcluster.Enums.StatusCodeEnum.kInvalidTLSEndpoint,
-                                 "DUT must responds with Status Code InvalidTLSEndpoint.")
+                                 "DUT must respond with Status Code InvalidTLSEndpoint.")
 
         self.step(11)
         status = await self.allocate_one_pushav_transport(endpoint, ingestMethod=pvcluster.Enums.IngestMethodsEnum.kUnknownEnumValue,
-                                                          expected_cluster_status=pvcluster.Enums.StatusCodeEnum.kInvalidCombination,
                                                           tlsEndPoint=tlsEndpointId, url=f"https://{host_ip}:1234/streams/{uploadStreamId}")
-        asserts.assert_equal(status, pvcluster.Enums.StatusCodeEnum.kInvalidCombination,
-                             "DUT must  responds with Status Code InvalidCombination.")
+        asserts.assert_equal(status, Status.ConstraintError,
+                             "DUT must respond with Status Code ConstraintError.")
 
         self.step(12)
         status = await self.allocate_one_pushav_transport(endpoint, expected_cluster_status=pvcluster.Enums.StatusCodeEnum.kInvalidURL,
                                                           tlsEndPoint=tlsEndpointId, url=f"https:/{host_ip}:1234/streams/{uploadStreamId}")
         asserts.assert_equal(status, pvcluster.Enums.StatusCodeEnum.kInvalidURL,
-                             "DUT must  responds with Status Code InvalidURL.")
+                             "DUT must respond with Status Code InvalidURL.")
 
         self.step(13)
         status = await self.allocate_one_pushav_transport(endpoint, triggerType=pvcluster.Enums.TransportTriggerTypeEnum.kUnknownEnumValue,
-                                                          expected_cluster_status=pvcluster.Enums.StatusCodeEnum.kInvalidTriggerType,
                                                           tlsEndPoint=tlsEndpointId, url=f"https://{host_ip}:1234/streams/{uploadStreamId}")
-        asserts.assert_equal(status, pvcluster.Enums.StatusCodeEnum.kInvalidTriggerType,
-                             "DUT must  responds with Status Code InvalidTriggerType.")
+        asserts.assert_equal(status, Status.ConstraintError,
+                             "DUT must respond with Status Code ConstraintError.")
 
         self.step(14)
+        # Verify a null Zone is handled
+        try:
+            zoneList = [{"zone": NullValue, "sensitivity": 4}]
+            triggerOptions = {"triggerType": pvcluster.Enums.TransportTriggerTypeEnum.kMotion,
+                              "maxPreRollLen": 4000,
+                              "motionZones": zoneList,
+                              "motionTimeControl": {"initialDuration": 1, "augmentationDuration": 1, "maxDuration": 1, "blindDuration": 1}}
+            status = await self.allocate_one_pushav_transport(endpoint, trigger_Options=triggerOptions, tlsEndPoint=tlsEndpointId, url=f"https://{host_ip}:1234/streams/{uploadStreamId}")
+            asserts.assert_equal(status, Status.Success, "DUT should respond with Status Code Success with a Null Zone.")
+        except InteractionModelError as e:
+            asserts.assert_fail("Unexptected error when setting a Zone that is Null (meaning all Zones).")
+
         try:
             zoneList = [{"zone": 14, "sensitivity": 4}]
             triggerOptions = {"triggerType": pvcluster.Enums.TransportTriggerTypeEnum.kMotion,
