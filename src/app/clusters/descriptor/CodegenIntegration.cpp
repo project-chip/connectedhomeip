@@ -38,7 +38,7 @@ public:
     ServerClusterRegistration & CreateRegistration(EndpointId endpointId, unsigned emberEndpointIndex,
                                                    uint32_t optionalAttributeBits, uint32_t featureMap) override
     {
-        gServers[emberEndpointIndex].Create(endpointId, BitFlags<Descriptor::Feature>(featureMap));
+        gServers[emberEndpointIndex].Create(endpointId);
         return gServers[emberEndpointIndex].Registration();
     }
 
