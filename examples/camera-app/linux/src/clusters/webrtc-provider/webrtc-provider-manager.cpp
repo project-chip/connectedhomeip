@@ -169,8 +169,7 @@ void WebRTCProviderManager::RegisterWebrtcTransport(uint16_t sessionId)
     mMediaController->RegisterTransport(transport, args.videoStreamId, args.audioStreamId);
 }
 
-std::string WebRTCProviderManager::ExtractMidFromSdp(const std::string & sdp,
-                                                    const std::string & mediaType)
+std::string WebRTCProviderManager::ExtractMidFromSdp(const std::string & sdp, const std::string & mediaType)
 {
     if (sdp.empty() || mediaType.empty())
     {
@@ -193,13 +192,13 @@ std::string WebRTCProviderManager::ExtractMidFromSdp(const std::string & sdp,
 
         if (inTargetBlock)
         {
-            if (line.rfind(midPrefix, 0) == 0)               // line starts with "a=mid:"
+            if (line.rfind(midPrefix, 0) == 0) // line starts with "a=mid:"
                 return line.substr(midPrefix.length());
 
-            if (line.rfind("m=", 0) == 0)                    // next media block – stop searching
+            if (line.rfind("m=", 0) == 0) // next media block – stop searching
                 break;
         }
-        else if (line.rfind(mediaPrefix, 0) == 0)           // found the desired media block
+        else if (line.rfind(mediaPrefix, 0) == 0) // found the desired media block
         {
             inTargetBlock = true;
         }

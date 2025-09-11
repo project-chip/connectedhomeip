@@ -89,7 +89,7 @@ public:
     void LiveStreamPrivacyModeChanged(bool privacyModeEnabled);
 
 private:
-    std::string ExtractMidFromSdp(const std::string& sdp, const std::string& mediaType);
+    std::string ExtractMidFromSdp(const std::string & sdp, const std::string & mediaType);
 
     void ScheduleOfferSend(uint16_t sessionId);
 
