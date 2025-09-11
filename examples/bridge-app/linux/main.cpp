@@ -26,18 +26,15 @@
 #include <app/AttributeAccessInterfaceRegistry.h>
 #include <app/ConcreteAttributePath.h>
 #include <app/EventLogging.h>
-#include <app/persistence/String.h>
 #include <app/reporting/reporting.h>
 #include <app/util/af-types.h>
 #include <app/util/attribute-storage.h>
-#include <app/util/ember-strings.h>
 #include <app/util/endpoint-config-api.h>
 #include <app/util/util.h>
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
 #include <lib/core/CHIPError.h>
 #include <lib/support/CHIPMem.h>
-#include <lib/support/Span.h>
 #include <lib/support/ZclString.h>
 #include <platform/CommissionableDataProvider.h>
 #include <setup_payload/QRCodeSetupPayloadGenerator.h>
@@ -64,7 +61,6 @@ using namespace chip::Inet;
 using namespace chip::Transport;
 using namespace chip::DeviceLayer;
 using namespace chip::app::Clusters;
-using namespace chip::app::Storage;
 
 // These variables need to be in global scope for bridged-actions-stub.cpp to access them
 std::vector<Room *> gRooms;
@@ -578,14 +574,13 @@ Protocols::InteractionModel::Status HandleWriteBridgedDeviceBasicAttribute(Devic
         return Protocols::InteractionModel::Status::UnsupportedWrite;
     }
 
-    const uint8_t len = emberAfStringLength(buffer);
+    CharSpan nameSpan = CharSpan::fromZclString(buffer);
 
-    if (len > kNodeLabelSize)
+    if (nameSpan.size() > kNodeLabelSize)
     {
         return Protocols::InteractionModel::Status::ConstraintError;
     }
 
-    CharSpan nameSpan = CharSpan::fromZclString(buffer);
     std::string name(nameSpan.data(), nameSpan.size());
     dev->SetName(name.c_str());
 
