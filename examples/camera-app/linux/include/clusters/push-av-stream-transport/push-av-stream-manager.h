@@ -56,7 +56,7 @@ public:
     void Init();
     void SetMediaController(MediaController * mediaController);
     void SetCameraDevice(CameraDeviceInterface * cameraDevice);
-    void SetPushAvStreamTransportServer(PushAvStreamTransportServerLogic * server);
+    void SetPushAvStreamTransportServer(PushAvStreamTransportServerLogic * server) override;
 
     // Add missing override keywords and fix signatures
     Protocols::InteractionModel::Status AllocatePushTransport(const TransportOptionsStruct & transportOptions,
