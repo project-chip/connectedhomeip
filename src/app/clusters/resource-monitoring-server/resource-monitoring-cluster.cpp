@@ -63,15 +63,11 @@ ResourceMonitoringCluster::ResourceMonitoringCluster(
 
 CHIP_ERROR ResourceMonitoringCluster::SetDelegate(ResourceMonitoringDelegate* aDelegate)
 {
-    if (aDelegate != nullptr)
-    {
-        mDelegate = aDelegate;
-        mDelegate->SetInstance(this);
-        ChipLogDetail(Zcl, "ResourceMonitoring: calling mDelegate->Init()");
-        ReturnErrorOnFailure(mDelegate->Init());
-    }
-
-    return CHIP_NO_ERROR;
+    VerifyOrReturnError(aDelegate != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    
+    mDelegate = aDelegate;
+    mDelegate->SetInstance(this);
+    return mDelegate->Init();
 }
 
 
@@ -88,7 +84,7 @@ DataModel::ActionReturnStatus ResourceMonitoringCluster::WriteImpl(const DataMod
 
     switch (request.path.mAttributeId)
     {
-    case HepaFilterMonitoring::Attributes::LastChangedTime::Id: {
+    case ResourceMonitoring::Attributes::LastChangedTime::Id: {
         uint32_t lastChangedTime;
         ReturnErrorOnFailure(persistence.DecodeAndStoreNativeEndianValue(request.path, decoder, lastChangedTime));
         mLastChangedTime = DataModel::MakeNullable(lastChangedTime);
@@ -153,31 +149,29 @@ CHIP_ERROR ResourceMonitoringCluster::Attributes(const ConcreteClusterPath & pat
 
 CHIP_ERROR ResourceMonitoringCluster::ReadReplaceableProductList(AttributeValueEncoder & aEncoder)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    if (mEnabledFeatures.Has(ResourceMonitoring::Feature::kReplacementProductList))
+    VerifyOrReturnError(mEnabledFeatures.Has(ResourceMonitoring::Feature::kReplacementProductList), CHIP_NO_ERROR);
+
+    ReplacementProductListManager * productListManagerInstance = GetReplacementProductListManagerInstance();
+    if (nullptr == productListManagerInstance)
     {
-        ReplacementProductListManager * productListManagerInstance = GetReplacementProductListManagerInstance();
-        if (nullptr == productListManagerInstance)
+        aEncoder.EncodeEmptyList();
+        return CHIP_NO_ERROR;
+    }
+
+    productListManagerInstance->Reset();
+
+    return aEncoder.EncodeList([productListManagerInstance](const auto & encoder) -> CHIP_ERROR {
+        ReplacementProductStruct replacementProductStruct;
+        CHIP_ERROR iteratorError = productListManagerInstance->Next(replacementProductStruct);
+
+        while (CHIP_NO_ERROR == iteratorError)
         {
-            aEncoder.EncodeEmptyList();
-            return CHIP_NO_ERROR;
+            ReturnErrorOnFailure(encoder.Encode(replacementProductStruct));
+            iteratorError = productListManagerInstance->Next(replacementProductStruct);
         }
 
-        productListManagerInstance->Reset();
-
-        err = aEncoder.EncodeList([productListManagerInstance](const auto & encoder) -> CHIP_ERROR {
-            ReplacementProductStruct replacementProductStruct;
-            CHIP_ERROR iteratorError = productListManagerInstance->Next(replacementProductStruct);
-
-            while (CHIP_NO_ERROR == iteratorError)
-            {
-                ReturnErrorOnFailure(encoder.Encode(replacementProductStruct));
-                iteratorError = productListManagerInstance->Next(replacementProductStruct);
-            }
-            return (CHIP_ERROR_PROVIDER_LIST_EXHAUSTED == iteratorError) ? CHIP_NO_ERROR : iteratorError;
-        });
-    }
-    return err;
+        return (CHIP_ERROR_PROVIDER_LIST_EXHAUSTED == iteratorError) ? CHIP_NO_ERROR : iteratorError;
+    });
 }
 
 ResourceMonitoring::ReplacementProductListManager * ResourceMonitoringCluster::GetReplacementProductListManagerInstance() {
@@ -190,7 +184,7 @@ void ResourceMonitoringCluster::SetReplacementProductListManagerInstance(Resourc
 }
 
 
-chip::Protocols::InteractionModel::Status ResourceMonitoringCluster::UpdateCondition(uint8_t newCondition)
+void ResourceMonitoringCluster::UpdateCondition(uint8_t newCondition)
 {
     auto oldConditionattr = mCondition;
     mCondition    = newCondition;
@@ -204,17 +198,15 @@ chip::Protocols::InteractionModel::Status ResourceMonitoringCluster::UpdateCondi
             NotifyAttributeChanged(ActivatedCarbonFilterMonitoring::Attributes::Condition::Id);
         }
     }
-    return Protocols::InteractionModel::Status::Success;
 }
 
-chip::Protocols::InteractionModel::Status
-ResourceMonitoringCluster::UpdateChangeIndication(chip::app::Clusters::ResourceMonitoring::ChangeIndicationEnum aNewChangeIndication)
+void ResourceMonitoringCluster::UpdateChangeIndication(chip::app::Clusters::ResourceMonitoring::ChangeIndicationEnum aNewChangeIndication)
 {
     if (aNewChangeIndication == chip::app::Clusters::ResourceMonitoring::ChangeIndicationEnum::kWarning)
     {
         if (!mEnabledFeatures.Has(ResourceMonitoring::Feature::kWarning))
         {
-            return Protocols::InteractionModel::Status::InvalidValue;
+            return;
         }
     }
     auto oldChangeIndication = mChangeIndication;
@@ -224,10 +216,9 @@ ResourceMonitoringCluster::UpdateChangeIndication(chip::app::Clusters::ResourceM
         NotifyAttributeChanged(ResourceMonitoring::Attributes::ChangeIndication::Id);        
     }
 
-    return Protocols::InteractionModel::Status::Success;
 }
 
-chip::Protocols::InteractionModel::Status ResourceMonitoringCluster::UpdateInPlaceIndicator(bool newInPlaceIndicator)
+void ResourceMonitoringCluster::UpdateInPlaceIndicator(bool newInPlaceIndicator)
 {
     auto oldInPlaceIndicator = mInPlaceIndicator;
     mInPlaceIndicator        = newInPlaceIndicator;
@@ -241,11 +232,9 @@ chip::Protocols::InteractionModel::Status ResourceMonitoringCluster::UpdateInPla
             NotifyAttributeChanged(ActivatedCarbonFilterMonitoring::Attributes::InPlaceIndicator::Id);   
         }
     }
-
-    return Protocols::InteractionModel::Status::Success;
 }
 
-chip::Protocols::InteractionModel::Status ResourceMonitoringCluster::UpdateLastChangedTime(DataModel::Nullable<uint32_t> aNewLastChangedTime)
+void ResourceMonitoringCluster::UpdateLastChangedTime(DataModel::Nullable<uint32_t> aNewLastChangedTime)
 {
     auto oldLastchangedTime = mLastChangedTime;
     mLastChangedTime        = aNewLastChangedTime;
@@ -263,7 +252,6 @@ chip::Protocols::InteractionModel::Status ResourceMonitoringCluster::UpdateLastC
             NotifyAttributeChanged(ActivatedCarbonFilterMonitoring::Attributes::LastChangedTime::Id);
         }
     }
-    return Protocols::InteractionModel::Status::Success;
 }
 
 
