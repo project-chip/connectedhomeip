@@ -17,9 +17,9 @@
 
 #include <app/clusters/descriptor/descriptor-cluster.h>
 #include <app/server-cluster/AttributeListBuilder.h>
+#include <clusters/Descriptor/Attributes.h>
 #include <clusters/Descriptor/ClusterId.h>
 #include <clusters/Descriptor/Metadata.h>
-#include <clusters/Descriptor/Attributes.h>
 #include <clusters/Descriptor/Structs.h>
 #include <lib/core/DataModelTypes.h>
 
