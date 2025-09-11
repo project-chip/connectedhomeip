@@ -47,6 +47,7 @@ public:
         std::vector<uint8_t> mRootCertBuffer;
         std::vector<uint8_t> mClientCertBuffer;
         std::vector<uint8_t> mClientKeyBuffer;
+        std::vector<std::vector<uint8_t>> mIntermediateCertBuffer;
     } PushAVCertBuffer;
 
     PushAVUploader();

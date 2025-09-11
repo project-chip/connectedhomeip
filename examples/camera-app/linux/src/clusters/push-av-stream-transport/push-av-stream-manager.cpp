@@ -138,7 +138,8 @@ PushAvStreamTransportManager::AllocatePushTransport(const TransportOptionsStruct
 
 #ifndef TLS_CLUSTER_NOT_ENABLED
     ChipLogDetail(Camera, "PushAvStreamTransportManager: TLS Cluster enabled, using default certs");
-    mTransportMap[connectionID].get()->SetTLSCert(mBufferRootCert, mBufferClientCert, mBufferClientCertKey);
+    mTransportMap[connectionID].get()->SetTLSCert(mBufferRootCert, mBufferClientCert, mBufferClientCertKey,
+                                                  mBufferIntermediateCerts);
 #else
     // TODO: The else block is for testing purpose. It should be removed once the TLS cluster integration is stable.
     mTransportMap[connectionID].get()->SetTLSCertPath("/tmp/pavstest/certs/server/root.pem", "/tmp/pavstest/certs/device/dev.pem",
@@ -553,8 +554,35 @@ void PushAvStreamTransportManager::SetTLSCerts(Tls::CertificateTable::BufferedCl
     auto rootSpan = rootCertEntry.GetCert().certificate.Value();
     mBufferRootCert.assign(rootSpan.data(), rootSpan.data() + rootSpan.size());
 
-    auto clientSpan = clientCertEntry.GetCert().clientCertificate.Value();
+    auto clientSpan = clientCertEntry.GetCert().clientCertificate.Value().Value();
     mBufferClientCert.assign(clientSpan.data(), clientSpan.data() + clientSpan.size());
+
+    mBufferIntermediateCerts.clear();
+    if (clientCertEntry.mCertWithKey.detail.intermediateCertificates.HasValue())
+    {
+        auto intermediateList = clientCertEntry.mCertWithKey.detail.intermediateCertificates.Value();
+        auto iter             = intermediateList.begin();
+        while (iter.Next())
+        {
+            auto certSpan = iter.GetValue();
+            std::vector<uint8_t> intermediateCert;
+            intermediateCert.assign(certSpan.data(), certSpan.data() + certSpan.size());
+            mBufferIntermediateCerts.push_back(intermediateCert);
+        }
+        if (iter.GetStatus() != CHIP_NO_ERROR)
+        {
+            ChipLogError(Camera, "Error iterating intermediate certificates: %" CHIP_ERROR_FORMAT, iter.GetStatus().Format());
+            mBufferIntermediateCerts.clear();
+        }
+        else
+        {
+            ChipLogProgress(Camera, "Intermediate certificates fetched and stored. Size: %zu", mBufferIntermediateCerts.size());
+        }
+    }
+    else
+    {
+        ChipLogProgress(Camera, "No intermediate certificates found.");
+    }
 
     const ByteSpan rawKeySpan = clientCertEntry.mCertWithKey.key.Span();
     if (rawKeySpan.size() != Crypto::kP256_PublicKey_Length + Crypto::kP256_PrivateKey_Length)
@@ -583,8 +611,4 @@ void PushAvStreamTransportManager::SetTLSCerts(Tls::CertificateTable::BufferedCl
     }
 
     mBufferClientCertKey.assign(keypairDer.data(), keypairDer.data() + keypairDer.size());
-
-    // TODO: Handle Intermediate certificates and use for chain validation if needed. For now just log it.
-    ChipLogDetail(Camera, "Intermediate certificate size %b",
-                  clientCertEntry.mCertWithKey.detail.intermediateCertificates.HasValue());
 }

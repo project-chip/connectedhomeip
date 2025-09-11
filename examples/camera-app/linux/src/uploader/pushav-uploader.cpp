@@ -301,8 +301,16 @@ void PushAVUploader::UploadData(std::pair<std::string, std::string> data)
     // TODO: The logic to provide DER-formatted certificates and keys in memory (blob) format to curl is currently unstable. As a
     // temporary workaround, PEM-format files are being provided as input to curl.
 
-    auto rootCertPEM           = DerCertToPem(mCertBuffer.mRootCertBuffer);
-    auto clientCertPEM         = DerCertToPem(mCertBuffer.mClientCertBuffer);
+    auto rootCertPEM   = DerCertToPem(mCertBuffer.mRootCertBuffer);
+    auto clientCertPEM = DerCertToPem(mCertBuffer.mClientCertBuffer);
+    if (!mCertBuffer.mIntermediateCertBuffer.empty())
+    {
+        clientCertPEM.append("\n"); // Add newline separator between certs in PEM format
+    }
+    for (size_t i = 0; i < mCertBuffer.mIntermediateCertBuffer.size(); ++i)
+    {
+        clientCertPEM.append(DerCertToPem(mCertBuffer.mIntermediateCertBuffer[i]) + "\n");
+    }
     std::string derKeyToPemstr = ConvertECDSAPrivateKey_DER_to_PEM(mCertBuffer.mClientKeyBuffer);
 
     SaveCertToFile(rootCertPEM, "/tmp/root.pem");

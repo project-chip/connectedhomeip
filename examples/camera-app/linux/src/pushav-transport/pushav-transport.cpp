@@ -394,11 +394,13 @@ void PushAVTransport::SetTLSCertPath(std::string rootCert, std::string devCert, 
 }
 
 void PushAVTransport::SetTLSCert(std::vector<uint8_t> bufferRootCert, std::vector<uint8_t> bufferClientCert,
-                                 std::vector<uint8_t> bufferClientCertKey)
+                                 std::vector<uint8_t> bufferClientCertKey,
+                                 std::vector<std::vector<uint8_t>> bufferIntermediateCerts)
 {
-    mCertBuffer.mRootCertBuffer   = bufferRootCert;
-    mCertBuffer.mClientCertBuffer = bufferClientCert;
-    mCertBuffer.mClientKeyBuffer  = bufferClientCertKey;
+    mCertBuffer.mRootCertBuffer         = bufferRootCert;
+    mCertBuffer.mClientCertBuffer       = bufferClientCert;
+    mCertBuffer.mClientKeyBuffer        = bufferClientCertKey;
+    mCertBuffer.mIntermediateCertBuffer = bufferIntermediateCerts;
 }
 
 void PushAVTransport::SetTransportStatus(TransportStatusEnum status)

@@ -127,6 +127,7 @@ private:
     std::vector<uint8_t> mBufferRootCert;
     std::vector<uint8_t> mBufferClientCert;
     std::vector<uint8_t> mBufferClientCertKey;
+    std::vector<std::vector<uint8_t>> mBufferIntermediateCerts;
 
     /**
      * @brief Calculates the total bandwidth in Mbps for the given video and audio stream IDs.

@@ -92,7 +92,7 @@ public:
     void SetTLSCertPath(std::string rootCert, std::string devCert, std::string devKey);
 
     void SetTLSCert(std::vector<uint8_t> bufferRootCert, std::vector<uint8_t> bufferClientCert,
-                    std::vector<uint8_t> bufferClientCertKey);
+                    std::vector<uint8_t> bufferClientCertKey, std::vector<std::vector<uint8_t>> bufferIntermediateCerts);
 
     void SetOnRecorderStoppedCallback(std::function<void()> cb) { mOnRecorderStoppedCb = std ::move(cb); }
 
