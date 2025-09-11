@@ -60,7 +60,11 @@ public:
         return gServer.Registration();
     }
 
-    ServerClusterInterface & FindRegistration(unsigned emberEndpointIndex) override { return gServer.Cluster(); }
+    ServerClusterInterface * FindRegistration(unsigned emberEndpointIndex) override
+    {
+        VerifyOrReturnValue(gServer.IsConstructed(), nullptr);
+        return &gServer.Cluster();
+    }
     void ReleaseRegistration(unsigned emberEndpointIndex) override { gServer.Destroy(); }
 };
 
@@ -68,6 +72,11 @@ public:
 
 void emberAfAdministratorCommissioningClusterServerInitCallback(EndpointId endpointId)
 {
+    // The implemenration of the serer we use here is only for the RootNode (i.e. endpoint 0)
+    // singleton. Other fabric sync will need their own implementations and would be added
+    // separately.
+    VerifyOrReturn(endpointId == kRootEndpointId);
+
     IntegrationDelegate integrationDelegate;
 
     // register a singleton server (root endpoint only)
@@ -75,8 +84,8 @@ void emberAfAdministratorCommissioningClusterServerInitCallback(EndpointId endpo
         {
             .endpointId                      = endpointId,
             .clusterId                       = AdministratorCommissioning::Id,
-            .fixedClusterServerEndpointCount = 1,
-            .maxEndpointCount                = 1,
+            .fixedClusterServerEndpointCount = AdministratorCommissioning::StaticApplicationConfig::kFixedClusterConfig.size(),
+            .maxClusterInstanceCount         = 1,
             .fetchFeatureMap                 = true,
             .fetchOptionalAttributes         = false,
         },
@@ -85,6 +94,8 @@ void emberAfAdministratorCommissioningClusterServerInitCallback(EndpointId endpo
 
 void MatterAdministratorCommissioningClusterServerShutdownCallback(EndpointId endpointId)
 {
+    VerifyOrReturn(endpointId == kRootEndpointId);
+
     IntegrationDelegate integrationDelegate;
 
     // register a singleton server (root endpoint only)
@@ -92,8 +103,8 @@ void MatterAdministratorCommissioningClusterServerShutdownCallback(EndpointId en
         {
             .endpointId                      = endpointId,
             .clusterId                       = AdministratorCommissioning::Id,
-            .fixedClusterServerEndpointCount = 1,
-            .maxEndpointCount                = 1,
+            .fixedClusterServerEndpointCount = AdministratorCommissioning::StaticApplicationConfig::kFixedClusterConfig.size(),
+            .maxClusterInstanceCount         = 1,
         },
         integrationDelegate);
 }

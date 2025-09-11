@@ -43,9 +43,10 @@ public:
         return gServers[emberEndpointIndex].Registration();
     }
 
-    ServerClusterInterface & FindRegistration(unsigned emberEndpointIndex) override
+    ServerClusterInterface * FindRegistration(unsigned emberEndpointIndex) override
     {
-        return gServers[emberEndpointIndex].Cluster();
+        VerifyOrReturnValue(gServers[emberEndpointIndex].IsConstructed(), nullptr);
+        return &gServers[emberEndpointIndex].Cluster();
     }
     void ReleaseRegistration(unsigned emberEndpointIndex) override { gServers[emberEndpointIndex].Destroy(); }
 };
@@ -61,7 +62,7 @@ void emberAfOtaSoftwareUpdateProviderClusterServerInitCallback(EndpointId endpoi
             .endpointId                      = endpointId,
             .clusterId                       = OtaSoftwareUpdateProvider::Id,
             .fixedClusterServerEndpointCount = kOtaProviderFixedClusterCount,
-            .maxEndpointCount                = kOtaProviderMaxClusterCount,
+            .maxClusterInstanceCount         = kOtaProviderMaxClusterCount,
             .fetchFeatureMap                 = false,
             .fetchOptionalAttributes         = false,
         },
@@ -77,7 +78,7 @@ void MatterOtaSoftwareUpdateProviderClusterServerShutdownCallback(EndpointId end
             .endpointId                      = endpointId,
             .clusterId                       = OtaSoftwareUpdateProvider::Id,
             .fixedClusterServerEndpointCount = kOtaProviderFixedClusterCount,
-            .maxEndpointCount                = kOtaProviderMaxClusterCount,
+            .maxClusterInstanceCount         = kOtaProviderMaxClusterCount,
         },
         integrationDelegate);
 }
@@ -93,10 +94,19 @@ namespace OTAProvider {
 
 void SetDelegate(EndpointId endpointId, OTAProviderDelegate * delegate)
 {
-    uint16_t arrayIndex = emberAfGetClusterServerEndpointIndex(endpointId, OtaSoftwareUpdateProvider::Id,
-                                                               static_cast<uint16_t>(kOtaProviderFixedClusterCount));
-    VerifyOrReturn(arrayIndex < kOtaProviderMaxClusterCount);
-    gServers[arrayIndex].Cluster().SetDelegate(delegate);
+    IntegrationDelegate integrationDelegate;
+
+    ServerClusterInterface * interface = CodegenClusterIntegration::GetClusterForEndpointIndex(
+        {
+            .endpointId                      = endpointId,
+            .clusterId                       = OtaSoftwareUpdateProvider::Id,
+            .fixedClusterServerEndpointCount = kOtaProviderFixedClusterCount,
+            .maxClusterInstanceCount         = kOtaProviderMaxClusterCount,
+        },
+        integrationDelegate);
+    VerifyOrReturn(interface != nullptr);
+
+    static_cast<OtaProviderServer *>(interface)->SetDelegate(delegate);
 }
 
 } // namespace OTAProvider

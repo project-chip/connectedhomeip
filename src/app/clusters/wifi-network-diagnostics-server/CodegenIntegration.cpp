@@ -55,9 +55,10 @@ public:
         return gServers[emberEndpointIndex].Registration();
     }
 
-    ServerClusterInterface & FindRegistration(unsigned emberEndpointIndex) override
+    ServerClusterInterface * FindRegistration(unsigned emberEndpointIndex) override
     {
-        return gServers[emberEndpointIndex].Cluster();
+        VerifyOrReturnValue(gServers[emberEndpointIndex].IsConstructed(), nullptr);
+        return &gServers[emberEndpointIndex].Cluster();
     }
     void ReleaseRegistration(unsigned emberEndpointIndex) override { gServers[emberEndpointIndex].Destroy(); }
 };
@@ -74,7 +75,7 @@ void emberAfWiFiNetworkDiagnosticsClusterServerInitCallback(EndpointId endpointI
             .endpointId                      = endpointId,
             .clusterId                       = WiFiNetworkDiagnostics::Id,
             .fixedClusterServerEndpointCount = kWiFiNetworkDiagnosticsFixedClusterCount,
-            .maxEndpointCount                = kWiFiNetworkDiagnosticsMaxClusterCount,
+            .maxClusterInstanceCount         = kWiFiNetworkDiagnosticsMaxClusterCount,
             .fetchFeatureMap                 = true,
             .fetchOptionalAttributes         = true,
         },
@@ -91,7 +92,7 @@ void MatterWiFiNetworkDiagnosticsClusterServerShutdownCallback(EndpointId endpoi
             .endpointId                      = endpointId,
             .clusterId                       = WiFiNetworkDiagnostics::Id,
             .fixedClusterServerEndpointCount = kWiFiNetworkDiagnosticsFixedClusterCount,
-            .maxEndpointCount                = kWiFiNetworkDiagnosticsMaxClusterCount,
+            .maxClusterInstanceCount         = kWiFiNetworkDiagnosticsMaxClusterCount,
         },
         integrationDelegate);
 }

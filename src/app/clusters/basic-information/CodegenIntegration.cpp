@@ -58,7 +58,7 @@ public:
         return gRegistration;
     }
 
-    ServerClusterInterface & FindRegistration(unsigned emberEndpointIndex) override { return BasicInformationCluster::Instance(); }
+    ServerClusterInterface * FindRegistration(unsigned emberEndpointIndex) override { return &BasicInformationCluster::Instance(); }
 
     // Nothing to destroy: separate singleton class without constructor/destructor is used
     void ReleaseRegistration(unsigned emberEndpointIndex) override {}
@@ -77,8 +77,8 @@ void emberAfBasicInformationClusterServerInitCallback(EndpointId endpointId)
         {
             .endpointId                      = endpointId,
             .clusterId                       = BasicInformation::Id,
-            .fixedClusterServerEndpointCount = 1,
-            .maxEndpointCount                = 1,
+            .fixedClusterServerEndpointCount = BasicInformation::StaticApplicationConfig::kFixedClusterConfig.size(),
+            .maxClusterInstanceCount         = 1,
             .fetchFeatureMap                 = false,
             .fetchOptionalAttributes         = true,
         },
@@ -95,8 +95,8 @@ void MatterBasicInformationClusterServerShutdownCallback(EndpointId endpointId)
         {
             .endpointId                      = endpointId,
             .clusterId                       = BasicInformation::Id,
-            .fixedClusterServerEndpointCount = 1,
-            .maxEndpointCount                = 1,
+            .fixedClusterServerEndpointCount = BasicInformation::StaticApplicationConfig::kFixedClusterConfig.size(),
+            .maxClusterInstanceCount         = 1,
         },
         integrationDelegate);
 }

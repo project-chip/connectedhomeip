@@ -48,12 +48,27 @@ public:
         return gServers[emberEndpointIndex].Registration();
     }
 
-    ServerClusterInterface & FindRegistration(unsigned emberEndpointIndex) override
+    ServerClusterInterface * FindRegistration(unsigned emberEndpointIndex) override
     {
-        return gServers[emberEndpointIndex].Cluster();
+        VerifyOrReturnValue(gServers[emberEndpointIndex].IsConstructed(), nullptr);
+        return &gServers[emberEndpointIndex].Cluster();
     }
     void ReleaseRegistration(unsigned emberEndpointIndex) override { gServers[emberEndpointIndex].Destroy(); }
 };
+
+PushAvStreamTransportServer * FindClusterOnEndpoint(EndpointId endpointId)
+{
+    IntegrationDelegate integrationDelegate;
+    return static_cast<PushAvStreamTransportServer *>(
+        CodegenClusterIntegration::GetClusterForEndpointIndex(
+            {
+                .endpointId                      = endpointId,
+                .clusterId                       = PushAvStreamTransport::Id,
+                .fixedClusterServerEndpointCount = kPushAvStreamTransportFixedClusterCount,
+                .maxClusterInstanceCount         = kPushAvStreamTransportMaxClusterCount,
+            },
+            integrationDelegate);
+}
 
 } // namespace
 void emberAfPushAvStreamTransportClusterServerInitCallback(EndpointId endpointId)
@@ -66,7 +81,7 @@ void emberAfPushAvStreamTransportClusterServerInitCallback(EndpointId endpointId
             .endpointId                      = endpointId,
             .clusterId                       = PushAvStreamTransport::Id,
             .fixedClusterServerEndpointCount = kPushAvStreamTransportFixedClusterCount,
-            .maxEndpointCount                = kPushAvStreamTransportMaxClusterCount,
+            .maxClusterInstanceCount         = kPushAvStreamTransportMaxClusterCount,
             .fetchFeatureMap                 = true,
             .fetchOptionalAttributes         = false,
         },
@@ -82,7 +97,7 @@ void MatterPushAvStreamTransportClusterServerShutdownCallback(EndpointId endpoin
             .endpointId                      = endpointId,
             .clusterId                       = PushAvStreamTransport::Id,
             .fixedClusterServerEndpointCount = kPushAvStreamTransportFixedClusterCount,
-            .maxEndpointCount                = kPushAvStreamTransportMaxClusterCount,
+            .maxClusterInstanceCount         = kPushAvStreamTransportMaxClusterCount,
         },
         integrationDelegate);
 }
@@ -99,39 +114,21 @@ namespace PushAvStreamTransport {
 void SetDelegate(EndpointId endpointId, PushAvStreamTransportDelegate * delegate)
 {
     ChipLogProgress(AppServer, "Setting Push AV Stream Transport delegate on endpoint %u", endpointId);
-    uint16_t arrayIndex =
-        emberAfGetClusterServerEndpointIndex(endpointId, PushAvStreamTransport::Id, kPushAvStreamTransportFixedClusterCount);
-    if (arrayIndex >= kPushAvStreamTransportMaxClusterCount)
-    {
-        return;
-    }
 
-    if (!gServers[arrayIndex].IsConstructed())
+    if (PushAvStreamTransportServer * cluster = FindClusterOnEndpoint(endpointId); cluster != nullptr)
     {
-        ChipLogError(AppServer, "Push AV Stream transport is NOT yet constructed. Cannot set delegate");
-        return;
+        cluster->SetDelegate(delegate);
+        cluster->Init();
     }
-
-    gServers[arrayIndex].Cluster().SetDelegate(delegate);
-    gServers[arrayIndex].Cluster().Init();
 }
 
 void SetTLSClientManagementDelegate(EndpointId endpointId, TlsClientManagementDelegate * delegate)
 {
     ChipLogProgress(AppServer, "Setting TLS Client Management delegate on endpoint %u", endpointId);
-    uint16_t arrayIndex =
-        emberAfGetClusterServerEndpointIndex(endpointId, PushAvStreamTransport::Id, kPushAvStreamTransportFixedClusterCount);
-    if (arrayIndex >= kPushAvStreamTransportMaxClusterCount)
+    if (PushAvStreamTransportServer * cluster = FindClusterOnEndpoint(endpointId); cluster != nullptr)
     {
-        return;
+        cluster->SetTLSClientManagementDelegate(delegate);
     }
-
-    if (!gServers[arrayIndex].IsConstructed())
-    {
-        ChipLogError(AppServer, "Push AV Stream transport is NOT yet constructed. Cannot set TLS Client Management delegate");
-        return;
-    }
-    gServers[arrayIndex].Cluster().SetTLSClientManagementDelegate(delegate);
 }
 
 } // namespace PushAvStreamTransport

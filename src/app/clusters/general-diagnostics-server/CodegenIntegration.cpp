@@ -76,7 +76,11 @@ public:
         return gServer.Registration();
     }
 
-    ServerClusterInterface & FindRegistration(unsigned emberEndpointIndex) override { return gServer.Cluster(); }
+    ServerClusterInterface * FindRegistration(unsigned emberEndpointIndex) override
+    {
+        VerifyOrReturnValue(gServer.IsConstructed(), nullptr);
+        return &gServer.Cluster();
+    }
     void ReleaseRegistration(unsigned emberEndpointIndex) override { gServer.Destroy(); }
 };
 
@@ -91,8 +95,8 @@ void emberAfGeneralDiagnosticsClusterServerInitCallback(EndpointId endpointId)
         {
             .endpointId                      = endpointId,
             .clusterId                       = GeneralDiagnostics::Id,
-            .fixedClusterServerEndpointCount = 1,
-            .maxEndpointCount                = 1,
+            .fixedClusterServerEndpointCount = GeneralDiagnostics::StaticApplicationConfig::kFixedClusterConfig.size(),
+            .maxClusterInstanceCount         = 1,
             .fetchFeatureMap                 = false,
             .fetchOptionalAttributes         = true,
         },
@@ -108,8 +112,8 @@ void MatterGeneralDiagnosticsClusterServerShutdownCallback(EndpointId endpointId
         {
             .endpointId                      = endpointId,
             .clusterId                       = GeneralDiagnostics::Id,
-            .fixedClusterServerEndpointCount = 1,
-            .maxEndpointCount                = 1,
+            .fixedClusterServerEndpointCount = GeneralDiagnostics::StaticApplicationConfig::kFixedClusterConfig.size(),
+            .maxClusterInstanceCount         = 1,
         },
         integrationDelegate);
 }

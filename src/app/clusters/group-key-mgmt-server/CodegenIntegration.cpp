@@ -42,7 +42,11 @@ public:
         return gServer.Registration();
     }
 
-    ServerClusterInterface & FindRegistration(unsigned emberEndpointIndex) override { return gServer.Cluster(); }
+    ServerClusterInterface * FindRegistration(unsigned emberEndpointIndex) override
+    {
+        VerifyOrReturnValue(gServer.IsConstructed(), nullptr);
+        return &gServer.Cluster();
+    }
 
     // Nothing to destroy: separate singleton class without constructor/destructor is used
     void ReleaseRegistration(unsigned emberEndpointIndex) override { gServer.Destroy(); }
@@ -58,8 +62,8 @@ void emberAfGroupKeyManagementClusterServerInitCallback(EndpointId endpointId)
         {
             .endpointId                      = endpointId,
             .clusterId                       = GroupKeyManagement::Id,
-            .fixedClusterServerEndpointCount = 1,
-            .maxEndpointCount                = 1,
+            .fixedClusterServerEndpointCount = GroupKeyManagement::StaticApplicationConfig::kFixedClusterConfig.size(),
+            .maxClusterInstanceCount         = 1,
             .fetchFeatureMap                 = false,
             .fetchOptionalAttributes         = false,
         },
@@ -74,8 +78,8 @@ void MatterGroupKeyManagementClusterServerShutdownCallback(EndpointId endpointId
         {
             .endpointId                      = endpointId,
             .clusterId                       = GroupKeyManagement::Id,
-            .fixedClusterServerEndpointCount = 1,
-            .maxEndpointCount                = 1,
+            .fixedClusterServerEndpointCount = GroupKeyManagement::StaticApplicationConfig::kFixedClusterConfig.size(),
+            .maxClusterInstanceCount         = 1,
         },
         integrationDelegate);
 }

@@ -52,9 +52,10 @@ public:
         return gServers[emberEndpointIndex].Registration();
     }
 
-    ServerClusterInterface & FindRegistration(unsigned emberEndpointIndex) override
+    ServerClusterInterface * FindRegistration(unsigned emberEndpointIndex) override
     {
-        return gServers[emberEndpointIndex].Cluster();
+        VerifyOrReturnValue(gServers[emberEndpointIndex].IsConstructed(), nullptr);
+        return &gServers[emberEndpointIndex].Cluster();
     }
     void ReleaseRegistration(unsigned emberEndpointIndex) override { gServers[emberEndpointIndex].Destroy(); }
 };
@@ -70,7 +71,7 @@ void emberAfEthernetNetworkDiagnosticsClusterServerInitCallback(EndpointId endpo
             .endpointId                      = endpointId,
             .clusterId                       = EthernetNetworkDiagnostics::Id,
             .fixedClusterServerEndpointCount = kEthernetNetworkDiagnosticsFixedClusterCount,
-            .maxEndpointCount                = kEthernetNetworkDiagnosticsMaxClusterCount,
+            .maxClusterInstanceCount         = kEthernetNetworkDiagnosticsMaxClusterCount,
             .fetchFeatureMap                 = true,
             .fetchOptionalAttributes         = true,
         },
@@ -86,7 +87,7 @@ void MatterEthernetNetworkDiagnosticsClusterServerShutdownCallback(EndpointId en
             .endpointId                      = endpointId,
             .clusterId                       = EthernetNetworkDiagnostics::Id,
             .fixedClusterServerEndpointCount = kEthernetNetworkDiagnosticsFixedClusterCount,
-            .maxEndpointCount                = kEthernetNetworkDiagnosticsMaxClusterCount,
+            .maxClusterInstanceCount         = kEthernetNetworkDiagnosticsMaxClusterCount,
         },
         integrationDelegate);
 }
