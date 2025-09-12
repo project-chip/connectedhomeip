@@ -152,12 +152,12 @@ class TC_CADMIN_1_28(MatterBaseTest):
         self.ecoACATs = base64.b64decode(jfcStorage.get("Default", "CommissionerCATs"))[::-1].hex().strip('0')
 
         self.thserver_fabric_a_passcode = random.randint(11022011, 11022099)
-        self.theserver_fabric_b_discriminator = random.randint(0, 4095)
+        self.theserver_fabric_a_discriminator = random.randint(0, 4095)
         self.fabric_a_server_app = AppServerSubprocess(
             self.th_server_app,
             storage_dir=self.storage_fabric_a,
             port=random.randint(5001, 5999),
-            discriminator=self.theserver_fabric_b_discriminator,
+            discriminator=self.theserver_fabric_a_discriminator,
             passcode=self.thserver_fabric_a_passcode,
             extra_args=["--capabilities", "0x04"])
         self.fabric_a_server_app.start(
@@ -165,7 +165,7 @@ class TC_CADMIN_1_28(MatterBaseTest):
             timeout=10)
 
         self.fabric_a_ctrl.send(
-            message=f"pairing onnetwork-long 2 {self.thserver_fabric_a_passcode} {self.theserver_fabric_b_discriminator}",
+            message=f"pairing onnetwork-long 2 {self.thserver_fabric_a_passcode} {self.theserver_fabric_a_discriminator}",
             expected_output="[CTL] Commissioning complete for node ID 0x0000000000000002: success",
             timeout=30)
 

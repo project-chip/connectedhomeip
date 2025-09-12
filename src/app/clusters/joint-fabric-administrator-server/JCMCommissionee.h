@@ -19,6 +19,7 @@
 #pragma once
 
 #include <credentials/jcm/TrustVerification.h>
+#include <credentials/jcm/VendorIdVerificationClient.h>
 
 #include <app/CommandHandlerInterface.h>
 #include <lib/core/CHIPCallback.h>

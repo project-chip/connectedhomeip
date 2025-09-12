@@ -22,7 +22,6 @@
 #include <app/ClusterStateCache.h>
 #include <app/OperationalSessionSetup.h>
 #include <controller/CommissioneeDeviceProxy.h>
-#include <controller/jcm/TrustVerification.h>
 #include <credentials/attestation_verifier/DeviceAttestationDelegate.h>
 #include <credentials/attestation_verifier/DeviceAttestationVerifier.h>
 #include <credentials/jcm/TrustVerification.h> // nogncheck

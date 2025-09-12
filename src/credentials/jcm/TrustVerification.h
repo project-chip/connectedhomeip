@@ -86,8 +86,6 @@ enum class TrustVerificationError : uint16_t
     kInternalError = 200,
 };
 
-class TrustVerificationStateMachine;
-
 enum TrustVerificationStage : uint8_t
 {
     kIdle,
@@ -177,48 +175,7 @@ inline std::string EnumToString(TrustVerificationStage stage)
     }
 }
 
-typedef void (*TrustVerificationCompleteCallback)(void * context, TrustVerificationInfo & info, TrustVerificationError result);
-
-/**
- * A delegate that can be notified of progress as the JCM Trust Verification check proceeds.
- */
-class DLL_EXPORT TrustVerificationDelegate
-{
-public:
-    virtual ~TrustVerificationDelegate() = default;
-
-    virtual void OnProgressUpdate(TrustVerificationStateMachine & stateMachine, TrustVerificationStage stage,
-                                  TrustVerificationInfo & info, TrustVerificationError error)                    = 0;
-    virtual void OnAskUserForConsent(TrustVerificationStateMachine & stateMachine, TrustVerificationInfo & info) = 0;
-    virtual CHIP_ERROR OnLookupOperationalTrustAnchor(VendorId vendorID, CertificateKeyId & subjectKeyId,
-                                                      ByteSpan & globallyTrustedRootSpan)                        = 0;
-};
-
-/**
- * A client that handles Vendor ID verification for a specific device.
- */
-class DLL_EXPORT VendorIdVerificationClient
-{
-public:
-    virtual ~VendorIdVerificationClient() = default;
-
-    // Used to obtain SessionHandles from VerifyVendorId callers. SessionHandles cannot be stored, so we must retrieve them
-    // dynamically with a callback.
-    using SessionGetterFunc = std::function<Optional<SessionHandle>()>;
-
-    CHIP_ERROR VerifyVendorId(ExchangeManager * exchangeMgr, const SessionGetterFunc getSession, TrustVerificationInfo * info);
-
-protected:
-    virtual CHIP_ERROR OnLookupOperationalTrustAnchor(VendorId vendorID, CertificateKeyId & subjectKeyId,
-                                                      ByteSpan & globallyTrustedRootSpan) = 0;
-    virtual void OnVendorIdVerficationComplete(const CHIP_ERROR & err)                    = 0;
-
-private:
-    CHIP_ERROR VerifyNOCCertificateChain(const ByteSpan & nocSpan, const ByteSpan & icacSpan, const ByteSpan & rcacSpan);
-
-    CHIP_ERROR Verify(ExchangeManager * exchangeMgr, const SessionGetterFunc getSession, TrustVerificationInfo * info,
-                      const ByteSpan clientChallengeSpan, const SignVIDVerificationResponse::DecodableType responseData);
-};
+class TrustVerificationDelegate;
 
 class DLL_EXPORT TrustVerificationStateMachine
 {
@@ -261,6 +218,21 @@ protected:
 
     // Trust verification delegate for the commissioning client
     TrustVerificationDelegate * mTrustVerificationDelegate = nullptr;
+};
+
+/**
+ * A delegate that can be notified of progress as the JCM Trust Verification check proceeds.
+ */
+class DLL_EXPORT TrustVerificationDelegate
+{
+public:
+    virtual ~TrustVerificationDelegate() = default;
+
+    virtual void OnProgressUpdate(TrustVerificationStateMachine & stateMachine, TrustVerificationStage stage,
+                                  TrustVerificationInfo & info, TrustVerificationError error)                    = 0;
+    virtual void OnAskUserForConsent(TrustVerificationStateMachine & stateMachine, TrustVerificationInfo & info) = 0;
+    virtual CHIP_ERROR OnLookupOperationalTrustAnchor(VendorId vendorID, CertificateKeyId & subjectKeyId,
+                                                      ByteSpan & globallyTrustedRootSpan)                        = 0;
 };
 
 } // namespace JCM

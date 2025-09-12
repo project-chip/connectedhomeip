@@ -1,12 +1,13 @@
 # Joint Fabric Guide
 
-- [Joint Fabric Guide](#joint-fabric-guide)
-  - [Joint Fabric Example Applications](#joint-fabric-example-applications)
-    - [Building the Example Application](#building-the-example-application)
-  - [Bootstrap Joint Fabric Demo on Linux](#bootstrap-joint-fabric-demo-on-linux)
-    - [Initialize Ecosystem A (Vendor ID = 0xFFF1)](#initialize-ecosystem-a-vendor-id--0xfff1)
-    - [Initialize Ecosystem B (Vendor ID = 0xFFF2)](#initialize-ecosystem-b-vendor-id--0xfff2)
-  - [Manually Testing JCM (Joint Commissioning Method)](#manually-testing-jcm-joint-commissioning-method)
+-   [Joint Fabric Guide](#joint-fabric-guide)
+    -   [Joint Fabric Example Applications](#joint-fabric-example-applications)
+        -   [Building the Example Application](#building-the-example-application)
+    -   [Bootstrap Joint Fabric Demo on Linux](#bootstrap-joint-fabric-demo-on-linux)
+        -   [Initialize Ecosystem A (Vendor ID = 0xFFF1)](#initialize-ecosystem-a-vendor-id--0xfff1)
+        -   [Initialize Ecosystem B (Vendor ID = 0xFFF2)](#initialize-ecosystem-b-vendor-id--0xfff2)
+    -   [Manually Testing JCM (Joint Commissioning Method)](#manually-testing-jcm-joint-commissioning-method)
+    -   [Unit Testing Joint Fabric](#unit-testing-joint-fabric)
 
 ## Joint Fabric Example Applications
 
@@ -278,3 +279,9 @@ On the Ecosystem A Joint Fabric Controller application
 ```
 pairing code 10 [manual pairing code] --jcm true
 ```
+
+## Unit Testing Joint Fabric
+
+To enable Joint Fabric related unit tests please use the following command:
+
+`gn gen out/test --args="chip_device_config_enable_joint_fabric=true"`
