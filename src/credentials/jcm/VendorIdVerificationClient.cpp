@@ -125,7 +125,7 @@ CHIP_ERROR VendorIdVerificationClient::Verify(TrustVerificationInfo * info, cons
     // associated with the candidate fabric. If the chain is not valid, the procedure terminates as failed.
     ReturnLogErrorOnFailure(VerifyNOCCertificateChain(nocSpan, icacSpan, globallyTrustedRootSpan));
 
-    // 13. Given that all prior steps succeeded, the candidate fabric’s VendorID SHALL be deemed authentic and err should be 
+    // 13. Given that all prior steps succeeded, the candidate fabric’s VendorID SHALL be deemed authentic and err should be
     // CHIP_NO_ERROR.
     return CHIP_NO_ERROR;
 }
