@@ -64,7 +64,7 @@ public:
         /// however it is not a generic rule. Usage of it must be double-checked as sufficient.
         ///
         /// Method is assumed to never fail: this is expected to call a constructor and not fail.
-        virtual ServerClusterRegistration & CreateRegistration(EndpointId endpointId, unsigned emberEndpointIndex,
+        virtual ServerClusterRegistration & CreateRegistration(EndpointId endpointId, unsigned clusterInstanceIndex,
                                                                uint32_t optionalAttributeBits, uint32_t featureMap) = 0;
 
         /// Find the previously created cluster on the given index.
@@ -72,14 +72,14 @@ public:
         /// It should return the given interface IF AND ONLY IF it is valid.
         /// This will be called after CreateRegistration or as part of finding an existing
         /// registered cluster.
-        virtual ServerClusterInterface * FindRegistration(unsigned emberEndpointIndex) = 0;
+        virtual ServerClusterInterface * FindRegistration(unsigned clusterInstanceIndex) = 0;
 
         /// Free up resources for this index, generally expected to call a destructor/free resources
         /// as applicable.
         ///
         /// It is assumed that this is called once as part of the shutdown sequence to undo
         /// work done by `CreateRegistration`.
-        virtual void ReleaseRegistration(unsigned emberEndpointIndex) = 0;
+        virtual void ReleaseRegistration(unsigned clusterInstanceIndex) = 0;
     };
 
     // Note on indexing:

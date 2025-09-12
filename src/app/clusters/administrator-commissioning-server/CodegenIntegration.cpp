@@ -53,19 +53,19 @@ LazyRegisteredServerCluster<ClusterImpl> gServer;
 class IntegrationDelegate : public CodegenClusterIntegration::Delegate
 {
 public:
-    ServerClusterRegistration & CreateRegistration(EndpointId endpointId, unsigned emberEndpointIndex,
+    ServerClusterRegistration & CreateRegistration(EndpointId endpointId, unsigned clusterInstanceIndex,
                                                    uint32_t optionalAttributeBits, uint32_t featureMap) override
     {
         gServer.Create(endpointId, BitFlags<AdministratorCommissioning::Feature>(featureMap));
         return gServer.Registration();
     }
 
-    ServerClusterInterface * FindRegistration(unsigned emberEndpointIndex) override
+    ServerClusterInterface * FindRegistration(unsigned clusterInstanceIndex) override
     {
         VerifyOrReturnValue(gServer.IsConstructed(), nullptr);
         return &gServer.Cluster();
     }
-    void ReleaseRegistration(unsigned emberEndpointIndex) override { gServer.Destroy(); }
+    void ReleaseRegistration(unsigned clusterInstanceIndex) override { gServer.Destroy(); }
 };
 
 } // namespace

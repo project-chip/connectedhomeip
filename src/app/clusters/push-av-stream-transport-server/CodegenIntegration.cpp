@@ -40,20 +40,20 @@ LazyRegisteredServerCluster<PushAvStreamTransportServer> gServers[kPushAvStreamT
 class IntegrationDelegate : public CodegenClusterIntegration::Delegate
 {
 public:
-    ServerClusterRegistration & CreateRegistration(EndpointId endpointId, unsigned emberEndpointIndex,
+    ServerClusterRegistration & CreateRegistration(EndpointId endpointId, unsigned clusterInstanceIndex,
                                                    uint32_t optionalAttributeBits, uint32_t featureMap) override
     {
-        ChipLogProgress(AppServer, "Registering Push AV Stream Transport on endpoint %u, %d", endpointId, emberEndpointIndex);
-        gServers[emberEndpointIndex].Create(endpointId, BitFlags<PushAvStreamTransport::Feature>(featureMap));
-        return gServers[emberEndpointIndex].Registration();
+        ChipLogProgress(AppServer, "Registering Push AV Stream Transport on endpoint %u, %d", endpointId, clusterInstanceIndex);
+        gServers[clusterInstanceIndex].Create(endpointId, BitFlags<PushAvStreamTransport::Feature>(featureMap));
+        return gServers[clusterInstanceIndex].Registration();
     }
 
-    ServerClusterInterface * FindRegistration(unsigned emberEndpointIndex) override
+    ServerClusterInterface * FindRegistration(unsigned clusterInstanceIndex) override
     {
-        VerifyOrReturnValue(gServers[emberEndpointIndex].IsConstructed(), nullptr);
-        return &gServers[emberEndpointIndex].Cluster();
+        VerifyOrReturnValue(gServers[clusterInstanceIndex].IsConstructed(), nullptr);
+        return &gServers[clusterInstanceIndex].Cluster();
     }
-    void ReleaseRegistration(unsigned emberEndpointIndex) override { gServers[emberEndpointIndex].Destroy(); }
+    void ReleaseRegistration(unsigned clusterInstanceIndex) override { gServers[clusterInstanceIndex].Destroy(); }
 };
 
 PushAvStreamTransportServer * FindClusterOnEndpoint(EndpointId endpointId)
