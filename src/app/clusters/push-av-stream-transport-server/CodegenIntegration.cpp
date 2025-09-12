@@ -64,7 +64,7 @@ PushAvStreamTransportServer * FindClusterOnEndpoint(EndpointId endpointId)
             {
                 .endpointId                      = endpointId,
                 .clusterId                       = PushAvStreamTransport::Id,
-                .fixedClusterServerEndpointCount = kPushAvStreamTransportFixedClusterCount,
+                .fixedClusterInstanceCount = kPushAvStreamTransportFixedClusterCount,
                 .maxClusterInstanceCount         = kPushAvStreamTransportMaxClusterCount,
             },
             integrationDelegate);
@@ -78,12 +78,12 @@ void emberAfPushAvStreamTransportClusterServerInitCallback(EndpointId endpointId
 
     CodegenClusterIntegration::RegisterServer(
         {
-            .endpointId                      = endpointId,
-            .clusterId                       = PushAvStreamTransport::Id,
-            .fixedClusterServerEndpointCount = kPushAvStreamTransportFixedClusterCount,
-            .maxClusterInstanceCount         = kPushAvStreamTransportMaxClusterCount,
-            .fetchFeatureMap                 = true,
-            .fetchOptionalAttributes         = false,
+            .endpointId                = endpointId,
+            .clusterId                 = PushAvStreamTransport::Id,
+            .fixedClusterInstanceCount = kPushAvStreamTransportFixedClusterCount,
+            .maxClusterInstanceCount   = kPushAvStreamTransportMaxClusterCount,
+            .fetchFeatureMap           = true,
+            .fetchOptionalAttributes   = false,
         },
         integrationDelegate);
 }
@@ -94,10 +94,10 @@ void MatterPushAvStreamTransportClusterServerShutdownCallback(EndpointId endpoin
 
     CodegenClusterIntegration::UnregisterServer(
         {
-            .endpointId                      = endpointId,
-            .clusterId                       = PushAvStreamTransport::Id,
-            .fixedClusterServerEndpointCount = kPushAvStreamTransportFixedClusterCount,
-            .maxClusterInstanceCount         = kPushAvStreamTransportMaxClusterCount,
+            .endpointId                = endpointId,
+            .clusterId                 = PushAvStreamTransport::Id,
+            .fixedClusterInstanceCount = kPushAvStreamTransportFixedClusterCount,
+            .maxClusterInstanceCount   = kPushAvStreamTransportMaxClusterCount,
         },
         integrationDelegate);
 }

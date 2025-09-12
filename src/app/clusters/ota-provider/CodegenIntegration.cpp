@@ -59,12 +59,12 @@ void emberAfOtaSoftwareUpdateProviderClusterServerInitCallback(EndpointId endpoi
 
     CodegenClusterIntegration::RegisterServer(
         {
-            .endpointId                      = endpointId,
-            .clusterId                       = OtaSoftwareUpdateProvider::Id,
-            .fixedClusterServerEndpointCount = kOtaProviderFixedClusterCount,
-            .maxClusterInstanceCount         = kOtaProviderMaxClusterCount,
-            .fetchFeatureMap                 = false,
-            .fetchOptionalAttributes         = false,
+            .endpointId                = endpointId,
+            .clusterId                 = OtaSoftwareUpdateProvider::Id,
+            .fixedClusterInstanceCount = kOtaProviderFixedClusterCount,
+            .maxClusterInstanceCount   = kOtaProviderMaxClusterCount,
+            .fetchFeatureMap           = false,
+            .fetchOptionalAttributes   = false,
         },
         integrationDelegate);
 }
@@ -75,10 +75,10 @@ void MatterOtaSoftwareUpdateProviderClusterServerShutdownCallback(EndpointId end
 
     CodegenClusterIntegration::UnregisterServer(
         {
-            .endpointId                      = endpointId,
-            .clusterId                       = OtaSoftwareUpdateProvider::Id,
-            .fixedClusterServerEndpointCount = kOtaProviderFixedClusterCount,
-            .maxClusterInstanceCount         = kOtaProviderMaxClusterCount,
+            .endpointId                = endpointId,
+            .clusterId                 = OtaSoftwareUpdateProvider::Id,
+            .fixedClusterInstanceCount = kOtaProviderFixedClusterCount,
+            .maxClusterInstanceCount   = kOtaProviderMaxClusterCount,
         },
         integrationDelegate);
 }
@@ -98,10 +98,10 @@ void SetDelegate(EndpointId endpointId, OTAProviderDelegate * delegate)
 
     ServerClusterInterface * interface = CodegenClusterIntegration::GetClusterForEndpointIndex(
         {
-            .endpointId                      = endpointId,
-            .clusterId                       = OtaSoftwareUpdateProvider::Id,
-            .fixedClusterServerEndpointCount = kOtaProviderFixedClusterCount,
-            .maxClusterInstanceCount         = kOtaProviderMaxClusterCount,
+            .endpointId                = endpointId,
+            .clusterId                 = OtaSoftwareUpdateProvider::Id,
+            .fixedClusterInstanceCount = kOtaProviderFixedClusterCount,
+            .maxClusterInstanceCount   = kOtaProviderMaxClusterCount,
         },
         integrationDelegate);
     VerifyOrReturn(interface != nullptr);

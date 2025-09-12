@@ -60,12 +60,12 @@ void emberAfGroupKeyManagementClusterServerInitCallback(EndpointId endpointId)
 
     CodegenClusterIntegration::RegisterServer(
         {
-            .endpointId                      = endpointId,
-            .clusterId                       = GroupKeyManagement::Id,
-            .fixedClusterServerEndpointCount = GroupKeyManagement::StaticApplicationConfig::kFixedClusterConfig.size(),
-            .maxClusterInstanceCount         = 1,
-            .fetchFeatureMap                 = false,
-            .fetchOptionalAttributes         = false,
+            .endpointId                = endpointId,
+            .clusterId                 = GroupKeyManagement::Id,
+            .fixedClusterInstanceCount = GroupKeyManagement::StaticApplicationConfig::kFixedClusterConfig.size(),
+            .maxClusterInstanceCount   = 1,
+            .fetchFeatureMap           = false,
+            .fetchOptionalAttributes   = false,
         },
         integrationDelegate);
 }
@@ -76,10 +76,10 @@ void MatterGroupKeyManagementClusterServerShutdownCallback(EndpointId endpointId
 
     CodegenClusterIntegration::UnregisterServer(
         {
-            .endpointId                      = endpointId,
-            .clusterId                       = GroupKeyManagement::Id,
-            .fixedClusterServerEndpointCount = GroupKeyManagement::StaticApplicationConfig::kFixedClusterConfig.size(),
-            .maxClusterInstanceCount         = 1,
+            .endpointId                = endpointId,
+            .clusterId                 = GroupKeyManagement::Id,
+            .fixedClusterInstanceCount = GroupKeyManagement::StaticApplicationConfig::kFixedClusterConfig.size(),
+            .maxClusterInstanceCount   = 1,
         },
         integrationDelegate);
 }

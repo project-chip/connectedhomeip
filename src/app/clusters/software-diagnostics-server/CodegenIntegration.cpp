@@ -65,12 +65,12 @@ void emberAfSoftwareDiagnosticsClusterServerInitCallback(EndpointId endpointId)
     // register a singleton server (root endpoint only)
     CodegenClusterIntegration::RegisterServer(
         {
-            .endpointId                      = endpointId,
-            .clusterId                       = SoftwareDiagnostics::Id,
-            .fixedClusterServerEndpointCount = SoftwareDiagnostics::StaticApplicationConfig::kFixedClusterConfig.size(),
-            .maxClusterInstanceCount         = 1,
-            .fetchFeatureMap                 = false,
-            .fetchOptionalAttributes         = true,
+            .endpointId                = endpointId,
+            .clusterId                 = SoftwareDiagnostics::Id,
+            .fixedClusterInstanceCount = SoftwareDiagnostics::StaticApplicationConfig::kFixedClusterConfig.size(),
+            .maxClusterInstanceCount   = 1,
+            .fetchFeatureMap           = false,
+            .fetchOptionalAttributes   = true,
         },
         integrationDelegate);
 }
@@ -82,10 +82,10 @@ void MatterSoftwareDiagnosticsClusterServerShutdownCallback(EndpointId endpointI
     // register a singleton server (root endpoint only)
     CodegenClusterIntegration::UnregisterServer(
         {
-            .endpointId                      = endpointId,
-            .clusterId                       = SoftwareDiagnostics::Id,
-            .fixedClusterServerEndpointCount = SoftwareDiagnostics::StaticApplicationConfig::kFixedClusterConfig.size(),
-            .maxClusterInstanceCount         = 1,
+            .endpointId                = endpointId,
+            .clusterId                 = SoftwareDiagnostics::Id,
+            .fixedClusterInstanceCount = SoftwareDiagnostics::StaticApplicationConfig::kFixedClusterConfig.size(),
+            .maxClusterInstanceCount   = 1,
         },
         integrationDelegate);
 }

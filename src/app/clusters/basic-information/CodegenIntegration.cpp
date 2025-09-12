@@ -78,12 +78,12 @@ void emberAfBasicInformationClusterServerInitCallback(EndpointId endpointId)
     // register a singleton server (root endpoint only)
     CodegenClusterIntegration::RegisterServer(
         {
-            .endpointId                      = endpointId,
-            .clusterId                       = BasicInformation::Id,
-            .fixedClusterServerEndpointCount = BasicInformation::StaticApplicationConfig::kFixedClusterConfig.size(),
-            .maxClusterInstanceCount         = 1,
-            .fetchFeatureMap                 = false,
-            .fetchOptionalAttributes         = true,
+            .endpointId                = endpointId,
+            .clusterId                 = BasicInformation::Id,
+            .fixedClusterInstanceCount = BasicInformation::StaticApplicationConfig::kFixedClusterConfig.size(),
+            .maxClusterInstanceCount   = 1,
+            .fetchFeatureMap           = false,
+            .fetchOptionalAttributes   = true,
         },
         integrationDelegate);
 }
@@ -96,10 +96,10 @@ void MatterBasicInformationClusterServerShutdownCallback(EndpointId endpointId)
 
     CodegenClusterIntegration::UnregisterServer(
         {
-            .endpointId                      = endpointId,
-            .clusterId                       = BasicInformation::Id,
-            .fixedClusterServerEndpointCount = BasicInformation::StaticApplicationConfig::kFixedClusterConfig.size(),
-            .maxClusterInstanceCount         = 1,
+            .endpointId                = endpointId,
+            .clusterId                 = BasicInformation::Id,
+            .fixedClusterInstanceCount = BasicInformation::StaticApplicationConfig::kFixedClusterConfig.size(),
+            .maxClusterInstanceCount   = 1,
         },
         integrationDelegate);
 }

@@ -64,12 +64,12 @@ void emberAfBooleanStateClusterServerInitCallback(EndpointId endpointId)
     // register a singleton server (root endpoint only)
     CodegenClusterIntegration::RegisterServer(
         {
-            .endpointId                      = endpointId,
-            .clusterId                       = BooleanState::Id,
-            .fixedClusterServerEndpointCount = kBooleanStateFixedClusterCount,
-            .maxClusterInstanceCount         = kBooleanStateMaxClusterCount,
-            .fetchFeatureMap                 = false,
-            .fetchOptionalAttributes         = false,
+            .endpointId                = endpointId,
+            .clusterId                 = BooleanState::Id,
+            .fixedClusterInstanceCount = kBooleanStateFixedClusterCount,
+            .maxClusterInstanceCount   = kBooleanStateMaxClusterCount,
+            .fetchFeatureMap           = false,
+            .fetchOptionalAttributes   = false,
         },
         integrationDelegate);
 }
@@ -81,10 +81,10 @@ void MatterBooleanStateClusterServerShutdownCallback(EndpointId endpointId)
     // register a singleton server (root endpoint only)
     CodegenClusterIntegration::UnregisterServer(
         {
-            .endpointId                      = endpointId,
-            .clusterId                       = BooleanState::Id,
-            .fixedClusterServerEndpointCount = kBooleanStateFixedClusterCount,
-            .maxClusterInstanceCount         = kBooleanStateMaxClusterCount,
+            .endpointId                = endpointId,
+            .clusterId                 = BooleanState::Id,
+            .fixedClusterInstanceCount = kBooleanStateFixedClusterCount,
+            .maxClusterInstanceCount   = kBooleanStateMaxClusterCount,
         },
         integrationDelegate);
 }
@@ -97,10 +97,10 @@ BooleanStateCluster * GetClusterForEndpointIndex(EndpointId endpointId)
 
     ServerClusterInterface * booleanState = CodegenClusterIntegration::GetClusterForEndpointIndex(
         {
-            .endpointId                      = endpointId,
-            .clusterId                       = BooleanState::Id,
-            .fixedClusterServerEndpointCount = kBooleanStateFixedClusterCount,
-            .maxClusterInstanceCount         = kBooleanStateMaxClusterCount,
+            .endpointId                = endpointId,
+            .clusterId                 = BooleanState::Id,
+            .fixedClusterInstanceCount = kBooleanStateFixedClusterCount,
+            .maxClusterInstanceCount   = kBooleanStateMaxClusterCount,
         },
         integrationDelegate);
 

@@ -72,12 +72,12 @@ void emberAfWiFiNetworkDiagnosticsClusterServerInitCallback(EndpointId endpointI
 
     CodegenClusterIntegration::RegisterServer(
         {
-            .endpointId                      = endpointId,
-            .clusterId                       = WiFiNetworkDiagnostics::Id,
-            .fixedClusterServerEndpointCount = kWiFiNetworkDiagnosticsFixedClusterCount,
-            .maxClusterInstanceCount         = kWiFiNetworkDiagnosticsMaxClusterCount,
-            .fetchFeatureMap                 = true,
-            .fetchOptionalAttributes         = true,
+            .endpointId                = endpointId,
+            .clusterId                 = WiFiNetworkDiagnostics::Id,
+            .fixedClusterInstanceCount = kWiFiNetworkDiagnosticsFixedClusterCount,
+            .maxClusterInstanceCount   = kWiFiNetworkDiagnosticsMaxClusterCount,
+            .fetchFeatureMap           = true,
+            .fetchOptionalAttributes   = true,
         },
         integrationDelegate);
 }
@@ -89,10 +89,10 @@ void MatterWiFiNetworkDiagnosticsClusterServerShutdownCallback(EndpointId endpoi
 
     CodegenClusterIntegration::UnregisterServer(
         {
-            .endpointId                      = endpointId,
-            .clusterId                       = WiFiNetworkDiagnostics::Id,
-            .fixedClusterServerEndpointCount = kWiFiNetworkDiagnosticsFixedClusterCount,
-            .maxClusterInstanceCount         = kWiFiNetworkDiagnosticsMaxClusterCount,
+            .endpointId                = endpointId,
+            .clusterId                 = WiFiNetworkDiagnostics::Id,
+            .fixedClusterInstanceCount = kWiFiNetworkDiagnosticsFixedClusterCount,
+            .maxClusterInstanceCount   = kWiFiNetworkDiagnosticsMaxClusterCount,
         },
         integrationDelegate);
 }

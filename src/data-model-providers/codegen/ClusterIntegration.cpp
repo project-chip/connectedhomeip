@@ -29,10 +29,10 @@ namespace chip::app {
 
 namespace {
 
-bool FindEndpointWithLog(EndpointId endpointId, ClusterId clusterId, uint16_t fixedClusterServerEndpointCount,
+bool FindEndpointWithLog(EndpointId endpointId, ClusterId clusterId, uint16_t fixedClusterInstanceCount,
                          uint16_t maxClusterInstanceCount, uint16_t & clusterInstanceIndex)
 {
-    clusterInstanceIndex = emberAfGetClusterServerEndpointIndex(endpointId, clusterId, fixedClusterServerEndpointCount);
+    clusterInstanceIndex = emberAfGetClusterServerEndpointIndex(endpointId, clusterId, fixedClusterInstanceCount);
 
     if (clusterInstanceIndex >= maxClusterInstanceCount)
     {
@@ -73,7 +73,7 @@ uint32_t LoadFeatureMap(EndpointId endpointId, ClusterId clusterId)
 void CodegenClusterIntegration::RegisterServer(const RegisterServerOptions & options, Delegate & delegate)
 {
     uint16_t clusterInstanceIndex;
-    if (!FindEndpointWithLog(options.endpointId, options.clusterId, options.fixedClusterServerEndpointCount,
+    if (!FindEndpointWithLog(options.endpointId, options.clusterId, options.fixedClusterInstanceCount,
                              options.maxClusterInstanceCount, clusterInstanceIndex))
     {
         return;
@@ -123,7 +123,7 @@ void CodegenClusterIntegration::RegisterServer(const RegisterServerOptions & opt
 void CodegenClusterIntegration::UnregisterServer(const UnregisterServerOptions & options, Delegate & delegate)
 {
     uint16_t clusterInstanceIndex;
-    if (!FindEndpointWithLog(options.endpointId, options.clusterId, options.fixedClusterServerEndpointCount,
+    if (!FindEndpointWithLog(options.endpointId, options.clusterId, options.fixedClusterInstanceCount,
                              options.maxClusterInstanceCount, clusterInstanceIndex))
     {
         return;
@@ -151,7 +151,7 @@ ServerClusterInterface * CodegenClusterIntegration::GetClusterForEndpointIndex(c
                                                                                Delegate & delegate)
 {
     uint16_t clusterInstanceIndex;
-    if (!FindEndpointWithLog(options.endpointId, options.clusterId, options.fixedClusterServerEndpointCount,
+    if (!FindEndpointWithLog(options.endpointId, options.clusterId, options.fixedClusterInstanceCount,
                              options.maxClusterInstanceCount, clusterInstanceIndex))
     {
         return nullptr;

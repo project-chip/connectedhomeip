@@ -82,12 +82,12 @@ void emberAfAdministratorCommissioningClusterServerInitCallback(EndpointId endpo
     // register a singleton server (root endpoint only)
     CodegenClusterIntegration::RegisterServer(
         {
-            .endpointId                      = endpointId,
-            .clusterId                       = AdministratorCommissioning::Id,
-            .fixedClusterServerEndpointCount = AdministratorCommissioning::StaticApplicationConfig::kFixedClusterConfig.size(),
-            .maxClusterInstanceCount         = 1,
-            .fetchFeatureMap                 = true,
-            .fetchOptionalAttributes         = false,
+            .endpointId                = endpointId,
+            .clusterId                 = AdministratorCommissioning::Id,
+            .fixedClusterInstanceCount = AdministratorCommissioning::StaticApplicationConfig::kFixedClusterConfig.size(),
+            .maxClusterInstanceCount   = 1,
+            .fetchFeatureMap           = true,
+            .fetchOptionalAttributes   = false,
         },
         integrationDelegate);
 }
@@ -101,10 +101,10 @@ void MatterAdministratorCommissioningClusterServerShutdownCallback(EndpointId en
     // unregister a singleton server (root endpoint only)
     CodegenClusterIntegration::UnregisterServer(
         {
-            .endpointId                      = endpointId,
-            .clusterId                       = AdministratorCommissioning::Id,
-            .fixedClusterServerEndpointCount = AdministratorCommissioning::StaticApplicationConfig::kFixedClusterConfig.size(),
-            .maxClusterInstanceCount         = 1,
+            .endpointId                = endpointId,
+            .clusterId                 = AdministratorCommissioning::Id,
+            .fixedClusterInstanceCount = AdministratorCommissioning::StaticApplicationConfig::kFixedClusterConfig.size(),
+            .maxClusterInstanceCount   = 1,
         },
         integrationDelegate);
 }

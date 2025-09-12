@@ -68,12 +68,12 @@ void emberAfEthernetNetworkDiagnosticsClusterServerInitCallback(EndpointId endpo
 
     CodegenClusterIntegration::RegisterServer(
         {
-            .endpointId                      = endpointId,
-            .clusterId                       = EthernetNetworkDiagnostics::Id,
-            .fixedClusterServerEndpointCount = kEthernetNetworkDiagnosticsFixedClusterCount,
-            .maxClusterInstanceCount         = kEthernetNetworkDiagnosticsMaxClusterCount,
-            .fetchFeatureMap                 = true,
-            .fetchOptionalAttributes         = true,
+            .endpointId                = endpointId,
+            .clusterId                 = EthernetNetworkDiagnostics::Id,
+            .fixedClusterInstanceCount = kEthernetNetworkDiagnosticsFixedClusterCount,
+            .maxClusterInstanceCount   = kEthernetNetworkDiagnosticsMaxClusterCount,
+            .fetchFeatureMap           = true,
+            .fetchOptionalAttributes   = true,
         },
         integrationDelegate);
 }
@@ -84,10 +84,10 @@ void MatterEthernetNetworkDiagnosticsClusterServerShutdownCallback(EndpointId en
 
     CodegenClusterIntegration::UnregisterServer(
         {
-            .endpointId                      = endpointId,
-            .clusterId                       = EthernetNetworkDiagnostics::Id,
-            .fixedClusterServerEndpointCount = kEthernetNetworkDiagnosticsFixedClusterCount,
-            .maxClusterInstanceCount         = kEthernetNetworkDiagnosticsMaxClusterCount,
+            .endpointId                = endpointId,
+            .clusterId                 = EthernetNetworkDiagnostics::Id,
+            .fixedClusterInstanceCount = kEthernetNetworkDiagnosticsFixedClusterCount,
+            .maxClusterInstanceCount   = kEthernetNetworkDiagnosticsMaxClusterCount,
         },
         integrationDelegate);
 }

@@ -85,15 +85,15 @@ public:
     // Note on indexing:
     //   - The methods here use emberAfGetClusterServerEndpointIndex to convert
     //     an endpointId to a linear index [0; maxClusterInstanceCount) from ember.
-    //     For this ember requires the fixedClusterServerEndpointCount.
+    //     For this ember requires the fixedClusterInstanceCount.
     struct RegisterServerOptions
     {
         EndpointId endpointId;
         ClusterId clusterId;
-        uint16_t fixedClusterInstanceCount; // Number of fixed endpoints that contain this server cluster in ember configuration.
-        uint16_t maxClusterInstanceCount;         // This is how many endpoints are supported by the delegate (0-based index).
-        bool fetchFeatureMap;                     // Read feature map attribute from ember.
-        bool fetchOptionalAttributes;             // Read the enabling of the first 32 optional attributes from ember.
+        uint16_t fixedClusterInstanceCount; // Number of fixed endpoints that contain this server cluster in the ember configuration.
+        uint16_t maxClusterInstanceCount;   // This is how many endpoints are supported by the delegate (0-based index).
+        bool fetchFeatureMap;               // Read feature map attribute from ember.
+        bool fetchOptionalAttributes;       // Read the enabling of the first 32 optional attributes from ember.
     };
 
     /// Loads required data from ember and calls `CreateRegistration` once all the data
@@ -115,8 +115,8 @@ public:
     {
         EndpointId endpointId;
         ClusterId clusterId;
-        uint16_t fixedClusterServerEndpointCount; // Number of fixed endpoints that contain this cluster in the ember configuration.
-        uint16_t maxClusterInstanceCount;         // This is how many endpoints are supported by the delegate (0-based index).
+        uint16_t fixedClusterInstanceCount; // Number of fixed endpoints that contain this server cluster in the ember configuration.
+        uint16_t maxClusterInstanceCount;   // This is how many endpoints are supported by the delegate (0-based index).
     };
 
     /// A typical implementation is that this gets called in `Matter....ClusterServerShutdownCallback`.
@@ -129,8 +129,9 @@ public:
     {
         EndpointId endpointId;
         ClusterId clusterId;
-        uint16_t fixedClusterServerEndpointCount; // Number of fixed endpoints in ember configuration.
-        uint16_t maxClusterInstanceCount;         // This is how many cluster instances are supported by the delegate (0-based indexing, so indices smaller than this are valid).
+        uint16_t fixedClusterInstanceCount; // Number of fixed endpoints that contain this server cluster in the ember configuration.
+        uint16_t maxClusterInstanceCount; // This is how many cluster instances are supported by the delegate (0-based indexing, so
+                                          // indices smaller than this are valid).
     };
 
     /// Calls 'FindRegistration' on the delegate and returns the address of the cluster for an endpoint index or nullptr if not
