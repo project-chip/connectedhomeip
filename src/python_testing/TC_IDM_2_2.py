@@ -162,7 +162,7 @@ class TC_IDM_2_2(MatterBaseTest, BasicCompositionTests):
                         attr_list_id = cluster_obj.Attributes.AttributeList.attribute_id
                         asserts.assert_in(attr_list_id, read_response.tlvAttributes[ep][cluster_id],
                                           f"AttributeList not found in cluster {cluster_id} on endpoint {ep}")
-                        
+
                         # Verify that returned attributes match the AttributeList
                         self._verify_attributes_match_list(read_response, ep, cluster_id)
             else:
@@ -178,12 +178,12 @@ class TC_IDM_2_2(MatterBaseTest, BasicCompositionTests):
 
     def _verify_attributes_match_list(self, read_response: dict, endpoint: int, cluster_or_id):
         """Verify that returned attributes match the AttributeList for a spec-defined cluster.
-        
+
         Args:
             read_response: The read response containing attribute data
             endpoint: The endpoint ID
             cluster_or_id: Either a cluster object (from ReadAttribute) or cluster ID (from Read)
-            
+
         Returns:
             bool: True if verification was performed, False if cluster was skipped (non-standard)
         """
@@ -196,30 +196,30 @@ class TC_IDM_2_2(MatterBaseTest, BasicCompositionTests):
             # cluster_or_id is a cluster ID
             cluster_id = cluster_or_id
             cluster_key = cluster_id
-            
+
         # Only verify spec-defined clusters to avoid issues with clusters such as MEIthat may have write-only attributes
         if global_attribute_ids.cluster_id_type(cluster_id) != global_attribute_ids.ClusterIdType.kStandard:
             return False
-            
+
         # Get AttributeList attribute ID
         cluster_obj = ClusterObjects.ALL_CLUSTERS.get(cluster_id)
         if not cluster_obj or not hasattr(cluster_obj.Attributes, 'AttributeList'):
             return False
-            
+
         if hasattr(read_response, 'tlvAttributes'):
             cluster_data = read_response.tlvAttributes[endpoint][cluster_key]
         else:
             cluster_data = read_response[endpoint][cluster_key]
-            
+
         attr_list_id = cluster_obj.Attributes.AttributeList.attribute_id
         if attr_list_id not in cluster_data:
             return False
-            
+
         # Verify that returned attributes match the AttributeList
         returned_attrs = sorted([x for x in cluster_data.keys()])
         attr_list = sorted(cluster_data[attr_list_id])
         asserts.assert_equal(returned_attrs, attr_list,
-                            f"Returned attributes don't match AttributeList for cluster {cluster_id} on endpoint {endpoint}")
+                             f"Returned attributes don't match AttributeList for cluster {cluster_id} on endpoint {endpoint}")
         return True
 
     async def _read_global_attribute_all_endpoints(self, attribute_id):
@@ -231,13 +231,13 @@ class TC_IDM_2_2(MatterBaseTest, BasicCompositionTests):
 
     async def _read_cluster_all_endpoints(self, cluster):
         read_request = await self.default_controller.ReadAttribute(self.dut_node_id, [cluster])
-        
+
         # Verify all expected endpoints are returned
         expected_endpoints = list(self.endpoints.keys())
         returned_endpoints = list(read_request.keys())
         asserts.assert_equal(sorted(returned_endpoints), sorted(expected_endpoints),
-                            f"Expected endpoints {expected_endpoints} but got {returned_endpoints}")
-        
+                             f"Expected endpoints {expected_endpoints} but got {returned_endpoints}")
+
         for endpoint in read_request:
             asserts.assert_in(cluster, read_request[endpoint].keys(),
                               f"{cluster} cluster not in output")
@@ -253,13 +253,15 @@ class TC_IDM_2_2(MatterBaseTest, BasicCompositionTests):
         asserts.assert_in(Clusters.Descriptor, read_request[endpoint].keys(), "Descriptor cluster not in output")
         asserts.assert_in(Clusters.Descriptor.Attributes.ServerList,
                           read_request[endpoint][Clusters.Descriptor], "ServerList not in output")
-        
+
         # Verify that returned clusters match the ServerList
         returned_cluster_ids = sorted([cluster.id for cluster in read_request[endpoint].keys()])
         server_list = sorted(read_request[endpoint][Clusters.Descriptor][Clusters.Descriptor.Attributes.ServerList])
-        asserts.assert_equal(returned_cluster_ids, server_list,
-                            f"Returned cluster IDs {returned_cluster_ids} don't match ServerList {server_list} for endpoint {endpoint}")
-        
+        asserts.assert_equal(
+            returned_cluster_ids,
+            server_list,
+            f"Returned cluster IDs {returned_cluster_ids} don't match ServerList {server_list} for endpoint {endpoint}")
+
         for cluster in read_request[endpoint]:
             attribute_ids = [a.attribute_id for a in read_request[endpoint][cluster].keys()
                              if a != Clusters.Attribute.DataVersion]
