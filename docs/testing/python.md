@@ -655,7 +655,7 @@ cover the following checks:
 -   Device type revisions are correct for the stated specification revision
 -   Devices types respect superset rules
 
-Test tests in
+The tests in
 [https://github.com/project-chip/connectedhomeip/blob/master/src/python_testing/TC_DefaultWarnings.py](TC_DefaultWarnings.py)
 cover the following checks:
 
