@@ -31,6 +31,7 @@
 
 using namespace ::chip;
 using namespace ::chip::app;
+using namespace Credentials::JCM;
 
 namespace chip {
 namespace app {
@@ -46,7 +47,7 @@ CHIP_ERROR JCMCommissionee::VerifyTrustAgainstCommissionerAdmin()
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR JCMCommissionee::OnLookupOperationalTrustAnchor(VendorId vendorID, CertificateKeyId & subjectKeyId,
+CHIP_ERROR JCMCommissionee::OnLookupOperationalTrustAnchor(VendorId vendorID, Credentials::CertificateKeyId & subjectKeyId,
                                                            ByteSpan & globallyTrustedRootSpan)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -158,6 +159,7 @@ TrustVerificationError JCMCommissionee::StoreEndpointId()
 TrustVerificationError JCMCommissionee::ReadCommissionerAdminFabricIndex()
 {
     using Attr     = chip::app::Clusters::JointFabricAdministrator::Attributes::AdministratorFabricIndex::TypeInfo;
+
     auto onSuccess = [this](const ConcreteAttributePath & path, const Attr::DecodableType & val) {
         if (val.IsNull())
         {
@@ -170,12 +172,13 @@ TrustVerificationError JCMCommissionee::ReadCommissionerAdminFabricIndex()
             this->TrustVerificationStageFinished(kReadingCommissionerAdminFabricIndex, TrustVerificationError::kSuccess);
         }
     };
+
     auto onError = [this](const ConcreteAttributePath *, CHIP_ERROR err) {
         this->TrustVerificationStageFinished(kReadingCommissionerAdminFabricIndex,
                                              TrustVerificationError::kReadAdminFabricIndexFailed);
     };
 
-    ExchangeContext * exchangeContext = mCommandHandle.Get()->GetExchangeContext();
+    Messaging::ExchangeContext * exchangeContext = mCommandHandle.Get()->GetExchangeContext();
     SessionHandle session             = exchangeContext->GetSessionHandle();
 
     chip::Messaging::ExchangeManager * exchangeMgr = &chip::Server::GetInstance().GetExchangeManager();
@@ -204,7 +207,7 @@ TrustVerificationError JCMCommissionee::PerformVendorIdVerification()
     chip::Messaging::ExchangeManager * exchangeMgr = &chip::Server::GetInstance().GetExchangeManager();
 
     auto sessionHandleGetter = [this]() -> Optional<SessionHandle> {
-        ExchangeContext * ec = this->mCommandHandle.Get()->GetExchangeContext();
+        Messaging::ExchangeContext * ec = this->mCommandHandle.Get()->GetExchangeContext();
         if (ec == nullptr)
         {
             return Optional<SessionHandle>::Missing();
@@ -242,14 +245,14 @@ TrustVerificationError JCMCommissionee::CrossCheckAdministratorIds()
 
     Crypto::P256PublicKey accessingRootPubKey;
     CHIP_ERROR err = accessingFabricInfo->FetchRootPubkey(accessingRootPubKey);
-    if (err != CHIP_NO_ERROR || accessingRootPubKey.Length() != kP256_PublicKey_Length ||
-        mInfo.rootPublicKey.AllocatedSize() != kP256_PublicKey_Length)
+    if (err != CHIP_NO_ERROR || accessingRootPubKey.Length() != Crypto::kP256_PublicKey_Length ||
+        mInfo.rootPublicKey.AllocatedSize() != Crypto::kP256_PublicKey_Length)
     {
         ChipLogError(Controller, "JCM: Unable to fetch or size-mismatch accessing RootPublicKey");
         return TrustVerificationError::kInternalError;
     }
 
-    if (memcmp(mInfo.rootPublicKey.Get(), accessingRootPubKey.ConstBytes(), kP256_PublicKey_Length) != 0)
+    if (memcmp(mInfo.rootPublicKey.Get(), accessingRootPubKey.ConstBytes(), Crypto::kP256_PublicKey_Length) != 0)
     {
         ChipLogError(Controller, "JCM: Accessing RootPublicKey does not match Administrator RootPublicKey");
         return TrustVerificationError::kAdministratorIdMismatched;
@@ -279,7 +282,7 @@ TrustVerificationError JCMCommissionee::ParseCommissionerAdminInfo()
         ChipLogError(Controller, "JCM: Failed to fetch fabric root key");
         return TrustVerificationError::kInternalError;
     }
-    if (rootPubKey.Length() != kP256_PublicKey_Length)
+    if (rootPubKey.Length() != Crypto::kP256_PublicKey_Length)
     {
         ChipLogError(Controller, "JCM: Fabric root key size mismatch");
         return TrustVerificationError::kInternalError;

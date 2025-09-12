@@ -36,13 +36,6 @@ namespace chip {
 namespace Credentials {
 namespace JCM {
 
-using namespace ::chip;
-using namespace ::chip::app;
-using namespace ::chip::app::Clusters::OperationalCredentials::Commands;
-using namespace ::chip::Credentials;
-using namespace ::chip::Crypto;
-using namespace ::chip::Messaging;
-
 struct TrustVerificationInfo
 {
     EndpointId adminEndpointId   = kInvalidEndpointId;

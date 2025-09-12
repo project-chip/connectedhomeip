@@ -21,12 +21,6 @@
 #include <credentials/CHIPCert.h>
 #include <credentials/FabricTable.h>
 
-using namespace ::chip;
-using namespace ::chip::app;
-using namespace ::chip::Crypto;
-using namespace ::chip::Controller;
-using namespace chip::app::Clusters;
-
 namespace chip {
 namespace Credentials {
 namespace JCM {
@@ -56,7 +50,7 @@ CHIP_ERROR VendorIdVerificationClient::VerifyNOCCertificateChain(const ByteSpan 
 
 CHIP_ERROR VendorIdVerificationClient::Verify(TrustVerificationInfo * info, const ByteSpan clientChallengeSpan,
                                               const ByteSpan attestationChallengeSpan,
-                                              const SignVIDVerificationResponse::DecodableType responseData)
+                                              const app::Clusters::OperationalCredentials::Commands::SignVIDVerificationResponse::DecodableType responseData)
 {
     // Steps 1-9 have already been completed prior to the response callback
     const FabricIndex fabricIndex = info->adminFabricIndex;
@@ -69,33 +63,33 @@ CHIP_ERROR VendorIdVerificationClient::Verify(TrustVerificationInfo * info, cons
     // Extract the root public key
     P256PublicKeySpan rcacPublicKeySpan;
     ReturnLogErrorOnFailure(ExtractPublicKeyFromChipCert(rcacSpan, rcacPublicKeySpan));
-    P256PublicKey rcacPublicKey(rcacPublicKeySpan);
+    Crypto::P256PublicKey rcacPublicKey(rcacPublicKeySpan);
 
     // Locally generate the vendor_fabric_binding_message
-    uint8_t vendorFabricBindingMessageBuffer[kVendorFabricBindingMessageV1Size];
+    uint8_t vendorFabricBindingMessageBuffer[Crypto::kVendorFabricBindingMessageV1Size];
     MutableByteSpan vendorFabricBindingMessageSpan{ vendorFabricBindingMessageBuffer };
-    ReturnLogErrorOnFailure(Crypto::GenerateVendorFabricBindingMessage(FabricBindingVersion::kVersion1, rcacPublicKey, fabricId,
+    ReturnLogErrorOnFailure(Crypto::GenerateVendorFabricBindingMessage(Crypto::FabricBindingVersion::kVersion1, rcacPublicKey, fabricId,
                                                                        vendorID, vendorFabricBindingMessageSpan));
 
     // Locally generate the vendor_id_verification_tbs message
     ByteSpan vidVerificationStatementSpan;
-    uint8_t vidVerificationStatementBuffer[kVendorIdVerificationTbsV1MaxSize];
+    uint8_t vidVerificationStatementBuffer[Crypto::kVendorIdVerificationTbsV1MaxSize];
     MutableByteSpan vidVerificationTbsSpan{ vidVerificationStatementBuffer };
 
     // Generate the ToBeSigned portion of the VID verification
-    ReturnLogErrorOnFailure(GenerateVendorIdVerificationToBeSigned(fabricIndex, clientChallengeSpan, attestationChallengeSpan,
+    ReturnLogErrorOnFailure(Crypto::GenerateVendorIdVerificationToBeSigned(fabricIndex, clientChallengeSpan, attestationChallengeSpan,
                                                                    vendorFabricBindingMessageSpan, vidVerificationStatementSpan,
                                                                    vidVerificationTbsSpan));
 
     // Extract the operational public key
     P256PublicKeySpan nocPublicKeySpan;
     ReturnLogErrorOnFailure(ExtractPublicKeyFromChipCert(nocSpan, nocPublicKeySpan));
-    P256PublicKey nocPublicKey(nocPublicKeySpan);
+    Crypto::P256PublicKey nocPublicKey(nocPublicKeySpan);
 
     // 10. Given the subject public key associated with the fabric being verified, validate that Crypto_Verify(noc_public_key,
     // vendor_id_verification_tbs, signature) succeeds, otherwise the procedure terminates as failed.
-    VerifyOrReturnError(responseData.signature.size() >= P256ECDSASignature::Capacity(), CHIP_ERROR_BUFFER_TOO_SMALL);
-    P256ECDSASignature signature;
+    VerifyOrReturnError(responseData.signature.size() >= Crypto::P256ECDSASignature::Capacity(), CHIP_ERROR_BUFFER_TOO_SMALL);
+    Crypto::P256ECDSASignature signature;
     memcpy(signature.Bytes(), responseData.signature.data(), signature.Capacity());
     signature.SetLength(signature.Capacity());
 
@@ -131,14 +125,14 @@ CHIP_ERROR VendorIdVerificationClient::Verify(TrustVerificationInfo * info, cons
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR VendorIdVerificationClient::VerifyVendorId(ExchangeManager * exchangeMgr, const SessionGetterFunc getSession,
+CHIP_ERROR VendorIdVerificationClient::VerifyVendorId(Messaging::ExchangeManager * exchangeMgr, const SessionGetterFunc getSession,
                                                       TrustVerificationInfo * info)
 {
     ChipLogProgress(Controller, "Performing vendor ID verification for vendor ID: %u", info->adminVendorId);
 
     // Generate a 32-octet random challenge
     uint8_t kClientChallenge[32];
-    DRBG_get_bytes(kClientChallenge, sizeof(kClientChallenge));
+    Crypto::DRBG_get_bytes(kClientChallenge, sizeof(kClientChallenge));
     ByteSpan clientChallengeSpan{ kClientChallenge };
     chip::app::Clusters::OperationalCredentials::Commands::SignVIDVerificationRequest::Type request;
 
@@ -163,7 +157,7 @@ CHIP_ERROR VendorIdVerificationClient::VerifyVendorId(ExchangeManager * exchange
         OnVendorIdVerficationComplete(err);
     };
 
-    CHIP_ERROR err = InvokeCommandRequest(exchangeMgr, getSession().Value(), kRootEndpointId, request, onSuccessCb, onFailureCb);
+    CHIP_ERROR err = Controller::InvokeCommandRequest(exchangeMgr, getSession().Value(), kRootEndpointId, request, onSuccessCb, onFailureCb);
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(Controller, "Failed to send SignVIDVerificationRequest: %s", ErrorStr(err));

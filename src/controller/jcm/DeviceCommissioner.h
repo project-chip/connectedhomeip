@@ -40,16 +40,14 @@ namespace Controller {
 
 namespace JCM {
 
-using namespace ::chip::Credentials::JCM;
-
 /*
  * DeviceCommissioner is a class that handles the Joint Commissioning Management (JCM) process
  * for commissioning Joint Fabric Administrator devices in a CHIP network. It extends the DeviceCommissioner class and
  * implements the JCM trust verification process.
  */
 class DeviceCommissioner : public chip::Controller::DeviceCommissioner,
-                           public VendorIdVerificationClient,
-                           public TrustVerificationStateMachine
+                           public Credentials::JCM::VendorIdVerificationClient,
+                           public Credentials::JCM::TrustVerificationStateMachine
 {
 public:
     // The constructor initializes the DeviceCommissioner with a reference to this device commissioner
@@ -85,7 +83,7 @@ public:
     /*
      * GetTrustVerificationInfo is a method that returns the JCM trust verification information.
      */
-    TrustVerificationInfo & GetTrustVerificationInfo() { return mInfo; }
+    Credentials::JCM::TrustVerificationInfo & GetTrustVerificationInfo() { return mInfo; }
 
     bool HasValidCommissioningMode(const Dnssd::CommissionNodeData & nodeData) override;
 
@@ -94,7 +92,7 @@ protected:
     CHIP_ERROR ParseExtraCommissioningInfo(ReadCommissioningInfo & info, const CommissioningParameters & params) override;
     // Override CleanupCommissioning to clean up JCM trust verification state
     void CleanupCommissioning(DeviceProxy * proxy, NodeId nodeId, const CompletionStatus & completionStatus) override;
-    CHIP_ERROR OnLookupOperationalTrustAnchor(VendorId vendorID, CertificateKeyId & subjectKeyId,
+    CHIP_ERROR OnLookupOperationalTrustAnchor(VendorId vendorID, Credentials::CertificateKeyId & subjectKeyId,
                                               ByteSpan & globallyTrustedRootSpan) override;
     void OnVendorIdVerficationComplete(const CHIP_ERROR & err) override;
 
@@ -105,10 +103,10 @@ private:
     CHIP_ERROR ParseTrustedRoot(const ReadCommissioningInfo & info);
 
     // JCM commissioning trust verification steps
-    TrustVerificationError VerifyAdministratorInformation();
+    Credentials::JCM::TrustVerificationError VerifyAdministratorInformation();
     CHIP_ERROR OnSignVIDVerificationSuccessCb(const ByteSpan & signatureSpan, const ByteSpan & clientChallengeSpan);
-    TrustVerificationError PerformVendorIDVerificationProcedure();
-    TrustVerificationError AskUserForConsent();
+    Credentials::JCM::TrustVerificationError PerformVendorIDVerificationProcedure();
+    Credentials::JCM::TrustVerificationError AskUserForConsent();
 
     /*
      * ContinueAfterVendorIDVerification is a method that continues the JCM trust verification process after the
@@ -118,8 +116,8 @@ private:
      */
     void ContinueAfterVendorIDVerification(const CHIP_ERROR & err);
 
-    TrustVerificationStage GetNextTrustVerificationStage(const TrustVerificationStage & currentStage) override;
-    void PerformTrustVerificationStage(const TrustVerificationStage & nextStage) override;
+    Credentials::JCM::TrustVerificationStage GetNextTrustVerificationStage(const Credentials::JCM::TrustVerificationStage & currentStage) override;
+    void PerformTrustVerificationStage(const Credentials::JCM::TrustVerificationStage & nextStage) override;
 
     /*
      * OnTrustVerificationComplete is a callback method that is called when the JCM trust verification process is complete.
@@ -127,7 +125,7 @@ private:
      *
      * @param result The result of the JCM trust verification process.
      */
-    virtual void OnTrustVerificationComplete(TrustVerificationError error);
+    virtual void OnTrustVerificationComplete(Credentials::JCM::TrustVerificationError error);
 
     // Device proxy for the device being commissioned
     DeviceProxy * mDeviceProxy;

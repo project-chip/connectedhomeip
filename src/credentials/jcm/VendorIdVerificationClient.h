@@ -37,12 +37,6 @@ namespace chip {
 namespace Credentials {
 namespace JCM {
 
-using namespace ::chip;
-using namespace ::chip::app;
-using namespace ::chip::app::Clusters::OperationalCredentials::Commands;
-using namespace ::chip::Credentials;
-using namespace ::chip::Messaging;
-
 /**
  * A client that handles Vendor ID verification
  */
@@ -55,7 +49,7 @@ public:
     // dynamically with a callback.
     using SessionGetterFunc = std::function<Optional<SessionHandle>()>;
 
-    CHIP_ERROR VerifyVendorId(ExchangeManager * exchangeMgr, const SessionGetterFunc getSession, TrustVerificationInfo * info);
+    CHIP_ERROR VerifyVendorId(Messaging::ExchangeManager * exchangeMgr, const SessionGetterFunc getSession, TrustVerificationInfo * info);
 
 protected:
     virtual CHIP_ERROR OnLookupOperationalTrustAnchor(VendorId vendorID, CertificateKeyId & subjectKeyId,
@@ -66,7 +60,7 @@ private:
     CHIP_ERROR VerifyNOCCertificateChain(const ByteSpan & nocSpan, const ByteSpan & icacSpan, const ByteSpan & rcacSpan);
 
     CHIP_ERROR Verify(TrustVerificationInfo * info, const ByteSpan clientChallengeSpan, ByteSpan attestationChallengeSpan,
-                      const SignVIDVerificationResponse::DecodableType responseData);
+                      const app::Clusters::OperationalCredentials::Commands::SignVIDVerificationResponse::DecodableType responseData);
 };
 
 } // namespace JCM

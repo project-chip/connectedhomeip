@@ -33,6 +33,7 @@ using namespace ::chip::app;
 using namespace ::chip::Credentials;
 using namespace ::chip::Crypto;
 using namespace chip::app::Clusters;
+using namespace ::chip::Credentials::JCM;
 
 namespace chip {
 namespace Controller {

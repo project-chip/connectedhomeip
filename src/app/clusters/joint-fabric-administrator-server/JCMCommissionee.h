@@ -30,21 +30,16 @@
 #include <functional>
 #include <optional>
 
-using namespace ::chip;
-using namespace ::chip::app;
-
 namespace chip {
 namespace app {
 namespace Clusters {
 namespace JointFabricAdministrator {
 
-using namespace ::chip::Credentials::JCM;
-
 /*
  * JCMCommissionee is a class that handles the Joint Commissioning Management (JCM) process for Joint Fabric Administrator devices
  * being commissioned in a CHIP network. It implements the JCM trust verification process.
  */
-class JCMCommissionee : public VendorIdVerificationClient, public TrustVerificationStateMachine
+class JCMCommissionee : public Credentials::JCM::VendorIdVerificationClient, public Credentials::JCM::TrustVerificationStateMachine
 {
 public:
     using OnCompletionFunc = std::function<void(CHIP_ERROR)>;
@@ -67,14 +62,14 @@ public:
 
 protected:
     // VendorIdVerificationClient
-    CHIP_ERROR OnLookupOperationalTrustAnchor(VendorId vendorID, CertificateKeyId & subjectKeyId,
+    CHIP_ERROR OnLookupOperationalTrustAnchor(VendorId vendorID, Credentials::CertificateKeyId & subjectKeyId,
                                               ByteSpan & globallyTrustedRootSpan) override;
     void OnVendorIdVerficationComplete(const CHIP_ERROR & err) override;
 
     // TrustVerificationStateMachine
-    TrustVerificationStage GetNextTrustVerificationStage(const TrustVerificationStage & currentStage) override;
-    void PerformTrustVerificationStage(const TrustVerificationStage & nextStage) override;
-    void OnTrustVerificationComplete(TrustVerificationError error) override;
+    Credentials::JCM::TrustVerificationStage GetNextTrustVerificationStage(const Credentials::JCM::TrustVerificationStage & currentStage) override;
+    void PerformTrustVerificationStage(const Credentials::JCM::TrustVerificationStage & nextStage) override;
+    void OnTrustVerificationComplete(Credentials::JCM::TrustVerificationError error) override;
 
 private:
     CommandHandler::Handle & mCommandHandle;
@@ -82,19 +77,18 @@ private:
 
     /// Trust Verification Stages
     // Ecosystem B Administrator SHALL save the value of the EndpointID
-    TrustVerificationError StoreEndpointId();
+    Credentials::JCM::TrustVerificationError StoreEndpointId();
     // Ecosystem B Administrator SHALL read the AdministratorFabricIndex attribute of the Joint Fabric Administrator cluster
     // belonging to JointEndPointA on Ecosystem A Administrator...
-    TrustVerificationError ReadCommissionerAdminFabricIndex();
+    Credentials::JCM::TrustVerificationError ReadCommissionerAdminFabricIndex();
     // ... and executes Fabric Table Vendor ID Verification Procedure against the Fabric indicated by AdministratorFabricIndex (i.e.
     // FabricIndex corresponding to Fabric A).
-    TrustVerificationError PerformVendorIdVerification();
+    Credentials::JCM::TrustVerificationError PerformVendorIdVerification();
     // Ecosystem B Administrator SHALL check that the RootPublicKey and FabricID of the accessing fabric (found in the
     // FabricDescriptorStruct) match the RootPublicKey and FabricID of the Fabric indicated by AdministratorFabricIndex.
-    TrustVerificationError CrossCheckAdministratorIds();
+    Credentials::JCM::TrustVerificationError CrossCheckAdministratorIds();
     /// End Trust Verification Stages
-
-    TrustVerificationError ParseCommissionerAdminInfo();
+    Credentials::JCM::TrustVerificationError ParseCommissionerAdminInfo();
 };
 
 } // namespace JointFabricAdministrator
