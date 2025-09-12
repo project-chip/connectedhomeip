@@ -18,6 +18,7 @@
 
 #include <pw_unit_test/framework.h>
 
+#include "Test_cert_data.h"
 #include <controller/AutoCommissioner.h>
 #include <controller/CommissioningDelegate.h>
 #include <controller/tests/AutoCommissionerTestAccess.h>
@@ -336,6 +337,57 @@ TEST_F(AutoCommissionerTest, NextStageConfigureTCAcknowledgments)
     nextStage = privateConfigCommissioner.AccessGetNextCommissioningStageInternal(kConfigureTCAcknowledgments, err);
 
     EXPECT_EQ(nextStage, kSendPAICertificateRequest);
+}
+
+// Happy paths and valid arguments are thoroughly checked with the Python integration test in
+// src/controller/python/OpCredsBinding.cpp
+
+// Ensures empty RCAC certificates aren't admitted
+TEST_F(AutoCommissionerTest, NOCChainGenerated_EmptyRCACReturnsInvalidArgument)
+{
+    AutoCommissionerTestAccess privateConfigCommissioner(&mCommissioner);
+
+    CHIP_ERROR err =
+        privateConfigCommissioner.NOCChainGenerated(ByteSpan(), ByteSpan(), ByteSpan(), Crypto::IdentityProtectionKeySpan(), 0);
+
+    EXPECT_EQ(err, CHIP_ERROR_INVALID_ARGUMENT);
+}
+
+// Ensures extra checks are done with RCAC buffer size
+TEST_F(AutoCommissionerTest, NOCChainGenerated_CorruptedRCACLengthReturnsError)
+{
+    AutoCommissionerTestAccess privateConfigCommissioner(&mCommissioner);
+    uint8_t buffer[10];
+    ByteSpan corruptedSizeRCAC(
+        buffer, static_cast<size_t>(std::numeric_limits<uint32_t>::max()) + 1); // Use uint32_t for portability on 32-bit systems
+
+    CHIP_ERROR err = privateConfigCommissioner.NOCChainGenerated(ByteSpan(), ByteSpan(), corruptedSizeRCAC,
+                                                                 Crypto::IdentityProtectionKeySpan(), 0);
+
+    EXPECT_EQ(err, CHIP_ERROR_INVALID_ARGUMENT);
+}
+
+// Ensures extra checks are done with NOC buffer size
+TEST_F(AutoCommissionerTest, NOCChainGenerated_CorruptedNOCLengthReturnsError)
+{
+    AutoCommissionerTestAccess privateConfigCommissioner(&mCommissioner);
+    uint8_t buffer[10];
+    ByteSpan corruptedSizeNOC(buffer, static_cast<size_t>(std::numeric_limits<uint32_t>::max()) + 1);
+
+    CHIP_ERROR err = privateConfigCommissioner.NOCChainGenerated(corruptedSizeNOC, ByteSpan(), chip::TestCerts::kTestRCACSpan,
+                                                                 Crypto::IdentityProtectionKeySpan(), 0);
+
+    EXPECT_EQ(err, CHIP_ERROR_INVALID_ARGUMENT);
+}
+
+// Ensures empty NOC certificates aren't admitted
+TEST_F(AutoCommissionerTest, NOCChainGenerated_EmptyNOCReturnsInvalidArgument)
+{
+    AutoCommissionerTestAccess privateConfigCommissioner(&mCommissioner);
+    CHIP_ERROR err = privateConfigCommissioner.NOCChainGenerated(ByteSpan(), ByteSpan(), chip::TestCerts::kTestRCACSpan,
+                                                                 Crypto::IdentityProtectionKeySpan(), 0);
+
+    EXPECT_EQ(err, CHIP_ERROR_INVALID_ARGUMENT);
 }
 
 } // namespace
