@@ -895,14 +895,14 @@ class MatterBaseTest(base_test.BaseTestClass):
 
     async def read_single_attribute_check_success(
             self, cluster: ClusterObjects.Cluster, attribute: Type[ClusterObjects.ClusterAttributeDescriptor],
-            dev_ctrl: Optional[ChipDeviceCtrl.ChipDeviceController] = None, node_id: Optional[int] = None, endpoint: Optional[int] = None, fabric_filtered: bool = True, assert_on_error: bool = True, test_name: str = "") -> object:
+            dev_ctrl: Optional[ChipDeviceCtrl.ChipDeviceController] = None, node_id: Optional[int] = None, endpoint: Optional[int] = None, fabric_filtered: bool = True, assert_on_error: bool = True, test_name: str = "", payloadCapability: int = ChipDeviceCtrl.TransportPayloadCapability.MRP_PAYLOAD) -> object:
         if dev_ctrl is None:
             dev_ctrl = self.default_controller
         if node_id is None:
             node_id = self.dut_node_id
         if endpoint is None:
             endpoint = self.get_endpoint()
-        result = await dev_ctrl.ReadAttribute(node_id, [(endpoint, attribute)], fabricFiltered=fabric_filtered)
+        result = await dev_ctrl.ReadAttribute(node_id, [(endpoint, attribute)], fabricFiltered=fabric_filtered, payloadCapability=payloadCapability)
         attr_ret = result[endpoint][cluster][attribute]
         read_err_msg = f"Error reading {str(cluster)}:{str(attribute)} = {attr_ret}"
         desired_type = attribute.attribute_type.Type
