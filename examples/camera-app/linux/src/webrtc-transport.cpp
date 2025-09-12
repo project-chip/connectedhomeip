@@ -158,8 +158,8 @@ void WebrtcTransport::Stop()
         mPeerConnection->Close();
     }
 
-    mLocalVideoTrack  = nullptr;
-    mLocalAudioTrack  = nullptr;
+    mLocalVideoTrack = nullptr;
+    mLocalAudioTrack = nullptr;
 }
 
 void WebrtcTransport::AddTracks(const std::string & videoMid, const std::string & audioMid)
@@ -217,6 +217,7 @@ void WebrtcTransport::OnConnectionStateChanged(bool connected)
 
 void WebrtcTransport::OnTrack(std::shared_ptr<WebRTCTrack> track)
 {
-    // Only logging the track addition here as it's not used in the current implementation. In future, we can add functionality to handle
+    // Only logging the track addition here as it's not used in the current implementation. In future, we can add functionality to
+    // handle
     ChipLogProgress(Camera, "Remote track added for the sessionID: %u, type: %s", mRequestArgs.sessionId, track->GetType().c_str());
 }
