@@ -693,7 +693,7 @@ python3 TC_DeviceConformance.py --manual-code 34970112332
 python3 TC_DeviceConformance.py --discriminator 3840 --passcode 20202021
 ```
 
-#### Running conformance tests against an commissioned device over CASE
+#### Running conformance tests against a commissioned device over CASE
 
 If the device has already been commissioned into the python testing fabric, you
 can run the test directly
