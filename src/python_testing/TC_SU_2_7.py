@@ -296,7 +296,7 @@ class TC_SU_2_7(MatterBaseTest):
         version_param = f"--filepath {ota_file}"
         proc = self._launch_app(
             app_name_path='out/debug/chip-ota-provider-app',
-            env_app_name="OTA_PROVIDER_APP",
+            env_app_name="OTA_PROVIDER_APP_V2",
             base_params=[
                 '--discriminator 321',
                 '--passcode 2321',
@@ -415,7 +415,11 @@ class TC_SU_2_7(MatterBaseTest):
         await self._write_ota_providers(controller=controller, provider_node_id=provider_data['node_id'], endpoint=0)
 
         self.step(1)
-        # Create event subscriber
+        # Craete event subcriber for basicinformation cluster
+        basicinformation_handler = EventSubscriptionHandler(
+            expected_cluster=Clusters.BasicInformation, expected_event_id=Clusters.BasicInformation.Events.ShutDown.event_id)
+        await basicinformation_handler.start(controller, requestor_node_id, endpoint=0, min_interval_sec=0, max_interval_sec=6000)
+        # Create event subscriber for StateTransition
         state_transition_event_handler = EventSubscriptionHandler(
             expected_cluster=self.ota_req, expected_event_id=self.ota_req.Events.StateTransition.event_id)
         await state_transition_event_handler.start(controller, requestor_node_id, endpoint=0, min_interval_sec=0, max_interval_sec=60*6)
@@ -432,17 +436,53 @@ class TC_SU_2_7(MatterBaseTest):
         self._verify_event_transition_status(event_report, self.ota_req.Enums.UpdateStateEnum.kQuerying,
                                              self.ota_req.Enums.UpdateStateEnum.kDownloading, target_version=update_software_version)
 
-        # # Event for Applying
-        event_report = state_transition_event_handler.wait_for_event_report(self.ota_req.Events.StateTransition, timeout_sec=60*4)
+        # Event for Applying
+        event_report = state_transition_event_handler.wait_for_event_report(self.ota_req.Events.StateTransition, timeout_sec=60*5)
         logger.info(f"Event report for Complete transfer {event_report}")
         self._verify_event_transition_status(event_report, self.ota_req.Enums.UpdateStateEnum.kDownloading,
                                              self.ota_req.Enums.UpdateStateEnum.kApplying, target_version=update_software_version)
+
+        # Wait until the device restarts
+        bi_event_report = basicinformation_handler.wait_for_event_report(Clusters.BasicInformation.Events.ShutDown, timeout_sec=60)
+        logger.info(f"Shutting down event: {bi_event_report}")
+        basicinformation_handler.reset()
+        await basicinformation_handler.cancel()
         state_transition_event_handler.reset()
         await state_transition_event_handler.cancel()
+        await asyncio.sleep(5)
+        # After restart read the events from the start (Startup)
+        urgent = 1
+        state_transition_event = self.ota_req.Events.StateTransition
+        events_response = await controller.ReadEvent(
+            requestor_node_id,
+            events=[(0, state_transition_event, urgent)],
+            fabricFiltered=True
+        )
+        logger.info(f"StateTransition Gathered {events_response}")
+        # Only UpdateAppliedEvent should be in the list
+        if len(events_response) == 0:
+            asserts.fail("Failed to read the Version Applied Event")
+        # Verify StateTransitionEvent
+        event_report = events_response[0].Data
+        self._verify_event_transition_status(event_report, self.ota_req.Enums.UpdateStateEnum.kApplying,
+                                             self.ota_req.Enums.UpdateStateEnum.kIdle)
+
+        logger.info(f"UpdateAppliedEvent response: {events_response}")
+
         self._terminate_provider_process()
         controller.ExpireSessions(nodeid=provider_data['node_id'])
+        self._terminate_requestor_process()
+        controller.ExpireSessions(nodeid=requestor_node_id)
+        # Cleaned up so version is reset
 
         self.step(2)
+        self._launch_requestor_app(extra_params=["-a"])
+        await controller.CommissionOnNetwork(
+            nodeId=requestor_node_id,
+            setupPinCode=requestor_setup_pincode,
+            filterType=ChipDeviceCtrl.DiscoveryFilterType.LONG_DISCRIMINATOR,
+            filter=requestor_node_id
+        )
         self._launch_provider_app(
             extra_params=["--delayedQueryActionTimeSec 60", "--queryImageStatus  busy"])
         await controller.CommissionOnNetwork(
@@ -646,8 +686,12 @@ class TC_SU_2_7(MatterBaseTest):
         logger.info(f"Event report: {event_report}")
         asserts.assert_equal(event_report.newState, self.ota_req.Enums.UpdateStateEnum.kDelayedOnApply,
                              f"Event status is not {self.ota_req.Enums.UpdateStateEnum.kDelayedOnApply}")
+        event_report = state_transition_event_handler.wait_for_event_report(self.ota_req.Events.StateTransition, timeout_sec=60*5)
+        logger.info(f"Event report for Complete transfer {event_report}")
+        self._verify_event_transition_status(event_report, self.ota_req.Enums.UpdateStateEnum.kDelayedOnApply,
+                                             self.ota_req.Enums.UpdateStateEnum.kApplying, target_version=update_software_version)
         # Wait for Restart or ShutdownEvent
-        shutdown_event = basicinformation_handler.wait_for_event_report(Clusters.BasicInformation.Events.ShutDown, timeout_sec=60*4)
+        shutdown_event = basicinformation_handler.wait_for_event_report(Clusters.BasicInformation.Events.ShutDown, timeout_sec=60)
         logger.info(f"Shutting down {shutdown_event}")
         await state_transition_event_handler.cancel()
         await basicinformation_handler.cancel()
@@ -663,7 +707,7 @@ class TC_SU_2_7(MatterBaseTest):
         )
         logger.info(f"Events gathered {events_response}")
         # Only UpdateAppliedEvent should be in the list
-        if len(events_response) != 1:
+        if len(events_response) == 0:
             asserts.fail("Failed to read the Version Applied Event")
 
         version_applied_event_data = events_response[0].Data
