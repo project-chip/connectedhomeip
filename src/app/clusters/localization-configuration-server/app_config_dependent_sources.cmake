@@ -25,6 +25,4 @@ TARGET_SOURCES(
   PRIVATE
     "${CLUSTER_DIR}/localization-configuration-cluster.cpp"
     "${CLUSTER_DIR}/localization-configuration-cluster.h"
-    "${CLUSTER_DIR}/localization-configuration-logic.cpp"
-    "${CLUSTER_DIR}/localization-configuration-logic.h"
 )

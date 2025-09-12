@@ -128,23 +128,23 @@ TEST_F(TestLocalizationConfigurationCluster, TestReadAndWriteActiveLocale)
     LocalizationConfigurationCluster cluster(*mDeviceInfoProvider, initialLocale);
 
     // ActiveLocale should not be set.
-    CharSpan actualLocale = cluster.GetLogic().GetActiveLocale();
+    CharSpan actualLocale = cluster.GetActiveLocale();
     EXPECT_EQ(actualLocale.size(), size_t(0));
 
     // Test 1: Write a valid supported locale.
     CharSpan validLocale                       = CharSpan::fromCharString("es-ES");
-    Protocols::InteractionModel::Status status = cluster.GetLogic().SetActiveLocale(validLocale);
+    Protocols::InteractionModel::Status status = cluster.SetActiveLocale(validLocale);
     EXPECT_EQ(status, Protocols::InteractionModel::Status::Success);
 
     // Verify the valid locale was written correctly.
-    actualLocale = cluster.GetLogic().GetActiveLocale();
+    actualLocale = cluster.GetActiveLocale();
     EXPECT_TRUE(actualLocale.data_equal(validLocale));
     EXPECT_EQ(actualLocale.size(), validLocale.size());
 
     // Test 2: Write an invalid unsupported locale.
     CharSpan invalidLocale = CharSpan::fromCharString("de-DE");
 
-    status = cluster.GetLogic().SetActiveLocale(invalidLocale);
+    status = cluster.SetActiveLocale(invalidLocale);
     EXPECT_EQ(status, Protocols::InteractionModel::Status::ConstraintError);
 }
 

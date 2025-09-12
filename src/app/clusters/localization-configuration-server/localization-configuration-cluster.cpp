@@ -21,7 +21,7 @@
 #include <app/persistence/String.h>
 #include <app/server-cluster/AttributeListBuilder.h>
 #include <clusters/LocalizationConfiguration/Metadata.h>
-#include <protocols/interaction_model/StatusCode.h>
+#include <platform/PlatformManager.h>
 
 using namespace chip;
 using namespace chip::app;
@@ -39,11 +39,17 @@ CHIP_ERROR LocalizationConfigurationCluster::Startup(ServerClusterContext & cont
     AttributePersistence persistence(context.attributeStorage);
 
     // Load the active locale from persistence
-    chip::app::Storage::String<35> storedLocale;
-    (void) persistence.LoadString({ kRootEndpointId, LocalizationConfiguration::Id, Attributes::ActiveLocale::Id }, storedLocale);
-
-    // Convert String to CharSpan and set it in the logic
-    mLogic.SetActiveLocale(storedLocale.Content());
+    chip::app::Storage::String<kActiveLocaleMaxLength> storedLocale;
+    if (persistence.LoadString({ kRootEndpointId, LocalizationConfiguration::Id, Attributes::ActiveLocale::Id }, storedLocale))
+    {
+        SetActiveLocale(storedLocale.Content());
+    }
+    else
+    {
+        ChipLogProgress(AppServer, "Failed to load active locale from persistence, using default locale");
+        ReturnErrorOnFailure(persistence.StoreString(
+            { kRootEndpointId, LocalizationConfiguration::Id, Attributes::ActiveLocale::Id }, mActiveLocale));
+    }
 
     return CHIP_NO_ERROR;
 }
@@ -59,9 +65,9 @@ DataModel::ActionReturnStatus LocalizationConfigurationCluster::ReadAttribute(co
     case ClusterRevision::Id:
         return aEncoder.Encode(LocalizationConfiguration::kRevision);
     case ActiveLocale::Id:
-        return aEncoder.Encode(mLogic.GetActiveLocale());
+        return aEncoder.Encode(GetActiveLocale());
     case SupportedLocales::Id:
-        return mLogic.ReadSupportedLocales(aEncoder);
+        return ReadSupportedLocales(aEncoder);
     }
     return Status::UnsupportedAttribute;
 }
@@ -76,16 +82,12 @@ DataModel::ActionReturnStatus LocalizationConfigurationCluster::WriteAttribute(c
         CharSpan label;
         ReturnErrorOnFailure(aDecoder.Decode(label));
         ChipLogProgress(AppServer, "Setting active locale to %s", label.data());
-        Protocols::InteractionModel::Status status = mLogic.SetActiveLocale(label);
-        if (status != Protocols::InteractionModel::Status::Success)
-        {
-            return status;
-        }
-
         // Store the string in persistence
-        Storage::String<35> shortString;
-        shortString.SetContent(label);
-        return persistence.StoreString(request.path, shortString);
+        Storage::String<kActiveLocaleMaxLength> shortString;
+        VerifyOrReturnError(shortString.SetContent(label), Status::Failure);
+        ReturnValueOnFailure(persistence.StoreString(request.path, shortString), Status::Failure);
+
+        return SetActiveLocale(label);
     }
     }
     return Status::UnsupportedAttribute;
@@ -98,4 +100,81 @@ CHIP_ERROR LocalizationConfigurationCluster::Attributes(const ConcreteClusterPat
     return attributeListBuilder.Append(Span(kMandatoryMetadata), {}, {});
 }
 
+Protocols::InteractionModel::Status LocalizationConfigurationCluster::SetActiveLocale(CharSpan activeLocale)
+{
+    if (!IsSupportedLocale(activeLocale))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+
+    mActiveLocale.SetContent(activeLocale);
+    return Protocols::InteractionModel::Status::Success;
+}
+
+CharSpan LocalizationConfigurationCluster::GetActiveLocale()
+{
+    return mActiveLocale.Content();
+}
+
+CHIP_ERROR LocalizationConfigurationCluster::ReadSupportedLocales(AttributeValueEncoder & aEncoder)
+{
+    CHIP_ERROR err                                                 = CHIP_NO_ERROR;
+    DeviceLayer::DeviceInfoProvider::SupportedLocalesIterator * it = mDeviceInfoProvider.IterateSupportedLocales();
+    if (it)
+    {
+        err = aEncoder.EncodeList([&it](const auto & encoder) -> CHIP_ERROR {
+            CharSpan supportedLocale;
+
+            while (it->Next(supportedLocale))
+            {
+                ReturnErrorOnFailure(encoder.Encode(supportedLocale));
+            }
+
+            return CHIP_NO_ERROR;
+        });
+
+        it->Release();
+    }
+    else
+    {
+        err = aEncoder.EncodeEmptyList();
+    }
+    return err;
+}
+
+bool LocalizationConfigurationCluster::IsSupportedLocale(CharSpan newLangTag)
+{
+    DeviceLayer::DeviceInfoProvider::SupportedLocalesIterator * it;
+    if ((it = mDeviceInfoProvider.IterateSupportedLocales()))
+    {
+        CharSpan outLocale;
+
+        while (it->Next(outLocale))
+        {
+            if (outLocale.data_equal(newLangTag))
+            {
+                it->Release();
+                return true;
+            }
+        }
+
+        it->Release();
+    }
+
+    return false;
+}
+
+bool LocalizationConfigurationCluster::GetDefaultLocale(MutableCharSpan & outLocale)
+{
+    bool found = false;
+    DeviceLayer::DeviceInfoProvider::SupportedLocalesIterator * it;
+    if ((it = mDeviceInfoProvider.IterateSupportedLocales()))
+    {
+        CharSpan tempLocale;
+        found = it->Next(tempLocale);
+        CopyCharSpanToMutableCharSpan(tempLocale, outLocale);
+        it->Release();
+    }
+    return found;
+}
 } // namespace chip::app::Clusters

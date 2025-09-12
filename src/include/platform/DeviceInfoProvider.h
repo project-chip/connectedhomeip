@@ -151,14 +151,6 @@ public:
     virtual SupportedLocalesIterator * IterateSupportedLocales() = 0;
 
     /**
-     * @brief Get the default locale of the device.
-     *
-     * @param outLocale - the default locale of the device.
-     * @return true if the default locale is found, false otherwise.
-     */
-    virtual bool GetDefaultLocale(MutableCharSpan & outLocale);
-
-    /**
      *  Creates an iterator that may be used to obtain the list of supported calendar types of the device.
      *  In order to release the allocated memory, the Release() method must be called after the iteration is finished.
      *  @retval An instance of EndpointIterator on success
