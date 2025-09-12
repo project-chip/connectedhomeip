@@ -297,11 +297,8 @@ CHIP_ERROR se05x_get_certificate(uint32_t keyId, uint8_t * buf, size_t * buflen)
 
     VerifyOrReturnError(buf != nullptr, CHIP_ERROR_INTERNAL);
     VerifyOrReturnError(buflen != nullptr, CHIP_ERROR_INTERNAL);
+    VerifyOrReturnError((SIZE_MAX / 8) >= (*buflen), CHIP_ERROR_INTERNAL);
 
-    if ((SIZE_MAX / 8) < (*buflen))
-    {
-        return CHIP_ERROR_INTERNAL;
-    }
     certBitLen = (*buflen) * 8;
 
     VerifyOrReturnError(se05x_session_open() == CHIP_NO_ERROR, CHIP_ERROR_INTERNAL);

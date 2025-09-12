@@ -46,6 +46,16 @@ public:
 
     CHIP_ERROR Init(const char * file)
     {
+        CHIP_ERROR status = CHIP_NO_ERROR;
+        // tmp_buffer - Need larger buffer to read node operational certificate chain
+        uint8_t tmp_buffer[(2 * chip::Credentials::kMaxCHIPCertLength) + 32];
+        size_t tmp_buffer_len = sizeof(tmp_buffer);
+        char kvs_key_name[32] = { 0 };
+        char ssid[DeviceLayer::Internal::kMaxWiFiSSIDLength];
+        char password[DeviceLayer::Internal::kMaxWiFiKeyLength];
+        size_t ssid_len     = sizeof(ssid);
+        size_t password_len = sizeof(password);
+
         ChipLogDetail(Crypto, "SE05x :: KVS Initialization ");
 
         if (se05x_is_nfc_commissioning_done() != CHIP_NO_ERROR)
@@ -75,100 +85,100 @@ public:
             return fCreate;
         }
 
-        CHIP_ERROR status = CHIP_NO_ERROR;
-
-        uint8_t buffer_cert_1[chip::Credentials::kMaxCHIPCertLength];
-        uint8_t buffer_cert_2[chip::Credentials::kMaxCHIPCertLength];
-        uint8_t buffer_cert_3[chip::Credentials::kMaxCHIPCertLength];
-        uint8_t buffer_cert_4[chip::Credentials::kMaxDERCertLength];
-
-        uint8_t * nocBuf           = &buffer_cert_1[0];
-        size_t nocBufLen           = sizeof(buffer_cert_1);
-        uint8_t * rootCertBuf      = &buffer_cert_2[0];
-        size_t rootCertBufLen      = sizeof(buffer_cert_2);
-        uint8_t * icacBuf          = &buffer_cert_3[0];
-        size_t icacBufLen          = sizeof(buffer_cert_3);
-        uint8_t * ipkBuf           = &buffer_cert_4[0];
-        size_t ipkLen              = sizeof(buffer_cert_4);
-        uint8_t * refkeyBuf        = NULL;
-        size_t refkeyBufLen        = 0;
-        uint8_t * aclBuf           = NULL;
-        size_t aclLen              = 0;
-        uint8_t * fabgrpData       = NULL;
-        size_t fabrgrpLen          = 0;
-        uint8_t * metaData         = NULL;
-        size_t metaLen             = 0;
-        uint8_t * fabindexinfoData = NULL;
-        size_t fabindexinfoLen     = 0;
-
-        char nocKey[SE05X_KEY_BUFFER_LEN_KVS_FUNCTIONS]          = { 0 };
-        char rootCertKey[SE05X_KEY_BUFFER_LEN_KVS_FUNCTIONS]     = { 0 };
-        char icackey[SE05X_KEY_BUFFER_LEN_KVS_FUNCTIONS]         = { 0 };
-        char ipkey[SE05X_KEY_BUFFER_LEN_KVS_FUNCTIONS]           = { 0 };
-        char opKey[SE05X_KEY_BUFFER_LEN_KVS_FUNCTIONS]           = { 0 };
-        char aclKey[SE05X_KEY_BUFFER_LEN_KVS_FUNCTIONS]          = { 0 };
-        char fabgrpkey[SE05X_KEY_BUFFER_LEN_KVS_FUNCTIONS]       = { 0 };
-        char metakey[SE05X_KEY_BUFFER_LEN_KVS_FUNCTIONS]         = { 0 };
-        char fabindexinfokey[SE05X_KEY_BUFFER_LEN_KVS_FUNCTIONS] = { 0 };
-
-        status = se05x_read_operational_credentials_cluster(&nocKey[0], nocBuf, &nocBufLen, &rootCertKey[0], rootCertBuf,
-                                                            &rootCertBufLen, &icackey[0], icacBuf, &icacBufLen, &ipkey[0], ipkBuf,
-                                                            &ipkLen);
+        status = se05x_read_node_oper_cert(tmp_buffer, &tmp_buffer_len);
         VerifyOrReturnError(status == CHIP_NO_ERROR, CHIP_ERROR_INTERNAL);
 
-        status = _Put(nocKey, nocBuf, nocBufLen);
-        VerifyOrReturnError(status == CHIP_NO_ERROR, status);
-        status = _Put(rootCertKey, rootCertBuf, rootCertBufLen);
-        VerifyOrReturnError(status == CHIP_NO_ERROR, status);
-        status = _Put(icackey, icacBuf, icacBufLen);
-        VerifyOrReturnError(status == CHIP_NO_ERROR, status);
-        status = _Put(ipkey, ipkBuf, ipkLen);
+        VerifyOrReturnError(snprintf(kvs_key_name, sizeof(kvs_key_name), "f/%x/n", se05x_get_fabric_id()) > 0, CHIP_ERROR_INTERNAL);
+        status = _Put(kvs_key_name, tmp_buffer, tmp_buffer_len);
         VerifyOrReturnError(status == CHIP_NO_ERROR, status);
 
-        memset(buffer_cert_1, 0, sizeof(buffer_cert_1));
-        refkeyBuf    = &buffer_cert_1[0];
-        refkeyBufLen = sizeof(buffer_cert_1);
-        status       = se05x_read_node_operational_keypair(&opKey[0], refkeyBuf, &refkeyBufLen);
+        memset(tmp_buffer, 0, sizeof(tmp_buffer));
+        tmp_buffer_len = sizeof(tmp_buffer);
+        status         = se05x_read_root_cert(tmp_buffer, &tmp_buffer_len);
         VerifyOrReturnError(status == CHIP_NO_ERROR, CHIP_ERROR_INTERNAL);
 
-        status = _Put(opKey, refkeyBuf, refkeyBufLen);
+        VerifyOrReturnError(snprintf(kvs_key_name, sizeof(kvs_key_name), "f/%x/r", se05x_get_fabric_id()) > 0, CHIP_ERROR_INTERNAL);
+        status = _Put(kvs_key_name, tmp_buffer, tmp_buffer_len);
         VerifyOrReturnError(status == CHIP_NO_ERROR, status);
 
-        memset(buffer_cert_4, 0, sizeof(buffer_cert_4));
-        aclBuf = &buffer_cert_4[0];
-        aclLen = sizeof(buffer_cert_4);
-        status = se05x_read_acl_data(&aclKey[0], aclBuf, &aclLen);
+        memset(tmp_buffer, 0, sizeof(tmp_buffer));
+        tmp_buffer_len = sizeof(tmp_buffer);
+        status         = se05x_read_ICA(tmp_buffer, &tmp_buffer_len);
         VerifyOrReturnError(status == CHIP_NO_ERROR, CHIP_ERROR_INTERNAL);
 
-        status = _Put(aclKey, aclBuf, aclLen);
+        VerifyOrReturnError(snprintf(kvs_key_name, sizeof(kvs_key_name), "f/%x/i", se05x_get_fabric_id()) > 0, CHIP_ERROR_INTERNAL);
+        status = _Put(kvs_key_name, tmp_buffer, tmp_buffer_len);
         VerifyOrReturnError(status == CHIP_NO_ERROR, status);
 
-        memset(buffer_cert_1, 0, sizeof(buffer_cert_1));
-        fabgrpData = &buffer_cert_1[0];
-        fabrgrpLen = sizeof(buffer_cert_1);
-        status     = se05x_read_fabric_groups(&fabgrpkey[0], fabgrpData, &fabrgrpLen);
+        memset(tmp_buffer, 0, sizeof(tmp_buffer));
+        tmp_buffer_len = sizeof(tmp_buffer);
+        status         = se05x_read_ipk(tmp_buffer, &tmp_buffer_len);
         VerifyOrReturnError(status == CHIP_NO_ERROR, CHIP_ERROR_INTERNAL);
 
-        status = _Put(fabgrpkey, fabgrpData, fabrgrpLen);
+        VerifyOrReturnError(snprintf(kvs_key_name, sizeof(kvs_key_name), "f/%x/k/0", se05x_get_fabric_id()) > 0,
+                            CHIP_ERROR_INTERNAL);
+        status = _Put(kvs_key_name, tmp_buffer, tmp_buffer_len);
         VerifyOrReturnError(status == CHIP_NO_ERROR, status);
 
-        memset(buffer_cert_1, 0, sizeof(buffer_cert_1));
-        metaData = &buffer_cert_1[0];
-        metaLen  = sizeof(buffer_cert_1);
-        status   = se05x_read_meta_data(&metakey[0], metaData, &metaLen);
+        memset(tmp_buffer, 0, sizeof(tmp_buffer));
+        tmp_buffer_len = sizeof(tmp_buffer);
+        status         = se05x_read_node_operational_keypair(tmp_buffer, &tmp_buffer_len);
         VerifyOrReturnError(status == CHIP_NO_ERROR, CHIP_ERROR_INTERNAL);
 
-        status = _Put(metakey, metaData, metaLen);
+        VerifyOrReturnError(snprintf(kvs_key_name, sizeof(kvs_key_name), "f/%x/o", se05x_get_fabric_id()) > 0, CHIP_ERROR_INTERNAL);
+        status = _Put(kvs_key_name, tmp_buffer, tmp_buffer_len);
         VerifyOrReturnError(status == CHIP_NO_ERROR, status);
 
-        memset(buffer_cert_1, 0, sizeof(buffer_cert_1));
-        fabindexinfoData = &buffer_cert_1[0];
-        fabindexinfoLen  = sizeof(buffer_cert_1);
-        status           = se05x_read_fabric_index_info_data(&fabindexinfokey[0], fabindexinfoData, &fabindexinfoLen);
+        memset(tmp_buffer, 0, sizeof(tmp_buffer));
+        tmp_buffer_len = sizeof(tmp_buffer);
+        status         = se05x_read_acl_data(tmp_buffer, &tmp_buffer_len);
         VerifyOrReturnError(status == CHIP_NO_ERROR, CHIP_ERROR_INTERNAL);
 
-        status = _Put(fabindexinfokey, fabindexinfoData, fabindexinfoLen);
+        VerifyOrReturnError(snprintf(kvs_key_name, sizeof(kvs_key_name), "f/%x/ac/0/0", se05x_get_fabric_id()) > 0,
+                            CHIP_ERROR_INTERNAL);
+        status = _Put(kvs_key_name, tmp_buffer, tmp_buffer_len);
         VerifyOrReturnError(status == CHIP_NO_ERROR, status);
+
+        memset(tmp_buffer, 0, sizeof(tmp_buffer));
+        tmp_buffer_len = sizeof(tmp_buffer);
+        status         = se05x_read_fabric_groups(tmp_buffer, &tmp_buffer_len);
+        VerifyOrReturnError(status == CHIP_NO_ERROR, CHIP_ERROR_INTERNAL);
+
+        VerifyOrReturnError(snprintf(kvs_key_name, sizeof(kvs_key_name), "f/%x/g", se05x_get_fabric_id()) > 0, CHIP_ERROR_INTERNAL);
+        status = _Put(kvs_key_name, tmp_buffer, tmp_buffer_len);
+        VerifyOrReturnError(status == CHIP_NO_ERROR, status);
+
+        memset(tmp_buffer, 0, sizeof(tmp_buffer));
+        tmp_buffer_len = sizeof(tmp_buffer);
+        status         = se05x_read_meta_data(tmp_buffer, &tmp_buffer_len);
+        VerifyOrReturnError(status == CHIP_NO_ERROR, CHIP_ERROR_INTERNAL);
+
+        VerifyOrReturnError(snprintf(kvs_key_name, sizeof(kvs_key_name), "f/%x/m", se05x_get_fabric_id()) > 0, CHIP_ERROR_INTERNAL);
+        status = _Put(kvs_key_name, tmp_buffer, tmp_buffer_len);
+        VerifyOrReturnError(status == CHIP_NO_ERROR, status);
+
+        memset(tmp_buffer, 0, sizeof(tmp_buffer));
+        tmp_buffer_len = sizeof(tmp_buffer);
+        status         = se05x_read_fabric_index_info_data(tmp_buffer, &tmp_buffer_len);
+        VerifyOrReturnError(status == CHIP_NO_ERROR, CHIP_ERROR_INTERNAL);
+
+        status = _Put("g/fidx", tmp_buffer, tmp_buffer_len);
+        VerifyOrReturnError(status == CHIP_NO_ERROR, status);
+
+        memset(tmp_buffer, 0, sizeof(tmp_buffer));
+        tmp_buffer_len = sizeof(tmp_buffer);
+        status         = se05x_read_wifi_credentials(tmp_buffer, tmp_buffer_len, ssid, &ssid_len, password, &password_len);
+        if (status == CHIP_NO_ERROR)
+        {
+            status = _Put("wifi-ssid", ssid, ssid_len);
+            VerifyOrReturnError(status == CHIP_NO_ERROR, status);
+            status = _Put("wifi-pass", password, password_len);
+            VerifyOrReturnError(status == CHIP_NO_ERROR, status);
+        }
+        else
+        {
+            ChipLogDetail(Crypto, "SE05x: Reading Wi-Fi credentials from secure element failed");
+        }
 
         return CHIP_NO_ERROR;
     }

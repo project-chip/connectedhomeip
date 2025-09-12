@@ -107,6 +107,16 @@ CHIP_ERROR LinuxWiFiDriver::Init(BaseDriver::NetworkStatusChangeCallback * netwo
     }
 
     ConnectivityMgrImpl().SetNetworkStatusChangeCallback(networkStatusChangeCallback);
+
+    if (network.ssidLen != 0 && network.credentialsLen != 0)
+    {
+        err = ConnectivityMgrImpl().ConnectWiFiNetworkAsync(ByteSpan(network.ssid, network.ssidLen),
+                                                            ByteSpan(network.credentials, network.credentialsLen), NULL);
+        if (err != CHIP_NO_ERROR)
+        {
+            return CHIP_ERROR_INTERNAL;
+        }
+    }
     return CHIP_NO_ERROR;
 
 exit:

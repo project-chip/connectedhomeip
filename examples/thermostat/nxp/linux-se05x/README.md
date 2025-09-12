@@ -78,7 +78,7 @@ To use SE05x for device attestation,
 1. Enable device attestation option when building the example -
 
 ```
-gn gen out --args="chip_se05x_device_attestation=y"
+gn gen out --args="chip_se05x_device_attestation=true"
 ```
 
 2. Run the provision example (one time)

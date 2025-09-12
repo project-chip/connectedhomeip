@@ -220,19 +220,16 @@ if CHIP_SE05X
 
 config CHIP_SE05X_SPAKE_VERIFIER
 	bool "Enable SE05x Secure element for offloading spake verifier"
-	default n
 	help
 		Enable SE05x Secure element for offloading spake verifier.
 
 config CHIP_SE05X_SPAKE_PROVER
 	bool "Enable SE05x Secure element for offloading spake prover"
-	default n
 	help
 		Enable SE05x Secure element for offloading spake prover.
 
 config CHIP_SE05X_RND_GEN
 	bool "Enable SE05x Secure element for offloading random number generation"
-	default n
 	help
 		Enable SE05x Secure element for offloading random number generation.
 
@@ -250,25 +247,21 @@ config CHIP_SE05X_ECDSA_VERIFY
 
 config CHIP_SE05X_PBKDF2_SHA256
 	bool "Enable SE05x Secure element for PBKDF2_SHA256"
-	default n
 	help
 		Enable SE05x Secure element for PBKDF2_SHA256.
 
 config CHIP_SE05X_HKDF_SHA256
-	bool "Enable SE05x Secure element for HMAC_SHA256"
-	default n
+	bool "Enable SE05x Secure element for HKDF_SHA256"
 	help
-		Enable SE05x Secure element for HMAC_SHA256.
+		Enable SE05x Secure element for HKDF_SHA256.
 
 config CHIP_SE05X_HMAC_SHA256
 	bool "Enable SE05x Secure element for HMAC_SHA256"
-	default n
 	help
 		Enable SE05x Secure element for HMAC_SHA256.
 
 config CHIP_SE05X_DEVICE_ATTESTATION
 	bool "Enable SE05x Secure element for offloading Device attestation Sign"
-	default n
 	help
 		Enable SE05x Secure element for offloading Device attestation Sign.
 

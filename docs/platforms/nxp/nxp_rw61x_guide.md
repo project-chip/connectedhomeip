@@ -272,12 +272,13 @@ The complete Border Router guide is located [here](./nxp_otbr_guide.md).
 
 -   Connections using OM-SE051ARD board :
 
-    | Signal  | FRDM-RW612 Pin | OM-SE051ARD Pin |
-    | ------- | -------------- | --------------- |
-    | I2C SDA | J1_2           | J2_9            |
-    | I2C SCL | J1_4           | J2_10           |
-    | 3V3     | J3_8           | J8_4            |
-    | GND     | J3_14          | J8_7            |
+    | Signal         | FRDM-RW612 Pin | OM-SE051ARD Pin |
+    | -------------- | -------------- | --------------- |
+    | I2C SDA        | J1_2           | J2_9            |
+    | I2C SCL        | J1_4           | J2_10           |
+    | 3V3            | J3_8           | J8_4            |
+    | GND            | J3_14          | J8_7            |
+    | ENA (optional) | J1_12          | J1_6            |
 
 ### Build options
 

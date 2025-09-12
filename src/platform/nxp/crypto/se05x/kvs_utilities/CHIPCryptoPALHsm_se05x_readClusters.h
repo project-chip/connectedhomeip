@@ -28,77 +28,98 @@
 #include <vector>
 
 /**
+ * @brief The function is used to get the fabric id.
+ * @return Fabric id (0 if no NFC commissioning done)
+ */
+uint32_t se05x_get_fabric_id();
+
+/**
  * @brief The function is used to check if the NFC commissioning is done or not.
  * @return CHIP_ERROR_INTERNAL on no nfc commissioning, CHIP_NO_ERROR on nfc commissioning.
  */
 CHIP_ERROR se05x_is_nfc_commissioning_done();
 
 /**
- * @brief Read operational credentials data from SE05x.
- * Read Node Operational Certificate, ICA Certificate, Identity Protection key.
- * @param[out] nocKey - key name for Node Operational Certificate in chip_kvs file
- * @param[out] nocBuf - Node Operational Certificate buffer
- * @param[out] nocBuf - Node Operational Certificate buffer length
- * @param[out] rootCertKey - key name for Root Certificate in chip_kvs file
- * @param[out] rootCertBuf - Root Certificate buffer
- * @param[out] rootCertBufLen - Root Certificate buffer length
- * @param[out] icackey - key name for Intermediate certificate Authority in chip_kvs file
- * @param[out] icacBuf - Intermediate Certificate Authority buffer
- * @param[out] icacBufLen - Intermediate Certificate Authority buffer length
- * @param[out] ipKey - key name for Identity Protection Key in chip_kvs file
- * @param[out] ipkBuf - Identity Protection Key buffer
- * @param[out] ipkBufLen - Identity Protection Key buffer length
+ * @brief Read node operational key pair in the form of refeence key from SE05x.
+ * @param[out] noc_buf - input buffer for node operational key pair in reference key format
+ * @param[in,out] noc_buf_len - input buffer length when input and reference key length when output
  * @return CHIP_ERROR_INTERNAL on error, CHIP_NO_ERROR otherwise
  */
-CHIP_ERROR se05x_read_operational_credentials_cluster(char * nocKey, uint8_t * nocBuf, size_t * nocBufLen, char * rootCertKey,
-                                                      uint8_t * rootCertBuf, size_t * rootCertBufLen, char * icackey,
-                                                      uint8_t * icacBuf, size_t * icacBufLen, char * ipKey, uint8_t * ipkBuf,
-                                                      size_t * ipkBufLen);
+CHIP_ERROR se05x_read_node_operational_keypair(uint8_t * op_key_ref_key, size_t * op_key_ref_key_len);
 
 /**
- * @brief Read node operational key pair in the form of refeence key from SE05x.
- * @param[out] op_key_name - node operational key pair name in chip_kvs file
- * @param[out] op_key_ref_key - node operational key pair in reference key format
- * @param[out] op_key_ref_key_len - node operational reference key pair length
+ * @brief Read node operational certificate from SE05x.
+ * @param[out] noc_buf - input buffer for node operational certificate
+ * @param[in,out] noc_buf_len - input buffer length when input and noc length when output
  * @return CHIP_ERROR_INTERNAL on error, CHIP_NO_ERROR otherwise
  */
-CHIP_ERROR se05x_read_node_operational_keypair(char * op_key_name, uint8_t * op_key_ref_key, size_t * op_key_ref_key_len);
+CHIP_ERROR se05x_read_node_oper_cert(uint8_t * noc_buf, size_t * noc_buf_len);
+
+/**
+ * @brief Read node operational certificate from SE05x.
+ * @param[out] root_cert_buf - input buffer for root certificate
+ * @param[in,out] root_cert_buf_len - input buffer length when input and root cert length when output
+ * @return CHIP_ERROR_INTERNAL on error, CHIP_NO_ERROR otherwise
+ */
+CHIP_ERROR se05x_read_root_cert(uint8_t * root_cert_buf, size_t * root_cert_buf_len);
+
+/**
+ * @brief Read ICA certificate from SE05x.
+ * @param[out] ica_buf - input buffer for ICA certificate
+ * @param[in,out] ica_buf_len - input buffer length when input and ICA cert length when output
+ * @return CHIP_ERROR_INTERNAL on error, CHIP_NO_ERROR otherwise
+ */
+CHIP_ERROR se05x_read_ICA(uint8_t * ica_buf, size_t * ica_buf_len);
+
+/**
+ * @brief Read IPK from SE05x.
+ * @param[out] ipk_buf - input buffer for IPK
+ * @param[in,out] ipk_buf_len - input buffer length when input and IPK length when output
+ * @return CHIP_ERROR_INTERNAL on error, CHIP_NO_ERROR otherwise
+ */
+CHIP_ERROR se05x_read_ipk(uint8_t * ipk_buf, size_t * ipk_buf_len);
 
 /**
  * @brief Read access control list from SE05x.
- * @param[out] acl_key - ACL name in chip_kvs file
- * @param[out] acl - ACL data buffer
- * @param[out] acl_len - ACL data length
+ * @param[out] acl - input buffer for ACL data
+ * @param[in,out] acl_len - input buffer length when input and ACL data length when output
  * @return CHIP_ERROR_INTERNAL on error, CHIP_NO_ERROR otherwise
  */
-CHIP_ERROR se05x_read_acl_data(char * acl_key, uint8_t * acl, size_t * acl_len);
+CHIP_ERROR se05x_read_acl_data(uint8_t * acl, size_t * acl_len);
 
 /**
  * @brief Read fabric group info from SE05x.
- * @param[out] fgrp_key - Fabric group name in chip_kvs file
- * @param[out] fabgrp_data - Fabric group data buffer
- * @param[out] fabgrp_data_len - Fabric group data length
+ * @param[out] fabgrp_data - input buffer for fabric group data
+ * @param[in,out] fabgrp_data_len - input buffer length when input and fabric data length when output
  * @return CHIP_ERROR_INTERNAL on error, CHIP_NO_ERROR otherwise
  */
-CHIP_ERROR se05x_read_fabric_groups(char * fgrp_key, uint8_t * fabgrp_data, size_t * fabgrp_data_len);
+CHIP_ERROR se05x_read_fabric_groups(uint8_t * fabgrp_data, size_t * fabgrp_data_len);
 
 /**
  * @brief Read meta data info from SE05x.
- * @param[out] meta_data_key - meta data name in chip_kvs file
- * @param[out] meta_data - meta data buffer
- * @param[out] meta_data_len - meta data buffer length
+ * @param[out] meta_data - input buffer for meta data
+ * @param[in,out] meta_data_len - input buffer length when input and meta data length when output
  * @return CHIP_ERROR_INTERNAL on error, CHIP_NO_ERROR otherwise
  */
-CHIP_ERROR se05x_read_meta_data(char * meta_data_key, uint8_t * meta_data, size_t * meta_data_len);
+CHIP_ERROR se05x_read_meta_data(uint8_t * meta_data, size_t * meta_data_len);
 
 /**
- * @brief Read fabric index info info from SE05x.
- * @param[out] fab_index_info_key - fabric index info name in chip_kvs file
- * @param[out] fab_info_data - fabric index info data buffer
- * @param[out] fab_info_data_len - fabric index info data buffer length
+ * @brief Read fabric index from SE05x.
+ * @param[out] fab_info_data - input buffer for fabric index
+ * @param[in,out] fab_info_data_len - input buffer length when input and fabric index length when output
  * @return CHIP_ERROR_INTERNAL on error, CHIP_NO_ERROR otherwise
  */
-CHIP_ERROR se05x_read_fabric_index_info_data(char * fab_index_info_key, uint8_t * fab_info_data, size_t * fab_info_data_len);
+CHIP_ERROR se05x_read_fabric_index_info_data(uint8_t * fab_info_data, size_t * fab_info_data_len);
 
-/* Length of buffer used for key in KVS utilities functions */
-#define SE05X_KEY_BUFFER_LEN_KVS_FUNCTIONS 12
+/**
+ * @brief Read wifi credentials info from SE05x.
+ * @param[in] buf - input buffer for reading binary file
+ * @param[in] buflen - input buffer length
+ * @param[in,out] ssid - input buffer for ssid
+ * @param[in,out] ssid_len - ssid input buffer length when input and ssid length when output
+ * @param[in,out] password - input buffer for password
+ * @param[in,out] password_len - password input buffer length when input and password length when output
+ * @return CHIP_ERROR_INTERNAL on error, CHIP_NO_ERROR otherwise
+ */
+CHIP_ERROR se05x_read_wifi_credentials(uint8_t * buf, size_t buflen, char * ssid, size_t * ssid_len, char * password,
+                                       size_t * password_len);

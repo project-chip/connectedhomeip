@@ -107,18 +107,6 @@ matter_add_gn_arg_string("nxp_ar" ${CMAKE_AR})
 matter_add_gn_arg_string("nxp_cc" ${CMAKE_C_COMPILER})
 matter_add_gn_arg_string("nxp_cxx" ${CMAKE_CXX_COMPILER})
 
-if (CONFIG_CHIP_SE05X)
-    matter_add_gn_arg_bool("chip_se05x_spake_verifier" ${CONFIG_CHIP_SE05X_SPAKE_VERIFIER})
-    matter_add_gn_arg_bool("chip_se05x_spake_prover" ${CONFIG_CHIP_SE05X_SPAKE_PROVER})
-    matter_add_gn_arg_bool("chip_se05x_rnd_gen" ${CONFIG_CHIP_SE05X_RND_GEN})
-    matter_add_gn_arg_bool("chip_se05x_gen_ec_key" ${CONFIG_CHIP_SE05X_GENERATE_EC_KEY})
-    matter_add_gn_arg_bool("chip_se05x_ecdsa_verify" ${CONFIG_CHIP_SE05X_ECDSA_VERIFY})
-    matter_add_gn_arg_bool("chip_se05x_pbkdf2_sha256" ${CONFIG_CHIP_SE05X_PBKDF2_SHA256})
-    matter_add_gn_arg_bool("chip_se05x_hkdf_sha256" ${CONFIG_CHIP_SE05X_HKDF_SHA256})
-    matter_add_gn_arg_bool("chip_se05x_hmac_sha256" ${CONFIG_CHIP_SE05X_HMAC_SHA256})
-    matter_add_gn_arg_bool("chip_se05x_device_attestation" ${CONFIG_CHIP_SE05X_DEVICE_ATTESTATION})
-endif()
-
 matter_common_gn_args(
     DEBUG CONFIG_DEBUG
     LIB_SHELL CONFIG_CHIP_LIB_SHELL

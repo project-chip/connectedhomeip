@@ -87,6 +87,22 @@ the correct variant of secure element connected.
 Integration of SE05x with RW61x is demonstrated using the thermostat and all
 cluster app. Refer [RW61x](nxp_rw61x_guide.md) to set up the build environment.
 
+#### To build Thermostat for NFC Commissioning
+
+In case wifi credentials are already provisioned then use the following command
+to build:
+
+```
+# ~/matter/connectedhomeip$ west build -d <out_dir> -b frdmrw612 examples/thermostat/nxp/ -DCONF_FILE_NAME=prj_wifi.conf -DCONFIG_CHIP_SE05X=y
+```
+
+If wifi credentials are not provisioned use following command to build:
+
+```
+# ~/matter/connectedhomeip$ west build -d <out_dir> -b frdmrw612 examples/thermostat/nxp
+-DCONF_FILE_NAME=prj_wifi_onnetwork.conf -DCONFIG_CHIP_SE05X=y -DCONFIG_CHIP_APP_WIFI_SSID=\"<wifi_ssid>\" -DCONFIG_CHIP_APP_WIFI_PASSWORD=\"<password>\"
+```
+
 #### Hardware connections and Building the example with SE05x
 
 Refer [RW61x and SE05x](./nxp_rw61x_guide.md#se05x_secure_element_with_rw61x)
@@ -121,17 +137,17 @@ operations to be offloaded to SE05x
 
 *   CMAKE Options :
 
-    | GN Options                    | Description              | Default setting |
-    | ----------------------------- | ------------------------ | --------------- |
-    | CHIP_SE05X_SPAKE_VERIFIER     | Spake2P Verifier on SE   | Disabled        |
-    | CHIP_SE05X_SPAKE_PROVER       | Spake2P Prover on SE     | Disabled        |
-    | CHIP_SE05X_RND_GEN            | Random number generation | Disabled        |
-    | CHIP_SE05X_GENERATE_EC_KEY    | Generate EC key in SE    | Enabled         |
-    | CHIP_SE05X_ECDSA_VERIFY       | ECDSA Verify             | Enabled         |
-    | CHIP_SE05X_PBKDF2_SHA256      | PBKDF2-SHA256            | Disabled        |
-    | CHIP_SE05X_HKDF_SHA256        | HKDF-SHA256              | Disabled        |
-    | CHIP_SE05X_HMAC_SHA256        | HMAC-SHA256              | Disabled        |
-    | CHIP_SE05X_DEVICE_ATTESTATION | Device attestation       | Disabled        |
+    | Kconfig Options                      | Description              | Default setting |
+    | ------------------------------------ | ------------------------ | --------------- |
+    | CONFIG_CHIP_SE05X_SPAKE_VERIFIER     | Spake2P Verifier on SE   | Disabled        |
+    | CONFIG_CHIP_SE05X_SPAKE_PROVER       | Spake2P Prover on SE     | Disabled        |
+    | CONFIG_CHIP_SE05X_RND_GEN            | Random number generation | Disabled        |
+    | CONFIG_CHIP_SE05X_GENERATE_EC_KEY    | Generate EC key in SE    | Enabled         |
+    | CONFIG_CHIP_SE05X_ECDSA_VERIFY       | ECDSA Verify             | Enabled         |
+    | CONFIG_CHIP_SE05X_PBKDF2_SHA256      | PBKDF2-SHA256            | Disabled        |
+    | CONFIG_CHIP_SE05X_HKDF_SHA256        | HKDF-SHA256              | Disabled        |
+    | CONFIG_CHIP_SE05X_HMAC_SHA256        | HMAC-SHA256              | Disabled        |
+    | CONFIG_CHIP_SE05X_DEVICE_ATTESTATION | Device attestation       | Disabled        |
 
 <a name="se05x_type_configurations"></a>
 
@@ -173,7 +189,7 @@ To use SE05x for device attestation,
 
 1. Enable device attestation when building the example using
    `"chip_se05x_device_attestation=true"` for GN build OR
-   `"-DCHIP_SE05X_DEVICE_ATTESTATION`" for cmake Build.
+   `"-DCONFIG_CHIP_SE05X_DEVICE_ATTESTATION`" for cmake Build.
 
 2. Run the provision example (one time)
    `third_party/simw-top-mini/repo/demos/se05x_dev_attest_key_prov/` to
@@ -205,6 +221,12 @@ For GN Build system -
 
 ```
 gn gen out --args="chip_se05x_auth=\"scp03\""
+```
+
+For CMake Build system - Add the following command while building example.
+
+```
+-DCONFIG_SE05X_SCP03=y
 ```
 
 > [!IMPORTANT] Ensure to enable CMAC (MBEDTLS_CMAC_C) in mbedtls config file
@@ -245,7 +267,7 @@ using chip tool. Ensure to connect Jumper J6 to 2-3 pins to use onboard antenna
 of OM-SE051ARD board
 
 ```
-./out/linux-x64-chip-tool-nfc-commission/chip-tool pairing nfc-wifi 1 "ssid-name" "password" <passcode (Noted in previous step)> 3840
+./out/linux-x64-chip-tool-nfc-commission/chip-tool pairing nfc-thread 1 1 <passcode (Noted in previous step)> 3840
 ```
 
 ### Step 4: Run Thermostat example
@@ -285,3 +307,12 @@ the KVS file / file system for CASE operation to work.
     public key is read out. The private key bytes are filled with the
     information of the Node operational key id. This is called reference key.
     Reference key is used to refer SE05x for ECDSA Sign operation.
+
+### Step 5: Run Chip-tool example
+
+```
+./out/linux-x64-chip-tool-nfc-commission/chip-tool thermostat read local-temperature 1 1
+```
+
+The command will establish a CASE session using the Node operation key created
+during the NFC commissioning step.
