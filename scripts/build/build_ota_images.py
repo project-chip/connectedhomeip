@@ -78,13 +78,13 @@ def build_ota_images(vendor_id, product_id, max_range, out_prefix):
 
     status = 0
     for version in range(2, max_range):
-
-        config_version_string = config_version_string.replace("$VERSION_N", str(version))
-        config_version_string = config_version_string.replace("$VERSION_STR", str(version))
-        logging.info(f"Injecting the code following code into {target_file}:")
+        config_str = config_version_string
+        config_str = config_str.replace("$VERSION_N", str(version))
+        config_str = config_str.replace("$VERSION_STR", str(version))
+        logging.info(f"Injecting version code into {target_file}:")
 
         logging.info(f"Building requestor-app with version {version}")
-        code_inject_cmd = f"echo '{config_version_string}' >> {target_file}"
+        code_inject_cmd = f"echo '{config_str}' >> {target_file}"
         status = os.system(code_inject_cmd)
         if status != 0:
             logging.error("Unable to append to configfile.")
