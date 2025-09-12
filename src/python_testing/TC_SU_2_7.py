@@ -288,7 +288,7 @@ class TC_SU_2_7(MatterBaseTest):
         """
         logger.info(f"LAUNCHING PROVIDER APP WITH VERSION {version}")
 
-        ota_file = f"{getcwd()}/firmware_requestor_v{version}.min.ota"
+        ota_file = f"{getcwd()}/chip-ota-requestor-app_v{version}.min.ota"
         # verify ota file exists
         if not path.exists(ota_file):
             raise FileNotFoundError
