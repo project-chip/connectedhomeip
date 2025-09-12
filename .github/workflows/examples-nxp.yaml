@@ -73,22 +73,29 @@ jobs:
               run: |
                   scripts/run_in_build_env.sh "\
                       ./scripts/build/build_examples.py \
+                      --target nxp-mcxw71-freertos-contact-sensor-thread-mtd-low-power-cmake-frdm \
+                      --target nxp-mcxw71-freertos-lighting-thread-cmake-frdm \
+                      --target nxp-mcxw71-freertos-lock-app-thread-mtd-low-power-cmake-frdm \
                       --target nxp-mcxw71-freertos-contact-sensor-low-power \
-                      --target nxp-mcxw71-freertos-lock-app \
                       build \
-                      --copy-artifacts-to out/artifacts \
                   "
             - name: Get MCXW71 contact sensor size stats
               run: |
                   .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
                     nxp mcxw71+release contact \
-                    out/artifacts/nxp-mcxw71-freertos-contact-sensor-low-power/chip-mcxw71-contact-example.elf \
+                    out/nxp-mcxw71-freertos-contact-sensor-thread-mtd-low-power-cmake-frdm/app.elf \
+                    /tmp/bloat_reports/
+            - name: Get MCXW71 lighting app size stats
+              run: |
+                  .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
+                    nxp mcxw71+release lighting \
+                    out/nxp-mcxw71-freertos-lighting-thread-cmake-frdm/app.elf \
                     /tmp/bloat_reports/
             - name: Get MCXW71 lock app size stats
               run: |
                   .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
                     nxp mcxw71+release lock \
-                    out/artifacts/nxp-mcxw71-freertos-lock-app/chip-mcxw71-lock-example.elf \
+                    out/nxp-mcxw71-freertos-lock-app-thread-mtd-low-power-cmake-frdm/app.elf \
                     /tmp/bloat_reports/
 
             - name: Build MCXW72 examples
