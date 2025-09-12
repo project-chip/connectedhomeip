@@ -44,7 +44,7 @@ private:
     {
         OwnershipTransferContext * data = reinterpret_cast<OwnershipTransferContext *>(arg);
         chip::JFAMgr().FinalizeCommissioning(data->mNodeId, data->mJCM, data->mTrustedIcacPublicKeyBSerialized,
-                                       data->mPeerAdminJFAdminClusterEndpointId);
+                                             data->mPeerAdminJFAdminClusterEndpointId);
         chip::Platform::Delete(data);
     }
 

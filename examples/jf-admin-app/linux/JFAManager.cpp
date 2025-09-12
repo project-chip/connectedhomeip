@@ -265,8 +265,7 @@ CHIP_ERROR JFAManager::SendICACSRRequest()
     return cluster.InvokeCommand(request, this, OnSendICACSRRequestResponse, OnSendICACSRRequestFailure);
 }
 
-void JFAManager::OnSendICACSRRequestResponse(void * context,
-                                             const Commands::ICACCSRResponse::DecodableType & icaccsr)
+void JFAManager::OnSendICACSRRequestResponse(void * context, const Commands::ICACCSRResponse::DecodableType & icaccsr)
 {
     JFAManager * jfaManagerCore = static_cast<JFAManager *>(context);
     VerifyOrDie(jfaManagerCore != nullptr);
