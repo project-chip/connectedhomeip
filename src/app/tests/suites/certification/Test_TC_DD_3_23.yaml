@@ -43,26 +43,24 @@ tests:
 
     - label: |
         Step 4: Start Thread Border Router and perform NFC-based commissioning.
-        
+
       verification: |
         # Start the Thread Border Router with:
         ./certification-tool/backend/test_collections/matter/scripts/OTBR/otbr_start.sh
-        
+
         # Copy the Thread dataset that is displayed on the line starting with "Param: 'dataset active -x'"
-        
+
         # Launch NFC-based commissioning with chip-tool (replace XXXXXXX by the Thread dataset)
         ./apps/chip-tool pairing nfc-thread 1 hex:XXXXXXX 20202021 3840
-        
+
         Expected result:
         - chip-tool should complete without error
         - The traces should show that commissioning completed successfully.
       disabled: true
-      
+
     - label: |
         Step 5: Stop the Thread Border Router
       verification: |
         # Stop the Thread Border Router with:
         ./certification-tool/backend/test_collections/matter/scripts/OTBR/otbr_stop.sh
       disabled: true
-
-
