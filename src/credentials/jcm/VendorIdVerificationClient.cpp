@@ -141,7 +141,7 @@ CHIP_ERROR VendorIdVerificationClient::VerifyVendorId(Messaging::ExchangeManager
     request.fabricIndex     = info->adminFabricIndex;
     request.clientChallenge = clientChallengeSpan;
 
-    auto onSuccessCb = [&, exchangeMgr, getSession, info, kClientChallenge](const app::ConcreteCommandPath & aPath,
+    auto onSuccessCb = [&, getSession, info, kClientChallenge](const app::ConcreteCommandPath & aPath,
                                                                             const app::StatusIB & aStatus,
                                                                             const decltype(request)::ResponseType & responseData) {
         ChipLogProgress(Controller, "Successfully received SignVIDVerificationResponse");
