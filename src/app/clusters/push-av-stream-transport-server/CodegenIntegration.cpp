@@ -59,15 +59,14 @@ public:
 PushAvStreamTransportServer * FindClusterOnEndpoint(EndpointId endpointId)
 {
     IntegrationDelegate integrationDelegate;
-    return static_cast<PushAvStreamTransportServer *>(
-        CodegenClusterIntegration::GetClusterForEndpointIndex(
-            {
-                .endpointId                      = endpointId,
-                .clusterId                       = PushAvStreamTransport::Id,
-                .fixedClusterInstanceCount = kPushAvStreamTransportFixedClusterCount,
-                .maxClusterInstanceCount         = kPushAvStreamTransportMaxClusterCount,
-            },
-            integrationDelegate));
+    return static_cast<PushAvStreamTransportServer *>(CodegenClusterIntegration::GetClusterForEndpointIndex(
+        {
+            .endpointId                = endpointId,
+            .clusterId                 = PushAvStreamTransport::Id,
+            .fixedClusterInstanceCount = kPushAvStreamTransportFixedClusterCount,
+            .maxClusterInstanceCount   = kPushAvStreamTransportMaxClusterCount,
+        },
+        integrationDelegate));
 }
 
 } // namespace
