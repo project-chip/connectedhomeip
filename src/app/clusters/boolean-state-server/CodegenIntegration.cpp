@@ -34,7 +34,7 @@ namespace {
 constexpr size_t kBooleanStateFixedClusterCount = BooleanState::StaticApplicationConfig::kFixedClusterConfig.size();
 constexpr size_t kBooleanStateMaxClusterCount   = kBooleanStateFixedClusterCount + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT;
 
-LazyRegisteredServerCluster<BooleanStateCluster> gServers[kBooleanStateFixedClusterCount];
+LazyRegisteredServerCluster<BooleanStateCluster> gServers[kBooleanStateMaxClusterCount];
 
 class IntegrationDelegate : public CodegenClusterIntegration::Delegate
 {
