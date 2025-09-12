@@ -27,7 +27,7 @@
 #       --discriminator 1234
 #       --passcode 20202021
 #       --KVS kvs1
-#       --trace-to json:${TRACE_APP}.json
+#       --trace-to json:${TRACE_TEST_JSON}-app.json
 #       --enable-key 000102030405060708090a0b0c0d0e0f
 #     script-args: >
 #       --storage-path admin_storage.json
