@@ -25,6 +25,7 @@
 #include <controller/jcm/TrustVerification.h>
 #include <credentials/attestation_verifier/DeviceAttestationDelegate.h>
 #include <credentials/attestation_verifier/DeviceAttestationVerifier.h>
+#include <credentials/jcm/TrustVerification.h> // nogncheck
 #include <crypto/CHIPCryptoPAL.h>
 #include <lib/support/Span.h>
 #include <lib/support/Variant.h>
@@ -876,7 +877,7 @@ public:
      */
     struct CommissioningReport : Variant<RequestedCertificate, AttestationResponse, CSRResponse, NocChain, OperationalNodeFoundData,
                                          ReadCommissioningInfo, AttestationErrorInfo, CommissioningErrorInfo,
-                                         NetworkCommissioningStatusInfo, TimeZoneResponseInfo, JCM::TrustVerificationError>
+                                         NetworkCommissioningStatusInfo, TimeZoneResponseInfo, Credentials::JCM::TrustVerificationError>
     {
         CommissioningReport() : stageCompleted(CommissioningStage::kError) {}
         CommissioningStage stageCompleted;

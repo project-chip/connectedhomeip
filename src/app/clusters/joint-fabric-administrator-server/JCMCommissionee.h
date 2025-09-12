@@ -18,7 +18,7 @@
 
 #pragma once
 
-#include "TrustVerification.h"
+#include <credentials/jcm/TrustVerification.h>
 
 #include <app/CommandHandlerInterface.h>
 #include <lib/core/CHIPCallback.h>
@@ -33,10 +33,11 @@ using namespace ::chip;
 using namespace ::chip::app;
 
 namespace chip {
+namespace app {
+namespace Clusters {
+namespace JointFabricAdministrator {
 
-namespace Controller {
-
-namespace JCM {
+using namespace ::chip::Credentials::JCM;
 
 /*
  * JCMCommissionee is a class that handles the Joint Commissioning Management (JCM) process for Joint Fabric Administrator devices
@@ -95,6 +96,7 @@ private:
     TrustVerificationError ParseCommissionerAdminInfo();
 };
 
-} // namespace JCM
-} // namespace Controller
+} // namespace JointFabricAdministrator
+} // namespace Clusters
+} // namespace app
 } // namespace chip

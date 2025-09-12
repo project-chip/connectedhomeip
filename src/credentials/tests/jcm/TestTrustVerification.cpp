@@ -16,12 +16,12 @@
  */
 
 #include <app/tests/AppTestContext.h>
-#include <controller/jcm/TrustVerification.h>
+#include <credentials/jcm/TrustVerification.h>
 #include <lib/support/tests/ExtraPwTestMacros.h>
 #include <pw_unit_test/framework.h>
 
 using namespace chip;
-using namespace chip::Controller::JCM;
+using namespace chip::Credentials::JCM;
 
 class TestTrustVerification : public chip::Test::AppContext
 {

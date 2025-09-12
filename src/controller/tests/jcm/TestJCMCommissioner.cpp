@@ -52,6 +52,7 @@ using namespace chip::Transport;
 namespace chip {
 namespace Controller {
 namespace JCM {
+using namespace ::chip::Credentials::JCM;
 
 // Mock function for linking
 void InitDataModelHandler() {}

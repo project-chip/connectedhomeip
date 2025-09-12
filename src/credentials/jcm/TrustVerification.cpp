@@ -23,12 +23,12 @@
 
 using namespace ::chip;
 using namespace ::chip::app;
-using namespace ::chip::Credentials;
 using namespace ::chip::Crypto;
+using namespace ::chip::Controller;
 using namespace chip::app::Clusters;
 
 namespace chip {
-namespace Controller {
+namespace Credentials {
 namespace JCM {
 
 CHIP_ERROR VendorIdVerificationClient::VerifyNOCCertificateChain(const ByteSpan & nocSpan, const ByteSpan & icacSpan,
@@ -219,5 +219,5 @@ void TrustVerificationStateMachine::TrustVerificationStageFinished(const TrustVe
 }
 
 } // namespace JCM
-} // namespace Controller
+} // namespace Credentials
 } // namespace chip

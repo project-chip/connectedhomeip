@@ -18,7 +18,7 @@
 
 #pragma once
 
-#include "TrustVerification.h"
+#include <credentials/jcm/TrustVerification.h>
 
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
@@ -38,6 +38,8 @@ namespace chip {
 namespace Controller {
 
 namespace JCM {
+
+using namespace ::chip::Credentials::JCM;
 
 /*
  * DeviceCommissioner is a class that handles the Joint Commissioning Management (JCM) process
