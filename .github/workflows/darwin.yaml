@@ -36,7 +36,9 @@ env:
 jobs:
     framework:
         name: Build framework
-        if: github.actor != 'restyled-io[bot]'
+        if: |
+            github.actor != 'restyled-io[bot]' &&
+            (github.event_name != 'pull_request' || github.event.pull_request.draft == false)
         runs-on: macos-13
         strategy:
             matrix:
@@ -72,7 +74,9 @@ jobs:
 
     tests:
         name: Run framework tests
-        if: github.actor != 'restyled-io[bot]'
+        if: |
+            github.actor != 'restyled-io[bot]' &&
+            (github.event_name != 'pull_request' || github.event.pull_request.draft == false)
         needs: [framework] # serialize to avoid running to many parallel macos runners
         runs-on: macos-13
         strategy:

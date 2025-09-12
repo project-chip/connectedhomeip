@@ -16,10 +16,12 @@ name: Data model directory checks
 
 on:
   pull_request:
+  workflow_dispatch:
 
 jobs:
   check-data-model-updates:
     name: Check for updates to data model directory without SHA updates
+    if: github.event_name != 'pull_request' || github.event.pull_request.draft == false
     runs-on: ubuntu-latest
     container:
       image: ghcr.io/project-chip/chip-build
@@ -72,6 +74,7 @@ jobs:
 
   check-data_model-build-file:
     name: Check that all data_model files are listed in the data_model_xmls.gni build file
+    if: github.event_name != 'pull_request' || github.event.pull_request.draft == false
     runs-on: ubuntu-latest
     container:
       image: ghcr.io/project-chip/chip-build
