@@ -69,18 +69,18 @@ WebrtcTransport::RequestArgs & WebrtcTransport::GetRequestArgs()
 
 void WebrtcTransport::SendVideo(const char * data, size_t size, uint16_t videoStreamID)
 {
-    if (mVideoTrack)
+    if (mLocalVideoTrack)
     {
-        mVideoTrack->SendData(data, size);
+        mLocalVideoTrack->SendData(data, size);
     }
 }
 
 // Implementation of SendAudio method
 void WebrtcTransport::SendAudio(const char * data, size_t size, uint16_t audioStreamID)
 {
-    if (mAudioTrack)
+    if (mLocalAudioTrack)
     {
-        mAudioTrack->SendData(data, size);
+        mLocalAudioTrack->SendData(data, size);
     }
 }
 
@@ -93,13 +93,13 @@ void WebrtcTransport::SendAudioVideo(const char * data, size_t size, uint16_t vi
 // Implementation of CanSendVideo method
 bool WebrtcTransport::CanSendVideo()
 {
-    return mVideoTrack != nullptr;
+    return mLocalVideoTrack != nullptr;
 }
 
 // Implementation of CanSendAudio method
 bool WebrtcTransport::CanSendAudio()
 {
-    return mAudioTrack != nullptr;
+    return mLocalAudioTrack != nullptr;
 }
 
 const char * WebrtcTransport::GetStateStr() const
@@ -153,20 +153,24 @@ void WebrtcTransport::Start()
 
 void WebrtcTransport::Stop()
 {
-    mVideoTrack = nullptr;
-    mAudioTrack = nullptr;
     if (mPeerConnection != nullptr)
     {
         mPeerConnection->Close();
     }
+
+    mLocalVideoTrack = nullptr;
+    mLocalAudioTrack = nullptr;
+    mRemoteVideoTrack = nullptr;
+    mRemoteAudioTrack = nullptr;
 }
 
 void WebrtcTransport::AddTracks(const std::string & videoMid, const std::string & audioMid)
 {
     if (mPeerConnection != nullptr)
     {
-        mVideoTrack = mPeerConnection->AddTrack(MediaType::Video, videoMid);
-        mAudioTrack = mPeerConnection->AddTrack(MediaType::Audio, audioMid);
+        // Adding local tracks to send audio/video data to remote peer
+        mLocalVideoTrack = mPeerConnection->AddTrack(MediaType::Video, videoMid);
+        mLocalAudioTrack = mPeerConnection->AddTrack(MediaType::Audio, audioMid);
     }
 }
 

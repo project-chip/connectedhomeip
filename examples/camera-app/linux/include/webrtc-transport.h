@@ -133,10 +133,14 @@ private:
     State mState             = State::Idle;
 
     std::shared_ptr<WebRTCPeerConnection> mPeerConnection;
-    std::shared_ptr<WebRTCTrack> mVideoTrack;
-    std::shared_ptr<WebRTCTrack> mAudioTrack;
+
+    // Local tracks set to send the camera data to remote peer connection object
+    std::shared_ptr<WebRTCTrack> mLocalVideoTrack;;
+    std::shared_ptr<WebRTCTrack> mLocalAudioTrack;
+    // Remote tracks set using onTrack API callback if there is any mismatch in MIDs between local and remote tracks
     std::shared_ptr<WebRTCTrack> mRemoteVideoTrack;
     std::shared_ptr<WebRTCTrack> mRemoteAudioTrack;
+
     std::string mLocalSdp;
     SDPType mLocalSdpType;
     std::vector<std::string> mLocalCandidates;
