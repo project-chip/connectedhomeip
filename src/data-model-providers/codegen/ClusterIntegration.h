@@ -52,7 +52,7 @@ public:
         ///   - IF AND ONLY IF  optional attribute load is requested that optionalAttributeBits are
         ///    loaded from ember according to supported attributes
         ///   - IF AND ONLY IF feature map loading is requested, that the feature map for the
-        ///     underlying cluster ID has been loaded.
+        ///     underlying cluster ID and endpoint has been loaded.
         ///
         /// NOTE: optionalAttributeBits is intended for low id attributes since it supports attribute bits up to 31 only. It is
         ///       intended for use with `OptionalAttributeSet` and NOT all clusters support this. Specific examples:
@@ -67,7 +67,7 @@ public:
         virtual ServerClusterRegistration & CreateRegistration(EndpointId endpointId, unsigned clusterInstanceIndex,
                                                                uint32_t optionalAttributeBits, uint32_t featureMap) = 0;
 
-        /// Find the previously created cluster on the given index.
+        /// Find the previously created cluster at the given index.
         ///
         /// It should return the given interface IF AND ONLY IF it is valid.
         /// This will be called after CreateRegistration or as part of finding an existing
@@ -90,7 +90,7 @@ public:
     {
         EndpointId endpointId;
         ClusterId clusterId;
-        uint16_t fixedClusterServerEndpointCount; // Number of fixed endpoints that contain this cluster in ember configuration.
+        uint16_t fixedClusterInstanceCount; // Number of fixed endpoints that contain this server cluster in ember configuration.
         uint16_t maxClusterInstanceCount;         // This is how many endpoints are supported by the delegate (0-based index).
         bool fetchFeatureMap;                     // Read feature map attribute from ember.
         bool fetchOptionalAttributes;             // Read the enabling of the first 32 optional attributes from ember.
@@ -130,7 +130,7 @@ public:
         EndpointId endpointId;
         ClusterId clusterId;
         uint16_t fixedClusterServerEndpointCount; // Number of fixed endpoints in ember configuration.
-        uint16_t maxClusterInstanceCount;         // This is how many endpoints are supported by the delegate (0-based index).
+        uint16_t maxClusterInstanceCount;         // This is how many cluster instances are supported by the delegate (0-based indexing, so indices smaller than this are valid).
     };
 
     /// Calls 'FindRegistration' on the delegate and returns the address of the cluster for an endpoint index or nullptr if not
