@@ -95,12 +95,6 @@ public:
 
     void AddTracks(const std::string & videoMid = "video", const std::string & audioMid = "audio");
 
-    // Set video track for the transport
-    void SetVideoTrack(std::shared_ptr<WebRTCTrack> videoTrack);
-
-    // Set audio track for the transport
-    void SetAudioTrack(std::shared_ptr<WebRTCTrack> audioTrack);
-
     std::shared_ptr<WebRTCPeerConnection> GetPeerConnection() { return mPeerConnection; }
 
     std::string GetLocalDescription() { return mLocalSdp; }
@@ -137,9 +131,6 @@ private:
     // Local tracks set to send the camera data to remote peer connection object
     std::shared_ptr<WebRTCTrack> mLocalVideoTrack;
     std::shared_ptr<WebRTCTrack> mLocalAudioTrack;
-    // Remote tracks set using onTrack API callback if there is any mismatch in MIDs between local and remote tracks
-    std::shared_ptr<WebRTCTrack> mRemoteVideoTrack;
-    std::shared_ptr<WebRTCTrack> mRemoteAudioTrack;
 
     std::string mLocalSdp;
     SDPType mLocalSdpType;

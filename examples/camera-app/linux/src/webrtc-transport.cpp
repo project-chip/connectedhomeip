@@ -160,8 +160,6 @@ void WebrtcTransport::Stop()
 
     mLocalVideoTrack  = nullptr;
     mLocalAudioTrack  = nullptr;
-    mRemoteVideoTrack = nullptr;
-    mRemoteAudioTrack = nullptr;
 }
 
 void WebrtcTransport::AddTracks(const std::string & videoMid, const std::string & audioMid)
@@ -172,20 +170,6 @@ void WebrtcTransport::AddTracks(const std::string & videoMid, const std::string 
         mLocalVideoTrack = mPeerConnection->AddTrack(MediaType::Video, videoMid);
         mLocalAudioTrack = mPeerConnection->AddTrack(MediaType::Audio, audioMid);
     }
-}
-
-// Implementation of SetVideoTrack method
-void WebrtcTransport::SetVideoTrack(std::shared_ptr<WebRTCTrack> videoTrack)
-{
-    ChipLogProgress(Camera, "Setting video track for sessionID: %u", mRequestArgs.sessionId);
-    mRemoteVideoTrack = videoTrack;
-}
-
-// Implementation of SetAudioTrack method
-void WebrtcTransport::SetAudioTrack(std::shared_ptr<WebRTCTrack> audioTrack)
-{
-    ChipLogProgress(Camera, "Setting audio track for sessionID: %u", mRequestArgs.sessionId);
-    mRemoteAudioTrack = audioTrack;
 }
 
 void WebrtcTransport::AddRemoteCandidate(const std::string & candidate, const std::string & mid)
@@ -233,15 +217,6 @@ void WebrtcTransport::OnConnectionStateChanged(bool connected)
 
 void WebrtcTransport::OnTrack(std::shared_ptr<WebRTCTrack> track)
 {
-    ChipLogProgress(Camera, "Track received for sessionID: %u, type: %s", mRequestArgs.sessionId, track->GetType().c_str());
-    if (track->GetType() == "video")
-    {
-        ChipLogProgress(Camera, "Video track updated from remote peer");
-        SetVideoTrack(track);
-    }
-    else if (track->GetType() == "audio")
-    {
-        ChipLogProgress(Camera, "audio track updated from remote peer");
-        SetAudioTrack(track);
-    }
+    // Only logging the track addition here as it's not used in the current implementation. In future, we can add functionality to handle
+    ChipLogProgress(Camera, "Remote track added for the sessionID: %u, type: %s", mRequestArgs.sessionId, track->GetType().c_str());
 }
