@@ -54,7 +54,8 @@ CHIP_ERROR VendorIdVerificationClient::VerifyNOCCertificateChain(const ByteSpan 
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR VendorIdVerificationClient::Verify(TrustVerificationInfo * info, const ByteSpan clientChallengeSpan, const ByteSpan attestationChallengeSpan,
+CHIP_ERROR VendorIdVerificationClient::Verify(TrustVerificationInfo * info, const ByteSpan clientChallengeSpan,
+                                              const ByteSpan attestationChallengeSpan,
                                               const SignVIDVerificationResponse::DecodableType responseData)
 {
     // Steps 1-9 have already been completed prior to the response callback
@@ -152,7 +153,7 @@ CHIP_ERROR VendorIdVerificationClient::VerifyVendorId(ExchangeManager * exchange
         ChipLogProgress(Controller, "Successfully received SignVIDVerificationResponse");
         ByteSpan clientChallenge{ kClientChallenge };
         ByteSpan attestationChallenge = getSession().Value()->AsSecureSession()->GetCryptoContext().GetAttestationChallenge();
-        CHIP_ERROR err = Verify(info, clientChallenge, attestationChallenge, responseData);
+        CHIP_ERROR err                = Verify(info, clientChallenge, attestationChallenge, responseData);
         ChipLogProgress(Controller, "Vendor ID verification completed with result: %s", ErrorStr(err));
         OnVendorIdVerficationComplete(err);
     };

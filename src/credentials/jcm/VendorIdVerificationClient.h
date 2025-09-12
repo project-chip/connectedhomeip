@@ -66,7 +66,7 @@ private:
     CHIP_ERROR VerifyNOCCertificateChain(const ByteSpan & nocSpan, const ByteSpan & icacSpan, const ByteSpan & rcacSpan);
 
     CHIP_ERROR Verify(TrustVerificationInfo * info, const ByteSpan clientChallengeSpan, ByteSpan attestationChallengeSpan,
-        const SignVIDVerificationResponse::DecodableType responseData);
+                      const SignVIDVerificationResponse::DecodableType responseData);
 };
 
 } // namespace JCM
