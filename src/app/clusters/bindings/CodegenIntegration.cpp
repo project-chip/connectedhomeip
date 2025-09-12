@@ -32,7 +32,6 @@ static constexpr size_t kBindingMaxClusterCount   = kBindingFixedClusterCount + 
 
 LazyRegisteredServerCluster<BindingCluster> gServers[kBindingMaxClusterCount];
 
-
 class IntegrationDelegate : public CodegenClusterIntegration::Delegate
 {
 public:
