@@ -91,7 +91,7 @@ class TC_WebRTCRequestor_2_3(MatterBaseTest):
 
     def desc_TC_WebRTCRequestor_2_3(self) -> str:
         """Returns a description of this test"""
-        return "[TC-{picsCode}-2.3] Validate sending an SDP Offer command to {DUT_Server} with an existing session id"
+        return "[TC-{picsCode}-2.3] Validate Offer command with valid session id"
 
     def steps_TC_WebRTCRequestor_2_3(self) -> list[TestStep]:
         """
@@ -99,7 +99,7 @@ class TC_WebRTCRequestor_2_3(MatterBaseTest):
         """
         steps = [
             TestStep(1, "Commission the {TH_Server} from DUT"),
-            TestStep(2, "Send SolicitOffer command to the {TH_Server}"),
+            TestStep(2, "Trigger {TH_Server} to send an Offer to DUT with valid session ID and SDP offer"),
         ]
         return steps
 
@@ -159,7 +159,7 @@ class TC_WebRTCRequestor_2_3(MatterBaseTest):
         prompt_msg = (
             "\nSend 'SolicitOffer' command to the server app from DUT:\n"
             "  webrtc establish-session 1 --offer-type 1\n"
-            "Input 'Y' if WebRTC session is successfully established\n"
+            "Input 'Y' if WebRTC session has been successfully established\n"
             "Input 'N' if WebRTC session is not established\n"
         )
 

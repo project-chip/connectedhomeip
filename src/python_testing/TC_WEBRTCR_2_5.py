@@ -39,13 +39,12 @@ from time import sleep
 
 from mobly import asserts
 
-import matter.clusters as Clusters
 from matter import ChipDeviceCtrl
 from matter.testing.apps import AppServerSubprocess
 from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 
 
-class TC_WebRTCRequestor_2_2(MatterBaseTest):
+class TC_WebRTCRequestor_2_5(MatterBaseTest):
     def setup_class(self):
         super().setup_class()
 
@@ -86,11 +85,11 @@ class TC_WebRTCRequestor_2_2(MatterBaseTest):
             self.storage.cleanup()
         super().teardown_class()
 
-    def desc_TC_WebRTCRequestor_2_2(self) -> str:
+    def desc_TC_WebRTCRequestor_2_5(self) -> str:
         """Returns a description of this test"""
-        return "[TC-{picsCode}-2.2] Validate Answer command with invalid session id"
+        return "[TC-{picsCode}-2.5] Validate CurrentSessions attribute read"
 
-    def steps_TC_WebRTCRequestor_2_2(self) -> list[TestStep]:
+    def steps_TC_WebRTCRequestor_2_5(self) -> list[TestStep]:
         """
         Define the step-by-step sequence for the test.
         """
@@ -98,21 +97,24 @@ class TC_WebRTCRequestor_2_2(MatterBaseTest):
             TestStep(1, "Commission the {TH_Server} from TH"),
             TestStep(2, "Open the Commissioning Window of the {TH_Server}"),
             TestStep(3, "Commission the {TH_Server} from DUT"),
-            TestStep(4, "Activate fault injection on {TH_Server} to modify the session ID of the WebRTC Answer command"),
-            TestStep(5, "Trigger {TH_Server} to send an Answer command to DUT with an invalid/non-existent WebRTCSessionID"),
+            TestStep(4, "Read CurrentSessions attribute from DUT"),
+            TestStep(5, "Establish a WebRTC session between {TH_Server} and DUT"),
+            TestStep(6, "Read CurrentSessions attribute from DUT"),
+            TestStep(7, "End the WebRTC session"),
+            TestStep(8, "Read CurrentSessions attribute from DUT"),
         ]
         return steps
 
-    # This test has some manual steps and one sleep for up to 30 seconds. Test typically
-    # runs under 1 mins, so 3 minutes is more than enough.
+    # This test has multiple manual steps for attribute reads and session management.
+    # Test typically runs under 2 mins, so 5 minutes is sufficient.
     @property
     def default_timeout(self) -> int:
-        return 3 * 60
+        return 5 * 60
 
     @async_test_body
-    async def test_TC_WebRTCRequestor_2_2(self):
+    async def test_TC_WebRTCRequestor_2_5(self):
         """
-        Executes the test steps for the WebRTC Provider cluster scenario.
+        Executes the test steps for the WebRTC CurrentSessions attribute validation.
         """
 
         discriminator = 1234
@@ -156,52 +158,123 @@ class TC_WebRTCRequestor_2_2(MatterBaseTest):
         )
 
         self.step(4)
-        logging.info("Injecting kFault_ModifyWebRTCAnswerSessionId on TH_SERVER")
-
-        # --- Fault‑Injection cluster (mfg‑specific 0xFFF1_FC06) ---
-        # Use FailAtFault to activate the chip‑layer fault exactly once
-        #
-        #  • faultType = kChipFault (0x03)  – always used for CHIP faults
-        #  • id        = FaultInjection.Id.kFault_ModifyWebRTCAnswerSessionId
-        #  • numCallsToSkip = 0  – trigger on the very next call
-        #  • numCallsToFail = 1  – inject once, then auto‑clear
-        #  • takeMutex      = False  – single‑threaded app, no lock needed
-        #
-        command = Clusters.FaultInjection.Commands.FailAtFault(
-            type=Clusters.FaultInjection.Enums.FaultType.kChipFault,
-            id=15,  # kFault_ModifyWebRTCAnswerSessionId
-            numCallsToFail=1,
-            takeMutex=False,
-        )
-        await self.default_controller.SendCommand(
-            nodeid=self.th_server_local_nodeid,
-            endpoint=0,  # Fault‑Injection cluster lives on EP0
-            payload=command,
-        )
-        sleep(1)
-
-        self.step(5)
-        # Prompt user with instructions
+        # Prompt user to read CurrentSessions attribute before establishing session
         prompt_msg = (
-            "\nSend 'ProvideOffer' command to the server app from DUT:\n"
-            "  webrtc establish-session 1\n"
-            "Input 'Y' if WebRTC session is failed with error 'NOT_FOUND'\n"
-            "Input 'N' if WebRTC session is successfully established\n"
+            "\nRead CurrentSessions attribute from DUT:\n"
+            "  webrtc read current-sessions 1 1\n"
+            "Input 'Y' if attribute read succeeds and returns an empty list\n"
+            "Input 'N' if attribute read fails or returns non-empty list\n"
         )
 
         if self.is_pics_sdk_ci_only:
-            # TODO: send command to DUT via websocket
+            # TODO: read attribute via websocket and verify empty list
             resp = 'Y'
         else:
             resp = self.wait_for_user_input(prompt_msg)
 
-        result = resp.lower() == 'y'
+        read_success = resp.lower() == 'y'
 
         # Verify results
         asserts.assert_equal(
-            result,
+            read_success,
             True,
-            f"WebRTC session {'failed as expected' if result else 'unexpectedly succeeded'}"
+            f"CurrentSessions attribute read {'succeeded with empty list' if read_success else 'failed or returned non-empty list'}"
+        )
+
+        self.step(5)
+        # Prompt user to establish WebRTC session
+        prompt_msg = (
+            "\nEstablish WebRTC session between TH_SERVER and DUT:\n"
+            "  webrtc establish-session 1\n"
+            "Input 'Y' if WebRTC session is successfully established\n"
+            "Input 'N' if WebRTC session establishment failed\n"
+        )
+
+        if self.is_pics_sdk_ci_only:
+            # TODO: establish session via websocket
+            resp = 'Y'
+        else:
+            resp = self.wait_for_user_input(prompt_msg)
+
+        session_success = resp.lower() == 'y'
+
+        # Verify results
+        asserts.assert_equal(
+            session_success,
+            True,
+            f"WebRTC session {'established successfully' if session_success else 'failed to establish'}"
+        )
+
+        self.step(6)
+        # Prompt user to read CurrentSessions attribute after establishing session
+        prompt_msg = (
+            "\nRead CurrentSessions attribute from DUT:\n"
+            "  webrtc read current-sessions 1 1\n"
+            "Input 'Y' if attribute read succeeds and returns a list with one WebRTCSessionStruct containing session ID and peer node information\n"
+            "Input 'N' if attribute read fails or returns incorrect data\n"
+        )
+
+        if self.is_pics_sdk_ci_only:
+            # TODO: read attribute via websocket and verify session info
+            resp = 'Y'
+        else:
+            resp = self.wait_for_user_input(prompt_msg)
+
+        session_read_success = resp.lower() == 'y'
+
+        # Verify results
+        asserts.assert_equal(
+            session_read_success,
+            True,
+            f"CurrentSessions attribute read {'succeeded with session info' if session_read_success else 'failed or returned incorrect data'}"
+        )
+
+        self.step(7)
+        # Prompt user to end WebRTC session
+        prompt_msg = (
+            "\nEnd the WebRTC session:\n"
+            "  webrtc end-session 1\n"
+            "Input 'Y' if session is successfully terminated\n"
+            "Input 'N' if session termination failed\n"
+        )
+
+        if self.is_pics_sdk_ci_only:
+            # TODO: end session via websocket
+            resp = 'Y'
+        else:
+            resp = self.wait_for_user_input(prompt_msg)
+
+        session_end_success = resp.lower() == 'y'
+
+        # Verify results
+        asserts.assert_equal(
+            session_end_success,
+            True,
+            f"WebRTC session {'terminated successfully' if session_end_success else 'failed to terminate'}"
+        )
+
+        self.step(8)
+        # Prompt user to read CurrentSessions attribute after ending session
+        prompt_msg = (
+            "\nRead CurrentSessions attribute from DUT:\n"
+            "  webrtc read current-sessions 1 1\n"
+            "Input 'Y' if attribute read succeeds and returns an empty list\n"
+            "Input 'N' if attribute read fails or returns non-empty list\n"
+        )
+
+        if self.is_pics_sdk_ci_only:
+            # TODO: read attribute via websocket and verify empty list
+            resp = 'Y'
+        else:
+            resp = self.wait_for_user_input(prompt_msg)
+
+        final_read_success = resp.lower() == 'y'
+
+        # Verify results
+        asserts.assert_equal(
+            final_read_success,
+            True,
+            f"Final CurrentSessions attribute read {'succeeded with empty list' if final_read_success else 'failed or returned non-empty list'}"
         )
 
 
