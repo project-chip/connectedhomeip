@@ -69,7 +69,7 @@ public:
 
 } // namespace
 
-void emberAfBasicInformationClusterServerInitCallback(EndpointId endpointId)
+void MatterCodedrivenBasicInformationClusterInitCallback(EndpointId endpointId)
 {
     VerifyOrReturn(endpointId == kRootEndpointId);
 
@@ -88,7 +88,7 @@ void emberAfBasicInformationClusterServerInitCallback(EndpointId endpointId)
         integrationDelegate);
 }
 
-void MatterBasicInformationClusterServerShutdownCallback(EndpointId endpointId)
+void MatterCodedrivenBasicInformationClusterShutdownCallback(EndpointId endpointId)
 {
     VerifyOrReturn(endpointId == kRootEndpointId);
 

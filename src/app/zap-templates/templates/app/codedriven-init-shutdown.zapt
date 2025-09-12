@@ -1,0 +1,42 @@
+{{> header}}
+
+#include <cstdint>
+#include <cinttypes>
+
+#include <app-common/zap-generated/callback.h>
+#include <app-common/zap-generated/cluster-objects.h>
+#include <app-common/zap-generated/ids/Clusters.h>
+#include <app-common/zap-generated/ids/Commands.h>
+#include <app/util/util.h>
+#include <app/CommandHandler.h>
+#include <lib/core/CHIPSafeCasts.h>
+#include <lib/support/TypeTraits.h>
+
+using namespace chip;
+
+// Cluster Init Functions for Codedriven Clusters
+void MatterCodedrivenClusterInitCallback(EndpointId endpoint, ClusterId  clusterId) {
+    switch (clusterId)
+    {
+    {{#all_user_clusters side='server'}}
+    {{#if (isInConfigList name "CodeDrivenClusters")}}
+    case app::Clusters::{{asUpperCamelCase name}}::Id:
+        MatterCodedriven{{asUpperCamelCase name}}ClusterInitCallback(endpoint);
+        break;
+    {{/if}}
+    {{/all_user_clusters}}
+    }
+}
+
+void MatterCodedrivenClusterShutdownCallback(EndpointId endpoint, ClusterId clusterId) {
+    switch (clusterId)
+    {
+    {{#all_user_clusters side='server'}}
+    {{#if (isInConfigList name "CodeDrivenClusters")}}
+    case app::Clusters::{{asUpperCamelCase name}}::Id:
+        MatterCodedriven{{asUpperCamelCase name}}ClusterShutdownCallback(endpoint);
+        break;
+    {{/if}}
+    {{/all_user_clusters}}
+    }
+}

@@ -65,8 +65,7 @@ public:
 
 } // namespace
 
-// This callback is called for any endpoint (fixed or dynamic) that is registered with the Ember machinery.
-void emberAfWiFiNetworkDiagnosticsClusterServerInitCallback(EndpointId endpointId)
+void MatterCodedrivenWiFiNetworkDiagnosticsClusterInitCallback(EndpointId endpointId)
 {
     IntegrationDelegate integrationDelegate;
 
@@ -82,8 +81,7 @@ void emberAfWiFiNetworkDiagnosticsClusterServerInitCallback(EndpointId endpointI
         integrationDelegate);
 }
 
-// This callback is called for any endpoint (fixed or dynamic) that is registered with the Ember machinery.
-void MatterWiFiNetworkDiagnosticsClusterServerShutdownCallback(EndpointId endpointId)
+void MatterCodedrivenEthernetNetworkDiagnosticsClusterShutdownCallback(EndpointId endpointId)
 {
     IntegrationDelegate integrationDelegate;
 

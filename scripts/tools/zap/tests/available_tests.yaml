@@ -16,6 +16,7 @@ inputs/all-clusters-app.zap:
         gen_config.h: outputs/all-clusters-app/app-templates/gen_config.h
         access.h: outputs/all-clusters-app/app-templates/access.h
         IMClusterCommandHandler.cpp: outputs/all-clusters-app/app-templates/IMClusterCommandHandler.cpp
+        CodedrivenInitShutdown.cpp: outputs/all-clusters-app/app-templates/CodedrivenInitShutdown.cpp
 
 inputs/lighting-app.zap:
     ../../../../src/app/zap-templates/app-templates.json:
@@ -23,3 +24,4 @@ inputs/lighting-app.zap:
         gen_config.h: outputs/lighting-app/app-templates/gen_config.h
         access.h: outputs/lighting-app/app-templates/access.h
         IMClusterCommandHandler.cpp: outputs/lighting-app/app-templates/IMClusterCommandHandler.cpp
+        CodedrivenInitShutdown.cpp: outputs/lighting-app/app-templates/CodedrivenInitShutdown.cpp

@@ -727,10 +727,6 @@
 
 // Cluster function static arrays
 #define GENERATED_FUNCTION_ARRAYS                                                                                                  \
-    const EmberAfGenericClusterFunction chipFuncArrayBasicInformationServer[] = {                                                  \
-        (EmberAfGenericClusterFunction) emberAfBasicInformationClusterServerInitCallback,                                          \
-        (EmberAfGenericClusterFunction) MatterBasicInformationClusterServerShutdownCallback,                                       \
-    };                                                                                                                             \
     const EmberAfGenericClusterFunction chipFuncArrayLocalizationConfigurationServer[] = {                                         \
         (EmberAfGenericClusterFunction) emberAfLocalizationConfigurationClusterServerInitCallback,                                 \
         (EmberAfGenericClusterFunction) MatterLocalizationConfigurationClusterServerPreAttributeChangedCallback,                   \
@@ -739,27 +735,9 @@
         (EmberAfGenericClusterFunction) emberAfTimeFormatLocalizationClusterServerInitCallback,                                    \
         (EmberAfGenericClusterFunction) MatterTimeFormatLocalizationClusterServerPreAttributeChangedCallback,                      \
     };                                                                                                                             \
-    const EmberAfGenericClusterFunction chipFuncArrayGeneralDiagnosticsServer[] = {                                                \
-        (EmberAfGenericClusterFunction) emberAfGeneralDiagnosticsClusterServerInitCallback,                                        \
-        (EmberAfGenericClusterFunction) MatterGeneralDiagnosticsClusterServerShutdownCallback,                                     \
-    };                                                                                                                             \
-    const EmberAfGenericClusterFunction chipFuncArraySoftwareDiagnosticsServer[] = {                                               \
-        (EmberAfGenericClusterFunction) emberAfSoftwareDiagnosticsClusterServerInitCallback,                                       \
-        (EmberAfGenericClusterFunction) MatterSoftwareDiagnosticsClusterServerShutdownCallback,                                    \
-    };                                                                                                                             \
     const EmberAfGenericClusterFunction chipFuncArrayWiFiNetworkDiagnosticsServer[] = {                                            \
         (EmberAfGenericClusterFunction) emberAfWiFiNetworkDiagnosticsClusterServerInitCallback,                                    \
         (EmberAfGenericClusterFunction) MatterWiFiNetworkDiagnosticsClusterServerShutdownCallback,                                 \
-    };                                                                                                                             \
-    const EmberAfGenericClusterFunction chipFuncArrayEthernetNetworkDiagnosticsServer[] = {                                        \
-        (EmberAfGenericClusterFunction) emberAfEthernetNetworkDiagnosticsClusterServerInitCallback,                                \
-    };                                                                                                                             \
-    const EmberAfGenericClusterFunction chipFuncArrayAdministratorCommissioningServer[] = {                                        \
-        (EmberAfGenericClusterFunction) emberAfAdministratorCommissioningClusterServerInitCallback,                                \
-        (EmberAfGenericClusterFunction) MatterAdministratorCommissioningClusterServerShutdownCallback,                             \
-    };                                                                                                                             \
-    const EmberAfGenericClusterFunction chipFuncArrayGroupKeyManagementServer[] = {                                                \
-        (EmberAfGenericClusterFunction) emberAfGroupKeyManagementClusterServerInitCallback,                                        \
     };                                                                                                                             \
     const EmberAfGenericClusterFunction chipFuncArrayFixedLabelServer[] = {                                                        \
         (EmberAfGenericClusterFunction) emberAfFixedLabelClusterServerInitCallback,                                                \
@@ -1010,8 +988,8 @@
       .attributes = ZAP_ATTRIBUTE_INDEX(13), \
       .attributeCount = 23, \
       .clusterSize = 0, \
-      .mask = ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(INIT_FUNCTION) | ZAP_CLUSTER_MASK(SHUTDOWN_FUNCTION), \
-      .functions = chipFuncArrayBasicInformationServer, \
+      .mask = ZAP_CLUSTER_MASK(SERVER), \
+      .functions = NULL, \
       .acceptedCommandList = nullptr, \
       .generatedCommandList = nullptr, \
       .eventList = ZAP_GENERATED_EVENTS_INDEX( 2 ), \
@@ -1114,8 +1092,8 @@
       .attributes = ZAP_ATTRIBUTE_INDEX(70), \
       .attributeCount = 11, \
       .clusterSize = 0, \
-      .mask = ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(INIT_FUNCTION) | ZAP_CLUSTER_MASK(SHUTDOWN_FUNCTION), \
-      .functions = chipFuncArrayGeneralDiagnosticsServer, \
+      .mask = ZAP_CLUSTER_MASK(SERVER), \
+      .functions = NULL, \
       .acceptedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 25 ), \
       .generatedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 28 ), \
       .eventList = ZAP_GENERATED_EVENTS_INDEX( 8 ), \
@@ -1127,8 +1105,8 @@
       .attributes = ZAP_ATTRIBUTE_INDEX(81), \
       .attributeCount = 6, \
       .clusterSize = 0, \
-      .mask = ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(INIT_FUNCTION) | ZAP_CLUSTER_MASK(SHUTDOWN_FUNCTION), \
-      .functions = chipFuncArraySoftwareDiagnosticsServer, \
+      .mask = ZAP_CLUSTER_MASK(SERVER), \
+      .functions = NULL, \
       .acceptedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 30 ), \
       .generatedCommandList = nullptr, \
       .eventList = nullptr, \
@@ -1166,8 +1144,8 @@
       .attributes = ZAP_ATTRIBUTE_INDEX(167), \
       .attributeCount = 11, \
       .clusterSize = 4, \
-      .mask = ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(INIT_FUNCTION), \
-      .functions = chipFuncArrayEthernetNetworkDiagnosticsServer, \
+      .mask = ZAP_CLUSTER_MASK(SERVER), \
+      .functions = NULL, \
       .acceptedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 36 ), \
       .generatedCommandList = nullptr, \
       .eventList = nullptr, \
@@ -1192,8 +1170,8 @@
       .attributes = ZAP_ATTRIBUTE_INDEX(182), \
       .attributeCount = 5, \
       .clusterSize = 4, \
-      .mask = ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(INIT_FUNCTION) | ZAP_CLUSTER_MASK(SHUTDOWN_FUNCTION), \
-      .functions = chipFuncArrayAdministratorCommissioningServer, \
+      .mask = ZAP_CLUSTER_MASK(SERVER), \
+      .functions = NULL, \
       .acceptedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 38 ), \
       .generatedCommandList = nullptr, \
       .eventList = nullptr, \
@@ -1218,8 +1196,8 @@
       .attributes = ZAP_ATTRIBUTE_INDEX(195), \
       .attributeCount = 6, \
       .clusterSize = 0, \
-      .mask = ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(INIT_FUNCTION), \
-      .functions = chipFuncArrayGroupKeyManagementServer, \
+      .mask = ZAP_CLUSTER_MASK(SERVER), \
+      .functions = NULL, \
       .acceptedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 56 ), \
       .generatedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 61 ), \
       .eventList = nullptr, \

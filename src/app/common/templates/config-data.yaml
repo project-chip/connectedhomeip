@@ -79,27 +79,17 @@ CommandHandlerInterfaceOnlyClusters:
 # We need a more configurable way of deciding which clusters have which init functions....
 # See https://github.com/project-chip/connectedhomeip/issues/4369
 ClustersWithInitFunctions:
-    - Administrator Commissioning
-    - Basic Information
-    - Boolean State
-    - Binding
     - Color Control
-    - Ethernet Network Diagnostics
-    - General Diagnostics
     - Groups
-    - Group Key Management
     - Identify
     - Level Control
     - Localization Configuration
     - Mode Select
     - Occupancy Sensing
     - On/Off
-    - OTA Software Update Provider
     - Pump Configuration and Control
-    - Push AV Stream Transport
     - Sample MEI
     - Scenes Management
-    - Software Diagnostics
     - Thermostat
     - Time Format Localization
     - Wi-Fi Network Diagnostics
@@ -115,21 +105,13 @@ ClustersWithAttributeChangedFunctions:
     - Thermostat
 
 ClustersWithShutdownFunctions:
-    - Administrator Commissioning
     - Barrier Control
-    - Basic Information
-    - Boolean State
-    - Binding
     - Color Control
     - Door Lock
-    - General Diagnostics
     - Level Control
     - On/Off
-    - OTA Software Update Provider
-    - Push AV Stream Transport
     - Sample MEI
     - Scenes Management
-    - Software Diagnostics
     - Thermostat
     - Wi-Fi Network Diagnostics
     - Fixed Label
@@ -146,3 +128,19 @@ ClustersWithPreAttributeChangeFunctions:
     - Energy Preference
     - Laundry Washer Controls
     - Laundry Dryer Controls
+
+CodeDrivenClusters:
+    - Binding
+    - Network Commissioning
+    - Soil Measurement
+    - WebRTC Transport Requestor
+    - Wi-Fi Network Diagnostics
+    - Administrator Commissioning
+    - Group Key Management
+    - Software Diagnostics
+    - OTA Software Update Provider
+    - General Diagnostics
+    - Push AV Stream Transport
+    - Ethernet Network Diagnostics
+    - Basic Information
+    - Boolean State
