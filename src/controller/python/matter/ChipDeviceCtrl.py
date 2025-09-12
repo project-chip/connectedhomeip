@@ -2074,7 +2074,8 @@ class ChipDeviceControllerBase():
         eventPaths = [self._parseEventPathTuple(
             v) for v in events] if events else None
 
-        allowLargePayload = payloadCapability == TransportPayloadCapability.LARGE_PAYLOAD or payloadCapability == TransportPayloadCapability.MRP_OR_TCP_PAYLOAD
+        allowLargePayload = payloadCapability in (TransportPayloadCapability.LARGE_PAYLOAD,
+                                                  TransportPayloadCapability.MRP_OR_TCP_PAYLOAD)
         transaction = ClusterAttribute.AsyncReadTransaction(future, eventLoop, self, returnClusterObject)
         ClusterAttribute.Read(transaction, device=device.deviceProxy,
                               attributes=attributePaths, dataVersionFilters=clusterDataVersionFilters, events=eventPaths,

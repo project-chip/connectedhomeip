@@ -40,8 +40,8 @@ namespace app {
 class BufferedReadCallback : public ReadClient::Callback
 {
 public:
-    BufferedReadCallback(Callback & callback) : mCallback(callback) {}
-    BufferedReadCallback(Callback & callback, bool allowLargePayload) : mAllowLargePayload(allowLargePayload), mCallback(callback)
+    BufferedReadCallback(Callback & callback, bool allowLargePayload = false) :
+        mAllowLargePayload(allowLargePayload), mCallback(callback)
     {}
 
 private:

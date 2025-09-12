@@ -1208,7 +1208,7 @@ def Read(transaction: AsyncReadTransaction, device,
             eventPathsForCffi,
             ctypes.c_size_t(0 if events is None else len(events)),
             eventNumberFilterPtr,
-            ctypes.c_bool(False if allowLargePayload is None else allowLargePayload)))
+            ctypes.c_bool(allowLargePayload or False)))
 
     transaction.SetClientObjPointers(readClientObj)
 
