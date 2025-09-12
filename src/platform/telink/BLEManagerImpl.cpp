@@ -512,7 +512,8 @@ CHIP_ERROR BLEManagerImpl::HandleGAPDisconnect(const ChipDeviceEvent * event)
 
     ChipLogProgress(DeviceLayer, "BLE GAP connection terminated (reason 0x%02x)", hciResult);
 
-    mNeedToResetFailSafeTimer = (hciResult == BT_HCI_ERR_REMOTE_USER_TERM_CONN || hciResult == BT_HCI_ERR_CONN_TIMEOUT);
+    mNeedToResetFailSafeTimer = !ConfigurationMgr().IsFullyProvisioned() &&
+        (hciResult == BT_HCI_ERR_REMOTE_USER_TERM_CONN || hciResult == BT_HCI_ERR_CONN_TIMEOUT);
     mGAPConns--;
 
     // If indications were enabled for this connection, record that they are now disabled and
