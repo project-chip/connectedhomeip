@@ -130,7 +130,7 @@ public:
         EndpointId endpointId;
         ClusterId clusterId;
         uint16_t fixedClusterServerEndpointCount; // Number of fixed endpoints in ember configuration.
-        uint16_t maxClusterInstanceCount;         // This is how many endpoints are supported by the delegate (0-based index).
+        uint16_t maxClusterInstanceCount;         // This is how many cluster instances are supported by the delegate (0-based indexing, so indices smaller than this are valid).
     };
 
     /// Calls 'FindRegistration' on the delegate and returns the address of the cluster for an endpoint index or nullptr if not
