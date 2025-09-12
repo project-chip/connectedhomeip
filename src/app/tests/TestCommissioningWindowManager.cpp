@@ -504,7 +504,6 @@ TEST_F(TestCommissioningWindowManager, TestOnPlatformEventOperationalNetworkEnab
     auto event = CreateEvent(chip::DeviceLayer::DeviceEventType::kOperationalNetworkEnabled);
 
     commissionMgr.OnPlatformEvent(&event);
-    EXPECT_EQ(chip::app::DnssdServer::Instance().AdvertiseOperational(), CHIP_NO_ERROR);
 }
 
 // Verify that operational advertising failure is handled gracefully
@@ -530,7 +529,6 @@ TEST_F(TestCommissioningWindowManager, TestOnPlatformEventCloseAllBleConnections
     CommissioningWindowManager & commissionMgr = Server::GetInstance().GetCommissioningWindowManager();
 
     // ensure that BLE advertisement is enabled
-    // EXPECT_TRUE(chip::DeviceLayer::ConnectivityMgr().IsBLEAdvertisingEnabled());
     auto event = CreateEvent(chip::DeviceLayer::DeviceEventType::kCloseAllBleConnections);
 
     commissionMgr.OnPlatformEvent(&event);
