@@ -66,13 +66,13 @@ void emberAfLocalizationConfigurationClusterServerInitCallback(EndpointId endpoi
     }
 
     // If the active locale is not supported, set the default supported locale.
-    if (!gServer.Cluster().GetLogic().IsSupportedLocale(activeLocale))
+    if (!gServer.Cluster().IsSupportedLocale(activeLocale))
     {
         char tempBuf[Attributes::ActiveLocale::TypeInfo::MaxLength()];
         MutableCharSpan validLocale(tempBuf);
-        if (DeviceLayer::GetDeviceInfoProvider()->GetDefaultLocale(validLocale))
+        if (gServer.Cluster().GetDefaultLocale(validLocale))
         {
-            gServer.Cluster().GetLogic().SetActiveLocale(validLocale);
+            gServer.Cluster().SetActiveLocale(validLocale);
         }
     }
 }

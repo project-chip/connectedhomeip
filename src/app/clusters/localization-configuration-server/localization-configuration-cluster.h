@@ -18,21 +18,25 @@
 
 #pragma once
 
-#include <app/clusters/localization-configuration-server/localization-configuration-logic.h>
+#include <app/AttributeValueEncoder.h>
+#include <app/persistence/String.h>
 #include <app/server-cluster/DefaultServerCluster.h>
 #include <clusters/LocalizationConfiguration/ClusterId.h>
 #include <lib/support/Span.h>
+#include <platform/DeviceInfoProvider.h>
+#include <protocols/interaction_model/StatusCode.h>
 
 namespace chip {
 namespace app {
 namespace Clusters {
+constexpr size_t kActiveLocaleMaxLength = 35;
 class LocalizationConfigurationCluster : public DefaultServerCluster
 {
 public:
     LocalizationConfigurationCluster(DeviceLayer::DeviceInfoProvider & aDeviceInfoProvider, CharSpan activeLocale) :
-        DefaultServerCluster({ kRootEndpointId, LocalizationConfiguration::Id }), mLogic(aDeviceInfoProvider)
+        DefaultServerCluster({ kRootEndpointId, LocalizationConfiguration::Id }), mDeviceInfoProvider(aDeviceInfoProvider)
     {
-        mLogic.SetActiveLocale(activeLocale);
+        SetActiveLocale(activeLocale);
     }
 
     // Server cluster implementation
@@ -43,10 +47,44 @@ public:
                                                  AttributeValueDecoder & aDecoder) override;
     CHIP_ERROR Attributes(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder) override;
 
-    LocalizationConfigurationServerLogic & GetLogic() { return mLogic; }
+    /*
+     * Set the active locale.
+     *
+     * @param activeLocale The active locale to set.
+     * @return InteractionModel::Status::Success on success, InteractionModel::Status::ConstraintError if the locale is not valid or
+     * supportedLocale.
+     */
+    Protocols::InteractionModel::Status SetActiveLocale(CharSpan activeLocale);
+
+    CharSpan GetActiveLocale();
+
+    /*
+     * Read the supported locales.
+     *
+     * @param aEncoder The encoder to write the supported locales to.
+     * @return CHIP_NO_ERROR on success.
+     */
+    CHIP_ERROR ReadSupportedLocales(AttributeValueEncoder & aEncoder);
+
+    /*
+     * Check if a locale is supported.
+     *
+     * @param newLangTag The locale to check.
+     * @return true if the locale is supported, false otherwise.
+     */
+    bool IsSupportedLocale(CharSpan newLangTag);
+
+    /**
+     * @brief Get the default locale of the device.
+     *
+     * @param outLocale - the default locale of the device.
+     * @return true if the default locale is found, false otherwise.
+     */
+    virtual bool GetDefaultLocale(MutableCharSpan & outLocale);
 
 private:
-    LocalizationConfigurationServerLogic mLogic;
+    Storage::String<kActiveLocaleMaxLength> mActiveLocale;
+    DeviceLayer::DeviceInfoProvider & mDeviceInfoProvider;
 };
 } // namespace Clusters
 } // namespace app
