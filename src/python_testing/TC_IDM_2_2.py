@@ -125,7 +125,14 @@ class TC_IDM_2_2(MatterBaseTest, BasicCompositionTests):
             for cluster in read_response.tlvAttributes[endpoint]:
                 # Only verify spec-defined clusters to avoid issues with clusters that may have write-only attributes
                 # Note: Comprehensive verification of wildcard reads is also performed in IDM-10.1 and ACE tests
-                self._verify_attributes_match_list(read_response, endpoint, cluster)
+                if global_attribute_ids.cluster_id_type(cluster) != global_attribute_ids.ClusterIdType.kStandard:
+                    continue  
+                                      
+                returned_attrs = sorted([x for x in read_response.tlvAttributes[endpoint][cluster].keys()])
+                attr_list = sorted([x for x in read_response.tlvAttributes[endpoint][cluster][
+                    ClusterObjects.ALL_CLUSTERS[cluster].Attributes.AttributeList.attribute_id]])
+                asserts.assert_equal(returned_attrs, attr_list,
+                                    f"Mismatch for {cluster} at endpoint {endpoint}")
 
     def verify_attribute_path(self, read_response: dict, path: AttributePath):
         """Verify read response for an attribute path.
@@ -164,63 +171,18 @@ class TC_IDM_2_2(MatterBaseTest, BasicCompositionTests):
                                           f"AttributeList not found in cluster {cluster_id} on endpoint {ep}")
 
                         # Verify that returned attributes match the AttributeList
-                        self._verify_attributes_match_list(read_response, ep, cluster_id)
+                        if global_attribute_ids.cluster_id_type(cluster_id) == global_attribute_ids.ClusterIdType.kStandard:
+                            returned_attrs = sorted([x for x in read_response.tlvAttributes[ep][cluster_id].keys()])
+                            attr_list = sorted([x for x in read_response.tlvAttributes[ep][cluster_id][
+                                ClusterObjects.ALL_CLUSTERS[cluster_id].Attributes.AttributeList.attribute_id]])
+                            asserts.assert_equal(returned_attrs, attr_list,
+                                                 f"Returned attributes don't match AttributeList for cluster {cluster_id} on endpoint {ep}")
             else:
                 # For global attributes, we expect them to be present across all clusters
                 if attribute_id is not None:
-                    found_in_any_cluster = False
                     for cluster in read_response.tlvAttributes[ep].values():
-                        if attribute_id in cluster:
-                            found_in_any_cluster = True
-                            break
-                    asserts.assert_true(found_in_any_cluster,
-                                        f"Global attribute {attribute_id} not found in any cluster on endpoint {ep}")
-
-    def _verify_attributes_match_list(self, read_response: dict, endpoint: int, cluster_or_id):
-        """Verify that returned attributes match the AttributeList for a spec-defined cluster.
-
-        Args:
-            read_response: The read response containing attribute data
-            endpoint: The endpoint ID
-            cluster_or_id: Either a cluster object (from ReadAttribute) or cluster ID (from Read)
-
-        Returns:
-            bool: True if verification was performed, False if cluster was skipped (non-standard)
-        """
-        # Extract cluster ID and cluster key for accessing data
-        if hasattr(cluster_or_id, 'id'):
-            # cluster_or_id is a cluster object
-            cluster_id = cluster_or_id.id
-            cluster_key = cluster_or_id
-        else:
-            # cluster_or_id is a cluster ID
-            cluster_id = cluster_or_id
-            cluster_key = cluster_id
-
-        # Only verify spec-defined clusters to avoid issues with clusters such as MEIthat may have write-only attributes
-        if global_attribute_ids.cluster_id_type(cluster_id) != global_attribute_ids.ClusterIdType.kStandard:
-            return False
-
-        # Get AttributeList attribute ID
-        cluster_obj = ClusterObjects.ALL_CLUSTERS.get(cluster_id)
-        if not cluster_obj or not hasattr(cluster_obj.Attributes, 'AttributeList'):
-            return False
-
-        if hasattr(read_response, 'tlvAttributes'):
-            cluster_data = read_response.tlvAttributes[endpoint][cluster_key]
-        else:
-            cluster_data = read_response[endpoint][cluster_key]
-
-        attr_list_id = cluster_obj.Attributes.AttributeList.attribute_id
-        if attr_list_id not in cluster_data:
-            return False
-
-        # Verify that returned attributes match the AttributeList
-        returned_attrs = sorted([x for x in cluster_data.keys()])
-        attr_list = sorted(cluster_data[attr_list_id])
-        asserts.assert_equal(returned_attrs, attr_list,
-                             f"Returned attributes don't match AttributeList for cluster {cluster_id} on endpoint {endpoint}")
-        return True
+                        asserts.assert_in(attribute_id, cluster,
+                                         f"Global attribute {attribute_id} not found in cluster on endpoint {ep}")
 
     async def _read_global_attribute_all_endpoints(self, attribute_id):
         attribute_path = AttributePath(
@@ -245,7 +207,13 @@ class TC_IDM_2_2(MatterBaseTest, BasicCompositionTests):
                               read_request[endpoint][cluster],
                               "AttributeList not in output")
             # Verify that returned attributes match the AttributeList
-            self._verify_attributes_match_list(read_request, endpoint, cluster)
+            # DataVersion is excluded as it is metadata and not a real attribute
+            if global_attribute_ids.cluster_id_type(cluster.id) == global_attribute_ids.ClusterIdType.kStandard:
+                returned_attrs = sorted([x.attribute_id for x in read_request[endpoint][cluster].keys()
+                                         if x != Clusters.Attribute.DataVersion])
+                attr_list = sorted([x for x in read_request[endpoint][cluster][cluster.Attributes.AttributeList]])
+                asserts.assert_equal(returned_attrs, attr_list,
+                                     f"Returned attributes don't match AttributeList for cluster {cluster.id} on endpoint {endpoint}")
         return read_request
 
     async def _read_endpoint_all_clusters(self, endpoint):
@@ -326,10 +294,7 @@ class TC_IDM_2_2(MatterBaseTest, BasicCompositionTests):
     async def _read_unsupported_attribute(self):
         """
         Attempts to read an unsupported attribute from a supported cluster on any endpoint.
-        Expects an UNSUPPORTED_ATTRIBUTE error from the DUT.
-
-        If no unsupported attributes are found (e.g., when testing with chip-all-clusters-app),
-        the test is skipped as this is a valid scenario.
+        Requires an UNSUPPORTED_ATTRIBUTE error from the DUT.
         """
         for endpoint_id, endpoint in self.endpoints.items():
             for cluster_type, cluster in endpoint.items():
@@ -356,11 +321,11 @@ class TC_IDM_2_2(MatterBaseTest, BasicCompositionTests):
                     )
                     asserts.assert_true(isinstance(result.Reason, InteractionModelError),
                                         msg="Unexpected success reading invalid attribute")
+                    logging.info(f"Confirmed unsupported attribute {unsupported_attr} returns error on endpoint {endpoint_id}")
                     return
 
-        # If we get here, no unsupported attributes were found
-        logging.info("No unsupported attributes found - skipping test (expected with chip-all-clusters-app)")
-        self.skip_step("No unsupported attributes available to test")
+        # If we get here, we got problems as there should always be at least one unsupported attribute
+        asserts.fail("No unsupported attributes found we must find at least one unsupported attribute")
 
     async def _read_repeat_attribute(self, endpoint, cluster, attribute, repeat_count):
         results = []
