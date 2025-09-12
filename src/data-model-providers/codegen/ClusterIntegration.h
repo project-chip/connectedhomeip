@@ -118,7 +118,7 @@ public:
         ClusterId clusterId;
         uint16_t
             fixedClusterInstanceCount;    // Number of fixed endpoints that contain this server cluster in the ember configuration.
-        uint16_t maxClusterInstanceCount; // This is how many endpoints are supported by the delegate (0-based index).
+        uint16_t maxClusterInstanceCount; // This is how many cluster instancers are supported by the delegate (0-based indexing, so indices smaller than this are valid).
     };
 
     /// A typical implementation is that this gets called in `Matter....ClusterServerShutdownCallback`.
