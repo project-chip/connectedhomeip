@@ -253,24 +253,6 @@ class MatterBaseTest(base_test.BaseTestClass):
             if steps is None:
                 self.step(1)
 
-    def teardown_class(self):
-        """Final teardown after all tests: log all problems."""
-        if len(self.problems) > 0:
-            logging.info("###########################################################")
-            logging.info("Problems found:")
-            logging.info("===============")
-            for problem in self.problems:
-                logging.info(str(problem))
-            logging.info("###########################################################")
-        super().teardown_class()
-
-    def check_pics(self, pics_key: str) -> bool:
-        return self.matter_test_config.pics.get(pics_key.strip(), False)
-
-    @property
-    def is_pics_sdk_ci_only(self) -> bool:
-        return self.check_pics('PICS_SDK_CI_ONLY')
-
     def _update_legacy_test_event_triggers(self, eventTrigger: int) -> int:
         """ This function updates eventTriged if legacy flag is activated. """
         target_endpoint = 0
@@ -291,43 +273,6 @@ class MatterBaseTest(base_test.BaseTestClass):
         eventTrigger |= (target_endpoint & 0xFFFF) << 32
 
         return eventTrigger
-
-    async def commission_devices(self) -> bool:
-        dev_ctrl: ChipDeviceCtrl.ChipDeviceController = self.default_controller
-        dut_node_ids: List[int] = self.matter_test_config.dut_node_ids
-        setup_payloads: List[SetupPayloadInfo] = self.get_setup_payload_info()
-        commissioning_info: CommissioningInfo = CommissioningInfo(
-            commissionee_ip_address_just_for_testing=self.matter_test_config.commissionee_ip_address_just_for_testing,
-            commissioning_method=self.matter_test_config.commissioning_method,
-            thread_operational_dataset=self.matter_test_config.thread_operational_dataset,
-            wifi_passphrase=self.matter_test_config.wifi_passphrase,
-            wifi_ssid=self.matter_test_config.wifi_ssid,
-            tc_version_to_simulate=self.matter_test_config.tc_version_to_simulate,
-            tc_user_response_to_simulate=self.matter_test_config.tc_user_response_to_simulate,
-        )
-
-        return await commission_devices(dev_ctrl, dut_node_ids, setup_payloads, commissioning_info)
-
-    async def open_commissioning_window(self, dev_ctrl: Optional[ChipDeviceCtrl.ChipDeviceController] = None, node_id: Optional[int] = None, timeout: int = 900) -> CustomCommissioningParameters:
-        rnd_discriminator = random.randint(0, 4095)
-        if dev_ctrl is None:
-            dev_ctrl = self.default_controller
-        if node_id is None:
-            node_id = self.dut_node_id
-        try:
-            commissioning_params = await dev_ctrl.OpenCommissioningWindow(nodeid=node_id, timeout=timeout, iteration=1000,
-                                                                          discriminator=rnd_discriminator, option=1)
-            params = CustomCommissioningParameters(commissioning_params, rnd_discriminator)
-            return params
-
-        except InteractionModelError as e:
-            asserts.fail(e.status, 'Failed to open commissioning window')
-
-    async def read_single_attribute(
-            self, dev_ctrl: ChipDeviceCtrl.ChipDeviceController, node_id: int, endpoint: int, attribute: object, fabricFiltered: bool = True) -> object:
-        result = await dev_ctrl.ReadAttribute(node_id, [(endpoint, attribute)], fabricFiltered=fabricFiltered)
-        data = result[endpoint]
-        return list(data.values())[0][attribute]
 
     async def read_single_attribute_all_endpoints(
             self, cluster: Clusters.ClusterObjects.ClusterCommand, attribute: Clusters.ClusterObjects.ClusterAttributeDescriptor,
@@ -478,9 +423,6 @@ class MatterBaseTest(base_test.BaseTestClass):
         # GeneralDiagnostics cluster is meant to be on Endpoint 0 (Root)
         test_event_enabled = await self.read_single_attribute_check_success(endpoint=0, cluster=cluster, attribute=full_attr)
         asserts.assert_equal(test_event_enabled, True, "TestEventTriggersEnabled is False")
-
-    def print_step(self, stepnum: typing.Union[int, str], title: str) -> None:
-        logging.info(f'***** Test Step {stepnum} : {title}')
 
     def record_error(self, test_name: str, location: ProblemLocation, problem: str, spec_location: str = ""):
         self.problems.append(ProblemNotice(test_name, location, ProblemSeverity.ERROR, problem, spec_location))
@@ -1146,7 +1088,7 @@ class MatterBaseTest(base_test.BaseTestClass):
         desired_type = attribute.attribute_type.Type
         type_err_msg = f'Returned attribute {attribute} is wrong type expected {desired_type}, got {type(attr_ret)}'
         read_ok = attr_ret is not None and not isinstance(attr_ret, Clusters.Attribute.ValueDecodeFailure)
-        type_ok = type_matches(attr_ret, desired_type)
+        type_ok = matchers.is_type(attr_ret, desired_type)
         if assert_on_error:
             asserts.assert_true(read_ok, read_err_msg)
             asserts.assert_true(type_ok, type_err_msg)
