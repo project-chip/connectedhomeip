@@ -645,7 +645,7 @@ cover the following checks:
 -   "test" to create device description files in MatterTlvJson and text
 
 The tests in
-[https://github.com/project-chip/connectedhomeip/blob/master/src/python_testing/TC_DeviceConformance.py](TC_DeviceComposition.py)
+[https://github.com/project-chip/connectedhomeip/blob/master/src/python_testing/TC_DeviceConformance.py](TC_DeviceConformance.py)
 cover the following checks:
 
 -   Cluster conformance for every cluster is correct with respect to implemented
