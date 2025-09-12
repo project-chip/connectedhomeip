@@ -1007,7 +1007,7 @@ void BLEManagerImpl::SwitchToIeee802154(void)
 } // namespace DeviceLayer
 } // namespace chip
 
-#if !CONFIG_ZEPHYR_VERSION_3_3
+#if !defined(CONFIG_ZEPHYR_VERSION_3_3)
 // Implementation for Zephyr Bluetooth host.
 int bt_rand(void * buf, size_t len)
 {
