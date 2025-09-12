@@ -60,11 +60,8 @@ config("se05x_config") {
   ]
 
   if (chip_se05x_host_gpio == "frdm_imx93") {
-    include_dirs += [
-      "sysroot/usr/include",
-    ]
+    include_dirs += [ "sysroot/usr/include" ]
   }
-
 
   if (chip_se05x_auth == "scp03") {
     include_dirs += [ "repo/feature_file/scp03_ftr" ]
@@ -139,7 +136,7 @@ static_library("se05x") {
   }
 
   if (chip_se05x_host_gpio == "frdm_imx93") {
-    lib_dirs = [ "sysroot/usr/lib"]
+    lib_dirs = [ "sysroot/usr/lib" ]
     libs = [ "gpiod" ]
   }
 

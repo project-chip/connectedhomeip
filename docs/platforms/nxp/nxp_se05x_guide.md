@@ -73,6 +73,7 @@ control the enable pin as required.
 
 ```
     cd connectedhomeip
+    export IMX_SDK_ROOT= <path of the Yocto SDK>
     ./scripts/examples/imxlinux_example.sh -s examples/thermostat/nxp/linux-se05x/ -o out/thermostat -d
 ```
 
