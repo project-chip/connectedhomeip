@@ -116,7 +116,8 @@ private:
      */
     void ContinueAfterVendorIDVerification(const CHIP_ERROR & err);
 
-    Credentials::JCM::TrustVerificationStage GetNextTrustVerificationStage(const Credentials::JCM::TrustVerificationStage & currentStage) override;
+    Credentials::JCM::TrustVerificationStage
+    GetNextTrustVerificationStage(const Credentials::JCM::TrustVerificationStage & currentStage) override;
     void PerformTrustVerificationStage(const Credentials::JCM::TrustVerificationStage & nextStage) override;
 
     /*

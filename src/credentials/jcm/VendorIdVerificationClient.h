@@ -49,7 +49,8 @@ public:
     // dynamically with a callback.
     using SessionGetterFunc = std::function<Optional<SessionHandle>()>;
 
-    CHIP_ERROR VerifyVendorId(Messaging::ExchangeManager * exchangeMgr, const SessionGetterFunc getSession, TrustVerificationInfo * info);
+    CHIP_ERROR VerifyVendorId(Messaging::ExchangeManager * exchangeMgr, const SessionGetterFunc getSession,
+                              TrustVerificationInfo * info);
 
 protected:
     virtual CHIP_ERROR OnLookupOperationalTrustAnchor(VendorId vendorID, CertificateKeyId & subjectKeyId,
@@ -59,8 +60,9 @@ protected:
 private:
     CHIP_ERROR VerifyNOCCertificateChain(const ByteSpan & nocSpan, const ByteSpan & icacSpan, const ByteSpan & rcacSpan);
 
-    CHIP_ERROR Verify(TrustVerificationInfo * info, const ByteSpan clientChallengeSpan, ByteSpan attestationChallengeSpan,
-                      const app::Clusters::OperationalCredentials::Commands::SignVIDVerificationResponse::DecodableType responseData);
+    CHIP_ERROR
+    Verify(TrustVerificationInfo * info, const ByteSpan clientChallengeSpan, ByteSpan attestationChallengeSpan,
+           const app::Clusters::OperationalCredentials::Commands::SignVIDVerificationResponse::DecodableType responseData);
 };
 
 } // namespace JCM

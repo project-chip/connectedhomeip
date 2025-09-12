@@ -48,9 +48,9 @@ CHIP_ERROR VendorIdVerificationClient::VerifyNOCCertificateChain(const ByteSpan 
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR VendorIdVerificationClient::Verify(TrustVerificationInfo * info, const ByteSpan clientChallengeSpan,
-                                              const ByteSpan attestationChallengeSpan,
-                                              const app::Clusters::OperationalCredentials::Commands::SignVIDVerificationResponse::DecodableType responseData)
+CHIP_ERROR VendorIdVerificationClient::Verify(
+    TrustVerificationInfo * info, const ByteSpan clientChallengeSpan, const ByteSpan attestationChallengeSpan,
+    const app::Clusters::OperationalCredentials::Commands::SignVIDVerificationResponse::DecodableType responseData)
 {
     // Steps 1-9 have already been completed prior to the response callback
     const FabricIndex fabricIndex = info->adminFabricIndex;
@@ -68,8 +68,8 @@ CHIP_ERROR VendorIdVerificationClient::Verify(TrustVerificationInfo * info, cons
     // Locally generate the vendor_fabric_binding_message
     uint8_t vendorFabricBindingMessageBuffer[Crypto::kVendorFabricBindingMessageV1Size];
     MutableByteSpan vendorFabricBindingMessageSpan{ vendorFabricBindingMessageBuffer };
-    ReturnLogErrorOnFailure(Crypto::GenerateVendorFabricBindingMessage(Crypto::FabricBindingVersion::kVersion1, rcacPublicKey, fabricId,
-                                                                       vendorID, vendorFabricBindingMessageSpan));
+    ReturnLogErrorOnFailure(Crypto::GenerateVendorFabricBindingMessage(Crypto::FabricBindingVersion::kVersion1, rcacPublicKey,
+                                                                       fabricId, vendorID, vendorFabricBindingMessageSpan));
 
     // Locally generate the vendor_id_verification_tbs message
     ByteSpan vidVerificationStatementSpan;
@@ -77,9 +77,9 @@ CHIP_ERROR VendorIdVerificationClient::Verify(TrustVerificationInfo * info, cons
     MutableByteSpan vidVerificationTbsSpan{ vidVerificationStatementBuffer };
 
     // Generate the ToBeSigned portion of the VID verification
-    ReturnLogErrorOnFailure(Crypto::GenerateVendorIdVerificationToBeSigned(fabricIndex, clientChallengeSpan, attestationChallengeSpan,
-                                                                   vendorFabricBindingMessageSpan, vidVerificationStatementSpan,
-                                                                   vidVerificationTbsSpan));
+    ReturnLogErrorOnFailure(Crypto::GenerateVendorIdVerificationToBeSigned(fabricIndex, clientChallengeSpan,
+                                                                           attestationChallengeSpan, vendorFabricBindingMessageSpan,
+                                                                           vidVerificationStatementSpan, vidVerificationTbsSpan));
 
     // Extract the operational public key
     P256PublicKeySpan nocPublicKeySpan;
@@ -157,7 +157,8 @@ CHIP_ERROR VendorIdVerificationClient::VerifyVendorId(Messaging::ExchangeManager
         OnVendorIdVerficationComplete(err);
     };
 
-    CHIP_ERROR err = Controller::InvokeCommandRequest(exchangeMgr, getSession().Value(), kRootEndpointId, request, onSuccessCb, onFailureCb);
+    CHIP_ERROR err =
+        Controller::InvokeCommandRequest(exchangeMgr, getSession().Value(), kRootEndpointId, request, onSuccessCb, onFailureCb);
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(Controller, "Failed to send SignVIDVerificationRequest: %s", ErrorStr(err));

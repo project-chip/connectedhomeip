@@ -67,7 +67,8 @@ protected:
     void OnVendorIdVerficationComplete(const CHIP_ERROR & err) override;
 
     // TrustVerificationStateMachine
-    Credentials::JCM::TrustVerificationStage GetNextTrustVerificationStage(const Credentials::JCM::TrustVerificationStage & currentStage) override;
+    Credentials::JCM::TrustVerificationStage
+    GetNextTrustVerificationStage(const Credentials::JCM::TrustVerificationStage & currentStage) override;
     void PerformTrustVerificationStage(const Credentials::JCM::TrustVerificationStage & nextStage) override;
     void OnTrustVerificationComplete(Credentials::JCM::TrustVerificationError error) override;
 

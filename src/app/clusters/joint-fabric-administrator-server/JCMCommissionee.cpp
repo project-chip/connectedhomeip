@@ -158,7 +158,7 @@ TrustVerificationError JCMCommissionee::StoreEndpointId()
 
 TrustVerificationError JCMCommissionee::ReadCommissionerAdminFabricIndex()
 {
-    using Attr     = chip::app::Clusters::JointFabricAdministrator::Attributes::AdministratorFabricIndex::TypeInfo;
+    using Attr = chip::app::Clusters::JointFabricAdministrator::Attributes::AdministratorFabricIndex::TypeInfo;
 
     auto onSuccess = [this](const ConcreteAttributePath & path, const Attr::DecodableType & val) {
         if (val.IsNull())
@@ -179,7 +179,7 @@ TrustVerificationError JCMCommissionee::ReadCommissionerAdminFabricIndex()
     };
 
     Messaging::ExchangeContext * exchangeContext = mCommandHandle.Get()->GetExchangeContext();
-    SessionHandle session             = exchangeContext->GetSessionHandle();
+    SessionHandle session                        = exchangeContext->GetSessionHandle();
 
     chip::Messaging::ExchangeManager * exchangeMgr = &chip::Server::GetInstance().GetExchangeManager();
     CHIP_ERROR err = chip::Controller::ReadAttribute<Attr>(exchangeMgr, session, mInfo.adminEndpointId, onSuccess, onError,
