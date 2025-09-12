@@ -26,41 +26,41 @@ config:
 
 tests:
     - label: |
-        Step 1: Bring the NFC reader close to the DUT’s NFC tag.
+          Step 1: Bring the NFC reader close to the DUT’s NFC tag.
       disabled: true
 
     - label: |
-        Step 2:
-        If "Custom Flow" field of Onboarding data corresponds to "User-Intent commissioning flow",
-        perform user action required to enter commissioning mode.
+          Step 2:
+          If "Custom Flow" field of Onboarding data corresponds to "User-Intent commissioning flow",
+          perform user action required to enter commissioning mode.
       disabled: true
 
     - label: |
-        Step 3:
-        If "Custom Flow" field of Onboarding data corresponds to "Custom commissioning flow",
-        perform vendor-specified interactions to enter commissioning mode.
+          Step 3:
+          If "Custom Flow" field of Onboarding data corresponds to "Custom commissioning flow",
+          perform vendor-specified interactions to enter commissioning mode.
       disabled: true
 
     - label: |
-        Step 4: Start Thread Border Router and perform NFC-based commissioning.
+          Step 4: Start Thread Border Router and perform NFC-based commissioning.
 
       verification: |
-        # Start the Thread Border Router with:
-        ./certification-tool/backend/test_collections/matter/scripts/OTBR/otbr_start.sh
+          # Start the Thread Border Router with:
+          ./certification-tool/backend/test_collections/matter/scripts/OTBR/otbr_start.sh
 
-        # Copy the Thread dataset that is displayed on the line starting with "Param: 'dataset active -x'"
+          # Copy the Thread dataset that is displayed on the line starting with "Param: 'dataset active -x'"
 
-        # Launch NFC-based commissioning with chip-tool (replace XXXXXXX by the Thread dataset)
-        ./apps/chip-tool pairing nfc-thread 1 hex:XXXXXXX 20202021 3840
+          # Launch NFC-based commissioning with chip-tool (replace XXXXXXX by the Thread dataset)
+          ./apps/chip-tool pairing nfc-thread 1 hex:XXXXXXX 20202021 3840
 
-        Expected result:
-        - chip-tool should complete without error
-        - The traces should show that commissioning completed successfully.
+          Expected result:
+          - chip-tool should complete without error
+          - The traces should show that commissioning completed successfully.
       disabled: true
 
     - label: |
-        Step 5: Stop the Thread Border Router
+          Step 5: Stop the Thread Border Router
       verification: |
-        # Stop the Thread Border Router with:
-        ./certification-tool/backend/test_collections/matter/scripts/OTBR/otbr_stop.sh
+          # Stop the Thread Border Router with:
+          ./certification-tool/backend/test_collections/matter/scripts/OTBR/otbr_stop.sh
       disabled: true

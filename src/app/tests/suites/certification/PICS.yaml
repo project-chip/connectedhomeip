@@ -93,8 +93,7 @@ PICS:
           payload?"
       id: MCORE.DD.NFC
 
-    - label:
-          "Does the DUT support NFC Transport Layer for commissioning?"
+    - label: "Does the DUT support NFC Transport Layer for commissioning?"
       id: MCORE.DD.NTL
 
     - label: "Does the commissionee device support dynamic passcodes?"
