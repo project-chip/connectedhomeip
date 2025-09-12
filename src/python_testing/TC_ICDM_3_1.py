@@ -64,6 +64,12 @@ features = cluster.Bitmaps.Feature
 
 
 class ICDTestEventTriggerOperations(IntEnum):
+    """
+    Copy of ICDTestEventTriggerEvent from ICDManager.cpp.
+    Both enum classes must use the same values to maintain compatibility.
+
+    TODO: Figure out how to use the class from ICDManager instead of maintaining a copy.
+    """
     kAddActiveModeReq = 0x0046000000000001
     kRemoveActiveModeReq = 0x0046000000000002
     kInvalidateHalfCounterValues = 0x0046000000000003
@@ -209,19 +215,19 @@ class TC_ICDM_3_1(MatterBaseTest):
                 newClients = []
                 # Generate new clients data
                 for i in range(clientsSupportedPerFabric - len(registeredClients)):
-                    newClients.append({
-                        "checkInNodeID": i + 1,
-                        "monitoredSubject": i + 1,
-                        "key": os.urandom(16),
-                        "clientType": clientTypeEnum.kPermanent
-                    })
+                    # Generate ICD registration parameters using the controller's method
+                    icd_params = self.default_controller.GenerateICDRegistrationParameters()
+                    # Increment the checkInNodeID and monitoredSubject by i to ensure uniqueness
+                    icd_params.checkInNodeId += i
+                    newClients.append(icd_params)
+
                 for client in newClients:
                     try:
                         response = await self._send_single_icdm_command(commands.RegisterClient(
-                            checkInNodeID=client["checkInNodeID"],
-                            monitoredSubject=client["monitoredSubject"],
-                            key=client["key"],
-                            clientType=client["clientType"]))
+                            checkInNodeID=client.checkInNodeId,
+                            monitoredSubject=client.monitoredSubject,
+                            key=client.symmetricKey,
+                            clientType=client.clientType))
                     except InteractionModelError as e:
                         asserts.assert_fail(f"Unexpected error returned : {e}")
 
@@ -239,11 +245,11 @@ class TC_ICDM_3_1(MatterBaseTest):
 
             for client, expectedClient in zip(registeredClients[1:], newClients):
                 asserts.assert_equal(
-                    client.checkInNodeID, expectedClient["checkInNodeID"], "The read attribute does not match the registered value.")
+                    client.checkInNodeID, expectedClient.checkInNodeId, "The read attribute does not match the registered value.")
                 asserts.assert_equal(
-                    client.monitoredSubject, expectedClient["monitoredSubject"], "The read attribute does not match the registered value.")
+                    client.monitoredSubject, expectedClient.monitoredSubject, "The read attribute does not match the registered value.")
                 asserts.assert_equal(
-                    client.clientType, expectedClient["clientType"], "The read attribute does not match the registered value.")
+                    client.clientType, expectedClient.clientType, "The read attribute does not match the registered value.")
 
             # Step 10: RegisterClient with a different CheckInNodeID (should fail RESOURCE_EXHAUSTED)
             self.step(10)
@@ -279,14 +285,14 @@ class TC_ICDM_3_1(MatterBaseTest):
             self.step(14)
             for client in newClients:
                 try:
-                    await self._send_single_icdm_command(commands.UnregisterClient(checkInNodeID=client["checkInNodeID"]))
+                    await self._send_single_icdm_command(commands.UnregisterClient(checkInNodeID=client.checkInNodeId))
                 except InteractionModelError as e:
                     asserts.assert_fail(f"Unexpected error returned : {e}")
 
                 registeredClients = await self._read_icdm_attribute_expect_success(attributes.RegisteredClients)
                 for remainingClient in registeredClients:
                     asserts.assert_not_equal(
-                        remainingClient.checkInNodeID, client["checkInNodeID"], "CheckInNodeID was unregistered. It should not be present in the attribute list.")
+                        remainingClient.checkInNodeID, client.checkInNodeId, "CheckInNodeID was unregistered. It should not be present in the attribute list.")
 
             # Step 15: Read RegisteredClients, should be empty
             self.step(15)
@@ -309,7 +315,7 @@ class TC_ICDM_3_1(MatterBaseTest):
             except InteractionModelError as e:
                 asserts.assert_fail(f"Unexpected error returned : {e}")
             finally:
-                self.send_test_event_triggers(eventTrigger=ICDTestEventTriggerOperations.kRemoveActiveModeReq)
+                await self.send_test_event_triggers(eventTrigger=ICDTestEventTriggerOperations.kRemoveActiveModeReq)
 
 
 if __name__ == "__main__":
