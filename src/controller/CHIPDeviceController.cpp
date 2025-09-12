@@ -70,6 +70,10 @@
 #include <transport/raw/WiFiPAF.h>
 #endif
 
+#if CHIP_DEVICE_CONFIG_ENABLE_NFC_BASED_COMMISSIONING
+#include <platform/internal/NFCCommissioningManager.h>
+#endif
+
 #include <algorithm>
 #include <array>
 #include <errno.h>
@@ -596,7 +600,7 @@ CommissioneeDeviceProxy * DeviceCommissioner::FindCommissioneeDevice(NodeId id)
     MATTER_TRACE_SCOPE("FindCommissioneeDevice", "DeviceCommissioner");
     CommissioneeDeviceProxy * foundDevice = nullptr;
     mCommissioneeDevicePool.ForEachActiveObject([&](auto * deviceProxy) {
-        if (deviceProxy->GetDeviceId() == id)
+        if (deviceProxy->GetDeviceId() == id || deviceProxy->GetTemporaryCommissioningId() == id)
         {
             foundDevice = deviceProxy;
             return Loop::Break;
@@ -632,6 +636,16 @@ void DeviceCommissioner::ReleaseCommissioneeDevice(CommissioneeDeviceProxy * dev
         mSystemState->BleLayer()->CloseAllBleConnections();
     }
 #endif
+
+#if CHIP_DEVICE_CONFIG_ENABLE_NFC_BASED_COMMISSIONING
+    Nfc::NFCReaderTransport * readerTransport = DeviceLayer::Internal::NFCCommissioningMgr().GetNFCReaderTransport();
+    if (readerTransport)
+    {
+        ChipLogProgress(Controller, "Stopping discovery of all NFC tags");
+        readerTransport->StopDiscoveringTags();
+    }
+#endif
+
     // Make sure that there will be no dangling pointer
     if (mDeviceInPASEEstablishment == device)
     {
@@ -1071,6 +1085,49 @@ DeviceCommissioner::ContinueCommissioningAfterDeviceAttestation(DeviceProxy * de
     return CHIP_NO_ERROR;
 }
 
+#if CHIP_DEVICE_CONFIG_ENABLE_NFC_BASED_COMMISSIONING
+CHIP_ERROR DeviceCommissioner::ContinueCommissioningAfterConnectNetworkRequest(NodeId remoteDeviceId)
+{
+    MATTER_TRACE_SCOPE("continueCommissioningAfterConnectNetworkRequest", "DeviceCommissioner");
+
+    if (mDefaultCommissioner == nullptr)
+    {
+        ChipLogError(Controller, "No default commissioner is specified");
+        return CHIP_ERROR_INCORRECT_STATE;
+    }
+
+    // Move to kEvictPreviousCaseSessions stage since the next stage will be to find the device
+    // on the operational network
+    mCommissioningStage = CommissioningStage::kEvictPreviousCaseSessions;
+
+    // Setup device being commissioned
+    CommissioneeDeviceProxy * device = nullptr;
+    if (!mDeviceBeingCommissioned)
+    {
+        device = mCommissioneeDevicePool.CreateObject();
+        if (!device)
+            return CHIP_ERROR_NO_MEMORY;
+
+        Transport::PeerAddress peerAddress = Transport::PeerAddress::UDP(Inet::IPAddress::Any);
+        device->Init(GetControllerDeviceInitParams(), remoteDeviceId, peerAddress);
+        mDeviceBeingCommissioned = device;
+    }
+
+    mDefaultCommissioner->SetOperationalCredentialsDelegate(mOperationalCredentialsDelegate);
+
+    ChipLogProgress(Controller, "Continuing commissioning after connect to network complete for device ID 0x" ChipLogFormatX64,
+                    ChipLogValueX64(remoteDeviceId));
+
+    MATTER_LOG_METRIC_BEGIN(kMetricDeviceCommissioningOperationalSetup);
+    CHIP_ERROR err = mDefaultCommissioner->StartCommissioning(this, device);
+    if (err != CHIP_NO_ERROR)
+    {
+        MATTER_LOG_METRIC_END(kMetricDeviceCommissioningOperationalSetup, err);
+    }
+    return err;
+}
+#endif
+
 CHIP_ERROR DeviceCommissioner::StopPairing(NodeId remoteDeviceId)
 {
     VerifyOrReturnError(mState == State::Initialized, CHIP_ERROR_INCORRECT_STATE);
@@ -1082,6 +1139,7 @@ CHIP_ERROR DeviceCommissioner::StopPairing(NodeId remoteDeviceId)
     if (mSetUpCodePairer.StopPairing(remoteDeviceId))
     {
         mRunCommissioningAfterConnection = false;
+        OnSessionEstablishmentError(CHIP_ERROR_CANCELLED);
         return CHIP_NO_ERROR;
     }
 
@@ -2301,6 +2359,8 @@ void DeviceCommissioner::ContinueReadingCommissioningInfo(const CommissioningPar
                                                 Clusters::GeneralCommissioning::Attributes::RegulatoryConfig::Id));
         VerifyOrReturn(builder.AddAttributePath(kRootEndpointId, Clusters::GeneralCommissioning::Id,
                                                 Clusters::GeneralCommissioning::Attributes::LocationCapability::Id));
+        VerifyOrReturn(builder.AddAttributePath(kRootEndpointId, Clusters::GeneralCommissioning::Id,
+                                                Clusters::GeneralCommissioning::Attributes::IsCommissioningWithoutPower::Id));
 
         // Basic Information: VID and PID for device attestation purposes
         VerifyOrReturn(builder.AddAttributePath(kRootEndpointId, Clusters::BasicInformation::Id,
@@ -2317,6 +2377,14 @@ void DeviceCommissioner::ContinueReadingCommissioningInfo(const CommissioningPar
                                                 Clusters::NetworkCommissioning::Attributes::FeatureMap::Id));
         VerifyOrReturn(builder.AddAttributePath(Clusters::NetworkCommissioning::Id,
                                                 Clusters::NetworkCommissioning::Attributes::ConnectMaxTimeSeconds::Id));
+
+        // If we were asked to do network scans, also read ScanMaxTimeSeconds,
+        // so we know how long to wait for those.
+        if (params.GetAttemptWiFiNetworkScan().ValueOr(false) || params.GetAttemptThreadNetworkScan().ValueOr(false))
+        {
+            VerifyOrReturn(builder.AddAttributePath(Clusters::NetworkCommissioning::Id,
+                                                    Clusters::NetworkCommissioning::Attributes::ScanMaxTimeSeconds::Id));
+        }
 
         // OperationalCredentials: existing fabrics, if necessary
         if (params.GetCheckForMatchingFabric())
@@ -2449,6 +2517,13 @@ CHIP_ERROR DeviceCommissioner::ParseGeneralCommissioningInfo(ReadCommissioningIn
         info.supportsConcurrentConnection = true; // default to true (concurrent), not a fatal error
     }
 
+    err = mAttributeCache->Get<IsCommissioningWithoutPower::TypeInfo>(kRootEndpointId, info.general.isCommissioningWithoutPower);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Controller, "Ignoring failure to read IsCommissioningWithoutPower: %" CHIP_ERROR_FORMAT, err.Format());
+        info.general.isCommissioningWithoutPower = false; // default to false, not a fatal error
+    }
+
     return return_err;
 }
 
@@ -2511,33 +2586,52 @@ CHIP_ERROR DeviceCommissioner::ParseNetworkCommissioningInfo(ReadCommissioningIn
 
     if (info.network.thread.endpoint != kInvalidEndpointId)
     {
-        err = mAttributeCache->Get<ConnectMaxTimeSeconds::TypeInfo>(info.network.thread.endpoint,
-                                                                    info.network.thread.minConnectionTime);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogError(Controller, "Failed to read Thread ConnectMaxTimeSeconds (endpoint %u): %" CHIP_ERROR_FORMAT,
-                         info.network.thread.endpoint, err.Format());
-            return_err = err;
-        }
+        err = ParseNetworkCommissioningTimeouts(info.network.thread, "Thread");
+        AccumulateErrors(return_err, err);
     }
 
     if (info.network.wifi.endpoint != kInvalidEndpointId)
     {
-        err =
-            mAttributeCache->Get<ConnectMaxTimeSeconds::TypeInfo>(info.network.wifi.endpoint, info.network.wifi.minConnectionTime);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogError(Controller, "Failed to read Wi-Fi ConnectMaxTimeSeconds (endpoint %u): %" CHIP_ERROR_FORMAT,
-                         info.network.wifi.endpoint, err.Format());
-            return_err = err;
-        }
+        err = ParseNetworkCommissioningTimeouts(info.network.wifi, "Wi-Fi");
+        AccumulateErrors(return_err, err);
     }
 
     if (return_err != CHIP_NO_ERROR)
     {
-        ChipLogError(Controller, "Failed to parsing Network Commissioning information: %" CHIP_ERROR_FORMAT, return_err.Format());
+        ChipLogError(Controller, "Failed to parse Network Commissioning information: %" CHIP_ERROR_FORMAT, return_err.Format());
     }
     return return_err;
+}
+
+CHIP_ERROR DeviceCommissioner::ParseNetworkCommissioningTimeouts(NetworkClusterInfo & networkInfo, const char * networkType)
+{
+    using namespace NetworkCommissioning::Attributes;
+
+    CHIP_ERROR err = mAttributeCache->Get<ConnectMaxTimeSeconds::TypeInfo>(networkInfo.endpoint, networkInfo.minConnectionTime);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Controller, "Failed to read %s ConnectMaxTimeSeconds (endpoint %u): %" CHIP_ERROR_FORMAT, networkType,
+                     networkInfo.endpoint, err.Format());
+        return err;
+    }
+
+    err = mAttributeCache->Get<ScanMaxTimeSeconds::TypeInfo>(networkInfo.endpoint, networkInfo.maxScanTime);
+    if (err != CHIP_NO_ERROR)
+    {
+        // We don't always read this attribute, and we read it as a wildcard, so
+        // don't treat it as an error simply because it's missing.
+        if (err != CHIP_ERROR_KEY_NOT_FOUND)
+        {
+            ChipLogError(Controller, "Failed to read %s ScanMaxTimeSeconds (endpoint: %u): %" CHIP_ERROR_FORMAT, networkType,
+                         networkInfo.endpoint, err.Format());
+            return err;
+        }
+
+        // Just flag as "we don't know".
+        networkInfo.maxScanTime = 0;
+    }
+
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR DeviceCommissioner::ParseTimeSyncInfo(ReadCommissioningInfo & info)
@@ -3733,6 +3827,12 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
         }
     }
     break;
+#if CHIP_DEVICE_CONFIG_ENABLE_NFC_BASED_COMMISSIONING
+    case CommissioningStage::kUnpoweredPhaseComplete:
+        ChipLogProgress(Controller, "Completed unpowered commissioning phase, marking commissioning as complete");
+        CommissioningStageComplete(CHIP_NO_ERROR);
+        break;
+#endif
     case CommissioningStage::kCleanup:
         CleanupCommissioning(proxy, proxy->GetDeviceId(), params.GetCompletionStatus());
         break;

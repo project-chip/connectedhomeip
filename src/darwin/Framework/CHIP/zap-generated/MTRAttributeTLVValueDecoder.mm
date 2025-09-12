@@ -17644,8 +17644,8 @@ static id _Nullable DecodeAttributeValueForCameraAVStreamManagementCluster(Attri
         value = [NSNumber numberWithBool:cppValue];
         return value;
     }
-    case Attributes::MinViewport::Id: {
-        using TypeInfo = Attributes::MinViewport::TypeInfo;
+    case Attributes::MinViewportResolution::Id: {
+        using TypeInfo = Attributes::MinViewportResolution::TypeInfo;
         TypeInfo::DecodableType cppValue;
         *aError = DataModel::Decode(aReader, cppValue);
         if (*aError != CHIP_NO_ERROR) {
@@ -18516,6 +18516,17 @@ static id _Nullable DecodeAttributeValueForCameraAVSettingsUserLevelManagementCl
         }
         NSNumber * _Nonnull value;
         value = [NSNumber numberWithShort:cppValue];
+        return value;
+    }
+    case Attributes::MovementState::Id: {
+        using TypeInfo = Attributes::MovementState::TypeInfo;
+        TypeInfo::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+        NSNumber * _Nonnull value;
+        value = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue)];
         return value;
     }
     default: {
@@ -20574,7 +20585,11 @@ static id _Nullable DecodeAttributeValueForTLSCertificateManagementCluster(Attri
                 newElement_0 = [MTRTLSCertificateManagementClusterTLSClientCertificateDetailStruct new];
                 newElement_0.ccdid = [NSNumber numberWithUnsignedShort:entry_0.ccdid];
                 if (entry_0.clientCertificate.HasValue()) {
-                    newElement_0.clientCertificate = AsData(entry_0.clientCertificate.Value());
+                    if (entry_0.clientCertificate.Value().IsNull()) {
+                        newElement_0.clientCertificate = nil;
+                    } else {
+                        newElement_0.clientCertificate = AsData(entry_0.clientCertificate.Value().Value());
+                    }
                 } else {
                     newElement_0.clientCertificate = nil;
                 }

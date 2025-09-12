@@ -1296,9 +1296,12 @@
         { ZAP_SIMPLE_DEFAULT(1), 0x0000FFFD, 2, ZAP_TYPE(INT16U), ZAP_ATTRIBUTE_MASK(READABLE) }, /* ClusterRevision */            \
                                                                                                                                    \
         /* Endpoint: 1, Cluster: Boolean State (server) */                                                                         \
-        { ZAP_SIMPLE_DEFAULT(0), 0x00000000, 1, ZAP_TYPE(BOOLEAN), ZAP_ATTRIBUTE_MASK(READABLE) },  /* StateValue */               \
-        { ZAP_SIMPLE_DEFAULT(0), 0x0000FFFC, 4, ZAP_TYPE(BITMAP32), ZAP_ATTRIBUTE_MASK(READABLE) }, /* FeatureMap */               \
-        { ZAP_SIMPLE_DEFAULT(1), 0x0000FFFD, 2, ZAP_TYPE(INT16U), ZAP_ATTRIBUTE_MASK(READABLE) },   /* ClusterRevision */          \
+        { ZAP_EMPTY_DEFAULT(), 0x00000000, 1, ZAP_TYPE(BOOLEAN),                                                                   \
+          ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(READABLE) }, /* StateValue */                                  \
+        { ZAP_EMPTY_DEFAULT(), 0x0000FFFC, 4, ZAP_TYPE(BITMAP32),                                                                  \
+          ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(READABLE) }, /* FeatureMap */                                  \
+        { ZAP_EMPTY_DEFAULT(), 0x0000FFFD, 2, ZAP_TYPE(INT16U),                                                                    \
+          ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(READABLE) }, /* ClusterRevision */                             \
                                                                                                                                    \
         /* Endpoint: 1, Cluster: Oven Cavity Operational State (server) */                                                         \
         { ZAP_EMPTY_DEFAULT(), 0x00000000, 0, ZAP_TYPE(ARRAY),                                                                     \
@@ -2964,6 +2967,10 @@
         (EmberAfGenericClusterFunction) emberAfLevelControlClusterServerInitCallback,                                              \
         (EmberAfGenericClusterFunction) MatterLevelControlClusterServerShutdownCallback,                                           \
     };                                                                                                                             \
+    const EmberAfGenericClusterFunction chipFuncArrayBooleanStateServer[] = {                                                      \
+        (EmberAfGenericClusterFunction) emberAfBooleanStateClusterServerInitCallback,                                              \
+        (EmberAfGenericClusterFunction) MatterBooleanStateClusterServerShutdownCallback,                                           \
+    };                                                                                                                             \
     const EmberAfGenericClusterFunction chipFuncArrayLaundryDryerControlsServer[] = {                                              \
         (EmberAfGenericClusterFunction) MatterLaundryDryerControlsClusterServerPreAttributeChangedCallback,                        \
     };                                                                                                                             \
@@ -3401,7 +3408,7 @@
   0x00000002 /* FindRootCertificate */, \
   0x00000004 /* LookupRootCertificate */, \
   0x00000006 /* RemoveRootCertificate */, \
-  0x00000007 /* TLSClientCSR */, \
+  0x00000007 /* ClientCSR */, \
   0x00000009 /* ProvisionClientCertificate */, \
   0x0000000A /* FindClientCertificate */, \
   0x0000000C /* LookupClientCertificate */, \
@@ -3411,7 +3418,7 @@
   0x00000001 /* ProvisionRootCertificateResponse */, \
   0x00000003 /* FindRootCertificateResponse */, \
   0x00000005 /* LookupRootCertificateResponse */, \
-  0x00000008 /* TLSClientCSRResponse */, \
+  0x00000008 /* ClientCSRResponse */, \
   0x0000000B /* FindClientCertificateResponse */, \
   0x0000000D /* LookupClientCertificateResponse */, \
   chip::kInvalidCommandId /* end of list */, \
@@ -4058,9 +4065,9 @@
       .clusterId = 0x00000045, \
       .attributes = ZAP_ATTRIBUTE_INDEX(314), \
       .attributeCount = 3, \
-      .clusterSize = 7, \
-      .mask = ZAP_CLUSTER_MASK(SERVER), \
-      .functions = NULL, \
+      .clusterSize = 0, \
+      .mask = ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(INIT_FUNCTION) | ZAP_CLUSTER_MASK(SHUTDOWN_FUNCTION), \
+      .functions = chipFuncArrayBooleanStateServer, \
       .acceptedCommandList = nullptr, \
       .generatedCommandList = nullptr, \
       .eventList = nullptr, \
