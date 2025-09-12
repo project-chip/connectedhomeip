@@ -31,9 +31,7 @@ chip_test_suite("jcm") {
     "../data_model/DataModelFixtures.h",
   ]
 
-  test_sources = [
-    "TestJCMCommissioner.cpp",
-  ]
+  test_sources = [ "TestJCMCommissioner.cpp" ]
 
   defines = [ "CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC=1" ]
 
