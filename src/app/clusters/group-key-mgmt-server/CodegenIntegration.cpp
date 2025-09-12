@@ -63,7 +63,7 @@ void emberAfGroupKeyManagementClusterServerInitCallback(EndpointId endpointId)
             .endpointId                = endpointId,
             .clusterId                 = GroupKeyManagement::Id,
             .fixedClusterInstanceCount = GroupKeyManagement::StaticApplicationConfig::kFixedClusterConfig.size(),
-            .maxClusterInstanceCount   = 1,
+            .maxClusterInstanceCount   = 1, // Cluster is a singleton on the root node and this is the only thing supported
             .fetchFeatureMap           = false,
             .fetchOptionalAttributes   = false,
         },
@@ -79,7 +79,7 @@ void MatterGroupKeyManagementClusterServerShutdownCallback(EndpointId endpointId
             .endpointId                = endpointId,
             .clusterId                 = GroupKeyManagement::Id,
             .fixedClusterInstanceCount = GroupKeyManagement::StaticApplicationConfig::kFixedClusterConfig.size(),
-            .maxClusterInstanceCount   = 1,
+            .maxClusterInstanceCount   = 1, // Cluster is a singleton on the root node and this is the only thing supported
         },
         integrationDelegate);
 }

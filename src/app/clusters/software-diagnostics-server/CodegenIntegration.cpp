@@ -68,7 +68,7 @@ void emberAfSoftwareDiagnosticsClusterServerInitCallback(EndpointId endpointId)
             .endpointId                = endpointId,
             .clusterId                 = SoftwareDiagnostics::Id,
             .fixedClusterInstanceCount = SoftwareDiagnostics::StaticApplicationConfig::kFixedClusterConfig.size(),
-            .maxClusterInstanceCount   = 1,
+            .maxClusterInstanceCount   = 1, // Cluster is a singleton on the root node and this is the only thing supported
             .fetchFeatureMap           = false,
             .fetchOptionalAttributes   = true,
         },
@@ -85,7 +85,7 @@ void MatterSoftwareDiagnosticsClusterServerShutdownCallback(EndpointId endpointI
             .endpointId                = endpointId,
             .clusterId                 = SoftwareDiagnostics::Id,
             .fixedClusterInstanceCount = SoftwareDiagnostics::StaticApplicationConfig::kFixedClusterConfig.size(),
-            .maxClusterInstanceCount   = 1,
+            .maxClusterInstanceCount   = 1, // Cluster is a singleton on the root node and this is the only thing supported
         },
         integrationDelegate);
 }

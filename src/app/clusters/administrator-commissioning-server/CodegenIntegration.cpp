@@ -48,6 +48,8 @@ using ClusterImpl = AdministratorCommissioningWithBasicCommissioningWindowCluste
 using ClusterImpl = AdministratorCommissioningCluster;
 #endif
 
+// Exactly one instance allocated: implementation here supports root-node functionality and does not support
+// generic functionality (e.g. for multi fabric)
 LazyRegisteredServerCluster<ClusterImpl> gServer;
 
 class IntegrationDelegate : public CodegenClusterIntegration::Delegate
@@ -85,7 +87,7 @@ void emberAfAdministratorCommissioningClusterServerInitCallback(EndpointId endpo
             .endpointId                = endpointId,
             .clusterId                 = AdministratorCommissioning::Id,
             .fixedClusterInstanceCount = AdministratorCommissioning::StaticApplicationConfig::kFixedClusterConfig.size(),
-            .maxClusterInstanceCount   = 1,
+            .maxClusterInstanceCount   = 1, // only root-node functionality supported by this implementation
             .fetchFeatureMap           = true,
             .fetchOptionalAttributes   = false,
         },
@@ -104,7 +106,7 @@ void MatterAdministratorCommissioningClusterServerShutdownCallback(EndpointId en
             .endpointId                = endpointId,
             .clusterId                 = AdministratorCommissioning::Id,
             .fixedClusterInstanceCount = AdministratorCommissioning::StaticApplicationConfig::kFixedClusterConfig.size(),
-            .maxClusterInstanceCount   = 1,
+            .maxClusterInstanceCount   = 1, // only root-node functionality supported by this implementation
         },
         integrationDelegate);
 }

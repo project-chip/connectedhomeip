@@ -81,7 +81,7 @@ void emberAfBasicInformationClusterServerInitCallback(EndpointId endpointId)
             .endpointId                = endpointId,
             .clusterId                 = BasicInformation::Id,
             .fixedClusterInstanceCount = BasicInformation::StaticApplicationConfig::kFixedClusterConfig.size(),
-            .maxClusterInstanceCount   = 1,
+            .maxClusterInstanceCount   = 1, // Cluster is a singleton on the root node and this is the only thing supported
             .fetchFeatureMap           = false,
             .fetchOptionalAttributes   = true,
         },
@@ -99,7 +99,7 @@ void MatterBasicInformationClusterServerShutdownCallback(EndpointId endpointId)
             .endpointId                = endpointId,
             .clusterId                 = BasicInformation::Id,
             .fixedClusterInstanceCount = BasicInformation::StaticApplicationConfig::kFixedClusterConfig.size(),
-            .maxClusterInstanceCount   = 1,
+            .maxClusterInstanceCount   = 1, // Cluster is a singleton on the root node and this is the only thing supported
         },
         integrationDelegate);
 }
