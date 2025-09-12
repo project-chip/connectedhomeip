@@ -231,7 +231,7 @@ class TC_PAVSTI_1_2(MatterBaseTest, AVSMTestBase, PAVSTIUtils):
         audioStreamId = allocatedAudioStream.audioStreamID
 
         self.step(5)
-        if self.pics_guard(self.check_pics("AVSM.S.F0003")):
+        if self.pics_guard(self.check_pics("AVSM.S.F03")):
             aFeatureMap = await self.read_single_attribute_check_success(
                 endpoint=endpoint, cluster=avsmCluster, attribute=avsmAttr.FeatureMap
             )
@@ -248,7 +248,7 @@ class TC_PAVSTI_1_2(MatterBaseTest, AVSMTestBase, PAVSTIUtils):
             )
 
         self.step(6)
-        if self.pics_guard(self.check_pics("AVSM.S.F0003")):
+        if self.pics_guard(self.check_pics("AVSM.S.F03")):
             result = await self.write_single_attribute(
                 avsmAttr.SoftLivestreamPrivacyModeEnabled(True), endpoint_id=endpoint
             )
@@ -287,7 +287,7 @@ class TC_PAVSTI_1_2(MatterBaseTest, AVSMTestBase, PAVSTIUtils):
         )
 
         self.step(8)
-        if self.pics_guard(self.check_pics("AVSM.S.F0003")):
+        if self.pics_guard(self.check_pics("AVSM.S.F03")):
             try:
                 await self.send_single_cmd(
                     cmd=pushavCluster.Commands.SetTransportStatus(
@@ -306,7 +306,7 @@ class TC_PAVSTI_1_2(MatterBaseTest, AVSMTestBase, PAVSTIUtils):
                 )
 
         self.step(9)
-        if self.pics_guard(self.check_pics("AVSM.S.F0003")):
+        if self.pics_guard(self.check_pics("AVSM.S.F03")):
             result = await self.write_single_attribute(
                 avsmAttr.SoftRecordingPrivacyModeEnabled(False), endpoint_id=endpoint
             )
@@ -317,7 +317,7 @@ class TC_PAVSTI_1_2(MatterBaseTest, AVSMTestBase, PAVSTIUtils):
             )
 
         self.step(10)
-        if self.pics_guard(self.check_pics("AVSM.S.F0003")):
+        if self.pics_guard(self.check_pics("AVSM.S.F03")):
             result = await self.write_single_attribute(
                 avsmAttr.SoftLivestreamPrivacyModeEnabled(False), endpoint_id=endpoint
             )
