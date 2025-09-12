@@ -135,7 +135,7 @@ private:
     std::shared_ptr<WebRTCPeerConnection> mPeerConnection;
 
     // Local tracks set to send the camera data to remote peer connection object
-    std::shared_ptr<WebRTCTrack> mLocalVideoTrack;;
+    std::shared_ptr<WebRTCTrack> mLocalVideoTrack;
     std::shared_ptr<WebRTCTrack> mLocalAudioTrack;
     // Remote tracks set using onTrack API callback if there is any mismatch in MIDs between local and remote tracks
     std::shared_ptr<WebRTCTrack> mRemoteVideoTrack;

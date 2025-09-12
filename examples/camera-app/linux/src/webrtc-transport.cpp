@@ -158,8 +158,8 @@ void WebrtcTransport::Stop()
         mPeerConnection->Close();
     }
 
-    mLocalVideoTrack = nullptr;
-    mLocalAudioTrack = nullptr;
+    mLocalVideoTrack  = nullptr;
+    mLocalAudioTrack  = nullptr;
     mRemoteVideoTrack = nullptr;
     mRemoteAudioTrack = nullptr;
 }
