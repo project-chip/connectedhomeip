@@ -252,14 +252,14 @@ void PushAvStreamTransportManager::GetBandwidthForStreams(const Optional<DataMod
     {
         uint16_t vStreamId = videoStreamId.Value().Value();
 
-        auto & availableVideoStreams = mCameraDevice->GetCameraHALInterface().GetAvailableVideoStreams();
-        for (const VideoStream & stream : availableVideoStreams)
+        auto & availableVideoStreams = mCameraDevice->GetCameraAVStreamMgmtDelegate().GetAllocatedVideoStreams();
+        for (const chip::app::Clusters::CameraAvStreamManagement::Structs::VideoStreamStruct::Type & stream : availableVideoStreams)
         {
-            if (stream.videoStreamParams.videoStreamID == vStreamId)
+            if (stream.videoStreamID == vStreamId)
             {
-                outBandwidthMbps += (stream.videoStreamParams.maxBitRate / 1000000.0);
+                outBandwidthMbps += (stream.maxBitRate / 1000000.0);
                 ChipLogProgress(Camera, "GetBandwidthForStreams: VideoStream %u maxBitRate: %u bps (%.2f Mbps)", vStreamId,
-                                stream.videoStreamParams.maxBitRate, (stream.videoStreamParams.maxBitRate / 1000000.0));
+                                stream.maxBitRate, (stream.maxBitRate / 1000000.0));
                 break;
             }
         }
@@ -269,14 +269,14 @@ void PushAvStreamTransportManager::GetBandwidthForStreams(const Optional<DataMod
     {
         uint16_t aStreamId = audioStreamId.Value().Value();
 
-        auto & availableAudioStreams = mCameraDevice->GetCameraHALInterface().GetAvailableAudioStreams();
-        for (const AudioStream & stream : availableAudioStreams)
+        auto & availableAudioStreams = mCameraDevice->GetCameraAVStreamMgmtDelegate().GetAllocatedAudioStreams();
+        for (const chip::app::Clusters::CameraAvStreamManagement::Structs::AudioStreamStruct::Type & stream : availableAudioStreams)
         {
-            if (stream.audioStreamParams.audioStreamID == aStreamId)
+            if (stream.audioStreamID == aStreamId)
             {
-                outBandwidthMbps += (stream.audioStreamParams.bitRate / 1000000.0);
+                outBandwidthMbps += (stream.bitRate / 1000000.0);
                 ChipLogProgress(Camera, "GetBandwidthForStreams: AudioStream %u bitRate: %u bps (%.2f Mbps)", aStreamId,
-                                stream.audioStreamParams.bitRate, (stream.audioStreamParams.bitRate / 1000000.0));
+                                stream.bitRate, (stream.bitRate / 1000000.0));
                 break;
             }
         }
