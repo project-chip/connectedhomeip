@@ -130,9 +130,9 @@ void PushAVTransport::ConfigureRecorderSettings(const TransportOptionsStruct & t
         }
     }
 
-    mTransportTriggerType    = transportOptions.triggerOptions.triggerType;
-    mClipInfo.mClipId        = 0;
-    mClipInfo.mOutputPath    = "/tmp/";
+    mTransportTriggerType = transportOptions.triggerOptions.triggerType;
+    mClipInfo.mClipId     = 0;
+    mClipInfo.mOutputPath = "/tmp/"; // CAUTION: If path is not accessible to executable, the program may fail to write and crash.
     mClipInfo.mInputTimeBase = { 1, 1000000 };
 
     uint8_t audioCodec   = static_cast<uint8_t>(audioStreamParams.audioCodec);
@@ -496,13 +496,13 @@ void PushAVTransport::readFromFile(char * filename, uint8_t ** videoBuffer, size
 // Implementation of CanSendVideo method
 bool PushAVTransport::CanSendVideo()
 {
-    return mCanSendVideo;
+    return IsStreaming();
 }
 
 // Dummy implementation of CanfSendAudio method
 bool PushAVTransport::CanSendAudio()
 {
-    return mCanSendAudio;
+    return IsStreaming();
 }
 
 void PushAVTransport::ModifyPushTransport(const TransportOptionsStorage & transportOptions)
