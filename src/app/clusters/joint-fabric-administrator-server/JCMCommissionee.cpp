@@ -33,8 +33,9 @@ using namespace ::chip;
 using namespace ::chip::app;
 
 namespace chip {
-namespace Controller {
-namespace JCM {
+namespace app {
+namespace Clusters {
+namespace JointFabricAdministrator {
 
 /*
  * DeviceCommissioner public interface and override implementation
@@ -142,12 +143,16 @@ void JCMCommissionee::OnTrustVerificationComplete(TrustVerificationError error)
 
 TrustVerificationError JCMCommissionee::StoreEndpointId()
 {
+#if CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
     if (mInfo.adminEndpointId == kInvalidEndpointId)
     {
         return TrustVerificationError::kInvalidAdministratorEndpointId;
     }
     Server::GetInstance().GetJointFabricAdministrator().SetPeerJFAdminClusterEndpointId(mInfo.adminEndpointId);
     return TrustVerificationError::kSuccess;
+#else
+    return TrustVerificationError::kInternalError;
+#endif // CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
 }
 
 TrustVerificationError JCMCommissionee::ReadCommissionerAdminFabricIndex()
@@ -320,6 +325,7 @@ TrustVerificationError JCMCommissionee::ParseCommissionerAdminInfo()
     return TrustVerificationError::kSuccess;
 }
 
-} // namespace JCM
-} // namespace Controller
+} // namespace JointFabricAdministrator
+} // namespace Clusters
+} // namespace app
 } // namespace chip

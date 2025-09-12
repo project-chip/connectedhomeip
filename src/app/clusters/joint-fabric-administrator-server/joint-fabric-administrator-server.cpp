@@ -29,10 +29,10 @@
 #include <app/CommandHandlerInterface.h>
 #include <app/CommandHandlerInterfaceRegistry.h>
 #include <app/ConcreteCommandPath.h>
+#include <app/clusters/joint-fabric-administrator-server/JCMCommissionee.h>
 #include <app/reporting/reporting.h>
 #include <app/server/Server.h>
 #include <app/util/attribute-storage.h>
-#include <controller/jcm/JCMCommissionee.h>
 #include <credentials/CHIPCert.h>
 #include <credentials/CertificationDeclaration.h>
 #include <credentials/DeviceAttestationConstructor.h>
@@ -234,7 +234,7 @@ void JointFabricAdministratorGlobalInstance::HandleAnnounceJointFabricAdministra
     // Scope the next section so that we can instantiate the JCMCommissionee without VerifyOrExit messing with
     // construction/destruction.
     {
-        chip::Controller::JCM::JCMCommissionee jcmCommissionee(handle, commandData.endpointID, onComplete);
+        JCMCommissionee jcmCommissionee(handle, commandData.endpointID, onComplete);
         VerifyOrExit(jcmCommissionee.VerifyTrustAgainstCommissionerAdmin() == CHIP_NO_ERROR, globalStatus = Status::Failure);
     }
 exit:

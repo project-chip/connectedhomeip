@@ -33,7 +33,6 @@ chip_test_suite("jcm") {
 
   test_sources = [
     "TestJCMCommissioner.cpp",
-    "TestTrustVerification.cpp",
   ]
 
   defines = [ "CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC=1" ]

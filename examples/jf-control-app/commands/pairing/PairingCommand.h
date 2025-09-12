@@ -23,7 +23,7 @@
 #include <controller/CommissioningDelegate.h>
 #include <controller/CurrentFabricRemover.h>
 #include <controller/jcm/DeviceCommissioner.h>
-#include <controller/jcm/TrustVerification.h>
+#include <credentials/jcm/TrustVerification.h>
 
 #include <commands/common/CredentialIssuerCommands.h>
 #include <lib/support/Span.h>
@@ -78,8 +78,7 @@ public:
     PairingCommand(const char * commandName, PairingMode mode, PairingNetworkType networkType,
                    CredentialIssuerCommands * credIssuerCmds,
                    chip::Dnssd::DiscoveryFilterType filterType = chip::Dnssd::DiscoveryFilterType::kNone) :
-        CHIPCommand(commandName, credIssuerCmds),
-        mPairingMode(mode), mNetworkType(networkType), mFilterType(filterType),
+        CHIPCommand(commandName, credIssuerCmds), mPairingMode(mode), mNetworkType(networkType), mFilterType(filterType),
         mRemoteAddr{ IPAddress::Any, chip::Inet::InterfaceId::Null() }, mComplex_TimeZones(&mTimeZoneList),
         mComplex_DSTOffsets(&mDSTOffsetList), mCurrentFabricRemoveCallback(OnCurrentFabricRemove, this)
     {

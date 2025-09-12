@@ -33,7 +33,7 @@
 #include <functional>
 
 namespace chip {
-namespace Controller {
+namespace Credentials {
 namespace JCM {
 
 using namespace ::chip;
@@ -264,5 +264,5 @@ protected:
 };
 
 } // namespace JCM
-} // namespace Controller
+} // namespace Credentials
 } // namespace chip
