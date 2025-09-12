@@ -24,6 +24,7 @@
 #include <app/server/Dnssd.h>
 #include <app/server/Server.h>
 #include <app/util/attribute-storage.h>
+#include <app/server/Server.h>
 
 using namespace chip;
 using namespace chip::app;
@@ -43,7 +44,7 @@ public:
     ServerClusterRegistration & CreateRegistration(EndpointId endpointId, unsigned emberEndpointIndex,
                                                    uint32_t optionalAttributeBits, uint32_t featureMap) override
     {
-        gServer.Create(endpointId);
+        gServer.Create(endpointId, Server::GetInstance().GetFabricTable(), Server::GetInstance().GetFailSafeContext());
         return gServer.Registration();
     }
 

@@ -62,11 +62,10 @@ ByteSpan GetAttestationChallengeFromCurrentSession(app::CommandHandler * command
     return attestationChallenge;
 }
 
-const FabricInfo * RetrieveCurrentFabric(CommandHandler * aCommandHandler)
+const FabricInfo * RetrieveCurrentFabric(CommandHandler * aCommandHandler, FabricTable & fabricTable)
 {
     FabricIndex index = aCommandHandler->GetAccessingFabricIndex();
-    ChipLogDetail(Zcl, "OpCreds: Finding fabric with fabricIndex 0x%x", static_cast<unsigned>(index));
-    return Server::GetInstance().GetFabricTable().FindFabricWithIndex(index);
+    return fabricTable.FindFabricWithIndex(index);
 }
 
 CHIP_ERROR CreateAccessControlEntryForNewFabricAdministrator(const Access::SubjectDescriptor & subjectDescriptor,
@@ -152,6 +151,7 @@ void SendNOCResponse(app::CommandHandler * commandObj, const ConcreteCommandPath
     payload.statusCode = status;
     if (status == NodeOperationalCertStatusEnum::kOk)
     {
+        payload.fabricIndex.SetValue(index);
         payload.fabricIndex.Emplace(index);
     }
     if (!debug_text.empty())
@@ -164,10 +164,9 @@ void SendNOCResponse(app::CommandHandler * commandObj, const ConcreteCommandPath
     commandObj->AddResponse(path, payload);
 }
 
-CHIP_ERROR ReadNOCs(AttributeValueEncoder & aEncoder)
+CHIP_ERROR ReadNOCs(AttributeValueEncoder & aEncoder, FabricTable & fabricTable)
 {
-    return aEncoder.EncodeList([](const auto & encoder) -> CHIP_ERROR {
-        const auto & fabricTable = Server::GetInstance().GetFabricTable();
+    return aEncoder.EncodeList([&fabricTable](const auto & encoder) -> CHIP_ERROR {
         for (const auto & fabricInfo : fabricTable)
         {
             OperationalCredentials::Structs::NOCStruct::Type nocStruct;
@@ -205,18 +204,9 @@ CHIP_ERROR ReadNOCs(AttributeValueEncoder & aEncoder)
     });
 }
 
-CHIP_ERROR ReadSupportedFabrics(AttributeValueEncoder & aEncoder)
+CHIP_ERROR ReadFabricsList(AttributeValueEncoder & aEncoder, FabricTable & fabricTable)
 {
-    uint8_t fabricCount = CHIP_CONFIG_MAX_FABRICS;
-
-    return aEncoder.Encode(fabricCount);
-}
-
-CHIP_ERROR ReadFabricsList(AttributeValueEncoder & aEncoder)
-{
-    return aEncoder.EncodeList([](const auto & encoder) -> CHIP_ERROR {
-        const auto & fabricTable = Server::GetInstance().GetFabricTable();
-
+    return aEncoder.EncodeList([&fabricTable](const auto & encoder) -> CHIP_ERROR {
         for (const auto & fabricInfo : fabricTable)
         {
             OperationalCredentials::Structs::FabricDescriptorStruct::Type fabricDescriptor;
@@ -248,17 +238,10 @@ CHIP_ERROR ReadFabricsList(AttributeValueEncoder & aEncoder)
     });
 }
 
-CHIP_ERROR ReadCommissionedFabrics(AttributeValueEncoder & aEncoder)
-{
-    return aEncoder.Encode(Server::GetInstance().GetFabricTable().FabricCount());
-}
-
-CHIP_ERROR ReadRootCertificates(AttributeValueEncoder & aEncoder)
+CHIP_ERROR ReadRootCertificates(AttributeValueEncoder & aEncoder, FabricTable & fabricTable)
 {
     // It is OK to have duplicates.
-    return aEncoder.EncodeList([](const auto & encoder) -> CHIP_ERROR {
-        const auto & fabricTable = Server::GetInstance().GetFabricTable();
-
+    return aEncoder.EncodeList([&fabricTable](const auto & encoder) -> CHIP_ERROR {
         for (const auto & fabricInfo : fabricTable)
         {
             uint8_t certBuf[kMaxCHIPCertLength];
@@ -290,7 +273,7 @@ CHIP_ERROR ReadRootCertificates(AttributeValueEncoder & aEncoder)
 }
 
 std::optional<DataModel::ActionReturnStatus> HandleCSRRequest(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
-                                                              Commands::CSRRequest::DecodableType & commandData)
+                                                              Commands::CSRRequest::DecodableType & commandData, FabricTable & fabricTable, FailSafeContext & failSafeContext)
 {
     MATTER_TRACE_SCOPE("CSRRequest", "OperationalCredentials");
     ChipLogProgress(Zcl, "OpCreds: Received a CSRRequest command");
@@ -304,16 +287,13 @@ std::optional<DataModel::ActionReturnStatus> HandleCSRRequest(CommandHandler * c
     // logs by the end. We use finalStatus as our overall success marker, not error
     CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
 
-    auto & fabricTable     = Server::GetInstance().GetFabricTable();
-    auto & failSafeContext = Server::GetInstance().GetFailSafeContext();
-
     auto & CSRNonce     = commandData.CSRNonce;
     bool isForUpdateNoc = commandData.isForUpdateNOC.ValueOr(false);
 
     ByteSpan attestationChallenge = GetAttestationChallengeFromCurrentSession(commandObj);
 
     failSafeContext.SetCsrRequestForUpdateNoc(isForUpdateNoc);
-    const FabricInfo * fabricInfo = RetrieveCurrentFabric(commandObj);
+    const FabricInfo * fabricInfo = RetrieveCurrentFabric(commandObj, fabricTable);
 
     VerifyOrExit(CSRNonce.size() == Credentials::kExpectedAttestationNonceSize, finalStatus = Status::InvalidCommand);
 
@@ -420,7 +400,7 @@ exit:
 }
 
 std::optional<DataModel::ActionReturnStatus> HandleAddNOC(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
-                                                          Commands::AddNOC::DecodableType & commandData)
+                                                          Commands::AddNOC::DecodableType & commandData, FabricTable & fabricTable, FailSafeContext & failSafeContext)
 {
     MATTER_TRACE_SCOPE("AddNOC", "OperationalCredentials");
     auto & NOCValue          = commandData.NOCValue;
@@ -436,10 +416,8 @@ std::optional<DataModel::ActionReturnStatus> HandleAddNOC(CommandHandler * comma
     FabricIndex newFabricIndex = kUndefinedFabricIndex;
     Credentials::GroupDataProvider::KeySet keyset;
     const FabricInfo * newFabricInfo = nullptr;
-    auto & fabricTable               = Server::GetInstance().GetFabricTable();
 
     auto * secureSession   = commandObj->GetExchangeContext()->GetSessionHandle()->AsSecureSession();
-    auto & failSafeContext = Server::GetInstance().GetFailSafeContext();
 
     uint8_t compressed_fabric_id_buffer[sizeof(uint64_t)];
     MutableByteSpan compressed_fabric_id(compressed_fabric_id_buffer);
@@ -600,7 +578,7 @@ exit:
 }
 
 std::optional<DataModel::ActionReturnStatus> HandleUpdateNOC(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
-                                                             Commands::UpdateNOC::DecodableType & commandData)
+                                                             Commands::UpdateNOC::DecodableType & commandData, FabricTable & fabricTable, FailSafeContext & failSafeContext)
 {
     MATTER_TRACE_SCOPE("UpdateNOC", "OperationalCredentials");
     auto & NOCValue  = commandData.NOCValue;
@@ -614,9 +592,7 @@ std::optional<DataModel::ActionReturnStatus> HandleUpdateNOC(CommandHandler * co
 
     ChipLogProgress(Zcl, "OpCreds: Received an UpdateNOC command");
 
-    auto & fabricTable            = Server::GetInstance().GetFabricTable();
-    auto & failSafeContext        = Server::GetInstance().GetFailSafeContext();
-    const FabricInfo * fabricInfo = RetrieveCurrentFabric(commandObj);
+    const FabricInfo * fabricInfo = RetrieveCurrentFabric(commandObj, fabricTable);
 
     bool csrWasForUpdateNoc = false; //< Output param of HasPendingOperationalKey
     bool hasPendingKey      = fabricTable.HasPendingOperationalKey(csrWasForUpdateNoc);
@@ -692,13 +668,12 @@ exit:
 
 std::optional<DataModel::ActionReturnStatus> HandleUpdateFabricLabel(CommandHandler * commandObj,
                                                                      const ConcreteCommandPath & commandPath,
-                                                                     Commands::UpdateFabricLabel::DecodableType & commandData)
+                                                                     Commands::UpdateFabricLabel::DecodableType & commandData, FabricTable & fabricTable)
 {
     MATTER_TRACE_SCOPE("UpdateFabricLabel", "OperationalCredentials");
     auto & label        = commandData.label;
     auto ourFabricIndex = commandObj->GetAccessingFabricIndex();
     auto finalStatus    = Status::Failure;
-    auto & fabricTable  = Server::GetInstance().GetFabricTable();
 
     ChipLogProgress(Zcl, "OpCreds: Received an UpdateFabricLabel command");
 
@@ -745,11 +720,10 @@ exit:
 
 std::optional<DataModel::ActionReturnStatus>
 HandleAddTrustedRootCertificate(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
-                                Commands::AddTrustedRootCertificate::DecodableType & commandData)
+                                Commands::AddTrustedRootCertificate::DecodableType & commandData, FabricTable & fabricTable, FailSafeContext & failSafeContext )
 {
     MATTER_TRACE_SCOPE("AddTrustedRootCertificate", "OperationalCredentials");
 
-    auto & fabricTable = Server::GetInstance().GetFabricTable();
     auto finalStatus   = Status::Failure;
 
     // Start with CHIP_ERROR_INVALID_ARGUMENT so that cascading errors yield correct
@@ -757,7 +731,6 @@ HandleAddTrustedRootCertificate(CommandHandler * commandObj, const ConcreteComma
     CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
 
     auto & rootCertificate = commandData.rootCACertificate;
-    auto & failSafeContext = Server::GetInstance().GetFailSafeContext();
 
     ChipLogProgress(Zcl, "OpCreds: Received an AddTrustedRootCertificate command");
 
@@ -803,7 +776,7 @@ exit:
 
 std::optional<DataModel::ActionReturnStatus>
 HandleSetVIDVerificationStatement(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
-                                  Commands::SetVIDVerificationStatement::DecodableType & commandData)
+                                  Commands::SetVIDVerificationStatement::DecodableType & commandData, FabricTable & fabricTable, FailSafeContext & failSafeContext)
 {
     FabricIndex fabricIndex = commandObj->GetAccessingFabricIndex();
     ChipLogProgress(Zcl, "OpCreds: Received a SetVIDVerificationStatement Command for FabricIndex 0x%x",
@@ -820,8 +793,6 @@ HandleSetVIDVerificationStatement(CommandHandler * commandObj, const ConcreteCom
         commandObj->AddStatus(commandPath, Status::ConstraintError);
         return std::nullopt;
     }
-
-    auto & fabricTable = Server::GetInstance().GetFabricTable();
 
     bool fabricChangesOccurred = false;
     CHIP_ERROR err             = fabricTable.SetVIDVerificationStatementElements(
@@ -849,7 +820,6 @@ HandleSetVIDVerificationStatement(CommandHandler * commandObj, const ConcreteCom
     // is not reportable (`C` quality).
     if (fabricChangesOccurred)
     {
-        auto & failSafeContext = Server::GetInstance().GetFailSafeContext();
         failSafeContext.RecordSetVidVerificationStatementHasBeenInvoked();
 
         MatterReportingAttributeChangeCallback(commandPath.mEndpointId, OperationalCredentials::Id,
@@ -865,7 +835,7 @@ HandleSetVIDVerificationStatement(CommandHandler * commandObj, const ConcreteCom
 
 std::optional<DataModel::ActionReturnStatus> HandleRemoveFabric(CommandHandler * commandObj,
                                                                 const ConcreteCommandPath & commandPath,
-                                                                Commands::RemoveFabric::DecodableType & commandData)
+                                                                Commands::RemoveFabric::DecodableType & commandData, FabricTable & fabricTable)
 {
     MATTER_TRACE_SCOPE("RemoveFabric", "OperationalCredentials");
     auto & fabricBeingRemoved = commandData.fabricIndex;
@@ -882,7 +852,7 @@ std::optional<DataModel::ActionReturnStatus> HandleRemoveFabric(CommandHandler *
 
     commandObj->FlushAcksRightAwayOnSlowCommand();
 
-    CHIP_ERROR err = Server::GetInstance().GetFabricTable().Delete(fabricBeingRemoved);
+    CHIP_ERROR err = fabricTable.Delete(fabricBeingRemoved);
     SuccessOrExit(err);
 
     // Notification was already done by FabricTable delegate
@@ -925,7 +895,7 @@ exit:
 
 std::optional<DataModel::ActionReturnStatus>
 HandleSignVIDVerificationRequest(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
-                                 Commands::SignVIDVerificationRequest::DecodableType & commandData)
+                                 Commands::SignVIDVerificationRequest::DecodableType & commandData, FabricTable & fabricTable)
 {
     ChipLogProgress(Zcl, "OpCreds: Received a SignVIDVerificationRequest Command for FabricIndex 0x%x",
                     static_cast<unsigned>(commandData.fabricIndex));
@@ -939,7 +909,6 @@ HandleSignVIDVerificationRequest(CommandHandler * commandObj, const ConcreteComm
 
     commandObj->FlushAcksRightAwayOnSlowCommand();
 
-    auto & fabricTable = Server::GetInstance().GetFabricTable();
     FabricTable::SignVIDVerificationResponseData responseData;
     ByteSpan attestationChallenge = GetAttestationChallengeFromCurrentSession(commandObj);
 
@@ -1115,7 +1084,7 @@ void NotifyFabricTableChanged()
     MatterReportingAttributeChangeCallback(0, OperationalCredentials::Id, OperationalCredentials::Attributes::Fabrics::Id);
 }
 
-void FailSafeCleanup(const chip::DeviceLayer::ChipDeviceEvent * event)
+void FailSafeCleanup(const chip::DeviceLayer::ChipDeviceEvent * event, FabricTable & fabricTable, SessionManager & sessionMgr)
 {
     ChipLogError(Zcl, "OpCreds: Proceeding to FailSafeCleanup on fail-safe expiry!");
 
@@ -1147,11 +1116,9 @@ void FailSafeCleanup(const chip::DeviceLayer::ChipDeviceEvent * event)
     // Session Context at the Server.
     if (nocAddedOrUpdatedDuringFailsafe)
     {
-        SessionManager & sessionMgr = Server::GetInstance().GetSecureSessionManager();
         sessionMgr.ExpireAllSessionsForFabric(fabricIndex);
     }
 
-    auto & fabricTable = Server::GetInstance().GetFabricTable();
     fabricTable.RevertPendingFabricData();
 
     // If an AddNOC command had been successfully invoked, achieve the equivalent effect of invoking the RemoveFabric command
@@ -1159,7 +1126,7 @@ void FailSafeCleanup(const chip::DeviceLayer::ChipDeviceEvent * event)
     // command.
     if (nocAddedDuringFailsafe)
     {
-        CHIP_ERROR err = Server::GetInstance().GetFabricTable().Delete(fabricIndex);
+        CHIP_ERROR err = fabricTable.Delete(fabricIndex);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "OpCreds: failed to delete fabric at index %u: %" CHIP_ERROR_FORMAT, fabricIndex, err.Format());
@@ -1179,7 +1146,7 @@ void OnPlatformEventHandler(const chip::DeviceLayer::ChipDeviceEvent * event, in
     if (event->Type == DeviceLayer::DeviceEventType::kFailSafeTimerExpired)
     {
         ChipLogError(Zcl, "OpCreds: Got FailSafeTimerExpired");
-        FailSafeCleanup(event);
+        FailSafeCleanup(event, Server::GetInstance().GetFabricTable(), Server::GetInstance().GetSecureSessionManager());
     }
 }
 } // anonymous namespace
@@ -1187,7 +1154,7 @@ void OnPlatformEventHandler(const chip::DeviceLayer::ChipDeviceEvent * event, in
 CHIP_ERROR OperationalCredentialsCluster::Startup(ServerClusterContext & context)
 {
     ReturnErrorOnFailure(DefaultServerCluster::Startup(context));
-    Server::GetInstance().GetFabricTable().AddFabricDelegate(this);
+    mFabricTable.AddFabricDelegate(this);
     DeviceLayer::PlatformMgrImpl().AddEventHandler(OnPlatformEventHandler);
     return CHIP_NO_ERROR;
 }
@@ -1195,7 +1162,7 @@ CHIP_ERROR OperationalCredentialsCluster::Startup(ServerClusterContext & context
 void OperationalCredentialsCluster::Shutdown()
 {
     DeviceLayer::PlatformMgrImpl().RemoveEventHandler(OnPlatformEventHandler);
-    Server::GetInstance().GetFabricTable().RemoveFabricDelegate(this);
+    mFabricTable.RemoveFabricDelegate(this);
     DefaultServerCluster::Shutdown();
 }
 
@@ -1218,15 +1185,15 @@ DataModel::ActionReturnStatus OperationalCredentialsCluster::ReadAttribute(const
     case OperationalCredentials::Attributes::FeatureMap::Id:
         return encoder.Encode(static_cast<uint32_t>(0));
     case OperationalCredentials::Attributes::NOCs::Id:
-        return ReadNOCs(encoder);
+        return ReadNOCs(encoder, mFabricTable);
     case OperationalCredentials::Attributes::Fabrics::Id:
-        return ReadFabricsList(encoder);
+        return ReadFabricsList(encoder, mFabricTable);
     case OperationalCredentials::Attributes::SupportedFabrics::Id:
-        return ReadSupportedFabrics(encoder);
+        return encoder.Encode(CHIP_CONFIG_MAX_FABRICS);
     case OperationalCredentials::Attributes::CommissionedFabrics::Id:
-        return ReadCommissionedFabrics(encoder);
+        return encoder.Encode(mFabricTable.FabricCount());
     case OperationalCredentials::Attributes::TrustedRootCertificates::Id:
-        return ReadRootCertificates(encoder);
+        return ReadRootCertificates(encoder, mFabricTable);
     case OperationalCredentials::Attributes::CurrentFabricIndex::Id:
         return encoder.Encode(encoder.AccessingFabricIndex());
     default:
@@ -1280,42 +1247,42 @@ std::optional<DataModel::ActionReturnStatus> OperationalCredentialsCluster::Invo
     case OperationalCredentials::Commands::CSRRequest::Id: {
         OperationalCredentials::Commands::CSRRequest::DecodableType requestData;
         ReturnErrorOnFailure(requestData.Decode(input_arguments));
-        return HandleCSRRequest(handler, request.path, requestData);
+        return HandleCSRRequest(handler, request.path, requestData, mFabricTable, mFailSafeContext);
     }
     case OperationalCredentials::Commands::AddNOC::Id: {
         OperationalCredentials::Commands::AddNOC::DecodableType requestData;
         ReturnErrorOnFailure(requestData.Decode(input_arguments));
-        return HandleAddNOC(handler, request.path, requestData);
+        return HandleAddNOC(handler, request.path, requestData, mFabricTable, mFailSafeContext);
     }
     case OperationalCredentials::Commands::UpdateNOC::Id: {
         OperationalCredentials::Commands::UpdateNOC::DecodableType requestData;
         ReturnErrorOnFailure(requestData.Decode(input_arguments, request.GetAccessingFabricIndex()));
-        return HandleUpdateNOC(handler, request.path, requestData);
+        return HandleUpdateNOC(handler, request.path, requestData, mFabricTable, mFailSafeContext);
     }
     case OperationalCredentials::Commands::UpdateFabricLabel::Id: {
         OperationalCredentials::Commands::UpdateFabricLabel::DecodableType requestData;
         ReturnErrorOnFailure(requestData.Decode(input_arguments, request.GetAccessingFabricIndex()));
-        return HandleUpdateFabricLabel(handler, request.path, requestData);
+        return HandleUpdateFabricLabel(handler, request.path, requestData, mFabricTable);
     }
     case OperationalCredentials::Commands::RemoveFabric::Id: {
         OperationalCredentials::Commands::RemoveFabric::DecodableType requestData;
         ReturnErrorOnFailure(requestData.Decode(input_arguments));
-        return HandleRemoveFabric(handler, request.path, requestData);
+        return HandleRemoveFabric(handler, request.path, requestData, mFabricTable);
     }
     case OperationalCredentials::Commands::AddTrustedRootCertificate::Id: {
         OperationalCredentials::Commands::AddTrustedRootCertificate::DecodableType requestData;
         ReturnErrorOnFailure(requestData.Decode(input_arguments));
-        return HandleAddTrustedRootCertificate(handler, request.path, requestData);
+        return HandleAddTrustedRootCertificate(handler, request.path, requestData, mFabricTable, mFailSafeContext);
     }
     case OperationalCredentials::Commands::SetVIDVerificationStatement::Id: {
         OperationalCredentials::Commands::SetVIDVerificationStatement::DecodableType requestData;
         ReturnErrorOnFailure(requestData.Decode(input_arguments, request.GetAccessingFabricIndex()));
-        return HandleSetVIDVerificationStatement(handler, request.path, requestData);
+        return HandleSetVIDVerificationStatement(handler, request.path, requestData, mFabricTable, mFailSafeContext);
     }
     case OperationalCredentials::Commands::SignVIDVerificationRequest::Id: {
         OperationalCredentials::Commands::SignVIDVerificationRequest::DecodableType requestData;
         ReturnErrorOnFailure(requestData.Decode(input_arguments));
-        return HandleSignVIDVerificationRequest(handler, request.path, requestData);
+        return HandleSignVIDVerificationRequest(handler, request.path, requestData, mFabricTable);
     }
     default:
         return Protocols::InteractionModel::Status::UnsupportedCommand;

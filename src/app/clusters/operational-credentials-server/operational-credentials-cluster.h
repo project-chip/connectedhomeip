@@ -17,6 +17,7 @@
 #pragma once
 
 #include <app/server-cluster/DefaultServerCluster.h>
+#include <app/FailSafeContext.h>
 #include <clusters/OperationalCredentials/ClusterId.h>
 
 namespace chip {
@@ -26,7 +27,8 @@ namespace Clusters {
 class OperationalCredentialsCluster : public DefaultServerCluster, chip::FabricTable::Delegate
 {
 public:
-    OperationalCredentialsCluster(EndpointId endpoint) : DefaultServerCluster({ endpoint, OperationalCredentials::Id }){};
+    OperationalCredentialsCluster(EndpointId endpoint, FabricTable & fabricTable, FailSafeContext & failSafeContext): DefaultServerCluster({ endpoint, OperationalCredentials::Id }), 
+    mFabricTable(fabricTable), mFailSafeContext(failSafeContext){};
 
     CHIP_ERROR Startup(ServerClusterContext & context) override;
     void Shutdown() override;
@@ -46,6 +48,10 @@ public:
     void OnFabricRemoved(const FabricTable & fabricTable, FabricIndex fabricIndex) override;
     void OnFabricUpdated(const FabricTable & fabricTable, FabricIndex fabricIndex) override;
     void OnFabricCommitted(const FabricTable & fabricTable, FabricIndex fabricIndex) override;
+
+private:
+    FabricTable & mFabricTable;
+    FailSafeContext & mFailSafeContext;
 };
 
 } // namespace Clusters
