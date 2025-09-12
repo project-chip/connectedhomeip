@@ -412,6 +412,8 @@ CameraError CameraDevice::InitializeCameraDevice()
         gstreamerInitialized = true;
     }
 
+    ChipLogDetail(Camera, "InitializeCameraDevice: %s", mVideoDevicePath.c_str());
+
     videoDeviceFd = open(mVideoDevicePath.c_str(), O_RDWR);
     if (videoDeviceFd == -1)
     {
