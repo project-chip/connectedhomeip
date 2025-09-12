@@ -1,14 +1,14 @@
-name: Check Changed Paths
+name: Run Workflow Based On Changed Paths
 
 on:
   workflow_call:
     outputs:
       proceed:
         description: "Determines if the workflow should proceed based on modified paths."
-        value: ${{ jobs.changed_paths.outputs.non_markdown_changes }}
+        value: ${{ jobs.non_md_changes.outputs.non_markdown_changes }}
 
 jobs:
-  changed_paths:
+  non_md_changes:
     runs-on: ubuntu-latest
     if: github.actor != 'restyled-io[bot]'
     outputs:
