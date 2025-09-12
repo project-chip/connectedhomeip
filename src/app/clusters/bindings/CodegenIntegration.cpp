@@ -17,7 +17,7 @@
 #include <app/clusters/bindings/binding-cluster.h>
 #include <app/static-cluster-config/Binding.h>
 #include <app/util/attribute-storage.h>
-#include <data-model-providers/codegen/CodegenDataModelProvider.h>
+#include <data-model-providers/codegen/ClusterIntegration.h>
 
 #include <cstdint>
 
@@ -32,52 +32,54 @@ static constexpr size_t kBindingMaxClusterCount   = kBindingFixedClusterCount + 
 
 LazyRegisteredServerCluster<BindingCluster> gServers[kBindingMaxClusterCount];
 
-// Find the 0-based array index corresponding to the given endpoint id.
-// Log an error if not found.
-bool findEndpointWithLog(EndpointId endpointId, uint16_t & outArrayIndex)
-{
-    uint16_t arrayIndex = emberAfGetClusterServerEndpointIndex(endpointId, Binding::Id, kBindingFixedClusterCount);
 
-    if (arrayIndex >= kBindingMaxClusterCount)
+class IntegrationDelegate : public CodegenClusterIntegration::Delegate
+{
+public:
+    ServerClusterRegistration & CreateRegistration(EndpointId endpointId, unsigned emberEndpointIndex,
+                                                   uint32_t optionalAttributeBits, uint32_t featureMap) override
     {
-        ChipLogError(AppServer, "Could not find endpoint index for endpoint %u", endpointId);
-        return false;
+        gServers[emberEndpointIndex].Create(endpointId);
+        return gServers[emberEndpointIndex].Registration();
     }
-    outArrayIndex = arrayIndex;
-    return true;
-}
+
+    ServerClusterInterface & FindRegistration(unsigned emberEndpointIndex) override
+    {
+        return gServers[emberEndpointIndex].Cluster();
+    }
+    void ReleaseRegistration(unsigned emberEndpointIndex) override { gServers[emberEndpointIndex].Destroy(); }
+};
 
 } // namespace
 
 void emberAfBindingClusterServerInitCallback(EndpointId endpointId)
 {
-    uint16_t arrayIndex = 0;
-    if (!findEndpointWithLog(endpointId, arrayIndex))
-    {
-        return;
-    }
-    gServers[arrayIndex].Create(endpointId);
-    CHIP_ERROR err = CodegenDataModelProvider::Instance().Registry().Register(gServers[arrayIndex].Registration());
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogError(AppServer, "Failed to register Binding on endpoint %u: %" CHIP_ERROR_FORMAT, endpointId, err.Format());
-    }
+    IntegrationDelegate integrationDelegate;
+
+    CodegenClusterIntegration::RegisterServer(
+        {
+            .endpointId                      = endpointId,
+            .clusterId                       = Binding::Id,
+            .fixedClusterServerEndpointCount = kBindingFixedClusterCount,
+            .maxEndpointCount                = kBindingMaxClusterCount,
+            .fetchFeatureMap                 = false,
+            .fetchOptionalAttributes         = false,
+        },
+        integrationDelegate);
 }
 
 void MatterBindingClusterServerShutdownCallback(EndpointId endpointId)
 {
-    uint16_t arrayIndex = 0;
-    if (!findEndpointWithLog(endpointId, arrayIndex))
-    {
-        return;
-    }
+    IntegrationDelegate integrationDelegate;
 
-    CHIP_ERROR err = CodegenDataModelProvider::Instance().Registry().Unregister(&gServers[arrayIndex].Cluster());
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogError(AppServer, "Failed to unregister Binding on endpoint %u: %" CHIP_ERROR_FORMAT, endpointId, err.Format());
-    }
-    gServers[arrayIndex].Destroy();
+    CodegenClusterIntegration::UnregisterServer(
+        {
+            .endpointId                      = endpointId,
+            .clusterId                       = Binding::Id,
+            .fixedClusterServerEndpointCount = kBindingFixedClusterCount,
+            .maxEndpointCount                = kBindingMaxClusterCount,
+        },
+        integrationDelegate);
 }
 
 void MatterBindingPluginServerInitCallback() {}

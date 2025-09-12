@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2020-2025 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -116,7 +116,7 @@ CHIP_ERROR CreateBindingEntry(const TargetStructType & entry, EndpointId localEn
                                                        entry.cluster.std_optional());
     }
 
-    return chip::AddBindingEntry(bindingEntry);
+    return chip::app::AddBindingEntry(bindingEntry);
 }
 
 } // namespace
@@ -134,37 +134,38 @@ DataModel::ActionReturnStatus BindingCluster::ReadAttribute(const DataModel::Rea
         return encoder.EncodeList([&](const auto & subEncoder) {
             for (auto & entry : BindingTable::GetInstance())
             {
-                if (entry.local == request.path.mEndpointId)
+                if (entry.local != request.path.mEndpointId)
                 {
-                    if (entry.type == MATTER_UNICAST_BINDING)
-                    {
-                        Binding::Structs::TargetStruct::Type value = {
-                            .node        = MakeOptional(entry.nodeId),
-                            .group       = NullOptional,
-                            .endpoint    = MakeOptional(entry.remote),
-                            .cluster     = FromStdOptional(entry.clusterId),
-                            .fabricIndex = entry.fabricIndex,
-                        };
-                        ReturnErrorOnFailure(subEncoder.Encode(value));
-                    }
-                    else if (entry.type == MATTER_MULTICAST_BINDING)
-                    {
-                        Binding::Structs::TargetStruct::Type value = {
-                            .node        = NullOptional,
-                            .group       = MakeOptional(entry.groupId),
-                            .endpoint    = NullOptional,
-                            .cluster     = FromStdOptional(entry.clusterId),
-                            .fabricIndex = entry.fabricIndex,
-                        };
-                        ReturnErrorOnFailure(subEncoder.Encode(value));
-                    }
+                    continue;
+                }
+                if (entry.type == MATTER_UNICAST_BINDING)
+                {
+                    Binding::Structs::TargetStruct::Type value = {
+                        .node        = MakeOptional(entry.nodeId),
+                        .group       = NullOptional,
+                        .endpoint    = MakeOptional(entry.remote),
+                        .cluster     = FromStdOptional(entry.clusterId),
+                        .fabricIndex = entry.fabricIndex,
+                    };
+                    ReturnErrorOnFailure(subEncoder.Encode(value));
+                }
+                else if (entry.type == MATTER_MULTICAST_BINDING)
+                {
+                    Binding::Structs::TargetStruct::Type value = {
+                        .node        = NullOptional,
+                        .group       = MakeOptional(entry.groupId),
+                        .endpoint    = NullOptional,
+                        .cluster     = FromStdOptional(entry.clusterId),
+                        .fabricIndex = entry.fabricIndex,
+                    };
+                    ReturnErrorOnFailure(subEncoder.Encode(value));
                 }
             }
             return CHIP_NO_ERROR;
         });
     }
     case Globals::Attributes::FeatureMap::Id:
-        return encoder.Encode((uint32_t) 0);
+        return encoder.Encode<uint32_t>(0);
     case Globals::Attributes::ClusterRevision::Id:
         return encoder.Encode(Binding::kRevision);
     default:

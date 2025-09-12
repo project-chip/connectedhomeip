@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2022 Project CHIP Authors
+ *    Copyright (c) 2022-2025 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -179,6 +179,7 @@ private:
     CHIP_ERROR mLastSessionEstablishmentError;
 };
 
+namespace app {
 /**
  * @brief appends a binding to the list of bindings
  *        This function is to be used when a device wants to add a binding to its own table
@@ -189,5 +190,6 @@ private:
  * @param entry binding to add
  */
 CHIP_ERROR AddBindingEntry(const EmberBindingTableEntry & entry);
+} // namespace app
 
 } // namespace chip

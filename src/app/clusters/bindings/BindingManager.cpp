@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2022 Project CHIP Authors
+ *    Copyright (c) 2022-2025 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -207,6 +207,7 @@ exit:
     return error;
 }
 
+namespace app {
 CHIP_ERROR AddBindingEntry(const EmberBindingTableEntry & entry)
 {
     CHIP_ERROR err = BindingTable::GetInstance().Add(entry);
@@ -234,5 +235,6 @@ CHIP_ERROR AddBindingEntry(const EmberBindingTableEntry & entry)
 
     return CHIP_NO_ERROR;
 }
+} // namespace app
 
 } // namespace chip
