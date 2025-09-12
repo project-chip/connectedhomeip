@@ -111,10 +111,6 @@ class RealtekApp(Enum):
         else:
             raise Exception('Unknown app type: %r' % self)
 
-    def BuildRoot(self, root, os_env):
-        if (os_env == RtkOsUsed.ZEPHYR):
-            return os.path.join(root, 'examples', self.ExampleName, 'realtek', 'zephyr')
-
 
 class RealtekBuilder(Builder):
 
@@ -122,7 +118,6 @@ class RealtekBuilder(Builder):
                  root,
                  runner,
                  board: RealtekBoard = RealtekBoard.RTL8777G,
-                 os_env: RtkOsUsed = RtkOsUsed.FREERTOS,
                  app: RealtekApp = RealtekApp.LIGHT,
                  enable_cli: bool = False,
                  enable_rpc: bool = False,
@@ -137,8 +132,10 @@ class RealtekBuilder(Builder):
 
         if self.board == RealtekBoard.RTL87X2G:
             self.os_env = RtkOsUsed.ZEPHYR
-        else:
+        elif self.board == RealtekBoard.RTL8777G:
             self.os_env = RtkOsUsed.FREERTOS
+        else:
+            raise Exception('Unknown board type: %r' % self.board)
 
     def CmakeBuildFlags(self) -> str:
         flags = [
@@ -165,10 +162,9 @@ class RealtekBuilder(Builder):
         return " ".join(flags)
 
     def get_cmd_prefixes(self):
-        if not self._runner.dry_run:
-            # Zephyr base
-            if 'ZEPHYR_REALTEK_BASE' not in os.environ:
-                raise Exception("Realtek builds require ZEPHYR_REALTEK_BASE")
+        # Zephyr base
+        if 'ZEPHYR_REALTEK_BASE' not in os.environ:
+            raise Exception("Realtek builds require ZEPHYR_REALTEK_BASE")
 
         cmd = 'export ZEPHYR_BASE="$ZEPHYR_REALTEK_BASE"\n'
 
@@ -178,7 +174,10 @@ class RealtekBuilder(Builder):
         return cmd
 
     def generate(self):
-        if self.os_env == RtkOsUsed.FREERTOS:
+        if self.os_env != RtkOsUsed.FREERTOS:
+            # For freertos, app.ld needs to be precompiled with gcc
+            return
+        else:
             cmd = 'arm-none-eabi-gcc -D BUILD_BANK=0 -E -P -x c {ot_src_dir}/src/bee4/{board_name}/app.ld -o {ot_src_dir}/src/bee4/{board_name}/app.ld.gen'.format(
                 ot_src_dir=self.ot_src_dir,
                 board_name=self.board.BoardName)
@@ -203,7 +202,7 @@ class RealtekBuilder(Builder):
             cmd += '\nsource "$ZEPHYR_BASE/zephyr-env.sh"'
             cmd += '\nwest build -b rtl87x2g_evb -d {out_folder} {example_folder} --pristine'.format(
                 out_folder=self.output_dir,
-                example_folder=self.app.BuildRoot(self.root, self.os_env))
+                example_folder=os.path.join(self.root, 'examples', self.app.ExampleName, 'realtek', 'zephyr'))
             self._Execute(['bash', '-c', cmd], title='Building ' + self.identifier)
 
     def build_outputs(self):
