@@ -67,7 +67,7 @@ PushAvStreamTransportServer * FindClusterOnEndpoint(EndpointId endpointId)
                 .fixedClusterInstanceCount = kPushAvStreamTransportFixedClusterCount,
                 .maxClusterInstanceCount         = kPushAvStreamTransportMaxClusterCount,
             },
-            integrationDelegate);
+            integrationDelegate));
 }
 
 } // namespace
