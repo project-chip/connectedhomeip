@@ -46,11 +46,11 @@ bool FindEndpointWithLog(EndpointId endpointId, ClusterId clusterId, uint16_t fi
     return true;
 }
 
-/// Fetch the featuremap from ember for the given endpoint/cluster
-///
-/// on error 0 is returned
-uint32_t LoadFeatureMap(EndpointId endpointId, ClusterId clusterId)
+} // namespace
+
+uint32_t CodegenClusterIntegration::LoadFeatureMap(EndpointId endpointId, ClusterId clusterId)
 {
+    {
     using Traits = NumericAttributeTraits<uint32_t>;
     Traits::StorageType temp;
     uint8_t * readable = Traits::ToAttributeStoreRepresentation(temp);
@@ -68,7 +68,7 @@ uint32_t LoadFeatureMap(EndpointId endpointId, ClusterId clusterId)
     return Traits::StorageToWorking(temp);
 }
 
-} // namespace
+}
 
 void CodegenClusterIntegration::RegisterServer(const RegisterServerOptions & options, Delegate & delegate)
 {
