@@ -103,20 +103,6 @@ void DeviceInfoProvider::SetStorageDelegate(PersistentStorageDelegate * storage)
     mStorage = storage;
 }
 
-bool DeviceInfoProvider::GetDefaultLocale(MutableCharSpan & outLocale)
-{
-    SupportedLocalesIterator * it;
-    bool found = false;
-    if (gDeviceInfoProvider && (it = gDeviceInfoProvider->IterateSupportedLocales()))
-    {
-        CharSpan tempLocale;
-        found = it->Next(tempLocale);
-        CopyCharSpanToMutableCharSpan(tempLocale, outLocale);
-        it->Release();
-    }
-    return found;
-}
-
 /**
  * Instance getter for the global DeviceInfoProvider.
  *

@@ -19,8 +19,6 @@ source_set("localization-configuration-server") {
   sources = [
     "localization-configuration-cluster.cpp",
     "localization-configuration-cluster.h",
-    "localization-configuration-logic.cpp",
-    "localization-configuration-logic.h",
   ]
 
   public_deps = [
