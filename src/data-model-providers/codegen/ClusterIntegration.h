@@ -90,7 +90,7 @@ public:
     {
         EndpointId endpointId;
         ClusterId clusterId;
-        uint16_t fixedClusterServerEndpointCount; // Number of fixed endpoints that contain this cluster in ember configuration.
+        uint16_t fixedClusterInstanceCount; // Number of fixed endpoints that contain this server cluster in ember configuration.
         uint16_t maxClusterInstanceCount;         // This is how many endpoints are supported by the delegate (0-based index).
         bool fetchFeatureMap;                     // Read feature map attribute from ember.
         bool fetchOptionalAttributes;             // Read the enabling of the first 32 optional attributes from ember.
