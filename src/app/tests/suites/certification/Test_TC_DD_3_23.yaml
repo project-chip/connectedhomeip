@@ -1,0 +1,68 @@
+# Copyright (c) 2025 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+name: 3.3.23 [TC-DD-3.23] NFC-based commissioning [DUT as Commissionee]
+
+PICS:
+    - MCORE.ROLE.COMMISSIONER
+    - MCORE.DD.NFC
+    - MCORE.DD.NTL
+
+config:
+    nodeId: 0x12344321
+    cluster: "Basic Information"
+    endpoint: 0
+
+tests:
+    - label: |
+        Step 1: Bring the NFC reader close to the DUT’s NFC tag.
+      disabled: true
+
+    - label: |
+        Step 2:
+        If "Custom Flow" field of Onboarding data corresponds to "User-Intent commissioning flow",
+        perform user action required to enter commissioning mode.
+      disabled: true
+
+    - label: |
+        Step 3:
+        If "Custom Flow" field of Onboarding data corresponds to "Custom commissioning flow",
+        perform vendor-specified interactions to enter commissioning mode.
+      disabled: true
+
+    - label: |
+        Step 4: Start Thread Border Router and perform NFC-based commissioning.
+        
+      verification: |
+        # Start the Thread Border Router with:
+        ./certification-tool/backend/test_collections/matter/scripts/OTBR/otbr_start.sh
+        
+        # Copy the Thread dataset that is displayed on the line starting with "Param: 'dataset active -x'"
+        
+        # Launch NFC-based commissioning with chip-tool (replace XXXXXXX by the Thread dataset)
+        ./apps/chip-tool pairing nfc-thread 1 hex:XXXXXXX 20202021 3840
+        
+        Expected result:
+        - chip-tool should complete without error
+        - The traces should show that commissioning completed successfully.
+      disabled: true
+      
+    - label: |
+        Step 5: Stop the Thread Border Router
+      verification: |
+        # Stop the Thread Border Router with:
+        ./certification-tool/backend/test_collections/matter/scripts/OTBR/otbr_stop.sh
+      disabled: true
+
+
