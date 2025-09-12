@@ -90,10 +90,11 @@ public:
     {
         EndpointId endpointId;
         ClusterId clusterId;
-        uint16_t fixedClusterInstanceCount; // Number of fixed endpoints that contain this server cluster in the ember configuration.
-        uint16_t maxClusterInstanceCount;   // This is how many endpoints are supported by the delegate (0-based index).
-        bool fetchFeatureMap;               // Read feature map attribute from ember.
-        bool fetchOptionalAttributes;       // Read the enabling of the first 32 optional attributes from ember.
+        uint16_t
+            fixedClusterInstanceCount;    // Number of fixed endpoints that contain this server cluster in the ember configuration.
+        uint16_t maxClusterInstanceCount; // This is how many endpoints are supported by the delegate (0-based index).
+        bool fetchFeatureMap;             // Read feature map attribute from ember.
+        bool fetchOptionalAttributes;     // Read the enabling of the first 32 optional attributes from ember.
     };
 
     /// Loads required data from ember and calls `CreateRegistration` once all the data
@@ -115,8 +116,9 @@ public:
     {
         EndpointId endpointId;
         ClusterId clusterId;
-        uint16_t fixedClusterInstanceCount; // Number of fixed endpoints that contain this server cluster in the ember configuration.
-        uint16_t maxClusterInstanceCount;   // This is how many endpoints are supported by the delegate (0-based index).
+        uint16_t
+            fixedClusterInstanceCount;    // Number of fixed endpoints that contain this server cluster in the ember configuration.
+        uint16_t maxClusterInstanceCount; // This is how many endpoints are supported by the delegate (0-based index).
     };
 
     /// A typical implementation is that this gets called in `Matter....ClusterServerShutdownCallback`.
@@ -129,7 +131,8 @@ public:
     {
         EndpointId endpointId;
         ClusterId clusterId;
-        uint16_t fixedClusterInstanceCount; // Number of fixed endpoints that contain this server cluster in the ember configuration.
+        uint16_t
+            fixedClusterInstanceCount;    // Number of fixed endpoints that contain this server cluster in the ember configuration.
         uint16_t maxClusterInstanceCount; // This is how many cluster instances are supported by the delegate (0-based indexing, so
                                           // indices smaller than this are valid).
     };
