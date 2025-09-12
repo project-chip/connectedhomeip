@@ -142,8 +142,8 @@ CHIP_ERROR VendorIdVerificationClient::VerifyVendorId(Messaging::ExchangeManager
     request.clientChallenge = clientChallengeSpan;
 
     auto onSuccessCb = [&, getSession, info, kClientChallenge](const app::ConcreteCommandPath & aPath,
-                                                                            const app::StatusIB & aStatus,
-                                                                            const decltype(request)::ResponseType & responseData) {
+                                                               const app::StatusIB & aStatus,
+                                                               const decltype(request)::ResponseType & responseData) {
         ChipLogProgress(Controller, "Successfully received SignVIDVerificationResponse");
         ByteSpan clientChallenge{ kClientChallenge };
         ByteSpan attestationChallenge = getSession().Value()->AsSecureSession()->GetCryptoContext().GetAttestationChallenge();
