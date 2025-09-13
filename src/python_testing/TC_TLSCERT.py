@@ -41,10 +41,10 @@ from mobly import asserts
 from TC_TLS_Utils import TLSUtils
 
 import matter.clusters as Clusters
+from matter.ChipDeviceCtrl import TransportPayloadCapability
 from matter.interaction_model import Status
 from matter.testing import matter_asserts
 from matter.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main, has_cluster, run_if_endpoint_matches
-from matter.ChipDeviceCtrl import TransportPayloadCapability
 from matter.utils import CommissioningBuildingBlocks
 
 
