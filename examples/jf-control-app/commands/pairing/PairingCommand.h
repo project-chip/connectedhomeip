@@ -35,11 +35,11 @@ using namespace ::chip;
 using namespace ::chip::Credentials;
 
 using JCMDeviceCommissioner            = chip::Controller::JCM::DeviceCommissioner;
-using JCMTrustVerificationStateMachine = chip::Controller::JCM::TrustVerificationStateMachine;
-using JCMTrustVerificationDelegate     = chip::Controller::JCM::TrustVerificationDelegate;
-using JCMTrustVerificationStage        = chip::Controller::JCM::TrustVerificationStage;
-using JCMTrustVerificationError        = chip::Controller::JCM::TrustVerificationError;
-using JCMTrustVerificationInfo         = chip::Controller::JCM::TrustVerificationInfo;
+using JCMTrustVerificationStateMachine = chip::Credentials::JCM::TrustVerificationStateMachine;
+using JCMTrustVerificationDelegate     = chip::Credentials::JCM::TrustVerificationDelegate;
+using JCMTrustVerificationStage        = chip::Credentials::JCM::TrustVerificationStage;
+using JCMTrustVerificationError        = chip::Credentials::JCM::TrustVerificationError;
+using JCMTrustVerificationInfo         = chip::Credentials::JCM::TrustVerificationInfo;
 
 enum class PairingMode
 {
