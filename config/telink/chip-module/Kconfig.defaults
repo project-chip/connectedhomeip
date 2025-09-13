@@ -88,7 +88,7 @@ config HEAP_MEM_POOL_SIZE
 
 config COMMON_LIBC_MALLOC_ARENA_SIZE
     default 20716 if SOC_SERIES_RISCV_TELINK_B9X_RETENTION || (SOC_RISCV_TELINK_TL321X && ZEPHYR_VERSION_3_3) || (SOC_RISCV_TELINK_TL721X && SOC_SERIES_RISCV_TELINK_TLX_RETENTION)
-    default 16954 if (SOC_RISCV_TELINK_TL321X && !ZEPHYR_VERSION_3_3)
+    default 19000 if (SOC_RISCV_TELINK_TL321X && !ZEPHYR_VERSION_3_3)
     default 18000 if SOC_RISCV_TELINK_TL721X
     default 29448 if SOC_RISCV_TELINK_W91
     default 12288
@@ -232,6 +232,10 @@ endif
 # Config dynamic interrupts to have posibility to switch between BLE/Thread radio drivers
 config DYNAMIC_INTERRUPTS
     default y
+
+config RISCV_MTVEC_VECTORED_MODE
+	bool
+    default n
 
 config CHIP_OTA_REQUESTOR
     default y
@@ -430,9 +434,7 @@ config CHIP_WIFI_CONNECTION_RECOVERY_JITTER
       within range [-JITTER; +JITTER].
 
 config NET_MGMT_EVENT_STACK_SIZE
-    default 1280 if SOC_RISCV_TELINK_W91
-    default 1128 if ZEPHYR_VERSION_3_3
-    default 1250
+    default 2048
 
 if !ZEPHYR_VERSION_3_3
 config IPC_SERVICE_BACKEND_ICMSG_WQ_STACK_SIZE
@@ -441,10 +443,10 @@ config IPC_SERVICE_BACKEND_ICMSG_WQ_STACK_SIZE
 endif
 
 config TELINK_W91_WIFI_EVENT_THREAD_STACK_SIZE
-	default 1136
+    default 1136
 
 config IPC_SERVICE_ICMSG_WORK_QUEUE_STACK_SIZE
-	default 544
+    default 544
 
 endif # CHIP_WIFI
 
