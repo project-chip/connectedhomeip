@@ -94,8 +94,15 @@
             "name": "Run TestTrustVerification",
             "type": "lldb",
             "request": "launch",
-            "program": "${workspaceFolder}/src/controller/tests/jcm/out/test/tests/TestTrustVerification",
-            "cwd": "${workspaceFolder}/src/controller/tests/jcm/out/test/tests"
+            "program": "${workspaceFolder}/src/credentials/tests/jcm/out/test/tests/TestTrustVerification",
+            "cwd": "${workspaceFolder}/src/credentials/tests/jcm/out/test/tests"
+        },
+        {
+            "name": "Run TestVendorIdVerificationClient",
+            "type": "lldb",
+            "request": "launch",
+            "program": "${workspaceFolder}/src/credentials/tests/jcm/out/test/tests/TestVendorIdVerificationClient",
+            "cwd": "${workspaceFolder}/src/credentials/tests/jcm/out/test/tests"
         },
         {
             "name": "Run TestCommands",
@@ -675,8 +682,15 @@
             "name": "Run TestTrustVerification",
             "type": "lldb",
             "request": "launch",
-            "program": "${workspaceFolder}/src/controller/tests/jcm/out/test/tests/TestTrustVerification",
-            "cwd": "${workspaceFolder}/src/controller/tests/jcm/out/test/tests"
+            "program": "${workspaceFolder}/src/credentials/tests/jcm/out/test/tests/TestTrustVerification",
+            "cwd": "${workspaceFolder}/src/credentials/tests/jcm/out/test/tests"
+        },
+        {
+            "name": "Run TestVendorIdVerificationClient",
+            "type": "lldb",
+            "request": "launch",
+            "program": "${workspaceFolder}/src/credentials/tests/jcm/out/test/tests/TestVendorIdVerificationClient",
+            "cwd": "${workspaceFolder}/src/credentials/tests/jcm/out/test/tests"
         },
         {
             "name": "Run TestCommands",
