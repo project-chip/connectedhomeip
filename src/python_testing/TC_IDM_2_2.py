@@ -171,17 +171,17 @@ class TC_IDM_2_2(MatterBaseTest, BasicCompositionTests):
                                           f"AttributeList not found in cluster {cluster_id} on endpoint {ep}")
 
                         # Verify that returned attributes match the AttributeList
-                        if global_attribute_ids.cluster_id_type(cluster_id) == global_attribute_ids.ClusterIdType.kStandard:
-                            returned_attrs = sorted([x for x in read_response.tlvAttributes[ep][cluster_id].keys()])
-                            attr_list = sorted([x for x in read_response.tlvAttributes[ep][cluster_id][
-                                ClusterObjects.ALL_CLUSTERS[cluster_id].Attributes.AttributeList.attribute_id]])
-                            asserts.assert_equal(
-                                returned_attrs,
-                                attr_list,
-                                f"Returned attributes don't match AttributeList for cluster {cluster_id} on endpoint {ep}")
+                        returned_attrs = sorted([x for x in read_response.tlvAttributes[ep][cluster_id].keys()])
+                        attr_list = sorted([x for x in read_response.tlvAttributes[ep][cluster_id][
+                            ClusterObjects.ALL_CLUSTERS[cluster_id].Attributes.AttributeList.attribute_id]])
+                        asserts.assert_equal(
+                            returned_attrs,
+                            attr_list,
+                            f"Returned attributes don't match AttributeList for cluster {cluster_id} on endpoint {ep}")
             else:
                 # For global attributes, we expect them to be present across all clusters
                 if attribute_id is not None:
+                    # Reading a specific global attribute - verify it exists in all clusters
                     for cluster in read_response.tlvAttributes[ep].values():
                         asserts.assert_in(attribute_id, cluster,
                                           f"Global attribute {attribute_id} not found in cluster on endpoint {ep}")
