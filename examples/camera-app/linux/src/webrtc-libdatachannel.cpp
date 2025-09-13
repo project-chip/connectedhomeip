@@ -272,11 +272,12 @@ public:
         }
     }
 
-    std::shared_ptr<WebRTCTrack> AddTrack(MediaType mediaType) override
+    std::shared_ptr<WebRTCTrack> AddTrack(MediaType mediaType, const std::string & mid) override
     {
         if (mediaType == MediaType::Video)
         {
-            rtc::Description::Video vMedia("video", rtc::Description::Direction::SendOnly);
+            std::string videoMid = mid.empty() ? "video" : mid;
+            rtc::Description::Video vMedia(videoMid, rtc::Description::Direction::SendOnly);
             vMedia.addH264Codec(kVideoH264PayloadType);
             vMedia.setBitrate(kVideoBitRate);
             vMedia.addSSRC(kSSRC, "video-stream", "stream1", "video-stream");
@@ -286,7 +287,8 @@ public:
 
         if (mediaType == MediaType::Audio)
         {
-            rtc::Description::Audio aMedia("audio", rtc::Description::Direction::SendOnly);
+            std::string audioMid = mid.empty() ? "audio" : mid;
+            rtc::Description::Audio aMedia(audioMid, rtc::Description::Direction::SendOnly);
             aMedia.addOpusCodec(kOpusPayloadType);
             aMedia.setBitrate(kAudioBitRate);
             aMedia.addSSRC(kAudioSSRC, "audio-stream", "stream1", "audio-stream");

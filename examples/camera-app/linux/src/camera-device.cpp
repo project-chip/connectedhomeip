@@ -1376,6 +1376,7 @@ CameraError CameraDevice::RemoveZoneTrigger(const uint16_t zoneID)
 void CameraDevice::HandleSimulatedZoneTriggeredEvent(uint16_t zoneID)
 {
     mZoneManager.OnZoneTriggeredEvent(zoneID, ZoneEventTriggeredReasonEnum::kMotion);
+    mPushAVTransportManager.OnZoneTriggeredEvent(zoneID);
 }
 
 void CameraDevice::HandleSimulatedZoneStoppedEvent(uint16_t zoneID)

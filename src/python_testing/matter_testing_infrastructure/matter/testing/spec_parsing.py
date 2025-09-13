@@ -1063,7 +1063,7 @@ def dm_from_spec_version(specification_version: uint) -> PrebuiltDataModelDirect
     # However, 1.3 allowed the dot to be any value
     if specification_version < uint(0x01040000):
         # The expression (specification_version & uint(0xFFFF00FF)) might be inferred as int by mypy.
-        specification_version = uint(int(specification_version) & int(uint(0xFFFF00FF)))
+        specification_version = typing.cast(uint, specification_version & uint(0xFFFF00FF))
 
     version_to_dm = {0x01030000: PrebuiltDataModelDirectory.k1_3,
                      0x01040000: PrebuiltDataModelDirectory.k1_4,

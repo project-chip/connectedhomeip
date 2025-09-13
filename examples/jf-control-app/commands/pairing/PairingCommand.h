@@ -261,9 +261,9 @@ public:
 
     /////////// JCMTrustVerificationDelegate /////////
     void OnProgressUpdate(JCMDeviceCommissioner & commissioner, JCMTrustVerificationStage stage, JCMTrustVerificationInfo & info,
-                          JCMTrustVerificationError error);
-    void OnAskUserForConsent(JCMDeviceCommissioner & commissioner, JCMTrustVerificationInfo & info);
-    void OnVerifyVendorId(JCMDeviceCommissioner & commissioner, JCMTrustVerificationInfo & info);
+                          JCMTrustVerificationError error) override;
+    void OnAskUserForConsent(JCMDeviceCommissioner & commissioner, JCMTrustVerificationInfo & info) override;
+    void OnVerifyVendorId(JCMDeviceCommissioner & commissioner, JCMTrustVerificationInfo & info) override;
 
 private:
     CHIP_ERROR RunInternal(NodeId remoteId);

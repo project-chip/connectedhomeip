@@ -33,43 +33,27 @@
 #     factory-reset: true
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
-import datetime
 import random
 import string
-from typing import List, Optional, Union
 
 import test_plan_support
-from cryptography import x509
-from cryptography.hazmat.primitives import hashes, serialization
-from cryptography.hazmat.primitives.asymmetric import ec, rsa, utils
-from cryptography.x509 import CertificateBuilder, random_serial_number
-from cryptography.x509.oid import NameOID
-from ecdsa.curves import curve_by_name
 from mobly import asserts
-from pyasn1.codec.der.decoder import decode as der_decoder
-from pyasn1.error import PyAsn1Error
-from pyasn1_modules import rfc2986, rfc5480
+from TC_TLS_Utils import TLSUtils
 
 import matter.clusters as Clusters
-from matter import ChipDeviceCtrl
-from matter.clusters.Types import Nullable, NullValue
-from matter.interaction_model import InteractionModelError, Status
+from matter.interaction_model import Status
 from matter.testing import matter_asserts
 from matter.testing.conversions import hex_from_bytes
 from matter.testing.matter_testing import (MatterBaseTest, TestStep, default_matter_test_main, has_cluster, matchers,
                                            run_if_endpoint_matches)
+
 from matter.utils import CommissioningBuildingBlocks
 
 
 class TC_TLSCERT(MatterBaseTest):
-    class CertWithKey:
-        def __init__(self, cert: bytes, key: rsa.RSAPrivateKey):
-            self.cert = cert
-            self.key = key
-
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-
+        
     def get_key(self) -> rsa.RSAPrivateKey:
         return rsa.generate_private_key(
             public_exponent=65537, key_size=2048
@@ -323,7 +307,7 @@ class TC_TLSCERT(MatterBaseTest):
                 resp.statusCode, Clusters.OperationalCredentials.Enums.NodeOperationalCertStatusEnum.kOk)
 
     class TwoFabricData:
-        def __init__(self, cr1_cmd, cr2_cmd):
+        def __init__(self, cr1_cmd: TLSUtils, cr2_cmd: TLSUtils):
             self.cr1_cmd = cr1_cmd
             self.cr2_cmd = cr2_cmd
 
@@ -340,13 +324,13 @@ class TC_TLSCERT(MatterBaseTest):
                 f'{step_prefix}.5', "CR1 sends RemoveClientCertificate command with CCDID set to ccdidToClean[i] for all entries returned.", test_plan_support.verify_success()),
         ]
 
-    async def common_setup(self, step_prefix: string = "1") -> TargetedFabric:
+    async def common_setup(self, step_prefix: string = "1") -> TLSUtils:
         self.step(f'{step_prefix}.1')
         attributes = Clusters.TlsCertificateManagement.Attributes
         endpoint = self.get_endpoint(default=1)
 
         # Establishing CR1 controller
-        cr1_cmd = self.TargetedFabric(self, endpoint=endpoint)
+        cr1_cmd = TLSUtils(self, endpoint=endpoint)
 
         self.step(f'{step_prefix}.2')
         root_certs = await cr1_cmd.read_tls_cert_attribute(attributes.ProvisionedRootCertificates)
@@ -390,7 +374,7 @@ class TC_TLSCERT(MatterBaseTest):
         )
         fabric_index_cr2 = noc_resp.fabricIndex
 
-        cr2_cmd = self.TargetedFabric(self, endpoint=endpoint, dev_ctrl=cr2, node_id=cr2_dut_node_id, fabric_index=fabric_index_cr2)
+        cr2_cmd = TLSUtils(self, endpoint=endpoint, dev_ctrl=cr2, node_id=cr2_dut_node_id, fabric_index=fabric_index_cr2)
         return self.TwoFabricData(cr1_cmd=cr1_cmd, cr2_cmd=cr2_cmd)
 
     def pics_TC_TLSCERT_2_2(self):
@@ -455,11 +439,11 @@ class TC_TLSCERT(MatterBaseTest):
         cr2_cmd = setup_data.cr2_cmd
 
         self.step(2)
-        my_root_cert = [self.gen_cert(), self.gen_cert(), self.gen_cert()]
+        my_root_cert = [cr1_cmd.gen_cert(), cr1_cmd.gen_cert(), cr1_cmd.gen_cert()]
 
         self.step(3)
         response = await cr1_cmd.send_provision_root_command(certificate=my_root_cert[0])
-        self.assert_valid_caid(response.caid)
+        cr1_cmd.assert_valid_caid(response.caid)
         my_caid = [response.caid, None, None]
 
         self.step(4)
@@ -519,7 +503,7 @@ class TC_TLSCERT(MatterBaseTest):
 
         self.step(15)
         response = await cr2_cmd.send_provision_root_command(certificate=my_root_cert[2])
-        self.assert_valid_caid(response.caid)
+        cr2_cmd.assert_valid_caid(response.caid)
         my_caid[1] = response.caid
 
         self.step(16)
@@ -625,33 +609,33 @@ class TC_TLSCERT(MatterBaseTest):
         self.step(3)
         for i in range(2):
             response = await cr1_cmd.send_csr_command(nonce=my_nonce[i])
-            self.assert_valid_ccdid(response.ccdid)
+            cr1_cmd.assert_valid_ccdid(response.ccdid)
             my_ccdid[i] = response.ccdid
-            my_csr[i] = self.assert_valid_csr(response, my_nonce[i])
+            my_csr[i] = cr1_cmd.assert_valid_csr(response, my_nonce[i])
             if i > 1:
                 asserts.assert_not_equal(my_ccdid[i-1], my_ccdid[i], "CCDID should be unique")
 
         self.step(4)
         response = await cr2_cmd.send_csr_command(nonce=my_nonce[2])
-        self.assert_valid_ccdid(response.ccdid)
+        cr2_cmd.assert_valid_ccdid(response.ccdid)
         my_ccdid[2] = response.ccdid
-        my_csr[2] = self.assert_valid_csr(response, my_nonce[2])
+        my_csr[2] = cr2_cmd.assert_valid_csr(response, my_nonce[2])
 
         self.step(5)
         # Don't have to use the same root, but may as well
-        root = self.get_key()
-        certs_with_key_1 = self.gen_cert_chain(root, 10)
+        root = cr1_cmd.get_key()
+        certs_with_key_1 = cr1_cmd.gen_cert_chain(root, 10)
         my_intermediate_certs_1 = [x.cert for x in certs_with_key_1]
 
         self.step(6)
-        certs_with_key_2 = self.gen_cert_chain(root, 1)
+        certs_with_key_2 = cr1_cmd.gen_cert_chain(root, 1)
         my_intermediate_certs_2 = [x.cert for x in certs_with_key_2]
         signers = [root, certs_with_key_1[0].key, certs_with_key_2[0].key]
 
         self.step(7)
         my_client_cert = [None, None, None, None]
         for i in range(3):
-            my_client_cert[i] = self.gen_cert_with_key(signers[i], public_key=my_csr[i].public_key(), subject=my_csr[i].subject)
+            my_client_cert[i] = cr1_cmd.gen_cert_with_key(signers[i], public_key=my_csr[i].public_key(), subject=my_csr[i].subject)
 
         self.step(8)
         await cr1_cmd.send_provision_client_command(ccdid=my_ccdid[0], certificate=my_client_cert[0])
@@ -706,10 +690,10 @@ class TC_TLSCERT(MatterBaseTest):
 
         self.step(16)
         response = await cr1_cmd.send_csr_command(ccdid=my_ccdid[0], nonce=my_nonce[3])
-        self.assert_valid_ccdid(response.ccdid)
+        cr1_cmd.assert_valid_ccdid(response.ccdid)
         asserts.assert_equal(response.ccdid, my_ccdid[0], "Expected same ID")
-        my_csr[3] = self.assert_valid_csr(response, my_nonce[3])
-        my_client_cert[3] = self.gen_cert_with_key(root, public_key=my_csr[3].public_key(), subject=my_csr[3].subject)
+        my_csr[3] = cr1_cmd.assert_valid_csr(response, my_nonce[3])
+        my_client_cert[3] = cr1_cmd.gen_cert_with_key(root, public_key=my_csr[3].public_key(), subject=my_csr[3].subject)
 
         self.step(17)
         await cr1_cmd.send_provision_client_command(ccdid=my_ccdid[0], certificate=my_client_cert[3])

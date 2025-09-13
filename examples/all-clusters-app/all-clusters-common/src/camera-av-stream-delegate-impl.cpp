@@ -304,6 +304,16 @@ CameraAVStreamManager::OnTransportReleaseAudioVideoStreams(uint16_t audioStreamI
     return CHIP_NO_ERROR;
 }
 
+const std::vector<VideoStreamStruct> & CameraAVStreamManager::GetAllocatedVideoStreams() const
+{
+    return videoStreamStructs;
+}
+
+const std::vector<AudioStreamStruct> & CameraAVStreamManager::GetAllocatedAudioStreams() const
+{
+    return audioStreamStructs;
+}
+
 void CameraAVStreamManager::InitializeAvailableVideoStreams()
 {
     // Example initialization with different codecs

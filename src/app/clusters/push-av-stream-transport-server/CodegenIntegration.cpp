@@ -134,6 +134,23 @@ void SetTLSClientManagementDelegate(EndpointId endpointId, TlsClientManagementDe
     gServers[arrayIndex].Cluster().SetTLSClientManagementDelegate(delegate);
 }
 
+void SetTlsCertificateManagementDelegate(EndpointId endpointId, TlsCertificateManagementDelegate * delegate)
+{
+    ChipLogProgress(AppServer, "Setting TLS Certificate Management delegate on endpoint %u", endpointId);
+    uint16_t arrayIndex =
+        emberAfGetClusterServerEndpointIndex(endpointId, PushAvStreamTransport::Id, kPushAvStreamTransportFixedClusterCount);
+    if (arrayIndex >= kPushAvStreamTransportMaxClusterCount)
+    {
+        return;
+    }
+
+    if (!gServers[arrayIndex].IsConstructed())
+    {
+        ChipLogError(AppServer, "Push AV Stream transport is NOT yet constructed. Cannot set TLS Certificate Management delegate");
+        return;
+    }
+    gServers[arrayIndex].Cluster().SetTlsCertificateManagementDelegate(delegate);
+}
 } // namespace PushAvStreamTransport
 } // namespace Clusters
 } // namespace app

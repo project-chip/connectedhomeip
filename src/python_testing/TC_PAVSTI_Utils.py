@@ -21,27 +21,21 @@ import os
 import random
 import shutil
 import tempfile
-from typing import List, Optional, Union
+from typing import Optional
 
 import psutil
 import requests
 from cryptography import x509
-from cryptography.hazmat.primitives import hashes, serialization
-from cryptography.hazmat.primitives.asymmetric import ec, utils
-from ecdsa.curves import curve_by_name
-from mobly import asserts
-from pyasn1.codec.der.decoder import decode as der_decoder
-from pyasn1.error import PyAsn1Error
-from pyasn1_modules import rfc2986, rfc5480
-
+from cryptography.hazmat.primitives import serialization
+from TC_TLS_Utils import TLSUtils
 import matter.clusters as Clusters
 from matter import ChipDeviceCtrl
 from matter.clusters.Types import Nullable, NullValue
-from matter.interaction_model import InteractionModelError, Status
 from matter.testing.conversions import hex_from_bytes
 from matter.testing.matter_testing import matchers
+from matter.interaction_model import Status
+
 from matter.testing.tasks import Subprocess
-from matter.tlv import uint
 
 
 class PushAvServerProcess(Subprocess):
@@ -141,6 +135,7 @@ class PushAvServerProcess(Subprocess):
 
 class PAVSTIUtils:
     """Utils for Push AV TC's TLS requirements."""
+
 
     def assert_valid_caid(self, caid: int) -> None:
         asserts.assert_greater_equal(caid, 0, "Invalid CAID returned")
@@ -341,26 +336,26 @@ class PAVSTIUtils:
             host_ip = self._get_private_ip()
             logging.info(f"Using IP: {host_ip} as hostname to provision TLS Endpoint")
 
+        tls_utils = TLSUtils(self, endpoint=endpoint)
         # Create Kep Pair for camera as it currently tries to access it from /tmp/pavstest when uploading.
         # TODO: Remove once camera-app supports TLS
         server.create_key_pair()
         root_cert_der = server.get_root_cert()
-        prc_result = await self.send_provision_root_command(endpoint=endpoint, certificate=root_cert_der)
-        self.assert_valid_caid(prc_result.caid)
+        prc_result = await tls_utils.send_provision_root_command(certificate=root_cert_der)
+        tls_utils.assert_valid_caid(prc_result.caid)
 
         csr_nonce = random.randbytes(32)
-        csr_result = await self.send_csr_command(endpoint=endpoint, nonce=csr_nonce)
-        self.assert_valid_ccdid(csr_result.ccdid)
-        self.assert_valid_csr(csr_result, csr_nonce)
+        csr_result = await tls_utils.send_csr_command(nonce=csr_nonce)
+        tls_utils.assert_valid_ccdid(csr_result.ccdid)
+        tls_utils.assert_valid_csr(csr_result, csr_nonce)
 
         server.sign_csr(csr_result.csr)
         device_cert_der = server.get_device_certificate()
 
-        await self.send_provision_client_command(
-            endpoint=endpoint, certificate=device_cert_der, ccdid=csr_result.ccdid
+        await tls_utils.send_provision_client_command(
+            certificate=device_cert_der, ccdid=csr_result.ccdid
         )
-        result = await self.send_provision_tls_endpoint_command(
-            endpoint=endpoint,
+        result = await tls_utils.send_provision_tls_endpoint_command(
             hostname=host_ip.encode('utf-8'),
             port=1234,
             expected_status=Status.Success,
