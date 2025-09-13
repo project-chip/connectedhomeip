@@ -42,8 +42,9 @@ void InitDataModelHandler() {}
 
 namespace chip {
 namespace app {
-    void DispatchSingleClusterCommand(const ConcreteCommandPath & aRequestCommandPath, chip::TLV::TLVReader & aReader,
-                                  CommandHandler * apCommandObj) {}
+void DispatchSingleClusterCommand(const ConcreteCommandPath & aRequestCommandPath, chip::TLV::TLVReader & aReader,
+                                  CommandHandler * apCommandObj)
+{}
 } // namespace app
 namespace Credentials {
 namespace JCM {
@@ -137,8 +138,7 @@ const chip::Test::MockNodeConfig & TestMockNodeConfig()
     return config;
 }
 
-class VendorIdVerificationClientTest : public chip::Test::AppContext,
-                                       public Credentials::JCM::VendorIdVerificationClient
+class VendorIdVerificationClientTest : public chip::Test::AppContext, public Credentials::JCM::VendorIdVerificationClient
 {
 public:
     // Performs shared setup for all tests in the test suite.  Run once for the whole suite.
@@ -179,7 +179,7 @@ public:
     void OnVendorIdVerficationComplete(const CHIP_ERROR & err)
     {
         mVerificationCompleteCalled = true;
-        mVerificationResult = err;
+        mVerificationResult         = err;
     }
 
     void TestVerificationSucceeds();
@@ -193,7 +193,7 @@ public:
     void TestVerificationFailsDueToInvalidOperationalTrustAnchor();
 
 protected:
-   void SetUp() override
+    void SetUp() override
     {
         AppContext::SetUp();
         mOldProvider =
@@ -201,18 +201,18 @@ protected:
         SetMockNodeConfig(TestMockNodeConfig());
 
         mInfo.adminFabricIndex = GetJFBFabricIndex();
-        mInfo.adminVendorId = VendorId::TestVendor1;
+        mInfo.adminVendorId    = VendorId::TestVendor1;
         mInfo.adminNOC.CopyFromSpan(GetJFBNodeCertAsset().mCert);
         mInfo.adminICAC.CopyFromSpan(GetJFBIACertAsset().mCert);
         mInfo.adminRCAC.CopyFromSpan(GetJFBRootCertAsset().mCert);
-        mInfo.adminFabricId = GetJFBFabric()->GetFabricId();
+        mInfo.adminFabricId   = GetJFBFabric()->GetFabricId();
         mInfo.adminEndpointId = 1;
     }
 
     void TearDown() override
     {
         mInvalidOperationTrustAnchor = false;
-        mNoOperationTrustAnchor = false;
+        mNoOperationTrustAnchor      = false;
 
         ExpireJFSessionAToB();
 
@@ -224,10 +224,10 @@ protected:
     chip::app::DataModel::Provider * mOldProvider = nullptr;
 
 private:
-    bool mVerificationCompleteCalled = false;
-    CHIP_ERROR mVerificationResult = CHIP_ERROR_INTERNAL;
+    bool mVerificationCompleteCalled  = false;
+    CHIP_ERROR mVerificationResult    = CHIP_ERROR_INTERNAL;
     bool mInvalidOperationTrustAnchor = false;
-    bool mNoOperationTrustAnchor = false;
+    bool mNoOperationTrustAnchor      = false;
     TrustVerificationInfo mInfo;
 };
 
