@@ -99,6 +99,7 @@ RUN set -x \
     shellcheck \
     software-properties-common \
     strace \
+    swig \
     systemd \
     udev \
     unzip \
