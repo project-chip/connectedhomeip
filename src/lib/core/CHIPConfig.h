@@ -1123,6 +1123,15 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
 #endif
 
 /**
+ * @def CHIP_CONFIG_MAX_BINDING_ENTRIES_PER_FABRIC
+ *
+ * @brief Defines the number of binding entries per fabric.
+ */
+#ifndef CHIP_CONFIG_MAX_BINDING_ENTRIES_PER_FABRIC
+#define CHIP_CONFIG_MAX_BINDING_ENTRIES_PER_FABRIC 4
+#endif
+
+/**
  * @def CHIP_CONFIG_MAX_GROUPS_PER_FABRIC
  *
  * @brief Defines the number of groups supported per fabric, see Group Key Management Cluster in specification.

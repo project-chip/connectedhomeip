@@ -26,9 +26,3 @@
 #include <zap-generated/endpoint_config.h>
 
 #endif // !CHIP_CONFIG_SKIP_APP_SPECIFIC_GENERATED_HEADER_INCLUDES
-
-// User options for plugin Binding Table Library
-// TODO: Make this a CHIP_CONFIG value.
-#ifndef MATTER_BINDING_TABLE_SIZE
-#define MATTER_BINDING_TABLE_SIZE 10
-#endif // MATTER_BINDING_TABLE_SIZE

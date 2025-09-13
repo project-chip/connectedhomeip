@@ -81,6 +81,7 @@ ClustersWithInitFunctions:
     - Administrator Commissioning
     - Basic Information
     - Boolean State
+    - Binding
     - Color Control
     - Ethernet Network Diagnostics
     - General Diagnostics
@@ -116,6 +117,7 @@ ClustersWithShutdownFunctions:
     - Barrier Control
     - Basic Information
     - Boolean State
+    - Binding
     - Color Control
     - Door Lock
     - General Diagnostics
