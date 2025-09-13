@@ -58,5 +58,5 @@
 
 
 &storage_partition {
-        reg = <0x00406200 DT_SIZE_K(92)>;
+        reg = <0x00406200 DT_SIZE_K(68)>;
 };
