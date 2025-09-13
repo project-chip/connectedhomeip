@@ -1008,4 +1008,12 @@ void BLEManagerImpl::SwitchToIeee802154(void)
 } // namespace DeviceLayer
 } // namespace chip
 
+#if !defined(CONFIG_ZEPHYR_VERSION_3_3)
+// Implementation for Zephyr Bluetooth host.
+int bt_rand(void * buf, size_t len)
+{
+    return sys_csrand_get(buf, len);
+}
+#endif
+
 #endif // CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
