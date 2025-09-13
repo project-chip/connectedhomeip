@@ -32,6 +32,11 @@
 
 namespace chip {
 
+namespace Test {
+// Forward declaration of CommissioningWindowManagerTestAccess class tests to allow it to be friends with CommissioningWindowManager
+class CommissioningWindowManagerTestAccess;
+} // namespace Test
+
 enum class CommissioningWindowAdvertisement
 {
     kAllSupported,
@@ -226,6 +231,7 @@ private:
     // without having to wait 3 minutes.
     Optional<System::Clock::Seconds32> mMinCommissioningTimeoutOverride;
 
+    friend class Test::CommissioningWindowManagerTestAccess;
     // The PASE session we are using, so we can handle CloseSession properly.
     SessionHolderWithDelegate mPASESession;
 
