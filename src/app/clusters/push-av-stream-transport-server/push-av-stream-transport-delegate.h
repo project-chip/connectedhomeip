@@ -217,9 +217,9 @@ public:
      * @brief Validates size of motion zone List.
      *
      * @param zoneSize Size for the requested zone list
-     * @return true if URL is valid, false otherwise
+     * @return true if the motion zone size is less than the defined maximum, false otherwise
      */
-    virtual bool ValidateMotionZoneSize(uint16_t zoneSize) = 0;
+    virtual bool ValidateMotionZoneSize(size_t zoneSize) = 0;
 
     /**
      * @brief Gets the status of the transport.

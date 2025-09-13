@@ -333,7 +333,7 @@ public:
         return Status::Success;
     }
 
-    bool ValidateMotionZoneSize(uint16_t zoneSize) override
+    bool ValidateMotionZoneSize(size_t zoneSize) override
     {
         // TODO: Validate motion zone size
         // Returning true to pass through checks in the Server Implementation.
