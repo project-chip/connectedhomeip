@@ -480,6 +480,7 @@ GstElement * CameraDevice::CreateVideoPipeline(const std::string & device, int w
     GstElement * capsfilter1  = gst_element_factory_make("capsfilter", "filter1");
     GstElement * capsfilter2  = gst_element_factory_make("capsfilter", "filter2");
     GstElement * videoconvert = gst_element_factory_make("videoconvert", "videoconvert");
+    GstElement * overlay      = gst_element_factory_make("textoverlay", "overlay");
     GstElement * x264enc      = gst_element_factory_make("x264enc", "encoder");
     GstElement * appsink      = gst_element_factory_make("appsink", "appsink");
     GstElement * source       = nullptr;
@@ -499,6 +500,7 @@ GstElement * CameraDevice::CreateVideoPipeline(const std::string & device, int w
         { capsfilter1, "filter1" },       //
         { videoconvert, "videoconvert" }, //
         { capsfilter2, "filter2" },       //
+        { overlay, "overlay" },           //
         { x264enc, "encoder" },           //
         { appsink, "appsink" }            //
     };
@@ -509,7 +511,8 @@ GstElement * CameraDevice::CreateVideoPipeline(const std::string & device, int w
     {
         ChipLogError(Camera, "Not all elements could be created.");
         // Unreference the elements that were created
-        GstreamerPipepline::unrefGstElements(pipeline, source, capsfilter1, videoconvert, capsfilter2, x264enc, appsink);
+        GstreamerPipepline::unrefGstElements(pipeline, source, capsfilter1, videoconvert, capsfilter2, overlay, x264enc,
+                                             appsink);
         error = CameraError::ERROR_INIT_FAILED;
         return nullptr;
     }
@@ -525,17 +528,21 @@ GstElement * CameraDevice::CreateVideoPipeline(const std::string & device, int w
     g_object_set(capsfilter2, "caps", caps2, nullptr);
     gst_caps_unref(caps2);
 
+    // Configure overlay to show a timestamp
+    g_object_set(overlay, "text", "Date: %Y/%m/%d Time: %H:%M:%S", "valignment", 2, "halignment", 0, "font-desc", "Sans, 12",
+                 "shaded-background", TRUE, nullptr);
+
     // Configure encoder for low‑latency and force IDR at start
     g_object_set(x264enc, "tune", 0, "speed-preset", 1, "key-int-max", framerate * 1, "insert-vui", TRUE, nullptr);
 
     // Configure appsink for receiving H.264 buffers data
     g_object_set(appsink, "emit-signals", TRUE, nullptr);
 
-    // Build pipeline: v4l2src → capsfilter1 → videoconvert → capsfilter2 -> x264enc → appsink
-    gst_bin_add_many(GST_BIN(pipeline), source, capsfilter1, videoconvert, capsfilter2, x264enc, appsink, nullptr);
+    // Build pipeline: v4l2src → capsfilter1 → videoconvert → capsfilter2 -> overlay -> x264enc → appsink
+    gst_bin_add_many(GST_BIN(pipeline), source, capsfilter1, videoconvert, capsfilter2, overlay, x264enc, appsink, nullptr);
 
     // Link the elements
-    if (!gst_element_link_many(source, capsfilter1, videoconvert, capsfilter2, x264enc, appsink, nullptr))
+    if (!gst_element_link_many(source, capsfilter1, videoconvert, capsfilter2, overlay, x264enc, appsink, nullptr))
     {
         ChipLogError(Camera, "CreateVideoPipeline: link failed");
 
