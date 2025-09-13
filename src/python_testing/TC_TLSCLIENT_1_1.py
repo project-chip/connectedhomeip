@@ -37,8 +37,14 @@ from mobly import asserts
 from TC_TLS_Utils import TLSUtils
 
 import matter.clusters as Clusters
+from matter import ChipDeviceCtrl
+from matter.clusters.Types import Nullable, NullValue
+from matter.interaction_model import InteractionModelError, Status
+from matter.testing.matter_testing import (MatterBaseTest, TestStep, default_matter_test_main, has_cluster, matchers,
+                                           run_if_endpoint_matches)
+from matter.tlv import uint
 from matter.interaction_model import Status
-from matter.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main, has_cluster, run_if_endpoint_matches
+
 
 
 class TC_TLSCLIENT_1_1(MatterBaseTest):
@@ -52,6 +58,19 @@ class TC_TLSCLIENT_1_1(MatterBaseTest):
                      "Verify that the DUT sends ProvisionEndpointResponse."),
         ]
         return steps
+
+    async def send_provision_command(self, endpoint: int, hostname: bytes, port: uint, caid: uint,
+                                     ccdid: Union[Nullable, uint] = NullValue, expected_status: Status = Status.Success) -> Union[Clusters.TlsClientManagement.Commands.ProvisionEndpointResponse, InteractionModelError]:
+        try:
+            result = await self.send_single_cmd(cmd=Clusters.TlsClientManagement.Commands.ProvisionEndpoint(hostname=hostname, port=port, caid=caid, ccdid=ccdid),
+                                                endpoint=endpoint, payloadCapability=ChipDeviceCtrl.TransportPayloadCapability.LARGE_PAYLOAD)
+
+            asserts.assert_true(matchers.is_type(result, Clusters.TlsClientManagement.Commands.ProvisionEndpointResponse),
+                                "Unexpected return type for ProvisionEndpoint")
+            return result
+        except InteractionModelError as e:
+            asserts.assert_equal(e.status, expected_status, "Unexpected error returned")
+            return e
 
     @run_if_endpoint_matches(has_cluster(Clusters.TlsClientManagement))
     async def test_TC_TLSCLIENT_1_1(self):
