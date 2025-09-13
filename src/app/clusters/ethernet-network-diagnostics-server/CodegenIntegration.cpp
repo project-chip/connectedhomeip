@@ -39,24 +39,25 @@ LazyRegisteredServerCluster<EthernetDiagnosticsServerCluster> gServers[kEthernet
 class IntegrationDelegate : public CodegenClusterIntegration::Delegate
 {
 public:
-    ServerClusterRegistration & CreateRegistration(EndpointId endpointId, unsigned emberEndpointIndex,
+    ServerClusterRegistration & CreateRegistration(EndpointId endpointId, unsigned clusterInstanceIndex,
                                                    uint32_t optionalAttributeBits, uint32_t featureMap) override
     {
         // Create OptionalAttributeSet from optionalAttributeBits
         EthernetDiagnosticsServerCluster::OptionalAttributeSet optionalAttributeSet(optionalAttributeBits);
 
         // Create the cluster with all required parameters
-        gServers[emberEndpointIndex].Create(DeviceLayer::GetDiagnosticDataProvider(), BitFlags<Feature>(featureMap),
-                                            optionalAttributeSet);
+        gServers[clusterInstanceIndex].Create(DeviceLayer::GetDiagnosticDataProvider(), BitFlags<Feature>(featureMap),
+                                              optionalAttributeSet);
 
-        return gServers[emberEndpointIndex].Registration();
+        return gServers[clusterInstanceIndex].Registration();
     }
 
-    ServerClusterInterface & FindRegistration(unsigned emberEndpointIndex) override
+    ServerClusterInterface * FindRegistration(unsigned clusterInstanceIndex) override
     {
-        return gServers[emberEndpointIndex].Cluster();
+        VerifyOrReturnValue(gServers[clusterInstanceIndex].IsConstructed(), nullptr);
+        return &gServers[clusterInstanceIndex].Cluster();
     }
-    void ReleaseRegistration(unsigned emberEndpointIndex) override { gServers[emberEndpointIndex].Destroy(); }
+    void ReleaseRegistration(unsigned clusterInstanceIndex) override { gServers[clusterInstanceIndex].Destroy(); }
 };
 
 } // namespace
@@ -67,12 +68,12 @@ void emberAfEthernetNetworkDiagnosticsClusterServerInitCallback(EndpointId endpo
 
     CodegenClusterIntegration::RegisterServer(
         {
-            .endpointId                      = endpointId,
-            .clusterId                       = EthernetNetworkDiagnostics::Id,
-            .fixedClusterServerEndpointCount = kEthernetNetworkDiagnosticsFixedClusterCount,
-            .maxEndpointCount                = kEthernetNetworkDiagnosticsMaxClusterCount,
-            .fetchFeatureMap                 = true,
-            .fetchOptionalAttributes         = true,
+            .endpointId                = endpointId,
+            .clusterId                 = EthernetNetworkDiagnostics::Id,
+            .fixedClusterInstanceCount = kEthernetNetworkDiagnosticsFixedClusterCount,
+            .maxClusterInstanceCount   = kEthernetNetworkDiagnosticsMaxClusterCount,
+            .fetchFeatureMap           = true,
+            .fetchOptionalAttributes   = true,
         },
         integrationDelegate);
 }
@@ -83,10 +84,10 @@ void MatterEthernetNetworkDiagnosticsClusterServerShutdownCallback(EndpointId en
 
     CodegenClusterIntegration::UnregisterServer(
         {
-            .endpointId                      = endpointId,
-            .clusterId                       = EthernetNetworkDiagnostics::Id,
-            .fixedClusterServerEndpointCount = kEthernetNetworkDiagnosticsFixedClusterCount,
-            .maxEndpointCount                = kEthernetNetworkDiagnosticsMaxClusterCount,
+            .endpointId                = endpointId,
+            .clusterId                 = EthernetNetworkDiagnostics::Id,
+            .fixedClusterInstanceCount = kEthernetNetworkDiagnosticsFixedClusterCount,
+            .maxClusterInstanceCount   = kEthernetNetworkDiagnosticsMaxClusterCount,
         },
         integrationDelegate);
 }
