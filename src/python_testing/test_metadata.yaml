@@ -133,6 +133,8 @@ not_automated:
           test.
     - name: TC_PAVSTI_Utils.py
       reason: Helper methods for Push AV Integration TCs
+    - name: TC_TLS_Utils.py
+      reason: Helper methods for TC tests dependent on TLS clusters
 
 # This is a list of slow tests (just arbitrarily picked around 20 seconds)
 # used in some script reporting for "be patient" messages as well as potentially
