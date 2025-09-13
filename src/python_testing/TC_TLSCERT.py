@@ -44,6 +44,7 @@ import matter.clusters as Clusters
 from matter.interaction_model import Status
 from matter.testing import matter_asserts
 from matter.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main, has_cluster, run_if_endpoint_matches
+from matter.ChipDeviceCtrl import TransportPayloadCapability
 from matter.utils import CommissioningBuildingBlocks
 
 
@@ -392,7 +393,7 @@ class TC_TLSCERT(MatterBaseTest):
         await cr2_cmd.send_provision_client_command(ccdid=my_ccdid[2], certificate=my_client_cert[2], intermediates=my_intermediate_certs_2)
 
         self.step(11)
-        found_certs = await cr1_cmd.read_client_certs_attribute_as_map(ChipDeviceCtrl.TransportPayloadCapability.LARGE_PAYLOAD)
+        found_certs = await cr1_cmd.read_client_certs_attribute_as_map(TransportPayloadCapability.LARGE_PAYLOAD)
         asserts.assert_equal(len(found_certs), 2, "Expected 2 certificates")
         for i in range(2):
             asserts.assert_in(my_ccdid[i], found_certs, "ProvisionedClientCertificates should contain provisioned client cert")
@@ -400,7 +401,7 @@ class TC_TLSCERT(MatterBaseTest):
                                  my_client_cert[i], "Expected matching certificate detail")
 
         self.step(12)
-        found_certs = await cr2_cmd.read_client_certs_attribute_as_map(ChipDeviceCtrl.TransportPayloadCapability.LARGE_PAYLOAD)
+        found_certs = await cr2_cmd.read_client_certs_attribute_as_map(TransportPayloadCapability.LARGE_PAYLOAD)
         asserts.assert_equal(len(found_certs), 1, "Expected 1 certificate")
         asserts.assert_in(my_ccdid[2], found_certs, "ProvisionedClientCertificates should contain provisioned client cert")
         asserts.assert_equal(found_certs[my_ccdid[2]].clientCertificate, my_client_cert[2], "Expected matching certificate detail")
@@ -443,7 +444,7 @@ class TC_TLSCERT(MatterBaseTest):
         await cr1_cmd.send_provision_client_command(ccdid=my_ccdid[0], certificate=my_client_cert[3])
 
         self.step(18)
-        found_certs = await cr1_cmd.read_client_certs_attribute_as_map(ChipDeviceCtrl.TransportPayloadCapability.LARGE_PAYLOAD)
+        found_certs = await cr1_cmd.read_client_certs_attribute_as_map(TransportPayloadCapability.LARGE_PAYLOAD)
         asserts.assert_equal(len(found_certs), 2, "Expected 2 certificates")
         expected_certs = [my_client_cert[3], my_client_cert[1]]
         for i in range(2):
@@ -452,7 +453,7 @@ class TC_TLSCERT(MatterBaseTest):
                                  expected_certs[i], "Expected matching certificate detail")
 
         self.step(19)
-        found_certs = await cr2_cmd.read_client_certs_attribute_as_map(ChipDeviceCtrl.TransportPayloadCapability.LARGE_PAYLOAD)
+        found_certs = await cr2_cmd.read_client_certs_attribute_as_map(TransportPayloadCapability.LARGE_PAYLOAD)
         asserts.assert_equal(len(found_certs), 1, "Expected 1 certificate")
         asserts.assert_in(my_ccdid[2], found_certs, "ProvisionedClientCertificates should contain provisioned client cert")
         asserts.assert_equal(found_certs[my_ccdid[2]].clientCertificate, my_client_cert[2], "Expected matching certificate detail")
