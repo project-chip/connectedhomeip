@@ -166,7 +166,7 @@ public:
 
             return CHIP_NO_ERROR;
         }
-        
+
         if (mNoOperationTrustAnchor)
         {
             return CHIP_ERROR_CERT_NOT_FOUND;
