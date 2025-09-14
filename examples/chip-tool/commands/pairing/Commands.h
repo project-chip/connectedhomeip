@@ -180,6 +180,23 @@ public:
         PairingCommand("nfc-thread", PairingMode::Nfc, PairingNetworkType::Thread, credsIssuerConfig)
     {}
 };
+
+class PairNfcWiFi : public PairingCommand
+{
+public:
+    PairNfcWiFi(CredentialIssuerCommands * credsIssuerConfig) :
+        PairingCommand("nfc-wifi", PairingMode::Nfc, PairingNetworkType::WiFi, credsIssuerConfig)
+    {}
+};
+
+class PairNfcNone : public PairingCommand
+{
+public:
+    PairNfcNone(CredentialIssuerCommands * credsIssuerConfig) :
+        PairingCommand("nfc-none", PairingMode::Nfc, PairingNetworkType::None, credsIssuerConfig)
+    {}
+};
+
 class PairSoftAP : public PairingCommand
 {
 public:
@@ -260,6 +277,8 @@ void registerCommandsPairing(Commands & commands, CredentialIssuerCommands * cre
         make_unique<PairBleWiFi>(credsIssuerConfig),
         make_unique<PairBleThread>(credsIssuerConfig),
         make_unique<PairNfcThread>(credsIssuerConfig),
+        make_unique<PairNfcWiFi>(credsIssuerConfig),
+        make_unique<PairNfcNone>(credsIssuerConfig),
         make_unique<PairSoftAP>(credsIssuerConfig),
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
         make_unique<PairWiFiPAF>(credsIssuerConfig),

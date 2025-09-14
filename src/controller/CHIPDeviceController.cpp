@@ -2309,7 +2309,7 @@ void DeviceCommissioner::ContinueReadingCommissioningInfo(const CommissioningPar
                                                 Clusters::BasicInformation::Attributes::ProductID::Id));
 
         // Time Synchronization: all attributes
-        VerifyOrReturn(builder.AddAttributePath(kRootEndpointId, Clusters::TimeSynchronization::Id));
+        // VerifyOrReturn(builder.AddAttributePath(kRootEndpointId, Clusters::TimeSynchronization::Id));
 
         // Network Commissioning (all endpoints): Read the feature map and connect time
         // TODO: Expose a flag that disables network setup so we don't need to read this
