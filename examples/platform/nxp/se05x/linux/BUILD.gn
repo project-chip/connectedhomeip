@@ -202,9 +202,7 @@ source_set("app-main") {
   ]
 
   deps += [ "${chip_root}/third_party/simw-top-mini:se05x" ]
-
   defines += [ "EXTERNAL_KEYVALUESTOREMANAGERIMPL_HEADER=<platform/nxp/crypto/se05x/linux_kvs/KeyValueStoreManagerImpl.h>" ]
-
   public_configs = [ ":app-main-config" ]
 }
 

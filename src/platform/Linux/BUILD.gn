@@ -134,6 +134,8 @@ static_library("Linux") {
       "NFCCommissioningManagerImpl.h",
     ]
     public_configs += [ ":nfc_commissioning_config" ]
+
+    deps += [ "${chip_root}/src/transport/raw:nfc-application-delegate" ]
   }
 
   if (chip_mdns == "platform") {

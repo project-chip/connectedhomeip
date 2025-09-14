@@ -275,7 +275,7 @@ endif # NET_L2_OPENTHREAD
 
 config CHIP_IPV4
 	bool "IPv4 support for Matter"
-	default n if CHIP_NET_L2_OPENTHREAD && !CHIP_WIFI
+	default n if NET_L2_OPENTHREAD && !CHIP_WIFI
 	default y
 	help
 		If disabled, it allows to build NXP SDK application
@@ -292,7 +292,7 @@ config NETWORK_LAYER_BLE
 
 config OPERATIONAL_KEYSTORE
 	bool "Use custom implementation of operational keystore"
-	default y if CHIP_NXP_PLATFORM_MCXW71 || CHIP_NXP_PLATFORM_MCXW72
+	default y if CHIP_NXP_PLATFORM_MCXW71 || CHIP_NXP_PLATFORM_MCXW72 || CHIP_NXP_PLATFORM_RW61X
 	default y if CHIP_SE05X
 	help
 		"Use custom implementation of operational keystore"
