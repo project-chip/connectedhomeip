@@ -195,6 +195,7 @@ public:
 protected:
     void SetUp() override
     {
+        SetupForJFTests();
         AppContext::SetUp();
         mOldProvider =
             InteractionModelEngine::GetInstance()->SetDataModelProvider(&TestVendorIDVerificationDataModel::Instance(this));

@@ -62,14 +62,22 @@ CHIP_ERROR MessagingContext::Init(TransportMgrBase * transport, IOContext * ioCo
     {
         ReturnErrorOnFailure(CreateAliceFabric());
         ReturnErrorOnFailure(CreateBobFabric());
-        ReturnErrorOnFailure(CreateJFAFabric());
-        ReturnErrorOnFailure(CreateJFBFabric());
+
+        if (mSetupForJFTests)
+        {
+            ReturnErrorOnFailure(CreateJFAFabric());
+            ReturnErrorOnFailure(CreateJFBFabric());
+        }
 
         ReturnErrorOnFailure(CreateSessionBobToAlice());
         ReturnErrorOnFailure(CreateSessionAliceToBob());
         ReturnErrorOnFailure(CreateSessionBobToFriends());
-        ReturnErrorOnFailure(CreateJFSessionAToB());
-        ReturnErrorOnFailure(CreateJFSessionBToA());
+
+        if (mSetupForJFTests)
+        {
+            ReturnErrorOnFailure(CreateJFSessionAToB());
+            ReturnErrorOnFailure(CreateJFSessionBToA());
+        }
 
         ReturnErrorOnFailure(CreatePASESessionCharlieToDavid());
         ReturnErrorOnFailure(CreatePASESessionDavidToCharlie());
@@ -124,8 +132,11 @@ void MessagingContext::SetMRPMode(MRPMode mode)
         mpData->mSessionAliceToBob->AsSecureSession()->SetRemoteSessionParameters(GetDefaultMRPConfig());
         mpData->mSessionCharlieToDavid->AsSecureSession()->SetRemoteSessionParameters(GetDefaultMRPConfig());
         mpData->mSessionDavidToCharlie->AsSecureSession()->SetRemoteSessionParameters(GetDefaultMRPConfig());
-        mpData->mJFSessionAToB->AsSecureSession()->SetRemoteSessionParameters(GetDefaultMRPConfig());
-        mpData->mJFSessionBToA->AsSecureSession()->SetRemoteSessionParameters(GetDefaultMRPConfig());
+        if (mSetupForJFTests)
+        {
+            mpData->mJFSessionAToB->AsSecureSession()->SetRemoteSessionParameters(GetDefaultMRPConfig());
+            mpData->mJFSessionBToA->AsSecureSession()->SetRemoteSessionParameters(GetDefaultMRPConfig());
+        }
 
 #if CONFIG_BUILD_FOR_HOST_UNIT_TEST
         ClearLocalMRPConfigOverride();
@@ -157,10 +168,13 @@ void MessagingContext::SetMRPMode(MRPMode mode)
             MessagingContext::kResponsiveIdleRetransTimeout, MessagingContext::kResponsiveActiveRetransTimeout));
         mpData->mSessionDavidToCharlie->AsSecureSession()->SetRemoteSessionParameters(ReliableMessageProtocolConfig(
             MessagingContext::kResponsiveIdleRetransTimeout, MessagingContext::kResponsiveActiveRetransTimeout));
-        mpData->mJFSessionAToB->AsSecureSession()->SetRemoteSessionParameters(ReliableMessageProtocolConfig(
-            MessagingContext::kResponsiveIdleRetransTimeout, MessagingContext::kResponsiveActiveRetransTimeout));
-        mpData->mJFSessionBToA->AsSecureSession()->SetRemoteSessionParameters(ReliableMessageProtocolConfig(
-            MessagingContext::kResponsiveIdleRetransTimeout, MessagingContext::kResponsiveActiveRetransTimeout));
+        if (mSetupForJFTests)
+        {
+            mpData->mJFSessionAToB->AsSecureSession()->SetRemoteSessionParameters(ReliableMessageProtocolConfig(
+                MessagingContext::kResponsiveIdleRetransTimeout, MessagingContext::kResponsiveActiveRetransTimeout));
+            mpData->mJFSessionBToA->AsSecureSession()->SetRemoteSessionParameters(ReliableMessageProtocolConfig(
+                MessagingContext::kResponsiveIdleRetransTimeout, MessagingContext::kResponsiveActiveRetransTimeout));
+        }
     }
 }
 

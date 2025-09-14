@@ -192,7 +192,7 @@ public:
     Messaging::ExchangeContext * NewExchangeToBob(Messaging::ExchangeDelegate * delegate, bool isInitiator = true);
 
     System::Layer & GetSystemLayer() { return mpData->mIOContext->GetSystemLayer(); }
-
+    void SetupForJFTests() { mSetupForJFTests = true; }
 private:
     // These members are encapsulated in a struct which is allocated upon construction of MessagingContext and freed upon
     // destruction of MessagingContext.  This is done to save stack space.
@@ -240,6 +240,7 @@ private:
         Optional<Transport::OutgoingGroupSession> mSessionBobToFriends;
     };
     std::unique_ptr<MessagingContextData> mpData;
+    bool mSetupForJFTests = false;
 };
 
 // LoopbackMessagingContext enriches MessagingContext with an async loopback transport
