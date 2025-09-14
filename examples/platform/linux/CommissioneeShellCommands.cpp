@@ -161,7 +161,6 @@ static CHIP_ERROR CommissioneeHandler(int argc, char ** argv)
         // ex. sendudc <address> <port> t t 111 5 'hello world'
 
         Protocols::UserDirectedCommissioning::IdentificationDeclaration id;
-        id.SetPasscodeLength(8);
         if (argc > 3)
         {
             id.SetNoPasscode(strcmp(argv[3], "t") == 0);
