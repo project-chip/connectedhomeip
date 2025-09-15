@@ -69,7 +69,8 @@ class TC_WebRTCRequestor_2_5(MatterBaseTest):
             th_server_app,
             storage_dir=self.storage.name,
             discriminator=self.th_server_discriminator,
-            passcode=self.th_server_passcode
+            passcode=self.th_server_passcode,
+            port=5682,  # Use unique port number to avoid port conflict           
         )
 
         self.th_server.start(
@@ -117,8 +118,8 @@ class TC_WebRTCRequestor_2_5(MatterBaseTest):
         Executes the test steps for the WebRTC CurrentSessions attribute validation.
         """
 
-        discriminator = 1234
-        passcode = 20202021
+        discriminator = self.th_server_discriminator
+        passcode = self.th_server_passcode
         self.th_server_local_nodeid = 1111
         self.discriminator = random.randint(0, 4095)
 
@@ -161,7 +162,7 @@ class TC_WebRTCRequestor_2_5(MatterBaseTest):
         # Prompt user to read CurrentSessions attribute before establishing session
         prompt_msg = (
             "\nRead CurrentSessions attribute from DUT:\n"
-            "  webrtc read current-sessions 1 1\n"
+            "  webrtctransportprovider read current-sessions 1 1\n"
             "Input 'Y' if attribute read succeeds and returns an empty list\n"
             "Input 'N' if attribute read fails or returns non-empty list\n"
         )
@@ -209,7 +210,7 @@ class TC_WebRTCRequestor_2_5(MatterBaseTest):
         # Prompt user to read CurrentSessions attribute after establishing session
         prompt_msg = (
             "\nRead CurrentSessions attribute from DUT:\n"
-            "  webrtc read current-sessions 1 1\n"
+            "  webrtctransportprovider read current-sessions 1 1\n"
             "Input 'Y' if attribute read succeeds and returns a list with one WebRTCSessionStruct containing session ID and peer node information\n"
             "Input 'N' if attribute read fails or returns incorrect data\n"
         )
@@ -257,7 +258,7 @@ class TC_WebRTCRequestor_2_5(MatterBaseTest):
         # Prompt user to read CurrentSessions attribute after ending session
         prompt_msg = (
             "\nRead CurrentSessions attribute from DUT:\n"
-            "  webrtc read current-sessions 1 1\n"
+            "  webrtctransportprovider read current-sessions 1 1\n"
             "Input 'Y' if attribute read succeeds and returns an empty list\n"
             "Input 'N' if attribute read fails or returns non-empty list\n"
         )
