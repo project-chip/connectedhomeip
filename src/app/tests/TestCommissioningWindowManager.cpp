@@ -506,12 +506,11 @@ TEST_F(TestCommissioningWindowManager, TestOnPlatformEventOperationalNetworkEnab
     commissionMgr.OnPlatformEvent(&event);
 }
 
-
 // Verify that operational advertising failure is handled gracefully
 TEST_F(TestCommissioningWindowManager, TestOnPlatformEventOperationalNetworkEnabledFail)
 {
     CommissioningWindowManager & commissionMgr = Server::GetInstance().GetCommissioningWindowManager();
-    auto & fabricTable = Server::GetInstance().GetFabricTable();
+    auto & fabricTable                         = Server::GetInstance().GetFabricTable();
 
     // Stopping DNS-SD server to trigger AdvertiseOperational() failure
     chip::app::DnssdServer::Instance().StopServer();
