@@ -39,7 +39,7 @@ import logging
 import secrets
 import threading
 import typing
-from ctypes import (CDLL, CFUNCTYPE, POINTER, Structure, byref, c_bool, c_char, c_char_p, c_int, c_int32, c_size_t, c_ubyte,
+from ctypes import (CDLL, CFUNCTYPE, POINTER, Structure, byref, c_bool, c_char, c_char_p, c_int, c_int32, c_size_t,
                     c_uint8, c_uint16, c_uint32, c_uint64, c_void_p, cast, create_string_buffer, pointer, py_object, string_at)
 from dataclasses import dataclass
 
@@ -52,12 +52,10 @@ from .bdx import Bdx
 from .clusters import Attribute as ClusterAttribute
 from .clusters import ClusterObjects as ClusterObjects
 from .clusters import Command as ClusterCommand
-from .clusters.Attribute import AttributeCache, AttributePath, ValueDecodeFailure
 from .clusters.CHIPClusters import ChipClusters
 from .crypto import p256keypair
 from .interaction_model import SessionParameters, SessionParametersStruct
 from .native import PyChipError
-from .tlv import TLVReader
 
 __all__ = ["ChipDeviceController", "CommissioningParameters"]
 
