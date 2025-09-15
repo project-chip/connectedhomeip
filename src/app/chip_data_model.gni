@@ -76,6 +76,7 @@ template("chip_data_model") {
       "zap-generated/access.h",
       "zap-generated/gen_config.h",
       "zap-generated/endpoint_config.h",
+      "zap-generated/CodedrivenInitShutdown.cpp",
     ]
 
     if (!chip_build_controller_dynamic_server) {
@@ -137,6 +138,7 @@ template("chip_data_model") {
             [
               "*/callback-stup.cpp",
               "*/cluster-callbacks.cpp",
+              "*/CodedrivenInitShutdown.cpp",
             ])
 
     deps = [

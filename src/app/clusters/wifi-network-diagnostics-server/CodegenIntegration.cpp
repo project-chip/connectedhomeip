@@ -81,7 +81,7 @@ void MatterCodedrivenWiFiNetworkDiagnosticsClusterInitCallback(EndpointId endpoi
         integrationDelegate);
 }
 
-void MatterCodedrivenEthernetNetworkDiagnosticsClusterShutdownCallback(EndpointId endpointId)
+void MatterCodedrivenWifiNetworkDiagnosticsClusterShutdownCallback(EndpointId endpointId)
 {
     IntegrationDelegate integrationDelegate;
 

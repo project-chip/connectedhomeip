@@ -1,9 +1,9 @@
 {{> header}}
+// This file is generated from codedriven-init-shutdown.cpp.zapt
 
 #include <cstdint>
 #include <cinttypes>
 
-#include <app-common/zap-generated/callback.h>
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app-common/zap-generated/ids/Commands.h>
@@ -11,8 +11,9 @@
 #include <app/CommandHandler.h>
 #include <lib/core/CHIPSafeCasts.h>
 #include <lib/support/TypeTraits.h>
+#include <zap-generated/CodedrivenCallback.h>
 
-using namespace chip;
+namespace chip {
 
 // Cluster Init Functions for Codedriven Clusters
 void MatterCodedrivenClusterInitCallback(EndpointId endpoint, ClusterId  clusterId) {
@@ -39,4 +40,5 @@ void MatterCodedrivenClusterShutdownCallback(EndpointId endpoint, ClusterId clus
     {{/if}}
     {{/all_user_clusters}}
     }
+}
 }
