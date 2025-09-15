@@ -213,9 +213,9 @@ CHIP_ERROR Resolver::LookupNode(const NodeLookupRequest & request, Impl::NodeLoo
 
 #if CHIP_DEVICE_ENABLE_CASE_DNS_CACHE
     ResolveResult result;
-    if (GetCachedNodeAddress(request.GetPeerId().GetNodeId(), result) == CHIP_NO_ERROR)
+    if (mNodeAddressCache.GetCachedNodeAddress(request.GetPeerId().GetNodeId(), result) == CHIP_NO_ERROR)
     {
-        ChipLogError(Discovery, "LookupNode seeding with cached value");
+        ChipLogProgress(Discovery, "LookupNode seeding with cached value");
         handle.LookupResult(result);
     }
 #endif // CHIP_DEVICE_ENABLE_CASE_DNS_CACHE
@@ -227,66 +227,7 @@ CHIP_ERROR Resolver::LookupNode(const NodeLookupRequest & request, Impl::NodeLoo
 
 CHIP_ERROR Resolver::CacheNode(NodeId nodeId, const ResolveResult & result)
 {
-    // Check if nodeId already exists in cache to update it
-    for (size_t i = 0; i < mCacheCount; ++i)
-    {
-        if (mCache[i].nodeId == nodeId)
-        {
-            mCache[i].result = result;
-            ChipLogProgress(Discovery, "Updated cached result for NodeId: 0x" ChipLogFormatX64, ChipLogValueX64(nodeId));
-            return CHIP_NO_ERROR;
-        }
-    }
-
-    // If cache is full, overwrite oldest entry (FIFO)
-    if (mCacheCount >= kMaxCacheSize)
-    {
-        ChipLogProgress(Discovery, "Cache full, overwriting oldest entry at index %zu", mNextCacheIndex);
-        mCache[mNextCacheIndex].nodeId = nodeId;
-        mCache[mNextCacheIndex].result = result;
-        mNextCacheIndex = (mNextCacheIndex + 1) % kMaxCacheSize;
-    }
-    else
-    {
-        // Add new entry
-        mCache[mCacheCount].nodeId = nodeId;
-        mCache[mCacheCount].result = result;
-        ++mCacheCount;
-        mNextCacheIndex = mCacheCount;
-    }
-
-    ChipLogProgress(Discovery, "Cached address for NodeId: 0x" ChipLogFormatX64, ChipLogValueX64(nodeId));
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR Resolver::GetCachedNodeAddress(NodeId nodeId, ResolveResult & result)
-{
-    for (size_t i = 0; i < mCacheCount; ++i)
-    {
-        if (mCache[i].nodeId == nodeId)
-        {
-            result = mCache[i].result;
-            ChipLogProgress(Discovery, "Retrieved cached address for NodeId: 0x" ChipLogFormatX64, ChipLogValueX64(nodeId));
-            return CHIP_NO_ERROR;
-        }
-    }
-    ChipLogError(Discovery, "No cached address for NodeId: 0x" ChipLogFormatX64, ChipLogValueX64(nodeId));
-    return CHIP_ERROR_KEY_NOT_FOUND;
-}
-
-CHIP_ERROR Resolver::RemoveCachedNodeAddress(NodeId nodeId)
-{
-    for (size_t i = 0; i < mCacheCount; ++i)
-    {
-        if (mCache[i].nodeId == nodeId)
-        {
-            mCache[i].nodeId = 0;
-            ChipLogProgress(Discovery, "Removed cached address for NodeId: 0x" ChipLogFormatX64, ChipLogValueX64(nodeId));
-            return CHIP_NO_ERROR;
-        }
-    }
-    ChipLogError(Discovery, "No cached address to remove for NodeId: 0x" ChipLogFormatX64, ChipLogValueX64(nodeId));
-    return CHIP_ERROR_KEY_NOT_FOUND;
+    return mNodeAddressCache.CacheNode(nodeId, result);
 }
 
 #endif // CHIP_DEVICE_ENABLE_CASE_DNS_CACHE
@@ -450,7 +391,7 @@ void Resolver::HandleAction(IntrusiveList<NodeLookupHandle>::Iterator & current)
         break;
     }
 #if CHIP_DEVICE_ENABLE_CASE_DNS_CACHE
-    RemoveCachedNodeAddress(peerId.GetNodeId());
+    mNodeAddressCache.RemoveCachedNodeAddress(peerId.GetNodeId());
 #endif // CHIP_DEVICE_ENABLE_CASE_DNS_CACHE
 }
 

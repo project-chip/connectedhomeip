@@ -250,13 +250,6 @@ public:
 #if CHIP_DEVICE_ENABLE_CASE_DNS_CACHE
     // cache node address
     virtual CHIP_ERROR CacheNode(NodeId nodeId, const ResolveResult & result) = 0;
-
-    // retrieve cached address
-    virtual CHIP_ERROR GetCachedNodeAddress(NodeId nodeId, ResolveResult & result) = 0;
-
-    // remove cached address
-    virtual CHIP_ERROR RemoveCachedNodeAddress(NodeId nodeId) = 0;
-
 #endif // CHIP_DEVICE_ENABLE_CASE_DNS_CACHE
 
     /// Shut down any active resolves
@@ -281,6 +274,7 @@ public:
 #ifdef CHIP_ADDRESS_RESOLVE_IMPL_INCLUDE_HEADER
 #include CHIP_ADDRESS_RESOLVE_IMPL_INCLUDE_HEADER
 #else
+#include <lib/address_resolve/NodeAddressCache.h>
 #include <lib/address_resolve/AddressResolve_DefaultImpl.h>
 #endif
 
