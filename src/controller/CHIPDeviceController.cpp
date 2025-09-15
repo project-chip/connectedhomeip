@@ -751,14 +751,6 @@ CHIP_ERROR DeviceCommissioner::EstablishPASEConnection(NodeId remoteDeviceId, Re
     {
         peerAddress = Transport::PeerAddress::UDP(params.GetPeerAddress().GetIPAddress(), params.GetPeerAddress().GetPort(),
                                                   params.GetPeerAddress().GetInterface());
-#if CHIP_DEVICE_ENABLE_CASE_DNS_CACHE
-        ResolveResult result;
-        result.address = params.GetPeerAddress();
-        result.mrpRemoteConfig = params.GetMRPConfig();
-        result.supportsTcpClient = params.GetPeerAddress().GetTransportType() == Transport::Type::kTcp;
-        result.supportsTcpServer = params.GetPeerAddress().GetTransportType() == Transport::Type::kTcp;
-        Resolver::Instance().CacheNode(remoteDeviceId, result);
-#endif // CHIP_DEVICE_ENABLE_CASE_DNS_CACHE
     }
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
     else if (params.GetPeerAddress().GetTransportType() == Transport::Type::kWiFiPAF)
@@ -1687,6 +1679,18 @@ CHIP_ERROR DeviceCommissioner::ProcessCSR(DeviceProxy * proxy, const ByteSpan & 
     {
         mOperationalCredentialsDelegate->SetFabricIdForNextNOCRequest(GetFabricId());
     }
+
+#if CHIP_DEVICE_ENABLE_CASE_DNS_CACHE
+    {
+        // cache the address we are using for PASE as a backup
+        ResolveResult result;
+        result.address = proxy->GetSecureSession().Value()->AsSecureSession()->GetPeerAddress();
+        result.mrpRemoteConfig = proxy->GetSecureSession().Value()->GetRemoteMRPConfig();
+        result.supportsTcpClient = result.address.GetTransportType() == Transport::Type::kTcp;
+        result.supportsTcpServer = result.address.GetTransportType() == Transport::Type::kTcp;
+        Resolver::Instance().CacheNode(proxy->GetDeviceId(), result);
+    }
+#endif // CHIP_DEVICE_ENABLE_CASE_DNS_CACHE
 
     return mOperationalCredentialsDelegate->GenerateNOCChain(NOCSRElements, csrNonce, AttestationSignature, attestationChallenge,
                                                              dac, pai, &mDeviceNOCChainCallback);
