@@ -110,7 +110,7 @@ for ((i = 2; i <= "$MAX_RANGE"; i++)); do
     if [ "$(uname -s)" = "Darwin" ]; then
         strip "$BASE_OUT_PREFIX"/chip-ota-requestor-app -o "$BASE_OUT_PREFIX"/chip-ota-requestor-app.min >/dev/null 2>&1
     else
-        strip --strip-all  "$BASE_OUT_PREFIX"/chip-ota-requestor-app -o "$BASE_OUT_PREFIX"/chip-ota-requestor-app.min >/dev/null 2>&1
+        strip --strip-all "$BASE_OUT_PREFIX"/chip-ota-requestor-app -o "$BASE_OUT_PREFIX"/chip-ota-requestor-app.min >/dev/null 2>&1
     fi
     STATUS_CODE=$?
     if [ "$STATUS_CODE" -ne 0 ]; then
