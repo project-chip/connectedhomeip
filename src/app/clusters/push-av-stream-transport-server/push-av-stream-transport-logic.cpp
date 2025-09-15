@@ -654,7 +654,7 @@ PushAvStreamTransportServerLogic::HandleAllocatePushTransport(CommandHandler & h
 
         auto & motionZonesList = transportOptions.triggerOptions.motionZones;
         auto iter              = motionZonesList.Value().Value().begin();
-        size_t zoneListSize        = 0;
+        size_t zoneListSize    = 0;
         motionZonesList.Value().Value().ComputeSize(&zoneListSize);
 
         bool isValidZoneSize = mDelegate->ValidateMotionZoneListSize(zoneListSize);
