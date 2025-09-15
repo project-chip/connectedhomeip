@@ -1129,11 +1129,18 @@ AudioCapabilitiesStruct & CameraDevice::GetSpeakerCapabilities()
 
 std::vector<SnapshotCapabilitiesStruct> & CameraDevice::GetSnapshotCapabilities()
 {
-    static std::vector<SnapshotCapabilitiesStruct> snapshotCapabilities = { { { kMinResolutionWidth, kMinResolutionHeight },
-                                                                              kSnapshotStreamFrameRate,
-                                                                              ImageCodecEnum::kJpeg,
-                                                                              false,
-                                                                              chip::MakeOptional(static_cast<bool>(false)) } };
+    static std::vector<SnapshotCapabilitiesStruct> snapshotCapabilities = {
+        { { kMinResolutionWidth, kMinResolutionHeight },
+          kSnapshotStreamFrameRate,
+          ImageCodecEnum::kJpeg,
+          false,
+          chip::MakeOptional(static_cast<bool>(false)) },
+        { { k720pResolutionWidth, k720pResolutionHeight },
+          kSnapshotStreamFrameRate,
+          ImageCodecEnum::kJpeg,
+          true,
+          chip::MakeOptional(static_cast<bool>(true)) },
+    };
     return snapshotCapabilities;
 }
 
@@ -1386,25 +1393,66 @@ void CameraDevice::HandleSimulatedZoneStoppedEvent(uint16_t zoneID)
 
 void CameraDevice::InitializeVideoStreams()
 {
-    // Create single video stream with typical supported parameters
-    VideoStream videoStream = { { 1 /* Id */,
-                                  StreamUsageEnum::kLiveView /* StreamUsage */,
-                                  VideoCodecEnum::kH264,
-                                  kMinVideoFrameRate /* MinFrameRate */,
-                                  kMaxVideoFrameRate /* MaxFrameRate */,
-                                  { kMinResolutionWidth, kMinResolutionHeight } /* MinResolution */,
-                                  { kMaxResolutionWidth, kMaxResolutionHeight } /* MaxResolution */,
-                                  kMinBitRateBps /* MinBitRate */,
-                                  kMaxBitRateBps /* MaxBitRate */,
-                                  kKeyFrameIntervalMsec /* KeyFrameInterval */,
-                                  chip::MakeOptional(static_cast<bool>(false)) /* WMark */,
-                                  chip::MakeOptional(static_cast<bool>(false)) /* OSD */,
-                                  0 /* RefCount */ },
-                                false,
-                                { mViewport.x1, mViewport.y1, mViewport.x2, mViewport.y2 },
-                                nullptr };
+    // Create a video stream with a max resolution of 720p and max frame rate of
+    // 60 fps
+    VideoStream videoStream1 = { { 1 /* Id */,
+                                   StreamUsageEnum::kLiveView /* StreamUsage */,
+                                   VideoCodecEnum::kH264,
+                                   kMinVideoFrameRate /* MinFrameRate */,
+                                   k60fpsVideoFrameRate /* MaxFrameRate */,
+                                   { kMinResolutionWidth, kMinResolutionHeight } /* MinResolution */,
+                                   { k720pResolutionWidth, k720pResolutionHeight } /* MaxResolution */,
+                                   kMinBitRateBps /* MinBitRate */,
+                                   kMaxBitRateBps /* MaxBitRate */,
+                                   kKeyFrameIntervalMsec /* KeyFrameInterval */,
+                                   chip::MakeOptional(static_cast<bool>(false)) /* WMark */,
+                                   chip::MakeOptional(static_cast<bool>(false)) /* OSD */,
+                                   0 /* RefCount */ },
+                                 false,
+                                 { mViewport.x1, mViewport.y1, mViewport.x2, mViewport.y2 },
+                                 nullptr };
+    mVideoStreams.push_back(videoStream1);
 
-    mVideoStreams.push_back(videoStream);
+    // Create a video stream with a min framerate of 60 fps and min resolution
+    // of 720p
+    VideoStream videoStream2 = { { 2 /* Id */,
+                                   StreamUsageEnum::kLiveView /* StreamUsage */,
+                                   VideoCodecEnum::kH264,
+                                   k60fpsVideoFrameRate /* MinFrameRate */,
+                                   kMaxVideoFrameRate /* MaxFrameRate */,
+                                   { k720pResolutionWidth, k720pResolutionHeight } /* MinResolution */,
+                                   { kMaxResolutionWidth, kMaxResolutionHeight } /* MaxResolution */,
+                                   kMinBitRateBps /* MinBitRate */,
+                                   kMaxBitRateBps /* MaxBitRate */,
+                                   kKeyFrameIntervalMsec /* KeyFrameInterval */,
+                                   chip::MakeOptional(static_cast<bool>(false)) /* WMark */,
+                                   chip::MakeOptional(static_cast<bool>(false)) /* OSD */,
+                                   0 /* RefCount */ },
+                                 false,
+                                 { mViewport.x1, mViewport.y1, mViewport.x2, mViewport.y2 },
+                                 nullptr };
+
+    mVideoStreams.push_back(videoStream2);
+
+    // Create a video stream for the full range(fps, resolution, bitrate) supported by the camera.
+    VideoStream videoStream3 = { { 3 /* Id */,
+                                   StreamUsageEnum::kLiveView /* StreamUsage */,
+                                   VideoCodecEnum::kH264,
+                                   kMinVideoFrameRate /* MinFrameRate */,
+                                   kMaxVideoFrameRate /* MaxFrameRate */,
+                                   { kMinResolutionWidth, kMinResolutionHeight } /* MinResolution */,
+                                   { kMaxResolutionWidth, kMaxResolutionHeight } /* MaxResolution */,
+                                   kMinBitRateBps /* MinBitRate */,
+                                   kMaxBitRateBps /* MaxBitRate */,
+                                   kKeyFrameIntervalMsec /* KeyFrameInterval */,
+                                   chip::MakeOptional(static_cast<bool>(false)) /* WMark */,
+                                   chip::MakeOptional(static_cast<bool>(false)) /* OSD */,
+                                   0 /* RefCount */ },
+                                 false,
+                                 { mViewport.x1, mViewport.y1, mViewport.x2, mViewport.y2 },
+                                 nullptr };
+
+    mVideoStreams.push_back(videoStream3);
 }
 
 void CameraDevice::InitializeAudioStreams()
