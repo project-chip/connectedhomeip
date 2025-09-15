@@ -3133,6 +3133,11 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
                         params.GetCompletionStatus().err.AsString());
     }
 
+    if (mPairingDelegate)
+    {
+        mPairingDelegate->OnCommissioningStageStart(PeerId(GetCompressedFabricId(), proxy->GetDeviceId()), step);
+    }
+
     mCommissioningStepTimeout = timeout;
     mCommissioningStage       = step;
     mCommissioningDelegate    = delegate;
