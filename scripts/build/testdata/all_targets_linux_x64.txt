@@ -19,7 +19,7 @@ nrf-{nrf52840dk,nrf52840dongle,nrf5340dk}-{all-clusters,all-clusters-minimal,lig
 nrf-native-sim-tests
 nuttx-x64-light
 qpg-qpg6200-{light,light-switch,lock,persistent-storage,shell,thermostat}[-updateimage]
-realtek-rtl8777g-{all-clusters,light-switch,lighting,lock,ota-requestor,thermostat,window}
+realtek-{rtl8777g,rtl87x2g}-{all-clusters,light-switch,lighting,lock,ota-requestor,thermostat,window}
 stm32-stm32wb5mm-dk-light
 tizen-{arm,arm64}-{all-clusters,chip-tool,light,tests}[-asan][-coverage][-no-ble][-no-thread][-no-wifi][-ubsan][-with-ui]
 telink-{tl3218x,tl3218x_ml3m,tl3218x_retention,tl7218x,tl7218x_ml7g,tl7218x_ml7m,tl7218x_retention,tlsr9118bdk40d,tlsr9518adk80d,tlsr9528a,tlsr9528a_retention}-{air-quality-sensor,all-clusters,all-clusters-minimal,bridge,contact-sensor,light,light-switch,lock,ota-requestor,pump,pump-controller,shell,smoke-co-alarm,temperature-measurement,thermostat,window-covering}[-4mb][-compress-lzma][-dfu][-factory-data][-mars][-ota][-precompiled-ot][-rpc][-shell][-tflm][-thread-analyzer][-usb]
