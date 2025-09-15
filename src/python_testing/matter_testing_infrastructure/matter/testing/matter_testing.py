@@ -734,7 +734,7 @@ class MatterBaseTest(base_test.BaseTestClass):
                 None, None, GlobalAttributeIds.FEATURE_MAP_ID), Attribute.AttributePath(None, None, GlobalAttributeIds.ACCEPTED_COMMAND_LIST_ID)]), timeout=60)
             self.stored_global_wildcard = await global_wildcard
 
-    async def cluster_guard(self, endpoint: int, cluster: ClusterObjects.Cluster, skip_step: bool = True):
+    async def cluster_guard(self, endpoint: int, cluster: ClusterObjects.ClusterObjectDescriptor, skip_step: bool = True):
         """Similar to attribute_guard.
 
            If the `skip_step` argument is set to True (default), and the condition check returns False,
