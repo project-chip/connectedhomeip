@@ -93,7 +93,7 @@ fi
 
 for (( i=2; i<=$MAX_RANGE; i++ )); do
     echo "Running for version $i"
-    
+
     $(replace_version_config_str "$i" $TARGET_FILE)
 
     # Build the image
@@ -105,7 +105,7 @@ for (( i=2; i<=$MAX_RANGE; i++ )); do
         break
     fi
 
-    # Strip 
+    # Strip
     LINUX_OPT="--strip-all"
     if [ "$(uname -s)" = "Darwin" ]; then
         LINUX_OPT=""
@@ -126,7 +126,7 @@ for (( i=2; i<=$MAX_RANGE; i++ )); do
         echo "Failed to create the OTA Image $TARGET_FILE"
         break
     fi
-    
+
     echo "Restoring the config file"
     cp $CHIP_ROOT/examples/ota-requestor-app/linux/include/CHIPProjectAppConfig.h.backup $TARGET_FILE
 done
