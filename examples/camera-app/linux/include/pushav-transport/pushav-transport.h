@@ -132,7 +132,7 @@ private:
     PushAVUploader::CertificatesInfo mCertBuffer;
     AudioStreamStruct mAudioStreamParams;
     VideoStreamStruct mVideoStreamParams;
-    
+
     // Note, a ZoneID within a Zone List can be Null, meaning the entry applies to all zones.
     std::vector<std::pair<chip::app::DataModel::Nullable<uint16_t>, uint8_t>> mZoneSensitivityList;
 

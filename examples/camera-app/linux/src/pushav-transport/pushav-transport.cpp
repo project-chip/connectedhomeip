@@ -344,7 +344,7 @@ void PushAVTransport::TriggerTransport(TriggerActivationReasonEnum activationRea
             {
                 zoneFound = true;
             }
-            else 
+            else
             {
                 zoneFound = (zone.first.Value() = zoneId);
             }
