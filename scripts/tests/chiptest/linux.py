@@ -223,9 +223,20 @@ class BluetoothMock(subprocess.Popen):
     # The MAC addresses of the virtual Bluetooth adapters.
     ADAPTERS = ["00:00:00:11:11:11", "00:00:00:22:22:22"]
 
+    def __forward_stderr(self):
+        for line in self.stderr:
+            if "adapter[1][00:00:00:22:22:22]" in line:
+                self.event.set()
+            logging.debug("%s", line.strip())
+
     def __init__(self):
         adapters = [f"--adapter={mac}" for mac in self.ADAPTERS]
-        super().__init__(["bluezoo", "--quiet", "--auto-enable"] + adapters)
+        super().__init__(["bluezoo", "--auto-enable"] + adapters,
+                         stderr=subprocess.PIPE, text=True)
+        self.event = threading.Event()
+        threading.Thread(target=self.__forward_stderr, daemon=True).start()
+        # Wait for the adapters to be ready.
+        self.event.wait()
 
     def terminate(self):
         super().terminate()
