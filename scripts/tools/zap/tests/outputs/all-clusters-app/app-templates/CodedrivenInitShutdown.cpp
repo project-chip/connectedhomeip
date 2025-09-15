@@ -40,9 +40,6 @@ void MatterCodedrivenClusterInitCallback(EndpointId endpoint, ClusterId clusterI
     case app::Clusters::BasicInformation::Id:
         MatterCodedrivenBasicInformationClusterInitCallback(endpoint);
         break;
-    case app::Clusters::NetworkCommissioning::Id:
-        MatterCodedrivenNetworkCommissioningClusterInitCallback(endpoint);
-        break;
     case app::Clusters::GeneralDiagnostics::Id:
         MatterCodedrivenGeneralDiagnosticsClusterInitCallback(endpoint);
         break;
@@ -73,9 +70,6 @@ void MatterCodedrivenClusterShutdownCallback(EndpointId endpoint, ClusterId clus
     {
     case app::Clusters::BasicInformation::Id:
         MatterCodedrivenBasicInformationClusterShutdownCallback(endpoint);
-        break;
-    case app::Clusters::NetworkCommissioning::Id:
-        MatterCodedrivenNetworkCommissioningClusterShutdownCallback(endpoint);
         break;
     case app::Clusters::GeneralDiagnostics::Id:
         MatterCodedrivenGeneralDiagnosticsClusterShutdownCallback(endpoint);

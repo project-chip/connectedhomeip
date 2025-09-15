@@ -35,15 +35,6 @@ void MatterCodedrivenBasicInformationClusterShutdownCallback(chip::EndpointId en
 /**
  * @param endpoint    Endpoint that is being initialized
  */
-void MatterCodedrivenNetworkCommissioningClusterInitCallback(chip::EndpointId endpointId);
-
-/**
- * @param endpoint    Endpoint that is being shutdown
- */
-void MatterCodedrivenNetworkCommissioningClusterShutdownCallback(chip::EndpointId endpointId);
-/**
- * @param endpoint    Endpoint that is being initialized
- */
 void MatterCodedrivenGeneralDiagnosticsClusterInitCallback(chip::EndpointId endpointId);
 
 /**
