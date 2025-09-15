@@ -74,7 +74,7 @@ class TC_FAN_3_5(MatterBaseTest):
                                         values (descending order).
 
                                         Monitoring the Setting attribute values primarily (PercentSetting, SpeedSetting).""",
-                                    """SETUP
+                         """SETUP
 
                                         Initialize the PercentSetting attribute to 100
 
