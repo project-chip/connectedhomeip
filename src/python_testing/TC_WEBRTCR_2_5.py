@@ -70,7 +70,7 @@ class TC_WebRTCRequestor_2_5(MatterBaseTest):
             storage_dir=self.storage.name,
             discriminator=self.th_server_discriminator,
             passcode=self.th_server_passcode,
-            port=5682,  # Use unique port number to avoid port conflict           
+            port=5682,  # Use unique port number to avoid port conflict
         )
 
         self.th_server.start(
