@@ -1392,9 +1392,30 @@ using CHIP_ERROR = ::chip::ChipError;
  */
 #define CHIP_ERROR_INVALID_TIME                                CHIP_CORE_ERROR(0x86)
 
-// AVAILABLE: 0x87
+/**
+ *  @def CHIP_ERROR_CONSTRAINT
+ *
+ *  @brief
+ *    A constraint is violated.
+ *
+ *  This error is used to indicate that a value does not meet the constraints
+ *  imposed by the protocol or application logic.
+ */
+#define CHIP_ERROR_CONSTRAINT                                  CHIP_CORE_ERROR(0x87)
+
 // AVAILABLE: 0x88
-// AVAILABLE: 0x89
+
+/**
+ *  @def CHIP_ERROR_RESOURCE_EXHAUSTED
+ *
+ *  @brief
+ *    A resource is exhausted.
+ *
+ *  This error is used to indicate that a resource (e.g., memory, file handles,
+ *  etc.) is exhausted and cannot be allocated or used.
+ */
+#define CHIP_ERROR_RESOURCE_EXHAUSTED                          CHIP_CORE_ERROR(0x89)
+
 // AVAILABLE: 0x8a
 // AVAILABLE: 0x8b
 // AVAILABLE: 0x8c
