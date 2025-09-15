@@ -157,6 +157,10 @@ struct ConcreteDataAttributePath : public ConcreteAttributePath
 
     bool operator<(const ConcreteDataAttributePath & aOther) const = delete;
 
+    // Explicit comparison with ConcreteAttributePath objects
+    using ConcreteAttributePath::operator==;
+    using ConcreteAttributePath::operator!=;
+
     //
     // This index is only valid if `mListOp` is set to a list item operation, i.e
     // ReplaceItem, DeleteItem or AppendItem. Otherwise, it is to be ignored.
