@@ -18,6 +18,14 @@ rsource "../../zephyr/Kconfig"
 
 if CHIP
 
+config CHIP_TELINK_PLATFORM
+	bool
+	default y
+	help
+	  States that the configuration uses Matter Telink platform,
+	  what can be used to conditionally deviate from Zephyr generic configuration
+	  for Telink platform related purposes.
+
 # See config/zephyr/Kconfig for full definition
 config CHIP_DEVICE_VENDOR_NAME
 	default "Telink Semiconductor"
