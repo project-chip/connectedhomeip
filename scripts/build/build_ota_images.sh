@@ -134,7 +134,7 @@ done
 if [ "$STATUS_CODE" -eq 0 ]; then
     echo "Generated files"
     for item in "${BUILT_IMAGES_STACK[@]}"; do
-        echo $item
+        echo "$item"
     done
 fi
 
