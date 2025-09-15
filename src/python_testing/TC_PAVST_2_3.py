@@ -148,7 +148,6 @@ class TC_PAVST_2_3(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
         pvattr = Clusters.PushAvStreamTransport.Attributes
         avattr = Clusters.CameraAvStreamManagement.Attributes
         aZones = []
-        aMaxZones = []
         aProvisionedEndpoints = []
         aConnectionID = ""
 
@@ -330,16 +329,19 @@ class TC_PAVST_2_3(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
                              "DUT must  responds with Status Code Success.")
 
         self.step(20)
-        zoneList = [{"zone": 1, "sensitivity": 4}, {"zone": 2, "sensitivity": 4}, {"zone": 3, "sensitivity": 4}, {"zone": 4, "sensitivity": 4}, {"zone": 5, "sensitivity": 4}, {"zone": 6, "sensitivity": 4},
-                    {"zone": 7, "sensitivity": 4}, {"zone": 8, "sensitivity": 4}, {"zone": 9, "sensitivity": 4}, {"zone": 10, "sensitivity": 4}, {"zone": 11, "sensitivity": 4}, {"zone": 12, "sensitivity": 4}]
+        # Create a zoneList that is one larger than max zones that we have already read
+        zoneList = []
+        for i in range(aMaxZones+1):
+            itemToAppend = {"zone": i, "sensitivity": 4}
+            zoneList.append(itemToAppend)
         triggerOptions = {"triggerType": pvcluster.Enums.TransportTriggerTypeEnum.kMotion,
                           "maxPreRollLen": 4000,
                           "motionZones": zoneList,
                           "motionTimeControl": {"initialDuration": 1, "augmentationDuration": 1, "maxDuration": 1, "blindDuration": 1}}
         status = await self.allocate_one_pushav_transport(endpoint, trigger_Options=triggerOptions,
                                                           tlsEndPoint=tlsEndpointId, url=f"https://{host_ip}:1234/streams/{uploadStreamId}")
-        asserts.assert_equal(status, Status.ConstraintError,
-                             "DUT must  responds with Status code ConstraintError")
+        asserts.assert_equal(status, Status.DynamicConstraintError,
+                             "DUT must respond with Status code DynamicConstraintError")
 
         self.step(21)
         zoneList = []

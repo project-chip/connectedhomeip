@@ -108,19 +108,19 @@ PushAvStreamTransportManager::AllocatePushTransport(const TransportOptionsStruct
     if (transportOptions.triggerOptions.triggerType == TransportTriggerTypeEnum::kMotion &&
         transportOptions.triggerOptions.motionZones.HasValue())
     {
-        std::vector<std::pair<uint16_t, uint8_t>> zoneSensitivityList;
+        std::vector<std::pair<chip::app::DataModel::Nullable<uint16_t>, uint8_t>> zoneSensitivityList;
 
         auto motionZones = transportOptions.triggerOptions.motionZones.Value().Value();
         for (const auto & zoneOption : motionZones)
         {
             if (zoneOption.sensitivity.HasValue())
             {
-                zoneSensitivityList.push_back({ zoneOption.zone.Value(), zoneOption.sensitivity.Value() });
+                zoneSensitivityList.push_back({ zoneOption.zone, zoneOption.sensitivity.Value() });
             }
             else
             {
                 zoneSensitivityList.push_back(
-                    { zoneOption.zone.Value(), transportOptions.triggerOptions.motionSensitivity.Value().Value() });
+                    { zoneOption.zone, transportOptions.triggerOptions.motionSensitivity.Value().Value() });
             }
         }
 
