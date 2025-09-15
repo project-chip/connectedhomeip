@@ -126,10 +126,17 @@ for ((i = 2; i <= "$MAX_RANGE"; i++)); do
         echo "Failed to create the OTA Image $TARGET_FILE"
         break
     fi
-
+    BUILT_IMAGES_STACK+=("$OTA_IMAGE_PATH")
     echo "Restoring the config file"
     cp "$CHIP_ROOT"/examples/ota-requestor-app/linux/include/CHIPProjectAppConfig.h.backup "$TARGET_FILE"
 done
+
+if [ "$STATUS_CODE" -eq 0 ]; then
+    echo "Generated files"
+    for item in "${BUILT_IMAGES_STACK[@]}"; do
+        echo $item
+    done
+fi
 
 echo "Restoring backup file"
 cp "$CHIP_ROOT"/examples/ota-requestor-app/linux/include/CHIPProjectAppConfig.h.backup "$TARGET_FILE"
