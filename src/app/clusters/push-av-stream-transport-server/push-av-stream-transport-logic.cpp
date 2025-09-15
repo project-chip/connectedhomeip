@@ -573,7 +573,7 @@ PushAvStreamTransportServerLogic::HandleAllocatePushTransport(CommandHandler & h
         return std::nullopt;
     }
 
-    // ImgestMethod has alread beem validated against the constraints above, this is handling the subsequent required spec logic
+    // IngestMethod has alread been validated against the constraints above, this is handling the subsequent required spec logic
     // to cross-reference use against the ContainerType
     IngestMethodsEnum ingestMethod = commandData.transportOptions.ingestMethod;
 
@@ -585,6 +585,7 @@ PushAvStreamTransportServerLogic::HandleAllocatePushTransport(CommandHandler & h
             (supportsFormat.containerFormat == commandData.transportOptions.containerOptions.containerType))
         {
             isFormatSupported = true;
+            break;
         }
     }
 
@@ -620,19 +621,19 @@ PushAvStreamTransportServerLogic::HandleAllocatePushTransport(CommandHandler & h
         return std::nullopt;
     }
 
-    // here add check for valid zoneid
+    // Validate the motion zones in the trigger options
     if ((transportOptions.triggerOptions.triggerType == TransportTriggerTypeEnum::kMotion) &&
         (transportOptions.triggerOptions.motionZones.HasValue()) && (!transportOptions.triggerOptions.motionZones.Value().IsNull()))
     {
 
         auto & motionZonesList = transportOptions.triggerOptions.motionZones;
         auto iter              = motionZonesList.Value().Value().begin();
-        size_t zoneSize        = 0;
-        motionZonesList.Value().Value().ComputeSize(&zoneSize);
+        size_t zoneListSize        = 0;
+        motionZonesList.Value().Value().ComputeSize(&zoneListSize);
 
-        bool isValidZoneSize = mDelegate->ValidateMotionZoneSize(zoneSize);
+        bool isValidZoneSize = mDelegate->ValidateMotionZoneListSize(zoneListSize);
         VerifyOrReturnValue(
-            isValidZoneSize, Status::ConstraintError,
+            isValidZoneSize, Status::DynamicConstraintError,
             ChipLogError(Zcl, "Transport Options verification from command data[ep=%d]: Invalid Motion Zone Size ", mEndpointId));
 
         while (iter.Next())

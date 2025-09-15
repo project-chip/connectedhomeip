@@ -219,7 +219,7 @@ public:
      * @param zoneSize Size for the requested zone list
      * @return true if the motion zone size is less than the defined maximum, false otherwise
      */
-    virtual bool ValidateMotionZoneSize(size_t zoneSize) = 0;
+    virtual bool ValidateMotionZoneListSize(size_t zoneListSize) = 0;
 
     /**
      * @brief Gets the status of the transport.

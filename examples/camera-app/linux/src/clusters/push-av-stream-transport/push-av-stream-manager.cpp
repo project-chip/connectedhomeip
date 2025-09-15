@@ -342,7 +342,7 @@ Protocols::InteractionModel::Status PushAvStreamTransportManager::ValidateZoneId
     return Status::Failure;
 }
 
-bool PushAvStreamTransportManager::ValidateMotionZoneSize(size_t zoneSize)
+bool PushAvStreamTransportManager::ValidateMotionZoneListSize(size_t zoneListSize)
 {
     if (mCameraDevice == nullptr)
     {
@@ -350,7 +350,7 @@ bool PushAvStreamTransportManager::ValidateMotionZoneSize(size_t zoneSize)
         return false;
     }
     auto maxZones = mCameraDevice->GetZoneManagementDelegate().GetZoneMgmtServer()->GetMaxZones();
-    if (zoneSize >= maxZones)
+    if (zoneListSize >= maxZones)
     {
         return false;
     }
