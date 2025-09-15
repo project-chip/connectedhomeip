@@ -7,6 +7,7 @@
 #include <app/util/basic-types.h>
 
 {{#all_user_clusters side='server'}}
+{{#if (isInConfigList name "CodeDrivenClusters")}}
 /**
  * @param endpoint    Endpoint that is being initialized
  */
@@ -16,5 +17,5 @@ void MatterCodedriven{{asUpperCamelCase name}}ClusterInitCallback(chip::Endpoint
  * @param endpoint    Endpoint that is being shutdown
  */
 void MatterCodedriven{{asUpperCamelCase name}}ClusterShutdownCallback(chip::EndpointId endpointId);
-
+{{/if}}
 {{/all_user_clusters}}

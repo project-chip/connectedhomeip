@@ -26,113 +26,12 @@
 /**
  * @param endpoint    Endpoint that is being initialized
  */
-void MatterCodedrivenIdentifyClusterInitCallback(chip::EndpointId endpointId);
-
-/**
- * @param endpoint    Endpoint that is being shutdown
- */
-void MatterCodedrivenIdentifyClusterShutdownCallback(chip::EndpointId endpointId);
-
-/**
- * @param endpoint    Endpoint that is being initialized
- */
-void MatterCodedrivenGroupsClusterInitCallback(chip::EndpointId endpointId);
-
-/**
- * @param endpoint    Endpoint that is being shutdown
- */
-void MatterCodedrivenGroupsClusterShutdownCallback(chip::EndpointId endpointId);
-
-/**
- * @param endpoint    Endpoint that is being initialized
- */
-void MatterCodedrivenOnOffClusterInitCallback(chip::EndpointId endpointId);
-
-/**
- * @param endpoint    Endpoint that is being shutdown
- */
-void MatterCodedrivenOnOffClusterShutdownCallback(chip::EndpointId endpointId);
-
-/**
- * @param endpoint    Endpoint that is being initialized
- */
-void MatterCodedrivenLevelControlClusterInitCallback(chip::EndpointId endpointId);
-
-/**
- * @param endpoint    Endpoint that is being shutdown
- */
-void MatterCodedrivenLevelControlClusterShutdownCallback(chip::EndpointId endpointId);
-
-/**
- * @param endpoint    Endpoint that is being initialized
- */
-void MatterCodedrivenDescriptorClusterInitCallback(chip::EndpointId endpointId);
-
-/**
- * @param endpoint    Endpoint that is being shutdown
- */
-void MatterCodedrivenDescriptorClusterShutdownCallback(chip::EndpointId endpointId);
-
-/**
- * @param endpoint    Endpoint that is being initialized
- */
-void MatterCodedrivenAccessControlClusterInitCallback(chip::EndpointId endpointId);
-
-/**
- * @param endpoint    Endpoint that is being shutdown
- */
-void MatterCodedrivenAccessControlClusterShutdownCallback(chip::EndpointId endpointId);
-
-/**
- * @param endpoint    Endpoint that is being initialized
- */
 void MatterCodedrivenBasicInformationClusterInitCallback(chip::EndpointId endpointId);
 
 /**
  * @param endpoint    Endpoint that is being shutdown
  */
 void MatterCodedrivenBasicInformationClusterShutdownCallback(chip::EndpointId endpointId);
-
-/**
- * @param endpoint    Endpoint that is being initialized
- */
-void MatterCodedrivenOtaSoftwareUpdateRequestorClusterInitCallback(chip::EndpointId endpointId);
-
-/**
- * @param endpoint    Endpoint that is being shutdown
- */
-void MatterCodedrivenOtaSoftwareUpdateRequestorClusterShutdownCallback(chip::EndpointId endpointId);
-
-/**
- * @param endpoint    Endpoint that is being initialized
- */
-void MatterCodedrivenLocalizationConfigurationClusterInitCallback(chip::EndpointId endpointId);
-
-/**
- * @param endpoint    Endpoint that is being shutdown
- */
-void MatterCodedrivenLocalizationConfigurationClusterShutdownCallback(chip::EndpointId endpointId);
-
-/**
- * @param endpoint    Endpoint that is being initialized
- */
-void MatterCodedrivenTimeFormatLocalizationClusterInitCallback(chip::EndpointId endpointId);
-
-/**
- * @param endpoint    Endpoint that is being shutdown
- */
-void MatterCodedrivenTimeFormatLocalizationClusterShutdownCallback(chip::EndpointId endpointId);
-
-/**
- * @param endpoint    Endpoint that is being initialized
- */
-void MatterCodedrivenGeneralCommissioningClusterInitCallback(chip::EndpointId endpointId);
-
-/**
- * @param endpoint    Endpoint that is being shutdown
- */
-void MatterCodedrivenGeneralCommissioningClusterShutdownCallback(chip::EndpointId endpointId);
-
 /**
  * @param endpoint    Endpoint that is being initialized
  */
@@ -142,17 +41,6 @@ void MatterCodedrivenNetworkCommissioningClusterInitCallback(chip::EndpointId en
  * @param endpoint    Endpoint that is being shutdown
  */
 void MatterCodedrivenNetworkCommissioningClusterShutdownCallback(chip::EndpointId endpointId);
-
-/**
- * @param endpoint    Endpoint that is being initialized
- */
-void MatterCodedrivenDiagnosticLogsClusterInitCallback(chip::EndpointId endpointId);
-
-/**
- * @param endpoint    Endpoint that is being shutdown
- */
-void MatterCodedrivenDiagnosticLogsClusterShutdownCallback(chip::EndpointId endpointId);
-
 /**
  * @param endpoint    Endpoint that is being initialized
  */
@@ -162,7 +50,6 @@ void MatterCodedrivenGeneralDiagnosticsClusterInitCallback(chip::EndpointId endp
  * @param endpoint    Endpoint that is being shutdown
  */
 void MatterCodedrivenGeneralDiagnosticsClusterShutdownCallback(chip::EndpointId endpointId);
-
 /**
  * @param endpoint    Endpoint that is being initialized
  */
@@ -172,17 +59,6 @@ void MatterCodedrivenSoftwareDiagnosticsClusterInitCallback(chip::EndpointId end
  * @param endpoint    Endpoint that is being shutdown
  */
 void MatterCodedrivenSoftwareDiagnosticsClusterShutdownCallback(chip::EndpointId endpointId);
-
-/**
- * @param endpoint    Endpoint that is being initialized
- */
-void MatterCodedrivenThreadNetworkDiagnosticsClusterInitCallback(chip::EndpointId endpointId);
-
-/**
- * @param endpoint    Endpoint that is being shutdown
- */
-void MatterCodedrivenThreadNetworkDiagnosticsClusterShutdownCallback(chip::EndpointId endpointId);
-
 /**
  * @param endpoint    Endpoint that is being initialized
  */
@@ -192,7 +68,6 @@ void MatterCodedrivenWiFiNetworkDiagnosticsClusterInitCallback(chip::EndpointId 
  * @param endpoint    Endpoint that is being shutdown
  */
 void MatterCodedrivenWiFiNetworkDiagnosticsClusterShutdownCallback(chip::EndpointId endpointId);
-
 /**
  * @param endpoint    Endpoint that is being initialized
  */
@@ -202,17 +77,6 @@ void MatterCodedrivenEthernetNetworkDiagnosticsClusterInitCallback(chip::Endpoin
  * @param endpoint    Endpoint that is being shutdown
  */
 void MatterCodedrivenEthernetNetworkDiagnosticsClusterShutdownCallback(chip::EndpointId endpointId);
-
-/**
- * @param endpoint    Endpoint that is being initialized
- */
-void MatterCodedrivenSwitchClusterInitCallback(chip::EndpointId endpointId);
-
-/**
- * @param endpoint    Endpoint that is being shutdown
- */
-void MatterCodedrivenSwitchClusterShutdownCallback(chip::EndpointId endpointId);
-
 /**
  * @param endpoint    Endpoint that is being initialized
  */
@@ -222,17 +86,6 @@ void MatterCodedrivenAdministratorCommissioningClusterInitCallback(chip::Endpoin
  * @param endpoint    Endpoint that is being shutdown
  */
 void MatterCodedrivenAdministratorCommissioningClusterShutdownCallback(chip::EndpointId endpointId);
-
-/**
- * @param endpoint    Endpoint that is being initialized
- */
-void MatterCodedrivenOperationalCredentialsClusterInitCallback(chip::EndpointId endpointId);
-
-/**
- * @param endpoint    Endpoint that is being shutdown
- */
-void MatterCodedrivenOperationalCredentialsClusterShutdownCallback(chip::EndpointId endpointId);
-
 /**
  * @param endpoint    Endpoint that is being initialized
  */
@@ -242,53 +95,3 @@ void MatterCodedrivenGroupKeyManagementClusterInitCallback(chip::EndpointId endp
  * @param endpoint    Endpoint that is being shutdown
  */
 void MatterCodedrivenGroupKeyManagementClusterShutdownCallback(chip::EndpointId endpointId);
-
-/**
- * @param endpoint    Endpoint that is being initialized
- */
-void MatterCodedrivenFixedLabelClusterInitCallback(chip::EndpointId endpointId);
-
-/**
- * @param endpoint    Endpoint that is being shutdown
- */
-void MatterCodedrivenFixedLabelClusterShutdownCallback(chip::EndpointId endpointId);
-
-/**
- * @param endpoint    Endpoint that is being initialized
- */
-void MatterCodedrivenUserLabelClusterInitCallback(chip::EndpointId endpointId);
-
-/**
- * @param endpoint    Endpoint that is being shutdown
- */
-void MatterCodedrivenUserLabelClusterShutdownCallback(chip::EndpointId endpointId);
-
-/**
- * @param endpoint    Endpoint that is being initialized
- */
-void MatterCodedrivenScenesManagementClusterInitCallback(chip::EndpointId endpointId);
-
-/**
- * @param endpoint    Endpoint that is being shutdown
- */
-void MatterCodedrivenScenesManagementClusterShutdownCallback(chip::EndpointId endpointId);
-
-/**
- * @param endpoint    Endpoint that is being initialized
- */
-void MatterCodedrivenColorControlClusterInitCallback(chip::EndpointId endpointId);
-
-/**
- * @param endpoint    Endpoint that is being shutdown
- */
-void MatterCodedrivenColorControlClusterShutdownCallback(chip::EndpointId endpointId);
-
-/**
- * @param endpoint    Endpoint that is being initialized
- */
-void MatterCodedrivenOccupancySensingClusterInitCallback(chip::EndpointId endpointId);
-
-/**
- * @param endpoint    Endpoint that is being shutdown
- */
-void MatterCodedrivenOccupancySensingClusterShutdownCallback(chip::EndpointId endpointId);
