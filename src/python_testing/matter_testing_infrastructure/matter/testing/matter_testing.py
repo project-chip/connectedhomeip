@@ -908,7 +908,7 @@ class MatterBaseTest(base_test.BaseTestClass):
         desired_type = attribute.attribute_type.Type
         type_err_msg = f'Returned attribute {attribute} is wrong type expected {desired_type}, got {type(attr_ret)}'
         read_ok = attr_ret is not None and not isinstance(attr_ret, Clusters.Attribute.ValueDecodeFailure)
-        type_ok = type_matches(attr_ret, desired_type)
+        type_ok = matchers.is_type(attr_ret, desired_type)
         if assert_on_error:
             asserts.assert_true(read_ok, read_err_msg)
             asserts.assert_true(type_ok, type_err_msg)
