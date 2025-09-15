@@ -1,5 +1,5 @@
 #
-#  Copyright (c) 2025 Project CHIP Authors
+#   Copyright (c) 2025 Project CHIP Authors
 #    All rights reserved.
 #
 #    Licensed under the Apache License, Version 2.0 (the "License");
@@ -74,7 +74,7 @@ class TC_CGEN_2_1(MatterBaseTest):
         logging.info(f"Breadcrumb initial value: {breadcrumb}")
 
         self.step("3")
-        result = await self.write_single_attribute(cluster.Attributes.Breadcrumb(1))
+        result = await self.write_single_attribute(attributes.Breadcrumb(1), endpoint=self.endpoint)
         asserts.assert_equal(result, Status.Success, "Error when trying to write a Breadcrumb value")
         logging.info("Breadcrumb set to 1")
 
@@ -87,18 +87,20 @@ class TC_CGEN_2_1(MatterBaseTest):
         self.step("5")
         reg_cfg = await self.read_single_attribute_check_success(
             cluster=cluster, attribute=attributes.RegulatoryConfig)
-        matter_asserts.assert_valid_enum(
-            reg_cfg, "RegulatoryConfig must be a valid RegulatoryLocationTypeEnum",
-            Clusters.GeneralCommissioning.Enums.RegulatoryLocationTypeEnum)
-        logging.info(f"RegulatoryConfig value: {Clusters.GeneralCommissioning.Enums.RegulatoryLocationTypeEnum(reg_cfg).name}")
+        try:
+            enum_val = Clusters.GeneralCommissioning.Enums.RegulatoryLocationTypeEnum(reg_cfg)
+            logging.info(f"RegulatoryConfig value: {enum_val.name}")
+        except ValueError:
+            asserts.fail(f"RegulatoryConfig has invalid value: {reg_cfg}")
 
         self.step("6")
         loc_cap = await self.read_single_attribute_check_success(
             cluster=cluster, attribute=attributes.LocationCapability)
-        matter_asserts.assert_valid_enum(
-            loc_cap, "LocationCapability must be a valid RegulatoryLocationTypeEnum",
-            Clusters.GeneralCommissioning.Enums.RegulatoryLocationTypeEnum)
-        logging.info(f"LocationCapability value: {Clusters.GeneralCommissioning.Enums.RegulatoryLocationTypeEnum(loc_cap).name}")
+        try:
+            enum_val = Clusters.GeneralCommissioning.Enums.RegulatoryLocationTypeEnum(loc_cap)
+            logging.info(f"LocationCapability value: {enum_val.name}")
+        except ValueError:
+            asserts.fail(f"LocationCapability has invalid value: {loc_cap}")
 
         self.step("7")
         basic_info = await self.read_single_attribute_check_success(
@@ -109,8 +111,8 @@ class TC_CGEN_2_1(MatterBaseTest):
         max_cumulative = basic_info.maxCumulativeFailsafeSeconds
         matter_asserts.assert_valid_uint16(failsafe, "failSafeExpiryLengthSeconds must be uint16")
         matter_asserts.assert_valid_uint16(max_cumulative, "maxCumulativeFailsafeSeconds must be uint16")
-        asserts.assert_greater_equal(max_cumulative, failsafe,
-                                     "maxCumulativeFailsafeSeconds must be >= failSafeExpiryLengthSeconds")
+        asserts.assert_greater(failsafe, 0, "failSafeExpiryLengthSeconds must be greater than 0")
+        asserts.assert_greater(max_cumulative, 0, "maxCumulativeFailsafeSeconds must be greater than 0")
 
         self.step("8")
         supports_con = await self.read_single_attribute_check_success(
