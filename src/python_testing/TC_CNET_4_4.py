@@ -24,7 +24,7 @@ from mobly import asserts
 
 import matter.clusters as Clusters
 from matter.clusters.Types import NullValue
-from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main, matchers
+from matter.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main, matchers, run_if_endpoint_matches, has_feature
 
 
 class TC_CNET_4_4(MatterBaseTest):
