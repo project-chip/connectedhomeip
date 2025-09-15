@@ -1404,7 +1404,7 @@ bool CommandIsFabricScoped(ClusterId aCluster, CommandId aCommand)
             return true;
         case Clusters::TlsCertificateManagement::Commands::RemoveRootCertificate::Id:
             return true;
-        case Clusters::TlsCertificateManagement::Commands::TLSClientCSR::Id:
+        case Clusters::TlsCertificateManagement::Commands::ClientCSR::Id:
             return true;
         case Clusters::TlsCertificateManagement::Commands::ProvisionClientCertificate::Id:
             return true;
@@ -1590,12 +1590,12 @@ bool CommandHasLargePayload(ClusterId aCluster, CommandId aCommand)
         return true;
     }
     if ((aCluster == Clusters::TlsCertificateManagement::Id) &&
-        (aCommand == Clusters::TlsCertificateManagement::Commands::TLSClientCSR::Id))
+        (aCommand == Clusters::TlsCertificateManagement::Commands::ClientCSR::Id))
     {
         return true;
     }
     if ((aCluster == Clusters::TlsCertificateManagement::Id) &&
-        (aCommand == Clusters::TlsCertificateManagement::Commands::TLSClientCSRResponse::Id))
+        (aCommand == Clusters::TlsCertificateManagement::Commands::ClientCSRResponse::Id))
     {
         return true;
     }

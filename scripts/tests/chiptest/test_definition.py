@@ -215,7 +215,7 @@ class ApplicationPaths:
     bridge_app: typing.List[str]
     lit_icd_app: typing.List[str]
     microwave_oven_app: typing.List[str]
-    chip_repl_yaml_tester_cmd: typing.List[str]
+    matter_repl_yaml_tester_cmd: typing.List[str]
     chip_tool_with_python_cmd: typing.List[str]
     rvc_app: typing.List[str]
     network_manager_app: typing.List[str]
@@ -227,7 +227,7 @@ class ApplicationPaths:
         return [self.chip_tool, self.all_clusters_app, self.lock_app,
                 self.fabric_bridge_app, self.ota_provider_app, self.ota_requestor_app,
                 self.tv_app, self.bridge_app, self.lit_icd_app,
-                self.microwave_oven_app, self.chip_repl_yaml_tester_cmd,
+                self.microwave_oven_app, self.matter_repl_yaml_tester_cmd,
                 self.chip_tool_with_python_cmd, self.rvc_app, self.network_manager_app,
                 self.energy_gateway_app, self.energy_management_app, self.closure_app]
 
@@ -251,7 +251,7 @@ class ApplicationPaths:
             (self.bridge_app, "chip-bridge-app"),
             (self.lit_icd_app, "lit-icd-app"),
             (self.microwave_oven_app, "chip-microwave-oven-app"),
-            (self.chip_repl_yaml_tester_cmd, "yamltest_with_chip_repl_tester.py"),
+            (self.matter_repl_yaml_tester_cmd, "yamltest_with_matter_repl_tester.py"),
             (
                 # This path varies, however it is a fixed python tool so it may be ok
                 self.chip_tool_with_python_cmd,
@@ -323,7 +323,7 @@ class TestTag(Enum):
 class TestRunTime(Enum):
     CHIP_TOOL_PYTHON = auto()  # use the python yaml test parser with chip-tool
     DARWIN_FRAMEWORK_TOOL_PYTHON = auto()  # use the python yaml test parser with chip-tool
-    CHIP_REPL_PYTHON = auto()       # use the python yaml test runner
+    MATTER_REPL_PYTHON = auto()       # use the python yaml test runner
 
 
 @dataclass
@@ -394,9 +394,9 @@ class TestDefinition:
 
             if not dry_run:
                 for command, key in paths.items_with_key():
-                    # Do not add chip-tool or chip-repl-yaml-tester-cmd to the register
+                    # Do not add chip-tool or matter-repl-yaml-tester-cmd to the register
                     if (command == paths.chip_tool
-                            or command == paths.chip_repl_yaml_tester_cmd
+                            or command == paths.matter_repl_yaml_tester_cmd
                             or command == paths.chip_tool_with_python_cmd):
                         continue
 
@@ -442,16 +442,15 @@ class TestDefinition:
                 app.start()
                 setupCode = app.setupCode
 
-            if test_runtime == TestRunTime.CHIP_REPL_PYTHON:
-                chip_repl_yaml_tester_cmd = paths.chip_repl_yaml_tester_cmd
-                python_cmd = (chip_repl_yaml_tester_cmd
+            if test_runtime == TestRunTime.MATTER_REPL_PYTHON:
+                python_cmd = (paths.matter_repl_yaml_tester_cmd
                               + ['--setup-code', setupCode]
                               + ['--yaml-path', self.run_name]
                               + ["--pics-file", pics_file])
                 if dry_run:
                     logging.info(" ".join(python_cmd))
                 else:
-                    runner.RunSubprocess(python_cmd, name='CHIP_REPL_YAML_TESTER',
+                    runner.RunSubprocess(python_cmd, name='MATTER_REPL_YAML_TESTER',
                                          dependencies=[apps_register], timeout_seconds=timeout_seconds)
             else:
                 pairing_server_args = []

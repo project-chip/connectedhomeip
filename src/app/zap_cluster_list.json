@@ -173,7 +173,7 @@
         "BALLAST_CONFIGURATION_CLUSTER": [],
         "BASIC_INFORMATION_CLUSTER": ["basic-information"],
         "BINDING_CLUSTER": ["bindings"],
-        "BOOLEAN_STATE_CLUSTER": [],
+        "BOOLEAN_STATE_CLUSTER": ["boolean-state-server"],
         "BOOLEAN_STATE_CONFIGURATION_CLUSTER": [
             "boolean-state-configuration-server"
         ],
