@@ -596,19 +596,9 @@ PushAvStreamTransportServerLogic::HandleAllocatePushTransport(CommandHandler & h
             handler.AddClusterSpecificFailure(commandPath, status);
             return std::nullopt;
         });
-
         // Use heap allocation for large certificate buffers to reduce stack usage
-        std::unique_ptr<PersistentStore<CHIP_CONFIG_TLS_PERSISTED_ROOT_CERT_BYTES>> rootCertBuffer{ new (
-            std::nothrow) PersistentStore<CHIP_CONFIG_TLS_PERSISTED_ROOT_CERT_BYTES>() };
-        std::unique_ptr<PersistentStore<CHIP_CONFIG_TLS_PERSISTED_CLIENT_CERT_BYTES>> clientCertBuffer{ new (
-            std::nothrow) PersistentStore<CHIP_CONFIG_TLS_PERSISTED_CLIENT_CERT_BYTES>() };
-
-        if (!rootCertBuffer || !clientCertBuffer)
-        {
-            ChipLogError(Zcl, "HandleAllocatePushTransport[ep=%d]: Memory allocation failed for certificate buffers", mEndpointId);
-            handler.AddStatus(commandPath, Status::ResourceExhausted);
-            return std::nullopt;
-        }
+        auto rootCertBuffer   = std::make_unique<PersistentStore<CHIP_CONFIG_TLS_PERSISTED_ROOT_CERT_BYTES>>();
+        auto clientCertBuffer = std::make_unique<PersistentStore<CHIP_CONFIG_TLS_PERSISTED_CLIENT_CERT_BYTES>>();
 
         Tls::CertificateTable::BufferedClientCert clientCertEntry(*clientCertBuffer);
         Tls::CertificateTable::BufferedRootCert rootCertEntry(*rootCertBuffer);
