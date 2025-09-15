@@ -24,6 +24,12 @@ config("server_config") {
   if (chip_app_use_echo) {
     defines += [ "CHIP_APP_USE_ECHO" ]
   }
+
+  if (chip_mdns_minimal) {
+    defines += [ "CHIP_MDNS_MINIMAL=1" ]
+  } else {
+    defines += [ "CHIP_MDNS_MINIMAL=0" ]
+  }
 }
 
 source_set("terms_and_conditions") {
@@ -98,6 +104,11 @@ static_library("server") {
     "${chip_root}/src/protocols",
     "${chip_root}/src/transport",
   ]
+
+  if (chip_mdns_minimal) {
+    public_deps +=
+        [ "${chip_root}/src/lib/dnssd/minimal_mdns:singleinterface_policy" ]
+  }
 
   if (chip_terms_and_conditions_required) {
     public_deps += [ ":terms_and_conditions" ]
