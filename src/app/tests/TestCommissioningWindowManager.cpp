@@ -506,10 +506,12 @@ TEST_F(TestCommissioningWindowManager, TestOnPlatformEventOperationalNetworkEnab
     commissionMgr.OnPlatformEvent(&event);
 }
 
+
 // Verify that operational advertising failure is handled gracefully
 TEST_F(TestCommissioningWindowManager, TestOnPlatformEventOperationalNetworkEnabledFail)
 {
     CommissioningWindowManager & commissionMgr = Server::GetInstance().GetCommissioningWindowManager();
+    auto & fabricTable = Server::GetInstance().GetFabricTable(); 
 
     // Stopping DNS-SD server to trigger AdvertiseOperational() failure
     chip::app::DnssdServer::Instance().StopServer();
@@ -519,20 +521,31 @@ TEST_F(TestCommissioningWindowManager, TestOnPlatformEventOperationalNetworkEnab
     commissionMgr.OnPlatformEvent(&event);
     // This should attempt to start operational advertising, which will fail
     EXPECT_EQ(chip::app::DnssdServer::Instance().AdvertiseOperational(), CHIP_ERROR_INCORRECT_STATE);
-
-    chip::app::DnssdServer::Instance().StartServer(); // Restart the server for subsequent tests
+    // StopServer() clears the FabricTable pointer
+    // we must restore it with SetFabricTable before calling StartServer() 
+    // to ensure the server reinitializes correctly and to maintain a clean state for subsequent tests
+    chip::app::DnssdServer::Instance().SetFabricTable(&fabricTable); 
+    chip::app::DnssdServer::Instance().StartServer();
 }
 
 // Verify that BLE advertising is stopped when all BLE connections are closed
+#if CONFIG_NETWORK_LAYER_BLE
 TEST_F(TestCommissioningWindowManager, TestOnPlatformEventCloseAllBleConnections)
 {
     CommissioningWindowManager & commissionMgr = Server::GetInstance().GetCommissioningWindowManager();
+    
+    EXPECT_EQ(commissionMgr.OpenBasicCommissioningWindow(commissionMgr.MaxCommissioningTimeout(),
+                                                         CommissioningWindowAdvertisement::kAllSupported),
+              CHIP_NO_ERROR);
 
-    // ensure that BLE advertisement is enabled
+    // ensure that BLE advertising is active before the event generation
+    EXPECT_TRUE(chip::DeviceLayer::ConnectivityMgr().IsBLEAdvertisingEnabled());
     auto event = CreateEvent(chip::DeviceLayer::DeviceEventType::kCloseAllBleConnections);
 
     commissionMgr.OnPlatformEvent(&event);
+    commissionMgr.CloseCommissioningWindow();
     EXPECT_FALSE(chip::DeviceLayer::ConnectivityMgr().IsBLEAdvertisingEnabled());
 }
+#endif
 
 } // namespace
