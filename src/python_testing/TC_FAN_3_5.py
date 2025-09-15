@@ -283,7 +283,6 @@ class TC_FAN_3_5(MatterBaseTest):
             await self.send_single_cmd(step, endpoint=self.endpoint)
         except InteractionModelError as e:
             asserts.assert_equal(e.status, Status.Success, f"[FC] Unexpected error returned ({e})")
-            pass
 
     async def send_on_off_command(self, cmd: Clusters.ClusterObjects.ClusterCommand) -> None:
         """Send an On/Off command to the DUT.
