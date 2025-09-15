@@ -511,7 +511,7 @@ TEST_F(TestCommissioningWindowManager, TestOnPlatformEventOperationalNetworkEnab
 TEST_F(TestCommissioningWindowManager, TestOnPlatformEventOperationalNetworkEnabledFail)
 {
     CommissioningWindowManager & commissionMgr = Server::GetInstance().GetCommissioningWindowManager();
-    auto & fabricTable = Server::GetInstance().GetFabricTable(); 
+    auto & fabricTable = Server::GetInstance().GetFabricTable();
 
     // Stopping DNS-SD server to trigger AdvertiseOperational() failure
     chip::app::DnssdServer::Instance().StopServer();
@@ -522,9 +522,9 @@ TEST_F(TestCommissioningWindowManager, TestOnPlatformEventOperationalNetworkEnab
     // This should attempt to start operational advertising, which will fail
     EXPECT_EQ(chip::app::DnssdServer::Instance().AdvertiseOperational(), CHIP_ERROR_INCORRECT_STATE);
     // StopServer() clears the FabricTable pointer
-    // we must restore it with SetFabricTable before calling StartServer() 
+    // we must restore it with SetFabricTable before calling StartServer()
     // to ensure the server reinitializes correctly and to maintain a clean state for subsequent tests
-    chip::app::DnssdServer::Instance().SetFabricTable(&fabricTable); 
+    chip::app::DnssdServer::Instance().SetFabricTable(&fabricTable);
     chip::app::DnssdServer::Instance().StartServer();
 }
 
@@ -533,7 +533,7 @@ TEST_F(TestCommissioningWindowManager, TestOnPlatformEventOperationalNetworkEnab
 TEST_F(TestCommissioningWindowManager, TestOnPlatformEventCloseAllBleConnections)
 {
     CommissioningWindowManager & commissionMgr = Server::GetInstance().GetCommissioningWindowManager();
-    
+
     EXPECT_EQ(commissionMgr.OpenBasicCommissioningWindow(commissionMgr.MaxCommissioningTimeout(),
                                                          CommissioningWindowAdvertisement::kAllSupported),
               CHIP_NO_ERROR);
