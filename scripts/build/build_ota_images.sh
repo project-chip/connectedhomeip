@@ -16,9 +16,7 @@
 # limitations under the License.
 #
 
-
 CHIP_ROOT="$(dirname "$0")/../.."
-
 
 # Default values for optional arguments
 VENDOR_ID="0xDEAD"
@@ -34,7 +32,7 @@ replace_version_config_str() {
     local version="$1"
     local dest_file="$2"
 
-cat >> "$dest_file" << EOL
+    cat >>"$dest_file" <<EOL
 
 #ifdef CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION
 #undef CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION
@@ -91,14 +89,14 @@ if [ "$STATUS_CODE" -ne 0 ]; then
     exit 1
 fi
 
-for (( i=2; i<="$MAX_RANGE"; i++ )); do
+for ((i = 2; i <= "$MAX_RANGE"; i++)); do
     echo "Running for version $i"
 
     "$(replace_version_config_str "$i" "$TARGET_FILE")"
 
     # Build the image
     echo "Building the requestor app"
-    ./"$CHIP_ROOT"/scripts/examples/gn_build_example.sh "$CHIP_ROOT"/examples/ota-requestor-app/linux "$CHIP_ROOT/$OUT_PREFIX" chip_config_network_layer_ble=false is_debug=false > /dev/null
+    ./"$CHIP_ROOT"/scripts/examples/gn_build_example.sh "$CHIP_ROOT"/examples/ota-requestor-app/linux "$CHIP_ROOT/$OUT_PREFIX" chip_config_network_layer_ble=false is_debug=false >/dev/null
     STATUS_CODE=$?
     if [ "$STATUS_CODE" -ne 0 ]; then
         echo "Failed to build the app $TARGET_FILE"
@@ -111,7 +109,7 @@ for (( i=2; i<="$MAX_RANGE"; i++ )); do
         LINUX_OPT=""
     fi
 
-    strip "$LINUX_OPT" "$CHIP_ROOT/$OUT_PREFIX"/chip-ota-requestor-app -o "$CHIP_ROOT/$OUT_PREFIX"/chip-ota-requestor-app.min > /dev/null
+    strip "$LINUX_OPT" "$CHIP_ROOT/$OUT_PREFIX"/chip-ota-requestor-app -o "$CHIP_ROOT/$OUT_PREFIX"/chip-ota-requestor-app.min >/dev/null
     STATUS_CODE=$?
     if [ "$STATUS_CODE" -ne 0 ]; then
         echo "Failed to strip the code from min app"
@@ -131,12 +129,11 @@ for (( i=2; i<="$MAX_RANGE"; i++ )); do
     cp "$CHIP_ROOT"/examples/ota-requestor-app/linux/include/CHIPProjectAppConfig.h.backup "$TARGET_FILE"
 done
 
-
 echo "Restoring backup file"
 cp "$CHIP_ROOT"/examples/ota-requestor-app/linux/include/CHIPProjectAppConfig.h.backup "$TARGET_FILE"
 echo "Removing old backup file"
 rm "$CHIP_ROOT"/examples/ota-requestor-app/linux/include/CHIPProjectAppConfig.h.backup
 
 if [ "$STATUS_CODE" -ne 0 ]; then
-exit 1
+    exit 1
 fi
