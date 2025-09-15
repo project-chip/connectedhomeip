@@ -90,7 +90,7 @@ TEST(TestNodeAddressCache, CacheFIFOReplacement)
         Inet::IPAddress ipAddress;
         chip::Inet::IPAddress::FromString("192.168.1.1", ipAddress);
         result.address.SetIPAddress(ipAddress);
-        result.address.SetPort((uint16_t)(5540 + i));
+        result.address.SetPort((uint16_t) (5540 + i));
         EXPECT_EQ(cache.CacheNode(i + 1, result), CHIP_NO_ERROR);
     }
     EXPECT_EQ(cache.GetCacheSize(), NodeAddressCache::kMaxCacheSize);
@@ -119,7 +119,7 @@ TEST(TestNodeAddressCache, CacheClear)
     result.address.SetIPAddress(ipAddress);
     for (size_t i = 0; i < 5; ++i)
     {
-        result.address.SetPort((uint16_t)(5540 + i));
+        result.address.SetPort((uint16_t) (5540 + i));
         EXPECT_EQ(cache.CacheNode(i + 1, result), CHIP_NO_ERROR);
     }
     EXPECT_EQ(cache.GetCacheSize(), 5u);

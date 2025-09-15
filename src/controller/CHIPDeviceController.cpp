@@ -1684,8 +1684,8 @@ CHIP_ERROR DeviceCommissioner::ProcessCSR(DeviceProxy * proxy, const ByteSpan & 
     {
         // cache the address we are using for PASE as a backup
         ResolveResult result;
-        result.address = proxy->GetSecureSession().Value()->AsSecureSession()->GetPeerAddress();
-        result.mrpRemoteConfig = proxy->GetSecureSession().Value()->GetRemoteMRPConfig();
+        result.address           = proxy->GetSecureSession().Value()->AsSecureSession()->GetPeerAddress();
+        result.mrpRemoteConfig   = proxy->GetSecureSession().Value()->GetRemoteMRPConfig();
         result.supportsTcpClient = result.address.GetTransportType() == Transport::Type::kTcp;
         result.supportsTcpServer = result.address.GetTransportType() == Transport::Type::kTcp;
         Resolver::Instance().CacheNode(proxy->GetDeviceId(), result);

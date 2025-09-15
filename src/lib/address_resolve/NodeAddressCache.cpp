@@ -40,7 +40,7 @@ CHIP_ERROR NodeAddressCache::CacheNode(NodeId nodeId, const ResolveResult & resu
         ChipLogProgress(Discovery, "Cache full, overwriting oldest entry at index %zu", mNextCacheIndex);
         mCache[mNextCacheIndex].nodeId = nodeId;
         mCache[mNextCacheIndex].result = result;
-        mNextCacheIndex = (mNextCacheIndex + 1) % kMaxCacheSize;
+        mNextCacheIndex                = (mNextCacheIndex + 1) % kMaxCacheSize;
     }
     else
     {
@@ -91,7 +91,7 @@ CHIP_ERROR NodeAddressCache::RemoveCachedNodeAddress(NodeId nodeId)
 
 void NodeAddressCache::Clear()
 {
-    mCacheCount = 0;
+    mCacheCount     = 0;
     mNextCacheIndex = 0;
 }
 
