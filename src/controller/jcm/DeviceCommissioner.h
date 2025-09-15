@@ -126,7 +126,7 @@ private:
      *
      * @param result The result of the JCM trust verification process.
      */
-    virtual void OnTrustVerificationComplete(Credentials::JCM::TrustVerificationError error);
+    void OnTrustVerificationComplete(Credentials::JCM::TrustVerificationError error) override;
 
     // Device proxy for the device being commissioned
     DeviceProxy * mDeviceProxy;
