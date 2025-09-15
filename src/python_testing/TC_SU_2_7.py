@@ -182,24 +182,6 @@ class TC_SU_2_7(MatterBaseTest):
         )
         logger.info(f"After udpate ACL Entries {acl_attr}")
 
-    async def write_acl(self, controller, node_id, endpoint, acls):
-        result = await controller.WriteAttribute(
-            node_id,
-            [(endpoint, Clusters.AccessControl.Attributes.Acl(acls))]
-        )
-        asserts.assert_equal(result[0].Status, Status.Success, "ACL write failed")
-        logger.info(f"Status of write ACL: {result}")
-        return True
-
-    async def _update_ota_requestor_state(self, controller, requestor_node_id, endpoint: int = 0, state: Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum = Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kUnknown):
-        logger.info(f"Updating Requestor -> UpdateState to {state}")
-        new_state_attr = Clusters.OtaSoftwareUpdateRequestor.Attributes.UpdateState(state)
-        resp = await controller.WriteAttribute(
-            attributes=[(endpoint, new_state_attr)],
-            nodeid=requestor_node_id,
-        )
-        asserts.assert_equal(resp[0].Status, Status.Success, "Failed to write UpdateState Attirbute")
-
     async def _write_ota_providers(self, controller, provider_node_id, endpoint: int = 0):
 
         current_otap_info = await self.read_single_attribute_check_success(
@@ -372,14 +354,15 @@ class TC_SU_2_7(MatterBaseTest):
     async def test_TC_SU_2_7(self):
 
         #### Apps to run for this test case ###
-        # Terminal 1: ./out/debug/chip-ota-requestor-app --discriminator 123 --passcode 2123 --secured-device-port 5540 --KVS /tmp/chip_kvs_requestor --a
+        # Terminal 1: ./out/debug/chip-ota-requestor-app --discriminator 123 --passcode 2123 --secured-device-port 5540 --KVS /tmp/chip_kvs_requestor -a
         # Terminal 2: ./out/debug/chip-ota-provider-app --filepath firmware_requestor_v2.min.ota  --discriminator 321 --passcode 2321 --secured-device-port 5541
         # Terminal 3: python3 src/python_testing/TC_SU_2_7.py --commissioning-method on-network --passcode 2123 --discriminator 123 --endpoint 0 --nodeId 123
         ###
         # Define varaibles to use in test case
         update_software_version = 2
-        # self.current_provider_app_pid = self._get_pid_by_name("chip-ota-provider-app")
         self.current_requestor_app_pid = self._get_pid_by_name("chip-ota-requestor-app")
+        if self.current_requestor_app_pid is None:
+            asserts.fail("Failed to find the PID for chip-ota-requestor-app")
         logger.info(f"Test started with provider PID {self.current_requestor_app_pid}")
 
         # Requestor is the DUT
@@ -626,10 +609,12 @@ class TC_SU_2_7(MatterBaseTest):
         download_event_report = error_download_event_handler.wait_for_event_report(
             self.ota_req.Events.DownloadError, timeout_sec=60*10)
         logger.info(f"Download error Event: {download_event_report}")
-        asserts.assert_equal(download_event_report.softwareVersion, update_software_version)
-        asserts.assert_greater(download_event_report.bytesDownloaded, 0)
-        asserts.assert_greater(download_event_report.progressPercent, 0)
-        asserts.assert_equal(download_event_report.platformCode, NullValue)
+        asserts.assert_equal(download_event_report.softwareVersion, update_software_version,
+                             f"Expected Software version {update_software_version}, found {download_event_report.softwareVersion}")
+        asserts.assert_greater(download_event_report.bytesDownloaded, 0, "Download was 0 bytes")
+        asserts.assert_greater(download_event_report.progressPercent, 0, "Download progress was 0")
+        asserts.assert_equal(download_event_report.platformCode, NullValue,
+                             f"Null value not found at platformCode {download_event_report.platformCode}")
         # Cancel Handlers
         error_download_event_handler.reset()
         await error_download_event_handler.cancel()
