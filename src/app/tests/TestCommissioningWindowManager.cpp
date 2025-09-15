@@ -441,7 +441,7 @@ TEST_F(TestCommissioningWindowManager, TestOnPlatformEventCommissioningComplete)
 }
 
 // Verify that on normal failsafe timer expiry the commissioning window remains open
-// The explicit CloseConnection() call is for cleanup and also checks that the commissioning mode changes to kDisabled
+// The explicit CloseCommissioningWindow() call is for cleanup and also checks that the commissioning mode changes to kDisabled
 TEST_F(TestCommissioningWindowManager, TestOnPlatformEventFailSafeTimerExpired)
 {
     CommissioningWindowManager & commissionMgr = Server::GetInstance().GetCommissioningWindowManager();
