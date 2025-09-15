@@ -39,6 +39,10 @@
 #include <ble/Ble.h>
 #endif // CONFIG_NETWORK_BLE
 
+#if CHIP_DEVICE_CONFIG_ENABLE_NFC_BASED_COMMISSIONING
+#include <nfc/NFC.h>
+#endif // CHIP_DEVICE_CONFIG_ENABLE_NFC_BASED_COMMISSIONING
+
 #include <controller/DeviceDiscoveryDelegate.h>
 
 #include <deque>
@@ -89,6 +93,10 @@ enum class DiscoveryType : uint8_t
 };
 
 class DLL_EXPORT SetUpCodePairer : public DevicePairingDelegate
+#if CHIP_DEVICE_CONFIG_ENABLE_NFC_BASED_COMMISSIONING
+    ,
+                                   public Nfc::NFCReaderTransportDelegate
+#endif
 {
 public:
     SetUpCodePairer(DeviceCommissioner * commissioner) : mCommissioner(commissioner) {}
@@ -119,6 +127,12 @@ private:
     void OnPairingDeleted(CHIP_ERROR error) override;
     void OnCommissioningComplete(NodeId deviceId, CHIP_ERROR error) override;
 
+#if CHIP_DEVICE_CONFIG_ENABLE_NFC_BASED_COMMISSIONING
+    // Nfc::NFCReaderTransportDelegate implementation
+    void OnTagDiscovered(const chip::Nfc::NFCTag::Identifier & identifer) override;
+    void OnTagDiscoveryFailed(CHIP_ERROR error) override;
+#endif
+
     CHIP_ERROR Connect();
     CHIP_ERROR StartDiscoveryOverBLE();
     CHIP_ERROR StopDiscoveryOverBLE();
@@ -126,6 +140,8 @@ private:
     CHIP_ERROR StopDiscoveryOverDNSSD();
     CHIP_ERROR StartDiscoveryOverWiFiPAF();
     CHIP_ERROR StopDiscoveryOverWiFiPAF();
+    CHIP_ERROR StartDiscoveryOverNFC();
+    CHIP_ERROR StopDiscoveryOverNFC();
 
     // Returns whether we have kicked off a new connection attempt.
     bool ConnectToDiscoveredDevice();
@@ -169,6 +185,9 @@ private:
         kBLETransport = 0,
         kIPTransport,
         kWiFiPAFTransport,
+#if CHIP_DEVICE_CONFIG_ENABLE_NFC_BASED_COMMISSIONING
+        kNFCTransport,
+#endif
         kTransportTypeCount,
     };
 

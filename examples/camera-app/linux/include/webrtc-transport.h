@@ -23,6 +23,8 @@
 #include <lib/core/DataModelTypes.h>
 #include <lib/core/ScopedNodeId.h>
 
+#include <string>
+
 using OnTransportLocalDescriptionCallback = std::function<void(const std::string & sdp, SDPType type, const int16_t sessionId)>;
 using OnTransportConnectionStateCallback  = std::function<void(bool connected, const int16_t sessionId)>;
 
@@ -36,6 +38,7 @@ public:
         kOffer         = 1,
         kAnswer        = 2,
         kICECandidates = 3,
+        kEnd           = 4,
     };
 
     enum class State : uint8_t
@@ -44,6 +47,7 @@ public:
         SendingOffer,         ///< Sending Offer command from camera
         SendingAnswer,        ///< Sending Answer command from camera
         SendingICECandidates, ///< Sending ICECandidates command from camera
+        SendingEnd,           ///< Sending End command from camera
     };
 
     struct RequestArgs
@@ -89,13 +93,7 @@ public:
     // Stops WebRTC peer connection and cleanup
     void Stop();
 
-    void AddTracks();
-
-    // Set video track for the transport
-    void SetVideoTrack(std::shared_ptr<WebRTCTrack> videoTrack);
-
-    // Set audio track for the transport
-    void SetAudioTrack(std::shared_ptr<WebRTCTrack> audioTrack);
+    void AddTracks(const std::string & videoMid = "video", const std::string & audioMid = "audio");
 
     std::shared_ptr<WebRTCPeerConnection> GetPeerConnection() { return mPeerConnection; }
 
@@ -129,8 +127,11 @@ private:
     State mState             = State::Idle;
 
     std::shared_ptr<WebRTCPeerConnection> mPeerConnection;
-    std::shared_ptr<WebRTCTrack> mVideoTrack;
-    std::shared_ptr<WebRTCTrack> mAudioTrack;
+
+    // Local tracks set to send the camera data to remote peer connection object
+    std::shared_ptr<WebRTCTrack> mLocalVideoTrack;
+    std::shared_ptr<WebRTCTrack> mLocalAudioTrack;
+
     std::string mLocalSdp;
     SDPType mLocalSdpType;
     std::vector<std::string> mLocalCandidates;
