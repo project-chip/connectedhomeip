@@ -32,13 +32,13 @@ from pyasn1.error import PyAsn1Error
 from pyasn1_modules import rfc2986, rfc5480
 
 import matter.clusters as Clusters
+import matter.testing.matchers as matchers
 from matter import ChipDeviceCtrl
 from matter.clusters.Types import Nullable, NullValue
 from matter.interaction_model import InteractionModelError, Status
 from matter.testing import matter_asserts
 from matter.testing.conversions import hex_from_bytes
 from matter.testing.matter_testing import MatterBaseTest
-import matter.testing.matchers as matchers
 from matter.tlv import uint
 
 
