@@ -37,7 +37,7 @@ CHIP_ERROR NodeAddressCache::CacheNode(NodeId nodeId, const ResolveResult & resu
     // If cache is full, overwrite oldest entry (FIFO)
     if (mCacheCount >= kMaxCacheSize)
     {
-        ChipLogProgress(Discovery, "Cache full, overwriting oldest entry at index %zu", mNextCacheIndex);
+        ChipLogProgress(Discovery, "Cache full, overwriting oldest entry at index %u", static_cast<unsigned int>(mNextCacheIndex));
         mCache[mNextCacheIndex].nodeId = nodeId;
         mCache[mNextCacheIndex].result = result;
         mNextCacheIndex                = (mNextCacheIndex + 1) % kMaxCacheSize;
