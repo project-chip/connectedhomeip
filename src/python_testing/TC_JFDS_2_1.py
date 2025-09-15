@@ -82,7 +82,7 @@ class TC_JFDS_2_1(MatterBaseTest):
         #
         #####################################################################################################################################
         self.jfadmin_fabric_a_passcode = random.randint(110220011, 110220999)
-        self.jfadmin_fabric_a_discriminator = random.randint(0, 4095),
+        self.jfadmin_fabric_a_discriminator = random.randint(0, 4095)
         self.jfctrl_fabric_a_vid = random.randint(0x0001, 0xFFF0)
 
         # Start Fabric A JF-Administrator App
@@ -111,7 +111,7 @@ class TC_JFDS_2_1(MatterBaseTest):
         self.fabric_a_ctrl.send(
             message=f"pairing onnetwork-long 1 {self.jfadmin_fabric_a_passcode} {self.jfadmin_fabric_a_discriminator} --anchor true",
             expected_output="[JF] Anchor Administrator (nodeId=1) commissioned with success",
-            timeout=10)
+            timeout=30)
 
         # Extract the Ecosystem A certificates and inject them in the storage that will be provided to a new Python Controller later
         jfcStorage = ConfigParser()
