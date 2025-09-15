@@ -32,10 +32,12 @@
 # === END CI TEST ARGUMENTS ===
 
 import logging
+
 from mobly import asserts
+
 import matter.clusters as Clusters
 from matter.testing import matter_asserts
-from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main, Status
+from matter.testing.matter_testing import MatterBaseTest, Status, TestStep, async_test_body, default_matter_test_main
 
 
 class TC_CGEN_2_1(MatterBaseTest):
