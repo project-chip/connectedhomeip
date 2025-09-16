@@ -1,5 +1,5 @@
 #
-#    Copyright (c) 2024 Project CHIP Authors
+#    Copyright (c) 2025 Project CHIP Authors
 #    All rights reserved.
 #
 #    Licensed under the Apache License, Version 2.0 (the "License");
@@ -28,7 +28,6 @@ from matter.tlv import uint
 
 class TestSpecParsingDataType(MatterBaseTest):
     def setup_class(self):
-        # Get the latest fully qualified release for testing
         self.xml_clusters, self.xml_cluster_problems = build_xml_clusters(PrebuiltDataModelDirectory.k1_5)
 
         # Setup templates for testing struct, enum, and bitmap data types
@@ -967,7 +966,7 @@ class TestSpecParsingDataType(MatterBaseTest):
                     if field_id is None:
                         issues.append(f"Struct field with empty id in {struct_name} of cluster {cluster.name}")
 
-                    # Skip known cases where type_info is intentionally missing
+                    # Skip known cases where type_info is missing
                     is_monitoring_key = (struct_name.strip() == "MonitoringRegistrationStruct" and
                                          field.name.strip() == "Key" and
                                          "ICD Management" in cluster.name)
