@@ -70,6 +70,7 @@ namespace Crypto {
 
 CHIP_ERROR ESP32P256Keypair::Initialize(ECPKeyTarget keyTarget, int efuseBlock)
 {
+#ifdef CONFIG_USE_ESP32_ECDSA_PERIPHERAL
     Clear();
 
     CHIP_ERROR error = CHIP_NO_ERROR;
@@ -95,6 +96,59 @@ exit:
     }
     _log_mbedTLS_error(status);
     return error;
+#else
+    return CHIP_ERROR_INCORRECT_STATE;
+#endif
+}
+
+CHIP_ERROR ESP32P256Keypair::InitializeFromTEE(ECPKeyTarget keyTarget, const char * key_id)
+{
+#ifdef CONFIG_USE_ESP32_TEE_SECURE_STORAGE
+    Clear();
+
+    CHIP_ERROR error = CHIP_NO_ERROR;
+
+    mbedtls_ecdsa_context * ecdsa_ctx = to_ecdsa_ctx(&mKeypair);
+    mbedtls_ecdsa_init(ecdsa_ctx);
+
+    int status = mbedtls_ecp_group_load(&ecdsa_ctx->MBEDTLS_PRIVATE(grp), MBEDTLS_ECP_DP_SECP256R1);
+    VerifyOrExit(status == 0, error = CHIP_ERROR_INTERNAL);
+
+    {
+        mbedtls_pk_context key_ctx;
+        mbedtls_pk_init(&key_ctx);
+
+        esp_ecdsa_pk_conf_t conf = {
+            .grp_id              = MBEDTLS_ECP_DP_SECP256R1,
+            .tee_key_id          = key_id,
+            .use_tee_sec_stg_key = true,
+        };
+
+        status = esp_ecdsa_tee_set_pk_context(&key_ctx, &conf);
+        VerifyOrExit(status == 0, error = CHIP_ERROR_INTERNAL);
+
+        mbedtls_ecp_keypair * keypair = mbedtls_pk_ec(key_ctx);
+        status                        = mbedtls_mpi_copy(&ecdsa_ctx->MBEDTLS_PRIVATE(d), &keypair->MBEDTLS_PRIVATE(d));
+        VerifyOrExit(status == 0, error = CHIP_ERROR_INTERNAL);
+
+        mbedtls_pk_free(&key_ctx);
+    }
+
+    mInitialized = true;
+    ecdsa_ctx    = nullptr;
+    return error;
+
+exit:
+    if (ecdsa_ctx)
+    {
+        mbedtls_ecdsa_free(ecdsa_ctx);
+        ecdsa_ctx = nullptr;
+    }
+    _log_mbedTLS_error(status);
+    return error;
+#else
+    return CHIP_ERROR_INCORRECT_STATE;
+#endif
 }
 
 CHIP_ERROR ESP32P256Keypair::ECDSA_sign_msg(const uint8_t * msg, const size_t msg_length, P256ECDSASignature & out_signature) const
