@@ -66,15 +66,18 @@ namespace chip {
  */
 enum class TransportPayloadCapability : uint8_t
 {
-    kMRPPayload,               // Transport requires the maximum payload size to fit within a single
-                               // IPv6 packet(1280 bytes).
-    kLargePayload,             // Transport needs to handle payloads larger than the single IPv6
-                               // packet, as supported by MRP. The transport of choice, in this
-                               // case, is TCP.
-    kMRPOrTCPCompatiblePayload // This option provides the ability to use MRP
-                               // as the preferred transport, but use a large
-                               // payload transport if that is already
-                               // available.
+    kMRPPayload,                // Transport requires the maximum payload size to fit within a single
+                                // IPv6 packet(1280 bytes).
+    kLargePayload,              // Transport needs to handle payloads larger than the single IPv6
+                                // packet, as supported by MRP. The transport of choice, in this
+                                // case, is TCP.
+    kMRPOrTCPCompatiblePayload, // This option provides the ability to use MRP
+                                // as the preferred transport, but use a large
+                                // payload transport if that is already
+                                // available.
+    kPreferTCPCompatiblePayload // This option provides the ability to use large
+                                // payloads when available and fallback to MRP
+                                // otherwise.
 };
 /**
  * @brief
