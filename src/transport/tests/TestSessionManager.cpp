@@ -61,6 +61,11 @@ const char PAYLOAD[] = "Hello!";
 
 const char LARGE_PAYLOAD[kMaxAppMessageLen + 1] = "test message";
 
+uint16_t GetRandomPort()
+{
+    return static_cast<uint16_t>(CHIP_PORT + chip::Crypto::GetRandU16() % 100);
+}
+
 // Just enough init to replace a ton of boilerplate
 class FabricTableHolder
 {
@@ -1020,5 +1025,115 @@ TEST_F(TestSessionManager, TestFindSecureSessionForNode)
 
     sessionManager.Shutdown();
 }
+
+#if INET_CONFIG_ENABLE_TCP_ENDPOINT
+TEST_F(TestSessionManager, TestFindSecureSessionForNodeWithoutATCPSession)
+{
+    IPAddress addr;
+    IPAddress::FromString("::1", addr);
+
+    NodeId aliceNodeId           = 0x11223344ull;
+    NodeId bobNodeId             = 0x12344321ull;
+    FabricIndex aliceFabricIndex = 1;
+
+    FabricTableHolder fabricTableHolder;
+    SessionManager sessionManager;
+    secure_channel::MessageCounterManager gMessageCounterManager;
+    chip::TestPersistentStorageDelegate deviceStorage;
+    chip::Crypto::DefaultSessionKeystore sessionKeystore;
+
+    EXPECT_EQ(CHIP_NO_ERROR, fabricTableHolder.Init());
+    EXPECT_EQ(CHIP_NO_ERROR,
+              sessionManager.Init(&mContext.GetSystemLayer(), &mContext.GetTransportMgr(), &gMessageCounterManager, &deviceStorage,
+                                  &fabricTableHolder.GetFabricTable(), sessionKeystore));
+
+    Transport::PeerAddress peer(Transport::PeerAddress::UDP(addr, CHIP_PORT));
+    SessionHolder aliceToBobSession;
+    CHIP_ERROR err = sessionManager.InjectCaseSessionWithTestKey(aliceToBobSession, 2, 1, aliceNodeId, bobNodeId, aliceFabricIndex,
+                                                                 peer, CryptoContext::SessionRole::kInitiator);
+    EXPECT_EQ(err, CHIP_NO_ERROR);
+    aliceToBobSession->AsSecureSession()->MarkActiveRx();
+
+    // ASSERT: There is an MRP session.
+    auto foundSession = sessionManager.FindSecureSessionForNode(ScopedNodeId(bobNodeId, aliceFabricIndex),
+                                                                MakeOptional(SecureSession::Type::kCASE));
+    EXPECT_TRUE(foundSession.HasValue());
+    EXPECT_TRUE(aliceToBobSession.Contains(foundSession.Value()));
+
+    // ASSERT: There isn't a TCP session.
+    foundSession = sessionManager.FindSecureSessionForNode(ScopedNodeId(bobNodeId, aliceFabricIndex),
+                                                           MakeOptional(SecureSession::Type::kCASE),
+                                                           TransportPayloadCapability::kLargePayload);
+    EXPECT_FALSE(foundSession.HasValue());
+
+    // ASSERT: Fallback to MRP session works.
+    foundSession = sessionManager.FindSecureSessionForNode(ScopedNodeId(bobNodeId, aliceFabricIndex),
+                                                           MakeOptional(SecureSession::Type::kCASE),
+                                                           TransportPayloadCapability::kPreferTCPCompatiblePayload);
+    EXPECT_TRUE(foundSession.HasValue());
+    EXPECT_TRUE(aliceToBobSession.Contains(foundSession.Value()));
+
+    sessionManager.Shutdown();
+}
+
+TEST_F(TestSessionManager, TestFindSecureSessionForNodeWithATCPSession)
+{
+    IOContext ioContext;
+    ASSERT_EQ(ioContext.Init(), CHIP_NO_ERROR);
+
+    IPAddress addr;
+    IPAddress::FromString("::1", addr);
+
+    NodeId aliceNodeId           = 0x11223344ull;
+    NodeId bobNodeId             = 0x12344321ull;
+    FabricIndex aliceFabricIndex = 1;
+
+    FabricTableHolder fabricTableHolder;
+    SessionManager sessionManager;
+    secure_channel::MessageCounterManager gMessageCounterManager;
+    chip::TestPersistentStorageDelegate deviceStorage;
+    chip::Crypto::DefaultSessionKeystore sessionKeystore;
+
+    EXPECT_EQ(CHIP_NO_ERROR, fabricTableHolder.Init());
+    EXPECT_EQ(CHIP_NO_ERROR,
+              sessionManager.Init(&mContext.GetSystemLayer(), &mContext.GetTransportMgr(), &gMessageCounterManager, &deviceStorage,
+                                  &fabricTableHolder.GetFabricTable(), sessionKeystore));
+
+    Transport::PeerAddress peer(Transport::PeerAddress::TCP(addr, CHIP_PORT));
+    ASSERT_EQ(peer.GetTransportType(), Transport::Type::kTcp);
+
+    SessionHolder aliceToBobSession;
+    CHIP_ERROR err = sessionManager.InjectCaseSessionWithTestKey(aliceToBobSession, 2, 1, aliceNodeId, bobNodeId, aliceFabricIndex,
+                                                                 peer, CryptoContext::SessionRole::kInitiator);
+    EXPECT_EQ(err, CHIP_NO_ERROR);
+    aliceToBobSession->AsSecureSession()->MarkActiveRx();
+
+    // ARRANGE: Create an actual TCP connection and set it on the injected session as SessionManager will check the connection
+    // state.
+    TCP<1, 1> tcp;
+    err = tcp.Init(Transport::TcpListenParameters(
+        ioContext.GetTCPEndPointManager()).SetAddressType(addr.Type()).SetListenPort(GetRandomPort()));
+    ASSERT_EQ(err, CHIP_NO_ERROR);
+    ActiveTCPConnectionHolder tcpConnectionHolder;
+    EXPECT_EQ(tcp.TCPConnect(peer, nullptr, tcpConnectionHolder), CHIP_NO_ERROR);
+    aliceToBobSession->AsSecureSession()->SetTCPConnection(tcpConnectionHolder);
+
+    // ASSERT: There is a TCP session.
+    auto foundSession = sessionManager.FindSecureSessionForNode(ScopedNodeId(bobNodeId, aliceFabricIndex),
+                                                                MakeOptional(SecureSession::Type::kCASE),
+                                                                TransportPayloadCapability::kLargePayload);
+    EXPECT_TRUE(foundSession.HasValue());
+    EXPECT_TRUE(aliceToBobSession.Contains(foundSession.Value()));
+
+    // ASSERT: Prefer TCP session works.
+    foundSession = sessionManager.FindSecureSessionForNode(ScopedNodeId(bobNodeId, aliceFabricIndex),
+                                                           MakeOptional(SecureSession::Type::kCASE),
+                                                           TransportPayloadCapability::kPreferTCPCompatiblePayload);
+    EXPECT_TRUE(foundSession.HasValue());
+    EXPECT_TRUE(aliceToBobSession.Contains(foundSession.Value()));
+
+    sessionManager.Shutdown();
+}
+#endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
 
 } // namespace
