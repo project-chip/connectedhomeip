@@ -40,6 +40,7 @@
 
 import logging
 from enum import Enum
+
 from mobly import asserts
 
 import matter.clusters as Clusters
