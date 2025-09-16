@@ -275,7 +275,6 @@ public:
 #include CHIP_ADDRESS_RESOLVE_IMPL_INCLUDE_HEADER
 #else
 #include <lib/address_resolve/AddressResolve_DefaultImpl.h>
-#include <lib/address_resolve/NodeAddressCache.h>
 #endif
 
 namespace chip {

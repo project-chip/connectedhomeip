@@ -17,6 +17,7 @@
 #pragma once
 
 #include <lib/address_resolve/AddressResolve.h>
+#include <lib/address_resolve/NodeAddressCache.h>
 #include <lib/dnssd/IPAddressSorter.h>
 #include <lib/dnssd/Resolver.h>
 #include <system/TimeSource.h>
