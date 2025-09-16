@@ -763,12 +763,13 @@
     const EmberAfGenericClusterFunction chipFuncArrayGroupKeyManagementServer[] = {                                                \
         (EmberAfGenericClusterFunction) emberAfGroupKeyManagementClusterServerInitCallback,                                        \
     };                                                                                                                             \
-    const EmberAfGenericClusterFunction chipFuncArrayUserLabelServer[] = {                                                         \
-        (EmberAfGenericClusterFunction) emberAfUserLabelClusterServerInitCallback,                                                 \
-        (EmberAfGenericClusterFunction) MatterUserLabelClusterServerShutdownCallback,                                              \
     const EmberAfGenericClusterFunction chipFuncArrayFixedLabelServer[] = {                                                        \
         (EmberAfGenericClusterFunction) emberAfFixedLabelClusterServerInitCallback,                                                \
         (EmberAfGenericClusterFunction) MatterFixedLabelClusterServerShutdownCallback,                                             \
+    };                                                                                                                             \
+    const EmberAfGenericClusterFunction chipFuncArrayUserLabelServer[] = {                                                         \
+        (EmberAfGenericClusterFunction) emberAfUserLabelClusterServerInitCallback,                                                 \
+        (EmberAfGenericClusterFunction) MatterUserLabelClusterServerShutdownCallback,                                              \
     };                                                                                                                             \
     const EmberAfGenericClusterFunction chipFuncArrayIdentifyServer[] = {                                                          \
         (EmberAfGenericClusterFunction) emberAfIdentifyClusterServerInitCallback,                                                  \
@@ -1369,7 +1370,7 @@
 // This is an array of EmberAfEndpointType structures.
 #define GENERATED_ENDPOINT_TYPES                                                                                                   \
     {                                                                                                                              \
-        { ZAP_CLUSTER_INDEX(0), 21, 119 },                                                                                         \
+        { ZAP_CLUSTER_INDEX(0), 21, 113 },                                                                                         \
         { ZAP_CLUSTER_INDEX(21), 8, 109 },                                                                                         \
     }
 
@@ -1382,7 +1383,7 @@ static_assert(ATTRIBUTE_LARGEST <= CHIP_CONFIG_MAX_ATTRIBUTE_STORE_ELEMENT_SIZE,
 #define ATTRIBUTE_SINGLETONS_SIZE (0)
 
 // Total size of attribute storage
-#define ATTRIBUTE_MAX_SIZE (228)
+#define ATTRIBUTE_MAX_SIZE (222)
 
 // Number of fixed endpoints
 #define FIXED_ENDPOINT_COUNT (2)
