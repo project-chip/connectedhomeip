@@ -82,6 +82,8 @@ template("scm1612s_ayla_sources") {
       "AYLA_LOG_SNAPSHOTS",
       "STATIC_WEB_CONTENT_IN_MEMORY",
       "XXD_BIN_TO_C",
+      "CONFIG_AYLA_SYSTEM_PARTITION_ADDR=0x80014000",
+      "CONFIG_AYLA_SYSTEM_PARTITION_SIZE=4096"
     ]
     if (defined(invoker.defines)) {
       defines += invoker.defines
