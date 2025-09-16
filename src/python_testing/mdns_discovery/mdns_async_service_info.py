@@ -16,7 +16,7 @@
 #
 
 from random import randint
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Optional
 
 from zeroconf import (BadTypeInNameException, DNSOutgoing, DNSQuestion, DNSQuestionType, ServiceInfo, Zeroconf, current_time_millis,
                       service_type_name)
@@ -58,8 +58,8 @@ class MdnsAsyncServiceInfo(ServiceInfo):
     async def async_request(
         self,
         zc: Zeroconf,
-        timeout: float,
-        question_type: DNSQuestionType | None = None,
+        timeout_ms: float,
+        question_type: Optional[DNSQuestionType] = None,
         addr: str | None = None,
         port: int = _MDNS_PORT,
     ) -> bool:
@@ -86,7 +86,7 @@ class MdnsAsyncServiceInfo(ServiceInfo):
         now = current_time_millis()
 
         # Absolute cutoff time after which the request stops if incomplete
-        deadline_ms = now + timeout
+        deadline_ms = now + timeout_ms
 
         # Delay before sending the first retry query if the initial query did not complete
         initial_delay_ms = _LISTENER_TIME + randint(0, 50)

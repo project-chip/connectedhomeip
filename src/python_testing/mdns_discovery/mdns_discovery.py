@@ -300,7 +300,7 @@ class MdnsDiscovery:
 
             is_discovered = await addr_resolver.async_request(
                 azc.zeroconf,
-                timeout=query_timeout_sec * 1000)
+                timeout_ms=query_timeout_sec * 1000)
 
             if is_discovered:
                 logger.info(f"Service record information (AAAA) for '{hostname}' discovered.")
@@ -623,8 +623,8 @@ class MdnsDiscovery:
             service_info = MdnsAsyncServiceInfo(name=service_name, type_=service_type)
             service_info._query_record_types = query_record_types
             is_discovered = await service_info.async_request(
-                azc.zeroconf,
-                query_timeout_sec * 1000)
+                zc=azc.zeroconf,
+                timeout_ms=query_timeout_sec * 1000)
 
             # Remove service listener
             await azc.async_remove_service_listener(service_listener)
