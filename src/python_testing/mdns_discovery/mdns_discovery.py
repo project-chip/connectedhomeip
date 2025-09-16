@@ -21,9 +21,9 @@ import time
 from asyncio import Event, Semaphore, TimeoutError, create_task, gather, sleep, wait_for
 from typing import Dict, List, Optional
 
+from mdns_discovery.data_classes.aaaa_record import AaaaRecord
 from mdns_discovery.data_classes.mdns_service_info import MdnsServiceInfo
 from mdns_discovery.data_classes.ptr_record import PtrRecord
-from mdns_discovery.data_classes.aaaa_record import AaaaRecord
 from mdns_discovery.enums.mdns_service_type import MdnsServiceType
 from mdns_discovery.mdns_async_service_info import AddressResolverIPv6, MdnsAsyncServiceInfo
 from mdns_discovery.service_listeners.mdns_service_listener import MdnsServiceListener
