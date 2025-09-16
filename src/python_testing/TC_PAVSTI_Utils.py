@@ -48,6 +48,7 @@ class PushAvServerProcess(Subprocess):
         server_path: str | None,
         port: int = 1234,
         host: str = "0.0.0.0",
+        server_ip: str | None = None,
     ):
         if server_path is None:
             logging.error(f"No path provided for Push AV Server, using the default path for TH: {self.DEFAULT_SERVER_PATH}")
@@ -69,6 +70,14 @@ class PushAvServerProcess(Subprocess):
                 self._working_directory,
             ]
         )
+
+        if server_ip:
+            command.extend(
+                [
+                    "--server-ip",
+                    server_ip
+                ]
+            )
 
         # Start the server application
         super().__init__(
@@ -120,13 +129,6 @@ class PushAvServerProcess(Subprocess):
         response = self._post_json("/streams")
         return response["stream_id"]
 
-    def create_key_pair(self) -> None:
-        """
-        This method is a work around to create keys for camera-app
-        as currently it tries to access from /tmp/pavstest/
-        """
-        self._post_json("/certs/dev/keypair")
-
 
 class PAVSTIUtils:
     """Utils for Push AV TC's TLS requirements."""
@@ -135,7 +137,7 @@ class PAVSTIUtils:
     # Precondition setup
     # ----------------------------------------------------------------------
 
-    def _get_private_ip(self):
+    def get_private_ip(self):
         candidates = {"192": [], "10": []}
 
         for iface, addrs in psutil.net_if_addrs().items():
@@ -164,13 +166,10 @@ class PAVSTIUtils:
             # If no host ip specified, try to get private ip
             # this is mainly required when running TCs in Test Harness
             logging.error("No host_ip provided in test arguments")
-            host_ip = self._get_private_ip()
-            logging.info(f"Using IP: {host_ip} as hostname to provision TLS Endpoint")
+            host_ip = self.get_private_ip()
 
         tls_utils = TLSUtils(self, endpoint=endpoint)
-        # Create Kep Pair for camera as it currently tries to access it from /tmp/pavstest when uploading.
-        # TODO: Remove once camera-app supports TLS
-        server.create_key_pair()
+        logging.info(f"Using IP: {host_ip} as hostname to provision TLS Endpoint")
         root_cert_der = server.get_root_cert()
         prc_result = await tls_utils.send_provision_root_command(certificate=root_cert_der)
         tls_utils.assert_valid_caid(prc_result.caid)
