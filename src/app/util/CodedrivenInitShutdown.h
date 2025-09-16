@@ -26,8 +26,7 @@
 #include <lib/core/CHIPSafeCasts.h>
 #include <lib/support/TypeTraits.h>
 
-namespace chip
-{
+namespace chip {
 void MatterCodedrivenClusterInitCallback(EndpointId endpoint, ClusterId clusterId);
 void MatterCodedrivenClusterShutdownCallback(EndpointId endpoint, ClusterId clusterId);
 

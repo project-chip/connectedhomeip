@@ -24,9 +24,9 @@
 #include <app/persistence/AttributePersistenceProviderInstance.h>
 #include <app/persistence/PascalString.h>
 #include <app/reporting/reporting.h>
+#include <app/util/CodedrivenInitShutdown.h>
 #include <app/util/attribute-metadata.h>
 #include <app/util/attribute-storage-detail.h>
-#include <app/util/CodedrivenInitShutdown.h>
 #include <app/util/config.h>
 #include <app/util/ember-io-storage.h>
 #include <app/util/ember-strings.h>
@@ -478,7 +478,8 @@ static void initializeEndpoint(EmberAfDefinedEndpoint * definedEndpoint)
         const EmberAfCluster * cluster = &(epType->cluster[clusterIndex]);
         EmberAfGenericClusterFunction f;
         emberAfClusterInitCallback(definedEndpoint->endpoint, cluster->clusterId);
-        if(cluster->IsServer()) {
+        if (cluster->IsServer())
+        {
             MatterCodedrivenClusterInitCallback(definedEndpoint->endpoint, cluster->clusterId);
         }
         f = emberAfFindClusterFunction(cluster, MATTER_CLUSTER_FLAG_INIT_FUNCTION);
@@ -496,8 +497,9 @@ static void shutdownEndpoint(EmberAfDefinedEndpoint * definedEndpoint)
     const EmberAfEndpointType * epType = definedEndpoint->endpointType;
     for (clusterIndex = 0; clusterIndex < epType->clusterCount; clusterIndex++)
     {
-        const EmberAfCluster * cluster  = &(epType->cluster[clusterIndex]);
-        if(cluster->IsServer()) {
+        const EmberAfCluster * cluster = &(epType->cluster[clusterIndex]);
+        if (cluster->IsServer())
+        {
             MatterCodedrivenClusterShutdownCallback(definedEndpoint->endpoint, cluster->clusterId);
         }
         EmberAfGenericClusterFunction f = emberAfFindClusterFunction(cluster, MATTER_CLUSTER_FLAG_SHUTDOWN_FUNCTION);
