@@ -1034,11 +1034,11 @@ class TestSpecParsingDataType(MatterBaseTest):
             for problem in self.xml_global_problems:
                 self.print_step("Problem", str(problem))
         
-        # Verify we have at least some global data types
+        # Verify we have at least 3 global data types
         total_global_types = (len(self.xml_global_data_types['structs']) + 
                              len(self.xml_global_data_types['enums']) + 
                              len(self.xml_global_data_types['bitmaps']))
-        asserts.assert_true(total_global_types > 0, "Should have at least some global data types")
+        asserts.assert_true(total_global_types >= 3, "Should have at least some global data types")
         
         self.print_step("Global Data Types", f"Found {len(self.xml_global_data_types['structs'])} global structs, "
                                            f"{len(self.xml_global_data_types['enums'])} global enums, "
@@ -1065,11 +1065,6 @@ class TestSpecParsingDataType(MatterBaseTest):
                 asserts.assert_true(component.conformance is not None, f"Component {component_id} in {struct_name} should have conformance")
                 asserts.assert_true(component_id is not None, f"Component in {struct_name} should have a valid ID")
         
-        # Log some example structs found
-        struct_names = list(global_structs.keys())[:5]  # Show first 5 as examples
-        self.print_step("Example Global Structs", f"Examples: {struct_names}")
-        self.print_step("Global Structs Validation", f"Successfully validated all {len(global_structs)} global structs")
-
     def test_global_enums_validation(self):
         """Test validation of all global enum data types"""
         global_enums = self.xml_global_data_types['enums']
@@ -1091,10 +1086,6 @@ class TestSpecParsingDataType(MatterBaseTest):
                 asserts.assert_true(component.conformance is not None, f"Component {component_id} in {enum_name} should have conformance")
                 asserts.assert_true(component_id is not None, f"Component in {enum_name} should have a valid ID")
         
-        # Log some example enums found
-        enum_names = list(global_enums.keys())[:5]  # Show first 5 as examples
-        self.print_step("Example Global Enums", f"Examples: {enum_names}")
-        self.print_step("Global Enums Validation", f"Successfully validated all {len(global_enums)} global enums")
 
     def test_global_bitmaps_validation(self):
         """Test validation of all global bitmap data types"""
@@ -1117,11 +1108,6 @@ class TestSpecParsingDataType(MatterBaseTest):
                 asserts.assert_true(component.conformance is not None, f"Component {component_id} in {bitmap_name} should have conformance")
                 asserts.assert_true(component_id is not None, f"Component in {bitmap_name} should have a valid ID")
         
-        # Log some example bitmaps found
-        bitmap_names = list(global_bitmaps.keys())[:5]  # Show first 5 as examples
-        self.print_step("Example Global Bitmaps", f"Examples: {bitmap_names}")
-        self.print_step("Global Bitmaps Validation", f"Successfully validated all {len(global_bitmaps)} global bitmaps")
-
     def test_global_data_types_comprehensive_validation(self):
         """Comprehensive validation of all global data types"""
         issues = []
