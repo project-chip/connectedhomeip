@@ -23,66 +23,30 @@
 
 #include <app/util/basic-types.h>
 
-/**
- * @param endpoint    Endpoint that is being initialized
- */
 void MatterCodedrivenBasicInformationClusterInitCallback(chip::EndpointId endpointId);
 
-/**
- * @param endpoint    Endpoint that is being shutdown
- */
 void MatterCodedrivenBasicInformationClusterShutdownCallback(chip::EndpointId endpointId);
-/**
- * @param endpoint    Endpoint that is being initialized
- */
+
 void MatterCodedrivenGeneralDiagnosticsClusterInitCallback(chip::EndpointId endpointId);
 
-/**
- * @param endpoint    Endpoint that is being shutdown
- */
 void MatterCodedrivenGeneralDiagnosticsClusterShutdownCallback(chip::EndpointId endpointId);
-/**
- * @param endpoint    Endpoint that is being initialized
- */
+
 void MatterCodedrivenSoftwareDiagnosticsClusterInitCallback(chip::EndpointId endpointId);
 
-/**
- * @param endpoint    Endpoint that is being shutdown
- */
 void MatterCodedrivenSoftwareDiagnosticsClusterShutdownCallback(chip::EndpointId endpointId);
-/**
- * @param endpoint    Endpoint that is being initialized
- */
+
 void MatterCodedrivenWiFiNetworkDiagnosticsClusterInitCallback(chip::EndpointId endpointId);
 
-/**
- * @param endpoint    Endpoint that is being shutdown
- */
 void MatterCodedrivenWiFiNetworkDiagnosticsClusterShutdownCallback(chip::EndpointId endpointId);
-/**
- * @param endpoint    Endpoint that is being initialized
- */
+
 void MatterCodedrivenEthernetNetworkDiagnosticsClusterInitCallback(chip::EndpointId endpointId);
 
-/**
- * @param endpoint    Endpoint that is being shutdown
- */
 void MatterCodedrivenEthernetNetworkDiagnosticsClusterShutdownCallback(chip::EndpointId endpointId);
-/**
- * @param endpoint    Endpoint that is being initialized
- */
+
 void MatterCodedrivenAdministratorCommissioningClusterInitCallback(chip::EndpointId endpointId);
 
-/**
- * @param endpoint    Endpoint that is being shutdown
- */
 void MatterCodedrivenAdministratorCommissioningClusterShutdownCallback(chip::EndpointId endpointId);
-/**
- * @param endpoint    Endpoint that is being initialized
- */
+
 void MatterCodedrivenGroupKeyManagementClusterInitCallback(chip::EndpointId endpointId);
 
-/**
- * @param endpoint    Endpoint that is being shutdown
- */
 void MatterCodedrivenGroupKeyManagementClusterShutdownCallback(chip::EndpointId endpointId);
