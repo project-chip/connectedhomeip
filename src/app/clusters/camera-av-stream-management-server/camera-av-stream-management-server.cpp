@@ -973,8 +973,17 @@ CHIP_ERROR CameraAVStreamMgmtServer::SetSoftLivestreamPrivacyModeEnabled(bool aS
 
 CHIP_ERROR CameraAVStreamMgmtServer::SetHardPrivacyModeOn(bool aHardPrivacyModeOn)
 {
-    return SetAttributeIfDifferent(mHardPrivacyModeOn, aHardPrivacyModeOn, Attributes::HardPrivacyModeOn::Id,
-                                   /* shouldPersist = */ false);
+    if (mHardPrivacyModeOn != aHardPrivacyModeOn)
+    {
+        mHardPrivacyModeOn = aHardPrivacyModeOn;
+        ReturnErrorOnFailure(SetAttributeIfDifferent(mHardPrivacyModeOn, aHardPrivacyModeOn, Attributes::HardPrivacyModeOn::Id,
+                                                     /* shouldPersist = */ false));
+
+        auto path = ConcreteAttributePath(mEndpointId, CameraAvStreamManagement::Id, Attributes::HardPrivacyModeOn::Id);
+        mDelegate.OnAttributeChanged(Attributes::HardPrivacyModeOn::Id);
+        MatterReportingAttributeChangeCallback(path);
+    }
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR CameraAVStreamMgmtServer::SetNightVision(TriStateAutoEnum aNightVision)

@@ -92,6 +92,8 @@ public:
 
     bool HasAllocatedAudioStreams() override;
 
+    CHIP_ERROR SetHardPrivacyModeOn(bool hardPrivacyMode) override;
+
     CHIP_ERROR PersistentAttributesLoadedCallback() override;
 
     CHIP_ERROR OnTransportAcquireAudioVideoStreams(uint16_t audioStreamID, uint16_t videoStreamID) override;

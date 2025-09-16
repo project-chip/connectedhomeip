@@ -41,6 +41,7 @@ private:
     Camera::CameraDevice * mCameraDevice = nullptr;
 
     void OnZoneTriggeredHandler(uint16_t zoneId);
+    void OnSetHardPrivacyModeOnHandler(bool value);
 };
 
 class CameraAppCommandDelegate : public NamedPipeCommandDelegate

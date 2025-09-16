@@ -57,6 +57,11 @@ void CameraAppCommandHandler::HandleCommand(intptr_t context)
         uint16_t zoneId = static_cast<uint16_t>(self->mJsonValue["ZoneId"].asUInt());
         self->OnZoneTriggeredHandler(zoneId);
     }
+    else if (name == "SetHardPrivacyModeOn")
+    {
+        bool value = self->mJsonValue["Value"].asBool();
+        self->OnSetHardPrivacyModeOnHandler(value);
+    }
     else
     {
         ChipLogError(NotSpecified, "Unhandled command: Should never happen");
@@ -74,6 +79,11 @@ void CameraAppCommandHandler::SetCameraDevice(Camera::CameraDevice * aCameraDevi
 void CameraAppCommandHandler::OnZoneTriggeredHandler(uint16_t zoneId)
 {
     mCameraDevice->HandleSimulatedZoneTriggeredEvent(zoneId);
+}
+
+void CameraAppCommandHandler::OnSetHardPrivacyModeOnHandler(bool value)
+{
+    mCameraDevice->GetCameraAVStreamMgmtController().SetHardPrivacyModeOn(value);
 }
 
 void CameraAppCommandDelegate::SetCameraDevice(Camera::CameraDevice * aCameraDevice)
