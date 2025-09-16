@@ -116,8 +116,8 @@ class TC_WebRTCRequestor_2_7(MatterBaseTest):
         Executes the test steps for the WebRTC ICECandidates with empty candidate list scenario.
         """
 
-        discriminator = 1234
-        passcode = 20202021
+        discriminator = self.th_server_discriminator
+        passcode = self.th_server_passcode
         self.th_server_local_nodeid = 1111
         self.discriminator = random.randint(0, 4095)
 
