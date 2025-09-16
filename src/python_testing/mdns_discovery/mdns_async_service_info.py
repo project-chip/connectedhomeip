@@ -24,6 +24,7 @@ from zeroconf.const import _CLASS_IN, _DUPLICATE_QUESTION_INTERVAL, _FLAGS_QR_QU
 
 _LISTENER_TIME_MS = _LISTENER_TIME
 
+
 class MdnsAsyncServiceInfo(ServiceInfo):
     """
     This subclass of **zeroconf.ServiceInfo** enables AAAA address
