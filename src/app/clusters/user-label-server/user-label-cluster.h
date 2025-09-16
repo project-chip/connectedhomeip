@@ -21,10 +21,15 @@
 
 namespace chip::app::Clusters {
 
-class UserLabelCluster : public DefaultServerCluster
+class UserLabelCluster : public DefaultServerCluster, public chip::FabricTable::Delegate
 {
 public:
     UserLabelCluster(EndpointId endpoint);
+
+    CHIP_ERROR Startup(ServerClusterContext & context) override;
+    void Shutdown() override;
+
+    void OnFabricRemoved(const FabricTable & fabricTable, FabricIndex fabricIndex) override;
 
     // Server cluster implementation
     DataModel::ActionReturnStatus ReadAttribute(const DataModel::ReadAttributeRequest & request,

@@ -17,9 +17,7 @@
  */
 
 #include <app/clusters/user-label-server/user-label-cluster.h>
-#include <app/server/Server.h>
 #include <app/static-cluster-config/UserLabel.h>
-#include <app/util/attribute-storage.h>
 #include <data-model-providers/codegen/ClusterIntegration.h>
 #include <data-model-providers/codegen/CodegenDataModelProvider.h>
 
@@ -55,37 +53,6 @@ public:
     void ReleaseRegistration(unsigned clusterInstanceIndex) override { gServers[clusterInstanceIndex].Destroy(); }
 };
 
-class UserLabelFabricTableDelegate : public chip::FabricTable::Delegate
-{
-public:
-    // Gets called when a fabric is deleted
-    void OnFabricRemoved(const FabricTable & fabricTable, FabricIndex fabricIndex) override
-    {
-        // If the FabricIndex matches the last remaining entry in the Fabrics list, then the device SHALL delete all Matter
-        // related data on the node which was created since it was commissioned.
-        if (Server::GetInstance().GetFabricTable().FabricCount() == 0)
-        {
-            ChipLogProgress(Zcl, "UserLabel: Last Fabric index 0x%x was removed", static_cast<unsigned>(fabricIndex));
-
-            // Delete all user label data on the node which was added since it was commissioned.
-            DeviceLayer::DeviceInfoProvider * provider = DeviceLayer::GetDeviceInfoProvider();
-            if (provider)
-            {
-                for (auto endpoint : EnabledEndpointsWithServerCluster(UserLabel::Id))
-                {
-                    // If UserLabel cluster is implemented on this endpoint
-                    if (CHIP_NO_ERROR != provider->ClearUserLabelList(endpoint))
-                    {
-                        ChipLogError(Zcl, "UserLabel::Failed to clear UserLabelList for endpoint:%d", endpoint);
-                    }
-                }
-            }
-        }
-    }
-};
-
-UserLabelFabricTableDelegate gUserLabelFabricDelegate;
-
 } // namespace
 
 void emberAfUserLabelClusterServerInitCallback(EndpointId endpointId)
@@ -103,14 +70,10 @@ void emberAfUserLabelClusterServerInitCallback(EndpointId endpointId)
             .fetchOptionalAttributes   = false,
         },
         integrationDelegate);
-
-    Server::GetInstance().GetFabricTable().AddFabricDelegate(&gUserLabelFabricDelegate);
 }
 
 void MatterUserLabelClusterServerShutdownCallback(EndpointId endpointId)
 {
-    Server::GetInstance().GetFabricTable().RemoveFabricDelegate(&gUserLabelFabricDelegate);
-
     IntegrationDelegate integrationDelegate;
 
     // register a singleton server (root endpoint only)

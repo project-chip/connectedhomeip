@@ -16,6 +16,7 @@
 
 #include <app/clusters/user-label-server/user-label-cluster.h>
 #include <app/server-cluster/AttributeListBuilder.h>
+#include <app/server/Server.h>
 #include <clusters/UserLabel/Metadata.h>
 
 namespace chip::app::Clusters {
@@ -167,6 +168,45 @@ CHIP_ERROR UserLabelCluster::Attributes(const ConcreteClusterPath & path,
 {
     AttributeListBuilder listBuilder(builder);
     return listBuilder.Append(Span(UserLabel::Attributes::kMandatoryMetadata), {});
+}
+
+CHIP_ERROR UserLabelCluster::Startup(ServerClusterContext & context)
+{
+    CHIP_ERROR err = DefaultServerCluster::Startup(context);
+    VerifyOrReturnError(err == CHIP_NO_ERROR, err);
+
+    err = Server::GetInstance().GetFabricTable().AddFabricDelegate(this);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Zcl, "UserLabel: Unable to register Fabric table delegate");
+    }
+
+    return err;
+}
+
+void UserLabelCluster::Shutdown()
+{
+    Server::GetInstance().GetFabricTable().RemoveFabricDelegate(this);
+
+    DefaultServerCluster::Shutdown();
+}
+
+void UserLabelCluster::OnFabricRemoved(const FabricTable & fabricTable, FabricIndex fabricIndex)
+{
+    // If the FabricIndex matches the last remaining entry in the Fabrics list, then the device SHALL delete all Matter
+    // related data on the node which was created since it was commissioned.
+    VerifyOrReturn(Server::GetInstance().GetFabricTable().FabricCount() == 0);
+
+    ChipLogProgress(Zcl, "UserLabel: Last Fabric index 0x%x was removed", static_cast<unsigned>(fabricIndex));
+
+    // Delete all user label data on the node which was added since it was commissioned.
+    DeviceLayer::DeviceInfoProvider * provider = DeviceLayer::GetDeviceInfoProvider();
+    VerifyOrReturn(provider != nullptr);
+    // If UserLabel cluster is implemented on this endpoint
+    if (CHIP_NO_ERROR != provider->ClearUserLabelList(mPath.mEndpointId))
+    {
+        ChipLogError(Zcl, "UserLabel: Failed to clear UserLabelList for endpoint: %d", mPath.mEndpointId);
+    }
 }
 
 } // namespace chip::app::Clusters
