@@ -24,12 +24,13 @@
 #include <app/clusters/ota-provider/ota-provider-delegate.h>
 #include <lib/core/OTAImageHeader.h>
 #include <ota-provider-common/BdxOtaSender.h>
+#include <platform/PlatformManager.h>
 #include <vector>
 
 /**
  * A reference implementation for an OTA Provider. Includes a method for providing a path to a local OTA file to serve.
  */
-class OTAProviderExample : public chip::app::Clusters::OTAProviderDelegate
+class OTAProviderExample : public chip::app::Clusters::OTAProviderDelegate, public chip::DeviceLayer::PlatformManagerDelegate
 {
 public:
     OTAProviderExample();
@@ -90,6 +91,9 @@ public:
     }
 
     void SetMaxBDXBlockSize(uint16_t blockSize) { mMaxBDXBlockSize = blockSize; }
+
+     // PlatformManagerDelegate
+    void OnShutDown() override;
 
 private:
     bool SelectOTACandidate(const uint16_t requestorVendorID, const uint16_t requestorProductID,
