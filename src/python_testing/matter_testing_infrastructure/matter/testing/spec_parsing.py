@@ -760,6 +760,7 @@ class PrebuiltDataModelDirectory(Enum):
 class DataModelLevel(Enum):
     kCluster = auto()
     kDeviceType = auto()
+    kGlobal = auto()
 
     @property
     def dirname(self):
@@ -767,6 +768,8 @@ class DataModelLevel(Enum):
             return "clusters"
         if self == DataModelLevel.kDeviceType:
             return "device_types"
+        if self == DataModelLevel.kGlobal:
+            return "globals"
         raise KeyError("Invalid enum: %r" % self)
 
 
@@ -1206,6 +1209,100 @@ def build_xml_device_types(data_model_directory: typing.Union[PrebuiltDataModelD
         d.superset_of_device_type_id = matches[0]
 
     return device_types, problems
+
+
+def build_xml_global_data_types(data_model_directory: Union[PrebuiltDataModelDirectory, Traversable]) -> typing.Tuple[dict[str, dict[str, XmlDataType]], list[ProblemNotice]]:
+    """
+    Build XML global data types from the globals data model directory.
+
+    `data_model_directory` given as a path MUST be of type Traversable (often `pathlib.Path(somepathstring)`).
+    If data_model_directory is a Traversable, it is assumed to already contain `globals` 
+    
+    Returns:
+        Tuple of (global_data_types, problems) where global_data_types is a dict with keys:
+        - 'structs': dict[str, XmlDataType] - global structs by name
+        - 'enums': dict[str, XmlDataType] - global enums by name  
+        - 'bitmaps': dict[str, XmlDataType] - global bitmaps by name
+    """
+    
+    global_data_types = {
+        'structs': {},
+        'enums': {},
+        'bitmaps': {}
+    }
+    problems: list[ProblemNotice] = []
+
+    top = get_data_model_directory(data_model_directory, DataModelLevel.kGlobal)
+    logging.info("Reading XML global data types from %r", top)
+
+    # Map of XML file names to data type categories
+    file_to_datatype_map = {
+        'Structs.xml': ('structs', DataTypeEnum.kStruct),
+        'Enums.xml': ('enums', DataTypeEnum.kEnum), 
+        'Bitmaps.xml': ('bitmaps', DataTypeEnum.kBitmap)
+    }
+
+    found_xmls = 0
+    for f in top.iterdir():
+        if not f.name.endswith('.xml'):
+            logging.info("Ignoring non-XML file %s", f.name)
+            continue
+            
+        if f.name not in file_to_datatype_map:
+            logging.info("Ignoring XML file %s (not a data type file - only parsing Structs.xml, Enums.xml, Bitmaps.xml)", f.name)
+            continue
+
+        found_xmls += 1
+        category, data_type_enum = file_to_datatype_map[f.name]
+        
+        with f.open("r", encoding="utf8") as file:
+            root = ElementTree.parse(file).getroot()
+            
+            # Parse each data type element in the file
+            for element in root:
+                if element.tag != str(data_type_enum):
+                    continue
+                    
+                try:
+                    name = element.attrib['name']
+                except KeyError:
+                    location = ClusterPathLocation(0, 0)  # Global types have no cluster ID
+                    problems.append(ProblemNotice("Global Data Type XML Parsing", location=location,
+                                                  severity=ProblemSeverity.WARNING, 
+                                                  problem=f"Global {data_type_enum} with no name in {f.name}"))
+                    continue
+
+                # Create a temporary parser to parse components
+                # Global data types have no cluster ID, so we pass None
+                temp_parser = ClusterParser(ElementTree.Element('cluster'), None, 'GlobalDataTypes')
+                components = temp_parser._parse_components(element, data_type_enum)
+                temp_problems = temp_parser.get_problems()
+                
+                # Filter out conformance parsing problems for global data types
+                # Global data types often have complex field reference conformances that our parser can't handle yet
+                filtered_problems = []
+                for problem in temp_problems:
+                    if "ConformanceException" in problem.problem and any(field_name in problem.problem for field_name in ['PercentMax', 'PercentMin', 'FixedMax', 'FixedMin', 'MfgCode']):
+                        logging.info(f"Ignoring complex conformance in global data type {name} from {f.name}: {problem.problem}")
+                        continue
+                    filtered_problems.append(problem)
+                
+                problems.extend(filtered_problems)
+
+                # Global data types have no cluster IDs - they're truly global
+                global_data_types[category][name] = XmlDataType(
+                    data_type=data_type_enum,
+                    name=name,
+                    components=components,
+                    cluster_ids=None  # Global types have no specific cluster IDs
+                )
+
+    # For now we assume we should have at least 3 global data type XMLs to parse
+    # Intent here is to make user aware of typos in paths instead of silently having empty parsing
+    if found_xmls < 3:
+        raise SpecParsingException(f'Did not find all 3 global data model files in specified directory {top:!r}')
+
+    return global_data_types, problems
 
 
 def dm_from_spec_version(specification_version: uint) -> PrebuiltDataModelDirectory:
