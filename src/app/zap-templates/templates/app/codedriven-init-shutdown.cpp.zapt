@@ -13,7 +13,7 @@
 #include <lib/support/TypeTraits.h>
 #include <zap-generated/CodedrivenCallback.h>
 
-namespace chip {
+using namespace chip;
 
 void MatterCodedrivenClusterServerInitCallback(EndpointId endpoint, ClusterId  clusterId) {
     switch (clusterId)
@@ -39,5 +39,4 @@ void MatterCodedrivenClusterServerShutdownCallback(EndpointId endpoint, ClusterI
     {{/if}}
     {{/all_user_clusters}}
     }
-}
 }

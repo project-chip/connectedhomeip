@@ -92,7 +92,6 @@ ClustersWithInitFunctions:
     - Scenes Management
     - Thermostat
     - Time Format Localization
-    - Wi-Fi Network Diagnostics
     - Fixed Label
 
 ClustersWithAttributeChangedFunctions:
@@ -113,7 +112,6 @@ ClustersWithShutdownFunctions:
     - Sample MEI
     - Scenes Management
     - Thermostat
-    - Wi-Fi Network Diagnostics
     - Fixed Label
 
 ClustersWithPreAttributeChangeFunctions:
