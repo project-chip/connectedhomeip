@@ -74,8 +74,7 @@ class TC_CGEN_2_1(MatterBaseTest):
         logging.info(f"Breadcrumb initial value: {breadcrumb}")
 
         self.step("3")
-        result = await self.write_single_attribute(attributes.Breadcrumb(1), endpoint=self.endpoint)
-        asserts.assert_equal(result, Status.Success, "Error when trying to write a Breadcrumb value")
+        await self.write_single_attribute(attributes.Breadcrumb(1), expect_success=True)
         logging.info("Breadcrumb set to 1")
 
         self.step("4")
@@ -87,11 +86,10 @@ class TC_CGEN_2_1(MatterBaseTest):
         self.step("5")
         reg_cfg = await self.read_single_attribute_check_success(
             cluster=cluster, attribute=attributes.RegulatoryConfig)
-        try:
-            enum_val = Clusters.GeneralCommissioning.Enums.RegulatoryLocationTypeEnum(reg_cfg)
-            logging.info(f"RegulatoryConfig value: {enum_val.name}")
-        except ValueError:
-            asserts.fail(f"RegulatoryConfig has invalid value: {reg_cfg}")
+        matter_asserts.assert_valid_enum(
+            reg_cfg, "RegulatoryConfig must be a valid RegulatoryLocationTypeEnum",
+            Clusters.GeneralCommissioning.Enums.RegulatoryLocationTypeEnum)
+        logging.info(f"RegulatoryConfig value: {Clusters.GeneralCommissioning.Enums.RegulatoryLocationTypeEnum(reg_cfg).name}")
 
         self.step("6")
         loc_cap = await self.read_single_attribute_check_success(
