@@ -569,7 +569,7 @@ class MdnsDiscovery:
             None: This method does not return any value.
         """
         # Exit if status isn't 'Added'
-        if state_change in [ServiceStateChange.Removed, ServiceStateChange.Updated]:
+        if state_change != ServiceStateChange.Added:
             return
 
         logger.info(f"Service info added. Service name: '{name}', Service Type: '{service_type}'")
