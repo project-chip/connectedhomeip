@@ -132,7 +132,7 @@ def get_valid_compressed_ipv6(ipv6: IPv6Address) -> str:
     Validates the address format and raises if invalid.
     """
     # This raises if format is invalid. Drop everything after the first `%` if one exists.
-    return IPvsAddress(str(ipv6).split('%', 1)[0])
+    return IPv6Address(str(ipv6).split('%', 1)[0])
 
 
 def get_interface(scope_id: str | int | None) -> str | int | None:
