@@ -57,6 +57,9 @@ class MdnsServiceListener(ServiceListener):
             rec_types (str): Record types being queried.
             timeout (float): Maximum time in seconds to wait.
 
+        Raises:
+            TimeoutError: If no update occurs within the given timeout.
+
         Returns:
             None
         """
@@ -67,3 +70,4 @@ class MdnsServiceListener(ServiceListener):
             logger.info(
                 f"Service record information lookup {rec_types} for '{service_name}' timeout ({timeout} seconds) reached without an update."
             )
+            raise
