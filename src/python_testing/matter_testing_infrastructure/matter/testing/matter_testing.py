@@ -133,6 +133,7 @@ class AttributeMatcher:
         return AttributeMatcherFromCallable(description, matcher)
 
 
+@dataclass
 class SetupParameters:
     passcode: int
     vendor_id: int = 0xFFF1
