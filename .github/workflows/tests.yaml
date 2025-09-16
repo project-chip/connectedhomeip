@@ -369,7 +369,6 @@ jobs:
                      --runner chip_tool_python \
                      --target TestCommissionerNodeId \
                      --chip-tool ./out/linux-x64-chip-tool${CHIP_TOOL_VARIANT}-${BUILD_VARIANT}/chip-tool \
-                     --log-level=debug \
                      run \
                      --iterations 1 \
                      --test-timeout-seconds 120 \
