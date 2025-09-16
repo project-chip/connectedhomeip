@@ -257,7 +257,7 @@ types-protobuf==5.29.1.20250208
     # via
     #   -r requirements.all.txt
     #   mypy-protobuf
-typing-extensions==4.6.1
+typing-extensions==4.8.0
     # via mypy
 urllib3==1.26.14
     # via requests
