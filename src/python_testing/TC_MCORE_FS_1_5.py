@@ -74,7 +74,7 @@ import matter.clusters as Clusters
 from matter import ChipDeviceCtrl
 from matter.testing.apps import AppServerSubprocess
 from matter.testing.commissioning import SetupParameters
-from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main, type_matches
+from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main, matchers
 
 # Length of `w0s` and `w1s` elements
 WS_LENGTH = NIST256p.baselen + 8
@@ -206,7 +206,7 @@ class TC_MCORE_FS_1_5(MatterBaseTest):
         parts_list_cached_attributes = self._partslist_subscription.GetAttributes()
         step_1_dut_parts_list = parts_list_cached_attributes[root_endpoint][Clusters.Descriptor][Clusters.Descriptor.Attributes.PartsList]
 
-        asserts.assert_true(type_matches(step_1_dut_parts_list, list), "PartsList is expected to be a list")
+        asserts.assert_true(matchers.is_type(step_1_dut_parts_list, list), "PartsList is expected to be a list")
 
         self.step(2)
         if not self.is_pics_sdk_ci_only:

@@ -183,6 +183,17 @@ public:
      */
     virtual Protocols::InteractionModel::Status AudioStreamDeallocate(const uint16_t streamID) = 0;
 
+    struct SnapshotStreamAllocateArgs
+    {
+        ImageCodecEnum imageCodec;
+        uint16_t maxFrameRate;
+        Structs::VideoResolutionStruct::Type minResolution;
+        Structs::VideoResolutionStruct::Type maxResolution;
+        uint8_t quality;
+        Optional<bool> watermarkEnabled;
+        Optional<bool> OSDEnabled;
+    };
+
     /**
      *   @brief Handle Command Delegate for Snapshot stream allocation.
      *
@@ -197,7 +208,7 @@ public:
      *   produced; otherwise, the command SHALL be rejected with an appropriate
      *   error.
      */
-    virtual Protocols::InteractionModel::Status SnapshotStreamAllocate(const SnapshotStreamStruct & allocateArgs,
+    virtual Protocols::InteractionModel::Status SnapshotStreamAllocate(const SnapshotStreamAllocateArgs & allocateArgs,
                                                                        uint16_t & outStreamID) = 0;
 
     /**
@@ -285,6 +296,26 @@ public:
      *
      */
     virtual CHIP_ERROR OnTransportReleaseAudioVideoStreams(uint16_t audioStreamID, uint16_t videoStreamID) = 0;
+
+    /**
+     * @brief Provides read-only access to the list of currently allocated video streams.
+     * This allows other components (like PushAVStreamTransportManager) to query
+     * allocated stream parameters (e.g., for bandwidth calculation) without directly
+     * accessing the CameraAVStreamMgmtServer instance.
+     *
+     * @return A const reference to the vector of allocated video stream structures.
+     */
+    virtual const std::vector<VideoStreamStruct> & GetAllocatedVideoStreams() const = 0;
+
+    /**
+     * @brief Provides read-only access to the list of currently allocated audio streams.
+     * This allows other components (like PushAVStreamTransportManager) to query
+     * allocated stream parameters (e.g., for bandwidth calculation) without directly
+     * accessing the CameraAVStreamMgmtServer instance.
+     *
+     * @return A const reference to the vector of allocated audio stream structures.
+     */
+    virtual const std::vector<AudioStreamStruct> & GetAllocatedAudioStreams() const = 0;
 
 private:
     friend class CameraAVStreamMgmtServer;
@@ -542,7 +573,7 @@ public:
     CHIP_ERROR AddSnapshotStream(const SnapshotStreamStruct & snapshotStream);
 
     CHIP_ERROR UpdateSnapshotStreamRangeParams(SnapshotStreamStruct & snapshotStreamToUpdate,
-                                               const SnapshotStreamStruct & snapshotStream);
+                                               const CameraAVStreamMgmtDelegate::SnapshotStreamAllocateArgs & snapshotStream);
 
     CHIP_ERROR RemoveSnapshotStream(uint16_t snapshotStreamId);
 

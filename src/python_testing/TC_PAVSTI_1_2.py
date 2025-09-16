@@ -25,6 +25,7 @@
 #     script-args: >
 #       --storage-path admin_storage.json
 #       --string-arg th_server_app_path:${PUSH_AV_SERVER}
+#       --string-arg host_ip:localhost
 #       --commissioning-method on-network
 #       --discriminator 1234
 #       --passcode 20202021
@@ -59,10 +60,7 @@ class TC_PAVSTI_1_2(MatterBaseTest, AVSMTestBase, PAVSTIUtils):
     @async_test_body
     async def setup_class(self):
         th_server_app = self.user_params.get("th_server_app_path", None)
-        if th_server_app:
-            self.server = PushAvServerProcess(server_path=th_server_app)
-        else:
-            self.server = PushAvServerProcess()
+        self.server = PushAvServerProcess(server_path=th_server_app)
         self.server.start(
             expected_output="Running on https://0.0.0.0:1234",
             timeout=30,
@@ -153,6 +151,7 @@ class TC_PAVSTI_1_2(MatterBaseTest, AVSMTestBase, PAVSTIUtils):
 
     @async_test_body
     async def test_TC_PAVSTI_1_2(self):
+        PICS_PRIVACY = "AVSM.S.F03"
         endpoint = self.get_endpoint(default=1)
         pushavCluster = Clusters.PushAvStreamTransport
         avsmCluster = Clusters.CameraAvStreamManagement
@@ -163,7 +162,8 @@ class TC_PAVSTI_1_2(MatterBaseTest, AVSMTestBase, PAVSTIUtils):
         # Commission DUT - already done
         await self.precondition_one_allocated_video_stream(streamUsage=Globals.Enums.StreamUsageEnum.kRecording)
         await self.precondition_one_allocated_audio_stream(streamUsage=Globals.Enums.StreamUsageEnum.kRecording)
-        tlsEndpointId = await self.precondition_provision_tls_endpoint(endpoint=endpoint, server=self.server)
+        host_ip = self.user_params.get("host_ip", None)
+        tlsEndpointId, host_ip = await self.precondition_provision_tls_endpoint(endpoint=endpoint, server=self.server, host_ip=host_ip)
         uploadStreamId = self.server.create_stream()
 
         self.step(1)
@@ -232,7 +232,7 @@ class TC_PAVSTI_1_2(MatterBaseTest, AVSMTestBase, PAVSTIUtils):
         audioStreamId = allocatedAudioStream.audioStreamID
 
         self.step(5)
-        if self.pics_guard(self.check_pics("AVSM.S.F0003")):
+        if self.pics_guard(self.check_pics(PICS_PRIVACY)):
             aFeatureMap = await self.read_single_attribute_check_success(
                 endpoint=endpoint, cluster=avsmCluster, attribute=avsmAttr.FeatureMap
             )
@@ -249,7 +249,7 @@ class TC_PAVSTI_1_2(MatterBaseTest, AVSMTestBase, PAVSTIUtils):
             )
 
         self.step(6)
-        if self.pics_guard(self.check_pics("AVSM.S.F0003")):
+        if self.pics_guard(self.check_pics(PICS_PRIVACY)):
             result = await self.write_single_attribute(
                 avsmAttr.SoftLivestreamPrivacyModeEnabled(True), endpoint_id=endpoint
             )
@@ -267,13 +267,14 @@ class TC_PAVSTI_1_2(MatterBaseTest, AVSMTestBase, PAVSTIUtils):
                     "videoStreamID": videoStreamId,
                     "audioStreamID": audioStreamId,
                     "endpointID": tlsEndpointId,
-                    "url": f"https://localhost:1234/streams/{uploadStreamId}",
+                    "url": f"https://{host_ip}:1234/streams/{uploadStreamId}",
                     "triggerOptions": {"triggerType": pushavCluster.Enums.TransportTriggerTypeEnum.kContinuous},
                     "ingestMethod": pushavCluster.Enums.IngestMethodsEnum.kCMAFIngest,
                     "containerFormat": pushavCluster.Enums.ContainerFormatEnum.kCmaf,
                     "containerOptions": {
                         "containerType": pushavCluster.Enums.ContainerFormatEnum.kCmaf,
-                        "CMAFContainerOptions": {"CMAFInterface": 0, "segmentDuration": 4000, "chunkDuration": 2000, "sessionGroup": 1, "trackName": "media"},
+                        # TODO: Currently camera-app treats chunkDuration as seconds, revert to ms once fixed.
+                        "CMAFContainerOptions": {"CMAFInterface": 0, "segmentDuration": 4000, "chunkDuration": 2, "sessionGroup": 1, "trackName": "media"},
                     },
                 }
             ),
@@ -287,7 +288,7 @@ class TC_PAVSTI_1_2(MatterBaseTest, AVSMTestBase, PAVSTIUtils):
         )
 
         self.step(8)
-        if self.pics_guard(self.check_pics("AVSM.S.F0003")):
+        if self.pics_guard(self.check_pics(PICS_PRIVACY)):
             try:
                 await self.send_single_cmd(
                     cmd=pushavCluster.Commands.SetTransportStatus(
@@ -306,7 +307,7 @@ class TC_PAVSTI_1_2(MatterBaseTest, AVSMTestBase, PAVSTIUtils):
                 )
 
         self.step(9)
-        if self.pics_guard(self.check_pics("AVSM.S.F0003")):
+        if self.pics_guard(self.check_pics(PICS_PRIVACY)):
             result = await self.write_single_attribute(
                 avsmAttr.SoftRecordingPrivacyModeEnabled(False), endpoint_id=endpoint
             )
@@ -317,7 +318,7 @@ class TC_PAVSTI_1_2(MatterBaseTest, AVSMTestBase, PAVSTIUtils):
             )
 
         self.step(10)
-        if self.pics_guard(self.check_pics("AVSM.S.F0003")):
+        if self.pics_guard(self.check_pics(PICS_PRIVACY)):
             result = await self.write_single_attribute(
                 avsmAttr.SoftLivestreamPrivacyModeEnabled(False), endpoint_id=endpoint
             )
@@ -335,14 +336,17 @@ class TC_PAVSTI_1_2(MatterBaseTest, AVSMTestBase, PAVSTIUtils):
         )
 
         self.step(12)
-        # TODO: Add a step to allow user to verify this through TH UI.
         if not self.check_pics("PICS_SDK_CI_ONLY"):
-            user_response = self.wait_for_user_input(
-                prompt_msg="Verify the video stream is being transmitted and is of CMAF format. Enter 'y' to confirm.",
-                prompt_msg_placeholder="y",
-                default_value="y",
+            skipped = self.user_verify_push_av_stream(
+                prompt_msg="Verify the video stream is being transmitted and is of CMAF format."
             )
-            asserts.assert_equal(user_response.lower(), "y")
+            if skipped:
+                user_response = self.wait_for_user_input(
+                    prompt_msg="Verify the video stream is being transmitted and is of CMAF format. Enter 'y' to confirm.",
+                    prompt_msg_placeholder="y",
+                    default_value="y",
+                )
+                asserts.assert_equal(user_response.lower(), "y")
 
         self.step(13)
         await self.send_single_cmd(
@@ -352,14 +356,17 @@ class TC_PAVSTI_1_2(MatterBaseTest, AVSMTestBase, PAVSTIUtils):
         )
 
         self.step(14)
-        # TODO: Add a step to allow user to verify this through TH UI.
         if not self.check_pics("PICS_SDK_CI_ONLY"):
-            user_response = self.wait_for_user_input(
-                prompt_msg="Verify the transmission of video stream has stopped. Enter 'y' to confirm.",
-                prompt_msg_placeholder="y",
-                default_value="y",
+            skipped = self.user_verify_push_av_stream(
+                prompt_msg="Verify the transmission of video stream has stopped."
             )
-            asserts.assert_equal(user_response.lower(), "y")
+            if skipped:
+                user_response = self.wait_for_user_input(
+                    prompt_msg="Verify the transmission of video stream has stopped. Enter 'y' to confirm.",
+                    prompt_msg_placeholder="y",
+                    default_value="y",
+                )
+                asserts.assert_equal(user_response.lower(), "y")
 
 
 if __name__ == "__main__":

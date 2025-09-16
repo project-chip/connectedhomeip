@@ -206,6 +206,7 @@
             "MaxPathsPerInvoke",
             "ConfigurationVersion"
         ],
+        "Boolean State": ["ClusterRevision", "FeatureMap", "StateValue"],
         "Bridged Device Basic Information": ["ProductAppearance"],
         "Chime": ["SelectedChime", "Enabled"],
         "Closure Control": [
@@ -799,6 +800,7 @@
             "FeatureMap"
         ],
         "Camera AV Settings User Level Management": ["MPTZPosition"],
+        "Fixed Label": ["LabelList", "ClusterRevision", "FeatureMap"],
         "Soil Measurement": [
             "SoilMoistureMeasurementLimits",
             "SoilMoistureMeasuredValue",

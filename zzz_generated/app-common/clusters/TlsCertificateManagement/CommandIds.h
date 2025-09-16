@@ -34,9 +34,9 @@ namespace RemoveRootCertificate {
 inline constexpr CommandId Id = 0x00000006;
 } // namespace RemoveRootCertificate
 
-namespace TLSClientCSR {
+namespace ClientCSR {
 inline constexpr CommandId Id = 0x00000007;
-} // namespace TLSClientCSR
+} // namespace ClientCSR
 
 namespace ProvisionClientCertificate {
 inline constexpr CommandId Id = 0x00000009;
@@ -66,9 +66,9 @@ namespace LookupRootCertificateResponse {
 inline constexpr CommandId Id = 0x00000005;
 } // namespace LookupRootCertificateResponse
 
-namespace TLSClientCSRResponse {
+namespace ClientCSRResponse {
 inline constexpr CommandId Id = 0x00000008;
-} // namespace TLSClientCSRResponse
+} // namespace ClientCSRResponse
 
 namespace FindClientCertificateResponse {
 inline constexpr CommandId Id = 0x0000000B;

@@ -18,10 +18,12 @@
 #pragma once
 
 #include "pushav-uploader.h"
+#include <app/clusters/push-av-stream-transport-server/push-av-stream-transport-cluster.h>
 
 #include <algorithm>
 #include <atomic>
 #include <condition_variable>
+#include <functional>
 #include <memory>
 #include <mutex>
 #include <queue>
@@ -70,7 +72,8 @@ public:
         uint32_t mMaxClipDuration;                            ///< Maximum clip duration in seconds
         uint16_t mInitialDuration;                            ///< Initial clip duration in seconds
         uint16_t mAugmentationDuration;                       ///< Duration increment on motion detect
-        uint16_t mChunkDuration;                              ///< Segment duration in seconds
+        uint16_t mChunkDuration;                              ///< Chunk duration  milliseconds
+        uint16_t mSegmentDuration;                            ///< Segment duration in milliseconds
         uint16_t mBlindDuration;                              ///< Duration without recording after motion stop
         uint16_t mPreRollLength;                              ///< Pre-roll length in seconds
         std::string mRecorderId;                              ///< Unique recorder identifier
@@ -138,6 +141,22 @@ public:
      */
     void PushPacket(const char * data, size_t size, bool isVideo);
 
+    void SetOnStopCallback(std::function<void()> cb) { mOnStopCallback = std::move(cb); }
+
+    // Set the cluster server reference for direct API calls
+    void SetPushAvStreamTransportServer(chip::app::Clusters::PushAvStreamTransportServer * server)
+    {
+        mPushAvStreamTransportServer = server;
+    }
+
+    void SetConnectionInfo(uint16_t connectionID, chip::app::Clusters::PushAvStreamTransport::TransportTriggerTypeEnum triggerType,
+                           chip::Optional<chip::app::Clusters::PushAvStreamTransport::TriggerActivationReasonEnum> reasonType)
+    {
+        mConnectionID = connectionID;
+        mTriggerType  = triggerType;
+        mReasonType   = reasonType;
+    }
+
     std::atomic<bool> mDeinitializeRecorder{ false }; ///< Deinitialization flag
     ClipInfoStruct mClipInfo;                         ///< Clip configuration parameters
     void SetRecorderStatus(bool status);              ///< Sets the recorder status
@@ -152,6 +171,8 @@ private:
     AudioInfoStruct mAudioInfo; ///< Audio stream parameters
     VideoInfoStruct mVideoInfo; ///< Video stream parameters
     /// @}
+
+    std::function<void()> mOnStopCallback;
 
     AVFormatContext * mFormatContext;
     AVFormatContext * mInputFormatContext;
@@ -175,6 +196,12 @@ private:
     bool mUploadMPD              = false;
 
     PushAVUploader * mUploader;
+
+    // Cluster server reference for direct API calls
+    chip::app::Clusters::PushAvStreamTransportServer * mPushAvStreamTransportServer = nullptr;
+    uint16_t mConnectionID                                                          = 0;
+    chip::app::Clusters::PushAvStreamTransport::TransportTriggerTypeEnum mTriggerType;
+    chip ::Optional<chip::app::Clusters::PushAvStreamTransport::TriggerActivationReasonEnum> mReasonType;
 
     /// @name Internal Methods
     /// @{
