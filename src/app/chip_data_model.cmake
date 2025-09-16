@@ -149,7 +149,7 @@ function(chip_configure_data_model APP_TARGET)
         "zap-generated/gen_config.h"
         "zap-generated/IMClusterCommandHandler.cpp"
         "zap-generated/CodedrivenInitShutdown.cpp"
-        "zap-generated/CodedrivenCallback.h",
+        "zap-generated/CodedrivenCallback.h"
         OUTPUT_PATH APP_TEMPLATES_GEN_DIR
         OUTPUT_FILES APP_TEMPLATES_GEN_FILES
         ZCL_PATH ${ARG_ZCL_PATH}
