@@ -148,6 +148,18 @@ public:
      *            from the time it receives the StayActiveRequest command.
      */
     virtual void OnICDStayActiveComplete(ScopedNodeId icdNodeId, uint32_t promisedActiveDurationMsec) {}
+
+    /**
+     * @brief
+     *   Called when a commissioning stage starts.
+     *
+     * @param[in] peerId an identifier for the commissioning process.  This is generally the
+     *                   client-provided commissioning identifier before AddNOC and the actual
+     *                   NodeID of the node after AddNoc, combined with the compressed fabric ID for
+     *                   the fabric doing the commissioning.
+     * @param[in] stageStarting the stage being started.
+     */
+    virtual void OnCommissioningStageStart(PeerId peerId, CommissioningStage stageStarting) {}
 };
 
 } // namespace Controller

@@ -169,6 +169,45 @@ void WebRTCProviderManager::RegisterWebrtcTransport(uint16_t sessionId)
     mMediaController->RegisterTransport(transport, args.videoStreamId, args.audioStreamId);
 }
 
+std::string WebRTCProviderManager::ExtractMidFromSdp(const std::string & sdp, const std::string & mediaType)
+{
+    if (sdp.empty() || mediaType.empty())
+    {
+        ChipLogError(Camera, "ExtractMidFromSdp: empty SDP or media type");
+        return "";
+    }
+
+    const std::string mediaPrefix = "m=" + mediaType;
+    const std::string midPrefix   = "a=mid:";
+
+    std::istringstream stream(sdp);
+    std::string line;
+    bool inTargetBlock = false;
+
+    while (std::getline(stream, line))
+    {
+        // Trim possible Windows carriage return
+        if (!line.empty() && line.back() == '\r')
+            line.pop_back();
+
+        if (inTargetBlock)
+        {
+            if (line.rfind(midPrefix, 0) == 0) // line starts with "a=mid:"
+                return line.substr(midPrefix.length());
+
+            if (line.rfind("m=", 0) == 0) // next media block – stop searching
+                break;
+        }
+        else if (line.rfind(mediaPrefix, 0) == 0) // found the desired media block
+        {
+            inTargetBlock = true;
+        }
+    }
+
+    // No MID found for the requested media type
+    return "";
+}
+
 CHIP_ERROR WebRTCProviderManager::HandleProvideOffer(const ProvideOfferRequestArgs & args, WebRTCSessionStruct & outSession)
 {
     ChipLogProgress(Camera, "HandleProvideOffer called");
@@ -242,7 +281,12 @@ CHIP_ERROR WebRTCProviderManager::HandleProvideOffer(const ProvideOfferRequestAr
 
     transport->SetRequestArgs(requestArgs);
     transport->Start();
-    transport->AddTracks();
+    std::string audioMid = ExtractMidFromSdp(args.sdp, "audio");
+    std::string videoMid = ExtractMidFromSdp(args.sdp, "video");
+
+    ChipLogProgress(Camera, "Extracted audioMid: %s, videoMid: %s", audioMid.c_str(), videoMid.c_str());
+
+    transport->AddTracks(videoMid, audioMid);
 
     // Acquire the Video and Audio Streams from the CameraAVStreamManagement
     // cluster and update the reference counts.

@@ -537,6 +537,11 @@ void PairingCommand::OnICDStayActiveComplete(ScopedNodeId deviceId, uint32_t pro
                     ChipLogValueX64(deviceId.GetNodeId()), promisedActiveDuration);
 }
 
+void PairingCommand::OnCommissioningStageStart(PeerId peerId, CommissioningStage stageStarting)
+{
+    ChipLogDetail(chipTool, "Starting commissioning stage '%s'", StageToString(stageStarting));
+}
+
 void PairingCommand::OnDiscoveredDevice(const Dnssd::CommissionNodeData & nodeData)
 {
     // Ignore nodes with closed commissioning window
