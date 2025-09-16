@@ -77,7 +77,7 @@ void MatterCodedrivenClusterServerInitCallback(EndpointId endpoint, ClusterId cl
 {
     assertChipStackLockedByCurrentThread();
 
-    // No-op: Until Descriptor cluster is migrated to be code driven, 
+    // No-op: Until Descriptor cluster is migrated to be code driven,
     // this is a no-op
 }
 
@@ -85,7 +85,7 @@ void MatterCodedrivenClusterServerShutdownCallback(EndpointId endpoint, ClusterI
 {
     assertChipStackLockedByCurrentThread();
 
-    // No-op: Until Descriptor cluster is migrated to be code driven, 
+    // No-op: Until Descriptor cluster is migrated to be code driven,
     // this is a no-op
 }
 
