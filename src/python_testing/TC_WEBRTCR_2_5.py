@@ -211,17 +211,30 @@ class TC_WebRTCRequestor_2_5(MatterBaseTest):
         prompt_msg = (
             "\nRead CurrentSessions attribute from DUT:\n"
             "  webrtctransportprovider read current-sessions 1 1\n"
-            "Input 'Y' if attribute read succeeds and returns a list with one WebRTCSessionStruct containing session ID and peer node information\n"
-            "Input 'N' if attribute read fails or returns incorrect data\n"
+            "If the read succeeds and returns a list with one WebRTCSessionStruct, enter the session ID\n"
+            "If the read fails or returns incorrect data, enter 'N'\n"
+            "Example: if the output shows '0x0 = 0 (unsigned),' then the session ID is 0, enter: 0\n"
+            "Note: The session ID is the value of field 0x0 in the WebRTCSessionStruct\n"
         )
 
         if self.is_pics_sdk_ci_only:
             # TODO: read attribute via websocket and verify session info
-            resp = 'Y'
+            self.session_id = "1"  # Mock session ID for CI
+            session_read_success = True
         else:
             resp = self.wait_for_user_input(prompt_msg)
-
-        session_read_success = resp.lower() == 'y'
+            if resp.lower() == 'n':
+                session_read_success = False
+                self.session_id = None
+            else:
+                try:
+                    # Validate that the input is a valid session ID (numeric)
+                    int(resp.strip())
+                    self.session_id = resp.strip()
+                    session_read_success = True
+                except ValueError:
+                    session_read_success = False
+                    self.session_id = None
 
         # Verify results
         asserts.assert_equal(
@@ -230,11 +243,15 @@ class TC_WebRTCRequestor_2_5(MatterBaseTest):
             f"CurrentSessions attribute read {'succeeded with session info' if session_read_success else 'failed or returned incorrect data'}"
         )
 
+        # Ensure we have a valid session ID before proceeding
+        if not self.session_id:
+            asserts.fail("No valid session ID obtained from CurrentSessions attribute read")
+
         self.step(7)
         # Prompt user to end WebRTC session
         prompt_msg = (
             "\nEnd the WebRTC session:\n"
-            "  webrtc end-session 1\n"
+            f"  webrtctransportprovider end-session {self.session_id} 2 1 1\n"
             "Input 'Y' if session is successfully terminated\n"
             "Input 'N' if session termination failed\n"
         )
