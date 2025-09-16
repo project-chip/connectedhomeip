@@ -30,7 +30,7 @@
 #include <lib/support/TypeTraits.h>
 #include <zap-generated/CodedrivenCallback.h>
 
-namespace chip {
+using namespace chip;
 
 void MatterCodedrivenClusterServerInitCallback(EndpointId endpoint, ClusterId clusterId)
 {
@@ -93,4 +93,3 @@ void MatterCodedrivenClusterServerShutdownCallback(EndpointId endpoint, ClusterI
         break;
     }
 }
-} // namespace chip

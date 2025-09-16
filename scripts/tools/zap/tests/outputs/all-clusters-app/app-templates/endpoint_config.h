@@ -2936,10 +2936,6 @@
         (EmberAfGenericClusterFunction) emberAfTimeFormatLocalizationClusterServerInitCallback,                                    \
         (EmberAfGenericClusterFunction) MatterTimeFormatLocalizationClusterServerPreAttributeChangedCallback,                      \
     };                                                                                                                             \
-    const EmberAfGenericClusterFunction chipFuncArrayWiFiNetworkDiagnosticsServer[] = {                                            \
-        (EmberAfGenericClusterFunction) emberAfWiFiNetworkDiagnosticsClusterServerInitCallback,                                    \
-        (EmberAfGenericClusterFunction) MatterWiFiNetworkDiagnosticsClusterServerShutdownCallback,                                 \
-    };                                                                                                                             \
     const EmberAfGenericClusterFunction chipFuncArrayFixedLabelServer[] = {                                                        \
         (EmberAfGenericClusterFunction) emberAfFixedLabelClusterServerInitCallback,                                                \
         (EmberAfGenericClusterFunction) MatterFixedLabelClusterServerShutdownCallback,                                             \
@@ -3765,8 +3761,8 @@
       .attributes = ZAP_ATTRIBUTE_INDEX(178), \
       .attributeCount = 15, \
       .clusterSize = 6, \
-      .mask = ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(INIT_FUNCTION) | ZAP_CLUSTER_MASK(SHUTDOWN_FUNCTION), \
-      .functions = chipFuncArrayWiFiNetworkDiagnosticsServer, \
+      .mask = ZAP_CLUSTER_MASK(SERVER), \
+      .functions = NULL, \
       .acceptedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 48 ), \
       .generatedCommandList = nullptr, \
       .eventList = ZAP_GENERATED_EVENTS_INDEX( 13 ), \
