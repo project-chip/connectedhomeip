@@ -22,7 +22,10 @@
 #include <lib/core/CHIPError.h>
 #include <lib/core/NodeId.h>
 #include <lib/support/DLLUtil.h>
+#include <protocols/secure_channel/RendezvousParameters.h>
 #include <stdint.h>
+
+#include <optional>
 
 namespace chip {
 namespace Controller {
@@ -57,6 +60,22 @@ public:
      * @param error Error cause, if any
      */
     virtual void OnPairingComplete(CHIP_ERROR error) {}
+
+    /**
+     * @brief
+     *   Called when PASE session establishment is complete (with success or error)
+     *
+     * @param error Error cause, if any
+     *
+     * @param rendezvousParameters The RendezvousParameters that were used for PASE establishment.
+     *                             If available, this helps identify which exact commissionee PASE
+     *                             was established for. This will generally be present only when
+     *                             PASE establishment succeeds.
+     */
+    virtual void OnPairingComplete(CHIP_ERROR error, const std::optional<RendezvousParameters> & rendezvousParameters)
+    {
+        OnPairingComplete(error);
+    }
 
     /**
      * @brief
