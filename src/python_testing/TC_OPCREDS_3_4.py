@@ -115,7 +115,7 @@ class TC_OPCREDS_3_4(MatterBaseTest):
                 TestStep(
                     11, f"TH1 sends {send_command('ArmFailSafe')} command to the DUT with the ExpiryLengthSeconds field set to 900", None, verify_armfailsafe_response()),
                 TestStep(
-                    12, f"TH1 {send_command('CSRequest')} with the IsForUpdateNOC field set to true", None, verify_csr_not_update()),
+                    12, f"TH1 {send_command('CSRRequest')} with the IsForUpdateNOC field set to true", None, verify_csr_not_update()),
                 TestStep(
                     13, f"TH1 {send_command('UpdateNOC')} to the Node Operational Credentials cluster", None, verify_noc_response("InvalidPublicKey")),
                 TestStep(14, "TH1 generates a new Trusted Root Certificate and Private Key and saves as new_root_cert and new_root_key so that TH can generate an NOC for UpdateNOC that doesn’t chain to the original root"),
@@ -146,7 +146,9 @@ class TC_OPCREDS_3_4(MatterBaseTest):
                 TestStep(
                     29, f"TH1 sends {send_command ('ArmFailSafe')} command to the DUT with the ExpiryLengthSeconds field set to 0", None, verify_armfailsafe_response()),
                 TestStep(
-                    30, f"TH1 {send_command('CSRequest')} over PASE with the IsForUpdateNOC field set to true", None, verify_invalid_command())]
+                    30, f"TH1 {send_command('CSRRequest')} over PASE with the IsForUpdateNOC field set to true", None, verify_invalid_command()),
+                TestStep(31, f"TH1 {send_command('RevokeCommissioning')} to the DUT", "Verify that the commissioning window is closed"),
+                TestStep(32, f"TH1 {send_command('ArmFailSafe')} to the DUT with the ExpiryLengthSeconds field set to 0", None, verify_armfailsafe_response())]
 
     @async_test_body
     async def test_TC_OPCREDS_3_4(self):
@@ -326,6 +328,16 @@ class TC_OPCREDS_3_4(MatterBaseTest):
             asserts.fail("Unexpected error sending CSRRequest command")
         except InteractionModelError as e:
             asserts.assert_equal(e.status, Status.InvalidCommand, "Failure status returned from CSRRequest")
+
+        self.step(31)
+        revokeCmd = Clusters.AdministratorCommissioning.Commands.RevokeCommissioning()
+        await self.default_controller.SendCommand(nodeid=self.dut_node_id, endpoint=0, payload=revokeCmd, timedRequestTimeoutMs=6000)
+
+        self.step(32)
+        cmd = Clusters.GeneralCommissioning.Commands.ArmFailSafe(0)
+        resp = await self.send_single_cmd(dev_ctrl=self.default_controller, node_id=self.dut_node_id, cmd=cmd)
+        asserts.assert_equal(resp.errorCode, Clusters.GeneralCommissioning.Enums.CommissioningErrorEnum.kOk,
+                             "Failure status returned from arm failsafe")
 
 
 if __name__ == "__main__":
