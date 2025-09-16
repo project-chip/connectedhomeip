@@ -153,11 +153,11 @@ public:
      * @brief
      *   Called when a commissioning stage starts.
      *
-     * @param[in] PeerId an identifier for the commissioning process.  This is generally the
+     * @param[in] peerId an identifier for the commissioning process.  This is generally the
      *                   client-provided commissioning identifier before AddNOC and the actual
      *                   NodeID of the node after AddNoc, combined with the compressed fabric ID for
      *                   the fabric doing the commissioning.
-     * @param[in] CommissioningStage the stage being started.
+     * @param[in] stageStarting the stage being started.
      */
     virtual void OnCommissioningStageStart(PeerId peerId, CommissioningStage stageStarting) {}
 };
