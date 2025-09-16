@@ -42,7 +42,7 @@ class TC_CNET_4_15(MatterBaseTest):
         return '[TC-CNET-4.15] [Wi-Fi] NetworkIDNotFound returned in LastNetworkingStatus field validation [DUT-Server]'
 
     def pics_TC_CNET_4_15(self):
-        return ['CNET.S.F00(WI)']
+        return ['CNET.S.F00']
 
     @run_if_endpoint_matches(has_feature(Clusters.NetworkCommissioning,
                                          Clusters.NetworkCommissioning.Bitmaps.Feature.kWiFiNetworkInterface))
