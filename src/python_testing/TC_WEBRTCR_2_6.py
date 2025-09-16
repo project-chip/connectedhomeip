@@ -170,7 +170,7 @@ class TC_WebRTCRequestor_2_6(MatterBaseTest):
         #
         command = Clusters.FaultInjection.Commands.FailAtFault(
             type=Clusters.FaultInjection.Enums.FaultType.kChipFault,
-            id=FaultInjection.ChipFaultId.ModifyWebRTCICECandidatesSessionId,
+            id=32,  # kFault_ModifyWebRTCICECandidatesSessionId
             numCallsToFail=1,
             takeMutex=False,
         )
