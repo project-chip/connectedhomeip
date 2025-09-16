@@ -77,13 +77,9 @@ class TC_FAN_3_5(MatterBaseTest):
                          """SETUP
 
                                         Initialize the PercentSetting attribute to 100
-
                                         Verify that the SpeedSetting attribute value is set to SpeedMax
-
                                         Verify that the FanMode attribute value is set to High
-
                                         Subscribe to the PercentSetting, SpeedSetting, and FanMode attributes
-
                                         Step: LowestOff=True, Direction=Decrease, Wrap=False"""),
                 ]
 
