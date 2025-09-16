@@ -90,7 +90,7 @@ class AddressMeta:
 
 
 @dataclass
-class QuadaRecord(JsonSerializable):
+class AaaaRecord(JsonSerializable):
     ipv6: ZeroconfIPv6Address = field(repr=False, compare=False)
     address: str = field(init=False)
     version: int = field(init=False)

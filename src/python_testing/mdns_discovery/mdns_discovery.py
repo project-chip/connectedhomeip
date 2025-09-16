@@ -23,7 +23,7 @@ from typing import Dict, List, Optional
 
 from mdns_discovery.data_classes.mdns_service_info import MdnsServiceInfo
 from mdns_discovery.data_classes.ptr_record import PtrRecord
-from mdns_discovery.data_classes.quada_record import QuadaRecord
+from mdns_discovery.data_classes.aaaa_record import AaaaRecord
 from mdns_discovery.enums.mdns_service_type import MdnsServiceType
 from mdns_discovery.mdns_async_service_info import AddressResolverIPv6, MdnsAsyncServiceInfo
 from mdns_discovery.service_listeners.mdns_service_listener import MdnsServiceListener
@@ -275,7 +275,7 @@ class MdnsDiscovery:
     async def get_quada_records(self, hostname: str,
                                 query_timeout_sec: float = QUERY_TIMEOUT_SEC,
                                 log_output: bool = False
-                                ) -> list[QuadaRecord]:
+                                ) -> list[AaaaRecord]:
         """
         Asynchronously retrieves the AAAA (IPv6) record of a device on the local network via mDNS.
 
@@ -290,7 +290,7 @@ class MdnsDiscovery:
                 Defaults to False.
 
         Returns:
-            list[QuadaRecord]: A list of discovered QuadaRecord objects.
+            list[AaaaRecord]: A list of discovered AaaaRecord objects.
         """
         logger.info(f"Service record information lookup (AAAA) for '{hostname}' in progress...")
 
@@ -305,12 +305,12 @@ class MdnsDiscovery:
             if is_discovered:
                 logger.info(f"Service record information (AAAA) for '{hostname}' discovered.")
 
-                # Get IPv6 addresses and convert to QuadaRecord objects
+                # Get IPv6 addresses and convert to AaaaRecord objects
                 ipv6_addresses = addr_resolver.ip_addresses_by_version(IPVersion.V6Only)
-                quada_records: list[QuadaRecord] = []
+                quada_records: list[AaaaRecord] = []
 
                 if ipv6_addresses:
-                    quada_records = [QuadaRecord(ipv6) for ipv6 in ipv6_addresses]
+                    quada_records = [AaaaRecord(ipv6) for ipv6 in ipv6_addresses]
 
                 # Adds service to discovered services
                 self._discovered_services = {hostname: [ipv6 for ipv6 in quada_records]}
