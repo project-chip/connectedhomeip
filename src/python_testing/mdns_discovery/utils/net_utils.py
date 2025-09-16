@@ -44,7 +44,7 @@ def get_host_ipv6_addresses():
         # Get list of IPv6 addresses for the interface
         for ip in adapter.ips:
             # Get IPv6 address and interface
-            if isinstance(ip.ip, tuple) and ':' in ip.ip[0]:
+            if isinstance(ip.ip, tuple):
                 base_addr = ip.ip[0]
                 iface_name = adapter.nice_name
 
