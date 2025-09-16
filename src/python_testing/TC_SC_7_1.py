@@ -22,11 +22,11 @@
 # test-runner-runs:
 #   run1:
 #     app: ${ALL_CLUSTERS_APP}
-#     app-args: --discriminator 2222 --KVS kvs1 --trace-to json:${TRACE_APP}.json
+#     app-args: --discriminator 2222 --passcode 20202024 --KVS kvs1 --trace-to json:${TRACE_APP}.json
 #     script-args: >
 #       --storage-path admin_storage.json
 #       --bool-arg post_cert_test:true
-#       --qr-code MT:-24J0KCZ16750648G00
+#       --qr-code MT:Y.K908OC16N71648G00
 #       --trace-to json:${TRACE_TEST_JSON}.json
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 #     factory-reset: true
