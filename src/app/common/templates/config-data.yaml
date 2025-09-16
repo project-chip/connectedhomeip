@@ -71,6 +71,7 @@ CommandHandlerInterfaceOnlyClusters:
     - Commodity Tariff
     - Joint Fabric Administrator
     - Zone Management
+    - Fixed Label
     - Soil Measurement
     - Basic Information
     - Boolean State
@@ -103,6 +104,7 @@ ClustersWithInitFunctions:
     - Time Format Localization
     - User Label
     - Wi-Fi Network Diagnostics
+    - Fixed Label
 
 ClustersWithAttributeChangedFunctions:
     - Bridged Device Basic Information
@@ -131,6 +133,7 @@ ClustersWithShutdownFunctions:
     - Thermostat
     - User Label
     - Wi-Fi Network Diagnostics
+    - Fixed Label
 
 ClustersWithPreAttributeChangeFunctions:
     - Door Lock
