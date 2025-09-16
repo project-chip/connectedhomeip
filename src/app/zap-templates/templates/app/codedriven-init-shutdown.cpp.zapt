@@ -15,8 +15,7 @@
 
 namespace chip {
 
-// Cluster Init Functions for Codedriven Clusters
-void MatterCodedrivenClusterInitCallback(EndpointId endpoint, ClusterId  clusterId) {
+void MatterCodedrivenClusterServerInitCallback(EndpointId endpoint, ClusterId  clusterId) {
     switch (clusterId)
     {
     {{#all_user_clusters side='server'}}
@@ -29,7 +28,7 @@ void MatterCodedrivenClusterInitCallback(EndpointId endpoint, ClusterId  cluster
     }
 }
 
-void MatterCodedrivenClusterShutdownCallback(EndpointId endpoint, ClusterId clusterId) {
+void MatterCodedrivenClusterServerShutdownCallback(EndpointId endpoint, ClusterId clusterId) {
     switch (clusterId)
     {
     {{#all_user_clusters side='server'}}
