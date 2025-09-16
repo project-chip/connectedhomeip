@@ -48,10 +48,10 @@ public:
         return gServer.Registration();
     }
 
-    ServerClusterInterface * FindRegistration(unsigned emberEndpointIndex) override 
-    { 
+    ServerClusterInterface * FindRegistration(unsigned emberEndpointIndex) override
+    {
         VerifyOrReturnValue(gServer.IsConstructed(), nullptr);
-        return &gServer.Cluster(); 
+        return &gServer.Cluster();
     }
     void ReleaseRegistration(unsigned emberEndpointIndex) override { gServer.Destroy(); }
 };

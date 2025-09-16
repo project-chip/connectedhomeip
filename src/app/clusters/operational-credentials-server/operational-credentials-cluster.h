@@ -27,7 +27,7 @@ namespace Clusters {
 class OperationalCredentialsCluster : public DefaultServerCluster, chip::FabricTable::Delegate
 {
 public:
-    OperationalCredentialsCluster(EndpointId endpoint, FabricTable & fabricTable, FailSafeContext & failSafeContext): DefaultServerCluster({ endpoint, OperationalCredentials::Id }), 
+    OperationalCredentialsCluster(EndpointId endpoint, FabricTable & fabricTable, FailSafeContext & failSafeContext): DefaultServerCluster({ endpoint, OperationalCredentials::Id }),
     mFabricTable(fabricTable), mFailSafeContext(failSafeContext){};
 
     CHIP_ERROR Startup(ServerClusterContext & context) override;
