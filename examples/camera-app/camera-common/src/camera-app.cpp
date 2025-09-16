@@ -134,7 +134,7 @@ CameraApp::CameraApp(chip::EndpointId aClustersEndpoint, CameraDeviceInterface *
     uint32_t maxContentBufferSize               = mCameraDevice->GetCameraHALInterface().GetMaxContentBufferSize();
     AudioCapabilitiesStruct micCapabilities     = mCameraDevice->GetCameraHALInterface().GetMicrophoneCapabilities();
     AudioCapabilitiesStruct spkrCapabilities    = mCameraDevice->GetCameraHALInterface().GetSpeakerCapabilities();
-    TwoWayTalkSupportTypeEnum twowayTalkSupport = TwoWayTalkSupportTypeEnum::kNotSupported;
+    TwoWayTalkSupportTypeEnum twowayTalkSupport = TwoWayTalkSupportTypeEnum::kFullDuplex;
     std::vector<SnapshotCapabilitiesStruct> snapshotCapabilities = mCameraDevice->GetCameraHALInterface().GetSnapshotCapabilities();
     uint32_t maxNetworkBandwidth                                 = mCameraDevice->GetCameraHALInterface().GetMaxNetworkBandwidth();
     std::vector<StreamUsageEnum> supportedStreamUsages = mCameraDevice->GetCameraHALInterface().GetSupportedStreamUsages();
