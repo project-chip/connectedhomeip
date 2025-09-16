@@ -22,6 +22,7 @@ from zeroconf import (BadTypeInNameException, DNSOutgoing, DNSQuestion, DNSQuest
                       service_type_name)
 from zeroconf.const import _CLASS_IN, _DUPLICATE_QUESTION_INTERVAL, _FLAGS_QR_QUERY, _LISTENER_TIME, _MDNS_PORT, _TYPE_AAAA
 
+_LISTENER_TIME_MS = _LISTENER_TIME
 
 class MdnsAsyncServiceInfo(ServiceInfo):
     """
@@ -89,7 +90,7 @@ class MdnsAsyncServiceInfo(ServiceInfo):
         deadline_ms = now + timeout_ms
 
         # Delay before sending the first retry query if the initial query did not complete
-        initial_delay_ms = _LISTENER_TIME + randint(0, 50)
+        initial_delay_ms = _LISTENER_TIME_MS + randint(0, 50)
 
         # Minimum delay between subsequent QM retries after the first retry,
         # to prevent duplicate-question suppression by responding devices
