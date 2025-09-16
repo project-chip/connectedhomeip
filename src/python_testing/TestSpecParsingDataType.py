@@ -22,7 +22,8 @@ from mobly import asserts
 
 import matter.clusters as Clusters
 from matter.testing.matter_testing import MatterBaseTest, default_matter_test_main
-from matter.testing.spec_parsing import ClusterParser, DataTypeEnum, PrebuiltDataModelDirectory, build_xml_clusters, build_xml_global_data_types
+from matter.testing.spec_parsing import (ClusterParser, DataTypeEnum, PrebuiltDataModelDirectory, build_xml_clusters,
+                                         build_xml_global_data_types)
 from matter.tlv import uint
 
 
