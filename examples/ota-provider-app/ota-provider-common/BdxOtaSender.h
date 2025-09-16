@@ -28,6 +28,8 @@ public:
     // Initializes BDX transfer-related metadata. Should always be called first.
     CHIP_ERROR InitializeTransfer(chip::FabricIndex fabricIndex, chip::NodeId nodeId);
 
+    CHIP_ERROR GracefullyCloseTransfer();
+
 private:
     // Inherited from bdx::TransferFacilitator
     void HandleTransferSessionOutput(chip::bdx::TransferSession::OutputEvent & event) override;
