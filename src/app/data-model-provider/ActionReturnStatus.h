@@ -26,6 +26,10 @@ namespace chip {
 namespace app {
 namespace DataModel {
 
+enum class FixedActionStatus 
+{
+    kWriteSuccessNoOp,
+};
 /// An ActionReturnStatus encodes the result of a read/write/invoke.
 ///
 /// Generally such actions result in a StatusIB in the interaction model,
@@ -64,6 +68,7 @@ public:
         mReturnStatus(Protocols::InteractionModel::ClusterStatusCode(status))
     {}
     ActionReturnStatus(Protocols::InteractionModel::ClusterStatusCode status) : mReturnStatus(status) {}
+    ActionReturnStatus(FixedActionStatus status): mReturnStatus(status) {}
 
     /// Constructs a status code. Either returns the underlying code directly
     /// or converts the underlying CHIP_ERROR into a cluster status code.
@@ -89,6 +94,10 @@ public:
     /// Generally this is when the return is based on CHIP_ERROR_NO_MEMORY or CHIP_ERROR_BUFFER_TOO_SMALL
     bool IsOutOfSpaceEncodingResponse() const;
 
+    /// Check if the operation was successful but shouldn't trigger any specific operation
+    /// (e.g. overwriting an attribute with the same value).
+    bool IsNoOpSuccess() const;
+
     // NOTE: operator== will treat a CHIP_GLOBAL_IM_ERROR and a raw cluster status as equal if the statuses match,
     //       even though a CHIP_ERROR has some formatting info like file/line
     bool operator==(const ActionReturnStatus & other) const;
@@ -100,7 +109,7 @@ public:
     const char * c_str(StringStorage & storage) const;
 
 private:
-    std::variant<CHIP_ERROR, Protocols::InteractionModel::ClusterStatusCode> mReturnStatus;
+    std::variant<CHIP_ERROR, Protocols::InteractionModel::ClusterStatusCode, FixedActionStatus> mReturnStatus;
 };
 
 } // namespace DataModel

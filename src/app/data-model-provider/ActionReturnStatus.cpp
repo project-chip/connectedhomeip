@@ -104,6 +104,14 @@ CHIP_ERROR ActionReturnStatus::GetUnderlyingError() const
                                 : CHIP_ERROR_IM_GLOBAL_STATUS_VALUE(status->GetStatus());
     }
 
+    if (const FixedActionStatus * status = std::get_if<FixedActionStatus>(&mReturnStatus))
+    {
+        if (*status == FixedActionStatus::kWriteSuccessNoop)
+        {
+            return (CHIP_NO_ERROR);
+        }
+    }
+
     chipDie();
 }
 
@@ -117,6 +125,14 @@ ClusterStatusCode ActionReturnStatus::GetStatusCode() const
     if (const CHIP_ERROR * err = std::get_if<CHIP_ERROR>(&mReturnStatus))
     {
         return ClusterStatusCode(*err);
+    }
+
+    if (const FixedActionStatus * status = std::get_if<FixedActionStatus>(&mReturnStatus))
+    {
+        if (*status == FixedActionStatus::kWriteSuccessNoop)
+        {
+            return ClusterStatusCode(CHIP_NO_ERROR);
+        }
     }
 
     // all std::variant cases exhausted
@@ -133,6 +149,22 @@ bool ActionReturnStatus::IsSuccess() const
     if (const ClusterStatusCode * status = std::get_if<ClusterStatusCode>(&mReturnStatus))
     {
         return status->IsSuccess();
+    }
+
+    if (const FixedActionStatus * status = std::get_if<FixedActionStatus>(&mReturnStatus))
+    {
+        return (*status == FixedActionStatus::kWriteSuccessNoop);
+    }
+
+    // all std::variant cases exhausted
+    chipDie();
+}
+
+bool ActionReturnStatus::IsNoOpSuccess() const
+{
+    if (const FixedActionStatus * status = std::get_if<FixedActionStatus>(&mReturnStatus))
+    {
+        return (*status == FixedActionStatus::kWriteSuccessNoop);
     }
 
     // all std::variant cases exhausted
