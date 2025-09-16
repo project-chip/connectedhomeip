@@ -91,7 +91,7 @@ public:
     {
         // Handle TLS certificates if needed for implementation
     }
-    void SetPushAvStreamTransportServer(PushAvStreamTransportServerLogic * serverLogic) override
+    void SetPushAvStreamTransportServer(PushAvStreamTransportServer * serverLogic) override
     {
         // Store pointer to server logic if needed for implementation
     }
