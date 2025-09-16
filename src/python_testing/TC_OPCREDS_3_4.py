@@ -147,7 +147,8 @@ class TC_OPCREDS_3_4(MatterBaseTest):
                     29, f"TH1 sends {send_command ('ArmFailSafe')} command to the DUT with the ExpiryLengthSeconds field set to 0", None, verify_armfailsafe_response()),
                 TestStep(
                     30, f"TH1 {send_command('CSRRequest')} over PASE with the IsForUpdateNOC field set to true", None, verify_invalid_command()),
-                TestStep(31, f"TH1 {send_command('RevokeCommissioning')} to the DUT", "Verify that the commissioning window is closed"),
+                TestStep(31, f"TH1 {send_command('RevokeCommissioning')} to the DUT",
+                         "Verify that the commissioning window is closed"),
                 TestStep(32, f"TH1 {send_command('ArmFailSafe')} to the DUT with the ExpiryLengthSeconds field set to 0", None, verify_armfailsafe_response())]
 
     @async_test_body
