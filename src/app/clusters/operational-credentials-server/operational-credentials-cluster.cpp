@@ -34,7 +34,6 @@
 #include <lib/support/CodeUtils.h>
 #include <tracing/macros.h>
 
-
 using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;
@@ -272,7 +271,8 @@ CHIP_ERROR ReadRootCertificates(AttributeValueEncoder & aEncoder, FabricTable & 
 }
 
 std::optional<DataModel::ActionReturnStatus> HandleCSRRequest(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
-                                                              Commands::CSRRequest::DecodableType & commandData, FabricTable & fabricTable, FailSafeContext & failSafeContext)
+                                                              Commands::CSRRequest::DecodableType & commandData,
+                                                              FabricTable & fabricTable, FailSafeContext & failSafeContext)
 {
     MATTER_TRACE_SCOPE("CSRRequest", "OperationalCredentials");
     ChipLogProgress(Zcl, "OpCreds: Received a CSRRequest command");
@@ -399,7 +399,8 @@ exit:
 }
 
 std::optional<DataModel::ActionReturnStatus> HandleAddNOC(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
-                                                          Commands::AddNOC::DecodableType & commandData, FabricTable & fabricTable, FailSafeContext & failSafeContext)
+                                                          Commands::AddNOC::DecodableType & commandData, FabricTable & fabricTable,
+                                                          FailSafeContext & failSafeContext)
 {
     MATTER_TRACE_SCOPE("AddNOC", "OperationalCredentials");
     auto & NOCValue          = commandData.NOCValue;
@@ -416,7 +417,7 @@ std::optional<DataModel::ActionReturnStatus> HandleAddNOC(CommandHandler * comma
     Credentials::GroupDataProvider::KeySet keyset;
     const FabricInfo * newFabricInfo = nullptr;
 
-    auto * secureSession   = commandObj->GetExchangeContext()->GetSessionHandle()->AsSecureSession();
+    auto * secureSession = commandObj->GetExchangeContext()->GetSessionHandle()->AsSecureSession();
 
     uint8_t compressed_fabric_id_buffer[sizeof(uint64_t)];
     MutableByteSpan compressed_fabric_id(compressed_fabric_id_buffer);
@@ -596,7 +597,8 @@ exit:
 }
 
 std::optional<DataModel::ActionReturnStatus> HandleUpdateNOC(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
-                                                             Commands::UpdateNOC::DecodableType & commandData, FabricTable & fabricTable, FailSafeContext & failSafeContext)
+                                                             Commands::UpdateNOC::DecodableType & commandData,
+                                                             FabricTable & fabricTable, FailSafeContext & failSafeContext)
 {
     MATTER_TRACE_SCOPE("UpdateNOC", "OperationalCredentials");
     auto & NOCValue  = commandData.NOCValue;
@@ -686,7 +688,8 @@ exit:
 
 std::optional<DataModel::ActionReturnStatus> HandleUpdateFabricLabel(CommandHandler * commandObj,
                                                                      const ConcreteCommandPath & commandPath,
-                                                                     Commands::UpdateFabricLabel::DecodableType & commandData, FabricTable & fabricTable)
+                                                                     Commands::UpdateFabricLabel::DecodableType & commandData,
+                                                                     FabricTable & fabricTable)
 {
     MATTER_TRACE_SCOPE("UpdateFabricLabel", "OperationalCredentials");
     auto & label        = commandData.label;
@@ -738,11 +741,12 @@ exit:
 
 std::optional<DataModel::ActionReturnStatus>
 HandleAddTrustedRootCertificate(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
-                                Commands::AddTrustedRootCertificate::DecodableType & commandData, FabricTable & fabricTable, FailSafeContext & failSafeContext )
+                                Commands::AddTrustedRootCertificate::DecodableType & commandData, FabricTable & fabricTable,
+                                FailSafeContext & failSafeContext)
 {
     MATTER_TRACE_SCOPE("AddTrustedRootCertificate", "OperationalCredentials");
 
-    auto finalStatus   = Status::Failure;
+    auto finalStatus = Status::Failure;
 
     // Start with CHIP_ERROR_INVALID_ARGUMENT so that cascading errors yield correct
     // logs by the end. We use finalStatus as our overall success marker, not error
@@ -794,7 +798,8 @@ exit:
 
 std::optional<DataModel::ActionReturnStatus>
 HandleSetVIDVerificationStatement(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
-                                  Commands::SetVIDVerificationStatement::DecodableType & commandData, FabricTable & fabricTable, FailSafeContext & failSafeContext)
+                                  Commands::SetVIDVerificationStatement::DecodableType & commandData, FabricTable & fabricTable,
+                                  FailSafeContext & failSafeContext)
 {
     FabricIndex fabricIndex = commandObj->GetAccessingFabricIndex();
     ChipLogProgress(Zcl, "OpCreds: Received a SetVIDVerificationStatement Command for FabricIndex 0x%x",
@@ -853,7 +858,8 @@ HandleSetVIDVerificationStatement(CommandHandler * commandObj, const ConcreteCom
 
 std::optional<DataModel::ActionReturnStatus> HandleRemoveFabric(CommandHandler * commandObj,
                                                                 const ConcreteCommandPath & commandPath,
-                                                                Commands::RemoveFabric::DecodableType & commandData, FabricTable & fabricTable)
+                                                                Commands::RemoveFabric::DecodableType & commandData,
+                                                                FabricTable & fabricTable)
 {
     MATTER_TRACE_SCOPE("RemoveFabric", "OperationalCredentials");
     auto & fabricBeingRemoved = commandData.fabricIndex;

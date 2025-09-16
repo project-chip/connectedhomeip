@@ -24,7 +24,6 @@
 #include <app/server/Dnssd.h>
 #include <app/server/Server.h>
 #include <app/util/attribute-storage.h>
-#include <app/server/Server.h>
 
 using namespace chip;
 using namespace chip::app;
@@ -64,12 +63,12 @@ void emberAfOperationalCredentialsClusterServerInitCallback(EndpointId endpointI
 
     CodegenClusterIntegration::RegisterServer(
         {
-            .endpointId                      = endpointId,
-            .clusterId                       = OperationalCredentials::Id,
-            .fixedClusterInstanceCount       = 1,
-            .maxClusterInstanceCount                = 1,
-            .fetchFeatureMap                 = false,
-            .fetchOptionalAttributes         = false,
+            .endpointId                = endpointId,
+            .clusterId                 = OperationalCredentials::Id,
+            .fixedClusterInstanceCount = 1,
+            .maxClusterInstanceCount   = 1,
+            .fetchFeatureMap           = false,
+            .fetchOptionalAttributes   = false,
         },
         integrationDelegate);
 }
@@ -79,10 +78,10 @@ void MatterOperationalCredentialsClusterServerShutdownCallback(EndpointId endpoi
     IntegrationDelegate integrationDelegate;
     CodegenClusterIntegration::UnregisterServer(
         {
-            .endpointId                      = endpointId,
-            .clusterId                       = OperationalCredentials::Id,
-            .fixedClusterInstanceCount       = 1,
-            .maxClusterInstanceCount                = 1,
+            .endpointId                = endpointId,
+            .clusterId                 = OperationalCredentials::Id,
+            .fixedClusterInstanceCount = 1,
+            .maxClusterInstanceCount   = 1,
         },
         integrationDelegate);
 }
