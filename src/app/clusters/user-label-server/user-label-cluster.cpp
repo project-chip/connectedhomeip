@@ -151,12 +151,10 @@ DataModel::ActionReturnStatus UserLabelCluster::WriteAttribute(const DataModel::
     switch (request.path.mAttributeId)
     {
     case LabelList::Id: {
-        auto ret = WriteLabelList(request.path, decoder);
-        if (ret == CHIP_NO_ERROR)
-        {
-            NotifyAttributeChanged(LabelList::Id);
-        }
-        return ret;
+        CHIP_ERROR err = WriteLabelList(request.path, decoder);
+        VerifyOrReturnError(err == CHIP_NO_ERROR, err);
+        NotifyAttributeChanged(LabelList::Id);
+        return CHIP_NO_ERROR;
     }
     default:
         return Protocols::InteractionModel::Status::UnsupportedWrite;

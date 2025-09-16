@@ -21,6 +21,7 @@
 #include <app/clusters/testing/AttributeTesting.h>
 #include <app/server-cluster/AttributeListBuilder.h>
 #include <app/server-cluster/DefaultServerCluster.h>
+#include <app/server-cluster/testing/TestServerClusterContext.h>
 #include <clusters/UserLabel/Attributes.h>
 #include <clusters/UserLabel/Metadata.h>
 
@@ -82,6 +83,30 @@ public:
     }
 };
 
+class WriteAttribute
+{
+    UserLabelCluster & mCluster;
+    DataModel::ActionReturnStatus mStatus;
+
+public:
+    WriteAttribute(UserLabelCluster & cluster) : mCluster(cluster), mStatus(CHIP_NO_ERROR) {}
+
+    DataModel::ActionReturnStatus GetStatus() const { return mStatus; }
+
+    void operator()(DataModel::WriteAttributeRequest & request)
+    {
+        Platform::ScopedMemoryBufferWithSize<uint8_t> buffer;
+        ASSERT_NE(buffer.Alloc(1024).Get(), nullptr);
+
+        TLV::TLVReader reportReader;
+        reportReader.Init(buffer.Get(), buffer.AllocatedSize());
+
+        AttributeValueDecoder decoder(reportReader, Access::SubjectDescriptor{});
+
+        mStatus = mCluster.WriteAttribute(request, decoder);
+    }
+};
+
 } // namespace
 
 TEST_F(TestUserLabelCluster, AttributeTest)
@@ -105,6 +130,9 @@ TEST_F(TestUserLabelCluster, ReadAttributeTest)
     for (EndpointId endpoint = 0; endpoint < kUserLabelFixedClusterCount; ++endpoint)
     {
         UserLabelClusterTest(endpoint).Check([&](UserLabelCluster & userLabel) {
+            chip::Test::TestServerClusterContext context;
+            EXPECT_EQ(userLabel.Startup(context.Get()), CHIP_NO_ERROR);
+
             DataModel::ReadAttributeRequest request;
             request.path.mEndpointId  = endpoint;
             request.path.mClusterId   = UserLabel::Id;
@@ -125,6 +153,34 @@ TEST_F(TestUserLabelCluster, ReadAttributeTest)
             request.path.mAttributeId = 0xFFFF;
             readAttribute(request);
             EXPECT_TRUE(readAttribute.GetStatus().IsError());
+        });
+    }
+}
+
+TEST_F(TestUserLabelCluster, WriteAttributeTest)
+{
+    for (EndpointId endpoint = 0; endpoint < kUserLabelFixedClusterCount; ++endpoint)
+    {
+        UserLabelClusterTest(endpoint).Check([&](UserLabelCluster & userLabel) {
+            chip::Test::TestServerClusterContext context;
+            EXPECT_EQ(userLabel.Startup(context.Get()), CHIP_NO_ERROR);
+
+            DataModel::WriteAttributeRequest request;
+            request.path.mEndpointId  = endpoint;
+            request.path.mClusterId   = UserLabel::Id;
+            request.path.mAttributeId = Globals::Attributes::ClusterRevision::Id;
+
+            WriteAttribute writeAttribute(userLabel);
+            writeAttribute(request);
+            EXPECT_TRUE(writeAttribute.GetStatus().IsError());
+
+            request.path.mAttributeId = FeatureMap::Id;
+            writeAttribute(request);
+            EXPECT_TRUE(writeAttribute.GetStatus().IsError());
+
+            request.path.mAttributeId = 0xFFFF;
+            writeAttribute(request);
+            EXPECT_TRUE(writeAttribute.GetStatus().IsError());
         });
     }
 }
