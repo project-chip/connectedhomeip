@@ -326,6 +326,20 @@ public:
         return Status::Success;
     }
 
+    Protocols::InteractionModel::Status ValidateZoneId(uint16_t zoneId) override
+    {
+        // TODO: Validate zoneId from the allocated zones
+        // Returning Status::Success to pass through checks in the Server Implementation.
+        return Status::Success;
+    }
+
+    bool ValidateMotionZoneSize(uint16_t zoneSize) override
+    {
+        // TODO: Validate motion zone size
+        // Returning true to pass through checks in the Server Implementation.
+        return true;
+    }
+
     PushAvStreamTransportStatusEnum GetTransportBusyStatus(const uint16_t connectionID) override
     {
         for (PushAvStream & stream : pushavStreams)

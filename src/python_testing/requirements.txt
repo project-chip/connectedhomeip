@@ -4,3 +4,4 @@ pyasn1_modules
 zeroconf
 ifaddr
 langcodes
+requests
