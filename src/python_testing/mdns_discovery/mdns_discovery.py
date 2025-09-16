@@ -640,6 +640,8 @@ class MdnsDiscovery:
                     self._discovered_services = {}
                 self._discovered_services.setdefault(service_type, []).append(mdns_service_info)
 
+                # Logging is handled in the caller when
+                # append_results is set to True
                 if not append_results:
                     if log_output:
                         self._log_output()
