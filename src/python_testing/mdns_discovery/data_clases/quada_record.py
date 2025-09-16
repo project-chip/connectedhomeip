@@ -131,11 +131,8 @@ def get_valid_compressed_ipv6(ipv6: IPv6Address) -> str:
     Strips the zone index (e.g., %eth0) from an IPv6 address and returns the compressed form.
     Validates the address format and raises if invalid.
     """
-    compressed = str(ipv6)
-    if '%' in compressed:
-        compressed = compressed.split('%')[0]
-    IPv6Address(compressed)  # will raise if invalid
-    return compressed
+    # This raises if format is invalid. Drop everything after the first `%` if one exists.
+    return IPvsAddress(str(ipv6).split('%', 1)[0])
 
 
 def get_interface(scope_id: str | int | None) -> str | int | None:
