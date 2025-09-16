@@ -30,7 +30,7 @@ class TestSpecParsingDataType(MatterBaseTest):
     def setup_class(self):
         self.xml_clusters, self.xml_cluster_problems = build_xml_clusters(PrebuiltDataModelDirectory.k1_5)
         self.xml_global_data_types, self.xml_global_problems = build_xml_global_data_types(PrebuiltDataModelDirectory.k1_5)
-        
+
         # Setup templates for testing struct, enum, and bitmap data types
         self.cluster_id = 0xABCD
         self.cluster_name = "Test Cluster"
@@ -1027,30 +1027,30 @@ class TestSpecParsingDataType(MatterBaseTest):
         """Test that global data types are parsed correctly from 1.5 specification"""
         # Check that we have global data types loaded
         asserts.assert_true(self.xml_global_data_types is not None, "Global data types should be loaded")
-        
+
         # Check for parsing problems
         if self.xml_global_problems:
             self.print_step("Global Parsing Problems", f"Found {len(self.xml_global_problems)} problems:")
             for problem in self.xml_global_problems:
                 self.print_step("Problem", str(problem))
-        
+
         # Verify we have at least 3 global data types
-        total_global_types = (len(self.xml_global_data_types['structs']) + 
-                             len(self.xml_global_data_types['enums']) + 
-                             len(self.xml_global_data_types['bitmaps']))
+        total_global_types = (len(self.xml_global_data_types['structs']) +
+                              len(self.xml_global_data_types['enums']) +
+                              len(self.xml_global_data_types['bitmaps']))
         asserts.assert_true(total_global_types >= 3, "Should have at least some global data types")
-        
+
         self.print_step("Global Data Types", f"Found {len(self.xml_global_data_types['structs'])} global structs, "
-                                           f"{len(self.xml_global_data_types['enums'])} global enums, "
-                                           f"{len(self.xml_global_data_types['bitmaps'])} global bitmaps")
+                        f"{len(self.xml_global_data_types['enums'])} global enums, "
+                        f"{len(self.xml_global_data_types['bitmaps'])} global bitmaps")
 
     def test_global_structs_validation(self):
         """Test validation of all global struct data types"""
         global_structs = self.xml_global_data_types['structs']
         asserts.assert_true(len(global_structs) > 0, "Should have at least one global struct")
-        
+
         self.print_step("Global Structs", f"Found {len(global_structs)} global structs")
-        
+
         # Comprehensively validate ALL global structs
         for struct_name, struct in global_structs.items():
             # Validate basic properties
@@ -1058,20 +1058,21 @@ class TestSpecParsingDataType(MatterBaseTest):
             asserts.assert_equal(struct.name, struct_name, f"Struct name should match")
             asserts.assert_true(len(struct.components) > 0, f"{struct_name} should have components")
             asserts.assert_true(struct.cluster_ids is None, f"Global struct {struct_name} should have no cluster IDs")
-            
+
             # Validate all components have proper attributes
             for component_id, component in struct.components.items():
                 asserts.assert_true(component.name, f"Component {component_id} in {struct_name} should have a name")
-                asserts.assert_true(component.conformance is not None, f"Component {component_id} in {struct_name} should have conformance")
+                asserts.assert_true(component.conformance is not None,
+                                    f"Component {component_id} in {struct_name} should have conformance")
                 asserts.assert_true(component_id is not None, f"Component in {struct_name} should have a valid ID")
-        
+
     def test_global_enums_validation(self):
         """Test validation of all global enum data types"""
         global_enums = self.xml_global_data_types['enums']
         asserts.assert_true(len(global_enums) > 0, "Should have at least one global enum")
-        
+
         self.print_step("Global Enums", f"Found {len(global_enums)} global enums")
-        
+
         # Comprehensively validate ALL global enums
         for enum_name, enum in global_enums.items():
             # Validate basic properties
@@ -1079,21 +1080,21 @@ class TestSpecParsingDataType(MatterBaseTest):
             asserts.assert_equal(enum.name, enum_name, f"Enum name should match")
             asserts.assert_true(len(enum.components) > 0, f"{enum_name} should have components")
             asserts.assert_true(enum.cluster_ids is None, f"Global enum {enum_name} should have no cluster IDs")
-            
+
             # Validate all components have proper attributes
             for component_id, component in enum.components.items():
                 asserts.assert_true(component.name, f"Component {component_id} in {enum_name} should have a name")
-                asserts.assert_true(component.conformance is not None, f"Component {component_id} in {enum_name} should have conformance")
+                asserts.assert_true(component.conformance is not None,
+                                    f"Component {component_id} in {enum_name} should have conformance")
                 asserts.assert_true(component_id is not None, f"Component in {enum_name} should have a valid ID")
-        
 
     def test_global_bitmaps_validation(self):
         """Test validation of all global bitmap data types"""
         global_bitmaps = self.xml_global_data_types['bitmaps']
         asserts.assert_true(len(global_bitmaps) > 0, "Should have at least one global bitmap")
-        
+
         self.print_step("Global Bitmaps", f"Found {len(global_bitmaps)} global bitmaps")
-        
+
         # Comprehensively validate ALL global bitmaps
         for bitmap_name, bitmap in global_bitmaps.items():
             # Validate basic properties
@@ -1101,62 +1102,63 @@ class TestSpecParsingDataType(MatterBaseTest):
             asserts.assert_equal(bitmap.name, bitmap_name, f"Bitmap name should match")
             asserts.assert_true(len(bitmap.components) > 0, f"{bitmap_name} should have components")
             asserts.assert_true(bitmap.cluster_ids is None, f"Global bitmap {bitmap_name} should have no cluster IDs")
-            
+
             # Validate all components have proper attributes
             for component_id, component in bitmap.components.items():
                 asserts.assert_true(component.name, f"Component {component_id} in {bitmap_name} should have a name")
-                asserts.assert_true(component.conformance is not None, f"Component {component_id} in {bitmap_name} should have conformance")
+                asserts.assert_true(component.conformance is not None,
+                                    f"Component {component_id} in {bitmap_name} should have conformance")
                 asserts.assert_true(component_id is not None, f"Component in {bitmap_name} should have a valid ID")
-        
+
     def test_global_data_types_comprehensive_validation(self):
         """Comprehensive validation of all global data types"""
         issues = []
-        
+
         # Check all global structs
         for struct_name, struct in self.xml_global_data_types['structs'].items():
             if not struct.name:
                 issues.append(f"Global struct with empty name")
             if struct.cluster_ids is not None:
                 issues.append(f"Global struct {struct_name} should not have cluster IDs")
-            
+
             for component_id, component in struct.components.items():
                 if not component.name:
                     issues.append(f"Global struct {struct_name} component {component_id} has empty name")
                 if component_id is None:
                     issues.append(f"Global struct {struct_name} component has None ID")
-        
+
         # Check all global enums
         for enum_name, enum in self.xml_global_data_types['enums'].items():
             if not enum.name:
                 issues.append(f"Global enum with empty name")
             if enum.cluster_ids is not None:
                 issues.append(f"Global enum {enum_name} should not have cluster IDs")
-                
+
             for component_id, component in enum.components.items():
                 if not component.name:
                     issues.append(f"Global enum {enum_name} component {component_id} has empty name")
                 if component_id is None:
                     issues.append(f"Global enum {enum_name} component has None ID")
-        
+
         # Check all global bitmaps
         for bitmap_name, bitmap in self.xml_global_data_types['bitmaps'].items():
             if not bitmap.name:
                 issues.append(f"Global bitmap with empty name")
             if bitmap.cluster_ids is not None:
                 issues.append(f"Global bitmap {bitmap_name} should not have cluster IDs")
-                
+
             for component_id, component in bitmap.components.items():
                 if not component.name:
                     issues.append(f"Global bitmap {bitmap_name} component {component_id} has empty name")
                 if component_id is None:
                     issues.append(f"Global bitmap {bitmap_name} component has None ID")
-        
+
         if issues:
             print("\n===== Global Data Type Validation Issues Found =====")
             for issue in issues:
                 print(issue)
             asserts.fail(f"{len(issues)} issues found in global data type validation. See above for details.")
-        
+
         self.print_step("Global Validation", f"Successfully validated all global data types with no issues")
 
 
