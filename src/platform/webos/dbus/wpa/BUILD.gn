@@ -16,11 +16,16 @@ import("//build_overrides/chip.gni")
 
 import("${chip_root}/build/chip/linux/gdbus_library.gni")
 
-gdbus_library("openthread") {
-  sources = [ "DBusOpenthread.xml" ]
+gdbus_library("wpa") {
+  sources = [
+    "DBusWpa.xml",
+    "DBusWpaBss.xml",
+    "DBusWpaInterface.xml",
+    "DBusWpaNetwork.xml",
+  ]
 
-  c_namespace = "Openthread"
-  interface_prefix = "io.openthread"
+  c_namespace = "WpaSupplicant"
+  interface_prefix = "fi.w1.wpa_supplicant"
   c_generate_object_manager = false
-  dbus_out_dir = "platform/Linux/dbus/openthread"
+  dbus_out_dir = "platform/Linux/dbus/wpa"
 }

@@ -18,7 +18,7 @@
 /**
  *    @file
  *          Platform-specific configuration overrides for CHIP on
- *          webOS platforms.
+ *          Linux platforms.
  */
 
 #pragma once
@@ -41,6 +41,11 @@ using CHIP_CONFIG_PERSISTED_STORAGE_KEY_TYPE = const char *;
 
 // ==================== Security Adaptations ====================
 
+// If unspecified, assume crypto is fast on Linux
+#ifndef CHIP_CONFIG_SLOW_CRYPTO
+#define CHIP_CONFIG_SLOW_CRYPTO 0
+#endif // CHIP_CONFIG_SLOW_CRYPTO
+
 // ==================== General Configuration Overrides ====================
 
 #ifndef CHIP_CONFIG_MAX_UNSOLICITED_MESSAGE_HANDLERS
@@ -52,7 +57,7 @@ using CHIP_CONFIG_PERSISTED_STORAGE_KEY_TYPE = const char *;
 #endif // CHIP_CONFIG_MAX_EXCHANGE_CONTEXTS
 
 #ifndef CHIP_LOG_FILTERING
-#define CHIP_LOG_FILTERING 0
+#define CHIP_LOG_FILTERING 1
 #endif // CHIP_LOG_FILTERING
 
 #ifndef CHIP_CONFIG_BDX_MAX_NUM_TRANSFERS
