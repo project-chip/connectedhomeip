@@ -1391,7 +1391,7 @@ def build_xml_global_data_types(data_model_directory: Union[PrebuiltDataModelDir
         - 'bitmaps': dict[str, XmlDataType] - global bitmaps by name
     """
 
-    global_data_types = {
+    global_data_types: dict[str, dict[str, XmlDataType]] = {
         'structs': {},
         'enums': {},
         'bitmaps': {}
