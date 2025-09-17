@@ -364,8 +364,8 @@ CHIP_ERROR CameraAVStreamMgmtServer::AddSnapshotStream(const SnapshotStreamStruc
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR CameraAVStreamMgmtServer::UpdateSnapshotStreamRangeParams(SnapshotStreamStruct & snapshotStreamToUpdate,
-                                                                     const SnapshotStreamStruct & snapshotStream)
+CHIP_ERROR CameraAVStreamMgmtServer::UpdateSnapshotStreamRangeParams(
+    SnapshotStreamStruct & snapshotStreamToUpdate, const CameraAVStreamMgmtDelegate::SnapshotStreamAllocateArgs & snapshotStream)
 {
     // Adjust the range parameters for the allocated snapshot stream to be the
     // intersection of the existing and the new one.
@@ -1842,25 +1842,42 @@ void CameraAVStreamMgmtServer::HandleVideoStreamAllocate(HandlerContext & ctx,
 void CameraAVStreamMgmtServer::HandleVideoStreamModify(HandlerContext & ctx,
                                                        const Commands::VideoStreamModify::DecodableType & commandData)
 {
-    Status status             = Status::Success;
     auto & isWaterMarkEnabled = commandData.watermarkEnabled;
     auto & isOSDEnabled       = commandData.OSDEnabled;
     auto & videoStreamID      = commandData.videoStreamID;
 
-    // If Watermark feature is supported, then command should have the
-    // isWaterMarkEnabled param. Or, if it is not supported, then command should
-    // not have the param.
-    VerifyOrReturn((HasFeature(Feature::kWatermark) == commandData.watermarkEnabled.HasValue()),
-                   ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::InvalidCommand));
+    // If WatermarkEnabled is provided then the Watermark feature has to be supported
+    if (commandData.watermarkEnabled.HasValue())
+    {
+        VerifyOrReturn(HasFeature(Feature::kWatermark), {
+            ChipLogError(Zcl, "CameraAVStreamMgmt[ep=%d]: WatermarkEnabled provided but Watermark Feature not set", mEndpointId);
+            ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::InvalidCommand);
+        });
+    }
 
-    // If OSD feature is supported, then command should have the
-    // isOSDEnabled param. Or, if it is not supported, then command should
-    // not have the param.
-    VerifyOrReturn((HasFeature(Feature::kOnScreenDisplay) == commandData.OSDEnabled.HasValue()),
-                   ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::InvalidCommand));
+    // If OSDEnabled is provided then the OSD feature has to be supported
+    if (commandData.OSDEnabled.HasValue())
+    {
+        VerifyOrReturn(HasFeature(Feature::kOnScreenDisplay), {
+            ChipLogError(Zcl, "CameraAVStreamMgmt[ep=%d]: OSDEnabled provided but OSD Feature not set", mEndpointId);
+            ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::InvalidCommand);
+        });
+    }
+
+    // One of WatermarkEnabled or OSDEnabled has to be present
+    VerifyOrReturn(commandData.watermarkEnabled.HasValue() || commandData.OSDEnabled.HasValue(), {
+        ChipLogError(Zcl, "CameraAVStreamMgmt[ep=%d]: One of WatermarkEnabled or OSDEnabled must be provided in VideoStreamModify",
+                     mEndpointId);
+        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::InvalidCommand);
+    });
+
+    if (!ValidateVideoStreamForModifyOrDeallocate(videoStreamID, ctx, /* isDeallocate = */ false))
+    {
+        return;
+    }
 
     // Call the delegate
-    status = mDelegate.VideoStreamModify(videoStreamID, isWaterMarkEnabled, isOSDEnabled);
+    Status status = mDelegate.VideoStreamModify(videoStreamID, isWaterMarkEnabled, isOSDEnabled);
 
     if (status == Status::Success)
     {
@@ -1874,6 +1891,11 @@ void CameraAVStreamMgmtServer::HandleVideoStreamDeallocate(HandlerContext & ctx,
                                                            const Commands::VideoStreamDeallocate::DecodableType & commandData)
 {
     auto & videoStreamID = commandData.videoStreamID;
+
+    if (!ValidateVideoStreamForModifyOrDeallocate(videoStreamID, ctx, /* isDeallocate = */ true))
+    {
+        return;
+    }
 
     // Call the delegate
     Status status = mDelegate.VideoStreamDeallocate(videoStreamID);
@@ -1972,8 +1994,12 @@ void CameraAVStreamMgmtServer::HandleAudioStreamAllocate(HandlerContext & ctx,
 void CameraAVStreamMgmtServer::HandleAudioStreamDeallocate(HandlerContext & ctx,
                                                            const Commands::AudioStreamDeallocate::DecodableType & commandData)
 {
-
     auto & audioStreamID = commandData.audioStreamID;
+
+    if (!ValidateAudioStreamForDeallocate(audioStreamID, ctx))
+    {
+        return;
+    }
 
     // Call the delegate
     Status status = mDelegate.AudioStreamDeallocate(audioStreamID);
@@ -1992,6 +2018,18 @@ void CameraAVStreamMgmtServer::HandleSnapshotStreamAllocate(HandlerContext & ctx
 
     Commands::SnapshotStreamAllocateResponse::Type response;
     uint16_t snapshotStreamID = 0;
+
+    // If Watermark feature is supported, then command should have the
+    // isWaterMarkEnabled param. Or, if it is not supported, then command should
+    // not have the param.
+    VerifyOrReturn((HasFeature(Feature::kWatermark) == commandData.watermarkEnabled.HasValue()),
+                   ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::InvalidCommand));
+
+    // If OSD feature is supported, then command should have the
+    // isOSDEnabled param. Or, if it is not supported, then command should
+    // not have the param.
+    VerifyOrReturn((HasFeature(Feature::kOnScreenDisplay) == commandData.OSDEnabled.HasValue()),
+                   ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::InvalidCommand));
 
     VerifyOrReturn(commandData.imageCodec != ImageCodecEnum::kUnknownEnumValue, {
         ChipLogError(Zcl, "CameraAVStreamMgmt[ep=%d]: Invalid image codec", mEndpointId);
@@ -2014,34 +2052,14 @@ void CameraAVStreamMgmtServer::HandleSnapshotStreamAllocate(HandlerContext & ctx
         ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ConstraintError);
     });
 
-    // If WatermarkEnabled is provided then the Watermark feature has to be supported
-    if (commandData.watermarkEnabled.HasValue())
-    {
-        VerifyOrReturn(HasFeature(Feature::kWatermark), {
-            ChipLogError(Zcl, "CameraAVStreamMgmt[ep=%d]: WatermarkEnabled provided but Watermark Feature not set", mEndpointId);
-            ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::InvalidCommand);
-        });
-    }
-
-    // If OSDEnabled is provided then the OSD feature has to be supported
-    if (commandData.OSDEnabled.HasValue())
-    {
-        VerifyOrReturn(HasFeature(Feature::kOnScreenDisplay), {
-            ChipLogError(Zcl, "CameraAVStreamMgmt[ep=%d]: OSDEnabled provided but OSD Feature not set", mEndpointId);
-            ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::InvalidCommand);
-        });
-    }
-
-    SnapshotStreamStruct snapshotStreamArgs;
-    snapshotStreamArgs.snapshotStreamID = 0;
+    CameraAVStreamMgmtDelegate::SnapshotStreamAllocateArgs snapshotStreamArgs;
     snapshotStreamArgs.imageCodec       = commandData.imageCodec;
-    snapshotStreamArgs.frameRate        = commandData.maxFrameRate;
+    snapshotStreamArgs.maxFrameRate     = commandData.maxFrameRate;
     snapshotStreamArgs.minResolution    = commandData.minResolution;
     snapshotStreamArgs.maxResolution    = commandData.maxResolution;
     snapshotStreamArgs.quality          = commandData.quality;
     snapshotStreamArgs.watermarkEnabled = commandData.watermarkEnabled;
     snapshotStreamArgs.OSDEnabled       = commandData.OSDEnabled;
-    snapshotStreamArgs.referenceCount   = 0;
 
     // Call the delegate
     Status status = mDelegate.SnapshotStreamAllocate(snapshotStreamArgs, snapshotStreamID);
@@ -2060,9 +2078,19 @@ void CameraAVStreamMgmtServer::HandleSnapshotStreamAllocate(HandlerContext & ctx
 
     if (it == mAllocatedSnapshotStreams.end())
     {
-        // Add the allocated snapshotstream object in the AllocatedSnapshotStreams list.
-        snapshotStreamArgs.snapshotStreamID = snapshotStreamID;
-        AddSnapshotStream(snapshotStreamArgs);
+        // Add the allocated snapshot stream object in the mAllocatedSnapshotStreams list.
+        SnapshotStreamStruct allocatedSnapshotStream;
+        allocatedSnapshotStream.snapshotStreamID = snapshotStreamID;
+        allocatedSnapshotStream.referenceCount   = 0;
+        allocatedSnapshotStream.imageCodec       = snapshotStreamArgs.imageCodec;
+        allocatedSnapshotStream.frameRate        = snapshotStreamArgs.maxFrameRate;
+        allocatedSnapshotStream.minResolution    = snapshotStreamArgs.minResolution;
+        allocatedSnapshotStream.maxResolution    = snapshotStreamArgs.maxResolution;
+        allocatedSnapshotStream.quality          = snapshotStreamArgs.quality;
+        allocatedSnapshotStream.watermarkEnabled = snapshotStreamArgs.watermarkEnabled;
+        allocatedSnapshotStream.OSDEnabled       = snapshotStreamArgs.OSDEnabled;
+
+        AddSnapshotStream(allocatedSnapshotStream);
     }
     else
     {
@@ -2109,6 +2137,11 @@ void CameraAVStreamMgmtServer::HandleSnapshotStreamModify(HandlerContext & ctx,
         ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::InvalidCommand);
     });
 
+    if (!ValidateSnapshotStreamForModifyOrDeallocate(snapshotStreamID, ctx, /* isDeallocate = */ false))
+    {
+        return;
+    }
+
     status = mDelegate.SnapshotStreamModify(snapshotStreamID, isWaterMarkEnabled, isOSDEnabled);
 
     if (status == Status::Success)
@@ -2122,8 +2155,12 @@ void CameraAVStreamMgmtServer::HandleSnapshotStreamModify(HandlerContext & ctx,
 void CameraAVStreamMgmtServer::HandleSnapshotStreamDeallocate(HandlerContext & ctx,
                                                               const Commands::SnapshotStreamDeallocate::DecodableType & commandData)
 {
-
     auto & snapshotStreamID = commandData.snapshotStreamID;
+
+    if (!ValidateSnapshotStreamForModifyOrDeallocate(snapshotStreamID, ctx, /* isDeallocate = */ true))
+    {
+        return;
+    }
 
     // Call the delegate
     Status status = mDelegate.SnapshotStreamDeallocate(snapshotStreamID);
@@ -2264,6 +2301,29 @@ bool CameraAVStreamMgmtServer::ValidateSnapshotStreamId(const DataModel::Nullabl
         return false;
     }
     return true;
+}
+
+bool CameraAVStreamMgmtServer::ValidateVideoStreamForModifyOrDeallocate(const uint16_t videoStreamID, HandlerContext & ctx,
+                                                                        bool isDeallocate)
+{
+    return ValidateStreamForModifyOrDeallocateImpl(
+        mAllocatedVideoStreams, videoStreamID, ctx, StreamType::kVideo, [](const VideoStreamStruct & s) { return s.videoStreamID; },
+        isDeallocate);
+}
+
+bool CameraAVStreamMgmtServer::ValidateAudioStreamForDeallocate(const uint16_t audioStreamID, HandlerContext & ctx)
+{
+    return ValidateStreamForModifyOrDeallocateImpl(
+        mAllocatedAudioStreams, audioStreamID, ctx, StreamType::kAudio, [](const AudioStreamStruct & s) { return s.audioStreamID; },
+        /* isDeallocate = */ true);
+}
+
+bool CameraAVStreamMgmtServer::ValidateSnapshotStreamForModifyOrDeallocate(const uint16_t snapshotStreamID, HandlerContext & ctx,
+                                                                           bool isDeallocate)
+{
+    return ValidateStreamForModifyOrDeallocateImpl(
+        mAllocatedSnapshotStreams, snapshotStreamID, ctx, StreamType::kSnapshot,
+        [](const SnapshotStreamStruct & s) { return s.snapshotStreamID; }, isDeallocate);
 }
 
 } // namespace CameraAvStreamManagement

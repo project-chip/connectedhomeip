@@ -31,6 +31,7 @@ declare_args() {
   chip_enable_smoke_co_trigger = false
   chip_enable_boolean_state_configuration_trigger = false
   chip_enable_commodity_price_trigger = false
+  chip_enable_commodity_tariff_trigger = false
   chip_enable_energy_evse_trigger = false
   chip_enable_electrical_grid_conditions_trigger = false
   chip_enable_energy_reporting_trigger = false
@@ -98,6 +99,10 @@ source_set("commodity-metering-test-event-trigger") {
   sources = [ "${chip_root}/src/app/clusters/commodity-metering-server/CommodityMeteringTestEventTriggerHandler.h" ]
 }
 
+source_set("commodity-tariff-test-event-trigger") {
+  sources = [ "${chip_root}/src/app/clusters/commodity-tariff-server/CommodityTariffTestEventTriggerHandler.h" ]
+}
+
 source_set("app-main") {
   defines = [
     "ENABLE_TRACING=${matter_enable_tracing_support}",
@@ -127,6 +132,7 @@ source_set("app-main") {
     ":commissioner-main",
     ":commodity-metering-test-event-trigger",
     ":commodity-price-test-event-trigger",
+    ":commodity-tariff-test-event-trigger",
     ":device-energy-management-test-event-trigger",
     ":electrical-grid-conditions-test-event-trigger",
     ":energy-evse-test-event-trigger",
@@ -187,6 +193,7 @@ source_set("app-main") {
     "CHIP_DEVICE_CONFIG_ENABLE_BOOLEAN_STATE_CONFIGURATION_TRIGGER=${chip_enable_boolean_state_configuration_trigger}",
     "CHIP_DEVICE_CONFIG_ENABLE_COMMODITY_PRICE_TRIGGER=${chip_enable_commodity_price_trigger}",
     "CHIP_DEVICE_CONFIG_ENABLE_ELECTRICAL_GRID_CONDITIONS_TRIGGER=${chip_enable_electrical_grid_conditions_trigger}",
+    "CHIP_DEVICE_CONFIG_ENABLE_COMMODITY_TARIFF_TRIGGER=${chip_enable_commodity_tariff_trigger}",
     "CHIP_DEVICE_CONFIG_ENABLE_ENERGY_EVSE_TRIGGER=${chip_enable_energy_evse_trigger}",
     "CHIP_DEVICE_CONFIG_ENABLE_ENERGY_REPORTING_TRIGGER=${chip_enable_energy_reporting_trigger}",
     "CHIP_DEVICE_CONFIG_ENABLE_METER_IDENTIFICATION_TRIGGER=${chip_enable_meter_identification_trigger}",

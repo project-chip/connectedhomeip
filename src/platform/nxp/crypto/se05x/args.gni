@@ -18,3 +18,15 @@ import("${chip_root}/src/crypto/crypto.gni")
 nxp_crypto_impl = "se05x"
 chip_crypto = "platform"
 nxp_crypto_mw_root = "//third_party/simw-top-mini"
+
+declare_args() {
+  chip_se05x_spake_verifier = false
+  chip_se05x_spake_prover = false
+  chip_se05x_rnd_gen = false
+  chip_se05x_gen_ec_key = true
+  chip_se05x_ecdsa_verify = true
+  chip_se05x_pbkdf2_sha256 = false
+  chip_se05x_hkdf_sha256 = false
+  chip_se05x_hmac_sha256 = false
+  chip_se05x_device_attestation = false
+}

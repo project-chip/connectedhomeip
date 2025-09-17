@@ -84,6 +84,7 @@ class CameraDevice : public CameraDeviceInterface, public CameraDeviceInterface:
 public:
     chip::app::Clusters::ChimeDelegate & GetChimeDelegate() override;
     chip::app::Clusters::WebRTCTransportProvider::Delegate & GetWebRTCProviderDelegate() override;
+    chip::app::Clusters::WebRTCTransportProvider::WebRTCTransportProviderController & GetWebRTCProviderController() override;
     chip::app::Clusters::CameraAvStreamManagement::CameraAVStreamMgmtDelegate & GetCameraAVStreamMgmtDelegate() override;
     chip::app::Clusters::CameraAvStreamManagement::CameraAVStreamController & GetCameraAVStreamMgmtController() override;
     chip::app::Clusters::CameraAvSettingsUserLevelManagement::Delegate & GetCameraAVSettingsUserLevelMgmtDelegate() override;
@@ -117,6 +118,11 @@ public:
 
     // Stop audio stream
     CameraError StopAudioStream(uint16_t streamID) override;
+
+    // Allocate snapshot stream
+    CameraError AllocateSnapshotStream(
+        const chip::app::Clusters::CameraAvStreamManagement::CameraAVStreamMgmtDelegate::SnapshotStreamAllocateArgs & args,
+        uint16_t & outStreamID) override;
 
     // Start snapshot stream
     CameraError StartSnapshotStream(uint16_t streamID) override;
@@ -171,6 +177,7 @@ public:
     std::vector<StreamUsageEnum> & GetSupportedStreamUsages() override;
 
     std::vector<StreamUsageEnum> & GetStreamUsagePriorities() override { return mStreamUsagePriorities; }
+    CameraError SetStreamUsagePriorities(std::vector<StreamUsageEnum> streamUsagePriorities) override;
 
     // Sets the Default Camera Viewport
     CameraError SetViewport(const chip::app::Clusters::Globals::Structs::ViewportStruct::Type & viewPort) override;
@@ -275,6 +282,10 @@ public:
 
     uint8_t GetDetectionSensitivity() override { return mDetectionSensitivity; }
 
+    size_t GetPreRollBufferSize();
+
+    int64_t GetMinKeyframeIntervalMs();
+
     CameraError SetDetectionSensitivity(uint8_t aSensitivity) override;
 
     CameraError CreateZoneTrigger(const chip::app::Clusters::ZoneManagement::ZoneTriggerControlStruct & zoneTrigger) override;
@@ -286,6 +297,7 @@ public:
     CameraError SetPan(int16_t aPan) override;
     CameraError SetTilt(int16_t aTilt) override;
     CameraError SetZoom(uint8_t aZoom) override;
+    CameraError SetPhysicalPTZ(chip::Optional<int16_t> aPan, chip::Optional<int16_t> aTilt, chip::Optional<uint8_t> aZoom) override;
 
     std::vector<VideoStream> & GetAvailableVideoStreams() override { return mVideoStreams; }
 
@@ -310,11 +322,18 @@ private:
     void InitializeAudioStreams();
     void InitializeSnapshotStreams();
 
+    bool AddSnapshotStream(const chip::app::Clusters::CameraAvStreamManagement::CameraAVStreamManager::SnapshotStreamAllocateArgs &
+                               snapshotStreamAllocateArgs,
+                           uint16_t & outStreamID);
+
     GstElement * CreateVideoPipeline(const std::string & device, int width, int height, int framerate, CameraError & error);
-    GstElement * CreateAudioPipeline(const std::string & device, int channels, int sampleRate, CameraError & error);
+    GstElement * CreateAudioPipeline(const std::string & device, int channels, int sampleRate, int bitRate, CameraError & error);
     GstElement * CreateSnapshotPipeline(const std::string & device, int width, int height, int quality, int frameRate,
                                         const std::string & filename, CameraError & error);
     CameraError SetV4l2Control(uint32_t controlId, int value);
+
+    bool MatchClosestSnapshotParams(const VideoResolutionStruct & requested, VideoResolutionStruct & outResolution,
+                                    chip::app::Clusters::CameraAvStreamManagement::ImageCodecEnum & outCodec);
 
     // Various cluster server delegates
     chip::app::Clusters::ChimeManager mChimeManager;
