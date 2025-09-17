@@ -18,7 +18,7 @@
 /**
  *    @file
  *          Provides an implementation of the ConfigurationManager object
- *          for webOS platforms.
+ *          for webos platforms.
  */
 
 #pragma once
@@ -32,7 +32,7 @@ namespace chip {
 namespace DeviceLayer {
 
 /**
- * Concrete implementation of the ConfigurationManager singleton object for the webOS platform.
+ * Concrete implementation of the ConfigurationManager singleton object for the Linux platform.
  */
 class ConfigurationManagerImpl : public Internal::GenericConfigurationManagerImpl<Internal::PosixConfig>
 {
@@ -48,6 +48,8 @@ public:
     CHIP_ERROR StoreBootReason(uint32_t bootReason) override;
     CHIP_ERROR GetRegulatoryLocation(uint8_t & location) override;
     CHIP_ERROR GetLocationCapability(uint8_t & location) override;
+    CHIP_ERROR GetConfigurationVersion(uint32_t & configurationVersion) override;
+    CHIP_ERROR StoreConfigurationVersion(uint32_t configurationVersion) override;
     static ConfigurationManagerImpl & GetDefaultInstance();
 
 private:
