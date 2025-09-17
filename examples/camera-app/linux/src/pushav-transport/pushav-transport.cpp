@@ -22,8 +22,7 @@ using namespace chip::app::Clusters::PushAvStreamTransport;
 
 PushAVTransport::PushAVTransport(const TransportOptionsStruct & transportOptions, const uint16_t connectionID,
                                  AudioStreamStruct & audioStreamParams, VideoStreamStruct & videoStreamParams) :
-    mAudioStreamParams(audioStreamParams),
-    mVideoStreamParams(videoStreamParams)
+    mAudioStreamParams(audioStreamParams), mVideoStreamParams(videoStreamParams)
 {
     ConfigureRecorderSettings(transportOptions, audioStreamParams, videoStreamParams);
     mConnectionID    = connectionID;
@@ -523,7 +522,7 @@ bool PushAVTransport::CanSendPacketsToRecorder()
     return true;
 }
 
-void PushAVTransport::SendVideo(const char * data, size_t size, uint16_t videoStreamID)
+void PushAVTransport::SendVideo(const char * data, size_t size, int64_t timestamp, uint16_t videoStreamID)
 {
     if (CanSendPacketsToRecorder())
     {
@@ -531,7 +530,7 @@ void PushAVTransport::SendVideo(const char * data, size_t size, uint16_t videoSt
     }
 }
 
-void PushAVTransport::SendAudio(const char * data, size_t size, uint16_t audioStreamID)
+void PushAVTransport::SendAudio(const char * data, size_t size, int64_t timestamp, uint16_t audioStreamID)
 {
     if (CanSendPacketsToRecorder())
     {

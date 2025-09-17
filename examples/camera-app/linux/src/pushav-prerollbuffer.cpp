@@ -90,12 +90,12 @@ void PreRollBuffer::PushBufferToTransport()
                     //  Frame is not older than the requested prebuffer length and hasn't been delivered to this sink yet
                     if (streamKey[0] == 'a' && sink->transport->CanSendAudio())
                     {
-                        sink->transport->SendAudio(frame->data.get(), frame->size,
+                        sink->transport->SendAudio(frame->data.get(), frame->size, frame->ptsMs,
                                                    static_cast<uint16_t>(std::stoi(streamKey.substr(1))));
                     }
                     else if (streamKey[0] == 'v' && sink->transport->CanSendVideo())
                     {
-                        sink->transport->SendVideo(frame->data.get(), frame->size,
+                        sink->transport->SendVideo(frame->data.get(), frame->size, frame->ptsMs,
                                                    static_cast<uint16_t>(std::stoi(streamKey.substr(1))));
                     }
                     else
