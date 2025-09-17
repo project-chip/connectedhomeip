@@ -873,6 +873,7 @@ jobs:
 
             - name: Verify Testing Support
               run: |
+                  scripts/run_in_python_env.sh out/venv 'python3 src/python_testing/test_testing/test_ota_images_versions.py'
                   scripts/run_in_python_env.sh out/venv 'python3 src/python_testing/test_testing/test_IDM_10_4.py'
                   scripts/run_in_python_env.sh out/venv 'python3 src/python_testing/test_testing/test_TC_ICDM_2_1_full_pics.py'
                   scripts/run_in_python_env.sh out/venv 'python3 src/python_testing/test_testing/test_TC_ICDM_2_1_min_pics.py'
@@ -888,7 +889,6 @@ jobs:
                   scripts/run_in_python_env.sh out/venv 'python3 src/python_testing/TestSpecParsingSelection.py'
                   scripts/run_in_python_env.sh out/venv 'python3 src/python_testing/TestSpecParsingSupport.py'
                   scripts/run_in_python_env.sh out/venv 'PYTHONPATH=src/python_testing:$PYTHONPATH python3 -m unittest discover -s src/python_testing/mdns_discovery/tests -p "test_*.py"'
-
             - name: Run Tests
               run: |
                   mkdir -p out/trace_data
