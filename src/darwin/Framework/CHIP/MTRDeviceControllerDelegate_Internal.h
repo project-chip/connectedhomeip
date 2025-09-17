@@ -17,10 +17,8 @@
 #import <Foundation/Foundation.h>
 #import <Matter/MTRCommissioningDelegate.h>
 #import <Matter/MTRDeviceController.h>
+#import <Matter/MTRSetupPayload.h>
 #import <Matter/MTRStructsObjc.h>
-
-#include <optional>
-#include <protocols/secure_channel/RendezvousParameters.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -34,6 +32,6 @@ NS_ASSUME_NONNULL_BEGIN
                     error:(nullable NSError *)error;
 - (void)controller:(MTRDeviceController *)controller
     reachedCommissioningStage:(MTRCommissioningStage)stage;
-- (void)controller:(MTRDeviceController *)controller commissioningSessionEstablishmentDone:(NSError * _Nullable)error forParameters:(const std::optional<chip::RendezvousParameters> &)parameters;
+- (void)controller:(MTRDeviceController *)controller commissioningSessionEstablishmentDone:(NSError * _Nullable)error forPayload:(MTRSetupPayload * _Nullable)payload;
 @end
 NS_ASSUME_NONNULL_END

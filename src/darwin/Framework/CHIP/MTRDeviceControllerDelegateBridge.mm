@@ -27,6 +27,7 @@
 #import "MTRMetricKeys.h"
 #import "MTRMetricsCollector.h"
 #import "MTRProductIdentity.h"
+#import "MTRSetupPayload_Internal.h"
 #import "MTRUtilities.h"
 #import "zap-generated/MTRCommandPayloads_Internal.h"
 
@@ -101,7 +102,7 @@ void MTRDeviceControllerDelegateBridge::OnStatusUpdate(chip::Controller::DeviceP
     }
 }
 
-void MTRDeviceControllerDelegateBridge::OnPairingComplete(CHIP_ERROR error, const std::optional<chip::RendezvousParameters> & rendezvousParameters)
+void MTRDeviceControllerDelegateBridge::OnPairingComplete(CHIP_ERROR error, const std::optional<chip::RendezvousParameters> & rendezvousParameters, const std::optional<chip::SetupPayload> & setupPayload)
 {
     MTRDeviceController * strongController = mController;
 
@@ -115,12 +116,14 @@ void MTRDeviceControllerDelegateBridge::OnPairingComplete(CHIP_ERROR error, cons
     id<MTRDeviceControllerDelegate> strongDelegate = mDelegate;
     id<MTRDeviceControllerDelegate_Internal> strongInternalDelegate = GetInternalDelegate();
     if (strongDelegate && mQueue && strongController) {
-        if ([strongInternalDelegate respondsToSelector:@selector(controller:commissioningSessionEstablishmentDone:forParameters:)]) {
-            // Capture parameters by value.
-            std::optional<chip::RendezvousParameters> parameters = rendezvousParameters;
+        if ([strongInternalDelegate respondsToSelector:@selector(controller:commissioningSessionEstablishmentDone:forPayload:)]) {
+            MTRSetupPayload * payload;
+            if (setupPayload) {
+                payload = [[MTRSetupPayload alloc] initWithSetupPayload:*setupPayload];
+            }
             dispatch_async(mQueue, ^{
                 NSError * nsError = [MTRError errorForCHIPErrorCode:error];
-                [strongInternalDelegate controller:strongController commissioningSessionEstablishmentDone:nsError forParameters:parameters];
+                [strongInternalDelegate controller:strongController commissioningSessionEstablishmentDone:nsError forPayload:payload];
             });
         } else if ([strongDelegate respondsToSelector:@selector(controller:commissioningSessionEstablishmentDone:)]) {
             dispatch_async(mQueue, ^{

@@ -48,11 +48,6 @@ NS_ASSUME_NONNULL_BEGIN
 // Matter queue.
 @property (nonatomic, readwrite, assign) BOOL isWaitingAfterPASEEstablished;
 
-// payloadWithSuccessfulPASE, if not nil, is the payload (from possibly
-// multiple payloads represented by our self.setupPayload) that represents
-// the device we successfully established PASE with.
-@property (nonatomic, readonly, strong, nullable) MTRSetupPayload * payloadWithSuccessfulPASE;
-
 @end
 
 NS_ASSUME_NONNULL_END
