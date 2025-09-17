@@ -121,13 +121,12 @@ void LsRequester::stop()
             m_mainLoop = nullptr;
         }
     }
-    catch(const LS::Error& e)
-    {
+    catch(const LS::Error& e) {
         ChipLogError(DeviceLayer, "Exception: %s", e.what());
     }
 }
 
-bool LsRequester::_callbackSync(LSHandle *sh, LSMessage *reply, void *ctx)
+bool LsRequester::_callbackSync(LSHandle * sh, LSMessage * reply, void * ctx)
 {
     LS::Message response(reply);
     SyncCallbackContext *cc = static_cast<SyncCallbackContext *>(ctx);
