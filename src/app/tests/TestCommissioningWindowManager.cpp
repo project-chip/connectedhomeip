@@ -528,7 +528,9 @@ TEST_F(TestCommissioningWindowManager, TestOnPlatformEventOperationalNetworkEnab
 }
 
 // Verify that BLE advertising is stopped when all BLE connections are closed
-#if CONFIG_NETWORK_LAYER_BLE
+// BLE advertisement is not supported on Darwin in Matter
+// so this test is skipped on Darwin since it requires the device to act as an advertiser
+#if CONFIG_NETWORK_LAYER_BLE && !CHIP_DEVICE_LAYER_TARGET_DARWIN
 TEST_F(TestCommissioningWindowManager, TestOnPlatformEventCloseAllBleConnections)
 {
     CommissioningWindowManager & commissionMgr = Server::GetInstance().GetCommissioningWindowManager();
