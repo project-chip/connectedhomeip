@@ -97,7 +97,7 @@ class TC_WebRTCProvider_2_7(MatterBaseTest, WEBRTCPTestBase):
         self.step(3)
         # Send SolicitOffer command with valid parameters - should fail with INVALID_IN_STATE
         cmd = Clusters.WebRTCTransportProvider.Commands.SolicitOffer(
-            streamUsage=3,  # Both audio and video
+            streamUsage=Clusters.Globals.Enums.StreamUsageEnum.kLiveView,
             originatingEndpointID=endpoint,
             videoStreamID=videoStreamID,
             audioStreamID=audioStreamID
@@ -124,7 +124,7 @@ class TC_WebRTCProvider_2_7(MatterBaseTest, WEBRTCPTestBase):
         self.step(5)
         # Send SolicitOffer command with the same valid parameters - should succeed now
         cmd = Clusters.WebRTCTransportProvider.Commands.SolicitOffer(
-            streamUsage=3,  # Both audio and video
+            streamUsage=Clusters.Globals.Enums.StreamUsageEnum.kLiveView,
             originatingEndpointID=endpoint,
             videoStreamID=videoStreamID,
             audioStreamID=audioStreamID
