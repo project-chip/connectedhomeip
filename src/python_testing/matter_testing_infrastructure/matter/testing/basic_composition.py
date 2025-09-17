@@ -335,4 +335,3 @@ class BasicCompositionTests:
             asserts.fail(msg=self.problems[-1].problem)
         else:
             asserts.fail(msg)
-
