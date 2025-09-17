@@ -53,6 +53,9 @@ class MdnsAsyncServiceInfo(ServiceInfo):
             raise BadTypeInNameException
 
         super().__init__(type_=type_, name=name, server=server)
+
+        # _name, type, and server must be explicitly set because
+        # the inherited ServiceInfo methods depend on them.
         self._name = name
         self.type = type_
         self.server = server
