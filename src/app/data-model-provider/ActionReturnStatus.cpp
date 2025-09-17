@@ -108,7 +108,7 @@ CHIP_ERROR ActionReturnStatus::GetUnderlyingError() const
     {
         if (*status == FixedActionStatus::kWriteSuccessNoOp)
         {
-            return (CHIP_NO_ERROR);
+            return CHIP_NO_ERROR;
         }
     }
 
