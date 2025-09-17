@@ -19,6 +19,7 @@
 #include <app/clusters/testing/AttributeTesting.h>
 #include <app/data-model-provider/MetadataTypes.h>
 #include <app/server-cluster/DefaultServerCluster.h>
+#include <app/server/Server.h>
 #include <clusters/OperationalCredentials/Metadata.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/DataModelTypes.h>
@@ -27,6 +28,7 @@
 namespace {
 
 using namespace chip;
+using namespace chip::app;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::OperationalCredentials;
 
@@ -42,7 +44,8 @@ struct TestOperationalCredentials : public ::testing::Test
 
 TEST_F(TestOperationalCredentials, TestAttributes)
 {
-    OperationalCredentialsCluster cluster(kRootEndpointId);
+    OperationalCredentialsCluster cluster(kRootEndpointId, Server::GetInstance().GetFabricTable(), 
+    Server::GetInstance().GetFailSafeContext());
 
     ReadOnlyBufferBuilder<AttributeEntry> builder;
     ASSERT_EQ(cluster.Attributes({ kRootEndpointId, OperationalCredentials::Id }, builder), CHIP_NO_ERROR);
@@ -64,7 +67,8 @@ TEST_F(TestOperationalCredentials, TestAttributes)
 
 TEST_F(TestOperationalCredentials, TestCommands)
 {
-    OperationalCredentialsCluster cluster(kRootEndpointId);
+    OperationalCredentialsCluster cluster(kRootEndpointId, Server::GetInstance().GetFabricTable(), 
+    Server::GetInstance().GetFailSafeContext());
 
     ReadOnlyBufferBuilder<AcceptedCommandEntry> builder;
     ASSERT_EQ(cluster.AcceptedCommands({ kRootEndpointId, OperationalCredentials::Id }, builder), CHIP_NO_ERROR);
