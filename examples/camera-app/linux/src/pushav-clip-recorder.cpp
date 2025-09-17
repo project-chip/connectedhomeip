@@ -732,6 +732,7 @@ void PushAVClipRecorder::FinalizeCurrentClip(int reason)
         std::string mpd_path = make_path("%s.mpd");
         if (FileExists(mpd_path) && !FileExists(mpd_path + ".tmp"))
         {
+            mUploader->setMPDPath(std::make_pair(mpd_path, mClipInfo.mUrl));
             CheckAndUploadFile(mpd_path);
             mUploadMPD = false; // Reset flag after successful upload
         }
