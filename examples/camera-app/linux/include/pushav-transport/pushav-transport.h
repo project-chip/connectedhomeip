@@ -30,7 +30,7 @@
 #include <app/AttributeAccessInterface.h>
 #include <app/CommandHandlerInterface.h>
 #include <app/clusters/push-av-stream-transport-server/constants.h>
-#include <app/clusters/push-av-stream-transport-server/push-av-stream-transport-logic.h>
+#include <app/clusters/push-av-stream-transport-server/push-av-stream-transport-cluster.h>
 #include <functional>
 #include <memory>
 #include <protocols/interaction_model/StatusCode.h>
@@ -108,7 +108,7 @@ public:
     double GetCurrentlyUsedBandwidthMbps() { return mCurrentlyUsedBandwidthMbps; }
 
     // Set the cluster server reference for direct API calls
-    void SetPushAvStreamTransportServer(chip::app::Clusters::PushAvStreamTransportServerLogic * server)
+    void SetPushAvStreamTransportServer(chip::app::Clusters::PushAvStreamTransportServer * server)
     {
         mPushAvStreamTransportServer = server;
     }
@@ -118,11 +118,11 @@ public:
             timeControl);
 
 private:
-    bool mHasAugmented                                                                   = false;
-    bool mStreaming                                                                      = false;
-    std::unique_ptr<PushAVClipRecorder> mRecorder                                        = nullptr;
-    std::unique_ptr<PushAVUploader> mUploader                                            = nullptr;
-    chip::app::Clusters::PushAvStreamTransportServerLogic * mPushAvStreamTransportServer = nullptr;
+    bool mHasAugmented                                                              = false;
+    bool mStreaming                                                                 = false;
+    std::unique_ptr<PushAVClipRecorder> mRecorder                                   = nullptr;
+    std::unique_ptr<PushAVUploader> mUploader                                       = nullptr;
+    chip::app::Clusters::PushAvStreamTransportServer * mPushAvStreamTransportServer = nullptr;
 
     std::chrono::steady_clock::time_point mBlindStartTime;
     PushAVClipRecorder::ClipInfoStruct mClipInfo;

@@ -63,7 +63,7 @@ void PushAvStreamTransportManager::SetCameraDevice(CameraDeviceInterface * aCame
     mCameraDevice = aCameraDevice;
 }
 
-void PushAvStreamTransportManager::SetPushAvStreamTransportServer(PushAvStreamTransportServerLogic * server)
+void PushAvStreamTransportManager::SetPushAvStreamTransportServer(PushAvStreamTransportServer * server)
 {
     mPushAvStreamTransportServer = server;
 }
