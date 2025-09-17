@@ -15,10 +15,10 @@
 #    limitations under the License.
 #
 
-import json
 import inspect
+import json
 from dataclasses import asdict
-from typing import Any, List, Dict
+from typing import Any, Dict, List
 
 
 class OrderedPropsMeta(type):
