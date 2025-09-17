@@ -168,7 +168,7 @@ bool ActionReturnStatus::IsNoOpSuccess() const
     }
     else
     {
-        // NoOp Success only works with FixedStatus, any other type should return false since it is not 
+        // NoOp Success only works with FixedStatus, any other type should return false since it is not
         // supported specifically by the type.
         return false;
     }
