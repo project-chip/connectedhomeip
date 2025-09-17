@@ -26,10 +26,6 @@ namespace chip {
 namespace app {
 namespace DataModel {
 
-enum class FixedActionStatus 
-{
-    kWriteSuccessNoOp,
-};
 /// An ActionReturnStatus encodes the result of a read/write/invoke.
 ///
 /// Generally such actions result in a StatusIB in the interaction model,
@@ -48,6 +44,12 @@ enum class FixedActionStatus
 class ActionReturnStatus
 {
 public:
+    // Provides additional statuses used for specific functionalities not necessarily covered
+    // by the existing CHIP_ERROR or InteractionModel::Status
+    enum class FixedStatus 
+    {
+        kWriteSuccessNoOp,
+    };
     /// Provides storage for the c_str() call for the action status.
     struct StringStorage
     {
@@ -68,7 +70,7 @@ public:
         mReturnStatus(Protocols::InteractionModel::ClusterStatusCode(status))
     {}
     ActionReturnStatus(Protocols::InteractionModel::ClusterStatusCode status) : mReturnStatus(status) {}
-    ActionReturnStatus(FixedActionStatus status): mReturnStatus(status) {}
+    ActionReturnStatus(FixedStatus status): mReturnStatus(status) {}
 
     /// Constructs a status code. Either returns the underlying code directly
     /// or converts the underlying CHIP_ERROR into a cluster status code.
@@ -109,7 +111,7 @@ public:
     const char * c_str(StringStorage & storage) const;
 
 private:
-    std::variant<CHIP_ERROR, Protocols::InteractionModel::ClusterStatusCode, FixedActionStatus> mReturnStatus;
+    std::variant<CHIP_ERROR, Protocols::InteractionModel::ClusterStatusCode, FixedStatus> mReturnStatus;
 };
 
 } // namespace DataModel
