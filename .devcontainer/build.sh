@@ -21,6 +21,7 @@ CHIP_ROOT="$(realpath "$HERE"/..)"
 BUILD_VERSION=$(sed 's/ .*//' "$CHIP_ROOT/integrations/docker/images/base/chip-build/version")
 IMAGE_TAG="matter-dev-environment:local"
 USER_UID=$UID
+WORKSPACE_ROOT=/workspaces/connectedhomeip
 
 function show_usage() {
     cat <<EOF
@@ -30,9 +31,10 @@ Build vscode dev environment docker image.
 
 Options:
     -h,--help        Show this help
-    -t,--tag         Image tag - default is matter-dev-environment:local
-    -u,--uid         User UIDa - default is the current user ID
-    -v,--version     Build version - default is the version of the base chip-build docker image
+    -t,--tag         Image tag - default is $IMAGE_TAG
+    -u,--uid         User UID - default is $USER_UID
+    -w,--workspace   Path to the workspace inside the Docker container - default is $WORKSPACE_ROOT
+    -v,--version     Build version - default is the version of the base chip-build docker image ($BUILD_VERSION)
 EOF
 }
 
@@ -81,5 +83,7 @@ docker build \
     --pull \
     --build-arg USER_UID="$USER_UID" \
     --build-arg BUILD_VERSION="$BUILD_VERSION" \
+    --build-arg WORKSPACE_ROOT="$WORKSPACE_ROOT" \
+    --build-arg LOCAL_WORKSPACE_ROOT="$CHIP_ROOT" \
     --network=host \
     "$HERE"
