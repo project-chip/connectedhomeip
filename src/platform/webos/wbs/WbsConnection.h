@@ -82,15 +82,6 @@ private:
         GAutoPtr<GSource> mWatchSource;
     };
 
-    /*struct ConnectionDataBundle
-    {
-        ConnectionDataBundle(const WbsConnection &, const chip::System::PacketBufferHandle &);
-        ~ConnectionDataBundle() = default;
-
-        const WbsConnection & mConn;
-        GAutoPtr<GVariant> mData;
-    };*/
-
     // Static Function
     static CHIP_ERROR ConnectDeviceImpl(ConnectParams * apParams);
     static CHIP_ERROR SendIndicationImpl(ConnectionDataBundle * data); //(NEED TO UPDATE!!!!)
