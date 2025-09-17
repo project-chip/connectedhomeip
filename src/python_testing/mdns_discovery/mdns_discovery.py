@@ -27,7 +27,7 @@ from mdns_discovery.data_classes.ptr_record import PtrRecord
 from mdns_discovery.enums.mdns_service_type import MdnsServiceType
 from mdns_discovery.mdns_async_service_info import AddressResolverIPv6, MdnsAsyncServiceInfo
 from mdns_discovery.service_listeners.mdns_service_listener import MdnsServiceListener
-from mdns_discovery.utils.net_utils import get_host_ipv6_addresses
+from mdns_discovery.utils.network import get_host_ipv6_addresses
 from zeroconf import IPVersion, ServiceStateChange, Zeroconf
 from zeroconf.asyncio import AsyncServiceBrowser, AsyncZeroconf, AsyncZeroconfServiceTypes
 from zeroconf.const import _TYPE_A, _TYPE_AAAA, _TYPE_SRV, _TYPE_TXT, _TYPES
