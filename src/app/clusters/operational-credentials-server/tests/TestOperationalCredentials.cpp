@@ -44,7 +44,7 @@ struct TestOperationalCredentials : public ::testing::Test
 
 TEST_F(TestOperationalCredentials, TestAttributes)
 {
-    OperationalCredentialsCluster cluster(kRootEndpointId, Server::GetInstance().GetFabricTable(), 
+    OperationalCredentialsCluster cluster(kRootEndpointId, Server::GetInstance().GetFabricTable(),
     Server::GetInstance().GetFailSafeContext());
 
     ReadOnlyBufferBuilder<AttributeEntry> builder;
@@ -67,7 +67,7 @@ TEST_F(TestOperationalCredentials, TestAttributes)
 
 TEST_F(TestOperationalCredentials, TestCommands)
 {
-    OperationalCredentialsCluster cluster(kRootEndpointId, Server::GetInstance().GetFabricTable(), 
+    OperationalCredentialsCluster cluster(kRootEndpointId, Server::GetInstance().GetFabricTable(),
     Server::GetInstance().GetFailSafeContext());
 
     ReadOnlyBufferBuilder<AcceptedCommandEntry> builder;
