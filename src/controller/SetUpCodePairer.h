@@ -123,7 +123,7 @@ public:
 private:
     // DevicePairingDelegate implementation.
     void OnStatusUpdate(DevicePairingDelegate::Status status) override;
-    void OnPairingComplete(CHIP_ERROR error) override;
+    void OnPairingComplete(CHIP_ERROR error, const std::optional<RendezvousParameters> & rendezvousParameters) override;
     void OnPairingDeleted(CHIP_ERROR error) override;
     void OnCommissioningComplete(NodeId deviceId, CHIP_ERROR error) override;
 

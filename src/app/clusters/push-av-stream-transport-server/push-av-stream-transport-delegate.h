@@ -31,8 +31,9 @@ namespace chip {
 namespace app {
 namespace Clusters {
 
-// Forward declaration
+// Forward declarations
 class PushAvStreamTransportServerLogic;
+class PushAvStreamTransportServer;
 
 /**
  * @brief Defines interfaces for implementing application-specific logic for the PushAvStreamTransport Delegate.
@@ -272,13 +273,13 @@ public:
     /**
      * @brief Sets the PushAvStreamTransportServerLogic instance for the delegate.
      *
-     * This method is called by the PushAvStreamTransportServerLogic to provide
-     * the delegate with a pointer to the server logic instance. This allows the
-     * delegate to interact with the server logic, for example, to generate events.
+     * This method is called by the PushAvStreamTransportServer to provide
+     * the delegate with a pointer to the server instance. This allows the
+     * delegate to interact with the server, for example, to generate events.
      *
-     * @param serverLogic A pointer to the PushAvStreamTransportServerLogic instance.
+     * @param server A pointer to the PushAvStreamTransportServer instance.
      */
-    virtual void SetPushAvStreamTransportServer(PushAvStreamTransportServerLogic * serverLogic) = 0;
+    virtual void SetPushAvStreamTransportServer(PushAvStreamTransportServer * server) = 0;
 };
 } // namespace Clusters
 } // namespace app
