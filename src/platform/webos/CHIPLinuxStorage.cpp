@@ -35,8 +35,8 @@
 #include <lib/support/CodeUtils.h>
 #include <lib/support/ScopedBuffer.h>
 #include <lib/support/logging/CHIPLogging.h>
-#include <platform/webos/CHIPLinuxStorage.h>
 #include <platform/internal/CHIPDeviceLayerInternal.h>
+#include <platform/webos/CHIPLinuxStorage.h>
 
 namespace chip {
 namespace DeviceLayer {

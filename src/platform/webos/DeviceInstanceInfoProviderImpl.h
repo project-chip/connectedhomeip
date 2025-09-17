@@ -18,8 +18,8 @@
 
 #pragma once
 
-#include <platform/webos/ConfigurationManagerImpl.h>
 #include <platform/internal/GenericDeviceInstanceInfoProvider.h>
+#include <platform/webos/ConfigurationManagerImpl.h>
 
 namespace chip {
 namespace DeviceLayer {

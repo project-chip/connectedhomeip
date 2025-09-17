@@ -93,7 +93,6 @@ public:
     static void NotifyBLEPeripheralAdvStopComplete(CHIP_ERROR error);
     static void NotifyBLEPeripheralAdvReleased();
 
-
 private:
     // ===== Members that implement the BLEManager internal interface.
 
@@ -174,7 +173,7 @@ private:
 
     void DriveBLEState();
     void DisableBLEService(CHIP_ERROR err);
-    //BluezAdvertisement::AdvertisingIntervals GetAdvertisingIntervals() const;
+    // BluezAdvertisement::AdvertisingIntervals GetAdvertisingIntervals() const;
     void InitiateScan(BleScanState scanType);
     void CleanScanConfig();
 
@@ -187,8 +186,8 @@ private:
     uint32_t mAdapterId = 0;
 
     char mDeviceName[kMaxDeviceNameLength + 1];
-    bool mIsCentral = false;
-    WbsEndpoint * mEndpoint = nullptr;
+    bool mIsCentral          = false;
+    WbsEndpoint * mEndpoint  = nullptr;
     const char * mBLEAdvUUID = nullptr;
 
     WbsDeviceScanner mDeviceScanner;
