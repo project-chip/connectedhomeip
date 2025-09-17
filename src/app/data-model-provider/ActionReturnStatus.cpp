@@ -166,12 +166,10 @@ bool ActionReturnStatus::IsNoOpSuccess() const
     {
         return (*status == ActionReturnStatus::FixedStatus::kWriteSuccessNoOp);
     }
-    else
-    {
-        // NoOp Success only works with FixedStatus, any other type should return false since it is not
-        // supported specifically by the type.
-        return false;
-    }
+
+    // NoOp Success only works with FixedStatus, any other type should return false since it is not
+    // supported specifically by the type.
+    return false;
 }
 
 bool ActionReturnStatus::IsOutOfSpaceEncodingResponse() const
