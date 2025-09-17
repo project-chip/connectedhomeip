@@ -28,6 +28,7 @@
 #import "MTRMetricKeys.h"
 #import "MTRMetricsCollector.h"
 #import "MTRMetrics_Internal.h"
+#import "MTRSetupPayload_Internal.h"
 
 #include <controller/ExampleOperationalCredentialsIssuer.h>
 #include <lib/core/CHIPError.h>
@@ -250,8 +251,22 @@ static inline void emitMetricForSetupPayload(NSString * payload)
     });
 }
 
-- (void)controller:(MTRDeviceController *)controller commissioningSessionEstablishmentDone:(NSError * _Nullable)error
+- (void)controller:(MTRDeviceController *)controller commissioningSessionEstablishmentDone:(NSError * _Nullable)error forParameters:(const std::optional<chip::RendezvousParameters> &)parameters
 {
+    if (!error && parameters) {
+        std::vector<SetupPayload> payloads;
+        CHIP_ERROR err = SetupPayload::FromStringRepresentation(_setupPayload.UTF8String, payloads);
+        if (err == CHIP_NO_ERROR) {
+            // Look for a payload matching the RendezvousParameters.
+            for (auto & payload : payloads) {
+                if (parameters->GetSetupDiscriminator() == payload.discriminator && parameters->HasSetupPINCode() && parameters->GetSetupPINCode() == payload.setUpPINCode) {
+                    _payloadWithSuccessfulPASE = [[MTRSetupPayload alloc] initWithSetupPayload:payload];
+                    break;
+                }
+            }
+        }
+    }
+
     id<MTRCommissioningDelegate_Internal> strongDelegate = [self _internalDelegate];
     // NOTE: Doing respondsToSelector check before dispatch, so we can kick off
     // commissioning ourselves if not.

@@ -17,6 +17,7 @@
 #import <Foundation/Foundation.h>
 #import <Matter/MTRCommissioningOperation.h>
 #import <Matter/MTRDeviceControllerDelegate.h>
+#import <Matter/MTRSetupPayload.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -46,6 +47,11 @@ NS_ASSUME_NONNULL_BEGIN
 // This property should generally be written on client queues only, not on the
 // Matter queue.
 @property (nonatomic, readwrite, assign) BOOL isWaitingAfterPASEEstablished;
+
+// payloadWithSuccessfulPASE, if not nil, is the payload (from possibly
+// multiple payloads represented by our self.setupPayload) that represents
+// the device we successfully established PASE with.
+@property (nonatomic, readonly, strong, nullable) MTRSetupPayload * payloadWithSuccessfulPASE;
 
 @end
 

@@ -39,7 +39,7 @@ public:
     // DevicePairingDelegate implementation
     void OnStatusUpdate(chip::Controller::DevicePairingDelegate::Status status) override;
 
-    void OnPairingComplete(CHIP_ERROR error) override;
+    void OnPairingComplete(CHIP_ERROR error, const std::optional<chip::RendezvousParameters> & rendezvousParameters) override;
 
     void OnPairingDeleted(CHIP_ERROR error) override;
 

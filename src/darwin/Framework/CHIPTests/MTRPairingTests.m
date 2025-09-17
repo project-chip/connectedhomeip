@@ -17,6 +17,7 @@
 // module headers
 #import <Matter/Matter.h>
 
+#import "MTRCommissioningOperation_Internal.h"
 #import "MTRDefines_Internal.h"
 #import "MTRErrorTestUtils.h"
 #import "MTRSecureCodingTestHelpers.h"
@@ -800,6 +801,9 @@ typedef BOOL (^CommissioningSessionHandler)(NSError * _Nullable error);
     [commissioning startWithController:sController];
 
     [self waitForExpectations:@[ expectation1 ] timeout:kPairingTimeoutInSeconds];
+    XCTAssertNotNil(commissioning.payloadWithSuccessfulPASE);
+    XCTAssertEqualObjects(commissioning.payloadWithSuccessfulPASE,
+        [MTRSetupPayload setupPayloadWithOnboardingPayload:kOnboardingPayload1 error:nil]);
 
     XCTestExpectation * expectation2 = [self expectationWithDescription:@"Commissioning 2 complete"];
     commissioningDelegate = [[MTRPairingTestsCommissioningDelegate alloc] initWithExpectation:expectation2];
@@ -814,6 +818,9 @@ typedef BOOL (^CommissioningSessionHandler)(NSError * _Nullable error);
     [commissioning startWithController:sController];
 
     [self waitForExpectations:@[ expectation2 ] timeout:kPairingTimeoutInSeconds];
+    XCTAssertNotNil(commissioning.payloadWithSuccessfulPASE);
+    XCTAssertEqualObjects(commissioning.payloadWithSuccessfulPASE,
+        [MTRSetupPayload setupPayloadWithOnboardingPayload:kOnboardingPayload2 error:nil]);
 }
 
 - (void)test014_CommissioningOperationStopDuringAttestation

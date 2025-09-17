@@ -101,7 +101,7 @@ void MTRDeviceControllerDelegateBridge::OnStatusUpdate(chip::Controller::DeviceP
     }
 }
 
-void MTRDeviceControllerDelegateBridge::OnPairingComplete(CHIP_ERROR error)
+void MTRDeviceControllerDelegateBridge::OnPairingComplete(CHIP_ERROR error, const std::optional<chip::RendezvousParameters> & rendezvousParameters)
 {
     MTRDeviceController * strongController = mController;
 
@@ -113,8 +113,16 @@ void MTRDeviceControllerDelegateBridge::OnPairingComplete(CHIP_ERROR error)
     MATTER_LOG_METRIC_END(kMetricSetupPASESession, error);
 
     id<MTRDeviceControllerDelegate> strongDelegate = mDelegate;
+    id<MTRDeviceControllerDelegate_Internal> strongInternalDelegate = GetInternalDelegate();
     if (strongDelegate && mQueue && strongController) {
-        if ([strongDelegate respondsToSelector:@selector(controller:commissioningSessionEstablishmentDone:)]) {
+        if ([strongInternalDelegate respondsToSelector:@selector(controller:commissioningSessionEstablishmentDone:forParameters:)]) {
+            // Capture parameters by value.
+            std::optional<chip::RendezvousParameters> parameters = rendezvousParameters;
+            dispatch_async(mQueue, ^{
+                NSError * nsError = [MTRError errorForCHIPErrorCode:error];
+                [strongInternalDelegate controller:strongController commissioningSessionEstablishmentDone:nsError forParameters:parameters];
+            });
+        } else if ([strongDelegate respondsToSelector:@selector(controller:commissioningSessionEstablishmentDone:)]) {
             dispatch_async(mQueue, ^{
                 NSError * nsError = [MTRError errorForCHIPErrorCode:error];
                 [strongDelegate controller:strongController commissioningSessionEstablishmentDone:nsError];
