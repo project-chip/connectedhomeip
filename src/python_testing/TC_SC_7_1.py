@@ -26,7 +26,7 @@
 #     script-args: >
 #       --storage-path admin_storage.json
 #       --bool-arg post_cert_test:true
-#       --qr-code MT:Y.K908OC16N71648G00
+#       --qr-code MT:-24J0KCZ16N71648G00
 #       --trace-to json:${TRACE_TEST_JSON}.json
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 #     factory-reset: true
