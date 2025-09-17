@@ -46,7 +46,7 @@ class ActionReturnStatus
 public:
     // Provides additional statuses used for specific functionalities not necessarily covered
     // by the existing CHIP_ERROR or InteractionModel::Status
-    enum class FixedStatus 
+    enum class FixedStatus
     {
         kWriteSuccessNoOp,
     };
