@@ -94,11 +94,10 @@ class TC_CGEN_2_1(MatterBaseTest):
         self.step("6")
         loc_cap = await self.read_single_attribute_check_success(
             cluster=cluster, attribute=attributes.LocationCapability)
-        try:
-            enum_val = Clusters.GeneralCommissioning.Enums.RegulatoryLocationTypeEnum(loc_cap)
-            logging.info(f"LocationCapability value: {enum_val.name}")
-        except ValueError:
-            asserts.fail(f"LocationCapability has invalid value: {loc_cap}")
+        matter_asserts.assert_valid_enum(
+            loc_cap, "LocationCapability must be a valid RegulatoryLocationTypeEnum",
+            Clusters.GeneralCommissioning.Enums.RegulatoryLocationTypeEnum)
+        logging.info(f"LocationCapability value: {Clusters.GeneralCommissioning.Enums.RegulatoryLocationTypeEnum(loc_cap).name}")
 
         self.step("7")
         basic_info = await self.read_single_attribute_check_success(
