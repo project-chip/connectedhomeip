@@ -58,7 +58,6 @@
     ],
     "FlowMeasurement": ["Test_TC_FLW_2_1"],
     "FanControl": ["Test_TC_FAN_3_6"],
-    "GeneralCommissioning": ["Test_TC_CGEN_2_1"],
     "GeneralDiagnostics": [],
     "GroupKeyManagement": ["Test_TC_GRPKEY_2_2"],
     "IcdManagement": [

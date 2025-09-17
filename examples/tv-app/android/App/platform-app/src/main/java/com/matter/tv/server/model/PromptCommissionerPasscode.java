@@ -8,6 +8,7 @@ public class PromptCommissionerPasscode implements Parcelable {
   private int productId;
   private String commissioneeName;
   private long passcode;
+  private int passcodeLength;
   private int pairingHint;
   private String pairingInstruction;
 
@@ -16,12 +17,14 @@ public class PromptCommissionerPasscode implements Parcelable {
       int productId,
       String commissioneeName,
       long passcode,
+      int passcodeLength,
       int pairingHint,
       String pairingInstruction) {
     this.vendorId = vendorId;
     this.productId = productId;
     this.commissioneeName = commissioneeName;
     this.passcode = passcode;
+    this.passcodeLength = passcodeLength;
     this.pairingHint = pairingHint;
     this.pairingInstruction = pairingInstruction;
   }
@@ -31,6 +34,7 @@ public class PromptCommissionerPasscode implements Parcelable {
     productId = in.readInt();
     commissioneeName = in.readString();
     passcode = in.readLong();
+    passcodeLength = in.readInt();
     pairingHint = in.readInt();
     pairingInstruction = in.readString();
   }
@@ -80,6 +84,14 @@ public class PromptCommissionerPasscode implements Parcelable {
     this.passcode = passcode;
   }
 
+  public int getPasscodeLength() {
+    return passcodeLength;
+  }
+
+  public void setPasscodeLength(int passcodeLength) {
+    this.passcodeLength = passcodeLength;
+  }
+
   public int getPairingHint() {
     return pairingHint;
   }
@@ -108,6 +120,8 @@ public class PromptCommissionerPasscode implements Parcelable {
         + '\''
         + ", passcode="
         + passcode
+        + ", passcodeLength="
+        + passcodeLength
         + ", pairingHint="
         + pairingHint
         + ", pairingInstruction='"
@@ -127,6 +141,7 @@ public class PromptCommissionerPasscode implements Parcelable {
     parcel.writeInt(productId);
     parcel.writeString(commissioneeName);
     parcel.writeLong(passcode);
+    parcel.writeInt(passcodeLength);
     parcel.writeInt(pairingHint);
     parcel.writeString(pairingInstruction);
   }

@@ -30,7 +30,7 @@
 namespace chip {
 namespace DeviceLayer {
 
-__attribute__((section(".bss"))) static uint8_t mFactoryDataBuffer[FIXED_PARTITION_SIZE(factory_partition)];
+static uint8_t * mFactoryDataBuffer = nullptr;
 
 struct InternalFlashFactoryData
 {
@@ -48,6 +48,12 @@ struct ExternalFlashFactoryData
 {
     CHIP_ERROR GetFactoryDataPartition(uint8_t *& data, size_t & dataSize)
     {
+        if (mFactoryDataBuffer == nullptr)
+        {
+            ChipLogError(DeviceLayer, "mFactoryDataBuffer ptr is nullptr");
+            return CHIP_ERROR_NO_MEMORY;
+        }
+
         int ret = flash_read(mFlashDevice, FIXED_PARTITION_OFFSET(factory_partition), mFactoryDataBuffer,
                              FIXED_PARTITION_SIZE(factory_partition));
 

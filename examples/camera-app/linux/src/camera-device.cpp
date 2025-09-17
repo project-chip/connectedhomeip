@@ -412,6 +412,8 @@ CameraError CameraDevice::InitializeCameraDevice()
         gstreamerInitialized = true;
     }
 
+    ChipLogDetail(Camera, "InitializeCameraDevice: %s", mVideoDevicePath.c_str());
+
     videoDeviceFd = open(mVideoDevicePath.c_str(), O_RDWR);
     if (videoDeviceFd == -1)
     {
@@ -1374,6 +1376,7 @@ CameraError CameraDevice::RemoveZoneTrigger(const uint16_t zoneID)
 void CameraDevice::HandleSimulatedZoneTriggeredEvent(uint16_t zoneID)
 {
     mZoneManager.OnZoneTriggeredEvent(zoneID, ZoneEventTriggeredReasonEnum::kMotion);
+    mPushAVTransportManager.OnZoneTriggeredEvent(zoneID);
 }
 
 void CameraDevice::HandleSimulatedZoneStoppedEvent(uint16_t zoneID)
