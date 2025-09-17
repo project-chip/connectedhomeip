@@ -31877,6 +31877,7 @@ class Thermostat(Cluster):
             kMatterScheduleConfiguration = 0x80
             kPresets = 0x100
             kEvents = 0x200
+            kThermostatSuggestions = 0x400
 
         class HVACSystemTypeBitmap(IntFlag):
             kCoolingStage = 0x3
@@ -31938,6 +31939,7 @@ class Thermostat(Cluster):
             kVacationMode = 0x10
             kTimeOfUseCostSavings = 0x20
             kPreCoolingOrPreHeating = 0x40
+            kConflictingSuggestions = 0x80
 
     class Structs:
         @dataclass

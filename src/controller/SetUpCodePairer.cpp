@@ -403,6 +403,7 @@ bool SetUpCodePairer::ConnectToDiscoveredDevice()
                 if (payload.discriminator.MatchesLongDiscriminator(longDiscriminator))
                 {
                     params.SetSetupPINCode(payload.setUpPINCode);
+                    params.SetSetupDiscriminator(payload.discriminator);
                     found = true;
                     break;
                 }
@@ -422,6 +423,7 @@ bool SetUpCodePairer::ConnectToDiscoveredDevice()
             if (mSetupPayloads.size() == 1)
             {
                 params.SetSetupPINCode(mSetupPayloads[0].setUpPINCode);
+                params.SetSetupDiscriminator(mSetupPayloads[0].discriminator);
             }
             else
             {
@@ -782,7 +784,7 @@ void SetUpCodePairer::OnStatusUpdate(DevicePairingDelegate::Status status)
     }
 }
 
-void SetUpCodePairer::OnPairingComplete(CHIP_ERROR error)
+void SetUpCodePairer::OnPairingComplete(CHIP_ERROR error, const std::optional<RendezvousParameters> & rendezvousParameters)
 {
     // Save the pairing delegate so we can notify it.  We want to notify it
     // _after_ we restore the state on the commissioner, in case the delegate
@@ -799,7 +801,7 @@ void SetUpCodePairer::OnPairingComplete(CHIP_ERROR error)
         MATTER_LOG_METRIC_END(kMetricSetupCodePairerPairDevice, error);
         if (pairingDelegate != nullptr)
         {
-            pairingDelegate->OnPairingComplete(error);
+            pairingDelegate->OnPairingComplete(error, rendezvousParameters);
         }
         return;
     }
@@ -832,7 +834,7 @@ void SetUpCodePairer::OnPairingComplete(CHIP_ERROR error)
     MATTER_LOG_METRIC_END(kMetricSetupCodePairerPairDevice, error);
     if (pairingDelegate != nullptr)
     {
-        pairingDelegate->OnPairingComplete(error);
+        pairingDelegate->OnPairingComplete(error, rendezvousParameters);
     }
 }
 

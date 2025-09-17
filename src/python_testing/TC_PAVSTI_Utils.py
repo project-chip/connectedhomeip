@@ -21,27 +21,16 @@ import os
 import random
 import shutil
 import tempfile
-from typing import List, Optional, Union
+from typing import Optional
 
 import psutil
 import requests
 from cryptography import x509
-from cryptography.hazmat.primitives import hashes, serialization
-from cryptography.hazmat.primitives.asymmetric import ec, utils
-from ecdsa.curves import curve_by_name
-from mobly import asserts
-from pyasn1.codec.der.decoder import decode as der_decoder
-from pyasn1.error import PyAsn1Error
-from pyasn1_modules import rfc2986, rfc5480
+from cryptography.hazmat.primitives import serialization
+from TC_TLS_Utils import TLSUtils
 
-import matter.clusters as Clusters
-from matter import ChipDeviceCtrl
-from matter.clusters.Types import Nullable, NullValue
-from matter.interaction_model import InteractionModelError, Status
-from matter.testing.conversions import hex_from_bytes
-from matter.testing.matter_testing import type_matches
+from matter.interaction_model import Status
 from matter.testing.tasks import Subprocess
-from matter.tlv import uint
 
 
 class PushAvServerProcess(Subprocess):
@@ -59,6 +48,7 @@ class PushAvServerProcess(Subprocess):
         server_path: str | None,
         port: int = 1234,
         host: str = "0.0.0.0",
+        server_ip: str | None = None,
     ):
         if server_path is None:
             logging.error(f"No path provided for Push AV Server, using the default path for TH: {self.DEFAULT_SERVER_PATH}")
@@ -80,6 +70,14 @@ class PushAvServerProcess(Subprocess):
                 self._working_directory,
             ]
         )
+
+        if server_ip:
+            command.extend(
+                [
+                    "--server-ip",
+                    server_ip
+                ]
+            )
 
         # Start the server application
         super().__init__(
@@ -131,185 +129,15 @@ class PushAvServerProcess(Subprocess):
         response = self._post_json("/streams")
         return response["stream_id"]
 
-    def create_key_pair(self) -> None:
-        """
-        This method is a work around to create keys for camera-app
-        as currently it tries to access from /tmp/pavstest/
-        """
-        self._post_json("/certs/dev/keypair")
-
 
 class PAVSTIUtils:
     """Utils for Push AV TC's TLS requirements."""
-
-    def assert_valid_caid(self, caid: int) -> None:
-        asserts.assert_greater_equal(caid, 0, "Invalid CAID returned")
-        asserts.assert_less_equal(caid, 65534, "Invalid CAID returned")
-
-    def assert_valid_ccdid(self, ccdid: int) -> None:
-        asserts.assert_greater_equal(ccdid, 0, "Invalid CCDID returned")
-        asserts.assert_less_equal(ccdid, 65534, "Invalid CCDID returned")
-
-    def assert_valid_csr(self, response: Clusters.TlsCertificateManagement.Commands.ClientCSRResponse, nonce: bytes):
-        # Verify der encoded and PKCS #10 (rfc2986 is PKCS #10) - next two requirements
-        try:
-            temp, _ = der_decoder(response.csr, asn1Spec=rfc2986.CertificationRequest())
-        except PyAsn1Error:
-            asserts.fail("Unable to decode CSR - improperly formatted DER")
-        layer1 = dict(temp)
-
-        # Verify public key is 256 bytes
-        csr = x509.load_der_x509_csr(response.csr)
-        csr_pubkey = csr.public_key()
-        asserts.assert_equal(csr_pubkey.key_size, 256, "Incorrect key size")
-
-        # Verify signature algorithm is ecdsa-with-SHA256
-        signature_algorithm = dict(layer1['signatureAlgorithm'])['algorithm']
-        asserts.assert_equal(signature_algorithm, rfc5480.ecdsa_with_SHA256, "CSR specifies incorrect signature key algorithm")
-
-        # Verify signature is valid
-        asserts.assert_true(csr.is_signature_valid, "Signature is invalid")
-
-        # Verify response.nonceSignature is octet string of length 32
-        try:
-            # response.nonceSignature is an octet string if it can be converted to an int
-            int(hex_from_bytes(response.nonceSignature), 16)
-        except ValueError:
-            asserts.fail("Returned CSR nonceSignature is not an octet string")
-
-        # Verify response.nonceSignature is valid signature
-        baselen = curve_by_name("NIST256p").baselen
-        signature_raw_r = int(hex_from_bytes(response.nonceSignature[:baselen]), 16)
-        signature_raw_s = int(hex_from_bytes(response.nonceSignature[baselen:]), 16)
-
-        nonceSignature = utils.encode_dss_signature(signature_raw_r, signature_raw_s)
-        csr_pubkey.verify(signature=nonceSignature, data=nonce, signature_algorithm=ec.ECDSA(hashes.SHA256()))
-        return csr
-
-    # ----------------------------------------------------------------------
-    # Command helpers
-    # ----------------------------------------------------------------------
-
-    async def send_provision_root_command(
-        self, endpoint: int, certificate: bytes, expected_status: Status = Status.Success
-    ) -> Union[
-        Clusters.TlsCertificateManagement.Commands.ProvisionRootCertificateResponse,
-        InteractionModelError,
-    ]:
-        try:
-            result = await self.send_single_cmd(
-                cmd=Clusters.TlsCertificateManagement.Commands.ProvisionRootCertificate(
-                    certificate=certificate
-                ),
-                endpoint=endpoint,
-                payloadCapability=ChipDeviceCtrl.TransportPayloadCapability.LARGE_PAYLOAD,
-            )
-
-            asserts.assert_true(
-                type_matches(
-                    result,
-                    Clusters.TlsCertificateManagement.Commands.ProvisionRootCertificateResponse,
-                ),
-                "Unexpected return type for ProvisionRootCertificate",
-            )
-            return result
-        except InteractionModelError as e:
-            asserts.assert_equal(e.status, expected_status, "Unexpected error returned")
-            return e
-
-    async def send_remove_root_command(
-        self, endpoint: int, caid: int, expected_status: Status = Status.Success
-    ) -> InteractionModelError:
-        try:
-            result = await self.send_single_cmd(
-                cmd=Clusters.TlsCertificateManagement.Commands.RemoveRootCertificate(
-                    caid=caid
-                ),
-                endpoint=endpoint,
-                payloadCapability=ChipDeviceCtrl.TransportPayloadCapability.LARGE_PAYLOAD,
-            )
-            return result
-        except InteractionModelError as e:
-            asserts.assert_equal(e.status, expected_status, "Unexpected error returned")
-            return e
-
-    async def send_csr_command(
-        self, endpoint: int, nonce: bytes, expected_status: Status = Status.Success
-    ) -> Union[
-        Clusters.TlsCertificateManagement.Commands.ClientCSRResponse,
-        InteractionModelError,
-    ]:
-        try:
-            result = await self.send_single_cmd(
-                cmd=Clusters.TlsCertificateManagement.Commands.ClientCSR(
-                    nonce=nonce
-                ),
-                endpoint=endpoint,
-                payloadCapability=ChipDeviceCtrl.TransportPayloadCapability.LARGE_PAYLOAD,
-            )
-
-            asserts.assert_true(
-                type_matches(
-                    result,
-                    Clusters.TlsCertificateManagement.Commands.ClientCSRResponse,
-                ),
-                "Unexpected return type for TLSClientCSR",
-            )
-            return result
-        except InteractionModelError as e:
-            asserts.assert_equal(e.status, expected_status, "Unexpected error returned")
-            return e
-
-    async def send_provision_client_command(
-            self, endpoint: int, certificate: bytes, ccdid: int, intermediates: List[bytes] = [],
-            expected_status: Status = Status.Success) -> InteractionModelError:
-        try:
-            result = await self.send_single_cmd(cmd=Clusters.TlsCertificateManagement.Commands.ProvisionClientCertificate(ccdid=ccdid, clientCertificate=certificate, intermediateCertificates=intermediates),
-                                                endpoint=endpoint, payloadCapability=ChipDeviceCtrl.TransportPayloadCapability.LARGE_PAYLOAD)
-
-            return result
-        except InteractionModelError as e:
-            asserts.assert_equal(e.status, expected_status, "Unexpected error returned")
-            return e
-
-    async def send_provision_tls_endpoint_command(
-        self,
-        endpoint: int,
-        hostname: bytes,
-        port: uint,
-        caid: uint,
-        ccdid: Union[Nullable, uint] = NullValue,
-        expected_status: Status = Status.Success,
-    ) -> Union[
-        Clusters.TlsClientManagement.Commands.ProvisionEndpointResponse,
-        InteractionModelError,
-    ]:
-        try:
-            result = await self.send_single_cmd(
-                cmd=Clusters.TlsClientManagement.Commands.ProvisionEndpoint(
-                    hostname=hostname, port=port, caid=caid, ccdid=ccdid
-                ),
-                endpoint=endpoint,
-                payloadCapability=ChipDeviceCtrl.TransportPayloadCapability.LARGE_PAYLOAD,
-            )
-
-            asserts.assert_true(
-                type_matches(
-                    result,
-                    Clusters.TlsClientManagement.Commands.ProvisionEndpointResponse,
-                ),
-                "Unexpected return type for ProvisionEndpoint",
-            )
-            return result
-        except InteractionModelError as e:
-            asserts.assert_equal(e.status, expected_status, "Unexpected error returned")
-            return e
 
     # ----------------------------------------------------------------------
     # Precondition setup
     # ----------------------------------------------------------------------
 
-    def _get_private_ip(self):
+    def get_private_ip(self):
         candidates = {"192": [], "10": []}
 
         for iface, addrs in psutil.net_if_addrs().items():
@@ -338,29 +166,26 @@ class PAVSTIUtils:
             # If no host ip specified, try to get private ip
             # this is mainly required when running TCs in Test Harness
             logging.error("No host_ip provided in test arguments")
-            host_ip = self._get_private_ip()
-            logging.info(f"Using IP: {host_ip} as hostname to provision TLS Endpoint")
+            host_ip = self.get_private_ip()
 
-        # Create Kep Pair for camera as it currently tries to access it from /tmp/pavstest when uploading.
-        # TODO: Remove once camera-app supports TLS
-        server.create_key_pair()
+        tls_utils = TLSUtils(self, endpoint=endpoint)
+        logging.info(f"Using IP: {host_ip} as hostname to provision TLS Endpoint")
         root_cert_der = server.get_root_cert()
-        prc_result = await self.send_provision_root_command(endpoint=endpoint, certificate=root_cert_der)
-        self.assert_valid_caid(prc_result.caid)
+        prc_result = await tls_utils.send_provision_root_command(certificate=root_cert_der)
+        tls_utils.assert_valid_caid(prc_result.caid)
 
         csr_nonce = random.randbytes(32)
-        csr_result = await self.send_csr_command(endpoint=endpoint, nonce=csr_nonce)
-        self.assert_valid_ccdid(csr_result.ccdid)
-        self.assert_valid_csr(csr_result, csr_nonce)
+        csr_result = await tls_utils.send_csr_command(nonce=csr_nonce)
+        tls_utils.assert_valid_ccdid(csr_result.ccdid)
+        tls_utils.assert_valid_csr(csr_result, csr_nonce)
 
         server.sign_csr(csr_result.csr)
         device_cert_der = server.get_device_certificate()
 
-        await self.send_provision_client_command(
-            endpoint=endpoint, certificate=device_cert_der, ccdid=csr_result.ccdid
+        await tls_utils.send_provision_client_command(
+            certificate=device_cert_der, ccdid=csr_result.ccdid
         )
-        result = await self.send_provision_tls_endpoint_command(
-            endpoint=endpoint,
+        result = await tls_utils.send_provision_tls_endpoint_command(
             hostname=host_ip.encode('utf-8'),
             port=1234,
             expected_status=Status.Success,

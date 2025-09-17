@@ -19,11 +19,14 @@
 #pragma once
 #include <app-common/zap-generated/cluster-enums.h>
 #include <app/clusters/push-av-stream-transport-server/push-av-stream-transport-cluster.h>
-
+#include <app/clusters/tls-certificate-management-server/tls-certificate-management-server.h>
 #include <camera-device-interface.h>
+#include <credentials/CHIPCert.h>
+#include <crypto/CHIPCryptoPAL.h>
+#include <functional>
+#include <iomanip>
 #include <media-controller.h>
 #include <pushav-transport.h>
-
 #include <unordered_map>
 #include <vector>
 
@@ -52,6 +55,7 @@ public:
     void Init();
     void SetMediaController(MediaController * mediaController);
     void SetCameraDevice(CameraDeviceInterface * cameraDevice);
+    void SetPushAvStreamTransportServer(PushAvStreamTransportServer * server) override;
 
     // Add missing override keywords and fix signatures
     Protocols::InteractionModel::Status AllocatePushTransport(const TransportOptionsStruct & transportOptions,
@@ -68,6 +72,9 @@ public:
     Protocols::InteractionModel::Status ManuallyTriggerTransport(
         const uint16_t connectionID, TriggerActivationReasonEnum activationReason,
         const Optional<Structs::TransportMotionTriggerTimeControlStruct::DecodableType> & timeControl) override;
+
+    void SetTLSCerts(Tls::CertificateTable::BufferedClientCert & clientCertEntry,
+                     Tls::CertificateTable::BufferedRootCert & rootCertEntry) override;
 
     bool ValidateUrl(const std::string & url) override;
 
@@ -99,15 +106,34 @@ public:
 
     CHIP_ERROR PersistentAttributesLoadedCallback() override;
 
+    void OnZoneTriggeredEvent(uint16_t zoneId);
+
 private:
     std::vector<PushAvStream> pushavStreams;
-    MediaController * mMediaController    = nullptr;
-    CameraDeviceInterface * mCameraDevice = nullptr;
+    MediaController * mMediaController                         = nullptr;
+    CameraDeviceInterface * mCameraDevice                      = nullptr;
+    PushAvStreamTransportServer * mPushAvStreamTransportServer = nullptr;
 
     AudioStreamStruct mAudioStreamParams;
     VideoStreamStruct mVideoStreamParams;
     std::unordered_map<uint16_t, std::unique_ptr<PushAVTransport>> mTransportMap; // map for the transport objects
     std::unordered_map<uint16_t, TransportOptionsStruct> mTransportOptionsMap;    // map for the transport options
+
+    double mTotalUsedBandwidthMbps = 0.0; // Tracks the total bandwidth used by all active transports
+
+    std::vector<uint8_t> mBufferRootCert;
+    std::vector<uint8_t> mBufferClientCert;
+    std::vector<uint8_t> mBufferClientCertKey;
+    std::vector<std::vector<uint8_t>> mBufferIntermediateCerts;
+
+    /**
+     * @brief Calculates the total bandwidth in Mbps for the given video and audio stream IDs.
+     * @param videoStreamId Optional nullable video stream ID.
+     * @param audioStreamId Optional nullable audio stream ID.
+     * @param outBandwidthMbps Output parameter for the calculated bandwidth in Mbps.
+     */
+    void GetBandwidthForStreams(const Optional<DataModel::Nullable<uint16_t>> & videoStreamId,
+                                const Optional<DataModel::Nullable<uint16_t>> & audioStreamId, double & outBandwidthMbps);
 };
 
 } // namespace PushAvStreamTransport
