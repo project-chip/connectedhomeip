@@ -160,9 +160,9 @@ class MdnsAsyncServiceInfo(ServiceInfo):
 class AddressResolverIPv6(MdnsAsyncServiceInfo):
     """Resolve a host name to an IPv6 address."""
 
-    def __init__(self, server: str) -> None:
+    def __init__(self, hostname: str) -> None:
         """Initialize the AddressResolver."""
-        super().__init__(server, server, server=server)
+        super().__init__(hostname, hostname, server=hostname)
         self._query_record_types = {_TYPE_AAAA}
 
     @property

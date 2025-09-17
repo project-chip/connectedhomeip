@@ -296,7 +296,7 @@ class MdnsDiscovery:
 
         async with AsyncZeroconf(interfaces=self.interfaces) as azc:
             # Perform AAAA query
-            addr_resolver = AddressResolverIPv6(server=hostname)
+            addr_resolver = AddressResolverIPv6(hostname)
 
             is_discovered = await addr_resolver.async_request(
                 azc.zeroconf,
