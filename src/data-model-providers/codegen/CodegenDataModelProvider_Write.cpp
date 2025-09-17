@@ -107,25 +107,6 @@ DataModel::ActionReturnStatus CodegenDataModelProvider::WriteAttribute(const Dat
     // This SHOULD NEVER HAPPEN hence the general return code (seemed preferable to VerifyOrDie)
     VerifyOrReturnError(attributeMetadata != nullptr, Status::Failure);
 
-    if (request.path.mDataVersion.HasValue())
-    {
-        DataVersion * versionPtr = emberAfDataVersionStorage(request.path);
-
-        if (versionPtr == nullptr)
-        {
-            ChipLogError(DataManagement, "Unable to get cluster info for Endpoint 0x%x, Cluster " ChipLogFormatMEI,
-                         request.path.mEndpointId, ChipLogValueMEI(request.path.mClusterId));
-            return Status::DataVersionMismatch;
-        }
-
-        if (request.path.mDataVersion.Value() != *versionPtr)
-        {
-            ChipLogError(DataManagement, "Write Version mismatch for Endpoint 0x%x, Cluster " ChipLogFormatMEI,
-                         request.path.mEndpointId, ChipLogValueMEI(request.path.mClusterId));
-            return Status::DataVersionMismatch;
-        }
-    }
-
     ContextAttributesChangeListener change_listener(mContext->dataModelChangeListener);
 
     AttributeAccessInterface * aai =
