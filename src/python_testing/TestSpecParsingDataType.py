@@ -1056,7 +1056,7 @@ class TestSpecParsingDataType(MatterBaseTest):
         for struct_name, struct in global_structs.items():
             # Validate basic properties
             asserts.assert_equal(struct.data_type, DataTypeEnum.kStruct, f"{struct_name} should be a struct")
-            asserts.assert_equal(struct.name, struct_name, f"Struct name should match")
+            asserts.assert_equal(struct.name, struct_name, "Struct name should match")
             asserts.assert_true(len(struct.components) > 0, f"{struct_name} should have components")
             asserts.assert_true(struct.cluster_ids is None, f"Global struct {struct_name} should have no cluster IDs")
 
@@ -1078,7 +1078,7 @@ class TestSpecParsingDataType(MatterBaseTest):
         for enum_name, enum in global_enums.items():
             # Validate basic properties
             asserts.assert_equal(enum.data_type, DataTypeEnum.kEnum, f"{enum_name} should be an enum")
-            asserts.assert_equal(enum.name, enum_name, f"Enum name should match")
+            asserts.assert_equal(enum.name, enum_name, "Enum name should match")
             asserts.assert_true(len(enum.components) > 0, f"{enum_name} should have components")
             asserts.assert_true(enum.cluster_ids is None, f"Global enum {enum_name} should have no cluster IDs")
 
@@ -1100,7 +1100,7 @@ class TestSpecParsingDataType(MatterBaseTest):
         for bitmap_name, bitmap in global_bitmaps.items():
             # Validate basic properties
             asserts.assert_equal(bitmap.data_type, DataTypeEnum.kBitmap, f"{bitmap_name} should be a bitmap")
-            asserts.assert_equal(bitmap.name, bitmap_name, f"Bitmap name should match")
+            asserts.assert_equal(bitmap.name, bitmap_name, "Bitmap name should match")
             asserts.assert_true(len(bitmap.components) > 0, f"{bitmap_name} should have components")
             asserts.assert_true(bitmap.cluster_ids is None, f"Global bitmap {bitmap_name} should have no cluster IDs")
 
@@ -1118,7 +1118,7 @@ class TestSpecParsingDataType(MatterBaseTest):
         # Check all global structs
         for struct_name, struct in self.xml_global_data_types['structs'].items():
             if not struct.name:
-                issues.append(f"Global struct with empty name")
+                issues.append("Global struct with empty name")
             if struct.cluster_ids is not None:
                 issues.append(f"Global struct {struct_name} should not have cluster IDs")
 
@@ -1131,7 +1131,7 @@ class TestSpecParsingDataType(MatterBaseTest):
         # Check all global enums
         for enum_name, enum in self.xml_global_data_types['enums'].items():
             if not enum.name:
-                issues.append(f"Global enum with empty name")
+                issues.append("Global enum with empty name")
             if enum.cluster_ids is not None:
                 issues.append(f"Global enum {enum_name} should not have cluster IDs")
 
@@ -1144,7 +1144,7 @@ class TestSpecParsingDataType(MatterBaseTest):
         # Check all global bitmaps
         for bitmap_name, bitmap in self.xml_global_data_types['bitmaps'].items():
             if not bitmap.name:
-                issues.append(f"Global bitmap with empty name")
+                issues.append("Global bitmap with empty name")
             if bitmap.cluster_ids is not None:
                 issues.append(f"Global bitmap {bitmap_name} should not have cluster IDs")
 
@@ -1160,7 +1160,7 @@ class TestSpecParsingDataType(MatterBaseTest):
                 print(issue)
             asserts.fail(f"{len(issues)} issues found in global data type validation. See above for details.")
 
-        self.print_step("Global Validation", f"Successfully validated all global data types with no issues")
+        self.print_step("Global Validation", "Successfully validated all global data types with no issues")
 
 
 if __name__ == "__main__":
