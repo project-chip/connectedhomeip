@@ -111,7 +111,7 @@ public:
     const char * c_str(StringStorage & storage) const;
 
 private:
-    std::variant<CHIP_ERROR, Protocols::InteractionModel::ClusterStatusCode, FixedStatus> mReturnStatus;
+    std::variant<CHIP_ERROR, Protocols::InteractionModel::ClusterStatusCode, ActionReturnStatus::FixedStatus> mReturnStatus;
 };
 
 } // namespace DataModel
