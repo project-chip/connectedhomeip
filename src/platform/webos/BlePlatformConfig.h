@@ -27,14 +27,12 @@
 namespace chip {
 namespace DeviceLayer {
 namespace Internal {
-//class BluezConnection;
 class WbsConnection;
 } // namespace Internal
 } // namespace DeviceLayer
 } // namespace chip
 
 // ==================== Platform Adaptations ====================
-//#define BLE_CONNECTION_OBJECT chip::DeviceLayer::Internal::BluezConnection *
 #define BLE_CONNECTION_OBJECT chip::DeviceLayer::Internal::WbsConnection *
 #define BLE_CONNECTION_UNINITIALIZED nullptr
 

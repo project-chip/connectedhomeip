@@ -24,7 +24,7 @@ class LsRequester
 public:
     static LsRequester* getInstance();
     void stop();
-
+    void restart();
     bool lsCallSync(const char * pAPI, const char * pParams, pbnjson::JValue & response, int timeout = 10);
     bool lsSubscribe(const char * pAPI, const char * pParams, void* ctx, LSFilterFunc func, LS::Call& call);
     bool lsSubscribe(const char * pAPI, const char * pParams, void* ctx, LSFilterFunc func, LSMessageToken *pulToken);

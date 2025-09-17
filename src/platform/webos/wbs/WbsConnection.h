@@ -8,7 +8,7 @@
 #include <cstdint>
 #include <string>
 #include <luna-service2++/handle.hpp>
-#include "lsrequester.h"
+#include "LsRequester.h"
 
 namespace chip {
 namespace DeviceLayer {
@@ -104,7 +104,7 @@ private:
     char * mPeerAddress;
     bool mNotifyAcquired = false;
     uint16_t mMtu = 0;
-    std::string clientId;
+    std::string mClientId;
     uint32_t uMonitorToken;
     WbsEndpoint * mEndpoint;
 };

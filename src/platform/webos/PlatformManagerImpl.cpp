@@ -19,7 +19,7 @@
 /**
  *    @file
  *          Provides an implementation of the PlatformManager object
- *          for Linux platforms.
+ *          for webOS platforms.
  */
 
 #include <platform/internal/CHIPDeviceLayerInternal.h>
@@ -32,7 +32,7 @@
 #include <net/if.h>
 #include <netinet/in.h>
 #include <unistd.h>
-#include <thread>
+
 #include <mutex>
 
 #include <app-common/zap-generated/ids/Events.h>
@@ -108,14 +108,19 @@ gboolean WiFiIPChangeListener(GIOChannel * ch, GIOCondition /* condition */, voi
                             continue;
                         }
 
-                        if (ConnectivityMgrImpl().GetWiFiIfName() == nullptr)
+                        ChipLogDetail(DeviceLayer, "Got IP address on interface: %s", name);
+
+                        const char * wifiIfName = ConnectivityMgrImpl().GetWiFiIfName();
+                        if (wifiIfName == nullptr)
                         {
-                            ChipLogDetail(DeviceLayer, "No wifi interface name. Ignoring IP update event.");
+                            ChipLogDetail(DeviceLayer, "Ignoring IP update event: No WiFi interface name configured");
                             continue;
                         }
 
-                        if (strcmp(name, ConnectivityMgrImpl().GetWiFiIfName()) != 0)
+                        if (strcmp(name, wifiIfName) != 0)
                         {
+                            ChipLogDetail(DeviceLayer, "Ignoring IP update event: Interface name mismatch: %s != %s", name,
+                                          wifiIfName);
                             continue;
                         }
 
@@ -196,19 +201,21 @@ CHIP_ERROR RunWiFiIPChangeListener()
 CHIP_ERROR PlatformManagerImpl::_InitChipStack()
 {
 #if CHIP_DEVICE_CONFIG_WITH_GLIB_MAIN_LOOP
-    auto * context = g_main_context_new();
-    mGLibMainLoop = g_main_loop_new(context, FALSE); //문제 발생
+
+    auto * context      = g_main_context_new();
+    mGLibMainLoop       = g_main_loop_new(context, FALSE);
     mGLibMainLoopThread = g_thread_new("gmain-matter", GLibMainLoopThread, mGLibMainLoop);
     g_main_context_unref(context);
+
     {
+        // Wait for the GLib main loop to start. It is required that the context used
+        // by the main loop is acquired before any other GLib functions are called. Otherwise,
+        // the GLibMatterContextInvokeSync() might run functions on the wrong thread.
+
         std::unique_lock<std::mutex> lock(mGLibMainLoopCallbackIndirectionMutex);
         GLibMatterContextInvokeData invokeData{};
 
         auto * idleSource = g_idle_source_new();
-        if (idleSource == nullptr) {
-            return CHIP_ERROR_NO_MEMORY;
-        }
-
         g_source_set_callback(
             idleSource,
             [](void * userData_) {
@@ -219,33 +226,31 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack()
                 return G_SOURCE_REMOVE;
             },
             &invokeData, nullptr);
-
         GLibMatterContextAttachSource(idleSource);
         g_source_unref(idleSource);
 
         invokeData.mDoneCond.wait(lock, [&invokeData]() { return invokeData.mDone; });
     }
 
-#endif // CHIP_DEVICE_CONFIG_WITH_GLIB_MAIN_LOOP
+#endif
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
-    CHIP Facet CHIPS_NO_ERROR = RunWiFiIPChangeListener();
-    if (CHIPS_NO_ERROR != CHIP_NO_ERROR) {
-        printf("[PlatformManagerImpl::_InitChipStack] ERROR: Failed to start WiFi IP change listener, error code: %d\n", CHIPS_NO_ERROR);
-        return CHIPS_NO_ERROR;
-    }
-#endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI
+    ReturnErrorOnFailure(RunWiFiIPChangeListener());
+#endif
 
-    CHIP_ERROR err = Internal::PosixConfig::Init();
-    if (err != CHIP_NO_ERROR) {
-        return err;
-    }
-    err = Internal::GenericPlatformManagerImpl_POSIX<PlatformManagerImpl>::_InitChipStack();
-    if (err != CHIP_NO_ERROR) {
-        return err;
-    }
+    // Initialize the configuration system.
+    ReturnErrorOnFailure(Internal::PosixConfig::Init());
+
+    // Call _InitChipStack() on the generic implementation base class
+    // to finish the initialization process.
+    ReturnErrorOnFailure(Internal::GenericPlatformManagerImpl_POSIX<PlatformManagerImpl>::_InitChipStack());
+
+    // Now set up our device instance info provider.  We couldn't do that
+    // earlier, because the generic implementation sets a generic one.
     SetDeviceInstanceInfoProvider(&DeviceInstanceInfoProviderMgrImpl());
+
     mStartTime = System::SystemClock().GetMonotonicTimestamp();
+
     return CHIP_NO_ERROR;
 }
 
@@ -291,23 +296,30 @@ void PlatformManagerImpl::_GLibMatterContextInvokeSync(LambdaBridge && bridge)
     // the GLibMatterContextInvokeData object (including constructor and destructor). This is a temporary
     // workaround until TSAN-enabled GLib will be used in our CI.
     std::unique_lock<std::mutex> lock(mGLibMainLoopCallbackIndirectionMutex);
+
     GLibMatterContextInvokeData invokeData{ std::move(bridge) };
+
     lock.unlock();
+
     g_main_context_invoke_full(
         g_main_loop_get_context(mGLibMainLoop), G_PRIORITY_HIGH_IDLE,
         [](void * userData_) {
             auto * data = reinterpret_cast<GLibMatterContextInvokeData *>(userData_);
+
             // XXX: Temporary workaround for TSAN false positives.
             std::unique_lock<std::mutex> lock_(PlatformMgrImpl().mGLibMainLoopCallbackIndirectionMutex);
+
             lock_.unlock();
             data->bridge();
             lock_.lock();
+
             data->mDone = true;
             data->mDoneCond.notify_one();
 
             return G_SOURCE_REMOVE;
         },
         &invokeData, nullptr);
+
     lock.lock();
     invokeData.mDoneCond.wait(lock, [&invokeData]() { return invokeData.mDone; });
 }

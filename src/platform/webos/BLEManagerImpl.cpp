@@ -59,7 +59,7 @@ namespace Internal {
 namespace {
 
 static constexpr System::Clock::Timeout kNewConnectionScanTimeout = System::Clock::Seconds16(20);
-static constexpr System::Clock::Timeout kConnectTimeout           = System::Clock::Seconds16(40);
+static constexpr System::Clock::Timeout kConnectTimeout           = System::Clock::Seconds16(20);
 static constexpr System::Clock::Timeout kFastAdvertiseTimeout =
     System::Clock::Milliseconds32(CHIP_DEVICE_CONFIG_BLE_ADVERTISING_INTERVAL_CHANGE_TIME);
 #if CHIP_DEVICE_CONFIG_EXT_ADVERTISING
@@ -233,7 +233,7 @@ void BLEManagerImpl::_OnPlatformEvent(const ChipDeviceEvent * event)
 void BLEManagerImpl::HandlePlatformSpecificBLEEvent(const ChipDeviceEvent * apEvent)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-    ChipLogDetail(DeviceLayer, "HandlePlatformSpecificBLEEvent %d", apEvent->Type);
+    //ChipLogDetail(DeviceLayer, "HandlePlatformSpecificBLEEvent %d", apEvent->Type);
     switch (apEvent->Type)
     {
     case DeviceEventType::kPlatformWebOSBLEAdapterAdded:
@@ -407,6 +407,23 @@ exit:
     return err;
 }
 
+/*CHIP_ERROR BLEManagerImpl::SendWriteRequest(BLE_CONNECTION_OBJECT conId, const Ble::ChipBleUUID * svcId,
+                                            const Ble::ChipBleUUID * charId, chip::System::PacketBufferHandle pBuf)
+{
+    CHIP_ERROR err = BLE_ERROR_GATT_WRITE_FAILED;
+
+    VerifyOrExit(conId != BLE_CONNECTION_UNINITIALIZED,
+                 ChipLogError(DeviceLayer, "BLE connection is not initialized in %s", __func__));
+    VerifyOrExit(Ble::UUIDsMatch(svcId, &CHIP_BLE_SVC_ID),
+                 ChipLogError(DeviceLayer, "SendWriteRequest() called with invalid service ID"));
+    VerifyOrExit(Ble::UUIDsMatch(charId, &Ble::CHIP_BLE_CHAR_1_UUID),
+                 ChipLogError(DeviceLayer, "SendWriteRequest() called with invalid characteristic ID"));
+    err = conId->SendWriteRequest(std::move(pBuf));
+
+exit:
+    return err;
+}*/
+
 CHIP_ERROR BLEManagerImpl::SendWriteRequest(BLE_CONNECTION_OBJECT conId, const Ble::ChipBleUUID * svcId,
                                             const Ble::ChipBleUUID * charId, chip::System::PacketBufferHandle pBuf)
 {
@@ -463,7 +480,7 @@ void BLEManagerImpl::HandleTXCharChanged(BLE_CONNECTION_OBJECT conId, const uint
     System::PacketBufferHandle buf(System::PacketBufferHandle::NewWithData(value, len));
     VerifyOrReturn(!buf.IsNull(), ChipLogError(DeviceLayer, "Failed to allocate packet buffer in %s", __func__));
 
-    ChipLogDetail(DeviceLayer, "Indication received, conn = %p", conId);
+    //ChipLogDetail(DeviceLayer, "Indication received, conn = %p", conId);
 
     ChipDeviceEvent event{ .Type     = DeviceEventType::kPlatformWebOSBLEIndicationReceived,
                            .Platform = {
@@ -697,11 +714,14 @@ void BLEManagerImpl::NewConnection(BleLayer * bleLayer, void * appState, const S
 
 CHIP_ERROR BLEManagerImpl::CancelConnection()
 {
-    if (mBLEScanConfig.mBleScanState == BleScanState::kConnecting)
+    if (mBLEScanConfig.mBleScanState == BleScanState::kConnecting){
+        ChipLogProgress(Ble, "CancelConnection BleScanState::kConnecting");
         mConnection.CancelConnect();
+    }
     // If in discovery mode, stop scan.
     else if (mBLEScanConfig.mBleScanState != BleScanState::kNotScanning)
     {
+        ChipLogProgress(Ble, "CancelConnection  != BleScanState::kNotScanning");
         DeviceLayer::SystemLayer().CancelTimer(HandleScanTimer, this);
         mDeviceScanner.StopScan();
     }
@@ -780,6 +800,7 @@ void BLEManagerImpl::OnDeviceScanned(const pbnjson::JValue & device, const chip:
         ChipLogError(Ble, "Unknown discovery type. Ignoring scanned device.");
         return;
     }
+    ChipLogProgress(Ble, "Device address match. Attempting to connect.");
     mBLEScanConfig.mBleScanState = BleScanState::kConnecting;
 	mBLEScanConfig.mAddress = device["address"].asString();
     chip::DeviceLayer::PlatformMgr().LockChipStack();
@@ -799,8 +820,8 @@ void BLEManagerImpl::OnDeviceScanned(const pbnjson::JValue & device, const chip:
 
 void BLEManagerImpl::HandleConnectTimer(chip::System::Layer *, void * appState)
 {
+    ChipLogProgress(Ble, "HandleConnectTimer ");
     auto * manager = static_cast<BLEManagerImpl *>(appState);
-    //manager->mEndpoint->CancelConnect();
     manager->mConnection.CancelConnect();
     BLEManagerImpl::HandleConnectFailed(CHIP_ERROR_TIMEOUT);
 }

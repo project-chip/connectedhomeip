@@ -24,10 +24,12 @@
 #include <ble/Ble.h>
 #include <lib/core/CHIPError.h>
 #include <system/SystemLayer.h>
-
 #include <luna-service2/lunaservice.h>
+#include <luna-service2++/handle.hpp>
 #include <pbnjson.hpp>
 #include "WebosLockTracker.h"
+#include "WbsConnection.h"
+#include "LsRequester.h"
 
 namespace chip {
 namespace DeviceLayer {
@@ -86,6 +88,7 @@ public:
 
     /// Check if the scanner is active
     bool IsScanning() const { return mScannerState == WbsDeviceScannerState::SCANNING; }
+    void setAddress(const std::string& aAddr) { mAddress = aAddr; }
 
 private:
     enum class WbsDeviceScannerState
@@ -104,11 +107,12 @@ private:
     /// Check if a given device is a CHIP device and if yes, remove it from the adapter
     /// so that it can be re-discovered if it's still advertising.
     void RemoveDevice(const pbnjson::JValue & device);
+
     WbsDeviceScannerDelegate * mDelegate = nullptr;
     WbsDeviceScannerState mScannerState  = WbsDeviceScannerState::UNINITIALIZED;
-
     BLEChipDevice * mBleChipDevice = nullptr;
     uint32_t mLeInternalStartScanToken;
+    std::string mAddress;
 };
 
 } // namespace Internal

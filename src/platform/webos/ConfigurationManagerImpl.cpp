@@ -286,13 +286,13 @@ void ConfigurationManagerImpl::DoFactoryReset(intptr_t arg)
     err = PosixConfig::FactoryResetConfig();
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(DeviceLayer, "Failed to factory reset configurations: %s", ErrorStr(err));
+        ChipLogError(DeviceLayer, "Failed to factory reset configurations: %" CHIP_ERROR_FORMAT, err.Format());
     }
 
     err = PosixConfig::FactoryResetCounters();
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(DeviceLayer, "Failed to factory reset counters: %s", ErrorStr(err));
+        ChipLogError(DeviceLayer, "Failed to factory reset counters: %" CHIP_ERROR_FORMAT, err.Format());
     }
 
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
@@ -362,7 +362,6 @@ CHIP_ERROR ConfigurationManagerImpl::GetRegulatoryLocation(uint8_t & location)
     }
     else
     {
-        VerifyOrReturnError(value <= UINT8_MAX, CHIP_ERROR_INVALID_INTEGER_VALUE);
         location = static_cast<uint8_t>(value);
     }
 

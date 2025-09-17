@@ -20,6 +20,8 @@ import("${build_root}/config/linux/pkg_config.gni")
 import("${chip_root}/src/lib/core/core.gni")
 import("${chip_root}/src/platform/device.gni")
 
+import("${chip_root}/src/crypto/crypto.gni")
+
 assert(chip_device_platform == "webos")
 
 if (chip_enable_openthread) {
@@ -103,16 +105,23 @@ static_library("webos") {
       "BLEManagerImpl.cpp",
       "BLEManagerImpl.h",
       "BlePlatformConfig.h",
+      "wbs/LsRequester.cpp",
+      "wbs/LsRequester.h",
       "wbs/WbsConnection.cpp",
       "wbs/WbsConnection.h",
       "wbs/WbsDeviceScanner.cpp",
       "wbs/WbsDeviceScanner.h",
       "wbs/WebosLockTracker.cpp",
       "wbs/WebosLockTracker.h",
-      "wbs/lsrequester.cpp",
-      "wbs/lsrequester.h",
     ]
     configs += [ ":enable_exceptions" ]
+  }
+
+  if (chip_with_trusty_os) {
+    sources += [
+      "DeviceAttestationCredsTrusty.cpp",
+      "DeviceAttestationCredsTrusty.h",
+    ]
   }
 
   public_deps = [
@@ -167,7 +176,10 @@ static_library("webos") {
 
   if (chip_enable_ble) {
     public_configs += [ ":luna-service" ]
-    public_deps += [ "dbus/bluez" ]
+  }
+
+  if (chip_with_trusty_os) {
+    public_deps += [ "${chip_root}/third_party/libtrustymatter" ]
   }
 
   if (chip_device_config_enable_wifipaf) {

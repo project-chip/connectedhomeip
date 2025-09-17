@@ -81,7 +81,7 @@ enum InternalPlatformSpecificWbsEventTypes
 } // namespace DeviceEventType
 
 /**
- * Represents platform-specific event information for Linux platforms.
+ * Represents platform-specific event information for webOS platforms.
  */
 struct ChipDevicePlatformEvent
 {

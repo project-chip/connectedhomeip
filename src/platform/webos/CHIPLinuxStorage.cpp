@@ -52,10 +52,10 @@ ChipLinuxStorage::~ChipLinuxStorage() {}
 CHIP_ERROR ChipLinuxStorage::Init(const char * configFile)
 {
     CHIP_ERROR retval = CHIP_NO_ERROR;
-    ChipLogDetail(DeviceLayer, "ChipLinuxStorage::Init: Using KVS config file");
+
     if (mInitialized)
     {
-        ChipLogError(DeviceLayer, "ChipLinuxStorage::Init: Attempt to re-initialize with KVS config file: %s",
+        ChipLogError(DeviceLayer, "ChipLinuxStorage::Init: Attempt to re-initialize with KVS config file: %s, IGNORING.",
                      StringOrNullMarker(configFile));
         return CHIP_NO_ERROR;
     }

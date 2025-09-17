@@ -25,12 +25,12 @@
 #include <platform/PlatformManager.h>
 
 #include <luna-service2++/handle.hpp>
-#include "lsrequester.h"
 
 #define CHIP_BLE_BASE_SERVICE_UUID_STRING "-0000-1000-8000-00805f9b34fb"
 #define CHIP_BLE_SERVICE_PREFIX_LENGTH 8
 #define CHIP_BLE_BASE_SERVICE_PREFIX "0000"
 #define CHIP_BLE_UUID_SERVICE_SHORT_STRING "fff6"
+#define CHIP_BLE_UUID_SERVICE_LONG_STRING "0000FFF6-0000-1000-8000-00805F9B34FB"
 
 #define CHIP_BLE_UUID_SERVICE_STRING                                                                                               \
     CHIP_BLE_BASE_SERVICE_PREFIX CHIP_BLE_UUID_SERVICE_SHORT_STRING CHIP_BLE_BASE_SERVICE_UUID_STRING
@@ -185,16 +185,14 @@ CHIP_ERROR WbsDeviceScanner::StopScanImpl()
 {
     bool ret = false;
     LsRequester *lsRequester = LsRequester::getInstance();
-    pbnjson::JValue responsePayload;
 
     ret = lsRequester->lsCallCancel(mLeInternalStartScanToken);
-    if(ret != true)
+    if(ret != true){
+        ChipLogError(Ble, "ChipDeviceScanner StopScanImpl lsCallCancel Error");
         return CHIP_ERROR_INTERNAL;
-
-    ret = lsRequester->lsCallSync(API_BLUETOOTH_ADAPTER_CANCEL_DISCOVERY, PARAM_BLANK, responsePayload, 30);
-    if(ret != true || !responsePayload.hasKey(STR_RETURN_VALUE) || !responsePayload[STR_RETURN_VALUE].asBool())
-        return CHIP_ERROR_INTERNAL;
-
+    }
+    lsRequester->restart();
+    ChipLogError(Ble, "ChipDeviceScanner StopScanImpl Success");
     return CHIP_NO_ERROR;
 }
 
@@ -205,11 +203,11 @@ CHIP_ERROR WbsDeviceScanner::StartScanImpl()
     pbnjson::JValue lunaParam = pbnjson::JObject();
     pbnjson::JValue responsePayload;
 
-    ret = lsRequester->lsCallSync(API_BLUETOOTH_ADAPTER_START_DISCOVERY, lunaParam.stringify().c_str(), responsePayload);
-    if(ret != true || !responsePayload.hasKey(STR_RETURN_VALUE) || !responsePayload[STR_RETURN_VALUE].asBool())
-        return CHIP_ERROR_INTERNAL;
-
     lunaParam.put("subscribe", true);
+    pbnjson::JValue serviceUuid = pbnjson::JObject();
+    serviceUuid.put("uuid", CHIP_BLE_UUID_SERVICE_LONG_STRING);
+    lunaParam.put("serviceUuid", serviceUuid);
+
     LSMessageToken ulToken = LSMESSAGE_TOKEN_INVALID;
 
     ret = lsRequester->lsSubscribe(API_BLUETOOTH_LE_INTERNAL_STARTSCAN, lunaParam.stringify().c_str(), this, OnLeDeviceScanned, &ulToken);
@@ -217,9 +215,45 @@ CHIP_ERROR WbsDeviceScanner::StartScanImpl()
     mLeInternalStartScanToken = ulToken;
     VerifyOrReturnError(ret == true, CHIP_ERROR_INTERNAL, ChipLogError(DeviceLayer, "StartScanImpl ret: %d", ret));
 
-    ChipLogProgress(DeviceLayer, "Scan started");
+    ChipLogProgress(DeviceLayer, "Scan started(API_BLUETOOTH_LE_INTERNAL_STARTSCAN)");
 
     return CHIP_NO_ERROR;
+}
+
+bool WbsDeviceScanner::OnLeDeviceScanned(LSHandle * sh, LSMessage * message, void * userData)
+{
+    WbsDeviceScanner * self = (WbsDeviceScanner *) userData;
+
+    LS::Message response(message);
+    pbnjson::JValue responsePayload;
+    std::string responseStr(response.getPayload());
+    ChipLogDetail(DeviceLayer, "receiveMessage = %s", response.getPayload());
+
+    responsePayload = pbnjson::JDomParser::fromString(response.getPayload());
+
+    if (responsePayload["returnValue"].asBool() == true)
+    {
+        if(responsePayload.hasKey("adapterAddress") == true) {
+            ChipLogDetail(DeviceLayer, "LeStartScan success");
+        }
+        else if(responsePayload.hasKey("devices") == true) {
+            pbnjson::JValue value = pbnjson::JDomParser::fromString(responseStr);
+
+            pbnjson::JValueArrayElement devicesDataJObj = value["devices"];
+            ssize_t devicesDataSize = devicesDataJObj.arraySize();
+
+            for (ssize_t i = 0; i < devicesDataSize; ++i)
+            {
+                self->ReportDevice(devicesDataJObj[i]);
+            }
+        }
+    }
+    else
+    {
+        ChipLogDetail(DeviceLayer, "LeStartScan failure");
+    }
+
+    return true;
 }
 
 void WbsDeviceScanner::ReportDevice(const pbnjson::JValue & device)
@@ -327,42 +361,6 @@ void WbsDeviceScanner::ReportDevice(const pbnjson::JValue & device)
     mBleChipDevice  = chip::Platform::New<BLEChipDevice>(bleDevice, deviceInfo);
     mDelegate->OnDeviceScanned(mBleChipDevice->mBleDevice, mBleChipDevice->mDeviceInfo);
     chip::Platform::Delete(mBleChipDevice);
-}
-
-bool WbsDeviceScanner::OnLeDeviceScanned(LSHandle * sh, LSMessage * message, void * userData)
-{
-    WbsDeviceScanner * self = (WbsDeviceScanner *) userData;
-
-    LS::Message response(message);
-    pbnjson::JValue responsePayload;
-    std::string responseStr(response.getPayload());
-    //ChipLogDetail(DeviceLayer, "receiveMessage = %s", response.getPayload());
-
-    responsePayload = pbnjson::JDomParser::fromString(response.getPayload());
-
-    if (responsePayload["returnValue"].asBool() == true)
-    {
-        if(responsePayload.hasKey("adapterAddress") == true) {
-            ChipLogDetail(DeviceLayer, "LeStartScan success");
-        }
-        else if(responsePayload.hasKey("devices") == true) {
-            pbnjson::JValue value = pbnjson::JDomParser::fromString(responseStr);
-
-            pbnjson::JValueArrayElement devicesDataJObj = value["devices"];
-            ssize_t devicesDataSize = devicesDataJObj.arraySize();
-
-            for (ssize_t i = 0; i < devicesDataSize; ++i)
-            {
-                self->ReportDevice(devicesDataJObj[i]);
-            }
-        }
-    }
-    else
-    {
-        ChipLogDetail(DeviceLayer, "LeStartScan failure");
-    }
-
-    return true;
 }
 
 void WbsDeviceScanner::RemoveDevice(const pbnjson::JValue & device)

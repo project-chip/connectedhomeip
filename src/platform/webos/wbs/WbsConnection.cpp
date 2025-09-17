@@ -8,7 +8,6 @@
 #include <platform/CHIPDeviceLayer.h>
 
 #include <luna-service2++/handle.hpp>
-#include "lsrequester.h"
 #include "WbsConnection.h"
 
 #define API_BLUETOOTH_GATT_GETSTATUS "luna://com.webos.service.bluetooth2/gatt/getStatus"
@@ -58,7 +57,7 @@ exit:
     {
         EndpointCleanup(endpoint);
     }
-    //ChipLogDetail(DeviceLayer, "Wbs InitConnectionData err : %u\n", err);
+    ChipLogDetail(DeviceLayer, "Wbs InitConnectionData err\n");
     return err;
 }
 
@@ -78,7 +77,7 @@ CHIP_ERROR WbsConnection::SendIndicationImpl(ConnectionDataBundle * data)
     pbnjson::JValue lunaParam = pbnjson::JObject();
     pbnjson::JValue responsePayload;
 
-    lunaParam.put("clientId", data->mConn->clientId);
+    lunaParam.put("clientId", data->mConn->mClientId);
     lunaParam.put("service", std::string(CHIP_BLE_GATT_SERVICE));
     lunaParam.put("characteristic", std::string(CHIP_BLE_GATT_CHAR_WRITE));
     pbnjson::JValue valueParam = pbnjson::JObject();
@@ -95,11 +94,12 @@ CHIP_ERROR WbsConnection::SendIndicationImpl(ConnectionDataBundle * data)
     if(ret != true || !responsePayload.hasKey(STR_RETURN_VALUE) || !responsePayload[STR_RETURN_VALUE].asBool())
     {
         g_free(data);
+        ChipLogError(DeviceLayer, "SendIndicationImpl API_BLUETOOTH_GATT_WRITECHRACTERISTIC Failed");
         return CHIP_ERROR_INTERNAL;
     }
 
     BLEManagerImpl::HandleWriteComplete(data->mConn);
-
+    ChipLogDetail(DeviceLayer, "SendIndicationImpl success");
     g_free(data);
     return CHIP_NO_ERROR;
 }
@@ -118,7 +118,7 @@ CHIP_ERROR WbsConnection::SendWriteRequestImpl(ConnectionDataBundle * data)
     pbnjson::JValue lunaParam = pbnjson::JObject();
     pbnjson::JValue responsePayload;
 
-    lunaParam.put("clientId", data->mConn->clientId);
+    lunaParam.put("clientId", data->mConn->mClientId);
     lunaParam.put("service", std::string(CHIP_BLE_GATT_SERVICE));
     lunaParam.put("characteristic", std::string(CHIP_BLE_GATT_CHAR_WRITE));
     pbnjson::JValue valueParam = pbnjson::JObject();
@@ -135,11 +135,12 @@ CHIP_ERROR WbsConnection::SendWriteRequestImpl(ConnectionDataBundle * data)
     if(ret != true || !responsePayload.hasKey(STR_RETURN_VALUE) || !responsePayload[STR_RETURN_VALUE].asBool())
     {
         g_free(data);
+        ChipLogError(DeviceLayer, "SendWriteRequestImpl API_BLUETOOTH_GATT_WRITECHRACTERISTIC Failed");
         return CHIP_ERROR_INTERNAL;
     }
 
     BLEManagerImpl::HandleWriteComplete(data->mConn);
-
+    //ChipLogDetail(DeviceLayer, "SendWriteRequestImpl success");
     g_free(data);
     return CHIP_NO_ERROR;
 }
@@ -166,7 +167,7 @@ CHIP_ERROR WbsConnection::CloseConnectionImpl(WbsConnection * conn)
     VerifyOrExit(conn != nullptr, ChipLogError(DeviceLayer, "conn is NULL in %s", __func__));
     ChipLogDetail(DeviceLayer, "%s peer=%s", __func__, conn->mPeerAddress);
 
-    lunaParam.put("clientId", conn->clientId);
+    lunaParam.put("clientId", conn->mClientId);
 
     ret = lsRequester->lsCallSync(API_BLUETOOTH_GATT_DISCONNECT, lunaParam.stringify().c_str(), responsePayload);
     if(ret != true || !responsePayload.hasKey(STR_RETURN_VALUE) || !responsePayload[STR_RETURN_VALUE].asBool())
@@ -174,7 +175,7 @@ CHIP_ERROR WbsConnection::CloseConnectionImpl(WbsConnection * conn)
         return CHIP_ERROR_INTERNAL;
     }
 
-    //UpdateConnectionTable(conn->mpPeerAddress, conn->clientId, *(conn->mpEndpoint));
+    UpdateConnectionTable(conn->mPeerAddress, conn->mClientId, *(conn->mEndpoint));
 
 exit:
     return CHIP_NO_ERROR;
@@ -249,7 +250,7 @@ CHIP_ERROR WbsConnection::SubscribeCharacteristicImpl(BLE_CONNECTION_OBJECT conn
 
     VerifyOrExit(conn != nullptr, ChipLogError(DeviceLayer, "WbsConnection is NULL in %s", __func__));
 
-    lunaParam.put("clientId", conn->clientId);
+    lunaParam.put("clientId", conn->mClientId);
     lunaParam.put("service", std::string(CHIP_BLE_GATT_SERVICE));
     charsJArray.append(std::string(CHIP_BLE_GATT_CHAR_READ));
 
@@ -260,7 +261,7 @@ CHIP_ERROR WbsConnection::SubscribeCharacteristicImpl(BLE_CONNECTION_OBJECT conn
 
     conn->uMonitorToken = ulToken;
 
-    std::this_thread::sleep_for(std::chrono::milliseconds(2000));
+    std::this_thread::sleep_for(std::chrono::milliseconds(3000)); // To Prevent Crash between WBS <-> BLE
 
     lunaParam.remove("characteristics");
     lunaParam.remove("subscribe");
@@ -279,8 +280,8 @@ CHIP_ERROR WbsConnection::SubscribeCharacteristicImpl(BLE_CONNECTION_OBJECT conn
         lsRequester->lsCallCancel(ulToken);
         return CHIP_ERROR_INTERNAL;
     }
-
-    //BLEManagerImpl::HandleSubscribeOpComplete(conn, true);
+    //ChipLogDetail(DeviceLayer, "SubscribeCharacteristicImpl success");
+    BLEManagerImpl::HandleSubscribeOpComplete(conn, true);
 
 exit:
     return CHIP_NO_ERROR;
@@ -375,11 +376,12 @@ CHIP_ERROR WbsConnection::ConnectDeviceImpl(ConnectParams * apParams)
     pbnjson::JValue responsePayload;
     std::string wbsAddress;
     std::string wbsClientId;
-
+    
     lunaParam.put("address", std::string(deviceAddress));
     ret = lsRequester->lsCallSync(API_BLUETOOTH_GATT_CONNECT, lunaParam.stringify().c_str(), responsePayload);
     if(ret != true || !responsePayload.hasKey(STR_RETURN_VALUE) || !responsePayload[STR_RETURN_VALUE].asBool())
     {
+        ChipLogError(Ble, "ConnectDeviceImpl() Failed API_BLUETOOTH_GATT_CONNECT response %s", responsePayload.asString().c_str());
         return CHIP_ERROR_INTERNAL;
     }
     if (responsePayload.hasKey("clientId"))
@@ -399,7 +401,7 @@ CHIP_ERROR WbsConnection::ConnectDeviceImpl(ConnectParams * apParams)
             serviceAvailable = true;
             break;
         }
-        std::this_thread::sleep_for(std::chrono::milliseconds(2000));
+        //std::this_thread::sleep_for(std::chrono::milliseconds(100));
     }
     if(serviceAvailable == false)
     {
@@ -424,7 +426,6 @@ CHIP_ERROR WbsConnection::ConnectDevice(std::string address, WbsEndpoint * aEndp
     CHIP_ERROR err = CHIP_NO_ERROR;
     char * mRemoteAddress = chip::Platform::MemoryAllocString(address.c_str(), address.length());
     auto params = chip::Platform::New<ConnectParams>(mRemoteAddress, aEndpoint);
-
     while (params->mNumRetries ++ < kMaxConnectRetries)
     {
         if (PlatformMgrImpl().GLibMatterContextInvokeSync(ConnectDeviceImpl, params) == CHIP_NO_ERROR)
@@ -437,7 +438,7 @@ CHIP_ERROR WbsConnection::ConnectDevice(std::string address, WbsEndpoint * aEndp
         {
             err = CHIP_ERROR_INCORRECT_STATE;
             ChipLogError(Ble, "Failed to schedule ConnectDeviceImpl() on gmain-matter thread");
-            std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+            std::this_thread::sleep_for(std::chrono::milliseconds(500));
         }
     }
 
@@ -451,7 +452,26 @@ CHIP_ERROR WbsConnection::ConnectDevice(std::string address, WbsEndpoint * aEndp
 
 void WbsConnection::CancelConnect()
 {
-    ChipLogDetail(Ble, "%s : NOT Implemented", __func__);
+    if(!mClientId.empty()) {
+        bool ret = false;
+        LsRequester *lsRequester = LsRequester::getInstance();
+        pbnjson::JValue lunaParam = pbnjson::JObject();
+        pbnjson::JValue responsePayload;
+        ChipLogDetail(DeviceLayer, "%s peer=%s", __func__, mPeerAddress);
+        lunaParam.put("clientId", mClientId);
+
+        ret = lsRequester->lsCallSync(API_BLUETOOTH_GATT_DISCONNECT, lunaParam.stringify().c_str(), responsePayload);
+        if(ret != true || !responsePayload.hasKey(STR_RETURN_VALUE) || !responsePayload[STR_RETURN_VALUE].asBool())
+        {
+            ChipLogError(Ble, "%s API_BLUETOOTH_GATT_DISCONNECT Failed", __func__);
+        }
+        else
+            ChipLogDetail(Ble, "%s : Successed", __func__);
+    }
+    else {
+        ChipLogError(Ble, "%s Client ID is empty()", __func__);
+    }
+    return ;
 }
 
 /*WbsConnection::ConnectionDataBundle(const WbsConnection & aConn,
@@ -485,7 +505,7 @@ void WbsConnection::UpdateConnectionTable(std::string remoteAddr, std::string cl
         connection = g_new0(WbsConnection, 1);
         connection->mPeerAddress = g_strdup(remoteAddr.c_str()); // mpPeerAddress -> mPeerAddress
         connection->mEndpoint = &aEndpoint; // mpEndpoint -> mEndpoint
-        connection->clientId = clientId;
+        connection->mClientId = clientId;
         g_hash_table_insert(aEndpoint.mConnectionMap, connection->mPeerAddress, connection); // mpPeerAddress -> mPeerAddress
 
         ChipLogDetail(DeviceLayer, "New BLE connection: conn %p, device %s", connection, connection->mPeerAddress); // mpPeerAddress -> mPeerAddress
