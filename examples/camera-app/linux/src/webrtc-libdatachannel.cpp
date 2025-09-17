@@ -325,11 +325,11 @@ public:
         // Return default values for the supported codec
         if (codec == "H264")
         {
-            return 96;
+            return kVideoH264PayloadType;
         }
         else if (codec == "opus")
         {
-            return 111;
+            return kOpusPayloadType;
         }
         return -1;
     }

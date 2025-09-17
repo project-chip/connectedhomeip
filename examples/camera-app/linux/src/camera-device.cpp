@@ -483,8 +483,8 @@ GstElement * CameraDevice::CreateVideoPipeline(const std::string & device, int w
 
     if (LinuxDeviceOptions::GetInstance().cameraTestVideosrc)
     {
-        int kBallAnimationPattern = 18;
-        source                    = gst_element_factory_make("videotestsrc", "source");
+        const int kBallAnimationPattern = 18;
+        source                          = gst_element_factory_make("videotestsrc", "source");
         g_object_set(source, "pattern", kBallAnimationPattern, nullptr);
         ChipLogProgress(Camera, "Video piepline: using test video source");
     }
