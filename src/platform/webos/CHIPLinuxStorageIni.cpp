@@ -33,8 +33,8 @@
 #include <lib/support/IniEscaping.h>
 #include <lib/support/TemporaryFileStream.h>
 #include <lib/support/logging/CHIPLogging.h>
-#include <platform/webos/CHIPLinuxStorageIni.h>
 #include <platform/internal/CHIPDeviceLayerInternal.h>
+#include <platform/webos/CHIPLinuxStorageIni.h>
 
 using namespace chip::IniEscaping;
 

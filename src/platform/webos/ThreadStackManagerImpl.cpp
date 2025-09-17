@@ -21,9 +21,9 @@
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/GLibTypeDeleter.h>
-#include <platform/webos/NetworkCommissioningDriver.h>
 #include <platform/PlatformManager.h>
 #include <platform/ThreadStackManager.h>
+#include <platform/webos/NetworkCommissioningDriver.h>
 
 #include <app-common/zap-generated/ids/Attributes.h>
 

@@ -32,8 +32,8 @@
 #include <platform/CHIPDeviceConfig.h>
 #include <platform/ConfigurationManager.h>
 #include <platform/DiagnosticDataProvider.h>
-#include <platform/webos/PosixConfig.h>
 #include <platform/internal/GenericConfigurationManagerImpl.ipp>
+#include <platform/webos/PosixConfig.h>
 
 #include <algorithm>
 

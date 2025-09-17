@@ -18,9 +18,9 @@
 #include <lib/support/CodeUtils.h>
 #include <lib/support/SafeInt.h>
 #include <platform/CHIPDeviceLayer.h>
+#include <platform/ThreadStackManager.h>
 #include <platform/webos/NetworkCommissioningDriver.h>
 #include <platform/webos/ThreadStackManagerImpl.h>
-#include <platform/ThreadStackManager.h>
 
 #include <limits>
 #include <string>

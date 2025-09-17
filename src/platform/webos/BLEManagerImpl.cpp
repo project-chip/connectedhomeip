@@ -105,7 +105,7 @@ void BLEManagerImpl::_Shutdown()
 
     mDeviceScanner.Shutdown();
     // Release BLE connection resources
-    //ShutdownWbsLayer(mEndpoint);
+    // ShutdownWbsLayer(mEndpoint);
     mFlags.Clear(Flags::kWBSManagerInitialized);
 }
 
@@ -233,7 +233,7 @@ void BLEManagerImpl::_OnPlatformEvent(const ChipDeviceEvent * event)
 void BLEManagerImpl::HandlePlatformSpecificBLEEvent(const ChipDeviceEvent * apEvent)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-    //ChipLogDetail(DeviceLayer, "HandlePlatformSpecificBLEEvent %d", apEvent->Type);
+    // ChipLogDetail(DeviceLayer, "HandlePlatformSpecificBLEEvent %d", apEvent->Type);
     switch (apEvent->Type)
     {
     case DeviceEventType::kPlatformWebOSBLEAdapterAdded:
@@ -252,8 +252,8 @@ void BLEManagerImpl::HandlePlatformSpecificBLEEvent(const ChipDeviceEvent * apEv
         {
             // Shutdown all BLE operations and release resources
             mDeviceScanner.Shutdown();
-            //mEndpoint->Shutdown();
-            // Clear all flags related to WBS BLE operations
+            // mEndpoint->Shutdown();
+            //  Clear all flags related to WBS BLE operations
             mFlags.Clear(Flags::kWBSAdapterAvailable);
             mFlags.Clear(Flags::kWBSBLELayerInitialized);
             mFlags.Clear(Flags::kAdvertisingConfigured);
@@ -350,7 +350,8 @@ exit:
     return mtu;
 }
 
-CHIP_ERROR BLEManagerImpl::SubscribeCharacteristic(BLE_CONNECTION_OBJECT conId, const ChipBleUUID * svcId, const ChipBleUUID * charId)
+CHIP_ERROR BLEManagerImpl::SubscribeCharacteristic(BLE_CONNECTION_OBJECT conId, const ChipBleUUID * svcId,
+                                                   const ChipBleUUID * charId)
 {
     CHIP_ERROR err = BLE_ERROR_GATT_SUBSCRIBE_FAILED;
 
@@ -366,7 +367,8 @@ exit:
     return err;
 }
 
-CHIP_ERROR BLEManagerImpl::UnsubscribeCharacteristic(BLE_CONNECTION_OBJECT conId, const ChipBleUUID * svcId, const ChipBleUUID * charId)
+CHIP_ERROR BLEManagerImpl::UnsubscribeCharacteristic(BLE_CONNECTION_OBJECT conId, const ChipBleUUID * svcId,
+                                                     const ChipBleUUID * charId)
 {
     CHIP_ERROR err = BLE_ERROR_GATT_UNSUBSCRIBE_FAILED;
 
@@ -395,7 +397,8 @@ exit:
     return err;
 }
 
-CHIP_ERROR BLEManagerImpl::SendIndication(BLE_CONNECTION_OBJECT conId, const ChipBleUUID * svcId, const Ble::ChipBleUUID * charId, chip::System::PacketBufferHandle pBuf)
+CHIP_ERROR BLEManagerImpl::SendIndication(BLE_CONNECTION_OBJECT conId, const ChipBleUUID * svcId, const Ble::ChipBleUUID * charId,
+                                          chip::System::PacketBufferHandle pBuf)
 {
     CHIP_ERROR err = BLE_ERROR_GATT_INDICATE_FAILED;
 
@@ -480,7 +483,7 @@ void BLEManagerImpl::HandleTXCharChanged(BLE_CONNECTION_OBJECT conId, const uint
     System::PacketBufferHandle buf(System::PacketBufferHandle::NewWithData(value, len));
     VerifyOrReturn(!buf.IsNull(), ChipLogError(DeviceLayer, "Failed to allocate packet buffer in %s", __func__));
 
-    //ChipLogDetail(DeviceLayer, "Indication received, conn = %p", conId);
+    // ChipLogDetail(DeviceLayer, "Indication received, conn = %p", conId);
 
     ChipDeviceEvent event{ .Type     = DeviceEventType::kPlatformWebOSBLEIndicationReceived,
                            .Platform = {
@@ -551,13 +554,13 @@ void BLEManagerImpl::DriveBLEState()
     {
         if (!mFlags.Has(Flags::kWBSManagerInitialized))
         {
-            //SuccessOrExit(err = mBluezObjectManager.Init());
+            // SuccessOrExit(err = mBluezObjectManager.Init());
             mFlags.Set(Flags::kWBSManagerInitialized);
         }
         if (!mFlags.Has(Flags::kWBSAdapterAvailable))
         {
-            //mAdapter.reset(mBluezObjectManager.GetAdapter(mAdapterId));
-            //VerifyOrExit(mAdapter, err = BLE_ERROR_ADAPTER_UNAVAILABLE);
+            // mAdapter.reset(mBluezObjectManager.GetAdapter(mAdapterId));
+            // VerifyOrExit(mAdapter, err = BLE_ERROR_ADAPTER_UNAVAILABLE);
             mFlags.Set(Flags::kWBSAdapterAvailable);
         }
         if (!mFlags.Has(Flags::kWBSBLELayerInitialized))
@@ -565,7 +568,6 @@ void BLEManagerImpl::DriveBLEState()
             SuccessOrExit(err = mConnection.InitConnectionData(mIsCentral, mEndpoint));
             mFlags.Set(Flags::kWBSBLELayerInitialized);
         }
-
     }
 
 exit:
@@ -714,7 +716,8 @@ void BLEManagerImpl::NewConnection(BleLayer * bleLayer, void * appState, const S
 
 CHIP_ERROR BLEManagerImpl::CancelConnection()
 {
-    if (mBLEScanConfig.mBleScanState == BleScanState::kConnecting){
+    if (mBLEScanConfig.mBleScanState == BleScanState::kConnecting)
+    {
         ChipLogProgress(Ble, "CancelConnection BleScanState::kConnecting");
         mConnection.CancelConnect();
     }
@@ -771,10 +774,10 @@ void BLEManagerImpl::NotifyBLEPeripheralAdvReleased()
     PlatformMgr().PostEventOrDie(&event);
 }
 
-
 void BLEManagerImpl::OnDeviceScanned(const pbnjson::JValue & device, const chip::Ble::ChipBLEDeviceIdentificationInfo & info)
 {
-    ChipLogProgress(Ble, "New device scanned: %s discriminator : %u", device["address"].asString().c_str(), info.GetDeviceDiscriminator());
+    ChipLogProgress(Ble, "New device scanned: %s discriminator : %u", device["address"].asString().c_str(),
+                    info.GetDeviceDiscriminator());
 
     if (mBLEScanConfig.mBleScanState == BleScanState::kScanForDiscriminator)
     {
@@ -790,8 +793,8 @@ void BLEManagerImpl::OnDeviceScanned(const pbnjson::JValue & device, const chip:
     {
         auto isMatch = strcmp(device["address"].asString().c_str(), mBLEScanConfig.mAddress.c_str()) == 0;
         VerifyOrReturn(isMatch,
-                       ChipLogError(Ble, "Skip connection: Device address does not match: %s != %s", device["address"].asString().c_str(),
-                                    mBLEScanConfig.mAddress.c_str()));
+                       ChipLogError(Ble, "Skip connection: Device address does not match: %s != %s",
+                                    device["address"].asString().c_str(), mBLEScanConfig.mAddress.c_str()));
         ChipLogProgress(Ble, "Device address match. Attempting to connect.");
     }
     else
@@ -802,7 +805,7 @@ void BLEManagerImpl::OnDeviceScanned(const pbnjson::JValue & device, const chip:
     }
     ChipLogProgress(Ble, "Device address match. Attempting to connect.");
     mBLEScanConfig.mBleScanState = BleScanState::kConnecting;
-	mBLEScanConfig.mAddress = device["address"].asString();
+    mBLEScanConfig.mAddress      = device["address"].asString();
     chip::DeviceLayer::PlatformMgr().LockChipStack();
     // We StartScan in the ChipStack thread.
     // StopScan should also be performed in the ChipStack thread.
