@@ -1,10 +1,10 @@
-name: Run Workflow Based On Changed Paths
+name: Analyze Changed Paths
 
 on:
   workflow_call:
     outputs:
-      proceed:
-        description: "Determines if the workflow should proceed based on modified paths."
+      non_md_changes:
+        description: "Determines whether the changed paths contain non-markdwon changes."
         value: ${{ jobs.non_md_changes.outputs.non_markdown_changes }}
 
 jobs:
