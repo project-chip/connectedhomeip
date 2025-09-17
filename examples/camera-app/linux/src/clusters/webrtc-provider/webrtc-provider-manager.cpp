@@ -811,7 +811,7 @@ CHIP_ERROR WebRTCProviderManager::SendAnswerCommand(Messaging::ExchangeManager &
 
     // Build the command
     WebRTCTransportRequestor::Commands::Answer::Type command;
-    command.webRTCSessionID = mSessionIdMap[sessionHandle->GetPeer().GetNodeId()];
+    command.webRTCSessionID = sessionId;
     std::string localSdp    = transport->GetLocalDescription();
     command.sdp             = CharSpan::fromCharString(localSdp.c_str());
 
