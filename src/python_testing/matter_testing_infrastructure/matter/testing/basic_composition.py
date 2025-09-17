@@ -296,7 +296,7 @@ class BasicCompositionTests:
 
     def teardown_class(self):
         """Override teardown_class to dump device attribute data when problems are found.
-        
+
         This ensures that whenever any test inheriting from BasicCompositionTests has problems,
         we automatically get the device attribute dump for debugging purposes.
         """
@@ -306,7 +306,7 @@ class BasicCompositionTests:
             try:
                 if hasattr(self, 'endpoints_tlv') and self.endpoints_tlv:
                     logging.info("Device attribute data available - generating dump")
-                    _, txt_str = self.dump_wildcard(None)  
+                    _, txt_str = self.dump_wildcard(None)
                     # Only dump the text format - it's more readable for debugging
                     log_structured_data('==== FAILURE_DUMP_txt: ', txt_str)
                 else:
@@ -314,13 +314,13 @@ class BasicCompositionTests:
             except Exception as e:
                 # Don't let logging errors interfere with the original test failure
                 logging.warning(f"Failed to generate device attribute dump: {e}")
-        
+
         # Call the parent teardown_class method to handle normal teardown and problem logging
         super().teardown_class()
 
     def fail_current_test(self, msg: Optional[str] = None) -> typing.NoReturn:  # type: ignore[misc]
         """Override fail_current_test to automatically dump device attribute data when any composition test fails.
-        
+
         This ensures that whenever any test inheriting from BasicCompositionTests fails,
         we automatically get the device attribute dump for debugging purposes.
         """
@@ -328,7 +328,7 @@ class BasicCompositionTests:
         try:
             if hasattr(self, 'endpoints_tlv') and self.endpoints_tlv:
                 logging.info("Device attribute dump available - generating dump")
-                _, txt_str = self.dump_wildcard(None) 
+                _, txt_str = self.dump_wildcard(None)
                 # Only dump the text format - it's more readable for debugging
                 log_structured_data('==== FAILURE_DUMP_txt: ', txt_str)
             else:
@@ -336,6 +336,6 @@ class BasicCompositionTests:
         except Exception as e:
             # Don't let logging errors interfere with the original test failure
             logging.warning(f"Failed to generate device attribute dump on test failure: {e}")
-        
+
         # Call the parent fail_current_test method to actually fail the test
         super().fail_current_test(msg)
