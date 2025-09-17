@@ -23,6 +23,7 @@
 #       --discriminator 1234
 #       --KVS kvs1
 #       --trace-to json:${TRACE_APP}.json
+#       --app-pipe /tmp/dishm_2_1_fifo
 #     script-args: >
 #       --storage-path admin_storage.json
 #       --commissioning-method on-network
@@ -31,6 +32,7 @@
 #       --endpoint 1
 #       --int-arg PIXIT.DISHM.MODE_CHANGE_OK:0
 #       --int-arg PIXIT.DISHM.MODE_CHANGE_FAIL:2
+#       --app-pipe /tmp/dishm_2_1_fifo
 #       --trace-to json:${TRACE_TEST_JSON}.json
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 #     factory-reset: true
