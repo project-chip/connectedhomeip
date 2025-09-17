@@ -26,33 +26,41 @@ using namespace UserLabel::Attributes;
 
 namespace {
 
-CHIP_ERROR ReadLabelList(EndpointId endpoint, AttributeValueEncoder & encoder)
+class AutoReleaseIterator
 {
-    DeviceLayer::DeviceInfoProvider * provider = DeviceLayer::GetDeviceInfoProvider();
-
-    if (provider)
+public:
+    AutoReleaseIterator(DeviceLayer::DeviceInfoProvider * provider, EndpointId endpointId) :
+        mIterator(provider != nullptr ? provider->IterateUserLabel(endpointId) : nullptr)
+    {}
+    ~AutoReleaseIterator()
     {
-        DeviceLayer::DeviceInfoProvider::UserLabelIterator * it = provider->IterateUserLabel(endpoint);
-
-        if (it)
+        if (mIterator != nullptr)
         {
-            CHIP_ERROR err = encoder.EncodeList([&it](const auto & encod) -> CHIP_ERROR {
-                UserLabel::Structs::LabelStruct::Type userlabel;
-
-                while (it->Next(userlabel))
-                {
-                    ReturnErrorOnFailure(encod.Encode(userlabel));
-                }
-
-                return CHIP_NO_ERROR;
-            });
-
-            it->Release();
-            return err;
+            mIterator->Release();
         }
     }
 
-    return encoder.EncodeEmptyList();
+    bool IsValid() const { return mIterator != nullptr; }
+
+    DeviceLayer::DeviceInfoProvider::UserLabelIterator * operator->() { return mIterator; }
+
+private:
+    DeviceLayer::DeviceInfoProvider::UserLabelIterator * mIterator;
+};
+
+CHIP_ERROR ReadLabelList(EndpointId endpoint, AttributeValueEncoder & encoder)
+{
+    AutoReleaseIterator it(DeviceLayer::GetDeviceInfoProvider(), endpoint);
+    VerifyOrReturnValue(it.IsValid(), encoder.EncodeEmptyList());
+
+    return encoder.EncodeList([&it](const auto & encod) -> CHIP_ERROR {
+        UserLabel::Structs::LabelStruct::Type userlabel;
+        while (it->Next(userlabel))
+        {
+            ReturnErrorOnFailure(encod.Encode(userlabel));
+        }
+        return CHIP_NO_ERROR;
+    });
 }
 
 /// Matches constraints on a LabelStruct.
@@ -97,8 +105,7 @@ CHIP_ERROR WriteLabelList(const ConcreteDataAttributePath & path, AttributeValue
         auto iter = decodablelist.begin();
         while (iter.Next())
         {
-            auto & entry = iter.GetValue();
-            ReturnErrorOnFailure(labelList.add(entry));
+            ReturnErrorOnFailure(labelList.add(iter.GetValue()));
         }
         ReturnErrorOnFailure(iter.GetStatus());
 
@@ -150,9 +157,8 @@ DataModel::ActionReturnStatus UserLabelCluster::WriteAttribute(const DataModel::
 {
     switch (request.path.mAttributeId)
     {
-    case LabelList::Id: {
+    case LabelList::Id:
         return NotifyAttributeChangedIfSuccess(LabelList::Id, WriteLabelList(request.path, decoder));
-    }
     default:
         return Protocols::InteractionModel::Status::UnsupportedWrite;
     }
@@ -167,22 +173,14 @@ CHIP_ERROR UserLabelCluster::Attributes(const ConcreteClusterPath & path,
 
 CHIP_ERROR UserLabelCluster::Startup(ServerClusterContext & context)
 {
-    CHIP_ERROR err = DefaultServerCluster::Startup(context);
-    VerifyOrReturnError(err == CHIP_NO_ERROR, err);
+    ReturnErrorOnFailure(DefaultServerCluster::Startup(context));
 
-    err = Server::GetInstance().GetFabricTable().AddFabricDelegate(this);
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogError(Zcl, "UserLabel: Unable to register Fabric table delegate");
-    }
-
-    return err;
+    return Server::GetInstance().GetFabricTable().AddFabricDelegate(this);
 }
 
 void UserLabelCluster::Shutdown()
 {
     Server::GetInstance().GetFabricTable().RemoveFabricDelegate(this);
-
     DefaultServerCluster::Shutdown();
 }
 
