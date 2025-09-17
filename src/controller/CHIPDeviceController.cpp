@@ -1266,7 +1266,8 @@ void DeviceCommissioner::OnSessionEstablished(const SessionHandle & session)
     {
         // If we started with a string payload, then at this point mPairingDelegate is
         // mSetUpCodePairer, and it will provide the right SetupPayload argument to
-        // OnPairingComplete as needed.
+        // OnPairingComplete as needed.  If mPairingDelegate is not
+        // mSetUpCodePairer, then we don't have a SetupPayload to provide.
         mPairingDelegate->OnPairingComplete(CHIP_NO_ERROR, paseParameters, std::nullopt);
     }
 

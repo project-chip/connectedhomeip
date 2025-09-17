@@ -78,7 +78,7 @@ public:
      *                     succeeds and the original input to commissioning was a payload string.
      *                     If the original input represented a concatenated QR code, this will
      *                     represent the actual payload that was used to successfully establish PASE
-     *                     with the commissionee..
+     *                     with the commissionee.
      */
     virtual void OnPairingComplete(CHIP_ERROR error, const std::optional<RendezvousParameters> & rendezvousParameters,
                                    const std::optional<SetupPayload> & setupPayload)
