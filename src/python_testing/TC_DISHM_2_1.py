@@ -45,7 +45,7 @@ from mobly import asserts
 
 import matter.clusters as Clusters
 from matter.testing.matter_asserts import is_valid_int_value
-from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main, type_matches
+from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main, matchers
 
 
 class TC_DISHM_2_1(MatterBaseTest):
@@ -151,7 +151,7 @@ class TC_DISHM_2_1(MatterBaseTest):
         change_to_mode_response = await self.send_single_cmd(cmd=cmd, endpoint=endpoint)
 
         # DUT responds contains a ChangeToModeResponse command with a SUCCESS (value 0x00) status response
-        asserts.assert_true(type_matches(change_to_mode_response, cluster.Commands.ChangeToModeResponse),
+        asserts.assert_true(matchers.is_type(change_to_mode_response, cluster.Commands.ChangeToModeResponse),
                             "Unexpected return type for ChangeToMode")
         asserts.assert_equal(change_to_mode_response.status, CommonCodes.SUCCESS.value,
                              f"Status is {change_to_mode_response.status} and it should be SUCCESS 0x00")
@@ -168,7 +168,7 @@ class TC_DISHM_2_1(MatterBaseTest):
                 logging.info(f"Change to DISH Mode to {self.mode_fail}")
                 cmd = cluster.Commands.ChangeToMode(newMode=self.mode_fail)
                 ret = await self.send_single_cmd(cmd=cmd, endpoint=self.endpoint)
-                asserts.assert_true(type_matches(ret, cluster.Commands.ChangeToModeResponse),
+                asserts.assert_true(matchers.is_type(ret, cluster.Commands.ChangeToModeResponse),
                                     "Unexpected return type for ChangeToMode")
             else:
                 self.wait_for_user_input(
@@ -188,7 +188,7 @@ class TC_DISHM_2_1(MatterBaseTest):
         change_to_mode_response = await self.send_single_cmd(cmd=cmd, endpoint=endpoint)
 
         # DUT responds contains a ChangeToModeResponse command with Status field is set to GenericFailure(0x02), InvalidInMode(0x03), or in the MfgCodes (0x80 to 0xBF) range and StatusText field has a length between 1 and 64
-        asserts.assert_true(type_matches(change_to_mode_response, cluster.Commands.ChangeToModeResponse),
+        asserts.assert_true(matchers.is_type(change_to_mode_response, cluster.Commands.ChangeToModeResponse),
                             "Unexpected return type for ChangeToMode")
 
         logging.info(f"response: {change_to_mode_response}")
@@ -236,7 +236,7 @@ class TC_DISHM_2_1(MatterBaseTest):
         change_to_mode_response = await self.send_single_cmd(cmd=cmd, endpoint=self.endpoint)
 
         # DUT responds contains a ChangeToModeResponse command with a SUCCESS (value 0x00) status response
-        asserts.assert_true(type_matches(change_to_mode_response, cluster.Commands.ChangeToModeResponse),
+        asserts.assert_true(matchers.is_type(change_to_mode_response, cluster.Commands.ChangeToModeResponse),
                             "Unexpected return type for ChangeToMode")
         asserts.assert_equal(change_to_mode_response.status, CommonCodes.SUCCESS.value,
                              f"Status is {change_to_mode_response.status} and it should be SUCCESS 0x00")
