@@ -50,6 +50,7 @@ class JsonSerializable(metaclass=OrderedPropsMeta):
       out anything that can't be encoded by `json.dumps`.
     - Adds all properties in the order they were written in the class
     """
+
     def json_dict(self) -> dict:
         result: Dict[str, Any] = {}
 
@@ -67,7 +68,6 @@ class JsonSerializable(metaclass=OrderedPropsMeta):
                 result[name] = value
 
         return result
-
 
     @staticmethod
     def _is_json_serializable(value: Any) -> bool:
