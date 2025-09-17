@@ -41,10 +41,10 @@ from matter.testing.spec_parsing import PrebuiltDataModelDirectory, build_xml_cl
 
 def log_structured_data(start_tag: str, dump_string: str):
     """Log structured data with a clear start and end marker.
-    
+
     This function is used to output device attribute dumps and other structured 
     data to logs in a format that can be easily extracted for debugging.
-    
+
     Args:
         start_tag: A prefix tag to identify the type of data being logged
         dump_string: The data to be logged
@@ -296,13 +296,13 @@ class BasicCompositionTests:
 
     def on_fail(self, record):
         """Override on_fail to automatically dump device data when any composition test fails.
-        
+
         This ensures that whenever any test inheriting from BasicCompositionTests fails,
         we automatically get the device attribute dump for debugging purposes.
         """
         # Call the parent on_fail method first (this will be MatterBaseTest.on_fail)
         super().on_fail(record)
-        
+
         # Dump device composition data if available for debugging
         try:
             if hasattr(self, 'endpoints_tlv') and self.endpoints_tlv:
