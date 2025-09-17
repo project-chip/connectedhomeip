@@ -415,40 +415,19 @@ TEST_F(TestCommodityTariffBaseDataClass, UpdateAbort)
 struct ResourceStruct
 {
     uint32_t id;
-    char * dynamicString;                   // Requires manual memory management
-    DataModel::List<uint32_t> * nestedList; // Requires cleanup
+    CharSpan label;                   // Requires manual memory management
+    DataModel::List<const uint32_t> nestedList; // Requires cleanup
 
-    ResourceStruct() : id(0), dynamicString(nullptr), nestedList(nullptr) {}
+    // Proper equality operator
+    bool operator==(const ResourceStruct& other) const {
+        return id == other.id && 
+               label == other.label && 
+               nestedList == other.nestedList;
+    }
 
-    bool operator!=(const ResourceStruct & other) const
-    {
-        if (id != other.id)
-            return true;
-        if (dynamicString && other.dynamicString)
-        {
-            if (strcmp(dynamicString, other.dynamicString) != 0)
-                return true;
-        }
-        else if (dynamicString != other.dynamicString)
-        {
-            return true; // One is null, other isn't
-        }
-        // Compare nested lists if both exist
-        if (nestedList && other.nestedList)
-        {
-            if (nestedList->size() != other.nestedList->size())
-                return true;
-            for (size_t i = 0; i < nestedList->size(); i++)
-            {
-                if ((*nestedList)[i] != (*other.nestedList)[i])
-                    return true;
-            }
-        }
-        else if (nestedList != other.nestedList)
-        {
-            return true; // One is null, other isn't
-        }
-        return false;
+    // Proper inequality operator - should use content comparison, not pointer comparison
+    bool operator!=(const ResourceStruct& other) const {
+        return !(*this == other);
     }
 };
 
@@ -461,49 +440,19 @@ CHIP_ERROR CTC_BaseDataClass<ComplexType>::CopyData(const StructType & input, St
     output.id = input.id;
 
     // Copy dynamic string
-    if (input.dynamicString)
+    if (input.label.data())
     {
-        output.dynamicString = static_cast<char *>(Platform::MemoryCalloc(strlen(input.dynamicString) + 1, 1));
-        if (!output.dynamicString)
-        {
-            return CHIP_ERROR_NO_MEMORY;
-        }
-        strcpy(output.dynamicString, input.dynamicString);
-    }
-    else
-    {
-        output.dynamicString = nullptr;
+        ReturnErrorOnFailure(SpanCopier<char>::Copy(input.label, output.label, input.label.size()));
     }
 
     // Copy nested list
-    if (input.nestedList)
+    if ( input.nestedList.data() && !input.nestedList.empty() )
     {
-        output.nestedList = new DataModel::List<uint32_t>();
-        if (!output.nestedList)
-        {
-            Platform::MemoryFree(output.dynamicString);
-            return CHIP_ERROR_NO_MEMORY;
-        }
-
-        if (input.nestedList->size() > 0)
-        {
-            auto * buffer = static_cast<uint32_t *>(Platform::MemoryCalloc(input.nestedList->size(), sizeof(uint32_t)));
-            if (!buffer)
-            {
-                Platform::MemoryFree(output.dynamicString);
-                delete output.nestedList;
-                return CHIP_ERROR_NO_MEMORY;
-            }
-            for (size_t i = 0; i < input.nestedList->size(); i++)
-            {
-                buffer[i] = (*input.nestedList)[i];
-            }
-            *output.nestedList = DataModel::List<uint32_t>(buffer, input.nestedList->size());
-        }
-    }
-    else
-    {
-        output.nestedList = nullptr;
+        DataModel::List<const uint32_t> tempList;
+        ReturnErrorOnFailure(SpanCopier<uint32_t>::Copy(input.nestedList, tempList, input.nestedList.size()));
+        
+        // This should work if DataModel::List has the right constructor
+        output.nestedList = tempList;
     }
 
     return CHIP_NO_ERROR;
@@ -519,21 +468,20 @@ template <>
 void CTC_BaseDataClass<ComplexType>::CleanupStruct(StructType & value)
 {
     // Cleanup dynamic string
-    if (value.dynamicString)
+    if (value.label.data())
     {
-        Platform::MemoryFree(value.dynamicString);
-        value.dynamicString = nullptr;
+        Platform::MemoryFree(const_cast<char *>(value.label.data()));
+        value.label = CharSpan();
     }
 
     // Cleanup nested list
-    if (value.nestedList)
+    if (value.nestedList.data())
     {
-        if (value.nestedList->data())
+        if (value.nestedList.data())
         {
-            Platform::MemoryFree(value.nestedList->data());
+            Platform::MemoryFree(const_cast<uint32_t *>(value.nestedList.data()));
+            value.nestedList = DataModel::List<const uint32_t>();
         }
-        delete value.nestedList;
-        value.nestedList = nullptr;
     }
 
     value.id = 0;
@@ -541,29 +489,28 @@ void CTC_BaseDataClass<ComplexType>::CleanupStruct(StructType & value)
 
 TEST_F(TestCommodityTariffBaseDataClass, NullableListOfResourceStructs_CreationAndCleanup)
 {
+    const uint32_t IDs[] = { 100, 200 };
+
+    ResourceStruct ListEntries[] = {
+        {
+            .id = 1,
+            .label = CharSpan::fromCharString("test1"),
+            .nestedList = DataModel::List<const uint32_t>(IDs),
+        },
+        {
+            .id = 2,
+            .label = CharSpan::fromCharString("test2"),
+            .nestedList = DataModel::List<const uint32_t>(),
+        }
+    };
+
+    ComplexType sourceValue;
     CTC_BaseDataClass<ComplexType> data(1);
 
-    // Create list with resource-intensive structs
-    EXPECT_EQ(data.CreateNewListValue(2), CHIP_NO_ERROR);
+    sourceValue.SetNonNull(ListEntries);
 
-    auto & newList = data.GetNewValue().Value();
+    EXPECT_EQ(data.SetNewValue(sourceValue), CHIP_NO_ERROR);
 
-    // First struct with dynamic resources
-    newList[0].id            = 1;
-    newList[0].dynamicString = static_cast<char *>(Platform::MemoryCalloc(10, 1));
-    strcpy(newList[0].dynamicString, "test1");
-
-    auto * nestedBuffer1  = static_cast<uint32_t *>(Platform::MemoryCalloc(2, sizeof(uint32_t)));
-    nestedBuffer1[0]      = 100;
-    nestedBuffer1[1]      = 200;
-    newList[0].nestedList = new DataModel::List<uint32_t>(nestedBuffer1, 2);
-
-    // Second struct
-    newList[1].id            = 2;
-    newList[1].dynamicString = static_cast<char *>(Platform::MemoryCalloc(10, 1));
-    strcpy(newList[1].dynamicString, "test2");
-
-    data.MarkAsAssigned();
     data.UpdateBegin(nullptr);
     EXPECT_TRUE(data.UpdateFinish(true));
 
@@ -571,10 +518,13 @@ TEST_F(TestCommodityTariffBaseDataClass, NullableListOfResourceStructs_CreationA
     EXPECT_FALSE(data.GetValue().IsNull());
     EXPECT_EQ(data.GetValue().Value().size(), 2ul);
     EXPECT_EQ(data.GetValue().Value()[0].id, 1u);
-    EXPECT_STREQ(data.GetValue().Value()[0].dynamicString, "test1");
-    EXPECT_EQ(data.GetValue().Value()[0].nestedList->size(), 2ul);
-    EXPECT_EQ((*data.GetValue().Value()[0].nestedList)[0], 100u);
+    EXPECT_STREQ(data.GetValue().Value()[0].label.data(), "test1");
+    EXPECT_EQ(data.GetValue().Value()[0].nestedList.size(), 2ul);
+    EXPECT_EQ((data.GetValue().Value()[0].nestedList)[0], 100u);
+    EXPECT_EQ((data.GetValue().Value()[0].nestedList)[1], 200u);
 }
+
+#define TEST_STR_SAMPLE "dynamic_content"
 
 TEST_F(TestCommodityTariffBaseDataClass, NullableListOfResourceStructs_SetNewValue)
 {
@@ -582,17 +532,18 @@ TEST_F(TestCommodityTariffBaseDataClass, NullableListOfResourceStructs_SetNewVal
 
     // Prepare source data
     ComplexType sourceValue;
+    char* testStr = static_cast<char*>(Platform::MemoryAlloc(strlen(TEST_STR_SAMPLE) + 1));
 
     // Create a struct with resources
     ResourceStruct testStruct = {};
     testStruct.id             = 42;
-    testStruct.dynamicString  = static_cast<char *>(Platform::MemoryCalloc(20, 1));
-    strcpy(testStruct.dynamicString, "dynamic_content");
+    strcpy(testStr, TEST_STR_SAMPLE);
+    testStruct.label  = CharSpan(testStr, strlen(testStr));
 
     auto * nestedBuffer   = static_cast<uint32_t *>(Platform::MemoryCalloc(2, sizeof(uint32_t)));
     nestedBuffer[0]       = 100;
     nestedBuffer[1]       = 200;
-    testStruct.nestedList = new DataModel::List<uint32_t>(nestedBuffer, 2);
+    testStruct.nestedList = DataModel::List<const uint32_t>(nestedBuffer, 2);
 
     sourceValue.SetNonNull(DataModel::List<ResourceStruct>(&testStruct, 1ul));
 
@@ -604,27 +555,29 @@ TEST_F(TestCommodityTariffBaseDataClass, NullableListOfResourceStructs_SetNewVal
 
     // Cleanup source (should not affect the copied data)
     data.CleanupExtListEntry(testStruct);
-    EXPECT_EQ(testStruct.dynamicString, nullptr);
-    EXPECT_EQ(testStruct.nestedList, nullptr);
+    EXPECT_EQ(testStruct.label.data(), nullptr);
+    EXPECT_EQ(testStruct.nestedList.data(), nullptr);
 
     EXPECT_EQ(data.GetValue().Value().size(), 1ul);
-    EXPECT_STREQ(data.GetValue().Value()[0].dynamicString, "dynamic_content");
+    EXPECT_STREQ(data.GetValue().Value()[0].label.data(), "dynamic_content");
 
-    EXPECT_NE(data.GetValue().Value()[0].nestedList, nullptr);
-    EXPECT_EQ(data.GetValue().Value()[0].nestedList->size(), 2ul);
-    EXPECT_EQ((*data.GetValue().Value()[0].nestedList)[0], 100u);
-    EXPECT_EQ((*data.GetValue().Value()[0].nestedList)[1], 200u);
+    EXPECT_NE(data.GetValue().Value()[0].nestedList.data(), nullptr);
+    EXPECT_EQ(data.GetValue().Value()[0].nestedList.size(), 2ul);
+    EXPECT_EQ((data.GetValue().Value()[0].nestedList)[0], 100u);
+    EXPECT_EQ((data.GetValue().Value()[0].nestedList)[1], 200u);
 }
 
 TEST_F(TestCommodityTariffBaseDataClass, NullableListOfResourceStructs_NullTransition)
 {
     CTC_BaseDataClass<ComplexType> data(1);
+    char* testStr = static_cast<char*>(Platform::MemoryAlloc(strlen(TEST_STR_SAMPLE) + 1));
 
     // First set non-null with resources
     data.CreateNewListValue(1);
     data.GetNewValue().Value()[0].id            = 1;
-    data.GetNewValue().Value()[0].dynamicString = static_cast<char *>(Platform::MemoryCalloc(10, 1));
-    strcpy(data.GetNewValue().Value()[0].dynamicString, "test");
+
+    strcpy(testStr, TEST_STR_SAMPLE);
+    data.GetNewValue().Value()[0].label = CharSpan(testStr, strlen(testStr));
 
     data.MarkAsAssigned();
     data.UpdateBegin(nullptr);
@@ -650,9 +603,11 @@ TEST_F(TestCommodityTariffBaseDataClass, NullableListOfResourceStructs_UpdateRej
 
     for (uint32_t i = 0; i < 3; i++)
     {
+        char* testStr = static_cast<char*>(Platform::MemoryAlloc(32));
+
         data.GetNewValue().Value()[i].id            = i;
-        data.GetNewValue().Value()[i].dynamicString = static_cast<char *>(Platform::MemoryCalloc(20, 1));
-        sprintf(data.GetNewValue().Value()[i].dynamicString, "resource_%" PRIu32 "", i);
+        sprintf(testStr, "resource_%" PRIu32 "", i);
+        data.GetNewValue().Value()[i].label = CharSpan(testStr, strlen(testStr));
     }
 
     data.MarkAsAssigned();

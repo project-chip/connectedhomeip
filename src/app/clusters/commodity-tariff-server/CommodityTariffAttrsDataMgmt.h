@@ -211,6 +211,11 @@ struct SpanCopier
     static CHIP_ERROR Copy(const Span<const T> & source, DataModel::List<const T> & destination,
                            size_t maxCount = std::numeric_limits<size_t>::max())
     {
+        if (!destination.empty())
+        {
+            return CHIP_ERROR_IN_USE;
+        }
+    
         if (source.empty())
         {
             destination = DataModel::List<const T>();
@@ -238,7 +243,7 @@ struct SpanCopier<char>
     /// @param destination Output span to populate
     /// @param maxCount Maximum number of characters to copy (default: unlimited)
     /// @return CHIP_NO_ERROR if copy succeeded, error code on failure
-    static CHIP_ERROR Copy(const CharSpan & source, DataModel::Nullable<CharSpan> & destination,
+    static CHIP_ERROR Copy(const CharSpan & source, CharSpan & destination,
                            size_t maxCount = std::numeric_limits<size_t>::max())
     {
         if (source.size() > maxCount)
@@ -246,19 +251,29 @@ struct SpanCopier<char>
             return CHIP_ERROR_INVALID_STRING_LENGTH;
         }
 
+        if (!source.empty())
+        {
+            char * buffer = static_cast<char *>(Platform::MemoryCalloc(1, source.size()));
+            if (!buffer)
+                return CHIP_ERROR_NO_MEMORY;
+
+            std::copy(source.begin(), source.end(), buffer);
+            destination = CharSpan(buffer, source.size());                
+        }
+
+        return CHIP_NO_ERROR;
+    }
+
+    static CHIP_ERROR CopyToNullable(const CharSpan & source, DataModel::Nullable<CharSpan> & destination,
+                           size_t maxCount = std::numeric_limits<size_t>::max())
+    {
         if (source.empty())
         {
             destination.SetNull();
             return CHIP_NO_ERROR;
         }
 
-        char * buffer = static_cast<char *>(Platform::MemoryCalloc(1, source.size()));
-        if (!buffer)
-            return CHIP_ERROR_NO_MEMORY;
-
-        std::copy(source.begin(), source.end(), buffer);
-        destination.SetNonNull(CharSpan(buffer, source.size()));
-        return CHIP_NO_ERROR;
+        return Copy(source, destination.Value(), maxCount);
     }
 };
 
