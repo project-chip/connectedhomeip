@@ -25,44 +25,30 @@ from .json_serializable import JsonSerializable
 
 @dataclass
 class MdnsServiceInfo(JsonSerializable):
-    service_info: AsyncServiceInfo = field(repr=False, compare=False)
+    service_info: "AsyncServiceInfo" = field(repr=False, compare=False)
 
-    service_name: Optional[str] = field(init=False)
-    service_type: Optional[str] = field(init=False)
-    instance_name: Optional[str] = field(init=False)
-    hostname: Optional[str] = field(init=False)
-    port: Optional[int] = field(init=False)
-    addresses: Optional[List[str]] = field(init=False)
-    txt: Optional[Dict[str, str]] = field(init=False)
-    priority: Optional[int] = field(init=False)
-    interface_index: Optional[int] = field(init=False)
-    weight: Optional[int] = field(init=False)
-    host_ttl: Optional[int] = field(init=False)
-    other_ttl: Optional[int] = field(init=False)
+    @staticmethod
+    def _strip_dot(s: Optional[str]) -> str:
+        if not s:
+            return ""
+        return s[:-1] if s.endswith(".") else s
 
-    def __post_init__(self):
-        si = self.service_info
+    @property
+    def service_name(self) -> Optional[str]:
+        return getattr(self.service_info, "name", None)
 
-        self.service_name = si.name
-        self.service_type = si.type
-        self.hostname = si.server
-        self.port = si.port
-        self.addresses = si.parsed_addresses()
-        self.txt = si.decoded_properties
-        self.priority = si.priority
-        self.interface_index = si.interface_index
-        self.weight = si.weight
-        self.host_ttl = si.host_ttl
-        self.other_ttl = si.other_ttl
+    @property
+    def service_type(self) -> Optional[str]:
+        return getattr(self.service_info, "type", None)
 
-        def _strip_dot(s: str | None) -> str:
-            if not s:
-                return ""
-            return s[:-1] if s.endswith(".") else s
-
+    @property
+    def instance_name(self) -> Optional[str]:
         # Normalize names (remove trailing dot for comparisons)
-        name = _strip_dot(self.service_name)
-        stype = _strip_dot(self.service_type)
+        name = self._strip_dot(self.service_name)
+        stype = self._strip_dot(self.service_type)
+
+        if not name:
+            return None
 
         # If subtype, use the base service type after "._sub."
         if "._sub." in stype:
@@ -71,6 +57,47 @@ class MdnsServiceInfo(JsonSerializable):
         # Remove ".<base_service_type>" suffix from the full service name
         suffix = "." + stype if stype else ""
         if suffix and name.endswith(suffix):
-            self.instance_name = name[: -len(suffix)]
-        else:
-            self.instance_name = name
+            return name[: -len(suffix)]
+        return name
+
+    @property
+    def hostname(self) -> Optional[str]:
+        return getattr(self.service_info, "server", None)
+
+    @property
+    def addresses(self) -> Optional[List[str]]:
+        si = self.service_info
+        if si and hasattr(si, "parsed_addresses"):
+            try:
+                return si.parsed_addresses()
+            except Exception:
+                return None
+        return None
+
+    @property
+    def port(self) -> Optional[int]:
+        return getattr(self.service_info, "port", None)
+
+    @property
+    def txt(self) -> Optional[Dict[str, str]]:
+        return getattr(self.service_info, "decoded_properties", None)
+
+    @property
+    def priority(self) -> Optional[int]:
+        return getattr(self.service_info, "priority", None)
+
+    @property
+    def interface_index(self) -> Optional[int]:
+        return getattr(self.service_info, "interface_index", None)
+
+    @property
+    def weight(self) -> Optional[int]:
+        return getattr(self.service_info, "weight", None)
+
+    @property
+    def host_ttl(self) -> Optional[int]:
+        return getattr(self.service_info, "host_ttl", None)
+
+    @property
+    def other_ttl(self) -> Optional[int]:
+        return getattr(self.service_info, "other_ttl", None)
