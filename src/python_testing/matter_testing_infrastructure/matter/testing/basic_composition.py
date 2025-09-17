@@ -261,13 +261,6 @@ class BasicCompositionTests:
             return "<unknown_test>"
         return frame.f_code.co_name
 
-    def fail_current_test(self, msg: Optional[str] = None) -> typing.NoReturn:  # type: ignore[misc]
-        if not msg:
-            # Without a message, just log the last problem seen
-            asserts.fail(msg=self.problems[-1].problem)
-        else:
-            asserts.fail(msg)
-
     def _get_dm(self) -> PrebuiltDataModelDirectory:  # type: ignore[return]
         # mypy doesn't understand that asserts.fail always raises a TestFailure
         try:
@@ -337,5 +330,9 @@ class BasicCompositionTests:
             # Don't let logging errors interfere with the original test failure
             logging.warning(f"Failed to generate device attribute dump on test failure: {e}")
 
-        # Call the parent fail_current_test method to actually fail the test
-        super().fail_current_test(msg)
+        if not msg:
+            # Without a message, just log the last problem seen
+            asserts.fail(msg=self.problems[-1].problem)
+        else:
+            asserts.fail(msg)
+
