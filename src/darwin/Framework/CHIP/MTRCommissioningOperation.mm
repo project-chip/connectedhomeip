@@ -431,6 +431,17 @@ static inline void emitMetricForSetupPayload(NSString * payload)
     });
 }
 
+- (void)controller:(MTRDeviceController *)controller
+    reachedCommissioningStage:(MTRCommissioningStage)stage
+{
+    id<MTRCommissioningDelegate> strongDelegate = [self _internalDelegate];
+    if ([strongDelegate respondsToSelector:@selector(commissioning:reachedCommissioningStage:)]) {
+        dispatch_async(_delegateQueue, ^{
+            [strongDelegate commissioning:self reachedCommissioningStage:stage];
+        });
+    }
+}
+
 #pragma mark - MTRDeviceAttestationDelegate implementation
 
 - (void)deviceAttestationCompletedForController:(MTRDeviceController *)controller
