@@ -101,6 +101,9 @@ if (chip_device_platform != "none" && chip_device_platform != "external") {
 
     # Define the default endpoint id for the generic Thread network commissioning instance
     chip_device_config_thread_network_endpoint_id = 0
+
+    # Generate MatterSdkVersion.h header file
+    chip_enable_sdk_version = false
   }
 
   if (chip_stack_lock_tracking == "auto") {
@@ -180,6 +183,10 @@ if (chip_device_platform != "none" && chip_device_platform != "external") {
 
     if (chip_enable_nfc_based_commissioning) {
       defines += [ "CHIP_DEVICE_CONFIG_ENABLE_NFC_BASED_COMMISSIONING=1" ]
+    }
+
+    if (defined(chip_enable_sdk_version)) {
+      defines += [ "CHIP_ENABLE_SDK_VERSION=${chip_enable_sdk_version}" ]
     }
 
     if (chip_device_project_config_include != "") {
@@ -494,6 +501,10 @@ if (chip_device_platform != "none") {
       "${chip_root}/src/system",
     ]
 
+    if (defined(chip_enable_sdk_version)) {
+      public_deps += [ ":matter_sdk_version" ]
+    }
+
     public_configs = [ "${chip_root}/src:includes" ]
   }
 
@@ -687,4 +698,13 @@ if (chip_device_platform != "none") {
 
 source_set("syscalls_stub") {
   sources = [ "SyscallStubs.cpp" ]
+}
+
+if (defined(chip_enable_sdk_version)) {
+  import("${chip_root}/build/chip/chip_version.gni")
+
+  gen_sdk_version("matter_sdk_version") {
+    filename = "MatterSdkVersion"
+    directory = "${root_gen_dir}/include"
+  }
 }
