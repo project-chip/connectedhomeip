@@ -40,7 +40,7 @@ import logging
 from typing import Callable
 
 import matter.clusters as Clusters
-from matter.testing.basic_composition import BasicCompositionTests, log_structured_data
+from matter.testing.basic_composition import BasicCompositionTests
 from matter.testing.choice_conformance import (evaluate_attribute_choice_conformance, evaluate_command_choice_conformance,
                                                evaluate_feature_choice_conformance)
 from matter.testing.conformance import conformance_allowed
