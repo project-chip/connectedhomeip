@@ -104,9 +104,9 @@ CHIP_ERROR ActionReturnStatus::GetUnderlyingError() const
                                 : CHIP_ERROR_IM_GLOBAL_STATUS_VALUE(status->GetStatus());
     }
 
-    if (const FixedActionStatus * status = std::get_if<FixedActionStatus>(&mReturnStatus))
+    if (const ActionReturnStatus::FixedStatus * status = std::get_if<ActionReturnStatus::FixedStatus>(&mReturnStatus))
     {
-        if (*status == FixedActionStatus::kWriteSuccessNoOp)
+        if (*status == ActionReturnStatus::FixedStatus::kWriteSuccessNoOp)
         {
             return CHIP_NO_ERROR;
         }
@@ -127,9 +127,9 @@ ClusterStatusCode ActionReturnStatus::GetStatusCode() const
         return ClusterStatusCode(*err);
     }
 
-    if (const FixedActionStatus * status = std::get_if<FixedActionStatus>(&mReturnStatus))
+    if (const ActionReturnStatus::FixedStatus * status = std::get_if<ActionReturnStatus::FixedStatus>(&mReturnStatus))
     {
-        if (*status == FixedActionStatus::kWriteSuccessNoOp)
+        if (*status == ActionReturnStatus::FixedStatus::kWriteSuccessNoOp)
         {
             return ClusterStatusCode(CHIP_NO_ERROR);
         }
@@ -151,9 +151,9 @@ bool ActionReturnStatus::IsSuccess() const
         return status->IsSuccess();
     }
 
-    if (const FixedActionStatus * status = std::get_if<FixedActionStatus>(&mReturnStatus))
+    if (const ActionReturnStatus::FixedStatus * status = std::get_if<ActionReturnStatus::FixedStatus>(&mReturnStatus))
     {
-        return (*status == FixedActionStatus::kWriteSuccessNoOp);
+        return (*status == ActionReturnStatus::FixedStatus::kWriteSuccessNoOp);
     }
 
     // all std::variant cases exhausted
@@ -162,9 +162,9 @@ bool ActionReturnStatus::IsSuccess() const
 
 bool ActionReturnStatus::IsNoOpSuccess() const
 {
-    if (const FixedActionStatus * status = std::get_if<FixedActionStatus>(&mReturnStatus))
+    if (const ActionReturnStatus::FixedStatus * status = std::get_if<ActionReturnStatus::FixedStatus>(&mReturnStatus))
     {
-        return (*status == FixedActionStatus::kWriteSuccessNoOp);
+        return (*status == ActionReturnStatus::FixedStatus::kWriteSuccessNoOp);
     }
 
     // all std::variant cases exhausted
