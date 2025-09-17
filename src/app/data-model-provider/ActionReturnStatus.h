@@ -70,7 +70,7 @@ public:
         mReturnStatus(Protocols::InteractionModel::ClusterStatusCode(status))
     {}
     ActionReturnStatus(Protocols::InteractionModel::ClusterStatusCode status) : mReturnStatus(status) {}
-    ActionReturnStatus(FixedStatus status): mReturnStatus(status) {}
+    ActionReturnStatus(FixedStatus status) : mReturnStatus(status) {}
 
     /// Constructs a status code. Either returns the underlying code directly
     /// or converts the underlying CHIP_ERROR into a cluster status code.
