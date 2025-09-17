@@ -36,7 +36,6 @@
 # === END CI TEST ARGUMENTS ===
 
 # TODO: Enable 10.5 in CI once the door lock OTA requestor problem is sorted.
-import logging
 from typing import Callable
 
 import matter.clusters as Clusters
