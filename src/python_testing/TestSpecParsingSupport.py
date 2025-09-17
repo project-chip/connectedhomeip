@@ -274,6 +274,7 @@ class TestSpecParsingSupport(MatterBaseTest):
         one_four_clusters, one_four_problems = build_xml_clusters(PrebuiltDataModelDirectory.k1_4)
         one_four_one_clusters, one_four_one_problems = build_xml_clusters(PrebuiltDataModelDirectory.k1_4_1)
         one_four_two_xml_clusters, one_four_two_problems = build_xml_clusters(PrebuiltDataModelDirectory.k1_4_2)
+        one_five_xml_clusters, one_five_problems = build_xml_clusters(PrebuiltDataModelDirectory.k1_5)
 
         # We know 1.2, 1.3, 1.4 and 1.4.1, 1.4.2 are clear of errors, ensure it stays that way.
         asserts.assert_equal(len(one_two_problems), 0, "Unexpected problems found on 1.2 cluster parsing")
@@ -281,6 +282,9 @@ class TestSpecParsingSupport(MatterBaseTest):
         asserts.assert_equal(len(one_four_problems), 0, "Unexpected problems found on 1.4 cluster parsing")
         asserts.assert_equal(len(one_four_one_problems), 0, "Unexpected problems found on 1.4.1 cluster parsing")
         asserts.assert_equal(len(one_four_two_problems), 0, "Unexpected problems found on 1.4.2 cluster parsing")
+        for p in one_five_problems:
+            print(p)
+        asserts.assert_equal(len(one_five_problems), 0, "Unexpected problems found on 1.5 cluster parsing")
 
         asserts.assert_greater(len(set(one_four_two_xml_clusters.keys()) - set(one_two_clusters.keys())),
                                0, "1.2.2 dir does not contain any clusters not in 1.3")
@@ -292,6 +296,8 @@ class TestSpecParsingSupport(MatterBaseTest):
                                0, "1.4 dir does not contain any clusters not in 1.3")
         asserts.assert_equal(len(one_four_clusters.keys()), len(one_four_one_clusters.keys()),
                              "1.4 and 1.4.1 do not contain the same clusters")
+        asserts.assert_greater(len(set(one_five_xml_clusters.keys()) - set(one_four_two_xml_clusters.keys())),
+                               0, "1.5 dir does not contain any clusters not in 1.4.2")
 
         # The following clusters were removed in 1.3: Scenes, Leaf Wetness Measurement, Soil Moisture Measurement
         one_two_removed = set([0x0005, 0x0407, 0x0408])
@@ -302,12 +308,14 @@ class TestSpecParsingSupport(MatterBaseTest):
         asserts.assert_equal(set(one_three_clusters.keys()) - set(one_four_clusters.keys()),
                              one_four_removed, "There are some 1.3 clusters that are unexpectedly not included in the 1.4 spec")
         # Ballast and all the proxy clusters are being removed in 1.4.2
-        one_five_removed = set([Clusters.BallastConfiguration.id, Clusters.ProxyConfiguration.id,
-                               Clusters.ProxyDiscovery.id, Clusters.ProxyValid.id])
+        one_four_two_removed = set([Clusters.BallastConfiguration.id, Clusters.ProxyConfiguration.id,
+                                    Clusters.ProxyDiscovery.id, Clusters.ProxyValid.id])
         asserts.assert_equal(set(one_four_clusters.keys())-set(one_four_two_xml_clusters.keys()),
-                             one_five_removed, "There are some 1.4 clusters that are unexpectedly not included in the TOT spec")
+                             one_four_two_removed, "There are some 1.4 clusters that are unexpectedly not included in the 1.4.2 spec")
         asserts.assert_equal(set(one_three_clusters.keys())-set(one_four_two_xml_clusters.keys()),
-                             one_four_removed.union(one_five_removed), "There are some 1.3 clusters that are unexpectedly not included in the TOT spec")
+                             one_four_removed.union(one_four_two_removed), "There are some 1.3 clusters that are unexpectedly not included in the 1.4.2 spec")
+        asserts.assert_equal(set(one_four_two_xml_clusters.keys())-set(one_five_xml_clusters.keys()), set(),
+                             "There are some 1.4.2 cluster that are unexpectedly not included in the 1.5 spec")
 
         str_path = get_data_model_directory(PrebuiltDataModelDirectory.k1_4, DataModelLevel.kCluster)
         string_override_check, problems = build_xml_clusters(str_path)

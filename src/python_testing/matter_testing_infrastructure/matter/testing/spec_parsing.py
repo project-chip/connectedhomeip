@@ -36,7 +36,8 @@ from matter.testing.conformance import (OPTIONAL_CONFORM, TOP_LEVEL_CONFORMANCE_
                                         parse_callable_from_xml)
 from matter.testing.global_attribute_ids import GlobalAttributeIds
 from matter.testing.problem_notices import (AttributePathLocation, ClusterPathLocation, CommandPathLocation, DeviceTypePathLocation,
-                                            EventPathLocation, FeaturePathLocation, ProblemNotice, ProblemSeverity)
+                                            EventPathLocation, FeaturePathLocation, NamespacePathLocation, ProblemNotice,
+                                            ProblemSeverity, UnknownProblemLocation)
 from matter.tlv import uint
 
 # Type alias maintained for constants access; actual values are ints at runtime
@@ -156,6 +157,31 @@ class XmlDeviceTypeClusterRequirements:
 
     def __str__(self):
         return f'{self.name}: {str(self.conformance)}'
+
+
+@dataclass
+class XmlNamespace:
+    """Represents a namespace definition from XML"""
+    id: int = 0
+    name: str = ""
+    tags: dict[int, 'XmlTag'] = field(default_factory=dict)
+
+    def __str__(self) -> str:
+        tags_str = '\n  '.join(f"{tag_id:04X}: {tag.name}"
+                               for tag_id, tag in sorted(self.tags.items()))
+        return f"Namespace 0x{self.id:04X} ({self.name})\n  {tags_str}"
+
+
+@dataclass
+class XmlTag:
+    """Represents a tag within a namespace"""
+    id: int = 0
+    name: str = ""
+    description: Optional[str] = None
+
+    def __str__(self) -> str:
+        desc = f" - {self.description}" if self.description else ""
+        return f"{self.name}{desc}"
 
 
 @dataclass
@@ -588,6 +614,7 @@ class PrebuiltDataModelDirectory(Enum):
     k1_4 = auto()
     k1_4_1 = auto()
     k1_4_2 = auto()
+    k1_5 = auto()
 
     @property
     def dirname(self):
@@ -601,12 +628,15 @@ class PrebuiltDataModelDirectory(Enum):
             return "1.4.1"
         if self == PrebuiltDataModelDirectory.k1_4_2:
             return "1.4.2"
+        if self == PrebuiltDataModelDirectory.k1_5:
+            return "1.5"
         raise KeyError("Invalid enum: %r" % self)
 
 
 class DataModelLevel(Enum):
     kCluster = auto()
     kDeviceType = auto()
+    kNamespace = auto()
 
     @property
     def dirname(self):
@@ -614,6 +644,8 @@ class DataModelLevel(Enum):
             return "clusters"
         if self == DataModelLevel.kDeviceType:
             return "device_types"
+        if self == DataModelLevel.kNamespace:
+            return "namespaces"
         raise KeyError("Invalid enum: %r" % self)
 
 
@@ -840,6 +872,143 @@ def combine_derived_clusters_with_base(xml_clusters: dict[uint, XmlCluster], pur
             xml_clusters[id] = new
 
 
+def parse_namespace(et: ElementTree.Element) -> tuple[XmlNamespace, list[ProblemNotice]]:
+    """Parse a single namespace XML definition"""
+    problems: list[ProblemNotice] = []
+    namespace = XmlNamespace()
+
+    # Parse namespace attributes
+    namespace_id = et.get('id')
+    if namespace_id is not None:
+        try:
+            namespace.id = int(str(namespace_id), 16)
+        except (ValueError, TypeError):
+            problems.append(ProblemNotice(
+                test_name="Parse Namespace XML",
+                location=NamespacePathLocation(),
+                severity=ProblemSeverity.WARNING,
+                problem=f"Invalid namespace ID: {namespace_id}"
+            ))
+    else:
+        problems.append(ProblemNotice(
+            test_name="Parse Namespace XML",
+            location=NamespacePathLocation(),
+            severity=ProblemSeverity.WARNING,
+            problem="Missing namespace ID"
+        ))
+
+    # Parse and validate namespace name
+    namespace.name = et.get('name', '').strip()
+    if not namespace.name:
+        problems.append(ProblemNotice(
+            test_name="Parse Namespace XML",
+            location=NamespacePathLocation(namespace_id=getattr(namespace, 'id', None)),
+            severity=ProblemSeverity.WARNING,
+            problem="Missing or empty namespace name"
+        ))
+
+    # Parse tags
+    tags_elem = et.find('tags')
+    if tags_elem is not None:
+        for tag_elem in tags_elem.findall('tag'):
+            tag = XmlTag()
+            tag_id = tag_elem.get('id')
+            if tag_id is not None:
+                try:
+                    tag.id = int(str(tag_id), 0)
+                except (ValueError, TypeError):
+                    problems.append(ProblemNotice(
+                        test_name="Parse Namespace XML",
+                        location=NamespacePathLocation(namespace_id=namespace.id),
+                        severity=ProblemSeverity.WARNING,
+                        problem=f"Invalid tag ID: {tag_id}"
+                    ))
+                    continue
+
+            tag.name = tag_elem.get('name', '').strip()
+            if not tag.name:
+                problems.append(ProblemNotice(
+                    test_name="Parse Namespace XML",
+                    location=NamespacePathLocation(namespace_id=namespace.id, tag_id=getattr(tag, 'id', None)),
+                    severity=ProblemSeverity.WARNING,
+                    problem=f"Missing name for tag {tag.id}"
+                ))
+                continue
+
+            desc_elem = tag_elem.find('description')
+            if desc_elem is not None and desc_elem.text:
+                tag.description = desc_elem.text.strip()
+
+            namespace.tags[tag.id] = tag
+
+    return namespace, problems
+
+
+def build_xml_namespaces(data_model_directory: typing.Union[PrebuiltDataModelDirectory, Traversable]) -> tuple[dict[int, XmlNamespace], list[ProblemNotice]]:
+    """Build a dictionary of namespaces from XML files in the given directory"""
+    namespace_dir = get_data_model_directory(data_model_directory, DataModelLevel.kNamespace)
+    namespaces: dict[int, XmlNamespace] = {}
+    problems: list[ProblemNotice] = []
+
+    found_xmls = 0
+
+    try:
+        for filename in namespace_dir.iterdir():
+            if not filename.name.endswith('.xml'):
+                continue
+            logging.info('Parsing file %s', str(filename))
+            found_xmls += 1
+
+            try:
+                with filename.open('r', encoding="utf8") as xml:
+                    root = ElementTree.parse(xml).getroot()
+                    namespace, parse_problems = parse_namespace(root)
+                    problems.extend(parse_problems)
+
+                    if namespace.id in namespaces:
+                        problems.append(ProblemNotice(
+                            test_name="Build XML Namespaces",
+                            location=NamespacePathLocation(namespace_id=namespace.id),
+                            severity=ProblemSeverity.WARNING,
+                            problem=f"Duplicate namespace ID 0x{namespace.id:04X} in {filename.name}"
+                        ))
+                    else:
+                        namespaces[namespace.id] = namespace
+
+            except Exception as e:
+                problems.append(ProblemNotice(
+                    test_name="Build XML Namespaces",
+                    location=UnknownProblemLocation(),
+                    severity=ProblemSeverity.WARNING,
+                    problem=f"Failed to parse {filename.name}: {str(e)}"
+                ))
+
+    except Exception as e:
+        problems.append(ProblemNotice(
+            test_name="Build XML Namespaces",
+            location=UnknownProblemLocation(),
+            severity=ProblemSeverity.WARNING,
+            problem=f"Failed to access namespace directory: {str(e)}"
+        ))
+
+    if found_xmls < 1:
+        logging.warning("No XML files found in the specified namespace directory: %r", namespace_dir)
+        problems.append(ProblemNotice(
+            test_name="Build XML Namespaces",
+            location=UnknownProblemLocation(),
+            severity=ProblemSeverity.WARNING,
+            problem=f"No XML files found in namespace directory: {str(namespace_dir)}"
+        ))
+
+    # Print problems for debugging
+    if problems:
+        logging.warning("Found %d problems while parsing namespaces:", len(problems))
+        for problem in problems:
+            logging.warning("  - %s", str(problem))
+
+    return namespaces, problems
+
+
 def parse_single_device_type(root: ElementTree.Element, cluster_definition_xml: dict[uint, XmlCluster]) -> tuple[dict[int, XmlDeviceType], list[ProblemNotice]]:
     problems: list[ProblemNotice] = []
     device_types: dict[int, XmlDeviceType] = {}
@@ -944,8 +1113,16 @@ def parse_single_device_type(root: ElementTree.Element, cluster_definition_xml: 
                         try:
                             name = e.attrib['name']
                         except KeyError:
+                            if override_element_type == 'feature':
+                                try:
+                                    name = e.attrib['code']
+                                except KeyError:
+                                    name = None
+                            else:
+                                name = None
+                        if name is None:
                             problems.append(ProblemNotice("Parse Device Type XML", location=location,
-                                            severity=ProblemSeverity.WARNING, problem=f"Missing {override_element_type} name for override in cluster 0x{cid:04X}, e={str(e)}"))
+                                            severity=ProblemSeverity.WARNING, problem=f"Missing {override_element_type} name for override in cluster 0x{cid:04X}, e={str(e.attrib)}"))
                             continue
 
                         try:
@@ -964,7 +1141,7 @@ def parse_single_device_type(root: ElementTree.Element, cluster_definition_xml: 
                                         f"Ignoring unknown {override_element_type} {name} in cluster {cid} because the conformance is disallowed")
                                     continue
                                 problems.append(ProblemNotice("Parse Device Type XML", location=location,
-                                                severity=ProblemSeverity.WARNING, problem=f"Unknown {override_element_type} {name} in cluster 0x{cid:04X} - map = {map}"))
+                                                severity=ProblemSeverity.WARNING, problem=f"Unknown {override_element_type} {name} in cluster 0x{cid:04X} - map = {map_id}"))
                             else:
                                 override[map_id[0]] = conformance_override
 
@@ -1052,12 +1229,13 @@ def dm_from_spec_version(specification_version: uint) -> PrebuiltDataModelDirect
     # However, 1.3 allowed the dot to be any value
     if specification_version < uint(0x01040000):
         # The expression (specification_version & uint(0xFFFF00FF)) might be inferred as int by mypy.
-        specification_version = uint(int(specification_version) & int(uint(0xFFFF00FF)))
+        specification_version = typing.cast(uint, specification_version & uint(0xFFFF00FF))
 
     version_to_dm = {0x01030000: PrebuiltDataModelDirectory.k1_3,
                      0x01040000: PrebuiltDataModelDirectory.k1_4,
                      0x01040100: PrebuiltDataModelDirectory.k1_4_1,
-                     0x01040200: PrebuiltDataModelDirectory.k1_4_2}
+                     0x01040200: PrebuiltDataModelDirectory.k1_4_2,
+                     0x01050000: PrebuiltDataModelDirectory.k1_5, }
 
     if specification_version not in version_to_dm.keys():
         raise ConformanceException(f"Unknown specification_version 0x{specification_version:08X}")

@@ -147,7 +147,7 @@ Protocols::InteractionModel::Status CameraAVStreamManager::AudioStreamDeallocate
     return Status::Success;
 }
 
-Protocols::InteractionModel::Status CameraAVStreamManager::SnapshotStreamAllocate(const SnapshotStreamStruct & allocateArgs,
+Protocols::InteractionModel::Status CameraAVStreamManager::SnapshotStreamAllocate(const SnapshotStreamAllocateArgs & allocateArgs,
                                                                                   uint16_t & outStreamID)
 {
     outStreamID = kInvalidStreamID;
@@ -302,6 +302,16 @@ CameraAVStreamManager::OnTransportReleaseAudioVideoStreams(uint16_t audioStreamI
     ChipLogDetail(Zcl, "Transport released audio/video streams");
 
     return CHIP_NO_ERROR;
+}
+
+const std::vector<VideoStreamStruct> & CameraAVStreamManager::GetAllocatedVideoStreams() const
+{
+    return videoStreamStructs;
+}
+
+const std::vector<AudioStreamStruct> & CameraAVStreamManager::GetAllocatedAudioStreams() const
+{
+    return audioStreamStructs;
 }
 
 void CameraAVStreamManager::InitializeAvailableVideoStreams()
