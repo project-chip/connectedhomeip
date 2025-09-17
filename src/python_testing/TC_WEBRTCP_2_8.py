@@ -99,7 +99,8 @@ class TC_WebRTCProvider_2_8(MatterBaseTest, WEBRTCPTestBase):
             await self.send_single_cmd(cmd=solicit_offer_request_recording, endpoint=endpoint, payloadCapability=ChipDeviceCtrl.TransportPayloadCapability.LARGE_PAYLOAD)
             asserts.fail("Unexpected success on SolicitOffer with SoftRecordingPrivacyModeEnabled is True")
         except InteractionModelError as e:
-            asserts.assert_equal(e.status, Status.InvalidInState, "Expected INVALID_IN_STATE when SoftRecordingPrivacyModeEnabled is True")
+            asserts.assert_equal(e.status, Status.InvalidInState,
+                                 "Expected INVALID_IN_STATE when SoftRecordingPrivacyModeEnabled is True")
 
         self.step(4)
         # Send SolicitOffer with StreamUsage = kAnalysis (should fail)
@@ -114,22 +115,24 @@ class TC_WebRTCProvider_2_8(MatterBaseTest, WEBRTCPTestBase):
             await self.send_single_cmd(cmd=solicit_offer_request_recording, endpoint=endpoint, payloadCapability=ChipDeviceCtrl.TransportPayloadCapability.LARGE_PAYLOAD)
             asserts.fail("Unexpected success on SolicitOffer with SoftRecordingPrivacyModeEnabled is True")
         except InteractionModelError as e:
-            asserts.assert_equal(e.status, Status.InvalidInState, "Expected INVALID_IN_STATE when SoftRecordingPrivacyModeEnabled is True")
+            asserts.assert_equal(e.status, Status.InvalidInState,
+                                 "Expected INVALID_IN_STATE when SoftRecordingPrivacyModeEnabled is True")
 
         self.step(5)
         # Send SolicitOffer with StreamUsage = kLiveView (should succeed)
         solicit_offer_request_liveview = Clusters.WebRTCTransportProvider.Commands.SolicitOffer(
             streamUsage=Clusters.Globals.Enums.StreamUsageEnum.kLiveView,
-            originatingEndpointID=endpoint,            
+            originatingEndpointID=endpoint,
             videoStreamID=videoStreamID,
             audioStreamID=audioStreamID
         )
 
         try:
-            await self.send_single_cmd(cmd=solicit_offer_request_recording, endpoint=endpoint, payloadCapability=ChipDeviceCtrl.TransportPayloadCapability.LARGE_PAYLOAD)
+            await self.send_single_cmd(cmd=solicit_offer_request_liveview, endpoint=endpoint, payloadCapability=ChipDeviceCtrl.TransportPayloadCapability.LARGE_PAYLOAD)
             asserts.fail("Unexpected success on SolicitOffer with SoftRecordingPrivacyModeEnabled is True")
         except InteractionModelError as e:
-            asserts.assert_equal(e.status, Status.InvalidInState, "Expected INVALID_IN_STATE when SoftRecordingPrivacyModeEnabled is True")
+            asserts.assert_equal(e.status, Status.InvalidInState,
+                                 "Expected INVALID_IN_STATE when SoftRecordingPrivacyModeEnabled is True")
 
 
 if __name__ == "__main__":
