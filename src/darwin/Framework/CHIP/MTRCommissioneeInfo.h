@@ -19,6 +19,7 @@
 
 @class MTRProductIdentity;
 @class MTREndpointInfo;
+@class MTRNetworkInterfaceInfo;
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -49,13 +50,6 @@ MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
 @property (nonatomic, copy, readonly, nullable) MTREndpointInfo * rootEndpoint;
 
 /**
- * A dictionary mapping endpoint IDs to FeatureMap values for the Network
- * Commissioning cluster, for endpoints that implement that cluster.  May
- * contain no entries if there are no such endpoints.
- */
-@property (nonatomic, copy, readonly) NSDictionary<NSNumber *, NSNumber *> * networkCommissioningFeatureMaps MTR_AVAILABLE(ios(26.1), macos(26.1), watchos(26.1), tvos(26.1));
-
-/**
  * Attributes that were read from the commissionee.  This will contain the
  * following, if they are available:
  *
@@ -63,6 +57,14 @@ MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
  * 2) The FeatureMap attributes of all Network Commissioning clusters on the commissionee.
  */
 @property (nonatomic, copy, readonly, nullable) NSDictionary<MTRAttributePath *, NSDictionary<NSString *, id> *> * attributes MTR_PROVISIONALLY_AVAILABLE;
+
+/**
+ * Network interfaces the commissionee has.  If there are no interfaces of a
+ * given type, the corresponding array will be empty.
+ */
+@property (nonatomic, copy, readonly) NSArray<MTRNetworkInterfaceInfo *> * wifiInterfaces MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy, readonly) NSArray<MTRNetworkInterfaceInfo *> * threadInterfaces MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy, readonly) NSArray<MTRNetworkInterfaceInfo *> * ethernetInterfaces MTR_PROVISIONALLY_AVAILABLE;
 
 @end
 
