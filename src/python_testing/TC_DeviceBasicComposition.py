@@ -271,7 +271,7 @@ def check_no_duplicates(obj: Any) -> None:
         raise ValueError(f"Value {str(obj)} contains duplicate values")
 
 
-class TC_DeviceBasicComposition(MatterBaseTest, BasicCompositionTests):
+class TC_DeviceBasicComposition(BasicCompositionTests, MatterBaseTest):
     @async_test_body
     async def setup_class(self):
         super().setup_class()

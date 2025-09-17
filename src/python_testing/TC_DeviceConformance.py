@@ -505,7 +505,7 @@ class DeviceConformanceTests(BasicCompositionTests):
         return problems
 
 
-class TC_DeviceConformance(MatterBaseTest, DeviceConformanceTests):
+class TC_DeviceConformance(DeviceConformanceTests, MatterBaseTest):
     @async_test_body
     async def setup_class(self):
         super().setup_class()

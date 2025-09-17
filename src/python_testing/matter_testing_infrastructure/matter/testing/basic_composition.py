@@ -294,21 +294,48 @@ class BasicCompositionTests:
         self.xml_device_types, problems = build_xml_device_types(dm)
         self.problems.extend(problems)
 
-    def on_fail(self, record):
-        """Override on_fail to automatically dump device data when any composition test fails.
+    def teardown_class(self):
+        """Override teardown_class to dump device attribute data when problems are found.
+        
+        This ensures that whenever any test inheriting from BasicCompositionTests has problems,
+        we automatically get the device attribute dump for debugging purposes.
+        """
+        # Check if we have problems and device attributes are available
+        if len(self.problems) > 0:
+            logging.info("BasicCompositionTests: Problems detected - attempting device attribute dump")
+            try:
+                if hasattr(self, 'endpoints_tlv') and self.endpoints_tlv:
+                    logging.info("Device attribute data available - generating dump")
+                    _, txt_str = self.dump_wildcard(None)  
+                    # Only dump the text format - it's more readable for debugging
+                    log_structured_data('==== FAILURE_DUMP_txt: ', txt_str)
+                else:
+                    logging.info("No device attribute data available (endpoints_tlv not populated)")
+            except Exception as e:
+                # Don't let logging errors interfere with the original test failure
+                logging.warning(f"Failed to generate device attribute dump: {e}")
+        
+        # Call the parent teardown_class method to handle normal teardown and problem logging
+        super().teardown_class()
 
+    def fail_current_test(self, msg: Optional[str] = None) -> typing.NoReturn:  # type: ignore[misc]
+        """Override fail_current_test to automatically dump device attribute data when any composition test fails.
+        
         This ensures that whenever any test inheriting from BasicCompositionTests fails,
         we automatically get the device attribute dump for debugging purposes.
         """
-        # Call the parent on_fail method first (this will be MatterBaseTest.on_fail)
-        super().on_fail(record)
-
-        # Dump device composition data if available for debugging
+        # Dump device attribute data if available for debugging BEFORE failing the test
         try:
             if hasattr(self, 'endpoints_tlv') and self.endpoints_tlv:
-                json_str, txt_str = self.dump_wildcard(None)  # Don't write to file, just get strings
-                log_structured_data('==== FAILURE_DUMP_json: ', json_str)
+                logging.info("Device attribute dump available - generating dump")
+                _, txt_str = self.dump_wildcard(None) 
+                # Only dump the text format - it's more readable for debugging
                 log_structured_data('==== FAILURE_DUMP_txt: ', txt_str)
+            else:
+                logging.info("No device attribute dump available (endpoints_tlv not populated)")
         except Exception as e:
             # Don't let logging errors interfere with the original test failure
-            logging.warning(f"Failed to dump device data on test failure: {e}")
+            logging.warning(f"Failed to generate device attribute dump on test failure: {e}")
+        
+        # Call the parent fail_current_test method to actually fail the test
+        super().fail_current_test(msg)
