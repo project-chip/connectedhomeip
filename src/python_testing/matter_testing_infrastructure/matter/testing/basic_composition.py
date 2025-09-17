@@ -39,6 +39,23 @@ from matter.testing.matter_testing import MatterTestConfig, ProblemNotice
 from matter.testing.spec_parsing import PrebuiltDataModelDirectory, build_xml_clusters, build_xml_device_types, dm_from_spec_version
 
 
+def log_structured_data(start_tag: str, dump_string: str):
+    """Log structured data with a clear start and end marker.
+    
+    This function is used to output device attribute dumps and other structured 
+    data to logs in a format that can be easily extracted for debugging.
+    
+    Args:
+        start_tag: A prefix tag to identify the type of data being logged
+        dump_string: The data to be logged
+    """
+    lines = dump_string.splitlines()
+    logging.info(f'{start_tag}BEGIN ({len(lines)} lines)====')
+    for line in lines:
+        logging.info(f'{start_tag}{line}')
+    logging.info(f'{start_tag}END ====')
+
+
 @dataclass
 class ArlData:
     have_arl: bool
@@ -276,3 +293,22 @@ class BasicCompositionTests:
         self.xml_clusters, self.problems = build_xml_clusters(dm)
         self.xml_device_types, problems = build_xml_device_types(dm)
         self.problems.extend(problems)
+
+    def on_fail(self, record):
+        """Override on_fail to automatically dump device data when any composition test fails.
+        
+        This ensures that whenever any test inheriting from BasicCompositionTests fails,
+        we automatically get the device attribute dump for debugging purposes.
+        """
+        # Call the parent on_fail method first (this will be MatterBaseTest.on_fail)
+        super().on_fail(record)
+        
+        # Dump device composition data if available for debugging
+        try:
+            if hasattr(self, 'endpoints_tlv') and self.endpoints_tlv:
+                json_str, txt_str = self.dump_wildcard(None)  # Don't write to file, just get strings
+                log_structured_data('==== FAILURE_DUMP_json: ', json_str)
+                log_structured_data('==== FAILURE_DUMP_txt: ', txt_str)
+        except Exception as e:
+            # Don't let logging errors interfere with the original test failure
+            logging.warning(f"Failed to dump device data on test failure: {e}")
