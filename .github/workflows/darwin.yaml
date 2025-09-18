@@ -42,7 +42,7 @@ jobs:
         runs-on: ${{ matrix.os }}
         strategy:
             matrix:
-                os: ${{ github.event_name == 'schedule' && fromJSON('["macos-13", "macos-14", "macos-15"]') || fromJSON('["macos-13", "macos-14", "macos-15"]') }} # temporarily run on all OSes even for PRs
+                os: ${{ github.event_name == 'schedule' && fromJSON('["macos-13", "macos-14", "macos-15", "macos-26"]') || fromJSON('["macos-13", "macos-14", "macos-15", "macos-26"]') }} # temporarily run on all OSes even for PRs
                 options: # We don't need a full matrix
                     - flavor: macos-release
                       arguments: -sdk macosx -configuration Release

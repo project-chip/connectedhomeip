@@ -469,6 +469,16 @@ jobs:
                       dry-run: false
                       build_variant: no-ble-no-shell-tsan-clang
                       chip_tool: ""
+                    - os: macos-26
+                      arch: arm64     # observed, not configured
+                      dry-run: true
+                      build_variant: no-ble-no-shell-asan-clang
+                      chip_tool: ""
+                    - os: macos-26
+                      arch: arm64     # observed, not configured
+                      dry-run: true
+                      build_variant: no-ble-no-shell-tsan-clang
+                      chip_tool: ""
         continue-on-error: ${{ matrix.dry-run }}
         env:
             BUILD_VARIANT: ${{matrix.build_variant}}
@@ -951,6 +961,9 @@ jobs:
                   arch: arm64   # observed, not configured
                   build_variant: no-ble-no-wifi-tsan-clang
                 - os: macos-15
+                  arch: arm64   # observed, not configured
+                  build_variant: no-ble-no-wifi-tsan-clang
+                - os: macos-26
                   arch: arm64   # observed, not configured
                   build_variant: no-ble-no-wifi-tsan-clang
         env:
