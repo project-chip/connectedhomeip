@@ -62,10 +62,9 @@ import("//build_overrides/build.gni") import("//build_overrides/chip.gni") impor
         test_sources += ["TestAutoCommissioner.cpp"]
     }
 
-    if (chip_device_config_enable_joint_fabric)
-    {
-        test_sources += ["TestJCMCommissioner.cpp"]
-    }
+    test_sources += ["TestCommissioningDelegate.cpp"]
+
+        if (chip_device_config_enable_joint_fabric){ test_sources += ["TestJCMCommissioner.cpp"] }
 
     cflags = ["-Wconversion"]
 
