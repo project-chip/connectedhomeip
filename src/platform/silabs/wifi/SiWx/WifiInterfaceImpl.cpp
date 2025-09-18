@@ -557,7 +557,7 @@ void WifiInterfaceImpl::ProcessEvent(WiseconnectWifiInterface::WifiPlatformEvent
     {
     case WiseconnectWifiInterface::WifiPlatformEvent::kStationConnect:
         ChipLogDetail(DeviceLayer, "WifiPlatformEvent::kStationConnect");
-        wfx_rsi.dev_state.Set(WifiInterface::WifiState::kStationConnected);
+        wfx_rsi.dev_state.Set(WifiInterface::WifiState::kStationConnected).Clear(WifiInterface::WifiState::kStationConnecting);
         ResetConnectivityNotificationFlags();
         break;
 
