@@ -80,10 +80,10 @@ class MdnsAsyncServiceInfo(ServiceInfo):
         zc.question_history.clear()
         self.async_clear_cache()
 
-        now = current_time_millis()
+        now_ms = current_time_millis()
 
         # Absolute cutoff time after which the request stops if incomplete
-        deadline_ms = now + timeout_ms
+        deadline_ms = now_ms + timeout_ms
 
         # Delay before sending the first retry query if the initial query did not complete
         initial_delay_ms = _LISTENER_TIME_MS + randint(0, 50)
@@ -97,7 +97,7 @@ class MdnsAsyncServiceInfo(ServiceInfo):
         linger_after_complete_ms = randint(300, 500)
 
         first_send = True
-        next_send = now
+        next_send = now_ms
 
         # Build an outgoing DNS query for the requested record types
         def build_outgoing(as_qu: bool) -> DNSOutgoing:
@@ -113,13 +113,13 @@ class MdnsAsyncServiceInfo(ServiceInfo):
             use_qu_first = (question_type in (None, DNSQuestionType.QU))
 
             while not self._is_complete:
-                now = current_time_millis()
+                now_ms = current_time_millis()
 
                 # Deadline reached before record was found
-                if now >= deadline_ms:
+                if now_ms >= deadline_ms:
                     return False
 
-                if now >= next_send:
+                if now_ms >= next_send:
                     # If this is the first cycle and QU is allowed, send a unicast-preferred query first.
                     if use_qu_first:
                         zc.async_send(build_outgoing(as_qu=True), addr, port)
@@ -129,16 +129,16 @@ class MdnsAsyncServiceInfo(ServiceInfo):
 
                 if first_send:
                     # First retry: wait the shorter initial delay before sending again.
-                    next_send = now + initial_delay_ms
+                    next_send = now_ms + initial_delay_ms
                     first_send = False
                 else:
                     # Subsequent retries: wait at least the duplicate-question interval
                     # to avoid suppression by responders, plus a small random offset.
-                    next_send = now + max(duplicate_interval_ms, initial_delay_ms + randint(0, 100))
+                    next_send = now_ms + max(duplicate_interval_ms, initial_delay_ms + randint(0, 100))
 
                 # Sleep until the next scheduled send time or the overall deadline,
                 # whichever occurs first. Clamp to 0 to avoid negative waits.
-                await self.async_wait(max(0, min(next_send, deadline_ms) - now), zc.loop)
+                await self.async_wait(max(0, min(next_send, deadline_ms) - now_ms), zc.loop)
 
             # After exiting the query loop, wait briefly to passively
             # catch any late TXT/SRV/AAAA/A responses.
