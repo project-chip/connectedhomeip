@@ -297,6 +297,26 @@ public:
      */
     virtual CHIP_ERROR OnTransportReleaseAudioVideoStreams(uint16_t audioStreamID, uint16_t videoStreamID) = 0;
 
+    /**
+     * @brief Provides read-only access to the list of currently allocated video streams.
+     * This allows other components (like PushAVStreamTransportManager) to query
+     * allocated stream parameters (e.g., for bandwidth calculation) without directly
+     * accessing the CameraAVStreamMgmtServer instance.
+     *
+     * @return A const reference to the vector of allocated video stream structures.
+     */
+    virtual const std::vector<VideoStreamStruct> & GetAllocatedVideoStreams() const = 0;
+
+    /**
+     * @brief Provides read-only access to the list of currently allocated audio streams.
+     * This allows other components (like PushAVStreamTransportManager) to query
+     * allocated stream parameters (e.g., for bandwidth calculation) without directly
+     * accessing the CameraAVStreamMgmtServer instance.
+     *
+     * @return A const reference to the vector of allocated audio stream structures.
+     */
+    virtual const std::vector<AudioStreamStruct> & GetAllocatedAudioStreams() const = 0;
+
 private:
     friend class CameraAVStreamMgmtServer;
 

@@ -596,6 +596,25 @@ PushAvStreamTransportServerLogic::HandleAllocatePushTransport(CommandHandler & h
             handler.AddClusterSpecificFailure(commandPath, status);
             return std::nullopt;
         });
+        // Use heap allocation for large certificate buffers to reduce stack usage
+        auto rootCertBuffer   = std::make_unique<PersistentStore<CHIP_CONFIG_TLS_PERSISTED_ROOT_CERT_BYTES>>();
+        auto clientCertBuffer = std::make_unique<PersistentStore<CHIP_CONFIG_TLS_PERSISTED_CLIENT_CERT_BYTES>>();
+
+        Tls::CertificateTable::BufferedClientCert clientCertEntry(*clientCertBuffer);
+        Tls::CertificateTable::BufferedRootCert rootCertEntry(*rootCertBuffer);
+
+        if (mTlsCertificateManagementDelegate != nullptr)
+        {
+            auto & table = mTlsCertificateManagementDelegate->GetCertificateTable();
+            table.GetClientCertificateEntry(handler.GetAccessingFabricIndex(), TLSEndpoint.ccdid.Value(), clientCertEntry);
+            table.GetRootCertificateEntry(handler.GetAccessingFabricIndex(), TLSEndpoint.caid, rootCertEntry);
+            mDelegate->SetTLSCerts(clientCertEntry, rootCertEntry);
+        }
+        else
+        {
+            // For tests, create empty cert entries
+            mDelegate->SetTLSCerts(clientCertEntry, rootCertEntry);
+        }
     }
     else
     {
@@ -1163,6 +1182,42 @@ Status PushAvStreamTransportServerLogic::GeneratePushTransportEndEvent(const uin
         return Status::Failure;
     }
     return Status::Success;
+}
+
+Status PushAvStreamTransportServerLogic::NotifyTransportStarted(uint16_t connectionID, TransportTriggerTypeEnum triggerType,
+                                                                Optional<TriggerActivationReasonEnum> activationReason)
+{
+    ChipLogProgress(Zcl, "NotifyTransportStarted called for connectionID %u with triggerType %u", connectionID,
+                    to_underlying(triggerType));
+
+    // Validate that the connection exists
+    TransportConfigurationStorage * transportConfig = FindStreamTransportConnection(connectionID);
+    if (transportConfig == nullptr)
+    {
+        ChipLogError(Zcl, "NotifyTransportStarted: ConnectionID %u not found", connectionID);
+        return Status::NotFound;
+    }
+
+    // Generate the PushTransportBegin event
+    return GeneratePushTransportBeginEvent(connectionID, triggerType, activationReason);
+}
+
+Status PushAvStreamTransportServerLogic::NotifyTransportStopped(uint16_t connectionID, TransportTriggerTypeEnum triggerType,
+                                                                Optional<TriggerActivationReasonEnum> activationReason)
+{
+    ChipLogProgress(Zcl, "NotifyTransportStopped called for connectionID %u with triggerType %u", connectionID,
+                    to_underlying(triggerType));
+
+    // Validate that the connection exists
+    TransportConfigurationStorage * transportConfig = FindStreamTransportConnection(connectionID);
+    if (transportConfig == nullptr)
+    {
+        ChipLogError(Zcl, "NotifyTransportStopped: ConnectionID %u not found", connectionID);
+        return Status::NotFound;
+    }
+
+    // Generate the PushTransportEnd event
+    return GeneratePushTransportEndEvent(connectionID, triggerType, activationReason);
 }
 
 } // namespace Clusters

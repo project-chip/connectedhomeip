@@ -144,6 +144,18 @@ CHIP_ERROR CameraAVStreamManager::ValidateStreamUsage(StreamUsageEnum streamUsag
     return CHIP_NO_ERROR;
 }
 
+const std::vector<chip::app::Clusters::CameraAvStreamManagement::VideoStreamStruct> &
+CameraAVStreamManager::GetAllocatedVideoStreams() const
+{
+    return GetCameraAVStreamMgmtServer()->GetAllocatedVideoStreams();
+}
+
+const std::vector<chip::app::Clusters::CameraAvStreamManagement::AudioStreamStruct> &
+CameraAVStreamManager::GetAllocatedAudioStreams() const
+{
+    return GetCameraAVStreamMgmtServer()->GetAllocatedAudioStreams();
+}
+
 CHIP_ERROR CameraAVStreamManager::ValidateVideoStreamID(uint16_t videoStreamId)
 {
     const std::vector<VideoStreamStruct> & allocatedVideoStreams = GetCameraAVStreamMgmtServer()->GetAllocatedVideoStreams();

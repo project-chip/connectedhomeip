@@ -81,6 +81,8 @@ public:
      */
     EndpointId GetEndpointId() { return AttributeAccessInterface::GetEndpointId().Value(); }
 
+    Tls::CertificateTable & GetCertificateTable() { return mCertificateTable; }
+
 private:
     TlsCertificateManagementDelegate & mDelegate;
     Tls::CertificateTable & mCertificateTable;
@@ -330,6 +332,8 @@ public:
      */
     virtual Protocols::InteractionModel::Status RemoveClientCert(EndpointId matterEndpoint, FabricIndex fabric,
                                                                  Tls::TLSCAID id) = 0;
+
+    Tls::CertificateTable & GetCertificateTable() { return mTlsCertificateManagementServer->GetCertificateTable(); }
 
 protected:
     friend class TlsCertificateManagementServer;

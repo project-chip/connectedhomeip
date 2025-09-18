@@ -14,18 +14,25 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+
 #pragma once
 
-#include <app/clusters/bindings/BindingManager.h>
-#include <app/util/binding-table.h>
+#include <platform/internal/CHIPDeviceLayerInternal.h>
 
-/**
- * @brief appends a binding to the list of bindings
- *        This function is to be used when a device wants to add a binding to its own table
- *        If entry is a unicast binding, BindingManager will be notified and will establish a case session with the peer device
- *        Entry will be added to the binding table and persisted into storage
- *        BindingManager will be notified and the binding added callback will be called if it has been set
- *
- * @param entry binding to add
- */
-CHIP_ERROR AddBindingEntry(const EmberBindingTableEntry & entry);
+namespace chip {
+namespace DeviceLayer {
+
+class FactoryDataDecoder
+{
+public:
+    CHIP_ERROR ReadFactoryData(uint8_t * buffer, uint16_t * pfactorydata_len);
+    CHIP_ERROR DecodeFactoryData(uint8_t * buffer, FactoryData * fdata, uint16_t factorydata_len);
+    static FactoryDataDecoder & GetInstance()
+    {
+        static FactoryDataDecoder instance;
+        return instance;
+    }
+};
+
+} // namespace DeviceLayer
+} // namespace chip

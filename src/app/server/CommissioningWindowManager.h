@@ -27,7 +27,7 @@
 #include <lib/dnssd/Advertiser.h>
 #include <messaging/ExchangeDelegate.h>
 #include <platform/CHIPDeviceConfig.h>
-#include <protocols/secure_channel/RendezvousParameters.h>
+#include <protocols/secure_channel/PASESession.h>
 #include <system/SystemClock.h>
 
 namespace chip {

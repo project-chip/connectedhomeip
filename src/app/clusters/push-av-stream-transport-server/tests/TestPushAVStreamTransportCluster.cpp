@@ -371,6 +371,17 @@ public:
         return CHIP_NO_ERROR;
     }
 
+    void SetTLSCerts(Tls::CertificateTable::BufferedClientCert & clientCertEntry,
+                     Tls::CertificateTable::BufferedRootCert & rootCertEntry) override
+    {
+        // No-op implementation for tests
+    }
+
+    void SetPushAvStreamTransportServer(PushAvStreamTransportServer * server) override
+    {
+        // No-op implementation for tests
+    }
+
 private:
     std::vector<Clusters::PushAvStreamTransport::PushAvStream> pushavStreams;
 };

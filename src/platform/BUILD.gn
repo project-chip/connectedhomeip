@@ -304,6 +304,9 @@ if (chip_device_platform != "none" && chip_device_platform != "external") {
     } else if (chip_device_platform == "realtek_bee") {
       device_layer_target_define = "REALTEK_BEE"
       defines += [ "CHIP_DEVICE_LAYER_TARGET=realtek/BEE" ]
+    } else if (chip_device_platform == "realtek_zephyr") {
+      device_layer_target_define = "REALTEK_ZEPHYR"
+      defines += [ "CHIP_DEVICE_LAYER_TARGET=realtek/zephyr" ]
     } else if (chip_device_platform == "cyw30739") {
       device_layer_target_define = "CYW30739"
       defines += [ "CHIP_DEVICE_LAYER_TARGET=Infineon/CYW30739" ]
@@ -373,6 +376,7 @@ if (chip_device_platform != "none" && chip_device_platform != "external") {
       "ANDROID",
       "AMEBA",
       "REALTEK_BEE",
+      "REALTEK_ZEPHYR",
       "CYW30739",
       "WEBOS",
       "MW320",
@@ -631,6 +635,8 @@ if (chip_device_platform != "none") {
       _platform_target = "Ameba"
     } else if (chip_device_platform == "realtek_bee") {
       _platform_target = "realtek/BEE"
+    } else if (chip_device_platform == "realtek_zephyr") {
+      _platform_target = "realtek/zephyr:realtek_zephyr"
     } else if (chip_device_platform == "webos") {
       _platform_target = "webos"
     } else if (chip_device_platform == "bl602") {

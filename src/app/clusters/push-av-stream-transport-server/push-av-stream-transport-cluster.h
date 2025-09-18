@@ -50,9 +50,59 @@ public:
 
     PushAvStreamTransportServerLogic & GetLogic() { return mLogic; }
 
-    void SetDelegate(PushAvStreamTransportDelegate * delegate) { mLogic.SetDelegate(delegate); }
+    void SetDelegate(PushAvStreamTransportDelegate * delegate)
+    {
+        mLogic.SetDelegate(delegate);
+        if (delegate != nullptr)
+        {
+            delegate->SetPushAvStreamTransportServer(this);
+        }
+    }
 
     void SetTLSClientManagementDelegate(TlsClientManagementDelegate * delegate) { mLogic.SetTLSClientManagementDelegate(delegate); }
+
+    void SetTlsCertificateManagementDelegate(TlsCertificateManagementDelegate * delegate)
+    {
+        mLogic.SetTlsCertificateManagementDelegate(delegate);
+    }
+
+    /**
+     * @brief API for application layer to notify when transport has started
+     *
+     * This should be called by the application layer when a transport begins streaming.
+     * It will generate the appropriate PushTransportBegin event.
+     *
+     * @param connectionID The connection ID of the transport that started
+     * @param triggerType The type of trigger that started the transport
+     * @param activationReason Optional reason for the activation
+     * @return Status::Success if event was generated successfully, failure otherwise
+     */
+    Protocols::InteractionModel::Status
+    NotifyTransportStarted(uint16_t connectionID, PushAvStreamTransport::TransportTriggerTypeEnum triggerType,
+                           Optional<PushAvStreamTransport::TriggerActivationReasonEnum> activationReason =
+                               Optional<PushAvStreamTransport::TriggerActivationReasonEnum>())
+    {
+        return mLogic.NotifyTransportStarted(connectionID, triggerType, activationReason);
+    }
+
+    /**
+     * @brief API for application layer to notify when transport has stopped
+     *
+     * This should be called by the application layer when a transport stops streaming.
+     * It will generate the appropriate PushTransportEnd event.
+     *
+     * @param connectionID The connection ID of the transport that stopped
+     * @param triggerType The type of trigger that started the transport
+     * @param activationReason Optional reason for the deactivation
+     * @return Status::Success if event was generated successfully, failure otherwise
+     */
+    Protocols::InteractionModel::Status
+    NotifyTransportStopped(uint16_t connectionID, PushAvStreamTransport::TransportTriggerTypeEnum triggerType,
+                           Optional<PushAvStreamTransport::TriggerActivationReasonEnum> activationReason =
+                               Optional<PushAvStreamTransport::TriggerActivationReasonEnum>())
+    {
+        return mLogic.NotifyTransportStopped(connectionID, triggerType, activationReason);
+    }
 
     CHIP_ERROR Init() { return mLogic.Init(); }
 
