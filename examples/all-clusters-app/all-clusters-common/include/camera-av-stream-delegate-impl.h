@@ -111,11 +111,9 @@ public:
     // static inline CameraAVStreamManager & GetInstance() { return sCameraAVStreamMgrInstance; }
 
 private:
-    std::vector<VideoStream> videoStreams;             // Vector to hold available video streams
-    std::vector<AudioStream> audioStreams;             // Vector to hold available audio streams
-    std::vector<SnapshotStream> snapshotStreams;       // Vector to hold available snapshot streams
-    std::vector<VideoStreamStruct> videoStreamStructs; // Vector to hold allocated video streams
-    std::vector<AudioStreamStruct> audioStreamStructs; // Vector to hold allocated audio streams
+    std::vector<VideoStream> videoStreams;       // Vector to hold available video streams
+    std::vector<AudioStream> audioStreams;       // Vector to hold available audio streams
+    std::vector<SnapshotStream> snapshotStreams; // Vector to hold available snapshot streams
     void InitializeAvailableVideoStreams();
     void InitializeAvailableAudioStreams();
     void InitializeAvailableSnapshotStreams();

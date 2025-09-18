@@ -145,16 +145,43 @@ CHIP_ERROR CameraAVStreamManager::ValidateStreamUsage(StreamUsageEnum streamUsag
     return CHIP_NO_ERROR;
 }
 
-const std::vector<chip::app::Clusters::CameraAvStreamManagement::VideoStreamStruct> &
-CameraAVStreamManager::GetAllocatedVideoStreams() const
+void CameraAVStreamManager::GetBandwidthForStreams(const Optional<DataModel::Nullable<uint16_t>> & videoStreamId,
+                                                   const Optional<DataModel::Nullable<uint16_t>> & audioStreamId,
+                                                   double & outBandwidthMbps)
 {
-    return GetCameraAVStreamMgmtServer()->GetAllocatedVideoStreams();
-}
 
-const std::vector<chip::app::Clusters::CameraAvStreamManagement::AudioStreamStruct> &
-CameraAVStreamManager::GetAllocatedAudioStreams() const
-{
-    return GetCameraAVStreamMgmtServer()->GetAllocatedAudioStreams();
+    outBandwidthMbps = 0.0;
+    if (videoStreamId.HasValue() && !videoStreamId.Value().IsNull())
+    {
+        uint16_t vStreamId           = videoStreamId.Value().Value();
+        auto & availableVideoStreams = GetCameraAVStreamMgmtServer()->GetAllocatedVideoStreams();
+        for (const chip::app::Clusters::CameraAvStreamManagement::Structs::VideoStreamStruct::Type & stream : availableVideoStreams)
+        {
+            if (stream.videoStreamID == vStreamId)
+            {
+                outBandwidthMbps += (stream.maxBitRate / 1000000.0);
+                ChipLogProgress(Camera, "GetBandwidthForStreams: VideoStream %u maxBitRate: %u bps (%.2f Mbps)", vStreamId,
+                                stream.maxBitRate, (stream.maxBitRate / 1000000.0));
+                break;
+            }
+        }
+    }
+    if (audioStreamId.HasValue() && !audioStreamId.Value().IsNull())
+    {
+        uint16_t aStreamId           = audioStreamId.Value().Value();
+        auto & availableAudioStreams = GetCameraAVStreamMgmtServer()->GetAllocatedAudioStreams();
+        for (const chip::app::Clusters::CameraAvStreamManagement::Structs::AudioStreamStruct::Type & stream : availableAudioStreams)
+        {
+            if (stream.audioStreamID == aStreamId)
+            {
+                outBandwidthMbps += (stream.bitRate / 1000000.0);
+                ChipLogProgress(Camera, "GetBandwidthForStreams: AudioStream %u bitRate: %u bps (%.2f Mbps)", aStreamId,
+                                +stream.bitRate, (stream.bitRate / 1000000.0));
+                break;
+            }
+        }
+    }
+    return;
 }
 
 void CameraAVStreamManager::GetBandwidthForStreams(const Optional<DataModel::Nullable<uint16_t>> & videoStreamId,
