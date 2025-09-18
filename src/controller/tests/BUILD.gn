@@ -36,6 +36,7 @@ chip_test_suite("tests") {
             "TestEventNumberCaching.cpp",
             "TestReadChunking.cpp",
             "TestServerCommandDispatch.cpp",
+
         ]
 
         # At some instances, this Test end ups allocating more than 32 Timers,
