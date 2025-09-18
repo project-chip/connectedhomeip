@@ -43,9 +43,6 @@ class MdnsAsyncServiceInfo(ServiceInfo):
         # AddressResolverIPv6 class which inherits from this class
         if server and not (name and type_):
             super().__init__(type_=server, name=server, server=server)
-            self._name = None
-            self.type = None
-            self.server = server
             return
 
         # Validate a fully qualified service name, instance or subtype
@@ -54,11 +51,6 @@ class MdnsAsyncServiceInfo(ServiceInfo):
 
         super().__init__(type_=type_, name=name, server=server)
 
-        # _name, type, and server must be explicitly set because
-        # the inherited ServiceInfo methods depend on them.
-        self._name = name
-        self.type = type_
-        self.server = server
 
     async def async_request(
         self,
@@ -111,7 +103,7 @@ class MdnsAsyncServiceInfo(ServiceInfo):
         def build_outgoing(as_qu: bool) -> DNSOutgoing:
             out = DNSOutgoing(_FLAGS_QR_QUERY)
             for rtype in self._query_record_types:
-                q = DNSQuestion(self._name, rtype, _CLASS_IN)
+                q = DNSQuestion(self.name, rtype, _CLASS_IN)
                 q.unicast = as_qu
                 out.add_question(q)
             return out
