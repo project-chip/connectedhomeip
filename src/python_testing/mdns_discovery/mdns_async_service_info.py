@@ -51,7 +51,6 @@ class MdnsAsyncServiceInfo(ServiceInfo):
 
         super().__init__(type_=type_, name=name, server=server)
 
-
     async def async_request(
         self,
         zc: Zeroconf,
