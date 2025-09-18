@@ -32,7 +32,6 @@ namespace app {
 namespace Clusters {
 
 // Forward declarations
-class PushAvStreamTransportServerLogic;
 class PushAvStreamTransportServer;
 
 /**
@@ -271,7 +270,14 @@ public:
                              Tls::CertificateTable::BufferedRootCert & rootCertEntry) = 0;
 
     /**
-     * @brief Sets the PushAvStreamTransportServerLogic instance for the delegate.
+     * @brief Delegate callback for notifying that a zone has been triggered.
+     *
+     * @param zoneId The ID of the zone that was triggered.
+     */
+    virtual void OnZoneTriggeredEvent(uint16_t zoneId) = 0;
+
+    /**
+     * @brief Sets the PushAvStreamTransportServer instance for the delegate.
      *
      * This method is called by the PushAvStreamTransportServer to provide
      * the delegate with a pointer to the server instance. This allows the
