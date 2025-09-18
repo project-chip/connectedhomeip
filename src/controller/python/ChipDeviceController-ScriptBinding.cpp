@@ -145,6 +145,8 @@ PyChipError pychip_DeviceController_GetNodeId(chip::Controller::DeviceCommission
 // Rendezvous
 PyChipError pychip_DeviceController_ConnectBLE(chip::Controller::DeviceCommissioner * devCtrl, uint16_t discriminator,
                                                bool isShortDiscriminator, uint32_t setupPINCode, chip::NodeId nodeid);
+PyChipError pychip_DeviceController_ConnectNFC(chip::Controller::DeviceCommissioner * devCtrl, uint16_t discriminator,
+                                               bool isShortDiscriminator, uint32_t setupPINCode, chip::NodeId nodeid);
 PyChipError pychip_DeviceController_ConnectIP(chip::Controller::DeviceCommissioner * devCtrl, const char * peerAddrStr,
                                               uint32_t setupPINCode, chip::NodeId nodeid);
 PyChipError pychip_DeviceController_ConnectWithCode(chip::Controller::DeviceCommissioner * devCtrl, const char * onboardingPayload,
