@@ -20,6 +20,7 @@
 #include <app/clusters/testing/AttributeTesting.h>
 #include <app/server-cluster/AttributeListBuilder.h>
 #include <app/server-cluster/DefaultServerCluster.h>
+#include <app/server-cluster/testing/TestServerClusterContext.h>
 #include <clusters/BooleanState/Attributes.h>
 #include <clusters/BooleanState/Metadata.h>
 
@@ -104,6 +105,9 @@ TEST_F(TestBooleanStateCluster, ReadAttributeTest)
     for (EndpointId endpoint = 0; endpoint < kBooleanStateFixedClusterCount; ++endpoint)
     {
         BooleanStateClusterTest(endpoint).Check([&](BooleanStateCluster & booleanState) {
+            chip::Test::TestServerClusterContext context;
+            EXPECT_EQ(booleanState.Startup(context.Get()), CHIP_NO_ERROR);
+
             DataModel::ReadAttributeRequest request;
             request.path.mEndpointId  = endpoint;
             request.path.mClusterId   = BooleanState::Id;
@@ -133,20 +137,26 @@ TEST_F(TestBooleanStateCluster, StateValue)
     for (EndpointId endpoint = 0; endpoint < kBooleanStateFixedClusterCount; ++endpoint)
     {
         BooleanStateClusterTest(endpoint).Check([](BooleanStateCluster & booleanState) {
-            bool stateValue = false;
-            booleanState.SetStateValue(stateValue);
-            auto stateVal = booleanState.GetStateValue();
-            EXPECT_EQ(stateVal, stateValue);
+            chip::Test::TestServerClusterContext context;
+            EXPECT_EQ(booleanState.Startup(context.Get()), CHIP_NO_ERROR);
 
-            stateValue = true;
-            booleanState.SetStateValue(stateValue);
-            stateVal = booleanState.GetStateValue();
+            bool stateValue  = false;
+            auto eventNumber = booleanState.SetStateValue(stateValue);
+            auto stateVal    = booleanState.GetStateValue();
             EXPECT_EQ(stateVal, stateValue);
+            EXPECT_FALSE(eventNumber.has_value());
 
-            stateValue = false;
-            booleanState.SetStateValue(stateValue);
-            stateVal = booleanState.GetStateValue();
+            stateValue  = true;
+            eventNumber = booleanState.SetStateValue(stateValue);
+            stateVal    = booleanState.GetStateValue();
             EXPECT_EQ(stateVal, stateValue);
+            EXPECT_TRUE(eventNumber.has_value());
+
+            stateValue  = false;
+            eventNumber = booleanState.SetStateValue(stateValue);
+            stateVal    = booleanState.GetStateValue();
+            EXPECT_EQ(stateVal, stateValue);
+            EXPECT_TRUE(eventNumber.has_value());
         });
     }
 }
