@@ -18,6 +18,7 @@
 
 #include "camera-device.h"
 #include <AppMain.h>
+#include <Options.h>
 #include <chrono>
 #include <fcntl.h> // For file descriptor operations
 #include <filesystem>
@@ -65,10 +66,6 @@ struct AudioAppSinkContext
 
 // Using Gstreamer video test source's ball animation pattern for the live streaming visual verification.
 // Refer https://gstreamer.freedesktop.org/documentation/videotestsrc/index.html?gi-language=c#GstVideoTestSrcPattern
-
-#ifdef AV_STREAM_GST_USE_TEST_SRC
-const int kBallAnimationPattern = 18;
-#endif
 
 // Callback function for GStreamer app sink
 GstFlowReturn OnNewVideoSampleFromAppSink(GstAppSink * appsink, gpointer user_data)
@@ -484,13 +481,18 @@ GstElement * CameraDevice::CreateVideoPipeline(const std::string & device, int w
     GstElement * appsink      = gst_element_factory_make("appsink", "appsink");
     GstElement * source       = nullptr;
 
-#ifdef AV_STREAM_GST_USE_TEST_SRC
-    source = gst_element_factory_make("videotestsrc", "source");
-    g_object_set(source, "pattern", kBallAnimationPattern, nullptr);
-#else
-    source = gst_element_factory_make("v4l2src", "source");
-    g_object_set(source, "device", device.c_str(), nullptr);
-#endif
+    if (LinuxDeviceOptions::GetInstance().cameraTestVideosrc)
+    {
+        const int kBallAnimationPattern = 18;
+        source                          = gst_element_factory_make("videotestsrc", "source");
+        g_object_set(source, "pattern", kBallAnimationPattern, nullptr);
+        ChipLogProgress(Camera, "Video piepline: using test video source");
+    }
+    else
+    {
+        source = gst_element_factory_make("v4l2src", "source");
+        g_object_set(source, "device", device.c_str(), nullptr);
+    }
 
     // Check for any nullptr among the created elements
     const std::vector<std::pair<GstElement *, const char *>> elements = {
@@ -554,14 +556,19 @@ GstElement * CameraDevice::CreateAudioPipeline(const std::string & device, int c
 {
     // Pipeline: source → capsfilter → audioconvert → audioresample → opusenc → appsink
     GstElement * pipeline = gst_pipeline_new("audio-pipeline");
+    GstElement * source   = nullptr;
 
-#ifdef AV_STREAM_GST_USE_TEST_SRC
-    GstElement * source = gst_element_factory_make("audiotestsrc", "source");
-    g_object_set(source, "wave", 0, "is-live", TRUE, nullptr); // beep 0
-#else
-    GstElement * source = gst_element_factory_make("pulsesrc", "source");
-    // g_object_set(source, "device", device.c_str(), nullptr);
-#endif
+    if (LinuxDeviceOptions::GetInstance().cameraTestAudiosrc)
+    {
+        source = gst_element_factory_make("audiotestsrc", "source");
+        g_object_set(source, "wave", 0, "is-live", TRUE, nullptr); // beep 0
+        ChipLogProgress(Camera, "Audio piepline: using test audio source");
+    }
+    else
+    {
+        source = gst_element_factory_make("pulsesrc", "source");
+        // g_object_set(source, "device", device.c_str(), nullptr);
+    }
 
     GstElement * acaps   = gst_element_factory_make("capsfilter", "acaps");
     GstElement * aconv   = gst_element_factory_make("audioconvert", "aconv");

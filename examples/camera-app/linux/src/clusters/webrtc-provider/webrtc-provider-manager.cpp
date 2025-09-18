@@ -134,7 +134,8 @@ CHIP_ERROR WebRTCProviderManager::HandleSolicitOffer(const OfferRequestArgs & ar
 
     transport->SetRequestArgs(requestArgs);
     transport->Start();
-    transport->AddTracks();
+    transport->AddAudioTrack();
+    transport->AddVideoTrack();
 
     // Acquire the Video and Audio Streams from the CameraAVStreamManagement
     // cluster and update the reference counts.
@@ -281,12 +282,17 @@ CHIP_ERROR WebRTCProviderManager::HandleProvideOffer(const ProvideOfferRequestAr
 
     transport->SetRequestArgs(requestArgs);
     transport->Start();
+    auto peerConnection  = transport->GetPeerConnection();
     std::string audioMid = ExtractMidFromSdp(args.sdp, "audio");
     std::string videoMid = ExtractMidFromSdp(args.sdp, "video");
+    int videoPt          = peerConnection->GetPayloadType(args.sdp, SDPType::Offer, /*codec*/ "H264");
+    int audioPt          = peerConnection->GetPayloadType(args.sdp, SDPType::Offer, /*codec*/ "opus");
 
-    ChipLogProgress(Camera, "Extracted audioMid: %s, videoMid: %s", audioMid.c_str(), videoMid.c_str());
+    ChipLogProgress(Camera, "Extracted audioMid: %s, payloadType: %d", audioMid.c_str(), audioPt);
+    ChipLogProgress(Camera, "Extracted videoMid: %s, payloadType: %d", videoMid.c_str(), videoPt);
 
-    transport->AddTracks(videoMid, audioMid);
+    transport->AddVideoTrack(videoMid, videoPt);
+    transport->AddAudioTrack(audioMid, audioPt);
 
     // Acquire the Video and Audio Streams from the CameraAVStreamManagement
     // cluster and update the reference counts.
@@ -294,7 +300,7 @@ CHIP_ERROR WebRTCProviderManager::HandleProvideOffer(const ProvideOfferRequestAr
 
     transport->MoveToState(WebrtcTransport::State::SendingAnswer);
 
-    if (transport->GetPeerConnection())
+    if (peerConnection != nullptr)
     {
         transport->GetPeerConnection()->SetRemoteDescription(args.sdp, SDPType::Offer);
         transport->GetPeerConnection()->CreateAnswer();
