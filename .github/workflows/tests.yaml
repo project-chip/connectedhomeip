@@ -43,9 +43,12 @@ env:
     CHIP_NO_LOG_TIMESTAMPS: true
 
 jobs:
+    changed_paths:
+      uses: ./.github/workflows/analyze-changed-paths.yaml
+
     test_suites_linux:
         name: Test Suites - Linux
-
+        needs: changed_paths
         strategy:
             matrix:
                 build_variant: [no-ble-no-shell-tsan-clang]
@@ -58,7 +61,7 @@ jobs:
             DISABLE_CCACHE: ${{ (github.event_name == 'workflow_dispatch' && inputs.disable_ccache == 'true') && 'true' || (contains(github.event.head_commit.message, '[no-ccache]') && 'true') || 'false' }}
             CCACHE_KEY_SUFFIX: ${{ github.event_name == 'workflow_dispatch' && inputs.cache_suffix || '' }}
 
-        if: github.actor != 'restyled-io[bot]'
+        if: github.actor != 'restyled-io[bot]' && needs.changed_paths.outputs.non_md_changes == 'true'
         runs-on: ubuntu-latest
 
         container:
@@ -432,7 +435,7 @@ jobs:
 
     test_suites_darwin:
         name: Test Suites - Darwin
-
+        needs: changed_paths
         strategy:
             matrix:
                 build_variant: [no-ble-no-shell-asan-clang, no-ble-no-shell-tsan-clang]
@@ -443,7 +446,7 @@ jobs:
             TSAN_OPTIONS: "halt_on_error=1"
             LSAN_OPTIONS: detect_leaks=1 suppressions=scripts/tests/chiptest/lsan-mac-suppressions.txt
 
-        if: github.actor != 'restyled-io[bot]'
+        if: github.actor != 'restyled-io[bot]' && needs.changed_paths.outputs.non_md_changes == 'true'
         runs-on: macos-13
 
         steps:
@@ -549,8 +552,8 @@ jobs:
 
     repl_tests_linux:
         name: REPL Tests - Linux
-
-        if: github.actor != 'restyled-io[bot]'
+        needs: changed_paths
+        if: github.actor != 'restyled-io[bot]' && needs.changed_paths.outputs.non_md_changes == 'true'
 
         strategy:
             matrix:
@@ -909,7 +912,7 @@ jobs:
 
     repl_tests_darwin:
         name: REPL Tests - Darwin (Build Only)
-
+        needs: changed_paths
         strategy:
             matrix:
                 build_variant: [no-ble-no-wifi-tsan-clang]
@@ -917,7 +920,7 @@ jobs:
             BUILD_VARIANT: ${{matrix.build_variant}}
             TSAN_OPTIONS: "halt_on_error=1"
 
-        if: github.actor != 'restyled-io[bot]'
+        if: github.actor != 'restyled-io[bot]' && needs.changed_paths.outputs.non_md_changes == 'true'
         runs-on: macos-13
 
         steps:
