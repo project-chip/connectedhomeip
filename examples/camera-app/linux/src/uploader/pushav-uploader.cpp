@@ -32,6 +32,13 @@ PushAVUploader::PushAVUploader() : mIsRunning(false) {}
 
 PushAVUploader::~PushAVUploader()
 {
+    // Ensure final MPD upload during uploader thread termination to persist media data before shutdown.
+    if (!mMPDPath.first.empty() && !mMPDPath.second.empty())
+    {
+        ChipLogProgress(Camera, "Uploading final MPD to server before shutdown");
+        UploadData(mMPDPath);
+    }
+
     Stop();
 }
 
@@ -356,7 +363,7 @@ void PushAVUploader::UploadData(std::pair<std::string, std::string> data)
     }
     else
     {
-        ChipLogError(Camera, "CURL uploaded file  %s size: %ld", data.first.c_str(), size);
+        ChipLogDetail(Camera, "CURL uploaded file  %s size: %ld", data.first.c_str(), size);
     }
     if (upload.mData)
     {
