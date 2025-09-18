@@ -152,6 +152,12 @@ TEST_F(TestBooleanStateCluster, StateValue)
             EXPECT_EQ(stateVal, stateValue);
             EXPECT_TRUE(eventNumber.has_value());
 
+            stateValue  = true;
+            eventNumber = booleanState.SetStateValue(stateValue);
+            stateVal    = booleanState.GetStateValue();
+            EXPECT_EQ(stateVal, stateValue);
+            EXPECT_FALSE(eventNumber.has_value());
+
             stateValue  = false;
             eventNumber = booleanState.SetStateValue(stateValue);
             stateVal    = booleanState.GetStateValue();
