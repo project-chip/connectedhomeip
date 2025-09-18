@@ -185,25 +185,28 @@ class TC_DISHM_2_1(MatterBaseTest):
         # TH sends a ChangeToMode command to the DUT with NewMode set to PIXIT.DISHM.MODE_CHANGE_FAIL
         # NOTE: Skip this step as SDK is not enabled with this failure response
 
-        self.skip_step(7)
-        cmd = cluster.Commands.ChangeToMode(newMode=self.mode_fail)
-        change_to_mode_response = await self.send_single_cmd(cmd=cmd, endpoint=endpoint)
+        if True:
+            self.skip_step(7)
+        else:
+            self.step(7)
+            cmd = cluster.Commands.ChangeToMode(newMode=self.mode_fail)
+            change_to_mode_response = await self.send_single_cmd(cmd=cmd, endpoint=endpoint)
 
-        # DUT responds contains a ChangeToModeResponse command with Status field is set to GenericFailure(0x02), InvalidInMode(0x03), or in the MfgCodes (0x80 to 0xBF) range and StatusText field has a length between 1 and 64
-        asserts.assert_true(matchers.is_type(change_to_mode_response, cluster.Commands.ChangeToModeResponse),
-                            "Unexpected return type for ChangeToMode")
+            # DUT responds contains a ChangeToModeResponse command with Status field is set to GenericFailure(0x02), InvalidInMode(0x03), or in the MfgCodes (0x80 to 0xBF) range and StatusText field has a length between 1 and 64
+            asserts.assert_true(matchers.is_type(change_to_mode_response, cluster.Commands.ChangeToModeResponse),
+                                "Unexpected return type for ChangeToMode")
 
-        logging.info(f"response: {change_to_mode_response}")
+            logging.info(f"response: {change_to_mode_response}")
 
-        st = change_to_mode_response.status
+            st = change_to_mode_response.status
 
-        is_mfg_code = st in range(0x80, 0xC0)
-        is_err_code = (st == CommonCodes.GENERIC_FAILURE.value) or (st == CommonCodes.INVALID_IN_MODE.value) or is_mfg_code
+            is_mfg_code = st in range(0x80, 0xC0)
+            is_err_code = (st == CommonCodes.GENERIC_FAILURE.value) or (st == CommonCodes.INVALID_IN_MODE.value) or is_mfg_code
 
-        asserts.assert_true(is_err_code, f"Changing to mode {self.mode_fail} must fail due to the current state of the device")
+            asserts.assert_true(is_err_code, f"Changing to mode {self.mode_fail} must fail due to the current state of the device")
 
-        st_text_len = len(change_to_mode_response.statusText)
-        asserts.assert_true(st_text_len in range(1, 65), f"StatusText length {st_text_len} must be between 1 and 64")
+            st_text_len = len(change_to_mode_response.statusText)
+            asserts.assert_true(st_text_len in range(1, 65), f"StatusText length {st_text_len} must be between 1 and 64")
 
         # TH reads from the DUT the CurrentMode attribute
         self.step(8)
