@@ -83,7 +83,7 @@ PushAvStreamTransportManager::AllocatePushTransport(const TransportOptionsStruct
     mMediaController->RegisterTransport(mTransportMap[connectionID].get(), transportOptions.videoStreamID.Value().Value(),
                                         transportOptions.audioStreamID.Value().Value());
 
-    // mMediaController->SetPreRollLength(mTransportMap[connectionID].get(), mTransportMap[connectionID].get()->GetPreRollLength());
+    mMediaController->SetPreRollLength(mTransportMap[connectionID].get(), mTransportMap[connectionID].get()->GetPreRollLength());
 #ifdef TLS_CLUSTER_ENABLED
     // TODO: get TLS endpointId from PAVST cluster
     auto & tlsClientManager = mCameraDevice->GetTLSClientMgmtDelegate();
@@ -152,7 +152,6 @@ Protocols::InteractionModel::Status PushAvStreamTransportManager::DeallocatePush
         ChipLogError(Camera, "PushAvStreamTransportManager, failed to find Connection :[%u]", connectionID);
         return Status::NotFound;
     }
-    mTransportMap[connectionID].reset();
     mMediaController->UnregisterTransport(mTransportMap[connectionID].get());
     mTransportMap.erase(connectionID);
     mTransportOptionsMap.erase(connectionID);
@@ -238,6 +237,18 @@ PushAvStreamTransportManager::ValidateBandwidthLimit(StreamUsageEnum streamUsage
     return Status::Success;
 }
 
+bool PushAvStreamTransportManager::ValidateStreamUsage(StreamUsageEnum streamUsage)
+{
+    // TODO: if StreamUsage is present in the StreamUsagePriorities list, return true, false otherwise
+    return true;
+}
+
+bool PushAvStreamTransportManager::ValidateSegmentDuration(uint16_t segmentDuration)
+{
+    // TODO: if Segment Duration is multiple of KeyFrameInterval, return true, false otherwise
+    return true;
+}
+
 bool PushAvStreamTransportManager::ValidateUrl(const std::string & url)
 {
     const std::string https = "https://";
@@ -310,6 +321,40 @@ Protocols::InteractionModel::Status PushAvStreamTransportManager::SelectAudioStr
     }
 
     return Status::Failure;
+}
+
+Protocols::InteractionModel::Status PushAvStreamTransportManager::ValidateZoneId(uint16_t zoneId)
+{
+    if (mCameraDevice == nullptr)
+    {
+        ChipLogError(Camera, "CameraDeviceInterface not initialized");
+        return Status::Failure;
+    }
+    auto & zones = mCameraDevice->GetZoneManagementDelegate().GetZoneMgmtServer()->GetZones();
+
+    for (const auto & zone : zones)
+    {
+        if (zone.zoneID == zoneId)
+        {
+            return Status::Success;
+        }
+    }
+    return Status::Failure;
+}
+
+bool PushAvStreamTransportManager::ValidateMotionZoneSize(uint16_t zoneSize)
+{
+    if (mCameraDevice == nullptr)
+    {
+        ChipLogError(Camera, "CameraDeviceInterface not initialized");
+        return false;
+    }
+    auto maxZones = mCameraDevice->GetZoneManagementDelegate().GetZoneMgmtServer()->GetMaxZones();
+    if (zoneSize >= maxZones)
+    {
+        return false;
+    }
+    return true;
 }
 
 Protocols::InteractionModel::Status PushAvStreamTransportManager::ValidateVideoStream(uint16_t videoStreamId)

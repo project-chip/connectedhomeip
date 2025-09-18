@@ -40,8 +40,9 @@ class PushAVTransport : public Transport
 {
 public:
     PushAVTransport(const chip::app::Clusters::PushAvStreamTransport::TransportOptionsStruct & transportOptions,
-                    const uint16_t connectionID, AudioStreamStruct mAudioStreamParams, VideoStreamStruct mVideoStreamParams);
+                    const uint16_t connectionID, AudioStreamStruct & audioStreamParams, VideoStreamStruct & videoStreamParams);
     ~PushAVTransport() override;
+
     // Send video data for a given stream ID
     void SendVideo(const char * data, size_t size, uint16_t videoStreamID) override;
 
@@ -76,9 +77,9 @@ public:
     } // 0:Active 1:Inactive
 
     void ConfigureRecorderSettings(const chip::app::Clusters::PushAvStreamTransport::TransportOptionsStruct & transportOptions,
-                                   AudioStreamStruct mAudioStreamParams, VideoStreamStruct mVideoStreamParams);
+                                   AudioStreamStruct & audioStreamParams, VideoStreamStruct & videoStreamParams);
 
-    void ModifyPushTransport(const chip::app::Clusters::PushAvStreamTransport::TransportOptionsStorage transportOptions);
+    void ModifyPushTransport(const chip::app::Clusters::PushAvStreamTransport::TransportOptionsStorage & transportOptions);
 
     bool HandleTriggerDetected();
 
@@ -88,27 +89,23 @@ public:
     void SetTLSCertPath(std::string rootCert, std::string devCert, std::string devKey);
 
 private:
-    // bool isRecorderInitialized                   = false;
-    // bool isUploaderInitialized                   = false;
-    bool hasAugmented                            = false;
-    bool mStreaming                              = false;
-    std::unique_ptr<PushAVClipRecorder> recorder = nullptr;
-    std::unique_ptr<PushAVUploader> uploader     = nullptr;
-    std::chrono::steady_clock::time_point blindStartTime;
-    PushAVClipRecorder::ClipInfoStruct clipInfo;
-    PushAVClipRecorder::AudioInfoStruct audioInfo;
-    PushAVClipRecorder::VideoInfoStruct videoInfo;
+    bool mHasAugmented                            = false;
+    bool mStreaming                               = false;
+    std::unique_ptr<PushAVClipRecorder> mRecorder = nullptr;
+    std::unique_ptr<PushAVUploader> mUploader     = nullptr;
+    std::chrono::steady_clock::time_point mBlindStartTime;
+    PushAVClipRecorder::ClipInfoStruct mClipInfo;
+    PushAVClipRecorder::AudioInfoStruct mAudioInfo;
+    PushAVClipRecorder::VideoInfoStruct mVideoInfo;
     PushAVUploader::PushAVCertPath mCertPath;
-    AudioStreamStruct audioStreamParams;
-    VideoStreamStruct videoStreamParams;
+    AudioStreamStruct mAudioStreamParams;
+    VideoStreamStruct mVideoStreamParams;
 
     // Dummy implementation to indicate if video can be sent
     bool mCanSendVideo = false;
 
     // Dummy implementation to indicate if audio can be sent
     bool mCanSendAudio = false;
-
-    // unsigned int mClipId = 0;
 
     // Enum indicating the type of trigger used to start the transport
     chip::app::Clusters::PushAvStreamTransport::TransportStatusEnum mTransportStatus;

@@ -30,7 +30,7 @@
 #       --PICS src/app/tests/suites/certification/ci-pics-values
 #       --trace-to json:${TRACE_TEST_JSON}.json
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
-#       --tests test_TC_IDM_10_2 test_TC_IDM_10_6 test_TC_DESC_2_3
+#       --tests test_TC_IDM_10_2 test_TC_IDM_10_6 test_TC_DESC_2_3 test_TC_IDM_14_1
 #     factory-reset: true
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
@@ -39,6 +39,21 @@
 from test_testing.DeviceConformanceTests import DeviceConformanceTests
 
 from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+
+    def check_root_node_restricted_clusters(self) -> list[ProblemNotice]:
+        # TODO: Are these marked in the spec? Time sync and ACL have specific notes, but can be determine this from the data model files?
+        root_node_restricted_clusters = {Clusters.AccessControl, Clusters.TimeSynchronization,
+                                         Clusters.TlsCertificateManagement, Clusters.TlsClientManagement}
+        problems = []
+        for endpoint_id, endpoint in self.endpoints.items():
+            if endpoint_id == 0:
+                continue
+
+            for cluster in endpoint.keys():
+                if cluster in root_node_restricted_clusters:
+                    problems.append(ProblemNotice("TC-IDM-14.1", location=ClusterPathLocation(endpoint_id=endpoint_id, cluster_id=cluster.id),
+                                                  severity=ProblemSeverity.ERROR, problem=f"Root-node-restricted cluster {cluster} appears on non-root-node endpoint"))
+        return problems
 
 
 class TC_DeviceConformance(MatterBaseTest, DeviceConformanceTests):
@@ -77,6 +92,25 @@ class TC_DeviceConformance(MatterBaseTest, DeviceConformanceTests):
         self.problems.extend(problems)
         if not success:
             self.fail_current_test("Problems with Device type revisions on one or more endpoints")
+
+    def steps_TC_IDM_14_1(self):
+        return [TestStep(0, "TH performs a wildcard read of all attributes and endpoints on the device"),
+                TestStep(1, """ For each root-node-restricted cluster in the list, ensure the cluster does not appear on any endpoint that is not the root node.
+                                List of root-node-restricted clusters:
+
+                                * ACL
+                                * Time Synchronization
+                                * TLS Certificate Management
+                                * TLS Client Management
+                         """, "No root-node-restricted clusters appear on non-root endpoints")]
+
+    def test_TC_IDM_14_1(self):
+        self.step(0)  # wildcard read - done in setup
+        self.step(1)
+        problems = self.check_root_node_restricted_clusters()
+        if problems:
+            self.problems.extend(problems)
+            self.fail_current_test("One or more root-node-restricted clusters appear on non-root-node endpoints")
 
     def steps_TC_DESC_2_3(self):
         return [TestStep(0, "TH performs a wildcard read of all attributes on all endpoints on the device"),

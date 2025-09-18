@@ -1,21 +1,22 @@
 import argparse
+import asyncio
 import datetime
 import json
 import logging
-import multiprocessing
 import os.path
 import pathlib
 import random
+import signal
 import socket
 import ssl
 import string
 import subprocess
 import sys
 import tempfile
+from enum import Enum
 from pathlib import Path
-from typing import Literal, Optional, Union
+from typing import Awaitable, Callable, Literal, Optional
 
-import uvicorn
 from cryptography import x509
 from cryptography.hazmat.primitives import hashes, serialization
 from cryptography.hazmat.primitives.asymmetric import rsa
@@ -26,22 +27,11 @@ from fastapi.responses import FileResponse, HTMLResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from pydantic import BaseModel
-# Monkey patch uvicorn to make the underlying transport available to us.
-# That will let us access the ssl context and get the client certificate information.
-from uvicorn.protocols.http.h11_impl import H11Protocol
 from zeroconf import ServiceInfo, Zeroconf
 
-http_tools_protocol_old__should_upgrade = H11Protocol._should_upgrade
-
-
-def http_tools_protocol_new__should_upgrade(self):
-    http_tools_protocol_old__should_upgrade(self)
-    self.scope["transport"] = self.transport
-
-
-H11Protocol._should_upgrade = http_tools_protocol_new__should_upgrade
-
-# End monkey patch
+module_dir_path = os.path.dirname(os.path.realpath(__file__))
+templates_path = os.path.join(module_dir_path, "templates")
+static_path = os.path.join(module_dir_path, "static")
 
 
 class WorkingDirectory:
@@ -238,9 +228,9 @@ class CAHierarchy:
         self,
         name: str,
         cert: x509.Certificate,
-        key: Union[CertificateIssuerPrivateKeyTypes, None],
+        key: Optional[CertificateIssuerPrivateKeyTypes],
         bundle_root: bool,
-    ) -> tuple[str, str]:
+    ) -> tuple[Optional[Path], Path]:
         """
         Private method that help with saving certificate and key to the hierarchy folder.
         This tool isn't meant to be used in production, but instead to help with development
@@ -250,7 +240,7 @@ class CAHierarchy:
         cert_path = self.directory / f"{name}.pem"
         key_path = self.directory / f"{name}.key" if key else None
 
-        if key:
+        if key and key_path:
             with open(key_path, "wb") as f:
                 f.write(
                     key.private_bytes(
@@ -400,13 +390,20 @@ class SignClientCertificate(BaseModel):
     csr: str
 
 
+class SupportedIngestInterface(str, Enum):
+    cmaf = "cmaf-ingest"
+    dash = "dash"
+    hls = "hls"
+
+
 class PushAvServer:
 
-    templates = Jinja2Templates(directory="templates")
+    templates = Jinja2Templates(directory=templates_path)
 
-    def __init__(self, wd: WorkingDirectory, device_hierarchy: CAHierarchy):
+    def __init__(self, wd: WorkingDirectory, device_hierarchy: CAHierarchy, strict_mode: bool):
         self.wd = wd
         self.device_hierarchy = device_hierarchy
+        self.strict_mode = strict_mode
         self.router = APIRouter()
 
         # UI
@@ -421,13 +418,32 @@ class PushAvServer:
         self.router.add_api_route("/streams", self.create_stream, methods=["POST"], status_code=201)
         self.router.add_api_route("/streams", self.list_streams, methods=["GET"])
         self.router.add_api_route("/streams/probe/{stream_id}/{file_path:path}", self.ffprobe_check, methods=["GET"])
-        self.router.add_api_route("/streams/{stream_id}", self.manifest_upload, methods=["PUT"])
-        self.router.add_api_route("/streams/{stream_id}/{file_path:path}", self.segment_upload, methods=["PUT"], status_code=202)
+
+        # TODO Rename API names to use fragment instead of segment (as this is what is actually being uploaded)
+        self.router.add_api_route("/streams/{stream_id}/{manifest}.{ext}", self.manifest_upload, methods=["PUT"])
+        self.router.add_api_route("/streams/{stream_id}/segment{segment_no}/{track_name}/clip{frag_no}.{frag_ext}",
+                                  self.segment_strict_cmaf_upload, methods=["PUT"], status_code=202)
+        self.router.add_api_route("/streams/{stream_id}/{file_path:path}",
+                                  self.segment_any_upload, methods=["PUT"], status_code=202)
+
         self.router.add_api_route("/streams/{stream_id}/{file_path:path}", self.segment_download, methods=["GET"])
         self.router.add_api_route("/certs", self.list_certs, methods=["GET"], status_code=200)
         self.router.add_api_route("/certs/{hierarchy}/{name}", self.certificate_details, methods=["GET"], status_code=200)
         self.router.add_api_route("/certs/{name}/keypair", self.create_client_keypair, methods=["POST"])
         self.router.add_api_route("/certs/{name}/sign", self.sign_client_certificate, methods=["POST"])
+
+    # Utilities
+
+    def _read_stream_details(self, stream_id: int):
+        p = self.wd.path("streams", str(stream_id), "details.json")
+
+        try:
+            with open(p, 'r') as file:
+                return json.load(file)
+        except FileNotFoundError:
+            raise HTTPException(404, detail="Stream doesn't exists")
+        except Exception as e:
+            raise HTTPException(500, f"An unexpected error occurred: {e}")
 
     # UI website
 
@@ -451,6 +467,9 @@ class PushAvServer:
             p = self.wd.path("streams", str(stream_id), file_path)
             with open(p, "r") as f:
                 context['cert'] = json.load(f)
+        elif file_path == 'details.json':
+            context['type'] = 'details'
+            context['details'] = self._read_stream_details(stream_id)
         else:
             context['type'] = 'media'
             context['probe'] = self.ffprobe_check(stream_id, file_path)
@@ -471,15 +490,20 @@ class PushAvServer:
 
     # APIs
 
-    def create_stream(self):
+    def create_stream(self, interface: Optional[SupportedIngestInterface] = None):
         # Find the last registered stream
         dirs = [d for d in pathlib.Path(self.wd.path("streams")).iterdir() if d.is_dir()]
         last_stream = int(dirs[-1].name) if len(dirs) > 0 else 0
         stream_id = last_stream + 1
 
-        self.wd.mkdir("streams", str(stream_id))
+        # TODO Add option to specify Interface-1, Interface-2 DASH, or I2-HLS to improve the strict mode
+        p = self.wd.mkdir("streams", str(stream_id))
+        stream = {"stream_id": stream_id, "strict_mode": self.strict_mode, "interface": interface}
 
-        return {"stream_id": stream_id}
+        with open(p / "details.json", 'w', encoding='utf-8') as f:
+            json.dump(stream, f, ensure_ascii=False, indent=4)
+
+        return stream
 
     def list_streams(self):
         dirs = [d for d in pathlib.Path(self.wd.path("streams")).iterdir() if d.is_dir()]
@@ -491,28 +515,15 @@ class PushAvServer:
 
         return {"streams": streams}
 
-    async def manifest_upload(self, stream_id: int, req: Request):
-        """The DASH manifest is uploaded onto the base path without any file path"""
+    async def _handle_upload(self, dst: Path, req: Request):
+        """ Handle an upload, sending content to disk at 'dst'.
 
-        # Here we assume that no camera will upload an index.mpd file on their own.
-        # That is something that may not be true, in which case we would have to add
-        # another layer of abstraction on the file system where we can store the mpd
-        # file and the camera direct uploads.
-        return await self.segment_upload("index.mpd", stream_id, req)
-
-    async def segment_upload(self, file_path: str, stream_id: int, req: Request):
-        """Extract the parsed version of a client certificate.
-        See https://docs.python.org/3/library/ssl.html#ssl.SSLSocket.getpeercert
+        Extract the parsed version of a client certificate via a patched TLS
+        extension. See https://docs.python.org/3/library/ssl.html#ssl.SSLSocket.getpeercert
         for the exact content.
         """
-        cert_details = req.scope["transport"].get_extra_info("ssl_object").getpeercert()
 
-        logging.debug(f"segment_upload. stream_id={stream_id} file_path:{file_path}")
-
-        if not self.wd.path("streams", str(stream_id)).exists():
-            raise HTTPException(404, detail="Stream doesn't exists")
-
-        dst = self.wd.mkdir("streams", str(stream_id), file_path, is_file=True)
+        cert_details = req.scope["extensions"]["ssl"]["client_certificate"]
 
         with open(dst.with_suffix(dst.suffix + ".crt"), "w") as f:
             f.write(json.dumps(cert_details))
@@ -522,6 +533,44 @@ class PushAvServer:
                 f.write(chunk)
 
         return Response(status_code=202)
+
+    async def manifest_upload(self, stream_id: int, manifest: str, ext: str, req: Request):
+        """The DASH manifest is uploaded onto the base path without any file path"""
+        stream = self._read_stream_details(stream_id)
+
+        if stream.get('strict_mode', False):
+            iface = stream.get('interface', None)
+            if (iface == SupportedIngestInterface.dash and ext != "mpd" or
+                iface == SupportedIngestInterface.hls and ext != "m3u8" or
+                    iface == SupportedIngestInterface.cmaf):
+                raise HTTPException(404, "Unsupported manifest object extension")
+
+        dst = self.wd.mkdir("streams", str(stream_id), f"{manifest}.{ext}", is_file=True)
+
+        return await self._handle_upload(dst, req)
+
+    async def segment_any_upload(self, file_path: str, stream_id: int, req: Request):
+        logging.debug(f"segment_any_upload. stream_id={stream_id} file_path:{file_path}")
+        stream = self._read_stream_details(stream_id)
+
+        logging.debug(f"stream details = {stream}")
+        if stream.get('strict_mode', False):
+            raise HTTPException(404, "Wrong path. Fragments should follow Matter's specificied path.")
+
+        logging.debug("processing to store field via any_upload")
+        dst = self.wd.mkdir("streams", str(stream_id), file_path, is_file=True)
+
+        return await self._handle_upload(dst, req)
+
+    async def segment_strict_cmaf_upload(self, stream_id: int, segment_no: int, track_name: str, frag_no: int, frag_ext: str, req: Request):
+        logging.debug(
+            f"segment_strict_upload. stream_id={stream_id} segment_no={segment_no}, track_name={track_name}, frag_no={frag_no}, frag_ext={frag_ext}")
+        self._read_stream_details(stream_id)
+
+        dst = self.wd.mkdir("streams", str(stream_id), f"segment{segment_no}",
+                            track_name, f"clip{frag_no}.{frag_ext}", is_file=True)
+
+        return await self._handle_upload(dst, req)
 
     def ffprobe_check(self, stream_id: int, file_path: str):
 
@@ -601,12 +650,12 @@ class PushAvServer:
 class PushAvContext:
     """Hold the context for a full Push AV Server including temporary disk, CA hierarchies and web server"""
 
-    def __init__(self, host: Optional[str], port: Optional[int], working_directory: Optional[str], dns: Optional[str]):
+    def __init__(self, host: Optional[str], port: Optional[int], working_directory: Optional[str], dns: Optional[str], strict_mode: bool):
         self.directory = WorkingDirectory(working_directory)
         self.host = host
         self.port = port
         self.dns = "localhost" if dns is None else f"{dns}._http._tcp_.local."
-        self.proc: multiprocessing.Process | None = None
+        self.strict_mode = strict_mode
 
         # Create CA hierarchies (for webserver and devices)
         self.device_hierarchy = CAHierarchy(self.directory.mkdir("certs", "device"), "device", "client")
@@ -629,45 +678,41 @@ class PushAvContext:
         self.directory.mkdir("streams")
 
         self.app = FastAPI()
-        self.app.mount("/static", StaticFiles(directory="static"), name="static")
-        pas = PushAvServer(self.directory, self.device_hierarchy)
+        self.app.mount("/static", StaticFiles(directory=static_path), name="static")
+        pas = PushAvServer(self.directory, self.device_hierarchy, strict_mode)
         self.app.include_router(pas.router)
 
-    def start_in_background(self):
-        if self.proc:
-            logging.warning("Attempting to start a server when one is already running, no new server is being started.")
-            return
-
+    async def start(self, shutdown_trigger: Optional[Callable[..., Awaitable]] = None,):
+        """
+        Start the PUSH AV server. Note that method do not check if a server is already running.
+        """
         # Advertise over mDNS
         if self.svc_info:
             logging.info("Advertising the service as %s", self.svc_info)
             self.zeroconf.register_service(self.svc_info)
 
-        def background_job():
-            # Start the web server
-            try:
-                uvicorn.run(
-                    self.app,
-                    host=self.host,
-                    port=self.port,
-                    ssl_keyfile=self.server_key_file,
-                    ssl_certfile=self.server_cert_file,
-                    ssl_cert_reqs=ssl.CERT_OPTIONAL,
-                    ssl_ca_certs=self.device_hierarchy.root_cert_path,
-                )
-            finally:
-                if self.svc_info:
-                    self.zeroconf.unregister_service(self.svc_info)
+        # Start the web server
+        from hypercorn.asyncio import serve
+        from hypercorn.config import Config
+        bind = (self.host or "127.0.0.1") + ":" + (str(self.port or 8000))
+        config = Config.from_mapping(
+            bind=bind,
+            quic_bind=bind,
+            alpn_protocols=["h2"],
+            keyfile=self.server_key_file,
+            certfile=self.server_cert_file,
+            ca_certs=self.device_hierarchy.root_cert_path,
+            verify_mode=ssl.CERT_OPTIONAL
+        )
 
-        # Spawning the function results in python not being able to pickle the full context
-        # (most notably cryptography's rust bindings). So instead we force use forks as the
-        # way to create processes.
-        multiprocessing.set_start_method('fork')
-        self.proc = multiprocessing.Process(target=background_job, daemon=True)
-        self.proc.start()
+        try:
+            await serve(self.app, config, shutdown_trigger=shutdown_trigger)
 
-    def terminate(self):
-        self.proc.terminate()
+        finally:
+            if self.svc_info:
+                self.zeroconf.unregister_service(self.svc_info)
+
+    def cleanup(self):
         self.directory.cleanup()
 
 
@@ -677,6 +722,7 @@ if __name__ == "__main__":
         level=logging.DEBUG,
         datefmt="%H:%M:%S",
     )
+    logging.getLogger("hpack").setLevel(logging.WARN)
 
     parser = argparse.ArgumentParser(
         prog="push_av_tool.py",
@@ -693,11 +739,21 @@ if __name__ == "__main__":
     parser.add_argument(
         "--dns", help="A mDNS record to adversise, or none if left empty."
     )
+    parser.add_argument("--strict-mode", action='store_true',
+                        help="When enabled, upload must happen on the path described by the Matter specification")
 
     args = parser.parse_args()
 
-    ctx = PushAvContext(args.host, args.port, args.working_directory, args.dns)
-    ctx.start_in_background()
-    print(ctx.proc)
-    ctx.proc.join()
-    ctx.terminate()
+    ctx = PushAvContext(args.host, args.port, args.working_directory, args.dns, args.strict_mode)
+
+    shutdown_event = asyncio.Event()
+
+    def _signal_handler():
+        print("SIGINT received. Shutting down web server.")
+        shutdown_event.set()
+
+    loop = asyncio.get_event_loop()
+    loop.add_signal_handler(signal.SIGINT, _signal_handler)
+    loop.run_until_complete(ctx.start(shutdown_trigger=shutdown_event.wait))
+
+    ctx.cleanup()

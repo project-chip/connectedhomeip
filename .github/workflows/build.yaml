@@ -43,7 +43,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: ghcr.io/project-chip/chip-build:162
+            image: ghcr.io/project-chip/chip-build:167
             volumes:
                 - "/:/runner-root-volume"
                 - "/tmp/log_output:/tmp/test_logs"
@@ -153,7 +153,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]' && inputs.run-codeql != true
 
         container:
-            image: ghcr.io/project-chip/chip-build:162
+            image: ghcr.io/project-chip/chip-build:167
             volumes:
                 - "/:/runner-root-volume"
                 - "/tmp/log_output:/tmp/test_logs"
@@ -331,7 +331,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]' && inputs.run-codeql != true
 
         container:
-            image: ghcr.io/project-chip/chip-build:162
+            image: ghcr.io/project-chip/chip-build:167
             volumes:
                 - "/:/runner-root-volume"
                 - "/tmp/log_output:/tmp/test_logs"
@@ -365,9 +365,7 @@ jobs:
                   scripts/run_in_build_env.sh 'virtualenv pyenv'
                   source pyenv/bin/activate
                   python -m ensurepip --upgrade
-                  python -m pip install ./out/controller/python/matter_core-1.0.0-cp37-abi3-linux_x86_64.whl
-                  python -m pip install ./out/controller/python/matter_clusters-1.0.0-py3-none-any.whl
-                  python -m pip install ./out/controller/python/matter_repl-1.0.0-py3-none-any.whl
+                  python -m pip install out/controller/python/matter*.whl
 
             - name: Run Python tests
               shell: bash
@@ -396,7 +394,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]' && inputs.run-codeql != true
 
         container:
-            image: ghcr.io/project-chip/chip-build:162
+            image: ghcr.io/project-chip/chip-build:167
             volumes:
                 - "/:/runner-root-volume"
                 - "/tmp/log_output:/tmp/test_logs"
@@ -520,7 +518,7 @@ jobs:
         runs-on: ubuntu-latest
 
         container:
-            image: ghcr.io/project-chip/chip-build:162
+            image: ghcr.io/project-chip/chip-build:167
             options: --privileged --sysctl "net.ipv6.conf.all.disable_ipv6=0
                 net.ipv4.conf.all.forwarding=0 net.ipv6.conf.all.forwarding=0"
 

@@ -118,6 +118,19 @@ public:
     /// In case of errors, this method will log the error and return (error state is not
     /// returned to the caller as it is generally not actionable/fixable)
     static void UnregisterServer(const UnregisterServerOptions & options, Delegate & delegate);
+
+    struct GetClusterForEndpointIndexOptions
+    {
+        EndpointId endpointId;
+        ClusterId clusterId;
+        uint16_t fixedClusterServerEndpointCount; // Number of fixed endpoints in ember configuration.
+        uint16_t maxEndpointCount;                // This is how many endpoints are supported by the delegate (0-based index).
+    };
+
+    /// Calls 'FindRegistration' on the delegate and returns the address of the cluster for an endpoint index or nullptr if not
+    /// found.
+    static ServerClusterInterface * GetClusterForEndpointIndex(const GetClusterForEndpointIndexOptions & options,
+                                                               Delegate & delegate);
 };
 
 } // namespace chip::app

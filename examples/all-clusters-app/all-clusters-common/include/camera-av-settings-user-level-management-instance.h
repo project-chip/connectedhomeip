@@ -32,6 +32,8 @@ public:
     AVSettingsUserLevelManagementDelegate()  = default;
     ~AVSettingsUserLevelManagementDelegate() = default;
 
+    void ShutdownApp() override;
+
     bool CanChangeMPTZ() override;
 
     CHIP_ERROR LoadMPTZPresets(std::vector<MPTZPresetHelper> & mptzPresetHelpers) override;
@@ -42,15 +44,22 @@ public:
     virtual void VideoStreamDeallocated(uint16_t aStreamID) override;
     virtual void DefaultViewportUpdated(Globals::Structs::ViewportStruct::Type aViewport) override;
 
+    // To be invoked by the Camera App once a physical PTZ action has been completed.  This is expected to be a discrete period of
+    // time after a request is made for PTZ via the HAL.  This results in the request command receiving an appropriate status
+    // response.
+    void OnPhysicalMoveCompleted(Protocols::InteractionModel::Status status);
+
+    void CancelActiveTimers();
+
     /**
      * delegate command handlers
      */
-    Protocols::InteractionModel::Status MPTZSetPosition(Optional<int16_t> aPan, Optional<int16_t> aTilt,
-                                                        Optional<uint8_t> aZoom) override;
-    Protocols::InteractionModel::Status MPTZRelativeMove(Optional<int16_t> aPan, Optional<int16_t> aTilt,
-                                                         Optional<uint8_t> aZoom) override;
+    Protocols::InteractionModel::Status MPTZSetPosition(Optional<int16_t> aPan, Optional<int16_t> aTilt, Optional<uint8_t> aZoom,
+                                                        PhysicalPTZCallback * callback) override;
+    Protocols::InteractionModel::Status MPTZRelativeMove(Optional<int16_t> aPan, Optional<int16_t> aTilt, Optional<uint8_t> aZoom,
+                                                         PhysicalPTZCallback * callback) override;
     Protocols::InteractionModel::Status MPTZMoveToPreset(uint8_t aPreset, Optional<int16_t> aPan, Optional<int16_t> aTilt,
-                                                         Optional<uint8_t> aZoom) override;
+                                                         Optional<uint8_t> aZoom, PhysicalPTZCallback * callback) override;
     Protocols::InteractionModel::Status MPTZSavePreset(uint8_t aPreset) override;
     Protocols::InteractionModel::Status MPTZRemovePreset(uint8_t aPreset) override;
     Protocols::InteractionModel::Status DPTZSetViewport(uint16_t aVideoStreamID,
@@ -58,6 +67,9 @@ public:
     Protocols::InteractionModel::Status DPTZRelativeMove(uint16_t aVideoStreamID, Optional<int16_t> aDeltaX,
                                                          Optional<int16_t> aDeltaY, Optional<int8_t> aZoomDelta,
                                                          Globals::Structs::ViewportStruct::Type & aViewport) override;
+
+private:
+    PhysicalPTZCallback * mCallback = nullptr;
 };
 
 void Shutdown();

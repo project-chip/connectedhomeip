@@ -588,6 +588,7 @@ class PrebuiltDataModelDirectory(Enum):
     k1_4 = auto()
     k1_4_1 = auto()
     k1_4_2 = auto()
+    k1_5 = auto()
 
     @property
     def dirname(self):
@@ -601,6 +602,8 @@ class PrebuiltDataModelDirectory(Enum):
             return "1.4.1"
         if self == PrebuiltDataModelDirectory.k1_4_2:
             return "1.4.2"
+        if self == PrebuiltDataModelDirectory.k1_5:
+            return "1.5"
         raise KeyError("Invalid enum: %r" % self)
 
 
@@ -944,8 +947,16 @@ def parse_single_device_type(root: ElementTree.Element, cluster_definition_xml: 
                         try:
                             name = e.attrib['name']
                         except KeyError:
+                            if override_element_type == 'feature':
+                                try:
+                                    name = e.attrib['code']
+                                except KeyError:
+                                    name = None
+                            else:
+                                name = None
+                        if name is None:
                             problems.append(ProblemNotice("Parse Device Type XML", location=location,
-                                            severity=ProblemSeverity.WARNING, problem=f"Missing {override_element_type} name for override in cluster 0x{cid:04X}, e={str(e)}"))
+                                            severity=ProblemSeverity.WARNING, problem=f"Missing {override_element_type} name for override in cluster 0x{cid:04X}, e={str(e.attrib)}"))
                             continue
 
                         try:
@@ -964,7 +975,7 @@ def parse_single_device_type(root: ElementTree.Element, cluster_definition_xml: 
                                         f"Ignoring unknown {override_element_type} {name} in cluster {cid} because the conformance is disallowed")
                                     continue
                                 problems.append(ProblemNotice("Parse Device Type XML", location=location,
-                                                severity=ProblemSeverity.WARNING, problem=f"Unknown {override_element_type} {name} in cluster 0x{cid:04X} - map = {map}"))
+                                                severity=ProblemSeverity.WARNING, problem=f"Unknown {override_element_type} {name} in cluster 0x{cid:04X} - map = {map_id}"))
                             else:
                                 override[map_id[0]] = conformance_override
 
@@ -1057,7 +1068,8 @@ def dm_from_spec_version(specification_version: uint) -> PrebuiltDataModelDirect
     version_to_dm = {0x01030000: PrebuiltDataModelDirectory.k1_3,
                      0x01040000: PrebuiltDataModelDirectory.k1_4,
                      0x01040100: PrebuiltDataModelDirectory.k1_4_1,
-                     0x01040200: PrebuiltDataModelDirectory.k1_4_2}
+                     0x01040200: PrebuiltDataModelDirectory.k1_4_2,
+                     0x01050000: PrebuiltDataModelDirectory.k1_5, }
 
     if specification_version not in version_to_dm.keys():
         raise ConformanceException(f"Unknown specification_version 0x{specification_version:08X}")

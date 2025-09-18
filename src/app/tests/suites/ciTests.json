@@ -8,6 +8,7 @@
         "Test_TC_ACL_2_6",
         "Test_TC_ACL_2_7",
         "Test_TC_ACL_2_8",
+        "Test_TC_ACL_2_9",
         "Test_TC_ACL_2_10"
     ],
     "ContentAppObserver": [],

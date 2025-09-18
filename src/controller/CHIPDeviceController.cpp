@@ -70,6 +70,10 @@
 #include <transport/raw/WiFiPAF.h>
 #endif
 
+#if CHIP_DEVICE_CONFIG_ENABLE_NFC_BASED_COMMISSIONING
+#include <platform/internal/NFCCommissioningManager.h>
+#endif
+
 #include <algorithm>
 #include <array>
 #include <errno.h>
@@ -632,6 +636,16 @@ void DeviceCommissioner::ReleaseCommissioneeDevice(CommissioneeDeviceProxy * dev
         mSystemState->BleLayer()->CloseAllBleConnections();
     }
 #endif
+
+#if CHIP_DEVICE_CONFIG_ENABLE_NFC_BASED_COMMISSIONING
+    Nfc::NFCReaderTransport * readerTransport = DeviceLayer::Internal::NFCCommissioningMgr().GetNFCReaderTransport();
+    if (readerTransport)
+    {
+        ChipLogProgress(Controller, "Stopping discovery of all NFC tags");
+        readerTransport->StopDiscoveringTags();
+    }
+#endif
+
     // Make sure that there will be no dangling pointer
     if (mDeviceInPASEEstablishment == device)
     {
@@ -1070,6 +1084,49 @@ DeviceCommissioner::ContinueCommissioningAfterDeviceAttestation(DeviceProxy * de
     }
     return CHIP_NO_ERROR;
 }
+
+#if CHIP_DEVICE_CONFIG_ENABLE_NFC_BASED_COMMISSIONING
+CHIP_ERROR DeviceCommissioner::ContinueCommissioningAfterConnectNetworkRequest(NodeId remoteDeviceId)
+{
+    MATTER_TRACE_SCOPE("continueCommissioningAfterConnectNetworkRequest", "DeviceCommissioner");
+
+    if (mDefaultCommissioner == nullptr)
+    {
+        ChipLogError(Controller, "No default commissioner is specified");
+        return CHIP_ERROR_INCORRECT_STATE;
+    }
+
+    // Move to kEvictPreviousCaseSessions stage since the next stage will be to find the device
+    // on the operational network
+    mCommissioningStage = CommissioningStage::kEvictPreviousCaseSessions;
+
+    // Setup device being commissioned
+    CommissioneeDeviceProxy * device = nullptr;
+    if (!mDeviceBeingCommissioned)
+    {
+        device = mCommissioneeDevicePool.CreateObject();
+        if (!device)
+            return CHIP_ERROR_NO_MEMORY;
+
+        Transport::PeerAddress peerAddress = Transport::PeerAddress::UDP(Inet::IPAddress::Any);
+        device->Init(GetControllerDeviceInitParams(), remoteDeviceId, peerAddress);
+        mDeviceBeingCommissioned = device;
+    }
+
+    mDefaultCommissioner->SetOperationalCredentialsDelegate(mOperationalCredentialsDelegate);
+
+    ChipLogProgress(Controller, "Continuing commissioning after connect to network complete for device ID 0x" ChipLogFormatX64,
+                    ChipLogValueX64(remoteDeviceId));
+
+    MATTER_LOG_METRIC_BEGIN(kMetricDeviceCommissioningOperationalSetup);
+    CHIP_ERROR err = mDefaultCommissioner->StartCommissioning(this, device);
+    if (err != CHIP_NO_ERROR)
+    {
+        MATTER_LOG_METRIC_END(kMetricDeviceCommissioningOperationalSetup, err);
+    }
+    return err;
+}
+#endif
 
 CHIP_ERROR DeviceCommissioner::StopPairing(NodeId remoteDeviceId)
 {
@@ -2302,6 +2359,8 @@ void DeviceCommissioner::ContinueReadingCommissioningInfo(const CommissioningPar
                                                 Clusters::GeneralCommissioning::Attributes::RegulatoryConfig::Id));
         VerifyOrReturn(builder.AddAttributePath(kRootEndpointId, Clusters::GeneralCommissioning::Id,
                                                 Clusters::GeneralCommissioning::Attributes::LocationCapability::Id));
+        VerifyOrReturn(builder.AddAttributePath(kRootEndpointId, Clusters::GeneralCommissioning::Id,
+                                                Clusters::GeneralCommissioning::Attributes::IsCommissioningWithoutPower::Id));
 
         // Basic Information: VID and PID for device attestation purposes
         VerifyOrReturn(builder.AddAttributePath(kRootEndpointId, Clusters::BasicInformation::Id,
@@ -2456,6 +2515,13 @@ CHIP_ERROR DeviceCommissioner::ParseGeneralCommissioningInfo(ReadCommissioningIn
     {
         ChipLogError(Controller, "Ignoring failure to read SupportsConcurrentConnection: %" CHIP_ERROR_FORMAT, err.Format());
         info.supportsConcurrentConnection = true; // default to true (concurrent), not a fatal error
+    }
+
+    err = mAttributeCache->Get<IsCommissioningWithoutPower::TypeInfo>(kRootEndpointId, info.general.isCommissioningWithoutPower);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Controller, "Ignoring failure to read IsCommissioningWithoutPower: %" CHIP_ERROR_FORMAT, err.Format());
+        info.general.isCommissioningWithoutPower = false; // default to false, not a fatal error
     }
 
     return return_err;
@@ -3761,6 +3827,12 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
         }
     }
     break;
+#if CHIP_DEVICE_CONFIG_ENABLE_NFC_BASED_COMMISSIONING
+    case CommissioningStage::kUnpoweredPhaseComplete:
+        ChipLogProgress(Controller, "Completed unpowered commissioning phase, marking commissioning as complete");
+        CommissioningStageComplete(CHIP_NO_ERROR);
+        break;
+#endif
     case CommissioningStage::kCleanup:
         CleanupCommissioning(proxy, proxy->GetDeviceId(), params.GetCompletionStatus());
         break;

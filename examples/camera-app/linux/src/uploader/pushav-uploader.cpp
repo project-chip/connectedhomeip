@@ -75,7 +75,7 @@ void PushAVUploader::Stop()
 
 void PushAVUploader::AddUploadData(std::string & filename, std::string & url)
 {
-    ChipLogError(Camera, "Added file name %s to queue", filename.c_str());
+    ChipLogProgress(Camera, "Added file name %s to queue", filename.c_str());
     std::lock_guard<std::mutex> lock(mQueueMutex);
     auto data = make_pair(filename, url);
     mAvData.push(data);
@@ -138,7 +138,21 @@ void PushAVUploader::UploadData(std::pair<std::string, std::string> data)
     upload.mBytesRead           = 0;
     struct curl_slist * headers = nullptr;
     headers                     = curl_slist_append(headers, "Content-Type: application/*");
-    std::string fullUrl         = data.second + data.first;
+
+    // Extract just the filename from the full path
+    std::string fullPath = data.first;
+    std::string filename = fullPath.substr(fullPath.find_last_of("/\\") + 1);
+
+    // Construct the URL with just the filename
+    std::string baseUrl = data.second;
+    if (baseUrl.back() != '/')
+    {
+        baseUrl += "/";
+    }
+    std::string fullUrl = baseUrl + filename;
+
+    ChipLogProgress(Camera, "Uploading file: %s to URL: %s", filename.c_str(), fullUrl.c_str());
+
     curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
     curl_easy_setopt(curl, CURLOPT_URL, fullUrl.c_str());
     curl_easy_setopt(curl, CURLOPT_HTTP_VERSION, CURL_HTTP_VERSION_2_0);

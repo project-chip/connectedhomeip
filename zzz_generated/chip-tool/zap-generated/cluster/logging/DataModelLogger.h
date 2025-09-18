@@ -1151,9 +1151,8 @@ LogValue(const char * label, size_t indent,
 static CHIP_ERROR
 LogValue(const char * label, size_t indent,
          const chip::app::Clusters::TlsCertificateManagement::Commands::LookupRootCertificateResponse::DecodableType & value);
-static CHIP_ERROR
-LogValue(const char * label, size_t indent,
-         const chip::app::Clusters::TlsCertificateManagement::Commands::TLSClientCSRResponse::DecodableType & value);
+static CHIP_ERROR LogValue(const char * label, size_t indent,
+                           const chip::app::Clusters::TlsCertificateManagement::Commands::ClientCSRResponse::DecodableType & value);
 static CHIP_ERROR
 LogValue(const char * label, size_t indent,
          const chip::app::Clusters::TlsCertificateManagement::Commands::FindClientCertificateResponse::DecodableType & value);
