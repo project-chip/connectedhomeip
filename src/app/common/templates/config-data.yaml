@@ -132,9 +132,6 @@ ClustersWithPreAttributeChangeFunctions:
 # in the cluster's respective CodgenIntegration.cpp file.
 CodeDrivenClusters:
     - Binding
-    - Network Commissioning
-    - Soil Measurement
-    - WebRTC Transport Requestor
     - Wi-Fi Network Diagnostics
     - Administrator Commissioning
     - Group Key Management
