@@ -77,6 +77,13 @@ enum class StreamAllocationAction
     kReuse          // Reusing existing stream without changes - no action needed
 };
 
+enum class StreamType
+{
+    kAudio,
+    kVideo,
+    kSnapshot
+};
+
 class CameraAVStreamMgmtServer;
 
 // ImageSnapshot response data for a CaptureSnapshot command.
@@ -176,6 +183,17 @@ public:
      */
     virtual Protocols::InteractionModel::Status AudioStreamDeallocate(const uint16_t streamID) = 0;
 
+    struct SnapshotStreamAllocateArgs
+    {
+        ImageCodecEnum imageCodec;
+        uint16_t maxFrameRate;
+        Structs::VideoResolutionStruct::Type minResolution;
+        Structs::VideoResolutionStruct::Type maxResolution;
+        uint8_t quality;
+        Optional<bool> watermarkEnabled;
+        Optional<bool> OSDEnabled;
+    };
+
     /**
      *   @brief Handle Command Delegate for Snapshot stream allocation.
      *
@@ -190,7 +208,7 @@ public:
      *   produced; otherwise, the command SHALL be rejected with an appropriate
      *   error.
      */
-    virtual Protocols::InteractionModel::Status SnapshotStreamAllocate(const SnapshotStreamStruct & allocateArgs,
+    virtual Protocols::InteractionModel::Status SnapshotStreamAllocate(const SnapshotStreamAllocateArgs & allocateArgs,
                                                                        uint16_t & outStreamID) = 0;
 
     /**
@@ -278,6 +296,26 @@ public:
      *
      */
     virtual CHIP_ERROR OnTransportReleaseAudioVideoStreams(uint16_t audioStreamID, uint16_t videoStreamID) = 0;
+
+    /**
+     * @brief Provides read-only access to the list of currently allocated video streams.
+     * This allows other components (like PushAVStreamTransportManager) to query
+     * allocated stream parameters (e.g., for bandwidth calculation) without directly
+     * accessing the CameraAVStreamMgmtServer instance.
+     *
+     * @return A const reference to the vector of allocated video stream structures.
+     */
+    virtual const std::vector<VideoStreamStruct> & GetAllocatedVideoStreams() const = 0;
+
+    /**
+     * @brief Provides read-only access to the list of currently allocated audio streams.
+     * This allows other components (like PushAVStreamTransportManager) to query
+     * allocated stream parameters (e.g., for bandwidth calculation) without directly
+     * accessing the CameraAVStreamMgmtServer instance.
+     *
+     * @return A const reference to the vector of allocated audio stream structures.
+     */
+    virtual const std::vector<AudioStreamStruct> & GetAllocatedAudioStreams() const = 0;
 
 private:
     friend class CameraAVStreamMgmtServer;
@@ -535,7 +573,7 @@ public:
     CHIP_ERROR AddSnapshotStream(const SnapshotStreamStruct & snapshotStream);
 
     CHIP_ERROR UpdateSnapshotStreamRangeParams(SnapshotStreamStruct & snapshotStreamToUpdate,
-                                               const SnapshotStreamStruct & snapshotStream);
+                                               const CameraAVStreamMgmtDelegate::SnapshotStreamAllocateArgs & snapshotStream);
 
     CHIP_ERROR RemoveSnapshotStream(uint16_t snapshotStreamId);
 
@@ -544,6 +582,21 @@ public:
     CHIP_ERROR UpdateAudioStreamRefCount(uint16_t audioStreamId, bool shouldIncrement);
 
     CHIP_ERROR UpdateSnapshotStreamRefCount(uint16_t snapshotStreamId, bool shouldIncrement);
+
+    constexpr const char * StreamTypeToString(StreamType type)
+    {
+        switch (type)
+        {
+        case StreamType::kVideo:
+            return "Video";
+        case StreamType::kAudio:
+            return "Audio";
+        case StreamType::kSnapshot:
+            return "Snapshot";
+        default:
+            return "Unknown";
+        }
+    };
 
 private:
     CameraAVStreamMgmtDelegate & mDelegate;
@@ -617,6 +670,66 @@ private:
         return CHIP_NO_ERROR;
     }
 
+    template <typename StreamContainer, typename IdGetter>
+    bool ValidateStreamForModifyOrDeallocateImpl(StreamContainer & streams, uint16_t streamID, HandlerContext & ctx,
+                                                 StreamType streamType, IdGetter id_getter, bool isDeallocate)
+    {
+        auto it = std::find_if(streams.begin(), streams.end(), [&](const auto & stream) { return id_getter(stream) == streamID; });
+
+        if (it == streams.end())
+        {
+            ChipLogError(Zcl, "CameraAVStreamMgmt[ep=%d]: %s stream with ID: %u not found", mEndpointId,
+                         StreamTypeToString(streamType), streamID);
+            ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Protocols::InteractionModel::Status::NotFound);
+            return false;
+        }
+
+        if (isDeallocate && it->referenceCount > 0)
+        {
+            ChipLogError(Zcl, "CameraAVStreamMgmt[ep=%d]: %s stream with ID: %u still in use", mEndpointId,
+                         StreamTypeToString(streamType), streamID);
+            ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Protocols::InteractionModel::Status::InvalidInState);
+            return false;
+        }
+
+        using StreamValueType = typename StreamContainer::value_type;
+        if constexpr (std::is_same_v<StreamValueType, VideoStreamStruct> || std::is_same_v<StreamValueType, AudioStreamStruct>)
+        {
+            if (it->streamUsage == Globals::StreamUsageEnum::kInternal)
+            {
+                ChipLogError(Zcl, "CameraAVStreamMgmt[ep=%d]: %s stream with ID: %u is Internal", mEndpointId,
+                             StreamTypeToString(streamType), streamID);
+                ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Protocols::InteractionModel::Status::DynamicConstraintError);
+                return false;
+            }
+        }
+
+        // For SnapshotStreamModify, check against the corresponding
+        // SnapshotStreamStruct for requiresHardwareEncoder.
+        if constexpr (std::is_same_v<StreamValueType, SnapshotStreamStruct>)
+        {
+            if (!isDeallocate)
+            {
+                auto sn_capab_it =
+                    std::find_if(mSnapshotCapabilitiesList.begin(), mSnapshotCapabilitiesList.end(), [&](const auto & capability) {
+                        return capability.imageCodec == it->imageCodec && capability.maxFrameRate > it->frameRate;
+                    });
+                if (sn_capab_it != mSnapshotCapabilitiesList.end() && sn_capab_it->requiresHardwareEncoder.HasValue() &&
+                    !sn_capab_it->requiresHardwareEncoder.Value())
+                {
+                    ChipLogError(Zcl,
+                                 "CameraAVStreamMgmt[ep=%d]: Snapshot stream with ID: %u based off an underlying video stream and "
+                                 "not modifiable",
+                                 mEndpointId, streamID);
+                    ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Protocols::InteractionModel::Status::DynamicConstraintError);
+                    return false;
+                }
+            }
+        }
+
+        return true;
+    }
+
     bool IsBitDepthValid(uint8_t bitDepth) { return (bitDepth == 8 || bitDepth == 16 || bitDepth == 24 || bitDepth == 32); }
 
     /**
@@ -688,6 +801,12 @@ private:
     bool CheckSnapshotStreamsAvailability(HandlerContext & ctx);
 
     bool ValidateSnapshotStreamId(const DataModel::Nullable<uint16_t> & snapshotStreamID, HandlerContext & ctx);
+
+    bool ValidateVideoStreamForModifyOrDeallocate(const uint16_t videoStreamID, HandlerContext & ctx, bool isDeallocate);
+
+    bool ValidateAudioStreamForDeallocate(const uint16_t audioStreamID, HandlerContext & ctx);
+
+    bool ValidateSnapshotStreamForModifyOrDeallocate(const uint16_t snapshotStreamID, HandlerContext & ctx, bool isDeallocate);
 };
 
 } // namespace CameraAvStreamManagement

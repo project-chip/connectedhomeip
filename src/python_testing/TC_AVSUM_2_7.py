@@ -65,6 +65,8 @@ class TC_AVSUM_2_7(MatterBaseTest, AVSUMTestBase):
             TestStep(12, "Read the DPTZStreams attribute, verify that the response contains an entry with the allocated stream ID and the viewport from step 10"),
             TestStep(13, "Modify the valid viewport so that the aspect ratio is invalid"),
             TestStep(14, "Send DPTZSetVieport with a the viewport created in Step 10. Verify ConstraintError response"),
+            TestStep(15, "Send a VideoStreamDeallocate command to AVStreamManagement to de-allocate the video stream allocated in step 5. Verify success"),
+            TestStep(16, "Read the DPTZStreams attribute, verify that the response does not contain any entry with the allocated stream ID from step 5"),
         ]
         return steps
 
@@ -146,6 +148,15 @@ class TC_AVSUM_2_7(MatterBaseTest, AVSUMTestBase):
             x1=x1, y1=viewportheight//2, x2=sensordimensions.sensorWidth, y2=viewportheight)
         self.step(14)
         await self.send_dptz_set_viewport_command(endpoint, videoStreamID, failingviewport, expected_status=Status.ConstraintError)
+
+        self.step(15)
+        # De-allocate the stream
+        await self.send_single_cmd(endpoint=endpoint, cmd=Clusters.CameraAvStreamManagement.Commands.VideoStreamDeallocate(videoStreamID=videoStreamID))
+
+        self.step(16)
+        dptz_streams = await self.read_avsum_attribute_expect_success(endpoint, Clusters.Objects.CameraAvSettingsUserLevelManagement.Attributes.DPTZStreams)
+        stream_is_present = any(s.videoStreamID == videoStreamID for s in dptz_streams)
+        asserts.assert_false(stream_is_present, "Video stream deallocation not updated in DPTZStreams")
 
 
 if __name__ == "__main__":

@@ -100,6 +100,16 @@ Protocols::InteractionModel::Status PushAvStreamTransportManager::ManuallyTrigge
     return Status::Success;
 }
 
+bool PushAvStreamTransportManager::ValidateStreamUsage(StreamUsageEnum streamUsage)
+{
+    return true;
+}
+
+bool PushAvStreamTransportManager::ValidateSegmentDuration(uint16_t segmentDuration)
+{
+    return true;
+}
+
 Protocols::InteractionModel::Status
 PushAvStreamTransportManager::ValidateBandwidthLimit(StreamUsageEnum streamUsage,
                                                      const Optional<DataModel::Nullable<uint16_t>> & videoStreamId,
@@ -143,6 +153,20 @@ Protocols::InteractionModel::Status PushAvStreamTransportManager::ValidateAudioS
     // TODO: Validate audioStreamID from the allocated audioStreams
     // Returning Status::Success to pass through checks in the Server Implementation.
     return Status::Success;
+}
+
+Protocols::InteractionModel::Status PushAvStreamTransportManager::ValidateZoneId(uint16_t zoneId)
+{
+    // TODO: Validate zoneId from the allocated zones
+    // Returning Status::Success to pass through checks in the Server Implementation.
+    return Status::Success;
+}
+
+bool PushAvStreamTransportManager::ValidateMotionZoneSize(uint16_t zoneSize)
+{
+    // TODO: Validate motion zone size
+    // Returning true to pass through checks in the Server Implementation.
+    return true;
 }
 
 PushAvStreamTransportStatusEnum PushAvStreamTransportManager::GetTransportBusyStatus(const uint16_t connectionID)

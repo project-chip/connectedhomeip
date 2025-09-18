@@ -93,9 +93,10 @@ mcxw71_sdk("sdk") {
   if (nxp_multiple_ble_connections) {
     include_dirs += [ "${example_platform_dir}/app_ble/include" ]
     defines += [
-      "EXTRA_GATT_DB_HEADER=\"extra_gatt_db.h\"",
-      "EXTRA_GATT_UUID_HEADER=\"extra_gatt_uuid128.h\"",
+      "CONFIG_CHIP_APP_EXTRA_GATT_DB_HEADER=\"extra_gatt_db.h\"",
+      "CONFIG_CHIP_APP_EXTRA_GATT_UUID_HEADER=\"extra_gatt_uuid128.h\"",
     ]
+    sources += [ "${support_common_platform_dir}/ble/ble_nvm_bonding.c" ]
   }
 }
 
@@ -199,8 +200,9 @@ mcxw71_executable("lock_app") {
   }
 
   if (nxp_multiple_ble_connections) {
-    sources +=
-        [ "${example_platform_dir}/app_ble/source/BLEApplicationManager.cpp" ]
+    sources += [
+      "${common_example_dir}/app_ble/source/NXPHostBLEApplicationManager.cpp",
+    ]
   } else {
     sources += [
       "${common_example_dir}/app_ble/source/BLEApplicationManagerEmpty.cpp",
