@@ -2434,12 +2434,12 @@ bool CameraAVStreamMgmtServer::IsResourceAvailableForStreamAllocation(uint32_t c
     uint32_t totalEncodedPixelRate = candidateEncodedPixelRate;
     uint16_t totalEncodersRequired = encoderRequired ? 1 : 0;
 
-    for (VideoStreamStruct & stream : mAllocatedVideoStreams)
+    for (const VideoStreamStruct & stream : mAllocatedVideoStreams)
     {
         totalEncodedPixelRate += (stream.maxFrameRate * stream.maxResolution.height * stream.maxResolution.width);
     }
 
-    for (SnapshotStreamStruct & stream : mAllocatedSnapshotStreams)
+    for (const SnapshotStreamStruct & stream : mAllocatedSnapshotStreams)
     {
         if (stream.encodedPixels)
         {

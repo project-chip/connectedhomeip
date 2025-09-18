@@ -177,7 +177,6 @@ class TC_AVSM_2_2(MatterBaseTest):
             asserts.assert_is_not_none(
                 snpStreamAllocateResponse.snapshotStreamID, "SnapshotStreamAllocateResponse does not contain StreamID"
             )
-            aStreamID = snpStreamAllocateResponse.snapshotStreamID
         except InteractionModelError as e:
             asserts.assert_equal(e.status, Status.Success, "Unexpected error returned")
             pass
@@ -333,7 +332,6 @@ class TC_AVSM_2_2(MatterBaseTest):
                 maxFrameRate=aSnapshotCapabilities[0].maxFrameRate,
                 minResolution=newResolution,
                 maxResolution=newResolution,
-                #maxResolution=Clusters.CameraAvStreamManagement.Structs.VideoResolutionStruct(width=0, height=0),
                 quality=90,
                 watermarkEnabled=watermark,
                 OSDEnabled=osd,

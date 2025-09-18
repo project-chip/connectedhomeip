@@ -636,7 +636,7 @@ class TC_AVSM_2_7(MatterBaseTest):
             asserts.fail("Allocated video streams not cleared")
         minFrameRateConfig = 30
         maxFrameRateConfig = 40
-        # Try and allocate up to maxConcurentEncoders. If all these streams are
+        # Try and allocate up to maxConcurrentEncoders. If all these streams are
         # successfully allocated, the next one should hit a resource exhausted
         # error.
         # Note: One of these allocations may also hit a resource-exhausted error
@@ -668,7 +668,7 @@ class TC_AVSM_2_7(MatterBaseTest):
                 )
                 myStreamID = videoStreamAllocateResponse.videoStreamID
             except InteractionModelError as e:
-                asserts.assert_equal(e.status, Status.Success or Status.ResourceExhausted, "Unexpected error returned")
+                asserts.assert_in(e.status, [Status.Success, Status.ResourceExhausted], "Unexpected error returned")
                 pass
             minFrameRateConfig = maxFrameRateConfig
             maxFrameRateConfig = maxFrameRateConfig + 20
