@@ -130,16 +130,13 @@ public:
     /**
      *    @brief Command Delegate for creation of TwoDCartesianZone with the provided parameters.
      *
+     *   @param[in] zoneID  Indicates the ID of the zone to create.
      *   @param[in]  zone       Structure with parameters for defining a TwoDCartesian zone.
      *
-     *   @param[out] outZoneID  Indicates the ID of the created zone.
-     *
-     *   @return Success if the creation is successful and a zoneID was
-     *   produced; otherwise, the command SHALL be rejected with an appropriate
-     *   error.
+     *   @return Success if the creation is successful; otherwise, the command
+     *   SHALL be rejected with an appropriate error.
      */
-    virtual Protocols::InteractionModel::Status CreateTwoDCartesianZone(const TwoDCartesianZoneStorage & zone,
-                                                                        uint16_t & outZoneID) = 0;
+    virtual Protocols::InteractionModel::Status CreateTwoDCartesianZone(uint16_t zoneID, const TwoDCartesianZoneStorage & zone) = 0;
 
     /**
      *    @brief Command Delegate for updating of a TwoDCartesianZone with the provided parameters.
@@ -280,6 +277,8 @@ public:
     const std::vector<ZoneTriggerControlStruct> & GetTriggers() const { return mTriggers; }
 
     const Optional<ZoneTriggerControlStruct> GetTriggerForZone(uint16_t zoneID);
+
+    uint16_t GetNewZoneId();
 
     uint8_t GetMaxUserDefinedZones() const { return mMaxUserDefinedZones; }
     uint8_t GetMaxZones() const { return mMaxZones; }

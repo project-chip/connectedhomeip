@@ -37,45 +37,18 @@ void ZoneManager::SetCameraDevice(CameraDeviceInterface * aCameraDevice)
     mCameraDevice = aCameraDevice;
 }
 
-Protocols::InteractionModel::Status ZoneManager::CreateTwoDCartesianZone(const TwoDCartesianZoneStorage & zone,
-                                                                         uint16_t & outZoneID)
+Protocols::InteractionModel::Status ZoneManager::CreateTwoDCartesianZone(uint16_t zoneID, const TwoDCartesianZoneStorage & zone)
 {
-    TwoDCartZone twoDCartZone;
-    outZoneID           = GetNewZoneId();
-    twoDCartZone.zoneId = outZoneID;
-    twoDCartZone.zone   = zone;
-
-    mTwoDCartZones.push_back(twoDCartZone);
-
     return Status::Success;
 }
 
 Protocols::InteractionModel::Status ZoneManager::UpdateTwoDCartesianZone(uint16_t zoneID, const TwoDCartesianZoneStorage & zone)
 {
-    // Find an iterator to the item with the matching ID
-    auto it = std::find_if(mTwoDCartZones.begin(), mTwoDCartZones.end(),
-                           [zoneID](const TwoDCartZone & zone) { return zone.zoneId == zoneID; });
-
-    // If an item with the zoneID was found
-    if (it != mTwoDCartZones.end())
-    {
-        TwoDCartZone twoDCartZone;
-        twoDCartZone.zoneId = zoneID;
-        twoDCartZone.zone   = zone;
-        *it                 = twoDCartZone; // Replace the found item with the newItem
-
-        return Status::Success; // Indicate success
-    }
-
-    return Status::NotFound;
+    return Status::Success;
 }
 
 Protocols::InteractionModel::Status ZoneManager::RemoveZone(uint16_t zoneID)
 {
-    mTwoDCartZones.erase(std::remove_if(mTwoDCartZones.begin(), mTwoDCartZones.end(),
-                                        [&](const TwoDCartZone & zone) { return zone.zoneId == zoneID; }),
-                         mTwoDCartZones.end());
-
     return Status::Success;
 }
 

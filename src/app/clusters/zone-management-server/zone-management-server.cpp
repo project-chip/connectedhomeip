@@ -509,8 +509,11 @@ void ZoneMgmtServer::HandleCreateTwoDCartesianZone(HandlerContext & ctx,
     TwoDCartesianZoneStorage twoDCartZoneStorage;
     twoDCartZoneStorage.Set(zoneToCreate.name, zoneToCreate.use, twoDCartVertices, zoneToCreate.color);
 
+    // Get a new zone ID
+    zoneID = GetNewZoneId();
+
     // Call the delegate
-    status = mDelegate.CreateTwoDCartesianZone(twoDCartZoneStorage, zoneID);
+    status = mDelegate.CreateTwoDCartesianZone(zoneID, twoDCartZoneStorage);
     if (status != Status::Success)
     {
         ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);
@@ -769,6 +772,29 @@ bool ZoneMgmtServer::ZoneAlreadyExists(ZoneUseEnum zoneUse, const std::vector<Tw
         }
     }
     return false;
+}
+
+uint16_t ZoneMgmtServer::GetNewZoneId()
+{
+    // TODO: Replace with a better algo; Maybe use a std::set
+    uint16_t newId = 1;
+    while (true)
+    {
+        bool idExists = false;
+        for (const auto & zone : mZones)
+        {
+            if (zone.zoneID == newId)
+            {
+                idExists = true;
+                break;
+            }
+        }
+        if (!idExists)
+        {
+            return newId;
+        }
+        newId++;
+    }
 }
 
 Status ZoneMgmtServer::GenerateZoneTriggeredEvent(uint16_t zoneID, ZoneEventTriggeredReasonEnum triggerReason)
