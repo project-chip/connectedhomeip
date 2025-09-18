@@ -3340,6 +3340,7 @@ bool DoorLockServer::clearFabricFromCredentials(chip::EndpointId endpointId, chi
 
     if (SupportsPIN(endpointId))
     {
+        clearFabricFromCredentials(endpointId, CredentialTypeEnum::kProgrammingPIN, fabricToRemove);
         clearFabricFromCredentials(endpointId, CredentialTypeEnum::kPin, fabricToRemove);
     }
 
@@ -3353,8 +3354,6 @@ bool DoorLockServer::clearFabricFromCredentials(chip::EndpointId endpointId, chi
     {
         clearFabricFromCredentials(endpointId, CredentialTypeEnum::kFace, fabricToRemove);
     }
-
-    clearFabricFromCredentials(endpointId, CredentialTypeEnum::kProgrammingPIN, fabricToRemove);
 
     return true;
 }
