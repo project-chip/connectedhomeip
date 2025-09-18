@@ -59299,6 +59299,7 @@ public class ChipClusters {
     private static final long TILT_MAX_ATTRIBUTE_ID = 6L;
     private static final long PAN_MIN_ATTRIBUTE_ID = 7L;
     private static final long PAN_MAX_ATTRIBUTE_ID = 8L;
+    private static final long MOVEMENT_STATE_ATTRIBUTE_ID = 9L;
     private static final long GENERATED_COMMAND_LIST_ATTRIBUTE_ID = 65528L;
     private static final long ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID = 65529L;
     private static final long ATTRIBUTE_LIST_ATTRIBUTE_ID = 65531L;
@@ -59747,6 +59748,32 @@ public class ChipClusters {
             callback.onSuccess(value);
           }
         }, PAN_MAX_ATTRIBUTE_ID, minInterval, maxInterval);
+    }
+
+    public void readMovementStateAttribute(
+        IntegerAttributeCallback callback) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, MOVEMENT_STATE_ATTRIBUTE_ID);
+
+      readAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, MOVEMENT_STATE_ATTRIBUTE_ID, true);
+    }
+
+    public void subscribeMovementStateAttribute(
+        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, MOVEMENT_STATE_ATTRIBUTE_ID);
+
+      subscribeAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, MOVEMENT_STATE_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
     public void readGeneratedCommandListAttribute(
@@ -64243,17 +64270,21 @@ public class ChipClusters {
         }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
-    public void TLSClientCSR(TLSClientCSRResponseCallback callback, byte[] nonce) {
-      TLSClientCSR(callback, nonce, 0);
+    public void clientCSR(ClientCSRResponseCallback callback, byte[] nonce, @Nullable Integer ccdid) {
+      clientCSR(callback, nonce, ccdid, 0);
     }
 
-    public void TLSClientCSR(TLSClientCSRResponseCallback callback, byte[] nonce, int timedInvokeTimeoutMs) {
+    public void clientCSR(ClientCSRResponseCallback callback, byte[] nonce, @Nullable Integer ccdid, int timedInvokeTimeoutMs) {
       final long commandId = 7L;
 
       ArrayList<StructElement> elements = new ArrayList<>();
       final long nonceFieldID = 0L;
       BaseTLVType noncetlvValue = new ByteArrayType(nonce);
       elements.add(new StructElement(nonceFieldID, noncetlvValue));
+
+      final long ccdidFieldID = 1L;
+      BaseTLVType ccdidtlvValue = ccdid != null ? new UIntType(ccdid) : new NullType();
+      elements.add(new StructElement(ccdidFieldID, ccdidtlvValue));
 
       StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
@@ -64263,8 +64294,8 @@ public class ChipClusters {
           Integer ccdid = null;
           final long csrFieldID = 1L;
           byte[] csr = null;
-          final long nonceFieldID = 2L;
-          byte[] nonce = null;
+          final long nonceSignatureFieldID = 2L;
+          byte[] nonceSignature = null;
           for (StructElement element: invokeStructValue.value()) {
             if (element.contextTagNum() == ccdidFieldID) {
               if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
@@ -64276,22 +64307,22 @@ public class ChipClusters {
                 ByteArrayType castingValue = element.value(ByteArrayType.class);
                 csr = castingValue.value(byte[].class);
               }
-            } else if (element.contextTagNum() == nonceFieldID) {
+            } else if (element.contextTagNum() == nonceSignatureFieldID) {
               if (element.value(BaseTLVType.class).type() == TLVType.ByteArray) {
                 ByteArrayType castingValue = element.value(ByteArrayType.class);
-                nonce = castingValue.value(byte[].class);
+                nonceSignature = castingValue.value(byte[].class);
               }
             }
           }
-          callback.onSuccess(ccdid, csr, nonce);
+          callback.onSuccess(ccdid, csr, nonceSignature);
         }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
-    public void provisionClientCertificate(DefaultClusterCallback callback, Integer ccdid, ChipStructs.TlsCertificateManagementClusterTLSClientCertificateDetailStruct clientCertificateDetails) {
-      provisionClientCertificate(callback, ccdid, clientCertificateDetails, 0);
+    public void provisionClientCertificate(DefaultClusterCallback callback, Integer ccdid, byte[] clientCertificate, ArrayList<byte[]> intermediateCertificates) {
+      provisionClientCertificate(callback, ccdid, clientCertificate, intermediateCertificates, 0);
     }
 
-    public void provisionClientCertificate(DefaultClusterCallback callback, Integer ccdid, ChipStructs.TlsCertificateManagementClusterTLSClientCertificateDetailStruct clientCertificateDetails, int timedInvokeTimeoutMs) {
+    public void provisionClientCertificate(DefaultClusterCallback callback, Integer ccdid, byte[] clientCertificate, ArrayList<byte[]> intermediateCertificates, int timedInvokeTimeoutMs) {
       final long commandId = 9L;
 
       ArrayList<StructElement> elements = new ArrayList<>();
@@ -64299,9 +64330,13 @@ public class ChipClusters {
       BaseTLVType ccdidtlvValue = new UIntType(ccdid);
       elements.add(new StructElement(ccdidFieldID, ccdidtlvValue));
 
-      final long clientCertificateDetailsFieldID = 1L;
-      BaseTLVType clientCertificateDetailstlvValue = clientCertificateDetails.encodeTlv();
-      elements.add(new StructElement(clientCertificateDetailsFieldID, clientCertificateDetailstlvValue));
+      final long clientCertificateFieldID = 1L;
+      BaseTLVType clientCertificatetlvValue = new ByteArrayType(clientCertificate);
+      elements.add(new StructElement(clientCertificateFieldID, clientCertificatetlvValue));
+
+      final long intermediateCertificatesFieldID = 2L;
+      BaseTLVType intermediateCertificatestlvValue = ArrayType.generateArrayType(intermediateCertificates, (elementintermediateCertificates) -> new ByteArrayType(elementintermediateCertificates));
+      elements.add(new StructElement(intermediateCertificatesFieldID, intermediateCertificatestlvValue));
 
       StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
@@ -64403,8 +64438,8 @@ public class ChipClusters {
       void onSuccess(Integer caid);
     }
 
-    public interface TLSClientCSRResponseCallback extends BaseClusterCallback {
-      void onSuccess(Integer ccdid, byte[] csr, byte[] nonce);
+    public interface ClientCSRResponseCallback extends BaseClusterCallback {
+      void onSuccess(Integer ccdid, byte[] csr, byte[] nonceSignature);
     }
 
     public interface FindClientCertificateResponseCallback extends BaseClusterCallback {

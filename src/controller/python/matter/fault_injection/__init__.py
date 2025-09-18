@@ -49,6 +49,8 @@ class CHIPFaultId(IntEnum):
     CASECorruptSigma2NOC = 29
     CASECorruptSigma2ICAC = 30
     CASECorruptSigma2Signature = 31
+    ModifyWebRTCICECandidatesSessionId = 32
+    EmptyWebRTCICECandidatesList = 33
 
 
 # END-IF-CHANGE-ALSO-CHANGE(/src/lib/support/CHIPFaultInjection.h)

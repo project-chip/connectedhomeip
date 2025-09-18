@@ -59,6 +59,7 @@ template("qpg_sdk") {
 
     include_dirs += [
       "${qpg_sdk_root}/Components/Qorvo/Matter/qvCHIP/inc",
+      "${qpg_sdk_root}/Components/Qorvo/Bootloader/qvMultiProtocolOta/inc/",
       "${qpg_sdk_root}/Components/ThirdParty/ARM/mbedtls/v3.3.0/include",
       "${qpg_sdk_root}/Libraries/Qorvo/mbedtls_alt/inc",
       "${qpg_sdk_root}/Components/Qorvo/BSP/qPinCfg/inc",

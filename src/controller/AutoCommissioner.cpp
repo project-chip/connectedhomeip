@@ -487,7 +487,25 @@ CommissioningStage AutoCommissioner::GetNextCommissioningStageInternal(Commissio
         }
         return CommissioningStage::kEvictPreviousCaseSessions;
     case CommissioningStage::kEvictPreviousCaseSessions:
+#if CHIP_DEVICE_CONFIG_ENABLE_NFC_BASED_COMMISSIONING
+    {
+        // If there is no secure session, means commissioning has been continued after the unpowered phase was completed
+        // In such case, move on setup the CASE session over operational network
+        if (!mCommissioneeDeviceProxy->GetSecureSession().HasValue())
+        {
+            return CommissioningStage::kFindOperationalForStayActive;
+        }
+
+        // If the transport is NFC, move to unpowered phase complete to end the first phase of commissioning
+        auto transportType =
+            mCommissioneeDeviceProxy->GetSecureSession().Value()->AsSecureSession()->GetPeerAddress().GetTransportType();
+        return (transportType == Transport::Type::kNfc && mDeviceCommissioningInfo.general.isCommissioningWithoutPower)
+            ? CommissioningStage::kUnpoweredPhaseComplete
+            : CommissioningStage::kFindOperationalForStayActive;
+    }
+#else
         return CommissioningStage::kFindOperationalForStayActive;
+#endif
     case CommissioningStage::kPrimaryOperationalNetworkFailed:
         if (mDeviceCommissioningInfo.network.wifi.endpoint == kRootEndpointId)
         {
@@ -508,6 +526,10 @@ CommissioningStage AutoCommissioner::GetNextCommissioningStageInternal(Commissio
         return CommissioningStage::kSendComplete;
     case CommissioningStage::kSendComplete:
         return CommissioningStage::kCleanup;
+#if CHIP_DEVICE_CONFIG_ENABLE_NFC_BASED_COMMISSIONING
+    case CommissioningStage::kUnpoweredPhaseComplete:
+        return CommissioningStage::kCleanup; // End commissioning (phase 1)
+#endif
 
     // Neither of these have a next stage so return kError;
     case CommissioningStage::kCleanup:
@@ -578,7 +600,14 @@ CHIP_ERROR AutoCommissioner::StartCommissioning(DeviceCommissioner * commissione
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
 
-    if (proxy == nullptr || !proxy->GetSecureSession().HasValue())
+    // Proxy is expected to have a valid secure session before starting to commission. However, in case of continuing
+    // commissioning post unpowered phase, allow proceeding if the stage is evict secure CASE sessions
+    if (proxy == nullptr ||
+        (!proxy->GetSecureSession().HasValue()
+#if CHIP_DEVICE_CONFIG_ENABLE_NFC_BASED_COMMISSIONING
+         && commissioner->GetCommissioningStage() != CommissioningStage::kEvictPreviousCaseSessions
+#endif
+         ))
     {
         ChipLogError(Controller, "Device proxy secure session error");
         return CHIP_ERROR_INVALID_ARGUMENT;
@@ -587,8 +616,15 @@ CHIP_ERROR AutoCommissioner::StartCommissioning(DeviceCommissioner * commissione
     mCommissioner            = commissioner;
     mCommissioneeDeviceProxy = proxy;
 
-    auto transportType =
-        mCommissioneeDeviceProxy->GetSecureSession().Value()->AsSecureSession()->GetPeerAddress().GetTransportType();
+    // When commissioning is started after unpowered phase, there will be no secure session since the CASE session first needs to be
+    // setup over operational network. Hence assume transport is UDP in such case.
+    auto transportType = Transport::Type::kUdp;
+    if (mCommissioneeDeviceProxy->GetSecureSession().HasValue())
+    {
+        transportType =
+            mCommissioneeDeviceProxy->GetSecureSession().Value()->AsSecureSession()->GetPeerAddress().GetTransportType();
+    }
+
     mNeedsNetworkSetup = (transportType == Transport::Type::kBle);
 #if CHIP_DEVICE_CONFIG_ENABLE_NFC_BASED_COMMISSIONING
     mNeedsNetworkSetup = mNeedsNetworkSetup || (transportType == Transport::Type::kNfc);
@@ -597,7 +633,7 @@ CHIP_ERROR AutoCommissioner::StartCommissioning(DeviceCommissioner * commissione
     mNeedsNetworkSetup = mNeedsNetworkSetup || (transportType == Transport::Type::kWiFiPAF);
 #endif
     CHIP_ERROR err               = CHIP_NO_ERROR;
-    CommissioningStage nextStage = GetNextCommissioningStage(CommissioningStage::kSecurePairing, err);
+    CommissioningStage nextStage = GetNextCommissioningStage(commissioner->GetCommissioningStage(), err);
 
     mCommissioner->PerformCommissioningStep(mCommissioneeDeviceProxy, nextStage, mParams, this, GetEndpoint(nextStage),
                                             GetCommandTimeout(mCommissioneeDeviceProxy, nextStage));

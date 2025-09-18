@@ -133,6 +133,7 @@ class AttributeMatcher:
         return AttributeMatcherFromCallable(description, matcher)
 
 
+@dataclass
 class SetupParameters:
     passcode: int
     vendor_id: int = 0xFFF1
@@ -510,6 +511,11 @@ class MatterBaseTest(base_test.BaseTestClass):
             return fn()
         except AttributeError:
             return None
+
+    def get_restart_flag_file(self) -> Optional[str]:
+        if self.matter_test_config.restart_flag_file is None:
+            return None
+        return str(self.matter_test_config.restart_flag_file)
 
     def get_test_pics(self, test: str) -> list[str]:
         ''' Retrieves a list of top-level PICS that should be checked before running this test
@@ -890,20 +896,20 @@ class MatterBaseTest(base_test.BaseTestClass):
 
     async def read_single_attribute_check_success(
             self, cluster: ClusterObjects.Cluster, attribute: Type[ClusterObjects.ClusterAttributeDescriptor],
-            dev_ctrl: Optional[ChipDeviceCtrl.ChipDeviceController] = None, node_id: Optional[int] = None, endpoint: Optional[int] = None, fabric_filtered: bool = True, assert_on_error: bool = True, test_name: str = "") -> object:
+            dev_ctrl: Optional[ChipDeviceCtrl.ChipDeviceController] = None, node_id: Optional[int] = None, endpoint: Optional[int] = None, fabric_filtered: bool = True, assert_on_error: bool = True, test_name: str = "", payloadCapability: int = ChipDeviceCtrl.TransportPayloadCapability.MRP_PAYLOAD) -> object:
         if dev_ctrl is None:
             dev_ctrl = self.default_controller
         if node_id is None:
             node_id = self.dut_node_id
         if endpoint is None:
             endpoint = self.get_endpoint()
-        result = await dev_ctrl.ReadAttribute(node_id, [(endpoint, attribute)], fabricFiltered=fabric_filtered)
+        result = await dev_ctrl.ReadAttribute(node_id, [(endpoint, attribute)], fabricFiltered=fabric_filtered, payloadCapability=payloadCapability)
         attr_ret = result[endpoint][cluster][attribute]
         read_err_msg = f"Error reading {str(cluster)}:{str(attribute)} = {attr_ret}"
         desired_type = attribute.attribute_type.Type
         type_err_msg = f'Returned attribute {attribute} is wrong type expected {desired_type}, got {type(attr_ret)}'
         read_ok = attr_ret is not None and not isinstance(attr_ret, Clusters.Attribute.ValueDecodeFailure)
-        type_ok = type_matches(attr_ret, desired_type)
+        type_ok = matchers.is_type(attr_ret, desired_type)
         if assert_on_error:
             asserts.assert_true(read_ok, read_err_msg)
             asserts.assert_true(type_ok, type_err_msg)
@@ -1224,6 +1230,25 @@ class MatterBaseTest(base_test.BaseTestClass):
                 logging.info("========= EOF on STDIN =========")
                 return None
 
+    def _user_verify_prompt(self, prompt_msg: str, hook_method_name: str, validation_name: str, error_message: str) -> bool:
+        """Helper to show a prompt and wait for user validation in TH."""
+        # Only run when TC is being executed in TH
+        if self.runner_hook and hasattr(self.runner_hook, hook_method_name):
+            hook_method = getattr(self.runner_hook, hook_method_name)
+            hook_method(msg=prompt_msg)
+
+            logging.info(f"========= USER PROMPT for {validation_name} =========")
+
+            try:
+                result = input()
+                if result != '1':  # User did not select 'PASS'
+                    raise TestError(error_message)
+            except EOFError:
+                logging.info("========= EOF on STDIN =========")
+            return False
+        else:
+            return True  # Indicating skipped
+
     def user_verify_video_stream(self,
                                  prompt_msg: str) -> None:
         """Show Video Verification Prompt and wait for user validation.
@@ -1239,19 +1264,56 @@ class MatterBaseTest(base_test.BaseTestClass):
         Raises:
             TestError: Indicating video validation step failed.
         """
-        # Only run when TC is being executed in TH
-        if self.runner_hook and hasattr(self.runner_hook, 'show_video_prompt'):
-            self.runner_hook.show_video_prompt(msg=prompt_msg)
+        self._user_verify_prompt(
+            prompt_msg=prompt_msg,
+            hook_method_name='show_video_prompt',
+            validation_name='Video Stream Validation',
+            error_message='Video stream validation failed'
+        )
 
-            logging.info("========= USER PROMPT for Video Stream Validation =========")
+    def user_verify_two_way_talk(self,
+                                 prompt_msg: str) -> None:
+        """Show Two Way Talk Verification Prompt and wait for user validation.
+           This method will be executed only when TC is running in TH.
 
-            try:
-                result = input()
-                if result != '1':  # User did not select 'PASS'
-                    raise TestError("Video stream validation failed")
-            except EOFError:
-                logging.info("========= EOF on STDIN =========")
-                return None
+        Args:
+            prompt_msg (str): Message for TH UI prompt and input function.
+            Indicates what is expected from the user.
+
+        Returns:
+            Returns nothing indicating success so the test can go on.
+
+        Raises:
+            TestError: Indicating Two Way Talk validation step failed.
+        """
+        self._user_verify_prompt(
+            prompt_msg=prompt_msg,
+            hook_method_name='show_two_way_talk_prompt',
+            validation_name='Two Way Talk Validation',
+            error_message='Two way talk validation failed'
+        )
+
+    def user_verify_push_av_stream(self, prompt_msg: str) -> bool:
+        """Show Push AV Stream Verification Prompt and wait for user validation.
+           This method will be executed only when TC is running in TH.
+
+        Args:
+            prompt_msg (str): Message for TH UI prompt and input function.
+            Indicates what is expected from the user.
+
+        Returns:
+            True if validation was skipped, False otherwise.
+
+        Raises:
+            TestError: Indicating Push AV Stream validation step failed.
+        """
+        skipped = self._user_verify_prompt(
+            prompt_msg=prompt_msg,
+            hook_method_name='show_push_av_stream_prompt',
+            validation_name='Push AV Stream Validation',
+            error_message='Push AV Stream validation failed'
+        )
+        return skipped
 
 
 def _async_runner(body, self: MatterBaseTest, *args, **kwargs):
@@ -1303,7 +1365,6 @@ async def _get_all_matching_endpoints(self: MatterBaseTest, accept_function: End
 
 
 # TODO(#37537): Remove these temporary aliases after transition period
-type_matches = matchers.is_type
 utc_time_in_matter_epoch = timeoperations.utc_time_in_matter_epoch
 utc_datetime_from_matter_epoch_us = timeoperations.utc_datetime_from_matter_epoch_us
 utc_datetime_from_posix_time_ms = timeoperations.utc_datetime_from_posix_time_ms

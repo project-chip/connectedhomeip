@@ -217,6 +217,8 @@ public:
 
     virtual CHIP_ERROR LoadTriggers(std::vector<ZoneTriggerControlStruct> & aTriggers) = 0;
 
+    ZoneMgmtServer * GetZoneMgmtServer() const { return mZoneMgmtServer; }
+
 private:
     friend class ZoneMgmtServer;
 
@@ -230,9 +232,6 @@ private:
      * @param aZoneMgmtServer  A pointer to the ZoneMgmtServer object related to this delegate object.
      */
     void SetZoneMgmtServer(ZoneMgmtServer * aZoneMgmtServer) { mZoneMgmtServer = aZoneMgmtServer; }
-
-protected:
-    ZoneMgmtServer * GetZoneMgmtServer() const { return mZoneMgmtServer; }
 };
 
 class ZoneMgmtServer : public CommandHandlerInterface, public AttributeAccessInterface

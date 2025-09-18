@@ -88,7 +88,7 @@ class TC_WebRTCRequestor_2_1(MatterBaseTest):
 
     def desc_TC_WebRTCRequestor_2_1(self) -> str:
         """Returns a description of this test"""
-        return "[TC-{picsCode}-2.1] Validate sending an SDP Offer command to {DUT_Server} with an invalid session id"
+        return "[TC-{picsCode}-2.1] Validate Offer command with invalid session id"
 
     def steps_TC_WebRTCRequestor_2_1(self) -> list[TestStep]:
         """
@@ -98,8 +98,8 @@ class TC_WebRTCRequestor_2_1(MatterBaseTest):
             TestStep(1, "Commission the {TH_Server} from TH"),
             TestStep(2, "Open the Commissioning Window of the {TH_Server}"),
             TestStep(3, "Commission the {TH_Server} from DUT"),
-            TestStep(4, "Activate the fault injection to modify the session ID of the WebRTC Offer command from {TH_Server}"),
-            TestStep(5, "Send SolicitOffer command to the {TH_Server} from DUT"),
+            TestStep(4, "Activate fault injection on {TH_Server} to modify the session ID of the WebRTC Offer command"),
+            TestStep(5, "Trigger {TH_Server} to send an Offer command to DUT with an invalid/non-existent WebRTCSessionID"),
         ]
         return steps
 
@@ -156,7 +156,7 @@ class TC_WebRTCRequestor_2_1(MatterBaseTest):
         )
 
         self.step(4)
-        logging.info("Injecting kFault_ModifyWebRTCAnswerSessionId on TH_SERVER")
+        logging.info("Injecting kFault_ModifyWebRTCOfferSessionId on TH_SERVER")
 
         # --- Fault‑Injection cluster (mfg‑specific 0xFFF1_FC06) ---
         # Use FailAtFault to activate the chip‑layer fault exactly once

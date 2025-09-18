@@ -47,6 +47,7 @@ config("config") {
     "${chip_root}/examples/camera-app/camera-common/include",
     "${chip_root}/examples/camera-app/camera-common/include/media-controller",
     "${chip_root}/examples/camera-app/camera-common/include/camera-avstream-controller",
+    "${chip_root}/examples/camera-app/camera-common/include/webrtc-provider-controller",
     "${chip_root}/examples/camera-app/camera-common/include/transport",
     "${chip_root}/third_party/libdatachannel/repo/include",
   ]
@@ -78,6 +79,7 @@ executable("chip-camera-app") {
 
   sources = [
     "${chip_root}/examples/camera-app/linux/include/media-controller/default-media-controller.h",
+    "${chip_root}/examples/camera-app/linux/include/pushav-prerollbuffer.h",
     "${chip_root}/examples/camera-app/linux/src/CameraAppCommandDelegate.cpp",
     "${chip_root}/examples/camera-app/linux/src/camera-device.cpp",
     "${chip_root}/examples/camera-app/linux/src/clusters/camera-avsettingsuserlevel-mgmt/camera-avsettingsuserlevel-manager.cpp",
@@ -88,6 +90,7 @@ executable("chip-camera-app") {
     "${chip_root}/examples/camera-app/linux/src/clusters/zone-mgmt/zone-manager.cpp",
     "${chip_root}/examples/camera-app/linux/src/media-controller/default-media-controller.cpp",
     "${chip_root}/examples/camera-app/linux/src/pushav-clip-recorder.cpp",
+    "${chip_root}/examples/camera-app/linux/src/pushav-prerollbuffer.cpp",
     "${chip_root}/examples/camera-app/linux/src/pushav-transport/pushav-transport.cpp",
     "${chip_root}/examples/camera-app/linux/src/uploader/pushav-uploader.cpp",
     "${chip_root}/examples/camera-app/linux/src/webrtc-libdatachannel.cpp",
