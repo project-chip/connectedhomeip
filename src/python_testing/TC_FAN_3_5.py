@@ -66,21 +66,44 @@ class TC_FAN_3_5(MatterBaseTest):
                          "- Set PercentSetting to 0. - Send Step command with direction=Increase, lowestOff=True, and wrap=False. - Read the resulting PercentSetting attribute report value. - Calculate the PercentSetting range per Step command. - Store value for future reference."),
 
                 TestStep("6", """[FC] LowestOff field test
+                                            Iteratively send step commands with LowestOff set to True, Direction set to Decrease,
+                                            and Wrap set to False.
 
-                                        Iteratively send step commands with LowestOff set to True, Direction set to Decrease,
-                                        and Wrap set to False.
+                                            Starting form the maximum fan attribute values and ending at the minimum fan attribute
+                                            values (descending order).
 
-                                        Starting form the maximum fan attribute values and ending at the minimum fan attribute
-                                        values (descending order).
+                                            Monitoring the Setting attribute values primarily (PercentSetting, SpeedSetting).""", """
+                                        SETUP
+                                            - Initialize the PercentSetting attribute to 100
+                                                - Verify that the SpeedSetting attribute value is set to SpeedMax
+                                                - Verify that the FanMode attribute value is set to High
+                                            - Subscribe to the PercentSetting, SpeedSetting, and FanMode attributes
+                                            - Step: LowestOff=True, Direction=Decrease, Wrap=False"""),
 
-                                        Monitoring the Setting attribute values primarily (PercentSetting, SpeedSetting).""",
-                         """SETUP
+                TestStep("6a", """TH sends Step commands iteratively""", """
+                                        LowestOff Check
+                                            - Verify that the PercentSetting attribute value reaches 0
+                                        No Wrap Check
+                                            - When the PercentSetting attribute value reaches 0:
+                                                - Send an additional Step command and verify that PercentSetting stays at 0"""),
 
-                                        Initialize the PercentSetting attribute to 100
-                                        Verify that the SpeedSetting attribute value is set to SpeedMax
-                                        Verify that the FanMode attribute value is set to High
-                                        Subscribe to the PercentSetting, SpeedSetting, and FanMode attributes
-                                        Step: LowestOff=True, Direction=Decrease, Wrap=False"""),
+
+
+
+
+
+
+
+                TestStep("ssssss", "aaaaa", """ccccc"""),
+
+
+
+
+
+
+
+
+
                 ]
 
     async def read_setting(self, attribute: Any) -> Any:
