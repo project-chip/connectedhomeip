@@ -166,6 +166,7 @@ public:
     CameraError SetHDRMode(bool hdrMode) override;
     bool GetHDRMode() override { return mHDREnabled; }
 
+    CameraError SetHardPrivacyMode(bool hardPrivacyMode) override;
     bool GetHardPrivacyMode() override { return mHardPrivacyModeOn; }
 
     CameraError SetNightVision(chip::app::Clusters::CameraAvStreamManagement::TriStateAutoEnum nightVision) override;

@@ -1168,6 +1168,14 @@ CameraError CameraDevice::SetHDRMode(bool hdrMode)
     return CameraError::SUCCESS;
 }
 
+CameraError CameraDevice::SetHardPrivacyMode(bool hardPrivacyMode)
+{
+    ChipLogProgress(Camera, "SetHardPrivacyMode: Setting hard privacy mode to %s", hardPrivacyMode ? "true" : "false");
+    mHardPrivacyModeOn = hardPrivacyMode;
+
+    return CameraError::SUCCESS;
+}
+
 CameraError CameraDevice::SetStreamUsagePriorities(std::vector<StreamUsageEnum> streamUsagePriorities)
 {
     mStreamUsagePriorities = streamUsagePriorities;

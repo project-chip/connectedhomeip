@@ -195,11 +195,17 @@ CHIP_ERROR CameraAVStreamManager::ValidateAudioStreamID(uint16_t audioStreamId)
 CHIP_ERROR CameraAVStreamManager::IsPrivacyModeActive(bool & isActive)
 {
     // Check privacy mode attributes
+    bool hardPrivacyMode           = GetCameraAVStreamMgmtServer()->GetHardPrivacyModeOn();
     bool softRecordingPrivacyMode  = GetCameraAVStreamMgmtServer()->GetSoftRecordingPrivacyModeEnabled();
     bool softLivestreamPrivacyMode = GetCameraAVStreamMgmtServer()->GetSoftLivestreamPrivacyModeEnabled();
 
-    isActive = softRecordingPrivacyMode || softLivestreamPrivacyMode;
+    isActive = hardPrivacyMode || softRecordingPrivacyMode || softLivestreamPrivacyMode;
     return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR CameraAVStreamManager::SetHardPrivacyModeOn(bool hardPrivacyMode)
+{
+    return GetCameraAVStreamMgmtServer()->SetHardPrivacyModeOn(hardPrivacyMode);
 }
 
 bool CameraAVStreamManager::HasAllocatedVideoStreams()
@@ -501,6 +507,10 @@ void CameraAVStreamManager::OnAttributeChanged(AttributeId attributeId)
     case SoftLivestreamPrivacyModeEnabled::Id: {
         mCameraDeviceHAL->GetCameraHALInterface().SetSoftLivestreamPrivacyModeEnabled(
             GetCameraAVStreamMgmtServer()->GetSoftLivestreamPrivacyModeEnabled());
+        break;
+    }
+    case HardPrivacyModeOn::Id: {
+        mCameraDeviceHAL->GetCameraHALInterface().SetHardPrivacyMode(GetCameraAVStreamMgmtServer()->GetHardPrivacyModeOn());
         break;
     }
     case NightVision::Id: {
