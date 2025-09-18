@@ -129,7 +129,7 @@ public:
     /// returned to the caller as it is generally not actionable/fixable)
     static void UnregisterServer(const UnregisterServerOptions & options, Delegate & delegate);
 
-    struct GetClusterForEndpointIndexOptions
+    struct FindClusterOnEndpointOptions
     {
         EndpointId endpointId;
         ClusterId clusterId;
@@ -141,8 +141,7 @@ public:
 
     /// Calls 'FindRegistration' on the delegate and returns the address of the cluster for an endpoint index or nullptr if not
     /// found.
-    static ServerClusterInterface * GetClusterForEndpointIndex(const GetClusterForEndpointIndexOptions & options,
-                                                               Delegate & delegate);
+    static ServerClusterInterface * FindClusterOnEndpoint(const FindClusterOnEndpointOptions & options, Delegate & delegate);
 };
 
 } // namespace chip::app
