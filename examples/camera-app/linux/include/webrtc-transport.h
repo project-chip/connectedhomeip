@@ -93,7 +93,10 @@ public:
     // Stops WebRTC peer connection and cleanup
     void Stop();
 
+    // Adds video track to the peerconnection with H264 codec with default payload type as 96
     void AddVideoTrack(const std::string & videoMid = "video", int payloadType = 96);
+
+    // Adds audio track to the peerconnection with opus codec with default payload type as 111
     void AddAudioTrack(const std::string & audioMid = "audio", int payloadType = 111);
 
     std::shared_ptr<WebRTCPeerConnection> GetPeerConnection() { return mPeerConnection; }
