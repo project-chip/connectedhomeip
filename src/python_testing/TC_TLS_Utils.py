@@ -18,12 +18,12 @@
 import datetime
 import random
 import string
-from typing import List, Optional, Union
+from typing import Callable, List, Optional, Union
 
 from cryptography import x509
 from cryptography.hazmat.primitives import hashes, serialization
 from cryptography.hazmat.primitives.asymmetric import ec, rsa, utils
-from cryptography.x509 import CertificateBuilder, random_serial_number
+from cryptography.x509 import CertificateBuilder, CertificateSigningRequest, random_serial_number
 from cryptography.x509.oid import NameOID
 from ecdsa.curves import curve_by_name
 from mobly import asserts
@@ -79,7 +79,9 @@ class TLSUtils:
             signer = key
         return result
 
-    def gen_cert_with_key(self, signer: rsa.RSAPrivateKey, public_key: bytes | None = None, subject: x509.Name | None = None) -> bytes:
+    def gen_cert_with_key(self, signer: rsa.RSAPrivateKey, public_key: bytes | None = None,
+        subject: x509.Name | None = None, builder_lambda: Callable[
+          [CertificateBuilder], CertificateBuilder] = lambda x: x) -> bytes:
         if not public_key:
             public_key = signer.public_key()
 
@@ -143,7 +145,7 @@ class TLSUtils:
         asserts.assert_greater_equal(caid, 0, "Invalid CCDID returned")
         asserts.assert_less_equal(caid, 65534, "Invalid CCDID returned")
 
-    def assert_valid_csr(self, response: Clusters.TlsCertificateManagement.Commands.ClientCSRResponse, nonce: bytes):
+    def assert_valid_csr(self, response: Clusters.TlsCertificateManagement.Commands.ClientCSRResponse, nonce: bytes) -> CertificateSigningRequest:
         # Verify der encoded and PKCS #10 (rfc2986 is PKCS #10) - next two requirements
         try:
             temp, _ = der_decoder(response.csr, asn1Spec=rfc2986.CertificationRequest())
@@ -178,6 +180,9 @@ class TLSUtils:
         nonce_signature = utils.encode_dss_signature(signature_raw_r, signature_raw_s)
         csr_pubkey.verify(signature=nonce_signature, data=nonce, signature_algorithm=ec.ECDSA(hashes.SHA256()))
         return csr
+
+    def get_fingerprint(self, cert: bytes) -> bytes:
+        return x509.load_der_x509_certificate(cert).fingerprint(hashes.SHA256())
 
     async def send_provision_root_command(
             self, certificate: bytes, caid: Union[Nullable, int] = NullValue,
@@ -331,6 +336,23 @@ class TLSUtils:
                 "Unexpected return type for ProvisionEndpoint",
             )
             return result
+        except InteractionModelError as e:
+            asserts.assert_equal(e.status, expected_status, "Unexpected error returned")
+            return e
+
+    async def send_remove_tls_endpoint_command(
+        self,
+        endpoint_id: uint,
+        expected_status: Status = Status.Success,
+    ) -> InteractionModelError:
+        try:
+            return await self.test.send_single_cmd(
+                cmd=Clusters.TlsClientManagement.Commands.RemoveEndpoint(
+                    endpointID=endpoint_id
+                ),
+                endpoint=self.endpoint, dev_ctrl=self.dev_ctrl, node_id=self.node_id,
+                payloadCapability=ChipDeviceCtrl.TransportPayloadCapability.LARGE_PAYLOAD,
+            )
         except InteractionModelError as e:
             asserts.assert_equal(e.status, expected_status, "Unexpected error returned")
             return e
