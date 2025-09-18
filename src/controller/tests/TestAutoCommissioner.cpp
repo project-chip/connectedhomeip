@@ -21,10 +21,9 @@
 #include <controller/AutoCommissioner.h>
 #include <controller/CommissioningDelegate.h>
 #include <controller/tests/AutoCommissionerTestAccess.h>
+#include <controller/tests/Test_cert_data.cpp>
 #include <lib/core/StringBuilderAdapters.h>
 #include <lib/support/CHIPMemString.h>
-// #include <credentials/tests/CHIPCert_test_vectors.h>
-#include <controller/tests/Test_cert_data.cpp>
 
 #include <cstring>
 #include <memory>
