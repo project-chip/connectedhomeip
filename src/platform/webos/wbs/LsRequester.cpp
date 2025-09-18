@@ -78,9 +78,9 @@ LsRequester::LsRequester()
     try {
         m_handle = LS::registerService(LS_REQ_SERVICE_NAME);
         m_handle.attachToLoop(m_mainLoop);
-        m_thread = g_thread_new("lsTask", lsTask, (GMainLoop*) m_mainLoop);
+        m_thread = g_thread_new("lsTask", lsTask, (GMainLoop *) m_mainLoop);
         ChipLogDetail(DeviceLayer, "LsRequester initialized, m_mainLoop: %p, m_thread: %p", m_mainLoop, m_thread);
-    } catch (const LS::Error& e)
+    } catch (const LS::Error & e)
     {
         ChipLogError(DeviceLayer, "LsRequester init failed: %s", e.what());
     }
@@ -98,9 +98,9 @@ void LsRequester::restart() {
     try {
         m_handle = LS::registerService(LS_REQ_SERVICE_NAME);
         m_handle.attachToLoop(m_mainLoop);
-        m_thread = g_thread_new("lsTask", lsTask, (GMainLoop*) m_mainLoop);
+        m_thread = g_thread_new("lsTask", lsTask, (GMainLoop *) m_mainLoop);
         ChipLogDetail(DeviceLayer, "LsRequester restarted");
-    } catch (const LS::Error& e)
+    } catch (const LS::Error & e)
     {
         ChipLogError(DeviceLayer, "LsRequester restart failed: %s", e.what());
     }
@@ -121,7 +121,7 @@ void LsRequester::stop()
             g_main_loop_unref(m_mainLoop);
             m_mainLoop = nullptr;
         }
-    } catch(const LS::Error& e)
+    } catch (const LS::Error & e)
     {
         ChipLogError(DeviceLayer, "Exception: %s", e.what());
     }
@@ -167,7 +167,7 @@ bool LsRequester::lsCallSync(const char* pAPI, const char* pParams, pbnjson::JVa
         } else {
             //ChipLogDetail(DeviceLayer, "lsCallSync received response for API: %s, result: %s", pAPI, cc->result.c_str());
         }
-    } catch (const LS::Error &e)
+    } catch (const LS::Error & e)
     {
         ChipLogError(DeviceLayer, "LS::Error in lsCallSync for API: %s, error: %s", pAPI, e.what());
         retVal = false;
@@ -223,7 +223,7 @@ bool LsRequester::lsSubscribe(const char* pAPI, const char* pParams, void* ctx, 
     try {
         call = m_handle.callMultiReply(pAPI, pParams);
         call.continueWith(func, ctx);
-    } catch (const LS::Error &e)
+    } catch (const LS::Error & e)
     {
         ChipLogError(DeviceLayer, "Exception: %s", e.what());
         return false;
@@ -249,7 +249,7 @@ bool LsRequester::lsSubscribe(const char* pAPI, const char* pParams, void* ctx, 
 
     try {
         LSCall(m_handle.get(), pAPI, pParams, func, ctx, pulToken, NULL);
-    } catch (const LS::Error &e)
+    } catch (const LS::Error & e)
     {
         ChipLogError(DeviceLayer, "Exception: %s", e.what());
         return false;
