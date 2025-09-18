@@ -28,62 +28,68 @@
 #include <app/util/util.h>
 #include <lib/core/CHIPSafeCasts.h>
 #include <lib/support/TypeTraits.h>
-#include <zap-generated/CodedrivenCallback.h>
+#include <zap-generated/CodeDrivenCallback.h>
 
 using namespace chip;
 
-void MatterCodedrivenClusterServerInitCallback(EndpointId endpoint, ClusterId clusterId)
+void MatterClusterServerInitCallback(EndpointId endpoint, ClusterId clusterId)
 {
     switch (clusterId)
     {
     case app::Clusters::BasicInformation::Id:
-        MatterCodedrivenBasicInformationClusterInitCallback(endpoint);
+        MatterBasicInformationClusterInitCallback(endpoint);
         break;
     case app::Clusters::GeneralDiagnostics::Id:
-        MatterCodedrivenGeneralDiagnosticsClusterInitCallback(endpoint);
+        MatterGeneralDiagnosticsClusterInitCallback(endpoint);
         break;
     case app::Clusters::SoftwareDiagnostics::Id:
-        MatterCodedrivenSoftwareDiagnosticsClusterInitCallback(endpoint);
+        MatterSoftwareDiagnosticsClusterInitCallback(endpoint);
         break;
     case app::Clusters::WiFiNetworkDiagnostics::Id:
-        MatterCodedrivenWiFiNetworkDiagnosticsClusterInitCallback(endpoint);
+        MatterWiFiNetworkDiagnosticsClusterInitCallback(endpoint);
         break;
     case app::Clusters::EthernetNetworkDiagnostics::Id:
-        MatterCodedrivenEthernetNetworkDiagnosticsClusterInitCallback(endpoint);
+        MatterEthernetNetworkDiagnosticsClusterInitCallback(endpoint);
         break;
     case app::Clusters::AdministratorCommissioning::Id:
-        MatterCodedrivenAdministratorCommissioningClusterInitCallback(endpoint);
+        MatterAdministratorCommissioningClusterInitCallback(endpoint);
         break;
     case app::Clusters::GroupKeyManagement::Id:
-        MatterCodedrivenGroupKeyManagementClusterInitCallback(endpoint);
+        MatterGroupKeyManagementClusterInitCallback(endpoint);
+        break;
+    case app::Clusters::BooleanState::Id:
+        MatterBooleanStateClusterInitCallback(endpoint);
         break;
     }
 }
 
-void MatterCodedrivenClusterServerShutdownCallback(EndpointId endpoint, ClusterId clusterId)
+void MatterClusterServerShutdownCallback(EndpointId endpoint, ClusterId clusterId)
 {
     switch (clusterId)
     {
     case app::Clusters::BasicInformation::Id:
-        MatterCodedrivenBasicInformationClusterShutdownCallback(endpoint);
+        MatterBasicInformationClusterShutdownCallback(endpoint);
         break;
     case app::Clusters::GeneralDiagnostics::Id:
-        MatterCodedrivenGeneralDiagnosticsClusterShutdownCallback(endpoint);
+        MatterGeneralDiagnosticsClusterShutdownCallback(endpoint);
         break;
     case app::Clusters::SoftwareDiagnostics::Id:
-        MatterCodedrivenSoftwareDiagnosticsClusterShutdownCallback(endpoint);
+        MatterSoftwareDiagnosticsClusterShutdownCallback(endpoint);
         break;
     case app::Clusters::WiFiNetworkDiagnostics::Id:
-        MatterCodedrivenWiFiNetworkDiagnosticsClusterShutdownCallback(endpoint);
+        MatterWiFiNetworkDiagnosticsClusterShutdownCallback(endpoint);
         break;
     case app::Clusters::EthernetNetworkDiagnostics::Id:
-        MatterCodedrivenEthernetNetworkDiagnosticsClusterShutdownCallback(endpoint);
+        MatterEthernetNetworkDiagnosticsClusterShutdownCallback(endpoint);
         break;
     case app::Clusters::AdministratorCommissioning::Id:
-        MatterCodedrivenAdministratorCommissioningClusterShutdownCallback(endpoint);
+        MatterAdministratorCommissioningClusterShutdownCallback(endpoint);
         break;
     case app::Clusters::GroupKeyManagement::Id:
-        MatterCodedrivenGroupKeyManagementClusterShutdownCallback(endpoint);
+        MatterGroupKeyManagementClusterShutdownCallback(endpoint);
+        break;
+    case app::Clusters::BooleanState::Id:
+        MatterBooleanStateClusterShutdownCallback(endpoint);
         break;
     }
 }

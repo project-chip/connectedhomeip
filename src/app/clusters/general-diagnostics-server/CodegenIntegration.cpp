@@ -86,7 +86,7 @@ public:
 
 } // namespace
 
-void MatterCodedrivenGeneralDiagnosticsClusterInitCallback(EndpointId endpointId)
+void MatterGeneralDiagnosticsClusterInitCallback(EndpointId endpointId)
 {
     IntegrationDelegate integrationDelegate;
 
@@ -103,7 +103,7 @@ void MatterCodedrivenGeneralDiagnosticsClusterInitCallback(EndpointId endpointId
         integrationDelegate);
 }
 
-void MatterCodedrivenGeneralDiagnosticsClusterShutdownCallback(EndpointId endpointId)
+void MatterGeneralDiagnosticsClusterShutdownCallback(EndpointId endpointId)
 {
     IntegrationDelegate integrationDelegate;
 

@@ -65,7 +65,7 @@ public:
 
 } // namespace
 
-void MatterCodedrivenWiFiNetworkDiagnosticsClusterInitCallback(EndpointId endpointId)
+void MatterWiFiNetworkDiagnosticsClusterInitCallback(EndpointId endpointId)
 {
     IntegrationDelegate integrationDelegate;
 
@@ -81,7 +81,7 @@ void MatterCodedrivenWiFiNetworkDiagnosticsClusterInitCallback(EndpointId endpoi
         integrationDelegate);
 }
 
-void MatterCodedrivenWiFiNetworkDiagnosticsClusterShutdownCallback(EndpointId endpointId)
+void MatterWiFiNetworkDiagnosticsClusterShutdownCallback(EndpointId endpointId)
 {
     IntegrationDelegate integrationDelegate;
 

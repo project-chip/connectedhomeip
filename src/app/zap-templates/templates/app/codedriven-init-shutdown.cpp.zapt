@@ -11,30 +11,30 @@
 #include <app/CommandHandler.h>
 #include <lib/core/CHIPSafeCasts.h>
 #include <lib/support/TypeTraits.h>
-#include <zap-generated/CodedrivenCallback.h>
+#include <zap-generated/CodeDrivenCallback.h>
 
 using namespace chip;
 
-void MatterCodedrivenClusterServerInitCallback(EndpointId endpoint, ClusterId  clusterId) {
+void MatterClusterServerInitCallback(EndpointId endpoint, ClusterId  clusterId) {
     switch (clusterId)
     {
     {{#all_user_clusters side='server'}}
     {{#if (isInConfigList name "CodeDrivenClusters")}}
     case app::Clusters::{{asUpperCamelCase name}}::Id:
-        MatterCodedriven{{asUpperCamelCase name}}ClusterInitCallback(endpoint);
+        Matter{{asUpperCamelCase name}}ClusterInitCallback(endpoint);
         break;
     {{/if}}
     {{/all_user_clusters}}
     }
 }
 
-void MatterCodedrivenClusterServerShutdownCallback(EndpointId endpoint, ClusterId clusterId) {
+void MatterClusterServerShutdownCallback(EndpointId endpoint, ClusterId clusterId) {
     switch (clusterId)
     {
     {{#all_user_clusters side='server'}}
     {{#if (isInConfigList name "CodeDrivenClusters")}}
     case app::Clusters::{{asUpperCamelCase name}}::Id:
-        MatterCodedriven{{asUpperCamelCase name}}ClusterShutdownCallback(endpoint);
+        Matter{{asUpperCamelCase name}}ClusterShutdownCallback(endpoint);
         break;
     {{/if}}
     {{/all_user_clusters}}

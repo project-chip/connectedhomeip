@@ -53,7 +53,7 @@ public:
 
 } // namespace
 
-void MatterCodedrivenOtaSoftwareUpdateProviderClusterInitCallback(EndpointId endpointId)
+void MatterOtaSoftwareUpdateProviderClusterInitCallback(EndpointId endpointId)
 {
     IntegrationDelegate integrationDelegate;
 
@@ -69,7 +69,7 @@ void MatterCodedrivenOtaSoftwareUpdateProviderClusterInitCallback(EndpointId end
         integrationDelegate);
 }
 
-void MatterCodedrivenOtaSoftwareUpdateProviderClusterShutdownCallback(EndpointId endpointId)
+void MatterOtaSoftwareUpdateProviderClusterShutdownCallback(EndpointId endpointId)
 {
     IntegrationDelegate integrationDelegate;
 

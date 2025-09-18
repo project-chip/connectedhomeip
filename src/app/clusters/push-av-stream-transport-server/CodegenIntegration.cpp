@@ -70,7 +70,7 @@ PushAvStreamTransportServer * FindClusterOnEndpoint(EndpointId endpointId)
 }
 
 } // namespace
-void MatterCodedrivenPushAvStreamTransportClusterInitCallback(EndpointId endpointId)
+void MatterPushAvStreamTransportClusterInitCallback(EndpointId endpointId)
 {
 
     IntegrationDelegate integrationDelegate;
@@ -87,7 +87,7 @@ void MatterCodedrivenPushAvStreamTransportClusterInitCallback(EndpointId endpoin
         integrationDelegate);
 }
 
-void MatterCodedrivenPushAvStreamTransportClusterShutdownCallback(EndpointId endpointId)
+void MatterPushAvStreamTransportClusterShutdownCallback(EndpointId endpointId)
 {
     IntegrationDelegate integrationDelegate;
 

@@ -54,7 +54,7 @@ public:
 
 } // namespace
 
-void MatterCodedrivenGroupKeyManagementClusterInitCallback(EndpointId endpointId)
+void MatterGroupKeyManagementClusterInitCallback(EndpointId endpointId)
 {
     IntegrationDelegate integrationDelegate;
 
@@ -70,7 +70,7 @@ void MatterCodedrivenGroupKeyManagementClusterInitCallback(EndpointId endpointId
         integrationDelegate);
 }
 
-void MatterCodedrivenGroupKeyManagementClusterShutdownCallback(EndpointId endpointId)
+void MatterGroupKeyManagementClusterShutdownCallback(EndpointId endpointId)
 {
     IntegrationDelegate integrationDelegate;
 

@@ -57,7 +57,7 @@ public:
 
 } // namespace
 
-void MatterCodedrivenBooleanStateClusterInitCallback(EndpointId endpointId)
+void MatterBooleanStateClusterInitCallback(EndpointId endpointId)
 {
     IntegrationDelegate integrationDelegate;
 
@@ -74,7 +74,7 @@ void MatterCodedrivenBooleanStateClusterInitCallback(EndpointId endpointId)
         integrationDelegate);
 }
 
-void MatterCodedrivenBooleanStateClusterShutdownCallback(EndpointId endpointId)
+void MatterBooleanStateClusterShutdownCallback(EndpointId endpointId)
 {
     IntegrationDelegate integrationDelegate;
 

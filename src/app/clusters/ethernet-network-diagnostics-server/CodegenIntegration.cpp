@@ -62,7 +62,7 @@ public:
 
 } // namespace
 
-void MatterCodedrivenEthernetNetworkDiagnosticsClusterInitCallback(EndpointId endpointId)
+void MatterEthernetNetworkDiagnosticsClusterInitCallback(EndpointId endpointId)
 {
     IntegrationDelegate integrationDelegate;
 
@@ -78,7 +78,7 @@ void MatterCodedrivenEthernetNetworkDiagnosticsClusterInitCallback(EndpointId en
         integrationDelegate);
 }
 
-void MatterCodedrivenEthernetNetworkDiagnosticsClusterShutdownCallback(EndpointId endpointId)
+void MatterEthernetNetworkDiagnosticsClusterShutdownCallback(EndpointId endpointId)
 {
     IntegrationDelegate integrationDelegate;
 

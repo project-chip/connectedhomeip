@@ -127,6 +127,9 @@ ClustersWithPreAttributeChangeFunctions:
     - Laundry Washer Controls
     - Laundry Dryer Controls
 
+# Code Driven clusters are clusters that implement the ServerClusterInterface. 
+# The clusters in this list require Init() and/or Shutdown() callbacks, defined
+# in the cluster's respective CodgenIntegration.cpp file.
 CodeDrivenClusters:
     - Binding
     - Network Commissioning

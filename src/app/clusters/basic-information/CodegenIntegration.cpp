@@ -69,7 +69,7 @@ public:
 
 } // namespace
 
-void MatterCodedrivenBasicInformationClusterInitCallback(EndpointId endpointId)
+void MatterBasicInformationClusterInitCallback(EndpointId endpointId)
 {
     VerifyOrReturn(endpointId == kRootEndpointId);
 
@@ -88,7 +88,7 @@ void MatterCodedrivenBasicInformationClusterInitCallback(EndpointId endpointId)
         integrationDelegate);
 }
 
-void MatterCodedrivenBasicInformationClusterShutdownCallback(EndpointId endpointId)
+void MatterBasicInformationClusterShutdownCallback(EndpointId endpointId)
 {
     VerifyOrReturn(endpointId == kRootEndpointId);
 

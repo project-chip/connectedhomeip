@@ -45,12 +45,12 @@
         {
             "path": "templates/app/codedriven-callback.h.zapt",
             "name": "Matter code driven cluster init and shutdown callbacks header",
-            "output": "CodedrivenCallback.h"
+            "output": "CodeDrivenCallback.h"
         },
         {
             "path": "templates/app/codedriven-init-shutdown.cpp.zapt",
             "name": "Matter code driven cluster init and shutdown calls",
-            "output": "CodedrivenInitShutdown.cpp"
+            "output": "CodeDrivenInitShutdown.cpp"
         }
     ]
 }
