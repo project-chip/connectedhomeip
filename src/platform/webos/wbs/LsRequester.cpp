@@ -10,18 +10,19 @@
  *
  * LICENSE@@@
  */
+#include "LsRequester.h"
 #include <atomic>
 #include <chrono>
 #include <condition_variable>
 #include <lib/support/logging/CHIPLogging.h>
-#include "LsRequester.h"
 
 #define LS_REQ_SERVICE_NAME "com.webos.service.unifiedmatter-req"
 
-std::atomic<LsRequester*> LsRequester::_singleton;
+std::atomic<LsRequester *> LsRequester::_singleton;
 std::mutex LsRequester::_mutex;
 
-struct SyncCallbackContext {
+struct SyncCallbackContext
+{
     std::mutex mutex;
     std::unique_lock<std::mutex> lock;
     std::condition_variable cond;
@@ -31,39 +32,44 @@ struct SyncCallbackContext {
     bool error;
     bool received;
 
-    explicit SyncCallbackContext() : lock(mutex), alive(false), timeOut(false), error(false), received(false) { }
+    explicit SyncCallbackContext() : lock(mutex), alive(false), timeOut(false), error(false), received(false) {}
 
-    bool wait(int timeout) {
-        if (received) {
+    bool wait(int timeout)
+    {
+        if (received)
+        {
             return true;
         }
 
         std::chrono::seconds sec(timeout);
-        return cond.wait_for(lock, sec, [&](){ return !result.empty(); });
+        return cond.wait_for(lock, sec, [&]() { return !result.empty(); });
     }
 };
 
-void *LsRequester::lsTask(void *arg)
+void * LsRequester::lsTask(void * arg)
 {
-    g_main_loop_run((GMainLoop*)arg);
+    g_main_loop_run((GMainLoop *) arg);
     return NULL;
 }
 
-LsRequester* LsRequester::getInstance()
+LsRequester * LsRequester::getInstance()
 {
-    LsRequester* inst = _singleton.load(std::memory_order_relaxed);
+    LsRequester * inst = _singleton.load(std::memory_order_relaxed);
     std::atomic_thread_fence(std::memory_order_acquire);
-    if (inst == 0) {
+    if (inst == 0)
+    {
         std::lock_guard<std::mutex> lock(_mutex);
         inst = _singleton.load(std::memory_order_relaxed);
-        if (inst == 0) {
+        if (inst == 0)
+        {
             inst = new LsRequester();
             std::atomic_thread_fence(std::memory_order_release);
             _singleton.store(inst, std::memory_order_relaxed);
         }
     }
     // GMainLoop 상태 점검
-    if (!g_main_loop_is_running(inst->m_mainLoop)) {
+    if (!g_main_loop_is_running(inst->m_mainLoop))
+    {
         ChipLogError(DeviceLayer, "Main loop not running, restarting...");
         inst->stop();
         inst->restart();
@@ -73,9 +79,10 @@ LsRequester* LsRequester::getInstance()
 
 LsRequester::LsRequester()
 {
-    GMainContext *pCxt = g_main_context_new();
-    m_mainLoop = g_main_loop_new(pCxt, false);
-    try {
+    GMainContext * pCxt = g_main_context_new();
+    m_mainLoop          = g_main_loop_new(pCxt, false);
+    try
+    {
         m_handle = LS::registerService(LS_REQ_SERVICE_NAME);
         m_handle.attachToLoop(m_mainLoop);
         m_thread = g_thread_new("lsTask", lsTask, (GMainLoop *) m_mainLoop);
@@ -91,11 +98,13 @@ LsRequester::~LsRequester()
     stop();
 }
 
-void LsRequester::restart() {
+void LsRequester::restart()
+{
     stop();
-    GMainContext *pCxt = g_main_context_new();
-    m_mainLoop = g_main_loop_new(pCxt, false);
-    try {
+    GMainContext * pCxt = g_main_context_new();
+    m_mainLoop          = g_main_loop_new(pCxt, false);
+    try
+    {
         m_handle = LS::registerService(LS_REQ_SERVICE_NAME);
         m_handle.attachToLoop(m_mainLoop);
         m_thread = g_thread_new("lsTask", lsTask, (GMainLoop *) m_mainLoop);
@@ -111,12 +120,12 @@ void LsRequester::stop()
     std::lock_guard<std::mutex> lock(_mutex);
     try
     {
-        if(g_main_loop_is_running(m_mainLoop))
+        if (g_main_loop_is_running(m_mainLoop))
             g_main_loop_quit(m_mainLoop);
         m_handle.detach();
         g_thread_unref(m_thread);
 
-        if(m_mainLoop)
+        if (m_mainLoop)
         {
             g_main_loop_unref(m_mainLoop);
             m_mainLoop = nullptr;
@@ -130,8 +139,8 @@ void LsRequester::stop()
 bool LsRequester::_callbackSync(LSHandle * sh, LSMessage * reply, void * ctx)
 {
     LS::Message response(reply);
-    auto *cc = static_cast<SyncCallbackContext *>(ctx);
-    if(cc->timeOut || cc->error)
+    auto * cc = static_cast<SyncCallbackContext *>(ctx);
+    if (cc->timeOut || cc->error)
     {
         delete cc;
         ChipLogError(DeviceLayer, "return by timeout or error");
@@ -142,36 +151,41 @@ bool LsRequester::_callbackSync(LSHandle * sh, LSMessage * reply, void * ctx)
     cc->received = true;
     cc->cond.notify_all();
     cc->alive = false;
-    //ChipLogDetail(DeviceLayer, "Response: %s", response.getPayload());
+    // ChipLogDetail(DeviceLayer, "Response: %s", response.getPayload());
     return true;
 }
 
-bool LsRequester::lsCallSync(const char* pAPI, const char* pParams, pbnjson::JValue &response, int timeout)
+bool LsRequester::lsCallSync(const char * pAPI, const char * pParams, pbnjson::JValue & response, int timeout)
 {
     std::lock_guard<std::mutex> lock(_mutex);
-    if (pAPI == NULL || pParams == NULL) {
+    if (pAPI == NULL || pParams == NULL)
+    {
         ChipLogError(DeviceLayer, "Invalid API or params: %s, %s", pAPI, pParams);
         return false;
     }
-    //ChipLogDetail(DeviceLayer, "lsCallSync calling API: %s, params: %s, timeout: %d", pAPI, pParams, timeout);
-    SyncCallbackContext *cc = new SyncCallbackContext();
-    bool retVal = true;
-    try {
-        auto call = m_handle.callOneReply(pAPI, pParams, _callbackSync, (void *)cc);
-        if (!cc->wait(timeout)) {
+    // ChipLogDetail(DeviceLayer, "lsCallSync calling API: %s, params: %s, timeout: %d", pAPI, pParams, timeout);
+    SyncCallbackContext * cc = new SyncCallbackContext();
+    bool retVal              = true;
+    try
+    {
+        auto call = m_handle.callOneReply(pAPI, pParams, _callbackSync, (void *) cc);
+        if (!cc->wait(timeout))
+        {
             cc->timeOut = true;
             ChipLogError(DeviceLayer, "lsCallSync timed out after %d seconds for API: %s", timeout, pAPI);
             call.cancel();
             delete cc;
             return false;
-        } else {
-            //ChipLogDetail(DeviceLayer, "lsCallSync received response for API: %s, result: %s", pAPI, cc->result.c_str());
+        }
+        else
+        {
+            // ChipLogDetail(DeviceLayer, "lsCallSync received response for API: %s, result: %s", pAPI, cc->result.c_str());
         }
     } catch (const LS::Error & e)
     {
         ChipLogError(DeviceLayer, "LS::Error in lsCallSync for API: %s, error: %s", pAPI, e.what());
         retVal = false;
-    } catch (const std::system_error &e)
+    } catch (const std::system_error & e)
     {
         cc->error = true;
         ChipLogError(DeviceLayer, "System error in lsCallSync for API: %s, error: %s", pAPI, e.what());
@@ -179,8 +193,9 @@ bool LsRequester::lsCallSync(const char* pAPI, const char* pParams, pbnjson::JVa
     }
 
     response = pbnjson::JDomParser::fromString(cc->result);
-    //ChipLogDetail(DeviceLayer, "lsCallSync completed for API: %s, response: %s", pAPI, response.stringify().c_str());
-    if (cc) delete cc;
+    // ChipLogDetail(DeviceLayer, "lsCallSync completed for API: %s, response: %s", pAPI, response.stringify().c_str());
+    if (cc)
+        delete cc;
     return retVal;
 }
 
@@ -211,16 +226,18 @@ bool LsRequester::lsCallCancel(LSMessageToken ulToken)
     return true;
 }
 
-bool LsRequester::lsSubscribe(const char* pAPI, const char* pParams, void* ctx, LSFilterFunc func, LS::Call& call)
+bool LsRequester::lsSubscribe(const char * pAPI, const char * pParams, void * ctx, LSFilterFunc func, LS::Call & call)
 {
     std::lock_guard<std::mutex> lock(_mutex);
-    if (call.isActive()) {
+    if (call.isActive())
+    {
         call.cancel();
     }
 
     ChipLogDetail(DeviceLayer, "API : %s, params: %s", pAPI, pParams);
 
-    try {
+    try
+    {
         call = m_handle.callMultiReply(pAPI, pParams);
         call.continueWith(func, ctx);
     } catch (const LS::Error & e)
@@ -231,10 +248,10 @@ bool LsRequester::lsSubscribe(const char* pAPI, const char* pParams, void* ctx, 
     return true;
 }
 
-bool LsRequester::lsSubscribe(const char* pAPI, const char* pParams, void* ctx, LSFilterFunc func, LSMessageToken *pulToken)
+bool LsRequester::lsSubscribe(const char * pAPI, const char * pParams, void * ctx, LSFilterFunc func, LSMessageToken * pulToken)
 {
     std::lock_guard<std::mutex> lock(_mutex);
-    if (*pulToken != LSMESSAGE_TOKEN_INVALID )
+    if (*pulToken != LSMESSAGE_TOKEN_INVALID)
     {
         LSError lserror;
         LSErrorInit(&lserror);
@@ -247,7 +264,8 @@ bool LsRequester::lsSubscribe(const char* pAPI, const char* pParams, void* ctx, 
 
     ChipLogDetail(DeviceLayer, "API : %s, params: %s", pAPI, pParams);
 
-    try {
+    try
+    {
         LSCall(m_handle.get(), pAPI, pParams, func, ctx, pulToken, NULL);
     } catch (const LS::Error & e)
     {

@@ -1,14 +1,14 @@
 #pragma once
 #include <stdint.h>
 
+#include "LsRequester.h"
+#include <cstdint>
 #include <gio/gio.h>
 #include <glib-object.h>
 #include <glib.h>
-#include <platform/GLibTypeDeleter.h>
-#include <cstdint>
-#include <string>
 #include <luna-service2++/handle.hpp>
-#include "LsRequester.h"
+#include <platform/GLibTypeDeleter.h>
+#include <string>
 
 namespace chip {
 namespace DeviceLayer {
@@ -32,7 +32,7 @@ struct ConnectParams
 
 struct ConnectionDataBundle
 {
-    WbsConnection* mConn;
+    WbsConnection * mConn;
     chip::System::PacketBufferHandle buf;
 };
 
@@ -48,10 +48,10 @@ public:
 
     uint16_t GetMTU() const { return mMtu; };
     void SetMTU(uint16_t aMtu) { mMtu = aMtu; };
-    
+
     bool IsNotifyAcquired() const { return mNotifyAcquired; }
     void SetNotifyAcquired(bool aNotifyAcquired) { mNotifyAcquired = aNotifyAcquired; }
-    
+
     /// 1. Send indication to the CHIP RX characteristic on the remote peripheral device
     CHIP_ERROR SendIndication(chip::System::PacketBufferHandle apBuf);
     /// 2. Write to the CHIP RX characteristic on the remote peripheral device
@@ -61,13 +61,13 @@ public:
     /// 4. Unsubscribe from the CHIP TX characteristic on the remote peripheral device
     CHIP_ERROR UnsubscribeCharacteristic();
     CHIP_ERROR CloseConnection();
-    
+
     static bool GattGetStatus(std::string address);
     static bool GattGetServices(std::string address);
-    
+
     static bool gattMonitorCharateristicsCb(LSHandle * sh, LSMessage * message, void * userData);
-    static ConnectionDataBundle * MakeConnectionDataBundle(WbsConnection* apConn, chip::System::PacketBufferHandle apBuf);
-    
+    static ConnectionDataBundle * MakeConnectionDataBundle(WbsConnection * apConn, chip::System::PacketBufferHandle apBuf);
+
     void EndpointCleanup(WbsEndpoint * apEndpoint);
     CHIP_ERROR ConnectDevice(std::string address, WbsEndpoint * aEndpoint);
     void CancelConnect(); // NEED TO IMPLETEMENT
@@ -94,7 +94,7 @@ private:
 
     char * mPeerAddress;
     bool mNotifyAcquired = false;
-    uint16_t mMtu = 0;
+    uint16_t mMtu        = 0;
     std::string mClientId;
     uint32_t uMonitorToken;
     WbsEndpoint * mEndpoint;

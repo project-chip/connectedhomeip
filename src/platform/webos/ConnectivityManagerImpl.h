@@ -150,10 +150,7 @@ public:
     void OnNanPublishTerminated(guint public_id, gchar * reason);
     void OnNanSubscribeTerminated(guint subscribe_id, gchar * reason);
     CHIP_ERROR _WiFiPAFSend(const WiFiPAF::WiFiPAFSession & TxInfo, chip::System::PacketBufferHandle && msgBuf);
-    void _WiFiPafSetApFreq(const uint16_t freq)
-    {
-        mApFreq = freq;
-    }
+    void _WiFiPafSetApFreq(const uint16_t freq) { mApFreq = freq; }
     CHIP_ERROR _WiFiPAFShutdown(uint32_t id, WiFiPAF::WiFiPafRole role);
 #endif
 
@@ -178,10 +175,7 @@ private:
 #endif
 
 public:
-    const char * GetEthernetIfName()
-    {
-        return (mEthIfName[0] == '\0') ? nullptr : mEthIfName;
-    }
+    const char * GetEthernetIfName() { return (mEthIfName[0] == '\0') ? nullptr : mEthIfName; }
     void UpdateEthernetNetworkingStatus();
 
     void
@@ -191,10 +185,7 @@ public:
     }
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
-    const char * GetWiFiIfName()
-    {
-        return (sWiFiIfName[0] == '\0') ? nullptr : sWiFiIfName;
-    }
+    const char * GetWiFiIfName() { return (sWiFiIfName[0] == '\0') ? nullptr : sWiFiIfName; }
 #endif
 
 private:
@@ -255,10 +246,7 @@ private:
     uint16_t mApFreq;
     CHIP_ERROR _WiFiPAFPublish(WiFiPAFAdvertiseParam & args);
     CHIP_ERROR _WiFiPAFCancelPublish(uint32_t PublishId);
-    bool _WiFiPAFResourceAvailable()
-    {
-        return mPafChannelAvailable;
-    };
+    bool _WiFiPAFResourceAvailable() { return mPafChannelAvailable; };
     // The resource checking is needed right before sending data packets that they are initialized and connected.
     bool mPafChannelAvailable = true;
 #endif

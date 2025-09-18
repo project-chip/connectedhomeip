@@ -1,6 +1,6 @@
 // platform/webos/WebosLockTracker.cpp
-#include <platform/CHIPDeviceConfig.h>
 #include <lib/support/logging/CHIPLogging.h>
+#include <platform/CHIPDeviceConfig.h>
 
 namespace chip {
 namespace Platform {

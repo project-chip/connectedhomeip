@@ -21,15 +21,15 @@
 
 #include <glib.h>
 
+#include "LsRequester.h"
+#include "WbsConnection.h"
+#include "WebosLockTracker.h"
 #include <ble/Ble.h>
 #include <lib/core/CHIPError.h>
-#include <system/SystemLayer.h>
-#include <luna-service2/lunaservice.h>
 #include <luna-service2++/handle.hpp>
+#include <luna-service2/lunaservice.h>
 #include <pbnjson.hpp>
-#include "WebosLockTracker.h"
-#include "WbsConnection.h"
-#include "LsRequester.h"
+#include <system/SystemLayer.h>
 
 namespace chip {
 namespace DeviceLayer {
@@ -37,7 +37,9 @@ namespace Internal {
 
 struct BLEChipDevice
 {
-    BLEChipDevice(pbnjson::JValue &device, chip::Ble::ChipBLEDeviceIdentificationInfo deviceInfo) : mBleDevice(device), mDeviceInfo(deviceInfo) {}
+    BLEChipDevice(pbnjson::JValue & device, chip::Ble::ChipBLEDeviceIdentificationInfo deviceInfo) :
+        mBleDevice(device), mDeviceInfo(deviceInfo)
+    {}
     pbnjson::JValue mBleDevice;
     chip::Ble::ChipBLEDeviceIdentificationInfo mDeviceInfo;
 };
@@ -64,7 +66,7 @@ public:
 class WbsDeviceScanner
 {
 public:
-    WbsDeviceScanner()                                      = default;
+    WbsDeviceScanner()                                     = default;
     WbsDeviceScanner(WbsDeviceScanner &&)                  = default;
     WbsDeviceScanner(const WbsDeviceScanner &)             = delete;
     WbsDeviceScanner & operator=(const WbsDeviceScanner &) = delete;
@@ -88,7 +90,7 @@ public:
 
     /// Check if the scanner is active
     bool IsScanning() const { return mScannerState == WbsDeviceScannerState::SCANNING; }
-    void setAddress(const std::string& aAddr) { mAddress = aAddr; }
+    void setAddress(const std::string & aAddr) { mAddress = aAddr; }
 
 private:
     enum class WbsDeviceScannerState
@@ -110,7 +112,7 @@ private:
 
     WbsDeviceScannerDelegate * mDelegate = nullptr;
     WbsDeviceScannerState mScannerState  = WbsDeviceScannerState::UNINITIALIZED;
-    BLEChipDevice * mBleChipDevice = nullptr;
+    BLEChipDevice * mBleChipDevice       = nullptr;
     uint32_t mLeInternalStartScanToken;
     std::string mAddress;
 };
