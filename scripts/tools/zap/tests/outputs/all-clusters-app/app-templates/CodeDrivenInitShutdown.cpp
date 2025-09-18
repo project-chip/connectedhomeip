@@ -27,8 +27,14 @@ void MatterClusterServerInitCallback(EndpointId endpoint, ClusterId clusterId)
 {
     switch (clusterId)
     {
+    case app::Clusters::Binding::Id:
+        MatterBindingClusterInitCallback(endpoint);
+        break;
     case app::Clusters::BasicInformation::Id:
         MatterBasicInformationClusterInitCallback(endpoint);
+        break;
+    case app::Clusters::NetworkCommissioning::Id:
+        MatterNetworkCommissioningClusterInitCallback(endpoint);
         break;
     case app::Clusters::GeneralDiagnostics::Id:
         MatterGeneralDiagnosticsClusterInitCallback(endpoint);
@@ -58,8 +64,14 @@ void MatterClusterServerShutdownCallback(EndpointId endpoint, ClusterId clusterI
 {
     switch (clusterId)
     {
+    case app::Clusters::Binding::Id:
+        MatterBindingClusterShutdownCallback(endpoint);
+        break;
     case app::Clusters::BasicInformation::Id:
         MatterBasicInformationClusterShutdownCallback(endpoint);
+        break;
+    case app::Clusters::NetworkCommissioning::Id:
+        MatterNetworkCommissioningClusterShutdownCallback(endpoint);
         break;
     case app::Clusters::GeneralDiagnostics::Id:
         MatterGeneralDiagnosticsClusterShutdownCallback(endpoint);

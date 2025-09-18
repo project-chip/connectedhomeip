@@ -23,9 +23,17 @@
 
 #include <app/util/basic-types.h>
 
+void MatterBindingClusterInitCallback(chip::EndpointId endpointId);
+
+void MatterBindingClusterShutdownCallback(chip::EndpointId endpointId);
+
 void MatterBasicInformationClusterInitCallback(chip::EndpointId endpointId);
 
 void MatterBasicInformationClusterShutdownCallback(chip::EndpointId endpointId);
+
+void MatterNetworkCommissioningClusterInitCallback(chip::EndpointId endpointId);
+
+void MatterNetworkCommissioningClusterShutdownCallback(chip::EndpointId endpointId);
 
 void MatterGeneralDiagnosticsClusterInitCallback(chip::EndpointId endpointId);
 
