@@ -91,7 +91,9 @@ CHIP_ERROR WbsConnection::SendIndicationImpl(ConnectionDataBundle * data)
     lunaParam.put("value", valueParam);
 
     ret = lsRequester->lsCallSync(API_BLUETOOTH_GATT_WRITECHRACTERISTIC, lunaParam.stringify().c_str(), responsePayload);
-    if(ret != true || !responsePayload.hasKey(STR_RETURN_VALUE) || !responsePayload[STR_RETURN_VALUE].asBool())
+    if(ret != true ||
+        !responsePayload.hasKey(STR_RETURN_VALUE) ||
+        !responsePayload[STR_RETURN_VALUE].asBool())
     {
         g_free(data);
         ChipLogError(DeviceLayer, "SendIndicationImpl API_BLUETOOTH_GATT_WRITECHRACTERISTIC Failed");
@@ -132,7 +134,9 @@ CHIP_ERROR WbsConnection::SendWriteRequestImpl(ConnectionDataBundle * data)
     lunaParam.put("value", valueParam);
 
     ret = lsRequester->lsCallSync(API_BLUETOOTH_GATT_WRITECHRACTERISTIC, lunaParam.stringify().c_str(), responsePayload);
-    if(ret != true || !responsePayload.hasKey(STR_RETURN_VALUE) || !responsePayload[STR_RETURN_VALUE].asBool())
+    if(ret != true ||
+        !responsePayload.hasKey(STR_RETURN_VALUE) ||
+        !responsePayload[STR_RETURN_VALUE].asBool())
     {
         g_free(data);
         ChipLogError(DeviceLayer, "SendWriteRequestImpl API_BLUETOOTH_GATT_WRITECHRACTERISTIC Failed");
@@ -170,7 +174,9 @@ CHIP_ERROR WbsConnection::CloseConnectionImpl(WbsConnection * conn)
     lunaParam.put("clientId", conn->mClientId);
 
     ret = lsRequester->lsCallSync(API_BLUETOOTH_GATT_DISCONNECT, lunaParam.stringify().c_str(), responsePayload);
-    if(ret != true || !responsePayload.hasKey(STR_RETURN_VALUE) || !responsePayload[STR_RETURN_VALUE].asBool())
+    if(ret != true ||
+        !responsePayload.hasKey(STR_RETURN_VALUE) ||
+        !responsePayload[STR_RETURN_VALUE].asBool())
     {
         return CHIP_ERROR_INTERNAL;
     }
@@ -191,7 +197,9 @@ bool WbsConnection::GattGetStatus(std::string address)
 
     lunaParam.put("address", address);
     ret = lsRequester->lsCallSync(API_BLUETOOTH_GATT_GETSTATUS, lunaParam.stringify().c_str(), responsePayload);
-    if(ret != true || !responsePayload.hasKey(STR_RETURN_VALUE) || !responsePayload[STR_RETURN_VALUE].asBool())
+    if(ret != true ||
+        !responsePayload.hasKey(STR_RETURN_VALUE) ||
+        !responsePayload[STR_RETURN_VALUE].asBool())
     {
         return false;
     }
@@ -212,7 +220,9 @@ bool WbsConnection::GattGetServices(std::string address)
 
     lunaParam.put("address", address);
     ret = lsRequester->lsCallSync(API_BLUETOOTH_GATT_GETSERVICES, lunaParam.stringify().c_str(), responsePayload);
-    if(ret != true || !responsePayload.hasKey(STR_RETURN_VALUE) || !responsePayload[STR_RETURN_VALUE].asBool())
+    if(ret != true ||
+        !responsePayload.hasKey(STR_RETURN_VALUE) ||
+        !responsePayload[STR_RETURN_VALUE].asBool())
     {
         return false;
     }
@@ -275,7 +285,9 @@ CHIP_ERROR WbsConnection::SubscribeCharacteristicImpl(BLE_CONNECTION_OBJECT conn
     lunaParam.put("value", valueParam);
 
     ret = lsRequester->lsCallSync(API_BLUETOOTH_GATT_WRITEDESCRIPTOR, lunaParam.stringify().c_str(), responsePayload);
-    if(ret != true || !responsePayload.hasKey(STR_RETURN_VALUE) || !responsePayload[STR_RETURN_VALUE].asBool())
+    if(ret != true ||
+        !responsePayload.hasKey(STR_RETURN_VALUE) ||
+        !responsePayload[STR_RETURN_VALUE].asBool())
     {
         lsRequester->lsCallCancel(ulToken);
         return CHIP_ERROR_INTERNAL;
@@ -298,7 +310,8 @@ CHIP_ERROR WbsConnection::UnsubscribeCharacteristicImpl(BLE_CONNECTION_OBJECT co
 
     VerifyOrExit(connection != nullptr, ChipLogError(DeviceLayer, "WbsConnection is NULL in %s", __func__));
 
-    VerifyOrExit(LsRequester::getInstance()->lsCallCancel(connection->uMonitorToken) == true,  ChipLogError(DeviceLayer, "lsCallCancel failed") );
+    VerifyOrExit(LsRequester::getInstance()->lsCallCancel(connection->uMonitorToken) == true,  
+        ChipLogError(DeviceLayer, "lsCallCancel failed") );
 
     result = CHIP_NO_ERROR;
     BLEManagerImpl::HandleSubscribeOpComplete(connection, false);
@@ -379,7 +392,9 @@ CHIP_ERROR WbsConnection::ConnectDeviceImpl(ConnectParams * apParams)
     
     lunaParam.put("address", std::string(deviceAddress));
     ret = lsRequester->lsCallSync(API_BLUETOOTH_GATT_CONNECT, lunaParam.stringify().c_str(), responsePayload);
-    if(ret != true || !responsePayload.hasKey(STR_RETURN_VALUE) || !responsePayload[STR_RETURN_VALUE].asBool())
+    if(ret != true ||
+        !responsePayload.hasKey(STR_RETURN_VALUE) ||
+        !responsePayload[STR_RETURN_VALUE].asBool())
     {
         ChipLogError(Ble, "ConnectDeviceImpl() Failed API_BLUETOOTH_GATT_CONNECT response %s", responsePayload.asString().c_str());
         return CHIP_ERROR_INTERNAL;
@@ -406,7 +421,9 @@ CHIP_ERROR WbsConnection::ConnectDeviceImpl(ConnectParams * apParams)
     if(serviceAvailable == false)
     {
         ret = lsRequester->lsCallSync(API_BLUETOOTH_GATT_DISCOVERSERVICES, lunaParam.stringify().c_str(), responsePayload);
-        if(ret != true || !responsePayload.hasKey(STR_RETURN_VALUE) || !responsePayload[STR_RETURN_VALUE].asBool())
+        if(ret != true ||
+            !responsePayload.hasKey(STR_RETURN_VALUE) ||
+            !responsePayload[STR_RETURN_VALUE].asBool())
         {
             return CHIP_ERROR_INTERNAL;
         }
@@ -461,7 +478,9 @@ void WbsConnection::CancelConnect()
         lunaParam.put("clientId", mClientId);
 
         ret = lsRequester->lsCallSync(API_BLUETOOTH_GATT_DISCONNECT, lunaParam.stringify().c_str(), responsePayload);
-        if(ret != true || !responsePayload.hasKey(STR_RETURN_VALUE) || !responsePayload[STR_RETURN_VALUE].asBool())
+        if(ret != true ||
+            !responsePayload.hasKey(STR_RETURN_VALUE) ||
+            !responsePayload[STR_RETURN_VALUE].asBool())
         {
             ChipLogError(Ble, "%s API_BLUETOOTH_GATT_DISCONNECT Failed", __func__);
         }
