@@ -27,6 +27,7 @@
 #include <app/util/util.h>
 #include <clusters/ZoneManagement/Metadata.h>
 #include <lib/core/CHIPSafeCasts.h>
+#include <lib/core/TLVReader.h>
 #include <lib/support/DefaultStorageKeyAllocator.h>
 #include <protocols/interaction_model/StatusCode.h>
 
@@ -45,6 +46,9 @@ namespace chip {
 namespace app {
 namespace Clusters {
 namespace ZoneManagement {
+
+// TODO: find a more reasonable value, enforce / check on save
+constexpr size_t kMaxPersistedValueLengthSupported = 2048;
 
 ZoneMgmtServer::ZoneMgmtServer(Delegate & aDelegate, EndpointId aEndpointId, const BitFlags<Feature> aFeatures,
                                uint8_t aMaxUserDefinedZones, uint8_t aMaxZones, uint8_t aSensitivityMax,
@@ -103,12 +107,51 @@ bool ZoneMgmtServer::HasFeature(Feature feature) const
 void ZoneMgmtServer::LoadPersistentAttributes()
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
+    uint8_t buffer[kMaxPersistedValueLengthSupported];
+    MutableByteSpan bufferSpan(buffer);
 
     // Load Zones
-    err = mDelegate.LoadZones(mZones);
-    if (err != CHIP_NO_ERROR)
+    mZones.clear();
+    DataModel::DecodableList<chip::app::Clusters::ZoneManagement::Structs::ZoneInformationStruct::DecodableType> decodableZones;
+
+    err = GetSafeAttributePersistenceProvider()->SafeReadValue(ConcreteAttributePath(mEndpointId, ZoneManagement::Id, Attributes::Zones::Id), bufferSpan);
+
+    VerifyOrReturn((CHIP_NO_ERROR == err) || (err == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND), ChipLogDetail(Zcl, "ZoneManagement[ep=%d]: Unable to load zones from the KVS.", mEndpointId));
+
+    chip::TLV::TLVReader reader;
+    reader.Init(bufferSpan);
+    decodableZones.Decode(reader);
+
+    auto iter = decodableZones.begin();
+    while (iter.Next())
     {
-        ChipLogDetail(Zcl, "ZoneManagement[ep=%d]: Unable to load zones from the KVS.", mEndpointId);
+        auto & decodableZone = iter.GetValue();
+        ZoneInformationStorage zoneInfo;
+
+        Optional<TwoDCartesianZoneStorage> twoDCartZoneStorage;
+        if (decodableZone.twoDCartesianZone.HasValue())
+        {
+            auto & decodableTwoDCartZone = decodableZone.twoDCartesianZone.Value();
+            std::vector<TwoDCartesianVertexStruct> vertices;
+            auto vertexIter = decodableTwoDCartZone.vertices.begin();
+            while (vertexIter.Next())
+            {
+                vertices.push_back(vertexIter.GetValue());
+            }
+            if (vertexIter.GetStatus() == CHIP_NO_ERROR)
+            {
+                TwoDCartesianZoneStorage storage;
+                storage.Set(decodableTwoDCartZone.name, decodableTwoDCartZone.use, vertices, decodableTwoDCartZone.color);
+                twoDCartZoneStorage.SetValue(storage);
+            }
+        }
+
+        zoneInfo.Set(decodableZone.zoneID, decodableZone.zoneType, decodableZone.zoneSource, twoDCartZoneStorage);
+        mZones.push_back(zoneInfo);
+    }
+    if (iter.GetStatus() != CHIP_NO_ERROR)
+    {
+        ChipLogDetail(Zcl, "ZoneManagement[ep=%d]: Unable to iterate zones from the KVS.", mEndpointId);
     }
 
     // Load Triggers
