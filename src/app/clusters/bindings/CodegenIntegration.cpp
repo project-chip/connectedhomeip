@@ -42,7 +42,7 @@ public:
         return gServers[clusterInstanceIndex].Registration();
     }
 
-    ServerClusterInterface *FindRegistration(unsigned clusterInstanceIndex) override
+    ServerClusterInterface * FindRegistration(unsigned clusterInstanceIndex) override
     {
         VerifyOrReturnValue(gServers[clusterInstanceIndex].IsConstructed(), nullptr);
         return &gServers[clusterInstanceIndex].Cluster();

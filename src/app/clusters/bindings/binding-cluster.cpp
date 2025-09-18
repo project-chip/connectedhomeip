@@ -48,7 +48,9 @@ bool IsValidBinding(const EndpointId localEndpoint, const TargetStructType & ent
         // Valid node/endpoint/cluster binding
         ReadOnlyBufferBuilder<ClusterId> clientClusters;
         // TODO: is this a correct validation?
-        VerifyOrReturnValue(InteractionModelEngine::GetInstance()->GetDataModelProvider()->ClientClusters(localEndpoint, clientClusters) == CHIP_NO_ERROR, false);
+        VerifyOrReturnValue(InteractionModelEngine::GetInstance()->GetDataModelProvider()->ClientClusters(
+                                localEndpoint, clientClusters) == CHIP_NO_ERROR,
+                            false);
         for (auto & client : clientClusters.TakeBuffer())
         {
             VerifyOrReturnValue(client != entry.cluster.Value(), true);
