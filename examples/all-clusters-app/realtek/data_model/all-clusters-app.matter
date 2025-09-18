@@ -8237,8 +8237,8 @@ endpoint 0 {
 
   server cluster UserLabel {
     callback attribute labelList;
-    ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 1;
+    callback attribute featureMap;
+    callback attribute clusterRevision;
   }
 
   server cluster IcdManagement {
@@ -8419,8 +8419,8 @@ endpoint 1 {
 
   server cluster UserLabel {
     callback attribute labelList;
-    ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 1;
+    callback attribute featureMap;
+    callback attribute clusterRevision;
   }
 
   server cluster BooleanState {
