@@ -41,6 +41,7 @@ from mobly import asserts
 from TC_TLS_Utils import TLSUtils
 
 import matter.clusters as Clusters
+from matter.ChipDeviceCtrl import TransportPayloadCapability
 from matter.interaction_model import Status
 from matter.testing import matter_asserts
 from matter.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main, has_cluster, run_if_endpoint_matches
@@ -392,19 +393,18 @@ class TC_TLSCERT(MatterBaseTest):
         await cr2_cmd.send_provision_client_command(ccdid=my_ccdid[2], certificate=my_client_cert[2], intermediates=my_intermediate_certs_2)
 
         self.step(11)
-        # TODO(gmarcosb): There be dragons with large attributes over large transport
-        # found_certs = await cr1_cmd.read_client_certs_attribute_as_map()
-        # asserts.assert_equal(len(found_certs), 2, "Expected 2 certificates")
-        # for i in range(2):
-        #     asserts.assert_in(my_ccdid[i], found_certs, "ProvisionedClientCertificates should contain provisioned client cert")
-        #     asserts.assert_equal(found_certs[my_ccdid[i]].clientCertificate, my_client_cert[i], "Expected matching certificate detail")
+        found_certs = await cr1_cmd.read_client_certs_attribute_as_map(TransportPayloadCapability.LARGE_PAYLOAD)
+        asserts.assert_equal(len(found_certs), 2, "Expected 2 certificates")
+        for i in range(2):
+            asserts.assert_in(my_ccdid[i], found_certs, "ProvisionedClientCertificates should contain provisioned client cert")
+            asserts.assert_equal(found_certs[my_ccdid[i]].clientCertificate,
+                                 my_client_cert[i], "Expected matching certificate detail")
 
         self.step(12)
-        # TODO(gmarcosb): There be dragons with large attributes over large transport
-        # found_certs = await cr2_cmd.read_client_certs_attribute_as_map()
-        # asserts.assert_equal(len(found_certs), 1, "Expected 1 certificate")
-        # asserts.assert_in(my_ccdid[2], found_certs, "ProvisionedClientCertificates should contain provisioned client cert")
-        # asserts.assert_equal(found_certs[my_ccdid[2]].clientCertificate, my_client_cert[2], "Expected matching certificate detail")
+        found_certs = await cr2_cmd.read_client_certs_attribute_as_map(TransportPayloadCapability.LARGE_PAYLOAD)
+        asserts.assert_equal(len(found_certs), 1, "Expected 1 certificate")
+        asserts.assert_in(my_ccdid[2], found_certs, "ProvisionedClientCertificates should contain provisioned client cert")
+        asserts.assert_equal(found_certs[my_ccdid[2]].clientCertificate, my_client_cert[2], "Expected matching certificate detail")
 
         self.step(13)
         # Must close session so we don't re-use large payload session
@@ -444,20 +444,19 @@ class TC_TLSCERT(MatterBaseTest):
         await cr1_cmd.send_provision_client_command(ccdid=my_ccdid[0], certificate=my_client_cert[3])
 
         self.step(18)
-        # TODO(gmarcosb): There be dragons with large attributes over large transport
-        # found_certs = await cr1_cmd.read_client_certs_attribute_as_map()
-        # asserts.assert_equal(len(found_certs), 2, "Expected 2 certificates")
-        # expected_certs = [my_client_cert[0], my_client_cert[3]]
-        # for i in range(2):
-        #     asserts.assert_in(my_ccdid[i], found_certs, "ProvisionedClientCertificates should contain provisioned client cert")
-        #     asserts.assert_equal(found_certs[my_ccdid[i]].clientCertificate, expected_certs[i], "Expected matching certificate detail")
+        found_certs = await cr1_cmd.read_client_certs_attribute_as_map(TransportPayloadCapability.LARGE_PAYLOAD)
+        asserts.assert_equal(len(found_certs), 2, "Expected 2 certificates")
+        expected_certs = [my_client_cert[3], my_client_cert[1]]
+        for i in range(2):
+            asserts.assert_in(my_ccdid[i], found_certs, "ProvisionedClientCertificates should contain provisioned client cert")
+            asserts.assert_equal(found_certs[my_ccdid[i]].clientCertificate,
+                                 expected_certs[i], "Expected matching certificate detail")
 
         self.step(19)
-        # TODO(gmarcosb): There be dragons with large attributes over large transport
-        # found_certs = await cr2_cmd.read_client_certs_attribute_as_map()
-        # asserts.assert_equal(len(found_certs), 1, "Expected 1 certificate")
-        # asserts.assert_in(my_ccdid[2], found_certs, "ProvisionedClientCertificates should contain provisioned client cert")
-        # asserts.assert_equal(found_certs[my_ccdid[2]].clientCertificate, my_client_cert[2], "Expected matching certificate detail")
+        found_certs = await cr2_cmd.read_client_certs_attribute_as_map(TransportPayloadCapability.LARGE_PAYLOAD)
+        asserts.assert_equal(len(found_certs), 1, "Expected 1 certificate")
+        asserts.assert_in(my_ccdid[2], found_certs, "ProvisionedClientCertificates should contain provisioned client cert")
+        asserts.assert_equal(found_certs[my_ccdid[2]].clientCertificate, my_client_cert[2], "Expected matching certificate detail")
 
         self.step(20)
         find_response = await cr1_cmd.send_find_client_command(ccdid=my_ccdid[0])

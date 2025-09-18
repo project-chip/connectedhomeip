@@ -15,6 +15,7 @@
  */
 
 #import <Foundation/Foundation.h>
+#import <Matter/MTRCommissioningDelegate.h>
 #import <Matter/MTRDeviceController.h>
 #import <Matter/MTRStructsObjc.h>
 
@@ -28,5 +29,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)controller:(MTRDeviceController *)controller
     scannedThreadNetworks:(nullable NSArray<MTRNetworkCommissioningClusterThreadInterfaceScanResultStruct *> *)networks
                     error:(nullable NSError *)error;
+- (void)controller:(MTRDeviceController *)controller
+    reachedCommissioningStage:(MTRCommissioningStage)stage;
 @end
 NS_ASSUME_NONNULL_END
