@@ -92,7 +92,7 @@ public:
 
     void SetMaxBDXBlockSize(uint16_t blockSize) { mMaxBDXBlockSize = blockSize; }
 
-     // PlatformManagerDelegate
+    // PlatformManagerDelegate
     void OnShutDown() override;
 
 private:

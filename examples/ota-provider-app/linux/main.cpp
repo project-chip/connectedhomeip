@@ -350,7 +350,7 @@ void ApplicationInit()
 
     ChipLogDetail(SoftwareUpdate, "Using OTA file: %s", gOtaFilepath ? gOtaFilepath : "(none)");
 
-    chip::DeviceLayer::PlatformMgr().SetDelegate(static_cast<PlatformManagerDelegate*>(&gOtaProvider));
+    chip::DeviceLayer::PlatformMgr().SetDelegate(static_cast<PlatformManagerDelegate *>(&gOtaProvider));
 
     if (gOtaFilepath != nullptr)
     {
