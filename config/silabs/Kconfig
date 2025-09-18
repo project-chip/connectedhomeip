@@ -87,7 +87,7 @@ config CHIP_LOG_FILE_NAME
 	  assertion macros.
 
 config CHIP_MALLOC_SYS_HEAP
-	default y if !ARCH_POSIX
+	default n if !ARCH_POSIX
 
 config CHIP_TASK_STACK_SIZE
 	int "The Matter thread stack size"
@@ -303,6 +303,7 @@ config CHIP_ENABLE_BDX_LOG_TRANSFER
 config CHIP_WIFI
 	bool "Enable Silicon Labs Wi-Fi support"
 	default y if BOARD_SIWX917_RB4338A
+	default y if BOARD_SIWX917_RB4342A
 	select WIFI
 	imply NET_STATISTICS
 	imply NET_PKT_TXTIME
@@ -413,10 +414,6 @@ config CHIP_LAST_FABRIC_REMOVED_ACTION_DELAY
 	  an action chosen by the CHIP_LAST_FABRIC_REMOVED_ACTION option. This schedule will allow for
 	  avoiding race conditions before the device removes non-volatile data.
 
-config CHIP_MALLOC_SYS_HEAP_SIZE
-    default 8192 if NET_L2_OPENTHREAD
-    #default 20480 if CHIP_WIFI
-
 # ==============================================================================
 # System configuration
 # ==============================================================================
@@ -448,16 +445,10 @@ config SYSTEM_WORKQUEUE_STACK_SIZE
     default 2560 if CHIP_WIFI
     default 2048 if CHIP_ICD_LIT_SUPPORT
 
-config HEAP_MEM_POOL_SIZE
-    default 110720 if CHIP_WIFI
-
 config HEAP_MEM_POOL_IGNORE_MIN
     default y if CHIP_WIFI
 
 #We use sys_heap based allocators, so make sure we don't reserve unused libc heap anyway
-
-config COMMON_LIBC_MALLOC_ARENA_SIZE
-    default -1
 
 config NVS_LOOKUP_CACHE_SIZE
     default 512 if NVS

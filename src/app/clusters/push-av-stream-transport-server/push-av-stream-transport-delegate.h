@@ -21,12 +21,19 @@
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/clusters/push-av-stream-transport-server/constants.h>
 #include <app/clusters/push-av-stream-transport-server/push-av-stream-transport-storage.h>
+#include <app/clusters/tls-certificate-management-server/tls-certificate-management-server.h>
+#include <app/clusters/tls-client-management-server/tls-client-management-server.h>
+#include <functional>
 #include <protocols/interaction_model/StatusCode.h>
 #include <vector>
 
 namespace chip {
 namespace app {
 namespace Clusters {
+
+// Forward declarations
+class PushAvStreamTransportServerLogic;
+class PushAvStreamTransportServer;
 
 /**
  * @brief Defines interfaces for implementing application-specific logic for the PushAvStreamTransport Delegate.
@@ -259,6 +266,20 @@ public:
      * @return CHIP_ERROR indicating success or failure
      */
     virtual CHIP_ERROR PersistentAttributesLoadedCallback() = 0;
+
+    virtual void SetTLSCerts(Tls::CertificateTable::BufferedClientCert & clientCertEntry,
+                             Tls::CertificateTable::BufferedRootCert & rootCertEntry) = 0;
+
+    /**
+     * @brief Sets the PushAvStreamTransportServerLogic instance for the delegate.
+     *
+     * This method is called by the PushAvStreamTransportServer to provide
+     * the delegate with a pointer to the server instance. This allows the
+     * delegate to interact with the server, for example, to generate events.
+     *
+     * @param server A pointer to the PushAvStreamTransportServer instance.
+     */
+    virtual void SetPushAvStreamTransportServer(PushAvStreamTransportServer * server) = 0;
 };
 } // namespace Clusters
 } // namespace app

@@ -156,7 +156,7 @@ class TC_WebRTCRequestor_2_1(MatterBaseTest):
         )
 
         self.step(4)
-        logging.info("Injecting kFault_ModifyWebRTCAnswerSessionId on TH_SERVER")
+        logging.info("Injecting kFault_ModifyWebRTCOfferSessionId on TH_SERVER")
 
         # --- Fault‑Injection cluster (mfg‑specific 0xFFF1_FC06) ---
         # Use FailAtFault to activate the chip‑layer fault exactly once

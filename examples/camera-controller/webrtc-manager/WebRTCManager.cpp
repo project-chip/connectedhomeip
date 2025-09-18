@@ -341,7 +341,6 @@ CHIP_ERROR WebRTCManager::Connnect(Controller::DeviceCommissioner & commissioner
     mTrack->onMessage(
         [this, addr](rtc::binary message) {
             // This is an RTP packet
-            ChipLogProgress(Camera, "Video packets size: [%u]", static_cast<unsigned int>(message.size()));
             sendto(mRTPSocket, reinterpret_cast<const char *>(message.data()), size_t(message.size()), 0,
                    reinterpret_cast<const struct sockaddr *>(&addr), sizeof(addr));
         },
@@ -364,7 +363,6 @@ CHIP_ERROR WebRTCManager::Connnect(Controller::DeviceCommissioner & commissioner
     audioTrack->onMessage(
         [this, audioAddr](rtc::binary message) {
             // This is an RTP Audio packet
-            ChipLogProgress(Camera, "Audio packets size: [%u]", static_cast<unsigned int>(message.size()));
             sendto(mAudioRTPSocket, reinterpret_cast<const char *>(message.data()), static_cast<size_t>(message.size()), 0,
                    reinterpret_cast<const struct sockaddr *>(&audioAddr), sizeof(audioAddr));
         },

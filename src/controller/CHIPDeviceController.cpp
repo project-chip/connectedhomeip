@@ -781,7 +781,8 @@ CHIP_ERROR DeviceCommissioner::EstablishPASEConnection(NodeId remoteDeviceId, Re
                 if (mPairingDelegate)
                 {
                     // We already have an open secure session to this device, call the callback immediately and early return.
-                    mPairingDelegate->OnPairingComplete(CHIP_NO_ERROR);
+                    // We don't know what the right RendezvousParameters are here.
+                    mPairingDelegate->OnPairingComplete(CHIP_NO_ERROR, std::nullopt, std::nullopt);
                 }
                 MATTER_LOG_METRIC_END(kMetricDeviceCommissionerPASESession, CHIP_NO_ERROR);
                 return CHIP_NO_ERROR;
@@ -882,6 +883,8 @@ CHIP_ERROR DeviceCommissioner::EstablishPASEConnection(NodeId remoteDeviceId, Re
     err = device->GetPairing().Pair(*mSystemState->SessionMgr(), params.GetSetupPINCode(), GetLocalMRPConfig(), exchangeCtxt, this);
     SuccessOrExit(err);
 
+    mRendezvousParametersForPASEEstablishment = params;
+
 exit:
     if (err != CHIP_NO_ERROR)
     {
@@ -928,7 +931,7 @@ void DeviceCommissioner::OnDiscoveredDeviceOverBleError(void * appState, CHIP_ER
         // A better way to handle it should define a new error code
         if (self->mPairingDelegate != nullptr)
         {
-            self->mPairingDelegate->OnPairingComplete(err);
+            self->mPairingDelegate->OnPairingComplete(err, std::nullopt, std::nullopt);
         }
     }
 }
@@ -965,7 +968,7 @@ void DeviceCommissioner::OnWiFiPAFSubscribeError(void * appState, CHIP_ERROR err
         self->mRendezvousParametersForDeviceDiscoveredOverWiFiPAF = RendezvousParameters();
         if (self->mPairingDelegate != nullptr)
         {
-            self->mPairingDelegate->OnPairingComplete(err);
+            self->mPairingDelegate->OnPairingComplete(err, std::nullopt, std::nullopt);
         }
     }
 }
@@ -1214,7 +1217,7 @@ void DeviceCommissioner::RendezvousCleanup(CHIP_ERROR status)
 
         if (mPairingDelegate != nullptr)
         {
-            mPairingDelegate->OnPairingComplete(status);
+            mPairingDelegate->OnPairingComplete(status, std::nullopt, std::nullopt);
         }
     }
 }
@@ -1222,6 +1225,8 @@ void DeviceCommissioner::RendezvousCleanup(CHIP_ERROR status)
 void DeviceCommissioner::OnSessionEstablishmentError(CHIP_ERROR err)
 {
     MATTER_LOG_METRIC_END(kMetricDeviceCommissionerPASESession, err);
+
+    mRendezvousParametersForPASEEstablishment.reset();
 
     if (mPairingDelegate != nullptr)
     {
@@ -1239,6 +1244,11 @@ void DeviceCommissioner::OnSessionEstablished(const SessionHandle & session)
     // We are in the callback for this pairing. Reset so we can pair another device.
     mDeviceInPASEEstablishment = nullptr;
 
+    // Make sure to clear out mRendezvousParametersForPASEEstablishment no
+    // matter what.
+    std::optional<RendezvousParameters> paseParameters;
+    paseParameters.swap(mRendezvousParametersForPASEEstablishment);
+
     VerifyOrReturn(device != nullptr, OnSessionEstablishmentError(CHIP_ERROR_INVALID_DEVICE_DESCRIPTOR));
 
     CHIP_ERROR err = device->SetConnected(session);
@@ -1254,7 +1264,11 @@ void DeviceCommissioner::OnSessionEstablished(const SessionHandle & session)
     MATTER_LOG_METRIC_END(kMetricDeviceCommissionerPASESession, CHIP_NO_ERROR);
     if (mPairingDelegate != nullptr)
     {
-        mPairingDelegate->OnPairingComplete(CHIP_NO_ERROR);
+        // If we started with a string payload, then at this point mPairingDelegate is
+        // mSetUpCodePairer, and it will provide the right SetupPayload argument to
+        // OnPairingComplete as needed.  If mPairingDelegate is not
+        // mSetUpCodePairer, then we don't have a SetupPayload to provide.
+        mPairingDelegate->OnPairingComplete(CHIP_NO_ERROR, paseParameters, std::nullopt);
     }
 
     if (mRunCommissioningAfterConnection)
@@ -3131,6 +3145,11 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
     {
         ChipLogProgress(Controller, "Performing next commissioning step '%s' with completion status = '%s'", StageToString(step),
                         params.GetCompletionStatus().err.AsString());
+    }
+
+    if (mPairingDelegate)
+    {
+        mPairingDelegate->OnCommissioningStageStart(PeerId(GetCompressedFabricId(), proxy->GetDeviceId()), step);
     }
 
     mCommissioningStepTimeout = timeout;
