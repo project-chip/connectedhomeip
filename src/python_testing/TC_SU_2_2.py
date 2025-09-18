@@ -42,26 +42,21 @@
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
 
-import logging
 import asyncio
-import threading     # For Step #1
-import time          # For Step #2
-import subprocess
-import os
-import signal
-import psutil
-import socket
+import logging
 import queue
+import subprocess
+import threading
+import time
+
+from mobly import asserts
 
 import matter.clusters as Clusters
 from matter import ChipDeviceCtrl
 from matter.interaction_model import Status
+from matter.testing import matter_asserts
 from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from matter.testing.event_attribute_reporting import AttributeSubscriptionHandler, EventSubscriptionHandler, AttributeMatcher
-
-from matter.testing import matter_asserts
-
-from mobly import asserts
 
 # Create a logger
 logger = logging.getLogger(__name__)
