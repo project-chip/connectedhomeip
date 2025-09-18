@@ -109,10 +109,7 @@ public:
     }
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI_PDC
-    bool SupportsPerDeviceCredentials() override
-    {
-        return true;
-    };
+    bool SupportsPerDeviceCredentials() override { return true; };
     CHIP_ERROR AddOrUpdateNetworkWithPDC(ByteSpan ssid, ByteSpan networkIdentity, Optional<uint8_t> clientIdentityNetworkIndex,
                                          Status & outStatus, MutableCharSpan & outDebugText, MutableByteSpan & outClientIdentity,
                                          uint8_t & outNetworkIndex) override;
@@ -137,10 +134,7 @@ private:
         static_assert(std::numeric_limits<decltype(credentialsLen)>::max() >= sizeof(credentials));
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI_PDC
-        bool UsingPDC() const
-        {
-            return networkIdentityLen != 0;
-        }
+        bool UsingPDC() const { return networkIdentityLen != 0; }
 
         uint8_t networkIdentity[Credentials::kMaxCHIPCompactNetworkIdentityLength];
         uint8_t networkIdentityLen = 0;

@@ -95,10 +95,7 @@ public:
 
 #endif
 
-    System::Clock::Timestamp GetStartTime()
-    {
-        return mStartTime;
-    }
+    System::Clock::Timestamp GetStartTime() { return mStartTime; }
 
 private:
     // ===== Methods that implement the PlatformManager abstract interface.
