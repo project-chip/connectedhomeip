@@ -23,6 +23,7 @@
 #include <lib/core/NodeId.h>
 #include <lib/support/DLLUtil.h>
 #include <protocols/secure_channel/RendezvousParameters.h>
+#include <setup_payload/SetupPayload.h>
 #include <stdint.h>
 
 #include <optional>
@@ -71,8 +72,16 @@ public:
      *                             If available, this helps identify which exact commissionee PASE
      *                             was established for. This will generally be present only when
      *                             PASE establishment succeeds.
+     *
+     * @param setupPayload The SetupPayload that was used for PASE establishment, if one is
+     *                     available.  This will generally be present only when PASE establishment
+     *                     succeeds and the original input to commissioning was a payload string.
+     *                     If the original input represented a concatenated QR code, this will
+     *                     represent the actual payload that was used to successfully establish PASE
+     *                     with the commissionee.
      */
-    virtual void OnPairingComplete(CHIP_ERROR error, const std::optional<RendezvousParameters> & rendezvousParameters)
+    virtual void OnPairingComplete(CHIP_ERROR error, const std::optional<RendezvousParameters> & rendezvousParameters,
+                                   const std::optional<SetupPayload> & setupPayload)
     {
         OnPairingComplete(error);
     }
