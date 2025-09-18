@@ -73,7 +73,7 @@ void emberAfClusterInitCallback(EndpointId endpoint, ClusterId clusterId)
     // clusters dont use it.
 }
 
-void MatterCodedrivenClusterServerInitCallback(EndpointId endpoint, ClusterId clusterId)
+void MatterClusterServerInitCallback(EndpointId endpoint, ClusterId clusterId)
 {
     assertChipStackLockedByCurrentThread();
 
@@ -81,7 +81,7 @@ void MatterCodedrivenClusterServerInitCallback(EndpointId endpoint, ClusterId cl
     // this is a no-op
 }
 
-void MatterCodedrivenClusterServerShutdownCallback(EndpointId endpoint, ClusterId clusterId)
+void MatterClusterServerShutdownCallback(EndpointId endpoint, ClusterId clusterId)
 {
     assertChipStackLockedByCurrentThread();
 
