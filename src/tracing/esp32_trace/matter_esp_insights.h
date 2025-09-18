@@ -14,20 +14,18 @@
 #pragma once
 #include <esp_diagnostics_metrics.h>
 
-esp_err_t chip_esp_insights_add_uint(const char * tag, const char * key, uint32_t u)
+esp_err_t matter_esp_insights_add_uint([[maybe_unused]] const char * tag, const char * key, uint32_t u)
 {
 #ifdef CONFIG_ESP_INSIGHTS_META_VERSION_10
-    (void) tag; // tag is not used in this version
     return esp_diag_metrics_add_uint(key, u);
 #else
     return esp_diag_metrics_report_uint(tag, key, u);
 #endif
 }
 
-esp_err_t chip_esp_insights_add_int(const char * tag, const char * key, int32_t i)
+esp_err_t matter_esp_insights_add_int([[maybe_unused]] const char * tag, const char * key, int32_t i)
 {
 #ifdef CONFIG_ESP_INSIGHTS_META_VERSION_10
-    (void) tag; // tag is not used in this version
     return esp_diag_metrics_add_int(key, i);
 #else
     return esp_diag_metrics_report_int(tag, key, i);

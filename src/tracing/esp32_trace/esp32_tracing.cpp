@@ -16,7 +16,7 @@
  *    limitations under the License.
  */
 
-#include "insights_api.h"
+#include "matter_esp_insights.h"
 #include <algorithm>
 #include <esp_err.h>
 #include <esp_heap_caps.h>
@@ -201,17 +201,17 @@ void ESP32Backend::LogMetricEvent(const MetricEvent & event)
     {
     case ValueType::kInt32:
         ESP_LOGI("mtr", "The value of %s is %ld ", event.key(), event.ValueInt32());
-        chip_esp_insights_add_int("SYS_MTR", event.key(), event.ValueInt32());
+        matter_esp_insights_add_int("SYS_MTR", event.key(), event.ValueInt32());
         break;
 
     case ValueType::kUInt32:
         ESP_LOGI("mtr", "The value of %s is %lu ", event.key(), event.ValueUInt32());
-        chip_esp_insights_add_uint("SYS_MTR", event.key(), event.ValueUInt32());
+        matter_esp_insights_add_uint("SYS_MTR", event.key(), event.ValueUInt32());
         break;
 
     case ValueType::kChipErrorCode:
         ESP_LOGI("mtr", "The value of %s is error with code %lu ", event.key(), event.ValueErrorCode());
-        chip_esp_insights_add_uint("SYS_MTR", event.key(), event.ValueErrorCode());
+        matter_esp_insights_add_uint("SYS_MTR", event.key(), event.ValueErrorCode());
         break;
 
     case ValueType::kUndefined:
