@@ -80,7 +80,7 @@ RUN sed -i '/^TIZEN_SDK_DATA_PATH/d' $TIZEN_SDK_ROOT/sdk.info \
 
 RUN [ -n "${LOCAL_WORKSPACE_ROOT}" ] \
     && mkdir -p "$(dirname "${LOCAL_WORKSPACE_ROOT}")" \
-    && ln -s "${WORKSPACE_ROOT}" "${LOCAL_WORKSPACE_ROOT}" \
+    && ln -sf "${WORKSPACE_ROOT}" "${LOCAL_WORKSPACE_ROOT}" \
     && :
 
 ENV TIZEN_ROOTFS=/tizen_rootfs
