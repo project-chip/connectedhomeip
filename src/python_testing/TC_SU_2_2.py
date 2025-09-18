@@ -63,8 +63,6 @@ logger = logging.getLogger(__name__)
 
 
 class TC_SU_2_2(MatterBaseTest):
-    cluster_otap = Clusters.OtaSoftwareUpdateProvider
-    cluster_otar = Clusters.OtaSoftwareUpdateRequestor
 
     def launch_provider_regex(self, ota_file: str, discriminator: int, passcode: int, secured_device_port: int,
                               wait_for: str, queue: str = None, timeout: int = None, override_image_uri: str = None):
@@ -289,8 +287,8 @@ class TC_SU_2_2(MatterBaseTest):
         # Read existing DefaultOTAProviders on the Requestor
         current_providers = await self.read_single_attribute_check_success(
             dev_ctrl=controller,
-            cluster=self.cluster_otar,
-            attribute=self.cluster_otar.Attributes.DefaultOTAProviders
+            cluster=Clusters.OtaSoftwareUpdateRequestor,
+            attribute=Clusters.OtaSoftwareUpdateRequestor.Attributes.DefaultOTAProviders
         )
         logger.info(f'Prerequisite #4.0 - Current DefaultOTAProviders on Requestor: {current_providers}')
 
@@ -300,7 +298,7 @@ class TC_SU_2_2(MatterBaseTest):
             return
 
         # Create a ProviderLocation for the new provider
-        provider_location = self.cluster_otar.Structs.ProviderLocation(
+        provider_location = Clusters.OtaSoftwareUpdateRequestor.Structs.ProviderLocation(
             providerNodeID=provider_node_id,
             endpoint=0,
             fabricIndex=controller.fabricId
@@ -311,7 +309,7 @@ class TC_SU_2_2(MatterBaseTest):
         updated_providers = current_providers + [provider_location]
 
         # Write the updated DefaultOTAProviders list back to the Requestor
-        attr = self.cluster_otar.Attributes.DefaultOTAProviders(value=updated_providers)
+        attr = Clusters.OtaSoftwareUpdateRequestor.Attributes.DefaultOTAProviders(value=updated_providers)
         resp = await controller.WriteAttribute(
             attributes=[(0, attr)],
             nodeid=requestor_node_id
