@@ -140,7 +140,7 @@ class TC_SU_2_2(MatterBaseTest):
                 break
             time.sleep(0.1)
 
-        # If regext not found, fail test
+        # If regex not found, fail test
         if not found_wait_for:
             proc.terminate()
             raise RuntimeError("Provider ended before matching status")
@@ -770,7 +770,7 @@ class TC_SU_2_2(MatterBaseTest):
             thread_progress.join()
 
             logger.info(
-                f'{step_number_s1}: Step #1.3 - Both OTA attributes UpdateState (2.1.1) and UpdateStateProgress (121.2) matchers have completed.')
+                f'{step_number_s1}: Step #1.3 - Both OTA attributes UpdateState (1.2.1) and UpdateStateProgress (1.2.2) matchers have completed.')
         except Exception as e:
             logger.warning(f'OTA update encountered an error or timeout: {e}')
         finally:
@@ -1357,7 +1357,7 @@ class TC_SU_2_2(MatterBaseTest):
 
         logger.info(f'{step_number_s6}: Step #6.0 - Controller sends AnnounceOTAProvider command')
         resp_announce = await self.send_announce_ota_provider(CONTROLLER, REQUESTOR_NODE_ID, provider_node_id=provider_node_id_s6)
-        logger.info(f'{step_number_s6}: Step #2.0 - cmd AnnounceOTAProvider response: {resp_announce}.')
+        logger.info(f'{step_number_s6}: Step #6.0 - cmd AnnounceOTAProvider response: {resp_announce}.')
 
         # ------------------------------------------------------------------------------------
         # [STEP_6]: Step #6.2 -  Track OTA StateTransition event: should stay Idle if UpdateAvailable version is same or lower
@@ -1382,7 +1382,7 @@ class TC_SU_2_2(MatterBaseTest):
             val = report.Data.newState
             prev_state = report.Data.previousState
             event_reason = report.Data.reason
-            event_targer_sw = report.Data.targetSoftwareVersion
+            event_target_sw = report.Data.targetSoftwareVersion
 
             if val is None:
                 return False
@@ -1529,7 +1529,7 @@ class TC_SU_2_2(MatterBaseTest):
             val = report.Data.newState
             prev_state = report.Data.previousState
             event_reason = report.Data.reason
-            event_targer_sw = report.Data.targetSoftwareVersion
+            event_target_sw = report.Data.targetSoftwareVersion
 
             if val is None:
                 return False
