@@ -157,7 +157,7 @@ class AddressResolverIPv6(MdnsAsyncServiceInfo):
 
     def __init__(self, hostname: str) -> None:
         """Initialize the AddressResolver."""
-        super().__init__(hostname, hostname, server=hostname)
+        super().__init__(server=hostname)
         self._query_record_types = {_TYPE_AAAA}
 
     @property
