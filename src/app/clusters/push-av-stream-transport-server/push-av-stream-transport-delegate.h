@@ -222,8 +222,8 @@ public:
     /**
      * @brief Validates size of motion zone List.
      *
-     * @param zoneSize Size for the requested zone list
-     * @return true if the motion zone size is less than the defined maximum, false otherwise
+     * @param zoneListSize Size of the motion zone list
+     * @return true if the motion zone size is less than or equal to the defined maximum, false otherwise
      */
     virtual bool ValidateMotionZoneListSize(size_t zoneListSize) = 0;
 

@@ -657,6 +657,8 @@ PushAvStreamTransportServerLogic::HandleAllocatePushTransport(CommandHandler & h
         size_t zoneListSize    = 0;
         motionZonesList.Value().Value().ComputeSize(&zoneListSize);
 
+        // To Do: de-duplicate the entries, per issue https://github.com/project-chip/connectedhomeip/issues/41051
+
         bool isValidZoneSize = mDelegate->ValidateMotionZoneListSize(zoneListSize);
         VerifyOrReturnValue(
             isValidZoneSize, Status::DynamicConstraintError,
