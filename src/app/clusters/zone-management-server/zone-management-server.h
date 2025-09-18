@@ -330,6 +330,8 @@ private:
      */
     void LoadPersistentAttributes();
 
+    void PersistZones();
+
     CHIP_ERROR ReadAndEncodeZones(const AttributeValueEncoder::ListEncodeHelper & encoder);
 
     CHIP_ERROR ReadAndEncodeTriggers(const AttributeValueEncoder::ListEncodeHelper & encoder);

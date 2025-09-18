@@ -364,9 +364,34 @@ void ZoneMgmtServer::InvokeCommand(HandlerContext & handlerContext)
     }
 }
 
+void ZoneMgmtServer::PersistZones() {
+    uint8_t buffer[kMaxPersistedValueLengthSupported];
+    MutableByteSpan bufferSpan(buffer);
+    chip::TLV::TLVWriter writer;
+    CHIP_ERROR err;
+    TLV::TLVType arrayType;
+
+    err = writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Array, arrayType);
+    VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogDetail(Zcl,"ZoneManagement[ep=%d] failure saving zone: %s", mEndpointId, "start"));
+
+    for (const auto & zone : mZones)
+    {
+        err = zone.Encode(writer, chip::TLV::AnonymousTag());
+        VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogDetail(Zcl,"ZoneManagement[ep=%d] failure saving zone: %s", mEndpointId, "element"));
+    }
+    err = writer.EndContainer(arrayType);
+    VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogDetail(Zcl,"ZoneManagement[ep=%d] failure saving zone: %s", mEndpointId, "end"));
+
+    bufferSpan.reduce_size(writer.GetLengthWritten());
+
+    err = GetSafeAttributePersistenceProvider()->SafeWriteValue(ConcreteAttributePath(mEndpointId, ZoneManagement::Id, Attributes::Zones::Id), bufferSpan);
+    VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogDetail(Zcl,"ZoneManagement[ep=%d] failure saving zone: %s", mEndpointId, "write"));
+}
+
 CHIP_ERROR ZoneMgmtServer::AddZone(const ZoneInformationStorage & zone)
 {
     mZones.push_back(zone);
+    PersistZones();
     auto path = ConcreteAttributePath(mEndpointId, ZoneManagement::Id, Attributes::Zones::Id);
     mDelegate.OnAttributeChanged(Attributes::Zones::Id);
     MatterReportingAttributeChangeCallback(path);
@@ -384,6 +409,7 @@ CHIP_ERROR ZoneMgmtServer::UpdateZone(uint16_t zoneId, const ZoneInformationStor
     if (it != mZones.end())
     {
         *it       = zoneInfo; // Replace the found item with the newItem
+        PersistZones();
         auto path = ConcreteAttributePath(mEndpointId, ZoneManagement::Id, Attributes::Zones::Id);
         mDelegate.OnAttributeChanged(Attributes::Zones::Id);
         MatterReportingAttributeChangeCallback(path);
@@ -404,6 +430,7 @@ CHIP_ERROR ZoneMgmtServer::RemoveZone(uint16_t zoneId)
     if (it != mZones.end())
     {
         mZones.erase(it, mZones.end());
+        PersistZones();
         auto path = ConcreteAttributePath(mEndpointId, ZoneManagement::Id, Attributes::Zones::Id);
         mDelegate.OnAttributeChanged(Attributes::Zones::Id);
         MatterReportingAttributeChangeCallback(path);
