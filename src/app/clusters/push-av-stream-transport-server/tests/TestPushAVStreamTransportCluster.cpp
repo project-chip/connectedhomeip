@@ -377,7 +377,7 @@ public:
         // No-op implementation for tests
     }
 
-    void SetPushAvStreamTransportServer(PushAvStreamTransportServerLogic * serverLogic) override
+    void SetPushAvStreamTransportServer(PushAvStreamTransportServer * server) override
     {
         // No-op implementation for tests
     }

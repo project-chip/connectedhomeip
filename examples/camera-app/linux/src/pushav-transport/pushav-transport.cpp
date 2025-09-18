@@ -491,10 +491,10 @@ void PushAVTransport::SetTransportStatus(TransportStatusEnum status)
         mCanSendVideo = false;
         mCanSendAudio = false;
         mRecorder.reset();
-        ChipLogError(Camera, "Recorder destruction done");
+        ChipLogProgress(Camera, "Recorder destruction done");
         InitializeRecorder();
         mUploader.reset();
-
+        ChipLogProgress(Camera, "Uploader destruction done");
         ChipLogProgress(Camera, "PushAVTransport transport status changed to inactive");
     }
 }
@@ -532,7 +532,7 @@ bool PushAVTransport::CanSendPacketsToRecorder()
     return true;
 }
 
-void PushAVTransport::SendVideo(const char * data, size_t size, uint16_t videoStreamID)
+void PushAVTransport::SendVideo(const char * data, size_t size, int64_t timestamp, uint16_t videoStreamID)
 {
     if (CanSendPacketsToRecorder())
     {
@@ -540,7 +540,7 @@ void PushAVTransport::SendVideo(const char * data, size_t size, uint16_t videoSt
     }
 }
 
-void PushAVTransport::SendAudio(const char * data, size_t size, uint16_t audioStreamID)
+void PushAVTransport::SendAudio(const char * data, size_t size, int64_t timestamp, uint16_t audioStreamID)
 {
     if (CanSendPacketsToRecorder())
     {
