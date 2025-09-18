@@ -187,7 +187,7 @@ CHIP_ERROR WbsDeviceScanner::StopScanImpl()
     LsRequester *lsRequester = LsRequester::getInstance();
 
     ret = lsRequester->lsCallCancel(mLeInternalStartScanToken);
-    if(ret != true){
+    if(ret != true) {
         ChipLogError(Ble, "ChipDeviceScanner StopScanImpl lsCallCancel Error");
         return CHIP_ERROR_INTERNAL;
     }
