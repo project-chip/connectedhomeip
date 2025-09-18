@@ -198,7 +198,7 @@ class TC_WEBRTC_1_7(MatterBaseTest, WebRTCTestHelper):
             endpoint=endpoint,
             payloadCapability=TransportPayloadCapability.LARGE_PAYLOAD,
         )
-        
+
         self.step(8)
         th2 = await webrtc_create_test_harness_controller(self)
 
@@ -214,40 +214,40 @@ class TC_WEBRTC_1_7(MatterBaseTest, WebRTCTestHelper):
         map_nodeId = self.dut_node_id + 1
         aVideoStreamId = await self.allocate_video_stream(endpoint, devCtrl=dev_ctrl, node_id=map_nodeId)
         provide_offer_response: WebRTCTransportProvider.Commands.ProvideOfferResponse = await webrtc_peer2.send_command(
-        cmd=WebRTCTransportProvider.Commands.ProvideOffer(
-            webRTCSessionID=NullValue,
-            sdp=offer,
-            streamUsage=Objects.Globals.Enums.StreamUsageEnum.kLiveView,
-            originatingEndpointID=1,
-            videoStreamID=aVideoStreamId,
-        ),
-        endpoint=endpoint,
-        payloadCapability=TransportPayloadCapability.LARGE_PAYLOAD,
+            cmd=WebRTCTransportProvider.Commands.ProvideOffer(
+                webRTCSessionID=NullValue,
+                sdp=offer,
+                streamUsage=Objects.Globals.Enums.StreamUsageEnum.kLiveView,
+                originatingEndpointID=1,
+                videoStreamID=aVideoStreamId,
+            ),
+            endpoint=endpoint,
+            payloadCapability=TransportPayloadCapability.LARGE_PAYLOAD,
         )
         session_id = provide_offer_response.webRTCSessionID
         asserts.assert_true(session_id >= 0, "Invalid response")
         webrtc_manager.session_id_created(session_id, map_nodeId)
         answer_sessionId, answer = await webrtc_peer2.get_remote_answer(timeout_s=30)
         webrtc_peer2.set_remote_answer(answer)
-        
+
         local_candidates = await webrtc_peer2.get_local_ice_candidates()
         local_candidates_struct_list = [
-        Objects.Globals.Structs.ICECandidateStruct(candidate=cand.candidate) for cand in local_candidates
+            Objects.Globals.Structs.ICECandidateStruct(candidate=cand.candidate) for cand in local_candidates
         ]
-        
+
         await self.send_single_cmd(
-        cmd=WebRTCTransportProvider.Commands.ProvideICECandidates(
-            webRTCSessionID=answer_sessionId, ICECandidates=local_candidates_struct_list
-        ),
-        endpoint=endpoint,
-        payloadCapability=TransportPayloadCapability.LARGE_PAYLOAD,
-        dev_ctrl=dev_ctrl,
-        node_id=map_nodeId
+            cmd=WebRTCTransportProvider.Commands.ProvideICECandidates(
+                webRTCSessionID=answer_sessionId, ICECandidates=local_candidates_struct_list
+            ),
+            endpoint=endpoint,
+            payloadCapability=TransportPayloadCapability.LARGE_PAYLOAD,
+            dev_ctrl=dev_ctrl,
+            node_id=map_nodeId
         )
-        
+
         ice_session_id, remote_candidates = await webrtc_peer2.get_remote_ice_candidates()
         webrtc_peer2.set_remote_ice_candidates(remote_candidates)
-        
+
         if not await webrtc_peer2.check_for_session_establishment():
             logging.error("Failed to establish webrtc session for controller 2")
             raise Exception("Failed to establish webrtc session for controller 2")
@@ -259,13 +259,13 @@ class TC_WEBRTC_1_7(MatterBaseTest, WebRTCTestHelper):
             ),
             endpoint=endpoint,
             payloadCapability=TransportPayloadCapability.LARGE_PAYLOAD,
-            dev_ctrl = th2,
-            node_id = map_nodeId,
+            dev_ctrl=th2,
+            node_id=map_nodeId,
         )
-        
+
         await webrtc_manager.close_all()
-        
-        
+
+
 async def webrtc_create_test_harness_controller(self):
     self.th1 = self.default_controller
     self.discriminator = random.randint(0, 4095)
