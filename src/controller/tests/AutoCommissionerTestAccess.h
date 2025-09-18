@@ -52,7 +52,7 @@ public:
     Controller::ReadCommissioningInfo & GetDeviceCommissioningInfo() { return mCommissioner->mDeviceCommissioningInfo; }
     void ResetTryingSecondaryNetwork() { mCommissioner->ResetTryingSecondaryNetwork(); }
 
-    bool TryingSecondaryNetwork() { return mCommissioner->TryingSecondaryNetwork(); }
+    bool TryingSecondaryNetwork() const { return mCommissioner->TryingSecondaryNetwork(); }
     void TrySecondaryNetwork() { mCommissioner->TrySecondaryNetwork(); }
 
     Controller::CommissioningStage GetNextCommissioningStageNetworkSetup(Controller::CommissioningStage currentStage,
