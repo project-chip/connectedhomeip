@@ -13,7 +13,7 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 #
-mainmenu "Matter NXP Thermostat Example Application"
+mainmenu "Matter NXP Laundry Washer Example Application"
 
 source "$(CHIP_ROOT)/config/nxp/chip-cmake-freertos/Kconfig.defaults"
 source "$(CHIP_ROOT)/examples/platform/nxp/common/Kconfig"
