@@ -351,11 +351,6 @@ static inline void emitMetricForSetupPayload(NSString * payload)
     });
 }
 
-// TODO: There is currently no way to know when a commissioning stage _starts_, so we
-// don't have a good way to create MTRCommissioningStageWiFiScanStart and
-// MTRCommissioningStageThreadScanStart notifications.  This will need changes
-// to the C++ DevicePairingDelegate.
-
 #pragma mark - MTRDeviceControllerDelegate_Internal implementatation
 
 - (void)controller:(MTRDeviceController *)controller
