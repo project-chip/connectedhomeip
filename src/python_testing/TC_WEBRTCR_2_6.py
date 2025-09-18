@@ -45,7 +45,7 @@ from matter.testing.apps import AppServerSubprocess
 from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 
 
-class TC_WebRTCRequestor_2_1(MatterBaseTest):
+class TC_WebRTCRequestor_2_6(MatterBaseTest):
     def setup_class(self):
         super().setup_class()
 
@@ -70,7 +70,8 @@ class TC_WebRTCRequestor_2_1(MatterBaseTest):
             th_server_app,
             storage_dir=self.storage.name,
             discriminator=self.th_server_discriminator,
-            passcode=self.th_server_passcode
+            passcode=self.th_server_passcode,
+            port=5683,  # Use unique port number to avoid port conflict
         )
 
         self.th_server.start(
@@ -86,11 +87,11 @@ class TC_WebRTCRequestor_2_1(MatterBaseTest):
             self.storage.cleanup()
         super().teardown_class()
 
-    def desc_TC_WebRTCRequestor_2_1(self) -> str:
+    def desc_TC_WebRTCRequestor_2_6(self) -> str:
         """Returns a description of this test"""
-        return "[TC-{picsCode}-2.1] Validate Offer command with invalid session id"
+        return "[TC-{picsCode}-2.6] Validate ICECandidates command with invalid session id"
 
-    def steps_TC_WebRTCRequestor_2_1(self) -> list[TestStep]:
+    def steps_TC_WebRTCRequestor_2_6(self) -> list[TestStep]:
         """
         Define the step-by-step sequence for the test.
         """
@@ -98,8 +99,8 @@ class TC_WebRTCRequestor_2_1(MatterBaseTest):
             TestStep(1, "Commission the {TH_Server} from TH"),
             TestStep(2, "Open the Commissioning Window of the {TH_Server}"),
             TestStep(3, "Commission the {TH_Server} from DUT"),
-            TestStep(4, "Activate fault injection on {TH_Server} to modify the session ID of the WebRTC Offer command"),
-            TestStep(5, "Trigger {TH_Server} to send an Offer command to DUT with an invalid/non-existent WebRTCSessionID"),
+            TestStep(4, "Activate fault injection on TH_SERVER to modify the session ID of the WebRTC ICECandidates command"),
+            TestStep(5, "Trigger TH_SERVER to send ICECandidates command to DUT with invalid session ID"),
         ]
         return steps
 
@@ -110,13 +111,13 @@ class TC_WebRTCRequestor_2_1(MatterBaseTest):
         return 3 * 60
 
     @async_test_body
-    async def test_TC_WebRTCRequestor_2_1(self):
+    async def test_TC_WebRTCRequestor_2_6(self):
         """
-        Executes the test steps for the WebRTC Provider cluster scenario.
+        Executes the test steps for the WebRTC ICECandidates with invalid session ID scenario.
         """
 
-        discriminator = 1234
-        passcode = 20202021
+        discriminator = self.th_server_discriminator
+        passcode = self.th_server_passcode
         self.th_server_local_nodeid = 1111
         self.discriminator = random.randint(0, 4095)
 
@@ -156,20 +157,20 @@ class TC_WebRTCRequestor_2_1(MatterBaseTest):
         )
 
         self.step(4)
-        logging.info("Injecting kFault_ModifyWebRTCOfferSessionId on TH_SERVER")
+        logging.info("Injecting kFault_ModifyWebRTCICECandidatesSessionId on TH_SERVER")
 
         # --- Fault‑Injection cluster (mfg‑specific 0xFFF1_FC06) ---
         # Use FailAtFault to activate the chip‑layer fault exactly once
         #
         #  • faultType = kChipFault (0x03)  – always used for CHIP faults
-        #  • id        = FaultInjection.Id.kFault_ModifyWebRTCOfferSessionId
+        #  • id        = FaultInjection.Id.kFault_ModifyWebRTCICECandidatesSessionId
         #  • numCallsToSkip = 0  – trigger on the very next call
         #  • numCallsToFail = 1  – inject once, then auto‑clear
         #  • takeMutex      = False  – single‑threaded app, no lock needed
         #
         command = Clusters.FaultInjection.Commands.FailAtFault(
             type=Clusters.FaultInjection.Enums.FaultType.kChipFault,
-            id=16,  # kFault_ModifyWebRTCOfferSessionId
+            id=32,  # kFault_ModifyWebRTCICECandidatesSessionId
             numCallsToFail=1,
             takeMutex=False,
         )
@@ -183,10 +184,11 @@ class TC_WebRTCRequestor_2_1(MatterBaseTest):
         self.step(5)
         # Prompt user with instructions
         prompt_msg = (
-            "\nSend 'SolicitOffer' command to the server app from DUT:\n"
-            "  webrtc establish-session 1 --offer-type 1\n"
-            "Input 'Y' if WebRTC session is failed with error 'NOT_FOUND'\n"
-            "Input 'N' if WebRTC session is successfully established\n"
+            "\nSend 'ProvideOffer' command to the server app from DUT:\n"
+            "  webrtc establish-session 1\n"
+            "This should be done by establishing a WebRTC session and then triggering ICE candidate exchange.\n"
+            "Input 'Y' if DUT responds with NOT_FOUND status code\n"
+            "Input 'N' if DUT accepts the ICECandidates command or responds with a different error\n"
         )
 
         if self.is_pics_sdk_ci_only:
@@ -201,7 +203,7 @@ class TC_WebRTCRequestor_2_1(MatterBaseTest):
         asserts.assert_equal(
             result,
             True,
-            f"WebRTC session {'failed as expected' if result else 'unexpectedly succeeded'}"
+            f"DUT {'correctly responded with NOT_FOUND' if result else 'did not respond with NOT_FOUND as expected'}"
         )
 
 

@@ -811,7 +811,7 @@ CHIP_ERROR WebRTCProviderManager::SendAnswerCommand(Messaging::ExchangeManager &
 
     // Build the command
     WebRTCTransportRequestor::Commands::Answer::Type command;
-    command.webRTCSessionID = mSessionIdMap[sessionHandle->GetPeer().GetNodeId()];
+    command.webRTCSessionID = sessionId;
     std::string localSdp    = transport->GetLocalDescription();
     command.sdp             = CharSpan::fromCharString(localSdp.c_str());
 
@@ -857,8 +857,19 @@ CHIP_ERROR WebRTCProviderManager::SendICECandidatesCommand(Messaging::ExchangeMa
         iceCandidateStructList.push_back(iceCandidate);
     }
 
+    CHIP_FAULT_INJECT(chip::FaultInjection::kFault_ModifyWebRTCICECandidatesSessionId, sessionId++);
+    CHIP_FAULT_INJECT(chip::FaultInjection::kFault_EmptyWebRTCICECandidatesList, iceCandidateStructList.clear());
+
     command.webRTCSessionID = sessionId;
-    command.ICECandidates = DataModel::List<const ICECandidateStruct>(iceCandidateStructList.data(), iceCandidateStructList.size());
+    if (iceCandidateStructList.empty())
+    {
+        command.ICECandidates = DataModel::List<const ICECandidateStruct>();
+    }
+    else
+    {
+        command.ICECandidates =
+            DataModel::List<const ICECandidateStruct>(iceCandidateStructList.data(), iceCandidateStructList.size());
+    }
 
     WebrtcTransport::RequestArgs requestArgs = transport->GetRequestArgs();
     // Now invoke the command using the found session handle
