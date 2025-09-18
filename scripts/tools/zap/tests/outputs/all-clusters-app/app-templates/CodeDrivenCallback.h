@@ -31,10 +31,6 @@ void MatterBasicInformationClusterInitCallback(chip::EndpointId endpointId);
 
 void MatterBasicInformationClusterShutdownCallback(chip::EndpointId endpointId);
 
-void MatterNetworkCommissioningClusterInitCallback(chip::EndpointId endpointId);
-
-void MatterNetworkCommissioningClusterShutdownCallback(chip::EndpointId endpointId);
-
 void MatterGeneralDiagnosticsClusterInitCallback(chip::EndpointId endpointId);
 
 void MatterGeneralDiagnosticsClusterShutdownCallback(chip::EndpointId endpointId);
