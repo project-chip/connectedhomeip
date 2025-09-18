@@ -18,12 +18,13 @@
 
 #include <pw_unit_test/framework.h>
 
-#include "Test_cert_data.h"
 #include <controller/AutoCommissioner.h>
 #include <controller/CommissioningDelegate.h>
 #include <controller/tests/AutoCommissionerTestAccess.h>
 #include <lib/core/StringBuilderAdapters.h>
 #include <lib/support/CHIPMemString.h>
+// #include <credentials/tests/CHIPCert_test_vectors.h>
+#include <controller/tests/Test_cert_data.cpp>
 
 #include <cstring>
 #include <memory>
@@ -339,6 +340,22 @@ TEST_F(AutoCommissionerTest, NextStageConfigureTCAcknowledgments)
     EXPECT_EQ(nextStage, kSendPAICertificateRequest);
 }
 
+namespace {
+const ByteSpan kValidRCAC(TestCerts::kTestRCAC);
+const ByteSpan kValidNOC(TestCerts::kTestICAC);
+const ByteSpan kValidICAC(TestCerts::kTestIcacNOC);
+const Crypto::IdentityProtectionKeySpan kValidIpk(TestCerts::kTestIPK);
+const NodeId kValidNodeId = 0x000;
+// Invalid buffers
+const ByteSpan kInvalidEmptyRCAC;
+const ByteSpan kInvalidEmptyNOC;
+const ByteSpan kInvalidEmptyICAC;
+
+uint8_t buffer[10];
+ByteSpan kCoruptedBufferInvalidRCAC(buffer, static_cast<size_t>(std::numeric_limits<uint32_t>::max()) + 1);
+ByteSpan kCoruptedBufferInvalidNOC(buffer, static_cast<size_t>(std::numeric_limits<uint32_t>::max()) + 1);
+} // namespace
+
 // Happy paths and valid arguments are thoroughly checked with the Python integration test in
 // src/controller/python/OpCredsBinding.cpp
 
@@ -347,8 +364,7 @@ TEST_F(AutoCommissionerTest, NOCChainGenerated_EmptyRCACReturnsInvalidArgument)
 {
     AutoCommissionerTestAccess privateConfigCommissioner(&mCommissioner);
 
-    CHIP_ERROR err =
-        privateConfigCommissioner.NOCChainGenerated(ByteSpan(), ByteSpan(), ByteSpan(), Crypto::IdentityProtectionKeySpan(), 0);
+    CHIP_ERROR err = privateConfigCommissioner.NOCChainGenerated(kValidNOC, kValidICAC, kInvalidEmptyRCAC, kValidIpk, kValidNodeId);
 
     EXPECT_EQ(err, CHIP_ERROR_INVALID_ARGUMENT);
 }
@@ -357,12 +373,10 @@ TEST_F(AutoCommissionerTest, NOCChainGenerated_EmptyRCACReturnsInvalidArgument)
 TEST_F(AutoCommissionerTest, NOCChainGenerated_CorruptedRCACLengthReturnsError)
 {
     AutoCommissionerTestAccess privateConfigCommissioner(&mCommissioner);
-    uint8_t buffer[10];
-    ByteSpan corruptedSizeRCAC(
-        buffer, static_cast<size_t>(std::numeric_limits<uint32_t>::max()) + 1); // Use uint32_t for portability on 32-bit systems
+    // Use uint32_t for portability on 32-bit systems
 
-    CHIP_ERROR err = privateConfigCommissioner.NOCChainGenerated(ByteSpan(), ByteSpan(), corruptedSizeRCAC,
-                                                                 Crypto::IdentityProtectionKeySpan(), 0);
+    CHIP_ERROR err =
+        privateConfigCommissioner.NOCChainGenerated(kValidNOC, kValidICAC, kCoruptedBufferInvalidRCAC, kValidIpk, kValidNodeId);
 
     EXPECT_EQ(err, CHIP_ERROR_INVALID_ARGUMENT);
 }
@@ -371,11 +385,9 @@ TEST_F(AutoCommissionerTest, NOCChainGenerated_CorruptedRCACLengthReturnsError)
 TEST_F(AutoCommissionerTest, NOCChainGenerated_CorruptedNOCLengthReturnsError)
 {
     AutoCommissionerTestAccess privateConfigCommissioner(&mCommissioner);
-    uint8_t buffer[10];
-    ByteSpan corruptedSizeNOC(buffer, static_cast<size_t>(std::numeric_limits<uint32_t>::max()) + 1);
 
-    CHIP_ERROR err = privateConfigCommissioner.NOCChainGenerated(corruptedSizeNOC, ByteSpan(), chip::TestCerts::kTestRCACSpan,
-                                                                 Crypto::IdentityProtectionKeySpan(), 0);
+    CHIP_ERROR err =
+        privateConfigCommissioner.NOCChainGenerated(kCoruptedBufferInvalidNOC, kValidICAC, kValidRCAC, kValidIpk, kValidNodeId);
 
     EXPECT_EQ(err, CHIP_ERROR_INVALID_ARGUMENT);
 }
@@ -384,8 +396,7 @@ TEST_F(AutoCommissionerTest, NOCChainGenerated_CorruptedNOCLengthReturnsError)
 TEST_F(AutoCommissionerTest, NOCChainGenerated_EmptyNOCReturnsInvalidArgument)
 {
     AutoCommissionerTestAccess privateConfigCommissioner(&mCommissioner);
-    CHIP_ERROR err = privateConfigCommissioner.NOCChainGenerated(ByteSpan(), ByteSpan(), chip::TestCerts::kTestRCACSpan,
-                                                                 Crypto::IdentityProtectionKeySpan(), 0);
+    CHIP_ERROR err = privateConfigCommissioner.NOCChainGenerated(kInvalidEmptyNOC, kValidICAC, kValidRCAC, kValidIpk, kValidNodeId);
 
     EXPECT_EQ(err, CHIP_ERROR_INVALID_ARGUMENT);
 }
