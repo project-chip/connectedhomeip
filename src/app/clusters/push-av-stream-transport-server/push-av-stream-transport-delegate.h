@@ -32,7 +32,6 @@ namespace app {
 namespace Clusters {
 
 // Forward declarations
-class PushAvStreamTransportServerLogic;
 class PushAvStreamTransportServer;
 
 /**

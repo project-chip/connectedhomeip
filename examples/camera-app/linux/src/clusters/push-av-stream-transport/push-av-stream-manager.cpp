@@ -264,42 +264,7 @@ void PushAvStreamTransportManager::GetBandwidthForStreams(const Optional<DataMod
                                                           const Optional<DataModel::Nullable<uint16_t>> & audioStreamId,
                                                           double & outBandwidthMbps)
 {
-    outBandwidthMbps = 0.0;
-
-    if (videoStreamId.HasValue() && !videoStreamId.Value().IsNull())
-    {
-        uint16_t vStreamId = videoStreamId.Value().Value();
-
-        auto & availableVideoStreams = mCameraDevice->GetCameraAVStreamMgmtDelegate().GetAllocatedVideoStreams();
-        for (const chip::app::Clusters::CameraAvStreamManagement::Structs::VideoStreamStruct::Type & stream : availableVideoStreams)
-        {
-            if (stream.videoStreamID == vStreamId)
-            {
-                outBandwidthMbps += (stream.maxBitRate / 1000000.0);
-                ChipLogProgress(Camera, "GetBandwidthForStreams: VideoStream %u maxBitRate: %u bps (%.2f Mbps)", vStreamId,
-                                stream.maxBitRate, (stream.maxBitRate / 1000000.0));
-                break;
-            }
-        }
-    }
-
-    if (audioStreamId.HasValue() && !audioStreamId.Value().IsNull())
-    {
-        uint16_t aStreamId = audioStreamId.Value().Value();
-
-        auto & availableAudioStreams = mCameraDevice->GetCameraAVStreamMgmtDelegate().GetAllocatedAudioStreams();
-        for (const chip::app::Clusters::CameraAvStreamManagement::Structs::AudioStreamStruct::Type & stream : availableAudioStreams)
-        {
-            if (stream.audioStreamID == aStreamId)
-            {
-                outBandwidthMbps += (stream.bitRate / 1000000.0);
-                ChipLogProgress(Camera, "GetBandwidthForStreams: AudioStream %u bitRate: %u bps (%.2f Mbps)", aStreamId,
-                                stream.bitRate, (stream.bitRate / 1000000.0));
-                break;
-            }
-        }
-    }
-
+    mCameraDevice->GetCameraAVStreamMgmtDelegate().GetBandwidthForStreams(videoStreamId, audioStreamId, outBandwidthMbps);
     return;
 }
 

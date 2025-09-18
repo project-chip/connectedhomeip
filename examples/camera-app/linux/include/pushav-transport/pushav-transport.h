@@ -37,6 +37,9 @@
 #include <thread>
 #include <vector>
 
+static constexpr int kInvalidZoneId      = -1;
+static constexpr int kDefaultSensitivity = 5;
+
 class PushAVTransport : public Transport
 {
 public:
@@ -69,8 +72,8 @@ public:
     // Set Transport status
     void SetTransportStatus(chip::app::Clusters::PushAvStreamTransport::TransportStatusEnum status);
 
-    void TriggerTransport(chip::app::Clusters::PushAvStreamTransport::TriggerActivationReasonEnum activationReason, int zoneId = -1,
-                          int sensitivity = 5);
+    void TriggerTransport(chip::app::Clusters::PushAvStreamTransport::TriggerActivationReasonEnum activationReason,
+                          int zoneId = kInvalidZoneId, int sensitivity = kDefaultSensitivity);
     // Get Transport status
     bool GetTransportStatus()
     {
