@@ -41,38 +41,21 @@ namespace {
 
 bool IsValidBinding(const EndpointId localEndpoint, const TargetStructType & entry)
 {
-    bool isValid = false;
-
     // Entry has endpoint, node id and no group id
     if (!entry.group.HasValue() && entry.endpoint.HasValue() && entry.node.HasValue())
     {
-        if (entry.cluster.HasValue())
+        VerifyOrReturnValue(entry.cluster.HasValue(), true); // valid node/endopint binding without a clusterid
+        // Valid node/endpoint/cluster binding
+        ReadOnlyBufferBuilder<ClusterId> clientClusters;
+        // TODO: is this a correct validation?
+        VerifyOrReturnValue(InteractionModelEngine::GetInstance()->GetDataModelProvider()->ClientClusters(localEndpoint, clientClusters) == CHIP_NO_ERROR, false);
+        for (auto & client : clientClusters.TakeBuffer())
         {
-            // Valid node/endpoint/cluster binding
-            ReadOnlyBufferBuilder<ClusterId> clientClusters;
-            InteractionModelEngine::GetInstance()->GetDataModelProvider()->ClientClusters(localEndpoint, clientClusters);
-            for (auto & client : clientClusters.TakeBuffer())
-            {
-                if (client == entry.cluster.Value())
-                {
-                    isValid = true;
-                }
-            }
-        }
-        else
-        {
-            // Valid node/endpoint (no cluster id) binding
-            isValid = true;
+            VerifyOrReturnValue(client != entry.cluster.Value(), true);
         }
     }
     // Entry has group id and no endpoint and node id
-    else if (!entry.endpoint.HasValue() && !entry.node.HasValue() && entry.group.HasValue())
-    {
-        // Valid group binding
-        isValid = true;
-    }
-
-    return isValid;
+    return (!entry.endpoint.HasValue() && !entry.node.HasValue() && entry.group.HasValue());
 }
 
 CHIP_ERROR CheckValidBindingList(const EndpointId localEndpoint, const DecodableBindingListType & bindingList,
