@@ -366,40 +366,40 @@ TEST_F(AutoCommissionerTest, IsScanNeededCombinations)
 
     const Case cases[] = {
         {
-            .name          = "WiFiAndThreadSet",
-            .attemptWiFi   = true,
-            .attemptThread = true,
-            .wifiEndpoint  = kRootEndpointId,
-            .threadEndpoint= kRootEndpointId,
-            .scanExpected       = true,
+            .name           = "WiFiAndThreadSet",
+            .attemptWiFi    = true,
+            .attemptThread  = true,
+            .wifiEndpoint   = kRootEndpointId,
+            .threadEndpoint = kRootEndpointId,
+            .scanExpected   = true,
         },
         {
-            .name          = "WiFiAndThreadNotSet",
-            .attemptWiFi   = false,
-            .attemptThread = false,
-            .wifiEndpoint  = kInvalidEndpointId,
-            .threadEndpoint= kInvalidEndpointId,
-            .scanExpected       = false,
+            .name           = "WiFiAndThreadNotSet",
+            .attemptWiFi    = false,
+            .attemptThread  = false,
+            .wifiEndpoint   = kInvalidEndpointId,
+            .threadEndpoint = kInvalidEndpointId,
+            .scanExpected   = false,
         },
         {
-            .name          = "WiFiOnlySet",
-            .attemptWiFi   = true,
-            .attemptThread = false,
-            .wifiEndpoint  = kRootEndpointId,
-            .threadEndpoint= kInvalidEndpointId,
-            .scanExpected       = true,
+            .name           = "WiFiOnlySet",
+            .attemptWiFi    = true,
+            .attemptThread  = false,
+            .wifiEndpoint   = kRootEndpointId,
+            .threadEndpoint = kInvalidEndpointId,
+            .scanExpected   = true,
         },
         {
-            .name          = "ThreadOnlySet",
-            .attemptWiFi   = false,
-            .attemptThread = true,
-            .wifiEndpoint  = kInvalidEndpointId,
-            .threadEndpoint= kRootEndpointId,
-            .scanExpected       = true,
+            .name           = "ThreadOnlySet",
+            .attemptWiFi    = false,
+            .attemptThread  = true,
+            .wifiEndpoint   = kInvalidEndpointId,
+            .threadEndpoint = kRootEndpointId,
+            .scanExpected   = true,
         },
     };
 
-    AutoCommissionerTestAccess privateConfigCommissioner(&mCommissioner); 
+    AutoCommissionerTestAccess privateConfigCommissioner(&mCommissioner);
 
     for (const auto & c : cases)
     {
@@ -419,8 +419,7 @@ TEST_F(AutoCommissionerTest, IsScanNeededCombinations)
             ChipLogError(Test,
                          "%s failed: result=%d scanExpected=%d, attemptWiFi=%d, attemptThread=%d, "
                          "wifiEndpoint=0x%03X, threadEndpoint=0x%03X",
-                         c.name, result, c.scanExpected, c.attemptWiFi, c.attemptThread,
-                         c.wifiEndpoint, c.threadEndpoint);
+                         c.name, result, c.scanExpected, c.attemptWiFi, c.attemptThread, c.wifiEndpoint, c.threadEndpoint);
         }
         EXPECT_EQ(result, c.scanExpected);
     }
@@ -440,57 +439,57 @@ TEST_F(AutoCommissionerTest, IsSecondaryNetworkSupportedCombinations)
 
     const Case cases[] = {
         {
-            .name              = "AllConditionsTrue",
-            .supportsConcurrent= true,
-            .hasWiFiCreds      = true,
-            .hasThreadDataset  = true,
-            .wifiEndpoint      = kRootEndpointId,
-            .threadEndpoint    = kRootEndpointId,
+            .name                        = "AllConditionsTrue",
+            .supportsConcurrent          = true,
+            .hasWiFiCreds                = true,
+            .hasThreadDataset            = true,
+            .wifiEndpoint                = kRootEndpointId,
+            .threadEndpoint              = kRootEndpointId,
             .isSecondaryNetworkSupported = true,
         },
         {
-            .name              = "NoConcurrentConnection",
-            .supportsConcurrent= false,
-            .hasWiFiCreds      = true,
-            .hasThreadDataset  = true,
-            .wifiEndpoint      = kRootEndpointId,
-            .threadEndpoint    = kRootEndpointId,
+            .name                        = "NoConcurrentConnection",
+            .supportsConcurrent          = false,
+            .hasWiFiCreds                = true,
+            .hasThreadDataset            = true,
+            .wifiEndpoint                = kRootEndpointId,
+            .threadEndpoint              = kRootEndpointId,
             .isSecondaryNetworkSupported = false,
         },
         {
-            .name              = "NoWiFiCredentials",
-            .supportsConcurrent= true,
-            .hasWiFiCreds      = false,
-            .hasThreadDataset  = true,
-            .wifiEndpoint      = kRootEndpointId,
-            .threadEndpoint    = kRootEndpointId,
+            .name                        = "NoWiFiCredentials",
+            .supportsConcurrent          = true,
+            .hasWiFiCreds                = false,
+            .hasThreadDataset            = true,
+            .wifiEndpoint                = kRootEndpointId,
+            .threadEndpoint              = kRootEndpointId,
             .isSecondaryNetworkSupported = false,
         },
         {
-            .name              = "NoThreadDataset",
-            .supportsConcurrent= true,
-            .hasWiFiCreds      = true,
-            .hasThreadDataset  = false,
-            .wifiEndpoint      = kRootEndpointId,
-            .threadEndpoint    = kRootEndpointId,
+            .name                        = "NoThreadDataset",
+            .supportsConcurrent          = true,
+            .hasWiFiCreds                = true,
+            .hasThreadDataset            = false,
+            .wifiEndpoint                = kRootEndpointId,
+            .threadEndpoint              = kRootEndpointId,
             .isSecondaryNetworkSupported = false,
         },
         {
-            .name              = "InvalidWiFiEndpoint",
-            .supportsConcurrent= true,
-            .hasWiFiCreds      = true,
-            .hasThreadDataset  = true,
-            .wifiEndpoint      = kInvalidEndpointId,
-            .threadEndpoint    = kRootEndpointId,
+            .name                        = "InvalidWiFiEndpoint",
+            .supportsConcurrent          = true,
+            .hasWiFiCreds                = true,
+            .hasThreadDataset            = true,
+            .wifiEndpoint                = kInvalidEndpointId,
+            .threadEndpoint              = kRootEndpointId,
             .isSecondaryNetworkSupported = false,
         },
         {
-            .name              = "InvalidThreadEndpoint",
-            .supportsConcurrent= true,
-            .hasWiFiCreds      = true,
-            .hasThreadDataset  = true,
-            .wifiEndpoint      = kRootEndpointId,
-            .threadEndpoint    = kInvalidEndpointId,
+            .name                        = "InvalidThreadEndpoint",
+            .supportsConcurrent          = true,
+            .hasWiFiCreds                = true,
+            .hasThreadDataset            = true,
+            .wifiEndpoint                = kRootEndpointId,
+            .threadEndpoint              = kInvalidEndpointId,
             .isSecondaryNetworkSupported = false,
         },
     };
@@ -505,7 +504,6 @@ TEST_F(AutoCommissionerTest, IsSecondaryNetworkSupportedCombinations)
         if (c.hasWiFiCreds)
         {
             params.SetWiFiCredentials(WiFiCredentials(ByteSpan(), ByteSpan()));
-
         }
         if (c.hasThreadDataset)
         {
