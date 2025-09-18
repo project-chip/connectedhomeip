@@ -782,7 +782,7 @@ CHIP_ERROR DeviceCommissioner::EstablishPASEConnection(NodeId remoteDeviceId, Re
                 {
                     // We already have an open secure session to this device, call the callback immediately and early return.
                     // We don't know what the right RendezvousParameters are here.
-                    mPairingDelegate->OnPairingComplete(CHIP_NO_ERROR, std::nullopt);
+                    mPairingDelegate->OnPairingComplete(CHIP_NO_ERROR, std::nullopt, std::nullopt);
                 }
                 MATTER_LOG_METRIC_END(kMetricDeviceCommissionerPASESession, CHIP_NO_ERROR);
                 return CHIP_NO_ERROR;
@@ -931,7 +931,7 @@ void DeviceCommissioner::OnDiscoveredDeviceOverBleError(void * appState, CHIP_ER
         // A better way to handle it should define a new error code
         if (self->mPairingDelegate != nullptr)
         {
-            self->mPairingDelegate->OnPairingComplete(err, std::nullopt);
+            self->mPairingDelegate->OnPairingComplete(err, std::nullopt, std::nullopt);
         }
     }
 }
@@ -968,7 +968,7 @@ void DeviceCommissioner::OnWiFiPAFSubscribeError(void * appState, CHIP_ERROR err
         self->mRendezvousParametersForDeviceDiscoveredOverWiFiPAF = RendezvousParameters();
         if (self->mPairingDelegate != nullptr)
         {
-            self->mPairingDelegate->OnPairingComplete(err, std::nullopt);
+            self->mPairingDelegate->OnPairingComplete(err, std::nullopt, std::nullopt);
         }
     }
 }
@@ -1217,7 +1217,7 @@ void DeviceCommissioner::RendezvousCleanup(CHIP_ERROR status)
 
         if (mPairingDelegate != nullptr)
         {
-            mPairingDelegate->OnPairingComplete(status, std::nullopt);
+            mPairingDelegate->OnPairingComplete(status, std::nullopt, std::nullopt);
         }
     }
 }
@@ -1264,7 +1264,11 @@ void DeviceCommissioner::OnSessionEstablished(const SessionHandle & session)
     MATTER_LOG_METRIC_END(kMetricDeviceCommissionerPASESession, CHIP_NO_ERROR);
     if (mPairingDelegate != nullptr)
     {
-        mPairingDelegate->OnPairingComplete(CHIP_NO_ERROR, paseParameters);
+        // If we started with a string payload, then at this point mPairingDelegate is
+        // mSetUpCodePairer, and it will provide the right SetupPayload argument to
+        // OnPairingComplete as needed.  If mPairingDelegate is not
+        // mSetUpCodePairer, then we don't have a SetupPayload to provide.
+        mPairingDelegate->OnPairingComplete(CHIP_NO_ERROR, paseParameters, std::nullopt);
     }
 
     if (mRunCommissioningAfterConnection)
