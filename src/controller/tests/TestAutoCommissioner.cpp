@@ -372,6 +372,12 @@ TEST_F(AutoCommissionerTest, NOCChainGenerated_EmptyRCACReturnsInvalidArgument)
 // Ensures extra checks are done with RCAC buffer size
 TEST_F(AutoCommissionerTest, NOCChainGenerated_CorruptedRCACLengthReturnsError)
 {
+    // On 32-bit systems, NOCChainGenerated cannot fail due to size_t being 32 bits and never exceeding uint32_t,
+    // therefore we skip this check . 
+
+    #if SIZE_MAX <= UINT32_MAX
+        GTEST_SKIP() << "Only meaningful on 64-bit systems";
+    #endif
     AutoCommissionerTestAccess privateConfigCommissioner(&mCommissioner);
     // Use uint32_t for portability on 32-bit systems
 
@@ -384,6 +390,10 @@ TEST_F(AutoCommissionerTest, NOCChainGenerated_CorruptedRCACLengthReturnsError)
 // Ensures extra checks are done with NOC buffer size
 TEST_F(AutoCommissionerTest, NOCChainGenerated_CorruptedNOCLengthReturnsError)
 {
+    #if SIZE_MAX <= UINT32_MAX
+        GTEST_SKIP() << "Only meaningful on 64-bit systems";
+    #endif
+
     AutoCommissionerTestAccess privateConfigCommissioner(&mCommissioner);
 
     CHIP_ERROR err =
