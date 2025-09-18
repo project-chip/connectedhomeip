@@ -40,21 +40,6 @@ from test_testing.DeviceConformanceTests import DeviceConformanceTests
 
 from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 
-    def check_root_node_restricted_clusters(self) -> list[ProblemNotice]:
-        # TODO: Are these marked in the spec? Time sync and ACL have specific notes, but can be determine this from the data model files?
-        root_node_restricted_clusters = {Clusters.AccessControl, Clusters.TimeSynchronization,
-                                         Clusters.TlsCertificateManagement, Clusters.TlsClientManagement}
-        problems = []
-        for endpoint_id, endpoint in self.endpoints.items():
-            if endpoint_id == 0:
-                continue
-
-            for cluster in endpoint.keys():
-                if cluster in root_node_restricted_clusters:
-                    problems.append(ProblemNotice("TC-IDM-14.1", location=ClusterPathLocation(endpoint_id=endpoint_id, cluster_id=cluster.id),
-                                                  severity=ProblemSeverity.ERROR, problem=f"Root-node-restricted cluster {cluster} appears on non-root-node endpoint"))
-        return problems
-
 
 class TC_DeviceConformance(MatterBaseTest, DeviceConformanceTests):
     @async_test_body
