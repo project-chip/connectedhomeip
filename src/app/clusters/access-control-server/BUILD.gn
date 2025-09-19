@@ -45,7 +45,5 @@ source_set("access-control-server") {
     "${chip_root}/zzz_generated/app-common/clusters/AccessControl",
   ]
 
-  public_configs = [ 
-    "${chip_root}/src:includes",
-  ]
+  public_configs = [ "${chip_root}/src:includes" ]
 }
