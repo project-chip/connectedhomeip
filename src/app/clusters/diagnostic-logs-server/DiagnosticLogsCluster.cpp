@@ -35,7 +35,6 @@ using chip::Protocols::InteractionModel::Status;
 using chip::bdx::DiagnosticLogs::kMaxFileDesignatorLen;
 using chip::bdx::DiagnosticLogs::kMaxLogContentSize;
 
-
 namespace chip {
 namespace app {
 namespace Clusters {
@@ -48,7 +47,7 @@ void AddResponse(CommandHandler * commandObj, const ConcreteCommandPath & path, 
 }
 
 void AddResponse(CommandHandler * commandObj, const ConcreteCommandPath & path, StatusEnum status, MutableByteSpan & logContent,
-                    const Optional<uint64_t> & timeStamp, const Optional<uint64_t> & timeSinceBoot)
+                 const Optional<uint64_t> & timeStamp, const Optional<uint64_t> & timeSinceBoot)
 {
     Commands::RetrieveLogsResponse::Type response;
     response.status        = status;
@@ -121,7 +120,6 @@ DiagnosticLogsProviderLogic::HandleLogRequestForBdx(CommandHandler * commandObj,
 
     return std::nullopt;
 }
-
 
 // Implementation of virtual methods from DefaultServerCluster
 DataModel::ActionReturnStatus DiagnosticLogsCluster::ReadAttribute(const DataModel::ReadAttributeRequest & request,

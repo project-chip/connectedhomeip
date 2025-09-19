@@ -17,8 +17,8 @@
 
 #pragma once
 
-#include <app/server-cluster/DefaultServerCluster.h>
 #include <app/clusters/diagnostic-logs-server/DiagnosticLogsProviderDelegate.h>
+#include <app/server-cluster/DefaultServerCluster.h>
 
 namespace chip {
 namespace app {
