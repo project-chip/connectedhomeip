@@ -36,25 +36,29 @@ using namespace chip::Protocols::InteractionModel;
 namespace {
 
 // Diagnostic logs cluster is a device-wide cluster, so we only need one cluster instance.
-LazyRegisteredServerCluster<DiagnosticLogsCluster> gDiagnosticLogsCluster;
+LazyRegisteredServerCluster<DiagnosticLogsCluster> gServer;
 DiagnosticLogsProviderDelegate * gDiagnosticLogsProviderDelegate = nullptr;
 
 class IntegrationDelegate : public CodegenClusterIntegration::Delegate
 {
 public:
-    ServerClusterRegistration & CreateRegistration(EndpointId endpointId, unsigned emberEndpointIndex,
+    ServerClusterRegistration & CreateRegistration(EndpointId endpointId, unsigned clusterInstanceIndex,
                                                    uint32_t optionalAttributeBits, uint32_t featureMap) override
     {
-        gDiagnosticLogsCluster.Create(endpointId);
+        gServer.Create(endpointId);
         if (gDiagnosticLogsProviderDelegate != nullptr)
         {
-            gDiagnosticLogsCluster.Cluster().SetDelegate(gDiagnosticLogsProviderDelegate);
+            gServer.Cluster().SetDelegate(gDiagnosticLogsProviderDelegate);
         }
-        return gDiagnosticLogsCluster.Registration();
+        return gServer.Registration();
     }
 
-    ServerClusterInterface & FindRegistration(unsigned emberEndpointIndex) override { return gDiagnosticLogsCluster.Cluster(); }
-    void ReleaseRegistration(unsigned emberEndpointIndex) override { gDiagnosticLogsCluster.Destroy(); }
+    ServerClusterInterface * FindRegistration(unsigned clusterInstanceIndex) override
+    {
+        VerifyOrReturnValue(gServer.IsConstructed(), nullptr);
+        return &gServer.Cluster();
+    }
+    void ReleaseRegistration(unsigned clusterInstanceIndex) override { gServer.Destroy(); }
 };
 
 } // namespace
@@ -67,9 +71,8 @@ void emberAfDiagnosticLogsClusterServerInitCallback(EndpointId endpoint)
         {
             .endpointId = endpoint,
             .clusterId  = DiagnosticLogs::Id,
-            .fixedClusterServerEndpointCount =
-                1, // Diagnostic logs are device-wide functionality, so we only need one cluster instance
-            .maxEndpointCount        = 1,
+            .fixedClusterInstanceCount = DiagnosticLogs::StaticApplicationConfig::kFixedClusterConfig.size(),
+            .maxClusterInstanceCount = 1, // Only one instance is allowed
             .fetchFeatureMap         = false,
             .fetchOptionalAttributes = false,
         },
@@ -84,9 +87,8 @@ void MatterDiagnosticLogsClusterServerShutdownCallback(EndpointId endpointId)
         {
             .endpointId = endpointId,
             .clusterId  = DiagnosticLogs::Id,
-            .fixedClusterServerEndpointCount =
-                1, // Diagnostic logs are device-wide functionality, so we only need one cluster instance
-            .maxEndpointCount = 1,
+            .fixedClusterInstanceCount = DiagnosticLogs::StaticApplicationConfig::kFixedClusterConfig.size(),
+            .maxClusterInstanceCount = 1, // Only one instance is allowed
         },
         integrationDelegate);
 }
@@ -108,9 +110,6 @@ DiagnosticLogsServer & DiagnosticLogsServer::Instance()
 
 void DiagnosticLogsServer::SetDiagnosticLogsProviderDelegate(EndpointId endpoint, DiagnosticLogsProviderDelegate * delegate)
 {
-    VerifyOrReturn(endpoint == kRootEndpointId,
-                   ChipLogError(DeviceLayer, "DiagnosticLogsProviderDelegate can only be set on root endpoint"));
-    VerifyOrReturn(delegate != nullptr, ChipLogError(DeviceLayer, "DiagnosticLogsProviderDelegate cannot be nullptr"));
     gDiagnosticLogsProviderDelegate = delegate;
 }
 

@@ -27,8 +27,6 @@ TARGET_SOURCES(
   PRIVATE
   "${CLUSTER_DIR}/DiagnosticLogsCluster.cpp"
   "${CLUSTER_DIR}/DiagnosticLogsCluster.h"
-  "${CLUSTER_DIR}/DiagnosticLogsLogic.cpp"
-  "${CLUSTER_DIR}/DiagnosticLogsLogic.h"
   "${CLUSTER_DIR}/DiagnosticLogsProviderDelegate.h"
   "${CLUSTER_DIR}/BDXDiagnosticLogsProvider.cpp"
   "${CLUSTER_DIR}/BDXDiagnosticLogsProvider.h"

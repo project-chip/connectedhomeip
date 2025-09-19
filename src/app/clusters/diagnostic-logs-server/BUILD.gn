@@ -21,8 +21,6 @@ source_set("diagnostic-logs-server") {
     "BDXDiagnosticLogsProvider.h",
     "DiagnosticLogsCluster.cpp",
     "DiagnosticLogsCluster.h",
-    "DiagnosticLogsLogic.cpp",
-    "DiagnosticLogsLogic.h",
     "DiagnosticLogsProviderDelegate.h",
   ]
 
