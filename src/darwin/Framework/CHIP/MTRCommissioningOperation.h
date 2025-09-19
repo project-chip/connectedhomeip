@@ -70,10 +70,10 @@ MTR_PROVISIONALLY_AVAILABLE
 - (BOOL)stop;
 
 /**
- * matchedPayload, if not nil, is the payload (from possibly multiple payloads
- * represented by the provided setupPayload) that represents the commissionee we
- * successfully established PASE with.  This will only be non-nil after
- * successful PASE establishment.
+ * If not nil, the payload (from possibly multiple payloads represented by the
+ * provided setupPayload) that represents the commissionee we successfully
+ * established PASE with.  This will only be non-nil after successful PASE
+ * establishment.
  */
 @property (nonatomic, readonly, strong, nullable) MTRSetupPayload * matchedPayload;
 

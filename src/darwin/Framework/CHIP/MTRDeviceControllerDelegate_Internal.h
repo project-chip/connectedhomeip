@@ -17,12 +17,13 @@
 #import <Foundation/Foundation.h>
 #import <Matter/MTRCommissioningDelegate.h>
 #import <Matter/MTRDeviceController.h>
+#import <Matter/MTRDeviceControllerDelegate.h>
 #import <Matter/MTRSetupPayload.h>
 #import <Matter/MTRStructsObjc.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
-@protocol MTRDeviceControllerDelegate_Internal <NSObject>
+@protocol MTRDeviceControllerDelegate_Internal <MTRDeviceControllerDelegate>
 @required
 - (void)controller:(MTRDeviceController *)controller
     scannedWiFiNetworks:(nullable NSArray<MTRNetworkCommissioningClusterWiFiInterfaceScanResultStruct *> *)networks

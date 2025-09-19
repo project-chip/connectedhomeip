@@ -75,11 +75,6 @@ private:
     MTRCommissioningParameters * mCommissioningParameters;
 
     MTRCommissioningStatus MapStatus(chip::Controller::DevicePairingDelegate::Status status);
-
-    id<MTRDeviceControllerDelegate_Internal> GetInternalDelegate() const
-    {
-        return static_cast<id<MTRDeviceControllerDelegate_Internal>>(mDelegate);
-    }
 };
 
 NS_ASSUME_NONNULL_END
