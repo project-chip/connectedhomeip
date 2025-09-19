@@ -96,5 +96,5 @@ chip_test_suite("tests") {
       "${chip_root}/src/app/server:joint_fabric",
       "${chip_root}/src/controller:jcm",
     ]
-  } 
+  }
 }
