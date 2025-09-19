@@ -590,6 +590,9 @@ int ChipLinuxAppInit(int argc, char * const argv[], OptionSet * customOptions,
 #endif
 
     sSecondaryNetworkCommissioningEndpoint = secondaryNetworkCommissioningEndpoint;
+    if (LinuxDeviceOptions::GetInstance().StorageSpace != nullptr) {
+        ConfigurationMgr().SetStorageSpace(LinuxDeviceOptions::GetInstance().StorageSpace);
+    }
 
 #ifdef CHIP_CONFIG_KVS_PATH
     if (LinuxDeviceOptions::GetInstance().KVS == nullptr)
