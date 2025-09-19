@@ -96,8 +96,8 @@ TimeFormatLocalizationCluster::TimeFormatLocalizationCluster(EndpointId endpoint
                                                              BitFlags<TimeFormatLocalization::Feature> features,
                                                              TimeFormatLocalization::HourFormatEnum defaultHourFormat,
                                                              TimeFormatLocalization::CalendarTypeEnum defaultCalendarType) :
-    DefaultServerCluster({ endpointId, TimeFormatLocalization::Id }), mFeatures(features), mHourFormat(defaultHourFormat),
-    mCalendarType(defaultCalendarType)
+    DefaultServerCluster({ endpointId, TimeFormatLocalization::Id }),
+    mFeatures(features), mHourFormat(defaultHourFormat), mCalendarType(defaultCalendarType)
 {}
 
 CHIP_ERROR TimeFormatLocalizationCluster::Startup(ServerClusterContext & context)
