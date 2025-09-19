@@ -212,7 +212,7 @@ TEST_F(TestDiagnosticLogsLogic, Bdx_WithDelegate_kExhausted)
     const ConcreteCommandPath kPath{ kEndpoint0, DiagnosticLogs::Id, DiagnosticLogs::Commands::RetrieveLogsRequest::Id };
     MockCommandHandler handler;
     logic.HandleLogRequestForBdx(&handler, kPath, DiagnosticLogs::IntentEnum::kEndUserSupport,
-                                           MakeOptional(CharSpan::fromCharString("enduser.log")));
+                                 MakeOptional(CharSpan::fromCharString("enduser.log")));
     EXPECT_EQ(handler.GetResponse().commandId, DiagnosticLogs::Commands::RetrieveLogsResponse::Id);
     auto decoded = DecodeRetrieveLogsResponse(handler.GetResponse());
     EXPECT_EQ(decoded.status, DiagnosticLogs::StatusEnum::kExhausted);
@@ -232,7 +232,7 @@ TEST_F(TestDiagnosticLogsLogic, Bdx_WithDelegate_kExhausted_with_buffer_greater_
     const ConcreteCommandPath kPath{ kEndpoint0, DiagnosticLogs::Id, DiagnosticLogs::Commands::RetrieveLogsRequest::Id };
     MockCommandHandler handler;
     logic.HandleLogRequestForBdx(&handler, kPath, DiagnosticLogs::IntentEnum::kEndUserSupport,
-                                           MakeOptional(CharSpan::fromCharString("enduser.log")));
+                                 MakeOptional(CharSpan::fromCharString("enduser.log")));
     EXPECT_EQ(handler.GetResponse().commandId, DiagnosticLogs::Commands::RetrieveLogsResponse::Id);
     auto decoded = DecodeRetrieveLogsResponse(handler.GetResponse());
     EXPECT_EQ(decoded.status, DiagnosticLogs::StatusEnum::kExhausted);
