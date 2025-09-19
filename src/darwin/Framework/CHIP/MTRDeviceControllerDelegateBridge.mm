@@ -27,6 +27,7 @@
 #import "MTRMetricKeys.h"
 #import "MTRMetricsCollector.h"
 #import "MTRProductIdentity.h"
+#import "MTRSetupPayload_Internal.h"
 #import "MTRUtilities.h"
 #import "zap-generated/MTRCommandPayloads_Internal.h"
 
@@ -101,7 +102,7 @@ void MTRDeviceControllerDelegateBridge::OnStatusUpdate(chip::Controller::DeviceP
     }
 }
 
-void MTRDeviceControllerDelegateBridge::OnPairingComplete(CHIP_ERROR error)
+void MTRDeviceControllerDelegateBridge::OnPairingComplete(CHIP_ERROR error, const std::optional<chip::RendezvousParameters> & rendezvousParameters, const std::optional<chip::SetupPayload> & setupPayload)
 {
     MTRDeviceController * strongController = mController;
 
@@ -112,9 +113,21 @@ void MTRDeviceControllerDelegateBridge::OnPairingComplete(CHIP_ERROR error)
     }
     MATTER_LOG_METRIC_END(kMetricSetupPASESession, error);
 
-    id<MTRDeviceControllerDelegate> strongDelegate = mDelegate;
+    auto * strongDelegate = static_cast<id<MTRDeviceControllerDelegate_Internal>>(mDelegate);
     if (strongDelegate && mQueue && strongController) {
-        if ([strongDelegate respondsToSelector:@selector(controller:commissioningSessionEstablishmentDone:)]) {
+        // The methods on MTRDeviceControllerDelegate_Internal are required, but
+        // we don't know whether our delegate actually implements the protocol,
+        // so still need to do the respondsToSelector checks.
+        if ([strongDelegate respondsToSelector:@selector(controller:commissioningSessionEstablishmentDone:forPayload:)]) {
+            MTRSetupPayload * payload;
+            if (setupPayload) {
+                payload = [[MTRSetupPayload alloc] initWithSetupPayload:*setupPayload];
+            }
+            dispatch_async(mQueue, ^{
+                NSError * nsError = [MTRError errorForCHIPErrorCode:error];
+                [strongDelegate controller:strongController commissioningSessionEstablishmentDone:nsError forPayload:payload];
+            });
+        } else if ([strongDelegate respondsToSelector:@selector(controller:commissioningSessionEstablishmentDone:)]) {
             dispatch_async(mQueue, ^{
                 NSError * nsError = [MTRError errorForCHIPErrorCode:error];
                 [strongDelegate controller:strongController commissioningSessionEstablishmentDone:nsError];
@@ -232,7 +245,7 @@ void MTRDeviceControllerDelegateBridge::OnCommissioningStatusUpdate(chip::PeerId
 void MTRDeviceControllerDelegateBridge::OnCommissioningStageStart(chip::PeerId peerId, chip::Controller::CommissioningStage stageStarting)
 {
     MTRDeviceController * strongController = mController;
-    id<MTRDeviceControllerDelegate_Internal> strongDelegate = GetInternalDelegate();
+    auto * strongDelegate = static_cast<id<MTRDeviceControllerDelegate_Internal>>(mDelegate);
     // The methods on MTRDeviceControllerDelegate_Internal are required, but
     // we don't know whether our delegate actually implements the protocol,
     // so still need to do the respondsToSelector checks.
@@ -266,7 +279,7 @@ void MTRDeviceControllerDelegateBridge::OnCommissioningStageStart(chip::PeerId p
 void MTRDeviceControllerDelegateBridge::OnScanNetworksSuccess(const chip::app::Clusters::NetworkCommissioning::Commands::ScanNetworksResponse::DecodableType & dataResponse)
 {
     MTRDeviceController * strongController = mController;
-    id<MTRDeviceControllerDelegate_Internal> strongDelegate = GetInternalDelegate();
+    auto * strongDelegate = static_cast<id<MTRDeviceControllerDelegate_Internal>>(mDelegate);
     // The methods on MTRDeviceControllerDelegate_Internal are required, but
     // we don't know whether our delegate actually implements the protocol,
     // so still need to do the respondsToSelector checks.
@@ -304,7 +317,7 @@ void MTRDeviceControllerDelegateBridge::OnScanNetworksSuccess(const chip::app::C
 void MTRDeviceControllerDelegateBridge::OnScanNetworksFailure(CHIP_ERROR error)
 {
     MTRDeviceController * strongController = mController;
-    id<MTRDeviceControllerDelegate_Internal> strongDelegate = GetInternalDelegate();
+    auto * strongDelegate = static_cast<id<MTRDeviceControllerDelegate_Internal>>(mDelegate);
     // The methods on MTRDeviceControllerDelegate_Internal are required, but
     // we don't know whether our delegate actually implements the protocol,
     // so still need to do the respondsToSelector checks.

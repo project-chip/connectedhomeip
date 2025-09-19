@@ -250,8 +250,12 @@ static inline void emitMetricForSetupPayload(NSString * payload)
     });
 }
 
-- (void)controller:(MTRDeviceController *)controller commissioningSessionEstablishmentDone:(NSError * _Nullable)error
+- (void)controller:(MTRDeviceController *)controller commissioningSessionEstablishmentDone:(NSError * _Nullable)error forPayload:(MTRSetupPayload * _Nullable)payload
 {
+    if (!error && payload) {
+        _matchedPayload = payload;
+    }
+
     id<MTRCommissioningDelegate_Internal> strongDelegate = [self _internalDelegate];
     // NOTE: Doing respondsToSelector check before dispatch, so we can kick off
     // commissioning ourselves if not.
