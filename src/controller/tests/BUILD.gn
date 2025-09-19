@@ -20,82 +20,81 @@ import("${chip_root}/src/controller/flags.gni")
 import("${chip_root}/src/lib/lib.gni")
 
 chip_test_suite("tests") {
-    output_name = "libControllerTests"
+  output_name = "libControllerTests"
 
-    test_sources = []
+  test_sources = []
+
+  # Not supported on efr32.
+  if (chip_device_platform != "efr32") {
+    test_sources += [ "TestCommissionableNodeController.cpp" ]
+  }
+
+  if (chip_device_platform != "mbed" && chip_device_platform != "esp32") {
+    test_sources += [
+      "TestEventCaching.cpp",
+      "TestEventChunking.cpp",
+      "TestEventNumberCaching.cpp",
+      "TestReadChunking.cpp",
+      "TestServerCommandDispatch.cpp",
+    ]
+
+    # At some instances, this Test end ups allocating more than 32 Timers,
+    # and since the fake platform doesn`t use the heap, the maximum number
+    # of allowed timers is 32. So we get failures because we can't
+    # allocate any more timers, in the log it looks like:
+    # SendMessage() to UDP : [::1] : 5541 failed : b
+    #
+    # Deactivating since the Fake platform is mostly done to test Platform APIs
+    if (chip_device_platform != "fake") {
+      test_sources += [ "TestWriteChunking.cpp" ]
+    }
 
     # Not supported on efr32.
     if (chip_device_platform != "efr32") {
-        test_sources += [ "TestCommissionableNodeController.cpp" ]
+      test_sources += [
+        "TestCommissioningWindowOpener.cpp",
+        "TestExampleOperationalCredentialsIssuer.cpp",
+      ]
     }
+  }
 
-    if (chip_device_platform != "mbed" && chip_device_platform != "esp32") {
-        test_sources += [
-            "TestEventCaching.cpp",
-            "TestEventChunking.cpp",
-            "TestEventNumberCaching.cpp",
-            "TestReadChunking.cpp",
-            "TestServerCommandDispatch.cpp",
+  if (chip_support_commissioning_in_controller && chip_build_controller) {
+    test_sources += [ "TestAutoCommissioner.cpp" ]
+  }
 
-        ]
+  test_sources += [ "TestCommissioningDelegate.cpp" ]
 
-        # At some instances, this Test end ups allocating more than 32 Timers,
-        # and since the fake platform doesn`t use the heap, the maximum number
-        # of allowed timers is 32. So we get failures because we can't
-        # allocate any more timers, in the log it looks like:
-        # SendMessage() to UDP : [::1] : 5541 failed : b
-        #
-        # Deactivating since the Fake platform is mostly done to test Platform APIs
-        if (chip_device_platform != "fake") {
-            test_sources += [ "TestWriteChunking.cpp" ]
-        }
+  if (chip_device_config_enable_joint_fabric) {
+    test_sources += [ "TestJCMCommissioner.cpp" ]
+  }
 
-        # Not supported on efr32.
-        if (chip_device_platform != "efr32") {
-            test_sources += [
-                "TestCommissioningWindowOpener.cpp",
-                "TestExampleOperationalCredentialsIssuer.cpp",
-            ]
-        }
-    }
+  cflags = [ "-Wconversion" ]
 
-    if (chip_support_commissioning_in_controller && chip_build_controller) {
-        test_sources += [ "TestAutoCommissioner.cpp" ]
-    }
+  sources = [
+    "AutoCommissionerTestAccess.h",
+    "Test_cert_data.cpp",
+  ]
 
-    test_sources += [ "TestCommissioningDelegate.cpp" ]
+  public_deps = [
+    "${chip_root}/src/app/common:cluster-objects",
+    "${chip_root}/src/app/server",
+    "${chip_root}/src/app/tests:helpers",
+    "${chip_root}/src/controller",
+    "${chip_root}/src/lib/core:string-builder-adapters",
+    "${chip_root}/src/lib/support:test_utils",
+    "${chip_root}/src/lib/support:testing",
+    "${chip_root}/src/messaging/tests:helpers",
+    "${chip_root}/src/transport/raw/tests:helpers",
+  ]
 
-    if (chip_device_config_enable_joint_fabric) {
-        test_sources += [ "TestJCMCommissioner.cpp" ]
-    }
+  if (chip_device_platform != "mbed") {
+    public_deps += [ "${chip_root}/src/controller/data_model" ]
+  }
 
-    cflags = [ "-Wconversion" ]
-
-    sources = [
-        "AutoCommissionerTestAccess.h",
-        "Test_cert_data.cpp",
+  if (chip_device_config_enable_joint_fabric) {
+    public_deps += [
+      "${chip_root}/src/app/server:joint_fabric",
+      "${chip_root}/src/controller:jcm",
     ]
-
-    public_deps = [
-        "${chip_root}/src/app/common:cluster-objects",
-        "${chip_root}/src/app/server",
-        "${chip_root}/src/app/tests:helpers",
-        "${chip_root}/src/controller",
-        "${chip_root}/src/lib/core:string-builder-adapters",
-        "${chip_root}/src/lib/support:test_utils",
-        "${chip_root}/src/lib/support:testing",
-        "${chip_root}/src/messaging/tests:helpers",
-        "${chip_root}/src/transport/raw/tests:helpers",
-    ]
-
-    if (chip_device_platform != "mbed") {
-        public_deps += [ "${chip_root}/src/controller/data_model" ]
-    }
-
-    if (chip_device_config_enable_joint_fabric) {
-        public_deps += [
-            "${chip_root}/src/app/server:joint_fabric",
-            "${chip_root}/src/controller:jcm",
-        ]
-    }
+  }
 }
