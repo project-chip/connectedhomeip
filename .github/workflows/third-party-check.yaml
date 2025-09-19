@@ -34,7 +34,7 @@ jobs:
                   echo This pull request attempts to update submodules without the changing-git-submodules-on-purpose label. Please apply that label if the changes are intentional, or remove those changes.
                   exit 1
             - name: Success
-              if: contains(github.event.pull_request.labels.*.name, 'changing-submodules-on-purpose')
+              if: contains(github.event.pull_request.labels.*.name, 'changing-git-submodules-on-purpose')
               run: |
                   echo PR looks good.
                   exit 0
