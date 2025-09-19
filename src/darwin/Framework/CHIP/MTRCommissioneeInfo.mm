@@ -50,9 +50,7 @@ MTR_DIRECT_MEMBERS
         }
     }
 
-    NSMutableArray<MTRNetworkInterfaceInfo *> * wifiInterfaces = [[NSMutableArray alloc] init];
-    NSMutableArray<MTRNetworkInterfaceInfo *> * threadInterfaces = [[NSMutableArray alloc] init];
-    NSMutableArray<MTRNetworkInterfaceInfo *> * ethernetInterfaces = [[NSMutableArray alloc] init];
+    NSMutableArray<MTRNetworkInterfaceInfo *> * networkInterfaces = [[NSMutableArray alloc] init];
 
     if (info.attributes != nullptr) {
         NSMutableDictionary<MTRAttributePath *, NSDictionary<NSString *, id> *> * attributes = [[NSMutableDictionary alloc] init];
@@ -132,26 +130,20 @@ MTR_DIRECT_MEMBERS
                 return CHIP_NO_ERROR;
             }
 
-            MTRNetworkInterfaceInfo * interfaceInfo = [[MTRNetworkInterfaceInfo alloc] initWithEndpointID:@(path.mEndpointId) featureMap:@(value)];
-
-            // Check feature map bits to determine interface type
-            if (value & MTRNetworkCommissioningFeatureWiFiNetworkInterface) {
-                [wifiInterfaces addObject:interfaceInfo];
-            }
-            if (value & MTRNetworkCommissioningFeatureThreadNetworkInterface) {
-                [threadInterfaces addObject:interfaceInfo];
-            }
-            if (value & MTRNetworkCommissioningFeatureEthernetNetworkInterface) {
-                [ethernetInterfaces addObject:interfaceInfo];
+            MTRNetworkInterfaceInfo * _Nullable interfaceInfo = [[MTRNetworkInterfaceInfo alloc] initWithEndpointID:@(path.mEndpointId) featureMap:@(value)];
+            if (!interfaceInfo) {
+                // Invalid feature map.  Just keep looking for other ones.
+                return CHIP_NO_ERROR;
             }
 
+            [networkInterfaces addObject:interfaceInfo];
             return CHIP_NO_ERROR;
         });
     }
 
-    _wifiInterfaces = wifiInterfaces;
-    _threadInterfaces = threadInterfaces;
-    _ethernetInterfaces = ethernetInterfaces;
+    auto * endpointDescriptor = [[NSSortDescriptor alloc] initWithKey:@"endpointID" ascending:YES];
+    [networkInterfaces sortUsingDescriptors:@[ endpointDescriptor ]];
+    _networkInterfaces = networkInterfaces;
 
     return self;
 }
@@ -159,9 +151,7 @@ MTR_DIRECT_MEMBERS
 static NSString * const sProductIdentityCodingKey = @"pi";
 static NSString * const sEndpointsCodingKey = @"ep";
 static NSString * const sAttributesCodingKey = @"at";
-static NSString * const sWifiInterfacesCodingKey = @"wi";
-static NSString * const sThreadInterfacesCodingKey = @"ti";
-static NSString * const sEthernetInterfacesCodingKey = @"ei";
+static NSString * const sNetworkInterfacesCodingKey = @"ni";
 
 - (nullable instancetype)initWithCoder:(NSCoder *)coder
 {
@@ -199,21 +189,13 @@ static NSString * const sEthernetInterfacesCodingKey = @"ei";
         }
     }
 
-    // Decode network interface arrays (may be nil if decoding something encoded
+    // Decode network interface array (may be nil if decoding something encoded
     // before we added these properties).
-    _wifiInterfaces = [coder decodeArrayOfObjectsOfClass:MTRNetworkInterfaceInfo.class forKey:sWifiInterfacesCodingKey];
-    _threadInterfaces = [coder decodeArrayOfObjectsOfClass:MTRNetworkInterfaceInfo.class forKey:sThreadInterfacesCodingKey];
-    _ethernetInterfaces = [coder decodeArrayOfObjectsOfClass:MTRNetworkInterfaceInfo.class forKey:sEthernetInterfacesCodingKey];
+    _networkInterfaces = [coder decodeArrayOfObjectsOfClass:MTRNetworkInterfaceInfo.class forKey:sNetworkInterfacesCodingKey];
 
-    // Provide empty arrays for backward compatibility if not present in encoded data
-    if (_wifiInterfaces == nil) {
-        _wifiInterfaces = @[];
-    }
-    if (_threadInterfaces == nil) {
-        _threadInterfaces = @[];
-    }
-    if (_ethernetInterfaces == nil) {
-        _ethernetInterfaces = @[];
+    // Provide empty array for backward compatibility if not present in encoded data
+    if (_networkInterfaces == nil) {
+        _networkInterfaces = @[];
     }
 
     return self;
@@ -224,9 +206,7 @@ static NSString * const sEthernetInterfacesCodingKey = @"ei";
     [coder encodeObject:_productIdentity forKey:sProductIdentityCodingKey];
     [coder encodeObject:_endpointsById forKey:sEndpointsCodingKey];
     [coder encodeObject:_attributes forKey:sAttributesCodingKey];
-    [coder encodeObject:_wifiInterfaces forKey:sWifiInterfacesCodingKey];
-    [coder encodeObject:_threadInterfaces forKey:sThreadInterfacesCodingKey];
-    [coder encodeObject:_ethernetInterfaces forKey:sEthernetInterfacesCodingKey];
+    [coder encodeObject:_networkInterfaces forKey:sNetworkInterfacesCodingKey];
 }
 
 + (BOOL)supportsSecureCoding
@@ -246,9 +226,7 @@ static NSString * const sEthernetInterfacesCodingKey = @"ei";
     VerifyOrReturnValue(MTREqualObjects(_productIdentity, other->_productIdentity), NO);
     VerifyOrReturnValue(MTREqualObjects(_endpointsById, other->_endpointsById), NO);
     VerifyOrReturnValue(MTREqualObjects(_attributes, other->_attributes), NO);
-    VerifyOrReturnValue(MTREqualObjects(_wifiInterfaces, other->_wifiInterfaces), NO);
-    VerifyOrReturnValue(MTREqualObjects(_threadInterfaces, other->_threadInterfaces), NO);
-    VerifyOrReturnValue(MTREqualObjects(_ethernetInterfaces, other->_ethernetInterfaces), NO);
+    VerifyOrReturnValue(MTREqualObjects(_networkInterfaces, other->_networkInterfaces), NO);
 
     return YES;
 }

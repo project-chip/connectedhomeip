@@ -59,12 +59,10 @@ MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
 @property (nonatomic, copy, readonly, nullable) NSDictionary<MTRAttributePath *, NSDictionary<NSString *, id> *> * attributes MTR_PROVISIONALLY_AVAILABLE;
 
 /**
- * Network interfaces the commissionee has.  If there are no interfaces of a
- * given type, the corresponding array will be empty.
+ * Network interfaces the commissionee has.  The array will be empty if there
+ * are no network interfaces exposed on the commissionee.
  */
-@property (nonatomic, copy, readonly) NSArray<MTRNetworkInterfaceInfo *> * wifiInterfaces MTR_PROVISIONALLY_AVAILABLE;
-@property (nonatomic, copy, readonly) NSArray<MTRNetworkInterfaceInfo *> * threadInterfaces MTR_PROVISIONALLY_AVAILABLE;
-@property (nonatomic, copy, readonly) NSArray<MTRNetworkInterfaceInfo *> * ethernetInterfaces MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy, readonly) NSArray<MTRNetworkInterfaceInfo *> * networkInterfaces MTR_UNSTABLE_API;
 
 @end
 

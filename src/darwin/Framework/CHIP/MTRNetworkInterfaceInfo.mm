@@ -16,7 +16,10 @@
 
 #import "MTRNetworkInterfaceInfo_Internal.h"
 
+#import <Matter/MTRBaseClusters.h>
+
 #import "MTRDefines_Internal.h"
+#import "MTRLogging_Internal.h"
 #import "MTRUtilities.h"
 
 #include <lib/support/CodeUtils.h>
@@ -26,14 +29,28 @@ NS_ASSUME_NONNULL_BEGIN
 MTR_DIRECT_MEMBERS
 @implementation MTRNetworkInterfaceInfo
 
-- (instancetype)initWithEndpointID:(NSNumber *)endpointID featureMap:(NSNumber *)featureMap
+- (nullable instancetype)initWithEndpointID:(NSNumber *)endpointID featureMap:(NSNumber *)featureMap
 {
+    constexpr MTRNetworkCommissioningFeature typeBits = (MTRNetworkCommissioningFeatureWiFiNetworkInterface | MTRNetworkCommissioningFeatureThreadNetworkInterface | MTRNetworkCommissioningFeatureEthernetNetworkInterface);
+    auto ourTypeBits = featureMap.unsignedLongLongValue & typeBits;
+
+    if (ourTypeBits == 0) {
+        MTR_LOG_ERROR("MTRNetworkInterfaceInfo for endpoint %@ has no network technology bits set", endpointID);
+        return nil;
+    }
+
+    if ((ourTypeBits & (ourTypeBits - 1)) != 0) {
+        MTR_LOG_ERROR("MTRNetworkInterfaceInfo for endpoint %@ has multiple network technology bits set: 0x%llx", endpointID, ourTypeBits);
+        return nil;
+    }
+
     if (!(self = [super init])) {
         return nil;
     }
 
     _endpointID = [endpointID copy];
     _featureMap = [featureMap copy];
+    _type = static_cast<MTRNetworkCommissioningFeature>(ourTypeBits);
 
     return self;
 }

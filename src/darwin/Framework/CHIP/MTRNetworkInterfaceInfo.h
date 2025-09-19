@@ -15,6 +15,7 @@
  */
 
 #import <Foundation/Foundation.h>
+#import <Matter/MTRBaseClusters.h>
 #import <Matter/MTRDefines.h>
 
 NS_ASSUME_NONNULL_BEGIN
@@ -24,7 +25,7 @@ NS_ASSUME_NONNULL_BEGIN
  */
 
 NS_SWIFT_SENDABLE
-MTR_PROVISIONALLY_AVAILABLE
+MTR_UNSTABLE_API
 @interface MTRNetworkInterfaceInfo : NSObject <NSCopying, NSSecureCoding>
 
 - (instancetype)init NS_UNAVAILABLE;
@@ -38,10 +39,15 @@ MTR_PROVISIONALLY_AVAILABLE
 
 /**
  * The value of the FeatureMap attribute of the corresponding Network
- * Commissioning cluster instance (which indicates what network technology is
- * being used; see MTRNetworkCommissioningFeature).
+ * Commissioning cluster instance.
  */
 @property (nonatomic, copy, readonly) NSNumber * featureMap;
+
+/**
+ * The network technology used by the interface.  This will be one of the
+ * MTRNetworkCommissioningFeature*NetworkInterface values (exactly one bit).
+ */
+@property (nonatomic, assign, readonly) MTRNetworkCommissioningFeature type;
 
 @end
 

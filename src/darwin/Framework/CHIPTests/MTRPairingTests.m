@@ -301,9 +301,7 @@ typedef BOOL (^CommissioningSessionHandler)(NSError * _Nullable error);
         XCTAssertEqualObjects(decoded.endpointsById, info.endpointsById);
         XCTAssertEqualObjects(decoded.rootEndpoint.children, info.rootEndpoint.children);
         XCTAssertEqualObjects(decoded.attributes, info.attributes);
-        XCTAssertEqualObjects(decoded.wifiInterfaces, info.wifiInterfaces);
-        XCTAssertEqualObjects(decoded.threadInterfaces, info.threadInterfaces);
-        XCTAssertEqualObjects(decoded.ethernetInterfaces, info.ethernetInterfaces);
+        XCTAssertEqualObjects(decoded.networkInterfaces, info.networkInterfaces);
     } else {
         XCTAssertNil(info.endpointsById);
         XCTAssertNil(info.rootEndpoint);
@@ -315,10 +313,9 @@ typedef BOOL (^CommissioningSessionHandler)(NSError * _Nullable error);
         return [path.cluster isEqual:@(MTRClusterIDTypeNetworkCommissioningID)] &&
             [path.attribute isEqual:@(MTRAttributeIDTypeGlobalAttributeFeatureMapID)];
     };
-    __auto_type endpointInList = ^(NSNumber * endpoint, NSArray<MTRNetworkInterfaceInfo *> * list, MTRNetworkCommissioningFeature expectedFeature) {
+    __auto_type endpointInList = ^(NSNumber * endpoint, NSArray<MTRNetworkInterfaceInfo *> * list) {
         for (MTRNetworkInterfaceInfo * info in list) {
             if ([info.endpointID isEqual:endpoint]) {
-                XCTAssertTrue(info.featureMap.unsignedLongLongValue & expectedFeature);
                 return YES;
             }
         }
@@ -329,13 +326,12 @@ typedef BOOL (^CommissioningSessionHandler)(NSError * _Nullable error);
     for (MTRAttributePath * path in info.attributes) {
         if (isNetworkCommissioningFeatureMap(path)) {
             ++networkCommissioningFeatureMapCount;
-            XCTAssertTrue(endpointInList(path.endpoint, info.wifiInterfaces, MTRNetworkCommissioningFeatureWiFiNetworkInterface) || endpointInList(path.endpoint, info.threadInterfaces, MTRNetworkCommissioningFeatureThreadNetworkInterface) || endpointInList(path.endpoint, info.ethernetInterfaces, MTRNetworkCommissioningFeatureEthernetNetworkInterface));
+            XCTAssertTrue(endpointInList(path.endpoint, info.networkInterfaces));
         }
     }
     XCTAssertGreaterThan(networkCommissioningFeatureMapCount, 0);
 
-    XCTAssertEqual(networkCommissioningFeatureMapCount,
-        info.wifiInterfaces.count + info.threadInterfaces.count + info.ethernetInterfaces.count);
+    XCTAssertEqual(networkCommissioningFeatureMapCount, info.networkInterfaces.count);
 
     if (self.extraAttributesToRead) {
         // The attributes we tried to read should really have worked.

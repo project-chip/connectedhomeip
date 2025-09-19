@@ -23,7 +23,8 @@ NS_ASSUME_NONNULL_BEGIN
 MTR_DIRECT_MEMBERS
 @interface MTRNetworkInterfaceInfo ()
 
-- (instancetype)initWithEndpointID:(NSNumber *)endpointID featureMap:(NSNumber *)featureMap;
+// Will fail init if the featureMap claims multiple interface types.
+- (nullable instancetype)initWithEndpointID:(NSNumber *)endpointID featureMap:(NSNumber *)featureMap;
 
 @end
 
