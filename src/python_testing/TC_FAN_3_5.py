@@ -117,7 +117,8 @@ class TC_FAN_3_5(MatterBaseTest):
                                             - Verify that all the expected SpeedSetting values are present in the reports in accordance with the SpeedMax attribute value.
                                         [Save the resulting ascending attribute report values from each subscription as a baseline for comparison with the descending values from the previous steps]"""),
 
-                TestStep("8", """Compare the descending baseline values with the ascending baseline values""", """Verify that the descending baseline values are the reverse of the ascending baseline values for each attribute"""),
+                TestStep("8", """Compare the descending baseline values with the ascending baseline values""",
+                         """Verify that the descending baseline values are the reverse of the ascending baseline values for each attribute"""),
 
                 TestStep("9", """LowestOff field test
                                         Iteratively send step commands with LowestOff set to True, Direction set to Decrease, and Wrap set to False.
@@ -170,7 +171,8 @@ class TC_FAN_3_5(MatterBaseTest):
                                         - Verify that all the expected SpeedCurrent values are present in the reports in accordance with the SpeedMax attribute value.
                                     [Save the resulting descending attribute report values from each subscription as a baseline for comparison with the descending values from the previous steps]"""),
 
-                TestStep("11", """Compare the descending baseline values with the ascending baseline values""", """Verify that the descending baseline values are the reverse of the ascending baseline values for each attribute"""),
+                TestStep("11", """Compare the descending baseline values with the ascending baseline values""",
+                         """Verify that the descending baseline values are the reverse of the ascending baseline values for each attribute"""),
 
                 TestStep("12", """LowestOff field test
                                         Iteratively send step commands with LowestOff set to False, Direction set to Decrease, and Wrap set to False.
@@ -224,7 +226,8 @@ class TC_FAN_3_5(MatterBaseTest):
                                         - Verify that all the expected SpeedSetting values are present in the reports in accordance with the SpeedMax attribute value.
                                     [Save the resulting ascending attribute report values from each subscription as a baseline for comparison with the descending values from the previous steps]"""),
 
-                TestStep("14", """Compare the descending baseline values with the ascending baseline values""", """Verify that the descending baseline values are the reverse of the ascending baseline values for each attribute"""),
+                TestStep("14", """Compare the descending baseline values with the ascending baseline values""",
+                         """Verify that the descending baseline values are the reverse of the ascending baseline values for each attribute"""),
 
                 TestStep("ssssss", """aaaaa""", """ccccc"""),
 
