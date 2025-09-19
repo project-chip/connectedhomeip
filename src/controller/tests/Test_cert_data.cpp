@@ -50,8 +50,6 @@
  *
  * See more in Matter documentation: tools/matter/chip/certificate-tool
  */
-
-#include "Test_cert_data.h"
 #include <crypto/CHIPCryptoPAL.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/Span.h>
