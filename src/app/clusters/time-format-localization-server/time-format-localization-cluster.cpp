@@ -57,39 +57,21 @@ private:
     Iterator * mIterator;
 };
 
-bool IsSupportedCalendarType(TimeFormatLocalization::CalendarTypeEnum reqCalendar,
-                             TimeFormatLocalization::CalendarTypeEnum * validCalendar = nullptr)
+bool IsSupportedCalendarType(TimeFormatLocalization::CalendarTypeEnum reqCalendar)
 {
     AutoReleaseIterator it(DeviceLayer::GetDeviceInfoProvider());
     VerifyOrReturnValue(it.IsValid(), false);
-
     TimeFormatLocalization::CalendarTypeEnum type;
-    bool found = false;
-
-    // Set input value to kUnknownEnumValue to signal an empty supported CalendarList.
-    if (validCalendar != nullptr)
-    {
-        *validCalendar = TimeFormatLocalization::CalendarTypeEnum::kUnknownEnumValue;
-    }
 
     while (it.Next(type))
     {
-        // Update the optional validCalendar to a value from the SupportedList.
-        // If reqCalendar is supported, validCalendar is set to it. Otherwise,
-        // it is set to the last supported value from the provider.
-        if (validCalendar != nullptr)
-        {
-            *validCalendar = type;
-        }
-
         if (type == reqCalendar)
         {
-            found = true;
-            break;
+            return true;
         }
     }
 
-    return found;
+    return false;
 }
 
 CHIP_ERROR GetSupportedCalendarTypes(AttributeValueEncoder & aEncoder)
@@ -114,8 +96,8 @@ TimeFormatLocalizationCluster::TimeFormatLocalizationCluster(EndpointId endpoint
                                                              BitFlags<TimeFormatLocalization::Feature> features,
                                                              TimeFormatLocalization::HourFormatEnum defaultHourFormat,
                                                              TimeFormatLocalization::CalendarTypeEnum defaultCalendarType) :
-    DefaultServerCluster({ endpointId, TimeFormatLocalization::Id }), mFeatures(features), mHourFormat(defaultHourFormat),
-    mCalendarType(defaultCalendarType)
+    DefaultServerCluster({ endpointId, TimeFormatLocalization::Id }),
+    mFeatures(features), mHourFormat(defaultHourFormat), mCalendarType(defaultCalendarType)
 {}
 
 CHIP_ERROR TimeFormatLocalizationCluster::Startup(ServerClusterContext & context)
@@ -124,33 +106,24 @@ CHIP_ERROR TimeFormatLocalizationCluster::Startup(ServerClusterContext & context
 
     AttributePersistence attrPersistence{ context.attributeStorage };
 
-    // Store default values before attempting to load from persistence
-    TimeFormatLocalization::CalendarTypeEnum defaultCalendarType = mCalendarType;
-    TimeFormatLocalization::HourFormatEnum defaultHourFormat     = mHourFormat;
-
-    // Initialize the CalendarType if available
-    attrPersistence.LoadNativeEndianValue<TimeFormatLocalization::CalendarTypeEnum>(
-        { kRootEndpointId, TimeFormatLocalization::Id, TimeFormatLocalization::Attributes::ActiveCalendarType::Id }, mCalendarType,
-        defaultCalendarType);
-
-    // We could have an invalid calendar type value if an OTA update removed support for the value we were using.
-    // If initial value is not one of the allowed values, pick one valid value and write it.
-    TimeFormatLocalization::CalendarTypeEnum validCalendar = defaultCalendarType;
-    if (!IsSupportedCalendarType(mCalendarType, &validCalendar))
+    TimeFormatLocalization::CalendarTypeEnum persistedCalendarType = mCalendarType;
+    if (attrPersistence.LoadNativeEndianValue<TimeFormatLocalization::CalendarTypeEnum>(
+            { mPath.mEndpointId, TimeFormatLocalization::Id, TimeFormatLocalization::Attributes::ActiveCalendarType::Id },
+            mCalendarType, persistedCalendarType))
     {
-        // If the requested calendar is not valid and it was set to kUnknownEnumValue
-        // it means that the SupportedCalendar list is empty;
-        if (validCalendar == TimeFormatLocalization::CalendarTypeEnum::kUnknownEnumValue)
+        if (IsSupportedCalendarType(persistedCalendarType))
         {
-            return CHIP_ERROR_NOT_FOUND;
+            mCalendarType = persistedCalendarType;
         }
-        mCalendarType = validCalendar;
     }
 
-    // Initialize HourFormat
-    attrPersistence.LoadNativeEndianValue<TimeFormatLocalization::HourFormatEnum>(
-        { kRootEndpointId, TimeFormatLocalization::Id, TimeFormatLocalization::Attributes::HourFormat::Id }, mHourFormat,
-        defaultHourFormat);
+    TimeFormatLocalization::HourFormatEnum persistedHourFormat = mHourFormat;
+    if (attrPersistence.LoadNativeEndianValue<TimeFormatLocalization::HourFormatEnum>(
+            { mPath.mEndpointId, TimeFormatLocalization::Id, TimeFormatLocalization::Attributes::HourFormat::Id }, mHourFormat,
+            persistedHourFormat))
+    {
+        mHourFormat = persistedHourFormat;
+    }
 
     return CHIP_NO_ERROR;
 }
@@ -186,9 +159,8 @@ DataModel::ActionReturnStatus TimeFormatLocalizationCluster::WriteImpl(const Dat
 
         // Using WriteValue directly so we can check that the decoded value is in the supported list
         // before storing it.
-        return mContext->attributeStorage.WriteValue(
-            { kRootEndpointId, TimeFormatLocalization::Id, TimeFormatLocalization::Attributes::ActiveCalendarType::Id },
-            { reinterpret_cast<const uint8_t *>(&mCalendarType), sizeof(mCalendarType) });
+        return mContext->attributeStorage.WriteValue(request.path,
+                                                     { reinterpret_cast<const uint8_t *>(&mCalendarType), sizeof(mCalendarType) });
     }
 
     return Protocols::InteractionModel::Status::UnsupportedWrite;

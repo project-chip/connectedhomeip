@@ -19,6 +19,7 @@
 #include <app/static-cluster-config/TimeFormatLocalization.h>
 #include <app/util/attribute-metadata.h>
 #include <data-model-providers/codegen/CodegenDataModelProvider.h>
+#include <data-model-providers/codegen/CodegenProcessingConfig.h>
 #include <platform/DeviceInfoProvider.h>
 #include <platform/PlatformManager.h>
 
@@ -26,6 +27,12 @@ using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;
 using namespace Protocols::InteractionModel;
+
+#if CHIP_CODEGEN_CONFIG_ENABLE_CODEGEN_INTEGRATION_LOOKUP_ERRORS
+#define CodegenInitError(...) ChipLogError(AppServer, __VA_ARGS__)
+#else // CHIP_CODEGEN_CONFIG_ENABLE_CODEGEN_INTEGRATION_LOOKUP_ERRORS
+#define CodegenInitError(...) (void) 0;
+#endif // CHIP_CODEGEN_CONFIG_ENABLE_CODEGEN_INTEGRATION_LOOKUP_ERRORS
 
 namespace {
 
@@ -42,7 +49,7 @@ void emberAfTimeFormatLocalizationClusterServerInitCallback(EndpointId endpoint)
     uint32_t rawFeatureMap;
     if (TimeFormatLocalization::Attributes::FeatureMap::Get(endpoint, &rawFeatureMap) != Status::Success)
     {
-        ChipLogError(AppServer, "Failed to get feature map for endpoint %u", endpoint);
+        CodegenInitError("Failed to get feature map for endpoint %u", endpoint);
         rawFeatureMap = 0;
     }
 
@@ -53,7 +60,7 @@ void emberAfTimeFormatLocalizationClusterServerInitCallback(EndpointId endpoint)
     // First the HourFormat
     if (TimeFormatLocalization::Attributes::HourFormat::Get(endpoint, &defaultHourFormat) != Status::Success)
     {
-        ChipLogError(AppServer, "Failed to get HourFormat for endpoint %u", endpoint);
+        CodegenInitError("Failed to get HourFormat for endpoint %u", endpoint);
         defaultHourFormat = TimeFormatLocalization::HourFormatEnum::k12hr;
     }
 
@@ -62,7 +69,7 @@ void emberAfTimeFormatLocalizationClusterServerInitCallback(EndpointId endpoint)
     {
         if (TimeFormatLocalization::Attributes::ActiveCalendarType::Get(endpoint, &defaultCalendarType) != Status::Success)
         {
-            ChipLogError(AppServer, "Failed to get ActiveCalendarType for endpoint %u", endpoint);
+            CodegenInitError("Failed to get ActiveCalendarType for endpoint %u", endpoint);
             defaultCalendarType = TimeFormatLocalization::CalendarTypeEnum::kBuddhist;
         }
     }
@@ -73,7 +80,7 @@ void emberAfTimeFormatLocalizationClusterServerInitCallback(EndpointId endpoint)
 
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(AppServer, "TimeFormatLocalization cluster error registration");
+        CodegenInitError("TimeFormatLocalization cluster error registration: %" CHIP_ERROR_FORMAT, err.Format());
     }
 }
 
@@ -86,7 +93,7 @@ void MatterTimeFormatLocalizationClusterServerShutdownCallback(EndpointId endpoi
 
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(AppServer, "TimeFormatLocalization unregister error");
+        CodegenInitError("TimeFormatLocalization unregister error: %" CHIP_ERROR_FORMAT, err.Format());
     }
 
     gServer.Destroy();
