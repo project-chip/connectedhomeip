@@ -66,12 +66,8 @@ class TC_FAN_3_5(MatterBaseTest):
                          "- Set PercentSetting to 0. - Send Step command with direction=Increase, lowestOff=True, and wrap=False. - Read the resulting PercentSetting attribute report value. - Calculate the PercentSetting range per Step command. - Store value for future reference."),
 
                 TestStep("6", """[FC] LowestOff field test
-                                            Iteratively send step commands with LowestOff set to True, Direction set to Decrease,
-                                            and Wrap set to False.
-
-                                            Starting form the maximum fan attribute values and ending at the minimum fan attribute
-                                            values (descending order).
-
+                                            Iteratively send step commands with LowestOff set to True, Direction set to Decrease, and Wrap set to False.
+                                            Starting form the maximum fan attribute values and ending at the minimum fan attribute values (descending order).
                                             Monitoring the Setting attribute values primarily (PercentSetting, SpeedSetting).""", """
                                         SETUP
                                             - Initialize the PercentSetting attribute to 100
@@ -87,14 +83,187 @@ class TC_FAN_3_5(MatterBaseTest):
                                             - When the PercentSetting attribute value reaches 0:
                                                 - Send an additional Step command and verify that PercentSetting stays at 0"""),
 
+                TestStep("6b", """Read the resulting attribute reports from each subscription""", """
+                                        - Verify that the attribute report values from each subscription are in descending order
+                                        - If the number of PercentSetting reports is greater than the number of FanMode reports:
+                                            - Verify that all the expected FanMode values are present in the reports in accordance with the FanModeSequence attribute value
+                                        - If the number of PercentSetting reports is greater or equal than the number of SpeedSetting reports:
+                                            - Verify that all the expected SpeedSetting values are present in the reports in accordance with the SpeedMax attribute value.
+                                        [Save the resulting descending attribute report values from each subscription as a baseline for comparison with the ascending values from the next steps]"""),
 
+                TestStep("7", """LowestOff field test
+                                        Iteratively send step commands with LowestOff set to True, Direction set to Increase, and Wrap set to False.
+                                        Starting form the minimum fan attribute values and ending at the maximum fan attribute values (ascending order).
+                                        Monitoring the Setting attribute values primarily (PercentSetting, SpeedSetting).""", """
+                                    SETUP
+                                    - Initialize the PercentSetting attribute to 0
+                                        - Verify that the SpeedSetting attribute value is set to 0
+                                        - Verify that the FanMode attribute value is set to Off
+                                    - Subscribe to the PercentSetting, SpeedSetting, and FanMode attributes
+                                    - Step: LowestOff=True, Direction=Increase, Wrap=False"""),
 
+                TestStep("7a", """TH sends Step commands iteratively""", """
+                                        Max PercentSetting Check
+                                            - Verify that the PercentSetting attribute value reaches 100
+                                        No Wrap Check
+                                            - When the PercentSetting attribute value reaches 100:
+                                                - Send an additional Step command to verify that PercentSetting stays at 100"""),
 
+                TestStep("7b", """Read the resulting attribute reports from each subscription""", """
+                                        - Verify that the attribute report values from each subscription are in ascending order
+                                        - If the number of PercentSetting reports is greater than the number of FanMode reports:
+                                            - Verify that all the expected FanMode values are present in the reports in accordance with the FanModeSequence attribute value
+                                        - If the number of PercentSetting reports is greater or equal than the number of SpeedSetting reports:
+                                            - Verify that all the expected SpeedSetting values are present in the reports in accordance with the SpeedMax attribute value.
+                                        [Save the resulting ascending attribute report values from each subscription as a baseline for comparison with the descending values from the previous steps]"""),
 
+                TestStep("8", """Compare the descending baseline values with the ascending baseline values""", """Verify that the descending baseline values are the reverse of the ascending baseline values for each attribute"""),
 
+                TestStep("9", """LowestOff field test
+                                        Iteratively send step commands with LowestOff set to True, Direction set to Decrease, and Wrap set to False.
+                                        Starting form the maximum fan attribute values and ending at the minimum fan attribute values (descending order).
+                                        Monitoring the Current attribute values primarily (PercentCurrent, SpeedCurrent).""", """
+                                    SETUP
+                                    - Initialize the PercentSetting attribute to 100
+                                        - Verify that the PercentCurrent attribute value is set to 100
+                                        - Verify that the SpeedCurrent attribute value is set to SpeedMax
+                                    - Subscribe to the PercentSetting, PercentCurrent, and SpeedCurrent attributes
+                                    - Step: LowestOff=True, Direction=Decrease, Wrap=False"""),
 
+                TestStep("9a", """TH sends Step commands iteratively""", """
+                                    LowestOff Check
+                                        - Verify that the PercentSetting attribute value reaches 0
+                                    No Wrap Check
+                                        - When the PercentSetting attribute value reaches 0:
+                                            - Send an additional Step command to verify that PercentSetting stays at 0"""),
 
-                TestStep("ssssss", "aaaaa", """ccccc"""),
+                TestStep("9b", """Read the resulting attribute reports from each subscription""", """
+                                    - Verify that the attribute report values from each subscription are in descending order
+                                    - If the number of PercentSetting reports is equal to the number of PercentCurrent reports:
+                                        - Verify that all the expected PercentCurrent values are present in the reports
+                                    - If the number of PercentSetting reports is greater or equal than the number of SpeedCurrent reports:
+                                        - Verify that all the expected SpeedCurrent values are present in the reports in accordance with the SpeedMax attribute value.
+                                    [Save the resulting descending attribute report values from each subscription as a baseline for comparison with the ascending values from the next steps]"""),
+
+                TestStep("10", """LowestOff field test
+                                        Iteratively send step commands with LowestOff set to True, Direction set to Increase, and Wrap set to False.
+                                        Starting form the minimum fan attribute values and ending at the maximum fan attribute values (ascending order).
+                                        Monitoring the Current attribute values primarily (PercentCurrent, SpeedCurrent).""", """
+                                    SETUP
+                                    - Initialize the PercentCurrent attribute to 0
+                                        - Verify that the SpeedCurrent attribute value is set to 0
+                                    - Subscribe to the PercentSetting, PercentCurrent, and SpeedCurrent attributes
+                                    - Step: LowestOff=True, Direction=Increase, Wrap=False"""),
+
+                TestStep("10a", """TH sends Step commands iteratively""", """
+                                    Max PercentSetting Check
+                                        - Verify that the PercentSetting attribute value reaches 100
+                                    No Wrap Check
+                                        - When the PercentSetting attribute value reaches 100:
+                                            - Send an additional Step command to verify that PercentSetting stays at 100"""),
+
+                TestStep("10b", """Read the resulting attribute reports from each subscription""", """
+                                    - Verify that the attribute report values from each subscription are in ascending order
+                                    - If the number of PercentSetting reports is equal to the number of PercentCurrent reports:
+                                        - Verify that all the expected PercentCurrent values are present in the reports
+                                    - If the number of PercentSetting reports is greater or equal than the number of SpeedCurrent reports:
+                                        - Verify that all the expected SpeedCurrent values are present in the reports in accordance with the SpeedMax attribute value.
+                                    [Save the resulting descending attribute report values from each subscription as a baseline for comparison with the descending values from the previous steps]"""),
+
+                TestStep("11", """Compare the descending baseline values with the ascending baseline values""", """Verify that the descending baseline values are the reverse of the ascending baseline values for each attribute"""),
+
+                TestStep("12", """LowestOff field test
+                                        Iteratively send step commands with LowestOff set to False, Direction set to Decrease, and Wrap set to False.
+                                        Starting form the maximum fan attribute values and ending at the minimum PercentSetting attribute value above 0 (descending order).
+                                        Monitoring the Setting attribute values primarily (PercentSetting, SpeedSetting).""", """
+                                    SETUP
+                                    - Initialize the PercentSetting attribute to 100
+                                        - Verify that the SpeedSetting attribute value is set to SpeedMax
+                                        - Verify that the FanMode attribute value is set to High
+                                    - Subscribe to the PercentSetting, SpeedSetting, and FanMode attributes
+                                    - Step: LowestOff=False, Direction=Decrease, Wrap=False"""),
+
+                TestStep("12a", """TH sends Step commands iteratively""", """
+                                    LowestOff Check
+                                        - Verify that the PercentSetting attribute value reaches the minimum PercentSetting attribute value above 0
+                                    No Wrap Check
+                                        - When the PercentSetting attribute value reaches the minimum PercentSetting attribute value above 0:
+                                            -Send an additional Step command to verify that PercentSetting stays at the minimum PercentSetting attribute value above 0"""),
+
+                TestStep("12b", """Read the resulting attribute reports from each subscription""", """
+                                    - Verify that the attribute report values from each subscription are in descending order
+                                    - If the number of PercentSetting reports is greater than the number of FanMode reports:
+                                        - Verify that all the expected FanMode values are present in the reports in accordance with the FanModeSequence attribute value
+                                    - If the number of PercentSetting reports is greater or equal than the number of SpeedSetting reports:
+                                        - Verify that all the expected SpeedSetting values are present in the reports in accordance with the SpeedMax attribute value.
+                                    [Save the resulting descending attribute report values from each subscription as a baseline for comparison with the ascending values from the next steps]"""),
+
+                TestStep("13", """LowestOff field test
+                                        Iteratively send step commands with LowestOff set to False, Direction set to Increase, and Wrap set to False.
+                                        Starting form the minimum fan attribute values and ending at the maximum fan attribute values (ascending order).
+                                        Monitoring the Setting attribute values primarily (PercentSetting, SpeedSetting).""", """
+                                    SETUP
+                                    - Initialize the PercentSetting attribute to 0
+                                        - Verify that the SpeedSetting attribute value is set to 0
+                                        - Verify that the FanMode attribute value is set to Off
+                                    - Subscribe to the PercentSetting, SpeedSetting, and FanMode attributes
+                                    - Step: LowestOff=True, Direction=Increase, Wrap=False"""),
+
+                TestStep("13a", """TH sends Step commands iteratively""", """
+                                    Max PercentSetting Check
+                                        - Verify that the PercentSetting attribute value reaches 100
+                                    No Wrap Check
+                                        - When the PercentSetting attribute value reaches 100:
+                                            - Send an additional Step command to verify that PercentSetting stays at 100"""),
+
+                TestStep("13b", """Read the resulting attribute reports from each subscription""", """
+                                    - Verify that the attribute report values from each subscription are in ascending order
+                                    - If the number of PercentSetting reports is greater than the number of FanMode reports:
+                                        - Verify that all the expected FanMode values are present in the reports in accordance with the FanModeSequence attribute value
+                                    - If the number of PercentSetting reports is greater or equal than the number of SpeedSetting reports:
+                                        - Verify that all the expected SpeedSetting values are present in the reports in accordance with the SpeedMax attribute value.
+                                    [Save the resulting ascending attribute report values from each subscription as a baseline for comparison with the descending values from the previous steps]"""),
+
+                TestStep("14", """Compare the descending baseline values with the ascending baseline values""", """Verify that the descending baseline values are the reverse of the ascending baseline values for each attribute"""),
+
+                TestStep("ssssss", """aaaaa""", """ccccc"""),
+
+                TestStep("ssssss", """aaaaa""", """ccccc"""),
+
+                TestStep("ssssss", """aaaaa""", """ccccc"""),
+
+                TestStep("ssssss", """aaaaa""", """ccccc"""),
+
+                TestStep("ssssss", """aaaaa""", """ccccc"""),
+
+                TestStep("ssssss", """aaaaa""", """ccccc"""),
+
+                TestStep("ssssss", """aaaaa""", """ccccc"""),
+
+                TestStep("ssssss", """aaaaa""", """ccccc"""),
+
+                TestStep("ssssss", """aaaaa""", """ccccc"""),
+
+                TestStep("ssssss", """aaaaa""", """ccccc"""),
+
+                TestStep("ssssss", """aaaaa""", """ccccc"""),
+
+                TestStep("ssssss", """aaaaa""", """ccccc"""),
+
+                TestStep("ssssss", """aaaaa""", """ccccc"""),
+
+                TestStep("ssssss", """aaaaa""", """ccccc"""),
+
+                TestStep("ssssss", """aaaaa""", """ccccc"""),
+
+                TestStep("ssssss", """aaaaa""", """ccccc"""),
+
+                TestStep("ssssss", """aaaaa""", """ccccc"""),
+
+                TestStep("ssssss", """aaaaa""", """ccccc"""),
+
+                TestStep("ssssss", """aaaaa""", """ccccc"""),
+
 
 
 
