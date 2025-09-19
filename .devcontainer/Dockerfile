@@ -78,10 +78,11 @@ RUN sed -i '/^TIZEN_SDK_DATA_PATH/d' $TIZEN_SDK_ROOT/sdk.info \
     && ln -sf /home/$USERNAME/.tizen-cli-config $TIZEN_SDK_ROOT/tools/.tizen-cli-config \
     && : # last line
 
-RUN [ -n "${LOCAL_WORKSPACE_ROOT}" ] \
+RUN if [ -n "${LOCAL_WORKSPACE_ROOT}" ]; then \
+    true \
     && mkdir -p "$(dirname "${LOCAL_WORKSPACE_ROOT}")" \
     && ln -sf "${WORKSPACE_ROOT}" "${LOCAL_WORKSPACE_ROOT}" \
-    && :
+    ; fi
 
 ENV TIZEN_ROOTFS=/tizen_rootfs
 
