@@ -35,7 +35,9 @@ class AutoReleaseIterator
 public:
     using Iterator = DeviceLayer::DeviceInfoProvider::SupportedCalendarTypesIterator;
 
-    explicit AutoReleaseIterator(Iterator * value) : mIterator(value) {}
+    explicit AutoReleaseIterator(DeviceLayer::DeviceInfoProvider * provider) :
+        mIterator(provider != nullptr ? provider->IterateSupportedCalendarTypes() : nullptr)
+    {}
     ~AutoReleaseIterator()
     {
         if (mIterator != nullptr)
@@ -58,10 +60,7 @@ private:
 bool IsSupportedCalendarType(TimeFormatLocalization::CalendarTypeEnum reqCalendar,
                              TimeFormatLocalization::CalendarTypeEnum * validCalendar = nullptr)
 {
-    DeviceLayer::DeviceInfoProvider * provider = DeviceLayer::GetDeviceInfoProvider();
-    VerifyOrReturnValue(provider != nullptr, false);
-
-    AutoReleaseIterator it(provider->IterateSupportedCalendarTypes());
+    AutoReleaseIterator it(DeviceLayer::GetDeviceInfoProvider());
     VerifyOrReturnValue(it.IsValid(), false);
 
     TimeFormatLocalization::CalendarTypeEnum type;
@@ -93,14 +92,30 @@ bool IsSupportedCalendarType(TimeFormatLocalization::CalendarTypeEnum reqCalenda
     return found;
 }
 
+CHIP_ERROR GetSupportedCalendarTypes(AttributeValueEncoder & aEncoder)
+{
+    AutoReleaseIterator it(DeviceLayer::GetDeviceInfoProvider());
+    VerifyOrReturnValue(it.IsValid(), aEncoder.EncodeEmptyList());
+
+    return aEncoder.EncodeList([&it](const auto & encoder) -> CHIP_ERROR {
+        TimeFormatLocalization::CalendarTypeEnum type;
+
+        while (it.Next(type))
+        {
+            ReturnErrorOnFailure(encoder.Encode(type));
+        }
+        return CHIP_NO_ERROR;
+    });
+}
+
 } // namespace
 
 TimeFormatLocalizationCluster::TimeFormatLocalizationCluster(EndpointId endpointId,
                                                              BitFlags<TimeFormatLocalization::Feature> features,
                                                              TimeFormatLocalization::HourFormatEnum defaultHourFormat,
                                                              TimeFormatLocalization::CalendarTypeEnum defaultCalendarType) :
-    DefaultServerCluster({ endpointId, TimeFormatLocalization::Id }),
-    mFeatures(features), mHourFormat(defaultHourFormat), mCalendarType(defaultCalendarType)
+    DefaultServerCluster({ endpointId, TimeFormatLocalization::Id }), mFeatures(features), mHourFormat(defaultHourFormat),
+    mCalendarType(defaultCalendarType)
 {}
 
 CHIP_ERROR TimeFormatLocalizationCluster::Startup(ServerClusterContext & context)
@@ -225,25 +240,6 @@ CHIP_ERROR TimeFormatLocalizationCluster::Attributes(const ConcreteClusterPath &
     }
 
     return listBuilder.Append(Span(kMandatoryAttributes), Span(optionalAttributes), optionalAttributeSet);
-}
-
-CHIP_ERROR TimeFormatLocalizationCluster::GetSupportedCalendarTypes(AttributeValueEncoder & aEncoder) const
-{
-    DeviceLayer::DeviceInfoProvider * provider = DeviceLayer::GetDeviceInfoProvider();
-    VerifyOrReturnValue(provider != nullptr, aEncoder.EncodeEmptyList());
-
-    AutoReleaseIterator it(provider->IterateSupportedCalendarTypes());
-    VerifyOrReturnValue(it.IsValid(), aEncoder.EncodeEmptyList());
-
-    return aEncoder.EncodeList([&it](const auto & encoder) -> CHIP_ERROR {
-        TimeFormatLocalization::CalendarTypeEnum type;
-
-        while (it.Next(type))
-        {
-            ReturnErrorOnFailure(encoder.Encode(type));
-        }
-        return CHIP_NO_ERROR;
-    });
 }
 
 } // namespace Clusters

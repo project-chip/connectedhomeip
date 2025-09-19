@@ -41,7 +41,6 @@ public:
 
 private:
     DataModel::ActionReturnStatus WriteImpl(const DataModel::WriteAttributeRequest & request, AttributeValueDecoder & decoder);
-    CHIP_ERROR GetSupportedCalendarTypes(AttributeValueEncoder & aEncoder) const;
     const BitFlags<TimeFormatLocalization::Feature> mFeatures;
     TimeFormatLocalization::HourFormatEnum mHourFormat;
     TimeFormatLocalization::CalendarTypeEnum mCalendarType;
