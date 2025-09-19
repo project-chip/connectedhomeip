@@ -31,10 +31,10 @@ public:
                                                 AttributeValueEncoder & encoder) override;
     CHIP_ERROR Attributes(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder) override;
 
-    // Set a boolean value
-    // If the boolean value was actually modified, an event will be generated
-    // On success, the return value is an optional containing an EventNumber
-    // On error, the return value is nullopt
+    // Set a boolean value.
+    // If the boolean value was actually modified, an event will be generated.
+    // On success, the return value is an optional containing an EventNumber.
+    // On error, the return value is nullopt.
     std::optional<EventNumber> SetStateValue(bool stateValue);
 
     bool GetStateValue() const { return mStateValue; }
