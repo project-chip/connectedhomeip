@@ -97,6 +97,7 @@ ClustersWithInitFunctions:
     - OTA Software Update Provider
     - Pump Configuration and Control
     - Push AV Stream Transport
+    - Time Format Localization
     - Sample MEI
     - Scenes Management
     - Software Diagnostics
@@ -131,6 +132,7 @@ ClustersWithShutdownFunctions:
     - Scenes Management
     - Software Diagnostics
     - Thermostat
+    - Time Format Localization
     - Wi-Fi Network Diagnostics
     - Fixed Label
 
@@ -138,7 +140,6 @@ ClustersWithPreAttributeChangeFunctions:
     - Door Lock
     - Pump Configuration and Control
     - Thermostat User Interface Configuration
-    - Time Format Localization
     - Localization Configuration
     - Mode Select
     - Fan Control
