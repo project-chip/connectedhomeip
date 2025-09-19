@@ -97,4 +97,5 @@ chip_test_suite("tests") {
       "${chip_root}/src/controller:jcm",
     ]
   }
+  
 }
