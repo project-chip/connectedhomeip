@@ -5,6 +5,7 @@ on:
             - master
             - 'v*-branch'
     pull_request:
+        paths-ignore: ['**/*.md', '*.md']
 
 jobs:
   validation:
