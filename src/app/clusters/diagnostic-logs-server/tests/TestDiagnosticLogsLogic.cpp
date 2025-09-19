@@ -20,7 +20,7 @@
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/CommandHandler.h>
 #include <app/MessageDef/CommandDataIB.h>
-#include <app/clusters/diagnostic-logs-server/DiagnosticLogsLogic.h>
+#include <app/clusters/diagnostic-logs-server/DiagnosticLogsCluster.h>
 #include <app/clusters/diagnostic-logs-server/DiagnosticLogsProviderDelegate.h>
 #include <lib/support/Span.h>
 #include <protocols/bdx/DiagnosticLogs.h>
@@ -179,19 +179,6 @@ struct TestDiagnosticLogsLogic : public ::testing::Test
     static void SetUpTestSuite() { ASSERT_EQ(Platform::MemoryInit(), CHIP_NO_ERROR); }
     static void TearDownTestSuite() { Platform::MemoryShutdown(); }
 };
-
-TEST_F(TestDiagnosticLogsLogic, ResponsePayload_NoDelegate_NoLogs)
-{
-    DiagnosticLogsProviderLogic logic;
-
-    const ConcreteCommandPath kPath{ kEndpoint0, DiagnosticLogs::Id, DiagnosticLogs::Commands::RetrieveLogsRequest::Id };
-
-    MockCommandHandler handler;
-    EXPECT_EQ(logic.HandleLogRequestForResponsePayload(&handler, kPath, DiagnosticLogs::IntentEnum::kEndUserSupport), std::nullopt);
-    EXPECT_EQ(handler.GetResponse().commandId, DiagnosticLogs::Commands::RetrieveLogsResponse::Id);
-    auto decoded = DecodeRetrieveLogsResponse(handler.GetResponse());
-    EXPECT_EQ(decoded.status, DiagnosticLogs::StatusEnum::kNoLogs);
-}
 
 TEST_F(TestDiagnosticLogsLogic, ResponsePayload_WithDelegate_Success)
 {
