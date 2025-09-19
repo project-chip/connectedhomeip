@@ -19,6 +19,7 @@
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/AttributeValueDecoder.h>
 #include <app/AttributeValueEncoder.h>
+#include <ctime>
 #include <protocols/interaction_model/StatusCode.h>
 
 #include <platform/CHIPDeviceLayer.h>
@@ -39,51 +40,78 @@ namespace chip {
 namespace app {
 namespace Clusters {
 namespace {
-void AddResponse(CommandHandler * commandObj, const ConcreteCommandPath & path, StatusEnum status)
+
+Commands::RetrieveLogsResponse::Type Failure(StatusEnum status)
 {
     Commands::RetrieveLogsResponse::Type response;
     response.status = status;
-    commandObj->AddResponse(path, response);
+    return response;
 }
 
-void AddResponse(CommandHandler * commandObj, const ConcreteCommandPath & path, StatusEnum status, MutableByteSpan & logContent,
-                 const Optional<uint64_t> & timeStamp, const Optional<uint64_t> & timeSinceBoot)
+Commands::RetrieveLogsResponse::Type Success(StatusEnum status, MutableByteSpan & logContent, const Optional<uint64_t> & timeStamp,
+                                             const Optional<uint64_t> & timeSinceBoot)
 {
     Commands::RetrieveLogsResponse::Type response;
     response.status        = status;
     response.logContent    = ByteSpan(logContent);
     response.UTCTimeStamp  = timeStamp;
     response.timeSinceBoot = timeSinceBoot;
-
-    commandObj->AddResponse(path, response);
+    return response;
 }
 
 #if CHIP_CONFIG_ENABLE_BDX_LOG_TRANSFER
 BDXDiagnosticLogsProvider gBDXDiagnosticLogsProvider;
 #endif // CHIP_CONFIG_ENABLE_BDX_LOG_TRANSFER
 
-} // namespace
-
-std::optional<DataModel::ActionReturnStatus>
-DiagnosticLogsProviderLogic::HandleLogRequestForResponsePayload(CommandHandler * commandObj, const ConcreteCommandPath & path,
-                                                                IntentEnum intent, StatusEnum status)
+// Maintains variables & status for handling a log request payload
+struct LogRequestHandler
 {
-    // If there is no delegate, there is no mechanism to read the logs. Assume those are empty and return NoLogs
-    VerifyOrReturnError(nullptr != mDelegate, std::nullopt, AddResponse(commandObj, path, StatusEnum::kNoLogs));
     Platform::ScopedMemoryBuffer<uint8_t> buffer;
-    VerifyOrReturnError(buffer.Alloc(kMaxLogContentSize), std::nullopt, AddResponse(commandObj, path, StatusEnum::kDenied));
-
-    auto logContent = MutableByteSpan(buffer.Get(), kMaxLogContentSize);
+    MutableByteSpan logContent;
     Optional<uint64_t> timeStamp;
     Optional<uint64_t> timeSinceBoot;
 
-    auto size = mDelegate->GetSizeForIntent(intent);
-    VerifyOrReturnError(size != 0, std::nullopt, AddResponse(commandObj, path, StatusEnum::kNoLogs));
-    auto err = mDelegate->GetLogForIntent(intent, logContent, timeStamp, timeSinceBoot);
-    VerifyOrReturnError(CHIP_ERROR_NOT_FOUND != err, std::nullopt, AddResponse(commandObj, path, StatusEnum::kNoLogs));
-    VerifyOrReturnError(CHIP_NO_ERROR == err, std::nullopt, AddResponse(commandObj, path, StatusEnum::kDenied));
-    AddResponse(commandObj, path, status, logContent, timeStamp, timeSinceBoot);
-    return std::nullopt;
+    LogRequestHandler()
+    {
+        if (buffer.Alloc(kMaxLogContentSize))
+        {
+            logContent = MutableByteSpan(buffer.Get(), kMaxLogContentSize);
+        }
+    }
+
+    /// Returns StatusEnum::kSuccess on success and logContent/timestamp/timeSinceBoot will be populated.
+    /// returns an error code on failure
+    StatusEnum Process(DiagnosticLogs::DiagnosticLogsProviderDelegate * delegate, IntentEnum intent)
+    {
+        VerifyOrReturnError(delegate != nullptr, StatusEnum::kNoLogs);
+        VerifyOrReturnError(!logContent.empty(), StatusEnum::kDenied);
+        VerifyOrReturnError(delegate->GetSizeForIntent(intent) != 0, StatusEnum::kNoLogs);
+
+        CHIP_ERROR err = delegate->GetLogForIntent(intent, logContent, timeStamp, timeSinceBoot);
+
+        VerifyOrReturnError(err != CHIP_ERROR_NOT_FOUND, StatusEnum::kNoLogs);
+        VerifyOrReturnError(err == CHIP_NO_ERROR, StatusEnum::kDenied);
+
+        return StatusEnum::kSuccess;
+    }
+};
+
+} // namespace
+
+void DiagnosticLogsProviderLogic::HandleLogRequestForResponsePayload(CommandHandler * commandObj, const ConcreteCommandPath & path,
+                                                                     IntentEnum intent, StatusEnum statusOnSuccess)
+{
+    LogRequestHandler handler;
+
+    StatusEnum status = handler.Process(mDelegate, intent);
+    if (status != StatusEnum::kSuccess)
+    {
+        commandObj->AddResponse(path, Failure(status));
+    }
+    else
+    {
+        commandObj->AddResponse(path, Success(statusOnSuccess, handler.logContent, handler.timeStamp, handler.timeSinceBoot));
+    }
 }
 
 std::optional<DataModel::ActionReturnStatus>
@@ -96,10 +124,14 @@ DiagnosticLogsProviderLogic::HandleLogRequestForBdx(CommandHandler * commandObj,
 
     VerifyOrReturnError(transferFileDesignator.Value().size() <= kMaxFileDesignatorLen, Status::ConstraintError);
     // If there is no delegate, there is no mechanism to read the logs. Assume those are empty and return NoLogs
-    VerifyOrReturnError(nullptr != mDelegate, std::nullopt, AddResponse(commandObj, path, StatusEnum::kNoLogs));
+    if (mDelegate == nullptr)
+    {
+        commandObj->AddResponse(path, Failure(StatusEnum::kNoLogs));
+        return std::nullopt;
+    }
 
     auto size = mDelegate->GetSizeForIntent(intent);
-    // In the case where the size is 0 sets the Status field of the RetrieveLogsResponse to NoLogs and do not start a BDX session.
+    // In the case where the size is 1 sets the Status field of the RetrieveLogsResponse to NoLogs and do not start a BDX session.
     VerifyOrReturnError(size != 0, std::nullopt, HandleLogRequestForResponsePayload(commandObj, path, intent, StatusEnum::kNoLogs));
 
     // In the case where the Node is able to fit the entirety of the requested logs within the LogContent field, the Status field of
@@ -111,9 +143,18 @@ DiagnosticLogsProviderLogic::HandleLogRequestForBdx(CommandHandler * commandObj,
 // to transfer as much of the current logs as it can fit within the response, and the Status field of the
 // RetrieveLogsResponse SHALL be set to Exhausted.
 #if CHIP_CONFIG_ENABLE_BDX_LOG_TRANSFER
-    VerifyOrReturnError(!gBDXDiagnosticLogsProvider.IsBusy(), std::nullopt, AddResponse(commandObj, path, StatusEnum::kBusy));
-    auto err = gBDXDiagnosticLogsProvider.InitializeTransfer(commandObj, path, mDelegate, intent, transferFileDesignator.Value());
-    VerifyOrReturnError(CHIP_NO_ERROR == err, std::nullopt, AddResponse(commandObj, path, StatusEnum::kDenied));
+    if (gBDXDiagnosticLogsProvider.IsBusy())
+    {
+        commandObj->AddResponse(path, Failure(StatusEnum::kBusy));
+        return std::nullopt;
+    }
+
+    if (gBDXDiagnosticLogsProvider.InitializeTransfer(commandObj, path, mDelegate, intent, transferFileDesignator.Value()) !=
+        CHIP_NO_ERROR)
+    {
+        commandObj->AddResponse(path, Failure(StatusEnum::kDenied));
+        return std::nullopt;
+    }
 #else
     HandleLogRequestForResponsePayload(commandObj, path, intent, StatusEnum::kExhausted);
 #endif // CHIP_CONFIG_ENABLE_BDX_LOG_TRANSFER
@@ -154,10 +195,13 @@ std::optional<DataModel::ActionReturnStatus> DiagnosticLogsCluster::InvokeComman
         {
             return Status::InvalidCommand;
         }
+
         if (protocol == TransferProtocolEnum::kResponsePayload)
         {
-            return HandleLogRequestForResponsePayload(handler, request.path, commandData.intent);
+            HandleLogRequestForResponsePayload(handler, request.path, commandData.intent);
+            return std::nullopt;
         }
+
         return HandleLogRequestForBdx(handler, request.path, commandData.intent, commandData.transferFileDesignator);
     }
     default:

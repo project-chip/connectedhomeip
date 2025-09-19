@@ -45,11 +45,11 @@ public:
      * @param intent      The log type requested in the RetrieveLogsRequest command
      * @param status      The status to be returned on success
      *
+     * @commandObject AddStatus WILL BE SET after this menthod executes
      */
-    std::optional<DataModel::ActionReturnStatus>
-    HandleLogRequestForResponsePayload(CommandHandler * commandObj, const ConcreteCommandPath & path,
-                                       DiagnosticLogs::IntentEnum intent,
-                                       DiagnosticLogs::StatusEnum status = DiagnosticLogs::StatusEnum::kSuccess);
+    void HandleLogRequestForResponsePayload(CommandHandler * commandObj, const ConcreteCommandPath & path,
+                                            DiagnosticLogs::IntentEnum intent,
+                                            DiagnosticLogs::StatusEnum status = DiagnosticLogs::StatusEnum::kSuccess);
 
     std::optional<DataModel::ActionReturnStatus> HandleLogRequestForBdx(CommandHandler * commandObj,
                                                                         const ConcreteCommandPath & path,
