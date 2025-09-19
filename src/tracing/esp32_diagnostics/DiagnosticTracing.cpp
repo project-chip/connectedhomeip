@@ -17,6 +17,7 @@
  */
 
 #include <algorithm>
+#include <cctype>
 #include <lib/support/CHIPMemString.h>
 #include <system/SystemClock.h>
 #include <tracing/esp32_diagnostics/Counter.h>
@@ -66,24 +67,20 @@ ESP32Diagnostics::ESP32Diagnostics(CircularDiagnosticBuffer * storageInstance) :
 
 void ESP32Diagnostics::InitializeDefaultFilters()
 {
-    mEnabledFilters[MurmurHash("PASESession")]            = true;
-    mEnabledFilters[MurmurHash("CASESession")]            = true;
-    mEnabledFilters[MurmurHash("NetworkCommissioning")]   = true;
-    mEnabledFilters[MurmurHash("GeneralCommissioning")]   = true;
-    mEnabledFilters[MurmurHash("OperationalCredentials")] = true;
-    mEnabledFilters[MurmurHash("CASEServer")]             = true;
-    mEnabledFilters[MurmurHash("Fabric")]                 = true;
+    mEnabledFilters.insert(MurmurHash("PASESession"));
+    mEnabledFilters.insert(MurmurHash("CASESession"));
+    mEnabledFilters.insert(MurmurHash("NetworkCommissioning"));
+    mEnabledFilters.insert(MurmurHash("GeneralCommissioning"));
+    mEnabledFilters.insert(MurmurHash("OperationalCredentials"));
+    mEnabledFilters.insert(MurmurHash("CASEServer"));
+    mEnabledFilters.insert(MurmurHash("Fabric"));
 }
 
 CHIP_ERROR ESP32Diagnostics::AddFilter(const char * scope)
 {
     VerifyOrReturnError(scope != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(strlen(scope) > 0, CHIP_ERROR_INVALID_ARGUMENT);
-    if (mEnabledFilters.find(MurmurHash(scope)) != mEnabledFilters.end())
-    {
-        return CHIP_NO_ERROR;
-    }
-    mEnabledFilters[MurmurHash(scope)] = true;
+    mEnabledFilters.insert(MurmurHash(scope));
     return CHIP_NO_ERROR;
 }
 
@@ -91,9 +88,9 @@ CHIP_ERROR ESP32Diagnostics::RemoveFilter(const char * scope)
 {
     VerifyOrReturnError(scope != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(strlen(scope) > 0, CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrReturnError(mEnabledFilters.find(MurmurHash(scope)) != mEnabledFilters.end(), CHIP_ERROR_INCORRECT_STATE,
-                        ChipLogError(DeviceLayer, "Filter does not exist"));
-    mEnabledFilters.erase(MurmurHash(scope));
+    auto it = mEnabledFilters.find(MurmurHash(scope));
+    VerifyOrReturnError(it != mEnabledFilters.end(), CHIP_ERROR_INCORRECT_STATE);
+    mEnabledFilters.erase(it);
     return CHIP_NO_ERROR;
 }
 
@@ -109,7 +106,7 @@ bool ESP32Diagnostics::IsEnabled(const char * scope)
     {
         return true;
     }
-    return mEnabledFilters.find(MurmurHash(scope)) != mEnabledFilters.end();
+    return mEnabledFilters.count(MurmurHash(scope)) > 0;
 }
 
 #ifdef CONFIG_ENABLE_ESP_DIAGNOSTIC_METRICS

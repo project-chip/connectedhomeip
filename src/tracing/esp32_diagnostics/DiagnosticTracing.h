@@ -21,7 +21,7 @@
 #include <tracing/backend.h>
 #include <tracing/esp32_diagnostics/DiagnosticStorage.h>
 #include <tracing/metric_event.h>
-#include <unordered_map>
+#include <unordered_set>
 
 namespace chip {
 namespace Tracing {
@@ -91,7 +91,7 @@ public:
 private:
     using ValueType = MetricEvent::Value::Type;
     CircularDiagnosticBuffer * mStorageInstance;
-    std::unordered_map<uint32_t, bool> mEnabledFilters;
+    std::unordered_set<uint32_t> mEnabledFilters;
 
     /*
      * @brief Store the diagnostics in the storage instance
