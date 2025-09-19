@@ -69,12 +69,12 @@ void emberAfDiagnosticLogsClusterServerInitCallback(EndpointId endpoint)
 
     CodegenClusterIntegration::RegisterServer(
         {
-            .endpointId = endpoint,
-            .clusterId  = DiagnosticLogs::Id,
+            .endpointId                = endpoint,
+            .clusterId                 = DiagnosticLogs::Id,
             .fixedClusterInstanceCount = DiagnosticLogs::StaticApplicationConfig::kFixedClusterConfig.size(),
-            .maxClusterInstanceCount = 1, // Only one instance is allowed
-            .fetchFeatureMap         = false,
-            .fetchOptionalAttributes = false,
+            .maxClusterInstanceCount   = 1, // Only one instance is allowed
+            .fetchFeatureMap           = false,
+            .fetchOptionalAttributes   = false,
         },
         integrationDelegate);
 }
@@ -85,10 +85,10 @@ void MatterDiagnosticLogsClusterServerShutdownCallback(EndpointId endpointId)
 
     CodegenClusterIntegration::UnregisterServer(
         {
-            .endpointId = endpointId,
-            .clusterId  = DiagnosticLogs::Id,
+            .endpointId                = endpointId,
+            .clusterId                 = DiagnosticLogs::Id,
             .fixedClusterInstanceCount = DiagnosticLogs::StaticApplicationConfig::kFixedClusterConfig.size(),
-            .maxClusterInstanceCount = 1, // Only one instance is allowed
+            .maxClusterInstanceCount   = 1, // Only one instance is allowed
         },
         integrationDelegate);
 }
