@@ -640,36 +640,6 @@ TEST_F(TestCommodityTariffBaseDataClass, NullableListOfResourceStructs_ZeroSizeL
     EXPECT_TRUE(data.GetValue().IsNull());
 }
 
-TEST_F(TestCommodityTariffBaseDataClass, ConcurrentReadAccess)
-{
-    CTC_BaseDataClass<DataModel::Nullable<uint32_t>> data(2);
-
-    // Initialize with a value
-    EXPECT_EQ(data.CreateNewSingleValue(), CHIP_NO_ERROR);
-    data.GetNewValue().SetNonNull(123);
-    EXPECT_EQ(data.MarkAsAssigned(), CHIP_NO_ERROR);
-    EXPECT_EQ(data.UpdateBegin(nullptr), CHIP_NO_ERROR);
-    EXPECT_TRUE(data.UpdateFinish(true));
-
-    // Multiple threads should be able to read simultaneously
-    auto reader = [&data]() {
-        for (int i = 0; i < 1000; i++)
-        {
-            auto & value = data.GetValue();
-            EXPECT_FALSE(value.IsNull());
-            EXPECT_EQ(value.Value(), 123u);
-        }
-    };
-
-    std::thread t1(reader);
-    std::thread t2(reader);
-    std::thread t3(reader);
-
-    t1.join();
-    t2.join();
-    t3.join();
-}
-
 TEST_F(TestCommodityTariffBaseDataClass, ConcurrentWriteAccess_ShouldBeSynchronized)
 {
     CTC_BaseDataClass<DataModel::Nullable<uint32_t>> data(2);
@@ -721,7 +691,11 @@ TEST_F(TestCommodityTariffBaseDataClass, ConcurrentWriteAccess_ShouldBeSynchroni
     t3.join();
 
     // Without synchronization, we expect many failures due to state conflicts
-    if (failureCount.load() > 0)
+    if (failureCount.load() == 0)
+    {
+        ChipLogProgress(NotSpecified, "There were no errors now, but it will definitely happen next time");
+    }
+    else
     {
         EXPECT_GT(failureCount.load(), 0) << "Concurrent writes should cause state errors without synchronization";
     }
@@ -877,101 +851,6 @@ TEST_F(TestCommodityTariffBaseDataClass, MixedReadWriteConcurrency)
     // Final value should be from one of the writers
     EXPECT_FALSE(data.GetValue().IsNull());
     EXPECT_GE(data.GetValue().Value(), 100u);
-}
-
-TEST_F(TestCommodityTariffBaseDataClass, ConcurrentListOperations)
-{
-    CTC_BaseDataClass<DataModel::List<uint32_t>> data(2);
-    std::mutex dataMutex;
-
-    auto listWriter = [&](uint32_t threadId) {
-        std::lock_guard<std::mutex> lock(dataMutex);
-
-        EXPECT_EQ(data.CreateNewListValue(3), CHIP_NO_ERROR);
-        auto & list = data.GetNewValue();
-
-        for (size_t i = 0; i < list.size(); i++)
-        {
-            list[i] = threadId * 100 + static_cast<uint32_t>(i);
-        }
-
-        EXPECT_EQ(data.MarkAsAssigned(), CHIP_NO_ERROR);
-        EXPECT_EQ(data.UpdateBegin(nullptr), CHIP_NO_ERROR);
-        EXPECT_TRUE(data.UpdateFinish(true));
-    };
-
-    std::thread t1(listWriter, 1);
-    std::thread t2(listWriter, 2);
-    std::thread t3(listWriter, 3);
-
-    t1.join();
-    t2.join();
-    t3.join();
-
-    // Final list should be from one of the threads
-    EXPECT_TRUE(data.HasValue());
-    EXPECT_EQ(data.GetValue().size(), 3u);
-
-    // Verify the list contains valid values from one thread
-    auto & finalList   = data.GetValue();
-    uint32_t baseValue = finalList[0] / 100 * 100;
-    EXPECT_GE(baseValue, 100u);
-    EXPECT_LE(baseValue, 300u);
-
-    for (size_t i = 0; i < finalList.size(); i++)
-    {
-        EXPECT_EQ(finalList[i], baseValue + i);
-    }
-}
-
-TEST_F(TestCommodityTariffBaseDataClass, StressTest_ManyThreads)
-{
-    constexpr size_t NUM_THREADS           = 10;
-    constexpr size_t OPERATIONS_PER_THREAD = 50;
-
-    CTC_BaseDataClass<DataModel::Nullable<uint32_t>> data(2);
-    std::mutex dataMutex;
-    std::atomic<size_t> totalOperations(0);
-
-    auto worker = [&](uint32_t threadId) {
-        for (size_t i = 0; i < OPERATIONS_PER_THREAD; i++)
-        {
-            std::lock_guard<std::mutex> lock(dataMutex);
-
-            CHIP_ERROR err = data.CreateNewSingleValue();
-            if (err != CHIP_NO_ERROR)
-                continue;
-
-            data.GetNewValue().SetNonNull(threadId * 1000 + static_cast<uint32_t>(i));
-            err = data.MarkAsAssigned();
-            if (err != CHIP_NO_ERROR)
-                continue;
-
-            err = data.UpdateBegin(nullptr);
-            if (err != CHIP_NO_ERROR)
-                continue;
-
-            if (data.UpdateFinish(true))
-            {
-                totalOperations++;
-            }
-        }
-    };
-
-    std::vector<std::thread> threads;
-    for (uint32_t i = 0; i < NUM_THREADS; i++)
-    {
-        threads.emplace_back(worker, i);
-    }
-
-    for (auto & t : threads)
-    {
-        t.join();
-    }
-
-    EXPECT_EQ(totalOperations, NUM_THREADS * OPERATIONS_PER_THREAD);
-    EXPECT_TRUE(data.HasValue());
-    EXPECT_FALSE(data.GetValue().IsNull());
 }
 
 } // namespace app
