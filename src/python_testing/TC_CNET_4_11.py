@@ -32,7 +32,27 @@ import matter.clusters as Clusters
 from matter.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main, has_feature, run_if_endpoint_matches
 
 logger = logging.getLogger(__name__)
-logging.basicConfig(level=logging.INFO)
+
+
+def run_subprocess_quiet(cmd, check=False, shell=False):
+    """Run subprocess with controlled output to avoid log formatting issues"""
+    try:
+        result = subprocess.run(
+            cmd,
+            capture_output=True,
+            text=True,
+            check=check,
+            shell=shell,
+            env=dict(os.environ, PYTHONUNBUFFERED='1')
+        )
+        return result
+    except subprocess.CalledProcessError as e:
+        logger.debug(f"Subprocess failed (expected): {cmd if isinstance(cmd, str) else ' '.join(cmd)}")
+        return e
+    except Exception as e:
+        logger.warning(f"Subprocess error: {cmd if isinstance(cmd, str) else ' '.join(cmd)} - {e}")
+        return None
+
 
 # General configuration
 MAX_RETRIES = 3                      # Number of retry attempts for failed operations
@@ -46,13 +66,15 @@ ATTRIBUTE_READ_TIMEOUT = 30          # Attribute read timeout (30s) - after netw
 # Network operation timeouts
 CONNECTION_TIMEOUT = 20              # WiFi connection timeout (20s) - time to establish WiFi link
 IP_TIMEOUT = 15                      # IP assignment timeout (15s) - time to get IP address via DHCP
-NETWORK_CHANGE_TIMEOUT = 45          # Network transition timeout (45s) - for network changes
-MDNS_DISCOVERY_TIMEOUT = 60          # mDNS discovery timeout (60s) - device discovery after network changes
+NETWORK_CHANGE_TIMEOUT = 180         # Network transition timeout (180s) - for network changes (increased for discovery issues)
+# mDNS discovery timeout (180s) - device discovery after network changes (increased for discovery issues)
+MDNS_DISCOVERY_TIMEOUT = 180
 
 # Wait periods (not timeouts, but delays for stability)
 WIFI_WAIT_SECONDS = 5                # WiFi stabilization wait (5s) - basic network settling time
-NETWORK_STABILIZATION_WAIT = 25      # Network stabilization wait (25s) - after major network changes
-RETRY_DELAY_SECONDS = 5              # Delay between retry attempts (5s) - delay for DUT recovery
+# Network stabilization wait (60s) - after major network changes (increased for Docker mDNS stability)
+NETWORK_STABILIZATION_WAIT = 60
+RETRY_DELAY_SECONDS = 8              # Delay between retry attempts (8s) - delay for DUT recovery (increased for Docker)
 
 cgen = Clusters.GeneralCommissioning
 cnet = Clusters.NetworkCommissioning
@@ -496,7 +518,223 @@ async def change_networks(test, cluster, ssid, password, breadcrumb):
     raise Exception(f"Failed to switch networks to {ssid} after {MAX_RETRIES} attempts")
 
 
+def cleanup_mdns_state():
+    """Clean up mDNS state to prevent discovery issues."""
+    try:
+        logger.info("cleanup_mdns_state: Performing quick mDNS cleanup...")
+
+        # Step 1: Clear avahi cache files safely
+        cache_dirs = ["/run/avahi-daemon", "/var/lib/avahi-daemon"]
+        for cache_dir in cache_dirs:
+            try:
+                import glob
+                cache_files = glob.glob(f"{cache_dir}/*")
+                for cache_file in cache_files:
+                    run_subprocess_quiet(["sudo", "rm", "-rf", cache_file])
+            except Exception:
+                pass
+
+        # Step 2: Send SIGHUP to avahi-daemon to refresh (if running)
+        try:
+            run_subprocess_quiet(["sudo", "pkill", "-HUP", "avahi-daemon"])
+            time.sleep(1)
+        except Exception:
+            pass
+
+        logger.info("cleanup_mdns_state: mDNS cleanup completed")
+    except Exception as e:
+        logger.warning(f"cleanup_mdns_state: Cleanup failed but continuing: {e}")
+
+
 class TC_CNET_4_11(MatterBaseTest):
+
+    @classmethod
+    def setup_class(cls):
+        """Remove default route from LAN interface to force traffic through Wi-Fi during test."""
+        try:
+            # Clean mDNS state aggressively to prevent intermittent failures
+            logger.info("setup_class: Performing aggressive mDNS cleanup...")
+            try:
+                # Step 1: Kill all avahi-related processes
+                run_subprocess_quiet(["sudo", "pkill", "-f", "avahi-daemon"])
+                run_subprocess_quiet(["sudo", "pkill", "-f", "avahi-browse"])
+                run_subprocess_quiet(["sudo", "pkill", "-f", "avahi-resolve"])
+                time.sleep(2)
+
+                # Step 2: Clear avahi cache and temporary files
+                cache_dirs = [
+                    "/var/lib/avahi-daemon",
+                    "/run/avahi-daemon",
+                    "/tmp/avahi-*"
+                ]
+                for cache_dir in cache_dirs:
+                    try:
+                        if '*' in cache_dir:
+                            run_subprocess_quiet(f"sudo rm -rf {cache_dir}", shell=True)
+                        else:
+                            run_subprocess_quiet(["sudo", "rm", "-rf", cache_dir])
+                    except Exception:
+                        pass
+
+                # Step 3: Restart avahi daemon cleanly
+                time.sleep(1)
+                if os.path.exists("/usr/sbin/service"):
+                    # Try service command first (works in Docker)
+                    run_subprocess_quiet(["sudo", "service", "avahi-daemon", "stop"])
+                    time.sleep(2)
+                    run_subprocess_quiet(["sudo", "service", "avahi-daemon", "start"], check=True)
+                    logger.info("setup_class: Avahi daemon restarted via service command")
+                else:
+                    # Try direct process management with clean start
+                    run_subprocess_quiet(["sudo", "/usr/sbin/avahi-daemon", "-D"], check=True)
+                    logger.info("setup_class: Avahi daemon restarted via process management")
+
+                # Step 4: Wait for avahi to stabilize
+                time.sleep(5)
+
+            except subprocess.CalledProcessError as e:
+                logger.warning(f"setup_class: Failed to restart Avahi daemon: {e}")
+                # Try alternative cleanup
+                try:
+                    run_subprocess_quiet(["sudo", "pkill", "-9", "-f", "avahi-daemon"])
+                    time.sleep(2)
+                    run_subprocess_quiet(["sudo", "/usr/sbin/avahi-daemon", "-D"])
+                    time.sleep(5)
+                    logger.info("setup_class: Attempted Avahi cleanup via force restart")
+                except Exception as fallback_e:
+                    logger.warning(f"setup_class: All Avahi restart methods failed: {fallback_e}")
+
+            # Get current default routes to save them for restoration
+            result = run_subprocess_quiet(["ip", "route", "show", "default"], check=True)
+            output = result.stdout if result else ""
+            cls._original_routes = []
+
+            for line in output.splitlines():
+                if "default via" in line:
+                    # Parse route: "default via 192.168.1.1 dev eth0 proto dhcp src 192.168.1.54 metric 100"
+                    parts = line.split()
+                    gateway = None
+                    interface = None
+                    metric = None
+
+                    for i, part in enumerate(parts):
+                        if part == "via" and i + 1 < len(parts):
+                            gateway = parts[i + 1]
+                        elif part == "dev" and i + 1 < len(parts):
+                            interface = parts[i + 1]
+                        elif part == "metric" and i + 1 < len(parts):
+                            metric = parts[i + 1]
+
+                    # Only remove LAN routes (exclude Wi-Fi interfaces)
+                    if (interface and gateway and
+                            not any(x in interface for x in ["wlan", "wl", "wifi", "wlp", "wlx"])):
+
+                        logger.info(f"setup_class: Removing default route via {gateway} dev {interface}")
+                        try:
+                            run_subprocess_quiet(["sudo", "ip", "route", "del", "default", "via", gateway, "dev", interface],
+                                                 check=True)
+                            # Save route info for restoration
+                            cls._original_routes.append({
+                                "gateway": gateway,
+                                "interface": interface,
+                                "metric": metric,
+                                "full_line": line.strip()
+                            })
+                        except subprocess.CalledProcessError as e:
+                            logger.warning(f"setup_class: Failed to remove route via {gateway}: {e}")
+
+            if cls._original_routes:
+                logger.info(f"setup_class: Removed {len(cls._original_routes)} LAN default route(s)")
+            else:
+                logger.info("setup_class: No LAN default routes found to remove")
+
+        except Exception as e:
+            logger.error(f"setup_class: Error managing default routes: {e}")
+            cls._original_routes = []
+
+    @classmethod
+    def teardown_class(cls):
+        """Restore original default routes after the test finishes."""
+        try:
+            original_routes = getattr(cls, "_original_routes", [])
+            if original_routes:
+                for route in original_routes:
+                    gateway = route["gateway"]
+                    interface = route["interface"]
+                    metric = route["metric"]
+
+                    logger.info(f"teardown_class: Restoring default route via {gateway} dev {interface}")
+                    try:
+                        cmd = ["sudo", "ip", "route", "add", "default", "via", gateway, "dev", interface]
+                        if metric:
+                            cmd.extend(["metric", metric])
+                        run_subprocess_quiet(cmd, check=True)
+                    except subprocess.CalledProcessError as e:
+                        logger.warning(f"teardown_class: Failed to restore route via {gateway}: {e}")
+                        # Try to restore using dhclient as fallback
+                        try:
+                            logger.info(f"teardown_class: Trying dhclient fallback for {interface}")
+                            run_subprocess_quiet(["sudo", "dhclient", "-r", interface])
+                            run_subprocess_quiet(["sudo", "dhclient", interface], check=True)
+                        except Exception as dhcp_e:
+                            logger.error(f"teardown_class: DHCP fallback failed for {interface}: {dhcp_e}")
+            else:
+                logger.info("teardown_class: No original routes to restore")
+
+            # Clean mDNS state after test completion to prevent interference with next run
+            logger.info("teardown_class: Cleaning mDNS state for next run...")
+            try:
+                # Step 1: Kill all avahi-related processes
+                run_subprocess_quiet(["sudo", "pkill", "-f", "avahi-daemon"])
+                run_subprocess_quiet(["sudo", "pkill", "-f", "avahi-browse"])
+                run_subprocess_quiet(["sudo", "pkill", "-f", "avahi-resolve"])
+                time.sleep(2)
+
+                # Step 2: Clear avahi cache and temporary files
+                cache_dirs = [
+                    "/var/lib/avahi-daemon",
+                    "/run/avahi-daemon",
+                    "/tmp/avahi-*"
+                ]
+                for cache_dir in cache_dirs:
+                    try:
+                        if '*' in cache_dir:
+                            run_subprocess_quiet(f"sudo rm -rf {cache_dir}", shell=True)
+                        else:
+                            run_subprocess_quiet(["sudo", "rm", "-rf", cache_dir])
+                    except Exception:
+                        pass
+
+                # Step 3: Restart avahi daemon cleanly
+                time.sleep(1)
+                if os.path.exists("/usr/sbin/service"):
+                    # Try service command first (works in Docker)
+                    run_subprocess_quiet(["sudo", "service", "avahi-daemon", "stop"])
+                    time.sleep(2)
+                    run_subprocess_quiet(["sudo", "service", "avahi-daemon", "start"], check=True)
+                    logger.info("teardown_class: Avahi daemon restarted via service command")
+                else:
+                    # Try direct process management with clean start
+                    run_subprocess_quiet(["sudo", "/usr/sbin/avahi-daemon", "-D"], check=True)
+                    logger.info("teardown_class: Avahi daemon restarted via process management")
+
+                # Step 4: Wait for avahi to stabilize
+                time.sleep(3)
+
+            except subprocess.CalledProcessError as e:
+                logger.warning(f"teardown_class: Failed to restart Avahi daemon: {e}")
+                # Try alternative cleanup
+                try:
+                    run_subprocess_quiet(["sudo", "pkill", "-9", "-f", "avahi-daemon"])
+                    time.sleep(2)
+                    run_subprocess_quiet(["sudo", "/usr/sbin/avahi-daemon", "-D"])
+                    time.sleep(3)
+                    logger.info("teardown_class: Attempted Avahi cleanup via force restart")
+                except Exception as fallback_e:
+                    logger.warning(f"teardown_class: All Avahi restart methods failed: {fallback_e}")
+
+        except Exception as e:
+            logger.error(f"teardown_class: Error restoring default routes: {e}")
 
     # Overrides default_timeout: Test includes several long waits, adjust timeout to accommodate.
     @property
@@ -519,49 +757,149 @@ class TC_CNET_4_11(MatterBaseTest):
         logger.info(f"verify_operational_network: Waiting {NETWORK_STABILIZATION_WAIT}s for network stabilization...")
         await asyncio.sleep(NETWORK_STABILIZATION_WAIT)
 
-        while retry < MAX_RETRIES:
-            retry += 1
-            try:
-                # Use extended timeout for mDNS discovery, especially on first attempt after network change
-                if retry == 1:
-                    timeout_to_use = MDNS_DISCOVERY_TIMEOUT  # Extended timeout for first attempt (60s)
-                else:
-                    timeout_to_use = ATTRIBUTE_READ_TIMEOUT  # Shorter timeout for subsequent attempts (30s)
+        # Temporarily manage routes to ensure proper connectivity during WiFi verification
+        lan_route_removed = False
+        gateway = None
+        lan_interface = None
+        os_name = platform.system()
 
-                logger.debug(f"verify_operational_network: Using timeout {timeout_to_use}s for attempt {retry}")
+        try:
+            # If this is WiFi verification and we detect dual routes, temporarily remove LAN default route
+            # Only attempt this on Linux systems (Docker containers and native Linux)
+            if ssid != self.matter_test_config.wifi_ssid and os_name == "Linux":  # This is the 2nd WiFi network
+                try:
+                    # Check if we have both LAN and WiFi default routes
+                    route_check = subprocess.run(['ip', 'route', 'show', 'default'],
+                                                 capture_output=True, text=True, check=True)
+                    routes = route_check.stdout.strip().split('\n')
 
-                networks = await asyncio.wait_for(
-                    self.read_single_attribute_check_success(
-                        cluster=cnet,
-                        attribute=cnet.Attributes.Networks
-                    ),
-                    timeout=timeout_to_use
-                )
+                    lan_default = None
+                    wifi_default = None
 
-                if networks and len(networks) > 0:
-                    # Check if we have any connected network
-                    for network in networks:
-                        if network.connected:
-                            break
+                    for route in routes:
+                        # Look for ethernet interfaces (eth0, enp*, ens*, etc.)
+                        if ('dev eth' in route or 'dev enp' in route or 'dev ens' in route) and 'default' in route:
+                            lan_default = route.strip()
+                        elif 'dev wlan' in route and 'default' in route:
+                            wifi_default = route.strip()
+
+                    if lan_default and wifi_default:
+                        logger.info(
+                            f"verify_operational_network: Detected dual default routes, temporarily removing LAN route: {lan_default}")
+                        # Extract gateway and interface for restoration with better parsing
+                        parts = lan_default.split()
+                        for i, part in enumerate(parts):
+                            if part == 'via' and i + 1 < len(parts):
+                                gateway = parts[i + 1]
+                            elif part == 'dev' and i + 1 < len(parts):
+                                lan_interface = parts[i + 1]
+
+                        if gateway and lan_interface:
+                            # Verify route exists before removing
+                            verify_route = subprocess.run(
+                                ['ip', 'route', 'show', 'default', 'via', gateway, 'dev', lan_interface],
+                                capture_output=True, text=True, check=False)
+
+                            if verify_route.returncode == 0 and verify_route.stdout.strip():
+                                # Remove LAN default route temporarily
+                                result = subprocess.run(['sudo', 'ip', 'route', 'del', 'default', 'via', gateway, 'dev', lan_interface],
+                                                        capture_output=True, text=True, check=False)
+                                if result.returncode == 0:
+                                    lan_route_removed = True
+                                    logger.info(
+                                        f"verify_operational_network: LAN default route temporarily removed (gateway: {gateway}, interface: {lan_interface})")
+                                else:
+                                    logger.warning(f"verify_operational_network: Failed to remove LAN route: {result.stderr}")
+                            else:
+                                logger.info("verify_operational_network: LAN default route verification failed, skipping removal")
+
+                            # Wait a moment for route change to take effect
+                            await asyncio.sleep(2)
+                        else:
+                            logger.warning("verify_operational_network: Could not parse gateway/interface from LAN route")
+
+                except Exception as e:
+                    logger.warning(f"verify_operational_network: Could not manage routes on {os_name}: {e}")
+            elif ssid != self.matter_test_config.wifi_ssid and os_name != "Linux":
+                logger.info(
+                    f"verify_operational_network: Route management not implemented for {os_name}, skipping route optimization")
+
+            # Increased retries for better reliability in Docker/mDNS environment
+            max_retries_for_discovery = 5
+
+            while retry < max_retries_for_discovery:
+                retry += 1
+                try:
+                    # Use extended timeout for mDNS discovery, especially on first attempt after network change
+                    if retry == 1:
+                        timeout_to_use = MDNS_DISCOVERY_TIMEOUT  # Extended timeout for first attempt (120s)
                     else:
-                        # No connected network found, continue trying
-                        raise Exception("No connected network found in response")
-                    break
+                        timeout_to_use = ATTRIBUTE_READ_TIMEOUT  # Shorter timeout for subsequent attempts (30s)
 
-            except Exception as e:
-                logger.error(f" --- verify_operational_network: Exception reading networks: {e}")
+                    logger.debug(f"verify_operational_network: Using timeout {timeout_to_use}s for attempt {retry}")
 
-            # Progressive delay - ESP32 needs more time after network switch
-            if retry == 1:
-                retry_delay = 10  # First retry: 10s
-            elif retry == 2:
-                retry_delay = 15  # Second retry: 15s
+                    networks = await asyncio.wait_for(
+                        self.read_single_attribute_check_success(
+                            cluster=cnet,
+                            attribute=cnet.Attributes.Networks
+                        ),
+                        timeout=timeout_to_use
+                    )
+
+                    if networks and len(networks) > 0:
+                        # Check if we have any connected network
+                        for network in networks:
+                            if network.connected:
+                                break
+                        else:
+                            # No connected network found, continue trying
+                            raise Exception("No connected network found in response")
+                        break
+
+                except Exception as e:
+                    logger.error(f" --- verify_operational_network: Exception reading networks: {e}")
+
+                # Clean mDNS state between retry attempts to prevent cache issues
+                if retry < max_retries_for_discovery:
+                    logger.info(f"verify_operational_network: Cleaning mDNS state before retry {retry + 1}")
+                    cleanup_mdns_state()
+
+                # Progressive delay - ESP32 needs more time after network switch
+                if retry == 1:
+                    retry_delay = 10  # First retry: 10s
+                elif retry == 2:
+                    retry_delay = 15  # Second retry: 15s
+                elif retry == 3:
+                    retry_delay = 20  # Third retry: 20s
+                else:
+                    retry_delay = RETRY_DELAY_SECONDS  # Final retry: 8s
+
+                await asyncio.sleep(retry_delay)
             else:
-                retry_delay = RETRY_DELAY_SECONDS  # Final retry: 5s
+                asserts.fail(f" --- verify_operational_network: Could not read networks after {max_retries_for_discovery} retries.")
 
-            await asyncio.sleep(retry_delay)
-        else:
-            asserts.fail(f" --- verify_operational_network: Could not read networks after {MAX_RETRIES} retries.")
+        finally:
+            # Always restore LAN default route if we removed it (Linux only)
+            if lan_route_removed and gateway and lan_interface and os_name == "Linux":
+                try:
+                    # Check if route already exists before adding
+                    verify_restore = subprocess.run(
+                        ['ip', 'route', 'show', 'default', 'via', gateway, 'dev', lan_interface],
+                        capture_output=True, text=True, check=False)
+
+                    if not verify_restore.stdout.strip():
+                        # Route doesn't exist, safe to add
+                        result = subprocess.run(['sudo', 'ip', 'route', 'add', 'default', 'via', gateway, 'dev', lan_interface, 'metric', '100'],
+                                                capture_output=True, text=True, check=False)
+                        if result.returncode == 0:
+                            logger.info(
+                                f"verify_operational_network: LAN default route restored (gateway: {gateway}, interface: {lan_interface})")
+                        else:
+                            logger.error(f"verify_operational_network: Failed to restore LAN route: {result.stderr}")
+                    else:
+                        logger.info("verify_operational_network: LAN default route already exists, no restoration needed")
+                except Exception as e:
+                    logger.error(f"verify_operational_network: Failed to restore LAN route: {e}")
 
         userwifi_netidx = await self.find_network_and_assert(networks, ssid)
         if userwifi_netidx is not None:
@@ -630,6 +968,10 @@ class TC_CNET_4_11(MatterBaseTest):
 
     @run_if_endpoint_matches(has_feature(Clusters.NetworkCommissioning, Clusters.NetworkCommissioning.Bitmaps.Feature.kWiFiNetworkInterface))
     async def test_TC_CNET_4_11(self):
+
+        # Wait for mDNS service to stabilize after any setup_class activities
+        logger.info("Waiting for mDNS service to stabilize before starting test...")
+        await asyncio.sleep(10)
 
         asserts.assert_true("PIXIT.CNET.WIFI_2ND_ACCESSPOINT_SSID" in self.matter_test_config.global_test_params,
                             "PIXIT.CNET.WIFI_2ND_ACCESSPOINT_SSID must be included on the command line in "
