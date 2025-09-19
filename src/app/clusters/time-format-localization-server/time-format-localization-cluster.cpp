@@ -111,7 +111,7 @@ CHIP_ERROR TimeFormatLocalizationCluster::Startup(ServerClusterContext & context
             { mPath.mEndpointId, TimeFormatLocalization::Id, TimeFormatLocalization::Attributes::ActiveCalendarType::Id },
             mCalendarType, defaultCalendarType))
     {
-        if (IsSupportedCalendarType(mCalendarType))
+        if (!IsSupportedCalendarType(mCalendarType))
         {
             mCalendarType = defaultCalendarType;
         }
