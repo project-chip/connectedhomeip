@@ -282,6 +282,13 @@ config CHIP_CRYPTO_PSA
 	  based on the PSA crypto API (instead of the default implementation, which
 	  is based on the legacy mbedTLS APIs).
 
+config CHIP_CRYPTO_PSA_AEAD_SINGLE_PART
+    bool "Use PSA AEAD single-part API"
+    depends on CHIP_CRYPTO_PSA
+    help
+      When enabled, the single-part AEAD API is used with a large buffer
+      allocated on the stack. Otherwise, the multipart API path is used.
+
 config CHIP_PERSISTENT_SUBSCRIPTIONS
 	bool "Persistent subscriptions"
 	help

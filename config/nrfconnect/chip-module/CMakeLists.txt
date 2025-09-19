@@ -191,8 +191,9 @@ else()
 endif()
 
 if (CONFIG_CHIP_CRYPTO_PSA)
-    matter_add_gn_arg_string("chip_crypto"             "psa")
-    matter_add_gn_arg_bool  ("chip_crypto_psa_spake2p" CONFIG_PSA_WANT_ALG_SPAKE2P_MATTER)
+    matter_add_gn_arg_string("chip_crypto"                      "psa")
+    matter_add_gn_arg_bool  ("chip_crypto_psa_spake2p"          CONFIG_PSA_WANT_ALG_SPAKE2P_MATTER)
+    matter_add_gn_arg_bool  ("chip_crypto_psa_aead_single_part" CONFIG_CHIP_CRYPTO_PSA_AEAD_SINGLE_PART)
 endif()
 
 if (BOARD STREQUAL "native_sim")
