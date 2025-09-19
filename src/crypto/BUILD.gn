@@ -67,6 +67,7 @@ buildconfig_header("crypto_buildconfig") {
     "CHIP_CRYPTO_MBEDTLS=${chip_crypto_mbedtls}",
     "CHIP_CRYPTO_PSA=${chip_crypto_psa}",
     "CHIP_CRYPTO_PSA_SPAKE2P=${chip_crypto_psa_spake2p}",
+    "CHIP_CRYPTO_PSA_AEAD_SINGLE_PART=${chip_crypto_psa_aead_single_part}",
     "CHIP_CRYPTO_KEYSTORE_PSA=${chip_crypto_keystore_psa}",
     "CHIP_CRYPTO_KEYSTORE_RAW=${chip_crypto_keystore_raw}",
     "CHIP_CRYPTO_KEYSTORE_APP=${chip_crypto_keystore_app}",
