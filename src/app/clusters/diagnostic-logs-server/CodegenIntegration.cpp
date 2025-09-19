@@ -19,13 +19,9 @@
 #include "CodegenIntegration.h"
 
 #include <app/clusters/diagnostic-logs-server/DiagnosticLogsCluster.h>
-#include <app/static-cluster-config/DiagnosticLogs.h>
-#include <app/util/attribute-storage.h>
-#include <app/util/config.h>
-#include <data-model-providers/codegen/ClusterIntegration.h>
-#include <protocols/bdx/DiagnosticLogs.h>
-
-#include "BDXDiagnosticLogsProvider.h"
+#include <data-model-providers/codegen/CodegenDataModelProvider.h>
+#include <data-model-providers/codegen/Instance.h>
+#include <lib/core/Global.h>
 
 using namespace chip;
 using namespace chip::app;
@@ -36,61 +32,28 @@ using namespace chip::Protocols::InteractionModel;
 namespace {
 
 // Diagnostic logs cluster is a device-wide cluster, so we only need one cluster instance.
-LazyRegisteredServerCluster<DiagnosticLogsCluster> gServer;
-DiagnosticLogsProviderDelegate * gDiagnosticLogsProviderDelegate = nullptr;
+Global<DiagnosticLogsCluster> gServer;
 
-class IntegrationDelegate : public CodegenClusterIntegration::Delegate
+ServerClusterRegistration & ClusterRegistration()
 {
-public:
-    ServerClusterRegistration & CreateRegistration(EndpointId endpointId, unsigned clusterInstanceIndex,
-                                                   uint32_t optionalAttributeBits, uint32_t featureMap) override
-    {
-        gServer.Create(endpointId);
-        if (gDiagnosticLogsProviderDelegate != nullptr)
-        {
-            gServer.Cluster().SetDelegate(gDiagnosticLogsProviderDelegate);
-        }
-        return gServer.Registration();
-    }
-
-    ServerClusterInterface * FindRegistration(unsigned clusterInstanceIndex) override
-    {
-        VerifyOrReturnValue(gServer.IsConstructed(), nullptr);
-        return &gServer.Cluster();
-    }
-    void ReleaseRegistration(unsigned clusterInstanceIndex) override { gServer.Destroy(); }
-};
+    static ServerClusterRegistration gRegistration(gServer.get());
+    return gRegistration;
+}
 
 } // namespace
 
 void emberAfDiagnosticLogsClusterServerInitCallback(EndpointId endpoint)
 {
-    IntegrationDelegate integrationDelegate;
-
-    CodegenClusterIntegration::RegisterServer(
-        {
-            .endpointId                = endpoint,
-            .clusterId                 = DiagnosticLogs::Id,
-            .fixedClusterInstanceCount = DiagnosticLogs::StaticApplicationConfig::kFixedClusterConfig.size(),
-            .maxClusterInstanceCount   = 1, // Only one instance is allowed
-            .fetchFeatureMap           = false,
-            .fetchOptionalAttributes   = false,
-        },
-        integrationDelegate);
+    // This cluster is assumed to be and implemented as a singleton on the root endpoint
+    VerifyOrReturn(endpoint == kRootEndpointId);
+    (void) CodegenDataModelProvider::Instance().Registry().Register(ClusterRegistration());
 }
 
 void MatterDiagnosticLogsClusterServerShutdownCallback(EndpointId endpointId)
 {
-    IntegrationDelegate integrationDelegate;
-
-    CodegenClusterIntegration::UnregisterServer(
-        {
-            .endpointId                = endpointId,
-            .clusterId                 = DiagnosticLogs::Id,
-            .fixedClusterInstanceCount = DiagnosticLogs::StaticApplicationConfig::kFixedClusterConfig.size(),
-            .maxClusterInstanceCount   = 1, // Only one instance is allowed
-        },
-        integrationDelegate);
+    // This cluster is assumed to be and implemented as a singleton on the root endpoint
+    VerifyOrReturn(endpointId == kRootEndpointId);
+    CodegenDataModelProvider::Instance().Registry().Unregister(&gServer.get());
 }
 
 void MatterDiagnosticLogsPluginServerInitCallback() {}
@@ -110,7 +73,7 @@ DiagnosticLogsServer & DiagnosticLogsServer::Instance()
 
 void DiagnosticLogsServer::SetDiagnosticLogsProviderDelegate(EndpointId endpoint, DiagnosticLogsProviderDelegate * delegate)
 {
-    gDiagnosticLogsProviderDelegate = delegate;
+    gServer->SetDelegate(delegate);
 }
 
 } // namespace DiagnosticLogs

@@ -63,7 +63,7 @@ private:
 class DiagnosticLogsCluster : public DefaultServerCluster, public DiagnosticLogsProviderLogic
 {
 public:
-    DiagnosticLogsCluster(EndpointId endpointId) : DefaultServerCluster({ endpointId, DiagnosticLogs::Id }) {}
+    DiagnosticLogsCluster() : DefaultServerCluster({ kRootEndpointId, DiagnosticLogs::Id }) {}
 
     // Server cluster implementation
     DataModel::ActionReturnStatus ReadAttribute(const DataModel::ReadAttributeRequest & request,
