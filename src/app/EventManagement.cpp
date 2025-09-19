@@ -553,7 +553,13 @@ CHIP_ERROR EventManagement::CheckEventContext(EventLoadOutContext * eventLoadOut
     ReturnErrorOnFailure(ret);
 
     DataModel::EventEntry eventInfo;
-    ReturnErrorOnFailure(InteractionModelEngine::GetInstance()->GetDataModelProvider()->EventInfo(path, eventInfo));
+    if (InteractionModelEngine::GetInstance()->GetDataModelProvider()->EventInfo(path, eventInfo) != CHIP_NO_ERROR)
+    {
+        // If we cannot get event info here, the interested path should be a wildcard path but the data model does't
+        // support the event, return CHIP_ERROR_UNEXPECTED_EVENT here so the event path will be excluded in the generated
+        // event report.
+        return CHIP_ERROR_UNEXPECTED_EVENT;
+    }
 
     Access::RequestPath requestPath{ .cluster     = event.mClusterId,
                                      .endpoint    = event.mEndpointId,
