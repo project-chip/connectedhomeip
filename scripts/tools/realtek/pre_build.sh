@@ -1,4 +1,3 @@
-
 #!/bin/bash
 #
 # Copyright (c) 2022 Project CHIP Authors
@@ -20,7 +19,7 @@ BUILD_BANK="$1"
 BUILD_TARGET="$2"
 RT_PLATFORM="$3"
 
-if [ -z "${OT_SRCDIR}" ]; then
+if [ -z "$OT_SRCDIR" ]; then
     echo "OT_SRCDIR not set!"
     exit 1
 fi
@@ -30,12 +29,12 @@ if [ -z "$BUILD_BANK" ] || [ -z "$BUILD_TARGET" ] || [ -z "$RT_PLATFORM" ]; then
     exit 1
 fi
 
-if [ "${BUILD_BANK}" = "bank0" ]; then
-   BANK_NUM=0
-elif [ "${BUILD_BANK}" = "bank1" ]; then
-   BANK_NUM=1
+if [ "$BUILD_BANK" = "bank0" ]; then
+    BANK_NUM=0
+elif [ "$BUILD_BANK" = "bank1" ]; then
+    BANK_NUM=1
 fi
 
-SRC="${OT_SRCDIR}/vendor/${RT_PLATFORM}/${BUILD_TARGET}/app.ld"
-OUT="${OT_SRCDIR}/vendor/${RT_PLATFORM}/${BUILD_TARGET}/app.ld.gen"
-arm-none-eabi-gcc -D BUILD_BANK=${BANK_NUM} -E -P -x c "${SRC}" -o "${OUT}"
+SRC="$OT_SRCDIR/vendor/$RT_PLATFORM/$BUILD_TARGET/app.ld"
+OUT="$OT_SRCDIR/vendor/$RT_PLATFORM/$BUILD_TARGET/app.ld.gen"
+arm-none-eabi-gcc -D BUILD_BANK="$BANK_NUM" -E -P -x c "$SRC" -o "$OUT"

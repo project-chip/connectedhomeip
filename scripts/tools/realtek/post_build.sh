@@ -27,36 +27,36 @@ CMAKE_TARGET="$2"
 RT_PLATFORM="$3"
 
 # disassembly
-arm-none-eabi-objdump -S -C -l ${OUT_FOLDER}/bin/${CMAKE_TARGET} > ${OUT_FOLDER}/bin/${CMAKE_TARGET}.asm
+arm-none-eabi-objdump -S -C -l "$OUT_FOLDER/bin/$CMAKE_TARGET" >"$OUT_FOLDER/bin/$CMAKE_TARGET".asm
 
-if [ "${BUILD_BANK}" = "bank1" ]; then
-    BIN_FILE="${OUT_FOLDER}/bin/${CMAKE_TARGET}_bank1.bin"
-    MP_FILE="${OUT_FOLDER}/bin/${CMAKE_TARGET}_bank1_MP.bin"
-    TRACE_FILE="${OUT_FOLDER}/bin/${CMAKE_TARGET}_bank1.trace"
+if [ "$BUILD_BANK" = "bank1" ]; then
+    BIN_FILE="$OUT_FOLDER/bin/${CMAKE_TARGET}_bank1.bin"
+    MP_FILE="$OUT_FOLDER/bin/${CMAKE_TARGET}_bank1_MP.bin"
+    TRACE_FILE="$OUT_FOLDER/bin/${CMAKE_TARGET}_bank1.trace"
 else
-    BIN_FILE="${OUT_FOLDER}/bin/${CMAKE_TARGET}_bank0.bin"
-    MP_FILE="${OUT_FOLDER}/bin/${CMAKE_TARGET}_bank0_MP.bin"
-    TRACE_FILE="${OUT_FOLDER}/bin/${CMAKE_TARGET}_bank0.trace"
+    BIN_FILE="$OUT_FOLDER/bin/${CMAKE_TARGET}_bank0.bin"
+    MP_FILE="$OUT_FOLDER/bin/${CMAKE_TARGET}_bank0_MP.bin"
+    TRACE_FILE="$OUT_FOLDER/bin/${CMAKE_TARGET}_bank0.trace"
 fi
 
 # generate bin and trace
-arm-none-eabi-objcopy -O binary -S ${OUT_FOLDER}/bin/${CMAKE_TARGET} ${BIN_FILE} --remove-section=App.trace
-arm-none-eabi-objcopy -O binary -S ${OUT_FOLDER}/bin/${CMAKE_TARGET} ${TRACE_FILE} --only-section=App.trace
+arm-none-eabi-objcopy -O binary -S "$OUT_FOLDER/bin/$CMAKE_TARGET" "$BIN_FILE" --remove-section=App.trace
+arm-none-eabi-objcopy -O binary -S "$OUT_FOLDER/bin/$CMAKE_TARGET" "$TRACE_FILE" --only-section=App.trace
 
 if [ "$(uname -s)" = "Darwin" ]; then
-    PREPEND_HEADER="${REALTEK_SDK_PATH}/tools/prepend_header/prepend_header.macOS"
-    MD5_TOOL="${REALTEK_SDK_PATH}/tools/md5/MD5.macOS"
+    PREPEND_HEADER="$REALTEK_SDK_PATH/tools/prepend_header/prepend_header.macOS"
+    MD5_TOOL="$REALTEK_SDK_PATH/tools/md5/MD5.macOS"
 elif [ "$(uname -s)" = "Linux" ]; then
-    PREPEND_HEADER="${REALTEK_SDK_PATH}/tools/prepend_header/prepend_header"
-    MD5_TOOL="${REALTEK_SDK_PATH}/tools/md5/MD5"
+    PREPEND_HEADER="$REALTEK_SDK_PATH/tools/prepend_header/prepend_header"
+    MD5_TOOL="$REALTEK_SDK_PATH/tools/md5/MD5"
 fi
 
 chmod +x "$PREPEND_HEADER"
 chmod +x "$MD5_TOOL"
 
 "$PREPEND_HEADER" -t app_code -b 15 -p "$BIN_FILE" -m 1 \
-    -i "${OT_SRCDIR}/vendor/${RT_PLATFORM}/common/mp.ini" \
-    -r "${REALTEK_SDK_PATH}/tools/keys/rtk_ecdsa.pem" \
-    -a "${REALTEK_SDK_PATH}/tools/keys/key.json"
+    -i "$OT_SRCDIR/vendor/$RT_PLATFORM/common/mp.ini" \
+    -r "$REALTEK_SDK_PATH/tools/keys/rtk_ecdsa.pem" \
+    -a "$REALTEK_SDK_PATH/tools/keys/key.json"
 
-"$MD5_TOOL" ${MP_FILE}
+"$MD5_TOOL" "$MP_FILE"

@@ -26,59 +26,59 @@ for var in MATTER_EXAMPLE_PATH OT_SRCDIR REALTEK_SDK_PATH OUT_FOLDER OTA_FOLDER;
     fi
 done
 
-PROJECT_CONFIG=${MATTER_EXAMPLE_PATH}/main/include/CHIPProjectConfig.h
-OTA_IMG_TOOL="${OT_SRCDIR}/../matter/connectedhomeip/src/app/ota_image_tool.py"
+PROJECT_CONFIG=$MATTER_EXAMPLE_PATH/main/include/CHIPProjectConfig.h
+OTA_IMG_TOOL="$OT_SRCDIR/../matter/connectedhomeip/src/app/ota_image_tool.py"
 
 # select tools for different platforms
 if [ "$(uname -s)" = "Darwin" ]; then
-    FLASHMAP_GEN_CLI="${REALTEK_SDK_PATH}/tools/FlashMapGenerateCli/FlashMapGenerateCli.macOS"
-    PACKCLI="${REALTEK_SDK_PATH}/tools/PackCli/PackCli.macOS"
+    FLASHMAP_GEN_CLI="$REALTEK_SDK_PATH/tools/FlashMapGenerateCli/FlashMapGenerateCli.macOS"
+    PACKCLI="$REALTEK_SDK_PATH/tools/PackCli/PackCli.macOS"
 elif [ "$(uname -s)" = "Linux" ]; then
-    FLASHMAP_GEN_CLI="${REALTEK_SDK_PATH}/tools/FlashMapGenerateCli/FlashMapGenerateCli"
-    PACKCLI="${REALTEK_SDK_PATH}/tools/PackCli/PackCli"
+    FLASHMAP_GEN_CLI="$REALTEK_SDK_PATH/tools/FlashMapGenerateCli/FlashMapGenerateCli"
+    PACKCLI="$REALTEK_SDK_PATH/tools/PackCli/PackCli"
 fi
 
 # read OTA metadata
-VENDOR_ID=$(awk '/#define CHIP_DEVICE_CONFIG_DEVICE_VENDOR_ID/{print $3}' ${PROJECT_CONFIG})
-PRODUCT_ID=$(awk '/#define CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_ID/{print $3}' ${PROJECT_CONFIG})
-VERSION=$(awk '/#define CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION/{print $3; exit}' ${PROJECT_CONFIG})
-VERSION_STR=$(awk '/#define CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING/{print $3}' ${PROJECT_CONFIG})
+VENDOR_ID=$(awk '/#define CHIP_DEVICE_CONFIG_DEVICE_VENDOR_ID/{print $3}' "$PROJECT_CONFIG")
+PRODUCT_ID=$(awk '/#define CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_ID/{print $3}' "$PROJECT_CONFIG")
+VERSION=$(awk '/#define CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION/{print $3; exit}' "$PROJECT_CONFIG")
+VERSION_STR=$(awk '/#define CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING/{print $3}' "$PROJECT_CONFIG")
 
-echo "VENDOR_ID=${VENDOR_ID}"
-echo "PRODUCT_ID=${PRODUCT_ID}"
-echo "VERSION=${VERSION}"
-echo "VERSION_STR=${VERSION_STR}"
+echo "VENDOR_ID=$VENDOR_ID"
+echo "PRODUCT_ID=$PRODUCT_ID"
+echo "VERSION=$VERSION"
+echo "VERSION_STR=$VERSION_STR"
 
 chmod +x "$FLASHMAP_GEN_CLI"
 chmod +x "$PACKCLI"
 
 # use different copy and image generation methods for dual/single bank modes
-if [[ $1 == *"dual"* ]]; then  
-    cp -f ${OT_SRCDIR}/vendor/$3/$1/*.ini ${OTA_FOLDER}
-    cp -f ${OT_SRCDIR}/vendor/$3/${1%/secure}/firmware/bank0/* ${OTA_FOLDER}
-    cp -f ${OT_SRCDIR}/vendor/$3/${1%/secure}/firmware/bank1/* ${OTA_FOLDER}
-    cp -f ${OUT_FOLDER}/bin/*MP_dev*.bin ${OTA_FOLDER}
+if [[ $1 == *"dual"* ]]; then
+    cp -f "$OT_SRCDIR/vendor/$3/$1"/*.ini "$OTA_FOLDER"
+    cp -f "$OT_SRCDIR/vendor/$3/${1%/secure}"/firmware/bank0/* "$OTA_FOLDER"
+    cp -f "$OT_SRCDIR/vendor/$3/${1%/secure}"/firmware/bank1/* "$OTA_FOLDER"
+    cp -f "$OUT_FOLDER"/bin/*MP_dev*.bin "$OTA_FOLDER"
 
-    "$FLASHMAP_GEN_CLI" ${OTA_FOLDER} $2 ${OTA_FOLDER}
+    "$FLASHMAP_GEN_CLI" "$OTA_FOLDER" "$2" "$OTA_FOLDER"
 else
-    cp -f ${OT_SRCDIR}/vendor/$2/$1/*.ini  ${OTA_FOLDER}
-    cp -f ${OUT_FOLDER}/bin/*MP_dev*.bin  ${OTA_FOLDER}
+    cp -f "$OT_SRCDIR/vendor/$2/$1"/*.ini "$OTA_FOLDER"
+    cp -f "$OUT_FOLDER"/bin/*MP_dev*.bin "$OTA_FOLDER"
 fi
 
 # generate pack bin
-rm -rf  ${OTA_FOLDER}/*.ota
-"$PACKCLI" 8772gwp ota  ${OTA_FOLDER}  ${OTA_FOLDER}/..
+rm -rf "$OTA_FOLDER"/*.ota
+"$PACKCLI" 8772gwp ota "$OTA_FOLDER" "$OTA_FOLDER"/..
 
 # generate matter ota bin
 "$OTA_IMG_TOOL" create \
-    -v "${VENDOR_ID}" \
-    -p "${PRODUCT_ID}" \
-    -vn "${VERSION}" \
-    -vs "${VERSION_STR}" \
+    -v "$VENDOR_ID" \
+    -p "$PRODUCT_ID" \
+    -vn "$VERSION" \
+    -vs "$VERSION_STR" \
     -da sha256 \
-    "${OTA_FOLDER}/ImgPacketFile"*.bin \
-    "${OTA_FOLDER}/matter.ota"
+    "$OTA_FOLDER/ImgPacketFile"*.bin \
+    "$OTA_FOLDER/matter.ota"
 
 # remove unnecessary files
-rm -rf  ${OTA_FOLDER}/*.bin
-rm -rf  ${OTA_FOLDER}/*.ini
+rm -rf "$OTA_FOLDER"/*.bin
+rm -rf "$OTA_FOLDER"/*.ini
