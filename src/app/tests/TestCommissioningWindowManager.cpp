@@ -36,8 +36,8 @@
 #include <lib/core/StringBuilderAdapters.h>
 #include <pw_unit_test/framework.h>
 
-#include <app/tests/CommissioningWindowManagerTestAccess.h>
 #include <app/server/IDnssdServer.h>
+#include <app/tests/CommissioningWindowManagerTestAccess.h>
 
 using namespace chip::Crypto;
 
@@ -114,16 +114,19 @@ static void StopEventLoop(intptr_t context)
     chip::DeviceLayer::PlatformMgr().StopEventLoopTask();
 }
 
-class MockDnssdServer : public chip::IDnssdServer {
-    public:
-        MockDnssdServer() : mAdvertisingEnabled(false) {}
-        CHIP_ERROR AdvertiseOperational() override {
-            mAdvertisingEnabled = true;
-            return CHIP_NO_ERROR;
-        }
-        bool IsAdvertisingEnabled() override {return mAdvertisingEnabled;}
-    private:
-        bool mAdvertisingEnabled;
+class MockDnssdServer : public chip::IDnssdServer
+{
+public:
+    MockDnssdServer() : mAdvertisingEnabled(false) {}
+    CHIP_ERROR AdvertiseOperational() override
+    {
+        mAdvertisingEnabled = true;
+        return CHIP_NO_ERROR;
+    }
+    bool IsAdvertisingEnabled() override { return mAdvertisingEnabled; }
+
+private:
+    bool mAdvertisingEnabled;
 };
 
 class TestCommissioningWindowManager : public ::testing::Test
@@ -514,7 +517,7 @@ TEST_F(TestCommissioningWindowManager, TestOnPlatformEventOperationalNetworkEnab
 {
     MockDnssdServer mockDnssd;
     CommissioningWindowManager commissionMgr = CommissioningWindowManager(&mockDnssd);
-    auto event = CreateEvent(chip::DeviceLayer::DeviceEventType::kOperationalNetworkEnabled);
+    auto event                               = CreateEvent(chip::DeviceLayer::DeviceEventType::kOperationalNetworkEnabled);
 
     commissionMgr.OnPlatformEvent(&event);
     EXPECT_TRUE(mockDnssd.IsAdvertisingEnabled());
