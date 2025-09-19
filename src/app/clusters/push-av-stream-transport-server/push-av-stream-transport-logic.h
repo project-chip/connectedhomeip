@@ -161,7 +161,7 @@ private:
     /**
      * @brief Schedule deallocate with a given timeout
      *
-     * @param endpointId    endpoint where DoorLockServer is running
+     * @param endpointId    endpoint where PushAvStreamTransportServer is running
      * @param timeoutSec    timeout in seconds
      */
     CHIP_ERROR ScheduleTransportDeallocate(uint16_t connectionID, uint32_t timeoutSec);

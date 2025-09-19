@@ -106,7 +106,7 @@ public:
 
     CHIP_ERROR PersistentAttributesLoadedCallback() override;
 
-    void OnZoneTriggeredEvent(uint16_t zoneId);
+    void OnZoneTriggeredEvent(uint16_t zoneId) override;
 
 private:
     std::vector<PushAvStream> pushavStreams;
