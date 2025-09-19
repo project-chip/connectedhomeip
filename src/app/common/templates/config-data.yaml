@@ -51,6 +51,7 @@ CommandHandlerInterfaceOnlyClusters:
     - General Diagnostics
     - Group Key Management
     - HEPA Filter Monitoring
+    - ICD Management
     - Joint Fabric Administrator
     - Laundry Washer Mode
     - Microwave Oven Control
@@ -155,6 +156,7 @@ CodeDrivenClusters:
     - General Commissioning
     - General Diagnostics
     - Group Key Management
+    - ICD Management
     - OTA Software Update Provider
     - Operational Credentials
     - Push AV Stream Transport

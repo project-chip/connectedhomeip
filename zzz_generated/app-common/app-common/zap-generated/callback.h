@@ -7079,23 +7079,65 @@ bool emberAfBridgedDeviceBasicInformationClusterKeepActiveCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::BridgedDeviceBasicInformation::Commands::KeepActive::DecodableType & commandData);
 /**
- * @brief ICD Management Cluster RegisterClient Command callback (from client)
+ * @brief Operational Credentials Cluster AttestationRequest Command callback (from client)
  */
-bool emberAfIcdManagementClusterRegisterClientCallback(
+bool emberAfOperationalCredentialsClusterAttestationRequestCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::IcdManagement::Commands::RegisterClient::DecodableType & commandData);
+    const chip::app::Clusters::OperationalCredentials::Commands::AttestationRequest::DecodableType & commandData);
 /**
- * @brief ICD Management Cluster UnregisterClient Command callback (from client)
+ * @brief Operational Credentials Cluster CertificateChainRequest Command callback (from client)
  */
-bool emberAfIcdManagementClusterUnregisterClientCallback(
+bool emberAfOperationalCredentialsClusterCertificateChainRequestCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::IcdManagement::Commands::UnregisterClient::DecodableType & commandData);
+    const chip::app::Clusters::OperationalCredentials::Commands::CertificateChainRequest::DecodableType & commandData);
 /**
- * @brief ICD Management Cluster StayActiveRequest Command callback (from client)
+ * @brief Operational Credentials Cluster CSRRequest Command callback (from client)
  */
-bool emberAfIcdManagementClusterStayActiveRequestCallback(
+bool emberAfOperationalCredentialsClusterCSRRequestCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::IcdManagement::Commands::StayActiveRequest::DecodableType & commandData);
+    const chip::app::Clusters::OperationalCredentials::Commands::CSRRequest::DecodableType & commandData);
+/**
+ * @brief Operational Credentials Cluster AddNOC Command callback (from client)
+ */
+bool emberAfOperationalCredentialsClusterAddNOCCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::OperationalCredentials::Commands::AddNOC::DecodableType & commandData);
+/**
+ * @brief Operational Credentials Cluster UpdateNOC Command callback (from client)
+ */
+bool emberAfOperationalCredentialsClusterUpdateNOCCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::OperationalCredentials::Commands::UpdateNOC::DecodableType & commandData);
+/**
+ * @brief Operational Credentials Cluster UpdateFabricLabel Command callback (from client)
+ */
+bool emberAfOperationalCredentialsClusterUpdateFabricLabelCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::OperationalCredentials::Commands::UpdateFabricLabel::DecodableType & commandData);
+/**
+ * @brief Operational Credentials Cluster RemoveFabric Command callback (from client)
+ */
+bool emberAfOperationalCredentialsClusterRemoveFabricCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::OperationalCredentials::Commands::RemoveFabric::DecodableType & commandData);
+/**
+ * @brief Operational Credentials Cluster AddTrustedRootCertificate Command callback (from client)
+ */
+bool emberAfOperationalCredentialsClusterAddTrustedRootCertificateCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::OperationalCredentials::Commands::AddTrustedRootCertificate::DecodableType & commandData);
+/**
+ * @brief Operational Credentials Cluster SetVIDVerificationStatement Command callback (from client)
+ */
+bool emberAfOperationalCredentialsClusterSetVIDVerificationStatementCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::OperationalCredentials::Commands::SetVIDVerificationStatement::DecodableType & commandData);
+/**
+ * @brief Operational Credentials Cluster SignVIDVerificationRequest Command callback (from client)
+ */
+bool emberAfOperationalCredentialsClusterSignVIDVerificationRequestCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::OperationalCredentials::Commands::SignVIDVerificationRequest::DecodableType & commandData);
 /**
  * @brief Timer Cluster SetTimer Command callback (from client)
  */
