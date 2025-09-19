@@ -52,6 +52,7 @@ if (chip_build_tests) {
     tests = [
       "${chip_root}/src/access/tests",
       "${chip_root}/src/app/clusters/administrator-commissioning-server/tests",
+      "${chip_root}/src/app/clusters/access-control-server/tests",
       "${chip_root}/src/app/clusters/basic-information/tests",
       "${chip_root}/src/app/clusters/bindings/tests",
       "${chip_root}/src/app/clusters/general-diagnostics-server/tests",
