@@ -93,7 +93,7 @@ mcxw72_sdk("sdk") {
   ]
 
   if (nxp_enable_matter_cli) {
-    defines += [ "BOARD_APP_UART_CLK_FREQ=6000000U" ]
+    defines += [ "gAppUseSerialManager_c=1" ]
   }
 }
 
