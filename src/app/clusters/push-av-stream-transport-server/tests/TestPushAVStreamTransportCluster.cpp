@@ -391,6 +391,11 @@ public:
         // No-op implementation for tests
     }
 
+    void OnZoneTriggeredEvent(uint16_t zoneId) override
+    {
+        // No-op implementation for tests
+    }
+
 private:
     std::vector<Clusters::PushAvStreamTransport::PushAvStream> pushavStreams;
 };
