@@ -66,12 +66,12 @@ TEST_F(TestAccessControlCluster, CommandsTest)
     ASSERT_EQ(acceptedCommands[0].GetInvokePrivilege(),
               AccessControl::Commands::ReviewFabricRestrictions::kMetadataEntry.GetInvokePrivilege());
 
-    //Check generated commands
+    // Check generated commands
     ASSERT_EQ(generatedCommands.size(), AccessControl::Commands::kGeneratedCommandsCount);
     ASSERT_EQ(generatedCommands[0], AccessControl::Commands::ReviewFabricRestrictionsResponse::Id);
 #else
-    ASSERT_EQ(acceptedCommands.size(), (size_t)(0));
-    ASSERT_EQ(generatedCommands.size(), (size_t)(0));
+    ASSERT_EQ(acceptedCommands.size(), (size_t) (0));
+    ASSERT_EQ(generatedCommands.size(), (size_t) (0));
 #endif
 }
 
@@ -86,20 +86,18 @@ TEST_F(TestAccessControlCluster, AttributesTest)
     ReadOnlyBufferBuilder<DataModel::AttributeEntry> expectedBuilder;
     ASSERT_EQ(expectedBuilder.ReferenceExisting(DefaultServerCluster::GlobalAttributes()), CHIP_NO_ERROR);
 
-    ASSERT_EQ(expectedBuilder.AppendElements(
-        {
+    ASSERT_EQ(expectedBuilder.AppendElements({
 #if CHIP_CONFIG_ENABLE_ACL_EXTENSIONS
-            AccessConttrol::Attributes::Extension::kMetadataEntry,
+        AccessConttrol::Attributes::Extension::kMetadataEntry,
 #endif
 
 #if CHIP_CONFIG_USE_ACCESS_RESTRICTIONS
-            AccessConttrol::Attributes::CommissioningARL::kMetadataEntry,
-            AccessConttrol::Attributes::Arl::kMetadataEntry
+            AccessConttrol::Attributes::CommissioningARL::kMetadataEntry, AccessConttrol::Attributes::Arl::kMetadataEntry
 #endif
-        }
-    ), CHIP_NO_ERROR);
+    }),
+              CHIP_NO_ERROR);
     ASSERT_EQ(expectedBuilder.AppendElements(AccessControl::Attributes::kMandatoryMetadata), CHIP_NO_ERROR);
     ASSERT_TRUE(Testing::EqualAttributeSets(attributesBuilder.TakeBuffer(), expectedBuilder.TakeBuffer()));
 }
 
-}
+} // namespace
