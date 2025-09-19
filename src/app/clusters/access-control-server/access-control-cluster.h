@@ -29,16 +29,15 @@ namespace chip {
 namespace app {
 namespace Clusters {
 
-class AccessControlCluster : public DefaultServerCluster, public chip::Access::AccessControl::EntryListener
+class AccessControlCluster : public DefaultServerCluster,
+                             public chip::Access::AccessControl::EntryListener
 #if CHIP_CONFIG_USE_ACCESS_RESTRICTIONS
     ,
-                               public AccessRestrictionProvider::Listener
+                             public AccessRestrictionProvider::Listener
 #endif
 {
 public:
-    AccessControlCluster() :
-        DefaultServerCluster({ kRootEndpointId, AccessControl::Id })
-    {}
+    AccessControlCluster() : DefaultServerCluster({ kRootEndpointId, AccessControl::Id }) {}
 
     DataModel::ActionReturnStatus ReadAttribute(const DataModel::ReadAttributeRequest & request,
                                                 AttributeValueEncoder & encoder) override;
@@ -63,9 +62,8 @@ private:
                         chip::Access::AccessControl::EntryListener::ChangeType changeType) override;
 
 #if CHIP_CONFIG_USE_ACCESS_RESTRICTIONS
-    void OnFabricRestrictionReviewUpdate(FabricIndex fabricIndex, uint64_t token,
-                                                             Optional<CharSpan> instruction, Optional<CharSpan>
-                                                             arlRequestFlowUrl) override;
+    void OnFabricRestrictionReviewUpdate(FabricIndex fabricIndex, uint64_t token, Optional<CharSpan> instruction,
+                                         Optional<CharSpan> arlRequestFlowUrl) override;
 #endif
 };
 

@@ -17,12 +17,12 @@
 
 #include <access/AccessConfig.h>
 #if CHIP_CONFIG_USE_ACCESS_RESTRICTIONS
-#include <app/clusters/access-control-server/ArlEncoder.h>
 #include <access/AccessRestrictionProvider.h>
+#include <app/clusters/access-control-server/ArlEncoder.h>
 #endif
 
-#include <app/clusters/access-control-server/access-control-cluster.h>
 #include <app-common/zap-generated/cluster-objects.h>
+#include <app/clusters/access-control-server/access-control-cluster.h>
 #include <app/server-cluster/AttributeListBuilder.h>
 #include <app/server-cluster/DefaultServerCluster.h>
 #include <app/server/Server.h>
@@ -192,9 +192,9 @@ CHIP_ERROR ReadExtension(AttributeValueEncoder & aEncoder)
         return CHIP_NO_ERROR;
     });
 }
-CHIP_ERROR LogExtensionChangedEvent(
-    const Clusters::AccessControl::Structs::AccessControlExtensionStruct::Type & item,
-    const Access::SubjectDescriptor & subjectDescriptor, Clusters::AccessControl::ChangeTypeEnum changeType)
+CHIP_ERROR LogExtensionChangedEvent(const Clusters::AccessControl::Structs::AccessControlExtensionStruct::Type & item,
+                                    const Access::SubjectDescriptor & subjectDescriptor,
+                                    Clusters::AccessControl::ChangeTypeEnum changeType)
 {
     ExtensionEvent event{ .changeType = changeType, .fabricIndex = subjectDescriptor.fabricIndex };
 
@@ -278,8 +278,8 @@ CHIP_ERROR WriteExtension(const ConcreteDataAttributePath & aPath, AttributeValu
                 .data        = ByteSpan(buffer, size),
                 .fabricIndex = accessingFabricIndex,
             };
-            ReturnErrorOnFailure(LogExtensionChangedEvent(item, aDecoder.GetSubjectDescriptor(),
-                                                            Clusters::AccessControl::ChangeTypeEnum::kRemoved));
+            ReturnErrorOnFailure(
+                LogExtensionChangedEvent(item, aDecoder.GetSubjectDescriptor(), Clusters::AccessControl::ChangeTypeEnum::kRemoved));
         }
         else if (count == 1)
         {
@@ -300,9 +300,9 @@ CHIP_ERROR WriteExtension(const ConcreteDataAttributePath & aPath, AttributeValu
                 storage.SyncSetKeyValue(DefaultStorageKeyAllocator::AccessControlExtensionEntry(accessingFabricIndex).KeyName(),
                                         item.data.data(), static_cast<uint16_t>(item.data.size())));
             ReturnErrorOnFailure(LogExtensionChangedEvent(item, aDecoder.GetSubjectDescriptor(),
-                                                            errStorage == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND
-                                                                ? Clusters::AccessControl::ChangeTypeEnum::kAdded
-                                                                : Clusters::AccessControl::ChangeTypeEnum::kChanged));
+                                                          errStorage == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND
+                                                              ? Clusters::AccessControl::ChangeTypeEnum::kAdded
+                                                              : Clusters::AccessControl::ChangeTypeEnum::kChanged));
         }
         else
         {
@@ -378,9 +378,8 @@ CHIP_ERROR ReadArl(AttributeValueEncoder & aEncoder)
     });
 }
 
-void AccessControlCluster::OnFabricRestrictionReviewUpdate(FabricIndex fabricIndex, uint64_t token,
-                                                             Optional<CharSpan> instruction, Optional<CharSpan>
-                                                             arlRequestFlowUrl)
+void AccessControlCluster::OnFabricRestrictionReviewUpdate(FabricIndex fabricIndex, uint64_t token, Optional<CharSpan> instruction,
+                                                           Optional<CharSpan> arlRequestFlowUrl)
 {
     CHIP_ERROR err;
     ArlReviewEvent event{ .token = token, .fabricIndex = fabricIndex };
@@ -397,9 +396,9 @@ exit:
     ChipLogError(DataManagement, "AccessControlCluster: review event failed: %" CHIP_ERROR_FORMAT, err.Format());
 }
 
-std::optional<DataModel::ActionReturnStatus> HandleReviewFabricRestrictions(
-    CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
-    const Clusters::AccessControl::Commands::ReviewFabricRestrictions::DecodableType & commandData)
+std::optional<DataModel::ActionReturnStatus>
+HandleReviewFabricRestrictions(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
+                               const Clusters::AccessControl::Commands::ReviewFabricRestrictions::DecodableType & commandData)
 {
     if (commandPath.mEndpointId != kRootEndpointId)
     {
@@ -467,7 +466,7 @@ std::optional<DataModel::ActionReturnStatus> HandleReviewFabricRestrictions(
     return Protocols::InteractionModel::Status::Success;
 }
 #endif
-}
+} // namespace
 
 namespace chip {
 namespace app {
@@ -568,7 +567,7 @@ CHIP_ERROR AccessControlCluster::Attributes(const ConcreteClusterPath & path,
 #if CHIP_CONFIG_ENABLE_ACL_EXTENSIONS
     const bool haveExtensions = true;
 #else
-    const bool haveExtensions = false;
+    const bool haveExtensions    = false;
 #endif
 
 #if CHIP_CONFIG_USE_ACCESS_RESTRICTIONS
@@ -578,9 +577,9 @@ CHIP_ERROR AccessControlCluster::Attributes(const ConcreteClusterPath & path,
 #endif
 
     AttributeListBuilder::OptionalAttributeEntry optionalEntries[] = {
-        {haveExtensions, Attributes::Extension::kMetadataEntry},
-        {haveManagedDevice, Attributes::CommissioningARL::kMetadataEntry},
-        {haveManagedDevice, Attributes::Arl::kMetadataEntry},
+        { haveExtensions, Attributes::Extension::kMetadataEntry },
+        { haveManagedDevice, Attributes::CommissioningARL::kMetadataEntry },
+        { haveManagedDevice, Attributes::Arl::kMetadataEntry },
     };
 
     return listBuilder.Append(Span(AccessControl::Attributes::kMandatoryMetadata), Span(optionalEntries));
