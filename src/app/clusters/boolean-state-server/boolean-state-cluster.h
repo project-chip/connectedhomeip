@@ -33,7 +33,7 @@ public:
 
     // Set a boolean value.
     // If the boolean value was actually modified, an event will be generated.
-    // On success, the return value is an optional containing an EventNumber.
+    // On success, the return value is an optional containing the EventNumber of the event that was generated.
     // On error, the return value is nullopt.
     std::optional<EventNumber> SetStateValue(bool stateValue);
 

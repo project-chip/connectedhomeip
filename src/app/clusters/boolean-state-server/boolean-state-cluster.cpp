@@ -52,10 +52,10 @@ CHIP_ERROR BooleanStateCluster::Attributes(const ConcreteClusterPath & path,
 
 std::optional<EventNumber> BooleanStateCluster::SetStateValue(bool stateValue)
 {
-    VerifyOrReturnValue(mStateValue != stateValue, std::optional<EventNumber>());
+    VerifyOrReturnValue(mStateValue != stateValue, std::nullopt);
     mStateValue = stateValue;
     NotifyAttributeChanged(StateValue::Id);
-    VerifyOrReturnValue(mContext != nullptr, std::optional<EventNumber>());
+    VerifyOrReturnValue(mContext != nullptr, std::nullopt);
     BooleanState::Events::StateChange::Type event{ stateValue };
     return mContext->interactionContext.eventsGenerator.GenerateEvent(event, mPath.mEndpointId);
 }

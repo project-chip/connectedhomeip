@@ -139,8 +139,8 @@ public:
                                           // indices smaller than this are valid).
     };
 
-    /// Calls 'FindRegistration' on the delegate and returns the address of the cluster for an endpoint index or nullptr if not
-    /// found.
+    /// Calls 'FindRegistration' on the delegate and returns the address of the cluster for the provided endpoint id or nullptr if
+    /// not found.
     static ServerClusterInterface * FindClusterOnEndpoint(const FindClusterOnEndpointOptions & options, Delegate & delegate);
 };
 

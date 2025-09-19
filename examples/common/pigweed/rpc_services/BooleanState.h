@@ -53,7 +53,7 @@ public:
             eventNumber = booleanState->SetStateValue(newState);
         }
 
-        response.event_number = eventNumber.has_value() ? eventNumber.value() : 0;
+        response.event_number = eventNumber.value_or(0);
         return pw::OkStatus();
 #else
         return pw::Status::InvalidArgument();
