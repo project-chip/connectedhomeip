@@ -60,6 +60,14 @@
             "cwd": "${workspaceFolder}"
         },
         {
+            "name": "Run application Energy-Gtw-Sample (Darwin arm64)",
+            "type": "lldb",
+            "request": "launch",
+            "program": "${workspaceFolder}/out/darwin-arm64-energy-gateway/chip-energy-gateway-app",
+            "args": ["--enable-key", "00112233445566778899aabbccddeeff"],
+            "cwd": "${workspaceFolder}/examples/energy-gateway-app"
+        },
+        {
             "name": "Run application (Linux x64)",
             "type": "cppdbg",
             "request": "launch",
@@ -75,7 +83,6 @@
             "args": [],
             "cwd": "${workspaceFolder}"
         },
-
         {
             "name": "Run pw FuzzTest (Linux x64) UnitTest Mode",
             "type": "cppdbg",
@@ -83,7 +90,6 @@
             "program": "${workspaceFolder}/out/${input:outPWFuzzTestLinux}",
             "cwd": "${workspaceFolder}"
         },
-
         {
             "name": "Run pw FuzzTest (Linux x64) Continuous Fuzzing Mode",
             "type": "cppdbg",
@@ -93,7 +99,6 @@
             "cwd": "${workspaceFolder}",
             "preLaunchTask": ""
         },
-
         {
             "name": "QRCode Tests",
             "type": "cppdbg",
@@ -187,7 +192,6 @@
                 }
             ]
         },
-
         {
             "name": "Debug Mbed examples",
             "type": "cortex-debug",
@@ -220,7 +224,6 @@
             "runToMain": true, // if true, program will halt at main. Not used for a restart
             "showDevDebugOutput": false // When set to true, displays output of GDB.
         },
-
         {
             "name": "Debug Mbed examples [remote]",
             "type": "cortex-debug",
@@ -247,7 +250,6 @@
             "runToMain": true, // if true, program will halt at main. Not used for a restart
             "showDevDebugOutput": false // When set to true, displays output of GDB.
         },
-
         {
             "name": "Flash Mbed examples",
             "type": "cortex-debug",
@@ -272,7 +274,6 @@
             "targetProcessor": 1, // Set to 0 for the CM0+, set to 1 for the CM4
             "showDevDebugOutput": false // When set to true, displays output of GDB.
         },
-
         {
             "name": "Flash Mbed examples [remote]",
             "type": "cortex-debug",
@@ -290,7 +291,6 @@
             ],
             "showDevDebugOutput": false // When set to true, displays output of GDB.
         },
-
         {
             "name": "Debug Mbed unit tests",
             "type": "cortex-debug",
@@ -323,7 +323,6 @@
             "runToMain": true, // if true, program will halt at main. Not used for a restart
             "showDevDebugOutput": false // When set to true, displays output of GDB.
         },
-
         {
             "name": "Debug Mbed unit tests [remote]",
             "type": "cortex-debug",
@@ -350,7 +349,6 @@
             "runToMain": true, // if true, program will halt at main. Not used for a restart
             "showDevDebugOutput": false // When set to true, displays output of GDB.
         },
-
         {
             "name": "Flash Mbed unit tests",
             "type": "cortex-debug",
@@ -375,7 +373,6 @@
             "targetProcessor": 1, // Set to 0 for the CM0+, set to 1 for the CM4
             "showDevDebugOutput": false // When set to true, displays output of GDB.
         },
-
         {
             "name": "Flash Mbed unit tests [remote]",
             "type": "cortex-debug",
@@ -393,7 +390,6 @@
             ],
             "showDevDebugOutput": false // When set to true, displays output of GDB.
         },
-
         {
             "name": "Debug Mbed bootloader",
             "type": "cortex-debug",
@@ -426,7 +422,6 @@
             "runToMain": true, // if true, program will halt at main. Not used for a restart
             "showDevDebugOutput": false // When set to true, displays output of GDB.
         },
-
         {
             "name": "Debug Mbed bootloader [remote]",
             "type": "cortex-debug",
@@ -453,7 +448,6 @@
             "runToMain": true, // if true, program will halt at main. Not used for a restart
             "showDevDebugOutput": false // When set to true, displays output of GDB.
         },
-
         {
             "name": "CHIP All Clusters App (Linux)",
             "type": "lldb",
@@ -461,7 +455,6 @@
             "program": "${workspaceFolder}/out/debug/standalone/chip-all-clusters-app",
             "cwd": "${workspaceFolder}"
         },
-
         {
             "name": "Fabric Admin (Linux)",
             "type": "lldb",
@@ -470,7 +463,6 @@
             "args": ["--log-file-path", "/tmp/fabric_admin.log"],
             "cwd": "${workspaceFolder}"
         },
-
         {
             "name": "Fabric Bridge App (Linux)",
             "type": "lldb",
@@ -478,7 +470,6 @@
             "program": "${workspaceFolder}/out/debug/standalone/fabric-bridge-app",
             "cwd": "${workspaceFolder}"
         },
-
         {
             "name": "Fabric Sync (Linux)",
             "type": "lldb",
@@ -486,7 +477,6 @@
             "program": "${workspaceFolder}/out/debug/standalone/fabric-sync",
             "cwd": "${workspaceFolder}"
         },
-
         {
             "name": "OTA Requestor App (Linux)",
             "type": "lldb",
@@ -502,7 +492,6 @@
             ],
             "cwd": "${workspaceFolder}"
         },
-
         {
             "name": "OTA Provider App (Linux)",
             "type": "lldb",
@@ -517,47 +506,6 @@
                 "/tmp/ota-image.bin"
             ],
             "cwd": "${workspaceFolder}"
-        },
-
-        {
-            "name": "Debug Open IoT SDK example application",
-            "type": "cortex-debug",
-            "request": "launch",
-            "cwd": "${workspaceRoot}/examples/${input:openiotsdkExample}/openiotsdk",
-            "executable": "./build/chip-openiotsdk-${input:openiotsdkExample}-example.elf",
-            "armToolchainPath": "${env:PW_ENVIRONMENT_ROOT}/cipd/packages/arm/bin/",
-            "servertype": "external",
-            "gdbTarget": "${input:openiotsdkRemoteHost}:31627", //GDBserver port on FVP
-            "overrideLaunchCommands": [
-                "-enable-pretty-printing",
-                "add-symbol-file ./build/bl2.elf 0x10000000",
-                "add-symbol-file ./build/tfm_s.elf 0x38000400",
-                "add-symbol-file ./build/chip-openiotsdk-${input:openiotsdkExample}-example_ns.elf 0x28060400",
-                "break main_ns.cpp:main"
-            ],
-            "runToEntryPoint": "main",
-            "preLaunchTask": "Debug Open IoT SDK example",
-            "showDevDebugOutput": "parsed"
-        },
-        {
-            "name": "Debug Open IoT SDK unit-tests application",
-            "type": "cortex-debug",
-            "request": "launch",
-            "cwd": "${workspaceRoot}/src/test_driver/openiotsdk/unit-tests",
-            "executable": "./build/${input:openiotsdkUnitTest}.elf",
-            "armToolchainPath": "${env:PW_ENVIRONMENT_ROOT}/cipd/packages/arm/bin/",
-            "servertype": "external",
-            "gdbTarget": ":31627", //GDBserver port on FVP
-            "overrideLaunchCommands": [
-                "-enable-pretty-printing",
-                "add-symbol-file ./build/bl2.elf 0x10000000",
-                "add-symbol-file ./build/tfm_s.elf 0x38000400",
-                "add-symbol-file ./build/${input:openiotsdkUnitTest}_ns.elf 0x28060400",
-                "break main_ns.cpp:main"
-            ],
-            "runToEntryPoint": "main",
-            "preLaunchTask": "Debug Open IoT SDK unit-tests",
-            "showDevDebugOutput": "parsed"
         },
         {
             "name": "Zephyr native tests",
@@ -659,30 +607,6 @@
             "description": "What mbed target do you want to use?",
             "options": ["CY8CPROTO_062_4343W"],
             "default": "CY8CPROTO_062_4343W"
-        },
-        {
-            "type": "command",
-            "id": "openiotsdkExample",
-            "command": "shellCommand.execute",
-            "args": {
-                "command": "cat examples/platform/openiotsdk/supported_examples.txt",
-                "description": "What Open IoT SDK example application do you want to use?"
-            }
-        },
-        {
-            "type": "promptString",
-            "id": "openiotsdkRemoteHost",
-            "description": "Type the hostname/IP address of external GDB target that you want to connect to. Leave blank for internal GDB server",
-            "default": ""
-        },
-        {
-            "type": "command",
-            "id": "openiotsdkUnitTest",
-            "command": "shellCommand.execute",
-            "args": {
-                "command": "cat src/test_driver/openiotsdk/unit-tests/test_components.txt",
-                "description": "What Open IoT SDK unit test application do you want to use?"
-            }
         }
     ]
 }

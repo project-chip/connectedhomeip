@@ -18,8 +18,8 @@
 
 #include "NetworkCommissioningCluster.h"
 
+#include <app/server-cluster/ServerClusterInterfaceRegistry.h>
 #include <data-model-providers/codegen/CodegenDataModelProvider.h>
-#include <data-model-providers/codegen/ServerClusterInterfaceRegistry.h>
 
 namespace chip {
 namespace app {

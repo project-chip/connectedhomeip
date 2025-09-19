@@ -516,14 +516,27 @@
 #endif // CHIP_CONFIG_ERROR_SOURCE
 
 /**
+ *  @def CHIP_CONFIG_ERROR_STD_SOURCE_LOCATION
+ *
+ *  If asserted (1) along with CHIP_CONFIG_ERROR_SOURCE, then CHIP_ERROR will store the error location
+ *  using the std::source_location (requires at least C++20) instead of keeping raw __FILE__ and __LINE__.
+ *  This feature comes with FLASH and RAM overhead, so it is disabled by default.
+ */
+#ifndef CHIP_CONFIG_ERROR_STD_SOURCE_LOCATION
+#define CHIP_CONFIG_ERROR_STD_SOURCE_LOCATION 0
+#endif // CHIP_CONFIG_ERROR_STD_SOURCE_LOCATION
+
+/**
  *  @def CHIP_CONFIG_ERROR_SOURCE_NO_ERROR
  *
  *  If asserted (1) along with CHIP_CONFIG_ERROR_SOURCE, then instances of CHIP_NO_ERROR will also include
  *  the source location of their expansion. Otherwise, CHIP_NO_ERROR is excluded from source tracking.
+ *  Since CHIP_NO_ERROR is used in many places and tracking it adds marginal debugging value, it is
+ *  disabled by default.
  */
 #ifndef CHIP_CONFIG_ERROR_SOURCE_NO_ERROR
-#define CHIP_CONFIG_ERROR_SOURCE_NO_ERROR 1
-#endif // CHIP_CONFIG_ERROR_SOURCE
+#define CHIP_CONFIG_ERROR_SOURCE_NO_ERROR 0
+#endif // CHIP_CONFIG_ERROR_SOURCE_NO_ERROR
 
 /**
  *  @def CHIP_CONFIG_ERROR_FORMAT_AS_STRING
@@ -532,7 +545,6 @@
  *  If 1, then ChipError::Format() returns a const char *, from chip::ErrorStr().
  *  In either case, the macro CHIP_ERROR_FORMAT expands to a suitable printf format.
  */
-
 #ifndef CHIP_CONFIG_ERROR_FORMAT_AS_STRING
 #define CHIP_CONFIG_ERROR_FORMAT_AS_STRING 0
 #endif // CHIP_CONFIG_ERROR_FORMAT_AS_STRING
@@ -1108,6 +1120,15 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
  */
 #ifndef CHIP_CONFIG_MAX_GROUP_ENDPOINTS_PER_FABRIC
 #define CHIP_CONFIG_MAX_GROUP_ENDPOINTS_PER_FABRIC 1
+#endif
+
+/**
+ * @def CHIP_CONFIG_MAX_BINDING_ENTRIES_PER_FABRIC
+ *
+ * @brief Defines the number of binding entries per fabric.
+ */
+#ifndef CHIP_CONFIG_MAX_BINDING_ENTRIES_PER_FABRIC
+#define CHIP_CONFIG_MAX_BINDING_ENTRIES_PER_FABRIC 4
 #endif
 
 /**

@@ -196,7 +196,7 @@ int OTAImageProcessorImpl::MemoryTest()
             }
         }
 
-        ChipLogProgress(SoftwareUpdate, " %.*s", buffer_size - i, &buffer.Get()[i]);
+        ChipLogProgress(SoftwareUpdate, " %s", NullTerminated(&buffer.Get()[i], buffer_size - i).c_str());
     }
     ChipLogProgress(SoftwareUpdate, "---\n");
 

@@ -5,6 +5,7 @@
 #pragma once
 
 #include <app/data-model-provider/MetadataTypes.h>
+#include <array>
 #include <lib/core/DataModelTypes.h>
 
 #include <cstdint>
@@ -19,6 +20,7 @@ namespace Switch {
 inline constexpr uint32_t kRevision = 2;
 
 namespace Attributes {
+
 namespace NumberOfPositions {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(NumberOfPositions::Id, BitFlags<DataModel::AttributeQualityFlags>(),
                                                           Access::Privilege::kView, std::nullopt);
@@ -31,10 +33,40 @@ namespace MultiPressMax {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(MultiPressMax::Id, BitFlags<DataModel::AttributeQualityFlags>(),
                                                           Access::Privilege::kView, std::nullopt);
 } // namespace MultiPressMax
+constexpr std::array<DataModel::AttributeEntry, 2> kMandatoryMetadata = {
+    NumberOfPositions::kMetadataEntry,
+    CurrentPosition::kMetadataEntry,
+
+};
 
 } // namespace Attributes
 
 namespace Commands {} // namespace Commands
+
+namespace Events {
+namespace SwitchLatched {
+inline constexpr DataModel::EventEntry kMetadataEntry{ Access::Privilege::kView };
+} // namespace SwitchLatched
+namespace InitialPress {
+inline constexpr DataModel::EventEntry kMetadataEntry{ Access::Privilege::kView };
+} // namespace InitialPress
+namespace LongPress {
+inline constexpr DataModel::EventEntry kMetadataEntry{ Access::Privilege::kView };
+} // namespace LongPress
+namespace ShortRelease {
+inline constexpr DataModel::EventEntry kMetadataEntry{ Access::Privilege::kView };
+} // namespace ShortRelease
+namespace LongRelease {
+inline constexpr DataModel::EventEntry kMetadataEntry{ Access::Privilege::kView };
+} // namespace LongRelease
+namespace MultiPressOngoing {
+inline constexpr DataModel::EventEntry kMetadataEntry{ Access::Privilege::kView };
+} // namespace MultiPressOngoing
+namespace MultiPressComplete {
+inline constexpr DataModel::EventEntry kMetadataEntry{ Access::Privilege::kView };
+} // namespace MultiPressComplete
+
+} // namespace Events
 } // namespace Switch
 } // namespace Clusters
 } // namespace app

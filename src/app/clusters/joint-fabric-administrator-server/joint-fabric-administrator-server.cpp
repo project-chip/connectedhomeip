@@ -45,6 +45,7 @@
 #include <lib/support/ScopedBuffer.h>
 #include <lib/support/TestGroupData.h>
 #include <lib/support/logging/CHIPLogging.h>
+#include <platform/CHIPDeviceConfig.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/CommissionableDataProvider.h>
 #include <string.h>
@@ -93,9 +94,6 @@ CHIP_ERROR JointFabricAdministratorGlobalInstance::Read(const ConcreteReadAttrib
 
     switch (aPath.mAttributeId)
     {
-    case JointFabricAdministrator::Attributes::AdministratorFabricIndex::Id: {
-        return ReadAdministratorFabricIndex(aEncoder);
-    }
     default:
         break;
     }
@@ -147,7 +145,59 @@ void JointFabricAdministratorGlobalInstance::HandleOJCW(HandlerContext & ctx,
                                                         const Commands::OpenJointCommissioningWindow::DecodableType & commandData)
 {
     MATTER_TRACE_SCOPE("OpenJointCommissioningWindow", "JointFabricAdministrator");
+    auto commissioningTimeout = System::Clock::Seconds16(commandData.commissioningTimeout);
+    auto & pakeVerifier       = commandData.PAKEPasscodeVerifier;
+    auto & discriminator      = commandData.discriminator;
+    auto & iterations         = commandData.iterations;
+    auto & salt               = commandData.salt;
+
+    using namespace chip::app::Clusters::JointFabricAdministrator;
+
+    Optional<StatusCodeEnum> status = Optional<StatusCodeEnum>::Missing();
+    Status globalStatus             = Status::Success;
+    Spake2pVerifier verifier;
+
     ChipLogProgress(Zcl, "Received command to open joint commissioning window");
+
+    FabricIndex fabricIndex       = ctx.mCommandHandler.GetAccessingFabricIndex();
+    const FabricInfo * fabricInfo = Server::GetInstance().GetFabricTable().FindFabricWithIndex(fabricIndex);
+    auto & failSafeContext        = Server::GetInstance().GetFailSafeContext();
+    auto & commissionMgr          = Server::GetInstance().GetCommissioningWindowManager();
+
+    VerifyOrExit(fabricInfo != nullptr, status.Emplace(StatusCodeEnum::kPAKEParameterError));
+    VerifyOrExit(failSafeContext.IsFailSafeFullyDisarmed(), status.Emplace(StatusCodeEnum::kBusy));
+
+    VerifyOrExit(!commissionMgr.IsCommissioningWindowOpen(), status.Emplace(StatusCodeEnum::kBusy));
+    VerifyOrExit(iterations >= kSpake2p_Min_PBKDF_Iterations, status.Emplace(StatusCodeEnum::kPAKEParameterError));
+    VerifyOrExit(iterations <= kSpake2p_Max_PBKDF_Iterations, status.Emplace(StatusCodeEnum::kPAKEParameterError));
+    VerifyOrExit(salt.size() >= kSpake2p_Min_PBKDF_Salt_Length, status.Emplace(StatusCodeEnum::kPAKEParameterError));
+    VerifyOrExit(salt.size() <= kSpake2p_Max_PBKDF_Salt_Length, status.Emplace(StatusCodeEnum::kPAKEParameterError));
+
+    VerifyOrExit(commissioningTimeout <= commissionMgr.MaxCommissioningTimeout(), globalStatus = Status::InvalidCommand);
+    VerifyOrExit(commissioningTimeout >= commissionMgr.MinCommissioningTimeout(), globalStatus = Status::InvalidCommand);
+    VerifyOrExit(discriminator <= kMaxDiscriminatorValue, globalStatus = Status::InvalidCommand);
+
+    VerifyOrExit(verifier.Deserialize(pakeVerifier) == CHIP_NO_ERROR, status.Emplace(StatusCodeEnum::kPAKEParameterError));
+    VerifyOrExit(commissionMgr.OpenJointCommissioningWindow(commissioningTimeout, discriminator, verifier, iterations, salt,
+                                                            fabricIndex, fabricInfo->GetVendorId()) == CHIP_NO_ERROR,
+                 status.Emplace(StatusCodeEnum::kPAKEParameterError));
+    ChipLogProgress(Zcl, "Commissioning window is now open");
+
+exit:
+    if (status.HasValue())
+    {
+        ChipLogError(Zcl, "Failed to open joint commissioning window. Cluster status 0x%02x", to_underlying(status.Value()));
+        ctx.mCommandHandler.AddClusterSpecificFailure(ctx.mRequestPath, to_underlying(status.Value()));
+    }
+    else
+    {
+        if (globalStatus != Status::Success)
+        {
+            ChipLogError(Zcl, "Failed to open joint commissioning window. Global status " ChipLogFormatIMStatus,
+                         ChipLogValueIMStatus(globalStatus));
+        }
+        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, globalStatus);
+    }
 }
 
 void JointFabricAdministratorGlobalInstance::HandleAnnounceJointFabricAdministrator(

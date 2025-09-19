@@ -12,7 +12,7 @@ Python tests located in src/python_testing
 -   [src/python_testing/hello_test.py](https://github.com/project-chip/connectedhomeip/blob/master/src/python_testing/hello_test.py) -
     sample test showing test setup and test harness integration
 -   [https://github.com/google/mobly/blob/master/docs/tutorial.md](https://github.com/google/mobly/blob/master/docs/tutorial.md)
--   [ChipDeviceCtrl.py](https://github.com/project-chip/connectedhomeip/blob/master/src/controller/python/chip/ChipDeviceCtrl.py) -
+-   [ChipDeviceCtrl.py](https://github.com/project-chip/connectedhomeip/blob/master/src/controller/python/matter/ChipDeviceCtrl.py) -
     Controller implementation - [API documentation](./ChipDeviceCtrlAPI.md)
 -   [scripts/tests/run_python_test.py](https://github.com/project-chip/connectedhomeip/blob/master/scripts/tests/run_python_test.py)
     to easily set up app and script for testing - used in CI
@@ -25,7 +25,7 @@ Python tests located in src/python_testing
         section should include various parameters and their respective values,
         which will guide the test runner on how to execute the tests.
 -   All test classes inherit from `MatterBaseTest` in
-    [matter_testing.py](https://github.com/project-chip/connectedhomeip/blob/master/src/python_testing/matter_testing_infrastructure/chip/testing/matter_testing.py)
+    [matter_testing.py](https://github.com/project-chip/connectedhomeip/blob/master/src/python_testing/matter_testing_infrastructure/matter/testing/matter_testing.py)
     -   Support for commissioning using the python controller
     -   Default controller (`self.default_controller`) of type `ChipDeviceCtrl`
     -   `MatterBaseTest` inherits from the Mobly BaseTestClass
@@ -103,12 +103,12 @@ the tests. Please see [Running tests in CI](#running-tests-in-ci).
 
 ## Cluster Codegen
 
--   [Objects.py](https://github.com/project-chip/connectedhomeip/blob/master/src/controller/python/chip/clusters/Objects.py)
+-   [Objects.py](https://github.com/project-chip/connectedhomeip/blob/master/src/controller/python/matter/clusters/Objects.py)
     for codegen,
--   [ClusterObjects.py](https://github.com/project-chip/connectedhomeip/blob/master/src/controller/python/chip/clusters/ClusterObjects.py)
+-   [ClusterObjects.py](https://github.com/project-chip/connectedhomeip/blob/master/src/controller/python/matter/clusters/ClusterObjects.py)
     for classes
 
-Common import used in test files: `import chip.clusters as Clusters`
+Common import used in test files: `import matter.clusters as Clusters`
 
 Each cluster is defined in the `Clusters.<ClusterName>` namespace and contains
 always:
@@ -225,29 +225,30 @@ Clusters.BasicInformation.Structs.ProductAppearanceStruct(
 
 ## Accessing Clusters and Cluster Elements by ID
 
-[ClusterObjects.py](https://github.com/project-chip/connectedhomeip/blob/master/src/controller/python/chip/clusters/ClusterObjects.py)
+[ClusterObjects.py](https://github.com/project-chip/connectedhomeip/blob/master/src/controller/python/matter/clusters/ClusterObjects.py)
 has a set of objects that map ID to the code generated object.
 
-`chip.clusters.ClusterObjects.ALL_CLUSTERS`
+`matter.clusters.ClusterObjects.ALL_CLUSTERS`
 
 -   `dict[int, Cluster]` - maps cluster ID to Cluster class
-    -   `cluster = chip.clusters.ClusterObjects.ALL_CLUSTERS[cluster_id]`
+    -   `cluster = matter.clusters.ClusterObjects.ALL_CLUSTERS[cluster_id]`
 
-`chip.clusters.ClusterObjects.ALL_ATTRIBUTES`
+`matter.clusters.ClusterObjects.ALL_ATTRIBUTES`
 
 -   `dict[int, dict[int, ClusterAttributeDescriptor]]` - maps cluster ID to a
     dict of attribute ID to attribute class
-    -   `attr = chip.clusters.ClusterObjects.ALL_ATTRIBUTES[cluster_id][attribute_id]`
+    -   `attr = matter.clusters.ClusterObjects.ALL_ATTRIBUTES[cluster_id][attribute_id]`
 
-`chip.clusters.ClusterObjects.ALL_ACCEPTED_COMMANDS/ALL_GENERATED_COMMANDS`
+`matter.clusters.ClusterObjects.ALL_ACCEPTED_COMMANDS/ALL_GENERATED_COMMANDS`
 
 -   dict[int, dict[int, ClusterCommand]]
--   cmd = chip.clusters.ClusterObjects.ALL_ACCEPTED_COMMANDS[cluster_id][cmd_id]
+-   cmd =
+    matter.clusters.ClusterObjects.ALL_ACCEPTED_COMMANDS[cluster_id][cmd_id]
 
 ## ChipDeviceCtrl API
 
 The `ChipDeviceCtrl` API is implemented in
-[ChipDeviceCtrl.py](https://github.com/project-chip/connectedhomeip/blob/master/src/controller/python/chip/ChipDeviceCtrl.py).
+[ChipDeviceCtrl.py](https://github.com/project-chip/connectedhomeip/blob/master/src/controller/python/matter/ChipDeviceCtrl.py).
 
 The `ChipDeviceCtrl` implements a python-based controller that can be used to
 commission and control devices. The API is documented here in the
@@ -378,7 +379,7 @@ pai = await dev_ctrl.SendCommand(nodeid, 0, Clusters.OperationalCredentials.Comm
 ## Mobly helpers
 
 The test system is based on Mobly, and the
-[matter_testing.py](https://github.com/project-chip/connectedhomeip/blob/master/src/python_testing/matter_testing_infrastructure/chip/testing/matter_testing.py)
+[matter_testing.py](https://github.com/project-chip/connectedhomeip/blob/master/src/python_testing/matter_testing_infrastructure/matter/testing/matter_testing.py)
 class provides some helpers for Mobly integration.
 
 -   `default_matter_test_main`

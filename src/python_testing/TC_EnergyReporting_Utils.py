@@ -17,9 +17,10 @@
 
 import logging
 
-import chip.clusters as Clusters
-from chip.clusters.Types import NullValue
 from mobly import asserts
+
+import matter.clusters as Clusters
+from matter.clusters.Types import NullValue
 
 logger = logging.getLogger(__name__)
 

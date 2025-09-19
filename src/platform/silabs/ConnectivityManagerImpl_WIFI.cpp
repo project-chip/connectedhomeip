@@ -224,7 +224,8 @@ void ConnectivityManagerImpl::DriveStationState()
     {
         // Ensure that the Wifi task is started.
         CHIP_ERROR error = WifiInterface::GetInstance().StartWifiTask();
-        VerifyOrReturn(error == CHIP_NO_ERROR, ChipLogError(DeviceLayer, "StartWifiTask() failed: %s", ErrorStr(error)));
+        VerifyOrReturn(error == CHIP_NO_ERROR,
+                       ChipLogError(DeviceLayer, "StartWifiTask() failed: %" CHIP_ERROR_FORMAT, error.Format()));
 
         // Ensure that station mode is enabled in the WiFi layer.
         WifiInterface::GetInstance().ConfigureStationMode();
@@ -257,7 +258,8 @@ void ConnectivityManagerImpl::DriveStationState()
             ChipLogProgress(DeviceLayer, "Disconnecting WiFi station interface");
 
             CHIP_ERROR error = WifiInterface::GetInstance().TriggerDisconnection();
-            SuccessOrExitAction(error, ChipLogError(DeviceLayer, "TriggerDisconnection() failed: %s", ErrorStr(error)));
+            SuccessOrExitAction(error,
+                                ChipLogError(DeviceLayer, "TriggerDisconnection() failed: %" CHIP_ERROR_FORMAT, error.Format()));
 
             ChangeWiFiStationState(kWiFiStationState_Disconnecting);
         }

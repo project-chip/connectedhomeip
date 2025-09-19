@@ -22,6 +22,7 @@
 #include <app/AttributeAccessInterfaceRegistry.h>
 #include <app/GlobalAttributes.h>
 #include <app/RequiredPrivilege.h>
+#include <app/data-model-provider/ProviderChangeListener.h>
 #include <app/data-model/FabricScoped.h>
 #include <app/reporting/reporting.h>
 #include <app/util/af-types.h>
@@ -50,12 +51,11 @@ using Protocols::InteractionModel::Status;
 class ContextAttributesChangeListener : public AttributesChangedListener
 {
 public:
-    ContextAttributesChangeListener(const DataModel::InteractionModelContext & context) : mListener(context.dataModelChangeListener)
-    {}
-    void MarkDirty(const AttributePathParams & path) override { mListener->MarkDirty(path); }
+    ContextAttributesChangeListener(DataModel::ProviderChangeListener & listener) : mListener(listener) {}
+    void MarkDirty(const AttributePathParams & path) override { mListener.MarkDirty(path); }
 
 private:
-    DataModel::ProviderChangeListener * mListener;
+    DataModel::ProviderChangeListener & mListener;
 };
 
 /// Attempts to write via an attribute access interface (AAI)
@@ -96,6 +96,9 @@ DataModel::ActionReturnStatus CodegenDataModelProvider::WriteAttribute(const Dat
         return cluster->WriteAttribute(request, decoder);
     }
 
+    // we must be started up to accept writes (we make use of the context below)
+    VerifyOrReturnError(mContext.has_value(), CHIP_ERROR_INCORRECT_STATE);
+
     const EmberAfAttributeMetadata * attributeMetadata =
         emberAfLocateAttributeMetadata(request.path.mEndpointId, request.path.mClusterId, request.path.mAttributeId);
 
@@ -104,26 +107,7 @@ DataModel::ActionReturnStatus CodegenDataModelProvider::WriteAttribute(const Dat
     // This SHOULD NEVER HAPPEN hence the general return code (seemed preferable to VerifyOrDie)
     VerifyOrReturnError(attributeMetadata != nullptr, Status::Failure);
 
-    if (request.path.mDataVersion.HasValue())
-    {
-        DataVersion * versionPtr = emberAfDataVersionStorage(request.path);
-
-        if (versionPtr == nullptr)
-        {
-            ChipLogError(DataManagement, "Unable to get cluster info for Endpoint 0x%x, Cluster " ChipLogFormatMEI,
-                         request.path.mEndpointId, ChipLogValueMEI(request.path.mClusterId));
-            return Status::DataVersionMismatch;
-        }
-
-        if (request.path.mDataVersion.Value() != *versionPtr)
-        {
-            ChipLogError(DataManagement, "Write Version mismatch for Endpoint 0x%x, Cluster " ChipLogFormatMEI,
-                         request.path.mEndpointId, ChipLogValueMEI(request.path.mClusterId));
-            return Status::DataVersionMismatch;
-        }
-    }
-
-    ContextAttributesChangeListener change_listener(CurrentContext());
+    ContextAttributesChangeListener change_listener(mContext->dataModelChangeListener);
 
     AttributeAccessInterface * aai =
         AttributeAccessInterfaceRegistry::Instance().Get(request.path.mEndpointId, request.path.mClusterId);
@@ -208,7 +192,10 @@ void CodegenDataModelProvider::ListAttributeWriteNotification(const ConcreteAttr
 
 void CodegenDataModelProvider::Temporary_ReportAttributeChanged(const AttributePathParams & path)
 {
-    ContextAttributesChangeListener change_listener(CurrentContext());
+    // we must be started up to process changes since we use the context
+    VerifyOrReturn(mContext.has_value());
+
+    ContextAttributesChangeListener change_listener(mContext->dataModelChangeListener);
     if (path.mClusterId != kInvalidClusterId)
     {
         emberAfAttributeChanged(path.mEndpointId, path.mClusterId, path.mAttributeId, &change_listener);

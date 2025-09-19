@@ -58,7 +58,7 @@ struct NetworkInterface : public app::Clusters::GeneralDiagnostics::Structs::Net
     uint8_t Ipv6AddressesBuffer[kMaxIPv6AddrCount][kMaxIPv6AddrSize];
     chip::ByteSpan Ipv4AddressSpans[kMaxIPv4AddrCount];
     chip::ByteSpan Ipv6AddressSpans[kMaxIPv6AddrCount];
-    NetworkInterface * Next; /* Pointer to the next structure.  */
+    NetworkInterface * Next = nullptr; /* Pointer to the next structure.  */
 };
 
 class DiagnosticDataProviderImpl;

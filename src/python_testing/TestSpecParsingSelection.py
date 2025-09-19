@@ -14,14 +14,15 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 #
-import chip.clusters as Clusters
-from chip.testing.conformance import ConformanceDecision, ConformanceException
-from chip.testing.global_attribute_ids import is_standard_attribute_id
-from chip.testing.matter_testing import MatterBaseTest, default_matter_test_main
-from chip.testing.spec_parsing import PrebuiltDataModelDirectory, build_xml_clusters, dm_from_spec_version
-from chip.tlv import uint
 from mobly import asserts, signals
 from TC_DeviceConformance import DeviceConformanceTests
+
+import matter.clusters as Clusters
+from matter.testing.conformance import ConformanceDecision, ConformanceException
+from matter.testing.global_attribute_ids import is_standard_attribute_id
+from matter.testing.matter_testing import MatterBaseTest, default_matter_test_main
+from matter.testing.spec_parsing import PrebuiltDataModelDirectory, build_xml_clusters, dm_from_spec_version
+from matter.tlv import uint
 
 
 class TestSpecParsingSelection(MatterBaseTest, DeviceConformanceTests):
@@ -30,6 +31,11 @@ class TestSpecParsingSelection(MatterBaseTest, DeviceConformanceTests):
         pass
 
     def test_dm_from_spec_version(self):
+        # dm_from_spec_version is not implemented for 1.2 because this attribute does not exist.
+        # Instead, the basic composition tests that use the _get_dm function using the endpoint
+        # information. This selection mechanism is tested in the test conformance test, where we
+        # build a 1.2-style mock device that will fail conformance checks if the wrong pre-built is
+        # selected.
         asserts.assert_equal(dm_from_spec_version(0x01030000), PrebuiltDataModelDirectory.k1_3,
                              "Incorrect directory selected for 1.3 with patch 0")
         asserts.assert_equal(dm_from_spec_version(0x01030100), PrebuiltDataModelDirectory.k1_3,
@@ -40,8 +46,10 @@ class TestSpecParsingSelection(MatterBaseTest, DeviceConformanceTests):
                              "Incorrect directory selected for 1.4.1")
         asserts.assert_equal(dm_from_spec_version(0x01040200), PrebuiltDataModelDirectory.k1_4_2,
                              "Incorrect directory selected for 1.4.2")
+        asserts.assert_equal(dm_from_spec_version(0x01050000), PrebuiltDataModelDirectory.k1_5,
+                             "Incorrect directory selected for 1.5")
 
-        # We don't have data model files for 1.2, so these should error
+        # 1.2 doesn't include a specification revision field, so this should error
         with asserts.assert_raises(ConformanceException, "Expected assertion was not raised for spec version 1.2"):
             dm_from_spec_version(0x01020000)
 
@@ -69,8 +77,14 @@ class TestSpecParsingSelection(MatterBaseTest, DeviceConformanceTests):
             dm_from_spec_version(0x01050001)
 
     def _create_device(self, spec_version: uint, tc_enabled: bool):
-        # Build at 1.4.1 so we can have TC info
-        xml_clusters, _ = build_xml_clusters(PrebuiltDataModelDirectory.k1_4_1)
+        if spec_version is None:
+            dm = PrebuiltDataModelDirectory.k1_2
+        elif spec_version == 0xFFFFFFFF:
+            # use 1.4.1, but change the spec version to something bad.
+            dm = PrebuiltDataModelDirectory.k1_4_1
+        else:
+            dm = dm_from_spec_version(spec_version)
+        xml_clusters, _ = build_xml_clusters(dm)
 
         gc_feature_map = Clusters.GeneralCommissioning.Bitmaps.Feature.kTermsAndConditions if tc_enabled else 0
 
@@ -108,7 +122,9 @@ class TestSpecParsingSelection(MatterBaseTest, DeviceConformanceTests):
 
         gc_resp = create_cluster_globals(Clusters.GeneralCommissioning, gc_feature_map)
         bi_resp = create_cluster_globals(Clusters.BasicInformation, 0)
-        bi_resp[Clusters.BasicInformation.Attributes.SpecificationVersion] = spec_version
+
+        if spec_version is not None:
+            bi_resp[Clusters.BasicInformation.Attributes.SpecificationVersion] = spec_version
 
         self.endpoints = {0: {Clusters.GeneralCommissioning: gc_resp, Clusters.BasicInformation: bi_resp}}
         self.endpoints_tlv = {0: {Clusters.GeneralCommissioning.id: get_tlv(
@@ -121,23 +137,54 @@ class TestSpecParsingSelection(MatterBaseTest, DeviceConformanceTests):
         success, problems = self.check_conformance(ignore_in_progress=False, is_ci=False, allow_provisional=False)
         problem_strs = [str(p) for p in problems]
         problem_str = "\n".join(problem_strs)
+        spec_version_str = f'{spec_version:08X}' if spec_version is not None else "None (1.2)"
         asserts.assert_equal(success, expect_success_conformance,
-                             f"Improper conformance result for spec version {spec_version:08X}, TC: {tc_enabled} problems: {problem_str}")
+                             f"Improper conformance result for spec version {spec_version_str}, TC: {tc_enabled} problems: {problem_str}")
 
         success, problems = self.check_revisions(ignore_in_progress=False)
         asserts.assert_equal(success, expect_success_revisions,
-                             f"Improper revision result for spec version {spec_version:08X}, TC: {tc_enabled} problems: {problems}")
+                             f"Improper revision result for spec version {spec_version_str}, TC: {tc_enabled} problems: {problems}")
 
     def test_conformance(self):
-
+        # 1.2 is OK if TC is off. Note that 1.2 doesn't have a spec revision field, which is why ths is none.
+        # Below, we can use this to force a conformance error when this value is populated to prove the 1.2
+        # DM files are being properly selected.
+        self._run_conformance_against_device(spec_version=None, tc_enabled=False,
+                                             expect_success_conformance=True, expect_success_revisions=True)
+        # 1.3 is OK if TC is off
+        self._run_conformance_against_device(spec_version=0x01030000, tc_enabled=False,
+                                             expect_success_conformance=True, expect_success_revisions=True)
         # 1.4 is OK if TC is off
-        self._run_conformance_against_device(0x01040000, False, expect_success_conformance=True, expect_success_revisions=True)
+        self._run_conformance_against_device(spec_version=0x01040000, tc_enabled=False,
+                                             expect_success_conformance=True, expect_success_revisions=True)
         # 1.4.1 is OK if TC is off
-        self._run_conformance_against_device(0x01040100, False, expect_success_conformance=True, expect_success_revisions=True)
+        self._run_conformance_against_device(spec_version=0x01040100, tc_enabled=False,
+                                             expect_success_conformance=True, expect_success_revisions=True)
+        # 1.4.2 is OK if TC is off
+        self._run_conformance_against_device(spec_version=0x01040200, tc_enabled=False,
+                                             expect_success_conformance=True, expect_success_revisions=True)
+        # 1.5 is OK if TC is off
+        self._run_conformance_against_device(spec_version=0x01050000, tc_enabled=False,
+                                             expect_success_conformance=True, expect_success_revisions=True)
+
+        # 1.5 is OK if TC is on
+        self._run_conformance_against_device(spec_version=0x01050000, tc_enabled=True,
+                                             expect_success_conformance=True, expect_success_revisions=True)
+        # 1.4.2 is OK if TC is on
+        self._run_conformance_against_device(spec_version=0x01040200, tc_enabled=True,
+                                             expect_success_conformance=True, expect_success_revisions=True)
         # 1.4.1 is OK if TC is on
-        self._run_conformance_against_device(0x01040100, True, expect_success_conformance=True, expect_success_revisions=True)
+        self._run_conformance_against_device(spec_version=0x01040100, tc_enabled=True,
+                                             expect_success_conformance=True, expect_success_revisions=True)
         # 1.4 is NOT OK if TC is on
-        self._run_conformance_against_device(0x01040000, True, expect_success_conformance=False, expect_success_revisions=True)
+        self._run_conformance_against_device(spec_version=0x01040000, tc_enabled=True,
+                                             expect_success_conformance=False, expect_success_revisions=True)
+        # 1.3 is NOT OK if TC is on
+        self._run_conformance_against_device(spec_version=0x01030000, tc_enabled=True,
+                                             expect_success_conformance=False, expect_success_revisions=True)
+        # 1.2 is NOT OK if TC is on
+        self._run_conformance_against_device(spec_version=None, tc_enabled=True,
+                                             expect_success_conformance=False, expect_success_revisions=True)
 
         # Check that we get a test failure on a bad spec revision
         self._create_device(0xFFFFFFFF, False)

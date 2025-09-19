@@ -23,4 +23,5 @@ chip_data_model("light-switch-common") {
     zap_file = "light-switch-app.zap"
   }
   is_server = true
+  public_deps = [ "${chip_root}/src/app/clusters/bindings:binding-manager" ]
 }

@@ -17540,7 +17540,7 @@ public class ClusterIDMapping {
             MaxEncodedPixelRate(1L),
             VideoSensorParams(2L),
             NightVisionUsesInfrared(3L),
-            MinViewport(4L),
+            MinViewportResolution(4L),
             RateDistortionTradeOffPoints(5L),
             MaxContentBufferSize(6L),
             MicrophoneCapabilities(7L),
@@ -17683,7 +17683,7 @@ public class ClusterIDMapping {
                         }
                         throw new NoSuchFieldError();
                     }
-                }public enum VideoStreamAllocateCommandField {StreamUsage(0),VideoCodec(1),MinFrameRate(2),MaxFrameRate(3),MinResolution(4),MaxResolution(5),MinBitRate(6),MaxBitRate(7),MinKeyFrameInterval(8),MaxKeyFrameInterval(9),WatermarkEnabled(10),OSDEnabled(11),;
+                }public enum VideoStreamAllocateCommandField {StreamUsage(0),VideoCodec(1),MinFrameRate(2),MaxFrameRate(3),MinResolution(4),MaxResolution(5),MinBitRate(6),MaxBitRate(7),KeyFrameInterval(8),WatermarkEnabled(9),OSDEnabled(10),;
                     private final int id;
                     VideoStreamAllocateCommandField(int id) {
                         this.id = id;
@@ -17865,6 +17865,7 @@ public class ClusterIDMapping {
             TiltMax(6L),
             PanMin(7L),
             PanMax(8L),
+            MovementState(9L),
             GeneratedCommandList(65528L),
             AcceptedCommandList(65529L),
             AttributeList(65531L),
@@ -18158,7 +18159,7 @@ public class ClusterIDMapping {
                 }
                 throw new NoSuchFieldError();
             }
-        }public enum SolicitOfferCommandField {StreamUsage(0),OriginatingEndpointID(1),VideoStreamID(2),AudioStreamID(3),ICEServers(4),ICETransportPolicy(5),MetadataEnabled(6),;
+        }public enum SolicitOfferCommandField {StreamUsage(0),OriginatingEndpointID(1),VideoStreamID(2),AudioStreamID(3),ICEServers(4),ICETransportPolicy(5),MetadataEnabled(6),SFrameConfig(7),;
                     private final int id;
                     SolicitOfferCommandField(int id) {
                         this.id = id;
@@ -18175,7 +18176,7 @@ public class ClusterIDMapping {
                         }
                         throw new NoSuchFieldError();
                     }
-                }public enum ProvideOfferCommandField {WebRTCSessionID(0),Sdp(1),StreamUsage(2),OriginatingEndpointID(3),VideoStreamID(4),AudioStreamID(5),ICEServers(6),ICETransportPolicy(7),MetadataEnabled(8),;
+                }public enum ProvideOfferCommandField {WebRTCSessionID(0),Sdp(1),StreamUsage(2),OriginatingEndpointID(3),VideoStreamID(4),AudioStreamID(5),ICEServers(6),ICETransportPolicy(7),MetadataEnabled(8),SFrameConfig(9),;
                     private final int id;
                     ProvideOfferCommandField(int id) {
                         this.id = id;
@@ -18592,7 +18593,7 @@ public class ClusterIDMapping {
                         }
                         throw new NoSuchFieldError();
                     }
-                }public enum ManuallyTriggerTransportCommandField {ConnectionID(0),ActivationReason(1),TimeControl(2),;
+                }public enum ManuallyTriggerTransportCommandField {ConnectionID(0),ActivationReason(1),TimeControl(2),UserDefined(3),;
                     private final int id;
                     ManuallyTriggerTransportCommandField(int id) {
                         this.id = id;
@@ -19841,7 +19842,7 @@ public class ClusterIDMapping {
             FindRootCertificate(2L),
             LookupRootCertificate(4L),
             RemoveRootCertificate(6L),
-            TLSClientCSR(7L),
+            ClientCSR(7L),
             ProvisionClientCertificate(9L),
             FindClientCertificate(10L),
             LookupClientCertificate(12L),
@@ -19931,24 +19932,24 @@ public class ClusterIDMapping {
                         }
                         throw new NoSuchFieldError();
                     }
-                }public enum TLSClientCSRCommandField {Nonce(0),;
+                }public enum ClientCSRCommandField {Nonce(0),Ccdid(1),;
                     private final int id;
-                    TLSClientCSRCommandField(int id) {
+                    ClientCSRCommandField(int id) {
                         this.id = id;
                     }
 
                     public int getID() {
                         return id;
                     }
-                    public static TLSClientCSRCommandField value(int id) throws NoSuchFieldError {
-                        for (TLSClientCSRCommandField field : TLSClientCSRCommandField.values()) {
+                    public static ClientCSRCommandField value(int id) throws NoSuchFieldError {
+                        for (ClientCSRCommandField field : ClientCSRCommandField.values()) {
                         if (field.getID() == id) {
                             return field;
                         }
                         }
                         throw new NoSuchFieldError();
                     }
-                }public enum ProvisionClientCertificateCommandField {Ccdid(0),ClientCertificateDetails(1),;
+                }public enum ProvisionClientCertificateCommandField {Ccdid(0),ClientCertificate(1),IntermediateCertificates(2),;
                     private final int id;
                     ProvisionClientCertificateCommandField(int id) {
                         this.id = id;
@@ -20314,7 +20315,7 @@ public class ClusterIDMapping {
         public enum Attribute {
             MeteredQuantity(0L),
             MeteredQuantityTimestamp(1L),
-            MeasurementType(2L),
+            TariffUnit(2L),
             MaximumMeteredQuantities(3L),
             GeneratedCommandList(65528L),
             AcceptedCommandList(65529L),

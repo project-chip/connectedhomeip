@@ -17,7 +17,7 @@ cmake_minimum_required(VERSION 3.13.1)
 
 get_filename_component(CHIP_ROOT ${CMAKE_CURRENT_SOURCE_DIR}/../third_party/connectedhomeip REALPATH)
 get_filename_component(GEN_DIR ${CHIP_ROOT}/zzz_generated/ REALPATH)
-get_filename_component(ZEPHYR_PLATFORM_COMMON ${CHIP_ROOT}/examples/platform/zephyr REALPATH)
+get_filename_component(ZEPHYR_PLATFORM_COMMON ${CHIP_ROOT}/examples/platform/silabs/zephyr REALPATH)
 get_filename_component(SILABS_LIGHTING_COMMON ${CHIP_ROOT}/examples/lighting-app/silabs REALPATH)
 get_filename_component(ALL_CLUSTERS_COMMON_DIR ${CHIP_ROOT}/examples/all-clusters-app/all-clusters-common REALPATH)
 
@@ -43,19 +43,18 @@ include(${CHIP_ROOT}/src/app/chip_data_model.cmake)
 target_include_directories(app
     PRIVATE
     include
-    ${ZEPHYR_PLATFORM_COMMON}/include
+    ${ZEPHYR_PLATFORM_COMMON}
 )
 
 target_sources(app
     PRIVATE
     src/AppTask.cpp
     ../include/CHIPProjectConfig.h
-    ${ZEPHYR_PLATFORM_COMMON}/source/main.cpp
-    ${ZEPHYR_PLATFORM_COMMON}/source/AppTaskBase.cpp
-    ${ZEPHYR_PLATFORM_COMMON}/source/AppTaskZephyr.cpp
-    ${ZEPHYR_PLATFORM_COMMON}/source/CHIPDeviceManager.cpp
-    ${ZEPHYR_PLATFORM_COMMON}/source/CommonDeviceCallbacks.cpp
-    ${ZEPHYR_PLATFORM_COMMON}/source/DeviceCallbacks.cpp
+    ${ZEPHYR_PLATFORM_COMMON}/main.cpp
+    ${ZEPHYR_PLATFORM_COMMON}/AppTaskBase.cpp
+    ${ZEPHYR_PLATFORM_COMMON}/AppTaskZephyr.cpp
+    ${ZEPHYR_PLATFORM_COMMON}/CHIPDeviceManager.cpp
+    ${ZEPHYR_PLATFORM_COMMON}/CommonDeviceCallbacks.cpp
 )
 
 # TODO Implement OTA support
@@ -86,8 +85,7 @@ if(CONFIG_CHIP_LIB_SHELL)
                                ${ZEPHYR_PLATFORM_COMMON}/include
     )
     target_sources(app PRIVATE
-                   ${ZEPHYR_PLATFORM_COMMON}/source/AppCLIBase.cpp
-                   ${ZEPHYR_PLATFORM_COMMON}/source/AppCLIZephyr.cpp
+                   ${ZEPHYR_PLATFORM_COMMON}/AppCLIZephyr.cpp
                    ${CHIP_ROOT}/examples/shell/shell_common/cmd_misc.cpp
                    ${CHIP_ROOT}/examples/shell/shell_common/cmd_otcli.cpp
                    ${CHIP_ROOT}/examples/shell/shell_common/cmd_server.cpp

@@ -1005,7 +1005,7 @@ exit:
 
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(DeviceLayer, "GetAndLogThreadTopologyFull failed: %s", ErrorStr(err));
+        ChipLogError(DeviceLayer, "GetAndLogThreadTopologyFull failed: %" CHIP_ERROR_FORMAT, err.Format());
     }
 #endif // CHIP_PROGRESS_LOGGING
     return err;
@@ -1881,7 +1881,7 @@ void GenericThreadStackManagerImpl_OpenThread<ImplClass>::OnDnsBrowseResult(otEr
 {
     CHIP_ERROR error;
     // type buffer size is kDnssdTypeAndProtocolMaxSize + . + kMaxDomainNameSize + . + termination character
-    char type[Dnssd::kDnssdTypeAndProtocolMaxSize + SrpClient::kMaxDomainNameSize + 3];
+    char type[Dnssd::kDnssdFullTypeAndProtocolMaxSize + SrpClient::kMaxDomainNameSize + 3];
     // hostname buffer size is kHostNameMaxLength + . + kMaxDomainNameSize + . + termination character
     char hostname[Dnssd::kHostNameMaxLength + SrpClient::kMaxDomainNameSize + 3];
     // secure space for the raw TXT data in the worst-case scenario relevant for Matter:

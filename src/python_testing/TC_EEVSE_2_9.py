@@ -42,18 +42,19 @@
 
 import logging
 
-import chip.clusters as Clusters
-from chip.clusters.Types import NullValue
-from chip.testing.event_attribute_reporting import EventSubscriptionHandler
-from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from mobly import asserts
 from TC_EEVSE_Utils import EEVSEBaseTestHelper
+
+import matter.clusters as Clusters
+from matter.clusters.Types import NullValue
+from matter.testing.event_attribute_reporting import EventSubscriptionHandler
+from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 
 logger = logging.getLogger(__name__)
 
 
 class TC_EEVSE_2_9(MatterBaseTest, EEVSEBaseTestHelper):
-    """This test case verifies the primary functionality of the Energy EVSE Cluster server 
+    """This test case verifies the primary functionality of the Energy EVSE Cluster server
     with the optional RFID feature supported."""
 
     def desc_TC_EEVSE_2_9(self) -> str:

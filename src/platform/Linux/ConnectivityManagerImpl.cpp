@@ -528,7 +528,7 @@ void ConnectivityManagerImpl::_OnWpaInterfaceProxyReady(GObject * sourceObject, 
         CHIP_ERROR errInner = StopAutoScan();
         if (errInner != CHIP_NO_ERROR)
         {
-            ChipLogError(DeviceLayer, "wpa_supplicant: Failed to stop auto scan: %s", ErrorStr(errInner));
+            ChipLogError(DeviceLayer, "wpa_supplicant: Failed to stop auto scan: %" CHIP_ERROR_FORMAT, errInner.Format());
         }
     });
 }
@@ -825,7 +825,18 @@ CHIP_ERROR ConnectivityManagerImpl::_WiFiPAFCancelPublish(uint32_t PublishId)
 
     ChipLogProgress(DeviceLayer, "WiFi-PAF: cancel publish_id: %d ! ", PublishId);
     std::lock_guard<std::mutex> lock(mWpaSupplicantMutex);
-    wpa_supplicant_1_interface_call_nancancel_publish_sync(mWpaSupplicant.iface.get(), PublishId, nullptr, &err.GetReceiver());
+
+    VerifyOrReturnError(mWpaSupplicant.iface, CHIP_ERROR_INTERNAL,
+                        ChipLogError(DeviceLayer, "WiFi-PAF: Skip D-Bus 'cancel publish' call since wpa_supplicant is not ready"));
+
+    gboolean result =
+        wpa_supplicant_1_interface_call_nancancel_publish_sync(mWpaSupplicant.iface.get(), PublishId, nullptr, &err.GetReceiver());
+
+    // TODO #40814: make sure that the callers do check the return values. This doesn't seem to be happening now.
+    VerifyOrReturnError(
+        result, CHIP_ERROR_INTERNAL,
+        ChipLogError(DeviceLayer, "WiFi-PAF: Failed to Cancel Publish with Error: %s", err ? err->message : "unknown error"));
+
     return CHIP_NO_ERROR;
 }
 #endif
@@ -947,7 +958,7 @@ exit:
     if (err != CHIP_NO_ERROR)
     {
         SetWiFiAPMode(kWiFiAPMode_Disabled);
-        ChipLogError(DeviceLayer, "Drive AP state failed: %s", ErrorStr(err));
+        ChipLogError(DeviceLayer, "Drive AP state failed: %" CHIP_ERROR_FORMAT, err.Format());
     }
 }
 
@@ -2062,16 +2073,13 @@ bool ConnectivityManagerImpl::_GetBssInfo(const gchar * bssPath, NetworkCommissi
         return false;
     }
 
-    const guchar * ssidStr       = nullptr;
-    const guchar * bssidBuf      = nullptr;
-    char bssidStr[2 * 6 + 5 + 1] = { 0 };
     gsize ssidLen                = 0;
     gsize bssidLen               = 0;
-    gint16 signal                = wpa_supplicant_1_bss_get_signal(bss.get());
-    guint16 frequency            = wpa_supplicant_1_bss_get_frequency(bss.get());
-
-    ssidStr  = reinterpret_cast<const guchar *>(g_variant_get_fixed_array(ssid.get(), &ssidLen, sizeof(guchar)));
-    bssidBuf = reinterpret_cast<const guchar *>(g_variant_get_fixed_array(bssid.get(), &bssidLen, sizeof(guchar)));
+    char bssidStr[2 * 6 + 5 + 1] = { 0 };
+    auto ssidStr      = reinterpret_cast<const uint8_t *>(g_variant_get_fixed_array(ssid.get(), &ssidLen, sizeof(uint8_t)));
+    auto bssidBuf     = reinterpret_cast<const uint8_t *>(g_variant_get_fixed_array(bssid.get(), &bssidLen, sizeof(uint8_t)));
+    gint16 signal     = wpa_supplicant_1_bss_get_signal(bss.get());
+    guint16 frequency = wpa_supplicant_1_bss_get_frequency(bss.get());
 
     if (bssidLen == 6)
     {
@@ -2080,11 +2088,11 @@ bool ConnectivityManagerImpl::_GetBssInfo(const gchar * bssPath, NetworkCommissi
     }
     else
     {
+        ChipLogError(DeviceLayer, "WPA supplicant: Got a network with incorrect BSSID len: %zd != 6", bssidLen);
         bssidLen = 0;
-        ChipLogError(DeviceLayer, "Got a network with bssid not equals to 6");
     }
-    ChipLogDetail(DeviceLayer, "Network Found: %.*s (%s) Signal:%d", int(ssidLen), StringOrNullMarker((const gchar *) ssidStr),
-                  bssidStr, signal);
+    ChipLogDetail(DeviceLayer, "Network Found: %s (%s) Signal:%d",
+                  NullTerminated(StringOrNullMarker((const gchar *) ssidStr), ssidLen).c_str(), bssidStr, signal);
 
     // A flag for enterprise encryption option to avoid returning open for these networks by mistake
     // TODO: The following code will mistakenly recognize WEP encryption as OPEN network, this should be fixed by reading
@@ -2204,8 +2212,7 @@ void ConnectivityManagerImpl::_OnWpaInterfaceScanDone(WpaSupplicant1Interface * 
 {
     ChipLogProgress(DeviceLayer, "wpa_supplicant: network scan done");
 
-    char ** bsss    = wpa_supplicant_1_interface_dup_bsss(iface);
-    char ** oldBsss = bsss;
+    const char * const * bsss = wpa_supplicant_1_interface_get_bsss(iface);
     if (bsss == nullptr)
     {
         ChipLogProgress(DeviceLayer, "wpa_supplicant: no network found");
@@ -2220,16 +2227,13 @@ void ConnectivityManagerImpl::_OnWpaInterfaceScanDone(WpaSupplicant1Interface * 
     }
 
     std::vector<WiFiScanResponse> * networkScanned = new std::vector<WiFiScanResponse>();
-    for (const gchar * bssPath = (bsss != nullptr ? *bsss : nullptr); bssPath != nullptr; bssPath = *(++bsss))
+    for (const char * bssPath = (bsss != nullptr ? *bsss : nullptr); bssPath != nullptr; bssPath = *(++bsss))
     {
         WiFiScanResponse network;
         if (_GetBssInfo(bssPath, network))
         {
-            if (sInterestedSSIDLen == 0)
-            {
-                networkScanned->push_back(network);
-            }
-            else if (network.ssidLen == sInterestedSSIDLen && memcmp(network.ssid, sInterestedSSID, sInterestedSSIDLen) == 0)
+            if (sInterestedSSIDLen == 0 ||
+                (network.ssidLen == sInterestedSSIDLen && memcmp(network.ssid, sInterestedSSID, sInterestedSSIDLen) == 0))
             {
                 networkScanned->push_back(network);
             }
@@ -2237,20 +2241,17 @@ void ConnectivityManagerImpl::_OnWpaInterfaceScanDone(WpaSupplicant1Interface * 
     }
 
     DeviceLayer::SystemLayer().ScheduleLambda([this, networkScanned]() {
-        // Note: We cannot post a event in ScheduleLambda since std::vector is not trivial copiable. This results in the use of
-        // const_cast but should be fine for almost all cases, since we actually handled the ownership of this element to this
-        // lambda.
+        // Note: We cannot post an event in ScheduleLambda since std::vector is not trivial copyable.
         if (mpScanCallback != nullptr)
         {
-            LinuxScanResponseIterator<WiFiScanResponse> iter(const_cast<std::vector<WiFiScanResponse> *>(networkScanned));
+            LinuxScanResponseIterator<WiFiScanResponse> iter(networkScanned);
             mpScanCallback->OnFinished(Status::kSuccess, CharSpan(), &iter);
             mpScanCallback = nullptr;
         }
 
-        delete const_cast<std::vector<WiFiScanResponse> *>(networkScanned);
+        delete networkScanned;
     });
 
-    g_strfreev(oldBsss);
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
     mPafChannelAvailable = true;
 #endif

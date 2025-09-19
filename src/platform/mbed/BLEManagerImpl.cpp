@@ -235,7 +235,7 @@ class GapEventHandler : private mbed::NonCopyable<GapEventHandler>, public ble::
             CHIP_ERROR err = sConnectionInfo.setStatus(event.getConnectionHandle(), BLE_GATT_MTU_SIZE_DEFAULT);
             if (err != CHIP_NO_ERROR)
             {
-                ChipLogError(DeviceLayer, "Unable to store connection status, error: %s ", ErrorStr(err));
+                ChipLogError(DeviceLayer, "Unable to store connection status, error: %" CHIP_ERROR_FORMAT, err.Format());
             }
         }
         else
@@ -285,7 +285,7 @@ class GapEventHandler : private mbed::NonCopyable<GapEventHandler>, public ble::
         CHIP_ERROR err = sConnectionInfo.clearStatus(event.getConnectionHandle());
         if (err != CHIP_NO_ERROR)
         {
-            ChipLogError(DeviceLayer, "Unable to clear connection status, error: %s ", ErrorStr(err));
+            ChipLogError(DeviceLayer, "Unable to clear connection status, error: %" CHIP_ERROR_FORMAT, err.Format());
         }
 
         ChipDeviceEvent chip_event;
@@ -410,7 +410,7 @@ struct CHIPService : public ble::GattServer::EventHandler
         CHIP_ERROR err = sConnectionInfo.setStatus(connectionHandle, attMtuSize);
         if (err != CHIP_NO_ERROR)
         {
-            ChipLogError(DeviceLayer, "Unable to store connection status, error: %s ", ErrorStr(err));
+            ChipLogError(DeviceLayer, "Unable to store connection status, error: %" CHIP_ERROR_FORMAT, err.Format());
         }
     }
 
@@ -640,7 +640,7 @@ void BLEManagerImpl::HandleInitComplete(bool no_error)
 exit:
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(DeviceLayer, "BLEManager init error: %s ", ErrorStr(err));
+        ChipLogError(DeviceLayer, "BLEManager init error: %" CHIP_ERROR_FORMAT, err.Format());
         ChipLogError(DeviceLayer, "Disabling CHIPoBLE service.");
         mServiceMode = ConnectivityManager::kCHIPoBLEServiceMode_Disabled;
         mInitialized = false;
@@ -692,7 +692,7 @@ void BLEManagerImpl::DriveBLEState()
 exit:
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(DeviceLayer, "Disabling CHIPoBLE service due to error: %s", ErrorStr(err));
+        ChipLogError(DeviceLayer, "Disabling CHIPoBLE service due to error: %" CHIP_ERROR_FORMAT, err.Format());
         mServiceMode = ConnectivityManager::kCHIPoBLEServiceMode_Disabled;
     }
 }

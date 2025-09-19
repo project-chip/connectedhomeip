@@ -5,6 +5,7 @@
 #pragma once
 
 #include <app/data-model-provider/MetadataTypes.h>
+#include <array>
 #include <lib/core/DataModelTypes.h>
 
 #include <cstdint>
@@ -19,6 +20,7 @@ namespace ColorControl {
 inline constexpr uint32_t kRevision = 7;
 
 namespace Attributes {
+
 namespace CurrentHue {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(CurrentHue::Id, BitFlags<DataModel::AttributeQualityFlags>(),
                                                           Access::Privilege::kView, std::nullopt);
@@ -137,47 +139,47 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry(Primary6Intensity::Id,
 } // namespace Primary6Intensity
 namespace WhitePointX {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(WhitePointX::Id, BitFlags<DataModel::AttributeQualityFlags>(),
-                                                          Access::Privilege::kView, Access::Privilege::kManage);
+                                                          Access::Privilege::kView, std::nullopt);
 } // namespace WhitePointX
 namespace WhitePointY {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(WhitePointY::Id, BitFlags<DataModel::AttributeQualityFlags>(),
-                                                          Access::Privilege::kView, Access::Privilege::kManage);
+                                                          Access::Privilege::kView, std::nullopt);
 } // namespace WhitePointY
 namespace ColorPointRX {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(ColorPointRX::Id, BitFlags<DataModel::AttributeQualityFlags>(),
-                                                          Access::Privilege::kView, Access::Privilege::kManage);
+                                                          Access::Privilege::kView, std::nullopt);
 } // namespace ColorPointRX
 namespace ColorPointRY {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(ColorPointRY::Id, BitFlags<DataModel::AttributeQualityFlags>(),
-                                                          Access::Privilege::kView, Access::Privilege::kManage);
+                                                          Access::Privilege::kView, std::nullopt);
 } // namespace ColorPointRY
 namespace ColorPointRIntensity {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(ColorPointRIntensity::Id, BitFlags<DataModel::AttributeQualityFlags>(),
-                                                          Access::Privilege::kView, Access::Privilege::kManage);
+                                                          Access::Privilege::kView, std::nullopt);
 } // namespace ColorPointRIntensity
 namespace ColorPointGX {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(ColorPointGX::Id, BitFlags<DataModel::AttributeQualityFlags>(),
-                                                          Access::Privilege::kView, Access::Privilege::kManage);
+                                                          Access::Privilege::kView, std::nullopt);
 } // namespace ColorPointGX
 namespace ColorPointGY {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(ColorPointGY::Id, BitFlags<DataModel::AttributeQualityFlags>(),
-                                                          Access::Privilege::kView, Access::Privilege::kManage);
+                                                          Access::Privilege::kView, std::nullopt);
 } // namespace ColorPointGY
 namespace ColorPointGIntensity {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(ColorPointGIntensity::Id, BitFlags<DataModel::AttributeQualityFlags>(),
-                                                          Access::Privilege::kView, Access::Privilege::kManage);
+                                                          Access::Privilege::kView, std::nullopt);
 } // namespace ColorPointGIntensity
 namespace ColorPointBX {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(ColorPointBX::Id, BitFlags<DataModel::AttributeQualityFlags>(),
-                                                          Access::Privilege::kView, Access::Privilege::kManage);
+                                                          Access::Privilege::kView, std::nullopt);
 } // namespace ColorPointBX
 namespace ColorPointBY {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(ColorPointBY::Id, BitFlags<DataModel::AttributeQualityFlags>(),
-                                                          Access::Privilege::kView, Access::Privilege::kManage);
+                                                          Access::Privilege::kView, std::nullopt);
 } // namespace ColorPointBY
 namespace ColorPointBIntensity {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(ColorPointBIntensity::Id, BitFlags<DataModel::AttributeQualityFlags>(),
-                                                          Access::Privilege::kView, Access::Privilege::kManage);
+                                                          Access::Privilege::kView, std::nullopt);
 } // namespace ColorPointBIntensity
 namespace EnhancedCurrentHue {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(EnhancedCurrentHue::Id, BitFlags<DataModel::AttributeQualityFlags>(),
@@ -233,10 +235,16 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry(StartUpColorTemperatur
                                                           BitFlags<DataModel::AttributeQualityFlags>(), Access::Privilege::kView,
                                                           Access::Privilege::kManage);
 } // namespace StartUpColorTemperatureMireds
+constexpr std::array<DataModel::AttributeEntry, 5> kMandatoryMetadata = {
+    ColorMode::kMetadataEntry,         Options::kMetadataEntry,           NumberOfPrimaries::kMetadataEntry,
+    EnhancedColorMode::kMetadataEntry, ColorCapabilities::kMetadataEntry,
+
+};
 
 } // namespace Attributes
 
 namespace Commands {
+
 namespace MoveToHue {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(MoveToHue::Id, BitFlags<DataModel::CommandQualityFlags>(),
                                                                 Access::Privilege::kOperate);
@@ -315,6 +323,8 @@ inline constexpr DataModel::AcceptedCommandEntry
 } // namespace StepColorTemperature
 
 } // namespace Commands
+
+namespace Events {} // namespace Events
 } // namespace ColorControl
 } // namespace Clusters
 } // namespace app

@@ -26,7 +26,7 @@
 
 #ifdef SL_WIFI
 #include <platform/silabs/NetworkCommissioningWiFiDriver.h>
-#include <platform/silabs/wifi/WifiInterface.h>
+#include <platform/silabs/wifi/WifiInterface.h> // nogncheck
 
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
 #include <platform/silabs/wifi/icd/WifiSleepManager.h> // nogncheck
@@ -87,7 +87,6 @@ static chip::DeviceLayer::Internal::Efr32PsaOperationalKeystore gOperationalKeys
 #include <platform/silabs/platformAbstraction/SilabsPlatform.h>
 
 #include <app/clusters/network-commissioning/network-commissioning.h>
-
 /**********************************************************
  * Defines
  *********************************************************/
@@ -174,7 +173,7 @@ constexpr osThreadAttr_t kMainTaskAttr = { .name       = "main",
 #ifdef SLI_SI91X_MCU_INTERFACE
                                            .priority = osPriorityRealtime4
 #else
-                                           .priority = osPriorityRealtime7
+                                           .priority = osPriorityRealtime5 // Must be above BLE Link Layer priority
 #endif // SLI_SI91X_MCU_INTERFACE
 };
 osThreadId_t sMainTaskHandle;
@@ -226,13 +225,6 @@ CHIP_ERROR SilabsMatterConfig::InitMatter(const char * appName)
 {
     using namespace chip::DeviceLayer::Silabs;
 
-    CHIP_ERROR err;
-#ifdef SL_WIFI
-    // Because OpenThread needs to use memory allocation during its Key operations, we initialize the memory management for thread
-    // and set the allocation functions inside sl_ot_create_instance, which is called by sl_system_init in the OpenThread stack
-    // initialization.
-    mbedtls_platform_set_calloc_free(CHIPPlatformMemoryCalloc, CHIPPlatformMemoryFree);
-#endif
     ChipLogProgress(DeviceLayer, "==================================================");
     ChipLogProgress(DeviceLayer, "%s starting", appName);
     ChipLogProgress(DeviceLayer, "==================================================");
@@ -252,9 +244,11 @@ CHIP_ERROR SilabsMatterConfig::InitMatter(const char * appName)
 
 #ifdef SL_WIFI
     // Init Chip memory management before the stack
-    // See comment above about OpenThread memory allocation as to why this is WIFI only here.
+    // Because OpenThread needs to use memory allocation during its Key operations, we initialize the memory management for thread
+    // and set the allocation functions inside sl_ot_create_instance, which is called earlier by sl_system_init.
+    mbedtls_platform_set_calloc_free(CHIPPlatformMemoryCalloc, CHIPPlatformMemoryFree);
     ReturnErrorOnFailure(chip::Platform::MemoryInit());
-    ReturnErrorOnFailure(InitWiFi());
+    ReturnErrorOnFailure(WifiInterface::GetInstance().InitWiFiStack());
 
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
     ReturnErrorOnFailure(WifiSleepManager::GetInstance().Init(&WifiInterface::GetInstance(), &WifiInterface::GetInstance()));
@@ -272,16 +266,28 @@ CHIP_ERROR SilabsMatterConfig::InitMatter(const char * appName)
     SetCommissionableDataProvider(&provision.GetStorage());
     ChipLogProgress(DeviceLayer, "Provision mode %s", provision.IsProvisionRequired() ? "ENABLED" : "disabled");
 
+    // Create initParams with SDK example defaults here
+    // TODO: replace with our own init param to avoid double allocation in examples
+    static chip::CommonCaseDeviceServerInitParams initParams;
+
 #if CHIP_ENABLE_OPENTHREAD
     ReturnErrorOnFailure(InitOpenThread());
+
+    // Set up OpenThread configuration when OpenThread is included
+    chip::Inet::EndPointStateOpenThread::OpenThreadEndpointInitParam nativeParams;
+    nativeParams.lockCb                = LockOpenThreadTask;
+    nativeParams.unlockCb              = UnlockOpenThreadTask;
+    nativeParams.openThreadInstancePtr = chip::DeviceLayer::ThreadStackMgrImpl().OTInstance();
+    initParams.endpointNativeParams    = static_cast<void *>(&nativeParams);
+#endif
+#ifdef SL_WIFI
+    // This must be initialized after InitWiFiStack and InitChipStack which enable communication between the TA an M4
+    // This is required for TA nvm access used by the sWifiNetworkDriver.
+    ReturnErrorOnFailure(sWifiNetworkDriver.Init());
 #endif
 
     // Stop Matter event handling while setting up resources
     chip::DeviceLayer::PlatformMgr().LockChipStack();
-
-    // Create initParams with SDK example defaults here
-    // TODO: replace with our own init param to avoid double allocation in examples
-    static chip::CommonCaseDeviceServerInitParams initParams;
 
     // Report scheduler and timer delegate instance
     static DefaultTimerDelegate sTimerDelegate;
@@ -308,21 +314,11 @@ CHIP_ERROR SilabsMatterConfig::InitMatter(const char * appName)
 #endif
 
     // Initialize the remaining (not overridden) providers to the SDK example defaults
-    (void) initParams.InitializeStaticResourcesBeforeServerInit();
+    ReturnErrorOnFailure(initParams.InitializeStaticResourcesBeforeServerInit());
     initParams.dataModelProvider = CodegenDataModelProviderInstance(initParams.persistentStorageDelegate);
-
-#if CHIP_ENABLE_OPENTHREAD
-    // Set up OpenThread configuration when OpenThread is included
-    chip::Inet::EndPointStateOpenThread::OpenThreadEndpointInitParam nativeParams;
-    nativeParams.lockCb                = LockOpenThreadTask;
-    nativeParams.unlockCb              = UnlockOpenThreadTask;
-    nativeParams.openThreadInstancePtr = chip::DeviceLayer::ThreadStackMgrImpl().OTInstance();
-    initParams.endpointNativeParams    = static_cast<void *>(&nativeParams);
-#endif
-
-    initParams.appDelegate = &BaseApplication::sAppDelegate;
+    initParams.appDelegate       = &BaseApplication::sAppDelegate;
     // Init Matter Server and Start Event Loop
-    err = chip::Server::GetInstance().Init(initParams);
+    CHIP_ERROR err = chip::Server::GetInstance().Init(initParams);
 
     chip::DeviceLayer::PlatformMgr().UnlockChipStack();
 
@@ -337,14 +333,6 @@ CHIP_ERROR SilabsMatterConfig::InitMatter(const char * appName)
 
     return CHIP_NO_ERROR;
 }
-
-#ifdef SL_WIFI
-CHIP_ERROR SilabsMatterConfig::InitWiFi(void)
-{
-    sWifiNetworkDriver.Init();
-    return WifiInterface::GetInstance().InitWiFiStack();
-}
-#endif // SL_WIFI
 
 // ================================================================================
 // FreeRTOS Callbacks

@@ -68,6 +68,11 @@ class TestXmlParser(unittest.TestCase):
                     <description>AttributeWithAccess</description>
                     <access op="read" role="operate" />
                     <access op="write" role="manage" />
+                </attribute> 
+                
+                <attribute side="server" code="33" type="INT8U" min="0" max="10" \
+                   reportable="true" default="0" writable="true" readable="false" optional="true">
+                   <description>WriteOnlyAttribute</description>
                 </attribute>
 
                 <command source="client" code="33" name="GetSomeData" response="GetSomeDataResponse" optional="true">
@@ -117,7 +122,14 @@ class TestXmlParser(unittest.TestCase):
                                          qualities=FieldQuality.OPTIONAL),
                                          qualities=AttributeQuality.READABLE | AttributeQuality.WRITABLE,
                                          readacl=AccessPrivilege.OPERATE,
-                                         writeacl=AccessPrivilege.MANAGE)
+                                         writeacl=AccessPrivilege.MANAGE),
+
+                                     Attribute(definition=Field(
+                                         data_type=DataType(
+                                             name='INT8U', min_value=0, max_value=10),
+                                         code=33, name='WriteOnlyAttribute',
+                                         qualities=FieldQuality.OPTIONAL),
+                                         qualities=AttributeQuality.WRITABLE)
                                  ],
                                  structs=[
                                      Struct(name='GetSomeDataRequest',
@@ -333,7 +345,8 @@ class TestXmlParser(unittest.TestCase):
             ])
         self.assertEqual(idl,
                          Idl(clusters=[
-                             Cluster(name='TestFeatures', code=20, bitmaps=[bitmap])
+                             Cluster(name='TestFeatures',
+                                     code=20, bitmaps=[bitmap])
                          ])),
 
     def testGlobalStruct(self):
@@ -377,7 +390,8 @@ class TestXmlParser(unittest.TestCase):
                                      attributes=[
                                          Attribute(
                                              definition=Field(
-                                                 data_type=DataType(name='int16u', min_value=4),
+                                                 data_type=DataType(
+                                                     name='int16u', min_value=4),
                                                  code=2,
                                                  name='SubjectsPerAccessControlEntry',
                                              ),

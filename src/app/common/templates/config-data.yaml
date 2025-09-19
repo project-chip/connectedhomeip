@@ -38,6 +38,7 @@ CommandHandlerInterfaceOnlyClusters:
     - Microwave Oven Control
     - Chime
     - Camera AV Stream Management
+    - Push AV Stream Transport
     - Commissioner Control
     - Commodity Price
     - Energy EVSE
@@ -58,6 +59,8 @@ CommandHandlerInterfaceOnlyClusters:
     - General Commissioning
     - General Diagnostics
     - Software Diagnostics
+    - Ethernet Network Diagnostics
+    - Group Key Management
     - Wi-Fi Network Diagnostics
     - Camera AV Settings User Level Management
     - Administrator Commissioning
@@ -65,24 +68,42 @@ CommandHandlerInterfaceOnlyClusters:
     - Closure Control
     - Closure Dimension
     - OTA Software Update Provider
+    - Commodity Tariff
     - Joint Fabric Administrator
+    - Zone Management
+    - Fixed Label
+    - Soil Measurement
+    - Basic Information
+    - Boolean State
 
 # We need a more configurable way of deciding which clusters have which init functions....
 # See https://github.com/project-chip/connectedhomeip/issues/4369
 ClustersWithInitFunctions:
+    - Administrator Commissioning
+    - Basic Information
+    - Boolean State
+    - Binding
     - Color Control
+    - Ethernet Network Diagnostics
+    - General Diagnostics
     - Groups
+    - Group Key Management
     - Identify
     - Level Control
     - Localization Configuration
+    - Mode Select
     - Occupancy Sensing
     - On/Off
+    - OTA Software Update Provider
     - Pump Configuration and Control
-    - Time Format Localization
-    - Thermostat
-    - Mode Select
+    - Push AV Stream Transport
     - Sample MEI
     - Scenes Management
+    - Software Diagnostics
+    - Thermostat
+    - Time Format Localization
+    - Wi-Fi Network Diagnostics
+    - Fixed Label
 
 ClustersWithAttributeChangedFunctions:
     - Bridged Device Basic Information
@@ -94,14 +115,24 @@ ClustersWithAttributeChangedFunctions:
     - Thermostat
 
 ClustersWithShutdownFunctions:
+    - Administrator Commissioning
     - Barrier Control
-    - On/Off
-    - Door Lock
-    - Level Control
+    - Basic Information
+    - Boolean State
+    - Binding
     - Color Control
+    - Door Lock
+    - General Diagnostics
+    - Level Control
+    - On/Off
+    - OTA Software Update Provider
+    - Push AV Stream Transport
     - Sample MEI
     - Scenes Management
+    - Software Diagnostics
     - Thermostat
+    - Wi-Fi Network Diagnostics
+    - Fixed Label
 
 ClustersWithPreAttributeChangeFunctions:
     - Door Lock

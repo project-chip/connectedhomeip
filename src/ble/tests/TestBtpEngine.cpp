@@ -612,4 +612,56 @@ TEST_F(TestBtpEngine, IsValidAckOnSequenceWraparound)
     EXPECT_EQ(receivedAck, invalidAckValue);
 }
 
+// Test that the initial sequence numbers are set correctly when the BtpEngine is initialized.
+TEST_F(TestBtpEngine, InitialSequenceNumbers)
+{
+    // inline function completely omitted from the LCOV report, no function symbols are generated.
+    EXPECT_EQ(mBtpEngine.GetLastReceivedSequenceNumber(), 0);
+    // inline function appears in the LCOV report as uncovered (red), even though is actually covered/executed in the test cases,
+    // function symbols are generated.
+    EXPECT_EQ(mBtpEngine.GetNewestUnackedSentSequenceNumber(), 0);
+}
+
+// Test that sending a packet updates the unacknowledged sequence number correctly,
+// and that receiving an acknowledgment updates the state as expected.
+TEST_F(TestBtpEngine, NewestUnackedSentSequenceNumberSend)
+{
+    // Create a 1-byte packet and fill it with data.
+    auto packet0 = System::PacketBufferHandle::New(10);
+    ASSERT_FALSE(packet0.IsNull());
+    packet0->SetDataLength(1);
+    auto * data0 = packet0->Start();
+    ASSERT_NE(data0, nullptr);
+    data0[0] = 0;
+
+    // Send the packet and check that the newest unacked sent sequence number is 0.
+    EXPECT_TRUE(mBtpEngine.HandleCharacteristicSend(packet0.Retain(), false));
+    EXPECT_EQ(mBtpEngine.GetNewestUnackedSentSequenceNumber(), 0);
+
+    // Confirm that there is unacknowledged data.
+    EXPECT_TRUE(mBtpEngine.ExpectingAck());
+
+    // Prepare an acknowledgment packet for sequence number 0.
+    uint8_t ackData[] = {
+        to_underlying(BtpEngine::HeaderFlags::kFragmentAck),
+        0x00,
+        0x01,
+    };
+
+    auto ackPacket = System::PacketBufferHandle::NewWithData(ackData, sizeof(ackData));
+
+    SequenceNumber_t seqNum;
+    bool didRecieveAck;
+
+    // Handle the acknowledgment and verify the result.
+    EXPECT_EQ(mBtpEngine.HandleCharacteristicReceived(std::move(ackPacket), seqNum, didRecieveAck), CHIP_NO_ERROR);
+    EXPECT_TRUE(didRecieveAck);
+    EXPECT_EQ(seqNum, 0);
+
+    // After acknowledgment, we are no longer expecting an ack
+    EXPECT_FALSE(mBtpEngine.ExpectingAck());
+    // After acknowledgment, the newest unacked sent sequence number should still be 0 (no new sends).
+    EXPECT_EQ(mBtpEngine.GetNewestUnackedSentSequenceNumber(), 0);
+}
+
 } // namespace

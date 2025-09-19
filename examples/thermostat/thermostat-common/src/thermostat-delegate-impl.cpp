@@ -318,27 +318,19 @@ ThermostatDelegate::AppendToThermostatSuggestionsList(const Structs::ThermostatS
     return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED;
 }
 
-CHIP_ERROR ThermostatDelegate::RemoveFromThermostatSuggestionsList(uint8_t uniqueID)
+CHIP_ERROR ThermostatDelegate::RemoveFromThermostatSuggestionsList(size_t indexToRemove)
 {
-    size_t uniqueIDMatchedIndex = mNextFreeIndexInThermostatSuggestionsList;
-    for (size_t index = 0; index < static_cast<size_t>(mNextFreeIndexInThermostatSuggestionsList); index++)
+    if (indexToRemove >= GetNumberOfThermostatSuggestions())
     {
-        if (mThermostatSuggestions[index].GetUniqueID() == uniqueID)
-        {
-            uniqueIDMatchedIndex = index;
-            break;
-        }
+        return CHIP_ERROR_INVALID_ARGUMENT;
     }
-    if (uniqueIDMatchedIndex == mNextFreeIndexInThermostatSuggestionsList)
-    {
-        return CHIP_ERROR_NOT_FOUND;
-    }
+
     // Shift elements to the left to fill the gap.
-    for (size_t index = uniqueIDMatchedIndex; index < static_cast<size_t>(mNextFreeIndexInThermostatSuggestionsList - 1); index++)
+    for (size_t index = indexToRemove; index < static_cast<size_t>(mNextFreeIndexInThermostatSuggestionsList - 1); index++)
     {
         mThermostatSuggestions[index] = mThermostatSuggestions[index + 1];
     }
-    if (uniqueIDMatchedIndex == mIndexOfCurrentSuggestion)
+    if (indexToRemove == mIndexOfCurrentSuggestion)
     {
         CancelExpirationTimer();
         SetCurrentThermostatSuggestion(GetMaxThermostatSuggestions());
@@ -347,52 +339,60 @@ CHIP_ERROR ThermostatDelegate::RemoveFromThermostatSuggestionsList(uint8_t uniqu
     return CHIP_NO_ERROR;
 }
 
-uint8_t ThermostatDelegate::GetUniqueID()
+bool ThermostatDelegate::HaveSuggestionWithID(uint8_t uniqueIDToFind)
+{
+    for (auto & suggestion : Span(mThermostatSuggestions, mNextFreeIndexInThermostatSuggestionsList))
+    {
+        if (uniqueIDToFind == suggestion.GetUniqueID())
+        {
+            return true;
+        }
+    }
+    return false;
+}
+
+CHIP_ERROR ThermostatDelegate::GetUniqueID(uint8_t & uniqueID)
 {
     uint8_t maxUniqueId = 0;
 
-    for (size_t index = 0; index < static_cast<size_t>(mNextFreeIndexInThermostatSuggestionsList); index++)
+    for (auto & suggestion : Span(mThermostatSuggestions, mNextFreeIndexInThermostatSuggestionsList))
     {
-        uint8_t uniqueID = mThermostatSuggestions[index].GetUniqueID();
-        if (uniqueID > maxUniqueId)
+        uint8_t existingUniqueID = suggestion.GetUniqueID();
+        if (existingUniqueID > maxUniqueId)
         {
-            maxUniqueId = uniqueID;
+            maxUniqueId = existingUniqueID;
         }
     }
 
-    // TODO: Fix this to return an id that does not truly exist in the list. e.g. If the list has uniqueID 0 and 255 this will
-    // incorrectly return 0 which exists in the list and is not unique.
-    return maxUniqueId + 1;
+    uniqueID = maxUniqueId + 1;
+
+    // If overflow occurs, check for next available uniqueID.
+    if (uniqueID == 0)
+    {
+        while (HaveSuggestionWithID(uniqueID))
+        {
+            uniqueID++;
+            if (uniqueID == UINT8_MAX)
+            {
+                return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED;
+            }
+        };
+    }
+    return CHIP_NO_ERROR;
 }
+
 /**
  * @brief Starts a timer to wait for the expiration of the current thermostat suggestion.
  *
  * @param[in] timeoutInSecs The timeout in seconds.
  */
-CHIP_ERROR ThermostatDelegate::StartExpirationTimer(uint32_t timeoutInSecs)
+CHIP_ERROR ThermostatDelegate::StartExpirationTimer(Seconds32 timeout)
 {
     ChipLogProgress(Zcl, "Starting timer to wait for %" PRIu32 "seconds for the current thermostat suggestion to expire",
-                    timeoutInSecs);
-    IsExpirationTimerRunning = true;
-    return DeviceLayer::SystemLayer().StartTimer(std::chrono::duration_cast<Milliseconds32>(Seconds32(timeoutInSecs)),
-                                                 TimerExpiredCallback, static_cast<void *>(this));
-}
-
-CHIP_ERROR ThermostatDelegate::RemoveExpiredSuggestions(uint32_t currentMatterEpochTimestampInSeconds)
-{
-    for (int i = static_cast<int>(GetNumberOfThermostatSuggestions()) - 1; i >= 0; i--)
-    {
-        ThermostatSuggestionStructWithOwnedMembers suggestion;
-        CHIP_ERROR err = GetThermostatSuggestionAtIndex(static_cast<size_t>(i), suggestion);
-        VerifyOrReturnError(err == CHIP_NO_ERROR, err);
-
-        if (suggestion.GetExpirationTime() < currentMatterEpochTimestampInSeconds)
-        {
-            err = RemoveFromThermostatSuggestionsList(suggestion.GetUniqueID());
-            VerifyOrReturnError(err == CHIP_NO_ERROR, err);
-        }
-    }
-    return CHIP_NO_ERROR;
+                    timeout.count());
+    mIsExpirationTimerRunning = true;
+    return DeviceLayer::SystemLayer().StartTimer(std::chrono::duration_cast<Milliseconds32>(timeout), TimerExpiredCallback,
+                                                 static_cast<void *>(this));
 }
 
 void ThermostatDelegate::TimerExpiredCallback(System::Layer * systemLayer, void * appState)
@@ -408,11 +408,11 @@ void ThermostatDelegate::TimerExpiredCallback(System::Layer * systemLayer, void 
 
 void ThermostatDelegate::CancelExpirationTimer()
 {
-    if (IsExpirationTimerRunning)
+    if (mIsExpirationTimerRunning)
     {
         ChipLogProgress(Zcl, "Cancelling expiration timer for the current thermostat suggestion");
         DeviceLayer::SystemLayer().CancelTimer(TimerExpiredCallback, static_cast<void *>(this));
-        IsExpirationTimerRunning = false;
+        mIsExpirationTimerRunning = false;
     }
 }
 
@@ -428,11 +428,10 @@ CHIP_ERROR ThermostatDelegate::ReEvaluateCurrentSuggestion()
         return err;
     }
 
-    // Remove all expired suggestions.
-    RemoveExpiredSuggestions(currentMatterEpochTimestampInSeconds);
+    Seconds32 currentMatterEpochTimestamp = Seconds32(currentMatterEpochTimestampInSeconds);
 
     // For the reference thermostat app, we will always choose a suggestion with the earliest effective time.
-    mIndexOfCurrentSuggestion = GetThermostatSuggestionIndexWithEarliestEffectiveTime(currentMatterEpochTimestampInSeconds);
+    mIndexOfCurrentSuggestion = GetThermostatSuggestionIndexWithEarliestEffectiveTime(currentMatterEpochTimestamp);
     SetCurrentThermostatSuggestion(mIndexOfCurrentSuggestion);
 
     DataModel::Nullable<ThermostatSuggestionStructWithOwnedMembers> nullableCurrentThermostatSuggestion;
@@ -450,22 +449,22 @@ CHIP_ERROR ThermostatDelegate::ReEvaluateCurrentSuggestion()
         MatterReportingAttributeChangeCallback(mEndpointId, Thermostat::Id, Attributes::ActivePresetHandle::Id);
         SetThermostatSuggestionNotFollowingReason(DataModel::NullNullable);
 
-        // Start a timer from the timestamp in currentMatterEpochTimestampInSeconds to the timestamp in the expiration time.
-        if (currentThermostatSuggestion.GetExpirationTime() > currentMatterEpochTimestampInSeconds)
+        // Start a timer from the timestamp in currentMatterEpochTimestamp to the timestamp in the expiration time.
+        if (currentThermostatSuggestion.GetExpirationTime() > currentMatterEpochTimestamp)
         {
-            StartExpirationTimer(currentThermostatSuggestion.GetExpirationTime() - currentMatterEpochTimestampInSeconds);
+            StartExpirationTimer(currentThermostatSuggestion.GetExpirationTime() - currentMatterEpochTimestamp);
         }
     }
 
     return CHIP_NO_ERROR;
 }
 
-size_t ThermostatDelegate::GetThermostatSuggestionIndexWithEarliestEffectiveTime(uint32_t currentMatterEpochTimestampInSeconds)
+size_t ThermostatDelegate::GetThermostatSuggestionIndexWithEarliestEffectiveTime(Seconds32 currentMatterEpochTimestamp)
 {
     uint8_t maxThermostatSuggestions = GetMaxThermostatSuggestions();
     VerifyOrReturnValue(GetNumberOfThermostatSuggestions() > 0, maxThermostatSuggestions);
 
-    uint32_t minEffectiveTimeValue         = UINT32_MAX;
+    Seconds32 minEffectiveTimeValue        = Seconds32(UINT32_MAX);
     size_t minEffectiveTimeSuggestionIndex = maxThermostatSuggestions;
 
     for (size_t index = 0; index < static_cast<size_t>(GetNumberOfThermostatSuggestions()); index++)
@@ -475,8 +474,8 @@ size_t ThermostatDelegate::GetThermostatSuggestionIndexWithEarliestEffectiveTime
         VerifyOrReturnValue(err == CHIP_NO_ERROR, maxThermostatSuggestions);
 
         // Check for the least effective time that is less than the current timestamp.
-        uint32_t effectiveTime = suggestion.GetEffectiveTime();
-        if (effectiveTime < minEffectiveTimeValue && effectiveTime <= currentMatterEpochTimestampInSeconds)
+        Seconds32 effectiveTime = suggestion.GetEffectiveTime();
+        if (effectiveTime < minEffectiveTimeValue && effectiveTime <= currentMatterEpochTimestamp)
         {
             minEffectiveTimeValue           = effectiveTime;
             minEffectiveTimeSuggestionIndex = index;

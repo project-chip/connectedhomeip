@@ -5,6 +5,7 @@
 #pragma once
 
 #include <app/data-model-provider/MetadataTypes.h>
+#include <array>
 #include <lib/core/DataModelTypes.h>
 
 #include <cstdint>
@@ -19,6 +20,7 @@ namespace TlsClientManagement {
 inline constexpr uint32_t kRevision = 1;
 
 namespace Attributes {
+
 namespace MaxProvisioned {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(MaxProvisioned::Id, BitFlags<DataModel::AttributeQualityFlags>(),
                                                           Access::Privilege::kView, std::nullopt);
@@ -29,10 +31,16 @@ inline constexpr DataModel::AttributeEntry
                    BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kListAttribute),
                    Access::Privilege::kView, std::nullopt);
 } // namespace ProvisionedEndpoints
+constexpr std::array<DataModel::AttributeEntry, 2> kMandatoryMetadata = {
+    MaxProvisioned::kMetadataEntry,
+    ProvisionedEndpoints::kMetadataEntry,
+
+};
 
 } // namespace Attributes
 
 namespace Commands {
+
 namespace ProvisionEndpoint {
 inline constexpr DataModel::AcceptedCommandEntry
     kMetadataEntry(ProvisionEndpoint::Id, BitFlags<DataModel::CommandQualityFlags>(DataModel::CommandQualityFlags::kFabricScoped),
@@ -50,6 +58,8 @@ inline constexpr DataModel::AcceptedCommandEntry
 } // namespace RemoveEndpoint
 
 } // namespace Commands
+
+namespace Events {} // namespace Events
 } // namespace TlsClientManagement
 } // namespace Clusters
 } // namespace app

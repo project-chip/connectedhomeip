@@ -241,7 +241,7 @@ Davis, CA 95616, USA
     </bitmap>
   </dataTypes>
   <attributes>
-    <attribute id="0x0000" name="CurrentHue" type="uint8" default="0">
+    <attribute id="0x0000" name="CurrentHue" type="uint8">
       <access read="true" readPrivilege="view"/>
       <quality persistence="nonVolatile" reportable="true" quieterReporting="true"/>
       <mandatoryConform>
@@ -251,7 +251,7 @@ Davis, CA 95616, USA
         <max value="254"/>
       </constraint>
     </attribute>
-    <attribute id="0x0001" name="CurrentSaturation" type="uint8" default="0">
+    <attribute id="0x0001" name="CurrentSaturation" type="uint8">
       <access read="true" readPrivilege="view"/>
       <quality scene="true" persistence="nonVolatile" reportable="true" quieterReporting="true"/>
       <mandatoryConform>
@@ -269,7 +269,7 @@ Davis, CA 95616, USA
         <max value="65534"/>
       </constraint>
     </attribute>
-    <attribute id="0x0003" name="CurrentX" type="uint16" default="24939">
+    <attribute id="0x0003" name="CurrentX" type="uint16">
       <access read="true" readPrivilege="view"/>
       <quality scene="true" persistence="nonVolatile" reportable="true" quieterReporting="true"/>
       <mandatoryConform>
@@ -279,7 +279,7 @@ Davis, CA 95616, USA
         <max value="65279"/>
       </constraint>
     </attribute>
-    <attribute id="0x0004" name="CurrentY" type="uint16" default="24701">
+    <attribute id="0x0004" name="CurrentY" type="uint16">
       <access read="true" readPrivilege="view"/>
       <quality scene="true" persistence="nonVolatile" reportable="true" quieterReporting="true"/>
       <mandatoryConform>
@@ -300,7 +300,7 @@ Davis, CA 95616, USA
         <maxLength value="254"/>
       </constraint>
     </attribute>
-    <attribute id="0x0007" name="ColorTemperatureMireds" type="uint16" default="250">
+    <attribute id="0x0007" name="ColorTemperatureMireds" type="uint16">
       <access read="true" readPrivilege="view"/>
       <quality scene="true" persistence="nonVolatile" reportable="true" quieterReporting="true"/>
       <mandatoryConform>
@@ -310,12 +310,12 @@ Davis, CA 95616, USA
         <max value="65279"/>
       </constraint>
     </attribute>
-    <attribute id="0x0008" name="ColorMode" type="ColorModeEnum" default="1">
+    <attribute id="0x0008" name="ColorMode" type="ColorModeEnum">
       <access read="true" readPrivilege="view"/>
       <quality persistence="nonVolatile"/>
       <mandatoryConform/>
     </attribute>
-    <attribute id="0x000F" name="Options" type="OptionsBitmap" default="0">
+    <attribute id="0x000F" name="Options" type="OptionsBitmap">
       <access read="true" write="true" readPrivilege="view" writePrivilege="operate"/>
       <mandatoryConform/>
       <constraint>
@@ -671,19 +671,19 @@ Davis, CA 95616, USA
       <quality nullable="true"/>
       <optionalConform/>
     </attribute>
-    <attribute id="0x4000" name="EnhancedCurrentHue" type="uint16" default="0">
+    <attribute id="0x4000" name="EnhancedCurrentHue" type="uint16">
       <access read="true" readPrivilege="view"/>
       <quality scene="true" persistence="nonVolatile" quieterReporting="true"/>
       <mandatoryConform>
         <feature name="EHUE"/>
       </mandatoryConform>
     </attribute>
-    <attribute id="0x4001" name="EnhancedColorMode" type="EnhancedColorModeEnum" default="1">
+    <attribute id="0x4001" name="EnhancedColorMode" type="EnhancedColorModeEnum">
       <access read="true" readPrivilege="view"/>
       <quality scene="true" persistence="nonVolatile"/>
       <mandatoryConform/>
     </attribute>
-    <attribute id="0x4002" name="ColorLoopActive" type="uint8" default="0">
+    <attribute id="0x4002" name="ColorLoopActive" type="uint8">
       <access read="true" readPrivilege="view"/>
       <quality scene="true" persistence="nonVolatile"/>
       <mandatoryConform>
@@ -694,35 +694,32 @@ Davis, CA 95616, USA
       </constraint>
     </attribute>
     <attribute id="0x4003" name="ColorLoopDirection" type="ColorLoopDirectionEnum">
-      <default>
-        <enum default="Decrement"/>
-      </default>
       <access read="true" readPrivilege="view"/>
       <quality scene="true" persistence="nonVolatile"/>
       <mandatoryConform>
         <feature name="CL"/>
       </mandatoryConform>
     </attribute>
-    <attribute id="0x4004" name="ColorLoopTime" type="uint16" default="25">
+    <attribute id="0x4004" name="ColorLoopTime" type="uint16">
       <access read="true" readPrivilege="view"/>
       <quality scene="true" persistence="nonVolatile"/>
       <mandatoryConform>
         <feature name="CL"/>
       </mandatoryConform>
     </attribute>
-    <attribute id="0x4005" name="ColorLoopStartEnhancedHue" type="uint16" default="8960">
+    <attribute id="0x4005" name="ColorLoopStartEnhancedHue" type="uint16">
       <access read="true" readPrivilege="view"/>
       <mandatoryConform>
         <feature name="CL"/>
       </mandatoryConform>
     </attribute>
-    <attribute id="0x4006" name="ColorLoopStoredEnhancedHue" type="uint16" default="0">
+    <attribute id="0x4006" name="ColorLoopStoredEnhancedHue" type="uint16">
       <access read="true" readPrivilege="view"/>
       <mandatoryConform>
         <feature name="CL"/>
       </mandatoryConform>
     </attribute>
-    <attribute id="0x400A" name="ColorCapabilities" type="ColorCapabilitiesBitmap" default="0">
+    <attribute id="0x400A" name="ColorCapabilities" type="ColorCapabilitiesBitmap">
       <access read="true" readPrivilege="view"/>
       <mandatoryConform/>
       <constraint>
@@ -750,7 +747,7 @@ Davis, CA 95616, USA
         <max value="65279"/>
       </constraint>
     </attribute>
-    <attribute id="0x400D" name="CoupleColorTempToLevelMinMireds" type="uint16" default="MS">
+    <attribute id="0x400D" name="CoupleColorTempToLevelMinMireds" type="uint16">
       <access read="true" readPrivilege="view"/>
       <mandatoryConform>
         <feature name="CT"/>
@@ -766,7 +763,7 @@ Davis, CA 95616, USA
         </between>
       </constraint>
     </attribute>
-    <attribute id="0x4010" name="StartUpColorTemperatureMireds" type="uint16" default="MS">
+    <attribute id="0x4010" name="StartUpColorTemperatureMireds" type="uint16">
       <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
       <quality nullable="true" persistence="nonVolatile"/>
       <mandatoryConform>
@@ -801,13 +798,13 @@ Davis, CA 95616, USA
           <max value="65534"/>
         </constraint>
       </field>
-      <field id="3" name="OptionsMask" type="OptionsBitmap" default="0">
+      <field id="3" name="OptionsMask" type="OptionsBitmap">
         <mandatoryConform/>
         <constraint>
           <desc/>
         </constraint>
       </field>
-      <field id="4" name="OptionsOverride" type="OptionsBitmap" default="0">
+      <field id="4" name="OptionsOverride" type="OptionsBitmap">
         <mandatoryConform/>
         <constraint>
           <desc/>
@@ -825,13 +822,13 @@ Davis, CA 95616, USA
       <field id="1" name="Rate" type="uint8">
         <mandatoryConform/>
       </field>
-      <field id="2" name="OptionsMask" type="OptionsBitmap" default="0">
+      <field id="2" name="OptionsMask" type="OptionsBitmap">
         <mandatoryConform/>
         <constraint>
           <desc/>
         </constraint>
       </field>
-      <field id="3" name="OptionsOverride" type="OptionsBitmap" default="0">
+      <field id="3" name="OptionsOverride" type="OptionsBitmap">
         <mandatoryConform/>
         <constraint>
           <desc/>
@@ -852,13 +849,13 @@ Davis, CA 95616, USA
       <field id="2" name="TransitionTime" type="uint8">
         <mandatoryConform/>
       </field>
-      <field id="3" name="OptionsMask" type="OptionsBitmap" default="0">
+      <field id="3" name="OptionsMask" type="OptionsBitmap">
         <mandatoryConform/>
         <constraint>
           <desc/>
         </constraint>
       </field>
-      <field id="4" name="OptionsOverride" type="OptionsBitmap" default="0">
+      <field id="4" name="OptionsOverride" type="OptionsBitmap">
         <mandatoryConform/>
         <constraint>
           <desc/>
@@ -882,13 +879,13 @@ Davis, CA 95616, USA
           <max value="65534"/>
         </constraint>
       </field>
-      <field id="2" name="OptionsMask" type="OptionsBitmap" default="0">
+      <field id="2" name="OptionsMask" type="OptionsBitmap">
         <mandatoryConform/>
         <constraint>
           <desc/>
         </constraint>
       </field>
-      <field id="3" name="OptionsOverride" type="OptionsBitmap" default="0">
+      <field id="3" name="OptionsOverride" type="OptionsBitmap">
         <mandatoryConform/>
         <constraint>
           <desc/>
@@ -906,13 +903,13 @@ Davis, CA 95616, USA
       <field id="1" name="Rate" type="uint8">
         <mandatoryConform/>
       </field>
-      <field id="2" name="OptionsMask" type="OptionsBitmap" default="0">
+      <field id="2" name="OptionsMask" type="OptionsBitmap">
         <mandatoryConform/>
         <constraint>
           <desc/>
         </constraint>
       </field>
-      <field id="3" name="OptionsOverride" type="OptionsBitmap" default="0">
+      <field id="3" name="OptionsOverride" type="OptionsBitmap">
         <mandatoryConform/>
         <constraint>
           <desc/>
@@ -933,13 +930,13 @@ Davis, CA 95616, USA
       <field id="2" name="TransitionTime" type="uint8">
         <mandatoryConform/>
       </field>
-      <field id="3" name="OptionsMask" type="OptionsBitmap" default="0">
+      <field id="3" name="OptionsMask" type="OptionsBitmap">
         <mandatoryConform/>
         <constraint>
           <desc/>
         </constraint>
       </field>
-      <field id="4" name="OptionsOverride" type="OptionsBitmap" default="0">
+      <field id="4" name="OptionsOverride" type="OptionsBitmap">
         <mandatoryConform/>
         <constraint>
           <desc/>
@@ -969,13 +966,13 @@ Davis, CA 95616, USA
           <max value="65534"/>
         </constraint>
       </field>
-      <field id="3" name="OptionsMask" type="OptionsBitmap" default="0">
+      <field id="3" name="OptionsMask" type="OptionsBitmap">
         <mandatoryConform/>
         <constraint>
           <desc/>
         </constraint>
       </field>
-      <field id="4" name="OptionsOverride" type="OptionsBitmap" default="0">
+      <field id="4" name="OptionsOverride" type="OptionsBitmap">
         <mandatoryConform/>
         <constraint>
           <desc/>
@@ -1005,13 +1002,13 @@ Davis, CA 95616, USA
           <max value="65534"/>
         </constraint>
       </field>
-      <field id="3" name="OptionsMask" type="OptionsBitmap" default="0">
+      <field id="3" name="OptionsMask" type="OptionsBitmap">
         <mandatoryConform/>
         <constraint>
           <desc/>
         </constraint>
       </field>
-      <field id="4" name="OptionsOverride" type="OptionsBitmap" default="0">
+      <field id="4" name="OptionsOverride" type="OptionsBitmap">
         <mandatoryConform/>
         <constraint>
           <desc/>
@@ -1029,13 +1026,13 @@ Davis, CA 95616, USA
       <field id="1" name="RateY" type="int16">
         <mandatoryConform/>
       </field>
-      <field id="2" name="OptionsMask" type="OptionsBitmap" default="0">
+      <field id="2" name="OptionsMask" type="OptionsBitmap">
         <mandatoryConform/>
         <constraint>
           <desc/>
         </constraint>
       </field>
-      <field id="3" name="OptionsOverride" type="OptionsBitmap" default="0">
+      <field id="3" name="OptionsOverride" type="OptionsBitmap">
         <mandatoryConform/>
         <constraint>
           <desc/>
@@ -1059,13 +1056,13 @@ Davis, CA 95616, USA
           <max value="65534"/>
         </constraint>
       </field>
-      <field id="3" name="OptionsMask" type="OptionsBitmap" default="0">
+      <field id="3" name="OptionsMask" type="OptionsBitmap">
         <mandatoryConform/>
         <constraint>
           <desc/>
         </constraint>
       </field>
-      <field id="4" name="OptionsOverride" type="OptionsBitmap" default="0">
+      <field id="4" name="OptionsOverride" type="OptionsBitmap">
         <mandatoryConform/>
         <constraint>
           <desc/>
@@ -1089,13 +1086,13 @@ Davis, CA 95616, USA
           <max value="65534"/>
         </constraint>
       </field>
-      <field id="2" name="OptionsMask" type="OptionsBitmap" default="0">
+      <field id="2" name="OptionsMask" type="OptionsBitmap">
         <mandatoryConform/>
         <constraint>
           <desc/>
         </constraint>
       </field>
-      <field id="3" name="OptionsOverride" type="OptionsBitmap" default="0">
+      <field id="3" name="OptionsOverride" type="OptionsBitmap">
         <mandatoryConform/>
         <constraint>
           <desc/>
@@ -1119,13 +1116,13 @@ Davis, CA 95616, USA
           <max value="65534"/>
         </constraint>
       </field>
-      <field id="3" name="OptionsMask" type="OptionsBitmap" default="0">
+      <field id="3" name="OptionsMask" type="OptionsBitmap">
         <mandatoryConform/>
         <constraint>
           <desc/>
         </constraint>
       </field>
-      <field id="4" name="OptionsOverride" type="OptionsBitmap" default="0">
+      <field id="4" name="OptionsOverride" type="OptionsBitmap">
         <mandatoryConform/>
         <constraint>
           <desc/>
@@ -1146,13 +1143,13 @@ Davis, CA 95616, USA
       <field id="1" name="Rate" type="uint16">
         <mandatoryConform/>
       </field>
-      <field id="2" name="OptionsMask" type="OptionsBitmap" default="0">
+      <field id="2" name="OptionsMask" type="OptionsBitmap">
         <mandatoryConform/>
         <constraint>
           <desc/>
         </constraint>
       </field>
-      <field id="3" name="OptionsOverride" type="OptionsBitmap" default="0">
+      <field id="3" name="OptionsOverride" type="OptionsBitmap">
         <mandatoryConform/>
         <constraint>
           <desc/>
@@ -1179,13 +1176,13 @@ Davis, CA 95616, USA
           <max value="65534"/>
         </constraint>
       </field>
-      <field id="3" name="OptionsMask" type="OptionsBitmap" default="0">
+      <field id="3" name="OptionsMask" type="OptionsBitmap">
         <mandatoryConform/>
         <constraint>
           <desc/>
         </constraint>
       </field>
-      <field id="4" name="OptionsOverride" type="OptionsBitmap" default="0">
+      <field id="4" name="OptionsOverride" type="OptionsBitmap">
         <mandatoryConform/>
         <constraint>
           <desc/>
@@ -1212,13 +1209,13 @@ Davis, CA 95616, USA
           <max value="65534"/>
         </constraint>
       </field>
-      <field id="3" name="OptionsMask" type="OptionsBitmap" default="0">
+      <field id="3" name="OptionsMask" type="OptionsBitmap">
         <mandatoryConform/>
         <constraint>
           <desc/>
         </constraint>
       </field>
-      <field id="4" name="OptionsOverride" type="OptionsBitmap" default="0">
+      <field id="4" name="OptionsOverride" type="OptionsBitmap">
         <mandatoryConform/>
         <constraint>
           <desc/>
@@ -1245,13 +1242,13 @@ Davis, CA 95616, USA
       <field id="4" name="StartHue" type="uint16">
         <mandatoryConform/>
       </field>
-      <field id="5" name="OptionsMask" type="OptionsBitmap" default="0">
+      <field id="5" name="OptionsMask" type="OptionsBitmap">
         <mandatoryConform/>
         <constraint>
           <desc/>
         </constraint>
       </field>
-      <field id="6" name="OptionsOverride" type="OptionsBitmap" default="0">
+      <field id="6" name="OptionsOverride" type="OptionsBitmap">
         <mandatoryConform/>
         <constraint>
           <desc/>
@@ -1267,13 +1264,13 @@ Davis, CA 95616, USA
           <feature name="CT"/>
         </orTerm>
       </mandatoryConform>
-      <field id="0" name="OptionsMask" type="OptionsBitmap" default="0">
+      <field id="0" name="OptionsMask" type="OptionsBitmap">
         <mandatoryConform/>
         <constraint>
           <desc/>
         </constraint>
       </field>
-      <field id="1" name="OptionsOverride" type="OptionsBitmap" default="0">
+      <field id="1" name="OptionsOverride" type="OptionsBitmap">
         <mandatoryConform/>
         <constraint>
           <desc/>
@@ -1303,13 +1300,13 @@ Davis, CA 95616, USA
           <max value="65279"/>
         </constraint>
       </field>
-      <field id="4" name="OptionsMask" type="OptionsBitmap" default="0">
+      <field id="4" name="OptionsMask" type="OptionsBitmap">
         <mandatoryConform/>
         <constraint>
           <desc/>
         </constraint>
       </field>
-      <field id="5" name="OptionsOverride" type="OptionsBitmap" default="0">
+      <field id="5" name="OptionsOverride" type="OptionsBitmap">
         <mandatoryConform/>
         <constraint>
           <desc/>
@@ -1345,13 +1342,13 @@ Davis, CA 95616, USA
           <max value="65279"/>
         </constraint>
       </field>
-      <field id="5" name="OptionsMask" type="OptionsBitmap" default="0">
+      <field id="5" name="OptionsMask" type="OptionsBitmap">
         <mandatoryConform/>
         <constraint>
           <desc/>
         </constraint>
       </field>
-      <field id="6" name="OptionsOverride" type="OptionsBitmap" default="0">
+      <field id="6" name="OptionsOverride" type="OptionsBitmap">
         <mandatoryConform/>
         <constraint>
           <desc/>

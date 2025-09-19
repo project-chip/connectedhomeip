@@ -37,13 +37,14 @@
 import logging
 import time
 
-import chip.clusters as Clusters
-from chip.clusters.Types import NullValue
-from chip.interaction_model import InteractionModelError, Status
-from chip.testing.event_attribute_reporting import AttributeSubscriptionHandler, EventSubscriptionHandler
-from chip.testing.matter_testing import (AttributeMatcher, AttributeValue, MatterBaseTest, TestStep, async_test_body,
-                                         default_matter_test_main)
 from mobly import asserts
+
+import matter.clusters as Clusters
+from matter.clusters.Types import NullValue
+from matter.interaction_model import InteractionModelError, Status
+from matter.testing.event_attribute_reporting import AttributeSubscriptionHandler, EventSubscriptionHandler
+from matter.testing.matter_testing import (AttributeMatcher, AttributeValue, MatterBaseTest, TestStep, async_test_body,
+                                           default_matter_test_main)
 
 triggerError = 0x0104000000000000
 triggerDisengaged = 0x0104000000000002
@@ -67,11 +68,6 @@ def current_latch_matcher(current_latch: bool) -> AttributeMatcher:
 
 
 class TC_CLCTRL_6_1(MatterBaseTest):
-    @property
-    def default_timeout(self) -> int:
-        # This test has potentially 45s waits, so set the timeout to 60
-        return 60
-
     async def read_clctrl_attribute_expect_success(self, endpoint, attribute):
         cluster = Clusters.Objects.ClosureControl
         return await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attribute)
@@ -87,7 +83,7 @@ class TC_CLCTRL_6_1(MatterBaseTest):
             TestStep("2c", "TH reads from the DUT the (0xFFFB) AttributeList attribute."),
             TestStep("2d", "TH establishes a wildcard subscription to all attributes on the Closure Control Cluster, with MinIntervalFloor = 0, MaxIntervalCeiling = 30 and KeepSubscriptions = false."),
             TestStep("3a", "If the LT feature is not supported on the cluster, skip steps 3b to 3i."),
-            TestStep("3b", "If the attribute is supported on the cluster, TH reads from the DUT the OverallCurrentState.Latch attribute."),
+            TestStep("3b", "TH reads from the DUT the OverallCurrentState.Latch attribute."),
             TestStep("3c", "If the attribute is supported on the cluster, TH reads from the DUT the LatchControlModes attribute."),
             TestStep("3d", "If CurrentLatch = False, skip steps 3e to 3i."),
             TestStep("3e", "If LatchControlModes Bit 1 = 0 (RemoteUnlatching = False), skip step 3f."),
@@ -96,7 +92,7 @@ class TC_CLCTRL_6_1(MatterBaseTest):
             TestStep("3h", "Unlatch the DUT manually to set OverallCurrentState.Latch to False."),
             TestStep("3i", "Wait until TH receives a subscription report with OverallCurrentState.Latch."),
             TestStep("3j", "If the PS feature is not supported on the cluster, skip steps 3k to 3n."),
-            TestStep("3k", "If the attribute is supported on the cluster, TH reads from the DUT the OverallCurrentState attribute."),
+            TestStep("3k", "TH reads from the DUT the OverallCurrentState attribute."),
             TestStep("3l", "If CurrentPosition = FullyClosed, skip steps 3m to 3n."),
             TestStep("3m", "TH sends command MoveTo with Position = MoveToFullyClosed."),
             TestStep("3n", "Wait until TH receives a subscription report with OverallCurrentState.Position."),
@@ -116,7 +112,7 @@ class TC_CLCTRL_6_1(MatterBaseTest):
             TestStep("6d", "TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 with EnableKey field set to PIXIT.CLCTRL.TEST_EVENT_TRIGGER_ENABLE_KEY and EventTrigger field set to PIXIT.CLCTRL.TEST_EVENT_TRIGGER for MainState Test Event Clear."),
             TestStep("6e", "Verify that the DUT has emitted the EngageStateChanged event."),
             TestStep("7a", "If LT feature is supported on the cluster or PS feature is not supported on the cluster, skip steps 7b to 7f."),
-            TestStep("7b", "If the attribute is supported on the cluster, TH reads from the DUT the OverallCurrentState attribute."),
+            TestStep("7b", "TH reads from the DUT the OverallCurrentState attribute."),
             TestStep("7c", "TH sends command MoveTo with Position = MoveToFullyOpen."),
             TestStep("7d", "Verify that the DUT has emitted the SecureStateChanged event."),
             TestStep("7e", "TH sends command MoveTo with Position = MoveToFullyClosed."),
@@ -147,38 +143,6 @@ class TC_CLCTRL_6_1(MatterBaseTest):
             TestStep("9l", "Verify that the DUT has emitted the SecureStateChanged event."),
         ]
         return steps
-
-    def wait_for_secure_state_changed_and_assert(self, event_sub_handler, expected_secure_value: bool, timeout: int):
-        """
-        Waits for a SecureStateChanged event, allowing for one other event to arrive first.
-        Asserts that the SecureStateChanged event is received and its secureValue matches the expected value.
-        """
-        event_queue = event_sub_handler.event_queue
-
-        try:
-            event1 = event_queue.get(block=True, timeout=timeout)
-        except event_queue.Empty:
-            asserts.fail("Timeout waiting for event.")
-
-        secure_event = None
-        if event1.Header.EventId == Clusters.ClosureControl.Events.SecureStateChanged.event_id:
-            secure_event = event1
-        else:
-            logging.info(f"Received other event first: {event1.Header.EventId}, waiting for SecureStateChanged.")
-            try:
-                event2 = event_queue.get(block=True, timeout=timeout)
-            except event_queue.Empty:
-                asserts.fail("Timeout waiting for SecureStateChanged event after receiving another event first.")
-
-            asserts.assert_equal(event2.Header.EventId, Clusters.ClosureControl.Events.SecureStateChanged.event_id,
-                                 "Expected SecureStateChanged event not received as the second event.")
-            secure_event = event2
-
-        logging.info(f"SecureStateChanged event received: {secure_event}")
-        if expected_secure_value:
-            asserts.assert_true(secure_event.Data.secureValue, "SecureStateChanged event secureValue is not True.")
-        else:
-            asserts.assert_false(secure_event.Data.secureValue, "SecureStateChanged event secureValue is not False.")
 
     def pics_TC_CLCTRL_6_1(self) -> list[str]:
         pics = [
@@ -241,19 +205,16 @@ class TC_CLCTRL_6_1(MatterBaseTest):
         else:
             logging.info("Motion Latching feature supported.")
 
-            # STEP 3b: If the attribute is supported on the cluster, TH reads from the DUT the OverallCurrentState.Latch attribute
+            # STEP 3b: TH reads from the DUT the OverallCurrentState.Latch attribute
             self.step("3b")
 
-            if attributes.OverallCurrentState.attribute_id in attribute_list:
-                overall_current_state = await self.read_clctrl_attribute_expect_success(endpoint, attributes.OverallCurrentState)
-                logging.info(f"OverallCurrentState: {overall_current_state}")
-                if overall_current_state is NullValue:
-                    asserts.assert_true(False, "OverallCurrentState is NullValue.")
+            overall_current_state = await self.read_clctrl_attribute_expect_success(endpoint, attributes.OverallCurrentState)
+            logging.info(f"OverallCurrentState: {overall_current_state}")
+            if overall_current_state is NullValue:
+                asserts.assert_fail("OverallCurrentState is NullValue.")
 
-                CurrentLatch = overall_current_state.latch
-                asserts.assert_in(CurrentLatch, [True, False], "OverallCurrentState.latch is not in the expected range")
-            else:
-                asserts.assert_true(False, "OverallCurrentState attribute is not supported.")
+            CurrentLatch = overall_current_state.latch
+            asserts.assert_in(CurrentLatch, [True, False], "OverallCurrentState.latch is not in the expected range")
 
             # STEP 3c: If the attribute is supported on the cluster, TH reads from the DUT the LatchControlModes attribute
             self.step("3c")
@@ -262,9 +223,9 @@ class TC_CLCTRL_6_1(MatterBaseTest):
                 LatchControlModes = await self.read_clctrl_attribute_expect_success(endpoint, attributes.LatchControlModes)
                 logging.info(f"LatchControlModes: {LatchControlModes}")
                 if LatchControlModes is NullValue:
-                    asserts.assert_true(False, "LatchControlModes is NullValue.")
+                    asserts.assert_fail("LatchControlModes is NullValue.")
             else:
-                asserts.assert_true(False, "LatchControlModes attribute is not supported.")
+                asserts.assert_fail("LatchControlModes attribute is not supported.")
 
             # STEP 3d: If CurrentLatch = False, skip steps 3e to 3i
             self.step("3d")
@@ -295,7 +256,7 @@ class TC_CLCTRL_6_1(MatterBaseTest):
 
                     logging.info("Unlatch the DUT manually to set OverallCurrentState.Latch to False")
                     # Simulating manual unlatching by waiting for user input
-                    self.wait_for_user_input(promt_msg="Press Enter after unlatching the DUT...")
+                    self.wait_for_user_input(prompt_msg="Press Enter after unlatching the DUT..")
                     logging.info("Manual unlatching completed.")
                 else:
                     logging.info("LatchControlModes Bit 1 is 1 (RemoteUnlatching = True), proceeding to step 3f")
@@ -332,20 +293,17 @@ class TC_CLCTRL_6_1(MatterBaseTest):
         else:
             logging.info("Positioning feature supported.")
 
-            # STEP 3k: If the attribute is supported on the cluster, TH reads from the DUT the OverallCurrentState attribute
+            # STEP 3k: TH reads from the DUT the OverallCurrentState attribute
             self.step("3k")
 
-            if attributes.OverallCurrentState.attribute_id in attribute_list:
-                overall_current_state = await self.read_clctrl_attribute_expect_success(endpoint, attributes.OverallCurrentState)
-                logging.info(f"OverallCurrentState: {overall_current_state}")
-                if overall_current_state is NullValue:
-                    asserts.assert_true(False, "OverallCurrentState is NullValue.")
+            overall_current_state = await self.read_clctrl_attribute_expect_success(endpoint, attributes.OverallCurrentState)
+            logging.info(f"OverallCurrentState: {overall_current_state}")
+            if overall_current_state is NullValue:
+                asserts.assert_fail("OverallCurrentState is NullValue.")
 
-                CurrentPosition = overall_current_state.position
-                asserts.assert_in(CurrentPosition, Clusters.ClosureControl.Enums.CurrentPositionEnum,
-                                  "OverallCurrentState.position is not in the expected range")
-            else:
-                asserts.assert_true(False, "OverallCurrentState attribute is not supported.")
+            CurrentPosition = overall_current_state.position
+            asserts.assert_in(CurrentPosition, Clusters.ClosureControl.Enums.CurrentPositionEnum,
+                              "OverallCurrentState.position is not in the expected range")
 
             # STEP 3l: If CurrentPosition = FullyClosed, skip steps 3m to 3n
             self.step("3l")
@@ -393,7 +351,8 @@ class TC_CLCTRL_6_1(MatterBaseTest):
         self.step("4b")
 
         # Wait for the OperationalError event to be emitted
-        data = event_sub_handler.wait_for_event_report(Clusters.ClosureControl.Events.OperationalError, timeout_sec=timeout)
+        data = event_sub_handler.wait_for_event_type_report(
+            Clusters.ClosureControl.Events.OperationalError, timeout_sec=timeout)
         logging.info(f"-> OperationalError event last received: {data.errorState}")
 
         asserts.assert_not_equal(data.errorState, [], "The CurrentErrorList attribute is empty.")
@@ -429,7 +388,9 @@ class TC_CLCTRL_6_1(MatterBaseTest):
             # STEP 5b: TH sends command MoveTo with Position = MoveToFullyOpen
             self.step("5b")
 
+            event_sub_handler.reset()
             sub_handler.reset()
+
             try:
                 await self.send_single_cmd(cmd=Clusters.ClosureControl.Commands.MoveTo(
                     position=Clusters.ClosureControl.Enums.TargetPositionEnum.kMoveToFullyOpen,
@@ -439,12 +400,14 @@ class TC_CLCTRL_6_1(MatterBaseTest):
                     e.status, Status.Success, f"Failed to send command MoveTo: {e.status}")
                 pass
 
-            # STEP 5c: Wait until TH receives a subscription report with OverallCurrentState.Position = FullyOpened.
+            # STEP 5c: Wait until TH receives a subscription report with OverallCurrentState.Position = FullyOpened and the MovementCompleted event.
             self.step("5c")
 
-            logging.info("Waiting for OverallCurrentState.Position to be FullyOpened and OverallCurrentState.SecureState to be False")
+            logging.info("Waiting for OverallCurrentState.Position to be FullyOpened and the corresponding MovementCompleted event.")
             sub_handler.await_all_expected_report_matches(expected_matchers=[current_position_matcher(Clusters.ClosureControl.Enums.CurrentPositionEnum.kFullyOpened)],
                                                           timeout_sec=timeout)
+            event_sub_handler.wait_for_event_type_report(
+                Clusters.ClosureControl.Events.MovementCompleted, timeout_sec=timeout)
 
             # STEP 5d: TH sends command MoveTo with Position = MoveToFullyClosed
             self.step("5d")
@@ -459,11 +422,14 @@ class TC_CLCTRL_6_1(MatterBaseTest):
                     e.status, Status.Success, f"Failed to send command MoveTo: {e.status}")
                 pass
 
-            # STEP 5e: Verify that the DUT has emitted the MovementCompleted event.
+            # STEP 5e: Wait until TH receives a subscription report with OverallCurrentState.Position = FullyClosed and the MovementCompleted event.
             self.step("5e")
 
-            # Wait for the MovementCompleted event to be emitted
-            event_sub_handler.wait_for_event_report(Clusters.ClosureControl.Events.MovementCompleted, timeout_sec=timeout)
+            logging.info("Waiting for OverallCurrentState.Position to be FullyClosed and the corresponding MovementCompleted event.")
+            sub_handler.await_all_expected_report_matches(expected_matchers=[current_position_matcher(Clusters.ClosureControl.Enums.CurrentPositionEnum.kFullyClosed)],
+                                                          timeout_sec=timeout)
+            event_sub_handler.wait_for_event_type_report(
+                Clusters.ClosureControl.Events.MovementCompleted, timeout_sec=timeout)
 
             # STEP 5f: TH reads from the DUT the MainState attribute
             self.step("5f")
@@ -474,7 +440,7 @@ class TC_CLCTRL_6_1(MatterBaseTest):
                 asserts.assert_equal(main_state, Clusters.ClosureControl.Enums.MainStateEnum.kStopped,
                                      "MainState is not in the expected state")
             else:
-                asserts.assert_true(False, "MainState attribute is not supported.")
+                asserts.assert_fail("MainState attribute is not supported.")
 
         # STEP 6a: If MO feature is not supported on the cluster, skip steps 6b to 6e
         self.step("6a")
@@ -502,7 +468,8 @@ class TC_CLCTRL_6_1(MatterBaseTest):
             self.step("6c")
 
             # Wait for the EngageStateChanged event to be emitted
-            data = event_sub_handler.wait_for_event_report(Clusters.ClosureControl.Events.EngageStateChanged, timeout_sec=timeout)
+            data = event_sub_handler.wait_for_event_type_report(
+                Clusters.ClosureControl.Events.EngageStateChanged, timeout_sec=timeout)
 
             asserts.assert_false(data.engageValue, f"Unexpected event data: {data.engageValue}")
 
@@ -521,7 +488,8 @@ class TC_CLCTRL_6_1(MatterBaseTest):
             self.step("6e")
 
             # Wait for the EngageStateChanged event to be emitted
-            data = event_sub_handler.wait_for_event_report(Clusters.ClosureControl.Events.EngageStateChanged, timeout_sec=timeout)
+            data = event_sub_handler.wait_for_event_type_report(
+                Clusters.ClosureControl.Events.EngageStateChanged, timeout_sec=timeout)
 
             asserts.assert_true(data.engageValue, f"Unexpected event data: {data.engageValue}")
 
@@ -536,22 +504,19 @@ class TC_CLCTRL_6_1(MatterBaseTest):
         else:
             logging.info("Positioning feature supported and Motion Latching feature not supported processing steps 7b to 7f.")
 
-            # STEP 7b: If the attribute is supported on the cluster, TH reads from the DUT the OverallCurrentState attribute
+            # STEP 7b: TH reads from the DUT the OverallCurrentState attribute
             self.step("7b")
 
-            if attributes.OverallCurrentState.attribute_id in attribute_list:
-                overall_current_state = await self.read_clctrl_attribute_expect_success(endpoint, attributes.OverallCurrentState)
-                logging.info(f"OverallCurrentState: {overall_current_state}")
-                if overall_current_state is NullValue:
-                    asserts.assert_true(False, "OverallCurrentState is NullValue.")
+            overall_current_state = await self.read_clctrl_attribute_expect_success(endpoint, attributes.OverallCurrentState)
+            logging.info(f"OverallCurrentState: {overall_current_state}")
+            if overall_current_state is NullValue:
+                asserts.assert_fail("OverallCurrentState is NullValue.")
 
-                asserts.assert_in(overall_current_state.position, Clusters.ClosureControl.Enums.CurrentPositionEnum,
-                                  "OverallCurrentState.position is not in the expected range")
-                asserts.assert_equal(overall_current_state.position,
-                                     Clusters.ClosureControl.Enums.CurrentPositionEnum.kFullyClosed, "The DUT is in an incorrect position.")
-                asserts.assert_true(overall_current_state.secureState, "The DUT is in an incorrect secure state.")
-            else:
-                asserts.assert_true(False, "OverallCurrentState attribute is not supported.")
+            asserts.assert_in(overall_current_state.position, Clusters.ClosureControl.Enums.CurrentPositionEnum,
+                              "OverallCurrentState.position is not in the expected range")
+            asserts.assert_equal(overall_current_state.position,
+                                 Clusters.ClosureControl.Enums.CurrentPositionEnum.kFullyClosed, "The DUT is in an incorrect position.")
+            asserts.assert_true(overall_current_state.secureState, "The DUT is in an incorrect secure state.")
 
             # STEP 7c: TH sends command MoveTo with Position = MoveToFullyOpen.
             self.step("7c")
@@ -570,7 +535,9 @@ class TC_CLCTRL_6_1(MatterBaseTest):
             self.step("7d")
 
             # Wait for the SecureStateChanged event to be emitted
-            self.wait_for_secure_state_changed_and_assert(event_sub_handler, expected_secure_value=False, timeout=timeout)
+            data = event_sub_handler.wait_for_event_type_report(
+                Clusters.ClosureControl.Events.SecureStateChanged, timeout_sec=timeout)
+            asserts.assert_false(data.secureValue, f"Unexpected event data: {data.secureValue}")
 
             # STEP 7e: TH sends command MoveTo with Position = MoveToFullyClosed.
             self.step("7e")
@@ -589,7 +556,9 @@ class TC_CLCTRL_6_1(MatterBaseTest):
             self.step("7f")
 
             # Wait for the SecureStateChanged event to be emitted
-            self.wait_for_secure_state_changed_and_assert(event_sub_handler, expected_secure_value=True, timeout=timeout)
+            data = event_sub_handler.wait_for_event_type_report(
+                Clusters.ClosureControl.Events.SecureStateChanged, timeout_sec=timeout)
+            asserts.assert_true(data.secureValue, f"Unexpected event data: {data.secureValue}")
 
         # STEP 8a: If LT feature is not supported on the cluster or PS feature is supported on the cluster, skip steps 8b to 8l
         self.step("8a")
@@ -621,7 +590,7 @@ class TC_CLCTRL_6_1(MatterBaseTest):
 
                 logging.info("Latch the DUT manually to set OverallCurrentState.Latch to True")
                 # Simulating manual latching by waiting for user input
-                self.wait_for_user_input(promt_msg="Press Enter after latching the DUT...")
+                self.wait_for_user_input(prompt_msg="Press Enter after latching the DUT...")
                 logging.info("Manual latching completed.")
             else:
                 logging.info("LatchControlModes Bit 0 is 1 (RemoteLatching = True), proceeding to step 8c")
@@ -651,7 +620,9 @@ class TC_CLCTRL_6_1(MatterBaseTest):
             self.step("8g")
 
             # Wait for the SecureStateChanged event to be emitted
-            self.wait_for_secure_state_changed_and_assert(event_sub_handler, expected_secure_value=True, timeout=timeout)
+            data = event_sub_handler.wait_for_event_type_report(
+                Clusters.ClosureControl.Events.SecureStateChanged, timeout_sec=timeout)
+            asserts.assert_true(data.secureValue, f"Unexpected event data: {data.secureValue}")
 
             # STEP 8h: If LatchControlModes Bit 1 = 0 (RemoteUnlatching = False), skip step 8i
             self.step("8h")
@@ -672,7 +643,7 @@ class TC_CLCTRL_6_1(MatterBaseTest):
 
                 logging.info("Unlatch the DUT manually to set OverallCurrentState.Latch to False")
                 # Simulating manual unlatching by waiting for user input
-                self.wait_for_user_input(promt_msg="Press Enter after unlatching the DUT...")
+                self.wait_for_user_input(prompt_msg="Press Enter after unlatching the DUT...")
                 logging.info("Manual unlatching completed.")
             else:
                 logging.info("LatchControlModes Bit 1 is 1 (RemoteUnlatching = True), proceeding to step 8i")
@@ -695,7 +666,9 @@ class TC_CLCTRL_6_1(MatterBaseTest):
             self.step("8l")
 
             # Wait for the SecureStateChanged event to be emitted
-            self.wait_for_secure_state_changed_and_assert(event_sub_handler, expected_secure_value=False, timeout=timeout)
+            data = event_sub_handler.wait_for_event_type_report(
+                Clusters.ClosureControl.Events.SecureStateChanged, timeout_sec=timeout)
+            asserts.assert_false(data.secureValue, f"Unexpected event data: {data.secureValue}")
 
         # STEP 9a: If LT feature is not supported on the cluster or PS feature is not supported on the cluster, skip steps 9b to 9l
         self.step("9a")
@@ -725,7 +698,7 @@ class TC_CLCTRL_6_1(MatterBaseTest):
 
                 logging.info("Latch the DUT manually to set OverallCurrentState.Latch to True")
                 # Simulating manual latching by waiting for user input
-                self.wait_for_user_input(promt_msg="Press Enter after latching the DUT...")
+                self.wait_for_user_input(prompt_msg="Press Enter after latching the DUT...")
                 logging.info("Manual latching completed.")
             else:
                 logging.info("LatchControlModes Bit 0 is 1 (RemoteLatching = True), proceeding to step 9c")
@@ -748,7 +721,9 @@ class TC_CLCTRL_6_1(MatterBaseTest):
             self.step("9f")
 
             # Wait for the SecureStateChanged event to be emitted
-            self.wait_for_secure_state_changed_and_assert(event_sub_handler, expected_secure_value=True, timeout=timeout)
+            data = event_sub_handler.wait_for_event_type_report(
+                Clusters.ClosureControl.Events.SecureStateChanged, timeout_sec=timeout)
+            asserts.assert_true(data.secureValue, f"Unexpected event data: {data.secureValue}")
 
             # STEP 9g: If LatchControlModes Bit 1 = 0 (RemoteUnlatching = False), skip step 9h
             self.step("9g")
@@ -769,7 +744,7 @@ class TC_CLCTRL_6_1(MatterBaseTest):
 
                 logging.info("Unlatch the DUT manually to set OverallCurrentState.Latch to False")
                 # Simulating manual unlatching by waiting for user input
-                self.wait_for_user_input(promt_msg="Press Enter after unlatching the DUT...")
+                self.wait_for_user_input(prompt_msg="Press Enter after unlatching the DUT...")
                 logging.info("Manual unlatching completed.")
             else:
                 logging.info("LatchControlModes Bit 1 is 1 (RemoteUnlatching = True), proceeding to step 9h")
@@ -805,7 +780,9 @@ class TC_CLCTRL_6_1(MatterBaseTest):
             self.step("9l")
 
             # Wait for the SecureStateChanged event to be emitted
-            self.wait_for_secure_state_changed_and_assert(event_sub_handler, expected_secure_value=False, timeout=timeout)
+            data = event_sub_handler.wait_for_event_type_report(
+                Clusters.ClosureControl.Events.SecureStateChanged, timeout_sec=timeout)
+            asserts.assert_false(data.secureValue, f"Unexpected event data: {data.secureValue}")
 
 
 if __name__ == "__main__":

@@ -31,6 +31,12 @@ using namespace chip::app;
 using namespace chip::app::Clusters;
 using namespace chip::Controller;
 using namespace chip::Crypto;
+using namespace chip::app::Clusters::JointFabricAdministrator;
+
+constexpr uint8_t kJFAvailableShift = 0;
+constexpr uint8_t kJFAdminShift     = 1;
+constexpr uint8_t kJFAnchorShift    = 2;
+constexpr uint8_t kJFDatastoreShift = 3;
 
 JFAManager JFAManager::sJFA;
 
@@ -39,6 +45,15 @@ CHIP_ERROR JFAManager::Init(Server & server)
     mServer             = &server;
     mCASESessionManager = server.GetCASESessionManager();
 
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR JFAManager::GetJointFabricMode(uint8_t & jointFabricMode)
+{
+    jointFabricMode = ((IsDeviceCommissioned() ? 0 : 1) << kJFAvailableShift) |
+        (IsDeviceCommissioned() ? (IsDeviceJFAdmin() ? (1 << kJFAdminShift) : 0) : 0) |
+        (IsDeviceCommissioned() ? (IsDeviceJFAnchor() ? (1 << kJFAnchorShift) : 0) : 0) |
+        (IsDeviceCommissioned() ? (1 << kJFDatastoreShift) : 0);
     return CHIP_NO_ERROR;
 }
 
@@ -88,6 +103,46 @@ void JFAManager::HandleCommissioningCompleteEvent()
             }
         }
     }
+}
+
+bool JFAManager::IsDeviceJFAdmin()
+{
+    if (jfFabricIndex == kUndefinedFabricId)
+    {
+        return false;
+    }
+
+    CATValues cats;
+
+    if (mServer->GetFabricTable().FetchCATs(jfFabricIndex, cats) == CHIP_NO_ERROR)
+    {
+        if (cats.ContainsIdentifier(kAdminCATIdentifier))
+        {
+            return true;
+        }
+    }
+
+    return false;
+}
+
+bool JFAManager::IsDeviceJFAnchor()
+{
+    if (jfFabricIndex == kUndefinedFabricId)
+    {
+        return false;
+    }
+
+    CATValues cats;
+
+    if (mServer->GetFabricTable().FetchCATs(jfFabricIndex, cats) == CHIP_NO_ERROR)
+    {
+        if (cats.ContainsIdentifier(kAnchorCATIdentifier))
+        {
+            return true;
+        }
+    }
+
+    return false;
 }
 
 void JFAManager::ReleaseSession()
@@ -162,7 +217,7 @@ void JFAManager::OnConnectionFailure(void * context, const ScopedNodeId & peerId
 
 CHIP_ERROR JFAManager::AnnounceJointFabricAdministrator()
 {
-    JointFabricAdministrator::Commands::AnnounceJointFabricAdministrator::Type request;
+    Commands::AnnounceJointFabricAdministrator::Type request;
 
     if (!mExchangeMgr)
     {
@@ -197,7 +252,7 @@ void JFAManager::OnAnnounceJointFabricAdministratorFailure(void * context, CHIP_
 
 CHIP_ERROR JFAManager::SendICACSRRequest()
 {
-    JointFabricAdministrator::Commands::ICACCSRRequest::Type request;
+    Commands::ICACCSRRequest::Type request;
 
     if (!mExchangeMgr)
     {
@@ -210,8 +265,7 @@ CHIP_ERROR JFAManager::SendICACSRRequest()
     return cluster.InvokeCommand(request, this, OnSendICACSRRequestResponse, OnSendICACSRRequestFailure);
 }
 
-void JFAManager::OnSendICACSRRequestResponse(void * context,
-                                             const JointFabricAdministrator::Commands::ICACCSRResponse::DecodableType & icaccsr)
+void JFAManager::OnSendICACSRRequestResponse(void * context, const Commands::ICACCSRResponse::DecodableType & icaccsr)
 {
     JFAManager * jfaManagerCore = static_cast<JFAManager *>(context);
     VerifyOrDie(jfaManagerCore != nullptr);
@@ -223,6 +277,7 @@ void JFAManager::OnSendICACSRRequestResponse(void * context,
         jfaManagerCore->peerAdminICACPubKey.Matches(pubKey))
     {
         ChipLogProgress(JointFabric, "OnSendICACSRRequestResponse: validated ICAC CSR");
+        jfaManagerCore->SendCommissioningComplete();
     }
 }
 

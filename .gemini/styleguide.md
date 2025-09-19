@@ -9,3 +9,4 @@
 - Look for common typos and suggest fixes
 - The current year is 2025.
 - Wrong years and years in the future are OK. Humans will catch these issues.
+- Comments regarding issues about whitespace or code alignment are not needed. A code formatter will take care of these problems.

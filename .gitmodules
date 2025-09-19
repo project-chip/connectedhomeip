@@ -243,11 +243,6 @@
 	url = https://github.com/matter-mtk/genio-matter-lwip.git
 	branch = main
 	platforms = genio
-[submodule "open-iot-sdk"]
-	path = third_party/open-iot-sdk/sdk
-	url = https://git.gitlab.arm.com/iot/open-iot-sdk/sdk.git
-	branch = main
-	platforms = openiotsdk
 [submodule "bouffalolab_sdk"]
 	path = third_party/bouffalolab/repo
 	url = https://github.com/bouffalolab/bl_iot_sdk_tiny.git
@@ -344,7 +339,7 @@
 [submodule "third_party/libdatachannel/repo"]
 	path = third_party/libdatachannel/repo
 	url = https://github.com/paullouisageneau/libdatachannel.git
-	platforms = linux
+	platforms = linux,darwin
 	recursive = true
 [submodule "third_party/openthread/ot-realtek"]
 	path = third_party/openthread/ot-realtek

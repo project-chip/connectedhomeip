@@ -106,46 +106,25 @@ Davis, CA 95616, USA
         <mandatoryConform/>
       </item>
       <item value="0x48" name="LowBattery" summary="The device is unable to start or to continue operating due to a low battery">
-        <otherwiseConform>
-          <provisionalConform/>
-          <mandatoryConform/>
-        </otherwiseConform>
+        <mandatoryConform/>
       </item>
       <item value="0x49" name="CannotReachTargetArea" summary="The device is unable to move to an area where it was asked to operate, such as by setting the ServiceArea cluster&apos;s SelectedAreas attribute, due to an obstruction. For example, the obstruction might be a closed door or objects blocking the mapped path.">
-        <otherwiseConform>
-          <provisionalConform/>
-          <mandatoryConform/>
-        </otherwiseConform>
+        <mandatoryConform/>
       </item>
       <item value="0x4A" name="DirtyWaterTankFull" summary="The device has detected that its dirty water tank is full">
-        <otherwiseConform>
-          <provisionalConform/>
-          <mandatoryConform/>
-        </otherwiseConform>
+        <mandatoryConform/>
       </item>
-      <item value="0x4B" name="DirtyWaterTankMissing" summary="The device has detected that its dirty water tank is full">
-        <otherwiseConform>
-          <provisionalConform/>
-          <mandatoryConform/>
-        </otherwiseConform>
+      <item value="0x4B" name="DirtyWaterTankMissing" summary="The device has detected that its dirty water is missing">
+        <mandatoryConform/>
       </item>
       <item value="0x4C" name="WheelsJammed" summary="The device has detected that one or more wheels are jammed by an object">
-        <otherwiseConform>
-          <provisionalConform/>
-          <mandatoryConform/>
-        </otherwiseConform>
+        <mandatoryConform/>
       </item>
       <item value="0x4D" name="BrushJammed" summary="The device has detected that its brush is jammed by an object">
-        <otherwiseConform>
-          <provisionalConform/>
-          <mandatoryConform/>
-        </otherwiseConform>
+        <mandatoryConform/>
       </item>
       <item value="0x4E" name="NavigationSensorObscured" summary="The device has detected that one of its sensors, such as LiDAR, infrared, or camera is obscured and needs to be cleaned">
-        <otherwiseConform>
-          <provisionalConform/>
-          <mandatoryConform/>
-        </otherwiseConform>
+        <mandatoryConform/>
       </item>
     </enum>
     <enum name="OperationalStateEnum">
@@ -171,28 +150,16 @@ Davis, CA 95616, USA
         <mandatoryConform/>
       </item>
       <item value="0x43" name="EmptyingDustBin" summary="The device is automatically emptying its own dust bin, such as to a dock">
-        <otherwiseConform>
-          <provisionalConform/>
-          <optionalConform/>
-        </otherwiseConform>
+        <optionalConform/>
       </item>
       <item value="0x44" name="CleaningMop" summary="The device is automatically cleaning its own mopping device, such as on a dock">
-        <otherwiseConform>
-          <provisionalConform/>
-          <optionalConform/>
-        </otherwiseConform>
+        <optionalConform/>
       </item>
       <item value="0x45" name="FillingWaterTank" summary="The device is automatically filling its own clean water tank for use when mopping, such as from a dock">
-        <otherwiseConform>
-          <provisionalConform/>
-          <optionalConform/>
-        </otherwiseConform>
+        <optionalConform/>
       </item>
       <item value="0x46" name="UpdatingMaps" summary="The device is processing acquired data to update its maps">
-        <otherwiseConform>
-          <provisionalConform/>
-          <optionalConform/>
-        </otherwiseConform>
+        <optionalConform/>
       </item>
     </enum>
   </dataTypes>

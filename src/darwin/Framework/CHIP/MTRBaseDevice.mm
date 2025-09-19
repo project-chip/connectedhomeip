@@ -2021,7 +2021,6 @@ MTREventPriority MTREventPriorityForValidPriorityLevel(chip::app::PriorityLevel 
                 });
             };
 
-            SetupPayload setupPayload;
             auto errorCode = OpenCommissioningWindowHelper::OpenCommissioningWindow(commissioner, self.nodeID,
                 chip::System::Clock::Seconds16(static_cast<uint16_t>(durationVal)), static_cast<uint16_t>(discriminatorVal),
                 passcode, resultCallback);
@@ -2762,7 +2761,7 @@ static NSString * const sClusterKey = @"clusterKey";
 @end
 
 @implementation MTRAttributePath
-- (instancetype)initWithPath:(const ConcreteDataAttributePath &)path
+- (instancetype)initWithPath:(const ConcreteAttributePath &)path
 {
     if (self = [super initWithPath:path]) {
         _attribute = @(path.mAttributeId);

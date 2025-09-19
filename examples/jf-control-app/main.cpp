@@ -27,6 +27,7 @@
 #include "commands/icd/ICDCommand.h"
 #include "commands/interactive/Commands.h"
 #include "commands/pairing/Commands.h"
+#include "commands/pairing/OpenJointCommissioningWindowCommand.h"
 
 #include "RpcClientProcessor.h"
 
@@ -44,6 +45,17 @@ CHIP_ERROR RpcConnect(void)
     chip::rpc::client::SetRpcServerAddress(rpcServerIp.c_str());
     chip::rpc::client::SetRpcServerPort(rpcServerPort);
     return chip::rpc::client::StartPacketProcessing();
+}
+
+void registerCommandsJCM(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
+{
+    const char * clusterName = "Pairing";
+
+    commands_list clusterCommands = {
+        make_unique<OpenJointCommissioningWindowCommand>(credsIssuerConfig),
+    };
+
+    commands.UpdateCommandSet(clusterName, clusterCommands);
 }
 
 // ================================================================================
@@ -98,6 +110,7 @@ int main(int argc, char * argv[])
     registerCommandsPairing(commands, &credIssuerCommands);
     registerClusters(commands, &credIssuerCommands);
     registerCommandsSubscriptions(commands, &credIssuerCommands);
+    registerCommandsJCM(commands, &credIssuerCommands);
 
     return commands.Run(static_cast<int>(c_args.size()), c_args.data());
 }

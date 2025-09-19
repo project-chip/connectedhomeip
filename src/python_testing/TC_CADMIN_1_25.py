@@ -33,11 +33,12 @@
 
 import random
 
-import chip.clusters as Clusters
-from chip import ChipDeviceCtrl
-from chip.testing.event_attribute_reporting import AttributeSubscriptionHandler
-from chip.testing.matter_testing import AttributeMatcher, MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from mobly import asserts
+
+import matter.clusters as Clusters
+from matter import ChipDeviceCtrl
+from matter.testing.event_attribute_reporting import AttributeSubscriptionHandler
+from matter.testing.matter_testing import AttributeMatcher, MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 
 
 class TC_CADMIN_1_25(MatterBaseTest):
@@ -209,7 +210,7 @@ class TC_CADMIN_1_25(MatterBaseTest):
 
         null_match = AttributeMatcher.from_callable(
             "Attribute is null",
-            lambda report: str(type(report.value)).find('chip.clusters.Types.Nullable') >= 0)
+            lambda report: str(type(report.value)).find('matter.clusters.Types.Nullable') >= 0)
 
         th1_window_status_accumulator.await_all_expected_report_matches([window_status_0_match], timeout_sec=10)
         th1_admin_fabric_index_accumulator.await_all_expected_report_matches([null_match], timeout_sec=10)

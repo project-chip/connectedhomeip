@@ -60,12 +60,19 @@ chip_test_suite("tests") {
     test_sources += [ "TestAutoCommissioner.cpp" ]
   }
 
+  test_sources += [ "TestCommissioningDelegate.cpp" ]
+
+  if (chip_device_config_enable_joint_fabric) {
+    test_sources += [ "TestJCMCommissioner.cpp" ]
+  }
+
   cflags = [ "-Wconversion" ]
 
   sources = [ "AutoCommissionerTestAccess.h" ]
 
   public_deps = [
     "${chip_root}/src/app/common:cluster-objects",
+    "${chip_root}/src/app/server",
     "${chip_root}/src/app/tests:helpers",
     "${chip_root}/src/controller",
     "${chip_root}/src/lib/core:string-builder-adapters",
@@ -77,5 +84,12 @@ chip_test_suite("tests") {
 
   if (chip_device_platform != "mbed") {
     public_deps += [ "${chip_root}/src/controller/data_model" ]
+  }
+
+  if (chip_device_config_enable_joint_fabric) {
+    public_deps += [
+      "${chip_root}/src/app/server:joint_fabric",
+      "${chip_root}/src/controller:jcm",
+    ]
   }
 }

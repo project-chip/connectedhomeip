@@ -33,11 +33,22 @@ class TCPBaseTestAccess
 public:
     using TCPImpl = Transport::TCP<kActiveConnectionsSize, kPendingPacketSize>;
 
-    static void * FindActiveConnection(TCPImpl & tcp, Transport::PeerAddress & peerAddress)
+    class Connection
     {
-        return tcp.FindActiveConnection(peerAddress);
+        friend class TCPBaseTestAccess;
+        ActiveTCPConnectionHolder mHolder;
+
+    public:
+        operator bool() const { return !mHolder.IsNull(); }
+    };
+
+    static Connection FindActiveConnection(TCPImpl & tcp, Transport::PeerAddress & peerAddress)
+    {
+        Connection result;
+        result.mHolder = tcp.FindInUseConnection(peerAddress);
+        return result;
     }
-    static Inet::TCPEndPoint * GetEndpoint(void * state) { return static_cast<ActiveTCPConnectionState *>(state)->mEndPoint; }
+    static Inet::TCPEndPoint * GetEndpoint(Connection & state) { return state.mHolder->mEndPoint; }
 
     static CHIP_ERROR ProcessReceivedBuffer(TCPImpl & tcp, Inet::TCPEndPoint * endPoint, const PeerAddress & peerAddress,
                                             System::PacketBufferHandle && buffer)

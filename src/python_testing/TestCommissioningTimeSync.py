@@ -16,13 +16,14 @@
 #
 import logging
 
-import chip.clusters as Clusters
-from chip import ChipDeviceCtrl
-from chip.clusters.Types import NullValue
-from chip.interaction_model import InteractionModelError, Status
-from chip.testing.matter_testing import MatterBaseTest, async_test_body, default_matter_test_main
-from chip.testing.timeoperations import utc_time_in_matter_epoch
 from mobly import asserts
+
+import matter.clusters as Clusters
+from matter import ChipDeviceCtrl
+from matter.clusters.Types import NullValue
+from matter.interaction_model import InteractionModelError, Status
+from matter.testing.matter_testing import MatterBaseTest, async_test_body, default_matter_test_main
+from matter.testing.timeoperations import utc_time_in_matter_epoch
 
 # We don't have a good pipe between the c++ enums in CommissioningDelegate and python
 # so this is hardcoded.
@@ -196,7 +197,8 @@ class TestCommissioningTimeSync(MatterBaseTest):
 
         self.commissioner.SetTimeZone(offset=3600, validAt=0)
         six_months = 1.577e+13  # in us
-        self.commissioner.SetDSTOffset(offset=3600, validStarting=0, validUntil=utc_time_in_matter_epoch() + int(six_months))
+        self.commissioner.SetDSTOffset(offset=3600, validStarting=0,
+                                       validUntil=utc_time_in_matter_epoch() + int(six_months))
         self.commissioner.SetDefaultNTP("fe80::1")
         self.commissioner.SetTrustedTimeSource(self.commissioner.nodeId, 0)
 
