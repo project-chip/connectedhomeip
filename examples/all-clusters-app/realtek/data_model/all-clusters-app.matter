@@ -245,8 +245,8 @@ enum ThreeLevelAutoEnum : enum8 {
 }
 
 enum WebRTCEndReasonEnum : enum8 {
-  kIceFailed = 0;
-  kIceTimeout = 1;
+  kICEFailed = 0;
+  kICETimeout = 1;
   kUserHangup = 2;
   kUserBusy = 3;
   kReplaced = 4;
@@ -256,7 +256,8 @@ enum WebRTCEndReasonEnum : enum8 {
   kOutOfResources = 8;
   kMediaTimeout = 9;
   kLowPower = 10;
-  kUnknownReason = 11;
+  kPrivacyMode = 11;
+  kUnknownReason = 12;
 }
 
 bitmap TestGlobalBitmap : bitmap32 {
@@ -343,7 +344,7 @@ fabric_scoped struct WebRTCSessionStruct {
   StreamUsageEnum streamUsage = 3;
   nullable int16u videoStreamID = 4;
   nullable int16u audioStreamID = 5;
-  optional boolean metadataEnabled = 6;
+  boolean metadataEnabled = 6;
   fabric_idx fabricIndex = 254;
 }
 
@@ -537,9 +538,9 @@ cluster OnOff = 6 {
   command Toggle(): DefaultSuccess = 2;
   /** The OffWithEffect command allows devices to be turned off using enhanced ways of fading. */
   command OffWithEffect(OffWithEffectRequest): DefaultSuccess = 64;
-  /** The OnWithRecallGlobalScene command allows the recall of the settings when the device was turned off. */
+  /** This command allows the recall of the settings when the device was turned off. */
   command OnWithRecallGlobalScene(): DefaultSuccess = 65;
-  /** The OnWithTimedOff command allows devices to be turned on for a specific duration with a guarded off duration so that SHOULD the device be subsequently switched off, further OnWithTimedOff commands, received during this time, are prevented from turning the devices back on. */
+  /** This command allows devices to be turned on for a specific duration with a guarded off duration so that SHOULD the device be subsequently turned off, further OnWithTimedOff commands, received during this time, are prevented from turning the devices back on. */
   command OnWithTimedOff(OnWithTimedOffRequest): DefaultSuccess = 66;
 }
 
@@ -608,9 +609,9 @@ cluster OnOff = 6 {
   command Toggle(): DefaultSuccess = 2;
   /** The OffWithEffect command allows devices to be turned off using enhanced ways of fading. */
   command OffWithEffect(OffWithEffectRequest): DefaultSuccess = 64;
-  /** The OnWithRecallGlobalScene command allows the recall of the settings when the device was turned off. */
+  /** This command allows the recall of the settings when the device was turned off. */
   command OnWithRecallGlobalScene(): DefaultSuccess = 65;
-  /** The OnWithTimedOff command allows devices to be turned on for a specific duration with a guarded off duration so that SHOULD the device be subsequently switched off, further OnWithTimedOff commands, received during this time, are prevented from turning the devices back on. */
+  /** This command allows devices to be turned on for a specific duration with a guarded off duration so that SHOULD the device be subsequently turned off, further OnWithTimedOff commands, received during this time, are prevented from turning the devices back on. */
   command OnWithTimedOff(OnWithTimedOffRequest): DefaultSuccess = 66;
 }
 
@@ -5683,6 +5684,7 @@ cluster Thermostat = 513 {
     kMatterScheduleConfiguration = 0x80;
     kPresets = 0x100;
     kEvents = 0x200;
+    kThermostatSuggestions = 0x400;
   }
 
   bitmap HVACSystemTypeBitmap : bitmap8 {
@@ -5754,6 +5756,7 @@ cluster Thermostat = 513 {
     kVacationMode = 0x10;
     kTimeOfUseCostSavings = 0x20;
     kPreCoolingOrPreHeating = 0x40;
+    kConflictingSuggestions = 0x80;
   }
 
   struct ScheduleTransitionStruct {
@@ -6219,17 +6222,17 @@ cluster ColorControl = 768 {
   readonly attribute optional int16u primary6X = 40;
   readonly attribute optional int16u primary6Y = 41;
   readonly attribute optional nullable int8u primary6Intensity = 42;
-  attribute access(write: manage) optional int16u whitePointX = 48;
-  attribute access(write: manage) optional int16u whitePointY = 49;
-  attribute access(write: manage) optional int16u colorPointRX = 50;
-  attribute access(write: manage) optional int16u colorPointRY = 51;
-  attribute access(write: manage) optional nullable int8u colorPointRIntensity = 52;
-  attribute access(write: manage) optional int16u colorPointGX = 54;
-  attribute access(write: manage) optional int16u colorPointGY = 55;
-  attribute access(write: manage) optional nullable int8u colorPointGIntensity = 56;
-  attribute access(write: manage) optional int16u colorPointBX = 58;
-  attribute access(write: manage) optional int16u colorPointBY = 59;
-  attribute access(write: manage) optional nullable int8u colorPointBIntensity = 60;
+  readonly attribute optional int16u whitePointX = 48;
+  readonly attribute optional int16u whitePointY = 49;
+  readonly attribute optional int16u colorPointRX = 50;
+  readonly attribute optional int16u colorPointRY = 51;
+  readonly attribute optional nullable int8u colorPointRIntensity = 52;
+  readonly attribute optional int16u colorPointGX = 54;
+  readonly attribute optional int16u colorPointGY = 55;
+  readonly attribute optional nullable int8u colorPointGIntensity = 56;
+  readonly attribute optional int16u colorPointBX = 58;
+  readonly attribute optional int16u colorPointBY = 59;
+  readonly attribute optional nullable int8u colorPointBIntensity = 60;
   readonly attribute optional int16u enhancedCurrentHue = 16384;
   readonly attribute EnhancedColorModeEnum enhancedColorMode = 16385;
   readonly attribute optional int8u colorLoopActive = 16386;
@@ -7807,8 +7810,8 @@ endpoint 0 {
 
   server cluster Binding {
     callback attribute binding;
-    ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 1;
+    callback attribute featureMap;
+    callback attribute clusterRevision;
   }
 
   server cluster AccessControl {
@@ -7835,7 +7838,7 @@ endpoint 0 {
     callback attribute vendorID;
     callback attribute productName;
     callback attribute productID;
-    persist  attribute nodeLabel;
+    callback attribute nodeLabel;
     callback attribute location;
     callback attribute hardwareVersion;
     callback attribute hardwareVersionString;
@@ -7846,18 +7849,18 @@ endpoint 0 {
     callback attribute productURL;
     callback attribute productLabel;
     callback attribute serialNumber;
-    persist  attribute localConfigDisabled default = 0;
+    callback attribute localConfigDisabled;
     callback attribute uniqueID;
     callback attribute capabilityMinima;
     callback attribute productAppearance;
     callback attribute specificationVersion;
     callback attribute maxPathsPerInvoke;
-    ram      attribute configurationVersion default = 1;
+    callback attribute configurationVersion;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 3;
+    callback attribute featureMap;
+    callback attribute clusterRevision;
   }
 
   server cluster OtaSoftwareUpdateRequestor {
@@ -8125,7 +8128,7 @@ endpoint 0 {
     callback attribute carrierDetect;
     callback attribute timeSinceReset;
     ram      attribute featureMap default = 3;
-    ram      attribute clusterRevision default = 1;
+    callback attribute clusterRevision;
 
     handle command ResetCounts;
   }
@@ -8228,8 +8231,8 @@ endpoint 0 {
 
   server cluster FixedLabel {
     callback attribute labelList;
-    ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 1;
+    callback attribute featureMap;
+    callback attribute clusterRevision;
   }
 
   server cluster UserLabel {
@@ -8372,8 +8375,8 @@ endpoint 1 {
 
   server cluster Binding {
     callback attribute binding;
-    ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 1;
+    callback attribute featureMap;
+    callback attribute clusterRevision;
   }
 
   server cluster Actions {
@@ -8410,8 +8413,8 @@ endpoint 1 {
 
   server cluster FixedLabel {
     callback attribute labelList;
-    ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 1;
+    callback attribute featureMap;
+    callback attribute clusterRevision;
   }
 
   server cluster UserLabel {
@@ -8421,9 +8424,9 @@ endpoint 1 {
   }
 
   server cluster BooleanState {
-    ram      attribute stateValue default = 0;
-    ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 1;
+    callback attribute stateValue;
+    callback attribute featureMap;
+    callback attribute clusterRevision;
   }
 
   server cluster OvenCavityOperationalState {

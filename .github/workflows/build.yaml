@@ -36,14 +36,17 @@ env:
     CHIP_NO_LOG_TIMESTAMPS: true
 
 jobs:
+    changed_paths:
+      uses: ./.github/workflows/analyze-changed-paths.yaml
+
     build_linux_gcc_debug:
         name: Build on Linux (gcc_debug)
-
+        needs: changed_paths
         runs-on: ubuntu-latest
-        if: github.actor != 'restyled-io[bot]'
+        if: github.actor != 'restyled-io[bot]' && needs.changed_paths.outputs.non_md_changes == 'true'
 
         container:
-            image: ghcr.io/project-chip/chip-build:153
+            image: ghcr.io/project-chip/chip-build:167
             volumes:
                 - "/:/runner-root-volume"
                 - "/tmp/log_output:/tmp/test_logs"
@@ -60,7 +63,7 @@ jobs:
                   CONCURRENCY_CONTEXT: ${{ github.ref }}-${{ github.workflow }}-${{ (github.event_name == 'pull_request' && github.event.number) || (github.event_name == 'workflow_dispatch' && github.run_number) || github.sha }}
               run: echo "$CONCURRENCY_CONTEXT"
             - name: Checkout
-              uses: actions/checkout@v4
+              uses: actions/checkout@v5
             - name: Try to ensure the directories for core dumping exist and we
                   can write them.
               run: |
@@ -148,12 +151,12 @@ jobs:
 
     build_linux:
         name: Build on Linux (fake, gcc_release, clang, simulated)
-
+        needs: changed_paths
         runs-on: ubuntu-latest
-        if: github.actor != 'restyled-io[bot]' && inputs.run-codeql != true
+        if: github.actor != 'restyled-io[bot]' && inputs.run-codeql != true && needs.changed_paths.outputs.non_md_changes == 'true'
 
         container:
-            image: ghcr.io/project-chip/chip-build:153
+            image: ghcr.io/project-chip/chip-build:167
             volumes:
                 - "/:/runner-root-volume"
                 - "/tmp/log_output:/tmp/test_logs"
@@ -170,7 +173,7 @@ jobs:
                   CONCURRENCY_CONTEXT: ${{ github.ref }}-${{ github.workflow }}-${{ (github.event_name == 'pull_request' && github.event.number) || (github.event_name == 'workflow_dispatch' && github.run_number) || github.sha }}
               run: echo "$CONCURRENCY_CONTEXT"
             - name: Checkout
-              uses: actions/checkout@v4
+              uses: actions/checkout@v5
               with:
                   fetch-depth: 2
                   persist-credentials: true
@@ -234,7 +237,7 @@ jobs:
                   ./scripts/run_in_build_env.sh "./scripts/run_codegen_targets.sh out/sanitizers"
             - name: Find changed files
               id: changed-files
-              uses: tj-actions/changed-files@v46
+              uses: tj-actions/changed-files@v47
               with:
                 # Exclude all files under "third_party/"
                 files-ignore: |
@@ -326,12 +329,12 @@ jobs:
 
     build_linux_python_lib:
         name: Build on Linux (python_lib)
-
+        needs: changed_paths
         runs-on: ubuntu-latest
-        if: github.actor != 'restyled-io[bot]' && inputs.run-codeql != true
+        if: github.actor != 'restyled-io[bot]' && inputs.run-codeql != true && needs.changed_paths.outputs.non_md_changes == 'true'
 
         container:
-            image: ghcr.io/project-chip/chip-build:153
+            image: ghcr.io/project-chip/chip-build:167
             volumes:
                 - "/:/runner-root-volume"
                 - "/tmp/log_output:/tmp/test_logs"
@@ -348,7 +351,7 @@ jobs:
                   CONCURRENCY_CONTEXT: ${{ github.ref }}-${{ github.workflow }}-${{ (github.event_name == 'pull_request' && github.event.number) || (github.event_name == 'workflow_dispatch' && github.run_number) || github.sha }}
               run: echo "$CONCURRENCY_CONTEXT"
             - name: Checkout
-              uses: actions/checkout@v4
+              uses: actions/checkout@v5
             - name: Checkout submodules & Bootstrap
               uses: ./.github/actions/checkout-submodules-and-bootstrap
               with:
@@ -365,15 +368,13 @@ jobs:
                   scripts/run_in_build_env.sh 'virtualenv pyenv'
                   source pyenv/bin/activate
                   python -m ensurepip --upgrade
-                  python -m pip install ./out/controller/python/chip_core-0.0-cp37-abi3-linux_x86_64.whl
-                  python -m pip install ./out/controller/python/chip_clusters-0.0-py3-none-any.whl
-                  python -m pip install ./out/controller/python/chip_repl-0.0-py3-none-any.whl
+                  python -m pip install out/controller/python/matter*.whl
 
             - name: Run Python tests
               shell: bash
               run: |
                   source pyenv/bin/activate
-                  cd src/controller/python/test/unit_tests/
+                  cd src/controller/python/tests
                   python3 -m unittest -v
             - name: Clean previous outputs
               run: rm -rf out pyenv
@@ -391,12 +392,12 @@ jobs:
 
     build_linux_python_lighting_device:
         name: Build on Linux (python lighting-app)
-
+        needs: changed_paths
         runs-on: ubuntu-latest
-        if: github.actor != 'restyled-io[bot]' && inputs.run-codeql != true
+        if: github.actor != 'restyled-io[bot]' && inputs.run-codeql != true && needs.changed_paths.outputs.non_md_changes == 'true'
 
         container:
-            image: ghcr.io/project-chip/chip-build:153
+            image: ghcr.io/project-chip/chip-build:167
             volumes:
                 - "/:/runner-root-volume"
                 - "/tmp/log_output:/tmp/test_logs"
@@ -413,7 +414,7 @@ jobs:
                   CONCURRENCY_CONTEXT: ${{ github.ref }}-${{ github.workflow }}-${{ (github.event_name == 'pull_request' && github.event.number) || (github.event_name == 'workflow_dispatch' && github.run_number) || github.sha }}
               run: echo "$CONCURRENCY_CONTEXT"
             - name: Checkout
-              uses: actions/checkout@v4
+              uses: actions/checkout@v5
             - name: Checkout submodules & Bootstrap
               uses: ./.github/actions/checkout-submodules-and-bootstrap
               with:
@@ -425,12 +426,13 @@ jobs:
 
     build_darwin:
         name: Build on Darwin (clang, simulated)
+        needs: changed_paths
         runs-on: macos-13
-        if: github.actor != 'restyled-io[bot]'  && inputs.run-codeql != true
+        if: github.actor != 'restyled-io[bot]'  && inputs.run-codeql != true && needs.changed_paths.outputs.non_md_changes == 'true'
 
         steps:
             - name: Checkout
-              uses: actions/checkout@v4
+              uses: actions/checkout@v5
               with:
                   fetch-depth: 2
                   persist-credentials: true
@@ -473,7 +475,7 @@ jobs:
                   ./scripts/run_in_build_env.sh "./scripts/run_codegen_targets.sh out/default"
             - name: Find changed files
               id: changed-files
-              uses: tj-actions/changed-files@v46
+              uses: tj-actions/changed-files@v47
             - name: Clang-tidy validation
               # NOTE: clang-tidy crashes on CodegenDataModel_Write due to Nullable/std::optional check.
               #       See https://github.com/llvm/llvm-project/issues/97426
@@ -512,26 +514,36 @@ jobs:
 
     build_linux_gcc_coverage:
         name: Build on Linux (coverage)
-
+        needs: changed_paths
         env:
             TSAN_OPTIONS: "halt_on_error=1 suppressions=scripts/tests/chiptest/tsan-linux-suppressions.txt"
 
-        if: github.actor != 'restyled-io[bot]' && inputs.run-codeql != true
+        if: github.actor != 'restyled-io[bot]' && inputs.run-codeql != true && needs.changed_paths.outputs.non_md_changes == 'true'
         runs-on: ubuntu-latest
 
         container:
-            image: ghcr.io/project-chip/chip-build:153
+            image: ghcr.io/project-chip/chip-build:167
             options: --privileged --sysctl "net.ipv6.conf.all.disable_ipv6=0
                 net.ipv4.conf.all.forwarding=0 net.ipv6.conf.all.forwarding=0"
 
         steps:
             - name: Checkout
-              uses: actions/checkout@v4
+              uses: actions/checkout@v5
             - name: Checkout submodules & Bootstrap
               uses: ./.github/actions/checkout-submodules-and-bootstrap
               with:
                 platform: linux
-                bootstrap-log-name: bootstrap-logs-linux-${{ matrix.build_variant }}${{ matrix.chip_tool }}                
+                bootstrap-log-name: bootstrap-logs-linux-${{ matrix.build_variant }}${{ matrix.chip_tool }}
 
             - name: Run Build Coverage
-              run: ./scripts/build_coverage.sh --yaml
+              run: ./scripts/build_coverage.sh --yaml --xml
+            # This is a workaround to unblock CI: failure is due to missing gpg which got triggered when codecov-action@v5 made a new release
+            # TODO: install gpg in chip-build image directly
+            - name: Install gpg
+              run: |
+                apt-get update
+                apt-get install -y --no-install-recommends gnupg
+            - name: Upload coverage reports to Codecov with GitHub Action
+              uses: codecov/codecov-action@v5
+              env:
+                CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}

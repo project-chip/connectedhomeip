@@ -203,8 +203,7 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetNetworkInterfaces(NetworkInterface ** 
         for (esp_netif_t * ifa = netif; ifa != NULL; ifa = esp_netif_next(ifa))
         {
             NetworkInterface * ifp = new NetworkInterface();
-            esp_netif_ip_info_t ipv4_info;
-            uint8_t addressSize = 0;
+            uint8_t addressSize    = 0;
             Platform::CopyString(ifp->Name, esp_netif_get_ifkey(ifa));
             ifp->name          = CharSpan::fromCharString(ifp->Name);
             ifp->isOperational = true;
@@ -236,6 +235,7 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetNetworkInterfaces(NetworkInterface ** 
                 ChipLogError(DeviceLayer, "Failed to get network hardware address");
             }
 #ifndef CONFIG_DISABLE_IPV4
+            esp_netif_ip_info_t ipv4_info;
             if (esp_netif_get_ip_info(ifa, &ipv4_info) == ESP_OK)
             {
                 memcpy(ifp->Ipv4AddressesBuffer[0], &(ipv4_info.ip.addr), kMaxIPv4AddrSize);

@@ -52,7 +52,6 @@ updates:
       - dependency-name: "third_party/nlfaultinjection/repo"
       - dependency-name: "third_party/nlio/repo"
       - dependency-name: "third_party/nxp/repo"
-      - dependency-name: "third_party/open-iot-sdk/repo"
       - dependency-name: "third_party/ot-br-posix/repo"
       - dependency-name: "third_party/perfetto/repo"
       - dependency-name: "third_party/qpg_sdk/repo"

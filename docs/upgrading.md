@@ -101,6 +101,115 @@ commandHandler->AddResponse(path, kReplyCommandId, replyEncoder);
 
 ```
 
+### Decoupling of `CommandHandlerInterface` from EmberTestCodegenModelViaMocks.cpp:1513:77 Metadata
+
+CommandHandler Interface was coupled with Ember data in ways that caused bugs if
+not set up correctly, updates were made for decoupling, now this data is
+provided through the new interface.
+
+With this the interfaces
+[`CommandHandlerInterface::RetrieveGeneratedCommands`](#enumerateacceptedcommands-to-retrieveacceptedcommands),
+[`CommandHandlerInterface::RetrieveAcceptedCommands`](#enumerategeneratedcommands-to-retrievegeneratedcommands)
+go through some changes, a shim is provided to make the transition simpler
+
+#### Full Changes
+
+##### EnumerateGeneratedCommands to RetrieveGeneratedCommands
+
+Changed the old callback based iteration into a ListBuilder based approach for
+the enumeration of generated commands
+
+`CommandHandlerInterface::EnumerateGeneratedCommands(const ConcreteClusterPath & cluster, CommandIdCallback callback, void * context)`
+becomes
+`CommandHandlerInterface::RetrieveGeneratedCommands(const ConcreteClusterPath & cluster, ListBuilder<CommandId> & builder)`
+
+Changes for implementation
+
+-   old
+
+```cpp
+   for (auto && cmd : { ScanNetworksResponse::Id, NetworkConfigResponse::Id, ConnectNetworkResponse::Id })
+   {
+       VerifyOrExit(callback(cmd, context) == Loop::Continue, /**/);
+   }
+```
+
+-   new
+
+```cpp
+   ReturnErrorOnFailure(
+        builder.AppendElements({ ScanNetworksResponse::Id, NetworkConfigResponse::Id, ConnectNetworkResponse::Id })
+   )
+```
+
+##### EnumerateAcceptedCommands to RetrieveAcceptedCommands
+
+Changed the old callback based iteration into a ListBuilder based approach for
+the enumeration of accepted commands. The new Interface allows for the full
+metadata lookup.
+
+`CommandHandlerInterface::EnumerateAcceptedCommands(const ConcreteClusterPath & cluster, CommandIdCallback callback, void * context)`
+becomes
+`CommandHandlerInterface::RetrieveAcceptedCommands(const ConcreteClusterPath & cluster, ListBuilder<AcceptedCommandEntry> & builder)`
+
+Changes for implementation:
+
+-   Old
+
+```cpp
+    for (auto && cmd : {
+             Disable::Id,
+             EnableCharging::Id,
+         })
+    {
+        VerifyOrExit(callback(cmd, context) == Loop::Continue, /**/);
+    }
+
+    if (HasFeature(Feature::kV2x))
+    {
+        VerifyOrExit(callback(EnableDischarging::Id, context) == Loop::Continue, /**/);
+    }
+```
+
+-   new
+
+```cpp
+    ReturnErrorOnFailure(builder.AppendElements({
+        Disable::kMetadataEntry,
+        EnableCharging::kMetadataEntry,
+    }));
+    if (HasFeature(Feature::kV2x))
+    {
+        ReturnErrorOnFailure(builder.EnsureAppendCapacity(1));
+        ReturnErrorOnFailure(
+            builder.Append(EnableDischarging::kMetadataEntry)
+        );
+    }
+```
+
+Important Notes:
+
+Use `EnsureAppendCapacity` before `ListBuilder::Append` to prevent buffer
+overflow when appending a single element, this function never allocates.
+
+#### Backwards compatibility
+
+If the changes above are too high friction for upgrading, we provide a shim that
+allows implementing these changes with a very minimal change. It adds a little
+extra code size compared to the code above but should be decent for most cases.
+
+To use this shim just replace inheriting from CommandHandlerInterface with
+inheriting from CommandHandlerInterfaceShim<> with a list of the cluster IDs
+required for your implementation
+
+```diff
+- #include <app/CommandHandlerInterface.h>
++ #include <app/CommandHandlerInterfaceShim.h>
+...
+- class Instance : public CommandHandlerInterface,
++ class Instance : public CommandHandlerInterfaceShim<NetworkCommissioning::Id>
+```
+
 ### `CommandHandlerInterface` in `chip::app::InteractionModelEngine`
 
 Command handler lists were placed in a separate registry class that is

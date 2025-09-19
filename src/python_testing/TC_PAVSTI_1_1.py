@@ -24,6 +24,8 @@
 #     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
 #     script-args: >
 #       --storage-path admin_storage.json
+#       --string-arg th_server_app_path:${PUSH_AV_SERVER}
+#       --string-arg host_ip:127.0.0.1
 #       --commissioning-method on-network
 #       --discriminator 1234
 #       --passcode 20202021
@@ -36,21 +38,41 @@
 
 import logging
 
-import chip.clusters as Clusters
-from chip.clusters import Globals
-from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from mobly import asserts
 from TC_AVSMTestBase import AVSMTestBase
+from TC_PAVSTI_Utils import PAVSTIUtils, PushAvServerProcess
+
+import matter.clusters as Clusters
+from matter.clusters import Globals
+from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 
 logger = logging.getLogger(__name__)
 
 
-class TC_PAVSTI_1_1(MatterBaseTest, AVSMTestBase):
+class TC_PAVSTI_1_1(MatterBaseTest, AVSMTestBase, PAVSTIUtils):
     def desc_TC_PAVSTI_1_1(self) -> str:
         return "[TC-PAVSTI-1.1] Verify transmission when trigger type is Manual."
 
     def pics_TC_PAVSTI_1_1(self):
         return ["PAVST.S"]
+
+    @async_test_body
+    async def setup_class(self):
+        th_server_app = self.user_params.get("th_server_app_path", None)
+        self.host_ip = self.user_params.get("host_ip", None)
+        if self.host_ip is None:
+            self.host_ip = self.get_private_ip()
+        self.server = PushAvServerProcess(server_path=th_server_app, server_ip=self.host_ip)
+        self.server.start(
+            expected_output="Running on https://0.0.0.0:1234",
+            timeout=30,
+        )
+        super().setup_class()
+
+    def teardown_class(self):
+        if self.server is not None:
+            self.server.terminate()
+        super().teardown_class()
 
     def steps_TC_PAVSTI_1_1(self) -> list[TestStep]:
         return [
@@ -121,6 +143,8 @@ class TC_PAVSTI_1_1(MatterBaseTest, AVSMTestBase):
         # Commission DUT - already done
         await self.precondition_one_allocated_video_stream(streamUsage=Globals.Enums.StreamUsageEnum.kRecording)
         await self.precondition_one_allocated_audio_stream(streamUsage=Globals.Enums.StreamUsageEnum.kRecording)
+        tlsEndpointId, _ = await self.precondition_provision_tls_endpoint(endpoint=endpoint, server=self.server, host_ip=self.host_ip)
+        uploadStreamId = self.server.create_stream()
 
         self.step(1)
         currentConnections = await self.read_single_attribute_check_success(
@@ -193,14 +217,14 @@ class TC_PAVSTI_1_1(MatterBaseTest, AVSMTestBase):
                     "streamUsage": Globals.Enums.StreamUsageEnum.kRecording,
                     "videoStreamID": videoStreamId,
                     "audioStreamID": audioStreamId,
-                    "endpointID": 1,  # TODO: Revisit TLS arguments once TLSCM cluster is available.
-                    "url": "https://localhost:1234/streams/1",
+                    "endpointID": tlsEndpointId,
+                    "url": f"https://{self.host_ip}:1234/streams/{uploadStreamId}",
                     "triggerOptions": {"triggerType": pushavCluster.Enums.TransportTriggerTypeEnum.kCommand, "maxPreRollLen": 10},
                     "ingestMethod": pushavCluster.Enums.IngestMethodsEnum.kCMAFIngest,
                     "containerFormat": pushavCluster.Enums.ContainerFormatEnum.kCmaf,
                     "containerOptions": {
                         "containerType": pushavCluster.Enums.ContainerFormatEnum.kCmaf,
-                        "CMAFContainerOptions": {"chunkDuration": 4},
+                        "CMAFContainerOptions": {"CMAFInterface": 0, "segmentDuration": 4000, "chunkDuration": 2000, "sessionGroup": 1, "trackName": "media"},
                     },
                 }
             ),
@@ -224,20 +248,31 @@ class TC_PAVSTI_1_1(MatterBaseTest, AVSMTestBase):
         await self.send_single_cmd(
             cmd=pushavCluster.Commands.ManuallyTriggerTransport(
                 connectionID=aConnectionID,
-                activationReason=pushavCluster.Enums.TriggerActivationReasonEnum.kUserInitiated
+                activationReason=pushavCluster.Enums.TriggerActivationReasonEnum.kUserInitiated,
+                # TODO: Time control field though optional is curretly required by camera-app, revert when fixed.
+                timeControl={
+                    "initialDuration": 30,
+                    "augmentationDuration": 10,
+                    "maxDuration": 120,
+                    "blindDuration": 1,
+                }
             ),
             endpoint=endpoint,
         )
 
         self.step(8)
-        # TODO: Add a step to allow user to verify this through TH UI.
         if not self.check_pics("PICS_SDK_CI_ONLY"):
-            user_response = self.wait_for_user_input(
-                prompt_msg="Verify the video stream is being transmitted and is of CMAF format. Enter 'y' to confirm.",
-                prompt_msg_placeholder="y",
-                default_value="y",
+            skipped = self.user_verify_push_av_stream(
+                prompt_msg="Verify the video stream is being transmitted and is of CMAF format."
             )
-            asserts.assert_equal(user_response.lower(), "y")
+            if skipped:
+                # For when running in CLI
+                user_response = self.wait_for_user_input(
+                    prompt_msg="Verify the video stream is being transmitted and is of CMAF format. Enter 'y' to confirm.",
+                    prompt_msg_placeholder="y",
+                    default_value="y",
+                )
+                asserts.assert_equal(user_response.lower(), "y")
 
         self.step(9)
         await self.send_single_cmd(
@@ -247,14 +282,18 @@ class TC_PAVSTI_1_1(MatterBaseTest, AVSMTestBase):
         )
 
         self.step(10)
-        # TODO: Add a step to allow user to verify this through TH UI.
         if not self.check_pics("PICS_SDK_CI_ONLY"):
-            user_response = self.wait_for_user_input(
-                prompt_msg="Verify the transmission of video stream has stopped. Enter 'y' to confirm.",
-                prompt_msg_placeholder="y",
-                default_value="y",
+            skipped = self.user_verify_push_av_stream(
+                prompt_msg="Verify the transmission of video stream has stopped."
             )
-            asserts.assert_equal(user_response.lower(), "y")
+            if skipped:
+                # For when running in CLI
+                user_response = self.wait_for_user_input(
+                    prompt_msg="Verify the transmission of video stream has stopped. Enter 'y' to confirm.",
+                    prompt_msg_placeholder="y",
+                    default_value="y",
+                )
+                asserts.assert_equal(user_response.lower(), "y")
 
 
 if __name__ == "__main__":

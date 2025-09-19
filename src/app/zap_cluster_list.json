@@ -173,7 +173,7 @@
         "BALLAST_CONFIGURATION_CLUSTER": [],
         "BASIC_INFORMATION_CLUSTER": ["basic-information"],
         "BINDING_CLUSTER": ["bindings"],
-        "BOOLEAN_STATE_CLUSTER": [],
+        "BOOLEAN_STATE_CLUSTER": ["boolean-state-server"],
         "BOOLEAN_STATE_CONFIGURATION_CLUSTER": [
             "boolean-state-configuration-server"
         ],
@@ -340,7 +340,9 @@
         "TIME_FORMAT_LOCALIZATION_CLUSTER": ["time-format-localization-server"],
         "TIME_SYNCHRONIZATION_CLUSTER": ["time-synchronization-server"],
         "TIMER_CLUSTER": ["timer-server"],
-        "TLS_CERTIFICATE_MANAGEMENT_CLUSTER": [],
+        "TLS_CERTIFICATE_MANAGEMENT_CLUSTER": [
+            "tls-certificate-management-server"
+        ],
         "TLS_CLIENT_MANAGEMENT_CLUSTER": ["tls-client-management-server"],
         "TVOC_CONCENTRATION_MEASUREMENT_CLUSTER": [
             "concentration-measurement-server"

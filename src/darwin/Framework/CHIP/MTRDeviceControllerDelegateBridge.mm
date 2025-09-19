@@ -16,6 +16,8 @@
 
 #import "MTRDeviceControllerDelegateBridge.h"
 
+#import <Matter/MTRClusterConstants.h>
+
 #import "MTRCommissioneeInfo_Internal.h"
 #import "MTRDeviceController.h"
 #import "MTRDeviceController_Internal.h"
@@ -26,6 +28,9 @@
 #import "MTRMetricsCollector.h"
 #import "MTRProductIdentity.h"
 #import "MTRUtilities.h"
+#import "zap-generated/MTRCommandPayloads_Internal.h"
+
+#include <lib/core/DataModelTypes.h>
 
 using namespace chip::Tracing::DarwinFramework;
 
@@ -145,6 +150,17 @@ void MTRDeviceControllerDelegateBridge::OnReadCommissioningInfo(const chip::Cont
         });
     }
 
+    mRootEndpointNetworkCommissioningFeatureMap.ClearAll();
+    if (info.attributes) {
+        using TypeInfo = chip::app::Clusters::NetworkCommissioning::Attributes::FeatureMap::TypeInfo;
+        chip::app::ConcreteAttributePath path(chip::kRootEndpointId, MTRClusterIDTypeNetworkCommissioningID,
+            MTRAttributeIDTypeGlobalAttributeFeatureMapID);
+        TypeInfo::DecodableType value;
+        if (info.attributes->Get<TypeInfo>(path, value) == CHIP_NO_ERROR) {
+            mRootEndpointNetworkCommissioningFeatureMap.SetRaw(value);
+        }
+    }
+
     // Don't hold on to the commissioning parameters now that we don't need them anymore.
     mCommissioningParameters = nil;
 }
@@ -160,7 +176,7 @@ void MTRDeviceControllerDelegateBridge::OnCommissioningComplete(chip::NodeId nod
     if (strongDelegate && mQueue && strongController) {
 
         // Always collect the metrics to avoid unbounded growth of the stats in the collector
-        MTRMetrics * metrics = [[MTRMetricsCollector sharedInstance] metricSnapshot:TRUE];
+        MTRMetrics * metrics = [[MTRMetricsCollector sharedInstance] metricSnapshotForCommissioning:YES];
         MTR_LOG("%@ Device commissioning complete with metrics %@", strongController, metrics);
 
         if ([strongDelegate respondsToSelector:@selector(controller:commissioningComplete:nodeID:)] ||
@@ -210,6 +226,115 @@ void MTRDeviceControllerDelegateBridge::OnCommissioningStatusUpdate(chip::PeerId
                 [strongDelegate controller:strongController commissioneeHasReceivedNetworkCredentials:nodeID];
             });
         }
+    }
+}
+
+void MTRDeviceControllerDelegateBridge::OnCommissioningStageStart(chip::PeerId peerId, chip::Controller::CommissioningStage stageStarting)
+{
+    MTRDeviceController * strongController = mController;
+    id<MTRDeviceControllerDelegate_Internal> strongDelegate = GetInternalDelegate();
+    // The methods on MTRDeviceControllerDelegate_Internal are required, but
+    // we don't know whether our delegate actually implements the protocol,
+    // so still need to do the respondsToSelector checks.
+
+    if (stageStarting != chip::Controller::CommissioningStage::kScanNetworks) {
+        // This is the only stage we handle right now.
+        return;
+    }
+
+    if (!strongController || !mQueue || !strongDelegate) {
+        MTR_LOG_ERROR("Unable to handle commissioning stage start: missing required data: %@ %@ %@", strongController, mQueue, strongDelegate);
+        return;
+    }
+
+    if ([strongDelegate respondsToSelector:@selector(controller:reachedCommissioningStage:)]) {
+        // We don't know which type of scan this will be (see
+        // https://github.com/project-chip/connectedhomeip/issues/40755), so decide
+        // based on mRootEndpointNetworkCommissioningFeatureMap.
+        auto featureMap = mRootEndpointNetworkCommissioningFeatureMap;
+        dispatch_async(mQueue, ^{
+            using Feature = chip::app::Clusters::NetworkCommissioning::Feature;
+            if (featureMap.Has(Feature::kWiFiNetworkInterface)) {
+                [strongDelegate controller:strongController reachedCommissioningStage:MTRCommissioningStageWiFiScanStart];
+            } else if (featureMap.Has(Feature::kThreadNetworkInterface)) {
+                [strongDelegate controller:strongController reachedCommissioningStage:MTRCommissioningStageThreadScanStart];
+            }
+        });
+    }
+}
+
+void MTRDeviceControllerDelegateBridge::OnScanNetworksSuccess(const chip::app::Clusters::NetworkCommissioning::Commands::ScanNetworksResponse::DecodableType & dataResponse)
+{
+    MTRDeviceController * strongController = mController;
+    id<MTRDeviceControllerDelegate_Internal> strongDelegate = GetInternalDelegate();
+    // The methods on MTRDeviceControllerDelegate_Internal are required, but
+    // we don't know whether our delegate actually implements the protocol,
+    // so still need to do the respondsToSelector checks.
+
+    MTR_LOG("%@ DeviceControllerDelegate network scan for nodeID 0x%016llx complete", strongController, mDeviceNodeId);
+
+    if (!strongController || !mQueue || !strongDelegate) {
+        MTR_LOG_ERROR("Unable to handle ScanNetworks success: missing required data: %@ %@ %@", strongController, mQueue, strongDelegate);
+        return;
+    }
+
+    auto * response = [[MTRNetworkCommissioningClusterScanNetworksResponseParams alloc] initWithDecodableStruct:dataResponse];
+    if (response == nil) {
+        // The TLV in the arrays was invalid.  Just treat this as a failure.
+        return OnScanNetworksFailure(CHIP_ERROR_SCHEMA_MISMATCH);
+    }
+
+    if (response.wiFiScanResults) {
+        if ([strongDelegate respondsToSelector:@selector(controller:scannedWiFiNetworks:error:)]) {
+            dispatch_async(mQueue, ^{
+                [strongDelegate controller:strongController scannedWiFiNetworks:response.wiFiScanResults error:nil];
+            });
+        }
+    } else if (response.threadScanResults) {
+        if ([strongDelegate respondsToSelector:@selector(controller:scannedThreadNetworks:error:)]) {
+            dispatch_async(mQueue, ^{
+                [strongDelegate controller:strongController scannedThreadNetworks:response.threadScanResults error:nil];
+            });
+        }
+    } else {
+        MTR_LOG_ERROR("Scan succeeded but for unknown network type: %lu", static_cast<unsigned long>(mRootEndpointNetworkCommissioningFeatureMap.Raw()));
+    }
+}
+
+void MTRDeviceControllerDelegateBridge::OnScanNetworksFailure(CHIP_ERROR error)
+{
+    MTRDeviceController * strongController = mController;
+    id<MTRDeviceControllerDelegate_Internal> strongDelegate = GetInternalDelegate();
+    // The methods on MTRDeviceControllerDelegate_Internal are required, but
+    // we don't know whether our delegate actually implements the protocol,
+    // so still need to do the respondsToSelector checks.
+
+    MTR_LOG("%@ DeviceControllerDelegate network scan for nodeID 0x%016llx failed: %" CHIP_ERROR_FORMAT,
+        strongController, mDeviceNodeId, error.Format());
+
+    if (!strongController || !mQueue || !strongDelegate) {
+        MTR_LOG_ERROR("Unable to handle ScanNetworks failure: missing required data: %@ %@ %@", strongController, mQueue, strongDelegate);
+        return;
+    }
+
+    // We don't know which type of scan this was (see
+    // https://github.com/project-chip/connectedhomeip/issues/40755), so decide
+    // based on mRootEndpointNetworkCommissioningFeatureMap.
+    using Feature = chip::app::Clusters::NetworkCommissioning::Feature;
+    if (mRootEndpointNetworkCommissioningFeatureMap.Has(Feature::kWiFiNetworkInterface)) {
+        if ([strongDelegate respondsToSelector:@selector(controller:scannedWiFiNetworks:error:)]) {
+            dispatch_async(mQueue, ^{
+                [strongDelegate controller:strongController scannedWiFiNetworks:nil error:[MTRError errorForCHIPErrorCode:error]];
+            });
+        }
+    } else if (mRootEndpointNetworkCommissioningFeatureMap.Has(Feature::kThreadNetworkInterface)) {
+        if ([strongDelegate respondsToSelector:@selector(controller:scannedThreadNetworks:error:)]) {
+            dispatch_async(mQueue, ^{
+                [strongDelegate controller:strongController scannedThreadNetworks:nil error:[MTRError errorForCHIPErrorCode:error]];
+            });
+        }
+    } else {
+        MTR_LOG_ERROR("Scan failed for unknown network type: %lu", static_cast<unsigned long>(mRootEndpointNetworkCommissioningFeatureMap.Raw()));
     }
 }
 

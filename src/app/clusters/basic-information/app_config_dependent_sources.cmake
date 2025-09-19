@@ -16,6 +16,13 @@
 TARGET_SOURCES(
   ${APP_TARGET}
   PRIVATE
-    "${CLUSTER_DIR}/basic-information.cpp"
-    "${CLUSTER_DIR}/basic-information.h"
+    "${CLUSTER_DIR}/CodegenIntegration.cpp"
+)
+
+# These are the things that BUILD.gn dependencies would pull
+TARGET_SOURCES(
+  ${APP_TARGET}
+  PRIVATE
+    "${CLUSTER_DIR}/BasicInformationCluster.cpp"
+    "${CLUSTER_DIR}/BasicInformationCluster.h"
 )

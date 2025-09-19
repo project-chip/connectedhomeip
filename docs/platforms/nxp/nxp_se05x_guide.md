@@ -52,9 +52,8 @@ build environment.
 #### Build the example as
 
 ```
-    cd connectedhomeip/examples/thermostat/nxp/linux-se05x
-    gn gen out
-    ninja -C out
+    cd connectedhomeip
+    ./scripts/examples/imxlinux_example.sh -s examples/thermostat/nxp/linux-se05x/ -o out/thermostat -d
 ```
 
 Refer [SE05x Crypto Configurations](#se05x_crypto_configurations) sections to
@@ -70,8 +69,8 @@ cluster app. Refer [RW61x](nxp_rw61x_guide.md) to set up the build environment.
 
 #### Hardware connections and Building the example with SE05x
 
-Refer
-[RW61x and SE05x Connection](./nxp_examples_freertos_platforms.md#se05x_secure_element_with_rw61x)
+Refer [RW61x and SE05x](./nxp_rw61x_guide.md#se05x_secure_element_with_rw61x)
+for hardware connections / Building.
 
 Refer [SE05x Crypto Configurations](#se05x_crypto_configurations) sections to
 control what crypto operations to be offloaded to SE05x.
@@ -83,48 +82,36 @@ the correct variant of secure element connected.
 
 ## SE05x Crypto Configurations
 
-Use the config file
-`src/platform/nxp/crypto/se05x/CHIPCryptoPALHsm_se05x_config.h` to enable /
-disable offloading required crypto operation on SE05x.
+Following GN / cmake options can be used to enable / disable the crypto
+operations to be offloaded to SE05x
 
-```
-/*
- * Enable se05x for random number generation
- */
-#define ENABLE_SE05X_RND_GEN 1
+-   GN Options :
 
-/*
- * Enable se05x for Generate EC Key
- */
-#define ENABLE_SE05X_GENERATE_EC_KEY 1
+    | GN Options                    | Description              | Type    | Default setting |
+    | ----------------------------- | ------------------------ | ------- | --------------- |
+    | chip_se05x_spake_verifier     | Spake2P Verifier on SE   | Boolean | Disabled        |
+    | chip_se05x_spake_prover       | Spake2P Prover on SE     | Boolean | Disabled        |
+    | chip_se05x_rnd_gen            | Random number generation | Boolean | Disabled        |
+    | chip_se05x_gen_ec_key         | Generate EC key in SE    | Boolean | Enabled         |
+    | chip_se05x_ecdsa_verify       | ECDSA Verify             | Boolean | Enabled         |
+    | chip_se05x_pbkdf2_sha256      | PBKDF2-SHA256            | Boolean | Disabled        |
+    | chip_se05x_hkdf_sha256        | HKDF-SHA256              | Boolean | Disabled        |
+    | chip_se05x_hmac_sha256        | HMAC-SHA256              | Boolean | Disabled        |
+    | chip_se05x_device_attestation | Device attestation       | Boolean | Disabled        |
 
-/*
- * Enable ECDSA Verify using se05x
- */
-#define ENABLE_SE05X_ECDSA_VERIFY 1
+*   CMAKE Options :
 
-/*
- * Enable se05x for PBKDF SHA256
- * Not supported for SE052F
- */
-#define ENABLE_SE05X_PBKDF2_SHA256 0
-
-/*
- * Enable se05x for HKDF SHA256
- * Not supported for SE052F
- */
-#define ENABLE_SE05X_HKDF_SHA256 1
-
-/*
- * Enable se05x for HMAC SHA256
- */
-#define ENABLE_SE05X_HMAC_SHA256 1
-
-/*
- * Enable se05x for DA
- */
-#define ENABLE_SE05X_DEVICE_ATTESTATION 0
-```
+    | Kconfig Options                      | Description              | Default setting |
+    | ------------------------------------ | ------------------------ | --------------- |
+    | CONFIG_CHIP_SE05X_SPAKE_VERIFIER     | Spake2P Verifier on SE   | Disabled        |
+    | CONFIG_CHIP_SE05X_SPAKE_PROVER       | Spake2P Prover on SE     | Disabled        |
+    | CONFIG_CHIP_SE05X_RND_GEN            | Random number generation | Disabled        |
+    | CONFIG_CHIP_SE05X_GENERATE_EC_KEY    | Generate EC key in SE    | Enabled         |
+    | CONFIG_CHIP_SE05X_ECDSA_VERIFY       | ECDSA Verify             | Enabled         |
+    | CONFIG_CHIP_SE05X_PBKDF2_SHA256      | PBKDF2-SHA256            | Disabled        |
+    | CONFIG_CHIP_SE05X_HKDF_SHA256        | HKDF-SHA256              | Disabled        |
+    | CONFIG_CHIP_SE05X_HMAC_SHA256        | HMAC-SHA256              | Disabled        |
+    | CONFIG_CHIP_SE05X_DEVICE_ATTESTATION | Device attestation       | Disabled        |
 
 <a name="se05x_type_configurations"></a>
 
@@ -160,12 +147,13 @@ SE050E is enabled by default.
 
 <a name="device_attestation"></a>
 
-# Device attestation
+## Device attestation
 
 To use SE05x for device attestation,
 
-1. Enable `ENABLE_SE05X_DEVICE_ATTESTATION` in CHIPCryptoPALHsm_se05x_config.h
-   config file
+1. Enable device attestation when building the example using
+   `"chip_se05x_device_attestation=true"` for GN build OR
+   `"-DCHIP_SE05X_DEVICE_ATTESTATION`" for cmake Build.
 
 2. Run the provision example (one time)
    `third_party/simw-top-mini/repo/demos/se05x_dev_attest_key_prov/` to
@@ -179,11 +167,13 @@ ninja -C out se05x_dev_attest_key_prov
 ./out/se05x_dev_attest_key_prov
 ```
 
-The example is currently supported for i.MX 8M Mini EVK and RW61x.
+> [!IMPORTANT] The example is currently supported for i.MX 8M Mini EVK, FRDM
+> i.MX93 and RW61x. Adapt the above commands to the i.MX and RW612 build
+> commands accordingly.
 
 <a name="scp03"></a>
 
-# SCP03
+## SCP03
 
 To enable SCP03 authentication with SE05x, build the example with option
 

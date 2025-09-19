@@ -21,12 +21,19 @@
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/clusters/push-av-stream-transport-server/constants.h>
 #include <app/clusters/push-av-stream-transport-server/push-av-stream-transport-storage.h>
+#include <app/clusters/tls-certificate-management-server/tls-certificate-management-server.h>
+#include <app/clusters/tls-client-management-server/tls-client-management-server.h>
+#include <functional>
 #include <protocols/interaction_model/StatusCode.h>
 #include <vector>
 
 namespace chip {
 namespace app {
 namespace Clusters {
+
+// Forward declarations
+class PushAvStreamTransportServerLogic;
+class PushAvStreamTransportServer;
 
 /**
  * @brief Defines interfaces for implementing application-specific logic for the PushAvStreamTransport Delegate.
@@ -39,8 +46,6 @@ public:
     PushAvStreamTransportDelegate() = default;
 
     virtual ~PushAvStreamTransportDelegate() = default;
-
-    void SetEndpointId(EndpointId aEndpoint) { mEndpointId = aEndpoint; }
 
     /**
      * @brief Handles stream transport allocation with the provided transport configuration option.
@@ -131,7 +136,23 @@ public:
      * @param url The URL to validate
      * @return true if URL is valid, false otherwise
      */
-    virtual bool ValidateUrl(std::string url) = 0;
+    virtual bool ValidateUrl(const std::string & url) = 0;
+
+    /**
+     * @brief Validates the provided StreamUsage.
+     *
+     * @param streamUsage The StreamUsage to validate
+     * @return true if StreamUsage is present in the StreamUsagePriorities list, false otherwise
+     */
+    virtual bool ValidateStreamUsage(PushAvStreamTransport::StreamUsageEnum streamUsage) = 0;
+
+    /**
+     * @brief Validates the provided Segment Duration.
+     *
+     * @param segmentDuration The Segment Duration to validate
+     * @return true if Segment Duration is multiple of KeyFrameInterval, false otherwise
+     */
+    virtual bool ValidateSegmentDuration(uint16_t segmentDuration) = 0;
 
     /**
      * @brief Validates bandwidth requirements against camera's resource management.
@@ -191,6 +212,23 @@ public:
     virtual Protocols::InteractionModel::Status ValidateAudioStream(uint16_t audioStreamId) = 0;
 
     /**
+     * @brief Validates that the zone corresponding to zoneId exists.
+     *
+     * @param zoneId Identifier for the requested zone
+     * @return Status::Success if zone exists;
+     *         Status::InvalidZone if no zone with zoneId exists
+     */
+    virtual Protocols::InteractionModel::Status ValidateZoneId(uint16_t zoneId) = 0;
+
+    /**
+     * @brief Validates size of motion zone List.
+     *
+     * @param zoneListSize Size of the motion zone list
+     * @return true if the motion zone list size is less than or equal to the defined maximum, false otherwise
+     */
+    virtual bool ValidateMotionZoneListSize(size_t zoneListSize) = 0;
+
+    /**
      * @brief Gets the status of the transport.
      *
      * @param connectionID The connectionID of the stream transport to check status
@@ -229,8 +267,19 @@ public:
      */
     virtual CHIP_ERROR PersistentAttributesLoadedCallback() = 0;
 
-protected:
-    EndpointId mEndpointId = kInvalidEndpointId;
+    virtual void SetTLSCerts(Tls::CertificateTable::BufferedClientCert & clientCertEntry,
+                             Tls::CertificateTable::BufferedRootCert & rootCertEntry) = 0;
+
+    /**
+     * @brief Sets the PushAvStreamTransportServerLogic instance for the delegate.
+     *
+     * This method is called by the PushAvStreamTransportServer to provide
+     * the delegate with a pointer to the server instance. This allows the
+     * delegate to interact with the server, for example, to generate events.
+     *
+     * @param server A pointer to the PushAvStreamTransportServer instance.
+     */
+    virtual void SetPushAvStreamTransportServer(PushAvStreamTransportServer * server) = 0;
 };
 } // namespace Clusters
 } // namespace app

@@ -149,7 +149,7 @@
         { ZAP_EMPTY_DEFAULT(), 0x00000004, 2, ZAP_TYPE(INT16U),                                                                    \
           ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(READABLE) }, /* ProductID */                                   \
         { ZAP_EMPTY_DEFAULT(), 0x00000005, 33, ZAP_TYPE(CHAR_STRING),                                                              \
-          ZAP_ATTRIBUTE_MASK(TOKENIZE) | ZAP_ATTRIBUTE_MASK(WRITABLE) | ZAP_ATTRIBUTE_MASK(READABLE) }, /* NodeLabel */            \
+          ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(WRITABLE) | ZAP_ATTRIBUTE_MASK(READABLE) }, /* NodeLabel */    \
         { ZAP_EMPTY_DEFAULT(), 0x00000006, 3, ZAP_TYPE(CHAR_STRING),                                                               \
           ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(WRITABLE) | ZAP_ATTRIBUTE_MASK(READABLE) }, /* Location */     \
         { ZAP_EMPTY_DEFAULT(), 0x00000007, 2, ZAP_TYPE(INT16U),                                                                    \
@@ -170,8 +170,9 @@
           ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(READABLE) }, /* ProductLabel */                                \
         { ZAP_EMPTY_DEFAULT(), 0x0000000F, 33, ZAP_TYPE(CHAR_STRING),                                                              \
           ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(READABLE) }, /* SerialNumber */                                \
-        { ZAP_SIMPLE_DEFAULT(0), 0x00000010, 1, ZAP_TYPE(BOOLEAN),                                                                 \
-          ZAP_ATTRIBUTE_MASK(TOKENIZE) | ZAP_ATTRIBUTE_MASK(WRITABLE) | ZAP_ATTRIBUTE_MASK(READABLE) }, /* LocalConfigDisabled */  \
+        { ZAP_EMPTY_DEFAULT(), 0x00000010, 1, ZAP_TYPE(BOOLEAN),                                                                   \
+          ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(WRITABLE) |                                                    \
+              ZAP_ATTRIBUTE_MASK(READABLE) }, /* LocalConfigDisabled */                                                            \
         { ZAP_EMPTY_DEFAULT(), 0x00000012, 33, ZAP_TYPE(CHAR_STRING),                                                              \
           ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(READABLE) }, /* UniqueID */                                    \
         { ZAP_EMPTY_DEFAULT(), 0x00000013, 0, ZAP_TYPE(STRUCT),                                                                    \
@@ -179,9 +180,11 @@
         { ZAP_EMPTY_DEFAULT(), 0x00000015, 4, ZAP_TYPE(INT32U),                                                                    \
           ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(READABLE) }, /* SpecificationVersion */                        \
         { ZAP_EMPTY_DEFAULT(), 0x00000016, 2, ZAP_TYPE(INT16U),                                                                    \
-          ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(READABLE) },                    /* MaxPathsPerInvoke */        \
-        { ZAP_SIMPLE_DEFAULT(0), 0x0000FFFC, 4, ZAP_TYPE(BITMAP32), ZAP_ATTRIBUTE_MASK(READABLE) }, /* FeatureMap */               \
-        { ZAP_SIMPLE_DEFAULT(3), 0x0000FFFD, 2, ZAP_TYPE(INT16U), ZAP_ATTRIBUTE_MASK(READABLE) },   /* ClusterRevision */          \
+          ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(READABLE) }, /* MaxPathsPerInvoke */                           \
+        { ZAP_EMPTY_DEFAULT(), 0x0000FFFC, 4, ZAP_TYPE(BITMAP32),                                                                  \
+          ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(READABLE) }, /* FeatureMap */                                  \
+        { ZAP_EMPTY_DEFAULT(), 0x0000FFFD, 2, ZAP_TYPE(INT16U),                                                                    \
+          ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(READABLE) }, /* ClusterRevision */                             \
                                                                                                                                    \
         /* Endpoint: 0, Cluster: OTA Software Update Requestor (server) */                                                         \
         { ZAP_EMPTY_DEFAULT(), 0x00000000, 0, ZAP_TYPE(ARRAY),                                                                     \
@@ -492,7 +495,8 @@
         { ZAP_EMPTY_DEFAULT(), 0x00000008, 8, ZAP_TYPE(INT64U),                                                                    \
           ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(READABLE) },                    /* TimeSinceReset */           \
         { ZAP_SIMPLE_DEFAULT(3), 0x0000FFFC, 4, ZAP_TYPE(BITMAP32), ZAP_ATTRIBUTE_MASK(READABLE) }, /* FeatureMap */               \
-        { ZAP_SIMPLE_DEFAULT(1), 0x0000FFFD, 2, ZAP_TYPE(INT16U), ZAP_ATTRIBUTE_MASK(READABLE) },   /* ClusterRevision */          \
+        { ZAP_EMPTY_DEFAULT(), 0x0000FFFD, 2, ZAP_TYPE(INT16U),                                                                    \
+          ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(READABLE) }, /* ClusterRevision */                             \
                                                                                                                                    \
         /* Endpoint: 0, Cluster: Switch (server) */                                                                                \
         { ZAP_SIMPLE_DEFAULT(2), 0x00000000, 1, ZAP_TYPE(INT8U), ZAP_ATTRIBUTE_MASK(READABLE) },    /* NumberOfPositions */        \
@@ -545,9 +549,11 @@
                                                                                                                                    \
         /* Endpoint: 0, Cluster: Fixed Label (server) */                                                                           \
         { ZAP_EMPTY_DEFAULT(), 0x00000000, 0, ZAP_TYPE(ARRAY),                                                                     \
-          ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(READABLE) },                    /* LabelList */                \
-        { ZAP_SIMPLE_DEFAULT(0), 0x0000FFFC, 4, ZAP_TYPE(BITMAP32), ZAP_ATTRIBUTE_MASK(READABLE) }, /* FeatureMap */               \
-        { ZAP_SIMPLE_DEFAULT(1), 0x0000FFFD, 2, ZAP_TYPE(INT16U), ZAP_ATTRIBUTE_MASK(READABLE) },   /* ClusterRevision */          \
+          ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(READABLE) }, /* LabelList */                                   \
+        { ZAP_EMPTY_DEFAULT(), 0x0000FFFC, 4, ZAP_TYPE(BITMAP32),                                                                  \
+          ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(READABLE) }, /* FeatureMap */                                  \
+        { ZAP_EMPTY_DEFAULT(), 0x0000FFFD, 2, ZAP_TYPE(INT16U),                                                                    \
+          ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(READABLE) }, /* ClusterRevision */                             \
                                                                                                                                    \
         /* Endpoint: 0, Cluster: User Label (server) */                                                                            \
         { ZAP_EMPTY_DEFAULT(), 0x00000000, 0, ZAP_TYPE(ARRAY),                                                                     \
@@ -721,6 +727,10 @@
 
 // Cluster function static arrays
 #define GENERATED_FUNCTION_ARRAYS                                                                                                  \
+    const EmberAfGenericClusterFunction chipFuncArrayBasicInformationServer[] = {                                                  \
+        (EmberAfGenericClusterFunction) emberAfBasicInformationClusterServerInitCallback,                                          \
+        (EmberAfGenericClusterFunction) MatterBasicInformationClusterServerShutdownCallback,                                       \
+    };                                                                                                                             \
     const EmberAfGenericClusterFunction chipFuncArrayLocalizationConfigurationServer[] = {                                         \
         (EmberAfGenericClusterFunction) emberAfLocalizationConfigurationClusterServerInitCallback,                                 \
         (EmberAfGenericClusterFunction) MatterLocalizationConfigurationClusterServerPreAttributeChangedCallback,                   \
@@ -728,6 +738,32 @@
     const EmberAfGenericClusterFunction chipFuncArrayTimeFormatLocalizationServer[] = {                                            \
         (EmberAfGenericClusterFunction) emberAfTimeFormatLocalizationClusterServerInitCallback,                                    \
         (EmberAfGenericClusterFunction) MatterTimeFormatLocalizationClusterServerPreAttributeChangedCallback,                      \
+    };                                                                                                                             \
+    const EmberAfGenericClusterFunction chipFuncArrayGeneralDiagnosticsServer[] = {                                                \
+        (EmberAfGenericClusterFunction) emberAfGeneralDiagnosticsClusterServerInitCallback,                                        \
+        (EmberAfGenericClusterFunction) MatterGeneralDiagnosticsClusterServerShutdownCallback,                                     \
+    };                                                                                                                             \
+    const EmberAfGenericClusterFunction chipFuncArraySoftwareDiagnosticsServer[] = {                                               \
+        (EmberAfGenericClusterFunction) emberAfSoftwareDiagnosticsClusterServerInitCallback,                                       \
+        (EmberAfGenericClusterFunction) MatterSoftwareDiagnosticsClusterServerShutdownCallback,                                    \
+    };                                                                                                                             \
+    const EmberAfGenericClusterFunction chipFuncArrayWiFiNetworkDiagnosticsServer[] = {                                            \
+        (EmberAfGenericClusterFunction) emberAfWiFiNetworkDiagnosticsClusterServerInitCallback,                                    \
+        (EmberAfGenericClusterFunction) MatterWiFiNetworkDiagnosticsClusterServerShutdownCallback,                                 \
+    };                                                                                                                             \
+    const EmberAfGenericClusterFunction chipFuncArrayEthernetNetworkDiagnosticsServer[] = {                                        \
+        (EmberAfGenericClusterFunction) emberAfEthernetNetworkDiagnosticsClusterServerInitCallback,                                \
+    };                                                                                                                             \
+    const EmberAfGenericClusterFunction chipFuncArrayAdministratorCommissioningServer[] = {                                        \
+        (EmberAfGenericClusterFunction) emberAfAdministratorCommissioningClusterServerInitCallback,                                \
+        (EmberAfGenericClusterFunction) MatterAdministratorCommissioningClusterServerShutdownCallback,                             \
+    };                                                                                                                             \
+    const EmberAfGenericClusterFunction chipFuncArrayGroupKeyManagementServer[] = {                                                \
+        (EmberAfGenericClusterFunction) emberAfGroupKeyManagementClusterServerInitCallback,                                        \
+    };                                                                                                                             \
+    const EmberAfGenericClusterFunction chipFuncArrayFixedLabelServer[] = {                                                        \
+        (EmberAfGenericClusterFunction) emberAfFixedLabelClusterServerInitCallback,                                                \
+        (EmberAfGenericClusterFunction) MatterFixedLabelClusterServerShutdownCallback,                                             \
     };                                                                                                                             \
     const EmberAfGenericClusterFunction chipFuncArrayIdentifyServer[] = {                                                          \
         (EmberAfGenericClusterFunction) emberAfIdentifyClusterServerInitCallback,                                                  \
@@ -973,9 +1009,9 @@
       .clusterId = 0x00000028, \
       .attributes = ZAP_ATTRIBUTE_INDEX(13), \
       .attributeCount = 23, \
-      .clusterSize = 40, \
-      .mask = ZAP_CLUSTER_MASK(SERVER), \
-      .functions = NULL, \
+      .clusterSize = 0, \
+      .mask = ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(INIT_FUNCTION) | ZAP_CLUSTER_MASK(SHUTDOWN_FUNCTION), \
+      .functions = chipFuncArrayBasicInformationServer, \
       .acceptedCommandList = nullptr, \
       .generatedCommandList = nullptr, \
       .eventList = ZAP_GENERATED_EVENTS_INDEX( 2 ), \
@@ -1078,8 +1114,8 @@
       .attributes = ZAP_ATTRIBUTE_INDEX(70), \
       .attributeCount = 11, \
       .clusterSize = 0, \
-      .mask = ZAP_CLUSTER_MASK(SERVER), \
-      .functions = NULL, \
+      .mask = ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(INIT_FUNCTION) | ZAP_CLUSTER_MASK(SHUTDOWN_FUNCTION), \
+      .functions = chipFuncArrayGeneralDiagnosticsServer, \
       .acceptedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 25 ), \
       .generatedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 28 ), \
       .eventList = ZAP_GENERATED_EVENTS_INDEX( 8 ), \
@@ -1091,8 +1127,8 @@
       .attributes = ZAP_ATTRIBUTE_INDEX(81), \
       .attributeCount = 6, \
       .clusterSize = 0, \
-      .mask = ZAP_CLUSTER_MASK(SERVER), \
-      .functions = NULL, \
+      .mask = ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(INIT_FUNCTION) | ZAP_CLUSTER_MASK(SHUTDOWN_FUNCTION), \
+      .functions = chipFuncArraySoftwareDiagnosticsServer, \
       .acceptedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 30 ), \
       .generatedCommandList = nullptr, \
       .eventList = nullptr, \
@@ -1117,8 +1153,8 @@
       .attributes = ZAP_ATTRIBUTE_INDEX(152), \
       .attributeCount = 15, \
       .clusterSize = 6, \
-      .mask = ZAP_CLUSTER_MASK(SERVER), \
-      .functions = NULL, \
+      .mask = ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(INIT_FUNCTION) | ZAP_CLUSTER_MASK(SHUTDOWN_FUNCTION), \
+      .functions = chipFuncArrayWiFiNetworkDiagnosticsServer, \
       .acceptedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 34 ), \
       .generatedCommandList = nullptr, \
       .eventList = ZAP_GENERATED_EVENTS_INDEX( 12 ), \
@@ -1129,9 +1165,9 @@
       .clusterId = 0x00000037, \
       .attributes = ZAP_ATTRIBUTE_INDEX(167), \
       .attributeCount = 11, \
-      .clusterSize = 6, \
-      .mask = ZAP_CLUSTER_MASK(SERVER), \
-      .functions = NULL, \
+      .clusterSize = 4, \
+      .mask = ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(INIT_FUNCTION), \
+      .functions = chipFuncArrayEthernetNetworkDiagnosticsServer, \
       .acceptedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 36 ), \
       .generatedCommandList = nullptr, \
       .eventList = nullptr, \
@@ -1156,8 +1192,8 @@
       .attributes = ZAP_ATTRIBUTE_INDEX(182), \
       .attributeCount = 5, \
       .clusterSize = 4, \
-      .mask = ZAP_CLUSTER_MASK(SERVER), \
-      .functions = NULL, \
+      .mask = ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(INIT_FUNCTION) | ZAP_CLUSTER_MASK(SHUTDOWN_FUNCTION), \
+      .functions = chipFuncArrayAdministratorCommissioningServer, \
       .acceptedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 38 ), \
       .generatedCommandList = nullptr, \
       .eventList = nullptr, \
@@ -1182,8 +1218,8 @@
       .attributes = ZAP_ATTRIBUTE_INDEX(195), \
       .attributeCount = 6, \
       .clusterSize = 0, \
-      .mask = ZAP_CLUSTER_MASK(SERVER), \
-      .functions = NULL, \
+      .mask = ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(INIT_FUNCTION), \
+      .functions = chipFuncArrayGroupKeyManagementServer, \
       .acceptedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 56 ), \
       .generatedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 61 ), \
       .eventList = nullptr, \
@@ -1194,9 +1230,9 @@
       .clusterId = 0x00000040, \
       .attributes = ZAP_ATTRIBUTE_INDEX(201), \
       .attributeCount = 3, \
-      .clusterSize = 6, \
-      .mask = ZAP_CLUSTER_MASK(SERVER), \
-      .functions = NULL, \
+      .clusterSize = 0, \
+      .mask = ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(INIT_FUNCTION) | ZAP_CLUSTER_MASK(SHUTDOWN_FUNCTION), \
+      .functions = chipFuncArrayFixedLabelServer, \
       .acceptedCommandList = nullptr, \
       .generatedCommandList = nullptr, \
       .eventList = nullptr, \
@@ -1328,7 +1364,7 @@
 // This is an array of EmberAfEndpointType structures.
 #define GENERATED_ENDPOINT_TYPES                                                                                                   \
     {                                                                                                                              \
-        { ZAP_CLUSTER_INDEX(0), 21, 167 },                                                                                         \
+        { ZAP_CLUSTER_INDEX(0), 21, 119 },                                                                                         \
         { ZAP_CLUSTER_INDEX(21), 8, 109 },                                                                                         \
     }
 
@@ -1341,7 +1377,7 @@ static_assert(ATTRIBUTE_LARGEST <= CHIP_CONFIG_MAX_ATTRIBUTE_STORE_ELEMENT_SIZE,
 #define ATTRIBUTE_SINGLETONS_SIZE (0)
 
 // Total size of attribute storage
-#define ATTRIBUTE_MAX_SIZE (276)
+#define ATTRIBUTE_MAX_SIZE (228)
 
 // Number of fixed endpoints
 #define FIXED_ENDPOINT_COUNT (2)

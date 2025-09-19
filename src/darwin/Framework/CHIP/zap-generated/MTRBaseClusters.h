@@ -245,7 +245,7 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 /**
  * Command OnWithRecallGlobalScene
  *
- * The OnWithRecallGlobalScene command allows the recall of the settings when the device was turned off.
+ * This command allows the recall of the settings when the device was turned off.
  */
 - (void)onWithRecallGlobalSceneWithParams:(MTROnOffClusterOnWithRecallGlobalSceneParams * _Nullable)params completion:(MTRStatusCompletion)completion MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 - (void)onWithRecallGlobalSceneWithCompletion:(MTRStatusCompletion)completion
@@ -253,7 +253,7 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 /**
  * Command OnWithTimedOff
  *
- * The OnWithTimedOff command allows devices to be turned on for a specific duration with a guarded off duration so that SHOULD the device be subsequently switched off, further OnWithTimedOff commands, received during this time, are prevented from turning the devices back on.
+ * This command allows devices to be turned on for a specific duration with a guarded off duration so that SHOULD the device be subsequently turned off, further OnWithTimedOff commands, received during this time, are prevented from turning the devices back on.
  */
 - (void)onWithTimedOffWithParams:(MTROnOffClusterOnWithTimedOffParams *)params completion:(MTRStatusCompletion)completion MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 
@@ -10500,88 +10500,66 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 + (void)readAttributePrimary6IntensityWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 
 - (void)readAttributeWhitePointXWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
-- (void)writeAttributeWhitePointXWithValue:(NSNumber * _Nonnull)value completion:(MTRStatusCompletion)completion MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
-- (void)writeAttributeWhitePointXWithValue:(NSNumber * _Nonnull)value params:(MTRWriteParams * _Nullable)params completion:(MTRStatusCompletion)completion MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 - (void)subscribeAttributeWhitePointXWithParams:(MTRSubscribeParams *)params
                         subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                   reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 + (void)readAttributeWhitePointXWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 
 - (void)readAttributeWhitePointYWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
-- (void)writeAttributeWhitePointYWithValue:(NSNumber * _Nonnull)value completion:(MTRStatusCompletion)completion MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
-- (void)writeAttributeWhitePointYWithValue:(NSNumber * _Nonnull)value params:(MTRWriteParams * _Nullable)params completion:(MTRStatusCompletion)completion MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 - (void)subscribeAttributeWhitePointYWithParams:(MTRSubscribeParams *)params
                         subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                   reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 + (void)readAttributeWhitePointYWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 
 - (void)readAttributeColorPointRXWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
-- (void)writeAttributeColorPointRXWithValue:(NSNumber * _Nonnull)value completion:(MTRStatusCompletion)completion MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
-- (void)writeAttributeColorPointRXWithValue:(NSNumber * _Nonnull)value params:(MTRWriteParams * _Nullable)params completion:(MTRStatusCompletion)completion MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 - (void)subscribeAttributeColorPointRXWithParams:(MTRSubscribeParams *)params
                          subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                    reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 + (void)readAttributeColorPointRXWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 
 - (void)readAttributeColorPointRYWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
-- (void)writeAttributeColorPointRYWithValue:(NSNumber * _Nonnull)value completion:(MTRStatusCompletion)completion MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
-- (void)writeAttributeColorPointRYWithValue:(NSNumber * _Nonnull)value params:(MTRWriteParams * _Nullable)params completion:(MTRStatusCompletion)completion MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 - (void)subscribeAttributeColorPointRYWithParams:(MTRSubscribeParams *)params
                          subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                    reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 + (void)readAttributeColorPointRYWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 
 - (void)readAttributeColorPointRIntensityWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
-- (void)writeAttributeColorPointRIntensityWithValue:(NSNumber * _Nullable)value completion:(MTRStatusCompletion)completion MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
-- (void)writeAttributeColorPointRIntensityWithValue:(NSNumber * _Nullable)value params:(MTRWriteParams * _Nullable)params completion:(MTRStatusCompletion)completion MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 - (void)subscribeAttributeColorPointRIntensityWithParams:(MTRSubscribeParams *)params
                                  subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                            reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 + (void)readAttributeColorPointRIntensityWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 
 - (void)readAttributeColorPointGXWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
-- (void)writeAttributeColorPointGXWithValue:(NSNumber * _Nonnull)value completion:(MTRStatusCompletion)completion MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
-- (void)writeAttributeColorPointGXWithValue:(NSNumber * _Nonnull)value params:(MTRWriteParams * _Nullable)params completion:(MTRStatusCompletion)completion MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 - (void)subscribeAttributeColorPointGXWithParams:(MTRSubscribeParams *)params
                          subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                    reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 + (void)readAttributeColorPointGXWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 
 - (void)readAttributeColorPointGYWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
-- (void)writeAttributeColorPointGYWithValue:(NSNumber * _Nonnull)value completion:(MTRStatusCompletion)completion MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
-- (void)writeAttributeColorPointGYWithValue:(NSNumber * _Nonnull)value params:(MTRWriteParams * _Nullable)params completion:(MTRStatusCompletion)completion MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 - (void)subscribeAttributeColorPointGYWithParams:(MTRSubscribeParams *)params
                          subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                    reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 + (void)readAttributeColorPointGYWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 
 - (void)readAttributeColorPointGIntensityWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
-- (void)writeAttributeColorPointGIntensityWithValue:(NSNumber * _Nullable)value completion:(MTRStatusCompletion)completion MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
-- (void)writeAttributeColorPointGIntensityWithValue:(NSNumber * _Nullable)value params:(MTRWriteParams * _Nullable)params completion:(MTRStatusCompletion)completion MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 - (void)subscribeAttributeColorPointGIntensityWithParams:(MTRSubscribeParams *)params
                                  subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                            reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 + (void)readAttributeColorPointGIntensityWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 
 - (void)readAttributeColorPointBXWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
-- (void)writeAttributeColorPointBXWithValue:(NSNumber * _Nonnull)value completion:(MTRStatusCompletion)completion MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
-- (void)writeAttributeColorPointBXWithValue:(NSNumber * _Nonnull)value params:(MTRWriteParams * _Nullable)params completion:(MTRStatusCompletion)completion MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 - (void)subscribeAttributeColorPointBXWithParams:(MTRSubscribeParams *)params
                          subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                    reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 + (void)readAttributeColorPointBXWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 
 - (void)readAttributeColorPointBYWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
-- (void)writeAttributeColorPointBYWithValue:(NSNumber * _Nonnull)value completion:(MTRStatusCompletion)completion MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
-- (void)writeAttributeColorPointBYWithValue:(NSNumber * _Nonnull)value params:(MTRWriteParams * _Nullable)params completion:(MTRStatusCompletion)completion MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 - (void)subscribeAttributeColorPointBYWithParams:(MTRSubscribeParams *)params
                          subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                    reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 + (void)readAttributeColorPointBYWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 
 - (void)readAttributeColorPointBIntensityWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
-- (void)writeAttributeColorPointBIntensityWithValue:(NSNumber * _Nullable)value completion:(MTRStatusCompletion)completion MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
-- (void)writeAttributeColorPointBIntensityWithValue:(NSNumber * _Nullable)value params:(MTRWriteParams * _Nullable)params completion:(MTRStatusCompletion)completion MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 - (void)subscribeAttributeColorPointBIntensityWithParams:(MTRSubscribeParams *)params
                                  subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                            reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
@@ -14619,11 +14597,11 @@ MTR_PROVISIONALLY_AVAILABLE
                                               reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler MTR_PROVISIONALLY_AVAILABLE;
 + (void)readAttributeNightVisionUsesInfraredWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
 
-- (void)readAttributeMinViewportWithCompletion:(void (^)(MTRCameraAVStreamManagementClusterVideoResolutionStruct * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
-- (void)subscribeAttributeMinViewportWithParams:(MTRSubscribeParams *)params
-                        subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
-                                  reportHandler:(void (^)(MTRCameraAVStreamManagementClusterVideoResolutionStruct * _Nullable value, NSError * _Nullable error))reportHandler MTR_PROVISIONALLY_AVAILABLE;
-+ (void)readAttributeMinViewportWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(MTRCameraAVStreamManagementClusterVideoResolutionStruct * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
+- (void)readAttributeMinViewportResolutionWithCompletion:(void (^)(MTRCameraAVStreamManagementClusterVideoResolutionStruct * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
+- (void)subscribeAttributeMinViewportResolutionWithParams:(MTRSubscribeParams *)params
+                                  subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
+                                            reportHandler:(void (^)(MTRCameraAVStreamManagementClusterVideoResolutionStruct * _Nullable value, NSError * _Nullable error))reportHandler MTR_PROVISIONALLY_AVAILABLE;
++ (void)readAttributeMinViewportResolutionWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(MTRCameraAVStreamManagementClusterVideoResolutionStruct * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
 
 - (void)readAttributeRateDistortionTradeOffPointsWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
 - (void)subscribeAttributeRateDistortionTradeOffPointsWithParams:(MTRSubscribeParams *)params
@@ -14935,7 +14913,7 @@ MTR_PROVISIONALLY_AVAILABLE
 /**
  * Command MPTZSetPosition
  *
- * This command SHALL set the values for the pan, tilt, and zoom in the mechanical PTZ.
+ * This command SHALL move the camera to the provided values for pan, tilt, and zoom in the mechanical PTZ.
  */
 - (void)MPTZSetPositionWithParams:(MTRCameraAVSettingsUserLevelManagementClusterMPTZSetPositionParams * _Nullable)params completion:(MTRStatusCompletion)completion MTR_PROVISIONALLY_AVAILABLE;
 - (void)MPTZSetPositionWithCompletion:(MTRStatusCompletion)completion
@@ -15033,6 +15011,12 @@ MTR_PROVISIONALLY_AVAILABLE
                              reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler MTR_PROVISIONALLY_AVAILABLE;
 + (void)readAttributePanMaxWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
 
+- (void)readAttributeMovementStateWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
+- (void)subscribeAttributeMovementStateWithParams:(MTRSubscribeParams *)params
+                          subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
+                                    reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler MTR_PROVISIONALLY_AVAILABLE;
++ (void)readAttributeMovementStateWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
+
 - (void)readAttributeGeneratedCommandListWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
 - (void)subscribeAttributeGeneratedCommandListWithParams:(MTRSubscribeParams *)params
                                  subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
@@ -15109,7 +15093,7 @@ MTR_PROVISIONALLY_AVAILABLE
 /**
  * Command ProvideICECandidates
  *
- * This command allows for string based https://rfc-editor.org/rfc/rfc8839#section-5.1 generated after the initial Offer / Answer exchange, via a JSEP https://datatracker.ietf.org/doc/html/rfc9429#section-4.1.20 event, a DOM https://www.w3.org/TR/webrtc/#dom-rtcpeerconnectioniceevent event, or other WebRTC compliant implementations, to be added to a session during the gathering phase.
+ * This command allows for string based ICE candidates generated after the initial Offer / Answer exchange, via a JSEP onicecandidate event, a DOM rtcpeerconnectioniceevent event, or other WebRTC compliant implementations, to be added to a session during the gathering phase.
  */
 - (void)provideICECandidatesWithParams:(MTRWebRTCTransportProviderClusterProvideICECandidatesParams *)params completion:(MTRStatusCompletion)completion MTR_PROVISIONALLY_AVAILABLE;
 /**
@@ -15195,7 +15179,7 @@ MTR_PROVISIONALLY_AVAILABLE
 /**
  * Command ICECandidates
  *
- * This command allows for the object based https://rfc-editor.org/rfc/rfc8839#section-5.1 generated after the initial Offer / Answer exchange, via a JSEP https://datatracker.ietf.org/doc/html/rfc9429#section-4.1.20 event, a DOM https://www.w3.org/TR/webrtc/#dom-rtcpeerconnectioniceevent event, or other WebRTC compliant implementations, to be added to a session during the gathering phase.
+ * This command allows for the object based ICE candidates generated after the initial Offer / Answer exchange, via a JSEP onicecandidate event, a DOM rtcpeerconnectioniceevent event, or other WebRTC compliant implementations, to be added to a session during the gathering phase.
  */
 - (void)ICECandidatesWithParams:(MTRWebRTCTransportRequestorClusterICECandidatesParams *)params completion:(MTRStatusCompletion)completion MTR_PROVISIONALLY_AVAILABLE;
 /**
@@ -15301,9 +15285,7 @@ MTR_PROVISIONALLY_AVAILABLE
  *
  * This command SHALL return the Transport Configuration for the specified push transport or all allocated transports for the fabric if null.
  */
-- (void)findTransportWithParams:(MTRPushAVStreamTransportClusterFindTransportParams * _Nullable)params completion:(void (^)(MTRPushAVStreamTransportClusterFindTransportResponseParams * _Nullable data, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
-- (void)findTransportWithCompletion:(void (^)(MTRPushAVStreamTransportClusterFindTransportResponseParams * _Nullable data, NSError * _Nullable error))completion
-    MTR_PROVISIONALLY_AVAILABLE;
+- (void)findTransportWithParams:(MTRPushAVStreamTransportClusterFindTransportParams *)params completion:(void (^)(MTRPushAVStreamTransportClusterFindTransportResponseParams * _Nullable data, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
 
 - (void)readAttributeSupportedFormatsWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
 - (void)subscribeAttributeSupportedFormatsWithParams:(MTRSubscribeParams *)params
@@ -16155,7 +16137,7 @@ MTR_PROVISIONALLY_AVAILABLE
 /**
  * Command FindRootCertificate
  *
- * This command SHALL return the specified TLS root certificate, or all TLS provisioned root certificates, based on the contents of the CAID field.
+ * This command SHALL return the specified TLS root certificate, or all provisioned TLS root certificates for the accessing fabric, based on the contents of the CAID field.
  */
 - (void)findRootCertificateWithParams:(MTRTLSCertificateManagementClusterFindRootCertificateParams *)params completion:(void (^)(MTRTLSCertificateManagementClusterFindRootCertificateResponseParams * _Nullable data, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
 /**
@@ -16171,11 +16153,11 @@ MTR_PROVISIONALLY_AVAILABLE
  */
 - (void)removeRootCertificateWithParams:(MTRTLSCertificateManagementClusterRemoveRootCertificateParams *)params completion:(MTRStatusCompletion)completion MTR_PROVISIONALLY_AVAILABLE;
 /**
- * Command TLSClientCSR
+ * Command ClientCSR
  *
- * This command SHALL be generated to request the Node generates a Certificate Signing Request.
+ * This command SHALL be generated to request the Node generates a certificate signing request for a new TLS key pair or use an existing CCDID for certificate rotation.
  */
-- (void)TLSClientCSRWithParams:(MTRTLSCertificateManagementClusterTLSClientCSRParams *)params completion:(void (^)(MTRTLSCertificateManagementClusterTLSClientCSRResponseParams * _Nullable data, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
+- (void)clientCSRWithParams:(MTRTLSCertificateManagementClusterClientCSRParams *)params completion:(void (^)(MTRTLSCertificateManagementClusterClientCSRResponseParams * _Nullable data, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
 /**
  * Command ProvisionClientCertificate
  *
@@ -16185,7 +16167,7 @@ MTR_PROVISIONALLY_AVAILABLE
 /**
  * Command FindClientCertificate
  *
- * This command SHALL return the TLSClientCertificateDetailStruct for the passed in CCDID, or all TLS client certificates, based on the contents of the CCDID field.
+ * This command SHALL return the TLSClientCertificateDetailStruct for the passed in CCDID, or all TLS client certificates for the accessing fabric, based on the contents of the CCDID field.
  */
 - (void)findClientCertificateWithParams:(MTRTLSCertificateManagementClusterFindClientCertificateParams *)params completion:(void (^)(MTRTLSCertificateManagementClusterFindClientCertificateResponseParams * _Nullable data, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
 /**
@@ -16463,11 +16445,11 @@ MTR_PROVISIONALLY_AVAILABLE
                                                reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler MTR_PROVISIONALLY_AVAILABLE;
 + (void)readAttributeMeteredQuantityTimestampWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
 
-- (void)readAttributeMeasurementTypeWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
-- (void)subscribeAttributeMeasurementTypeWithParams:(MTRSubscribeParams *)params
-                            subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
-                                      reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler MTR_PROVISIONALLY_AVAILABLE;
-+ (void)readAttributeMeasurementTypeWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
+- (void)readAttributeTariffUnitWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
+- (void)subscribeAttributeTariffUnitWithParams:(MTRSubscribeParams *)params
+                       subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
+                                 reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler MTR_PROVISIONALLY_AVAILABLE;
++ (void)readAttributeTariffUnitWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
 
 - (void)readAttributeMaximumMeteredQuantitiesWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
 - (void)subscribeAttributeMaximumMeteredQuantitiesWithParams:(MTRSubscribeParams *)params
@@ -17854,8 +17836,8 @@ typedef NS_ENUM(uint8_t, MTRDataTypeThreeLevelAutoEnum) {
 } MTR_PROVISIONALLY_AVAILABLE;
 
 typedef NS_ENUM(uint8_t, MTRDataTypeWebRTCEndReasonEnum) {
-    MTRDataTypeWebRTCEndReasonEnumIceFailed MTR_PROVISIONALLY_AVAILABLE = 0x00,
-    MTRDataTypeWebRTCEndReasonEnumIceTimeout MTR_PROVISIONALLY_AVAILABLE = 0x01,
+    MTRDataTypeWebRTCEndReasonEnumICEFailed MTR_PROVISIONALLY_AVAILABLE = 0x00,
+    MTRDataTypeWebRTCEndReasonEnumICETimeout MTR_PROVISIONALLY_AVAILABLE = 0x01,
     MTRDataTypeWebRTCEndReasonEnumUserHangup MTR_PROVISIONALLY_AVAILABLE = 0x02,
     MTRDataTypeWebRTCEndReasonEnumUserBusy MTR_PROVISIONALLY_AVAILABLE = 0x03,
     MTRDataTypeWebRTCEndReasonEnumReplaced MTR_PROVISIONALLY_AVAILABLE = 0x04,
@@ -17865,7 +17847,8 @@ typedef NS_ENUM(uint8_t, MTRDataTypeWebRTCEndReasonEnum) {
     MTRDataTypeWebRTCEndReasonEnumOutOfResources MTR_PROVISIONALLY_AVAILABLE = 0x08,
     MTRDataTypeWebRTCEndReasonEnumMediaTimeout MTR_PROVISIONALLY_AVAILABLE = 0x09,
     MTRDataTypeWebRTCEndReasonEnumLowPower MTR_PROVISIONALLY_AVAILABLE = 0x0A,
-    MTRDataTypeWebRTCEndReasonEnumUnknownReason MTR_PROVISIONALLY_AVAILABLE = 0x0B,
+    MTRDataTypeWebRTCEndReasonEnumPrivacyMode MTR_PROVISIONALLY_AVAILABLE = 0x0B,
+    MTRDataTypeWebRTCEndReasonEnumUnknownReason MTR_PROVISIONALLY_AVAILABLE = 0x0C,
 } MTR_PROVISIONALLY_AVAILABLE;
 
 typedef NS_ENUM(uint8_t, MTRIdentifyEffectIdentifier) {
@@ -20642,6 +20625,7 @@ typedef NS_OPTIONS(uint32_t, MTRThermostatFeature) {
     MTRThermostatFeatureMatterScheduleConfiguration MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4)) = 0x80,
     MTRThermostatFeaturePresets MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4)) = 0x100,
     MTRThermostatFeatureEvents MTR_PROVISIONALLY_AVAILABLE = 0x200,
+    MTRThermostatFeatureThermostatSuggestions MTR_PROVISIONALLY_AVAILABLE = 0x400,
 } MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
 typedef NS_OPTIONS(uint8_t, MTRThermostatHVACSystemTypeBitmap) {
@@ -20732,6 +20716,7 @@ typedef NS_OPTIONS(uint16_t, MTRThermostatSuggestionNotFollowingReasonBitmap) {
     MTRThermostatSuggestionNotFollowingReasonBitmapVacationMode MTR_PROVISIONALLY_AVAILABLE = 0x10,
     MTRThermostatSuggestionNotFollowingReasonBitmapTimeOfUseCostSavings MTR_PROVISIONALLY_AVAILABLE = 0x20,
     MTRThermostatSuggestionNotFollowingReasonBitmapPreCoolingOrPreHeating MTR_PROVISIONALLY_AVAILABLE = 0x40,
+    MTRThermostatSuggestionNotFollowingReasonBitmapConflictingSuggestions MTR_PROVISIONALLY_AVAILABLE = 0x80,
 } MTR_PROVISIONALLY_AVAILABLE;
 
 typedef NS_ENUM(uint8_t, MTRFanControlAirflowDirection) {
@@ -21837,6 +21822,11 @@ typedef NS_OPTIONS(uint32_t, MTRCameraAVStreamManagementFeature) {
     MTRCameraAVStreamManagementFeatureNightVision MTR_PROVISIONALLY_AVAILABLE = 0x400,
 } MTR_PROVISIONALLY_AVAILABLE;
 
+typedef NS_ENUM(uint8_t, MTRCameraAVSettingsUserLevelManagementPhysicalMovement) {
+    MTRCameraAVSettingsUserLevelManagementPhysicalMovementIdle MTR_PROVISIONALLY_AVAILABLE = 0x00,
+    MTRCameraAVSettingsUserLevelManagementPhysicalMovementMoving MTR_PROVISIONALLY_AVAILABLE = 0x01,
+} MTR_PROVISIONALLY_AVAILABLE;
+
 typedef NS_OPTIONS(uint32_t, MTRCameraAVSettingsUserLevelManagementFeature) {
     MTRCameraAVSettingsUserLevelManagementFeatureDigitalPTZ MTR_PROVISIONALLY_AVAILABLE = 0x1,
     MTRCameraAVSettingsUserLevelManagementFeatureMechanicalPan MTR_PROVISIONALLY_AVAILABLE = 0x2,
@@ -21847,6 +21837,12 @@ typedef NS_OPTIONS(uint32_t, MTRCameraAVSettingsUserLevelManagementFeature) {
 
 typedef NS_OPTIONS(uint32_t, MTRWebRTCTransportProviderFeature) {
     MTRWebRTCTransportProviderFeatureMetadata MTR_PROVISIONALLY_AVAILABLE = 0x1,
+} MTR_PROVISIONALLY_AVAILABLE;
+
+typedef NS_ENUM(uint8_t, MTRPushAVStreamTransportCMAFInterface) {
+    MTRPushAVStreamTransportCMAFInterfaceInterface1 MTR_PROVISIONALLY_AVAILABLE = 0x00,
+    MTRPushAVStreamTransportCMAFInterfaceInterface2DASH MTR_PROVISIONALLY_AVAILABLE = 0x01,
+    MTRPushAVStreamTransportCMAFInterfaceInterface2HLS MTR_PROVISIONALLY_AVAILABLE = 0x02,
 } MTR_PROVISIONALLY_AVAILABLE;
 
 typedef NS_ENUM(uint8_t, MTRPushAVStreamTransportContainerFormat) {
@@ -21865,6 +21861,8 @@ typedef NS_ENUM(uint8_t, MTRPushAVStreamTransportStatusCode) {
     MTRPushAVStreamTransportStatusCodeInvalidCombination MTR_PROVISIONALLY_AVAILABLE = 0x06,
     MTRPushAVStreamTransportStatusCodeInvalidTriggerType MTR_PROVISIONALLY_AVAILABLE = 0x07,
     MTRPushAVStreamTransportStatusCodeInvalidTransportStatus MTR_PROVISIONALLY_AVAILABLE = 0x08,
+    MTRPushAVStreamTransportStatusCodeInvalidOptions MTR_PROVISIONALLY_AVAILABLE = 0x09,
+    MTRPushAVStreamTransportStatusCodeInvalidStreamUsage MTR_PROVISIONALLY_AVAILABLE = 0x0A,
 } MTR_PROVISIONALLY_AVAILABLE;
 
 typedef NS_ENUM(uint8_t, MTRPushAVStreamTransportTransportStatus) {
@@ -21994,11 +21992,6 @@ typedef NS_ENUM(uint8_t, MTRJointFabricAdministratorTransferAnchorResponseStatus
     MTRJointFabricAdministratorTransferAnchorResponseStatusOK MTR_PROVISIONALLY_AVAILABLE = 0x00,
     MTRJointFabricAdministratorTransferAnchorResponseStatusTransferAnchorStatusDatastoreBusy MTR_PROVISIONALLY_AVAILABLE = 0x01,
     MTRJointFabricAdministratorTransferAnchorResponseStatusTransferAnchorStatusNoUserConsent MTR_PROVISIONALLY_AVAILABLE = 0x02,
-} MTR_PROVISIONALLY_AVAILABLE;
-
-typedef NS_ENUM(uint8_t, MTRTLSCertificateManagementStatusCode) {
-    MTRTLSCertificateManagementStatusCodeCertificateAlreadyInstalled MTR_PROVISIONALLY_AVAILABLE = 0x02,
-    MTRTLSCertificateManagementStatusCodeDuplicateKey MTR_PROVISIONALLY_AVAILABLE = 0x03,
 } MTR_PROVISIONALLY_AVAILABLE;
 
 typedef NS_ENUM(uint8_t, MTRTLSClientManagementStatusCode) {
@@ -27228,8 +27221,6 @@ typedef NS_OPTIONS(uint8_t, MTRTestClusterSimpleBitmap) {
 + (void)readAttributePrimary6IntensityWithAttributeCache:(MTRAttributeCacheContainer *)attributeCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completionHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler MTR_DEPRECATED("Please use readAttributePrimary6IntensityWithAttributeCache:endpoint:queue:completion:", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4));
 
 - (void)readAttributeWhitePointXWithCompletionHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler MTR_DEPRECATED("Please use readAttributeWhitePointXWithCompletion:", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4));
-- (void)writeAttributeWhitePointXWithValue:(NSNumber * _Nonnull)value completionHandler:(MTRStatusCompletion)completionHandler MTR_DEPRECATED("Please use writeAttributeWhitePointXWithValue:completion:", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4));
-- (void)writeAttributeWhitePointXWithValue:(NSNumber * _Nonnull)value params:(MTRWriteParams * _Nullable)params completionHandler:(MTRStatusCompletion)completionHandler MTR_DEPRECATED("Please use writeAttributeWhitePointXWithValue:params:completion:", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4));
 - (void)subscribeAttributeWhitePointXWithMinInterval:(NSNumber * _Nonnull)minInterval maxInterval:(NSNumber * _Nonnull)maxInterval
                                               params:(MTRSubscribeParams * _Nullable)params
                              subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
@@ -27237,8 +27228,6 @@ typedef NS_OPTIONS(uint8_t, MTRTestClusterSimpleBitmap) {
 + (void)readAttributeWhitePointXWithAttributeCache:(MTRAttributeCacheContainer *)attributeCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completionHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler MTR_DEPRECATED("Please use readAttributeWhitePointXWithAttributeCache:endpoint:queue:completion:", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4));
 
 - (void)readAttributeWhitePointYWithCompletionHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler MTR_DEPRECATED("Please use readAttributeWhitePointYWithCompletion:", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4));
-- (void)writeAttributeWhitePointYWithValue:(NSNumber * _Nonnull)value completionHandler:(MTRStatusCompletion)completionHandler MTR_DEPRECATED("Please use writeAttributeWhitePointYWithValue:completion:", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4));
-- (void)writeAttributeWhitePointYWithValue:(NSNumber * _Nonnull)value params:(MTRWriteParams * _Nullable)params completionHandler:(MTRStatusCompletion)completionHandler MTR_DEPRECATED("Please use writeAttributeWhitePointYWithValue:params:completion:", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4));
 - (void)subscribeAttributeWhitePointYWithMinInterval:(NSNumber * _Nonnull)minInterval maxInterval:(NSNumber * _Nonnull)maxInterval
                                               params:(MTRSubscribeParams * _Nullable)params
                              subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
@@ -27246,8 +27235,6 @@ typedef NS_OPTIONS(uint8_t, MTRTestClusterSimpleBitmap) {
 + (void)readAttributeWhitePointYWithAttributeCache:(MTRAttributeCacheContainer *)attributeCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completionHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler MTR_DEPRECATED("Please use readAttributeWhitePointYWithAttributeCache:endpoint:queue:completion:", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4));
 
 - (void)readAttributeColorPointRXWithCompletionHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler MTR_DEPRECATED("Please use readAttributeColorPointRXWithCompletion:", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4));
-- (void)writeAttributeColorPointRXWithValue:(NSNumber * _Nonnull)value completionHandler:(MTRStatusCompletion)completionHandler MTR_DEPRECATED("Please use writeAttributeColorPointRXWithValue:completion:", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4));
-- (void)writeAttributeColorPointRXWithValue:(NSNumber * _Nonnull)value params:(MTRWriteParams * _Nullable)params completionHandler:(MTRStatusCompletion)completionHandler MTR_DEPRECATED("Please use writeAttributeColorPointRXWithValue:params:completion:", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4));
 - (void)subscribeAttributeColorPointRXWithMinInterval:(NSNumber * _Nonnull)minInterval maxInterval:(NSNumber * _Nonnull)maxInterval
                                                params:(MTRSubscribeParams * _Nullable)params
                               subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
@@ -27255,8 +27242,6 @@ typedef NS_OPTIONS(uint8_t, MTRTestClusterSimpleBitmap) {
 + (void)readAttributeColorPointRXWithAttributeCache:(MTRAttributeCacheContainer *)attributeCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completionHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler MTR_DEPRECATED("Please use readAttributeColorPointRXWithAttributeCache:endpoint:queue:completion:", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4));
 
 - (void)readAttributeColorPointRYWithCompletionHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler MTR_DEPRECATED("Please use readAttributeColorPointRYWithCompletion:", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4));
-- (void)writeAttributeColorPointRYWithValue:(NSNumber * _Nonnull)value completionHandler:(MTRStatusCompletion)completionHandler MTR_DEPRECATED("Please use writeAttributeColorPointRYWithValue:completion:", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4));
-- (void)writeAttributeColorPointRYWithValue:(NSNumber * _Nonnull)value params:(MTRWriteParams * _Nullable)params completionHandler:(MTRStatusCompletion)completionHandler MTR_DEPRECATED("Please use writeAttributeColorPointRYWithValue:params:completion:", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4));
 - (void)subscribeAttributeColorPointRYWithMinInterval:(NSNumber * _Nonnull)minInterval maxInterval:(NSNumber * _Nonnull)maxInterval
                                                params:(MTRSubscribeParams * _Nullable)params
                               subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
@@ -27264,8 +27249,6 @@ typedef NS_OPTIONS(uint8_t, MTRTestClusterSimpleBitmap) {
 + (void)readAttributeColorPointRYWithAttributeCache:(MTRAttributeCacheContainer *)attributeCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completionHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler MTR_DEPRECATED("Please use readAttributeColorPointRYWithAttributeCache:endpoint:queue:completion:", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4));
 
 - (void)readAttributeColorPointRIntensityWithCompletionHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler MTR_DEPRECATED("Please use readAttributeColorPointRIntensityWithCompletion:", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4));
-- (void)writeAttributeColorPointRIntensityWithValue:(NSNumber * _Nullable)value completionHandler:(MTRStatusCompletion)completionHandler MTR_DEPRECATED("Please use writeAttributeColorPointRIntensityWithValue:completion:", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4));
-- (void)writeAttributeColorPointRIntensityWithValue:(NSNumber * _Nullable)value params:(MTRWriteParams * _Nullable)params completionHandler:(MTRStatusCompletion)completionHandler MTR_DEPRECATED("Please use writeAttributeColorPointRIntensityWithValue:params:completion:", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4));
 - (void)subscribeAttributeColorPointRIntensityWithMinInterval:(NSNumber * _Nonnull)minInterval maxInterval:(NSNumber * _Nonnull)maxInterval
                                                        params:(MTRSubscribeParams * _Nullable)params
                                       subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
@@ -27273,8 +27256,6 @@ typedef NS_OPTIONS(uint8_t, MTRTestClusterSimpleBitmap) {
 + (void)readAttributeColorPointRIntensityWithAttributeCache:(MTRAttributeCacheContainer *)attributeCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completionHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler MTR_DEPRECATED("Please use readAttributeColorPointRIntensityWithAttributeCache:endpoint:queue:completion:", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4));
 
 - (void)readAttributeColorPointGXWithCompletionHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler MTR_DEPRECATED("Please use readAttributeColorPointGXWithCompletion:", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4));
-- (void)writeAttributeColorPointGXWithValue:(NSNumber * _Nonnull)value completionHandler:(MTRStatusCompletion)completionHandler MTR_DEPRECATED("Please use writeAttributeColorPointGXWithValue:completion:", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4));
-- (void)writeAttributeColorPointGXWithValue:(NSNumber * _Nonnull)value params:(MTRWriteParams * _Nullable)params completionHandler:(MTRStatusCompletion)completionHandler MTR_DEPRECATED("Please use writeAttributeColorPointGXWithValue:params:completion:", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4));
 - (void)subscribeAttributeColorPointGXWithMinInterval:(NSNumber * _Nonnull)minInterval maxInterval:(NSNumber * _Nonnull)maxInterval
                                                params:(MTRSubscribeParams * _Nullable)params
                               subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
@@ -27282,8 +27263,6 @@ typedef NS_OPTIONS(uint8_t, MTRTestClusterSimpleBitmap) {
 + (void)readAttributeColorPointGXWithAttributeCache:(MTRAttributeCacheContainer *)attributeCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completionHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler MTR_DEPRECATED("Please use readAttributeColorPointGXWithAttributeCache:endpoint:queue:completion:", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4));
 
 - (void)readAttributeColorPointGYWithCompletionHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler MTR_DEPRECATED("Please use readAttributeColorPointGYWithCompletion:", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4));
-- (void)writeAttributeColorPointGYWithValue:(NSNumber * _Nonnull)value completionHandler:(MTRStatusCompletion)completionHandler MTR_DEPRECATED("Please use writeAttributeColorPointGYWithValue:completion:", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4));
-- (void)writeAttributeColorPointGYWithValue:(NSNumber * _Nonnull)value params:(MTRWriteParams * _Nullable)params completionHandler:(MTRStatusCompletion)completionHandler MTR_DEPRECATED("Please use writeAttributeColorPointGYWithValue:params:completion:", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4));
 - (void)subscribeAttributeColorPointGYWithMinInterval:(NSNumber * _Nonnull)minInterval maxInterval:(NSNumber * _Nonnull)maxInterval
                                                params:(MTRSubscribeParams * _Nullable)params
                               subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
@@ -27291,8 +27270,6 @@ typedef NS_OPTIONS(uint8_t, MTRTestClusterSimpleBitmap) {
 + (void)readAttributeColorPointGYWithAttributeCache:(MTRAttributeCacheContainer *)attributeCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completionHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler MTR_DEPRECATED("Please use readAttributeColorPointGYWithAttributeCache:endpoint:queue:completion:", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4));
 
 - (void)readAttributeColorPointGIntensityWithCompletionHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler MTR_DEPRECATED("Please use readAttributeColorPointGIntensityWithCompletion:", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4));
-- (void)writeAttributeColorPointGIntensityWithValue:(NSNumber * _Nullable)value completionHandler:(MTRStatusCompletion)completionHandler MTR_DEPRECATED("Please use writeAttributeColorPointGIntensityWithValue:completion:", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4));
-- (void)writeAttributeColorPointGIntensityWithValue:(NSNumber * _Nullable)value params:(MTRWriteParams * _Nullable)params completionHandler:(MTRStatusCompletion)completionHandler MTR_DEPRECATED("Please use writeAttributeColorPointGIntensityWithValue:params:completion:", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4));
 - (void)subscribeAttributeColorPointGIntensityWithMinInterval:(NSNumber * _Nonnull)minInterval maxInterval:(NSNumber * _Nonnull)maxInterval
                                                        params:(MTRSubscribeParams * _Nullable)params
                                       subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
@@ -27300,8 +27277,6 @@ typedef NS_OPTIONS(uint8_t, MTRTestClusterSimpleBitmap) {
 + (void)readAttributeColorPointGIntensityWithAttributeCache:(MTRAttributeCacheContainer *)attributeCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completionHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler MTR_DEPRECATED("Please use readAttributeColorPointGIntensityWithAttributeCache:endpoint:queue:completion:", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4));
 
 - (void)readAttributeColorPointBXWithCompletionHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler MTR_DEPRECATED("Please use readAttributeColorPointBXWithCompletion:", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4));
-- (void)writeAttributeColorPointBXWithValue:(NSNumber * _Nonnull)value completionHandler:(MTRStatusCompletion)completionHandler MTR_DEPRECATED("Please use writeAttributeColorPointBXWithValue:completion:", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4));
-- (void)writeAttributeColorPointBXWithValue:(NSNumber * _Nonnull)value params:(MTRWriteParams * _Nullable)params completionHandler:(MTRStatusCompletion)completionHandler MTR_DEPRECATED("Please use writeAttributeColorPointBXWithValue:params:completion:", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4));
 - (void)subscribeAttributeColorPointBXWithMinInterval:(NSNumber * _Nonnull)minInterval maxInterval:(NSNumber * _Nonnull)maxInterval
                                                params:(MTRSubscribeParams * _Nullable)params
                               subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
@@ -27309,8 +27284,6 @@ typedef NS_OPTIONS(uint8_t, MTRTestClusterSimpleBitmap) {
 + (void)readAttributeColorPointBXWithAttributeCache:(MTRAttributeCacheContainer *)attributeCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completionHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler MTR_DEPRECATED("Please use readAttributeColorPointBXWithAttributeCache:endpoint:queue:completion:", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4));
 
 - (void)readAttributeColorPointBYWithCompletionHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler MTR_DEPRECATED("Please use readAttributeColorPointBYWithCompletion:", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4));
-- (void)writeAttributeColorPointBYWithValue:(NSNumber * _Nonnull)value completionHandler:(MTRStatusCompletion)completionHandler MTR_DEPRECATED("Please use writeAttributeColorPointBYWithValue:completion:", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4));
-- (void)writeAttributeColorPointBYWithValue:(NSNumber * _Nonnull)value params:(MTRWriteParams * _Nullable)params completionHandler:(MTRStatusCompletion)completionHandler MTR_DEPRECATED("Please use writeAttributeColorPointBYWithValue:params:completion:", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4));
 - (void)subscribeAttributeColorPointBYWithMinInterval:(NSNumber * _Nonnull)minInterval maxInterval:(NSNumber * _Nonnull)maxInterval
                                                params:(MTRSubscribeParams * _Nullable)params
                               subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
@@ -27318,8 +27291,6 @@ typedef NS_OPTIONS(uint8_t, MTRTestClusterSimpleBitmap) {
 + (void)readAttributeColorPointBYWithAttributeCache:(MTRAttributeCacheContainer *)attributeCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completionHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler MTR_DEPRECATED("Please use readAttributeColorPointBYWithAttributeCache:endpoint:queue:completion:", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4));
 
 - (void)readAttributeColorPointBIntensityWithCompletionHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler MTR_DEPRECATED("Please use readAttributeColorPointBIntensityWithCompletion:", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4));
-- (void)writeAttributeColorPointBIntensityWithValue:(NSNumber * _Nullable)value completionHandler:(MTRStatusCompletion)completionHandler MTR_DEPRECATED("Please use writeAttributeColorPointBIntensityWithValue:completion:", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4));
-- (void)writeAttributeColorPointBIntensityWithValue:(NSNumber * _Nullable)value params:(MTRWriteParams * _Nullable)params completionHandler:(MTRStatusCompletion)completionHandler MTR_DEPRECATED("Please use writeAttributeColorPointBIntensityWithValue:params:completion:", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4));
 - (void)subscribeAttributeColorPointBIntensityWithMinInterval:(NSNumber * _Nonnull)minInterval maxInterval:(NSNumber * _Nonnull)maxInterval
                                                        params:(MTRSubscribeParams * _Nullable)params
                                       subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler

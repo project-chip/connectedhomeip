@@ -619,6 +619,17 @@ public:
     CHIP_ERROR
     ContinueCommissioningAfterDeviceAttestation(DeviceProxy * device, Credentials::AttestationVerificationResult attestationResult);
 
+#if CHIP_DEVICE_CONFIG_ENABLE_NFC_BASED_COMMISSIONING
+    /**
+     * @brief
+     *   This method instructs the commissioner to proceed to the commissioning complete stage for a device
+     *   that had previously being commissioned until request to connect to network.
+     *
+     * @param[in] remoteDeviceId        The remote device Id.
+     */
+    CHIP_ERROR ContinueCommissioningAfterConnectNetworkRequest(NodeId remoteDeviceId);
+#endif
+
     CHIP_ERROR GetDeviceBeingCommissioned(NodeId deviceId, CommissioneeDeviceProxy ** device);
 
     /**
@@ -823,6 +834,11 @@ public:
         return mDefaultCommissioner == nullptr ? NullOptional : MakeOptional(mDefaultCommissioner->GetCommissioningParameters());
     }
 
+    CHIP_ERROR UpdateCommissioningParameters(const CommissioningParameters & newParameters)
+    {
+        return mDefaultCommissioner->SetCommissioningParameters(newParameters);
+    }
+
     // Reset the arm failsafe timer during commissioning.  If this returns
     // false, that means that the timer was already set for a longer time period
     // than the new time we are trying to set.  In this case, neither
@@ -835,6 +851,9 @@ public:
         return ExtendArmFailSafeInternal(proxy, step, armFailSafeTimeout, commandTimeout, onSuccess, onFailure,
                                          /* fireAndForget = */ true);
     }
+
+    // Check if the commissioning mode is valid for the current commissioning parameters.
+    virtual bool HasValidCommissioningMode(const Dnssd::CommissionNodeData & nodeData);
 
 protected:
     // Cleans up and resets failsafe as appropriate depending on the error and the failed stage.
@@ -876,6 +895,16 @@ private:
     Internal::WriteCancelFn mWriteCancelFn;
 
     ObjectPool<CommissioneeDeviceProxy, kNumMaxActiveDevices> mCommissioneeDevicePool;
+
+    // While we have an ongoing PASE attempt (i.e. after calling Pair() on the
+    // PASESession), track which RendezvousParameters we used for that attempt.
+    // This allows us to notify delegates about which thing it was we actually
+    // established PASE with, especially in the context of concatenated QR
+    // codes.
+    //
+    // This member only has a value while we are in the middle of session
+    // establishment.
+    std::optional<RendezvousParameters> mRendezvousParametersForPASEEstablishment;
 
 #if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY // make this commissioner discoverable
     Protocols::UserDirectedCommissioning::UserDirectedCommissioningServer * mUdcServer = nullptr;
@@ -1089,6 +1118,7 @@ private:
     CHIP_ERROR ParseGeneralCommissioningInfo(ReadCommissioningInfo & info);
     CHIP_ERROR ParseBasicInformation(ReadCommissioningInfo & info);
     CHIP_ERROR ParseNetworkCommissioningInfo(ReadCommissioningInfo & info);
+    CHIP_ERROR ParseNetworkCommissioningTimeouts(NetworkClusterInfo & networkInfo, const char * networkType);
     CHIP_ERROR ParseFabrics(ReadCommissioningInfo & info);
     CHIP_ERROR ParseICDInfo(ReadCommissioningInfo & info);
     CHIP_ERROR ParseTimeSyncInfo(ReadCommissioningInfo & info);

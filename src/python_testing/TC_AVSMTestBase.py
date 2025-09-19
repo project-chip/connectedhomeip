@@ -17,10 +17,11 @@
 
 import logging
 
-import chip.clusters as Clusters
-from chip.clusters import Globals
-from chip.interaction_model import InteractionModelError, Status
 from mobly import asserts
+
+import matter.clusters as Clusters
+from matter.clusters import Globals
+from matter.interaction_model import InteractionModelError, Status
 
 logger = logging.getLogger(__name__)
 
@@ -119,7 +120,7 @@ class AVSMTestBase:
                 audioCodec=aMicrophoneCapabilities.supportedCodecs[0],
                 channelCount=aMicrophoneCapabilities.maxNumberOfChannels,
                 sampleRate=aMicrophoneCapabilities.supportedSampleRates[0],
-                bitRate=1024,
+                bitRate=30000,
                 bitDepth=aMicrophoneCapabilities.supportedBitDepths[0],
             )
             audioStreamAllocateResponse = await self.send_single_cmd(endpoint=endpoint, cmd=adoStreamAllocateCmd)
@@ -160,10 +161,10 @@ class AVSMTestBase:
             endpoint=endpoint, cluster=cluster, attribute=attr.RateDistortionTradeOffPoints
         )
         logger.info(f"Rx'd RateDistortionTradeOffPoints: {aRateDistortionTradeOffPoints}")
-        aMinViewport = await self.read_single_attribute_check_success(
-            endpoint=endpoint, cluster=cluster, attribute=attr.MinViewport
+        aMinViewportRes = await self.read_single_attribute_check_success(
+            endpoint=endpoint, cluster=cluster, attribute=attr.MinViewportResolution
         )
-        logger.info(f"Rx'd MinViewport: {aMinViewport}")
+        logger.info(f"Rx'd MinViewportResolution: {aMinViewportRes}")
         aVideoSensorParams = await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=cluster, attribute=attr.VideoSensorParams
         )
@@ -190,14 +191,13 @@ class AVSMTestBase:
                 videoCodec=aRateDistortionTradeOffPoints[0].codec,
                 minFrameRate=30,  # An acceptable value for min frame rate
                 maxFrameRate=aVideoSensorParams.maxFPS,
-                minResolution=aMinViewport,
+                minResolution=aMinViewportRes,
                 maxResolution=cluster.Structs.VideoResolutionStruct(
                     width=aVideoSensorParams.sensorWidth, height=aVideoSensorParams.sensorHeight
                 ),
                 minBitRate=aRateDistortionTradeOffPoints[0].minBitRate,
                 maxBitRate=aRateDistortionTradeOffPoints[0].minBitRate,
-                minKeyFrameInterval=4000,
-                maxKeyFrameInterval=4000,
+                keyFrameInterval=4000,
                 watermarkEnabled=watermark,
                 OSDEnabled=osd
             )

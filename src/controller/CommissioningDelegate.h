@@ -89,6 +89,9 @@ enum CommissioningStage : uint8_t
     kRemoveThreadNetworkConfig,       ///< Remove Thread network config.
     kConfigureTCAcknowledgments,      ///< Send SetTCAcknowledgements (0x30:6) command to the device
     kCleanup,                         ///< Call delegates with status, free memory, clear timers and state/
+#if CHIP_DEVICE_CONFIG_ENABLE_NFC_BASED_COMMISSIONING
+    kUnpoweredPhaseComplete, ///< Commissioning completed until connect network for unpowered commissioning (NFC)
+#endif
 };
 
 enum class ICDRegistrationStrategy : uint8_t
@@ -745,6 +748,9 @@ struct NetworkClusterInfo
 {
     EndpointId endpoint = kInvalidEndpointId;
     app::Clusters::NetworkCommissioning::Attributes::ConnectMaxTimeSeconds::TypeInfo::DecodableType minConnectionTime = 0;
+    // maxScanTime == 0 means we don't know; normal commissioning step timeouts
+    // will apply in that case.
+    app::Clusters::NetworkCommissioning::Attributes::ScanMaxTimeSeconds::TypeInfo::DecodableType maxScanTime = 0;
 };
 struct NetworkClusters
 {
@@ -765,7 +771,7 @@ struct GeneralCommissioningInfo
         app::Clusters::GeneralCommissioning::RegulatoryLocationTypeEnum::kIndoorOutdoor;
     app::Clusters::GeneralCommissioning::RegulatoryLocationTypeEnum locationCapability =
         app::Clusters::GeneralCommissioning::RegulatoryLocationTypeEnum::kIndoorOutdoor;
-    ;
+    bool isCommissioningWithoutPower = false;
 };
 
 // ICDManagementClusterInfo is populated when the controller reads information from

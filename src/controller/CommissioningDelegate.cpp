@@ -119,13 +119,13 @@ const char * StageToString(CommissioningStage stage)
         return "ThreadNetworkEnable";
 
     case kEvictPreviousCaseSessions:
-        return "kEvictPreviousCaseSessions";
+        return "EvictPreviousCaseSessions";
 
     case kFindOperationalForStayActive:
-        return "kFindOperationalForStayActive";
+        return "FindOperationalForStayActive";
 
     case kFindOperationalForCommissioningComplete:
-        return "kFindOperationalForCommissioningComplete";
+        return "FindOperationalForCommissioningComplete";
 
     case kICDSendStayActive:
         return "ICDSendStayActive";
@@ -147,6 +147,11 @@ const char * StageToString(CommissioningStage stage)
 
     case kRemoveThreadNetworkConfig:
         return "RemoveThreadNetworkConfig";
+
+#if CHIP_DEVICE_CONFIG_ENABLE_NFC_BASED_COMMISSIONING
+    case kUnpoweredPhaseComplete:
+        return "UnpoweredPhaseComplete";
+#endif
 
     default:
         return "???";
@@ -262,6 +267,11 @@ const char * MetricKeyForCommissioningStage(CommissioningStage stage)
 
     case kNeedsNetworkCreds:
         return "core_commissioning_stage_need_network_creds";
+
+#if CHIP_DEVICE_CONFIG_ENABLE_NFC_BASED_COMMISSIONING
+    case kUnpoweredPhaseComplete:
+        return "core_commissioning_stage_unpowered_phase";
+#endif
 
     default:
         return "core_commissioning_stage_unknown";

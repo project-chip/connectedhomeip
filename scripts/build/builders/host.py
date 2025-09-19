@@ -515,7 +515,6 @@ class HostBuilder(GnBuilder):
 
         if enable_webrtc:
             self.extra_gn_options.append('chip_support_webrtc_python_bindings=true')
-            self.extra_gn_options.append('chip_build_controller_dynamic_server=true')
 
         if terms_and_conditions_required is not None:
             if terms_and_conditions_required:
@@ -537,7 +536,7 @@ class HostBuilder(GnBuilder):
         elif app == HostApp.PYTHON_BINDINGS:
             self.extra_gn_options.append('enable_rtti=false')
             self.extra_gn_options.append('chip_project_config_include_dirs=["//config/python"]')
-            self.build_command = 'chip-repl'
+            self.build_command = 'matter-repl'
 
         if self.app == HostApp.SIMULATED_APP1:
             self.extra_gn_options.append('chip_tests_zap_config="app1"')

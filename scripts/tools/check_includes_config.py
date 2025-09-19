@@ -143,7 +143,7 @@ ALLOW: Dict[str, Set[str]] = {
     'src/app/clusters/camera-av-stream-management-server/camera-av-stream-management-server.h': {'vector'},
     'src/app/clusters/camera-av-stream-management-server/camera-av-stream-management-server.cpp': {'set'},
     'src/app/clusters/camera-av-settings-user-level-management-server/camera-av-settings-user-level-management-server.h': {'string', 'vector'},
-    'src/app/clusters/webrtc-transport-requestor-server/webrtc-transport-requestor-server.h': {'string', 'vector'},
+    'src/app/clusters/webrtc-transport-requestor-server/webrtc-transport-requestor-cluster.h': {'string', 'vector'},
     'src/app/clusters/push-av-stream-transport-server/push-av-stream-transport-server.h': {'vector'},
     'src/app/clusters/push-av-stream-transport-server/push-av-stream-transport-delegate.h': {'vector'},
     'src/app/clusters/push-av-stream-transport-server/push-av-stream-transport-storage.h': {'vector'},
@@ -153,6 +153,8 @@ ALLOW: Dict[str, Set[str]] = {
     'src/credentials/attestation_verifier/FileAttestationTrustStore.h': {'vector'},
     'src/credentials/attestation_verifier/FileAttestationTrustStore.cpp': {'string'},
     'src/credentials/attestation_verifier/TestDACRevocationDelegateImpl.cpp': {'fstream'},
+    # Commodity Tariff Cluster are expected to run on resource-capable devices
+    'src/app/clusters/commodity-tariff-server/CommodityTariffAttrsDataMgmt.h': {'map', 'set', 'unordered_map', 'unordered_set', 'string'},
 
     'src/setup_payload/AdditionalDataPayload.h': {'string'},
     'src/setup_payload/AdditionalDataPayloadParser.cpp': {'vector', 'string'},

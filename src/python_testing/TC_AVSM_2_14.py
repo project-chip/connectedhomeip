@@ -37,17 +37,18 @@
 
 import logging
 
-import chip.clusters as Clusters
-from chip.interaction_model import InteractionModelError, Status
-from chip.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main, has_feature, run_if_endpoint_matches
 from mobly import asserts
+
+import matter.clusters as Clusters
+from matter.interaction_model import InteractionModelError, Status
+from matter.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main, has_feature, run_if_endpoint_matches
 
 logger = logging.getLogger(__name__)
 
 
 class TC_AVSM_2_14(MatterBaseTest):
     def desc_TC_AVSM_2_14(self) -> str:
-        return "[TC-AVSM-2.5] Validate Audio Stream Allocation reuse with Server as DUT"
+        return "[TC-AVSM-2.14] Validate Audio Stream Allocation reuse with Server as DUT"
 
     def pics_TC_AVSM_2_14(self):
         return ["AVSM.S"]
@@ -139,7 +140,7 @@ class TC_AVSM_2_14(MatterBaseTest):
                 audioCodec=aMicrophoneCapabilities.supportedCodecs[0],
                 channelCount=aMicrophoneCapabilities.maxNumberOfChannels,
                 sampleRate=aMicrophoneCapabilities.supportedSampleRates[0],
-                bitRate=1024,
+                bitRate=30000,
                 bitDepth=aMicrophoneCapabilities.supportedBitDepths[0],
             )
             audioStreamAllocateResponse = await self.send_single_cmd(endpoint=endpoint, cmd=adoStreamAllocateCmd)
@@ -166,7 +167,7 @@ class TC_AVSM_2_14(MatterBaseTest):
                 audioCodec=aMicrophoneCapabilities.supportedCodecs[0],
                 channelCount=aMicrophoneCapabilities.maxNumberOfChannels,
                 sampleRate=aMicrophoneCapabilities.supportedSampleRates[0],
-                bitRate=1024,
+                bitRate=30000,
                 bitDepth=aMicrophoneCapabilities.supportedBitDepths[0],
             )
             audioStreamAllocateResponse = await self.send_single_cmd(endpoint=endpoint, cmd=adoStreamAllocateCmd)

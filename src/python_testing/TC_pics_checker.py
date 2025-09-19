@@ -16,14 +16,15 @@
 #
 import math
 
-import chip.clusters as Clusters
-from chip.testing.basic_composition import BasicCompositionTests
-from chip.testing.global_attribute_ids import GlobalAttributeIds
-from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
-from chip.testing.pics import accepted_cmd_pics_str, attribute_pics_str, feature_pics_str, generated_cmd_pics_str
-from chip.testing.problem_notices import (AttributePathLocation, ClusterPathLocation, CommandPathLocation, FeaturePathLocation,
-                                          UnknownProblemLocation)
 from mobly import asserts
+
+import matter.clusters as Clusters
+from matter.testing.basic_composition import BasicCompositionTests
+from matter.testing.global_attribute_ids import GlobalAttributeIds
+from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+from matter.testing.pics import accepted_cmd_pics_str, attribute_pics_str, feature_pics_str, generated_cmd_pics_str
+from matter.testing.problem_notices import (AttributePathLocation, ClusterPathLocation, CommandPathLocation, FeaturePathLocation,
+                                            UnknownProblemLocation)
 
 
 class TC_PICS_Checker(MatterBaseTest, BasicCompositionTests):

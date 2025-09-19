@@ -156,7 +156,7 @@ RUN case ${TARGETPLATFORM} in \
     set -x \
     && source scripts/activate.sh \
     && scripts/build/build_examples.py \
-    --target linux-x64-chip-tool-ipv6only-platform-mdns \
+    --target linux-x64-chip-tool-ipv6only-platform-mdns-nfc-commission \
     --target linux-x64-shell-ipv6only-platform-mdns \
     --target linux-x64-chip-cert-ipv6only-platform-mdns \
     --target linux-x64-air-purifier-ipv6only \
@@ -185,8 +185,11 @@ RUN case ${TARGETPLATFORM} in \
     --target linux-x64-water-leak-detector-ipv6only \
     --target linux-x64-camera-ipv6only \
     --target linux-x64-camera-controller-ipv6only \
+    --target linux-x64-closure-ipv6only \
+    --target linux-x64-jf-control-app-ipv6only \
+    --target linux-x64-jf-admin-app-ipv6only \
     build \
-    && mv out/linux-x64-chip-tool-ipv6only-platform-mdns/chip-tool out/chip-tool \
+    && mv out/linux-x64-chip-tool-ipv6only-platform-mdns-nfc-commission/chip-tool out/chip-tool \
     && mv out/linux-x64-shell-ipv6only-platform-mdns/chip-shell out/chip-shell \
     && mv out/linux-x64-chip-cert-ipv6only-platform-mdns/chip-cert out/chip-cert \
     && mv out/linux-x64-air-purifier-ipv6only/chip-air-purifier-app out/chip-air-purifier-app \
@@ -215,12 +218,15 @@ RUN case ${TARGETPLATFORM} in \
     && mv out/linux-x64-water-leak-detector-ipv6only/water-leak-detector-app out/water-leak-detector-app \
     && mv out/linux-x64-camera-ipv6only/chip-camera-app out/chip-camera-app \
     && mv out/linux-x64-camera-controller-ipv6only/chip-camera-controller out/chip-camera-controller \
+    && mv out/linux-x64-closure-ipv6only/closure-app out/closure-app \
+    && mv out/linux-x64-jf-control-app-ipv6only/jfc-app out/jfc-app \
+    && mv out/linux-x64-jf-admin-app-ipv6only/jfa-app out/jfa-app \
     ;; \
     "linux/arm64")\
     set -x \
     && source scripts/activate.sh \
     && scripts/build/build_examples.py \
-    --target linux-arm64-chip-tool-ipv6only-platform-mdns \
+    --target linux-arm64-chip-tool-ipv6only-platform-mdns-nfc-commission \
     --target linux-arm64-shell-ipv6only-platform-mdns \
     --target linux-arm64-chip-cert-ipv6only-platform-mdns \
     --target linux-arm64-air-purifier-ipv6only \
@@ -249,8 +255,11 @@ RUN case ${TARGETPLATFORM} in \
     --target linux-arm64-water-leak-detector-ipv6only \
     --target linux-arm64-camera-clang-ipv6only \
     --target linux-arm64-camera-controller-ipv6only \
+    --target linux-arm64-closure-ipv6only \
+    --target linux-arm64-jf-control-app-ipv6only \
+    --target linux-arm64-jf-admin-app-ipv6only \
     build \
-    && mv out/linux-arm64-chip-tool-ipv6only-platform-mdns/chip-tool out/chip-tool \
+    && mv out/linux-arm64-chip-tool-ipv6only-platform-mdns-nfc-commission/chip-tool out/chip-tool \
     && mv out/linux-arm64-shell-ipv6only-platform-mdns/chip-shell out/chip-shell \
     && mv out/linux-arm64-chip-cert-ipv6only-platform-mdns/chip-cert out/chip-cert \
     && mv out/linux-arm64-air-purifier-ipv6only/chip-air-purifier-app out/chip-air-purifier-app \
@@ -279,6 +288,9 @@ RUN case ${TARGETPLATFORM} in \
     && mv out/linux-arm64-water-leak-detector-ipv6only/water-leak-detector-app out/water-leak-detector-app \
     && mv out/linux-arm64-camera-clang-ipv6only/chip-camera-app out/chip-camera-app \
     && mv out/linux-arm64-camera-controller-ipv6only/chip-camera-controller out/chip-camera-controller \
+    && mv out/linux-arm64-closure-ipv6only/closure-app out/closure-app \
+    && mv out/linux-arm64-jf-control-app-ipv6only/jfc-app out/jfc-app \
+    && mv out/linux-arm64-jf-admin-app-ipv6only/jfa-app out/jfa-app \
     ;; \
     *) ;; \
     esac
@@ -324,6 +336,9 @@ COPY --from=chip-build-cert-bins /root/connectedhomeip/out/chip-terms-and-condit
 COPY --from=chip-build-cert-bins /root/connectedhomeip/out/water-leak-detector-app apps/water-leak-detector-app
 COPY --from=chip-build-cert-bins /root/connectedhomeip/out/chip-camera-app apps/chip-camera-app
 COPY --from=chip-build-cert-bins /root/connectedhomeip/out/chip-camera-controller apps/chip-camera-controller
+COPY --from=chip-build-cert-bins /root/connectedhomeip/out/closure-app apps/closure-app
+COPY --from=chip-build-cert-bins /root/connectedhomeip/out/jfc-app apps/jfc-app
+COPY --from=chip-build-cert-bins /root/connectedhomeip/out/jfa-app apps/jfa-app
 
 # Create symbolic links for now since this allows users to use existing configurations
 # for running just `app-name` instead of `apps/app-name`
@@ -341,7 +356,8 @@ RUN pip install --break-system-packages -r /tmp/requirements.txt && rm /tmp/requ
 
 # Copy PushAV Server to apps and install dependencies
 COPY --from=chip-build-cert-bins /root/connectedhomeip/src/tools/push_av_server apps/push_av_server
-RUN pip install --break-system-packages -r apps/push_av_server/requirements.txt
+RUN pip install --break-system-packages -r apps/push_av_server/requirements.txt \
+    && patch -d $(pip show hypercorn | grep "Location: " | sed "s/Location: //") -p0 < apps/push_av_server/hypercorn.patch
 
 # Stage 3.2: Setup the Mock Server
 COPY --from=chip-build-cert-bins /root/connectedhomeip/integrations/mock_server mock_server
@@ -351,8 +367,8 @@ RUN set -x && DEBIAN_FRONTEND=noninteractive apt-get update; apt-get install -fy
 
 # TODO: remove this dependency conflict workaround --> issue: #37975
 # python3-gi is being installed as a dependency by 'openjdk-8-jdk'. python3-gi is not wanted since it installs PyGObject 3.48.2 (which we are not using),
-# This issue showed up when we pinned pygobject==3.50.0 in the chip-repl in https://github.com/project-chip/connectedhomeip/pull/37948
-# having pygobject ==3.50.0 being installed through pip creates a conflict, and pip can not unintstall the PyGObject (python3-gi's version) because the system APT installed it
+# This issue showed up when we pinned pygobject==3.50.0 in the matter-repl in https://github.com/project-chip/connectedhomeip/pull/37948
+# having pygobject ==3.50.0 being installed through pip creates a conflict, and pip can not uninstall the PyGObject (python3-gi's version) because the system APT installed it
 # Error log:
 #   ERROR: Cannot uninstall 'PyGObject'. It is a distutils installed project and thus we cannot accurately determine which files belong to it which would lead to only a partial uninstall.
 RUN apt-get remove -y python3-gi
@@ -360,8 +376,8 @@ RUN apt-get remove -y python3-gi
 RUN pip install --break-system-packages --no-cache-dir \
     python_lib/python/obj/scripts/py_matter_idl/matter-idl._build_wheel/matter_idl-*.whl \
     python_lib/python/obj/scripts/py_matter_yamltests/matter-yamltests._build_wheel/matter_yamltests-*.whl \
-    python_lib/obj/src/python_testing/matter_testing_infrastructure/chip-testing._build_wheel/chip_testing-*.whl \
-    python_lib/controller/python/chip*.whl
+    python_lib/obj/src/python_testing/matter_testing_infrastructure/matter-testing._build_wheel/matter_testing-*.whl \
+    python_lib/controller/python/matter*.whl
 
 # Copy device attestation revocation set and device attestation test vectors
 RUN mkdir -p credentials/test/revoked-attestation-certificates

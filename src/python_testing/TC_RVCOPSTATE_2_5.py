@@ -39,11 +39,12 @@ import asyncio
 import enum
 import logging
 
-import chip.clusters as Clusters
-from chip.testing.event_attribute_reporting import AttributeSubscriptionHandler
-from chip.testing.matter_testing import (AttributeMatcher, MatterBaseTest, TestStep, async_test_body, default_matter_test_main,
-                                         type_matches)
 from mobly import asserts
+
+import matter.clusters as Clusters
+from matter.testing.event_attribute_reporting import AttributeSubscriptionHandler
+from matter.testing.matter_testing import (AttributeMatcher, MatterBaseTest, TestStep, async_test_body, default_matter_test_main,
+                                           matchers)
 
 
 class RvcStatusEnum(enum.IntEnum):
@@ -151,7 +152,7 @@ class TC_RVCOPSTATE_2_5(MatterBaseTest):
     async def send_go_home_cmd(self) -> Clusters.Objects.RvcOperationalState.Commands.OperationalCommandResponse:
         ret = await self.send_single_cmd(cmd=Clusters.Objects.RvcOperationalState.Commands.GoHome(),
                                          endpoint=self.endpoint)
-        asserts.assert_true(type_matches(ret, Clusters.Objects.RvcOperationalState.Commands.OperationalCommandResponse),
+        asserts.assert_true(matchers.is_type(ret, Clusters.Objects.RvcOperationalState.Commands.OperationalCommandResponse),
                             "Unexpected return type for GoHome")
         return ret
 
@@ -234,9 +235,6 @@ class TC_RVCOPSTATE_2_5(MatterBaseTest):
 
             # TH sends GoHome command to the DUT
             self.step("8")
-
-            # TODO:  add this idle mode set to test plan, as RVC must be idle for GoHome to be performed successfully
-            await self.send_change_to_mode_with_check(idle_mode, RvcStatusEnum.Success)
 
             await self.send_go_home_cmd_with_check(Clusters.OperationalState.Enums.ErrorStateEnum.kNoError)
             await self.read_operational_state_with_check(Clusters.RvcOperationalState.Enums.OperationalStateEnum.kSeekingCharger)

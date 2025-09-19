@@ -14297,31 +14297,9 @@ using chip::System::Clock::Timeout;
     return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeColorControlID) attributeID:@(MTRAttributeIDTypeClusterColorControlAttributeWhitePointXID) params:params];
 }
 
-- (void)writeAttributeWhitePointXWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-{
-    [self writeAttributeWhitePointXWithValue:dataValueDictionary expectedValueInterval:expectedValueIntervalMs params:nil];
-}
-- (void)writeAttributeWhitePointXWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params
-{
-    NSNumber * timedWriteTimeout = params.timedWriteTimeout;
-
-    [self.device writeAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeColorControlID) attributeID:@(MTRAttributeIDTypeClusterColorControlAttributeWhitePointXID) value:dataValueDictionary expectedValueInterval:expectedValueIntervalMs timedWriteTimeout:timedWriteTimeout];
-}
-
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeWhitePointYWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeColorControlID) attributeID:@(MTRAttributeIDTypeClusterColorControlAttributeWhitePointYID) params:params];
-}
-
-- (void)writeAttributeWhitePointYWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-{
-    [self writeAttributeWhitePointYWithValue:dataValueDictionary expectedValueInterval:expectedValueIntervalMs params:nil];
-}
-- (void)writeAttributeWhitePointYWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params
-{
-    NSNumber * timedWriteTimeout = params.timedWriteTimeout;
-
-    [self.device writeAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeColorControlID) attributeID:@(MTRAttributeIDTypeClusterColorControlAttributeWhitePointYID) value:dataValueDictionary expectedValueInterval:expectedValueIntervalMs timedWriteTimeout:timedWriteTimeout];
 }
 
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeColorPointRXWithParams:(MTRReadParams * _Nullable)params
@@ -14329,31 +14307,9 @@ using chip::System::Clock::Timeout;
     return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeColorControlID) attributeID:@(MTRAttributeIDTypeClusterColorControlAttributeColorPointRXID) params:params];
 }
 
-- (void)writeAttributeColorPointRXWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-{
-    [self writeAttributeColorPointRXWithValue:dataValueDictionary expectedValueInterval:expectedValueIntervalMs params:nil];
-}
-- (void)writeAttributeColorPointRXWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params
-{
-    NSNumber * timedWriteTimeout = params.timedWriteTimeout;
-
-    [self.device writeAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeColorControlID) attributeID:@(MTRAttributeIDTypeClusterColorControlAttributeColorPointRXID) value:dataValueDictionary expectedValueInterval:expectedValueIntervalMs timedWriteTimeout:timedWriteTimeout];
-}
-
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeColorPointRYWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeColorControlID) attributeID:@(MTRAttributeIDTypeClusterColorControlAttributeColorPointRYID) params:params];
-}
-
-- (void)writeAttributeColorPointRYWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-{
-    [self writeAttributeColorPointRYWithValue:dataValueDictionary expectedValueInterval:expectedValueIntervalMs params:nil];
-}
-- (void)writeAttributeColorPointRYWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params
-{
-    NSNumber * timedWriteTimeout = params.timedWriteTimeout;
-
-    [self.device writeAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeColorControlID) attributeID:@(MTRAttributeIDTypeClusterColorControlAttributeColorPointRYID) value:dataValueDictionary expectedValueInterval:expectedValueIntervalMs timedWriteTimeout:timedWriteTimeout];
 }
 
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeColorPointRIntensityWithParams:(MTRReadParams * _Nullable)params
@@ -14361,31 +14317,9 @@ using chip::System::Clock::Timeout;
     return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeColorControlID) attributeID:@(MTRAttributeIDTypeClusterColorControlAttributeColorPointRIntensityID) params:params];
 }
 
-- (void)writeAttributeColorPointRIntensityWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-{
-    [self writeAttributeColorPointRIntensityWithValue:dataValueDictionary expectedValueInterval:expectedValueIntervalMs params:nil];
-}
-- (void)writeAttributeColorPointRIntensityWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params
-{
-    NSNumber * timedWriteTimeout = params.timedWriteTimeout;
-
-    [self.device writeAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeColorControlID) attributeID:@(MTRAttributeIDTypeClusterColorControlAttributeColorPointRIntensityID) value:dataValueDictionary expectedValueInterval:expectedValueIntervalMs timedWriteTimeout:timedWriteTimeout];
-}
-
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeColorPointGXWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeColorControlID) attributeID:@(MTRAttributeIDTypeClusterColorControlAttributeColorPointGXID) params:params];
-}
-
-- (void)writeAttributeColorPointGXWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-{
-    [self writeAttributeColorPointGXWithValue:dataValueDictionary expectedValueInterval:expectedValueIntervalMs params:nil];
-}
-- (void)writeAttributeColorPointGXWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params
-{
-    NSNumber * timedWriteTimeout = params.timedWriteTimeout;
-
-    [self.device writeAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeColorControlID) attributeID:@(MTRAttributeIDTypeClusterColorControlAttributeColorPointGXID) value:dataValueDictionary expectedValueInterval:expectedValueIntervalMs timedWriteTimeout:timedWriteTimeout];
 }
 
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeColorPointGYWithParams:(MTRReadParams * _Nullable)params
@@ -14393,31 +14327,9 @@ using chip::System::Clock::Timeout;
     return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeColorControlID) attributeID:@(MTRAttributeIDTypeClusterColorControlAttributeColorPointGYID) params:params];
 }
 
-- (void)writeAttributeColorPointGYWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-{
-    [self writeAttributeColorPointGYWithValue:dataValueDictionary expectedValueInterval:expectedValueIntervalMs params:nil];
-}
-- (void)writeAttributeColorPointGYWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params
-{
-    NSNumber * timedWriteTimeout = params.timedWriteTimeout;
-
-    [self.device writeAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeColorControlID) attributeID:@(MTRAttributeIDTypeClusterColorControlAttributeColorPointGYID) value:dataValueDictionary expectedValueInterval:expectedValueIntervalMs timedWriteTimeout:timedWriteTimeout];
-}
-
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeColorPointGIntensityWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeColorControlID) attributeID:@(MTRAttributeIDTypeClusterColorControlAttributeColorPointGIntensityID) params:params];
-}
-
-- (void)writeAttributeColorPointGIntensityWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-{
-    [self writeAttributeColorPointGIntensityWithValue:dataValueDictionary expectedValueInterval:expectedValueIntervalMs params:nil];
-}
-- (void)writeAttributeColorPointGIntensityWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params
-{
-    NSNumber * timedWriteTimeout = params.timedWriteTimeout;
-
-    [self.device writeAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeColorControlID) attributeID:@(MTRAttributeIDTypeClusterColorControlAttributeColorPointGIntensityID) value:dataValueDictionary expectedValueInterval:expectedValueIntervalMs timedWriteTimeout:timedWriteTimeout];
 }
 
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeColorPointBXWithParams:(MTRReadParams * _Nullable)params
@@ -14425,47 +14337,14 @@ using chip::System::Clock::Timeout;
     return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeColorControlID) attributeID:@(MTRAttributeIDTypeClusterColorControlAttributeColorPointBXID) params:params];
 }
 
-- (void)writeAttributeColorPointBXWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-{
-    [self writeAttributeColorPointBXWithValue:dataValueDictionary expectedValueInterval:expectedValueIntervalMs params:nil];
-}
-- (void)writeAttributeColorPointBXWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params
-{
-    NSNumber * timedWriteTimeout = params.timedWriteTimeout;
-
-    [self.device writeAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeColorControlID) attributeID:@(MTRAttributeIDTypeClusterColorControlAttributeColorPointBXID) value:dataValueDictionary expectedValueInterval:expectedValueIntervalMs timedWriteTimeout:timedWriteTimeout];
-}
-
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeColorPointBYWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeColorControlID) attributeID:@(MTRAttributeIDTypeClusterColorControlAttributeColorPointBYID) params:params];
 }
 
-- (void)writeAttributeColorPointBYWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-{
-    [self writeAttributeColorPointBYWithValue:dataValueDictionary expectedValueInterval:expectedValueIntervalMs params:nil];
-}
-- (void)writeAttributeColorPointBYWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params
-{
-    NSNumber * timedWriteTimeout = params.timedWriteTimeout;
-
-    [self.device writeAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeColorControlID) attributeID:@(MTRAttributeIDTypeClusterColorControlAttributeColorPointBYID) value:dataValueDictionary expectedValueInterval:expectedValueIntervalMs timedWriteTimeout:timedWriteTimeout];
-}
-
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeColorPointBIntensityWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeColorControlID) attributeID:@(MTRAttributeIDTypeClusterColorControlAttributeColorPointBIntensityID) params:params];
-}
-
-- (void)writeAttributeColorPointBIntensityWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-{
-    [self writeAttributeColorPointBIntensityWithValue:dataValueDictionary expectedValueInterval:expectedValueIntervalMs params:nil];
-}
-- (void)writeAttributeColorPointBIntensityWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params
-{
-    NSNumber * timedWriteTimeout = params.timedWriteTimeout;
-
-    [self.device writeAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeColorControlID) attributeID:@(MTRAttributeIDTypeClusterColorControlAttributeColorPointBIntensityID) value:dataValueDictionary expectedValueInterval:expectedValueIntervalMs timedWriteTimeout:timedWriteTimeout];
 }
 
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeEnhancedCurrentHueWithParams:(MTRReadParams * _Nullable)params
@@ -19656,9 +19535,9 @@ using chip::System::Clock::Timeout;
     return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeCameraAVStreamManagementID) attributeID:@(MTRAttributeIDTypeClusterCameraAVStreamManagementAttributeNightVisionUsesInfraredID) params:params];
 }
 
-- (NSDictionary<NSString *, id> * _Nullable)readAttributeMinViewportWithParams:(MTRReadParams * _Nullable)params
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeMinViewportResolutionWithParams:(MTRReadParams * _Nullable)params
 {
-    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeCameraAVStreamManagementID) attributeID:@(MTRAttributeIDTypeClusterCameraAVStreamManagementAttributeMinViewportID) params:params];
+    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeCameraAVStreamManagementID) attributeID:@(MTRAttributeIDTypeClusterCameraAVStreamManagementAttributeMinViewportResolutionID) params:params];
 }
 
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeRateDistortionTradeOffPointsWithParams:(MTRReadParams * _Nullable)params
@@ -20310,6 +20189,11 @@ using chip::System::Clock::Timeout;
     return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeCameraAVSettingsUserLevelManagementID) attributeID:@(MTRAttributeIDTypeClusterCameraAVSettingsUserLevelManagementAttributePanMaxID) params:params];
 }
 
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeMovementStateWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeCameraAVSettingsUserLevelManagementID) attributeID:@(MTRAttributeIDTypeClusterCameraAVSettingsUserLevelManagementAttributeMovementStateID) params:params];
+}
+
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeCameraAVSettingsUserLevelManagementID) attributeID:@(MTRAttributeIDTypeClusterCameraAVSettingsUserLevelManagementAttributeGeneratedCommandListID) params:params];
@@ -20785,11 +20669,7 @@ using chip::System::Clock::Timeout;
                                         completion:responseHandler];
 }
 
-- (void)findTransportWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:(void (^)(MTRPushAVStreamTransportClusterFindTransportResponseParams * _Nullable data, NSError * _Nullable error))completion
-{
-    [self findTransportWithParams:nil expectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs completion:completion];
-}
-- (void)findTransportWithParams:(MTRPushAVStreamTransportClusterFindTransportParams * _Nullable)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedValues expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completion:(void (^)(MTRPushAVStreamTransportClusterFindTransportResponseParams * _Nullable data, NSError * _Nullable error))completion
+- (void)findTransportWithParams:(MTRPushAVStreamTransportClusterFindTransportParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedValues expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completion:(void (^)(MTRPushAVStreamTransportClusterFindTransportResponseParams * _Nullable data, NSError * _Nullable error))completion
 {
     if (params == nil) {
         params = [[MTRPushAVStreamTransportClusterFindTransportParams
@@ -22212,10 +22092,10 @@ using chip::System::Clock::Timeout;
                                         completion:responseHandler];
 }
 
-- (void)TLSClientCSRWithParams:(MTRTLSCertificateManagementClusterTLSClientCSRParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedValues expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completion:(void (^)(MTRTLSCertificateManagementClusterTLSClientCSRResponseParams * _Nullable data, NSError * _Nullable error))completion
+- (void)clientCSRWithParams:(MTRTLSCertificateManagementClusterClientCSRParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedValues expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completion:(void (^)(MTRTLSCertificateManagementClusterClientCSRResponseParams * _Nullable data, NSError * _Nullable error))completion
 {
     if (params == nil) {
-        params = [[MTRTLSCertificateManagementClusterTLSClientCSRParams
+        params = [[MTRTLSCertificateManagementClusterClientCSRParams
             alloc] init];
     }
 
@@ -22225,7 +22105,7 @@ using chip::System::Clock::Timeout;
 
     auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
 
-    using RequestType = TlsCertificateManagement::Commands::TLSClientCSR::Type;
+    using RequestType = TlsCertificateManagement::Commands::ClientCSR::Type;
     [self.device _invokeKnownCommandWithEndpointID:self.endpointID
                                          clusterID:@(RequestType::GetClusterId())
                                          commandID:@(RequestType::GetCommandId())
@@ -22234,7 +22114,7 @@ using chip::System::Clock::Timeout;
                              expectedValueInterval:expectedValueIntervalMs
                                 timedInvokeTimeout:timedInvokeTimeoutMs
                        serverSideProcessingTimeout:params.serverSideProcessingTimeout
-                                     responseClass:MTRTLSCertificateManagementClusterTLSClientCSRResponseParams.class
+                                     responseClass:MTRTLSCertificateManagementClusterClientCSRResponseParams.class
                                              queue:self.callbackQueue
                                         completion:responseHandler];
 }
@@ -22580,9 +22460,9 @@ using chip::System::Clock::Timeout;
     return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeCommodityMeteringID) attributeID:@(MTRAttributeIDTypeClusterCommodityMeteringAttributeMeteredQuantityTimestampID) params:params];
 }
 
-- (NSDictionary<NSString *, id> * _Nullable)readAttributeMeasurementTypeWithParams:(MTRReadParams * _Nullable)params
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeTariffUnitWithParams:(MTRReadParams * _Nullable)params
 {
-    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeCommodityMeteringID) attributeID:@(MTRAttributeIDTypeClusterCommodityMeteringAttributeMeasurementTypeID) params:params];
+    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeCommodityMeteringID) attributeID:@(MTRAttributeIDTypeClusterCommodityMeteringAttributeTariffUnitID) params:params];
 }
 
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeMaximumMeteredQuantitiesWithParams:(MTRReadParams * _Nullable)params

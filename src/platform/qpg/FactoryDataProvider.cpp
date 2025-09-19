@@ -19,7 +19,6 @@
 #include "CHIPDevicePlatformConfig.h"
 #include <crypto/CHIPCryptoPAL.h>
 #include <lib/support/Base64.h>
-#include <lib/support/CHIPMemString.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/CHIPDeviceConfig.h>
@@ -27,18 +26,6 @@
 #include "qvCHIP.h"
 
 namespace chip {
-namespace {
-
-CHIP_ERROR LoadKeypairFromRaw(ByteSpan privateKey, ByteSpan publicKey, Crypto::P256Keypair & keypair)
-{
-    Crypto::P256SerializedKeypair serializedKeypair;
-    ReturnErrorOnFailure(serializedKeypair.SetLength(privateKey.size() + publicKey.size()));
-    memcpy(serializedKeypair.Bytes(), publicKey.data(), publicKey.size());
-    memcpy(serializedKeypair.Bytes() + publicKey.size(), privateKey.data(), privateKey.size());
-    return keypair.Deserialize(serializedKeypair);
-}
-
-} // namespace
 
 namespace DeviceLayer {
 
@@ -128,7 +115,7 @@ CHIP_ERROR FactoryDataProvider::SignWithDeviceAttestationKey(const ByteSpan & me
 
         // In a non-exemplary implementation, the public key is not needed here. It is used here merely because
         // Crypto::P256Keypair is only (currently) constructable from raw keys if both private/public keys are present.
-        ReturnErrorOnFailure(LoadKeypairFromRaw(qorvoDacPrivateKey, qorvoDacPublicKey, keypair));
+        ReturnErrorOnFailure(keypair.HazardousOperationLoadKeypairFromRaw(qorvoDacPrivateKey, qorvoDacPublicKey));
         ReturnErrorOnFailure(keypair.ECDSA_sign_msg(messageToSign.data(), messageToSign.size(), signature));
     }
 
@@ -199,13 +186,6 @@ CHIP_ERROR FactoryDataProvider::GetProductId(uint16_t & productId)
     VerifyOrReturnError(QV_STATUS_NO_ERROR == status, MapQorvoError(status));
     VerifyOrReturnError(tlvDataLength == sizeof(productId), CHIP_ERROR_INVALID_LIST_LENGTH);
 
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR FactoryDataProvider::GetSoftwareVersionString(char * buf, size_t bufSize)
-{
-    VerifyOrReturnError(bufSize >= sizeof(CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING), CHIP_ERROR_BUFFER_TOO_SMALL);
-    Platform::CopyString(buf, bufSize, CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING);
     return CHIP_NO_ERROR;
 }
 
