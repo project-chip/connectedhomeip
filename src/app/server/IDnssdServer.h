@@ -29,14 +29,14 @@ namespace chip  {
                 virtual bool IsAdvertisingEnabled() = 0;
         };
 
-        class DnnsdServerWrapper : public IDnssdServer 
+        class DnnsdServerWrapper : public IDnssdServer
         {
             CHIP_ERROR AdvertiseOperational() override {
                 return app::DnssdServer::Instance().AdvertiseOperational();
             }
 
             bool IsAdvertisingEnabled() override {
-                return false; // placeholder 
+                return false; // placeholder
             }
         };
     // } // namespace app
