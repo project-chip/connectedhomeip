@@ -96,8 +96,8 @@ TimeFormatLocalizationCluster::TimeFormatLocalizationCluster(EndpointId endpoint
                                                              BitFlags<TimeFormatLocalization::Feature> features,
                                                              TimeFormatLocalization::HourFormatEnum defaultHourFormat,
                                                              TimeFormatLocalization::CalendarTypeEnum defaultCalendarType) :
-    DefaultServerCluster({ endpointId, TimeFormatLocalization::Id }),
-    mFeatures(features), mHourFormat(defaultHourFormat), mCalendarType(defaultCalendarType)
+    DefaultServerCluster({ endpointId, TimeFormatLocalization::Id }), mFeatures(features), mHourFormat(defaultHourFormat),
+    mCalendarType(defaultCalendarType)
 {}
 
 CHIP_ERROR TimeFormatLocalizationCluster::Startup(ServerClusterContext & context)
@@ -106,24 +106,21 @@ CHIP_ERROR TimeFormatLocalizationCluster::Startup(ServerClusterContext & context
 
     AttributePersistence attrPersistence{ context.attributeStorage };
 
-    TimeFormatLocalization::CalendarTypeEnum persistedCalendarType = mCalendarType;
+    TimeFormatLocalization::CalendarTypeEnum defaultCalendarType = mCalendarType;
     if (attrPersistence.LoadNativeEndianValue<TimeFormatLocalization::CalendarTypeEnum>(
             { mPath.mEndpointId, TimeFormatLocalization::Id, TimeFormatLocalization::Attributes::ActiveCalendarType::Id },
-            mCalendarType, persistedCalendarType))
+            mCalendarType, defaultCalendarType))
     {
-        if (IsSupportedCalendarType(persistedCalendarType))
+        if (IsSupportedCalendarType(mCalendarType))
         {
-            mCalendarType = persistedCalendarType;
+            mCalendarType = defaultCalendarType;
         }
     }
 
-    TimeFormatLocalization::HourFormatEnum persistedHourFormat = mHourFormat;
-    if (attrPersistence.LoadNativeEndianValue<TimeFormatLocalization::HourFormatEnum>(
-            { mPath.mEndpointId, TimeFormatLocalization::Id, TimeFormatLocalization::Attributes::HourFormat::Id }, mHourFormat,
-            persistedHourFormat))
-    {
-        mHourFormat = persistedHourFormat;
-    }
+    TimeFormatLocalization::HourFormatEnum defaultHourFormat = mHourFormat;
+    attrPersistence.LoadNativeEndianValue<TimeFormatLocalization::HourFormatEnum>(
+        { mPath.mEndpointId, TimeFormatLocalization::Id, TimeFormatLocalization::Attributes::HourFormat::Id }, mHourFormat,
+        defaultHourFormat);
 
     return CHIP_NO_ERROR;
 }
