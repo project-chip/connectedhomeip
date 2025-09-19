@@ -17,12 +17,48 @@
 
 #pragma once
 
-#include <app/clusters/diagnostic-logs-server/DiagnosticLogsLogic.h>
 #include <app/server-cluster/DefaultServerCluster.h>
+#include <app/clusters/diagnostic-logs-server/DiagnosticLogsProviderDelegate.h>
 
 namespace chip {
 namespace app {
 namespace Clusters {
+
+class DiagnosticLogsProviderLogic
+{
+public:
+    /**
+     * Set the default delegate of the diagnostic logs cluster for the specified endpoint
+     *
+     * @param endpoint ID of the endpoint
+     *
+     * @param delegate The log provider delegate at the endpoint
+     */
+    void SetDelegate(DiagnosticLogs::DiagnosticLogsProviderDelegate * delegate) { mDelegate = delegate; }
+
+    /**
+     * Handles the request to download diagnostic logs of type specified in the intent argument for protocol type ResponsePayload
+     * This should return whatever fits in the logContent field of the RetrieveLogsResponse command
+     *
+     * @param commandObj  The command handler object from the RetrieveLogsRequest command
+     * @param path        The command path from the RetrieveLogsRequest command
+     * @param intent      The log type requested in the RetrieveLogsRequest command
+     * @param status      The status to be returned on success
+     *
+     */
+    std::optional<DataModel::ActionReturnStatus>
+    HandleLogRequestForResponsePayload(CommandHandler * commandObj, const ConcreteCommandPath & path,
+                                       DiagnosticLogs::IntentEnum intent,
+                                       DiagnosticLogs::StatusEnum status = DiagnosticLogs::StatusEnum::kSuccess);
+
+    std::optional<DataModel::ActionReturnStatus> HandleLogRequestForBdx(CommandHandler * commandObj,
+                                                                        const ConcreteCommandPath & path,
+                                                                        DiagnosticLogs::IntentEnum intent,
+                                                                        Optional<CharSpan> transferFileDesignator);
+
+private:
+    DiagnosticLogs::DiagnosticLogsProviderDelegate * mDelegate = nullptr;
+};
 
 class DiagnosticLogsCluster : public DefaultServerCluster, public DiagnosticLogsProviderLogic
 {
