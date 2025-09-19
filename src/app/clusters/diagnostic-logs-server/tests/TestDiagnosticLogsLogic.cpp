@@ -191,7 +191,7 @@ TEST_F(TestDiagnosticLogsLogic, ResponsePayload_WithDelegate_Success)
 
     const ConcreteCommandPath kPath{ kEndpoint0, DiagnosticLogs::Id, DiagnosticLogs::Commands::RetrieveLogsRequest::Id };
     MockCommandHandler handler;
-    EXPECT_EQ(logic.HandleLogRequestForResponsePayload(&handler, kPath, DiagnosticLogs::IntentEnum::kEndUserSupport), std::nullopt);
+    logic.HandleLogRequestForResponsePayload(&handler, kPath, DiagnosticLogs::IntentEnum::kEndUserSupport);
     EXPECT_EQ(handler.GetResponse().commandId, DiagnosticLogs::Commands::RetrieveLogsResponse::Id);
     auto decoded = DecodeRetrieveLogsResponse(handler.GetResponse());
     EXPECT_EQ(decoded.status, DiagnosticLogs::StatusEnum::kSuccess);
@@ -211,9 +211,8 @@ TEST_F(TestDiagnosticLogsLogic, Bdx_WithDelegate_kExhausted)
 
     const ConcreteCommandPath kPath{ kEndpoint0, DiagnosticLogs::Id, DiagnosticLogs::Commands::RetrieveLogsRequest::Id };
     MockCommandHandler handler;
-    EXPECT_EQ(logic.HandleLogRequestForBdx(&handler, kPath, DiagnosticLogs::IntentEnum::kEndUserSupport,
-                                           MakeOptional(CharSpan::fromCharString("enduser.log"))),
-              std::nullopt);
+    logic.HandleLogRequestForBdx(&handler, kPath, DiagnosticLogs::IntentEnum::kEndUserSupport,
+                                           MakeOptional(CharSpan::fromCharString("enduser.log")));
     EXPECT_EQ(handler.GetResponse().commandId, DiagnosticLogs::Commands::RetrieveLogsResponse::Id);
     auto decoded = DecodeRetrieveLogsResponse(handler.GetResponse());
     EXPECT_EQ(decoded.status, DiagnosticLogs::StatusEnum::kExhausted);
@@ -232,9 +231,8 @@ TEST_F(TestDiagnosticLogsLogic, Bdx_WithDelegate_kExhausted_with_buffer_greater_
 
     const ConcreteCommandPath kPath{ kEndpoint0, DiagnosticLogs::Id, DiagnosticLogs::Commands::RetrieveLogsRequest::Id };
     MockCommandHandler handler;
-    EXPECT_EQ(logic.HandleLogRequestForBdx(&handler, kPath, DiagnosticLogs::IntentEnum::kEndUserSupport,
-                                           MakeOptional(CharSpan::fromCharString("enduser.log"))),
-              std::nullopt);
+    logic.HandleLogRequestForBdx(&handler, kPath, DiagnosticLogs::IntentEnum::kEndUserSupport,
+                                           MakeOptional(CharSpan::fromCharString("enduser.log")));
     EXPECT_EQ(handler.GetResponse().commandId, DiagnosticLogs::Commands::RetrieveLogsResponse::Id);
     auto decoded = DecodeRetrieveLogsResponse(handler.GetResponse());
     EXPECT_EQ(decoded.status, DiagnosticLogs::StatusEnum::kExhausted);
