@@ -37,6 +37,7 @@
 #include <pw_unit_test/framework.h>
 
 #include <app/tests/CommissioningWindowManagerTestAccess.h>
+#include <app/server/IDnssdServer.h>
 
 using namespace chip::Crypto;
 
@@ -112,6 +113,18 @@ static void StopEventLoop(intptr_t context)
 {
     chip::DeviceLayer::PlatformMgr().StopEventLoopTask();
 }
+
+class MockDnssdServer : public chip::IDnssdServer {
+    public:
+        MockDnssdServer() : mAdvertisingEnabled(false) {}
+        CHIP_ERROR AdvertiseOperational() override {
+            mAdvertisingEnabled = true;
+            return CHIP_NO_ERROR;
+        }
+        bool IsAdvertisingEnabled() override {return mAdvertisingEnabled;}
+    private:
+        bool mAdvertisingEnabled;
+};
 
 class TestCommissioningWindowManager : public ::testing::Test
 {
@@ -499,11 +512,12 @@ TEST_F(TestCommissioningWindowManager, TestOnPlatformEventFailSafeTimerExpiredPA
 // Verify that operational advertising is started when the operational network is enabled
 TEST_F(TestCommissioningWindowManager, TestOnPlatformEventOperationalNetworkEnabled)
 {
-    CommissioningWindowManager & commissionMgr = Server::GetInstance().GetCommissioningWindowManager();
-
+    MockDnssdServer mockDnssd;
+    CommissioningWindowManager commissionMgr = CommissioningWindowManager(&mockDnssd);
     auto event = CreateEvent(chip::DeviceLayer::DeviceEventType::kOperationalNetworkEnabled);
 
     commissionMgr.OnPlatformEvent(&event);
+    EXPECT_TRUE(mockDnssd.IsAdvertisingEnabled());
 }
 
 // Verify that operational advertising failure is handled gracefully

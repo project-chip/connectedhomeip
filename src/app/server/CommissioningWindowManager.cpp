@@ -39,7 +39,6 @@ using chip::app::DataModel::Nullable;
 using chip::app::DataModel::NullNullable;
 
 namespace {
-
 // As per specifications (Section 13.3), Nodes SHALL exit commissioning mode after 20 failed commission attempts.
 constexpr uint8_t kMaxFailedCommissioningAttempts = 20;
 
@@ -88,7 +87,7 @@ void CommissioningWindowManager::OnPlatformEvent(const DeviceLayer::ChipDeviceEv
     }
     else if (event->Type == DeviceLayer::DeviceEventType::kOperationalNetworkEnabled)
     {
-        CHIP_ERROR err = app::DnssdServer::Instance().AdvertiseOperational();
+        CHIP_ERROR err = mDnsSdServer->AdvertiseOperational();
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(AppServer, "Operational advertising failed: %" CHIP_ERROR_FORMAT, err.Format());
@@ -345,8 +344,7 @@ CHIP_ERROR CommissioningWindowManager::OpenBasicCommissioningWindow(Seconds32 co
     return err;
 }
 
-CHIP_ERROR
-CommissioningWindowManager::OpenBasicCommissioningWindowForAdministratorCommissioningCluster(
+CHIP_ERROR CommissioningWindowManager::OpenBasicCommissioningWindowForAdministratorCommissioningCluster(
     System::Clock::Seconds32 commissioningTimeout, FabricIndex fabricIndex, VendorId vendorId)
 {
     ReturnErrorOnFailure(OpenBasicCommissioningWindow(commissioningTimeout, CommissioningWindowAdvertisement::kDnssdOnly));
