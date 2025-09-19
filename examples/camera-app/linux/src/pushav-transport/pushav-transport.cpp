@@ -482,10 +482,10 @@ void PushAVTransport::SetTransportStatus(TransportStatusEnum status)
         mCanSendVideo = false;
         mCanSendAudio = false;
         mRecorder.reset();
-        ChipLogError(Camera, "Recorder destruction done");
+        ChipLogProgress(Camera, "Recorder destruction done");
         InitializeRecorder();
         mUploader.reset();
-
+        ChipLogProgress(Camera, "Uploader destruction done");
         ChipLogProgress(Camera, "PushAVTransport transport status changed to inactive");
     }
 }
