@@ -33,6 +33,9 @@ if [ "$BUILD_BANK" = "bank0" ]; then
     BANK_NUM=0
 elif [ "$BUILD_BANK" = "bank1" ]; then
     BANK_NUM=1
+else
+    echo "Error: Invalid BUILD_BANK value '$BUILD_BANK'. Must be 'bank0' or 'bank1'." >&2
+    exit 1
 fi
 
 SRC="$OT_SRCDIR/vendor/$RT_PLATFORM/$BUILD_TARGET/app.ld"

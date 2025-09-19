@@ -52,16 +52,20 @@ echo "VERSION_STR=$VERSION_STR"
 chmod +x "$FLASHMAP_GEN_CLI"
 chmod +x "$PACKCLI"
 
+BOARD_TARGET="$1"
+RT_PLATFORM="$2"
+
 # use different copy and image generation methods for dual/single bank modes
-if [[ $1 == *"dual"* ]]; then
-    cp -f "$OT_SRCDIR/vendor/$3/$1"/*.ini "$OTA_FOLDER"
-    cp -f "$OT_SRCDIR/vendor/$3/${1%/secure}"/firmware/bank0/* "$OTA_FOLDER"
-    cp -f "$OT_SRCDIR/vendor/$3/${1%/secure}"/firmware/bank1/* "$OTA_FOLDER"
+if [[ $BOARD_TARGET == *"dual"* ]]; then
+    cp -f "$OT_SRCDIR/vendor/$RT_PLATFORM/$BOARD_TARGET"/*.ini "$OTA_FOLDER"
+    cp -f "$OT_SRCDIR/vendor/$RT_PLATFORM/${BOARD_TARGET%/secure}"/firmware/bank0/* "$OTA_FOLDER"
+    cp -f "$OT_SRCDIR/vendor/$RT_PLATFORM/${BOARD_TARGET%/secure}"/firmware/bank1/* "$OTA_FOLDER"
     cp -f "$OUT_FOLDER"/bin/*MP_dev*.bin "$OTA_FOLDER"
 
-    "$FLASHMAP_GEN_CLI" "$OTA_FOLDER" "$2" "$OTA_FOLDER"
+    OTA_VERSION="$3"
+    "$FLASHMAP_GEN_CLI" "$OTA_FOLDER" "$OTA_VERSION" "$OTA_FOLDER"
 else
-    cp -f "$OT_SRCDIR/vendor/$2/$1"/*.ini "$OTA_FOLDER"
+    cp -f "$OT_SRCDIR/vendor/$RT_PLATFORM/$BOARD_TARGET"/*.ini "$OTA_FOLDER"
     cp -f "$OUT_FOLDER"/bin/*MP_dev*.bin "$OTA_FOLDER"
 fi
 
