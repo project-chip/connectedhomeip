@@ -73,7 +73,7 @@ class TC_WEBRTCP_2_15(MatterBaseTest, WEBRTCPTestBase):
             "WEBRTCP.S",
             "AVSM.S",
         ]
-        return pics  
+        return pics
 
     @async_test_body
     async def test_TC_WEBRTCP_2_15(self):
@@ -129,7 +129,8 @@ class TC_WEBRTCP_2_15(MatterBaseTest, WEBRTCPTestBase):
         asserts.assert_is_not_none(resp.webRTCSessionID, "WebRTCSessionID should be allocated")
 
         allocated_session_id = resp.webRTCSessionID
-        self.print_step(2, f"✓ ProvideOffer succeeded, allocated WebRTCSessionID: {allocated_session_id} with OriginatingEndpointID: {originating_endpoint}")
+        self.print_step(
+            2, f"✓ ProvideOffer succeeded, allocated WebRTCSessionID: {allocated_session_id} with OriginatingEndpointID: {originating_endpoint}")
 
         self.step(3)
         # Read CurrentSessions attribute to verify the OriginatingEndpointID was stored correctly
@@ -150,7 +151,7 @@ class TC_WEBRTCP_2_15(MatterBaseTest, WEBRTCPTestBase):
                 break
 
         asserts.assert_is_not_none(target_session, f"Should find session with ID {allocated_session_id} in CurrentSessions")
-        
+
         # Verify the PeerEndpointID matches our OriginatingEndpointID
         asserts.assert_equal(target_session.peerEndpointID, originating_endpoint,
                              f"PeerEndpointID ({target_session.peerEndpointID}) should match OriginatingEndpointID ({originating_endpoint})")
