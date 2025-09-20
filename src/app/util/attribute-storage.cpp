@@ -477,6 +477,10 @@ static void initializeEndpoint(EmberAfDefinedEndpoint * definedEndpoint)
         const EmberAfCluster * cluster = &(epType->cluster[clusterIndex]);
         EmberAfGenericClusterFunction f;
         emberAfClusterInitCallback(definedEndpoint->endpoint, cluster->clusterId);
+        if (cluster->IsServer())
+        {
+            MatterClusterServerInitCallback(definedEndpoint->endpoint, cluster->clusterId);
+        }
         f = emberAfFindClusterFunction(cluster, MATTER_CLUSTER_FLAG_INIT_FUNCTION);
         if (f != nullptr)
         {
@@ -492,7 +496,11 @@ static void shutdownEndpoint(EmberAfDefinedEndpoint * definedEndpoint)
     const EmberAfEndpointType * epType = definedEndpoint->endpointType;
     for (clusterIndex = 0; clusterIndex < epType->clusterCount; clusterIndex++)
     {
-        const EmberAfCluster * cluster  = &(epType->cluster[clusterIndex]);
+        const EmberAfCluster * cluster = &(epType->cluster[clusterIndex]);
+        if (cluster->IsServer())
+        {
+            MatterClusterServerShutdownCallback(definedEndpoint->endpoint, cluster->clusterId);
+        }
         EmberAfGenericClusterFunction f = emberAfFindClusterFunction(cluster, MATTER_CLUSTER_FLAG_SHUTDOWN_FUNCTION);
         if (f != nullptr)
         {

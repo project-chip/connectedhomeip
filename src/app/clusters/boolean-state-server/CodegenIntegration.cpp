@@ -57,7 +57,7 @@ public:
 
 } // namespace
 
-void emberAfBooleanStateClusterServerInitCallback(EndpointId endpointId)
+void MatterBooleanStateClusterInitCallback(EndpointId endpointId)
 {
     IntegrationDelegate integrationDelegate;
 
@@ -74,7 +74,7 @@ void emberAfBooleanStateClusterServerInitCallback(EndpointId endpointId)
         integrationDelegate);
 }
 
-void MatterBooleanStateClusterServerShutdownCallback(EndpointId endpointId)
+void MatterBooleanStateClusterShutdownCallback(EndpointId endpointId)
 {
     IntegrationDelegate integrationDelegate;
 

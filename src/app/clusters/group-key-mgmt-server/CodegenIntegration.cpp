@@ -54,7 +54,7 @@ public:
 
 } // namespace
 
-void emberAfGroupKeyManagementClusterServerInitCallback(EndpointId endpointId)
+void MatterGroupKeyManagementClusterInitCallback(EndpointId endpointId)
 {
     IntegrationDelegate integrationDelegate;
 
@@ -70,7 +70,7 @@ void emberAfGroupKeyManagementClusterServerInitCallback(EndpointId endpointId)
         integrationDelegate);
 }
 
-void MatterGroupKeyManagementClusterServerShutdownCallback(EndpointId endpointId)
+void MatterGroupKeyManagementClusterShutdownCallback(EndpointId endpointId)
 {
     IntegrationDelegate integrationDelegate;
 

@@ -52,7 +52,7 @@ public:
 
 } // namespace
 
-void emberAfBindingClusterServerInitCallback(EndpointId endpointId)
+void MatterBindingClusterInitCallback(EndpointId endpointId)
 {
     IntegrationDelegate integrationDelegate;
 
@@ -68,7 +68,7 @@ void emberAfBindingClusterServerInitCallback(EndpointId endpointId)
         integrationDelegate);
 }
 
-void MatterBindingClusterServerShutdownCallback(EndpointId endpointId)
+void MatterBindingClusterShutdownCallback(EndpointId endpointId)
 {
     IntegrationDelegate integrationDelegate;
 

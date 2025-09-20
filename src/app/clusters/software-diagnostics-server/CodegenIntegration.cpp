@@ -58,7 +58,7 @@ public:
 
 } // namespace
 
-void emberAfSoftwareDiagnosticsClusterServerInitCallback(EndpointId endpointId)
+void MatterSoftwareDiagnosticsClusterInitCallback(EndpointId endpointId)
 {
     IntegrationDelegate integrationDelegate;
 
@@ -75,7 +75,7 @@ void emberAfSoftwareDiagnosticsClusterServerInitCallback(EndpointId endpointId)
         integrationDelegate);
 }
 
-void MatterSoftwareDiagnosticsClusterServerShutdownCallback(EndpointId endpointId)
+void MatterSoftwareDiagnosticsClusterShutdownCallback(EndpointId endpointId)
 {
     IntegrationDelegate integrationDelegate;
 

@@ -73,6 +73,24 @@ void emberAfClusterInitCallback(EndpointId endpoint, ClusterId clusterId)
     // clusters dont use it.
 }
 
+void MatterClusterServerInitCallback(EndpointId endpoint, ClusterId clusterId)
+{
+    assertChipStackLockedByCurrentThread();
+
+    // No-op: Until Descriptor cluster is migrated to be code driven,
+    // this is a no-op. For OTA we don't use the functions in CodegenIntegration
+    // because we use the gOtaProviderServer and the functions defined here.
+}
+
+void MatterClusterServerShutdownCallback(EndpointId endpoint, ClusterId clusterId)
+{
+    assertChipStackLockedByCurrentThread();
+
+    // No-op: Until Descriptor cluster is migrated to be code driven,
+    // this is a no-op. For OTA we don't use the functions in CodegenIntegration
+    // because we use the gOtaProviderServer and the functions defined here.
+}
+
 Protocols::InteractionModel::Status emAfWriteAttributeExternal(const ConcreteAttributePath & path,
     const EmberAfWriteDataInput & input)
 {
