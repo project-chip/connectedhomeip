@@ -91,7 +91,7 @@ class TC_IDM_3_2(MatterBaseTest, BasicCompositionTests):
 
         # Try to write to an unsupported endpoint using framework method
         write_status = await self.write_single_attribute(
-            attribute_value=test_attribute(0),  
+            attribute_value=test_attribute(0),
             endpoint_id=unsupported_endpoint,
             expect_success=False
         )
