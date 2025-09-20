@@ -18,7 +18,7 @@
 #pragma once
 #include <lib/core/TLVCircularBuffer.h>
 #include <lib/support/Span.h>
-#include <tracing/esp32_diagnostic_trace/DiagnosticEntry.h>
+#include <tracing/esp32_diagnostics/DiagnosticEntry.h>
 
 namespace chip {
 namespace Tracing {
