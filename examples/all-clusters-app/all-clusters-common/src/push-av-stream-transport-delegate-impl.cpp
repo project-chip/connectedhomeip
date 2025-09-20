@@ -187,11 +187,6 @@ void PushAvStreamTransportManager::OnAttributeChanged(AttributeId attributeId)
     ChipLogProgress(Zcl, "Attribute changed for AttributeId = " ChipLogFormatMEI, ChipLogValueMEI(attributeId));
 }
 
-void PushAvStreamTransportManager::OnZoneTriggeredEvent(uint16_t zoneId)
-{
-    ChipLogProgress(Zcl, "Zone triggered event received for ZoneId = %u", zoneId);
-}
-
 void PushAvStreamTransportManager::Init()
 {
     ChipLogProgress(Zcl, "Push AV Stream Transport Initialized");
