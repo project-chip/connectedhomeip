@@ -18,6 +18,7 @@
 
 #include "pushav-clip-recorder.h"
 #include <cstring>
+#include <dirent.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/PlatformManager.h>
 #include <sys/stat.h>
@@ -29,6 +30,7 @@ extern "C" {
 #include <libavutil/error.h>
 #include <libavutil/opt.h>
 #include <libavutil/timestamp.h>
+#include <unistd.h>
 }
 
 #ifndef LIBAVCODEC_VERSION_INT
@@ -42,8 +44,7 @@ AVDictionary * options = NULL;
 
 PushAVClipRecorder::PushAVClipRecorder(ClipInfoStruct & aClipInfo, AudioInfoStruct & aAudioInfo, VideoInfoStruct & aVideoInfo,
                                        PushAVUploader * aUploader) :
-    mClipInfo(aClipInfo),
-    mAudioInfo(aAudioInfo), mVideoInfo(aVideoInfo), mUploader(aUploader)
+    mClipInfo(aClipInfo), mAudioInfo(aAudioInfo), mVideoInfo(aVideoInfo), mUploader(aUploader)
 {
     mFormatContext        = nullptr;
     mInputFormatContext   = nullptr;
@@ -90,6 +91,77 @@ PushAVClipRecorder::~PushAVClipRecorder()
     {
         mWorkerThread.join();
     }
+}
+
+void PushAVClipRecorder::RemovePreviousRecordingFiles(const std::string & path)
+{
+    DIR * dir = opendir(path.c_str());
+    if (!dir)
+    {
+        ChipLogError(Camera, "Failed to open directory for cleaning: %s", path.c_str());
+        return;
+    }
+
+    struct dirent * entry;
+    while ((entry = readdir(dir)) != nullptr)
+    {
+        // Skip current and parent directory entries
+        if (strcmp(entry->d_name, ".") == 0 || strcmp(entry->d_name, "..") == 0)
+        {
+            continue;
+        }
+
+        // Check if file has one of the recording-related extensions
+        std::string filename(entry->d_name);
+        if (filename.length() > 4 &&
+            (filename.substr(filename.length() - 4) == ".mpd" || filename.substr(filename.length() - 5) == ".fmp4" ||
+             filename.substr(filename.length() - 5) == ".cmfv"))
+        {
+            std::string filepath = path + "/" + filename;
+            if (unlink(filepath.c_str()) == 0)
+            {
+                ChipLogDetail(Camera, "Removed previous recording file: %s", filepath.c_str());
+            }
+            else
+            {
+                ChipLogError(Camera, "Failed to remove previous recording file: %s", filepath.c_str());
+            }
+        }
+    }
+
+    closedir(dir);
+}
+
+bool PushAVClipRecorder::IsOutputDirectoryValid(const std::string & path)
+{
+    struct stat info;
+    if (stat(path.c_str(), &info) != 0)
+    {
+        // Path doesn't exist, try to create directory
+        // 0755 = owner: rwx, group: rx, others: rx
+        if (mkdir(path.c_str(), 0755) != 0)
+        {
+            ChipLogError(Camera, "Failed to create output directory: %s", path.c_str());
+            return false;
+        }
+        ChipLogProgress(Camera, "Created output directory: %s", path.c_str());
+    }
+    else if (!(info.st_mode & S_IFDIR))
+    {
+        ChipLogProgress(Camera, "Output path is not a directory %s", path.c_str());
+        return false;
+    }
+
+    if (access(path.c_str(), W_OK) != 0)
+    {
+        ChipLogError(Camera, "Output path is not writable: %s", path.c_str());
+        return false;
+    }
+
+    // Remove files from previous recordings
+    RemovePreviousRecordingFiles(path);
+
+    return true;
 }
 
 namespace {
@@ -229,6 +301,12 @@ void PushAVClipRecorder::Start()
         ChipLogError(Camera, "ERROR: Recording is already running. Stop before starting again");
         return;
     }
+
+    if (!IsOutputDirectoryValid(mClipInfo.mOutputPath))
+    {
+        Stop();
+    }
+
     SetRecorderStatus(true);
     mWorkerThread = std::thread(&PushAVClipRecorder::StartClipRecording, this);
     ChipLogProgress(Camera, "Recording started for ID: %s", mClipInfo.mRecorderId.c_str());
