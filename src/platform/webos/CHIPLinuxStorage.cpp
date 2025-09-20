@@ -19,7 +19,7 @@
 /**
  *    @file
  *         This file implements a class for managing client application
- *         user-editable settings on webOS platform.
+ *         user-editable settings on Linux platform.
  *
  */
 
@@ -36,7 +36,7 @@
 #include <lib/support/ScopedBuffer.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/internal/CHIPDeviceLayerInternal.h>
-#include <platform/webos/CHIPWebOSStorage.h>
+#include <platform/webos/CHIPLinuxStorage.h>
 
 namespace chip {
 namespace DeviceLayer {
@@ -53,13 +53,14 @@ CHIP_ERROR ChipLinuxStorage::Init(const char * configFile)
 {
     CHIP_ERROR retval = CHIP_NO_ERROR;
 
-    ChipLogDetail(DeviceLayer, "ChipLinuxStorage::Init: Using KVS config file: %s", StringOrNullMarker(configFile));
     if (mInitialized)
     {
-        ChipLogError(DeviceLayer, "ChipLinuxStorage::Init: Attempt to re-initialize with KVS config file: %s",
+        ChipLogError(DeviceLayer, "ChipLinuxStorage::Init: Attempt to re-initialize with KVS config file: %s, IGNORING.",
                      StringOrNullMarker(configFile));
         return CHIP_NO_ERROR;
     }
+
+    ChipLogDetail(DeviceLayer, "ChipLinuxStorage::Init: Using KVS config file: %s", StringOrNullMarker(configFile));
 
     mConfigPath.assign(configFile);
     retval = ChipLinuxStorageIni::Init();
