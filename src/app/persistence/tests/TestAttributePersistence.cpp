@@ -272,4 +272,221 @@ TEST(TestAttributePersistence, TestInvalidPascalLengthStored)
     }
 }
 
+TEST(TestAttributePersistence, TestArithmeticValidationSuccess)
+{
+    TestPersistentStorageDelegate storageDelegate;
+    DefaultAttributePersistenceProvider ramProvider;
+    ASSERT_EQ(ramProvider.Init(&storageDelegate), CHIP_NO_ERROR);
+
+    AttributePersistence persistence(ramProvider);
+
+    const ConcreteAttributePath path(1, 2, 3);
+    constexpr uint32_t kValueToStore = 50;
+    constexpr uint32_t kOtherValue   = 99;
+    uint32_t valueRead               = 0;
+
+    // Create a validator that accepts values between 1 and 100
+    auto rangeValidator = [](uint32_t value) -> CHIP_ERROR {
+        if (value >= 1 && value <= 100)
+        {
+            return CHIP_NO_ERROR;
+        }
+        return CHIP_IM_GLOBAL_STATUS(ConstraintError);
+    };
+
+    // Store a value that passes validation
+    {
+        WriteOperation writeOp(path);
+        AttributeValueDecoder decoder = writeOp.DecoderFor(kValueToStore);
+        EXPECT_EQ(persistence.DecodeAndStoreNativeEndianValue(path, decoder, valueRead, rangeValidator), CHIP_NO_ERROR);
+        EXPECT_EQ(valueRead, kValueToStore);
+    }
+
+    // Verify the value was stored and can be loaded back
+    {
+        valueRead = 0;
+        ASSERT_TRUE(persistence.LoadNativeEndianValue(path, valueRead, kOtherValue));
+        ASSERT_EQ(valueRead, kValueToStore);
+    }
+}
+
+TEST(TestAttributePersistence, TestArithmeticValidationFailure)
+{
+    TestPersistentStorageDelegate storageDelegate;
+    DefaultAttributePersistenceProvider ramProvider;
+    ASSERT_EQ(ramProvider.Init(&storageDelegate), CHIP_NO_ERROR);
+
+    AttributePersistence persistence(ramProvider);
+
+    const ConcreteAttributePath path(1, 2, 3);
+    constexpr uint32_t kInvalidValue = 150; // Outside the valid range
+    constexpr uint32_t kOtherValue   = 99;
+    uint32_t valueRead               = 0;
+
+    // Create a validator that only accepts values between 1 and 100
+    auto rangeValidator = [](uint32_t value) -> CHIP_ERROR {
+        if (value >= 1 && value <= 100)
+        {
+            return CHIP_NO_ERROR;
+        }
+        return CHIP_IM_GLOBAL_STATUS(ConstraintError);
+    };
+
+    // Try to store a value that fails validation
+    {
+        WriteOperation writeOp(path);
+        AttributeValueDecoder decoder = writeOp.DecoderFor(kInvalidValue);
+        EXPECT_EQ(persistence.DecodeAndStoreNativeEndianValue(path, decoder, valueRead, rangeValidator),
+                  CHIP_IM_GLOBAL_STATUS(ConstraintError));
+    }
+
+    // Verify no value was stored
+    {
+        valueRead = 0;
+        ASSERT_FALSE(persistence.LoadNativeEndianValue(path, valueRead, kOtherValue));
+        ASSERT_EQ(valueRead, kOtherValue);
+    }
+}
+
+TEST(TestAttributePersistence, TestArithmeticValidationErrorPropagation)
+{
+    TestPersistentStorageDelegate storageDelegate;
+    DefaultAttributePersistenceProvider ramProvider;
+    ASSERT_EQ(ramProvider.Init(&storageDelegate), CHIP_NO_ERROR);
+
+    AttributePersistence persistence(ramProvider);
+
+    const ConcreteAttributePath path(1, 2, 3);
+    constexpr uint32_t kTestValue = 42;
+    uint32_t valueRead            = 0;
+
+    // Test different error types are properly propagated
+    {
+        // Custom error validator
+        auto customErrorValidator = [](uint32_t value) -> CHIP_ERROR { return CHIP_ERROR_INVALID_ARGUMENT; };
+
+        WriteOperation writeOp(path);
+        AttributeValueDecoder decoder = writeOp.DecoderFor(kTestValue);
+        EXPECT_EQ(persistence.DecodeAndStoreNativeEndianValue(path, decoder, valueRead, customErrorValidator),
+                  CHIP_ERROR_INVALID_ARGUMENT);
+    }
+
+    {
+        // Different custom error validator
+        auto anotherErrorValidator = [](uint32_t value) -> CHIP_ERROR { return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE; };
+
+        WriteOperation writeOp(path);
+        AttributeValueDecoder decoder = writeOp.DecoderFor(kTestValue);
+        EXPECT_EQ(persistence.DecodeAndStoreNativeEndianValue(path, decoder, valueRead, anotherErrorValidator),
+                  CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
+    }
+}
+
+TEST(TestAttributePersistence, TestEnumCustomValidationSuccess)
+{
+    using namespace chip::app::Clusters;
+    using namespace chip::app::Clusters::TimeFormatLocalization;
+
+    TestPersistentStorageDelegate storageDelegate;
+    DefaultAttributePersistenceProvider ramProvider;
+    ASSERT_EQ(ramProvider.Init(&storageDelegate), CHIP_NO_ERROR);
+
+    AttributePersistence persistence(ramProvider);
+
+    const ConcreteAttributePath path(1, 2, 3);
+    CalendarTypeEnum valueRead = CalendarTypeEnum::kUnknownEnumValue;
+
+    // Create a validator that only allows Gregorian and Persian calendars
+    auto calendarValidator = [](CalendarTypeEnum value) -> CHIP_ERROR {
+        if (value == CalendarTypeEnum::kGregorian || value == CalendarTypeEnum::kPersian)
+        {
+            return CHIP_NO_ERROR;
+        }
+        return CHIP_IM_GLOBAL_STATUS(ConstraintError);
+    };
+
+    // Test with a valid enum value that passes custom validation
+    {
+        WriteOperation writeOp(path);
+        AttributeValueDecoder decoder = writeOp.DecoderFor(CalendarTypeEnum::kGregorian);
+        EXPECT_EQ(persistence.DecodeAndStoreNativeEndianValue(path, decoder, valueRead, calendarValidator), CHIP_NO_ERROR);
+        EXPECT_EQ(valueRead, CalendarTypeEnum::kGregorian);
+    }
+
+    // Verify the value was stored and can be loaded back
+    {
+        valueRead = CalendarTypeEnum::kUnknownEnumValue;
+        EXPECT_TRUE(persistence.LoadNativeEndianValue(path, valueRead, CalendarTypeEnum::kPersian));
+        EXPECT_EQ(valueRead, CalendarTypeEnum::kGregorian);
+    }
+}
+
+TEST(TestAttributePersistence, TestEnumCustomValidationFailure)
+{
+    using namespace chip::app::Clusters;
+    using namespace chip::app::Clusters::TimeFormatLocalization;
+
+    TestPersistentStorageDelegate storageDelegate;
+    DefaultAttributePersistenceProvider ramProvider;
+    ASSERT_EQ(ramProvider.Init(&storageDelegate), CHIP_NO_ERROR);
+
+    AttributePersistence persistence(ramProvider);
+
+    const ConcreteAttributePath path(1, 2, 3);
+    CalendarTypeEnum valueRead = CalendarTypeEnum::kUnknownEnumValue;
+
+    // Create a validator that only allows Gregorian calendar
+    auto restrictiveValidator = [](CalendarTypeEnum value) -> CHIP_ERROR {
+        if (value == CalendarTypeEnum::kGregorian)
+        {
+            return CHIP_NO_ERROR;
+        }
+        return CHIP_IM_GLOBAL_STATUS(ConstraintError);
+    };
+
+    // Test with a valid enum value that fails custom validation
+    {
+        WriteOperation writeOp(path);
+        AttributeValueDecoder decoder = writeOp.DecoderFor(CalendarTypeEnum::kPersian);
+        EXPECT_EQ(persistence.DecodeAndStoreNativeEndianValue(path, decoder, valueRead, restrictiveValidator),
+                  CHIP_IM_GLOBAL_STATUS(ConstraintError));
+    }
+
+    // Verify no value was stored
+    {
+        valueRead = CalendarTypeEnum::kUnknownEnumValue;
+        ASSERT_FALSE(persistence.LoadNativeEndianValue(path, valueRead, CalendarTypeEnum::kGregorian));
+        ASSERT_EQ(valueRead, CalendarTypeEnum::kGregorian);
+    }
+}
+
+TEST(TestAttributePersistence, TestValidationWithoutValidator)
+{
+    TestPersistentStorageDelegate storageDelegate;
+    DefaultAttributePersistenceProvider ramProvider;
+    ASSERT_EQ(ramProvider.Init(&storageDelegate), CHIP_NO_ERROR);
+
+    AttributePersistence persistence(ramProvider);
+
+    const ConcreteAttributePath path(1, 2, 3);
+    constexpr uint32_t kValueToStore = 42;
+    constexpr uint32_t kOtherValue   = 99;
+    uint32_t valueRead               = 0;
+
+    // Test that the function works correctly without a validator (backward compatibility)
+    {
+        WriteOperation writeOp(path);
+        AttributeValueDecoder decoder = writeOp.DecoderFor(kValueToStore);
+        EXPECT_EQ(persistence.DecodeAndStoreNativeEndianValue(path, decoder, valueRead), CHIP_NO_ERROR);
+        EXPECT_EQ(valueRead, kValueToStore);
+    }
+
+    // Verify the value was stored
+    {
+        valueRead = 0;
+        ASSERT_TRUE(persistence.LoadNativeEndianValue(path, valueRead, kOtherValue));
+        ASSERT_EQ(valueRead, kValueToStore);
+    }
+}
+
 } // namespace
