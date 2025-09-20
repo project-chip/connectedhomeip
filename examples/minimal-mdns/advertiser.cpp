@@ -192,7 +192,7 @@ OptionDef cmdLineOptionsDef[] = {
     { "long-discriminator", kArgumentRequired, kOptionCommissioningLongDiscriminaotr },
     { "vendor-id", kArgumentRequired, kOptionCommissioningVendorId },
     { "product-id", kArgumentRequired, kOptionCommissioningProductId },
-    { "commissioning-mode", kNoArgument, kOptionCommissioningMode },
+    { "commissioning-mode", kArgumentRequired, kOptionCommissioningMode },
     { "device-type", kArgumentRequired, kOptionCommissioningDeviceType },
     { "device-name", kArgumentRequired, kOptionCommissioningDeviceName },
     { "rotating-id", kArgumentRequired, kOptionCommissioningRotatingId },

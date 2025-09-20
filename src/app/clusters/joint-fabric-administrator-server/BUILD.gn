@@ -11,5 +11,12 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+import("//build_overrides/chip.gni")
+
 group("joint-fabric-administrator-server") {
+  public_deps = [
+    "${chip_root}/src/controller:interactions",
+    "${chip_root}/src/credentials:credentials",
+    "${chip_root}/src/credentials/jcm",
+  ]
 }

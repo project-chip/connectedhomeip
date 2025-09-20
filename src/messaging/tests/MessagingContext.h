@@ -124,6 +124,8 @@ public:
     static const uint16_t kAliceKeyId   = 2;
     static const uint16_t kCharlieKeyId = 3;
     static const uint16_t kDavidKeyId   = 4;
+    static const uint16_t kJFAKeyId     = 5;
+    static const uint16_t kJFBKeyId     = 6;
     GroupId GetFriendsGroupId() const { return mpData->mFriendsGroupId; }
 
     SessionManager & GetSecureSessionManager() { return mpData->mSessionManager; }
@@ -134,8 +136,12 @@ public:
 
     FabricIndex GetAliceFabricIndex() { return mpData->mAliceFabricIndex; }
     FabricIndex GetBobFabricIndex() { return mpData->mBobFabricIndex; }
+    FabricIndex GetJFAFabricIndex() { return mpData->mJFAFabricIndex; }
+    FabricIndex GetJFBFabricIndex() { return mpData->mJFBFabricIndex; }
     const FabricInfo * GetAliceFabric() { return mpData->mFabricTable.FindFabricWithIndex(mpData->mAliceFabricIndex); }
     const FabricInfo * GetBobFabric() { return mpData->mFabricTable.FindFabricWithIndex(mpData->mBobFabricIndex); }
+    const FabricInfo * GetJFAFabric() { return mpData->mFabricTable.FindFabricWithIndex(mpData->mJFAFabricIndex); }
+    const FabricInfo * GetJFBFabric() { return mpData->mFabricTable.FindFabricWithIndex(mpData->mJFBFabricIndex); }
 
     CHIP_ERROR CreateSessionBobToAlice(); // Creates PASE session
     CHIP_ERROR CreateCASESessionBobToAlice();
@@ -146,10 +152,18 @@ public:
     CHIP_ERROR CreateSessionBobToFriends(); // Creates PASE session
     CHIP_ERROR CreatePASESessionCharlieToDavid();
     CHIP_ERROR CreatePASESessionDavidToCharlie();
+    CHIP_ERROR CreateJFSessionAToB(); // Creates PASE session
+    CHIP_ERROR CreateJFCASESessionAToB();
+    CHIP_ERROR CreateJFCASESessionAToB(const CATValues & cats);
+    CHIP_ERROR CreateJFSessionBToA(); // Creates PASE session
+    CHIP_ERROR CreateJFCASESessionBToA();
+    CHIP_ERROR CreateJFCASESessionBToA(const CATValues & cats);
 
     void ExpireSessionBobToAlice();
     void ExpireSessionAliceToBob();
     void ExpireSessionBobToFriends();
+    void ExpireJFSessionAToB();
+    void ExpireJFSessionBToA();
 
     void SetMRPMode(MRPMode mode);
 
@@ -158,12 +172,18 @@ public:
     SessionHandle GetSessionCharlieToDavid();
     SessionHandle GetSessionDavidToCharlie();
     SessionHandle GetSessionBobToFriends();
+    SessionHandle GetJFSessionAToB();
+    SessionHandle GetJFSessionBToA();
 
     CHIP_ERROR CreateAliceFabric();
     CHIP_ERROR CreateBobFabric();
+    CHIP_ERROR CreateJFAFabric();
+    CHIP_ERROR CreateJFBFabric();
 
     const Transport::PeerAddress & GetAliceAddress() { return mpData->mAliceAddress; }
     const Transport::PeerAddress & GetBobAddress() { return mpData->mBobAddress; }
+    const Transport::PeerAddress & GetJFAAddress() { return mpData->mJFAAddress; }
+    const Transport::PeerAddress & GetJFBAddress() { return mpData->mJFBAddress; }
 
     Messaging::ExchangeContext * NewUnauthenticatedExchangeToAlice(Messaging::ExchangeDelegate * delegate);
     Messaging::ExchangeContext * NewUnauthenticatedExchangeToBob(Messaging::ExchangeDelegate * delegate);
@@ -172,6 +192,7 @@ public:
     Messaging::ExchangeContext * NewExchangeToBob(Messaging::ExchangeDelegate * delegate, bool isInitiator = true);
 
     System::Layer & GetSystemLayer() { return mpData->mIOContext->GetSystemLayer(); }
+    void SetupForJFTests() { mSetupForJFTests = true; }
 
 private:
     // These members are encapsulated in a struct which is allocated upon construction of MessagingContext and freed upon
@@ -180,7 +201,9 @@ private:
     {
         MessagingContextData() :
             mAliceAddress(Transport::PeerAddress::UDP(GetAddress(), CHIP_PORT + 1)),
-            mBobAddress(LoopbackTransport::LoopbackPeer(mAliceAddress))
+            mBobAddress(LoopbackTransport::LoopbackPeer(mAliceAddress)),
+            mJFAAddress(Transport::PeerAddress::UDP(GetAddress(), CHIP_PORT + 2)),
+            mJFBAddress(LoopbackTransport::LoopbackPeer(mJFAAddress))
         {}
         ~MessagingContextData() { EXPECT_FALSE(mInitialized); }
 
@@ -200,18 +223,25 @@ private:
 
         FabricIndex mAliceFabricIndex = kUndefinedFabricIndex;
         FabricIndex mBobFabricIndex   = kUndefinedFabricIndex;
+        FabricIndex mJFAFabricIndex   = kUndefinedFabricIndex;
+        FabricIndex mJFBFabricIndex   = kUndefinedFabricIndex;
         GroupId mFriendsGroupId       = 0x0101;
         Transport::PeerAddress mAliceAddress;
         Transport::PeerAddress mBobAddress;
         Transport::PeerAddress mCharlieAddress;
         Transport::PeerAddress mDavidAddress;
+        Transport::PeerAddress mJFAAddress;
+        Transport::PeerAddress mJFBAddress;
         SessionHolder mSessionAliceToBob;
         SessionHolder mSessionBobToAlice;
         SessionHolder mSessionCharlieToDavid;
         SessionHolder mSessionDavidToCharlie;
+        SessionHolder mJFSessionAToB;
+        SessionHolder mJFSessionBToA;
         Optional<Transport::OutgoingGroupSession> mSessionBobToFriends;
     };
     std::unique_ptr<MessagingContextData> mpData;
+    bool mSetupForJFTests = false;
 };
 
 // LoopbackMessagingContext enriches MessagingContext with an async loopback transport
