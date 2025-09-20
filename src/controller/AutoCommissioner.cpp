@@ -317,9 +317,8 @@ CommissioningStage AutoCommissioner::GetNextCommissioningStageNetworkSetup(Commi
         // IsSecondaryNetworkSupported() would have tested true.
         //
         // Also, since we got here, we don't (yet) have credentials for the one network technology
-        // the commissionee supports.  , and we do not have credentials for whatever network
-        // technologies it does support.  Go ahead and just try to use that one network technology,
-        // which shoudl be the primary network (on the root endpoint).
+        // the commissionee supports. Go ahead and just try to use that one network technology,
+        // which should be the primary network (on the root endpoint).
         //
         // Note that we don't call TryPrimaryNetwork() here, because that's only used when there
         // will be a secondary network to try.  Which in this case there isn't.
@@ -830,7 +829,7 @@ CHIP_ERROR AutoCommissioner::CommissioningStepFinished(CHIP_ERROR err, Commissio
             // If we are configured to scan networks, then don't error out.
             // Instead, allow the app to try another network.
             //
-            // TODO: This doesn't actually work, because in order to provide crendentials someone
+            // TODO: This doesn't actually work, because in order to provide credentials someone
             // had to SetWiFiCredentials() or SetThreadOperationalDataset() on our params, so
             // IsScanNeeded() will no longer test true for that network technology.
             if (IsScanNeeded())
@@ -847,7 +846,7 @@ CHIP_ERROR AutoCommissioner::CommissioningStepFinished(CHIP_ERROR err, Commissio
         }
 
         auto isNetworkFailureStage = [](CommissioningStage stage) {
-            // If we were somwhere between network setup and and trying to finish up commisioning,
+            // If we were somewhere between network setup and and trying to finish up commissioning,
             // treat that as a network failure stage; trying the secondary network might work
             // better.
             if (stage >= kWiFiNetworkSetup && stage <= kICDSendStayActive)

@@ -568,7 +568,7 @@ CHIP_ERROR PairingCommand::WiFiCredentialsNeeded(EndpointId endpoint)
                 break;
             }
             ChipLogError(chipTool, "Invalid value for SSID");
-        } while (1);
+        } while (true);
 
         do
         {
@@ -579,7 +579,7 @@ CHIP_ERROR PairingCommand::WiFiCredentialsNeeded(EndpointId endpoint)
                 break;
             }
             ChipLogError(chipTool, "Invalid value for password");
-        } while (1);
+        } while (true);
 
         auto & commissioner            = CurrentCommissioner();
         CommissioningParameters params = commissioner.GetCommissioningParameters();
@@ -618,7 +618,7 @@ CHIP_ERROR PairingCommand::ThreadCredentialsNeeded(EndpointId endpoint)
                 break;
             }
             ChipLogError(chipTool, "Invalid value for operational dataset");
-        } while (1);
+        } while (true);
 
         auto & commissioner            = CurrentCommissioner();
         CommissioningParameters params = commissioner.GetCommissioningParameters();
