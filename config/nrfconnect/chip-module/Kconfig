@@ -372,4 +372,15 @@ config CHIP_SYSTEM_PACKETBUFFER_POOL_SIZE
 	help
 	  Total number of packet buffers allocated by the stack for internal pool.
 
+config CHIP_IM_PRETTY_PRINT
+	bool "Enable detailed logging of Matter messages"
+	depends on !CHIP_LOG_SIZE_OPTIMIZATION
+	depends on MATTER_LOG_LEVEL_DBG
+	help
+	  Enables enhanced verbosity for logging content of Matter messages. This configuration option
+	  facilitates detailed tracking of interactions, including Cluster ID, Endpoint ID, Attribute ID,
+	  or Command ID as well as payload content for all interaction types (like Read Request or Invoke
+	  Request). This option helps in debugging and development of message exchanges within the Matter
+	  protocol.
+
 endif # CHIP
