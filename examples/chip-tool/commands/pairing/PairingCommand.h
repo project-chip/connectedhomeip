@@ -27,6 +27,7 @@
 #include <lib/support/ThreadOperationalDataset.h>
 
 #include <optional>
+#include <thread>
 
 enum class PairingMode
 {
@@ -329,4 +330,10 @@ private:
 
     static void OnCurrentFabricRemove(void * context, NodeId remoteNodeId, CHIP_ERROR status);
     void PersistIcdInfo();
+
+    std::optional<std::thread> mPrompterThread;
+
+    std::string mPromptedSSID;
+    std::string mPromptedPassword;
+    std::string mPromptedOperationalDataset;
 };
