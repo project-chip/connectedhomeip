@@ -38,6 +38,8 @@
 
 import logging
 
+from mobly import asserts
+
 import matter.clusters as Clusters
 from matter.clusters import ClusterObjects as ClusterObjects
 from matter.interaction_model import Status
@@ -89,7 +91,7 @@ class TC_IDM_3_2(MatterBaseTest, BasicCompositionTests):
 
         # Try to write to an unsupported endpoint using framework method
         write_status = await self.write_single_attribute(
-            attribute_value=test_attribute(0),  # Provide a valid value for FeatureMap (uint32)
+            attribute_value=test_attribute(0),  
             endpoint_id=unsupported_endpoint,
             expect_success=False
         )
@@ -126,11 +128,10 @@ class TC_IDM_3_2(MatterBaseTest, BasicCompositionTests):
         test_unsupported_attribute = next(iter(cluster_attributes.values()))
 
         write_status = await self.write_single_attribute(
-            attribute_value=test_unsupported_attribute(0),
+            attribute_value=test_unsupported_attribute,
             endpoint_id=self.endpoint,
             expect_success=False
         )
-
         # Verify we get UNSUPPORTED_CLUSTER error
         asserts.assert_equal(write_status, Status.UnsupportedCluster,
                              f"Write to unsupported cluster should return UNSUPPORTED_CLUSTER, got {write_status}")
