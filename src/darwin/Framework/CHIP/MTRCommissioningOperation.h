@@ -69,6 +69,14 @@ MTR_PROVISIONALLY_AVAILABLE
  */
 - (BOOL)stop;
 
+/**
+ * If not nil, the payload (from possibly multiple payloads represented by the
+ * provided setupPayload) that represents the commissionee we successfully
+ * established PASE with.  This will only be non-nil after successful PASE
+ * establishment.
+ */
+@property (nonatomic, readonly, strong, nullable) MTRSetupPayload * matchedPayload;
+
 @end
 
 NS_ASSUME_NONNULL_END

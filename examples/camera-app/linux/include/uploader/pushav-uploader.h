@@ -65,6 +65,9 @@ public:
     void setCertificateBuffer(const PushAVCertBuffer & certBuffer) { mCertBuffer = certBuffer; }
     void setCertificatePath(const PushAVCertPath & certPath) { mCertPath = certPath; }
 
+    void setMPDPath(const std::pair<std::string, std::string> & path) { mMPDPath = path; }
+    std::pair<std::string, std::string> getMPDPath() const { return mMPDPath; }
+
 private:
     void ProcessQueue();
     void UploadData(std::pair<std::string, std::string> data);
@@ -74,4 +77,5 @@ private:
     std::mutex mQueueMutex;
     std::atomic<bool> mIsRunning;
     std::thread mUploaderThread;
+    std::pair<std::string, std::string> mMPDPath;
 };

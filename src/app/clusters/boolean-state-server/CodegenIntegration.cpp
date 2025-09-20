@@ -91,11 +91,11 @@ void MatterBooleanStateClusterServerShutdownCallback(EndpointId endpointId)
 
 namespace chip::app::Clusters::BooleanState {
 
-BooleanStateCluster * GetClusterForEndpointIndex(EndpointId endpointId)
+BooleanStateCluster * FindClusterOnEndpoint(EndpointId endpointId)
 {
     IntegrationDelegate integrationDelegate;
 
-    ServerClusterInterface * booleanState = CodegenClusterIntegration::GetClusterForEndpointIndex(
+    ServerClusterInterface * booleanState = CodegenClusterIntegration::FindClusterOnEndpoint(
         {
             .endpointId                = endpointId,
             .clusterId                 = BooleanState::Id,

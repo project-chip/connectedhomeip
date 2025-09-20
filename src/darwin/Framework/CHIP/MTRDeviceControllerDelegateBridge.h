@@ -39,7 +39,7 @@ public:
     // DevicePairingDelegate implementation
     void OnStatusUpdate(chip::Controller::DevicePairingDelegate::Status status) override;
 
-    void OnPairingComplete(CHIP_ERROR error) override;
+    void OnPairingComplete(CHIP_ERROR error, const std::optional<chip::RendezvousParameters> & rendezvousParameters, const std::optional<chip::SetupPayload> & setupPayload) override;
 
     void OnPairingDeleted(CHIP_ERROR error) override;
 
@@ -75,11 +75,6 @@ private:
     MTRCommissioningParameters * mCommissioningParameters;
 
     MTRCommissioningStatus MapStatus(chip::Controller::DevicePairingDelegate::Status status);
-
-    id<MTRDeviceControllerDelegate_Internal> GetInternalDelegate() const
-    {
-        return static_cast<id<MTRDeviceControllerDelegate_Internal>>(mDelegate);
-    }
 };
 
 NS_ASSUME_NONNULL_END

@@ -84,7 +84,7 @@ void AppTask::UpdateClusterStateInternal(intptr_t arg)
 
     ChipLogProgress(NotSpecified, "StateValue::Set : %d", newValue);
 
-    auto booleanState = chip::app::Clusters::BooleanState::GetClusterForEndpointIndex(1);
+    auto booleanState = chip::app::Clusters::BooleanState::FindClusterOnEndpoint(1);
     VerifyOrReturn(booleanState != nullptr);
     booleanState->SetStateValue(newValue);
 }
@@ -137,7 +137,7 @@ void AppTask::UpdateDeviceState(void)
 
 void AppTask::UpdateDeviceStateInternal(intptr_t arg)
 {
-    auto booleanState = chip::app::Clusters::BooleanState::GetClusterForEndpointIndex(1);
+    auto booleanState = chip::app::Clusters::BooleanState::FindClusterOnEndpoint(1);
     VerifyOrReturn(booleanState != nullptr);
     auto stateValueAttrValue = booleanState->GetStateValue();
     LedManager::getInstance().setLed(LedManager::EAppLed_App0, stateValueAttrValue);
