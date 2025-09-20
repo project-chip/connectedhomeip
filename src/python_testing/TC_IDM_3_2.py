@@ -260,8 +260,8 @@ class TC_IDM_3_2(MatterBaseTest, BasicCompositionTests):
         self.step(7)
         '''
         TH sends the WriteRequestMessage to the DUT to modify the value of a specific attribute data that needs 
-        Timed Write transaction to write and this action is not part of a Timed Write transaction.
-        The yaml script version of this test says it requires this to be implemented on the DUT.
+        timed write transaction to write and this action is not part of a timed write transaction.
+        The yaml script version of this test says it requires this to be implemented on the DUT and does not have validation data.
         '''
         logging.info("Step 7: Timed write transaction currently needs further context to be implemented correctly by coder")
 
