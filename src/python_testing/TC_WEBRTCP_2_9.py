@@ -51,12 +51,18 @@ class TC_WEBRTCP_2_9(MatterBaseTest, WEBRTCPTestBase):
 
     def steps_TC_WEBRTCP_2_9(self) -> list[TestStep]:
         steps = [
-            TestStep(1, "TH allocates both Audio and Video streams via AudioStreamAllocate and VideoStreamAllocate commands to CameraAVStreamManagement"),
-            TestStep(2, "TH sends the SolicitOffer command with valid parameters and no ICEServers or ICETransportPolicy fields"),
-            TestStep(3, "TH sends the SolicitOffer command with valid parameters and ICEServers field containing valid STUN/TURN server list"),
-            TestStep(4, "TH sends the SolicitOffer command with valid parameters and ICETransportPolicy = 0 (All)"),
-            TestStep(5, "TH sends the SolicitOffer command with valid parameters and ICETransportPolicy = 1 (Relay)"),
-            TestStep(6, "TH sends the SolicitOffer command with both ICEServers and ICETransportPolicy fields"),
+            TestStep(1, "TH allocates both Audio and Video streams via AudioStreamAllocate and VideoStreamAllocate commands to CameraAVStreamManagement",
+                     "DUT responds with success and provides stream IDs"),
+            TestStep(2, "TH sends the SolicitOffer command with valid parameters and no ICEServers or ICETransportPolicy fields",
+                     "DUT responds with SolicitOfferResponse containing allocated WebRTCSessionID"),
+            TestStep(3, "TH sends the SolicitOffer command with valid parameters and ICEServers field containing valid STUN/TURN server list",
+                     "DUT responds with SolicitOfferResponse containing allocated WebRTCSessionID and accepts ICE servers"),
+            TestStep(4, "TH sends the SolicitOffer command with valid parameters and ICETransportPolicy = 0 (All)",
+                     "DUT responds with SolicitOfferResponse containing allocated WebRTCSessionID and accepts ICE transport policy 'all'"),
+            TestStep(5, "TH sends the SolicitOffer command with valid parameters and ICETransportPolicy = 1 (Relay)",
+                     "DUT responds with SolicitOfferResponse containing allocated WebRTCSessionID and accepts ICE transport policy 'relay'"),
+            TestStep(6, "TH sends the SolicitOffer command with both ICEServers and ICETransportPolicy fields",
+                     "DUT responds with SolicitOfferResponse containing allocated WebRTCSessionID and accepts both ICE servers and transport policy"),
         ]
         return steps
 
@@ -67,9 +73,8 @@ class TC_WEBRTCP_2_9(MatterBaseTest, WEBRTCPTestBase):
         ]
         return pics
 
-    async def _test_solicit_offer_and_cleanup(self, solicit_offer_request, success_message):
+    async def _send_and_test_solicit_offer_and_cleanup(self, solicit_offer_request, success_message, endpoint):
         """Helper method to test SolicitOffer request and clean up the session"""
-        endpoint = self.user_params.get("endpoint", 1)
         resp = await self.send_single_cmd(solicit_offer_request, endpoint=endpoint, payloadCapability=ChipDeviceCtrl.TransportPayloadCapability.LARGE_PAYLOAD)
         asserts.assert_equal(type(resp), Clusters.WebRTCTransportProvider.Commands.SolicitOfferResponse,
                              "Incorrect response type")
@@ -103,7 +108,7 @@ class TC_WEBRTCP_2_9(MatterBaseTest, WEBRTCPTestBase):
             videoStreamID=videoStreamID,
             audioStreamID=audioStreamID
         )
-        await self._test_solicit_offer_and_cleanup(solicit_offer_request_basic, "WebRTC session ID should be allocated")
+        await self._send_and_test_solicit_offer_and_cleanup(solicit_offer_request_basic, "WebRTC session ID should be allocated", endpoint)
 
         self.step(3)
         # Send SolicitOffer with ICEServers field containing valid STUN/TURN server list
@@ -127,7 +132,7 @@ class TC_WEBRTCP_2_9(MatterBaseTest, WEBRTCPTestBase):
             audioStreamID=audioStreamID,
             ICEServers=ice_servers
         )
-        await self._test_solicit_offer_and_cleanup(solicit_offer_request_ice_servers, "WebRTC session ID should be allocated with ICE servers")
+        await self._send_and_test_solicit_offer_and_cleanup(solicit_offer_request_ice_servers, "WebRTC session ID should be allocated with ICE servers", endpoint)
 
         self.step(4)
         # Send SolicitOffer with ICETransportPolicy = 'all'
@@ -138,7 +143,7 @@ class TC_WEBRTCP_2_9(MatterBaseTest, WEBRTCPTestBase):
             audioStreamID=audioStreamID,
             ICETransportPolicy="all"
         )
-        await self._test_solicit_offer_and_cleanup(solicit_offer_request_policy_all, "WebRTC session ID should be allocated with ICE policy All")
+        await self._send_and_test_solicit_offer_and_cleanup(solicit_offer_request_policy_all, "WebRTC session ID should be allocated with ICE policy All", endpoint)
 
         self.step(5)
         # Send SolicitOffer with ICETransportPolicy = 'relay'
@@ -149,7 +154,7 @@ class TC_WEBRTCP_2_9(MatterBaseTest, WEBRTCPTestBase):
             audioStreamID=audioStreamID,
             ICETransportPolicy="relay"
         )
-        await self._test_solicit_offer_and_cleanup(solicit_offer_request_policy_relay, "WebRTC session ID should be allocated with ICE policy Relay")
+        await self._send_and_test_solicit_offer_and_cleanup(solicit_offer_request_policy_relay, "WebRTC session ID should be allocated with ICE policy Relay", endpoint)
 
         self.step(6)
         # Send SolicitOffer with both ICEServers and ICETransportPolicy fields
@@ -161,7 +166,7 @@ class TC_WEBRTCP_2_9(MatterBaseTest, WEBRTCPTestBase):
             ICEServers=ice_servers,
             ICETransportPolicy="all"
         )
-        await self._test_solicit_offer_and_cleanup(solicit_offer_request_both, "WebRTC session ID should be allocated with both ICE servers and policy")
+        await self._send_and_test_solicit_offer_and_cleanup(solicit_offer_request_both, "WebRTC session ID should be allocated with both ICE servers and policy", endpoint)
 
 
 if __name__ == "__main__":

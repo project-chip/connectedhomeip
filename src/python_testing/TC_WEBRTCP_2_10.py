@@ -51,9 +51,12 @@ class TC_WEBRTCP_2_10(MatterBaseTest, WEBRTCPTestBase):
 
     def steps_TC_WEBRTCP_2_10(self) -> list[TestStep]:
         steps = [
-            TestStep(1, "TH allocates both Audio and Video streams via AudioStreamAllocate and VideoStreamAllocate commands to CameraAVStreamManagement"),
-            TestStep(2, "TH sends the SolicitOffer command with valid parameters from a specific endpoint ID"),
-            TestStep(3, "TH reads currentSessions attribute from WebRTCTransportProvider on DUT"),
+            TestStep(1, "TH allocates both Audio and Video streams via AudioStreamAllocate and VideoStreamAllocate commands to CameraAVStreamManagement",
+                     "DUT responds with success and provides stream IDs"),
+            TestStep(2, "TH sends the SolicitOffer command with valid parameters from a specific endpoint ID",
+                     "DUT responds with SolicitOfferResponse containing allocated WebRTCSessionID"),
+            TestStep(3, "TH reads currentSessions attribute from WebRTCTransportProvider on DUT",
+                     "Verify the WebRTCSession entry has PeerEndpointID matching the OriginatingEndpointID from step 2"),
         ]
         return steps
 

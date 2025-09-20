@@ -49,36 +49,31 @@ from matter.webrtc import LibdatachannelPeerConnection, WebRTCManager
 
 
 class TC_WEBRTCP_2_11(MatterBaseTest, WebRTCTestHelper):
+    def desc_TC_WEBRTCP_2_11(self) -> str:
+        return "[TC-WEBRTCP-2.11] Validate deferred Offer command timing"
+
     def steps_TC_WEBRTCP_2_11(self) -> list[TestStep]:
         steps = [
             TestStep("precondition-1", commission_if_required(), is_commissioning=True),
             TestStep("precondition-2", "Confirm no active WebRTC sessions exist in DUT"),
             TestStep(
-                1,
-                description="TH allocates both Audio and Video streams via AudioStreamAllocate and VideoStreamAllocate commands to CameraAVStreamManagement",
-                expectation="DUT responds with success.",
+                1, "TH allocates both Audio and Video streams via AudioStreamAllocate and VideoStreamAllocate commands to CameraAVStreamManagement",
+                "DUT responds with success.",
             ),
             TestStep(
-                2,
-                description="TH sends the SolicitOffer command with valid parameters",
-                expectation="DUT responds with SolicitOfferResponse containing allocated WebRTCSessionID and DeferredOffer=TRUE.",
+                2, "TH sends the SolicitOffer command with valid parameters",
+                "DUT responds with SolicitOfferResponse containing allocated WebRTCSessionID and DeferredOffer=TRUE.",
             ),
             TestStep(
-                3,
-                description="TH starts a timer and waits for incoming Offer command from DUT on WebRTC Requestor cluster",
-                expectation="DUT sends Offer command to TH within 30 seconds of the SolicitOfferResponse.",
+                3, "TH starts a timer and waits for incoming Offer command from DUT on WebRTC Requestor cluster",
+                "DUT sends Offer command to TH within 30 seconds of the SolicitOfferResponse.",
             ),
             TestStep(
-                4,
-                description="TH verifies the Offer command contains the correct WebRTCSessionID from step 2",
-                expectation="Offer command WebRTCSessionID matches the allocated session ID.",
+                4, "TH verifies the Offer command contains the correct WebRTCSessionID from step 2",
+                "Offer command WebRTCSessionID matches the allocated session ID.",
             ),
         ]
-
         return steps
-
-    def desc_TC_WEBRTCP_2_11(self) -> str:
-        return "[TC-WEBRTCP-2.11] Validate deferred Offer command timing"
 
     def pics_TC_WEBRTCP_2_11(self) -> list[str]:
         return ["WEBRTCP.S", "AVSM.S"]
@@ -105,16 +100,16 @@ class TC_WEBRTCP_2_11(MatterBaseTest, WebRTCTestHelper):
 
         self.step(1)
         # Allocate both Audio and Video streams
-        aVideoStreamID = await self.allocate_video_stream(endpoint)
-        aAudioStreamID = await self.allocate_audio_stream(endpoint)
+        videoStreamID = await self.allocate_video_stream(endpoint)
+        audioStreamID = await self.allocate_audio_stream(endpoint)
 
         self.step(2)
         # Send SolicitOffer command with valid parameters, expecting deferred response
         solicit_offer_response: WebRTCTransportProvider.Commands.SolicitOfferResponse = await webrtc_peer.send_command(
             cmd=WebRTCTransportProvider.Commands.SolicitOffer(
                 streamUsage=Objects.Globals.Enums.StreamUsageEnum.kLiveView,
-                videoStreamID=aVideoStreamID,
-                audioStreamID=aAudioStreamID,
+                videoStreamID=videoStreamID,
+                audioStreamID=audioStreamID,
                 originatingEndpointID=endpoint,
             ),
             endpoint=endpoint,
