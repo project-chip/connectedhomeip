@@ -95,7 +95,7 @@ class TC_WEBRTCP_2_15(MatterBaseTest, WEBRTCPTestBase):
         await self.validate_allocated_video_stream(videoStreamID)
 
         self.step(2)
-        # Send ProvideOffer command with valid parameters - should fail with INVALID_IN_STATE
+        # Send ProvideOffer command with valid parameters
         cmd = Clusters.WebRTCTransportProvider.Commands.ProvideOffer(
             webRTCSessionID=NullValue,
             sdp=(
