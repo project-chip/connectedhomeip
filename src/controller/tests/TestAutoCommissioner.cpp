@@ -457,7 +457,6 @@ const NodeId kValidNodeId = 0x000;
 // Invalid buffers
 const ByteSpan kInvalidEmptyRCAC;
 const ByteSpan kInvalidEmptyNOC;
-const ByteSpan kInvalidEmptyICAC;
 
 uint8_t buffer[10];
 ByteSpan kCoruptedBufferInvalidRCAC(buffer, static_cast<size_t>(std::numeric_limits<uint32_t>::max()) + 1);
