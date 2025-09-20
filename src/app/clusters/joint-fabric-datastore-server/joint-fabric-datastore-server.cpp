@@ -24,6 +24,7 @@
 #include <app/AttributeAccessInterface.h>
 #include <app/AttributeAccessInterfaceRegistry.h>
 #include <app/ConcreteCommandPath.h>
+#include <app/InteractionModelEngine.h>
 #include <app/reporting/reporting.h>
 #include <app/server/Server.h>
 #include <app/util/attribute-storage.h>
@@ -37,6 +38,30 @@ using namespace chip::app::Clusters;
 using chip::Protocols::InteractionModel::Status;
 
 namespace JointFabricDatastoreCluster = chip::app::Clusters::JointFabricDatastore;
+
+namespace {
+
+Status ConvertToStatus(CHIP_ERROR err)
+{
+    switch (err.AsInteger())
+    {
+    case CHIP_NO_ERROR.AsInteger():
+        return Status::Success;
+    case CHIP_ERROR_NOT_FOUND.AsInteger():
+        return Status::NotFound;
+    case CHIP_ERROR_RESOURCE_EXHAUSTED.AsInteger():
+        return Status::ResourceExhausted;
+    case CHIP_ERROR_INVALID_ARGUMENT.AsInteger():
+    case CHIP_ERROR_NO_MEMORY.AsInteger():
+        return Status::Failure;
+    case CHIP_ERROR_CONSTRAINT.AsInteger():
+        return Status::ConstraintError;
+    default:
+        return Status::Failure;
+    }
+}
+
+} // namespace
 
 class JointFabricDatastoreAttrAccess : public AttributeAccessInterface, public app::JointFabricDatastore::Listener
 {
@@ -310,7 +335,7 @@ exit:
     else
     {
         ChipLogError(DataManagement, "JointFabricDatastoreCluster: failed with error: %" CHIP_ERROR_FORMAT, err.Format());
-        commandObj->AddStatus(commandPath, Protocols::InteractionModel::ClusterStatusCode(err));
+        commandObj->AddStatus(commandPath, ConvertToStatus(err));
     }
 
     return true;
@@ -335,7 +360,7 @@ exit:
     else
     {
         ChipLogError(DataManagement, "JointFabricDatastoreCluster: failed with error: %" CHIP_ERROR_FORMAT, err.Format());
-        commandObj->AddStatus(commandPath, Protocols::InteractionModel::ClusterStatusCode(err));
+        commandObj->AddStatus(commandPath, ConvertToStatus(err));
     }
 
     return true;
@@ -360,7 +385,7 @@ exit:
     else
     {
         ChipLogError(DataManagement, "JointFabricDatastoreCluster: failed with error: %" CHIP_ERROR_FORMAT, err.Format());
-        commandObj->AddStatus(commandPath, Protocols::InteractionModel::ClusterStatusCode(err));
+        commandObj->AddStatus(commandPath, ConvertToStatus(err));
     }
 
     return true;
@@ -383,7 +408,7 @@ exit:
     else
     {
         ChipLogError(DataManagement, "JointFabricDatastoreCluster: failed with error: %" CHIP_ERROR_FORMAT, err.Format());
-        commandObj->AddStatus(commandPath, Protocols::InteractionModel::ClusterStatusCode(err));
+        commandObj->AddStatus(commandPath, ConvertToStatus(err));
     }
 
     return true;
@@ -406,7 +431,7 @@ exit:
     else
     {
         ChipLogError(DataManagement, "JointFabricDatastoreCluster: failed with error: %" CHIP_ERROR_FORMAT, err.Format());
-        commandObj->AddStatus(commandPath, Protocols::InteractionModel::ClusterStatusCode(err));
+        commandObj->AddStatus(commandPath, ConvertToStatus(err));
     }
 
     return true;
@@ -429,7 +454,7 @@ exit:
     else
     {
         ChipLogError(DataManagement, "JointFabricDatastoreCluster: failed with error: %" CHIP_ERROR_FORMAT, err.Format());
-        commandObj->AddStatus(commandPath, Protocols::InteractionModel::ClusterStatusCode(err));
+        commandObj->AddStatus(commandPath, ConvertToStatus(err));
     }
 
     return true;
@@ -461,7 +486,7 @@ exit:
     else
     {
         ChipLogError(DataManagement, "JointFabricDatastoreCluster: failed with error: %" CHIP_ERROR_FORMAT, err.Format());
-        commandObj->AddStatus(commandPath, Protocols::InteractionModel::ClusterStatusCode(err));
+        commandObj->AddStatus(commandPath, ConvertToStatus(err));
     }
 
     return true;
@@ -487,7 +512,7 @@ exit:
     else
     {
         ChipLogError(DataManagement, "JointFabricDatastoreCluster: failed with error: %" CHIP_ERROR_FORMAT, err.Format());
-        commandObj->AddStatus(commandPath, Protocols::InteractionModel::ClusterStatusCode(err));
+        commandObj->AddStatus(commandPath, ConvertToStatus(err));
     }
 
     return true;
@@ -511,7 +536,7 @@ exit:
     else
     {
         ChipLogError(DataManagement, "JointFabricDatastoreCluster: failed with error: %" CHIP_ERROR_FORMAT, err.Format());
-        commandObj->AddStatus(commandPath, Protocols::InteractionModel::ClusterStatusCode(err));
+        commandObj->AddStatus(commandPath, ConvertToStatus(err));
     }
 
     return true;
@@ -535,7 +560,7 @@ exit:
     else
     {
         ChipLogError(DataManagement, "JointFabricDatastoreCluster: failed with error: %" CHIP_ERROR_FORMAT, err.Format());
-        commandObj->AddStatus(commandPath, Protocols::InteractionModel::ClusterStatusCode(err));
+        commandObj->AddStatus(commandPath, ConvertToStatus(err));
     }
 
     return true;
@@ -550,7 +575,11 @@ bool emberAfJointFabricDatastoreClusterRefreshNodeCallback(
 
     app::JointFabricDatastore & jointFabricDatastore = Server::GetInstance().GetJointFabricDatastore();
 
-    SuccessOrExit(err = jointFabricDatastore.RefreshNode(nodeId));
+    // TODO: Get Endpoints List from connected device with <nodeId>
+    ReadOnlyBufferBuilder<DataModel::EndpointEntry> endpointsList;
+    SuccessOrExit(err = InteractionModelEngine::GetInstance()->GetDataModelProvider()->Endpoints(endpointsList));
+
+    SuccessOrExit(err = jointFabricDatastore.RefreshNode(nodeId, endpointsList.TakeBuffer()));
 
 exit:
     if (err == CHIP_NO_ERROR)
@@ -560,7 +589,7 @@ exit:
     else
     {
         ChipLogError(DataManagement, "JointFabricDatastoreCluster: failed with error: %" CHIP_ERROR_FORMAT, err.Format());
-        commandObj->AddStatus(commandPath, Protocols::InteractionModel::ClusterStatusCode(err));
+        commandObj->AddStatus(commandPath, ConvertToStatus(err));
     }
 
     return true;
@@ -582,7 +611,7 @@ bool emberAfJointFabricDatastoreClusterUpdateNodeCallback(
     else
     {
         ChipLogError(DataManagement, "JointFabricDatastoreCluster: failed with error: %" CHIP_ERROR_FORMAT, err.Format());
-        commandObj->AddStatus(commandPath, Protocols::InteractionModel::ClusterStatusCode(err));
+        commandObj->AddStatus(commandPath, ConvertToStatus(err));
     }
 
     return true;
@@ -603,7 +632,7 @@ bool emberAfJointFabricDatastoreClusterRemoveNodeCallback(
     else
     {
         ChipLogError(DataManagement, "JointFabricDatastoreCluster: failed with error: %" CHIP_ERROR_FORMAT, err.Format());
-        commandObj->AddStatus(commandPath, Protocols::InteractionModel::ClusterStatusCode(err));
+        commandObj->AddStatus(commandPath, ConvertToStatus(err));
     }
 
     return true;
@@ -629,7 +658,7 @@ bool emberAfJointFabricDatastoreClusterUpdateEndpointForNodeCallback(
     else
     {
         ChipLogError(DataManagement, "JointFabricDatastoreCluster: failed with error: %" CHIP_ERROR_FORMAT, err.Format());
-        commandObj->AddStatus(commandPath, Protocols::InteractionModel::ClusterStatusCode(err));
+        commandObj->AddStatus(commandPath, ConvertToStatus(err));
     }
 
     return true;
@@ -655,7 +684,7 @@ bool emberAfJointFabricDatastoreClusterAddGroupIDToEndpointForNodeCallback(
     else
     {
         ChipLogError(DataManagement, "JointFabricDatastoreCluster: failed with error: %" CHIP_ERROR_FORMAT, err.Format());
-        commandObj->AddStatus(commandPath, Protocols::InteractionModel::ClusterStatusCode(err));
+        commandObj->AddStatus(commandPath, ConvertToStatus(err));
     }
 
     return true;
@@ -681,7 +710,7 @@ bool emberAfJointFabricDatastoreClusterRemoveGroupIDFromEndpointForNodeCallback(
     else
     {
         ChipLogError(DataManagement, "JointFabricDatastoreCluster: failed with error: %" CHIP_ERROR_FORMAT, err.Format());
-        commandObj->AddStatus(commandPath, Protocols::InteractionModel::ClusterStatusCode(err));
+        commandObj->AddStatus(commandPath, ConvertToStatus(err));
     }
 
     return true;
@@ -707,7 +736,7 @@ bool emberAfJointFabricDatastoreClusterAddBindingToEndpointForNodeCallback(
     else
     {
         ChipLogError(DataManagement, "JointFabricDatastoreCluster: failed with error: %" CHIP_ERROR_FORMAT, err.Format());
-        commandObj->AddStatus(commandPath, Protocols::InteractionModel::ClusterStatusCode(err));
+        commandObj->AddStatus(commandPath, ConvertToStatus(err));
     }
 
     return true;
@@ -733,7 +762,7 @@ bool emberAfJointFabricDatastoreClusterRemoveBindingFromEndpointForNodeCallback(
     else
     {
         ChipLogError(DataManagement, "JointFabricDatastoreCluster: failed with error: %" CHIP_ERROR_FORMAT, err.Format());
-        commandObj->AddStatus(commandPath, Protocols::InteractionModel::ClusterStatusCode(err));
+        commandObj->AddStatus(commandPath, ConvertToStatus(err));
     }
 
     return true;
@@ -758,7 +787,7 @@ bool emberAfJointFabricDatastoreClusterAddACLToNodeCallback(
     else
     {
         ChipLogError(DataManagement, "JointFabricDatastoreCluster: failed with error: %" CHIP_ERROR_FORMAT, err.Format());
-        commandObj->AddStatus(commandPath, Protocols::InteractionModel::ClusterStatusCode(err));
+        commandObj->AddStatus(commandPath, ConvertToStatus(err));
     }
 
     return true;
@@ -783,7 +812,7 @@ bool emberAfJointFabricDatastoreClusterRemoveACLFromNodeCallback(
     else
     {
         ChipLogError(DataManagement, "JointFabricDatastoreCluster: failed with error: %" CHIP_ERROR_FORMAT, err.Format());
-        commandObj->AddStatus(commandPath, Protocols::InteractionModel::ClusterStatusCode(err));
+        commandObj->AddStatus(commandPath, ConvertToStatus(err));
     }
 
     return true;
