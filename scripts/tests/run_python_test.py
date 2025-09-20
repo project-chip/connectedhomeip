@@ -275,8 +275,7 @@ def main_impl(app: str, factory_reset: bool, factory_reset_app_only: bool, app_a
     script_command = [
         script,
         "--fail-on-skipped",
-        "--paa-trust-store-path", os.path.join(DEFAULT_CHIP_ROOT, MATTER_DEVELOPMENT_PAA_ROOT_CERTS),
-        "--log-format", '%(message)s',
+        "--paa-trust-store-path", os.path.join(DEFAULT_CHIP_ROOT, MATTER_DEVELOPMENT_PAA_ROOT_CERTS)
     ] + shlex.split(script_args)
 
     if script_gdb:
