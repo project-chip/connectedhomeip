@@ -74,6 +74,7 @@ CommandHandlerInterfaceOnlyClusters:
     - Fixed Label
     - Soil Measurement
     - Basic Information
+    - Operational Credentials
     - Boolean State
 
 # We need a more configurable way of deciding which clusters have which init functions....
@@ -103,6 +104,7 @@ ClustersWithInitFunctions:
     - Thermostat
     - Time Format Localization
     - Wi-Fi Network Diagnostics
+    - Operational Credentials
     - Fixed Label
 
 ClustersWithAttributeChangedFunctions:
@@ -132,6 +134,7 @@ ClustersWithShutdownFunctions:
     - Software Diagnostics
     - Thermostat
     - Wi-Fi Network Diagnostics
+    - Operational Credentials
     - Fixed Label
 
 ClustersWithPreAttributeChangeFunctions:
