@@ -7716,14 +7716,14 @@ endpoint 0 {
   }
 
   server cluster TimeFormatLocalization {
-    persist  attribute hourFormat default = 0;
-    persist  attribute activeCalendarType default = 0;
+    ram      attribute hourFormat default = 0;
+    ram      attribute activeCalendarType default = 0;
     callback attribute supportedCalendarTypes;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     ram      attribute featureMap default = 1;
-    ram      attribute clusterRevision default = 1;
+    callback attribute clusterRevision;
   }
 
   server cluster UnitLocalization {
