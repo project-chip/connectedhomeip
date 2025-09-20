@@ -264,7 +264,7 @@ protected:
      *
      * @return A pointer to the Instance object associated with this delegate.
      */
-    Instance * GetInstance() const { return mInstance; }
+    const Instance * GetInstance() const { return mInstance; }
 };
 
 // A set of pointers to all initialised ModeBase instances. It provides a way to access all ModeBase derived clusters.
