@@ -107,7 +107,7 @@ public:
     CHIP_ERROR OnTransportReleaseAudioVideoStreams(uint16_t audioStreamID, uint16_t videoStreamID) override;
 
     void GetBandwidthForStreams(const Optional<DataModel::Nullable<uint16_t>> & videoStreamId,
-                                const Optional<DataModel::Nullable<uint16_t>> & audioStreamId, double & outBandwidthMbps);
+                                const Optional<DataModel::Nullable<uint16_t>> & audioStreamId, double & outBandwidthMbps) override;
     void Init();
 
     CameraAVStreamManager()  = default;
