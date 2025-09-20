@@ -133,7 +133,7 @@ class TC_IDM_3_2(MatterBaseTest, BasicCompositionTests):
         test_unsupported_attribute = next(iter(cluster_attributes.values()))
         
         write_status = await self.write_single_attribute(
-            attribute_value=test_unsupported_attribute,
+            attribute_value=test_unsupported_attribute(0),
             endpoint_id=self.endpoint,
             expect_success=False
         )
