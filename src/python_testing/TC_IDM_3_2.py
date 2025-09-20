@@ -144,7 +144,7 @@ class TC_IDM_3_2(MatterBaseTest, BasicCompositionTests):
 
         self.step(3)
         # Write an unsupported attribute to DUT
-        unupported_endpoint = None
+        unsupported_endpoint = None
         unsupported_attribute = None
         for endpoint_id, endpoint in self.endpoints.items():
             for cluster_type, cluster_data in endpoint.items():
