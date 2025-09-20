@@ -431,52 +431,8 @@ bool Command::InitArgument(size_t argIndex, char * argValue)
     }
 
     case ArgumentType::OctetString: {
-        isValidArgument = HandleNullableOptional<chip::ByteSpan>(arg, argValue, [&](auto * value) {
-            // We support two ways to pass an octet string argument.  If it happens
-            // to be all-ASCII, you can just pass it in.  Otherwise you can pass in
-            // "hex:" followed by the hex-encoded bytes.
-            size_t argLen = strlen(argValue);
-
-            if (IsHexString(argValue))
-            {
-                // Hex-encoded.  Decode it into a temporary buffer first, so if we
-                // run into errors we can do correct "argument is not valid" logging
-                // that actually shows the value that was passed in.  After we
-                // determine it's valid, modify the passed-in value to hold the
-                // right bytes, so we don't need to worry about allocating storage
-                // for this somewhere else.  This works because the hex
-                // representation is always longer than the octet string it encodes,
-                // so we have enough space in argValue for the decoded version.
-                chip::Platform::ScopedMemoryBuffer<uint8_t> buffer;
-
-                size_t octetCount;
-                CHIP_ERROR err = HexToBytes(
-                    chip::CharSpan(argValue + kHexStringPrefixLen, argLen - kHexStringPrefixLen),
-                    [&buffer](size_t allocSize) {
-                        buffer.Calloc(allocSize);
-                        return buffer.Get();
-                    },
-                    &octetCount);
-                if (err != CHIP_NO_ERROR)
-                {
-                    return false;
-                }
-
-                memcpy(argValue, buffer.Get(), octetCount);
-                *value = chip::ByteSpan(chip::Uint8::from_char(argValue), octetCount);
-                return true;
-            }
-
-            // Just ASCII.  Check for the "str:" prefix.
-            if (IsStrString(argValue))
-            {
-                // Skip the prefix
-                argValue += kStrStringPrefixLen;
-                argLen -= kStrStringPrefixLen;
-            }
-            *value = chip::ByteSpan(chip::Uint8::from_char(argValue), argLen);
-            return true;
-        });
+        isValidArgument = HandleNullableOptional<chip::ByteSpan>(
+            arg, argValue, [&](auto * value) { return OctetStringFromCharString(argValue, value); });
         break;
     }
 
@@ -1144,4 +1100,52 @@ void Command::ResetArguments()
             }
         }
     }
+}
+
+bool Command::OctetStringFromCharString(char * argValue, chip::ByteSpan * value)
+{
+    // We support two ways to pass an octet string argument.  If it happens
+    // to be all-ASCII, you can just pass it in.  Otherwise you can pass in
+    // "hex:" followed by the hex-encoded bytes.
+    size_t argLen = strlen(argValue);
+
+    if (IsHexString(argValue))
+    {
+        // Hex-encoded.  Decode it into a temporary buffer first, so if we
+        // run into errors we can do correct "argument is not valid" logging
+        // that actually shows the value that was passed in.  After we
+        // determine it's valid, modify the passed-in value to hold the
+        // right bytes, so we don't need to worry about allocating storage
+        // for this somewhere else.  This works because the hex
+        // representation is always longer than the octet string it encodes,
+        // so we have enough space in argValue for the decoded version.
+        chip::Platform::ScopedMemoryBuffer<uint8_t> buffer;
+
+        size_t octetCount;
+        CHIP_ERROR err = HexToBytes(
+            chip::CharSpan(argValue + kHexStringPrefixLen, argLen - kHexStringPrefixLen),
+            [&buffer](size_t allocSize) {
+                buffer.Calloc(allocSize);
+                return buffer.Get();
+            },
+            &octetCount);
+        if (err != CHIP_NO_ERROR)
+        {
+            return false;
+        }
+
+        memcpy(argValue, buffer.Get(), octetCount);
+        *value = chip::ByteSpan(chip::Uint8::from_char(argValue), octetCount);
+        return true;
+    }
+
+    // Just ASCII.  Check for the "str:" prefix.
+    if (IsStrString(argValue))
+    {
+        // Skip the prefix
+        argValue += kStrStringPrefixLen;
+        argLen -= kStrStringPrefixLen;
+    }
+    *value = chip::ByteSpan(chip::Uint8::from_char(argValue), argLen);
+    return true;
 }
