@@ -88,7 +88,9 @@ enum CommissioningStage : uint8_t
     kRemoveWiFiNetworkConfig,         ///< Remove Wi-Fi network config.
     kRemoveThreadNetworkConfig,       ///< Remove Thread network config.
     kConfigureTCAcknowledgments,      ///< Send SetTCAcknowledgements (0x30:6) command to the device
-    kCleanup,                         ///< Call delegates with status, free memory, clear timers and state/
+    kRequestWiFiCredentials,          ///< Wi-Fi credentials are needed; ask for those.
+    kRequestThreadCredentials,        ///< Thread credentials are needed; ask for those.
+    kCleanup,                         ///< Call delegates with status, free memory, clear timers and state.
 #if CHIP_DEVICE_CONFIG_ENABLE_NFC_BASED_COMMISSIONING
     kUnpoweredPhaseComplete, ///< Commissioning completed until connect network for unpowered commissioning (NFC)
 #endif

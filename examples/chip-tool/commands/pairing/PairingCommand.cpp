@@ -31,6 +31,7 @@
 #include "../dcl/DCLClient.h"
 #include "../dcl/DisplayTermsAndConditions.h"
 
+#include <iostream>
 #include <string>
 
 using namespace ::chip;
@@ -540,6 +541,94 @@ void PairingCommand::OnICDStayActiveComplete(ScopedNodeId deviceId, uint32_t pro
 void PairingCommand::OnCommissioningStageStart(PeerId peerId, CommissioningStage stageStarting)
 {
     ChipLogDetail(chipTool, "Starting commissioning stage '%s'", StageToString(stageStarting));
+}
+
+CHIP_ERROR PairingCommand::WiFiCredentialsNeeded(EndpointId endpoint)
+{
+    if (mNetworkType != PairingNetworkType::None)
+    {
+        // We only support prompting for credentials when no credentials were
+        // provided up front, for now.
+        return CHIP_ERROR_NOT_IMPLEMENTED;
+    }
+
+    // We block while prompting for the information, and that does not seem to
+    // work well if we do it synchronously: we seem to lose the BLE connection
+    // to the commissionee.  So do all the rest of the work async.
+    DeviceLayer::SystemLayer().ScheduleLambda([this] {
+        std::string ssid, password;
+        ByteSpan ssidSpan, passwordSpan;
+
+        do
+        {
+            std::cout << "Enter the Wi-Fi SSID: ";
+            std::getline(std::cin, ssid);
+            if (OctetStringFromCharString(ssid.data(), &ssidSpan))
+            {
+                break;
+            }
+            ChipLogError(chipTool, "Invalid value for SSID");
+        } while (1);
+
+        do
+        {
+            std::cout << "Enter the Wi-Fi password (empty for an open network): ";
+            std::getline(std::cin, password);
+            if (OctetStringFromCharString(password.data(), &passwordSpan))
+            {
+                break;
+            }
+            ChipLogError(chipTool, "Invalid value for password");
+        } while (1);
+
+        auto & commissioner            = CurrentCommissioner();
+        CommissioningParameters params = commissioner.GetCommissioningParameters();
+        auto credentials               = Controller::WiFiCredentials(ssidSpan, passwordSpan);
+        params.SetWiFiCredentials(credentials);
+        commissioner.UpdateCommissioningParameters(params);
+
+        commissioner.NetworkCredentialsReady();
+    });
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR PairingCommand::ThreadCredentialsNeeded(EndpointId endpoint)
+{
+    if (mNetworkType != PairingNetworkType::None)
+    {
+        // We only support prompting for credentials when no credentials were
+        // provided up front, for now.
+        return CHIP_ERROR_NOT_IMPLEMENTED;
+    }
+
+    // We block while prompting for the information, and that does not seem to
+    // work well if we do it synchronously: we seem to lose the BLE connection
+    // to the commissionee.  So do all the rest of the work async.
+    DeviceLayer::SystemLayer().ScheduleLambda([this] {
+        std::string operationalDataset;
+        ByteSpan operationalDatasetSpan;
+
+        do
+        {
+            std::cout << "Enter the operational dataset (probably as a hex string prefixed with \"hex:\"): ";
+            std::getline(std::cin, operationalDataset);
+            if (OctetStringFromCharString(operationalDataset.data(), &operationalDatasetSpan))
+            {
+                break;
+            }
+            ChipLogError(chipTool, "Invalid value for operational dataset");
+        } while (1);
+
+        auto & commissioner            = CurrentCommissioner();
+        CommissioningParameters params = commissioner.GetCommissioningParameters();
+        params.SetThreadOperationalDataset(operationalDatasetSpan);
+        commissioner.UpdateCommissioningParameters(params);
+
+        commissioner.NetworkCredentialsReady();
+    });
+
+    return CHIP_NO_ERROR;
 }
 
 void PairingCommand::OnDiscoveredDevice(const Dnssd::CommissionNodeData & nodeData)
