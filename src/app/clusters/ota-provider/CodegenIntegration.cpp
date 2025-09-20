@@ -96,7 +96,7 @@ void SetDelegate(EndpointId endpointId, OTAProviderDelegate * delegate)
 {
     IntegrationDelegate integrationDelegate;
 
-    ServerClusterInterface * interface = CodegenClusterIntegration::GetClusterForEndpointIndex(
+    ServerClusterInterface * interface = CodegenClusterIntegration::FindClusterOnEndpoint(
         {
             .endpointId                = endpointId,
             .clusterId                 = OtaSoftwareUpdateProvider::Id,

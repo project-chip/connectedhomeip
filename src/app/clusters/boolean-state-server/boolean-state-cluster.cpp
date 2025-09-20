@@ -50,16 +50,14 @@ CHIP_ERROR BooleanStateCluster::Attributes(const ConcreteClusterPath & path,
     return listBuilder.Append(Span(BooleanState::Attributes::kMandatoryMetadata), {});
 }
 
-void BooleanStateCluster::SetStateValue(bool stateValue, EventNumber * eventNumber)
+std::optional<EventNumber> BooleanStateCluster::SetStateValue(bool stateValue)
 {
-    VerifyOrReturn(mStateValue != stateValue);
+    VerifyOrReturnValue(mStateValue != stateValue, std::nullopt);
     mStateValue = stateValue;
     NotifyAttributeChanged(StateValue::Id);
-    VerifyOrReturn(mContext != nullptr);
+    VerifyOrReturnValue(mContext != nullptr, std::nullopt);
     BooleanState::Events::StateChange::Type event{ stateValue };
-    auto eventNum = mContext->interactionContext.eventsGenerator.GenerateEvent(event, mPath.mEndpointId);
-    VerifyOrReturn(eventNumber != nullptr && eventNum.has_value());
-    *eventNumber = eventNum.value();
+    return mContext->interactionContext.eventsGenerator.GenerateEvent(event, mPath.mEndpointId);
 }
 
 } // namespace chip::app::Clusters

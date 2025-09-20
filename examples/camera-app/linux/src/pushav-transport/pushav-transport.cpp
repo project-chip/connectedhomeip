@@ -339,9 +339,18 @@ void PushAVTransport::TriggerTransport(TriggerActivationReasonEnum activationRea
         bool zoneFound = false; // Zone found flag
         for (auto zone : mZoneSensitivityList)
         {
-            if (zone.first == zoneId)
+            // A Null ZoneId means all zones
+            if (zone.first.IsNull())
             {
                 zoneFound = true;
+            }
+            else
+            {
+                zoneFound = (zone.first.Value() = zoneId);
+            }
+
+            if (zoneFound)
+            {
                 if (zone.second > sensitivity)
                 {
                     ChipLogProgress(Camera, "PushAVTransport motion transport trigger received but ignored due to sensitivity");

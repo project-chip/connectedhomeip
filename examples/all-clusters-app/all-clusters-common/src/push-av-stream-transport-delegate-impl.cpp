@@ -162,7 +162,7 @@ Protocols::InteractionModel::Status PushAvStreamTransportManager::ValidateZoneId
     return Status::Success;
 }
 
-bool PushAvStreamTransportManager::ValidateMotionZoneSize(uint16_t zoneSize)
+bool PushAvStreamTransportManager::ValidateMotionZoneListSize(size_t zoneListSize)
 {
     // TODO: Validate motion zone size
     // Returning true to pass through checks in the Server Implementation.

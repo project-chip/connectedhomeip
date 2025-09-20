@@ -59,7 +59,7 @@ public:
 PushAvStreamTransportServer * FindClusterOnEndpoint(EndpointId endpointId)
 {
     IntegrationDelegate integrationDelegate;
-    return static_cast<PushAvStreamTransportServer *>(CodegenClusterIntegration::GetClusterForEndpointIndex(
+    return static_cast<PushAvStreamTransportServer *>(CodegenClusterIntegration::FindClusterOnEndpoint(
         {
             .endpointId                = endpointId,
             .clusterId                 = PushAvStreamTransport::Id,

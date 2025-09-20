@@ -147,8 +147,8 @@ void CodegenClusterIntegration::UnregisterServer(const UnregisterServerOptions &
     delegate.ReleaseRegistration(clusterInstanceIndex);
 }
 
-ServerClusterInterface * CodegenClusterIntegration::GetClusterForEndpointIndex(const GetClusterForEndpointIndexOptions & options,
-                                                                               Delegate & delegate)
+ServerClusterInterface * CodegenClusterIntegration::FindClusterOnEndpoint(const FindClusterOnEndpointOptions & options,
+                                                                          Delegate & delegate)
 {
     uint16_t clusterInstanceIndex;
     if (!FindEndpointWithLog(options.endpointId, options.clusterId, options.fixedClusterInstanceCount,

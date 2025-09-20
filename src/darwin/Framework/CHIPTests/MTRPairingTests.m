@@ -800,6 +800,9 @@ typedef BOOL (^CommissioningSessionHandler)(NSError * _Nullable error);
     [commissioning startWithController:sController];
 
     [self waitForExpectations:@[ expectation1 ] timeout:kPairingTimeoutInSeconds];
+    XCTAssertNotNil(commissioning.matchedPayload);
+    XCTAssertEqualObjects(commissioning.matchedPayload,
+        [MTRSetupPayload setupPayloadWithOnboardingPayload:kOnboardingPayload1 error:nil]);
 
     XCTestExpectation * expectation2 = [self expectationWithDescription:@"Commissioning 2 complete"];
     commissioningDelegate = [[MTRPairingTestsCommissioningDelegate alloc] initWithExpectation:expectation2];
@@ -814,6 +817,9 @@ typedef BOOL (^CommissioningSessionHandler)(NSError * _Nullable error);
     [commissioning startWithController:sController];
 
     [self waitForExpectations:@[ expectation2 ] timeout:kPairingTimeoutInSeconds];
+    XCTAssertNotNil(commissioning.matchedPayload);
+    XCTAssertEqualObjects(commissioning.matchedPayload,
+        [MTRSetupPayload setupPayloadWithOnboardingPayload:kOnboardingPayload2 error:nil]);
 }
 
 - (void)test014_CommissioningOperationStopDuringAttestation

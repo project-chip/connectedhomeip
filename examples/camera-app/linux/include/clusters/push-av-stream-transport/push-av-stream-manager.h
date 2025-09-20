@@ -88,7 +88,7 @@ public:
 
     Protocols::InteractionModel::Status ValidateZoneId(uint16_t zoneId) override;
 
-    bool ValidateMotionZoneSize(uint16_t zoneSize) override;
+    bool ValidateMotionZoneListSize(size_t zoneListSize) override;
 
     Protocols::InteractionModel::Status SelectVideoStream(StreamUsageEnum streamUsage, uint16_t & videoStreamId) override;
 
