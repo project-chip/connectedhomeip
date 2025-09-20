@@ -30,7 +30,14 @@
 #include <protocols/secure_channel/PASESession.h>
 #include <system/SystemClock.h>
 
+#include <app/server/IDnssdServer.h>
+
 namespace chip {
+
+namespace Test {
+// Forward declaration of CommissioningWindowManagerTestAccess class tests to allow it to be friends with CommissioningWindowManager
+class CommissioningWindowManagerTestAccess;
+} // namespace Test
 
 enum class CommissioningWindowAdvertisement
 {
@@ -46,7 +53,8 @@ class CommissioningWindowManager : public Messaging::UnsolicitedMessageHandler,
                                    public SessionDelegate
 {
 public:
-    CommissioningWindowManager() : mPASESession(*this) {}
+    CommissioningWindowManager() : mPASESession(*this), mDnsSdServer(&mDefaultDnssd) {}
+    CommissioningWindowManager(IDnssdServer * dnssd) : CommissioningWindowManager() { mDnsSdServer = dnssd; }
 
     CHIP_ERROR Init(Server * server)
     {
@@ -226,8 +234,13 @@ private:
     // without having to wait 3 minutes.
     Optional<System::Clock::Seconds32> mMinCommissioningTimeoutOverride;
 
+    friend class Test::CommissioningWindowManagerTestAccess;
     // The PASE session we are using, so we can handle CloseSession properly.
     SessionHolderWithDelegate mPASESession;
+
+    // For testing purposes use a dependency injection
+    IDnssdServer * mDnsSdServer;
+    DnnsdServerWrapper mDefaultDnssd;
 
     // Information about who opened the commissioning window.  These will only
     // be non-null if the window was opened via the operational credentials

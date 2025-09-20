@@ -74,6 +74,7 @@ static_library("server") {
     "Dnssd.h",
     "EchoHandler.cpp",
     "EchoHandler.h",
+    "IDnssdServer.h",
     "Server.cpp",
     "Server.h",
   ]
