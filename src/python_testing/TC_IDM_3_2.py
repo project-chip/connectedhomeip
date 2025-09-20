@@ -121,9 +121,6 @@ class TC_IDM_3_2(MatterBaseTest, BasicCompositionTests):
 
         # Use the first unsupported cluster
         unsupported_cluster_id = next(iter(unsupported_cluster_ids))
-        unsupported_cluster = ClusterObjects.ALL_CLUSTERS[unsupported_cluster_id]
-
-        # Get any writable attribute from this cluster
         cluster_attributes = ClusterObjects.ALL_ATTRIBUTES[unsupported_cluster_id]
         test_unsupported_attribute = next(iter(cluster_attributes.values()))
 
