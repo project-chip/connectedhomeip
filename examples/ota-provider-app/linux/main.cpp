@@ -40,6 +40,8 @@ using chip::ArgParser::PrintArgError;
 using chip::bdx::TransferControlFlags;
 using chip::Messaging::ExchangeManager;
 using namespace chip::app::Clusters::OtaSoftwareUpdateProvider;
+using chip::DeviceLayer::PlatformMgr;
+using namespace chip::DeviceLayer;
 
 // TODO: this should probably be done dynamically
 constexpr chip::EndpointId kOtaProviderEndpoint = 0;
@@ -347,6 +349,8 @@ void ApplicationInit()
     }
 
     ChipLogDetail(SoftwareUpdate, "Using OTA file: %s", gOtaFilepath ? gOtaFilepath : "(none)");
+
+    chip::DeviceLayer::PlatformMgr().SetDelegate(static_cast<PlatformManagerDelegate *>(&gOtaProvider));
 
     if (gOtaFilepath != nullptr)
     {

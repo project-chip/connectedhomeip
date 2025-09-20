@@ -439,3 +439,17 @@ void OTAProviderExample::HandleNotifyUpdateApplied(app::CommandHandler * command
 
     commandObj->AddStatus(commandPath, Status::Success);
 }
+
+void OTAProviderExample::OnShutDown()
+{
+    CHIP_ERROR err = mBdxOtaSender.GracefullyCloseTransfer();
+
+    if (err == CHIP_NO_ERROR)
+    {
+        ChipLogProgress(SoftwareUpdate, "BDX transfer closed gracefully on shutdown.");
+    }
+    else if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(SoftwareUpdate, "BDX transfer close failure: %" CHIP_ERROR_FORMAT, err.Format());
+    }
+}

@@ -525,6 +525,15 @@ CHIP_ERROR TransferSession::HandleStatusReportMessage(const PayloadHeader & head
 
     Protocols::SecureChannel::StatusReport report;
     ReturnErrorOnFailure(report.Parse(std::move(msg)));
+
+    if (report.GetProtocolId() == Protocols::SecureChannel::Id)
+    {
+        // StatusReport received from a peer TransferSession which executed:
+        // AbortTransfer() -> PrepareStatusReport() -> PrepareOutgoingMessage()
+        // and we (the other peer) are now receiving it.
+        return AbortTransfer(StatusCode::kUnknown);
+    }
+
     VerifyOrReturnError((report.GetProtocolId() == Protocols::BDX::Id), CHIP_ERROR_INVALID_MESSAGE_TYPE);
 
     mStatusReportData.statusCode = static_cast<StatusCode>(report.GetProtocolCode());

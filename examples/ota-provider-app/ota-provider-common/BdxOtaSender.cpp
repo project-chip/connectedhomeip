@@ -23,6 +23,8 @@
 #include <messaging/ExchangeContext.h>
 #include <messaging/Flags.h>
 #include <protocols/bdx/BdxTransferSession.h>
+#include <protocols/secure_channel/StatusReport.h>
+#include <system/SystemPacketBuffer.h>
 
 #include <fstream>
 
@@ -235,4 +237,28 @@ void BdxOtaSender::Reset()
     mInitialized  = false;
     mNumBytesSent = 0;
     memset(mFileDesignator, 0, chip::bdx::kMaxFileDesignatorLen);
+}
+
+CHIP_ERROR BdxOtaSender::GracefullyCloseTransfer()
+{
+    using namespace chip::Protocols::SecureChannel;
+
+    StatusReport statusReport(GeneralStatusCode::kFailure, Id, kProtocolCodeGeneralFailure);
+
+    size_t reportSize = statusReport.Size();
+    auto packetBuffer = chip::MessagePacketBuffer::New(reportSize);
+    VerifyOrReturnError(!packetBuffer.IsNull(), CHIP_ERROR_NO_MEMORY);
+    chip::Encoding::LittleEndian::PacketBufferWriter bbuf(std::move(packetBuffer), reportSize);
+    statusReport.WriteToBuffer(bbuf);
+
+    chip::System::PacketBufferHandle msg = bbuf.Finalize();
+    VerifyOrReturnError(!msg.IsNull(), CHIP_ERROR_NO_MEMORY);
+    VerifyOrReturnError(mExchangeCtx != nullptr, CHIP_ERROR_INCORRECT_STATE);
+
+    CHIP_ERROR err = mExchangeCtx->SendMessage(MsgType::StatusReport, std::move(msg), chip::Messaging::SendMessageFlags::kNone);
+
+    Reset();
+    ;
+
+    return err;
 }
