@@ -80,8 +80,10 @@ class TC_IDM_3_2(MatterBaseTest, BasicCompositionTests):
         await self.setup_class_helper(allow_pase=False)
 
         self.step(1)
-        # Write any attribute on an unsupported endpoint to DUT
-        # Find an unsupported endpoint
+        '''
+        Write any attribute on an unsupported endpoint to DUT
+        Find an unsupported endpoint
+        '''
         supported_endpoints = set(self.endpoints.keys())
         all_endpoints = set(range(max(supported_endpoints) + 2))
         unsupported_endpoints = list(all_endpoints - supported_endpoints)
@@ -101,8 +103,10 @@ class TC_IDM_3_2(MatterBaseTest, BasicCompositionTests):
                              f"Write to unsupported endpoint should return UNSUPPORTED_ENDPOINT, got {write_status}")
 
         self.step(2)
-        # Write all attributes on an unsupported cluster to DUT
-        # Find an unsupported cluster (reusing logic from _read_unsupported_cluster)
+        '''
+        Write all attributes on an unsupported cluster to DUT
+        Find an unsupported cluster
+        '''
         supported_cluster_ids = set()
         for endpoint_clusters in self.endpoints.values():
             supported_cluster_ids.update({cluster.id for cluster in endpoint_clusters.keys(
@@ -172,18 +176,22 @@ class TC_IDM_3_2(MatterBaseTest, BasicCompositionTests):
                              f"Write to unsupported attribute should return UNSUPPORTED_ATTRIBUTE, got {write_status2}")
 
         self.step(4)
-        # TH sends the WriteRequestMessage to the DUT to modify the value of one attribute and Set SuppressResponse to True.
-        # Currently there is an open issue for the SuppressResponse not being available currently and is mentioned in the yaml file for this test::
-        # Issue Link: https://github.com/project-chip/connectedhomeip/issues/8043
-        # Out of Scope
-        # For now similar to the yaml file version, skipping this test step as the Python API doesn't expose SuppressResponse
+        '''
+        TH sends the WriteRequestMessage to the DUT to modify the value of one attribute and Set SuppressResponse to True.
+        Currently there is an open issue for the SuppressResponse not being available currently and is mentioned in the yaml file for this test::
+        Issue Link: https://github.com/project-chip/connectedhomeip/issues/8043
+        Out of Scope
+        For now similar to the yaml file version, skipping this test step as the Python API doesn't expose SuppressResponse
+        '''
         logging.info(
             "Step 4: SuppressResponse parameter not supported in current WriteAttribute API, please refer to the issue link for more details")
 
         self.step(5)
-        # TH sends a ReadRequest message to the DUT to read any attribute on any cluster.
-        # DUT returns with a report data action with the attribute values and the dataversion of the cluster.
-        # TH sends a WriteRequestMessage to the DUT to modify the value of one attribute with the DataVersion field set to the one received in the prior step.
+        '''
+        TH sends a ReadRequest message to the DUT to read any attribute on any cluster.
+        DUT returns with a report data action with the attribute values and the dataversion of the cluster.
+        TH sends a WriteRequestMessage to the DUT to modify the value of one attribute with the DataVersion field set to the one received in the prior step.
+        '''
 
         # Read an attribute to get the current DataVersion
         test_cluster = Clusters.BasicInformation
@@ -214,10 +222,12 @@ class TC_IDM_3_2(MatterBaseTest, BasicCompositionTests):
                              f"Read value {actual_value} should match written value {new_value0}")
 
         self.step(6)
-        # TH sends a ReadRequest message to the DUT to read any attribute on any cluster.
-        # DUT returns with a report data action with the attribute values and the dataversion of the cluster.
-        # TH sends a WriteRequestMessage to the DUT to modify the value of one attribute no DataVersion indicated.
-        # TH sends a second WriteRequestMessage to the DUT to modify the value of an attribute with the dataversion field set to the value received earlier.
+        '''
+        TH sends a ReadRequest message to the DUT to read any attribute on any cluster.
+        DUT returns with a report data action with the attribute values and the dataversion of the cluster.
+        TH sends a WriteRequestMessage to the DUT to modify the value of one attribute no DataVersion indicated.
+        TH sends a second WriteRequestMessage to the DUT to modify the value of an attribute with the dataversion field set to the value received earlier.
+        '''
 
         # First, read to get the initial DataVersion
         initial_read = await self.default_controller.ReadAttribute(
@@ -228,7 +238,7 @@ class TC_IDM_3_2(MatterBaseTest, BasicCompositionTests):
         initial_data_version = initial_read[self.endpoint][test_cluster][Clusters.Attribute.DataVersion]
         logging.info(f"Initial DataVersion for step 6: {initial_data_version}")
 
-        # Write without DataVersion using framework method (this should succeed and increment the DataVersion)
+        # Write without DataVersion (this should succeed and increment the DataVersion)
         new_value1 = "New-Label-Step6"
         write_status = await self.write_single_attribute(
             attribute_value=test_attribute(new_value1),
@@ -236,7 +246,7 @@ class TC_IDM_3_2(MatterBaseTest, BasicCompositionTests):
             expect_success=True
         )
 
-        # Now try to write with the old DataVersion using direct WriteAttribute (this should fail with DATA_VERSION_MISMATCH)
+        # Now try to write with the old DataVersion (this should fail with DATA_VERSION_MISMATCH)
         new_value2 = "New-Label-Step6-2"
         write_result_old_version = await self.default_controller.WriteAttribute(
             self.dut_node_id,
@@ -248,10 +258,12 @@ class TC_IDM_3_2(MatterBaseTest, BasicCompositionTests):
                              f"Write with old DataVersion should return DATA_VERSION_MISMATCH, got {write_result_old_version[0].Status}")
 
         self.step(7)
-        # TH sends the WriteRequestMessage to the DUT to modify the value of a specific attribute data that needs Timed Write transaction to write and this action is not part of a Timed Write transaction.
-        # This test is in the yaml script version, it requires this to be implemented on the DUT.
-        # For now, skipping this test step as the Python API doesn't expose the timed write transaction
-        logging.info("Step 7: Timed write transaction does not appear to be supported in the current Python API")
+        '''
+        TH sends the WriteRequestMessage to the DUT to modify the value of a specific attribute data that needs 
+        Timed Write transaction to write and this action is not part of a Timed Write transaction.
+        The yaml script version of this test says it requires this to be implemented on the DUT.
+        '''
+        logging.info("Step 7: Timed write transaction currently needs further context to be implemented correctly by coder")
 
 
 if __name__ == "__main__":
