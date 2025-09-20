@@ -43,6 +43,7 @@ const uint8_t ModeProofing        = 8;
 class ChefDelegate : public ModeBase::Delegate
 {
 private:
+    EndpointId endpointId;
     using ModeTagStructType                      = detail::Structs::ModeTagStruct::Type;
     ModeTagStructType ModeTagsBake[1]            = { { .value = to_underlying(ModeTag::kBake) } };
     ModeTagStructType ModeTagsConvection[1]      = { { .value = to_underlying(ModeTag::kConvection) } };
