@@ -74,6 +74,7 @@
 #include <clusters/GeneralCommissioning/CommandIds.h>
 #include <clusters/GeneralDiagnostics/CommandIds.h>
 #include <clusters/GroupKeyManagement/CommandIds.h>
+#include <clusters/Groupcast/CommandIds.h>
 #include <clusters/Groups/CommandIds.h>
 #include <clusters/HepaFilterMonitoring/CommandIds.h>
 #include <clusters/IcdManagement/CommandIds.h>

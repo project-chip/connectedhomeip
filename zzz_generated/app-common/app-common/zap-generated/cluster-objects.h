@@ -239,6 +239,10 @@
 #include <clusters/GroupKeyManagement/Commands.h>
 #include <clusters/GroupKeyManagement/Events.h>
 #include <clusters/GroupKeyManagement/Structs.h>
+#include <clusters/Groupcast/Attributes.h>
+#include <clusters/Groupcast/Commands.h>
+#include <clusters/Groupcast/Events.h>
+#include <clusters/Groupcast/Structs.h>
 #include <clusters/Groups/Attributes.h>
 #include <clusters/Groups/Commands.h>
 #include <clusters/Groups/Events.h>
