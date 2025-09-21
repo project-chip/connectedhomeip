@@ -115,6 +115,7 @@ ClustersWithShutdownFunctions:
     - Scenes Management
     - Thermostat
     - Fixed Label
+    - Descriptor
 
 ClustersWithPreAttributeChangeFunctions:
     - Door Lock

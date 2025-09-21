@@ -30,7 +30,7 @@ namespace {
 static constexpr size_t kDescriptorFixedClusterCount = Descriptor::StaticApplicationConfig::kFixedClusterConfig.size();
 static constexpr size_t kDescriptorMaxClusterCount   = kDescriptorFixedClusterCount + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT;
 
-LazyRegisteredServerCluster<DescriptorCluster> gServers[kDescriptorFixedClusterCount];
+LazyRegisteredServerCluster<DescriptorCluster> gServers[kDescriptorMaxClusterCount];
 
 class IntegrationDelegate : public CodegenClusterIntegration::Delegate
 {
@@ -60,7 +60,7 @@ void emberAfDescriptorClusterServerInitCallback(EndpointId endpointId)
             .clusterId                       = Descriptor::Id,
             .fixedClusterServerEndpointCount = kDescriptorFixedClusterCount,
             .maxEndpointCount                = kDescriptorMaxClusterCount,
-            .fetchFeatureMap                 = true,
+            .fetchFeatureMap                 = false,
             .fetchOptionalAttributes         = false,
         },
         integrationDelegate);
