@@ -266,7 +266,8 @@ bool PushAVTransport::HandleTriggerDetected()
     int64_t elapsed = 0;
     auto now        = std::chrono::steady_clock::now();
 
-    if (InBlindPeriod(mBlindStartTime, mRecorder->mClipInfo.mBlindDuration))
+    if (mTransportTriggerType != TransportTriggerTypeEnum::kCommand ||
+        InBlindPeriod(mBlindStartTime, mRecorder->mClipInfo.mBlindDuration))
     {
         return false;
     }
