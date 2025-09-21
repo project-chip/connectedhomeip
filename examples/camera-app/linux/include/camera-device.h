@@ -32,9 +32,6 @@
 #define STREAM_GST_DEST_IP "127.0.0.1"
 #define VIDEO_STREAM_GST_DEST_PORT 5000
 #define AUDIO_STREAM_GST_DEST_PORT 5001
-// TODO: Define a configuration flag and enable/disable during the build. Configure this after the controller/TH side UI is ready.
-// Enable to use test src instead of hardware source for testing purposes.
-// #define AV_STREAM_GST_USE_TEST_SRC
 
 // Camera Constraints set to typical values.
 // TODO: Look into ways to fetch from hardware, if required/possible.
@@ -50,10 +47,13 @@ static constexpr uint8_t kMicrophoneMaxLevel         = 254;  // Spec constraint
 static constexpr uint8_t kMicrophoneMaxChannelCount  = 8;    // Spec Constraint in AudioStreamAllocate
 static constexpr uint16_t kMinResolutionWidth        = 640;  // Low SD resolution
 static constexpr uint16_t kMinResolutionHeight       = 360;  // Low SD resolution
+static constexpr uint16_t k720pResolutionWidth       = 1280; // 720p resolution
+static constexpr uint16_t k720pResolutionHeight      = 720;  // 720p resolution
 static constexpr uint16_t kMaxResolutionWidth        = 1920; // 1080p resolution
 static constexpr uint16_t kMaxResolutionHeight       = 1080; // 1080p resolution
 static constexpr uint16_t kSnapshotStreamFrameRate   = 30;
 static constexpr uint16_t kMaxVideoFrameRate         = 120;
+static constexpr uint16_t k60fpsVideoFrameRate       = 60;
 static constexpr uint16_t kMinVideoFrameRate         = 30;
 static constexpr uint32_t kMinBitRateBps             = 10000;   // 10 kbps
 static constexpr uint32_t kMaxBitRateBps             = 2000000; // 2 mbps
@@ -169,6 +169,7 @@ public:
     CameraError SetHDRMode(bool hdrMode) override;
     bool GetHDRMode() override { return mHDREnabled; }
 
+    CameraError SetHardPrivacyMode(bool hardPrivacyMode) override;
     bool GetHardPrivacyMode() override { return mHardPrivacyModeOn; }
 
     CameraError SetNightVision(chip::app::Clusters::CameraAvStreamManagement::TriStateAutoEnum nightVision) override;

@@ -31,40 +31,7 @@ public:
             ChipLogError(Zcl, "Push AV Stream Transport : Trying to set delegate to null");
             return;
         }
-        mDelegate->SetPushAvStreamTransportServer(this);
     }
-
-    /**
-     * @brief API for application layer to notify when transport has started
-     *
-     * This should be called by the application layer when a transport begins streaming.
-     * It will generate the appropriate PushTransportBegin event.
-     *
-     * @param connectionID The connection ID of the transport that started
-     * @param triggerType The type of trigger that started the transport
-     * @param activationReason Optional reason for the activation
-     * @return Status::Success if event was generated successfully, failure otherwise
-     */
-    Protocols::InteractionModel::Status
-    NotifyTransportStarted(uint16_t connectionID, PushAvStreamTransport::TransportTriggerTypeEnum triggerType,
-                           Optional<PushAvStreamTransport::TriggerActivationReasonEnum> activationReason =
-                               Optional<PushAvStreamTransport::TriggerActivationReasonEnum>());
-
-    /**
-     * @brief API for application layer to notify when transport has stopped
-     *
-     * This should be called by the application layer when a transport stops streaming.
-     * It will generate the appropriate PushTransportEnd event.
-     *
-     * @param connectionID The connection ID of the transport that stopped
-     * @param triggerType The type of trigger that started the transport
-     * @param activationReason Optional reason for the deactivation
-     * @return Status::Success if event was generated successfully, failure otherwise
-     */
-    Protocols::InteractionModel::Status
-    NotifyTransportStopped(uint16_t connectionID, PushAvStreamTransport::TransportTriggerTypeEnum triggerType,
-                           Optional<PushAvStreamTransport::TriggerActivationReasonEnum> activationReason =
-                               Optional<PushAvStreamTransport::TriggerActivationReasonEnum>());
 
     void SetTLSClientManagementDelegate(TlsClientManagementDelegate * delegate)
     {
@@ -85,6 +52,17 @@ public:
             return;
         }
     }
+
+    Protocols::InteractionModel::Status
+    NotifyTransportStarted(uint16_t connectionID, PushAvStreamTransport::TransportTriggerTypeEnum triggerType,
+                           Optional<PushAvStreamTransport::TriggerActivationReasonEnum> activationReason =
+                               Optional<PushAvStreamTransport::TriggerActivationReasonEnum>());
+
+    Protocols::InteractionModel::Status
+    NotifyTransportStopped(uint16_t connectionID, PushAvStreamTransport::TransportTriggerTypeEnum triggerType,
+                           Optional<PushAvStreamTransport::TriggerActivationReasonEnum> activationReason =
+                               Optional<PushAvStreamTransport::TriggerActivationReasonEnum>());
+
     enum class UpsertResultEnum : uint8_t
     {
         kInserted = 0x00,

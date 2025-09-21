@@ -63,7 +63,7 @@ void PushAvStreamTransportManager::SetCameraDevice(CameraDeviceInterface * aCame
     mCameraDevice = aCameraDevice;
 }
 
-void PushAvStreamTransportManager::SetPushAvStreamTransportServer(PushAvStreamTransportServerLogic * server)
+void PushAvStreamTransportManager::SetPushAvStreamTransportServer(PushAvStreamTransportServer * server)
 {
     mPushAvStreamTransportServer = server;
 }
@@ -108,19 +108,19 @@ PushAvStreamTransportManager::AllocatePushTransport(const TransportOptionsStruct
     if (transportOptions.triggerOptions.triggerType == TransportTriggerTypeEnum::kMotion &&
         transportOptions.triggerOptions.motionZones.HasValue())
     {
-        std::vector<std::pair<uint16_t, uint8_t>> zoneSensitivityList;
+        std::vector<std::pair<chip::app::DataModel::Nullable<uint16_t>, uint8_t>> zoneSensitivityList;
 
         auto motionZones = transportOptions.triggerOptions.motionZones.Value().Value();
         for (const auto & zoneOption : motionZones)
         {
             if (zoneOption.sensitivity.HasValue())
             {
-                zoneSensitivityList.push_back({ zoneOption.zone.Value(), zoneOption.sensitivity.Value() });
+                zoneSensitivityList.push_back({ zoneOption.zone, zoneOption.sensitivity.Value() });
             }
             else
             {
                 zoneSensitivityList.push_back(
-                    { zoneOption.zone.Value(), transportOptions.triggerOptions.motionSensitivity.Value().Value() });
+                    { zoneOption.zone, transportOptions.triggerOptions.motionSensitivity.Value().Value() });
             }
         }
 
@@ -450,7 +450,7 @@ Protocols::InteractionModel::Status PushAvStreamTransportManager::ValidateZoneId
     return Status::Failure;
 }
 
-bool PushAvStreamTransportManager::ValidateMotionZoneSize(uint16_t zoneSize)
+bool PushAvStreamTransportManager::ValidateMotionZoneListSize(size_t zoneListSize)
 {
     if (mCameraDevice == nullptr)
     {
@@ -458,7 +458,7 @@ bool PushAvStreamTransportManager::ValidateMotionZoneSize(uint16_t zoneSize)
         return false;
     }
     auto maxZones = mCameraDevice->GetZoneManagementDelegate().GetZoneMgmtServer()->GetMaxZones();
-    if (zoneSize >= maxZones)
+    if (zoneListSize >= maxZones)
     {
         return false;
     }
