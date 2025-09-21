@@ -91,6 +91,8 @@ declare_args() {
 
   # Enable TestEventTrigger in GeneralDiagnostics cluster
   sl_enable_test_event_trigger = false
+
+  sl_verbose_mode = false
 }
 
 examples_plat_dir = "${chip_root}/examples/platform/silabs/efr32"
@@ -666,6 +668,10 @@ template("efr32_sdk") {
         "${efr32_sdk_root}/platform/emdrv/uartdrv/config",
         "${efr32_sdk_root}/hardware/driver/memlcd/inc/memlcd_usart",
       ]
+    }
+
+    if (sl_verbose_mode) {
+      defines += [ "VERBOSE_MODE=1" ]
     }
 
     if (sl_use_subscription_syncing) {
