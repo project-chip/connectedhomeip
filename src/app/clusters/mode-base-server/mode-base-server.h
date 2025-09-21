@@ -262,7 +262,7 @@ protected:
     /**
      * @brief Provides access to the const Instance pointer.
      *
-     * @return A xonst pointer to the Instance object associated with this delegate.
+     * @return A const pointer to the Instance object associated with this delegate.
      */
     const Instance * GetInstance() const { return mInstance; }
 
