@@ -30,10 +30,10 @@ namespace app {
 namespace Clusters {
 
 class AccessControlCluster : public DefaultServerCluster,
-                             public chip::Access::AccessControl::EntryListener
+                             public Access::AccessControl::EntryListener
 #if CHIP_CONFIG_USE_ACCESS_RESTRICTIONS
     ,
-                             public AccessRestrictionProvider::Listener
+                             public Access::AccessRestrictionProvider::Listener
 #endif
 {
 public:
@@ -56,12 +56,21 @@ public:
 
     CHIP_ERROR GeneratedCommands(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<CommandId> & builder) override;
 
+#if CHIP_CONFIG_USE_ACCESS_RESTRICTIONS
+    std::optional<DataModel::ActionReturnStatus> HandleReviewFabricRestrictions(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
+                               const Clusters::AccessControl::Commands::ReviewFabricRestrictions::DecodableType & commandData);
+#endif
+
 private:
     void OnEntryChanged(const chip::Access::SubjectDescriptor * subjectDescriptor, FabricIndex fabric, size_t index,
                         const chip::Access::AccessControl::Entry * entry,
                         chip::Access::AccessControl::EntryListener::ChangeType changeType) override;
 
 #if CHIP_CONFIG_USE_ACCESS_RESTRICTIONS
+    void MarkCommissioningRestrictionListChanged() override;
+
+    void MarkRestrictionListChanged(FabricIndex fabricIndex) override;
+
     void OnFabricRestrictionReviewUpdate(FabricIndex fabricIndex, uint64_t token, Optional<CharSpan> instruction,
                                          Optional<CharSpan> arlRequestFlowUrl) override;
 #endif

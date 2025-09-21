@@ -18,7 +18,6 @@
 #pragma once
 
 #include <access/AccessRestrictionProvider.h>
-#include <app-common/zap-generated/cluster-objects.h>
 #include <credentials/FabricTable.h>
 
 namespace chip {

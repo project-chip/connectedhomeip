@@ -44,6 +44,7 @@
 using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters::AccessControl;
+using namespace chip::app::Clusters::AccessControl::Commands;
 using namespace chip::app::Clusters::AccessControl::Attributes;
 using namespace chip::DeviceLayer;
 using namespace chip::Access;
@@ -377,94 +378,6 @@ CHIP_ERROR ReadArl(AttributeValueEncoder & aEncoder)
         return CHIP_NO_ERROR;
     });
 }
-
-void AccessControlCluster::OnFabricRestrictionReviewUpdate(FabricIndex fabricIndex, uint64_t token, Optional<CharSpan> instruction,
-                                                           Optional<CharSpan> arlRequestFlowUrl)
-{
-    CHIP_ERROR err;
-    ArlReviewEvent event{ .token = token, .fabricIndex = fabricIndex };
-
-    event.instruction       = instruction;
-    event.ARLRequestFlowUrl = arlRequestFlowUrl;
-
-    EventNumber eventNumber;
-    SuccessOrExit(err = LogEvent(event, kRootEndpointId, eventNumber));
-
-    return;
-
-exit:
-    ChipLogError(DataManagement, "AccessControlCluster: review event failed: %" CHIP_ERROR_FORMAT, err.Format());
-}
-
-std::optional<DataModel::ActionReturnStatus>
-HandleReviewFabricRestrictions(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
-                               const Clusters::AccessControl::Commands::ReviewFabricRestrictions::DecodableType & commandData)
-{
-    if (commandPath.mEndpointId != kRootEndpointId)
-    {
-        ChipLogError(DataManagement, "AccessControlCluster: invalid endpoint in ReviewFabricRestrictions request");
-        return Protocols::InteractionModel::Status::InvalidCommand;
-    }
-
-    uint64_t token;
-    std::vector<AccessRestrictionProvider::Entry> entries;
-    auto entryIter = commandData.arl.begin();
-    while (entryIter.Next())
-    {
-        AccessRestrictionProvider::Entry entry;
-        entry.fabricIndex    = commandObj->GetAccessingFabricIndex();
-        entry.endpointNumber = entryIter.GetValue().endpoint;
-        entry.clusterId      = entryIter.GetValue().cluster;
-
-        auto restrictionIter = entryIter.GetValue().restrictions.begin();
-        while (restrictionIter.Next())
-        {
-            AccessRestrictionProvider::Restriction restriction;
-            if (ArlEncoder::Convert(restrictionIter.GetValue().type, restriction.restrictionType) != CHIP_NO_ERROR)
-            {
-                ChipLogError(DataManagement, "AccessControlCluster: invalid restriction type conversion");
-                return Protocols::InteractionModel::Status::InvalidCommand;
-            }
-
-            if (!restrictionIter.GetValue().id.IsNull())
-            {
-                restriction.id.SetValue(restrictionIter.GetValue().id.Value());
-            }
-            entry.restrictions.push_back(restriction);
-        }
-
-        if (restrictionIter.GetStatus() != CHIP_NO_ERROR)
-        {
-            ChipLogError(DataManagement, "AccessControlCluster: invalid ARL data");
-            return Protocols::InteractionModel::Status::InvalidCommand;
-        }
-
-        entries.push_back(entry);
-    }
-
-    if (entryIter.GetStatus() != CHIP_NO_ERROR)
-    {
-        ChipLogError(DataManagement, "AccessControlCluster: invalid ARL data");
-        return Protocols::InteractionModel::Status::InvalidCommand;
-    }
-
-    CHIP_ERROR err = chip::Access::GetAccessControl().GetAccessRestrictionProvider()->RequestFabricRestrictionReview(
-        commandObj->GetAccessingFabricIndex(), entries, token);
-
-    if (err == CHIP_NO_ERROR)
-    {
-        Clusters::AccessControl::Commands::ReviewFabricRestrictionsResponse::Type response;
-        response.token = token;
-        commandObj->AddResponse(commandPath, response);
-    }
-    else
-    {
-        ChipLogError(DataManagement, "AccessControlCluster: restriction review failed: %" CHIP_ERROR_FORMAT, err.Format());
-        return Protocols::InteractionModel::ClusterStatusCode(err);
-    }
-
-    return Protocols::InteractionModel::Status::Success;
-}
 #endif
 } // namespace
 
@@ -591,7 +504,8 @@ CHIP_ERROR AccessControlCluster::AcceptedCommands(const ConcreteClusterPath & pa
 #if CHIP_CONFIG_USE_ACCESS_RESTRICTIONS
     static constexpr DataModel::AcceptedCommandEntry kAcceptedCommands[] = {
         Commands::ReviewFabricRestrictions::kMetadataEntry,
-    } return builder.ReferenceExisting(kAcceptedCommands);
+    };
+    return builder.ReferenceExisting(kAcceptedCommands);
 #else
     return CHIP_NO_ERROR;
 #endif
@@ -601,13 +515,85 @@ CHIP_ERROR AccessControlCluster::GeneratedCommands(const ConcreteClusterPath & p
 {
 #if CHIP_CONFIG_USE_ACCESS_RESTRICTIONS
     static constexpr CommandId kGeneratedCommands[] = {
-        Commands::ReviewFabricRestrictionsResponse,
+        Commands::ReviewFabricRestrictionsResponse::Id,
     };
     return builder.ReferenceExisting(kGeneratedCommands);
 #else
     return CHIP_NO_ERROR;
 #endif
 }
+
+#if CHIP_CONFIG_USE_ACCESS_RESTRICTIONS
+std::optional<DataModel::ActionReturnStatus>
+AccessControlCluster::HandleReviewFabricRestrictions(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
+                               const Clusters::AccessControl::Commands::ReviewFabricRestrictions::DecodableType & commandData)
+{
+    if (commandPath.mEndpointId != kRootEndpointId)
+    {
+        ChipLogError(DataManagement, "AccessControlCluster: invalid endpoint in ReviewFabricRestrictions request");
+        return Protocols::InteractionModel::Status::InvalidCommand;
+    }
+
+    uint64_t token;
+    std::vector<AccessRestrictionProvider::Entry> entries;
+    auto entryIter = commandData.arl.begin();
+    while (entryIter.Next())
+    {
+        AccessRestrictionProvider::Entry entry;
+        entry.fabricIndex    = commandObj->GetAccessingFabricIndex();
+        entry.endpointNumber = entryIter.GetValue().endpoint;
+        entry.clusterId      = entryIter.GetValue().cluster;
+
+        auto restrictionIter = entryIter.GetValue().restrictions.begin();
+        while (restrictionIter.Next())
+        {
+            AccessRestrictionProvider::Restriction restriction;
+            if (ArlEncoder::Convert(restrictionIter.GetValue().type, restriction.restrictionType) != CHIP_NO_ERROR)
+            {
+                ChipLogError(DataManagement, "AccessControlCluster: invalid restriction type conversion");
+                return Protocols::InteractionModel::Status::InvalidCommand;
+            }
+
+            if (!restrictionIter.GetValue().id.IsNull())
+            {
+                restriction.id.SetValue(restrictionIter.GetValue().id.Value());
+            }
+            entry.restrictions.push_back(restriction);
+        }
+
+        if (restrictionIter.GetStatus() != CHIP_NO_ERROR)
+        {
+            ChipLogError(DataManagement, "AccessControlCluster: invalid ARL data");
+            return Protocols::InteractionModel::Status::InvalidCommand;
+        }
+
+        entries.push_back(entry);
+    }
+
+    if (entryIter.GetStatus() != CHIP_NO_ERROR)
+    {
+        ChipLogError(DataManagement, "AccessControlCluster: invalid ARL data");
+        return Protocols::InteractionModel::Status::InvalidCommand;
+    }
+
+    CHIP_ERROR err = chip::Access::GetAccessControl().GetAccessRestrictionProvider()->RequestFabricRestrictionReview(
+        commandObj->GetAccessingFabricIndex(), entries, token);
+
+    if (err == CHIP_NO_ERROR)
+    {
+        Clusters::AccessControl::Commands::ReviewFabricRestrictionsResponse::Type response;
+        response.token = token;
+        commandObj->AddResponse(commandPath, response);
+    }
+    else
+    {
+        ChipLogError(DataManagement, "AccessControlCluster: restriction review failed: %" CHIP_ERROR_FORMAT, err.Format());
+        return Protocols::InteractionModel::ClusterStatusCode(err);
+    }
+
+    return Protocols::InteractionModel::Status::Success;
+}
+#endif
 
 void AccessControlCluster::OnEntryChanged(const chip::Access::SubjectDescriptor * subjectDescriptor, FabricIndex fabric,
                                           size_t index, const chip::Access::AccessControl::Entry * entry,
@@ -663,6 +649,36 @@ void AccessControlCluster::OnEntryChanged(const chip::Access::SubjectDescriptor 
 exit:
     ChipLogError(DataManagement, "AccessControlCluster: event failed %" CHIP_ERROR_FORMAT, err.Format());
 }
+
+#if CHIP_CONFIG_USE_ACCESS_RESTRICTIONS
+void AccessControlCluster::MarkCommissioningRestrictionListChanged()
+{
+    NotifyAttributeChanged(AccessControl::Attributes::CommissioningARL::Id);
+}
+
+void AccessControlCluster::MarkRestrictionListChanged(FabricIndex fabricIndex)
+{
+    NotifyAttributeChanged(AccessControl::Attributes::Arl::Id);
+}
+
+void AccessControlCluster::OnFabricRestrictionReviewUpdate(FabricIndex fabricIndex, uint64_t token, Optional<CharSpan> instruction,
+                                                           Optional<CharSpan> arlRequestFlowUrl)
+{
+    CHIP_ERROR err;
+    ArlReviewEvent event{ .token = token, .fabricIndex = fabricIndex };
+
+    event.instruction       = instruction;
+    event.ARLRequestFlowUrl = arlRequestFlowUrl;
+
+    EventNumber eventNumber;
+    SuccessOrExit(err = LogEvent(event, kRootEndpointId, eventNumber));
+
+    return;
+
+exit:
+    ChipLogError(DataManagement, "AccessControlCluster: review event failed: %" CHIP_ERROR_FORMAT, err.Format());
+}
+#endif
 
 } // namespace Clusters
 } // namespace app
