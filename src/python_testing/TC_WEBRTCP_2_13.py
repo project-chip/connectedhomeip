@@ -127,16 +127,15 @@ class TC_WEBRTCP_2_13(MatterBaseTest, WEBRTCPTestBase):
             "a=ice-pwd:blrzPJtaV9Y1BNgbC1bXpi"
         )
 
+        self.step(3)
         cmd = Clusters.WebRTCTransportProvider.Commands.ProvideOffer(
             webRTCSessionID=NullValue,
             sdp=sdp_offer,
-            streamUsage=Clusters.Globals.Enums.StreamUsageEnum.kLiveView,
+            streamUsage=3,
             originatingEndpointID=endpoint,
             videoStreamID=videoStreamID,
             audioStreamID=audioStreamID
         )
-
-        self.step(3)
         try:
             await self.send_single_cmd(cmd=cmd, endpoint=endpoint, payloadCapability=ChipDeviceCtrl.TransportPayloadCapability.LARGE_PAYLOAD)
             asserts.fail("Expected ProvideOffer to fail with INVALID_IN_STATE when HardPrivacyModeOn is True")
