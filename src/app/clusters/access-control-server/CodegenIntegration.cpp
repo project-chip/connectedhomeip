@@ -86,3 +86,12 @@ void MatterAccessControlClusterServerShutdownCallback(EndpointId endpointId)
 void MatterAccessControlPluginServerInitCallback() {}
 
 void MatterAccessControlPluginServerShutdownCallback() {}
+
+#if CHIP_CONFIG_USE_ACCESS_RESTRICTIONS
+bool emberAfAccessControlClusterReviewFabricRestrictionsCallback(
+    CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
+    const Clusters::AccessControl::Commands::ReviewFabricRestrictions::DecodableType & commandData)
+{
+    return gServer.Cluster().HandleReviewFabricRestrictions(commandObj, commandPath, commandData)==Protocols::InteractionModel::Status::Success;
+}
+#endif
