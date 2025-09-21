@@ -265,6 +265,12 @@ protected:
      * @return A pointer to the Instance object associated with this delegate.
      */
     const Instance * GetInstance() const { return mInstance; }
+
+    /**
+     * @brief Provides access to the Instance pointer.
+     *
+     * @return A pointer to the Instance object associated with this delegate.
+     */
     Instance * GetInstance() { return mInstance; }
 };
 
