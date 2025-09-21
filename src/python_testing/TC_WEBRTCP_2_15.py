@@ -117,7 +117,7 @@ class TC_WEBRTCP_2_15(MatterBaseTest, WEBRTCPTestBase):
                 "a=ice-ufrag:ytRw\n"
                 "a=ice-pwd:blrzPJtaV9Y1BNgbC1bXpi"
             ),
-            streamUsage=3,
+            streamUsage=Clusters.Globals.Enums.StreamUsageEnum.kLiveView,
             originatingEndpointID=originating_endpoint,
             videoStreamID=videoStreamID,
             audioStreamID=audioStreamID
