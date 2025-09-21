@@ -131,7 +131,7 @@ class TC_WEBRTCP_2_13(MatterBaseTest, WEBRTCPTestBase):
         cmd = Clusters.WebRTCTransportProvider.Commands.ProvideOffer(
             webRTCSessionID=NullValue,
             sdp=sdp_offer,
-            streamUsage=3,
+            streamUsage=Clusters.Globals.Enums.StreamUsageEnum.kLiveView,
             originatingEndpointID=endpoint,
             videoStreamID=videoStreamID,
             audioStreamID=audioStreamID
