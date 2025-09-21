@@ -611,7 +611,7 @@ int PushAVClipRecorder::ProcessBuffersAndWrite()
         }
         std::string prefix           = mClipInfo.mRecorderId + "_clip_" + std::to_string(mClipInfo.mClipId);
         std::string initSegName      = prefix + "_init-stream$RepresentationID$.fmp4";
-        std::string mediaSegName     = prefix + "_chunk-stream$RepresentationID$-$Number%05d$.cmfv";
+        std::string mediaSegName     = prefix + "_chunk-stream$RepresentationID$-$Number%05d$.m4s";
         mInputFormatContext          = avformat_alloc_context();
         int avioCtxBufferSize        = 1048576; // 1MB
         uint8_t * mAvioContextBuffer = static_cast<uint8_t *>(av_malloc(static_cast<size_t>(avioCtxBufferSize)));
