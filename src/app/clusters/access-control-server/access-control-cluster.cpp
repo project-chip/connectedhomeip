@@ -524,9 +524,9 @@ CHIP_ERROR AccessControlCluster::GeneratedCommands(const ConcreteClusterPath & p
 }
 
 #if CHIP_CONFIG_USE_ACCESS_RESTRICTIONS
-std::optional<DataModel::ActionReturnStatus>
-AccessControlCluster::HandleReviewFabricRestrictions(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
-                               const Clusters::AccessControl::Commands::ReviewFabricRestrictions::DecodableType & commandData)
+std::optional<DataModel::ActionReturnStatus> AccessControlCluster::HandleReviewFabricRestrictions(
+    CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
+    const Clusters::AccessControl::Commands::ReviewFabricRestrictions::DecodableType & commandData)
 {
     if (commandPath.mEndpointId != kRootEndpointId)
     {
