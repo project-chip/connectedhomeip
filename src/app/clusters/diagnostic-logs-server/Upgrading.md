@@ -11,7 +11,8 @@ What Changed
 Old API (deprecated):
 
 ```
-chip::app::Clusters::DiagnosticLogs::DiagnosticLogsServer::SetDiagnosticLogsProviderDelegate(endpointId, delegate);
+using chip::app::clusters::DiagnosticLogs;
+DiagnosticLogsServer::Instance().SetDiagnosticLogsProviderDelegate(endpointId, delegate);
 ```
 
 -   Required passing an EndpointId.
@@ -20,7 +21,8 @@ chip::app::Clusters::DiagnosticLogs::DiagnosticLogsServer::SetDiagnosticLogsProv
 New API:
 
 ```
-chip::app::Clusters::DiagnosticLogsCluster::Instance().SetDelegate(delegate);
+using chip::app::Clusters;
+DiagnosticLogsCluster::Instance().SetDelegate(delegate);
 ```
 
 -   No endpointId required.

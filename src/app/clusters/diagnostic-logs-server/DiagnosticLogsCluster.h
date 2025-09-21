@@ -65,6 +65,8 @@ class DiagnosticLogsCluster : public DefaultServerCluster, public DiagnosticLogs
 public:
     DiagnosticLogsCluster() : DefaultServerCluster({ kRootEndpointId, DiagnosticLogs::Id }) {}
 
+    static DiagnosticLogsCluster & Instance();
+
     // Server cluster implementation
     DataModel::ActionReturnStatus ReadAttribute(const DataModel::ReadAttributeRequest & request,
                                                 AttributeValueEncoder & encoder) override;

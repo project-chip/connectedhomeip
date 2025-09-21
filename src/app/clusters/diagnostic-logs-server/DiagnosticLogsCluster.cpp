@@ -98,6 +98,13 @@ struct LogRequestHandler
 
 } // namespace
 
+DiagnosticLogsCluster gInstance;
+
+DiagnosticLogsCluster & DiagnosticLogsCluster::Instance()
+{
+    return gInstance;
+}
+
 void DiagnosticLogsProviderLogic::HandleLogRequestForResponsePayload(CommandHandler * commandObj, const ConcreteCommandPath & path,
                                                                      IntentEnum intent, StatusEnum statusOnSuccess)
 {
