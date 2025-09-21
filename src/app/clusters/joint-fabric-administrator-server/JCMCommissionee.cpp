@@ -189,10 +189,8 @@ TrustVerificationError JCMCommissionee::ReadCommissionerAdminFabricIndex()
     {
         return TrustVerificationError::kAsync;
     }
-    else
-    {
-        return TrustVerificationError::kReadAdminFabricIndexFailed;
-    }
+
+    return TrustVerificationError::kReadAdminFabricIndexFailed;
 }
 
 TrustVerificationError JCMCommissionee::PerformVendorIdVerification()
