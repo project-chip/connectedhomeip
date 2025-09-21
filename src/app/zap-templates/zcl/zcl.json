@@ -224,6 +224,10 @@
         "Bridged Device Basic Information": [
             "ProductAppearance"
         ],
+        "Binding": [
+            "FeatureMap",
+            "ClusterRevision"
+        ],
         "Chime": [
             "SelectedChime",
             "Enabled"
