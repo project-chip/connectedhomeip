@@ -116,9 +116,9 @@ void PushAVClipRecorder::RemovePreviousRecordingFiles(const std::string & path)
         std::string filename(entry->d_name);
         if (filename.length() > 4 &&
             (filename.substr(filename.length() - 4) == ".mpd" || filename.substr(filename.length() - 5) == ".fmp4" ||
-             filename.substr(filename.length() - 5) == ".cmfv"))
+             filename.substr(filename.length() - 4) == ".m4s"))
         {
-            std::string filepath = path + "/" + filename;
+            std::string filepath = path + filename;
             if (unlink(filepath.c_str()) == 0)
             {
                 ChipLogDetail(Camera, "Removed previous recording file: %s", filepath.c_str());
@@ -412,9 +412,18 @@ int PushAVClipRecorder::SetupOutput(const std::string & outputPrefix, const std:
     // Set DASH/CMAF options
     av_opt_set(mFormatContext->priv_data, "increment_tc", "1", 0);
     av_opt_set(mFormatContext->priv_data, "use_timeline", "1", 0);
-    av_opt_set(mFormatContext->priv_data, "movflags", "+cmaf+dash+delay_moov+skip_sidx+skip_trailer+frag_custom", 0);
+
+    if (mClipInfo.mChunkDuration == 0)
+    {
+        av_opt_set(mFormatContext->priv_data, "movflags", "+cmaf+dash+delay_moov+skip_sidx+skip_trailer", 0);
+    }
+    else
+    {
+        av_opt_set(mFormatContext->priv_data, "movflags", "+cmaf+dash+delay_moov+skip_sidx+skip_trailer+frag_custom", 0);
+        av_opt_set(mFormatContext->priv_data, "frag_duration", std::to_string(mClipInfo.mChunkDuration).c_str(), 0);
+    }
+
     av_opt_set(mFormatContext->priv_data, "seg_duration", std::to_string(segSeconds).c_str(), 0);
-    av_opt_set(mFormatContext->priv_data, "frag_duration", std::to_string(mClipInfo.mChunkDuration).c_str(), 0);
     av_opt_set(mFormatContext->priv_data, "init_seg_name", initSegPattern.c_str(), 0);
     av_opt_set(mFormatContext->priv_data, "media_seg_name", mediaSegPattern.c_str(), 0);
     av_opt_set_int(mFormatContext->priv_data, "use_template", 1, 0);
