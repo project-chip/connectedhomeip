@@ -45,7 +45,9 @@
 #include <lib/support/CodeUtils.h>
 #include <lib/support/ScopedBuffer.h>
 #include <lib/support/TestGroupData.h>
+
 #include <lib/support/logging/CHIPLogging.h>
+#include <optional>
 #include <platform/CHIPDeviceConfig.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/CommissionableDataProvider.h>
@@ -87,6 +89,12 @@ private:
     void HandleTransferAnchorComplete(HandlerContext & ctx, const Commands::TransferAnchorComplete::DecodableType & commandData);
 
     static void OnTrustVerificationCompletion(CHIP_ERROR err);
+
+    // Cleans up asynchronous resources used in HandleAnnounceJointFabricAdministrator
+    void CleanupAnnounceJFA();
+
+    std::optional<CommandHandler::Handle> mActiveCommandHandle;
+    std::optional<JCMCommissionee> mActiveCommissionee;
 };
 
 JointFabricAdministratorGlobalInstance gJointFabricAdministratorGlobalInstance;
@@ -210,36 +218,58 @@ void JointFabricAdministratorGlobalInstance::HandleAnnounceJointFabricAdministra
     ChipLogProgress(JointFabric, "Received an AnnounceJointFabricAdministrator command with endpointID=%u", commandData.endpointID);
 
     std::optional<Status> globalStatus = std::nullopt;
-    app::CommandHandler::Handle handle(&ctx.mCommandHandler);
     ConcreteCommandPath cachedPath(ctx.mRequestPath.mEndpointId, ctx.mRequestPath.mClusterId, ctx.mRequestPath.mCommandId);
 
-    auto onComplete = [&handle, cachedPath](const CHIP_ERROR & err) {
-        if (err == CHIP_NO_ERROR)
+    auto onComplete = [this, cachedPath](const CHIP_ERROR & err) {
+        if (mActiveCommandHandle.has_value())
         {
-            ChipLogProgress(JointFabric, "Successfully verified trust against commissioning fabric administrator");
-            handle.Get()->AddStatus(cachedPath, Status::Success);
+            auto * commandHandler = mActiveCommandHandle.value().Get();
+            if (err == CHIP_NO_ERROR)
+            {
+                ChipLogProgress(JointFabric, "Successfully verified trust against commissioning fabric administrator");
+                commandHandler->AddStatus(cachedPath, Status::Success);
+            }
+            else
+            {
+                ChipLogProgress(JointFabric, "Failed to verify trust against commissioning fabric administrator");
+                commandHandler->AddStatus(cachedPath, Status::Failure);
+            }
         }
-        else
-        {
-            ChipLogProgress(JointFabric, "Failed to verify trust against commissioning fabric administrator");
-            handle.Get()->AddStatus(cachedPath, Status::Failure);
-        }
+
+        // TODO: Potential edge case: if TrustVerification is interrupted such that this callback isn't invoked,
+        // CleanupAnnounceJFA wouldn't run and HandleAnnounceJointFabricAdministrator will permanently return Status::Busy.
+        CleanupAnnounceJFA();
     };
 
     VerifyOrExit(commandData.endpointID != kInvalidEndpointId, globalStatus = Status::ConstraintError);
 
-    // Scope the next section so that we can instantiate the JCMCommissionee without VerifyOrExit messing with
-    // construction/destruction.
-    {
-        JCMCommissionee jcmCommissionee(handle, commandData.endpointID, onComplete);
-        VerifyOrExit(jcmCommissionee.VerifyTrustAgainstCommissionerAdmin() == CHIP_NO_ERROR, globalStatus = Status::Failure);
-    }
+    // If we have an active commissionee, that means another AnnounceJointFabricAdministrator command is already being serviced.
+    // Respond that the server is busy.
+    VerifyOrExit(!mActiveCommissionee.has_value() && !mActiveCommandHandle.has_value(), globalStatus = Status::Busy);
+
+    mActiveCommandHandle.emplace(&ctx.mCommandHandler);
+    mActiveCommissionee.emplace(mActiveCommandHandle.value(), commandData.endpointID, std::move(onComplete));
+
+    VerifyOrExit(mActiveCommissionee->VerifyTrustAgainstCommissionerAdmin() == CHIP_NO_ERROR, {
+        CleanupAnnounceJFA();
+        globalStatus = Status::Failure;
+    });
+
+    return;
 exit:
     if (globalStatus.has_value())
     {
         ChipLogProgress(JointFabric, "Failed to handle AnnounceJointFabricAdministrator");
-        handle.Get()->AddStatus(cachedPath, globalStatus.value());
+        ctx.mCommandHandler.AddStatus(cachedPath, globalStatus.value());
+        // CommandHandler::Handle handle(&ctx.mCommandHandler);
+        // handle.Get()->AddStatus(cachedPath, globalStatus.value());
     }
+}
+
+void JointFabricAdministratorGlobalInstance::CleanupAnnounceJFA()
+{
+    mActiveCommissionee.reset();
+    mActiveCommandHandle.reset();
 }
 
 void JointFabricAdministratorGlobalInstance::HandleICACCSRRequest(HandlerContext & ctx,
