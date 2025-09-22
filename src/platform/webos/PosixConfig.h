@@ -32,7 +32,7 @@ namespace chip {
 namespace DeviceLayer {
 namespace Internal {
 
-class ChipLinuxStorage;
+class ChipWebOSStorage;
 
 /**
  * Provides functions and definitions for accessing device configuration information on the Posix.
@@ -111,7 +111,7 @@ public:
     static CHIP_ERROR ClearNamespace(const char * ns);
 
 private:
-    static ChipLinuxStorage * GetStorageForNamespace(Key key);
+    static ChipWebOSStorage * GetStorageForNamespace(Key key);
 };
 
 struct PosixConfig::Key

@@ -10,6 +10,9 @@
  *
  * LICENSE@@@
  */
+#include <lib/support/logging/CHIPLogging.h>
+#include <platform/PlatformManager.h>
+#include <platform/webos/wbs/WebosLockTracker.h>
 namespace chip {
 namespace Platform {
 namespace Internal {

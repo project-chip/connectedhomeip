@@ -6,9 +6,11 @@
 #include <gio/gio.h>
 #include <glib-object.h>
 #include <glib.h>
+#include <lib/core/CHIPError.h>
 #include <luna-service2++/handle.hpp>
 #include <platform/GLibTypeDeleter.h>
 #include <string>
+#include <system/SystemPacketBuffer.h>
 
 namespace chip {
 namespace DeviceLayer {
@@ -84,7 +86,7 @@ private:
 
     // Static Function
     static CHIP_ERROR ConnectDeviceImpl(ConnectParams * apParams);
-    static CHIP_ERROR SendIndicationImpl(ConnectionDataBundle * data); //(NEED TO UPDATE!!!!)
+    static CHIP_ERROR SendIndicationImpl(ConnectionDataBundle * data);
     static CHIP_ERROR SendWriteRequestImpl(ConnectionDataBundle * data);
     static CHIP_ERROR SubscribeCharacteristicImpl(BLE_CONNECTION_OBJECT apConn);
     static CHIP_ERROR UnsubscribeCharacteristicImpl(BLE_CONNECTION_OBJECT connection);
@@ -96,7 +98,7 @@ private:
     bool mNotifyAcquired = false;
     uint16_t mMtu        = 0;
     std::string mClientId;
-    uint32_t uMonitorToken;
+    uint32_t mMonitorToken;
     WbsEndpoint * mEndpoint;
 };
 

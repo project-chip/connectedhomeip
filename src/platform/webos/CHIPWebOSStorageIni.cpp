@@ -34,7 +34,7 @@
 #include <lib/support/TemporaryFileStream.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/internal/CHIPDeviceLayerInternal.h>
-#include <platform/webos/ChipWebOSStorageIni.h>
+#include <platform/webos/CHIPWebOSStorageIni.h>
 
 using namespace chip::IniEscaping;
 

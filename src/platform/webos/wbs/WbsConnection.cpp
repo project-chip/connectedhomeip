@@ -69,7 +69,6 @@ CHIP_ERROR WbsConnection::SendIndication(chip::System::PacketBufferHandle apBuf)
     // return PlatformMgrImpl().GLibMatterContextInvokeSync(SendIndicationImpl, &bundle);
 }
 
-// Need to update
 CHIP_ERROR WbsConnection::SendIndicationImpl(ConnectionDataBundle * data)
 {
     bool ret                  = false;
@@ -260,7 +259,7 @@ CHIP_ERROR WbsConnection::SubscribeCharacteristicImpl(BLE_CONNECTION_OBJECT conn
     ret = lsRequester->lsSubscribe(API_BLUETOOTH_GATT_MONITORCHRACTERISTICS, lunaParam.stringify().c_str(), conn,
                                    gattMonitorCharateristicsCb, &ulToken);
 
-    conn->uMonitorToken = ulToken;
+    conn->mMonitorToken = ulToken;
 
     std::this_thread::sleep_for(std::chrono::milliseconds(3000)); // To Prevent Crash between WBS <-> BLE
 
@@ -299,7 +298,7 @@ CHIP_ERROR WbsConnection::UnsubscribeCharacteristicImpl(BLE_CONNECTION_OBJECT co
 
     VerifyOrExit(connection != nullptr, ChipLogError(DeviceLayer, "WbsConnection is NULL in %s", __func__));
 
-    VerifyOrExit(LsRequester::getInstance()->lsCallCancel(connection->monitorToken) == true,
+    VerifyOrExit(LsRequester::getInstance()->lsCallCancel(connection->mMonitorToken) == true,
                  ChipLogError(DeviceLayer, "lsCallCancel failed"));
 
     result = CHIP_NO_ERROR;
@@ -476,12 +475,6 @@ void WbsConnection::CancelConnect()
     }
     return;
 }
-
-/*WbsConnection::ConnectionDataBundle(const WbsConnection & aConn,
-                                                            const chip::System::PacketBufferHandle & aBuf) :
-    mConn(aConn),
-    mData(g_variant_new_fixed_array(G_VARIANT_TYPE_BYTE, aBuf->Start(), aBuf->DataLength(), sizeof(uint8_t)))
-{}*/
 
 void WbsConnection::UpdateConnectionTable(std::string remoteAddr, std::string clientId, WbsEndpoint & aEndpoint)
 {

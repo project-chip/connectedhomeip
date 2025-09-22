@@ -11,16 +11,17 @@
  * LICENSE@@@
  */
 
-#include <platform/CHIPDeviceConfig.h>
-#include <glib.h>
+#pragma once
 #include "LsRequester.h"
 #include "WbsConnection.h"
 #include "WebosLockTracker.h"
 #include <ble/Ble.h>
+#include <glib.h>
 #include <lib/core/CHIPError.h>
 #include <luna-service2++/handle.hpp>
 #include <luna-service2/lunaservice.h>
 #include <pbnjson.hpp>
+#include <platform/CHIPDeviceConfig.h>
 #include <system/SystemLayer.h>
 
 namespace chip {
