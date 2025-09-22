@@ -119,9 +119,9 @@ silabs_executable("thermostat_app") {
   sources = [
     "${examples_common_plat_dir}/main.cpp",
     "src/AppTask.cpp",
+    "src/DataModelCallbacks.cpp",
     "src/SensorManager.cpp",
     "src/TemperatureManager.cpp",
-    "src/ZclCallbacks.cpp",
   ]
 
   if (!disable_lcd) {
