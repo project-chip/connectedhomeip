@@ -673,7 +673,7 @@ public:
     {}
     ~UnsupportedReadAccessInterface() = default;
 
-    CHIP_ERROR Read(const ConcreteReadAttributePath & path, AttributeValueEncoder & encoder) override
+    CHIP_ERROR Read(const ConcreteReadAttributePath & path, AttributeValueEncoder & _) override
     {
         if (static_cast<const ConcreteAttributePath &>(path) != mPath)
         {
@@ -682,6 +682,17 @@ public:
         }
 
         return CHIP_IM_GLOBAL_STATUS(UnsupportedRead);
+    }
+
+    CHIP_ERROR Write(const ConcreteDataAttributePath & path, AttributeValueDecoder & _) override
+    {
+        if (static_cast<const ConcreteAttributePath &>(path) != mPath)
+        {
+            // returning without trying to handle means "I do not handle this"
+            return CHIP_NO_ERROR;
+        }
+
+        return CHIP_IM_GLOBAL_STATUS(UnsupportedWrite);
     }
 
 private:
@@ -2133,6 +2144,81 @@ TEST_F(TestCodegenModelViaMocks, AttributeAccessInterfaceListIncrementalRead)
     }
 }
 
+// reading attributes is a LOT of boilerplate. This just makes tests more readable.
+static CHIP_ERROR ReadU32Attribute(DataModel::Provider & provider, const ConcreteAttributePath & path, uint32_t & value)
+{
+
+    ReadOperation testRequest(path);
+    testRequest.SetSubjectDescriptor(kAdminSubjectDescriptor);
+
+    std::unique_ptr<AttributeValueEncoder> encoder = testRequest.StartEncoding();
+    ReturnErrorOnFailure(provider.ReadAttribute(testRequest.GetRequest(), *encoder).GetUnderlyingError());
+    ReturnErrorOnFailure(testRequest.FinishEncoding());
+
+    std::vector<DecodedAttributeData> attribute_data;
+
+    ReturnErrorOnFailure(testRequest.GetEncodedIBs().Decode(attribute_data));
+    VerifyOrReturnError(attribute_data.size() == 1u, CHIP_ERROR_INCORRECT_STATE);
+
+    DecodedAttributeData & encodedData = attribute_data[0];
+
+    VerifyOrReturnError(encodedData.attributePath == testRequest.GetRequest().path, CHIP_ERROR_INCORRECT_STATE);
+
+    return chip::app::DataModel::Decode<uint32_t>(encodedData.dataReader, value);
+}
+
+TEST_F(TestCodegenModelViaMocks, AttributeAccessInterfaceTakesPrecedenceOverServerClusterInterface)
+{
+    // For backwards compatibility, we want AAI requests to be sent first and override SCI
+    // The test verifies this by adding a "error-out" AAI that overrides success SCI
+    TestServerClusterContext testContext;
+
+    UseMockNodeConfig config(gTestNodeConfig);
+    CodegenDataModelProviderWithContext model;
+
+    model.SetPersistentStorageDelegate(&testContext.StorageDelegate());
+    ASSERT_EQ(model.Startup(testContext.ImContext()), CHIP_NO_ERROR);
+
+    const ConcreteClusterPath kTestClusterPath(kMockEndpoint1, MockClusterId(2));
+    const ConcreteAttributePath kTestAttributePath(kTestClusterPath.mEndpointId, kTestClusterPath.mClusterId,
+                                                   kAttributeIdFakeAllowsWrite);
+    FakeDefaultServerCluster fakeClusterServer(kTestClusterPath);
+    ServerClusterRegistration registration(fakeClusterServer);
+
+    // SCI registered for kTestClusterPath, and this will work by a R/W for kTestAttributePath
+    ASSERT_EQ(model.Registry().Register(registration), CHIP_NO_ERROR);
+
+    {
+        // AAI registered that fails R/W
+        RegisteredAttributeAccessInterface<UnsupportedReadAccessInterface> aai(kTestAttributePath);
+
+        // Reads fail because AAI
+        uint32_t value = 0;
+        ASSERT_EQ(ReadU32Attribute(model, kTestAttributePath, value), CHIP_IM_GLOBAL_STATUS(UnsupportedRead));
+
+        // Writes fail because AAI
+        WriteOperation test(kTestAttributePath);
+        test.SetSubjectDescriptor(kAdminSubjectDescriptor);
+        AttributeValueDecoder decoder = test.DecoderFor(value);
+
+        // write should succeed
+        ASSERT_FALSE(model.WriteAttribute(test.GetRequest(), decoder).IsSuccess());
+    }
+
+    {
+        // now that AAI is out of the picture, SCI will read/write things ok
+        uint32_t value = 0;
+        ASSERT_EQ(ReadU32Attribute(model, kTestAttributePath, value), CHIP_NO_ERROR);
+
+        WriteOperation test(kTestAttributePath);
+        test.SetSubjectDescriptor(kAdminSubjectDescriptor);
+        AttributeValueDecoder decoder = test.DecoderFor(value);
+
+        // write should succeed
+        ASSERT_TRUE(model.WriteAttribute(test.GetRequest(), decoder).IsSuccess());
+    }
+}
+
 TEST_F(TestCodegenModelViaMocks, EmberAttributeWriteBasicTypes)
 {
     TestEmberScalarTypeWrite<uint8_t, ZCL_INT8U_ATTRIBUTE_TYPE>(0x12);
@@ -2643,29 +2729,6 @@ TEST_F(TestCodegenModelViaMocks, SemanticTagIteration)
     EXPECT_EQ(tag.namespaceID, kNamespaceID3);
     EXPECT_EQ(tag.tag, kTag3);
     EXPECT_FALSE(tag.label.HasValue());
-}
-
-// reading attributes is a LOT of boilerplate. This just makes tests more readable.
-static CHIP_ERROR ReadU32Attribute(DataModel::Provider & provider, const ConcreteAttributePath & path, uint32_t & value)
-{
-
-    ReadOperation testRequest(path);
-    testRequest.SetSubjectDescriptor(kAdminSubjectDescriptor);
-
-    std::unique_ptr<AttributeValueEncoder> encoder = testRequest.StartEncoding();
-    ReturnErrorOnFailure(provider.ReadAttribute(testRequest.GetRequest(), *encoder).GetUnderlyingError());
-    ReturnErrorOnFailure(testRequest.FinishEncoding());
-
-    std::vector<DecodedAttributeData> attribute_data;
-
-    ReturnErrorOnFailure(testRequest.GetEncodedIBs().Decode(attribute_data));
-    VerifyOrReturnError(attribute_data.size() == 1u, CHIP_ERROR_INCORRECT_STATE);
-
-    DecodedAttributeData & encodedData = attribute_data[0];
-
-    VerifyOrReturnError(encodedData.attributePath == testRequest.GetRequest().path, CHIP_ERROR_INCORRECT_STATE);
-
-    return chip::app::DataModel::Decode<uint32_t>(encodedData.dataReader, value);
 }
 
 TEST_F(TestCodegenModelViaMocks, ServerClusterInterfacesWrite)
