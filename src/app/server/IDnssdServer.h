@@ -20,16 +20,15 @@
 #include <lib/core/CHIPError.h>
 
 namespace chip {
-// namespace app {
-class IDnssdServer
+class DnssdServer
 {
 public:
-    virtual ~IDnssdServer()                   = default;
+    virtual ~DnssdServer()                   = default;
     virtual CHIP_ERROR AdvertiseOperational() = 0;
     virtual bool IsAdvertisingEnabled()       = 0;
 };
 
-class DnnsdServerWrapper : public IDnssdServer
+class PlatformDnssdServer : public DnssdServer
 {
     CHIP_ERROR AdvertiseOperational() override { return app::DnssdServer::Instance().AdvertiseOperational(); }
 
@@ -38,5 +37,4 @@ class DnnsdServerWrapper : public IDnssdServer
         return false; // placeholder
     }
 };
-// } // namespace app
 } // namespace chip

@@ -114,7 +114,7 @@ static void StopEventLoop(intptr_t context)
     chip::DeviceLayer::PlatformMgr().StopEventLoopTask();
 }
 
-class MockDnssdServer : public chip::IDnssdServer
+class MockDnssdServer : public chip::DnssdServer
 {
 public:
     MockDnssdServer() : mAdvertisingEnabled(false) {}
