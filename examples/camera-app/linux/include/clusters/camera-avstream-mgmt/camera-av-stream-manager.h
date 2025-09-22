@@ -92,11 +92,17 @@ public:
 
     bool HasAllocatedAudioStreams() override;
 
+    CHIP_ERROR SetHardPrivacyModeOn(bool hardPrivacyMode) override;
+
     CHIP_ERROR PersistentAttributesLoadedCallback() override;
 
     CHIP_ERROR OnTransportAcquireAudioVideoStreams(uint16_t audioStreamID, uint16_t videoStreamID) override;
 
     CHIP_ERROR OnTransportReleaseAudioVideoStreams(uint16_t audioStreamID, uint16_t videoStreamID) override;
+
+    const std::vector<chip::app::Clusters::CameraAvStreamManagement::VideoStreamStruct> & GetAllocatedVideoStreams() const override;
+
+    const std::vector<chip::app::Clusters::CameraAvStreamManagement::AudioStreamStruct> & GetAllocatedAudioStreams() const override;
 
     CameraAVStreamManager()  = default;
     ~CameraAVStreamManager() = default;

@@ -557,9 +557,9 @@ def BuildNxpTarget():
     target.AppendModifier(name="thread", enable_thread=True).ExceptIfRe('zephyr')
     target.AppendModifier(name="matter-shell", enable_shell=True)
     target.AppendModifier(name="factory-build", enable_factory_data_build=True).OnlyIfRe('rt1060|rt1170|rw61x')
-    target.AppendModifier(name="frdm", board_variant=NxpBoardVariant.FRDM).OnlyIfRe('rw61x|mcxw71')
+    target.AppendModifier(name="frdm", board_variant=NxpBoardVariant.FRDM).OnlyIfRe('rw61x|mcxw71|mcxw72')
     target.AppendModifier(name="cmake", build_system=NxpBuildSystem.CMAKE).ExceptIfRe(
-        'laundry-washer').OnlyIfRe('rt1060|rt1170|rw61x|mcxw71')
+        'laundry-washer').OnlyIfRe('rt1060|rt1170|rw61x|mcxw71|mcxw72')
     target.AppendModifier(name="evkc", board_variant=NxpBoardVariant.EVKC).OnlyIfRe('rt1060')
     target.AppendModifier(name="iw416", iw416_transceiver=True).OnlyIfRe('rt1060')
     target.AppendModifier(name="w8801", w8801_transceiver=True).OnlyIfRe('rt1060')
@@ -836,6 +836,7 @@ def BuildRealtekTarget():
     # board
     target.AppendFixedTargets([
         TargetPart('rtl8777g', board=RealtekBoard.RTL8777G),
+        TargetPart('rtl87x2g', board=RealtekBoard.RTL87X2G),
     ])
 
     # apps

@@ -46,7 +46,7 @@ using chip::Protocols::InteractionModel::Status;
 static constexpr uint16_t kSpecMaxCertBytes            = 3000;
 static constexpr uint16_t kSpecMaxFingerprintBytes     = 64;
 static constexpr uint16_t kMaxIntermediateCertificates = 10;
-static constexpr uint16_t kMaxNonceBytes               = 32;
+static constexpr uint16_t kNonceBytes                  = 32;
 static constexpr uint16_t kMaxSignatureBytes           = 128;
 
 TlsCertificateManagementServer::TlsCertificateManagementServer(EndpointId endpointId, TlsCertificateManagementDelegate & delegate,
@@ -331,7 +331,7 @@ void TlsCertificateManagementServer::HandleGenerateClientCsr(HandlerContext & ct
 {
     ChipLogDetail(Zcl, "TlsCertificateManagement: ClientCSR");
 
-    VerifyOrReturn(req.nonce.size() <= kMaxNonceBytes, ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ConstraintError));
+    VerifyOrReturn(req.nonce.size() == kNonceBytes, ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ConstraintError));
 
     auto fabric = ctx.mCommandHandler.GetAccessingFabricIndex();
     uint8_t numClientCerts;

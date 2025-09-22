@@ -87,7 +87,7 @@ struct SnapshotStream
     bool IsCompatible(const chip::app::Clusters::CameraAvStreamManagement::CameraAVStreamMgmtDelegate::SnapshotStreamAllocateArgs &
                           inputParams) const
     {
-        return (snapshotStreamParams.imageCodec == inputParams.imageCodec && snapshotStreamParams.quality == inputParams.quality &&
+        return (snapshotStreamParams.imageCodec == inputParams.imageCodec &&
                 snapshotStreamParams.frameRate <= inputParams.maxFrameRate &&
                 snapshotStreamParams.minResolution.width <= inputParams.minResolution.width &&
                 snapshotStreamParams.minResolution.height <= inputParams.minResolution.height &&
@@ -277,8 +277,9 @@ public:
         // Does camera have a hard privacy switch
         virtual bool HasHardPrivacySwitch() = 0;
 
-        // Get whether hard privacy mode is on
-        virtual bool GetHardPrivacyMode() = 0;
+        // Get/Set hard privacy mode
+        virtual CameraError SetHardPrivacyMode(bool hardPrivacyMode) = 0;
+        virtual bool GetHardPrivacyMode()                            = 0;
 
         // Get/Set night vision
         virtual CameraError SetNightVision(TriStateAutoEnum nightVision) = 0;
