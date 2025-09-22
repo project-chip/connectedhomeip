@@ -34,11 +34,13 @@ public:
     }
 
     /**
-     * Set the default delegate of the diagnostic logs cluster for the specified endpoint
+     * Set the default delegate of the diagnostic logs cluster.
      *
-     * @param endpoint ID of the endpoint
+     * @note The `endpoint` parameter is ignored,
+     * as diagnostic logs are a node-wide utility and not specific to any endpoint.
      *
-     * @param delegate The log provider delegate at the endpoint
+     * @param endpoint Ignored. Was intended to be the ID of the endpoint.
+     * @param delegate The log provider delegate.
      */
     void SetDiagnosticLogsProviderDelegate(EndpointId endpoint, DiagnosticLogsProviderDelegate * delegate);
 };

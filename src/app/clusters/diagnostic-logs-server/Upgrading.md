@@ -8,7 +8,7 @@ What Changed
 
 #### SetDelegate() API Updated
 
-Old API (deprecated):
+Old API:
 
 ```
 using chip::app::clusters::DiagnosticLogs;
@@ -27,17 +27,3 @@ DiagnosticLogsCluster::Instance().SetDelegate(delegate);
 
 -   No endpointId required.
 -   Clearer: directly sets the global delegate on the singleton cluster.
-
-#### Backward Compatibility
-
-For migration ease:
-
-The old method
-
-```
-DiagnosticLogsServer::SetDiagnosticLogsProviderDelegate(endpointId, delegate)
-```
-
-still exists.
-
-callers should migrate to the new Instance().SetDelegate() API.
