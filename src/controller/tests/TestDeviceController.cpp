@@ -39,6 +39,18 @@ chip::Credentials::GroupDataProviderImpl sProvider(5, 8);
 
 namespace {
 
+class Engine_raii {
+public:
+    Engine_raii(): engine{ chip::app::InteractionModelEngine::GetInstance() } {}
+
+    ~Engine_raii() { engine->Shutdown(); }
+
+    chip::app::InteractionModelEngine * operator->() { return engine; }
+
+private:
+    chip::app::InteractionModelEngine * engine;     
+};
+
 class FactoryInitParamsSetter
 {
 public:
@@ -153,7 +165,7 @@ TEST_F(TestDeviceControllerFactory, DeviceControllerFactoryMethods_FailInit)
 {
     chip::Controller::FactoryInitParams factoryInitParams = params.GetFactoryInitParams();
     // Initialize the ember side server logic
-    auto * engine = chip::app::InteractionModelEngine::GetInstance();
+    Engine_raii engine;
     EXPECT_EQ(engine->Init(&GetExchangeManager(), &GetFabricTable(), chip::app::reporting::GetDefaultReportScheduler()),
               CHIP_NO_ERROR);
 
@@ -163,16 +175,13 @@ TEST_F(TestDeviceControllerFactory, DeviceControllerFactoryMethods_FailInit)
 
     // Init device controller factory
     factoryInitParams.dataModelProvider = engine->GetDataModelProvider();
-
-    // Free engine before finish
-    engine->Shutdown();
 } // DeviceControllerFactoryMethods_FailInit
 
 TEST_F(TestDeviceControllerFactory, DeviceControllerFactoryMethods_DobleInit)
 {
     chip::Controller::FactoryInitParams factoryInitParams = params.GetFactoryInitParams();
     // Initialize the ember side server logic
-    auto * engine = chip::app::InteractionModelEngine::GetInstance();
+    Engine_raii engine;
     EXPECT_EQ(engine->Init(&GetExchangeManager(), &GetFabricTable(), chip::app::reporting::GetDefaultReportScheduler()),
               CHIP_NO_ERROR);
 
@@ -183,9 +192,6 @@ TEST_F(TestDeviceControllerFactory, DeviceControllerFactoryMethods_DobleInit)
     EXPECT_EQ(DeviceControllerFactory::GetInstance().Init(factoryInitParams), CHIP_NO_ERROR);
     EXPECT_EQ(DeviceControllerFactory::GetInstance().Init(factoryInitParams), CHIP_NO_ERROR);
     DeviceControllerFactory::GetInstance().Shutdown();
-
-    // Free engine before finish
-    engine->Shutdown();
 } // DeviceControllerFactoryMethods_DobleInit
 
 TEST_F(TestDeviceControllerFactory, DeviceControllerFactoryMethods_SetupControllerAndCommissioner)
@@ -196,7 +202,7 @@ TEST_F(TestDeviceControllerFactory, DeviceControllerFactoryMethods_SetupControll
     chip::Controller::DeviceCommissioner commissioner;
     chip::Controller::DeviceController device;
     // Initialize the ember side server logic
-    auto * engine = chip::app::InteractionModelEngine::GetInstance();
+    Engine_raii engine;
     EXPECT_EQ(engine->Init(&GetExchangeManager(), &GetFabricTable(), chip::app::reporting::GetDefaultReportScheduler()),
               CHIP_NO_ERROR);
 
@@ -223,9 +229,6 @@ TEST_F(TestDeviceControllerFactory, DeviceControllerFactoryMethods_SetupControll
 
     EXPECT_TRUE(DeviceControllerFactory::GetInstance().ReleaseSystemState());
     DeviceControllerFactory::GetInstance().Shutdown();
-
-    // Free engine before finish
-    engine->Shutdown();
 } // DeviceControllerFactoryMethods_SetupControllerAndCommissioner
 
 TEST_F(TestDeviceControllerFactory, DeviceControllerFactoryMethods_RetainAndRelease)
@@ -234,7 +237,7 @@ TEST_F(TestDeviceControllerFactory, DeviceControllerFactoryMethods_RetainAndRele
     chip::TestPersistentStorageDelegate storage;
     chip::Controller::SetupParams dparams;
     // Initialize the ember side server logic
-    auto * engine = chip::app::InteractionModelEngine::GetInstance();
+    Engine_raii engine;
     EXPECT_EQ(engine->Init(&GetExchangeManager(), &GetFabricTable(), chip::app::reporting::GetDefaultReportScheduler()),
               CHIP_NO_ERROR);
 
@@ -265,9 +268,6 @@ TEST_F(TestDeviceControllerFactory, DeviceControllerFactoryMethods_RetainAndRele
     EXPECT_EQ(DeviceControllerFactory::GetInstance().EnsureAndRetainSystemState(), CHIP_NO_ERROR);
     EXPECT_TRUE(DeviceControllerFactory::GetInstance().ReleaseSystemState());
     DeviceControllerFactory::GetInstance().Shutdown();
-
-    // Free engine before finish
-    engine->Shutdown();
 } // DeviceControllerFactoryMethods_RetainAndRelease
 
 } // namespace
