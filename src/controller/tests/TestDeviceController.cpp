@@ -39,7 +39,8 @@ chip::Credentials::GroupDataProviderImpl sProvider(5, 8);
 
 namespace {
 
-class Engine_raii {
+class Engine_raii
+{
 public:
     Engine_raii() : engine{ chip::app::InteractionModelEngine::GetInstance() } {}
 
