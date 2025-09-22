@@ -15,6 +15,9 @@
 import os
 import signal
 import tempfile
+import threading
+import subprocess
+import time
 from dataclasses import dataclass
 from typing import Optional, Union
 
@@ -138,6 +141,79 @@ class JFControllerSubprocess(Subprocess):
         # Start the server application
         super().__init__(*command,  # Pass the constructed command list
                          output_cb=lambda line, is_stderr: self.PREFIX + line)
+
+
+class OTAProviderLaunchSU:
+    def __init__(self, ota_file: str, discriminator: int, passcode: int, secured_device_port: int,
+                 wait_for: str, queue: str = None, timeout: int = None, override_image_uri: str = None,
+                 log_file: str = "provider.log"):
+        self.ota_file = ota_file
+        self.discriminator = discriminator
+        self.passcode = passcode
+        self.secured_device_port = secured_device_port
+        self.wait_for = wait_for
+        self.queue = queue
+        self.timeout = timeout
+        self.override_image_uri = override_image_uri
+        self.log_file = log_file
+        self.proc = None
+
+    def start(self) -> subprocess.Popen:
+        args = [
+            "./out/debug/chip-ota-provider-app",
+            f"--filepath={self.ota_file}",
+            f"--discriminator={self.discriminator}",
+            f"--passcode={self.passcode}",
+            f"--secured-device-port={self.secured_device_port}",
+            f"--KVS=/tmp/chip_kvs_provider"
+        ]
+
+        if self.queue:
+            args += ["-q", self.queue]
+        if self.timeout:
+            args += ["-t", str(self.timeout)]
+        if self.override_image_uri:
+            args += [f"-i={self.override_image_uri}"]
+
+        open(self.log_file, "w").close()
+
+        self.proc = subprocess.Popen(args, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
+
+        found_wait_for = False
+        start_time = time.time()
+
+        while True:
+            line = self.proc.stdout.readline()
+            if line:
+                with open(self.log_file, "a") as f:
+                    f.write(line)
+                    f.flush()
+                if not found_wait_for and self.wait_for in line:
+                    found_wait_for = True
+                    # logger.info(f"Provider reached status: {self.wait_for}")
+                    break
+            elif self.proc.poll() is not None:
+                break
+
+            if self.timeout and time.time() - start_time > self.timeout:
+                break
+
+            time.sleep(0.1)
+
+        if not found_wait_for:
+            self.proc.terminate()
+            raise RuntimeError(f"Provider did not reach expected status: {self.wait_for}")
+
+        # Thread para seguir escribiendo log en tiempo real
+        def _follow_output(proc):
+            for line in proc.stdout:
+                with open(self.log_file, "a") as f:
+                    f.write(line)
+                    f.flush()
+
+        threading.Thread(target=_follow_output, args=(self.proc,), daemon=True).start()
+
+        return self.proc
 
 
 class OTAProviderSubprocess(AppServerSubprocess):
