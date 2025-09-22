@@ -2216,6 +2216,9 @@ TEST_F(TestCodegenModelViaMocks, AttributeAccessInterfaceTakesPrecedenceOverServ
         // write should succeed
         ASSERT_TRUE(model.WriteAttribute(test.GetRequest(), decoder).IsSuccess());
     }
+
+    model.Registry().Unregister(&fakeClusterServer);
+    model.Shutdown();
 }
 
 TEST_F(TestCodegenModelViaMocks, EmberAttributeWriteBasicTypes)
