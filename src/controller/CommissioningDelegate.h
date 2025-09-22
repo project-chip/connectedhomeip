@@ -63,19 +63,27 @@ enum CommissioningStage : uint8_t
     kConfigureTrustedTimeSource, ///< Configure a trusted time source if one is required and available (must be done after SendNOC)
     kICDGetRegistrationInfo,     ///< Waiting for the higher layer to provide ICD registration informations.
     kICDRegistration,            ///< Register for ICD management
-    kWiFiNetworkSetup,           ///< Send AddOrUpdateWiFiNetwork (0x31:2) command to the device
-    kThreadNetworkSetup,         ///< Send AddOrUpdateThreadNetwork (0x31:3) command to the device
-    kFailsafeBeforeWiFiEnable,   ///< Extend the fail-safe before doing kWiFiNetworkEnable
-    kFailsafeBeforeThreadEnable, ///< Extend the fail-safe before doing kThreadNetworkEnable
-    kWiFiNetworkEnable,          ///< Send ConnectNetwork (0x31:6) command to the device for the WiFi network
-    kThreadNetworkEnable,        ///< Send ConnectNetwork (0x31:6) command to the device for the Thread network
-    kEvictPreviousCaseSessions,  ///< Evict previous stale case sessions from a commissioned device with this node ID before
+
+    // NOTE: If any new steps are added between kWiFiNetworkSetup and kICDSendStayActive, double-check
+    // whether the logic in AutoCommissioner::CommissioningStepFinished that checks for "network
+    // failure" conditions still makes sense.
+    kWiFiNetworkSetup,             ///< Send AddOrUpdateWiFiNetwork (0x31:2) command to the device
+    kThreadNetworkSetup,           ///< Send AddOrUpdateThreadNetwork (0x31:3) command to the device
+    kFailsafeBeforeWiFiEnable,     ///< Extend the fail-safe before doing kWiFiNetworkEnable
+    kFailsafeBeforeThreadEnable,   ///< Extend the fail-safe before doing kThreadNetworkEnable
+    kWiFiNetworkEnable,            ///< Send ConnectNetwork (0x31:6) command to the device for the WiFi network
+    kThreadNetworkEnable,          ///< Send ConnectNetwork (0x31:6) command to the device for the Thread network
+    kEvictPreviousCaseSessions,    ///< Evict previous stale case sessions from a commissioned device with this node ID before
     kFindOperationalForStayActive, ///< Perform operational discovery and establish a CASE session with the device for ICD
                                    ///< StayActive command
     kFindOperationalForCommissioningComplete, ///< Perform operational discovery and establish a CASE session with the device for
                                               ///< Commissioning Complete command
     kSendComplete,                            ///< Send CommissioningComplete (0x30:4) command to the device
     kICDSendStayActive,                       ///< Send Keep Alive to ICD
+    // NOTE: If any new steps are added between kWiFiNetworkSetup and kICDSendStayActive, double-check
+    // whether the logic in AutoCommissioner::CommissioningStepFinished that checks for "network
+    // failure" conditions still makes sense.
+
     /// Send ScanNetworks (0x31:0) command to the device.
     /// ScanNetworks can happen anytime after kArmFailsafe.
     kScanNetworks,
