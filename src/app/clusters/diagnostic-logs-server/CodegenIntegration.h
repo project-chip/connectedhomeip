@@ -27,7 +27,11 @@ namespace DiagnosticLogs {
 class DiagnosticLogsServer
 {
 public:
-    static DiagnosticLogsServer & Instance();
+    static DiagnosticLogsServer & Instance()
+    {
+        static DiagnosticLogsServer instance;
+        return instance;
+    }
 
     /**
      * Set the default delegate of the diagnostic logs cluster for the specified endpoint
@@ -37,9 +41,6 @@ public:
      * @param delegate The log provider delegate at the endpoint
      */
     void SetDiagnosticLogsProviderDelegate(EndpointId endpoint, DiagnosticLogsProviderDelegate * delegate);
-
-private:
-    static DiagnosticLogsServer sInstance;
 };
 
 } // namespace DiagnosticLogs

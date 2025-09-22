@@ -64,13 +64,6 @@ namespace app {
 namespace Clusters {
 namespace DiagnosticLogs {
 
-DiagnosticLogsServer DiagnosticLogsServer::sInstance;
-
-DiagnosticLogsServer & DiagnosticLogsServer::Instance()
-{
-    return sInstance;
-}
-
 void DiagnosticLogsServer::SetDiagnosticLogsProviderDelegate(EndpointId endpoint, DiagnosticLogsProviderDelegate * delegate)
 {
     gServer->SetDelegate(delegate);
