@@ -44,6 +44,9 @@ public:
     CHIP_ERROR GeneratedCommands(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<CommandId> & builder) override;
     CHIP_ERROR Attributes(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder) override;
 
+    // Method used to report attributes changes called from the cluster functions.
+    void OperationalCredentialsNotifyAttribute(AttributeId attributeId);
+
     // FabricTable delegate
     void FabricWillBeRemoved(const FabricTable & fabricTable, FabricIndex fabricIndex) override;
     void OnFabricRemoved(const FabricTable & fabricTable, FabricIndex fabricIndex) override;

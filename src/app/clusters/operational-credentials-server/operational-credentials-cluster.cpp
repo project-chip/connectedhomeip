@@ -400,7 +400,7 @@ exit:
 
 std::optional<DataModel::ActionReturnStatus> HandleAddNOC(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
                                                           Commands::AddNOC::DecodableType & commandData, FabricTable & fabricTable,
-                                                          FailSafeContext & failSafeContext)
+                                                          FailSafeContext & failSafeContext, OperationalCredentialsCluster * cluster)
 {
     MATTER_TRACE_SCOPE("AddNOC", "OperationalCredentials");
     auto & NOCValue          = commandData.NOCValue;
@@ -539,12 +539,10 @@ std::optional<DataModel::ActionReturnStatus> HandleAddNOC(CommandHandler * comma
     }
 
     // Notify the attributes containing fabric metadata can be read with new data
-    MatterReportingAttributeChangeCallback(commandPath.mEndpointId, OperationalCredentials::Id,
-                                           OperationalCredentials::Attributes::Fabrics::Id);
+    cluster->OperationalCredentialsNotifyAttribute(OperationalCredentials::Attributes::Fabrics::Id);
 
     // Notify we have one more fabric
-    MatterReportingAttributeChangeCallback(commandPath.mEndpointId, OperationalCredentials::Id,
-                                           OperationalCredentials::Attributes::CommissionedFabrics::Id);
+    cluster->OperationalCredentialsNotifyAttribute(OperationalCredentials::Attributes::CommissionedFabrics::Id);
 
 exit:
     if (needRevert)
@@ -563,10 +561,8 @@ exit:
 
         (void) Access::GetAccessControl().DeleteAllEntriesForFabric(newFabricIndex);
 
-        MatterReportingAttributeChangeCallback(commandPath.mEndpointId, OperationalCredentials::Id,
-                                               OperationalCredentials::Attributes::CommissionedFabrics::Id);
-        MatterReportingAttributeChangeCallback(commandPath.mEndpointId, OperationalCredentials::Id,
-                                               OperationalCredentials::Attributes::Fabrics::Id);
+        cluster->OperationalCredentialsNotifyAttribute(OperationalCredentials::Attributes::CommissionedFabrics::Id);
+        cluster->OperationalCredentialsNotifyAttribute(OperationalCredentials::Attributes::Fabrics::Id);
     }
 
     // We have an NOC response
@@ -689,7 +685,7 @@ exit:
 std::optional<DataModel::ActionReturnStatus> HandleUpdateFabricLabel(CommandHandler * commandObj,
                                                                      const ConcreteCommandPath & commandPath,
                                                                      Commands::UpdateFabricLabel::DecodableType & commandData,
-                                                                     FabricTable & fabricTable)
+                                                                     FabricTable & fabricTable, OperationalCredentialsCluster * cluster)
 {
     MATTER_TRACE_SCOPE("UpdateFabricLabel", "OperationalCredentials");
     auto & label        = commandData.label;
@@ -725,8 +721,7 @@ std::optional<DataModel::ActionReturnStatus> HandleUpdateFabricLabel(CommandHand
     finalStatus = Status::Success;
 
     // Succeeded at updating the label, mark Fabrics table changed.
-    MatterReportingAttributeChangeCallback(commandPath.mEndpointId, OperationalCredentials::Id,
-                                           OperationalCredentials::Attributes::Fabrics::Id);
+    cluster->OperationalCredentialsNotifyAttribute(OperationalCredentials::Attributes::Fabrics::Id);;
 exit:
     if (finalStatus == Status::Success)
     {
@@ -799,7 +794,7 @@ exit:
 std::optional<DataModel::ActionReturnStatus>
 HandleSetVIDVerificationStatement(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
                                   Commands::SetVIDVerificationStatement::DecodableType & commandData, FabricTable & fabricTable,
-                                  FailSafeContext & failSafeContext)
+                                  FailSafeContext & failSafeContext, OperationalCredentialsCluster * opCredscluster)
 {
     FabricIndex fabricIndex = commandObj->GetAccessingFabricIndex();
     ChipLogProgress(Zcl, "OpCreds: Received a SetVIDVerificationStatement Command for FabricIndex 0x%x",
@@ -845,8 +840,7 @@ HandleSetVIDVerificationStatement(CommandHandler * commandObj, const ConcreteCom
     {
         failSafeContext.RecordSetVidVerificationStatementHasBeenInvoked();
 
-        MatterReportingAttributeChangeCallback(commandPath.mEndpointId, OperationalCredentials::Id,
-                                               OperationalCredentials::Attributes::Fabrics::Id);
+        opCredscluster->OperationalCredentialsNotifyAttribute(OperationalCredentials::Attributes::Fabrics::Id);
     }
 
     if (err != CHIP_NO_ERROR)
@@ -1100,15 +1094,7 @@ exit:
     return std::nullopt;
 }
 
-void NotifyFabricTableChanged()
-{
-    // Opcreds cluster is always on Endpoint 0
-    MatterReportingAttributeChangeCallback(0, OperationalCredentials::Id,
-                                           OperationalCredentials::Attributes::CommissionedFabrics::Id);
-    MatterReportingAttributeChangeCallback(0, OperationalCredentials::Id, OperationalCredentials::Attributes::Fabrics::Id);
-}
-
-void FailSafeCleanup(const chip::DeviceLayer::ChipDeviceEvent * event, FabricTable & fabricTable, SessionManager & sessionMgr)
+void FailSafeCleanup(const chip::DeviceLayer::ChipDeviceEvent * event, FabricTable & fabricTable, SessionManager & sessionMgr, OperationalCredentialsCluster * cluster)
 {
     ChipLogError(Zcl, "OpCreds: Proceeding to FailSafeCleanup on fail-safe expiry!");
 
@@ -1132,7 +1118,7 @@ void FailSafeCleanup(const chip::DeviceLayer::ChipDeviceEvent * event, FabricTab
     {
         // Opcreds cluster is always on Endpoint 0.
         // Only `Fabrics` attribute is reported since `NOCs` is not reportable (`C` quality).```
-        MatterReportingAttributeChangeCallback(0, OperationalCredentials::Id, OperationalCredentials::Attributes::Fabrics::Id);
+        cluster->OperationalCredentialsNotifyAttribute(OperationalCredentials::Attributes::Fabrics::Id);
     }
 
     // If an AddNOC or UpdateNOC command has been successfully invoked, terminate all CASE sessions associated with the Fabric
@@ -1170,7 +1156,7 @@ void OnPlatformEventHandler(const chip::DeviceLayer::ChipDeviceEvent * event, in
     if (event->Type == DeviceLayer::DeviceEventType::kFailSafeTimerExpired)
     {
         ChipLogError(Zcl, "OpCreds: Got FailSafeTimerExpired");
-        FailSafeCleanup(event, Server::GetInstance().GetFabricTable(), Server::GetInstance().GetSecureSessionManager());
+        FailSafeCleanup(event, Server::GetInstance().GetFabricTable(), Server::GetInstance().GetSecureSessionManager(), reinterpret_cast<OperationalCredentialsCluster *>(arg));
     }
 }
 } // anonymous namespace
@@ -1179,7 +1165,7 @@ CHIP_ERROR OperationalCredentialsCluster::Startup(ServerClusterContext & context
 {
     ReturnErrorOnFailure(DefaultServerCluster::Startup(context));
     mFabricTable.AddFabricDelegate(this);
-    DeviceLayer::PlatformMgrImpl().AddEventHandler(OnPlatformEventHandler);
+    DeviceLayer::PlatformMgrImpl().AddEventHandler(OnPlatformEventHandler, reinterpret_cast<intptr_t>(this));
     return CHIP_NO_ERROR;
 }
 
@@ -1276,7 +1262,7 @@ std::optional<DataModel::ActionReturnStatus> OperationalCredentialsCluster::Invo
     case OperationalCredentials::Commands::AddNOC::Id: {
         OperationalCredentials::Commands::AddNOC::DecodableType requestData;
         ReturnErrorOnFailure(requestData.Decode(input_arguments));
-        return HandleAddNOC(handler, request.path, requestData, mFabricTable, mFailSafeContext);
+        return HandleAddNOC(handler, request.path, requestData, mFabricTable, mFailSafeContext, this);
     }
     case OperationalCredentials::Commands::UpdateNOC::Id: {
         OperationalCredentials::Commands::UpdateNOC::DecodableType requestData;
@@ -1286,7 +1272,7 @@ std::optional<DataModel::ActionReturnStatus> OperationalCredentialsCluster::Invo
     case OperationalCredentials::Commands::UpdateFabricLabel::Id: {
         OperationalCredentials::Commands::UpdateFabricLabel::DecodableType requestData;
         ReturnErrorOnFailure(requestData.Decode(input_arguments, request.GetAccessingFabricIndex()));
-        return HandleUpdateFabricLabel(handler, request.path, requestData, mFabricTable);
+        return HandleUpdateFabricLabel(handler, request.path, requestData, mFabricTable, this);
     }
     case OperationalCredentials::Commands::RemoveFabric::Id: {
         OperationalCredentials::Commands::RemoveFabric::DecodableType requestData;
@@ -1301,7 +1287,7 @@ std::optional<DataModel::ActionReturnStatus> OperationalCredentialsCluster::Invo
     case OperationalCredentials::Commands::SetVIDVerificationStatement::Id: {
         OperationalCredentials::Commands::SetVIDVerificationStatement::DecodableType requestData;
         ReturnErrorOnFailure(requestData.Decode(input_arguments, request.GetAccessingFabricIndex()));
-        return HandleSetVIDVerificationStatement(handler, request.path, requestData, mFabricTable, mFailSafeContext);
+        return HandleSetVIDVerificationStatement(handler, request.path, requestData, mFabricTable, mFailSafeContext, this);
     }
     case OperationalCredentials::Commands::SignVIDVerificationRequest::Id: {
         OperationalCredentials::Commands::SignVIDVerificationRequest::DecodableType requestData;
@@ -1360,12 +1346,19 @@ void OperationalCredentialsCluster::OnFabricRemoved(const FabricTable & fabricTa
 
     EventManagement::GetInstance().FabricRemoved(fabricIndex);
 
-    NotifyFabricTableChanged();
+    NotifyAttributeChanged(OperationalCredentials::Attributes::CommissionedFabrics::Id);
+    NotifyAttributeChanged(OperationalCredentials::Attributes::Fabrics::Id);
 }
 
 void OperationalCredentialsCluster::OnFabricUpdated(const FabricTable & fabricTable, FabricIndex fabricIndex)
 {
-    NotifyFabricTableChanged();
+    NotifyAttributeChanged(OperationalCredentials::Attributes::CommissionedFabrics::Id);
+    NotifyAttributeChanged(OperationalCredentials::Attributes::Fabrics::Id);
+}
+
+void OperationalCredentialsCluster::OperationalCredentialsNotifyAttribute(AttributeId attributeId)
+{
+    NotifyAttributeChanged(attributeId);
 }
 
 void OperationalCredentialsCluster::OnFabricCommitted(const FabricTable & fabricTable, FabricIndex fabricIndex)
