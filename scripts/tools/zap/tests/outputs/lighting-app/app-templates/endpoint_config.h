@@ -734,6 +734,14 @@
         (EmberAfGenericClusterFunction) emberAfLocalizationConfigurationClusterServerInitCallback,                                 \
         (EmberAfGenericClusterFunction) MatterLocalizationConfigurationClusterServerPreAttributeChangedCallback,                   \
     };                                                                                                                             \
+    const EmberAfGenericClusterFunction chipFuncArrayTimeFormatLocalizationServer[] = {                                            \
+        (EmberAfGenericClusterFunction) emberAfTimeFormatLocalizationClusterServerInitCallback,                                    \
+        (EmberAfGenericClusterFunction) MatterTimeFormatLocalizationClusterServerPreAttributeChangedCallback,                      \
+    };                                                                                                                             \
+    const EmberAfGenericClusterFunction chipFuncArrayOperationalCredentialsServer[] = {                                            \
+        (EmberAfGenericClusterFunction) emberAfOperationalCredentialsClusterServerInitCallback,                                    \
+        (EmberAfGenericClusterFunction) MatterOperationalCredentialsClusterServerShutdownCallback,                                 \
+    };                                                                                                                             \
     const EmberAfGenericClusterFunction chipFuncArrayFixedLabelServer[] = {                                                        \
         (EmberAfGenericClusterFunction) emberAfFixedLabelClusterServerInitCallback,                                                \
         (EmberAfGenericClusterFunction) MatterFixedLabelClusterServerShutdownCallback,                                             \
