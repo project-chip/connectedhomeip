@@ -57,7 +57,7 @@ public:
     FactoryInitParamsSetter()
     {
         // Set all the basic requirement to test DeviceControllerFactory
-        EXPECT_EQ(opCertStore.Init(&cerStorage), CHIP_NO_ERROR);
+        ASSERT_EQ(opCertStore.Init(&cerStorage), CHIP_NO_ERROR);
 
         // Initialize Group Data Provider
         sProvider.SetStorageDelegate(&sStorageDelegate);
