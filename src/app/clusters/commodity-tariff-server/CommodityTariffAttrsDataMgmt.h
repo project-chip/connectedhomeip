@@ -249,7 +249,7 @@ struct SpanCopier<char>
         {
             return CHIP_ERROR_IN_USE;
         }
-    
+
         if (source.size() > maxCount)
         {
             return CHIP_ERROR_INVALID_STRING_LENGTH;
