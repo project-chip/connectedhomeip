@@ -66,11 +66,9 @@ constexpr DataModel::AttributeEntry kMandatoryAttributes[] = {
     CapabilityMinima::kMetadataEntry,
     SpecificationVersion::kMetadataEntry,
     MaxPathsPerInvoke::kMetadataEntry,
-    ConfigurationVersion::kMetadataEntry,
     // NOTE: UniqueID used to NOT be mandatory in previous spec version, so we add
     // this as a separate condition
     // UniqueID::kMetadataEntry,
-
 };
 
 constexpr size_t kExpectedFixedLocationLength = 2;
@@ -204,13 +202,6 @@ inline CHIP_ERROR ReadCapabilityMinima(AttributeValueEncoder & aEncoder)
     return aEncoder.Encode(capabilityMinima);
 }
 
-inline CHIP_ERROR ReadConfigurationVersion(DeviceLayer::ConfigurationManager & configManager, AttributeValueEncoder & aEncoder)
-{
-    uint32_t configurationVersion = 0;
-    ReturnErrorOnFailure(configManager.GetConfigurationVersion(configurationVersion));
-    return aEncoder.Encode(configurationVersion);
-}
-
 inline CHIP_ERROR ReadLocation(DeviceLayer::ConfigurationManager & configManager, AttributeValueEncoder & aEncoder)
 {
     char location[kExpectedFixedLocationLength + 1] = { 0 };
@@ -340,12 +331,42 @@ DataModel::ActionReturnStatus BasicInformationCluster::ReadAttribute(const DataM
         return encoder.Encode(Revision::kSpecificationVersion);
     case MaxPathsPerInvoke::Id:
         return encoder.Encode<uint16_t>(CHIP_CONFIG_MAX_PATHS_PER_INVOKE);
-    case ConfigurationVersion::Id:
-        return ReadConfigurationVersion(configManager, encoder);
     case Reachable::Id:
         // On some platforms `true` is defined as a unsigned int and that gets
         // a ambigous TLVWriter::Put error. Hence the specialization.
         return encoder.Encode<bool>(true);
+    case GeneratedCommandList::Id:
+        return encoder.EncodeList([](const auto & encoder) -> CHIP_ERROR { return CHIP_NO_ERROR; });
+    case AcceptedCommandList::Id:
+        return encoder.EncodeList([](const auto & encoder) -> CHIP_ERROR { return CHIP_NO_ERROR; });
+    case AttributeList::Id:
+        return encoder.EncodeList([this](const auto & listEncoder) -> CHIP_ERROR {
+            // Manually encode the mandatory attributes
+            for (const auto & attr : kMandatoryAttributes)
+            {
+                ReturnErrorOnFailure(listEncoder.Encode(attr.attributeId));
+            }
+            // Manually encode the optional attributes that are enabled
+            const DataModel::AttributeEntry optionalAttributes[] = {
+                ManufacturingDate::kMetadataEntry, PartNumber::kMetadataEntry,        ProductURL::kMetadataEntry,
+                ProductLabel::kMetadataEntry,      SerialNumber::kMetadataEntry,      LocalConfigDisabled::kMetadataEntry,
+                Reachable::kMetadataEntry,         ProductAppearance::kMetadataEntry, UniqueID::kMetadataEntry,
+            };
+            for (const auto & attr : optionalAttributes)
+            {
+                if (mEnabledOptionalAttributes.IsSet(attr.attributeId))
+                {
+                    ReturnErrorOnFailure(listEncoder.Encode(attr.attributeId));
+                }
+            }
+            // Add list-related attributes
+            ReturnErrorOnFailure(listEncoder.Encode(FeatureMap::Id));
+            ReturnErrorOnFailure(listEncoder.Encode(ClusterRevision::Id));
+            ReturnErrorOnFailure(listEncoder.Encode(GeneratedCommandList::Id));
+            ReturnErrorOnFailure(listEncoder.Encode(AcceptedCommandList::Id));
+            ReturnErrorOnFailure(listEncoder.Encode(AttributeList::Id));
+            return CHIP_NO_ERROR;
+        });
     default:
         return Protocols::InteractionModel::Status::UnsupportedAttribute;
     }
