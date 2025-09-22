@@ -408,25 +408,24 @@ void ApplicationInit()
 void ApplicationShutdown() {}
 
 namespace {
-    class OtaProviderAppMainLoopImplementation : public AppMainLoopImplementation
+class OtaProviderAppMainLoopImplementation : public AppMainLoopImplementation
+{
+public:
+    void RunMainLoop() override { chip::DeviceLayer::PlatformMgr().RunEventLoop(); }
+    void SignalSafeStopMainLoop() override
     {
-    public:
-        void RunMainLoop() override { chip::DeviceLayer::PlatformMgr().RunEventLoop(); }
-        void SignalSafeStopMainLoop() override
-        {
-            chip::Server::GetInstance().GenerateShutDownEvent();
+        chip::Server::GetInstance().GenerateShutDownEvent();
 
-            chip::DeviceLayer::PlatformMgr().ScheduleWork([](intptr_t) {
-                ChipLogDetail(SoftwareUpdate, "Scheduling BdxOtaSender to ABORT TRANSFER");
+        chip::DeviceLayer::PlatformMgr().ScheduleWork([](intptr_t) {
+            ChipLogDetail(SoftwareUpdate, "Scheduling BdxOtaSender to ABORT TRANSFER");
 
-                gOtaProvider.GetBdxOtaSender()->AbortTransfer();
-            });
+            gOtaProvider.GetBdxOtaSender()->AbortTransfer();
+        });
 
-            chip::DeviceLayer::PlatformMgr().ScheduleWork([](intptr_t) { chip::DeviceLayer::PlatformMgr().StopEventLoopTask(); });
-        }
-    };
-}
-
+        chip::DeviceLayer::PlatformMgr().ScheduleWork([](intptr_t) { chip::DeviceLayer::PlatformMgr().StopEventLoopTask(); });
+    }
+};
+} // namespace
 
 int main(int argc, char * argv[])
 {
