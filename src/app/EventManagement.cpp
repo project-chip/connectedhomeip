@@ -522,64 +522,44 @@ CHIP_ERROR EventManagement::CopyEvent(const TLVReader & aReader, TLVWriter & aWr
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR EventManagement::CheckEventContext(EventLoadOutContext * eventLoadOutContext,
-                                              const EventManagement::EventEnvelopeContext & event)
+bool EventManagement::CheckEventContext(EventLoadOutContext * eventLoadOutContext,
+                                        const EventManagement::EventEnvelopeContext & event)
 {
     if (eventLoadOutContext->mCurrentEventNumber < eventLoadOutContext->mStartingEventNumber)
     {
-        return CHIP_ERROR_UNEXPECTED_EVENT;
+        return false;
     }
 
     if (event.mFabricIndex.HasValue() &&
         (event.mFabricIndex.Value() == kUndefinedFabricIndex ||
          eventLoadOutContext->mSubjectDescriptor.fabricIndex != event.mFabricIndex.Value()))
     {
-        return CHIP_ERROR_UNEXPECTED_EVENT;
+        return false;
     }
 
     ConcreteEventPath path(event.mEndpointId, event.mClusterId, event.mEventId);
-    CHIP_ERROR ret = CHIP_ERROR_UNEXPECTED_EVENT;
+    DataModel::EventEntry eventInfo;
+    if (InteractionModelEngine::GetInstance()->GetDataModelProvider()->EventInfo(path, eventInfo) != CHIP_NO_ERROR)
+    {
+        // If we cannot get event info here, the interested path should be a wildcard path but the data model does't
+        // support the event, return false here so the event path will be excluded in the generated event report.
+        return false;
+    }
 
+    // Check whether the event path is in the interested paths
     for (auto * interestedPath = eventLoadOutContext->mpInterestedEventPaths; interestedPath != nullptr;
          interestedPath        = interestedPath->mpNext)
     {
         if (interestedPath->mValue.IsEventPathSupersetOf(path))
         {
-            ret = CHIP_NO_ERROR;
-            break;
+            return true;
         }
     }
-
-    ReturnErrorOnFailure(ret);
-
-    DataModel::EventEntry eventInfo;
-    if (InteractionModelEngine::GetInstance()->GetDataModelProvider()->EventInfo(path, eventInfo) != CHIP_NO_ERROR)
-    {
-        // If we cannot get event info here, the interested path should be a wildcard path but the data model doesn't
-        // support the event, return CHIP_ERROR_UNEXPECTED_EVENT here so the event path will be excluded in the generated
-        // event report.
-        return CHIP_ERROR_UNEXPECTED_EVENT;
-    }
-
-    Access::RequestPath requestPath{ .cluster     = event.mClusterId,
-                                     .endpoint    = event.mEndpointId,
-                                     .requestType = Access::RequestType::kEventReadRequest,
-                                     .entityId    = event.mEventId };
-    CHIP_ERROR accessControlError =
-        Access::GetAccessControl().Check(eventLoadOutContext->mSubjectDescriptor, requestPath, eventInfo.readPrivilege);
-    if (accessControlError != CHIP_NO_ERROR)
-    {
-        VerifyOrReturnError((accessControlError == CHIP_ERROR_ACCESS_DENIED) ||
-                                (accessControlError == CHIP_ERROR_ACCESS_RESTRICTED_BY_ARL),
-                            accessControlError);
-        ret = CHIP_ERROR_UNEXPECTED_EVENT;
-    }
-
-    return ret;
+    return false;
 }
 
 CHIP_ERROR EventManagement::EventIterator(const TLVReader & aReader, size_t aDepth, EventLoadOutContext * apEventLoadOutContext,
-                                          EventEnvelopeContext * event)
+                                          EventEnvelopeContext * event, bool & encodeEvent)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     TLVReader innerReader;
@@ -608,16 +588,7 @@ CHIP_ERROR EventManagement::EventIterator(const TLVReader & aReader, size_t aDep
     apEventLoadOutContext->mCurrentTime        = event->mCurrentTime;
     apEventLoadOutContext->mCurrentEventNumber = event->mEventNumber;
 
-    err = CheckEventContext(apEventLoadOutContext, *event);
-    if (err == CHIP_NO_ERROR)
-    {
-        err = CHIP_EVENT_ID_FOUND;
-    }
-    else if (err == CHIP_ERROR_UNEXPECTED_EVENT)
-    {
-        err = CHIP_NO_ERROR;
-    }
-
+    encodeEvent = CheckEventContext(apEventLoadOutContext, *event);
     return err;
 }
 
@@ -625,8 +596,9 @@ CHIP_ERROR EventManagement::CopyEventsSince(const TLVReader & aReader, size_t aD
 {
     EventLoadOutContext * const loadOutContext = static_cast<EventLoadOutContext *>(apContext);
     EventEnvelopeContext event;
-    CHIP_ERROR err = EventIterator(aReader, aDepth, loadOutContext, &event);
-    if (err == CHIP_EVENT_ID_FOUND)
+    bool encodeEvent;
+    CHIP_ERROR err = EventIterator(aReader, aDepth, loadOutContext, &event, encodeEvent);
+    if ((err == CHIP_NO_ERROR) && encodeEvent)
     {
         // checkpoint the writer
         TLV::TLVWriter checkpoint = loadOutContext->mWriter;

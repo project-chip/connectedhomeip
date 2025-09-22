@@ -90,7 +90,7 @@ public:
      * @brief
      *   A constructor for the CircularEventBuffer (internal API).
      */
-    CircularEventBuffer() : TLVCircularBuffer(nullptr, 0){};
+    CircularEventBuffer() : TLVCircularBuffer(nullptr, 0) {};
 
     /**
      * @brief
@@ -155,7 +155,7 @@ class CircularEventReader;
 class CircularEventBufferWrapper : public TLV::TLVCircularBuffer
 {
 public:
-    CircularEventBufferWrapper() : TLVCircularBuffer(nullptr, 0), mpCurrent(nullptr){};
+    CircularEventBufferWrapper() : TLVCircularBuffer(nullptr, 0), mpCurrent(nullptr) {};
     CircularEventBuffer * mpCurrent;
 
 private:
@@ -511,9 +511,11 @@ private:
      *
      * The function is used to scan through the event log to find events matching the spec in the supplied context.
      * Particularly, it would check against mStartingEventNumber, and skip fetched event.
+     *
+     * If the fetched event log is not going to be filtered, the encodeEvent will be true.
      */
     static CHIP_ERROR EventIterator(const TLV::TLVReader & aReader, size_t aDepth, EventLoadOutContext * apEventLoadOutContext,
-                                    EventEnvelopeContext * event);
+                                    EventEnvelopeContext * event, bool & encodeEvent);
 
     /**
      * @brief Internal iterator function used to fetch event into EventEnvelopeContext, then EventIterator would filter event
@@ -542,15 +544,10 @@ private:
     /**
      * @brief Check whether the event instance represented by the EventEnvelopeContext should be included in the report.
      *
-     * @retval CHIP_ERROR_UNEXPECTED_EVENT This path should be excluded in the generated event report.
-     * @retval CHIP_EVENT_ID_FOUND This path should be included in the generated event report.
-     * @retval CHIP_ERROR_ACCESS_DENIED This path should be included in the generated event report, but the client does not have
-     * .       enough privilege to access it.
-     *
-     * TODO: Consider using CHIP_NO_ERROR, CHIP_ERROR_SKIP_EVENT, CHIP_ERROR_ACCESS_DENINED or some enum to represent the checking
-     * result.
+     * @retval false This path should be excluded in the generated event report.
+     * @retval true This path should be included in the generated event report.
      */
-    static CHIP_ERROR CheckEventContext(EventLoadOutContext * eventLoadOutContext, const EventEnvelopeContext & event);
+    static bool CheckEventContext(EventLoadOutContext * eventLoadOutContext, const EventEnvelopeContext & event);
 
     /**
      * @brief copy event from circular buffer to target buffer for report

@@ -89,8 +89,6 @@ void InitDataModelHandler() {}
 
 namespace {
 
-constexpr EventId kTestEventId = 0x321;
-
 constexpr AttributeId kAttributeIdReadOnly        = 0x3001;
 constexpr AttributeId kAttributeIdTimedWrite      = 0x3002;
 constexpr AttributeId kAttributeIdFakeAllowsWrite = 0x3003;
@@ -417,6 +415,8 @@ const MockNodeConfig gTestNodeConfig({
         }),
         MockClusterConfig(MockClusterId(2), {
             ClusterRevision::Id, FeatureMap::Id, MockAttributeId(1)
+        }, {
+            MockEventId(1),
         }),
         MockClusterConfig(MockClusterId(3), {}, {}, {}, {}, BitMask<MockClusterSide>().Set(MockClusterSide::kClient)),
         MockClusterConfig(MockClusterId(4), {}, {}, {}, {}, BitMask<MockClusterSide>().Set(MockClusterSide::kClient)),
@@ -2834,11 +2834,14 @@ TEST_F(TestCodegenModelViaMocks, EventInfo)
     UseMockNodeConfig config(gTestNodeConfig);
     CodegenDataModelProviderWithContext model;
 
-    // Mock models always set event privilege to admin.
     EventEntry entry;
-    ASSERT_EQ(model.EventInfo({ kMockEndpoint1, MockClusterId(1), kTestEventId }, entry), CHIP_NO_ERROR);
+    // Test unsupported Event.
+    ASSERT_NE(model.EventInfo({ kMockEndpoint1, MockClusterId(1), MockEventId(3) }, entry), CHIP_NO_ERROR);
+
+    // Mock models always set event privilege to admin.
+    ASSERT_EQ(model.EventInfo({ kMockEndpoint1, MockClusterId(1), MockEventId(1) }, entry), CHIP_NO_ERROR);
     ASSERT_EQ(entry.readPrivilege, Access::Privilege::kAdminister);
-    ASSERT_EQ(model.EventInfo({ kMockEndpoint1, MockClusterId(2), kTestEventId }, entry), CHIP_NO_ERROR);
+    ASSERT_EQ(model.EventInfo({ kMockEndpoint1, MockClusterId(2), MockEventId(1) }, entry), CHIP_NO_ERROR);
     ASSERT_EQ(entry.readPrivilege, Access::Privilege::kAdminister);
 
     const ConcreteClusterPath kTestClusterPath(kMockEndpoint1, MockClusterId(2));
@@ -2847,21 +2850,21 @@ TEST_F(TestCodegenModelViaMocks, EventInfo)
     ASSERT_EQ(model.Registry().Register(registration), CHIP_NO_ERROR);
 
     fakeClusterServer.mEventInfoFakePrivilege = Access::Privilege::kOperate;
-    ASSERT_EQ(model.EventInfo({ kMockEndpoint1, MockClusterId(2), kTestEventId }, entry), CHIP_NO_ERROR);
+    ASSERT_EQ(model.EventInfo({ kMockEndpoint1, MockClusterId(2), MockEventId(1) }, entry), CHIP_NO_ERROR);
     ASSERT_EQ(entry.readPrivilege, Access::Privilege::kOperate);
 
     fakeClusterServer.mEventInfoFakePrivilege = Access::Privilege::kView;
-    ASSERT_EQ(model.EventInfo({ kMockEndpoint1, MockClusterId(2), kTestEventId }, entry), CHIP_NO_ERROR);
+    ASSERT_EQ(model.EventInfo({ kMockEndpoint1, MockClusterId(2), MockEventId(1) }, entry), CHIP_NO_ERROR);
     ASSERT_EQ(entry.readPrivilege, Access::Privilege::kView);
 
     // the other cluster is unchanged
-    ASSERT_EQ(model.EventInfo({ kMockEndpoint1, MockClusterId(1), kTestEventId }, entry), CHIP_NO_ERROR);
+    ASSERT_EQ(model.EventInfo({ kMockEndpoint1, MockClusterId(1), MockEventId(1) }, entry), CHIP_NO_ERROR);
     ASSERT_EQ(entry.readPrivilege, Access::Privilege::kAdminister);
 
     model.Registry().Unregister(&fakeClusterServer);
 
     // once unregistered, go back to the default
-    ASSERT_EQ(model.EventInfo({ kMockEndpoint1, MockClusterId(2), kTestEventId }, entry), CHIP_NO_ERROR);
+    ASSERT_EQ(model.EventInfo({ kMockEndpoint1, MockClusterId(2), MockEventId(1) }, entry), CHIP_NO_ERROR);
     ASSERT_EQ(entry.readPrivilege, Access::Privilege::kAdminister);
 
     model.Shutdown();
