@@ -30,10 +30,8 @@ group("nxp_freertos") {
 
   if (chip_build_tests) {
     deps += [ "${chip_root}/src:tests" ]
-    if(nxp_custom_unit_tests_dir != ""){
-      deps += [
-        "${nxp_custom_unit_tests_dir}:custom_nxp_tests",
-      ]
+    if (nxp_custom_unit_tests_dir != "") {
+      deps += [ "${nxp_custom_unit_tests_dir}:custom_nxp_tests" ]
     }
   }
 
