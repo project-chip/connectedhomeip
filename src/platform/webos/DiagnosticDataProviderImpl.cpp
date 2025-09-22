@@ -18,7 +18,7 @@
 /**
  *    @file
  *          Provides an implementation of the DiagnosticDataProvider object
- *          for Linux platform.
+ *          for webOS platform.
  */
 
 #include <platform/internal/CHIPDeviceLayerInternal.h>

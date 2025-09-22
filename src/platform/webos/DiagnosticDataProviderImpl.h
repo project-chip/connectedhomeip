@@ -30,7 +30,7 @@ namespace chip {
 namespace DeviceLayer {
 
 /**
- * Concrete implementation of the DiagnosticDataProvider singleton object for Linux platforms.
+ * Concrete implementation of the DiagnosticDataProvider singleton object for webOS platforms.
  */
 class DiagnosticDataProviderImpl : public DiagnosticDataProvider
 {
