@@ -23,7 +23,7 @@ namespace chip {
 class DnssdServer
 {
 public:
-    virtual ~DnssdServer()                   = default;
+    virtual ~DnssdServer()                    = default;
     virtual CHIP_ERROR AdvertiseOperational() = 0;
     virtual bool IsAdvertisingEnabled()       = 0;
 };
