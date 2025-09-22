@@ -245,6 +245,11 @@ struct SpanCopier<char>
     /// @return CHIP_NO_ERROR if copy succeeded, error code on failure
     static CHIP_ERROR Copy(const CharSpan & source, CharSpan & destination, size_t maxCount = std::numeric_limits<size_t>::max())
     {
+        if (!destination.empty())
+        {
+            return CHIP_ERROR_IN_USE;
+        }
+    
         if (source.size() > maxCount)
         {
             return CHIP_ERROR_INVALID_STRING_LENGTH;
