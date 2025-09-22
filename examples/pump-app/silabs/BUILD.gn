@@ -135,8 +135,8 @@ silabs_executable("pump_app") {
   sources = [
     "${examples_common_plat_dir}/main.cpp",
     "src/AppTask.cpp",
-    "src/PumpManager.cpp",
     "src/DataModelCallbacks.cpp",
+    "src/PumpManager.cpp",
   ]
 
   deps = [

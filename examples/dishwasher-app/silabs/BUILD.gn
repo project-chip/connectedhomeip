@@ -151,13 +151,13 @@ silabs_executable("dishwasher_app") {
     "${example_enegy_management_dir}/energy-management-common/energy-reporting/src/PowerTopologyDelegate.cpp",
     "${examples_common_plat_dir}/main.cpp",
     "src/AppTask.cpp",
+    "src/DataModelCallbacks.cpp",
     "src/DataModelHelper.cpp",
     "src/DeviceEnergyManager.cpp",
     "src/DishwasherManager.cpp",
     "src/ElectricalEnergyMeasurementInstance.cpp",
     "src/ElectricalSensorManager.cpp",
     "src/PowerTopologyDelegateImpl.cpp",
-    "src/DataModelCallbacks.cpp",
     "src/operational-state-delegate-impl.cpp",
   ]
 

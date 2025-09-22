@@ -118,9 +118,9 @@ silabs_executable("lock_app") {
   sources = [
     "${examples_common_plat_dir}/main.cpp",
     "src/AppTask.cpp",
+    "src/DataModelCallbacks.cpp",
     "src/LockManager.cpp",
     "src/LockMigration.cpp",
-    "src/DataModelCallbacks.cpp",
   ]
 
   if (chip_build_libshell) {

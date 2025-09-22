@@ -86,8 +86,8 @@ silabs_executable("chef_app") {
 
   sources = [
     "src/AppTask.cpp",
-    "src/LightingManager.cpp",
     "src/DataModelCallbacks.cpp",
+    "src/LightingManager.cpp",
     "src/main.cpp",
   ]
 
