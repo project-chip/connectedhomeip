@@ -57,6 +57,8 @@ from matter.interaction_model import Status
 from matter.testing import matter_asserts
 from matter.testing.event_attribute_reporting import AttributeMatcher, AttributeSubscriptionHandler, EventSubscriptionHandler
 from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+from matter.testing.apps import AppServerSubprocess, OTAProviderSubprocess, OtaImagePath, ImageListPath, OTAProviderLaunchSU
+
 
 # Create a logger
 logger = logging.getLogger(__name__)
@@ -389,7 +391,19 @@ class TC_SU_2_2(MatterBaseTest):
             ota_file: {provider_ota_file}""")
 
         # Prerequisite #2.0- Launch Provider with Queue "updateAvailable"
-        provider_proc = self.launch_provider_regex(
+        # provider_proc = self.launch_provider_regex(
+        #     ota_file=provider_ota_file,
+        #     discriminator=provider_discriminator,
+        #     passcode=provider_setup_pin_code,
+        #     secured_device_port=provider_port,
+        #     wait_for=provider_wait_for,
+        #     queue=provider_queue,
+        #     timeout=provider_timeout,
+        #     override_image_uri=provider_override_image_uri
+        # )
+
+        # NOTE: Using OTAProviderLaunchSU from matter.testing.apps to avoid code duplication
+        provider_proc = OTAProviderLaunchSU(
             ota_file=provider_ota_file,
             discriminator=provider_discriminator,
             passcode=provider_setup_pin_code,
@@ -398,7 +412,8 @@ class TC_SU_2_2(MatterBaseTest):
             queue=provider_queue,
             timeout=provider_timeout,
             override_image_uri=provider_override_image_uri
-        )
+        ).start()
+
         logger.info(f'{step_number}: Prerequisite #2.0 - Launched Provider PID {provider_proc.pid}')
 
         # Prerequisite #2.1 - Commissioning Provider
