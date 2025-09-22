@@ -501,19 +501,19 @@ public:
     virtual ~CTC_BaseDataClassBase() = default;
 
     // Common interface
-    virtual bool IsValid() const                   = 0;
-    virtual bool HasValue() const                  = 0;
-    virtual bool HasNewValue() const               = 0;
-    virtual CHIP_ERROR MarkAsAssigned()            = 0;
-    virtual CHIP_ERROR UpdateBegin(void * aUpdCtx) = 0;
-    virtual bool UpdateFinish(bool aUpdateAllow)   = 0;
-    virtual bool Cleanup()                         = 0;
+    virtual bool IsValid() const                   { return true; };
+    virtual bool HasValue() const                  { return false; };
+    virtual bool HasNewValue() const               { return false; };
+    virtual CHIP_ERROR MarkAsAssigned()            { return CHIP_NO_ERROR; };
+    virtual CHIP_ERROR UpdateBegin(void * aUpdCtx) { return CHIP_NO_ERROR; };
+    virtual bool UpdateFinish(bool aUpdateAllow)   { return aUpdateAllow; };
+    virtual bool Cleanup()                         { return false; };
     virtual AttributeId GetAttrId() const          = 0;
 
     // Type-erased methods for generic access
-    virtual CHIP_ERROR GetValueAsVoid(void *& outValue)        = 0;
-    virtual CHIP_ERROR GetNewValueAsVoid(void *& outValue)     = 0;
-    virtual CHIP_ERROR SetNewValueFromVoid(const void * value) = 0;
+    virtual CHIP_ERROR GetValueAsVoid(void *& outValue)        { return CHIP_NO_ERROR; };
+    virtual CHIP_ERROR GetNewValueAsVoid(void *& outValue)     { return CHIP_NO_ERROR; };
+    virtual CHIP_ERROR SetNewValueFromVoid(const void * value) { return CHIP_NO_ERROR; };
 };
 
 template <typename T>
@@ -876,13 +876,13 @@ public:
 
     /**
      * @brief Completes the update process
-     * @param[in] aUpdateAllow Whether to commit the changes
+     * @param[in] aUpdateAllowed Whether to commit the changes
      * @return true if value changed, false otherwise
      *
      * @post Always transitions state to kIdle
      * @note Performs cleanup of unused storage
      */
-    bool UpdateFinish(bool aUpdateAllow) override
+    bool UpdateFinish(bool aUpdateAllowed) override
     {
         bool ret = false;
         /* Skip if the attribute object has no new attached data */
@@ -891,7 +891,7 @@ public:
             return false;
         }
 
-        if (aUpdateAllow && (mUpdateState.load() == UpdateState::kValidated))
+        if (aUpdateAllowed && (mUpdateState.load() == UpdateState::kValidated))
         {
             SwapActiveValueStorage();
 
@@ -899,7 +899,6 @@ public:
         }
 
         CleanupByIdx(1 - mActiveValueIdx.load());
-
         mUpdateState.store(UpdateState::kIdle);
 
         return ret;

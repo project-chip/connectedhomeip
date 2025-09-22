@@ -99,8 +99,8 @@ CHIP_ERROR CTC_BaseDataClass<uint32_t>::ValidateNewValue()
 TEST_F(TestCommodityTariffBaseDataClass, ScalarValueUpdateFlow)
 {
     CTC_BaseDataClass<uint32_t> data(1);
-    const uint32_t data_sample_1 = 0xde;
-    const uint32_t data_sample_2 = 0xad;
+    constexpr uint32_t data_sample_1 = 0xde;
+    constexpr uint32_t data_sample_2 = 0xad;
 
     // Create new value
     EXPECT_EQ(data.CreateNewSingleValue(), CHIP_NO_ERROR);
@@ -142,8 +142,8 @@ TEST_F(TestCommodityTariffBaseDataClass, ScalarValueNoChangeDetection)
 TEST_F(TestCommodityTariffBaseDataClass, NullableValueTransitions)
 {
     CTC_BaseDataClass<DataModel::Nullable<uint32_t>> data(1);
-    const uint32_t data_sample_1 = 0xde;
-    const uint32_t data_sample_2 = 0xad;
+    constexpr uint32_t data_sample_1 = 0xde;
+    constexpr uint32_t data_sample_2 = 0xad;
 
     // Set non-null value
     data.CreateNewSingleValue();
@@ -177,7 +177,7 @@ TEST_F(TestCommodityTariffBaseDataClass, NullableSetNewValue)
 {
     CTC_BaseDataClass<DataModel::Nullable<uint32_t>> data(1);
     DataModel::Nullable<uint32_t> newValue;
-    const uint32_t data_sample = 200;
+    constexpr uint32_t data_sample = 200;
 
     // Test setting null value
     newValue.SetNull();
@@ -225,10 +225,13 @@ void CTC_BaseDataClass<MockStruct>::CleanupStruct(StructType & value)
 TEST_F(TestCommodityTariffBaseDataClass, StructValueHandling)
 {
     CTC_BaseDataClass<MockStruct> data(1);
-    const uint32_t sample_field_one = 100;
-    const uint16_t sample_field_two = 200;
+    constexpr uint32_t sample_field_one = 100;
+    constexpr uint16_t sample_field_two = 200;
 
-    MockStruct testStruct = { sample_field_one, sample_field_two };
+    MockStruct testStruct = { 
+        .field1 = sample_field_one, 
+        .field2 = sample_field_two
+    };
 
     EXPECT_EQ(data.SetNewValue(testStruct), CHIP_NO_ERROR);
     data.UpdateBegin(nullptr);
@@ -262,7 +265,7 @@ void CTC_BaseDataClass<DataModel::Nullable<MockStruct>>::CleanupStruct(StructTyp
 TEST_F(TestCommodityTariffBaseDataClass, NullableStructValueHandling)
 {
     CTC_BaseDataClass<DataModel::Nullable<MockStruct>> data(1);
-    const uint32_t sample_field_one = 100;
+    constexpr uint32_t sample_field_one = 100;
     const uint16_t sample_field_two = 200;
     MockStruct testStruct           = { sample_field_one, sample_field_two };
     DataModel::Nullable<MockStruct> newValue;
@@ -287,7 +290,7 @@ TEST_F(TestCommodityTariffBaseDataClass, ListValueCreationAndCleanup)
 {
     CTC_BaseDataClass<DataModel::List<uint32_t>> data(1);
     uint32_t SampleArr[]                       = { 10, 20, 30 };
-    const uint32_t SampleListLen               = sizeof(SampleArr) / sizeof(uint32_t);
+    constexpr uint32_t SampleListLen               = sizeof(SampleArr) / sizeof(uint32_t);
     const DataModel::List<uint32_t> ListSample = DataModel::List<uint32_t>(SampleArr, SampleListLen);
 
     EXPECT_EQ(data.SetNewValue(ListSample), CHIP_NO_ERROR);
@@ -487,19 +490,22 @@ void CTC_BaseDataClass<ComplexType>::CleanupStruct(StructType & value)
     value.id = 0;
 }
 
+#define TEST_STR_SAMPLE_0 "test1"
+#define TEST_STR_SAMPLE_1 "test2"
+
 TEST_F(TestCommodityTariffBaseDataClass, NullableListOfResourceStructs_CreationAndCleanup)
 {
-    const uint32_t IDs[] = { 100, 200 };
+    constexpr uint32_t IDs[] = { 100, 200 };
 
     ResourceStruct ListEntries[] = {
         {
             .id = 1,
-            .label = CharSpan::fromCharString("test1"),
+            .label = CharSpan::fromCharString(TEST_STR_SAMPLE_0),
             .nestedList = DataModel::List<const uint32_t>(IDs),
         },
         {
             .id = 2,
-            .label = CharSpan::fromCharString("test2"),
+            .label = CharSpan::fromCharString(TEST_STR_SAMPLE_1),
             .nestedList = DataModel::List<const uint32_t>(),
         }
     };
@@ -518,13 +524,19 @@ TEST_F(TestCommodityTariffBaseDataClass, NullableListOfResourceStructs_CreationA
     EXPECT_FALSE(data.GetValue().IsNull());
     EXPECT_EQ(data.GetValue().Value().size(), 2ul);
     EXPECT_EQ(data.GetValue().Value()[0].id, 1u);
-    EXPECT_STREQ(data.GetValue().Value()[0].label.data(), "test1");
+
+    EXPECT_EQ(data.GetValue().Value()[0].label.size(), strlen(TEST_STR_SAMPLE_0));
+    EXPECT_EQ(memcmp(data.GetValue().Value()[0].label.data(), TEST_STR_SAMPLE_0, data.GetValue().Value()[0].label.size()), 0);
+
+    EXPECT_EQ(data.GetValue().Value()[1].label.size(), strlen(TEST_STR_SAMPLE_1));
+    EXPECT_EQ(memcmp(data.GetValue().Value()[1].label.data(), TEST_STR_SAMPLE_1, data.GetValue().Value()[1].label.size()), 0);
+
     EXPECT_EQ(data.GetValue().Value()[0].nestedList.size(), 2ul);
     EXPECT_EQ((data.GetValue().Value()[0].nestedList)[0], 100u);
     EXPECT_EQ((data.GetValue().Value()[0].nestedList)[1], 200u);
 }
 
-#define TEST_STR_SAMPLE "dynamic_content"
+#define TEST_STR_SAMPLE_2 "dynamic_content"
 
 TEST_F(TestCommodityTariffBaseDataClass, NullableListOfResourceStructs_SetNewValue)
 {
@@ -532,12 +544,12 @@ TEST_F(TestCommodityTariffBaseDataClass, NullableListOfResourceStructs_SetNewVal
 
     // Prepare source data
     ComplexType sourceValue;
-    char* testStr = static_cast<char*>(Platform::MemoryAlloc(strlen(TEST_STR_SAMPLE) + 1));
+    char* testStr = static_cast<char*>(Platform::MemoryAlloc(strlen(TEST_STR_SAMPLE_2) + 1));
 
     // Create a struct with resources
     ResourceStruct testStruct = {};
     testStruct.id             = 42;
-    strcpy(testStr, TEST_STR_SAMPLE);
+    strcpy(testStr, TEST_STR_SAMPLE_2);
     testStruct.label  = CharSpan(testStr, strlen(testStr));
 
     auto * nestedBuffer   = static_cast<uint32_t *>(Platform::MemoryCalloc(2, sizeof(uint32_t)));
@@ -558,8 +570,8 @@ TEST_F(TestCommodityTariffBaseDataClass, NullableListOfResourceStructs_SetNewVal
     EXPECT_EQ(testStruct.label.data(), nullptr);
     EXPECT_EQ(testStruct.nestedList.data(), nullptr);
 
-    EXPECT_EQ(data.GetValue().Value().size(), 1ul);
-    EXPECT_STREQ(data.GetValue().Value()[0].label.data(), "dynamic_content");
+    EXPECT_EQ(data.GetValue().Value()[0].label.size(), strlen(TEST_STR_SAMPLE_2));
+    EXPECT_EQ(memcmp(data.GetValue().Value()[0].label.data(), TEST_STR_SAMPLE_2, data.GetValue().Value()[0].label.size()), 0);
 
     EXPECT_NE(data.GetValue().Value()[0].nestedList.data(), nullptr);
     EXPECT_EQ(data.GetValue().Value()[0].nestedList.size(), 2ul);
@@ -570,13 +582,13 @@ TEST_F(TestCommodityTariffBaseDataClass, NullableListOfResourceStructs_SetNewVal
 TEST_F(TestCommodityTariffBaseDataClass, NullableListOfResourceStructs_NullTransition)
 {
     CTC_BaseDataClass<ComplexType> data(1);
-    char* testStr = static_cast<char*>(Platform::MemoryAlloc(strlen(TEST_STR_SAMPLE) + 1));
+    char* testStr = static_cast<char*>(Platform::MemoryAlloc(strlen(TEST_STR_SAMPLE_2) + 1));
 
     // First set non-null with resources
     data.CreateNewListValue(1);
     data.GetNewValue().Value()[0].id            = 1;
 
-    strcpy(testStr, TEST_STR_SAMPLE);
+    strcpy(testStr, TEST_STR_SAMPLE_2);
     data.GetNewValue().Value()[0].label = CharSpan(testStr, strlen(testStr));
 
     data.MarkAsAssigned();
