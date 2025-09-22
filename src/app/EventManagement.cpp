@@ -537,7 +537,23 @@ bool EventManagement::CheckEventContext(EventLoadOutContext * eventLoadOutContex
         return false;
     }
 
+    bool isPathInterested = false;
     ConcreteEventPath path(event.mEndpointId, event.mClusterId, event.mEventId);
+    // Check whether the event path is in the interested paths
+    for (auto * interestedPath = eventLoadOutContext->mpInterestedEventPaths; interestedPath != nullptr;
+         interestedPath        = interestedPath->mpNext)
+    {
+        if (interestedPath->mValue.IsEventPathSupersetOf(path))
+        {
+            isPathInterested = true;
+            break;
+        }
+    }
+    if (!isPathInterested)
+    {
+        return false;
+    }
+
     DataModel::EventEntry eventInfo;
     if (InteractionModelEngine::GetInstance()->GetDataModelProvider()->EventInfo(path, eventInfo) != CHIP_NO_ERROR)
     {
@@ -545,6 +561,7 @@ bool EventManagement::CheckEventContext(EventLoadOutContext * eventLoadOutContex
         // support the event, return false here so the event path will be excluded in the generated event report.
         return false;
     }
+
     Access::RequestPath requestPath{ .cluster     = event.mClusterId,
                                      .endpoint    = event.mEndpointId,
                                      .requestType = Access::RequestType::kEventReadRequest,
@@ -558,16 +575,8 @@ bool EventManagement::CheckEventContext(EventLoadOutContext * eventLoadOutContex
         return false;
     }
 
-    // Check whether the event path is in the interested paths
-    for (auto * interestedPath = eventLoadOutContext->mpInterestedEventPaths; interestedPath != nullptr;
-         interestedPath        = interestedPath->mpNext)
-    {
-        if (interestedPath->mValue.IsEventPathSupersetOf(path))
-        {
-            return true;
-        }
-    }
-    return false;
+    // If all the checks pass, the event path will be included in the generated event report.
+    return true;
 }
 
 CHIP_ERROR EventManagement::EventIterator(const TLVReader & aReader, size_t aDepth, EventLoadOutContext * apEventLoadOutContext,
