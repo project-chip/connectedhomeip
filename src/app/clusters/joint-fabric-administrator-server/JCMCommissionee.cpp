@@ -163,17 +163,20 @@ TrustVerificationError JCMCommissionee::ReadCommissionerAdminFabricIndex()
     auto onSuccess = [this](const ConcreteAttributePath & path, const Attr::DecodableType & val) {
         if (val.IsNull())
         {
+            ChipLogError(Controller, "JCM: Failed to read commissioner's AdministratorFabricIndex: received null");
             this->TrustVerificationStageFinished(kReadingCommissionerAdminFabricIndex,
                                                  TrustVerificationError::kReadAdminFabricIndexFailed);
         }
         else
         {
             mInfo.adminFabricIndex = val.Value();
+            ChipLogProgress(Controller, "JCM: Successfully read commissioner's AdministratorFabricIndex");
             this->TrustVerificationStageFinished(kReadingCommissionerAdminFabricIndex, TrustVerificationError::kSuccess);
         }
     };
 
     auto onError = [this](const ConcreteAttributePath *, CHIP_ERROR err) {
+        ChipLogError(Controller, "JCM: Failed to read commissioner's AdministratorFabricIndex: %" CHIP_ERROR_FORMAT, err.Format());
         this->TrustVerificationStageFinished(kReadingCommissionerAdminFabricIndex,
                                              TrustVerificationError::kReadAdminFabricIndexFailed);
     };
