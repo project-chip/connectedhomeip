@@ -117,7 +117,7 @@ class NxpApp(Enum):
             return "thermostat"
         elif self == NxpApp.LOCK_APP:
             return "lock-app"
-        elif self ==NxpApp.UNIT_TEST:
+        elif self == NxpApp.UNIT_TEST:
             return "unit-test"
         else:
             raise Exception('Unknown app type: %r' % self)
@@ -142,7 +142,7 @@ class NxpApp(Enum):
 
     def BuildRoot(self, root, board, os_env, build_system):
         if ((os_env == NxpOsUsed.FREERTOS) and (build_system == NxpBuildSystem.CMAKE)):
-            if(self.ExampleName() == "unit-test"):
+            if (self.ExampleName() == "unit-test"):
                 return os.path.join(root, 'src', 'test_driver', 'nxp')
             else:
                 return os.path.join(root, 'examples', self.ExampleName(), 'nxp')
