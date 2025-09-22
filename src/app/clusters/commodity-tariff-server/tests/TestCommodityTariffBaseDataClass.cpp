@@ -474,11 +474,8 @@ void CTC_BaseDataClass<ComplexType>::CleanupStruct(StructType & value)
     // Cleanup nested list
     if (value.nestedList.data())
     {
-        if (value.nestedList.data())
-        {
-            Platform::MemoryFree(const_cast<uint32_t *>(value.nestedList.data()));
-            value.nestedList = DataModel::List<const uint32_t>();
-        }
+        Platform::MemoryFree(const_cast<uint32_t *>(value.nestedList.data()));
+        value.nestedList = DataModel::List<const uint32_t>();
     }
 
     value.id = 0;

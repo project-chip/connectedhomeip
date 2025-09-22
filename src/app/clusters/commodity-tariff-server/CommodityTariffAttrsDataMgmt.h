@@ -272,7 +272,14 @@ struct SpanCopier<char>
             return CHIP_NO_ERROR;
         }
 
-        return Copy(source, destination.Value(), maxCount);
+        CharSpan tempSpan;
+        CHIP_ERROR err = Copy(source, tempSpan, maxCount);
+        if (err != CHIP_NO_ERROR)
+        {
+            return err;
+        }
+        destination.SetNonNull(tempSpan);
+        return CHIP_NO_ERROR;
     }
 };
 
