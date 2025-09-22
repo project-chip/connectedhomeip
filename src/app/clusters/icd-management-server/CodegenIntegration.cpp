@@ -15,21 +15,22 @@
  *    limitations under the License.
  */
 
+#include <app-common/zap-generated/attributes/Accessors.h>
 #include <app/clusters/icd-management-server/icd-management-cluster.h>
 #include <app/static-cluster-config/IcdManagement.h>
 #include <data-model-providers/codegen/ClusterIntegration.h>
 #include <zap-generated/gen_config.h>
 
 namespace {
- using namespace chip;
- using namespace chip::app;
- using namespace chip::app::Clusters;
- using namespace chip::app::Clusters::IcdManagement;
- 
- static_assert((IcdManagement::StaticApplicationConfig::kFixedClusterConfig.size() == 1 &&
-                IcdManagement::StaticApplicationConfig::kFixedClusterConfig[0].endpointNumber == kRootEndpointId) ||
-               IcdManagement::StaticApplicationConfig::kFixedClusterConfig.size() == 0);
- 
+using namespace chip;
+using namespace chip::app;
+using namespace chip::app::Clusters;
+using namespace chip::app::Clusters::IcdManagement;
+
+static_assert((IcdManagement::StaticApplicationConfig::kFixedClusterConfig.size() == 1 &&
+               IcdManagement::StaticApplicationConfig::kFixedClusterConfig[0].endpointNumber == kRootEndpointId) ||
+              IcdManagement::StaticApplicationConfig::kFixedClusterConfig.size() == 0);
+
 LazyRegisteredServerCluster<ICDManagementCluster> gServer;
 
 #if CHIP_CONFIG_ENABLE_ICD_CIP
@@ -48,7 +49,7 @@ constexpr chip::BitMask<OptionalCommands> kEnabledCommands()
     return result;
 }
 
- class IntegrationDelegate : public CodegenClusterIntegration::Delegate
+class IntegrationDelegate : public CodegenClusterIntegration::Delegate
 {
 public:
     ServerClusterRegistration & CreateRegistration(EndpointId endpointId, unsigned clusterInstanceIndex,
@@ -56,20 +57,44 @@ public:
     {
         ICDManagementCluster::OptionalAttributeSet optionalAttributeSet(optionalAttributeBits);
         const auto enabledCommands = kEnabledCommands();
-        gServer.Create(Server::GetInstance().GetPersistentStorage(), *Server::GetInstance().GetSessionKeystore(), Server::GetInstance().GetFabricTable(), ICDConfigurationData::GetInstance().GetInstance(),
-        BitFlags<IcdManagement::Feature>(featureMap), optionalAttributeSet, enabledCommands);
+
+        // Get UserActiveModeTriggerHint
+        BitMask<IcdManagement::UserActiveModeTriggerBitmap> userActiveModeTriggerHint(0);
+        if (Clusters::IcdManagement::Attributes::UserActiveModeTriggerHint::Get(endpointId, &userActiveModeTriggerHint) !=
+            Protocols::InteractionModel::Status::Success)
+        {
+            ChipLogError(Zcl, "Failed to get UserActiveModeTriggerHint, using default (0)");
+        }
+
+        // Get UserActiveModeTriggerInstruction
+        char instructionBuffer[kUserActiveModeTriggerInstructionMaxLength];
+        MutableCharSpan instructionSpan(instructionBuffer, sizeof(instructionBuffer));
+        CharSpan userActiveModeTriggerInstruction;
+
+        if (Clusters::IcdManagement::Attributes::UserActiveModeTriggerInstruction::Get(endpointId, instructionSpan) !=
+            Protocols::InteractionModel::Status::Success)
+        {
+            ChipLogError(Zcl, "Failed to get UserActiveModeTriggerInstruction, using default (empty string)");
+            userActiveModeTriggerInstruction = CharSpan();
+        }
+        else
+        {
+            userActiveModeTriggerInstruction = CharSpan(instructionSpan.data(), instructionSpan.size());
+        }
+
+        gServer.Create(Server::GetInstance().GetPersistentStorage(), *Server::GetInstance().GetSessionKeystore(),
+                       Server::GetInstance().GetFabricTable(), ICDConfigurationData::GetInstance().GetInstance(),
+                       BitFlags<IcdManagement::Feature>(featureMap), optionalAttributeSet, enabledCommands,
+                       userActiveModeTriggerHint, userActiveModeTriggerInstruction);
         return gServer.Registration();
     }
 
-    ServerClusterInterface & FindRegistration(unsigned clusterInstanceIndex) override
-    {
-        return gServer.Cluster();
-    }
+    ServerClusterInterface & FindRegistration(unsigned clusterInstanceIndex) override { return gServer.Cluster(); }
     void ReleaseRegistration(unsigned clusterInstanceIndex) override { gServer.Destroy(); }
 };
 } // namespace
 
- void MatterIcdManagementPluginServerInitCallback()
+void MatterIcdManagementPluginServerInitCallback()
 {
     PersistentStorageDelegate & storage           = Server::GetInstance().GetPersistentStorage();
     Crypto::SymmetricKeystore * symmetricKeystore = Server::GetInstance().GetSessionKeystore();
@@ -79,12 +104,12 @@ public:
     IntegrationDelegate integrationDelegate;
     CodegenClusterIntegration::RegisterServer(
         {
-            .endpointId                        = kRootEndpointId,
-            .clusterId                         = IcdManagement::Id,
-            .fixedClusterServerEndpointCount   = IcdManagement::StaticApplicationConfig::kFixedClusterConfig.size(),
-            .maxEndpointCount                  = 1, // only root-node functionality supported by this implementation
-            .fetchFeatureMap                   = true,
-            .fetchOptionalAttributes           = true,
+            .endpointId                      = kRootEndpointId,
+            .clusterId                       = IcdManagement::Id,
+            .fixedClusterServerEndpointCount = IcdManagement::StaticApplicationConfig::kFixedClusterConfig.size(),
+            .maxEndpointCount                = 1, // only root-node functionality supported by this implementation
+            .fetchFeatureMap                 = true,
+            .fetchOptionalAttributes         = true,
         },
         integrationDelegate);
 
@@ -93,8 +118,6 @@ public:
     gFabricDelegate.Init(storage, symmetricKeystore, icdConfigurationData);
     fabricTable.AddFabricDelegate(&gFabricDelegate);
 #endif // CHIP_CONFIG_ENABLE_ICD_CIP
-
-
 }
 
 void MatterIcdManagementPluginServerShutdownCallback()
@@ -107,10 +130,10 @@ void MatterIcdManagementPluginServerShutdownCallback()
     IntegrationDelegate integrationDelegate;
     CodegenClusterIntegration::UnregisterServer(
         {
-            .endpointId                        = kRootEndpointId,
-            .clusterId                         = IcdManagement::Id,
-            .fixedClusterServerEndpointCount   = IcdManagement::StaticApplicationConfig::kFixedClusterConfig.size(),
-            .maxEndpointCount                  = 1, // only root-node functionality supported by this implementation
+            .endpointId                      = kRootEndpointId,
+            .clusterId                       = IcdManagement::Id,
+            .fixedClusterServerEndpointCount = IcdManagement::StaticApplicationConfig::kFixedClusterConfig.size(),
+            .maxEndpointCount                = 1, // only root-node functionality supported by this implementation
         },
         integrationDelegate);
 }
