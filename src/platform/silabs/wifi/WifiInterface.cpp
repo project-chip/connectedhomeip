@@ -181,7 +181,7 @@ void WifiInterface::ScheduleConnectionAttempt()
 
 void WifiInterface::ResetConnectionRetryInterval()
 {
-    ChipLogDetail(DeviceLayer, "ScheduleConnectionAttempts: Resetting state to default");
+    ChipLogDetail(DeviceLayer, "ResetConnectionRetryInterval: Resetting state to default");
     retryInterval = kWlanMinRetryIntervalsInSec;
 }
 
