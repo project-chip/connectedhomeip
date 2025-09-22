@@ -41,14 +41,14 @@ namespace {
 
 class Engine_raii {
 public:
-    Engine_raii(): engine{ chip::app::InteractionModelEngine::GetInstance() } {}
+    Engine_raii() : engine{ chip::app::InteractionModelEngine::GetInstance() } {}
 
     ~Engine_raii() { engine->Shutdown(); }
 
     chip::app::InteractionModelEngine * operator->() { return engine; }
 
 private:
-    chip::app::InteractionModelEngine * engine;     
+    chip::app::InteractionModelEngine * engine;
 };
 
 class FactoryInitParamsSetter
