@@ -2196,12 +2196,11 @@ TEST_F(TestCodegenModelViaMocks, AttributeAccessInterfaceTakesPrecedenceOverServ
         uint32_t value = 0;
         ASSERT_EQ(ReadU32Attribute(model, kTestAttributePath, value), CHIP_IM_GLOBAL_STATUS(UnsupportedRead));
 
-        // Writes fail because AAI
+        // Writes fail because AAI.
         WriteOperation test(kTestAttributePath);
         test.SetSubjectDescriptor(kAdminSubjectDescriptor);
         AttributeValueDecoder decoder = test.DecoderFor(value);
 
-        // write should succeed
         ASSERT_FALSE(model.WriteAttribute(test.GetRequest(), decoder).IsSuccess());
     }
 
