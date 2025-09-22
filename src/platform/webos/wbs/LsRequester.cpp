@@ -1,6 +1,6 @@
 /* @@@LICENSE
  *
- * Copyright (c) 2017 LG Electronics, Inc.
+ * Copyright (c) 2017-2025 LG Electronics, Inc.
  *
  * Confidential computer software. Valid license from LG required for
  * possession, use or copying. Consistent with FAR 12.211 and 12.212,

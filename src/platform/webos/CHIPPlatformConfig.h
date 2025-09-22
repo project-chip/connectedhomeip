@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020-2022 Project CHIP Authors
+ *    Copyright (c) 2020-2025 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -18,7 +18,7 @@
 /**
  *    @file
  *          Platform-specific configuration overrides for CHIP on
- *          Linux platforms.
+ *          webOS platforms.
  */
 
 #pragma once

@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2021 Project CHIP Authors
+ *    Copyright (c) 2021-2025 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,7 +18,7 @@
 
 /**
  *    @file
- *          Platform-specific implementation of KVS for linux.
+ *          Platform-specific implementation of KVS for webOS.
  */
 
 #pragma once
