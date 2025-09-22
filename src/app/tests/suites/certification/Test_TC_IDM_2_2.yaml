@@ -77,7 +77,7 @@ tests:
       verification: |
           The cluster used in the below command is an example, User can use any supported chip cluster/attribute/command.
 
-           ./chip-tool any read-by-id 0x03 0xFFFFFFFF 1 0
+           ./chip-tool any read-by-id 0x03 0xFFFFFFFF 1 1
 
           On the TH(chip-tool) verify the received report data message has only the attributes that the TH has privilege to.
 
@@ -387,7 +387,7 @@ tests:
       verification: |
           The cluster used in the below command is an example, User can use any supported chip cluster/attribute/command.
 
-           ./chip-tool any read-by-id 0x3 0x1 1 0
+           ./chip-tool any read-by-id 0x3 0x1 1 1
 
           On the TH(chip-tool) verify the received report data message has the right attribute value for above command
 
@@ -449,13 +449,44 @@ tests:
       PICS: MCORE.IDM.S.Attribute.DataType_Struct
       verification: |
           The cluster used in the below command is an example, User can use any supported chip cluster/attribute/command.
-             ./chip-tool  occupancysensing read   occupancy-sensor-type 1 1
 
-          On the TH(chip-tool) verify the received report data message has the right attribute value for above command
+           ./chip-tool modeselect read supported-modes 1 1
 
-          [1653630542.619226][9034:9039] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0406 Attribute 0x0000_0001 DataVersion: 3604656322
-          [1653630542.619277][9034:9039] CHIP:TOO:   occupancy sensor type: 0
-          [1653630542.619361][9034:9039] CHIP:EM: Sending Standalone Ack for MessageCounter:4568856 on exchange 18045i
+        On the TH (chip-tool), verify that the DUT has returned data from the expected attribute path. The output should resemble the following:
+        
+        [1720438689.894] [11260:11262] [DMG]         SuppressResponse = true, 
+        [1720438689.894] [11260:11262] [DMG]         InteractionModelRevision = 11
+        [1720438689.894] [11260:11262] [DMG] }
+        [1720438689.894] [11260:11262] [TOO] Endpoint: 1 Cluster: 0x0000_0050 Attribute 0x0000_0002 DataVersion: 1411155267
+        [1720438689.894] [11260:11262] [TOO]   SupportedModes: 3 entries
+        [1720438689.894] [11260:11262] [TOO]     [1]: {
+        [1720438689.894] [11260:11262] [TOO]       Label: Black
+        [1720438689.894] [11260:11262] [TOO]       Mode: 0
+        [1720438689.894] [11260:11262] [TOO]       SemanticTags: 1 entries
+        [1720438689.894] [11260:11262] [TOO]         [1]: {
+        [1720438689.894] [11260:11262] [TOO]           MfgCode: 0
+        [1720438689.894] [11260:11262] [TOO]           Value: 0
+        [1720438689.894] [11260:11262] [TOO]          }
+        [1720438689.894] [11260:11262] [TOO]      }
+        [1720438689.894] [11260:11262] [TOO]     [2]: {
+        [1720438689.895] [11260:11262] [TOO]       Label: Cappuccino
+        [1720438689.895] [11260:11262] [TOO]       Mode: 4
+        [1720438689.895] [11260:11262] [TOO]       SemanticTags: 1 entries
+        [1720438689.895] [11260:11262] [TOO]         [1]: {
+        [1720438689.895] [11260:11262] [TOO]           MfgCode: 0
+        [1720438689.895] [11260:11262] [TOO]           Value: 0
+        [1720438689.895] [11260:11262] [TOO]          }
+        [1720438689.895] [11260:11262] [TOO]      }
+        [1720438689.895] [11260:11262] [TOO]     [3]: {
+        [1720438689.895] [11260:11262] [TOO]       Label: Espresso
+        [1720438689.895] [11260:11262] [TOO]       Mode: 7
+        [1720438689.895] [11260:11262] [TOO]       SemanticTags: 1 entries
+        [1720438689.895] [11260:11262] [TOO]         [1]: {
+        [1720438689.895] [11260:11262] [TOO]           MfgCode: 0
+        [1720438689.895] [11260:11262] [TOO]           Value: 0
+        [1720438689.895] [11260:11262] [TOO]          }
+        [1720438689.895] [11260:11262] [TOO]      }
+        [1720438689.895] [11260:11262] [EM] <<< [E:5154i S:62262 M:155629086 (Ack:235901070)] (S) Msg TX to 1:0000000000000001 [67EF] [UDP:[fe80::e65f:1ff:fe49:ae1a%eth0]:5540] --- Type 0000:10 (SecureChannel:StandaloneAck)
       disabled: true
 
     - label:
@@ -495,13 +526,44 @@ tests:
       verification: |
           The cluster used in the below command is an example, User can use any supported chip cluster/attribute/command.
 
-          ./chip-tool  occupancysensing read   occupancy-sensor-type 1 1
+        The TH sends a Read Request Message to the DUT to read an attribute of data type enum:
 
-          On the TH(chip-tool) verify the received report data message has the right attribute value for above command
-          [1653630949.025002][9198:9203] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0406 Attribute 0x0000_0001 DataVersion: 3604656322
-          [1653630949.025066][9198:9203] CHIP:TOO:   occupancy sensor type: 0
-          [1653630949.025181][9198:9203] CHIP:EM: Sending Standalone Ack for MessageCounter:1638675 on exchange 63250i
-      disabled: true
+          ./chip-tool windowcovering read  type 1 1
+
+        On the TH (chip-tool), verify that the DUT has returned data from the expected attribute path. The output should show the type value, for example:
+        
+        [1720438762.165] [11289:11291] [EM] Rxd Ack; Removing MessageCounter:55647197 from Retrans Table on exchange 62870i
+        [1720438762.165] [11289:11291] [DMG] ReportDataMessage =
+        [1720438762.165] [11289:11291] [DMG] {
+        [1720438762.165] [11289:11291] [DMG]         AttributeReportIBs =
+        [1720438762.165] [11289:11291] [DMG]         [
+        [1720438762.165] [11289:11291] [DMG]                 AttributeReportIB =
+        [1720438762.165] [11289:11291] [DMG]                 {
+        [1720438762.165] [11289:11291] [DMG]                         AttributeDataIB =
+        [1720438762.165] [11289:11291] [DMG]                         {
+        [1720438762.166] [11289:11291] [DMG]                                 DataVersion = 0x304f15ef,
+        [1720438762.166] [11289:11291] [DMG]                                 AttributePathIB =
+        [1720438762.166] [11289:11291] [DMG]                                 {
+        [1720438762.166] [11289:11291] [DMG]                                         Endpoint = 0x1,
+        [1720438762.166] [11289:11291] [DMG]                                         Cluster = 0x102,
+        [1720438762.166] [11289:11291] [DMG]                                         Attribute = 0x0000_0000,
+        [1720438762.166] [11289:11291] [DMG]                                 }
+        [1720438762.166] [11289:11291] [DMG]                                         
+        [1720438762.166] [11289:11291] [DMG]                                 Data = 8 (unsigned), 
+        [1720438762.166] [11289:11291] [DMG]                         },
+        [1720438762.167] [11289:11291] [DMG]                         
+        [1720438762.167] [11289:11291] [DMG]                 },
+        [1720438762.167] [11289:11291] [DMG]                 
+        [1720438762.167] [11289:11291] [DMG]         ],
+        [1720438762.167] [11289:11291] [DMG]         
+        [1720438762.167] [11289:11291] [DMG]         SuppressResponse = true, 
+        [1720438762.167] [11289:11291] [DMG]         InteractionModelRevision = 11
+        [1720438762.167] [11289:11291] [DMG] }
+        [1720438762.167] [11289:11291] [TOO] Endpoint: 1 Cluster: 0x0000_0102 Attribute 0x0000_0000 DataVersion: 810489327
+        [1720438762.167] [11289:11291] [TOO]   Type: 8
+        [1720438762.167] [11289:11291] [EM] <<< [E:62870i S:42139 M:55647198 (Ack:38231779)] (S) Msg TX to 1:0000000000000001 [67EF] [UDP:[fe80::e65f:1ff:fe49:ae1a%eth0]:5540] --- Type 0000:10 (SecureChannel:StandaloneAck)
+        [1720438762.168] [11289:11291] [EM] Flushed pending ack for MessageCounter:38231779 on exchange 62870i
+              disabled: true
 
     - label:
           "Step 18: TH sends the Read Request Message to the DUT to read an
@@ -521,14 +583,6 @@ tests:
 
     - label:
           "Step 19: TH sends the Read Request Message to the DUT to read any
-          attribute to an unsupported node. DUT responds with the report data
-          action."
-      verification: |
-          Out of Scope
-      disabled: true
-
-    - label:
-          "Step 20: TH sends the Read Request Message to the DUT to read any
           attribute to an unsupported Endpoint. DUT responds with the report
           data action."
       verification: |
@@ -546,13 +600,13 @@ tests:
       disabled: true
 
     - label:
-          "Step 21: TH sends the Read Request Message to the DUT to read any
+          "Step 20: TH sends the Read Request Message to the DUT to read any
           attribute to an unsupported cluster. DUT responds with the report data
           action."
       verification: |
           The cluster used in the below command is an example, User can use any supported chip cluster/attribute/command.
 
-           ./chip-tool any read-by-id 0x3 0x1 1 2
+            ./chip-tool windowcovering read  type 1 2
 
           On TH(chip-tool) verify that the DUT sends the status code UNSUPPORTED_CLUSTER for above command
 
@@ -564,7 +618,7 @@ tests:
       disabled: true
 
     - label:
-          "Step 22: TH sends the Read Request Message to the DUT to read an
+          "Step 21: TH sends the Read Request Message to the DUT to read an
           unsupported attribute DUT responds with the report data action."
       verification: |
           The cluster used in the below command is an example, User can use any supported chip cluster/attribute/command.
@@ -581,91 +635,7 @@ tests:
       disabled: true
 
     - label:
-          "Step 23: TH sends the Read Request Message to the DUT to read an
-          attribute which is not readable. DUT responds with the report data
-          action."
-      verification: |
-          DUT implementation required to verify read an attribute which is not having a read access
-          If the Vendor DUT doesn't implement/supported this attribute, Please mark the test step as "\Not Applicable\"
-      disabled: true
-
-    - label:
-          "Step 24: TH sends the Read Request Message to the DUT to read an
-          attribute in the path that requires a privilege that is not granted
-          for the cluster in the path. DUT responds with the report data action."
-      verification: |
-          The cluster used in the below command is an example, User can use any supported chip cluster/attribute/command.
-
-
-          To Setup the TH(chip-tool) such that it should not have the privilege for the cluster in the path. , 1st we need to send below mentioned ACL command. Here by sending below mentioned ACL command giving only access for ACL cluster(31), So except ACL cluster command if try to send any other command will get status as unsupported access
-
-          ./chip-tool accesscontrol write acl '[{"fabricIndex": 1, "privilege": 5, "authMode": 2, "subjects":[112233], "targets": [{ "cluster":31, "endpoint":0, "deviceType":null }]}]' 1 0
-
-          [1659419722.669629][1915:1920] CHIP:DMG: WriteResponseMessage =
-          [1659419722.669657][1915:1920] CHIP:DMG: {
-          [1659419722.669687][1915:1920] CHIP:DMG:         AttributeStatusIBs =
-          [1659419722.669727][1915:1920] CHIP:DMG:         [
-          [1659419722.669758][1915:1920] CHIP:DMG:                 AttributeStatusIB =
-          [1659419722.669796][1915:1920] CHIP:DMG:                 {
-          [1659419722.669833][1915:1920] CHIP:DMG:                         AttributePathIB =
-          [1659419722.669871][1915:1920] CHIP:DMG:                         {
-          [1659419722.669912][1915:1920] CHIP:DMG:                                 Endpoint = 0x0,
-          [1659419722.669953][1915:1920] CHIP:DMG:                                 Cluster = 0x1f,
-          [1659419722.669993][1915:1920] CHIP:DMG:                                 Attribute = 0x0000_0000,
-          [1659419722.670034][1915:1920] CHIP:DMG:                         }
-          [1659419722.670077][1915:1920] CHIP:DMG:
-          [1659419722.670114][1915:1920] CHIP:DMG:                         StatusIB =
-          [1659419722.670153][1915:1920] CHIP:DMG:                         {
-          [1659419722.670191][1915:1920] CHIP:DMG:                                 status = 0x00 (SUCCESS),
-          [1659419722.670229][1915:1920] CHIP:DMG:                         },
-          [1659419722.670266][1915:1920] CHIP:DMG:
-          [1659419722.670300][1915:1920] CHIP:DMG:                 },
-          [1659419722.670343][1915:1920] CHIP:DMG:
-          [1659419722.670373][1915:1920] CHIP:DMG:                 AttributeStatusIB =
-          [1659419722.670405][1915:1920] CHIP:DMG:                 {
-          [1659419722.670436][1915:1920] CHIP:DMG:                         AttributePathIB =
-          [1659419722.670471][1915:1920] CHIP:DMG:                         {
-          [1659419722.670510][1915:1920] CHIP:DMG:                                 Endpoint = 0x0,
-          [1659419722.670550][1915:1920] CHIP:DMG:                                 Cluster = 0x1f,
-          [1659419722.670590][1915:1920] CHIP:DMG:                                 Attribute = 0x0000_0000,
-          [1659419722.670661][1915:1920] CHIP:DMG:                                 ListIndex = Null,
-          [1659419722.670700][1915:1920] CHIP:DMG:                         }
-          [1659419722.670740][1915:1920] CHIP:DMG:
-          [1659419722.670776][1915:1920] CHIP:DMG:                         StatusIB =
-          [1659419722.670813][1915:1920] CHIP:DMG:                         {
-          [1659419722.670851][1915:1920] CHIP:DMG:                                 status = 0x00 (SUCCESS),
-          [1659419722.670888][1915:1920] CHIP:DMG:                         },
-          [1659419722.670925][1915:1920] CHIP:DMG:
-          [1659419722.670958][1915:1920] CHIP:DMG:                 },
-          [1659419722.670994][1915:1920] CHIP:DMG:
-          [1659419722.671022][1915:1920] CHIP:DMG:         ],
-          [1659419722.671062][1915:1920] CHIP:DMG:
-          [1659419722.671092][1915:1920] CHIP:DMG:         InteractionModelRevision = 1
-          [1659419722.671120][1915:1920] CHIP:DMG: }
-          [1659419722.671244][1915:1920] CHIP:DMG: WriteClient moving to [AwaitingDe]
-          [1659419722.671314][1915:1920] CHIP:EM: Sending Standalone Ack for MessageCounter:153124628 on
-
-
-
-           ./chip-tool operationalcredentials read trusted-root-certificates 1 0
-
-          On TH(chip-tool) verify that the DUT sends the status code UNSUPPORTED_ACCESS(0x7E) for above command
-
-          [1659422202.429460][2021:2027] CHIP:DMG:
-          [1659422202.429488][2021:2027] CHIP:DMG:         SuppressResponse = true,
-          [1659422202.429516][2021:2027] CHIP:DMG:         InteractionModelRevision = 1
-          [1659422202.429544][2021:2027] CHIP:DMG: }
-          [1659422202.429658][2021:2027] CHIP:TOO: Response Failure: IM Error 0x0000057E: General error: 0x7e (UNSUPPORTED_ACCESS)
-          [1659422202.429750][2021:2027] CHIP:EM: Sending Standalone Ack for MessageCounter:188462
-
-
-          With the above command, we are overwriting the default privilege that chip-tool has as an admin. After this test step you need to  send below mentioned command to Grant access to all clusters again.
-
-          ./chip-tool accesscontrol write acl '[{"fabricIndex": 1, "privilege": 5, "authMode":2, "subjects":[112233], "targets":null}]' 1 0
-      disabled: true
-
-    - label:
-          "Step 25: TH sends the Read Request Message to the DUT to read an
+          "Step 22: TH sends the Read Request Message to the DUT to read an
           attribute Repeat the above steps 3 times."
       verification: |
           The cluster used in the below command is an example, User can use any supported chip cluster/attribute/command.
@@ -689,7 +659,7 @@ tests:
       disabled: true
 
     - label:
-          "Step 26: TH sends a Read Request Message to the DUT to read a
+          "Step 23: TH sends a Read Request Message to the DUT to read a
           particular attribute with the DataVersionFilter Field not set. DUT
           sends back the attribute value with the DataVersion of the cluster. TH
           sends a second read request to the same cluster with the
@@ -745,7 +715,7 @@ tests:
       disabled: true
 
     - label:
-          "Step 27: TH sends a Read Request Message to the DUT to read a
+          "Step 24: TH sends a Read Request Message to the DUT to read a
           particular attribute with the DataVersionFilter Field not set. DUT
           sends back the attribute value with the DataVersion of the cluster. TH
           sends a write request to the same cluster to write to any attribute.
@@ -790,7 +760,6 @@ tests:
           [1653632941.731258][9571:9576] CHIP:EM: Sending Standalone Ack for MessageCounter:578130 on exchange 46565i
 
 
-
            ./chip-tool identify write identify-time 2 1 1
 
           On the TH(chip-tool) verify the succes status response received from DUT
@@ -810,7 +779,7 @@ tests:
       disabled: true
 
     - label:
-          "Step 28: TH sends a Read Request Message to the DUT to read all
+          "Step 25: TH sends a Read Request Message to the DUT to read all
           attributes on a cluster with the DataVersionFilter Field not set. DUT
           sends back the all the attribute values with the DataVersion of the
           cluster. TH sends a write request to the same cluster to write to any
@@ -909,7 +878,7 @@ tests:
       disabled: true
 
     - label:
-          "Step 29: TH sends a Read Request Message to the DUT to read a
+          "Step 26: TH sends a Read Request Message to the DUT to read a
           particular attribute on a particular cluster with the
           DataVersionFilter Field not set. DUT sends back the attribute value
           with the DataVersion of the cluster. TH sends a read request to the
@@ -984,7 +953,7 @@ tests:
       disabled: true
 
     - label:
-          "Step 30: TH sends a Read Request Message to the DUT to read any
+          "Step 27: TH sends a Read Request Message to the DUT to read any
           supported attribute/wildcard on a particular cluster say A with the
           DataVersionFilter Field not set. DUT sends back the attribute value
           with the DataVersion of the cluster A. TH sends a Read Request Message
@@ -1051,7 +1020,7 @@ tests:
       disabled: true
 
     - label:
-          "Step 31: TH sends a Read Request Message to the DUT to read
+          "Step 28: TH sends a Read Request Message to the DUT to read
           something(Attribute) which is larger than 1 MTU(1280 bytes) and per
           spec can be chunked +"
       PICS: MCORE.IDM.S.LargeData
@@ -1061,7 +1030,7 @@ tests:
       disabled: true
 
     - label:
-          "Step 32: TH sends a Read Request Message to the DUT to read a non
+          "Step 29: TH sends a Read Request Message to the DUT to read a non
           global attribute from all clusters at that Endpoint AttributePath =
           [[Endpoint = Specific Endpoint, Attribute = Specific Non Global
           Attribute]] +"
@@ -1083,7 +1052,7 @@ tests:
       disabled: true
 
     - label:
-          "Step 33: TH sends a Read Request Message to the DUT to read a non
+          "Step 30: TH sends a Read Request Message to the DUT to read a non
           global attribute from all clusters at all Endpoints AttributePath =
           [[Attribute = Specific Non Global Attribute]] +"
       verification: |
@@ -1103,7 +1072,7 @@ tests:
       disabled: true
 
     - label:
-          "Step 34: TH should have access to only a single cluster at one
+          "Step 31: TH should have access to only a single cluster at one
           Endpoint1. TH sends a Read Request Message to the DUT to read all
           attributes from all clusters at Endpoint1 AttributePath = [[Endpoint =
           Specific Endpoint]] +"
@@ -1219,7 +1188,7 @@ tests:
       disabled: true
 
     - label:
-          "Step 35: TH sends a Read Request Message to read all events and
+          "Step 32: TH sends a Read Request Message to read all events and
           attributes from the DUT."
       verification: |
           In case of chip tool, here is an example command to use
