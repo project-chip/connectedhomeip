@@ -43,23 +43,24 @@ LazyRegisteredServerCluster<WiFiDiagnosticsServerCluster> gServers[kWiFiNetworkD
 class IntegrationDelegate : public CodegenClusterIntegration::Delegate
 {
 public:
-    ServerClusterRegistration & CreateRegistration(EndpointId endpointId, unsigned emberEndpointIndex,
+    ServerClusterRegistration & CreateRegistration(EndpointId endpointId, unsigned clusterInstanceIndex,
                                                    uint32_t optionalAttributeBits, uint32_t featureMap) override
     {
         // NOTE: Currently, diagnostics only support a single provider (DeviceLayer::GetDiagnosticDataProvider())
         // and do not properly support secondary network interfaces or per-endpoint diagnostics.
         // See issue:#40317
-        gServers[emberEndpointIndex].Create(endpointId, DeviceLayer::GetDiagnosticDataProvider(),
-                                            WiFiDiagnosticsServerLogic::OptionalAttributeSet(optionalAttributeBits),
-                                            BitFlags<WiFiNetworkDiagnostics::Feature>(featureMap));
-        return gServers[emberEndpointIndex].Registration();
+        gServers[clusterInstanceIndex].Create(endpointId, DeviceLayer::GetDiagnosticDataProvider(),
+                                              WiFiDiagnosticsServerLogic::OptionalAttributeSet(optionalAttributeBits),
+                                              BitFlags<WiFiNetworkDiagnostics::Feature>(featureMap));
+        return gServers[clusterInstanceIndex].Registration();
     }
 
-    ServerClusterInterface & FindRegistration(unsigned emberEndpointIndex) override
+    ServerClusterInterface * FindRegistration(unsigned clusterInstanceIndex) override
     {
-        return gServers[emberEndpointIndex].Cluster();
+        VerifyOrReturnValue(gServers[clusterInstanceIndex].IsConstructed(), nullptr);
+        return &gServers[clusterInstanceIndex].Cluster();
     }
-    void ReleaseRegistration(unsigned emberEndpointIndex) override { gServers[emberEndpointIndex].Destroy(); }
+    void ReleaseRegistration(unsigned clusterInstanceIndex) override { gServers[clusterInstanceIndex].Destroy(); }
 };
 
 } // namespace
@@ -71,12 +72,12 @@ void emberAfWiFiNetworkDiagnosticsClusterServerInitCallback(EndpointId endpointI
 
     CodegenClusterIntegration::RegisterServer(
         {
-            .endpointId                      = endpointId,
-            .clusterId                       = WiFiNetworkDiagnostics::Id,
-            .fixedClusterServerEndpointCount = kWiFiNetworkDiagnosticsFixedClusterCount,
-            .maxEndpointCount                = kWiFiNetworkDiagnosticsMaxClusterCount,
-            .fetchFeatureMap                 = true,
-            .fetchOptionalAttributes         = true,
+            .endpointId                = endpointId,
+            .clusterId                 = WiFiNetworkDiagnostics::Id,
+            .fixedClusterInstanceCount = kWiFiNetworkDiagnosticsFixedClusterCount,
+            .maxClusterInstanceCount   = kWiFiNetworkDiagnosticsMaxClusterCount,
+            .fetchFeatureMap           = true,
+            .fetchOptionalAttributes   = true,
         },
         integrationDelegate);
 }
@@ -88,10 +89,10 @@ void MatterWiFiNetworkDiagnosticsClusterServerShutdownCallback(EndpointId endpoi
 
     CodegenClusterIntegration::UnregisterServer(
         {
-            .endpointId                      = endpointId,
-            .clusterId                       = WiFiNetworkDiagnostics::Id,
-            .fixedClusterServerEndpointCount = kWiFiNetworkDiagnosticsFixedClusterCount,
-            .maxEndpointCount                = kWiFiNetworkDiagnosticsMaxClusterCount,
+            .endpointId                = endpointId,
+            .clusterId                 = WiFiNetworkDiagnostics::Id,
+            .fixedClusterInstanceCount = kWiFiNetworkDiagnosticsFixedClusterCount,
+            .maxClusterInstanceCount   = kWiFiNetworkDiagnosticsMaxClusterCount,
         },
         integrationDelegate);
 }

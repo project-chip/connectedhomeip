@@ -31877,6 +31877,7 @@ class Thermostat(Cluster):
             kMatterScheduleConfiguration = 0x80
             kPresets = 0x100
             kEvents = 0x200
+            kThermostatSuggestions = 0x400
 
         class HVACSystemTypeBitmap(IntFlag):
             kCoolingStage = 0x3
@@ -31938,6 +31939,7 @@ class Thermostat(Cluster):
             kVacationMode = 0x10
             kTimeOfUseCostSavings = 0x20
             kPreCoolingOrPreHeating = 0x40
+            kConflictingSuggestions = 0x80
 
     class Structs:
         @dataclass
@@ -47837,6 +47839,7 @@ class CameraAvSettingsUserLevelManagement(Cluster):
                 ClusterObjectFieldDescriptor(Label="tiltMax", Tag=0x00000006, Type=typing.Optional[int]),
                 ClusterObjectFieldDescriptor(Label="panMin", Tag=0x00000007, Type=typing.Optional[int]),
                 ClusterObjectFieldDescriptor(Label="panMax", Tag=0x00000008, Type=typing.Optional[int]),
+                ClusterObjectFieldDescriptor(Label="movementState", Tag=0x00000009, Type=typing.Optional[CameraAvSettingsUserLevelManagement.Enums.PhysicalMovementEnum]),
                 ClusterObjectFieldDescriptor(Label="generatedCommandList", Tag=0x0000FFF8, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="acceptedCommandList", Tag=0x0000FFF9, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="attributeList", Tag=0x0000FFFB, Type=typing.List[uint]),
@@ -47853,11 +47856,22 @@ class CameraAvSettingsUserLevelManagement(Cluster):
     tiltMax: typing.Optional[int] = None
     panMin: typing.Optional[int] = None
     panMax: typing.Optional[int] = None
+    movementState: typing.Optional[CameraAvSettingsUserLevelManagement.Enums.PhysicalMovementEnum] = None
     generatedCommandList: typing.List[uint] = field(default_factory=lambda: [])
     acceptedCommandList: typing.List[uint] = field(default_factory=lambda: [])
     attributeList: typing.List[uint] = field(default_factory=lambda: [])
     featureMap: uint = 0
     clusterRevision: uint = 0
+
+    class Enums:
+        class PhysicalMovementEnum(MatterIntEnum):
+            kIdle = 0x00
+            kMoving = 0x01
+            # All received enum values that are not listed above will be mapped
+            # to kUnknownEnumValue. This is a helper enum value that should only
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
+            kUnknownEnumValue = 2
 
     class Bitmaps:
         class Feature(IntFlag):
@@ -48186,6 +48200,22 @@ class CameraAvSettingsUserLevelManagement(Cluster):
                 return ClusterObjectFieldDescriptor(Type=typing.Optional[int])
 
             value: typing.Optional[int] = None
+
+        @dataclass
+        class MovementState(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000552
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000009
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[CameraAvSettingsUserLevelManagement.Enums.PhysicalMovementEnum])
+
+            value: typing.Optional[CameraAvSettingsUserLevelManagement.Enums.PhysicalMovementEnum] = None
 
         @dataclass
         class GeneratedCommandList(ClusterAttributeDescriptor):
@@ -52003,16 +52033,6 @@ class TlsCertificateManagement(Cluster):
     featureMap: uint = 0
     clusterRevision: uint = 0
 
-    class Enums:
-        class StatusCodeEnum(MatterIntEnum):
-            kCertificateAlreadyInstalled = 0x02
-            kDuplicateKey = 0x03
-            # All received enum values that are not listed above will be mapped
-            # to kUnknownEnumValue. This is a helper enum value that should only
-            # be used by code to process how it handles receiving an unknown
-            # enum value. This specific value should never be transmitted.
-            kUnknownEnumValue = 0
-
     class Structs:
         @dataclass
         class TLSCertStruct(ClusterObject):
@@ -52036,13 +52056,13 @@ class TlsCertificateManagement(Cluster):
                 return ClusterObjectDescriptor(
                     Fields=[
                         ClusterObjectFieldDescriptor(Label="ccdid", Tag=0, Type=uint),
-                        ClusterObjectFieldDescriptor(Label="clientCertificate", Tag=1, Type=typing.Optional[bytes]),
+                        ClusterObjectFieldDescriptor(Label="clientCertificate", Tag=1, Type=typing.Union[None, Nullable, bytes]),
                         ClusterObjectFieldDescriptor(Label="intermediateCertificates", Tag=2, Type=typing.Optional[typing.List[bytes]]),
                         ClusterObjectFieldDescriptor(Label="fabricIndex", Tag=254, Type=uint),
                     ])
 
             ccdid: 'uint' = 0
-            clientCertificate: 'typing.Optional[bytes]' = None
+            clientCertificate: 'typing.Union[None, Nullable, bytes]' = None
             intermediateCertificates: 'typing.Optional[typing.List[bytes]]' = None
             fabricIndex: 'uint' = 0
 
@@ -52162,23 +52182,25 @@ class TlsCertificateManagement(Cluster):
             caid: uint = 0
 
         @dataclass
-        class TLSClientCSR(ClusterCommand):
+        class ClientCSR(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x00000801
             command_id: typing.ClassVar[int] = 0x00000007
             is_client: typing.ClassVar[bool] = True
-            response_type: typing.ClassVar[str] = 'TLSClientCSRResponse'
+            response_type: typing.ClassVar[str] = 'ClientCSRResponse'
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields=[
                         ClusterObjectFieldDescriptor(Label="nonce", Tag=0, Type=bytes),
+                        ClusterObjectFieldDescriptor(Label="ccdid", Tag=1, Type=typing.Union[Nullable, uint]),
                     ])
 
             nonce: bytes = b""
+            ccdid: typing.Union[Nullable, uint] = NullValue
 
         @dataclass
-        class TLSClientCSRResponse(ClusterCommand):
+        class ClientCSRResponse(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x00000801
             command_id: typing.ClassVar[int] = 0x00000008
             is_client: typing.ClassVar[bool] = False
@@ -52190,12 +52212,12 @@ class TlsCertificateManagement(Cluster):
                     Fields=[
                         ClusterObjectFieldDescriptor(Label="ccdid", Tag=0, Type=uint),
                         ClusterObjectFieldDescriptor(Label="csr", Tag=1, Type=bytes),
-                        ClusterObjectFieldDescriptor(Label="nonce", Tag=2, Type=bytes),
+                        ClusterObjectFieldDescriptor(Label="nonceSignature", Tag=2, Type=bytes),
                     ])
 
             ccdid: uint = 0
             csr: bytes = b""
-            nonce: bytes = b""
+            nonceSignature: bytes = b""
 
         @dataclass
         class ProvisionClientCertificate(ClusterCommand):
@@ -52209,11 +52231,13 @@ class TlsCertificateManagement(Cluster):
                 return ClusterObjectDescriptor(
                     Fields=[
                         ClusterObjectFieldDescriptor(Label="ccdid", Tag=0, Type=uint),
-                        ClusterObjectFieldDescriptor(Label="clientCertificateDetails", Tag=1, Type=TlsCertificateManagement.Structs.TLSClientCertificateDetailStruct),
+                        ClusterObjectFieldDescriptor(Label="clientCertificate", Tag=1, Type=bytes),
+                        ClusterObjectFieldDescriptor(Label="intermediateCertificates", Tag=2, Type=typing.List[bytes]),
                     ])
 
             ccdid: uint = 0
-            clientCertificateDetails: TlsCertificateManagement.Structs.TLSClientCertificateDetailStruct = field(default_factory=lambda: TlsCertificateManagement.Structs.TLSClientCertificateDetailStruct())
+            clientCertificate: bytes = b""
+            intermediateCertificates: typing.List[bytes] = field(default_factory=lambda: [])
 
         @dataclass
         class FindClientCertificate(ClusterCommand):

@@ -60,7 +60,7 @@ class TC_SC_3_4(MatterBaseTest):
     def steps_TC_SC_3_4(self) -> list[TestStep]:
         steps = [
 
-            TestStep("precondition", "DUT is commissioned and TH has an open CASE Session with DUT"),
+            TestStep("precondition", "DUT is commissioned and TH has an open CASE Session with DUT", is_commissioning=True),
 
             TestStep(1, "TH constructs and sends a Sigma1 message with a resumptionID and NO initiatorResumeMIC to DUT",
                      "DUT sends a status report to the TH with a FAILURE general code , Protocol ID of SECURE_CHANNEL (0x0000), and Protocol Code of INVALID_PARAMETER (0X0002). DUT MUST perform no further processing after sending the status report."),

@@ -19,7 +19,7 @@
 #include "app-common/zap-generated/ids/Clusters.h"
 #include "app-common/zap-generated/ids/Commands.h"
 #include "lib/core/CHIPError.h"
-#include <app/clusters/bindings/bindings.h>
+#include <app/clusters/bindings/BindingManager.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <variant>
 

@@ -22,7 +22,7 @@
 #include <platform/ConfigurationManager.h>
 #include <platform/ConnectivityManager.h>
 #include <platform/PlatformManager.h>
-#include <src/platform/nxp/common/ble/BLEManagerCommon.h>
+#include <platform/nxp/common/ble/BLEManagerCommon.h>
 
 #include "gatt_db_app_interface.h"
 #include "gatt_db_handles.h"
@@ -59,7 +59,7 @@ void BLEApplicationManager::Init(void)
     CHIP_ERROR err    = CHIP_NO_ERROR;
     auto * bleManager = &chip::DeviceLayer::Internal::BLEMgrImpl();
 
-    bleManager->RegisterAppCallbacks(app_gap_callback, app_gatt_callback);
+    bleManager->RegisterAppCallbacks(nullptr, nullptr, app_gap_callback, app_gatt_callback);
     err = bleManager->AddWriteNotificationHandle((uint16_t) value_uart_stream);
 
     if (err != CHIP_NO_ERROR)

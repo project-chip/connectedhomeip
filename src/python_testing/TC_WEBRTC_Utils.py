@@ -25,6 +25,43 @@ class WebRTCTestHelper:
             endpoint=endpoint, cluster=CameraAvStreamManagement, attribute=attribute
         )
 
+    async def allocate_audio_stream(self, endpoint):
+        """Try to allocate an audio stream from the camera device. Returns the stream ID if successful, otherwise None."""
+        attrs = CameraAvStreamManagement.Attributes
+        try:
+            # Get the parms from the device (those which are available)
+            aStreamUsagePriorities = await self.read_avstr_attribute_expect_success(endpoint, attrs.StreamUsagePriorities)
+            aMicrophoneCapabilities = await self.read_avstr_attribute_expect_success(
+                endpoint=endpoint, attribute=attrs.MicrophoneCapabilities
+            )
+            aBitRate = 0
+            codec = aMicrophoneCapabilities.supportedCodecs[0]
+            match codec:
+                case CameraAvStreamManagement.Enums.AudioCodecEnum.kOpus:
+                    aBitRate = 30000
+
+                case CameraAvStreamManagement.Enums.AudioCodecEnum.kAacLc:
+                    aBitRate = 40000
+
+                case _:
+                    aBitRate = 30000
+                    logging.warning(f"Using default bitrate {aBitRate} for unhandled codec {codec}")
+
+            adoStreamAllocateCmd = CameraAvStreamManagement.Commands.AudioStreamAllocate(
+                streamUsage=aStreamUsagePriorities[0],
+                audioCodec=aMicrophoneCapabilities.supportedCodecs[0],
+                channelCount=aMicrophoneCapabilities.maxNumberOfChannels,
+                sampleRate=aMicrophoneCapabilities.supportedSampleRates[0],
+                bitRate=aBitRate,
+                bitDepth=aMicrophoneCapabilities.supportedBitDepths[0],
+            )
+            audioStreamAllocateResponse = await self.send_single_cmd(endpoint=endpoint, cmd=adoStreamAllocateCmd)
+            return audioStreamAllocateResponse.audioStreamID
+
+        except Exception as e:
+            logging.error(f"Failed to allocate audio stream. {e}")
+            return None
+
     async def allocate_video_stream(self, endpoint):
         """Try to allocate a video stream from the camera device. Returns the stream ID if successful, otherwise None."""
         attrs = CameraAvStreamManagement.Attributes
