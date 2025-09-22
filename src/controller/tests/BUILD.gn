@@ -57,7 +57,10 @@ chip_test_suite("tests") {
   }
 
   if (chip_support_commissioning_in_controller && chip_build_controller) {
-    test_sources += [ "TestAutoCommissioner.cpp" ]
+    test_sources += [
+      "TestAutoCommissioner.cpp",
+      "TestCommissioneeDeviceProxy.cpp",
+    ]
   }
 
   test_sources += [ "TestCommissioningDelegate.cpp" ]
