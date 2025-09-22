@@ -215,7 +215,7 @@ struct SpanCopier
         {
             return CHIP_ERROR_IN_USE;
         }
-    
+
         if (source.empty())
         {
             destination = DataModel::List<const T>();
@@ -243,8 +243,7 @@ struct SpanCopier<char>
     /// @param destination Output span to populate
     /// @param maxCount Maximum number of characters to copy (default: unlimited)
     /// @return CHIP_NO_ERROR if copy succeeded, error code on failure
-    static CHIP_ERROR Copy(const CharSpan & source, CharSpan & destination,
-                           size_t maxCount = std::numeric_limits<size_t>::max())
+    static CHIP_ERROR Copy(const CharSpan & source, CharSpan & destination, size_t maxCount = std::numeric_limits<size_t>::max())
     {
         if (source.size() > maxCount)
         {
@@ -258,14 +257,14 @@ struct SpanCopier<char>
                 return CHIP_ERROR_NO_MEMORY;
 
             std::copy(source.begin(), source.end(), buffer);
-            destination = CharSpan(buffer, source.size());                
+            destination = CharSpan(buffer, source.size());
         }
 
         return CHIP_NO_ERROR;
     }
 
     static CHIP_ERROR CopyToNullable(const CharSpan & source, DataModel::Nullable<CharSpan> & destination,
-                           size_t maxCount = std::numeric_limits<size_t>::max())
+                                     size_t maxCount = std::numeric_limits<size_t>::max())
     {
         if (source.empty())
         {
@@ -501,18 +500,18 @@ public:
     virtual ~CTC_BaseDataClassBase() = default;
 
     // Common interface
-    virtual bool IsValid() const                   { return true; };
-    virtual bool HasValue() const                  { return false; };
-    virtual bool HasNewValue() const               { return false; };
-    virtual CHIP_ERROR MarkAsAssigned()            { return CHIP_NO_ERROR; };
+    virtual bool IsValid() const { return true; };
+    virtual bool HasValue() const { return false; };
+    virtual bool HasNewValue() const { return false; };
+    virtual CHIP_ERROR MarkAsAssigned() { return CHIP_NO_ERROR; };
     virtual CHIP_ERROR UpdateBegin(void * aUpdCtx) { return CHIP_NO_ERROR; };
-    virtual bool UpdateFinish(bool aUpdateAllow)   { return aUpdateAllow; };
-    virtual bool Cleanup()                         { return false; };
-    virtual AttributeId GetAttrId() const          = 0;
+    virtual bool UpdateFinish(bool aUpdateAllow) { return aUpdateAllow; };
+    virtual bool Cleanup() { return false; };
+    virtual AttributeId GetAttrId() const = 0;
 
     // Type-erased methods for generic access
-    virtual CHIP_ERROR GetValueAsVoid(void *& outValue)        { return CHIP_NO_ERROR; };
-    virtual CHIP_ERROR GetNewValueAsVoid(void *& outValue)     { return CHIP_NO_ERROR; };
+    virtual CHIP_ERROR GetValueAsVoid(void *& outValue) { return CHIP_NO_ERROR; };
+    virtual CHIP_ERROR GetNewValueAsVoid(void *& outValue) { return CHIP_NO_ERROR; };
     virtual CHIP_ERROR SetNewValueFromVoid(const void * value) { return CHIP_NO_ERROR; };
 };
 

@@ -243,8 +243,8 @@ CHIP_ERROR CTC_BaseDataClass<DataModel::Nullable<DataModel::List<TariffComponent
         output.label.Value().SetNull();
         if (!input.label.Value().IsNull())
         {
-            ReturnErrorOnFailure(
-                SpanCopier<char>::CopyToNullable(input.label.Value().Value(), output.label.Value(), input.label.Value().Value().size()));
+            ReturnErrorOnFailure(SpanCopier<char>::CopyToNullable(input.label.Value().Value(), output.label.Value(),
+                                                                  input.label.Value().Value().size()));
         }
     }
 
@@ -309,8 +309,7 @@ CHIP_ERROR CTC_BaseDataClass<DataModel::Nullable<DataModel::List<CalendarPeriodS
         output.startDate.SetNonNull(input.startDate.Value());
     }
 
-    ReturnErrorOnFailure(
-        SpanCopier<uint32_t>::Copy(input.dayPatternIDs, output.dayPatternIDs, input.dayPatternIDs.size()));
+    ReturnErrorOnFailure(SpanCopier<uint32_t>::Copy(input.dayPatternIDs, output.dayPatternIDs, input.dayPatternIDs.size()));
 
     return CHIP_NO_ERROR;
 }

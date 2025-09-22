@@ -228,10 +228,7 @@ TEST_F(TestCommodityTariffBaseDataClass, StructValueHandling)
     constexpr uint32_t sample_field_one = 100;
     constexpr uint16_t sample_field_two = 200;
 
-    MockStruct testStruct = { 
-        .field1 = sample_field_one, 
-        .field2 = sample_field_two
-    };
+    MockStruct testStruct = { .field1 = sample_field_one, .field2 = sample_field_two };
 
     EXPECT_EQ(data.SetNewValue(testStruct), CHIP_NO_ERROR);
     data.UpdateBegin(nullptr);
@@ -266,8 +263,8 @@ TEST_F(TestCommodityTariffBaseDataClass, NullableStructValueHandling)
 {
     CTC_BaseDataClass<DataModel::Nullable<MockStruct>> data(1);
     constexpr uint32_t sample_field_one = 100;
-    const uint16_t sample_field_two = 200;
-    MockStruct testStruct           = { sample_field_one, sample_field_two };
+    const uint16_t sample_field_two     = 200;
+    MockStruct testStruct               = { sample_field_one, sample_field_two };
     DataModel::Nullable<MockStruct> newValue;
 
     newValue.SetNonNull(testStruct);
@@ -290,7 +287,7 @@ TEST_F(TestCommodityTariffBaseDataClass, ListValueCreationAndCleanup)
 {
     CTC_BaseDataClass<DataModel::List<uint32_t>> data(1);
     uint32_t SampleArr[]                       = { 10, 20, 30 };
-    constexpr uint32_t SampleListLen               = sizeof(SampleArr) / sizeof(uint32_t);
+    constexpr uint32_t SampleListLen           = sizeof(SampleArr) / sizeof(uint32_t);
     const DataModel::List<uint32_t> ListSample = DataModel::List<uint32_t>(SampleArr, SampleListLen);
 
     EXPECT_EQ(data.SetNewValue(ListSample), CHIP_NO_ERROR);
@@ -418,20 +415,17 @@ TEST_F(TestCommodityTariffBaseDataClass, UpdateAbort)
 struct ResourceStruct
 {
     uint32_t id;
-    CharSpan label;                   // Requires manual memory management
+    CharSpan label;                             // Requires manual memory management
     DataModel::List<const uint32_t> nestedList; // Requires cleanup
 
     // Proper equality operator
-    bool operator==(const ResourceStruct& other) const {
-        return id == other.id && 
-               label == other.label && 
-               nestedList == other.nestedList;
+    bool operator==(const ResourceStruct & other) const
+    {
+        return id == other.id && label == other.label && nestedList == other.nestedList;
     }
 
     // Proper inequality operator - should use content comparison, not pointer comparison
-    bool operator!=(const ResourceStruct& other) const {
-        return !(*this == other);
-    }
+    bool operator!=(const ResourceStruct & other) const { return !(*this == other); }
 };
 
 using ComplexType = DataModel::Nullable<DataModel::List<ResourceStruct>>;
@@ -449,11 +443,11 @@ CHIP_ERROR CTC_BaseDataClass<ComplexType>::CopyData(const StructType & input, St
     }
 
     // Copy nested list
-    if ( input.nestedList.data() && !input.nestedList.empty() )
+    if (input.nestedList.data() && !input.nestedList.empty())
     {
         DataModel::List<const uint32_t> tempList;
         ReturnErrorOnFailure(SpanCopier<uint32_t>::Copy(input.nestedList, tempList, input.nestedList.size()));
-        
+
         // This should work if DataModel::List has the right constructor
         output.nestedList = tempList;
     }
@@ -497,18 +491,16 @@ TEST_F(TestCommodityTariffBaseDataClass, NullableListOfResourceStructs_CreationA
 {
     constexpr uint32_t IDs[] = { 100, 200 };
 
-    ResourceStruct ListEntries[] = {
-        {
-            .id = 1,
-            .label = CharSpan::fromCharString(TEST_STR_SAMPLE_0),
-            .nestedList = DataModel::List<const uint32_t>(IDs),
-        },
-        {
-            .id = 2,
-            .label = CharSpan::fromCharString(TEST_STR_SAMPLE_1),
-            .nestedList = DataModel::List<const uint32_t>(),
-        }
-    };
+    ResourceStruct ListEntries[] = { {
+                                         .id         = 1,
+                                         .label      = CharSpan::fromCharString(TEST_STR_SAMPLE_0),
+                                         .nestedList = DataModel::List<const uint32_t>(IDs),
+                                     },
+                                     {
+                                         .id         = 2,
+                                         .label      = CharSpan::fromCharString(TEST_STR_SAMPLE_1),
+                                         .nestedList = DataModel::List<const uint32_t>(),
+                                     } };
 
     ComplexType sourceValue;
     CTC_BaseDataClass<ComplexType> data(1);
@@ -544,13 +536,13 @@ TEST_F(TestCommodityTariffBaseDataClass, NullableListOfResourceStructs_SetNewVal
 
     // Prepare source data
     ComplexType sourceValue;
-    char* testStr = static_cast<char*>(Platform::MemoryAlloc(strlen(TEST_STR_SAMPLE_2) + 1));
+    char * testStr = static_cast<char *>(Platform::MemoryAlloc(strlen(TEST_STR_SAMPLE_2) + 1));
 
     // Create a struct with resources
     ResourceStruct testStruct = {};
     testStruct.id             = 42;
     strcpy(testStr, TEST_STR_SAMPLE_2);
-    testStruct.label  = CharSpan(testStr, strlen(testStr));
+    testStruct.label = CharSpan(testStr, strlen(testStr));
 
     auto * nestedBuffer   = static_cast<uint32_t *>(Platform::MemoryCalloc(2, sizeof(uint32_t)));
     nestedBuffer[0]       = 100;
@@ -582,11 +574,11 @@ TEST_F(TestCommodityTariffBaseDataClass, NullableListOfResourceStructs_SetNewVal
 TEST_F(TestCommodityTariffBaseDataClass, NullableListOfResourceStructs_NullTransition)
 {
     CTC_BaseDataClass<ComplexType> data(1);
-    char* testStr = static_cast<char*>(Platform::MemoryAlloc(strlen(TEST_STR_SAMPLE_2) + 1));
+    char * testStr = static_cast<char *>(Platform::MemoryAlloc(strlen(TEST_STR_SAMPLE_2) + 1));
 
     // First set non-null with resources
     data.CreateNewListValue(1);
-    data.GetNewValue().Value()[0].id            = 1;
+    data.GetNewValue().Value()[0].id = 1;
 
     strcpy(testStr, TEST_STR_SAMPLE_2);
     data.GetNewValue().Value()[0].label = CharSpan(testStr, strlen(testStr));
@@ -615,9 +607,9 @@ TEST_F(TestCommodityTariffBaseDataClass, NullableListOfResourceStructs_UpdateRej
 
     for (uint32_t i = 0; i < 3; i++)
     {
-        char* testStr = static_cast<char*>(Platform::MemoryAlloc(32));
+        char * testStr = static_cast<char *>(Platform::MemoryAlloc(32));
 
-        data.GetNewValue().Value()[i].id            = i;
+        data.GetNewValue().Value()[i].id = i;
         sprintf(testStr, "resource_%" PRIu32 "", i);
         data.GetNewValue().Value()[i].label = CharSpan(testStr, strlen(testStr));
     }
