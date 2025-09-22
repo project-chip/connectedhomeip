@@ -104,15 +104,19 @@ DataModel::ActionReturnStatus CodegenDataModelProvider::ReadAttribute(const Data
     // in case some application installed AAI before Server Cluster Interfaces were supported
     std::optional<CHIP_ERROR> aai_result = TryReadViaAccessInterface(
         request, AttributeAccessInterfaceRegistry::Instance().Get(request.path.mEndpointId, request.path.mClusterId), encoder);
-    VerifyOrReturnError(!aai_result.has_value(), *aai_result);
-
-    if (auto * cluster = mRegistry.Get(request.path); cluster != nullptr)
-    {
-        return cluster->ReadAttribute(request, encoder);
-    }
-
     const EmberAfAttributeMetadata * attributeMetadata =
         emberAfLocateAttributeMetadata(request.path.mEndpointId, request.path.mClusterId, request.path.mAttributeId);
+
+    // we only allow AAI on ember-registered clusters
+    if (attributeMetadata)
+    {
+        VerifyOrReturnError(!aai_result.has_value(), *aai_result);
+
+        if (auto * cluster = mRegistry.Get(request.path); cluster != nullptr)
+        {
+            return cluster->ReadAttribute(request, encoder);
+        }
+    }
 
     // ReadAttribute requirement is that request.path is a VALID path inside the provider
     // metadata tree. Clients are supposed to validate this (and data version and other flags)

@@ -98,18 +98,26 @@ DataModel::ActionReturnStatus CodegenDataModelProvider::WriteAttribute(const Dat
     // in case some application installed AAI before Server Cluster Interfaces were supported
     ContextAttributesChangeListener change_listener(mContext->dataModelChangeListener);
 
+    const EmberAfAttributeMetadata * attributeMetadata =
+        emberAfLocateAttributeMetadata(request.path.mEndpointId, request.path.mClusterId, request.path.mAttributeId);
     AttributeAccessInterface * aai =
         AttributeAccessInterfaceRegistry::Instance().Get(request.path.mEndpointId, request.path.mClusterId);
-    std::optional<CHIP_ERROR> aai_result = TryWriteViaAccessInterface(request.path, aai, decoder);
-    if (aai_result.has_value())
+
+    if (attributeMetadata != nullptr)
     {
-        if (*aai_result == CHIP_NO_ERROR)
+        // AAI is only allowed on ember-attributes
+        std::optional<CHIP_ERROR> aai_result = TryWriteViaAccessInterface(request.path, aai, decoder);
+        if (aai_result.has_value())
         {
-            // TODO: this is awkward since it provides AAI no control over this, specifically
-            //       AAI may not want to increase versions for some attributes that are Q
-            emberAfAttributeChanged(request.path.mEndpointId, request.path.mClusterId, request.path.mAttributeId, &change_listener);
+            if (*aai_result == CHIP_NO_ERROR)
+            {
+                // TODO: this is awkward since it provides AAI no control over this, specifically
+                //       AAI may not want to increase versions for some attributes that are Q
+                emberAfAttributeChanged(request.path.mEndpointId, request.path.mClusterId, request.path.mAttributeId,
+                                        &change_listener);
+            }
+            return *aai_result;
         }
-        return *aai_result;
     }
 
     // If ServerClusterInterface is available, it provides the final answer
@@ -117,9 +125,6 @@ DataModel::ActionReturnStatus CodegenDataModelProvider::WriteAttribute(const Dat
     {
         return cluster->WriteAttribute(request, decoder);
     }
-
-    const EmberAfAttributeMetadata * attributeMetadata =
-        emberAfLocateAttributeMetadata(request.path.mEndpointId, request.path.mClusterId, request.path.mAttributeId);
 
     // WriteAttribute requirement is that request.path is a VALID path inside the provider
     // metadata tree. Clients are supposed to validate this (and data version and other flags)
@@ -187,6 +192,14 @@ void CodegenDataModelProvider::ListAttributeWriteNotification(const ConcreteAttr
             aai->OnListWriteEnd(aPath, true);
             break;
         }
+
+        // We fall through here and will notify any ServerClusterInterface as well.
+        // This is NOT ideal because AAI may or may not fully intercept the write,
+        // So we do not know which of the ::Write behavior AAI uses:
+        //   - write succeeds (so SCI should not be notified)
+        //   - AAI falls-through (so SCI should process the request)
+        //
+        // for now we err on the side of notifying both.
     }
 
     if (auto * cluster = mRegistry.Get(aPath); cluster != nullptr)
