@@ -102,14 +102,15 @@ DataModel::ActionReturnStatus CodegenDataModelProvider::ReadAttribute(const Data
 
     // Codegen logic specific: we accept AAI reads BEFORE server cluster interface, so that we are backwards compatible
     // in case some application installed AAI before Server Cluster Interfaces were supported
-    std::optional<CHIP_ERROR> aai_result = TryReadViaAccessInterface(
-        request, AttributeAccessInterfaceRegistry::Instance().Get(request.path.mEndpointId, request.path.mClusterId), encoder);
     const EmberAfAttributeMetadata * attributeMetadata =
         emberAfLocateAttributeMetadata(request.path.mEndpointId, request.path.mClusterId, request.path.mAttributeId);
 
     // we only allow AAI on ember-registered clusters
     if (attributeMetadata)
     {
+        std::optional<CHIP_ERROR> aai_result = TryReadViaAccessInterface(
+            request, AttributeAccessInterfaceRegistry::Instance().Get(request.path.mEndpointId, request.path.mClusterId), encoder);
+
         VerifyOrReturnError(!aai_result.has_value(), *aai_result);
 
         if (auto * cluster = mRegistry.Get(request.path); cluster != nullptr)
