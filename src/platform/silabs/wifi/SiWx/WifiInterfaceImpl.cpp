@@ -742,9 +742,9 @@ sl_status_t WifiInterfaceImpl::JoinCallback(sl_wifi_event_t event, char * result
         wfx_rsi.dev_state.Clear(WifiState::kStationConnecting);
         if (SL_WIFI_CHECK_IF_EVENT_FAILED(event))
         {
-            // Returning SL_STATUS_IN_PROGRESS here is intentional: if a failed event is encountered while sl_net_up is still in progress,
-            // we do not want to report a final failure yet, as the connection process may still be ongoing and the final outcome
-            // will be determined once sl_net_up completes. This prevents premature error handling by higher layers.
+            // Returning SL_STATUS_IN_PROGRESS here is intentional: if a failed event is encountered while sl_net_up is still in
+            // progress, we do not want to report a final failure yet, as the connection process may still be ongoing and the final
+            // outcome will be determined once sl_net_up completes. This prevents premature error handling by higher layers.
             return SL_STATUS_IN_PROGRESS;
         }
     }
