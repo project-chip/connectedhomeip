@@ -1317,32 +1317,23 @@ void OperationalCredentialsCluster::FabricWillBeRemoved(const FabricTable & fabr
 {
     // The Leave event SHOULD be emitted by a Node prior to permanently leaving the Fabric.
     ReadOnlyBufferBuilder<DataModel::EndpointEntry> endpointBuilder;
-    DataModel::Provider * provider = InteractionModelEngine::GetInstance()->GetDataModelProvider();
+    ReadOnlyBufferBuilder<DataModel::ServerClusterEntry> clusterBuilder;
 
-    ReturnOnFailure(provider->Endpoints(endpointBuilder));
+    ReturnOnFailure(mContext->provider.ServerClusters(mPath.mEndpointId, clusterBuilder));
 
-    auto allEndpoints = endpointBuilder.TakeBuffer();
+    auto allClusters = clusterBuilder.TakeBuffer();
 
-    for (const auto & ep : allEndpoints)
+    for (const auto & cluster : allClusters)
     {
-        ReadOnlyBufferBuilder<DataModel::ServerClusterEntry> clusterBuilder;
-
-        ReturnOnFailure(provider->ServerClusters(ep.id, clusterBuilder));
-
-        auto allClusters = clusterBuilder.TakeBuffer();
-
-        for (const auto & cluster : allClusters)
+        if (cluster.clusterId == BasicInformation::Id)
         {
-            if (cluster.clusterId == BasicInformation::Id)
-            {
-                BasicInformation::Events::Leave::Type event;
-                event.fabricIndex = fabricIndex;
-                EventNumber eventNumber;
+            BasicInformation::Events::Leave::Type event;
+            event.fabricIndex = fabricIndex;
+            EventNumber eventNumber;
 
-                if (CHIP_NO_ERROR != LogEvent(event, ep.id, eventNumber))
-                {
-                    ChipLogError(Zcl, "OpCredsFabricTableDelegate: Failed to record Leave event");
-                }
+            if (CHIP_NO_ERROR != LogEvent(event, mPath.mEndpointId, eventNumber))
+            {
+                ChipLogError(Zcl, "OpCredsFabricTableDelegate: Failed to record Leave event");
             }
         }
     }
