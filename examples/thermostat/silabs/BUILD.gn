@@ -121,7 +121,7 @@ silabs_executable("thermostat_app") {
     "src/AppTask.cpp",
     "src/SensorManager.cpp",
     "src/TemperatureManager.cpp",
-    "src/ZclCallbacks.cpp",
+    "src/DataModelCallbacks.cpp",
   ]
 
   if (!disable_lcd) {

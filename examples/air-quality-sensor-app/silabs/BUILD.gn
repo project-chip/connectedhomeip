@@ -124,7 +124,7 @@ silabs_executable("air_quality_sensor_app") {
     "${examples_common_plat_dir}/main.cpp",
     "src/AppTask.cpp",
     "src/SensorManager.cpp",
-    "src/ZclCallbacks.cpp",
+    "src/DataModelCallbacks.cpp",
   ]
 
   #TODO: This is a placeholder for the actual implementation

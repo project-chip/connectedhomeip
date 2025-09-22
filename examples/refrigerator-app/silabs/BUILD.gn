@@ -139,7 +139,7 @@ silabs_executable("refrigerator_app") {
     "${examples_common_plat_dir}/main.cpp",
     "src/AppTask.cpp",
     "src/RefrigeratorManager.cpp",
-    "src/ZclCallbacks.cpp",
+    "src/DataModelCallbacks.cpp",
     "src/refrigerator-and-temperature-controlled-cabinet-mode.cpp",
   ]
 

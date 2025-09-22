@@ -120,7 +120,7 @@ silabs_executable("lock_app") {
     "src/AppTask.cpp",
     "src/LockManager.cpp",
     "src/LockMigration.cpp",
-    "src/ZclCallbacks.cpp",
+    "src/DataModelCallbacks.cpp",
   ]
 
   if (chip_build_libshell) {

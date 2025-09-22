@@ -121,7 +121,7 @@ silabs_executable("light_switch_app") {
     "src/AppTask.cpp",
     "src/BindingHandler.cpp",
     "src/LightSwitchMgr.cpp",
-    "src/ZclCallbacks.cpp",
+    "src/DataModelCallbacks.cpp",
   ]
 
   deps = [

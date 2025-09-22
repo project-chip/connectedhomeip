@@ -157,7 +157,7 @@ silabs_executable("dishwasher_app") {
     "src/ElectricalEnergyMeasurementInstance.cpp",
     "src/ElectricalSensorManager.cpp",
     "src/PowerTopologyDelegateImpl.cpp",
-    "src/ZclCallbacks.cpp",
+    "src/DataModelCallbacks.cpp",
     "src/operational-state-delegate-impl.cpp",
   ]
 
