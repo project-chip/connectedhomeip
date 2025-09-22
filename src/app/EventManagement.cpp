@@ -545,6 +545,18 @@ bool EventManagement::CheckEventContext(EventLoadOutContext * eventLoadOutContex
         // support the event, return false here so the event path will be excluded in the generated event report.
         return false;
     }
+    Access::RequestPath requestPath{ .cluster     = event.mClusterId,
+                                     .endpoint    = event.mEndpointId,
+                                     .requestType = Access::RequestType::kEventReadRequest,
+                                     .entityId    = event.mEventId };
+    CHIP_ERROR accessControlError =
+        Access::GetAccessControl().Check(eventLoadOutContext->mSubjectDescriptor, requestPath, eventInfo.readPrivilege);
+    if (accessControlError != CHIP_NO_ERROR)
+    {
+        // If we don't have the access for the event, the interested path should be a wildcard path. Return false so that
+        // the event path will be excluded in the generated event report.
+        return false;
+    }
 
     // Check whether the event path is in the interested paths
     for (auto * interestedPath = eventLoadOutContext->mpInterestedEventPaths; interestedPath != nullptr;
