@@ -112,7 +112,7 @@ DataModel::ActionReturnStatus CodegenDataModelProvider::WriteAttribute(const Dat
         return *aai_result;
     }
 
-    // If ServerClusterInteface is available, it provides the final answer
+    // If ServerClusterInterface is available, it provides the final answer
     if (auto * cluster = mRegistry.Get(request.path); cluster != nullptr)
     {
         return cluster->WriteAttribute(request, decoder);
