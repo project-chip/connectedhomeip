@@ -36,7 +36,7 @@ namespace chip {
 namespace DeviceLayer {
 namespace Internal {
 
-class ChipLinuxStorageIni
+class ChipWebOSStorageIni
 {
 public:
     CHIP_ERROR Init();

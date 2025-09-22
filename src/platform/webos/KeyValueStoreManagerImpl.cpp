@@ -18,7 +18,7 @@
 
 /**
  *    @file
- *          Platform-specific implementatiuon of KVS for linux.
+ *          Platform-specific implementatiuon of KVS for webOS.
  */
 
 #include <platform/KeyValueStoreManager.h>
@@ -28,7 +28,7 @@
 
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
-#include <platform/webos/CHIPLinuxStorage.h>
+#include <platform/webos/CHIPWebOSStorage.h>
 
 namespace chip {
 namespace DeviceLayer {

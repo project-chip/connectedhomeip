@@ -23,7 +23,7 @@
 
 #pragma once
 
-#include <platform/webos/CHIPLinuxStorage.h>
+#include <platform/webos/CHIPWebOSStorage.h>
 
 namespace chip {
 namespace DeviceLayer {
@@ -43,7 +43,7 @@ public:
     CHIP_ERROR _Put(const char * key, const void * value, size_t value_size);
 
 private:
-    DeviceLayer::Internal::ChipLinuxStorage mStorage;
+    DeviceLayer::Internal::ChipWebOSStorage mStorage;
 
     // ===== Members for internal use by the following friends.
     friend KeyValueStoreManager & KeyValueStoreMgr();

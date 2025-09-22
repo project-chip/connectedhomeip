@@ -27,14 +27,14 @@
  *
  *         The ephemeral partition should be erased during factory reset.
  *
- *         ChipLinuxStorage wraps the storage class ChipLinuxStorageIni with mutex.
+ *         ChipWebosStorage wraps the storage class ChipWebosStorageIni with mutex.
  *
  */
 
 #pragma once
 
 #include <mutex>
-#include <platform/webos/CHIPLinuxStorageIni.h>
+#include <platform/webos/CHIPWebOSStorageIni.h>
 #include <string>
 
 #ifndef FATCONFDIR
@@ -63,11 +63,11 @@ namespace chip {
 namespace DeviceLayer {
 namespace Internal {
 
-class ChipLinuxStorage : private ChipLinuxStorageIni
+class ChipWebOSStorage : private ChipWebOSStorageIni
 {
 public:
-    ChipLinuxStorage();
-    ~ChipLinuxStorage();
+    ChipWebOSStorage();
+    ~ChipWebOSStorage();
 
     CHIP_ERROR Init(const char * configFile);
     CHIP_ERROR ReadValue(const char * key, bool & val);

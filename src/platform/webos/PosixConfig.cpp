@@ -29,16 +29,16 @@
 
 #include <lib/core/CHIPEncoding.h>
 #include <lib/support/CodeUtils.h>
-#include <platform/webos/CHIPLinuxStorage.h>
+#include <platform/webos/CHIPWebOSStorage.h>
 #include <platform/webos/PosixConfig.h>
 
 namespace chip {
 namespace DeviceLayer {
 namespace Internal {
 
-static ChipLinuxStorage gChipLinuxFactoryStorage;
-static ChipLinuxStorage gChipLinuxConfigStorage;
-static ChipLinuxStorage gChipLinuxCountersStorage;
+static ChipWebOSStorage gChipWebOSFactoryStorage;
+static ChipWebOSStorage gChipWebOSConfigStorage;
+static ChipWebOSStorage gChipWebOSCountersStorage;
 
 // *** CAUTION ***: Changing the names or namespaces of these values will *break* existing devices.
 
@@ -82,16 +82,16 @@ const PosixConfig::Key PosixConfig::kCounterKey_TotalOperationalHours = { kConfi
                                                                           "total-operational-hours" };
 const PosixConfig::Key PosixConfig::kCounterKey_BootReason            = { kConfigNamespace_ChipCounters, "boot-reason" };
 
-ChipLinuxStorage * PosixConfig::GetStorageForNamespace(Key key)
+ChipWebOSStorage * PosixConfig::GetStorageForNamespace(Key key)
 {
     if (strcmp(key.Namespace, kConfigNamespace_ChipFactory) == 0)
-        return &gChipLinuxFactoryStorage;
+        return &gChipWebOSFactoryStorage;
 
     if (strcmp(key.Namespace, kConfigNamespace_ChipConfig) == 0)
-        return &gChipLinuxConfigStorage;
+        return &gChipWebOSConfigStorage;
 
     if (strcmp(key.Namespace, kConfigNamespace_ChipCounters) == 0)
-        return &gChipLinuxCountersStorage;
+        return &gChipWebOSCountersStorage;
 
     return nullptr;
 }
@@ -104,7 +104,7 @@ CHIP_ERROR PosixConfig::Init()
 CHIP_ERROR PosixConfig::ReadConfigValue(Key key, bool & val)
 {
     CHIP_ERROR err;
-    ChipLinuxStorage * storage;
+    ChipWebOSStorage * storage;
     uint32_t intVal;
 
     storage = GetStorageForNamespace(key);
@@ -126,7 +126,7 @@ exit:
 CHIP_ERROR PosixConfig::ReadConfigValue(Key key, uint16_t & val)
 {
     CHIP_ERROR err;
-    ChipLinuxStorage * storage;
+    ChipWebOSStorage * storage;
 
     storage = GetStorageForNamespace(key);
     VerifyOrExit(storage != nullptr, err = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND);
@@ -145,7 +145,7 @@ exit:
 CHIP_ERROR PosixConfig::ReadConfigValue(Key key, uint32_t & val)
 {
     CHIP_ERROR err;
-    ChipLinuxStorage * storage;
+    ChipWebOSStorage * storage;
 
     storage = GetStorageForNamespace(key);
     VerifyOrExit(storage != nullptr, err = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND);
@@ -164,7 +164,7 @@ exit:
 CHIP_ERROR PosixConfig::ReadConfigValue(Key key, uint64_t & val)
 {
     CHIP_ERROR err;
-    ChipLinuxStorage * storage;
+    ChipWebOSStorage * storage;
 
     storage = GetStorageForNamespace(key);
     VerifyOrExit(storage != nullptr, err = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND);
@@ -199,7 +199,7 @@ exit:
 CHIP_ERROR PosixConfig::ReadConfigValueStr(Key key, char * buf, size_t bufSize, size_t & outLen)
 {
     CHIP_ERROR err;
-    ChipLinuxStorage * storage;
+    ChipWebOSStorage * storage;
 
     storage = GetStorageForNamespace(key);
     VerifyOrExit(storage != nullptr, err = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND);
@@ -210,15 +210,15 @@ CHIP_ERROR PosixConfig::ReadConfigValueStr(Key key, char * buf, size_t bufSize, 
         // Special case for UniqueId, which used to be (erroneously) stored in the Factory namespace.
         // If it is not found in the Config namespace, try reading from Factory. If we find it there,
         // we will copy it to the Config namespace and write an empty value to the Factory namespace.
-        err = gChipLinuxFactoryStorage.ReadValueStr(kConfigKey_UniqueId.Name, buf, bufSize, outLen);
+        err = gChipWebOSFactoryStorage.ReadValueStr(kConfigKey_UniqueId.Name, buf, bufSize, outLen);
         if (err == CHIP_NO_ERROR && outLen > 0)
         {
             // If any of these steps fail, ignore the error and just return the existing
             // err == CHIP_NO_ERROR, since we successfully returned the UniqueId from Factory.
             SuccessOrExit(/* ignored = */ storage->WriteValueStr(kConfigKey_UniqueId.Name, buf));
             SuccessOrExit(/* ignored = */ storage->Commit());
-            SuccessOrExit(/* ignored = */ gChipLinuxFactoryStorage.WriteValueStr(kConfigKey_UniqueId.Name, ""));
-            SuccessOrExit(/* ignored = */ gChipLinuxFactoryStorage.Commit());
+            SuccessOrExit(/* ignored = */ gChipWebOSFactoryStorage.WriteValueStr(kConfigKey_UniqueId.Name, ""));
+            SuccessOrExit(/* ignored = */ gChipWebOSFactoryStorage.Commit());
             ChipLogProgress(DeviceLayer, "NVS migrated %s from %s to %s namespace", key.Name, kConfigNamespace_ChipFactory,
                             key.Namespace);
         }
@@ -240,7 +240,7 @@ exit:
 CHIP_ERROR PosixConfig::ReadConfigValueBin(Key key, uint8_t * buf, size_t bufSize, size_t & outLen)
 {
     CHIP_ERROR err;
-    ChipLinuxStorage * storage;
+    ChipWebOSStorage * storage;
 
     storage = GetStorageForNamespace(key);
     VerifyOrExit(storage != nullptr, err = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND);
@@ -264,7 +264,7 @@ exit:
 CHIP_ERROR PosixConfig::WriteConfigValue(Key key, bool val)
 {
     CHIP_ERROR err;
-    ChipLinuxStorage * storage;
+    ChipWebOSStorage * storage;
 
     storage = GetStorageForNamespace(key);
     VerifyOrExit(storage != nullptr, err = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND);
@@ -286,7 +286,7 @@ exit:
 CHIP_ERROR PosixConfig::WriteConfigValue(Key key, uint16_t val)
 {
     CHIP_ERROR err;
-    ChipLinuxStorage * storage;
+    ChipWebOSStorage * storage;
 
     storage = GetStorageForNamespace(key);
     VerifyOrExit(storage != nullptr, err = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND);
@@ -308,7 +308,7 @@ exit:
 CHIP_ERROR PosixConfig::WriteConfigValue(Key key, uint32_t val)
 {
     CHIP_ERROR err;
-    ChipLinuxStorage * storage;
+    ChipWebOSStorage * storage;
 
     storage = GetStorageForNamespace(key);
     VerifyOrExit(storage != nullptr, err = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND);
@@ -330,7 +330,7 @@ exit:
 CHIP_ERROR PosixConfig::WriteConfigValue(Key key, uint64_t val)
 {
     CHIP_ERROR err;
-    ChipLinuxStorage * storage;
+    ChipWebOSStorage * storage;
 
     storage = GetStorageForNamespace(key);
     VerifyOrExit(storage != nullptr, err = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND);
@@ -352,7 +352,7 @@ exit:
 CHIP_ERROR PosixConfig::WriteConfigValueStr(Key key, const char * str)
 {
     CHIP_ERROR err;
-    ChipLinuxStorage * storage;
+    ChipWebOSStorage * storage;
 
     if (str != nullptr)
     {
@@ -408,7 +408,7 @@ exit:
 CHIP_ERROR PosixConfig::WriteConfigValueBin(Key key, const uint8_t * data, size_t dataLen)
 {
     CHIP_ERROR err;
-    ChipLinuxStorage * storage;
+    ChipWebOSStorage * storage;
 
     if (data != nullptr)
     {
@@ -438,7 +438,7 @@ exit:
 CHIP_ERROR PosixConfig::ClearConfigValue(Key key)
 {
     CHIP_ERROR err;
-    ChipLinuxStorage * storage;
+    ChipWebOSStorage * storage;
 
     storage = GetStorageForNamespace(key);
     VerifyOrExit(storage != nullptr, err = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND);
@@ -462,7 +462,7 @@ exit:
 
 bool PosixConfig::ConfigValueExists(Key key)
 {
-    ChipLinuxStorage * storage;
+    ChipWebOSStorage * storage;
 
     storage = GetStorageForNamespace(key);
     if (storage == nullptr)
@@ -474,21 +474,21 @@ bool PosixConfig::ConfigValueExists(Key key)
 CHIP_ERROR PosixConfig::EnsureNamespace(const char * ns)
 {
     CHIP_ERROR err             = CHIP_NO_ERROR;
-    ChipLinuxStorage * storage = nullptr;
+    ChipWebOSStorage * storage = nullptr;
 
     if (strcmp(ns, kConfigNamespace_ChipFactory) == 0)
     {
-        storage = &gChipLinuxFactoryStorage;
+        storage = &gChipWebOSFactoryStorage;
         err     = storage->Init(CHIP_DEFAULT_FACTORY_PATH);
     }
     else if (strcmp(ns, kConfigNamespace_ChipConfig) == 0)
     {
-        storage = &gChipLinuxConfigStorage;
+        storage = &gChipWebOSConfigStorage;
         err     = storage->Init(CHIP_DEFAULT_CONFIG_PATH);
     }
     else if (strcmp(ns, kConfigNamespace_ChipCounters) == 0)
     {
-        storage = &gChipLinuxCountersStorage;
+        storage = &gChipWebOSCountersStorage;
         err     = storage->Init(CHIP_DEFAULT_DATA_PATH);
     }
 
@@ -501,15 +501,15 @@ exit:
 CHIP_ERROR PosixConfig::ClearNamespace(const char * ns)
 {
     CHIP_ERROR err             = CHIP_NO_ERROR;
-    ChipLinuxStorage * storage = nullptr;
+    ChipWebOSStorage * storage = nullptr;
 
     if (strcmp(ns, kConfigNamespace_ChipConfig) == 0)
     {
-        storage = &gChipLinuxConfigStorage;
+        storage = &gChipWebOSConfigStorage;
     }
     else if (strcmp(ns, kConfigNamespace_ChipCounters) == 0)
     {
-        storage = &gChipLinuxCountersStorage;
+        storage = &gChipWebOSCountersStorage;
     }
 
     VerifyOrExit(storage != nullptr, err = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND);
@@ -534,11 +534,11 @@ exit:
 CHIP_ERROR PosixConfig::FactoryResetConfig()
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-    ChipLinuxStorage * storage;
+    ChipWebOSStorage * storage;
 
     ChipLogProgress(DeviceLayer, "Performing factory reset configuration");
 
-    storage = &gChipLinuxConfigStorage;
+    storage = &gChipWebOSConfigStorage;
     if (storage == nullptr)
     {
         ChipLogError(DeviceLayer, "Storage get failed");
@@ -566,11 +566,11 @@ exit:
 CHIP_ERROR PosixConfig::FactoryResetCounters()
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-    ChipLinuxStorage * storage;
+    ChipWebOSStorage * storage;
 
     ChipLogProgress(DeviceLayer, "Performing factory reset counters");
 
-    storage = &gChipLinuxCountersStorage;
+    storage = &gChipWebOSCountersStorage;
     if (storage == nullptr)
     {
         ChipLogError(DeviceLayer, "Storage get failed");
