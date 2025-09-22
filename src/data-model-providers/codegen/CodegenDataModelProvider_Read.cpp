@@ -110,13 +110,12 @@ DataModel::ActionReturnStatus CodegenDataModelProvider::ReadAttribute(const Data
     {
         std::optional<CHIP_ERROR> aai_result = TryReadViaAccessInterface(
             request, AttributeAccessInterfaceRegistry::Instance().Get(request.path.mEndpointId, request.path.mClusterId), encoder);
-
         VerifyOrReturnError(!aai_result.has_value(), *aai_result);
+    }
 
-        if (auto * cluster = mRegistry.Get(request.path); cluster != nullptr)
-        {
-            return cluster->ReadAttribute(request, encoder);
-        }
+    if (auto * cluster = mRegistry.Get(request.path); cluster != nullptr)
+    {
+        return cluster->ReadAttribute(request, encoder);
     }
 
     // ReadAttribute requirement is that request.path is a VALID path inside the provider
