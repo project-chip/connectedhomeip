@@ -10,6 +10,7 @@
  *
  * LICENSE@@@
  */
+#pragma once
 #ifndef LSREQUESTER_H_
 #define LSREQUESTER_H_
 
