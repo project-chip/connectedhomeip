@@ -106,7 +106,7 @@ DataModel::ActionReturnStatus CodegenDataModelProvider::ReadAttribute(const Data
         emberAfLocateAttributeMetadata(request.path.mEndpointId, request.path.mClusterId, request.path.mAttributeId);
 
     // we only allow AAI on ember-registered clusters
-    if (attributeMetadata)
+    if (attributeMetadata != nullptr)
     {
         std::optional<CHIP_ERROR> aai_result = TryReadViaAccessInterface(
             request, AttributeAccessInterfaceRegistry::Instance().Get(request.path.mEndpointId, request.path.mClusterId), encoder);

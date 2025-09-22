@@ -621,6 +621,7 @@ const MockNodeConfig gTestNodeConfig({
             // Special case handling
             MockAttributeConfig(kAttributeIdReadOnly, ZCL_INT32S_ATTRIBUTE_TYPE, 0),
             MockAttributeConfig(kAttributeIdTimedWrite, ZCL_INT32S_ATTRIBUTE_TYPE, MATTER_ATTRIBUTE_FLAG_WRITABLE | MATTER_ATTRIBUTE_FLAG_READABLE | MATTER_ATTRIBUTE_FLAG_MUST_USE_TIMED_WRITE ),
+            MockAttributeConfig(kAttributeIdFakeAllowsWrite, ZCL_INT32U_ATTRIBUTE_TYPE, 0),
         }),
     }),
     MockEndpointConfig(kMockEndpoint4, {
@@ -2179,7 +2180,8 @@ TEST_F(TestCodegenModelViaMocks, AttributeAccessInterfaceTakesPrecedenceOverServ
     model.SetPersistentStorageDelegate(&testContext.StorageDelegate());
     ASSERT_EQ(model.Startup(testContext.ImContext()), CHIP_NO_ERROR);
 
-    const ConcreteClusterPath kTestClusterPath(kMockEndpoint1, MockClusterId(2));
+    // It is important to have kTestClusterPath be valid ember paths (so we have metadata for them)
+    const ConcreteClusterPath kTestClusterPath(kMockEndpoint3, MockClusterId(4));
     const ConcreteAttributePath kTestAttributePath(kTestClusterPath.mEndpointId, kTestClusterPath.mClusterId,
                                                    kAttributeIdFakeAllowsWrite);
     FakeDefaultServerCluster fakeClusterServer(kTestClusterPath);
@@ -2218,7 +2220,6 @@ TEST_F(TestCodegenModelViaMocks, AttributeAccessInterfaceTakesPrecedenceOverServ
     }
 
     model.Registry().Unregister(&fakeClusterServer);
-    model.Shutdown();
 }
 
 TEST_F(TestCodegenModelViaMocks, EmberAttributeWriteBasicTypes)
@@ -2773,7 +2774,6 @@ TEST_F(TestCodegenModelViaMocks, ServerClusterInterfacesWrite)
     }
 
     model.Registry().Unregister(&fakeClusterServer);
-    model.Shutdown();
 }
 
 TEST_F(TestCodegenModelViaMocks, ServerClusterInterfacesRead)
@@ -2802,7 +2802,6 @@ TEST_F(TestCodegenModelViaMocks, ServerClusterInterfacesRead)
     }
 
     model.Registry().Unregister(&fakeClusterServer);
-    model.Shutdown();
 }
 
 TEST_F(TestCodegenModelViaMocks, ServerClusterInterfacesRegistration)
@@ -2889,7 +2888,6 @@ TEST_F(TestCodegenModelViaMocks, ServerClusterInterfacesRegistration)
     }
 
     model.Registry().Unregister(&fakeClusterServer);
-    model.Shutdown();
 }
 
 TEST_F(TestCodegenModelViaMocks, EventInfo)
@@ -2928,8 +2926,6 @@ TEST_F(TestCodegenModelViaMocks, EventInfo)
     // once unregistered, go back to the default
     ASSERT_EQ(model.EventInfo({ kMockEndpoint1, MockClusterId(2), kTestEventId }, entry), CHIP_NO_ERROR);
     ASSERT_EQ(entry.readPrivilege, Access::Privilege::kAdminister);
-
-    model.Shutdown();
 }
 
 TEST_F(TestCodegenModelViaMocks, ServerClusterInterfacesListClusters)
