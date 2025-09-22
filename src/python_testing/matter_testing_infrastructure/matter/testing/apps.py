@@ -16,7 +16,8 @@ import os
 import signal
 import tempfile
 from dataclasses import dataclass
-from typing import Optional, Union
+from sys import stdout
+from typing import BinaryIO, Optional, Union
 
 import matter.clusters as Clusters
 from matter.ChipDeviceCtrl import ChipDeviceController
@@ -53,7 +54,7 @@ class AppServerSubprocess(Subprocess):
     PREFIX = b"[SERVER]"
 
     def __init__(self, app: str, storage_dir: str, discriminator: int,
-                 passcode: int, port: int = 5540, extra_args: list[str] = []):
+                 passcode: int, port: int = 5540, extra_args: list[str] = [], f_stdout: BinaryIO = stdout.buffer, f_stderr: BinaryIO = stdout.buffer):
         # Create a temporary KVS file and keep the descriptor to avoid leaks.
         self.kvs_fd, kvs_path = tempfile.mkstemp(dir=storage_dir, prefix="kvs-app-")
         try:
@@ -71,7 +72,7 @@ class AppServerSubprocess(Subprocess):
 
             # Start the server application
             super().__init__(*command,  # Pass the constructed command list
-                             output_cb=lambda line, is_stderr: self.PREFIX + line)
+                             output_cb=lambda line, is_stderr: self.PREFIX + line, f_stdout=f_stdout, f_stderr=f_stderr)
         except Exception:
             # Do not leak KVS file descriptor on failure
             os.close(self.kvs_fd)
@@ -150,7 +151,7 @@ class OTAProviderSubprocess(AppServerSubprocess):
 
     def __init__(self, app: str, storage_dir: str, discriminator: int,
                  passcode: int, ota_source: Union[OtaImagePath, ImageListPath],
-                 port: int = 5541, extra_args: list[str] = []):
+                 port: int = 5541, extra_args: list[str] = [], f_stdout: BinaryIO = stdout.buffer, f_stderr: BinaryIO = stdout.buffer):
         """Initialize the OTA Provider subprocess.
 
         Args:
@@ -165,10 +166,17 @@ class OTAProviderSubprocess(AppServerSubprocess):
 
         # Build OTA-specific arguments using the ota_source property
         combined_extra_args = ota_source.ota_args + extra_args
+        print(combined_extra_args)
 
         # Initialize with the combined arguments
         super().__init__(app=app, storage_dir=storage_dir, discriminator=discriminator,
-                         passcode=passcode, port=port, extra_args=combined_extra_args)
+                         passcode=passcode, port=port, extra_args=combined_extra_args, f_stdout=f_stdout, f_stderr=f_stderr)
+
+    def kill(self):
+        self.p.send_signal(signal.SIGKILL)
+
+    def get_pid(self):
+        self.p.pid
 
     def create_acl_entry(self, dev_ctrl: ChipDeviceController, provider_node_id: int, requestor_node_id: Optional[int] = None):
         """Create ACL entries to allow OTA requestors to access the provider.
