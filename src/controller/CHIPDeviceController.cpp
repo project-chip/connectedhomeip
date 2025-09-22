@@ -3259,8 +3259,12 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
         break;
     }
     case CommissioningStage::kNeedsNetworkCreds: {
-        // nothing to do, the OnScanNetworksSuccess and OnScanNetworksFailure callbacks provide indication to the
-        // DevicePairingDelegate that network credentials are needed.
+        // Nothing to do.
+        //
+        // Either we did a scan and the OnScanNetworksSuccess and OnScanNetworksFailure
+        // callbacks will tell the DevicePairingDelegate that network credentials are
+        // needed, or we asked the DevicePairingDelegate for network credentials
+        // explicitly, and are waiting for it to get back to us.
         break;
     }
     case CommissioningStage::kConfigRegulatory: {
@@ -3575,6 +3579,30 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
             return;
         }
         break;
+    }
+    case CommissioningStage::kRequestWiFiCredentials: {
+        if (!mPairingDelegate)
+        {
+            ChipLogError(Controller, "Unable to request Wi-Fi credentials: no delegate available");
+            CommissioningStageComplete(CHIP_ERROR_INCORRECT_STATE);
+            return;
+        }
+
+        CHIP_ERROR err = mPairingDelegate->WiFiCredentialsNeeded(endpoint);
+        CommissioningStageComplete(err);
+        return;
+    }
+    case CommissioningStage::kRequestThreadCredentials: {
+        if (!mPairingDelegate)
+        {
+            ChipLogError(Controller, "Unable to request Thread credentials: no delegate available");
+            CommissioningStageComplete(CHIP_ERROR_INCORRECT_STATE);
+            return;
+        }
+
+        CHIP_ERROR err = mPairingDelegate->ThreadCredentialsNeeded(endpoint);
+        CommissioningStageComplete(err);
+        return;
     }
     case CommissioningStage::kWiFiNetworkSetup: {
         if (!params.GetWiFiCredentials().HasValue())
