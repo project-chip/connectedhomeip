@@ -39,6 +39,10 @@ logger = logging.getLogger(__name__)
 MAX_RETRIES = 3                      # Number of retry attempts for failed operations
 TIMEOUT = 900                        # Overall test timeout (15 min) - main test execution time limit
 
+# DNS-SD specific timeouts
+DNSSD_STARTUP_TIMEOUT = 30           # DNS-SD startup timeout (30s) - max time to wait for DNS-SD initialization
+DNSSD_RETRY_TIMEOUT = 60             # DNS-SD retry timeout (60s) - max time to retry DNS-SD operations before giving up
+
 # Matter command timeouts
 TIMED_REQUEST_TIMEOUT_MS = 5000      # Matter command timeout (5s) - for individual Matter commands
 COMMAND_TIMEOUT = 15                 # Quick command timeout (15s) - for ConnectNetwork that may timeout intentionally
@@ -76,13 +80,14 @@ class ConnectionResult:
         self.stderr = stderr
 
 
-async def run_subprocess(cmd, check=False, capture_output=False):
-    """Run subprocess command with optional output capture.
+async def run_subprocess(cmd, check=False, capture_output=False, timeout=30):
+    """Run subprocess command with optional output capture and timeout.
 
     Args:
         cmd: List of command arguments (e.g., ["sudo", "ip", "link", "set", "eth0", "up"])
         check: If True, raise CalledProcessError on non-zero exit code
         capture_output: If True, return stdout as string; if False, return success boolean
+        timeout: Maximum time to wait for command completion in seconds
 
     Returns:
         If capture_output=True: stdout as string (empty on failure)
@@ -95,7 +100,7 @@ async def run_subprocess(cmd, check=False, capture_output=False):
             stderr=asyncio.subprocess.PIPE
         )
 
-        stdout, stderr = await proc.communicate()
+        stdout, stderr = await asyncio.wait_for(proc.communicate(), timeout=timeout)
 
         if check and proc.returncode != 0:
             raise subprocess.CalledProcessError(proc.returncode, cmd, stdout, stderr)
@@ -105,6 +110,11 @@ async def run_subprocess(cmd, check=False, capture_output=False):
         else:
             return proc.returncode == 0
 
+    except asyncio.TimeoutError:
+        logger.warning(f"run_subprocess: Command timed out after {timeout}s: {' '.join(cmd)}")
+        if check:
+            raise
+        return "" if capture_output else False
     except subprocess.CalledProcessError as e:
         logger.warning(f"run_subprocess: Subprocess failed (handled): {' '.join(cmd)}")
         if check:
@@ -115,8 +125,15 @@ async def run_subprocess(cmd, check=False, capture_output=False):
         return "" if capture_output else False
 
 
-async def detect_wifi_iface():
-    """Detect WiFi interface using wpa_supplicant sockets"""
+async def detect_wifi_interface():
+    """Detect WiFi interface using wpa_supplicant sockets.
+
+    Returns:
+        str or None: First available WiFi interface name (e.g., 'wlan0'), or None if not found
+
+    Raises:
+        None: Function handles all exceptions internally and returns None on error
+    """
 
     try:
         wpa_dir = "/var/run/wpa_supplicant"
@@ -131,11 +148,22 @@ async def detect_wifi_iface():
         return None
 
 
-async def wpa_command(iface, cmd):
-    """Send command to wpa_supplicant via Unix socket"""
+async def wpa_command(interface, cmd):
+    """Send command to wpa_supplicant via Unix socket.
 
-    sock_file = f"/var/run/wpa_supplicant/{iface}"
-    sock_tmp = f"/tmp/wpa_{iface}_sock"
+    Args:
+        interface: WiFi interface name (string)
+        cmd: wpa_supplicant command to send (string)
+
+    Returns:
+        str: Response from wpa_supplicant daemon
+
+    Raises:
+        Exception: If socket communication fails or command execution fails
+    """
+
+    sock_file = f"/var/run/wpa_supplicant/{interface}"
+    sock_tmp = f"/tmp/wpa_{interface}_sock"
     if os.path.exists(sock_tmp):
         os.remove(sock_tmp)
     sock = socket.socket(socket.AF_UNIX, socket.SOCK_DGRAM)
@@ -145,7 +173,7 @@ async def wpa_command(iface, cmd):
         resp, _ = sock.recvfrom(4096)
         return resp.decode(errors="ignore").strip()
     except Exception as e:
-        logger.error(f"wpa_command: Error sending '{cmd}' to {iface}: {e}")
+        logger.error(f"wpa_command: Error sending '{cmd}' to {interface}: {e}")
         raise
     finally:
         sock.close()
@@ -153,17 +181,30 @@ async def wpa_command(iface, cmd):
             os.remove(sock_tmp)
 
 
-async def scan_and_find_ssid(iface, target_ssid, retries=MAX_RETRIES, delay=RETRY_DELAY_SECONDS):
-    """Scans and searches for SSID with retries"""
+async def scan_and_find_ssid(interface, target_ssid, retries=MAX_RETRIES, delay=RETRY_DELAY_SECONDS):
+    """Scan and search for SSID with retry logic.
+
+    Args:
+        interface: WiFi interface name (string)
+        target_ssid: SSID to search for (string)
+        retries: Maximum number of retry attempts (int)
+        delay: Delay between retry attempts in seconds (int)
+
+    Returns:
+        bool: True if SSID found, False otherwise
+
+    Raises:
+        None: Function handles all exceptions internally and returns False on error
+    """
 
     retry = 0
     while retry < retries:
         retry += 1
         try:
-            await wpa_command(iface, "SCAN")
+            await wpa_command(interface, "SCAN")
             await asyncio.sleep(delay)
 
-            results = await wpa_command(iface, "SCAN_RESULTS")
+            results = await wpa_command(interface, "SCAN_RESULTS")
             scan_lines = results.splitlines()[1:]
 
             for line in scan_lines:
@@ -181,44 +222,55 @@ async def scan_and_find_ssid(iface, target_ssid, retries=MAX_RETRIES, delay=RETR
 
 
 async def connect_wifi_linux(ssid, password) -> ConnectionResult:
-    """Connects to WiFi using wpa_supplicant commands in Linux (for both desktop and Raspberry Pi)"""
+    """Connect to WiFi using wpa_supplicant commands in Linux (desktop and Raspberry Pi).
+
+    Args:
+        ssid: Network SSID (string or bytes)
+        password: Network password (string or bytes)
+
+    Returns:
+        ConnectionResult: Object with returncode (0=success, non-zero=failure) and stderr message
+
+    Raises:
+        None: Function handles all exceptions internally and returns ConnectionResult with error info
+    """
 
     if isinstance(ssid, bytes):
         ssid = ssid.decode()
     if isinstance(password, bytes):
         password = password.decode()
 
-    iface = await detect_wifi_iface()
-    if not iface:
+    interface = await detect_wifi_interface()
+    if not interface:
         logger.error("connect_wifi_linux: No WiFi interface found")
         return ConnectionResult(1, "No WiFi interface found")
 
     try:
         # Scan to ensure SSID is available
-        if not await scan_and_find_ssid(iface, ssid):
+        if not await scan_and_find_ssid(interface, ssid):
             logger.error(f"connect_wifi_linux: SSID {ssid} not found in scan")
             return ConnectionResult(1, f"SSID {ssid} not available")
 
         # Ensure interface is up and reset state
-        await run_subprocess(["sudo", "ip", "link", "set", iface, "up"])
+        await run_subprocess(["sudo", "ip", "link", "set", interface, "up"])
         await asyncio.sleep(SHORT_WAIT)
 
         # Disconnect from any current connection
-        await wpa_command(iface, "DISCONNECT")
+        await wpa_command(interface, "DISCONNECT")
         await asyncio.sleep(MEDIUM_WAIT)
 
         # Remove all existing networks to avoid conflicts
-        nets_result = await wpa_command(iface, "LIST_NETWORKS")
+        nets_result = await wpa_command(interface, "LIST_NETWORKS")
         if nets_result and "network id" in nets_result:
             nets = nets_result.splitlines()[1:]
             for n in nets:
                 if n.strip():
                     cols = n.split("\t")
                     if len(cols) >= 1:
-                        await wpa_command(iface, f"REMOVE_NETWORK {cols[0]}")
+                        await wpa_command(interface, f"REMOVE_NETWORK {cols[0]}")
 
         # Add and configure the target network
-        net_id = await wpa_command(iface, "ADD_NETWORK")
+        net_id = await wpa_command(interface, "ADD_NETWORK")
         if net_id.startswith("FAIL"):
             logger.error(f"connect_wifi_linux: Failed to add network: {net_id}")
             return ConnectionResult(1, f"Failed to add network: {net_id}")
@@ -236,15 +288,15 @@ async def connect_wifi_linux(ssid, password) -> ConnectionResult:
         ]
 
         for cmd in config_commands:
-            result = await wpa_command(iface, cmd)
+            result = await wpa_command(interface, cmd)
             if result.startswith("FAIL"):
                 logger.error(f"connect_wifi_linux: Failed to configure network: {cmd} -> {result}")
                 return ConnectionResult(1, f"Failed to configure network: {cmd}")
 
         # Enable and select the network
-        await wpa_command(iface, f"ENABLE_NETWORK {net_id}")
-        await wpa_command(iface, f"SELECT_NETWORK {net_id}")
-        await wpa_command(iface, "REASSOCIATE")
+        await wpa_command(interface, f"ENABLE_NETWORK {net_id}")
+        await wpa_command(interface, f"SELECT_NETWORK {net_id}")
+        await wpa_command(interface, "REASSOCIATE")
 
         retry = 0
         timeout = CONNECTION_TIMEOUT
@@ -255,7 +307,7 @@ async def connect_wifi_linux(ssid, password) -> ConnectionResult:
             connected = False
 
             while time.time() - start_time < timeout:
-                status = await wpa_command(iface, "STATUS")
+                status = await wpa_command(interface, "STATUS")
 
                 if "wpa_state=COMPLETED" in status:
                     connected = True
@@ -275,60 +327,49 @@ async def connect_wifi_linux(ssid, password) -> ConnectionResult:
             # If connection failed and we have more attempts, reset interface
             if retry < MAX_RETRIES:
                 logger.warning(f"connect_wifi_linux: Attempt {retry} failed, resetting interface")
-                await run_subprocess(["sudo", "ip", "link", "set", iface, "down"])
+                await run_subprocess(["sudo", "ip", "link", "set", interface, "down"])
                 await asyncio.sleep(MEDIUM_WAIT)
-                await run_subprocess(["sudo", "ip", "link", "set", iface, "up"])
+                await run_subprocess(["sudo", "ip", "link", "set", interface, "up"])
                 await asyncio.sleep(LONG_WAIT)
-                await wpa_command(iface, f"SELECT_NETWORK {net_id}")
-                await wpa_command(iface, "REASSOCIATE")
+                await wpa_command(interface, f"SELECT_NETWORK {net_id}")
+                await wpa_command(interface, "REASSOCIATE")
                 await asyncio.sleep(MEDIUM_WAIT)
 
         if not connected:
-            final_status = await wpa_command(iface, "STATUS")
+            final_status = await wpa_command(interface, "STATUS")
             logger.error(f"connect_wifi_linux: Connection failed after {MAX_RETRIES} attempts. Final status: {final_status}")
             return ConnectionResult(1, f"Connection failed: {final_status}")
 
         # Connection successful, get IP address
         # Release any existing DHCP lease and request new one
-        await run_subprocess(["sudo", "dhclient", "-r", iface])
+        await run_subprocess(["sudo", "dhclient", "-r", interface])
         await asyncio.sleep(SHORT_WAIT)
-        await run_subprocess(["sudo", "dhclient", iface])
+        await run_subprocess(["sudo", "dhclient", interface])
 
         # Wait for IP assignment with retry
         ip_timeout = IP_TIMEOUT
         ip_start = time.time()
 
         while time.time() - ip_start < ip_timeout:
-            proc = await asyncio.create_subprocess_exec(
-                "ip", "-4", "addr", "show", iface,
-                stdout=asyncio.subprocess.PIPE,
-                stderr=asyncio.subprocess.PIPE
-            )
-            stdout, _ = await proc.communicate()
-            output = stdout.decode()
+            output = await run_subprocess(["ip", "-4", "addr", "show", interface], capture_output=True)
 
-            if "inet " in output:
+            if output and "inet " in output:
                 ip_match = re.search(r'inet\s+(\S+)', output)
                 if ip_match:
                     # Test connectivity to gateway
                     try:
-                        gateway_proc = await asyncio.create_subprocess_exec(
-                            "ip", "route", "show", "default",
-                            stdout=asyncio.subprocess.PIPE
-                        )
-                        gw_stdout, _ = await gateway_proc.communicate()
-                        gw_output = gw_stdout.decode()
-                        gw_match = re.search(r'default via (\S+)', gw_output)
-                        if gw_match:
-                            gateway = gw_match.group(1)
-                            ping_proc = await asyncio.create_subprocess_exec(
-                                "ping", "-c", "1", "-W", "3", gateway,
-                                stdout=asyncio.subprocess.PIPE,
-                                stderr=asyncio.subprocess.PIPE
-                            )
-                            ping_stdout, _ = await ping_proc.communicate()
-                            if "1 received" in ping_stdout.decode():
-                                pass  # Connectivity verified
+                        gw_output = await run_subprocess(["ip", "route", "show", "default"], capture_output=True)
+                        if gw_output:
+                            gw_match = re.search(r'default via (\S+)', gw_output)
+                            if gw_match:
+                                gateway = gw_match.group(1)
+                                ping_output = await run_subprocess(
+                                    ["ping", "-c", "1", "-W", "3", gateway],
+                                    capture_output=True,
+                                    timeout=5
+                                )
+                                if ping_output and "1 received" in ping_output:
+                                    pass  # Connectivity verified
                     except Exception:
                         logger.warning("connect_wifi_linux: Could not verify connectivity, but connection appears established")
 
@@ -345,7 +386,18 @@ async def connect_wifi_linux(ssid, password) -> ConnectionResult:
 
 
 async def connect_wifi_mac(ssid, password) -> ConnectionResult:
-    """ Connects to WiFi with the SSID and Password provided as arguments using 'networksetup' in Mac."""
+    """Connect to WiFi using 'networksetup' command on macOS.
+
+    Args:
+        ssid: Network SSID (string)
+        password: Network password (string)
+
+    Returns:
+        ConnectionResult: Object with returncode (0=success, non-zero=failure) and stderr message
+
+    Raises:
+        None: Function handles all exceptions internally and returns ConnectionResult with error info
+    """
 
     if not shutil.which("networksetup"):
         logger.error("connect_wifi_mac: 'networksetup' is not present. Please install 'networksetup'.")
@@ -382,7 +434,18 @@ async def connect_wifi_mac(ssid, password) -> ConnectionResult:
 
 
 async def connect_host_wifi(ssid, password) -> Optional[ConnectionResult]:
-    """ Checks in which OS (Linux or Darwin only) the script is running and calls the corresponding connect_wifi_* function. """
+    """Connect to WiFi network based on host OS (Linux or macOS) with retry logic.
+
+    Args:
+        ssid: Network SSID (string or bytes)
+        password: Network password (string or bytes)
+
+    Returns:
+        Optional[ConnectionResult]: ConnectionResult object with success/failure info, or None on unsupported OS
+
+    Raises:
+        None: Function handles all exceptions internally and returns ConnectionResult with error info
+    """
 
     os_name = platform.system()
     retry = 0
@@ -410,7 +473,14 @@ async def connect_host_wifi(ssid, password) -> Optional[ConnectionResult]:
 
 
 def is_network_switch_successful(err):
-    """ Verifies if networkingStatus is 0 (kSuccess) """
+    """Verify if network switch was successful by checking networkingStatus.
+
+    Args:
+        err: Error response from network command, should have networkingStatus attribute or None
+
+    Returns:
+        bool: True if network switch was successful (status is kSuccess or None), False otherwise
+    """
 
     return (
         err is None or
@@ -420,8 +490,21 @@ def is_network_switch_successful(err):
 
 
 async def change_networks(test, cluster, ssid, password, breadcrumb):
-    """ Changes networks in DUT by sending ConnectNetwork command and
-        changes TH network by calling connect_host_wifi function with fallback."""
+    """Change networks for both DUT and test host with fallback logic.
+
+    Args:
+        test: Test instance with send_single_cmd method and matter_test_config
+        cluster: NetworkCommissioning cluster object for sending commands
+        ssid: Target network SSID (bytes)
+        password: Target network password (bytes)
+        breadcrumb: Breadcrumb value for network commands (int)
+
+    Returns:
+        None: Function completes successfully or raises exception
+
+    Raises:
+        Exception: If network change fails after all retry attempts
+    """
 
     logger.info(f"change_networks: Starting network change to {ssid}")
 
@@ -533,7 +616,19 @@ async def change_networks(test, cluster, ssid, password, breadcrumb):
 
 
 async def parse_default_routes():
-    """Parse and return default routes information."""
+    """Parse and return default routes information from system routing table.
+
+    Returns:
+        list: List of dictionaries containing route information with keys:
+              - gateway: Gateway IP address (string)
+              - interface: Network interface name (string)  
+              - metric: Route metric value (string or None)
+              - full_line: Complete route line (string)
+              - is_lan: Boolean indicating if route is LAN-based (not WiFi)
+
+    Raises:
+        None: Function handles all exceptions internally and returns empty list on error
+    """
     try:
         output = await run_subprocess(["ip", "route", "show", "default"], check=True, capture_output=True)
         routes_info = []
@@ -570,7 +665,14 @@ async def parse_default_routes():
 
 
 async def remove_lan_routes():
-    """Remove LAN default routes and return list of removed routes for restoration."""
+    """Remove LAN default routes and return list of removed routes for restoration.
+
+    Returns:
+        list: List of route dictionaries that were successfully removed
+
+    Raises:
+        None: Function handles all exceptions internally and returns partial results
+    """
     original_routes = []
 
     try:
@@ -599,8 +701,42 @@ async def remove_lan_routes():
     return original_routes
 
 
+async def check_route_exists(gateway, interface):
+    """Check if a specific default route exists.
+
+    Args:
+        gateway: Gateway IP address (string)
+        interface: Network interface name (string)
+
+    Returns:
+        bool: True if route exists, False otherwise
+
+    Raises:
+        None: Function handles all exceptions internally and returns False on error
+    """
+    try:
+        output = await run_subprocess(
+            ["ip", "route", "show", "default", "via", gateway, "dev", interface],
+            capture_output=True
+        )
+        return bool(output and output.strip())
+    except Exception as e:
+        logger.warning(f"check_route_exists: Error checking route: {e}")
+        return False
+
+
 async def restore_lan_routes(original_routes):
-    """Restore previously removed LAN default routes."""
+    """Restore previously removed LAN default routes.
+
+    Args:
+        original_routes: List of route dictionaries to restore (list)
+
+    Returns:
+        None
+
+    Raises:
+        None: Function handles all exceptions internally and logs failures
+    """
     if not original_routes:
         logger.info("restore_lan_routes: No original routes to restore")
         return
@@ -631,7 +767,18 @@ async def restore_lan_routes(original_routes):
 async def temporarily_remove_lan_route_for_wifi(ssid, wifi_1st_ap_ssid):
     """Temporarily remove LAN route if this is 2nd WiFi network and dual routes exist.
 
-    Returns tuple: (lan_route_removed, gateway, lan_interface) for restoration.
+    Args:
+        ssid: Current network SSID to connect to (string)
+        wifi_1st_ap_ssid: First WiFi AP SSID for comparison (string)
+
+    Returns:
+        tuple: (lan_route_removed, gateway, lan_interface) for restoration
+               - lan_route_removed: Boolean indicating if route was removed
+               - gateway: Gateway IP address of removed route (string or None)
+               - lan_interface: Interface name of removed route (string or None)
+
+    Raises:
+        None: Function handles all exceptions internally and logs warnings
     """
     lan_route_removed = False
     gateway = None
@@ -660,20 +807,18 @@ async def temporarily_remove_lan_route_for_wifi(ssid, wifi_1st_ap_ssid):
                     f"temporarily_remove_lan_route_for_wifi: Detected dual default routes, temporarily removing LAN route via {gateway} dev {lan_interface}")
 
                 # Verify route exists before removing
-                verify_route = subprocess.run(
-                    ['ip', 'route', 'show', 'default', 'via', gateway, 'dev', lan_interface],
-                    capture_output=True, text=True, check=False)
-
-                if verify_route.returncode == 0 and verify_route.stdout.strip():
-                    # Remove LAN default route temporarily
-                    result = subprocess.run(['sudo', 'ip', 'route', 'del', 'default', 'via', gateway, 'dev', lan_interface],
-                                            capture_output=True, text=True, check=False)
-                    if result.returncode == 0:
+                if await check_route_exists(gateway, lan_interface):
+                    # Remove LAN default route temporarily using run_subprocess
+                    success = await run_subprocess([
+                        'sudo', 'ip', 'route', 'del', 'default', 'via', gateway, 'dev', lan_interface
+                    ], check=False)
+                    if success:
                         lan_route_removed = True
                         logger.info(f"temporarily_remove_lan_route_for_wifi: LAN default route temporarily removed")
                         await asyncio.sleep(MEDIUM_WAIT)  # Wait for route change to take effect
                     else:
-                        logger.warning(f"temporarily_remove_lan_route_for_wifi: Failed to remove LAN route: {result.stderr}")
+                        logger.warning(
+                            f"temporarily_remove_lan_route_for_wifi: Failed to remove LAN route via {gateway} dev {lan_interface}")
                 else:
                     logger.info("temporarily_remove_lan_route_for_wifi: LAN default route verification failed, skipping removal")
 
@@ -687,23 +832,33 @@ async def temporarily_remove_lan_route_for_wifi(ssid, wifi_1st_ap_ssid):
 
 
 async def restore_temporarily_removed_lan_route(lan_route_removed, gateway, lan_interface):
-    """Restore temporarily removed LAN route (Linux only)."""
+    """Restore temporarily removed LAN route (Linux only).
+
+    Args:
+        lan_route_removed: Boolean indicating if route was previously removed
+        gateway: Gateway IP address to restore (string or None)
+        lan_interface: Interface name to restore (string or None)
+
+    Returns:
+        None
+
+    Raises:
+        None: Function handles all exceptions internally and logs errors
+    """
     if lan_route_removed and gateway and lan_interface and platform.system() == "Linux":
         try:
             # Check if route already exists before adding
-            verify_restore = subprocess.run(
-                ['ip', 'route', 'show', 'default', 'via', gateway, 'dev', lan_interface],
-                capture_output=True, text=True, check=False)
-
-            if not verify_restore.stdout.strip():
+            if not await check_route_exists(gateway, lan_interface):
                 # Route doesn't exist, safe to add
-                result = subprocess.run(['sudo', 'ip', 'route', 'add', 'default', 'via', gateway, 'dev', lan_interface, 'metric', '100'],
-                                        capture_output=True, text=True, check=False)
-                if result.returncode == 0:
+                success = await run_subprocess([
+                    'sudo', 'ip', 'route', 'add', 'default', 'via', gateway, 'dev', lan_interface, 'metric', '100'
+                ], check=False)
+                if success:
                     logger.info(
                         f"restore_temporarily_removed_lan_route: LAN default route restored (gateway: {gateway}, interface: {lan_interface})")
                 else:
-                    logger.error(f"restore_temporarily_removed_lan_route: Failed to restore LAN route: {result.stderr}")
+                    logger.error(
+                        f"restore_temporarily_removed_lan_route: Failed to restore LAN route via {gateway} dev {lan_interface}")
             else:
                 logger.info("restore_temporarily_removed_lan_route: LAN default route already exists, no restoration needed")
         except Exception as e:
@@ -719,7 +874,7 @@ async def find_network_and_assert(networks, ssid, should_be_connected=True):
         should_be_connected: Expected connection state (bool)
 
     Returns:
-        Index of the network in the list
+        int: Index of the network in the list
 
     Raises:
         AssertionError: If network not found or connection state doesn't match
@@ -733,6 +888,79 @@ async def find_network_and_assert(networks, ssid, should_be_connected=True):
     asserts.fail(f"Wifi network not found for SSID: {ssid}")
 
 
+async def verify_breadcrumb_value(test_instance, expected_value, step_number, timeout=None):
+    """Verify breadcrumb attribute value.
+
+    Args:
+        test_instance: Test instance with read_single_attribute_check_success method
+        expected_value: Expected breadcrumb value (int)
+        step_number: Step number for logging (int)
+        timeout: Optional timeout for the operation (int)
+
+    Returns:
+        None
+
+    Raises:
+        AssertionError: If breadcrumb value doesn't match expected
+    """
+    if timeout:
+        breadcrumb = await asyncio.wait_for(
+            test_instance.read_single_attribute_check_success(
+                cluster=cgen,
+                attribute=cgen.Attributes.Breadcrumb
+            ),
+            timeout=timeout
+        )
+    else:
+        breadcrumb = await test_instance.read_single_attribute_check_success(
+            cluster=cgen,
+            attribute=cgen.Attributes.Breadcrumb
+        )
+
+    logger.info(f"Step {step_number}: Breadcrumb is: {breadcrumb}")
+    asserts.assert_equal(breadcrumb, expected_value, f"Expected breadcrumb to be {expected_value}, but got: {breadcrumb}")
+
+
+async def send_add_or_update_wifi_network_with_retries(test_instance, ssid, credentials, breadcrumb=1, max_retries=MAX_RETRIES):
+    """Send AddOrUpdateWiFiNetwork command with retry logic.
+
+    Args:
+        test_instance: Test instance with send_single_cmd method
+        ssid: Network SSID (string)
+        credentials: Network credentials (string)  
+        breadcrumb: Breadcrumb value (int)
+        max_retries: Maximum retry attempts (int)
+
+    Returns:
+        Response from AddOrUpdateWiFiNetwork command
+
+    Raises:
+        Exception: If command fails after all retries
+    """
+    cmd = cnet.Commands.AddOrUpdateWiFiNetwork(
+        ssid=ssid.encode(), credentials=credentials.encode(), breadcrumb=breadcrumb)
+
+    # Try with retries in case of temporary connectivity issues
+    response = None
+    retry = 0
+    while retry < max_retries:
+        retry += 1
+        try:
+            logger.info(
+                f"send_add_or_update_wifi_network_with_retries: Attempt {retry}/{max_retries}: Sending AddOrUpdateWiFiNetwork command")
+            response = await test_instance.send_single_cmd(cmd=cmd, timedRequestTimeoutMs=TIMED_REQUEST_TIMEOUT_MS)
+            break
+        except Exception as e:
+            logger.warning(f"send_add_or_update_wifi_network_with_retries: Attempt {retry} failed: {e}")
+            if retry < max_retries:
+                logger.info(f"Retrying in {RETRY_DELAY_SECONDS} seconds...")
+                await asyncio.sleep(RETRY_DELAY_SECONDS)
+            else:
+                raise Exception(f"Failed to send AddOrUpdateWiFiNetwork after {max_retries} attempts: {e}")
+
+    return response
+
+
 async def verify_operational_network(ssid, wifi_1st_ap_ssid, read_single_attribute_check_success):
     """Verify that DUT is operational on the specified network.
 
@@ -740,6 +968,9 @@ async def verify_operational_network(ssid, wifi_1st_ap_ssid, read_single_attribu
         ssid: SSID to verify connection to (string)
         wifi_1st_ap_ssid: First WiFi AP SSID for comparison (string)
         read_single_attribute_check_success: Function to read Matter attributes
+
+    Returns:
+        None
 
     Raises:
         AssertionError: If network verification fails
@@ -754,11 +985,12 @@ async def verify_operational_network(ssid, wifi_1st_ap_ssid, read_single_attribu
     lan_route_removed, gateway, lan_interface = await temporarily_remove_lan_route_for_wifi(ssid, wifi_1st_ap_ssid)
 
     try:
-        # Increased retries for better reliability in Docker/mDNS environment
+        # Reasonable retries for mDNS discovery, especially in Docker environment
         max_retries_for_discovery = 5
 
         while retry < max_retries_for_discovery:
             retry += 1
+
             try:
                 # Use extended timeout for mDNS discovery, especially on first attempt after network change
                 if retry == 1:
@@ -766,7 +998,8 @@ async def verify_operational_network(ssid, wifi_1st_ap_ssid, read_single_attribu
                 else:
                     timeout_to_use = ATTRIBUTE_READ_TIMEOUT  # Shorter timeout for subsequent attempts (30s)
 
-                logger.debug(f"verify_operational_network: Using timeout {timeout_to_use}s for attempt {retry}")
+                logger.debug(
+                    f"verify_operational_network: Using timeout {timeout_to_use}s for attempt {retry}/{max_retries_for_discovery}")
 
                 networks = await asyncio.wait_for(
                     read_single_attribute_check_success(
@@ -786,13 +1019,16 @@ async def verify_operational_network(ssid, wifi_1st_ap_ssid, read_single_attribu
                         raise Exception("No connected network found in response")
                     break
 
+            except asyncio.TimeoutError:
+                logger.error(f"verify_operational_network: Timeout during attempt {retry} (waited {timeout_to_use}s)")
             except Exception as e:
                 logger.error(f"verify_operational_network: Exception reading networks: {e}")
 
-            # Clean mDNS state between retry attempts to prevent cache issues
+            # Wait between retry attempts to allow network stabilization
             if retry < max_retries_for_discovery:
-                logger.info(f"verify_operational_network: Cleaning mDNS state before retry {retry + 1}")
-                await cleanup_mdns_state()
+                logger.info(f"verify_operational_network: Waiting before retry {retry + 1}")
+                # Small wait to allow network and mDNS to stabilize naturally
+                await asyncio.sleep(MEDIUM_WAIT)
 
             # Progressive delay - ESP32 needs more time after network switch
             if retry == 1:
@@ -818,7 +1054,14 @@ async def verify_operational_network(ssid, wifi_1st_ap_ssid, read_single_attribu
 
 
 async def clean_avahi_cache():
-    """Clean Avahi cache files without restarting daemon."""
+    """Clean Avahi cache files without restarting daemon.
+
+    Returns:
+        None
+
+    Raises:
+        None: Function handles all exceptions internally and logs warnings
+    """
     try:
         logger.debug("clean_avahi_cache: Cleaning Avahi cache files...")
 
@@ -837,7 +1080,14 @@ async def clean_avahi_cache():
 
 
 async def restart_avahi_daemon():
-    """Restart Avahi daemon for complete mDNS reset."""
+    """Restart Avahi daemon for complete mDNS reset.
+
+    Returns:
+        None
+
+    Raises:
+        subprocess.CalledProcessError: If Avahi daemon restart fails and fallback methods also fail
+    """
     try:
         logger.debug("restart_avahi_daemon: Restarting Avahi daemon...")
 
@@ -873,7 +1123,14 @@ async def restart_avahi_daemon():
 
 
 async def aggressive_mdns_cleanup():
-    """Perform aggressive mDNS cleanup for test setup (kill processes, clean cache, restart daemon)."""
+    """Perform aggressive mDNS cleanup for test setup (kill processes, clean cache, restart daemon).
+
+    Returns:
+        None
+
+    Raises:
+        Exception: If critical mDNS cleanup operations fail
+    """
     try:
         logger.info("aggressive_mdns_cleanup: Performing aggressive mDNS cleanup...")
 
@@ -913,33 +1170,55 @@ async def aggressive_mdns_cleanup():
         raise
 
 
-async def cleanup_mdns_state():
-    """Clean up mDNS state to prevent discovery issues."""
+async def check_dnssd_health():
+    """Check if DNS-SD/mDNS services are working properly.
 
+    Returns:
+        bool: True if DNS-SD is healthy, False otherwise
+    """
     try:
-        logger.info("cleanup_mdns_state: Performing quick mDNS cleanup...")
+        logger.info("check_dnssd_health: Verifying DNS-SD availability...")
 
-        # Clean cache files
-        await clean_avahi_cache()
+        # Check if Avahi daemon is running
+        result = await run_subprocess(["ps", "aux"], capture_output=True, timeout=5)
+        if result.returncode == 0 and "avahi-daemon" in result.stdout:
+            logger.info("check_dnssd_health: Avahi daemon is running")
+            return True
+        else:
+            logger.warning("check_dnssd_health: Avahi daemon not found - DNS-SD may not work properly")
 
-        # Send SIGHUP to avahi-daemon to refresh (if running)
-        try:
-            await run_subprocess(["sudo", "pkill", "-HUP", "avahi-daemon"])
-            await asyncio.sleep(SHORT_WAIT)
-        except Exception as e:
-            logger.warning(f"cleanup_mdns_state: Failed to send SIGHUP to avahi-daemon: {e}")
+        # Try to start Avahi if not running
+        logger.info("check_dnssd_health: Attempting to start Avahi daemon...")
+        start_result = await run_subprocess(["avahi-daemon", "--daemonize"], capture_output=True, timeout=10)
+        if start_result.returncode == 0:
+            logger.info("check_dnssd_health: Successfully started Avahi daemon")
+            return True
+        else:
+            logger.warning(f"check_dnssd_health: Failed to start Avahi: {start_result.stderr}")
+            return False
 
-        logger.info("cleanup_mdns_state: mDNS cleanup completed")
     except Exception as e:
-        logger.warning(f"cleanup_mdns_state: Cleanup failed but continuing: {e}")
+        logger.error(f"check_dnssd_health: Failed to check DNS-SD health: {e}")
+        return False
 
 
 async def setup_network_environment():
-    """Setup network environment by cleaning mDNS state and managing default routes."""
+    """Setup network environment by managing default routes.
+
+    Returns:
+        list: List of original LAN routes that were removed for restoration
+
+    Raises:
+        None: Function handles all exceptions internally and returns empty list on error
+    """
 
     try:
-        # Clean mDNS state aggressively to prevent intermittent failures
-        await aggressive_mdns_cleanup()
+        logger.info("setup_network_environment: Setting up test environment...")
+
+        # Check DNS-SD health first
+        dnssd_healthy = await check_dnssd_health()
+        if not dnssd_healthy:
+            logger.warning("setup_network_environment: DNS-SD services may not be available - test may experience issues")
 
         # Remove LAN routes to force traffic through Wi-Fi during the test
         original_routes = await remove_lan_routes()
@@ -952,15 +1231,23 @@ async def setup_network_environment():
 
 
 async def teardown_network_environment(original_routes):
-    """Restore network environment by restoring routes and cleaning mDNS state."""
+    """Restore network environment by restoring routes.
+
+    Args:
+        original_routes: List of route dictionaries to restore
+
+    Returns:
+        None
+
+    Raises:
+        None: Function handles all exceptions internally and logs errors
+    """
 
     try:
+        logger.info("teardown_network_environment: Restoring network environment...")
+
         # Restore original LAN routes using helper function
         await restore_lan_routes(original_routes)
-
-        # Clean mDNS state after test completion to prevent interference with next run
-        logger.info("teardown_network_environment: Cleaning mDNS state for next run...")
-        await cleanup_mdns_state()
 
     except Exception as e:
         logger.error(f"teardown_network_environment: Error during teardown: {e}")
@@ -975,9 +1262,15 @@ class TC_CNET_4_11(MatterBaseTest):
             cls._original_routes = asyncio.run(
                 asyncio.wait_for(setup_network_environment(), timeout=SETUP_TEARDOWN_TIMEOUT)
             )
+            logger.info("setup_class: Network environment setup completed successfully")
+        except asyncio.TimeoutError:
+            logger.error(f"setup_class: Network environment setup timed out after {SETUP_TEARDOWN_TIMEOUT}s")
+            cls._original_routes = []
+            raise
         except Exception as e:
             logger.error(f"setup_class: Failed to setup network environment: {e}")
             cls._original_routes = []
+            raise
 
     @classmethod
     def teardown_class(cls):
@@ -1114,10 +1407,7 @@ class TC_CNET_4_11(MatterBaseTest):
         # TH sends ArmFailSafe command to the DUT with ExpiryLengthSeconds set to 900
         self.step(1)
 
-        await self.send_single_cmd(
-            cmd=cgen.Commands.ArmFailSafe(expiryLengthSeconds=900),
-            timedRequestTimeoutMs=TIMED_REQUEST_TIMEOUT_MS
-        )
+        await self.send_single_cmd(cmd=cgen.Commands.ArmFailSafe(expiryLengthSeconds=900), timedRequestTimeoutMs=TIMED_REQUEST_TIMEOUT_MS)
         # Successful command execution is implied if no exception is raised.
 
         # TH reads Networks attribute from the DUT and saves the number of entries as 'NumNetworks'
@@ -1167,26 +1457,7 @@ class TC_CNET_4_11(MatterBaseTest):
         self.step(5)
 
         # Add second network - handle potential connectivity issues after removing the first network
-        cmd = cnet.Commands.AddOrUpdateWiFiNetwork(
-            ssid=wifi_2nd_ap_ssid.encode(), credentials=wifi_2nd_ap_credentials.encode(), breadcrumb=1)
-
-        # Try with retries in case of temporary connectivity issues
-        response = None
-        retry = 0
-        while retry < MAX_RETRIES:
-            retry += 1
-            try:
-                logger.info(f"Step 5 attempt {retry}/{MAX_RETRIES}: Sending AddOrUpdateWiFiNetwork command")
-                response = await self.send_single_cmd(cmd=cmd, timedRequestTimeoutMs=TIMED_REQUEST_TIMEOUT_MS)
-                break
-            except Exception as e:
-                logger.warning(f"Step 5 attempt {retry} failed: {e}")
-                if retry < MAX_RETRIES:
-                    logger.info(f"Retrying in {RETRY_DELAY_SECONDS} seconds...")
-                    await asyncio.sleep(RETRY_DELAY_SECONDS)
-                else:
-                    raise Exception(f"Failed to send AddOrUpdateWiFiNetwork after {MAX_RETRIES} attempts: {e}")
-
+        response = await send_add_or_update_wifi_network_with_retries(self, wifi_2nd_ap_ssid, wifi_2nd_ap_credentials, breadcrumb=1)
         # Verify that DUT sends the NetworkConfigResponse command to the TH with the following response fields:
         asserts.assert_true(isinstance(response, cnet.Commands.NetworkConfigResponse),
                             "Unexpected value returned from AddOrUpdateWiFiNetwork")
@@ -1237,12 +1508,7 @@ class TC_CNET_4_11(MatterBaseTest):
         self.step(9)
 
         # Verify that the breadcrumb value is set to 2
-        breadcrumb = await self.read_single_attribute_check_success(
-            cluster=cgen,
-            attribute=cgen.Attributes.Breadcrumb
-        )
-        logger.info(f"Step 9: Breadcrumb is: {breadcrumb}")
-        asserts.assert_equal(breadcrumb, 2, f"Expected breadcrumb to be 2, but got: {breadcrumb}")
+        await verify_breadcrumb_value(self, expected_value=2, step_number=9)
 
         # TH sends ArmFailSafe command to the DUT with ExpiryLengthSeconds set to 0.
         # This forcibly disarms the fail-safe and is expected to cause the changes of
@@ -1297,10 +1563,7 @@ class TC_CNET_4_11(MatterBaseTest):
         # TH sends ArmFailSafe command to the DUT with ExpiryLengthSeconds set to 900
         self.step(13)
 
-        await self.send_single_cmd(
-            cmd=cgen.Commands.ArmFailSafe(expiryLengthSeconds=900),
-            timedRequestTimeoutMs=TIMED_REQUEST_TIMEOUT_MS
-        )
+        await self.send_single_cmd(cmd=cgen.Commands.ArmFailSafe(expiryLengthSeconds=900), timedRequestTimeoutMs=TIMED_REQUEST_TIMEOUT_MS)
         # Successful command execution is implied if no exception is raised.
 
         # TH sends RemoveNetwork Command to the DUT with NetworkID field set to PIXIT.CNET.WIFI_1ST_ACCESSPOINT_SSID and Breadcrumb field set to 1
@@ -1313,8 +1576,9 @@ class TC_CNET_4_11(MatterBaseTest):
             ),
             timedRequestTimeoutMs=TIMED_REQUEST_TIMEOUT_MS
         )
-
         # Verify that DUT sends NetworkConfigResponse to command with the following response fields:
+        asserts.assert_true(isinstance(response, cnet.Commands.NetworkConfigResponse),
+                            f"Expected response to be of type NetworkConfigResponse but got: {type(response)}")
         # 1. NetworkingStatus is success
         asserts.assert_equal(response.networkingStatus,
                              cnet.Enums.NetworkCommissioningStatusEnum.kSuccess, "Network was not removed")
@@ -1326,10 +1590,7 @@ class TC_CNET_4_11(MatterBaseTest):
         # Credentials field set to PIXIT.CNET.WIFI_2ND_ACCESSPOINT_CREDENTIALS and Breadcrumb field set to 1
         self.step(15)
 
-        cmd = cnet.Commands.AddOrUpdateWiFiNetwork(
-            ssid=wifi_2nd_ap_ssid.encode(), credentials=wifi_2nd_ap_credentials.encode(), breadcrumb=1)
-        response = await self.send_single_cmd(cmd=cmd, timedRequestTimeoutMs=TIMED_REQUEST_TIMEOUT_MS)
-
+        response = await send_add_or_update_wifi_network_with_retries(self, wifi_2nd_ap_ssid, wifi_2nd_ap_credentials, breadcrumb=1)
         # Verify that DUT sends the NetworkConfigResponse command to the TH with the following response fields:
         # 1. NetworkingStatus is success which is "0"
         asserts.assert_true(isinstance(response, cnet.Commands.NetworkConfigResponse),
@@ -1363,16 +1624,8 @@ class TC_CNET_4_11(MatterBaseTest):
         # TH reads Breadcrumb attribute from the General Commissioning cluster of the DUT
         self.step(18)
 
-        breadcrumb = await asyncio.wait_for(
-            self.read_single_attribute_check_success(
-                cluster=cgen,
-                attribute=cgen.Attributes.Breadcrumb
-            ),
-            timeout=TIMEOUT
-        )
-        logger.info(f"Step 18: Breadcrumb is: {breadcrumb}")
         # Verify that the breadcrumb value is set to 3
-        asserts.assert_equal(breadcrumb, 3, f"Expected breadcrumb to be 3, but got: {breadcrumb}")
+        await verify_breadcrumb_value(self, expected_value=3, step_number=18, timeout=TIMEOUT)
 
         # TH sends the CommissioningComplete command to the DUT
         self.step(19)
