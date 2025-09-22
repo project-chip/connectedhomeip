@@ -236,3 +236,13 @@ void BdxOtaSender::Reset()
     mNumBytesSent = 0;
     memset(mFileDesignator, 0, chip::bdx::kMaxFileDesignatorLen);
 }
+
+void BdxOtaSender::AbortTransfer()
+{
+    if (mInitialized)
+    {
+        ChipLogDetail(BDX, "Aborting current transfer");
+        mTransfer.AbortTransfer(StatusCode::kUnknown);
+        Reset();
+    }
+}
