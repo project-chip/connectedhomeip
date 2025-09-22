@@ -15,26 +15,25 @@
  *    limitations under the License.
  */
 
-#include <platform/CHIPDeviceLayer.h>
-#include <lib/support/UnitTest.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CHIPPlatformMemory.h>
+#include <lib/support/UnitTest.h>
+#include <mbedtls/platform.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/KeyValueStoreManager.h>
-#include <mbedtls/platform.h>
 
 #if configAPPLICATION_ALLOCATED_HEAP
 uint8_t __attribute__((section(".heap"))) ucHeap[configTOTAL_HEAP_SIZE];
 #endif
 
 #ifndef MAIN_TASK_SIZE
-#define MAIN_TASK_SIZE ((configSTACK_DEPTH_TYPE)24576 / sizeof(portSTACK_TYPE))
+#define MAIN_TASK_SIZE ((configSTACK_DEPTH_TYPE) 24576 / sizeof(portSTACK_TYPE))
 #endif
 
 using namespace ::chip;
 using namespace ::chip::DeviceLayer;
 
-void main_task(void *pvParameters)
+void main_task(void * pvParameters)
 {
     chip::Platform::MemoryInit();
     chip::DeviceLayer::PlatformManagerImpl().ServiceInit();
@@ -42,7 +41,7 @@ void main_task(void *pvParameters)
     int status = chip::test::RunAllTests();
 }
 
-extern "C" int main(int argc, char *argv[])
+extern "C" int main(int argc, char * argv[])
 {
     TaskHandle_t taskHandle;
 
@@ -59,7 +58,7 @@ extern "C" int main(int argc, char *argv[])
 }
 
 #if (defined(configCHECK_FOR_STACK_OVERFLOW) && (configCHECK_FOR_STACK_OVERFLOW > 0))
-void vApplicationStackOverflowHook(TaskHandle_t xTask, char *pcTaskName)
+void vApplicationStackOverflowHook(TaskHandle_t xTask, char * pcTaskName)
 {
     assert(0);
 }

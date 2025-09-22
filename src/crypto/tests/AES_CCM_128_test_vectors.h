@@ -956,12 +956,12 @@ static const struct ccm_128_test_vector chiptest_dac9e1195a0d_test_vector_266 = 
                                                                                   .tcId      = 37,
                                                                                   .result    = CHIP_ERROR_INTERNAL };
 
-static const uint8_t chiptest_dac9e1195a0d_key_267[]   = {  0x40, 0x41, 0x42, 0x43, 0x44, 0x45, 0x46, 0x47,
-                                                            0x48, 0x49, 0x4a, 0x4b, 0x4c, 0x4d, 0x4e, 0x4f
-                                                        };
-static const uint8_t chiptest_dac9e1195a0d_nonce_268[] = { 0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17, 0x18, 0x19, 0x1A, 0x1B, 0x1C};
-static const uint8_t chiptest_dac9e1195a0d_tag_269[]   = { 0x32, 0xd6, 0xf8, 0x24, 0x3a, 0x26, 0xd0, 0xbd,
-                                                           0x98, 0xd0, 0x1b, 0x0f, 0x44, 0x8e, 0x77, 0x73 };
+static const uint8_t chiptest_dac9e1195a0d_key_267[]                          = { 0x40, 0x41, 0x42, 0x43, 0x44, 0x45, 0x46, 0x47,
+                                                                                  0x48, 0x49, 0x4a, 0x4b, 0x4c, 0x4d, 0x4e, 0x4f };
+static const uint8_t chiptest_dac9e1195a0d_nonce_268[]                        = { 0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16,
+                                                                                  0x17, 0x18, 0x19, 0x1A, 0x1B, 0x1C };
+static const uint8_t chiptest_dac9e1195a0d_tag_269[]                          = { 0x32, 0xd6, 0xf8, 0x24, 0x3a, 0x26, 0xd0, 0xbd,
+                                                                                  0x98, 0xd0, 0x1b, 0x0f, 0x44, 0x8e, 0x77, 0x73 };
 static const struct ccm_128_test_vector chiptest_dac9e1195a0d_test_vector_270 = { .pt        = nullptr,
                                                                                   .pt_len    = 0,
                                                                                   .aad       = nullptr,
