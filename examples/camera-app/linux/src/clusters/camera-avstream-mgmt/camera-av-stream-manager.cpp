@@ -23,6 +23,7 @@
 #include <fstream>
 #include <iostream>
 #include <lib/support/logging/CHIPLogging.h>
+#include <set>
 
 #define SNAPSHOT_FILE_PATH "./capture_snapshot.jpg"
 #define SNAPSHOT_FILE_RES_WIDTH (168)
@@ -676,25 +677,128 @@ Protocols::InteractionModel::Status CameraAVStreamManager::CaptureSnapshot(const
 }
 
 CHIP_ERROR
-CameraAVStreamManager::LoadAllocatedVideoStreams(std::vector<VideoStreamStruct> & allocatedVideoStreams)
+CameraAVStreamManager::AllocatedVideoStreamsLoaded()
 {
-    allocatedVideoStreams.clear();
+    const std::vector<VideoStreamStruct> & persistedStreams = GetCameraAVStreamMgmtServer()->GetAllocatedVideoStreams();
+    auto & halStreams                                       = mCameraDeviceHAL->GetCameraHALInterface().GetAvailableVideoStreams();
+
+    for (auto & halStream : halStreams)
+    {
+        auto it = std::find_if(persistedStreams.begin(), persistedStreams.end(), [&](const VideoStreamStruct & persistedStream) {
+            return persistedStream.videoStreamID == halStream.videoStreamParams.videoStreamID;
+        });
+
+        if (it != persistedStreams.end())
+        {
+            // Found in persisted streams, mark as allocated in HAL
+            halStream.isAllocated = true;
+            ChipLogProgress(Camera, "HAL Video Stream ID %u marked as allocated from persisted state.",
+                            halStream.videoStreamParams.videoStreamID);
+
+            // Signal for starting the video stream
+            OnVideoStreamAllocated(*it, StreamAllocationAction::kNewAllocation);
+        }
+    }
 
     return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR
-CameraAVStreamManager::LoadAllocatedAudioStreams(std::vector<AudioStreamStruct> & allocatedAudioStreams)
+CameraAVStreamManager::AllocatedAudioStreamsLoaded()
 {
-    allocatedAudioStreams.clear();
+    const std::vector<AudioStreamStruct> & persistedStreams = GetCameraAVStreamMgmtServer()->GetAllocatedAudioStreams();
+    auto & halStreams                                       = mCameraDeviceHAL->GetCameraHALInterface().GetAvailableAudioStreams();
+
+    for (auto & halStream : halStreams)
+    {
+        auto it = std::find_if(persistedStreams.begin(), persistedStreams.end(), [&](const AudioStreamStruct & persistedStream) {
+            return persistedStream.audioStreamID == halStream.audioStreamParams.audioStreamID;
+        });
+
+        if (it != persistedStreams.end())
+        {
+            // Found in persisted streams, mark as allocated in HAL
+            halStream.isAllocated = true;
+            ChipLogProgress(Camera, "HAL Audio Stream ID %u marked as allocated from persisted state.",
+                            halStream.audioStreamParams.audioStreamID);
+
+            // Start the audio stream from HAL for serving.
+            mCameraDeviceHAL->GetCameraHALInterface().StartAudioStream(halStream.audioStreamParams.audioStreamID);
+        }
+    }
 
     return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR
-CameraAVStreamManager::LoadAllocatedSnapshotStreams(std::vector<SnapshotStreamStruct> & allocatedSnapshotStreams)
+CameraAVStreamManager::AllocatedSnapshotStreamsLoaded()
 {
-    allocatedSnapshotStreams.clear();
+    const std::vector<SnapshotStreamStruct> & persistedStreams = GetCameraAVStreamMgmtServer()->GetAllocatedSnapshotStreams();
+    auto & halStreams = mCameraDeviceHAL->GetCameraHALInterface().GetAvailableSnapshotStreams();
+    std::set<uint16_t> halStreamIds;
+
+    // Keep a set of the streamIDs provided by HAL
+    for (const auto & halStream : halStreams)
+    {
+        halStreamIds.insert(halStream.snapshotStreamParams.snapshotStreamID);
+    }
+
+    for (auto & halStream : halStreams)
+    {
+        auto it = std::find_if(persistedStreams.begin(), persistedStreams.end(), [&](const SnapshotStreamStruct & persistedStream) {
+            return persistedStream.snapshotStreamID == halStream.snapshotStreamParams.snapshotStreamID;
+        });
+
+        if (it != persistedStreams.end())
+        {
+            // Found in persisted streams, mark as allocated in HAL
+            halStream.isAllocated = true;
+
+            ChipLogProgress(Camera, "HAL Snapshot Stream ID %u marked as allocated from persisted state.",
+                            halStream.snapshotStreamParams.snapshotStreamID);
+
+            // Start the snapshot stream for serving.
+            mCameraDeviceHAL->GetCameraHALInterface().StartSnapshotStream(halStream.snapshotStreamParams.snapshotStreamID);
+        }
+    }
+
+    // Allocate missing Persisted Streams
+
+    for (const auto & persistedStream : persistedStreams)
+    {
+        if (halStreamIds.find(persistedStream.snapshotStreamID) == halStreamIds.end())
+        {
+            ChipLogProgress(Camera, "Persisted Snapshot Stream ID %u not found in HAL, attempting to allocate.",
+                            persistedStream.snapshotStreamID);
+
+            // Convert SnapshotStreamStruct to SnapshotStreamAllocateArgs
+            CameraAVStreamMgmtDelegate::SnapshotStreamAllocateArgs snapshotStreamArgs;
+
+            snapshotStreamArgs.imageCodec       = persistedStream.imageCodec;
+            snapshotStreamArgs.maxFrameRate     = persistedStream.frameRate;
+            snapshotStreamArgs.minResolution    = persistedStream.minResolution;
+            snapshotStreamArgs.maxResolution    = persistedStream.maxResolution;
+            snapshotStreamArgs.quality          = persistedStream.quality;
+            snapshotStreamArgs.encodedPixels    = false;
+            snapshotStreamArgs.hardwareEncoder  = false;
+            snapshotStreamArgs.watermarkEnabled = persistedStream.watermarkEnabled;
+            snapshotStreamArgs.OSDEnabled       = persistedStream.OSDEnabled;
+
+            uint16_t streamID = persistedStream.snapshotStreamID; // Use the persisted ID
+
+            CameraError halErr = mCameraDeviceHAL->GetCameraHALInterface().AllocateSnapshotStream(snapshotStreamArgs, streamID);
+
+            if (halErr == CameraError::SUCCESS)
+            {
+                ChipLogProgress(Camera, "Successfully allocated HAL Snapshot Stream for persisted ID %u.", streamID);
+            }
+            else
+            {
+                ChipLogError(Camera, "Failed to allocate HAL Snapshot Stream for persisted ID %u. HAL Error: %d",
+                             persistedStream.snapshotStreamID, static_cast<int>(halErr));
+            }
+        }
+    }
 
     return CHIP_NO_ERROR;
 }
@@ -702,7 +806,22 @@ CameraAVStreamManager::LoadAllocatedSnapshotStreams(std::vector<SnapshotStreamSt
 CHIP_ERROR
 CameraAVStreamManager::PersistentAttributesLoadedCallback()
 {
-    ChipLogError(Camera, "Persistent attributes loaded");
+    ChipLogProgress(Camera, "Persistent attributes loaded");
+
+    if (AllocatedVideoStreamsLoaded() != CHIP_NO_ERROR)
+    {
+        ChipLogError(Camera, "Allocated video streams could not be loaded");
+    }
+
+    if (AllocatedAudioStreamsLoaded() != CHIP_NO_ERROR)
+    {
+        ChipLogError(Camera, "Allocated audio streams could not be loaded");
+    }
+
+    if (AllocatedSnapshotStreamsLoaded() != CHIP_NO_ERROR)
+    {
+        ChipLogError(Camera, "Allocated snapshot streams could not be loaded");
+    }
 
     return CHIP_NO_ERROR;
 }

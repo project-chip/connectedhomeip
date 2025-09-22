@@ -70,6 +70,80 @@ constexpr size_t kArrayTlvOverhead = 2;
 
 constexpr size_t kStreamUsagePrioritiesTlvSize = kArrayTlvOverhead + kStreamUsageTlvSize * kNumOfStreamUsageTypes;
 
+// Calculate VideoStreamStruct TLV encoding size
+
+// videoStreamID: Tag 0, uint16 -> 1 + 2 = 3
+// streamUsage: Tag 1, enum (uint8) -> 1 + 1 = 2
+// videoCodec: Tag 2, enum (uint8) -> 1 + 1 = 2
+// minFrameRate: Tag 3, uint16 -> 1 + 2 = 3
+// maxFrameRate: Tag 4, uint16 -> 1 + 2 = 3
+// minResolution: Tag 5, Struct -> 1 (tag) + 1 (start) + (1+2) + (1+2) + 1 (end) = 9
+// maxResolution: Tag 6, Struct -> 1 (tag) + 1 (start) + (1+2) + (1+2) + 1 (end) = 9
+// minBitRate: Tag 7, uint32 -> 1 + 4 = 5
+// maxBitRate: Tag 8, uint32 -> 1 + 4 = 5
+// keyFrameInterval: Tag 9, uint16 -> 1 + 2 = 3
+// watermarkEnabled: Tag 10, Optional<bool> -> 1 + 1 = 2 (max)
+// OSDEnabled: Tag 11, Optional<bool> -> 1 + 1 = 2 (max)
+// referenceCount: Tag 12, uint8 -> 1 + 1 = 2
+// Total per `VideoStreamStruct`: 1 (start container) + 50 + 1 (end container) = 52 bytes
+//
+// TLV Overhead for the Vector:
+// 1 (tag for Array) + 1 (start container)
+// N * (52 bytes per struct + 1 byte for AnonymousTag per element)
+// 1 (end container)
+// kMaxAllocatedVideoStreamsSerializedSize = 3 + (CHIP_CONFIG_MAX_NUM_CAMERA_STREAMS * (52 + 1))
+
+constexpr size_t kMaxOneVideoStreamStructSerializedSize = 64; // Conservative estimate
+constexpr size_t kMaxAllocatedVideoStreamsSerializedSize =
+    3 + (CHIP_CONFIG_MAX_NUM_CAMERA_STREAMS * kMaxOneVideoStreamStructSerializedSize);
+
+// kSnapshotStreamID (Tag 0): uint16_t -> 1 + 2 = 3
+// kImageCodec (Tag 1): enum (uint8_t) -> 1 + 1 = 2
+// kFrameRate (Tag 2): uint16_t -> 1 + 2 = 3
+// kMinResolution (Tag 3): VideoResolutionStruct -> 1 + 8 = 9
+// kMaxResolution (Tag 4): VideoResolutionStruct -> 1 + 8 = 9
+// kQuality (Tag 5): uint8_t -> 1 + 1 = 2
+// kReferenceCount (Tag 6): uint8_t -> 1 + 1 = 2
+// kEncodedPixels (Tag 7): bool -> 1 + 1 = 2
+// kHardwareEncoder (Tag 8): bool -> 1 + 1 = 2
+// kWatermarkEnabled (Tag 9): Optional<bool> -> 1 + 1 = 2 (max)
+// kOSDEnabled (Tag 10): Optional<bool> -> 1 + 1 = 2 (max)
+
+// Total per `SnapshotStreamStruct`: 1 (start container) + 38 + 1 (end container) = 40 bytes
+
+// TLV Overhead for the Vector:
+// 1 (tag for Array) + 1 (start container)
+// N * (40 bytes per struct + 1 byte for AnonymousTag per element)
+// 1 (end container)
+// kMaxAllocatedSnapshotStreamsSerializedSize = 3 + (CHIP_CONFIG_MAX_NUM_CAMERA_STREAMS * (40 + 1))
+
+constexpr size_t kMaxOneSnapshotStructSerializedSize = 48; // Conservative estimate
+// Max size for the TLV-encoded array of SnapshotStreamStruct
+constexpr size_t kMaxAllocatedSnapshotStreamsSerializedSize =
+    3 + (CHIP_CONFIG_MAX_NUM_CAMERA_STREAMS * kMaxOneSnapshotStructSerializedSize);
+
+// kAudioStreamID (Tag 0): uint16_t -> 1 + 2 = 3
+// kStreamUsage (Tag 1): enum (uint8_t) -> 1 + 1 = 2
+// kAudioCodec (Tag 2): enum (uint8_t) -> 1 + 1 = 2
+// kChannelCount (Tag 3): uint8_t -> 1 + 1 = 2
+// kSampleRate (Tag 4): uint32_t -> 1 + 4 = 5
+// kBitRate (Tag 5): uint32_t -> 1 + 4 = 5
+// kBitDepth (Tag 6): uint8_t -> 1 + 1 = 2
+// kReferenceCount (Tag 7): uint8_t -> 1 + 1 = 2
+
+// Total per `AudioStreamStruct`: 1 (start container) + 23 + 1 (end container) = 25 bytes
+
+// TLV Overhead for the Vector:
+// 1 (tag for Array) + 1 (start container)
+// N * (40 bytes per struct + 1 byte for AnonymousTag per element)
+// 1 (end container)
+// kMaxAllocatedAudioStreamsSerializedSize = 3 + (CHIP_CONFIG_MAX_NUM_CAMERA_STREAMS * (25 + 1))
+
+constexpr size_t kMaxOneAudioStreamStructSerializedSize = 32; // Conservative estimate
+// Max size for the TLV-encoded array of AudioStreamStruct
+constexpr size_t kMaxAllocatedAudioStreamsSerializedSize =
+    3 + (CHIP_CONFIG_MAX_NUM_CAMERA_STREAMS * kMaxOneAudioStreamStructSerializedSize);
+
 enum class StreamAllocationAction
 {
     kNewAllocation, // Fresh stream allocation - always start
@@ -264,22 +338,6 @@ public:
     virtual Protocols::InteractionModel::Status CaptureSnapshot(const DataModel::Nullable<uint16_t> streamID,
                                                                 const VideoResolutionStruct & resolution,
                                                                 ImageSnapshot & outImageSnapshot) = 0;
-
-    /**
-     *  Delegate functions to load the allocated video, audio, and snapshot streams.
-     *  The delegate application is responsible for creating and persisting
-     *  these streams (based on the Allocation commands). These Load APIs would be
-     *  used to load the pre-allocated stream context information into the cluster server list,
-     *  at initialization.
-     *  Once loaded, the cluster server would be serving Reads on these
-     *  attributes. The list is updatable via the Add/Remove functions for the
-     *  respective streams.
-     */
-    virtual CHIP_ERROR LoadAllocatedVideoStreams(std::vector<VideoStreamStruct> & allocatedVideoStreams) = 0;
-
-    virtual CHIP_ERROR LoadAllocatedAudioStreams(std::vector<AudioStreamStruct> & allocatedAudioStreams) = 0;
-
-    virtual CHIP_ERROR LoadAllocatedSnapshotStreams(std::vector<SnapshotStreamStruct> & allocatedSnapshotStreams) = 0;
 
     /**
      *  @brief Callback into the delegate once persistent attributes managed by
@@ -787,6 +845,12 @@ private:
 
     CHIP_ERROR StoreStreamUsagePriorities();
     CHIP_ERROR LoadStreamUsagePriorities();
+
+    template <typename T, size_t N>
+    CHIP_ERROR StoreAllocatedStreams(const std::vector<T> & streams, AttributeId attributeId, StreamType streamType);
+
+    template <typename T, size_t N>
+    CHIP_ERROR LoadAllocatedStreams(std::vector<T> & streams, AttributeId attributeId, StreamType streamType);
 
     void ModifyVideoStream(const uint16_t streamID, const Optional<bool> waterMarkEnabled, const Optional<bool> osdEnabled);
 

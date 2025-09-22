@@ -257,7 +257,7 @@
         if (!::chip::ChipError::IsSuccess(__err))                                                                                  \
         {                                                                                                                          \
             ChipLogError(MOD, MSG ": %" CHIP_ERROR_FORMAT, ##__VA_ARGS__, __err.Format());                                         \
-            return _err;                                                                                                           \
+            return __err;                                                                                                          \
         }                                                                                                                          \
     } while (false)
 

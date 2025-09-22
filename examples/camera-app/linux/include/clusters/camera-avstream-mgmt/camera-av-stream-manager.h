@@ -67,15 +67,6 @@ public:
                                                         ImageSnapshot & outImageSnapshot) override;
 
     CHIP_ERROR
-    LoadAllocatedVideoStreams(std::vector<VideoStreamStruct> & allocatedVideoStreams) override;
-
-    CHIP_ERROR
-    LoadAllocatedAudioStreams(std::vector<AudioStreamStruct> & allocatedAudioStreams) override;
-
-    CHIP_ERROR
-    LoadAllocatedSnapshotStreams(std::vector<SnapshotStreamStruct> & allocatedSnapshotStreams) override;
-
-    CHIP_ERROR
     ValidateStreamUsage(StreamUsageEnum streamUsage, Optional<DataModel::Nullable<uint16_t>> & videoStreamId,
                         Optional<DataModel::Nullable<uint16_t>> & audioStreamId) override;
 
@@ -113,6 +104,12 @@ public:
     void SetCameraDeviceHAL(CameraDeviceInterface * aCameraDevice);
 
 private:
+    CHIP_ERROR AllocatedVideoStreamsLoaded();
+
+    CHIP_ERROR AllocatedAudioStreamsLoaded();
+
+    CHIP_ERROR AllocatedSnapshotStreamsLoaded();
+
     CameraDeviceInterface * mCameraDeviceHAL = nullptr;
 };
 

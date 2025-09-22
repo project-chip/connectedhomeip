@@ -2002,6 +2002,16 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
 #ifndef CHIP_CONFIG_TLS_MAX_ROOT_PER_FABRIC_CERTS_TABLE_SIZE
 #define CHIP_CONFIG_TLS_MAX_ROOT_PER_FABRIC_CERTS_TABLE_SIZE 5
 #endif // CHIP_CONFIG_TLS_MAX_ROOT_PER_FABRIC_CERTS_TABLE_SIZE
+
+/**
+ * @def CHIP_CONFIG_MAX_NUM_CAMERA_STREAMS
+ *
+ * @brief The maximum number of camera streams for each
+ *        type(Audio/Video/Snapshot) per device
+ */
+#ifndef CHIP_CONFIG_MAX_NUM_CAMERA_STREAMS
+#define CHIP_CONFIG_MAX_NUM_CAMERA_STREAMS 8
+#endif // CHIP_CONFIG_MAX_NUM_CAMERA_STREAMS
 /**
  * @}
  */
