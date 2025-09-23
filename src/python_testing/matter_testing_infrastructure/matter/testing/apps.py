@@ -166,7 +166,6 @@ class OTAProviderSubprocess(AppServerSubprocess):
 
         # Build OTA-specific arguments using the ota_source property
         combined_extra_args = ota_source.ota_args + extra_args
-        print(combined_extra_args)
 
         # Initialize with the combined arguments
         super().__init__(app=app, storage_dir=storage_dir, discriminator=discriminator,
@@ -175,8 +174,8 @@ class OTAProviderSubprocess(AppServerSubprocess):
     def kill(self):
         self.p.send_signal(signal.SIGKILL)
 
-    def get_pid(self):
-        self.p.pid
+    def get_pid(self) -> int:
+        return self.p.pid
 
     def create_acl_entry(self, dev_ctrl: ChipDeviceController, provider_node_id: int, requestor_node_id: Optional[int] = None):
         """Create ACL entries to allow OTA requestors to access the provider.
