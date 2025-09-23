@@ -723,7 +723,12 @@ CameraAVStreamManager::AllocatedAudioStreamsLoaded()
                             halStream.audioStreamParams.audioStreamID);
 
             // Start the audio stream from HAL for serving.
-            mCameraDeviceHAL->GetCameraHALInterface().StartAudioStream(halStream.audioStreamParams.audioStreamID);
+            if (mCameraDeviceHAL->GetCameraHALInterface().StartAudioStream(halStream.audioStreamParams.audioStreamID) !=
+                CameraError::SUCCESS)
+            {
+                ChipLogError(Camera, "Failed to start HAL Audio Stream for persisted ID %u.",
+                             halStream.audioStreamParams.audioStreamID);
+            }
         }
     }
 
@@ -758,7 +763,12 @@ CameraAVStreamManager::AllocatedSnapshotStreamsLoaded()
                             halStream.snapshotStreamParams.snapshotStreamID);
 
             // Start the snapshot stream for serving.
-            mCameraDeviceHAL->GetCameraHALInterface().StartSnapshotStream(halStream.snapshotStreamParams.snapshotStreamID);
+            if (mCameraDeviceHAL->GetCameraHALInterface().StartSnapshotStream(halStream.snapshotStreamParams.snapshotStreamID) !=
+                CameraError::SUCCESS)
+            {
+                ChipLogError(Camera, "Failed to start HAL Snapshot Stream for persisted ID %u.",
+                             halStream.snapshotStreamParams.snapshotStreamID);
+            }
         }
     }
 
@@ -796,6 +806,7 @@ CameraAVStreamManager::AllocatedSnapshotStreamsLoaded()
             {
                 ChipLogError(Camera, "Failed to allocate HAL Snapshot Stream for persisted ID %u. HAL Error: %d",
                              persistedStream.snapshotStreamID, static_cast<int>(halErr));
+                return CHIP_ERROR_INTERNAL;
             }
         }
     }
@@ -806,21 +817,27 @@ CameraAVStreamManager::AllocatedSnapshotStreamsLoaded()
 CHIP_ERROR
 CameraAVStreamManager::PersistentAttributesLoadedCallback()
 {
-    ChipLogProgress(Camera, "Persistent attributes loaded");
+    ChipLogProgress(Camera, "Successfully loaded persistent attributes");
 
-    if (AllocatedVideoStreamsLoaded() != CHIP_NO_ERROR)
+    CHIP_ERROR err = AllocatedVideoStreamsLoaded();
+    if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(Camera, "Allocated video streams could not be loaded");
+        ChipLogError(Camera, "Allocated video streams could not be loaded: %" CHIP_ERROR_FORMAT, err.Format());
+        return err;
     }
 
-    if (AllocatedAudioStreamsLoaded() != CHIP_NO_ERROR)
+    err = AllocatedAudioStreamsLoaded();
+    if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(Camera, "Allocated audio streams could not be loaded");
+        ChipLogError(Camera, "Allocated audio streams could not be loaded: %" CHIP_ERROR_FORMAT, err.Format());
+        return err;
     }
 
-    if (AllocatedSnapshotStreamsLoaded() != CHIP_NO_ERROR)
+    err = AllocatedSnapshotStreamsLoaded();
+    if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(Camera, "Allocated snapshot streams could not be loaded");
+        ChipLogError(Camera, "Allocated snapshot streams could not be loaded: %" CHIP_ERROR_FORMAT, err.Format());
+        return err;
     }
 
     return CHIP_NO_ERROR;
