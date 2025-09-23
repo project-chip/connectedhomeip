@@ -167,7 +167,7 @@ implementation.
 
 ## Part 4: Example Application and Integration Testing
 
--   Write unit testing to ensure cluster test coverage
+-   Write unit tests to ensure cluster test coverage
 -   **Integrate into an Example:** Add your cluster to an example application,
     such as the `all-clusters-app`, to test it in a real-world scenario.
     -   use tools such as `chip-tool` or `matter-repl` to manually validate the
