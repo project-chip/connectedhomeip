@@ -36,7 +36,6 @@
 #include <lib/core/StringBuilderAdapters.h>
 #include <pw_unit_test/framework.h>
 
-#include <app/server/IDnssdServer.h>
 #include <app/tests/CommissioningWindowManagerTestAccess.h>
 
 using namespace chip::Crypto;
@@ -114,7 +113,7 @@ static void StopEventLoop(intptr_t context)
     chip::DeviceLayer::PlatformMgr().StopEventLoopTask();
 }
 
-class MockDnssdServer : public chip::DnssdServer
+class MockDnssdServer : public chip::IDnssdServer
 {
 public:
     MockDnssdServer() : mAdvertisingEnabled(false) {}

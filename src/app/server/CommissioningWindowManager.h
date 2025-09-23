@@ -30,7 +30,7 @@
 #include <protocols/secure_channel/RendezvousParameters.h>
 #include <system/SystemClock.h>
 
-#include <app/server/IDnssdServer.h>
+#include <lib/dnssd/IDnssdServer.h>
 
 namespace chip {
 
@@ -54,7 +54,7 @@ class CommissioningWindowManager : public Messaging::UnsolicitedMessageHandler,
 {
 public:
     CommissioningWindowManager() : mPASESession(*this), mDnsSdServer(&mDefaultDnssd) {}
-    CommissioningWindowManager(DnssdServer * dnssd) : CommissioningWindowManager() { mDnsSdServer = dnssd; }
+    CommissioningWindowManager(IDnssdServer * dnssd) : CommissioningWindowManager() { mDnsSdServer = dnssd; }
 
     CHIP_ERROR Init(Server * server)
     {
@@ -236,7 +236,7 @@ private:
     SessionHolderWithDelegate mPASESession;
 
     // For testing purposes use a dependency injection
-    DnssdServer * mDnsSdServer;
+    IDnssdServer * mDnsSdServer;
     PlatformDnssdServer mDefaultDnssd;
 
     // Information about who opened the commissioning window.  These will only
