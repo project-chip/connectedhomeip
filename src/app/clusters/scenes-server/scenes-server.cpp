@@ -802,19 +802,19 @@ void ScenesServer::RemoveFabric(EndpointId aEndpointId, FabricIndex aFabricIndex
 
 void ScenesServer::HandleAddScene(HandlerContext & ctx, const Commands::AddScene::DecodableType & req)
 {
-    MATTER_TRACE_SCOPE("AddScene", "Scenes");
+    MATTER_TRACE_SCOPE(kAddScene, kScenes);
     AddSceneParse<Commands::AddScene::DecodableType, Commands::AddSceneResponse::Type>(ctx, req, mGroupProvider);
 }
 
 void ScenesServer::HandleViewScene(HandlerContext & ctx, const Commands::ViewScene::DecodableType & req)
 {
-    MATTER_TRACE_SCOPE("ViewScene", "Scenes");
+    MATTER_TRACE_SCOPE(kViewScene, kScenes);
     ViewSceneParse<Commands::ViewScene::DecodableType, Commands::ViewSceneResponse::Type>(ctx, req, mGroupProvider);
 }
 
 void ScenesServer::HandleRemoveScene(HandlerContext & ctx, const Commands::RemoveScene::DecodableType & req)
 {
-    MATTER_TRACE_SCOPE("RemoveScene", "Scenes");
+    MATTER_TRACE_SCOPE(kRemoveScene, kScenes);
     Commands::RemoveSceneResponse::Type response;
 
     uint16_t endpointTableSize = 0;
@@ -878,7 +878,7 @@ void ScenesServer::HandleRemoveScene(HandlerContext & ctx, const Commands::Remov
 
 void ScenesServer::HandleRemoveAllScenes(HandlerContext & ctx, const Commands::RemoveAllScenes::DecodableType & req)
 {
-    MATTER_TRACE_SCOPE("RemoveAllScenes", "Scenes");
+    MATTER_TRACE_SCOPE(kRemoveAllScenes, kScenes);
     Commands::RemoveAllScenesResponse::Type response;
 
     uint16_t endpointTableSize = 0;
@@ -926,7 +926,7 @@ void ScenesServer::HandleRemoveAllScenes(HandlerContext & ctx, const Commands::R
 
 void ScenesServer::HandleStoreScene(HandlerContext & ctx, const Commands::StoreScene::DecodableType & req)
 {
-    MATTER_TRACE_SCOPE("StoreScene", "Scenes");
+    MATTER_TRACE_SCOPE(kStoreScene, kScenes);
     Commands::StoreSceneResponse::Type response;
 
     // Response data
@@ -951,7 +951,7 @@ void ScenesServer::HandleStoreScene(HandlerContext & ctx, const Commands::StoreS
 
 void ScenesServer::HandleRecallScene(HandlerContext & ctx, const Commands::RecallScene::DecodableType & req)
 {
-    MATTER_TRACE_SCOPE("RecallScene", "Scenes");
+    MATTER_TRACE_SCOPE(kRecallScene, kScenes);
 
     // Verify the attributes are respecting constraints
     if (req.sceneID == scenes::kUndefinedSceneId)
@@ -981,7 +981,7 @@ void ScenesServer::HandleRecallScene(HandlerContext & ctx, const Commands::Recal
 
 void ScenesServer::HandleGetSceneMembership(HandlerContext & ctx, const Commands::GetSceneMembership::DecodableType & req)
 {
-    MATTER_TRACE_SCOPE("GetSceneMembership", "Scenes");
+    MATTER_TRACE_SCOPE(kGetSceneMembership, kScenes);
     Commands::GetSceneMembershipResponse::Type response;
 
     uint16_t endpointTableSize = 0;
@@ -1028,7 +1028,7 @@ void ScenesServer::HandleGetSceneMembership(HandlerContext & ctx, const Commands
 
 void ScenesServer::HandleCopyScene(HandlerContext & ctx, const Commands::CopyScene::DecodableType & req)
 {
-    MATTER_TRACE_SCOPE("CopyScene", "Scenes");
+    MATTER_TRACE_SCOPE(kCopyScene, kScenes);
     Commands::CopySceneResponse::Type response;
 
     uint16_t endpointTableSize = 0;

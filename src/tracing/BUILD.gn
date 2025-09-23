@@ -35,6 +35,8 @@ config("multiplexed_tracing") {
 static_library("tracing") {
   sources = [
     "backend.h",
+    "group_keys.h",
+    "label_keys.h",
     "log_declares.h",
     "metric_event.h",
     "metric_keys.h",

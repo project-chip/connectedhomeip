@@ -115,7 +115,7 @@ CHIP_ERROR ModeSelectAttrAccess::Read(const ConcreteReadAttributePath & aPath, A
 
 Status ChangeToMode(EndpointId endpointId, uint8_t newMode)
 {
-    MATTER_TRACE_SCOPE("ChangeToMode", "ModeSelect");
+    MATTER_TRACE_SCOPE(kChangeToMode, kModeSelect);
     ChipLogProgress(Zcl, "ModeSelect: Entering emberAfModeSelectClusterChangeToModeCallback");
 
     // Check that the newMode matches one of the supported options

@@ -39,7 +39,7 @@ namespace {
 
 void ReachableChanged(EndpointId endpointId)
 {
-    MATTER_TRACE_INSTANT("ReachableChanged", "BridgeBasicInfo");
+    MATTER_TRACE_INSTANT(kReachableChanged, kBridgeBasicInfo);
     bool reachable = false;
     if (Status::Success != Attributes::Reachable::Get(endpointId, &reachable))
     {

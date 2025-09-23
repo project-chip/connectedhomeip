@@ -381,7 +381,7 @@ void Instance::UnregisterThisInstance()
 
 void Instance::HandleChangeToMode(HandlerContext & ctx, const Commands::ChangeToMode::DecodableType & commandData)
 {
-    MATTER_TRACE_SCOPE("ChangeToMode", "ModeBase");
+    MATTER_TRACE_SCOPE(kChangeToMode, kModeBase);
     uint8_t newMode = commandData.newMode;
 
     Commands::ChangeToModeResponse::Type response;

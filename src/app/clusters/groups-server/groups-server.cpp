@@ -152,7 +152,7 @@ void emberAfGroupsClusterServerInitCallback(EndpointId endpointId)
 bool emberAfGroupsClusterAddGroupCallback(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
                                           const Commands::AddGroup::DecodableType & commandData)
 {
-    MATTER_TRACE_SCOPE("AddGroup", "Groups");
+    MATTER_TRACE_SCOPE(kAddGroup, kGroups);
     auto fabricIndex = commandObj->GetAccessingFabricIndex();
     Groups::Commands::AddGroupResponse::Type response;
 
@@ -165,7 +165,7 @@ bool emberAfGroupsClusterAddGroupCallback(app::CommandHandler * commandObj, cons
 bool emberAfGroupsClusterViewGroupCallback(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
                                            const Commands::ViewGroup::DecodableType & commandData)
 {
-    MATTER_TRACE_SCOPE("ViewGroup", "Groups");
+    MATTER_TRACE_SCOPE(kViewGroup, kGroups);
     auto fabricIndex             = commandObj->GetAccessingFabricIndex();
     auto groupId                 = commandData.groupID;
     GroupDataProvider * provider = GetGroupDataProvider();
@@ -269,7 +269,7 @@ struct GroupMembershipResponse
 bool emberAfGroupsClusterGetGroupMembershipCallback(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
                                                     const Commands::GetGroupMembership::DecodableType & commandData)
 {
-    MATTER_TRACE_SCOPE("GetGroupMembership", "Groups");
+    MATTER_TRACE_SCOPE(kGetGroupMembership, kGroups);
     auto fabricIndex = commandObj->GetAccessingFabricIndex();
     auto * provider  = GetGroupDataProvider();
     Status status    = Status::Failure;
@@ -299,7 +299,7 @@ exit:
 bool emberAfGroupsClusterRemoveGroupCallback(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
                                              const Commands::RemoveGroup::DecodableType & commandData)
 {
-    MATTER_TRACE_SCOPE("RemoveGroup", "Groups");
+    MATTER_TRACE_SCOPE(kRemoveGroup, kGroups);
     auto fabricIndex = commandObj->GetAccessingFabricIndex();
     Groups::Commands::RemoveGroupResponse::Type response;
 
@@ -317,7 +317,7 @@ bool emberAfGroupsClusterRemoveGroupCallback(app::CommandHandler * commandObj, c
 bool emberAfGroupsClusterRemoveAllGroupsCallback(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
                                                  const Commands::RemoveAllGroups::DecodableType & commandData)
 {
-    MATTER_TRACE_SCOPE("RemoveAllGroups", "Groups");
+    MATTER_TRACE_SCOPE(kRemoveAllGroups, kGroups);
     auto fabricIndex = commandObj->GetAccessingFabricIndex();
     auto * provider  = GetGroupDataProvider();
     Status status    = Status::Failure;
@@ -359,7 +359,7 @@ bool emberAfGroupsClusterAddGroupIfIdentifyingCallback(app::CommandHandler * com
                                                        const app::ConcreteCommandPath & commandPath,
                                                        const Commands::AddGroupIfIdentifying::DecodableType & commandData)
 {
-    MATTER_TRACE_SCOPE("AddGroupIfIdentifying", "Groups");
+    MATTER_TRACE_SCOPE(kAddGroupIfIdentifying, kGroups);
     auto fabricIndex = commandObj->GetAccessingFabricIndex();
     auto groupId     = commandData.groupID;
     auto groupName   = commandData.groupName;

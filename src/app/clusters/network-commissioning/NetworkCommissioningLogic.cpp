@@ -263,7 +263,7 @@ std::optional<ActionReturnStatus> NetworkCommissioningLogic::HandleScanNetworks(
                                                                                 const ConcreteCommandPath & commandPath,
                                                                                 const Commands::ScanNetworks::DecodableType & req)
 {
-    MATTER_TRACE_SCOPE("HandleScanNetwork", "NetworkCommissioning");
+    MATTER_TRACE_SCOPE(kHandleScanNetwork, kNetworkCommissioning);
 
     mScanningWasDirected = false;
     if (mFeatureFlags.Has(Feature::kWiFiNetworkInterface))
@@ -366,7 +366,7 @@ NetworkCommissioningLogic::HandleAddOrUpdateWiFiNetwork(CommandHandler & handler
                                                         const Commands::AddOrUpdateWiFiNetwork::DecodableType & req)
 {
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI_STATION || CHIP_DEVICE_CONFIG_ENABLE_WIFI_AP
-    MATTER_TRACE_SCOPE("HandleAddOrUpdateWiFiNetwork", "NetworkCommissioning");
+    MATTER_TRACE_SCOPE(kHandleAddOrUpdateWiFiNetwork, kNetworkCommissioning);
 
     RETURN_ERROR_STATUS_IF_FAILSAFE_NOT_ARMED(handler.GetAccessingFabricIndex());
 
@@ -555,7 +555,7 @@ NetworkCommissioningLogic::HandleAddOrUpdateThreadNetwork(CommandHandler & handl
 {
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
 
-    MATTER_TRACE_SCOPE("HandleAddOrUpdateThreadNetwork", "NetworkCommissioning");
+    MATTER_TRACE_SCOPE(kHandleAddOrUpdateThreadNetwork, kNetworkCommissioning);
 
     RETURN_ERROR_STATUS_IF_FAILSAFE_NOT_ARMED(handler.GetAccessingFabricIndex());
 
@@ -596,7 +596,7 @@ std::optional<ActionReturnStatus> NetworkCommissioningLogic::HandleRemoveNetwork
                                                                                  const ConcreteCommandPath & commandPath,
                                                                                  const Commands::RemoveNetwork::DecodableType & req)
 {
-    MATTER_TRACE_SCOPE("HandleRemoveNetwork", "NetworkCommissioning");
+    MATTER_TRACE_SCOPE(kHandleRemoveNetwork, kNetworkCommissioning);
 
     RETURN_ERROR_STATUS_IF_FAILSAFE_NOT_ARMED(handler.GetAccessingFabricIndex());
 
@@ -627,7 +627,7 @@ std::optional<ActionReturnStatus>
 NetworkCommissioningLogic::HandleConnectNetwork(CommandHandler & handler, const ConcreteCommandPath & commandPath,
                                                 const Commands::ConnectNetwork::DecodableType & req)
 {
-    MATTER_TRACE_SCOPE("HandleConnectNetwork", "NetworkCommissioning");
+    MATTER_TRACE_SCOPE(kHandleConnectNetwork, kNetworkCommissioning);
     if (req.networkID.size() > kMaxNetworkIDLen)
     {
         return Protocols::InteractionModel::Status::ConstraintError;
@@ -676,7 +676,7 @@ std::optional<ActionReturnStatus>
 NetworkCommissioningLogic::HandleReorderNetwork(CommandHandler & handler, const ConcreteCommandPath & commandPath,
                                                 const Commands::ReorderNetwork::DecodableType & req)
 {
-    MATTER_TRACE_SCOPE("HandleReorderNetwork", "NetworkCommissioning");
+    MATTER_TRACE_SCOPE(kHandleReorderNetwork, kNetworkCommissioning);
     Commands::NetworkConfigResponse::Type response;
     DebugTextStorage debugTextBuffer;
     MutableCharSpan debugText(debugTextBuffer);
@@ -696,7 +696,7 @@ std::optional<ActionReturnStatus> NetworkCommissioningLogic::HandleQueryIdentity
                                                                                  const ConcreteCommandPath & commandPath,
                                                                                  const Commands::QueryIdentity::DecodableType & req)
 {
-    MATTER_TRACE_SCOPE("HandleQueryIdentity", "NetworkCommissioning");
+    MATTER_TRACE_SCOPE(kHandleQueryIdentity, kNetworkCommissioning);
 
     if (req.keyIdentifier.size() != CertificateKeyId::size())
     {

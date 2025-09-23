@@ -367,7 +367,7 @@ void CASESession::OnSessionReleased()
 
 void CASESession::Clear()
 {
-    MATTER_TRACE_SCOPE("Clear", "CASESession");
+    MATTER_TRACE_SCOPE(kClear, kCASESession);
     // Cancel any outstanding work.
     if (mSendSigma3Helper)
     {
@@ -428,7 +428,7 @@ void CASESession::InvalidateIfPendingEstablishmentOnFabric(FabricIndex fabricInd
 CHIP_ERROR CASESession::Init(SessionManager & sessionManager, Credentials::CertificateValidityPolicy * policy,
                              SessionEstablishmentDelegate * delegate, const ScopedNodeId & sessionEvictionHint)
 {
-    MATTER_TRACE_SCOPE("Init", "CASESession");
+    MATTER_TRACE_SCOPE(kInit, kCASESession);
     VerifyOrReturnError(delegate != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(mGroupDataProvider != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(sessionManager.GetSessionKeystore() != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
@@ -457,7 +457,7 @@ CASESession::PrepareForSessionEstablishment(SessionManager & sessionManager, Fab
                                             SessionEstablishmentDelegate * delegate, const ScopedNodeId & previouslyEstablishedPeer,
                                             Optional<ReliableMessageProtocolConfig> mrpLocalConfig)
 {
-    MATTER_TRACE_SCOPE("PrepareForSessionEstablishment", "CASESession");
+    MATTER_TRACE_SCOPE(kPrepareForSessionEstablishment, kCASESession);
     // Below VerifyOrReturnError is not SuccessOrExit since we only want to goto `exit:` after
     // Init has been successfully called.
     VerifyOrReturnError(fabricTable != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
@@ -488,7 +488,7 @@ CHIP_ERROR CASESession::EstablishSession(SessionManager & sessionManager, Fabric
                                          Credentials::CertificateValidityPolicy * policy, SessionEstablishmentDelegate * delegate,
                                          Optional<ReliableMessageProtocolConfig> mrpLocalConfig)
 {
-    MATTER_TRACE_SCOPE("EstablishSession", "CASESession");
+    MATTER_TRACE_SCOPE(kEstablishSession, kCASESession);
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     // Return early on error here, as we have not initialized any state yet
@@ -564,14 +564,14 @@ exit:
 
 void CASESession::OnResponseTimeout(ExchangeContext * ec)
 {
-    MATTER_TRACE_SCOPE("OnResponseTimeout", "CASESession");
+    MATTER_TRACE_SCOPE(kOnResponseTimeout, kCASESession);
     VerifyOrReturn(ec != nullptr, ChipLogError(SecureChannel, "CASESession::OnResponseTimeout was called by null exchange"));
     VerifyOrReturn(mExchangeCtxt.HasValue() && (&mExchangeCtxt.Value().Get() == ec),
                    ChipLogError(SecureChannel, "CASESession::OnResponseTimeout exchange doesn't match"));
     ChipLogError(SecureChannel,
                  "CASESession timed out while waiting for a response from peer " ChipLogFormatScopedNodeId ". Current state was %u",
                  ChipLogValueScopedNodeId(GetPeer()), to_underlying(mState));
-    MATTER_TRACE_COUNTER("CASETimeout");
+    MATTER_TRACE_COUNTER(kCASETimeout);
     // Discard the exchange so that Clear() doesn't try aborting it.  The
     // exchange will handle that.
     DiscardExchange();
@@ -581,7 +581,7 @@ void CASESession::OnResponseTimeout(ExchangeContext * ec)
 void CASESession::AbortPendingEstablish(CHIP_ERROR err)
 {
     MATTER_LOG_METRIC_END(kMetricDeviceCASESession, err);
-    MATTER_TRACE_SCOPE("AbortPendingEstablish", "CASESession");
+    MATTER_TRACE_SCOPE(kAbortPendingEstablish, kCASESession);
     // This needs to come before Clear() which will reset mState.
     SessionEstablishmentStage state = MapCASEStateToSessionEstablishmentStage(mState);
     Clear();
@@ -718,7 +718,7 @@ void CASESession::HandleConnectionClosed(const Transport::ActiveTCPConnectionSta
 
 CHIP_ERROR CASESession::SendSigma1()
 {
-    MATTER_TRACE_SCOPE("SendSigma1", "CASESession");
+    MATTER_TRACE_SCOPE(kSendSigma1, kCASESession);
 
     uint8_t destinationIdentifier[kSHA256_Hash_Length] = { 0 };
 
@@ -819,7 +819,7 @@ CHIP_ERROR CASESession::SendSigma1()
 
 CHIP_ERROR CASESession::EncodeSigma1(System::PacketBufferHandle & msg, EncodeSigma1Inputs & input)
 {
-    MATTER_TRACE_SCOPE("EncodeSigma1", "CASESession");
+    MATTER_TRACE_SCOPE(kEncodeSigma1, kCASESession);
 
     VerifyOrReturnError(input.initiatorEphPubKey != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
@@ -878,7 +878,7 @@ CHIP_ERROR CASESession::EncodeSigma1(System::PacketBufferHandle & msg, EncodeSig
 
 CHIP_ERROR CASESession::HandleSigma1_and_SendSigma2(System::PacketBufferHandle && msg)
 {
-    MATTER_TRACE_SCOPE("HandleSigma1_and_SendSigma2", "CASESession");
+    MATTER_TRACE_SCOPE(kHandleSigma1_and_SendSigma2, kCASESession);
 
     CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -937,7 +937,7 @@ exit:
 
 CHIP_ERROR CASESession::FindLocalNodeFromDestinationId(const ByteSpan & destinationId, const ByteSpan & initiatorRandom)
 {
-    MATTER_TRACE_SCOPE("FindLocalNodeFromDestinationId", "CASESession");
+    MATTER_TRACE_SCOPE(kFindLocalNodeFromDestinationId, kCASESession);
     VerifyOrReturnError(mFabricsTable != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
     bool found = false;
@@ -992,7 +992,7 @@ CHIP_ERROR CASESession::FindLocalNodeFromDestinationId(const ByteSpan & destinat
 CHIP_ERROR CASESession::TryResumeSession(SessionResumptionStorage::ConstResumptionIdView resumptionId, ByteSpan resume1MIC,
                                          ByteSpan initiatorRandom)
 {
-    MATTER_TRACE_SCOPE("TryResumeSession", "CASESession");
+    MATTER_TRACE_SCOPE(kTryResumeSession, kCASESession);
     VerifyOrReturnError(mSessionResumptionStorage != nullptr, CHIP_ERROR_INCORRECT_STATE);
     VerifyOrReturnError(mFabricsTable != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
@@ -1015,9 +1015,9 @@ CHIP_ERROR CASESession::TryResumeSession(SessionResumptionStorage::ConstResumpti
 }
 CASESession::NextStep CASESession::HandleSigma1(System::PacketBufferHandle && msg)
 {
-    MATTER_TRACE_SCOPE("HandleSigma1", "CASESession");
+    MATTER_TRACE_SCOPE(kHandleSigma1, kCASESession);
     ChipLogProgress(SecureChannel, "Received Sigma1 msg");
-    MATTER_TRACE_COUNTER("Sigma1");
+    MATTER_TRACE_COUNTER(kSigma1);
 
     VerifyOrReturnError(mFabricsTable != nullptr, NextStep::Create<CHIP_ERROR>(CHIP_ERROR_INCORRECT_STATE));
 
@@ -1087,7 +1087,7 @@ CASESession::NextStep CASESession::HandleSigma1(System::PacketBufferHandle && ms
 
 CHIP_ERROR CASESession::PrepareSigma2Resume(EncodeSigma2ResumeInputs & outSigma2ResData)
 {
-    MATTER_TRACE_SCOPE("PrepareSigma2Resume", "CASESession");
+    MATTER_TRACE_SCOPE(kPrepareSigma2Resume, kCASESession);
 
     VerifyOrReturnError(mLocalMRPConfig.HasValue(), CHIP_ERROR_INCORRECT_STATE);
 
@@ -1109,7 +1109,7 @@ CHIP_ERROR CASESession::PrepareSigma2Resume(EncodeSigma2ResumeInputs & outSigma2
 
 CHIP_ERROR CASESession::EncodeSigma2Resume(System::PacketBufferHandle & msgR2Resume, EncodeSigma2ResumeInputs & input)
 {
-    MATTER_TRACE_SCOPE("EncodeSigma2Resume", "CASESession");
+    MATTER_TRACE_SCOPE(kEncodeSigma2Resume, kCASESession);
 
     VerifyOrReturnError(input.responderMrpConfig != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
@@ -1158,7 +1158,7 @@ CHIP_ERROR CASESession::SendSigma2Resume(System::PacketBufferHandle && msgR2Resu
 CHIP_ERROR CASESession::PrepareSigma2(EncodeSigma2Inputs & outSigma2Data)
 {
 
-    MATTER_TRACE_SCOPE("PrepareSigma2", "CASESession");
+    MATTER_TRACE_SCOPE(kPrepareSigma2, kCASESession);
 
     VerifyOrReturnError(mFabricsTable != nullptr, CHIP_ERROR_INCORRECT_STATE);
     VerifyOrReturnError(mLocalMRPConfig.HasValue(), CHIP_ERROR_INCORRECT_STATE);
@@ -1325,7 +1325,7 @@ CHIP_ERROR CASESession::EncodeSigma2(System::PacketBufferHandle & msgR2, EncodeS
 
 CHIP_ERROR CASESession::SendSigma2(System::PacketBufferHandle && msgR2)
 {
-    MATTER_TRACE_SCOPE("SendSigma2", "CASESession");
+    MATTER_TRACE_SCOPE(kSendSigma2, kCASESession);
 
     ReturnErrorOnFailure(mCommissioningHash.AddData(ByteSpan{ msgR2->Start(), msgR2->DataLength() }));
 
@@ -1336,18 +1336,18 @@ CHIP_ERROR CASESession::SendSigma2(System::PacketBufferHandle && msgR2)
     mState = State::kSentSigma2;
 
     ChipLogProgress(SecureChannel, "Sent Sigma2 msg");
-    MATTER_TRACE_COUNTER("Sigma2");
+    MATTER_TRACE_COUNTER(kSigma2);
 
     return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR CASESession::HandleSigma2Resume(System::PacketBufferHandle && msg)
 {
-    MATTER_TRACE_SCOPE("HandleSigma2Resume", "CASESession");
+    MATTER_TRACE_SCOPE(kHandleSigma2Resume, kCASESession);
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     ChipLogDetail(SecureChannel, "Received Sigma2Resume msg");
-    MATTER_TRACE_COUNTER("Sigma2Resume");
+    MATTER_TRACE_COUNTER(kSigma2Resume);
     MATTER_LOG_METRIC_END(kMetricDeviceCASESessionSigma1, err);
 
     System::PacketBufferTLVReader tlvReader;
@@ -1435,7 +1435,7 @@ CHIP_ERROR CASESession::ParseSigma2Resume(ContiguousBufferTLVReader & tlvReader,
 
 CHIP_ERROR CASESession::HandleSigma2_and_SendSigma3(System::PacketBufferHandle && msg)
 {
-    MATTER_TRACE_SCOPE("HandleSigma2_and_SendSigma3", "CASESession");
+    MATTER_TRACE_SCOPE(kHandleSigma2_and_SendSigma3, kCASESession);
     CHIP_ERROR err = HandleSigma2(std::move(msg));
     MATTER_LOG_METRIC_END(kMetricDeviceCASESessionSigma1, err);
     SuccessOrExit(err);
@@ -1458,7 +1458,7 @@ exit:
 
 CHIP_ERROR CASESession::HandleSigma2(System::PacketBufferHandle && msg)
 {
-    MATTER_TRACE_SCOPE("HandleSigma2", "CASESession");
+    MATTER_TRACE_SCOPE(kHandleSigma2, kCASESession);
     ChipLogProgress(SecureChannel, "Received Sigma2 msg");
 
     VerifyOrReturnError(mEphemeralKey != nullptr, CHIP_ERROR_INTERNAL);
@@ -1677,7 +1677,7 @@ CHIP_ERROR CASESession::ParseSigma2TBEData(ContiguousBufferTLVReader & decrypted
 
 CHIP_ERROR CASESession::SendSigma3a()
 {
-    MATTER_TRACE_SCOPE("SendSigma3", "CASESession");
+    MATTER_TRACE_SCOPE(kSendSigma3, kCASESession);
 
     ChipLogDetail(SecureChannel, "Sending Sigma3");
 
@@ -1896,7 +1896,7 @@ exit:
 
 CHIP_ERROR CASESession::HandleSigma3a(System::PacketBufferHandle && msg)
 {
-    MATTER_TRACE_SCOPE("HandleSigma3", "CASESession");
+    MATTER_TRACE_SCOPE(kHandleSigma3, kCASESession);
     CHIP_ERROR err = CHIP_NO_ERROR;
     ContiguousBufferTLVReader decryptedDataTlvReader;
     TLVType containerType = kTLVType_Structure;
@@ -1909,7 +1909,7 @@ CHIP_ERROR CASESession::HandleSigma3a(System::PacketBufferHandle && msg)
     uint8_t msg_salt[kIPKSize + kSHA256_Hash_Length];
 
     ChipLogProgress(SecureChannel, "Received Sigma3 msg");
-    MATTER_TRACE_COUNTER("Sigma3");
+    MATTER_TRACE_COUNTER(kSigma3);
     MATTER_LOG_METRIC_END(kMetricDeviceCASESessionSigma2, err);
 
     auto helper = WorkHelper<HandleSigma3Data>::Create(*this, &HandleSigma3b, &CASESession::HandleSigma3c);
@@ -2466,7 +2466,7 @@ CHIP_ERROR CASESession::ValidateReceivedMessage(ExchangeContext * ec, const Payl
 CHIP_ERROR CASESession::OnMessageReceived(ExchangeContext * ec, const PayloadHeader & payloadHeader,
                                           System::PacketBufferHandle && msg)
 {
-    MATTER_TRACE_SCOPE("OnMessageReceived", "CASESession");
+    MATTER_TRACE_SCOPE(kOnMessageReceived, kCASESession);
     CHIP_ERROR err                            = ValidateReceivedMessage(ec, payloadHeader, msg);
     Protocols::SecureChannel::MsgType msgType = static_cast<Protocols::SecureChannel::MsgType>(payloadHeader.GetMessageType());
     SuccessOrExit(err);

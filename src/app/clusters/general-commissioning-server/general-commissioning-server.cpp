@@ -334,7 +334,7 @@ void NotifyTermsAndConditionsAttributeChangeIfRequired(const TermsAndConditionsS
 void GeneralCommissioningGlobalInstance::HandleArmFailSafe(HandlerContext & ctx,
                                                            const Commands::ArmFailSafe::DecodableType & commandData)
 {
-    MATTER_TRACE_SCOPE("ArmFailSafe", "GeneralCommissioning");
+    MATTER_TRACE_SCOPE(kArmFailSafe, kGeneralCommissioning);
     auto & failSafeContext = Server::GetInstance().GetFailSafeContext();
     Commands::ArmFailSafeResponse::Type response;
 
@@ -390,7 +390,7 @@ void GeneralCommissioningGlobalInstance::HandleArmFailSafe(HandlerContext & ctx,
 void GeneralCommissioningGlobalInstance::HandleCommissioningComplete(
     HandlerContext & ctx, const Commands::CommissioningComplete::DecodableType & commandData)
 {
-    MATTER_TRACE_SCOPE("CommissioningComplete", "GeneralCommissioning");
+    MATTER_TRACE_SCOPE(kCommissioningComplete, kGeneralCommissioning);
 
     DeviceControlServer * devCtrl = &DeviceLayer::DeviceControlServer::DeviceControlSvr();
     auto & failSafe               = Server::GetInstance().GetFailSafeContext();
@@ -508,7 +508,7 @@ void GeneralCommissioningGlobalInstance::HandleCommissioningComplete(
 void GeneralCommissioningGlobalInstance::HandleSetRegulatoryConfig(HandlerContext & ctx,
                                                                    const Commands::SetRegulatoryConfig::DecodableType & commandData)
 {
-    MATTER_TRACE_SCOPE("SetRegulatoryConfig", "GeneralCommissioning");
+    MATTER_TRACE_SCOPE(kSetRegulatoryConfig, kGeneralCommissioning);
     DeviceControlServer * server = &DeviceLayer::DeviceControlServer::DeviceControlSvr();
     Commands::SetRegulatoryConfigResponse::Type response;
     auto & countryCode = commandData.countryCode;
@@ -555,7 +555,7 @@ void GeneralCommissioningGlobalInstance::HandleSetRegulatoryConfig(HandlerContex
 void GeneralCommissioningGlobalInstance::HandleSetTCAcknowledgements(
     HandlerContext & ctx, const Commands::SetTCAcknowledgements::DecodableType & commandData)
 {
-    MATTER_TRACE_SCOPE("SetTCAcknowledgements", "GeneralCommissioning");
+    MATTER_TRACE_SCOPE(kSetTCAcknowledgements, kGeneralCommissioning);
 
     auto & failSafeContext                  = Server::GetInstance().GetFailSafeContext();
     TermsAndConditionsProvider * tcProvider = TermsAndConditionsManager::GetInstance();

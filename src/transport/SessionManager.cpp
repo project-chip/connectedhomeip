@@ -173,7 +173,7 @@ void SessionManager::FabricRemoved(FabricIndex fabricIndex)
 CHIP_ERROR SessionManager::PrepareMessage(const SessionHandle & sessionHandle, PayloadHeader & payloadHeader,
                                           System::PacketBufferHandle && message, EncryptedPacketBufferHandle & preparedMessage)
 {
-    MATTER_TRACE_SCOPE("PrepareMessage", "SessionManager");
+    MATTER_TRACE_SCOPE(kPrepareMessage, kSessionManager);
 
     PacketHeader packetHeader;
     bool isControlMsg = IsControlMessage(payloadHeader);
@@ -734,7 +734,7 @@ void SessionManager::UnauthenticatedMessageDispatch(const PacketHeader & partial
                                                     const Transport::PeerAddress & peerAddress, System::PacketBufferHandle && msg,
                                                     Transport::MessageTransportContext * ctxt)
 {
-    MATTER_TRACE_SCOPE("Unauthenticated Message Dispatch", "SessionManager");
+    MATTER_TRACE_SCOPE(kUnauthenticated_Message_Dispatch, kSessionManager);
 
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
     if (peerAddress.GetTransportType() == Transport::Type::kTcp && ctxt->conn.IsNull())
@@ -859,7 +859,7 @@ void SessionManager::SecureUnicastMessageDispatch(const PacketHeader & partialPa
                                                   const Transport::PeerAddress & peerAddress, System::PacketBufferHandle && msg,
                                                   Transport::MessageTransportContext * ctxt)
 {
-    MATTER_TRACE_SCOPE("Secure Unicast Message Dispatch", "SessionManager");
+    MATTER_TRACE_SCOPE(kSecure_Unicast_Message_Dispatch, kSessionManager);
 
     CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -1066,7 +1066,7 @@ static bool GroupKeyDecryptAttempt(const PacketHeader & partialPacketHeader, Pac
 void SessionManager::SecureGroupMessageDispatch(const PacketHeader & partialPacketHeader,
                                                 const Transport::PeerAddress & peerAddress, System::PacketBufferHandle && msg)
 {
-    MATTER_TRACE_SCOPE("Group Message Dispatch", "SessionManager");
+    MATTER_TRACE_SCOPE(kGroup_Message_Dispatch, kSessionManager);
 
     // Capture length before consuming headers.
     [[maybe_unused]] size_t messageTotalSize = msg->TotalLength();

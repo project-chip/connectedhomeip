@@ -441,7 +441,7 @@ void BasicInformationCluster::OnStartUp(uint32_t softwareVersion)
     // The StartUp event SHALL be emitted by a Node after completing a boot or reboot process
     VerifyOrReturn(mContext != nullptr);
 
-    MATTER_TRACE_INSTANT("OnStartUp", "BasicInfo");
+    MATTER_TRACE_INSTANT(kOnStartUp, kBasicInfo);
     ChipLogDetail(Zcl, "Emitting StartUp event");
 
     BasicInformation::Events::StartUp::Type event{ softwareVersion };
@@ -455,7 +455,7 @@ void BasicInformationCluster::OnShutDown()
     // The ShutDown event SHOULD be emitted on a best-effort basis by a Node prior to any orderly shutdown sequence.
     VerifyOrReturn(mContext != nullptr);
 
-    MATTER_TRACE_INSTANT("OnShutDown", "BasicInfo");
+    MATTER_TRACE_INSTANT(kOnShutDown, kBasicInfo);
     ChipLogDetail(Zcl, "Emitting ShutDown event");
 
     BasicInformation::Events::ShutDown::Type event;

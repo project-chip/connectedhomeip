@@ -33,7 +33,7 @@ namespace Clusters {
 DataModel::ActionReturnStatus AdministratorCommissioningLogic::OpenCommissioningWindow(
     FabricIndex fabricIndex, const AdministratorCommissioning::Commands::OpenCommissioningWindow::DecodableType & commandData)
 {
-    MATTER_TRACE_SCOPE("OpenCommissioningWindow", "AdministratorCommissioning");
+    MATTER_TRACE_SCOPE(kOpenCommissioningWindow, kAdministratorCommissioning);
     auto commissioningTimeout = System::Clock::Seconds16(commandData.commissioningTimeout);
     auto & pakeVerifier       = commandData.PAKEPasscodeVerifier;
     auto & discriminator      = commandData.discriminator;
@@ -78,7 +78,7 @@ DataModel::ActionReturnStatus AdministratorCommissioningLogic::OpenCommissioning
 DataModel::ActionReturnStatus AdministratorCommissioningLogic::OpenBasicCommissioningWindow(
     FabricIndex fabricIndex, const AdministratorCommissioning::Commands::OpenBasicCommissioningWindow::DecodableType & commandData)
 {
-    MATTER_TRACE_SCOPE("OpenBasicCommissioningWindow", "AdministratorCommissioning");
+    MATTER_TRACE_SCOPE(kOpenBasicCommissioningWindow, kAdministratorCommissioning);
     auto commissioningTimeout = System::Clock::Seconds16(commandData.commissioningTimeout);
 
     ChipLogProgress(Zcl, "Received command to open basic commissioning window");
@@ -104,7 +104,7 @@ DataModel::ActionReturnStatus AdministratorCommissioningLogic::OpenBasicCommissi
 DataModel::ActionReturnStatus AdministratorCommissioningLogic::RevokeCommissioning(
     const AdministratorCommissioning::Commands::RevokeCommissioning::DecodableType & commandData)
 {
-    MATTER_TRACE_SCOPE("RevokeCommissioning", "AdministratorCommissioning");
+    MATTER_TRACE_SCOPE(kRevokeCommissioning, kAdministratorCommissioning);
     ChipLogProgress(Zcl, "Received command to close commissioning window");
 
     Server::GetInstance().GetFailSafeContext().ForceFailSafeTimerExpiry();

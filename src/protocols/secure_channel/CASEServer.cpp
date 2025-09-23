@@ -60,7 +60,7 @@ CHIP_ERROR CASEServer::ListenForSessionEstablishment(Messaging::ExchangeManager 
 
 CHIP_ERROR CASEServer::InitCASEHandshake(Messaging::ExchangeContext * ec)
 {
-    MATTER_TRACE_SCOPE("InitCASEHandshake", "CASEServer");
+    MATTER_TRACE_SCOPE(kInitCASEHandshake, kCASEServer);
     VerifyOrReturnError(ec != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
     // Hand over the exchange context to the CASE session.
@@ -79,7 +79,7 @@ CHIP_ERROR CASEServer::OnUnsolicitedMessageReceived(const PayloadHeader & payloa
 CHIP_ERROR CASEServer::OnMessageReceived(Messaging::ExchangeContext * ec, const PayloadHeader & payloadHeader,
                                          System::PacketBufferHandle && payload)
 {
-    MATTER_TRACE_SCOPE("OnMessageReceived", "CASEServer");
+    MATTER_TRACE_SCOPE(kOnMessageReceived, kCASEServer);
 
     bool busy = GetSession().GetState() != CASESession::State::kInitialized;
     CHIP_FAULT_INJECT(FaultInjection::kFault_CASEServerBusy, busy = true);
@@ -206,16 +206,16 @@ void CASEServer::PrepareForSessionEstablishment(const ScopedNodeId & previouslyE
 
 void CASEServer::OnSessionEstablishmentError(CHIP_ERROR err)
 {
-    MATTER_TRACE_SCOPE("OnSessionEstablishmentError", "CASEServer");
+    MATTER_TRACE_SCOPE(kOnSessionEstablishmentError, kCASEServer);
     ChipLogError(Inet, "CASE Session establishment failed: %" CHIP_ERROR_FORMAT, err.Format());
 
-    MATTER_TRACE_SCOPE("CASEFail", "CASESession");
+    MATTER_TRACE_SCOPE(kCASEFail, kCASESession);
     PrepareForSessionEstablishment();
 }
 
 void CASEServer::OnSessionEstablished(const SessionHandle & session)
 {
-    MATTER_TRACE_SCOPE("OnSessionEstablished", "CASEServer");
+    MATTER_TRACE_SCOPE(kOnSessionEstablished, kCASEServer);
     ChipLogProgress(Inet, "CASE Session established to peer: " ChipLogFormatScopedNodeId,
                     ChipLogValueScopedNodeId(session->GetPeer()));
     PrepareForSessionEstablishment(session->GetPeer());
@@ -223,7 +223,7 @@ void CASEServer::OnSessionEstablished(const SessionHandle & session)
 
 CHIP_ERROR CASEServer::SendBusyStatusReport(Messaging::ExchangeContext * ec, System::Clock::Milliseconds16 minimumWaitTime)
 {
-    MATTER_TRACE_SCOPE("SendBusyStatusReport", "CASEServer");
+    MATTER_TRACE_SCOPE(kSendBusyStatusReport, kCASEServer);
     ChipLogProgress(Inet, "Already in the middle of CASE handshake, sending busy status report");
 
     System::PacketBufferHandle handle = Protocols::SecureChannel::StatusReport::MakeBusyStatusReportMessage(minimumWaitTime);

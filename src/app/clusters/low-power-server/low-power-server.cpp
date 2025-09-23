@@ -94,7 +94,7 @@ void SetDefaultDelegate(EndpointId endpoint, Delegate * delegate)
 bool emberAfLowPowerClusterSleepCallback(app::CommandHandler * command, const app::ConcreteCommandPath & commandPath,
                                          const Commands::Sleep::DecodableType & commandData)
 {
-    MATTER_TRACE_SCOPE("Sleep", "LowPower");
+    MATTER_TRACE_SCOPE(kSleep, kLowPower);
     using Protocols::InteractionModel::Status;
 
     EndpointId endpoint = commandPath.mEndpointId;

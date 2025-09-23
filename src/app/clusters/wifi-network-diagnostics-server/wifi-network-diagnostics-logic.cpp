@@ -55,7 +55,7 @@ CHIP_ERROR WiFiDiagnosticsServerLogic::ReadWiFiBssId(AttributeValueEncoder & aEn
 
 void WiFiDiagnosticsServerLogic::OnDisconnectionDetected(uint16_t reasonCode)
 {
-    MATTER_TRACE_SCOPE("OnDisconnectionDetected", "WiFiDiagnosticsDelegate");
+    MATTER_TRACE_SCOPE(kOnDisconnectionDetected, kWiFiDiagnosticsDelegate);
 
     Events::Disconnection::Type event{ reasonCode };
     EventNumber eventNumber;
@@ -69,7 +69,7 @@ void WiFiDiagnosticsServerLogic::OnDisconnectionDetected(uint16_t reasonCode)
 
 void WiFiDiagnosticsServerLogic::OnAssociationFailureDetected(uint8_t associationFailureCause, uint16_t status)
 {
-    MATTER_TRACE_SCOPE("OnAssociationFailureDetected", "WiFiDiagnosticsDelegate");
+    MATTER_TRACE_SCOPE(kOnAssociationFailureDetected, kWiFiDiagnosticsDelegate);
 
     Events::AssociationFailure::Type event{ static_cast<AssociationFailureCauseEnum>(associationFailureCause), status };
     EventNumber eventNumber;
@@ -83,7 +83,7 @@ void WiFiDiagnosticsServerLogic::OnAssociationFailureDetected(uint8_t associatio
 
 void WiFiDiagnosticsServerLogic::OnConnectionStatusChanged(uint8_t connectionStatus)
 {
-    MATTER_TRACE_SCOPE("OnConnectionStatusChanged", "WiFiDiagnosticsDelegate");
+    MATTER_TRACE_SCOPE(kOnConnectionStatusChanged, kWiFiDiagnosticsDelegate);
 
     Events::ConnectionStatus::Type event{ static_cast<ConnectionStatusEnum>(connectionStatus) };
     EventNumber eventNumber;

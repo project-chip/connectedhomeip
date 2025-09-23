@@ -235,7 +235,7 @@ void PacketParser::ParseSRVResource(const ResourceData & data)
 
 void PacketParser::ParseSrvRecords(const BytesRange & packet)
 {
-    MATTER_TRACE_SCOPE("Searching SRV Records", "PacketParser");
+    MATTER_TRACE_SCOPE(kSearching_SRV_Records, kPacketParser);
 
     mParsingState = RecordParsingState::kSrvInitialization;
     mPacketRange  = packet;
@@ -250,7 +250,7 @@ void PacketParser::ParseSrvRecords(const BytesRange & packet)
 
 void PacketParser::ParseNonSrvRecords(Inet::InterfaceId interface, const BytesRange & packet)
 {
-    MATTER_TRACE_SCOPE("Searching NON-SRV Records", "PacketParser");
+    MATTER_TRACE_SCOPE(kSearching_NON_SRV_Records, kPacketParser);
 
     mParsingState = RecordParsingState::kRecordParsing;
     mPacketRange  = packet;
@@ -357,7 +357,7 @@ void MinMdnsResolver::ScheduleIpAddressResolve(SerializedQNameIterator hostName)
 
 void MinMdnsResolver::AdvancePendingResolverStates()
 {
-    MATTER_TRACE_SCOPE("Advance pending resolve states", "MinMdnsResolver");
+    MATTER_TRACE_SCOPE(kAdvance_pending_resolve_states, kMinMdnsResolver);
 
     for (IncrementalResolver * resolver = mPacketParser.ResolverBegin(); resolver != mPacketParser.ResolverEnd(); resolver++)
     {
@@ -401,7 +401,7 @@ void MinMdnsResolver::AdvancePendingResolverStates()
         // SUCCESS. Call the delegates
         if (resolver->IsActiveCommissionParse())
         {
-            MATTER_TRACE_SCOPE("Active commissioning delegate call", "MinMdnsResolver");
+            MATTER_TRACE_SCOPE(kActive_commissioning_delegate_call, kMinMdnsResolver);
             DiscoveredNodeData nodeData;
 
             CHIP_ERROR err = resolver->Take(nodeData);
@@ -449,7 +449,7 @@ void MinMdnsResolver::AdvancePendingResolverStates()
         }
         else if (resolver->IsActiveOperationalParse())
         {
-            MATTER_TRACE_SCOPE("Active operational delegate call", "MinMdnsResolver");
+            MATTER_TRACE_SCOPE(kActive_operational_delegate_call, kMinMdnsResolver);
             ResolvedNodeData nodeResolvedData;
             CHIP_ERROR err = resolver->Take(nodeResolvedData);
 
@@ -501,7 +501,7 @@ void MinMdnsResolver::AdvancePendingResolverStates()
 
 void MinMdnsResolver::OnMdnsPacketData(const BytesRange & data, const chip::Inet::IPPacketInfo * info)
 {
-    MATTER_TRACE_SCOPE("Received MDNS Packet", "MinMdnsResolver");
+    MATTER_TRACE_SCOPE(kReceived_MDNS_Packet, kMinMdnsResolver);
 
     // Fill up any relevant data
     mPacketParser.ParseSrvRecords(data);
@@ -768,7 +768,7 @@ void MinMdnsResolver::NodeIdResolutionNoLongerNeeded(const PeerId & peerId)
 
 CHIP_ERROR MinMdnsResolver::ScheduleRetries()
 {
-    MATTER_TRACE_SCOPE("Schedule retries", "MinMdnsResolver");
+    MATTER_TRACE_SCOPE(kSchedule_retries, kMinMdnsResolver);
 
     VerifyOrReturnError(mSystemLayer != nullptr, CHIP_ERROR_INCORRECT_STATE);
     mSystemLayer->CancelTimer(&RetryCallback, this);

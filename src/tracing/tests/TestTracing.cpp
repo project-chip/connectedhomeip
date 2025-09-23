@@ -61,19 +61,19 @@ TEST(TestTracing, TestBasicTracing)
     {
         ScopedRegistration scope(backend);
 
-        MATTER_TRACE_SCOPE("A", "Group");
+        MATTER_TRACE_SCOPE(kA, kGroup);
         {
-            MATTER_TRACE_SCOPE("B", "Group");
+            MATTER_TRACE_SCOPE(kB, kGroup);
 
             // direct scope begin/end (not usual, but should work)
-            MATTER_TRACE_BEGIN("C", "Group");
-            MATTER_TRACE_BEGIN("D", "Group");
-            MATTER_TRACE_END("D", "Group");
-            MATTER_TRACE_INSTANT("FOO", "Group");
-            MATTER_TRACE_END("C", "Group");
+            MATTER_TRACE_BEGIN(kC, kGroup);
+            MATTER_TRACE_BEGIN(kD, kGroup);
+            MATTER_TRACE_END(kD, kGroup);
+            MATTER_TRACE_INSTANT(kFOO, kGroup);
+            MATTER_TRACE_END(kC, kGroup);
         }
         {
-            MATTER_TRACE_SCOPE("E", "Group");
+            MATTER_TRACE_SCOPE(kE, kGroup);
         }
     }
 
@@ -94,18 +94,18 @@ TEST(TestTracing, TestMultipleBackends)
 
     {
         ScopedRegistration register1(b1);
-        MATTER_TRACE_SCOPE("1", "G");
+        MATTER_TRACE_SCOPE(k_1, kG);
 
         {
             ScopedRegistration register2(b2);
-            MATTER_TRACE_SCOPE("2", "G");
+            MATTER_TRACE_SCOPE(k_2, kG);
 
             {
                 ScopedRegistration register3(b3);
-                MATTER_TRACE_SCOPE("3", "G");
+                MATTER_TRACE_SCOPE(k_3, kG);
             }
             {
-                MATTER_TRACE_SCOPE("4", "G");
+                MATTER_TRACE_SCOPE(k_4, kG);
             }
         }
     }

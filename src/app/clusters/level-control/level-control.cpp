@@ -668,7 +668,7 @@ static bool shouldExecuteIfOff(EndpointId endpoint, CommandId commandId, chip::O
 bool emberAfLevelControlClusterMoveToLevelCallback(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
                                                    const Commands::MoveToLevel::DecodableType & commandData)
 {
-    MATTER_TRACE_SCOPE("MoveToLevel", "LevelControl");
+    MATTER_TRACE_SCOPE(kMoveToLevel, kLevelControl);
     commandObj->AddStatus(commandPath, LevelControlServer::MoveToLevel(commandPath.mEndpointId, commandData));
     return true;
 }
@@ -714,7 +714,7 @@ chip::scenes::SceneHandler * GetSceneHandler()
 bool emberAfLevelControlClusterMoveToLevelWithOnOffCallback(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
                                                             const Commands::MoveToLevelWithOnOff::DecodableType & commandData)
 {
-    MATTER_TRACE_SCOPE("MoveToLevelWithOnOff", "LevelControl");
+    MATTER_TRACE_SCOPE(kMoveToLevelWithOnOff, kLevelControl);
     auto & level           = commandData.level;
     auto & transitionTime  = commandData.transitionTime;
     auto & optionsMask     = commandData.optionsMask;
@@ -744,7 +744,7 @@ bool emberAfLevelControlClusterMoveToLevelWithOnOffCallback(CommandHandler * com
 bool emberAfLevelControlClusterMoveCallback(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
                                             const Commands::Move::DecodableType & commandData)
 {
-    MATTER_TRACE_SCOPE("Move", "LevelControl");
+    MATTER_TRACE_SCOPE(kMove, kLevelControl);
     auto & moveMode        = commandData.moveMode;
     auto & rate            = commandData.rate;
     auto & optionsMask     = commandData.optionsMask;
@@ -769,7 +769,7 @@ bool emberAfLevelControlClusterMoveCallback(CommandHandler * commandObj, const C
 bool emberAfLevelControlClusterMoveWithOnOffCallback(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
                                                      const Commands::MoveWithOnOff::DecodableType & commandData)
 {
-    MATTER_TRACE_SCOPE("MoveWithOnOff", "LevelControl");
+    MATTER_TRACE_SCOPE(kMoveWithOnOff, kLevelControl);
     auto & moveMode        = commandData.moveMode;
     auto & rate            = commandData.rate;
     auto & optionsMask     = commandData.optionsMask;
@@ -794,7 +794,7 @@ bool emberAfLevelControlClusterMoveWithOnOffCallback(CommandHandler * commandObj
 bool emberAfLevelControlClusterStepCallback(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
                                             const Commands::Step::DecodableType & commandData)
 {
-    MATTER_TRACE_SCOPE("Step", "LevelControl");
+    MATTER_TRACE_SCOPE(kStep, kLevelControl);
     auto & stepMode        = commandData.stepMode;
     auto & stepSize        = commandData.stepSize;
     auto & transitionTime  = commandData.transitionTime;
@@ -820,7 +820,7 @@ bool emberAfLevelControlClusterStepCallback(CommandHandler * commandObj, const C
 bool emberAfLevelControlClusterStepWithOnOffCallback(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
                                                      const Commands::StepWithOnOff::DecodableType & commandData)
 {
-    MATTER_TRACE_SCOPE("StepWithOnOff", "LevelControl");
+    MATTER_TRACE_SCOPE(kStepWithOnOff, kLevelControl);
     auto & stepMode        = commandData.stepMode;
     auto & stepSize        = commandData.stepSize;
     auto & transitionTime  = commandData.transitionTime;
@@ -846,7 +846,7 @@ bool emberAfLevelControlClusterStepWithOnOffCallback(CommandHandler * commandObj
 bool emberAfLevelControlClusterStopCallback(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
                                             const Commands::Stop::DecodableType & commandData)
 {
-    MATTER_TRACE_SCOPE("Stop", "LevelControl");
+    MATTER_TRACE_SCOPE(kStop, kLevelControl);
     auto & optionsMask     = commandData.optionsMask;
     auto & optionsOverride = commandData.optionsOverride;
 
@@ -859,7 +859,7 @@ bool emberAfLevelControlClusterStopCallback(CommandHandler * commandObj, const C
 bool emberAfLevelControlClusterStopWithOnOffCallback(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
                                                      const Commands::StopWithOnOff::DecodableType & commandData)
 {
-    MATTER_TRACE_SCOPE("StopWithOnOff", "LevelControl");
+    MATTER_TRACE_SCOPE(kStopWithOnOff, kLevelControl);
     auto & optionsMask     = commandData.optionsMask;
     auto & optionsOverride = commandData.optionsOverride;
     ChipLogProgress(Zcl, "%s STOP_WITH_ON_OFF", "RX level-control:");
