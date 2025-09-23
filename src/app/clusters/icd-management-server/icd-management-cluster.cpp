@@ -41,7 +41,7 @@ DataModel::ActionReturnStatus ICDManagementCluster::ReadAttribute(const DataMode
         return aEncoder.Encode(kRevision);
 
     case IcdManagement::Attributes::FeatureMap::Id:
-        return aEncoder.Encode(mFeatureMap);
+        return aEncoder.Encode(mICDConfigurationData.GetFeatureMap());
 
     case IcdManagement::Attributes::IdleModeDuration::Id:
         return aEncoder.Encode(mICDConfigurationData.GetIdleModeDuration().count());
@@ -75,8 +75,9 @@ DataModel::ActionReturnStatus ICDManagementCluster::ReadAttribute(const DataMode
         return aEncoder.Encode(mUserActiveModeTriggerBitmap);
 
     case IcdManagement::Attributes::UserActiveModeTriggerInstruction::Id:
-        return aEncoder.Encode(CharSpan(mUserActiveModeTriggerInstruction,
-                                        strnlen(mUserActiveModeTriggerInstruction, kUserActiveModeTriggerInstructionMaxLength)));
+        return aEncoder.Encode(
+            CharSpan(mUserActiveModeTriggerInstruction,
+                     strnlen(mUserActiveModeTriggerInstruction, IcdManagement::kUserActiveModeTriggerInstructionMaxLength)));
 
     default:
         return Protocols::InteractionModel::Status::UnsupportedAttribute;
@@ -92,19 +93,20 @@ CHIP_ERROR ICDManagementCluster::Attributes(const ConcreteClusterPath & path,
         IcdManagement::Attributes::ActiveModeDuration::kMetadataEntry,
         IcdManagement::Attributes::ActiveModeThreshold::kMetadataEntry,
     };
-    const bool hasCIP = mFeatureMap.Has(IcdManagement::Feature::kCheckInProtocolSupport);
-    const bool hasUAT = mFeatureMap.Has(IcdManagement::Feature::kUserActiveModeTrigger);
-    const bool hasLIT = mFeatureMap.Has(IcdManagement::Feature::kLongIdleTimeSupport);
+    BitFlags<IcdManagement::Feature> featureMap = mICDConfigurationData.GetFeatureMap();
+    const bool hasCIP                           = featureMap.Has(IcdManagement::Feature::kCheckInProtocolSupport);
+    const bool hasUAT                           = featureMap.Has(IcdManagement::Feature::kUserActiveModeTrigger);
+    const bool hasLIT                           = featureMap.Has(IcdManagement::Feature::kLongIdleTimeSupport);
 
     const AttributeListBuilder::OptionalAttributeEntry optionalEntries[] = {
         { hasCIP, IcdManagement::Attributes::RegisteredClients::kMetadataEntry },
         { hasCIP, IcdManagement::Attributes::ICDCounter::kMetadataEntry },
         { hasCIP, IcdManagement::Attributes::ClientsSupportedPerFabric::kMetadataEntry },
-        { hasCIP, IcdManagement::Attributes::MaximumCheckInBackOff::kMetadataEntry },
         { hasUAT, IcdManagement::Attributes::UserActiveModeTriggerHint::kMetadataEntry },
-        { hasLIT, IcdManagement::Attributes::OperatingMode::kMetadataEntry },
         { mOptionalAttributeSet.IsSet(IcdManagement::Attributes::UserActiveModeTriggerInstruction::Id),
           IcdManagement::Attributes::UserActiveModeTriggerInstruction::kMetadataEntry },
+        { hasLIT, IcdManagement::Attributes::OperatingMode::kMetadataEntry },
+        { hasCIP, IcdManagement::Attributes::MaximumCheckInBackOff::kMetadataEntry },
     };
     return attributeListBuilder.Append(Span(kMandatoryAttributes), Span(optionalEntries));
 }
@@ -175,7 +177,8 @@ CHIP_ERROR ICDManagementCluster::AcceptedCommands(const ConcreteClusterPath & pa
 #endif // CHIP_CONFIG_ENABLE_ICD_CIP
     };
     ReturnErrorOnFailure(builder.ReferenceExisting(kAcceptedCommands));
-    if (mFeatureMap.Has(IcdManagement::Feature::kLongIdleTimeSupport) || mEnabledCommands.Has(OptionalCommands::kStayActiveRequest))
+    if (mICDConfigurationData.GetFeatureMap().Has(IcdManagement::Feature::kLongIdleTimeSupport) ||
+        mEnabledCommands.Has(IcdManagement::OptionalCommands::kStayActive))
     {
         ReturnErrorOnFailure(builder.EnsureAppendCapacity(1));
         ReturnErrorOnFailure(builder.Append(Commands::StayActiveRequest::kMetadataEntry));
@@ -191,9 +194,8 @@ CHIP_ERROR ICDManagementCluster::GeneratedCommands(const ConcreteClusterPath & p
 #endif // CHIP_CONFIG_ENABLE_ICD_CIP
     };
     ReturnErrorOnFailure(builder.ReferenceExisting(kGeneratedCommands));
-    ReturnErrorOnFailure(builder.EnsureAppendCapacity(1));
-    if (mFeatureMap.Has(IcdManagement::Feature::kLongIdleTimeSupport) ||
-        mEnabledCommands.Has(OptionalCommands::kStayActiveResponse))
+    if (mICDConfigurationData.GetFeatureMap().Has(IcdManagement::Feature::kLongIdleTimeSupport) ||
+        mEnabledCommands.Has(IcdManagement::OptionalCommands::kStayActive))
     {
         ReturnErrorOnFailure(builder.EnsureAppendCapacity(1));
         ReturnErrorOnFailure(builder.Append(Commands::StayActiveResponse::Id));
