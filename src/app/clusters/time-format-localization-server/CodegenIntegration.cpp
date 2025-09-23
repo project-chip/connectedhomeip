@@ -40,7 +40,7 @@ LazyRegisteredServerCluster<TimeFormatLocalizationCluster> gServer;
 
 }
 
-void emberAfTimeFormatLocalizationClusterServerInitCallback(EndpointId endpoint)
+void MatterTimeFormatLocalizationClusterInitCallback(EndpointId endpoint)
 {
     // This cluster should only exist in Root endpoint.
     VerifyOrReturn(endpoint == kRootEndpointId);
@@ -84,7 +84,7 @@ void emberAfTimeFormatLocalizationClusterServerInitCallback(EndpointId endpoint)
     }
 }
 
-void MatterTimeFormatLocalizationClusterServerShutdownCallback(EndpointId endpoint)
+void MatterTimeFormatLocalizationClusterShutdownCallback(EndpointId endpoint)
 {
     // This cluster should only exist in Root endpoint.
     VerifyOrReturn(endpoint == kRootEndpointId);
