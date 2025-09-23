@@ -81,7 +81,7 @@ class TC_IDM_3_2(MatterBaseTest, BasicCompositionTests):
 
         # Test Setup with robust endpoint/cluster discovery
         await self.setup_class_helper(allow_pase=False)
- 
+
         self.step(1)
         '''
         Write any attribute on an unsupported endpoint to DUT
@@ -186,11 +186,12 @@ class TC_IDM_3_2(MatterBaseTest, BasicCompositionTests):
         Out of Scope
         For now similar to the yaml file version, skipping this test step as the Python API doesn't expose SuppressResponse
         '''
-        logging.info("Step 4: SuppressResponse parameter not supported in current WriteAttribute API, please refer to the issue link for more details")
+        logging.info(
+            "Step 4: SuppressResponse parameter not supported in current WriteAttribute API, please refer to the issue link for more details")
 
         # Check if NodeLabel exists (good for commissionable devices)
         if await self.attribute_guard(endpoint=self.endpoint, attribute=Clusters.BasicInformation.Attributes.NodeLabel):
-            # NodeLabel exists - use it 
+            # NodeLabel exists - use it
             test_cluster = Clusters.BasicInformation
             test_attribute = Clusters.BasicInformation.Attributes.NodeLabel
             new_value0 = "New-Label-Step5"
@@ -220,13 +221,13 @@ class TC_IDM_3_2(MatterBaseTest, BasicCompositionTests):
 
             # Verify write was successful
             asserts.assert_equal(write_result[0].Status, Status.Success,
-                                f"Write with correct DataVersion should succeed, got {write_result[0].Status}")
+                                 f"Write with correct DataVersion should succeed, got {write_result[0].Status}")
 
             # Verify the value was written by reading it back
             actual_value = await self.read_single_attribute_check_success(endpoint=self.endpoint, cluster=test_cluster, attribute=test_attribute)
 
             asserts.assert_equal(actual_value, new_value0,
-                                f"Read value {actual_value} should match written value {new_value0}")
+                                 f"Read value {actual_value} should match written value {new_value0}")
 
             self.step(6)
             '''
@@ -262,8 +263,8 @@ class TC_IDM_3_2(MatterBaseTest, BasicCompositionTests):
 
             # Verify we get DATA_VERSION_MISMATCH error
             asserts.assert_equal(write_result_old_version[0].Status, Status.DataVersionMismatch,
-                                f"Write with old DataVersion should return DATA_VERSION_MISMATCH, got {write_result_old_version[0].Status}")
-            
+                                 f"Write with old DataVersion should return DATA_VERSION_MISMATCH, got {write_result_old_version[0].Status}")
+
         else:
             # NodeLabel doesn't exist - skip this step for now (can be handled in follow-up)
             logging.info("NodeLabel not found - this may be a non-commissionable device")
@@ -291,7 +292,7 @@ class TC_IDM_3_2(MatterBaseTest, BasicCompositionTests):
                 asserts.fail("The write request should be rejected due to InteractionModelError: NeedsTimedInteraction (0xc6).")
             except InteractionModelError as e:
                 asserts.assert_equal(e.status, Status.NeedsTimedInteraction,
-                                    f"WriteAttribute should return NeedsTimedInteraction, got {e.status}")
+                                     f"WriteAttribute should return NeedsTimedInteraction, got {e.status}")
 
             # TIMED_REQUEST_MISMATCH - Writing with TimedRequest flag but no actual timed transaction
             logging.info("Writing with TimedRequest flag but no timed transaction should return TIMED_REQUEST_MISMATCH")
@@ -303,7 +304,8 @@ class TC_IDM_3_2(MatterBaseTest, BasicCompositionTests):
                 asserts.fail("The write request should be rejected due to InteractionModelError: TimedRequestMismatch (0xc9).")
             except InteractionModelError as e:
                 asserts.assert_equal(e.status, Status.TimedRequestMismatch,
-                                    f"WriteAttribute should return TimedRequestMismatch, got {e.status}")
+                                     f"WriteAttribute should return TimedRequestMismatch, got {e.status}")
+
 
 if __name__ == "__main__":
     default_matter_test_main()
