@@ -95,7 +95,7 @@ new code-driven class structure.
     your `CodegenIntegration.cpp` reads these defaults and passes them to your
     cluster's constructor.
 -   For persisted attributes, use the `AttributePersistence` helper, which is
-    available via the `ServerClusterContext`. Load values at startup and save
+    available via the `ServerClusterContext`. Load values in `Startup` and save
     them on writes.
 
 #### Command Handling
