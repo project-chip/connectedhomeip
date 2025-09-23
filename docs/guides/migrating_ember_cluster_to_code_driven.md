@@ -141,7 +141,7 @@ and optional attribute lists) from the generated code.
 
 > **Note:** The `CodegenClusterIntegration` helper for optional attributes only
 > supports attribute IDs up to 31. For clusters with higher attribute IDs (e.g.,
-> On/Off, Color Control), you will need a custom implementation.
+> `On/Off`, `Color Control`), you will need a custom implementation.
 
 #### ZAP Configuration
 
