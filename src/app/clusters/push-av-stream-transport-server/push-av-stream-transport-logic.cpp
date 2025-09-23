@@ -679,7 +679,8 @@ PushAvStreamTransportServerLogic::HandleAllocatePushTransport(CommandHandler & h
 
         VerifyOrReturnValue(
             !dupFound, Status::AlreadyExists,
-            ChipLogError(Zcl, "Transport Options verification from command data[ep=%d]: Duplicate Zone ID in Motion Zones ", mEndpointId));
+            ChipLogError(Zcl, "Transport Options verification from command data[ep=%d]: Duplicate Zone ID in Motion Zones ",
+                         mEndpointId));
 
         bool isValidZoneSize = mDelegate->ValidateMotionZoneListSize(zoneListSize);
         VerifyOrReturnValue(
