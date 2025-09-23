@@ -1582,6 +1582,43 @@ class ChipDeviceControllerBase():
             ), payload).raise_on_error()
         return await future
 
+    async def TestOnlyWriteAttributeTimedRequestFlagWithNoTimedAction(self, nodeid: int,
+                                                                      attributes: typing.List[typing.Tuple[int, ClusterObjects.ClusterAttributeDescriptor]],
+                                                                      interactionTimeoutMs: typing.Optional[int] = None, busyWaitMs: typing.Optional[int] = None,
+                                                                      payloadCapability: int = TransportPayloadCapability.MRP_PAYLOAD):
+        '''
+        ONLY TO BE USED FOR TEST: Write attributes with TimedRequest flag but no TimedAction transaction.
+        This should result in TIMED_REQUEST_MISMATCH error.
+
+        Please see WriteAttribute for description of parameters.
+
+        Returns:
+            [AttributeStatus] (list - one for each path).
+
+        Raises:
+            InteractionModelError on error (expected: TIMED_REQUEST_MISMATCH)
+        '''
+        self.CheckIsActive()
+
+        eventLoop = asyncio.get_running_loop()
+        future = eventLoop.create_future()
+
+        device = await self.GetConnectedDevice(nodeid, timeoutMs=interactionTimeoutMs, payloadCapability=payloadCapability)
+
+        attrs = []
+        for v in attributes:
+            if len(v) == 2:
+                attrs.append(ClusterAttribute.AttributeWriteRequest(
+                    v[0], v[1], 0, 0, v[1].value))  # type: ignore[attr-defined]
+            else:
+                attrs.append(ClusterAttribute.AttributeWriteRequest(
+                    v[0], v[1], v[2], 1, v[1].value))
+
+        ClusterAttribute.TestOnlyWriteAttributeTimedRequestFlagWithNoTimedAction(
+            future, eventLoop, device.deviceProxy, attrs,
+            interactionTimeoutMs=interactionTimeoutMs, busyWaitMs=busyWaitMs).raise_on_error()
+        return await future
+
     async def SendCommand(self, nodeid: int, endpoint: int, payload: ClusterObjects.ClusterCommand, responseType=None,
                           timedRequestTimeoutMs: typing.Optional[int] = None,
                           interactionTimeoutMs: typing.Optional[int] = None, busyWaitMs: typing.Optional[int] = None,

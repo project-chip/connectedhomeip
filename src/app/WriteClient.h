@@ -129,7 +129,7 @@ public:
                 bool aSuppressResponse = false) :
         mpExchangeMgr(apExchangeMgr),
         mExchangeCtx(*this), mpCallback(apCallback), mTimedWriteTimeoutMs(aTimedWriteTimeoutMs),
-        mSuppressResponse(aSuppressResponse)
+        mSuppressResponse(aSuppressResponse), mTimedRequest(aTimedWriteTimeoutMs.HasValue())
     {
         assertChipStackLockedByCurrentThread();
     }
@@ -138,7 +138,16 @@ public:
     WriteClient(Messaging::ExchangeManager * apExchangeMgr, Callback * apCallback, const Optional<uint16_t> & aTimedWriteTimeoutMs,
                 uint16_t aReservedSize) :
         mpExchangeMgr(apExchangeMgr),
-        mExchangeCtx(*this), mpCallback(apCallback), mTimedWriteTimeoutMs(aTimedWriteTimeoutMs), mReservedSize(aReservedSize)
+        mExchangeCtx(*this), mpCallback(apCallback), mTimedWriteTimeoutMs(aTimedWriteTimeoutMs), mReservedSize(aReservedSize),
+        mTimedRequest(aTimedWriteTimeoutMs.HasValue())
+    {
+        assertChipStackLockedByCurrentThread();
+    }
+
+    // TestOnly constructor that allows setting TimedRequest flag without timeout
+    WriteClient(Messaging::ExchangeManager * apExchangeMgr, Callback * apCallback, bool aTimedRequest) :
+        mpExchangeMgr(apExchangeMgr),
+        mExchangeCtx(*this), mpCallback(apCallback), mTimedRequest(aTimedRequest)
     {
         assertChipStackLockedByCurrentThread();
     }
@@ -524,6 +533,7 @@ private:
     // #if CONFIG_BUILD_FOR_HOST_UNIT_TEST
     uint16_t mReservedSize = 0;
     // #endif
+    bool mTimedRequest = false;
 
     /**
      * Below we define several const variables for encoding overheads.

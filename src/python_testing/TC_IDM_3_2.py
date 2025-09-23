@@ -1,5 +1,5 @@
 #
-#    Copyright (c) 2024 Project CHIP Authors
+#    Copyright (c) 2025 Project CHIP Authors
 #    All rights reserved.
 #
 #    Licensed under the Apache License, Version 2.0 (the "License");
@@ -42,7 +42,7 @@ from mobly import asserts
 
 import matter.clusters as Clusters
 from matter.clusters import ClusterObjects as ClusterObjects
-from matter.interaction_model import Status
+from matter.interaction_model import InteractionModelError, Status
 from matter.testing import global_attribute_ids
 from matter.testing.basic_composition import BasicCompositionTests
 from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
@@ -57,8 +57,9 @@ class TC_IDM_3_2(MatterBaseTest, BasicCompositionTests):
 
     def steps_TC_IDM_3_2(self) -> list[TestStep]:
         steps = [
+            TestStep(0, "Commissioning, already done", is_commissioning=True),
             TestStep(1, "TH sends the WriteRequestMessage to the DUT to write any attribute on an unsupported Endpoint. DUT responds with the Write Response action",
-                     "Verify on the TH that the DUT sends the status code UNSUPPORTED_ENDPOINT", is_commissioning=True),
+                     "Verify on the TH that the DUT sends the status code UNSUPPORTED_ENDPOINT"),
             TestStep(2, "TH sends the WriteRequestMessage to the DUT to write any attribute on an unsupported cluster. DUT responds with the Write Response action",
                      "Verify on the TH that the DUT sends the status code UNSUPPORTED_CLUSTER"),
             TestStep(3, "TH sends the WriteRequestMessage to the DUT to write an unsupported attribute. DUT responds with the Write Response action",
@@ -76,9 +77,11 @@ class TC_IDM_3_2(MatterBaseTest, BasicCompositionTests):
 
     @async_test_body
     async def test_TC_IDM_3_2(self):
+        self.step(0)
+
         # Test Setup with robust endpoint/cluster discovery
         await self.setup_class_helper(allow_pase=False)
-
+ 
         self.step(1)
         '''
         Write any attribute on an unsupported endpoint to DUT
@@ -183,88 +186,124 @@ class TC_IDM_3_2(MatterBaseTest, BasicCompositionTests):
         Out of Scope
         For now similar to the yaml file version, skipping this test step as the Python API doesn't expose SuppressResponse
         '''
-        logging.info(
-            "Step 4: SuppressResponse parameter not supported in current WriteAttribute API, please refer to the issue link for more details")
+        logging.info("Step 4: SuppressResponse parameter not supported in current WriteAttribute API, please refer to the issue link for more details")
 
-        self.step(5)
-        '''
-        TH sends a ReadRequest message to the DUT to read any attribute on any cluster.
-        DUT returns with a report data action with the attribute values and the dataversion of the cluster.
-        TH sends a WriteRequestMessage to the DUT to modify the value of one attribute with the DataVersion field set to the one received in the prior step.
-        '''
+        # Check if NodeLabel exists (good for commissionable devices)
+        if await self.attribute_guard(endpoint=self.endpoint, attribute=Clusters.BasicInformation.Attributes.NodeLabel):
+            # NodeLabel exists - use it 
+            test_cluster = Clusters.BasicInformation
+            test_attribute = Clusters.BasicInformation.Attributes.NodeLabel
+            new_value0 = "New-Label-Step5"
+            logging.info("Using NodeLabel for DataVersion test")
 
-        # Read an attribute to get the current DataVersion
-        test_cluster = Clusters.BasicInformation
-        test_attribute = Clusters.BasicInformation.Attributes.NodeLabel
-        read_result = await self.default_controller.ReadAttribute(
-            self.dut_node_id,
-            [(self.endpoint, test_cluster, test_attribute)]
-        )
+            self.step(5)
+            '''
+            TH sends a ReadRequest message to the DUT to read any attribute on any cluster.
+            DUT returns with a report data action with the attribute values and the dataversion of the cluster.
+            TH sends a WriteRequestMessage to the DUT to modify the value of one attribute with the DataVersion field set to the one received in the prior step.
+            '''
 
-        # Get the current DataVersion
-        current_data_version = read_result[self.endpoint][test_cluster][Clusters.Attribute.DataVersion]
-        logging.info(f"Current DataVersion for cluster {test_cluster.id}: {current_data_version}")
+            # Read an attribute to get the current DataVersion
+            read_result = await self.default_controller.ReadAttribute(
+                self.dut_node_id,
+                [(self.endpoint, test_cluster, test_attribute)]
+            )
 
-        new_value0 = "New-Label-Step5"
-        write_result = await self.default_controller.WriteAttribute(
-            self.dut_node_id,
-            [(self.endpoint, test_attribute(new_value0), current_data_version)]
-        )
+            # Get the current DataVersion
+            current_data_version = read_result[self.endpoint][test_cluster][Clusters.Attribute.DataVersion]
+            logging.info(f"Current DataVersion for cluster {test_cluster.id}: {current_data_version}")
 
-        # Verify write was successful
-        asserts.assert_equal(write_result[0].Status, Status.Success,
-                             f"Write with correct DataVersion should succeed, got {write_result[0].Status}")
+            write_result = await self.default_controller.WriteAttribute(
+                self.dut_node_id,
+                [(self.endpoint, test_attribute(new_value0), current_data_version)]
+            )
 
-        # Verify the value was written by reading it back
-        actual_value = await self.read_single_attribute_check_success(endpoint=self.endpoint, cluster=test_cluster, attribute=test_attribute)
+            # Verify write was successful
+            asserts.assert_equal(write_result[0].Status, Status.Success,
+                                f"Write with correct DataVersion should succeed, got {write_result[0].Status}")
 
-        asserts.assert_equal(actual_value, new_value0,
-                             f"Read value {actual_value} should match written value {new_value0}")
+            # Verify the value was written by reading it back
+            actual_value = await self.read_single_attribute_check_success(endpoint=self.endpoint, cluster=test_cluster, attribute=test_attribute)
 
-        self.step(6)
-        '''
-        TH sends a ReadRequest message to the DUT to read any attribute on any cluster.
-        DUT returns with a report data action with the attribute values and the dataversion of the cluster.
-        TH sends a WriteRequestMessage to the DUT to modify the value of one attribute no DataVersion indicated.
-        TH sends a second WriteRequestMessage to the DUT to modify the value of an attribute with the dataversion field set to the value received earlier.
-        '''
+            asserts.assert_equal(actual_value, new_value0,
+                                f"Read value {actual_value} should match written value {new_value0}")
 
-        # First, read to get the initial DataVersion
-        initial_read = await self.default_controller.ReadAttribute(
-            self.dut_node_id,
-            [(self.endpoint, test_cluster, test_attribute)]
-        )
+            self.step(6)
+            '''
+            TH sends a ReadRequest message to the DUT to read any attribute on any cluster.
+            DUT returns with a report data action with the attribute values and the dataversion of the cluster.
+            TH sends a WriteRequestMessage to the DUT to modify the value of one attribute no DataVersion indicated.
+            TH sends a second WriteRequestMessage to the DUT to modify the value of an attribute with the dataversion field set to the value received earlier.
+            '''
 
-        initial_data_version = initial_read[self.endpoint][test_cluster][Clusters.Attribute.DataVersion]
-        logging.info(f"Initial DataVersion for step 6: {initial_data_version}")
+            # First, read to get the initial DataVersion
+            initial_read = await self.default_controller.ReadAttribute(
+                self.dut_node_id,
+                [(self.endpoint, test_cluster, test_attribute)]
+            )
 
-        # Write without DataVersion (this should succeed and increment the DataVersion)
-        new_value1 = "New-Label-Step6"
-        write_status = await self.write_single_attribute(
-            attribute_value=test_attribute(new_value1),
-            endpoint_id=self.endpoint,
-            expect_success=True
-        )
+            initial_data_version = initial_read[self.endpoint][test_cluster][Clusters.Attribute.DataVersion]
+            logging.info(f"Initial DataVersion for step 6: {initial_data_version}")
 
-        # Now try to write with the old DataVersion (this should fail with DATA_VERSION_MISMATCH)
-        new_value2 = "New-Label-Step6-2"
-        write_result_old_version = await self.default_controller.WriteAttribute(
-            self.dut_node_id,
-            [(self.endpoint, test_attribute(new_value2), initial_data_version)]
-        )
+            # Write without DataVersion (this should succeed and increment the DataVersion)
+            new_value1 = "New-Label-Step6"
+            write_status = await self.write_single_attribute(
+                attribute_value=test_attribute(new_value1),
+                endpoint_id=self.endpoint,
+                expect_success=True
+            )
 
-        # Verify we get DATA_VERSION_MISMATCH error
-        asserts.assert_equal(write_result_old_version[0].Status, Status.DataVersionMismatch,
-                             f"Write with old DataVersion should return DATA_VERSION_MISMATCH, got {write_result_old_version[0].Status}")
+            # Now try to write with the old DataVersion (this should fail with DATA_VERSION_MISMATCH)
+            new_value2 = "New-Label-Step6-2"
+            write_result_old_version = await self.default_controller.WriteAttribute(
+                self.dut_node_id,
+                [(self.endpoint, test_attribute(new_value2), initial_data_version)]
+            )
+
+            # Verify we get DATA_VERSION_MISMATCH error
+            asserts.assert_equal(write_result_old_version[0].Status, Status.DataVersionMismatch,
+                                f"Write with old DataVersion should return DATA_VERSION_MISMATCH, got {write_result_old_version[0].Status}")
+            
+        else:
+            # NodeLabel doesn't exist - skip this step for now (can be handled in follow-up)
+            logging.info("NodeLabel not found - this may be a non-commissionable device")
+            self.skip_step(5)
+            self.skip_step(6)
 
         self.step(7)
         '''
         TH sends the WriteRequestMessage to the DUT to modify the value of a specific attribute data that needs 
         timed write transaction to write and this action is not part of a timed write transaction.
-        The yaml script version of this test says it requires this to be implemented on the DUT and does not have validation data.
+        
+        This step tests both timed write error scenarios:
+        1. NEEDS_TIMED_INTERACTION: Writing timed-write-required attribute without timed transaction
+        2. TIMED_REQUEST_MISMATCH: Writing with TimedRequest flag but no actual timed transaction
         '''
-        logging.info("Step 7: Timed write transaction currently needs further context to be implemented correctly by coder")
 
+        if await self.attribute_guard(endpoint=1, attribute=Clusters.UnitTesting.Attributes.TimedWriteBoolean):
+            # NEEDS_TIMED_INTERACTION - Writing timed-write-required attribute without timed transaction
+            logging.info("Writing UnitTesting-TimedWriteBoolean without timedRequestTimeoutMs should be rejected")
+            try:
+                result = await self.default_controller.WriteAttribute(
+                    self.dut_node_id,
+                    attributes=[(1, Clusters.UnitTesting.Attributes.TimedWriteBoolean(True))]
+                )
+                asserts.fail("The write request should be rejected due to InteractionModelError: NeedsTimedInteraction (0xc6).")
+            except InteractionModelError as e:
+                asserts.assert_equal(e.status, Status.NeedsTimedInteraction,
+                                    f"WriteAttribute should return NeedsTimedInteraction, got {e.status}")
+
+            # TIMED_REQUEST_MISMATCH - Writing with TimedRequest flag but no actual timed transaction
+            logging.info("Writing with TimedRequest flag but no timed transaction should return TIMED_REQUEST_MISMATCH")
+            try:
+                result = await self.default_controller.TestOnlyWriteAttributeTimedRequestFlagWithNoTimedAction(
+                    self.dut_node_id,
+                    attributes=[(1, Clusters.UnitTesting.Attributes.TimedWriteBoolean(False))]
+                )
+                asserts.fail("The write request should be rejected due to InteractionModelError: TimedRequestMismatch (0xc9).")
+            except InteractionModelError as e:
+                asserts.assert_equal(e.status, Status.TimedRequestMismatch,
+                                    f"WriteAttribute should return TimedRequestMismatch, got {e.status}")
 
 if __name__ == "__main__":
     default_matter_test_main()
