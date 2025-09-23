@@ -33,10 +33,12 @@ class GeneralCommissioningCluster : public DefaultServerCluster, chip::FabricTab
 public:
     using OptionalAttributes = OptionalAttributeSet<GeneralCommissioning::Attributes::IsCommissioningWithoutPower::Id>;
 
-    GeneralCommissioningCluster(BitFlags<GeneralCommissioning::Feature> features, OptionalAttributes optionalAttributes) :
-        DefaultServerCluster({ kRootEndpointId, GeneralCommissioning::Id }), mFeatures(features),
-        mOptionalAttributes(optionalAttributes)
+    GeneralCommissioningCluster() :
+        DefaultServerCluster({ kRootEndpointId, GeneralCommissioning::Id }), mFeatures(0),
+        mOptionalAttributes(0)
     {}
+
+    OptionalAttributes & GetOptionalAttributes() { return mOptionalAttributes; }
 
     void SetBreadCrumb(uint64_t value);
 
@@ -57,16 +59,12 @@ public:
     // Fabric delegate
     void OnFabricRemoved(const FabricTable & fabricTable, FabricIndex fabricIndex) override;
 
-    // GeneralCommissioning is generally a singleton.
-    // This provides access to an instance where "Startup" has been called.
-    // TODO: this IS NOT OK and coupling should be cleaned up
-    static GeneralCommissioningCluster * Instance() { return gGlobalInstance; }
+    // GeneralCommissioning is a singleton cluster that exists only on the root endpoint.
+    static GeneralCommissioningCluster & Instance();
 
 private:
-    static GeneralCommissioningCluster * gGlobalInstance;
-
     const BitFlags<GeneralCommissioning::Feature> mFeatures;
-    const OptionalAttributes mOptionalAttributes;
+    OptionalAttributes mOptionalAttributes;
     uint64_t mBreadCrumb = 0;
 
     std::optional<DataModel::ActionReturnStatus>

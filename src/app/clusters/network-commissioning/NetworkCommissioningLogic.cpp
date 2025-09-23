@@ -581,10 +581,7 @@ NetworkCommissioningLogic::HandleAddOrUpdateThreadNetwork(CommandHandler & handl
 void NetworkCommissioningLogic::UpdateBreadcrumb(const Optional<uint64_t> & breadcrumb)
 {
     VerifyOrReturn(breadcrumb.HasValue());
-    if (GeneralCommissioningCluster * cluster = GeneralCommissioningCluster::Instance(); cluster != nullptr)
-    {
-        cluster->SetBreadCrumb(breadcrumb.Value());
-    }
+    GeneralCommissioningCluster::Instance().SetBreadCrumb(breadcrumb.Value());
 }
 
 void NetworkCommissioningLogic::CommitSavedBreadcrumb()
