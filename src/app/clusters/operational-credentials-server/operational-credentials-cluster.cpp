@@ -701,6 +701,8 @@ std::optional<DataModel::ActionReturnStatus> HandleUpdateFabricLabel(CommandHand
 
     if (label.size() > 32)
     {
+        // TODO: This error should probably be a ConstraintError instead of InvalidCommand,
+        // need to confirm if current tests are expecting the later.
         ChipLogError(Zcl, "OpCreds: Failed UpdateFabricLabel due to invalid label size %u", static_cast<unsigned>(label.size()));
         commandObj->AddStatus(commandPath, Status::InvalidCommand);
         return std::nullopt;
