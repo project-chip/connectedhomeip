@@ -385,7 +385,8 @@ namespace chip {
 namespace app {
 namespace Clusters {
 
-CHIP_ERROR AccessControlCluster::Startup(ServerClusterContext & context) {
+CHIP_ERROR AccessControlCluster::Startup(ServerClusterContext & context)
+{
 
     ChipLogProgress(DataManagement, "AccessControlCluster: initializing");
 
@@ -402,7 +403,8 @@ CHIP_ERROR AccessControlCluster::Startup(ServerClusterContext & context) {
     return CHIP_NO_ERROR;
 }
 
-void AccessControlCluster::Shutdown() {
+void AccessControlCluster::Shutdown()
+{
     ChipLogProgress(DataManagement, "AccessControlCluster: shutdown");
 
 #if CHIP_CONFIG_USE_ACCESS_RESTRICTIONS
