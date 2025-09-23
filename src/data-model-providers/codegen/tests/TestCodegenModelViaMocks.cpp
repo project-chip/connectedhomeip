@@ -674,7 +674,7 @@ public:
     {}
     ~UnsupportedReadAccessInterface() = default;
 
-    CHIP_ERROR Read(const ConcreteReadAttributePath & path, AttributeValueEncoder & _) override
+    CHIP_ERROR Read(const ConcreteReadAttributePath & path, [[maybe_unused]] AttributeValueEncoder & _) override
     {
         if (static_cast<const ConcreteAttributePath &>(path) != mPath)
         {
@@ -685,7 +685,7 @@ public:
         return CHIP_IM_GLOBAL_STATUS(UnsupportedRead);
     }
 
-    CHIP_ERROR Write(const ConcreteDataAttributePath & path, AttributeValueDecoder & _) override
+    CHIP_ERROR Write(const ConcreteDataAttributePath & path, [[maybe_unused]] AttributeValueDecoder & _) override
     {
         if (static_cast<const ConcreteAttributePath &>(path) != mPath)
         {
