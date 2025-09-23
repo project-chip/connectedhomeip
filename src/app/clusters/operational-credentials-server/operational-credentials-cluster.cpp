@@ -1327,12 +1327,8 @@ void OperationalCredentialsCluster::FabricWillBeRemoved(const FabricTable & fabr
         {
             BasicInformation::Events::Leave::Type event;
             event.fabricIndex = fabricIndex;
-            EventNumber eventNumber;
 
-            if (CHIP_NO_ERROR != LogEvent(event, mPath.mEndpointId, eventNumber))
-            {
-                ChipLogError(Zcl, "OpCredsFabricTableDelegate: Failed to record Leave event");
-            }
+            (void) mContext->interactionContext.eventsGenerator.GenerateEvent(event, kRootEndpointId);
         }
     }
 
