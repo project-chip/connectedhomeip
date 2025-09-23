@@ -15,22 +15,6 @@
  *    limitations under the License.
  */
 
-/*
- *    Copyright (c) 2022-2025 Project CHIP Authors
- *    All rights reserved.
- *
- *    Licensed under the Apache License, Version 2.0 (the "License");
- *    you may not use this file except in compliance with the License.
- *    You may obtain a copy of the License at
- *
- *        http://www.apache.org/licenses/LICENSE-2.0
- *
- *    Unless required by applicable law or agreed to in writing, software
- *    distributed under the License is distributed on an "AS IS" BASIS,
- *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *    See the License for the specific language governing permissions and
- *    limitations under the License.
- */
 #include "general-commissioning-cluster.h"
 
 #include <app/AppConfig.h>
@@ -51,13 +35,15 @@
 #include <app/server/TermsAndConditionsProvider.h> //nogncheck
 #endif
 
+using namespace chip;
+using namespace chip::app;
+using namespace chip::app::Clusters;
 using namespace chip::DeviceLayer;
 using namespace chip::app::Clusters::GeneralCommissioning;
 using namespace chip::app::Clusters::GeneralCommissioning::Attributes;
 using chip::Transport::SecureSession;
 using chip::Transport::Session;
 
-namespace chip::app::Clusters {
 
 namespace {
 
@@ -86,12 +72,12 @@ CHIP_ERROR ReadIfSupported(CHIP_ERROR (ConfigurationManager::*getter)(uint8_t &)
     return aEncoder.Encode(data);
 }
 
-void OnPlatformEventHandler(const DeviceLayer::ChipDeviceEvent * event, intptr_t arg)
+void OnPlatformEventHandler(const DeviceLayer::ChipDeviceEvent * event, intptr_t /* arg */)
 {
     if (event->Type == DeviceLayer::DeviceEventType::kFailSafeTimerExpired)
     {
         // Spec says to reset Breadcrumb attribute to 0.
-        reinterpret_cast<GeneralCommissioningCluster *>(arg)->SetBreadCrumb(0);
+        GeneralCommissioningCluster::Instance().SetBreadCrumb(0);
 
 #if CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
         if (event->FailSafeTimerExpired.updateTermsAndConditionsHasBeenInvoked)
@@ -181,9 +167,16 @@ void NotifyTermsAndConditionsAttributeChangeIfRequired(const TermsAndConditionsS
 }
 #endif // CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
 
+
+GeneralCommissioningCluster gInstance;
 } // anonymous namespace
 
-GeneralCommissioningCluster * GeneralCommissioningCluster::gGlobalInstance = nullptr;
+namespace chip::app::Clusters {
+
+GeneralCommissioningCluster & GeneralCommissioningCluster::Instance()
+{
+    return gInstance;
+}
 
 DataModel::ActionReturnStatus GeneralCommissioningCluster::ReadAttribute(const DataModel::ReadAttributeRequest & request,
                                                                          AttributeValueEncoder & encoder)
@@ -410,20 +403,15 @@ void GeneralCommissioningCluster::SetBreadCrumb(uint64_t value)
 
 CHIP_ERROR GeneralCommissioningCluster::Startup(ServerClusterContext & context)
 {
-    gGlobalInstance = this;
     ReturnErrorOnFailure(DefaultServerCluster::Startup(context));
-    PlatformMgrImpl().AddEventHandler(OnPlatformEventHandler, reinterpret_cast<intptr_t>(this));
+    PlatformMgrImpl().AddEventHandler(OnPlatformEventHandler, 0);
     Server::GetInstance().GetFabricTable().AddFabricDelegate(this);
     return CHIP_NO_ERROR;
 }
 
 void GeneralCommissioningCluster::Shutdown()
 {
-    if (gGlobalInstance == this)
-    {
-        gGlobalInstance = nullptr;
-    }
-    PlatformMgrImpl().RemoveEventHandler(OnPlatformEventHandler, reinterpret_cast<intptr_t>(this));
+    PlatformMgrImpl().RemoveEventHandler(OnPlatformEventHandler, 0);
     Server::GetInstance().GetFabricTable().RemoveFabricDelegate(this);
     DefaultServerCluster::Shutdown();
 }
@@ -719,5 +707,6 @@ GeneralCommissioningCluster::HandleSetTCAcknowledgements(const DataModel::Invoke
     return std::nullopt;
 }
 #endif // CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
+
 
 } // namespace chip::app::Clusters
