@@ -123,7 +123,6 @@ void MatterTimeFormatLocalizationClusterShutdownCallback(EndpointId endpoint)
             .maxClusterInstanceCount   = 1, // Cluster is a singleton on the root node and this is the only thing supported
         },
         integrationDelegate);
-
 }
 
 void MatterTimeFormatLocalizationPluginServerInitCallback() {}
