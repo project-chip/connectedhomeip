@@ -34,8 +34,7 @@ public:
     using OptionalAttributes = OptionalAttributeSet<GeneralCommissioning::Attributes::IsCommissioningWithoutPower::Id>;
 
     GeneralCommissioningCluster() :
-        DefaultServerCluster({ kRootEndpointId, GeneralCommissioning::Id }), mFeatures(0),
-        mOptionalAttributes(0)
+        DefaultServerCluster({ kRootEndpointId, GeneralCommissioning::Id }), mFeatures(0), mOptionalAttributes(0)
     {}
 
     OptionalAttributes & GetOptionalAttributes() { return mOptionalAttributes; }

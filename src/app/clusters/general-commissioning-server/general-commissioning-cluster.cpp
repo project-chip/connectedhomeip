@@ -44,7 +44,6 @@ using namespace chip::app::Clusters::GeneralCommissioning::Attributes;
 using chip::Transport::SecureSession;
 using chip::Transport::Session;
 
-
 namespace {
 
 #define CheckSuccess(expr, code)                                                                                                   \
@@ -166,7 +165,6 @@ void NotifyTermsAndConditionsAttributeChangeIfRequired(const TermsAndConditionsS
     }
 }
 #endif // CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
-
 
 GeneralCommissioningCluster gInstance;
 } // anonymous namespace
@@ -707,6 +705,5 @@ GeneralCommissioningCluster::HandleSetTCAcknowledgements(const DataModel::Invoke
     return std::nullopt;
 }
 #endif // CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
-
 
 } // namespace chip::app::Clusters
