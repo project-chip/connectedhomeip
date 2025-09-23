@@ -18,6 +18,7 @@
 #include <app/clusters/time-format-localization-server/time-format-localization-cluster.h>
 #include <app/static-cluster-config/TimeFormatLocalization.h>
 #include <app/util/attribute-metadata.h>
+#include <data-model-providers/codegen/ClusterIntegration.h>
 #include <data-model-providers/codegen/CodegenDataModelProvider.h>
 #include <data-model-providers/codegen/CodegenProcessingConfig.h>
 #include <platform/DeviceInfoProvider.h>
@@ -36,52 +37,75 @@ using namespace Protocols::InteractionModel;
 
 namespace {
 
+void FetchDefaults(BitFlags<TimeFormatLocalization::Feature> featureMap, TimeFormatLocalization::HourFormatEnum & defaultHourFormat,
+                   TimeFormatLocalization::CalendarTypeEnum & defaultCalendarType)
+{
+    // hour format always supported
+    if (TimeFormatLocalization::Attributes::HourFormat::Get(kRootEndpointId, &defaultHourFormat) != Status::Success)
+    {
+        CodegenInitError("Failed to get HourFormat for endpoint %u", kRootEndpointId);
+        defaultHourFormat = TimeFormatLocalization::HourFormatEnum::k12hr;
+    }
+
+    // Calendar format is feature-dependent. We set some default but still try to read it
+    defaultCalendarType = TimeFormatLocalization::CalendarTypeEnum::kGregorian;
+    if (featureMap.Has(TimeFormatLocalization::Feature::kCalendarFormat))
+    {
+        if (TimeFormatLocalization::Attributes::ActiveCalendarType::Get(kRootEndpointId, &defaultCalendarType) != Status::Success)
+        {
+            CodegenInitError("Failed to get ActiveCalendarType for endpoint %u", kRootEndpointId);
+            defaultCalendarType = TimeFormatLocalization::CalendarTypeEnum::kGregorian;
+        }
+    }
+}
+
 LazyRegisteredServerCluster<TimeFormatLocalizationCluster> gServer;
 
-}
+class IntegrationDelegate : public CodegenClusterIntegration::Delegate
+{
+public:
+    ServerClusterRegistration & CreateRegistration(EndpointId endpointId, unsigned clusterInstanceIndex,
+                                                   uint32_t optionalAttributeBits, uint32_t rawFeatureMap) override
+    {
+        TimeFormatLocalization::HourFormatEnum defaultHourFormat;
+        TimeFormatLocalization::CalendarTypeEnum defaultCalendarType;
+        const BitFlags<TimeFormatLocalization::Feature> featureMap(rawFeatureMap);
+        FetchDefaults(featureMap, defaultHourFormat, defaultCalendarType);
+
+        gServer.Create(endpointId, featureMap, defaultHourFormat, defaultCalendarType);
+
+        return gServer.Registration();
+    }
+
+    ServerClusterInterface * FindRegistration(unsigned clusterInstanceIndex) override
+    {
+        VerifyOrReturnValue(gServer.IsConstructed(), nullptr);
+        return &gServer.Cluster();
+    }
+
+    // Nothing to destroy: separate singleton class without constructor/destructor is used
+    void ReleaseRegistration(unsigned clusterInstanceIndex) override { gServer.Destroy(); }
+};
+
+} // namespace
 
 void MatterTimeFormatLocalizationClusterInitCallback(EndpointId endpoint)
 {
     // This cluster should only exist in Root endpoint.
     VerifyOrReturn(endpoint == kRootEndpointId);
 
-    // Get feature Map
-    uint32_t rawFeatureMap;
-    if (TimeFormatLocalization::Attributes::FeatureMap::Get(endpoint, &rawFeatureMap) != Status::Success)
-    {
-        CodegenInitError("Failed to get feature map for endpoint %u", endpoint);
-        rawFeatureMap = 0;
-    }
-
-    // Get the default values from ZAP in case there is not a valid value in storage.
-    TimeFormatLocalization::HourFormatEnum defaultHourFormat;
-    TimeFormatLocalization::CalendarTypeEnum defaultCalendarType;
-
-    // First the HourFormat
-    if (TimeFormatLocalization::Attributes::HourFormat::Get(endpoint, &defaultHourFormat) != Status::Success)
-    {
-        CodegenInitError("Failed to get HourFormat for endpoint %u", endpoint);
-        defaultHourFormat = TimeFormatLocalization::HourFormatEnum::k12hr;
-    }
-
-    // Get the ActiveCalendarType default value if the feature is enabled.
-    if (BitFlags<TimeFormatLocalization::Feature>(rawFeatureMap).Has(TimeFormatLocalization::Feature::kCalendarFormat))
-    {
-        if (TimeFormatLocalization::Attributes::ActiveCalendarType::Get(endpoint, &defaultCalendarType) != Status::Success)
+    // register a singleton server (root endpoint only)
+    IntegrationDelegate integrationDelegate;
+    CodegenClusterIntegration::RegisterServer(
         {
-            CodegenInitError("Failed to get ActiveCalendarType for endpoint %u", endpoint);
-            defaultCalendarType = TimeFormatLocalization::CalendarTypeEnum::kBuddhist;
-        }
-    }
-
-    gServer.Create(endpoint, BitFlags<TimeFormatLocalization::Feature>(rawFeatureMap), defaultHourFormat, defaultCalendarType);
-
-    CHIP_ERROR err = CodegenDataModelProvider::Instance().Registry().Register(gServer.Registration());
-
-    if (err != CHIP_NO_ERROR)
-    {
-        CodegenInitError("TimeFormatLocalization cluster error registration: %" CHIP_ERROR_FORMAT, err.Format());
-    }
+            .endpointId                = kRootEndpointId,
+            .clusterId                 = TimeFormatLocalization::Id,
+            .fixedClusterInstanceCount = TimeFormatLocalization::StaticApplicationConfig::kFixedClusterConfig.size(),
+            .maxClusterInstanceCount   = 1, // Cluster is a singleton on the root node and this is the only thing supported
+            .fetchFeatureMap           = true,
+            .fetchOptionalAttributes   = false,
+        },
+        integrationDelegate);
 }
 
 void MatterTimeFormatLocalizationClusterShutdownCallback(EndpointId endpoint)
@@ -89,14 +113,17 @@ void MatterTimeFormatLocalizationClusterShutdownCallback(EndpointId endpoint)
     // This cluster should only exist in Root endpoint.
     VerifyOrReturn(endpoint == kRootEndpointId);
 
-    CHIP_ERROR err = CodegenDataModelProvider::Instance().Registry().Unregister(&gServer.Cluster());
+    // register a singleton server (root endpoint only)
+    IntegrationDelegate integrationDelegate;
+    CodegenClusterIntegration::UnregisterServer(
+        {
+            .endpointId                = kRootEndpointId,
+            .clusterId                 = TimeFormatLocalization::Id,
+            .fixedClusterInstanceCount = TimeFormatLocalization::StaticApplicationConfig::kFixedClusterConfig.size(),
+            .maxClusterInstanceCount   = 1, // Cluster is a singleton on the root node and this is the only thing supported
+        },
+        integrationDelegate);
 
-    if (err != CHIP_NO_ERROR)
-    {
-        CodegenInitError("TimeFormatLocalization unregister error: %" CHIP_ERROR_FORMAT, err.Format());
-    }
-
-    gServer.Destroy();
 }
 
 void MatterTimeFormatLocalizationPluginServerInitCallback() {}
