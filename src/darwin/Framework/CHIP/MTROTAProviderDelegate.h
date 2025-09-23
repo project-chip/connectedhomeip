@@ -155,6 +155,10 @@ NS_ASSUME_NONNULL_BEGIN
  * Notify the delegate when a BDX Query message has been received for some node.
  * The controller identifies the fabric the node is on, and the nodeID
  * identifies the node within that fabric.
+ *
+ * The data passed to the completion must be of size blockSize, unless it's the
+ * last block of data.  In that case, it may be smaller than blockSize, and
+ * isEOF must be set to YES.
  */
 - (void)handleBDXQueryForNodeID:(NSNumber *)nodeID
                      controller:(MTRDeviceController *)controller

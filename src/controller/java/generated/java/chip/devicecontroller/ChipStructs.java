@@ -14980,6 +14980,82 @@ public static class CameraAvSettingsUserLevelManagementClusterViewportStruct {
     return output.toString();
   }
 }
+public static class WebRTCTransportProviderClusterSFrameStruct {
+  public Integer cipherSuite;
+  public byte[] baseKey;
+  public byte[] kid;
+  private static final long CIPHER_SUITE_ID = 0L;
+  private static final long BASE_KEY_ID = 1L;
+  private static final long KID_ID = 2L;
+
+  public WebRTCTransportProviderClusterSFrameStruct(
+    Integer cipherSuite,
+    byte[] baseKey,
+    byte[] kid
+  ) {
+    this.cipherSuite = cipherSuite;
+    this.baseKey = baseKey;
+    this.kid = kid;
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+    values.add(new StructElement(CIPHER_SUITE_ID, new UIntType(cipherSuite)));
+    values.add(new StructElement(BASE_KEY_ID, new ByteArrayType(baseKey)));
+    values.add(new StructElement(KID_ID, new ByteArrayType(kid)));
+
+    return new StructType(values);
+  }
+
+  public static WebRTCTransportProviderClusterSFrameStruct decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    Integer cipherSuite = null;
+    byte[] baseKey = null;
+    byte[] kid = null;
+    for (StructElement element: ((StructType)tlvValue).value()) {
+      if (element.contextTagNum() == CIPHER_SUITE_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          cipherSuite = castingValue.value(Integer.class);
+        }
+      } else if (element.contextTagNum() == BASE_KEY_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.ByteArray) {
+          ByteArrayType castingValue = element.value(ByteArrayType.class);
+          baseKey = castingValue.value(byte[].class);
+        }
+      } else if (element.contextTagNum() == KID_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.ByteArray) {
+          ByteArrayType castingValue = element.value(ByteArrayType.class);
+          kid = castingValue.value(byte[].class);
+        }
+      }
+    }
+    return new WebRTCTransportProviderClusterSFrameStruct(
+      cipherSuite,
+      baseKey,
+      kid
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("WebRTCTransportProviderClusterSFrameStruct {\n");
+    output.append("\tcipherSuite: ");
+    output.append(cipherSuite);
+    output.append("\n");
+    output.append("\tbaseKey: ");
+    output.append(Arrays.toString(baseKey));
+    output.append("\n");
+    output.append("\tkid: ");
+    output.append(Arrays.toString(kid));
+    output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
 public static class WebRTCTransportProviderClusterICECandidateStruct {
   public String candidate;
   public @Nullable String SDPMid;
@@ -19152,7 +19228,7 @@ public static class TlsCertificateManagementClusterTLSCertStruct {
 }
 public static class TlsCertificateManagementClusterTLSClientCertificateDetailStruct {
   public Integer ccdid;
-  public Optional<byte[]> clientCertificate;
+  public @Nullable Optional<byte[]> clientCertificate;
   public Optional<ArrayList<byte[]>> intermediateCertificates;
   public Integer fabricIndex;
   private static final long CCDID_ID = 0L;
@@ -19162,7 +19238,7 @@ public static class TlsCertificateManagementClusterTLSClientCertificateDetailStr
 
   public TlsCertificateManagementClusterTLSClientCertificateDetailStruct(
     Integer ccdid,
-    Optional<byte[]> clientCertificate,
+    @Nullable Optional<byte[]> clientCertificate,
     Optional<ArrayList<byte[]>> intermediateCertificates,
     Integer fabricIndex
   ) {
@@ -19175,7 +19251,7 @@ public static class TlsCertificateManagementClusterTLSClientCertificateDetailStr
   public StructType encodeTlv() {
     ArrayList<StructElement> values = new ArrayList<>();
     values.add(new StructElement(CCDID_ID, new UIntType(ccdid)));
-    values.add(new StructElement(CLIENT_CERTIFICATE_ID, clientCertificate.<BaseTLVType>map((nonOptionalclientCertificate) -> new ByteArrayType(nonOptionalclientCertificate)).orElse(new EmptyType())));
+    values.add(new StructElement(CLIENT_CERTIFICATE_ID, clientCertificate != null ? clientCertificate.<BaseTLVType>map((nonOptionalclientCertificate) -> new ByteArrayType(nonOptionalclientCertificate)).orElse(new EmptyType()) : new NullType()));
     values.add(new StructElement(INTERMEDIATE_CERTIFICATES_ID, intermediateCertificates.<BaseTLVType>map((nonOptionalintermediateCertificates) -> ArrayType.generateArrayType(nonOptionalintermediateCertificates, (elementnonOptionalintermediateCertificates) -> new ByteArrayType(elementnonOptionalintermediateCertificates))).orElse(new EmptyType())));
     values.add(new StructElement(FABRIC_INDEX_ID, new UIntType(fabricIndex)));
 
@@ -19187,7 +19263,7 @@ public static class TlsCertificateManagementClusterTLSClientCertificateDetailStr
       return null;
     }
     Integer ccdid = null;
-    Optional<byte[]> clientCertificate = Optional.empty();
+    @Nullable Optional<byte[]> clientCertificate = null;
     Optional<ArrayList<byte[]>> intermediateCertificates = Optional.empty();
     Integer fabricIndex = null;
     for (StructElement element: ((StructType)tlvValue).value()) {

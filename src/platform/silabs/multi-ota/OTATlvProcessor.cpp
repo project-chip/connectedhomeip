@@ -18,12 +18,11 @@
 
 #include <lib/core/TLV.h>
 #include <lib/support/BufferReader.h>
-#include <platform/internal/CHIPDeviceLayerInternal.h>
+#include <lib/support/TypeTraits.h>
 
 #include <platform/silabs/multi-ota/OTAMultiImageProcessorImpl.h>
 #include <platform/silabs/multi-ota/OTATlvProcessor.h>
 #ifdef SL_MATTER_ENABLE_OTA_ENCRYPTION
-#include <platform/silabs/SilabsConfig.h>
 #include <platform/silabs/multi-ota/OtaTlvEncryptionKey.h>
 #endif
 
@@ -34,6 +33,28 @@ namespace chip {
 #ifdef SL_MATTER_ENABLE_OTA_ENCRYPTION
 constexpr uint8_t au8Iv[] = { 0x00, 0x00, 0x00, 0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17, 0x18, 0x00, 0x00, 0x00, 0x00 };
 #endif
+
+CHIP_ERROR OTATlvProcessor::Init()
+{
+    VerifyOrReturnError(mCallbackProcessDescriptor != nullptr, CHIP_OTA_PROCESSOR_CB_NOT_REGISTERED);
+    mAccumulator.Init(GetAccumulatorLength());
+#ifdef SL_MATTER_ENABLE_OTA_ENCRYPTION
+    mUnalignmentNum = 0;
+#endif
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR OTATlvProcessor::Clear()
+{
+    OTATlvProcessor::ClearInternal();
+    mAccumulator.Clear();
+    mDescriptorProcessed = false;
+#ifdef SL_MATTER_ENABLE_OTA_ENCRYPTION
+    mUnalignmentNum = 0;
+#endif
+    return CHIP_NO_ERROR;
+}
+
 CHIP_ERROR OTATlvProcessor::Process(ByteSpan & block)
 {
     CHIP_ERROR status     = CHIP_NO_ERROR;
@@ -60,7 +81,6 @@ CHIP_ERROR OTATlvProcessor::Process(ByteSpan & block)
             }
         }
     }
-
     return status;
 }
 
@@ -78,6 +98,14 @@ void OTATlvProcessor::ClearInternal()
 bool OTATlvProcessor::IsError(CHIP_ERROR & status)
 {
     return status != CHIP_NO_ERROR && status != CHIP_ERROR_BUFFER_TOO_SMALL && status != CHIP_OTA_FETCH_ALREADY_SCHEDULED;
+}
+
+bool OTATlvProcessor::IsValidTag(OTAProcessorTag tag)
+{
+    auto value = chip::to_underlying(tag);
+
+    return value >= chip::to_underlying(OTAProcessorTag::kApplicationProcessor) &&
+        value <= chip::to_underlying(OTAProcessorTag::kMaxValue);
 }
 
 void OTADataAccumulator::Init(uint32_t threshold)

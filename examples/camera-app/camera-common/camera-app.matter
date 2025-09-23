@@ -245,8 +245,8 @@ enum ThreeLevelAutoEnum : enum8 {
 }
 
 enum WebRTCEndReasonEnum : enum8 {
-  kIceFailed = 0;
-  kIceTimeout = 1;
+  kICEFailed = 0;
+  kICETimeout = 1;
   kUserHangup = 2;
   kUserBusy = 3;
   kReplaced = 4;
@@ -256,7 +256,8 @@ enum WebRTCEndReasonEnum : enum8 {
   kOutOfResources = 8;
   kMediaTimeout = 9;
   kLowPower = 10;
-  kUnknownReason = 11;
+  kPrivacyMode = 11;
+  kUnknownReason = 12;
 }
 
 bitmap TestGlobalBitmap : bitmap32 {
@@ -2633,7 +2634,7 @@ provisional cluster CameraAvStreamManagement = 1361 {
   readonly attribute optional int32u maxEncodedPixelRate = 1;
   readonly attribute optional VideoSensorParamsStruct videoSensorParams = 2;
   readonly attribute optional boolean nightVisionUsesInfrared = 3;
-  readonly attribute optional VideoResolutionStruct minViewport = 4;
+  readonly attribute optional VideoResolutionStruct minViewportResolution = 4;
   readonly attribute optional RateDistortionTradeOffPointsStruct rateDistortionTradeOffPoints[] = 5;
   readonly attribute int32u maxContentBufferSize = 6;
   readonly attribute optional AudioCapabilitiesStruct microphoneCapabilities = 7;
@@ -2786,6 +2787,11 @@ provisional cluster CameraAvStreamManagement = 1361 {
 provisional cluster CameraAvSettingsUserLevelManagement = 1362 {
   revision 1;
 
+  enum PhysicalMovementEnum : enum8 {
+    kIdle = 0;
+    kMoving = 1;
+  }
+
   bitmap Feature : bitmap32 {
     kDigitalPTZ = 0x1;
     kMechanicalPan = 0x2;
@@ -2820,6 +2826,7 @@ provisional cluster CameraAvSettingsUserLevelManagement = 1362 {
   readonly attribute optional int16s tiltMax = 6;
   readonly attribute optional int16s panMin = 7;
   readonly attribute optional int16s panMax = 8;
+  readonly attribute optional PhysicalMovementEnum movementState = 9;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute attrib_id attributeList[] = 65531;
@@ -2863,7 +2870,7 @@ provisional cluster CameraAvSettingsUserLevelManagement = 1362 {
     optional int8s zoomDelta = 3;
   }
 
-  /** This command SHALL set the values for the pan, tilt, and zoom in the mechanical PTZ. */
+  /** This command SHALL move the camera to the provided values for pan, tilt, and zoom in the mechanical PTZ. */
   command MPTZSetPosition(MPTZSetPositionRequest): DefaultSuccess = 0;
   /** This command SHALL move the camera by the delta values relative to the currently defined position. */
   command MPTZRelativeMove(MPTZRelativeMoveRequest): DefaultSuccess = 1;
@@ -2887,6 +2894,12 @@ provisional cluster WebRTCTransportProvider = 1363 {
     kMetadata = 0x1;
   }
 
+  struct SFrameStruct {
+    int16u cipherSuite = 0;
+    octet_string<128> baseKey = 1;
+    octet_string<8> kid = 2;
+  }
+
   readonly attribute access(read: manage) WebRTCSessionStruct currentSessions[] = 0;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
@@ -2902,6 +2915,7 @@ provisional cluster WebRTCTransportProvider = 1363 {
     optional ICEServerStruct ICEServers[] = 4;
     optional char_string<16> ICETransportPolicy = 5;
     optional boolean metadataEnabled = 6;
+    optional SFrameStruct SFrameConfig = 7;
   }
 
   response struct SolicitOfferResponse = 1 {
@@ -2921,6 +2935,7 @@ provisional cluster WebRTCTransportProvider = 1363 {
     optional ICEServerStruct ICEServers[] = 6;
     optional char_string<16> ICETransportPolicy = 7;
     optional boolean metadataEnabled = 8;
+    optional SFrameStruct SFrameConfig = 9;
   }
 
   response struct ProvideOfferResponse = 3 {
@@ -3208,11 +3223,6 @@ provisional cluster Chime = 1366 {
 provisional cluster TlsCertificateManagement = 2049 {
   revision 1;
 
-  enum StatusCodeEnum : enum8 {
-    kCertificateAlreadyInstalled = 2;
-    kDuplicateKey = 3;
-  }
-
   fabric_scoped struct TLSCertStruct {
     int16u caid = 0;
     optional long_octet_string<3000> certificate = 1;
@@ -3221,7 +3231,7 @@ provisional cluster TlsCertificateManagement = 2049 {
 
   fabric_scoped struct TLSClientCertificateDetailStruct {
     int16u ccdid = 0;
-    optional long_octet_string<3000> clientCertificate = 1;
+    optional nullable long_octet_string<3000> clientCertificate = 1;
     optional octet_string intermediateCertificates[] = 2;
     fabric_idx fabricIndex = 254;
   }
@@ -3265,19 +3275,21 @@ provisional cluster TlsCertificateManagement = 2049 {
     int16u caid = 0;
   }
 
-  request struct TLSClientCSRRequest {
-    octet_string<128> nonce = 0;
+  request struct ClientCSRRequest {
+    octet_string<32> nonce = 0;
+    nullable int16u ccdid = 1;
   }
 
-  response struct TLSClientCSRResponse = 8 {
+  response struct ClientCSRResponse = 8 {
     int16u ccdid = 0;
     long_octet_string<3000> csr = 1;
-    octet_string<128> nonce = 2;
+    octet_string<128> nonceSignature = 2;
   }
 
   request struct ProvisionClientCertificateRequest {
     int16u ccdid = 0;
-    TLSClientCertificateDetailStruct clientCertificateDetails = 1;
+    long_octet_string<3000> clientCertificate = 1;
+    octet_string intermediateCertificates[] = 2;
   }
 
   request struct FindClientCertificateRequest {
@@ -3302,17 +3314,17 @@ provisional cluster TlsCertificateManagement = 2049 {
 
   /** This command SHALL provision a newly provided certificate, or rotate an existing one, based on the contents of the CAID field. */
   fabric command access(invoke: administer) ProvisionRootCertificate(ProvisionRootCertificateRequest): ProvisionRootCertificateResponse = 0;
-  /** This command SHALL return the specified TLS root certificate, or all TLS provisioned root certificates, based on the contents of the CAID field. */
+  /** This command SHALL return the specified TLS root certificate, or all provisioned TLS root certificates for the accessing fabric, based on the contents of the CAID field. */
   fabric command FindRootCertificate(FindRootCertificateRequest): FindRootCertificateResponse = 2;
   /** This command SHALL return the CAID for the passed in fingerprint. */
   fabric command LookupRootCertificate(LookupRootCertificateRequest): LookupRootCertificateResponse = 4;
   /** This command SHALL be generated to request the server removes the certificate provisioned to the provided Certificate Authority ID. */
   fabric command access(invoke: administer) RemoveRootCertificate(RemoveRootCertificateRequest): DefaultSuccess = 6;
-  /** This command SHALL be generated to request the Node generates a Certificate Signing Request. */
-  fabric command access(invoke: administer) TLSClientCSR(TLSClientCSRRequest): TLSClientCSRResponse = 7;
+  /** This command SHALL be generated to request the Node generates a certificate signing request for a new TLS key pair or use an existing CCDID for certificate rotation. */
+  fabric command access(invoke: administer) ClientCSR(ClientCSRRequest): ClientCSRResponse = 7;
   /** This command SHALL be generated to request the Node provisions newly provided Client Certificate Details, or rotate an existing client certificate. */
   fabric command access(invoke: administer) ProvisionClientCertificate(ProvisionClientCertificateRequest): DefaultSuccess = 9;
-  /** This command SHALL return the TLSClientCertificateDetailStruct for the passed in CCDID, or all TLS client certificates, based on the contents of the CCDID field. */
+  /** This command SHALL return the TLSClientCertificateDetailStruct for the passed in CCDID, or all TLS client certificates for the accessing fabric, based on the contents of the CCDID field. */
   fabric command FindClientCertificate(FindClientCertificateRequest): FindClientCertificateResponse = 10;
   /** This command SHALL return the CCDID for the passed in Fingerprint. */
   fabric command LookupClientCertificate(LookupClientCertificateRequest): LookupClientCertificateResponse = 12;
@@ -3444,8 +3456,8 @@ endpoint 0 {
 
   server cluster Binding {
     callback attribute binding;
-    ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 1;
+    callback attribute featureMap;
+    callback attribute clusterRevision;
   }
 
   server cluster AccessControl {
@@ -3900,7 +3912,7 @@ endpoint 1 {
     callback attribute maxEncodedPixelRate;
     callback attribute videoSensorParams;
     callback attribute nightVisionUsesInfrared;
-    callback attribute minViewport;
+    callback attribute minViewportResolution;
     callback attribute rateDistortionTradeOffPoints;
     callback attribute maxContentBufferSize;
     callback attribute microphoneCapabilities;
@@ -3969,6 +3981,7 @@ endpoint 1 {
     ram      attribute tiltMax default = 90;
     ram      attribute panMin default = -180;
     ram      attribute panMax default = 180;
+    ram      attribute movementState;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
@@ -4053,8 +4066,8 @@ endpoint 1 {
     handle command LookupRootCertificate;
     handle command LookupRootCertificateResponse;
     handle command RemoveRootCertificate;
-    handle command TLSClientCSR;
-    handle command TLSClientCSRResponse;
+    handle command ClientCSR;
+    handle command ClientCSRResponse;
     handle command ProvisionClientCertificate;
     handle command FindClientCertificate;
     handle command FindClientCertificateResponse;

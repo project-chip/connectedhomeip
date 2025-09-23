@@ -26,7 +26,7 @@
 
 #include <platform/internal/GenericPlatformManagerImpl_CMSISOS.h>
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI_STATION
-#include <platform/silabs/wifi/WifiInterface.h>
+#include <platform/silabs/wifi/WifiInterface.h> // nogncheck
 #endif
 #include <cmsis_os2.h>
 

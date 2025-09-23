@@ -13,7 +13,7 @@ if (matter_enable_shell)
 list(
     APPEND ${list_chip_main_sources}
     #shell
-    ${chip_dir}/examples/platform/realtek/bee/shell/launch_shell.cpp
+    ${chip_dir}/examples/platform/realtek/shell/launch_shell.cpp
 )
 endif (matter_enable_shell)
 
@@ -26,7 +26,7 @@ list(
     ${chip_dir}/src/app/clusters/ota-requestor/DefaultOTARequestorDriver.cpp
     ${chip_dir}/src/app/clusters/ota-requestor/DefaultOTARequestorStorage.cpp
     ${chip_dir}/src/app/clusters/ota-requestor/ota-requestor-server.cpp
-    ${chip_dir}/examples/platform/realtek/bee/ota/OTAInitializer.cpp
+    ${chip_dir}/examples/platform/realtek/ota/OTAInitializer.cpp
 )
 endif (matter_enable_ota_requestor)
 
@@ -40,7 +40,7 @@ list(
     ${chip_dir}/examples/light-switch-app/realtek/bee/main/DeviceCallbacks.cpp
     ${chip_dir}/examples/light-switch-app/realtek/bee/main/CHIPDeviceManager.cpp
     ${chip_dir}/examples/light-switch-app/realtek/bee/main/Globals.cpp
-    ${chip_dir}/examples/platform/realtek/bee/util/LEDWidget.cpp
+    ${chip_dir}/examples/platform/realtek/util/LEDWidget.cpp
     ${chip_dir}/examples/providers/DeviceInfoProviderImpl.cpp
 )
 
@@ -64,7 +64,7 @@ target_include_directories(
     ${chip_dir}/zzz_generated/app-common
     ${chip_dir}/examples/light-switch-app/light-switch-common
     ${chip_dir}/examples/light-switch-app/realtek/bee/main/include
-    ${chip_dir}/examples/platform/realtek/bee
+    ${chip_dir}/examples/platform/realtek
     ${chip_dir}/examples/providers
     ${chip_dir_output}/gen/include
     ${chip_dir}/src/include/
@@ -85,14 +85,6 @@ list(
     -DCHIP_PROJECT=1
     -DCHIP_HAVE_CONFIG_H
 )
-
-if (matter_dac_key_encryption)
-list(
-    APPEND chip_main_flags 
-
-    -DCONFIG_DAC_KEY_ENC=1
-)
-endif (matter_dac_key_encryption)
 
 if (matter_enable_persistentstorage_audit)
 list(

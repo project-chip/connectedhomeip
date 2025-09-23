@@ -58,7 +58,7 @@ class CertificateAuthority:
     def logger(cls):
         return logging.getLogger('CertificateAuthority')
 
-    def __init__(self, chipStack: ChipStack.ChipStack, caIndex: int, persistentStorage: PersistentStorage = None):
+    def __init__(self, chipStack: ChipStack.ChipStack, caIndex: int, persistentStorage: Optional[PersistentStorage] = None):
         '''  Initializes the CertificateAuthority. This will set-up the associated C++ OperationalCredentialsAdapter
              as well.
 
@@ -86,7 +86,7 @@ class CertificateAuthority:
         self._Handle().pychip_OpCreds_SetCertificateValidityPeriod.restype = PyChipError
         self._Handle().pychip_OpCreds_SetCertificateValidityPeriod.argtypes = [ctypes.c_void_p, ctypes.c_uint32]
 
-        if (persistentStorage is None):
+        if persistentStorage is None:
             persistentStorage = self._chipStack.GetStorageManager()
 
         self._persistentStorage = persistentStorage
@@ -99,7 +99,7 @@ class CertificateAuthority:
                 ctypes.py_object(self), ctypes.c_uint32(self._caIndex), self._persistentStorage.GetSdkStorageObject())
         )
 
-        if (self._closure is None):
+        if self._closure is None:
             raise ValueError("Encountered error initializing OpCreds adapter")
 
         self._isActive = True
@@ -120,12 +120,12 @@ class CertificateAuthority:
 
         LOGGER.info("Loading fabric admins from storage...")
 
-        caList = self._persistentStorage.GetReplKey(key='caList')
+        caList = self._persistentStorage.GetKey(key='caList')
         if (str(self._caIndex) not in caList):
             caList[str(self._caIndex)] = []
-            self._persistentStorage.SetReplKey(key='caList', value=caList)
+            self._persistentStorage.SetKey(key='caList', value=caList)
 
-        fabricAdminMetadataList = self._persistentStorage.GetReplKey(key='caList')[str(self._caIndex)]
+        fabricAdminMetadataList = self._persistentStorage.GetKey(key='caList')[str(self._caIndex)]
         for adminMetadata in fabricAdminMetadataList:
             self.NewFabricAdmin(vendorId=int(adminMetadata['vendorId']), fabricId=int(adminMetadata['fabricId']))
 
@@ -148,14 +148,14 @@ class CertificateAuthority:
 
         fabricAdmin = FabricAdmin.FabricAdmin(self, vendorId=vendorId, fabricId=fabricId)
 
-        caList = self._persistentStorage.GetReplKey('caList')
+        caList = self._persistentStorage.GetKey('caList')
         if (caList is not None):
             replFabricEntry = {'fabricId': fabricId, 'vendorId': vendorId}
 
             if (replFabricEntry not in caList[str(self._caIndex)]):
                 caList[str(self._caIndex)].append(replFabricEntry)
 
-            self._persistentStorage.SetReplKey(key='caList', value=caList)
+            self._persistentStorage.SetKey(key='caList', value=caList)
 
         self._activeAdmins.append(fabricAdmin)
 
@@ -250,7 +250,7 @@ class CertificateAuthorityManager:
     def logger(cls):
         return logging.getLogger('CertificateAuthorityManager')
 
-    def __init__(self, chipStack: ChipStack.ChipStack, persistentStorage: PersistentStorage = None):
+    def __init__(self, chipStack: ChipStack.ChipStack, persistentStorage: Optional[PersistentStorage] = None):
         ''' Initializes the manager.
 
             chipStack:          Reference to a matter.ChipStack object that is used to initialize
@@ -261,7 +261,7 @@ class CertificateAuthorityManager:
         '''
         self._chipStack = chipStack
 
-        if (persistentStorage is None):
+        if persistentStorage is None:
             persistentStorage = self._chipStack.GetStorageManager()
 
         self._persistentStorage = persistentStorage
@@ -271,10 +271,7 @@ class CertificateAuthorityManager:
     def _AllocateNextCaIndex(self):
         ''' Allocate the next un-used CA index.
         '''
-        nextCaIndex = 1
-        for ca in self._activeCaList:
-            nextCaIndex = ca.caIndex + 1
-        return nextCaIndex
+        return max([ca.caIndex + 1 for ca in self._activeCaList], default=0)
 
     def LoadAuthoritiesFromStorage(self):
         ''' Loads any existing CertificateAuthority instances present in persistent storage.
@@ -288,7 +285,7 @@ class CertificateAuthorityManager:
         #
         # Persist details to storage (read modify write).
         #
-        caList = self._persistentStorage.GetReplKey('caList')
+        caList = self._persistentStorage.GetKey('caList')
         if (caList is None):
             caList = {}
 
@@ -312,13 +309,13 @@ class CertificateAuthorityManager:
         #
         # Persist details to storage (read modify write).
         #
-        caList = self._persistentStorage.GetReplKey('caList')
+        caList = self._persistentStorage.GetKey('caList')
         if (caList is None):
             caList = {}
 
         if (str(caIndex) not in caList):
             caList[str(caIndex)] = []
-            self._persistentStorage.SetReplKey(key='caList', value=caList)
+            self._persistentStorage.SetKey(key='caList', value=caList)
 
         if certificateValidityPeriodSec is None:
             certificateValidityPeriodSec = CERTIFICATE_VALIDITY_PERIOD_SEC

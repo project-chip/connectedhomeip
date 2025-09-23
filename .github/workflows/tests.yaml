@@ -43,9 +43,12 @@ env:
     CHIP_NO_LOG_TIMESTAMPS: true
 
 jobs:
+    changed_paths:
+      uses: ./.github/workflows/analyze-changed-paths.yaml
+
     test_suites_linux:
         name: Test Suites - Linux
-
+        needs: changed_paths
         strategy:
             matrix:
                 build_variant: [no-ble-no-shell-tsan-clang]
@@ -58,11 +61,11 @@ jobs:
             DISABLE_CCACHE: ${{ (github.event_name == 'workflow_dispatch' && inputs.disable_ccache == 'true') && 'true' || (contains(github.event.head_commit.message, '[no-ccache]') && 'true') || 'false' }}
             CCACHE_KEY_SUFFIX: ${{ github.event_name == 'workflow_dispatch' && inputs.cache_suffix || '' }}
 
-        if: github.actor != 'restyled-io[bot]'
+        if: github.actor != 'restyled-io[bot]' && needs.changed_paths.outputs.non_md_changes == 'true'
         runs-on: ubuntu-latest
 
         container:
-            image: ghcr.io/project-chip/chip-build:162
+            image: ghcr.io/project-chip/chip-build:167
             options: >-
                 --privileged --sysctl "net.ipv6.conf.all.disable_ipv6=0
                 net.ipv4.conf.all.forwarding=1 net.ipv6.conf.all.forwarding=1"
@@ -357,12 +360,12 @@ jobs:
                      --all-clusters-app ./out/linux-x64-all-clusters-${BUILD_VARIANT}/chip-all-clusters-app \
                   "
 
-            - name: Run Tests using chip-repl (skip slow)
+            - name: Run Tests using matter-repl (skip slow)
               if: github.event_name == 'pull_request'
               run: |
                   ./scripts/run_in_python_env.sh out/venv \
                   "./scripts/tests/run_test_suite.py \
-                     --runner chip_repl_python \
+                     --runner matter_repl_python \
                      --exclude-tags MANUAL \
                      --exclude-tags FLAKY \
                      --exclude-tags IN_DEVELOPMENT \
@@ -385,12 +388,12 @@ jobs:
                      --energy-gateway-app ./out/linux-x64-energy-gateway-${BUILD_VARIANT}/chip-energy-gateway-app \
                      --energy-management-app ./out/linux-x64-energy-management-${BUILD_VARIANT}/chip-energy-management-app \
                   "
-            - name: Run Tests using chip-repl (including slow)
+            - name: Run Tests using matter-repl (including slow)
               if: github.event_name == 'push'
               run: |
                   ./scripts/run_in_python_env.sh out/venv \
                   "./scripts/tests/run_test_suite.py \
-                     --runner chip_repl_python \
+                     --runner matter_repl_python \
                      run \
                      --iterations 1 \
                      --test-timeout-seconds 120 \
@@ -432,7 +435,7 @@ jobs:
 
     test_suites_darwin:
         name: Test Suites - Darwin
-
+        needs: changed_paths
         strategy:
             matrix:
                 build_variant: [no-ble-no-shell-asan-clang, no-ble-no-shell-tsan-clang]
@@ -443,7 +446,7 @@ jobs:
             TSAN_OPTIONS: "halt_on_error=1"
             LSAN_OPTIONS: detect_leaks=1 suppressions=scripts/tests/chiptest/lsan-mac-suppressions.txt
 
-        if: github.actor != 'restyled-io[bot]'
+        if: github.actor != 'restyled-io[bot]' && needs.changed_paths.outputs.non_md_changes == 'true'
         runs-on: macos-13
 
         steps:
@@ -549,8 +552,8 @@ jobs:
 
     repl_tests_linux:
         name: REPL Tests - Linux
-
-        if: github.actor != 'restyled-io[bot]'
+        needs: changed_paths
+        if: github.actor != 'restyled-io[bot]' && needs.changed_paths.outputs.non_md_changes == 'true'
 
         strategy:
             matrix:
@@ -563,7 +566,7 @@ jobs:
         runs-on: ubuntu-latest
 
         container:
-            image: ghcr.io/project-chip/chip-build:162
+            image: ghcr.io/project-chip/chip-build:167
             options: >-
                 --privileged
                 --sysctl net.ipv6.conf.all.disable_ipv6=0
@@ -788,13 +791,24 @@ jobs:
                   --pw-command-launcher=ccache build --copy-artifacts-to objdir-clone
                   && rm -rf out/linux-x64-closure-${BUILD_VARIANT}-tsan-clang-test"
 
+            - name: Build linux-x64-water-leak-detector
+              env:
+                  CCACHE_DIR: "${GITHUB_WORKSPACE}/.ccache"
+              run: >-
+                  ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py
+                  --target linux-x64-water-leak-detector-${BUILD_VARIANT}-tsan-clang-test
+                  --pw-command-launcher=ccache build --copy-artifacts-to objdir-clone
+                  && rm -rf out/linux-x64-water-leak-detector-${BUILD_VARIANT}-tsan-clang-test"
+
             - name: ccache stats
               run: ccache -s
 
             - name: Install push_av_server dependencies
               run: >-
                   ./scripts/run_in_python_env.sh out/venv \
-                  "python3 -m pip install -r src/tools/push_av_server/requirements.txt"
+                  "python3 -m pip install -r src/tools/push_av_server/requirements.txt \
+                    && patch -d \$(python3 -m pip show hypercorn | grep 'Location: ' | sed 's/Location: //') -p0 < src/tools/push_av_server/hypercorn.patch \
+                  "
 
             - name: Generate an argument environment file
               run: |
@@ -820,6 +834,7 @@ jobs:
                   echo "JF_CONTROL_APP: objdir-clone/linux-x64-jf-control-app/jfc-app" >> /tmp/test_env.yaml
                   echo "JF_ADMIN_APP: objdir-clone/linux-x64-jf-admin-app/jfa-app" >> /tmp/test_env.yaml
                   echo "CLOSURE_APP: objdir-clone/linux-x64-closure-${BUILD_VARIANT}-tsan-clang-test/closure-app" >> /tmp/test_env.yaml
+                  echo "WATER_LEAK_DETECTOR_APP: objdir-clone/linux-x64-water-leak-detector-${BUILD_VARIANT}-tsan-clang-test/water-leak-detector-app" >> /tmp/test_env.yaml
                   echo "PUSH_AV_SERVER: src/tools/push_av_server/server.py" >> /tmp/test_env.yaml
 
                   # Generic trace setups after applications
@@ -839,9 +854,12 @@ jobs:
                   scripts/run_in_python_env.sh out/venv 'python3 src/python_testing/TestDefaultWarnings.py'
                   scripts/run_in_python_env.sh out/venv 'python3 src/python_testing/TestIdChecks.py'
                   scripts/run_in_python_env.sh out/venv 'python3 src/python_testing/TestMatterTestingSupport.py'
+                  scripts/run_in_python_env.sh out/venv 'python3 src/python_testing/TestPics.py'
                   scripts/run_in_python_env.sh out/venv 'python3 src/python_testing/TestSpecParsingDeviceType.py'
+                  scripts/run_in_python_env.sh out/venv 'python3 src/python_testing/TestSpecParsingNamespace.py'
                   scripts/run_in_python_env.sh out/venv 'python3 src/python_testing/TestSpecParsingSelection.py'
                   scripts/run_in_python_env.sh out/venv 'python3 src/python_testing/TestSpecParsingSupport.py'
+                  scripts/run_in_python_env.sh out/venv 'PYTHONPATH=src/python_testing:$PYTHONPATH python3 -m unittest discover -s src/python_testing/mdns_discovery/tests -p "test_*.py"'
 
             - name: Run Tests
               run: |
@@ -863,10 +881,10 @@ jobs:
                   ln -s linux-x64-all-clusters-${BUILD_VARIANT}-clang-test out/linux-x64-all-clusters
 
                   scripts/run_in_python_env.sh out/venv \
-                  "jupyter execute docs/development_controllers/chip-repl/Matter_REPL_Intro.ipynb \
-                  docs/development_controllers/chip-repl/Matter_Basic_Interactions.ipynb \
-                  docs/development_controllers/chip-repl/Matter_Access_Control.ipynb \
-                  docs/development_controllers/chip-repl/Matter_Multi_Fabric_Commissioning.ipynb \
+                  "jupyter execute docs/development_controllers/matter-repl/Matter_REPL_Intro.ipynb \
+                  docs/development_controllers/matter-repl/Matter_Basic_Interactions.ipynb \
+                  docs/development_controllers/matter-repl/Matter_Access_Control.ipynb \
+                  docs/development_controllers/matter-repl/Matter_Multi_Fabric_Commissioning.ipynb \
                   "
 
             - name: Uploading core files
@@ -894,7 +912,7 @@ jobs:
 
     repl_tests_darwin:
         name: REPL Tests - Darwin (Build Only)
-
+        needs: changed_paths
         strategy:
             matrix:
                 build_variant: [no-ble-no-wifi-tsan-clang]
@@ -902,7 +920,7 @@ jobs:
             BUILD_VARIANT: ${{matrix.build_variant}}
             TSAN_OPTIONS: "halt_on_error=1"
 
-        if: github.actor != 'restyled-io[bot]'
+        if: github.actor != 'restyled-io[bot]' && needs.changed_paths.outputs.non_md_changes == 'true'
         runs-on: macos-13
 
         steps:

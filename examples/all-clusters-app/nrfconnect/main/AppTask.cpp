@@ -40,6 +40,7 @@
 #include <static-supported-modes-manager.h>
 #include <static-supported-temperature-levels.h>
 
+#include <platform/nrfconnect/FactoryResetTestEventTriggerHandler.h>
 #ifdef CONFIG_CHIP_WIFI
 #include <platform/nrfconnect/wifi/NrfWiFiDriver.h>
 #endif
@@ -244,8 +245,11 @@ CHIP_ERROR AppTask::Init()
     static CommonCaseDeviceServerInitParams initParams;
     static SimpleTestEventTriggerDelegate sTestEventTriggerDelegate{};
     static OTATestEventTriggerHandler sOtaTestEventTriggerHandler{};
+    static DeviceLayer::FactoryResetTestEventTriggerHandler sFactoryResetEventTriggerHandler{};
     VerifyOrDie(sTestEventTriggerDelegate.Init(ByteSpan(sTestEventTriggerEnableKey)) == CHIP_NO_ERROR);
     VerifyOrDie(sTestEventTriggerDelegate.AddHandler(&sOtaTestEventTriggerHandler) == CHIP_NO_ERROR);
+    VerifyOrDie(sTestEventTriggerDelegate.AddHandler(&sFactoryResetEventTriggerHandler) == CHIP_NO_ERROR);
+    LOG_INF("Factory Reset Test Event Trigger Handler registered");
 #ifdef CONFIG_CHIP_CRYPTO_PSA
     initParams.operationalKeystore = &sPSAOperationalKeystore;
 #endif

@@ -138,8 +138,8 @@ silabs_executable("smoke_co_alarm_app") {
   sources = [
     "${examples_common_plat_dir}/main.cpp",
     "src/AppTask.cpp",
+    "src/DataModelCallbacks.cpp",
     "src/SmokeCoAlarmManager.cpp",
-    "src/ZclCallbacks.cpp",
   ]
 
   deps = [

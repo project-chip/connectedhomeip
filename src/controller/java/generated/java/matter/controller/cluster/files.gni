@@ -217,6 +217,7 @@ matter_structs_sources = [
   "${chip_root}/src/controller/java/generated/java/matter/controller/cluster/structs/WaterHeaterModeClusterModeTagStruct.kt",
   "${chip_root}/src/controller/java/generated/java/matter/controller/cluster/structs/WebRTCTransportProviderClusterICECandidateStruct.kt",
   "${chip_root}/src/controller/java/generated/java/matter/controller/cluster/structs/WebRTCTransportProviderClusterICEServerStruct.kt",
+  "${chip_root}/src/controller/java/generated/java/matter/controller/cluster/structs/WebRTCTransportProviderClusterSFrameStruct.kt",
   "${chip_root}/src/controller/java/generated/java/matter/controller/cluster/structs/WebRTCTransportProviderClusterWebRTCSessionStruct.kt",
   "${chip_root}/src/controller/java/generated/java/matter/controller/cluster/structs/WebRTCTransportRequestorClusterICECandidateStruct.kt",
   "${chip_root}/src/controller/java/generated/java/matter/controller/cluster/structs/WebRTCTransportRequestorClusterICEServerStruct.kt",

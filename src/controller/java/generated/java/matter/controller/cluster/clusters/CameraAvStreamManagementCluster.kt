@@ -73,15 +73,17 @@ class CameraAvStreamManagementCluster(
     object SubscriptionEstablished : VideoSensorParamsAttributeSubscriptionState()
   }
 
-  class MinViewportAttribute(val value: CameraAvStreamManagementClusterVideoResolutionStruct?)
+  class MinViewportResolutionAttribute(
+    val value: CameraAvStreamManagementClusterVideoResolutionStruct?
+  )
 
-  sealed class MinViewportAttributeSubscriptionState {
+  sealed class MinViewportResolutionAttributeSubscriptionState {
     data class Success(val value: CameraAvStreamManagementClusterVideoResolutionStruct?) :
-      MinViewportAttributeSubscriptionState()
+      MinViewportResolutionAttributeSubscriptionState()
 
-    data class Error(val exception: Exception) : MinViewportAttributeSubscriptionState()
+    data class Error(val exception: Exception) : MinViewportResolutionAttributeSubscriptionState()
 
-    object SubscriptionEstablished : MinViewportAttributeSubscriptionState()
+    object SubscriptionEstablished : MinViewportResolutionAttributeSubscriptionState()
   }
 
   class RateDistortionTradeOffPointsAttribute(
@@ -1082,7 +1084,7 @@ class CameraAvStreamManagementCluster(
     }
   }
 
-  suspend fun readMinViewportAttribute(): MinViewportAttribute {
+  suspend fun readMinViewportResolutionAttribute(): MinViewportResolutionAttribute {
     val ATTRIBUTE_ID: UInt = 4u
 
     val attributePath =
@@ -1104,7 +1106,7 @@ class CameraAvStreamManagementCluster(
         it.path.attributeId == ATTRIBUTE_ID
       }
 
-    requireNotNull(attributeData) { "Minviewport attribute not found in response" }
+    requireNotNull(attributeData) { "Minviewportresolution attribute not found in response" }
 
     // Decode the TLV data into the appropriate type
     val tlvReader = TlvReader(attributeData.data)
@@ -1115,13 +1117,13 @@ class CameraAvStreamManagementCluster(
         null
       }
 
-    return MinViewportAttribute(decodedValue)
+    return MinViewportResolutionAttribute(decodedValue)
   }
 
-  suspend fun subscribeMinViewportAttribute(
+  suspend fun subscribeMinViewportResolutionAttribute(
     minInterval: Int,
     maxInterval: Int,
-  ): Flow<MinViewportAttributeSubscriptionState> {
+  ): Flow<MinViewportResolutionAttributeSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 4u
     val attributePaths =
       listOf(
@@ -1140,7 +1142,7 @@ class CameraAvStreamManagementCluster(
       when (subscriptionState) {
         is SubscriptionState.SubscriptionErrorNotification -> {
           emit(
-            MinViewportAttributeSubscriptionState.Error(
+            MinViewportResolutionAttributeSubscriptionState.Error(
               Exception(
                 "Subscription terminated with error code: ${subscriptionState.terminationCause}"
               )
@@ -1153,7 +1155,9 @@ class CameraAvStreamManagementCluster(
               .filterIsInstance<ReadData.Attribute>()
               .firstOrNull { it.path.attributeId == ATTRIBUTE_ID }
 
-          requireNotNull(attributeData) { "Minviewport attribute not found in Node State update" }
+          requireNotNull(attributeData) {
+            "Minviewportresolution attribute not found in Node State update"
+          }
 
           // Decode the TLV data into the appropriate type
           val tlvReader = TlvReader(attributeData.data)
@@ -1164,10 +1168,10 @@ class CameraAvStreamManagementCluster(
               null
             }
 
-          decodedValue?.let { emit(MinViewportAttributeSubscriptionState.Success(it)) }
+          decodedValue?.let { emit(MinViewportResolutionAttributeSubscriptionState.Success(it)) }
         }
         SubscriptionState.SubscriptionEstablished -> {
-          emit(MinViewportAttributeSubscriptionState.SubscriptionEstablished)
+          emit(MinViewportResolutionAttributeSubscriptionState.SubscriptionEstablished)
         }
       }
     }
