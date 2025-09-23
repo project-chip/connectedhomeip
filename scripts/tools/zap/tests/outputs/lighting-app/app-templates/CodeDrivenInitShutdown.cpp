@@ -73,8 +73,13 @@ void MatterClusterServerShutdownCallback(EndpointId endpoint, ClusterId clusterI
     case app::Clusters::BasicInformation::Id:
         MatterBasicInformationClusterShutdownCallback(endpoint);
         break;
+<<<<<<< HEAD
     case app::Clusters::TimeFormatLocalization::Id:
         MatterTimeFormatLocalizationClusterShutdownCallback(endpoint);
+=======
+    case app::Clusters::GeneralCommissioning::Id:
+        MatterGeneralCommissioningClusterShutdownCallback(endpoint);
+>>>>>>> c31485cfc4 (Update the callback function as per latest code driven config)
         break;
     case app::Clusters::DiagnosticLogs::Id:
         MatterDiagnosticLogsClusterShutdownCallback(endpoint);
