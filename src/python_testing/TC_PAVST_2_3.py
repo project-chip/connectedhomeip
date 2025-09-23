@@ -105,7 +105,7 @@ class TC_PAVST_2_3(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
             TestStep(14, "If the zone management cluster is present on this endpoint, TH sends the AllocatePushTransport command with an Null Zone within MotionZones.",
                      "DUT responds with Status Code Success."),
             TestStep(15, "If the zone management cluster is present on this endpoint, TH sends the AllocatePushTransport command with duplicate Zone IDs within MotionZones.",
-                     "DUT responds with Status Code AlredyExists."),                     
+                     "DUT responds with Status Code AlredyExists."),
             TestStep(16, "If the zone management cluster is present on this endpoint, TH sends the AllocatePushTransport command with an invalid ZoneID that is not present in aZones.",
                      "DUT responds with Status Code InvalidZone."),
             TestStep(17, "TH sends the AllocatePushTransport command with a VideoStreamID not present in aAllocatedVideoStreams.",
@@ -269,13 +269,15 @@ class TC_PAVST_2_3(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
 
         # Duplicate Zone ID rejection
         self.step(15)
-        zoneList = [{"zone": 1, "sensitivity": 4},{"zone": 2, "sensitivity": 4},{"zone": 3, "sensitivity": 4},{"zone": 1, "sensitivity": 4}]
+        zoneList = [{"zone": 1, "sensitivity": 4}, {"zone": 2, "sensitivity": 4},
+                    {"zone": 3, "sensitivity": 4}, {"zone": 1, "sensitivity": 4}]
         triggerOptions = {"triggerType": pvcluster.Enums.TransportTriggerTypeEnum.kMotion,
                           "maxPreRollLen": 4000,
                           "motionZones": zoneList,
                           "motionTimeControl": {"initialDuration": 1, "augmentationDuration": 1, "maxDuration": 1, "blindDuration": 1}}
         status = await self.allocate_one_pushav_transport(endpoint, trigger_Options=triggerOptions, tlsEndPoint=tlsEndpointId, url=f"https://{host_ip}:1234/streams/{uploadStreamId}")
-        asserts.assert_equal(status, Status.AlreadyExists, "DUT should respond with Status Code AlreadyExists with a Duplicate Zone.")
+        asserts.assert_equal(status, Status.AlreadyExists,
+                             "DUT should respond with Status Code AlreadyExists with a Duplicate Zone.")
 
         self.step(16)
         try:
