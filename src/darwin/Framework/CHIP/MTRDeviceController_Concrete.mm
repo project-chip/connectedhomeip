@@ -2030,16 +2030,7 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
     }
 
     auto block = ^BOOL {
-        auto optionalParams = self->_cppCommissioner->GetCommissioningParameters();
-        if (!optionalParams.HasValue()) {
-            MTR_LOG_ERROR("%@ Has no commissioning parameters", self);
-            if (error) {
-                *error = [MTRError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE];
-            }
-            return NO;
-        }
-
-        chip::Controller::CommissioningParameters params = optionalParams.Value();
+        chip::Controller::CommissioningParameters params = self->_cppCommissioner->GetCommissioningParameters();
         chip::ByteSpan ssidSpan = AsByteSpan(ssid);
         chip::ByteSpan credentialsSpan;
         if (credentials != nil) {
@@ -2072,16 +2063,7 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
     }
 
     auto block = ^BOOL {
-        auto optionalParams = self->_cppCommissioner->GetCommissioningParameters();
-        if (!optionalParams.HasValue()) {
-            MTR_LOG_ERROR("%@ Has no commissioning parameters", self);
-            if (error) {
-                *error = [MTRError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE];
-            }
-            return NO;
-        }
-
-        chip::Controller::CommissioningParameters params = optionalParams.Value();
+        chip::Controller::CommissioningParameters params = self->_cppCommissioner->GetCommissioningParameters();
         params.SetThreadOperationalDataset(AsByteSpan(operationalDataset));
 
         CHIP_ERROR err = self->_cppCommissioner->UpdateCommissioningParameters(params);
