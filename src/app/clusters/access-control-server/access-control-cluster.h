@@ -39,6 +39,10 @@ class AccessControlCluster : public DefaultServerCluster,
 public:
     AccessControlCluster() : DefaultServerCluster({ kRootEndpointId, AccessControl::Id }) {}
 
+    CHIP_ERROR Startup(ServerClusterContext & context) override;
+
+    void Shutdown() override;
+
     DataModel::ActionReturnStatus ReadAttribute(const DataModel::ReadAttributeRequest & request,
                                                 AttributeValueEncoder & encoder) override;
 
