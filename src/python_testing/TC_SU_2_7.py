@@ -23,19 +23,19 @@
 #   run1:
 #     app: ${OTA_REQUESTOR_APP}
 #     app-args: >
-#       --discriminator 1234
+#       --discriminator 123
 #       --passcode 2123
 #       --secured-device-port 5540
 #       --KVS /tmp/chip_kvs_requestor
+#       --autoApplyImage
 #       --trace-to json:${TRACE_APP}.json
 #     script-args: >
 #       --storage-path admin_storage.json
 #       --commissioning-method on-network
-#       --discriminator 1234
+#       --discriminator 123
 #       --passcode 2123
-#       --vendor-id 65521
-#       --product-id 32769
 #       --endpoint 0
+#       --nodeId 123
 #       --trace-to json:${TRACE_TEST_JSON}.json
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 #     factory-reset: true
