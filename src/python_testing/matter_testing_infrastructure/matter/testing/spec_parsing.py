@@ -74,6 +74,8 @@ ConformanceCallable = conformance_support.Conformance
 
 
 class DataTypeEnum(StrEnum):
+    # String values must match XML tag names exactly for XML parsing (see line 569: container.iter(str(data_type)))
+    # Using StrEnum instead of enum with auto() ensures values are predictable strings, not auto-generated integers
     kStruct = 'struct'
     kEnum = 'enum'
     kBitmap = 'bitmap'
