@@ -1313,24 +1313,14 @@ std::optional<DataModel::ActionReturnStatus> OperationalCredentialsCluster::Invo
 
 void OperationalCredentialsCluster::FabricWillBeRemoved(const FabricTable & fabricTable, FabricIndex fabricIndex)
 {
+
+    // TODO: Most of this implementation seems to be related to BasicInformation cluster, not sure if this link with OpCreds is ok.
     // The Leave event SHOULD be emitted by a Node prior to permanently leaving the Fabric.
-    ReadOnlyBufferBuilder<DataModel::EndpointEntry> endpointBuilder;
-    ReadOnlyBufferBuilder<DataModel::ServerClusterEntry> clusterBuilder;
-
-    ReturnOnFailure(mContext->provider.ServerClusters(mPath.mEndpointId, clusterBuilder));
-
-    auto allClusters = clusterBuilder.TakeBuffer();
-
-    for (const auto & cluster : allClusters)
-    {
-        if (cluster.clusterId == BasicInformation::Id)
-        {
-            BasicInformation::Events::Leave::Type event;
-            event.fabricIndex = fabricIndex;
-
-            (void) mContext->interactionContext.eventsGenerator.GenerateEvent(event, kRootEndpointId);
-        }
-    }
+    // This applies only for the BasicInformation cluster that is always in the Root endpoint and it
+    // is mandatory.
+    BasicInformation::Events::Leave::Type event;
+    event.fabricIndex = fabricIndex;
+    (void) mContext->interactionContext.eventsGenerator.GenerateEvent(event, kRootEndpointId);
 
     // Try to send the queued events as soon as possible for this fabric. If the just emitted leave event won't
     // be sent this time, it will likely not be delivered at all for the following reasons:
@@ -1338,10 +1328,7 @@ void OperationalCredentialsCluster::FabricWillBeRemoved(const FabricTable & fabr
     //   the leave event will be cancelled.
     // - removing the fabric removes all associated access control entries, so generating
     //   subsequent reports containing the leave event will fail the access control check.
-    EventReporter & eventReporter = InteractionModelEngine::GetInstance()->GetReportingEngine();
-
-    // public interface of event delivery is through an event reporter.
-    eventReporter.ScheduleUrgentEventDeliverySync(MakeOptional(fabricIndex));
+    mContext->interactionContext.eventsGenerator.ScheduleUrgentEventDeliverySync(fabricIndex);
 }
 
 void OperationalCredentialsCluster::OnFabricRemoved(const FabricTable & fabricTable, FabricIndex fabricIndex)
