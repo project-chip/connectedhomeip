@@ -496,7 +496,7 @@ class ClusterParser:
                 id = uint(int(xml_field.attrib[component_tags[component_type].id_attrib], 0))
             except (KeyError, ValueError):
                 p = ProblemNotice("Spec XML Parsing", location=location,
-                                  severity=ProblemSeverity.WARNING, problem=f"Struct field in {struct_name} with no id or name")
+                                  severity=ProblemSeverity.WARNING, problem=f"{component_type.value.capitalize()} field in {struct_name} with no id or name")
                 self._problems.append(p)
                 continue
 
@@ -579,7 +579,7 @@ class ClusterParser:
                 except KeyError:
                     location = ClusterPathLocation(0, int(self._cluster_id) if self._cluster_id is not None else 0)
                     self._problems.append(ProblemNotice("Spec XML Parsing", location=location,
-                                          severity=ProblemSeverity.WARNING, problem=f"Struct {element} with no id or name"))
+                                          severity=ProblemSeverity.WARNING, problem=f"{data_type.value.capitalize()} {element} with no name"))
                     continue
 
                 # Ensure we're using a valid cluster ID list, never [None]
