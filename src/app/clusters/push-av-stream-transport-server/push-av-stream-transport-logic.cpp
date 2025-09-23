@@ -29,6 +29,8 @@
 #include <lib/core/CHIPSafeCasts.h>
 #include <lib/support/DefaultStorageKeyAllocator.h>
 #include <protocols/interaction_model/StatusCode.h>
+#include <set>
+#include <vector>
 
 static constexpr uint16_t kMaxConnectionId = 65535; // This is also invalid connectionID
 static constexpr uint16_t kMaxEndpointId   = 65534;
@@ -640,23 +642,52 @@ PushAvStreamTransportServerLogic::HandleAllocatePushTransport(CommandHandler & h
         return std::nullopt;
     }
 
+    DataModel::List<const Structs::TransportZoneOptionsStruct::Type> zoneListNoDups;
+
     // Validate the motion zones in the trigger options
     if ((transportOptions.triggerOptions.triggerType == TransportTriggerTypeEnum::kMotion) &&
         (transportOptions.triggerOptions.motionZones.HasValue()) && (!transportOptions.triggerOptions.motionZones.Value().IsNull()))
     {
 
         auto & motionZonesList = transportOptions.triggerOptions.motionZones;
-        auto iter              = motionZonesList.Value().Value().begin();
+        auto iterDupCheck      = motionZonesList.Value().Value().begin();
         size_t zoneListSize    = 0;
         motionZonesList.Value().Value().ComputeSize(&zoneListSize);
 
-        // To Do: de-duplicate the entries, per issue https://github.com/project-chip/connectedhomeip/issues/41051
+        // If there are duplicate entries, reject the command
+        std::set<uint16_t> zoneIDsFound;
+        bool dupFound = false;
+
+        while (iterDupCheck.Next()) 
+        {
+            auto & transportZoneOption = iterDupCheck.GetValue();
+            if (!transportZoneOption.zone.IsNull())
+            {
+                if (zoneIDsFound.count(transportZoneOption.zone.Value()) == 0)
+                {
+                    // Zone ID not found, add to set of IDs
+                    //
+                    zoneIDsFound.emplace(transportZoneOption.zone.Value());
+                }
+                else
+                {
+                    // This is a duplicate
+                    dupFound = true;
+                    break;
+                }
+            }
+        }
+
+        VerifyOrReturnValue(
+            !dupFound, Status::AlreadyExists,
+            ChipLogError(Zcl, "Transport Options verification from command data[ep=%d]: Duplicate Zone ID in Motion Zones ", mEndpointId));
 
         bool isValidZoneSize = mDelegate->ValidateMotionZoneListSize(zoneListSize);
         VerifyOrReturnValue(
             isValidZoneSize, Status::DynamicConstraintError,
             ChipLogError(Zcl, "Transport Options verification from command data[ep=%d]: Invalid Motion Zone Size ", mEndpointId));
 
+        auto iter = motionZonesList.Value().Value().begin();
         while (iter.Next())
         {
             auto & transportZoneOption = iter.GetValue();
