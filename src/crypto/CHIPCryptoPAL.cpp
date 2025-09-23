@@ -1311,5 +1311,14 @@ const char * PemEncoder::NextLine()
     return hasLine ? mStringBuilder.c_str() : nullptr;
 }
 
+CHIP_ERROR P256Keypair::HazardousOperationLoadKeypairFromRaw(ByteSpan private_key, ByteSpan public_key)
+{
+    Crypto::P256SerializedKeypair serialized_keypair;
+    ReturnErrorOnFailure(serialized_keypair.SetLength(private_key.size() + public_key.size()));
+    memcpy(serialized_keypair.Bytes(), public_key.data(), public_key.size());
+    memcpy(serialized_keypair.Bytes() + public_key.size(), private_key.data(), private_key.size());
+    return this->Deserialize(serialized_keypair);
+}
+
 } // namespace Crypto
 } // namespace chip

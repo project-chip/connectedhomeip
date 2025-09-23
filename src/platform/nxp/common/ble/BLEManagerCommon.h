@@ -54,11 +54,17 @@ using namespace chip::Ble;
  */
 struct BLECallbackDelegate
 {
+    using InitAppCallback    = void (*)(void);
+    using ConnectionCallback = void (*)(deviceId_t id, gapConnectionEvent_t * event);
     using GapGenericCallback = void (*)(gapGenericEvent_t * event);
+    using GapAdvDataCallback = gapAdStructure_t * (*) (uint8_t * size); ///< The returned pointer must be freed by the caller.
     using GattServerCallback = void (*)(deviceId_t id, gattServerEvent_t * event);
 
-    GapGenericCallback gapCallback  = nullptr;
-    GattServerCallback gattCallback = nullptr;
+    InitAppCallback appInitCallback       = nullptr;
+    ConnectionCallback connCallback       = nullptr;
+    GapGenericCallback gapCallback        = nullptr;
+    GapAdvDataCallback gapAdvDataCallback = nullptr;
+    GattServerCallback gattCallback       = nullptr;
 };
 
 typedef enum service_mode_t
@@ -142,7 +148,11 @@ protected:
         BLE_KW_MSG_ATT_READ,
         BLE_KW_MSG_ATT_CCCD_WRITTEN,
         BLE_KW_MSG_FORCE_DISCONNECT,
+        BLE_KW_MSG_APP_EV_CB,
     } blekw_msg_type_t;
+
+    typedef void * blekw_callback_param_t;
+    typedef void (*blekw_callback_handler_t)(blekw_callback_param_t param);
 
     typedef struct hk_ble_kw_msg_s
     {
@@ -156,6 +166,9 @@ protected:
             uint8_t data[1];
             char * str;
         } data;
+        blekw_callback_handler_t handler;
+        blekw_callback_param_t param;
+
     } blekw_msg_t;
 
     typedef enum ble_err_t
@@ -241,19 +254,31 @@ protected:
     static BLEManagerCommon::ble_err_t blekw_stop_advertising(void);
     static void blekw_gap_advertising_cb(gapAdvertisingEvent_t * pAdvertisingEvent);
     static void blekw_gap_connection_cb(deviceId_t deviceId, gapConnectionEvent_t * pConnectionEvent);
+    static gapAdStructure_t * blekw_default_adv_data_cb(uint8_t * size);
     static void blekw_start_connection_timeout(void);
     static void blekw_stop_connection_timeout(void);
     static CHIP_ERROR blekw_stop_connection_internal(BLE_CONNECTION_OBJECT conId);
 
 public:
+    typedef enum
+    {
+        BLE_MSG_APP_EV_CB = blekw_msg_type_t::BLE_KW_MSG_APP_EV_CB,
+    } pub_ble_msg_type_t;
+
     virtual CHIP_ERROR InitHostController(BLECallbackDelegate::GapGenericCallback cb_fp) = 0;
     virtual BLEManagerCommon * GetImplInstance()                                         = 0;
     virtual CHIP_ERROR ResetController() { return CHIP_NO_ERROR; }
+
+    static CHIP_ERROR AddBleAppMsgHandler(pub_ble_msg_type_t type, blekw_callback_handler_t handler, blekw_callback_param_t param);
     void DoBleProcessing(void);
 
     BLECallbackDelegate callbackDelegate;
-    void RegisterAppCallbacks(BLECallbackDelegate::GapGenericCallback gapCallback,
-                              BLECallbackDelegate::GattServerCallback gattCallback);
+    void RegisterAppCallbacks(BLECallbackDelegate::InitAppCallback appInitCallback = nullptr,
+                              BLECallbackDelegate::ConnectionCallback connCallback = nullptr,
+                              BLECallbackDelegate::GapGenericCallback gapCallback  = nullptr,
+                              BLECallbackDelegate::GattServerCallback gattCallback = nullptr);
+
+    void RegisterAdvDataCallback(BLECallbackDelegate::GapAdvDataCallback gapAdvDataCallback);
 
     CHIP_ERROR AddWriteNotificationHandle(uint16_t name);
     CHIP_ERROR AddReadNotificationHandle(uint16_t name);

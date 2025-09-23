@@ -327,6 +327,7 @@ class CADMINBaseTest(MatterBaseTest):
 
         return params, window_status_accumulator
 
+
     async def write_nl_attr(self, dut_node_id: int, th: ChipDeviceCtrl, attr_val: object):
         result = await th.WriteAttribute(nodeid=dut_node_id, attributes=[(0, attr_val)])
         asserts.assert_equal(result[0].Status, Status.Success, f"{th} node label write failed")
@@ -377,7 +378,7 @@ class CADMINBaseTest(MatterBaseTest):
 
         def __post_init__(self):
             # Safely convert CM value to int if present
-            cm_value = self.service.txt_record.get('CM')
+            cm_value = self.service.txt.get('CM')
             if cm_value is not None:
                 try:
                     self.cm = int(cm_value)
@@ -386,7 +387,7 @@ class CADMINBaseTest(MatterBaseTest):
                     self.cm = None
 
             # Safely convert D value to int if present
-            d_value = self.service.txt_record.get('D')
+            d_value = self.service.txt.get('D')
             if d_value is not None:
                 try:
                     self.d = int(d_value)
@@ -418,9 +419,12 @@ class CADMINBaseTest(MatterBaseTest):
             expected_discriminator: int,
             max_attempts: int = 5,
             delay_sec: int = 5):
+
         """Wait for the correct CM value and discriminator in DNS-SD with retries."""
         for attempt in range(max_attempts):
-            raw_services = await self.get_all_txt_records()
+            discovery = mdns_discovery.MdnsDiscovery()
+            raw_services = await discovery.get_commissionable_services(discovery_timeout_sec=240, log_output=True)
+
             services = [self.ParsedService(service) for service in raw_services]
 
             # Look through all services for a match

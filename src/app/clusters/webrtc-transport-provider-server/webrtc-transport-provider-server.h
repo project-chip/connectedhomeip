@@ -290,7 +290,8 @@ public:
 
     /**
      * @brief
-     *   Destructor. Cleans up any internal data, but does not destroy the delegate.
+     *   Destructor. Cleans up any internal data, including unregistering the command handler and attribute interface,
+     *   but does not destroy the delegate.
      */
     ~WebRTCTransportProviderServer() override;
 
@@ -305,9 +306,9 @@ public:
 
     /**
      * @brief
-     *   Unregisters the command handler and attribute interface, releasing resources.
+     *   Handles any cleanup required on the instance or app/delegate prior to the destructor being called.
      */
-    void Shutdown();
+    void Shutdown(){};
 
     /**
      * @brief Get a reference to the current WebRTC sessions.
@@ -318,6 +319,12 @@ public:
      * @return const std::vector<WebRTCSessionStruct>& Reference to the current sessions list.
      */
     const std::vector<WebRTCSessionStruct> & GetCurrentSessions() const { return mCurrentSessions; }
+
+    /**
+     * @brief Removes a WebRTC session given a session ID.
+     *
+     */
+    void RemoveSession(uint16_t sessionId);
 
 private:
     enum class UpsertResultEnum : uint8_t
@@ -333,7 +340,6 @@ private:
     WebRTCSessionStruct * FindSession(uint16_t sessionId);
     WebRTCSessionStruct * CheckForMatchingSession(HandlerContext & ctx, uint16_t sessionId);
     UpsertResultEnum UpsertSession(const WebRTCSessionStruct & session);
-    void RemoveSession(uint16_t sessionId);
     CHIP_ERROR GenerateSessionId(uint16_t & outSessionId);
 
     // Command Handlers

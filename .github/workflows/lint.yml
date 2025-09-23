@@ -36,7 +36,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: ghcr.io/project-chip/chip-build:162
+            image: ghcr.io/project-chip/chip-build:167
 
         steps:
             - name: Checkout
@@ -112,8 +112,6 @@ jobs:
                      --known-failure app/util/attribute-storage.h \
                      --known-failure app/util/attribute-table-detail.h \
                      --known-failure app/util/attribute-table.h \
-                     --known-failure app/util/binding-table.cpp \
-                     --known-failure app/util/binding-table.h \
                      --known-failure app/util/config.h \
                      --known-failure app/util/DataModelHandler.cpp \
                      --known-failure app/util/DataModelHandler.h \

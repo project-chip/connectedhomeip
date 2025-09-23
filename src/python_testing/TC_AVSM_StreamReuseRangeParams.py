@@ -128,11 +128,15 @@ class TC_AVSM_StreamReuseRangeParams(MatterBaseTest):
             watermark = True if (aFeatureMap & cluster.Bitmaps.Feature.kWatermark) != 0 else None
             osd = True if (aFeatureMap & cluster.Bitmaps.Feature.kOnScreenDisplay) != 0 else None
 
+            aMinResolution = Clusters.CameraAvStreamManagement.Structs.VideoResolutionStruct(
+                width=aSnapshotCapabilities[1].resolution.width - 20, height=aSnapshotCapabilities[1].resolution.height - 20)
+            aMaxResolution = Clusters.CameraAvStreamManagement.Structs.VideoResolutionStruct(
+                width=aSnapshotCapabilities[1].resolution.width + 20, height=aSnapshotCapabilities[1].resolution.height + 20)
             snpStreamAllocateCmd = commands.SnapshotStreamAllocate(
-                imageCodec=aSnapshotCapabilities[0].imageCodec,
-                maxFrameRate=aSnapshotCapabilities[0].maxFrameRate,
-                minResolution=aSnapshotCapabilities[0].resolution,
-                maxResolution=aSnapshotCapabilities[0].resolution,
+                imageCodec=aSnapshotCapabilities[1].imageCodec,
+                maxFrameRate=aSnapshotCapabilities[1].maxFrameRate,
+                minResolution=aMinResolution,
+                maxResolution=aMaxResolution,
                 quality=90,
                 watermarkEnabled=watermark,
                 OSDEnabled=osd
@@ -157,12 +161,12 @@ class TC_AVSM_StreamReuseRangeParams(MatterBaseTest):
         self.step(6)
         try:
             newMinResolution = Clusters.CameraAvStreamManagement.Structs.VideoResolutionStruct(
-                width=aSnapshotCapabilities[0].resolution.width + 10, height=aSnapshotCapabilities[0].resolution.height + 10)
+                width=aSnapshotCapabilities[1].resolution.width - 10, height=aSnapshotCapabilities[1].resolution.height - 10)
             newMaxResolution = Clusters.CameraAvStreamManagement.Structs.VideoResolutionStruct(
-                width=aSnapshotCapabilities[0].resolution.width - 10, height=aSnapshotCapabilities[0].resolution.height - 10)
+                width=aSnapshotCapabilities[1].resolution.width + 10, height=aSnapshotCapabilities[1].resolution.height + 10)
             snpStreamAllocateCmd = commands.SnapshotStreamAllocate(
-                imageCodec=aSnapshotCapabilities[0].imageCodec,
-                maxFrameRate=aSnapshotCapabilities[0].maxFrameRate,
+                imageCodec=aSnapshotCapabilities[1].imageCodec,
+                maxFrameRate=aSnapshotCapabilities[1].maxFrameRate,
                 # Select a narrower range for min/max resolution
                 minResolution=newMinResolution,
                 maxResolution=newMaxResolution,

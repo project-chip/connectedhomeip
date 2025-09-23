@@ -27,6 +27,9 @@ constexpr int kVideoH264PayloadType = 96;
 constexpr int kVideoBitRate         = 3000;
 constexpr int kSSRC                 = 42;
 constexpr int kMaxFragmentSize      = 1188; // 1200 (max packet size) - 12 (RTP header size)
+constexpr int kAudioBitRate         = 64000;
+constexpr int kOpusPayloadType      = 111;
+constexpr int kAudioSSRC            = 43;
 
 rtc::Description::Type SDPTypeToRtcType(SDPType type)
 {
@@ -106,13 +109,14 @@ const char * GetGatheringStateStr(rtc::PeerConnection::GatheringState state)
 class LibDataChannelTrack : public WebRTCTrack
 {
 public:
-    LibDataChannelTrack(std::shared_ptr<rtc::Track> track) : mTrack(track) { InitH264Packetizer(); }
+    LibDataChannelTrack(std::shared_ptr<rtc::Track> track, int payloadType = -1) : mTrack(track), mPayloadType(payloadType) {}
     // Initialize libdatachannel's RTP packetizer for H.264
     void InitH264Packetizer()
     {
+        int payloadType = mPayloadType == -1 ? kVideoH264PayloadType : mPayloadType;
         // 90 kHz clock for H.264
-        mRtpCfg = std::make_shared<rtc::RtpPacketizationConfig>(kSSRC, "videosrc", kVideoH264PayloadType,
-                                                                rtc::H264RtpPacketizer::ClockRate);
+        mRtpCfg = std::make_shared<rtc::RtpPacketizationConfig>(kSSRC, "videosrc", payloadType, rtc::H264RtpPacketizer::ClockRate);
+        mRtpCfg->mid = mTrack->description().mid();
 
         // Setting MTU size to 1200 as default size used in the libdatachannel is 1400
         // Pick separator:
@@ -130,10 +134,38 @@ public:
         mTrack->setMediaHandler(mPacketizer);
     }
 
+    void InitOpusPacketizer()
+    {
+        int payloadType = mPayloadType == -1 ? kOpusPayloadType : mPayloadType;
+        mRtpCfgAudio =
+            std::make_shared<rtc::RtpPacketizationConfig>(kAudioSSRC, "mic", payloadType, rtc::OpusRtpPacketizer::DefaultClockRate);
+
+        mRtpCfgAudio->mid = mTrack->description().mid();
+
+        mOpusPacketizer = std::make_shared<rtc::OpusRtpPacketizer>(mRtpCfgAudio);
+        mOpusSr         = std::make_shared<rtc::RtcpSrReporter>(mRtpCfgAudio);
+        mOpusNack       = std::make_shared<rtc::RtcpNackResponder>();
+        mOpusPacketizer->addToChain(mOpusSr);
+        mOpusPacketizer->addToChain(mOpusNack);
+
+        mTrack->setMediaHandler(mOpusPacketizer);
+    }
+
     void SendData(const char * data, size_t size) override
     {
         if (mTrack && mTrack->isOpen())
         {
+            const std::string kind = mTrack->description().type();
+            if (kind == "video" && !mVideoInitDone)
+            {
+                InitH264Packetizer();
+                mVideoInitDone = true;
+            }
+            else if (kind == "audio" && !mAudioInitDone)
+            {
+                InitOpusPacketizer();
+                mAudioInitDone = true;
+            }
             // Feed RAW H.264 access unit. Packetizer does NAL split, FU-A/STAP-A, RTP headers, marker bit, SR/NACK.
             rtc::binary frame(size);
             std::memcpy(frame.data(), data, size);
@@ -143,6 +175,32 @@ public:
         {
             ChipLogError(Camera, "Track is closed");
         }
+    }
+
+    void SendFrame(const char * data, size_t size, int64_t timestamp) override
+    {
+        if (!IsReady())
+        {
+            ChipLogError(Camera, "Track is closed");
+            return;
+        }
+
+        const std::string kind = mTrack->description().type();
+        if (kind == "video" && !mVideoInitDone)
+        {
+            InitH264Packetizer();
+            mVideoInitDone = true;
+        }
+        else if (kind == "audio" && !mAudioInitDone)
+        {
+            InitOpusPacketizer();
+            mAudioInitDone = true;
+        }
+        // Feed RAW H.264 access unit. Packetizer does NAL split, FU-A/STAP-A, RTP headers, marker bit, SR/NACK.
+        rtc::binary frame(size);
+        std::memcpy(frame.data(), data, size);
+        rtc::FrameInfo info(timestamp);
+        mTrack->sendFrame(std::move(frame), info);
     }
 
     bool IsReady() override { return mTrack != nullptr && mTrack->isOpen(); }
@@ -158,11 +216,24 @@ public:
     }
 
 private:
+    // Lazy-init state
+    bool mAudioInitDone = false;
+    bool mVideoInitDone = false;
+
     std::shared_ptr<rtc::Track> mTrack;
+    int mPayloadType;
+
+    // For Video
     std::shared_ptr<rtc::RtpPacketizationConfig> mRtpCfg;
     std::shared_ptr<rtc::H264RtpPacketizer> mPacketizer;
     std::shared_ptr<rtc::RtcpSrReporter> mSr;
     std::shared_ptr<rtc::RtcpNackResponder> mNack;
+
+    // For audio
+    std::shared_ptr<rtc::RtpPacketizationConfig> mRtpCfgAudio;
+    std::shared_ptr<rtc::OpusRtpPacketizer> mOpusPacketizer;
+    std::shared_ptr<rtc::RtcpSrReporter> mOpusSr;
+    std::shared_ptr<rtc::RtcpNackResponder> mOpusNack;
 };
 
 class LibDataChannelPeerConnection : public WebRTCPeerConnection
@@ -217,6 +288,52 @@ public:
         mPeerConnection->setRemoteDescription(rtc::Description(sdp, rtcType));
     }
 
+    int GetPayloadType(const std::string & sdp, SDPType type, const std::string & codec) override
+    {
+        rtc::Description::Type rtcType = SDPTypeToRtcType(type);
+        rtc::Description desc(sdp, rtcType);
+        for (int mid = 0; mid < desc.mediaCount(); mid++)
+        {
+            auto media = desc.media(mid);
+            if (!std::holds_alternative<rtc::Description::Media *>(media))
+                continue;
+
+            rtc::Description::Media * mediaDesc = std::get<rtc::Description::Media *>(media);
+
+            if (mediaDesc == nullptr)
+            {
+                ChipLogError(Camera, "Media Description is null at index=%d", mid);
+                continue;
+            }
+
+            for (int pt : mediaDesc->payloadTypes())
+            {
+                auto * map = mediaDesc->rtpMap(pt);
+                if (map == nullptr)
+                {
+                    ChipLogError(Camera, "No RTP map found for payload type: %d", pt);
+                    continue;
+                }
+                if (map->format == codec)
+                {
+                    ChipLogProgress(Camera, "%s codec has payload type: %d", codec.c_str(), pt);
+                    return pt;
+                }
+            }
+        }
+        ChipLogError(Camera, "Payload type for codec %s not found", codec.c_str());
+        // Return default values for the supported codec
+        if (codec == "H264")
+        {
+            return kVideoH264PayloadType;
+        }
+        else if (codec == "opus")
+        {
+            return kOpusPayloadType;
+        }
+        return -1;
+    }
+
     void AddRemoteCandidate(const std::string & candidate, const std::string & mid) override
     {
         if (mid.empty())
@@ -229,19 +346,29 @@ public:
         }
     }
 
-    std::shared_ptr<WebRTCTrack> AddTrack(MediaType mediaType) override
+    std::shared_ptr<WebRTCTrack> AddTrack(MediaType mediaType, const std::string & mid, int payloadType) override
     {
         if (mediaType == MediaType::Video)
         {
-            rtc::Description::Video media("video", rtc::Description::Direction::SendOnly);
-            media.addH264Codec(kVideoH264PayloadType);
-            media.setBitrate(kVideoBitRate);
-            auto track = mPeerConnection->addTrack(media);
-            return std::make_shared<LibDataChannelTrack>(track);
+            std::string videoMid = mid.empty() ? "video" : mid;
+            rtc::Description::Video vMedia(videoMid, rtc::Description::Direction::SendOnly);
+            vMedia.addH264Codec(payloadType);
+            vMedia.setBitrate(kVideoBitRate);
+            vMedia.addSSRC(kSSRC, "video-stream", "stream1", "video-stream");
+            auto track = mPeerConnection->addTrack(vMedia);
+            return std::make_shared<LibDataChannelTrack>(track, payloadType);
         }
 
-        // TODO: Add audio track support
-        ChipLogProgress(Camera, "Audio track support is not yet implemented");
+        if (mediaType == MediaType::Audio)
+        {
+            std::string audioMid = mid.empty() ? "audio" : mid;
+            rtc::Description::Audio aMedia(audioMid, rtc::Description::Direction::SendRecv);
+            aMedia.addOpusCodec(payloadType);
+            aMedia.setBitrate(kAudioBitRate);
+            aMedia.addSSRC(kAudioSSRC, "audio-stream", "stream1", "audio-stream");
+            auto track = mPeerConnection->addTrack(aMedia);
+            return std::make_shared<LibDataChannelTrack>(track, payloadType);
+        }
         return nullptr;
     }
 

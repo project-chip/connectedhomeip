@@ -1104,7 +1104,7 @@ def Read(transaction: AsyncReadTransaction, device,
          attributes: Optional[List[AttributePath]] = None, dataVersionFilters: Optional[List[DataVersionFilter]] = None,
          events: Optional[List[EventPath]] = None, eventNumberFilter: Optional[int] = None,
          subscriptionParameters: Optional[SubscriptionParameters] = None,
-         fabricFiltered: bool = True, keepSubscriptions: bool = False, autoResubscribe: bool = True) -> PyChipError:
+         fabricFiltered: bool = True, keepSubscriptions: bool = False, autoResubscribe: bool = True, allowLargePayload: Union[None, bool] = None) -> PyChipError:
     if (not attributes) and dataVersionFilters:
         raise ValueError(
             "Must provide valid attribute list when data version filters is not null")
@@ -1207,7 +1207,8 @@ def Read(transaction: AsyncReadTransaction, device,
                 0 if dataVersionFilters is None else len(dataVersionFilters)),
             eventPathsForCffi,
             ctypes.c_size_t(0 if events is None else len(events)),
-            eventNumberFilterPtr))
+            eventNumberFilterPtr,
+            ctypes.c_bool(allowLargePayload or False)))
 
     transaction.SetClientObjPointers(readClientObj)
 

@@ -60,11 +60,17 @@ if CHIP_APP_BLE_MANAGER
             depends on CHIP_NXP_MULTIPLE_BLE_CONNECTIONS && !CHIP_DEVICE_USE_ZEPHYR_BLE
             help
                 Enable application custom MCXW7x BLE manager.
-        
+
         config CHIP_APP_BLE_MANAGER_EMPTY
             bool "App BLE Manager Empty"
             help
                 Enable application BLE manager empty implementation.
+
+        config CHIP_APP_BLE_MANAGER_CUSTOM_EXTERNAL
+            bool "App Custom BLE Manager External"
+            default n
+            help
+                Enable application custom externally linked (e.g from mcuxsdk-examples-matter) BLE manager.
 
     endchoice # CHIP_APP_BLE_MANAGER
 

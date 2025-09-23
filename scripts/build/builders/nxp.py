@@ -380,6 +380,12 @@ class NxpBuilder(GnBuilder):
         if self.se05x_enable:
             flags.append('-DCONFIG_CHIP_SE05X=y')
 
+        if self.board in (NxpBoard.MCXW71, NxpBoard.MCXW72):
+            flags.append('-DCONFIG_MCUX_COMPONENT_middleware.freertos-kernel.config=n')
+
+        if self.board == NxpBoard.MCXW72:
+            flags.append('-Dcore_id=cm33_core0')
+
         build_flags = " ".join(flags)
 
         return build_flags
@@ -395,7 +401,8 @@ class NxpBuilder(GnBuilder):
             "br" if self.enable_wifi and self.enable_thread else None,
             "ota" if self.enable_ota else None,
             "fdata" if self.enable_factory_data else None,
-            "onnetwork" if self.disable_ble else None
+            "onnetwork" if self.disable_ble else None,
+            "low_power" if self.low_power else None
         ]
 
         prj_file = "_".join(filter(None, components)) + ".conf"

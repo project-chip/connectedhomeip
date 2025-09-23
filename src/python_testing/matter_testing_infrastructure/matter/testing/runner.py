@@ -737,6 +737,8 @@ def convert_args_to_matter_config(args: argparse.Namespace):
     config.tests = list(chain.from_iterable(args.tests or []))
     config.timeout = args.timeout  # This can be none, we pull the default from the test if it's unspecified
     config.endpoint = args.endpoint  # This can be None, the get_endpoint function allows the tests to supply a default
+    config.restart_flag_file = args.restart_flag_file
+
     # Map CLI arg to the current config field name used by tests
     config.pipe_name = args.app_pipe
     if config.pipe_name is not None and not os.path.exists(config.pipe_name):
@@ -804,6 +806,8 @@ def parse_matter_test_args(argv: Optional[List[str]] = None):
                              'and NodeID to assign if commissioning (default: %d)' % TestingDefaults.DUT_NODE_ID, nargs="+")
     basic_group.add_argument('--endpoint', type=int, default=None, help="Endpoint under test")
     basic_group.add_argument('--app-pipe', type=str, default=None, help="The full path of the app to send an out-of-band command")
+    basic_group.add_argument('--restart-flag-file', type=str, default=None,
+                             help="The full path of the file to use to signal a restart to the app")
     basic_group.add_argument('--timeout', type=int, help="Test timeout in seconds")
     basic_group.add_argument("--PICS", help="PICS file path", type=str)
 
@@ -895,7 +899,7 @@ def parse_matter_test_args(argv: Optional[List[str]] = None):
     if not argv:
         argv = sys.argv[1:]
 
-    return convert_args_to_matter_config(parser.parse_known_args(argv)[0])
+    return convert_args_to_matter_config(parser.parse_args(argv))
 
 
 def int_decimal_or_hex(s: str) -> int:

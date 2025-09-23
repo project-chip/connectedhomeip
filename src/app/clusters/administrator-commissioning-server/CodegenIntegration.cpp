@@ -48,52 +48,65 @@ using ClusterImpl = AdministratorCommissioningWithBasicCommissioningWindowCluste
 using ClusterImpl = AdministratorCommissioningCluster;
 #endif
 
+// Exactly one instance allocated: implementation here supports root-node functionality and does not support
+// generic functionality (e.g. for multi fabric)
 LazyRegisteredServerCluster<ClusterImpl> gServer;
 
 class IntegrationDelegate : public CodegenClusterIntegration::Delegate
 {
 public:
-    ServerClusterRegistration & CreateRegistration(EndpointId endpointId, unsigned emberEndpointIndex,
+    ServerClusterRegistration & CreateRegistration(EndpointId endpointId, unsigned clusterInstanceIndex,
                                                    uint32_t optionalAttributeBits, uint32_t featureMap) override
     {
         gServer.Create(endpointId, BitFlags<AdministratorCommissioning::Feature>(featureMap));
         return gServer.Registration();
     }
 
-    ServerClusterInterface & FindRegistration(unsigned emberEndpointIndex) override { return gServer.Cluster(); }
-    void ReleaseRegistration(unsigned emberEndpointIndex) override { gServer.Destroy(); }
+    ServerClusterInterface * FindRegistration(unsigned clusterInstanceIndex) override
+    {
+        VerifyOrReturnValue(gServer.IsConstructed(), nullptr);
+        return &gServer.Cluster();
+    }
+    void ReleaseRegistration(unsigned clusterInstanceIndex) override { gServer.Destroy(); }
 };
 
 } // namespace
 
-void emberAfAdministratorCommissioningClusterServerInitCallback(EndpointId endpointId)
+void MatterAdministratorCommissioningClusterInitCallback(EndpointId endpointId)
 {
+    // The implementation of the server we use here is only for the RootNode (i.e. endpoint 0)
+    // singleton. Other uses (e.g. fabric sync) will need their own implementations and would be added
+    // separately.
+    VerifyOrReturn(endpointId == kRootEndpointId);
+
     IntegrationDelegate integrationDelegate;
 
     // register a singleton server (root endpoint only)
     CodegenClusterIntegration::RegisterServer(
         {
-            .endpointId                      = endpointId,
-            .clusterId                       = AdministratorCommissioning::Id,
-            .fixedClusterServerEndpointCount = 1,
-            .maxEndpointCount                = 1,
-            .fetchFeatureMap                 = true,
-            .fetchOptionalAttributes         = false,
+            .endpointId                = endpointId,
+            .clusterId                 = AdministratorCommissioning::Id,
+            .fixedClusterInstanceCount = AdministratorCommissioning::StaticApplicationConfig::kFixedClusterConfig.size(),
+            .maxClusterInstanceCount   = 1, // only root-node functionality supported by this implementation
+            .fetchFeatureMap           = true,
+            .fetchOptionalAttributes   = false,
         },
         integrationDelegate);
 }
 
-void MatterAdministratorCommissioningClusterServerShutdownCallback(EndpointId endpointId)
+void MatterAdministratorCommissioningClusterShutdownCallback(EndpointId endpointId)
 {
+    VerifyOrReturn(endpointId == kRootEndpointId);
+
     IntegrationDelegate integrationDelegate;
 
-    // register a singleton server (root endpoint only)
+    // unregister a singleton server (root endpoint only)
     CodegenClusterIntegration::UnregisterServer(
         {
-            .endpointId                      = endpointId,
-            .clusterId                       = AdministratorCommissioning::Id,
-            .fixedClusterServerEndpointCount = 1,
-            .maxEndpointCount                = 1,
+            .endpointId                = endpointId,
+            .clusterId                 = AdministratorCommissioning::Id,
+            .fixedClusterInstanceCount = AdministratorCommissioning::StaticApplicationConfig::kFixedClusterConfig.size(),
+            .maxClusterInstanceCount   = 1, // only root-node functionality supported by this implementation
         },
         integrationDelegate);
 }
