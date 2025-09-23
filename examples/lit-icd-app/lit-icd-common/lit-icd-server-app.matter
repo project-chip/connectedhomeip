@@ -2346,7 +2346,7 @@ endpoint 0 {
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    ram      attribute featureMap;
+    callback attribute featureMap;
     callback attribute clusterRevision default = 3;
 
     handle command RegisterClient;

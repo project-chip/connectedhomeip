@@ -348,7 +348,8 @@
             "ICDCounter",
             "ClientsSupportedPerFabric",
             "MaximumCheckInBackOff",
-            "OperatingMode"
+            "OperatingMode",
+            "FeatureMap"
         ],
         "Joint Fabric Datastore": ["Status"],
         "Meter Identification": [

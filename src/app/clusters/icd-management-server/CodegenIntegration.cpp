@@ -40,11 +40,8 @@ static IcdManagementFabricDelegate gFabricDelegate;
 constexpr chip::BitMask<OptionalCommands> kEnabledCommands()
 {
     chip::BitMask<OptionalCommands> result;
-#ifdef ICD_MANAGEMENT_STAY_ACTIVE_REQUEST_COMMAND
-    result.Set(kStayActiveRequest);
-#endif
-#ifdef ICD_MANAGEMENT_STAY_ACTIVE_RESPONSE_COMMAND
-    result.Set(kStayActiveResponse);
+#if defined(ICD_MANAGEMENT_STAY_ACTIVE_REQUEST_COMMAND) || defined(ICD_MANAGEMENT_STAY_ACTIVE_RESPONSE_COMMAND)
+    result.Set(kStayActive);
 #endif
     return result;
 }
@@ -84,8 +81,7 @@ public:
 
         gServer.Create(Server::GetInstance().GetPersistentStorage(), *Server::GetInstance().GetSessionKeystore(),
                        Server::GetInstance().GetFabricTable(), ICDConfigurationData::GetInstance().GetInstance(),
-                       BitFlags<IcdManagement::Feature>(featureMap), optionalAttributeSet, enabledCommands,
-                       userActiveModeTriggerHint, userActiveModeTriggerInstruction);
+                       optionalAttributeSet, enabledCommands, userActiveModeTriggerHint, userActiveModeTriggerInstruction);
         return gServer.Registration();
     }
 
@@ -108,7 +104,7 @@ void MatterIcdManagementPluginServerInitCallback()
             .clusterId                       = IcdManagement::Id,
             .fixedClusterServerEndpointCount = IcdManagement::StaticApplicationConfig::kFixedClusterConfig.size(),
             .maxEndpointCount                = 1, // only root-node functionality supported by this implementation
-            .fetchFeatureMap                 = true,
+            .fetchFeatureMap                 = false,
             .fetchOptionalAttributes         = true,
         },
         integrationDelegate);

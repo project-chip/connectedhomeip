@@ -44,12 +44,13 @@ using SymmetricKeystore = SessionKeystore;
 namespace app {
 namespace Clusters {
 
+namespace IcdManagement {
 enum class OptionalCommands : uint32_t
 {
-    kStayActiveRequest  = 0x01,
-    kStayActiveResponse = 0x02,
+    kStayActive = 0x01,
 };
 constexpr size_t kUserActiveModeTriggerInstructionMaxLength = 128;
+} // namespace IcdManagement
 
 #if CHIP_CONFIG_ENABLE_ICD_CIP
 /**
@@ -88,8 +89,7 @@ public:
 
     ICDManagementCluster(PersistentStorageDelegate & storage, Crypto::SymmetricKeystore & symmetricKeystore,
                          FabricTable & fabricTable, ICDConfigurationData & icdConfigurationData,
-                         BitFlags<IcdManagement::Feature> aFeatureMap, OptionalAttributeSet optionalAttributeSet,
-                         BitMask<OptionalCommands> aEnabledCommands,
+                         OptionalAttributeSet optionalAttributeSet, BitMask<IcdManagement::OptionalCommands> aEnabledCommands,
                          BitMask<IcdManagement::UserActiveModeTriggerBitmap> aUserActiveModeTriggerBitmap,
                          CharSpan aUserActiveModeTriggerInstruction) :
         DefaultServerCluster({ kRootEndpointId, IcdManagement::Id })
@@ -98,7 +98,7 @@ public:
         mStorage(storage), mSymmetricKeystore(symmetricKeystore), mFabricTable(fabricTable)
 #endif // CHIP_CONFIG_ENABLE_ICD_CIP
         ,
-        mICDConfigurationData(icdConfigurationData), mFeatureMap(aFeatureMap), mOptionalAttributeSet(optionalAttributeSet),
+        mICDConfigurationData(icdConfigurationData), mOptionalAttributeSet(optionalAttributeSet),
         mEnabledCommands(aEnabledCommands), mUserActiveModeTriggerBitmap(aUserActiveModeTriggerBitmap)
     {
         MutableCharSpan buffer(mUserActiveModeTriggerInstruction);
@@ -159,11 +159,10 @@ private:
     CHIP_ERROR CheckAdmin(CommandHandler * commandObj, const ConcreteCommandPath & commandPath, bool & isClientAdmin);
 
     chip::ICDConfigurationData & mICDConfigurationData;
-    BitFlags<IcdManagement::Feature> mFeatureMap;
     const OptionalAttributeSet mOptionalAttributeSet;
-    BitMask<OptionalCommands> mEnabledCommands;
+    BitMask<IcdManagement::OptionalCommands> mEnabledCommands;
     BitMask<IcdManagement::UserActiveModeTriggerBitmap> mUserActiveModeTriggerBitmap;
-    char mUserActiveModeTriggerInstruction[kUserActiveModeTriggerInstructionMaxLength];
+    char mUserActiveModeTriggerInstruction[IcdManagement::kUserActiveModeTriggerInstructionMaxLength];
 };
 
 } // namespace Clusters
