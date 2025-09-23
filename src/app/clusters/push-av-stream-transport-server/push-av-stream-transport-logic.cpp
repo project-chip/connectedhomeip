@@ -641,8 +641,6 @@ PushAvStreamTransportServerLogic::HandleAllocatePushTransport(CommandHandler & h
         return std::nullopt;
     }
 
-    DataModel::List<const Structs::TransportZoneOptionsStruct::Type> zoneListNoDups;
-
     // Validate the motion zones in the trigger options
     if ((transportOptions.triggerOptions.triggerType == TransportTriggerTypeEnum::kMotion) &&
         (transportOptions.triggerOptions.motionZones.HasValue()) && (!transportOptions.triggerOptions.motionZones.Value().IsNull()))
