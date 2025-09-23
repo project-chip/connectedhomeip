@@ -220,19 +220,27 @@ class TC_PAVST_2_3(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
 
         self.step(10)
         if self.pics_guard(self.check_pics("PAVST.S")):
-            status = await self.send_single_cmd(cmd=pvcluster.Commands.AllocatePushTransport(
-                {"streamUsage": 0,
-                 "videoStreamID": 1,
-                 "audioStreamID": 1,
-                 "endpointID": 5,
-                 "url": "https://{host_ip}:1234/streams/1",
-                 "triggerOptions": {"triggerType": 2},
-                 "ingestMethod": 0,
-                 "containerOptions": {"containerType": 0, "CMAFContainerOptions": {"chunkDuration": 4}},
-                 "expiryTime": 5
-                 }), endpoint=endpoint)
-            asserts.assert_equal(status, pvcluster.Enums.StatusCodeEnum.kInvalidTLSEndpoint,
-                                 "DUT must respond with Status Code InvalidTLSEndpoint.")
+            try:
+                status = await self.send_single_cmd(cmd=pvcluster.Commands.AllocatePushTransport(
+                    {
+                        "streamUsage": 0,
+                        "videoStreamID": 1,
+                        "audioStreamID": 1,
+                        "endpointID": 5,
+                        "url": f"https://{host_ip}:1234/streams/1",
+                        "triggerOptions": {"triggerType": 2},
+                        "ingestMethod": 0,
+                        "containerOptions": {
+                            "containerType": 0,
+                            "CMAFContainerOptions": {"CMAFInterface": 0, "segmentDuration": 4000, "chunkDuration": 2000, "sessionGroup": 1, "trackName": "media"}
+                        },
+                        "expiryTime": 5
+                    }), endpoint=endpoint)
+                asserts.assert_equal(status, pvcluster.Enums.StatusCodeEnum.kInvalidTLSEndpoint,
+                                     "DUT must responds with Status Code InvalidTLSEndpoint.")
+            except InteractionModelError as e:
+                asserts.assert_equal(e.clusterStatus, pvcluster.Enums.StatusCodeEnum.kInvalidTLSEndpoint,
+                                     "DUT must responds with Status Code InvalidTLSEndpoint.")
 
         self.step(11)
         status = await self.allocate_one_pushav_transport(endpoint, ingestMethod=pvcluster.Enums.IngestMethodsEnum.kUnknownEnumValue,
