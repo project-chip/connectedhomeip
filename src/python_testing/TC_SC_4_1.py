@@ -173,7 +173,7 @@ class TC_SC_4_1(MatterBaseTest):
         # Verify target hostname is derived from the 48bit or 64bit MAC address
         # expressed as a twelve or sixteen capital letter hex string. If the MAC
         # is randomized for privacy, the randomized version must be used each time.
-        assert_valid_hostname(commissionable_service.server)
+        assert_valid_hostname(commissionable_service.hostname)
 
         # Get commissionable subtypes
         subtypes = await mdns.get_commissionable_subtypes(log_output=True)
@@ -210,37 +210,37 @@ class TC_SC_4_1(MatterBaseTest):
         # Verify D key is present, which represents the discriminator
         # and must be encoded as a variable-length decimal value with up to 4
         # digits omitting any leading zeros
-        d_key = commissionable_service.txt_record.get('D')
+        d_key = commissionable_service.txt.get('D')
         asserts.assert_is_not_none(d_key, "D key must be present.")
         assert_valid_d_key(d_key)
 
         # If VP key is present, verify it contain at least Vendor ID
         # and if Product ID is present, values must be separated by a + sign
-        if 'VP' in commissionable_service.txt_record:
-            vp_key = commissionable_service.txt_record['VP']
+        if 'VP' in commissionable_service.txt:
+            vp_key = commissionable_service.txt['VP']
             if vp_key:
                 assert_valid_vp_key(vp_key)
 
         # If SAI key is present, SII key must be an unsigned integer with
         # units of milliseconds and shall be encoded as a variable length decimal
         # number in ASCII, omitting leading zeros. Shall not exceed 3600000.
-        if 'SII' in commissionable_service.txt_record:
-            sii_key = commissionable_service.txt_record['SII']
+        if 'SII' in commissionable_service.txt:
+            sii_key = commissionable_service.txt['SII']
             if sii_key:
                 assert_valid_sii_key(sii_key)
 
         # If SAI key is present, SAI key must be an unsigned integer with
         # units of milliseconds and shall be encoded as a variable length decimal
         # number in ASCII, omitting leading zeros. Shall not exceed 3600000.
-        if 'SAI' in commissionable_service.txt_record:
-            sai_key = commissionable_service.txt_record['SAI']
+        if 'SAI' in commissionable_service.txt:
+            sai_key = commissionable_service.txt['SAI']
             if sai_key:
                 assert_valid_sai_key(sai_key)
 
         # - If the SAT key is present, verify that it is a decimal value with
         #   no leading zeros and is less than or equal to 65535
-        if 'SAT' in commissionable_service.txt_record:
-            sat_key = commissionable_service.txt_record['SAT']
+        if 'SAT' in commissionable_service.txt:
+            sat_key = commissionable_service.txt['SAT']
             if sat_key:
                 assert_valid_sat_key(sat_key)
 
@@ -252,15 +252,15 @@ class TC_SC_4_1(MatterBaseTest):
 
         # Verify that the SAI key is present if the SAT key is present
         asserts.assert_true(
-            'SAT' not in commissionable_service.txt_record
-            or 'SAI' in commissionable_service.txt_record,
+            'SAT' not in commissionable_service.txt
+            or 'SAI' in commissionable_service.txt,
             "SAI key must be present if SAT key is present."
         )
 
         # TODO: how to make CM = 1, getting CM = 2 currently, why 1?
         # # Verify that the CM key is present and is equal to 1
-        # if 'CM' in commissionable_service.txt_record:
-        #     cm_key = commissionable_service.txt_record['CM']
+        # if 'CM' in commissionable_service.txt:
+        #     cm_key = commissionable_service.txt['CM']
         #     assert_valid_cm_key(cm_key)
         #     asserts.assert_true(cm_key == "1", f"CM key must be equal to 1, got {cm_key}")
         # else:
@@ -269,38 +269,38 @@ class TC_SC_4_1(MatterBaseTest):
         # If the DT key is present, it must contain the device type identifier from
         # Data Model Device Types and must be encoded as a variable length decimal
         # ASCII number without leading zeros
-        if 'DT' in commissionable_service.txt_record:
-            dt_key = commissionable_service.txt_record['DT']
+        if 'DT' in commissionable_service.txt:
+            dt_key = commissionable_service.txt['DT']
             assert_valid_dt_key(dt_key)
 
         # If the DN key is present, DN key must be a UTF-8 encoded string with a maximum length of 32B
-        if 'DN' in commissionable_service.txt_record:
-            dn_key = commissionable_service.txt_record['DN']
+        if 'DN' in commissionable_service.txt:
+            dn_key = commissionable_service.txt['DN']
             assert_valid_dn_key(dn_key)
 
         # If the RI key is present, key RI must include the Rotating Device Identifier
         # encoded as an uppercase string with a maximum length of 100 chars (each octet
         # encoded as a 2-digit hex number, max 50 octets)
-        if 'RI' in commissionable_service.txt_record:
-            ri_key = commissionable_service.txt_record['RI']
+        if 'RI' in commissionable_service.txt:
+            ri_key = commissionable_service.txt['RI']
             assert_valid_ri_key(ri_key)
 
         # If the PH key is present, key PH must be encoded as a variable-length decimal number
         # in ASCII text, omitting any leading zeros. If present value must be different of 0
-        if 'PH' in commissionable_service.txt_record:
-            ph_key = commissionable_service.txt_record['PH']
+        if 'PH' in commissionable_service.txt:
+            ph_key = commissionable_service.txt['PH']
             assert_valid_ph_key(ph_key)
 
         # TODO: Fix PI key present but null/None ??
         # If the PI key is present, key PI must be encoded as a valid UTF-8 string
         # with a maximum length of 128 bytes
-        if 'PI' in commissionable_service.txt_record:
-            pi_key = commissionable_service.txt_record['PI']
+        if 'PI' in commissionable_service.txt:
+            pi_key = commissionable_service.txt['PI']
             # assert_valid_pi_key(pi_key)
 
         # TH performs a query for the AAAA record against the target
         # listed in the Commissionable Service SRV record.
-        hostname = commissionable_service.server
+        hostname = commissionable_service.hostname
         quada_records = await mdns.get_quada_records(hostname=hostname, log_output=True)
 
         # Verify at least 1 AAAA record is returned
