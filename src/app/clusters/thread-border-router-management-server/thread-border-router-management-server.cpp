@@ -300,7 +300,7 @@ void ServerInstance::CommitSavedBreadcrumb()
 {
     if (mBreadcrumb.HasValue())
     {
-        GeneralCommissioningCluster::Instance().SetBreadCrumb(breadcrumb.Value());
+        GeneralCommissioningCluster::Instance().SetBreadCrumb(mBreadcrumb.Value());
     }
     mBreadcrumb.ClearValue();
 }
