@@ -2931,10 +2931,10 @@
     const EmberAfGenericClusterFunction chipFuncArrayGroupsServer[] = {                                                            \
         (EmberAfGenericClusterFunction) emberAfGroupsClusterServerInitCallback,                                                    \
     };                                                                                                                             \
-
     const EmberAfGenericClusterFunction chipFuncArrayDescriptorServer[] = {                                                        \
         (EmberAfGenericClusterFunction) emberAfDescriptorClusterServerInitCallback,                                                \
-    };                                                                                                                             \                                                                                                                         \
+        (EmberAfGenericClusterFunction) MatterDescriptorClusterServerShutdownCallback,                                             \
+    };                                                                                                                             \
     const EmberAfGenericClusterFunction chipFuncArrayLocalizationConfigurationServer[] = {                                         \
         (EmberAfGenericClusterFunction) emberAfLocalizationConfigurationClusterServerInitCallback,                                 \
         (EmberAfGenericClusterFunction) MatterLocalizationConfigurationClusterServerPreAttributeChangedCallback,                   \

@@ -730,6 +730,10 @@
 
 // Cluster function static arrays
 #define GENERATED_FUNCTION_ARRAYS                                                                                                  \
+    const EmberAfGenericClusterFunction chipFuncArrayDescriptorServer[] = {                                                        \
+        (EmberAfGenericClusterFunction) emberAfDescriptorClusterServerInitCallback,                                                \
+        (EmberAfGenericClusterFunction) MatterDescriptorClusterServerShutdownCallback,                                             \
+    };                                                                                                                             \
     const EmberAfGenericClusterFunction chipFuncArrayLocalizationConfigurationServer[] = {                                         \
         (EmberAfGenericClusterFunction) emberAfLocalizationConfigurationClusterServerInitCallback,                                 \
         (EmberAfGenericClusterFunction) MatterLocalizationConfigurationClusterServerPreAttributeChangedCallback,                   \
