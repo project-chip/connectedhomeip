@@ -1211,13 +1211,13 @@ DataModel::ActionReturnStatus OperationalCredentialsCluster::ReadAttribute(const
     case OperationalCredentials::Attributes::Fabrics::Id:
         return ReadFabricsList(encoder, mFabricTable);
     case OperationalCredentials::Attributes::SupportedFabrics::Id:
-        return encoder.Encode(CHIP_CONFIG_MAX_FABRICS);
+        return encoder.Encode(static_cast<uint8_t>(CHIP_CONFIG_MAX_FABRICS));
     case OperationalCredentials::Attributes::CommissionedFabrics::Id:
         return encoder.Encode(mFabricTable.FabricCount());
     case OperationalCredentials::Attributes::TrustedRootCertificates::Id:
         return ReadRootCertificates(encoder, mFabricTable);
     case OperationalCredentials::Attributes::CurrentFabricIndex::Id:
-        return encoder.Encode(encoder.AccessingFabricIndex());
+        return encoder.Encode(static_cast<uint8_t>(encoder.AccessingFabricIndex()));
     default:
         return Protocols::InteractionModel::Status::UnsupportedAttribute;
     }
