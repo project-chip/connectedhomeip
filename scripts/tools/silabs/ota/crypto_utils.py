@@ -380,10 +380,11 @@ class rijndael:
 
 def encryptFlashData(nonce, key, data, imageLen):
     encyptedBlock = ''
-    if (imageLen % 16) != 0:
-        for x in range(16 - (imageLen % 16)):
-            data = data + bytes([255])
-        imageLen = len(data)
+    block_size = 16
+    # pad using PKCS#7 padding
+    pad_len = block_size - (imageLen % block_size)
+    data = data + bytes([pad_len] * pad_len)
+    imageLen = len(data)
 
     r = rijndael(key, block_size=16)
 

@@ -108,7 +108,7 @@ class CADMINBaseTest(MatterBaseTest):
 
         def __post_init__(self):
             # Safely convert CM value to int if present
-            cm_value = self.service.txt_record.get('CM')
+            cm_value = self.service.txt.get('CM')
             if cm_value is not None:
                 try:
                     self.cm = int(cm_value)
@@ -117,7 +117,7 @@ class CADMINBaseTest(MatterBaseTest):
                     self.cm = None
 
             # Safely convert D value to int if present
-            d_value = self.service.txt_record.get('D')
+            d_value = self.service.txt.get('D')
             if d_value is not None:
                 try:
                     self.d = int(d_value)

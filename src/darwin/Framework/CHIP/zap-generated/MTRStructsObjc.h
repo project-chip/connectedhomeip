@@ -1176,6 +1176,16 @@ MTR_PROVISIONALLY_AVAILABLE
 @property (nonatomic, copy) NSNumber * _Nonnull fabricIndex MTR_PROVISIONALLY_AVAILABLE;
 @end
 
+MTR_PROVISIONALLY_AVAILABLE
+@interface MTRGroupcastClusterMembershipStruct : NSObject <NSCopying>
+@property (nonatomic, copy) NSNumber * _Nonnull groupID MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSArray * _Nonnull endpoints MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nonnull keyID MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nonnull hasAuxiliaryACL MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nullable expiringKeyID MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nonnull fabricIndex MTR_PROVISIONALLY_AVAILABLE;
+@end
+
 MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6))
 @interface MTRHEPAFilterMonitoringClusterReplacementProductStruct : NSObject <NSCopying>
 @property (nonatomic, copy) NSNumber * _Nonnull productIdentifierType MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6));
@@ -2415,6 +2425,13 @@ MTR_PROVISIONALLY_AVAILABLE
 @interface MTRCameraAVSettingsUserLevelManagementClusterDPTZStruct : NSObject <NSCopying>
 @property (nonatomic, copy) NSNumber * _Nonnull videoStreamID MTR_PROVISIONALLY_AVAILABLE;
 @property (nonatomic, copy) MTRDataTypeViewportStruct * _Nonnull viewport MTR_PROVISIONALLY_AVAILABLE;
+@end
+
+MTR_PROVISIONALLY_AVAILABLE
+@interface MTRWebRTCTransportProviderClusterSFrameStruct : NSObject <NSCopying>
+@property (nonatomic, copy) NSNumber * _Nonnull cipherSuite MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSData * _Nonnull baseKey MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSData * _Nonnull kid MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_PROVISIONALLY_AVAILABLE

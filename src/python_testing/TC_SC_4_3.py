@@ -46,11 +46,11 @@
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 # === END CI TEST ARGUMENTS ===
 
-import ipaddress
 import logging
-import re
 
 from mdns_discovery.mdns_discovery import MdnsDiscovery, MdnsServiceType
+from mdns_discovery.utils.asserts import (assert_valid_hostname, assert_valid_icd_key, assert_valid_ipv6_addresses,
+                                          assert_valid_sai_key, assert_valid_sat_key, assert_valid_sii_key, assert_valid_t_key)
 from mobly import asserts
 
 import matter.clusters as Clusters
@@ -154,25 +154,20 @@ class TC_SC_4_3(MatterBaseTest):
             return (False, f"Input ({input_value}) is not a valid decimal number.")
 
     def verify_t_value(self, operational_record):
-        has_t = operational_record and operational_record.txt_record and 'T' in operational_record.txt_record
+        has_t = operational_record and operational_record.txt and 'T' in operational_record.txt
         if not has_t:
             asserts.assert_false(self.check_pics(TCP_PICS_STR),
                                  f"T key must be included if TCP is supported - returned TXT record: {operational_record}")
             return True, 'T is not provided or required'
 
-        t_value = operational_record.txt_record['T']
+        t_value = operational_record.txt['T']
         logging.info("T key is present in TXT record, verify if that it is a decimal value with no leading zeros and is less than or equal to 6. Convert the value to a bitmap and verify bit 0 is clear.")
         # Verify t_value is a decimal number without leading zeros and less than or equal to 6
         try:
-            T_int = int(t_value)
-            if T_int < 0 or T_int > MAX_T_VALUE:
-                return False, f"T value ({t_value}) is not in the range 0 to 6. ({t_value})"
-            if str(t_value).startswith("0") and T_int != 0:
-                return False, f"T value ({t_value}) has leading zeros."
-            if T_int != float(t_value):
-                return False, f"T value ({t_value}) is not an integer."
+            assert_valid_t_key(t_value, enforce_provisional=False)
 
             # Convert to bitmap and verify bit 0 is clear
+            T_int = int(t_value)
             if T_int & 1 == 0:
                 return True, f"T value ({t_value}) is valid and bit 0 is clear."
             else:
@@ -192,30 +187,6 @@ class TC_SC_4_3(MatterBaseTest):
                     return True, f"T value ({t_value}) is valid."
         except ValueError:
             return False, f"T value ({t_value}) is not a valid integer"
-
-    @staticmethod
-    def is_valid_ipv6_address(address) -> bool:
-        try:
-            # Attempt to create an IPv6 address object. If successful, this is an IPv6 address.
-            ipaddress.IPv6Address(address)
-            return True
-        except ipaddress.AddressValueError:
-            # If an AddressValueError is raised, the current address is not a valid IPv6 address.
-            return False
-
-    @staticmethod
-    def verify_hostname(hostname: str) -> bool:
-        # Remove any trailing dot
-        if hostname.endswith('.'):
-            hostname = hostname[:-1]
-
-        # Remove '.local' suffix if present
-        if hostname.endswith('.local'):
-            hostname = hostname[:-6]
-
-        # Regular expression to match an uppercase hexadecimal string of 12 or 16 characters
-        pattern = re.compile(r'^[0-9A-F]{12}$|^[0-9A-F]{16}$')
-        return bool(pattern.match(hostname))
 
     @async_test_body
     async def test_TC_SC_4_3(self):
@@ -267,32 +238,29 @@ class TC_SC_4_3(MatterBaseTest):
         # TH performs a query for the SRV record against the qname instance_qname.
         self.step(6)
         mdns = MdnsDiscovery()
-        operational_record = await mdns.get_srv_record(
+        srv_record = await mdns.get_srv_record(
             service_name=instance_qname,
             service_type=MdnsServiceType.OPERATIONAL.value,
             log_output=True
         )
 
         # Verify SRV record is returned
-        srv_record_returned = operational_record is not None and operational_record.service_name == instance_qname
+        srv_record_returned = srv_record is not None and srv_record.service_name == instance_qname
         asserts.assert_true(srv_record_returned, "SRV record was not returned")
-
-        # Will be used in Step 8
-        hostname = operational_record.server
 
         # *** STEP 7 ***
         # TH performs a query for the TXT record against the qname instance_qname.
         # Verify TXT record is returned
         self.step(7)
-        operational_record = await mdns.get_txt_record(
+        txt_record = await mdns.get_txt_record(
             service_name=instance_qname,
             service_type=MdnsServiceType.OPERATIONAL.value,
             log_output=True
         )
 
         # Request the TXT record. The device may opt not to return a TXT record if there are no mandatory TXT keys
-        txt_record_returned = operational_record is not None and operational_record.txt_record is not None and bool(
-            operational_record.txt_record)
+        txt_record_returned = txt_record is not None and txt_record.txt is not None and bool(
+            txt_record.txt)
         txt_record_required = supports_icd or self.check_pics(TCP_PICS_STR)
 
         if txt_record_required:
@@ -302,12 +270,12 @@ class TC_SC_4_3(MatterBaseTest):
         # TH performs a query for the AAAA record against the target listed in the SRV record.
         self.step(8)
         quada_records = await mdns.get_quada_records(
-            hostname=hostname,
+            hostname=srv_record.hostname,
             log_output=True
         )
 
         # Verify AAAA record is returned
-        asserts.assert_greater(len(quada_records), 0, f"No AAAA addresses were resolved for hostname '{hostname}'")
+        asserts.assert_greater(len(quada_records), 0, f"No AAAA addresses were resolved for hostname '{srv_record.hostname}'")
 
         # # *** STEP 9 ***
         # TH verifies the following from the returned records: The hostname must be a fixed-length twelve-character (or sixteen-character)
@@ -322,11 +290,10 @@ class TC_SC_4_3(MatterBaseTest):
         self.step(9)
 
         def txt_has_key(key: str):
-            return txt_record_returned and key in operational_record.txt_record.keys()
+            return txt_record_returned and key in txt_record.txt.keys()
 
         # Verify hostname character length (12 or 16)
-        asserts.assert_true(self.verify_hostname(hostname=hostname),
-                            f"Hostname for '{hostname}' is not a 12 or 16 character uppercase hexadecimal string")
+        assert_valid_hostname(srv_record.hostname)
 
         # ICD TXT KEY
         if supports_lit:
@@ -336,19 +303,18 @@ class TC_SC_4_3(MatterBaseTest):
             asserts.assert_true(txt_has_key('ICD'), "ICD key is NOT present in the TXT record.")
 
             # Verify it has the value of 0 or 1 (ASCII)
-            icd_value = int(operational_record.txt_record['ICD'])
-            asserts.assert_true(icd_value == 0 or icd_value == 1, "ICD value is different than 0 or 1 (ASCII).")
+            assert_valid_icd_key(txt_record.txt['ICD'])
         else:
             logging.info("supports_lit is false, verify that the ICD key is NOT present in the TXT record.")
             if txt_record_returned:
-                asserts.assert_not_in('ICD', operational_record.txt_record, "ICD key is present in the TXT record.")
+                asserts.assert_not_in('ICD', txt_record.txt, "ICD key is present in the TXT record.")
 
         # SII TXT KEY
         if supports_icd and not supports_lit:
             sit_mode = True
 
         if supports_icd and supports_lit:
-            if icd_value == 0:
+            if int(txt_record.txt['ICD']) == 0:
                 sit_mode = True
             else:
                 sit_mode = False
@@ -361,9 +327,7 @@ class TC_SC_4_3(MatterBaseTest):
             asserts.assert_true(txt_has_key('SII'), "SII key is NOT present in the TXT record.")
 
             logging.info("Verify SII value is a decimal with no leading zeros and is less than or equal to 3600000 (1h in ms).")
-            sii_value = operational_record.txt_record['SII']
-            result, message = self.verify_decimal_value(sii_value, ONE_HOUR_IN_MS)
-            asserts.assert_true(result, message)
+            assert_valid_sii_key(txt_record.txt['SII'])
 
         # SAI TXT KEY
         if supports_icd:
@@ -371,33 +335,26 @@ class TC_SC_4_3(MatterBaseTest):
             asserts.assert_true(txt_has_key('SAI'), "SAI key is NOT present in the TXT record.")
 
             logging.info("Verify SAI value is a decimal with no leading zeros and is less than or equal to 3600000 (1h in ms).")
-            sai_value = operational_record.txt_record['SAI']
-            result, message = self.verify_decimal_value(sai_value, ONE_HOUR_IN_MS)
-            asserts.assert_true(result, message)
+            assert_valid_sai_key(txt_record.txt['SAI'])
 
         # SAT TXT KEY
         if txt_has_key('SAT'):
             logging.info(
                 "SAT key is present in TXT record, verify that it is a decimal value with no leading zeros and is less than or equal to 65535.")
-            sat_value = operational_record.txt_record['SAT']
-            result, message = self.verify_decimal_value(sat_value, MAX_SAT_VALUE)
-            asserts.assert_true(result, message)
+            assert_valid_sat_key(txt_record.txt['SAT'])
 
             if supports_icd:
                 logging.info("supports_icd is True, verify the SAT value is equal to active_mode_threshold.")
-                asserts.assert_equal(int(sat_value), active_mode_threshold_ms)
+                asserts.assert_equal(int(txt_record.txt['SAT']), active_mode_threshold_ms)
 
         # T TXT KEY
-        result, message = self.verify_t_value(operational_record)
+        result, message = self.verify_t_value(txt_record)
         asserts.assert_true(result, message)
 
         # Verify the AAAA records contain a valid IPv6 address
         logging.info("Verify the AAAA record contains a valid IPv6 address")
-        for r in quada_records:
-            asserts.assert_true(
-                self.is_valid_ipv6_address(r.address),
-                f"Invalid IPv6 address: '{r.address}'"
-            )
+        ipv6_addresses = [f"{r.address}%{r.interface}" for r in quada_records]
+        assert_valid_ipv6_addresses(ipv6_addresses)
 
         # # *** STEP 10 ***
         # TH performs a DNS-SD browse for _I<hhhh>._sub._matter._tcp.local, where <hhhh> is the 64-bit compressed

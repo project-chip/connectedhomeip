@@ -99,7 +99,9 @@ void PythonResubscribePolicy(uint32_t aNumCumulativeRetries, uint32_t & aNextSub
 class ReadClientCallback : public ReadClient::Callback
 {
 public:
-    ReadClientCallback(PyObject * appContext) : mBufferedReadCallback(*this), mAppContext(appContext) {}
+    ReadClientCallback(PyObject * appContext, bool allowLargePayload) :
+        mBufferedReadCallback(*this, allowLargePayload), mAppContext(appContext)
+    {}
 
     app::BufferedReadCallback * GetBufferedReadCallback() { return &mBufferedReadCallback; }
 
@@ -514,14 +516,14 @@ void pychip_ReadClient_GetSubscriptionTimeoutMs(ReadClient * pReadClient, uint32
 PyChipError pychip_ReadClient_Read(void * appContext, ReadClient ** pReadClient, DeviceProxy * device, uint8_t * readParamsBuf,
                                    void ** attributePathsFromPython, size_t numAttributePaths, void ** dataversionFiltersFromPython,
                                    size_t numDataversionFilters, void ** eventPathsFromPython, size_t numEventPaths,
-                                   uint64_t * eventNumberFilter)
+                                   uint64_t * eventNumberFilter, bool allowLargePayload)
 {
     CHIP_ERROR err                 = CHIP_NO_ERROR;
     PyReadAttributeParams pyParams = {};
     // The readParamsBuf might be not aligned, using a memcpy to avoid some unexpected behaviors.
     memcpy(&pyParams, readParamsBuf, sizeof(pyParams));
 
-    auto callback           = std::make_unique<ReadClientCallback>(appContext);
+    auto callback           = std::make_unique<ReadClientCallback>(appContext, allowLargePayload);
     auto attributePaths     = std::make_unique<AttributePathParams[]>(numAttributePaths);
     auto dataVersionFilters = std::make_unique<chip::app::DataVersionFilter[]>(numDataversionFilters);
     auto eventPaths         = std::make_unique<EventPathParams[]>(numEventPaths);

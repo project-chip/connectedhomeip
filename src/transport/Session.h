@@ -300,10 +300,10 @@ public:
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
     // This API is used to associate the connection with the session when the
     // latter is about to be marked active. It is also used to reset the
-    // connection to a nullptr when the connection is lost and the session
-    // is marked as Defunct.
-    ActiveTCPConnectionState * GetTCPConnection() const { return mTCPConnection; }
-    void SetTCPConnection(ActiveTCPConnectionState * conn) { mTCPConnection = conn; }
+    // connection when the connection is lost and the session is marked as Defunct.
+    inline const ActiveTCPConnectionHolder & GetTCPConnection() const { return const_cast<Session *>(this)->mTCPConnection; }
+    inline void SetTCPConnection(ActiveTCPConnectionHolder & conn) { mTCPConnection = conn; }
+    inline void ReleaseTCPConnection() { mTCPConnection.Release(); }
 #endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
 
     void NotifySessionHang()
@@ -352,7 +352,7 @@ private:
     // as that of the underlying connection with the peer.
     // It would remain as a nullptr for all sessions that are not set up over
     // a TCP connection.
-    ActiveTCPConnectionState * mTCPConnection = nullptr;
+    ActiveTCPConnectionHolder mTCPConnection;
 #endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
 };
 

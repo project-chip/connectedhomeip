@@ -84,16 +84,22 @@ CHIP_ERROR SetupPayloadParseCommand::Print(MTRSetupPayload * payload)
                 [humanFlags appendString:@"SoftAP"];
             }
             if (value & MTRDiscoveryCapabilitiesBLE) {
-                if (!humanFlags) {
+                if ([humanFlags length]) {
                     [humanFlags appendString:@", "];
                 }
                 [humanFlags appendString:@"BLE"];
             }
             if (value & MTRDiscoveryCapabilitiesOnNetwork) {
-                if (!humanFlags) {
+                if ([humanFlags length]) {
                     [humanFlags appendString:@", "];
                 }
                 [humanFlags appendString:@"ON NETWORK"];
+            }
+            if (value & MTRDiscoveryCapabilitiesNFC) {
+                if ([humanFlags length]) {
+                    [humanFlags appendString:@", "];
+                }
+                [humanFlags appendString:@"NFC"];
             }
 
             NSLog(@"Capabilities:  0x%02lX (%@)", static_cast<long>(value), humanFlags);

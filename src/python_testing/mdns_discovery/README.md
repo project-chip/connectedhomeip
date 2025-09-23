@@ -17,6 +17,7 @@ to low-level DNS records such as PTR, SRV, TXT, A, and AAAA.
 ├── 📁data_clases/                # Containers for service info and query results
 ├── 📁enums/                      # Enums for service types and other definitions
 ├── 📁service_listeners/          # Service listeners used during discovery sessions
+├── 📁tests/                      # Unit tests for assert functions and other methods
 ├── 📁utils/                      # Utility functions: IPv6 filtering and other utils
 ├── 📄mdns_async_service_info.py  # Supports querying specific mDNS record types
 └── 📄mdns_discovery.py           # Main entry point for mDNS discovery operations
@@ -98,7 +99,7 @@ async def main():
     )
 
     # Print Hostname
-    print(f"Hostname: {srv_record.server}")
+    print(f"Hostname: {srv_record.hostname}")
 
 asyncio.run(main())
 ```
@@ -165,7 +166,7 @@ get_quada_records()
         └── addr_resolver.ip_addresses_by_version(...)
                  └── extracts the resulting IPv6 addresses
         ▼
-returns list[QuadaRecord]
+returns list[AaaaRecord]
 ```
 
 #### 🎯 `get_ptr_records`
@@ -224,11 +225,44 @@ These three **Zeroconf** components provide the core functionalities of the
 `MdnsDiscovery` class, from discovering service types to resolving a service’s
 full information.
 
-| Component                                     |                                                Function                                                | Result Example                                                                                                                                                                                                                                                                                                                                                                                                                               |
-| --------------------------------------------- | :----------------------------------------------------------------------------------------------------: | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **AsyncZeroconfServiceTypes**                 |                      Returns all the advertised service-<br>types on the network.                      | \_matterd.\_udp.local.<br>\_matter.<br>\_tcp.local.<br>\_V65521.\_sub.\_matterd.\_udp.local.<br> \_IB7322C948581262F.\_sub.\_matter.\_tcp.local.                                                                                                                                                                                                                                                                                             |
-| **AsyncServiceBrowser**                       | Browse for services of specific service-<br>types, returns PTR info, service-name<br>and service-type. | "`service_type`": "\_matterd.\_udp.local."<br>"`service_name`": "A6666A3E45CF5655.\_matterd.\_udp.local."<br>"`instance_name`": "A6666A3E45CF5655"                                                                                                                                                                                                                                                                                           |
-| **async_request**<br>(from ServiceInfo class) |           Returns full-service info by service-<br>name (server, txt, addresses, ttl, etc.).           | "`service_name`": "354D34458F15657D.\_matterd.\_udp.local."<br>"`service_type`": "\_V65521.\_sub.\_matterd.\_udp.local."<br>"`instance_name`": "354D34458F15657D"<br>"`server`": "00155DD54A04.local."<br>"`port`": 5550<br>"`addresses`": ["172.30.139.182", "fe80::215:5dff:fed5:4a04"]<br>"`txt_record`": {"VP": "65521+32769}"<br>"`priority`": 0<br>"`interface_index`": 2<br>"`weight`": 0<br>"`host_ttl`": 120<br>"`other_ttl`": 4500 |
+| Component                                     |                                                Function                                                | Result Example                                                                                                                                                                                                                                                                                                                                                                                                                          |
+| --------------------------------------------- | :----------------------------------------------------------------------------------------------------: | :-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **AsyncZeroconfServiceTypes**                 |                      Returns all the advertised service-<br>types on the network.                      | \_matterd.\_udp.local.<br>\_matter.<br>\_tcp.local.<br>\_V65521.\_sub.\_matterd.\_udp.local.<br> \_IM7322C948581262F.\_sub.\_matter.\_tcp.local.                                                                                                                                                                                                                                                                                        |
+| **AsyncServiceBrowser**                       | Browse for services of specific service-<br>types, returns PTR info, service-name<br>and service-type. | "`service_type`": "\_matterd.\_udp.local."<br>"`service_name`": "A6666A3E45CF5655.\_matterd.\_udp.local."<br>"`instance_name`": "A6666A3E45CF5655"                                                                                                                                                                                                                                                                                      |
+| **async_request**<br>(from ServiceInfo class) |          Returns full-service info by service-<br>name (hostname, txt, addresses, ttl, etc.).          | "`service_name`": "354D34458F15657D.\_matterd.\_udp.local."<br>"`service_type`": "\_V65521.\_sub.\_matterd.\_udp.local."<br>"`instance_name`": "354D34458F15657D"<br>"`hostname`": "00155DD54A04.local."<br>"`port`": 5550<br>"`addresses`": ["172.30.139.182", "fe80::215:5dev:fed5:4a04"]<br>"`txt`": {"VP": "65521+32769}"<br>"`priority`": 0<br>"`interface_index`": 2<br>"`weight`": 0<br>"`host_ttl`": 120<br>"`other_ttl`": 4500 |
+
+## 🌐 Asserts for mDNS Values
+
+This module contains validation helpers used by mDNS discovery–related tests.
+Each function raises a `TestFailure` on failure and is designed to make the
+exact failing constraint obvious.
+
+You can import them from the following file: `mdns_discovery/utils/asserts.py`
+
+```
+from mdns_discovery.utils.asserts import assert_valid_dn_key
+
+assert_valid_dn_key("Kitchen")
+```
+
+### ✅ Available assert functions
+
+|                        |                                             |
+| ---------------------- | ------------------------------------------- |
+| `assert_valid_d_key`   | `assert_valid_commissionable_instance_name` |
+| `assert_valid_vp_key`  | `assert_valid_operational_instance_name`    |
+| `assert_valid_cm_key`  | `assert_valid_short_discriminator_subtype`  |
+| `assert_valid_dt_key`  | `assert_valid_long_discriminator_subtype`   |
+| `assert_valid_dn_key`  | `assert_is_commissionable_type`             |
+| `assert_valid_ri_key`  | `assert_is_border_router_type`              |
+| `assert_valid_ph_key`  | `assert_valid_devtype_subtype`              |
+| `assert_valid_pi_key`  | `assert_valid_vendor_subtype`               |
+| `assert_valid_jf_key`  | `assert_is_commissioner_type`               |
+| `assert_valid_sii_key` | `assert_valid_ipv6_addresses`               |
+| `assert_valid_sai_key` | `assert_is_operational_type`                |
+| `assert_valid_sat_key` | `assert_valid_product_id`                   |
+| `assert_valid_t_key`   | `assert_valid_vendor_id`                    |
+| `assert_valid_icd_key` | `assert_valid_hostname`                     |
 
 ## 📌 General Information
 

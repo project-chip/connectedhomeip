@@ -45,7 +45,7 @@ from matter.ChipDeviceCtrl import TransportPayloadCapability
 from matter.clusters import Objects, WebRTCTransportProvider
 from matter.clusters.Types import NullValue
 from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
-from matter.webrtc import PeerConnection, WebRTCManager
+from matter.webrtc import LibdatachannelPeerConnection, WebRTCManager
 
 
 class TC_WEBRTC_1_1(MatterBaseTest, WebRTCTestHelper):
@@ -89,7 +89,7 @@ class TC_WEBRTC_1_1(MatterBaseTest, WebRTCTestHelper):
         return "[TC-WEBRTC-1.1] Validate that setting an SDP Offer successfully initiates a new WebRTC session"
 
     def pics_TC_WEBRTC_1_1(self) -> list[str]:
-        return ["WEBRTCR", "WEBRTCP"]
+        return ["WEBRTCR.C", "WEBRTCP.S"]
 
     @property
     def default_timeout(self) -> int:
@@ -101,7 +101,7 @@ class TC_WEBRTC_1_1(MatterBaseTest, WebRTCTestHelper):
 
         endpoint = self.get_endpoint(default=1)
         webrtc_manager = WebRTCManager(event_loop=self.event_loop)
-        webrtc_peer: PeerConnection = webrtc_manager.create_peer(
+        webrtc_peer: LibdatachannelPeerConnection = webrtc_manager.create_peer(
             node_id=self.dut_node_id, fabric_index=self.default_controller.GetFabricIndexInternal(), endpoint=endpoint
         )
 
@@ -185,7 +185,7 @@ class TC_WEBRTC_1_1(MatterBaseTest, WebRTCTestHelper):
             payloadCapability=TransportPayloadCapability.LARGE_PAYLOAD,
         )
 
-        webrtc_manager.close_all()
+        await webrtc_manager.close_all()
 
 
 if __name__ == "__main__":

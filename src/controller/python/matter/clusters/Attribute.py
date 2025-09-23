@@ -440,6 +440,8 @@ class SubscriptionTransaction:
             EventReadResult, SubscriptionTransaction], None] = DefaultEventChangeCallback
         self._onErrorCb: Callable[[
             int, SubscriptionTransaction], None] = DefaultErrorCallback
+        self._onReportBeginCb: Callable[[SubscriptionTransaction], None] = DefaultReportBeginCallback
+        self._onReportEndCb: Callable[[SubscriptionTransaction], None] = DefaultReportEndCallback
         self._readTransaction = transaction
         self._subscriptionId = subscriptionId
         self._devCtrl = devCtrl
@@ -545,10 +547,30 @@ class SubscriptionTransaction:
     def SetAttributeUpdateCallback(self, callback: Callable[[TypedAttributePath, SubscriptionTransaction], None]):
         '''
         Sets the callback function for the attribute value change event,
-        accepts a Callable accepts an attribute path and the cached data.
+        accepts a Callable that accepts an attribute path and the cached data.
         '''
         if callback is not None:
             self._onAttributeChangeCb = callback
+
+    def SetReportBeginCallback(self, callback: Callable[[SubscriptionTransaction], None]):
+        '''
+        Sets the callback function for when a subscription report with at least one path starts,
+        accepts a Callable that accepts the transaction. If set to None, disable the callback.
+        '''
+        if callback is not None:
+            self._onReportBeginCb = callback
+        else:
+            self._onReportBeginCb = DefaultReportBeginCallback
+
+    def SetReportEndCallback(self, callback: Callable[[SubscriptionTransaction], None]):
+        '''
+        Sets the callback function for when a subscription report with at least one path ends,
+        accepts a Callable that accepts the transaction. If set to None, disable the callback.
+        '''
+        if callback is not None:
+            self._onReportEndCb = callback
+        else:
+            self._onReportEndCb = DefaultReportEndCallback
 
     def SetEventUpdateCallback(self, callback: Callable[[EventReadResult, SubscriptionTransaction], None]):
         if callback is not None:
@@ -565,6 +587,14 @@ class SubscriptionTransaction:
     @property
     def OnAttributeChangeCb(self) -> Callable[[TypedAttributePath, SubscriptionTransaction], None]:
         return self._onAttributeChangeCb
+
+    @property
+    def OnReportBeginCb(self) -> Callable[[SubscriptionTransaction], None]:
+        return self._onReportBeginCb
+
+    @property
+    def OnReportEndCb(self) -> Callable[[SubscriptionTransaction], None]:
+        return self._onReportEndCb
 
     @property
     def OnEventChangeCb(self) -> Callable[[EventReadResult, SubscriptionTransaction], None]:
@@ -620,6 +650,14 @@ def DefaultEventChangeCallback(data: EventReadResult, transaction: SubscriptionT
 
 def DefaultErrorCallback(chipError: int, transaction: SubscriptionTransaction):
     print(f"Error during Subscription: Matter Stack Error {chipError}")
+
+
+def DefaultReportBeginCallback(transaction: SubscriptionTransaction):
+    pass
+
+
+def DefaultReportEndCallback(transaction: SubscriptionTransaction):
+    pass
 
 
 def _BuildEventIndex():
@@ -775,7 +813,8 @@ class AsyncReadTransaction:
                 self._subscription_handler, terminationCause.code, nextResubscribeIntervalMsec)
 
     def _handleReportBegin(self):
-        pass
+        if self._subscription_handler is not None:
+            self._subscription_handler.OnReportBeginCb(self._subscription_handler)
 
     def _handleReportEnd(self):
         if self._subscription_handler is not None:
@@ -789,6 +828,7 @@ class AsyncReadTransaction:
                 self._subscription_handler.OnAttributeChangeCb(
                     attribute_path, self._subscription_handler)
 
+            self._subscription_handler.OnReportEndCb(self._subscription_handler)
             # Clear it out once we've notified of all changes in this transaction.
         self._changedPathSet = set()
 
@@ -823,7 +863,8 @@ class AsyncReadTransaction:
         self._event_loop.call_soon_threadsafe(self._handleDone)
 
     def handleReportBegin(self):
-        pass
+        # self._event_loop.call_soon_threadsafe(self._handleReportBegin)
+        self._handleReportBegin()
 
     def handleReportEnd(self):
         # self._event_loop.call_soon_threadsafe(self._handleReportEnd)
@@ -1063,7 +1104,7 @@ def Read(transaction: AsyncReadTransaction, device,
          attributes: Optional[List[AttributePath]] = None, dataVersionFilters: Optional[List[DataVersionFilter]] = None,
          events: Optional[List[EventPath]] = None, eventNumberFilter: Optional[int] = None,
          subscriptionParameters: Optional[SubscriptionParameters] = None,
-         fabricFiltered: bool = True, keepSubscriptions: bool = False, autoResubscribe: bool = True) -> PyChipError:
+         fabricFiltered: bool = True, keepSubscriptions: bool = False, autoResubscribe: bool = True, allowLargePayload: Union[None, bool] = None) -> PyChipError:
     if (not attributes) and dataVersionFilters:
         raise ValueError(
             "Must provide valid attribute list when data version filters is not null")
@@ -1166,7 +1207,8 @@ def Read(transaction: AsyncReadTransaction, device,
                 0 if dataVersionFilters is None else len(dataVersionFilters)),
             eventPathsForCffi,
             ctypes.c_size_t(0 if events is None else len(events)),
-            eventNumberFilterPtr))
+            eventNumberFilterPtr,
+            ctypes.c_bool(allowLargePayload or False)))
 
     transaction.SetClientObjPointers(readClientObj)
 

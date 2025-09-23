@@ -39,6 +39,7 @@ import logging
 from dataclasses import dataclass
 
 from mdns_discovery import mdns_discovery
+from mdns_discovery.utils.asserts import assert_valid_icd_key
 from mobly import asserts
 
 import matter.clusters as Clusters
@@ -116,9 +117,9 @@ class TC_ICDM_5_1(MatterBaseTest):
                                    f"Failed to get operational node service information for {self.dut_node_id} on {self.default_controller.GetCompressedFabricId()}")
 
         # Get TXT record
-        icdTxtRecord = OperatingModeEnum(int(service.txt_record['ICD']))
-        if icdTxtRecord.value != int(service.txt_record['ICD']):
-            raise AttributeError(f'Not a known ICD type: {service.txt_record["ICD"]}')
+        icd_value = service.txt['ICD']
+        assert_valid_icd_key(icd_value)
+        icdTxtRecord = OperatingModeEnum(int(icd_value))
 
         return icdTxtRecord
 

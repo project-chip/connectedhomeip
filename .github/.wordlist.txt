@@ -972,6 +972,7 @@ Murata
 mutex
 mutexes
 mv
+mve
 MX
 mydir
 MyPASSWORD
@@ -1059,6 +1060,7 @@ optionOverride
 optionsMask
 optionsOverride
 orgs
+Orchestrator
 OSS
 OTA
 OTADownloader
@@ -1263,6 +1265,7 @@ RGB
 riscv
 rloc
 rmw
+rnd
 rodata
 Rollershade
 rootfs

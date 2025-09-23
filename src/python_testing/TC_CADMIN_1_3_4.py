@@ -45,7 +45,6 @@
 # === END CI TEST ARGUMENTS ===
 
 import asyncio
-import base64
 import logging
 import random
 from time import sleep
@@ -108,13 +107,13 @@ class TC_CADMIN(CADMINBaseTest):
                 expected_cm_value=2,
                 expected_discriminator=1234
             )
-            logging.info(f"Successfully found service with CM={service.txt_record.get('CM')}, D={service.txt_record.get('D')}")
+            logging.info(f"Successfully found service with CM={service.txt.get('CM')}, D={service.txt.get('D')}")
         elif commission_type == "BCM":
             service = await self.wait_for_correct_cm_value(
                 expected_cm_value=1,
                 expected_discriminator=setupPayloadInfo[0].filter_value
             )
-            logging.info(f"Successfully found service with CM={service.txt_record.get('CM')}, D={service.txt_record.get('D')}")
+            logging.info(f"Successfully found service with CM={service.txt.get('CM')}, D={service.txt.get('D')}")
 
         self.step("3c")
         BI_cluster = Clusters.BasicInformation
@@ -151,8 +150,8 @@ class TC_CADMIN(CADMINBaseTest):
         self.step(5)
         # TH_CR1 reads the Fabrics attribute
         th1_fabric_info = await self.get_fabrics(th=self.th1)
-        th1_cam_rcac = TLVReader(base64.b64decode(
-            self.certificate_authority_manager.activeCaList[0]._persistentStorage._jsonData["sdk-config"]["f/1/r"])).get()["Any"][9]
+        th1_cam_rcac = TLVReader(
+            self.certificate_authority_manager.activeCaList[0]._persistentStorage.GetSdkKey("f/1/r")).get()["Any"][9]
         if th1_fabric_info[0].rootPublicKey != th1_cam_rcac:
             asserts.fail("Public keys from fabric and certs for TH1 are not the same.")
         if th1_fabric_info[0].nodeID != self.dut_node_id:

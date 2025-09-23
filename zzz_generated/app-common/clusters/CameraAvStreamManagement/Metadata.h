@@ -37,10 +37,10 @@ namespace NightVisionUsesInfrared {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(NightVisionUsesInfrared::Id, BitFlags<DataModel::AttributeQualityFlags>(),
                                                           Access::Privilege::kView, std::nullopt);
 } // namespace NightVisionUsesInfrared
-namespace MinViewport {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(MinViewport::Id, BitFlags<DataModel::AttributeQualityFlags>(),
+namespace MinViewportResolution {
+inline constexpr DataModel::AttributeEntry kMetadataEntry(MinViewportResolution::Id, BitFlags<DataModel::AttributeQualityFlags>(),
                                                           Access::Privilege::kView, std::nullopt);
-} // namespace MinViewport
+} // namespace MinViewportResolution
 namespace RateDistortionTradeOffPoints {
 inline constexpr DataModel::AttributeEntry
     kMetadataEntry(RateDistortionTradeOffPoints::Id,

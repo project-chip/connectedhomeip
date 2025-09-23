@@ -245,8 +245,8 @@ enum ThreeLevelAutoEnum : enum8 {
 }
 
 enum WebRTCEndReasonEnum : enum8 {
-  kIceFailed = 0;
-  kIceTimeout = 1;
+  kICEFailed = 0;
+  kICETimeout = 1;
   kUserHangup = 2;
   kUserBusy = 3;
   kReplaced = 4;
@@ -256,7 +256,8 @@ enum WebRTCEndReasonEnum : enum8 {
   kOutOfResources = 8;
   kMediaTimeout = 9;
   kLowPower = 10;
-  kUnknownReason = 11;
+  kPrivacyMode = 11;
+  kUnknownReason = 12;
 }
 
 bitmap TestGlobalBitmap : bitmap32 {
@@ -2025,6 +2026,7 @@ cluster Thermostat = 513 {
     kMatterScheduleConfiguration = 0x80;
     kPresets = 0x100;
     kEvents = 0x200;
+    kThermostatSuggestions = 0x400;
   }
 
   bitmap HVACSystemTypeBitmap : bitmap8 {
@@ -2096,6 +2098,7 @@ cluster Thermostat = 513 {
     kVacationMode = 0x10;
     kTimeOfUseCostSavings = 0x20;
     kPreCoolingOrPreHeating = 0x40;
+    kConflictingSuggestions = 0x80;
   }
 
   struct ScheduleTransitionStruct {
@@ -2644,7 +2647,7 @@ endpoint 1 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 0x0005;
+    ram      attribute clusterRevision default = 0x0006;
 
     handle command Identify;
     handle command TriggerEffect;

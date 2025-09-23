@@ -1,5 +1,5 @@
 #
-#    Copyright (c) 2025 Project CHIP Authors
+#    Copyright (c) 2024-2025 Project CHIP Authors
 #    All rights reserved.
 #
 #    Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,11 +16,13 @@
 #
 
 from random import randint
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Optional
 
 from zeroconf import (BadTypeInNameException, DNSOutgoing, DNSQuestion, DNSQuestionType, ServiceInfo, Zeroconf, current_time_millis,
                       service_type_name)
 from zeroconf.const import _CLASS_IN, _DUPLICATE_QUESTION_INTERVAL, _FLAGS_QR_QUERY, _LISTENER_TIME, _MDNS_PORT, _TYPE_AAAA
+
+_LISTENER_TIME_MS = _LISTENER_TIME
 
 
 class MdnsAsyncServiceInfo(ServiceInfo):
@@ -41,9 +43,6 @@ class MdnsAsyncServiceInfo(ServiceInfo):
         # AddressResolverIPv6 class which inherits from this class
         if server and not (name and type_):
             super().__init__(type_=server, name=server, server=server)
-            self._name = None
-            self.type = None
-            self.server = server
             return
 
         # Validate a fully qualified service name, instance or subtype
@@ -51,15 +50,12 @@ class MdnsAsyncServiceInfo(ServiceInfo):
             raise BadTypeInNameException
 
         super().__init__(type_=type_, name=name, server=server)
-        self._name = name
-        self.type = type_
-        self.server = server
 
     async def async_request(
         self,
         zc: Zeroconf,
-        timeout: float,
-        question_type: DNSQuestionType | None = None,
+        timeout_ms: float,
+        question_type: Optional[DNSQuestionType] = None,
         addr: str | None = None,
         port: int = _MDNS_PORT,
     ) -> bool:
@@ -83,13 +79,13 @@ class MdnsAsyncServiceInfo(ServiceInfo):
         zc.question_history.clear()
         self.async_clear_cache()
 
-        now = current_time_millis()
+        now_ms = current_time_millis()
 
         # Absolute cutoff time after which the request stops if incomplete
-        deadline_ms = now + timeout
+        deadline_ms = now_ms + timeout_ms
 
         # Delay before sending the first retry query if the initial query did not complete
-        initial_delay_ms = _LISTENER_TIME + randint(0, 50)
+        initial_delay_ms = _LISTENER_TIME_MS + randint(0, 50)
 
         # Minimum delay between subsequent QM retries after the first retry,
         # to prevent duplicate-question suppression by responding devices
@@ -100,13 +96,13 @@ class MdnsAsyncServiceInfo(ServiceInfo):
         linger_after_complete_ms = randint(300, 500)
 
         first_send = True
-        next_send = now
+        next_send = now_ms
 
         # Build an outgoing DNS query for the requested record types
         def build_outgoing(as_qu: bool) -> DNSOutgoing:
             out = DNSOutgoing(_FLAGS_QR_QUERY)
             for rtype in self._query_record_types:
-                q = DNSQuestion(self._name, rtype, _CLASS_IN)
+                q = DNSQuestion(self.name, rtype, _CLASS_IN)
                 q.unicast = as_qu
                 out.add_question(q)
             return out
@@ -116,13 +112,13 @@ class MdnsAsyncServiceInfo(ServiceInfo):
             use_qu_first = (question_type in (None, DNSQuestionType.QU))
 
             while not self._is_complete:
-                now = current_time_millis()
+                now_ms = current_time_millis()
 
                 # Deadline reached before record was found
-                if now >= deadline_ms:
+                if now_ms >= deadline_ms:
                     return False
 
-                if now >= next_send:
+                if now_ms >= next_send:
                     # If this is the first cycle and QU is allowed, send a unicast-preferred query first.
                     if use_qu_first:
                         zc.async_send(build_outgoing(as_qu=True), addr, port)
@@ -132,16 +128,16 @@ class MdnsAsyncServiceInfo(ServiceInfo):
 
                 if first_send:
                     # First retry: wait the shorter initial delay before sending again.
-                    next_send = now + initial_delay_ms
+                    next_send = now_ms + initial_delay_ms
                     first_send = False
                 else:
                     # Subsequent retries: wait at least the duplicate-question interval
                     # to avoid suppression by responders, plus a small random offset.
-                    next_send = now + max(duplicate_interval_ms, initial_delay_ms + randint(0, 100))
+                    next_send = now_ms + max(duplicate_interval_ms, initial_delay_ms + randint(0, 100))
 
                 # Sleep until the next scheduled send time or the overall deadline,
                 # whichever occurs first. Clamp to 0 to avoid negative waits.
-                await self.async_wait(max(0, min(next_send, deadline_ms) - now), zc.loop)
+                await self.async_wait(max(0, min(next_send, deadline_ms) - now_ms), zc.loop)
 
             # After exiting the query loop, wait briefly to passively
             # catch any late TXT/SRV/AAAA/A responses.
@@ -158,9 +154,9 @@ class MdnsAsyncServiceInfo(ServiceInfo):
 class AddressResolverIPv6(MdnsAsyncServiceInfo):
     """Resolve a host name to an IPv6 address."""
 
-    def __init__(self, server: str) -> None:
+    def __init__(self, hostname: str) -> None:
         """Initialize the AddressResolver."""
-        super().__init__(server, server, server=server)
+        super().__init__(server=hostname)
         self._query_record_types = {_TYPE_AAAA}
 
     @property

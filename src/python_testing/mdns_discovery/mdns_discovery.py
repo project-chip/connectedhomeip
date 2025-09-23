@@ -21,13 +21,13 @@ import time
 from asyncio import Event, Semaphore, TimeoutError, create_task, gather, sleep, wait_for
 from typing import Dict, List, Optional
 
-from mdns_discovery.data_clases.mdns_service_info import MdnsServiceInfo
-from mdns_discovery.data_clases.ptr_record import PtrRecord
-from mdns_discovery.data_clases.quada_record import QuadaRecord
+from mdns_discovery.data_classes.aaaa_record import AaaaRecord
+from mdns_discovery.data_classes.mdns_service_info import MdnsServiceInfo
+from mdns_discovery.data_classes.ptr_record import PtrRecord
 from mdns_discovery.enums.mdns_service_type import MdnsServiceType
 from mdns_discovery.mdns_async_service_info import AddressResolverIPv6, MdnsAsyncServiceInfo
 from mdns_discovery.service_listeners.mdns_service_listener import MdnsServiceListener
-from mdns_discovery.utils.net_utils import get_host_ipv6_addresses
+from mdns_discovery.utils.network import get_host_ipv6_addresses
 from zeroconf import IPVersion, ServiceStateChange, Zeroconf
 from zeroconf.asyncio import AsyncServiceBrowser, AsyncZeroconf, AsyncZeroconfServiceTypes
 from zeroconf.const import _TYPE_A, _TYPE_AAAA, _TYPE_SRV, _TYPE_TXT, _TYPES
@@ -275,7 +275,7 @@ class MdnsDiscovery:
     async def get_quada_records(self, hostname: str,
                                 query_timeout_sec: float = QUERY_TIMEOUT_SEC,
                                 log_output: bool = False
-                                ) -> list[QuadaRecord]:
+                                ) -> list[AaaaRecord]:
         """
         Asynchronously retrieves the AAAA (IPv6) record of a device on the local network via mDNS.
 
@@ -290,27 +290,27 @@ class MdnsDiscovery:
                 Defaults to False.
 
         Returns:
-            list[QuadaRecord]: A list of discovered QuadaRecord objects.
+            list[AaaaRecord]: A list of discovered AaaaRecord objects.
         """
         logger.info(f"Service record information lookup (AAAA) for '{hostname}' in progress...")
 
         async with AsyncZeroconf(interfaces=self.interfaces) as azc:
             # Perform AAAA query
-            addr_resolver = AddressResolverIPv6(server=hostname)
+            addr_resolver = AddressResolverIPv6(hostname)
 
             is_discovered = await addr_resolver.async_request(
                 azc.zeroconf,
-                timeout=query_timeout_sec * 1000)
+                timeout_ms=query_timeout_sec * 1000)
 
             if is_discovered:
                 logger.info(f"Service record information (AAAA) for '{hostname}' discovered.")
 
-                # Get IPv6 addresses and convert to QuadaRecord objects
+                # Get IPv6 addresses and convert to AaaaRecord objects
                 ipv6_addresses = addr_resolver.ip_addresses_by_version(IPVersion.V6Only)
-                quada_records: list[QuadaRecord] = []
+                quada_records: list[AaaaRecord] = []
 
                 if ipv6_addresses:
-                    quada_records = [QuadaRecord(ipv6) for ipv6 in ipv6_addresses]
+                    quada_records = [AaaaRecord(ipv6) for ipv6 in ipv6_addresses]
 
                 # Adds service to discovered services
                 self._discovered_services = {hostname: [ipv6 for ipv6 in quada_records]}
@@ -569,7 +569,7 @@ class MdnsDiscovery:
             None: This method does not return any value.
         """
         # Exit if status isn't 'Added'
-        if state_change in [ServiceStateChange.Removed, ServiceStateChange.Updated]:
+        if state_change != ServiceStateChange.Added:
             return
 
         logger.info(f"Service info added. Service name: '{name}', Service Type: '{service_type}'")
@@ -617,19 +617,14 @@ class MdnsDiscovery:
             await azc.async_add_service_listener(service_type, service_listener)
 
             # Wait for the add/update service event or timeout
-            try:
-                logger.info(f"Service record information lookup {rec_types} for '{service_name}' in progress...")
-                await wait_for(service_listener.updated_event.wait(), SERVICE_LISTENER_TIMEOUT_SEC)
-            except TimeoutError:
-                logger.info(
-                    f"Service record information lookup {rec_types} for '{service_name}' timeout ({SERVICE_LISTENER_TIMEOUT_SEC} seconds) reached without an update.")
+            await service_listener.wait_for_service_update(service_name, rec_types, SERVICE_LISTENER_TIMEOUT_SEC)
 
             # Prepare and perform query
             service_info = MdnsAsyncServiceInfo(name=service_name, type_=service_type)
             service_info._query_record_types = query_record_types
             is_discovered = await service_info.async_request(
-                azc.zeroconf,
-                query_timeout_sec * 1000)
+                zc=azc.zeroconf,
+                timeout_ms=query_timeout_sec * 1000)
 
             # Remove service listener
             await azc.async_remove_service_listener(service_listener)
@@ -645,6 +640,8 @@ class MdnsDiscovery:
                     self._discovered_services = {}
                 self._discovered_services.setdefault(service_type, []).append(mdns_service_info)
 
+                # Logging is handled in the caller when
+                # append_results is set to True
                 if not append_results:
                     if log_output:
                         self._log_output()
