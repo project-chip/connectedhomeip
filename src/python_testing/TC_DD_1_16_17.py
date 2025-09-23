@@ -1,0 +1,139 @@
+#
+#    Copyright (c) 2025 Project CHIP Authors
+#    All rights reserved.
+#
+#    Licensed under the Apache License, Version 2.0 (the "License");
+#    you may not use this file except in compliance with the License.
+#    You may obtain a copy of the License at
+#
+#        http://www.apache.org/licenses/LICENSE-2.0
+#
+#    Unless required by applicable law or agreed to in writing, software
+#    distributed under the License is distributed on an "AS IS" BASIS,
+#    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#    See the License for the specific language governing permissions and
+#    limitations under the License.
+#
+
+# See https://github.com/project-chip/connectedhomeip/blob/master/docs/testing/python.md#defining-the-ci-test-arguments
+# for details about the block below.
+#
+# === BEGIN CI TEST ARGUMENTS ===
+# test-runner-runs:
+#   run1:
+#     app: ${ALL_CLUSTERS_APP}
+#     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
+#     script-args: >
+#       --storage-path admin_storage.json
+#       --bool-arg post_cert_test:true
+#       --qr-code MT:-24J0KCZ16N71648G00
+#       --trace-to json:${TRACE_TEST_JSON}.json
+#       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+#     factory-reset: true
+#     quiet: true
+# === END CI TEST ARGUMENTS ===
+
+# Note that in the CI we are using the post-cert test as we can only start one app from the current script.
+# This should still be fine as this test has unit tests for other conditions. See test_TC_SC_7_1.py
+import logging
+
+from mobly import asserts
+
+import matter.clusters as Clusters
+from matter import discovery
+from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+
+
+def _trusted_root_test_step(dut_num: int) -> TestStep:
+    read_trusted_roots_over_pase = f'TH establishes a PASE session to DUT{dut_num} using the provided setup code and reads the TrustedRootCertificates attribute from the operational credentials cluster over PASE'
+    return TestStep(dut_num, read_trusted_roots_over_pase, "List should be empty as the DUT should be in factory reset ")
+
+
+class TC_DD_1_16_17(MatterBaseTest):
+    ''' TC-DD-1.16 and TC-DD-1.17
+
+        TC-DD-1.16
+        This is the test for manual code. This test includes a request to put the custom and user-intent
+        commissioning devices into a commissionable mode because this test needs to be run for every device
+        with a setup code. This test does NOT verify that user-intent commissioning flow devices do not
+        advertise out of box because they cannot be differentiated from custom commissioning flow devices
+        from the manual pairing code. That check is done in TC-DD-1.17
+
+        TC-DD-1.17
+        This is the test for the QR code. This test does NOT include a request to put the device into commissionable
+        mode since devices with a QR code will necessarily include a manual code as well per the spec guidelines. This
+        test DOES include a check that user-intent commissioning flow devices do not advertise on startup.
+    '''
+
+    def steps_TC_DD_1_16(self):
+        return [TestStep(1, "TH parses the manual code"),
+                TestStep(2, "If the VID_PID_PRESENT field is set to 0, this device uses standard flow. Verify that the DUT is advertising as Commissionable",
+                         "Device is advertising as commissionable"),
+                TestStep(3, "If the device uses custom flow or user-intent commissioning, ask the tester to place the device into commissionable mode"),
+                TestStep(4, "If the device uses custom flow or user-intent commissioning, verify that the DUT is advertising as commisionable"),
+                ]
+
+    def steps_TC_DD_1_17(self):
+        return [TestStep(1, "TH parses the QR code"),
+                TestStep(2, "If the Custom Flow field is set to 0, this device uses standard flow. Verify that the DUT is advertising as Commissionable",
+                         "Device is advertising as commissionable"),
+                TestStep(2, "If the Custom Flow field is set to 1, this device uses user-intent flow. Verify that the DUT is NOT advertising as Commissionable",
+                         "Device is not advertising as commissionable")
+                ]
+
+    def pics_TC_SC_7_1(self):
+        # Testers can use either the QR or manual code, but this test is gated on manual because the manual pairing code is required
+        # per 5.7.6. Onboarding Payload Inclusion (Manual Pairing Code, QR Code, NFC Tag), so devices that have a QR code will always
+        # have a manual code, and thus be required to run this test.
+        return ['MCORE.DD.MANUAL_PC']
+
+    @async_test_body
+    async def test_TC_SC_7_1(self):
+        # For now, this test is WAY easier if we just ask for the setup code instead of discriminator / passcode
+        asserts.assert_false(self.matter_test_config.discriminators,
+                             "This test needs to be run with either the QR or manual setup code. The QR code is preferred.")
+
+        if len(self.matter_test_config.qr_code_content + self.matter_test_config.manual_code) != self.expected_number_of_DUTs():
+            if self.post_cert_test:
+                msg = "The post_cert_test flag is only for use post-certification. When using this flag, specify a single discriminator, manual-code or qr-code-content"
+            else:
+                msg = "This test requires two devices for use at certification. Specify two device discriminators or QR codes ex. --discriminator 1234 5678"
+            asserts.fail(msg)
+
+        # Make sure these are no fabrics on the device so we know we're looking at the factory discriminator. This also ensures that the provided codes are correct.
+        for i, setup_code in enumerate(self.matter_test_config.qr_code_content + self.matter_test_config.manual_code):
+            self.step(i+1)
+            await self.default_controller.FindOrEstablishPASESession(setupCode=setup_code, nodeid=i+1)
+            root_certs = await self.read_single_attribute_check_success(node_id=i+1, cluster=Clusters.OperationalCredentials, attribute=Clusters.OperationalCredentials.Attributes.TrustedRootCertificates, endpoint=0)
+            asserts.assert_equal(
+                root_certs, [], "Root certificates found on device. Device must be factory reset before running this test.")
+
+        self.step(i+2)
+        setup_payload_info = self.get_setup_payload_info()
+        if self.post_cert_test:
+            # For post-cert, we're testing against the defaults
+            # TODO: Does it even make sense to test against a manual code in post-cert? It's such a small space, collisions are likely. Should we restrict post-cert to QR? What if one isn't provided?
+            if setup_payload_info[0].filter_type == discovery.FilterType.LONG_DISCRIMINATOR:
+                asserts.assert_not_equal(setup_payload_info[0].filter_value, 3840, "Device is using the default discriminator")
+            else:
+                self.mark_current_step_skipped()
+        else:
+            if setup_payload_info[0].filter_value == setup_payload_info[1].filter_value and self.matter_test_config.manual_code is not None:
+                logging.warn("The two provided discriminators are the same. Note that this CAN occur by chance, especially when using manual codes with the short discriminator. Consider using a QR code, or a different device if you believe the DUTs have individually provisioned")
+            asserts.assert_not_equal(
+                setup_payload_info[0].filter_value, setup_payload_info[1].filter_value, "Devices are using the same discriminator values")
+
+        self.step(i+3)
+        if self.post_cert_test:
+            asserts.assert_not_equal(setup_payload_info[0].passcode, 20202021, "Device is using the default passcode")
+        else:
+            asserts.assert_not_equal(
+                setup_payload_info[0].passcode, setup_payload_info[1].passcode, "Devices are using the same discriminator values")
+
+        # TODO: add test for PAKE salt. This needs to be plumbed through starting from HandlePBKDFParamResponse.
+        # Will handle in a separate follow up as the plumbing here is aggressive and through some of the crypto layers.
+        # TODO: Other unit-specific values?
+
+
+if __name__ == "__main__":
+    default_matter_test_main()
