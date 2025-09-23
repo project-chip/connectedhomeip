@@ -348,7 +348,7 @@ TEST_F(AutoCommissionerTest, TrySecondaryNetwork_confirm_true)
 TEST_F(AutoCommissionerTest, ResetTryingSecondaryNetwork_confirm_false)
 {
     AutoCommissionerTestAccess privateConfigCommissioner(&mCommissioner);
-    privateConfigCommissioner.ResetTryingSecondaryNetwork();
+    privateConfigCommissioner.ResetNetworkAttemptType();
     EXPECT_EQ(privateConfigCommissioner.TryingSecondaryNetwork(), false);
 }
 
