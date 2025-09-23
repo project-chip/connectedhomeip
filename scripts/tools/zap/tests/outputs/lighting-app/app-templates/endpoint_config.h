@@ -33,24 +33,7 @@
         /* Endpoint: 0, Cluster: Localization Configuration (server), big-endian */                                                \
                                                                                                                                    \
         /* 0 - ActiveLocale, */                                                                                                    \
-        5,                                                                                                                         \
-        'e',                                                                                                                       \
-        'n',                                                                                                                       \
-        '-',                                                                                                                       \
-        'U',                                                                                                                       \
-        'S',                                                                                                                       \
-                                                                                                                                   \
-        /* Endpoint: 0, Cluster: General Commissioning (server), big-endian */                                                     \
-                                                                                                                                   \
-        /* 6 - Breadcrumb, */                                                                                                      \
-        0x00,                                                                                                                      \
-        0x00,                                                                                                                      \
-        0x00,                                                                                                                      \
-        0x00,                                                                                                                      \
-        0x00,                                                                                                                      \
-        0x00,                                                                                                                      \
-        0x00,                                                                                                                      \
-        0x00,                                                                                                                      \
+        5, 'e', 'n', '-', 'U', 'S',                                                                                                \
                                                                                                                                    \
     }
 
@@ -61,30 +44,13 @@
         /* Endpoint: 0, Cluster: Localization Configuration (server), little-endian */                                             \
                                                                                                                                    \
         /* 0 - ActiveLocale, */                                                                                                    \
-        5,                                                                                                                         \
-        'e',                                                                                                                       \
-        'n',                                                                                                                       \
-        '-',                                                                                                                       \
-        'U',                                                                                                                       \
-        'S',                                                                                                                       \
-                                                                                                                                   \
-        /* Endpoint: 0, Cluster: General Commissioning (server), little-endian */                                                  \
-                                                                                                                                   \
-        /* 6 - Breadcrumb, */                                                                                                      \
-        0x00,                                                                                                                      \
-        0x00,                                                                                                                      \
-        0x00,                                                                                                                      \
-        0x00,                                                                                                                      \
-        0x00,                                                                                                                      \
-        0x00,                                                                                                                      \
-        0x00,                                                                                                                      \
-        0x00,                                                                                                                      \
+        5, 'e', 'n', '-', 'U', 'S',                                                                                                \
                                                                                                                                    \
     }
 
 #endif // CHIP_CONFIG_BIG_ENDIAN_TARGET
 
-#define GENERATED_DEFAULTS_COUNT (2)
+#define GENERATED_DEFAULTS_COUNT (1)
 
 // This is an array of EmberAfAttributeMinMaxValue structures.
 #define GENERATED_MIN_MAX_DEFAULT_COUNT 4
@@ -94,12 +60,14 @@
         /* Endpoint: 1, Cluster: On/Off (server) */                                                                                \
         { (uint16_t) 0xFF, (uint16_t) 0x0, (uint16_t) 0x2 }, /* StartUpOnOff */                                                    \
                                                                                                                                    \
-        /* Endpoint: 1, Cluster: Level Control (server) */                                                                         \
-        { (uint16_t) 0x0, (uint16_t) 0x0, (uint16_t) 0x3 },   /* Options */                                                        \
-        { (uint16_t) 0x32, (uint16_t) 0x1, (uint16_t) 0xFF }, /* DefaultMoveRate */                                                \
+            /* Endpoint: 1, Cluster: Level Control (server) */                                                                     \
+            { (uint16_t) 0x0, (uint16_t) 0x0, (uint16_t) 0x3 },   /* Options */                                                    \
+            { (uint16_t) 0x32, (uint16_t) 0x1, (uint16_t) 0xFF }, /* DefaultMoveRate */                                            \
                                                                                                                                    \
         /* Endpoint: 1, Cluster: Color Control (server) */                                                                         \
-        { (uint16_t) 0x0, (uint16_t) 0x0, (uint16_t) 0xFEFF } /* StartUpColorTemperatureMireds */                                  \
+        {                                                                                                                          \
+            (uint16_t) 0x0, (uint16_t) 0x0, (uint16_t) 0xFEFF                                                                      \
+        } /* StartUpColorTemperatureMireds */                                                                                      \
     }
 
 // This is an array of EmberAfAttributeMetadata structures.
@@ -217,8 +185,8 @@
           ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(READABLE) }, /* ClusterRevision */                             \
                                                                                                                                    \
         /* Endpoint: 0, Cluster: General Commissioning (server) */                                                                 \
-        { ZAP_LONG_DEFAULTS_INDEX(6), 0x00000000, 8, ZAP_TYPE(INT64U),                                                             \
-          ZAP_ATTRIBUTE_MASK(WRITABLE) | ZAP_ATTRIBUTE_MASK(READABLE) }, /* Breadcrumb */                                          \
+        { ZAP_EMPTY_DEFAULT(), 0x00000000, 8, ZAP_TYPE(INT64U),                                                                    \
+          ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(WRITABLE) | ZAP_ATTRIBUTE_MASK(READABLE) }, /* Breadcrumb */   \
         { ZAP_EMPTY_DEFAULT(), 0x00000001, 0, ZAP_TYPE(STRUCT),                                                                    \
           ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(READABLE) }, /* BasicCommissioningInfo */                      \
         { ZAP_EMPTY_DEFAULT(), 0x00000002, 1, ZAP_TYPE(ENUM8),                                                                     \
@@ -227,8 +195,10 @@
           ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(READABLE) }, /* LocationCapability */                          \
         { ZAP_EMPTY_DEFAULT(), 0x00000004, 1, ZAP_TYPE(BOOLEAN),                                                                   \
           ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(READABLE) }, /* SupportsConcurrentConnection */                \
-        { ZAP_SIMPLE_DEFAULT(0), 0x0000FFFC, 4, ZAP_TYPE(BITMAP32), ZAP_ATTRIBUTE_MASK(READABLE) }, /* FeatureMap */               \
-        { ZAP_SIMPLE_DEFAULT(1), 0x0000FFFD, 2, ZAP_TYPE(INT16U), ZAP_ATTRIBUTE_MASK(READABLE) },   /* ClusterRevision */          \
+        { ZAP_EMPTY_DEFAULT(), 0x0000FFFC, 4, ZAP_TYPE(BITMAP32),                                                                  \
+          ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(READABLE) }, /* FeatureMap */                                  \
+        { ZAP_EMPTY_DEFAULT(), 0x0000FFFD, 2, ZAP_TYPE(INT16U),                                                                    \
+          ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(READABLE) }, /* ClusterRevision */                             \
                                                                                                                                    \
         /* Endpoint: 0, Cluster: Network Commissioning (server) */                                                                 \
         { ZAP_EMPTY_DEFAULT(), 0x00000000, 1, ZAP_TYPE(INT8U),                                                                     \
@@ -1051,7 +1021,7 @@
       .clusterId = 0x00000030, \
       .attributes = ZAP_ATTRIBUTE_INDEX(51), \
       .attributeCount = 7, \
-      .clusterSize = 14, \
+      .clusterSize = 0, \
       .mask = ZAP_CLUSTER_MASK(SERVER), \
       .functions = NULL, \
       .acceptedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 2 ), \
@@ -1367,7 +1337,13 @@ static_assert(ATTRIBUTE_LARGEST <= CHIP_CONFIG_MAX_ATTRIBUTE_STORE_ELEMENT_SIZE,
 #define FIXED_PROFILE_IDS { 0x0103, 0x0103 }
 
 // Array of device types
-#define FIXED_DEVICE_TYPES { { 0x00000016, 1 }, { 0x00000101, 1 } }
+#define FIXED_DEVICE_TYPES                                                                                                         \
+    {                                                                                                                              \
+        { 0x00000016, 1 },                                                                                                         \
+        {                                                                                                                          \
+            0x00000101, 1                                                                                                          \
+        }                                                                                                                          \
+    }
 
 // Array of device type offsets
 #define FIXED_DEVICE_TYPE_OFFSETS { 0, 1 }
