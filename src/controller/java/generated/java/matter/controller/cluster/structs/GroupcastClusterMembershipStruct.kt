@@ -16,6 +16,7 @@
  */
 package matter.controller.cluster.structs
 
+import java.util.Optional
 import matter.controller.cluster.*
 import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
@@ -24,18 +25,20 @@ import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
 class GroupcastClusterMembershipStruct(
-  val groupId: UShort,
+  val groupID: UShort,
   val endpoints: List<UShort>,
-  val keyId: UInt,
+  val keyID: UInt,
   val hasAuxiliaryACL: Boolean,
+  val expiringKeyID: Optional<UInt>,
   val fabricIndex: UByte,
 ) {
   override fun toString(): String = buildString {
     append("GroupcastClusterMembershipStruct {\n")
-    append("\tgroupId : $groupId\n")
+    append("\tgroupID : $groupID\n")
     append("\tendpoints : $endpoints\n")
-    append("\tkeyId : $keyId\n")
+    append("\tkeyID : $keyID\n")
     append("\thasAuxiliaryACL : $hasAuxiliaryACL\n")
+    append("\texpiringKeyID : $expiringKeyID\n")
     append("\tfabricIndex : $fabricIndex\n")
     append("}\n")
   }
@@ -43,14 +46,18 @@ class GroupcastClusterMembershipStruct(
   fun toTlv(tlvTag: Tag, tlvWriter: TlvWriter) {
     tlvWriter.apply {
       startStructure(tlvTag)
-      put(ContextSpecificTag(TAG_GROUP_ID), groupId)
+      put(ContextSpecificTag(TAG_GROUP_ID), groupID)
       startArray(ContextSpecificTag(TAG_ENDPOINTS))
       for (item in endpoints.iterator()) {
         put(AnonymousTag, item)
       }
       endArray()
-      put(ContextSpecificTag(TAG_KEY_ID), keyId)
+      put(ContextSpecificTag(TAG_KEY_ID), keyID)
       put(ContextSpecificTag(TAG_HAS_AUXILIARY_ACL), hasAuxiliaryACL)
+      if (expiringKeyID.isPresent) {
+        val optexpiringKeyID = expiringKeyID.get()
+        put(ContextSpecificTag(TAG_EXPIRING_KEY_ID), optexpiringKeyID)
+      }
       put(ContextSpecificTag(TAG_FABRIC_INDEX), fabricIndex)
       endStructure()
     }
@@ -61,11 +68,12 @@ class GroupcastClusterMembershipStruct(
     private const val TAG_ENDPOINTS = 1
     private const val TAG_KEY_ID = 2
     private const val TAG_HAS_AUXILIARY_ACL = 3
+    private const val TAG_EXPIRING_KEY_ID = 4
     private const val TAG_FABRIC_INDEX = 254
 
     fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): GroupcastClusterMembershipStruct {
       tlvReader.enterStructure(tlvTag)
-      val groupId = tlvReader.getUShort(ContextSpecificTag(TAG_GROUP_ID))
+      val groupID = tlvReader.getUShort(ContextSpecificTag(TAG_GROUP_ID))
       val endpoints =
         buildList<UShort> {
           tlvReader.enterArray(ContextSpecificTag(TAG_ENDPOINTS))
@@ -74,17 +82,24 @@ class GroupcastClusterMembershipStruct(
           }
           tlvReader.exitContainer()
         }
-      val keyId = tlvReader.getUInt(ContextSpecificTag(TAG_KEY_ID))
+      val keyID = tlvReader.getUInt(ContextSpecificTag(TAG_KEY_ID))
       val hasAuxiliaryACL = tlvReader.getBoolean(ContextSpecificTag(TAG_HAS_AUXILIARY_ACL))
+      val expiringKeyID =
+        if (tlvReader.isNextTag(ContextSpecificTag(TAG_EXPIRING_KEY_ID))) {
+          Optional.of(tlvReader.getUInt(ContextSpecificTag(TAG_EXPIRING_KEY_ID)))
+        } else {
+          Optional.empty()
+        }
       val fabricIndex = tlvReader.getUByte(ContextSpecificTag(TAG_FABRIC_INDEX))
 
       tlvReader.exitContainer()
 
       return GroupcastClusterMembershipStruct(
-        groupId,
+        groupID,
         endpoints,
-        keyId,
+        keyID,
         hasAuxiliaryACL,
+        expiringKeyID,
         fabricIndex,
       )
     }

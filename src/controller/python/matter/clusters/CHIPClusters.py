@@ -5502,10 +5502,10 @@ class ChipClusters:
                 "commandId": 0x00000000,
                 "commandName": "JoinGroup",
                 "args": {
-                    "groupId": "int",
+                    "groupID": "int",
                     "endpoints": "int",
                     "key": "bytes",
-                    "keyId": "int",
+                    "keyID": "int",
                     "gracePeriod": "int",
                     "useAuxiliaryACL": "bool",
                 },
@@ -5514,7 +5514,7 @@ class ChipClusters:
                 "commandId": 0x00000001,
                 "commandName": "LeaveGroup",
                 "args": {
-                    "groupId": "int",
+                    "groupID": "int",
                     "endpoints": "int",
                 },
             },
@@ -5522,9 +5522,9 @@ class ChipClusters:
                 "commandId": 0x00000003,
                 "commandName": "UpdateGroupKey",
                 "args": {
-                    "groupId": "int",
+                    "groupID": "int",
                     "key": "bytes",
-                    "keyId": "int",
+                    "keyID": "int",
                     "gracePeriod": "int",
                 },
             },
@@ -5532,14 +5532,14 @@ class ChipClusters:
                 "commandId": 0x00000004,
                 "commandName": "ExpireGracePeriod",
                 "args": {
-                    "groupId": "int",
+                    "groupID": "int",
                 },
             },
             0x00000005: {
                 "commandId": 0x00000005,
                 "commandName": "ConfigureAuxiliaryACL",
                 "args": {
-                    "groupId": "int",
+                    "groupID": "int",
                     "useAuxiliaryACL": "bool",
                 },
             },

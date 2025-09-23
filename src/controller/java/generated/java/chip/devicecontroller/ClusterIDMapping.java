@@ -8542,7 +8542,7 @@ public class ClusterIDMapping {
                 }
                 throw new NoSuchFieldError();
             }
-        }public enum JoinGroupCommandField {GroupId(0),Endpoints(1),Key(2),KeyId(3),GracePeriod(4),UseAuxiliaryACL(5),;
+        }public enum JoinGroupCommandField {GroupID(0),Endpoints(1),Key(2),KeyID(3),GracePeriod(4),UseAuxiliaryACL(5),;
                     private final int id;
                     JoinGroupCommandField(int id) {
                         this.id = id;
@@ -8559,7 +8559,7 @@ public class ClusterIDMapping {
                         }
                         throw new NoSuchFieldError();
                     }
-                }public enum LeaveGroupCommandField {GroupId(0),Endpoints(1),;
+                }public enum LeaveGroupCommandField {GroupID(0),Endpoints(1),;
                     private final int id;
                     LeaveGroupCommandField(int id) {
                         this.id = id;
@@ -8576,7 +8576,7 @@ public class ClusterIDMapping {
                         }
                         throw new NoSuchFieldError();
                     }
-                }public enum UpdateGroupKeyCommandField {GroupId(0),Key(1),KeyId(2),GracePeriod(3),;
+                }public enum UpdateGroupKeyCommandField {GroupID(0),Key(1),KeyID(2),GracePeriod(3),;
                     private final int id;
                     UpdateGroupKeyCommandField(int id) {
                         this.id = id;
@@ -8593,7 +8593,7 @@ public class ClusterIDMapping {
                         }
                         throw new NoSuchFieldError();
                     }
-                }public enum ExpireGracePeriodCommandField {GroupId(0),;
+                }public enum ExpireGracePeriodCommandField {GroupID(0),;
                     private final int id;
                     ExpireGracePeriodCommandField(int id) {
                         this.id = id;
@@ -8610,7 +8610,7 @@ public class ClusterIDMapping {
                         }
                         throw new NoSuchFieldError();
                     }
-                }public enum ConfigureAuxiliaryACLCommandField {GroupId(0),UseAuxiliaryACL(1),;
+                }public enum ConfigureAuxiliaryACLCommandField {GroupID(0),UseAuxiliaryACL(1),;
                     private final int id;
                     ConfigureAuxiliaryACLCommandField(int id) {
                         this.id = id;

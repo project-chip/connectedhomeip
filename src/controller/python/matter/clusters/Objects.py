@@ -20534,17 +20534,19 @@ class Groupcast(Cluster):
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields=[
-                        ClusterObjectFieldDescriptor(Label="groupId", Tag=0, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="groupID", Tag=0, Type=uint),
                         ClusterObjectFieldDescriptor(Label="endpoints", Tag=1, Type=typing.List[uint]),
-                        ClusterObjectFieldDescriptor(Label="keyId", Tag=2, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="keyID", Tag=2, Type=uint),
                         ClusterObjectFieldDescriptor(Label="hasAuxiliaryACL", Tag=3, Type=bool),
+                        ClusterObjectFieldDescriptor(Label="expiringKeyID", Tag=4, Type=typing.Optional[uint]),
                         ClusterObjectFieldDescriptor(Label="fabricIndex", Tag=254, Type=uint),
                     ])
 
-            groupId: 'uint' = 0
+            groupID: 'uint' = 0
             endpoints: 'typing.List[uint]' = field(default_factory=lambda: [])
-            keyId: 'uint' = 0
+            keyID: 'uint' = 0
             hasAuxiliaryACL: 'bool' = False
+            expiringKeyID: 'typing.Optional[uint]' = None
             fabricIndex: 'uint' = 0
 
     class Commands:
@@ -20559,18 +20561,18 @@ class Groupcast(Cluster):
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields=[
-                        ClusterObjectFieldDescriptor(Label="groupId", Tag=0, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="groupID", Tag=0, Type=uint),
                         ClusterObjectFieldDescriptor(Label="endpoints", Tag=1, Type=typing.List[uint]),
                         ClusterObjectFieldDescriptor(Label="key", Tag=2, Type=bytes),
-                        ClusterObjectFieldDescriptor(Label="keyId", Tag=3, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="keyID", Tag=3, Type=uint),
                         ClusterObjectFieldDescriptor(Label="gracePeriod", Tag=4, Type=typing.Optional[uint]),
                         ClusterObjectFieldDescriptor(Label="useAuxiliaryACL", Tag=5, Type=typing.Optional[bool]),
                     ])
 
-            groupId: uint = 0
+            groupID: uint = 0
             endpoints: typing.List[uint] = field(default_factory=lambda: [])
             key: bytes = b""
-            keyId: uint = 0
+            keyID: uint = 0
             gracePeriod: typing.Optional[uint] = None
             useAuxiliaryACL: typing.Optional[bool] = None
 
@@ -20585,11 +20587,11 @@ class Groupcast(Cluster):
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields=[
-                        ClusterObjectFieldDescriptor(Label="groupId", Tag=0, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="groupID", Tag=0, Type=uint),
                         ClusterObjectFieldDescriptor(Label="endpoints", Tag=1, Type=typing.Optional[typing.List[uint]]),
                     ])
 
-            groupId: uint = 0
+            groupID: uint = 0
             endpoints: typing.Optional[typing.List[uint]] = None
 
         @dataclass
@@ -20603,12 +20605,12 @@ class Groupcast(Cluster):
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields=[
-                        ClusterObjectFieldDescriptor(Label="groupId", Tag=0, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="groupID", Tag=0, Type=uint),
                         ClusterObjectFieldDescriptor(Label="endpoints", Tag=1, Type=typing.Optional[typing.List[uint]]),
                         ClusterObjectFieldDescriptor(Label="listTooLarge", Tag=2, Type=typing.Optional[bool]),
                     ])
 
-            groupId: uint = 0
+            groupID: uint = 0
             endpoints: typing.Optional[typing.List[uint]] = None
             listTooLarge: typing.Optional[bool] = None
 
@@ -20623,15 +20625,15 @@ class Groupcast(Cluster):
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields=[
-                        ClusterObjectFieldDescriptor(Label="groupId", Tag=0, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="groupID", Tag=0, Type=uint),
                         ClusterObjectFieldDescriptor(Label="key", Tag=1, Type=bytes),
-                        ClusterObjectFieldDescriptor(Label="keyId", Tag=2, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="keyID", Tag=2, Type=uint),
                         ClusterObjectFieldDescriptor(Label="gracePeriod", Tag=3, Type=typing.Optional[uint]),
                     ])
 
-            groupId: uint = 0
+            groupID: uint = 0
             key: bytes = b""
-            keyId: uint = 0
+            keyID: uint = 0
             gracePeriod: typing.Optional[uint] = None
 
         @dataclass
@@ -20645,10 +20647,10 @@ class Groupcast(Cluster):
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields=[
-                        ClusterObjectFieldDescriptor(Label="groupId", Tag=0, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="groupID", Tag=0, Type=uint),
                     ])
 
-            groupId: uint = 0
+            groupID: uint = 0
 
         @dataclass
         class ConfigureAuxiliaryACL(ClusterCommand):
@@ -20661,11 +20663,11 @@ class Groupcast(Cluster):
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields=[
-                        ClusterObjectFieldDescriptor(Label="groupId", Tag=0, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="groupID", Tag=0, Type=uint),
                         ClusterObjectFieldDescriptor(Label="useAuxiliaryACL", Tag=1, Type=bool),
                     ])
 
-            groupId: uint = 0
+            groupID: uint = 0
             useAuxiliaryACL: bool = False
 
     class Attributes:

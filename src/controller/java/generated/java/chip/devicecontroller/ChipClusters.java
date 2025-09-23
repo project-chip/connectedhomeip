@@ -24979,17 +24979,17 @@ public class ChipClusters {
       return 0L;
     }
 
-    public void joinGroup(DefaultClusterCallback callback, Integer groupId, ArrayList<Integer> endpoints, byte[] key, Long keyId, Optional<Long> gracePeriod, Optional<Boolean> useAuxiliaryACL) {
-      joinGroup(callback, groupId, endpoints, key, keyId, gracePeriod, useAuxiliaryACL, 0);
+    public void joinGroup(DefaultClusterCallback callback, Integer groupID, ArrayList<Integer> endpoints, byte[] key, Long keyID, Optional<Long> gracePeriod, Optional<Boolean> useAuxiliaryACL) {
+      joinGroup(callback, groupID, endpoints, key, keyID, gracePeriod, useAuxiliaryACL, 0);
     }
 
-    public void joinGroup(DefaultClusterCallback callback, Integer groupId, ArrayList<Integer> endpoints, byte[] key, Long keyId, Optional<Long> gracePeriod, Optional<Boolean> useAuxiliaryACL, int timedInvokeTimeoutMs) {
+    public void joinGroup(DefaultClusterCallback callback, Integer groupID, ArrayList<Integer> endpoints, byte[] key, Long keyID, Optional<Long> gracePeriod, Optional<Boolean> useAuxiliaryACL, int timedInvokeTimeoutMs) {
       final long commandId = 0L;
 
       ArrayList<StructElement> elements = new ArrayList<>();
-      final long groupIdFieldID = 0L;
-      BaseTLVType groupIdtlvValue = new UIntType(groupId);
-      elements.add(new StructElement(groupIdFieldID, groupIdtlvValue));
+      final long groupIDFieldID = 0L;
+      BaseTLVType groupIDtlvValue = new UIntType(groupID);
+      elements.add(new StructElement(groupIDFieldID, groupIDtlvValue));
 
       final long endpointsFieldID = 1L;
       BaseTLVType endpointstlvValue = ArrayType.generateArrayType(endpoints, (elementendpoints) -> new UIntType(elementendpoints));
@@ -24999,9 +24999,9 @@ public class ChipClusters {
       BaseTLVType keytlvValue = new ByteArrayType(key);
       elements.add(new StructElement(keyFieldID, keytlvValue));
 
-      final long keyIdFieldID = 3L;
-      BaseTLVType keyIdtlvValue = new UIntType(keyId);
-      elements.add(new StructElement(keyIdFieldID, keyIdtlvValue));
+      final long keyIDFieldID = 3L;
+      BaseTLVType keyIDtlvValue = new UIntType(keyID);
+      elements.add(new StructElement(keyIDFieldID, keyIDtlvValue));
 
       final long gracePeriodFieldID = 4L;
       BaseTLVType gracePeriodtlvValue = gracePeriod.<BaseTLVType>map((nonOptionalgracePeriod) -> new UIntType(nonOptionalgracePeriod)).orElse(new EmptyType());
@@ -25019,17 +25019,17 @@ public class ChipClusters {
         }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
-    public void leaveGroup(LeaveGroupResponseCallback callback, Integer groupId, Optional<ArrayList<Integer>> endpoints) {
-      leaveGroup(callback, groupId, endpoints, 0);
+    public void leaveGroup(LeaveGroupResponseCallback callback, Integer groupID, Optional<ArrayList<Integer>> endpoints) {
+      leaveGroup(callback, groupID, endpoints, 0);
     }
 
-    public void leaveGroup(LeaveGroupResponseCallback callback, Integer groupId, Optional<ArrayList<Integer>> endpoints, int timedInvokeTimeoutMs) {
+    public void leaveGroup(LeaveGroupResponseCallback callback, Integer groupID, Optional<ArrayList<Integer>> endpoints, int timedInvokeTimeoutMs) {
       final long commandId = 1L;
 
       ArrayList<StructElement> elements = new ArrayList<>();
-      final long groupIdFieldID = 0L;
-      BaseTLVType groupIdtlvValue = new UIntType(groupId);
-      elements.add(new StructElement(groupIdFieldID, groupIdtlvValue));
+      final long groupIDFieldID = 0L;
+      BaseTLVType groupIDtlvValue = new UIntType(groupID);
+      elements.add(new StructElement(groupIDFieldID, groupIDtlvValue));
 
       final long endpointsFieldID = 1L;
       BaseTLVType endpointstlvValue = endpoints.<BaseTLVType>map((nonOptionalendpoints) -> ArrayType.generateArrayType(nonOptionalendpoints, (elementnonOptionalendpoints) -> new UIntType(elementnonOptionalendpoints))).orElse(new EmptyType());
@@ -25039,17 +25039,17 @@ public class ChipClusters {
       invoke(new InvokeCallbackImpl(callback) {
           @Override
           public void onResponse(StructType invokeStructValue) {
-          final long groupIdFieldID = 0L;
-          Integer groupId = null;
+          final long groupIDFieldID = 0L;
+          Integer groupID = null;
           final long endpointsFieldID = 1L;
           Optional<ArrayList<Integer>> endpoints = Optional.empty();
           final long listTooLargeFieldID = 2L;
           Optional<Boolean> listTooLarge = Optional.empty();
           for (StructElement element: invokeStructValue.value()) {
-            if (element.contextTagNum() == groupIdFieldID) {
+            if (element.contextTagNum() == groupIDFieldID) {
               if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
                 UIntType castingValue = element.value(UIntType.class);
-                groupId = castingValue.value(Integer.class);
+                groupID = castingValue.value(Integer.class);
               }
             } else if (element.contextTagNum() == endpointsFieldID) {
               if (element.value(BaseTLVType.class).type() == TLVType.Array) {
@@ -25063,29 +25063,29 @@ public class ChipClusters {
               }
             }
           }
-          callback.onSuccess(groupId, endpoints, listTooLarge);
+          callback.onSuccess(groupID, endpoints, listTooLarge);
         }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
-    public void updateGroupKey(DefaultClusterCallback callback, Integer groupId, byte[] key, Long keyId, Optional<Long> gracePeriod) {
-      updateGroupKey(callback, groupId, key, keyId, gracePeriod, 0);
+    public void updateGroupKey(DefaultClusterCallback callback, Integer groupID, byte[] key, Long keyID, Optional<Long> gracePeriod) {
+      updateGroupKey(callback, groupID, key, keyID, gracePeriod, 0);
     }
 
-    public void updateGroupKey(DefaultClusterCallback callback, Integer groupId, byte[] key, Long keyId, Optional<Long> gracePeriod, int timedInvokeTimeoutMs) {
+    public void updateGroupKey(DefaultClusterCallback callback, Integer groupID, byte[] key, Long keyID, Optional<Long> gracePeriod, int timedInvokeTimeoutMs) {
       final long commandId = 3L;
 
       ArrayList<StructElement> elements = new ArrayList<>();
-      final long groupIdFieldID = 0L;
-      BaseTLVType groupIdtlvValue = new UIntType(groupId);
-      elements.add(new StructElement(groupIdFieldID, groupIdtlvValue));
+      final long groupIDFieldID = 0L;
+      BaseTLVType groupIDtlvValue = new UIntType(groupID);
+      elements.add(new StructElement(groupIDFieldID, groupIDtlvValue));
 
       final long keyFieldID = 1L;
       BaseTLVType keytlvValue = new ByteArrayType(key);
       elements.add(new StructElement(keyFieldID, keytlvValue));
 
-      final long keyIdFieldID = 2L;
-      BaseTLVType keyIdtlvValue = new UIntType(keyId);
-      elements.add(new StructElement(keyIdFieldID, keyIdtlvValue));
+      final long keyIDFieldID = 2L;
+      BaseTLVType keyIDtlvValue = new UIntType(keyID);
+      elements.add(new StructElement(keyIDFieldID, keyIDtlvValue));
 
       final long gracePeriodFieldID = 3L;
       BaseTLVType gracePeriodtlvValue = gracePeriod.<BaseTLVType>map((nonOptionalgracePeriod) -> new UIntType(nonOptionalgracePeriod)).orElse(new EmptyType());
@@ -25099,17 +25099,17 @@ public class ChipClusters {
         }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
-    public void expireGracePeriod(DefaultClusterCallback callback, Integer groupId) {
-      expireGracePeriod(callback, groupId, 0);
+    public void expireGracePeriod(DefaultClusterCallback callback, Integer groupID) {
+      expireGracePeriod(callback, groupID, 0);
     }
 
-    public void expireGracePeriod(DefaultClusterCallback callback, Integer groupId, int timedInvokeTimeoutMs) {
+    public void expireGracePeriod(DefaultClusterCallback callback, Integer groupID, int timedInvokeTimeoutMs) {
       final long commandId = 4L;
 
       ArrayList<StructElement> elements = new ArrayList<>();
-      final long groupIdFieldID = 0L;
-      BaseTLVType groupIdtlvValue = new UIntType(groupId);
-      elements.add(new StructElement(groupIdFieldID, groupIdtlvValue));
+      final long groupIDFieldID = 0L;
+      BaseTLVType groupIDtlvValue = new UIntType(groupID);
+      elements.add(new StructElement(groupIDFieldID, groupIDtlvValue));
 
       StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
@@ -25119,17 +25119,17 @@ public class ChipClusters {
         }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
-    public void configureAuxiliaryACL(DefaultClusterCallback callback, Integer groupId, Boolean useAuxiliaryACL) {
-      configureAuxiliaryACL(callback, groupId, useAuxiliaryACL, 0);
+    public void configureAuxiliaryACL(DefaultClusterCallback callback, Integer groupID, Boolean useAuxiliaryACL) {
+      configureAuxiliaryACL(callback, groupID, useAuxiliaryACL, 0);
     }
 
-    public void configureAuxiliaryACL(DefaultClusterCallback callback, Integer groupId, Boolean useAuxiliaryACL, int timedInvokeTimeoutMs) {
+    public void configureAuxiliaryACL(DefaultClusterCallback callback, Integer groupID, Boolean useAuxiliaryACL, int timedInvokeTimeoutMs) {
       final long commandId = 5L;
 
       ArrayList<StructElement> elements = new ArrayList<>();
-      final long groupIdFieldID = 0L;
-      BaseTLVType groupIdtlvValue = new UIntType(groupId);
-      elements.add(new StructElement(groupIdFieldID, groupIdtlvValue));
+      final long groupIDFieldID = 0L;
+      BaseTLVType groupIDtlvValue = new UIntType(groupID);
+      elements.add(new StructElement(groupIDFieldID, groupIDtlvValue));
 
       final long useAuxiliaryACLFieldID = 1L;
       BaseTLVType useAuxiliaryACLtlvValue = new BooleanType(useAuxiliaryACL);
@@ -25144,7 +25144,7 @@ public class ChipClusters {
     }
 
     public interface LeaveGroupResponseCallback extends BaseClusterCallback {
-      void onSuccess(Integer groupId, Optional<ArrayList<Integer>> endpoints, Optional<Boolean> listTooLarge);
+      void onSuccess(Integer groupID, Optional<ArrayList<Integer>> endpoints, Optional<Boolean> listTooLarge);
     }
 
     public interface MembershipAttributeCallback extends BaseAttributeCallback {

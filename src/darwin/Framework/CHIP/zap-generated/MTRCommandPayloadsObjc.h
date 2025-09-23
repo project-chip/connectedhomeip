@@ -5354,13 +5354,13 @@ MTR_PROVISIONALLY_AVAILABLE
 MTR_PROVISIONALLY_AVAILABLE
 @interface MTRGroupcastClusterJoinGroupParams : NSObject <NSCopying>
 
-@property (nonatomic, copy) NSNumber * _Nonnull groupId MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nonnull groupID MTR_PROVISIONALLY_AVAILABLE;
 
 @property (nonatomic, copy) NSArray * _Nonnull endpoints MTR_PROVISIONALLY_AVAILABLE;
 
 @property (nonatomic, copy) NSData * _Nonnull key MTR_PROVISIONALLY_AVAILABLE;
 
-@property (nonatomic, copy) NSNumber * _Nonnull keyId MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nonnull keyID MTR_PROVISIONALLY_AVAILABLE;
 
 @property (nonatomic, copy) NSNumber * _Nullable gracePeriod MTR_PROVISIONALLY_AVAILABLE;
 
@@ -5394,7 +5394,7 @@ MTR_PROVISIONALLY_AVAILABLE
 MTR_PROVISIONALLY_AVAILABLE
 @interface MTRGroupcastClusterLeaveGroupParams : NSObject <NSCopying>
 
-@property (nonatomic, copy) NSNumber * _Nonnull groupId MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nonnull groupID MTR_PROVISIONALLY_AVAILABLE;
 
 @property (nonatomic, copy) NSArray * _Nullable endpoints MTR_PROVISIONALLY_AVAILABLE;
 /**
@@ -5426,7 +5426,7 @@ MTR_PROVISIONALLY_AVAILABLE
 MTR_PROVISIONALLY_AVAILABLE
 @interface MTRGroupcastClusterLeaveGroupResponseParams : NSObject <NSCopying>
 
-@property (nonatomic, copy) NSNumber * _Nonnull groupId MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nonnull groupID MTR_PROVISIONALLY_AVAILABLE;
 
 @property (nonatomic, copy) NSArray * _Nullable endpoints MTR_PROVISIONALLY_AVAILABLE;
 
@@ -5449,11 +5449,11 @@ MTR_PROVISIONALLY_AVAILABLE
 MTR_PROVISIONALLY_AVAILABLE
 @interface MTRGroupcastClusterUpdateGroupKeyParams : NSObject <NSCopying>
 
-@property (nonatomic, copy) NSNumber * _Nonnull groupId MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nonnull groupID MTR_PROVISIONALLY_AVAILABLE;
 
 @property (nonatomic, copy) NSData * _Nonnull key MTR_PROVISIONALLY_AVAILABLE;
 
-@property (nonatomic, copy) NSNumber * _Nonnull keyId MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nonnull keyID MTR_PROVISIONALLY_AVAILABLE;
 
 @property (nonatomic, copy) NSNumber * _Nullable gracePeriod MTR_PROVISIONALLY_AVAILABLE;
 /**
@@ -5485,7 +5485,7 @@ MTR_PROVISIONALLY_AVAILABLE
 MTR_PROVISIONALLY_AVAILABLE
 @interface MTRGroupcastClusterExpireGracePeriodParams : NSObject <NSCopying>
 
-@property (nonatomic, copy) NSNumber * _Nonnull groupId MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nonnull groupID MTR_PROVISIONALLY_AVAILABLE;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -5515,7 +5515,7 @@ MTR_PROVISIONALLY_AVAILABLE
 MTR_PROVISIONALLY_AVAILABLE
 @interface MTRGroupcastClusterConfigureAuxiliaryACLParams : NSObject <NSCopying>
 
-@property (nonatomic, copy) NSNumber * _Nonnull groupId MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nonnull groupID MTR_PROVISIONALLY_AVAILABLE;
 
 @property (nonatomic, copy) NSNumber * _Nonnull useAuxiliaryACL MTR_PROVISIONALLY_AVAILABLE;
 /**

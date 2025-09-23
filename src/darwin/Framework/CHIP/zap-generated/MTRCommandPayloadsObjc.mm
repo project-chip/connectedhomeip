@@ -15588,13 +15588,13 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
 {
     if (self = [super init]) {
 
-        _groupId = @(0);
+        _groupID = @(0);
 
         _endpoints = [NSArray array];
 
         _key = [NSData data];
 
-        _keyId = @(0);
+        _keyID = @(0);
 
         _gracePeriod = nil;
 
@@ -15609,10 +15609,10 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
 {
     auto other = [[MTRGroupcastClusterJoinGroupParams alloc] init];
 
-    other.groupId = self.groupId;
+    other.groupID = self.groupID;
     other.endpoints = self.endpoints;
     other.key = self.key;
-    other.keyId = self.keyId;
+    other.keyID = self.keyID;
     other.gracePeriod = self.gracePeriod;
     other.useAuxiliaryACL = self.useAuxiliaryACL;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
@@ -15623,7 +15623,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: groupId:%@; endpoints:%@; key:%@; keyId:%@; gracePeriod:%@; useAuxiliaryACL:%@; >", NSStringFromClass([self class]), _groupId, _endpoints, [_key base64EncodedStringWithOptions:0], _keyId, _gracePeriod, _useAuxiliaryACL];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: groupID:%@; endpoints:%@; key:%@; keyID:%@; gracePeriod:%@; useAuxiliaryACL:%@; >", NSStringFromClass([self class]), _groupID, _endpoints, [_key base64EncodedStringWithOptions:0], _keyID, _gracePeriod, _useAuxiliaryACL];
     return descriptionString;
 }
 
@@ -15636,7 +15636,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     chip::app::Clusters::Groupcast::Commands::JoinGroup::Type encodableStruct;
     ListFreer listFreer;
     {
-        encodableStruct.groupId = self.groupId.unsignedShortValue;
+        encodableStruct.groupID = self.groupID.unsignedShortValue;
     }
     {
         {
@@ -15667,7 +15667,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         encodableStruct.key = AsByteSpan(self.key);
     }
     {
-        encodableStruct.keyId = self.keyId.unsignedIntValue;
+        encodableStruct.keyID = self.keyID.unsignedIntValue;
     }
     {
         if (self.gracePeriod != nil) {
@@ -15725,7 +15725,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
 {
     if (self = [super init]) {
 
-        _groupId = @(0);
+        _groupID = @(0);
 
         _endpoints = nil;
         _timedInvokeTimeoutMs = nil;
@@ -15738,7 +15738,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
 {
     auto other = [[MTRGroupcastClusterLeaveGroupParams alloc] init];
 
-    other.groupId = self.groupId;
+    other.groupID = self.groupID;
     other.endpoints = self.endpoints;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
@@ -15748,7 +15748,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: groupId:%@; endpoints:%@; >", NSStringFromClass([self class]), _groupId, _endpoints];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: groupID:%@; endpoints:%@; >", NSStringFromClass([self class]), _groupID, _endpoints];
     return descriptionString;
 }
 
@@ -15761,7 +15761,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     chip::app::Clusters::Groupcast::Commands::LeaveGroup::Type encodableStruct;
     ListFreer listFreer;
     {
-        encodableStruct.groupId = self.groupId.unsignedShortValue;
+        encodableStruct.groupID = self.groupID.unsignedShortValue;
     }
     {
         if (self.endpoints != nil) {
@@ -15835,7 +15835,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
 {
     if (self = [super init]) {
 
-        _groupId = @(0);
+        _groupID = @(0);
 
         _endpoints = nil;
 
@@ -15848,7 +15848,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
 {
     auto other = [[MTRGroupcastClusterLeaveGroupResponseParams alloc] init];
 
-    other.groupId = self.groupId;
+    other.groupID = self.groupID;
     other.endpoints = self.endpoints;
     other.listTooLarge = self.listTooLarge;
 
@@ -15857,7 +15857,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: groupId:%@; endpoints:%@; listTooLarge:%@; >", NSStringFromClass([self class]), _groupId, _endpoints, _listTooLarge];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: groupID:%@; endpoints:%@; listTooLarge:%@; >", NSStringFromClass([self class]), _groupID, _endpoints, _listTooLarge];
     return descriptionString;
 }
 
@@ -15918,7 +15918,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
 - (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::Groupcast::Commands::LeaveGroupResponse::DecodableType &)decodableStruct
 {
     {
-        self.groupId = [NSNumber numberWithUnsignedShort:decodableStruct.groupId];
+        self.groupID = [NSNumber numberWithUnsignedShort:decodableStruct.groupID];
     }
     {
         if (decodableStruct.endpoints.HasValue()) {
@@ -15958,11 +15958,11 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
 {
     if (self = [super init]) {
 
-        _groupId = @(0);
+        _groupID = @(0);
 
         _key = [NSData data];
 
-        _keyId = @(0);
+        _keyID = @(0);
 
         _gracePeriod = nil;
         _timedInvokeTimeoutMs = nil;
@@ -15975,9 +15975,9 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
 {
     auto other = [[MTRGroupcastClusterUpdateGroupKeyParams alloc] init];
 
-    other.groupId = self.groupId;
+    other.groupID = self.groupID;
     other.key = self.key;
-    other.keyId = self.keyId;
+    other.keyID = self.keyID;
     other.gracePeriod = self.gracePeriod;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
@@ -15987,7 +15987,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: groupId:%@; key:%@; keyId:%@; gracePeriod:%@; >", NSStringFromClass([self class]), _groupId, [_key base64EncodedStringWithOptions:0], _keyId, _gracePeriod];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: groupID:%@; key:%@; keyID:%@; gracePeriod:%@; >", NSStringFromClass([self class]), _groupID, [_key base64EncodedStringWithOptions:0], _keyID, _gracePeriod];
     return descriptionString;
 }
 
@@ -16000,13 +16000,13 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     chip::app::Clusters::Groupcast::Commands::UpdateGroupKey::Type encodableStruct;
     ListFreer listFreer;
     {
-        encodableStruct.groupId = self.groupId.unsignedShortValue;
+        encodableStruct.groupID = self.groupID.unsignedShortValue;
     }
     {
         encodableStruct.key = AsByteSpan(self.key);
     }
     {
-        encodableStruct.keyId = self.keyId.unsignedIntValue;
+        encodableStruct.keyID = self.keyID.unsignedIntValue;
     }
     {
         if (self.gracePeriod != nil) {
@@ -16058,7 +16058,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
 {
     if (self = [super init]) {
 
-        _groupId = @(0);
+        _groupID = @(0);
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
     }
@@ -16069,7 +16069,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
 {
     auto other = [[MTRGroupcastClusterExpireGracePeriodParams alloc] init];
 
-    other.groupId = self.groupId;
+    other.groupID = self.groupID;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
 
@@ -16078,7 +16078,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: groupId:%@; >", NSStringFromClass([self class]), _groupId];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: groupID:%@; >", NSStringFromClass([self class]), _groupID];
     return descriptionString;
 }
 
@@ -16091,7 +16091,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     chip::app::Clusters::Groupcast::Commands::ExpireGracePeriod::Type encodableStruct;
     ListFreer listFreer;
     {
-        encodableStruct.groupId = self.groupId.unsignedShortValue;
+        encodableStruct.groupID = self.groupID.unsignedShortValue;
     }
 
     auto buffer = chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSizeWithoutReserve, 0);
@@ -16137,7 +16137,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
 {
     if (self = [super init]) {
 
-        _groupId = @(0);
+        _groupID = @(0);
 
         _useAuxiliaryACL = @(0);
         _timedInvokeTimeoutMs = nil;
@@ -16150,7 +16150,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
 {
     auto other = [[MTRGroupcastClusterConfigureAuxiliaryACLParams alloc] init];
 
-    other.groupId = self.groupId;
+    other.groupID = self.groupID;
     other.useAuxiliaryACL = self.useAuxiliaryACL;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
@@ -16160,7 +16160,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: groupId:%@; useAuxiliaryACL:%@; >", NSStringFromClass([self class]), _groupId, _useAuxiliaryACL];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: groupID:%@; useAuxiliaryACL:%@; >", NSStringFromClass([self class]), _groupID, _useAuxiliaryACL];
     return descriptionString;
 }
 
@@ -16173,7 +16173,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     chip::app::Clusters::Groupcast::Commands::ConfigureAuxiliaryACL::Type encodableStruct;
     ListFreer listFreer;
     {
-        encodableStruct.groupId = self.groupId.unsignedShortValue;
+        encodableStruct.groupID = self.groupID.unsignedShortValue;
     }
     {
         encodableStruct.useAuxiliaryACL = self.useAuxiliaryACL.boolValue;

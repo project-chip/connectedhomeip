@@ -4354,10 +4354,11 @@ cluster Groupcast = 101 {
   }
 
   fabric_scoped struct MembershipStruct {
-    group_id groupId = 0;
+    group_id groupID = 0;
     endpoint_no endpoints[] = 1;
-    fabric_sensitive int32u keyId = 2;
+    fabric_sensitive int32u keyID = 2;
     boolean hasAuxiliaryACL = 3;
+    optional fabric_sensitive int32u expiringKeyID = 4;
     fabric_idx fabricIndex = 254;
   }
 
@@ -4370,38 +4371,38 @@ cluster Groupcast = 101 {
   readonly attribute int16u clusterRevision = 65533;
 
   request struct JoinGroupRequest {
-    group_id groupId = 0;
+    group_id groupID = 0;
     endpoint_no endpoints[] = 1;
     octet_string<16> key = 2;
-    int32u keyId = 3;
+    int32u keyID = 3;
     optional epoch_s gracePeriod = 4;
     optional boolean useAuxiliaryACL = 5;
   }
 
   request struct LeaveGroupRequest {
-    group_id groupId = 0;
+    group_id groupID = 0;
     optional endpoint_no endpoints[] = 1;
   }
 
   response struct LeaveGroupResponse = 2 {
-    group_id groupId = 0;
+    group_id groupID = 0;
     optional endpoint_no endpoints[] = 1;
     optional boolean listTooLarge = 2;
   }
 
   request struct UpdateGroupKeyRequest {
-    group_id groupId = 0;
+    group_id groupID = 0;
     octet_string<16> key = 1;
-    int32u keyId = 2;
+    int32u keyID = 2;
     optional epoch_s gracePeriod = 3;
   }
 
   request struct ExpireGracePeriodRequest {
-    group_id groupId = 0;
+    group_id groupID = 0;
   }
 
   request struct ConfigureAuxiliaryACLRequest {
-    group_id groupId = 0;
+    group_id groupID = 0;
     boolean useAuxiliaryACL = 1;
   }
 

@@ -7992,11 +7992,11 @@ public class ClusterInfoMapping {
     }
 
     @Override
-    public void onSuccess(Integer groupId, Optional<ArrayList<Integer>> endpoints, Optional<Boolean> listTooLarge) {
+    public void onSuccess(Integer groupID, Optional<ArrayList<Integer>> endpoints, Optional<Boolean> listTooLarge) {
       Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
 
-      CommandResponseInfo groupIdResponseValue = new CommandResponseInfo("groupId", "Integer");
-      responseValues.put(groupIdResponseValue, groupId);
+      CommandResponseInfo groupIDResponseValue = new CommandResponseInfo("groupID", "Integer");
+      responseValues.put(groupIDResponseValue, groupID);
       // endpoints: endpoint_no
       // Conversion from this type to Java is not properly implemented yet
 
@@ -26182,8 +26182,8 @@ public class ClusterInfoMapping {
 
     Map<String, CommandParameterInfo> groupcastjoinGroupCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
 
-    CommandParameterInfo groupcastjoinGroupgroupIdCommandParameterInfo = new CommandParameterInfo("groupId", Integer.class, Integer.class);
-    groupcastjoinGroupCommandParams.put("groupId",groupcastjoinGroupgroupIdCommandParameterInfo);
+    CommandParameterInfo groupcastjoinGroupgroupIDCommandParameterInfo = new CommandParameterInfo("groupID", Integer.class, Integer.class);
+    groupcastjoinGroupCommandParams.put("groupID",groupcastjoinGroupgroupIDCommandParameterInfo);
 
     CommandParameterInfo groupcastjoinGroupendpointsCommandParameterInfo = new CommandParameterInfo("endpoints", ArrayList.class, ArrayList.class);
     groupcastjoinGroupCommandParams.put("endpoints",groupcastjoinGroupendpointsCommandParameterInfo);
@@ -26191,8 +26191,8 @@ public class ClusterInfoMapping {
     CommandParameterInfo groupcastjoinGroupkeyCommandParameterInfo = new CommandParameterInfo("key", byte[].class, byte[].class);
     groupcastjoinGroupCommandParams.put("key",groupcastjoinGroupkeyCommandParameterInfo);
 
-    CommandParameterInfo groupcastjoinGroupkeyIdCommandParameterInfo = new CommandParameterInfo("keyId", Long.class, Long.class);
-    groupcastjoinGroupCommandParams.put("keyId",groupcastjoinGroupkeyIdCommandParameterInfo);
+    CommandParameterInfo groupcastjoinGroupkeyIDCommandParameterInfo = new CommandParameterInfo("keyID", Long.class, Long.class);
+    groupcastjoinGroupCommandParams.put("keyID",groupcastjoinGroupkeyIDCommandParameterInfo);
 
     CommandParameterInfo groupcastjoinGroupgracePeriodCommandParameterInfo = new CommandParameterInfo("gracePeriod", Optional.class, Long.class);
     groupcastjoinGroupCommandParams.put("gracePeriod",groupcastjoinGroupgracePeriodCommandParameterInfo);
@@ -26204,13 +26204,13 @@ public class ClusterInfoMapping {
         ((ChipClusters.GroupcastCluster) cluster)
         .joinGroup((DefaultClusterCallback) callback
         , (Integer)
-        commandArguments.get("groupId")
+        commandArguments.get("groupID")
         , (ArrayList<Integer>)
         commandArguments.get("endpoints")
         , (byte[])
         commandArguments.get("key")
         , (Long)
-        commandArguments.get("keyId")
+        commandArguments.get("keyID")
         , (Optional<Long>)
         commandArguments.get("gracePeriod")
         , (Optional<Boolean>)
@@ -26224,8 +26224,8 @@ public class ClusterInfoMapping {
 
     Map<String, CommandParameterInfo> groupcastleaveGroupCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
 
-    CommandParameterInfo groupcastleaveGroupgroupIdCommandParameterInfo = new CommandParameterInfo("groupId", Integer.class, Integer.class);
-    groupcastleaveGroupCommandParams.put("groupId",groupcastleaveGroupgroupIdCommandParameterInfo);
+    CommandParameterInfo groupcastleaveGroupgroupIDCommandParameterInfo = new CommandParameterInfo("groupID", Integer.class, Integer.class);
+    groupcastleaveGroupCommandParams.put("groupID",groupcastleaveGroupgroupIDCommandParameterInfo);
 
     CommandParameterInfo groupcastleaveGroupendpointsCommandParameterInfo = new CommandParameterInfo("endpoints", Optional.class, ArrayList.class);
     groupcastleaveGroupCommandParams.put("endpoints",groupcastleaveGroupendpointsCommandParameterInfo);
@@ -26234,7 +26234,7 @@ public class ClusterInfoMapping {
         ((ChipClusters.GroupcastCluster) cluster)
           .leaveGroup((ChipClusters.GroupcastCluster.LeaveGroupResponseCallback) callback
            , (Integer)
-             commandArguments.get("groupId")
+             commandArguments.get("groupID")
 
            , (Optional<ArrayList<Integer>>)
              commandArguments.get("endpoints")
@@ -26248,14 +26248,14 @@ public class ClusterInfoMapping {
 
     Map<String, CommandParameterInfo> groupcastupdateGroupKeyCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
 
-    CommandParameterInfo groupcastupdateGroupKeygroupIdCommandParameterInfo = new CommandParameterInfo("groupId", Integer.class, Integer.class);
-    groupcastupdateGroupKeyCommandParams.put("groupId",groupcastupdateGroupKeygroupIdCommandParameterInfo);
+    CommandParameterInfo groupcastupdateGroupKeygroupIDCommandParameterInfo = new CommandParameterInfo("groupID", Integer.class, Integer.class);
+    groupcastupdateGroupKeyCommandParams.put("groupID",groupcastupdateGroupKeygroupIDCommandParameterInfo);
 
     CommandParameterInfo groupcastupdateGroupKeykeyCommandParameterInfo = new CommandParameterInfo("key", byte[].class, byte[].class);
     groupcastupdateGroupKeyCommandParams.put("key",groupcastupdateGroupKeykeyCommandParameterInfo);
 
-    CommandParameterInfo groupcastupdateGroupKeykeyIdCommandParameterInfo = new CommandParameterInfo("keyId", Long.class, Long.class);
-    groupcastupdateGroupKeyCommandParams.put("keyId",groupcastupdateGroupKeykeyIdCommandParameterInfo);
+    CommandParameterInfo groupcastupdateGroupKeykeyIDCommandParameterInfo = new CommandParameterInfo("keyID", Long.class, Long.class);
+    groupcastupdateGroupKeyCommandParams.put("keyID",groupcastupdateGroupKeykeyIDCommandParameterInfo);
 
     CommandParameterInfo groupcastupdateGroupKeygracePeriodCommandParameterInfo = new CommandParameterInfo("gracePeriod", Optional.class, Long.class);
     groupcastupdateGroupKeyCommandParams.put("gracePeriod",groupcastupdateGroupKeygracePeriodCommandParameterInfo);
@@ -26264,11 +26264,11 @@ public class ClusterInfoMapping {
         ((ChipClusters.GroupcastCluster) cluster)
         .updateGroupKey((DefaultClusterCallback) callback
         , (Integer)
-        commandArguments.get("groupId")
+        commandArguments.get("groupID")
         , (byte[])
         commandArguments.get("key")
         , (Long)
-        commandArguments.get("keyId")
+        commandArguments.get("keyID")
         , (Optional<Long>)
         commandArguments.get("gracePeriod")
         );
@@ -26280,14 +26280,14 @@ public class ClusterInfoMapping {
 
     Map<String, CommandParameterInfo> groupcastexpireGracePeriodCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
 
-    CommandParameterInfo groupcastexpireGracePeriodgroupIdCommandParameterInfo = new CommandParameterInfo("groupId", Integer.class, Integer.class);
-    groupcastexpireGracePeriodCommandParams.put("groupId",groupcastexpireGracePeriodgroupIdCommandParameterInfo);
+    CommandParameterInfo groupcastexpireGracePeriodgroupIDCommandParameterInfo = new CommandParameterInfo("groupID", Integer.class, Integer.class);
+    groupcastexpireGracePeriodCommandParams.put("groupID",groupcastexpireGracePeriodgroupIDCommandParameterInfo);
     InteractionInfo groupcastexpireGracePeriodInteractionInfo = new InteractionInfo(
       (cluster, callback, commandArguments) -> {
         ((ChipClusters.GroupcastCluster) cluster)
         .expireGracePeriod((DefaultClusterCallback) callback
         , (Integer)
-        commandArguments.get("groupId")
+        commandArguments.get("groupID")
         );
       },
       () -> new DelegatedDefaultClusterCallback(),
@@ -26297,8 +26297,8 @@ public class ClusterInfoMapping {
 
     Map<String, CommandParameterInfo> groupcastconfigureAuxiliaryACLCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
 
-    CommandParameterInfo groupcastconfigureAuxiliaryACLgroupIdCommandParameterInfo = new CommandParameterInfo("groupId", Integer.class, Integer.class);
-    groupcastconfigureAuxiliaryACLCommandParams.put("groupId",groupcastconfigureAuxiliaryACLgroupIdCommandParameterInfo);
+    CommandParameterInfo groupcastconfigureAuxiliaryACLgroupIDCommandParameterInfo = new CommandParameterInfo("groupID", Integer.class, Integer.class);
+    groupcastconfigureAuxiliaryACLCommandParams.put("groupID",groupcastconfigureAuxiliaryACLgroupIDCommandParameterInfo);
 
     CommandParameterInfo groupcastconfigureAuxiliaryACLuseAuxiliaryACLCommandParameterInfo = new CommandParameterInfo("useAuxiliaryACL", Boolean.class, Boolean.class);
     groupcastconfigureAuxiliaryACLCommandParams.put("useAuxiliaryACL",groupcastconfigureAuxiliaryACLuseAuxiliaryACLCommandParameterInfo);
@@ -26307,7 +26307,7 @@ public class ClusterInfoMapping {
         ((ChipClusters.GroupcastCluster) cluster)
         .configureAuxiliaryACL((DefaultClusterCallback) callback
         , (Integer)
-        commandArguments.get("groupId")
+        commandArguments.get("groupID")
         , (Boolean)
         commandArguments.get("useAuxiliaryACL")
         );

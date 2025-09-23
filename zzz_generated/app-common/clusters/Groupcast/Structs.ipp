@@ -46,13 +46,17 @@ CHIP_ERROR Type::DoEncode(TLV::TLVWriter & aWriter, TLV::Tag aTag, const Optiona
 
     DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
 
-    encoder.Encode(to_underlying(Fields::kGroupId), groupId);
+    encoder.Encode(to_underlying(Fields::kGroupID), groupID);
     encoder.Encode(to_underlying(Fields::kEndpoints), endpoints);
     if (includeSensitive)
     {
-        encoder.Encode(to_underlying(Fields::kKeyId), keyId);
+        encoder.Encode(to_underlying(Fields::kKeyID), keyID);
     }
     encoder.Encode(to_underlying(Fields::kHasAuxiliaryACL), hasAuxiliaryACL);
+    if (includeSensitive)
+    {
+        encoder.Encode(to_underlying(Fields::kExpiringKeyID), expiringKeyID);
+    }
     if (aAccessingFabricIndex.HasValue())
     {
         encoder.Encode(to_underlying(Fields::kFabricIndex), fabricIndex);
@@ -71,21 +75,25 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         VerifyOrReturnError(err != CHIP_ERROR_END_OF_TLV, CHIP_NO_ERROR);
         ReturnErrorOnFailure(err);
 
-        if (__context_tag == to_underlying(Fields::kGroupId))
+        if (__context_tag == to_underlying(Fields::kGroupID))
         {
-            err = DataModel::Decode(reader, groupId);
+            err = DataModel::Decode(reader, groupID);
         }
         else if (__context_tag == to_underlying(Fields::kEndpoints))
         {
             err = DataModel::Decode(reader, endpoints);
         }
-        else if (__context_tag == to_underlying(Fields::kKeyId))
+        else if (__context_tag == to_underlying(Fields::kKeyID))
         {
-            err = DataModel::Decode(reader, keyId);
+            err = DataModel::Decode(reader, keyID);
         }
         else if (__context_tag == to_underlying(Fields::kHasAuxiliaryACL))
         {
             err = DataModel::Decode(reader, hasAuxiliaryACL);
+        }
+        else if (__context_tag == to_underlying(Fields::kExpiringKeyID))
+        {
+            err = DataModel::Decode(reader, expiringKeyID);
         }
         else if (__context_tag == to_underlying(Fields::kFabricIndex))
         {

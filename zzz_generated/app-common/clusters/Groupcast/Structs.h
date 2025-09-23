@@ -40,20 +40,22 @@ namespace Structs {
 namespace MembershipStruct {
 enum class Fields : uint8_t
 {
-    kGroupId         = 0,
+    kGroupID         = 0,
     kEndpoints       = 1,
-    kKeyId           = 2,
+    kKeyID           = 2,
     kHasAuxiliaryACL = 3,
+    kExpiringKeyID   = 4,
     kFabricIndex     = 254,
 };
 
 struct Type
 {
 public:
-    chip::GroupId groupId = static_cast<chip::GroupId>(0);
+    chip::GroupId groupID = static_cast<chip::GroupId>(0);
     DataModel::List<const chip::EndpointId> endpoints;
-    uint32_t keyId                = static_cast<uint32_t>(0);
-    bool hasAuxiliaryACL          = static_cast<bool>(0);
+    uint32_t keyID       = static_cast<uint32_t>(0);
+    bool hasAuxiliaryACL = static_cast<bool>(0);
+    Optional<uint32_t> expiringKeyID;
     chip::FabricIndex fabricIndex = static_cast<chip::FabricIndex>(0);
 
     static constexpr bool kIsFabricScoped = true;
@@ -72,10 +74,11 @@ private:
 struct DecodableType
 {
 public:
-    chip::GroupId groupId = static_cast<chip::GroupId>(0);
+    chip::GroupId groupID = static_cast<chip::GroupId>(0);
     DataModel::DecodableList<chip::EndpointId> endpoints;
-    uint32_t keyId                = static_cast<uint32_t>(0);
-    bool hasAuxiliaryACL          = static_cast<bool>(0);
+    uint32_t keyID       = static_cast<uint32_t>(0);
+    bool hasAuxiliaryACL = static_cast<bool>(0);
+    Optional<uint32_t> expiringKeyID;
     chip::FabricIndex fabricIndex = static_cast<chip::FabricIndex>(0);
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);

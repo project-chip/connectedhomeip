@@ -34,10 +34,10 @@ namespace JoinGroup {
 CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 {
     DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
-    encoder.Encode(to_underlying(Fields::kGroupId), groupId);
+    encoder.Encode(to_underlying(Fields::kGroupID), groupID);
     encoder.Encode(to_underlying(Fields::kEndpoints), endpoints);
     encoder.Encode(to_underlying(Fields::kKey), key);
-    encoder.Encode(to_underlying(Fields::kKeyId), keyId);
+    encoder.Encode(to_underlying(Fields::kKeyID), keyID);
     encoder.Encode(to_underlying(Fields::kGracePeriod), gracePeriod);
     encoder.Encode(to_underlying(Fields::kUseAuxiliaryACL), useAuxiliaryACL);
     return encoder.Finalize();
@@ -53,9 +53,9 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader, FabricIndex aAccessing
         VerifyOrReturnError(err != CHIP_ERROR_END_OF_TLV, CHIP_NO_ERROR);
         ReturnErrorOnFailure(err);
 
-        if (__context_tag == to_underlying(Fields::kGroupId))
+        if (__context_tag == to_underlying(Fields::kGroupID))
         {
-            err = DataModel::Decode(reader, groupId);
+            err = DataModel::Decode(reader, groupID);
         }
         else if (__context_tag == to_underlying(Fields::kEndpoints))
         {
@@ -65,9 +65,9 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader, FabricIndex aAccessing
         {
             err = DataModel::Decode(reader, key);
         }
-        else if (__context_tag == to_underlying(Fields::kKeyId))
+        else if (__context_tag == to_underlying(Fields::kKeyID))
         {
-            err = DataModel::Decode(reader, keyId);
+            err = DataModel::Decode(reader, keyID);
         }
         else if (__context_tag == to_underlying(Fields::kGracePeriod))
         {
@@ -87,7 +87,7 @@ namespace LeaveGroup {
 CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 {
     DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
-    encoder.Encode(to_underlying(Fields::kGroupId), groupId);
+    encoder.Encode(to_underlying(Fields::kGroupID), groupID);
     encoder.Encode(to_underlying(Fields::kEndpoints), endpoints);
     return encoder.Finalize();
 }
@@ -102,9 +102,9 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader, FabricIndex aAccessing
         VerifyOrReturnError(err != CHIP_ERROR_END_OF_TLV, CHIP_NO_ERROR);
         ReturnErrorOnFailure(err);
 
-        if (__context_tag == to_underlying(Fields::kGroupId))
+        if (__context_tag == to_underlying(Fields::kGroupID))
         {
-            err = DataModel::Decode(reader, groupId);
+            err = DataModel::Decode(reader, groupID);
         }
         else if (__context_tag == to_underlying(Fields::kEndpoints))
         {
@@ -120,7 +120,7 @@ namespace LeaveGroupResponse {
 CHIP_ERROR Type::Encode(DataModel::FabricAwareTLVWriter & aWriter, TLV::Tag aTag) const
 {
     DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
-    encoder.Encode(to_underlying(Fields::kGroupId), groupId);
+    encoder.Encode(to_underlying(Fields::kGroupID), groupID);
     encoder.Encode(to_underlying(Fields::kEndpoints), endpoints);
     encoder.Encode(to_underlying(Fields::kListTooLarge), listTooLarge);
     return encoder.Finalize();
@@ -136,9 +136,9 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         VerifyOrReturnError(err != CHIP_ERROR_END_OF_TLV, CHIP_NO_ERROR);
         ReturnErrorOnFailure(err);
 
-        if (__context_tag == to_underlying(Fields::kGroupId))
+        if (__context_tag == to_underlying(Fields::kGroupID))
         {
-            err = DataModel::Decode(reader, groupId);
+            err = DataModel::Decode(reader, groupID);
         }
         else if (__context_tag == to_underlying(Fields::kEndpoints))
         {
@@ -158,9 +158,9 @@ namespace UpdateGroupKey {
 CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 {
     DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
-    encoder.Encode(to_underlying(Fields::kGroupId), groupId);
+    encoder.Encode(to_underlying(Fields::kGroupID), groupID);
     encoder.Encode(to_underlying(Fields::kKey), key);
-    encoder.Encode(to_underlying(Fields::kKeyId), keyId);
+    encoder.Encode(to_underlying(Fields::kKeyID), keyID);
     encoder.Encode(to_underlying(Fields::kGracePeriod), gracePeriod);
     return encoder.Finalize();
 }
@@ -175,17 +175,17 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader, FabricIndex aAccessing
         VerifyOrReturnError(err != CHIP_ERROR_END_OF_TLV, CHIP_NO_ERROR);
         ReturnErrorOnFailure(err);
 
-        if (__context_tag == to_underlying(Fields::kGroupId))
+        if (__context_tag == to_underlying(Fields::kGroupID))
         {
-            err = DataModel::Decode(reader, groupId);
+            err = DataModel::Decode(reader, groupID);
         }
         else if (__context_tag == to_underlying(Fields::kKey))
         {
             err = DataModel::Decode(reader, key);
         }
-        else if (__context_tag == to_underlying(Fields::kKeyId))
+        else if (__context_tag == to_underlying(Fields::kKeyID))
         {
-            err = DataModel::Decode(reader, keyId);
+            err = DataModel::Decode(reader, keyID);
         }
         else if (__context_tag == to_underlying(Fields::kGracePeriod))
         {
@@ -201,7 +201,7 @@ namespace ExpireGracePeriod {
 CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 {
     DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
-    encoder.Encode(to_underlying(Fields::kGroupId), groupId);
+    encoder.Encode(to_underlying(Fields::kGroupID), groupID);
     return encoder.Finalize();
 }
 
@@ -215,9 +215,9 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader, FabricIndex aAccessing
         VerifyOrReturnError(err != CHIP_ERROR_END_OF_TLV, CHIP_NO_ERROR);
         ReturnErrorOnFailure(err);
 
-        if (__context_tag == to_underlying(Fields::kGroupId))
+        if (__context_tag == to_underlying(Fields::kGroupID))
         {
-            err = DataModel::Decode(reader, groupId);
+            err = DataModel::Decode(reader, groupID);
         }
 
         ReturnErrorOnFailure(err);
@@ -229,7 +229,7 @@ namespace ConfigureAuxiliaryACL {
 CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 {
     DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
-    encoder.Encode(to_underlying(Fields::kGroupId), groupId);
+    encoder.Encode(to_underlying(Fields::kGroupID), groupID);
     encoder.Encode(to_underlying(Fields::kUseAuxiliaryACL), useAuxiliaryACL);
     return encoder.Finalize();
 }
@@ -244,9 +244,9 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader, FabricIndex aAccessing
         VerifyOrReturnError(err != CHIP_ERROR_END_OF_TLV, CHIP_NO_ERROR);
         ReturnErrorOnFailure(err);
 
-        if (__context_tag == to_underlying(Fields::kGroupId))
+        if (__context_tag == to_underlying(Fields::kGroupID))
         {
-            err = DataModel::Decode(reader, groupId);
+            err = DataModel::Decode(reader, groupID);
         }
         else if (__context_tag == to_underlying(Fields::kUseAuxiliaryACL))
         {

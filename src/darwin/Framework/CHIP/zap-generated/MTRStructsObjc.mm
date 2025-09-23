@@ -4749,13 +4749,15 @@ NS_ASSUME_NONNULL_BEGIN
 {
     if (self = [super init]) {
 
-        _groupId = @(0);
+        _groupID = @(0);
 
         _endpoints = [NSArray array];
 
-        _keyId = @(0);
+        _keyID = @(0);
 
         _hasAuxiliaryACL = @(0);
+
+        _expiringKeyID = nil;
 
         _fabricIndex = @(0);
     }
@@ -4766,10 +4768,11 @@ NS_ASSUME_NONNULL_BEGIN
 {
     auto other = [[MTRGroupcastClusterMembershipStruct alloc] init];
 
-    other.groupId = self.groupId;
+    other.groupID = self.groupID;
     other.endpoints = self.endpoints;
-    other.keyId = self.keyId;
+    other.keyID = self.keyID;
     other.hasAuxiliaryACL = self.hasAuxiliaryACL;
+    other.expiringKeyID = self.expiringKeyID;
     other.fabricIndex = self.fabricIndex;
 
     return other;
@@ -4777,7 +4780,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: groupId:%@; endpoints:%@; keyId:%@; hasAuxiliaryACL:%@; fabricIndex:%@; >", NSStringFromClass([self class]), _groupId, _endpoints, _keyId, _hasAuxiliaryACL, _fabricIndex];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: groupID:%@; endpoints:%@; keyID:%@; hasAuxiliaryACL:%@; expiringKeyID:%@; fabricIndex:%@; >", NSStringFromClass([self class]), _groupID, _endpoints, _keyID, _hasAuxiliaryACL, _expiringKeyID, _fabricIndex];
     return descriptionString;
 }
 

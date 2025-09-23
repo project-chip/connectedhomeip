@@ -6275,10 +6275,10 @@ public:
     GroupcastJoinGroup(CredentialIssuerCommands * credsIssuerConfig) :
         ClusterCommand("join-group", credsIssuerConfig), mComplex_Endpoints(&mRequest.endpoints)
     {
-        AddArgument("GroupId", 0, UINT16_MAX, &mRequest.groupId);
+        AddArgument("GroupID", 0, UINT16_MAX, &mRequest.groupID);
         AddArgument("Endpoints", &mComplex_Endpoints);
         AddArgument("Key", &mRequest.key);
-        AddArgument("KeyId", 0, UINT32_MAX, &mRequest.keyId);
+        AddArgument("KeyID", 0, UINT32_MAX, &mRequest.keyID);
         AddArgument("GracePeriod", 0, UINT32_MAX, &mRequest.gracePeriod);
         AddArgument("UseAuxiliaryACL", 0, 1, &mRequest.useAuxiliaryACL);
         ClusterCommand::AddArguments();
@@ -6319,7 +6319,7 @@ public:
     GroupcastLeaveGroup(CredentialIssuerCommands * credsIssuerConfig) :
         ClusterCommand("leave-group", credsIssuerConfig), mComplex_Endpoints(&mRequest.endpoints)
     {
-        AddArgument("GroupId", 0, UINT16_MAX, &mRequest.groupId);
+        AddArgument("GroupID", 0, UINT16_MAX, &mRequest.groupID);
         AddArgument("Endpoints", &mComplex_Endpoints, "", Argument::kOptional);
         ClusterCommand::AddArguments();
     }
@@ -6358,9 +6358,9 @@ class GroupcastUpdateGroupKey : public ClusterCommand
 public:
     GroupcastUpdateGroupKey(CredentialIssuerCommands * credsIssuerConfig) : ClusterCommand("update-group-key", credsIssuerConfig)
     {
-        AddArgument("GroupId", 0, UINT16_MAX, &mRequest.groupId);
+        AddArgument("GroupID", 0, UINT16_MAX, &mRequest.groupID);
         AddArgument("Key", &mRequest.key);
-        AddArgument("KeyId", 0, UINT32_MAX, &mRequest.keyId);
+        AddArgument("KeyID", 0, UINT32_MAX, &mRequest.keyID);
         AddArgument("GracePeriod", 0, UINT32_MAX, &mRequest.gracePeriod);
         ClusterCommand::AddArguments();
     }
@@ -6399,7 +6399,7 @@ public:
     GroupcastExpireGracePeriod(CredentialIssuerCommands * credsIssuerConfig) :
         ClusterCommand("expire-grace-period", credsIssuerConfig)
     {
-        AddArgument("GroupId", 0, UINT16_MAX, &mRequest.groupId);
+        AddArgument("GroupID", 0, UINT16_MAX, &mRequest.groupID);
         ClusterCommand::AddArguments();
     }
 
@@ -6437,7 +6437,7 @@ public:
     GroupcastConfigureAuxiliaryACL(CredentialIssuerCommands * credsIssuerConfig) :
         ClusterCommand("configure-auxiliary-acl", credsIssuerConfig)
     {
-        AddArgument("GroupId", 0, UINT16_MAX, &mRequest.groupId);
+        AddArgument("GroupID", 0, UINT16_MAX, &mRequest.groupID);
         AddArgument("UseAuxiliaryACL", 0, 1, &mRequest.useAuxiliaryACL);
         ClusterCommand::AddArguments();
     }

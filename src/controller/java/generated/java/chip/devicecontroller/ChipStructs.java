@@ -5685,37 +5685,42 @@ public static class ScenesManagementClusterSceneInfoStruct {
   }
 }
 public static class GroupcastClusterMembershipStruct {
-  public Integer groupId;
+  public Integer groupID;
   public ArrayList<Integer> endpoints;
-  public Long keyId;
+  public Long keyID;
   public Boolean hasAuxiliaryACL;
+  public Optional<Long> expiringKeyID;
   public Integer fabricIndex;
   private static final long GROUP_ID_ID = 0L;
   private static final long ENDPOINTS_ID = 1L;
   private static final long KEY_ID_ID = 2L;
   private static final long HAS_AUXILIARY_ACL_ID = 3L;
+  private static final long EXPIRING_KEY_ID_ID = 4L;
   private static final long FABRIC_INDEX_ID = 254L;
 
   public GroupcastClusterMembershipStruct(
-    Integer groupId,
+    Integer groupID,
     ArrayList<Integer> endpoints,
-    Long keyId,
+    Long keyID,
     Boolean hasAuxiliaryACL,
+    Optional<Long> expiringKeyID,
     Integer fabricIndex
   ) {
-    this.groupId = groupId;
+    this.groupID = groupID;
     this.endpoints = endpoints;
-    this.keyId = keyId;
+    this.keyID = keyID;
     this.hasAuxiliaryACL = hasAuxiliaryACL;
+    this.expiringKeyID = expiringKeyID;
     this.fabricIndex = fabricIndex;
   }
 
   public StructType encodeTlv() {
     ArrayList<StructElement> values = new ArrayList<>();
-    values.add(new StructElement(GROUP_ID_ID, new UIntType(groupId)));
+    values.add(new StructElement(GROUP_ID_ID, new UIntType(groupID)));
     values.add(new StructElement(ENDPOINTS_ID, ArrayType.generateArrayType(endpoints, (elementendpoints) -> new UIntType(elementendpoints))));
-    values.add(new StructElement(KEY_ID_ID, new UIntType(keyId)));
+    values.add(new StructElement(KEY_ID_ID, new UIntType(keyID)));
     values.add(new StructElement(HAS_AUXILIARY_ACL_ID, new BooleanType(hasAuxiliaryACL)));
+    values.add(new StructElement(EXPIRING_KEY_ID_ID, expiringKeyID.<BaseTLVType>map((nonOptionalexpiringKeyID) -> new UIntType(nonOptionalexpiringKeyID)).orElse(new EmptyType())));
     values.add(new StructElement(FABRIC_INDEX_ID, new UIntType(fabricIndex)));
 
     return new StructType(values);
@@ -5725,16 +5730,17 @@ public static class GroupcastClusterMembershipStruct {
     if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
       return null;
     }
-    Integer groupId = null;
+    Integer groupID = null;
     ArrayList<Integer> endpoints = null;
-    Long keyId = null;
+    Long keyID = null;
     Boolean hasAuxiliaryACL = null;
+    Optional<Long> expiringKeyID = Optional.empty();
     Integer fabricIndex = null;
     for (StructElement element: ((StructType)tlvValue).value()) {
       if (element.contextTagNum() == GROUP_ID_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
           UIntType castingValue = element.value(UIntType.class);
-          groupId = castingValue.value(Integer.class);
+          groupID = castingValue.value(Integer.class);
         }
       } else if (element.contextTagNum() == ENDPOINTS_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.Array) {
@@ -5744,12 +5750,17 @@ public static class GroupcastClusterMembershipStruct {
       } else if (element.contextTagNum() == KEY_ID_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
           UIntType castingValue = element.value(UIntType.class);
-          keyId = castingValue.value(Long.class);
+          keyID = castingValue.value(Long.class);
         }
       } else if (element.contextTagNum() == HAS_AUXILIARY_ACL_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.Boolean) {
           BooleanType castingValue = element.value(BooleanType.class);
           hasAuxiliaryACL = castingValue.value(Boolean.class);
+        }
+      } else if (element.contextTagNum() == EXPIRING_KEY_ID_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          expiringKeyID = Optional.of(castingValue.value(Long.class));
         }
       } else if (element.contextTagNum() == FABRIC_INDEX_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
@@ -5759,10 +5770,11 @@ public static class GroupcastClusterMembershipStruct {
       }
     }
     return new GroupcastClusterMembershipStruct(
-      groupId,
+      groupID,
       endpoints,
-      keyId,
+      keyID,
       hasAuxiliaryACL,
+      expiringKeyID,
       fabricIndex
     );
   }
@@ -5771,17 +5783,20 @@ public static class GroupcastClusterMembershipStruct {
   public String toString() {
     StringBuilder output = new StringBuilder();
     output.append("GroupcastClusterMembershipStruct {\n");
-    output.append("\tgroupId: ");
-    output.append(groupId);
+    output.append("\tgroupID: ");
+    output.append(groupID);
     output.append("\n");
     output.append("\tendpoints: ");
     output.append(endpoints);
     output.append("\n");
-    output.append("\tkeyId: ");
-    output.append(keyId);
+    output.append("\tkeyID: ");
+    output.append(keyID);
     output.append("\n");
     output.append("\thasAuxiliaryACL: ");
     output.append(hasAuxiliaryACL);
+    output.append("\n");
+    output.append("\texpiringKeyID: ");
+    output.append(expiringKeyID);
     output.append("\n");
     output.append("\tfabricIndex: ");
     output.append(fabricIndex);

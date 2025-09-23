@@ -2736,10 +2736,10 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
 {
     DataModelLogger::LogString(label, indent, "{");
     {
-        CHIP_ERROR err = LogValue("GroupId", indent + 1, value.groupId);
+        CHIP_ERROR err = LogValue("GroupID", indent + 1, value.groupID);
         if (err != CHIP_NO_ERROR)
         {
-            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'GroupId'");
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'GroupID'");
             return err;
         }
     }
@@ -2752,10 +2752,10 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
         }
     }
     {
-        CHIP_ERROR err = LogValue("KeyId", indent + 1, value.keyId);
+        CHIP_ERROR err = LogValue("KeyID", indent + 1, value.keyID);
         if (err != CHIP_NO_ERROR)
         {
-            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'KeyId'");
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'KeyID'");
             return err;
         }
     }
@@ -2764,6 +2764,14 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
         if (err != CHIP_NO_ERROR)
         {
             DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'HasAuxiliaryACL'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("ExpiringKeyID", indent + 1, value.expiringKeyID);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'ExpiringKeyID'");
             return err;
         }
     }
@@ -11644,7 +11652,7 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
                                      const Groupcast::Commands::LeaveGroupResponse::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
-    ReturnErrorOnFailure(DataModelLogger::LogValue("groupId", indent + 1, value.groupId));
+    ReturnErrorOnFailure(DataModelLogger::LogValue("groupID", indent + 1, value.groupID));
     ReturnErrorOnFailure(DataModelLogger::LogValue("endpoints", indent + 1, value.endpoints));
     ReturnErrorOnFailure(DataModelLogger::LogValue("listTooLarge", indent + 1, value.listTooLarge));
     DataModelLogger::LogString(indent, "}");
