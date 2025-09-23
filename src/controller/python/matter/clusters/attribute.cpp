@@ -321,6 +321,40 @@ private:
 
 using namespace chip::python;
 
+namespace {
+// Helper function to process write attributes data - reduces code duplication
+CHIP_ERROR ProcessWriteAttributesData(WriteClient * client, python::PyWriteAttributeData * writeAttributesData,
+                                      size_t attributeDataLength)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
+    for (size_t i = 0; i < attributeDataLength; i++)
+    {
+        python::PyAttributePath path = writeAttributesData[i].attributePath;
+        void * tlv                   = writeAttributesData[i].tlvData;
+        size_t length                = writeAttributesData[i].tlvLength;
+
+        uint8_t * tlvBuffer = reinterpret_cast<uint8_t *>(tlv);
+
+        TLV::TLVReader reader;
+        reader.Init(tlvBuffer, static_cast<uint32_t>(length));
+        reader.Next();
+        Optional<DataVersion> dataVersion;
+        if (path.hasDataVersion == 1)
+        {
+            dataVersion.SetValue(path.dataVersion);
+        }
+
+        SuccessOrExit(err = client->PutPreencodedAttribute(
+                          chip::app::ConcreteDataAttributePath(path.endpointId, path.clusterId, path.attributeId, dataVersion),
+                          reader));
+    }
+
+exit:
+    return err;
+}
+} 
+
 extern "C" {
 void pychip_WriteClient_InitCallbacks(OnWriteResponseCallback onWriteResponseCallback, OnWriteErrorCallback onWriteErrorCallback,
                                       OnWriteDoneCallback onWriteDoneCallback)
@@ -367,29 +401,36 @@ PyChipError pychip_WriteClient_WriteAttributes(void * appContext, DeviceProxy * 
 
     VerifyOrExit(device != nullptr && device->GetSecureSession().HasValue(), err = CHIP_ERROR_MISSING_SECURE_SESSION);
 
-    for (size_t i = 0; i < attributeDataLength; i++)
+    // Handle legacy list encoding override if needed
+    if (forceLegacyListEncoding)
     {
-        python::PyAttributePath path = writeAttributesData[i].attributePath;
-        void * tlv                   = writeAttributesData[i].tlvData;
-        size_t length                = writeAttributesData[i].tlvLength;
-
-        uint8_t * tlvBuffer = reinterpret_cast<uint8_t *>(tlv);
-
-        TLV::TLVReader reader;
-        reader.Init(tlvBuffer, static_cast<uint32_t>(length));
-        reader.Next();
-        Optional<DataVersion> dataVersion;
-        if (path.hasDataVersion == 1)
+        for (size_t i = 0; i < attributeDataLength; i++)
         {
-            dataVersion.SetValue(path.dataVersion);
+            python::PyAttributePath path = writeAttributesData[i].attributePath;
+            void * tlv                   = writeAttributesData[i].tlvData;
+            size_t length                = writeAttributesData[i].tlvLength;
+
+            uint8_t * tlvBuffer = reinterpret_cast<uint8_t *>(tlv);
+
+            TLV::TLVReader reader;
+            reader.Init(tlvBuffer, static_cast<uint32_t>(length));
+            reader.Next();
+            Optional<DataVersion> dataVersion;
+            if (path.hasDataVersion == 1)
+            {
+                dataVersion.SetValue(path.dataVersion);
+            }
+
+            auto listEncodingOverride = WriteClient::TestListEncodingOverride::kForceLegacyEncoding;
+
+            SuccessOrExit(err = client->PutPreencodedAttribute(
+                              chip::app::ConcreteDataAttributePath(path.endpointId, path.clusterId, path.attributeId, dataVersion),
+                              reader, listEncodingOverride));
         }
-
-        auto listEncodingOverride = forceLegacyListEncoding ? WriteClient::TestListEncodingOverride::kForceLegacyEncoding
-                                                            : WriteClient::TestListEncodingOverride::kNoOverride;
-
-        SuccessOrExit(err = client->PutPreencodedAttribute(
-                          chip::app::ConcreteDataAttributePath(path.endpointId, path.clusterId, path.attributeId, dataVersion),
-                          reader, listEncodingOverride));
+    }
+    else
+    {
+        SuccessOrExit(err = ProcessWriteAttributesData(client.get(), writeAttributesData, attributeDataLength));
     }
 
     SuccessOrExit(err = client->SendWriteRequest(device->GetSecureSession().Value(),
@@ -430,27 +471,7 @@ PyChipError pychip_WriteClient_TestOnlyWriteAttributesTimedRequestNoTimedAction(
 
     VerifyOrExit(device != nullptr && device->GetSecureSession().HasValue(), err = CHIP_ERROR_MISSING_SECURE_SESSION);
 
-    for (size_t i = 0; i < attributeDataLength; i++)
-    {
-        python::PyAttributePath path = writeAttributesData[i].attributePath;
-        void * tlv                   = writeAttributesData[i].tlvData;
-        size_t length                = writeAttributesData[i].tlvLength;
-
-        uint8_t * tlvBuffer = reinterpret_cast<uint8_t *>(tlv);
-
-        TLV::TLVReader reader;
-        reader.Init(tlvBuffer, static_cast<uint32_t>(length));
-        reader.Next();
-        Optional<DataVersion> dataVersion;
-        if (path.hasDataVersion == 1)
-        {
-            dataVersion.SetValue(path.dataVersion);
-        }
-
-        SuccessOrExit(
-            err = client->PutPreencodedAttribute(
-                chip::app::ConcreteDataAttributePath(path.endpointId, path.clusterId, path.attributeId, dataVersion), reader));
-    }
+    SuccessOrExit(err = ProcessWriteAttributesData(client.get(), writeAttributesData, attributeDataLength));
 
     // Send WriteRequest with TimedRequest flag set but no preceding TimedRequest action
     // This should trigger TIMED_REQUEST_MISMATCH error

@@ -1582,6 +1582,18 @@ class ChipDeviceControllerBase():
             ), payload).raise_on_error()
         return await future
 
+    def _prepare_write_attribute_requests(self, attributes: typing.List[typing.Tuple[int, ClusterObjects.ClusterAttributeDescriptor]]) -> typing.List[ClusterAttribute.AttributeWriteRequest]:
+        """Helper method to prepare attribute write requests."""
+        attrs = []
+        for v in attributes:
+            if len(v) == 2:
+                attrs.append(ClusterAttribute.AttributeWriteRequest(
+                    v[0], v[1], 0, 0, v[1].value))  # type: ignore[attr-defined]
+            else:
+                attrs.append(ClusterAttribute.AttributeWriteRequest(
+                    v[0], v[1], v[2], 1, v[1].value))
+        return attrs
+
     async def TestOnlyWriteAttributeTimedRequestFlagWithNoTimedAction(self, nodeid: int,
                                                                       attributes: typing.List[typing.Tuple[int, ClusterObjects.ClusterAttributeDescriptor]],
                                                                       interactionTimeoutMs: typing.Optional[int] = None, busyWaitMs: typing.Optional[int] = None,
@@ -1605,14 +1617,7 @@ class ChipDeviceControllerBase():
 
         device = await self.GetConnectedDevice(nodeid, timeoutMs=interactionTimeoutMs, payloadCapability=payloadCapability)
 
-        attrs = []
-        for v in attributes:
-            if len(v) == 2:
-                attrs.append(ClusterAttribute.AttributeWriteRequest(
-                    v[0], v[1], 0, 0, v[1].value))  # type: ignore[attr-defined]
-            else:
-                attrs.append(ClusterAttribute.AttributeWriteRequest(
-                    v[0], v[1], v[2], 1, v[1].value))
+        attrs = self._prepare_write_attribute_requests(attributes)
 
         ClusterAttribute.TestOnlyWriteAttributeTimedRequestFlagWithNoTimedAction(
             future, eventLoop, device.deviceProxy, attrs,
@@ -1764,14 +1769,7 @@ class ChipDeviceControllerBase():
 
         device = await self.GetConnectedDevice(nodeid, timeoutMs=interactionTimeoutMs, payloadCapability=payloadCapability)
 
-        attrs = []
-        for v in attributes:
-            if len(v) == 2:
-                attrs.append(ClusterAttribute.AttributeWriteRequest(
-                    v[0], v[1], 0, 0, v[1].value))  # type: ignore[attr-defined]  # 'value' added dynamically to ClusterAttributeDescriptor
-            else:
-                attrs.append(ClusterAttribute.AttributeWriteRequest(
-                    v[0], v[1], v[2], 1, v[1].value))
+        attrs = self._prepare_write_attribute_requests(attributes)
 
         ClusterAttribute.WriteAttributes(
             future, eventLoop, device.deviceProxy, attrs, timedRequestTimeoutMs=timedRequestTimeoutMs,
