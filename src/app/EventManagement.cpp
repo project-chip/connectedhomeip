@@ -617,8 +617,8 @@ CHIP_ERROR EventManagement::CopyEventsSince(const TLVReader & aReader, size_t aD
 {
     EventLoadOutContext * const loadOutContext = static_cast<EventLoadOutContext *>(apContext);
     EventEnvelopeContext event;
-    bool encodeEvent;
-    CHIP_ERROR err = EventIterator(aReader, aDepth, loadOutContext, &event, encodeEvent);
+    bool encodeEvent = false;
+    CHIP_ERROR err   = EventIterator(aReader, aDepth, loadOutContext, &event, encodeEvent);
     if ((err == CHIP_NO_ERROR) && encodeEvent)
     {
         // checkpoint the writer
