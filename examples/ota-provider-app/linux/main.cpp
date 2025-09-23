@@ -414,13 +414,13 @@ public:
     void RunMainLoop() override { chip::DeviceLayer::PlatformMgr().RunEventLoop(); }
     void SignalSafeStopMainLoop() override
     {
-        chip::Server::GetInstance().GenerateShutDownEvent();
-
         chip::DeviceLayer::PlatformMgr().ScheduleWork([](intptr_t) {
             ChipLogDetail(SoftwareUpdate, "Scheduling BdxOtaSender to ABORT TRANSFER");
 
             gOtaProvider.GetBdxOtaSender()->AbortTransfer();
         });
+
+        chip::Server::GetInstance().GenerateShutDownEvent();
 
         chip::DeviceLayer::PlatformMgr().ScheduleWork([](intptr_t) { chip::DeviceLayer::PlatformMgr().StopEventLoopTask(); });
     }

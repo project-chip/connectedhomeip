@@ -241,8 +241,7 @@ void BdxOtaSender::AbortTransfer()
 {
     if (mInitialized)
     {
-        ChipLogDetail(BDX, "Aborting current transfer");
         mTransfer.AbortTransfer(StatusCode::kUnknown);
-        Reset();
+        PollForOutput();
     }
 }

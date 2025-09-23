@@ -407,6 +407,7 @@ private:
     System::Clock::Timestamp mTimeoutStartTime = System::Clock::kZero;
     bool mShouldInitTimeoutStart               = true;
     bool mAwaitingResponse                     = false;
+    bool mAbortTransferPending                 = false;
 };
 
 } // namespace bdx

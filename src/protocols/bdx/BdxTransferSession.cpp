@@ -82,6 +82,14 @@ void TransferSession::PollOutput(OutputEvent & event, System::Clock::Timestamp c
         return;
     }
 
+    if (mAbortTransferPending)
+    {
+        event = OutputEvent::StatusReportEvent(OutputEventType::kInternalError, mStatusReportData);
+        mAbortTransferPending = false;
+        return;
+    }
+
+
     switch (mPendingOutput)
     {
     case OutputEventType::kNone:
@@ -403,6 +411,8 @@ CHIP_ERROR TransferSession::AbortTransfer(StatusCode reason)
                         CHIP_ERROR_INCORRECT_STATE);
 
     PrepareStatusReport(reason);
+
+    mAbortTransferPending = true;
 
     return CHIP_NO_ERROR;
 }
