@@ -21,7 +21,6 @@
 #include <app/data-model-provider/MetadataTypes.h>
 #include <app/reporting/reporting.h>
 #include <app/server-cluster/AttributeListBuilder.h>
-#include <app/server/Dnssd.h>
 #include <app/server/Server.h>
 #include <clusters/OperationalCredentials/AttributeIds.h>
 #include <clusters/OperationalCredentials/Commands.h>
@@ -461,7 +460,7 @@ std::optional<DataModel::ActionReturnStatus> HandleAddNOC(CommandHandler * comma
 
 #if CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
     // These checks should only run during JCM.
-    if (Server::GetInstance().GetCommissioningWindowManager().IsJCM())
+    if (cluster->GetCommissioningWindowManager().IsJCM())
     {
         // NOC must contain an Administrator CAT
         CATValues cats;
@@ -534,7 +533,7 @@ std::optional<DataModel::ActionReturnStatus> HandleAddNOC(CommandHandler * comma
     needRevert = false;
 
     // We might have a new operational identity, so we should start advertising it right away.
-    err = app::DnssdServer::Instance().AdvertiseOperational();
+    err = cluster->GetDNSSDServer().AdvertiseOperational();
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(AppServer, "Operational advertising failed: %" CHIP_ERROR_FORMAT, err.Format());
@@ -645,7 +644,7 @@ std::optional<DataModel::ActionReturnStatus> HandleUpdateNOC(CommandHandler * co
     // We might have a new operational identity, so we should start advertising
     // it right away.  Also, we need to withdraw our old operational identity.
     // So we need to StartServer() here.
-    app::DnssdServer::Instance().StartServer();
+    cluster->GetDNSSDServer().StartServer();
 
     // Attribute notification was already done by fabric table
 exit:
@@ -1152,7 +1151,7 @@ void FailSafeCleanup(const chip::DeviceLayer::ChipDeviceEvent * event, FabricTab
     {
         // Operational identities/records available may have changed due to NodeID update. Need to refresh all records.
         // The case of fabric removal that reverts AddNOC is handled by the `DeleteFabricFromTable` flow above.
-        app::DnssdServer::Instance().StartServer();
+        cluster->GetDNSSDServer().StartServer();
     }
 }
 
@@ -1160,8 +1159,9 @@ void OnPlatformEventHandler(const chip::DeviceLayer::ChipDeviceEvent * event, in
 {
     if (event->Type == DeviceLayer::DeviceEventType::kFailSafeTimerExpired)
     {
+        OperationalCredentialsCluster * cluster = reinterpret_cast<OperationalCredentialsCluster *>(arg);
         ChipLogError(Zcl, "OpCreds: Got FailSafeTimerExpired");
-        FailSafeCleanup(event, Server::GetInstance().GetFabricTable(), Server::GetInstance().GetSecureSessionManager(),
+        FailSafeCleanup(event, cluster->GetFabricTable(), cluster->GetSessionManager(),
                         reinterpret_cast<OperationalCredentialsCluster *>(arg));
     }
 }
@@ -1331,7 +1331,7 @@ void OperationalCredentialsCluster::OnFabricRemoved(const FabricTable & fabricTa
 
     // We need to withdraw the advertisement for the now-removed fabric, so need
     // to restart advertising altogether.
-    app::DnssdServer::Instance().StartServer();
+    GetDNSSDServer().StartServer();
 
     EventManagement::GetInstance().FabricRemoved(fabricIndex);
 
@@ -1363,6 +1363,21 @@ FailSafeContext & OperationalCredentialsCluster::GetFailSafeContext()
 Credentials::DeviceAttestationCredentialsProvider * OperationalCredentialsCluster::GetDACProvider()
 {
     return Credentials::GetDeviceAttestationCredentialsProvider();
+}
+
+SessionManager & OperationalCredentialsCluster::GetSessionManager()
+{
+    return Server::GetInstance().GetSecureSessionManager();
+}
+
+DnssdServer & OperationalCredentialsCluster::GetDNSSDServer()
+{
+    return app::DnssdServer::Instance();
+}
+
+CommissioningWindowManager & OperationalCredentialsCluster::GetCommissioningWindowManager()
+{
+    return Server::GetInstance().GetCommissioningWindowManager();
 }
 
 void OperationalCredentialsCluster::OnFabricCommitted(const FabricTable & fabricTable, FabricIndex fabricIndex)

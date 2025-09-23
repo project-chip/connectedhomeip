@@ -18,6 +18,8 @@
 
 #include <app/FailSafeContext.h>
 #include <app/server-cluster/DefaultServerCluster.h>
+#include <app/server/CommissioningWindowManager.h>
+#include <app/server/Dnssd.h>
 #include <clusters/OperationalCredentials/ClusterId.h>
 #include <credentials/DeviceAttestationCredsProvider.h>
 
@@ -51,6 +53,9 @@ public:
     FabricTable & GetFabricTable();
     FailSafeContext & GetFailSafeContext();
     Credentials::DeviceAttestationCredentialsProvider * GetDACProvider();
+    SessionManager & GetSessionManager();
+    DnssdServer & GetDNSSDServer();
+    CommissioningWindowManager & GetCommissioningWindowManager();
 
     // FabricTable delegate
     void FabricWillBeRemoved(const FabricTable & fabricTable, FabricIndex fabricIndex) override;
