@@ -511,7 +511,8 @@ DataModel::ActionReturnStatus AccessControlCluster::WriteAttribute(const DataMod
     }
 #if CHIP_CONFIG_ENABLE_ACL_EXTENSIONS
     case Extension::Id: {
-        return NotifyAttributeChangedIfSuccess(request.path.mAttributeId, ChipErrorToImErrorMap(WriteExtension(request.path, decoder)));
+        return NotifyAttributeChangedIfSuccess(request.path.mAttributeId,
+                                               ChipErrorToImErrorMap(WriteExtension(request.path, decoder)));
     }
 #endif
     default:
