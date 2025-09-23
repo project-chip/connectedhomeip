@@ -57,9 +57,9 @@ public:
         return gRegistration;
     }
 
-    ServerClusterInterface & FindRegistration(unsigned clusterInstanceIndex) override
+    ServerClusterInterface * FindRegistration(unsigned clusterInstanceIndex) override
     {
-        return GeneralCommissioningCluster::Instance();
+        return &GeneralCommissioningCluster::Instance();
     }
 
     // Nothing to destroy: separate singleton class without constructor/destructor is used
@@ -68,7 +68,7 @@ public:
 
 } // namespace
 
-void emberAfGeneralCommissioningClusterServerInitCallback(EndpointId endpointId)
+void MatterGeneralCommissioningClusterInitCallback(EndpointId endpointId)
 {
     VerifyOrReturn(endpointId == kRootEndpointId);
 
@@ -80,15 +80,15 @@ void emberAfGeneralCommissioningClusterServerInitCallback(EndpointId endpointId)
         {
             .endpointId                      = endpointId,
             .clusterId                       = GeneralCommissioning::Id,
-            .fixedClusterServerEndpointCount = GeneralCommissioning::StaticApplicationConfig::kFixedClusterConfig.size(),
-            .maxEndpointCount                = 1, // Cluster is a singleton on the root node and this is the only thing supported
+            .fixedClusterInstanceCount       = GeneralCommissioning::StaticApplicationConfig::kFixedClusterConfig.size(),
+            .maxClusterInstanceCount         = 1, // Cluster is a singleton on the root node and this is the only thing supported
             .fetchFeatureMap                 = false,
             .fetchOptionalAttributes         = true,
         },
         integrationDelegate);
 }
 
-void MatterGeneralCommissioningClusterServerShutdownCallback(EndpointId endpointId)
+void MatterGeneralCommissioningClusterShutdownCallback(EndpointId endpointId)
 {
     VerifyOrReturn(endpointId == kRootEndpointId);
 
@@ -99,8 +99,8 @@ void MatterGeneralCommissioningClusterServerShutdownCallback(EndpointId endpoint
         {
             .endpointId                      = endpointId,
             .clusterId                       = GeneralCommissioning::Id,
-            .fixedClusterServerEndpointCount = GeneralCommissioning::StaticApplicationConfig::kFixedClusterConfig.size(),
-            .maxEndpointCount                = 1, // Cluster is a singleton on the root node and this is the only thing supported
+            .fixedClusterInstanceCount       = GeneralCommissioning::StaticApplicationConfig::kFixedClusterConfig.size(),
+            .maxClusterInstanceCount         = 1, // Cluster is a singleton on the root node and this is the only thing supported
         },
         integrationDelegate);
 }
