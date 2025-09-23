@@ -285,9 +285,10 @@ class TC_IDM_3_2(MatterBaseTest, BasicCompositionTests):
 
         if await self.attribute_guard(endpoint=1, attribute=Clusters.UnitTesting.Attributes.TimedWriteBoolean):
             # NEEDS_TIMED_INTERACTION - Writing timed-write-required attribute without timed transaction
+            # Found below logic in /home/ubuntu/connectedhomeapi/connectedhomeip/src/controller/python/tests/scripts/cluster_objects.py and TC_IDM_1_2 test logic.
             logging.info("Writing UnitTesting-TimedWriteBoolean without timedRequestTimeoutMs should be rejected")
             try:
-                result = await self.default_controller.WriteAttribute(
+                await self.default_controller.WriteAttribute(
                     self.dut_node_id,
                     attributes=[(1, Clusters.UnitTesting.Attributes.TimedWriteBoolean(True))]
                 )
@@ -297,9 +298,10 @@ class TC_IDM_3_2(MatterBaseTest, BasicCompositionTests):
                                      f"WriteAttribute should return NeedsTimedInteraction, got {e.status}")
 
             # TIMED_REQUEST_MISMATCH - Writing with TimedRequest flag but no actual timed transaction
+            # Thanks to Cecille for the guidance on the test step logic and plumbing for this to function below.
             logging.info("Writing with TimedRequest flag but no timed transaction should return TIMED_REQUEST_MISMATCH")
             try:
-                result = await self.default_controller.TestOnlyWriteAttributeTimedRequestFlagWithNoTimedAction(
+                await self.default_controller.TestOnlyWriteAttributeTimedRequestFlagWithNoTimedAction(
                     self.dut_node_id,
                     attributes=[(1, Clusters.UnitTesting.Attributes.TimedWriteBoolean(False))]
                 )
