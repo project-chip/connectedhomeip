@@ -51,7 +51,7 @@ public:
 };
 } // namespace
 
-void emberAfDescriptorClusterServerInitCallback(EndpointId endpointId)
+void MatterDescriptorClusterInitCallback(EndpointId endpointId)
 {
     IntegrationDelegate integrationDelegate;
 
@@ -67,7 +67,7 @@ void emberAfDescriptorClusterServerInitCallback(EndpointId endpointId)
         integrationDelegate);
 }
 
-void MatterDescriptorClusterServerShutdownCallback(EndpointId endpointId)
+void MatterDescriptorClusterShutdownCallback(EndpointId endpointId)
 {
     IntegrationDelegate integrationDelegate;
 

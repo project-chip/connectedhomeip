@@ -94,7 +94,6 @@ ClustersWithInitFunctions:
     - Scenes Management
     - Thermostat
     - Fixed Label
-    - Descriptor
 
 ClustersWithAttributeChangedFunctions:
     - Bridged Device Basic Information
@@ -115,7 +114,6 @@ ClustersWithShutdownFunctions:
     - Scenes Management
     - Thermostat
     - Fixed Label
-    - Descriptor
 
 ClustersWithPreAttributeChangeFunctions:
     - Door Lock
@@ -146,3 +144,4 @@ CodeDrivenClusters:
     - Time Format Localization
     - Wi-Fi Network Diagnostics
     - Diagnostic Logs
+    - Descriptor
