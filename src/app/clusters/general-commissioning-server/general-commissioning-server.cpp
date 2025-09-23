@@ -56,6 +56,7 @@ using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::GeneralCommissioning;
 using namespace chip::app::Clusters::GeneralCommissioning::Attributes;
 using namespace chip::DeviceLayer;
+using namespace chip::Tracing;
 using chip::app::Clusters::GeneralCommissioning::CommissioningErrorEnum;
 using Transport::SecureSession;
 using Transport::Session;

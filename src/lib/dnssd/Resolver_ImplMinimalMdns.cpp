@@ -36,6 +36,8 @@
 // These logs are useful for debug only
 #undef MINMDNS_RESOLVER_OVERLY_VERBOSE
 
+using namespace chip::Tracing;
+
 namespace chip {
 namespace Dnssd {
 namespace {

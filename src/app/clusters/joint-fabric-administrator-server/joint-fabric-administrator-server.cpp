@@ -59,6 +59,7 @@ using namespace chip::app::Clusters::JointFabricAdministrator;
 using namespace chip::Credentials;
 using namespace chip::Crypto;
 using namespace chip::Protocols::InteractionModel;
+using namespace chip::Tracing;
 
 namespace JointFabricAdministratorCluster = chip::app::Clusters::JointFabricAdministrator;
 

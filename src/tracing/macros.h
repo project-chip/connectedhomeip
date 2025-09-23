@@ -30,6 +30,8 @@
 // Tracing macro to trace monotonically increasing counter values.
 //  MATTER_TRACE_COUNTER(label)
 
+#include <tracing/group_keys.h>
+#include <tracing/label_keys.h>
 #include <matter/tracing/macros_impl.h>
 #include <tracing/log_declares.h>
 #include <tracing/registry.h>

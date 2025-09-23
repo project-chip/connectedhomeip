@@ -36,6 +36,7 @@ using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::ColorControl;
+using namespace chip::Tracing;
 using chip::Protocols::InteractionModel::Status;
 
 #if defined(MATTER_DM_PLUGIN_SCENES_MANAGEMENT) && CHIP_CONFIG_SCENES_USE_DEFAULT_HANDLERS

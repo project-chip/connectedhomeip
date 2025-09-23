@@ -46,6 +46,7 @@ using SceneTable        = chip::scenes::SceneTable<chip::scenes::ExtensionFieldS
 using AuthMode          = chip::Access::AuthMode;
 using ScenesServer      = chip::app::Clusters::ScenesManagement::ScenesServer;
 using chip::Protocols::InteractionModel::Status;
+using namespace chip::Tracing;
 
 namespace chip {
 namespace app {

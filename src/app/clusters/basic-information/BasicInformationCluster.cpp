@@ -41,6 +41,7 @@ using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::BasicInformation;
 using namespace chip::app::Clusters::BasicInformation::Attributes;
 using namespace chip::DeviceLayer;
+using namespace chip::Tracing;
 
 namespace {
 

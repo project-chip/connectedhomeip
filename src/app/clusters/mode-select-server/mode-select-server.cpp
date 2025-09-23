@@ -46,6 +46,7 @@ using namespace chip::app;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::ModeSelect;
 using namespace chip::Protocols;
+using namespace chip::Tracing;
 using chip::Protocols::InteractionModel::Status;
 
 using BootReasonType = GeneralDiagnostics::BootReasonEnum;

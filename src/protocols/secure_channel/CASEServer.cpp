@@ -28,6 +28,7 @@
 using namespace ::chip::Inet;
 using namespace ::chip::Transport;
 using namespace ::chip::Credentials;
+using namespace ::chip::Tracing;
 
 namespace chip {
 

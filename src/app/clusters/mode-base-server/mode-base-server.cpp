@@ -31,6 +31,7 @@
 using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;
+using namespace chip::Tracing;
 using chip::Protocols::InteractionModel::Status;
 using BootReasonType       = GeneralDiagnostics::BootReasonEnum;
 using ModeOptionStructType = chip::app::Clusters::detail::Structs::ModeOptionStruct::Type;

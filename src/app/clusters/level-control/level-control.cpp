@@ -55,6 +55,7 @@ using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::LevelControl;
+using namespace chip::Tracing;
 using chip::Protocols::InteractionModel::Status;
 
 #ifndef IGNORE_LEVEL_CONTROL_CLUSTER_START_UP_CURRENT_LEVEL

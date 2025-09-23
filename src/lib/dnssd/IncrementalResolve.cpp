@@ -24,6 +24,8 @@
 #include <lib/support/CHIPMemString.h>
 #include <tracing/macros.h>
 
+using namespace chip::Tracing;
+
 namespace chip {
 namespace Dnssd {
 

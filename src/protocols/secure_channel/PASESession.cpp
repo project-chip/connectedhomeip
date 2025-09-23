@@ -102,6 +102,7 @@ namespace chip {
 using namespace Crypto;
 using namespace Messaging;
 using namespace Protocols::SecureChannel;
+using namespace Tracing;
 
 const char kSpake2pContext[] = "CHIP PAKE V1 Commissioning";
 

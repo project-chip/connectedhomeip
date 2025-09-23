@@ -23,6 +23,7 @@
 
 using namespace chip::Crypto;
 using namespace chip::app::Clusters::AdministratorCommissioning;
+using namespace chip::Tracing;
 using chip::Protocols::InteractionModel::ClusterStatusCode;
 using chip::Protocols::InteractionModel::Status;
 

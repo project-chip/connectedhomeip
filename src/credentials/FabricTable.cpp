@@ -36,6 +36,7 @@
 namespace chip {
 using namespace Credentials;
 using namespace Crypto;
+using namespace Tracing;
 
 using CertChainElement = chip::Credentials::OperationalCertificateStore::CertChainElement;
 

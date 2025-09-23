@@ -53,6 +53,7 @@ using namespace Credentials;
 using namespace DataModel;
 using namespace DeviceLayer::NetworkCommissioning;
 using namespace chip::app::Clusters::NetworkCommissioning;
+using namespace chip::Tracing;
 
 namespace {
 

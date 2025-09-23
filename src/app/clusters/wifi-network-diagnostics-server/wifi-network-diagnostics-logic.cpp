@@ -25,6 +25,7 @@ using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::WiFiNetworkDiagnostics;
+using namespace chip::Tracing;
 using chip::DeviceLayer::DiagnosticDataProvider;
 using chip::DeviceLayer::GetDiagnosticDataProvider;
 

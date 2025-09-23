@@ -55,6 +55,7 @@ using System::PacketBufferHandle;
 using Transport::GroupPeerTable;
 using Transport::PeerAddress;
 using Transport::SecureSession;
+using namespace Tracing;
 
 namespace {
 Global<GroupPeerTable> gGroupPeerTable;

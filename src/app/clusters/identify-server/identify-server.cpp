@@ -35,6 +35,7 @@
 using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters::Identify;
+using namespace chip::Tracing;
 using chip::Protocols::InteractionModel::Status;
 
 static Identify * firstIdentify = nullptr;

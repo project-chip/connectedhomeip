@@ -36,6 +36,7 @@ using namespace chip;
 using namespace app::Clusters;
 using namespace app::Clusters::Groups;
 using namespace chip::Credentials;
+using namespace chip::Tracing;
 using Protocols::InteractionModel::Status;
 
 // Is the device identifying?
