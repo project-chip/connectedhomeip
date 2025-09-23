@@ -252,19 +252,9 @@ CHIP_ERROR CodegenDataModelProvider::EventInfo(const ConcreteEventPath & path, D
     {
         return cluster->EventInfo(path, eventInfo);
     }
-    const EmberAfCluster * cluster = emberAfFindServerCluster(path.mEndpointId, path.mClusterId);
-    if (cluster)
-    {
-        for (size_t index = 0; index < cluster->eventCount; ++index)
-        {
-            if (cluster->eventList[index] == path.mEventId)
-            {
-                eventInfo.readPrivilege = RequiredPrivilege::ForReadEvent(path);
-                return CHIP_NO_ERROR;
-            }
-        }
-    }
-    return CHIP_ERROR_NOT_FOUND;
+
+    eventInfo.readPrivilege = RequiredPrivilege::ForReadEvent(path);
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR CodegenDataModelProvider::ServerClusters(EndpointId endpointId,

@@ -176,10 +176,6 @@ MockClusterConfig::MockClusterConfig(const MockClusterConfig & other) :
     {
         mEmberCluster.generatedCommandList = mGeneratedCommands.data();
     }
-    if (!mEmberEventList.empty())
-    {
-        mEmberCluster.eventList = mEmberEventList.data();
-    }
 }
 
 const MockAttributeConfig * MockClusterConfig::attributeById(AttributeId attributeId, ptrdiff_t * outIndex) const
