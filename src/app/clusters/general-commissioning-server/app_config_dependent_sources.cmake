@@ -26,6 +26,4 @@ TARGET_SOURCES(
   PRIVATE
     "${CLUSTER_DIR}/general-commissioning-cluster.cpp"
     "${CLUSTER_DIR}/general-commissioning-cluster.h"
-    "${CLUSTER_DIR}/general-commissioning-logic.cpp"
-    "${CLUSTER_DIR}/general-commissioning-logic.h"
 )

@@ -16,82 +16,109 @@
  *    limitations under the License.
  */
 
+/*
+ *    Copyright (c) 2025 Project CHIP Authors
+ *    All rights reserved.
+ *
+ *    Licensed under the Apache License, Version 2.0 (the "License");
+ *    you may not use this file except in compliance with the License.
+ *    You may obtain a copy of the License at
+ *
+ *        http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *    Unless required by applicable law or agreed to in writing, software
+ *    distributed under the License is distributed on an "AS IS" BASIS,
+ *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *    See the License for the specific language governing permissions and
+ *    limitations under the License.
+ */
 #include <app/clusters/general-commissioning-server/general-commissioning-cluster.h>
 #include <app/static-cluster-config/GeneralCommissioning.h>
-#include <data-model-providers/codegen/CodegenDataModelProvider.h>
-
-#include <app-common/zap-generated/attributes/Accessors.h>
 #include <app/util/attribute-storage.h>
+#include <app/util/endpoint-config-api.h>
+#include <data-model-providers/codegen/ClusterIntegration.h>
 
 using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;
-using namespace chip::app::Clusters::GeneralCommissioning::Attributes;
+using namespace chip::app::Clusters::GeneralCommissionings::Attributes;
+using namespace chip::app::Clusters::GeneralCommissioning::StaticApplicationConfig;
 using chip::Protocols::InteractionModel::Status;
-using namespace chip::DeviceLayer;
 
 namespace {
 
-// GeneralCommissioning implementation is specifically implemented
+// GeneralCommissioningCluster implementation is specifically implemented
 // only for the root endpoint (endpoint 0)
 // So either:
 //   - we have a fixed config and it is endpoint 0 OR
 //   - we have a fully dynamic config
 
-static constexpr size_t kGeneralCommissioningFixedClusterCount =
-    GeneralCommissioning::StaticApplicationConfig::kFixedClusterConfig.size();
+static constexpr size_t kGeneralCommissioningFixedClusterCount = GeneralCommissioning::StaticApplicationConfig::kFixedClusterConfig.size();
 
 static_assert((kGeneralCommissioningFixedClusterCount == 0) ||
                   ((kGeneralCommissioningFixedClusterCount == 1) &&
                    GeneralCommissioning::StaticApplicationConfig::kFixedClusterConfig[0].endpointNumber == kRootEndpointId),
-              "Fixed general commissioning MUST be on endpoint 0");
+              "General Commissioning cluster MUST be on endpoint 0");
 
-LazyRegisteredServerCluster<GeneralCommissioningCluster> gServer;
-static GeneralCommissioningFabricTableDelegate fabricDelegate;
+ServerClusterRegistration gRegistration(GeneralCommissioning::Instance());
+
+class IntegrationDelegate : public CodegenClusterIntegration::Delegate
+{
+public:
+    ServerClusterRegistration & CreateRegistration(EndpointId endpointId, unsigned clusterInstanceIndex,
+                                                   uint32_t optionalAttributeBits, uint32_t featureMap) override
+    {
+
+        GeneralCommissioningCluster::Instance().OptionalAttributes() =
+            GeneralCommissioningCluster::OptionalAttributesSet(optionalAttributeBits);
+
+        return gRegistration;
+    }
+
+    ServerClusterInterface * FindRegistration(unsigned clusterInstanceIndex) override
+    {
+        return &GeneralCommissioningCluster::Instance();
+    }
+
+    // Nothing to destroy: separate singleton class without constructor/destructor is used
+    void ReleaseRegistration(unsigned clusterInstanceIndex) override {}
+};
 
 } // namespace
 
-void emberAfGeneralCommissioningClusterInitCallback(EndpointId endpointId)
+void MatterGeneralCommissioningClusterInitCallback(EndpointId endpointId)
 {
-    if (endpointId != kRootEndpointId)
-    {
-        return;
-    }
+    VerifyOrReturn(endpointId == kRootEndpointId);
 
-    Breadcrumb::Set(0, 0);
-    uint32_t rawFeatureMap;
-    if (FeatureMap::Get(endpointId, &rawFeatureMap) != Status::Success)
-    {
-        ChipLogError(AppServer, "Failed to get feature map for endpoint %u", endpointId);
-        rawFeatureMap = 0;
-    }
+    IntegrationDelegate integrationDelegate;
 
-    gServer.Create(endpointId, BitFlags<GeneralCommissioning::Feature>(rawFeatureMap));
-    CHIP_ERROR err = CodegenDataModelProvider::Instance().Registry().Register(gServer.Registration());
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogError(AppServer, "General Commissioning register error: endpoint %u, %" CHIP_ERROR_FORMAT, endpointId, err.Format());
-    }
-    DeviceLayer::PlatformMgrImpl().AddEventHandler(chip::app::Clusters::GeneralCommissioningLogic::OnPlatformEventHandler);
-    chip::Server::GetInstance().GetFabricTable().AddFabricDelegate(&fabricDelegate);
+    // register a singleton server (root endpoint only)
+    CodegenClusterIntegration::RegisterServer(
+        {
+            .endpointId                = endpointId,
+            .clusterId                 = GeneralCommissioning::Id,
+            .fixedClusterInstanceCount = GeneralCommissioning::StaticApplicationConfig::kFixedClusterConfig.size(),
+            .maxClusterInstanceCount   = 1, // Cluster is a singleton on the root node and this is the only thing supported
+            .fetchFeatureMap           = false,
+            .fetchOptionalAttributes   = true,
+        },
+        integrationDelegate);
 }
 
-void emberAfGeneralCommissioningClusterShutdownCallback(EndpointId endpointId)
+void MatterGeneralCommissioningClusterShutdownCallback(EndpointId endpointId)
 {
-    if (endpointId != kRootEndpointId)
-    {
-        return;
-    }
-    Server::GetInstance().GetFabricTable().RemoveFabricDelegate(&fabricDelegate);
-    DeviceLayer::PlatformMgrImpl().RemoveEventHandler(chip::app::Clusters::GeneralCommissioningLogic::OnPlatformEventHandler);
+    VerifyOrReturn(endpointId == kRootEndpointId);
 
-    CHIP_ERROR err = CodegenDataModelProvider::Instance().Registry().Unregister(&gServer.Cluster());
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogError(AppServer, "General Commissioning unregister error: endpoint %u, %" CHIP_ERROR_FORMAT, endpointId,
-                     err.Format());
-    }
-    gServer.Destroy();
+    IntegrationDelegate integrationDelegate;
+
+    CodegenClusterIntegration::UnregisterServer(
+        {
+            .endpointId                = endpointId,
+            .clusterId                 = GeneralCommissioning::Id,
+            .fixedClusterInstanceCount = GeneralCommissioning::StaticApplicationConfig::kFixedClusterConfig.size(),
+            .maxClusterInstanceCount   = 1, // Cluster is a singleton on the root node and this is the only thing supported
+        },
+        integrationDelegate);
 }
 
 void MatterGeneralCommissioningPluginServerInitCallback() {}
