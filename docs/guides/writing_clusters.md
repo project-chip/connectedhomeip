@@ -106,7 +106,7 @@ attribute's value changes.
 #### Optimizing for Flash/RAM
 
 For common or large clusters, you may need to optimize for resource usage.
-Consider using C++ templates to compile-time select features and attributes,
+Consider using `C++` templates to compile-time select features and attributes,
 which can significantly reduce flash and RAM footprint.
 
 ### Unit Testing
