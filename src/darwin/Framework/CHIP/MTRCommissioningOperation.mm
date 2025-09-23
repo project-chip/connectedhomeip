@@ -250,8 +250,12 @@ static inline void emitMetricForSetupPayload(NSString * payload)
     });
 }
 
-- (void)controller:(MTRDeviceController *)controller commissioningSessionEstablishmentDone:(NSError * _Nullable)error
+- (void)controller:(MTRDeviceController *)controller commissioningSessionEstablishmentDone:(NSError * _Nullable)error forPayload:(MTRSetupPayload * _Nullable)payload
 {
+    if (!error && payload) {
+        _matchedPayload = payload;
+    }
+
     id<MTRCommissioningDelegate_Internal> strongDelegate = [self _internalDelegate];
     // NOTE: Doing respondsToSelector check before dispatch, so we can kick off
     // commissioning ourselves if not.
@@ -351,11 +355,6 @@ static inline void emitMetricForSetupPayload(NSString * payload)
     });
 }
 
-// TODO: There is currently no way to know when a commissioning stage _starts_, so we
-// don't have a good way to create MTRCommissioningStageWiFiScanStart and
-// MTRCommissioningStageThreadScanStart notifications.  This will need changes
-// to the C++ DevicePairingDelegate.
-
 #pragma mark - MTRDeviceControllerDelegate_Internal implementatation
 
 - (void)controller:(MTRDeviceController *)controller
@@ -429,6 +428,17 @@ static inline void emitMetricForSetupPayload(NSString * payload)
             }
         }];
     });
+}
+
+- (void)controller:(MTRDeviceController *)controller
+    reachedCommissioningStage:(MTRCommissioningStage)stage
+{
+    id<MTRCommissioningDelegate> strongDelegate = [self _internalDelegate];
+    if ([strongDelegate respondsToSelector:@selector(commissioning:reachedCommissioningStage:)]) {
+        dispatch_async(_delegateQueue, ^{
+            [strongDelegate commissioning:self reachedCommissioningStage:stage];
+        });
+    }
 }
 
 #pragma mark - MTRDeviceAttestationDelegate implementation

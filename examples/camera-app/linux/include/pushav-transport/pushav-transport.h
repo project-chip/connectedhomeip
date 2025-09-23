@@ -45,10 +45,10 @@ public:
     ~PushAVTransport() override;
 
     // Send video data for a given stream ID
-    void SendVideo(const char * data, size_t size, uint16_t videoStreamID) override;
+    void SendVideo(const char * data, size_t size, int64_t timestamp, uint16_t videoStreamID) override;
 
     // Send audio data for a given stream ID
-    void SendAudio(const char * data, size_t size, uint16_t audioStreamID) override;
+    void SendAudio(const char * data, size_t size, int64_t timestamp, uint16_t audioStreamID) override;
 
     // Send synchronized audio/video data for given audio and video stream IDs
     void SendAudioVideo(const char * data, size_t size, uint16_t videoStreamID, uint16_t audioStreamID) override;
@@ -95,7 +95,7 @@ public:
     void SetTLSCert(std::vector<uint8_t> bufferRootCert, std::vector<uint8_t> bufferClientCert,
                     std::vector<uint8_t> bufferClientCertKey, std::vector<std::vector<uint8_t>> bufferIntermediateCerts);
 
-    void SetZoneSensitivityList(std::vector<std::pair<uint16_t, uint8_t>> zoneSensitivityList)
+    void SetZoneSensitivityList(std::vector<std::pair<chip::app::DataModel::Nullable<uint16_t>, uint8_t>> zoneSensitivityList)
     {
         mZoneSensitivityList = zoneSensitivityList;
     }
@@ -132,7 +132,9 @@ private:
     PushAVUploader::CertificatesInfo mCertBuffer;
     AudioStreamStruct mAudioStreamParams;
     VideoStreamStruct mVideoStreamParams;
-    std::vector<std::pair<uint16_t, uint8_t>> mZoneSensitivityList;
+
+    // Note, a ZoneID within a Zone List can be Null, meaning the entry applies to all zones.
+    std::vector<std::pair<chip::app::DataModel::Nullable<uint16_t>, uint8_t>> mZoneSensitivityList;
 
     // Dummy implementation to indicate if video can be sent
     bool mCanSendVideo = false;
