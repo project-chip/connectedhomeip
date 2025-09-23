@@ -788,29 +788,29 @@ void PushAVClipRecorder::FinalizeCurrentClip(int reason)
     }
 
     // 2. Handle video fragments
-    std::string video_cmfv = make_path("%s_chunk-stream0-%05d.cmfv", mVideoFragment);
-    while (FileExists(video_cmfv) && !FileExists(video_cmfv + ".tmp"))
+    std::string video_m4s = make_path("%s_chunk-stream0-%05d.m4s", mVideoFragment);
+    while (FileExists(video_m4s) && !FileExists(video_m4s + ".tmp"))
     {
         if (mVideoFragment == 1)
         {
             mUploadedInitSegment = true;
         }
         mUploadMPD = true;
-        CheckAndUploadFile(video_cmfv);
+        CheckAndUploadFile(video_m4s);
         mVideoFragment++;
-        video_cmfv = make_path("%s_chunk-stream0-%05d.cmfv", mVideoFragment);
+        video_m4s = make_path("%s_chunk-stream0-%05d.m4s", mVideoFragment);
     }
 
     // 3. Handle audio fragments
     if (mClipInfo.mHasAudio)
     {
-        std::string audio_cmfv = make_path("%s_chunk-stream1-%05d.cmfv", mAudioFragment);
-        while (FileExists(audio_cmfv) && !FileExists(audio_cmfv + ".tmp"))
+        std::string audio_m4s = make_path("%s_chunk-stream1-%05d.m4s", mAudioFragment);
+        while (FileExists(audio_m4s) && !FileExists(audio_m4s + ".tmp"))
         {
             mUploadMPD = true;
-            CheckAndUploadFile(audio_cmfv);
+            CheckAndUploadFile(audio_m4s);
             mAudioFragment++;
-            audio_cmfv = make_path("%s_chunk-stream1-%05d.cmfv", mAudioFragment);
+            audio_m4s = make_path("%s_chunk-stream1-%05d.m4s", mAudioFragment);
         }
     }
 
