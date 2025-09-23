@@ -16,7 +16,6 @@
 #
 
 import asyncio
-import glob
 import logging
 import os
 import platform
@@ -36,41 +35,384 @@ logger = logging.getLogger(__name__)
 
 
 # General configuration
+MAX_MDNS_DISCOVERY_RETRIES = 5       # Number of retry attempts for mDNS discovery after network changes
 MAX_RETRIES = 3                      # Number of retry attempts for failed operations
+SETUP_TEARDOWN_TIMEOUT = 120         # Setup/teardown timeout (120s) - for class setup/teardown operations
 TIMEOUT = 900                        # Overall test timeout (15 min) - main test execution time limit
 
-# DNS-SD specific timeouts
-DNSSD_STARTUP_TIMEOUT = 30           # DNS-SD startup timeout (30s) - max time to wait for DNS-SD initialization
-DNSSD_RETRY_TIMEOUT = 60             # DNS-SD retry timeout (60s) - max time to retry DNS-SD operations before giving up
-
 # Matter command timeouts
-TIMED_REQUEST_TIMEOUT_MS = 5000      # Matter command timeout (5s) - for individual Matter commands
-COMMAND_TIMEOUT = 15                 # Quick command timeout (15s) - for ConnectNetwork that may timeout intentionally
 ATTRIBUTE_READ_TIMEOUT = 30          # Attribute read timeout (30s) - after network changes when DUT may be slow
+COMMAND_TIMEOUT = 15                 # Quick command timeout (15s) - for ConnectNetwork that may timeout intentionally
+TIMED_REQUEST_TIMEOUT_MS = 5000      # Matter command timeout (5s) - for individual Matter commands
+
+# TH (Test Harness) operation waits - for test framework operations
+TH_INTERFACE_WAIT = 3                # TH interface operations (3s) - interface resets, service setup
+TH_PROCESS_WAIT = 2                  # TH process operations (2s) - process starts/stops, interface operations
+TH_QUICK_WAIT = 1                    # Quick TH operations (1s) - quick stabilization, process monitoring
+
+# DUT waits - for Device Under Test operations and recovery
+DUT_NETWORK_WAIT = 3                 # DUT network wait (3s) - WiFi stabilization, network settling (reduced from 5s)
+DUT_PROGRESSIVE_RETRY_BASE = 3       # DUT progressive retry base (3s) - ESP32 network switch retries (reduced from 8s)
+DUT_RECOVERY_DELAY = 6               # DUT recovery delay (6s) - between retry attempts (reduced from 8s)
+DUT_SERVICE_STARTUP = 7              # DUT service startup (7s) - mDNS service stabilization (reduced from 10s)
+
 
 # Network operation timeouts
-CONNECTION_TIMEOUT = 20              # WiFi connection timeout (20s) - time to establish WiFi link
-IP_TIMEOUT = 15                      # IP assignment timeout (15s) - time to get IP address via DHCP
-NETWORK_CHANGE_TIMEOUT = 180         # Network transition timeout (180s) - for network changes
-# mDNS discovery timeout (180s) - device discovery after network changes
-MDNS_DISCOVERY_TIMEOUT = 180
+CONNECTION_TIMEOUT = 15              # WiFi connection timeout (15s) - time to establish WiFi link (reduced from 20s)
+IP_TIMEOUT = 8                       # IP assignment timeout (8s) - reduced from 10s for faster failure detection
+MDNS_DISCOVERY_TIMEOUT = 20          # mDNS discovery timeout (20s) - further reduced from 30s
+NETWORK_CHANGE_TIMEOUT = 45          # Network transition timeout (45s) - reduced from 150s
+# Network stabilization (5s) - further reduced from 15s for faster execution
+NETWORK_STABILIZATION_WAIT = 5
 
-# Wait periods (not timeouts, but delays for stability)
-WIFI_WAIT_SECONDS = 5                # WiFi stabilization wait (5s) - basic network settling time
-# Network stabilization wait (60s) - after major network changes (increased for Docker mDNS stability)
-NETWORK_STABILIZATION_WAIT = 60
-RETRY_DELAY_SECONDS = 8              # Delay between retry attempts (8s) - delay for DUT recovery
+# Discovery duration for mDNS and network operations
+DISCOVERY_DURATION = 8               # Default duration for mDNS discovery (reduced from 15s)
 
-# Short wait periods for internal operations
-SHORT_WAIT = 1                       # Short wait (1s) - for quick stabilization
-MEDIUM_WAIT = 2                      # Medium wait (2s) - for process starts/stops
-LONG_WAIT = 3                        # Long wait (3s) - for interface resets
-MDNS_STARTUP_WAIT = 10               # mDNS service startup wait (10s) - for mDNS service stabilization
-SETUP_TEARDOWN_TIMEOUT = 120         # Setup/teardown timeout (120s) - for class setup/teardown operations
+# Network verification parameters
+PING_COUNT = 1                       # Number of ping packets to send for connectivity verification
+PING_DEADLINE = 3                    # Ping deadline in seconds (-W parameter)
 
 cgen = Clusters.GeneralCommissioning
 cnet = Clusters.NetworkCommissioning
 attr = cnet.Attributes
+
+
+# ===== ENVIRONMENT DETECTION AND MDNS DISCOVERY FUNCTIONS =====
+
+# Global variable to store target device ID for mDNS discovery
+_target_device_id = None
+
+
+def detect_environment():
+    """Detect if we're running in Docker, Linux Desktop, or macOS.
+
+    Returns:
+        str: 'docker', 'linux_desktop', 'macos', or 'unknown'
+    """
+    # Check for Docker environment
+    docker_indicators = [
+        os.path.exists('/.dockerenv'),
+        os.path.exists('/proc/1/cgroup') and 'docker' in open('/proc/1/cgroup').read(),
+        os.environ.get('DOCKER_CONTAINER') == 'true'
+    ]
+
+    is_docker = any(docker_indicators)
+
+    if is_docker:
+        return 'docker'
+
+    # Check platform
+    system = platform.system()
+    if system == 'Darwin':
+        return 'macos'
+    elif system == 'Linux':
+        return 'linux_desktop'
+    else:
+        return 'unknown'
+
+
+def get_target_device_id():
+    """Get the cached target device ID for mDNS discovery."""
+    global _target_device_id
+    return _target_device_id
+
+
+def set_target_device_id(device_id):
+    """Set the target device ID for mDNS discovery."""
+    global _target_device_id
+    _target_device_id = str(device_id) if device_id is not None else None
+
+
+async def discover_dut(duration=DISCOVERY_DURATION, target_device_id=None):
+    """Discover Matter services using platform-specific command-line tools.
+
+    Uses different approaches based on environment:
+    - macOS: dns-sd command (built into macOS)
+    - Linux Desktop: avahi-browse (if available) or systemd-resolve
+    - Docker: avahi-browse command (no service dependencies)
+
+    Args:
+        duration: Discovery duration in seconds
+        target_device_id: Optional device ID to look for specifically
+
+    Returns:
+        list: List of discovered services with their details
+    """
+    env = detect_environment()
+    discovered_services = []
+
+    try:
+        logger.info(f"discover_dut: Starting mDNS discovery for {duration}s on {env}...")
+
+        if env == 'macos':
+            # macOS: Use built-in dns-sd command
+            await _discover_dut_from_macos(duration, target_device_id, discovered_services)
+
+        elif env == 'linux_desktop':
+            # Linux Desktop: Try avahi-browse or systemd-resolve
+            await _discover_dut_from_linux_desktop(duration, target_device_id, discovered_services)
+
+        elif env == 'docker':
+            # Docker: Use avahi-browse command directly
+            return await _discover_dut_from_docker(duration, target_device_id)
+
+        else:
+            logger.warning(f"discover_dut: No discovery method available for {env}")
+            return []
+
+        logger.info(f"discover_dut: Discovery completed. Found {len(discovered_services)} services")
+        return discovered_services
+
+    except Exception as e:
+        logger.error(f"discover_dut: Discovery failed: {e}")
+        return []
+
+
+async def _discover_dut_from_macos(duration, target_device_id, discovered_services):
+    """Discover services on macOS using dns-sd command-line tool."""
+    service_types = ["_matter._tcp", "_matterc._udp", "_chip._tcp"]
+
+    for service_type in service_types:
+        try:
+            logger.info(f"_discover_dut_from_macos: Browsing {service_type} on macOS...")
+
+            # Start dns-sd browse in background
+            proc = subprocess.Popen(
+                ["dns-sd", "-B", service_type],
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+                text=True
+            )
+
+            # Let it run for a portion of the duration
+            await asyncio.sleep(duration / len(service_types))
+
+            try:
+                stdout, stderr = proc.communicate(timeout=1)
+
+                # Parse dns-sd output
+                for line in stdout.split('\n'):
+                    if 'ADD' in line and service_type in line:
+                        parts = line.split()
+                        if len(parts) >= 6:
+                            service_name = parts[6] if len(parts) > 6 else 'unknown'
+
+                            service_info = {
+                                'name': service_name,
+                                'type': service_type,
+                                'domain': 'local',
+                                'method': 'dns-sd'
+                            }
+                            discovered_services.append(service_info)
+
+                            target_match = ""
+                            if target_device_id and target_device_id.lower() in service_name.lower():
+                                target_match = " TARGET FOUND"
+
+                            logger.info(f"_discover_dut_from_macos: [dns-sd] {service_name} ({service_type}){target_match}")
+
+            except subprocess.TimeoutExpired:
+                proc.kill()
+
+        except Exception as e:
+            logger.warning(f"_discover_dut_from_macos: dns-sd failed for {service_type}: {e}")
+
+
+async def _discover_dut_from_linux_desktop(duration, target_device_id, discovered_services):
+    """Discover services on Linux Desktop using avahi-browse or systemd-resolve CLI tools."""
+
+    # Try avahi-browse first (if installed)
+    try:
+        result = await run_subprocess(
+            ["avahi-browse", "-a", "-t", "-p"],
+            capture_output=True,
+            timeout=min(duration, 15)
+        )
+
+        if result.returncode == 0:
+            logger.info("_discover_dut_from_linux_desktop: Using avahi-browse for discovery...")
+
+            for line in result.stdout.split('\n'):
+                if ('_matter._tcp' in line or '_matterc._udp' in line or '_chip._tcp' in line) and line.startswith('+'):
+                    parts = line.split(';')
+                    if len(parts) >= 6:
+                        service_name = parts[6] if len(parts) > 6 else 'unknown'
+                        service_type = parts[4] if len(parts) > 4 else 'unknown'
+
+                        service_info = {
+                            'name': service_name,
+                            'type': service_type,
+                            'domain': 'local',
+                            'method': 'avahi-browse'
+                        }
+                        discovered_services.append(service_info)
+
+                        target_match = ""
+                        if target_device_id and target_device_id.lower() in service_name.lower():
+                            target_match = " TARGET FOUND"
+
+                        logger.info(
+                            f"_discover_dut_from_linux_desktop: [avahi-browse] {service_name} ({service_type}){target_match}")
+            return
+
+    except (subprocess.TimeoutExpired, subprocess.CalledProcessError, FileNotFoundError):
+        logger.debug("_discover_dut_from_linux_desktop: avahi-browse not available or failed")
+
+    # Try systemd-resolve as fallback
+    try:
+        logger.info("_discover_dut_from_linux_desktop: Trying systemd-resolve for mDNS...")
+
+        # Use systemd-resolve to query .local domains
+        test_queries = [f"{target_device_id}.local" if target_device_id else "matter-device.local"]
+
+        for query in test_queries:
+            try:
+                result = await run_subprocess(
+                    ["systemd-resolve", query],
+                    capture_output=True,
+                    timeout=5
+                )
+
+                if result.returncode == 0 and result.stdout:
+                    service_info = {
+                        'name': query,
+                        'type': '_matter._tcp',
+                        'domain': 'local',
+                        'method': 'systemd-resolve',
+                        'details': result.stdout.strip()
+                    }
+                    discovered_services.append(service_info)
+                    logger.info(f"_discover_dut_from_linux_desktop: [systemd-resolve] Found: {query}")
+
+            except Exception:
+                continue
+
+    except Exception as e:
+        logger.debug(f"_discover_dut_from_linux_desktop: systemd-resolve failed: {e}")
+
+    if not discovered_services:
+        logger.warning("_discover_dut_from_linux_desktop: No native Linux discovery tools worked")
+
+
+async def _discover_dut_from_docker(duration=DISCOVERY_DURATION, target_device_id=None):
+    """
+    Discover Matter services using avahi-browse command-line tool.
+
+    This function is designed for use inside a Docker container running on Raspberry Pi with Ubuntu.
+    Other environments are not supported or tested in this test scenario.
+
+    Args:
+        duration: Discovery duration in seconds
+        target_device_id: Optional device ID to look for specifically
+
+    Returns:
+        list: List of discovered services with their details
+    """
+    discovered_services = []
+    try:
+        logger.info(f"_discover_dut_from_docker: Starting avahi-browse mDNS discovery for {DISCOVERY_DURATION}s...")
+        # Run avahi-browse for the specified duration
+        proc = await asyncio.create_subprocess_exec(
+            "avahi-browse", "-a", "-t", "-p",
+            stdout=asyncio.subprocess.PIPE,
+            stderr=asyncio.subprocess.PIPE
+        )
+        try:
+            # Espera la duración indicada, luego termina el proceso
+            await asyncio.sleep(DISCOVERY_DURATION)
+            proc.terminate()
+            stdout, stderr = await proc.communicate()
+        except Exception:
+            proc.kill()
+            stdout, stderr = await proc.communicate()
+
+        output = stdout.decode() if stdout else ""
+        # Filtra servicios Matter
+        for line in output.splitlines():
+            if ("_matter._tcp" in line or "_matterc._udp" in line or "_chip._tcp" in line) and line.startswith('+'):
+                parts = line.split(';')
+                if len(parts) >= 6:
+                    service_name = parts[6] if len(parts) > 6 else 'unknown'
+                    service_type = parts[4] if len(parts) > 4 else 'unknown'
+                    service_info = {
+                        'name': service_name,
+                        'type': service_type,
+                        'domain': 'local',
+                        'method': 'avahi-browse'
+                    }
+                    # Si se especifica target_device_id, filtra por nombre
+                    if target_device_id:
+                        if target_device_id.lower() in service_name.lower():
+                            logger.info(f"_discover_dut_from_docker: [avahi-browse] {service_name} ({service_type}) TARGET FOUND")
+                            discovered_services.append(service_info)
+                    else:
+                        logger.info(f"_discover_dut_from_docker: [avahi-browse] {service_name} ({service_type})")
+                        discovered_services.append(service_info)
+
+        logger.info(f"_discover_dut_from_docker: avahi-browse discovery completed. Found {len(discovered_services)} services")
+        return discovered_services
+
+    except Exception as e:
+        logger.error(f"_discover_dut_from_docker: avahi-browse discovery failed: {e}")
+        return []
+
+
+async def verify_mdns_discovery():
+    """Verify that the target device is discoverable via mDNS.
+
+    This function only performs mDNS discovery to verify the device is discoverable
+    on the network.
+
+    Uses different strategies based on detected environment:
+    - Docker: avahi-browse command (no service dependencies)
+    - macOS: Native dns-sd command (built-in)
+    - Linux Desktop: avahi-browse or systemd-resolve (usually pre-installed)
+
+    Raises:
+        Exception: If mDNS discovery fails to find the target device
+    """
+    env = detect_environment()
+    logger.info(f"verify_mdns_discovery: Starting mDNS discovery verification (Environment: {env})")
+
+    # Wait for network stabilization
+    # logger.info(f"verify_mdns_discovery: Waiting {NETWORK_STABILIZATION_WAIT}s for network stabilization...")
+    # await asyncio.sleep(NETWORK_STABILIZATION_WAIT)
+
+    # Limit discovery attempts to prevent infinite loops
+    max_discovery_attempts = 3
+    attempt = 0
+
+    while attempt < max_discovery_attempts:
+        attempt += 1
+        logger.info(f"verify_mdns_discovery: Discovery attempt {attempt}/{max_discovery_attempts}")
+
+        try:
+            # Try mDNS discovery using avahi-browse or platform-specific tools
+            discovered_services = await discover_dut(
+                duration=DISCOVERY_DURATION,
+                target_device_id=get_target_device_id()  # Use cached device ID
+            )
+
+            if discovered_services:
+                logger.info(f"verify_mdns_discovery: mDNS discovery successful! Found {len(discovered_services)} services")
+                # Give additional time for service stabilization
+                await asyncio.sleep(TH_INTERFACE_WAIT)
+                return  # Success - mDNS discovery found the device
+            else:
+                logger.warning(f"verify_mdns_discovery: Attempt {attempt} failed - no services found")
+                if attempt < max_discovery_attempts:
+                    logger.info(f"verify_mdns_discovery: Waiting {TH_PROCESS_WAIT}s before next attempt...")
+                    await asyncio.sleep(TH_PROCESS_WAIT)
+
+        except Exception as e:
+            logger.error(f"verify_mdns_discovery: Discovery attempt {attempt} failed with exception: {e}")
+            if attempt < max_discovery_attempts:
+                logger.info(f"verify_mdns_discovery: Waiting {TH_PROCESS_WAIT}s before retry...")
+                await asyncio.sleep(TH_PROCESS_WAIT)
+
+    # All attempts failed
+    raise Exception(
+        f"verify_mdns_discovery: mDNS discovery failed after {max_discovery_attempts} attempts: No Matter services found on the network")
 
 
 class ConnectionResult:
@@ -80,7 +422,7 @@ class ConnectionResult:
         self.stderr = stderr
 
 
-async def run_subprocess(cmd, check=False, capture_output=False, timeout=30):
+async def run_subprocess(cmd, check=False, capture_output=False, timeout=ATTRIBUTE_READ_TIMEOUT):
     """Run subprocess command with optional output capture and timeout.
 
     Args:
@@ -181,7 +523,7 @@ async def wpa_command(interface, cmd):
             os.remove(sock_tmp)
 
 
-async def scan_and_find_ssid(interface, target_ssid, retries=MAX_RETRIES, delay=RETRY_DELAY_SECONDS):
+async def scan_and_find_ssid(interface, target_ssid, retries=MAX_RETRIES, delay=DUT_RECOVERY_DELAY):
     """Scan and search for SSID with retry logic.
 
     Args:
@@ -215,7 +557,7 @@ async def scan_and_find_ssid(interface, target_ssid, retries=MAX_RETRIES, delay=
             logger.error(f"scan_and_find_ssid: Scan attempt {retry} failed: {e}")
 
         if retry < retries:
-            await asyncio.sleep(SHORT_WAIT)
+            await asyncio.sleep(TH_QUICK_WAIT)
 
     logger.error(f"scan_and_find_ssid: SSID {target_ssid} not found after {retries} attempts")
     return False
@@ -253,11 +595,11 @@ async def connect_wifi_linux(ssid, password) -> ConnectionResult:
 
         # Ensure interface is up and reset state
         await run_subprocess(["sudo", "ip", "link", "set", interface, "up"])
-        await asyncio.sleep(SHORT_WAIT)
+        await asyncio.sleep(TH_QUICK_WAIT)
 
         # Disconnect from any current connection
         await wpa_command(interface, "DISCONNECT")
-        await asyncio.sleep(MEDIUM_WAIT)
+        await asyncio.sleep(TH_PROCESS_WAIT)
 
         # Remove all existing networks to avoid conflicts
         nets_result = await wpa_command(interface, "LIST_NETWORKS")
@@ -314,12 +656,12 @@ async def connect_wifi_linux(ssid, password) -> ConnectionResult:
                     break
                 elif "wpa_state=4WAY_HANDSHAKE" in status:
                     # Authentication in progress, wait a bit more
-                    await asyncio.sleep(MEDIUM_WAIT)
+                    await asyncio.sleep(TH_PROCESS_WAIT)
                 elif "wpa_state=DISCONNECTED" in status or "wpa_state=INACTIVE" in status:
                     logger.warning(f"connect_wifi_linux: Connection failed, status: {status}")
                     break
 
-                await asyncio.sleep(SHORT_WAIT)
+                await asyncio.sleep(TH_QUICK_WAIT)
 
             if connected:
                 break
@@ -328,12 +670,12 @@ async def connect_wifi_linux(ssid, password) -> ConnectionResult:
             if retry < MAX_RETRIES:
                 logger.warning(f"connect_wifi_linux: Attempt {retry} failed, resetting interface")
                 await run_subprocess(["sudo", "ip", "link", "set", interface, "down"])
-                await asyncio.sleep(MEDIUM_WAIT)
+                await asyncio.sleep(TH_PROCESS_WAIT)
                 await run_subprocess(["sudo", "ip", "link", "set", interface, "up"])
-                await asyncio.sleep(LONG_WAIT)
+                await asyncio.sleep(TH_INTERFACE_WAIT)
                 await wpa_command(interface, f"SELECT_NETWORK {net_id}")
                 await wpa_command(interface, "REASSOCIATE")
-                await asyncio.sleep(MEDIUM_WAIT)
+                await asyncio.sleep(TH_PROCESS_WAIT)
 
         if not connected:
             final_status = await wpa_command(interface, "STATUS")
@@ -343,7 +685,7 @@ async def connect_wifi_linux(ssid, password) -> ConnectionResult:
         # Connection successful, get IP address
         # Release any existing DHCP lease and request new one
         await run_subprocess(["sudo", "dhclient", "-r", interface])
-        await asyncio.sleep(SHORT_WAIT)
+        await asyncio.sleep(TH_QUICK_WAIT)
         await run_subprocess(["sudo", "dhclient", interface])
 
         # Wait for IP assignment with retry
@@ -364,9 +706,9 @@ async def connect_wifi_linux(ssid, password) -> ConnectionResult:
                             if gw_match:
                                 gateway = gw_match.group(1)
                                 ping_output = await run_subprocess(
-                                    ["ping", "-c", "1", "-W", "3", gateway],
+                                    ["ping", "-c", str(PING_COUNT), "-W", str(PING_DEADLINE), gateway],
                                     capture_output=True,
-                                    timeout=5
+                                    timeout=DUT_NETWORK_WAIT
                                 )
                                 if ping_output and "1 received" in ping_output:
                                     pass  # Connectivity verified
@@ -375,7 +717,7 @@ async def connect_wifi_linux(ssid, password) -> ConnectionResult:
 
                     return ConnectionResult(0, "")
 
-            await asyncio.sleep(SHORT_WAIT)
+            await asyncio.sleep(TH_QUICK_WAIT)
 
         logger.error("connect_wifi_linux: WiFi connected but no IP address obtained")
         return ConnectionResult(1, "No IP address obtained")
@@ -405,9 +747,9 @@ async def connect_wifi_mac(ssid, password) -> ConnectionResult:
 
     try:
         # Get the Wi-Fi interface
-        interface_result = subprocess.run(
+        interface_result = await run_subprocess(
             ["/usr/sbin/networksetup", "-listallhardwareports"],
-            capture_output=True, text=True
+            capture_output=True
         )
         interface = "en0"   # 'en0' is by default
         for block in interface_result.stdout.split("\n\n"):
@@ -418,11 +760,11 @@ async def connect_wifi_mac(ssid, password) -> ConnectionResult:
                         break
 
         logger.info(f"connect_wifi_mac: Using interface: {interface}")
-        result = subprocess.run([
+        result = await run_subprocess([
             "networksetup",
             "-setairportnetwork", interface, ssid, password
-        ], check=True, capture_output=True, text=True)
-        await asyncio.sleep(WIFI_WAIT_SECONDS)
+        ], check=True, capture_output=True)
+        await asyncio.sleep(DUT_NETWORK_WAIT)
         return ConnectionResult(result.returncode, result.stderr)
 
     except subprocess.CalledProcessError as e:
@@ -517,7 +859,7 @@ async def change_networks(test, cluster, ssid, password, breadcrumb):
         retry += 1
         try:
             if retry > 1:
-                await asyncio.sleep(WIFI_WAIT_SECONDS)
+                await asyncio.sleep(DUT_NETWORK_WAIT)
 
             try:
                 err = await asyncio.wait_for(
@@ -552,7 +894,7 @@ async def change_networks(test, cluster, ssid, password, breadcrumb):
             continue
 
         # Wait for DUT to change networks
-        await asyncio.sleep(WIFI_WAIT_SECONDS)
+        await asyncio.sleep(DUT_NETWORK_WAIT)
 
         logger.info(f"change_networks: Changing TH network to {ssid}")
         try:
@@ -563,7 +905,7 @@ async def change_networks(test, cluster, ssid, password, breadcrumb):
             if result and result.returncode == 0:
                 # Extra wait for network stabilization after TH connects
                 logger.info("change_networks: Waiting additional 3s for network stabilization...")
-                await asyncio.sleep(LONG_WAIT)
+                await asyncio.sleep(TH_INTERFACE_WAIT)
                 return  # Success!
             else:
                 logger.error(f"change_networks: TH failed to connect to {ssid}")
@@ -578,7 +920,7 @@ async def change_networks(test, cluster, ssid, password, breadcrumb):
                     if fallback_result and fallback_result.returncode == 0:
                         logger.info(f"change_networks: Successfully fell back to {original_ssid}")
                     else:
-                        logger.error(f"change_networks: Fallback to {original_ssid} also failed!")
+                        logger.error(f"change_networks: Fallback to {original_ssid} also failed")
                 except Exception as fallback_e:
                     logger.error(f"change_networks: Fallback connection failed: {fallback_e}")
 
@@ -595,16 +937,16 @@ async def change_networks(test, cluster, ssid, password, breadcrumb):
                 logger.error(f"change_networks: Fallback after timeout failed: {fallback_e}")
 
         except Exception as e:
+            # All attempts failed, ensure we have fallback connectivity
             logger.error(f"change_networks: TH failed to change to {ssid}: {e}")
-
-        retry += 1
-
-    # All attempts failed, ensure we have fallback connectivity
-    logger.error(f"change_networks: Failed to switch networks after {MAX_RETRIES} retries.")
+    logger.error(f"change_networks: Failed to switch networks after {MAX_RETRIES} attempts.")
     logger.info(f"change_networks: Ensuring fallback connectivity to {original_ssid}")
 
     try:
-        fallback_result = await connect_host_wifi(ssid=original_ssid, password=original_password)
+        fallback_result = await asyncio.wait_for(
+            connect_host_wifi(ssid=original_ssid, password=original_password),
+            timeout=NETWORK_CHANGE_TIMEOUT
+        )
         if fallback_result and fallback_result.returncode == 0:
             logger.info(f"change_networks: Final fallback to {original_ssid} successful")
         else:
@@ -757,7 +1099,7 @@ async def restore_lan_routes(original_routes):
             # Try to restore using dhclient as fallback
             try:
                 await run_subprocess(["sudo", "dhclient", "-r", interface])
-                await asyncio.sleep(SHORT_WAIT)
+                await asyncio.sleep(TH_QUICK_WAIT)
                 await run_subprocess(["sudo", "dhclient", interface])
                 logger.info(f"restore_lan_routes: Attempted DHCP refresh for {interface}")
             except Exception as dhcp_e:
@@ -815,7 +1157,7 @@ async def temporarily_remove_lan_route_for_wifi(ssid, wifi_1st_ap_ssid):
                     if success:
                         lan_route_removed = True
                         logger.info(f"temporarily_remove_lan_route_for_wifi: LAN default route temporarily removed")
-                        await asyncio.sleep(MEDIUM_WAIT)  # Wait for route change to take effect
+                        await asyncio.sleep(TH_PROCESS_WAIT)  # Wait for route change to take effect
                     else:
                         logger.warning(
                             f"temporarily_remove_lan_route_for_wifi: Failed to remove LAN route via {gateway} dev {lan_interface}")
@@ -953,8 +1295,8 @@ async def send_add_or_update_wifi_network_with_retries(test_instance, ssid, cred
         except Exception as e:
             logger.warning(f"send_add_or_update_wifi_network_with_retries: Attempt {retry} failed: {e}")
             if retry < max_retries:
-                logger.info(f"Retrying in {RETRY_DELAY_SECONDS} seconds...")
-                await asyncio.sleep(RETRY_DELAY_SECONDS)
+                logger.info(f"Retrying in {DUT_RECOVERY_DELAY} seconds...")
+                await asyncio.sleep(DUT_RECOVERY_DELAY)
             else:
                 raise Exception(f"Failed to send AddOrUpdateWiFiNetwork after {max_retries} attempts: {e}")
 
@@ -975,18 +1317,28 @@ async def verify_operational_network(ssid, wifi_1st_ap_ssid, read_single_attribu
     Raises:
         AssertionError: If network verification fails
     """
+    # Try enhanced mDNS discovery first
+    logger.info("Attempting enhanced mDNS discovery method...")
+    try:
+        await verify_mdns_discovery()
+        return  # Success with enhanced method
+    except Exception as e:
+        logger.warning(f"Enhanced mDNS method failed: {e}")
+        logger.info("Falling back to traditional method...")
+
+    # Traditional method (original implementation)
     networks = None
     retry = 0
 
-    logger.info(f"verify_operational_network: Waiting {NETWORK_STABILIZATION_WAIT}s for network stabilization...")
-    await asyncio.sleep(NETWORK_STABILIZATION_WAIT)
+    # logger.info(f"verify_operational_network: Waiting {NETWORK_STABILIZATION_WAIT}s for network stabilization...")
+    # await asyncio.sleep(NETWORK_STABILIZATION_WAIT)
 
     # Temporarily manage routes to ensure proper connectivity during WiFi verification
     lan_route_removed, gateway, lan_interface = await temporarily_remove_lan_route_for_wifi(ssid, wifi_1st_ap_ssid)
 
     try:
         # Reasonable retries for mDNS discovery, especially in Docker environment
-        max_retries_for_discovery = 5
+        max_retries_for_discovery = MAX_MDNS_DISCOVERY_RETRIES
 
         while retry < max_retries_for_discovery:
             retry += 1
@@ -1028,17 +1380,17 @@ async def verify_operational_network(ssid, wifi_1st_ap_ssid, read_single_attribu
             if retry < max_retries_for_discovery:
                 logger.info(f"verify_operational_network: Waiting before retry {retry + 1}")
                 # Small wait to allow network and mDNS to stabilize naturally
-                await asyncio.sleep(MEDIUM_WAIT)
+                await asyncio.sleep(TH_PROCESS_WAIT)
 
             # Progressive delay - ESP32 needs more time after network switch
             if retry == 1:
-                retry_delay = 10  # First retry: 10s
+                retry_delay = DUT_PROGRESSIVE_RETRY_BASE  # First retry: 3s
             elif retry == 2:
-                retry_delay = 15  # Second retry: 15s
+                retry_delay = DUT_PROGRESSIVE_RETRY_BASE + 2  # Second retry: 5s
             elif retry == 3:
-                retry_delay = 20  # Third retry: 20s
+                retry_delay = DUT_PROGRESSIVE_RETRY_BASE + 4  # Third retry: 7s
             else:
-                retry_delay = RETRY_DELAY_SECONDS  # Final retry: 8s
+                retry_delay = DUT_RECOVERY_DELAY  # Final retry: 6s
 
             await asyncio.sleep(retry_delay)
         else:
@@ -1053,220 +1405,16 @@ async def verify_operational_network(ssid, wifi_1st_ap_ssid, read_single_attribu
         logger.info(f"verify_operational_network: DUT connected to SSID: {ssid}")
 
 
-async def clean_avahi_cache():
-    """Clean Avahi cache files without restarting daemon.
-
-    Returns:
-        None
-
-    Raises:
-        None: Function handles all exceptions internally and logs warnings
-    """
-    try:
-        logger.debug("clean_avahi_cache: Cleaning Avahi cache files...")
-
-        # Clear avahi cache files safely
-        cache_dirs = ["/run/avahi-daemon", "/var/lib/avahi-daemon"]
-        for cache_dir in cache_dirs:
-            try:
-                cache_files = glob.glob(f"{cache_dir}/*")
-                for cache_file in cache_files:
-                    await run_subprocess(["sudo", "rm", "-rf", cache_file])
-            except Exception as e:
-                logger.warning(f"clean_avahi_cache: Failed to clean cache {cache_dir}: {e}")
-
-    except Exception as e:
-        logger.warning(f"clean_avahi_cache: Cache cleanup failed: {e}")
-
-
-async def restart_avahi_daemon():
-    """Restart Avahi daemon for complete mDNS reset.
-
-    Returns:
-        None
-
-    Raises:
-        subprocess.CalledProcessError: If Avahi daemon restart fails and fallback methods also fail
-    """
-    try:
-        logger.debug("restart_avahi_daemon: Restarting Avahi daemon...")
-
-        # Step 1: Stop avahi daemon cleanly
-        if os.path.exists("/usr/sbin/service"):
-            # Try service command first (works in Docker)
-            await run_subprocess(["sudo", "service", "avahi-daemon", "stop"])
-            await asyncio.sleep(MEDIUM_WAIT)
-            await run_subprocess(["sudo", "service", "avahi-daemon", "start"], check=True)
-            logger.debug("restart_avahi_daemon: Avahi daemon restarted via service command")
-        else:
-            # Try direct process management with clean start
-            await run_subprocess(["sudo", "pkill", "-f", "avahi-daemon"])
-            await asyncio.sleep(MEDIUM_WAIT)
-            await run_subprocess(["sudo", "/usr/sbin/avahi-daemon", "-D"], check=True)
-            logger.debug("restart_avahi_daemon: Avahi daemon restarted via process management")
-
-        # Wait for avahi to stabilize
-        await asyncio.sleep(WIFI_WAIT_SECONDS)
-
-    except subprocess.CalledProcessError as e:
-        logger.error(f"restart_avahi_daemon: Failed to restart Avahi daemon: {e}")
-        # Try alternative cleanup
-        try:
-            await run_subprocess(["sudo", "pkill", "-9", "-f", "avahi-daemon"])
-            await asyncio.sleep(MEDIUM_WAIT)
-            await run_subprocess(["sudo", "/usr/sbin/avahi-daemon", "-D"])
-            await asyncio.sleep(WIFI_WAIT_SECONDS)
-            logger.debug("restart_avahi_daemon: Attempted Avahi cleanup via force restart")
-        except Exception as fallback_e:
-            logger.error(f"restart_avahi_daemon: All Avahi restart methods failed: {fallback_e}")
-            raise
-
-
-async def aggressive_mdns_cleanup():
-    """Perform aggressive mDNS cleanup for test setup (kill processes, clean cache, restart daemon).
-
-    Returns:
-        None
-
-    Raises:
-        Exception: If critical mDNS cleanup operations fail
-    """
-    try:
-        logger.info("aggressive_mdns_cleanup: Performing aggressive mDNS cleanup...")
-
-        # Step 1: Kill all avahi-related processes
-        await run_subprocess(["sudo", "pkill", "-f", "avahi-daemon"])
-        await run_subprocess(["sudo", "pkill", "-f", "avahi-browse"])
-        await run_subprocess(["sudo", "pkill", "-f", "avahi-resolve"])
-        await asyncio.sleep(MEDIUM_WAIT)
-
-        # Step 2: Clear avahi cache and temporary files (more comprehensive than regular cleanup)
-        cache_dirs = [
-            "/var/lib/avahi-daemon",
-            "/run/avahi-daemon",
-            "/tmp/avahi-*"
-        ]
-        for cache_dir in cache_dirs:
-            try:
-                if '*' in cache_dir:
-                    # Handle wildcard patterns with glob
-                    cache_files = glob.glob(cache_dir)
-                    for cache_file in cache_files:
-                        await run_subprocess(["sudo", "rm", "-rf", cache_file])
-                else:
-                    # Handle regular directories
-                    await run_subprocess(["sudo", "rm", "-rf", cache_dir])
-            except Exception as e:
-                logger.warning(f"aggressive_mdns_cleanup: Failed to clean cache {cache_dir}: {e}")
-
-        # Step 3: Restart avahi daemon cleanly
-        await asyncio.sleep(SHORT_WAIT)
-        await restart_avahi_daemon()
-
-        logger.info("aggressive_mdns_cleanup: Aggressive mDNS cleanup completed")
-
-    except Exception as e:
-        logger.error(f"aggressive_mdns_cleanup: Aggressive cleanup failed: {e}")
-        raise
-
-
-async def check_dnssd_health():
-    """Check if DNS-SD/mDNS services are working properly.
-
-    Returns:
-        bool: True if DNS-SD is healthy, False otherwise
-    """
-    try:
-        logger.info("check_dnssd_health: Verifying DNS-SD availability...")
-
-        # Check if Avahi daemon is running
-        result = await run_subprocess(["ps", "aux"], capture_output=True, timeout=5)
-        if result.returncode == 0 and "avahi-daemon" in result.stdout:
-            logger.info("check_dnssd_health: Avahi daemon is running")
-            return True
-        else:
-            logger.warning("check_dnssd_health: Avahi daemon not found - DNS-SD may not work properly")
-
-        # Try to start Avahi if not running
-        logger.info("check_dnssd_health: Attempting to start Avahi daemon...")
-        start_result = await run_subprocess(["avahi-daemon", "--daemonize"], capture_output=True, timeout=10)
-        if start_result.returncode == 0:
-            logger.info("check_dnssd_health: Successfully started Avahi daemon")
-            return True
-        else:
-            logger.warning(f"check_dnssd_health: Failed to start Avahi: {start_result.stderr}")
-            return False
-
-    except Exception as e:
-        logger.error(f"check_dnssd_health: Failed to check DNS-SD health: {e}")
-        return False
-
-
-async def setup_network_environment():
-    """Setup network environment by managing default routes.
-
-    Returns:
-        list: List of original LAN routes that were removed for restoration
-
-    Raises:
-        None: Function handles all exceptions internally and returns empty list on error
-    """
-
-    try:
-        logger.info("setup_network_environment: Setting up test environment...")
-
-        # Check DNS-SD health first
-        dnssd_healthy = await check_dnssd_health()
-        if not dnssd_healthy:
-            logger.warning("setup_network_environment: DNS-SD services may not be available - test may experience issues")
-
-        # Remove LAN routes to force traffic through Wi-Fi during the test
-        original_routes = await remove_lan_routes()
-
-    except Exception as e:
-        logger.error(f"setup_network_environment: Error during setup: {e}")
-        original_routes = []
-
-    return original_routes
-
-
-async def teardown_network_environment(original_routes):
-    """Restore network environment by restoring routes.
-
-    Args:
-        original_routes: List of route dictionaries to restore
-
-    Returns:
-        None
-
-    Raises:
-        None: Function handles all exceptions internally and logs errors
-    """
-
-    try:
-        logger.info("teardown_network_environment: Restoring network environment...")
-
-        # Restore original LAN routes using helper function
-        await restore_lan_routes(original_routes)
-
-    except Exception as e:
-        logger.error(f"teardown_network_environment: Error during teardown: {e}")
-
-
 class TC_CNET_4_11(MatterBaseTest):
 
     @classmethod
     def setup_class(cls):
         """Remove default route from LAN interface to force traffic through Wi-Fi during test."""
         try:
-            cls._original_routes = asyncio.run(
-                asyncio.wait_for(setup_network_environment(), timeout=SETUP_TEARDOWN_TIMEOUT)
-            )
+            logger.info("setup_class: Setting up test environment...")
+            # Remove LAN routes to force traffic through Wi-Fi during the test
+            cls._original_routes = asyncio.run(remove_lan_routes())
             logger.info("setup_class: Network environment setup completed successfully")
-        except asyncio.TimeoutError:
-            logger.error(f"setup_class: Network environment setup timed out after {SETUP_TEARDOWN_TIMEOUT}s")
-            cls._original_routes = []
-            raise
         except Exception as e:
             logger.error(f"setup_class: Failed to setup network environment: {e}")
             cls._original_routes = []
@@ -1277,9 +1425,9 @@ class TC_CNET_4_11(MatterBaseTest):
         """Restore original default routes after the test finishes."""
         try:
             original_routes = getattr(cls, "_original_routes", [])
-            asyncio.run(
-                asyncio.wait_for(teardown_network_environment(original_routes), timeout=SETUP_TEARDOWN_TIMEOUT)
-            )
+            logger.info("teardown_class: Restoring network environment...")
+            # Restore original LAN routes using helper function
+            asyncio.run(restore_lan_routes(original_routes))
         except Exception as e:
             logger.error(f"teardown_class: Failed to teardown network environment: {e}")
 
@@ -1354,14 +1502,18 @@ class TC_CNET_4_11(MatterBaseTest):
 
         # Wait for mDNS service to stabilize after any setup_class activities
         logger.info("test_TC_CNET_4_11: Waiting for mDNS service to stabilize before starting test...")
-        await asyncio.sleep(MDNS_STARTUP_WAIT)
+        await asyncio.sleep(DUT_SERVICE_STARTUP)
+
+        # Set the target device ID for mDNS discovery from DUT node ID
+        set_target_device_id(self.dut_node_id)
+        logger.info(f"Set target device ID for mDNS discovery: {get_target_device_id()}")
 
         asserts.assert_true("PIXIT.CNET.WIFI_2ND_ACCESSPOINT_SSID" in self.matter_test_config.global_test_params,
                             "PIXIT.CNET.WIFI_2ND_ACCESSPOINT_SSID must be included on the command line in "
                             "the --string-arg flag as PIXIT.CNET.WIFI_2ND_ACCESSPOINT_SSID:<hex:7A6967626565686F6D65>")
         asserts.assert_true("PIXIT.CNET.WIFI_2ND_ACCESSPOINT_CREDENTIALS" in self.matter_test_config.global_test_params,
                             "PIXIT.CNET.WIFI_2ND_ACCESSPOINT_CREDENTIALS must be included on the command line in "
-                            "the --string-arg flag as PIXIT.CNET.WIFI_2ND_ACCESSPOINT_CREDENTIALS:<hex:70617373776f7264313233>")
+                            "the --string-arg flag as PIXIT.CNET.WIFI_2ND_ACCESSPOINT_CREDENTIALS:<hex:70617373776F7264313233>")
 
         wifi_1st_ap_ssid = self.matter_test_config.wifi_ssid
         wifi_1st_ap_credentials = self.matter_test_config.wifi_passphrase
@@ -1450,7 +1602,7 @@ class TC_CNET_4_11(MatterBaseTest):
 
         # Wait for network state to stabilize after removing current network
         logger.info("Waiting for network state to stabilize after RemoveNetwork...")
-        await asyncio.sleep(LONG_WAIT)
+        await asyncio.sleep(TH_INTERFACE_WAIT)
 
         # TH sends AddOrUpdateWiFiNetwork command to the DUT with SSID field set to PIXIT.CNET.WIFI_2ND_ACCESSPOINT_SSID,
         # Credentials field set to PIXIT.CNET.WIFI_2ND_ACCESSPOINT_CREDENTIALS and Breadcrumb field set to 1
@@ -1501,11 +1653,14 @@ class TC_CNET_4_11(MatterBaseTest):
         self.step(8)
 
         # Verify that the TH successfully connects to the DUT
-        await asyncio.sleep(WIFI_WAIT_SECONDS)
+        await asyncio.sleep(DUT_NETWORK_WAIT)
         await verify_operational_network(wifi_2nd_ap_ssid, wifi_1st_ap_ssid, self.read_single_attribute_check_success)
 
         # TH reads Breadcrumb attribute from the General Commissioning cluster of the DUT
         self.step(9)
+
+        # Small additional wait after network verification to ensure DUT session stability
+        await asyncio.sleep(TH_PROCESS_WAIT)
 
         # Verify that the breadcrumb value is set to 2
         await verify_breadcrumb_value(self, expected_value=2, step_number=9)
@@ -1530,7 +1685,7 @@ class TC_CNET_4_11(MatterBaseTest):
             logger.info("Proceeding with network change as this is expected behavior")
 
         # Wait for DUT to complete network reversion
-        await asyncio.sleep(WIFI_WAIT_SECONDS * 2)
+        await asyncio.sleep(DUT_NETWORK_WAIT * 2)
 
         # TH changes its WiFi connection to PIXIT.CNET.WIFI_1ST_ACCESSPOINT_SSID
         self.step(11)
@@ -1541,13 +1696,13 @@ class TC_CNET_4_11(MatterBaseTest):
             timeout=NETWORK_CHANGE_TIMEOUT
         )
         # Let's wait a couple of seconds to change networks
-        await asyncio.sleep(WIFI_WAIT_SECONDS)
+        await asyncio.sleep(DUT_NETWORK_WAIT)
 
         # TH discovers and connects to DUT on the PIXIT.CNET.WIFI_1ST_ACCESSPOINT_SSID operational network
         self.step(12)
 
         # Give more time for both TH and DUT to stabilize on the original network
-        await asyncio.sleep(WIFI_WAIT_SECONDS * 2)
+        await asyncio.sleep(DUT_NETWORK_WAIT * 2)
 
         # Verify that DUT has reverted to original network and is reachable
         try:
@@ -1557,7 +1712,7 @@ class TC_CNET_4_11(MatterBaseTest):
             logger.error(f"Failed to reconnect to DUT on original network: {e}")
             # Try one more time with additional wait
             logger.info("Retrying connection to DUT...")
-            await asyncio.sleep(WIFI_WAIT_SECONDS * 2)
+            await asyncio.sleep(DUT_NETWORK_WAIT * 2)
             await verify_operational_network(wifi_1st_ap_ssid, wifi_1st_ap_ssid, self.read_single_attribute_check_success)
 
         # TH sends ArmFailSafe command to the DUT with ExpiryLengthSeconds set to 900
@@ -1618,11 +1773,14 @@ class TC_CNET_4_11(MatterBaseTest):
         self.step(17)
 
         # Verify that the TH successfully connects to the DUT
-        await asyncio.sleep(WIFI_WAIT_SECONDS)
+        await asyncio.sleep(DUT_NETWORK_WAIT)
         await verify_operational_network(wifi_2nd_ap_ssid, wifi_1st_ap_ssid, self.read_single_attribute_check_success)
 
         # TH reads Breadcrumb attribute from the General Commissioning cluster of the DUT
         self.step(18)
+
+        # Small additional wait after network verification to ensure DUT session stability
+        await asyncio.sleep(TH_PROCESS_WAIT)
 
         # Verify that the breadcrumb value is set to 3
         await verify_breadcrumb_value(self, expected_value=3, step_number=18, timeout=TIMEOUT)
