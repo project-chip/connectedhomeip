@@ -245,7 +245,7 @@ public:
         // Get snapshot capabilities
         virtual std::vector<SnapshotCapabilitiesStruct> & GetSnapshotCapabilities() = 0;
 
-        // Get the maximum network bandwidth(mbps) that the camera would consume
+        // Get the maximum network bandwidth(bps) that the camera would consume
         // for transmission of its media streams.
         virtual uint32_t GetMaxNetworkBandwidth() = 0;
 

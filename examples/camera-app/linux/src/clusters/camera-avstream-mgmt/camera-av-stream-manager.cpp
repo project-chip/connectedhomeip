@@ -146,10 +146,10 @@ CHIP_ERROR CameraAVStreamManager::ValidateStreamUsage(StreamUsageEnum streamUsag
 
 void CameraAVStreamManager::GetBandwidthForStreams(const Optional<DataModel::Nullable<uint16_t>> & videoStreamId,
                                                    const Optional<DataModel::Nullable<uint16_t>> & audioStreamId,
-                                                   double & outBandwidthMbps)
+                                                   uint32_t & outBandwidthbps)
 {
 
-    outBandwidthMbps = 0.0;
+    outBandwidthbps = 0;
     if (videoStreamId.HasValue() && !videoStreamId.Value().IsNull())
     {
         uint16_t vStreamId           = videoStreamId.Value().Value();
@@ -158,9 +158,8 @@ void CameraAVStreamManager::GetBandwidthForStreams(const Optional<DataModel::Nul
         {
             if (stream.videoStreamID == vStreamId)
             {
-                outBandwidthMbps += (stream.maxBitRate / 1000000.0);
-                ChipLogProgress(Camera, "GetBandwidthForStreams: VideoStream %u maxBitRate: %u bps (%.2f Mbps)", vStreamId,
-                                stream.maxBitRate, (stream.maxBitRate / 1000000.0));
+                outBandwidthbps += stream.maxBitRate;
+                ChipLogProgress(Camera, "GetBandwidthForStreams: VideoStream %u maxBitRate: %u bps", vStreamId, stream.maxBitRate);
                 break;
             }
         }
@@ -173,9 +172,8 @@ void CameraAVStreamManager::GetBandwidthForStreams(const Optional<DataModel::Nul
         {
             if (stream.audioStreamID == aStreamId)
             {
-                outBandwidthMbps += (stream.bitRate / 1000000.0);
-                ChipLogProgress(Camera, "GetBandwidthForStreams: AudioStream %u bitRate: %u bps (%.2f Mbps)", aStreamId,
-                                +stream.bitRate, (stream.bitRate / 1000000.0));
+                outBandwidthbps += stream.bitRate;
+                ChipLogProgress(Camera, "GetBandwidthForStreams: AudioStream %u bitRate: %u bps", aStreamId, stream.bitRate);
                 break;
             }
         }

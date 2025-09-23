@@ -306,7 +306,7 @@ CameraAVStreamManager::OnTransportReleaseAudioVideoStreams(uint16_t audioStreamI
 
 void CameraAVStreamManager::GetBandwidthForStreams(const Optional<DataModel::Nullable<uint16_t>> & videoStreamId,
                                                    const Optional<DataModel::Nullable<uint16_t>> & audioStreamId,
-                                                   double & outBandwidthMbps)
+                                                   uint32_t & outBandwidthbps)
 {
     ChipLogDetail(Zcl, "Get bandwidth for streams called");
 }
