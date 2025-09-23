@@ -18,6 +18,9 @@
 # See https://github.com/project-chip/connectedhomeip/blob/master/docs/testing/python.md#defining-the-ci-test-arguments
 # for details about the block below.
 #
+# Note: This test expects the camera app to support the "SetHardPrivacyModeOn" pipe command
+# to simulate the physical privacy switch state for automated testing.
+#
 # === BEGIN CI TEST ARGUMENTS ===
 # test-runner-runs:
 #   run1:
@@ -51,7 +54,7 @@ class TC_WEBRTCP_2_13(MatterBaseTest, WEBRTCPTestBase):
 
     def desc_TC_WEBRTCP_2_13(self) -> str:
         """Returns a description of this test"""
-        return "[TC-WEBRTCP-2.13] Validate ProvideOffer fails with HardPrivacyModeOn"
+        return "[TC-WEBRTCP-2.13] Validate ProvideOffer fails when physical privacy switch is ON"
 
     def steps_TC_WEBRTCP_2_13(self) -> list[TestStep]:
         """
@@ -60,12 +63,12 @@ class TC_WEBRTCP_2_13(MatterBaseTest, WEBRTCPTestBase):
         steps = [
             TestStep(1, "TH allocates both Audio and Video streams via AudioStreamAllocate and VideoStreamAllocate commands to CameraAVStreamManagement",
                      "DUT responds with success"),
-            TestStep(2, "TH writes `HardPrivacyModeOn` to TRUE on CameraAVStreamManagement cluster",
-                     "DUT responds with success"),
+            TestStep(2, "Turns ON the physical privacy switch (HardPrivacyModeOn is TRUE)",
+                     "DUT's HardPrivacyModeOn attribute becomes TRUE"),
             TestStep(3, "TH sends the ProvideOffer command with null WebRTCSessionID and valid parameters",
                      "DUT responds with INVALID_IN_STATE status code"),
-            TestStep(4, "TH writes `HardPrivacyModeOn` to FALSE on CameraAVStreamManagement cluster",
-                     "DUT responds with success"),
+            TestStep(4, "Tures OFF the physical privacy switch (HardPrivacyModeOn is FALSE)",
+                     "DUT's HardPrivacyModeOn attribute becomes FALSE"),
             TestStep(5, "TH sends the ProvideOffer command with the same parameters",
                      "DUT responds with ProvideOfferResponse containing allocated WebRTCSessionID"),
         ]
@@ -81,7 +84,7 @@ class TC_WEBRTCP_2_13(MatterBaseTest, WEBRTCPTestBase):
     @async_test_body
     async def test_TC_WEBRTCP_2_13(self):
         """
-        Executes the test steps for validating ProvideOffer behavior with HardPrivacyModeOn.
+        Executes the test steps for validating ProvideOffer behavior when physical privacy switch is ON.
         """
 
         endpoint = self.get_endpoint(default=1)
@@ -96,16 +99,20 @@ class TC_WEBRTCP_2_13(MatterBaseTest, WEBRTCPTestBase):
         await self.validate_allocated_video_stream(videoStreamID)
 
         self.step(2)
-        # Set HardPrivacyModeOn to TRUE via app pipe
-        self.write_to_app_pipe({"Name": "SetHardPrivacyModeOn", "Value": True})
+        # For CI: Use app pipe to simulate physical privacy switch being turned on
+        # For manual testing: User should physically turn on the privacy switch
+        if self.is_pics_sdk_ci_only:
+            self.write_to_app_pipe({"Name": "SetHardPrivacyModeOn", "Value": True})
+        else:
+            input("Please turn ON the physical privacy switch on the device, then press Enter to continue...")
 
-        # Verify the attribute was set successfully
+        # Verify the attribute reflects the privacy switch state
         hard_privacy_mode = await self.read_single_attribute_check_success(
             endpoint=endpoint,
             cluster=Clusters.CameraAvStreamManagement,
             attribute=Clusters.CameraAvStreamManagement.Attributes.HardPrivacyModeOn
         )
-        asserts.assert_true(hard_privacy_mode, "HardPrivacyModeOn should be True")
+        asserts.assert_true(hard_privacy_mode, "HardPrivacyModeOn should be True when privacy switch is on")
 
         sdp_offer = (
             "v=0\n"
@@ -143,16 +150,20 @@ class TC_WEBRTCP_2_13(MatterBaseTest, WEBRTCPTestBase):
             asserts.assert_equal(e.status, Status.InvalidInState, "Expected INVALID_IN_STATE when HardPrivacyModeOn is True")
 
         self.step(4)
-        # Set HardPrivacyModeOn to FALSE via app pipe
-        self.write_to_app_pipe({"Name": "SetHardPrivacyModeOn", "Value": False})
+        # For CI: Use app pipe to simulate physical privacy switch being turned off
+        # For manual testing: User should physically turn off the privacy switch
+        if self.is_pics_sdk_ci_only:
+            self.write_to_app_pipe({"Name": "SetHardPrivacyModeOn", "Value": False})
+        else:
+            input("Please turn OFF the physical privacy switch on the device, then press Enter to continue...")
 
-        # Verify the attribute was set successfully
+        # Verify the attribute reflects the privacy switch state
         hard_privacy_mode = await self.read_single_attribute_check_success(
             endpoint=endpoint,
             cluster=Clusters.CameraAvStreamManagement,
             attribute=Clusters.CameraAvStreamManagement.Attributes.HardPrivacyModeOn
         )
-        asserts.assert_false(hard_privacy_mode, "HardPrivacyModeOn should be False")
+        asserts.assert_false(hard_privacy_mode, "HardPrivacyModeOn should be False when privacy switch is off")
 
         self.step(5)
         resp = await self.send_single_cmd(cmd=cmd, endpoint=endpoint, payloadCapability=ChipDeviceCtrl.TransportPayloadCapability.LARGE_PAYLOAD)
