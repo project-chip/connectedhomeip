@@ -33,7 +33,7 @@ When more complex logic is needed, Ember clusters use these interfaces.
 
 ### Determine ember/zap storage
 
-Ember storage should be moved from "persist/ram/callback" into "ram/callback":
+Ember storage should be moved from `persist/ram/callback` into `ram/callback`:
 
 -   if the value loaded from ZAP UI needs to be loaded, use `RAM` and have
     `CodegenIntegration.cpp` load the value from ZAP via `Accessors.h`. A common
