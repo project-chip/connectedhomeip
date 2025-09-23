@@ -19,6 +19,7 @@
 #include <app/FailSafeContext.h>
 #include <app/server-cluster/DefaultServerCluster.h>
 #include <clusters/OperationalCredentials/ClusterId.h>
+#include <credentials/DeviceAttestationCredsProvider.h>
 
 namespace chip {
 namespace app {
@@ -46,6 +47,10 @@ public:
 
     // Method used to report attributes changes called from the cluster functions.
     void OperationalCredentialsNotifyAttribute(AttributeId attributeId);
+
+    FabricTable & GetFabricTable();
+    FailSafeContext & GetFailSafeContext();
+    Credentials::DeviceAttestationCredentialsProvider * GetDACProvider();
 
     // FabricTable delegate
     void FabricWillBeRemoved(const FabricTable & fabricTable, FabricIndex fabricIndex) override;
