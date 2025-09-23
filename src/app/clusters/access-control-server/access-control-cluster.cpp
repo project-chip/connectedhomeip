@@ -385,6 +385,37 @@ namespace chip {
 namespace app {
 namespace Clusters {
 
+CHIP_ERROR AccessControlCluster::Startup(ServerClusterContext & context) {
+
+    ChipLogProgress(DataManagement, "AccessControlCluster: initializing");
+
+    GetAccessControl().AddEntryListener(*this);
+
+#if CHIP_CONFIG_USE_ACCESS_RESTRICTIONS
+    auto accessRestrictionProvider = GetAccessControl().GetAccessRestrictionProvider();
+    if (accessRestrictionProvider != nullptr)
+    {
+        accessRestrictionProvider->AddListener(*this);
+    }
+#endif
+
+    return CHIP_NO_ERROR;
+}
+
+void AccessControlCluster::Shutdown() {
+    ChipLogProgress(DataManagement, "AccessControlCluster: shutdown");
+
+#if CHIP_CONFIG_USE_ACCESS_RESTRICTIONS
+    auto accessRestrictionProvider = GetAccessControl().GetAccessRestrictionProvider();
+    if (accessRestrictionProvider != nullptr)
+    {
+        accessRestrictionProvider->RemoveListener(*this);
+    }
+#endif
+
+    GetAccessControl().RemoveEntryListener(*this);
+}
+
 DataModel::ActionReturnStatus AccessControlCluster::ReadAttribute(const DataModel::ReadAttributeRequest & request,
                                                                   AttributeValueEncoder & encoder)
 {
