@@ -207,6 +207,9 @@ class provisional(Conformance):
 
 class literal(Conformance):
     def __init__(self, value: str):
+        # base=0 allows automatic detection of number format from string prefix:
+        # "10" -> 10 (decimal), "0x10" -> 16 (hex), "0o10" -> 8 (octal), "0b10" -> 2 (binary)
+        # This is needed because XML literal values can be in different formats
         self.value = int(value, 0)
 
     def __call__(self):
