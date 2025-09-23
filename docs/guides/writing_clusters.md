@@ -91,9 +91,9 @@ attribute's value changes.
 -   Use the context to call
     `interactionContext->dataModelChangeListener->MarkDirty(path)`. A
     `NotifyAttributeChanged` helper exists for paths managed by this cluster.
-    -   For write implementations, you can use
-        `NotifyAttributeChangedIfSuccess` together with a separate `WriteImpl`
-        such that any successful attribute write will notify.
+    -   For write implementations, you can use `NotifyAttributeChangedIfSuccess`
+        together with a separate `WriteImpl` such that any successful attribute
+        write will notify.
 
 #### Persistent Storage
 
