@@ -272,6 +272,7 @@ std::optional<DataModel::ActionReturnStatus> HandleCSRRequest(CommandHandler * c
                                                               Commands::CSRRequest::DecodableType & commandData,
                                                               OperationalCredentialsCluster * cluster)
 {
+    VerifyOrDie(cluster != nullptr);
     MATTER_TRACE_SCOPE("CSRRequest", "OperationalCredentials");
     ChipLogProgress(Zcl, "OpCreds: Received a CSRRequest command");
 
@@ -401,6 +402,7 @@ std::optional<DataModel::ActionReturnStatus> HandleAddNOC(CommandHandler * comma
                                                           Commands::AddNOC::DecodableType & commandData,
                                                           OperationalCredentialsCluster * cluster)
 {
+    VerifyOrDie(cluster != nullptr);
     MATTER_TRACE_SCOPE("AddNOC", "OperationalCredentials");
     auto & failSafeContext   = cluster->GetFailSafeContext();
     auto & fabricTable       = cluster->GetFabricTable();
@@ -597,6 +599,7 @@ std::optional<DataModel::ActionReturnStatus> HandleUpdateNOC(CommandHandler * co
                                                              Commands::UpdateNOC::DecodableType & commandData,
                                                              OperationalCredentialsCluster * cluster)
 {
+    VerifyOrDie(cluster != nullptr);
     MATTER_TRACE_SCOPE("UpdateNOC", "OperationalCredentials");
     FabricTable & fabricTable         = cluster->GetFabricTable();
     FailSafeContext & failSafeContext = cluster->GetFailSafeContext();
@@ -690,6 +693,7 @@ std::optional<DataModel::ActionReturnStatus> HandleUpdateFabricLabel(CommandHand
                                                                      Commands::UpdateFabricLabel::DecodableType & commandData,
                                                                      OperationalCredentialsCluster * cluster)
 {
+    VerifyOrDie(cluster != nullptr);
     MATTER_TRACE_SCOPE("UpdateFabricLabel", "OperationalCredentials");
     FabricTable & fabricTable = cluster->GetFabricTable();
     auto & label              = commandData.label;
@@ -745,6 +749,7 @@ HandleAddTrustedRootCertificate(CommandHandler * commandObj, const ConcreteComma
                                 Commands::AddTrustedRootCertificate::DecodableType & commandData,
                                 OperationalCredentialsCluster * cluster)
 {
+    VerifyOrDie(cluster != nullptr);
     MATTER_TRACE_SCOPE("AddTrustedRootCertificate", "OperationalCredentials");
 
     auto finalStatus                  = Status::Failure;
@@ -801,6 +806,7 @@ HandleSetVIDVerificationStatement(CommandHandler * commandObj, const ConcreteCom
                                   Commands::SetVIDVerificationStatement::DecodableType & commandData,
                                   OperationalCredentialsCluster * cluster)
 {
+    VerifyOrDie(cluster != nullptr);
     FabricIndex fabricIndex = commandObj->GetAccessingFabricIndex();
     auto finalStatus        = Status::Failure;
 
@@ -860,6 +866,7 @@ std::optional<DataModel::ActionReturnStatus> HandleRemoveFabric(CommandHandler *
                                                                 Commands::RemoveFabric::DecodableType & commandData,
                                                                 OperationalCredentialsCluster * cluster)
 {
+    VerifyOrDie(cluster != nullptr);
     MATTER_TRACE_SCOPE("RemoveFabric", "OperationalCredentials");
     auto & fabricBeingRemoved = commandData.fabricIndex;
 
@@ -920,6 +927,7 @@ HandleSignVIDVerificationRequest(CommandHandler * commandObj, const ConcreteComm
                                  Commands::SignVIDVerificationRequest::DecodableType & commandData,
                                  OperationalCredentialsCluster * cluster)
 {
+    VerifyOrDie(cluster != nullptr);
     ChipLogProgress(Zcl, "OpCreds: Received a SignVIDVerificationRequest Command for FabricIndex 0x%x",
                     static_cast<unsigned>(commandData.fabricIndex));
 
@@ -962,6 +970,7 @@ HandleCertificateChainRequest(CommandHandler * commandObj, const ConcreteCommand
                               Commands::CertificateChainRequest::DecodableType & commandData,
                               OperationalCredentialsCluster * cluster)
 {
+    VerifyOrDie(cluster != nullptr);
     MATTER_TRACE_SCOPE("CertificateChainRequest", "OperationalCredentials");
     auto & certificateType = commandData.certificateType;
 
@@ -1008,6 +1017,7 @@ std::optional<DataModel::ActionReturnStatus> HandleAttestationRequest(CommandHan
                                                                       Commands::AttestationRequest::DecodableType & commandData,
                                                                       OperationalCredentialsCluster * cluster)
 {
+    VerifyOrDie(cluster != nullptr);
     MATTER_TRACE_SCOPE("AttestationRequest", "OperationalCredentials");
     auto & attestationNonce = commandData.attestationNonce;
 
@@ -1097,9 +1107,9 @@ exit:
     return std::nullopt;
 }
 
-void FailSafeCleanup(const chip::DeviceLayer::ChipDeviceEvent * event, FabricTable & fabricTable, SessionManager & sessionMgr,
-                     OperationalCredentialsCluster * cluster)
+void FailSafeCleanup(const chip::DeviceLayer::ChipDeviceEvent * event, OperationalCredentialsCluster * cluster)
 {
+    VerifyOrDie(cluster != nullptr);
     ChipLogError(Zcl, "OpCreds: Proceeding to FailSafeCleanup on fail-safe expiry!");
 
     bool nocAddedDuringFailsafe          = event->FailSafeTimerExpired.addNocCommandHasBeenInvoked;
@@ -1130,17 +1140,17 @@ void FailSafeCleanup(const chip::DeviceLayer::ChipDeviceEvent * event, FabricTab
     // Session Context at the Server.
     if (nocAddedOrUpdatedDuringFailsafe)
     {
-        sessionMgr.ExpireAllSessionsForFabric(fabricIndex);
+        cluster->GetSessionManager().ExpireAllSessionsForFabric(fabricIndex);
     }
 
-    fabricTable.RevertPendingFabricData();
+    cluster->GetFabricTable().RevertPendingFabricData();
 
     // If an AddNOC command had been successfully invoked, achieve the equivalent effect of invoking the RemoveFabric command
     // against the Fabric Index stored in the Fail-Safe Context for the Fabric Index that was the subject of the AddNOC
     // command.
     if (nocAddedDuringFailsafe)
     {
-        CHIP_ERROR err = fabricTable.Delete(fabricIndex);
+        CHIP_ERROR err = cluster->GetFabricTable().Delete(fabricIndex);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "OpCreds: failed to delete fabric at index %u: %" CHIP_ERROR_FORMAT, fabricIndex, err.Format());
@@ -1159,10 +1169,8 @@ void OnPlatformEventHandler(const chip::DeviceLayer::ChipDeviceEvent * event, in
 {
     if (event->Type == DeviceLayer::DeviceEventType::kFailSafeTimerExpired)
     {
-        OperationalCredentialsCluster * cluster = reinterpret_cast<OperationalCredentialsCluster *>(arg);
         ChipLogError(Zcl, "OpCreds: Got FailSafeTimerExpired");
-        FailSafeCleanup(event, cluster->GetFabricTable(), cluster->GetSessionManager(),
-                        reinterpret_cast<OperationalCredentialsCluster *>(arg));
+        FailSafeCleanup(event, reinterpret_cast<OperationalCredentialsCluster *>(arg));
     }
 }
 } // anonymous namespace
