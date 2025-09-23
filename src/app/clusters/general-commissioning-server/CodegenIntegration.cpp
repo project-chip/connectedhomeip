@@ -19,7 +19,6 @@
 #include <app/static-cluster-config/GeneralCommissioning.h>
 #include <data-model-providers/codegen/ClusterIntegration.h>
 
-
 using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;
@@ -35,7 +34,8 @@ namespace {
 //   - we have a fixed config and it is endpoint 0 OR
 //   - we have a fully dynamic config
 
-static constexpr size_t kGeneralCommissioningFixedClusterCount = GeneralCommissioning::StaticApplicationConfig::kFixedClusterConfig.size();
+static constexpr size_t kGeneralCommissioningFixedClusterCount =
+    GeneralCommissioning::StaticApplicationConfig::kFixedClusterConfig.size();
 
 static_assert((kGeneralCommissioningFixedClusterCount == 0) ||
                   ((kGeneralCommissioningFixedClusterCount == 1) &&
@@ -78,12 +78,12 @@ void MatterGeneralCommissioningClusterInitCallback(EndpointId endpointId)
     // Startup() will be called automatically by the registry when context is set
     CodegenClusterIntegration::RegisterServer(
         {
-            .endpointId                      = endpointId,
-            .clusterId                       = GeneralCommissioning::Id,
-            .fixedClusterInstanceCount       = GeneralCommissioning::StaticApplicationConfig::kFixedClusterConfig.size(),
-            .maxClusterInstanceCount         = 1, // Cluster is a singleton on the root node and this is the only thing supported
-            .fetchFeatureMap                 = false,
-            .fetchOptionalAttributes         = true,
+            .endpointId                = endpointId,
+            .clusterId                 = GeneralCommissioning::Id,
+            .fixedClusterInstanceCount = GeneralCommissioning::StaticApplicationConfig::kFixedClusterConfig.size(),
+            .maxClusterInstanceCount   = 1, // Cluster is a singleton on the root node and this is the only thing supported
+            .fetchFeatureMap           = false,
+            .fetchOptionalAttributes   = true,
         },
         integrationDelegate);
 }
@@ -97,10 +97,10 @@ void MatterGeneralCommissioningClusterShutdownCallback(EndpointId endpointId)
     // Shutdown() will be called automatically by the registry when context is cleared
     CodegenClusterIntegration::UnregisterServer(
         {
-            .endpointId                      = endpointId,
-            .clusterId                       = GeneralCommissioning::Id,
-            .fixedClusterInstanceCount       = GeneralCommissioning::StaticApplicationConfig::kFixedClusterConfig.size(),
-            .maxClusterInstanceCount         = 1, // Cluster is a singleton on the root node and this is the only thing supported
+            .endpointId                = endpointId,
+            .clusterId                 = GeneralCommissioning::Id,
+            .fixedClusterInstanceCount = GeneralCommissioning::StaticApplicationConfig::kFixedClusterConfig.size(),
+            .maxClusterInstanceCount   = 1, // Cluster is a singleton on the root node and this is the only thing supported
         },
         integrationDelegate);
 }
