@@ -657,7 +657,7 @@ PushAvStreamTransportServerLogic::HandleAllocatePushTransport(CommandHandler & h
         std::set<uint16_t> zoneIDsFound;
         bool dupFound = false;
 
-        while (iterDupCheck.Next()) 
+        while (iterDupCheck.Next())
         {
             auto & transportZoneOption = iterDupCheck.GetValue();
             if (!transportZoneOption.zone.IsNull())
