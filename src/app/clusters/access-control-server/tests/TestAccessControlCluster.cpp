@@ -88,11 +88,11 @@ TEST_F(TestAccessControlCluster, AttributesTest)
 
     ASSERT_EQ(expectedBuilder.AppendElements({
 #if CHIP_CONFIG_ENABLE_ACL_EXTENSIONS
-        AccessConttrol::Attributes::Extension::kMetadataEntry,
+        AccessControl::Attributes::Extension::kMetadataEntry,
 #endif
 
 #if CHIP_CONFIG_USE_ACCESS_RESTRICTIONS
-            AccessConttrol::Attributes::CommissioningARL::kMetadataEntry, AccessConttrol::Attributes::Arl::kMetadataEntry
+            AccessControl::Attributes::CommissioningARL::kMetadataEntry, AccessControl::Attributes::Arl::kMetadataEntry
 #endif
     }),
               CHIP_NO_ERROR);
