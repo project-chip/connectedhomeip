@@ -35,7 +35,7 @@ When more complex logic is needed, Ember clusters use these interfaces.
 
 Ember storage should be moved from "persist/ram/callback" into "ram/callback":
 
--   if the value loaded from ZAP UI needs to be loaded, use "RAM" and have
+-   if the value loaded from ZAP UI needs to be loaded, use `RAM` and have
     `CodegenIntegration.cpp` load the value from ZAP via `Accessors.h`. A common
     example here is `FeatureMap`
 
