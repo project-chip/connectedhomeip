@@ -24,6 +24,7 @@
 #include <lib/support/StringBuilder.h>
 #include <webrtc-manager/WebRTCManager.h>
 
+#include <chrono>
 #include <cstring>
 #include <errno.h>
 #include <map>
@@ -31,6 +32,7 @@
 #include <string>
 #include <sys/types.h>
 #include <sys/wait.h>
+#include <thread>
 #include <unistd.h>
 
 using namespace chip;
@@ -85,11 +87,14 @@ void DeviceManager::Shutdown()
     WebRTCManager::Instance().Disconnect();
 }
 
-CHIP_ERROR DeviceManager::AllocateVideoStream(NodeId nodeId, uint8_t streamUsage, WebRTCOfferType offerType)
+CHIP_ERROR DeviceManager::AllocateVideoStream(NodeId nodeId, uint8_t streamUsage, WebRTCOfferType offerType,
+                                              Optional<uint16_t> minWidth, Optional<uint16_t> minHeight,
+                                              Optional<uint16_t> minFrameRate, Optional<uint32_t> minBitRate)
 {
     ChipLogProgress(Camera, "Allocate a video stream on the camera device.");
 
-    CHIP_ERROR error = mAVStreamManagment.AllocateVideoStream(nodeId, kCameraEndpointId, streamUsage);
+    CHIP_ERROR error = mAVStreamManagment.AllocateVideoStream(nodeId, kCameraEndpointId, streamUsage, minWidth, minHeight,
+                                                              minFrameRate, minBitRate);
 
     if (error != CHIP_NO_ERROR)
     {
@@ -191,6 +196,9 @@ void DeviceManager::InitiateWebRTCSession(uint16_t videoStreamId)
         ChipLogError(Camera, "Failed to connect WebRTC manager. Error: %" CHIP_ERROR_FORMAT, err.Format());
         return;
     }
+
+    // Add a 1-second delay after successful connection to allow local SDP gets populated
+    std::this_thread::sleep_for(std::chrono::seconds(1));
 
     auto videoStreamIdNullable = app::DataModel::MakeNullable(videoStreamId);
     auto videoStreamIdOptional = MakeOptional(videoStreamIdNullable);

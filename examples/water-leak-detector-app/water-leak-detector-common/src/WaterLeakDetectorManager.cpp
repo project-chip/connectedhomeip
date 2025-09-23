@@ -22,6 +22,10 @@
 #include <lib/core/ErrorStr.h>
 #include <lib/support/logging/CHIPLogging.h>
 
+// TODO: Ideally we should not depend on the codegen integration
+// It would be best if we could use generic cluster API instead
+#include <app/clusters/boolean-state-server/CodegenIntegration.h>
+
 using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;
@@ -41,7 +45,8 @@ void WaterLeakDetectorManager::InitInstance(EndpointId endpoint)
 
 void WaterLeakDetectorManager::OnLeakDetected(bool detected)
 {
-    Status status = chip::app::Clusters::BooleanState::Attributes::StateValue::Set(mEndpoint, detected);
-    VerifyOrReturn(Status::Success == status, ChipLogError(NotSpecified, "Failed to set BooleanState StateValue attribute"));
+    auto booleanState = BooleanState::FindClusterOnEndpoint(sInstance.mEndpoint);
+    VerifyOrReturn(booleanState != nullptr);
+    booleanState->SetStateValue(detected);
     ChipLogDetail(NotSpecified, "Leak status updated to: %d", detected);
 }

@@ -5900,7 +5900,7 @@ static BOOL AttributeIsSpecifiedInCameraAVStreamManagementCluster(AttributeId aA
     case Attributes::NightVisionUsesInfrared::Id: {
         return YES;
     }
-    case Attributes::MinViewport::Id: {
+    case Attributes::MinViewportResolution::Id: {
         return YES;
     }
     case Attributes::RateDistortionTradeOffPoints::Id: {
@@ -6061,6 +6061,9 @@ static BOOL AttributeIsSpecifiedInCameraAVSettingsUserLevelManagementCluster(Att
         return YES;
     }
     case Attributes::PanMax::Id: {
+        return YES;
+    }
+    case Attributes::MovementState::Id: {
         return YES;
     }
     case Attributes::GeneratedCommandList::Id: {

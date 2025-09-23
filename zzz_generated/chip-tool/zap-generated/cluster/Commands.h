@@ -14031,7 +14031,7 @@ private:
 | * MaxEncodedPixelRate                                               | 0x0001 |
 | * VideoSensorParams                                                 | 0x0002 |
 | * NightVisionUsesInfrared                                           | 0x0003 |
-| * MinViewport                                                       | 0x0004 |
+| * MinViewportResolution                                             | 0x0004 |
 | * RateDistortionTradeOffPoints                                      | 0x0005 |
 | * MaxContentBufferSize                                              | 0x0006 |
 | * MicrophoneCapabilities                                            | 0x0007 |
@@ -14176,8 +14176,7 @@ public:
         AddArgument("MaxResolution", &mComplex_MaxResolution);
         AddArgument("MinBitRate", 0, UINT32_MAX, &mRequest.minBitRate);
         AddArgument("MaxBitRate", 0, UINT32_MAX, &mRequest.maxBitRate);
-        AddArgument("MinKeyFrameInterval", 0, UINT16_MAX, &mRequest.minKeyFrameInterval);
-        AddArgument("MaxKeyFrameInterval", 0, UINT16_MAX, &mRequest.maxKeyFrameInterval);
+        AddArgument("KeyFrameInterval", 0, UINT16_MAX, &mRequest.keyFrameInterval);
         AddArgument("WatermarkEnabled", 0, 1, &mRequest.watermarkEnabled);
         AddArgument("OSDEnabled", 0, 1, &mRequest.OSDEnabled);
         ClusterCommand::AddArguments();
@@ -14519,6 +14518,7 @@ private:
 | * TiltMax                                                           | 0x0006 |
 | * PanMin                                                            | 0x0007 |
 | * PanMax                                                            | 0x0008 |
+| * MovementState                                                     | 0x0009 |
 | * GeneratedCommandList                                              | 0xFFF8 |
 | * AcceptedCommandList                                               | 0xFFF9 |
 | * AttributeList                                                     | 0xFFFB |
@@ -14846,7 +14846,8 @@ class WebRTCTransportProviderSolicitOffer : public ClusterCommand
 {
 public:
     WebRTCTransportProviderSolicitOffer(CredentialIssuerCommands * credsIssuerConfig) :
-        ClusterCommand("solicit-offer", credsIssuerConfig), mComplex_ICEServers(&mRequest.ICEServers)
+        ClusterCommand("solicit-offer", credsIssuerConfig), mComplex_ICEServers(&mRequest.ICEServers),
+        mComplex_SFrameConfig(&mRequest.SFrameConfig)
     {
         AddArgument("StreamUsage", 0, UINT8_MAX, &mRequest.streamUsage);
         AddArgument("OriginatingEndpointID", 0, UINT16_MAX, &mRequest.originatingEndpointID);
@@ -14855,6 +14856,7 @@ public:
         AddArgument("ICEServers", &mComplex_ICEServers, "", Argument::kOptional);
         AddArgument("ICETransportPolicy", &mRequest.ICETransportPolicy);
         AddArgument("MetadataEnabled", 0, 1, &mRequest.metadataEnabled);
+        AddArgument("SFrameConfig", &mComplex_SFrameConfig, "", Argument::kOptional);
         ClusterCommand::AddArguments();
     }
 
@@ -14884,6 +14886,8 @@ private:
     TypedComplexArgument<
         chip::Optional<chip::app::DataModel::List<const chip::app::Clusters::Globals::Structs::ICEServerStruct::Type>>>
         mComplex_ICEServers;
+    TypedComplexArgument<chip::Optional<chip::app::Clusters::WebRTCTransportProvider::Structs::SFrameStruct::Type>>
+        mComplex_SFrameConfig;
 };
 
 /*
@@ -14893,7 +14897,8 @@ class WebRTCTransportProviderProvideOffer : public ClusterCommand
 {
 public:
     WebRTCTransportProviderProvideOffer(CredentialIssuerCommands * credsIssuerConfig) :
-        ClusterCommand("provide-offer", credsIssuerConfig), mComplex_ICEServers(&mRequest.ICEServers)
+        ClusterCommand("provide-offer", credsIssuerConfig), mComplex_ICEServers(&mRequest.ICEServers),
+        mComplex_SFrameConfig(&mRequest.SFrameConfig)
     {
         AddArgument("WebRTCSessionID", 0, UINT16_MAX, &mRequest.webRTCSessionID);
         AddArgument("Sdp", &mRequest.sdp);
@@ -14904,6 +14909,7 @@ public:
         AddArgument("ICEServers", &mComplex_ICEServers, "", Argument::kOptional);
         AddArgument("ICETransportPolicy", &mRequest.ICETransportPolicy);
         AddArgument("MetadataEnabled", 0, 1, &mRequest.metadataEnabled);
+        AddArgument("SFrameConfig", &mComplex_SFrameConfig, "", Argument::kOptional);
         ClusterCommand::AddArguments();
     }
 
@@ -14933,6 +14939,8 @@ private:
     TypedComplexArgument<
         chip::Optional<chip::app::DataModel::List<const chip::app::Clusters::Globals::Structs::ICEServerStruct::Type>>>
         mComplex_ICEServers;
+    TypedComplexArgument<chip::Optional<chip::app::Clusters::WebRTCTransportProvider::Structs::SFrameStruct::Type>>
+        mComplex_SFrameConfig;
 };
 
 /*
@@ -16887,7 +16895,7 @@ private:
 | * FindRootCertificate                                               |   0x02 |
 | * LookupRootCertificate                                             |   0x04 |
 | * RemoveRootCertificate                                             |   0x06 |
-| * TLSClientCSR                                                      |   0x07 |
+| * ClientCSR                                                         |   0x07 |
 | * ProvisionClientCertificate                                        |   0x09 |
 | * FindClientCertificate                                             |   0x0A |
 | * LookupClientCertificate                                           |   0x0C |
@@ -17061,22 +17069,23 @@ private:
 };
 
 /*
- * Command TLSClientCSR
+ * Command ClientCSR
  */
-class TlsCertificateManagementTLSClientCSR : public ClusterCommand
+class TlsCertificateManagementClientCSR : public ClusterCommand
 {
 public:
-    TlsCertificateManagementTLSClientCSR(CredentialIssuerCommands * credsIssuerConfig) :
-        ClusterCommand("tlsclient-csr", credsIssuerConfig)
+    TlsCertificateManagementClientCSR(CredentialIssuerCommands * credsIssuerConfig) :
+        ClusterCommand("client-csr", credsIssuerConfig)
     {
         AddArgument("Nonce", &mRequest.nonce);
+        AddArgument("Ccdid", 0, UINT16_MAX, &mRequest.ccdid);
         ClusterCommand::AddArguments();
     }
 
     CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         constexpr chip::ClusterId clusterId = chip::app::Clusters::TlsCertificateManagement::Id;
-        constexpr chip::CommandId commandId = chip::app::Clusters::TlsCertificateManagement::Commands::TLSClientCSR::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::TlsCertificateManagement::Commands::ClientCSR::Id;
 
         ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
                         commandId, endpointIds.at(0));
@@ -17086,7 +17095,7 @@ public:
     CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
         constexpr chip::ClusterId clusterId = chip::app::Clusters::TlsCertificateManagement::Id;
-        constexpr chip::CommandId commandId = chip::app::Clusters::TlsCertificateManagement::Commands::TLSClientCSR::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::TlsCertificateManagement::Commands::ClientCSR::Id;
 
         ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
                         groupId);
@@ -17095,7 +17104,7 @@ public:
     }
 
 private:
-    chip::app::Clusters::TlsCertificateManagement::Commands::TLSClientCSR::Type mRequest;
+    chip::app::Clusters::TlsCertificateManagement::Commands::ClientCSR::Type mRequest;
 };
 
 /*
@@ -17106,10 +17115,11 @@ class TlsCertificateManagementProvisionClientCertificate : public ClusterCommand
 public:
     TlsCertificateManagementProvisionClientCertificate(CredentialIssuerCommands * credsIssuerConfig) :
         ClusterCommand("provision-client-certificate", credsIssuerConfig),
-        mComplex_ClientCertificateDetails(&mRequest.clientCertificateDetails)
+        mComplex_IntermediateCertificates(&mRequest.intermediateCertificates)
     {
         AddArgument("Ccdid", 0, UINT16_MAX, &mRequest.ccdid);
-        AddArgument("ClientCertificateDetails", &mComplex_ClientCertificateDetails);
+        AddArgument("ClientCertificate", &mRequest.clientCertificate);
+        AddArgument("IntermediateCertificates", &mComplex_IntermediateCertificates);
         ClusterCommand::AddArguments();
     }
 
@@ -17138,8 +17148,7 @@ public:
 
 private:
     chip::app::Clusters::TlsCertificateManagement::Commands::ProvisionClientCertificate::Type mRequest;
-    TypedComplexArgument<chip::app::Clusters::TlsCertificateManagement::Structs::TLSClientCertificateDetailStruct::Type>
-        mComplex_ClientCertificateDetails;
+    TypedComplexArgument<chip::app::DataModel::List<const chip::ByteSpan>> mComplex_IntermediateCertificates;
 };
 
 /*
@@ -29843,7 +29852,7 @@ void registerClusterCameraAvStreamManagement(Commands & commands, CredentialIssu
         make_unique<ReadAttribute>(Id, "max-encoded-pixel-rate", Attributes::MaxEncodedPixelRate::Id, credsIssuerConfig),         //
         make_unique<ReadAttribute>(Id, "video-sensor-params", Attributes::VideoSensorParams::Id, credsIssuerConfig),              //
         make_unique<ReadAttribute>(Id, "night-vision-uses-infrared", Attributes::NightVisionUsesInfrared::Id, credsIssuerConfig), //
-        make_unique<ReadAttribute>(Id, "min-viewport", Attributes::MinViewport::Id, credsIssuerConfig),                           //
+        make_unique<ReadAttribute>(Id, "min-viewport-resolution", Attributes::MinViewportResolution::Id, credsIssuerConfig),      //
         make_unique<ReadAttribute>(Id, "rate-distortion-trade-off-points", Attributes::RateDistortionTradeOffPoints::Id,
                                    credsIssuerConfig),                                                                        //
         make_unique<ReadAttribute>(Id, "max-content-buffer-size", Attributes::MaxContentBufferSize::Id, credsIssuerConfig),   //
@@ -29901,7 +29910,8 @@ void registerClusterCameraAvStreamManagement(Commands & commands, CredentialIssu
         make_unique<WriteAttribute<bool>>(Id, "night-vision-uses-infrared", 0, 1, Attributes::NightVisionUsesInfrared::Id,
                                           WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttributeAsComplex<chip::app::Clusters::CameraAvStreamManagement::Structs::VideoResolutionStruct::Type>>(
-            Id, "min-viewport", Attributes::MinViewport::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+            Id, "min-viewport-resolution", Attributes::MinViewportResolution::Id, WriteCommandType::kForceWrite,
+            credsIssuerConfig), //
         make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<
             const chip::app::Clusters::CameraAvStreamManagement::Structs::RateDistortionTradeOffPointsStruct::Type>>>(
             Id, "rate-distortion-trade-off-points", Attributes::RateDistortionTradeOffPoints::Id, WriteCommandType::kForceWrite,
@@ -30008,8 +30018,8 @@ void registerClusterCameraAvStreamManagement(Commands & commands, CredentialIssu
         make_unique<SubscribeAttribute>(Id, "max-encoded-pixel-rate", Attributes::MaxEncodedPixelRate::Id, credsIssuerConfig),    //
         make_unique<SubscribeAttribute>(Id, "video-sensor-params", Attributes::VideoSensorParams::Id, credsIssuerConfig),         //
         make_unique<SubscribeAttribute>(Id, "night-vision-uses-infrared", Attributes::NightVisionUsesInfrared::Id,
-                                        credsIssuerConfig),                                                  //
-        make_unique<SubscribeAttribute>(Id, "min-viewport", Attributes::MinViewport::Id, credsIssuerConfig), //
+                                        credsIssuerConfig),                                                                       //
+        make_unique<SubscribeAttribute>(Id, "min-viewport-resolution", Attributes::MinViewportResolution::Id, credsIssuerConfig), //
         make_unique<SubscribeAttribute>(Id, "rate-distortion-trade-off-points", Attributes::RateDistortionTradeOffPoints::Id,
                                         credsIssuerConfig),                                                                      //
         make_unique<SubscribeAttribute>(Id, "max-content-buffer-size", Attributes::MaxContentBufferSize::Id, credsIssuerConfig), //
@@ -30098,6 +30108,7 @@ void registerClusterCameraAvSettingsUserLevelManagement(Commands & commands, Cre
         make_unique<ReadAttribute>(Id, "tilt-max", Attributes::TiltMax::Id, credsIssuerConfig),                            //
         make_unique<ReadAttribute>(Id, "pan-min", Attributes::PanMin::Id, credsIssuerConfig),                              //
         make_unique<ReadAttribute>(Id, "pan-max", Attributes::PanMax::Id, credsIssuerConfig),                              //
+        make_unique<ReadAttribute>(Id, "movement-state", Attributes::MovementState::Id, credsIssuerConfig),                //
         make_unique<ReadAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
         make_unique<ReadAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
         make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                //
@@ -30124,6 +30135,8 @@ void registerClusterCameraAvSettingsUserLevelManagement(Commands & commands, Cre
                                              WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttribute<int16_t>>(Id, "pan-max", INT16_MIN, INT16_MAX, Attributes::PanMax::Id,
                                              WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::Clusters::CameraAvSettingsUserLevelManagement::PhysicalMovementEnum>>(
+            Id, "movement-state", 0, UINT8_MAX, Attributes::MovementState::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
             Id, "generated-command-list", Attributes::GeneratedCommandList::Id, WriteCommandType::kForceWrite,
             credsIssuerConfig), //
@@ -30145,6 +30158,7 @@ void registerClusterCameraAvSettingsUserLevelManagement(Commands & commands, Cre
         make_unique<SubscribeAttribute>(Id, "tilt-max", Attributes::TiltMax::Id, credsIssuerConfig),                            //
         make_unique<SubscribeAttribute>(Id, "pan-min", Attributes::PanMin::Id, credsIssuerConfig),                              //
         make_unique<SubscribeAttribute>(Id, "pan-max", Attributes::PanMax::Id, credsIssuerConfig),                              //
+        make_unique<SubscribeAttribute>(Id, "movement-state", Attributes::MovementState::Id, credsIssuerConfig),                //
         make_unique<SubscribeAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
         make_unique<SubscribeAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
         make_unique<SubscribeAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                //
@@ -30874,7 +30888,7 @@ void registerClusterTlsCertificateManagement(Commands & commands, CredentialIssu
         make_unique<TlsCertificateManagementFindRootCertificate>(credsIssuerConfig),        //
         make_unique<TlsCertificateManagementLookupRootCertificate>(credsIssuerConfig),      //
         make_unique<TlsCertificateManagementRemoveRootCertificate>(credsIssuerConfig),      //
-        make_unique<TlsCertificateManagementTLSClientCSR>(credsIssuerConfig),               //
+        make_unique<TlsCertificateManagementClientCSR>(credsIssuerConfig),                  //
         make_unique<TlsCertificateManagementProvisionClientCertificate>(credsIssuerConfig), //
         make_unique<TlsCertificateManagementFindClientCertificate>(credsIssuerConfig),      //
         make_unique<TlsCertificateManagementLookupClientCertificate>(credsIssuerConfig),    //

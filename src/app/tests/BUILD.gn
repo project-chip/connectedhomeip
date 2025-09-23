@@ -46,21 +46,6 @@ static_library("helpers") {
   ]
 }
 
-source_set("binding-test-srcs") {
-  sources = [
-    "${chip_root}/src/app/clusters/bindings/PendingNotificationMap.cpp",
-    "${chip_root}/src/app/clusters/bindings/PendingNotificationMap.h",
-    "${chip_root}/src/app/util/binding-table.cpp",
-    "${chip_root}/src/app/util/binding-table.h",
-  ]
-
-  public_deps = [
-    "${chip_root}/src/app/util/mock:mock_codegen_data_model",
-    "${chip_root}/src/app/util/mock:mock_ember",
-    "${chip_root}/src/lib/core",
-  ]
-}
-
 source_set("ota-requestor-test-srcs") {
   sources = [
     "${chip_root}/src/app/clusters/ota-requestor/DefaultOTARequestorStorage.cpp",
@@ -258,7 +243,6 @@ chip_test_suite("tests") {
     "TestAttributeValueDecoder.cpp",
     "TestAttributeValueEncoder.cpp",
     "TestBasicCommandPathRegistry.cpp",
-    "TestBindingTable.cpp",
     "TestBuilderParser.cpp",
     "TestCheckInHandler.cpp",
     "TestClosureControlClusterLogic.cpp",
@@ -284,7 +268,6 @@ chip_test_suite("tests") {
     "TestMessageDef.cpp",
     "TestNumericAttributeTraits.cpp",
     "TestOperationalStateClusterObjects.cpp",
-    "TestPendingNotificationMap.cpp",
     "TestPendingResponseTrackerImpl.cpp",
     "TestPowerSourceCluster.cpp",
     "TestReadInteraction.cpp",
@@ -303,7 +286,6 @@ chip_test_suite("tests") {
 
   public_deps = [
     ":app-test-stubs",
-    ":binding-test-srcs",
     ":closure-control-test-srcs",
     ":closure-dimension-test-srcs",
     ":ecosystem-information-test-srcs",
@@ -381,8 +363,7 @@ chip_test_suite("tests") {
   # On NRF, Open IoT SDK and fake platforms we do not have a realtime clock available,
   # so TestEventLogging.cpp would be testing the same thing as TestEventLoggingNoUTCTime,
   # but it's not set up to deal with the timestamps being that low.
-  if (chip_device_platform != "nrfconnect" &&
-      chip_device_platform != "openiotsdk" && chip_device_platform != "fake") {
+  if (chip_device_platform != "nrfconnect" && chip_device_platform != "fake") {
     test_sources += [ "TestEventLogging.cpp" ]
   }
 }

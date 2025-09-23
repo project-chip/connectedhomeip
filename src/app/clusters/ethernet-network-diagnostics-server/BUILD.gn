@@ -11,5 +11,19 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-group("ethernet-network-diagnostics-server") {
+import("//build_overrides/build.gni")
+import("//build_overrides/chip.gni")
+
+source_set("ethernet-network-diagnostics-server") {
+  sources = [
+    "ethernet-diagnostics-cluster.cpp",
+    "ethernet-diagnostics-cluster.h",
+  ]
+
+  public_deps = [
+    "${chip_root}/src/app:attribute-access",
+    "${chip_root}/src/app/data-model-provider:metadata",
+    "${chip_root}/src/app/server-cluster",
+    "${chip_root}/zzz_generated/app-common/clusters/EthernetNetworkDiagnostics",
+  ]
 }

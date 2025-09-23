@@ -46,7 +46,7 @@ using WebRTCEndReasonEnum      = chip::app::Clusters::Globals::WebRTCEndReasonEn
 static constexpr chip::EndpointId kTestEndpointId = 1;
 
 // Mock delegate for testing
-class MockWebRTCTransportRequestorDelegate : public WebRTCTransportRequestorDelegate
+class MockWebRTCTransportRequestorDelegate : public Delegate
 {
 public:
     MockWebRTCTransportRequestorDelegate() : mLastSessionId(0), mLastEndReason(WebRTCEndReasonEnum::kUnknownEnumValue) {}
@@ -231,7 +231,7 @@ TEST_F(TestWebRTCTransportRequestorCluster, TestDelegateHandleOffer)
     // Test successful offer handling
     mockDelegate.SetOfferResult(CHIP_NO_ERROR);
 
-    WebRTCTransportRequestorDelegate::OfferArgs offerArgs;
+    Delegate::OfferArgs offerArgs;
     offerArgs.sdp        = testSdp;
     offerArgs.peerNodeId = 0x1234ULL; // Use ULL suffix for uint64_t/NodeId
 

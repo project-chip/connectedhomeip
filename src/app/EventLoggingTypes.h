@@ -18,7 +18,9 @@
 #pragma once
 
 #include <access/SubjectDescriptor.h>
+#include <app/ConcreteEventPath.h>
 #include <app/EventPathParams.h>
+#include <app/data-model/FabricScoped.h>
 #include <app/util/basic-types.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/core/Optional.h>
@@ -128,6 +130,17 @@ class EventOptions
 {
 public:
     EventOptions() = default;
+
+    template <typename EVENT_TYPE>
+    EventOptions(EndpointId endpointId, const EVENT_TYPE & eventData) :
+        mPath(endpointId, eventData.GetClusterId(), eventData.GetEventId()), mPriority(eventData.GetPriorityLevel())
+    {
+        constexpr bool isFabricScoped = DataModel::IsFabricScoped<EVENT_TYPE>::value;
+        if constexpr (isFabricScoped)
+        {
+            mFabricIndex = eventData.GetFabricIndex();
+        }
+    }
 
     ConcreteEventPath mPath;
     PriorityLevel mPriority = PriorityLevel::Invalid;

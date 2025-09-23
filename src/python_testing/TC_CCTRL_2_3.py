@@ -63,13 +63,14 @@ import random
 import tempfile
 import time
 
-import chip.clusters as Clusters
-from chip import ChipDeviceCtrl
-from chip.interaction_model import InteractionModelError, Status
-from chip.testing.apps import AppServerSubprocess
-from chip.testing.matter_testing import (MatterBaseTest, TestStep, async_test_body, default_matter_test_main, has_cluster,
-                                         run_if_endpoint_matches)
 from mobly import asserts
+
+import matter.clusters as Clusters
+from matter import ChipDeviceCtrl
+from matter.interaction_model import InteractionModelError, Status
+from matter.testing.apps import AppServerSubprocess
+from matter.testing.matter_testing import (MatterBaseTest, TestStep, async_test_body, default_matter_test_main, has_cluster,
+                                           run_if_endpoint_matches)
 
 
 class TC_CCTRL_2_3(MatterBaseTest):

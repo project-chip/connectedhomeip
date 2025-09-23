@@ -12,8 +12,8 @@ RUN set -x \
     && rm -rf /var/lib/apt/lists/ \
     && : # last line
 
-# Download Simplicity SDK v2025.6.0 (f107f75)
-RUN git clone --depth=1 --single-branch --branch=v2025.6.0 https://github.com/SiliconLabs/simplicity_sdk.git /tmp/simplicity_sdk \
+# Download Simplicity SDK v2025.6.1 (4c4c715)
+RUN git clone --depth=1 --single-branch --branch=v2025.6.1 https://github.com/SiliconLabs/simplicity_sdk.git /tmp/simplicity_sdk \
     # Deleting files that are not needed to save space
     && rm -rf /tmp/simplicity_sdk/.git /tmp/simplicity_sdk/protocol/flex /tmp/simplicity_sdk/protocol/z-wave /tmp/simplicity_sdk/protocol/zigbee /tmp/simplicity_sdk/protocol/wisun /tmp/simplicity_sdk/util/third_party/tensorflow_extra \
     /tmp/simplicity_sdk/util/third_party/sqlite /tmp/simplicity_sdk/util/third_party/ot-br-posix /tmp/simplicity_sdk/util/third_party/tflite-micro /tmp/simplicity_sdk/util/third_party/tflite-fatfs /tmp/simplicity_sdk/util/third_party/unity_test_framework \
@@ -32,15 +32,16 @@ RUN git clone --depth=1 --single-branch --branch=2.12.0 https://github.com/Silic
     rm -rf .git examples \
     && : # last line
 
-# Clone WiSeConnect SDK v3.5.0 (ca4c4b0)
-RUN git clone --depth=1 --single-branch --branch=v3.5.0 https://github.com/SiliconLabs/wiseconnect.git /tmp/wifi_sdk && \
+# Clone WiSeConnect SDK v3.5.1 (984fbd4)
+RUN git clone --depth=1 --single-branch --branch=v3.5.1 https://github.com/SiliconLabs/wiseconnect.git /tmp/wifi_sdk && \
     cd /tmp/wifi_sdk && \
     rm -rf .git examples components/device/stm32 \
     && : # last line
 
 # SLC-cli install
 # TODO: figure out a way to make this a fixed version. Currently a moving target.
-RUN wget https://www.silabs.com/documents/login/software/slc_cli_linux.zip && \
+
+RUN wget https://www.silabs.com/documents/public/software/slc_cli_linux.zip && \
     unzip ./slc_cli_linux.zip -d /tmp && \
     rm ./slc_cli_linux.zip \
     && : # last line

@@ -5,6 +5,7 @@
 #pragma once
 
 #include <app/data-model-provider/MetadataTypes.h>
+#include <array>
 #include <lib/core/DataModelTypes.h>
 
 #include <cstdint>
@@ -19,6 +20,7 @@ namespace BasicInformation {
 inline constexpr uint32_t kRevision = 5;
 
 namespace Attributes {
+
 namespace DataModelRevision {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(DataModelRevision::Id, BitFlags<DataModel::AttributeQualityFlags>(),
                                                           Access::Privilege::kView, std::nullopt);
@@ -115,10 +117,30 @@ namespace ConfigurationVersion {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(ConfigurationVersion::Id, BitFlags<DataModel::AttributeQualityFlags>(),
                                                           Access::Privilege::kView, std::nullopt);
 } // namespace ConfigurationVersion
+constexpr std::array<DataModel::AttributeEntry, 16> kMandatoryMetadata = {
+    DataModelRevision::kMetadataEntry,
+    VendorName::kMetadataEntry,
+    VendorID::kMetadataEntry,
+    ProductName::kMetadataEntry,
+    ProductID::kMetadataEntry,
+    NodeLabel::kMetadataEntry,
+    Location::kMetadataEntry,
+    HardwareVersion::kMetadataEntry,
+    HardwareVersionString::kMetadataEntry,
+    SoftwareVersion::kMetadataEntry,
+    SoftwareVersionString::kMetadataEntry,
+    UniqueID::kMetadataEntry,
+    CapabilityMinima::kMetadataEntry,
+    SpecificationVersion::kMetadataEntry,
+    MaxPathsPerInvoke::kMetadataEntry,
+    ConfigurationVersion::kMetadataEntry,
+
+};
 
 } // namespace Attributes
 
 namespace Commands {
+
 namespace MfgSpecificPing {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(MfgSpecificPing::Id, BitFlags<DataModel::CommandQualityFlags>(),
                                                                 Access::Privilege::kOperate);

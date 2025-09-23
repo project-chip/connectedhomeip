@@ -5,6 +5,7 @@
 #pragma once
 
 #include <app/data-model-provider/MetadataTypes.h>
+#include <array>
 #include <lib/core/DataModelTypes.h>
 
 #include <cstdint>
@@ -19,6 +20,7 @@ namespace WiFiNetworkDiagnostics {
 inline constexpr uint32_t kRevision = 1;
 
 namespace Attributes {
+
 namespace Bssid {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(Bssid::Id, BitFlags<DataModel::AttributeQualityFlags>(),
                                                           Access::Privilege::kView, std::nullopt);
@@ -71,10 +73,16 @@ namespace OverrunCount {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(OverrunCount::Id, BitFlags<DataModel::AttributeQualityFlags>(),
                                                           Access::Privilege::kView, std::nullopt);
 } // namespace OverrunCount
+constexpr std::array<DataModel::AttributeEntry, 5> kMandatoryMetadata = {
+    Bssid::kMetadataEntry,         SecurityType::kMetadataEntry, WiFiVersion::kMetadataEntry,
+    ChannelNumber::kMetadataEntry, Rssi::kMetadataEntry,
+
+};
 
 } // namespace Attributes
 
 namespace Commands {
+
 namespace ResetCounts {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(ResetCounts::Id, BitFlags<DataModel::CommandQualityFlags>(),
                                                                 Access::Privilege::kOperate);

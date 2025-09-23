@@ -26,7 +26,7 @@
 
 #ifdef SL_WIFI
 #include <platform/silabs/NetworkCommissioningWiFiDriver.h>
-#include <platform/silabs/wifi/WifiInterface.h>
+#include <platform/silabs/wifi/WifiInterface.h> // nogncheck
 
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
 #include <platform/silabs/wifi/icd/WifiSleepManager.h> // nogncheck
@@ -87,7 +87,6 @@ static chip::DeviceLayer::Internal::Efr32PsaOperationalKeystore gOperationalKeys
 #include <platform/silabs/platformAbstraction/SilabsPlatform.h>
 
 #include <app/clusters/network-commissioning/network-commissioning.h>
-
 /**********************************************************
  * Defines
  *********************************************************/
@@ -174,7 +173,7 @@ constexpr osThreadAttr_t kMainTaskAttr = { .name       = "main",
 #ifdef SLI_SI91X_MCU_INTERFACE
                                            .priority = osPriorityRealtime4
 #else
-                                           .priority = osPriorityRealtime7
+                                           .priority = osPriorityRealtime5 // Must be above BLE Link Layer priority
 #endif // SLI_SI91X_MCU_INTERFACE
 };
 osThreadId_t sMainTaskHandle;

@@ -30,7 +30,7 @@
 #       --PICS src/app/tests/suites/certification/ci-pics-values
 #       --trace-to json:${TRACE_TEST_JSON}.json
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
-#       --tests test_TC_IDM_10_2 test_TC_IDM_10_6 test_TC_DESC_2_3
+#       --tests test_TC_IDM_10_2 test_TC_IDM_10_6 test_TC_DESC_2_3 test_TC_IDM_14_1
 #     factory-reset: true
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
@@ -38,18 +38,18 @@
 # TODO: Enable 10.5 in CI once the door lock OTA requestor problem is sorted.
 from typing import Callable
 
-import chip.clusters as Clusters
-from chip.testing.basic_composition import BasicCompositionTests
-from chip.testing.choice_conformance import (evaluate_attribute_choice_conformance, evaluate_command_choice_conformance,
-                                             evaluate_feature_choice_conformance)
-from chip.testing.conformance import ConformanceDecision, conformance_allowed
-from chip.testing.global_attribute_ids import (ClusterIdType, DeviceTypeIdType, GlobalAttributeIds, cluster_id_type,
-                                               device_type_id_type, is_valid_device_type_id)
-from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
-from chip.testing.problem_notices import (AttributePathLocation, ClusterPathLocation, CommandPathLocation, DeviceTypePathLocation,
-                                          ProblemNotice, ProblemSeverity)
-from chip.testing.spec_parsing import CommandType, XmlDeviceType
-from chip.tlv import uint
+import matter.clusters as Clusters
+from matter.testing.basic_composition import BasicCompositionTests
+from matter.testing.choice_conformance import (evaluate_attribute_choice_conformance, evaluate_command_choice_conformance,
+                                               evaluate_feature_choice_conformance)
+from matter.testing.conformance import conformance_allowed
+from matter.testing.global_attribute_ids import (ClusterIdType, DeviceTypeIdType, GlobalAttributeIds, cluster_id_type,
+                                                 device_type_id_type, is_valid_device_type_id)
+from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+from matter.testing.problem_notices import (AttributePathLocation, ClusterPathLocation, CommandPathLocation, DeviceTypePathLocation,
+                                            ProblemNotice, ProblemSeverity)
+from matter.testing.spec_parsing import CommandType, XmlDeviceType, XmlDeviceTypeClusterRequirements
+from matter.tlv import uint
 
 
 def get_supersets(xml_device_types: dict[int, XmlDeviceType]) -> list[set[int]]:
@@ -193,17 +193,19 @@ class DeviceConformanceTests(BasicCompositionTests):
                         continue
 
                     if f not in self.xml_clusters[cluster_id].features.keys():
-                        record_error(location=location, problem=f'Unknown feature with mask 0x{f:02x}')
+                        record_error(location=location,
+                                     problem=f'Unknown feature with mask 0x{f:02x} (feature bit {f.bit_length() - 1})')
                         continue
                     xml_feature = self.xml_clusters[cluster_id].features[f]
                     conformance_decision_with_choice = xml_feature.conformance(feature_map, attribute_list, all_command_list)
                     if not conformance_allowed(conformance_decision_with_choice, allow_provisional):
-                        record_error(location=location, problem=f'Disallowed feature with mask 0x{f:02x}')
+                        record_error(location=location,
+                                     problem=f'Disallowed feature with mask 0x{f:02x} (feature bit {f.bit_length() - 1})')
                 for feature_mask, xml_feature in self.xml_clusters[cluster_id].features.items():
                     conformance_decision_with_choice = xml_feature.conformance(feature_map, attribute_list, all_command_list)
-                    if conformance_decision_with_choice.decision == ConformanceDecision.MANDATORY and feature_mask not in feature_masks:
+                    if conformance_decision_with_choice.is_mandatory() and feature_mask not in feature_masks:
                         record_error(
-                            location=location, problem=f'Required feature with mask 0x{feature_mask:02x} is not present in feature map. {conformance_str(xml_feature.conformance, feature_map, self.xml_clusters[cluster_id].features)}')
+                            location=location, problem=f'Required feature with mask 0x{feature_mask:02x} (feature bit {feature_mask.bit_length() - 1}) is not present in feature map. {conformance_str(xml_feature.conformance, feature_map, self.xml_clusters[cluster_id].features)}')
 
                 # Attribute conformance checking
                 for attribute_id, attribute in cluster.items():
@@ -225,7 +227,7 @@ class DeviceConformanceTests(BasicCompositionTests):
                     if cluster_id in ignore_attributes and attribute_id in ignore_attributes[cluster_id]:
                         continue
                     conformance_decision_with_choice = xml_attribute.conformance(feature_map, attribute_list, all_command_list)
-                    if conformance_decision_with_choice.decision == ConformanceDecision.MANDATORY and attribute_id not in cluster.keys():
+                    if conformance_decision_with_choice.is_mandatory() and attribute_id not in cluster.keys():
                         location = AttributePathLocation(endpoint_id=endpoint_id, cluster_id=cluster_id, attribute_id=attribute_id)
                         record_error(
                             location=location, problem=f'Attribute 0x{attribute_id:02x} is required, but is not present on the DUT. {conformance_str(xml_attribute.conformance, feature_map, self.xml_clusters[cluster_id].features)}')
@@ -248,7 +250,7 @@ class DeviceConformanceTests(BasicCompositionTests):
                                 location=location, problem=f'Command 0x{command_id:02x} is included, but disallowed by conformance. {conformance_str(xml_command.conformance, feature_map, self.xml_clusters[cluster_id].features)}')
                     for command_id, xml_command in xml_commands_dict.items():
                         conformance_decision_with_choice = xml_command.conformance(feature_map, attribute_list, all_command_list)
-                        if conformance_decision_with_choice.decision == ConformanceDecision.MANDATORY and command_id not in command_list:
+                        if conformance_decision_with_choice.is_mandatory() and command_id not in command_list:
                             location = CommandPathLocation(endpoint_id=endpoint_id, cluster_id=cluster_id, command_id=command_id)
                             record_error(
                                 location=location, problem=f'Command 0x{command_id:02x} is required, but is not present on the DUT. {conformance_str(xml_command.conformance, feature_map, self.xml_clusters[cluster_id].features)}')
@@ -390,15 +392,59 @@ class DeviceConformanceTests(BasicCompositionTests):
                     # Device type cluster conformances do not include any conformances based on cluster elements
                     conformance_decision_with_choice = cluster_requirement.conformance(0, [], [])
                     location = DeviceTypePathLocation(device_type_id=device_type_id, cluster_id=cluster_id)
-                    if conformance_decision_with_choice.decision == ConformanceDecision.MANDATORY and cluster_id not in server_clusters:
+                    if conformance_decision_with_choice.is_mandatory() and cluster_id not in server_clusters:
                         record_error(location=location,
                                      problem=f"Mandatory cluster {cluster_requirement.name} for device type {xml_device.name} is not present in the server list")
-                        success = False
+                        continue
 
                     if cluster_id in server_clusters and not conformance_allowed(conformance_decision_with_choice, allow_provisional):
                         record_error(location=location,
                                      problem=f"Disallowed cluster {cluster_requirement.name} found in server list for device type {xml_device.name}")
-                        success = False
+                        continue
+
+                    if cluster_id not in server_clusters:
+                        # Optional cluster not on this endpoint
+                        continue
+
+                    def check_feature_overrides(cluster_requirement: XmlDeviceTypeClusterRequirements, feature_map, attribute_list, cmd_list):
+                        for mask, conformance in cluster_requirement.feature_overrides.items():
+                            conformance_decision_with_choice = conformance(feature_map, attribute_list, cmd_list)
+                            if conformance_decision_with_choice.is_mandatory() and ((feature_map & mask) == 0):
+                                record_error(
+                                    location=location, problem=f"Feature bit {mask.bit_length() - 1} in cluster {cluster_requirement.name} is required by element override for device type {xml_device.name}, but is not present in the feature map")
+                            if not conformance_allowed(conformance_decision_with_choice, allow_provisional) and ((feature_map & mask) != 0):
+                                record_error(
+                                    location=location, problem=f"Feature bit {mask.bit_length() - 1} in cluster {cluster_requirement.name} is disallowed by element override for device type {xml_device.name}, but is present in the feature map")
+
+                    def check_attribute_overrides(cluster_requirement: XmlDeviceTypeClusterRequirements, feature_map: int, attribute_list: list[int], cmd_list: list[int]) -> None:
+                        for id, conformance in cluster_requirement.attribute_overrides.items():
+                            conformance_decision_with_choice = conformance(feature_map, attribute_list, cmd_list)
+                            if conformance_decision_with_choice.is_mandatory() and id not in attribute_list:
+                                record_error(
+                                    location=location, problem=f"Attribute {id} in cluster {cluster_requirement.name} is required by element override for device type {xml_device.name}, but is not present in the attribute list")
+                            if not conformance_allowed(conformance_decision_with_choice, allow_provisional) and id in attribute_list:
+                                record_error(
+                                    location=location, problem=f"Attribute {id} in cluster {cluster_requirement.name} is disallowed by element override for device type {xml_device.name}, but is present in the attribute list")
+
+                    def check_command_overrides(cluster_requirement: XmlDeviceTypeClusterRequirements, feature_map: int, attribute_list: list[int], cmd_list: list[int]):
+                        for id, conformance in cluster_requirement.command_overrides.items():
+                            conformance_decision_with_choice = conformance(feature_map, attribute_list, cmd_list)
+                            if conformance_decision_with_choice.is_mandatory() and id not in cmd_list:
+                                record_error(
+                                    location=location, problem=f"Command {id} in cluster {cluster_requirement.name} is required by element override for device type {xml_device.name}, but is not present in the cmd list")
+                            if not conformance_allowed(conformance_decision_with_choice, allow_provisional) and id in cmd_list:
+                                record_error(
+                                    location=location, problem=f"Command {id} in cluster {cluster_requirement.name} is disallowed by element override for device type {xml_device.name}, but is present in the cmd list")
+
+                    cluster = Clusters.ClusterObjects.ALL_CLUSTERS[cluster_id]
+                    feature_map = endpoint[cluster][cluster.Attributes.FeatureMap]
+                    attribute_list = endpoint[cluster][cluster.Attributes.AttributeList]
+                    cmd_list = endpoint[cluster][cluster.Attributes.AcceptedCommandList]
+
+                    check_feature_overrides(cluster_requirement, feature_map, attribute_list, cmd_list)
+                    check_attribute_overrides(cluster_requirement, feature_map, attribute_list, cmd_list)
+                    check_command_overrides(cluster_requirement, feature_map, attribute_list, cmd_list)
+
                 # If we want to check for extra clusters on the endpoint, we need to know the entire set of clusters in all the device type
                 # lists across all the device types on the endpoint.
                 endpoint_clusters += xml_device.server_clusters.keys()
@@ -443,6 +489,21 @@ class DeviceConformanceTests(BasicCompositionTests):
                             problem=f"Multiple non-superset application device types found on EP {endpoint_num} ({application_device_type_ids})"))
         return problems
 
+    def check_root_node_restricted_clusters(self) -> list[ProblemNotice]:
+        # TODO: Are these marked in the spec? Time sync and ACL have specific notes, but can be determine this from the data model files?
+        root_node_restricted_clusters = {Clusters.AccessControl, Clusters.TimeSynchronization,
+                                         Clusters.TlsCertificateManagement, Clusters.TlsClientManagement}
+        problems = []
+        for endpoint_id, endpoint in self.endpoints.items():
+            if endpoint_id == 0:
+                continue
+
+            for cluster in endpoint.keys():
+                if cluster in root_node_restricted_clusters:
+                    problems.append(ProblemNotice("TC-IDM-14.1", location=ClusterPathLocation(endpoint_id=endpoint_id, cluster_id=cluster.id),
+                                                  severity=ProblemSeverity.ERROR, problem=f"Root-node-restricted cluster {cluster} appears on non-root-node endpoint"))
+        return problems
+
 
 class TC_DeviceConformance(MatterBaseTest, DeviceConformanceTests):
     @async_test_body
@@ -480,6 +541,25 @@ class TC_DeviceConformance(MatterBaseTest, DeviceConformanceTests):
         self.problems.extend(problems)
         if not success:
             self.fail_current_test("Problems with Device type revisions on one or more endpoints")
+
+    def steps_TC_IDM_14_1(self):
+        return [TestStep(0, "TH performs a wildcard read of all attributes and endpoints on the device"),
+                TestStep(1, """ For each root-node-restricted cluster in the list, ensure the cluster does not appear on any endpoint that is not the root node.
+                                List of root-node-restricted clusters:
+
+                                * ACL
+                                * Time Synchronization
+                                * TLS Certificate Management
+                                * TLS Client Management
+                         """, "No root-node-restricted clusters appear on non-root endpoints")]
+
+    def test_TC_IDM_14_1(self):
+        self.step(0)  # wildcard read - done in setup
+        self.step(1)
+        problems = self.check_root_node_restricted_clusters()
+        if problems:
+            self.problems.extend(problems)
+            self.fail_current_test("One or more root-node-restricted clusters appear on non-root-node endpoints")
 
     def steps_TC_DESC_2_3(self):
         return [TestStep(0, "TH performs a wildcard read of all attributes on all endpoints on the device"),

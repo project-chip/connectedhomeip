@@ -55,16 +55,16 @@ from copy import deepcopy
 from enum import Enum, auto
 from typing import Optional
 
-import chip.clusters as Clusters
-from chip.clusters.Attribute import ValueDecodeFailure
-from chip.interaction_model import InteractionModelError, Status
-from chip.testing.basic_composition import BasicCompositionTests
-from chip.testing.global_attribute_ids import (GlobalAttributeIds, is_standard_attribute_id, is_standard_cluster_id,
-                                               is_standard_command_id)
-from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
-from chip.testing.problem_notices import AttributePathLocation, ClusterPathLocation, CommandPathLocation
-from chip.testing.spec_parsing import XmlCluster
-from chip.tlv import uint
+import matter.clusters as Clusters
+from matter.clusters.Attribute import ValueDecodeFailure
+from matter.interaction_model import InteractionModelError, Status
+from matter.testing.basic_composition import BasicCompositionTests
+from matter.testing.global_attribute_ids import (GlobalAttributeIds, is_standard_attribute_id, is_standard_cluster_id,
+                                                 is_standard_command_id)
+from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+from matter.testing.problem_notices import AttributePathLocation, ClusterPathLocation, CommandPathLocation
+from matter.testing.spec_parsing import XmlCluster
+from matter.tlv import uint
 
 
 class AccessTestType(Enum):

@@ -23,15 +23,29 @@
 #include <lib/core/CHIPError.h>
 #include <lib/core/TLV.h>
 
+struct IceCandidate
+{
+    const char * candidate;
+    const char * sdpMid;
+    int sdpMLineIndex;
+};
+
+struct OwnedIceCandidate
+{
+    std::unique_ptr<std::string> candidate, sdpMid;
+    int sdpMLineIndex;
+    IceCandidate view{};
+};
+
 // The Python callbacks to call when certain events happen in WebRTCTransportRequestor.
 using OnOfferCallback         = int (*)(uint16_t, const char *);
 using OnAnswerCallback        = int (*)(uint16_t, const char *);
-using OnICECandidatesCallback = int (*)(uint16_t, const char **, const int);
+using OnICECandidatesCallback = int (*)(uint16_t, const IceCandidate *, int);
 using OnEndCallback           = int (*)(uint16_t, uint8_t);
 
 constexpr chip::EndpointId kWebRTCRequesterDynamicEndpointId = 1;
 
-class WebRTCTransportRequestorManager : public chip::app::Clusters::WebRTCTransportRequestor::WebRTCTransportRequestorDelegate
+class WebRTCTransportRequestorManager : public chip::app::Clusters::WebRTCTransportRequestor::Delegate
 {
 public:
     using ICECandidateStruct  = chip::app::Clusters::Globals::Structs::ICECandidateStruct::Type;
@@ -45,6 +59,8 @@ public:
 
     // methods to be called by python
     void Init();
+
+    void Shutdown();
 
     void InitCallbacks(OnOfferCallback onOnOfferCallback, OnAnswerCallback onAnswerCallback,
                        OnICECandidatesCallback onICECandidatesCallback, OnEndCallback onEndCallback);

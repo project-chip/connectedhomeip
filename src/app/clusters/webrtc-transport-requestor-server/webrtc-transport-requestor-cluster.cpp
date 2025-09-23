@@ -14,7 +14,9 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-#include <app/clusters/webrtc-transport-requestor-server/webrtc-transport-requestor-cluster.h>
+#include "webrtc-transport-requestor-cluster.h"
+
+#include <app/server-cluster/AttributeListBuilder.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
 
@@ -31,10 +33,14 @@ namespace {
 constexpr uint16_t kMaxSessionId = 65534;
 
 constexpr DataModel::AcceptedCommandEntry kAcceptedCommands[] = {
-    WebRTCTransportRequestor::Commands::Offer::kMetadataEntry,
-    WebRTCTransportRequestor::Commands::Answer::kMetadataEntry,
-    WebRTCTransportRequestor::Commands::ICECandidates::kMetadataEntry,
-    WebRTCTransportRequestor::Commands::End::kMetadataEntry,
+    Commands::Offer::kMetadataEntry,
+    Commands::Answer::kMetadataEntry,
+    Commands::ICECandidates::kMetadataEntry,
+    Commands::End::kMetadataEntry,
+};
+
+constexpr DataModel::AttributeEntry kMandatoryAttributes[] = {
+    CurrentSessions::kMetadataEntry,
 };
 
 NodeId GetNodeIdFromCtx(const CommandHandler & commandHandler)
@@ -55,8 +61,8 @@ namespace app {
 namespace Clusters {
 namespace WebRTCTransportRequestor {
 
-WebRTCTransportRequestorServer::WebRTCTransportRequestorServer(EndpointId endpointId, WebRTCTransportRequestorDelegate & delegate) :
-    DefaultServerCluster({ endpointId, WebRTCTransportRequestor::Id }), mDelegate(delegate)
+WebRTCTransportRequestorServer::WebRTCTransportRequestorServer(EndpointId endpointId, Delegate & delegate) :
+    DefaultServerCluster({ endpointId, Id }), mDelegate(delegate)
 {}
 
 DataModel::ActionReturnStatus WebRTCTransportRequestorServer::ReadAttribute(const DataModel::ReadAttributeRequest & request,
@@ -64,7 +70,7 @@ DataModel::ActionReturnStatus WebRTCTransportRequestorServer::ReadAttribute(cons
 {
     switch (request.path.mAttributeId)
     {
-    case Attributes::CurrentSessions::Id:
+    case CurrentSessions::Id:
         return encoder.EncodeList([this](const auto & listEncoder) -> CHIP_ERROR {
             for (auto & session : mCurrentSessions)
             {
@@ -73,9 +79,14 @@ DataModel::ActionReturnStatus WebRTCTransportRequestorServer::ReadAttribute(cons
             return CHIP_NO_ERROR;
         });
     case ClusterRevision::Id:
-        return encoder.Encode(WebRTCTransportRequestor::kRevision);
+        return encoder.Encode(kRevision);
+    case FeatureMap::Id:
+        // TODO: Allow delegate to specify supported features
+        // Currently hardcoded to 0 (no features supported)
+        // METADATA feature (bit 0) should be configurable based on delegate capabilities
+        return encoder.Encode<uint32_t>(0);
     default:
-        return Protocols::InteractionModel::Status::UnsupportedAttribute;
+        return Status::UnsupportedAttribute;
     }
 }
 
@@ -89,36 +100,36 @@ std::optional<DataModel::ActionReturnStatus> WebRTCTransportRequestorServer::Inv
         Commands::Offer::DecodableType req;
         if (DataModel::Decode(input_arguments, req) != CHIP_NO_ERROR)
         {
-            return Protocols::InteractionModel::Status::InvalidCommand;
+            return Status::InvalidCommand;
         }
-        return HandleOffer(req, *handler);
+        return HandleOffer(*handler, req);
     }
     case Commands::Answer::Id: {
         Commands::Answer::DecodableType req;
         if (DataModel::Decode(input_arguments, req) != CHIP_NO_ERROR)
         {
-            return Protocols::InteractionModel::Status::InvalidCommand;
+            return Status::InvalidCommand;
         }
-        return HandleAnswer(req, *handler);
+        return HandleAnswer(*handler, req);
     }
     case Commands::ICECandidates::Id: {
         Commands::ICECandidates::DecodableType req;
         if (DataModel::Decode(input_arguments, req) != CHIP_NO_ERROR)
         {
-            return Protocols::InteractionModel::Status::InvalidCommand;
+            return Status::InvalidCommand;
         }
-        return HandleICECandidates(req, *handler);
+        return HandleICECandidates(*handler, req);
     }
     case Commands::End::Id: {
         Commands::End::DecodableType req;
         if (DataModel::Decode(input_arguments, req) != CHIP_NO_ERROR)
         {
-            return Protocols::InteractionModel::Status::InvalidCommand;
+            return Status::InvalidCommand;
         }
-        return HandleEnd(req, *handler);
+        return HandleEnd(*handler, req);
     }
     default:
-        return Protocols::InteractionModel::Status::UnsupportedCommand;
+        return Status::UnsupportedCommand;
     }
 }
 
@@ -126,6 +137,13 @@ CHIP_ERROR WebRTCTransportRequestorServer::AcceptedCommands(const ConcreteCluste
                                                             ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder)
 {
     return builder.ReferenceExisting(kAcceptedCommands);
+}
+
+CHIP_ERROR WebRTCTransportRequestorServer::Attributes(const ConcreteClusterPath & path,
+                                                      ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder)
+{
+    AttributeListBuilder listBuilder(builder);
+    return listBuilder.Append(Span(kMandatoryAttributes), {}, {});
 }
 
 uint16_t WebRTCTransportRequestorServer::GenerateSessionId()
@@ -154,7 +172,7 @@ uint16_t WebRTCTransportRequestorServer::GenerateSessionId()
     // This should never happen in practice since we support 65534 sessions
     // and typical applications will have far fewer active sessions
     ChipLogError(Zcl, "All session IDs are in use!");
-    VerifyOrDie(false);
+    chipDie();
 }
 
 bool WebRTCTransportRequestorServer::IsPeerNodeSessionValid(uint16_t sessionId, const CommandHandler & commandHandler)
@@ -175,18 +193,18 @@ bool WebRTCTransportRequestorServer::IsPeerNodeSessionValid(uint16_t sessionId, 
     return (peerNodeId == existingSession->peerNodeID) && (peerFabricIndex == existingSession->GetFabricIndex());
 }
 
-DataModel::ActionReturnStatus WebRTCTransportRequestorServer::HandleOffer(const Commands::Offer::DecodableType & req,
-                                                                          const CommandHandler & commandHandler)
+DataModel::ActionReturnStatus WebRTCTransportRequestorServer::HandleOffer(const CommandHandler & commandHandler,
+                                                                          const Commands::Offer::DecodableType & req)
 {
     uint16_t sessionId = req.webRTCSessionID;
 
     if (!IsPeerNodeSessionValid(sessionId, commandHandler))
     {
-        return Protocols::InteractionModel::Status::NotFound;
+        return Status::NotFound;
     }
 
-    // Create arguments for WebRTCTransportRequestorDelegate.
-    WebRTCTransportRequestorDelegate::OfferArgs args;
+    // Create arguments for Delegate.
+    Delegate::OfferArgs args;
     args.sdp = std::string(req.sdp.data(), req.sdp.size());
 
     // Convert ICE servers list from DecodableList to vector.
@@ -203,7 +221,7 @@ DataModel::ActionReturnStatus WebRTCTransportRequestorServer::HandleOffer(const 
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "HandleOffer: ICEServers list error: %" CHIP_ERROR_FORMAT, err.Format());
-            return Protocols::InteractionModel::Status::InvalidCommand;
+            return Status::InvalidCommand;
         }
     }
 
@@ -217,15 +235,15 @@ DataModel::ActionReturnStatus WebRTCTransportRequestorServer::HandleOffer(const 
     return mDelegate.HandleOffer(sessionId, args);
 }
 
-DataModel::ActionReturnStatus WebRTCTransportRequestorServer::HandleAnswer(const Commands::Answer::DecodableType & req,
-                                                                           const CommandHandler & commandHandler)
+DataModel::ActionReturnStatus WebRTCTransportRequestorServer::HandleAnswer(const CommandHandler & commandHandler,
+                                                                           const Commands::Answer::DecodableType & req)
 {
     uint16_t sessionId = req.webRTCSessionID;
     auto sdpSpan       = req.sdp;
 
     if (!IsPeerNodeSessionValid(sessionId, commandHandler))
     {
-        return Protocols::InteractionModel::Status::NotFound;
+        return Status::NotFound;
     }
 
     std::string sdpAnswer(sdpSpan.data(), sdpSpan.size());
@@ -235,8 +253,8 @@ DataModel::ActionReturnStatus WebRTCTransportRequestorServer::HandleAnswer(const
 }
 
 DataModel::ActionReturnStatus
-WebRTCTransportRequestorServer::HandleICECandidates(const Commands::ICECandidates::DecodableType & req,
-                                                    const CommandHandler & commandHandler)
+WebRTCTransportRequestorServer::HandleICECandidates(const CommandHandler & commandHandler,
+                                                    const Commands::ICECandidates::DecodableType & req)
 {
     uint16_t sessionId = req.webRTCSessionID;
 
@@ -254,27 +272,27 @@ WebRTCTransportRequestorServer::HandleICECandidates(const Commands::ICECandidate
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(Zcl, "HandleICECandidates: ICECandidates list error: %" CHIP_ERROR_FORMAT, err.Format());
-        return Protocols::InteractionModel::Status::InvalidCommand;
+        return Status::InvalidCommand;
     }
 
     // Check ice candidates min 1 contraint.
     if (candidates.empty())
     {
         ChipLogError(Zcl, "HandleICECandidates: No ICE candidates provided.");
-        return Protocols::InteractionModel::Status::ConstraintError;
+        return Status::ConstraintError;
     }
 
     // Check if the session, NodeID are valid
     if (!IsPeerNodeSessionValid(sessionId, commandHandler))
     {
-        return Protocols::InteractionModel::Status::NotFound;
+        return Status::NotFound;
     }
 
     return mDelegate.HandleICECandidates(sessionId, candidates);
 }
 
-DataModel::ActionReturnStatus WebRTCTransportRequestorServer::HandleEnd(const Commands::End::DecodableType & req,
-                                                                        const CommandHandler & commandHandler)
+DataModel::ActionReturnStatus WebRTCTransportRequestorServer::HandleEnd(const CommandHandler & commandHandler,
+                                                                        const Commands::End::DecodableType & req)
 {
     uint16_t sessionId = req.webRTCSessionID;
     auto reason        = req.reason;
@@ -283,12 +301,12 @@ DataModel::ActionReturnStatus WebRTCTransportRequestorServer::HandleEnd(const Co
     if (reason == WebRTCEndReasonEnum::kUnknownEnumValue)
     {
         ChipLogError(Zcl, "HandleEnd: Invalid reason value %u.", to_underlying(reason));
-        return Protocols::InteractionModel::Status::ConstraintError;
+        return Status::ConstraintError;
     }
 
     if (!IsPeerNodeSessionValid(sessionId, commandHandler))
     {
-        return Protocols::InteractionModel::Status::NotFound;
+        return Status::NotFound;
     }
 
     CHIP_ERROR delegateResult = mDelegate.HandleEnd(sessionId, reason);
@@ -330,7 +348,7 @@ WebRTCTransportRequestorServer::UpsertResultEnum WebRTCTransportRequestorServer:
         result = UpsertResultEnum::kInserted;
     }
 
-    NotifyAttributeChanged(WebRTCTransportRequestor::Attributes::CurrentSessions::Id);
+    NotifyAttributeChanged(CurrentSessions::Id);
 
     return result;
 }
@@ -347,7 +365,7 @@ void WebRTCTransportRequestorServer::RemoveSession(uint16_t sessionId)
     if (mCurrentSessions.size() < originalSize)
     {
         // Notify the stack that the CurrentSessions attribute has changed.
-        NotifyAttributeChanged(WebRTCTransportRequestor::Attributes::CurrentSessions::Id);
+        NotifyAttributeChanged(CurrentSessions::Id);
     }
 }
 

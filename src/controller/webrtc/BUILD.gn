@@ -23,7 +23,7 @@ import("${chip_root}/build/chip/buildconfig_header.gni")
 
 static_library("chip_webrtc") {
   sources = [
-    "${chip_root}/src/controller/python/chip/native/PyChipError.h",
+    "${chip_root}/src/controller/python/matter/native/PyChipError.h",
     "WebRTCClient.cpp",
     "WebRTCClient.h",
     "WebRTCTransportProviderClient.cpp",

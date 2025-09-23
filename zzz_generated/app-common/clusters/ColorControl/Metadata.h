@@ -5,6 +5,7 @@
 #pragma once
 
 #include <app/data-model-provider/MetadataTypes.h>
+#include <array>
 #include <lib/core/DataModelTypes.h>
 
 #include <cstdint>
@@ -19,6 +20,7 @@ namespace ColorControl {
 inline constexpr uint32_t kRevision = 7;
 
 namespace Attributes {
+
 namespace CurrentHue {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(CurrentHue::Id, BitFlags<DataModel::AttributeQualityFlags>(),
                                                           Access::Privilege::kView, std::nullopt);
@@ -233,10 +235,16 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry(StartUpColorTemperatur
                                                           BitFlags<DataModel::AttributeQualityFlags>(), Access::Privilege::kView,
                                                           Access::Privilege::kManage);
 } // namespace StartUpColorTemperatureMireds
+constexpr std::array<DataModel::AttributeEntry, 5> kMandatoryMetadata = {
+    ColorMode::kMetadataEntry,         Options::kMetadataEntry,           NumberOfPrimaries::kMetadataEntry,
+    EnhancedColorMode::kMetadataEntry, ColorCapabilities::kMetadataEntry,
+
+};
 
 } // namespace Attributes
 
 namespace Commands {
+
 namespace MoveToHue {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(MoveToHue::Id, BitFlags<DataModel::CommandQualityFlags>(),
                                                                 Access::Privilege::kOperate);

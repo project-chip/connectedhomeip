@@ -5753,18 +5753,10 @@ DataModelLogger::LogValue(const char * label, size_t indent,
         }
     }
     {
-        CHIP_ERROR err = LogValue("MinKeyFrameInterval", indent + 1, value.minKeyFrameInterval);
+        CHIP_ERROR err = LogValue("KeyFrameInterval", indent + 1, value.keyFrameInterval);
         if (err != CHIP_NO_ERROR)
         {
-            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'MinKeyFrameInterval'");
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("MaxKeyFrameInterval", indent + 1, value.maxKeyFrameInterval);
-        if (err != CHIP_NO_ERROR)
-        {
-            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'MaxKeyFrameInterval'");
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'KeyFrameInterval'");
             return err;
         }
     }
@@ -6223,6 +6215,40 @@ CHIP_ERROR DataModelLogger::LogValue(
         if (err != CHIP_NO_ERROR)
         {
             DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'Viewport'");
+            return err;
+        }
+    }
+    DataModelLogger::LogString(indent, "}");
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR
+DataModelLogger::LogValue(const char * label, size_t indent,
+                          const chip::app::Clusters::WebRTCTransportProvider::Structs::SFrameStruct::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    {
+        CHIP_ERROR err = LogValue("CipherSuite", indent + 1, value.cipherSuite);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'CipherSuite'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("BaseKey", indent + 1, value.baseKey);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'BaseKey'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("Kid", indent + 1, value.kid);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'Kid'");
             return err;
         }
     }
@@ -12015,12 +12041,12 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
     return CHIP_NO_ERROR;
 }
 CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
-                                     const TlsCertificateManagement::Commands::TLSClientCSRResponse::DecodableType & value)
+                                     const TlsCertificateManagement::Commands::ClientCSRResponse::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
     ReturnErrorOnFailure(DataModelLogger::LogValue("ccdid", indent + 1, value.ccdid));
     ReturnErrorOnFailure(DataModelLogger::LogValue("csr", indent + 1, value.csr));
-    ReturnErrorOnFailure(DataModelLogger::LogValue("nonce", indent + 1, value.nonce));
+    ReturnErrorOnFailure(DataModelLogger::LogValue("nonceSignature", indent + 1, value.nonceSignature));
     DataModelLogger::LogString(indent, "}");
     return CHIP_NO_ERROR;
 }
@@ -20975,10 +21001,10 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("NightVisionUsesInfrared", 1, value);
         }
-        case CameraAvStreamManagement::Attributes::MinViewport::Id: {
+        case CameraAvStreamManagement::Attributes::MinViewportResolution::Id: {
             chip::app::Clusters::CameraAvStreamManagement::Structs::VideoResolutionStruct::DecodableType value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("MinViewport", 1, value);
+            return DataModelLogger::LogValue("MinViewportResolution", 1, value);
         }
         case CameraAvStreamManagement::Attributes::RateDistortionTradeOffPoints::Id: {
             chip::app::DataModel::DecodableList<
@@ -21249,6 +21275,11 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             int16_t value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("PanMax", 1, value);
+        }
+        case CameraAvSettingsUserLevelManagement::Attributes::MovementState::Id: {
+            chip::app::Clusters::CameraAvSettingsUserLevelManagement::PhysicalMovementEnum value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("MovementState", 1, value);
         }
         case CameraAvSettingsUserLevelManagement::Attributes::GeneratedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
@@ -23343,10 +23374,10 @@ CHIP_ERROR DataModelLogger::LogCommand(const chip::app::ConcreteCommandPath & pa
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("LookupRootCertificateResponse", 1, value);
         }
-        case TlsCertificateManagement::Commands::TLSClientCSRResponse::Id: {
-            TlsCertificateManagement::Commands::TLSClientCSRResponse::DecodableType value;
+        case TlsCertificateManagement::Commands::ClientCSRResponse::Id: {
+            TlsCertificateManagement::Commands::ClientCSRResponse::DecodableType value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("TLSClientCSRResponse", 1, value);
+            return DataModelLogger::LogValue("ClientCSRResponse", 1, value);
         }
         case TlsCertificateManagement::Commands::FindClientCertificateResponse::Id: {
             TlsCertificateManagement::Commands::FindClientCertificateResponse::DecodableType value;

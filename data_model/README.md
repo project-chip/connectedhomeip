@@ -139,7 +139,7 @@ To do this, perform the following steps:
         is updated as a part of the generate_spec_xml.py script, so it is just
         the zip file inclusion in this file that needs to be updated
     -   In
-        src/python_testing/matter_testing_infrastructure/chip/testing/spec_parsing.py
+        src/python_testing/matter_testing_infrastructure/matter/testing/spec_parsing.py
         update the PrebuiltDataModelDirectory enum to add the new directory and
         dm_from_spec_version
     -   Add unit tests for the new data model files to the data model file unit

@@ -41,6 +41,7 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
     encoder.Encode(to_underlying(Fields::kICEServers), ICEServers);
     encoder.Encode(to_underlying(Fields::kICETransportPolicy), ICETransportPolicy);
     encoder.Encode(to_underlying(Fields::kMetadataEnabled), metadataEnabled);
+    encoder.Encode(to_underlying(Fields::kSFrameConfig), SFrameConfig);
     return encoder.Finalize();
 }
 
@@ -81,6 +82,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader, FabricIndex aAccessing
         else if (__context_tag == to_underlying(Fields::kMetadataEnabled))
         {
             err = DataModel::Decode(reader, metadataEnabled);
+        }
+        else if (__context_tag == to_underlying(Fields::kSFrameConfig))
+        {
+            err = DataModel::Decode(reader, SFrameConfig);
         }
 
         ReturnErrorOnFailure(err);
@@ -144,6 +149,7 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
     encoder.Encode(to_underlying(Fields::kICEServers), ICEServers);
     encoder.Encode(to_underlying(Fields::kICETransportPolicy), ICETransportPolicy);
     encoder.Encode(to_underlying(Fields::kMetadataEnabled), metadataEnabled);
+    encoder.Encode(to_underlying(Fields::kSFrameConfig), SFrameConfig);
     return encoder.Finalize();
 }
 
@@ -192,6 +198,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader, FabricIndex aAccessing
         else if (__context_tag == to_underlying(Fields::kMetadataEnabled))
         {
             err = DataModel::Decode(reader, metadataEnabled);
+        }
+        else if (__context_tag == to_underlying(Fields::kSFrameConfig))
+        {
+            err = DataModel::Decode(reader, SFrameConfig);
         }
 
         ReturnErrorOnFailure(err);
