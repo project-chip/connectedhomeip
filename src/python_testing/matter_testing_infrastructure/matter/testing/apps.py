@@ -15,15 +15,14 @@
 import os
 import signal
 import tempfile
-import threading
 import subprocess
-import time
 from dataclasses import dataclass
 from typing import Optional, Union
 
 import matter.clusters as Clusters
 from matter.ChipDeviceCtrl import ChipDeviceController
 from matter.clusters.Types import NullValue
+from matter.interaction_model import Status
 from matter.testing.tasks import Subprocess
 
 
@@ -143,79 +142,6 @@ class JFControllerSubprocess(Subprocess):
                          output_cb=lambda line, is_stderr: self.PREFIX + line)
 
 
-class OTAProviderLaunchSU:
-    def __init__(self, ota_file: str, discriminator: int, passcode: int, secured_device_port: int,
-                 wait_for: str, queue: str = None, timeout: int = None, override_image_uri: str = None,
-                 log_file: str = "provider.log"):
-        self.ota_file = ota_file
-        self.discriminator = discriminator
-        self.passcode = passcode
-        self.secured_device_port = secured_device_port
-        self.wait_for = wait_for
-        self.queue = queue
-        self.timeout = timeout
-        self.override_image_uri = override_image_uri
-        self.log_file = log_file
-        self.proc = None
-
-    def start(self) -> subprocess.Popen:
-        args = [
-            "./out/debug/chip-ota-provider-app",
-            f"--filepath={self.ota_file}",
-            f"--discriminator={self.discriminator}",
-            f"--passcode={self.passcode}",
-            f"--secured-device-port={self.secured_device_port}",
-            f"--KVS=/tmp/chip_kvs_provider"
-        ]
-
-        if self.queue:
-            args += ["-q", self.queue]
-        if self.timeout:
-            args += ["-t", str(self.timeout)]
-        if self.override_image_uri:
-            args += [f"-i={self.override_image_uri}"]
-
-        open(self.log_file, "w").close()
-
-        self.proc = subprocess.Popen(args, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
-
-        found_wait_for = False
-        start_time = time.time()
-
-        while True:
-            line = self.proc.stdout.readline()
-            if line:
-                with open(self.log_file, "a") as f:
-                    f.write(line)
-                    f.flush()
-                if not found_wait_for and self.wait_for in line:
-                    found_wait_for = True
-                    # logger.info(f"Provider reached status: {self.wait_for}")
-                    break
-            elif self.proc.poll() is not None:
-                break
-
-            if self.timeout and time.time() - start_time > self.timeout:
-                break
-
-            time.sleep(0.1)
-
-        if not found_wait_for:
-            self.proc.terminate()
-            raise RuntimeError(f"Provider did not reach expected status: {self.wait_for}")
-
-        # Thread para seguir escribiendo log en tiempo real
-        def _follow_output(proc):
-            for line in proc.stdout:
-                with open(self.log_file, "a") as f:
-                    f.write(line)
-                    f.flush()
-
-        threading.Thread(target=_follow_output, args=(self.proc,), daemon=True).start()
-
-        return self.proc
-
-
 class OTAProviderSubprocess(AppServerSubprocess):
     """Wrapper class for starting an OTA Provider application server in a subprocess."""
 
@@ -224,27 +150,102 @@ class OTAProviderSubprocess(AppServerSubprocess):
     # Prefix for log messages from the OTA provider application.
     PREFIX = b"[OTA-PROVIDER]"
 
-    def __init__(self, app: str, storage_dir: str, discriminator: int,
-                 passcode: int, ota_source: Union[OtaImagePath, ImageListPath],
-                 port: int = 5541, extra_args: list[str] = []):
-        """Initialize the OTA Provider subprocess.
+    def __init__(
+        self,
+        ota_file: str,
+        discriminator: int,
+        passcode: int,
+        secured_device_port: int,
+        queue: str = None,
+        timeout: int = None,
+        override_image_uri: str = None,
+        log_file_path: str = "provider.log",
+    ):
+        """
+        Initialize OTA Provider with hardcoded KVS path, log file, and extra args.
 
         Args:
-            app: Path to the chip-ota-provider-app executable
-            storage_dir: Directory for persistent storage
-            discriminator: Discriminator for commissioning
-            passcode: Passcode for commissioning
-            port: UDP port for secure connections (default: 5541)
-            ota_source: Either OtaImagePath or ImageListPath specifying the OTA image source
-            extra_args: Additional command line arguments
+            ota_file: Path to OTA image file (string or OtaImagePath).
+            discriminator: Commissioning discriminator.
+            passcode: Setup PIN code.
+            secured_device_port: Port for provider process.
+            queue: Optional queue name.
+            timeout: Optional timeout in seconds.
+            override_image_uri: Optional ImageURI override.
+            log_file_path: File to store logs in real-time.
         """
 
-        # Build OTA-specific arguments using the ota_source property
-        combined_extra_args = ota_source.ota_args + extra_args
+        self.log_file_path = log_file_path
 
-        # Initialize with the combined arguments
-        super().__init__(app=app, storage_dir=storage_dir, discriminator=discriminator,
-                         passcode=passcode, port=port, extra_args=combined_extra_args)
+        # Path to provider binary and hardcoded KVS
+        path_to_app = "./out/debug/chip-ota-provider-app"
+        provider_kvs_path = "/tmp/chip_kvs_provider"
+
+        # Build argument list exactly as before
+        args = [
+            f"--filepath={ota_file}" if isinstance(ota_file, str) else ota_file.path,
+            f"--discriminator={discriminator}",
+            f"--passcode={passcode}",
+            f"--secured-device-port={secured_device_port}",
+            f"--KVS={provider_kvs_path}",
+        ]
+        if queue:
+            args += ["-q", queue]
+        if timeout:
+            args += ["-t", str(timeout)]
+        if override_image_uri:
+            args += ["-i", override_image_uri]
+
+        # Clear the log file before starting
+        open(log_file_path, "w").close()
+
+        # Save args for use in the base constructor
+        self._extra_args = args
+
+        super().__init__(
+            app=path_to_app,
+            storage_dir="/tmp",
+            discriminator=discriminator,
+            passcode=passcode,
+            port=secured_device_port,
+            extra_args=args,
+        )
+
+    def _process_output(self, line: bytes, is_stderr: bool) -> bytes:
+        """Write logs only to file, return empty bytes to avoid console output."""
+        with open(self.log_file_path, "ab") as f:
+            f.write(line)
+            f.flush()
+        return b""  # must return bytes, not None
+
+    def start_and_wait(self, wait_for: str, timeout: int = 30):
+        """Start provider and wait for specific output in logs."""
+        self.output_cb = self._process_output
+        self.start(expected_output=wait_for, timeout=timeout)
+        return self
+
+    # ---------------- ACL METHODS ---------------- #
+
+    async def write_acl(self, controller, node_id: int, acl: list):
+        """
+        Writes the Access Control List (ACL) to the DUT device using the specified controller.
+
+        Args:
+            controller: The Matter controller (e.g., th1, th4) that will perform the write operation.
+            acl (list): List of AccessControlEntryStruct objects defining the ACL permissions to write.
+            node_id:
+
+        Raises:
+            AssertionError: If writing the ACL attribute fails (status is not Status.Success).
+        """
+        acl_attribute = Clusters.AccessControl.Attributes.Acl(acl)
+        result = await controller.WriteAttribute(
+            nodeid=node_id,
+            attributes=[(0, acl_attribute)]
+        )
+        if result[0].Status != Status.Success:
+            raise RuntimeError(f"ACL write failed for node {node_id}: {result[0].Status}")
+        return True
 
     def create_acl_entry(self, dev_ctrl: ChipDeviceController, provider_node_id: int, requestor_node_id: Optional[int] = None):
         """Create ACL entries to allow OTA requestors to access the provider.
@@ -292,3 +293,77 @@ class OTAProviderSubprocess(AppServerSubprocess):
             nodeid=provider_node_id,
             attributes=[(0, acl_attribute)]
         )
+
+    async def set_acl_for_requestor(
+            self,
+            controller,
+            requestor_node: int,
+            provider_node: int,
+            fabric_index: int,
+            original_requestor_acls: list
+    ):
+        """
+        Read existing ACLs on Requestor, add minimal ACL for Provider, and write back.
+        """
+
+        # Add minimal ACL for Provider
+        acl_operate_provider = Clusters.AccessControl.Structs.AccessControlEntryStruct(
+            fabricIndex=fabric_index,
+            privilege=Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kOperate,
+            authMode=Clusters.AccessControl.Enums.AccessControlEntryAuthModeEnum.kCase,
+            subjects=[provider_node],
+            targets=[Clusters.AccessControl.Structs.AccessControlTargetStruct(
+                endpoint=0,
+                cluster=Clusters.OtaSoftwareUpdateRequestor.id
+            )]
+        )
+
+        # Combine existing + new ACLs
+        combined_acls = original_requestor_acls + [acl_operate_provider]
+        await self.write_acl(controller, requestor_node, combined_acls)
+
+        return original_requestor_acls
+
+    async def set_acl_for_provider(
+            self, controller,
+            provider_node: int,
+            requestor_node: int,
+            fabric_index: int,
+            original_provider_acls: list
+    ):
+        """
+        Read existing ACLs on Provider, add minimal ACL for Requestor, and write back.
+        """
+
+        # Add minimal ACL for Requestor
+        acl_operate_requestor = Clusters.AccessControl.Structs.AccessControlEntryStruct(
+            fabricIndex=fabric_index,
+            privilege=Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kOperate,
+            authMode=Clusters.AccessControl.Enums.AccessControlEntryAuthModeEnum.kCase,
+            subjects=[requestor_node],
+            targets=[Clusters.AccessControl.Structs.AccessControlTargetStruct(
+                endpoint=0,
+                cluster=Clusters.OtaSoftwareUpdateProvider.id
+            )]
+        )
+
+        # Combine existing + new ACLs
+        combined_acls = original_provider_acls + [acl_operate_requestor]
+        await self.write_acl(controller, provider_node, combined_acls)
+
+        return original_provider_acls
+
+    async def set_ota_acls_for_provider(
+            self, controller,
+            requestor_node: int,
+            provider_node: int,
+            fabric_index: int,
+            original_requestor_acls: list,
+            original_provider_acls: list
+    ):
+        """
+        Set ACLs both ways and preserve originals.
+        """
+        original_requestor_acls = await self.set_acl_for_requestor(controller, requestor_node, provider_node, fabric_index, original_requestor_acls)
+        original_provider_acls = await self.set_acl_for_provider(controller, provider_node, requestor_node, fabric_index, original_provider_acls)
+        return original_requestor_acls, original_provider_acls
