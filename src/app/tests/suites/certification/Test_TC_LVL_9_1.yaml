@@ -18,7 +18,6 @@ PICS:
     - LVL.S
     - S.S
     - G.S
-    - GRPKEY.S
 
 config:
     nodeId: 0x12344321
@@ -41,7 +40,6 @@ tests:
           "Step 0a :TH sends KeySetWrite command in the GroupKeyManagement
           cluster to DUT using a key that is pre-installed on the TH.
           GroupKeySet fields are as follows:"
-      PICS: GRPKEY.S.C00.Rsp
       cluster: "Group Key Management"
       endpoint: 0
       command: "KeySetWrite"
@@ -64,7 +62,6 @@ tests:
           "Step 0b: TH binds GroupIds 0x0001 with GroupKeySetID 0x01a1 in the
           GroupKeyMap attribute list on GroupKeyManagement cluster by writing
           the GroupKeyMap attribute with two entries as follows:"
-      PICS: GRPKEY.S.A0000
       cluster: "Group Key Management"
       endpoint: 0
       command: "writeAttribute"
