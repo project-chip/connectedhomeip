@@ -90,9 +90,10 @@ rt_sdk("sdk") {
   include_dirs += [ "${example_platform_dir}/app/project_include/openthread" ]
 
   # For matter with BR feature, increase FreeRTOS heap size and enable TBR cluster
+  # Additionally in the context of OTBR support the freeRTOS heap should be big enough to allow to handle a large number of mDNS packets
   if (chip_enable_wifi && chip_enable_openthread) {
     defines += [
-      "configTOTAL_HEAP_SIZE=(size_t)(170 * 1024)",
+      "configTOTAL_HEAP_SIZE=(size_t)(250 * 1024)",
       "CHIP_DEVICE_CONFIG_ENABLE_TBR=1",
     ]
   }
@@ -194,6 +195,7 @@ rt_executable("thermostat") {
     "${common_example_dir}/device_callbacks/include",
     "${common_example_dir}/app_task/include",
     "${common_example_dir}/factory_data/include",
+    "${common_example_dir}/operational_keystore/include",
   ]
 
   sources += [
@@ -203,6 +205,7 @@ rt_executable("thermostat") {
     "${common_example_dir}/device_manager/source/CHIPDeviceManager.cpp",
     "${common_example_dir}/icd/source/ICDUtil.cpp",
     "${common_example_dir}/matter_button/source/ButtonRegistrationEmpty.cpp",
+    "${common_example_dir}/operational_keystore/source/OperationalKeystoreS50.cpp",
   ]
 
   deps = [
@@ -211,6 +214,9 @@ rt_executable("thermostat") {
     "${chip_root}/src/platform/logging:default",
     "${chip_root}/src/setup_payload:onboarding-codes-utils",
   ]
+
+  # Operational key secure storage
+  defines += [ "CONFIG_OPERATIONAL_KEYSTORE=1" ]
 
   if (nxp_enable_matter_cli) {
     defines += [ "ENABLE_CHIP_SHELL" ]

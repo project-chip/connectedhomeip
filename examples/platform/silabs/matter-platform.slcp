@@ -42,6 +42,10 @@ component:
 # Platform support
 - {id: cpp_support}
 - {id: sl_main}
+- id: common_token_manager
+  condition: [device_series_3]
+- id: common_token_manager_dynamic
+  condition: [device_series_3]
 - {id: device_init}
 - {id: memory_manager}
 - {id: silabs_core_memory_manager}
@@ -94,6 +98,9 @@ configuration:
   value: 0
 - {name: SL_MBEDTLS_KEY_EXCHANGE_ECDHE_ECDSA_ENABLED, value: '0'}
 - {name: SL_MBEDTLS_KEY_EXCHANGE_PSK_ENABLED, value: '1'}
+- condition: [uartdrv_eusart]
+  name: SL_UARTDRV_EUSART_VCOM_BAUDRATE
+  value: '921600'
 - condition: [uartdrv_usart]
   name: UARTDRV_RESTRICT_ENERGY_MODE_TO_ALLOW_RECEPTION
   value: '1'
@@ -115,6 +122,9 @@ configuration:
 - {name: SL_BT_RTOS_EVENT_HANDLER_STACK_SIZE, value: 1536}
 - {name: SL_MBEDTLS_PSA_ASSUME_EXCLUSIVE_BUFFERS, value: 1}
 - {name: SL_OPENTHREAD_ENABLE_SERIAL_TASK, value: 0}
+- condition: [device_series_3]
+  name: SL_TOKEN_MANAGER_STATIC_SECURE_TOKEN_SIZE
+  value: 8192
 
 requires:
 - condition: [device_series_2]

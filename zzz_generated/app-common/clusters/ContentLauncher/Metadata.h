@@ -5,6 +5,7 @@
 #pragma once
 
 #include <app/data-model-provider/MetadataTypes.h>
+#include <array>
 #include <lib/core/DataModelTypes.h>
 
 #include <cstdint>
@@ -19,6 +20,7 @@ namespace ContentLauncher {
 inline constexpr uint32_t kRevision = 1;
 
 namespace Attributes {
+
 namespace AcceptHeader {
 inline constexpr DataModel::AttributeEntry
     kMetadataEntry(AcceptHeader::Id, BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kListAttribute),
@@ -29,10 +31,14 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry(SupportedStreamingProt
                                                           BitFlags<DataModel::AttributeQualityFlags>(), Access::Privilege::kView,
                                                           std::nullopt);
 } // namespace SupportedStreamingProtocols
+constexpr std::array<DataModel::AttributeEntry, 0> kMandatoryMetadata = {
+
+};
 
 } // namespace Attributes
 
 namespace Commands {
+
 namespace LaunchContent {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(LaunchContent::Id, BitFlags<DataModel::CommandQualityFlags>(),
                                                                 Access::Privilege::kOperate);

@@ -45,6 +45,7 @@
         "diagnostic-logs-cluster.xml",
         "dishwasher-alarm-cluster.xml",
         "dishwasher-mode-cluster.xml",
+        "groupcast-cluster.xml",
         "microwave-oven-mode-cluster.xml",
         "meter-identification-cluster.xml",
         "door-lock-cluster.xml",
@@ -179,11 +180,14 @@
             "AdminVendorId"
         ],
         "Basic Information": [
+            "FeatureMap",
+            "ClusterRevision",
             "DataModelRevision",
             "VendorName",
             "VendorID",
             "ProductName",
             "ProductID",
+            "NodeLabel",
             "Location",
             "HardwareVersion",
             "HardwareVersionString",
@@ -194,13 +198,18 @@
             "ProductURL",
             "ProductLabel",
             "SerialNumber",
+            "LocalConfigDisabled",
+            "Reachable",
             "UniqueID",
             "CapabilityMinima",
             "ProductAppearance",
             "SpecificationVersion",
-            "MaxPathsPerInvoke"
+            "MaxPathsPerInvoke",
+            "ConfigurationVersion"
         ],
+        "Boolean State": ["ClusterRevision", "FeatureMap", "StateValue"],
         "Bridged Device Basic Information": ["ProductAppearance"],
+        "Binding": ["FeatureMap", "ClusterRevision"],
         "Chime": ["SelectedChime", "Enabled"],
         "Closure Control": [
             "CountdownTime",
@@ -234,7 +243,7 @@
         "Commodity Metering": [
             "MeteredQuantity",
             "MeteredQuantityTimestamp",
-            "MeasurementType",
+            "TariffUnit",
             "MaximumMeteredQuantities"
         ],
         "Descriptor": ["ClusterRevision", "FeatureMap"],
@@ -299,7 +308,8 @@
             "PacketTxCount",
             "TxErrCount",
             "CollisionCount",
-            "OverrunCount"
+            "OverrunCount",
+            "ClusterRevision"
         ],
         "General Commissioning": [
             "RegulatoryConfig",
@@ -756,7 +766,7 @@
         "Service Area": ["CurrentArea", "EstimatedEndTime", "FeatureMap"],
         "Camera AV Stream Management": [
             "VideoSensorParams",
-            "MinViewport",
+            "MinViewportResolution",
             "MicrophoneCapabilities",
             "SpeakerCapabilities",
             "Viewport",
@@ -792,18 +802,33 @@
             "FeatureMap"
         ],
         "Camera AV Settings User Level Management": ["MPTZPosition"],
+        "Fixed Label": ["LabelList", "ClusterRevision", "FeatureMap"],
         "Soil Measurement": [
             "SoilMoistureMeasurementLimits",
             "SoilMoistureMeasuredValue",
-            "ClusterRevision"
+            "ClusterRevision",
+            "FeatureMap"
         ],
         "Unit Localization": ["TemperatureUnit"],
-        "Zone Management": ["TwoDCartesianMax"],
+        "TLS Certificate Management": [
+            "ClusterRevision",
+            "MaxRootCertificates",
+            "MaxClientCertificates"
+        ],
         "TLS Client Management": ["ClusterRevision", "MaxProvisioned"],
         "Thermostat": [
             "MaxThermostatSuggestions",
             "CurrentThermostatSuggestion",
             "ThermostatSuggestionNotFollowingReason"
+        ],
+        "Zone Management": [
+            "MaxUserDefinedZones",
+            "MaxZones",
+            "SensitivityMax",
+            "Sensitivity",
+            "TwoDCartesianMax",
+            "FeatureMap",
+            "ClusterRevision"
         ]
     },
     "mandatoryDeviceTypes": "0x0016",

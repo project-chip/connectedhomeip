@@ -39,13 +39,13 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: ghcr.io/project-chip/chip-build-telink:153
+            image: ghcr.io/project-chip/chip-build-telink:167
             volumes:
                 - "/tmp/bloat_reports:/tmp/bloat_reports"
 
         steps:
             - name: Checkout
-              uses: actions/checkout@v4
+              uses: actions/checkout@v5
             - name: Checkout submodules & Bootstrap
               uses: ./.github/actions/checkout-submodules-and-bootstrap
               with:
@@ -58,7 +58,7 @@ jobs:
                 gh-context: ${{ toJson(github) }}
 
             # - name: Update Zephyr version 4.1.0 (develop) to specific revision (for developers purpose)
-            #   run: scripts/run_in_build_env.sh "python3 scripts/tools/telink/update_zephyr.py 522ce11c5ddfd004b5640a1f51a5fce2e0f14c35"
+            #   run: scripts/run_in_build_env.sh "python3 scripts/tools/telink/update_zephyr.py 86fb5f1142c99e04abc923f4c0aa5fafb2ea9ace"
 
             - name: Build tools required for Factory Data
               # Run test for master and all PRs
@@ -386,13 +386,13 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: ghcr.io/project-chip/chip-build-telink-zephyr_3_3:153
+            image: ghcr.io/project-chip/chip-build-telink-zephyr_3_3:167
             volumes:
                 - "/tmp/bloat_reports:/tmp/bloat_reports"
 
         steps:
             - name: Checkout
-              uses: actions/checkout@v4
+              uses: actions/checkout@v5
             - name: Checkout submodules & Bootstrap
               uses: ./.github/actions/checkout-submodules-and-bootstrap
               with:
@@ -405,7 +405,7 @@ jobs:
                 gh-context: ${{ toJson(github) }}
 
             # - name: Update Zephyr version 3.3.0 (develop_3.3) to specific revision (for developers purpose)
-            #   run: scripts/run_in_build_env.sh "python3 scripts/tools/telink/update_zephyr.py acc42427122e7d85481dc14e459834d25bf28697"
+            #   run: scripts/run_in_build_env.sh "python3 scripts/tools/telink/update_zephyr.py 0b56f3a0b56d720ba5b4c1108ccda4ccc19c1932"
 
             - name: Build tools required for Factory Data
               # Run test for master and all PRs

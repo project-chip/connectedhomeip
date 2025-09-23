@@ -59,6 +59,10 @@
 #include <platform/OpenThread/GenericNetworkCommissioningThreadDriver.h>
 #endif
 
+#if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
+#include "BLEApplicationManager.h"
+#endif
+
 #if CONFIG_CHIP_APP_WIFI_CONNECT_AT_BOOT
 #include "WifiConnect.h"
 #endif
@@ -127,7 +131,7 @@ chip::DeviceLayer::DeviceInfoProviderImpl gExampleDeviceInfoProvider;
 
 #if CONFIG_NET_L2_OPENTHREAD
 app::Clusters::NetworkCommissioning::InstanceAndDriver<DeviceLayer::NetworkCommissioning::GenericThreadDriver>
-    sThreadNetworkDriver(0 /*endpointId*/);
+    sThreadNetworkDriver(CHIP_DEVICE_CONFIG_THREAD_NETWORK_ENDPOINT_ID /*endpointId*/);
 #endif
 
 #if CONFIG_CHIP_WIFI || CHIP_DEVICE_CONFIG_ENABLE_WPA
@@ -442,6 +446,11 @@ void chip::NXP::App::AppTaskBase::SwitchCommissioningStateHandler(void)
 
 void chip::NXP::App::AppTaskBase::FactoryResetHandler(void)
 {
+#if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
+    /* Trigger factory reset for BLEApplicationManager */
+    chip::NXP::App::BleAppMgr().FactoryReset();
+#endif
+
     /* Emit the ShutDown event before factory reset */
     chip::Server::GetInstance().GenerateShutDownEvent();
     chip::Server::GetInstance().ScheduleFactoryReset();

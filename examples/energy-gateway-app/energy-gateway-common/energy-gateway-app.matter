@@ -245,8 +245,8 @@ enum ThreeLevelAutoEnum : enum8 {
 }
 
 enum WebRTCEndReasonEnum : enum8 {
-  kIceFailed = 0;
-  kIceTimeout = 1;
+  kICEFailed = 0;
+  kICETimeout = 1;
   kUserHangup = 2;
   kUserBusy = 3;
   kReplaced = 4;
@@ -256,7 +256,8 @@ enum WebRTCEndReasonEnum : enum8 {
   kOutOfResources = 8;
   kMediaTimeout = 9;
   kLowPower = 10;
-  kUnknownReason = 11;
+  kPrivacyMode = 11;
+  kUnknownReason = 12;
 }
 
 bitmap TestGlobalBitmap : bitmap32 {
@@ -343,7 +344,7 @@ fabric_scoped struct WebRTCSessionStruct {
   StreamUsageEnum streamUsage = 3;
   nullable int16u videoStreamID = 4;
   nullable int16u audioStreamID = 5;
-  optional boolean metadataEnabled = 6;
+  boolean metadataEnabled = 6;
   fabric_idx fabricIndex = 254;
 }
 
@@ -1631,7 +1632,7 @@ provisional cluster ElectricalGridConditions = 160 {
 }
 
 /** The CommodityTariffCluster provides the mechanism for communicating Commodity Tariff information within the premises. */
-cluster CommodityTariff = 1792 {
+provisional cluster CommodityTariff = 1792 {
   revision 1;
 
   enum AuxiliaryLoadSettingEnum : enum8 {
@@ -1710,7 +1711,7 @@ cluster CommodityTariff = 1792 {
     optional AuxiliaryLoadSwitchSettingsStruct auxiliaryLoad = 3;
     optional PeakPeriodStruct peakPeriod = 4;
     optional PowerThresholdStruct powerThreshold = 5;
-    nullable int32u threshold = 6;
+    nullable int64s threshold = 6;
     optional nullable char_string<128> label = 7;
     optional boolean predicted = 8;
   }
@@ -1859,7 +1860,7 @@ provisional cluster CommodityMetering = 2823 {
 
   readonly attribute nullable MeteredQuantityStruct meteredQuantity[] = 0;
   readonly attribute nullable epoch_s meteredQuantityTimestamp = 1;
-  readonly attribute nullable MeasurementTypeEnum measurementType = 2;
+  readonly attribute nullable TariffUnitEnum tariffUnit = 2;
   readonly attribute nullable int16u maximumMeteredQuantities = 3;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
@@ -1904,7 +1905,7 @@ endpoint 0 {
     callback attribute vendorID;
     callback attribute productName;
     callback attribute productID;
-    ram      attribute nodeLabel;
+    callback attribute nodeLabel;
     callback attribute location;
     callback attribute hardwareVersion;
     callback attribute hardwareVersionString;
@@ -1915,12 +1916,12 @@ endpoint 0 {
     callback attribute capabilityMinima;
     callback attribute specificationVersion;
     callback attribute maxPathsPerInvoke;
-    callback attribute configurationVersion default = 1;
+    callback attribute configurationVersion;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 5;
+    callback attribute featureMap;
+    callback attribute clusterRevision;
   }
 
   server cluster OtaSoftwareUpdateRequestor {
@@ -2156,11 +2157,11 @@ endpoint 1 {
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 0;
+    ram      attribute featureMap default = 63;
     ram      attribute clusterRevision default = 1;
 
-    handle command GetTariffComponentResponse;
     handle command GetTariffComponent;
+    handle command GetTariffComponentResponse;
     handle command GetDayEntry;
     handle command GetDayEntryResponse;
   }
@@ -2181,7 +2182,7 @@ endpoint 1 {
   server cluster CommodityMetering {
     callback attribute meteredQuantity;
     callback attribute meteredQuantityTimestamp;
-    callback attribute measurementType;
+    callback attribute tariffUnit;
     callback attribute maximumMeteredQuantities;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;

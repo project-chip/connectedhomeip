@@ -52,6 +52,7 @@ class NxpBoard(Enum):
     RT1170 = auto()
     RW61X = auto()
     MCXW71 = auto()
+    MCXW72 = auto()
 
     def Name(self, os_env):
         if self == NxpBoard.RT1060:
@@ -65,6 +66,8 @@ class NxpBoard(Enum):
                 return 'rw61x'
         elif self == NxpBoard.MCXW71:
             return 'mcxw71'
+        elif self == NxpBoard.MCXW72:
+            return 'mcxw72'
         else:
             raise Exception('Unknown board type: %r' % self)
 
@@ -80,6 +83,8 @@ class NxpBoard(Enum):
                 return 'rt/rw61x'
         elif self == NxpBoard.MCXW71:
             return 'mcxw71'
+        elif self == NxpBoard.MCXW72:
+            return 'mcxw72'
         else:
             raise Exception('Unknown board type: %r' % self)
 
@@ -174,6 +179,8 @@ class NxpBuilder(GnBuilder):
                  iw416_transceiver: bool = False,
                  w8801_transceiver: bool = False,
                  iwx12_transceiver: bool = False,
+                 iw610_transceiver: bool = False,
+                 se05x_enable: bool = False,
                  log_level: NxpLogLevel = NxpLogLevel.DEFAULT,
                  ):
         super(NxpBuilder, self).__init__(
@@ -207,6 +214,8 @@ class NxpBuilder(GnBuilder):
         self.iw416_transceiver = iw416_transceiver
         self.w8801_transceiver = w8801_transceiver
         self.iwx12_transceiver = iwx12_transceiver
+        self.iw610_transceiver = iw610_transceiver
+        self.se05x_enable = se05x_enable
         if self.low_power and log_level != NxpLogLevel.NONE:
             logging.warning("Switching log level to 'NONE' for low power build")
             log_level = NxpLogLevel.NONE
@@ -230,6 +239,11 @@ class NxpBuilder(GnBuilder):
             case NxpBoard.MCXW71:
                 if board_variant is NxpBoardVariant.FRDM:
                     return "frdmmcxw71"
+                else:
+                    return "mcxw71evk"
+            case NxpBoard.MCXW72:
+                if board_variant is NxpBoardVariant.FRDM:
+                    return "frdmmcxw72"
                 else:
                     return "mcxw72evk"
 
@@ -355,11 +369,22 @@ class NxpBuilder(GnBuilder):
         if self.w8801_transceiver:
             flags.append('-DCONFIG_MCUX_COMPONENT_component.wifi_bt_module.88W8801=y')
 
-        if self.iwx12_transceiver:
+        if self.iwx12_transceiver or self.iw610_transceiver:
             flags.append('-DCONFIG_MCUX_COMPONENT_component.wifi_bt_module.IW61X=y')
+        if self.iw610_transceiver:
+            flags.append('-DCONFIG_MCUX_COMPONENT_component.wifi_bt_module.board_murata_2ll_m2=y')
 
         if self.board == NxpBoard.RT1170:
             flags.append('-Dcore_id=cm7')
+
+        if self.se05x_enable:
+            flags.append('-DCONFIG_CHIP_SE05X=y')
+
+        if self.board in (NxpBoard.MCXW71, NxpBoard.MCXW72):
+            flags.append('-DCONFIG_MCUX_COMPONENT_middleware.freertos-kernel.config=n')
+
+        if self.board == NxpBoard.MCXW72:
+            flags.append('-Dcore_id=cm33_core0')
 
         build_flags = " ".join(flags)
 
@@ -376,7 +401,8 @@ class NxpBuilder(GnBuilder):
             "br" if self.enable_wifi and self.enable_thread else None,
             "ota" if self.enable_ota else None,
             "fdata" if self.enable_factory_data else None,
-            "onnetwork" if self.disable_ble else None
+            "onnetwork" if self.disable_ble else None,
+            "low_power" if self.low_power else None
         ]
 
         prj_file = "_".join(filter(None, components)) + ".conf"

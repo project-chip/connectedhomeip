@@ -23,8 +23,13 @@
 
 using namespace ::chip;
 
-void DiscoverCommissionablesCommandBase::OnDiscoveredDevice(const chip::Dnssd::CommissionNodeData & nodeData)
+void DiscoverCommissionablesCommandBase::OnDiscoveredDevice(const Dnssd::CommissionNodeData & nodeData)
 {
+    if (mCommissioningMode.HasValue() && nodeData.commissioningMode != mCommissioningMode.Value())
+    {
+        return; // Skip nodes that do not match the commissioning mode filter.
+    }
+
     nodeData.LogDetail();
     LogErrorOnFailure(RemoteDataModelLogger::LogDiscoveredNodeData(nodeData));
 

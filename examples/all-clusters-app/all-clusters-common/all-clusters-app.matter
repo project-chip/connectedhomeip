@@ -245,8 +245,8 @@ enum ThreeLevelAutoEnum : enum8 {
 }
 
 enum WebRTCEndReasonEnum : enum8 {
-  kIceFailed = 0;
-  kIceTimeout = 1;
+  kICEFailed = 0;
+  kICETimeout = 1;
   kUserHangup = 2;
   kUserBusy = 3;
   kReplaced = 4;
@@ -256,7 +256,8 @@ enum WebRTCEndReasonEnum : enum8 {
   kOutOfResources = 8;
   kMediaTimeout = 9;
   kLowPower = 10;
-  kUnknownReason = 11;
+  kPrivacyMode = 11;
+  kUnknownReason = 12;
 }
 
 bitmap TestGlobalBitmap : bitmap32 {
@@ -343,7 +344,7 @@ fabric_scoped struct WebRTCSessionStruct {
   StreamUsageEnum streamUsage = 3;
   nullable int16u videoStreamID = 4;
   nullable int16u audioStreamID = 5;
-  optional boolean metadataEnabled = 6;
+  boolean metadataEnabled = 6;
   fabric_idx fabricIndex = 254;
 }
 
@@ -537,9 +538,9 @@ cluster OnOff = 6 {
   command Toggle(): DefaultSuccess = 2;
   /** The OffWithEffect command allows devices to be turned off using enhanced ways of fading. */
   command OffWithEffect(OffWithEffectRequest): DefaultSuccess = 64;
-  /** The OnWithRecallGlobalScene command allows the recall of the settings when the device was turned off. */
+  /** This command allows the recall of the settings when the device was turned off. */
   command OnWithRecallGlobalScene(): DefaultSuccess = 65;
-  /** The OnWithTimedOff command allows devices to be turned on for a specific duration with a guarded off duration so that SHOULD the device be subsequently switched off, further OnWithTimedOff commands, received during this time, are prevented from turning the devices back on. */
+  /** This command allows devices to be turned on for a specific duration with a guarded off duration so that SHOULD the device be subsequently turned off, further OnWithTimedOff commands, received during this time, are prevented from turning the devices back on. */
   command OnWithTimedOff(OnWithTimedOffRequest): DefaultSuccess = 66;
 }
 
@@ -608,9 +609,9 @@ cluster OnOff = 6 {
   command Toggle(): DefaultSuccess = 2;
   /** The OffWithEffect command allows devices to be turned off using enhanced ways of fading. */
   command OffWithEffect(OffWithEffectRequest): DefaultSuccess = 64;
-  /** The OnWithRecallGlobalScene command allows the recall of the settings when the device was turned off. */
+  /** This command allows the recall of the settings when the device was turned off. */
   command OnWithRecallGlobalScene(): DefaultSuccess = 65;
-  /** The OnWithTimedOff command allows devices to be turned on for a specific duration with a guarded off duration so that SHOULD the device be subsequently switched off, further OnWithTimedOff commands, received during this time, are prevented from turning the devices back on. */
+  /** This command allows devices to be turned on for a specific duration with a guarded off duration so that SHOULD the device be subsequently turned off, further OnWithTimedOff commands, received during this time, are prevented from turning the devices back on. */
   command OnWithTimedOff(OnWithTimedOffRequest): DefaultSuccess = 66;
 }
 
@@ -4738,6 +4739,7 @@ cluster Thermostat = 513 {
     kMatterScheduleConfiguration = 0x80;
     kPresets = 0x100;
     kEvents = 0x200;
+    kThermostatSuggestions = 0x400;
   }
 
   bitmap HVACSystemTypeBitmap : bitmap8 {
@@ -4809,6 +4811,7 @@ cluster Thermostat = 513 {
     kVacationMode = 0x10;
     kTimeOfUseCostSavings = 0x20;
     kPreCoolingOrPreHeating = 0x40;
+    kConflictingSuggestions = 0x80;
   }
 
   struct ScheduleTransitionStruct {
@@ -5274,17 +5277,17 @@ cluster ColorControl = 768 {
   readonly attribute optional int16u primary6X = 40;
   readonly attribute optional int16u primary6Y = 41;
   readonly attribute optional nullable int8u primary6Intensity = 42;
-  attribute access(write: manage) optional int16u whitePointX = 48;
-  attribute access(write: manage) optional int16u whitePointY = 49;
-  attribute access(write: manage) optional int16u colorPointRX = 50;
-  attribute access(write: manage) optional int16u colorPointRY = 51;
-  attribute access(write: manage) optional nullable int8u colorPointRIntensity = 52;
-  attribute access(write: manage) optional int16u colorPointGX = 54;
-  attribute access(write: manage) optional int16u colorPointGY = 55;
-  attribute access(write: manage) optional nullable int8u colorPointGIntensity = 56;
-  attribute access(write: manage) optional int16u colorPointBX = 58;
-  attribute access(write: manage) optional int16u colorPointBY = 59;
-  attribute access(write: manage) optional nullable int8u colorPointBIntensity = 60;
+  readonly attribute optional int16u whitePointX = 48;
+  readonly attribute optional int16u whitePointY = 49;
+  readonly attribute optional int16u colorPointRX = 50;
+  readonly attribute optional int16u colorPointRY = 51;
+  readonly attribute optional nullable int8u colorPointRIntensity = 52;
+  readonly attribute optional int16u colorPointGX = 54;
+  readonly attribute optional int16u colorPointGY = 55;
+  readonly attribute optional nullable int8u colorPointGIntensity = 56;
+  readonly attribute optional int16u colorPointBX = 58;
+  readonly attribute optional int16u colorPointBY = 59;
+  readonly attribute optional nullable int8u colorPointBIntensity = 60;
   readonly attribute optional int16u enhancedCurrentHue = 16384;
   readonly attribute EnhancedColorModeEnum enhancedColorMode = 16385;
   readonly attribute optional int8u colorLoopActive = 16386;
@@ -6339,11 +6342,10 @@ provisional cluster CameraAvStreamManagement = 1361 {
     VideoResolutionStruct maxResolution = 6;
     int32u minBitRate = 7;
     int32u maxBitRate = 8;
-    int16u minKeyFrameInterval = 9;
-    int16u maxKeyFrameInterval = 10;
-    optional boolean watermarkEnabled = 11;
-    optional boolean OSDEnabled = 12;
-    int8u referenceCount = 13;
+    int16u keyFrameInterval = 9;
+    optional boolean watermarkEnabled = 10;
+    optional boolean OSDEnabled = 11;
+    int8u referenceCount = 12;
   }
 
   struct SnapshotStreamStruct {
@@ -6403,7 +6405,7 @@ provisional cluster CameraAvStreamManagement = 1361 {
   readonly attribute optional int32u maxEncodedPixelRate = 1;
   readonly attribute optional VideoSensorParamsStruct videoSensorParams = 2;
   readonly attribute optional boolean nightVisionUsesInfrared = 3;
-  readonly attribute optional VideoResolutionStruct minViewport = 4;
+  readonly attribute optional VideoResolutionStruct minViewportResolution = 4;
   readonly attribute optional RateDistortionTradeOffPointsStruct rateDistortionTradeOffPoints[] = 5;
   readonly attribute int32u maxContentBufferSize = 6;
   readonly attribute optional AudioCapabilitiesStruct microphoneCapabilities = 7;
@@ -6472,10 +6474,9 @@ provisional cluster CameraAvStreamManagement = 1361 {
     VideoResolutionStruct maxResolution = 5;
     int32u minBitRate = 6;
     int32u maxBitRate = 7;
-    int16u minKeyFrameInterval = 8;
-    int16u maxKeyFrameInterval = 9;
-    optional boolean watermarkEnabled = 10;
-    optional boolean OSDEnabled = 11;
+    int16u keyFrameInterval = 8;
+    optional boolean watermarkEnabled = 9;
+    optional boolean OSDEnabled = 10;
   }
 
   response struct VideoStreamAllocateResponse = 4 {
@@ -6557,6 +6558,11 @@ provisional cluster CameraAvStreamManagement = 1361 {
 provisional cluster CameraAvSettingsUserLevelManagement = 1362 {
   revision 1;
 
+  enum PhysicalMovementEnum : enum8 {
+    kIdle = 0;
+    kMoving = 1;
+  }
+
   bitmap Feature : bitmap32 {
     kDigitalPTZ = 0x1;
     kMechanicalPan = 0x2;
@@ -6591,6 +6597,7 @@ provisional cluster CameraAvSettingsUserLevelManagement = 1362 {
   readonly attribute optional int16s tiltMax = 6;
   readonly attribute optional int16s panMin = 7;
   readonly attribute optional int16s panMax = 8;
+  readonly attribute optional PhysicalMovementEnum movementState = 9;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute attrib_id attributeList[] = 65531;
@@ -6634,7 +6641,7 @@ provisional cluster CameraAvSettingsUserLevelManagement = 1362 {
     optional int8s zoomDelta = 3;
   }
 
-  /** This command SHALL set the values for the pan, tilt, and zoom in the mechanical PTZ. */
+  /** This command SHALL move the camera to the provided values for pan, tilt, and zoom in the mechanical PTZ. */
   command MPTZSetPosition(MPTZSetPositionRequest): DefaultSuccess = 0;
   /** This command SHALL move the camera by the delta values relative to the currently defined position. */
   command MPTZRelativeMove(MPTZRelativeMoveRequest): DefaultSuccess = 1;
@@ -6654,6 +6661,12 @@ provisional cluster CameraAvSettingsUserLevelManagement = 1362 {
 provisional cluster PushAvStreamTransport = 1365 {
   revision 1;
 
+  enum CMAFInterfaceEnum : enum8 {
+    kInterface1 = 0;
+    kInterface2DASH = 1;
+    kInterface2HLS = 2;
+  }
+
   enum ContainerFormatEnum : enum8 {
     kCMAF = 0 [spec_name = "CMAF"];
   }
@@ -6670,6 +6683,8 @@ provisional cluster PushAvStreamTransport = 1365 {
     kInvalidCombination = 6;
     kInvalidTriggerType = 7;
     kInvalidTransportStatus = 8;
+    kInvalidOptions = 9;
+    kInvalidStreamUsage = 10;
   }
 
   enum TransportStatusEnum : enum8 {
@@ -6715,10 +6730,14 @@ provisional cluster PushAvStreamTransport = 1365 {
   }
 
   struct CMAFContainerOptionsStruct {
-    int16u chunkDuration = 0;
-    optional octet_string<16> CENCKey = 1;
-    optional boolean metadataEnabled = 2;
-    optional octet_string<16> CENCKeyID = 3;
+    CMAFInterfaceEnum CMAFInterface = 0;
+    int16u segmentDuration = 1;
+    int16u chunkDuration = 2;
+    int8u sessionGroup = 3;
+    char_string<16> trackName = 4;
+    optional octet_string<16> CENCKey = 5;
+    optional octet_string<16> CENCKeyID = 6;
+    optional boolean metadataEnabled = 7;
   }
 
   struct ContainerOptionsStruct {
@@ -6796,10 +6815,11 @@ provisional cluster PushAvStreamTransport = 1365 {
     int16u connectionID = 0;
     TriggerActivationReasonEnum activationReason = 1;
     optional TransportMotionTriggerTimeControlStruct timeControl = 2;
+    optional long_octet_string<256> userDefined = 3;
   }
 
   request struct FindTransportRequest {
-    optional nullable int16u connectionID = 0;
+    nullable int16u connectionID = 0;
   }
 
   response struct FindTransportResponse = 7 {
@@ -6839,6 +6859,120 @@ provisional cluster Chime = 1366 {
   readonly attribute int16u clusterRevision = 65533;
 
   command PlayChimeSound(): DefaultSuccess = 0;
+}
+
+/** This Cluster is used to manage TLS Client Certificates and to provision
+      TLS endpoints with enough information to facilitate subsequent connection. */
+provisional cluster TlsCertificateManagement = 2049 {
+  revision 1;
+
+  fabric_scoped struct TLSCertStruct {
+    int16u caid = 0;
+    optional long_octet_string<3000> certificate = 1;
+    fabric_idx fabricIndex = 254;
+  }
+
+  fabric_scoped struct TLSClientCertificateDetailStruct {
+    int16u ccdid = 0;
+    optional nullable long_octet_string<3000> clientCertificate = 1;
+    optional octet_string intermediateCertificates[] = 2;
+    fabric_idx fabricIndex = 254;
+  }
+
+  readonly attribute int8u maxRootCertificates = 0;
+  readonly attribute TLSCertStruct provisionedRootCertificates[] = 1;
+  readonly attribute int8u maxClientCertificates = 2;
+  readonly attribute TLSClientCertificateDetailStruct provisionedClientCertificates[] = 3;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
+
+  request struct ProvisionRootCertificateRequest {
+    long_octet_string<3000> certificate = 0;
+    nullable int16u caid = 1;
+  }
+
+  response struct ProvisionRootCertificateResponse = 1 {
+    int16u caid = 0;
+  }
+
+  request struct FindRootCertificateRequest {
+    nullable int16u caid = 0;
+  }
+
+  response struct FindRootCertificateResponse = 3 {
+    TLSCertStruct certificateDetails[] = 0;
+  }
+
+  request struct LookupRootCertificateRequest {
+    octet_string<64> fingerprint = 0;
+  }
+
+  response struct LookupRootCertificateResponse = 5 {
+    int16u caid = 0;
+  }
+
+  request struct RemoveRootCertificateRequest {
+    int16u caid = 0;
+  }
+
+  request struct ClientCSRRequest {
+    octet_string<32> nonce = 0;
+    nullable int16u ccdid = 1;
+  }
+
+  response struct ClientCSRResponse = 8 {
+    int16u ccdid = 0;
+    long_octet_string<3000> csr = 1;
+    octet_string<128> nonceSignature = 2;
+  }
+
+  request struct ProvisionClientCertificateRequest {
+    int16u ccdid = 0;
+    long_octet_string<3000> clientCertificate = 1;
+    octet_string intermediateCertificates[] = 2;
+  }
+
+  request struct FindClientCertificateRequest {
+    nullable int16u ccdid = 0;
+  }
+
+  response struct FindClientCertificateResponse = 11 {
+    TLSClientCertificateDetailStruct certificateDetails[] = 0;
+  }
+
+  request struct LookupClientCertificateRequest {
+    octet_string<64> fingerprint = 0;
+  }
+
+  response struct LookupClientCertificateResponse = 13 {
+    int16u ccdid = 0;
+  }
+
+  request struct RemoveClientCertificateRequest {
+    int16u ccdid = 0;
+  }
+
+  /** This command SHALL provision a newly provided certificate, or rotate an existing one, based on the contents of the CAID field. */
+  fabric command access(invoke: administer) ProvisionRootCertificate(ProvisionRootCertificateRequest): ProvisionRootCertificateResponse = 0;
+  /** This command SHALL return the specified TLS root certificate, or all provisioned TLS root certificates for the accessing fabric, based on the contents of the CAID field. */
+  fabric command FindRootCertificate(FindRootCertificateRequest): FindRootCertificateResponse = 2;
+  /** This command SHALL return the CAID for the passed in fingerprint. */
+  fabric command LookupRootCertificate(LookupRootCertificateRequest): LookupRootCertificateResponse = 4;
+  /** This command SHALL be generated to request the server removes the certificate provisioned to the provided Certificate Authority ID. */
+  fabric command access(invoke: administer) RemoveRootCertificate(RemoveRootCertificateRequest): DefaultSuccess = 6;
+  /** This command SHALL be generated to request the Node generates a certificate signing request for a new TLS key pair or use an existing CCDID for certificate rotation. */
+  fabric command access(invoke: administer) ClientCSR(ClientCSRRequest): ClientCSRResponse = 7;
+  /** This command SHALL be generated to request the Node provisions newly provided Client Certificate Details, or rotate an existing client certificate. */
+  fabric command access(invoke: administer) ProvisionClientCertificate(ProvisionClientCertificateRequest): DefaultSuccess = 9;
+  /** This command SHALL return the TLSClientCertificateDetailStruct for the passed in CCDID, or all TLS client certificates for the accessing fabric, based on the contents of the CCDID field. */
+  fabric command FindClientCertificate(FindClientCertificateRequest): FindClientCertificateResponse = 10;
+  /** This command SHALL return the CCDID for the passed in Fingerprint. */
+  fabric command LookupClientCertificate(LookupClientCertificateRequest): LookupClientCertificateResponse = 12;
+  /** This command SHALL be used to request the Node removes all stored information for the provided CCDID. */
+  fabric command access(invoke: administer) RemoveClientCertificate(RemoveClientCertificateRequest): DefaultSuccess = 14;
 }
 
 /** This Cluster is used to provision TLS Endpoints with enough information to facilitate subsequent connection. */
@@ -7119,7 +7253,7 @@ internal cluster UnitTesting = 4294048773 {
   attribute nullable int8s nullableRangeRestrictedInt8s = 16423;
   attribute nullable int16u nullableRangeRestrictedInt16u = 16424;
   attribute nullable int16s nullableRangeRestrictedInt16s = 16425;
-  attribute optional int8u writeOnlyInt8u = 16426;
+  writeonly attribute optional int8u writeOnlyInt8u = 16426;
   attribute nullable TestGlobalEnum nullableGlobalEnum = 16435;
   attribute nullable TestGlobalStruct nullableGlobalStruct = 16436;
   readonly attribute command_id generatedCommandList[] = 65528;
@@ -7504,8 +7638,8 @@ endpoint 0 {
 
   server cluster Binding {
     callback attribute binding;
-    ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 1;
+    callback attribute featureMap;
+    callback attribute clusterRevision;
   }
 
   server cluster AccessControl {
@@ -7532,7 +7666,7 @@ endpoint 0 {
     callback attribute vendorID;
     callback attribute productName;
     callback attribute productID;
-    persist  attribute nodeLabel;
+    callback attribute nodeLabel;
     callback attribute location;
     callback attribute hardwareVersion;
     callback attribute hardwareVersionString;
@@ -7543,18 +7677,18 @@ endpoint 0 {
     callback attribute productURL;
     callback attribute productLabel;
     callback attribute serialNumber;
-    persist  attribute localConfigDisabled default = 0;
+    callback attribute localConfigDisabled;
     callback attribute uniqueID;
     callback attribute capabilityMinima;
     callback attribute productAppearance;
     callback attribute specificationVersion;
     callback attribute maxPathsPerInvoke;
-    ram      attribute configurationVersion default = 1;
+    callback attribute configurationVersion;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 5;
+    callback attribute featureMap;
+    callback attribute clusterRevision;
   }
 
   server cluster OtaSoftwareUpdateRequestor {
@@ -7810,7 +7944,7 @@ endpoint 0 {
     callback attribute currentMaxRate;
     callback attribute overrunCount;
     ram      attribute featureMap default = 3;
-    ram      attribute clusterRevision default = 1;
+    callback attribute clusterRevision default = 1;
 
     handle command ResetCounts;
   }
@@ -7826,7 +7960,7 @@ endpoint 0 {
     callback attribute carrierDetect;
     callback attribute timeSinceReset;
     ram      attribute featureMap default = 3;
-    ram      attribute clusterRevision default = 1;
+    callback attribute clusterRevision;
 
     handle command ResetCounts;
   }
@@ -7929,8 +8063,8 @@ endpoint 0 {
 
   server cluster FixedLabel {
     callback attribute labelList;
-    ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 1;
+    callback attribute featureMap;
+    callback attribute clusterRevision;
   }
 
   server cluster UserLabel {
@@ -8060,8 +8194,8 @@ endpoint 1 {
 
   server cluster Binding {
     callback attribute binding;
-    ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 1;
+    callback attribute featureMap;
+    callback attribute clusterRevision;
   }
 
   server cluster Actions {
@@ -8111,8 +8245,8 @@ endpoint 1 {
 
   server cluster FixedLabel {
     callback attribute labelList;
-    ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 1;
+    callback attribute featureMap;
+    callback attribute clusterRevision;
   }
 
   server cluster UserLabel {
@@ -8122,9 +8256,9 @@ endpoint 1 {
   }
 
   server cluster BooleanState {
-    ram      attribute stateValue default = 0;
-    ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 1;
+    callback attribute stateValue;
+    callback attribute featureMap;
+    callback attribute clusterRevision;
   }
 
   server cluster OvenCavityOperationalState {
@@ -8765,8 +8899,8 @@ endpoint 1 {
 
   server cluster PressureMeasurement {
     ram      attribute measuredValue default = 0x0000;
-    ram      attribute minMeasuredValue;
-    ram      attribute maxMeasuredValue;
+    ram      attribute minMeasuredValue default = 0;
+    ram      attribute maxMeasuredValue default = 32767;
     ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 3;
   }
@@ -8996,7 +9130,7 @@ endpoint 1 {
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 0;
+    callback attribute featureMap;
     callback attribute clusterRevision;
   }
 
@@ -9018,7 +9152,7 @@ endpoint 1 {
     callback attribute maxEncodedPixelRate;
     callback attribute videoSensorParams;
     callback attribute nightVisionUsesInfrared;
-    callback attribute minViewport;
+    callback attribute minViewportResolution;
     callback attribute rateDistortionTradeOffPoints;
     callback attribute maxContentBufferSize;
     callback attribute microphoneCapabilities;
@@ -9079,6 +9213,7 @@ endpoint 1 {
     ram      attribute tiltMax default = 90;
     ram      attribute panMin default = -180;
     ram      attribute panMax default = 180;
+    ram      attribute movementState;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
@@ -9126,6 +9261,34 @@ endpoint 1 {
     ram      attribute clusterRevision default = 1;
 
     handle command PlayChimeSound;
+  }
+
+  server cluster TlsCertificateManagement {
+    callback attribute maxRootCertificates;
+    callback attribute provisionedRootCertificates;
+    callback attribute maxClientCertificates;
+    callback attribute provisionedClientCertificates;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute attributeList;
+    ram      attribute featureMap default = 0;
+    callback attribute clusterRevision;
+
+    handle command ProvisionRootCertificate;
+    handle command ProvisionRootCertificateResponse;
+    handle command FindRootCertificate;
+    handle command FindRootCertificateResponse;
+    handle command LookupRootCertificate;
+    handle command LookupRootCertificateResponse;
+    handle command RemoveRootCertificate;
+    handle command ClientCSR;
+    handle command ClientCSRResponse;
+    handle command ProvisionClientCertificate;
+    handle command FindClientCertificate;
+    handle command FindClientCertificateResponse;
+    handle command LookupClientCertificate;
+    handle command LookupClientCertificateResponse;
+    handle command RemoveClientCertificate;
   }
 
   server cluster TlsClientManagement {

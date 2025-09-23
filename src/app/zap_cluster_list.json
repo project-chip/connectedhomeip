@@ -42,6 +42,7 @@
         "DISHWASHER_ALARM_CLUSTER": [],
         "DISHWASHER_MODE_CLUSTER": [],
         "ELECTRICAL_GRID_CONDITIONS_CLUSTER": [],
+        "GROUPCAST_CLUSTER": [],
         "METER_IDENTIFICATION_CLUSTER": [],
         "MICROWAVE_OVEN_MODE_CLUSTER": [],
         "DOOR_LOCK_CLUSTER": [],
@@ -173,7 +174,7 @@
         "BALLAST_CONFIGURATION_CLUSTER": [],
         "BASIC_INFORMATION_CLUSTER": ["basic-information"],
         "BINDING_CLUSTER": ["bindings"],
-        "BOOLEAN_STATE_CLUSTER": [],
+        "BOOLEAN_STATE_CLUSTER": ["boolean-state-server"],
         "BOOLEAN_STATE_CONFIGURATION_CLUSTER": [
             "boolean-state-configuration-server"
         ],
@@ -215,6 +216,7 @@
         "ELECTRICAL_GRID_CONDITIONS_CLUSTER": [
             "electrical-grid-conditions-server"
         ],
+        "GROUPCAST_CLUSTER": [],
         "METER_IDENTIFICATION_CLUSTER": ["meter-identification-server"],
         "MICROWAVE_OVEN_MODE_CLUSTER": ["mode-base-server"],
         "DOOR_LOCK_CLUSTER": ["door-lock-server"],
@@ -340,7 +342,9 @@
         "TIME_FORMAT_LOCALIZATION_CLUSTER": ["time-format-localization-server"],
         "TIME_SYNCHRONIZATION_CLUSTER": ["time-synchronization-server"],
         "TIMER_CLUSTER": ["timer-server"],
-        "TLS_CERTIFICATE_MANAGEMENT_CLUSTER": [],
+        "TLS_CERTIFICATE_MANAGEMENT_CLUSTER": [
+            "tls-certificate-management-server"
+        ],
         "TLS_CLIENT_MANAGEMENT_CLUSTER": ["tls-client-management-server"],
         "TVOC_CONCENTRATION_MEASUREMENT_CLUSTER": [
             "concentration-measurement-server"
@@ -366,6 +370,6 @@
         "WATER_HEATER_MANAGEMENT_CLUSTER": ["water-heater-management-server"],
         "WATER_HEATER_MODE_CLUSTER": ["mode-base-server"],
         "WI_FI_NETWORK_DIAGNOSTICS_CLUSTER": [],
-        "ZONE_MANAGEMENT_CLUSTER": []
+        "ZONE_MANAGEMENT_CLUSTER": ["zone-management-server"]
     }
 }

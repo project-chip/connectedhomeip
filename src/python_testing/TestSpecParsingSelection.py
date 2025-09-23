@@ -14,14 +14,15 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 #
-import chip.clusters as Clusters
-from chip.testing.conformance import ConformanceDecision, ConformanceException
-from chip.testing.global_attribute_ids import is_standard_attribute_id
-from chip.testing.matter_testing import MatterBaseTest, default_matter_test_main
-from chip.testing.spec_parsing import PrebuiltDataModelDirectory, build_xml_clusters, dm_from_spec_version
-from chip.tlv import uint
 from mobly import asserts, signals
 from TC_DeviceConformance import DeviceConformanceTests
+
+import matter.clusters as Clusters
+from matter.testing.conformance import ConformanceDecision, ConformanceException
+from matter.testing.global_attribute_ids import is_standard_attribute_id
+from matter.testing.matter_testing import MatterBaseTest, default_matter_test_main
+from matter.testing.spec_parsing import PrebuiltDataModelDirectory, build_xml_clusters, dm_from_spec_version
+from matter.tlv import uint
 
 
 class TestSpecParsingSelection(MatterBaseTest, DeviceConformanceTests):
@@ -45,6 +46,8 @@ class TestSpecParsingSelection(MatterBaseTest, DeviceConformanceTests):
                              "Incorrect directory selected for 1.4.1")
         asserts.assert_equal(dm_from_spec_version(0x01040200), PrebuiltDataModelDirectory.k1_4_2,
                              "Incorrect directory selected for 1.4.2")
+        asserts.assert_equal(dm_from_spec_version(0x01050000), PrebuiltDataModelDirectory.k1_5,
+                             "Incorrect directory selected for 1.5")
 
         # 1.2 doesn't include a specification revision field, so this should error
         with asserts.assert_raises(ConformanceException, "Expected assertion was not raised for spec version 1.2"):
@@ -160,7 +163,13 @@ class TestSpecParsingSelection(MatterBaseTest, DeviceConformanceTests):
         # 1.4.2 is OK if TC is off
         self._run_conformance_against_device(spec_version=0x01040200, tc_enabled=False,
                                              expect_success_conformance=True, expect_success_revisions=True)
+        # 1.5 is OK if TC is off
+        self._run_conformance_against_device(spec_version=0x01050000, tc_enabled=False,
+                                             expect_success_conformance=True, expect_success_revisions=True)
 
+        # 1.5 is OK if TC is on
+        self._run_conformance_against_device(spec_version=0x01050000, tc_enabled=True,
+                                             expect_success_conformance=True, expect_success_revisions=True)
         # 1.4.2 is OK if TC is on
         self._run_conformance_against_device(spec_version=0x01040200, tc_enabled=True,
                                              expect_success_conformance=True, expect_success_revisions=True)

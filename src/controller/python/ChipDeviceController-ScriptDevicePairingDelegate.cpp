@@ -20,7 +20,7 @@
 #include "ChipDeviceController-ScriptDevicePairingDelegate.h"
 #include "lib/support/TypeTraits.h"
 #include <app/icd/client/DefaultICDClientStorage.h>
-#include <controller/python/chip/native/PyChipError.h>
+#include <controller/python/matter/native/PyChipError.h>
 #include <setup_payload/ManualSetupPayloadGenerator.h>
 #include <setup_payload/QRCodeSetupPayloadGenerator.h>
 

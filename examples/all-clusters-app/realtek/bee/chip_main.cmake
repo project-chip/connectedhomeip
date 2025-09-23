@@ -30,7 +30,7 @@ pw_set_backend(pw_trace pw_trace_tokenized)
 
 add_subdirectory(${chip_dir}/third_party/pigweed/repo ${chip_dir}/examples/all-clusters-app/realtek/bee/out/pigweed)
 add_subdirectory(${chip_dir}/third_party/nanopb/repo ${chip_dir}/examples/all-clusters-app/realtek/bee/out/nanopb)
-add_subdirectory(${chip_dir}/examples/platform/realtek/bee/pw_sys_io ${chip_dir}/examples/all-clusters-app/realtek/bee/out/pw_sys_io)
+add_subdirectory(${chip_dir}/examples/platform/realtek/pw_sys_io ${chip_dir}/examples/all-clusters-app/realtek/out/pw_sys_io)
 
 pw_proto_library(attributes_service
   SOURCES
@@ -121,7 +121,7 @@ if (matter_enable_shell)
 list(
     APPEND ${list_chip_main_sources}
     #shell
-    ${chip_dir}/examples/platform/realtek/bee/shell/launch_shell.cpp
+    ${chip_dir}/examples/platform/realtek/shell/launch_shell.cpp
 )
 endif (matter_enable_shell)
 
@@ -129,8 +129,8 @@ if (matter_enable_rpc)
 list(
     APPEND ${list_chip_main_sources}
     #rpc
-    ${chip_dir}/examples/platform/realtek/bee/PigweedLogger.cpp
-    ${chip_dir}/examples/platform/realtek/bee/Rpc.cpp
+    ${chip_dir}/examples/platform/realtek/PigweedLogger.cpp
+    ${chip_dir}/examples/platform/realtek/Rpc.cpp
     ${chip_dir}/examples/common/pigweed/RpcService.cpp
     ${chip_dir}/examples/common/pigweed/PigweedLoggerMutex.cpp
 )
@@ -145,7 +145,7 @@ list(
     ${chip_dir}/src/app/clusters/ota-requestor/DefaultOTARequestorDriver.cpp
     ${chip_dir}/src/app/clusters/ota-requestor/DefaultOTARequestorStorage.cpp
     ${chip_dir}/src/app/clusters/ota-requestor/ota-requestor-server.cpp
-    ${chip_dir}/examples/platform/realtek/bee/ota/OTAInitializer.cpp
+    ${chip_dir}/examples/platform/realtek/ota/OTAInitializer.cpp
 )
 endif (matter_enable_ota_requestor)
 
@@ -179,7 +179,7 @@ list(
     ${chip_dir}/examples/all-clusters-app/realtek/bee/main/DeviceCallbacks.cpp
     ${chip_dir}/examples/all-clusters-app/realtek/bee/main/CHIPDeviceManager.cpp
     ${chip_dir}/examples/all-clusters-app/realtek/bee/main/Globals.cpp 
-    ${chip_dir}/examples/platform/realtek/bee/util/LEDWidget.cpp
+    ${chip_dir}/examples/platform/realtek/util/LEDWidget.cpp
     ${chip_dir}/examples/providers/DeviceInfoProviderImpl.cpp
 )
 
@@ -198,8 +198,8 @@ target_include_directories(
     ${chip_main}
     PUBLIC
     #rpc
-    ${chip_dir}/examples/platform/realtek/bee
-    ${chip_dir}/examples/platform/realtek/bee/pw_sys_io/public
+    ${chip_dir}/examples/platform/realtek
+    ${chip_dir}/examples/platform/realtek/pw_sys_io/public
     ${chip_dir}/examples/common
     ${chip_dir}/examples/common/pigweed
     ${chip_dir}/examples/common/pigweed/realtek/bee
@@ -221,7 +221,7 @@ target_include_directories(
     ${chip_dir}/examples/all-clusters-app/all-clusters-common/include
     ${chip_dir}/examples/microwave-oven-app/microwave-oven-common
     ${chip_dir}/examples/microwave-oven-app/microwave-oven-common/include
-    ${chip_dir}/examples/platform/realtek/bee
+    ${chip_dir}/examples/platform/realtek
     ${chip_dir}/examples/providers
     ${chip_dir_output}/gen/include
     ${chip_dir}/src/include/
@@ -268,14 +268,6 @@ list(
     -DCHIP_PROJECT=1
     -DCHIP_HAVE_CONFIG_H
 )
-
-if (matter_dac_key_encryption)
-list(
-    APPEND chip_main_flags 
-    
-    -DCONFIG_DAC_KEY_ENC=1
-)
-endif (matter_dac_key_encryption)
 
 if (matter_enable_persistentstorage_audit)
 list(

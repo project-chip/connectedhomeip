@@ -36,7 +36,6 @@ else
     PW_PATH="$PW_ENVIRONMENT_ROOT/cipd/packages/pigweed"
 fi
 
-set -x
 env
 USE_WIFI=false
 USE_DOCKER=false
@@ -44,6 +43,7 @@ USE_GIT_SHA_FOR_VERSION=true
 GN_PATH="$PW_PATH/gn"
 USE_BOOTLOADER=false
 DOTFILE=".gn"
+VERBOSE_MODE=false
 
 SILABS_THREAD_TARGET=\""../silabs:ot-efr32-cert"\"
 USAGE="./scripts/examples/gn_silabs_example.sh <AppRootFolder> <outputFolder> <silabs_board_name> [<Build options>]"
@@ -159,6 +159,8 @@ if [ "$#" == "0" ]; then
             Generate files with SLC for current board and options Requires an SLC-CLI installation or running in Docker.
         --slc_reuse_files
             Use generated files without running slc again.
+        --verbose
+            Add additional logs.
         --bootloader
             Add bootloader to the generated image.
 
@@ -242,7 +244,7 @@ else
             #    shift
             #    ;;
             --release)
-                optArgs+="is_debug=false disable_lcd=true chip_build_libshell=false enable_openthread_cli=false use_external_flash=false chip_logging=false silabs_log_enabled=false "
+                optArgs+="is_debug=false disable_lcd=true chip_build_libshell=false enable_openthread_cli=false use_external_flash=false chip_logging=false silabs_log_enabled=false sl_uart_log_output=false "
                 shift
                 ;;
             --bootloader)
@@ -271,6 +273,11 @@ else
                 ;;
             --slc_reuse_files)
                 optArgs+="slc_reuse_files=true "
+                shift
+                ;;
+            --verbose)
+                optArgs+="sl_verbose_mode=true "
+                VERBOSE_MODE=true
                 shift
                 ;;
             --gn_path)
@@ -306,7 +313,8 @@ else
     fi
 
     # 917 exception. TODO find a more generic way
-    if [ "$SILABS_BOARD" == "BRD4338A" ] || [ "$SILABS_BOARD" == "BRD2605A" ] || [ "$SILABS_BOARD" == "BRD4343A" ] || [ "$SILABS_BOARD" == "BRD4342A" ]; then
+    WIFI_SOC_BOARDS=("BRD4338A" "BRD2605A" "BRD4343A" "BRD4342A" "BRD2708A" "BRD2911A")
+    if [[ " ${WIFI_SOC_BOARDS[@]} " =~ " ${SILABS_BOARD} " ]]; then
         echo "Compiling for 917 WiFi SOC"
         USE_WIFI=true
     fi
@@ -345,8 +353,17 @@ else
     "$GN_PATH" gen --check --script-executable="$PYTHON_PATH" --fail-on-unused-args --add-export-compile-commands=* --root="$ROOT" --dotfile="$DOTFILE" --args="silabs_board=\"$SILABS_BOARD\" $optArgs" "$BUILD_DIR"
 
     ninja -C "$BUILD_DIR"/
+
     #print stats
     arm-none-eabi-size -A "$BUILD_DIR"/*.out
+
+    if [ "$VERBOSE_MODE" == true ]; then
+        echo "================= Warning!!!!! ================"
+        echo "Verbose mode is enabled. BAUDRATE FOR UART LOGS IS SET TO 921600"
+        echo "Use Simplicity Studio or commander with the following command to set the baudrate:"
+        echo "commander vcom config --baudrate 921600 --handshake rtscts"
+        echo "==============================================="
+    fi
 
     # add bootloader to generated image
     if [ "$USE_BOOTLOADER" == true ]; then

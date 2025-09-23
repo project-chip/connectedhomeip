@@ -45,6 +45,7 @@ attribute_with_access: attribute_access? struct_field
 
 attribute: attribute_qualities "attribute"i attribute_with_access ";"
 attribute_quality: "readonly"i -> attr_readonly
+                 | "writeonly"i -> attr_writeonly
                  | "nosubscribe"i -> attr_nosubscribe
                  | "timedwrite"i -> attr_timed
 attribute_qualities: attribute_quality* -> attribute_qualities

@@ -33,92 +33,19 @@
 
 import asyncio.exceptions as ae
 import logging
-from dataclasses import dataclass
 from time import sleep
-from typing import Optional
 
-import chip.clusters as Clusters
-from chip import ChipDeviceCtrl
-from chip.exceptions import ChipStackError
-from chip.interaction_model import InteractionModelError as IME
-from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
-from mdns_discovery import mdns_discovery
 from mobly import asserts
+from support_modules.cadmin_support import CADMINBaseTest
+
+import matter.clusters as Clusters
+from matter import ChipDeviceCtrl
+from matter.exceptions import ChipStackError
+from matter.interaction_model import InteractionModelError as IME
+from matter.testing.matter_testing import TestStep, async_test_body, default_matter_test_main
 
 
-class TC_CADMIN_1_5(MatterBaseTest):
-    @dataclass
-    class ParsedService:
-        service: mdns_discovery.MdnsServiceInfo
-        cm: Optional[int] = None
-        d: Optional[int] = None
-
-        def __post_init__(self):
-            # Safely convert CM value to int if present
-            cm_value = self.service.txt_record.get('CM')
-            if cm_value is not None:
-                try:
-                    self.cm = int(cm_value)
-                except (ValueError, TypeError):
-                    logging.warning(f"Could not convert CM value '{cm_value}' to integer")
-                    self.cm = None
-
-            # Safely convert D value to int if present
-            d_value = self.service.txt_record.get('D')
-            if d_value is not None:
-                try:
-                    self.d = int(d_value)
-                except (ValueError, TypeError):
-                    logging.warning(f"Could not convert discriminator value '{d_value}' to integer")
-                    self.d = None
-
-        def __str__(self) -> str:
-            return f"Service CM={self.cm}, D={self.d}"
-
-        def matches(self, expected_cm: int, expected_d: int) -> bool:
-            """Check if this service matches the expected CM and discriminator values."""
-            cm_match = self.cm == expected_cm
-            d_match = self.d == expected_d
-            return cm_match and d_match
-
-    async def get_all_txt_records(self):
-        discovery = mdns_discovery.MdnsDiscovery(verbose_logging=True)
-        discovery._service_types = [mdns_discovery.MdnsServiceType.COMMISSIONABLE.value]
-        await discovery._discover(discovery_timeout_sec=240, log_output=False)
-
-        if mdns_discovery.MdnsServiceType.COMMISSIONABLE.value in discovery._discovered_services:
-            return discovery._discovered_services[mdns_discovery.MdnsServiceType.COMMISSIONABLE.value]
-        return []
-
-    async def wait_for_correct_cm_value(self, expected_cm_value: int, expected_discriminator: int, max_attempts: int = 5, delay_sec: int = 5):
-        """Wait for the correct CM value and discriminator in DNS-SD with retries."""
-        for attempt in range(max_attempts):
-            raw_services = await self.get_all_txt_records()
-            services = [self.ParsedService(service) for service in raw_services]
-
-            # Look through all services for a match
-            for parsed_service in services:
-                if parsed_service.matches(expected_cm_value, expected_discriminator):
-                    logging.info(f"Found matching service: {parsed_service}")
-                    return parsed_service.service  # Return the original service object
-
-            # Log what we found for debugging purposes
-            logging.info(f"Found {len(services)} services, but none match CM={expected_cm_value}, D={expected_discriminator}")
-            for service in services:
-                logging.info(f"{service}")
-            else:
-                logging.info("No services found in this attempt")
-
-            # Not on last attempt, wait and retry
-            if attempt < max_attempts - 1:
-                logging.info(f"Waiting for service with CM={expected_cm_value} and D={expected_discriminator}, "
-                             f"attempt {attempt+1}/{max_attempts}")
-                sleep(delay_sec)
-            else:
-                # Final retry attempt failed
-                asserts.fail(f"Failed to find DNS-SD advertisement with CM={expected_cm_value} and "
-                             f"discriminator={expected_discriminator} after {max_attempts} attempts. "
-                             f"Found services: {[str(s) for s in services]}")
+class TC_CADMIN_1_5(CADMINBaseTest):
 
     async def commission_on_network(self, setup_code: int, discriminator: int, expected_error: int = 0):
         # This is expected to error as steps 4 and 7 expects timeout issue or pase connection error to occur due to commissioning window being closed already
@@ -197,7 +124,7 @@ class TC_CADMIN_1_5(MatterBaseTest):
             expected_cm_value=2,
             expected_discriminator=params.randomDiscriminator
         )
-        logging.info(f"Successfully found service with CM={service.txt_record.get('CM')}, D={service.txt_record.get('D')}")
+        logging.info(f"Successfully found service with CM={service.txt.get('CM')}, D={service.txt.get('D')}")
         sleep(190)
 
         self.step(4)

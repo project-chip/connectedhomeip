@@ -5,6 +5,7 @@
 #pragma once
 
 #include <app/data-model-provider/MetadataTypes.h>
+#include <array>
 #include <lib/core/DataModelTypes.h>
 
 #include <cstdint>
@@ -19,6 +20,7 @@ namespace LaundryDryerControls {
 inline constexpr uint32_t kRevision = 1;
 
 namespace Attributes {
+
 namespace SupportedDrynessLevels {
 inline constexpr DataModel::AttributeEntry
     kMetadataEntry(SupportedDrynessLevels::Id,
@@ -29,6 +31,11 @@ namespace SelectedDrynessLevel {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(SelectedDrynessLevel::Id, BitFlags<DataModel::AttributeQualityFlags>(),
                                                           Access::Privilege::kView, Access::Privilege::kOperate);
 } // namespace SelectedDrynessLevel
+constexpr std::array<DataModel::AttributeEntry, 2> kMandatoryMetadata = {
+    SupportedDrynessLevels::kMetadataEntry,
+    SelectedDrynessLevel::kMetadataEntry,
+
+};
 
 } // namespace Attributes
 

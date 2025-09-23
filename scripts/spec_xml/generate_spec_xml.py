@@ -25,9 +25,12 @@ from pathlib import Path
 
 import click
 import paths
-from chip.testing.conformance import ConformanceDecision
-from chip.testing.spec_parsing import build_xml_clusters, build_xml_device_types
 from lxml import etree
+
+from matter.testing.conformance import ConformanceDecision
+from matter.testing.spec_parsing import build_xml_clusters, build_xml_device_types
+
+logging.basicConfig(level=logging.DEBUG, format="[%(levelname)s] %(message)s")
 
 # Replace hardcoded paths with dynamic paths using paths.py functions
 DEFAULT_CHIP_ROOT = paths.get_chip_root()
@@ -39,28 +42,23 @@ except ModuleNotFoundError:
 
 
 CURRENT_IN_PROGRESS_DEFINES = [
+    "access-closure",
     "cameras",
     "closures",
-    "device-location",
-    "endpointuniqueid",
-    "energy-drlc",
+    "electrical-grid-conditions",
     "energy-mtrid",
     "energy-price",
     "energy-tariff",
-    "hrap-2",
-    "hrap-tbrd",
-    "hvac-preset-suggestions",
-    "hvac-thermostat-events",
     "irrigation-system",
-    "metering network-recovery",
+    "metering",
     "nfcCommissioning",
-    "paftp",
+    "q-phase-2",
+    "q-phase-3",
     "rvc-direct-mode",
-    "rvc-moreopstates",
-    "rvc-vacthenmop",
+    "rvc-go-home",
     "soil-sensor",
-    "thermostat-controller",
-    "tls",
+    "temperature-sensor-with-screen",
+    "tls"
 ]
 
 
@@ -168,7 +166,7 @@ def scrape_all(scraper, spec_root, output_dir, dry_run, include_in_progress):
     namespace_files = make_asciidoc('pdf-standardnamespaces-book', include_in_progress, spec_root, dry_run)
 
     cluster_files = main_out + cluster_out
-    cmd = [scraper, 'dm', '--dmRoot', output_dir, '--specRoot', spec_root]
+    cmd = [scraper, 'dm', '--dmRoot', output_dir, '--specRoot', spec_root, '--force']
     if include_in_progress == 'All':
         cmd.extend(['-a', 'in-progress'])
     elif include_in_progress == 'Current':

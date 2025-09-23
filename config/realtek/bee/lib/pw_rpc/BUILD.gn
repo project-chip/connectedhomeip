@@ -23,7 +23,7 @@ static_library("pw_rpc") {
   deps = [
     "$dir_pw_rpc:server",
     "$dir_pw_rpc/nanopb:echo_service",
-    "${chip_root}/examples/platform/realtek/bee/pw_sys_io:pw_sys_io_bee",
+    "${chip_root}/examples/platform/realtek/pw_sys_io:pw_sys_io_bee",
     dir_pw_assert,
     dir_pw_hdlc,
     dir_pw_log,
