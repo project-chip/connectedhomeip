@@ -14,6 +14,7 @@
  *    limitations under the License.
  */
 
+#include "time-format-localization-cluster.h"
 #include <app/clusters/time-format-localization-server/time-format-localization-cluster.h>
 #include <app/persistence/AttributePersistence.h>
 #include <app/server-cluster/AttributeListBuilder.h>
@@ -57,7 +58,8 @@ private:
     Iterator * mIterator;
 };
 
-bool IsSupportedCalendarType(TimeFormatLocalization::CalendarTypeEnum reqCalendar)
+bool IsSupportedCalendarType(TimeFormatLocalization::CalendarTypeEnum reqCalendar,
+                             TimeFormatLocalization::CalendarTypeEnum * aValidCalendar = nullptr)
 {
     AutoReleaseIterator it(DeviceLayer::GetDeviceInfoProvider());
     VerifyOrReturnValue(it.IsValid(), false);
@@ -65,6 +67,12 @@ bool IsSupportedCalendarType(TimeFormatLocalization::CalendarTypeEnum reqCalenda
 
     while (it.Next(type))
     {
+        // During the first loop, set some valid calendar value if requested
+        if (aValidCalendar != nullptr)
+        {
+            *aValidCalendar = type;
+            aValidCalendar  = nullptr;
+        }
         if (type == reqCalendar)
         {
             return true;
@@ -96,9 +104,19 @@ TimeFormatLocalizationCluster::TimeFormatLocalizationCluster(EndpointId endpoint
                                                              BitFlags<TimeFormatLocalization::Feature> features,
                                                              TimeFormatLocalization::HourFormatEnum defaultHourFormat,
                                                              TimeFormatLocalization::CalendarTypeEnum defaultCalendarType) :
-    DefaultServerCluster({ endpointId, TimeFormatLocalization::Id }),
-    mFeatures(features), mHourFormat(defaultHourFormat), mCalendarType(defaultCalendarType)
-{}
+    DefaultServerCluster({ endpointId, TimeFormatLocalization::Id }), mFeatures(features), mHourFormat(defaultHourFormat),
+    mCalendarType(defaultCalendarType)
+{
+    TimeFormatLocalization::CalendarTypeEnum validCalendar = defaultCalendarType;
+
+    // Enforce a valid calendar. Historically codegen zap configuration default to 0
+    // which is kBudhist calendar and is not typically supported. In that case
+    // this selects a valid calendar (usually Gregorian).
+    if (!IsSupportedCalendarType(defaultCalendarType, &validCalendar))
+    {
+        mCalendarType = validCalendar;
+    }
+}
 
 CHIP_ERROR TimeFormatLocalizationCluster::Startup(ServerClusterContext & context)
 {
@@ -106,18 +124,18 @@ CHIP_ERROR TimeFormatLocalizationCluster::Startup(ServerClusterContext & context
 
     AttributePersistence attrPersistence{ context.attributeStorage };
 
-    TimeFormatLocalization::CalendarTypeEnum defaultCalendarType = mCalendarType;
+    const TimeFormatLocalization::CalendarTypeEnum defaultCalendarType = mCalendarType;
     if (attrPersistence.LoadNativeEndianValue<TimeFormatLocalization::CalendarTypeEnum>(
             { mPath.mEndpointId, TimeFormatLocalization::Id, TimeFormatLocalization::Attributes::ActiveCalendarType::Id },
             mCalendarType, defaultCalendarType))
     {
         if (!IsSupportedCalendarType(mCalendarType))
         {
-            mCalendarType = defaultCalendarType;
+            mCalendarType = defaultCalendarType; // reset to the default if we fail to load
         }
     }
 
-    TimeFormatLocalization::HourFormatEnum defaultHourFormat = mHourFormat;
+    const TimeFormatLocalization::HourFormatEnum defaultHourFormat = mHourFormat;
     attrPersistence.LoadNativeEndianValue<TimeFormatLocalization::HourFormatEnum>(
         { mPath.mEndpointId, TimeFormatLocalization::Id, TimeFormatLocalization::Attributes::HourFormat::Id }, mHourFormat,
         defaultHourFormat);
