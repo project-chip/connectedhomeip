@@ -345,15 +345,15 @@ CHIP_ERROR ProcessWriteAttributesData(WriteClient * client, python::PyWriteAttri
             dataVersion.SetValue(path.dataVersion);
         }
 
-        SuccessOrExit(err = client->PutPreencodedAttribute(
-                          chip::app::ConcreteDataAttributePath(path.endpointId, path.clusterId, path.attributeId, dataVersion),
-                          reader));
+        SuccessOrExit(
+            err = client->PutPreencodedAttribute(
+                chip::app::ConcreteDataAttributePath(path.endpointId, path.clusterId, path.attributeId, dataVersion), reader));
     }
 
 exit:
     return err;
 }
-}
+} // namespace
 
 extern "C" {
 void pychip_WriteClient_InitCallbacks(OnWriteResponseCallback onWriteResponseCallback, OnWriteErrorCallback onWriteErrorCallback,
