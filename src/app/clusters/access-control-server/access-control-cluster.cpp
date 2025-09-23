@@ -379,6 +379,37 @@ CHIP_ERROR ReadArl(AttributeValueEncoder & aEncoder)
     });
 }
 #endif
+
+CHIP_ERROR ChipErrorToImErrorMap(CHIP_ERROR err)
+{
+    // Map some common errors into an underlying IM error
+    // Separate logging is done to not lose the original error location in case such
+    // this are available.
+    CHIP_ERROR mappedError = err;
+
+    if (err == CHIP_ERROR_INVALID_ARGUMENT)
+    {
+        mappedError = CHIP_IM_GLOBAL_STATUS(ConstraintError);
+    }
+    else if (err == CHIP_ERROR_NOT_FOUND)
+    {
+        // Not found is generally also illegal argument: caused a lookup into an invalid location,
+        // like invalid subjects or targets.
+        mappedError = CHIP_IM_GLOBAL_STATUS(ConstraintError);
+    }
+    else if (err == CHIP_ERROR_NO_MEMORY)
+    {
+        mappedError = CHIP_IM_GLOBAL_STATUS(ResourceExhausted);
+    }
+
+    if (mappedError != err)
+    {
+        ChipLogError(DataManagement, "Re-mapped %" CHIP_ERROR_FORMAT " into %" CHIP_ERROR_FORMAT " for IM return codes",
+                     err.Format(), mappedError.Format());
+    }
+
+    return mappedError;
+}
 } // namespace
 
 namespace chip {
@@ -476,11 +507,11 @@ DataModel::ActionReturnStatus AccessControlCluster::WriteAttribute(const DataMod
     switch (request.path.mAttributeId)
     {
     case Acl::Id: {
-        return NotifyAttributeChangedIfSuccess(request.path.mAttributeId, WriteAcl(request.path, decoder));
+        return NotifyAttributeChangedIfSuccess(request.path.mAttributeId, ChipErrorToImErrorMap(WriteAcl(request.path, decoder)));
     }
 #if CHIP_CONFIG_ENABLE_ACL_EXTENSIONS
     case Extension::Id: {
-        return NotifyAttributeChangedIfSuccess(request.path.mAttributeId, WriteExtension(request.path, decoder));
+        return NotifyAttributeChangedIfSuccess(request.path.mAttributeId, ChipErrorToImErrorMap(WriteExtension(request.path, decoder)));
     }
 #endif
     default:
