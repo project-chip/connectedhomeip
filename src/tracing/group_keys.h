@@ -23,7 +23,7 @@ namespace chip {
 namespace Tracing {
 
 /**
- * Defines the key type use to identity a specific group
+ * Defines the key type used to identify a specific group
  */
 typedef const char * GroupKey;
 
