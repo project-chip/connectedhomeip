@@ -390,9 +390,9 @@ exit:
     // If failed constraints or internal errors, send a status report instead of the response sent above
     if (finalStatus != Status::Success)
     {
-        commandObj->AddStatus(commandPath, finalStatus);
         ChipLogError(Zcl, "OpCreds: Failed CSRRequest request with IM error 0x%02x (err = %" CHIP_ERROR_FORMAT ")",
                      to_underlying(finalStatus), err.Format());
+        return finalStatus;
     }
 
     return std::nullopt;
@@ -587,8 +587,8 @@ exit:
     // No NOC response - Failed constraints
     else
     {
-        commandObj->AddStatus(commandPath, nonDefaultStatus);
         ChipLogError(Zcl, "OpCreds: Failed AddNOC request with IM error 0x%02x", to_underlying(nonDefaultStatus));
+        return nonDefaultStatus;
     }
 
     return std::nullopt;
@@ -679,8 +679,8 @@ exit:
     // No NOC response - Failed constraints
     else
     {
-        commandObj->AddStatus(commandPath, nonDefaultStatus);
         ChipLogError(Zcl, "OpCreds: Failed UpdateNOC request with IM error 0x%02x", to_underlying(nonDefaultStatus));
+        return nonDefaultStatus;
     }
 
     return std::nullopt;
@@ -704,8 +704,7 @@ std::optional<DataModel::ActionReturnStatus> HandleUpdateFabricLabel(CommandHand
         // TODO: This error should probably be a ConstraintError instead of InvalidCommand,
         // need to confirm if current tests are expecting the later.
         ChipLogError(Zcl, "OpCreds: Failed UpdateFabricLabel due to invalid label size %u", static_cast<unsigned>(label.size()));
-        commandObj->AddStatus(commandPath, Status::InvalidCommand);
-        return std::nullopt;
+        return Status::InvalidCommand;
     }
 
     for (const auto & fabricInfo : fabricTable)
@@ -737,7 +736,7 @@ exit:
     }
     else
     {
-        commandObj->AddStatus(commandPath, finalStatus);
+        return finalStatus;
     }
     return std::nullopt;
 }
@@ -795,9 +794,7 @@ exit:
         ChipLogError(Zcl, "OpCreds: Failed AddTrustedRootCertificate request with IM error 0x%02x (err = %" CHIP_ERROR_FORMAT ")",
                      to_underlying(finalStatus), err.Format());
     }
-
-    commandObj->AddStatus(commandPath, finalStatus);
-    return std::nullopt;
+    return finalStatus;
 }
 
 std::optional<DataModel::ActionReturnStatus>
@@ -806,19 +803,19 @@ HandleSetVIDVerificationStatement(CommandHandler * commandObj, const ConcreteCom
                                   OperationalCredentialsCluster * cluster)
 {
     FabricIndex fabricIndex = commandObj->GetAccessingFabricIndex();
+    auto finalStatus        = Status::Failure;
+
     ChipLogProgress(Zcl, "OpCreds: Received a SetVIDVerificationStatement Command for FabricIndex 0x%x",
                     static_cast<unsigned>(fabricIndex));
 
     if (!commandData.vendorID.HasValue() && !commandData.VIDVerificationStatement.HasValue() && !commandData.vvsc.HasValue())
     {
-        commandObj->AddStatus(commandPath, Status::InvalidCommand);
-        return std::nullopt;
+        return Status::InvalidCommand;
     }
 
     if (commandData.vendorID.HasValue() && !IsVendorIdValidOperationally(commandData.vendorID.Value()))
     {
-        commandObj->AddStatus(commandPath, Status::ConstraintError);
-        return std::nullopt;
+        return Status::ConstraintError;
     }
 
     bool fabricChangesOccurred = false;
@@ -826,21 +823,21 @@ HandleSetVIDVerificationStatement(CommandHandler * commandObj, const ConcreteCom
         fabricIndex, commandData.vendorID, commandData.VIDVerificationStatement, commandData.vvsc, fabricChangesOccurred);
     if (err == CHIP_ERROR_INVALID_ARGUMENT)
     {
-        commandObj->AddStatus(commandPath, Status::ConstraintError);
+        finalStatus = Status::ConstraintError;
     }
     else if (err == CHIP_ERROR_INCORRECT_STATE)
     {
-        commandObj->AddStatus(commandPath, Status::InvalidCommand);
+        finalStatus = Status::InvalidCommand;
     }
     else if (err != CHIP_NO_ERROR)
     {
         // We have no idea what happened; just report failure.
         StatusIB status(err);
-        commandObj->AddStatus(commandPath, status.mStatus);
+        finalStatus = status.mStatus;
     }
     else
     {
-        commandObj->AddStatus(commandPath, Status::Success);
+        finalStatus = Status::Success;
     }
 
     // Handle dirty-marking if anything changed. Only `Fabrics` attribute is reported since `NOCs`
@@ -856,7 +853,7 @@ HandleSetVIDVerificationStatement(CommandHandler * commandObj, const ConcreteCom
     {
         ChipLogError(Zcl, "SetVIDVerificationStatement failed: %" CHIP_ERROR_FORMAT, err.Format());
     }
-    return std::nullopt;
+    return finalStatus;
 }
 
 std::optional<DataModel::ActionReturnStatus> HandleRemoveFabric(CommandHandler * commandObj,
@@ -873,8 +870,7 @@ std::optional<DataModel::ActionReturnStatus> HandleRemoveFabric(CommandHandler *
     if (!IsValidFabricIndex(fabricBeingRemoved))
     {
         ChipLogError(Zcl, "OpCreds: Failed RemoveFabric due to invalid FabricIndex");
-        commandObj->AddStatus(commandPath, Status::InvalidCommand);
-        return std::nullopt;
+        return Status::InvalidCommand;
     }
 
     commandObj->FlushAcksRightAwayOnSlowCommand();
@@ -898,7 +894,7 @@ exit:
         // We have no idea what happened; just report failure.
         ChipLogError(Zcl, "OpCreds: Failed RemoveFabric due to internal error (err = %" CHIP_ERROR_FORMAT ")", err.Format());
         StatusIB status(err);
-        commandObj->AddStatus(commandPath, status.mStatus);
+        return status.mStatus;
     }
     else
     {
@@ -931,8 +927,7 @@ HandleSignVIDVerificationRequest(CommandHandler * commandObj, const ConcreteComm
     if (!IsValidFabricIndex(commandData.fabricIndex) ||
         (commandData.clientChallenge.size() != Crypto::kVendorIdVerificationClientChallengeSize))
     {
-        commandObj->AddStatus(commandPath, Status::ConstraintError);
-        return std::nullopt;
+        return Status::ConstraintError;
     }
 
     commandObj->FlushAcksRightAwayOnSlowCommand();
@@ -944,16 +939,14 @@ HandleSignVIDVerificationRequest(CommandHandler * commandObj, const ConcreteComm
                                                                           attestationChallenge, responseData);
     if (err == CHIP_ERROR_INVALID_ARGUMENT)
     {
-        commandObj->AddStatus(commandPath, Status::ConstraintError);
-        return std::nullopt;
+        return Status::ConstraintError;
     }
 
     if (err != CHIP_NO_ERROR)
     {
         // We have no idea what happened; just report failure.
         StatusIB status(err);
-        commandObj->AddStatus(commandPath, status.mStatus);
-        return std::nullopt;
+        return status.mStatus;
     }
 
     Commands::SignVIDVerificationResponse::Type response;
@@ -995,8 +988,7 @@ HandleCertificateChainRequest(CommandHandler * commandObj, const ConcreteCommand
     else
     {
         ChipLogError(Zcl, "OpCreds: Certificate Chain request received for unknown type: %d", static_cast<int>(certificateType));
-        commandObj->AddStatus(commandPath, Status::InvalidCommand);
-        return std::nullopt;
+        return Status::InvalidCommand;
     }
 
     response.certificate = derBufSpan;
@@ -1006,7 +998,7 @@ exit:
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(Zcl, "OpCreds: Failed CertificateChainRequest: %" CHIP_ERROR_FORMAT, err.Format());
-        commandObj->AddStatus(commandPath, Status::Failure);
+        return Status::Failure;
     }
 
     return std::nullopt;
@@ -1098,9 +1090,9 @@ std::optional<DataModel::ActionReturnStatus> HandleAttestationRequest(CommandHan
 exit:
     if (finalStatus != Status::Success)
     {
-        commandObj->AddStatus(commandPath, finalStatus);
         ChipLogError(Zcl, "OpCreds: Failed AttestationRequest request with IM error 0x%02x (err = %" CHIP_ERROR_FORMAT ")",
                      to_underlying(finalStatus), err.Format());
+        return finalStatus;
     }
 
     return std::nullopt;
