@@ -42,7 +42,7 @@ from typing import List
 from mobly import asserts
 
 import matter.clusters as Clusters
-from matter.clusters.Types import Nullable
+from matter.clusters.Types import NullValue
 from matter.interaction_model import InteractionModelError, Status
 from matter.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main, has_cluster, run_if_endpoint_matches
 
@@ -53,10 +53,9 @@ class TC_G_2_3(MatterBaseTest):
         return "Commands - GetGroupMembership, AddGroupIfIdentifying [DUT-Server]"
 
     def verify_group_membership_response(self, response, expected_group_ids):
-        # Check if capacity is within valid range (0-254) or Nullable
-        if response.capacity is not None and type(response.capacity) != Nullable:
+        if response.capacity != NullValue:
             try:
-                capacity = int(response.capacity)
+                capacity = response.capacity
                 if not (0 <= capacity <= 254):
                     return False, "Capacity is out of valid range"
             except ValueError:
@@ -278,9 +277,12 @@ class TC_G_2_3(MatterBaseTest):
         self.step("13")
         groupTableList: List[Clusters.GroupKeyManagement.Attributes.GroupTable] = await self.read_single_attribute(
             dev_ctrl=th1, node_id=self.dut_node_id, endpoint=0, attribute=Clusters.GroupKeyManagement.Attributes.GroupTable)
-        received_group_ids = [entry.groupId for entry in groupTableList]
-        asserts.assert_true(kGroupId7 in received_group_ids,
-                            f"Expected GroupId {kGroupId7} not found in DUT GroupTable: {received_group_ids}")
+        expected_endpoint = self.matter_test_config.endpoint
+        received_groups = [(entry.groupId, entry.endpoints) for entry in groupTableList]
+        asserts.assert_true(
+            (kGroupId7, [expected_endpoint]) in [(groupId, enps) for groupId, enps in received_groups if expected_endpoint in enps],
+            f"Expected GroupId {kGroupId7} with endpoint {expected_endpoint} not found in DUT GroupTable: {received_groups}"
+        )
 
         self.step("14")
         if await self.feature_guard(endpoint=self.matter_test_config.endpoint, cluster=Clusters.Groups, feature_int=Clusters.Groups.Bitmaps.Feature.kGroupNames):
