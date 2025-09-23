@@ -14,7 +14,6 @@
  *    limitations under the License.
  */
 
-#include "time-format-localization-cluster.h"
 #include <app/clusters/time-format-localization-server/time-format-localization-cluster.h>
 #include <app/persistence/AttributePersistence.h>
 #include <app/server-cluster/AttributeListBuilder.h>
