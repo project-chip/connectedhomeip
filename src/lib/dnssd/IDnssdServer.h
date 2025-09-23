@@ -23,7 +23,7 @@ namespace chip {
 class IDnssdServer
 {
 public:
-    virtual ~IDnssdServer()                    = default;
+    virtual ~IDnssdServer()                   = default;
     virtual CHIP_ERROR AdvertiseOperational() = 0;
     virtual bool IsAdvertisingEnabled()       = 0;
 };
