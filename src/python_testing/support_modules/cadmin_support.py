@@ -327,7 +327,6 @@ class CADMINBaseTest(MatterBaseTest):
 
         return params, window_status_accumulator
 
-
     async def write_nl_attr(self, dut_node_id: int, th: ChipDeviceCtrl, attr_val: object):
         result = await th.WriteAttribute(nodeid=dut_node_id, attributes=[(0, attr_val)])
         asserts.assert_equal(result[0].Status, Status.Success, f"{th} node label write failed")
