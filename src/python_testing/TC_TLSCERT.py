@@ -36,16 +36,18 @@ import random
 import string
 
 import test_plan_support
+from cryptography.x509 import CertificateBuilder, UnrecognizedExtension
+from cryptography.x509.oid import ObjectIdentifier
 from mobly import asserts
 from TC_TLS_Utils import TLSUtils
 
 import matter.clusters as Clusters
 from matter.ChipDeviceCtrl import TransportPayloadCapability
+from matter.clusters.Types import NullValue
 from matter.interaction_model import Status
 from matter.testing import matter_asserts
 from matter.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main, has_cluster, run_if_endpoint_matches
 from matter.utils import CommissioningBuildingBlocks
-from cryptography.x509 import CertificateBuilder
 
 
 class TC_TLSCERT(MatterBaseTest):
@@ -122,6 +124,18 @@ class TC_TLSCERT(MatterBaseTest):
 
         cr2_cmd = TLSUtils(self, endpoint=endpoint, dev_ctrl=cr2, node_id=cr2_dut_node_id, fabric_index=fabric_index_cr2)
         return self.TwoFabricData(cr1_cmd=cr1_cmd, cr2_cmd=cr2_cmd)
+
+    def pad_out_certificate(self) -> CertificateBuilder:
+        builder = CertificateBuilder()
+        for i in range(100):
+            builder = builder.add_extension(
+                UnrecognizedExtension(
+                    oid=ObjectIdentifier(f"1.1.{i}"),
+                    value=b'\x23' * 20
+                ),
+                critical=False
+            )
+        return builder
 
     def pics_TC_TLSCERT_2_1(self):
         return ["TLSCERT.S"]
@@ -472,24 +486,13 @@ class TC_TLSCERT(MatterBaseTest):
                      test_plan_support.verify_status(Status.NotFound)),
         ]
 
-    def pad_out_certificate(self, builder : CertificateBuilder) -> CertificateBuilder:
-        for i in range(1000):
-            builder = builder.add_extension(
-                x509.UnrecognizedExtension(
-                    oid=test_oid,
-                    value=asn1_value.dump()
-                ),
-                critical=False # Set to True if the extension must be understood by the client
-            )
-        return builder
-
     @run_if_endpoint_matches(has_cluster(Clusters.TlsCertificateManagement))
     async def test_TC_TLSCERT_2_4(self):
         cr1_cmd = await self.common_setup()
 
         self.step(2)
-        my_big_root_cert = cr1_cmd.gen_cert_with_key(signer=self.get_key(), builder_lambda = self.pad_out_certificate)
-        asserts.assert_greater_equal(len(my_big_root_cert), 3000)
+        my_big_root_cert = cr1_cmd.gen_cert_with_key(signer=cr1_cmd.get_key(), builder_lambda=self.pad_out_certificate)
+        asserts.assert_greater(len(my_big_root_cert), 3000)
 
         self.step(3)
         my_bad_root_cert = b"not a cert"
@@ -594,17 +597,17 @@ class TC_TLSCERT(MatterBaseTest):
             TestStep(9, "CR1 sends LookupRootCertificate command with Fingerprint set to myRootCertFingerprint[0].",
                      "DUT replies with a TLSCAID value equal to myCaid[0]."),
             TestStep(10, "CR1 sends LookupRootCertificate command with Fingerprint set to myRootCertFingerprint[1].",
-                      "DUT replies with a TLSCAID value equal to myCaid[1]."),
+                     "DUT replies with a TLSCAID value equal to myCaid[1]."),
             TestStep(11, "CR1 sends LookupRootCertificate command with Fingerprint set to myRootCertFingerprint[2].",
-                      test_plan_support.verify_status(Status.NotFound)),
+                     test_plan_support.verify_status(Status.NotFound)),
             TestStep(12, "CR2 sends LookupRootCertificate command with Fingerprint set to myRootCertFingerprint[2].",
-                      "DUT replies with a TLSCAID value equal to myCaid[2]."),
+                     "DUT replies with a TLSCAID value equal to myCaid[2]."),
             TestStep(13, "CR1 sends LookupRootCertificate command with Fingerprint set to myBigFingerprint.",
-                      test_plan_support.verify_status(Status.ConstraintError)),
+                     test_plan_support.verify_status(Status.ConstraintError)),
             TestStep(14, "CR1 sends RemoveRootCertificate command with CAID set to myCaid[i], for each i in [0..1].",
-                      test_plan_support.verify_success()),
+                     test_plan_support.verify_success()),
             TestStep(15, "CR2 sends RemoveRootCertificate command with CAID set to myCaid[2].",
-                      test_plan_support.verify_success()),
+                     test_plan_support.verify_success()),
             TestStep(16, test_plan_support.remove_fabric('CR2', 'CR1'), test_plan_support.verify_success()),
         ]
 
@@ -694,9 +697,9 @@ class TC_TLSCERT(MatterBaseTest):
             TestStep(9, "CR1 sends RemoveRootCertificate command with CAID set to myCaid.",
                      test_plan_support.verify_success()),
             TestStep(10, "CR1 sends FindRootCertificate command with CAID set to myCaid.",
-                      test_plan_support.verify_status(Status.NotFound)),
+                     test_plan_support.verify_status(Status.NotFound)),
             TestStep(11, "CR1 sends RemoveRootCertificate command with CAID set to myCaid.",
-                      test_plan_support.verify_status(Status.NotFound)),
+                     test_plan_support.verify_status(Status.NotFound)),
             TestStep(12, test_plan_support.remove_fabric('CR2', 'CR1'), test_plan_support.verify_success()),
         ]
 
@@ -721,7 +724,8 @@ class TC_TLSCERT(MatterBaseTest):
         await cr2_cmd.send_remove_root_command(caid=my_caid, expected_status=Status.NotFound)
 
         self.step(6)
-        my_endpoint = await cr1_cmd.send_provision_tls_endpoint_command(hostname=b"my_hostname", port=1000, caid=my_caid).endpointID
+        endpoint_response = await cr1_cmd.send_provision_tls_endpoint_command(hostname=b"my_hostname", port=1000, caid=my_caid)
+        my_endpoint = endpoint_response.endpointID
 
         self.step(7)
         await cr1_cmd.send_remove_root_command(caid=my_caid, expected_status=Status.InvalidInState)
@@ -764,16 +768,16 @@ class TC_TLSCERT(MatterBaseTest):
             TestStep(9, "CR2 reads ProvisionedClientCertificates attribute using a fabric-filtered read.",
                      "DUT replies with a list of TLSClientCertificateDetailStruct with myMaxClientCerts entries."),
             TestStep(10, "CR2 sends TLSClientCSR command with Nonce set to myNonce[myMaxClientCerts+1].",
-                      test_plan_support.verify_status(Status.ResourceExhausted)),
+                     test_plan_support.verify_status(Status.ResourceExhausted)),
             TestStep(11, "CR2 sends RemoveClientCertificate command with CCDID set to myCcdid[1].",
-                      test_plan_support.verify_success()),
+                     test_plan_support.verify_success()),
             TestStep(12, "CR2 sends TLSClientCSR command with Nonce set to myNonce[myMaxClientCerts+1].",
-                      "DUT replies with CCDID, CSR and Nonce."),
+                     "DUT replies with CCDID, CSR and Nonce."),
             TestStep(13, "CR2 reads ProvisionedClientCertificates attribute.",
-                      "DUT replies with a list of TLSClientCertificateDetailStruct with myMaxClientCerts entries."),
+                     "DUT replies with a list of TLSClientCertificateDetailStruct with myMaxClientCerts entries."),
             TestStep(14, test_plan_support.remove_fabric('CR2', 'CR1'), test_plan_support.verify_success()),
             TestStep(15, "CR1 sends RemoveClientCertificate command with CCDID set to myCcdid[0].",
-                      test_plan_support.verify_success()),
+                     test_plan_support.verify_success()),
         ]
 
     @run_if_endpoint_matches(has_cluster(Clusters.TlsCertificateManagement))
@@ -815,15 +819,18 @@ class TC_TLSCERT(MatterBaseTest):
         asserts.assert_equal(len(client_certs), 1)
         asserts.assert_in(my_ccdid[0], client_certs)
         asserts.assert_is_none(client_certs[my_ccdid[0]].clientCertificate, "Expected no certificate for unprovisioned certificate")
-        asserts.assert_is_none(client_certs[my_ccdid[0]].intermediateCertificates, "Expected no intermediate certificates for unprovisioned certificate")
+        asserts.assert_is_none(client_certs[my_ccdid[0]].intermediateCertificates,
+                               "Expected no intermediate certificates for unprovisioned certificate")
 
         self.step(9)
         client_certs = await cr2_cmd.read_client_certs_attribute_as_map(TransportPayloadCapability.LARGE_PAYLOAD)
         asserts.assert_equal(len(client_certs), my_max_client_certs)
         for i in range(1, my_max_client_certs + 1):
             asserts.assert_in(my_ccdid[i], client_certs)
-            asserts.assert_is_none(client_certs[my_ccdid[i]].clientCertificate, "Expected no certificate for unprovisioned certificate")
-            asserts.assert_is_none(client_certs[my_ccdid[i]].intermediateCertificates, "Expected no intermediate certificates for unprovisioned certificate")
+            asserts.assert_is_none(client_certs[my_ccdid[i]].clientCertificate,
+                                   "Expected no certificate for unprovisioned certificate")
+            asserts.assert_is_none(client_certs[my_ccdid[i]].intermediateCertificates,
+                                   "Expected no intermediate certificates for unprovisioned certificate")
 
         self.step(10)
         await cr2_cmd.send_csr_command(nonce=my_nonce[my_max_client_certs + 1], expected_status=Status.ResourceExhausted)
@@ -841,8 +848,10 @@ class TC_TLSCERT(MatterBaseTest):
         asserts.assert_equal(len(client_certs), my_max_client_certs)
         for i in range(2, my_max_client_certs + 2):
             asserts.assert_in(my_ccdid[i], client_certs)
-            asserts.assert_is_none(client_certs[my_ccdid[i]].clientCertificate, "Expected no certificate for unprovisioned certificate")
-            asserts.assert_is_none(client_certs[my_ccdid[i]].intermediateCertificates, "Expected no intermediate certificates for unprovisioned certificate")
+            asserts.assert_is_none(client_certs[my_ccdid[i]].clientCertificate,
+                                   "Expected no certificate for unprovisioned certificate")
+            asserts.assert_is_none(client_certs[my_ccdid[i]].intermediateCertificates,
+                                   "Expected no intermediate certificates for unprovisioned certificate")
 
         self.step(14)
         await cr1_cmd.send_remove_fabric_command(cr2_cmd.fabric_index)
@@ -1067,26 +1076,24 @@ class TC_TLSCERT(MatterBaseTest):
             TestStep(7,
                      "Populate myIntermediateCerts with 1 DER-encoded x509 certificates that form a certificate chain up to (but not including) a root."),
             TestStep(8,
-                     "Populate myClientCert[] with 2 distinct, valid, DER-encoded x509 certificates using the public key from myCsr and signed by myIntermediateCerts[0]."),
+                     "Populate myClientCert with a distinct, valid, DER-encoded x509 certificates using the public key from myCsr and signed by myIntermediateCerts[0]."),
             TestStep(9, "CR1 sends ProvisionClientCertificate command with CCDID set to myCcdid and ClientCertificate set to myBigCert.",
                      test_plan_support.verify_status(Status.ConstraintError)),
-            TestStep(10, "CR1 sends ProvisionClientCertificate command with CCDID set to myCcdid, ClientCertificate set to myClientCert[0], and IntermediateCertificates set to myBigCert.",
-                      test_plan_support.verify_status(Status.ConstraintError)),
-            TestStep(11, "CR1 sends ProvisionClientCertificate command with CCDID set to myCcdid, ClientCertificate set to myClientCert[1], and IntermediateCertificates set to myIntermediateCerts.",
-                      test_plan_support.verify_status(Status.DynamicConstraintError)),
-            TestStep(12, "CR1 sends ProvisionClientCertificate command with CCDID set to myCcdid and ClientCertificate set to myBadCert.",
-                      test_plan_support.verify_status(Status.DynamicConstraintError)),
-            TestStep(13, "CR1 sends ProvisionClientCertificate command with CCDID set to myCcdid and ClientCertificate set to myWrongKey.",
-                      test_plan_support.verify_status(Status.DynamicConstraintError)),
-            TestStep(14, "CR1 sends ProvisionClientCertificate command with CCDID set to myCcdid, ClientCertificate set to myClientCert[0], and IntermediateCertificates set to myBadCert.",
-                      test_plan_support.verify_status(Status.DynamicConstraintError)),
-            TestStep(15, "CR1 sends ProvisionClientCertificate command with CCDID set to a value not equal to myCcdid and ClientCertificate set to myClientCert[0].",
-                      test_plan_support.verify_status(Status.NotFound)),
-            TestStep(16, "CR2 sends ProvisionClientCertificate command with CCDID set to myCcdid and ClientCertificate set to myClientCert[0].",
-                      test_plan_support.verify_status(Status.NotFound)),
-            TestStep(17, "CR1 sends RemoveClientCertificate command with CCDID set to myCcdid.",
-                      test_plan_support.verify_success()),
-            TestStep(18, test_plan_support.remove_fabric('CR2', 'CR1'), test_plan_support.verify_success()),
+            TestStep(10, "CR1 sends ProvisionClientCertificate command with CCDID set to myCcdid, ClientCertificate set to myClientCert, and IntermediateCertificates set to myBigCert.",
+                     test_plan_support.verify_status(Status.ConstraintError)),
+            TestStep(11, "CR1 sends ProvisionClientCertificate command with CCDID set to myCcdid and ClientCertificate set to myBadCert.",
+                     test_plan_support.verify_status(Status.DynamicConstraintError)),
+            TestStep(12, "CR1 sends ProvisionClientCertificate command with CCDID set to myCcdid and ClientCertificate set to myWrongKey.",
+                     test_plan_support.verify_status(Status.DynamicConstraintError)),
+            TestStep(13, "CR1 sends ProvisionClientCertificate command with CCDID set to myCcdid, ClientCertificate set to myClientCert, and IntermediateCertificates set to myBadCert.",
+                     test_plan_support.verify_status(Status.DynamicConstraintError)),
+            TestStep(14, "CR1 sends ProvisionClientCertificate command with CCDID set to a value not equal to myCcdid and ClientCertificate set to myClientCert[0].",
+                     test_plan_support.verify_status(Status.NotFound)),
+            TestStep(15, "CR2 sends ProvisionClientCertificate command with CCDID set to myCcdid and ClientCertificate set to myClientCert.",
+                     test_plan_support.verify_status(Status.NotFound)),
+            TestStep(16, "CR1 sends RemoveClientCertificate command with CCDID set to myCcdid.",
+                     test_plan_support.verify_success()),
+            TestStep(17, test_plan_support.remove_fabric('CR2', 'CR1'), test_plan_support.verify_success()),
         ]
 
     @run_if_endpoint_matches(has_cluster(Clusters.TlsCertificateManagement))
@@ -1105,53 +1112,51 @@ class TC_TLSCERT(MatterBaseTest):
         my_csr = cr1_cmd.assert_valid_csr(response, my_nonce)
 
         self.step(4)
-        my_big_cert = cr1_cmd.gen_cert_with_key(signer=self.get_key(), public_key=my_csr.public_key(), builder_lambda = self.pad_out_certificate)
+        root = cr1_cmd.get_key()
+        my_big_cert = cr1_cmd.gen_cert_with_key(signer=root, public_key=my_csr.public_key(),
+                                                builder_lambda=self.pad_out_certificate)
+        asserts.assert_greater(len(my_big_cert), 3000)
 
         self.step(5)
         my_bad_cert = b"not a cert"
 
         self.step(6)
-        key_for_wrong_cert = cr1_cmd.gen_key()
+        key_for_wrong_cert = cr1_cmd.get_key()
         my_wrong_key_cert = cr1_cmd.gen_cert_with_key(key_for_wrong_cert, public_key=key_for_wrong_cert.public_key())
 
         self.step(7)
         certs_with_key = cr1_cmd.gen_cert_chain(key_for_wrong_cert, 1)
-        my_intermediate_certs = [x.cert for x in certs_with_key]
         signer_key = certs_with_key[0].key
 
         self.step(8)
-        my_client_cert = [cr1_cmd.gen_cert_with_key(
-            signer_key, public_key=my_csr.public_key(), subject=my_csr.subject) for _ in range(2)]
+        my_client_cert = cr1_cmd.gen_cert_with_key(
+            signer_key, public_key=my_csr.public_key(), subject=my_csr.subject)
 
         self.step(9)
         await cr1_cmd.send_provision_client_command(ccdid=my_ccdid, certificate=my_big_cert, expected_status=Status.ConstraintError)
 
         self.step(10)
-        await cr1_cmd.send_provision_client_command(ccdid=my_ccdid, certificate=my_client_cert[0], intermediates=[my_big_cert], expected_status=Status.ConstraintError)
+        await cr1_cmd.send_provision_client_command(ccdid=my_ccdid, certificate=my_client_cert, intermediates=[my_big_cert], expected_status=Status.ConstraintError)
 
         self.step(11)
-        client_cert_signed_by_root = cr1_cmd.gen_cert_with_key(root, public_key=my_csr.public_key(), subject=my_csr.subject)
-        await cr1_cmd.send_provision_client_command(ccdid=my_ccdid, certificate=client_cert_signed_by_root, intermediates=my_intermediate_certs, expected_status=Status.DynamicConstraintError)
-
-        self.step(12)
         await cr1_cmd.send_provision_client_command(ccdid=my_ccdid, certificate=my_bad_cert, expected_status=Status.DynamicConstraintError)
 
-        self.step(13)
+        self.step(12)
         await cr1_cmd.send_provision_client_command(ccdid=my_ccdid, certificate=my_wrong_key_cert, expected_status=Status.DynamicConstraintError)
 
+        self.step(13)
+        await cr1_cmd.send_provision_client_command(ccdid=my_ccdid, certificate=my_client_cert, intermediates=[my_bad_cert], expected_status=Status.DynamicConstraintError)
+
         self.step(14)
-        await cr1_cmd.send_provision_client_command(ccdid=my_ccdid, certificate=my_client_cert[0], intermediates=[my_bad_cert], expected_status=Status.DynamicConstraintError)
+        await cr1_cmd.send_provision_client_command(ccdid=my_ccdid + 1, certificate=my_client_cert, expected_status=Status.NotFound)
 
         self.step(15)
-        await cr1_cmd.send_provision_client_command(ccdid=my_ccdid + 1, certificate=my_client_cert[0], expected_status=Status.NotFound)
+        await cr2_cmd.send_provision_client_command(ccdid=my_ccdid, certificate=my_client_cert, expected_status=Status.NotFound)
 
         self.step(16)
-        await cr2_cmd.send_provision_client_command(ccdid=my_ccdid, certificate=my_client_cert[0], expected_status=Status.NotFound)
-
-        self.step(17)
         await cr1_cmd.send_remove_client_command(ccdid=my_ccdid)
 
-        self.step(18)
+        self.step(17)
         await cr1_cmd.send_remove_fabric_command(cr2_cmd.fabric_index)
 
     def pics_TC_TLSCERT_2_11(self):
@@ -1203,8 +1208,8 @@ class TC_TLSCERT(MatterBaseTest):
         find_response = await cr1_cmd.send_find_client_command(ccdid=my_ccdid)
         asserts.assert_equal(len(find_response.certificateDetails), 1)
         asserts.assert_equal(find_response.certificateDetails[0].ccdid, my_ccdid)
-        asserts.assert_is_none(find_response.certificateDetails[0].clientCertificate)
-        asserts.assert_is_none(find_response.certificateDetails[0].intermediateCertificates)
+        asserts.assert_equal(find_response.certificateDetails[0].clientCertificate, NullValue)
+        asserts.assert_equal(len(find_response.certificateDetails[0].intermediateCertificates), 0)
 
         self.step(6)
         await cr1_cmd.send_find_client_command(ccdid=my_ccdid + 1, expected_status=Status.NotFound)
@@ -1244,29 +1249,29 @@ class TC_TLSCERT(MatterBaseTest):
             TestStep(8, "Populate myClientCertFingerprint[] with the fingerprints corresponding to myClientCert[]."),
             TestStep(9, "Set myBigFingerprint to myClientCertFingerprint[0] concatenated with enough characters to exceed 64."),
             TestStep(10, "CR1 sends LookupClientCertificate command with Fingerprint set to the empty octstr.",
-                      test_plan_support.verify_status(Status.NotFound)),
+                     test_plan_support.verify_status(Status.NotFound)),
             TestStep(11, "CR1 sends LookupClientCertificate command with Fingerprint set to and arbitrary octstr.",
-                      test_plan_support.verify_status(Status.NotFound)),
+                     test_plan_support.verify_status(Status.NotFound)),
             TestStep(12, "CR1 sends LookupClientCertificate command with Fingerprint set to the myClientCertFingerprint[0]",
-                      test_plan_support.verify_status(Status.NotFound)),
+                     test_plan_support.verify_status(Status.NotFound)),
             TestStep(13, "CR1 sends ProvisionClientCertificate command with CCDID set to myCcdid[i] and ClientCertificate set to myClientCert[i], for each i in [0..1].",
-                      test_plan_support.verify_success()),
+                     test_plan_support.verify_success()),
             TestStep(14, "CR2 sends ProvisionClientCertificate command with CCDID set to myCcdid[2] and ClientCertificateDetails set to myClientCert[2].",
-                      test_plan_support.verify_success()),
+                     test_plan_support.verify_success()),
             TestStep(15, "CR1 sends LookupClientCertificate command with Fingerprint set to myClientCertFingerprint[0].",
-                      "DUT replies with a TLSCCDID value equal to myCcdid[0]."),
+                     "DUT replies with a TLSCCDID value equal to myCcdid[0]."),
             TestStep(16, "CR1 sends LookupClientCertificate command with Fingerprint set to myClientCertFingerprint[1].",
-                      "DUT replies with a TLSCCDID value equal to myCcdid[1]."),
+                     "DUT replies with a TLSCCDID value equal to myCcdid[1]."),
             TestStep(17, "CR1 sends LookupClientCertificate command with Fingerprint set to myClientCertFingerprint[2].",
-                      test_plan_support.verify_status(Status.NotFound)),
+                     test_plan_support.verify_status(Status.NotFound)),
             TestStep(18, "CR2 sends LookupClientCertificate command with Fingerprint set to myClientCertFingerprint[2].",
-                      "DUT replies with a TLSCCDID value equal to myCcdid[2]."),
+                     "DUT replies with a TLSCCDID value equal to myCcdid[2]."),
             TestStep(19, "CR1 sends LookupClientCertificate command with Fingerprint set to myBigFingerprint.",
-                      test_plan_support.verify_status(Status.ConstraintError)),
+                     test_plan_support.verify_status(Status.ConstraintError)),
             TestStep(20, "CR1 sends RemoveClientCertificate command with CCDID set to myCcdid[i], for each i in [0..1].",
-                      test_plan_support.verify_success()),
+                     test_plan_support.verify_success()),
             TestStep(21, "CR2 sends RemoveClientCertificate command with CCDID set to myCcdid[2].",
-                      test_plan_support.verify_success()),
+                     test_plan_support.verify_success()),
             TestStep(22, test_plan_support.remove_fabric('CR2', 'CR1'), test_plan_support.verify_success()),
         ]
 
@@ -1385,13 +1390,13 @@ class TC_TLSCERT(MatterBaseTest):
             TestStep(12, "CR1 sends RemoveEndpoint command with EndpointID set to myEndpoint.",
                      test_plan_support.verify_success()),
             TestStep(13, "CR1 sends RemoveClientCertificate command with CCDID set to myCcdid.",
-                      test_plan_support.verify_success()),
+                     test_plan_support.verify_success()),
             TestStep(14, "CR1 sends FindClientCertificate command with CCDID set to myCcdid.",
-                      test_plan_support.verify_status(Status.NotFound)),
+                     test_plan_support.verify_status(Status.NotFound)),
             TestStep(15, "CR1 sends RemoveClientCertificate command with CCDID set to myCcdid.",
-                      test_plan_support.verify_status(Status.NotFound)),
+                     test_plan_support.verify_status(Status.NotFound)),
             TestStep(16, "CR1 sends RemoveRootCertificate command with CAID set to myCaid.",
-                      test_plan_support.verify_success()),
+                     test_plan_support.verify_success()),
             TestStep(17, test_plan_support.remove_fabric('CR2', 'CR1'), test_plan_support.verify_success()),
         ]
 
@@ -1432,7 +1437,8 @@ class TC_TLSCERT(MatterBaseTest):
         my_caid = response.caid
 
         self.step(10)
-        my_endpoint = await cr1_cmd.send_provision_tls_endpoint_command(hostname=b"my_hostname", port=1000, caid=my_caid).endpointID
+        endpoint_response = await cr1_cmd.send_provision_tls_endpoint_command(hostname=b"my_hostname", port=1000, caid=my_caid)
+        my_endpoint = endpoint_response.endpointID
 
         self.step(11)
         await cr1_cmd.send_remove_client_command(ccdid=my_ccdid, expected_status=Status.InvalidInState)

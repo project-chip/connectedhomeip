@@ -162,12 +162,11 @@ public:
      * @param[in] provisionReq The request data specifying the root certificate to be provisioned
      * @param[out] outCaid a reference to the TLSCAID variable that is to contain the ID of the provisioned root cert.
      *
-     * @return CHIP_NO_ERROR if the certificate was appended to the list successfully.
-     * @return CHIP_ERROR if there was an error adding the certificate.
+     * @return Success if the certificate was provisioned successfully, or a failure status otherwise.
      */
-    virtual Protocols::InteractionModel::ClusterStatusCode ProvisionRootCert(EndpointId matterEndpoint, FabricIndex fabric,
-                                                                             const ProvisionRootCertificateType & provisionReq,
-                                                                             Tls::TLSCAID & outCaid) = 0;
+    virtual Protocols::InteractionModel::Status ProvisionRootCert(EndpointId matterEndpoint, FabricIndex fabric,
+                                                                  const ProvisionRootCertificateType & provisionReq,
+                                                                  Tls::TLSCAID & outCaid) = 0;
 
     /**
      * @brief Executes loadedCallback for each root certificate with matching (matterEndpoint, fabric). The certificate passed to
@@ -243,7 +242,7 @@ public:
      * @param[in] fingerprint The fingerprint of the root certificate to find.
      * @param[in] loadedCallback The lambda to execute with the generated client CSR. This lambda will be called before this method
      * returns.
-     * @return NotFound if no mapping is found.
+     * @return Success if the CSR was generated successfully, or a failure status otherwise
      */
     virtual Protocols::InteractionModel::Status GenerateClientCsr(EndpointId matterEndpoint, FabricIndex fabric,
                                                                   const ClientCsrType & request,
@@ -257,11 +256,10 @@ public:
      * @param[in] fabric The fabric the endpoint is associated with
      * @param[in] provisionReq The request data specifying the client certificate to be provisioned
      *
-     * @return CHIP_NO_ERROR if the certificate was appended to the list successfully.
-     * @return CHIP_ERROR if there was an error adding the certificate.
+     * @return Success if the certificate was provisioned successfully, or a failure status otherwise
      */
-    virtual Protocols::InteractionModel::ClusterStatusCode
-    ProvisionClientCert(EndpointId matterEndpoint, FabricIndex fabric, const ProvisionClientCertificateType & provisionReq) = 0;
+    virtual Protocols::InteractionModel::Status ProvisionClientCert(EndpointId matterEndpoint, FabricIndex fabric,
+                                                                    const ProvisionClientCertificateType & provisionReq) = 0;
 
     /**
      * @brief Executes loadedCallback for each client certificate matching (matterEndpoint, fabric).  The certificate passed to

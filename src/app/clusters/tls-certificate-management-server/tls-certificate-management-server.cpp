@@ -238,9 +238,12 @@ void TlsCertificateManagementServer::HandleProvisionRootCertificate(HandlerConte
                        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::NotFound));
     }
 
+    VerifyOrReturn(Crypto::IsCertificateValidAtCurrentTime(req.certificate) == CHIP_NO_ERROR,
+                   ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::DynamicConstraintError));
+
     ProvisionRootCertificateResponse::Type response;
     auto status = mDelegate.ProvisionRootCert(ctx.mRequestPath.mEndpointId, fabric, req, response.caid);
-    if (!status.IsSuccess())
+    if (status != Status::Success)
     {
         ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);
         return;
@@ -363,11 +366,22 @@ void TlsCertificateManagementServer::HandleProvisionClientCertificate(HandlerCon
     VerifyOrReturn(req.ccdid <= kMaxClientCertId, ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ConstraintError));
     VerifyOrReturn(req.clientCertificate.size() <= kSpecMaxCertBytes,
                    ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ConstraintError));
+    VerifyOrReturn(Crypto::IsCertificateValidAtCurrentTime(req.clientCertificate) == CHIP_NO_ERROR,
+                   ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::DynamicConstraintError));
     size_t intermediateSize;
     VerifyOrReturn(req.intermediateCertificates.ComputeSize(&intermediateSize) == CHIP_NO_ERROR,
                    ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::InvalidCommand));
     VerifyOrReturn(intermediateSize <= kMaxIntermediateCertificates,
                    ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ConstraintError));
+    auto srcIter = req.intermediateCertificates.begin();
+    while (srcIter.Next())
+    {
+        auto & cert = srcIter.GetValue();
+        VerifyOrReturn(cert.size() <= kSpecMaxCertBytes, ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ConstraintError));
+
+        VerifyOrReturn(Crypto::IsCertificateValidAtCurrentTime(cert) == CHIP_NO_ERROR,
+                       ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::DynamicConstraintError));
+    }
 
     auto fabric = ctx.mCommandHandler.GetAccessingFabricIndex();
     DataModel::Nullable<Tls::TLSCCDID> foundId;
