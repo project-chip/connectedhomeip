@@ -22,7 +22,7 @@
 #include <app/CommandHandlerInterface.h>
 #include <app/CommandHandlerInterfaceRegistry.h>
 #include <app/ConcreteCommandPath.h>
-#include <app/clusters/general-commissioning-server/general-commissioning-logic.h>
+#include <app/clusters/general-commissioning-server/general-commissioning-cluster.h>
 #include <app/clusters/network-commissioning/ThreadScanResponse.h>
 #include <app/clusters/network-commissioning/WifiScanResponse.h>
 #include <app/data-model/Nullable.h>
@@ -581,7 +581,10 @@ NetworkCommissioningLogic::HandleAddOrUpdateThreadNetwork(CommandHandler & handl
 void NetworkCommissioningLogic::UpdateBreadcrumb(const Optional<uint64_t> & breadcrumb)
 {
     VerifyOrReturn(breadcrumb.HasValue());
-    GeneralCommissioning::SetBreadcrumb(breadcrumb.Value());
+    if (GeneralCommissioningCluster * cluster = GeneralCommissioningCluster::Instance(); cluster != nullptr)
+    {
+        cluster->SetBreadCrumb(breadcrumb.Value());
+    }
 }
 
 void NetworkCommissioningLogic::CommitSavedBreadcrumb()
