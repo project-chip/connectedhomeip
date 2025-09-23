@@ -189,7 +189,7 @@ class TC_IDM_3_2(MatterBaseTest, BasicCompositionTests):
         logging.info(
             "Step 4: SuppressResponse parameter not supported in current WriteAttribute API, please refer to the issue link for more details")
 
-        # Check if NodeLabel exists (good for commissionable devices)
+        # Check if NodeLabel attribute exists
         if await self.attribute_guard(endpoint=self.endpoint, attribute=Clusters.BasicInformation.Attributes.NodeLabel):
             # NodeLabel exists - use it
             test_cluster = Clusters.BasicInformation
@@ -266,7 +266,9 @@ class TC_IDM_3_2(MatterBaseTest, BasicCompositionTests):
                                  f"Write with old DataVersion should return DATA_VERSION_MISMATCH, got {write_result_old_version[0].Status}")
 
         else:
-            # NodeLabel doesn't exist - skip this step for now (can be handled in follow-up)
+            # NodeLabel doesn't exist - skip these steps for now
+            # Created following follow-up task for the event that the node label attribute does not exist
+            # TODO: https://github.com/project-chip/matter-test-scripts/issues/693
             logging.info("NodeLabel not found - this may be a non-commissionable device")
             self.skip_step(5)
             self.skip_step(6)
