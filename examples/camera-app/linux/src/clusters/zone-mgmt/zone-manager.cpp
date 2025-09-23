@@ -271,7 +271,6 @@ void ZoneManager::OnZoneTriggeredEvent(uint16_t zoneId,
         }
     }
 
-    // Notify PushAVTransportManager after the ZoneManager has handled the event.
     if (mCameraDevice)
     {
         mCameraDevice->GetPushAVTransportDelegate().OnZoneTriggeredEvent(zoneId);

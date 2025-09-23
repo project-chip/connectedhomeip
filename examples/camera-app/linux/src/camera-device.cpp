@@ -1160,7 +1160,7 @@ CameraError CameraDevice::SetNightVision(TriStateAutoEnum nightVision)
 
 uint32_t CameraDevice::GetMaxNetworkBandwidth()
 {
-    return kMaxNetworkBandwidthMbps;
+    return kMaxNetworkBandwidthbps;
 }
 
 uint16_t CameraDevice::GetCurrentFrameRate()

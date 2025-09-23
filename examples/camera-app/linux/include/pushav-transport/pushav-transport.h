@@ -103,12 +103,9 @@ public:
         mZoneSensitivityList = zoneSensitivityList;
     }
 
-    void SetCurrentlyUsedBandwidthMbps(double currentlyUsedBandwidthMbps)
-    {
-        mCurrentlyUsedBandwidthMbps = currentlyUsedBandwidthMbps;
-    }
+    void SetCurrentlyUsedBandwidthbps(double currentlyUsedBandwidthbps) { mCurrentlyUsedBandwidthbps = currentlyUsedBandwidthbps; }
 
-    double GetCurrentlyUsedBandwidthMbps() { return mCurrentlyUsedBandwidthMbps; }
+    double GetCurrentlyUsedBandwidthbps() { return mCurrentlyUsedBandwidthbps; }
 
     // Set the cluster server reference for direct API calls
     void SetPushAvStreamTransportServer(chip::app::Clusters::PushAvStreamTransportServer * server)
@@ -148,5 +145,5 @@ private:
     chip::app::Clusters::PushAvStreamTransport::TransportStatusEnum mTransportStatus;
     chip::app::Clusters::PushAvStreamTransport::TransportTriggerTypeEnum mTransportTriggerType;
     uint16_t mConnectionID;
-    double mCurrentlyUsedBandwidthMbps = 0.0;
+    double mCurrentlyUsedBandwidthbps = 0.0;
 };
