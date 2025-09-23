@@ -53,7 +53,7 @@ public:
 
 } // namespace
 
-void emberAfAccessControlClusterServerInitCallback(EndpointId endpointId)
+void MatterAccessControlClusterInitCallback(EndpointId endpointId)
 {
     IntegrationDelegate integrationDelegate;
 
@@ -69,7 +69,7 @@ void emberAfAccessControlClusterServerInitCallback(EndpointId endpointId)
         integrationDelegate);
 }
 
-void MatterAccessControlClusterServerShutdownCallback(EndpointId endpointId)
+void MatterAccessControlClusterShutdownCallback(EndpointId endpointId)
 {
     IntegrationDelegate integrationDelegate;
 
