@@ -148,5 +148,9 @@ private:
     chip::app::Clusters::PushAvStreamTransport::TransportStatusEnum mTransportStatus;
     chip::app::Clusters::PushAvStreamTransport::TransportTriggerTypeEnum mTransportTriggerType;
     uint16_t mConnectionID;
+<<<<<<< HEAD
     uint32_t mCurrentlyUsedBandwidthbps = 0;
+=======
+    double mCurrentlyUsedBandwidthbps = 0.0;
+>>>>>>> 32727ac6df (Updated bandwidth calculation to use bps)
 };
