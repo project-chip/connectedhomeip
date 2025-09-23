@@ -57,12 +57,12 @@ void MatterDescriptorClusterInitCallback(EndpointId endpointId)
 
     CodegenClusterIntegration::RegisterServer(
         {
-            .endpointId                      = endpointId,
-            .clusterId                       = Descriptor::Id,
-            .fixedClusterInstanceCount       = kDescriptorFixedClusterCount,
-            .maxClusterInstanceCount         = kDescriptorMaxClusterCount,
-            .fetchFeatureMap                 = false,
-            .fetchOptionalAttributes         = false,
+            .endpointId                = endpointId,
+            .clusterId                 = Descriptor::Id,
+            .fixedClusterInstanceCount = kDescriptorFixedClusterCount,
+            .maxClusterInstanceCount   = kDescriptorMaxClusterCount,
+            .fetchFeatureMap           = false,
+            .fetchOptionalAttributes   = false,
         },
         integrationDelegate);
 }
@@ -73,10 +73,10 @@ void MatterDescriptorClusterShutdownCallback(EndpointId endpointId)
 
     CodegenClusterIntegration::UnregisterServer(
         {
-            .endpointId                      = endpointId,
-            .clusterId                       = Descriptor::Id,
-            .fixedClusterInstanceCount       = kDescriptorFixedClusterCount,
-            .maxClusterInstanceCount         = kDescriptorMaxClusterCount,
+            .endpointId                = endpointId,
+            .clusterId                 = Descriptor::Id,
+            .fixedClusterInstanceCount = kDescriptorFixedClusterCount,
+            .maxClusterInstanceCount   = kDescriptorMaxClusterCount,
         },
         integrationDelegate);
 }
