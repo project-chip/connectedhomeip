@@ -418,7 +418,7 @@ PyChipError pychip_WriteClient_TestOnlyWriteAttributesTimedRequestNoTimedAction(
     uint16_t busyWaitMs           = static_cast<uint16_t>(busyWaitMsSizeT);
 
     std::unique_ptr<WriteClientCallback> callback = std::make_unique<WriteClientCallback>(appContext);
-    
+
     // CRITICAL: Use TestOnly constructor to set TimedRequest flag without timeout.
     // This function intentionally sets TimedRequest=true but does NOT send a TimedRequest action first.
     // This should result in TIMED_REQUEST_MISMATCH error.
