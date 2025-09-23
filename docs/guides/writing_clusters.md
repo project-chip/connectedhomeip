@@ -80,7 +80,7 @@ available based on the enabled features and optional items.
 -   Use a feature map to control elements dependent on features.
 -   Use boolean flags or `BitFlags` for purely optional elements.
 -   Ensure your unit tests cover different combinations of enabled features and
-    optionals.
+    optional attributes/commands.
 
 #### Attribute Change Notifications
 

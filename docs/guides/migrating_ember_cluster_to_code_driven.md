@@ -23,7 +23,7 @@ type-safe accessors in
 In a code-driven implementation, this data must be moved into member variables
 within your new cluster class.
 
-### `AttributeAccessInterface` (AAI) and `CommandHandlerInterface` (CHI)
+### `AttributeAccessInterface` (`AAI`) and `CommandHandlerInterface` (`CHI`)
 
 When more complex logic is needed, Ember clusters use these interfaces.
 
