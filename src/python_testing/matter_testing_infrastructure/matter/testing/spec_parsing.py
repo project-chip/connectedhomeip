@@ -96,6 +96,10 @@ class XmlDataTypeComponent:
 
 @dataclass
 class XmlDataType:
+    # data_type field is kept for validation, testing, and type safety even though objects
+    # are stored in separate structs/enums/bitmaps collections. This allows:
+    # 1. Test assertions to verify correct parsing (see TestSpecParsingDataType.py)
+    # 2. Type checking when objects are passed without collection context
     data_type: DataTypeEnum
     name: str
     components: dict[uint, XmlDataTypeComponent]
