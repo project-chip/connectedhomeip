@@ -21,6 +21,8 @@
 #include <app/CommandHandlerInterfaceRegistry.h>
 #include <app/InteractionModelEngine.h>
 #include <app/clusters/camera-av-stream-management-server/camera-av-stream-management-server.h>
+#include <app/persistence/AttributePersistenceProvider.h>
+#include <app/persistence/AttributePersistenceProviderInstance.h>
 #include <app/reporting/reporting.h>
 #include <app/util/attribute-storage.h>
 #include <app/util/util.h>
@@ -1725,7 +1727,7 @@ CHIP_ERROR CameraAVStreamMgmtServer::StoreAllocatedStreams(const std::vector<T> 
     }
 
     auto path = ConcreteAttributePath(mEndpointId, CameraAvStreamManagement::Id, attributeId);
-    ReturnErrorOnFailure(GetSafeAttributePersistenceProvider()->SafeWriteValue(path, ByteSpan(buffer, len)));
+    ReturnErrorOnFailure(GetAttributePersistenceProvider()->WriteValue(path, ByteSpan(buffer, len)));
 
     ChipLogProgress(Zcl, "Saved %u %s streams", static_cast<unsigned int>(streams.size()), StreamTypeToString(streamType));
     return CHIP_NO_ERROR;
@@ -1739,7 +1741,7 @@ CHIP_ERROR CameraAVStreamMgmtServer::LoadAllocatedStreams(std::vector<T> & strea
 
     auto path = ConcreteAttributePath(mEndpointId, CameraAvStreamManagement::Id, attributeId);
 
-    CHIP_ERROR err = GetSafeAttributePersistenceProvider()->SafeReadValue(path, span);
+    CHIP_ERROR err = GetAttributePersistenceProvider()->ReadValue(path, span);
     if (err == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND)
     {
         streams.clear();
