@@ -359,43 +359,33 @@ TEST_F(AutoCommissionerTest, IsScanNeededCombinations)
         const char * name;
         bool attemptWiFi;
         bool attemptThread;
-        EndpointId wifiEndpoint;
-        EndpointId threadEndpoint;
         bool scanExpected;
     };
 
     const Case cases[] = {
         {
-            .name           = "WiFiAndThreadSet",
-            .attemptWiFi    = true,
-            .attemptThread  = true,
-            .wifiEndpoint   = kRootEndpointId,
-            .threadEndpoint = kRootEndpointId,
-            .scanExpected   = true,
+            .name          = "WiFiAndThreadSet",
+            .attemptWiFi   = true,
+            .attemptThread = true,
+            .scanExpected  = true,
         },
         {
-            .name           = "WiFiAndThreadNotSet",
-            .attemptWiFi    = false,
-            .attemptThread  = false,
-            .wifiEndpoint   = kInvalidEndpointId,
-            .threadEndpoint = kInvalidEndpointId,
-            .scanExpected   = false,
+            .name          = "WiFiAndThreadNotSet",
+            .attemptWiFi   = false,
+            .attemptThread = false,
+            .scanExpected  = false,
         },
         {
-            .name           = "WiFiOnlySet",
-            .attemptWiFi    = true,
-            .attemptThread  = false,
-            .wifiEndpoint   = kRootEndpointId,
-            .threadEndpoint = kInvalidEndpointId,
-            .scanExpected   = true,
+            .name          = "WiFiOnlySet",
+            .attemptWiFi   = true,
+            .attemptThread = false,
+            .scanExpected  = true,
         },
         {
-            .name           = "ThreadOnlySet",
-            .attemptWiFi    = false,
-            .attemptThread  = true,
-            .wifiEndpoint   = kInvalidEndpointId,
-            .threadEndpoint = kRootEndpointId,
-            .scanExpected   = true,
+            .name          = "ThreadOnlySet",
+            .attemptWiFi   = false,
+            .attemptThread = true,
+            .scanExpected  = true,
         },
     };
 
@@ -409,17 +399,15 @@ TEST_F(AutoCommissionerTest, IsScanNeededCombinations)
         EXPECT_EQ(mCommissioner.SetCommissioningParameters(params), CHIP_NO_ERROR);
 
         ReadCommissioningInfo & commissioningInfo = privateConfigCommissioner.GetDeviceCommissioningInfo();
-        commissioningInfo.network.wifi.endpoint   = c.wifiEndpoint;
-        commissioningInfo.network.thread.endpoint = c.threadEndpoint;
+        commissioningInfo.network.wifi.endpoint   = c.attemptWiFi ? kRootEndpointId : kInvalidEndpointId;
+        commissioningInfo.network.thread.endpoint = c.attemptThread ? kRootEndpointId : kInvalidEndpointId;
 
         bool result = privateConfigCommissioner.IsScanNeeded();
 
         if (result != c.scanExpected)
         {
-            ChipLogError(Test,
-                         "%s failed: result=%d scanExpected=%d, attemptWiFi=%d, attemptThread=%d, "
-                         "wifiEndpoint=0x%03X, threadEndpoint=0x%03X",
-                         c.name, result, c.scanExpected, c.attemptWiFi, c.attemptThread, c.wifiEndpoint, c.threadEndpoint);
+            ChipLogError(Test, "%s failed: result=%d scanExpected=%d, attemptWiFi=%d, attemptThread=%d", c.name, result,
+                         c.scanExpected, c.attemptWiFi, c.attemptThread);
         }
         EXPECT_EQ(result, c.scanExpected);
     }
