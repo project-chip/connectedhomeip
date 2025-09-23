@@ -27,6 +27,9 @@ void MatterClusterServerInitCallback(EndpointId endpoint, ClusterId clusterId)
 {
     switch (clusterId)
     {
+    case app::Clusters::Descriptor::Id:
+        MatterDescriptorClusterInitCallback(endpoint);
+        break;
     case app::Clusters::Binding::Id:
         MatterBindingClusterInitCallback(endpoint);
         break;
@@ -67,6 +70,9 @@ void MatterClusterServerShutdownCallback(EndpointId endpoint, ClusterId clusterI
 {
     switch (clusterId)
     {
+    case app::Clusters::Descriptor::Id:
+        MatterDescriptorClusterShutdownCallback(endpoint);
+        break;
     case app::Clusters::Binding::Id:
         MatterBindingClusterShutdownCallback(endpoint);
         break;

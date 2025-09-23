@@ -23,6 +23,10 @@
 
 #include <app/util/basic-types.h>
 
+void MatterDescriptorClusterInitCallback(chip::EndpointId endpointId);
+
+void MatterDescriptorClusterShutdownCallback(chip::EndpointId endpointId);
+
 void MatterBindingClusterInitCallback(chip::EndpointId endpointId);
 
 void MatterBindingClusterShutdownCallback(chip::EndpointId endpointId);

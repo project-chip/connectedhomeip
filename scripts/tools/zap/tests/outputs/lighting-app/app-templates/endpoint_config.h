@@ -730,10 +730,6 @@
 
 // Cluster function static arrays
 #define GENERATED_FUNCTION_ARRAYS                                                                                                  \
-    const EmberAfGenericClusterFunction chipFuncArrayDescriptorServer[] = {                                                        \
-        (EmberAfGenericClusterFunction) emberAfDescriptorClusterServerInitCallback,                                                \
-        (EmberAfGenericClusterFunction) MatterDescriptorClusterServerShutdownCallback,                                             \
-    };                                                                                                                             \
     const EmberAfGenericClusterFunction chipFuncArrayLocalizationConfigurationServer[] = {                                         \
         (EmberAfGenericClusterFunction) emberAfLocalizationConfigurationClusterServerInitCallback,                                 \
         (EmberAfGenericClusterFunction) MatterLocalizationConfigurationClusterServerPreAttributeChangedCallback,                   \
@@ -961,8 +957,8 @@
       .attributes = ZAP_ATTRIBUTE_INDEX(0), \
       .attributeCount = 6, \
       .clusterSize = 0, \
-      .mask = ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(INIT_FUNCTION) | ZAP_CLUSTER_MASK(SHUTDOWN_FUNCTION), \
-      .functions = chipFuncArrayDescriptorServer, \
+      .mask = ZAP_CLUSTER_MASK(SERVER), \
+      .functions = NULL, \
       .acceptedCommandList = nullptr, \
       .generatedCommandList = nullptr, \
       .eventList = nullptr, \
@@ -1286,8 +1282,8 @@
       .attributes = ZAP_ATTRIBUTE_INDEX(237), \
       .attributeCount = 6, \
       .clusterSize = 0, \
-      .mask = ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(INIT_FUNCTION) | ZAP_CLUSTER_MASK(SHUTDOWN_FUNCTION), \
-      .functions = chipFuncArrayDescriptorServer, \
+      .mask = ZAP_CLUSTER_MASK(SERVER), \
+      .functions = NULL, \
       .acceptedCommandList = nullptr, \
       .generatedCommandList = nullptr, \
       .eventList = nullptr, \
