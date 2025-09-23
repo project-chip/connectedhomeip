@@ -180,16 +180,16 @@ struct TestDiagnosticLogsLogic : public ::testing::Test
 
 TEST_F(TestDiagnosticLogsLogic, ResponsePayload_WithDelegate_Success)
 {
-    DiagnosticLogsProviderLogic logic;
+    DiagnosticLogsCluster diagnosticLogsCluster;
 
     MockDelegate delegate;
     uint8_t buffer[100];
     delegate.SetDiagnosticBuffer(buffer, sizeof(buffer));
-    logic.SetDelegate(&delegate);
+    diagnosticLogsCluster.SetDelegate(&delegate);
 
     const ConcreteCommandPath kPath{ kRootEndpoint, DiagnosticLogs::Id, DiagnosticLogs::Commands::RetrieveLogsRequest::Id };
     MockCommandHandler handler;
-    logic.HandleLogRequestForResponsePayload(&handler, kPath, DiagnosticLogs::IntentEnum::kEndUserSupport);
+    diagnosticLogsCluster.HandleLogRequestForResponsePayload(&handler, kPath, DiagnosticLogs::IntentEnum::kEndUserSupport);
     EXPECT_EQ(handler.GetResponse().commandId, DiagnosticLogs::Commands::RetrieveLogsResponse::Id);
     auto decoded = DecodeRetrieveLogsResponse(handler.GetResponse());
     EXPECT_EQ(decoded.status, DiagnosticLogs::StatusEnum::kSuccess);
@@ -200,17 +200,17 @@ TEST_F(TestDiagnosticLogsLogic, ResponsePayload_WithDelegate_Success)
 // If request is BDX but logs can fit in the response payload, the response should be kExhausted
 TEST_F(TestDiagnosticLogsLogic, Bdx_WithDelegate_kExhausted)
 {
-    DiagnosticLogsProviderLogic logic;
+    DiagnosticLogsCluster diagnosticLogsCluster;
 
     MockDelegate delegate;
     uint8_t buffer[1024];
     delegate.SetDiagnosticBuffer(buffer, sizeof(buffer));
-    logic.SetDelegate(&delegate);
+    diagnosticLogsCluster.SetDelegate(&delegate);
 
     const ConcreteCommandPath kPath{ kRootEndpoint, DiagnosticLogs::Id, DiagnosticLogs::Commands::RetrieveLogsRequest::Id };
     MockCommandHandler handler;
-    logic.HandleLogRequestForBdx(&handler, kPath, DiagnosticLogs::IntentEnum::kEndUserSupport,
-                                 MakeOptional(CharSpan::fromCharString("enduser.log")));
+    diagnosticLogsCluster.HandleLogRequestForBdx(&handler, kPath, DiagnosticLogs::IntentEnum::kEndUserSupport,
+                                                 MakeOptional(CharSpan::fromCharString("enduser.log")));
     EXPECT_EQ(handler.GetResponse().commandId, DiagnosticLogs::Commands::RetrieveLogsResponse::Id);
     auto decoded = DecodeRetrieveLogsResponse(handler.GetResponse());
     EXPECT_EQ(decoded.status, DiagnosticLogs::StatusEnum::kExhausted);
@@ -220,17 +220,17 @@ TEST_F(TestDiagnosticLogsLogic, Bdx_WithDelegate_kExhausted)
 
 TEST_F(TestDiagnosticLogsLogic, Bdx_WithDelegate_kExhausted_with_buffer_greater_than_kMaxLogContentSize)
 {
-    DiagnosticLogsProviderLogic logic;
+    DiagnosticLogsCluster diagnosticLogsCluster;
 
     MockDelegate delegate;
     uint8_t buffer[2048];
     delegate.SetDiagnosticBuffer(buffer, sizeof(buffer));
-    logic.SetDelegate(&delegate);
+    diagnosticLogsCluster.SetDelegate(&delegate);
 
     const ConcreteCommandPath kPath{ kRootEndpoint, DiagnosticLogs::Id, DiagnosticLogs::Commands::RetrieveLogsRequest::Id };
     MockCommandHandler handler;
-    logic.HandleLogRequestForBdx(&handler, kPath, DiagnosticLogs::IntentEnum::kEndUserSupport,
-                                 MakeOptional(CharSpan::fromCharString("enduser.log")));
+    diagnosticLogsCluster.HandleLogRequestForBdx(&handler, kPath, DiagnosticLogs::IntentEnum::kEndUserSupport,
+                                                 MakeOptional(CharSpan::fromCharString("enduser.log")));
     EXPECT_EQ(handler.GetResponse().commandId, DiagnosticLogs::Commands::RetrieveLogsResponse::Id);
     auto decoded = DecodeRetrieveLogsResponse(handler.GetResponse());
     EXPECT_EQ(decoded.status, DiagnosticLogs::StatusEnum::kExhausted);

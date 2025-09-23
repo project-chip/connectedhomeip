@@ -98,8 +98,8 @@ struct LogRequestHandler
 
 } // namespace
 
-void DiagnosticLogsProviderLogic::HandleLogRequestForResponsePayload(CommandHandler * commandObj, const ConcreteCommandPath & path,
-                                                                     IntentEnum intent, StatusEnum statusOnSuccess)
+void DiagnosticLogsCluster::HandleLogRequestForResponsePayload(CommandHandler * commandObj, const ConcreteCommandPath & path,
+                                                               IntentEnum intent, StatusEnum statusOnSuccess)
 {
     LogRequestHandler handler;
 
@@ -115,8 +115,8 @@ void DiagnosticLogsProviderLogic::HandleLogRequestForResponsePayload(CommandHand
 }
 
 std::optional<DataModel::ActionReturnStatus>
-DiagnosticLogsProviderLogic::HandleLogRequestForBdx(CommandHandler * commandObj, const ConcreteCommandPath & path,
-                                                    IntentEnum intent, Optional<CharSpan> transferFileDesignator)
+DiagnosticLogsCluster::HandleLogRequestForBdx(CommandHandler * commandObj, const ConcreteCommandPath & path, IntentEnum intent,
+                                              Optional<CharSpan> transferFileDesignator)
 {
     // If the RequestedProtocol is set to BDX and there is no TransferFileDesignator the command SHALL fail with a Status Code of
     // INVALID_COMMAND.

@@ -24,9 +24,26 @@ namespace chip {
 namespace app {
 namespace Clusters {
 
-class DiagnosticLogsProviderLogic
+class DiagnosticLogsCluster : public DefaultServerCluster
 {
 public:
+    DiagnosticLogsCluster() : DefaultServerCluster({ kRootEndpointId, DiagnosticLogs::Id }) {}
+
+    static DiagnosticLogsCluster & Instance()
+    {
+        static DiagnosticLogsCluster instance;
+        return instance;
+    }
+
+    // Server cluster implementation
+    DataModel::ActionReturnStatus ReadAttribute(const DataModel::ReadAttributeRequest & request,
+                                                AttributeValueEncoder & encoder) override;
+    std::optional<DataModel::ActionReturnStatus> InvokeCommand(const DataModel::InvokeRequest & request,
+                                                               TLV::TLVReader & input_arguments, CommandHandler * handler) override;
+    CHIP_ERROR AcceptedCommands(const ConcreteClusterPath & path,
+                                ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder) override;
+    CHIP_ERROR GeneratedCommands(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<CommandId> & builder) override;
+
     /**
      * Set the default delegate of the diagnostic logs cluster for the specified endpoint
      *
@@ -58,27 +75,6 @@ public:
 
 private:
     DiagnosticLogs::DiagnosticLogsProviderDelegate * mDelegate = nullptr;
-};
-
-class DiagnosticLogsCluster : public DefaultServerCluster, public DiagnosticLogsProviderLogic
-{
-public:
-    DiagnosticLogsCluster() : DefaultServerCluster({ kRootEndpointId, DiagnosticLogs::Id }) {}
-
-    static DiagnosticLogsCluster & Instance()
-    {
-        static DiagnosticLogsCluster instance;
-        return instance;
-    }
-
-    // Server cluster implementation
-    DataModel::ActionReturnStatus ReadAttribute(const DataModel::ReadAttributeRequest & request,
-                                                AttributeValueEncoder & encoder) override;
-    std::optional<DataModel::ActionReturnStatus> InvokeCommand(const DataModel::InvokeRequest & request,
-                                                               TLV::TLVReader & input_arguments, CommandHandler * handler) override;
-    CHIP_ERROR AcceptedCommands(const ConcreteClusterPath & path,
-                                ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder) override;
-    CHIP_ERROR GeneratedCommands(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<CommandId> & builder) override;
 };
 
 } // namespace Clusters
