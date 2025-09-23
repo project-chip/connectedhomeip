@@ -31,7 +31,9 @@ using namespace chip::Protocols::InteractionModel;
 
 namespace {
 
-// Diagnostic logs cluster is a device-wide cluster, so we only need one cluster instance.
+// Specification:
+// Diagnostic logs will be Node-wide and not specific to any subset of Endpoints.
+// When present, this Cluster SHALL be implemented once for the Node.
 Global<DiagnosticLogsCluster> gServer;
 
 ServerClusterRegistration & ClusterRegistration()
@@ -44,14 +46,14 @@ ServerClusterRegistration & ClusterRegistration()
 
 void emberAfDiagnosticLogsClusterServerInitCallback(EndpointId endpoint)
 {
-    // This cluster is assumed to be and implemented as a singleton on the root endpoint
+    // We implement the cluster as a singleton on the root endpoint.
     VerifyOrReturn(endpoint == kRootEndpointId);
     (void) CodegenDataModelProvider::Instance().Registry().Register(ClusterRegistration());
 }
 
 void MatterDiagnosticLogsClusterServerShutdownCallback(EndpointId endpointId)
 {
-    // This cluster is assumed to be and implemented as a singleton on the root endpoint
+    // We implement the cluster as a singleton on the root endpoint.
     VerifyOrReturn(endpointId == kRootEndpointId);
     CodegenDataModelProvider::Instance().Registry().Unregister(&gServer.get());
 }

@@ -30,13 +30,11 @@
 namespace chip {
 namespace app {
 
-using namespace chip;
-using namespace chip::app;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::DiagnosticLogs;
 using chip::Protocols::InteractionModel::Status;
 
-static constexpr EndpointId kEndpoint0 = 0;
+static constexpr EndpointId kRootEndpoint = 0;
 
 class MockCommandHandler : public CommandHandler
 {
@@ -189,7 +187,7 @@ TEST_F(TestDiagnosticLogsLogic, ResponsePayload_WithDelegate_Success)
     delegate.SetDiagnosticBuffer(buffer, sizeof(buffer));
     logic.SetDelegate(&delegate);
 
-    const ConcreteCommandPath kPath{ kEndpoint0, DiagnosticLogs::Id, DiagnosticLogs::Commands::RetrieveLogsRequest::Id };
+    const ConcreteCommandPath kPath{ kRootEndpoint, DiagnosticLogs::Id, DiagnosticLogs::Commands::RetrieveLogsRequest::Id };
     MockCommandHandler handler;
     logic.HandleLogRequestForResponsePayload(&handler, kPath, DiagnosticLogs::IntentEnum::kEndUserSupport);
     EXPECT_EQ(handler.GetResponse().commandId, DiagnosticLogs::Commands::RetrieveLogsResponse::Id);
@@ -209,7 +207,7 @@ TEST_F(TestDiagnosticLogsLogic, Bdx_WithDelegate_kExhausted)
     delegate.SetDiagnosticBuffer(buffer, sizeof(buffer));
     logic.SetDelegate(&delegate);
 
-    const ConcreteCommandPath kPath{ kEndpoint0, DiagnosticLogs::Id, DiagnosticLogs::Commands::RetrieveLogsRequest::Id };
+    const ConcreteCommandPath kPath{ kRootEndpoint, DiagnosticLogs::Id, DiagnosticLogs::Commands::RetrieveLogsRequest::Id };
     MockCommandHandler handler;
     logic.HandleLogRequestForBdx(&handler, kPath, DiagnosticLogs::IntentEnum::kEndUserSupport,
                                  MakeOptional(CharSpan::fromCharString("enduser.log")));
@@ -229,7 +227,7 @@ TEST_F(TestDiagnosticLogsLogic, Bdx_WithDelegate_kExhausted_with_buffer_greater_
     delegate.SetDiagnosticBuffer(buffer, sizeof(buffer));
     logic.SetDelegate(&delegate);
 
-    const ConcreteCommandPath kPath{ kEndpoint0, DiagnosticLogs::Id, DiagnosticLogs::Commands::RetrieveLogsRequest::Id };
+    const ConcreteCommandPath kPath{ kRootEndpoint, DiagnosticLogs::Id, DiagnosticLogs::Commands::RetrieveLogsRequest::Id };
     MockCommandHandler handler;
     logic.HandleLogRequestForBdx(&handler, kPath, DiagnosticLogs::IntentEnum::kEndUserSupport,
                                  MakeOptional(CharSpan::fromCharString("enduser.log")));
