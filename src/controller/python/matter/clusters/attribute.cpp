@@ -353,7 +353,7 @@ CHIP_ERROR ProcessWriteAttributesData(WriteClient * client, python::PyWriteAttri
 exit:
     return err;
 }
-} 
+}
 
 extern "C" {
 void pychip_WriteClient_InitCallbacks(OnWriteResponseCallback onWriteResponseCallback, OnWriteErrorCallback onWriteErrorCallback,
