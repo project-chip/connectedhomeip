@@ -187,11 +187,12 @@ void ClosureControlEndpoint::OnStopMotionActionComplete()
 
         if (overallCurrentState.IsNull())
         {
-            overallCurrentState.SetNonNull(GenericOverallCurrentState(position, NullOptional, NullOptional, NullOptional));
+            overallCurrentState.SetNonNull(GenericOverallCurrentState(position, NullOptional, NullOptional, false));
         }
         else
         {
-            overallCurrentState.Value().position = position;
+            overallCurrentState.Value().position    = position;
+            overallCurrentState.Value().secureState = false;
         }
 
         VerifyOrReturn(mLogic.SetOverallCurrentState(overallCurrentState) == CHIP_NO_ERROR,
@@ -324,11 +325,12 @@ void ClosureControlEndpoint::OnPanelMotionActionComplete()
 
     if (overallCurrentState.IsNull())
     {
-        overallCurrentState.SetNonNull(GenericOverallCurrentState(position, NullOptional, NullOptional, NullOptional));
+        overallCurrentState.SetNonNull(GenericOverallCurrentState(position, NullOptional, NullOptional, false));
     }
     else
     {
-        overallCurrentState.Value().position = position;
+        overallCurrentState.Value().position    = position;
+        overallCurrentState.Value().secureState = false;
     }
 
     // Set latch and speed to their target values if they are set in the overall target.

@@ -42,7 +42,7 @@ EndpointCheckFunction = Callable[[
     Clusters.Attribute.AsyncReadTransaction.ReadResponse, int], bool]
 
 
-def _has_cluster(wildcard: Clusters.Attribute.AsyncReadTransaction.ReadResponse, endpoint: int, cluster: Type[ClusterObjects.Cluster]) -> bool:
+def _has_cluster(wildcard: Clusters.Attribute.AsyncReadTransaction.ReadResponse, endpoint: int, cluster: ClusterObjects.ClusterObjectDescriptor) -> bool:
     """Check if a cluster exists on a specific endpoint.
 
     Args:

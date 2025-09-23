@@ -1686,8 +1686,8 @@ CHIP_ERROR VerifyAttestationCertificateFormat(const ByteSpan & cert, Attestation
     VerifyOrExit(X509_get_serialNumber(x509Cert) != nullptr, err = CHIP_ERROR_INTERNAL);
     VerifyOrExit(X509_get_signature_nid(x509Cert) == NID_ecdsa_with_SHA256, err = CHIP_ERROR_INTERNAL);
     VerifyOrExit(X509_get_issuer_name(x509Cert) != nullptr, err = CHIP_ERROR_INTERNAL);
-    VerifyOrExit(X509_get_notBefore(x509Cert) != nullptr, err = CHIP_ERROR_INTERNAL);
-    VerifyOrExit(X509_get_notAfter(x509Cert) != nullptr, err = CHIP_ERROR_INTERNAL);
+    VerifyOrExit(X509_getm_notBefore(x509Cert) != nullptr, err = CHIP_ERROR_INTERNAL);
+    VerifyOrExit(X509_getm_notAfter(x509Cert) != nullptr, err = CHIP_ERROR_INTERNAL);
     VerifyOrExit(X509_get_subject_name(x509Cert) != nullptr, err = CHIP_ERROR_INTERNAL);
 
     // Verify public key presence and format.
@@ -1843,12 +1843,16 @@ CHIP_ERROR ValidateCertificateChain(const uint8_t * rootCertificate, size_t root
     {
         X509_VERIFY_PARAM * param = X509_STORE_CTX_get0_param(verifyCtx);
         chip::ASN1::ASN1UniversalTime asn1Time;
-        char * asn1TimeStr = reinterpret_cast<char *>(X509_get_notBefore(x509LeafCertificate)->data);
         uint32_t unixEpoch;
 
         VerifyOrExit(param != nullptr, (result = CertificateChainValidationResult::kNoMemory, err = CHIP_ERROR_NO_MEMORY));
 
-        VerifyOrExit(CHIP_NO_ERROR == asn1Time.ImportFrom_ASN1_TIME_string(CharSpan(asn1TimeStr, strlen(asn1TimeStr))),
+        ASN1_TIME * pNotBefore = X509_getm_notBefore(x509LeafCertificate);
+        VerifyOrExit(pNotBefore != nullptr,
+                     (result = CertificateChainValidationResult::kLeafFormatInvalid, err = CHIP_ERROR_INTERNAL));
+        CharSpan asn1TimeSpan(reinterpret_cast<char *>(pNotBefore->data), static_cast<size_t>(pNotBefore->length));
+
+        VerifyOrExit(CHIP_NO_ERROR == asn1Time.ImportFrom_ASN1_TIME_string(asn1TimeSpan),
                      (result = CertificateChainValidationResult::kLeafFormatInvalid, err = CHIP_ERROR_INTERNAL));
 
         VerifyOrExit(asn1Time.ExportTo_UnixTime(unixEpoch),
@@ -1901,9 +1905,9 @@ CHIP_ERROR IsCertificateValidAtIssuance(const ByteSpan & candidateCertificate, c
     x509issuerCertificate = d2i_X509(nullptr, &pIssuerCertificate, static_cast<long>(issuerCertificate.size()));
     VerifyOrExit(x509issuerCertificate != nullptr, error = CHIP_ERROR_NO_MEMORY);
 
-    candidateNotBeforeTime = X509_get_notBefore(x509CandidateCertificate);
-    issuerNotBeforeTime    = X509_get_notBefore(x509issuerCertificate);
-    issuerNotAfterTime     = X509_get_notAfter(x509issuerCertificate);
+    candidateNotBeforeTime = X509_getm_notBefore(x509CandidateCertificate);
+    issuerNotBeforeTime    = X509_getm_notBefore(x509issuerCertificate);
+    issuerNotAfterTime     = X509_getm_notAfter(x509issuerCertificate);
     VerifyOrExit(candidateNotBeforeTime && issuerNotBeforeTime && issuerNotAfterTime, error = CHIP_ERROR_INTERNAL);
 
     result = ASN1_TIME_diff(&days, &seconds, issuerNotBeforeTime, candidateNotBeforeTime);
@@ -1940,14 +1944,14 @@ CHIP_ERROR IsCertificateValidAtCurrentTime(const ByteSpan & certificate)
     x509Certificate = d2i_X509(nullptr, &pCertificate, static_cast<long>(certificate.size()));
     VerifyOrExit(x509Certificate != nullptr, error = CHIP_ERROR_NO_MEMORY);
 
-    time = X509_get_notBefore(x509Certificate);
+    time = X509_getm_notBefore(x509Certificate);
     VerifyOrExit(time, error = CHIP_ERROR_INTERNAL);
 
     result = X509_cmp_current_time(time);
     // check if certificate's notBefore timestamp is earlier than or equal to current time.
     VerifyOrExit(result == -1, error = CHIP_ERROR_CERT_EXPIRED);
 
-    time = X509_get_notAfter(x509Certificate);
+    time = X509_getm_notAfter(x509Certificate);
     VerifyOrExit(time, error = CHIP_ERROR_INTERNAL);
 
     result = X509_cmp_current_time(time);

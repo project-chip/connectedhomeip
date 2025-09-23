@@ -151,8 +151,8 @@ class MetadataReader:
                 app_ready_pattern=attr.get("app-ready-pattern"),
                 app_stdin_pipe=attr.get("app-stdin-pipe"),
                 script_args=attr.get("script-args"),
-                factory_reset=attr.get("factory-reset", False),
-                quiet=attr.get("quiet", True),
+                factory_reset=str(attr.get("factory-reset", False)).lower() == 'true',
+                quiet=str(attr.get("quiet", True)).lower() == 'true',
             ))
 
         return runs_metadata

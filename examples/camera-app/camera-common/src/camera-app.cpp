@@ -16,11 +16,15 @@
  *    limitations under the License.
  */
 #include "camera-app.h"
+#include "tls-certificate-management-instance.h"
+#include "tls-client-management-instance.h"
+#include <app/clusters/push-av-stream-transport-server/CodegenIntegration.h>
 
 using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::Chime;
+using namespace chip::app::Clusters::PushAvStreamTransport;
 using namespace chip::app::Clusters::WebRTCTransportProvider;
 using namespace chip::app::Clusters::CameraAvStreamManagement;
 using namespace chip::app::Clusters::CameraAvSettingsUserLevelManagement;
@@ -42,6 +46,13 @@ CameraApp::CameraApp(chip::EndpointId aClustersEndpoint, CameraDeviceInterface *
     mWebRTCTransportProviderPtr =
         std::make_unique<WebRTCTransportProviderServer>(mCameraDevice->GetWebRTCProviderDelegate(), mEndpoint);
 
+    Clusters::PushAvStreamTransport::SetDelegate(mEndpoint, &(mCameraDevice->GetPushAVTransportDelegate()));
+
+    Clusters::PushAvStreamTransport::SetTLSClientManagementDelegate(mEndpoint,
+                                                                    &Clusters::TlsClientManagementCommandDelegate::GetInstance());
+
+    Clusters::PushAvStreamTransport::SetTlsCertificateManagementDelegate(
+        mEndpoint, &Clusters::TlsCertificateManagementCommandDelegate::getInstance());
     // Fetch all initialization parameters for CameraAVStreamMgmt Server
     BitFlags<CameraAvStreamManagement::Feature> avsmFeatures;
     BitFlags<CameraAvStreamManagement::OptionalAttribute> avsmOptionalAttrs;
@@ -120,10 +131,13 @@ CameraApp::CameraApp(chip::EndpointId aClustersEndpoint, CameraDeviceInterface *
     std::vector<RateDistortionTradeOffStruct> rateDistortionTradeOffPoints =
         mCameraDevice->GetCameraHALInterface().GetRateDistortionTradeOffPoints();
 
-    uint32_t maxContentBufferSize               = mCameraDevice->GetCameraHALInterface().GetMaxContentBufferSize();
-    AudioCapabilitiesStruct micCapabilities     = mCameraDevice->GetCameraHALInterface().GetMicrophoneCapabilities();
-    AudioCapabilitiesStruct spkrCapabilities    = mCameraDevice->GetCameraHALInterface().GetSpeakerCapabilities();
-    TwoWayTalkSupportTypeEnum twowayTalkSupport = TwoWayTalkSupportTypeEnum::kNotSupported;
+    uint32_t maxContentBufferSize            = mCameraDevice->GetCameraHALInterface().GetMaxContentBufferSize();
+    AudioCapabilitiesStruct micCapabilities  = mCameraDevice->GetCameraHALInterface().GetMicrophoneCapabilities();
+    AudioCapabilitiesStruct spkrCapabilities = mCameraDevice->GetCameraHALInterface().GetSpeakerCapabilities();
+    TwoWayTalkSupportTypeEnum twowayTalkSupport =
+        mCameraDevice->GetCameraHALInterface().HasMicrophone() && mCameraDevice->GetCameraHALInterface().HasSpeaker()
+        ? TwoWayTalkSupportTypeEnum::kFullDuplex
+        : TwoWayTalkSupportTypeEnum::kNotSupported;
     std::vector<SnapshotCapabilitiesStruct> snapshotCapabilities = mCameraDevice->GetCameraHALInterface().GetSnapshotCapabilities();
     uint32_t maxNetworkBandwidth                                 = mCameraDevice->GetCameraHALInterface().GetMaxNetworkBandwidth();
     std::vector<StreamUsageEnum> supportedStreamUsages = mCameraDevice->GetCameraHALInterface().GetSupportedStreamUsages();
@@ -151,7 +165,8 @@ CameraApp::CameraApp(chip::EndpointId aClustersEndpoint, CameraDeviceInterface *
         CameraAvSettingsUserLevelManagement::OptionalAttributes::kTiltMin,
         CameraAvSettingsUserLevelManagement::OptionalAttributes::kTiltMax,
         CameraAvSettingsUserLevelManagement::OptionalAttributes::kPanMin,
-        CameraAvSettingsUserLevelManagement::OptionalAttributes::kPanMax);
+        CameraAvSettingsUserLevelManagement::OptionalAttributes::kPanMax,
+        CameraAvSettingsUserLevelManagement::OptionalAttributes::kMovementState);
     const uint8_t appMaxPresets = 5;
 
     // Instantiate the CameraAVSettingsUserLevelMgmt Server
@@ -255,6 +270,7 @@ void CameraApp::InitCameraDeviceClusters()
 {
     // Initialize Cluster Servers
     mWebRTCTransportProviderPtr->Init();
+    mCameraDevice->GetWebRTCProviderController().SetWebRTCTransportProvider(std::move(mWebRTCTransportProviderPtr));
 
     mChimeServerPtr->Init();
 
@@ -263,6 +279,13 @@ void CameraApp::InitCameraDeviceClusters()
     InitializeCameraAVStreamMgmt();
 
     mZoneMgmtServerPtr->Init();
+}
+
+void CameraApp::ShutdownCameraDeviceClusters()
+{
+    ChipLogDetail(Camera, "CameraAppShutdown: Shutting down Camera device clusters");
+    mAVSettingsUserLevelMgmtServerPtr->Shutdown();
+    mWebRTCTransportProviderPtr->Shutdown();
 }
 
 static constexpr EndpointId kCameraEndpointId = 1;
@@ -280,5 +303,6 @@ void CameraAppInit(CameraDeviceInterface * cameraDevice)
 void CameraAppShutdown()
 {
     ChipLogDetail(Camera, "CameraAppShutdown: Shutting down Camera app");
+    gCameraApp.get()->ShutdownCameraDeviceClusters();
     gCameraApp = nullptr;
 }

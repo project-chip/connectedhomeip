@@ -282,6 +282,14 @@ Protocols::InteractionModel::Status emAfReadOrWriteAttribute(const EmberAfAttrib
     return Protocols::InteractionModel::Status::UnsupportedAttribute;
 }
 
+chip::Protocols::InteractionModel::Status emberAfReadAttribute(chip::EndpointId endpoint, chip::ClusterId cluster,
+                                                               chip::AttributeId attributeID, uint8_t * dataPtr,
+                                                               uint16_t readLength)
+{
+
+    return Protocols::InteractionModel::Status::UnsupportedAttribute;
+}
+
 namespace chip {
 namespace app {
 

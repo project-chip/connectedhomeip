@@ -140,5 +140,5 @@ void chip::NXP::App::ButtonBle::HandleTimerExpire()
     ChipLogProgress(DeviceLayer, "Device will factory reset...");
 
     // Actually trigger Factory Reset
-    chip::Server::GetInstance().ScheduleFactoryReset();
+    chip::NXP::App::GetAppTask().FactoryResetHandler();
 }

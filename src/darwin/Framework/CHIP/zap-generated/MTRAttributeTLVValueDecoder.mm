@@ -7217,6 +7217,81 @@ static id _Nullable DecodeAttributeValueForScenesManagementCluster(AttributeId a
     *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB;
     return nil;
 }
+static id _Nullable DecodeAttributeValueForGroupcastCluster(AttributeId aAttributeId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
+{
+    using namespace Clusters::Groupcast;
+    switch (aAttributeId) {
+    case Attributes::Membership::Id: {
+        using TypeInfo = Attributes::Membership::TypeInfo;
+        TypeInfo::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+        NSArray * _Nonnull value;
+        { // Scope for our temporary variables
+            auto * array_0 = [NSMutableArray new];
+            auto iter_0 = cppValue.begin();
+            while (iter_0.Next()) {
+                auto & entry_0 = iter_0.GetValue();
+                MTRGroupcastClusterMembershipStruct * newElement_0;
+                newElement_0 = [MTRGroupcastClusterMembershipStruct new];
+                newElement_0.groupID = [NSNumber numberWithUnsignedShort:entry_0.groupID];
+                { // Scope for our temporary variables
+                    auto * array_2 = [NSMutableArray new];
+                    auto iter_2 = entry_0.endpoints.begin();
+                    while (iter_2.Next()) {
+                        auto & entry_2 = iter_2.GetValue();
+                        NSNumber * newElement_2;
+                        newElement_2 = [NSNumber numberWithUnsignedShort:entry_2];
+                        [array_2 addObject:newElement_2];
+                    }
+                    CHIP_ERROR err = iter_2.GetStatus();
+                    if (err != CHIP_NO_ERROR) {
+                        *aError = err;
+                        return nil;
+                    }
+                    newElement_0.endpoints = array_2;
+                }
+                newElement_0.keyID = [NSNumber numberWithUnsignedInt:entry_0.keyID];
+                newElement_0.hasAuxiliaryACL = [NSNumber numberWithBool:entry_0.hasAuxiliaryACL];
+                if (entry_0.expiringKeyID.HasValue()) {
+                    newElement_0.expiringKeyID = [NSNumber numberWithUnsignedInt:entry_0.expiringKeyID.Value()];
+                } else {
+                    newElement_0.expiringKeyID = nil;
+                }
+                newElement_0.fabricIndex = [NSNumber numberWithUnsignedChar:entry_0.fabricIndex];
+                [array_0 addObject:newElement_0];
+            }
+            CHIP_ERROR err = iter_0.GetStatus();
+            if (err != CHIP_NO_ERROR) {
+                *aError = err;
+                return nil;
+            }
+            value = array_0;
+        }
+        return value;
+    }
+    case Attributes::MaxMembershipCount::Id: {
+        using TypeInfo = Attributes::MaxMembershipCount::TypeInfo;
+        TypeInfo::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+        NSNumber * _Nonnull value;
+        value = [NSNumber numberWithUnsignedShort:cppValue];
+        return value;
+    }
+    default: {
+        // Not a known Groupcast attribute.
+        break;
+    }
+    }
+
+    *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB;
+    return nil;
+}
 static id _Nullable DecodeAttributeValueForHEPAFilterMonitoringCluster(AttributeId aAttributeId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
 {
     using namespace Clusters::HepaFilterMonitoring;
@@ -17644,8 +17719,8 @@ static id _Nullable DecodeAttributeValueForCameraAVStreamManagementCluster(Attri
         value = [NSNumber numberWithBool:cppValue];
         return value;
     }
-    case Attributes::MinViewport::Id: {
-        using TypeInfo = Attributes::MinViewport::TypeInfo;
+    case Attributes::MinViewportResolution::Id: {
+        using TypeInfo = Attributes::MinViewportResolution::TypeInfo;
         TypeInfo::DecodableType cppValue;
         *aError = DataModel::Decode(aReader, cppValue);
         if (*aError != CHIP_NO_ERROR) {
@@ -18516,6 +18591,17 @@ static id _Nullable DecodeAttributeValueForCameraAVSettingsUserLevelManagementCl
         }
         NSNumber * _Nonnull value;
         value = [NSNumber numberWithShort:cppValue];
+        return value;
+    }
+    case Attributes::MovementState::Id: {
+        using TypeInfo = Attributes::MovementState::TypeInfo;
+        TypeInfo::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+        NSNumber * _Nonnull value;
+        value = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue)];
         return value;
     }
     default: {
@@ -20574,7 +20660,11 @@ static id _Nullable DecodeAttributeValueForTLSCertificateManagementCluster(Attri
                 newElement_0 = [MTRTLSCertificateManagementClusterTLSClientCertificateDetailStruct new];
                 newElement_0.ccdid = [NSNumber numberWithUnsignedShort:entry_0.ccdid];
                 if (entry_0.clientCertificate.HasValue()) {
-                    newElement_0.clientCertificate = AsData(entry_0.clientCertificate.Value());
+                    if (entry_0.clientCertificate.Value().IsNull()) {
+                        newElement_0.clientCertificate = nil;
+                    } else {
+                        newElement_0.clientCertificate = AsData(entry_0.clientCertificate.Value().Value());
+                    }
                 } else {
                     newElement_0.clientCertificate = nil;
                 }
@@ -22680,6 +22770,9 @@ id _Nullable MTRDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::T
     }
     case Clusters::ScenesManagement::Id: {
         return DecodeAttributeValueForScenesManagementCluster(aPath.mAttributeId, aReader, aError);
+    }
+    case Clusters::Groupcast::Id: {
+        return DecodeAttributeValueForGroupcastCluster(aPath.mAttributeId, aReader, aError);
     }
     case Clusters::HepaFilterMonitoring::Id: {
         return DecodeAttributeValueForHEPAFilterMonitoringCluster(aPath.mAttributeId, aReader, aError);

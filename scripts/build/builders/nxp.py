@@ -52,6 +52,7 @@ class NxpBoard(Enum):
     RT1170 = auto()
     RW61X = auto()
     MCXW71 = auto()
+    MCXW72 = auto()
 
     def Name(self, os_env):
         if self == NxpBoard.RT1060:
@@ -65,6 +66,8 @@ class NxpBoard(Enum):
                 return 'rw61x'
         elif self == NxpBoard.MCXW71:
             return 'mcxw71'
+        elif self == NxpBoard.MCXW72:
+            return 'mcxw72'
         else:
             raise Exception('Unknown board type: %r' % self)
 
@@ -80,6 +83,8 @@ class NxpBoard(Enum):
                 return 'rt/rw61x'
         elif self == NxpBoard.MCXW71:
             return 'mcxw71'
+        elif self == NxpBoard.MCXW72:
+            return 'mcxw72'
         else:
             raise Exception('Unknown board type: %r' % self)
 
@@ -235,6 +240,11 @@ class NxpBuilder(GnBuilder):
                 if board_variant is NxpBoardVariant.FRDM:
                     return "frdmmcxw71"
                 else:
+                    return "mcxw71evk"
+            case NxpBoard.MCXW72:
+                if board_variant is NxpBoardVariant.FRDM:
+                    return "frdmmcxw72"
+                else:
                     return "mcxw72evk"
 
             case _:
@@ -370,6 +380,12 @@ class NxpBuilder(GnBuilder):
         if self.se05x_enable:
             flags.append('-DCONFIG_CHIP_SE05X=y')
 
+        if self.board in (NxpBoard.MCXW71, NxpBoard.MCXW72):
+            flags.append('-DCONFIG_MCUX_COMPONENT_middleware.freertos-kernel.config=n')
+
+        if self.board == NxpBoard.MCXW72:
+            flags.append('-Dcore_id=cm33_core0')
+
         build_flags = " ".join(flags)
 
         return build_flags
@@ -385,7 +401,8 @@ class NxpBuilder(GnBuilder):
             "br" if self.enable_wifi and self.enable_thread else None,
             "ota" if self.enable_ota else None,
             "fdata" if self.enable_factory_data else None,
-            "onnetwork" if self.disable_ble else None
+            "onnetwork" if self.disable_ble else None,
+            "low_power" if self.low_power else None
         ]
 
         prj_file = "_".join(filter(None, components)) + ".conf"

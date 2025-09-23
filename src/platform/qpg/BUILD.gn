@@ -41,6 +41,8 @@ static_library("qpg") {
     "FactoryDataProvider.cpp",
     "FactoryDataProvider.h",
     "InetPlatformConfig.h",
+    "KeyValueStoreManagerImpl.cpp",
+    "KeyValueStoreManagerImpl.h",
     "OTAImageProcessorImpl.cpp",
     "PlatformManagerImpl.cpp",
     "PlatformManagerImpl.h",
@@ -60,11 +62,6 @@ static_library("qpg") {
   public_deps = [ "${chip_root}/src/platform:platform_base" ]
 
   public_configs = []
-
-  sources += [
-    "KeyValueStoreManagerImpl.cpp",
-    "KeyValueStoreManagerImpl.h",
-  ]
 
   if (chip_enable_openthread) {
     public_deps += [ "${chip_root}/third_party/openthread:openthread" ]

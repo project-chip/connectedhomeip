@@ -537,7 +537,7 @@ void DeviceCommissioner::CleanupCommissioning(DeviceProxy * proxy, NodeId nodeId
 
 bool DeviceCommissioner::HasValidCommissioningMode(const Dnssd::CommissionNodeData & nodeData)
 {
-    if (GetCommissioningParameters().HasValue() && GetCommissioningParameters().Value().GetUseJCM().ValueOr(false))
+    if (GetCommissioningParameters().GetUseJCM().ValueOr(false))
     {
         if (nodeData.commissioningMode != to_underlying(Dnssd::CommissioningMode::kEnabledJointFabric))
         {

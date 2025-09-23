@@ -42,6 +42,8 @@ from mobly.test_runner import TestRunner
 import matter.testing.global_stash as global_stash
 from matter.clusters import Attribute
 # Add imports for argument parsing dependencies
+from matter.testing.defaults import TestingDefaults
+# Add imports for argument parsing dependencies
 from matter.testing.pics import read_pics_from_file
 
 try:
@@ -66,15 +68,6 @@ from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from matter.testing.matter_test_config import MatterTestConfig
-
-_DEFAULT_LOG_PATH = "/tmp/matter_testing/logs"
-
-# Default constants for argument parsing
-_DEFAULT_ADMIN_VENDOR_ID = 0xFFF1
-_DEFAULT_STORAGE_PATH = "admin_storage.json"
-_DEFAULT_CONTROLLER_NODE_ID = 112233
-_DEFAULT_DUT_NODE_ID = 0x12344321
-_DEFAULT_TRUST_ROOT_INDEX = 1
 
 
 def default_paa_rootstore_from_root(root_path: pathlib.Path) -> Optional[pathlib.Path]:
@@ -287,7 +280,7 @@ def generate_mobly_test_config(matter_test_config):
     test_run_config.testbed_name = "MatterTest"
 
     log_path = matter_test_config.logs_path
-    log_path = _DEFAULT_LOG_PATH if log_path is None else log_path
+    log_path = TestingDefaults.LOG_PATH if log_path is None else log_path
     if ENV_MOBLY_LOGPATH in os.environ:
         log_path = os.environ[ENV_MOBLY_LOGPATH]
 
@@ -659,7 +652,7 @@ def populate_commissioning_args(args: argparse.Namespace, config) -> bool:
     device_descriptors = config.qr_code_content + config.manual_code + config.discriminators
 
     if not config.dut_node_ids:
-        config.dut_node_ids = [_DEFAULT_DUT_NODE_ID]
+        config.dut_node_ids = [TestingDefaults.DUT_NODE_ID]
 
     if args.commissioning_method is None:
         return True
@@ -733,8 +726,8 @@ def convert_args_to_matter_config(args: argparse.Namespace):
     if not populate_commissioning_args(args, config):
         sys.exit(1)
 
-    config.storage_path = pathlib.Path(_DEFAULT_STORAGE_PATH) if args.storage_path is None else args.storage_path
-    config.logs_path = pathlib.Path(_DEFAULT_LOG_PATH) if args.logs_path is None else args.logs_path
+    config.storage_path = pathlib.Path(TestingDefaults.STORAGE_PATH) if args.storage_path is None else args.storage_path
+    config.logs_path = pathlib.Path(TestingDefaults.LOG_PATH) if args.logs_path is None else args.logs_path
     config.paa_trust_store_path = args.paa_trust_store_path
     config.ble_controller = args.ble_controller
     if args.PICS is None:
@@ -744,6 +737,9 @@ def convert_args_to_matter_config(args: argparse.Namespace):
     config.tests = list(chain.from_iterable(args.tests or []))
     config.timeout = args.timeout  # This can be none, we pull the default from the test if it's unspecified
     config.endpoint = args.endpoint  # This can be None, the get_endpoint function allows the tests to supply a default
+    config.restart_flag_file = args.restart_flag_file
+
+    # Map CLI arg to the current config field name used by tests
     config.pipe_name = args.app_pipe
     if config.pipe_name is not None and not os.path.exists(config.pipe_name):
         # Named pipes are unique, so we MUST have consistent paths
@@ -802,14 +798,16 @@ def parse_matter_test_args(argv: Optional[List[str]] = None):
                              metavar="CONTROLLER_ID", help="BLE controller selector, see example or platform docs for details")
     basic_group.add_argument('-N', '--controller-node-id', type=int_decimal_or_hex,
                              metavar='NODE_ID',
-                             default=_DEFAULT_CONTROLLER_NODE_ID,
-                             help='NodeID to use for initial/default controller (default: %d)' % _DEFAULT_CONTROLLER_NODE_ID)
+                             default=TestingDefaults.CONTROLLER_NODE_ID,
+                             help='NodeID to use for initial/default controller (default: %d)' % TestingDefaults.CONTROLLER_NODE_ID)
     basic_group.add_argument('-n', '--dut-node-id', '--nodeId', type=int_decimal_or_hex,
                              metavar='NODE_ID', dest='dut_node_ids', default=[],
                              help='Node ID for primary DUT communication, '
-                             'and NodeID to assign if commissioning (default: %d)' % _DEFAULT_DUT_NODE_ID, nargs="+")
+                             'and NodeID to assign if commissioning (default: %d)' % TestingDefaults.DUT_NODE_ID, nargs="+")
     basic_group.add_argument('--endpoint', type=int, default=None, help="Endpoint under test")
     basic_group.add_argument('--app-pipe', type=str, default=None, help="The full path of the app to send an out-of-band command")
+    basic_group.add_argument('--restart-flag-file', type=str, default=None,
+                             help="The full path of the file to use to signal a restart to the app")
     basic_group.add_argument('--timeout', type=int, help="Test timeout in seconds")
     basic_group.add_argument("--PICS", help="PICS file path", type=str)
 
@@ -848,9 +846,9 @@ def parse_matter_test_args(argv: Optional[List[str]] = None):
                                   metavar='OPERATIONAL_DATASET_HEX',
                                   help='Thread operational dataset as a hex string for ble-thread commissioning')
 
-    commission_group.add_argument('--admin-vendor-id', action="store", type=int_decimal_or_hex, default=_DEFAULT_ADMIN_VENDOR_ID,
+    commission_group.add_argument('--admin-vendor-id', action="store", type=int_decimal_or_hex, default=TestingDefaults.ADMIN_VENDOR_ID,
                                   metavar="VENDOR_ID",
-                                  help="VendorID to use during commissioning (default 0x%04X)" % _DEFAULT_ADMIN_VENDOR_ID)
+                                  help="VendorID to use during commissioning (default 0x%04X)" % TestingDefaults.ADMIN_VENDOR_ID)
     commission_group.add_argument('--case-admin-subject', action="store", type=int_decimal_or_hex,
                                   metavar="CASE_ADMIN_SUBJECT",
                                   help="Set the CASE admin subject to an explicit value (default to commissioner Node ID)")
@@ -876,9 +874,9 @@ def parse_matter_test_args(argv: Optional[List[str]] = None):
                               help='Fabric ID on which to operate under the root of trust')
 
     fabric_group.add_argument('-r', '--root-index', type=root_index,
-                              metavar='ROOT_INDEX_OR_NAME', default=_DEFAULT_TRUST_ROOT_INDEX,
+                              metavar='ROOT_INDEX_OR_NAME', default=TestingDefaults.TRUST_ROOT_INDEX,
                               help='Root of trust under which to operate/commission for single-fabric basic usage. '
-                              'alpha/beta/gamma are aliases for 1/2/3. Default (%d)' % _DEFAULT_TRUST_ROOT_INDEX)
+                              'alpha/beta/gamma are aliases for 1/2/3. Default (%d)' % TestingDefaults.TRUST_ROOT_INDEX)
 
     fabric_group.add_argument('-c', '--chip-tool-credentials-path', type=pathlib.Path,
                               metavar='PATH',
@@ -901,7 +899,7 @@ def parse_matter_test_args(argv: Optional[List[str]] = None):
     if not argv:
         argv = sys.argv[1:]
 
-    return convert_args_to_matter_config(parser.parse_known_args(argv)[0])
+    return convert_args_to_matter_config(parser.parse_args(argv))
 
 
 def int_decimal_or_hex(s: str) -> int:

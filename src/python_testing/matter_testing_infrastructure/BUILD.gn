@@ -46,6 +46,7 @@ pw_python_package("matter-testing-module") {
     "matter/testing/conformance.py",
     "matter/testing/conversions.py",
     "matter/testing/decorators.py",
+    "matter/testing/defaults.py",
     "matter/testing/event_attribute_reporting.py",
     "matter/testing/global_attribute_ids.py",
     "matter/testing/global_stash.py",
@@ -115,6 +116,15 @@ pw_zip("data_model_zip_1_4_2") {
   output = "${root_out_dir}/data_model/zip_1_4_2.zip"
 }
 
+pw_zip("data_model_zip_1_5") {
+  inputs = []
+  foreach(file, data_model_XMLS_1_5) {
+    zip_path = rebase_path(file, "${chip_root}/data_model/1.5/", "/")
+    inputs += [ "${file} > /${zip_path}" ]
+  }
+  output = "${root_out_dir}/data_model/zip_1_5.zip"
+}
+
 pw_python_distribution("matter-testing") {
   packages = [ ":matter-testing-module" ]
 
@@ -131,6 +141,7 @@ pw_python_distribution("matter-testing") {
     ":data_model_zip_1_4",
     ":data_model_zip_1_4_1",
     ":data_model_zip_1_4_2",
+    ":data_model_zip_1_5",
   ]
 
   extra_files = [
@@ -139,5 +150,6 @@ pw_python_distribution("matter-testing") {
     "${root_out_dir}/data_model/zip_1_4.zip > matter/testing/data_model/1.4/allfiles.zip",
     "${root_out_dir}/data_model/zip_1_4_1.zip > matter/testing/data_model/1.4.1/allfiles.zip",
     "${root_out_dir}/data_model/zip_1_4_2.zip > matter/testing/data_model/1.4.2/allfiles.zip",
+    "${root_out_dir}/data_model/zip_1_5.zip > matter/testing/data_model/1.5/allfiles.zip",
   ]
 }

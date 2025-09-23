@@ -19,8 +19,7 @@
 #include <app/static-cluster-config/BasicInformation.h>
 #include <app/util/attribute-storage.h>
 #include <app/util/endpoint-config-api.h>
-#include <data-model-providers/codegen/CodegenDataModelProvider.h>
-#include <lib/support/BitFlags.h>
+#include <data-model-providers/codegen/ClusterIntegration.h>
 
 using namespace chip;
 using namespace chip::app;
@@ -46,44 +45,63 @@ static_assert((kBasicInformationFixedClusterCount == 0) ||
 
 ServerClusterRegistration gRegistration(BasicInformationCluster::Instance());
 
+class IntegrationDelegate : public CodegenClusterIntegration::Delegate
+{
+public:
+    ServerClusterRegistration & CreateRegistration(EndpointId endpointId, unsigned clusterInstanceIndex,
+                                                   uint32_t optionalAttributeBits, uint32_t featureMap) override
+    {
+
+        BasicInformationCluster::Instance().OptionalAttributes() =
+            BasicInformationCluster::OptionalAttributesSet(optionalAttributeBits);
+
+        return gRegistration;
+    }
+
+    ServerClusterInterface * FindRegistration(unsigned clusterInstanceIndex) override
+    {
+        return &BasicInformationCluster::Instance();
+    }
+
+    // Nothing to destroy: separate singleton class without constructor/destructor is used
+    void ReleaseRegistration(unsigned clusterInstanceIndex) override {}
+};
+
 } // namespace
 
-void emberAfBasicInformationClusterServerInitCallback(EndpointId endpointId)
+void MatterBasicInformationClusterInitCallback(EndpointId endpointId)
 {
     VerifyOrReturn(endpointId == kRootEndpointId);
 
-    BasicInformationCluster::OptionalAttributesSet & attrs = BasicInformationCluster::Instance().OptionalAttributes();
+    IntegrationDelegate integrationDelegate;
 
-    attrs.Set<ManufacturingDate::Id>(emberAfContainsAttribute(endpointId, BasicInformation::Id, ManufacturingDate::Id))
-        .Set<PartNumber::Id>(emberAfContainsAttribute(endpointId, BasicInformation::Id, PartNumber::Id))
-        .Set<ProductURL::Id>(emberAfContainsAttribute(endpointId, BasicInformation::Id, ProductURL::Id))
-        .Set<ProductLabel::Id>(emberAfContainsAttribute(endpointId, BasicInformation::Id, ProductLabel::Id))
-        .Set<SerialNumber::Id>(emberAfContainsAttribute(endpointId, BasicInformation::Id, SerialNumber::Id))
-        .Set<LocalConfigDisabled::Id>(emberAfContainsAttribute(endpointId, BasicInformation::Id, LocalConfigDisabled::Id))
-        .Set<Reachable::Id>(emberAfContainsAttribute(endpointId, BasicInformation::Id, Reachable::Id))
-        .Set<ProductAppearance::Id>(emberAfContainsAttribute(endpointId, BasicInformation::Id, ProductAppearance::Id))
-
-        // This is NOT typical, however we try to respect ZAP here. MCORE_FS tests require this:
-        // Specifically builds need to support the "do not build with unique id (make it optional)"
-        // to emulate the test case where UniqueID is missing as it was optional in previous versions of the spec
-        .Set<UniqueID::Id>(emberAfContainsAttribute(endpointId, BasicInformation::Id, UniqueID::Id));
-
-    CHIP_ERROR err = CodegenDataModelProvider::Instance().Registry().Register(gRegistration);
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogError(AppServer, "Basic Information register error: endpoint %u, %" CHIP_ERROR_FORMAT, endpointId, err.Format());
-    }
+    // register a singleton server (root endpoint only)
+    CodegenClusterIntegration::RegisterServer(
+        {
+            .endpointId                = endpointId,
+            .clusterId                 = BasicInformation::Id,
+            .fixedClusterInstanceCount = BasicInformation::StaticApplicationConfig::kFixedClusterConfig.size(),
+            .maxClusterInstanceCount   = 1, // Cluster is a singleton on the root node and this is the only thing supported
+            .fetchFeatureMap           = false,
+            .fetchOptionalAttributes   = true,
+        },
+        integrationDelegate);
 }
 
-void MatterBasicInformationClusterServerShutdownCallback(EndpointId endpointId)
+void MatterBasicInformationClusterShutdownCallback(EndpointId endpointId)
 {
     VerifyOrReturn(endpointId == kRootEndpointId);
 
-    CHIP_ERROR err = CodegenDataModelProvider::Instance().Registry().Unregister(&BasicInformationCluster::Instance());
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogError(AppServer, "Basic Information unregister error: endpoint %u, %" CHIP_ERROR_FORMAT, endpointId, err.Format());
-    }
+    IntegrationDelegate integrationDelegate;
+
+    CodegenClusterIntegration::UnregisterServer(
+        {
+            .endpointId                = endpointId,
+            .clusterId                 = BasicInformation::Id,
+            .fixedClusterInstanceCount = BasicInformation::StaticApplicationConfig::kFixedClusterConfig.size(),
+            .maxClusterInstanceCount   = 1, // Cluster is a singleton on the root node and this is the only thing supported
+        },
+        integrationDelegate);
 }
 
 void MatterBasicInformationPluginServerInitCallback() {}
