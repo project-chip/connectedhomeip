@@ -57,7 +57,7 @@ from matter.interaction_model import Status
 from matter.testing import matter_asserts
 from matter.testing.event_attribute_reporting import AttributeMatcher, AttributeSubscriptionHandler, EventSubscriptionHandler
 from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
-from matter.testing.apps import AppServerSubprocess, OTAProviderSubprocess, OtaImagePath, ImageListPath, OTAProviderLaunchSU
+from matter.testing.apps import AppServerSubprocess, OTAProviderSubprocess, OtaImagePath
 
 
 # Create a logger
@@ -65,212 +65,6 @@ logger = logging.getLogger(__name__)
 
 
 class TC_SU_2_2(MatterBaseTest):
-
-    def launch_provider_regex(self, ota_file: str, discriminator: int, passcode: int, secured_device_port: int,
-                              wait_for: str, queue: str = None, timeout: int = None, override_image_uri: str = None):
-        """
-        Launch OTA provider with required parameters, always log output in real-time to provider.log,
-        wait until a specific status is found, and continue reading output to allow tail -f.
-
-        Args:
-            ota_file: Path to the OTA image file to serve.
-            discriminator: Long discriminator used for commissioning.
-            passcode: Setup PIN code for the provider.
-            secured_device_port: Port number for the provider process.
-            wait_for: Log string to wait for before proceeding.
-            queue: Optional queue name for provider startup.
-            timeout: Optional startup timeout in seconds.
-            override_image_uri: Optional custom ImageURI for the OTA file.
-
-        Returns:
-            proc: Subprocess handle of the launched Provider.
-
-        Raises:
-            RuntimeError: If the provider process ends before the expected status is found.
-        """
-        # Path to the provider app binary
-        path_to_app = "./out/debug/chip-ota-provider-app"
-
-        # Hardcoded KVS path for provider
-        provider_kvs_path = "/tmp/chip_kvs_provider"
-
-        args = [
-            path_to_app,
-            f"--filepath={ota_file}",
-            f"--discriminator={discriminator}",
-            f"--passcode={passcode}",
-            f"--secured-device-port={secured_device_port}",
-            f"--KVS={provider_kvs_path}"  # Hardcoded KVS
-        ]
-
-        # Optional queue and timeout
-        if queue:
-            args += ["-q", queue]
-        if timeout:
-            args += ["-t", str(timeout)]
-
-        # Optional override for ImageURI
-        if override_image_uri:
-            args += ["-i", override_image_uri]
-
-        # Clean logs
-        log_file_path = "provider.log"
-        open(log_file_path, "w").close()
-
-        proc = subprocess.Popen(args, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
-
-        found_wait_for = False
-
-        while True:
-            line = proc.stdout.readline()
-            if line:
-                with open(log_file_path, "a") as f:
-                    f.write(line)
-                    f.flush()
-                if not found_wait_for and wait_for in line:
-                    found_wait_for = True
-                    logger.info(f"Provider reached status: {queue or 'no queue'}")
-                    break
-            elif proc.poll() is not None:
-                break
-            time.sleep(0.1)
-
-        # If regex not found, fail test
-        if not found_wait_for:
-            proc.terminate()
-            raise RuntimeError("Provider ended before matching status")
-
-        # Thread that write logs without block test
-        def _follow_output(proc):
-            for line in proc.stdout:
-                with open(log_file_path, "a") as f:
-                    f.write(line)
-                    f.flush()
-        threading.Thread(target=_follow_output, args=(proc,), daemon=True).start()
-        return proc
-
-    def stop_provider(self, proc: subprocess.Popen):
-        """
-        Close Provider process.
-
-        Args:
-            proc: Subprocess handle of the running Provider.
-
-        Returns:
-            None
-
-        Raises:
-            subprocess.TimeoutExpired: If the provider does not terminate within 5 seconds.
-        """
-        if proc.poll() is None:
-            proc.terminate()
-            try:
-                proc.wait(timeout=5)
-            except subprocess.TimeoutExpired:
-                proc.kill()
-            logger.info(f"Provider process {proc.pid} terminated")
-
-    async def set_ota_acls_for_provider(self, controller, requestor_node: int, provider_node: int, fabric_index: int):
-        """
-        Set ACLs for OTA interaction between a Requestor and Provider.
-        Preserves existing ACLs to avoid overwriting.
-
-        Args:
-            controller: The Matter device controller instance used to read/write ACLs.
-            requestor_node: Node ID of the OTA Requestor (DUT).
-            provider_node: Node ID of the OTA Provider.
-            fabric_index: Fabric index under which ACLs are applied.
-
-        Returns:
-            acl_original_requestor: Original ACLs of the Requestor.
-            acl_original_provider: Original ACLs of the Provider.
-
-        Raises:
-            ChipStackError: If reading or writing ACL attributes fails at the controller level.
-            ValueError: If ACL responses are malformed or do not contain expected structures.
-            Exception: Propagates unexpected errors from underlying async calls.
-        """
-        # -------------------------------
-        # Prerequisite #3.1: ACLs on Requestor to allow Provider to interact with OTA Requestor.
-        # -------------------------------
-
-        # Read existing ACLs on Requestor
-        acl_original_requestor = await self.read_single_attribute(
-            dev_ctrl=controller,
-            node_id=requestor_node,
-            endpoint=0,
-            attribute=Clusters.AccessControl.Attributes.Acl,
-        )
-        logger.info(f'Prerequisite #3.1 - ACLs current privileges on Requestor (DUT): {acl_original_requestor}')
-
-        # Add minimal ACL: ACLs on Requestor to allow Provider interaction
-        acl_operate_provider = Clusters.AccessControl.Structs.AccessControlEntryStruct(
-            fabricIndex=fabric_index,
-            privilege=Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kOperate,
-            authMode=Clusters.AccessControl.Enums.AccessControlEntryAuthModeEnum.kCase,
-            subjects=[provider_node],
-            targets=[Clusters.AccessControl.Structs.AccessControlTargetStruct(
-                endpoint=0,
-                cluster=Clusters.OtaSoftwareUpdateRequestor.id)]
-        )
-
-        # Combine original + new ACLs on Requestor
-        # This avoids overwriting existing entries when adding new ACLs
-        acls_requestor = acl_original_requestor + [acl_operate_provider]
-        resp = await self.write_acl(controller, requestor_node, acls_requestor)
-        logger.info(
-            f'Prerequisite #3.1 - Response of wrote combined ACLs on Requestor to allow Provider with node {provider_node}: {resp}')
-
-        # Read new ACLs on Requestor (after combined)
-        acl_current_requestor = await self.read_single_attribute(
-            dev_ctrl=controller,
-            node_id=requestor_node,  # DUT
-            endpoint=0,
-            attribute=Clusters.AccessControl.Attributes.Acl,
-        )
-        logger.info(f'Prerequisite #3.1 - ACLs combined current + new privileges on Requestor (DUT): {acl_current_requestor}')
-
-        # -------------------------------
-        # Prerequisite #3.1: ACLs on Provider to allow Requestor to interact with OTA Provider
-        # -------------------------------
-
-        # Read existing ACLs on Provider
-        acl_original_provider = await self.read_single_attribute(
-            dev_ctrl=controller,
-            node_id=provider_node,
-            endpoint=0,
-            attribute=Clusters.AccessControl.Attributes.Acl,
-        )
-        logger.info(f'Prerequisite #3.2 - ACLs current privileges on Provider with node {provider_node}: {acl_original_requestor}')
-
-        # Add minimal ACL: ACLs on Provider to allow Requestor interaction
-        acl_operate_requestor = Clusters.AccessControl.Structs.AccessControlEntryStruct(
-            fabricIndex=fabric_index,
-            privilege=Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kOperate,
-            authMode=Clusters.AccessControl.Enums.AccessControlEntryAuthModeEnum.kCase,
-            subjects=[requestor_node],
-            targets=[Clusters.AccessControl.Structs.AccessControlTargetStruct(
-                endpoint=0,
-                cluster=Clusters.OtaSoftwareUpdateProvider.id)]
-        )
-
-        # Combine original + new ACLs on Provider
-        # This avoids overwriting existing entries when adding new ACLs
-        acls_provider = acl_original_provider + [acl_operate_requestor]
-        resp = await self.write_acl(controller, provider_node, acls_provider)
-        logger.info(
-            f'Prerequisite #3.2 - Response of wrote combined ACLs on Provider with node {provider_node} to allow access from Requestor: {resp}')
-
-        # Read new ACLs on Provider (after combined)
-        acl_current_provider = await self.read_single_attribute(
-            dev_ctrl=controller,
-            node_id=provider_node,
-            endpoint=0,
-            attribute=Clusters.AccessControl.Attributes.Acl,
-        )
-        logger.info(f'Prerequisite #3.2 - ACLs current privileges on Provider with node {provider_node}: {acl_current_provider}')
-
-        return acl_original_requestor, acl_original_provider
 
     async def add_single_ota_provider(self, controller, requestor_node_id: int, provider_node_id: int):
         """
@@ -318,25 +112,6 @@ class TC_SU_2_2(MatterBaseTest):
         )
         logger.info(f'Prerequisite #4.0 - Write DefaultOTAProviders response: {resp}')
         asserts.assert_equal(resp[0].Status, Status.Success, "Failed to write DefaultOTAProviders attribute")
-
-    async def write_acl(self, controller, node_id, acl):
-        """
-        Writes the Access Control List (ACL) to the DUT device using the specified controller.
-
-        Args:
-            controller: The Matter controller (e.g., th1, th4) that will perform the write operation.
-            acl (list): List of AccessControlEntryStruct objects defining the ACL permissions to write.
-            node_id:
-
-        Raises:
-            AssertionError: If writing the ACL attribute fails (status is not Status.Success).
-        """
-        result = await controller.WriteAttribute(
-            node_id,
-            [(0, Clusters.AccessControl.Attributes.Acl(acl))]
-        )
-        asserts.assert_equal(result[0].Status, Status.Success, "ACL write failed")
-        return True
 
     async def setup_provider(
         self,
@@ -391,30 +166,23 @@ class TC_SU_2_2(MatterBaseTest):
             ota_file: {provider_ota_file}""")
 
         # Prerequisite #2.0- Launch Provider with Queue "updateAvailable"
-        # provider_proc = self.launch_provider_regex(
-        #     ota_file=provider_ota_file,
-        #     discriminator=provider_discriminator,
-        #     passcode=provider_setup_pin_code,
-        #     secured_device_port=provider_port,
-        #     wait_for=provider_wait_for,
-        #     queue=provider_queue,
-        #     timeout=provider_timeout,
-        #     override_image_uri=provider_override_image_uri
-        # )
-
-        # NOTE: Using OTAProviderLaunchSU from matter.testing.apps to avoid code duplication
-        provider_proc = OTAProviderLaunchSU(
-            ota_file=provider_ota_file,
+        # NOTE: Using OTAProviderSubprocess from matter.testing.apps to avoid code duplication
+        provider_proc = OTAProviderSubprocess(
+            ota_file=provider_ota_file,           # string o OtaImagePath(path=...)
             discriminator=provider_discriminator,
             passcode=provider_setup_pin_code,
             secured_device_port=provider_port,
-            wait_for=provider_wait_for,
             queue=provider_queue,
             timeout=provider_timeout,
-            override_image_uri=provider_override_image_uri
-        ).start()
+            override_image_uri=provider_override_image_uri,
+            log_file_path="provider.log"
+        ).start_and_wait(
+            wait_for=provider_wait_for,
+            timeout=300
+        )
 
-        logger.info(f'{step_number}: Prerequisite #2.0 - Launched Provider PID {provider_proc.pid}')
+        # Log the provider PID
+        logger.info(f"{step_number}: Prerequisite #2.0 - Launched Provider PID {provider_proc.p.pid}")
 
         # Prerequisite #2.1 - Commissioning Provider
         resp = await controller.CommissionOnNetwork(
@@ -433,11 +201,30 @@ class TC_SU_2_2(MatterBaseTest):
         # Set ACLs for OTA update:
         # - On Requestor to allow specified Provider to interact with OTA Requestor cluster
         # - On Provider to allow Requestor to interact with OTA Provider cluster
-        original_requestor_acls, original_provider_acls = await self.set_ota_acls_for_provider(
+
+        # Read existing ACLs Requestor
+        original_requestor_acls = await self.read_single_attribute(
+            dev_ctrl=controller,
+            node_id=requestor_node_id,
+            endpoint=0,
+            attribute=Clusters.AccessControl.Attributes.Acl,
+        )
+
+        # Read existing ACLs Provider
+        original_provider_acls = await self.read_single_attribute(
+            dev_ctrl=controller,
+            node_id=provider_node_id,
+            endpoint=0,
+            attribute=Clusters.AccessControl.Attributes.Acl,
+        )
+
+        original_requestor_acls, original_provider_acls = await provider_proc.set_ota_acls_for_provider(
             controller,
             requestor_node=requestor_node_id,
             provider_node=provider_node_id,
             fabric_index=fabric_id,
+            original_requestor_acls=original_requestor_acls,
+            original_provider_acls=original_provider_acls,
         )
 
         return provider_proc, original_requestor_acls, original_provider_acls
@@ -467,7 +254,7 @@ class TC_SU_2_2(MatterBaseTest):
             None
         """
         # Clean Provider ACL
-        await self.write_acl(controller, provider_node_id, original_provider_acls)
+        await provider_proc.write_acl(controller, provider_node_id, original_provider_acls)
         await asyncio.sleep(1)
 
         # Expire sessions
@@ -475,11 +262,11 @@ class TC_SU_2_2(MatterBaseTest):
         await asyncio.sleep(1)
 
         # Clean Requestor ACL
-        await self.write_acl(controller, requestor_node_id, original_requestor_acls)
+        await provider_proc.write_acl(controller, requestor_node_id, original_requestor_acls)
         await asyncio.sleep(1)
 
-        # Kill Provider
-        self.stop_provider(provider_proc)
+        # Kill Provider process
+        provider_proc.terminate()
         await asyncio.sleep(1)
 
         # Delete KVS files
@@ -1597,7 +1384,7 @@ class TC_SU_2_2(MatterBaseTest):
             f'{step_number_s7}: Step #7.5 - Cleanly closed Provider_S7 process: ACLs restored, sessions expired, process stopped, KVS files deleted.')
 
         # Kill Provider
-        self.stop_provider(provider_proc_s7)
+        provider_proc_s7.terminate()
         await asyncio.sleep(1)
 
         # Delete KVS files
