@@ -45,7 +45,7 @@ Ember storage should be moved from "persist/ram/callback" into "ram/callback":
     `ClusterRevision`
 
 -   if the value used to be `persist` it is an indication that the cluster
-    should handle persistence (load in Startup and store during writes).
+    should handle persistence (load in `Startup` and store during writes).
 
 ## Step 2: Design the Code-Driven Implementation
 
