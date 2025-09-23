@@ -146,8 +146,7 @@ public:
 
     // TestOnly constructor that allows setting TimedRequest flag without timeout
     WriteClient(Messaging::ExchangeManager * apExchangeMgr, Callback * apCallback, bool aTimedRequest) :
-        mpExchangeMgr(apExchangeMgr),
-        mExchangeCtx(*this), mpCallback(apCallback), mTimedRequest(aTimedRequest)
+        mpExchangeMgr(apExchangeMgr), mExchangeCtx(*this), mpCallback(apCallback), mTimedRequest(aTimedRequest)
     {
         assertChipStackLockedByCurrentThread();
     }

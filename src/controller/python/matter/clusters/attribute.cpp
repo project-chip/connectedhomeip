@@ -267,9 +267,9 @@ PyChipError pychip_WriteClient_WriteAttributes(void * appContext, DeviceProxy * 
                                                size_t interactionTimeoutMsSizeT, size_t busyWaitMsSizeT,
                                                chip::python::PyWriteAttributeData * writeAttributesData, size_t attributeDataLength,
                                                bool forceLegacyListEncoding);
-PyChipError pychip_WriteClient_TestOnlyWriteAttributesTimedRequestNoTimedAction(void * appContext, DeviceProxy * device,
-                                                                                size_t interactionTimeoutMsSizeT, size_t busyWaitMsSizeT,
-                                                                                chip::python::PyWriteAttributeData * writeAttributesData, size_t attributeDataLength);
+PyChipError pychip_WriteClient_TestOnlyWriteAttributesTimedRequestNoTimedAction(
+    void * appContext, DeviceProxy * device, size_t interactionTimeoutMsSizeT, size_t busyWaitMsSizeT,
+    chip::python::PyWriteAttributeData * writeAttributesData, size_t attributeDataLength);
 PyChipError pychip_WriteClient_WriteGroupAttributes(size_t groupIdSizeT, chip::Controller::DeviceCommissioner * devCtrl,
                                                     size_t busyWaitMsSizeT,
                                                     chip::python::PyWriteAttributeData * writeAttributesData,
@@ -409,8 +409,10 @@ exit:
 }
 
 PyChipError pychip_WriteClient_TestOnlyWriteAttributesTimedRequestNoTimedAction(void * appContext, DeviceProxy * device,
-                                                                                size_t interactionTimeoutMsSizeT, size_t busyWaitMsSizeT,
-                                                                                python::PyWriteAttributeData * writeAttributesData, size_t attributeDataLength)
+                                                                                size_t interactionTimeoutMsSizeT,
+                                                                                size_t busyWaitMsSizeT,
+                                                                                python::PyWriteAttributeData * writeAttributesData,
+                                                                                size_t attributeDataLength)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -445,9 +447,9 @@ PyChipError pychip_WriteClient_TestOnlyWriteAttributesTimedRequestNoTimedAction(
             dataVersion.SetValue(path.dataVersion);
         }
 
-        SuccessOrExit(err = client->PutPreencodedAttribute(
-                          chip::app::ConcreteDataAttributePath(path.endpointId, path.clusterId, path.attributeId, dataVersion),
-                          reader));
+        SuccessOrExit(
+            err = client->PutPreencodedAttribute(
+                chip::app::ConcreteDataAttributePath(path.endpointId, path.clusterId, path.attributeId, dataVersion), reader));
     }
 
     // Send WriteRequest with TimedRequest flag set but no preceding TimedRequest action
