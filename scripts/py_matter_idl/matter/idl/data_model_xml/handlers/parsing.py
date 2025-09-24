@@ -21,7 +21,7 @@ from xml.sax.xmlreader import AttributesImpl
 from matter.idl.generators.type_definitions import GetDataTypeSizeInBits, IsSignedDataType
 from matter.idl.matter_idl_types import AccessPrivilege, Attribute, Command, ConstantEntry, DataType, Event, EventPriority, Field
 
-LOGGER = logging.getLogger('data-model-xml-data-parsing')
+LOGGER = logging.getLogger(__name__)
 
 
 @dataclass
@@ -362,4 +362,4 @@ def ApplyConstraint(attrs, field: Field):
         field.data_type.min_length = ParseOptionalInt(attrs["from"])
         field.data_type.max_length = ParseOptionalInt(attrs["to"])
     else:
-        logging.error(f"UNKNOWN constraint type {constraint_type}")
+        LOGGER.error(f"UNKNOWN constraint type {constraint_type}")

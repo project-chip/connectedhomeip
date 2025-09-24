@@ -12,7 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import logging
 from typing import Any, Optional
 
 from matter.idl.matter_idl_types import (Attribute, Bitmap, Cluster, Command, CommandQuality, ConstantEntry, DataType, Enum, Event,
@@ -21,8 +20,6 @@ from matter.idl.matter_idl_types import (Attribute, Bitmap, Cluster, Command, Co
 from .base import BaseHandler, HandledDepth
 from .context import Context, IdlPostProcessor
 from .parsing import AttrsToAccessPrivilege, AttrsToAttribute, ParseInt
-
-LOGGER = logging.getLogger('matter-xml-parser')
 
 
 def _IsConformanceTagName(name: str) -> bool:
