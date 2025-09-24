@@ -55,7 +55,7 @@ tests:
           
       verification: |
           If !(MCORE.DD.CHIP_DEV) IP/BLE discovery tool should not discover the DUT
-          If device is not discovered, instruct DUT to start Advertising and scan again for commissionale devices using the IP/BLE discovery tool
+          If device is not discovered, instruct DUT to start Advertising and scan again for commissionable devices using the IP/BLE discovery tool
 
           Verify in TH (CHIP-TOOL)
           For devices already on the network:
