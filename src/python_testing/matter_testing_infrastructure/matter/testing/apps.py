@@ -14,9 +14,11 @@
 
 import os
 import signal
+import re
 import tempfile
 from dataclasses import dataclass
-from typing import Optional, Union
+from typing import BinaryIO, Optional, Union
+from sys import stdout
 
 import matter.clusters as Clusters
 from matter.ChipDeviceCtrl import ChipDeviceController
@@ -53,7 +55,7 @@ class AppServerSubprocess(Subprocess):
     PREFIX = b"[SERVER]"
 
     def __init__(self, app: str, storage_dir: str, discriminator: int,
-                 passcode: int, port: int = 5540, extra_args: list[str] = []):
+                 passcode: int, port: int = 5540, extra_args: list[str] = [], f_stdout: BinaryIO = stdout.buffer, f_stderr: BinaryIO = stdout.buffer):
         # Create a temporary KVS file and keep the descriptor to avoid leaks.
         self.kvs_fd, kvs_path = tempfile.mkstemp(dir=storage_dir, prefix="kvs-app-")
         try:
@@ -71,7 +73,7 @@ class AppServerSubprocess(Subprocess):
 
             # Start the server application
             super().__init__(*command,  # Pass the constructed command list
-                             output_cb=lambda line, is_stderr: self.PREFIX + line)
+                             output_cb=lambda line, is_stderr: self.PREFIX + line, f_stdout=f_stdout, f_stderr=f_stderr)
         except Exception:
             # Do not leak KVS file descriptor on failure
             os.close(self.kvs_fd)
@@ -147,10 +149,12 @@ class OTAProviderSubprocess(AppServerSubprocess):
 
     # Prefix for log messages from the OTA provider application.
     PREFIX = b"[OTA-PROVIDER]"
+    log_file = ""
+    err_log_file = ""
 
     def __init__(self, app: str, storage_dir: str, discriminator: int,
                  passcode: int, ota_source: Union[OtaImagePath, ImageListPath],
-                 port: int = 5541, extra_args: list[str] = []):
+                 port: int = 5541, extra_args: list[str] = [], log_file: str = "/tmp/provider.log", err_log_file: str = ""):
         """Initialize the OTA Provider subprocess.
 
         Args:
@@ -161,14 +165,58 @@ class OTAProviderSubprocess(AppServerSubprocess):
             port: UDP port for secure connections (default: 5541)
             ota_source: Either OtaImagePath or ImageListPath specifying the OTA image source
             extra_args: Additional command line arguments
+            log_file: Destination as str for the log file that will be handled as BinaryIO
+            err_log_file: Destination of error log file that will be handled as BinaryIO, if not provided, errors log will be sent into log_file
         """
+        # Create the BinaryIO fp.
+        f_stdout = open(log_file, 'a+b')
+        if err_log_file == "":
+            f_stderr = f_stdout
+        else:
+            f_stdout = open(err_log_file, 'a+b')
+        self.log_file = log_file
+        self.err_log_file = err_log_file
 
         # Build OTA-specific arguments using the ota_source property
         combined_extra_args = ota_source.ota_args + extra_args
 
         # Initialize with the combined arguments
         super().__init__(app=app, storage_dir=storage_dir, discriminator=discriminator,
-                         passcode=passcode, port=port, extra_args=combined_extra_args)
+                         passcode=passcode, port=port, extra_args=combined_extra_args, f_stdout=f_stdout, f_stderr=f_stderr)
+
+    def kill(self):
+        self.p.send_signal(signal.SIGKILL)
+
+    def terminate(self):
+        super().terminate()
+
+    def get_pid(self) -> int:
+        return self.p.pid
+
+    def read_from_logs(self, pattern: str, regex: bool = True) -> list[str]:
+        "Reads from logs for an especific pattern a return the found lines"
+        if not os.path.exists(self.log_file):
+            raise FileNotFoundError
+
+        # read all lines at the moment
+        all_lines = None
+        with open(self.log_file, 'r+b') as fp:
+            all_lines = fp.readlines()
+
+        found_lines = []
+        re_expr = None
+        if regex:
+            re_expr = re.compile(pattern=pattern)
+
+        for line in all_lines:
+            n_line = line.decode("utf-8")
+            if regex and re_expr.match(n_line):
+                found_lines.append(n_line)
+            else:
+                if pattern in n_line:
+                    found_lines.append(n_line)
+
+        return found_lines
 
     def create_acl_entry(self, dev_ctrl: ChipDeviceController, provider_node_id: int, requestor_node_id: Optional[int] = None):
         """Create ACL entries to allow OTA requestors to access the provider.
