@@ -152,7 +152,7 @@ CHIP_ERROR ThreadStackManagerImpl::_StartThreadTask()
 void ThreadStackManagerImpl::ExecuteThreadTask(void)
 {
 #if defined(FEATURE_TRUSTZONE_ENABLE) && (FEATURE_TRUSTZONE_ENABLE == 1)
-    os_alloc_secure_ctx(1024);
+    os_alloc_secure_ctx(5 * 1024);
 #endif
 
     while (true)
@@ -196,7 +196,7 @@ CHIP_ERROR ThreadStackManagerImpl::_StartThreadTask()
 void ThreadStackManagerImpl::ExecuteThreadTask(void)
 {
 #if defined(FEATURE_TRUSTZONE_ENABLE) && (FEATURE_TRUSTZONE_ENABLE == 1)
-    os_alloc_secure_ctx(1024);
+    os_alloc_secure_ctx(5 * 1024);
 #endif
     uint32_t notify;
     while (true)

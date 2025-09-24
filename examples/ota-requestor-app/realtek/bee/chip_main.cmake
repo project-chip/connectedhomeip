@@ -39,6 +39,7 @@ list(
     ${chip_dir}/examples/ota-requestor-app/realtek/bee/main/AppTask.cpp
     ${chip_dir}/examples/platform/realtek/util/LEDWidget.cpp
     ${chip_dir}/examples/providers/DeviceInfoProviderImpl.cpp
+    ${chip_dir}/examples/platform/realtek/dac_provider/CommonDACPrivider.cpp
 )
 
 add_library(

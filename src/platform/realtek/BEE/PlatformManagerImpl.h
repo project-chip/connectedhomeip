@@ -95,7 +95,7 @@ inline PlatformManagerImpl & PlatformMgrImpl(void)
 inline void PlatformManagerImpl::_RunEventLoop(void)
 {
 #if defined(FEATURE_TRUSTZONE_ENABLE) && (FEATURE_TRUSTZONE_ENABLE == 1)
-    os_alloc_secure_ctx(1024);
+    os_alloc_secure_ctx(2 * 1024);
 #endif
     Internal::GenericPlatformManagerImpl_FreeRTOS<PlatformManagerImpl>::_RunEventLoop();
 }
