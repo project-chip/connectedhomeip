@@ -71,7 +71,7 @@ class AppServerSubprocess(Subprocess):
             ])
 
             # Start the server application
-            super().__init__(*command,  # Pass the constructed command list
+            super().__init__(*command,
                              output_cb=lambda line, is_stderr: self.PREFIX + line)
         except Exception:
             # Do not leak KVS file descriptor on failure
@@ -157,6 +157,8 @@ class OTAProviderSubprocess(AppServerSubprocess):
         timeout: int = None,
         override_image_uri: str = None,
         log_file_path: str = "provider.log",
+        app_path: str = None,
+        kvs_path: str = None,
     ):
         """
         Initialize OTA Provider with hardcoded KVS path, log file, and extra args.
@@ -170,22 +172,19 @@ class OTAProviderSubprocess(AppServerSubprocess):
             timeout: Optional timeout in seconds.
             override_image_uri: Optional ImageURI override.
             log_file_path: File to store logs in real-time.
+            app_path: Required path to the chip-ota-provider-app binary.
+                      Must be provided explicitly (debug/release path may vary).
+                      example: ./out/debug/chip-ota-provider-app
+            kvs_path: Optional path for KVS storage. If provided, passed with --KVS.
         """
 
         self.log_file_path = log_file_path
 
-        # Path to provider binary and hardcoded KVS
-        path_to_app = "./out/debug/chip-ota-provider-app"
-        provider_kvs_path = "/tmp/chip_kvs_provider"
+        if not app_path:
+            raise ValueError("app_path must be provided for OTAProviderSubprocess")
 
-        # Build argument list exactly as before
-        args = [
-            f"--filepath={ota_file}" if isinstance(ota_file, str) else ota_file.path,
-            f"--discriminator={discriminator}",
-            f"--passcode={passcode}",
-            f"--secured-device-port={secured_device_port}",
-            f"--KVS={provider_kvs_path}",
-        ]
+        # Build argument list for provider launch
+        args = [f"--filepath={ota_file}" if isinstance(ota_file, str) else ota_file.path]
         if queue:
             args += ["-q", queue]
         if timeout:
@@ -193,14 +192,19 @@ class OTAProviderSubprocess(AppServerSubprocess):
         if override_image_uri:
             args += ["-i", override_image_uri]
 
+         # Add KVS path only if explicitly provided
+        if kvs_path:
+            args += [f"--KVS={kvs_path}"]
+
         # Clear the log file before starting
         open(log_file_path, "w").close()
 
         # Save args for use in the base constructor
         self._extra_args = args
 
+        # Initialize parent AppServerSubprocess with final arguments
         super().__init__(
-            app=path_to_app,
+            app=app_path,
             storage_dir="/tmp",
             discriminator=discriminator,
             passcode=passcode,

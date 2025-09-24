@@ -65,6 +65,10 @@ logger = logging.getLogger(__name__)
 
 class TC_SU_2_2(MatterBaseTest):
 
+    LOG_FILE_PATH = "provider.log"
+    APP_PATH = "./out/debug/chip-ota-provider-app"
+    KVS_PATH = "/tmp/chip_kvs_provider"
+
     async def add_single_ota_provider(self, controller, requestor_node_id: int, provider_node_id: int):
         """
         Adds a single OTA provider to the Requestor's DefaultOTAProviders attribute
@@ -167,14 +171,16 @@ class TC_SU_2_2(MatterBaseTest):
         # Prerequisite #2.0- Launch Provider with Queue "updateAvailable"
         # NOTE: Using OTAProviderSubprocess from matter.testing.apps to avoid code duplication
         provider_proc = OTAProviderSubprocess(
-            ota_file=provider_ota_file,           # string o OtaImagePath(path=...)
+            ota_file=provider_ota_file,           # Path to OTA image file
             discriminator=provider_discriminator,
             passcode=provider_setup_pin_code,
             secured_device_port=provider_port,
             queue=provider_queue,
             timeout=provider_timeout,
             override_image_uri=provider_override_image_uri,
-            log_file_path="provider.log"
+            log_file_path=self.LOG_FILE_PATH,
+            app_path=self.APP_PATH,
+            kvs_path=self.KVS_PATH,
         )
         provider_proc.start(expected_output=provider_wait_for, timeout=300)
 
