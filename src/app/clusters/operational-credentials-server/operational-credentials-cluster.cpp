@@ -276,7 +276,7 @@ std::optional<DataModel::ActionReturnStatus> HandleCSRRequest(CommandHandler * c
     MATTER_TRACE_SCOPE("CSRRequest", "OperationalCredentials");
     Commands::CSRRequest::DecodableType commandData;
     ReturnErrorOnFailure(commandData.Decode(input_arguments));
-    
+
     ChipLogProgress(Zcl, "OpCreds: Received a CSRRequest command");
 
     chip::Platform::ScopedMemoryBuffer<uint8_t> nocsrElements;
@@ -409,7 +409,7 @@ std::optional<DataModel::ActionReturnStatus> HandleAddNOC(CommandHandler * comma
     MATTER_TRACE_SCOPE("AddNOC", "OperationalCredentials");
     Commands::AddNOC::DecodableType commandData;
     ReturnErrorOnFailure(commandData.Decode(input_arguments));
-    
+
     auto & failSafeContext   = cluster->GetFailSafeContext();
     auto & fabricTable       = cluster->GetFabricTable();
     auto & NOCValue          = commandData.NOCValue;
@@ -609,7 +609,7 @@ std::optional<DataModel::ActionReturnStatus> HandleUpdateNOC(CommandHandler * co
     MATTER_TRACE_SCOPE("UpdateNOC", "OperationalCredentials");
     Commands::UpdateNOC::DecodableType commandData;
     ReturnErrorOnFailure(commandData.Decode(input_arguments, request.GetAccessingFabricIndex()));
-    
+
     FabricTable & fabricTable         = cluster->GetFabricTable();
     FailSafeContext & failSafeContext = cluster->GetFailSafeContext();
     auto & NOCValue                   = commandData.NOCValue;
@@ -705,7 +705,7 @@ std::optional<DataModel::ActionReturnStatus> HandleUpdateFabricLabel(CommandHand
     MATTER_TRACE_SCOPE("UpdateFabricLabel", "OperationalCredentials");
     Commands::UpdateFabricLabel::DecodableType commandData;
     ReturnErrorOnFailure(commandData.Decode(input_arguments, request.GetAccessingFabricIndex()));
-    
+
     FabricTable & fabricTable = cluster->GetFabricTable();
     auto & label              = commandData.label;
     auto ourFabricIndex       = commandObj->GetAccessingFabricIndex();
@@ -822,7 +822,7 @@ HandleSetVIDVerificationStatement(CommandHandler * commandObj,
     VerifyOrDie(cluster != nullptr);
     Commands::SetVIDVerificationStatement::DecodableType commandData;
     ReturnErrorOnFailure(commandData.Decode(input_arguments, request.GetAccessingFabricIndex()));
-    
+
     FabricIndex fabricIndex = commandObj->GetAccessingFabricIndex();
     auto finalStatus        = Status::Failure;
 
@@ -886,7 +886,7 @@ std::optional<DataModel::ActionReturnStatus> HandleRemoveFabric(CommandHandler *
     MATTER_TRACE_SCOPE("RemoveFabric", "OperationalCredentials");
     Commands::RemoveFabric::DecodableType commandData;
     ReturnErrorOnFailure(commandData.Decode(input_arguments));
-    
+
     auto & fabricBeingRemoved = commandData.fabricIndex;
 
     ChipLogProgress(Zcl, "OpCreds: Received a RemoveFabric Command for FabricIndex 0x%x",
@@ -949,7 +949,7 @@ HandleSignVIDVerificationRequest(CommandHandler * commandObj, const ConcreteComm
     VerifyOrDie(cluster != nullptr);
     Commands::SignVIDVerificationRequest::DecodableType commandData;
     ReturnErrorOnFailure(commandData.Decode(input_arguments));
-    
+
     ChipLogProgress(Zcl, "OpCreds: Received a SignVIDVerificationRequest Command for FabricIndex 0x%x",
                     static_cast<unsigned>(commandData.fabricIndex));
 
@@ -996,7 +996,7 @@ HandleCertificateChainRequest(CommandHandler * commandObj, const ConcreteCommand
     MATTER_TRACE_SCOPE("CertificateChainRequest", "OperationalCredentials");
     Commands::CertificateChainRequest::DecodableType commandData;
     ReturnErrorOnFailure(commandData.Decode(input_arguments));
-    
+
     auto & certificateType = commandData.certificateType;
 
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -1046,7 +1046,7 @@ std::optional<DataModel::ActionReturnStatus> HandleAttestationRequest(CommandHan
     MATTER_TRACE_SCOPE("AttestationRequest", "OperationalCredentials");
     OperationalCredentials::Commands::AttestationRequest::DecodableType commandData;
     ReturnErrorOnFailure(commandData.Decode(input_arguments));
-    
+
     auto & attestationNonce = commandData.attestationNonce;
     auto finalStatus = Status::Failure;
     CHIP_ERROR err   = CHIP_ERROR_INVALID_ARGUMENT;
