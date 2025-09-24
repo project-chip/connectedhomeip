@@ -90,6 +90,8 @@ runs:
 
     - name: Save bootstrap cache
       uses: ./.github/actions/dynamic
+      # Don't save cache if the build is a pull request, to prevent creating of multiple pr-ref caches with the same key. 
+      # PR builds still will be able to restore from cache created by master build.
       if: ${{ fromJSON(steps.restore.outputs.outputs).cache-hit != 'true' && github.event_name != 'pull_request' }}
       continue-on-error: true
       with:
