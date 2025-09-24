@@ -492,12 +492,15 @@ class ClusterParser:
         """
         try:
             name = xml_field.attrib['name']
+            # base=0 enables automatic number format detection: "10" -> 10, "0x10" -> 16, etc.
+            # This handles XML attributes that can be in decimal, hex, octal, or binary format
             id = uint(int(xml_field.attrib[component_tags[component_type].id_attrib], 0))
             return (name, id)
         except (KeyError, ValueError):
             return None
 
-    def _determine_optional_status(self, xml_field: ElementTree.Element) -> bool:
+    @staticmethod
+    def _isOptionalField(xml_field: ElementTree.Element) -> bool:
         """
         Determine if a field is optional based on XML attributes and child elements.
 
@@ -512,14 +515,15 @@ class ClusterParser:
             True if field is optional, False otherwise
         """
         # Check isOptional attribute
-        if 'isOptional' in xml_field.attrib and xml_field.attrib['isOptional'] == 'true':
+        if 'isOptional' in xml_field.attrib and xml_field.attrib['isOptional'].lower() == 'true':
             return True
 
         # Check for optionalConform child element
         optional_conform = xml_field.find('./optionalConform')
         return optional_conform is not None
 
-    def _determine_nullable_status(self, xml_field: ElementTree.Element) -> bool:
+    @staticmethod
+    def _isNullableField(xml_field: ElementTree.Element) -> bool:
         """
         Determine if a field is nullable based on XML attributes and child elements.
 
@@ -534,15 +538,12 @@ class ClusterParser:
             True if field is nullable, False otherwise
         """
         # Check isNullable attribute
-        if 'isNullable' in xml_field.attrib and xml_field.attrib['isNullable'] == 'true':
+        if 'isNullable' in xml_field.attrib and xml_field.attrib['isNullable'].lower() == 'true':
             return True
 
         # Check quality child element for nullable attribute
         quality = xml_field.find('./quality')
-        if quality is not None and 'nullable' in quality.attrib and quality.attrib['nullable'] == 'true':
-            return True
-
-        return False
+        return quality is not None and 'nullable' in quality.attrib and quality.attrib['nullable'].lower() == 'true'
 
     def _parse_field_constraints(self, xml_field: ElementTree.Element) -> dict | None:
         """
@@ -577,6 +578,8 @@ class ClusterParser:
                 if attr_element is not None and 'name' in attr_element.attrib:
                     constraints['maxCountAttribute'] = attr_element.attrib['name']
 
+        # Return None instead of {} to clearly distinguish "no constraints found" from "empty constraints"
+        # This matches the Optional[dict] type in XmlDataTypeComponent.constraints
         return constraints if constraints else None
 
     def _parse_field_conformance(self, xml_field: ElementTree.Element) -> ConformanceCallable:
@@ -651,8 +654,8 @@ class ClusterParser:
             type_info = xml_field.attrib.get('type', None) if component_type == DataTypeEnum.kStruct else None
 
             # Determine field properties using helper methods
-            is_optional = self._determine_optional_status(xml_field)
-            is_nullable = self._determine_nullable_status(xml_field)
+            is_optional = self._isOptionalField(xml_field)
+            is_nullable = self._isNullableField(xml_field)
             constraints = self._parse_field_constraints(xml_field)
             conformance = self._parse_field_conformance(xml_field)
 
