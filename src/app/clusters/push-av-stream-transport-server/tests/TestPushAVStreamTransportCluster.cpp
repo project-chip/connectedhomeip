@@ -333,7 +333,7 @@ public:
         return Status::Success;
     }
 
-    bool ValidateMotionZoneSize(uint16_t zoneSize) override
+    bool ValidateMotionZoneListSize(size_t zoneListSize) override
     {
         // TODO: Validate motion zone size
         // Returning true to pass through checks in the Server Implementation.
@@ -369,6 +369,17 @@ public:
     {
         ChipLogProgress(Zcl, "Persistent attributes loaded");
         return CHIP_NO_ERROR;
+    }
+
+    void SetTLSCerts(Tls::CertificateTable::BufferedClientCert & clientCertEntry,
+                     Tls::CertificateTable::BufferedRootCert & rootCertEntry) override
+    {
+        // No-op implementation for tests
+    }
+
+    void SetPushAvStreamTransportServer(PushAvStreamTransportServer * server) override
+    {
+        // No-op implementation for tests
     }
 
 private:

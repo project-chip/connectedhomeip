@@ -4344,6 +4344,80 @@ provisional cluster ScenesManagement = 98 {
   fabric command access(invoke: manage) CopyScene(CopySceneRequest): CopySceneResponse = 64;
 }
 
+/** The Groupcast cluster manages the content of the node-wide multicast Group membership that is part of the underlying interaction layer. */
+cluster Groupcast = 101 {
+  revision 1;
+
+  bitmap Feature : bitmap32 {
+    kListener = 0x1;
+    kSender = 0x2;
+  }
+
+  fabric_scoped struct MembershipStruct {
+    group_id groupID = 0;
+    endpoint_no endpoints[] = 1;
+    fabric_sensitive int32u keyID = 2;
+    boolean hasAuxiliaryACL = 3;
+    optional fabric_sensitive int32u expiringKeyID = 4;
+    fabric_idx fabricIndex = 254;
+  }
+
+  readonly attribute MembershipStruct membership[] = 0;
+  readonly attribute int16u maxMembershipCount = 1;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
+
+  request struct JoinGroupRequest {
+    group_id groupID = 0;
+    endpoint_no endpoints[] = 1;
+    octet_string<16> key = 2;
+    int32u keyID = 3;
+    optional epoch_s gracePeriod = 4;
+    optional boolean useAuxiliaryACL = 5;
+  }
+
+  request struct LeaveGroupRequest {
+    group_id groupID = 0;
+    optional endpoint_no endpoints[] = 1;
+  }
+
+  response struct LeaveGroupResponse = 2 {
+    group_id groupID = 0;
+    optional endpoint_no endpoints[] = 1;
+    optional boolean listTooLarge = 2;
+  }
+
+  request struct UpdateGroupKeyRequest {
+    group_id groupID = 0;
+    octet_string<16> key = 1;
+    int32u keyID = 2;
+    optional epoch_s gracePeriod = 3;
+  }
+
+  request struct ExpireGracePeriodRequest {
+    group_id groupID = 0;
+  }
+
+  request struct ConfigureAuxiliaryACLRequest {
+    group_id groupID = 0;
+    boolean useAuxiliaryACL = 1;
+  }
+
+  /** This command SHALL be used to instruct the server to join a multicast group. */
+  fabric command access(invoke: manage) JoinGroup(JoinGroupRequest): DefaultSuccess = 0;
+  /** This command SHALL allow a maintainer to request that the server withdraws itself or specific endpoints from a specific group or from all groups of this client's fabric. */
+  fabric command access(invoke: manage) LeaveGroup(LeaveGroupRequest): LeaveGroupResponse = 1;
+  /** This command SHALL allow a fabric maintainer to update the group operational key for an existing group ID that the server is a member of. */
+  fabric command access(invoke: manage) UpdateGroupKey(UpdateGroupKeyRequest): DefaultSuccess = 3;
+  /** This command SHALL allow a fabric maintainer to expire the grace period of the previous key for an existing group ID that the server is a member of. */
+  fabric command access(invoke: manage) ExpireGracePeriod(ExpireGracePeriodRequest): DefaultSuccess = 4;
+  /** This command SHALL allow an Administrator to enable or disable the generation of AuxiliaryACL entries in the Access Control Cluster based on the groups joined (see Groupcast Auxiliary ACL Handling). */
+  fabric command access(invoke: administer) ConfigureAuxiliaryACL(ConfigureAuxiliaryACLRequest): DefaultSuccess = 5;
+}
+
 /** Attributes and commands for monitoring HEPA filters in a device */
 cluster HepaFilterMonitoring = 113 {
   revision 1; // NOTE: Default/not specifically set
@@ -7027,6 +7101,7 @@ cluster Thermostat = 513 {
     kMatterScheduleConfiguration = 0x80;
     kPresets = 0x100;
     kEvents = 0x200;
+    kThermostatSuggestions = 0x400;
   }
 
   bitmap HVACSystemTypeBitmap : bitmap8 {
@@ -7098,6 +7173,7 @@ cluster Thermostat = 513 {
     kVacationMode = 0x10;
     kTimeOfUseCostSavings = 0x20;
     kPreCoolingOrPreHeating = 0x40;
+    kConflictingSuggestions = 0x80;
   }
 
   struct ScheduleTransitionStruct {
@@ -11136,11 +11212,6 @@ provisional cluster JointFabricAdministrator = 1875 {
 provisional cluster TlsCertificateManagement = 2049 {
   revision 1;
 
-  enum StatusCodeEnum : enum8 {
-    kCertificateAlreadyInstalled = 2;
-    kDuplicateKey = 3;
-  }
-
   fabric_scoped struct TLSCertStruct {
     int16u caid = 0;
     optional long_octet_string<3000> certificate = 1;
@@ -11149,7 +11220,7 @@ provisional cluster TlsCertificateManagement = 2049 {
 
   fabric_scoped struct TLSClientCertificateDetailStruct {
     int16u ccdid = 0;
-    optional long_octet_string<3000> clientCertificate = 1;
+    optional nullable long_octet_string<3000> clientCertificate = 1;
     optional octet_string intermediateCertificates[] = 2;
     fabric_idx fabricIndex = 254;
   }
@@ -11193,19 +11264,21 @@ provisional cluster TlsCertificateManagement = 2049 {
     int16u caid = 0;
   }
 
-  request struct TLSClientCSRRequest {
-    octet_string<128> nonce = 0;
+  request struct ClientCSRRequest {
+    octet_string<32> nonce = 0;
+    nullable int16u ccdid = 1;
   }
 
-  response struct TLSClientCSRResponse = 8 {
+  response struct ClientCSRResponse = 8 {
     int16u ccdid = 0;
     long_octet_string<3000> csr = 1;
-    octet_string<128> nonce = 2;
+    octet_string<128> nonceSignature = 2;
   }
 
   request struct ProvisionClientCertificateRequest {
     int16u ccdid = 0;
-    TLSClientCertificateDetailStruct clientCertificateDetails = 1;
+    long_octet_string<3000> clientCertificate = 1;
+    octet_string intermediateCertificates[] = 2;
   }
 
   request struct FindClientCertificateRequest {
@@ -11230,17 +11303,17 @@ provisional cluster TlsCertificateManagement = 2049 {
 
   /** This command SHALL provision a newly provided certificate, or rotate an existing one, based on the contents of the CAID field. */
   fabric command access(invoke: administer) ProvisionRootCertificate(ProvisionRootCertificateRequest): ProvisionRootCertificateResponse = 0;
-  /** This command SHALL return the specified TLS root certificate, or all TLS provisioned root certificates, based on the contents of the CAID field. */
+  /** This command SHALL return the specified TLS root certificate, or all provisioned TLS root certificates for the accessing fabric, based on the contents of the CAID field. */
   fabric command FindRootCertificate(FindRootCertificateRequest): FindRootCertificateResponse = 2;
   /** This command SHALL return the CAID for the passed in fingerprint. */
   fabric command LookupRootCertificate(LookupRootCertificateRequest): LookupRootCertificateResponse = 4;
   /** This command SHALL be generated to request the server removes the certificate provisioned to the provided Certificate Authority ID. */
   fabric command access(invoke: administer) RemoveRootCertificate(RemoveRootCertificateRequest): DefaultSuccess = 6;
-  /** This command SHALL be generated to request the Node generates a Certificate Signing Request. */
-  fabric command access(invoke: administer) TLSClientCSR(TLSClientCSRRequest): TLSClientCSRResponse = 7;
+  /** This command SHALL be generated to request the Node generates a certificate signing request for a new TLS key pair or use an existing CCDID for certificate rotation. */
+  fabric command access(invoke: administer) ClientCSR(ClientCSRRequest): ClientCSRResponse = 7;
   /** This command SHALL be generated to request the Node provisions newly provided Client Certificate Details, or rotate an existing client certificate. */
   fabric command access(invoke: administer) ProvisionClientCertificate(ProvisionClientCertificateRequest): DefaultSuccess = 9;
-  /** This command SHALL return the TLSClientCertificateDetailStruct for the passed in CCDID, or all TLS client certificates, based on the contents of the CCDID field. */
+  /** This command SHALL return the TLSClientCertificateDetailStruct for the passed in CCDID, or all TLS client certificates for the accessing fabric, based on the contents of the CCDID field. */
   fabric command FindClientCertificate(FindClientCertificateRequest): FindClientCertificateResponse = 10;
   /** This command SHALL return the CCDID for the passed in Fingerprint. */
   fabric command LookupClientCertificate(LookupClientCertificateRequest): LookupClientCertificateResponse = 12;

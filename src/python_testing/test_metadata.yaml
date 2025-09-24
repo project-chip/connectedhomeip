@@ -65,6 +65,8 @@ not_automated:
       reason: Shared code for TC_EGC, not a standalone test
     - name: TC_SEPRTestBase.py
       reason: Shared code for TC_SEPR, not a standalone test
+    - name: TC_SETRF_TestBase.py
+      reason: Shared code for TC_SETRF, not a standalone test
     - name: TC_COMMTR_TestBase.py
       reason: Shared code for TC_COMMTR, not a standalone test
     - name: TC_MTRIDTestBase.py
@@ -79,7 +81,11 @@ not_automated:
       reason: Unit test - does not run against an app
     - name: TestSpecParsingDeviceType.py
       reason: Unit test - does not run against an app
+    - name: TestSpecParsingNamespace.py
+      reason: Unit test - does not run against an app
     - name: TestConformanceTest.py
+      reason: Unit test - does not run against an app
+    - name: TestPics.py
       reason: Unit test - does not run against an app
     - name: TestSpecParsingSelection.py
       reason: Unit test - does not run against an app
@@ -131,6 +137,8 @@ not_automated:
           test.
     - name: TC_PAVSTI_Utils.py
       reason: Helper methods for Push AV Integration TCs
+    - name: TC_TLS_Utils.py
+      reason: Helper methods for TC tests dependent on TLS clusters
 
 # This is a list of slow tests (just arbitrarily picked around 20 seconds)
 # used in some script reporting for "be patient" messages as well as potentially

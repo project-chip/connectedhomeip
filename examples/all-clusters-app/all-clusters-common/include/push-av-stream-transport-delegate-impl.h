@@ -76,7 +76,7 @@ public:
 
     Protocols::InteractionModel::Status ValidateZoneId(uint16_t zoneId) override;
 
-    bool ValidateMotionZoneSize(uint16_t zoneSize) override;
+    bool ValidateMotionZoneListSize(size_t zoneListSize) override;
 
     PushAvStreamTransportStatusEnum GetTransportBusyStatus(const uint16_t connectionID) override;
 
@@ -85,6 +85,16 @@ public:
     CHIP_ERROR LoadCurrentConnections(std::vector<TransportConfigurationStorage> & currentConnections) override;
 
     CHIP_ERROR PersistentAttributesLoadedCallback() override;
+
+    void SetTLSCerts(Tls::CertificateTable::BufferedClientCert & clientCertEntry,
+                     Tls::CertificateTable::BufferedRootCert & rootCertEntry) override
+    {
+        // Handle TLS certificates if needed for implementation
+    }
+    void SetPushAvStreamTransportServer(PushAvStreamTransportServer * serverLogic) override
+    {
+        // Store pointer to server logic if needed for implementation
+    }
 
     void Init();
     PushAvStreamTransportManager()  = default;
