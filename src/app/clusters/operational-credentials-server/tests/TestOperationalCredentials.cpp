@@ -44,8 +44,14 @@ struct TestOperationalCredentials : public ::testing::Test
 
 TEST_F(TestOperationalCredentials, TestAttributes)
 {
-    OperationalCredentialsCluster cluster(kRootEndpointId, Server::GetInstance().GetFabricTable(),
-                                          Server::GetInstance().GetFailSafeContext());
+    OperationalCredentialsCluster::Context context = {
+        .fabricTable = Server::GetInstance().GetFabricTable(),
+        .failSafeContext = Server::GetInstance().GetFailSafeContext(),
+        .sessionManager = Server::GetInstance().GetSecureSessionManager(),
+        .dnssdServer = app::DnssdServer::Instance(),
+        .commissioningWindowManager = Server::GetInstance().GetCommissioningWindowManager()
+    };
+    OperationalCredentialsCluster cluster(kRootEndpointId, context);
 
     ReadOnlyBufferBuilder<AttributeEntry> builder;
     ASSERT_EQ(cluster.Attributes({ kRootEndpointId, OperationalCredentials::Id }, builder), CHIP_NO_ERROR);
@@ -67,8 +73,14 @@ TEST_F(TestOperationalCredentials, TestAttributes)
 
 TEST_F(TestOperationalCredentials, TestCommands)
 {
-    OperationalCredentialsCluster cluster(kRootEndpointId, Server::GetInstance().GetFabricTable(),
-                                          Server::GetInstance().GetFailSafeContext());
+    OperationalCredentialsCluster::Context context = {
+        .fabricTable = Server::GetInstance().GetFabricTable(),
+        .failSafeContext = Server::GetInstance().GetFailSafeContext(),
+        .sessionManager = Server::GetInstance().GetSecureSessionManager(),
+        .dnssdServer = app::DnssdServer::Instance(),
+        .commissioningWindowManager = Server::GetInstance().GetCommissioningWindowManager()
+    };
+    OperationalCredentialsCluster cluster(kRootEndpointId, context);
 
     ReadOnlyBufferBuilder<AcceptedCommandEntry> builder;
     ASSERT_EQ(cluster.AcceptedCommands({ kRootEndpointId, OperationalCredentials::Id }, builder), CHIP_NO_ERROR);

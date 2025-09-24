@@ -1202,7 +1202,7 @@ void OnPlatformEventHandler(const chip::DeviceLayer::ChipDeviceEvent * event, in
 CHIP_ERROR OperationalCredentialsCluster::Startup(ServerClusterContext & context)
 {
     ReturnErrorOnFailure(DefaultServerCluster::Startup(context));
-    mFabricTable.AddFabricDelegate(this);
+    mOpCredsContext.fabricTable.AddFabricDelegate(this);
     DeviceLayer::PlatformMgrImpl().AddEventHandler(OnPlatformEventHandler, reinterpret_cast<intptr_t>(this));
     return CHIP_NO_ERROR;
 }
@@ -1210,7 +1210,7 @@ CHIP_ERROR OperationalCredentialsCluster::Startup(ServerClusterContext & context
 void OperationalCredentialsCluster::Shutdown()
 {
     DeviceLayer::PlatformMgrImpl().RemoveEventHandler(OnPlatformEventHandler);
-    mFabricTable.RemoveFabricDelegate(this);
+    mOpCredsContext.fabricTable.RemoveFabricDelegate(this);
     DefaultServerCluster::Shutdown();
 }
 
@@ -1233,15 +1233,15 @@ DataModel::ActionReturnStatus OperationalCredentialsCluster::ReadAttribute(const
     case OperationalCredentials::Attributes::FeatureMap::Id:
         return encoder.Encode(static_cast<uint32_t>(0));
     case OperationalCredentials::Attributes::NOCs::Id:
-        return ReadNOCs(encoder, mFabricTable);
+        return ReadNOCs(encoder, mOpCredsContext.fabricTable);
     case OperationalCredentials::Attributes::Fabrics::Id:
-        return ReadFabricsList(encoder, mFabricTable);
+        return ReadFabricsList(encoder, mOpCredsContext.fabricTable);
     case OperationalCredentials::Attributes::SupportedFabrics::Id:
         return encoder.Encode(static_cast<uint8_t>(CHIP_CONFIG_MAX_FABRICS));
     case OperationalCredentials::Attributes::CommissionedFabrics::Id:
-        return encoder.Encode(mFabricTable.FabricCount());
+        return encoder.Encode(mOpCredsContext.fabricTable.FabricCount());
     case OperationalCredentials::Attributes::TrustedRootCertificates::Id:
-        return ReadRootCertificates(encoder, mFabricTable);
+        return ReadRootCertificates(encoder, mOpCredsContext.fabricTable);
     case OperationalCredentials::Attributes::CurrentFabricIndex::Id:
         return encoder.Encode(static_cast<uint8_t>(encoder.AccessingFabricIndex()));
     default:
@@ -1364,32 +1364,32 @@ void OperationalCredentialsCluster::OperationalCredentialsNotifyAttribute(Attrib
 
 FabricTable & OperationalCredentialsCluster::GetFabricTable()
 {
-    return mFabricTable;
+    return mOpCredsContext.fabricTable;
 }
 
 FailSafeContext & OperationalCredentialsCluster::GetFailSafeContext()
 {
-    return mFailSafeContext;
+    return mOpCredsContext.failSafeContext;
 }
 
 Credentials::DeviceAttestationCredentialsProvider * OperationalCredentialsCluster::GetDACProvider()
 {
-    return mDACProvider;
+    return Credentials::GetDeviceAttestationCredentialsProvider();
 }
 
 SessionManager & OperationalCredentialsCluster::GetSessionManager()
 {
-    return mSessionManager;
+    return mOpCredsContext.sessionManager;
 }
 
 DnssdServer & OperationalCredentialsCluster::GetDNSSDServer()
 {
-    return mDNSSDServer;
+    return mOpCredsContext.dnssdServer;
 }
 
 CommissioningWindowManager & OperationalCredentialsCluster::GetCommissioningWindowManager()
 {
-    return mCommissioningWindowManager;
+    return mOpCredsContext.commissioningWindowManager;
 }
 
 void OperationalCredentialsCluster::OnFabricCommitted(const FabricTable & fabricTable, FabricIndex fabricIndex)

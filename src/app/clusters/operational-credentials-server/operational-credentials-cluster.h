@@ -30,11 +30,16 @@ namespace Clusters {
 class OperationalCredentialsCluster : public DefaultServerCluster, chip::FabricTable::Delegate
 {
 public:
-    OperationalCredentialsCluster(EndpointId endpoint, FabricTable & fabricTable, FailSafeContext & failSafeContext, Credentials::DeviceAttestationCredentialsProvider * dacProvider,
-    SessionManager & sessionManager, DnssdServer & dnssdServer, CommissioningWindowManager & commissioningWindowManager) :
-        DefaultServerCluster({ endpoint, OperationalCredentials::Id }), mFabricTable(fabricTable),
-        mFailSafeContext(failSafeContext), mDACProvider(dacProvider), mSessionManager(sessionManager), mDNSSDServer(dnssdServer),
-        mCommissioningWindowManager(commissioningWindowManager){};
+    struct Context {
+        FabricTable & fabricTable;
+        FailSafeContext & failSafeContext;
+        SessionManager & sessionManager;
+        DnssdServer & dnssdServer;
+        CommissioningWindowManager & commissioningWindowManager;
+    };
+
+    OperationalCredentialsCluster(EndpointId endpoint, const Context  context) :
+        DefaultServerCluster({ endpoint, OperationalCredentials::Id }), mOpCredsContext(context){};
 
     CHIP_ERROR Startup(ServerClusterContext & context) override;
     void Shutdown() override;
@@ -66,12 +71,7 @@ public:
     void OnFabricCommitted(const FabricTable & fabricTable, FabricIndex fabricIndex) override;
 
 private:
-    FabricTable & mFabricTable;
-    FailSafeContext & mFailSafeContext;
-    Credentials::DeviceAttestationCredentialsProvider * mDACProvider;
-    SessionManager & mSessionManager;
-    DnssdServer & mDNSSDServer;
-    CommissioningWindowManager & mCommissioningWindowManager;
+    const OperationalCredentialsCluster::Context mOpCredsContext;
 };
 
 } // namespace Clusters
