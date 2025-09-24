@@ -40,10 +40,12 @@ import dbus.service  # type: ignore
 from .ChipBleBase import ChipBleBase
 from .ChipBleUtility import BLE_ERROR_REMOTE_DEVICE_DISCONNECTED, BleDisconnectEvent, ParseServiceData
 
+LOGGER = logging.getLogger(__name__)
+
 try:
     from gi.repository import GObject  # type: ignore
 except Exception:
-    logging.exception("Unable to find GObject from gi.repository")
+    LOGGER.exception("Unable to find GObject from gi.repository")
     from pgi.repository import GObject  # type: ignore
 
 chip_service = uuid.UUID("0000FFF6-0000-1000-8000-00805F9B34FB")
