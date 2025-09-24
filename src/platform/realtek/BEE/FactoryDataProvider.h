@@ -25,18 +25,11 @@
 namespace chip {
 namespace DeviceLayer {
 
-class FactoryDataProvider : public chip::Credentials::DeviceAttestationCredentialsProvider,
-                            public CommissionableDataProvider,
-                            public DeviceInstanceInfoProvider
+class FactoryDataProvider : public CommissionableDataProvider, public DeviceInstanceInfoProvider
 {
 public:
     // ===== Members functions that implement the DeviceAttestationCredentialsProvider
     CHIP_ERROR Init(void);
-    CHIP_ERROR GetCertificationDeclaration(MutableByteSpan & outBuffer) override;
-    CHIP_ERROR GetFirmwareInformation(MutableByteSpan & out_firmware_info_buffer) override;
-    CHIP_ERROR GetDeviceAttestationCert(MutableByteSpan & outBuffer) override;
-    CHIP_ERROR GetProductAttestationIntermediateCert(MutableByteSpan & outBuffer) override;
-    CHIP_ERROR SignWithDeviceAttestationKey(const ByteSpan & messageToSign, MutableByteSpan & outSignBuffer) override;
 
     // ===== Members functions that implement the CommissionableDataProvider
     CHIP_ERROR GetSetupDiscriminator(uint16_t & setupDiscriminator) override;
@@ -60,13 +53,9 @@ public:
     CHIP_ERROR GetHardwareVersion(uint16_t & hardwareVersion) override;
     CHIP_ERROR GetHardwareVersionString(char * buf, size_t bufSize) override;
     CHIP_ERROR GetRotatingDeviceIdUniqueId(MutableByteSpan & uniqueIdSpan) override;
-
-private:
-    static constexpr uint8_t kDACPrivateKeyLength = 32;
-    static constexpr uint8_t kDACPublicKeyLength  = 65;
-
-    FactoryData mFactoryData = { 0 };
 };
+
+const FactoryData * GetFactoryData();
 
 } // namespace DeviceLayer
 } // namespace chip
