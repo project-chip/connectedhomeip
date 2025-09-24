@@ -377,7 +377,7 @@ public:
      *                                          full-duplex, etc.
      * @param aSnapshotCapabilities             Indicates the set of supported snapshot capabilities by the device, e.g., the image
      *                                          codec, the resolution and the maximum frame rate.
-     * @param aMaxNetworkBandwidth              Indicates the maximum network bandwidth (in mbps) that the device would consume
+     * @param aMaxNetworkBandwidth              Indicates the maximum network bandwidth (in bps) that the device would consume
      * @param aSupportedStreamUsages            Indicates the possible stream types available
      * @param aStreamUsagePriorities            Indicates the priority ranking of the available streams
      * for the transmission of its media streams.
