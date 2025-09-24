@@ -2935,36 +2935,6 @@
         (EmberAfGenericClusterFunction) emberAfLocalizationConfigurationClusterServerInitCallback,                                 \
         (EmberAfGenericClusterFunction) MatterLocalizationConfigurationClusterServerPreAttributeChangedCallback,                   \
     };                                                                                                                             \
-    const EmberAfGenericClusterFunction chipFuncArrayTimeFormatLocalizationServer[] = {                                            \
-        (EmberAfGenericClusterFunction) emberAfTimeFormatLocalizationClusterServerInitCallback,                                    \
-        (EmberAfGenericClusterFunction) MatterTimeFormatLocalizationClusterServerPreAttributeChangedCallback,                      \
-    };                                                                                                                             \
-    const EmberAfGenericClusterFunction chipFuncArrayGeneralDiagnosticsServer[] = {                                                \
-        (EmberAfGenericClusterFunction) emberAfGeneralDiagnosticsClusterServerInitCallback,                                        \
-        (EmberAfGenericClusterFunction) MatterGeneralDiagnosticsClusterServerShutdownCallback,                                     \
-    };                                                                                                                             \
-    const EmberAfGenericClusterFunction chipFuncArraySoftwareDiagnosticsServer[] = {                                               \
-        (EmberAfGenericClusterFunction) emberAfSoftwareDiagnosticsClusterServerInitCallback,                                       \
-        (EmberAfGenericClusterFunction) MatterSoftwareDiagnosticsClusterServerShutdownCallback,                                    \
-    };                                                                                                                             \
-    const EmberAfGenericClusterFunction chipFuncArrayWiFiNetworkDiagnosticsServer[] = {                                            \
-        (EmberAfGenericClusterFunction) emberAfWiFiNetworkDiagnosticsClusterServerInitCallback,                                    \
-        (EmberAfGenericClusterFunction) MatterWiFiNetworkDiagnosticsClusterServerShutdownCallback,                                 \
-    };                                                                                                                             \
-    const EmberAfGenericClusterFunction chipFuncArrayEthernetNetworkDiagnosticsServer[] = {                                        \
-        (EmberAfGenericClusterFunction) emberAfEthernetNetworkDiagnosticsClusterServerInitCallback,                                \
-    };                                                                                                                             \
-    const EmberAfGenericClusterFunction chipFuncArrayTimeSynchronizationServer[] = {                                               \
-        (EmberAfGenericClusterFunction) emberAfTimeSynchronizationClusterServerInitCallback,                                       \
-        (EmberAfGenericClusterFunction) MatterTimeSynchronizationClusterServerShutdownCallback,                                    \
-    };                                                                                                                             \
-    const EmberAfGenericClusterFunction chipFuncArrayAdministratorCommissioningServer[] = {                                        \
-        (EmberAfGenericClusterFunction) emberAfAdministratorCommissioningClusterServerInitCallback,                                \
-        (EmberAfGenericClusterFunction) MatterAdministratorCommissioningClusterServerShutdownCallback,                             \
-    };                                                                                                                             \
-    const EmberAfGenericClusterFunction chipFuncArrayGroupKeyManagementServer[] = {                                                \
-        (EmberAfGenericClusterFunction) emberAfGroupKeyManagementClusterServerInitCallback,                                        \
-    };                                                                                                                             \
     const EmberAfGenericClusterFunction chipFuncArrayFixedLabelServer[] = {                                                        \
         (EmberAfGenericClusterFunction) emberAfFixedLabelClusterServerInitCallback,                                                \
         (EmberAfGenericClusterFunction) MatterFixedLabelClusterServerShutdownCallback,                                             \
@@ -3816,8 +3786,8 @@
       .attributes = ZAP_ATTRIBUTE_INDEX(204), \
       .attributeCount = 14, \
       .clusterSize = 3, \
-      .mask = ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(INIT_FUNCTION) | ZAP_CLUSTER_MASK(SHUTDOWN_FUNCTION), \
-      .functions = chipFuncArrayTimeSynchronizationServer, \
+      .mask = ZAP_CLUSTER_MASK(SERVER), \
+      .functions = NULL, \
       .acceptedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 52 ), \
       .generatedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 58 ), \
       .eventList = ZAP_GENERATED_EVENTS_INDEX( 16 ), \
@@ -4989,7 +4959,7 @@
 // This is an array of EmberAfEndpointType structures.
 #define GENERATED_ENDPOINT_TYPES                                                                                                   \
     {                                                                                                                              \
-        { ZAP_CLUSTER_INDEX(0), 28, 223 },                                                                                         \
+        { ZAP_CLUSTER_INDEX(0), 28, 221 },                                                                                         \
         { ZAP_CLUSTER_INDEX(28), 73, 3444 },                                                                                       \
         { ZAP_CLUSTER_INDEX(101), 7, 114 },                                                                                        \
         { ZAP_CLUSTER_INDEX(108), 2, 0 },                                                                                          \
@@ -5004,7 +4974,7 @@ static_assert(ATTRIBUTE_LARGEST <= CHIP_CONFIG_MAX_ATTRIBUTE_STORE_ELEMENT_SIZE,
 #define ATTRIBUTE_SINGLETONS_SIZE (0)
 
 // Total size of attribute storage
-#define ATTRIBUTE_MAX_SIZE (3781)
+#define ATTRIBUTE_MAX_SIZE (3779)
 
 // Number of fixed endpoints
 #define FIXED_ENDPOINT_COUNT (4)
