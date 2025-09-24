@@ -90,7 +90,7 @@ CHIP_ERROR CreateAccessControlEntryForNewFabricAdministrator(const Access::Subje
     }
 
     ChipLogDetail(Zcl, "OpCreds: ACL entry created for Fabric index 0x%x CASE Admin Subject 0x" ChipLogFormatX64,
-                    static_cast<unsigned>(fabricIndex), ChipLogValueX64(subject));
+                  static_cast<unsigned>(fabricIndex), ChipLogValueX64(subject));
 
     return CHIP_NO_ERROR;
 }
@@ -586,8 +586,7 @@ exit:
         // Success
         else
         {
-            ChipLogDetail(Zcl, "OpCreds: successfully created fabric index 0x%x via AddNOC",
-                            static_cast<unsigned>(newFabricIndex));
+            ChipLogDetail(Zcl, "OpCreds: successfully created fabric index 0x%x via AddNOC", static_cast<unsigned>(newFabricIndex));
         }
     }
     // No NOC response - Failed constraints
@@ -826,7 +825,7 @@ std::optional<DataModel::ActionReturnStatus> HandleSetVIDVerificationStatement(C
     auto finalStatus        = Status::Failure;
 
     ChipLogDetail(Zcl, "OpCreds: Received a SetVIDVerificationStatement Command for FabricIndex 0x%x",
-                    static_cast<unsigned>(fabricIndex));
+                  static_cast<unsigned>(fabricIndex));
 
     if (!commandData.vendorID.HasValue() && !commandData.VIDVerificationStatement.HasValue() && !commandData.vvsc.HasValue())
     {
@@ -888,8 +887,7 @@ std::optional<DataModel::ActionReturnStatus> HandleRemoveFabric(CommandHandler *
 
     auto & fabricBeingRemoved = commandData.fabricIndex;
 
-    ChipLogDetail(Zcl, "OpCreds: Received a RemoveFabric Command for FabricIndex 0x%x",
-                    static_cast<unsigned>(fabricBeingRemoved));
+    ChipLogDetail(Zcl, "OpCreds: Received a RemoveFabric Command for FabricIndex 0x%x", static_cast<unsigned>(fabricBeingRemoved));
 
     if (!IsValidFabricIndex(fabricBeingRemoved))
     {
@@ -950,7 +948,7 @@ std::optional<DataModel::ActionReturnStatus> HandleSignVIDVerificationRequest(Co
     ReturnErrorOnFailure(commandData.Decode(input_arguments));
 
     ChipLogDetail(Zcl, "OpCreds: Received a SignVIDVerificationRequest Command for FabricIndex 0x%x",
-                    static_cast<unsigned>(commandData.fabricIndex));
+                  static_cast<unsigned>(commandData.fabricIndex));
 
     if (!IsValidFabricIndex(commandData.fabricIndex) ||
         (commandData.clientChallenge.size() != Crypto::kVendorIdVerificationClientChallengeSize))
@@ -1401,8 +1399,8 @@ void OperationalCredentialsCluster::OnFabricCommitted(const FabricTable & fabric
     VerifyOrReturn(fabric != nullptr);
 
     ChipLogDetail(Zcl,
-                    "OpCreds: Fabric index 0x%x was committed to storage. Compressed Fabric Id 0x" ChipLogFormatX64
-                    ", FabricId " ChipLogFormatX64 ", NodeId " ChipLogFormatX64 ", VendorId 0x%04X",
-                    static_cast<unsigned>(fabric->GetFabricIndex()), ChipLogValueX64(fabric->GetCompressedFabricId()),
-                    ChipLogValueX64(fabric->GetFabricId()), ChipLogValueX64(fabric->GetNodeId()), fabric->GetVendorId());
+                  "OpCreds: Fabric index 0x%x was committed to storage. Compressed Fabric Id 0x" ChipLogFormatX64
+                  ", FabricId " ChipLogFormatX64 ", NodeId " ChipLogFormatX64 ", VendorId 0x%04X",
+                  static_cast<unsigned>(fabric->GetFabricIndex()), ChipLogValueX64(fabric->GetCompressedFabricId()),
+                  ChipLogValueX64(fabric->GetFabricId()), ChipLogValueX64(fabric->GetNodeId()), fabric->GetVendorId());
 }
