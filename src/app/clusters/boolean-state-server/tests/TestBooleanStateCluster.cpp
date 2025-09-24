@@ -181,31 +181,28 @@ TEST_F(TestBooleanStateCluster, EventGeneratedOnStateChange)
             auto eventNumber = booleanState.SetStateValue(true);
             EXPECT_TRUE(eventNumber.has_value());
 
-            // Validate the last emitted event metadata and payload
             auto & logOnlyEvents = context.EventsGenerator();
-            EXPECT_EQ(eventNumber.value(), logOnlyEvents.CurrentEventNumber());
-
-            using EventType = chip::app::Clusters::BooleanState::Events::StateChange::Type;
-            EXPECT_EQ(logOnlyEvents.LastOptions().mPath,
-                      ConcreteEventPath(endpoint, EventType::GetClusterId(), EventType::GetEventId()));
-
-            // Decode the last event and verify its contents
+            using EventType      = chip::app::Clusters::BooleanState::Events::StateChange::Type;
             chip::app::Clusters::BooleanState::Events::StateChange::DecodableType decodedEvent;
-            ASSERT_EQ(logOnlyEvents.DecodeLastEvent(decodedEvent), CHIP_NO_ERROR);
-            EXPECT_TRUE(decodedEvent.stateValue);
+
+            // Lambda to verify the last emitted event metadata and payload
+            auto verifyLastEvent = [&](bool expectedStateValue) {
+                EXPECT_EQ(eventNumber.value(), logOnlyEvents.CurrentEventNumber());
+                EXPECT_EQ(logOnlyEvents.LastOptions().mPath,
+                          ConcreteEventPath(endpoint, EventType::GetClusterId(), EventType::GetEventId()));
+                ASSERT_EQ(logOnlyEvents.DecodeLastEvent(decodedEvent), CHIP_NO_ERROR);
+                EXPECT_EQ(decodedEvent.stateValue, expectedStateValue);
+            };
+
+            // Verify event with expected true value
+            verifyLastEvent(true);
 
             // Now, change from true to false and expect an event
             eventNumber = booleanState.SetStateValue(false);
             EXPECT_TRUE(eventNumber.has_value());
 
-            // Validate the last emitted event metadata and payload for the new event
-            EXPECT_EQ(eventNumber.value(), logOnlyEvents.CurrentEventNumber());
-            EXPECT_EQ(logOnlyEvents.LastOptions().mPath,
-                      ConcreteEventPath(endpoint, EventType::GetClusterId(), EventType::GetEventId()));
-
-            // Decode the last event and verify its contents
-            ASSERT_EQ(logOnlyEvents.DecodeLastEvent(decodedEvent), CHIP_NO_ERROR);
-            EXPECT_FALSE(decodedEvent.stateValue);
+            // Verify event with expected false value
+            verifyLastEvent(false);
         });
     }
 }
