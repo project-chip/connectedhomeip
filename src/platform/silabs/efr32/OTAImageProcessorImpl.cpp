@@ -224,18 +224,11 @@ void OTAImageProcessorImpl::HandleApply(intptr_t context)
         return;
     }
 #endif // SL_BTLCTRL_MUX
-
-#if defined(_SILICON_LABS_32B_SERIES_3) && CHIP_PROGRESS_LOGGING
-    osDelay(100); // sl-temp: delay for uart print before verifyImage
-#endif            // _SILICON_LABS_32B_SERIES_3 && CHIP_PROGRESS_LOGGING
-    LockRadioProcessing();
 #if defined(SL_TRUSTZONE_NONSECURE)
-    WRAP_BL_DFU_CALL(err = bootloader_verifyImage(mSlotId))
+    CORE_CRITICAL_SECTION(err = bootloader_verifyImage(mSlotId);)
 #else
-    WRAP_BL_DFU_CALL(err = bootloader_verifyImage(mSlotId, NULL))
+    CORE_CRITICAL_SECTION(err = bootloader_verifyImage(mSlotId, NULL);)
 #endif
-    UnlockRadioProcessing();
-
     if (err != SL_BOOTLOADER_OK)
     {
         ChipLogError(SoftwareUpdate, "bootloader_verifyImage() error: %ld", err);
