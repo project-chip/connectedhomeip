@@ -157,6 +157,7 @@ public:
 
 protected:
     FactoryInitParamsSetter params;
+    Engine_raii engine;
 
 private:
     chip::app::DataModel::Provider * mOldProvider = nullptr;
@@ -166,7 +167,6 @@ TEST_F(TestDeviceControllerFactory, DeviceControllerFactoryMethods_FailInit)
 {
     chip::Controller::FactoryInitParams factoryInitParams = params.GetFactoryInitParams();
     // Initialize the ember side server logic
-    Engine_raii engine;
     EXPECT_EQ(engine->Init(&GetExchangeManager(), &GetFabricTable(), chip::app::reporting::GetDefaultReportScheduler()),
               CHIP_NO_ERROR);
 
@@ -182,7 +182,6 @@ TEST_F(TestDeviceControllerFactory, DeviceControllerFactoryMethods_DobleInit)
 {
     chip::Controller::FactoryInitParams factoryInitParams = params.GetFactoryInitParams();
     // Initialize the ember side server logic
-    Engine_raii engine;
     EXPECT_EQ(engine->Init(&GetExchangeManager(), &GetFabricTable(), chip::app::reporting::GetDefaultReportScheduler()),
               CHIP_NO_ERROR);
 
@@ -203,7 +202,6 @@ TEST_F(TestDeviceControllerFactory, DeviceControllerFactoryMethods_SetupControll
     chip::Controller::DeviceCommissioner commissioner;
     chip::Controller::DeviceController device;
     // Initialize the ember side server logic
-    Engine_raii engine;
     EXPECT_EQ(engine->Init(&GetExchangeManager(), &GetFabricTable(), chip::app::reporting::GetDefaultReportScheduler()),
               CHIP_NO_ERROR);
 
@@ -238,7 +236,6 @@ TEST_F(TestDeviceControllerFactory, DeviceControllerFactoryMethods_RetainAndRele
     chip::TestPersistentStorageDelegate storage;
     chip::Controller::SetupParams dparams;
     // Initialize the ember side server logic
-    Engine_raii engine;
     EXPECT_EQ(engine->Init(&GetExchangeManager(), &GetFabricTable(), chip::app::reporting::GetDefaultReportScheduler()),
               CHIP_NO_ERROR);
 
