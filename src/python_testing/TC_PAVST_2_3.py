@@ -279,6 +279,17 @@ class TC_PAVST_2_3(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
         asserts.assert_equal(status, Status.AlreadyExists,
                              "DUT should respond with Status Code AlreadyExists with a Duplicate Zone.")
 
+        # Duplicate Zone ID rejection with Nulls
+        zoneList = [{"zone": 1, "sensitivity": 4}, {"zone": NullValue, "sensitivity": 4},
+                    {"zone": 3, "sensitivity": 4}, {"zone": NullValue, "sensitivity": 4}]
+        triggerOptions = {"triggerType": pvcluster.Enums.TransportTriggerTypeEnum.kMotion,
+                          "maxPreRollLen": 4000,
+                          "motionZones": zoneList,
+                          "motionTimeControl": {"initialDuration": 1, "augmentationDuration": 1, "maxDuration": 1, "blindDuration": 1}}
+        status = await self.allocate_one_pushav_transport(endpoint, trigger_Options=triggerOptions, tlsEndPoint=tlsEndpointId, url=f"https://{host_ip}:1234/streams/{uploadStreamId}")
+        asserts.assert_equal(status, Status.AlreadyExists,
+                             "DUT should respond with Status Code AlreadyExists with Duplicate Null Zones.")
+
         self.step(16)
         try:
             zoneList = [{"zone": 14, "sensitivity": 4}]

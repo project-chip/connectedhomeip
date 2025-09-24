@@ -653,32 +653,41 @@ PushAvStreamTransportServerLogic::HandleAllocatePushTransport(CommandHandler & h
 
         // If there are duplicate entries, reject the command
         std::set<uint16_t> zoneIDsFound;
-        bool dupFound = false;
+        bool nullFound = false;
 
         while (iterDupCheck.Next())
         {
             auto & transportZoneOption = iterDupCheck.GetValue();
             if (!transportZoneOption.zone.IsNull())
             {
-                if (zoneIDsFound.count(transportZoneOption.zone.Value()) == 0)
+                uint16_t zoneID = transportZoneOption.zone.Value();
+                if (zoneIDsFound.count(zoneID) == 0)
                 {
                     // Zone ID not found, add to set of IDs
-                    //
-                    zoneIDsFound.emplace(transportZoneOption.zone.Value());
+                    zoneIDsFound.emplace(zoneID);
                 }
                 else
                 {
                     // This is a duplicate
-                    dupFound = true;
-                    break;
+                    ChipLogError(Zcl, "Transport Options verification from command data[ep=%d]: Duplicate Zone ID (=%d) in Motion Zones. ",
+                                 mEndpointId, zoneID);
+                    handler.AddStatus(commandPath, Status::AlreadyExists);
+                    return std::nullopt;
                 }
             }
+            else 
+            {
+                if (nullFound)
+                {
+                    // This is the second null, therefore also a duplicate entry
+                    ChipLogError(Zcl, "Transport Options verification from command data[ep=%d]: Duplicate Null Zone ID in Motion Zones. ",
+                                 mEndpointId);
+                    handler.AddStatus(commandPath, Status::AlreadyExists);
+                    return std::nullopt;
+                }
+                nullFound = true;
+            }
         }
-
-        VerifyOrReturnValue(
-            !dupFound, Status::AlreadyExists,
-            ChipLogError(Zcl, "Transport Options verification from command data[ep=%d]: Duplicate Zone ID in Motion Zones ",
-                         mEndpointId));
 
         bool isValidZoneSize = mDelegate->ValidateMotionZoneListSize(zoneListSize);
         VerifyOrReturnValue(
