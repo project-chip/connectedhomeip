@@ -261,6 +261,13 @@ class BasicCompositionTests:
             return "<unknown_test>"
         return frame.f_code.co_name
 
+    def fail_current_test(self, msg: Optional[str] = None) -> typing.NoReturn:  # type: ignore[misc]
+        if not msg:
+            # Without a message, just log the last problem seen
+            asserts.fail(msg=self.problems[-1].problem)
+        else:
+            asserts.fail(msg)
+
     def _get_dm(self) -> PrebuiltDataModelDirectory:  # type: ignore[return]
         # mypy doesn't understand that asserts.fail always raises a TestFailure
         try:
@@ -310,28 +317,3 @@ class BasicCompositionTests:
 
         # Call the parent teardown_class method to handle normal teardown and problem logging
         super().teardown_class()
-
-    def fail_current_test(self, msg: Optional[str] = None) -> typing.NoReturn:  # type: ignore[misc]
-        """Override fail_current_test to automatically dump device attribute data when any composition test fails.
-
-        This ensures that whenever any test inheriting from BasicCompositionTests fails,
-        we automatically get the device attribute dump for debugging purposes.
-        """
-        # Dump device attribute data if available for debugging BEFORE failing the test
-        try:
-            if hasattr(self, 'endpoints_tlv') and self.endpoints_tlv:
-                logging.info("Device attribute dump available - generating dump")
-                _, txt_str = self.dump_wildcard(None)
-                # Only dump the text format - it's more readable for debugging
-                log_structured_data('==== FAILURE_DUMP_txt: ', txt_str)
-            else:
-                logging.info("No device attribute dump available (endpoints_tlv not populated)")
-        except Exception as e:
-            # Don't let logging errors interfere with the original test failure
-            logging.warning(f"Failed to generate device attribute dump on test failure: {e}")
-
-        if not msg:
-            # Without a message, just log the last problem seen
-            asserts.fail(msg=self.problems[-1].problem)
-        else:
-            asserts.fail(msg)
