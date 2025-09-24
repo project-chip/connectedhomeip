@@ -544,6 +544,29 @@ void OvenTemperatureControlledCabinetCooktopCookSurfaceInit()
     CooktopCookSurfaceInit(kCooktopEpId);
 }
 
+#if MATTER_DM_TEMPERATURE_MEASUREMENT_CLUSTER_SERVER_ENDPOINT_COUNT > 0
+uint parity                                            = 1;
+const chip::EndpointId kTemperatureMeasurementEndpoint = 1;
+const System::Clock::Milliseconds16 kChatyPeriod(100); // 0.1 s
+const int16_t delta = 1;                               // 0.01 C
+static void chattyTemperatureChangeTick(System::Layer * systemLayer, void * data)
+{
+    DataModel::Nullable<int16_t> current, next;
+    TemperatureMeasurement::Attributes::MeasuredValue::Get(kTemperatureMeasurementEndpoint, current);
+    if (parity)
+    {
+        next.SetNonNull(current.ValueOr(0) + 1);
+    }
+    else
+    {
+        next.SetNonNull(current.ValueOr(0) - 1);
+    }
+    TemperatureMeasurement::Attributes::MeasuredValue::Set(kTemperatureMeasurementEndpoint, next);
+    ChipLogDetail(NotSpecified, "Temperature set to %d", next.ValueOr(0));
+    (void) DeviceLayer::SystemLayer().StartTimer(kChatyPeriod, chattyTemperatureChangeTick, nullptr);
+}
+#endif // MATTER_DM_TEMPERATURE_MEASUREMENT_CLUSTER_SERVER_ENDPOINT_COUNT > 0
+
 void ApplicationInit()
 {
     ChipLogProgress(NotSpecified, "Chef Application Init !!!");
@@ -580,6 +603,10 @@ void ApplicationInit()
 #if MATTER_DM_IDENTIFY_CLUSTER_SERVER_ENDPOINT_COUNT > 0
     InitIdentifyCluster();
 #endif // MATTER_DM_IDENTIFY_CLUSTER_SERVER_ENDPOINT_COUNT
+
+#if MATTER_DM_TEMPERATURE_MEASUREMENT_CLUSTER_SERVER_ENDPOINT_COUNT > 0
+    (void) DeviceLayer::SystemLayer().StartTimer(kChatyPeriod, chattyTemperatureChangeTick, nullptr);
+#endif // MATTER_DM_TEMPERATURE_MEASUREMENT_CLUSTER_SERVER_ENDPOINT_COUNT > 0
 }
 
 void ApplicationShutdown()
