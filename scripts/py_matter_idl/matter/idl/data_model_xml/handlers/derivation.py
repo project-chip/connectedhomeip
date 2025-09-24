@@ -21,7 +21,6 @@ from matter.idl.matter_idl_types import Attribute, AttributeQuality, Bitmap, Clu
 from .context import Context, IdlPostProcessor
 from .parsing import NormalizeName
 
-
 T = TypeVar("T")
 
 
