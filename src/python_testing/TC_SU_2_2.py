@@ -57,8 +57,7 @@ from matter.interaction_model import Status
 from matter.testing import matter_asserts
 from matter.testing.event_attribute_reporting import AttributeMatcher, AttributeSubscriptionHandler, EventSubscriptionHandler
 from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
-from matter.testing.apps import AppServerSubprocess, OTAProviderSubprocess, OtaImagePath
-
+from matter.testing.apps import OTAProviderSubprocess, ACLHandler
 
 # Create a logger
 logger = logging.getLogger(__name__)
@@ -216,8 +215,7 @@ class TC_SU_2_2(MatterBaseTest):
             attribute=Clusters.AccessControl.Attributes.Acl,
         )
 
-        original_requestor_acls, original_provider_acls = await provider_proc.set_ota_acls_for_provider(
-            controller,
+        await self.acl_handler.set_ota_acls(
             requestor_node=requestor_node_id,
             provider_node=provider_node_id,
             fabric_index=fabric_id,
@@ -252,7 +250,7 @@ class TC_SU_2_2(MatterBaseTest):
             None
         """
         # Clean Provider ACL
-        await provider_proc.write_acl(controller, provider_node_id, original_provider_acls)
+        await self.acl_handler.write_acl(provider_node_id, original_provider_acls)
         await asyncio.sleep(1)
 
         # Expire sessions
@@ -260,7 +258,7 @@ class TC_SU_2_2(MatterBaseTest):
         await asyncio.sleep(1)
 
         # Clean Requestor ACL
-        await provider_proc.write_acl(controller, requestor_node_id, original_requestor_acls)
+        await self.acl_handler.write_acl(requestor_node_id, original_requestor_acls)
         await asyncio.sleep(1)
 
         # Kill Provider process
@@ -370,6 +368,7 @@ class TC_SU_2_2(MatterBaseTest):
         CONTROLLER = self.default_controller
         FABRIC_ID = CONTROLLER.fabricId
         REQUESTOR_NODE_ID = self.dut_node_id  # Assigned on execution time
+        self.acl_handler = ACLHandler(CONTROLLER)
 
         step_number = "[STEP_0]"
         logger.info(f'{step_number}: Prerequisite #1.0 - Requestor (DUT), NodeID: {REQUESTOR_NODE_ID}, FabricId: {FABRIC_ID}')
