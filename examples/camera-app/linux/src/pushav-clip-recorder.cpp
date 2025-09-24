@@ -280,7 +280,6 @@ void PushAVClipRecorder::Stop()
         ChipLogError(Camera, "Error recording is not running");
     }
     mDeinitializeRecorder = true;
-    CleanupOutput();
     ChipLogProgress(Camera, "Recording stopped for ID: %s", mClipInfo.mRecorderId.c_str());
 }
 
@@ -394,7 +393,7 @@ int PushAVClipRecorder::StartClipRecording()
         }
         ProcessBuffersAndWrite();
     }
-
+    CleanupOutput();
     ChipLogProgress(Camera, "Recorder thread closing");
     return 0;
 }
@@ -665,9 +664,7 @@ void PushAVClipRecorder::FinalizeCurrentClip(int reason)
 
     if (reason || ((clipLengthInPTS >= clipDuration) && (mClipInfo.mTriggerType != 2)))
     {
-        mClipInfo.mClipId++;
         Stop();
-        mClipInfo.mClipId++;
         mCurrentClipStartPts = currentPts;
     }
 
@@ -735,6 +732,7 @@ void PushAVClipRecorder::FinalizeCurrentClip(int reason)
         std::string mpd_path = make_path("%s.mpd");
         if (FileExists(mpd_path) && !FileExists(mpd_path + ".tmp"))
         {
+            mUploader->setMPDPath(std::make_pair(mpd_path, mClipInfo.mUrl));
             CheckAndUploadFile(mpd_path);
             mUploadMPD = false; // Reset flag after successful upload
         }

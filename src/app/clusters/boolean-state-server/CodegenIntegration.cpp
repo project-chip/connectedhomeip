@@ -57,7 +57,7 @@ public:
 
 } // namespace
 
-void emberAfBooleanStateClusterServerInitCallback(EndpointId endpointId)
+void MatterBooleanStateClusterInitCallback(EndpointId endpointId)
 {
     IntegrationDelegate integrationDelegate;
 
@@ -74,7 +74,7 @@ void emberAfBooleanStateClusterServerInitCallback(EndpointId endpointId)
         integrationDelegate);
 }
 
-void MatterBooleanStateClusterServerShutdownCallback(EndpointId endpointId)
+void MatterBooleanStateClusterShutdownCallback(EndpointId endpointId)
 {
     IntegrationDelegate integrationDelegate;
 
@@ -91,11 +91,11 @@ void MatterBooleanStateClusterServerShutdownCallback(EndpointId endpointId)
 
 namespace chip::app::Clusters::BooleanState {
 
-BooleanStateCluster * GetClusterForEndpointIndex(EndpointId endpointId)
+BooleanStateCluster * FindClusterOnEndpoint(EndpointId endpointId)
 {
     IntegrationDelegate integrationDelegate;
 
-    ServerClusterInterface * booleanState = CodegenClusterIntegration::GetClusterForEndpointIndex(
+    ServerClusterInterface * booleanState = CodegenClusterIntegration::FindClusterOnEndpoint(
         {
             .endpointId                = endpointId,
             .clusterId                 = BooleanState::Id,

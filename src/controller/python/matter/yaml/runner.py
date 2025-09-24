@@ -35,7 +35,7 @@ from .data_model_lookup import DataModelLookup, PreDefinedDataModelLookup
 from .errors import ActionCreationError, UnexpectedActionCreationError
 
 _PSEUDO_CLUSTERS = get_default_pseudo_clusters()
-logger = logging.getLogger('YamlParser')
+LOGGER = logging.getLogger(__name__)
 
 
 class _ActionStatus(Enum):
@@ -379,7 +379,7 @@ class AttributeChangeAccumulator:
             result = _ActionResult(status=_ActionStatus.SUCCESS, response=path.AttributeType(data))
 
             item = _AttributeSubscriptionCallbackResult(self._name, path, result)
-            logging.debug(
+            LOGGER.debug(
                 f'Got subscription report on client {self.name} for {path.AttributeType}: {data}')
             self._output_queue.put(item)
 
@@ -401,7 +401,7 @@ class EventChangeAccumulator:
             result = _ActionResult(status=_ActionStatus.SUCCESS, response=event_response)
 
             item = _EventSubscriptionCallbackResult(self._name, result)
-            logging.debug(f'Got subscription report on client {self.name}')
+            LOGGER.debug(f'Got subscription report on client {self.name}')
             self._output_queue.put(item)
 
     @property
@@ -715,13 +715,13 @@ class DiscoveryCommandAction(BaseAction):
             filterType=self.filterType, filter=self.filter, stopOnFirst=True, timeoutSecond=5)
 
         # Devices will be a list: [CommissionableNode(), ...]
-        logging.info("Discovered devices: %r" % devices)
+        LOGGER.info("Discovered devices: %r" % devices)
 
         if not devices:
-            logging.error("No devices found")
+            LOGGER.error("No devices found")
             return _ActionResult(status=_ActionStatus.ERROR, response="NO DEVICES FOUND")
         elif len(devices) > 1:
-            logging.warning("Commissionable discovery found multiple results!")
+            LOGGER.warning("Commissionable discovery found multiple results!")
 
         return _ActionResult(status=_ActionStatus.SUCCESS, response=devices[0])
 
@@ -834,7 +834,7 @@ class ReplTestRunner:
         try:
             return DefaultPseudoCluster(test_step)
         except ActionCreationError as e:
-            logger.warning(f"Failed to create default pseudo cluster: {e}")
+            LOGGER.warning(f"Failed to create default pseudo cluster: {e}")
             return None
 
     def encode(self, request) -> Optional[BaseAction]:
@@ -870,7 +870,7 @@ class ReplTestRunner:
             action = self._default_pseudo_cluster(request)
 
         if action is None:
-            logger.warning(f"Failed to parse {request.label}")
+            LOGGER.warning(f"Failed to parse {request.label}")
         return action
 
     def decode(self, result: _ActionResult):
