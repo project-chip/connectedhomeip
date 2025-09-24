@@ -172,13 +172,13 @@ static Commands::RetrieveLogsResponse::DecodableType DecodeRetrieveLogsResponse(
     return decoded;
 }
 
-struct TestDiagnosticLogsLogic : public ::testing::Test
+struct TestDiagnosticLogsCluster : public ::testing::Test
 {
     static void SetUpTestSuite() { ASSERT_EQ(Platform::MemoryInit(), CHIP_NO_ERROR); }
     static void TearDownTestSuite() { Platform::MemoryShutdown(); }
 };
 
-TEST_F(TestDiagnosticLogsLogic, ResponsePayload_WithDelegate_Success)
+TEST_F(TestDiagnosticLogsCluster, ResponsePayload_WithDelegate_Success)
 {
     DiagnosticLogsCluster diagnosticLogsCluster;
 
@@ -198,7 +198,7 @@ TEST_F(TestDiagnosticLogsLogic, ResponsePayload_WithDelegate_Success)
 }
 
 // If request is BDX but logs can fit in the response payload, the response should be kExhausted
-TEST_F(TestDiagnosticLogsLogic, Bdx_WithDelegate_kExhausted)
+TEST_F(TestDiagnosticLogsCluster, Bdx_WithDelegate_kExhausted)
 {
     DiagnosticLogsCluster diagnosticLogsCluster;
 
@@ -218,7 +218,7 @@ TEST_F(TestDiagnosticLogsLogic, Bdx_WithDelegate_kExhausted)
     EXPECT_EQ(logContentSize, sizeof(buffer));
 }
 
-TEST_F(TestDiagnosticLogsLogic, Bdx_WithDelegate_kExhausted_with_buffer_greater_than_kMaxLogContentSize)
+TEST_F(TestDiagnosticLogsCluster, Bdx_WithDelegate_kExhausted_with_buffer_greater_than_kMaxLogContentSize)
 {
     DiagnosticLogsCluster diagnosticLogsCluster;
 
@@ -238,6 +238,88 @@ TEST_F(TestDiagnosticLogsLogic, Bdx_WithDelegate_kExhausted_with_buffer_greater_
 
     // The buffer is greater than kMaxLogContentSize, so the log content is cropped to kMaxLogContentSize
     EXPECT_EQ(logContentSize, (size_t) 1024);
+}
+
+TEST_F(TestDiagnosticLogsCluster, ResponsePayload_NoDelegate_NoLogs)
+{
+    DiagnosticLogsCluster diagnosticLogsCluster;
+
+    const ConcreteCommandPath kPath{ kRootEndpoint, DiagnosticLogs::Id, DiagnosticLogs::Commands::RetrieveLogsRequest::Id };
+    MockCommandHandler handler;
+    diagnosticLogsCluster.HandleLogRequestForResponsePayload(&handler, kPath, DiagnosticLogs::IntentEnum::kEndUserSupport);
+    EXPECT_EQ(handler.GetResponse().commandId, DiagnosticLogs::Commands::RetrieveLogsResponse::Id);
+    auto decoded = DecodeRetrieveLogsResponse(handler.GetResponse());
+    EXPECT_EQ(decoded.status, DiagnosticLogs::StatusEnum::kNoLogs);
+}
+
+TEST_F(TestDiagnosticLogsCluster, ResponsePayload_ZeroBufferSize_NoLogs)
+{
+    DiagnosticLogsCluster diagnosticLogsCluster;
+
+    MockDelegate delegate;
+    uint8_t buffer[10];
+    delegate.SetDiagnosticBuffer(buffer, 0);
+    diagnosticLogsCluster.SetDelegate(&delegate);
+
+    const ConcreteCommandPath kPath{ kRootEndpoint, DiagnosticLogs::Id, DiagnosticLogs::Commands::RetrieveLogsRequest::Id };
+    MockCommandHandler handler;
+    diagnosticLogsCluster.HandleLogRequestForResponsePayload(&handler, kPath, DiagnosticLogs::IntentEnum::kEndUserSupport);
+    EXPECT_EQ(handler.GetResponse().commandId, DiagnosticLogs::Commands::RetrieveLogsResponse::Id);
+    auto decoded = DecodeRetrieveLogsResponse(handler.GetResponse());
+    EXPECT_EQ(decoded.status, DiagnosticLogs::StatusEnum::kNoLogs);
+}
+
+TEST_F(TestDiagnosticLogsCluster, Bdx_NoDelegate_NoLogs)
+{
+    DiagnosticLogsCluster diagnosticLogsCluster;
+
+    const ConcreteCommandPath kPath{ kRootEndpoint, DiagnosticLogs::Id, DiagnosticLogs::Commands::RetrieveLogsRequest::Id };
+    MockCommandHandler handler;
+    diagnosticLogsCluster.HandleLogRequestForBdx(&handler, kPath, DiagnosticLogs::IntentEnum::kEndUserSupport,
+                                                 MakeOptional(CharSpan::fromCharString("enduser.log")));
+    EXPECT_EQ(handler.GetResponse().commandId, DiagnosticLogs::Commands::RetrieveLogsResponse::Id);
+    auto decoded = DecodeRetrieveLogsResponse(handler.GetResponse());
+    EXPECT_EQ(decoded.status, DiagnosticLogs::StatusEnum::kNoLogs);
+}
+
+TEST_F(TestDiagnosticLogsCluster, Bdx_NoFileDesignator_InvalidCommand)
+{
+    DiagnosticLogsCluster diagnosticLogsCluster;
+
+    MockDelegate delegate;
+    uint8_t buffer[2048];
+    delegate.SetDiagnosticBuffer(buffer, sizeof(buffer));
+    diagnosticLogsCluster.SetDelegate(&delegate);
+
+    const ConcreteCommandPath kPath{ kRootEndpoint, DiagnosticLogs::Id, DiagnosticLogs::Commands::RetrieveLogsRequest::Id };
+    MockCommandHandler handler;
+
+    auto result = diagnosticLogsCluster.HandleLogRequestForBdx(&handler, kPath, DiagnosticLogs::IntentEnum::kEndUserSupport,
+                                                               Optional<CharSpan>());
+    EXPECT_TRUE(result.has_value());
+    EXPECT_EQ(result.value(), Status::InvalidCommand);
+}
+
+TEST_F(TestDiagnosticLogsCluster, Bdx_TooLongFileDesignator_ConstraintError)
+{
+    DiagnosticLogsCluster diagnosticLogsCluster;
+
+    MockDelegate delegate;
+    uint8_t buffer[2048];
+    delegate.SetDiagnosticBuffer(buffer, sizeof(buffer));
+    diagnosticLogsCluster.SetDelegate(&delegate);
+
+    const ConcreteCommandPath kPath{ kRootEndpoint, DiagnosticLogs::Id, DiagnosticLogs::Commands::RetrieveLogsRequest::Id };
+    MockCommandHandler handler;
+
+    char longFileName[256]; // kMaxFileDesignatorLen is 255
+    memset(longFileName, 'a', sizeof(longFileName) - 1);
+    longFileName[sizeof(longFileName) - 1] = '\0';
+
+    auto result = diagnosticLogsCluster.HandleLogRequestForBdx(&handler, kPath, DiagnosticLogs::IntentEnum::kEndUserSupport,
+                                                               MakeOptional(CharSpan::fromCharString(longFileName)));
+    EXPECT_TRUE(result.has_value());
+    EXPECT_EQ(result.value(), Status::ConstraintError);
 }
 
 } // namespace app

@@ -131,7 +131,7 @@ DiagnosticLogsCluster::HandleLogRequestForBdx(CommandHandler * commandObj, const
     }
 
     auto size = mDelegate->GetSizeForIntent(intent);
-    // In the case where the size is 1 sets the Status field of the RetrieveLogsResponse to NoLogs and do not start a BDX session.
+    // In the case where the size is 0 sets the Status field of the RetrieveLogsResponse to NoLogs and do not start a BDX session.
     VerifyOrReturnError(size != 0, std::nullopt, HandleLogRequestForResponsePayload(commandObj, path, intent, StatusEnum::kNoLogs));
 
     // In the case where the Node is able to fit the entirety of the requested logs within the LogContent field, the Status field of
