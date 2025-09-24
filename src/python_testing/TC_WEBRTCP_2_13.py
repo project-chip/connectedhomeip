@@ -18,11 +18,14 @@
 # See https://github.com/project-chip/connectedhomeip/blob/master/docs/testing/python.md#defining-the-ci-test-arguments
 # for details about the block below.
 #
+# Note: This test expects the camera app to support the "SetHardPrivacyModeOn" pipe command
+# to simulate the physical privacy switch state for automated testing.
+#
 # === BEGIN CI TEST ARGUMENTS ===
 # test-runner-runs:
 #   run1:
 #     app: ${CAMERA_APP}
-#     app-args: --camera-deferred-offer --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json --app-pipe /tmp/webrtcp_2_7_fifo
+#     app-args: --camera-deferred-offer --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json --app-pipe /tmp/webrtcp_2_13_fifo
 #     script-args: >
 #       --PICS src/app/tests/suites/certification/ci-pics-values
 #       --storage-path admin_storage.json
@@ -31,7 +34,7 @@
 #       --passcode 20202021
 #       --trace-to json:${TRACE_TEST_JSON}.json
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
-#       --app-pipe /tmp/webrtcp_2_7_fifo
+#       --app-pipe /tmp/webrtcp_2_13_fifo
 #     factory-reset: true
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
@@ -42,17 +45,18 @@ from TC_WEBRTCPTestBase import WEBRTCPTestBase
 
 import matter.clusters as Clusters
 from matter import ChipDeviceCtrl
+from matter.clusters.Types import NullValue
 from matter.interaction_model import InteractionModelError, Status
 from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 
 
-class TC_WebRTCProvider_2_7(MatterBaseTest, WEBRTCPTestBase):
+class TC_WEBRTCP_2_13(MatterBaseTest, WEBRTCPTestBase):
 
-    def desc_TC_WebRTCProvider_2_7(self) -> str:
+    def desc_TC_WEBRTCP_2_13(self) -> str:
         """Returns a description of this test"""
-        return "[TC-{picsCode}-2.7] Validate SolicitOffer fails when physical privacy switch is ON"
+        return "[TC-WEBRTCP-2.13] Validate ProvideOffer fails when physical privacy switch is ON"
 
-    def steps_TC_WebRTCProvider_2_7(self) -> list[TestStep]:
+    def steps_TC_WEBRTCP_2_13(self) -> list[TestStep]:
         """
         Define the step-by-step sequence for the test.
         """
@@ -61,18 +65,26 @@ class TC_WebRTCProvider_2_7(MatterBaseTest, WEBRTCPTestBase):
                      "DUT responds with success"),
             TestStep(2, "Turns ON the physical privacy switch (HardPrivacyModeOn is TRUE)",
                      "DUT's HardPrivacyModeOn attribute becomes TRUE"),
-            TestStep(3, "TH sends the SolicitOffer command with valid parameters including allocated stream IDs",
+            TestStep(3, "TH sends the ProvideOffer command with null WebRTCSessionID and valid parameters",
                      "DUT responds with INVALID_IN_STATE status code"),
             TestStep(4, "Tures OFF the physical privacy switch (HardPrivacyModeOn is FALSE)",
                      "DUT's HardPrivacyModeOn attribute becomes FALSE"),
-            TestStep(5, "TH sends the SolicitOffer command with the same valid parameters"),
+            TestStep(5, "TH sends the ProvideOffer command with the same parameters",
+                     "DUT responds with ProvideOfferResponse containing allocated WebRTCSessionID"),
         ]
         return steps
 
+    def pics_TC_WEBRTCP_2_13(self) -> list[str]:
+        pics = [
+            "WEBRTCP.S",
+            "AVSM.S",
+        ]
+        return pics
+
     @async_test_body
-    async def test_TC_WebRTCProvider_2_7(self):
+    async def test_TC_WEBRTCP_2_13(self):
         """
-        Executes the test steps for validating SolicitOffer behavior when physical privacy switch is ON.
+        Executes the test steps for validating ProvideOffer behavior when physical privacy switch is ON.
         """
 
         endpoint = self.get_endpoint(default=1)
@@ -94,7 +106,7 @@ class TC_WebRTCProvider_2_7(MatterBaseTest, WEBRTCPTestBase):
         else:
             input("Please turn ON the physical privacy switch on the device, then press Enter to continue...")
 
-        # Verify the attribute was set successfully
+        # Verify the attribute reflects the privacy switch state
         hard_privacy_mode = await self.read_single_attribute_check_success(
             endpoint=endpoint,
             cluster=Clusters.CameraAvStreamManagement,
@@ -102,18 +114,38 @@ class TC_WebRTCProvider_2_7(MatterBaseTest, WEBRTCPTestBase):
         )
         asserts.assert_true(hard_privacy_mode, "HardPrivacyModeOn should be True when privacy switch is on")
 
+        sdp_offer = (
+            "v=0\n"
+            "o=rtc 2281582238 0 IN IP4 127.0.0.1\n"
+            "s=-\n"
+            "t=0 0\n"
+            "a=group:BUNDLE 0\n"
+            "a=msid-semantic:WMS *\n"
+            "a=ice-options:ice2,trickle\n"
+            "a=fingerprint:sha-256 8F:BF:9A:B9:FA:59:EC:F6:08:EA:47:D3:F4:AC:FA:AC:E9:27:FA:28:D3:00:1D:9B:EF:62:3F:B8:C6:09:FB:B9\n"
+            "m=application 9 UDP/DTLS/SCTP webrtc-datachannel\n"
+            "c=IN IP4 0.0.0.0\n"
+            "a=mid:0\n"
+            "a=sendrecv\n"
+            "a=sctp-port:5000\n"
+            "a=max-message-size:262144\n"
+            "a=setup:actpass\n"
+            "a=ice-ufrag:ytRw\n"
+            "a=ice-pwd:blrzPJtaV9Y1BNgbC1bXpi"
+        )
+
         self.step(3)
-        # Send SolicitOffer command with valid parameters - should fail with INVALID_IN_STATE
-        cmd = Clusters.WebRTCTransportProvider.Commands.SolicitOffer(
-            streamUsage=Clusters.Globals.Enums.StreamUsageEnum.kLiveView,
+        cmd = Clusters.WebRTCTransportProvider.Commands.ProvideOffer(
+            webRTCSessionID=NullValue,
+            sdp=sdp_offer,
+            streamUsage=3,
             originatingEndpointID=endpoint,
             videoStreamID=videoStreamID,
             audioStreamID=audioStreamID
         )
-
         try:
             await self.send_single_cmd(cmd=cmd, endpoint=endpoint, payloadCapability=ChipDeviceCtrl.TransportPayloadCapability.LARGE_PAYLOAD)
-            asserts.fail("Expected SolicitOffer to fail with INVALID_IN_STATE when HardPrivacyModeOn is True")
+            asserts.fail("Expected ProvideOffer to fail with INVALID_IN_STATE when HardPrivacyModeOn is True")
         except InteractionModelError as e:
             asserts.assert_equal(e.status, Status.InvalidInState, "Expected INVALID_IN_STATE when HardPrivacyModeOn is True")
 
@@ -125,7 +157,7 @@ class TC_WebRTCProvider_2_7(MatterBaseTest, WEBRTCPTestBase):
         else:
             input("Please turn OFF the physical privacy switch on the device, then press Enter to continue...")
 
-        # Verify the attribute was set successfully
+        # Verify the attribute reflects the privacy switch state
         hard_privacy_mode = await self.read_single_attribute_check_success(
             endpoint=endpoint,
             cluster=Clusters.CameraAvStreamManagement,
@@ -134,22 +166,14 @@ class TC_WebRTCProvider_2_7(MatterBaseTest, WEBRTCPTestBase):
         asserts.assert_false(hard_privacy_mode, "HardPrivacyModeOn should be False when privacy switch is off")
 
         self.step(5)
-        # Send SolicitOffer command with the same valid parameters - should succeed now
-        cmd = Clusters.WebRTCTransportProvider.Commands.SolicitOffer(
-            streamUsage=Clusters.Globals.Enums.StreamUsageEnum.kLiveView,
-            originatingEndpointID=endpoint,
-            videoStreamID=videoStreamID,
-            audioStreamID=audioStreamID
-        )
-
         resp = await self.send_single_cmd(cmd=cmd, endpoint=endpoint, payloadCapability=ChipDeviceCtrl.TransportPayloadCapability.LARGE_PAYLOAD)
-        asserts.assert_equal(type(resp), Clusters.WebRTCTransportProvider.Commands.SolicitOfferResponse,
-                             "Expected SolicitOfferResponse when HardPrivacyModeOn is False")
+        asserts.assert_equal(type(resp), Clusters.WebRTCTransportProvider.Commands.ProvideOfferResponse,
+                             "Expected ProvideOfferResponse when HardPrivacyModeOn is False")
         asserts.assert_is_not_none(resp.webRTCSessionID, "WebRTCSessionID should be allocated")
 
         # Log successful completion
         self.print_step(
-            5, f"✓ SolicitOffer succeeded when HardPrivacyModeOn is False, allocated WebRTCSessionID: {resp.webRTCSessionID}")
+            5, f"✓ ProvideOffer succeeded when HardPrivacyModeOn is False, allocated WebRTCSessionID: {resp.webRTCSessionID}")
 
 
 if __name__ == "__main__":
