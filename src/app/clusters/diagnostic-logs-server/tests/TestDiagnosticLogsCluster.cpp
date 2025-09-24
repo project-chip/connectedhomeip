@@ -296,7 +296,7 @@ TEST_F(TestDiagnosticLogsCluster, Bdx_NoFileDesignator_InvalidCommand)
 
     auto result = diagnosticLogsCluster.HandleLogRequestForBdx(&handler, kPath, DiagnosticLogs::IntentEnum::kEndUserSupport,
                                                                Optional<CharSpan>());
-    EXPECT_TRUE(result.has_value());
+    ASSERT_TRUE(result.has_value());
     EXPECT_EQ(result.value(), Status::InvalidCommand);
 }
 
@@ -318,7 +318,7 @@ TEST_F(TestDiagnosticLogsCluster, Bdx_TooLongFileDesignator_ConstraintError)
 
     auto result = diagnosticLogsCluster.HandleLogRequestForBdx(&handler, kPath, DiagnosticLogs::IntentEnum::kEndUserSupport,
                                                                MakeOptional(CharSpan::fromCharString(longFileName)));
-    EXPECT_TRUE(result.has_value());
+    ASSERT_TRUE(result.has_value());
     EXPECT_EQ(result.value(), Status::ConstraintError);
 }
 
