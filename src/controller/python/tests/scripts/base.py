@@ -798,8 +798,7 @@ class BaseTestHelper:
         try:
             await self.devCtrl2.CommissionWithCode(setupPayload=setup_code)
         except ChipStackException:
-            self.logger.exception(
-                "Failed to finish key exchange with device {}".format(ip))
+            self.logger.exception("Failed to finish key exchange with device")
             return False
 
         #
