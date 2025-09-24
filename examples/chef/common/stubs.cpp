@@ -564,6 +564,7 @@ static void chattyTemperatureChangeTick(System::Layer * systemLayer, void * data
     }
     TemperatureMeasurement::Attributes::MeasuredValue::Set(kTemperatureMeasurementEndpoint, next);
     ChipLogDetail(NotSpecified, "Temperature set to %d", next.ValueOr(0));
+    parity ^= 1;
     (void) DeviceLayer::SystemLayer().StartTimer(kChatyPeriod, chattyTemperatureChangeTick, nullptr);
 }
 #endif // MATTER_DM_TEMPERATURE_MEASUREMENT_CLUSTER_SERVER_ENDPOINT_COUNT > 0
