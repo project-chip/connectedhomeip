@@ -39,6 +39,8 @@ enum class StatusCode : uint16_t
     kStartOffsetNotSupported    = 0x0052,
     kVersionNotSupported        = 0x0053,
     kUnknown                    = 0x005F,
+    kSenderAborted              = 0x0060,
+    kReceiverAborted            = 0x0061,
 };
 
 StatusCode GetBdxStatusCodeFromChipError(CHIP_ERROR error);

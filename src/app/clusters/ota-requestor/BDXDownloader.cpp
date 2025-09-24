@@ -237,11 +237,12 @@ void BDXDownloader::PollTransferSession()
     } while (outEvent.EventType != TransferSession::OutputEventType::kNone);
 }
 
-void BDXDownloader::CleanupOnError(OTAChangeReasonEnum reason)
+void BDXDownloader::CleanupOnError(OTAChangeReasonEnum reason, bool abortedByProvider)
 {
     Reset();
     mBdxTransfer.Reset();
-    SetState(State::kIdle, reason);
+    auto nextState = abortedByProvider ? State::kAbortedByProvider : State::kIdle;
+    SetState(nextState, reason);
     if (mImageProcessor)
     {
         mImageProcessor->Abort();
@@ -288,7 +289,9 @@ CHIP_ERROR BDXDownloader::HandleBdxEvent(const chip::bdx::TransferSession::Outpu
     }
     case TransferSession::OutputEventType::kStatusReceived:
         ChipLogError(BDX, "BDX StatusReport %x", static_cast<uint16_t>(outEvent.statusData.statusCode));
-        CleanupOnError(OTAChangeReasonEnum::kFailure);
+        // second argument to CleanupOnError being TRUE means bdx transfer session moved 
+        // to UnrecoverableError state due to receiving an either SenerAborted or ReceiverAborted Status Report
+        CleanupOnError(OTAChangeReasonEnum::kFailure, mBdxTransfer.IsInUnrecoverableState());
         break;
     case TransferSession::OutputEventType::kInternalError:
         ChipLogError(BDX, "TransferSession error");

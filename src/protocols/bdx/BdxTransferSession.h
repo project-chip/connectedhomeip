@@ -321,6 +321,7 @@ public:
     uint32_t GetNextBlockNum() const { return mNextBlockNum; }
     uint32_t GetNextQueryNum() const { return mNextQueryNum; }
     size_t GetNumBytesProcessed() const { return mNumBytesProcessed; }
+    bool IsInUnrecoverableState() const { return mState == TransferState::kUnrecoverableError; }
     const uint8_t * GetFileDesignator(uint16_t & fileDesignatorLen) const
     {
         fileDesignatorLen = mTransferRequestData.FileDesLength;
@@ -341,6 +342,7 @@ private:
         kReceivedEOF,
         kTransferDone,
         kErrorState,
+        kUnrecoverableError
     };
 
     // Incoming message handlers
@@ -407,7 +409,6 @@ private:
     System::Clock::Timestamp mTimeoutStartTime = System::Clock::kZero;
     bool mShouldInitTimeoutStart               = true;
     bool mAwaitingResponse                     = false;
-    bool mAbortTransferPending                 = false;
 };
 
 } // namespace bdx

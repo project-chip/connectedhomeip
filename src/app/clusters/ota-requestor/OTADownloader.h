@@ -41,6 +41,7 @@ public:
         kPreparing,
         kInProgress,
         kComplete,
+        kAbortedByProvider
     };
 
     OTADownloader() : mImageProcessor(nullptr), mState(State::kIdle) {}

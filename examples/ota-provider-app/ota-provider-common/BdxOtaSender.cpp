@@ -241,7 +241,7 @@ void BdxOtaSender::AbortTransfer()
 {
     if (mInitialized)
     {
-        mTransfer.AbortTransfer(StatusCode::kUnknown);
+        mTransfer.AbortTransfer(StatusCode::kSenderAborted);
         PollForOutput();
     }
 }

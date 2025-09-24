@@ -622,6 +622,11 @@ void DefaultOTARequestor::OnDownloadStateChanged(OTADownloader::State state, OTA
 
     switch (state)
     {
+        
+    case OTADownloader::State::kAbortedByProvider: 
+        mOtaRequestorDriver->UpdateDiscontinued();
+        break;    
+
     case OTADownloader::State::kComplete:
         mOtaRequestorDriver->UpdateDownloaded();
         mBdxMessenger.Reset();

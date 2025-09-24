@@ -82,14 +82,6 @@ void TransferSession::PollOutput(OutputEvent & event, System::Clock::Timestamp c
         return;
     }
 
-    if (mAbortTransferPending)
-    {
-        event = OutputEvent::StatusReportEvent(OutputEventType::kInternalError, mStatusReportData);
-        mAbortTransferPending = false;
-        return;
-    }
-
-
     switch (mPendingOutput)
     {
     case OutputEventType::kNone:
@@ -412,7 +404,11 @@ CHIP_ERROR TransferSession::AbortTransfer(StatusCode reason)
 
     PrepareStatusReport(reason);
 
-    mAbortTransferPending = true;
+    if ( ( mRole == TransferRole::kSender && mStatusReportData.statusCode == StatusCode::kSenderAborted ) ||
+         ( mRole == TransferRole::kReceiver && mStatusReportData.statusCode == StatusCode::kReceiverAborted ) )
+    {
+        mState = TransferState::kUnrecoverableError; // Signaling this side of the session wants to completely abort the transfer
+    }
 
     return CHIP_NO_ERROR;
 }
@@ -538,6 +534,19 @@ CHIP_ERROR TransferSession::HandleStatusReportMessage(const PayloadHeader & head
     VerifyOrReturnError((report.GetProtocolId() == Protocols::BDX::Id), CHIP_ERROR_INVALID_MESSAGE_TYPE);
 
     mStatusReportData.statusCode = static_cast<StatusCode>(report.GetProtocolCode());
+
+    /// This condition reads:
+    /// If we are the Sender and we received a ReceiverAborted status, or
+    /// If we are the Receiver and we received a SenderAborted status,
+    /// then this is an unrecoverable error and we should move to that state.
+    /// This means that the other side of the transfer has indicated they want to completely abort the transfer.
+    if ( ( mRole == TransferRole::kSender && report.GetProtocolCode() == static_cast<uint16_t>(StatusCode::kReceiverAborted) )||
+         ( mRole == TransferRole::kReceiver && report.GetProtocolCode() == static_cast<uint16_t>(StatusCode::kSenderAborted) ))
+    {
+        ChipLogDetail(BDX, "moving %s to UnrecoverableError state", mRole == TransferRole::kSender ? "Sender" : "Receiver");
+
+        mState = TransferState::kUnrecoverableError;
+    }
 
     mPendingOutput = OutputEventType::kStatusReceived;
 
