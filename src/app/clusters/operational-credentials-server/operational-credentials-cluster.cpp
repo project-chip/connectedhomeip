@@ -1374,22 +1374,22 @@ FailSafeContext & OperationalCredentialsCluster::GetFailSafeContext()
 
 Credentials::DeviceAttestationCredentialsProvider * OperationalCredentialsCluster::GetDACProvider()
 {
-    return Credentials::GetDeviceAttestationCredentialsProvider();
+    return mDACProvider;
 }
 
 SessionManager & OperationalCredentialsCluster::GetSessionManager()
 {
-    return Server::GetInstance().GetSecureSessionManager();
+    return mSessionManager;
 }
 
 DnssdServer & OperationalCredentialsCluster::GetDNSSDServer()
 {
-    return app::DnssdServer::Instance();
+    return mDNSSDServer;
 }
 
 CommissioningWindowManager & OperationalCredentialsCluster::GetCommissioningWindowManager()
 {
-    return Server::GetInstance().GetCommissioningWindowManager();
+    return mCommissioningWindowManager;
 }
 
 void OperationalCredentialsCluster::OnFabricCommitted(const FabricTable & fabricTable, FabricIndex fabricIndex)

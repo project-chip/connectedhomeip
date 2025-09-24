@@ -43,7 +43,9 @@ public:
     ServerClusterRegistration & CreateRegistration(EndpointId endpointId, unsigned emberEndpointIndex,
                                                    uint32_t optionalAttributeBits, uint32_t featureMap) override
     {
-        gServer.Create(endpointId, Server::GetInstance().GetFabricTable(), Server::GetInstance().GetFailSafeContext());
+        gServer.Create(endpointId, Server::GetInstance().GetFabricTable(), Server::GetInstance().GetFailSafeContext(),
+                       Credentials::GetDeviceAttestationCredentialsProvider(), Server::GetInstance().GetSecureSessionManager(),
+                       app::DnssdServer::Instance(), Server::GetInstance().GetCommissioningWindowManager());
         return gServer.Registration();
     }
 

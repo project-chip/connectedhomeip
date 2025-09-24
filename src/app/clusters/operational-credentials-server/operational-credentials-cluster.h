@@ -30,9 +30,11 @@ namespace Clusters {
 class OperationalCredentialsCluster : public DefaultServerCluster, chip::FabricTable::Delegate
 {
 public:
-    OperationalCredentialsCluster(EndpointId endpoint, FabricTable & fabricTable, FailSafeContext & failSafeContext) :
+    OperationalCredentialsCluster(EndpointId endpoint, FabricTable & fabricTable, FailSafeContext & failSafeContext, Credentials::DeviceAttestationCredentialsProvider * dacProvider,
+    SessionManager & sessionManager, DnssdServer & dnssdServer, CommissioningWindowManager & commissioningWindowManager) :
         DefaultServerCluster({ endpoint, OperationalCredentials::Id }), mFabricTable(fabricTable),
-        mFailSafeContext(failSafeContext){};
+        mFailSafeContext(failSafeContext), mDACProvider(dacProvider), mSessionManager(sessionManager), mDNSSDServer(dnssdServer),
+        mCommissioningWindowManager(commissioningWindowManager){};
 
     CHIP_ERROR Startup(ServerClusterContext & context) override;
     void Shutdown() override;
@@ -66,6 +68,10 @@ public:
 private:
     FabricTable & mFabricTable;
     FailSafeContext & mFailSafeContext;
+    Credentials::DeviceAttestationCredentialsProvider * mDACProvider;
+    SessionManager & mSessionManager;
+    DnssdServer & mDNSSDServer;
+    CommissioningWindowManager & mCommissioningWindowManager;
 };
 
 } // namespace Clusters
