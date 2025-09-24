@@ -598,15 +598,18 @@ class ClusterParser:
         """
         xml_conformance, problems = get_conformance(xml_field, self._cluster_id)
 
-        # Try to parse conformance if no problems found
-        if not problems:
-            conformance = self.parse_conformance(xml_conformance)
-            if conformance:
-                return conformance
+        # Early return if problems found during conformance extraction
+        if problems:
+            return optional()
 
-        # Fallback to optional conformance
-        # Note: Many struct fields have arithmetic/desc conformances that are unused
-        return optional()
+        # Try to parse conformance
+        conformance = self.parse_conformance(xml_conformance)
+        if not conformance:
+            # Fallback to optional conformance
+            # Note: Many struct fields have arithmetic/desc conformances that are unused
+            return optional()
+
+        return conformance
 
     def _parse_components(self, struct: ElementTree.Element, component_type: DataTypeEnum) -> dict[uint, XmlDataTypeComponent]:
         """
@@ -653,6 +656,13 @@ class ClusterParser:
             summary = xml_field.attrib.get('summary', None)
             type_info = xml_field.attrib.get('type', None) if component_type == DataTypeEnum.kStruct else None
 
+            # Check for duplicate IDs to detect invalid XML data
+            if id in components:
+                p = ProblemNotice("Spec XML Parsing", location=location,
+                                  severity=ProblemSeverity.WARNING, 
+                                  problem=f"Duplicate {component_type.value} ID {id} in {struct_name} - overwriting previous entry")
+                self._problems.append(p)
+
             # Determine field properties using helper methods
             is_optional = self._isOptionalField(xml_field)
             is_nullable = self._isNullableField(xml_field)
@@ -686,6 +696,13 @@ class ClusterParser:
                     self._problems.append(ProblemNotice("Spec XML Parsing", location=location,
                                           severity=ProblemSeverity.WARNING, problem=f"{data_type.value.capitalize()} {element} with no name"))
                     continue
+
+                # Check for duplicate names to detect invalid XML data
+                if name in data_types:
+                    location = ClusterPathLocation(0, int(self._cluster_id) if self._cluster_id is not None else 0)
+                    self._problems.append(ProblemNotice("Spec XML Parsing", location=location,
+                                          severity=ProblemSeverity.WARNING, 
+                                          problem=f"Duplicate {data_type.value} name '{name}' - overwriting previous entry"))
 
                 # Ensure we're using a valid cluster ID list, never [None]
                 cluster_ids = [self._cluster_id] if self._cluster_id is not None else []
