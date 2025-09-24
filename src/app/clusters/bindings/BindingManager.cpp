@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2022 Project CHIP Authors
+ *    Copyright (c) 2022-2025 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -16,7 +16,7 @@
  */
 
 #include <app/clusters/bindings/BindingManager.h>
-#include <app/util/binding-table.h>
+#include <app/clusters/bindings/binding-table.h>
 #include <credentials/FabricTable.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CodeUtils.h>
@@ -206,5 +206,35 @@ exit:
 
     return error;
 }
+
+namespace app {
+CHIP_ERROR AddBindingEntry(const EmberBindingTableEntry & entry)
+{
+    CHIP_ERROR err = BindingTable::GetInstance().Add(entry);
+    if (err == CHIP_ERROR_NO_MEMORY)
+    {
+        return CHIP_IM_GLOBAL_STATUS(ResourceExhausted);
+    }
+
+    if (err != CHIP_NO_ERROR)
+    {
+        return err;
+    }
+
+    if (entry.type == MATTER_UNICAST_BINDING)
+    {
+        err = BindingManager::GetInstance().UnicastBindingCreated(entry.fabricIndex, entry.nodeId);
+        if (err != CHIP_NO_ERROR)
+        {
+            // Unicast connection failure can happen if peer is offline. We'll retry connection on-demand.
+            ChipLogError(
+                Zcl, "Binding: Failed to create session for unicast binding to device " ChipLogFormatX64 ": %" CHIP_ERROR_FORMAT,
+                ChipLogValueX64(entry.nodeId), err.Format());
+        }
+    }
+
+    return CHIP_NO_ERROR;
+}
+} // namespace app
 
 } // namespace chip

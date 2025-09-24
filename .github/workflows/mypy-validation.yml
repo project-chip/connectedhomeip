@@ -31,7 +31,7 @@ jobs:
     if: github.actor != 'restyled-io[bot]'
 
     container:
-      image: ghcr.io/project-chip/chip-build:162
+      image: ghcr.io/project-chip/chip-build:167
       options: --privileged --sysctl "net.ipv6.conf.all.disable_ipv6=0 net.ipv4.conf.all.forwarding=1 net.ipv6.conf.all.forwarding=1"
 
     steps:
@@ -71,6 +71,11 @@ jobs:
             exit 0
           fi
 
+      - name: Run mypy validation (MatterJsonTlv.py)
+        run: |
+          ./scripts/run_in_python_env.sh out/venv "mypy --config-file=src/python_testing/matter_testing_infrastructure/mypy.ini --follow-imports=skip \
+            src/controller/python/matter/MatterTlvJson.py"
+
 
       - name: Run mypy validation
         run: |
@@ -90,6 +95,9 @@ jobs:
             src/python_testing/matter_testing_infrastructure/matter/testing/commissioning.py \
             src/python_testing/matter_testing_infrastructure/matter/testing/decorators.py \
             src/python_testing/matter_testing_infrastructure/matter/testing/basic_composition.py \
+            src/python_testing/matter_testing_infrastructure/matter/testing/conformance.py \
+            src/python_testing/matter_testing_infrastructure/matter/testing/spec_parsing.py \
+            src/python_testing/matter_testing_infrastructure/matter/testing/metadata.py \
             src/python_testing/matter_testing_infrastructure/matter/testing/matter_testing.py"
 
           # Print a reminder about expanding coverage

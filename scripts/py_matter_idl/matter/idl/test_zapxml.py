@@ -68,8 +68,8 @@ class TestXmlParser(unittest.TestCase):
                     <description>AttributeWithAccess</description>
                     <access op="read" role="operate" />
                     <access op="write" role="manage" />
-                </attribute> 
-                
+                </attribute>
+
                 <attribute side="server" code="33" type="INT8U" min="0" max="10" \
                    reportable="true" default="0" writable="true" readable="false" optional="true">
                    <description>WriteOnlyAttribute</description>

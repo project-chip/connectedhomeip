@@ -90,6 +90,7 @@ ASR
 AssertionError
 AST
 ASYNC
+AsyncZeroconfServiceTypes
 ATL
 ATLs
 atomics
@@ -856,6 +857,7 @@ localhost
 LocalizationConfiguration
 localstatedir
 LockingState
+lookups
 LogEvent
 loopback
 LowPower
@@ -968,6 +970,7 @@ Murata
 mutex
 mutexes
 mv
+mve
 MX
 mydir
 MyPASSWORD
@@ -1260,6 +1263,7 @@ RGB
 riscv
 rloc
 rmw
+rnd
 rodata
 Rollershade
 rootfs
@@ -1411,6 +1415,7 @@ SubscribeResponse
 SubscriptionId
 substeps
 subtype
+subtypes
 sudo
 SulfateConcentrationMeasurement
 SulfurDioxideConcentrationMeasurement
@@ -1607,6 +1612,7 @@ VSC
 VSCode
 WaitNewInputEvent
 WakeOnLan
+Walkthrough
 WantedBy
 watchdogTimeout
 watchOS
@@ -1690,6 +1696,7 @@ zclwrite
 ZephyrConfig
 zephyrproject
 zhengyaohan
+Zeroconf
 Zigbee
 zigbeealliance
 zigbeethread
