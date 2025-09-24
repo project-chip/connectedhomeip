@@ -49,12 +49,10 @@ void MTRDeviceAttestationDelegateBridge::OnDeviceAttestationCompleted(chip::Cont
         attestationChallenge = [NSData data];
     }
 
-    // CommissioningParameters is always available; the DeviceCommissioner API is broken when it
-    // pretends it might not be.  And at this point in commissioning, the various attestation
-    // information received from the device is stored in those commissioning parameters; otherwise
-    // we would not have been called at all.
-    chip::Controller::CommissioningParameters commissioningParameters
-        = deviceCommissioner->GetCommissioningParameters().Value();
+    // At this point in commissioning, the various attestation information
+    // received from the device is stored in the controller's commissioning
+    // parameters; otherwise we would not have been called at all.
+    auto & commissioningParameters = deviceCommissioner->GetCommissioningParameters();
     NSData * attestationNonce = AsData(commissioningParameters.GetAttestationNonce().Value());
     NSData * elementsTLV = AsData(commissioningParameters.GetAttestationElements().Value());
     NSData * elementsSignature = AsData(commissioningParameters.GetAttestationSignature().Value());

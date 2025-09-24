@@ -51,6 +51,9 @@ extern "C" {
 
 static chip::OTAImageProcessorImpl gImageProcessor;
 
+using namespace chip::DeviceLayer;
+using namespace chip::DeviceLayer::Internal;
+
 namespace chip {
 
 // Define static memebers
@@ -70,24 +73,24 @@ CHIP_ERROR OTAImageProcessorImpl::Init(OTADownloader * downloader)
 
 CHIP_ERROR OTAImageProcessorImpl::PrepareDownload()
 {
-    DeviceLayer::PlatformMgr().ScheduleWork(HandlePrepareDownload, reinterpret_cast<intptr_t>(this));
+    PlatformMgr().ScheduleWork(HandlePrepareDownload, reinterpret_cast<intptr_t>(this));
     return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR OTAImageProcessorImpl::Finalize()
 {
-    DeviceLayer::PlatformMgr().ScheduleWork(HandleFinalize, reinterpret_cast<intptr_t>(this));
+    PlatformMgr().ScheduleWork(HandleFinalize, reinterpret_cast<intptr_t>(this));
     return CHIP_NO_ERROR;
 }
 CHIP_ERROR OTAImageProcessorImpl::Apply()
 {
-    DeviceLayer::PlatformMgr().ScheduleWork(HandleApply, reinterpret_cast<intptr_t>(this));
+    PlatformMgr().ScheduleWork(HandleApply, reinterpret_cast<intptr_t>(this));
     return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR OTAImageProcessorImpl::Abort()
 {
-    DeviceLayer::PlatformMgr().ScheduleWork(HandleAbort, reinterpret_cast<intptr_t>(this));
+    PlatformMgr().ScheduleWork(HandleAbort, reinterpret_cast<intptr_t>(this));
     return CHIP_NO_ERROR;
 }
 
@@ -106,7 +109,7 @@ CHIP_ERROR OTAImageProcessorImpl::ProcessBlock(ByteSpan & block)
         return err;
     }
 
-    DeviceLayer::PlatformMgr().ScheduleWork(HandleProcessBlock, reinterpret_cast<intptr_t>(this));
+    PlatformMgr().ScheduleWork(HandleProcessBlock, reinterpret_cast<intptr_t>(this));
     return CHIP_NO_ERROR;
 }
 
@@ -131,7 +134,7 @@ CHIP_ERROR OTAImageProcessorImpl::ConfirmCurrentImage()
 
     uint32_t currentVersion;
     uint32_t targetVersion = requestor->GetTargetVersion();
-    ReturnErrorOnFailure(DeviceLayer::ConfigurationMgr().GetSoftwareVersion(currentVersion));
+    ReturnErrorOnFailure(ConfigurationMgr().GetSoftwareVersion(currentVersion));
     if (currentVersion != targetVersion)
     {
         ChipLogError(SoftwareUpdate, "Current software version = %" PRIu32 ", expected software version = %" PRIu32, currentVersion,
@@ -235,14 +238,14 @@ void OTAImageProcessorImpl::HandleFinalize(intptr_t context)
 void OTAImageProcessorImpl::LockRadioProcessing()
 {
 #if !SL_WIFI && defined(_SILICON_LABS_32B_SERIES_3)
-    DeviceLayer::ThreadStackMgr().LockThreadStack();
+    ThreadStackMgr().LockThreadStack();
 #endif // SL_WIFI
 }
 
 void OTAImageProcessorImpl::UnlockRadioProcessing()
 {
 #if !SL_WIFI && defined(_SILICON_LABS_32B_SERIES_3)
-    DeviceLayer::ThreadStackMgr().UnlockThreadStack();
+    ThreadStackMgr().UnlockThreadStack();
 #endif // SL_WIFI
 }
 
@@ -253,7 +256,7 @@ void OTAImageProcessorImpl::HandleApply(intptr_t context)
     ChipLogProgress(SoftwareUpdate, "HandleApply: verifying image");
 
     // Force KVS to store pending keys such as data from StoreCurrentUpdateInfo()
-    chip::DeviceLayer::PersistedStorage::KeyValueStoreMgrImpl().ForceKeyMapSave();
+    PersistedStorage::KeyValueStoreMgrImpl().ForceKeyMapSave();
 #if SL_BTLCTRL_MUX
     err = sl_wfx_host_pre_bootloader_spi_transfer();
     if (err != SL_STATUS_OK)
@@ -321,7 +324,8 @@ void OTAImageProcessorImpl::HandleApply(intptr_t context)
     osDelay(100); // sl-temp: delay for uart print before reboot
 #endif            // _SILICON_LABS_32B_SERIES_3 && CHIP_PROGRESS_LOGGING
     LockRadioProcessing();
-    // This reboots the device
+    // Write that we are rebooting after a software update and reboot the device
+    SilabsConfig::WriteConfigValue(SilabsConfig::kConfigKey_MatterUpdateReboot, true);
     WRAP_BL_DFU_CALL(bootloader_rebootAndInstall())
     UnlockRadioProcessing(); // Unneccessay but for good measure
 }

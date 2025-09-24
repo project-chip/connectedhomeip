@@ -91,37 +91,45 @@ std::optional<CHIP_ERROR> TryWriteViaAccessInterface(const ConcreteDataAttribute
 DataModel::ActionReturnStatus CodegenDataModelProvider::WriteAttribute(const DataModel::WriteAttributeRequest & request,
                                                                        AttributeValueDecoder & decoder)
 {
+    // we must be started up to accept writes (we make use of the context below)
+    VerifyOrReturnError(mContext.has_value(), CHIP_ERROR_INCORRECT_STATE);
+
+    // Codegen logic specific: we accept AAI writes BEFORE server cluster interface, so that we are backwards compatible
+    // in case some application installed AAI before Server Cluster Interfaces were supported
+    ContextAttributesChangeListener change_listener(mContext->dataModelChangeListener);
+
+    const EmberAfAttributeMetadata * attributeMetadata =
+        emberAfLocateAttributeMetadata(request.path.mEndpointId, request.path.mClusterId, request.path.mAttributeId);
+
+    if (attributeMetadata != nullptr)
+    {
+        // AAI is only allowed on ember-attributes
+        AttributeAccessInterface * aai =
+            AttributeAccessInterfaceRegistry::Instance().Get(request.path.mEndpointId, request.path.mClusterId);
+        std::optional<CHIP_ERROR> aai_result = TryWriteViaAccessInterface(request.path, aai, decoder);
+        if (aai_result.has_value())
+        {
+            if (*aai_result == CHIP_NO_ERROR)
+            {
+                // TODO: this is awkward since it provides AAI no control over this, specifically
+                //       AAI may not want to increase versions for some attributes that are Q
+                emberAfAttributeChanged(request.path.mEndpointId, request.path.mClusterId, request.path.mAttributeId,
+                                        &change_listener);
+            }
+            return *aai_result;
+        }
+    }
+
+    // If ServerClusterInterface is available, it provides the final answer
     if (auto * cluster = mRegistry.Get(request.path); cluster != nullptr)
     {
         return cluster->WriteAttribute(request, decoder);
     }
 
-    // we must be started up to accept writes (we make use of the context below)
-    VerifyOrReturnError(mContext.has_value(), CHIP_ERROR_INCORRECT_STATE);
-
-    const EmberAfAttributeMetadata * attributeMetadata =
-        emberAfLocateAttributeMetadata(request.path.mEndpointId, request.path.mClusterId, request.path.mAttributeId);
-
     // WriteAttribute requirement is that request.path is a VALID path inside the provider
     // metadata tree. Clients are supposed to validate this (and data version and other flags)
     // This SHOULD NEVER HAPPEN hence the general return code (seemed preferable to VerifyOrDie)
     VerifyOrReturnError(attributeMetadata != nullptr, Status::Failure);
-
-    ContextAttributesChangeListener change_listener(mContext->dataModelChangeListener);
-
-    AttributeAccessInterface * aai =
-        AttributeAccessInterfaceRegistry::Instance().Get(request.path.mEndpointId, request.path.mClusterId);
-    std::optional<CHIP_ERROR> aai_result = TryWriteViaAccessInterface(request.path, aai, decoder);
-    if (aai_result.has_value())
-    {
-        if (*aai_result == CHIP_NO_ERROR)
-        {
-            // TODO: this is awkward since it provides AAI no control over this, specifically
-            //       AAI may not want to increase versions for some attributes that are Q
-            emberAfAttributeChanged(request.path.mEndpointId, request.path.mClusterId, request.path.mAttributeId, &change_listener);
-        }
-        return *aai_result;
-    }
 
     MutableByteSpan dataBuffer = gEmberAttributeIOBufferSpan;
     {
@@ -165,14 +173,11 @@ DataModel::ActionReturnStatus CodegenDataModelProvider::WriteAttribute(const Dat
 void CodegenDataModelProvider::ListAttributeWriteNotification(const ConcreteAttributePath & aPath,
                                                               DataModel::ListWriteOperation opType)
 {
-    if (auto * cluster = mRegistry.Get(aPath); cluster != nullptr)
-    {
-        cluster->ListAttributeWriteNotification(aPath, opType);
-        return;
-    }
 
+    // NOTE: for backwards compatibility, we process AAI logic BEFORE Server Cluster Interface
+    //       so that AttributeAccessInterface logic works if one was installed before Server Cluster Interface
+    //       support was introduced in the SDK.
     AttributeAccessInterface * aai = AttributeAccessInterfaceRegistry::Instance().Get(aPath.mEndpointId, aPath.mClusterId);
-
     if (aai != nullptr)
     {
         switch (opType)
@@ -187,6 +192,20 @@ void CodegenDataModelProvider::ListAttributeWriteNotification(const ConcreteAttr
             aai->OnListWriteEnd(aPath, true);
             break;
         }
+
+        // We fall through here and will notify any ServerClusterInterface as well.
+        // This is NOT ideal because AAI may or may not fully intercept the write,
+        // So we do not know which of the ::Write behavior AAI uses:
+        //   - write succeeds (so SCI should not be notified)
+        //   - AAI falls-through (so SCI should process the request)
+        //
+        // for now we err on the side of notifying both.
+    }
+
+    if (auto * cluster = mRegistry.Get(aPath); cluster != nullptr)
+    {
+        cluster->ListAttributeWriteNotification(aPath, opType);
+        return;
     }
 }
 

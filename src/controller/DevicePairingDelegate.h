@@ -188,6 +188,28 @@ public:
      * @param[in] stageStarting the stage being started.
      */
     virtual void OnCommissioningStageStart(PeerId peerId, CommissioningStage stageStarting) {}
+
+    /**
+     * @brief
+     *   Called when Wi-Fi credentials are needed.  If the call returns
+     *   CHIP_NO_ERROR, commissioning will pause until NetworkCredentialsReady()
+     *   is called on the CHIPDeviceController.  This call must happen
+     *   asynchronously, after WiFiCredentialsNeeded has returned.
+     *
+     * @param[in] endpoint the endpoint that hosts the Network Commissioning cluster the credentials are needed for.
+     */
+    virtual CHIP_ERROR WiFiCredentialsNeeded(EndpointId endpoint) { return CHIP_ERROR_NOT_IMPLEMENTED; }
+
+    /**
+     * @brief
+     *   Called when Thread credentials are needed.  If the call returns
+     *   CHIP_NO_ERROR, commissioning will pause until NetworkCredentialsReady()
+     *   is called on the CHIPDeviceController.  This call must happen
+     *   asynchronously, after ThreadCredentialsNeeded has returned.
+     *
+     * @param[in] endpoint the endpoint that hosts the Network Commissioning cluster the credentials are needed for.
+     */
+    virtual CHIP_ERROR ThreadCredentialsNeeded(EndpointId endpoint) { return CHIP_ERROR_NOT_IMPLEMENTED; }
 };
 
 } // namespace Controller

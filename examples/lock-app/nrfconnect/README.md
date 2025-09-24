@@ -70,7 +70,9 @@ In this example, to commission the device onto a Matter network, it must be
 discoverable over Bluetooth LE. For security reasons, you must start Bluetooth
 LE advertising manually after powering up the device by pressing:
 
--   On nRF52840 DK, nRF5340 DK, and nRF21540 DK: **Button 4**.
+-   On nRF52840 DK and nRF5340 DK: **Button 4**.
+
+-   On nRF54L15 DK: **Button 3**.
 
 -   On nRF7002 DK: **Button 2**.
 
@@ -162,11 +164,12 @@ more information.
 
 The example supports building and running on the following devices:
 
-| Hardware platform                                                                         | Build target               | Platform image                                                                                                                                   |
-| ----------------------------------------------------------------------------------------- | -------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------ |
-| [nRF52840 DK](https://www.nordicsemi.com/Software-and-Tools/Development-Kits/nRF52840-DK) | `nrf52840dk/nrf52840`      | <details><summary>nRF52840 DK</summary><img src="../../platform/nrfconnect/doc/images/nRF52840_DK_info-medium.jpg" alt="nRF52840 DK"/></details> |
-| [nRF5340 DK](https://www.nordicsemi.com/Software-and-Tools/Development-Kits/nRF5340-DK)   | `nrf5340dk/nrf5340/cpuapp` | <details><summary>nRF5340 DK</summary><img src="../../platform/nrfconnect/doc/images/nRF5340_DK_info-medium.jpg" alt="nRF5340 DK"/></details>    |
-| [nRF7002 DK](https://www.nordicsemi.com/Products/Development-hardware/nRF7002-DK)         | `nrf7002dk/nrf5340/cpuapp` | <details><summary>nRF7002 DK</summary><img src="../../platform/nrfconnect/doc/images/nRF7002-DK_Front-small.png" alt="nRF7002 DK"/></details>    |
+| Hardware platform                                                                         | Build target                 | Platform image                                                                                                                                   |
+| ----------------------------------------------------------------------------------------- | ---------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------ |
+| [nRF52840 DK](https://www.nordicsemi.com/Software-and-Tools/Development-Kits/nRF52840-DK) | `nrf52840dk/nrf52840`        | <details><summary>nRF52840 DK</summary><img src="../../platform/nrfconnect/doc/images/nRF52840_DK_info-medium.jpg" alt="nRF52840 DK"/></details> |
+| [nRF5340 DK](https://www.nordicsemi.com/Software-and-Tools/Development-Kits/nRF5340-DK)   | `nrf5340dk/nrf5340/cpuapp`   | <details><summary>nRF5340 DK</summary><img src="../../platform/nrfconnect/doc/images/nRF5340_DK_info-medium.jpg" alt="nRF5340 DK"/></details>    |
+| [nRF54L15 DK](https://www.nordicsemi.com/Software-and-Tools/Development-Kits/nRF54L15-DK) | `nrf54l15dk/nrf54l15/cpuapp` | <details><summary>nRF54L15 DK</summary><img src="../../platform/nrfconnect/doc/images/nRF54L15_DK_info-medium.png" alt="nRF54L15 DK"/></details> |
+| [nRF7002 DK](https://www.nordicsemi.com/Products/Development-hardware/nRF7002-DK)         | `nrf7002dk/nrf5340/cpuapp`   | <details><summary>nRF7002 DK</summary><img src="../../platform/nrfconnect/doc/images/nRF7002-DK_Front-small.png" alt="nRF7002 DK"/></details>    |
 
 <hr>
 
@@ -175,8 +178,8 @@ The example supports building and running on the following devices:
 The development kits for this sample offer the following IPv6 network support
 for Matter:
 
--   Matter over Thread is supported for `nrf52840dk/nrf52840` and
-    `nrf5340dk/nrf5340/cpuapp`.
+-   Matter over Thread is supported for `nrf52840dk/nrf52840`,
+    `nrf5340dk/nrf5340/cpuapp`, and `nrf54l15dk/nrf54l15/cpuapp`.
 -   Matter over Wi-Fi is supported for `nrf7002dk/nrf5340/cpuapp`.
 
 ## Device UI
@@ -185,82 +188,195 @@ This section lists the User Interface elements that you can use to control and
 monitor the state of the device. These correspond to PCB components on the
 platform image.
 
-**LED 1** shows the overall state of the device and its connectivity. The
-following states are possible:
+**Device UI elements by platform:**
 
--   _Short Flash On (50 ms on/950 ms off)_ &mdash; The device is in the
-    unprovisioned (unpaired) state and is waiting for a commissioning
-    application to connect.
+#### nRF52840 DK and nRF5340 DK
 
--   _Rapid Even Flashing (100 ms on/100 ms off)_ &mdash; The device is in the
-    unprovisioned state and a commissioning application is connected through
-    Bluetooth LE.
+-   **LED 1** shows the overall state of the device and its connectivity. The
+    following states are possible:
 
--   _Short Flash Off (950ms on/50ms off)_ &mdash; The device is fully
-    provisioned, but does not yet have full connectivity for Thread or Wi-Fi
-    network.
+        -   _Short Flash On (50 ms on/950 ms off)_ &mdash; The device is in the
+        unprovisioned (unpaired) state and is waiting for a commissioning
+        application to connect.
 
--   _Solid On_ &mdash; The device is fully provisioned.
+        -   _Rapid Even Flashing (100 ms on/100 ms off)_ &mdash; The device is in the
+        unprovisioned state and a commissioning application is connected through
+        Bluetooth LE.
 
-**LED 2** simulates the lock bolt and shows the state of the lock. The following
-states are possible:
+        -   _Short Flash Off (950ms on/50ms off)_ &mdash; The device is fully
+        provisioned, but does not yet have full connectivity for Thread or Wi-Fi
+        network.
 
--   _Solid On_ &mdash; The bolt is extended and the door is locked.
+        -   _Solid On_ &mdash; The device is fully provisioned.
 
--   _Off_ &mdash; The bolt is retracted and the door is unlocked.
+-   **LED 2** simulates the lock bolt and shows the state of the lock. The
+    following states are possible:
 
--   _Rapid Even Flashing (100 ms on/100 ms off during 2 s)_ &mdash; The
-    simulated bolt is in motion from one position to another.
+        -   _Solid On_ &mdash; The bolt is extended and the door is locked.
 
-    Additionally, the LED starts blinking evenly (500 ms on/500 ms off) when the
-    Identify command of the Identify cluster is received on the endpoint 1. The
-    command’s argument can be used to specify the duration of the effect.
+        -   _Off_ &mdash; The bolt is retracted and the door is unlocked.
 
-**Button 1** can be used for the following purposes:
+        -   _Rapid Even Flashing (100 ms on/100 ms off during 2 s)_ &mdash; The
+        simulated bolt is in motion from one position to another.
 
--   _Pressed for less than 3 s_ &mdash; Initiates the OTA software update
-    process. This feature is disabled by default, but can be enabled by
-    following the
-    [Building with Device Firmware Upgrade support](#building-with-device-firmware-upgrade-support)
-    instructions.
+        Additionally, the LED starts blinking evenly (500 ms on/500 ms off) when the
+        Identify command of the Identify cluster is received on the endpoint 1. The
+        command’s argument can be used to specify the duration of the effect.
 
--   _Pressed for more than 3 s_ &mdash; initiates the factory reset of the
-    device. Releasing the button within the 3-second window cancels the factory
-    reset procedure.
+-   **Button 1** can be used for the following purposes:
 
-**Button 2** &mdash; Pressing the button once changes the lock state to the
-opposite one.
+    -   _Pressed for less than 3 s_ &mdash; Initiates the OTA software update
+        process. This feature is disabled by default, but can be enabled by
+        following the
+        [Building with Device Firmware Upgrade support](#building-with-device-firmware-upgrade-support)
+        instructions.
 
--   On nRF52840 DK, nRF5340 DK, and nRF21540 DK: Changes the lock state to the
+    -   _Pressed for more than 3 s_ &mdash; initiates the factory reset of the
+        device. Releasing the button within the 3-second window cancels the
+        factory reset procedure.
+
+-   **Button 2** &mdash; Pressing the button once changes the lock state to the
     opposite one.
 
--   On nRF7002 DK:
+-   **Button 4**: Starts the NFC tag emulation, enables Bluetooth LE advertising
+    for the predefined period of time (60 minutes by default), and makes the
+    device discoverable over Bluetooth LE. This button is used during the
+    commissioning procedure.
+
+-   **SEGGER J-Link USB port** can be used to get logs from the device or
+    communicate with it using the
+    [command line interface](../../../docs/platforms/nrf/nrfconnect_examples_cli.md).
+
+-   **NFC port with antenna attached** can be used to start the
+    [rendezvous](#bluetooth-le-rendezvous) by providing the commissioning
+    information from the Matter device in a data payload that can be shared
+    using NFC.
+
+#### nRF54L15 DK
+
+-   **LED 0** shows the overall state of the device and its connectivity. The
+    following states are possible:
+
+        -   _Short Flash On (50 ms on/950 ms off)_ &mdash; The device is in the
+        unprovisioned (unpaired) state and is waiting for a commissioning
+        application to connect.
+
+        -   _Rapid Even Flashing (100 ms on/100 ms off)_ &mdash; The device is in the
+        unprovisioned state and a commissioning application is connected through
+        Bluetooth LE.
+
+        -   _Short Flash Off (950ms on/50ms off)_ &mdash; The device is fully
+        provisioned, but does not yet have full connectivity for Thread or Wi-Fi
+        network.
+
+        -   _Solid On_ &mdash; The device is fully provisioned.
+
+-   **LED 1** simulates the lock bolt and shows the state of the lock. The
+    following states are possible:
+
+        -   _Solid On_ &mdash; The bolt is extended and the door is locked.
+
+        -   _Off_ &mdash; The bolt is retracted and the door is unlocked.
+
+        -   _Rapid Even Flashing (100 ms on/100 ms off during 2 s)_ &mdash; The
+        simulated bolt is in motion from one position to another.
+
+        Additionally, the LED starts blinking evenly (500 ms on/500 ms off) when the
+        Identify command of the Identify cluster is received on the endpoint 1. The
+        command’s argument can be used to specify the duration of the effect.
+
+-   **Button 0** can be used for the following purposes:
+
+    -   _Pressed for less than 3 s_ &mdash; Initiates the OTA software update
+        process. This feature is disabled by default, but can be enabled by
+        following the
+        [Building with Device Firmware Upgrade support](#building-with-device-firmware-upgrade-support)
+        instructions.
+
+    -   _Pressed for more than 3 s_ &mdash; initiates the factory reset of the
+        device. Releasing the button within the 3-second window cancels the
+        factory reset procedure.
+
+-   **Button 1** &mdash; Pressing the button once changes the lock state to the
+    opposite one.
+
+-   **Button 3**: Starts the NFC tag emulation, enables Bluetooth LE advertising
+    for the predefined period of time (60 minutes by default), and makes the
+    device discoverable over Bluetooth LE. This button is used during the
+    commissioning procedure.
+
+-   **SEGGER J-Link USB port** can be used to get logs from the device or
+    communicate with it using the
+    [command line interface](../../../docs/platforms/nrf/nrfconnect_examples_cli.md).
+
+-   **NFC port with antenna attached** can be used to start the
+    [rendezvous](#bluetooth-le-rendezvous) by providing the commissioning
+    information from the Matter device in a data payload that can be shared
+    using NFC.
+
+#### nRF7002 DK
+
+-   **LED 1** shows the overall state of the device and its connectivity. The
+    following states are possible:
+
+        -   _Short Flash On (50 ms on/950 ms off)_ &mdash; The device is in the
+        unprovisioned (unpaired) state and is waiting for a commissioning
+        application to connect.
+
+        -   _Rapid Even Flashing (100 ms on/100 ms off)_ &mdash; The device is in the
+        unprovisioned state and a commissioning application is connected through
+        Bluetooth LE.
+
+        -   _Short Flash Off (950ms on/50ms off)_ &mdash; The device is fully
+        provisioned, but does not yet have full connectivity for Thread or Wi-Fi
+        network.
+
+        -   _Solid On_ &mdash; The device is fully provisioned.
+
+-   **LED 2** simulates the lock bolt and shows the state of the lock. The
+    following states are possible:
+
+        -   _Solid On_ &mdash; The bolt is extended and the door is locked.
+
+        -   _Off_ &mdash; The bolt is retracted and the door is unlocked.
+
+        -   _Rapid Even Flashing (100 ms on/100 ms off during 2 s)_ &mdash; The
+        simulated bolt is in motion from one position to another.
+
+        Additionally, the LED starts blinking evenly (500 ms on/500 ms off) when the
+        Identify command of the Identify cluster is received on the endpoint 1. The
+        command’s argument can be used to specify the duration of the effect.
+
+-   **Button 1** can be used for the following purposes:
+
+    -   _Pressed for less than 3 s_ &mdash; Initiates the OTA software update
+        process. This feature is disabled by default, but can be enabled by
+        following the
+        [Building with Device Firmware Upgrade support](#building-with-device-firmware-upgrade-support)
+        instructions.
+
+    -   _Pressed for more than 3 s_ &mdash; initiates the factory reset of the
+        device. Releasing the button within the 3-second window cancels the
+        factory reset procedure.
+
+-   **Button 2** can be used for the following purposes:
 
     -   If pressed for less than three seconds, it changes the lock state to the
         opposite one.
 
     -   If pressed for more than three seconds, it starts the NFC tag emulation,
-        enables Bluetooth LE advertising for the predefined period of time (15
+        enables Bluetooth LE advertising for the predefined period of time (60
         minutes by default), and makes the device discoverable over Bluetooth
         LE.
 
-**Button 4**:
+-   **SEGGER J-Link USB port** can be used to get logs from the device or
+    communicate with it using the
+    [command line interface](../../../docs/platforms/nrf/nrfconnect_examples_cli.md).
 
--   On nRF52840 DK, nRF5340 DK, and nRF21540 DK: Starts the NFC tag emulation,
-    enables Bluetooth LE advertising for the predefined period of time (15
-    minutes by default), and makes the device discoverable over Bluetooth LE.
-    This button is used during the commissioning procedure.
-
--   On nRF7002 DK: Not available.
-
-**SEGGER J-Link USB port** can be used to get logs from the device or
-communicate with it using the
-[command line interface](../../../docs/platforms/nrf/nrfconnect_examples_cli.md).
-
-**NFC port with antenna attached** can be used to start the
-[rendezvous](#bluetooth-le-rendezvous) by providing the commissioning
-information from the Matter device in a data payload that can be shared using
-NFC.
+-   **NFC port with antenna attached** can be used to start the
+    [rendezvous](#bluetooth-le-rendezvous) by providing the commissioning
+    information from the Matter device in a data payload that can be shared
+    using NFC.
 
 <hr>
 
@@ -383,10 +499,10 @@ using (for example `nrf52840dk/nrf52840`):
 >
 > There are two types of Device Firmware Upgrade modes: single-image DFU and
 > multi-image DFU. Single-image mode supports upgrading only one firmware image,
-> the application image, and should be used for single-core nRF52840 DK devices.
-> Multi-image mode allows to upgrade more firmware images and is suitable for
-> upgrading the application core and network core firmware in two-core nRF5340
-> DK devices.
+> the application image, and should be used for single-core nRF52840 DK and
+> nRF54L15 DK devices. Multi-image mode allows to upgrade more firmware images
+> and is suitable for upgrading the application core and network core firmware
+> in two-core nRF5340 DK devices.
 
 #### Changing bootloader configuration
 

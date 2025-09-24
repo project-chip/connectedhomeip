@@ -76,6 +76,8 @@ template("chip_data_model") {
       "zap-generated/access.h",
       "zap-generated/gen_config.h",
       "zap-generated/endpoint_config.h",
+      "zap-generated/CodeDrivenInitShutdown.cpp",
+      "zap-generated/CodeDrivenCallback.h",
     ]
 
     if (!chip_build_controller_dynamic_server) {

@@ -63,12 +63,13 @@ CHIP_ERROR WebRTCProviderManager::HandleSolicitOffer(const OfferRequestArgs & ar
                                                      bool & outDeferredOffer)
 {
     // Initialize a new WebRTC session from the SolicitOfferRequestArgs
-    outSession.id          = args.sessionId;
-    outSession.peerNodeID  = args.peerNodeId;
-    outSession.streamUsage = args.streamUsage;
-    outSession.fabricIndex = args.fabricIndex;
-    uint16_t videoStreamID = 0;
-    uint16_t audioStreamID = 0;
+    outSession.id             = args.sessionId;
+    outSession.peerNodeID     = args.peerNodeId;
+    outSession.peerEndpointID = args.originatingEndpointId;
+    outSession.streamUsage    = args.streamUsage;
+    outSession.fabricIndex    = args.fabricIndex;
+    uint16_t videoStreamID    = 0;
+    uint16_t audioStreamID    = 0;
 
     // Resolve or allocate a VIDEO stream
     if (args.videoStreamId.HasValue())
@@ -214,12 +215,13 @@ CHIP_ERROR WebRTCProviderManager::HandleProvideOffer(const ProvideOfferRequestAr
     ChipLogProgress(Camera, "HandleProvideOffer called");
 
     // Initialize a new WebRTC session from the SolicitOfferRequestArgs
-    outSession.id          = args.sessionId;
-    outSession.peerNodeID  = args.peerNodeId;
-    outSession.streamUsage = args.streamUsage;
-    outSession.fabricIndex = args.fabricIndex;
-    uint16_t videoStreamID = 0;
-    uint16_t audioStreamID = 0;
+    outSession.id             = args.sessionId;
+    outSession.peerNodeID     = args.peerNodeId;
+    outSession.peerEndpointID = args.originatingEndpointId;
+    outSession.streamUsage    = args.streamUsage;
+    outSession.fabricIndex    = args.fabricIndex;
+    uint16_t videoStreamID    = 0;
+    uint16_t audioStreamID    = 0;
 
     // Resolve or allocate a VIDEO stream
     if (args.videoStreamId.HasValue())
