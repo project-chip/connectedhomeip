@@ -48,8 +48,8 @@ from cluster_objects import ClusterObjectTests
 from network_commissioning import NetworkCommissioningTests
 
 import matter.logging
-from matter.tracing import TracingContext
 from matter.setup_payload import SetupPayload
+from matter.tracing import TracingContext
 
 # The thread network dataset tlv for testing, splitted into T-L-V.
 
