@@ -134,17 +134,17 @@ std::optional<DataModel::ActionReturnStatus> ICDManagementCluster::InvokeCommand
         }
         else
         {
-            // Error
             handler->AddStatus(request.path, status);
         }
-
-        return status;
+        break;
     }
     case IcdManagement::Commands::UnregisterClient::Id: {
         Commands::UnregisterClient::DecodableType commandData;
         ReturnErrorOnFailure(commandData.Decode(input_arguments, handler->GetAccessingFabricIndex()));
 
-        return UnregisterClient(handler, request.path, commandData);
+        Status status = UnregisterClient(handler, request.path, commandData);
+        handler->AddStatus(request.path, status);
+        break;
     }
     case IcdManagement::Commands::StayActiveRequest::Id: {
 // TODO(#32321): Remove #if after issue is resolved
@@ -159,24 +159,25 @@ std::optional<DataModel::ActionReturnStatus> ICDManagementCluster::InvokeCommand
         response.promisedActiveDuration = Server::GetInstance().GetICDManager().StayActiveRequest(commandData.stayActiveDuration);
         handler->AddResponse(request.path, response);
 #endif // CHIP_CONFIG_ENABLE_ICD_SERVER
-        return Status::Success;
+        break;
     }
 #endif // CHIP_CONFIG_ENABLE_ICD_CIP
     default:
         return Status::UnsupportedCommand;
     }
+    return Status::Success;
 }
 
 CHIP_ERROR ICDManagementCluster::AcceptedCommands(const ConcreteClusterPath & path,
                                                   ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder)
 {
-    static constexpr DataModel::AcceptedCommandEntry kAcceptedCommands[] = {
 #if CHIP_CONFIG_ENABLE_ICD_CIP
+    static constexpr DataModel::AcceptedCommandEntry kAcceptedCommands[] = {
         Commands::RegisterClient::kMetadataEntry,
         Commands::UnregisterClient::kMetadataEntry,
-#endif // CHIP_CONFIG_ENABLE_ICD_CIP
     };
     ReturnErrorOnFailure(builder.ReferenceExisting(kAcceptedCommands));
+#endif // CHIP_CONFIG_ENABLE_ICD_CIP
     if (mICDConfigurationData.GetFeatureMap().Has(IcdManagement::Feature::kLongIdleTimeSupport) ||
         mEnabledCommands.Has(IcdManagement::OptionalCommands::kStayActive))
     {
@@ -188,12 +189,12 @@ CHIP_ERROR ICDManagementCluster::AcceptedCommands(const ConcreteClusterPath & pa
 
 CHIP_ERROR ICDManagementCluster::GeneratedCommands(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<CommandId> & builder)
 {
-    static constexpr CommandId kGeneratedCommands[] = {
 #if CHIP_CONFIG_ENABLE_ICD_CIP
+    static constexpr CommandId kGeneratedCommands[] = {
         Commands::RegisterClientResponse::Id,
-#endif // CHIP_CONFIG_ENABLE_ICD_CIP
     };
     ReturnErrorOnFailure(builder.ReferenceExisting(kGeneratedCommands));
+#endif // CHIP_CONFIG_ENABLE_ICD_CIP
     if (mICDConfigurationData.GetFeatureMap().Has(IcdManagement::Feature::kLongIdleTimeSupport) ||
         mEnabledCommands.Has(IcdManagement::OptionalCommands::kStayActive))
     {

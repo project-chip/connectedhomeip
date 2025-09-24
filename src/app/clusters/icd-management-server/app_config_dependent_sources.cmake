@@ -22,8 +22,8 @@ TARGET_SOURCES(
 TARGET_SOURCES(
   ${APP_TARGET}
   PRIVATE
-    "${CLUSTER_DIR}/icd-management-server.cpp"
-    "${CLUSTER_DIR}/icd-management-server.h"
+    "${CLUSTER_DIR}/icd-management-cluster.cpp"
+    "${CLUSTER_DIR}/icd-management-cluster.h"
 )
 
 # TODO(#32321): Remove after issue is resolved
