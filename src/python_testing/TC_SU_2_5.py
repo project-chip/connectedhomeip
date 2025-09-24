@@ -225,57 +225,57 @@ class TC_SU_2_5(MatterBaseTest):
             "discriminator": 321,
             "setup_pincode": 2321
         }
-        # self.step(1)
-        # expected_software_version = 2
-        # self._launch_provider_app(extra_args=['--applyUpdateAction', 'proceed', '--delayedApplyActionTimeSec', '0'])
-        # await controller.CommissionOnNetwork(
-        #     nodeId=provider_data['node_id'],
-        #     setupPinCode=provider_data['setup_pincode'],
-        #     filterType=ChipDeviceCtrl.DiscoveryFilterType.LONG_DISCRIMINATOR,
-        #     filter=provider_data['discriminator']
-        # )
+        self.step(1)
+        expected_software_version = 2
+        self._launch_provider_app(extra_args=['--applyUpdateAction', 'proceed', '--delayedApplyActionTimeSec', '0'])
+        await controller.CommissionOnNetwork(
+            nodeId=provider_data['node_id'],
+            setupPinCode=provider_data['setup_pincode'],
+            filterType=ChipDeviceCtrl.DiscoveryFilterType.LONG_DISCRIMINATOR,
+            filter=provider_data['discriminator']
+        )
 
-        # await self.current_provider_app_proc.create_acl_entry(dev_ctrl=controller, provider_node_id=provider_data['node_id'], requestor_node_id=requestor_node_id)
-        # await self._write_ota_providers(controller=controller, provider_node_id=provider_data['node_id'], endpoint=0)
-        # await self._announce_ota_provider(controller, provider_data['node_id'], requestor_node_id)
+        await self.current_provider_app_proc.create_acl_entry(dev_ctrl=controller, provider_node_id=provider_data['node_id'], requestor_node_id=requestor_node_id)
+        await self._write_ota_providers(controller=controller, provider_node_id=provider_data['node_id'], endpoint=0)
+        await self._announce_ota_provider(controller, provider_data['node_id'], requestor_node_id)
 
-        # basicinformation_handler = EventSubscriptionHandler(
-        #     expected_cluster=Clusters.BasicInformation, expected_event_id=Clusters.BasicInformation.Events.ShutDown.event_id)
-        # await basicinformation_handler.start(controller, requestor_node_id, endpoint=0, min_interval_sec=0, max_interval_sec=6000)
+        basicinformation_handler = EventSubscriptionHandler(
+            expected_cluster=Clusters.BasicInformation, expected_event_id=Clusters.BasicInformation.Events.ShutDown.event_id)
+        await basicinformation_handler.start(controller, requestor_node_id, endpoint=0, min_interval_sec=0, max_interval_sec=6000)
 
-        # event_state_transition = EventSubscriptionHandler(expected_cluster=Clusters.OtaSoftwareUpdateRequestor,
-        #                                                   expected_event_id=Clusters.OtaSoftwareUpdateRequestor.Events.StateTransition.event_id)
-        # await event_state_transition.start(controller, requestor_node_id, endpoint=0, min_interval_sec=0, max_interval_sec=6000)
+        event_state_transition = EventSubscriptionHandler(expected_cluster=Clusters.OtaSoftwareUpdateRequestor,
+                                                          expected_event_id=Clusters.OtaSoftwareUpdateRequestor.Events.StateTransition.event_id)
+        await event_state_transition.start(controller, requestor_node_id, endpoint=0, min_interval_sec=0, max_interval_sec=6000)
 
-        # # wait for Download event this means updating has started
-        # event_report = event_state_transition.wait_for_event_report(
-        #     Clusters.OtaSoftwareUpdateRequestor.Events.StateTransition, timeout_sec=30)
-        # logger.info(f"Event report for Downloading : {event_report}")
+        # wait for Download event this means updating has started
+        event_report = event_state_transition.wait_for_event_report(
+            Clusters.OtaSoftwareUpdateRequestor.Events.StateTransition, timeout_sec=30)
+        logger.info(f"Event report for Downloading : {event_report}")
 
-        # # Wait for shutdown event ( this is triggered after the SU Completition)
-        # shutdown_event = basicinformation_handler.wait_for_event_report(Clusters.BasicInformation.Events.ShutDown, timeout_sec=60*6)
-        # logger.info(f"Event report for ShutDown : {shutdown_event}")
-        # # Cancel eventhandlers
-        # event_state_transition.flush_events()
-        # await event_state_transition.cancel()
+        # Wait for shutdown event ( this is triggered after the SU Completition)
+        shutdown_event = basicinformation_handler.wait_for_event_report(Clusters.BasicInformation.Events.ShutDown, timeout_sec=60*6)
+        logger.info(f"Event report for ShutDown : {shutdown_event}")
+        # Cancel eventhandlers
+        event_state_transition.flush_events()
+        await event_state_transition.cancel()
 
-        # basicinformation_handler.flush_events()
-        # await basicinformation_handler.cancel()
+        basicinformation_handler.flush_events()
+        await basicinformation_handler.cancel()
 
-        # # Just wait for the device to StartUp after ShutDown
-        # await asyncio.sleep(5)
-        # # Verify software version after StartUp
-        # self._verify_version_applied_basic_information(
-        #     controller=controller, node_id=requestor_node_id, target_version=expected_software_version)
+        # Just wait for the device to StartUp after ShutDown
+        await asyncio.sleep(5)
+        # Verify software version after StartUp
+        self._verify_version_applied_basic_information(
+            controller=controller, node_id=requestor_node_id, target_version=expected_software_version)
 
-        # # Verify on te OTA-P Logs  and confirm there is no other ApplyUpdateRequest form the DUT
-        # expected_line = 'Provider received ApplyUpdateRequest'
-        # found_lines = self.current_provider_app_proc.read_from_logs(expected_line, regex=False)
-        # asserts.assert_equal(len(found_lines), 1,
-        #                      f"Zero or more than 1 lines , but not 1 line containing {expected_line} found in the logs")
+        # Verify on te OTA-P Logs  and confirm there is no other ApplyUpdateRequest form the DUT
+        expected_line = 'Provider received ApplyUpdateRequest'
+        found_lines = self.current_provider_app_proc.read_from_logs(expected_line, regex=False)
+        asserts.assert_equal(len(found_lines), 1,
+                             f"Zero or more than 1 lines , but not 1 line containing {expected_line} found in the logs")
 
-        # self._terminate_provider_process()
-        # controller.ExpireSessions(nodeid=provider_data['node_id'])
+        self._terminate_provider_process()
+        controller.ExpireSessions(nodeid=provider_data['node_id'])
 
         self.step(2)
         expected_software_version = 3
@@ -368,12 +368,16 @@ class TC_SU_2_5(MatterBaseTest):
             filter=provider_data['discriminator']
         )
 
+        # Get current version
+        current_sw_version = await self.read_single_attribute_check_success(
+            dev_ctrl=controller,
+            cluster=Clusters.BasicInformation,
+            attribute=Clusters.BasicInformation.Attributes.SoftwareVersion,
+            node_id=requestor_node_id)
+
         event_state_transition = EventSubscriptionHandler(expected_cluster=Clusters.OtaSoftwareUpdateRequestor,
                                                           expected_event_id=Clusters.OtaSoftwareUpdateRequestor.Events.StateTransition.event_id)
         await event_state_transition.start(controller, requestor_node_id, endpoint=0, min_interval_sec=0, max_interval_sec=6000)
-        basicinformation_handler = EventSubscriptionHandler(
-            expected_cluster=Clusters.BasicInformation, expected_event_id=Clusters.BasicInformation.Events.ShutDown.event_id)
-        await basicinformation_handler.start(controller, requestor_node_id, endpoint=0, min_interval_sec=0, max_interval_sec=6000)
 
         await self.current_provider_app_proc.create_acl_entry(dev_ctrl=controller, provider_node_id=provider_data['node_id'], requestor_node_id=requestor_node_id)
         await self._write_ota_providers(controller=controller, provider_node_id=provider_data['node_id'], endpoint=0)
@@ -381,16 +385,42 @@ class TC_SU_2_5(MatterBaseTest):
 
         event_report = event_state_transition.wait_for_event_report(
             Clusters.OtaSoftwareUpdateRequestor.Events.StateTransition, timeout_sec=60)
-        logger.info(f"Event report for Downloading : {event_report}")
+        logger.info(f"Event report for Querying : {event_report}")
+        asserts.assert_equal(event_report.newState, Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kQuerying)
 
         update_state_prev = await self.read_single_attribute_check_success(
             Clusters.OtaSoftwareUpdateRequestor, Clusters.OtaSoftwareUpdateRequestor.Attributes.UpdateState, controller, requestor_node_id)
         logger.info("UpdateState before update " + str(update_state_prev))
 
-        # Applying this wil trigger the "delayedActionTime: 180 seconds" in the logs
+        # Applying this will trigger the "delayedActionTime: 180 seconds" in the logs
+        event_report = event_state_transition.wait_for_event_report(
+            Clusters.OtaSoftwareUpdateRequestor.Events.StateTransition, timeout_sec=10)
+        logger.info(f"Event report for Downloading : {event_report}")
+        asserts.assert_equal(event_report.newState, Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kDownloading)
+
         event_report = event_state_transition.wait_for_event_report(
             Clusters.OtaSoftwareUpdateRequestor.Events.StateTransition, timeout_sec=60*5)
         logger.info(f"Event report for Applying : {event_report}")
+        asserts.assert_equal(event_report.newState, Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kApplying)
+
+        # As the action is awaitNextAction State should be DelayedOnApply
+        event_report = event_state_transition.wait_for_event_report(
+            Clusters.OtaSoftwareUpdateRequestor.Events.StateTransition, timeout_sec=30)
+        logger.info(f"Event report for DelayedOnApply : {event_report}")
+        asserts.assert_equal(event_report.newState, Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kDelayedOnApply)
+
+        event_state_transition.flush_events()
+        await event_state_transition.cancel()
+
+        # Wait for 119 seconds 1 minute and 59 seconds and check the version in BasicInformationCluster
+        # In the last second verify no update has taken place
+        logger.info("Waitiing 1 minute a 59 seconds (Almost 2 minutes defined in the spec)")
+        await asyncio.sleep(119)
+        await self._verify_version_applied_basic_information(controller=controller, node_id=requestor_node_id, target_version=current_sw_version)
+
+        # Should be the same version as the start before annouce
+        self._terminate_provider_process()
+        controller.ExpireSessions(nodeid=provider_data['node_id'])
 
 
 if __name__ == "__main__":
