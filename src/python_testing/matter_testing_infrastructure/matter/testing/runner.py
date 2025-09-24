@@ -899,7 +899,7 @@ def parse_matter_test_args(argv: Optional[List[str]] = None):
     if not argv:
         argv = sys.argv[1:]
 
-    return convert_args_to_matter_config(parser.parse_known_args(argv)[0])
+    return convert_args_to_matter_config(parser.parse_args(argv))
 
 
 def int_decimal_or_hex(s: str) -> int:

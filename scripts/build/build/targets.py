@@ -1,4 +1,4 @@
-# Copyright (c) 2021-2024 Project CHIP Authors
+# Copyright (c) 2021-2025 Project CHIP Authors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -541,7 +541,8 @@ def BuildNxpTarget():
         TargetPart('lock-app', app=NxpApp.LOCK_APP).OnlyIfRe('mcxw71|mcxw72'),
         TargetPart('all-clusters', app=NxpApp.ALLCLUSTERS).OnlyIfRe('rt1060|rt1170|rw61x'),
         TargetPart('laundry-washer', app=NxpApp.LAUNDRYWASHER).OnlyIfRe('rt1060|rt1170|rw61x'),
-        TargetPart('thermostat', app=NxpApp.THERMOSTAT).OnlyIfRe('rt1060|rt1170|rw61x')
+        TargetPart('thermostat', app=NxpApp.THERMOSTAT).OnlyIfRe('rt1060|rt1170|rw61x'),
+        TargetPart('unit-test', app=NxpApp.UNIT_TEST)
     ])
 
     target.AppendModifier(name="factory", enable_factory_data=True)
