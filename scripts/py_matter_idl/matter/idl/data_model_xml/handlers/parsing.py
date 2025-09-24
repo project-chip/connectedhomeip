@@ -271,8 +271,8 @@ def AttributesToEvent(attrs: AttributesImpl) -> Event:
     elif attrs["priority"] == "debug":
         priority = EventPriority.DEBUG
     elif attrs["priority"] == "desc":
-        LOGGER.warn("Found an event with 'desc' priority: %s" %
-                    [item for item in attrs.items()])
+        LOGGER.warning("Found an event with 'desc' priority: %s" %
+                       [item for item in attrs.items()])
         priority = EventPriority.CRITICAL
     else:
         raise Exception("UNKNOWN event priority: %r" % attrs["priority"])
@@ -302,7 +302,7 @@ def AttributesToCommand(attrs: AttributesImpl) -> Command:
     assert "name" in attrs
 
     if "response" not in attrs:
-        LOGGER.warn(f"Command {attrs['name']} has no response set.")
+        LOGGER.warning(f"Command {attrs['name']} has no response set.")
         # Matter IDL has no concept of "no response sent"
         # Example is DoorLock::"Operating Event Notification"
         #
