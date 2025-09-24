@@ -103,7 +103,6 @@ const FactoryData * GetFactoryData()
     return &mFactoryData;
 }
 
-
 CHIP_ERROR FactoryDataProvider::Init()
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
