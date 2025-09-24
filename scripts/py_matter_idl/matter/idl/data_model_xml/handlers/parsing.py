@@ -170,7 +170,7 @@ def NormalizeName(name: str) -> str:
 
     while '_' in name:
         idx = name.find('_')
-        name = name[:idx] + name[idx+1].upper() + name[idx+2:]
+        name = name[:idx] + name[idx + 1].upper() + name[idx + 2:]
 
     return name
 

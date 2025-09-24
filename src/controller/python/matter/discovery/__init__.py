@@ -204,7 +204,7 @@ _gPendingDiscoveries = _PendingDiscoveries()
 
 
 @DiscoverSuccessCallback_t
-def _DiscoverSuccess(fabric: int, node: int, interface: int, ip: str,  port: int):
+def _DiscoverSuccess(fabric: int, node: int, interface: int, ip: str, port: int):
     peerId = PeerId(fabric, node)
     address = NodeAddress(interface, ip, port)
 

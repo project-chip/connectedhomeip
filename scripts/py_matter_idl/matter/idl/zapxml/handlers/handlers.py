@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import logging
 from typing import Any, Optional
 
 from matter.idl.matter_idl_types import (Attribute, Bitmap, Cluster, Command, CommandQuality, ConstantEntry, DataType, Enum, Event,
@@ -20,6 +21,8 @@ from matter.idl.matter_idl_types import (Attribute, Bitmap, Cluster, Command, Co
 from .base import BaseHandler, HandledDepth
 from .context import Context, IdlPostProcessor
 from .parsing import AttrsToAccessPrivilege, AttrsToAttribute, ParseInt
+
+LOGGER = logging.getLogger(__name__)
 
 
 def _IsConformanceTagName(name: str) -> bool:
@@ -412,7 +415,7 @@ class CommandHandler(BaseHandler):
             if name.endswith('Request'):
                 request_name = name
             else:
-                request_name = name+'Request'
+                request_name = name + 'Request'
 
             self._struct.name = request_name
 

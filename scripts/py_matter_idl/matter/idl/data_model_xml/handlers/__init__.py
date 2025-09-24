@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import logging
 from xml.sax.xmlreader import AttributesImpl
 
 from matter.idl.matter_idl_types import Idl
@@ -20,6 +21,8 @@ from .base import BaseHandler
 from .context import Context
 from .handlers import ClusterHandler
 from .parsing import NormalizeName
+
+LOGGER = logging.getLogger(__name__)
 
 
 def contains_valid_cluster_id(attrs: AttributesImpl) -> bool:
