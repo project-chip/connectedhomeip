@@ -123,7 +123,7 @@ attribute's value changes.
 
     -   For the `NotifyAttributeChangedIfSuccess` ensure that WriteImpl is
         returning
-        [ActionReturnStatus::FixedStatus::kWriteSuccessNoOp](https://github.com/project-chip/connectedhomeip/blob/master/src/app/data-model-provider/ActionReturnStatus.h
+        [ActionReturnStatus::FixedStatus::kWriteSuccessNoOp](https://github.com/project-chip/connectedhomeip/blob/master/src/app/data-model-provider/ActionReturnStatus.h)
         when no notification should be sent (e.g. write was a noop)
 
         Canonical example is:
