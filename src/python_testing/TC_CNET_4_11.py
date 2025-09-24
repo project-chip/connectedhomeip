@@ -52,7 +52,6 @@ TH_QUICK_WAIT = 1                    # Quick TH operations (1s) - quick stabiliz
 
 # DUT waits - for Device Under Test operations and recovery
 DUT_NETWORK_WAIT = 3                 # DUT network wait (3s) - WiFi stabilization, network settling (reduced from 5s)
-DUT_PROGRESSIVE_RETRY_BASE = 3       # DUT progressive retry base (3s) - ESP32 network switch retries (reduced from 8s)
 DUT_RECOVERY_DELAY = 6               # DUT recovery delay (6s) - between retry attempts (reduced from 8s)
 DUT_SERVICE_STARTUP = 7              # DUT service startup (7s) - mDNS service stabilization (reduced from 10s)
 
@@ -61,12 +60,17 @@ DUT_SERVICE_STARTUP = 7              # DUT service startup (7s) - mDNS service s
 CONNECTION_TIMEOUT = 15              # WiFi connection timeout (15s) - time to establish WiFi link (reduced from 20s)
 IP_TIMEOUT = 8                       # IP assignment timeout (8s) - reduced from 10s for faster failure detection
 MDNS_DISCOVERY_TIMEOUT = 20          # mDNS discovery timeout (20s) - further reduced from 30s
-NETWORK_CHANGE_TIMEOUT = 45          # Network transition timeout (45s) - reduced from 150s
+NETWORK_CHANGE_TIMEOUT = 90          # Network transition timeout (90s) - increased from 45s for better reliability
 # Network stabilization (5s) - further reduced from 15s for faster execution
 NETWORK_STABILIZATION_WAIT = 5
 
 # Discovery duration for mDNS and network operations
 DISCOVERY_DURATION = 8               # Default duration for mDNS discovery (reduced from 15s)
+
+# Avahi corruption recovery timeouts (used when Avahi state is corrupted)
+AVAHI_CORRUPTED_DISCOVERY_DURATION = 15    # Extended discovery duration when Avahi is corrupted
+AVAHI_CORRUPTED_NETWORK_TIMEOUT = 180      # Extended network timeout when Avahi is corrupted
+AVAHI_CORRUPTED_MDNS_TIMEOUT = 45          # Extended mDNS timeout when Avahi is corrupted
 
 # Network verification parameters
 PING_COUNT = 1                       # Number of ping packets to send for connectivity verification
@@ -81,6 +85,40 @@ attr = cnet.Attributes
 
 # Global variable to store target device ID for mDNS discovery
 _target_device_id = None
+
+# Global Avahi coordination lock to prevent simultaneous usage conflicts
+_avahi_lock = asyncio.Lock()
+
+# Track Avahi state health
+_avahi_consecutive_errors = 0
+_avahi_state_corrupted = False
+
+
+def get_adaptive_discovery_timeout():
+    """Get discovery timeout adapted to current Avahi state."""
+    global _avahi_state_corrupted
+    if _avahi_state_corrupted:
+        logger.debug(f"get_adaptive_discovery_timeout: Using extended timeout due to Avahi corruption: {AVAHI_CORRUPTED_DISCOVERY_DURATION}s")
+        return AVAHI_CORRUPTED_DISCOVERY_DURATION
+    return DISCOVERY_DURATION
+
+
+def get_adaptive_network_timeout():
+    """Get network timeout adapted to current Avahi state."""
+    global _avahi_state_corrupted
+    if _avahi_state_corrupted:
+        logger.debug(f"get_adaptive_network_timeout: Using extended timeout due to Avahi corruption: {AVAHI_CORRUPTED_NETWORK_TIMEOUT}s")
+        return AVAHI_CORRUPTED_NETWORK_TIMEOUT
+    return NETWORK_CHANGE_TIMEOUT
+
+
+def get_adaptive_mdns_timeout():
+    """Get mDNS timeout adapted to current Avahi state."""
+    global _avahi_state_corrupted
+    if _avahi_state_corrupted:
+        logger.debug(f"get_adaptive_mdns_timeout: Using extended timeout due to Avahi corruption: {AVAHI_CORRUPTED_MDNS_TIMEOUT}s")
+        return AVAHI_CORRUPTED_MDNS_TIMEOUT
+    return MDNS_DISCOVERY_TIMEOUT
 
 
 def detect_environment():
@@ -123,6 +161,141 @@ def set_target_device_id(device_id):
     _target_device_id = str(device_id) if device_id is not None else None
 
 
+async def check_avahi_state_health():
+    """Check if Avahi service is in a healthy state.
+    
+    Monitors for signs of Avahi state corruption that cause infinite re-register loops.
+    
+    Returns:
+        bool: True if Avahi appears healthy, False if corrupted state detected
+    """
+    global _avahi_consecutive_errors, _avahi_state_corrupted
+    
+    try:
+        # Quick test: try to list services with avahi-browse
+        proc = await asyncio.create_subprocess_exec(
+            "avahi-browse", "-a", "-t", "-p", "--timeout=2",
+            stdout=asyncio.subprocess.PIPE,
+            stderr=asyncio.subprocess.PIPE
+        )
+        
+        try:
+            stdout, stderr = await asyncio.wait_for(proc.communicate(), timeout=5)
+            if proc.returncode == 0:
+                _avahi_consecutive_errors = 0
+                _avahi_state_corrupted = False
+                return True
+            else:
+                _avahi_consecutive_errors += 1
+                logger.warning(f"Avahi health check failed (attempt {_avahi_consecutive_errors}): {stderr.decode() if stderr else 'unknown error'}")
+        except asyncio.TimeoutError:
+            proc.kill()
+            await proc.communicate()
+            _avahi_consecutive_errors += 1
+            logger.warning(f"Avahi health check timeout (attempt {_avahi_consecutive_errors})")
+            
+    except Exception as e:
+        _avahi_consecutive_errors += 1
+        logger.warning(f"Avahi health check exception (attempt {_avahi_consecutive_errors}): {e}")
+    
+    # Mark as corrupted if we have too many consecutive errors
+    if _avahi_consecutive_errors >= 3:
+        _avahi_state_corrupted = True
+        logger.error("Avahi state appears corrupted - detected multiple consecutive failures")
+        return False
+    
+    return _avahi_consecutive_errors < 2
+
+
+async def recover_avahi_service():
+    """Attempt to recover from Avahi service corruption using container-compatible strategies.
+    
+    Since we cannot control the host's avahi-daemon from within a container,
+    this function implements alternative recovery strategies that work in containerized environments.
+    """
+    global _avahi_consecutive_errors, _avahi_state_corrupted
+    
+    logger.info("Attempting Avahi service recovery (container-compatible strategies)...")
+    
+    # Strategy 1: Clear local avahi-browse process cache by killing any hanging processes
+    try:
+        logger.info("recover_avahi_service: Clearing hanging avahi-browse processes...")
+        proc = await asyncio.create_subprocess_exec(
+            "pkill", "-f", "avahi-browse",
+            stdout=asyncio.subprocess.PIPE,
+            stderr=asyncio.subprocess.PIPE
+        )
+        await proc.communicate()
+        logger.debug("recover_avahi_service: Cleared avahi-browse processes")
+        await asyncio.sleep(2)  # Allow cleanup
+        
+    except Exception as e:
+        logger.debug(f"recover_avahi_service: Process cleanup failed (may be normal): {e}")
+    
+    # Strategy 2: Test basic avahi-browse functionality with minimal timeout
+    recovery_success = False
+    try:
+        logger.info("recover_avahi_service: Testing avahi-browse basic functionality...")
+        proc = await asyncio.create_subprocess_exec(
+            "avahi-browse", "-a", "-t", "-p", "--timeout=3",
+            stdout=asyncio.subprocess.PIPE,
+            stderr=asyncio.subprocess.PIPE
+        )
+        
+        try:
+            stdout, stderr = await asyncio.wait_for(proc.communicate(), timeout=8)
+            
+            if proc.returncode == 0:
+                logger.info("recover_avahi_service: avahi-browse test successful")
+                recovery_success = True
+            else:
+                stderr_text = stderr.decode() if stderr else ""
+                logger.warning(f"recover_avahi_service: avahi-browse test failed: {stderr_text}")
+                
+        except asyncio.TimeoutError:
+            proc.kill()
+            await proc.communicate()
+            logger.warning("recover_avahi_service: avahi-browse test timeout")
+            
+    except Exception as e:
+        logger.warning(f"recover_avahi_service: avahi-browse test exception: {e}")
+    
+    # Strategy 3: Wait for potential host-side Avahi recovery (user intervention or automatic recovery)
+    if not recovery_success:
+        logger.info("recover_avahi_service: Waiting for potential host-side Avahi recovery...")
+        await asyncio.sleep(5)  # Give time for host-side recovery
+        
+        # Re-test after waiting
+        try:
+            proc = await asyncio.create_subprocess_exec(
+                "avahi-browse", "-a", "-t", "-p", "--timeout=2",
+                stdout=asyncio.subprocess.PIPE,
+                stderr=asyncio.subprocess.PIPE
+            )
+            
+            stdout, stderr = await asyncio.wait_for(proc.communicate(), timeout=5)
+            
+            if proc.returncode == 0:
+                logger.info("recover_avahi_service: Recovery detected after waiting period")
+                recovery_success = True
+            else:
+                logger.warning("recover_avahi_service: No recovery detected after waiting period")
+                
+        except Exception as e:
+            logger.debug(f"recover_avahi_service: Post-wait test failed: {e}")
+    
+    if recovery_success:
+        # Reset error counters on successful recovery
+        _avahi_consecutive_errors = 0
+        _avahi_state_corrupted = False
+        logger.info("recover_avahi_service: Avahi recovery successful")
+        return True
+    else:
+        logger.warning("recover_avahi_service: All container-compatible recovery strategies failed")
+        logger.warning("recover_avahi_service: Consider restarting the host avahi-daemon service manually if issues persist")
+        return False
+
+
 async def discover_dut(duration=DISCOVERY_DURATION, target_device_id=None):
     """Discover Matter services using platform-specific command-line tools.
 
@@ -130,6 +303,8 @@ async def discover_dut(duration=DISCOVERY_DURATION, target_device_id=None):
     - macOS: dns-sd command (built into macOS)
     - Linux Desktop: avahi-browse (if available) or systemd-resolve
     - Docker: avahi-browse command (no service dependencies)
+
+    This function implements Avahi coordination to prevent conflicts with Test Harness mDNS operations.
 
     Args:
         duration: Discovery duration in seconds
@@ -141,31 +316,47 @@ async def discover_dut(duration=DISCOVERY_DURATION, target_device_id=None):
     env = detect_environment()
     discovered_services = []
 
-    try:
-        logger.info(f"discover_dut: Starting mDNS discovery for {duration}s on {env}...")
+    # Use Avahi coordination lock to prevent conflicts with Test Harness
+    async with _avahi_lock:
+        try:
+            # Check Avahi health before proceeding (only for environments using Avahi)
+            if env in ['linux_desktop', 'docker']:
+                logger.info(f"discover_dut: Checking Avahi service health before discovery...")
+                avahi_healthy = await check_avahi_state_health()
+                
+                if not avahi_healthy:
+                    logger.warning(f"discover_dut: Avahi state appears corrupted, attempting recovery...")
+                    recovery_success = await recover_avahi_service()
+                    
+                    if not recovery_success:
+                        logger.error(f"discover_dut: Avahi recovery failed - using adaptive timeouts")
+                        # Use adaptive timeout based on Avahi state
+                        duration = get_adaptive_discovery_timeout()
 
-        if env == 'macos':
-            # macOS: Use built-in dns-sd command
-            await _discover_dut_from_macos(duration, target_device_id, discovered_services)
+            logger.info(f"discover_dut: Starting mDNS discovery for {duration}s on {env}...")
 
-        elif env == 'linux_desktop':
-            # Linux Desktop: Try avahi-browse or systemd-resolve
-            await _discover_dut_from_linux_desktop(duration, target_device_id, discovered_services)
+            if env == 'macos':
+                # macOS: Use built-in dns-sd command
+                await _discover_dut_from_macos(duration, target_device_id, discovered_services)
 
-        elif env == 'docker':
-            # Docker: Use avahi-browse command directly
-            return await _discover_dut_from_docker(duration, target_device_id)
+            elif env == 'linux_desktop':
+                # Linux Desktop: Try avahi-browse or systemd-resolve
+                await _discover_dut_from_linux_desktop(duration, target_device_id, discovered_services)
 
-        else:
-            logger.warning(f"discover_dut: No discovery method available for {env}")
+            elif env == 'docker':
+                # Docker: Use avahi-browse command directly
+                return await _discover_dut_from_docker(duration, target_device_id)
+
+            else:
+                logger.warning(f"discover_dut: No discovery method available for {env}")
+                return []
+
+            logger.info(f"discover_dut: Discovery completed. Found {len(discovered_services)} services")
+            return discovered_services
+
+        except Exception as e:
+            logger.error(f"discover_dut: Discovery failed: {e}")
             return []
-
-        logger.info(f"discover_dut: Discovery completed. Found {len(discovered_services)} services")
-        return discovered_services
-
-    except Exception as e:
-        logger.error(f"discover_dut: Discovery failed: {e}")
-        return []
 
 
 async def _discover_dut_from_macos(duration, target_device_id, discovered_services):
@@ -301,6 +492,8 @@ async def _discover_dut_from_docker(duration=DISCOVERY_DURATION, target_device_i
     This function is designed for use inside a Docker container running on Raspberry Pi with Ubuntu.
     Other environments are not supported or tested in this test scenario.
 
+    Implements enhanced error handling for Avahi state conflicts that can cause infinite re-register loops.
+
     Args:
         duration: Discovery duration in seconds
         target_device_id: Optional device ID to look for specifically
@@ -309,52 +502,244 @@ async def _discover_dut_from_docker(duration=DISCOVERY_DURATION, target_device_i
         list: List of discovered services with their details
     """
     discovered_services = []
+    max_retries = 3
+    retry_count = 0
+    
+    while retry_count < max_retries:
+        try:
+            logger.info(f"_discover_dut_from_docker: Starting avahi-browse mDNS discovery for {duration}s (attempt {retry_count + 1}/{max_retries})...")
+            
+            # Use timeout to prevent hanging if Avahi is in corrupted state
+            timeout_duration = min(duration + 10, 30)  # Cap timeout to prevent excessive waits
+            
+            # Run avahi-browse for the specified duration
+            proc = await asyncio.create_subprocess_exec(
+                "avahi-browse", "-a", "-t", "-p",
+                stdout=asyncio.subprocess.PIPE,
+                stderr=asyncio.subprocess.PIPE
+            )
+            
+            try:
+                # Wait for the specified duration, then terminate the process
+                await asyncio.sleep(duration)
+                proc.terminate()
+                stdout, stderr = await asyncio.wait_for(proc.communicate(), timeout=5)
+                
+            except asyncio.TimeoutError:
+                logger.warning(f"_discover_dut_from_docker: avahi-browse process timeout, force killing...")
+                proc.kill()
+                try:
+                    stdout, stderr = await asyncio.wait_for(proc.communicate(), timeout=2)
+                except asyncio.TimeoutError:
+                    stdout, stderr = b"", b"timeout_during_kill"
+                    
+            except Exception as e:
+                logger.warning(f"_discover_dut_from_docker: Exception during avahi-browse execution: {e}")
+                proc.kill()
+                try:
+                    stdout, stderr = await proc.communicate()
+                except:
+                    stdout, stderr = b"", b"exception_during_execution"
+
+            # Check for signs of Avahi corruption in stderr
+            stderr_text = stderr.decode() if stderr else ""
+            if any(indicator in stderr_text.lower() for indicator in [
+                "failed to create client", "daemon not running", 
+                "name collision", "service type already exists"
+            ]):
+                logger.warning(f"_discover_dut_from_docker: Avahi corruption detected in stderr: {stderr_text}")
+                if retry_count < max_retries - 1:
+                    logger.info(f"_discover_dut_from_docker: Retrying discovery after Avahi error...")
+                    retry_count += 1
+                    await asyncio.sleep(2)  # Brief wait before retry
+                    continue
+                else:
+                    logger.error(f"_discover_dut_from_docker: Max retries reached, discovery may be incomplete")
+
+            output = stdout.decode() if stdout else ""
+            
+            # Filter Matter services
+            for line in output.splitlines():
+                if ("_matter._tcp" in line or "_matterc._udp" in line or "_chip._tcp" in line) and line.startswith('+'):
+                    parts = line.split(';')
+                    if len(parts) >= 6:
+                        service_name = parts[6] if len(parts) > 6 else 'unknown'
+                        service_type = parts[4] if len(parts) > 4 else 'unknown'
+                        service_info = {
+                            'name': service_name,
+                            'type': service_type,
+                            'domain': 'local',
+                            'method': 'avahi-browse'
+                        }
+                        # Filter by target_device_id if specified
+                        if target_device_id:
+                            if target_device_id.lower() in service_name.lower():
+                                logger.info(f"_discover_dut_from_docker: [avahi-browse] {service_name} ({service_type}) TARGET FOUND")
+                                discovered_services.append(service_info)
+                        else:
+                            logger.info(f"_discover_dut_from_docker: [avahi-browse] {service_name} ({service_type})")
+                            discovered_services.append(service_info)
+
+            logger.info(f"_discover_dut_from_docker: avahi-browse discovery completed. Found {len(discovered_services)} services")
+            return discovered_services
+
+        except Exception as e:
+            logger.error(f"_discover_dut_from_docker: avahi-browse discovery failed (attempt {retry_count + 1}): {e}")
+            if retry_count < max_retries - 1:
+                retry_count += 1
+                await asyncio.sleep(2)  # Brief wait before retry
+                continue
+            else:
+                logger.error(f"_discover_dut_from_docker: All discovery attempts failed")
+                return []
+
+    return discovered_services
+
+
+async def detect_avahi_infinite_loop():
+    """Detect if Test Harness is stuck in an Avahi re-register infinite loop.
+    
+    This function monitors Matter Test Harness logs for signs of Avahi registration loops
+    that cause high CPU usage and prevent normal network operations.
+    
+    Returns:
+        bool: True if infinite loop detected, False otherwise
+    """
     try:
-        logger.info(f"_discover_dut_from_docker: Starting avahi-browse mDNS discovery for {DISCOVERY_DURATION}s...")
-        # Run avahi-browse for the specified duration
+        # Check recent system logs for Avahi re-register patterns
         proc = await asyncio.create_subprocess_exec(
-            "avahi-browse", "-a", "-t", "-p",
+            "journalctl", "-u", "matter-test-harness", "--since", "2 minutes ago", "-n", "50",
             stdout=asyncio.subprocess.PIPE,
             stderr=asyncio.subprocess.PIPE
         )
+        
         try:
-            # Espera la duración indicada, luego termina el proceso
-            await asyncio.sleep(DISCOVERY_DURATION)
-            proc.terminate()
-            stdout, stderr = await proc.communicate()
-        except Exception:
-            proc.kill()
-            stdout, stderr = await proc.communicate()
-
-        output = stdout.decode() if stdout else ""
-        # Filtra servicios Matter
-        for line in output.splitlines():
-            if ("_matter._tcp" in line or "_matterc._udp" in line or "_chip._tcp" in line) and line.startswith('+'):
-                parts = line.split(';')
-                if len(parts) >= 6:
-                    service_name = parts[6] if len(parts) > 6 else 'unknown'
-                    service_type = parts[4] if len(parts) > 4 else 'unknown'
-                    service_info = {
-                        'name': service_name,
-                        'type': service_type,
-                        'domain': 'local',
-                        'method': 'avahi-browse'
-                    }
-                    # Si se especifica target_device_id, filtra por nombre
-                    if target_device_id:
-                        if target_device_id.lower() in service_name.lower():
-                            logger.info(f"_discover_dut_from_docker: [avahi-browse] {service_name} ({service_type}) TARGET FOUND")
-                            discovered_services.append(service_info)
-                    else:
-                        logger.info(f"_discover_dut_from_docker: [avahi-browse] {service_name} ({service_type})")
-                        discovered_services.append(service_info)
-
-        logger.info(f"_discover_dut_from_docker: avahi-browse discovery completed. Found {len(discovered_services)} services")
-        return discovered_services
-
+            stdout, stderr = await asyncio.wait_for(proc.communicate(), timeout=10)
+            output = stdout.decode() if stdout else ""
+            
+            # Count Avahi re-register patterns
+            reregister_count = output.count("Avahi re-register required")
+            failed_advertise_count = output.count("Failed to advertise operational node")
+            incorrect_state_count = output.count("CHIP Error 0x00000003: Incorrect state")
+            
+            # If we see many re-register attempts in a short time, it's likely a loop
+            if reregister_count > 10 or failed_advertise_count > 15 or incorrect_state_count > 20:
+                logger.warning(f"detect_avahi_infinite_loop: Avahi loop detected - reregister: {reregister_count}, failed_advertise: {failed_advertise_count}, incorrect_state: {incorrect_state_count}")
+                return True
+                
+        except asyncio.TimeoutError:
+            logger.debug("detect_avahi_infinite_loop: journalctl timeout - unable to check logs")
+            
+    except FileNotFoundError:
+        # journalctl not available, try alternative detection
+        logger.debug("detect_avahi_infinite_loop: journalctl not available, using process monitoring")
+        return await _detect_avahi_loop_via_process_monitoring()
+        
     except Exception as e:
-        logger.error(f"_discover_dut_from_docker: avahi-browse discovery failed: {e}")
-        return []
+        logger.debug(f"detect_avahi_infinite_loop: Log check failed: {e}")
+        
+    return False
+
+
+async def _detect_avahi_loop_via_process_monitoring():
+    """Alternative Avahi loop detection using process monitoring."""
+    try:
+        # Check if any Matter-related processes are consuming high CPU
+        proc = await asyncio.create_subprocess_exec(
+            "ps", "aux", 
+            stdout=asyncio.subprocess.PIPE,
+            stderr=asyncio.subprocess.PIPE
+        )
+        
+        stdout, stderr = await asyncio.wait_for(proc.communicate(), timeout=5)
+        output = stdout.decode() if stdout else ""
+        
+        # Look for high CPU usage in Matter/Avahi related processes
+        high_cpu_processes = []
+        for line in output.splitlines():
+            if any(keyword in line.lower() for keyword in ['matter', 'avahi', 'chip']):
+                parts = line.split()
+                if len(parts) > 2:
+                    try:
+                        cpu_usage = float(parts[2])
+                        if cpu_usage > 50:  # High CPU usage
+                            high_cpu_processes.append(line)
+                    except ValueError:
+                        continue
+        
+        if high_cpu_processes:
+            logger.warning(f"detect_avahi_infinite_loop: High CPU processes detected: {len(high_cpu_processes)}")
+            return True
+            
+    except Exception as e:
+        logger.debug(f"_detect_avahi_loop_via_process_monitoring: Failed: {e}")
+        
+    return False
+
+
+async def mitigate_avahi_infinite_loop():
+    """Attempt to break out of Avahi infinite loop by restarting services.
+    
+    This function implements various strategies to recover from Avahi state corruption:
+    1. Restart avahi-daemon service
+    2. Clear stale Avahi registration cache
+    3. Reset Matter Test Harness mDNS state
+    
+    Returns:
+        bool: True if mitigation appears successful, False otherwise
+    """
+    logger.info("mitigate_avahi_infinite_loop: Attempting to break Avahi infinite loop...")
+    
+    try:
+        # Strategy 1: Try to restart avahi-daemon
+        logger.info("mitigate_avahi_infinite_loop: Restarting avahi-daemon service...")
+        proc = await asyncio.create_subprocess_exec(
+            "systemctl", "restart", "avahi-daemon",
+            stdout=asyncio.subprocess.PIPE,
+            stderr=asyncio.subprocess.PIPE
+        )
+        
+        await proc.communicate()
+        
+        if proc.returncode == 0:
+            logger.info("mitigate_avahi_infinite_loop: avahi-daemon restart successful")
+            await asyncio.sleep(5)  # Allow service to stabilize
+            
+            # Verify the loop is broken
+            await asyncio.sleep(2)
+            loop_still_active = await detect_avahi_infinite_loop()
+            
+            if not loop_still_active:
+                logger.info("mitigate_avahi_infinite_loop: Avahi loop successfully mitigated")
+                return True
+            else:
+                logger.warning("mitigate_avahi_infinite_loop: Loop persists after daemon restart")
+        else:
+            logger.warning("mitigate_avahi_infinite_loop: avahi-daemon restart failed")
+            
+    except Exception as e:
+        logger.warning(f"mitigate_avahi_infinite_loop: Service restart failed: {e}")
+    
+    # Strategy 2: Clear Avahi cache/state
+    try:
+        logger.info("mitigate_avahi_infinite_loop: Clearing Avahi cache...")
+        await asyncio.create_subprocess_exec("rm", "-rf", "/var/run/avahi-daemon/*")
+        await asyncio.sleep(2)
+        
+        # Try starting avahi-daemon again
+        await asyncio.create_subprocess_exec("systemctl", "start", "avahi-daemon")
+        await asyncio.sleep(3)
+        
+        loop_still_active = await detect_avahi_infinite_loop()
+        if not loop_still_active:
+            logger.info("mitigate_avahi_infinite_loop: Loop mitigated after cache clear")
+            return True
+            
+    except Exception as e:
+        logger.debug(f"mitigate_avahi_infinite_loop: Cache clear failed: {e}")
+    
+    logger.error("mitigate_avahi_infinite_loop: Failed to mitigate Avahi infinite loop")
+    return False
 
 
 async def verify_mdns_discovery():
@@ -648,20 +1033,28 @@ async def connect_wifi_linux(ssid, password) -> ConnectionResult:
             start_time = time.time()
             connected = False
 
-            while time.time() - start_time < timeout:
-                status = await wpa_command(interface, "STATUS")
+            try:
+                while time.time() - start_time < timeout:
+                    status = await wpa_command(interface, "STATUS")
 
-                if "wpa_state=COMPLETED" in status:
-                    connected = True
-                    break
-                elif "wpa_state=4WAY_HANDSHAKE" in status:
-                    # Authentication in progress, wait a bit more
-                    await asyncio.sleep(TH_PROCESS_WAIT)
-                elif "wpa_state=DISCONNECTED" in status or "wpa_state=INACTIVE" in status:
-                    logger.warning(f"connect_wifi_linux: Connection failed, status: {status}")
-                    break
+                    if "wpa_state=COMPLETED" in status:
+                        connected = True
+                        break
+                    elif "wpa_state=4WAY_HANDSHAKE" in status:
+                        # Authentication in progress, wait a bit more
+                        await asyncio.sleep(TH_PROCESS_WAIT)
+                    elif "wpa_state=DISCONNECTED" in status or "wpa_state=INACTIVE" in status:
+                        logger.warning(f"connect_wifi_linux: Connection failed, status: {status}")
+                        break
 
-                await asyncio.sleep(TH_QUICK_WAIT)
+                    await asyncio.sleep(TH_QUICK_WAIT)
+
+            except asyncio.CancelledError:
+                logger.warning(f"connect_wifi_linux: Connection attempt {retry} was cancelled, continuing with next attempt")
+                # Don't re-raise immediately, try the next attempt
+                if retry >= MAX_RETRIES:
+                    raise
+                connected = False
 
             if connected:
                 break
@@ -669,13 +1062,18 @@ async def connect_wifi_linux(ssid, password) -> ConnectionResult:
             # If connection failed and we have more attempts, reset interface
             if retry < MAX_RETRIES:
                 logger.warning(f"connect_wifi_linux: Attempt {retry} failed, resetting interface")
-                await run_subprocess(["sudo", "ip", "link", "set", interface, "down"])
-                await asyncio.sleep(TH_PROCESS_WAIT)
-                await run_subprocess(["sudo", "ip", "link", "set", interface, "up"])
-                await asyncio.sleep(TH_INTERFACE_WAIT)
-                await wpa_command(interface, f"SELECT_NETWORK {net_id}")
-                await wpa_command(interface, "REASSOCIATE")
-                await asyncio.sleep(TH_PROCESS_WAIT)
+                try:
+                    await run_subprocess(["sudo", "ip", "link", "set", interface, "down"])
+                    await asyncio.sleep(TH_PROCESS_WAIT)
+                    await run_subprocess(["sudo", "ip", "link", "set", interface, "up"])
+                    await asyncio.sleep(TH_INTERFACE_WAIT)
+                    await wpa_command(interface, f"SELECT_NETWORK {net_id}")
+                    await wpa_command(interface, "REASSOCIATE")
+                    await asyncio.sleep(TH_PROCESS_WAIT)
+                except asyncio.CancelledError:
+                    logger.warning(f"connect_wifi_linux: Interface reset for attempt {retry} was cancelled")
+                    if retry >= MAX_RETRIES:
+                        raise
 
         if not connected:
             final_status = await wpa_command(interface, "STATUS")
@@ -683,6 +1081,8 @@ async def connect_wifi_linux(ssid, password) -> ConnectionResult:
             return ConnectionResult(1, f"Connection failed: {final_status}")
 
         # Connection successful, get IP address
+        logger.info(f"connect_wifi_linux: WiFi connection established, obtaining IP address...")
+
         # Release any existing DHCP lease and request new one
         await run_subprocess(["sudo", "dhclient", "-r", interface])
         await asyncio.sleep(TH_QUICK_WAIT)
@@ -693,31 +1093,46 @@ async def connect_wifi_linux(ssid, password) -> ConnectionResult:
         ip_start = time.time()
 
         while time.time() - ip_start < ip_timeout:
-            output = await run_subprocess(["ip", "-4", "addr", "show", interface], capture_output=True)
+            try:
+                output = await run_subprocess(["ip", "-4", "addr", "show", interface], capture_output=True)
 
-            if output and "inet " in output:
-                ip_match = re.search(r'inet\s+(\S+)', output)
-                if ip_match:
-                    # Test connectivity to gateway
-                    try:
-                        gw_output = await run_subprocess(["ip", "route", "show", "default"], capture_output=True)
-                        if gw_output:
-                            gw_match = re.search(r'default via (\S+)', gw_output)
-                            if gw_match:
-                                gateway = gw_match.group(1)
-                                ping_output = await run_subprocess(
-                                    ["ping", "-c", str(PING_COUNT), "-W", str(PING_DEADLINE), gateway],
-                                    capture_output=True,
-                                    timeout=DUT_NETWORK_WAIT
-                                )
-                                if ping_output and "1 received" in ping_output:
-                                    pass  # Connectivity verified
-                    except Exception:
-                        logger.warning("connect_wifi_linux: Could not verify connectivity, but connection appears established")
+                if output and "inet " in output:
+                    ip_match = re.search(r'inet\s+(\S+)', output)
+                    if ip_match:
+                        ip_address = ip_match.group(1)
+                        logger.info(f"connect_wifi_linux: IP address obtained: {ip_address}")
 
-                    return ConnectionResult(0, "")
+                        # Test connectivity to gateway with better error handling
+                        try:
+                            gw_output = await run_subprocess(["ip", "route", "show", "default"], capture_output=True)
+                            if gw_output:
+                                gw_match = re.search(r'default via (\S+)', gw_output)
+                                if gw_match:
+                                    gateway = gw_match.group(1)
+                                    ping_output = await run_subprocess(
+                                        ["ping", "-c", str(PING_COUNT), "-W", str(PING_DEADLINE), gateway],
+                                        capture_output=True,
+                                        timeout=DUT_NETWORK_WAIT
+                                    )
+                                    if ping_output and "1 received" in ping_output:
+                                        logger.info(f"connect_wifi_linux: Gateway connectivity verified to {gateway}")
+                                    else:
+                                        logger.warning(f"connect_wifi_linux: Gateway ping failed but IP assigned")
+                        except Exception as e:
+                            logger.warning(f"connect_wifi_linux: Could not verify gateway connectivity: {e}")
 
-            await asyncio.sleep(TH_QUICK_WAIT)
+                        # Add stabilization delay after successful connection
+                        await asyncio.sleep(DUT_NETWORK_WAIT)
+                        return ConnectionResult(0, "")
+
+                await asyncio.sleep(TH_QUICK_WAIT)
+
+            except asyncio.CancelledError:
+                logger.warning("connect_wifi_linux: IP address acquisition was cancelled")
+                raise
+            except Exception as e:
+                logger.warning(f"connect_wifi_linux: Error during IP acquisition: {e}")
+                await asyncio.sleep(TH_QUICK_WAIT)
 
         logger.error("connect_wifi_linux: WiFi connected but no IP address obtained")
         return ConnectionResult(1, "No IP address obtained")
@@ -792,9 +1207,16 @@ async def connect_host_wifi(ssid, password) -> Optional[ConnectionResult]:
     os_name = platform.system()
     retry = 0
     conn = None
+    last_error = None
+
+    logger.info(f"connect_host_wifi: Starting connection to {ssid} on {os_name} (max {MAX_RETRIES} attempts)")
+
     while retry < MAX_RETRIES:
         retry += 1
+
         try:
+            logger.info(f"connect_host_wifi: Attempt {retry}/{MAX_RETRIES} to connect to {ssid}")
+
             if os_name == "Linux":
                 conn = await connect_wifi_linux(ssid, password)
             elif os_name == "Darwin":
@@ -802,16 +1224,37 @@ async def connect_host_wifi(ssid, password) -> Optional[ConnectionResult]:
             else:
                 logger.error(f"connect_host_wifi: OS not supported: {os_name}")
                 return ConnectionResult(1, "OS not supported")
+
             if conn and conn.returncode == 0:
-                logger.info(f"connect_host_wifi: Connected to {ssid}")
-                break
+                logger.info(f"connect_host_wifi: Successfully connected to {ssid} on attempt {retry}")
+                return conn
             elif conn:
-                logger.error(f"connect_host_wifi: Attempt {retry} failed. Return code: {conn.returncode}")
+                last_error = f"Return code: {conn.returncode}, stderr: {conn.stderr}"
+                logger.warning(f"connect_host_wifi: Attempt {retry} failed. {last_error}")
             else:
-                logger.error(f"connect_host_wifi: No result returned from connection attempt {retry}")
+                last_error = "No result returned from connection attempt"
+                logger.warning(f"connect_host_wifi: Attempt {retry} failed. {last_error}")
+
+        except asyncio.CancelledError:
+            logger.warning(f"connect_host_wifi: Attempt {retry} was cancelled")
+            raise  # Re-raise CancelledError to allow proper cleanup
         except Exception as e:
-            logger.error(f"connect_host_wifi: Exception on attempt {retry}: {e}")
-    return conn
+            last_error = str(e)
+            logger.warning(f"connect_host_wifi: Exception on attempt {retry}: {e}")
+
+        # Fixed delay between attempts, but don't delay after last attempt
+        if retry < MAX_RETRIES:
+            logger.info(f"connect_host_wifi: Waiting {DUT_RECOVERY_DELAY}s before next attempt...")
+            try:
+                await asyncio.sleep(DUT_RECOVERY_DELAY)
+            except asyncio.CancelledError:
+                logger.warning("connect_host_wifi: Delay between attempts was cancelled")
+                raise
+
+    # All attempts failed
+    final_error = f"Failed after {MAX_RETRIES} attempts. Last error: {last_error}"
+    logger.error(f"connect_host_wifi: {final_error}")
+    return ConnectionResult(1, final_error)
 
 
 def is_network_switch_successful(err):
@@ -896,7 +1339,9 @@ async def change_networks(test, cluster, ssid, password, breadcrumb):
         # Wait for DUT to change networks
         await asyncio.sleep(DUT_NETWORK_WAIT)
 
-        logger.info(f"change_networks: Changing TH network to {ssid}")
+        logger.info(f"change_networks: Changing TH network to {ssid} (timeout: {NETWORK_CHANGE_TIMEOUT}s)")
+        th_connection_success = False
+
         try:
             result = await asyncio.wait_for(
                 connect_host_wifi(ssid=ssid, password=password),
@@ -904,41 +1349,37 @@ async def change_networks(test, cluster, ssid, password, breadcrumb):
             )
             if result and result.returncode == 0:
                 # Extra wait for network stabilization after TH connects
-                logger.info("change_networks: Waiting additional 3s for network stabilization...")
+                logger.info("change_networks: TH connection successful, waiting for network stabilization...")
                 await asyncio.sleep(TH_INTERFACE_WAIT)
-                return  # Success!
+                th_connection_success = True
             else:
-                logger.error(f"change_networks: TH failed to connect to {ssid}")
-
-                # Try fallback to original network immediately
-                logger.warning(f"change_networks: Attempting fallback to original network {original_ssid}")
-                try:
-                    fallback_result = await asyncio.wait_for(
-                        connect_host_wifi(ssid=original_ssid, password=original_password),
-                        timeout=NETWORK_CHANGE_TIMEOUT
-                    )
-                    if fallback_result and fallback_result.returncode == 0:
-                        logger.info(f"change_networks: Successfully fell back to {original_ssid}")
-                    else:
-                        logger.error(f"change_networks: Fallback to {original_ssid} also failed")
-                except Exception as fallback_e:
-                    logger.error(f"change_networks: Fallback connection failed: {fallback_e}")
+                logger.error(f"change_networks: TH connection failed with result: {result}")
 
         except asyncio.TimeoutError:
-            logger.error(f"change_networks: Timeout changing TH to {ssid}")
-
-            # Attempt fallback on timeout as well
-            logger.warning(f"change_networks: Timeout occurred, attempting fallback to {original_ssid}")
-            try:
-                fallback_result = await connect_host_wifi(ssid=original_ssid, password=original_password)
-                if fallback_result and fallback_result.returncode == 0:
-                    logger.info(f"change_networks: Successfully fell back to {original_ssid} after timeout")
-            except Exception as fallback_e:
-                logger.error(f"change_networks: Fallback after timeout failed: {fallback_e}")
-
+            logger.error(f"change_networks: Timeout ({NETWORK_CHANGE_TIMEOUT}s) changing TH to {ssid}")
         except Exception as e:
-            # All attempts failed, ensure we have fallback connectivity
-            logger.error(f"change_networks: TH failed to change to {ssid}: {e}")
+            logger.error(f"change_networks: Exception changing TH to {ssid}: {e}")
+
+        if th_connection_success:
+            logger.info(f"change_networks: Successfully changed TH to {ssid}")
+            return  # Success!
+
+        # Connection failed, attempt fallback
+        logger.warning(f"change_networks: TH connection to {ssid} failed, attempting fallback to {original_ssid}")
+        try:
+            fallback_result = await asyncio.wait_for(
+                connect_host_wifi(ssid=original_ssid, password=original_password),
+                timeout=NETWORK_CHANGE_TIMEOUT
+            )
+            if fallback_result and fallback_result.returncode == 0:
+                logger.info(f"change_networks: Successfully fell back to {original_ssid}")
+            else:
+                logger.error(f"change_networks: Fallback to {original_ssid} also failed: {fallback_result}")
+        except asyncio.TimeoutError:
+            logger.error(f"change_networks: Timeout during fallback to {original_ssid}")
+        except Exception as fallback_e:
+            logger.error(f"change_networks: Exception during fallback to {original_ssid}: {fallback_e}")
+    # If we reach here, all retry attempts have been exhausted
     logger.error(f"change_networks: Failed to switch networks after {MAX_RETRIES} attempts.")
     logger.info(f"change_networks: Ensuring fallback connectivity to {original_ssid}")
 
@@ -951,6 +1392,8 @@ async def change_networks(test, cluster, ssid, password, breadcrumb):
             logger.info(f"change_networks: Final fallback to {original_ssid} successful")
         else:
             logger.error(f"change_networks: Final fallback to {original_ssid} failed - WiFi may be disconnected!")
+    except asyncio.TimeoutError:
+        logger.error(f"change_networks: Final fallback to {original_ssid} timed out")
     except Exception as final_e:
         logger.error(f"change_networks: Final fallback attempt failed: {final_e}")
 
@@ -1317,6 +1760,22 @@ async def verify_operational_network(ssid, wifi_1st_ap_ssid, read_single_attribu
     Raises:
         AssertionError: If network verification fails
     """
+    # Check for Avahi infinite loop before proceeding
+    logger.info("verify_operational_network: Checking for Avahi infinite loop...")
+    loop_detected = await detect_avahi_infinite_loop()
+    
+    if loop_detected:
+        logger.warning("verify_operational_network: Avahi infinite loop detected - attempting mitigation...")
+        mitigation_success = await mitigate_avahi_infinite_loop()
+        
+        if mitigation_success:
+            logger.info("verify_operational_network: Avahi loop mitigation successful, proceeding with verification")
+            # Brief pause to let services stabilize
+            await asyncio.sleep(3)
+        else:
+            logger.error("verify_operational_network: Avahi loop mitigation failed - verification may be unreliable")
+            # Continue anyway but use extended timeouts
+    
     # Try enhanced mDNS discovery first
     logger.info("Attempting enhanced mDNS discovery method...")
     try:
@@ -1382,17 +1841,8 @@ async def verify_operational_network(ssid, wifi_1st_ap_ssid, read_single_attribu
                 # Small wait to allow network and mDNS to stabilize naturally
                 await asyncio.sleep(TH_PROCESS_WAIT)
 
-            # Progressive delay - ESP32 needs more time after network switch
-            if retry == 1:
-                retry_delay = DUT_PROGRESSIVE_RETRY_BASE  # First retry: 3s
-            elif retry == 2:
-                retry_delay = DUT_PROGRESSIVE_RETRY_BASE + 2  # Second retry: 5s
-            elif retry == 3:
-                retry_delay = DUT_PROGRESSIVE_RETRY_BASE + 4  # Third retry: 7s
-            else:
-                retry_delay = DUT_RECOVERY_DELAY  # Final retry: 6s
-
-            await asyncio.sleep(retry_delay)
+            # Fixed delay - ESP32 needs time after network switch
+            await asyncio.sleep(DUT_RECOVERY_DELAY)
         else:
             asserts.fail(f"verify_operational_network: Could not read networks after {max_retries_for_discovery} retries.")
 
