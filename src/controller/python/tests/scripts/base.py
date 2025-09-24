@@ -778,7 +778,7 @@ class BaseTestHelper:
 
         return True
 
-    async def TestMultiFabric(self, ip: str, setuppin: int, nodeid: int):
+    async def TestMultiFabric(self, setup_code: str, nodeid: int):
         self.logger.info("Opening Commissioning Window")
 
         await self.devCtrl.SendCommand(
@@ -796,7 +796,7 @@ class BaseTestHelper:
             self.controllerNodeId, self.paaTrustStorePath)
 
         try:
-            await self.devCtrl2.CommissionIP(ip, setuppin, nodeid)
+            await self.devCtrl2.CommissionWithCode(setupPayload=setup_code)
         except ChipStackException:
             self.logger.exception(
                 "Failed to finish key exchange with device {}".format(ip))

@@ -49,6 +49,7 @@ from network_commissioning import NetworkCommissioningTests
 
 import matter.logging
 from matter.tracing import TracingContext
+from matter.setup_payload import SetupPayload
 
 # The thread network dataset tlv for testing, splitted into T-L-V.
 
@@ -86,13 +87,13 @@ async def ethernet_commissioning(test: BaseTestHelper, discriminator: int, setup
     # FailIfNot(test.SetNetworkCommissioningParameters(dataset=TEST_THREAD_NETWORK_DATASET_TLV),
     #           "Failed to finish network commissioning")
 
+    qr = SetupPayload().GenerateQrCode(setup_pin)
+
     if address_override:
         address = address_override
 
     logger.info("Testing commissioning")
-    FailIfNot(await test.TestCommissioning(ip=address,
-                                           setuppin=setup_pin,
-                                           nodeid=device_nodeid),
+    FailIfNot(await test.TestCommissioningWithSetupPayload(setupPayload=qr, nodeid=device_nodeid),
               "Failed to finish key exchange")
 
     logger.info("Testing multi-controller setup on the same fabric")
@@ -101,9 +102,7 @@ async def ethernet_commissioning(test: BaseTestHelper, discriminator: int, setup
     logger.info("Testing CATs used on controllers")
     FailIfNot(await test.TestControllerCATValues(nodeid=device_nodeid), "Failed the controller CAT test")
 
-    ok = await test.TestMultiFabric(ip=address,
-                                    setuppin=20202021,
-                                    nodeid=1)
+    ok = await test.TestMultiFabric(setup_code=qr, nodeid=1)
     FailIfNot(ok, "Failed to commission multi-fabric")
 
     FailIfNot(await test.TestAddUpdateRemoveFabric(nodeid=device_nodeid),
