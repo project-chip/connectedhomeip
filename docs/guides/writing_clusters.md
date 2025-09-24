@@ -46,8 +46,22 @@ generated from XML definitions located in
 
 ### File Structure
 
-Create a new directory for your cluster at `src/app/clusters/<cluster-name>/`.
+Create a new directory for your cluster at `src/app/clusters/<cluster-folder>/`.
 This directory will house the cluster implementation and its unit tests.
+
+For zap-based support, the directory mapping is defined in
+[src/app/zap_cluster_list.json](https://github.com/project-chip/connectedhomeip/blob/master/src/app/zap_cluster_list.json)
+under the `ServerDirectories` key. This maps the `UPPER_SNAKE_CASE` define of
+the cluster to the folder name under `src/app/clusters`.
+
+#### Naming conventions
+
+Names vary, however to be consistent with most of the existing code use:
+
+-   `cluster-name-server` for the cluster folder name
+-   `ClusterNameSnakeCluster.h/cpp` for the `ServerClusterInterface`
+    implementation
+-   `ClusterNameSnakeLogic.h/cpp` for the `Logic` implementation if applicable
 
 ### Recommended Modular Layout
 
@@ -91,9 +105,32 @@ attribute's value changes.
 -   Use the context to call
     `interactionContext->dataModelChangeListener->MarkDirty(path)`. A
     `NotifyAttributeChanged` helper exists for paths managed by this cluster.
+
     -   For write implementations, you can use `NotifyAttributeChangedIfSuccess`
         together with a separate `WriteImpl` such that any successful attribute
         write will notify.
+
+        Canonical example code would look like:
+
+        ```cpp
+        DataModel::ActionReturnStatus SomeCluster::WriteAttribute(const DataModel::WriteAttributeRequest & request,
+                                                                  AttributeValueDecoder & decoder)
+        {
+            // Delegate everything to WriteImpl. If write succeeds, notify that the attribute changed.
+            return NotifyAttributeChangedIfSuccess(request.path.mAttributeId, WriteImpl(request, decoder));
+        }
+        ```
+
+    -   For the `NofifyAttributeChangedIfSuccess` ensure that WriteImpl is
+        returning
+        [ActionReturnStatus::FixedStatus::kWriteSuccessNoOp](https://github.com/project-chip/connectedhomeip/blob/master/src/app/data-model-provider/ActionReturnStatus.h
+        when no notification should be sent (e.g. write was a noop)
+
+        Canonical example is:
+
+        ```cpp
+        VerifyOrReturnValue(mValue != value, ActionReturnStatus::FixedStatus::kWriteSuccessNoOp);
+        ```
 
 #### Persistent Storage
 
