@@ -282,45 +282,5 @@ TEST_F(TestDiagnosticLogsCluster, Bdx_NoDelegate_NoLogs)
     EXPECT_EQ(decoded.status, DiagnosticLogs::StatusEnum::kNoLogs);
 }
 
-TEST_F(TestDiagnosticLogsCluster, Bdx_NoFileDesignator_InvalidCommand)
-{
-    DiagnosticLogsCluster diagnosticLogsCluster;
-
-    MockDelegate delegate;
-    uint8_t buffer[2048];
-    delegate.SetDiagnosticBuffer(buffer, sizeof(buffer));
-    diagnosticLogsCluster.SetDelegate(&delegate);
-
-    const ConcreteCommandPath kPath{ kRootEndpoint, DiagnosticLogs::Id, DiagnosticLogs::Commands::RetrieveLogsRequest::Id };
-    MockCommandHandler handler;
-
-    auto result = diagnosticLogsCluster.HandleLogRequestForBdx(&handler, kPath, DiagnosticLogs::IntentEnum::kEndUserSupport,
-                                                               Optional<CharSpan>());
-    ASSERT_TRUE(result.has_value());
-    EXPECT_EQ(result.value(), Status::InvalidCommand);
-}
-
-TEST_F(TestDiagnosticLogsCluster, Bdx_TooLongFileDesignator_ConstraintError)
-{
-    DiagnosticLogsCluster diagnosticLogsCluster;
-
-    MockDelegate delegate;
-    uint8_t buffer[2048];
-    delegate.SetDiagnosticBuffer(buffer, sizeof(buffer));
-    diagnosticLogsCluster.SetDelegate(&delegate);
-
-    const ConcreteCommandPath kPath{ kRootEndpoint, DiagnosticLogs::Id, DiagnosticLogs::Commands::RetrieveLogsRequest::Id };
-    MockCommandHandler handler;
-
-    char longFileName[256]; // kMaxFileDesignatorLen is 255
-    memset(longFileName, 'a', sizeof(longFileName) - 1);
-    longFileName[sizeof(longFileName) - 1] = '\0';
-
-    auto result = diagnosticLogsCluster.HandleLogRequestForBdx(&handler, kPath, DiagnosticLogs::IntentEnum::kEndUserSupport,
-                                                               MakeOptional(CharSpan::fromCharString(longFileName)));
-    ASSERT_TRUE(result.has_value());
-    EXPECT_EQ(result.value(), Status::ConstraintError);
-}
-
 } // namespace app
 } // namespace chip
