@@ -107,6 +107,11 @@ DiagnosticDataProviderImpl & DiagnosticDataProviderImpl::GetDefaultInstance()
     return sInstance;
 }
 
+bool DiagnosticDataProviderImpl::SupportsWatermarks()
+{
+    return true;
+}
+
 CHIP_ERROR DiagnosticDataProviderImpl::GetCurrentHeapFree(uint64_t & currentHeapFree)
 {
     currentHeapFree = esp_get_free_heap_size();
