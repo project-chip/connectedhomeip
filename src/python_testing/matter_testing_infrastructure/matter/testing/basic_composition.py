@@ -38,7 +38,7 @@ from matter.testing.conformance import ConformanceException
 from matter.testing.matter_testing import MatterTestConfig, ProblemNotice
 from matter.testing.spec_parsing import PrebuiltDataModelDirectory, build_xml_clusters, build_xml_device_types, dm_from_spec_version
 
-logger = logging.getLogger(__name__)
+LOGGER = logging.getLogger(__name__)
 
 def log_structured_data(start_tag: str, dump_string: str):
     """Log structured data with a clear start and end marker.
@@ -51,11 +51,10 @@ def log_structured_data(start_tag: str, dump_string: str):
         dump_string: The data to be logged
     """
     lines = dump_string.splitlines()
-    logger.info(f'{start_tag}BEGIN ({len(lines)} lines)====')
+    LOGGER.info(f'{start_tag}BEGIN ({len(lines)} lines)====')
     for line in lines:
-        logger.info(f'{start_tag}{line}')
-    logger.info(f'{start_tag}END ====')
-
+        LOGGER.info(f'{start_tag}{line}')
+    LOGGER.info(f'{start_tag}END ====')
 
 @dataclass
 class ArlData:
@@ -183,7 +182,7 @@ class BasicCompositionTests:
         """
         node_dump_dict = {endpoint_id: MatterTlvToJson(self.endpoints_tlv[endpoint_id]) for endpoint_id in self.endpoints_tlv}
         json_dump_string = json.dumps(node_dump_dict, indent=2)
-        logging.debug(f"Raw TLV contents of Node: {json_dump_string}")
+        LOGGER.debug(f"Raw TLV contents of Node: {json_dump_string}")
 
         if dump_device_composition_path is not None:
             with open(pathlib.Path(dump_device_composition_path).with_suffix(".json"), "wt+") as outfile:
@@ -198,9 +197,9 @@ class BasicCompositionTests:
         self.test_from_file = self.user_params.get("test_from_file", None)
 
         def log_test_start():
-            logging.info("###########################################################")
-            logging.info("Start of actual tests")
-            logging.info("###########################################################")
+            LOGGER.info("###########################################################")
+            LOGGER.info("Start of actual tests")
+            LOGGER.info("###########################################################")
 
         if self.test_from_file:
             cache = JsonToMatterTlv(self.test_from_file)
@@ -275,7 +274,7 @@ class BasicCompositionTests:
             spec_version = self.endpoints[0][Clusters.BasicInformation][Clusters.BasicInformation.Attributes.SpecificationVersion]
         except KeyError:
             # For now, assume we're looking at a 1.2 device (this is as close as we can get before the 1.1 and 1.0 DM files are populated)
-            logging.info("No specification version attribute found in the Basic Information cluster - assuming 1.2 as closest match")
+            LOGGER.info("No specification version attribute found in the Basic Information cluster - assuming 1.2 as closest match")
             return PrebuiltDataModelDirectory.k1_2
         try:
             dm = dm_from_spec_version(spec_version)
@@ -288,9 +287,9 @@ class BasicCompositionTests:
 
     def build_spec_xmls(self):
         dm = self._get_dm()
-        logging.info("----------------------------------------------------------------------------------")
-        logging.info(f"-- Running tests against Specification version {dm.dirname}")
-        logging.info("----------------------------------------------------------------------------------")
+        LOGGER.info("----------------------------------------------------------------------------------")
+        LOGGER.info(f"-- Running tests against Specification version {dm.dirname}")
+        LOGGER.info("----------------------------------------------------------------------------------")
         self.xml_clusters, self.problems = build_xml_clusters(dm)
         self.xml_device_types, problems = build_xml_device_types(dm)
         self.problems.extend(problems)
@@ -303,18 +302,18 @@ class BasicCompositionTests:
         """
         # Check if we have problems and device attributes are available
         if len(self.problems) > 0:
-            logger.info("BasicCompositionTests: Problems detected - attempting device attribute dump")
+            LOGGER.info("BasicCompositionTests: Problems detected - attempting device attribute dump")
             try:
                 if hasattr(self, 'endpoints_tlv') and self.endpoints_tlv:
-                    logger.info("Device attribute data available - generating dump")
+                    LOGGER.info("Device attribute data available - generating dump")
                     _, txt_str = self.dump_wildcard(None)
                     # Only dump the text format - it's more readable for debugging
                     log_structured_data('==== FAILURE_DUMP_txt: ', txt_str)
                 else:
-                    logger.info("No device attribute data available (endpoints_tlv not populated)")
+                    LOGGER.info("No device attribute data available (endpoints_tlv not populated)")
             except Exception as e:
                 # Don't let logging errors interfere with the original test failure
-                logger.warning(f"Failed to generate device attribute dump: {e}")
+                LOGGER.warning(f"Failed to generate device attribute dump: {e}")
 
         # Call the parent teardown_class method to handle normal teardown and problem logging
         super().teardown_class()

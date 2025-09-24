@@ -53,7 +53,7 @@ public:
 
 } // namespace
 
-void emberAfOtaSoftwareUpdateProviderClusterServerInitCallback(EndpointId endpointId)
+void MatterOtaSoftwareUpdateProviderClusterInitCallback(EndpointId endpointId)
 {
     IntegrationDelegate integrationDelegate;
 
@@ -69,7 +69,7 @@ void emberAfOtaSoftwareUpdateProviderClusterServerInitCallback(EndpointId endpoi
         integrationDelegate);
 }
 
-void MatterOtaSoftwareUpdateProviderClusterServerShutdownCallback(EndpointId endpointId)
+void MatterOtaSoftwareUpdateProviderClusterShutdownCallback(EndpointId endpointId)
 {
     IntegrationDelegate integrationDelegate;
 
@@ -96,7 +96,7 @@ void SetDelegate(EndpointId endpointId, OTAProviderDelegate * delegate)
 {
     IntegrationDelegate integrationDelegate;
 
-    ServerClusterInterface * interface = CodegenClusterIntegration::GetClusterForEndpointIndex(
+    ServerClusterInterface * interface = CodegenClusterIntegration::FindClusterOnEndpoint(
         {
             .endpointId                = endpointId,
             .clusterId                 = OtaSoftwareUpdateProvider::Id,
