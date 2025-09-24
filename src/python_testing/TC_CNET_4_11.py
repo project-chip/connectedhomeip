@@ -66,24 +66,37 @@ class ConnectionResult:
         self.stderr = stderr
 
 
-async def run_command(command: str) -> str:
-    """Execute a shell command asynchronously"""
+async def run_subprocess(cmd, check=False, capture_output=False, timeout=ATTRIBUTE_READ_TIMEOUT):
     try:
-        proc = await asyncio.create_subprocess_shell(
-            command,
+        proc = await asyncio.create_subprocess_exec(
+            *cmd,
             stdout=asyncio.subprocess.PIPE,
             stderr=asyncio.subprocess.PIPE
         )
-        stdout, stderr = await proc.communicate()
 
-        if proc.returncode != 0:
-            logger.error(f"run_command: Command failed: {command} - {stderr.decode()}")
-            return ""
+        stdout, stderr = await asyncio.wait_for(proc.communicate(), timeout=timeout)
 
-        return stdout.decode()
+        if check and proc.returncode != 0:
+            raise subprocess.CalledProcessError(proc.returncode, cmd, stdout, stderr)
+
+        if capture_output:
+            return stdout.decode() if proc.returncode == 0 else ""
+        else:
+            return proc.returncode == 0
+
+    except asyncio.TimeoutError:
+        logger.warning(f"run_subprocess: Command timed out after {timeout}s: {' '.join(cmd)}")
+        if check:
+            raise
+        return "" if capture_output else False
+    except subprocess.CalledProcessError as e:
+        logger.warning(f"run_subprocess: Subprocess failed (handled): {' '.join(cmd)}")
+        if check:
+            raise
+        return "" if capture_output else False
     except Exception as e:
-        logger.error(f"run_command: Command execution failed: {command} - {e}")
-        return ""
+        logger.error(f"run_subprocess: Subprocess error: {' '.join(cmd)} - {e}")
+        return "" if capture_output else False
 
 
 async def detect_wifi_iface():
@@ -168,7 +181,7 @@ async def connect_wifi_linux(ssid, password) -> ConnectionResult:
             return ConnectionResult(1, f"SSID {ssid} not available")
 
         # Ensure interface is up and reset state
-        await run_command(f"sudo ip link set {iface} up")
+        await run_subprocess(["sudo", "ip", "link", "set", iface, "up"])
         await asyncio.sleep(1)
 
         # Disconnect from any current connection
@@ -243,9 +256,9 @@ async def connect_wifi_linux(ssid, password) -> ConnectionResult:
             # If connection failed and we have more attempts, reset interface
             if retry < MAX_RETRIES:
                 logger.warning(f"connect_wifi_linux: Attempt {retry} failed, resetting interface")
-                await run_command(f"sudo ip link set {iface} down")
+                await run_subprocess(["sudo", "ip", "link", "set", iface, "down"])
                 await asyncio.sleep(2)
-                await run_command(f"sudo ip link set {iface} up")
+                await run_subprocess(["sudo", "ip", "link", "set", iface, "up"])
                 await asyncio.sleep(3)
                 await wpa_command(iface, f"SELECT_NETWORK {net_id}")
                 await wpa_command(iface, "REASSOCIATE")
@@ -258,9 +271,9 @@ async def connect_wifi_linux(ssid, password) -> ConnectionResult:
 
         # Connection successful, get IP address
         # Release any existing DHCP lease and request new one
-        await run_command(f"sudo dhclient -r {iface}")
+        await run_subprocess(["sudo", "dhclient", "-r", iface])
         await asyncio.sleep(1)
-        await run_command(f"sudo dhclient {iface}")
+        await run_subprocess(["sudo", "dhclient", iface])
 
         # Wait for IP assignment with retry
         ip_timeout = IP_TIMEOUT
@@ -496,7 +509,124 @@ async def change_networks(test, cluster, ssid, password, breadcrumb):
     raise Exception(f"Failed to switch networks to {ssid} after {MAX_RETRIES} attempts")
 
 
+async def parse_default_routes():
+    try:
+        output = await run_subprocess(["ip", "route", "show", "default"], check=True, capture_output=True)
+        routes_info = []
+
+        for line in output.splitlines():
+            if "default via" in line:
+                # Parse route: "default via 192.168.1.1 dev eth0 proto dhcp src 192.168.1.54 metric 100"
+                parts = line.split()
+                gateway = None
+                interface = None
+                metric = None
+
+                for i, part in enumerate(parts):
+                    if part == "via" and i + 1 < len(parts):
+                        gateway = parts[i + 1]
+                    elif part == "dev" and i + 1 < len(parts):
+                        interface = parts[i + 1]
+                    elif part == "metric" and i + 1 < len(parts):
+                        metric = parts[i + 1]
+
+                if gateway and interface:
+                    routes_info.append({
+                        "gateway": gateway,
+                        "interface": interface,
+                        "metric": metric,
+                        "full_line": line.strip(),
+                        "is_lan": not any(x in interface for x in ["wlan", "wl", "wifi", "wlp", "wlx"])
+                    })
+
+        return routes_info
+    except Exception as e:
+        logger.error(f"parse_default_routes: Error parsing routes: {e}")
+        return []
+
+
+async def remove_lan_routes():
+    original_routes = []
+
+    try:
+        routes_info = await parse_default_routes()
+
+        for route in routes_info:
+            if route["is_lan"]:  # Only remove LAN routes
+                gateway = route["gateway"]
+                interface = route["interface"]
+
+                logger.info(f"remove_lan_routes: Removing default route via {gateway} dev {interface}")
+                try:
+                    await run_subprocess(["sudo", "ip", "route", "del", "default", "via", gateway, "dev", interface], check=True)
+                    original_routes.append(route)
+                except subprocess.CalledProcessError as e:
+                    logger.warning(f"remove_lan_routes: Failed to remove route via {gateway}: {e}")
+
+        if original_routes:
+            logger.info(f"remove_lan_routes: Removed {len(original_routes)} LAN default route(s)")
+        else:
+            logger.info("remove_lan_routes: No LAN default routes found to remove")
+
+    except Exception as e:
+        logger.error(f"remove_lan_routes: Error removing LAN routes: {e}")
+
+    return original_routes
+
+
+async def restore_lan_routes(original_routes):
+    if not original_routes:
+        logger.info("restore_lan_routes: No original routes to restore")
+        return
+
+    for route in original_routes:
+        gateway = route["gateway"]
+        interface = route["interface"]
+        metric = route["metric"]
+
+        logger.info(f"restore_lan_routes: Restoring default route via {gateway} dev {interface}")
+        try:
+            cmd = ["sudo", "ip", "route", "add", "default", "via", gateway, "dev", interface]
+            if metric:
+                cmd.extend(["metric", metric])
+            await run_subprocess(cmd, check=True)
+        except subprocess.CalledProcessError as e:
+            logger.warning(f"restore_lan_routes: Failed to restore route via {gateway}: {e}")
+            # Try to restore using dhclient as fallback
+            try:
+                await run_subprocess(["sudo", "dhclient", "-r", interface])
+                await asyncio.sleep(0.5)
+                await run_subprocess(["sudo", "dhclient", interface])
+                logger.info(f"restore_lan_routes: Attempted DHCP refresh for {interface}")
+            except Exception as dhcp_e:
+                logger.warning(f"restore_lan_routes: DHCP fallback failed for {interface}: {dhcp_e}")
+
+
 class TC_CNET_4_11(MatterBaseTest):
+
+    @classmethod
+    def setup_class(cls):
+        """Remove default route from LAN interface to force traffic through Wi-Fi during test."""
+        try:
+            logger.info("setup_class: Setting up test environment...")
+            # Remove LAN routes to force traffic through Wi-Fi during the test
+            cls._original_routes = asyncio.run(remove_lan_routes())
+            logger.info("setup_class: Network environment setup completed successfully")
+        except Exception as e:
+            logger.error(f"setup_class: Failed to setup network environment: {e}")
+            cls._original_routes = []
+            raise
+
+    @classmethod
+    def teardown_class(cls):
+        """Restore original default routes after the test finishes."""
+        try:
+            original_routes = getattr(cls, "_original_routes", [])
+            logger.info("teardown_class: Restoring network environment...")
+            # Restore original LAN routes using helper function
+            asyncio.run(restore_lan_routes(original_routes))
+        except Exception as e:
+            logger.error(f"teardown_class: Failed to teardown network environment: {e}")
 
     # Overrides default_timeout: Test includes several long waits, adjust timeout to accommodate.
     @property
