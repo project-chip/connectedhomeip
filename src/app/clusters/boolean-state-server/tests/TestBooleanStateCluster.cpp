@@ -179,7 +179,6 @@ TEST_F(TestBooleanStateCluster, EventGeneratedOnStateChange)
             // Ensure initial value is false, then change to true and expect an event
             EXPECT_EQ(booleanState.GetStateValue(), false);
             auto eventNumber = booleanState.SetStateValue(true);
-            EXPECT_TRUE(eventNumber.has_value());
 
             auto & logOnlyEvents = context.EventsGenerator();
             using EventType      = chip::app::Clusters::BooleanState::Events::StateChange::Type;
@@ -187,6 +186,7 @@ TEST_F(TestBooleanStateCluster, EventGeneratedOnStateChange)
 
             // Lambda to verify the last emitted event metadata and payload
             auto verifyLastEvent = [&](bool expectedStateValue) {
+                ASSERT_TRUE(eventNumber.has_value());
                 EXPECT_EQ(eventNumber.value(), logOnlyEvents.CurrentEventNumber());
                 EXPECT_EQ(logOnlyEvents.LastOptions().mPath,
                           ConcreteEventPath(endpoint, EventType::GetClusterId(), EventType::GetEventId()));
@@ -199,7 +199,6 @@ TEST_F(TestBooleanStateCluster, EventGeneratedOnStateChange)
 
             // Now, change from true to false and expect an event
             eventNumber = booleanState.SetStateValue(false);
-            EXPECT_TRUE(eventNumber.has_value());
 
             // Verify event with expected false value
             verifyLastEvent(false);
@@ -233,11 +232,11 @@ TEST_F(TestBooleanStateCluster, NoEventWhenValueUnchanged)
             EXPECT_GT(logOnlyEvents.CurrentEventNumber(), initialCount);
 
             // Re-set to the same value (true) and confirm no new event is generated
-            EventNumber before = logOnlyEvents.CurrentEventNumber();
+            EventNumber eventCountAfterChange = logOnlyEvents.CurrentEventNumber();
 
             auto thirdEvent = booleanState.SetStateValue(true);
             EXPECT_FALSE(thirdEvent.has_value());
-            EXPECT_EQ(logOnlyEvents.CurrentEventNumber(), before);
+            EXPECT_EQ(logOnlyEvents.CurrentEventNumber(), eventCountAfterChange);
         });
     }
 }
