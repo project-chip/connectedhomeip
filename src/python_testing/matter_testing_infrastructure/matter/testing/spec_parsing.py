@@ -478,7 +478,151 @@ class ClusterParser:
 
         return (read_access, write_access, invoke_access)
 
+    def _parse_basic_field_attributes(self, xml_field: ElementTree.Element, component_type: DataTypeEnum, component_tags: dict) -> tuple[str, uint] | None:
+        """
+        Extract basic field attributes (name and ID) from XML element.
+        
+        Args:
+            xml_field: XML element representing the field/item/bitfield
+            component_type: Type of component being parsed (struct/enum/bitmap)
+            component_tags: Mapping of component types to their XML tag info
+            
+        Returns:
+            Tuple of (name, id) if successful, None if parsing failed
+        """
+        try:
+            name = xml_field.attrib['name']
+            id = uint(int(xml_field.attrib[component_tags[component_type].id_attrib], 0))
+            return (name, id)
+        except (KeyError, ValueError):
+            return None
+
+    def _determine_optional_status(self, xml_field: ElementTree.Element) -> bool:
+        """
+        Determine if a field is optional based on XML attributes and child elements.
+        
+        Checks both:
+        1. isOptional attribute on the field element
+        2. Presence of optionalConform child element
+        
+        Args:
+            xml_field: XML element representing the field
+            
+        Returns:
+            True if field is optional, False otherwise
+        """
+        # Check isOptional attribute
+        if 'isOptional' in xml_field.attrib and xml_field.attrib['isOptional'] == 'true':
+            return True
+            
+        # Check for optionalConform child element
+        optional_conform = xml_field.find('./optionalConform')
+        return optional_conform is not None
+
+    def _determine_nullable_status(self, xml_field: ElementTree.Element) -> bool:
+        """
+        Determine if a field is nullable based on XML attributes and child elements.
+        
+        Checks both:
+        1. isNullable attribute on the field element
+        2. nullable attribute on quality child element
+        
+        Args:
+            xml_field: XML element representing the field
+            
+        Returns:
+            True if field is nullable, False otherwise
+        """
+        # Check isNullable attribute
+        if 'isNullable' in xml_field.attrib and xml_field.attrib['isNullable'] == 'true':
+            return True
+            
+        # Check quality child element for nullable attribute
+        quality = xml_field.find('./quality')
+        if quality is not None and 'nullable' in quality.attrib and quality.attrib['nullable'] == 'true':
+            return True
+            
+        return False
+
+    def _parse_field_constraints(self, xml_field: ElementTree.Element) -> dict | None:
+        """
+        Parse constraint information from XML field element.
+        
+        Handles both direct constraint attributes (min/max) and child elements (maxCount).
+        For maxCount, also extracts attribute references if present.
+        
+        Args:
+            xml_field: XML element representing the field
+            
+        Returns:
+            Dictionary of constraints if any found, None otherwise
+        """
+        constraint_elements = xml_field.findall('./constraint')
+        if not constraint_elements:
+            return None
+            
+        constraints = {}
+        for constraint in constraint_elements:
+            # Handle direct attributes like min/max
+            for attr_name in ['min', 'max']:
+                if attr_name in constraint.attrib:
+                    constraints[attr_name] = constraint.attrib[attr_name]
+
+            # Handle maxCount child element
+            max_count = constraint.find('./maxCount')
+            if max_count is not None and max_count.text is not None:
+                constraints['maxCount'] = max_count.text
+                # If maxCount references an attribute, store that reference
+                attr_element = max_count.find('./attribute')
+                if attr_element is not None and 'name' in attr_element.attrib:
+                    constraints['maxCountAttribute'] = attr_element.attrib['name']
+                    
+        return constraints if constraints else None
+
+    def _parse_field_conformance(self, xml_field: ElementTree.Element) -> ConformanceCallable:
+        """
+        Parse conformance information from XML field element with fallback.
+        
+        Attempts to parse conformance from XML, but falls back to optional conformance
+        if parsing fails. This handles cases where struct fields have arithmetic or
+        description conformances that are currently unused.
+        
+        Args:
+            xml_field: XML element representing the field
+            
+        Returns:
+            Conformance object (either parsed or optional fallback)
+        """
+        xml_conformance, problems = get_conformance(xml_field, self._cluster_id)
+        
+        # Try to parse conformance if no problems found
+        if not problems:
+            conformance = self.parse_conformance(xml_conformance)
+            if conformance:
+                return conformance
+                
+        # Fallback to optional conformance
+        # Note: Many struct fields have arithmetic/desc conformances that are unused
+        return optional()
+
     def _parse_components(self, struct: ElementTree.Element, component_type: DataTypeEnum) -> dict[uint, XmlDataTypeComponent]:
+        """
+        Parse components (fields/items/bitfields) from a data type XML element.
+        
+        This method orchestrates the parsing of struct fields, enum items, or bitmap bitfields
+        by delegating specific parsing tasks to focused helper methods. It handles:
+        - Basic attribute extraction (name, ID)
+        - Field property detection (optional, nullable)
+        - Constraint parsing (min/max values, counts)
+        - Conformance parsing with fallback logic
+        
+        Args:
+            struct: XML element containing the data type definition
+            component_type: Type of components to parse (struct/enum/bitmap)
+            
+        Returns:
+            Dictionary mapping component IDs to XmlDataTypeComponent objects
+        """
         @dataclass
         class ComponentTag:
             tag: str
@@ -491,68 +635,26 @@ class ClusterParser:
         for xml_field in list(struct):
             if xml_field.tag != component_tags[component_type].tag:
                 continue
-            try:
-                name = xml_field.attrib['name']
-                id = uint(int(xml_field.attrib[component_tags[component_type].id_attrib], 0))
-            except (KeyError, ValueError):
+                
+            # Parse basic field attributes (name and ID)
+            field_attrs = self._parse_basic_field_attributes(xml_field, component_type, component_tags)
+            if field_attrs is None:
                 p = ProblemNotice("Spec XML Parsing", location=location,
                                   severity=ProblemSeverity.WARNING, problem=f"{component_type.value.capitalize()} field in {struct_name} with no id or name")
                 self._problems.append(p)
                 continue
+            
+            name, id = field_attrs
 
             # Extract additional field attributes
             summary = xml_field.attrib.get('summary', None)
             type_info = xml_field.attrib.get('type', None) if component_type == DataTypeEnum.kStruct else None
 
-            # Check for optional fields - determined by optionalConform tag or isOptional attribute
-            is_optional = False
-            if 'isOptional' in xml_field.attrib and xml_field.attrib['isOptional'] == 'true':
-                is_optional = True
-            else:
-                # Also check for optionalConform tag
-                optional_conform = xml_field.find('./optionalConform')
-                if optional_conform is not None:
-                    is_optional = True
-
-            # Check for nullable fields - determined by quality tag with nullable attribute
-            is_nullable = False
-            if 'isNullable' in xml_field.attrib and xml_field.attrib['isNullable'] == 'true':
-                is_nullable = True
-            else:
-                # Also check for quality tag with nullable attribute
-                quality = xml_field.find('./quality')
-                if quality is not None and 'nullable' in quality.attrib and quality.attrib['nullable'] == 'true':
-                    is_nullable = True
-
-            # Process constraints - handle both direct attributes and child elements
-            constraints = None
-            # First check for direct constraint elements with attributes
-            constraint_elements = xml_field.findall('./constraint')
-            if constraint_elements:
-                constraints = {}
-                for constraint in constraint_elements:
-                    # Handle direct attributes like min/max
-                    for attr_name in ['min', 'max']:
-                        if attr_name in constraint.attrib:
-                            constraints[attr_name] = constraint.attrib[attr_name]
-
-                    # Handle child elements like maxCount
-                    max_count = constraint.find('./maxCount')
-                    if max_count is not None and max_count.text is not None:
-                        constraints['maxCount'] = max_count.text
-                        # If maxCount references an attribute, store that reference
-                        attr_element = max_count.find('./attribute')
-                        if attr_element is not None and 'name' in attr_element.attrib:
-                            constraints['maxCountAttribute'] = attr_element.attrib['name']
-
-            xml_conformance, problems = get_conformance(xml_field, self._cluster_id)
-            # There are a LOT of struct fields with either arithmetic or desc conformances. We'll just call these as optional if we can't parse
-            # These are currently unused, so this is fine for now.
-            conformance = None
-            if not problems:
-                conformance = self.parse_conformance(xml_conformance)
-            if not conformance:
-                conformance = optional()
+            # Determine field properties using helper methods
+            is_optional = self._determine_optional_status(xml_field)
+            is_nullable = self._determine_nullable_status(xml_field)
+            constraints = self._parse_field_constraints(xml_field)
+            conformance = self._parse_field_conformance(xml_field)
 
             # Create component with all extracted attributes
             components[id] = XmlDataTypeComponent(
@@ -1499,4 +1601,4 @@ def dm_from_spec_version(specification_version: uint) -> PrebuiltDataModelDirect
     if specification_version not in version_to_dm.keys():
         raise ConformanceException(f"Unknown specification_version 0x{specification_version:08X}")
 
-    return version_to_dm[specification_version]
+    return version_to_dm

@@ -393,7 +393,7 @@ class TestSpecParsingDataType(MatterBaseTest):
         asserts.assert_equal(len(enum.components), 1, "Should only have one valid item")
         asserts.assert_true(uint(0) in enum.components, "Valid item not found in enum components")
         asserts.assert_equal(len(problems), 1, "Should have one problem for invalid item")
-        asserts.assert_true("Struct field in TestEnum with no id or name" in problems[0].problem,
+        asserts.assert_true("Enum field in TestEnum with no id or name" in problems[0].problem,
                             "Problem message doesn't match expected error")
 
     def test_invalid_bitmap_field(self):
@@ -424,7 +424,7 @@ class TestSpecParsingDataType(MatterBaseTest):
         asserts.assert_equal(len(bitmap.components), 1, "Should only have one valid field")
         asserts.assert_true(uint(0) in bitmap.components, "Valid bitfield not found in bitmap components")
         asserts.assert_equal(len(problems), 1, "Should have one problem for invalid bitfield")
-        asserts.assert_true("Struct field in TestBitmap with no id or name" in problems[0].problem,
+        asserts.assert_true("Bitmap field in TestBitmap with no id or name" in problems[0].problem,
                             "Problem message doesn't match expected error")
 
     def test_missing_name(self):
