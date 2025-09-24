@@ -18,6 +18,7 @@
 
 #include "push-av-stream-manager.h"
 
+#include <algorithm>
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
@@ -310,7 +311,9 @@ PushAvStreamTransportManager::ValidateBandwidthLimit(StreamUsageEnum streamUsage
     return Status::Success;
 }
 
-bool PushAvStreamTransportManager::ValidateStreamUsage(StreamUsageEnum streamUsage)
+bool PushAvStreamTransportManager::ValidateStreamUsage(StreamUsageEnum streamUsage,
+                                                       const Optional<DataModel::Nullable<uint16_t>> & videoStreamId,
+                                                       const Optional<DataModel::Nullable<uint16_t>> & audioStreamId)
 {
     std::vector<StreamUsageEnum> supportedStreamUsages = mCameraDevice->GetCameraHALInterface().GetSupportedStreamUsages();
     auto it = std::find(supportedStreamUsages.begin(), supportedStreamUsages.end(), streamUsage);

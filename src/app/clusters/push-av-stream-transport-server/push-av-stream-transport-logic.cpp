@@ -711,7 +711,8 @@ PushAvStreamTransportServerLogic::HandleAllocatePushTransport(CommandHandler & h
         return std::nullopt;
     }
 
-    bool isValidStreamUsage = mDelegate->ValidateStreamUsage(transportOptions.streamUsage);
+    bool isValidStreamUsage = mDelegate->ValidateStreamUsage(transportOptions.streamUsage, transportOptions.videoStreamID,
+                                                             transportOptions.audioStreamID);
     if (isValidStreamUsage == false)
     {
         auto status = to_underlying(StatusCodeEnum::kInvalidStreamUsage);
