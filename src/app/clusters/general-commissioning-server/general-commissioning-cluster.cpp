@@ -123,7 +123,6 @@ void NotifyTermsAndConditionsAttributeChangeIfRequired(const TermsAndConditionsS
     // Notify on TCAcknowledgementsRequired change
     if (initialState.acknowledgementsRequired != updatedState.acknowledgementsRequired)
     {
-        // FIXME: this is NOT OK
         MatterReportingAttributeChangeCallback(kRootEndpointId, GeneralCommissioning::Id, TCAcknowledgementsRequired::Id);
     }
 
@@ -132,7 +131,6 @@ void NotifyTermsAndConditionsAttributeChangeIfRequired(const TermsAndConditionsS
         (initialState.acceptance.HasValue() &&
          (initialState.acceptance.Value().GetVersion() != updatedState.acceptance.Value().GetVersion())))
     {
-        // FIXME: this is NOT OK
         MatterReportingAttributeChangeCallback(kRootEndpointId, GeneralCommissioning::Id, TCAcceptedVersion::Id);
     }
 
@@ -141,7 +139,6 @@ void NotifyTermsAndConditionsAttributeChangeIfRequired(const TermsAndConditionsS
         (initialState.acceptance.HasValue() &&
          (initialState.acceptance.Value().GetValue() != updatedState.acceptance.Value().GetValue())))
     {
-        // FIXME: this is NOT OK
         MatterReportingAttributeChangeCallback(kRootEndpointId, GeneralCommissioning::Id, TCAcknowledgements::Id);
     }
 
@@ -151,7 +148,6 @@ void NotifyTermsAndConditionsAttributeChangeIfRequired(const TermsAndConditionsS
          (initialState.requirements.Value().GetVersion() != updatedState.requirements.Value().GetVersion() ||
           initialState.requirements.Value().GetValue() != updatedState.requirements.Value().GetValue())))
     {
-        // FIXME: this is NOT OK
         MatterReportingAttributeChangeCallback(kRootEndpointId, GeneralCommissioning::Id, TCMinRequiredVersion::Id);
     }
 
@@ -160,7 +156,6 @@ void NotifyTermsAndConditionsAttributeChangeIfRequired(const TermsAndConditionsS
         (initialState.updateAcceptanceDeadline.HasValue() &&
          (initialState.updateAcceptanceDeadline.Value() != updatedState.updateAcceptanceDeadline.Value())))
     {
-        // FIXME: this is NOT OK
         MatterReportingAttributeChangeCallback(kRootEndpointId, GeneralCommissioning::Id, TCUpdateDeadline::Id);
     }
 }
@@ -269,12 +264,6 @@ DataModel::ActionReturnStatus GeneralCommissioningCluster::ReadAttribute(const D
     }
 }
 
-DataModel::ActionReturnStatus GeneralCommissioningCluster::WriteAttribute(const DataModel::WriteAttributeRequest & request,
-                                                                          AttributeValueDecoder & decoder)
-{
-    // TODO: implement
-    return CHIP_ERROR_NOT_IMPLEMENTED;
-}
 
 std::optional<DataModel::ActionReturnStatus> GeneralCommissioningCluster::InvokeCommand(const DataModel::InvokeRequest & request,
                                                                                         TLV::TLVReader & input_arguments,
@@ -551,7 +540,6 @@ GeneralCommissioningCluster::HandleCommissioningComplete(const DataModel::Invoke
     }
 #endif // CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
 
-    // FIXME: how do I grab the current excahge session handle ????
     SessionHandle handle = mContext->interactionContext.actionContext.CurrentExchange()->GetSessionHandle();
 
     // Ensure it's a valid CASE session
