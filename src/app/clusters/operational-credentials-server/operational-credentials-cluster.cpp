@@ -269,11 +269,14 @@ CHIP_ERROR ReadRootCertificates(AttributeValueEncoder & aEncoder, FabricTable & 
 }
 
 std::optional<DataModel::ActionReturnStatus> HandleCSRRequest(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
-                                                              Commands::CSRRequest::DecodableType & commandData,
+                                                              TLV::TLVReader & input_arguments,
                                                               OperationalCredentialsCluster * cluster)
 {
     VerifyOrDie(cluster != nullptr);
     MATTER_TRACE_SCOPE("CSRRequest", "OperationalCredentials");
+    Commands::CSRRequest::DecodableType commandData;
+    ReturnErrorOnFailure(commandData.Decode(input_arguments));
+    
     ChipLogProgress(Zcl, "OpCreds: Received a CSRRequest command");
 
     chip::Platform::ScopedMemoryBuffer<uint8_t> nocsrElements;
@@ -399,11 +402,14 @@ exit:
 }
 
 std::optional<DataModel::ActionReturnStatus> HandleAddNOC(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
-                                                          Commands::AddNOC::DecodableType & commandData,
+                                                          TLV::TLVReader & input_arguments,
                                                           OperationalCredentialsCluster * cluster)
 {
     VerifyOrDie(cluster != nullptr);
     MATTER_TRACE_SCOPE("AddNOC", "OperationalCredentials");
+    Commands::AddNOC::DecodableType commandData;
+    ReturnErrorOnFailure(commandData.Decode(input_arguments));
+    
     auto & failSafeContext   = cluster->GetFailSafeContext();
     auto & fabricTable       = cluster->GetFabricTable();
     auto & NOCValue          = commandData.NOCValue;
@@ -595,12 +601,15 @@ exit:
     return std::nullopt;
 }
 
-std::optional<DataModel::ActionReturnStatus> HandleUpdateNOC(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
-                                                             Commands::UpdateNOC::DecodableType & commandData,
+std::optional<DataModel::ActionReturnStatus> HandleUpdateNOC(CommandHandler * commandObj,
+                                                             TLV::TLVReader & input_arguments, const DataModel::InvokeRequest & request,
                                                              OperationalCredentialsCluster * cluster)
 {
     VerifyOrDie(cluster != nullptr);
     MATTER_TRACE_SCOPE("UpdateNOC", "OperationalCredentials");
+    Commands::UpdateNOC::DecodableType commandData;
+    ReturnErrorOnFailure(commandData.Decode(input_arguments, request.GetAccessingFabricIndex()));
+    
     FabricTable & fabricTable         = cluster->GetFabricTable();
     FailSafeContext & failSafeContext = cluster->GetFailSafeContext();
     auto & NOCValue                   = commandData.NOCValue;
@@ -654,7 +663,7 @@ exit:
     // We have an NOC response
     if (nonDefaultStatus == Status::Success)
     {
-        SendNOCResponse(commandObj, commandPath, nocResponse, fabricIndex, CharSpan());
+        SendNOCResponse(commandObj, request.path, nocResponse, fabricIndex, CharSpan());
         // Failed to update NOC
         if (nocResponse != NodeOperationalCertStatusEnum::kOk)
         {
@@ -689,12 +698,14 @@ exit:
 }
 
 std::optional<DataModel::ActionReturnStatus> HandleUpdateFabricLabel(CommandHandler * commandObj,
-                                                                     const ConcreteCommandPath & commandPath,
-                                                                     Commands::UpdateFabricLabel::DecodableType & commandData,
+                                                                     TLV::TLVReader & input_arguments, const DataModel::InvokeRequest & request,
                                                                      OperationalCredentialsCluster * cluster)
 {
     VerifyOrDie(cluster != nullptr);
     MATTER_TRACE_SCOPE("UpdateFabricLabel", "OperationalCredentials");
+    Commands::UpdateFabricLabel::DecodableType commandData;
+    ReturnErrorOnFailure(commandData.Decode(input_arguments, request.GetAccessingFabricIndex()));
+    
     FabricTable & fabricTable = cluster->GetFabricTable();
     auto & label              = commandData.label;
     auto ourFabricIndex       = commandObj->GetAccessingFabricIndex();
@@ -715,7 +726,7 @@ std::optional<DataModel::ActionReturnStatus> HandleUpdateFabricLabel(CommandHand
         if (fabricInfo.GetFabricLabel().data_equal(label) && fabricInfo.GetFabricIndex() != ourFabricIndex)
         {
             ChipLogError(Zcl, "Fabric label already in use");
-            SendNOCResponse(commandObj, commandPath, NodeOperationalCertStatusEnum::kLabelConflict, ourFabricIndex, CharSpan());
+            SendNOCResponse(commandObj, request.path, NodeOperationalCertStatusEnum::kLabelConflict, ourFabricIndex, CharSpan());
             return std::nullopt;
         }
     }
@@ -735,7 +746,7 @@ std::optional<DataModel::ActionReturnStatus> HandleUpdateFabricLabel(CommandHand
 exit:
     if (finalStatus == Status::Success)
     {
-        SendNOCResponse(commandObj, commandPath, NodeOperationalCertStatusEnum::kOk, ourFabricIndex, CharSpan());
+        SendNOCResponse(commandObj, request.path, NodeOperationalCertStatusEnum::kOk, ourFabricIndex, CharSpan());
     }
     else
     {
@@ -746,11 +757,13 @@ exit:
 
 std::optional<DataModel::ActionReturnStatus>
 HandleAddTrustedRootCertificate(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
-                                Commands::AddTrustedRootCertificate::DecodableType & commandData,
+                                TLV::TLVReader & input_arguments,
                                 OperationalCredentialsCluster * cluster)
 {
     VerifyOrDie(cluster != nullptr);
     MATTER_TRACE_SCOPE("AddTrustedRootCertificate", "OperationalCredentials");
+    Commands::AddTrustedRootCertificate::DecodableType commandData;
+    ReturnErrorOnFailure(commandData.Decode(input_arguments));
 
     auto finalStatus                  = Status::Failure;
     FailSafeContext & failSafeContext = cluster->GetFailSafeContext();
@@ -802,11 +815,14 @@ exit:
 }
 
 std::optional<DataModel::ActionReturnStatus>
-HandleSetVIDVerificationStatement(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
-                                  Commands::SetVIDVerificationStatement::DecodableType & commandData,
+HandleSetVIDVerificationStatement(CommandHandler * commandObj,
+                                  TLV::TLVReader & input_arguments, const DataModel::InvokeRequest & request,
                                   OperationalCredentialsCluster * cluster)
 {
     VerifyOrDie(cluster != nullptr);
+    Commands::SetVIDVerificationStatement::DecodableType commandData;
+    ReturnErrorOnFailure(commandData.Decode(input_arguments, request.GetAccessingFabricIndex()));
+    
     FabricIndex fabricIndex = commandObj->GetAccessingFabricIndex();
     auto finalStatus        = Status::Failure;
 
@@ -863,11 +879,14 @@ HandleSetVIDVerificationStatement(CommandHandler * commandObj, const ConcreteCom
 
 std::optional<DataModel::ActionReturnStatus> HandleRemoveFabric(CommandHandler * commandObj,
                                                                 const ConcreteCommandPath & commandPath,
-                                                                Commands::RemoveFabric::DecodableType & commandData,
+                                                                TLV::TLVReader & input_arguments,
                                                                 OperationalCredentialsCluster * cluster)
 {
     VerifyOrDie(cluster != nullptr);
     MATTER_TRACE_SCOPE("RemoveFabric", "OperationalCredentials");
+    Commands::RemoveFabric::DecodableType commandData;
+    ReturnErrorOnFailure(commandData.Decode(input_arguments));
+    
     auto & fabricBeingRemoved = commandData.fabricIndex;
 
     ChipLogProgress(Zcl, "OpCreds: Received a RemoveFabric Command for FabricIndex 0x%x",
@@ -924,10 +943,13 @@ exit:
 
 std::optional<DataModel::ActionReturnStatus>
 HandleSignVIDVerificationRequest(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
-                                 Commands::SignVIDVerificationRequest::DecodableType & commandData,
+                                 TLV::TLVReader & input_arguments,
                                  OperationalCredentialsCluster * cluster)
 {
     VerifyOrDie(cluster != nullptr);
+    Commands::SignVIDVerificationRequest::DecodableType commandData;
+    ReturnErrorOnFailure(commandData.Decode(input_arguments));
+    
     ChipLogProgress(Zcl, "OpCreds: Received a SignVIDVerificationRequest Command for FabricIndex 0x%x",
                     static_cast<unsigned>(commandData.fabricIndex));
 
@@ -967,11 +989,14 @@ HandleSignVIDVerificationRequest(CommandHandler * commandObj, const ConcreteComm
 
 std::optional<DataModel::ActionReturnStatus>
 HandleCertificateChainRequest(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
-                              Commands::CertificateChainRequest::DecodableType & commandData,
+                              TLV::TLVReader & input_arguments,
                               OperationalCredentialsCluster * cluster)
 {
     VerifyOrDie(cluster != nullptr);
     MATTER_TRACE_SCOPE("CertificateChainRequest", "OperationalCredentials");
+    Commands::CertificateChainRequest::DecodableType commandData;
+    ReturnErrorOnFailure(commandData.Decode(input_arguments));
+    
     auto & certificateType = commandData.certificateType;
 
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -1014,13 +1039,15 @@ exit:
 
 std::optional<DataModel::ActionReturnStatus> HandleAttestationRequest(CommandHandler * commandObj,
                                                                       const ConcreteCommandPath & commandPath,
-                                                                      Commands::AttestationRequest::DecodableType & commandData,
+                                                                      TLV::TLVReader & input_arguments,
                                                                       OperationalCredentialsCluster * cluster)
 {
     VerifyOrDie(cluster != nullptr);
     MATTER_TRACE_SCOPE("AttestationRequest", "OperationalCredentials");
+    OperationalCredentials::Commands::AttestationRequest::DecodableType commandData;
+    ReturnErrorOnFailure(commandData.Decode(input_arguments));
+    
     auto & attestationNonce = commandData.attestationNonce;
-
     auto finalStatus = Status::Failure;
     CHIP_ERROR err   = CHIP_ERROR_INVALID_ARGUMENT;
     ByteSpan tbsSpan;
@@ -1259,54 +1286,34 @@ std::optional<DataModel::ActionReturnStatus> OperationalCredentialsCluster::Invo
     switch (request.path.mCommandId)
     {
     case OperationalCredentials::Commands::AttestationRequest::Id: {
-        OperationalCredentials::Commands::AttestationRequest::DecodableType requestData;
-        ReturnErrorOnFailure(requestData.Decode(input_arguments));
-        return HandleAttestationRequest(handler, request.path, requestData, this);
+        return HandleAttestationRequest(handler, request.path, input_arguments, this);
     }
     case OperationalCredentials::Commands::CertificateChainRequest::Id: {
-        OperationalCredentials::Commands::CertificateChainRequest::DecodableType requestData;
-        ReturnErrorOnFailure(requestData.Decode(input_arguments));
-        return HandleCertificateChainRequest(handler, request.path, requestData, this);
+        return HandleCertificateChainRequest(handler, request.path, input_arguments, this);
     }
     case OperationalCredentials::Commands::CSRRequest::Id: {
-        OperationalCredentials::Commands::CSRRequest::DecodableType requestData;
-        ReturnErrorOnFailure(requestData.Decode(input_arguments));
-        return HandleCSRRequest(handler, request.path, requestData, this);
+        return HandleCSRRequest(handler, request.path, input_arguments, this);
     }
     case OperationalCredentials::Commands::AddNOC::Id: {
-        OperationalCredentials::Commands::AddNOC::DecodableType requestData;
-        ReturnErrorOnFailure(requestData.Decode(input_arguments));
-        return HandleAddNOC(handler, request.path, requestData, this);
+        return HandleAddNOC(handler, request.path, input_arguments, this);
     }
     case OperationalCredentials::Commands::UpdateNOC::Id: {
-        OperationalCredentials::Commands::UpdateNOC::DecodableType requestData;
-        ReturnErrorOnFailure(requestData.Decode(input_arguments, request.GetAccessingFabricIndex()));
-        return HandleUpdateNOC(handler, request.path, requestData, this);
+        return HandleUpdateNOC(handler, input_arguments, request, this);
     }
     case OperationalCredentials::Commands::UpdateFabricLabel::Id: {
-        OperationalCredentials::Commands::UpdateFabricLabel::DecodableType requestData;
-        ReturnErrorOnFailure(requestData.Decode(input_arguments, request.GetAccessingFabricIndex()));
-        return HandleUpdateFabricLabel(handler, request.path, requestData, this);
+        return HandleUpdateFabricLabel(handler, input_arguments, request, this);
     }
     case OperationalCredentials::Commands::RemoveFabric::Id: {
-        OperationalCredentials::Commands::RemoveFabric::DecodableType requestData;
-        ReturnErrorOnFailure(requestData.Decode(input_arguments));
-        return HandleRemoveFabric(handler, request.path, requestData, this);
+        return HandleRemoveFabric(handler, request.path, input_arguments, this);
     }
     case OperationalCredentials::Commands::AddTrustedRootCertificate::Id: {
-        OperationalCredentials::Commands::AddTrustedRootCertificate::DecodableType requestData;
-        ReturnErrorOnFailure(requestData.Decode(input_arguments));
-        return HandleAddTrustedRootCertificate(handler, request.path, requestData, this);
+        return HandleAddTrustedRootCertificate(handler, request.path, input_arguments, this);
     }
     case OperationalCredentials::Commands::SetVIDVerificationStatement::Id: {
-        OperationalCredentials::Commands::SetVIDVerificationStatement::DecodableType requestData;
-        ReturnErrorOnFailure(requestData.Decode(input_arguments, request.GetAccessingFabricIndex()));
-        return HandleSetVIDVerificationStatement(handler, request.path, requestData, this);
+        return HandleSetVIDVerificationStatement(handler, input_arguments, request, this);
     }
     case OperationalCredentials::Commands::SignVIDVerificationRequest::Id: {
-        OperationalCredentials::Commands::SignVIDVerificationRequest::DecodableType requestData;
-        ReturnErrorOnFailure(requestData.Decode(input_arguments));
-        return HandleSignVIDVerificationRequest(handler, request.path, requestData, this);
+        return HandleSignVIDVerificationRequest(handler, request.path, input_arguments, this);
     }
     default:
         return Protocols::InteractionModel::Status::UnsupportedCommand;
