@@ -308,9 +308,9 @@ class TC_G_2_3(MatterBaseTest):
         asserts.assert_equal(resp[0].Status, Status.Success, "GroupKeyMap attribute write failed")
 
         self.step("16b")
-        unknownGroupId = 18
+        differentGroupId = 6+maxgroups
         try:
-            await th1.SendCommand(self.dut_node_id, self.matter_test_config.endpoint, Clusters.Groups.Commands.AddGroupIfIdentifying(unknownGroupId))
+            await th1.SendCommand(self.dut_node_id, self.matter_test_config.endpoint, Clusters.Groups.Commands.AddGroupIfIdentifying(differentGroupId))
             asserts.fail("Unexpected success to sending command AddGroupIfIdentifying")
         except InteractionModelError as e:
             asserts.assert_equal(e.status, Status.ResourceExhausted,
