@@ -40,9 +40,9 @@ tests:
           networking technologies that are supported by both the TH and the DUT
           If TH is unaware of the DUT’s Discovery Capability Bitmask, it MAY
           initiate Device Discovery in any order on all the networking
-          technologies it supports out of Wi-Fi PAF, BLE, and on
-          IP network discovery, or initiate Device Discovery on a specific
-          networking technology."
+          technologies it supports out of Wi-Fi PAF, BLE, and on IP network
+          discovery, or initiate Device Discovery on a specific networking
+          technology."
       verification: |
           TH selects the DUT's capability bitmask and start the commissiong process accordingly
           No applicable TH or DUT logs.
