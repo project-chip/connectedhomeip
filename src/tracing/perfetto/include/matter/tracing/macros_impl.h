@@ -35,5 +35,5 @@ PERFETTO_DEFINE_CATEGORIES(perfetto::Category("Matter").SetDescription("Matter t
     do                                                                                                                             \
     {                                                                                                                              \
         static int count##_label = 0;                                                                                              \
-        TRACE_COUNTER("Matter", #label, ++count##_label);                                                                           \
+        TRACE_COUNTER("Matter", #label, ++count##_label);                                                                          \
     } while (0)
