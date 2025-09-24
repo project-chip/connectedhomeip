@@ -44,14 +44,14 @@ ServerClusterRegistration & ClusterRegistration()
 
 } // namespace
 
-void emberAfDiagnosticLogsClusterServerInitCallback(EndpointId endpoint)
+void MatterDiagnosticLogsClusterInitCallback(EndpointId endpoint)
 {
     // We implement the cluster as a singleton on the root endpoint.
     VerifyOrReturn(endpoint == kRootEndpointId);
     (void) CodegenDataModelProvider::Instance().Registry().Register(ClusterRegistration());
 }
 
-void MatterDiagnosticLogsClusterServerShutdownCallback(EndpointId endpointId)
+void MatterDiagnosticLogsClusterShutdownCallback(EndpointId endpointId)
 {
     // We implement the cluster as a singleton on the root endpoint.
     VerifyOrReturn(endpointId == kRootEndpointId);
