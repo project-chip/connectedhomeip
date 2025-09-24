@@ -24,9 +24,9 @@
 #define MATTER_TRACE_END(label, group) os_signpost_interval_end(__DARWIN_MATTER_SIGNPOST_LOGGER(), OS_SIGNPOST_ID_EXCLUSIVE, #group "-" #label)
 #define MATTER_TRACE_INSTANT(label, group) os_signpost_event_emit(__DARWIN_MATTER_SIGNPOST_LOGGER(), OS_SIGNPOST_ID_EXCLUSIVE, #group "-" #label)
 
-#define MATTER_TRACE_COUNTER(label)                                                                                        \
-    do {                                                                                                                   \
-        static unsigned int count##_label = 0;                                                                             \
+#define MATTER_TRACE_COUNTER(label)                                                                                         \
+    do {                                                                                                                    \
+        static unsigned int count##_label = 0;                                                                              \
         os_signpost_event_emit(__DARWIN_MATTER_SIGNPOST_LOGGER(), OS_SIGNPOST_ID_EXCLUSIVE, #label, "%u", ++count##_label); \
     } while (0)
 
