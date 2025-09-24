@@ -40,6 +40,8 @@ from matter.testing.problem_notices import (AttributePathLocation, ClusterPathLo
                                             ProblemSeverity, UnknownProblemLocation)
 from matter.tlv import uint
 
+LOGGER = logging.getLogger(__name__)
+
 # Type alias maintained for constants access; actual values are ints at runtime
 ACCESS_CONTROL_PRIVILEGE_ENUM = Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum
 
@@ -691,12 +693,12 @@ def build_xml_clusters(data_model_directory: Union[PrebuiltDataModelDirectory, T
     problems: list[ProblemNotice] = []
 
     top = get_data_model_directory(data_model_directory, DataModelLevel.kCluster)
-    logging.info("Reading XML clusters from %r", top)
+    LOGGER.info("Reading XML clusters from %r", top)
 
     found_xmls = 0
     for f in top.iterdir():
         if not f.name.endswith('.xml'):
-            logging.info("Ignoring non-XML file %s", f.name)
+            LOGGER.info("Ignoring non-XML file %s", f.name)
             continue
 
         found_xmls += 1
@@ -956,7 +958,7 @@ def build_xml_namespaces(data_model_directory: typing.Union[PrebuiltDataModelDir
         for filename in namespace_dir.iterdir():
             if not filename.name.endswith('.xml'):
                 continue
-            logging.info('Parsing file %s', str(filename))
+            LOGGER.info('Parsing file %s', str(filename))
             found_xmls += 1
 
             try:
@@ -992,7 +994,7 @@ def build_xml_namespaces(data_model_directory: typing.Union[PrebuiltDataModelDir
         ))
 
     if found_xmls < 1:
-        logging.warning("No XML files found in the specified namespace directory: %r", namespace_dir)
+        LOGGER.warning("No XML files found in the specified namespace directory: %r", namespace_dir)
         problems.append(ProblemNotice(
             test_name="Build XML Namespaces",
             location=UnknownProblemLocation(),
@@ -1002,9 +1004,9 @@ def build_xml_namespaces(data_model_directory: typing.Union[PrebuiltDataModelDir
 
     # Print problems for debugging
     if problems:
-        logging.warning("Found %d problems while parsing namespaces:", len(problems))
+        LOGGER.warning("Found %d problems while parsing namespaces:", len(problems))
         for problem in problems:
-            logging.warning("  - %s", str(problem))
+            LOGGER.warning("  - %s", str(problem))
 
     return namespaces, problems
 
@@ -1070,7 +1072,7 @@ def parse_single_device_type(root: ElementTree.Element, cluster_definition_xml: 
                 # Workaround for 1.3 device types with zigbee clusters and old scenes
                 # This is OK because there are other tests that ensure that unknown clusters do not appear on the device
                 if cid not in cluster_definition_xml:
-                    logging.info(f"Skipping unknown cluster {cid:04X}")
+                    LOGGER.info(f"Skipping unknown cluster {cid:04X}")
                     continue
                 conformance_xml, tmp_problem = get_conformance(c, cid)
                 if tmp_problem:
@@ -1137,7 +1139,7 @@ def parse_single_device_type(root: ElementTree.Element, cluster_definition_xml: 
                                 # The thermostat in particular explicitly disallows some zigbee things that don't appear in the spec due to
                                 # ifdefs. We can ignore problems if the device type spec disallows things that don't exist.
                                 if is_disallowed(conformance_override):
-                                    logging.info(
+                                    LOGGER.info(
                                         f"Ignoring unknown {override_element_type} {name} in cluster {cid} because the conformance is disallowed")
                                     continue
                                 problems.append(ProblemNotice("Parse Device Type XML", location=location,
@@ -1191,7 +1193,7 @@ def build_xml_device_types(data_model_directory: typing.Union[PrebuiltDataModelD
             device_types.update(tmp_device_types)
 
     if found_xmls < 1:
-        logging.warning("No XML files found in the specified device type directory: %r", top)
+        LOGGER.warning("No XML files found in the specified device type directory: %r", top)
 
     if -1 not in device_types.keys():
         raise ConformanceException("Base device type not found in device type xml data")

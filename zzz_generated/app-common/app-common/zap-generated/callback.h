@@ -627,6 +627,16 @@ void emberAfScenesManagementClusterShutdownCallback(chip::EndpointId endpoint);
 /**
  * @param endpoint    Endpoint that is being initialized
  */
+void emberAfGroupcastClusterInitCallback(chip::EndpointId endpoint);
+
+/**
+ * @param endpoint    Endpoint that is being shutdown
+ */
+void emberAfGroupcastClusterShutdownCallback(chip::EndpointId endpoint);
+
+/**
+ * @param endpoint    Endpoint that is being initialized
+ */
 void emberAfHepaFilterMonitoringClusterInitCallback(chip::EndpointId endpoint);
 
 /**
@@ -3713,6 +3723,45 @@ MatterScenesManagementClusterServerPreAttributeChangedCallback(const chip::app::
  * @param endpoint  Endpoint that is being served
  */
 void emberAfScenesManagementClusterServerTickCallback(chip::EndpointId endpoint);
+
+//
+// Groupcast Cluster
+//
+
+/**
+ * @param endpoint    Endpoint that is being initialized
+ */
+void emberAfGroupcastClusterServerInitCallback(chip::EndpointId endpoint);
+
+/**
+ * @param endpoint    Endpoint that is being shutdown
+ */
+void MatterGroupcastClusterServerShutdownCallback(chip::EndpointId endpoint);
+
+/**
+ * @param endpoint    Endpoint that is being initialized
+ */
+void emberAfGroupcastClusterClientInitCallback(chip::EndpointId endpoint);
+
+/**
+ * @param attributePath Concrete attribute path that changed
+ */
+void MatterGroupcastClusterServerAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath);
+
+/**
+ * @param attributePath Concrete attribute path to be changed
+ * @param attributeType Attribute type
+ * @param size          Attribute size
+ * @param value         Attribute value
+ */
+chip::Protocols::InteractionModel::Status
+MatterGroupcastClusterServerPreAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath,
+                                                        EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
+
+/**
+ * @param endpoint  Endpoint that is being served
+ */
+void emberAfGroupcastClusterServerTickCallback(chip::EndpointId endpoint);
 
 //
 // HEPA Filter Monitoring Cluster
@@ -7141,6 +7190,36 @@ bool emberAfDishwasherAlarmClusterResetCallback(
 bool emberAfDishwasherAlarmClusterModifyEnabledAlarmsCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::DishwasherAlarm::Commands::ModifyEnabledAlarms::DecodableType & commandData);
+/**
+ * @brief Groupcast Cluster JoinGroup Command callback (from client)
+ */
+bool emberAfGroupcastClusterJoinGroupCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::Groupcast::Commands::JoinGroup::DecodableType & commandData);
+/**
+ * @brief Groupcast Cluster LeaveGroup Command callback (from client)
+ */
+bool emberAfGroupcastClusterLeaveGroupCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::Groupcast::Commands::LeaveGroup::DecodableType & commandData);
+/**
+ * @brief Groupcast Cluster UpdateGroupKey Command callback (from client)
+ */
+bool emberAfGroupcastClusterUpdateGroupKeyCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::Groupcast::Commands::UpdateGroupKey::DecodableType & commandData);
+/**
+ * @brief Groupcast Cluster ExpireGracePeriod Command callback (from client)
+ */
+bool emberAfGroupcastClusterExpireGracePeriodCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::Groupcast::Commands::ExpireGracePeriod::DecodableType & commandData);
+/**
+ * @brief Groupcast Cluster ConfigureAuxiliaryACL Command callback (from client)
+ */
+bool emberAfGroupcastClusterConfigureAuxiliaryACLCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::Groupcast::Commands::ConfigureAuxiliaryACL::DecodableType & commandData);
 /**
  * @brief Boolean State Configuration Cluster SuppressAlarm Command callback (from client)
  */

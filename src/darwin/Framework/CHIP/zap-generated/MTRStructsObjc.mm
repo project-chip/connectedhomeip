@@ -4744,6 +4744,48 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
+@implementation MTRGroupcastClusterMembershipStruct
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _groupID = @(0);
+
+        _endpoints = [NSArray array];
+
+        _keyID = @(0);
+
+        _hasAuxiliaryACL = @(0);
+
+        _expiringKeyID = nil;
+
+        _fabricIndex = @(0);
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRGroupcastClusterMembershipStruct alloc] init];
+
+    other.groupID = self.groupID;
+    other.endpoints = self.endpoints;
+    other.keyID = self.keyID;
+    other.hasAuxiliaryACL = self.hasAuxiliaryACL;
+    other.expiringKeyID = self.expiringKeyID;
+    other.fabricIndex = self.fabricIndex;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: groupID:%@; endpoints:%@; keyID:%@; hasAuxiliaryACL:%@; expiringKeyID:%@; fabricIndex:%@; >", NSStringFromClass([self class]), _groupID, _endpoints, _keyID, _hasAuxiliaryACL, _expiringKeyID, _fabricIndex];
+    return descriptionString;
+}
+
+@end
+
 @implementation MTRHEPAFilterMonitoringClusterReplacementProductStruct
 - (instancetype)init
 {
