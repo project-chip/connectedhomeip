@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2023 Project CHIP Authors
+ *    Copyright (c) 2025 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,18 +18,10 @@
 
 #pragma once
 
-#include "time-synchronization-delegate.h"
+#include <app/clusters/time-synchronization-server/time-synchronization-cluster.h>
 
 namespace chip::app::Clusters::TimeSynchronization {
 
-class DefaultTimeSyncDelegate : public Delegate
-{
-
-public:
-    DefaultTimeSyncDelegate() : Delegate() {};
-    bool IsNTPAddressValid(CharSpan ntp) override;
-    bool IsNTPAddressDomain(CharSpan ntp) override;
-    CHIP_ERROR UpdateTimeFromPlatformSource(chip::Callback::Callback<OnTimeSyncCompletion> * callback) override;
-};
+TimeSynchronizationCluster * FindClusterOnEndpoint(EndpointId endpointId);
 
 } // namespace chip::app::Clusters::TimeSynchronization

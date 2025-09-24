@@ -1105,10 +1105,12 @@
         { ZAP_EMPTY_DEFAULT(), 0x0000000A, 1, ZAP_TYPE(INT8U),                                                                     \
           ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(READABLE) }, /* TimeZoneListMaxSize */                         \
         { ZAP_EMPTY_DEFAULT(), 0x0000000B, 1, ZAP_TYPE(INT8U),                                                                     \
-          ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(READABLE) },                       /* DSTOffsetListMaxSize */  \
-        { ZAP_SIMPLE_DEFAULT(true), 0x0000000C, 1, ZAP_TYPE(BOOLEAN), ZAP_ATTRIBUTE_MASK(READABLE) },  /* SupportsDNSResolve */    \
-        { ZAP_SIMPLE_DEFAULT(0x0B), 0x0000FFFC, 4, ZAP_TYPE(BITMAP32), ZAP_ATTRIBUTE_MASK(READABLE) }, /* FeatureMap */            \
-        { ZAP_SIMPLE_DEFAULT(2), 0x0000FFFD, 2, ZAP_TYPE(INT16U), ZAP_ATTRIBUTE_MASK(READABLE) },      /* ClusterRevision */       \
+          ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(READABLE) },                      /* DSTOffsetListMaxSize */   \
+        { ZAP_SIMPLE_DEFAULT(true), 0x0000000C, 1, ZAP_TYPE(BOOLEAN), ZAP_ATTRIBUTE_MASK(READABLE) }, /* SupportsDNSResolve */     \
+        { ZAP_EMPTY_DEFAULT(), 0x0000FFFC, 4, ZAP_TYPE(BITMAP32),                                                                  \
+          ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(READABLE) }, /* FeatureMap */                                  \
+        { ZAP_EMPTY_DEFAULT(), 0x0000FFFD, 2, ZAP_TYPE(INT16U),                                                                    \
+          ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(READABLE) }, /* ClusterRevision */                             \
                                                                                                                                    \
         /* Endpoint: 0, Cluster: Administrator Commissioning (server) */                                                           \
         { ZAP_EMPTY_DEFAULT(), 0x00000000, 1, ZAP_TYPE(ENUM8),                                                                     \
@@ -2959,6 +2961,10 @@
     const EmberAfGenericClusterFunction chipFuncArrayEthernetNetworkDiagnosticsServer[] = {                                        \
         (EmberAfGenericClusterFunction) emberAfEthernetNetworkDiagnosticsClusterServerInitCallback,                                \
     };                                                                                                                             \
+    const EmberAfGenericClusterFunction chipFuncArrayTimeSynchronizationServer[] = {                                               \
+        (EmberAfGenericClusterFunction) emberAfTimeSynchronizationClusterServerInitCallback,                                       \
+        (EmberAfGenericClusterFunction) MatterTimeSynchronizationClusterServerShutdownCallback,                                    \
+    };                                                                                                                             \
     const EmberAfGenericClusterFunction chipFuncArrayAdministratorCommissioningServer[] = {                                        \
         (EmberAfGenericClusterFunction) emberAfAdministratorCommissioningClusterServerInitCallback,                                \
         (EmberAfGenericClusterFunction) MatterAdministratorCommissioningClusterServerShutdownCallback,                             \
@@ -3820,9 +3826,9 @@
       .clusterId = 0x00000038, \
       .attributes = ZAP_ATTRIBUTE_INDEX(204), \
       .attributeCount = 14, \
-      .clusterSize = 9, \
-      .mask = ZAP_CLUSTER_MASK(SERVER), \
-      .functions = NULL, \
+      .clusterSize = 3, \
+      .mask = ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(INIT_FUNCTION) | ZAP_CLUSTER_MASK(SHUTDOWN_FUNCTION), \
+      .functions = chipFuncArrayTimeSynchronizationServer, \
       .acceptedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 52 ), \
       .generatedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 58 ), \
       .eventList = ZAP_GENERATED_EVENTS_INDEX( 16 ), \
@@ -4994,7 +5000,7 @@
 // This is an array of EmberAfEndpointType structures.
 #define GENERATED_ENDPOINT_TYPES                                                                                                   \
     {                                                                                                                              \
-        { ZAP_CLUSTER_INDEX(0), 28, 229 },                                                                                         \
+        { ZAP_CLUSTER_INDEX(0), 28, 223 },                                                                                         \
         { ZAP_CLUSTER_INDEX(28), 73, 3444 },                                                                                       \
         { ZAP_CLUSTER_INDEX(101), 7, 114 },                                                                                        \
         { ZAP_CLUSTER_INDEX(108), 2, 0 },                                                                                          \
@@ -5009,7 +5015,7 @@ static_assert(ATTRIBUTE_LARGEST <= CHIP_CONFIG_MAX_ATTRIBUTE_STORE_ELEMENT_SIZE,
 #define ATTRIBUTE_SINGLETONS_SIZE (0)
 
 // Total size of attribute storage
-#define ATTRIBUTE_MAX_SIZE (3787)
+#define ATTRIBUTE_MAX_SIZE (3781)
 
 // Number of fixed endpoints
 #define FIXED_ENDPOINT_COUNT (4)

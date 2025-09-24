@@ -1,5 +1,5 @@
 /*
- *    Copyright (c) 2023 Project CHIP Authors
+ *    Copyright (c) 2023-2025 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -14,24 +14,12 @@
  *    limitations under the License.
  */
 
-#include "time-synchronization-server.h"
 #include "DefaultTimeSyncDelegate.h"
 #include "time-synchronization-delegate.h"
+#include <app/clusters/time-synchronization-server/CodegenIntegration.h>
+#include <app/clusters/time-synchronization-server/time-synchronization-cluster.h>
+#include <app/server-cluster/AttributeListBuilder.h>
 
-#include <app-common/zap-generated/attributes/Accessors.h>
-#include <app-common/zap-generated/cluster-enums.h>
-#include <app-common/zap-generated/cluster-objects.h>
-#include <app-common/zap-generated/ids/Attributes.h>
-#include <app-common/zap-generated/ids/Clusters.h>
-#include <app/AttributeAccessInterface.h>
-#include <app/AttributeAccessInterfaceRegistry.h>
-#include <app/CommandHandler.h>
-#include <app/EventLogging.h>
-#include <app/server/Server.h>
-#include <app/util/attribute-storage.h>
-#include <lib/support/CodeUtils.h>
-#include <lib/support/logging/CHIPLogging.h>
-#include <platform/CHIPDeviceLayer.h>
 #include <platform/RuntimeOptionsProvider.h>
 
 #include <system/SystemClock.h>
@@ -49,79 +37,9 @@ using namespace chip::app::Clusters::TimeSynchronization::Attributes;
 using chip::TimeSyncDataProvider;
 using chip::Protocols::InteractionModel::Status;
 
-// -----------------------------------------------------------------------------
-// Delegate Implementation
-
 namespace {
 
-Delegate * gDelegate = nullptr;
-
-Delegate * GetDelegate()
-{
-    if (gDelegate == nullptr)
-    {
-        static DefaultTimeSyncDelegate dg;
-        gDelegate = &dg;
-    }
-    return gDelegate;
-}
-
-#if TIME_SYNC_ENABLE_TSC_FEATURE
-void OnDeviceConnectedWrapper(void * context, Messaging::ExchangeManager & exchangeMgr, const SessionHandle & sessionHandle)
-{
-    TimeSynchronizationServer * server = reinterpret_cast<TimeSynchronizationServer *>(context);
-    server->OnDeviceConnectedFn(exchangeMgr, sessionHandle);
-}
-
-void OnDeviceConnectionFailureWrapper(void * context, const ScopedNodeId & peerId, CHIP_ERROR error)
-{
-    TimeSynchronizationServer * server = reinterpret_cast<TimeSynchronizationServer *>(context);
-    server->OnDeviceConnectionFailureFn();
-}
-
-#endif
-
-void OnPlatformEventWrapper(const DeviceLayer::ChipDeviceEvent * event, intptr_t ptr)
-{
-    TimeSynchronizationServer * server = reinterpret_cast<TimeSynchronizationServer *>(ptr);
-    server->OnPlatformEventFn(*event);
-}
-
-void OnTimeSyncCompletionWrapper(void * context, TimeSourceEnum timeSource, GranularityEnum granularity)
-{
-    TimeSynchronizationServer * server = reinterpret_cast<TimeSynchronizationServer *>(context);
-    server->OnTimeSyncCompletionFn(timeSource, granularity);
-}
-
-void OnFallbackNTPCompletionWrapper(void * context, bool timeSyncSuccessful)
-{
-    TimeSynchronizationServer * server = reinterpret_cast<TimeSynchronizationServer *>(context);
-    server->OnFallbackNTPCompletionFn(timeSyncSuccessful);
-}
-
-} // namespace
-
-namespace chip {
-namespace app {
-namespace Clusters {
-namespace TimeSynchronization {
-
-void SetDefaultDelegate(Delegate * delegate)
-{
-    gDelegate = delegate;
-}
-
-Delegate * GetDefaultDelegate()
-{
-    return GetDelegate();
-}
-
-} // namespace TimeSynchronization
-} // namespace Clusters
-} // namespace app
-} // namespace chip
-
-static CHIP_ERROR UpdateUTCTime(uint64_t UTCTimeInChipEpochUs)
+CHIP_ERROR UpdateUTCTime(uint64_t UTCTimeInChipEpochUs)
 {
     uint64_t UTCTimeInUnixEpochUs;
 
@@ -136,14 +54,50 @@ static CHIP_ERROR UpdateUTCTime(uint64_t UTCTimeInChipEpochUs)
     return CHIP_NO_ERROR;
 }
 
-static bool emitDSTTableEmptyEvent(EndpointId ep)
+} // namespace
+
+namespace chip::app::Clusters {
+
+namespace TimeSynchronization {
+
+// -----------------------------------------------------------------------------
+// Delegate Implementation
+
+Delegate * gDelegate = nullptr;
+
+Delegate * GetDelegate()
+{
+    if (gDelegate == nullptr)
+    {
+        static DefaultTimeSyncDelegate dg;
+        gDelegate = &dg;
+    }
+    return gDelegate;
+}
+
+void SetDefaultDelegate(Delegate * delegate)
+{
+    gDelegate = delegate;
+}
+
+Delegate * GetDefaultDelegate()
+{
+    return GetDelegate();
+}
+
+// -----------------------------------------------------------------------------
+// Event generation functions
+
+bool emitDSTTableEmptyEvent(EndpointId ep, DataModel::EventsGenerator * eventsGenerator)
 {
     Events::DSTTableEmpty::Type event;
-    EventNumber eventNumber;
+    std::optional<EventNumber> eventNumber;
 
-    CHIP_ERROR error = LogEvent(event, ep, eventNumber);
-
-    if (CHIP_NO_ERROR != error)
+    if (eventsGenerator != nullptr)
+    {
+        eventNumber = eventsGenerator->GenerateEvent(event, ep);
+    }
+    if (eventNumber == std::nullopt)
     {
         ChipLogError(Zcl, "Unable to emit DSTTableEmpty event [ep=%d]", ep);
         return false;
@@ -155,15 +109,17 @@ static bool emitDSTTableEmptyEvent(EndpointId ep)
     return true;
 }
 
-static bool emitDSTStatusEvent(EndpointId ep, bool dstOffsetActive)
+bool emitDSTStatusEvent(EndpointId ep, bool dstOffsetActive, DataModel::EventsGenerator * eventsGenerator)
 {
     Events::DSTStatus::Type event;
     event.DSTOffsetActive = dstOffsetActive;
-    EventNumber eventNumber;
+    std::optional<EventNumber> eventNumber;
 
-    CHIP_ERROR error = LogEvent(event, ep, eventNumber);
-
-    if (CHIP_NO_ERROR != error)
+    if (eventsGenerator != nullptr)
+    {
+        eventNumber = eventsGenerator->GenerateEvent(event, ep);
+    }
+    if (eventNumber == std::nullopt)
     {
         ChipLogError(Zcl, "Unable to emit DSTStatus event [ep=%d]", ep);
         return false;
@@ -173,11 +129,15 @@ static bool emitDSTStatusEvent(EndpointId ep, bool dstOffsetActive)
     return true;
 }
 
-static bool emitTimeZoneStatusEvent(EndpointId ep)
+bool emitTimeZoneStatusEvent(EndpointId ep, DataModel::EventsGenerator * eventsGenerator)
 {
-    const auto & tzList = TimeSynchronizationServer::Instance().GetTimeZone();
+    auto timeSynchronization = FindClusterOnEndpoint(ep);
+    VerifyOrReturnValue(timeSynchronization != nullptr, false);
+
+    const auto & tzList = timeSynchronization->GetTimeZone();
     VerifyOrReturnValue(tzList.size() != 0, false);
     const auto & tz = tzList[0].timeZone;
+
     Events::TimeZoneStatus::Type event;
 
     event.offset = tz.offset;
@@ -185,11 +145,13 @@ static bool emitTimeZoneStatusEvent(EndpointId ep)
     {
         event.name.SetValue(tz.name.Value());
     }
-    EventNumber eventNumber;
 
-    CHIP_ERROR error = LogEvent(event, ep, eventNumber);
-
-    if (CHIP_NO_ERROR != error)
+    std::optional<EventNumber> eventNumber;
+    if (eventsGenerator != nullptr)
+    {
+        eventNumber = eventsGenerator->GenerateEvent(event, ep);
+    }
+    if (eventNumber == std::nullopt)
     {
         ChipLogError(Zcl, "Unable to emit TimeZoneStatus event [ep=%d]", ep);
         return false;
@@ -199,14 +161,16 @@ static bool emitTimeZoneStatusEvent(EndpointId ep)
     return true;
 }
 
-static bool emitTimeFailureEvent(EndpointId ep)
+bool emitTimeFailureEvent(EndpointId ep, DataModel::EventsGenerator * eventsGenerator)
 {
     Events::TimeFailure::Type event;
-    EventNumber eventNumber;
 
-    CHIP_ERROR error = LogEvent(event, ep, eventNumber);
-
-    if (CHIP_NO_ERROR != error)
+    std::optional<EventNumber> eventNumber;
+    if (eventsGenerator != nullptr)
+    {
+        eventNumber = eventsGenerator->GenerateEvent(event, ep);
+    }
+    if (eventNumber == std::nullopt)
     {
         ChipLogError(Zcl, "Unable to emit TimeFailure event [ep=%d]", ep);
         return false;
@@ -219,14 +183,16 @@ static bool emitTimeFailureEvent(EndpointId ep)
     return true;
 }
 
-static bool emitMissingTrustedTimeSourceEvent(EndpointId ep)
+bool emitMissingTrustedTimeSourceEvent(EndpointId ep, DataModel::EventsGenerator * eventsGenerator)
 {
     Events::MissingTrustedTimeSource::Type event;
-    EventNumber eventNumber;
 
-    CHIP_ERROR error = LogEvent(event, ep, eventNumber);
-
-    if (CHIP_NO_ERROR != error)
+    std::optional<EventNumber> eventNumber;
+    if (eventsGenerator != nullptr)
+    {
+        eventNumber = eventsGenerator->GenerateEvent(event, ep);
+    }
+    if (eventNumber == std::nullopt)
     {
         ChipLogError(Zcl, "Unable to emit MissingTrustedTimeSource event [ep=%d]", ep);
         return false;
@@ -238,14 +204,42 @@ static bool emitMissingTrustedTimeSourceEvent(EndpointId ep)
     return true;
 }
 
-TimeSynchronizationServer TimeSynchronizationServer::sTimeSyncInstance;
+} // namespace TimeSynchronization
 
-TimeSynchronizationServer & TimeSynchronizationServer::Instance()
+#if TIME_SYNC_ENABLE_TSC_FEATURE
+void OnDeviceConnectedWrapper(void * context, Messaging::ExchangeManager & exchangeMgr, const SessionHandle & sessionHandle)
 {
-    return sTimeSyncInstance;
+    TimeSynchronizationCluster * timeSynchronization = reinterpret_cast<TimeSynchronizationCluster *>(context);
+    timeSynchronization->OnDeviceConnectedFn(exchangeMgr, sessionHandle);
 }
 
-TimeSynchronizationServer::TimeSynchronizationServer() :
+void OnDeviceConnectionFailureWrapper(void * context, const ScopedNodeId & peerId, CHIP_ERROR error)
+{
+    TimeSynchronizationCluster * timeSynchronization = reinterpret_cast<TimeSynchronizationCluster *>(context);
+    timeSynchronization->OnDeviceConnectionFailureFn();
+}
+#endif
+
+void OnPlatformEventWrapper(const DeviceLayer::ChipDeviceEvent * event, intptr_t ptr)
+{
+    TimeSynchronizationCluster * timeSynchronization = reinterpret_cast<TimeSynchronizationCluster *>(ptr);
+    timeSynchronization->OnPlatformEventFn(*event);
+}
+
+void OnTimeSyncCompletionWrapper(void * context, TimeSourceEnum timeSource, GranularityEnum granularity)
+{
+    TimeSynchronizationCluster * timeSynchronization = reinterpret_cast<TimeSynchronizationCluster *>(context);
+    timeSynchronization->OnTimeSyncCompletionFn(timeSource, granularity);
+}
+
+void OnFallbackNTPCompletionWrapper(void * context, bool timeSyncSuccessful)
+{
+    TimeSynchronizationCluster * timeSynchronization = reinterpret_cast<TimeSynchronizationCluster *>(context);
+    timeSynchronization->OnFallbackNTPCompletionFn(timeSyncSuccessful);
+}
+
+TimeSynchronizationCluster::TimeSynchronizationCluster(EndpointId endpoint, const BitFlags<TimeSynchronization::Feature> features) :
+    DefaultServerCluster({ endpoint, TimeSynchronization::Id }), mFeatures(features),
 #if TIME_SYNC_ENABLE_TSC_FEATURE
     mOnDeviceConnectedCallback(OnDeviceConnectedWrapper, this),
     mOnDeviceConnectionFailureCallback(OnDeviceConnectionFailureWrapper, this),
@@ -253,34 +247,222 @@ TimeSynchronizationServer::TimeSynchronizationServer() :
     mOnTimeSyncCompletion(OnTimeSyncCompletionWrapper, this), mOnFallbackNTPCompletion(OnFallbackNTPCompletionWrapper, this)
 {}
 
-void TimeSynchronizationServer::AttemptToGetFallbackNTPTimeFromDelegate()
+CHIP_ERROR TimeSynchronizationCluster::ReadTrustedTimeSource(EndpointId endpoint, AttributeValueEncoder & encoder)
+{
+    auto timeSynchronization = FindClusterOnEndpoint(endpoint);
+    VerifyOrReturnValue(timeSynchronization != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+
+    const auto & tts = timeSynchronization->GetTrustedTimeSource();
+    return encoder.Encode(tts);
+}
+
+CHIP_ERROR TimeSynchronizationCluster::ReadDefaultNtp(EndpointId endpoint, AttributeValueEncoder & encoder)
+{
+    char buffer[DefaultNTP::TypeInfo::MaxLength()];
+    MutableCharSpan dntp(buffer);
+
+    auto timeSynchronization = FindClusterOnEndpoint(endpoint);
+    VerifyOrReturnValue(timeSynchronization != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+
+    CHIP_ERROR err = timeSynchronization->GetDefaultNtp(dntp);
+    if (err == CHIP_NO_ERROR)
+    {
+        err = encoder.Encode(CharSpan(buffer, dntp.size()));
+    }
+    else if (err == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND)
+    {
+        err = encoder.EncodeNull();
+    }
+    return err;
+}
+
+CHIP_ERROR TimeSynchronizationCluster::ReadTimeZone(EndpointId endpoint, AttributeValueEncoder & encoder)
+{
+    auto timeSynchronization = FindClusterOnEndpoint(endpoint);
+    VerifyOrReturnValue(timeSynchronization != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+
+    CHIP_ERROR err = encoder.EncodeList([&timeSynchronization](const auto & encod) -> CHIP_ERROR {
+        const auto & tzList = timeSynchronization->GetTimeZone();
+        for (const auto & tzStore : tzList)
+        {
+            ReturnErrorOnFailure(encod.Encode(tzStore.timeZone));
+        }
+
+        return CHIP_NO_ERROR;
+    });
+
+    return err;
+}
+
+CHIP_ERROR TimeSynchronizationCluster::ReadDSTOffset(EndpointId endpoint, AttributeValueEncoder & encoder)
+{
+    auto timeSynchronization = FindClusterOnEndpoint(endpoint);
+    VerifyOrReturnValue(timeSynchronization != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+
+    CHIP_ERROR err = encoder.EncodeList([&timeSynchronization](const auto & encod) -> CHIP_ERROR {
+        const auto & dstList = timeSynchronization->GetDSTOffset();
+        for (const auto & dstOffset : dstList)
+        {
+            ReturnErrorOnFailure(encod.Encode(dstOffset));
+        }
+
+        return CHIP_NO_ERROR;
+    });
+
+    return err;
+}
+
+CHIP_ERROR TimeSynchronizationCluster::ReadLocalTime(EndpointId endpoint, AttributeValueEncoder & encoder)
+{
+    DataModel::Nullable<uint64_t> localTime;
+
+    auto timeSynchronization = FindClusterOnEndpoint(endpoint);
+    VerifyOrReturnValue(timeSynchronization != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+
+    CHIP_ERROR err = timeSynchronization->GetLocalTime(endpoint, localTime);
+    if (err == CHIP_NO_ERROR)
+    {
+        err = encoder.Encode(localTime);
+    }
+    return err;
+}
+
+CHIP_ERROR TimeSynchronizationCluster::Attributes(const ConcreteClusterPath & path,
+                                                  ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder)
+{
+    AttributeListBuilder listBuilder(builder);
+    return listBuilder.Append(Span(TimeSynchronization::Attributes::kMandatoryMetadata), {});
+}
+
+DataModel::ActionReturnStatus TimeSynchronizationCluster::ReadAttribute(const DataModel::ReadAttributeRequest & request,
+                                                                        AttributeValueEncoder & encoder)
+{
+    switch (request.path.mAttributeId)
+    {
+    case UTCTime::Id: {
+        System::Clock::Microseconds64 utcTimeUnix;
+        uint64_t chipEpochTime;
+        auto timeSynchronization = FindClusterOnEndpoint(request.path.mEndpointId);
+        VerifyOrReturnValue(timeSynchronization != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+        // This return allows us to simulate no internal time for testing purposes
+        // This will be set once we receive a good time either from the delegate or via a command
+        if (timeSynchronization->GetGranularity() == GranularityEnum::kNoTimeGranularity)
+        {
+            return encoder.EncodeNull();
+        }
+        VerifyOrReturnError(System::SystemClock().GetClock_RealTime(utcTimeUnix) == CHIP_NO_ERROR, encoder.EncodeNull());
+        VerifyOrReturnError(UnixEpochToChipEpochMicros(utcTimeUnix.count(), chipEpochTime), encoder.EncodeNull());
+        return encoder.Encode(chipEpochTime);
+    }
+    case Granularity::Id: {
+        auto timeSynchronization = FindClusterOnEndpoint(request.path.mEndpointId);
+        VerifyOrReturnValue(timeSynchronization != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+        return encoder.Encode(timeSynchronization->GetGranularity());
+    }
+    case TrustedTimeSource::Id:
+        return ReadTrustedTimeSource(request.path.mEndpointId, encoder);
+    case DefaultNTP::Id:
+        return ReadDefaultNtp(request.path.mEndpointId, encoder);
+    case TimeZone::Id:
+        return ReadTimeZone(request.path.mEndpointId, encoder);
+    case DSTOffset::Id:
+        return ReadDSTOffset(request.path.mEndpointId, encoder);
+    case TimeZoneListMaxSize::Id:
+        return encoder.Encode(CHIP_CONFIG_TIME_ZONE_LIST_MAX_SIZE);
+    case DSTOffsetListMaxSize::Id:
+        return encoder.Encode(CHIP_CONFIG_DST_OFFSET_LIST_MAX_SIZE);
+    case LocalTime::Id:
+        return ReadLocalTime(request.path.mEndpointId, encoder);
+    case ClusterRevision::Id:
+        return encoder.Encode(TimeSynchronization::kRevision);
+    case FeatureMap::Id:
+        return encoder.Encode(mFeatures);
+    default:
+        return Protocols::InteractionModel::Status::UnsupportedAttribute;
+    }
+}
+
+CHIP_ERROR TimeSynchronizationCluster::Startup(ServerClusterContext & context)
+{
+    ReturnErrorOnFailure(DefaultServerCluster::Startup(context));
+
+    mTimeSyncDataProvider.Init(context.storage);
+
+    Structs::TrustedTimeSourceStruct::Type tts;
+    if (mTimeSyncDataProvider.LoadTrustedTimeSource(tts) == CHIP_NO_ERROR)
+    {
+        mTrustedTimeSource.SetNonNull(tts);
+    }
+    if (LoadTimeZone() != CHIP_NO_ERROR)
+    {
+        ClearTimeZone();
+    }
+    if (LoadDSTOffset() != CHIP_NO_ERROR)
+    {
+        ClearDSTOffset();
+    }
+
+    // Set the granularity to none for now - this will force us to go to the delegate so it can
+    // properly report the time source
+    mGranularity = GranularityEnum::kNoTimeGranularity;
+
+    // This can error, but it's not clear what should happen in this case. For now, just ignore it because we still
+    // want time sync even if we can't register the delegate here.
+    CHIP_ERROR err = Server::GetInstance().GetFabricTable().AddFabricDelegate(this);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Zcl, "Unable to register Fabric table delegate for time sync");
+    }
+    PlatformMgr().AddEventHandler(OnPlatformEventWrapper, reinterpret_cast<intptr_t>(this));
+
+    return CHIP_NO_ERROR;
+}
+
+void TimeSynchronizationCluster::Shutdown()
+{
+    PlatformMgr().RemoveEventHandler(OnPlatformEventWrapper, 0);
+    Server::GetInstance().GetFabricTable().RemoveFabricDelegate(this);
+    DefaultServerCluster::Shutdown();
+}
+
+void TimeSynchronizationCluster::OnFabricRemoved(const FabricTable & fabricTable, FabricIndex fabricIndex)
+{
+    if (!mTrustedTimeSource.IsNull() && mTrustedTimeSource.Value().fabricIndex == fabricIndex)
+    {
+        DataModel::Nullable<Structs::TrustedTimeSourceStruct::Type> tts;
+        SetTrustedTimeSource(tts);
+        emitMissingTrustedTimeSourceEvent(0, GetEventsGenerator());
+    }
+}
+
+void TimeSynchronizationCluster::AttemptToGetFallbackNTPTimeFromDelegate()
 {
     // Sent as a char-string to the delegate so they can read it easily
     char defaultNTP[kMaxDefaultNTPSize];
     MutableCharSpan span(defaultNTP);
     if (GetDefaultNtp(span) != CHIP_NO_ERROR)
     {
-        emitTimeFailureEvent(kRootEndpointId);
+        emitTimeFailureEvent(kRootEndpointId, GetEventsGenerator());
         return;
     }
     if (span.size() > kMaxDefaultNTPSize)
     {
-        emitTimeFailureEvent(kRootEndpointId);
+        emitTimeFailureEvent(kRootEndpointId, GetEventsGenerator());
         return;
     }
     if (GetDelegate()->UpdateTimeUsingNTPFallback(span, &mOnFallbackNTPCompletion) != CHIP_NO_ERROR)
     {
-        emitTimeFailureEvent(kRootEndpointId);
+        emitTimeFailureEvent(kRootEndpointId, GetEventsGenerator());
     }
 }
 
 #if TIME_SYNC_ENABLE_TSC_FEATURE
-void TimeSynchronizationServer::OnDeviceConnectedFn(Messaging::ExchangeManager & exchangeMgr, const SessionHandle & sessionHandle)
+void TimeSynchronizationCluster::OnDeviceConnectedFn(Messaging::ExchangeManager & exchangeMgr, const SessionHandle & sessionHandle)
 {
     // Connected to our trusted time source, let's read the time.
     AttributePathParams readPaths[2];
-    readPaths[0] = AttributePathParams(kRootEndpointId, Id, Attributes::UTCTime::Id);
-    readPaths[1] = AttributePathParams(kRootEndpointId, Id, Attributes::Granularity::Id);
+    readPaths[0] = AttributePathParams(kRootEndpointId, Id, UTCTime::Id);
+    readPaths[1] = AttributePathParams(kRootEndpointId, Id, Granularity::Id);
 
     InteractionModelEngine * engine = InteractionModelEngine::GetInstance();
     ReadPrepareParams readParams(sessionHandle);
@@ -304,14 +486,14 @@ void TimeSynchronizationServer::OnDeviceConnectedFn(Messaging::ExchangeManager &
     mTimeReadInfo = std::move(readInfo);
 }
 
-void TimeSynchronizationServer::OnDeviceConnectionFailureFn()
+void TimeSynchronizationCluster::OnDeviceConnectionFailureFn()
 {
     // No way to read from the TrustedTimeSource, fall back to default NTP
     AttemptToGetFallbackNTPTimeFromDelegate();
 }
 
-void TimeSynchronizationServer::OnAttributeData(const ConcreteDataAttributePath & aPath, TLV::TLVReader * apData,
-                                                const StatusIB & aStatus)
+void TimeSynchronizationCluster::OnAttributeData(const ConcreteDataAttributePath & aPath, TLV::TLVReader * apData,
+                                                 const StatusIB & aStatus)
 {
     if (aPath.mClusterId != Id || aStatus.IsFailure())
     {
@@ -319,13 +501,13 @@ void TimeSynchronizationServer::OnAttributeData(const ConcreteDataAttributePath 
     }
     switch (aPath.mAttributeId)
     {
-    case Attributes::UTCTime::Id:
+    case UTCTime::Id:
         if (DataModel::Decode(*apData, mTimeReadInfo->utcTime) != CHIP_NO_ERROR)
         {
             mTimeReadInfo->utcTime.SetNull();
         }
         break;
-    case Attributes::Granularity::Id:
+    case Granularity::Id:
         if (DataModel::Decode(*apData, mTimeReadInfo->granularity) != CHIP_NO_ERROR)
         {
             mTimeReadInfo->granularity = GranularityEnum::kNoTimeGranularity;
@@ -336,7 +518,7 @@ void TimeSynchronizationServer::OnAttributeData(const ConcreteDataAttributePath 
     }
 }
 
-void TimeSynchronizationServer::OnDone(ReadClient * apReadClient)
+void TimeSynchronizationCluster::OnDone(ReadClient * apReadClient)
 {
     if (!mTimeReadInfo->utcTime.IsNull() && mTimeReadInfo->granularity != GranularityEnum::kNoTimeGranularity)
     {
@@ -369,7 +551,7 @@ void TimeSynchronizationServer::OnDone(ReadClient * apReadClient)
 }
 #endif
 
-void TimeSynchronizationServer::OnTimeSyncCompletionFn(TimeSourceEnum timeSource, GranularityEnum granularity)
+void TimeSynchronizationCluster::OnTimeSyncCompletionFn(TimeSourceEnum timeSource, GranularityEnum granularity)
 {
     if (timeSource != TimeSourceEnum::kNone && granularity == GranularityEnum::kNoTimeGranularity)
     {
@@ -389,7 +571,7 @@ void TimeSynchronizationServer::OnTimeSyncCompletionFn(TimeSourceEnum timeSource
     }
 }
 
-void TimeSynchronizationServer::OnFallbackNTPCompletionFn(bool timeSyncSuccessful)
+void TimeSynchronizationCluster::OnFallbackNTPCompletionFn(bool timeSyncSuccessful)
 {
     if (timeSyncSuccessful)
     {
@@ -403,11 +585,11 @@ void TimeSynchronizationServer::OnFallbackNTPCompletionFn(bool timeSyncSuccessfu
     }
     else
     {
-        emitTimeFailureEvent(kRootEndpointId);
+        emitTimeFailureEvent(kRootEndpointId, GetEventsGenerator());
     }
 }
 
-CHIP_ERROR TimeSynchronizationServer::AttemptToGetTimeFromTrustedNode()
+CHIP_ERROR TimeSynchronizationCluster::AttemptToGetTimeFromTrustedNode()
 {
 #if TIME_SYNC_ENABLE_TSC_FEATURE
     if (!mTrustedTimeSource.IsNull())
@@ -423,7 +605,7 @@ CHIP_ERROR TimeSynchronizationServer::AttemptToGetTimeFromTrustedNode()
 #endif
 }
 
-void TimeSynchronizationServer::AttemptToGetTime()
+void TimeSynchronizationCluster::AttemptToGetTime()
 {
     // Let's check the delegate and see if can get us a time. Even if the time is already set, we want to ask the delegate so we can
     // set the time source as appropriate.
@@ -438,45 +620,7 @@ void TimeSynchronizationServer::AttemptToGetTime()
     }
 }
 
-void TimeSynchronizationServer::Init()
-{
-    mTimeSyncDataProvider.Init(Server::GetInstance().GetPersistentStorage());
-
-    Structs::TrustedTimeSourceStruct::Type tts;
-    if (mTimeSyncDataProvider.LoadTrustedTimeSource(tts) == CHIP_NO_ERROR)
-    {
-        mTrustedTimeSource.SetNonNull(tts);
-    }
-    if (LoadTimeZone() != CHIP_NO_ERROR)
-    {
-        ClearTimeZone();
-    }
-    if (LoadDSTOffset() != CHIP_NO_ERROR)
-    {
-        ClearDSTOffset();
-    }
-
-    // Set the granularity to none for now - this will force us to go to the delegate so it can
-    // properly report the time source
-    mGranularity = GranularityEnum::kNoTimeGranularity;
-
-    // This can error, but it's not clear what should happen in this case. For now, just ignore it because we still
-    // want time sync even if we can't register the deletgate here.
-    CHIP_ERROR err = Server::GetInstance().GetFabricTable().AddFabricDelegate(this);
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogError(Zcl, "Unable to register Fabric table delegate for time sync");
-    }
-    PlatformMgr().AddEventHandler(OnPlatformEventWrapper, reinterpret_cast<intptr_t>(this));
-}
-
-void TimeSynchronizationServer::Shutdown()
-{
-    PlatformMgr().RemoveEventHandler(OnPlatformEventWrapper, 0);
-    Server::GetInstance().GetFabricTable().RemoveFabricDelegate(this);
-}
-
-void TimeSynchronizationServer::OnPlatformEventFn(const DeviceLayer::ChipDeviceEvent & event)
+void TimeSynchronizationCluster::OnPlatformEventFn(const DeviceLayer::ChipDeviceEvent & event)
 {
     switch (event.Type)
     {
@@ -491,7 +635,7 @@ void TimeSynchronizationServer::OnPlatformEventFn(const DeviceLayer::ChipDeviceE
     }
 }
 
-CHIP_ERROR TimeSynchronizationServer::SetTrustedTimeSource(const DataModel::Nullable<Structs::TrustedTimeSourceStruct::Type> & tts)
+CHIP_ERROR TimeSynchronizationCluster::SetTrustedTimeSource(const DataModel::Nullable<Structs::TrustedTimeSourceStruct::Type> & tts)
 {
     CHIP_ERROR err     = CHIP_NO_ERROR;
     mTrustedTimeSource = tts;
@@ -511,7 +655,7 @@ CHIP_ERROR TimeSynchronizationServer::SetTrustedTimeSource(const DataModel::Null
     return err;
 }
 
-CHIP_ERROR TimeSynchronizationServer::SetDefaultNTP(const DataModel::Nullable<CharSpan> & dntp)
+CHIP_ERROR TimeSynchronizationCluster::SetDefaultNTP(const DataModel::Nullable<CharSpan> & dntp)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     if (!dntp.IsNull())
@@ -525,7 +669,7 @@ CHIP_ERROR TimeSynchronizationServer::SetDefaultNTP(const DataModel::Nullable<Ch
     return err;
 }
 
-void TimeSynchronizationServer::InitTimeZone()
+void TimeSynchronizationCluster::InitTimeZone()
 {
     mTimeZoneObj.validSize    = 1; // one default time zone item is needed
     mTimeZoneObj.timeZoneList = Span<TimeSyncDataProvider::TimeZoneStore>(mTz);
@@ -536,7 +680,7 @@ void TimeSynchronizationServer::InitTimeZone()
     }
 }
 
-CHIP_ERROR TimeSynchronizationServer::SetTimeZone(const DataModel::DecodableList<Structs::TimeZoneStruct::Type> & tzL)
+CHIP_ERROR TimeSynchronizationCluster::SetTimeZone(const DataModel::DecodableList<Structs::TimeZoneStruct::Type> & tzL)
 {
     size_t items;
     VerifyOrReturnError(CHIP_NO_ERROR == tzL.ComputeSize(&items), CHIP_IM_GLOBAL_STATUS(InvalidCommand));
@@ -643,25 +787,25 @@ CHIP_ERROR TimeSynchronizationServer::SetTimeZone(const DataModel::DecodableList
     return mTimeSyncDataProvider.StoreTimeZone(GetTimeZone());
 }
 
-CHIP_ERROR TimeSynchronizationServer::LoadTimeZone()
+CHIP_ERROR TimeSynchronizationCluster::LoadTimeZone()
 {
     InitTimeZone();
     return mTimeSyncDataProvider.LoadTimeZone(mTimeZoneObj);
 }
 
-CHIP_ERROR TimeSynchronizationServer::ClearTimeZone()
+CHIP_ERROR TimeSynchronizationCluster::ClearTimeZone()
 {
     InitTimeZone();
     return mTimeSyncDataProvider.StoreTimeZone(GetTimeZone());
 }
 
-void TimeSynchronizationServer::InitDSTOffset()
+void TimeSynchronizationCluster::InitDSTOffset()
 {
     mDstOffsetObj.validSize     = 0;
     mDstOffsetObj.dstOffsetList = DataModel::List<Structs::DSTOffsetStruct::Type>(mDst);
 }
 
-CHIP_ERROR TimeSynchronizationServer::SetDSTOffset(const DataModel::DecodableList<Structs::DSTOffsetStruct::Type> & dstL)
+CHIP_ERROR TimeSynchronizationCluster::SetDSTOffset(const DataModel::DecodableList<Structs::DSTOffsetStruct::Type> & dstL)
 {
     size_t items;
     VerifyOrReturnError(CHIP_NO_ERROR == dstL.ComputeSize(&items), CHIP_IM_GLOBAL_STATUS(InvalidCommand));
@@ -725,44 +869,44 @@ CHIP_ERROR TimeSynchronizationServer::SetDSTOffset(const DataModel::DecodableLis
     return mTimeSyncDataProvider.StoreDSTOffset(GetDSTOffset());
 }
 
-CHIP_ERROR TimeSynchronizationServer::LoadDSTOffset()
+CHIP_ERROR TimeSynchronizationCluster::LoadDSTOffset()
 {
     InitDSTOffset();
     return mTimeSyncDataProvider.LoadDSTOffset(mDstOffsetObj);
 }
 
-CHIP_ERROR TimeSynchronizationServer::ClearDSTOffset()
+CHIP_ERROR TimeSynchronizationCluster::ClearDSTOffset()
 {
     InitDSTOffset();
     ReturnErrorOnFailure(mTimeSyncDataProvider.ClearDSTOffset());
-    emitDSTTableEmptyEvent(GetDelegate()->GetEndpoint());
+    emitDSTTableEmptyEvent(GetDelegate()->GetEndpoint(), GetEventsGenerator());
     return CHIP_NO_ERROR;
 }
 
-DataModel::Nullable<Structs::TrustedTimeSourceStruct::Type> & TimeSynchronizationServer::GetTrustedTimeSource()
+DataModel::Nullable<Structs::TrustedTimeSourceStruct::Type> & TimeSynchronizationCluster::GetTrustedTimeSource()
 {
     return mTrustedTimeSource;
 }
 
-CHIP_ERROR TimeSynchronizationServer::GetDefaultNtp(MutableCharSpan & dntp)
+CHIP_ERROR TimeSynchronizationCluster::GetDefaultNtp(MutableCharSpan & dntp)
 {
     return mTimeSyncDataProvider.LoadDefaultNtp(dntp);
 }
 
-Span<TimeSyncDataProvider::TimeZoneStore> & TimeSynchronizationServer::GetTimeZone()
+Span<TimeSyncDataProvider::TimeZoneStore> & TimeSynchronizationCluster::GetTimeZone()
 {
     mTimeZoneObj.timeZoneList = mTimeZoneObj.timeZoneList.SubSpan(0, mTimeZoneObj.validSize);
     return mTimeZoneObj.timeZoneList;
 }
 
-DataModel::List<Structs::DSTOffsetStruct::Type> & TimeSynchronizationServer::GetDSTOffset()
+DataModel::List<Structs::DSTOffsetStruct::Type> & TimeSynchronizationCluster::GetDSTOffset()
 {
     mDstOffsetObj.dstOffsetList = mDstOffsetObj.dstOffsetList.SubSpan(0, mDstOffsetObj.validSize);
     return mDstOffsetObj.dstOffsetList;
 }
 
-void TimeSynchronizationServer::ScheduleDelayedAction(System::Clock::Seconds32 delay, System::TimerCompleteCallback action,
-                                                      void * aAppState)
+void TimeSynchronizationCluster::ScheduleDelayedAction(System::Clock::Seconds32 delay, System::TimerCompleteCallback action,
+                                                       void * aAppState)
 {
     if (CHIP_NO_ERROR != SystemLayer().StartTimer(std::chrono::duration_cast<System::Clock::Timeout>(delay), action, aAppState))
     {
@@ -770,8 +914,8 @@ void TimeSynchronizationServer::ScheduleDelayedAction(System::Clock::Seconds32 d
     }
 }
 
-CHIP_ERROR TimeSynchronizationServer::SetUTCTime(EndpointId ep, uint64_t utcTime, GranularityEnum granularity,
-                                                 TimeSourceEnum source)
+CHIP_ERROR TimeSynchronizationCluster::SetUTCTime(EndpointId ep, uint64_t utcTime, GranularityEnum granularity,
+                                                  TimeSourceEnum source)
 {
     CHIP_ERROR err = UpdateUTCTime(utcTime);
     if (err != CHIP_NO_ERROR && !RuntimeOptionsProvider::Instance().GetSimulateNoInternalTime())
@@ -790,7 +934,7 @@ CHIP_ERROR TimeSynchronizationServer::SetUTCTime(EndpointId ep, uint64_t utcTime
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR TimeSynchronizationServer::GetLocalTime(EndpointId ep, DataModel::Nullable<uint64_t> & localTime)
+CHIP_ERROR TimeSynchronizationCluster::GetLocalTime(EndpointId ep, DataModel::Nullable<uint64_t> & localTime)
 {
     int64_t timeZoneOffset = 0, dstOffset = 0;
     System::Clock::Microseconds64 utcTime;
@@ -805,7 +949,7 @@ CHIP_ERROR TimeSynchronizationServer::GetLocalTime(EndpointId ep, DataModel::Nul
     VerifyOrReturnError(UnixEpochToChipEpochMicros(utcTime.count(), chipEpochTime), CHIP_ERROR_INVALID_TIME);
     if (TimeState::kChanged == UpdateTimeZoneState())
     {
-        emitTimeZoneStatusEvent(ep);
+        emitTimeZoneStatusEvent(ep, GetEventsGenerator());
     }
     VerifyOrReturnError(GetTimeZone().size() != 0, CHIP_ERROR_INVALID_TIME);
     const auto & tzStore = GetTimeZone()[0];
@@ -824,12 +968,12 @@ CHIP_ERROR TimeSynchronizationServer::GetLocalTime(EndpointId ep, DataModel::Nul
     localTime.SetNonNull((localTimeSec * chip::kMicrosecondsPerSecond) + usRemainder);
     if (newState == TimeState::kChanged)
     {
-        emitDSTStatusEvent(0, dstOffset != 0);
+        emitDSTStatusEvent(0, dstOffset != 0, GetEventsGenerator());
     }
     return CHIP_NO_ERROR;
 }
 
-TimeState TimeSynchronizationServer::UpdateTimeZoneState()
+TimeState TimeSynchronizationCluster::UpdateTimeZoneState()
 {
     System::Clock::Microseconds64 utcTime;
     auto & tzList        = GetTimeZone();
@@ -867,7 +1011,7 @@ TimeState TimeSynchronizationServer::UpdateTimeZoneState()
     return TimeState::kActive;
 }
 
-TimeState TimeSynchronizationServer::UpdateDSTOffsetState()
+TimeState TimeSynchronizationCluster::UpdateDSTOffsetState()
 {
     System::Clock::Microseconds64 utcTime;
     auto & dstList        = GetDSTOffset();
@@ -925,377 +1069,15 @@ TimeState TimeSynchronizationServer::UpdateDSTOffsetState()
     return TimeState::kActive;
 }
 
-TimeSyncEventFlag TimeSynchronizationServer::GetEventFlag()
+TimeSyncEventFlag TimeSynchronizationCluster::GetEventFlag()
 {
     return mEventFlag;
 }
 
-void TimeSynchronizationServer::ClearEventFlag(TimeSyncEventFlag flag)
+void TimeSynchronizationCluster::ClearEventFlag(TimeSyncEventFlag flag)
 {
     uint8_t eventFlag = to_underlying(mEventFlag) ^ to_underlying(flag);
     mEventFlag        = static_cast<TimeSyncEventFlag>(eventFlag);
 }
 
-void TimeSynchronizationServer::OnFabricRemoved(const FabricTable & fabricTable, FabricIndex fabricIndex)
-{
-    if (!mTrustedTimeSource.IsNull() && mTrustedTimeSource.Value().fabricIndex == fabricIndex)
-    {
-        DataModel::Nullable<Structs::TrustedTimeSourceStruct::Type> tts;
-        TimeSynchronizationServer::Instance().SetTrustedTimeSource(tts);
-        emitMissingTrustedTimeSourceEvent(0);
-    }
-}
-
-namespace {
-
-class TimeSynchronizationAttrAccess : public AttributeAccessInterface
-{
-public:
-    // register for the TimeSync cluster on all endpoints
-    TimeSynchronizationAttrAccess() : AttributeAccessInterface(Optional<EndpointId>::Missing(), Id) {}
-
-    CHIP_ERROR Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder) override;
-
-private:
-    CHIP_ERROR ReadTrustedTimeSource(EndpointId endpoint, AttributeValueEncoder & aEncoder);
-    CHIP_ERROR ReadDefaultNtp(EndpointId endpoint, AttributeValueEncoder & aEncoder);
-    CHIP_ERROR ReadTimeZone(EndpointId endpoint, AttributeValueEncoder & aEncoder);
-    CHIP_ERROR ReadDSTOffset(EndpointId endpoint, AttributeValueEncoder & aEncoder);
-    CHIP_ERROR ReadLocalTime(EndpointId endpoint, AttributeValueEncoder & aEncoder);
-};
-
-TimeSynchronizationAttrAccess gAttrAccess;
-
-CHIP_ERROR TimeSynchronizationAttrAccess::ReadTrustedTimeSource(EndpointId endpoint, AttributeValueEncoder & aEncoder)
-{
-    const auto & tts = TimeSynchronizationServer::Instance().GetTrustedTimeSource();
-    return aEncoder.Encode(tts);
-}
-
-CHIP_ERROR TimeSynchronizationAttrAccess::ReadDefaultNtp(EndpointId endpoint, AttributeValueEncoder & aEncoder)
-{
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    char buffer[DefaultNTP::TypeInfo::MaxLength()];
-    MutableCharSpan dntp(buffer);
-    err = TimeSynchronizationServer::Instance().GetDefaultNtp(dntp);
-    if (err == CHIP_NO_ERROR)
-    {
-        err = aEncoder.Encode(CharSpan(buffer, dntp.size()));
-    }
-    else if (err == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND)
-    {
-        err = aEncoder.EncodeNull();
-    }
-    return err;
-}
-
-CHIP_ERROR TimeSynchronizationAttrAccess::ReadTimeZone(EndpointId endpoint, AttributeValueEncoder & aEncoder)
-{
-    CHIP_ERROR err = aEncoder.EncodeList([](const auto & encoder) -> CHIP_ERROR {
-        const auto & tzList = TimeSynchronizationServer::Instance().GetTimeZone();
-        for (const auto & tzStore : tzList)
-        {
-            ReturnErrorOnFailure(encoder.Encode(tzStore.timeZone));
-        }
-
-        return CHIP_NO_ERROR;
-    });
-
-    return err;
-}
-
-CHIP_ERROR TimeSynchronizationAttrAccess::ReadDSTOffset(EndpointId endpoint, AttributeValueEncoder & aEncoder)
-{
-    CHIP_ERROR err = aEncoder.EncodeList([](const auto & encoder) -> CHIP_ERROR {
-        const auto & dstList = TimeSynchronizationServer::Instance().GetDSTOffset();
-        for (const auto & dstOffset : dstList)
-        {
-            ReturnErrorOnFailure(encoder.Encode(dstOffset));
-        }
-
-        return CHIP_NO_ERROR;
-    });
-
-    return err;
-}
-
-CHIP_ERROR TimeSynchronizationAttrAccess::ReadLocalTime(EndpointId endpoint, AttributeValueEncoder & aEncoder)
-{
-    DataModel::Nullable<uint64_t> localTime;
-    CHIP_ERROR err = TimeSynchronizationServer::Instance().GetLocalTime(endpoint, localTime);
-    err            = aEncoder.Encode(localTime);
-    return err;
-}
-
-CHIP_ERROR TimeSynchronizationAttrAccess::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
-{
-    CHIP_ERROR err = CHIP_NO_ERROR;
-
-    if (aPath.mClusterId != Id)
-    {
-        return CHIP_ERROR_INVALID_PATH_LIST;
-    }
-
-    switch (aPath.mAttributeId)
-    {
-    case UTCTime::Id: {
-        System::Clock::Microseconds64 utcTimeUnix;
-        uint64_t chipEpochTime;
-        // This return allows us to simulate no internal time for testing purposes
-        // This will be set once we receive a good time either from the delegate or via a command
-        if (TimeSynchronizationServer::Instance().GetGranularity() == GranularityEnum::kNoTimeGranularity)
-        {
-            return aEncoder.EncodeNull();
-        }
-        VerifyOrReturnError(System::SystemClock().GetClock_RealTime(utcTimeUnix) == CHIP_NO_ERROR, aEncoder.EncodeNull());
-        VerifyOrReturnError(UnixEpochToChipEpochMicros(utcTimeUnix.count(), chipEpochTime), aEncoder.EncodeNull());
-        return aEncoder.Encode(chipEpochTime);
-    }
-    case Granularity::Id: {
-        return aEncoder.Encode(TimeSynchronizationServer::Instance().GetGranularity());
-    }
-    case TrustedTimeSource::Id: {
-        return ReadTrustedTimeSource(aPath.mEndpointId, aEncoder);
-    }
-    case DefaultNTP::Id: {
-        return ReadDefaultNtp(aPath.mEndpointId, aEncoder);
-    }
-    case TimeZone::Id: {
-        return ReadTimeZone(aPath.mEndpointId, aEncoder);
-    }
-    case DSTOffset::Id: {
-        return ReadDSTOffset(aPath.mEndpointId, aEncoder);
-    }
-    case TimeZoneListMaxSize::Id: {
-        uint8_t max = CHIP_CONFIG_TIME_ZONE_LIST_MAX_SIZE;
-        return aEncoder.Encode(max);
-    }
-    case DSTOffsetListMaxSize::Id: {
-        uint8_t max = CHIP_CONFIG_DST_OFFSET_LIST_MAX_SIZE;
-        return aEncoder.Encode(max);
-    }
-    case LocalTime::Id: {
-        return ReadLocalTime(aPath.mEndpointId, aEncoder);
-    }
-    default: {
-        break;
-    }
-    }
-
-    return err;
-}
-} // anonymous namespace
-
-bool emberAfTimeSynchronizationClusterSetUTCTimeCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::TimeSynchronization::Commands::SetUTCTime::DecodableType & commandData)
-{
-    const auto & utcTime     = commandData.UTCTime;
-    const auto & granularity = commandData.granularity;
-    const auto & timeSource  = commandData.timeSource;
-
-    auto currentGranularity = TimeSynchronizationServer::Instance().GetGranularity();
-    if (granularity < GranularityEnum::kNoTimeGranularity || granularity > GranularityEnum::kMicrosecondsGranularity)
-    {
-        commandObj->AddStatus(commandPath, Status::InvalidCommand);
-        return true;
-    }
-    if (timeSource.HasValue() && (timeSource.Value() < TimeSourceEnum::kNone || timeSource.Value() > TimeSourceEnum::kGnss))
-    {
-        commandObj->AddStatus(commandPath, Status::InvalidCommand);
-        return true;
-    }
-
-    if (granularity != GranularityEnum::kNoTimeGranularity &&
-        (currentGranularity == GranularityEnum::kNoTimeGranularity || granularity >= currentGranularity) &&
-        CHIP_NO_ERROR ==
-            TimeSynchronizationServer::Instance().SetUTCTime(commandPath.mEndpointId, utcTime, granularity, TimeSourceEnum::kAdmin))
-    {
-        commandObj->AddStatus(commandPath, Status::Success);
-    }
-    else
-    {
-        commandObj->AddClusterSpecificFailure(commandPath, to_underlying(StatusCode::kTimeNotAccepted));
-    }
-    return true;
-}
-
-bool emberAfTimeSynchronizationClusterSetTrustedTimeSourceCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::TimeSynchronization::Commands::SetTrustedTimeSource::DecodableType & commandData)
-{
-    const auto & timeSource = commandData.trustedTimeSource;
-    DataModel::Nullable<Structs::TrustedTimeSourceStruct::Type> tts;
-
-    if (!timeSource.IsNull())
-    {
-
-        Structs::TrustedTimeSourceStruct::Type ts = { commandObj->GetAccessingFabricIndex(), timeSource.Value().nodeID,
-                                                      timeSource.Value().endpoint };
-        tts.SetNonNull(ts);
-        // TODO: schedule a utctime read from this time source and emit event only on failure to get time
-        emitTimeFailureEvent(commandPath.mEndpointId);
-    }
-    else
-    {
-        tts.SetNull();
-        emitMissingTrustedTimeSourceEvent(commandPath.mEndpointId);
-    }
-
-    TimeSynchronizationServer::Instance().SetTrustedTimeSource(tts);
-    commandObj->AddStatus(commandPath, Status::Success);
-    return true;
-}
-
-bool emberAfTimeSynchronizationClusterSetTimeZoneCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::TimeSynchronization::Commands::SetTimeZone::DecodableType & commandData)
-{
-    const auto & timeZone = commandData.timeZone;
-
-    CHIP_ERROR err = TimeSynchronizationServer::Instance().SetTimeZone(timeZone);
-    if (err != CHIP_NO_ERROR)
-    {
-        if (err == CHIP_ERROR_BUFFER_TOO_SMALL)
-        {
-            commandObj->AddStatus(commandPath, Status::ResourceExhausted);
-        }
-        else if (err == CHIP_IM_GLOBAL_STATUS(InvalidCommand))
-        {
-            commandObj->AddStatus(commandPath, Status::InvalidCommand);
-        }
-        else
-        {
-            commandObj->AddStatus(commandPath, Status::ConstraintError);
-        }
-        return true;
-    }
-
-    if (to_underlying(TimeSynchronizationServer::Instance().GetEventFlag()) & to_underlying(TimeSyncEventFlag::kTimeZoneStatus))
-    {
-        TimeSynchronizationServer::Instance().ClearEventFlag(TimeSyncEventFlag::kTimeZoneStatus);
-        emitTimeZoneStatusEvent(commandPath.mEndpointId);
-    }
-    GetDelegate()->TimeZoneListChanged(TimeSynchronizationServer::Instance().GetTimeZone());
-
-    TimeZoneDatabaseEnum tzDb;
-    TimeZoneDatabase::Get(commandPath.mEndpointId, &tzDb);
-    Commands::SetTimeZoneResponse::Type response;
-    TimeSynchronizationServer::Instance().UpdateTimeZoneState();
-    const auto & tzList = TimeSynchronizationServer::Instance().GetTimeZone();
-    if (GetDelegate()->HasFeature(Feature::kTimeZone) && tzDb != TimeZoneDatabaseEnum::kNone && tzList.size() != 0)
-    {
-        auto & tz = tzList[0].timeZone;
-        if (tz.name.HasValue() && GetDelegate()->HandleUpdateDSTOffset(tz.name.Value()))
-        {
-            response.DSTOffsetRequired = false;
-            emitDSTStatusEvent(commandPath.mEndpointId, true);
-        }
-        else
-        {
-            response.DSTOffsetRequired = true;
-        }
-    }
-    else
-    {
-        response.DSTOffsetRequired = true;
-    }
-
-    if (response.DSTOffsetRequired)
-    {
-        TimeState dstState = TimeSynchronizationServer::Instance().UpdateDSTOffsetState();
-        TimeSynchronizationServer::Instance().ClearDSTOffset();
-        if (dstState == TimeState::kActive || dstState == TimeState::kChanged)
-        {
-            emitDSTStatusEvent(commandPath.mEndpointId, false);
-        }
-    }
-
-    commandObj->AddResponse(commandPath, response);
-    return true;
-}
-
-bool emberAfTimeSynchronizationClusterSetDSTOffsetCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::TimeSynchronization::Commands::SetDSTOffset::DecodableType & commandData)
-{
-    const auto & dstOffset = commandData.DSTOffset;
-
-    TimeState dstState = TimeSynchronizationServer::Instance().UpdateDSTOffsetState();
-
-    CHIP_ERROR err = TimeSynchronizationServer::Instance().SetDSTOffset(dstOffset);
-    if (err != CHIP_NO_ERROR)
-    {
-        if (err == CHIP_ERROR_BUFFER_TOO_SMALL)
-        {
-            commandObj->AddStatus(commandPath, Status::ResourceExhausted);
-        }
-        else if (err == CHIP_IM_GLOBAL_STATUS(InvalidCommand))
-        {
-            commandObj->AddStatus(commandPath, Status::InvalidCommand);
-        }
-        else
-        {
-            commandObj->AddStatus(commandPath, Status::ConstraintError);
-        }
-        return true;
-    }
-    // if DST state changes, generate DSTStatus event
-    if (dstState != TimeSynchronizationServer::Instance().UpdateDSTOffsetState())
-    {
-        emitDSTStatusEvent(commandPath.mEndpointId,
-                           TimeState::kActive == TimeSynchronizationServer::Instance().UpdateDSTOffsetState());
-    }
-
-    commandObj->AddStatus(commandPath, Status::Success);
-    return true;
-}
-
-bool emberAfTimeSynchronizationClusterSetDefaultNTPCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::TimeSynchronization::Commands::SetDefaultNTP::DecodableType & commandData)
-{
-    Status status         = Status::Success;
-    const auto & dNtpChar = commandData.defaultNTP;
-
-    if (!dNtpChar.IsNull() && dNtpChar.Value().size() > 0)
-    {
-        size_t len = dNtpChar.Value().size();
-        if (len > DefaultNTP::TypeInfo::MaxLength())
-        {
-            commandObj->AddStatus(commandPath, Status::ConstraintError);
-            return true;
-        }
-        bool dnsResolve;
-        if (Status::Success != SupportsDNSResolve::Get(commandPath.mEndpointId, &dnsResolve))
-        {
-            commandObj->AddStatus(commandPath, Status::Failure);
-            return true;
-        }
-        bool isDomain = GetDelegate()->IsNTPAddressDomain(dNtpChar.Value());
-        bool isIPv6   = GetDelegate()->IsNTPAddressValid(dNtpChar.Value());
-        bool useable  = isIPv6 || (isDomain && dnsResolve);
-        if (!useable)
-        {
-            commandObj->AddStatus(commandPath, Status::InvalidCommand);
-            return true;
-        }
-    }
-
-    status = (CHIP_NO_ERROR == TimeSynchronizationServer::Instance().SetDefaultNTP(dNtpChar)) ? Status::Success : Status::Failure;
-
-    commandObj->AddStatus(commandPath, status);
-    return true;
-}
-
-void MatterTimeSynchronizationPluginServerInitCallback()
-{
-    TimeSynchronizationServer::Instance().Init();
-    AttributeAccessInterfaceRegistry::Instance().Register(&gAttrAccess);
-}
-
-void MatterTimeSynchronizationPluginServerShutdownCallback()
-{
-    AttributeAccessInterfaceRegistry::Instance().Unregister(&gAttrAccess);
-    TimeSynchronizationServer::Instance().Shutdown();
-}
+} // namespace chip::app::Clusters

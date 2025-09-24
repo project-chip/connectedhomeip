@@ -503,7 +503,9 @@
             "LocalTime",
             "Granularity",
             "TimeZoneListMaxSize",
-            "DSTOffsetListMaxSize"
+            "DSTOffsetListMaxSize",
+            "ClusterRevision",
+            "FeatureMap"
         ],
         "Temperature Control": ["SupportedTemperatureLevels"],
         "Dishwasher Mode": ["SupportedModes", "CurrentMode", "FeatureMap"],
