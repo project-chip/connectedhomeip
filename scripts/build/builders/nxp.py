@@ -102,6 +102,7 @@ class NxpApp(Enum):
     LAUNDRYWASHER = auto()
     THERMOSTAT = auto()
     LOCK_APP = auto()
+    UNIT_TEST = auto()
 
     def ExampleName(self):
         if self == NxpApp.LIGHTING:
@@ -116,6 +117,8 @@ class NxpApp(Enum):
             return "thermostat"
         elif self == NxpApp.LOCK_APP:
             return "lock-app"
+        elif self == NxpApp.UNIT_TEST:
+            return "unit-test"
         else:
             raise Exception('Unknown app type: %r' % self)
 
@@ -132,12 +135,17 @@ class NxpApp(Enum):
             return "thermostat-example"
         elif self == NxpApp.LOCK_APP:
             return "lock-example"
+        elif self == NxpApp.UNIT_TEST:
+            return "unit-test-example"
         else:
             raise Exception('Unknown app type: %r' % self)
 
     def BuildRoot(self, root, board, os_env, build_system):
         if ((os_env == NxpOsUsed.FREERTOS) and (build_system == NxpBuildSystem.CMAKE)):
-            return os.path.join(root, 'examples', self.ExampleName(), 'nxp')
+            if (self.ExampleName() == "unit-test"):
+                return os.path.join(root, 'src', 'test_driver', 'nxp')
+            else:
+                return os.path.join(root, 'examples', self.ExampleName(), 'nxp')
         else:
             return os.path.join(root, 'examples', self.ExampleName(), 'nxp', board.FolderName(os_env))
 
@@ -404,7 +412,6 @@ class NxpBuilder(GnBuilder):
             "onnetwork" if self.disable_ble else None,
             "low_power" if self.low_power else None
         ]
-
         prj_file = "_".join(filter(None, components)) + ".conf"
         prj_file_abs_path = os.path.dirname(os.path.realpath(__file__)) + "/../../../examples/platform/nxp/config/" + prj_file
         if os.path.isfile(prj_file_abs_path):
@@ -426,7 +433,7 @@ class NxpBuilder(GnBuilder):
             cmd += '\nexport ZEPHYR_BASE="$ZEPHYR_NXP_BASE"'
             cmd += '\nunset ZEPHYR_TOOLCHAIN_VARIANT'
         else:
-            if self.build_system is NxpBuildSystem.CMAKE:
+            if self.build_system is NxpBuildSystem.CMAKE and self.app.name != "UNIT_TEST":
                 build_flags += " " + "-DCONF_FILE_NAME=%s" % self.get_conf_file()
             cmd = ''
             # will be used with next sdk version to get sdk path
