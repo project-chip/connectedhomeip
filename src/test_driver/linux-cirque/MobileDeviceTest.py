@@ -97,7 +97,7 @@ class TestPythonController(CHIPVirtualHome):
             CHIP_REPO, "out/debug/linux_x64_gcc/controller/python/matter_repl-1.0.0-py3-none-any.whl")))
 
         command = ("gdb -batch -return-child-result -q -ex run -ex \"thread apply all bt\" "
-                   "--args python3 {} -t 300 -a {} --paa-trust-store-path {}").format(
+                   "--args python3 {} -t 300 --paa-trust-store-path {}").format(
             os.path.join(
                 CHIP_REPO, "src/controller/python/tests/scripts/mobile-device-test.py"),
             os.path.join(CHIP_REPO, MATTER_DEVELOPMENT_PAA_ROOT_CERTS))
