@@ -130,6 +130,12 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetCurrentHeapHighWatermark(uint64_t & cu
     return CHIP_NO_ERROR;
 }
 
+CHIP_ERROR DiagnosticDataProviderImpl::ResetWatermarks()
+{
+    // esp-idf does not provide a way to reset the watermarks
+    return CHIP_ERROR_NOT_IMPLEMENTED;
+}
+
 CHIP_ERROR DiagnosticDataProviderImpl::GetRebootCount(uint16_t & rebootCount)
 {
     uint32_t count = 0;
