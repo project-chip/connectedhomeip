@@ -218,11 +218,10 @@ class OTAProviderSubprocess(AppServerSubprocess):
             f.flush()
         return b""  # must return bytes, not None
 
-    def start_and_wait(self, wait_for: str, timeout: int = 30):
-        """Start provider and wait for specific output in logs."""
+    def start(self, expected_output: str = None, timeout: int = 30):
+        """Override start to attach log processing callback."""
         self.output_cb = self._process_output
-        self.start(expected_output=wait_for, timeout=timeout)
-        return self
+        super().start(expected_output=expected_output, timeout=timeout)
 
     # ---------------- ACL METHODS ---------------- #
 
