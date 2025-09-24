@@ -481,12 +481,12 @@ class ClusterParser:
     def _parse_basic_field_attributes(self, xml_field: ElementTree.Element, component_type: DataTypeEnum, component_tags: dict) -> tuple[str, uint] | None:
         """
         Extract basic field attributes (name and ID) from XML element.
-        
+
         Args:
             xml_field: XML element representing the field/item/bitfield
             component_type: Type of component being parsed (struct/enum/bitmap)
             component_tags: Mapping of component types to their XML tag info
-            
+
         Returns:
             Tuple of (name, id) if successful, None if parsing failed
         """
@@ -500,21 +500,21 @@ class ClusterParser:
     def _determine_optional_status(self, xml_field: ElementTree.Element) -> bool:
         """
         Determine if a field is optional based on XML attributes and child elements.
-        
+
         Checks both:
         1. isOptional attribute on the field element
         2. Presence of optionalConform child element
-        
+
         Args:
             xml_field: XML element representing the field
-            
+
         Returns:
             True if field is optional, False otherwise
         """
         # Check isOptional attribute
         if 'isOptional' in xml_field.attrib and xml_field.attrib['isOptional'] == 'true':
             return True
-            
+
         # Check for optionalConform child element
         optional_conform = xml_field.find('./optionalConform')
         return optional_conform is not None
@@ -522,45 +522,45 @@ class ClusterParser:
     def _determine_nullable_status(self, xml_field: ElementTree.Element) -> bool:
         """
         Determine if a field is nullable based on XML attributes and child elements.
-        
+
         Checks both:
         1. isNullable attribute on the field element
         2. nullable attribute on quality child element
-        
+
         Args:
             xml_field: XML element representing the field
-            
+
         Returns:
             True if field is nullable, False otherwise
         """
         # Check isNullable attribute
         if 'isNullable' in xml_field.attrib and xml_field.attrib['isNullable'] == 'true':
             return True
-            
+
         # Check quality child element for nullable attribute
         quality = xml_field.find('./quality')
         if quality is not None and 'nullable' in quality.attrib and quality.attrib['nullable'] == 'true':
             return True
-            
+
         return False
 
     def _parse_field_constraints(self, xml_field: ElementTree.Element) -> dict | None:
         """
         Parse constraint information from XML field element.
-        
+
         Handles both direct constraint attributes (min/max) and child elements (maxCount).
         For maxCount, also extracts attribute references if present.
-        
+
         Args:
             xml_field: XML element representing the field
-            
+
         Returns:
             Dictionary of constraints if any found, None otherwise
         """
         constraint_elements = xml_field.findall('./constraint')
         if not constraint_elements:
             return None
-            
+
         constraints = {}
         for constraint in constraint_elements:
             # Handle direct attributes like min/max
@@ -576,31 +576,31 @@ class ClusterParser:
                 attr_element = max_count.find('./attribute')
                 if attr_element is not None and 'name' in attr_element.attrib:
                     constraints['maxCountAttribute'] = attr_element.attrib['name']
-                    
+
         return constraints if constraints else None
 
     def _parse_field_conformance(self, xml_field: ElementTree.Element) -> ConformanceCallable:
         """
         Parse conformance information from XML field element with fallback.
-        
+
         Attempts to parse conformance from XML, but falls back to optional conformance
         if parsing fails. This handles cases where struct fields have arithmetic or
         description conformances that are currently unused.
-        
+
         Args:
             xml_field: XML element representing the field
-            
+
         Returns:
             Conformance object (either parsed or optional fallback)
         """
         xml_conformance, problems = get_conformance(xml_field, self._cluster_id)
-        
+
         # Try to parse conformance if no problems found
         if not problems:
             conformance = self.parse_conformance(xml_conformance)
             if conformance:
                 return conformance
-                
+
         # Fallback to optional conformance
         # Note: Many struct fields have arithmetic/desc conformances that are unused
         return optional()
@@ -608,18 +608,18 @@ class ClusterParser:
     def _parse_components(self, struct: ElementTree.Element, component_type: DataTypeEnum) -> dict[uint, XmlDataTypeComponent]:
         """
         Parse components (fields/items/bitfields) from a data type XML element.
-        
+
         This method orchestrates the parsing of struct fields, enum items, or bitmap bitfields
         by delegating specific parsing tasks to focused helper methods. It handles:
         - Basic attribute extraction (name, ID)
         - Field property detection (optional, nullable)
         - Constraint parsing (min/max values, counts)
         - Conformance parsing with fallback logic
-        
+
         Args:
             struct: XML element containing the data type definition
             component_type: Type of components to parse (struct/enum/bitmap)
-            
+
         Returns:
             Dictionary mapping component IDs to XmlDataTypeComponent objects
         """
@@ -635,7 +635,7 @@ class ClusterParser:
         for xml_field in list(struct):
             if xml_field.tag != component_tags[component_type].tag:
                 continue
-                
+
             # Parse basic field attributes (name and ID)
             field_attrs = self._parse_basic_field_attributes(xml_field, component_type, component_tags)
             if field_attrs is None:
@@ -643,7 +643,7 @@ class ClusterParser:
                                   severity=ProblemSeverity.WARNING, problem=f"{component_type.value.capitalize()} field in {struct_name} with no id or name")
                 self._problems.append(p)
                 continue
-            
+
             name, id = field_attrs
 
             # Extract additional field attributes
