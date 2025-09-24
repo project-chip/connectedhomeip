@@ -67,8 +67,7 @@ const uint8_t kDevelopmentPAI_PrivateKey_FFF1[32] = {
 ByteSpan kPaiCert       = ByteSpan(kDevelopmentPAI_Cert_FFF1);
 ByteSpan kPaiPrivateKey = ByteSpan(kDevelopmentPAI_PrivateKey_FFF1);
 ByteSpan kPaiPublicKey  = ByteSpan(kDevelopmentPAI_PublicKey_FFF1);
-#endif
-#if CHIP_DEVICE_CONFIG_DEVICE_VENDOR_ID == 0xFFF2
+#elif CHIP_DEVICE_CONFIG_DEVICE_VENDOR_ID == 0xFFF2
 const uint8_t kDevelopmentPAI_Cert_FFF2[441] = {
     0x30, 0x82, 0x01, 0xb5, 0x30, 0x82, 0x01, 0x5b, 0xa0, 0x03, 0x02, 0x01, 0x02, 0x02, 0x08, 0x3d, 0x58, 0xa3, 0xaa, 0x7f, 0x4e,
     0xba, 0x94, 0x30, 0x0a, 0x06, 0x08, 0x2a, 0x86, 0x48, 0xce, 0x3d, 0x04, 0x03, 0x02, 0x30, 0x1a, 0x31, 0x18, 0x30, 0x16, 0x06,
@@ -105,8 +104,7 @@ const uint8_t kDevelopmentPAI_PrivateKey_FFF2[32] = {
 ByteSpan kPaiCert       = ByteSpan(kDevelopmentPAI_Cert_FFF2);
 ByteSpan kPaiPrivateKey = ByteSpan(kDevelopmentPAI_PrivateKey_FFF2);
 ByteSpan kPaiPublicKey  = ByteSpan(kDevelopmentPAI_PublicKey_FFF2);
-#endif
-#if CHIP_DEVICE_CONFIG_DEVICE_VENDOR_ID == 0xFFF3
+#elif CHIP_DEVICE_CONFIG_DEVICE_VENDOR_ID == 0xFFF3
 const uint8_t kDevelopmentPAI_Cert_FFF3[440] = {
     0x30, 0x82, 0x01, 0xb4, 0x30, 0x82, 0x01, 0x5b, 0xa0, 0x03, 0x02, 0x01, 0x02, 0x02, 0x08, 0x23, 0x58, 0x10, 0x1b, 0xf9, 0x4d,
     0x71, 0xf9, 0x30, 0x0a, 0x06, 0x08, 0x2a, 0x86, 0x48, 0xce, 0x3d, 0x04, 0x03, 0x02, 0x30, 0x1a, 0x31, 0x18, 0x30, 0x16, 0x06,
@@ -143,6 +141,10 @@ const uint8_t kDevelopmentPAI_PrivateKey_FFF3[32] = {
 ByteSpan kPaiCert       = ByteSpan(kDevelopmentPAI_Cert_FFF3);
 ByteSpan kPaiPrivateKey = ByteSpan(kDevelopmentPAI_PrivateKey_FFF3);
 ByteSpan kPaiPublicKey  = ByteSpan(kDevelopmentPAI_PublicKey_FFF3);
+#else
+ByteSpan kPaiCert       = ByteSpan();
+ByteSpan kPaiPrivateKey = ByteSpan();
+ByteSpan kPaiPublicKey  = ByteSpan();
 #endif
 } // namespace DevelopmentCerts
 } // namespace chip
