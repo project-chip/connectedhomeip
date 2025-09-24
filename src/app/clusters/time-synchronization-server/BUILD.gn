@@ -16,13 +16,13 @@ import("//build_overrides/chip.gni")
 
 source_set("time-synchronization-server") {
   sources = [
-    "time-synchronization-cluster.cpp",
-    "time-synchronization-cluster.h",
-    "time-synchronization-delegate.h",
     "DefaultTimeSyncDelegate.cpp",
     "DefaultTimeSyncDelegate.h",
     "TimeSyncDataProvider.cpp",
     "TimeSyncDataProvider.h",
+    "time-synchronization-cluster.cpp",
+    "time-synchronization-cluster.h",
+    "time-synchronization-delegate.h",
   ]
 
   public_deps = [
