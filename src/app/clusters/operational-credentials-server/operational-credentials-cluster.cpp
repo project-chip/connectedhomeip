@@ -402,8 +402,7 @@ exit:
 }
 
 std::optional<DataModel::ActionReturnStatus> HandleAddNOC(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
-                                                          TLV::TLVReader & input_arguments,
-                                                          OperationalCredentialsCluster * cluster)
+                                                          TLV::TLVReader & input_arguments, OperationalCredentialsCluster * cluster)
 {
     VerifyOrDie(cluster != nullptr);
     MATTER_TRACE_SCOPE("AddNOC", "OperationalCredentials");
@@ -601,8 +600,8 @@ exit:
     return std::nullopt;
 }
 
-std::optional<DataModel::ActionReturnStatus> HandleUpdateNOC(CommandHandler * commandObj,
-                                                             TLV::TLVReader & input_arguments, const DataModel::InvokeRequest & request,
+std::optional<DataModel::ActionReturnStatus> HandleUpdateNOC(CommandHandler * commandObj, TLV::TLVReader & input_arguments,
+                                                             const DataModel::InvokeRequest & request,
                                                              OperationalCredentialsCluster * cluster)
 {
     VerifyOrDie(cluster != nullptr);
@@ -697,8 +696,8 @@ exit:
     return std::nullopt;
 }
 
-std::optional<DataModel::ActionReturnStatus> HandleUpdateFabricLabel(CommandHandler * commandObj,
-                                                                     TLV::TLVReader & input_arguments, const DataModel::InvokeRequest & request,
+std::optional<DataModel::ActionReturnStatus> HandleUpdateFabricLabel(CommandHandler * commandObj, TLV::TLVReader & input_arguments,
+                                                                     const DataModel::InvokeRequest & request,
                                                                      OperationalCredentialsCluster * cluster)
 {
     VerifyOrDie(cluster != nullptr);
@@ -755,10 +754,10 @@ exit:
     return std::nullopt;
 }
 
-std::optional<DataModel::ActionReturnStatus>
-HandleAddTrustedRootCertificate(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
-                                TLV::TLVReader & input_arguments,
-                                OperationalCredentialsCluster * cluster)
+std::optional<DataModel::ActionReturnStatus> HandleAddTrustedRootCertificate(CommandHandler * commandObj,
+                                                                             const ConcreteCommandPath & commandPath,
+                                                                             TLV::TLVReader & input_arguments,
+                                                                             OperationalCredentialsCluster * cluster)
 {
     VerifyOrDie(cluster != nullptr);
     MATTER_TRACE_SCOPE("AddTrustedRootCertificate", "OperationalCredentials");
@@ -814,10 +813,10 @@ exit:
     return finalStatus;
 }
 
-std::optional<DataModel::ActionReturnStatus>
-HandleSetVIDVerificationStatement(CommandHandler * commandObj,
-                                  TLV::TLVReader & input_arguments, const DataModel::InvokeRequest & request,
-                                  OperationalCredentialsCluster * cluster)
+std::optional<DataModel::ActionReturnStatus> HandleSetVIDVerificationStatement(CommandHandler * commandObj,
+                                                                               TLV::TLVReader & input_arguments,
+                                                                               const DataModel::InvokeRequest & request,
+                                                                               OperationalCredentialsCluster * cluster)
 {
     VerifyOrDie(cluster != nullptr);
     Commands::SetVIDVerificationStatement::DecodableType commandData;
@@ -941,10 +940,10 @@ exit:
     return std::nullopt;
 }
 
-std::optional<DataModel::ActionReturnStatus>
-HandleSignVIDVerificationRequest(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
-                                 TLV::TLVReader & input_arguments,
-                                 OperationalCredentialsCluster * cluster)
+std::optional<DataModel::ActionReturnStatus> HandleSignVIDVerificationRequest(CommandHandler * commandObj,
+                                                                              const ConcreteCommandPath & commandPath,
+                                                                              TLV::TLVReader & input_arguments,
+                                                                              OperationalCredentialsCluster * cluster)
 {
     VerifyOrDie(cluster != nullptr);
     Commands::SignVIDVerificationRequest::DecodableType commandData;
@@ -987,10 +986,10 @@ HandleSignVIDVerificationRequest(CommandHandler * commandObj, const ConcreteComm
     return std::nullopt;
 }
 
-std::optional<DataModel::ActionReturnStatus>
-HandleCertificateChainRequest(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
-                              TLV::TLVReader & input_arguments,
-                              OperationalCredentialsCluster * cluster)
+std::optional<DataModel::ActionReturnStatus> HandleCertificateChainRequest(CommandHandler * commandObj,
+                                                                           const ConcreteCommandPath & commandPath,
+                                                                           TLV::TLVReader & input_arguments,
+                                                                           OperationalCredentialsCluster * cluster)
 {
     VerifyOrDie(cluster != nullptr);
     MATTER_TRACE_SCOPE("CertificateChainRequest", "OperationalCredentials");
@@ -1048,8 +1047,8 @@ std::optional<DataModel::ActionReturnStatus> HandleAttestationRequest(CommandHan
     ReturnErrorOnFailure(commandData.Decode(input_arguments));
 
     auto & attestationNonce = commandData.attestationNonce;
-    auto finalStatus = Status::Failure;
-    CHIP_ERROR err   = CHIP_ERROR_INVALID_ARGUMENT;
+    auto finalStatus        = Status::Failure;
+    CHIP_ERROR err          = CHIP_ERROR_INVALID_ARGUMENT;
     ByteSpan tbsSpan;
 
     Platform::ScopedMemoryBuffer<uint8_t> attestationElements;
