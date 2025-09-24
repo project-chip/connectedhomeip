@@ -26,7 +26,7 @@ class DefaultTimeSyncDelegate : public Delegate
 {
 
 public:
-    DefaultTimeSyncDelegate() : Delegate() {};
+    DefaultTimeSyncDelegate() : Delegate(){};
     bool IsNTPAddressValid(CharSpan ntp) override;
     bool IsNTPAddressDomain(CharSpan ntp) override;
     CHIP_ERROR UpdateTimeFromPlatformSource(chip::Callback::Callback<OnTimeSyncCompletion> * callback) override;
