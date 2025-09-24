@@ -326,6 +326,20 @@ public:
         return Status::Success;
     }
 
+    Protocols::InteractionModel::Status ValidateZoneId(uint16_t zoneId) override
+    {
+        // TODO: Validate zoneId from the allocated zones
+        // Returning Status::Success to pass through checks in the Server Implementation.
+        return Status::Success;
+    }
+
+    bool ValidateMotionZoneListSize(size_t zoneListSize) override
+    {
+        // TODO: Validate motion zone size
+        // Returning true to pass through checks in the Server Implementation.
+        return true;
+    }
+
     PushAvStreamTransportStatusEnum GetTransportBusyStatus(const uint16_t connectionID) override
     {
         for (PushAvStream & stream : pushavStreams)
@@ -355,6 +369,17 @@ public:
     {
         ChipLogProgress(Zcl, "Persistent attributes loaded");
         return CHIP_NO_ERROR;
+    }
+
+    void SetTLSCerts(Tls::CertificateTable::BufferedClientCert & clientCertEntry,
+                     Tls::CertificateTable::BufferedRootCert & rootCertEntry) override
+    {
+        // No-op implementation for tests
+    }
+
+    void SetPushAvStreamTransportServer(PushAvStreamTransportServer * server) override
+    {
+        // No-op implementation for tests
     }
 
 private:

@@ -155,6 +155,20 @@ Protocols::InteractionModel::Status PushAvStreamTransportManager::ValidateAudioS
     return Status::Success;
 }
 
+Protocols::InteractionModel::Status PushAvStreamTransportManager::ValidateZoneId(uint16_t zoneId)
+{
+    // TODO: Validate zoneId from the allocated zones
+    // Returning Status::Success to pass through checks in the Server Implementation.
+    return Status::Success;
+}
+
+bool PushAvStreamTransportManager::ValidateMotionZoneListSize(size_t zoneListSize)
+{
+    // TODO: Validate motion zone size
+    // Returning true to pass through checks in the Server Implementation.
+    return true;
+}
+
 PushAvStreamTransportStatusEnum PushAvStreamTransportManager::GetTransportBusyStatus(const uint16_t connectionID)
 {
     for (PushAvStream & stream : pushavStreams)

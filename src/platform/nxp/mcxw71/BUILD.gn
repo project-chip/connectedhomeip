@@ -180,6 +180,12 @@ static_library("nxp_platform") {
     deps += [ "${chip_root}/third_party/openthread:openthread" ]
     public_deps += [ "${chip_root}/third_party/openthread:openthread-platform" ]
 
+    # If the user has requested a Matter CLI, use the OpenThread CLI
+    # implementation
+    if (nxp_enable_matter_cli) {
+      public_deps += [ "${chip_root}/third_party/openthread:openthread_cli" ]
+    }
+
     if (chip_mdns == "platform") {
       sources += [
         "../../OpenThread/DnssdImpl.cpp",

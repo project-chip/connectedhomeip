@@ -195,6 +195,7 @@ def _GetDarwinFrameworkToolUnsupportedTests() -> Set[str]:
         "Test_TC_ACL_2_6",  # darwin-framework-tool does not currently support reading or subscribing to Events
         "Test_TC_ACL_2_7",  # darwin-framework-tool does not currently support reading or subscribing to Events
         "Test_TC_ACL_2_8",  # darwin-framework-tool does not currently support reading or subscribing to Events
+        "Test_TC_ACL_2_9",  # darwin-framework-tool does not currently support reading or subscribing to Events
         "Test_TC_ACL_2_10",  # darwin-framework-tool does not currently support reading or subscribing to Events
         "Test_TC_BINFO_2_1",  # darwin-framework-tool does not support writing readonly attributes by name
         "Test_TC_BINFO_2_2",  # darwin-framework-tool does not currently support reading or subscribing to Events
