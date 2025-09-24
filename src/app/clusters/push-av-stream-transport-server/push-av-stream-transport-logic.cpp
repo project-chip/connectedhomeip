@@ -675,7 +675,7 @@ PushAvStreamTransportServerLogic::HandleAllocatePushTransport(CommandHandler & h
                     return std::nullopt;
                 }
             }
-            else 
+            else
             {
                 if (nullFound)
                 {
