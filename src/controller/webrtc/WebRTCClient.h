@@ -63,9 +63,11 @@ private:
     std::vector<std::string> mLocalCandidates;
 
     std::shared_ptr<rtc::Track> mTrack;
+    std::shared_ptr<rtc::Track> mAudioTrack;
 
     // UDP socket for stream forwarding
-    int mRTPSocket = -1;
+    int mRTPSocket      = -1;
+    int mAudioRTPSocket = -1;
 
     // Close and reset the UDP socket
     void CloseRTPSocket();

@@ -30,6 +30,11 @@ constexpr int kVideoBitRate         = 3000;
 constexpr const char * kStreamDestIp    = "127.0.0.1";
 constexpr uint16_t kVideoStreamDestPort = 5000;
 
+// Constants for Audio
+constexpr int kAudioBitRate             = 64000;
+constexpr int kOpusPayloadType          = 111;
+constexpr uint16_t kAudioStreamDestPort = 5001;
+
 const char * GetPeerConnectionStateStr(rtc::PeerConnection::State state)
 {
     switch (state)
@@ -132,6 +137,13 @@ CHIP_ERROR WebRTCClient::CreatePeerConnection(const std::string & stunUrl)
         return CHIP_ERROR_POSIX(errno);
     }
 
+    mAudioRTPSocket = socket(AF_INET, SOCK_DGRAM, 0);
+    if (mAudioRTPSocket == -1)
+    {
+        ChipLogError(Camera, "Failed to create RTP Audio socket: %s", strerror(errno));
+        return CHIP_ERROR_POSIX(errno);
+    }
+
     sockaddr_in addr     = {};
     addr.sin_family      = AF_INET;
     addr.sin_addr.s_addr = inet_addr(kStreamDestIp);
@@ -150,6 +162,28 @@ CHIP_ERROR WebRTCClient::CreatePeerConnection(const std::string & stunUrl)
         sendto(mRTPSocket, reinterpret_cast<const char *>(message.data()), size_t(message.size()), 0,
                reinterpret_cast<const struct sockaddr *>(&addr), sizeof(addr));
     });
+
+    // For Audio
+    sockaddr_in audioAddr     = {};
+    audioAddr.sin_family      = AF_INET;
+    audioAddr.sin_addr.s_addr = inet_addr(kStreamDestIp);
+    audioAddr.sin_port        = htons(kAudioStreamDestPort);
+
+    rtc::Description::Audio audioMedia("audio", rtc::Description::Direction::RecvOnly);
+    audioMedia.addOpusCodec(kOpusPayloadType);
+    audioMedia.setBitrate(kAudioBitRate);
+    mAudioTrack = mPeerConnection->addTrack(audioMedia);
+
+    auto audioSession = std::make_shared<rtc::RtcpReceivingSession>();
+    mAudioTrack->setMediaHandler(audioSession);
+
+    mAudioTrack->onMessage(
+        [this, audioAddr](rtc::binary message) {
+            // send audio RTP packets to sock so that a client can pick it up to play it.
+            sendto(mAudioRTPSocket, reinterpret_cast<const char *>(message.data()), static_cast<size_t>(message.size()), 0,
+                   reinterpret_cast<const struct sockaddr *>(&audioAddr), sizeof(audioAddr));
+        },
+        nullptr);
 
     return CHIP_NO_ERROR;
 }
@@ -223,6 +257,7 @@ void WebRTCClient::Disconnect()
 
     // Reset track
     mTrack.reset();
+    mAudioTrack.reset();
 
     // Clear local states
     mLocalDescription.clear();

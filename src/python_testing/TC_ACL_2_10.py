@@ -228,6 +228,13 @@ class TC_ACL_2_10(MatterBaseTest):
         if not restart_flag_file:
             # No restart flag file: ask user to manually reboot
             self.wait_for_user_input(prompt_msg="Reboot the DUT. Press Enter when ready.\n")
+
+            # After manual reboot, expire previous sessions so that we can re-establish connections
+            logging.info("Expiring sessions after manual device reboot")
+            self.th1.ExpireSessions(self.dut_node_id)
+            self.th2.ExpireSessions(self.dut_node_id)
+            logging.info("Manual device reboot completed")
+
         else:
             try:
                 # Create the restart flag file to signal the test runner
@@ -253,7 +260,7 @@ class TC_ACL_2_10(MatterBaseTest):
         # TH1 reads DUT Endpoint 0 AccessControl cluster ACL attribute
         # Result is SUCCESS, value is list of AccessControlExtensionStruct
         # containing 2 elements; must not contain an element with fabricIndex F2
-        #acl_cluster = Clusters.AccessControl
+        # acl_cluster = Clusters.AccessControl
         result1 = await self.read_single_attribute_check_success(dev_ctrl=self.th1, endpoint=0, cluster=acl_cluster, attribute=acl_attribute)
         logging.info("TH1 read result: %s", str(result1))
         asserts.assert_equal(len(result1), 2,

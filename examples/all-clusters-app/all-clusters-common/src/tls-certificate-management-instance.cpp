@@ -92,8 +92,16 @@ struct RefEncodableClientCert
     {
         VerifyOrReturnError(certificate != nullptr, CHIP_ERROR_INTERNAL);
 
-        MutableByteSpan targetBytes(certBytes);
-        ReturnErrorOnFailure(CopySpanToMutableSpan(src.clientCertificate.Value(), targetBytes));
+        if (!src.clientCertificate.Value().IsNull())
+        {
+            MutableByteSpan targetBytes(certBytes);
+            ReturnErrorOnFailure(CopySpanToMutableSpan(src.clientCertificate.Value().Value(), targetBytes));
+            certificate->clientCertificate.SetValue(Nullable<ByteSpan>(targetBytes));
+        }
+        else
+        {
+            certificate->clientCertificate.SetValue(Nullable<ByteSpan>());
+        }
 
         if (src.intermediateCertificates.HasValue())
         {
@@ -111,12 +119,11 @@ struct RefEncodableClientCert
         }
         else
         {
-            certificate->intermediateCertificates.ClearValue();
+            certificate->intermediateCertificates.SetValue(List<ByteSpan>());
         }
 
         certificate->fabricIndex = fabric;
         certificate->ccdid       = src.ccdid;
-        certificate->clientCertificate.SetValue(targetBytes);
         return CHIP_NO_ERROR;
     }
 };
@@ -280,18 +287,18 @@ Status TlsCertificateManagementCommandDelegate::GenerateClientCsr(EndpointId mat
     std::array<uint8_t, 128> nonceData;
     MutableByteSpan nonceSignature(nonceData);
 
-    ScopedMemoryBuffer<uint8_t> nocsrElementsData;
-    size_t nocsrElementsSize = kSpecMaxCertBytes + 128 + /*tlvPadding=*/100;
-    nocsrElementsData.Alloc(nocsrElementsSize);
-    MutableByteSpan nocsrElementsBuffer(nocsrElementsData.Get(), nocsrElementsSize);
-
     ClientCsrResponseType csrResponse;
     UniquePtr<InlineBufferedClientCert> certBuffer(New<InlineBufferedClientCert>());
-    auto result = mCertificateTable.PrepareClientCertificate(fabric, request.nonce, certBuffer->buffer, nocsrElementsBuffer,
-                                                             csrResponse.ccdid, csr, nonceSignature);
-    VerifyOrReturnValue(result == CHIP_NO_ERROR, Status::Failure);
-    csrResponse.csr   = csr;
-    csrResponse.nonce = nonceSignature;
+    Optional<TLSCCDID> id;
+    if (!request.ccdid.IsNull())
+    {
+        id.SetValue(request.ccdid.Value());
+    }
+    auto result = mCertificateTable.PrepareClientCertificate(fabric, request.nonce, certBuffer->buffer, id, csr, nonceSignature);
+    ReturnValueOnFailure(result, Status::Failure);
+    csrResponse.ccdid          = id.Value();
+    csrResponse.csr            = csr;
+    csrResponse.nonceSignature = nonceSignature;
     return loadedCallback(csrResponse);
 }
 
@@ -300,9 +307,13 @@ ClusterStatusCode TlsCertificateManagementCommandDelegate::ProvisionClientCert(E
 {
     UniquePtr<InlineBufferedClientCert> certBuffer(New<InlineBufferedClientCert>());
     VerifyOrReturnError(certBuffer, ClusterStatusCode(CHIP_ERROR_NO_MEMORY));
-    auto result = mCertificateTable.UpdateClientCertificateEntry(fabric, provisionReq.ccdid, certBuffer->buffer,
-                                                                 provisionReq.clientCertificateDetails);
-    VerifyOrReturnValue(result == CHIP_NO_ERROR, ClusterStatusCode(Status::Failure));
+    TLSClientCertificateDetailStruct::DecodableType details;
+    details.ccdid = provisionReq.ccdid;
+    details.clientCertificate.SetValue(provisionReq.clientCertificate);
+    details.intermediateCertificates.SetValue(provisionReq.intermediateCertificates);
+    details.SetFabricIndex(fabric);
+    auto result = mCertificateTable.UpdateClientCertificateEntry(fabric, provisionReq.ccdid, certBuffer->buffer, details);
+    ReturnValueOnFailure(result, ClusterStatusCode(Status::Failure));
     return ClusterStatusCode(Status::Success);
 }
 
@@ -379,12 +390,12 @@ TlsCertificateManagementCommandDelegate::LookupClientCertByFingerprint(EndpointI
         while (iterator.Next(certBuffer->mCertWithKey))
         {
             const auto & cert = certBuffer->GetCert();
-            if (!cert.clientCertificate.HasValue())
+            if (cert.clientCertificate.Value().IsNull())
             {
                 continue;
             }
             bool match = false;
-            ReturnErrorOnFailure(FingerprintMatch(fingerprint, cert.clientCertificate.Value(), match));
+            ReturnErrorOnFailure(FingerprintMatch(fingerprint, cert.clientCertificate.Value().Value(), match));
             if (match)
             {
                 UniquePtr<InlineEncodableClientCert> callbackCert(New<InlineEncodableClientCert>());

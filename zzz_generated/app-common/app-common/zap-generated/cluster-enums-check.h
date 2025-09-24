@@ -76,6 +76,7 @@
 #include <clusters/GeneralCommissioning/EnumsCheck.h>
 #include <clusters/GeneralDiagnostics/EnumsCheck.h>
 #include <clusters/GroupKeyManagement/EnumsCheck.h>
+#include <clusters/Groupcast/EnumsCheck.h>
 #include <clusters/Groups/EnumsCheck.h>
 #include <clusters/HepaFilterMonitoring/EnumsCheck.h>
 #include <clusters/IcdManagement/EnumsCheck.h>

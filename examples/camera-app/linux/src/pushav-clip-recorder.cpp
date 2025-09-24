@@ -19,6 +19,7 @@
 #include "pushav-clip-recorder.h"
 #include <cstring>
 #include <lib/support/logging/CHIPLogging.h>
+#include <platform/PlatformManager.h>
 #include <sys/stat.h>
 
 extern "C" {
@@ -237,6 +238,30 @@ void PushAVClipRecorder::Stop()
 {
     if (GetRecorderStatus())
     {
+        // Call the cluster server's NotifyTransportStopped method asynchronously to prevent blocking
+        if (mPushAvStreamTransportServer != nullptr)
+        {
+            ChipLogProgress(Camera, "PushAVClipRecorder::Stop - Scheduling async cluster server API call for connection %u",
+                            mConnectionID);
+
+            uint16_t connectionID = mConnectionID;
+            auto triggerType      = mTriggerType;
+            auto reasonType       = mReasonType;
+            auto * server         = mPushAvStreamTransportServer;
+
+            std::thread([server, connectionID, triggerType, reasonType]() {
+                ChipLogProgress(Camera, "Async thread: Calling NotifyTransportStopped for connection %u", connectionID);
+                chip::DeviceLayer::PlatformMgr().LockChipStack();
+                server->NotifyTransportStopped(connectionID, triggerType, reasonType);
+                chip::DeviceLayer::PlatformMgr().UnlockChipStack();
+                ChipLogProgress(Camera, "Async thread: NotifyTransportStopped completed for connection %u", connectionID);
+            }).detach();
+        }
+        else
+        {
+            ChipLogError(Camera, "PushAVClipRecorder::Stop - Cluster server reference is null for connection %u", mConnectionID);
+        }
+
         SetRecorderStatus(false);
         mCondition.notify_one();
         while (!mVideoQueue.empty())
@@ -255,7 +280,6 @@ void PushAVClipRecorder::Stop()
         ChipLogError(Camera, "Error recording is not running");
     }
     mDeinitializeRecorder = true;
-    CleanupOutput();
     ChipLogProgress(Camera, "Recording stopped for ID: %s", mClipInfo.mRecorderId.c_str());
 }
 
@@ -305,11 +329,13 @@ int PushAVClipRecorder::SetupOutput(const std::string & outputPrefix, const std:
     {
         ChipLogError(Camera, "ERROR: Output context is null");
     }
+    double segSeconds = static_cast<double>(mClipInfo.mSegmentDuration) / 1000.0;
     // Set DASH/CMAF options
     av_opt_set(mFormatContext->priv_data, "increment_tc", "1", 0);
     av_opt_set(mFormatContext->priv_data, "use_timeline", "1", 0);
     av_opt_set(mFormatContext->priv_data, "movflags", "+cmaf+dash+delay_moov+skip_sidx+skip_trailer+frag_custom", 0);
-    av_opt_set(mFormatContext->priv_data, "seg_duration", std::to_string(mClipInfo.mChunkDuration).c_str(), 0);
+    av_opt_set(mFormatContext->priv_data, "seg_duration", std::to_string(segSeconds).c_str(), 0);
+    av_opt_set(mFormatContext->priv_data, "frag_duration", std::to_string(mClipInfo.mChunkDuration).c_str(), 0);
     av_opt_set(mFormatContext->priv_data, "init_seg_name", initSegPattern.c_str(), 0);
     av_opt_set(mFormatContext->priv_data, "media_seg_name", mediaSegPattern.c_str(), 0);
     av_opt_set_int(mFormatContext->priv_data, "use_template", 1, 0);
@@ -367,7 +393,7 @@ int PushAVClipRecorder::StartClipRecording()
         }
         ProcessBuffersAndWrite();
     }
-
+    CleanupOutput();
     ChipLogProgress(Camera, "Recorder thread closing");
     return 0;
 }
@@ -638,9 +664,7 @@ void PushAVClipRecorder::FinalizeCurrentClip(int reason)
 
     if (reason || ((clipLengthInPTS >= clipDuration) && (mClipInfo.mTriggerType != 2)))
     {
-        mClipInfo.mClipId++;
         Stop();
-        mClipInfo.mClipId++;
         mCurrentClipStartPts = currentPts;
     }
 
@@ -708,6 +732,7 @@ void PushAVClipRecorder::FinalizeCurrentClip(int reason)
         std::string mpd_path = make_path("%s.mpd");
         if (FileExists(mpd_path) && !FileExists(mpd_path + ".tmp"))
         {
+            mUploader->setMPDPath(std::make_pair(mpd_path, mClipInfo.mUrl));
             CheckAndUploadFile(mpd_path);
             mUploadMPD = false; // Reset flag after successful upload
         }

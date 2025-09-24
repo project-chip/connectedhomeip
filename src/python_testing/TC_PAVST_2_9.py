@@ -24,6 +24,8 @@
 #     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
 #     script-args: >
 #       --storage-path admin_storage.json
+#       --string-arg th_server_app_path:${PUSH_AV_SERVER}
+#       --string-arg host_ip:localhost
 #       --commissioning-method on-network
 #       --discriminator 1234
 #       --passcode 20202021
@@ -60,10 +62,7 @@ class TC_PAVST_2_9(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
     @async_test_body
     async def setup_class(self):
         th_server_app = self.user_params.get("th_server_app_path", None)
-        if th_server_app:
-            self.server = PushAvServerProcess(server_path=th_server_app)
-        else:
-            self.server = PushAvServerProcess()
+        self.server = PushAvServerProcess(server_path=th_server_app)
         self.server.start(
             expected_output="Running on https://0.0.0.0:1234",
             timeout=30,
@@ -107,7 +106,8 @@ class TC_PAVST_2_9(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
         # Commission DUT - already done
 
         self.step("precondition")
-        tlsEndpointId = await self.precondition_provision_tls_endpoint(endpoint=endpoint, server=self.server)
+        host_ip = self.user_params.get("host_ip", None)
+        tlsEndpointId, host_ip = await self.precondition_provision_tls_endpoint(endpoint=endpoint, server=self.server, host_ip=host_ip)
         uploadStreamId = self.server.create_stream()
 
         self.step(1)
@@ -153,7 +153,7 @@ class TC_PAVST_2_9(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
         )
 
         self.step(6)
-        status = await self.allocate_one_pushav_transport(endpoint, tlsEndPoint=tlsEndpointId, url=f"https://localhost:1234/streams/{uploadStreamId}", expiryTime=5)
+        status = await self.allocate_one_pushav_transport(endpoint, tlsEndPoint=tlsEndpointId, url=f"https://{host_ip}:1234/streams/{uploadStreamId}", expiryTime=5)
         asserts.assert_equal(
             status, Status.Success, "Push AV Transport should be allocated successfully"
         )
