@@ -6,6 +6,7 @@
 #include <app/util/config.h>
 #include <app/util/endpoint-config-api.h>
 #include <lib/core/DataModelTypes.h>
+#include <platform/CHIPDeviceLayer.h>
 
 using chip::app::DataModel::Nullable;
 
