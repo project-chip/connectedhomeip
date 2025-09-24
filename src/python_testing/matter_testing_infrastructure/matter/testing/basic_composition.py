@@ -38,6 +38,7 @@ from matter.testing.conformance import ConformanceException
 from matter.testing.matter_testing import MatterTestConfig, ProblemNotice
 from matter.testing.spec_parsing import PrebuiltDataModelDirectory, build_xml_clusters, build_xml_device_types, dm_from_spec_version
 
+logger = logging.getLogger(__name__)
 
 def log_structured_data(start_tag: str, dump_string: str):
     """Log structured data with a clear start and end marker.
@@ -50,10 +51,10 @@ def log_structured_data(start_tag: str, dump_string: str):
         dump_string: The data to be logged
     """
     lines = dump_string.splitlines()
-    logging.info(f'{start_tag}BEGIN ({len(lines)} lines)====')
+    logger.info(f'{start_tag}BEGIN ({len(lines)} lines)====')
     for line in lines:
-        logging.info(f'{start_tag}{line}')
-    logging.info(f'{start_tag}END ====')
+        logger.info(f'{start_tag}{line}')
+    logger.info(f'{start_tag}END ====')
 
 
 @dataclass
@@ -302,18 +303,18 @@ class BasicCompositionTests:
         """
         # Check if we have problems and device attributes are available
         if len(self.problems) > 0:
-            logging.info("BasicCompositionTests: Problems detected - attempting device attribute dump")
+            logger.info("BasicCompositionTests: Problems detected - attempting device attribute dump")
             try:
                 if hasattr(self, 'endpoints_tlv') and self.endpoints_tlv:
-                    logging.info("Device attribute data available - generating dump")
+                    logger.info("Device attribute data available - generating dump")
                     _, txt_str = self.dump_wildcard(None)
                     # Only dump the text format - it's more readable for debugging
                     log_structured_data('==== FAILURE_DUMP_txt: ', txt_str)
                 else:
-                    logging.info("No device attribute data available (endpoints_tlv not populated)")
+                    logger.info("No device attribute data available (endpoints_tlv not populated)")
             except Exception as e:
                 # Don't let logging errors interfere with the original test failure
-                logging.warning(f"Failed to generate device attribute dump: {e}")
+                logger.warning(f"Failed to generate device attribute dump: {e}")
 
         # Call the parent teardown_class method to handle normal teardown and problem logging
         super().teardown_class()
