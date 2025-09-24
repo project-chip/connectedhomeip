@@ -2574,7 +2574,6 @@ class ChipDeviceController(ChipDeviceControllerBase):
     '''
     The ChipDeviceCommissioner binding, named as ChipDeviceController
     '''
-    # TODO: This class contains DEPRECATED functions, we should update the test scripts to avoid the usage of those functions.
 
     def __init__(self,
                  opCredsContext: ctypes.c_void_p,
