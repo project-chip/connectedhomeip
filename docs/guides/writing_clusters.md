@@ -46,19 +46,20 @@ generated from XML definitions located in
 
 ### File Structure
 
-Create a new directory for your cluster at `src/app/clusters/<cluster-folder>/`.
-This directory will house the cluster implementation and its unit tests.
+Create a new directory for your cluster at
+`src/app/clusters/<cluster-directory>/`. This directory will house the cluster
+implementation and its unit tests.
 
 For zap-based support, the directory mapping is defined in
 [src/app/zap_cluster_list.json](https://github.com/project-chip/connectedhomeip/blob/master/src/app/zap_cluster_list.json)
 under the `ServerDirectories` key. This maps the `UPPER_SNAKE_CASE` define of
-the cluster to the folder name under `src/app/clusters`.
+the cluster to the directory name under `src/app/clusters`.
 
 #### Naming conventions
 
 Names vary, however to be consistent with most of the existing code use:
 
--   `cluster-name-server` for the cluster folder name
+-   `cluster-name-server` for the cluster directory name
 -   `ClusterNameSnakeCluster.h/cpp` for the `ServerClusterInterface`
     implementation
 -   `ClusterNameSnakeLogic.h/cpp` for the `Logic` implementation if applicable
