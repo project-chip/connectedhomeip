@@ -182,7 +182,6 @@ TEST_F(TestBooleanStateCluster, EventGeneratedOnStateChange)
 
             auto & logOnlyEvents = context.EventsGenerator();
             using EventType      = chip::app::Clusters::BooleanState::Events::StateChange::Type;
-            chip::app::Clusters::BooleanState::Events::StateChange::DecodableType decodedEvent;
 
             // Lambda to verify the last emitted event metadata and payload
             auto verifyLastEvent = [&](bool expectedStateValue) {
@@ -190,6 +189,7 @@ TEST_F(TestBooleanStateCluster, EventGeneratedOnStateChange)
                 EXPECT_EQ(eventNumber.value(), logOnlyEvents.CurrentEventNumber());
                 EXPECT_EQ(logOnlyEvents.LastOptions().mPath,
                           ConcreteEventPath(endpoint, EventType::GetClusterId(), EventType::GetEventId()));
+                chip::app::Clusters::BooleanState::Events::StateChange::DecodableType decodedEvent;
                 ASSERT_EQ(logOnlyEvents.DecodeLastEvent(decodedEvent), CHIP_NO_ERROR);
                 EXPECT_EQ(decodedEvent.stateValue, expectedStateValue);
             };
@@ -229,7 +229,7 @@ TEST_F(TestBooleanStateCluster, NoEventWhenValueUnchanged)
             // Change from false -> true and confirm an event occurs
             auto secondEvent = booleanState.SetStateValue(true);
             EXPECT_TRUE(secondEvent.has_value());
-            EXPECT_GT(logOnlyEvents.CurrentEventNumber(), initialCount);
+            EXPECT_EQ(logOnlyEvents.CurrentEventNumber(), initialCount + 1);
 
             // Re-set to the same value (true) and confirm no new event is generated
             EventNumber eventCountAfterChange = logOnlyEvents.CurrentEventNumber();
