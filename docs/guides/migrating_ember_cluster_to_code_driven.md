@@ -23,7 +23,7 @@ type-safe accessors in
 In a code-driven implementation, this data must be moved into member variables
 within your new cluster class.
 
-In some cases the cluster folder may not even exists. In that case, create a new
+In some cases the cluster folder may not even exist. In that case, create a new
 folder and add the mapping in
 [src/app/zap_cluster_list.json](https://github.com/project-chip/connectedhomeip/blob/master/src/app/zap_cluster_list.json)
 under the `ServerDirectories` key.
