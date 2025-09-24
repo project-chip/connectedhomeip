@@ -176,10 +176,8 @@ class TC_SU_2_2(MatterBaseTest):
             timeout=provider_timeout,
             override_image_uri=provider_override_image_uri,
             log_file_path="provider.log"
-        ).start_and_wait(
-            wait_for=provider_wait_for,
-            timeout=300
         )
+        provider_proc.start(expected_output=provider_wait_for, timeout=300)
 
         # Log the provider PID
         logger.info(f"{step_number}: Prerequisite #2.0 - Launched Provider PID {provider_proc.p.pid}")
