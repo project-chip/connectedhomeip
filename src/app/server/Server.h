@@ -33,6 +33,7 @@
 #include <app/server/AppDelegate.h>
 #include <app/server/CommissioningWindowManager.h>
 #include <app/server/DefaultAclStorage.h>
+#include <app/server/PlatformDnssdServer.h>
 #include <credentials/CertificateValidityPolicy.h>
 #include <credentials/FabricTable.h>
 #include <credentials/GroupDataProvider.h>
@@ -44,9 +45,8 @@
 #include <crypto/PersistentStorageOperationalKeystore.h>
 #include <inet/InetConfig.h>
 #include <lib/core/CHIPConfig.h>
-#include <lib/support/SafeInt.h>
 #include <lib/dnssd/IDnssdServer.h>
-#include <app/server/PlatformDnssdServer.h>
+#include <lib/support/SafeInt.h>
 #include <messaging/ExchangeMgr.h>
 #include <platform/DeviceInstanceInfoProvider.h>
 #include <platform/KeyValueStoreManager.h>
@@ -605,8 +605,6 @@ private:
             (void) fabricTable;
             ClearCASEResumptionStateOnFabricChange(fabricIndex);
         }
-
-
 
     private:
         void ClearCASEResumptionStateOnFabricChange(chip::FabricIndex fabricIndex)
