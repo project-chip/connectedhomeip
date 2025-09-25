@@ -27,6 +27,28 @@
 namespace chip {
 namespace app {
 
+namespace datastore {
+
+struct AccessControlEntryStruct
+{
+    Clusters::JointFabricDatastore::DatastoreAccessControlEntryPrivilegeEnum privilege =
+        static_cast<Clusters::JointFabricDatastore::DatastoreAccessControlEntryPrivilegeEnum>(0);
+    Clusters::JointFabricDatastore::DatastoreAccessControlEntryAuthModeEnum authMode =
+        static_cast<Clusters::JointFabricDatastore::DatastoreAccessControlEntryAuthModeEnum>(0);
+    std::vector<uint64_t> subjects;
+    std::vector<Clusters::JointFabricDatastore::Structs::DatastoreAccessControlTargetStruct::Type> targets;
+};
+
+struct ACLEntryStruct
+{
+    chip::NodeId nodeID = static_cast<chip::NodeId>(0);
+    uint16_t listID     = static_cast<uint16_t>(0);
+    AccessControlEntryStruct ACLEntry;
+    Clusters::JointFabricDatastore::Structs::DatastoreStatusEntryStruct::Type statusEntry;
+};
+
+} // namespace datastore
+
 /**
  * A struct which extends the DatastoreNodeInformationEntry type with FriendlyName buffer reservation.
  */
@@ -144,7 +166,7 @@ public:
         return mNodeKeySetEntries;
     }
 
-    std::vector<Clusters::JointFabricDatastore::Structs::DatastoreACLEntryStruct::Type> & GetNodeACLList() { return mACLEntries; }
+    std::vector<datastore::ACLEntryStruct> & GetNodeACLList() { return mACLEntries; }
 
     std::vector<Clusters::JointFabricDatastore::Structs::DatastoreEndpointEntryStruct::Type> & GetNodeEndpointList()
     {
@@ -248,6 +270,7 @@ private:
     VendorId mAnchorVendorId                              = VendorId::NotSpecified;
     Clusters::JointFabricDatastore::Structs::DatastoreStatusEntryStruct::Type mDatastoreStatusEntry;
 
+    // TODO: Persist these members to local storage
     std::vector<GenericDatastoreNodeInformationEntry> mNodeInformationEntries;
     std::vector<Clusters::JointFabricDatastore::Structs::DatastoreGroupKeySetStruct::Type> mGroupKeySetList;
     std::vector<Clusters::JointFabricDatastore::Structs::DatastoreAdministratorInformationEntryStruct::Type> mAdminEntries;
@@ -255,7 +278,7 @@ private:
     std::vector<Clusters::JointFabricDatastore::Structs::DatastoreEndpointGroupIDEntryStruct::Type> mEndpointGroupIDEntries;
     std::vector<Clusters::JointFabricDatastore::Structs::DatastoreEndpointBindingEntryStruct::Type> mEndpointBindingEntries;
     std::vector<Clusters::JointFabricDatastore::Structs::DatastoreNodeKeySetEntryStruct::Type> mNodeKeySetEntries;
-    std::vector<Clusters::JointFabricDatastore::Structs::DatastoreACLEntryStruct::Type> mACLEntries;
+    std::vector<datastore::ACLEntryStruct> mACLEntries;
     std::vector<Clusters::JointFabricDatastore::Structs::DatastoreEndpointEntryStruct::Type> mEndpointEntries;
 
     Listener * mListeners = nullptr;
@@ -269,9 +292,13 @@ private:
     CHIP_ERROR IsNodeIdInNodeInformationEntries(NodeId nodeId, size_t & index);
     CHIP_ERROR IsNodeIdAndEndpointInEndpointInformationEntries(NodeId nodeId, EndpointId endpointId, size_t & index);
 
-    CHIP_ERROR
-    UpdateACLEntry(Clusters::JointFabricDatastore::Structs::DatastoreACLEntryStruct::Type & entryToUpdate,
-                   const Clusters::JointFabricDatastore::Structs::DatastoreAccessControlEntryStruct::DecodableType & aclEntry);
+    CHIP_ERROR GenerateAndAssignAUniqueListID(uint16_t & listId);
+    bool BindingMatches(const Clusters::JointFabricDatastore::Structs::DatastoreBindingTargetStruct::Type & binding1,
+                        const Clusters::JointFabricDatastore::Structs::DatastoreBindingTargetStruct::Type & binding2);
+    bool ACLMatches(const datastore::AccessControlEntryStruct & acl1,
+                    const Clusters::JointFabricDatastore::Structs::DatastoreAccessControlEntryStruct::DecodableType & acl2);
+    bool ACLTargetMatches(const Clusters::JointFabricDatastore::Structs::DatastoreAccessControlTargetStruct::Type & target1,
+                          const Clusters::JointFabricDatastore::Structs::DatastoreAccessControlTargetStruct::Type & target2);
 };
 
 } // namespace app

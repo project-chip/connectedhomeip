@@ -24,6 +24,8 @@
 #     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
 #     script-args: >
 #       --storage-path admin_storage.json
+#       --string-arg th_server_app_path:${PUSH_AV_SERVER}
+#       --string-arg host_ip:localhost
 #       --commissioning-method on-network
 #       --discriminator 1234
 #       --passcode 20202021
@@ -38,24 +40,42 @@
 import logging
 
 from mobly import asserts
+from TC_PAVSTI_Utils import PAVSTIUtils, PushAvServerProcess
 from TC_PAVSTTestBase import PAVSTTestBase
 
 import matter.clusters as Clusters
 from matter.interaction_model import Status
-from matter.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main, has_cluster, run_if_endpoint_matches
+from matter.testing.matter_testing import (MatterBaseTest, TestStep, async_test_body, default_matter_test_main, has_cluster,
+                                           run_if_endpoint_matches)
 
 logger = logging.getLogger(__name__)
 
 
-class TC_PAVST_2_7(MatterBaseTest, PAVSTTestBase):
+class TC_PAVST_2_7(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
     def TC_PAVST_2_7(self) -> str:
-        return "[TC-PAVST-2.5] Attributes with Server as DUT"
+        return "[TC-PAVST-2.7] Manually Trigger PushAV Transport Flow with Server as DUT"
 
     def pics_TC_PAVST_2_7(self):
         return ["PAVST.S"]
 
+    @async_test_body
+    async def setup_class(self):
+        th_server_app = self.user_params.get("th_server_app_path", None)
+        self.server = PushAvServerProcess(server_path=th_server_app)
+        self.server.start(
+            expected_output="Running on https://0.0.0.0:1234",
+            timeout=30,
+        )
+        super().setup_class()
+
+    def teardown_class(self):
+        if self.server is not None:
+            self.server.terminate()
+        super().teardown_class()
+
     def steps_TC_PAVST_2_7(self) -> list[TestStep]:
         return [
+            TestStep("precondition", "Commissioning, already done", is_commissioning=True),
             TestStep(
                 1,
                 "TH1 executes step 1-5 of TC-PAVST-2.3 to allocate a PushAV transport with TriggerType = Continuous.",
@@ -121,12 +141,19 @@ class TC_PAVST_2_7(MatterBaseTest, PAVSTTestBase):
     @run_if_endpoint_matches(has_cluster(Clusters.PushAvStreamTransport))
     async def test_TC_PAVST_2_7(self):
         endpoint = self.get_endpoint(default=1)
+        self.endpoint = endpoint
+        self.node_id = self.dut_node_id
         pvcluster = Clusters.PushAvStreamTransport
         pvattr = Clusters.PushAvStreamTransport.Attributes
         aAllocatedVideoStreams = []
         aAllocatedAudioStreams = []
 
         aConnectionID = ""
+
+        self.step("precondition")
+        host_ip = self.user_params.get("host_ip", None)
+        tlsEndpointId, host_ip = await self.precondition_provision_tls_endpoint(endpoint=endpoint, server=self.server, host_ip=host_ip)
+        uploadStreamId = self.server.create_stream()
 
         self.step(1)
         # Commission DUT - already done
@@ -149,7 +176,8 @@ class TC_PAVST_2_7(MatterBaseTest, PAVSTTestBase):
             "AllocatedAudioStreams must not be empty",
         )
 
-        status = await self.allocate_one_pushav_transport(endpoint, triggerType=pvcluster.Enums.TransportTriggerTypeEnum.kContinuous)
+        status = await self.allocate_one_pushav_transport(endpoint, triggerType=pvcluster.Enums.TransportTriggerTypeEnum.kContinuous,
+                                                          tlsEndPoint=tlsEndpointId, url=f"https://{host_ip}:1234/streams/{uploadStreamId}")
         asserts.assert_equal(
             status, Status.Success, "Push AV Transport should be allocated successfully"
         )
@@ -206,9 +234,11 @@ class TC_PAVST_2_7(MatterBaseTest, PAVSTTestBase):
             "DUT responds with SUCCESS status code.")
 
         self.step(6)
+        timeControl = {"initialDuration": 1, "augmentationDuration": 1, "maxDuration": 1, "blindDuration": 1}
         cmd = pvcluster.Commands.ManuallyTriggerTransport(
             connectionID=aConnectionID,
-            activationReason=pvcluster.Enums.TriggerActivationReasonEnum.kEmergency
+            activationReason=pvcluster.Enums.TriggerActivationReasonEnum.kEmergency,
+            timeControl=timeControl
         )
         status = await self.psvt_manually_trigger_transport(cmd, expected_cluster_status=pvcluster.Enums.StatusCodeEnum.kInvalidTransportStatus)
         asserts.assert_true(
@@ -227,9 +257,11 @@ class TC_PAVST_2_7(MatterBaseTest, PAVSTTestBase):
             "DUT responds with SUCCESS status code.")
 
         self.step(8)
+        timeControl = {"initialDuration": 1, "augmentationDuration": 1, "maxDuration": 1, "blindDuration": 1}
         cmd = pvcluster.Commands.ManuallyTriggerTransport(
             connectionID=aConnectionID,
-            activationReason=pvcluster.Enums.TriggerActivationReasonEnum.kEmergency
+            activationReason=pvcluster.Enums.TriggerActivationReasonEnum.kEmergency,
+            timeControl=timeControl
         )
         status = await self.psvt_manually_trigger_transport(cmd, expected_cluster_status=pvcluster.Enums.StatusCodeEnum.kInvalidTriggerType)
         asserts.assert_true(
@@ -257,9 +289,10 @@ class TC_PAVST_2_7(MatterBaseTest, PAVSTTestBase):
         aAllocatedAudioStreams = await self.allocate_one_audio_stream()
 
         triggerOptions = {"triggerType": pvcluster.Enums.TransportTriggerTypeEnum.kCommand,
-                          "maxPreRollLen": 4000, }
+                          "maxPreRollLen": 4000}
 
-        status = await self.allocate_one_pushav_transport(endpoint, trigger_Options=triggerOptions)
+        status = await self.allocate_one_pushav_transport(endpoint, trigger_Options=triggerOptions, tlsEndPoint=tlsEndpointId,
+                                                          url=f"https://{host_ip}:1234/streams/{uploadStreamId}")
         asserts.assert_equal(
             status, Status.Success, "Push AV Transport should be allocated successfully"
         )

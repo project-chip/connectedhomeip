@@ -227,7 +227,7 @@ CHIP_ERROR P256Keypair::ECDSA_sign_msg(const uint8_t * msg, size_t msg_length, P
     VerifyOrReturnError(msg != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(msg_length > 0, CHIP_ERROR_INVALID_ARGUMENT);
 
-    ChipLogDetail(Crypto, "ECDSA_sign_msg: Using se05x for ecdsa sign!");
+    ChipLogDetail(Crypto, "ECDSA_sign_msg: Using se05x for ecdsa sign! (using key id = 0x%" PRIx32 ")", keyid);
 
     error = Hash_SHA256(msg, msg_length, hash);
     SuccessOrExit(error);
@@ -521,16 +521,26 @@ exit:
 #endif // ENABLE_SE05X_ECDSA_VERIFY
 }
 
-void add_tlv(uint8_t * buf, size_t buf_index, uint8_t tag, size_t len, uint8_t * val)
+#if ENABLE_SE05X_GENERATE_EC_KEY
+static int add_tlv(uint8_t * buf, size_t buf_index, uint8_t tag, size_t len, uint8_t * val, size_t bufLen)
 {
+    VerifyOrReturnError(bufLen >= 2, -1);
+    VerifyOrReturnError(buf_index <= (bufLen - 2), -1);
+    VerifyOrReturnError(len <= UINT8_MAX, -1);
+
     buf[buf_index++] = (uint8_t) tag;
     buf[buf_index++] = (uint8_t) len;
     if (len > 0 && val != NULL)
     {
+        VerifyOrReturnError(buf_index < bufLen, -1);
         memcpy(&buf[buf_index], val, len);
+        VerifyOrReturnError((SIZE_MAX - len) >= buf_index, -1);
         buf_index = buf_index + len;
     }
+
+    return 0;
 }
+#endif // #if ENABLE_SE05X_GENERATE_EC_KEY
 
 /*
  * CSR format used in the below function,
@@ -574,6 +584,7 @@ CHIP_ERROR P256Keypair::NewCertificateSigningRequest(uint8_t * csr, size_t & csr
     sss_asymmetric_t asymm_ctx = { 0 };
     sss_object_t keyObject     = { 0 };
     uint32_t keyid             = 0;
+    int ret                    = -1;
 
     uint8_t data_to_hash[128] = { 0 };
     size_t data_to_hash_len   = sizeof(data_to_hash);
@@ -607,7 +618,8 @@ CHIP_ERROR P256Keypair::NewCertificateSigningRequest(uint8_t * csr, size_t & csr
 
     // No extensions are copied
     buffer_index -= kTlvHeader;
-    add_tlv(data_to_hash, buffer_index, (ASN1_CONSTRUCTED | ASN1_CONTEXT_SPECIFIC), 0, NULL);
+    ret = add_tlv(data_to_hash, buffer_index, (ASN1_CONSTRUCTED | ASN1_CONTEXT_SPECIFIC), 0, NULL, sizeof(data_to_hash));
+    VerifyOrExit(ret == 0, error = CHIP_ERROR_INTERNAL);
 
     // Copy public key (with header)
     {
@@ -629,29 +641,35 @@ CHIP_ERROR P256Keypair::NewCertificateSigningRequest(uint8_t * csr, size_t & csr
     // Copy subject (in the current implementation only organisation name info is added) and organisation OID
     buffer_index -= (kTlvHeader + sizeof(SUBJECT_STR) - 1);
     VerifyOrExit(buffer_index > 0, error = CHIP_ERROR_INTERNAL);
-    add_tlv(data_to_hash, buffer_index, ASN1_UTF8_STRING, sizeof(SUBJECT_STR) - 1, (uint8_t *) SUBJECT_STR);
+    ret = add_tlv(data_to_hash, buffer_index, ASN1_UTF8_STRING, sizeof(SUBJECT_STR) - 1, (uint8_t *) SUBJECT_STR,
+                  sizeof(data_to_hash));
+    VerifyOrExit(ret == 0, error = CHIP_ERROR_INTERNAL);
 
     buffer_index -= (kTlvHeader + sizeof(organisation_oid));
     VerifyOrExit(buffer_index > 0, error = CHIP_ERROR_INTERNAL);
-    add_tlv(data_to_hash, buffer_index, ASN1_OID, sizeof(organisation_oid), organisation_oid);
+    ret = add_tlv(data_to_hash, buffer_index, ASN1_OID, sizeof(organisation_oid), organisation_oid, sizeof(data_to_hash));
+    VerifyOrExit(ret == 0, error = CHIP_ERROR_INTERNAL);
 
     // Add length
     buffer_index -= kTlvHeader;
     // Subject TLV ==> 1 + 1 + len(subject)
     // Org OID TLV ==> 1 + 1 + len(organisation_oid)
     VerifyOrExit(buffer_index > 0, error = CHIP_ERROR_INTERNAL);
-    add_tlv(data_to_hash, buffer_index, (ASN1_CONSTRUCTED | ASN1_SEQUENCE),
-            ((2 * kTlvHeader) + (sizeof(SUBJECT_STR) - 1) + sizeof(organisation_oid)), NULL);
+    ret = add_tlv(data_to_hash, buffer_index, (ASN1_CONSTRUCTED | ASN1_SEQUENCE),
+                  ((2 * kTlvHeader) + (sizeof(SUBJECT_STR) - 1) + sizeof(organisation_oid)), NULL, sizeof(data_to_hash));
+    VerifyOrExit(ret == 0, error = CHIP_ERROR_INTERNAL);
 
     buffer_index -= kTlvHeader;
     VerifyOrExit(buffer_index > 0, error = CHIP_ERROR_INTERNAL);
-    add_tlv(data_to_hash, buffer_index, (ASN1_CONSTRUCTED | ASN1_SET),
-            ((3 * kTlvHeader) + (sizeof(SUBJECT_STR) - 1) + sizeof(organisation_oid)), NULL);
+    ret = add_tlv(data_to_hash, buffer_index, (ASN1_CONSTRUCTED | ASN1_SET),
+                  ((3 * kTlvHeader) + (sizeof(SUBJECT_STR) - 1) + sizeof(organisation_oid)), NULL, sizeof(data_to_hash));
+    VerifyOrExit(ret == 0, error = CHIP_ERROR_INTERNAL);
 
     buffer_index -= kTlvHeader;
     VerifyOrExit(buffer_index > 0, error = CHIP_ERROR_INTERNAL);
-    add_tlv(data_to_hash, buffer_index, (ASN1_CONSTRUCTED | ASN1_SEQUENCE),
-            ((4 * kTlvHeader) + (sizeof(SUBJECT_STR) - 1) + sizeof(organisation_oid)), NULL);
+    ret = add_tlv(data_to_hash, buffer_index, (ASN1_CONSTRUCTED | ASN1_SEQUENCE),
+                  ((4 * kTlvHeader) + (sizeof(SUBJECT_STR) - 1) + sizeof(organisation_oid)), NULL, sizeof(data_to_hash));
+    VerifyOrExit(ret == 0, error = CHIP_ERROR_INTERNAL);
 
     buffer_index -= 3;
     VerifyOrExit(buffer_index > 0, error = CHIP_ERROR_INTERNAL);
@@ -659,7 +677,9 @@ CHIP_ERROR P256Keypair::NewCertificateSigningRequest(uint8_t * csr, size_t & csr
 
     buffer_index -= kTlvHeader;
     VerifyOrExit(buffer_index > 0, error = CHIP_ERROR_INTERNAL);
-    add_tlv(data_to_hash, buffer_index, (ASN1_CONSTRUCTED | ASN1_SEQUENCE), (data_to_hash_len - buffer_index - kTlvHeader), NULL);
+    ret = add_tlv(data_to_hash, buffer_index, (ASN1_CONSTRUCTED | ASN1_SEQUENCE), (data_to_hash_len - buffer_index - kTlvHeader),
+                  NULL, sizeof(data_to_hash));
+    VerifyOrExit(ret == 0, error = CHIP_ERROR_INTERNAL);
 
     // TLV data is created by copying from backwards. move it to start of buffer.
     data_to_hash_len = (data_to_hash_len - buffer_index);
@@ -696,15 +716,20 @@ CHIP_ERROR P256Keypair::NewCertificateSigningRequest(uint8_t * csr, size_t & csr
     // ECDSA SHA256 Signature OID TLV ==> 1 + 1 + len(signature_oid) (8)
     // ASN_NULL ==> 1 + 1
     VerifyOrExit((csr_index + kTlvHeader) <= csr_length, error = CHIP_ERROR_INTERNAL);
-    add_tlv(csr, csr_index, (ASN1_CONSTRUCTED | ASN1_SEQUENCE), 0x0C, NULL);
+    ret = add_tlv(csr, csr_index, (ASN1_CONSTRUCTED | ASN1_SEQUENCE), 0x0C, NULL, csr_length);
+    VerifyOrExit(ret == 0, error = CHIP_ERROR_INTERNAL);
     csr_index = csr_index + kTlvHeader;
 
     VerifyOrExit((csr_index + sizeof(signature_oid) + kTlvHeader) <= csr_length, error = CHIP_ERROR_INTERNAL);
-    add_tlv(csr, csr_index, ASN1_OID, sizeof(signature_oid), signature_oid);
+    ret = add_tlv(csr, csr_index, ASN1_OID, sizeof(signature_oid), signature_oid, csr_length);
+    VerifyOrExit(ret == 0, error = CHIP_ERROR_INTERNAL);
+
     csr_index = csr_index + kTlvHeader + sizeof(signature_oid);
 
     VerifyOrExit((csr_index + kTlvHeader) <= csr_length, error = CHIP_ERROR_INTERNAL);
-    add_tlv(csr, csr_index, ASN1_NULL, 0x00, NULL);
+    ret = add_tlv(csr, csr_index, ASN1_NULL, 0x00, NULL, csr_length);
+    VerifyOrExit(ret == 0, error = CHIP_ERROR_INTERNAL);
+
     csr_index = csr_index + kTlvHeader;
 
     VerifyOrExit((csr_index + kTlvHeader) <= csr_length, error = CHIP_ERROR_INTERNAL);

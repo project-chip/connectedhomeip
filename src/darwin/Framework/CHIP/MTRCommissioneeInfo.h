@@ -55,7 +55,7 @@ MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
  * 1) The attributes in extraAttributesToRead on MTRCommissioningParameters.
  * 2) The FeatureMap attributes of all Network Commissioning clusters on the commissionee.
  */
-@property (nonatomic, copy, readonly, nullable) NSDictionary<MTRAttributePath *, NSDictionary<NSString *, id> *> * attributes MTR_UNSTABLE_API;
+@property (nonatomic, copy, readonly, nullable) NSDictionary<MTRAttributePath *, NSDictionary<NSString *, id> *> * attributes MTR_AVAILABLE(ios(26.2), macos(26.2), watchos(26.2), tvos(26.2));
 
 @end
 

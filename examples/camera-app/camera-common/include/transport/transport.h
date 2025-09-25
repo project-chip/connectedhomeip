@@ -31,10 +31,10 @@ class Transport
 {
 public:
     // Send video data for a given stream ID
-    virtual void SendVideo(const char * data, size_t size, uint16_t videoStreamID) = 0;
+    virtual void SendVideo(const char * data, size_t size, int64_t timestamp, uint16_t videoStreamID) = 0;
 
     // Send audio data for a given stream ID
-    virtual void SendAudio(const char * data, size_t size, uint16_t audioStreamID) = 0;
+    virtual void SendAudio(const char * data, size_t size, int64_t timestamp, uint16_t audioStreamID) = 0;
 
     // Send synchronixed audio/video data for given audio and video stream IDs
     virtual void SendAudioVideo(const char * data, size_t size, uint16_t videoSTreamID, uint16_t audioStreamID) = 0;

@@ -74,6 +74,10 @@ public:
 
     Protocols::InteractionModel::Status ValidateAudioStream(uint16_t audioStreamId) override;
 
+    Protocols::InteractionModel::Status ValidateZoneId(uint16_t zoneId) override;
+
+    bool ValidateMotionZoneListSize(size_t zoneListSize) override;
+
     PushAvStreamTransportStatusEnum GetTransportBusyStatus(const uint16_t connectionID) override;
 
     void OnAttributeChanged(AttributeId attributeId) override;
@@ -81,6 +85,16 @@ public:
     CHIP_ERROR LoadCurrentConnections(std::vector<TransportConfigurationStorage> & currentConnections) override;
 
     CHIP_ERROR PersistentAttributesLoadedCallback() override;
+
+    void SetTLSCerts(Tls::CertificateTable::BufferedClientCert & clientCertEntry,
+                     Tls::CertificateTable::BufferedRootCert & rootCertEntry) override
+    {
+        // Handle TLS certificates if needed for implementation
+    }
+    void SetPushAvStreamTransportServer(PushAvStreamTransportServer * serverLogic) override
+    {
+        // Store pointer to server logic if needed for implementation
+    }
 
     void Init();
     PushAvStreamTransportManager()  = default;
