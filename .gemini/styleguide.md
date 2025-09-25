@@ -21,7 +21,7 @@ Use these as a reference for finding common patterns and potential issues in new
     is to be implemented
   - [docs/guides/migrating_ember_cluster_to_code_driven.md](https://github.com/project-chip/connectedhomeip/blob/master/docs/guides/migrating_ember_cluster_to_code_driven.md)
     describes how ember clusters can be migrated to code driven
-  - [docs/testing/unit_testing.md](https://github.com/project-chip/connectedhomeip/blob/master/docs/guides/migrating_ember_cluster_to_code_driven.md)
+  - [docs/testing/unit_testing.md](https://github.com/project-chip/connectedhomeip/blob/master/docs/testing/unit_testing.md)
     describes how to implement unit testing
   - [docs/testing/integration_tests.md](https://github.com/project-chip/connectedhomeip/blob/master/docs/testing/integration_tests.md)
     describes how to implement integration tests.
