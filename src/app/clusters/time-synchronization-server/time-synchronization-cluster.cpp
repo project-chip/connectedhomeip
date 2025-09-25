@@ -368,9 +368,9 @@ DataModel::ActionReturnStatus TimeSynchronizationCluster::ReadAttribute(const Da
     case DSTOffset::Id:
         return ReadDSTOffset(request.path.mEndpointId, encoder);
     case TimeZoneListMaxSize::Id:
-        return encoder.Encode(CHIP_CONFIG_TIME_ZONE_LIST_MAX_SIZE);
+        return encoder.Encode<uint8_t>(CHIP_CONFIG_TIME_ZONE_LIST_MAX_SIZE);
     case DSTOffsetListMaxSize::Id:
-        return encoder.Encode(CHIP_CONFIG_DST_OFFSET_LIST_MAX_SIZE);
+        return encoder.Encode<uint8_t>(CHIP_CONFIG_DST_OFFSET_LIST_MAX_SIZE);
     case LocalTime::Id:
         return ReadLocalTime(request.path.mEndpointId, encoder);
     case ClusterRevision::Id:
