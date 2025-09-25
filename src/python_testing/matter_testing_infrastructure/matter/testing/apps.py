@@ -149,9 +149,7 @@ class OTAProviderSubprocess(AppServerSubprocess):
     # Prefix for log messages from the OTA provider application.
     PREFIX = b"[OTA-PROVIDER]"
 
-    def __init__(self, app: str, storage_dir: str, discriminator: int,
-                 passcode: int, ota_source: Union[OtaImagePath, ImageListPath],
-                 port: int = 5541, extra_args: list[str] = [], f_stdout: BinaryIO = stdout.buffer, f_stderr: BinaryIO = stdout.buffer):
+    def __init__(**kwargs):
         """Initialize the OTA Provider subprocess.
 
         Args:
@@ -165,11 +163,10 @@ class OTAProviderSubprocess(AppServerSubprocess):
         """
 
         # Build OTA-specific arguments using the ota_source property
-        combined_extra_args = ota_source.ota_args + extra_args
+        combined_extra_args = kwargs.ota_source.ota_args + kwargs.extra_args
 
         # Initialize with the combined arguments
-        super().__init__(app=app, storage_dir=storage_dir, discriminator=discriminator,
-                         passcode=passcode, port=port, extra_args=combined_extra_args, f_stdout=f_stdout, f_stderr=f_stderr)
+        super().__init__(**kwargs)
 
     def kill(self):
         self.p.send_signal(signal.SIGKILL)
