@@ -16,7 +16,7 @@
 ## Development guides
 
 The SDK source code contains guides for development best practices in `docs/guides`, `docs/testing` and other `docs` locations.
-Use these as a reference for finding common patters and potential issues in new code. In particular:
+Use these as a reference for finding common patterns and potential issues in new code. In particular:
   - [docs/guides/writing_clusters](https://github.com/project-chip/connectedhomeip/blob/master/docs/guides/writing_clusters.md) describes how cluster handling
     is to be implemented
   - [docs/guides/migrating_ember_cluster_to_code_driven.md](https://github.com/project-chip/connectedhomeip/blob/master/docs/guides/migrating_ember_cluster_to_code_driven.md)
