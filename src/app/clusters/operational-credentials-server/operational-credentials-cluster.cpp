@@ -1242,7 +1242,8 @@ std::optional<DataModel::ActionReturnStatus> OperationalCredentialsCluster::Invo
         return HandleCSRRequest(handler, request.path, input_arguments, GetFabricTable(), GetFailSafeContext(), GetDACProvider());
     case OperationalCredentials::Commands::AddNOC::Id: {
         std::optional<DataModel::ActionReturnStatus> returnStatus =
-            HandleAddNOC(handler, request.path, input_arguments, GetFabricTable(), GetFailSafeContext(), GetDNSSDServer(), GetCommissioningWindowManager());
+            HandleAddNOC(handler, request.path, input_arguments, GetFabricTable(), GetFailSafeContext(), GetDNSSDServer(),
+                         GetCommissioningWindowManager());
         if (returnStatus == Status::Success)
         {
             // Notify the attributes containing fabric metadata can be read with new data
