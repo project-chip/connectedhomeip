@@ -35,25 +35,9 @@
 using DeviceControllerFactory = chip::Controller::DeviceControllerFactory;
 using TestSessionKeystoreImpl = chip::Crypto::DefaultSessionKeystore;
 
-namespace chip {
-namespace Controller {
-
 chip::Credentials::GroupDataProviderImpl sProvider(5, 8);
-chip::TestPersistentStorageDelegate storage;
-chip::SimpleSessionResumptionStorage sessionStorage;
 
-class Engine_raii
-{
-public:
-    Engine_raii() : engine{ chip::app::InteractionModelEngine::GetInstance() } {}
-
-    ~Engine_raii() { engine->Shutdown(); }
-
-    chip::app::InteractionModelEngine * operator->() { return engine; }
-
-private:
-    chip::app::InteractionModelEngine * engine;
-};
+namespace {
 
 class FactoryInitParamsSetter
 {
@@ -160,7 +144,6 @@ public:
 
 protected:
     FactoryInitParamsSetter params;
-    Engine_raii engine;
 
 private:
     chip::app::DataModel::Provider * mOldProvider = nullptr;
@@ -170,6 +153,7 @@ TEST_F(TestDeviceControllerFactory, DeviceControllerFactoryMethods_FailInit)
 {
     chip::Controller::FactoryInitParams factoryInitParams = params.GetFactoryInitParams();
     // Initialize the ember side server logic
+    auto * engine = chip::app::InteractionModelEngine::GetInstance();
     EXPECT_EQ(engine->Init(&GetExchangeManager(), &GetFabricTable(), chip::app::reporting::GetDefaultReportScheduler()),
               CHIP_NO_ERROR);
 
@@ -179,12 +163,16 @@ TEST_F(TestDeviceControllerFactory, DeviceControllerFactoryMethods_FailInit)
 
     // Init device controller factory
     factoryInitParams.dataModelProvider = engine->GetDataModelProvider();
+
+    // Free engine before finish
+    engine->Shutdown();
 } // DeviceControllerFactoryMethods_FailInit
 
 TEST_F(TestDeviceControllerFactory, DeviceControllerFactoryMethods_DobleInit)
 {
     chip::Controller::FactoryInitParams factoryInitParams = params.GetFactoryInitParams();
     // Initialize the ember side server logic
+    auto * engine = chip::app::InteractionModelEngine::GetInstance();
     EXPECT_EQ(engine->Init(&GetExchangeManager(), &GetFabricTable(), chip::app::reporting::GetDefaultReportScheduler()),
               CHIP_NO_ERROR);
 
@@ -195,21 +183,28 @@ TEST_F(TestDeviceControllerFactory, DeviceControllerFactoryMethods_DobleInit)
     EXPECT_EQ(DeviceControllerFactory::GetInstance().Init(factoryInitParams), CHIP_NO_ERROR);
     EXPECT_EQ(DeviceControllerFactory::GetInstance().Init(factoryInitParams), CHIP_NO_ERROR);
     DeviceControllerFactory::GetInstance().Shutdown();
+
+    // Free engine before finish
+    engine->Shutdown();
 } // DeviceControllerFactoryMethods_DobleInit
 
 TEST_F(TestDeviceControllerFactory, DeviceControllerFactoryMethods_SetupControllerAndCommissioner)
 {
     chip::Controller::FactoryInitParams factoryInitParams = params.GetFactoryInitParams();
+    chip::TestPersistentStorageDelegate storage;
     chip::Controller::SetupParams deviceParams;
     chip::Controller::DeviceCommissioner commissioner;
     chip::Controller::DeviceController device;
-    FabricTableHolder fHolder;
     // Initialize the ember side server logic
+    auto * engine = chip::app::InteractionModelEngine::GetInstance();
     EXPECT_EQ(engine->Init(&GetExchangeManager(), &GetFabricTable(), chip::app::reporting::GetDefaultReportScheduler()),
               CHIP_NO_ERROR);
 
     // Init device controller factory
     factoryInitParams.dataModelProvider = engine->GetDataModelProvider();
+
+    chip::SimpleSessionResumptionStorage sessionStorage;
+    FabricTableHolder fHolder;
 
     EXPECT_EQ(sessionStorage.Init(&storage), CHIP_NO_ERROR);
     EXPECT_EQ(fHolder.Init(), CHIP_NO_ERROR);
@@ -228,19 +223,26 @@ TEST_F(TestDeviceControllerFactory, DeviceControllerFactoryMethods_SetupControll
 
     EXPECT_TRUE(DeviceControllerFactory::GetInstance().ReleaseSystemState());
     DeviceControllerFactory::GetInstance().Shutdown();
+
+    // Free engine before finish
+    engine->Shutdown();
 } // DeviceControllerFactoryMethods_SetupControllerAndCommissioner
 
 TEST_F(TestDeviceControllerFactory, DeviceControllerFactoryMethods_RetainAndRelease)
 {
     chip::Controller::FactoryInitParams factoryInitParams = params.GetFactoryInitParams();
+    chip::TestPersistentStorageDelegate storage;
     chip::Controller::SetupParams dparams;
-    FabricTableHolder fHolder;
     // Initialize the ember side server logic
+    auto * engine = chip::app::InteractionModelEngine::GetInstance();
     EXPECT_EQ(engine->Init(&GetExchangeManager(), &GetFabricTable(), chip::app::reporting::GetDefaultReportScheduler()),
               CHIP_NO_ERROR);
 
     // Init device controller factory
     factoryInitParams.dataModelProvider = engine->GetDataModelProvider();
+
+    chip::SimpleSessionResumptionStorage sessionStorage;
+    FabricTableHolder fHolder;
 
     EXPECT_EQ(sessionStorage.Init(&storage), CHIP_NO_ERROR);
     EXPECT_EQ(fHolder.Init(), CHIP_NO_ERROR);
@@ -263,7 +265,9 @@ TEST_F(TestDeviceControllerFactory, DeviceControllerFactoryMethods_RetainAndRele
     EXPECT_EQ(DeviceControllerFactory::GetInstance().EnsureAndRetainSystemState(), CHIP_NO_ERROR);
     EXPECT_TRUE(DeviceControllerFactory::GetInstance().ReleaseSystemState());
     DeviceControllerFactory::GetInstance().Shutdown();
+
+    // Free engine before finish
+    engine->Shutdown();
 } // DeviceControllerFactoryMethods_RetainAndRelease
 
-} // namespace Controller
-} // namespace chip
+} // namespace
