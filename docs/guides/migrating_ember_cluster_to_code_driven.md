@@ -126,10 +126,9 @@ new code-driven class structure.
         }
         ```
 
-    -   Command Handler Interface logic translates directly: `CHI` has a
-        switch on command ID inside its `InvokeCommand` call. You should
-        have the same logic inside the `ServerClusterInterface`
-        processing logic.
+    -   Command Handler Interface logic translates directly: `CHI` has a switch
+        on command ID inside its `InvokeCommand` call. You should have the same
+        logic inside the `ServerClusterInterface` processing logic.
 
 -   The `InvokeCommand` method can return an `ActionReturnStatus` optional. For
     better readability, prefer returning a status code directly (e.g.,
