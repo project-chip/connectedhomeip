@@ -36,7 +36,7 @@ INVALID_PASSCODES = [00000000,
                      88888888,
                      99999999,
                      12345678,
-                     87654321 ]
+                     87654321]
 
 # Length of `w0s` and `w1s` elements
 WS_LENGTH = NIST256p.baselen + 8

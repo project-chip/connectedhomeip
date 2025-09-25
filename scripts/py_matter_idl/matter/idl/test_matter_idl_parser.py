@@ -908,7 +908,7 @@ server cluster A = 1 { /* Test comment */ }
                     ],
                     structs=[
                         Struct(name="MyStruct", fields=[
-                            Field(name="subStruct", code=0, data_type=DataType(name="TestStruct"), qualities=FieldQuality.NULLABLE) ],
+                            Field(name="subStruct", code=0, data_type=DataType(name="TestStruct"), qualities=FieldQuality.NULLABLE)],
                         ),
                         global_struct,
                     ],
