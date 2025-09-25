@@ -21,6 +21,7 @@
 #include "CommodityTariffConsts.h"
 #include <app-common/zap-generated/cluster-enums.h>
 #include <app-common/zap-generated/cluster-objects.h>
+#include <cstdint>
 #include <platform/LockTracker.h>
 
 #include <atomic>
@@ -574,7 +575,7 @@ public:
      * - Others: default initialized
      * - Update state set to kIdle
      */
-    explicit CTC_BaseDataClass(AttributeId aAttrId) : mAttrId(aAttrId)
+    explicit CTC_BaseDataClass(AttributeId aAttrId, void * aMgmtCtx = nullptr) : mMgmtDataCtx(aMgmtCtx), mAttrId(aAttrId)
     {
         if constexpr (TypeIsNullable<ValueType>())
         {
@@ -783,7 +784,7 @@ public:
                 {
                     if constexpr (TypeIsStruct<ListEntryType>())
                     {
-                        if (CHIP_NO_ERROR == (err = CopyData(actualValue[idx], buffer[idx])))
+                        if (CHIP_NO_ERROR == (err = CopyListEntry(actualValue[idx], buffer[idx], idx)))
                         {
                             continue;
                         }
@@ -934,12 +935,6 @@ public:
     }
 
     /**
-     * @brief Cleans up an external list entry
-     * @param[in,out] entry The list entry to clean up
-     */
-    void CleanupExtListEntry(ListEntryType & entry) { CleanupStruct(entry); }
-
-    /**
      * @brief Gets the attribute ID
      * @return The attribute ID this instance manages
      */
@@ -1029,6 +1024,7 @@ private:
     // Internal implementation methods...
 
     CHIP_ERROR CopyData(const StructType & input, StructType & output);
+    CHIP_ERROR CopyListEntry(const StructType & input, StructType & output, size_t aIdx = 0);
 
     /**
      * @brief Validates the new value using type-specific validation
@@ -1144,7 +1140,7 @@ private:
                 }
                 else if constexpr (TypeIsStruct<DataType>())
                 {
-                    CleanupStruct(aValue.Value());
+                    CleanupData(aValue.Value());
                 }
             }
             aValue.SetNull();
@@ -1165,11 +1161,10 @@ private:
 
         if constexpr (TypeIsStruct<ListEntryType>())
         {
-
-            for (auto & item : list)
+            for (size_t idx = 0; idx < list.size(); idx++)
             {
-                CleanupStruct(item);
-            }
+                 CleanupListEntry(list[idx], idx);
+            }            
         }
 
         if (list.data())
@@ -1183,14 +1178,19 @@ private:
      * @brief Cleans up a struct value
      * @param aValue Struct to clean up
      */
-    void CleanupStruct(StructType & aValue);
+    void CleanupData(StructType & aValue);
+    void CleanupListEntry(StructType & aValue, size_t aIdx = 0);
 
     //{
     // CleanupStructValue<StructType>(aValue);
     //}
 
+    void * mMgmtDataCtx = nullptr;
     void * mAuxData = nullptr; ///< Validation context data
     const AttributeId mAttrId; ///< Managed attribute ID
+
+protected:
+    void * GetMgmtCtx() const { return mMgmtDataCtx; }
 };
 
 } // namespace CommodityTariffAttrsDataMgmt
