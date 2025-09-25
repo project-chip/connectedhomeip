@@ -108,6 +108,14 @@ class TC_ZONEMGMT_2_4(MatterBaseTest):
                      "Verify that the DUT responds with a NotFound status code"),
         ]
 
+    async def _trigger_motion_event(self, zone_id):
+        # CI: Use app pipe to trigger zone event.
+        # Manual: User should trigger a motion event from the defined zone.
+        if self.is_pics_sdk_ci_only:
+            self.write_to_app_pipe({"Name": "ZoneTriggered", "ZoneId": zone_id})
+        else:
+            self.wait_for_user_input(prompt_msg=f"Press enter and generate motion triggered event from zone {zone_id}")
+
     @run_if_endpoint_matches(has_cluster(Clusters.ZoneManagement) and
                              has_cluster(Clusters.CameraAvStreamManagement))
     async def test_TC_ZONEMGMT_2_4(self):
@@ -255,12 +263,7 @@ class TC_ZONEMGMT_2_4(MatterBaseTest):
         event_listener = EventSubscriptionHandler(expected_cluster=cluster)
         await event_listener.start(dev_ctrl, node_id, endpoint=endpoint, min_interval_sec=0, max_interval_sec=30)
         event_delay_seconds = 5.0
-        # CI: Use app pipe to trigger zone event.
-        # Manual: User should trigger a motion event from the defined zone.
-        if self.is_pics_sdk_ci_only:
-            self.write_to_app_pipe({"Name": "ZoneTriggered", "ZoneId": zoneID1})
-        else:
-            self.wait_for_user_input(prompt_msg=f"Press enter and generate motion triggered event from zone {zoneID1}")
+        await self._trigger_motion_event(zoneID1)
 
         event = event_listener.wait_for_event_report(
             cluster.Events.ZoneTriggered, timeout_sec=event_delay_seconds)
@@ -288,10 +291,7 @@ class TC_ZONEMGMT_2_4(MatterBaseTest):
         event_listener = EventSubscriptionHandler(expected_cluster=cluster)
         await event_listener.start(dev_ctrl, node_id, endpoint=endpoint, min_interval_sec=0, max_interval_sec=30)
         event_delay_seconds = 5.0
-        if self.is_pics_sdk_ci_only:
-            self.write_to_app_pipe({"Name": "ZoneTriggered", "ZoneId": zoneID1})
-        else:
-            self.wait_for_user_input(prompt_msg=f"Press enter and generate motion triggered event from zone {zoneID1}")
+        await self._trigger_motion_event(zoneID1)
 
         event = event_listener.wait_for_event_report(
             cluster.Events.ZoneTriggered, timeout_sec=event_delay_seconds)
@@ -301,10 +301,7 @@ class TC_ZONEMGMT_2_4(MatterBaseTest):
         asserts.assert_equal(event.reason, enums.ZoneEventTriggeredReasonEnum.kMotion, "Unexpected reason on ZoneTriggered")
 
         self.step("4a")
-        if self.is_pics_sdk_ci_only:
-            self.write_to_app_pipe({"Name": "ZoneTriggered", "ZoneId": zoneID1})
-        else:
-            self.wait_for_user_input(prompt_msg=f"Press enter and generate motion triggered event from zone {zoneID1}")
+        await self._trigger_motion_event(zoneID1)
 
         event_delay_seconds = initDuration + augDuration + 1
 
@@ -319,10 +316,7 @@ class TC_ZONEMGMT_2_4(MatterBaseTest):
 
         self.step("5")
         # Repeat Step 3
-        if self.is_pics_sdk_ci_only:
-            self.write_to_app_pipe({"Name": "ZoneTriggered", "ZoneId": zoneID1})
-        else:
-            self.wait_for_user_input(prompt_msg=f"Press enter and generate motion triggered event from zone {zoneID1}")
+        await self._trigger_motion_event(zoneID1)
 
         event = event_listener.wait_for_event_report(
             cluster.Events.ZoneTriggered, timeout_sec=event_delay_seconds)
@@ -341,7 +335,8 @@ class TC_ZONEMGMT_2_4(MatterBaseTest):
                 self.write_to_app_pipe({"Name": "ZoneTriggered", "ZoneId": zoneID1})
                 time.sleep(1)
         else:
-          self.wait_for_user_input(prompt_msg=f"Press enter and keep generating motion triggered event from zone {zoneID1} for a period exceeding {maxDuration} seconds")
+            self.wait_for_user_input(
+                prompt_msg=f"Press enter and keep generating motion triggered event from zone {zoneID1} for a period exceeding {maxDuration} seconds")
 
         event_delay_seconds = maxDuration
         event = event_listener.wait_for_event_report(
@@ -355,10 +350,7 @@ class TC_ZONEMGMT_2_4(MatterBaseTest):
 
         self.step("5c")
         event_delay_seconds = blindDuration + 1
-        if self.is_pics_sdk_ci_only:
-            self.write_to_app_pipe({"Name": "ZoneTriggered", "ZoneId": zoneID1})
-        else:
-            self.wait_for_user_input(prompt_msg=f"Press enter and generate motion triggered event from zone {zoneID1}")
+        await self._trigger_motion_event(zoneID1)
 
         event = event_listener.wait_for_event_expect_no_report(timeout_sec=event_delay_seconds)
         logger.info(f"Successfully timed out without receiving any ZoneTriggered event for zone: {zoneID1}")
