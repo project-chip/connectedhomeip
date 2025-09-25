@@ -54,8 +54,7 @@ drlkcluster = Clusters.DoorLock
 class TC_DRLK_2_9(MatterBaseTest, DRLK_COMMON):
 
     def steps_TC_DRLK_2_9(self) -> list[TestStep]:
-        steps = [
-
+        return [
             TestStep("1", "TH reads NumberOfTotalUsersSupported attribute.",
                      "Verify that TH is able to read the attribute successfully."),
             TestStep("2a", "TH sends SetUser Command to DUT.", "Verify that the DUT sends SUCCESS response"),
@@ -158,9 +157,8 @@ class TC_DRLK_2_9(MatterBaseTest, DRLK_COMMON):
             TestStep("36", "TH sends ClearCredential Command to DUT to clear all the credentials.",
                      "Verify that the DUT sends SUCCESS response."),
             TestStep("37", "TH sends ClearAliroReaderConfig Command to DUT.",
-                     "Verify that the DUT sends SUCCESS response.")]
-
-        return steps
+                     "Verify that the DUT sends SUCCESS response."),
+        ]
 
     async def read_attributes_from_dut(self, endpoint, cluster, attribute, expected_status: Status = Status.Success):
         try:
