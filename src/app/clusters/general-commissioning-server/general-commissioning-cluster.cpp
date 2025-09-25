@@ -264,7 +264,6 @@ DataModel::ActionReturnStatus GeneralCommissioningCluster::ReadAttribute(const D
     }
 }
 
-
 std::optional<DataModel::ActionReturnStatus> GeneralCommissioningCluster::InvokeCommand(const DataModel::InvokeRequest & request,
                                                                                         TLV::TLVReader & input_arguments,
                                                                                         CommandHandler * handler)
