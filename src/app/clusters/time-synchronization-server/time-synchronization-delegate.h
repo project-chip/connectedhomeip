@@ -21,8 +21,6 @@
 #include "TimeSyncDataProvider.h"
 
 #include <app-common/zap-generated/attributes/Accessors.h>
-#include <app-common/zap-generated/cluster-objects.h>
-#include <lib/support/Span.h>
 #include <protocols/interaction_model/StatusCode.h>
 
 namespace chip::app::Clusters::TimeSynchronization {

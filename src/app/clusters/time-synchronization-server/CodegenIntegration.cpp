@@ -59,7 +59,7 @@ public:
 
 } // namespace
 
-void emberAfTimeSynchronizationClusterServerInitCallback(EndpointId endpointId)
+void MatterTimeSynchronizationClusterInitCallback(EndpointId endpointId)
 {
     IntegrationDelegate integrationDelegate;
 
@@ -76,7 +76,7 @@ void emberAfTimeSynchronizationClusterServerInitCallback(EndpointId endpointId)
         integrationDelegate);
 }
 
-void MatterTimeSynchronizationClusterServerShutdownCallback(EndpointId endpointId)
+void MatterTimeSynchronizationClusterShutdownCallback(EndpointId endpointId)
 {
     IntegrationDelegate integrationDelegate;
 
@@ -92,8 +92,6 @@ void MatterTimeSynchronizationClusterServerShutdownCallback(EndpointId endpointI
 }
 
 void MatterTimeSynchronizationPluginServerInitCallback() {}
-
-void MatterTimeSynchronizationPluginServerShutdownCallback() {}
 
 namespace chip::app::Clusters::TimeSynchronization {
 
