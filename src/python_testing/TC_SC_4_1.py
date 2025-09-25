@@ -198,7 +198,7 @@ class TC_SC_4_1(MatterBaseTest):
             "SAI key must be present if SAT key is present."
         )
 
-        # Verify that the CM key is present and is equal to 1
+        # Verify that the CM key is present and is equal to the expected CM value
         if 'CM' in commissionable_service.txt:
             cm_key = commissionable_service.txt['CM']
             assert_valid_cm_key(cm_key)
