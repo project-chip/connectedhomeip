@@ -32,6 +32,6 @@ source_set("general-commissioning-server") {
   ]
 
   if (chip_terms_and_conditions_required) {
-    public_deps += [ "${chip_root}/src/app/server::terms_and_conditions" ]
+    public_deps += [ "${chip_root}/src/app/server:terms_and_conditions" ]
   }
 }
