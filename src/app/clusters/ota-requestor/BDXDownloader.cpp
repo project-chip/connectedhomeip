@@ -289,7 +289,7 @@ CHIP_ERROR BDXDownloader::HandleBdxEvent(const chip::bdx::TransferSession::Outpu
     }
     case TransferSession::OutputEventType::kStatusReceived:
         ChipLogError(BDX, "BDX StatusReport %x", static_cast<uint16_t>(outEvent.statusData.statusCode));
-        // second argument to CleanupOnError being TRUE means bdx transfer session moved 
+        // second argument to CleanupOnError being TRUE means bdx transfer session moved
         // to UnrecoverableError state due to receiving an either SenerAborted or ReceiverAborted Status Report
         CleanupOnError(OTAChangeReasonEnum::kFailure, mBdxTransfer.IsInUnrecoverableState());
         break;

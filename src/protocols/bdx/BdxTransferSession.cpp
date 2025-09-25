@@ -404,8 +404,8 @@ CHIP_ERROR TransferSession::AbortTransfer(StatusCode reason)
 
     PrepareStatusReport(reason);
 
-    if ( ( mRole == TransferRole::kSender && mStatusReportData.statusCode == StatusCode::kSenderAborted ) ||
-         ( mRole == TransferRole::kReceiver && mStatusReportData.statusCode == StatusCode::kReceiverAborted ) )
+    if ((mRole == TransferRole::kSender && mStatusReportData.statusCode == StatusCode::kSenderAborted) ||
+        (mRole == TransferRole::kReceiver && mStatusReportData.statusCode == StatusCode::kReceiverAborted))
     {
         mState = TransferState::kUnrecoverableError; // Signaling this side of the session wants to completely abort the transfer
     }
@@ -540,8 +540,8 @@ CHIP_ERROR TransferSession::HandleStatusReportMessage(const PayloadHeader & head
     /// If we are the Receiver and we received a SenderAborted status,
     /// then this is an unrecoverable error and we should move to that state.
     /// This means that the other side of the transfer has indicated they want to completely abort the transfer.
-    if ( ( mRole == TransferRole::kSender && report.GetProtocolCode() == static_cast<uint16_t>(StatusCode::kReceiverAborted) )||
-         ( mRole == TransferRole::kReceiver && report.GetProtocolCode() == static_cast<uint16_t>(StatusCode::kSenderAborted) ))
+    if ((mRole == TransferRole::kSender && report.GetProtocolCode() == static_cast<uint16_t>(StatusCode::kReceiverAborted)) ||
+        (mRole == TransferRole::kReceiver && report.GetProtocolCode() == static_cast<uint16_t>(StatusCode::kSenderAborted)))
     {
         ChipLogDetail(BDX, "moving %s to UnrecoverableError state", mRole == TransferRole::kSender ? "Sender" : "Receiver");
 
