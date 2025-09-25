@@ -224,9 +224,12 @@ DataModel::ActionReturnStatus DescriptorCluster::ReadAttribute(const DataModel::
     case PartsList::Id:
         return ReadPartsAttribute(mContext->provider, request.path.mEndpointId, encoder);
     case TagList::Id:
-        if(mFeatureFlags.Has(Feature::kTagList)) {
+        if (mFeatureFlags.Has(Feature::kTagList))
+        {
             return ReadTagListAttribute(mContext->provider, request.path.mEndpointId, encoder);
-        }else{
+        }
+        else
+        {
             return Status::UnsupportedAttribute;
         }
 #if CHIP_CONFIG_USE_ENDPOINT_UNIQUE_ID
