@@ -54,6 +54,7 @@ class TC_WEBRTC_1_8(MatterBaseTest, WebRTCTestHelper):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.th2 = None
+
     def steps_TC_WEBRTC_1_8(self) -> list[TestStep]:
         steps = [
             TestStep("precondition-1", commission_if_required(), is_commissioning=True),
@@ -104,10 +105,10 @@ class TC_WEBRTC_1_8(MatterBaseTest, WebRTCTestHelper):
             endpoint=endpoint,
             fabric_filtered=False,
         )
-        asserts.assert_equal(len(current_sessions), 2 , "Expected 1 WebRTC sessions")
+        asserts.assert_equal(len(current_sessions), 2, "Expected 1 WebRTC sessions")
         # Store session IDs for later cleanup if needed
         session_ids = [s.id for s in current_sessions]
-        
+
         self.step("precondition-2")
 
         # Close all sessions on DUT
@@ -126,7 +127,7 @@ class TC_WEBRTC_1_8(MatterBaseTest, WebRTCTestHelper):
             ),
             endpoint=endpoint,
             payloadCapability=TransportPayloadCapability.LARGE_PAYLOAD,
-            dev_ctrl = th2,
+            dev_ctrl=th2,
             node_id=self.dut_node_id+1
         )
         await webrtc_manager.close_all()
@@ -152,9 +153,9 @@ async def establish_webrtc_session(webrtc_manager, webrtc_peer, endpoint, self, 
         endpoint=endpoint,
         payloadCapability=TransportPayloadCapability.LARGE_PAYLOAD,
     )
-    
+
     session_id = provide_offer_response.webRTCSessionID
-    asserts.assert_true(session_id>= 0, "Invalid response")
+    asserts.assert_true(session_id >= 0, "Invalid response")
     webrtc_manager.session_id_created(session_id, map_nodeId)
 
     answer_sessionId, answer = await webrtc_peer.get_remote_answer(timeout_s=30)
@@ -170,7 +171,7 @@ async def establish_webrtc_session(webrtc_manager, webrtc_peer, endpoint, self, 
         ),
         endpoint=endpoint,
         payloadCapability=TransportPayloadCapability.LARGE_PAYLOAD,
-        dev_ctrl = dev_ctrl,
+        dev_ctrl=dev_ctrl,
         node_id=map_nodeId
     )
 
@@ -180,6 +181,7 @@ async def establish_webrtc_session(webrtc_manager, webrtc_peer, endpoint, self, 
     webrtc_peer.set_remote_ice_candidates(remote_candidates)
 
     return await webrtc_peer.check_for_session_establishment()
+
 
 async def webrtc_create_test_harness_controller(self):
     self.th1 = self.default_controller
@@ -198,7 +200,7 @@ async def webrtc_create_test_harness_controller(self):
         nodeId=2, useTestCommissioner=True)
 
     setupPinCode = params.setupPinCode
-    
+
     await self.th2.CommissionOnNetwork(
         nodeId=self.dut_node_id+1, setupPinCode=setupPinCode,
         filterType=ChipDeviceCtrl.DiscoveryFilterType.LONG_DISCRIMINATOR, filter=self.discriminator)
