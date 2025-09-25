@@ -229,8 +229,7 @@ class MdnsDiscovery:
             service_name=service_name,
             service_type=service_type,
             query_timeout_sec=query_timeout_sec,
-            query_record_types={_TYPE_SRV},
-            log_output=log_output
+            query_record_types={_TYPE_SRV}
         )
 
         if log_output:
@@ -269,8 +268,7 @@ class MdnsDiscovery:
             service_name=service_name,
             service_type=service_type,
             query_timeout_sec=query_timeout_sec,
-            query_record_types={_TYPE_TXT},
-            log_output=log_output
+            query_record_types={_TYPE_TXT}
         )
 
         if log_output:
@@ -454,7 +452,7 @@ class MdnsDiscovery:
                 query phase. Only applies when `query_service` is True. Defaults to QUERY_TIMEOUT_SEC (10 sec).
             append_results (bool): If True, appends results to `self._discovered_services`
                 without clearing previous entries. If False, clears the dictionary before
-                storing new results. Only applies when `query_service` is True.
+                storing new results. Only applies when `query_service` is True. Defaults to False.
             log_output (bool, optional): If True, logs the discovered services to the
                 console. Defaults to False.
 
@@ -514,18 +512,16 @@ class MdnsDiscovery:
                 self._event.set()
                 await aiobrowser.async_cancel()
 
-            if log_output:
-                self._log_output()
-
-            # Log discovery stats
+            # Log discovered services stats found during the browse
             services_count = sum(len(ptr_list) for ptr_list in self._discovered_services.values())
             types_count = len(self._discovered_services)
             logger.info(f"Discovered {services_count} mDNS service(s) across {types_count} service type(s)")
+            if log_output:
+                self._log_output()
 
-            # If service querying is enabled, perform controlled parallel queries to
-            # retrieve service information (TXT, SRV, A/AAAA) for each discovered PTR
-            # record. This is helpful when many PTR records are found, as it prevents
-            # system overload by limiting concurrent mDNS queries.
+            # If service querying is enabled, perform controlled parallel queries to retrieve
+            # service information (TXT, SRV, A/AAAA) for each discovered PTR record. This
+            # helps prevent system overload by limiting concurrent mDNS queries.
             if query_service:
                 logger.info("Querying service information for discovered services...")
                 semaphore = Semaphore(5)  # Limit to 5 concurrent queries
@@ -536,8 +532,7 @@ class MdnsDiscovery:
                             service_type=ptr.service_type,
                             service_name=ptr.service_name,
                             query_timeout_sec=query_timeout_sec,
-                            append_results=True,
-                            log_output=log_output
+                            append_results=True
                         )
 
                 tasks = []
@@ -549,6 +544,8 @@ class MdnsDiscovery:
 
                 await gather(*tasks)
 
+                # Log the full service info details
+                # from all the discovered services
                 if log_output:
                     self._log_output()
 
@@ -606,7 +603,7 @@ class MdnsDiscovery:
             query_record_types (set[int]): DNS record types to request (e.g., {33, 16, 1, 28} for SRV, TXT, A, AAAA).
                 Defaults to QUERY_RECORD_TYPES (SRV, TXT, A, AAAA).
             append_results (bool): If True, appends the results to `self._discovered_services` without clearing previous entries.
-                                   If False, clears `self._discovered_services` before storing the new result.
+                                   If False, clears `self._discovered_services` before storing the new result. Defaults to False.
 
         Returns:
             Optional[MdnsServiceInfo]: A fully resolved service instance containing details such as host address, port,
@@ -639,9 +636,15 @@ class MdnsDiscovery:
                 # Convert discovered service info into MdnsServiceInfo object
                 mdns_service_info = MdnsServiceInfo(service_info)
 
-                # Add service to discovered services
+                # - If not appending service info results to the discovered services list,
+                #   empty the list on every call so it holds only a single result (as used
+                #   by the `get_srv_record` and `get_txt_record` methods).
+                # - Otherwise append service info results to the discovered services
+                #   list (as used by the `discover` method)
                 if not append_results:
                     self._discovered_services = {}
+
+                # Add service to discovered services
                 self._discovered_services.setdefault(service_type, []).append(mdns_service_info)
 
                 return mdns_service_info
