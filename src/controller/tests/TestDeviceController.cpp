@@ -265,5 +265,5 @@ TEST_F(TestDeviceControllerFactory, DeviceControllerFactoryMethods_RetainAndRele
     DeviceControllerFactory::GetInstance().Shutdown();
 } // DeviceControllerFactoryMethods_RetainAndRelease
 
-} // namespace
-} // namespace
+} // namespace Controller
+} // namespace chip
