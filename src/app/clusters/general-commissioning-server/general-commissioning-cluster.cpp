@@ -264,6 +264,30 @@ DataModel::ActionReturnStatus GeneralCommissioningCluster::ReadAttribute(const D
     }
 }
 
+DataModel::ActionReturnStatus GeneralCommissioningCluster::WriteAttribute(const DataModel::WriteAttributeRequest & request,
+                                                                          AttributeValueDecoder & decoder)
+{
+
+    return NotifyAttributeChangedIfSuccess(request.path.mAttributeId, WriteImpl(request, decoder));
+}
+
+DataModel::ActionReturnStatus GeneralCommissioningCluster::WriteImpl(const DataModel::WriteAttributeRequest & request,
+                                                                     AttributeValueDecoder & decoder)
+{
+    using namespace GeneralCommissioning::Attributes;
+    switch (request.path.mAttributeId)
+    {
+    case Breadcrumb::Id: {
+        uint64_t value;
+        ReturnErrorOnFailure(decoder.Decode(value));
+        SetBreadCrumb(value);
+        return CHIP_NO_ERROR;
+    }
+    default:
+        return Protocols::InteractionModel::Status::UnsupportedWrite;
+    }
+}
+
 std::optional<DataModel::ActionReturnStatus> GeneralCommissioningCluster::InvokeCommand(const DataModel::InvokeRequest & request,
                                                                                         TLV::TLVReader & input_arguments,
                                                                                         CommandHandler * handler)
