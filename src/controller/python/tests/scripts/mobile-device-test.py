@@ -85,7 +85,7 @@ async def ethernet_commissioning(test: BaseTestHelper, discriminator: int, setup
     # FailIfNot(test.SetNetworkCommissioningParameters(dataset=TEST_THREAD_NETWORK_DATASET_TLV),
     #           "Failed to finish network commissioning")
 
-    qr = SetupPayload().GenerateQrCode(setup_pin)
+    qr = SetupPayload().GenerateQrCode(passcode=setup_pin, discriminator=discriminator)
 
     logger.info("Testing commissioning")
     FailIfNot(await test.TestCommissioningWithSetupPayload(setupPayload=qr, nodeid=device_nodeid),

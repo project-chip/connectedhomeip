@@ -46,6 +46,7 @@ from matter.ChipStack import ChipStack
 from matter.crypto import p256keypair
 from matter.exceptions import ChipStackException
 from matter.storage import PersistentStorageJSON
+from matter.setup_payload import SetupPayload
 from matter.utils import CommissioningBuildingBlocks
 
 DEFAULT_REPL_STORAGE_PATH = '/tmp/repl-storage.json'
@@ -317,17 +318,6 @@ class BaseTestHelper:
         await self.devCtrl.Commission(nodeid)
         return self.devCtrl.CheckTestCommissionerCallbacks() and self.devCtrl.CheckTestCommissionerPaseConnection(nodeid)
 
-    async def TestCommissioning(self, ip: str, setuppin: int, nodeid: int):
-        self.logger.info("Commissioning device {}".format(ip))
-        try:
-            await self.devCtrl.CommissionIP(ip, setuppin, nodeid)
-        except ChipStackException:
-            self.logger.exception(
-                "Failed to finish commissioning device {}".format(ip))
-            return False
-        self.logger.info("Commissioning finished.")
-        return True
-
     async def TestCommissioningWithSetupPayload(self, setupPayload: str, nodeid: int, discoveryType: int = 2):
         self.logger.info("Commissioning device with setup payload {}".format(setupPayload))
         try:
@@ -339,17 +329,17 @@ class BaseTestHelper:
         self.logger.info("Commissioning finished.")
         return True
 
-    async def TestOnNetworkCommissioning(self, discriminator: int, setuppin: int, nodeid: int, ip_override: str = None):
+    async def TestOnNetworkCommissioning(self, discriminator: int, setuppin: int, nodeid: int):
         self.logger.info("Testing discovery")
         device = await self.TestDiscovery(discriminator=discriminator)
+
+        qr = SetupPayload().GenerateQrCode(passcode=setuppin, discriminator=discriminator)
+
         if not device:
             self.logger.info("Failed to discover any devices.")
             return False
-        address = device.addresses[0]
-        if ip_override:
-            address = ip_override
         self.logger.info("Testing commissioning")
-        if not await self.TestCommissioning(address, setuppin, nodeid):
+        if not await self.TestCommissioningWithSetupPayload(setuppin, nodeid):
             self.logger.info("Failed to finish commissioning")
             return False
         return True
