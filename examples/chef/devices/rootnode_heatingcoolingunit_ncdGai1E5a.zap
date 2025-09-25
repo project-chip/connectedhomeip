@@ -2207,12 +2207,31 @@
     {
       "id": 2,
       "name": "Anonymous Endpoint Type",
-      "deviceTypes": [],
-      "deviceVersions": [],
-      "deviceIdentifiers": [],
-      "deviceTypeName": "",
-      "deviceTypeCode": "",
-      "deviceTypeProfileId": "",
+      "deviceTypeRef": {
+        "code": 768,
+        "profileId": 259,
+        "label": "MA-heatcool",
+        "name": "MA-heatcool",
+        "deviceTypeOrder": 0
+      },
+      "deviceTypes": [
+        {
+          "code": 768,
+          "profileId": 259,
+          "label": "MA-heatcool",
+          "name": "MA-heatcool",
+          "deviceTypeOrder": 0
+        }
+      ],
+      "deviceVersions": [
+        1
+      ],
+      "deviceIdentifiers": [
+        768
+      ],
+      "deviceTypeName": "MA-heatcool",
+      "deviceTypeCode": 768,
+      "deviceTypeProfileId": 259,
       "clusters": [
         {
           "name": "Identify",
