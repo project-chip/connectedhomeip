@@ -1238,7 +1238,7 @@ std::optional<DataModel::ActionReturnStatus> OperationalCredentialsCluster::Invo
 {
     switch (request.path.mCommandId)
     {
-    case OperationalCredentials::Commands::AttestationRequest::Id: 
+    case OperationalCredentials::Commands::AttestationRequest::Id:
         return HandleAttestationRequest(handler, request.path, input_arguments, GetDACProvider());
     case OperationalCredentials::Commands::CertificateChainRequest::Id:
         return HandleCertificateChainRequest(handler, request.path, input_arguments, GetDACProvider());
@@ -1256,7 +1256,7 @@ std::optional<DataModel::ActionReturnStatus> OperationalCredentialsCluster::Invo
             return std::nullopt;
         }
         return returnStatus;
-    }        
+    }
     case OperationalCredentials::Commands::UpdateNOC::Id:
         return HandleUpdateNOC(handler, input_arguments, request, GetFabricTable(), GetFailSafeContext(), GetDNSSDServer());
     case OperationalCredentials::Commands::UpdateFabricLabel::Id:
