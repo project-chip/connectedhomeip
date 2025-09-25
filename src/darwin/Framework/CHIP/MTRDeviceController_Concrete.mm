@@ -1139,7 +1139,7 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
         }
         if (commissioningParams.threadOperationalDataset) {
             params.SetThreadOperationalDataset(AsByteSpan(commissioningParams.threadOperationalDataset));
-        } else if (!commissioningParams.preventNetworkScans) {
+        } else if (!commissioningParams.preventNetworkScans && commissioningParams.forceThreadScan) {
             params.SetAttemptThreadNetworkScan(true);
         }
         if (commissioningParams.acceptedTermsAndConditions && commissioningParams.acceptedTermsAndConditionsVersion) {
@@ -1174,7 +1174,7 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
             }
             chip::Controller::WiFiCredentials wifiCreds(ssid, credentials);
             params.SetWiFiCredentials(wifiCreds);
-        } else if (!commissioningParams.preventNetworkScans) {
+        } else if (!commissioningParams.preventNetworkScans && commissioningParams.forceWiFiScan) {
             params.SetAttemptWiFiNetworkScan(true);
         }
 
@@ -2030,16 +2030,7 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
     }
 
     auto block = ^BOOL {
-        auto optionalParams = self->_cppCommissioner->GetCommissioningParameters();
-        if (!optionalParams.HasValue()) {
-            MTR_LOG_ERROR("%@ Has no commissioning parameters", self);
-            if (error) {
-                *error = [MTRError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE];
-            }
-            return NO;
-        }
-
-        chip::Controller::CommissioningParameters params = optionalParams.Value();
+        chip::Controller::CommissioningParameters params = self->_cppCommissioner->GetCommissioningParameters();
         chip::ByteSpan ssidSpan = AsByteSpan(ssid);
         chip::ByteSpan credentialsSpan;
         if (credentials != nil) {
@@ -2072,16 +2063,7 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
     }
 
     auto block = ^BOOL {
-        auto optionalParams = self->_cppCommissioner->GetCommissioningParameters();
-        if (!optionalParams.HasValue()) {
-            MTR_LOG_ERROR("%@ Has no commissioning parameters", self);
-            if (error) {
-                *error = [MTRError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE];
-            }
-            return NO;
-        }
-
-        chip::Controller::CommissioningParameters params = optionalParams.Value();
+        chip::Controller::CommissioningParameters params = self->_cppCommissioner->GetCommissioningParameters();
         params.SetThreadOperationalDataset(AsByteSpan(operationalDataset));
 
         CHIP_ERROR err = self->_cppCommissioner->UpdateCommissioningParameters(params);
@@ -2122,7 +2104,9 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
 }
 
 // We never trigger network scans for commissioning that comes through the old
-// APIs, so don't need scannedWiFiNetworks:/scannedThreadNetworks: bits.
+// APIs, and in general don't really support not providing credentials as part
+// of MTRCommissioningParameters, so don't need
+// needsWiFiCredentialsWithScanResults/needsThreadCredentialsWithScanResults bits.
 
 - (void)commissioning:(MTRCommissioningOperation *)commissioning
     succeededForNodeID:(NSNumber *)nodeID
