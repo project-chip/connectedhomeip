@@ -38,6 +38,18 @@ assert(
         chip_crypto == "platform",
     "Please select a valid crypto implementation: mbedtls, psa, openssl, boringssl, platform")
 
+if (chip_crypto_keystore == "") {
+  if (chip_crypto == "psa") {
+    chip_crypto_keystore = "psa"
+  } else {
+    chip_crypto_keystore = "raw"
+  }
+}
+
+assert(chip_crypto_keystore == "psa" || chip_crypto_keystore == "raw" ||
+           chip_crypto_keystore == "app",
+       "Please select a valid crypto keystore: psa, raw, app")
+
 buildconfig_header("crypto_buildconfig") {
   header = "CryptoBuildConfig.h"
   header_dir = "crypto"
@@ -47,11 +59,17 @@ buildconfig_header("crypto_buildconfig") {
   chip_crypto_openssl = chip_crypto == "openssl"
   chip_crypto_boringssl = chip_crypto == "boringssl"
   chip_crypto_platform = chip_crypto == "platform"
+  chip_crypto_keystore_psa = chip_crypto_keystore == "psa"
+  chip_crypto_keystore_raw = chip_crypto_keystore == "raw"
+  chip_crypto_keystore_app = chip_crypto_keystore == "app"
 
   defines = [
     "CHIP_CRYPTO_MBEDTLS=${chip_crypto_mbedtls}",
     "CHIP_CRYPTO_PSA=${chip_crypto_psa}",
     "CHIP_CRYPTO_PSA_SPAKE2P=${chip_crypto_psa_spake2p}",
+    "CHIP_CRYPTO_KEYSTORE_PSA=${chip_crypto_keystore_psa}",
+    "CHIP_CRYPTO_KEYSTORE_RAW=${chip_crypto_keystore_raw}",
+    "CHIP_CRYPTO_KEYSTORE_APP=${chip_crypto_keystore_app}",
     "CHIP_CRYPTO_OPENSSL=${chip_crypto_openssl}",
     "CHIP_CRYPTO_BORINGSSL=${chip_crypto_boringssl}",
     "CHIP_CRYPTO_PLATFORM=${chip_crypto_platform}",
@@ -144,18 +162,20 @@ static_library("crypto") {
     "RandUtils.h",
   ]
 
-  if (chip_crypto == "psa") {
+  if (chip_crypto_keystore == "psa") {
     sources += [
       "PSAOperationalKeystore.cpp",
       "PSAOperationalKeystore.h",
       "PSASessionKeystore.cpp",
       "PSASessionKeystore.h",
     ]
-  } else {
+  } else if (chip_crypto_keystore == "raw") {
     sources += [
       "RawKeySessionKeystore.cpp",
       "RawKeySessionKeystore.h",
     ]
+  } else {
+    # Keystore provided by app
   }
 
   if (chip_crypto_psa_spake2p) {

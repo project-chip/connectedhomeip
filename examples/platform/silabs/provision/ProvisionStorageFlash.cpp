@@ -470,14 +470,14 @@ CHIP_ERROR Storage::GetManufacturingDate(uint8_t * value, size_t max, size_t & s
     return Flash::Get(Parameters::ID::kManufacturingDate, value, max, size);
 }
 
-CHIP_ERROR Storage::SetUniqueId(const uint8_t * value, size_t size)
+CHIP_ERROR Storage::SetPersistentUniqueId(const uint8_t * value, size_t size)
 {
-    return Flash::Set(Parameters::ID::kUniqueId, value, size);
+    return Flash::Set(Parameters::ID::kPersistentUniqueId, value, size);
 }
 
-CHIP_ERROR Storage::GetUniqueId(uint8_t * value, size_t max, size_t & size)
+CHIP_ERROR Storage::GetPersistentUniqueId(uint8_t * value, size_t max, size_t & size)
 {
-    return Flash::Get(Parameters::ID::kUniqueId, value, max, size);
+    return Flash::Get(Parameters::ID::kPersistentUniqueId, value, max, size);
 }
 
 //

@@ -61,6 +61,17 @@ efr32_sdk("sdk") {
   ]
 }
 
+config("efr32_ldflags") {
+  _ldscript =
+      "${chip_root}/examples/platform/silabs/ldscripts/${silabs_family}.ld"
+
+  ldflags = [
+    "-T" + rebase_path(_ldscript, root_build_dir),
+    "-Wl,--no-warn-rwx-segment",
+    "-fno-lto",
+  ]
+}
+
 # This is the test runner.  `pw_test` will dep this for each `silabs_executable` target.
 source_set("efr32_test_main") {
   defines = [ "PW_RPC_ENABLED" ]
