@@ -24,7 +24,7 @@
 #include <headers/ProvisionStorage.h>
 #include <platform/silabs/multi-ota/OTAMultiImageProcessorImpl.h>
 #include <platform/silabs/multi-ota/OTATlvProcessor.h>
-#ifdef SL_MATTER_ENABLE_OTA_ENCRYPTION
+#if SL_MATTER_ENABLE_OTA_ENCRYPTION
 #include <platform/silabs/multi-ota/OtaTlvEncryptionKey.h>
 #endif
 
@@ -32,6 +32,27 @@ using namespace ::chip::DeviceLayer::Internal;
 using namespace ::chip::DeviceLayer::Silabs;
 
 namespace chip {
+
+CHIP_ERROR OTATlvProcessor::Init()
+{
+    VerifyOrReturnError(mCallbackProcessDescriptor != nullptr, CHIP_OTA_PROCESSOR_CB_NOT_REGISTERED);
+    mAccumulator.Init(GetAccumulatorLength());
+#ifdef SL_MATTER_ENABLE_OTA_ENCRYPTION
+    mUnalignmentNum = 0;
+#endif
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR OTATlvProcessor::Clear()
+{
+    OTATlvProcessor::ClearInternal();
+    mAccumulator.Clear();
+    mDescriptorProcessed = false;
+#ifdef SL_MATTER_ENABLE_OTA_ENCRYPTION
+    mUnalignmentNum = 0;
+#endif
+    return CHIP_NO_ERROR;
+}
 
 CHIP_ERROR OTATlvProcessor::Process(ByteSpan & block)
 {
@@ -115,27 +136,19 @@ CHIP_ERROR OTADataAccumulator::Accumulate(ByteSpan & block)
     return CHIP_NO_ERROR;
 }
 
-#ifdef SL_MATTER_ENABLE_OTA_ENCRYPTION
+#if SL_MATTER_ENABLE_OTA_ENCRYPTION
 CHIP_ERROR OTATlvProcessor::vOtaProcessInternalEncryption(MutableByteSpan & block)
 {
 #if defined(SL_MBEDTLS_USE_TINYCRYPT)
-    uint8_t keyBuffer[kOTAEncryptionKeyLength] = { 0 };
-    // Read the key from the provisioning storage
-    MutableByteSpan keySpan = MutableByteSpan(keyBuffer);
-    chip::DeviceLayer::Silabs::Provision::Manager::GetInstance().GetStorage().GetOtaTlvEncryptionKey(keySpan);
-
-    VerifyOrReturnError(keySpan.size() == kOTAEncryptionKeyLength, CHIP_ERROR_INVALID_ARGUMENT);
-
-    // Decrypt the block
-    chip::DeviceLayer::Silabs::OtaTlvEncryptionKey::OtaTlvEncryptionKey key;
-    key.Import(keyBuffer, keySpan.size());
-    key.Decrypt(block, mIVOffset);
+    Provision::Manager::GetInstance().GetStorage().DecryptUsingOtaTlvEncryptionKey(block, mIVOffset);
 #else  // MBEDTLS_USE_PSA_CRYPTO
     uint32_t keyId;
-    Provision::Manager::GetInstance().GetStorage().GetOtaTlvEncryptionKey(keyId);
-    chip::DeviceLayer::Silabs::OtaTlvEncryptionKey::OtaTlvEncryptionKey key(keyId);
+    Provision::Manager::GetInstance().GetStorage().GetOtaTlvEncryptionKeyId(keyId);
+    chip::DeviceLayer::Silabs::OtaTlvEncryptionKey key(keyId);
+
     key.Decrypt(block, mIVOffset);
 #endif // SL_MBEDTLS_USE_TINYCRYPT
+
     return CHIP_NO_ERROR;
 }
 
