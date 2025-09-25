@@ -28,6 +28,7 @@ from matter.tlv import uint
 
 LOGGER = logging.getLogger(__name__)
 
+
 class TestSpecParsingDataType(MatterBaseTest):
     def setup_class(self):
         self.xml_clusters, self.xml_cluster_problems = build_xml_clusters(PrebuiltDataModelDirectory.k1_5)
