@@ -191,7 +191,7 @@ class TLSUtils:
             result = await self.test.send_single_cmd(cmd=Clusters.TlsCertificateManagement.Commands.ProvisionRootCertificate(certificate=certificate, caid=caid),
                                                      endpoint=self.endpoint, dev_ctrl=self.dev_ctrl, node_id=self.node_id, payloadCapability=ChipDeviceCtrl.TransportPayloadCapability.LARGE_PAYLOAD)
             asserts.assert_equal(Status.Success, expected_status, "Unexpected success")
-            asserts.assert_true(type_matches(result, Clusters.TlsCertificateManagement.Commands.ProvisionRootCertificateResponse),
+            asserts.assert_true(matchers.is_type(result, Clusters.TlsCertificateManagement.Commands.ProvisionRootCertificateResponse),
                                 "Unexpected return type for ProvisionRootCertificate")
             return result
         except InteractionModelError as e:
@@ -205,7 +205,7 @@ class TLSUtils:
             result = await self.test.send_single_cmd(cmd=Clusters.TlsCertificateManagement.Commands.FindRootCertificate(caid=caid),
                                                      endpoint=self.endpoint, dev_ctrl=self.dev_ctrl, node_id=self.node_id, payloadCapability=ChipDeviceCtrl.TransportPayloadCapability.LARGE_PAYLOAD)
             asserts.assert_equal(Status.Success, expected_status, "Unexpected success")
-            asserts.assert_true(type_matches(result, Clusters.TlsCertificateManagement.Commands.FindRootCertificateResponse),
+            asserts.assert_true(matchers.is_type(result, Clusters.TlsCertificateManagement.Commands.FindRootCertificateResponse),
                                 "Unexpected return type for FindRootCertificate")
             return result
         except InteractionModelError as e:
@@ -219,7 +219,7 @@ class TLSUtils:
             result = await self.test.send_single_cmd(cmd=Clusters.TlsCertificateManagement.Commands.LookupRootCertificate(fingerprint=fingerprint),
                                                      endpoint=self.endpoint, dev_ctrl=self.dev_ctrl, node_id=self.node_id, payloadCapability=ChipDeviceCtrl.TransportPayloadCapability.LARGE_PAYLOAD)
             asserts.assert_equal(Status.Success, expected_status, "Unexpected success")
-            asserts.assert_true(type_matches(result, Clusters.TlsCertificateManagement.Commands.LookupRootCertificateResponse),
+            asserts.assert_true(matchers.is_type(result, Clusters.TlsCertificateManagement.Commands.LookupRootCertificateResponse),
                                 "Unexpected return type for LookupRootCertificate")
             return result
         except InteractionModelError as e:
@@ -245,7 +245,7 @@ class TLSUtils:
             result = await self.test.send_single_cmd(cmd=Clusters.TlsCertificateManagement.Commands.ClientCSR(ccdid=ccdid, nonce=nonce),
                                                      endpoint=self.endpoint, dev_ctrl=self.dev_ctrl, node_id=self.node_id, payloadCapability=ChipDeviceCtrl.TransportPayloadCapability.LARGE_PAYLOAD)
             asserts.assert_equal(Status.Success, expected_status, "Unexpected success")
-            asserts.assert_true(type_matches(result, Clusters.TlsCertificateManagement.Commands.ClientCSRResponse),
+            asserts.assert_true(matchers.is_type(result, Clusters.TlsCertificateManagement.Commands.ClientCSRResponse),
                                 "Unexpected return type for ClientCSR")
             return result
         except InteractionModelError as e:
@@ -272,7 +272,7 @@ class TLSUtils:
             result = await self.test.send_single_cmd(cmd=Clusters.TlsCertificateManagement.Commands.FindClientCertificate(ccdid=ccdid),
                                                      endpoint=self.endpoint, dev_ctrl=self.dev_ctrl, node_id=self.node_id, payloadCapability=ChipDeviceCtrl.TransportPayloadCapability.LARGE_PAYLOAD)
             asserts.assert_equal(Status.Success, expected_status, "Unexpected success")
-            asserts.assert_true(type_matches(result, Clusters.TlsCertificateManagement.Commands.FindClientCertificateResponse),
+            asserts.assert_true(matchers.is_type(result, Clusters.TlsCertificateManagement.Commands.FindClientCertificateResponse),
                                 "Unexpected return type for FindClientCertificate")
             return result
         except InteractionModelError as e:
@@ -286,7 +286,7 @@ class TLSUtils:
             result = await self.test.send_single_cmd(cmd=Clusters.TlsCertificateManagement.Commands.LookupClientCertificate(fingerprint=fingerprint),
                                                      endpoint=self.endpoint, dev_ctrl=self.dev_ctrl, node_id=self.node_id, payloadCapability=ChipDeviceCtrl.TransportPayloadCapability.LARGE_PAYLOAD)
             asserts.assert_equal(Status.Success, expected_status, "Unexpected success")
-            asserts.assert_true(type_matches(result, Clusters.TlsCertificateManagement.Commands.LookupClientCertificateResponse),
+            asserts.assert_true(matchers.is_type(result, Clusters.TlsCertificateManagement.Commands.LookupClientCertificateResponse),
                                 "Unexpected return type for LookupClientCertificate")
             return result
         except InteractionModelError as e:
