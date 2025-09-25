@@ -736,7 +736,6 @@ void AccessControlCluster::OnFabricRestrictionReviewUpdate(FabricIndex fabricInd
     event.instruction       = instruction;
     event.ARLRequestFlowUrl = arlRequestFlowUrl;
 
-    EventNumber eventNumber;
     mContext->interactionContext.eventsGenerator.GenerateEvent(event, kRootEndpointId);
 
     return;
