@@ -76,35 +76,23 @@ CommandHandlerInterfaceOnlyClusters:
     - Basic Information
     - Boolean State
     - User Label
+    - Diagnostic Logs
 
 # We need a more configurable way of deciding which clusters have which init functions....
 # See https://github.com/project-chip/connectedhomeip/issues/4369
 ClustersWithInitFunctions:
-    - Administrator Commissioning
-    - Basic Information
-    - Boolean State
-    - Binding
     - Color Control
-    - Ethernet Network Diagnostics
-    - General Diagnostics
     - Groups
-    - Group Key Management
     - Identify
     - Level Control
     - Localization Configuration
     - Mode Select
     - Occupancy Sensing
     - On/Off
-    - OTA Software Update Provider
     - Pump Configuration and Control
-    - Push AV Stream Transport
     - Sample MEI
     - Scenes Management
-    - Software Diagnostics
     - Thermostat
-    - Time Format Localization
-    - User Label
-    - Wi-Fi Network Diagnostics
     - Fixed Label
 
 ClustersWithAttributeChangedFunctions:
@@ -117,31 +105,20 @@ ClustersWithAttributeChangedFunctions:
     - Thermostat
 
 ClustersWithShutdownFunctions:
-    - Administrator Commissioning
     - Barrier Control
-    - Basic Information
-    - Boolean State
-    - Binding
     - Color Control
     - Door Lock
-    - General Diagnostics
     - Level Control
     - On/Off
-    - OTA Software Update Provider
-    - Push AV Stream Transport
     - Sample MEI
     - Scenes Management
-    - Software Diagnostics
     - Thermostat
-    - User Label
-    - Wi-Fi Network Diagnostics
     - Fixed Label
 
 ClustersWithPreAttributeChangeFunctions:
     - Door Lock
     - Pump Configuration and Control
     - Thermostat User Interface Configuration
-    - Time Format Localization
     - Localization Configuration
     - Mode Select
     - Fan Control
@@ -149,3 +126,22 @@ ClustersWithPreAttributeChangeFunctions:
     - Energy Preference
     - Laundry Washer Controls
     - Laundry Dryer Controls
+
+# Code Driven clusters are clusters that implement the ServerClusterInterface.
+# The clusters in this list require Init() and/or Shutdown() callbacks, defined
+# in the cluster's respective CodgenIntegration.cpp file.
+CodeDrivenClusters:
+    - Administrator Commissioning
+    - Basic Information
+    - Binding
+    - Boolean State
+    - Ethernet Network Diagnostics
+    - General Diagnostics
+    - Group Key Management
+    - OTA Software Update Provider
+    - Push AV Stream Transport
+    - Software Diagnostics
+    - Time Format Localization
+    - Wi-Fi Network Diagnostics
+    - Diagnostic Logs
+    - User Label
