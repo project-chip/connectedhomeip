@@ -58,6 +58,9 @@ class TC_DD_1_16_17(MatterBaseTest):
         test DOES include a check that user-intent commissioning flow devices do not advertise on startup.
     '''
 
+    def pics_TC_DD_1_16(self):
+        return ['MCORE.DD.MANUAL_PC']
+
     def steps_TC_DD_1_16(self):
         return [TestStep(1, "TH parses the manual code"),
                 TestStep(2, "If the VID_PID_PRESENT field is set to 0, this device uses standard flow. Verify that the DUT is advertising as Commissionable",
@@ -66,6 +69,17 @@ class TC_DD_1_16_17(MatterBaseTest):
                 TestStep(4, "If the device uses custom flow or user-intent commissioning, verify that the DUT is advertising as commisionable"),
                 ]
 
+    @async_test_body
+    async def test_TC_DD_1_16(self):
+        asserts.assert_true(self.matter_test_config.manual_code,
+                            "This test needs to be run with the manual setup code.")
+
+        self.step(1)
+
+        # need to use establish pase session here so we check over BLE and mdns
+        # Check with the NFC folks how this is supposed to work
+        self.mark_all_remaining_steps_skipped(2)
+
     def steps_TC_DD_1_17(self):
         return [TestStep(1, "TH parses the QR code"),
                 TestStep(2, "If the Custom Flow field is set to 0, this device uses standard flow. Verify that the DUT is advertising as Commissionable",
@@ -73,19 +87,6 @@ class TC_DD_1_16_17(MatterBaseTest):
                 TestStep(2, "If the Custom Flow field is set to 1, this device uses user-intent flow. Verify that the DUT is NOT advertising as Commissionable",
                          "Device is not advertising as commissionable")
                 ]
-
-    def pics_TC_DD_1_16(self):
-        return ['MCORE.DD.MANUAL_PC']
-
-    @async_test_body
-    async def test_TC_DD_1_16(self):
-        asserts.assert_true(self.matter_test_config.manual_code,
-                            "This test needs to be run with the manual setup code.")
-
-        self.step(1)
-        # need to use establish pase session here so we check over BLE and mdns
-        # Check with the NFC folks how this is supposed to work
-        self.mark_all_remaining_steps_skipped(2)
 
 
 if __name__ == "__main__":
