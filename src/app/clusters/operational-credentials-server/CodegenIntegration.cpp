@@ -72,7 +72,7 @@ void emberAfOperationalCredentialsClusterServerInitCallback(EndpointId endpointI
         {
             .endpointId                = endpointId,
             .clusterId                 = OperationalCredentials::Id,
-            .fixedClusterInstanceCount = 1,
+            .fixedClusterInstanceCount = OperationalCredentials::StaticApplicationConfig::kFixedClusterConfig.size(),
             .maxClusterInstanceCount   = 1,
             .fetchFeatureMap           = false,
             .fetchOptionalAttributes   = false,
@@ -87,7 +87,7 @@ void MatterOperationalCredentialsClusterServerShutdownCallback(EndpointId endpoi
         {
             .endpointId                = endpointId,
             .clusterId                 = OperationalCredentials::Id,
-            .fixedClusterInstanceCount = 1,
+            .fixedClusterInstanceCount = OperationalCredentials::StaticApplicationConfig::kFixedClusterConfig.size(),
             .maxClusterInstanceCount   = 1,
         },
         integrationDelegate);
