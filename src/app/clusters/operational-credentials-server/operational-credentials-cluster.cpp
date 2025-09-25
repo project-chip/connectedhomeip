@@ -583,17 +583,12 @@ exit:
             // Using Success status to report that a notification is needed.
             return Status::Success;
         }
-        else
-        {
-            return std::nullopt;
-        }
+        return std::nullopt;
     }
+
     // No NOC response - Failed constraints
-    else
-    {
-        ChipLogError(Zcl, "OpCreds: Failed AddNOC request with IM error 0x%02x", to_underlying(errorStatus));
-        return errorStatus;
-    }
+    ChipLogError(Zcl, "OpCreds: Failed AddNOC request with IM error 0x%02x", to_underlying(errorStatus));
+    return errorStatus;
 }
 
 std::optional<DataModel::ActionReturnStatus> HandleUpdateNOC(CommandHandler * commandObj, TLV::TLVReader & input_arguments,
@@ -680,11 +675,8 @@ exit:
         return std::nullopt;
     }
     // No NOC response - Failed constraints
-    else
-    {
-        ChipLogError(Zcl, "OpCreds: Failed UpdateNOC request with IM error 0x%02x", to_underlying(errorStatus));
-        return errorStatus;
-    }
+    ChipLogError(Zcl, "OpCreds: Failed UpdateNOC request with IM error 0x%02x", to_underlying(errorStatus));
+    return errorStatus;
 }
 
 std::optional<DataModel::ActionReturnStatus> HandleUpdateFabricLabel(CommandHandler * commandObj, TLV::TLVReader & input_arguments,
@@ -889,24 +881,22 @@ exit:
         ChipLogError(Zcl, "OpCreds: Failed RemoveFabric due to internal error (err = %" CHIP_ERROR_FORMAT ")", err.Format());
         return err;
     }
+    
+    ChipLogDetail(Zcl, "OpCreds: RemoveFabric successful");
+    SendNOCResponse(commandObj, commandPath, NodeOperationalCertStatusEnum::kOk, fabricBeingRemoved, CharSpan());
+
+    chip::Messaging::ExchangeContext * ec = commandObj->GetExchangeContext();
+    FabricIndex currentFabricIndex        = commandObj->GetAccessingFabricIndex();
+    if (currentFabricIndex == fabricBeingRemoved)
+    {
+        ec->AbortAllOtherCommunicationOnFabric();
+    }
     else
     {
-        ChipLogDetail(Zcl, "OpCreds: RemoveFabric successful");
-        SendNOCResponse(commandObj, commandPath, NodeOperationalCertStatusEnum::kOk, fabricBeingRemoved, CharSpan());
-
-        chip::Messaging::ExchangeContext * ec = commandObj->GetExchangeContext();
-        FabricIndex currentFabricIndex        = commandObj->GetAccessingFabricIndex();
-        if (currentFabricIndex == fabricBeingRemoved)
-        {
-            ec->AbortAllOtherCommunicationOnFabric();
-        }
-        else
-        {
-            SessionManager * sessionManager = ec->GetExchangeMgr()->GetSessionManager();
-            sessionManager->ExpireAllSessionsForFabric(fabricBeingRemoved);
-        }
-        return std::nullopt;
+        SessionManager * sessionManager = ec->GetExchangeMgr()->GetSessionManager();
+        sessionManager->ExpireAllSessionsForFabric(fabricBeingRemoved);
     }
+    return std::nullopt;
 }
 
 std::optional<DataModel::ActionReturnStatus> HandleSignVIDVerificationRequest(CommandHandler * commandObj,
