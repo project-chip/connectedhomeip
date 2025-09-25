@@ -22,12 +22,10 @@
 #include <task.h>
 
 #include <app/icd/server/ICDServerConfig.h>
-#include <lib/support/CodeUtils.h>
 
 #include <lib/support/CodeUtils.h>
 #if SILABS_LOG_ENABLED
 #include "silabs_utils.h"
-
 #endif // SILABS_LOG_ENABLED
 
 // TODO add includes ?
