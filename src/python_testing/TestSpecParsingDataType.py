@@ -430,13 +430,17 @@ class TestSpecParsingDataType(MatterBaseTest):
     def test_missing_name(self):
         """Test handling of a data type with missing name attribute"""
         # Try different data types - we'll generate a problem for each
-        for data_type in ["struct", "enum", "bitmap"]:
+        test_cases = [
+            ("struct", "<field id=\"1\" name=\"Field1\" type=\"uint8\"><mandatoryConform/></field>"),
+            ("enum", "<item value=\"0\" name=\"Item1\"><mandatoryConform/></item>"), 
+            ("bitmap", "<bitfield bit=\"0\" name=\"Bit0\"><mandatoryConform/></bitfield>")
+        ]
+        
+        for data_type, inner_content in test_cases:
             try:
                 # Create XML with missing name attribute
                 xml = f"""<{data_type}>
-                        <field id="1" name="Field1" type="uint8">
-                            <mandatoryConform/>
-                        </field>
+                        {inner_content}
                     </{data_type}>"""
 
                 cluster_xml = self.cluster_template.render(cluster_id=self.cluster_id,
@@ -449,7 +453,8 @@ class TestSpecParsingDataType(MatterBaseTest):
                 _ = parser.create_cluster()  # We don't use this, just care about problems
                 problems = parser.get_problems()
                 asserts.assert_equal(len(problems), 1, "Should have one problem for missing name")
-                asserts.assert_true("with no id or name" in problems[0].problem,
+                expected_error = f"{data_type.capitalize()} <Element '{data_type}' at" if data_type != "struct" else "Struct <Element 'struct' at"
+                asserts.assert_true("with no name" in problems[0].problem,
                                     f"Problem message doesn't match expected error for {data_type}")
             except Exception as e:
                 self.print_step("Error", f"Exception when testing {data_type}: {e}")
@@ -969,30 +974,26 @@ class TestSpecParsingDataType(MatterBaseTest):
                         issues.append(f"Struct field with empty id in {struct_name} of cluster {cluster.name}")
 
                     # Skip known cases where type_info is missing
-                    is_monitoring_key = (struct_name.strip() == "MonitoringRegistrationStruct" and
-                                         field.name.strip() == "Key" and
-                                         "ICD Management" in cluster.name)
-                    is_mode_option_field = (struct_name.strip() == "ModeOptionStruct" and
-                                            field.name.strip() in ["Mode", "ModeTags", "Label"])
-                    is_device_name_reference = (struct_name.strip() == "EcosystemDeviceStruct" and
-                                                field.name.strip() == "DeviceName" and
-                                                "Ecosystem Information" in cluster.name)
-                    is_hold_time_reference = (struct_name.strip() == "HoldTimeLimitsStruct" and
-                                              field.name.strip() in ["HoldTimeMin", "HoldTimeMax"] and
-                                              "Occupancy Sensing" in cluster.name)
-                    is_error_state_reference = (struct_name.strip() == "ErrorStateStruct" and
-                                                field.name.strip() == "ErrorStateID" and
-                                                "Operational State" in cluster.name)
-                    is_operational_state_reference = (struct_name.strip() == "OperationalStateStruct" and
-                                                      field.name.strip() == "OperationalStateID" and
-                                                      "Operational State" in cluster.name)
-                    is_device_energy_reference = (struct_name.strip() in ["PowerAdjustCapabilityStruct", "SlotStruct"] and
-                                                  field.name.strip() in ["MinPower", "MinDuration"] and
-                                                  "Device Energy Management" in cluster.name)
+                    s_name = struct_name.strip()
+                    f_name = field.name.strip()
 
-                    if (is_monitoring_key or is_mode_option_field or is_device_name_reference or
-                        is_hold_time_reference or is_error_state_reference or is_operational_state_reference or
-                            is_device_energy_reference):
+                    skip_conditions = [
+                        ({"MonitoringRegistrationStruct"}, ["Key"], "ICD Management"),
+                        ({"ModeOptionStruct"}, ["Mode", "ModeTags", "Label"], None),
+                        ({"EcosystemDeviceStruct"}, ["DeviceName"], "Ecosystem Information"),
+                        ({"HoldTimeLimitsStruct"}, ["HoldTimeMin", "HoldTimeMax"], "Occupancy Sensing"),
+                        ({"ErrorStateStruct"}, ["ErrorStateID"], "Operational State"),
+                        ({"OperationalStateStruct"}, ["OperationalStateID"], "Operational State"),
+                        ({"PowerAdjustCapabilityStruct", "SlotStruct"}, ["MinPower", "MinDuration"], "Device Energy Management"),
+                    ]
+
+                    should_skip = False
+                    for struct_names, field_names, cluster_name_part in skip_conditions:
+                        if s_name in struct_names and f_name in field_names and (cluster_name_part is None or cluster_name_part in cluster.name):
+                            should_skip = True
+                            break
+
+                    if should_skip:
                         continue
 
                     if field.type_info is None:
