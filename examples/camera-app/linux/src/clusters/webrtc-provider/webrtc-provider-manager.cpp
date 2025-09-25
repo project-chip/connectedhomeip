@@ -612,12 +612,19 @@ void WebRTCProviderManager::OnDeviceConnected(void * context, Messaging::Exchang
     WebrtcTransport * transport = nullptr;
     uint16_t sessionId          = 0;
 
+    NodeId peerNodeId = sessionHandle->GetPeer().GetNodeId();
+
     for (auto it = self->mWebrtcTransportMap.begin(); it != self->mWebrtcTransportMap.end();)
     {
         sessionId = it->first;
         transport = (WebrtcTransport *) it->second.get();
 
         if (transport == nullptr)
+        {
+            ++it;
+            continue;
+        }
+        if (transport->GetState() == WebrtcTransport::State::Idle || transport->GetRequestArgs().peerNodeId != peerNodeId)
         {
             ++it;
             continue;
