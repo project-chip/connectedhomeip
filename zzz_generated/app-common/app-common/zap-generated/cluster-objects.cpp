@@ -239,6 +239,10 @@
 #include <clusters/GroupKeyManagement/Commands.ipp>
 #include <clusters/GroupKeyManagement/Events.ipp>
 #include <clusters/GroupKeyManagement/Structs.ipp>
+#include <clusters/Groupcast/Attributes.ipp>
+#include <clusters/Groupcast/Commands.ipp>
+#include <clusters/Groupcast/Events.ipp>
+#include <clusters/Groupcast/Structs.ipp>
 #include <clusters/Groups/Attributes.ipp>
 #include <clusters/Groups/Commands.ipp>
 #include <clusters/Groups/Events.ipp>
@@ -1032,6 +1036,25 @@ bool CommandIsFabricScoped(ClusterId aCluster, CommandId aCommand)
         case Clusters::ScenesManagement::Commands::GetSceneMembership::Id:
             return true;
         case Clusters::ScenesManagement::Commands::CopyScene::Id:
+            return true;
+        default:
+            return false;
+        }
+    }
+    case Clusters::Groupcast::Id: {
+        switch (aCommand)
+        {
+        case Clusters::Groupcast::Commands::JoinGroup::Id:
+            return true;
+        case Clusters::Groupcast::Commands::LeaveGroup::Id:
+            return true;
+        case Clusters::Groupcast::Commands::LeaveGroupResponse::Id:
+            return true;
+        case Clusters::Groupcast::Commands::UpdateGroupKey::Id:
+            return true;
+        case Clusters::Groupcast::Commands::ExpireGracePeriod::Id:
+            return true;
+        case Clusters::Groupcast::Commands::ConfigureAuxiliaryACL::Id:
             return true;
         default:
             return false;

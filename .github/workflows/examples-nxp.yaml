@@ -179,6 +179,13 @@ jobs:
                       --target nxp-rw61x-freertos-thermostat-ethernet-cmake-frdm \
                       build \
                   "
+            - name: Build RW61X unit test example app
+              run: |
+                  scripts/run_in_build_env.sh "\
+                      ./scripts/build/build_examples.py \
+                      --target nxp-rw61x-freertos-unit-test-cmake-frdm \
+                      build \
+                  "
 
             - name: clean build
               run: rm -rf ./out
