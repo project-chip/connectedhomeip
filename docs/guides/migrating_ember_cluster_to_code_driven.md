@@ -23,6 +23,11 @@ type-safe accessors in
 In a code-driven implementation, this data must be moved into member variables
 within your new cluster class.
 
+In some cases the cluster directory may not exist. In that case, create a new
+directory and add the mapping in
+[src/app/zap_cluster_list.json](https://github.com/project-chip/connectedhomeip/blob/master/src/app/zap_cluster_list.json)
+under the `ServerDirectories` key.
+
 ### `AttributeAccessInterface` (`AAI`) and `CommandHandlerInterface` (`CHI`)
 
 When more complex logic is needed, Ember clusters use these interfaces.
@@ -157,6 +162,11 @@ data.
    `zcl-with-test-extensions.json`, add all of your cluster's non-list
    attributes to the `attributeAccessInterfaceAttributes` list. This tells ZAP
    not to allocate RAM for these attributes, as your class now manages them.
+3. Re-run ZAP regeneration, like
+
+    ```bash
+    ./scripts/run_in_build_env.sh 'scripts/tools/zap_regen_all.py'
+    ```
 
 ---
 
