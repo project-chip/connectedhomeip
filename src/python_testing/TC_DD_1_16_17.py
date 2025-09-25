@@ -38,8 +38,12 @@ import logging
 from mobly import asserts
 
 import matter.clusters as Clusters
-from matter import discovery
+import matter.discovery
+from matter.setup_payload import SetupPayload
 from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+
+# TODO: set the default timeout to be larger because there's a manual step
+# TODO: force the linux app to actually not advertise when it's in user intent mode and add a trigger to start advertising
 
 
 class TC_DD_1_16_17(MatterBaseTest):
@@ -69,24 +73,75 @@ class TC_DD_1_16_17(MatterBaseTest):
                 TestStep(4, "If the device uses custom flow or user-intent commissioning, verify that the DUT is advertising as commisionable"),
                 ]
 
+    async def ensure_advertising(self, filter_type: matter.discovery.FilterType, filter: int):
+        responses = await self.default_controller.DiscoverCommissionableNodes(filterType=filter_type, filter=filter, stopOnFirst=True)
+        asserts.assert_greater_equal(len(responses), 1, "Device is not advertising as commissionable")
+
     @async_test_body
     async def test_TC_DD_1_16(self):
+        self.step(1)
         asserts.assert_true(self.matter_test_config.manual_code,
                             "This test needs to be run with the manual setup code.")
+        parsed = SetupPayload().ParseManualPairingCode(self.matter_test_config.manual_code[0])
+        has_product_id = int(parsed.product_id) != 0
+        has_vendor_id = int(parsed.vendor_id) != 0
+        asserts.assert_equal(has_product_id, has_vendor_id, "Product and vendor ID must either both be included or both be omitted")
+        standard_flow = not has_vendor_id and not has_product_id
 
-        self.step(1)
+        self.step(2)
+        if standard_flow:
+            # Device should be advertising
+            await self.ensure_advertising(filter_type=matter.discovery.FilterType.SHORT_DISCRIMINATOR, filter=parsed.short_discriminator)
+        else:
+            self.mark_current_step_skipped()
 
-        # need to use establish pase session here so we check over BLE and mdns
-        # Check with the NFC folks how this is supposed to work
-        self.mark_all_remaining_steps_skipped(2)
+        self.step(3)
+        if not standard_flow:
+            command_dict = {"Name": 'UserIntentCommissioningStart'}
+            self.write_to_app_pipe(command_dict)
+            self.wait_for_user_input("Please perform any actions needed to put the device into commissionable mode")
+        else:
+            self.mark_current_step_skipped()
+
+        self.step(4)
+        if not standard_flow:
+            await self.ensure_advertising(filter_type=matter.discovery.FilterType.SHORT_DISCRIMINATOR, filter=parsed.short_discriminator)
+        else:
+            self.mark_current_step_skipped()
 
     def steps_TC_DD_1_17(self):
         return [TestStep(1, "TH parses the QR code"),
                 TestStep(2, "If the Custom Flow field is set to 0, this device uses standard flow. Verify that the DUT is advertising as Commissionable",
                          "Device is advertising as commissionable"),
-                TestStep(2, "If the Custom Flow field is set to 1, this device uses user-intent flow. Verify that the DUT is NOT advertising as Commissionable",
+                TestStep(3, "If the Custom Flow field is set to 1, this device uses user-intent flow. Verify that the DUT is NOT advertising as Commissionable",
                          "Device is not advertising as commissionable")
                 ]
+
+    def pics_TC_DD_1_16(self):
+        return ['MCORE.DD.QR']
+
+    @async_test_body
+    async def test_TC_DD_1_17(self):
+
+        self.step(1)
+        asserts.assert_true(self.matter_test_config.qr_code_content,
+                            "This test needs to be run with the qr setup code.")
+        print(self.matter_test_config.qr_code_content)
+        parsed = SetupPayload().ParseQrCode(self.matter_test_config.qr_code_content[0])
+
+        self.step(2)
+        if parsed.commissioning_flow == 0:
+            # Standard commissioning flow - this should be advertising
+            await self.ensure_advertising(filter_type=matter.discovery.FilterType.LONG_DISCRIMINATOR, filter=parsed.long_discriminator)
+        else:
+            self.mark_current_step_skipped()
+
+        self.step(3)
+        if parsed.commissioning_flow == 1:
+            responses = await self.default_controller.DiscoverCommissionableNodes(filterType=matter.discovery.FilterType.LONG_DISCRIMINATOR, filter=parsed.long_discriminator)
+            asserts.assert_equal(responses, [], "Device with user-intent commissioning flow should not be advertising")
+        else:
+            self.mark_current_step_skipped()
 
 
 if __name__ == "__main__":
