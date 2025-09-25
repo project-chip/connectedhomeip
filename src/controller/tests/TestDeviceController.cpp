@@ -35,9 +35,11 @@
 using DeviceControllerFactory = chip::Controller::DeviceControllerFactory;
 using TestSessionKeystoreImpl = chip::Crypto::DefaultSessionKeystore;
 
-chip::Credentials::GroupDataProviderImpl sProvider(5, 8);
-
 namespace {
+
+chip::Credentials::GroupDataProviderImpl sProvider(5, 8);
+chip::TestPersistentStorageDelegate storage;
+chip::SimpleSessionResumptionStorage sessionStorage;
 
 class Engine_raii
 {
@@ -197,19 +199,16 @@ TEST_F(TestDeviceControllerFactory, DeviceControllerFactoryMethods_DobleInit)
 TEST_F(TestDeviceControllerFactory, DeviceControllerFactoryMethods_SetupControllerAndCommissioner)
 {
     chip::Controller::FactoryInitParams factoryInitParams = params.GetFactoryInitParams();
-    chip::TestPersistentStorageDelegate storage;
     chip::Controller::SetupParams deviceParams;
     chip::Controller::DeviceCommissioner commissioner;
     chip::Controller::DeviceController device;
+    FabricTableHolder fHolder;
     // Initialize the ember side server logic
     EXPECT_EQ(engine->Init(&GetExchangeManager(), &GetFabricTable(), chip::app::reporting::GetDefaultReportScheduler()),
               CHIP_NO_ERROR);
 
     // Init device controller factory
     factoryInitParams.dataModelProvider = engine->GetDataModelProvider();
-
-    chip::SimpleSessionResumptionStorage sessionStorage;
-    FabricTableHolder fHolder;
 
     EXPECT_EQ(sessionStorage.Init(&storage), CHIP_NO_ERROR);
     EXPECT_EQ(fHolder.Init(), CHIP_NO_ERROR);
@@ -233,17 +232,14 @@ TEST_F(TestDeviceControllerFactory, DeviceControllerFactoryMethods_SetupControll
 TEST_F(TestDeviceControllerFactory, DeviceControllerFactoryMethods_RetainAndRelease)
 {
     chip::Controller::FactoryInitParams factoryInitParams = params.GetFactoryInitParams();
-    chip::TestPersistentStorageDelegate storage;
     chip::Controller::SetupParams dparams;
+    FabricTableHolder fHolder;
     // Initialize the ember side server logic
     EXPECT_EQ(engine->Init(&GetExchangeManager(), &GetFabricTable(), chip::app::reporting::GetDefaultReportScheduler()),
               CHIP_NO_ERROR);
 
     // Init device controller factory
     factoryInitParams.dataModelProvider = engine->GetDataModelProvider();
-
-    chip::SimpleSessionResumptionStorage sessionStorage;
-    FabricTableHolder fHolder;
 
     EXPECT_EQ(sessionStorage.Init(&storage), CHIP_NO_ERROR);
     EXPECT_EQ(fHolder.Init(), CHIP_NO_ERROR);
