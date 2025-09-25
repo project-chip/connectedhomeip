@@ -272,5 +272,6 @@ class TC_ACL_2_9(MatterBaseTest):
         removeFabricCmd = Clusters.OperationalCredentials.Commands.RemoveFabric(th2_idx)
         await self.th1.SendCommand(nodeid=self.dut_node_id, endpoint=0, payload=removeFabricCmd)
 
+
 if __name__ == "__main__":
     default_matter_test_main()
