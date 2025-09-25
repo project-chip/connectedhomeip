@@ -65,7 +65,6 @@ public:
     void OnFabricCommitted(const FabricTable & fabricTable, FabricIndex fabricIndex) override;
 
 private:
-
     const OperationalCredentialsCluster::Context mOpCredsContext;
 
     FabricTable & GetFabricTable();
@@ -74,7 +73,6 @@ private:
     SessionManager & GetSessionManager();
     DnssdServer & GetDNSSDServer();
     CommissioningWindowManager & GetCommissioningWindowManager();
-
 };
 
 } // namespace Clusters

@@ -1083,7 +1083,6 @@ exit:
     return errorStatus;
 }
 
-
 void OnPlatformEventHandler(const chip::DeviceLayer::ChipDeviceEvent * event, intptr_t arg)
 {
     if (event->Type == DeviceLayer::DeviceEventType::kFailSafeTimerExpired)
@@ -1094,7 +1093,8 @@ void OnPlatformEventHandler(const chip::DeviceLayer::ChipDeviceEvent * event, in
 }
 } // anonymous namespace
 
-void OperationalCredentialsCluster::FailSafeCleanup(const DeviceLayer::ChipDeviceEvent * event, OperationalCredentialsCluster * cluster)
+void OperationalCredentialsCluster::FailSafeCleanup(const DeviceLayer::ChipDeviceEvent * event,
+                                                    OperationalCredentialsCluster * cluster)
 {
     VerifyOrDie(cluster != nullptr);
     ChipLogError(Zcl, "OpCreds: Proceeding to FailSafeCleanup on fail-safe expiry!");
