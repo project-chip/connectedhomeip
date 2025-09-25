@@ -455,7 +455,6 @@ class TestSpecParsingDataType(MatterBaseTest):
                 _ = parser.create_cluster()  # We don't use this, just care about problems
                 problems = parser.get_problems()
                 asserts.assert_equal(len(problems), 1, "Should have one problem for missing name")
-                expected_error = f"{data_type.capitalize()} <Element '{data_type}' at" if data_type != "struct" else "Struct <Element 'struct' at"
                 asserts.assert_true("with no name" in problems[0].problem,
                                     f"Problem message doesn't match expected error for {data_type}")
             except Exception as e:
