@@ -37,7 +37,7 @@
 #include <assert.h>
 
 #include <credentials/DeviceAttestationCredsProvider.h>
-#if 0
+#if CHIP_BUILD_EXAMPLE_CREDS
 #include <credentials/examples/DeviceAttestationCredsExample.h>
 #else
 #include <platform/senscomm/scm1612s/FactoryDataProvider.h>
@@ -114,7 +114,9 @@ chip::app::Clusters::NetworkCommissioning::Instance sWiFiNetworkCommissioningIns
                                                                                       &WiseWiFiDriver::GetInstance());
 #endif
 
+#if !CHIP_BUILD_EXAMPLE_CREDS
 chip::DeviceLayer::FactoryDataProvider mFactoryDataProvider;
+#endif
 } // namespace
 
 using namespace chip::TLV;
@@ -355,7 +357,7 @@ CHIP_ERROR AppTask::Init()
     (void) initParams.InitializeStaticResourcesBeforeServerInit();
     chip::Server::GetInstance().Init(initParams);
 
-#if CONFIG_SENSCOMM_FACTORY_DATA_EXAMPLE
+#if CHIP_BUILD_EXAMPLE_CREDS
     // Initialize device attestation config
     SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
 #else

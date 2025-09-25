@@ -18,6 +18,7 @@ import("//build_overrides/scm1612s.gni")
 
 import("${build_root}/config/defaults.gni")
 import("${chip_root}/src/platform/device.gni")
+import("${chip_root}/src/platform/senscomm/scm1612s/args.gni")
 import("${scm1612s_sdk_build_root}/scm1612s_executable.gni")
 import("${scm1612s_sdk_build_root}/scm1612s_sdk.gni")
 
@@ -112,7 +113,9 @@ scm1612s_executable("lighting_app") {
     "${scm1612s_project_dir}/include",
   ]
 
-  defines = []
+  defines = [
+    "CHIP_BUILD_EXAMPLE_CREDS=$chip_build_example_creds",
+  ]
 
   if (chip_enable_ota_requestor) {
     sources += [ "${examples_plat_dir}/OTAConfig.cpp" ]
