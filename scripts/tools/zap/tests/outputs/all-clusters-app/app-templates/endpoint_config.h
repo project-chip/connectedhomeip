@@ -2943,10 +2943,6 @@
         (EmberAfGenericClusterFunction) emberAfFixedLabelClusterServerInitCallback,                                                \
         (EmberAfGenericClusterFunction) MatterFixedLabelClusterServerShutdownCallback,                                             \
     };                                                                                                                             \
-    const EmberAfGenericClusterFunction chipFuncArrayUserLabelServer[] = {                                                         \
-        (EmberAfGenericClusterFunction) emberAfUserLabelClusterServerInitCallback,                                                 \
-        (EmberAfGenericClusterFunction) MatterUserLabelClusterServerShutdownCallback,                                              \
-    };                                                                                                                             \
     const EmberAfGenericClusterFunction chipFuncArrayIdentifyServer[] = {                                                          \
         (EmberAfGenericClusterFunction) emberAfIdentifyClusterServerInitCallback,                                                  \
         (EmberAfGenericClusterFunction) MatterIdentifyClusterServerAttributeChangedCallback,                                       \
@@ -3859,8 +3855,8 @@
       .attributes = ZAP_ATTRIBUTE_INDEX(240), \
       .attributeCount = 3, \
       .clusterSize = 0, \
-      .mask = ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(INIT_FUNCTION) | ZAP_CLUSTER_MASK(SHUTDOWN_FUNCTION), \
-      .functions = chipFuncArrayUserLabelServer, \
+      .mask = ZAP_CLUSTER_MASK(SERVER), \
+      .functions = NULL, \
       .acceptedCommandList = nullptr, \
       .generatedCommandList = nullptr, \
       .eventList = nullptr, \
@@ -4041,8 +4037,8 @@
       .attributes = ZAP_ATTRIBUTE_INDEX(311), \
       .attributeCount = 3, \
       .clusterSize = 0, \
-      .mask = ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(INIT_FUNCTION) | ZAP_CLUSTER_MASK(SHUTDOWN_FUNCTION), \
-      .functions = chipFuncArrayUserLabelServer, \
+      .mask = ZAP_CLUSTER_MASK(SERVER), \
+      .functions = NULL, \
       .acceptedCommandList = nullptr, \
       .generatedCommandList = nullptr, \
       .eventList = nullptr, \
@@ -4967,8 +4963,8 @@
 // This is an array of EmberAfEndpointType structures.
 #define GENERATED_ENDPOINT_TYPES                                                                                                   \
     {                                                                                                                              \
-        { ZAP_CLUSTER_INDEX(0), 28, 221 },                                                                                         \
-        { ZAP_CLUSTER_INDEX(28), 73, 3444 },                                                                                       \
+        { ZAP_CLUSTER_INDEX(0), 28, 215 },                                                                                         \
+        { ZAP_CLUSTER_INDEX(28), 73, 3438 },                                                                                       \
         { ZAP_CLUSTER_INDEX(101), 7, 114 },                                                                                        \
         { ZAP_CLUSTER_INDEX(108), 2, 0 },                                                                                          \
     }
@@ -4982,7 +4978,7 @@ static_assert(ATTRIBUTE_LARGEST <= CHIP_CONFIG_MAX_ATTRIBUTE_STORE_ELEMENT_SIZE,
 #define ATTRIBUTE_SINGLETONS_SIZE (0)
 
 // Total size of attribute storage
-#define ATTRIBUTE_MAX_SIZE (3779)
+#define ATTRIBUTE_MAX_SIZE (3767)
 
 // Number of fixed endpoints
 #define FIXED_ENDPOINT_COUNT (4)
