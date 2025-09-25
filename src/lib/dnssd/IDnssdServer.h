@@ -16,25 +16,18 @@
  */
 
 #pragma once
-#include <app/server/Dnssd.h>
 #include <lib/core/CHIPError.h>
 
 namespace chip {
+namespace Dnssd {
 class IDnssdServer
 {
 public:
     virtual ~IDnssdServer()                   = default;
     virtual CHIP_ERROR AdvertiseOperational() = 0;
+    virtual void Start()                      = 0;
+    virtual void Stop()                       = 0;
     virtual bool IsAdvertisingEnabled()       = 0;
 };
-
-class PlatformDnssdServer : public IDnssdServer
-{
-    CHIP_ERROR AdvertiseOperational() override { return app::DnssdServer::Instance().AdvertiseOperational(); }
-
-    bool IsAdvertisingEnabled() override
-    {
-        return false; // placeholder
-    }
-};
+} // namespace Dnssd
 } // namespace chip

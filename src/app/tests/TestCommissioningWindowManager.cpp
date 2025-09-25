@@ -113,7 +113,7 @@ static void StopEventLoop(intptr_t context)
     chip::DeviceLayer::PlatformMgr().StopEventLoopTask();
 }
 
-class MockDnssdServer : public chip::IDnssdServer
+class MockDnssdServer : public chip::Dnssd::IDnssdServer
 {
 public:
     MockDnssdServer() : mAdvertisingEnabled(false) {}
@@ -122,6 +122,11 @@ public:
         mAdvertisingEnabled = true;
         return CHIP_NO_ERROR;
     }
+
+    void Start() override { mAdvertisingEnabled = true; }
+
+    void Stop() override { mAdvertisingEnabled = false; }
+
     bool IsAdvertisingEnabled() override { return mAdvertisingEnabled; }
 
 private:
