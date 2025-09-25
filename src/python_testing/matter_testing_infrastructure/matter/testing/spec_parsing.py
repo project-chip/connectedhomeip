@@ -661,7 +661,7 @@ class ClusterParser:
             # Check for duplicate IDs to detect invalid XML data
             if id in components:
                 p = ProblemNotice("Spec XML Parsing", location=location,
-                                  severity=ProblemSeverity.WARNING, 
+                                  severity=ProblemSeverity.WARNING,
                                   problem=f"Duplicate {component_type.value} ID {id} in {struct_name} - overwriting previous entry")
                 self._problems.append(p)
 
@@ -703,7 +703,7 @@ class ClusterParser:
                 if name in data_types:
                     location = ClusterPathLocation(0, int(self._cluster_id) if self._cluster_id is not None else 0)
                     self._problems.append(ProblemNotice("Spec XML Parsing", location=location,
-                                          severity=ProblemSeverity.WARNING, 
+                                          severity=ProblemSeverity.WARNING,
                                           problem=f"Duplicate {data_type.value} name '{name}' - overwriting previous entry"))
 
                 # Ensure we're using a valid cluster ID list, never [None]

@@ -433,10 +433,10 @@ class TestSpecParsingDataType(MatterBaseTest):
         # Try different data types - we'll generate a problem for each
         test_cases = [
             ("struct", "<field id=\"1\" name=\"Field1\" type=\"uint8\"><mandatoryConform/></field>"),
-            ("enum", "<item value=\"0\" name=\"Item1\"><mandatoryConform/></item>"), 
+            ("enum", "<item value=\"0\" name=\"Item1\"><mandatoryConform/></item>"),
             ("bitmap", "<bitfield bit=\"0\" name=\"Bit0\"><mandatoryConform/></bitfield>")
         ]
-        
+
         for data_type, inner_content in test_cases:
             try:
                 # Create XML with missing name attribute
