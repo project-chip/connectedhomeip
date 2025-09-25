@@ -736,7 +736,6 @@ void AccessControlCluster::MarkRestrictionListChanged(FabricIndex fabricIndex)
 void AccessControlCluster::OnFabricRestrictionReviewUpdate(FabricIndex fabricIndex, uint64_t token, Optional<CharSpan> instruction,
                                                            Optional<CharSpan> arlRequestFlowUrl)
 {
-    CHIP_ERROR err;
     ArlReviewEvent event{ .token = token, .fabricIndex = fabricIndex };
 
     event.instruction       = instruction;
