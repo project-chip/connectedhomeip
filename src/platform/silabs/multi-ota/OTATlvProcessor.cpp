@@ -37,7 +37,7 @@ CHIP_ERROR OTATlvProcessor::Init()
 {
     VerifyOrReturnError(mCallbackProcessDescriptor != nullptr, CHIP_OTA_PROCESSOR_CB_NOT_REGISTERED);
     mAccumulator.Init(GetAccumulatorLength());
-#ifdef SL_MATTER_ENABLE_OTA_ENCRYPTION
+#if defined(SL_MATTER_ENABLE_OTA_ENCRYPTION) && SL_MATTER_ENABLE_OTA_ENCRYPTION
     mUnalignmentNum = 0;
 #endif
     return CHIP_NO_ERROR;
@@ -48,7 +48,7 @@ CHIP_ERROR OTATlvProcessor::Clear()
     OTATlvProcessor::ClearInternal();
     mAccumulator.Clear();
     mDescriptorProcessed = false;
-#ifdef SL_MATTER_ENABLE_OTA_ENCRYPTION
+#if defined(SL_MATTER_ENABLE_OTA_ENCRYPTION) && SL_MATTER_ENABLE_OTA_ENCRYPTION
     mUnalignmentNum = 0;
 #endif
     return CHIP_NO_ERROR;
@@ -88,7 +88,7 @@ void OTATlvProcessor::ClearInternal()
     mLength          = 0;
     mProcessedLength = 0;
     mWasSelected     = false;
-#ifdef SL_MATTER_ENABLE_OTA_ENCRYPTION
+#if defined(SL_MATTER_ENABLE_OTA_ENCRYPTION) && SL_MATTER_ENABLE_OTA_ENCRYPTION
     mIVOffset  = 0;
     mLastBlock = false;
 #endif // SL_MATTER_ENABLE_OTA_ENCRYPTION
@@ -136,7 +136,7 @@ CHIP_ERROR OTADataAccumulator::Accumulate(ByteSpan & block)
     return CHIP_NO_ERROR;
 }
 
-#if SL_MATTER_ENABLE_OTA_ENCRYPTION
+#if defined(SL_MATTER_ENABLE_OTA_ENCRYPTION) && SL_MATTER_ENABLE_OTA_ENCRYPTION
 CHIP_ERROR OTATlvProcessor::vOtaProcessInternalEncryption(MutableByteSpan & block)
 {
 #if defined(SL_MBEDTLS_USE_TINYCRYPT)
