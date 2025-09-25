@@ -586,7 +586,7 @@ CHIP_ERROR AccessControlCluster::GeneratedCommands(const ConcreteClusterPath & p
 #endif
 }
 
-CHIP_ERROR AccessControlCluster::EventInfo(const ConcreteEventPath & path, DataModel::EventEntry & eventInfo) 
+CHIP_ERROR AccessControlCluster::EventInfo(const ConcreteEventPath & path, DataModel::EventEntry & eventInfo)
 {
     eventInfo.readPrivilege = Access::Privilege::kAdminister;
     return CHIP_NO_ERROR;
