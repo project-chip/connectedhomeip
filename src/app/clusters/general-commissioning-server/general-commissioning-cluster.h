@@ -79,8 +79,8 @@ private:
     HandleSetRegulatoryConfig(const DataModel::InvokeRequest & request, CommandHandler * handler,
                               const GeneralCommissioning::Commands::SetRegulatoryConfig::DecodableType & commandData);
 #if CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
-    std::optional<DataModel::ActActionReturnStatus>
-    HandleSetTCAcknowledgements(const Datamodel::InvokeRequest & request, CommandHandler * handler,
+    std::optional<DataModel::ActionReturnStatus>
+    HandleSetTCAcknowledgements(const DataModel::InvokeRequest & request, CommandHandler * handler,
                                 const GeneralCommissioning::Commands::SetTCAcknowledgements::DecodableType & commandData);
 #endif
 };
