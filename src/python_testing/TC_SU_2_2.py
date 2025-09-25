@@ -733,7 +733,7 @@ class TC_SU_2_2(MatterBaseTest):
         # UpdateState (Busy state sequence) with validation
         # ------------------------------------------------------------------------------------
         try:
-            # Wait until the final state (Idle) is reached or timeout (20 min)
+            # Wait until the final state (Idle) is reached or timeout (10 min)
             await subscription_attr_state_busy.await_all_expected_report_matches([matcher_busy_state_obj], timeout_sec=600.0)
             logger.info(f'{step_number_s2}: Step #2.3 - UpdateState (Busy sequence) matcher has completed.')
         except Exception as e:
