@@ -398,7 +398,8 @@ exit:
 
 std::optional<DataModel::ActionReturnStatus> HandleAddNOC(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
                                                           TLV::TLVReader & input_arguments, FabricTable & fabricTable,
-                                                          FailSafeContext & failSafeContext, DnssdServer & dnssdServer)
+                                                          FailSafeContext & failSafeContext, DnssdServer & dnssdServer,
+                                                          CommissioningWindowManager & commissioningWindowManager)
 {
     MATTER_TRACE_SCOPE("AddNOC", "OperationalCredentials");
     Commands::AddNOC::DecodableType commandData;
@@ -460,7 +461,7 @@ std::optional<DataModel::ActionReturnStatus> HandleAddNOC(CommandHandler * comma
 
 #if CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
     // These checks should only run during JCM.
-    if (cluster->GetCommissioningWindowManager().IsJCM())
+    if (commissioningWindowManager.IsJCM())
     {
         // NOC must contain an Administrator CAT
         CATValues cats;
@@ -1241,7 +1242,7 @@ std::optional<DataModel::ActionReturnStatus> OperationalCredentialsCluster::Invo
         return HandleCSRRequest(handler, request.path, input_arguments, GetFabricTable(), GetFailSafeContext(), GetDACProvider());
     case OperationalCredentials::Commands::AddNOC::Id: {
         std::optional<DataModel::ActionReturnStatus> returnStatus =
-            HandleAddNOC(handler, request.path, input_arguments, GetFabricTable(), GetFailSafeContext(), GetDNSSDServer());
+            HandleAddNOC(handler, request.path, input_arguments, GetFabricTable(), GetFailSafeContext(), GetDNSSDServer(), GetCommissioningWindowManager());
         if (returnStatus == Status::Success)
         {
             // Notify the attributes containing fabric metadata can be read with new data
