@@ -796,7 +796,7 @@ class BaseTestHelper:
             self.controllerNodeId, self.paaTrustStorePath)
 
         try:
-            await self.devCtrl2.CommissionWithCode(setupPayload=setup_code)
+            await self.devCtrl2.CommissionWithCode(setupPayload=setup_code, nodeid=nodeid)
         except ChipStackException:
             self.logger.exception("Failed to finish key exchange with device")
             return False
