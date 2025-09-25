@@ -224,7 +224,11 @@ DataModel::ActionReturnStatus DescriptorCluster::ReadAttribute(const DataModel::
     case PartsList::Id:
         return ReadPartsAttribute(mContext->provider, request.path.mEndpointId, encoder);
     case TagList::Id:
-        return ReadTagListAttribute(mContext->provider, request.path.mEndpointId, encoder);
+        if(mFeatureFlags.Has(Feature::kTagList)) {
+            return ReadTagListAttribute(mContext->provider, request.path.mEndpointId, encoder);
+        }else{
+            return Status::UnsupportedAttribute;
+        }
 #if CHIP_CONFIG_USE_ENDPOINT_UNIQUE_ID
     case EndpointUniqueID::Id: {
         char buffer[chip::app::Clusters::Descriptor::Attributes::EndpointUniqueID::TypeInfo::MaxLength()] = { 0 };
