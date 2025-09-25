@@ -162,6 +162,11 @@ data.
    `zcl-with-test-extensions.json`, add all of your cluster's non-list
    attributes to the `attributeAccessInterfaceAttributes` list. This tells ZAP
    not to allocate RAM for these attributes, as your class now manages them.
+3. Re-run ZAP regeneration, like
+
+    ```bash
+    ./scripts/run_in_build_env.sh 'scripts/tools/zap_regen_all.py'
+    ```
 
 ---
 

@@ -111,16 +111,16 @@ attribute's value changes.
         together with a separate `WriteImpl` such that any successful attribute
         write will notify.
 
-        Canonical example code would look like:
+            Canonical example code would look like:
 
-        ```cpp
-        DataModel::ActionReturnStatus SomeCluster::WriteAttribute(const DataModel::WriteAttributeRequest & request,
-                                                                  AttributeValueDecoder & decoder)
-        {
-            // Delegate everything to WriteImpl. If write succeeds, notify that the attribute changed.
-            return NotifyAttributeChangedIfSuccess(request.path.mAttributeId, WriteImpl(request, decoder));
-        }
-        ```
+            ```cpp
+            DataModel::ActionReturnStatus SomeCluster::WriteAttribute(const DataModel::WriteAttributeRequest & request,
+                                                                      AttributeValueDecoder & decoder)
+            {
+                // Delegate everything to WriteImpl. If write succeeds, notify that the attribute changed.
+                return NotifyAttributeChangedIfSuccess(request.path.mAttributeId, WriteImpl(request, decoder));
+            }
+            ```
 
     -   For the `NotifyAttributeChangedIfSuccess` ensure that WriteImpl is
         returning
@@ -128,11 +128,11 @@ attribute's value changes.
         when no notification should be sent (e.g. write was a `noop` because
         existing value was already the same).
 
-        Canonical example is:
+            Canonical example is:
 
-        ```cpp
-        VerifyOrReturnValue(mValue != value, ActionReturnStatus::FixedStatus::kWriteSuccessNoOp);
-        ```
+            ```cpp
+            VerifyOrReturnValue(mValue != value, ActionReturnStatus::FixedStatus::kWriteSuccessNoOp);
+            ```
 
 #### Persistent Storage
 
@@ -201,6 +201,12 @@ implementation.
       `zcl-with-test-extensions.json`, add all non-list attributes of your
       cluster to `attributeAccessInterfaceAttributes`. This marks them as
       externally handled.
+7. Once `config-data.yaml` and `zcl.json/zcl-with-test-extensions.json` are
+   updated, run the ZAP regeneration command, like
+
+    ```bash
+    ./scripts/run_in_build_env.sh 'scripts/tools/zap_regen_all.py'
+    ```
 
 ---
 
