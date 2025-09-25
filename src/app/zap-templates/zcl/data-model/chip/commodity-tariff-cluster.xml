@@ -148,7 +148,7 @@ Git: 0.7-summer-2025-606-g329573d34
     <item fieldId="2" name="PriceLevel" type="int16s" optional="true"/>
   </struct>
 
-  <cluster>
+  <cluster apiMaturity="provisional">
     <domain>Energy Management</domain>
     <name>Commodity Tariff</name>
     <code>0x0700</code>
