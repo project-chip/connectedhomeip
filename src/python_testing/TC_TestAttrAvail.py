@@ -119,7 +119,7 @@ class TC_TestAttrAvail(MatterBaseTest):
             TestStep(1, "Commissioning, already done", is_commissioning=True),
             TestStep(2, "Checking OperationalState attribute is available on endpoint"),
             TestStep(3, "Checking Operational Resume command is available on endpoint"),
-            TestStep(4, "Checking Timezone feature is available on endpoint"),
+            TestStep(4, "Checking Boolean State Config Audible feature is available on endpoint"),
         ]
 
     def TC_TestAttrAvail(self) -> list[str]:
