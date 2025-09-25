@@ -590,6 +590,9 @@ void AllClustersAppCommandHandler::HandleCommand(intptr_t context)
 
         self->OnSoilMoistureChange(endpoint, soilMoistureMeasuredValue);
     }
+    else if (name == "UserIntentCommissioningStart") {
+        ChipLogError(Zcl, "user intent commissioning received");
+    }
     else
     {
         ChipLogError(NotSpecified, "Unhandled command '%s': this should never happen", name.c_str());
