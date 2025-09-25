@@ -62,7 +62,6 @@ public:
 
     CHIP_ERROR EventInfo(const ConcreteEventPath & path, DataModel::EventEntry & eventInfo) override;
 
-
 #if CHIP_CONFIG_USE_ACCESS_RESTRICTIONS
     std::optional<DataModel::ActionReturnStatus>
     HandleReviewFabricRestrictions(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,

@@ -193,9 +193,10 @@ CHIP_ERROR ReadExtension(AttributeValueEncoder & aEncoder)
         return CHIP_NO_ERROR;
     });
 }
-std::optional<EventNumber> LogExtensionChangedEvent(const Clusters::AccessControl::Structs::AccessControlExtensionStruct::Type & item,
-                                    const Access::SubjectDescriptor & subjectDescriptor,
-                                    Clusters::AccessControl::ChangeTypeEnum changeType, ServerClusterContext *context)
+std::optional<EventNumber>
+LogExtensionChangedEvent(const Clusters::AccessControl::Structs::AccessControlExtensionStruct::Type & item,
+                         const Access::SubjectDescriptor & subjectDescriptor, Clusters::AccessControl::ChangeTypeEnum changeType,
+                         ServerClusterContext * context)
 {
     ExtensionEvent event{ .changeType = changeType, .fabricIndex = subjectDescriptor.fabricIndex };
 
@@ -242,7 +243,7 @@ CHIP_ERROR CheckExtensionEntryDataFormat(const ByteSpan & data)
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR WriteExtension(const ConcreteDataAttributePath & aPath, AttributeValueDecoder & aDecoder, ServerClusterContext *context)
+CHIP_ERROR WriteExtension(const ConcreteDataAttributePath & aPath, AttributeValueDecoder & aDecoder, ServerClusterContext * context)
 {
     auto & storage = Server::GetInstance().GetPersistentStorage();
 
@@ -272,7 +273,9 @@ CHIP_ERROR WriteExtension(const ConcreteDataAttributePath & aPath, AttributeValu
                 .data        = ByteSpan(buffer, size),
                 .fabricIndex = accessingFabricIndex,
             };
-            if(LogExtensionChangedEvent(item, aDecoder.GetSubjectDescriptor(), Clusters::AccessControl::ChangeTypeEnum::kRemoved, context) == std::nullopt) {
+            if (LogExtensionChangedEvent(item, aDecoder.GetSubjectDescriptor(), Clusters::AccessControl::ChangeTypeEnum::kRemoved,
+                                         context) == std::nullopt)
+            {
                 return CHIP_ERROR_INTERNAL;
             }
         }
@@ -295,9 +298,11 @@ CHIP_ERROR WriteExtension(const ConcreteDataAttributePath & aPath, AttributeValu
                 storage.SyncSetKeyValue(DefaultStorageKeyAllocator::AccessControlExtensionEntry(accessingFabricIndex).KeyName(),
                                         item.data.data(), static_cast<uint16_t>(item.data.size())));
             if (LogExtensionChangedEvent(item, aDecoder.GetSubjectDescriptor(),
-                                                          errStorage == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND
-                                                              ? Clusters::AccessControl::ChangeTypeEnum::kAdded
-                                                              : Clusters::AccessControl::ChangeTypeEnum::kChanged, context) == std::nullopt) {
+                                         errStorage == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND
+                                             ? Clusters::AccessControl::ChangeTypeEnum::kAdded
+                                             : Clusters::AccessControl::ChangeTypeEnum::kChanged,
+                                         context) == std::nullopt)
+            {
                 return CHIP_ERROR_INTERNAL;
             }
         }
@@ -319,7 +324,9 @@ CHIP_ERROR WriteExtension(const ConcreteDataAttributePath & aPath, AttributeValu
         ReturnErrorOnFailure(
             storage.SyncSetKeyValue(DefaultStorageKeyAllocator::AccessControlExtensionEntry(accessingFabricIndex).KeyName(),
                                     item.data.data(), static_cast<uint16_t>(item.data.size())));
-        if(LogExtensionChangedEvent(item, aDecoder.GetSubjectDescriptor(), Clusters::AccessControl::ChangeTypeEnum::kAdded, context) == std::nullopt) {
+        if (LogExtensionChangedEvent(item, aDecoder.GetSubjectDescriptor(), Clusters::AccessControl::ChangeTypeEnum::kAdded,
+                                     context) == std::nullopt)
+        {
             return CHIP_ERROR_INTERNAL;
         }
     }
@@ -592,7 +599,6 @@ CHIP_ERROR AccessControlCluster::EventInfo(const ConcreteEventPath & path, DataM
     return CHIP_NO_ERROR;
 }
 
-
 #if CHIP_CONFIG_USE_ACCESS_RESTRICTIONS
 std::optional<DataModel::ActionReturnStatus> AccessControlCluster::HandleReviewFabricRestrictions(
     CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
@@ -739,7 +745,6 @@ void AccessControlCluster::OnFabricRestrictionReviewUpdate(FabricIndex fabricInd
     mContext->interactionContext.eventsGenerator.GenerateEvent(event, kRootEndpointId);
 
     return;
-
 }
 #endif
 
