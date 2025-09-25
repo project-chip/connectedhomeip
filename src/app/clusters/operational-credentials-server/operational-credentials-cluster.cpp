@@ -41,8 +41,8 @@ using namespace chip::Protocols::InteractionModel;
 using namespace chip::Transport;
 namespace {
 
-constexpr auto kDACCertificate = CertificateChainTypeEnum::kDACCertificate;
-constexpr auto kPAICertificate = CertificateChainTypeEnum::kPAICertificate;
+constexpr auto kDACCertificate                = CertificateChainTypeEnum::kDACCertificate;
+constexpr auto kPAICertificate                = CertificateChainTypeEnum::kPAICertificate;
 constexpr auto kNocResponseMaxDebugTextLength = 128;
 
 // Get the attestation challenge for the current session in progress. Only valid when called
@@ -53,7 +53,7 @@ constexpr auto kNocResponseMaxDebugTextLength = 128;
 ByteSpan GetAttestationChallengeFromCurrentSession(app::CommandHandler * commandObj)
 {
     VerifyOrDie((commandObj != nullptr) && (commandObj->GetExchangeContext() != nullptr));
-    SessionHandle sessionHandle = commandObj->GetExchangeContext()->GetSessionHandle();
+    SessionHandle sessionHandle                 = commandObj->GetExchangeContext()->GetSessionHandle();
     Transport::Session::SessionType sessionType = sessionHandle->GetSessionType();
     VerifyOrReturnValue(sessionType == Transport::Session::SessionType::kSecure, ByteSpan{});
 
@@ -155,7 +155,8 @@ void SendNOCResponse(app::CommandHandler * commandObj, const ConcreteCommandPath
     if (!debug_text.empty())
     {
         // Max length of DebugText is 128 in the spec.
-        const CharSpan & to_send = debug_text.size() > kNocResponseMaxDebugTextLength ? debug_text.SubSpan(0, kNocResponseMaxDebugTextLength) : debug_text;
+        const CharSpan & to_send =
+            debug_text.size() > kNocResponseMaxDebugTextLength ? debug_text.SubSpan(0, kNocResponseMaxDebugTextLength) : debug_text;
         payload.debugText.Emplace(to_send);
     }
 
@@ -271,8 +272,7 @@ CHIP_ERROR ReadRootCertificates(AttributeValueEncoder & aEncoder, FabricTable & 
 }
 
 std::optional<DataModel::ActionReturnStatus> HandleCSRRequest(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
-                                                              TLV::TLVReader & input_arguments,
-                                                              FabricTable & fabricTable,
+                                                              TLV::TLVReader & input_arguments, FabricTable & fabricTable,
                                                               FailSafeContext & failSafeContext,
                                                               Credentials::DeviceAttestationCredentialsProvider * dacProvider)
 {
@@ -392,7 +392,7 @@ std::optional<DataModel::ActionReturnStatus> HandleCSRRequest(CommandHandler * c
 exit:
     // If failed constraints or internal errors, send a status report instead of the response sent above
     ChipLogError(Zcl, "OpCreds: Failed CSRRequest request with IM error 0x%02x (err = %" CHIP_ERROR_FORMAT ")",
-                    to_underlying(errorStatus), err.Format());
+                 to_underlying(errorStatus), err.Format());
     return errorStatus;
 }
 
@@ -435,8 +435,7 @@ std::optional<DataModel::ActionReturnStatus> HandleAddNOC(CommandHandler * comma
     VerifyOrExit(ipkValue.size() == Crypto::CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES, errorStatus = Status::InvalidCommand);
     VerifyOrExit(IsVendorIdValidOperationally(adminVendorId), errorStatus = Status::InvalidCommand);
 
-    VerifyOrExit(failSafeContext.IsFailSafeArmed(commandObj->GetAccessingFabricIndex()),
-                 errorStatus = Status::FailsafeRequired);
+    VerifyOrExit(failSafeContext.IsFailSafeArmed(commandObj->GetAccessingFabricIndex()), errorStatus = Status::FailsafeRequired);
 
     VerifyOrExit(!failSafeContext.NocCommandHasBeenInvoked(), errorStatus = Status::ConstraintError);
 
@@ -578,7 +577,7 @@ exit:
             ChipLogDetail(Zcl, "OpCreds: successfully created fabric index 0x%x via AddNOC", static_cast<unsigned>(newFabricIndex));
         }
 
-        if(shouldReport)
+        if (shouldReport)
         {
             // Using Success status to report that a notification is needed.
             return Status::Success;
@@ -604,10 +603,10 @@ std::optional<DataModel::ActionReturnStatus> HandleUpdateNOC(CommandHandler * co
     Commands::UpdateNOC::DecodableType commandData;
     ReturnErrorOnFailure(commandData.Decode(input_arguments, request.GetAccessingFabricIndex()));
 
-    auto & NOCValue                   = commandData.NOCValue;
-    auto & ICACValue                  = commandData.ICACValue;
+    auto & NOCValue  = commandData.NOCValue;
+    auto & ICACValue = commandData.ICACValue;
 
-    auto nocResponse      = NodeOperationalCertStatusEnum::kOk;
+    auto nocResponse = NodeOperationalCertStatusEnum::kOk;
     auto errorStatus = Status::Success;
 
     CHIP_ERROR err          = CHIP_NO_ERROR;
@@ -623,8 +622,7 @@ std::optional<DataModel::ActionReturnStatus> HandleUpdateNOC(CommandHandler * co
     VerifyOrExit(NOCValue.size() <= Credentials::kMaxCHIPCertLength, errorStatus = Status::InvalidCommand);
     VerifyOrExit(!ICACValue.HasValue() || ICACValue.Value().size() <= Credentials::kMaxCHIPCertLength,
                  errorStatus = Status::InvalidCommand);
-    VerifyOrExit(failSafeContext.IsFailSafeArmed(commandObj->GetAccessingFabricIndex()),
-                 errorStatus = Status::FailsafeRequired);
+    VerifyOrExit(failSafeContext.IsFailSafeArmed(commandObj->GetAccessingFabricIndex()), errorStatus = Status::FailsafeRequired);
 
     VerifyOrExit(!failSafeContext.NocCommandHasBeenInvoked(), errorStatus = Status::ConstraintError);
 
@@ -689,14 +687,15 @@ exit:
 }
 
 std::optional<DataModel::ActionReturnStatus> HandleUpdateFabricLabel(CommandHandler * commandObj, TLV::TLVReader & input_arguments,
-                                                                     const DataModel::InvokeRequest & request, FabricTable & fabricTable)
+                                                                     const DataModel::InvokeRequest & request,
+                                                                     FabricTable & fabricTable)
 {
     MATTER_TRACE_SCOPE("UpdateFabricLabel", "OperationalCredentials");
     Commands::UpdateFabricLabel::DecodableType commandData;
     ReturnErrorOnFailure(commandData.Decode(input_arguments, request.GetAccessingFabricIndex()));
 
-    auto & label              = commandData.label;
-    auto ourFabricIndex       = commandObj->GetAccessingFabricIndex();
+    auto & label        = commandData.label;
+    auto ourFabricIndex = commandObj->GetAccessingFabricIndex();
 
     ChipLogDetail(Zcl, "OpCreds: Received an UpdateFabricLabel command");
 
@@ -729,16 +728,15 @@ std::optional<DataModel::ActionReturnStatus> HandleUpdateFabricLabel(CommandHand
     return std::nullopt;
 }
 
-std::optional<DataModel::ActionReturnStatus> HandleAddTrustedRootCertificate(CommandHandler * commandObj,
-                                                                             const ConcreteCommandPath & commandPath,
-                                                                             TLV::TLVReader & input_arguments, FabricTable & fabricTable,
-                                                                             FailSafeContext & failSafeContext)
+std::optional<DataModel::ActionReturnStatus>
+HandleAddTrustedRootCertificate(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
+                                TLV::TLVReader & input_arguments, FabricTable & fabricTable, FailSafeContext & failSafeContext)
 {
     MATTER_TRACE_SCOPE("AddTrustedRootCertificate", "OperationalCredentials");
     Commands::AddTrustedRootCertificate::DecodableType commandData;
     ReturnErrorOnFailure(commandData.Decode(input_arguments));
 
-    auto finalStatus                  = Status::Failure;
+    auto finalStatus = Status::Failure;
 
     // Start with CHIP_ERROR_INVALID_ARGUMENT so that cascading errors yield correct
     // logs by the end. We use finalStatus as our overall success marker, not error
@@ -851,8 +849,7 @@ std::optional<DataModel::ActionReturnStatus> HandleSetVIDVerificationStatement(C
 
 std::optional<DataModel::ActionReturnStatus> HandleRemoveFabric(CommandHandler * commandObj,
                                                                 const ConcreteCommandPath & commandPath,
-                                                                TLV::TLVReader & input_arguments,
-                                                                FabricTable & fabricTable)
+                                                                TLV::TLVReader & input_arguments, FabricTable & fabricTable)
 {
     MATTER_TRACE_SCOPE("RemoveFabric", "OperationalCredentials");
     Commands::RemoveFabric::DecodableType commandData;
@@ -934,7 +931,7 @@ std::optional<DataModel::ActionReturnStatus> HandleSignVIDVerificationRequest(Co
     ByteSpan attestationChallenge = GetAttestationChallengeFromCurrentSession(commandObj);
 
     CHIP_ERROR err = fabricTable.SignVIDVerificationRequest(commandData.fabricIndex, commandData.clientChallenge,
-                                                                          attestationChallenge, responseData);
+                                                            attestationChallenge, responseData);
     if (err == CHIP_ERROR_INVALID_ARGUMENT)
     {
         return Status::ConstraintError;
@@ -955,10 +952,9 @@ std::optional<DataModel::ActionReturnStatus> HandleSignVIDVerificationRequest(Co
     return std::nullopt;
 }
 
-std::optional<DataModel::ActionReturnStatus> HandleCertificateChainRequest(CommandHandler * commandObj,
-                                                                           const ConcreteCommandPath & commandPath,
-                                                                           TLV::TLVReader & input_arguments,
-                                                                           Credentials::DeviceAttestationCredentialsProvider * dacProvider)
+std::optional<DataModel::ActionReturnStatus>
+HandleCertificateChainRequest(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
+                              TLV::TLVReader & input_arguments, Credentials::DeviceAttestationCredentialsProvider * dacProvider)
 {
     MATTER_TRACE_SCOPE("CertificateChainRequest", "OperationalCredentials");
     Commands::CertificateChainRequest::DecodableType commandData;
@@ -998,10 +994,9 @@ exit:
     return err;
 }
 
-std::optional<DataModel::ActionReturnStatus> HandleAttestationRequest(CommandHandler * commandObj,
-                                                                      const ConcreteCommandPath & commandPath,
-                                                                      TLV::TLVReader & input_arguments,
-                                                                      Credentials::DeviceAttestationCredentialsProvider * dacProvider )
+std::optional<DataModel::ActionReturnStatus>
+HandleAttestationRequest(CommandHandler * commandObj, const ConcreteCommandPath & commandPath, TLV::TLVReader & input_arguments,
+                         Credentials::DeviceAttestationCredentialsProvider * dacProvider)
 {
     MATTER_TRACE_SCOPE("AttestationRequest", "OperationalCredentials");
     OperationalCredentials::Commands::AttestationRequest::DecodableType commandData;
@@ -1244,10 +1239,10 @@ std::optional<DataModel::ActionReturnStatus> OperationalCredentialsCluster::Invo
         return HandleCertificateChainRequest(handler, request.path, input_arguments, GetDACProvider());
     case OperationalCredentials::Commands::CSRRequest::Id:
         return HandleCSRRequest(handler, request.path, input_arguments, GetFabricTable(), GetFailSafeContext(), GetDACProvider());
-    case OperationalCredentials::Commands::AddNOC::Id:
-    {
-        std::optional<DataModel::ActionReturnStatus> returnStatus = HandleAddNOC(handler, request.path, input_arguments, GetFabricTable(), GetFailSafeContext(), GetDNSSDServer());
-        if(returnStatus == Status::Success)
+    case OperationalCredentials::Commands::AddNOC::Id: {
+        std::optional<DataModel::ActionReturnStatus> returnStatus =
+            HandleAddNOC(handler, request.path, input_arguments, GetFabricTable(), GetFailSafeContext(), GetDNSSDServer());
+        if (returnStatus == Status::Success)
         {
             // Notify the attributes containing fabric metadata can be read with new data
             NotifyAttributeChanged(OperationalCredentials::Attributes::Fabrics::Id);
@@ -1259,10 +1254,10 @@ std::optional<DataModel::ActionReturnStatus> OperationalCredentialsCluster::Invo
     }
     case OperationalCredentials::Commands::UpdateNOC::Id:
         return HandleUpdateNOC(handler, input_arguments, request, GetFabricTable(), GetFailSafeContext(), GetDNSSDServer());
-    case OperationalCredentials::Commands::UpdateFabricLabel::Id:
-    {
-        std::optional<DataModel::ActionReturnStatus> returnStatus = HandleUpdateFabricLabel(handler, input_arguments, request, GetFabricTable());
-        if(returnStatus == std::nullopt)
+    case OperationalCredentials::Commands::UpdateFabricLabel::Id: {
+        std::optional<DataModel::ActionReturnStatus> returnStatus =
+            HandleUpdateFabricLabel(handler, input_arguments, request, GetFabricTable());
+        if (returnStatus == std::nullopt)
         {
             // Succeeded at updating the label, mark Fabrics table changed.
             NotifyAttributeChanged(OperationalCredentials::Attributes::Fabrics::Id);
@@ -1273,10 +1268,10 @@ std::optional<DataModel::ActionReturnStatus> OperationalCredentialsCluster::Invo
         return HandleRemoveFabric(handler, request.path, input_arguments, GetFabricTable());
     case OperationalCredentials::Commands::AddTrustedRootCertificate::Id:
         return HandleAddTrustedRootCertificate(handler, request.path, input_arguments, GetFabricTable(), GetFailSafeContext());
-    case OperationalCredentials::Commands::SetVIDVerificationStatement::Id:
-    {
-        std::optional<DataModel::ActionReturnStatus> returnStatus = HandleSetVIDVerificationStatement(handler, input_arguments, request, GetFabricTable(), GetFailSafeContext());
-        if(returnStatus == std::nullopt)
+    case OperationalCredentials::Commands::SetVIDVerificationStatement::Id: {
+        std::optional<DataModel::ActionReturnStatus> returnStatus =
+            HandleSetVIDVerificationStatement(handler, input_arguments, request, GetFabricTable(), GetFailSafeContext());
+        if (returnStatus == std::nullopt)
         {
             // Report if Fabric attribute has changed.
             NotifyAttributeChanged(OperationalCredentials::Attributes::Fabrics::Id);

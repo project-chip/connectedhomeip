@@ -30,7 +30,8 @@ namespace Clusters {
 class OperationalCredentialsCluster : public DefaultServerCluster, chip::FabricTable::Delegate
 {
 public:
-    struct Context {
+    struct Context
+    {
         FabricTable & fabricTable;
         FailSafeContext & failSafeContext;
         SessionManager & sessionManager;
@@ -38,7 +39,7 @@ public:
         CommissioningWindowManager & commissioningWindowManager;
     };
 
-    OperationalCredentialsCluster(EndpointId endpoint, const Context  context) :
+    OperationalCredentialsCluster(EndpointId endpoint, const Context context) :
         DefaultServerCluster({ endpoint, OperationalCredentials::Id }), mOpCredsContext(context){};
 
     CHIP_ERROR Startup(ServerClusterContext & context) override;

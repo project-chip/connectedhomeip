@@ -43,13 +43,12 @@ public:
     ServerClusterRegistration & CreateRegistration(EndpointId endpointId, unsigned emberEndpointIndex,
                                                    uint32_t optionalAttributeBits, uint32_t featureMap) override
     {
-        OperationalCredentialsCluster::Context context = {
-            .fabricTable = Server::GetInstance().GetFabricTable(),
-            .failSafeContext = Server::GetInstance().GetFailSafeContext(),
-            .sessionManager = Server::GetInstance().GetSecureSessionManager(),
-            .dnssdServer = app::DnssdServer::Instance(),
-            .commissioningWindowManager = Server::GetInstance().GetCommissioningWindowManager()
-        };
+        OperationalCredentialsCluster::Context context = { .fabricTable     = Server::GetInstance().GetFabricTable(),
+                                                           .failSafeContext = Server::GetInstance().GetFailSafeContext(),
+                                                           .sessionManager  = Server::GetInstance().GetSecureSessionManager(),
+                                                           .dnssdServer     = app::DnssdServer::Instance(),
+                                                           .commissioningWindowManager =
+                                                               Server::GetInstance().GetCommissioningWindowManager() };
         gServer.Create(endpointId, context);
         return gServer.Registration();
     }
