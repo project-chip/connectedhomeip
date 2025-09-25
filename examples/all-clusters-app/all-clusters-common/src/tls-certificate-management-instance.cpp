@@ -253,9 +253,9 @@ CHIP_ERROR TlsCertificateManagementCommandDelegate::LookupRootCert(EndpointId ma
                                                                    const ByteSpan & certificate,
                                                                    LoadedRootCertificateCallback loadedCallback) const
 {
-    std::array<uint8_t, Crypto::kSHA1_Hash_Length> fingerprintPayload = { 0 };
+    std::array<uint8_t, Crypto::kSHA256_Hash_Length> fingerprintPayload = { 0 };
     MutableByteSpan calculatedFingerprint(fingerprintPayload);
-    ReturnErrorOnFailure(Hash_SHA1(certificate.data(), certificate.size(), fingerprintPayload.data()));
+    ReturnErrorOnFailure(Hash_SHA256(certificate.data(), certificate.size(), fingerprintPayload.data()));
     return LookupRootCertByFingerprint(matterEndpoint, fabric, calculatedFingerprint, loadedCallback);
 }
 
@@ -420,9 +420,9 @@ CHIP_ERROR TlsCertificateManagementCommandDelegate::LookupClientCert(EndpointId 
                                                                      const ByteSpan & certificate,
                                                                      LoadedClientCertificateCallback loadedCallback) const
 {
-    std::array<uint8_t, Crypto::kSHA1_Hash_Length> fingerprintPayload = { 0 };
+    std::array<uint8_t, Crypto::kSHA256_Hash_Length> fingerprintPayload = { 0 };
     MutableByteSpan calculatedFingerprint(fingerprintPayload);
-    ReturnErrorOnFailure(Hash_SHA1(certificate.data(), certificate.size(), fingerprintPayload.data()));
+    ReturnErrorOnFailure(Hash_SHA256(certificate.data(), certificate.size(), fingerprintPayload.data()));
     return LookupClientCertByFingerprint(matterEndpoint, fabric, calculatedFingerprint, loadedCallback);
 }
 
