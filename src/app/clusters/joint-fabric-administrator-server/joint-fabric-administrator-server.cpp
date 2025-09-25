@@ -231,7 +231,7 @@ void JointFabricAdministratorGlobalInstance::HandleAnnounceJointFabricAdministra
             }
             else
             {
-                ChipLogProgress(JointFabric, "Failed to verify trust against commissioning fabric administrator");
+                ChipLogError(JointFabric, "Failed to verify trust against commissioning fabric administrator");
                 commandHandler->AddStatus(cachedPath, Status::Failure);
             }
         }
