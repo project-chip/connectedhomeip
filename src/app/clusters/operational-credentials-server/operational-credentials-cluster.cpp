@@ -881,7 +881,7 @@ exit:
         ChipLogError(Zcl, "OpCreds: Failed RemoveFabric due to internal error (err = %" CHIP_ERROR_FORMAT ")", err.Format());
         return err;
     }
-    
+
     ChipLogDetail(Zcl, "OpCreds: RemoveFabric successful");
     SendNOCResponse(commandObj, commandPath, NodeOperationalCertStatusEnum::kOk, fabricBeingRemoved, CharSpan());
 
