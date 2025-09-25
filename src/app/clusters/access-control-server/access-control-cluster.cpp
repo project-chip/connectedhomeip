@@ -193,9 +193,9 @@ CHIP_ERROR ReadExtension(AttributeValueEncoder & aEncoder)
         return CHIP_NO_ERROR;
     });
 }
-CHIP_ERROR LogExtensionChangedEvent(const Clusters::AccessControl::Structs::AccessControlExtensionStruct::Type & item,
+std::optional<EventNumber> LogExtensionChangedEvent(const Clusters::AccessControl::Structs::AccessControlExtensionStruct::Type & item,
                                     const Access::SubjectDescriptor & subjectDescriptor,
-                                    Clusters::AccessControl::ChangeTypeEnum changeType)
+                                    Clusters::AccessControl::ChangeTypeEnum changeType, ServerClusterContext *context)
 {
     ExtensionEvent event{ .changeType = changeType, .fabricIndex = subjectDescriptor.fabricIndex };
 
@@ -210,14 +210,7 @@ CHIP_ERROR LogExtensionChangedEvent(const Clusters::AccessControl::Structs::Acce
 
     event.latestValue.SetNonNull(item);
 
-    EventNumber eventNumber;
-    CHIP_ERROR err = LogEvent(event, 0, eventNumber);
-    if (CHIP_NO_ERROR != err)
-    {
-        ChipLogError(DataManagement, "AccessControlCluster: log event failed %" CHIP_ERROR_FORMAT, err.Format());
-    }
-
-    return err;
+    return context->interactionContext.eventsGenerator.GenerateEvent(event, 0);
 }
 
 CHIP_ERROR CheckExtensionEntryDataFormat(const ByteSpan & data)
@@ -249,7 +242,7 @@ CHIP_ERROR CheckExtensionEntryDataFormat(const ByteSpan & data)
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR WriteExtension(const ConcreteDataAttributePath & aPath, AttributeValueDecoder & aDecoder)
+CHIP_ERROR WriteExtension(const ConcreteDataAttributePath & aPath, AttributeValueDecoder & aDecoder, ServerClusterContext *context)
 {
     auto & storage = Server::GetInstance().GetPersistentStorage();
 
@@ -279,8 +272,9 @@ CHIP_ERROR WriteExtension(const ConcreteDataAttributePath & aPath, AttributeValu
                 .data        = ByteSpan(buffer, size),
                 .fabricIndex = accessingFabricIndex,
             };
-            ReturnErrorOnFailure(
-                LogExtensionChangedEvent(item, aDecoder.GetSubjectDescriptor(), Clusters::AccessControl::ChangeTypeEnum::kRemoved));
+            if(LogExtensionChangedEvent(item, aDecoder.GetSubjectDescriptor(), Clusters::AccessControl::ChangeTypeEnum::kRemoved, context) == std::nullopt) {
+                return CHIP_ERROR_INTERNAL;
+            }
         }
         else if (count == 1)
         {
@@ -300,10 +294,12 @@ CHIP_ERROR WriteExtension(const ConcreteDataAttributePath & aPath, AttributeValu
             ReturnErrorOnFailure(
                 storage.SyncSetKeyValue(DefaultStorageKeyAllocator::AccessControlExtensionEntry(accessingFabricIndex).KeyName(),
                                         item.data.data(), static_cast<uint16_t>(item.data.size())));
-            ReturnErrorOnFailure(LogExtensionChangedEvent(item, aDecoder.GetSubjectDescriptor(),
+            if (LogExtensionChangedEvent(item, aDecoder.GetSubjectDescriptor(),
                                                           errStorage == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND
                                                               ? Clusters::AccessControl::ChangeTypeEnum::kAdded
-                                                              : Clusters::AccessControl::ChangeTypeEnum::kChanged));
+                                                              : Clusters::AccessControl::ChangeTypeEnum::kChanged, context) == std::nullopt) {
+                return CHIP_ERROR_INTERNAL;
+            }
         }
         else
         {
@@ -323,8 +319,9 @@ CHIP_ERROR WriteExtension(const ConcreteDataAttributePath & aPath, AttributeValu
         ReturnErrorOnFailure(
             storage.SyncSetKeyValue(DefaultStorageKeyAllocator::AccessControlExtensionEntry(accessingFabricIndex).KeyName(),
                                     item.data.data(), static_cast<uint16_t>(item.data.size())));
-        ReturnErrorOnFailure(
-            LogExtensionChangedEvent(item, aDecoder.GetSubjectDescriptor(), Clusters::AccessControl::ChangeTypeEnum::kAdded));
+        if(LogExtensionChangedEvent(item, aDecoder.GetSubjectDescriptor(), Clusters::AccessControl::ChangeTypeEnum::kAdded, context) == std::nullopt) {
+            return CHIP_ERROR_INTERNAL;
+        }
     }
     else
     {
@@ -420,6 +417,7 @@ CHIP_ERROR AccessControlCluster::Startup(ServerClusterContext & context)
 {
 
     ChipLogProgress(DataManagement, "AccessControlCluster: initializing");
+    ReturnErrorOnFailure(DefaultServerCluster::Startup(context));
 
     GetAccessControl().AddEntryListener(*this);
 
@@ -512,7 +510,7 @@ DataModel::ActionReturnStatus AccessControlCluster::WriteAttribute(const DataMod
 #if CHIP_CONFIG_ENABLE_ACL_EXTENSIONS
     case Extension::Id: {
         return NotifyAttributeChangedIfSuccess(request.path.mAttributeId,
-                                               ChipErrorToImErrorMap(WriteExtension(request.path, decoder)));
+                                               ChipErrorToImErrorMap(WriteExtension(request.path, decoder, mContext)));
     }
 #endif
     default:
@@ -587,6 +585,13 @@ CHIP_ERROR AccessControlCluster::GeneratedCommands(const ConcreteClusterPath & p
     return CHIP_NO_ERROR;
 #endif
 }
+
+CHIP_ERROR AccessControlCluster::EventInfo(const ConcreteEventPath & path, DataModel::EventEntry & eventInfo) 
+{
+    eventInfo.readPrivilege = Access::Privilege::kAdminister;
+    return CHIP_NO_ERROR;
+}
+
 
 #if CHIP_CONFIG_USE_ACCESS_RESTRICTIONS
 std::optional<DataModel::ActionReturnStatus> AccessControlCluster::HandleReviewFabricRestrictions(
@@ -694,20 +699,16 @@ void AccessControlCluster::OnEntryChanged(const chip::Access::SubjectDescriptor 
         event.adminPasscodeID.SetNonNull(PAKEKeyIdFromNodeId(subjectDescriptor->subject));
     }
 
-    EventNumber eventNumber;
-
     if (entry != nullptr)
     {
         // NOTE: don't destroy encodable entry before staging entry is used!
         AclStorage::EncodableEntry encodableEntry(*entry);
         SuccessOrExit(err = encodableEntry.Stage());
         event.latestValue.SetNonNull(encodableEntry.GetStagingEntry());
-        SuccessOrExit(err = LogEvent(event, 0, eventNumber));
     }
-    else
-    {
-        SuccessOrExit(err = LogEvent(event, 0, eventNumber));
-    }
+
+    VerifyOrReturn(mContext != nullptr);
+    mContext->interactionContext.eventsGenerator.GenerateEvent(event, 0);
 
     return;
 
@@ -736,12 +737,10 @@ void AccessControlCluster::OnFabricRestrictionReviewUpdate(FabricIndex fabricInd
     event.ARLRequestFlowUrl = arlRequestFlowUrl;
 
     EventNumber eventNumber;
-    SuccessOrExit(err = LogEvent(event, kRootEndpointId, eventNumber));
+    mContext->interactionContext.eventsGenerator.GenerateEvent(event, kRootEndpointId);
 
     return;
 
-exit:
-    ChipLogError(DataManagement, "AccessControlCluster: review event failed: %" CHIP_ERROR_FORMAT, err.Format());
 }
 #endif
 
