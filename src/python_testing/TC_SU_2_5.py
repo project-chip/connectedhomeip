@@ -45,7 +45,7 @@
 import asyncio
 import logging
 from datetime import datetime
-from os import environ, getcwd
+from os import environ, getcwd, path
 from signal import SIGTERM
 from subprocess import run
 from time import sleep
@@ -70,6 +70,21 @@ class TC_SU_2_5(MatterBaseTest):
 
     current_provider_app_proc: Union[OTAProviderSubprocess, None] = None
     current_requestor_app_proc: Union[OTAProviderSubprocess, None] = None
+
+    def _get_downloaded_ota_image_info(self, ota_path='/tmp/test.bin') -> dict:
+        ota_image_info = {
+            "path": ota_path,
+            "exists": False,
+            "size": 0,
+        }
+        try:
+            ota_image_info['size'] = path.getsize(ota_path)
+            ota_image_info['exists'] = True
+        except OSError as e:
+            logger.info(f"OTA IMAGE at {ota_path} does not exists")
+            return ota_image_info
+
+        return ota_image_info
 
     async def _announce_ota_provider(self, controller, provider_node_id,  requestor_node_id, reason: Clusters.OtaSoftwareUpdateRequestor.Enums.AnnouncementReasonEnum = Clusters.OtaSoftwareUpdateRequestor.Enums.AnnouncementReasonEnum.kUpdateAvailable):
         cmd_announce_ota_provider = Clusters.OtaSoftwareUpdateRequestor.Commands.AnnounceOTAProvider(
@@ -521,6 +536,15 @@ class TC_SU_2_5(MatterBaseTest):
         logger.info(f"Event report for Downloading : {event_report}")
         asserts.assert_equal(event_report.newState, Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kDownloading)
 
+        # Wait some time to check if is downloading
+        await asyncio.sleep(5)
+        # Verify the default download path and the file size
+        # Read file for /tmp/test.bin should exists and greater than 0
+        ota_file_data = self._get_downloaded_ota_image_info()
+        logger.info(f"Downloaded ota image data {str(ota_file_data)}")
+        asserts.assert_equal(True, ota_file_data['exists'], f"File is not bein downloaded  at {ota_file_data['path']}")
+        asserts.assert_greater(ota_file_data['size'], 0, f"Downloaded file is still at 0")
+
         # Applying
         event_report = event_state_transition.wait_for_event_report(
             Clusters.OtaSoftwareUpdateRequestor.Events.StateTransition, timeout_sec=60*6)
@@ -541,6 +565,10 @@ class TC_SU_2_5(MatterBaseTest):
             Clusters.OtaSoftwareUpdateRequestor, Clusters.OtaSoftwareUpdateRequestor.Attributes.UpdateState, controller, requestor_node_id, 0)
         asserts.assert_equal(update_state, Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kIdle,
                              "Update state is not idle")
+        ota_file_data = self._get_downloaded_ota_image_info()
+        logger.info(f"Downloaded ota image data {str(ota_file_data)}")
+        asserts.assert_equal(ota_file_data['exists'], False, f"Downloaded file is still present {ota_file_data['path']}")
+        asserts.assert_equal(ota_file_data['size'], 0, f"File size is greater than 0")
         update_state_progress = await self.read_single_attribute_check_success(
             Clusters.OtaSoftwareUpdateRequestor, Clusters.OtaSoftwareUpdateRequestor.Attributes.UpdateStateProgress, controller, requestor_node_id, 0)
         asserts.assert_equal(update_state_progress, NullValue, "Progress is not Null")
