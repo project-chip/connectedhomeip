@@ -279,7 +279,6 @@ TrustVerificationError JCMCommissionee::ParseCommissionerAdminInfo()
 
     // Fetch root public key
     Crypto::P256PublicKey rootPubKey;
-    CHIP_ERROR err = fabricInfo->FetchRootPubkey(rootPubKey);
     if (fabricInfo->FetchRootPubkey(rootPubKey) != CHIP_NO_ERROR)
     {
         ChipLogError(Controller, "JCM: Failed to fetch fabric root key");
@@ -301,20 +300,17 @@ TrustVerificationError JCMCommissionee::ParseCommissionerAdminInfo()
     uint8_t nocBuf[Credentials::kMaxCHIPCertLength];
     MutableByteSpan nocSpan{ nocBuf };
 
-    err = fabricTable.FetchRootCert(fabricIndex, rcacSpan);
-    if (err != CHIP_NO_ERROR)
+    if (fabricTable.FetchRootCert(fabricIndex, rcacSpan) != CHIP_NO_ERROR)
     {
         ChipLogError(Controller, "JCM: Failed to fetch commissioner root cert");
         return TrustVerificationError::kVendorIdVerificationFailed;
     }
-    err = fabricTable.FetchICACert(fabricIndex, icacSpan);
-    if (err != CHIP_NO_ERROR)
+    if (fabricTable.FetchICACert(fabricIndex, icacSpan) != CHIP_NO_ERROR)
     {
         ChipLogError(Controller, "JCM: Failed to fetch commissioner ICAC");
         return TrustVerificationError::kVendorIdVerificationFailed;
     }
-    err = fabricTable.FetchNOCCert(fabricIndex, nocSpan);
-    if (err != CHIP_NO_ERROR)
+    if (fabricTable.FetchNOCCert(fabricIndex, nocSpan) != CHIP_NO_ERROR)
     {
         ChipLogError(Controller, "JCM: Failed to fetch commissioner NOC");
         return TrustVerificationError::kVendorIdVerificationFailed;
