@@ -44,11 +44,11 @@
 
 import asyncio
 import logging
-from datetime import datetime
 from os import environ, getcwd, path
 from signal import SIGTERM
 from subprocess import run
 from time import sleep
+from TC_SUBase import SoftwareUpdateBaseTest
 
 from mobly import asserts
 from typing import Union
@@ -57,7 +57,6 @@ import matter.clusters as Clusters
 from matter import ChipDeviceCtrl
 from matter.clusters.Types import NullValue
 from matter.interaction_model import Status
-from matter.testing.apps import OtaImagePath, OTAProviderSubprocess
 from matter.testing.event_attribute_reporting import EventSubscriptionHandler
 from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 
@@ -65,125 +64,8 @@ from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_b
 logger = logging.getLogger(__name__)
 
 
-class TC_SU_2_5(MatterBaseTest):
+class TC_SU_2_5(SoftwareUpdateBaseTest):
     "This test case verifies that the DUT behaves according to the spec when it is applying the software update."
-
-    current_provider_app_proc: Union[OTAProviderSubprocess, None] = None
-    current_requestor_app_proc: Union[OTAProviderSubprocess, None] = None
-
-    def _get_downloaded_ota_image_info(self, ota_path='/tmp/test.bin') -> dict:
-        ota_image_info = {
-            "path": ota_path,
-            "exists": False,
-            "size": 0,
-        }
-        try:
-            ota_image_info['size'] = path.getsize(ota_path)
-            ota_image_info['exists'] = True
-        except OSError as e:
-            logger.info(f"OTA IMAGE at {ota_path} does not exists")
-            return ota_image_info
-
-        return ota_image_info
-
-    async def _announce_ota_provider(self, controller, provider_node_id,  requestor_node_id, reason: Clusters.OtaSoftwareUpdateRequestor.Enums.AnnouncementReasonEnum = Clusters.OtaSoftwareUpdateRequestor.Enums.AnnouncementReasonEnum.kUpdateAvailable):
-        cmd_announce_ota_provider = Clusters.OtaSoftwareUpdateRequestor.Commands.AnnounceOTAProvider(
-            providerNodeID=provider_node_id,
-            vendorID=0xFFF1,
-            announcementReason=reason,
-            metadataForNode=None,
-            endpoint=0
-        )
-        logger.info("Sending AnnounceOTA Provider Command")
-        cmd_resp = await self.send_single_cmd(
-            cmd=cmd_announce_ota_provider,
-            dev_ctrl=controller,
-            node_id=requestor_node_id,
-            endpoint=0,
-        )
-        logger.info(f"Announce command sent {cmd_resp}")
-        return cmd_resp
-
-    def _launch_provider_app(self, version: int = 2, extra_args: list = [], log_file: str = "/tmp/provider.log"):
-        logger.info(f"LAUNCHING PROVIDER APP WITH VERSION {version}")
-        # Image to launch
-        ota_app = ""
-        if environ.get("OTA_PROVIDER_APP") is not None:
-            ota_app = environ.get("OTA_PROVIDER_APP")
-        else:
-            ota_app = f"{getcwd()}/out/debug/chip-ota-provider-app"
-
-        # Ota image
-        ota_image = ""
-        if environ.get(f"SU_OTA_REQUESTOR_V{version}") is not None:
-            ota_image = environ.get(f"SU_OTA_REQUESTOR_V{version}")
-        else:
-            ota_image = f"{getcwd()}/chip-ota-requestor-app_v{version}.min.ota"
-
-        ota_image_path = OtaImagePath(path=ota_image)
-        now = datetime.now()
-        ts = int(now.timestamp())
-        provider_log = f'/tmp/provider_{ts}.log'
-        logger.info(f"WRITING LOGS AT : {provider_log}")
-        proc = OTAProviderSubprocess(
-            ota_app,
-            storage_dir='/tmp',
-            port=5541,
-            discriminator=321,
-            passcode=2321,
-            ota_source=ota_image_path,
-            extra_args=extra_args,
-            log_file=provider_log)
-        proc.start(
-            expected_output="Server initialization complete",
-            timeout=10)
-
-        self.current_provider_app_proc = proc
-        logger.info(f"Provider stareted with  {self.current_provider_app_proc.get_pid()}")
-
-    async def _write_ota_providers(self, controller, provider_node_id, endpoint: int = 0):
-
-        current_otap_info = await self.read_single_attribute_check_success(
-            dev_ctrl=controller,
-            cluster=Clusters.OtaSoftwareUpdateRequestor,
-            attribute=Clusters.OtaSoftwareUpdateRequestor.Attributes.DefaultOTAProviders
-        )
-        logger.info(f"OTA Providers: {current_otap_info}")
-
-        # Create Provider Location into Requestor
-        provider_location_struct = Clusters.OtaSoftwareUpdateRequestor.Structs.ProviderLocation(
-            providerNodeID=provider_node_id,
-            endpoint=endpoint,
-            fabricIndex=controller.fabricId
-        )
-
-        # Create the OTA Provider Attribute
-        ota_providers_attr = Clusters.OtaSoftwareUpdateRequestor.Attributes.DefaultOTAProviders(value=[provider_location_struct])
-
-        # Write the Attribute
-        resp = await controller.WriteAttribute(
-            attributes=[(endpoint, ota_providers_attr)],
-            nodeid=self.dut_node_id,
-        )
-        asserts.assert_equal(resp[0].Status, Status.Success, "Failed to write Default OTA Providers Attribute")
-
-        # Read Updated OTAProviders
-        after_otap_info = await self.read_single_attribute_check_success(
-            dev_ctrl=controller,
-            cluster=Clusters.OtaSoftwareUpdateRequestor,
-            attribute=Clusters.OtaSoftwareUpdateRequestor.Attributes.DefaultOTAProviders
-        )
-        logger.info(f"OTA Providers List: {after_otap_info}")
-
-    async def _verify_version_applied_basic_information(self, controller, node_id: int, target_version):
-
-        basicinfo_softwareversion = await self.read_single_attribute_check_success(
-            dev_ctrl=controller,
-            cluster=Clusters.BasicInformation,
-            attribute=Clusters.BasicInformation.Attributes.SoftwareVersion,
-            node_id=node_id)
-        asserts.assert_equal(basicinfo_softwareversion, target_version,
-                             f"Version from basic info cluster is not {target_version}, current cluster version is {basicinfo_softwareversion}")
 
     def desc_TC_SU_2_5(self) -> str:
         return " [TC-SU-2.5] Handling Different ApplyUpdateResponse Scenarios on Requestor"
@@ -243,17 +125,13 @@ class TC_SU_2_5(MatterBaseTest):
         }
         self.step(1)
         expected_software_version = 2
-        self._launch_provider_app(extra_args=['--applyUpdateAction', 'proceed', '--delayedApplyActionTimeSec', '0'])
+        self.launch_provider_app(extra_args=['--applyUpdateAction', 'proceed', '--delayedApplyActionTimeSec', '0'])
         await controller.CommissionOnNetwork(
             nodeId=provider_data['node_id'],
             setupPinCode=provider_data['setup_pincode'],
             filterType=ChipDeviceCtrl.DiscoveryFilterType.LONG_DISCRIMINATOR,
             filter=provider_data['discriminator']
         )
-
-        await self.current_provider_app_proc.create_acl_entry(dev_ctrl=controller, provider_node_id=provider_data['node_id'], requestor_node_id=requestor_node_id)
-        await self._write_ota_providers(controller=controller, provider_node_id=provider_data['node_id'], endpoint=0)
-        await self._announce_ota_provider(controller, provider_data['node_id'], requestor_node_id)
 
         basicinformation_handler = EventSubscriptionHandler(
             expected_cluster=Clusters.BasicInformation, expected_event_id=Clusters.BasicInformation.Events.ShutDown.event_id)
@@ -262,6 +140,15 @@ class TC_SU_2_5(MatterBaseTest):
         event_state_transition = EventSubscriptionHandler(expected_cluster=Clusters.OtaSoftwareUpdateRequestor,
                                                           expected_event_id=Clusters.OtaSoftwareUpdateRequestor.Events.StateTransition.event_id)
         await event_state_transition.start(controller, requestor_node_id, endpoint=0, min_interval_sec=0, max_interval_sec=6000)
+
+        await self.current_provider_app_proc.create_acl_entry(dev_ctrl=controller, provider_node_id=provider_data['node_id'], requestor_node_id=requestor_node_id)
+        await self.write_ota_providers(controller=controller, provider_node_id=provider_data['node_id'], endpoint=0)
+        await self.announce_ota_provider(controller, provider_data['node_id'], requestor_node_id)
+
+        # wait for Download event this means updating has started
+        event_report = event_state_transition.wait_for_event_report(
+            Clusters.OtaSoftwareUpdateRequestor.Events.StateTransition, timeout_sec=30)
+        logger.info(f"Event report for Querying : {event_report}")
 
         # wait for Download event this means updating has started
         event_report = event_state_transition.wait_for_event_report(
@@ -281,7 +168,7 @@ class TC_SU_2_5(MatterBaseTest):
         # Just wait for the device to StartUp after ShutDown
         await asyncio.sleep(5)
         # Verify software version after StartUp
-        self._verify_version_applied_basic_information(
+        self.verify_version_applied_basic_information(
             controller=controller, node_id=requestor_node_id, target_version=expected_software_version)
 
         # Verify on te OTA-P Logs  and confirm there is no other ApplyUpdateRequest form the DUT
@@ -295,19 +182,15 @@ class TC_SU_2_5(MatterBaseTest):
 
         self.step(2)
         expected_software_version = 3
-        delayed_apply_action_time = 10
-        self._launch_provider_app(extra_args=['--applyUpdateAction', 'proceed',
-                                  '--delayedApplyActionTimeSec', str(delayed_apply_action_time)], version=expected_software_version)
+        delayed_apply_action_time = 60*3
+        self.launch_provider_app(extra_args=['--applyUpdateAction', 'proceed',
+                                             '--delayedApplyActionTimeSec', str(delayed_apply_action_time)], version=expected_software_version)
         await controller.CommissionOnNetwork(
             nodeId=provider_data['node_id'],
             setupPinCode=provider_data['setup_pincode'],
             filterType=ChipDeviceCtrl.DiscoveryFilterType.LONG_DISCRIMINATOR,
             filter=provider_data['discriminator']
         )
-
-        await self.current_provider_app_proc.create_acl_entry(dev_ctrl=controller, provider_node_id=provider_data['node_id'], requestor_node_id=requestor_node_id)
-        await self._write_ota_providers(controller=controller, provider_node_id=provider_data['node_id'], endpoint=0)
-        await self._announce_ota_provider(controller, provider_data['node_id'], requestor_node_id)
 
         event_state_transition = EventSubscriptionHandler(expected_cluster=Clusters.OtaSoftwareUpdateRequestor,
                                                           expected_event_id=Clusters.OtaSoftwareUpdateRequestor.Events.StateTransition.event_id)
@@ -316,18 +199,22 @@ class TC_SU_2_5(MatterBaseTest):
             expected_cluster=Clusters.BasicInformation, expected_event_id=Clusters.BasicInformation.Events.ShutDown.event_id)
         await basicinformation_handler.start(controller, requestor_node_id, endpoint=0, min_interval_sec=0, max_interval_sec=6000)
 
-        # Report of failed and waiting on Idle
-        # event_report = event_state_transition.wait_for_event_report(
-        #     Clusters.OtaSoftwareUpdateRequestor.Events.StateTransition, timeout_sec=60)
-        # logger.info(f"Event report for Idle : {event_report}")
+        await self.current_provider_app_proc.create_acl_entry(dev_ctrl=controller, provider_node_id=provider_data['node_id'], requestor_node_id=requestor_node_id)
+        await self.write_ota_providers(controller=controller, provider_node_id=provider_data['node_id'], endpoint=0)
+        await self.announce_ota_provider(controller, provider_data['node_id'], requestor_node_id)
 
-        # event_report = event_state_transition.wait_for_event_report(
-        #     Clusters.OtaSoftwareUpdateRequestor.Events.StateTransition, timeout_sec=60)
-        # logger.info(f"Event report for Query : {event_report}")
+        # Report of failed and waiting on Idle
+        event_report = event_state_transition.wait_for_event_report(
+            Clusters.OtaSoftwareUpdateRequestor.Events.StateTransition, timeout_sec=30)
+        logger.info(f"Event report for Idle : {event_report}")
+
+        event_report = event_state_transition.wait_for_event_report(
+            Clusters.OtaSoftwareUpdateRequestor.Events.StateTransition, timeout_sec=30)
+        logger.info(f"Event report for Query : {event_report}")
 
         # Downloading
         event_report = event_state_transition.wait_for_event_report(
-            Clusters.OtaSoftwareUpdateRequestor.Events.StateTransition, timeout_sec=60)
+            Clusters.OtaSoftwareUpdateRequestor.Events.StateTransition, timeout_sec=30)
         logger.info(f"Event report for Downloading : {event_report}")
 
         update_state_prev = await self.read_single_attribute_check_success(
@@ -366,7 +253,7 @@ class TC_SU_2_5(MatterBaseTest):
         asserts.assert_equal(update_state_after, Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kIdle,
                              "UpdateState is not Idle")
 
-        await self._verify_version_applied_basic_information(
+        await self.verify_version_applied_basic_information(
             controller=controller, node_id=requestor_node_id, target_version=expected_software_version)
 
         self._terminate_provider_process()
@@ -375,8 +262,8 @@ class TC_SU_2_5(MatterBaseTest):
         self.step(3)
         expected_software_version = 4
         delayed_apply_action_time = 60
-        self._launch_provider_app(extra_args=['--applyUpdateAction', 'awaitNextAction',
-                                  '--delayedApplyActionTimeSec', str(delayed_apply_action_time)], version=expected_software_version)
+        self.launch_provider_app(extra_args=['--applyUpdateAction', 'awaitNextAction',
+                                             '--delayedApplyActionTimeSec', str(delayed_apply_action_time)], version=expected_software_version)
         await controller.CommissionOnNetwork(
             nodeId=provider_data['node_id'],
             setupPinCode=provider_data['setup_pincode'],
@@ -396,8 +283,8 @@ class TC_SU_2_5(MatterBaseTest):
         await event_state_transition.start(controller, requestor_node_id, endpoint=0, min_interval_sec=0, max_interval_sec=6000)
 
         await self.current_provider_app_proc.create_acl_entry(dev_ctrl=controller, provider_node_id=provider_data['node_id'], requestor_node_id=requestor_node_id)
-        await self._write_ota_providers(controller=controller, provider_node_id=provider_data['node_id'], endpoint=0)
-        await self._announce_ota_provider(controller, provider_data['node_id'], requestor_node_id)
+        await self.write_ota_providers(controller=controller, provider_node_id=provider_data['node_id'], endpoint=0)
+        await self.announce_ota_provider(controller, provider_data['node_id'], requestor_node_id)
 
         event_report = event_state_transition.wait_for_event_report(
             Clusters.OtaSoftwareUpdateRequestor.Events.StateTransition, timeout_sec=60)
@@ -432,7 +319,7 @@ class TC_SU_2_5(MatterBaseTest):
         # In the last second verify no update has taken place
         logger.info("Waitiing 1 minute a 59 seconds (Almost 2 minutes defined in the spec)")
         await asyncio.sleep(119)
-        await self._verify_version_applied_basic_information(controller=controller, node_id=requestor_node_id, target_version=current_sw_version)
+        await self.verify_version_applied_basic_information(controller=controller, node_id=requestor_node_id, target_version=current_sw_version)
 
         # Should be the same version as the start before annouce
         self._terminate_provider_process()
@@ -441,8 +328,8 @@ class TC_SU_2_5(MatterBaseTest):
         self.step(4)
         expected_software_version = 5
         delayed_apply_action_time = 180
-        self._launch_provider_app(extra_args=['--applyUpdateAction', 'awaitNextAction',
-                                  '--delayedApplyActionTimeSec', str(delayed_apply_action_time)], version=expected_software_version)
+        self.launch_provider_app(extra_args=['--applyUpdateAction', 'awaitNextAction',
+                                             '--delayedApplyActionTimeSec', str(delayed_apply_action_time)], version=expected_software_version)
         await controller.CommissionOnNetwork(
             nodeId=provider_data['node_id'],
             setupPinCode=provider_data['setup_pincode'],
@@ -455,8 +342,8 @@ class TC_SU_2_5(MatterBaseTest):
         await event_state_transition.start(controller, requestor_node_id, endpoint=0, min_interval_sec=0, max_interval_sec=6000)
 
         await self.current_provider_app_proc.create_acl_entry(dev_ctrl=controller, provider_node_id=provider_data['node_id'], requestor_node_id=requestor_node_id)
-        await self._write_ota_providers(controller=controller, provider_node_id=provider_data['node_id'], endpoint=0)
-        await self._announce_ota_provider(controller, provider_data['node_id'], requestor_node_id)
+        await self.write_ota_providers(controller=controller, provider_node_id=provider_data['node_id'], endpoint=0)
+        await self.announce_ota_provider(controller, provider_data['node_id'], requestor_node_id)
 
         logger.info("Waiting for Attribute UpdateState events to complete")
         event_report = event_state_transition.wait_for_event_report(
@@ -496,11 +383,11 @@ class TC_SU_2_5(MatterBaseTest):
 
         # Wait device to shutdown and startup and then verify the SW Version
         await asyncio.sleep(5)
-        await self._verify_version_applied_basic_information(controller=controller, node_id=requestor_node_id, target_version=expected_software_version)
+        await self.verify_version_applied_basic_information(controller=controller, node_id=requestor_node_id, target_version=expected_software_version)
 
         self.step(5)
         expected_software_version = 6
-        self._launch_provider_app(extra_args=['--applyUpdateAction', 'discontinue'], version=expected_software_version)
+        self.launch_provider_app(extra_args=['--applyUpdateAction', 'discontinue'], version=expected_software_version)
         await controller.CommissionOnNetwork(
             nodeId=provider_data['node_id'],
             setupPinCode=provider_data['setup_pincode'],
@@ -521,8 +408,8 @@ class TC_SU_2_5(MatterBaseTest):
         await download_event_handler.start(controller, requestor_node_id, endpoint=0, min_interval_sec=0, max_interval_sec=6000)
 
         await self.current_provider_app_proc.create_acl_entry(dev_ctrl=controller, provider_node_id=provider_data['node_id'], requestor_node_id=requestor_node_id)
-        await self._write_ota_providers(controller=controller, provider_node_id=provider_data['node_id'], endpoint=0)
-        await self._announce_ota_provider(controller, provider_data['node_id'], requestor_node_id)
+        await self.write_ota_providers(controller=controller, provider_node_id=provider_data['node_id'], endpoint=0)
+        await self.announce_ota_provider(controller, provider_data['node_id'], requestor_node_id)
 
         # Querying
         event_report = event_state_transition.wait_for_event_report(
@@ -540,7 +427,7 @@ class TC_SU_2_5(MatterBaseTest):
         await asyncio.sleep(5)
         # Verify the default download path and the file size
         # Read file for /tmp/test.bin should exists and greater than 0
-        ota_file_data = self._get_downloaded_ota_image_info()
+        ota_file_data = self.get_downloaded_ota_image_info()
         logger.info(f"Downloaded ota image data {str(ota_file_data)}")
         asserts.assert_equal(True, ota_file_data['exists'], f"File is not bein downloaded  at {ota_file_data['path']}")
         asserts.assert_greater(ota_file_data['size'], 0, f"Downloaded file is still at 0")
@@ -565,7 +452,7 @@ class TC_SU_2_5(MatterBaseTest):
             Clusters.OtaSoftwareUpdateRequestor, Clusters.OtaSoftwareUpdateRequestor.Attributes.UpdateState, controller, requestor_node_id, 0)
         asserts.assert_equal(update_state, Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kIdle,
                              "Update state is not idle")
-        ota_file_data = self._get_downloaded_ota_image_info()
+        ota_file_data = self.get_downloaded_ota_image_info()
         logger.info(f"Downloaded ota image data {str(ota_file_data)}")
         asserts.assert_equal(ota_file_data['exists'], False, f"Downloaded file is still present {ota_file_data['path']}")
         asserts.assert_equal(ota_file_data['size'], 0, f"File size is greater than 0")
@@ -575,7 +462,7 @@ class TC_SU_2_5(MatterBaseTest):
         logger.info(f"Progress is {update_state_progress}")
 
         # Verify version is the same as when it  started
-        await self._verify_version_applied_basic_information(controller, requestor_node_id, current_sw_version)
+        await self.verify_version_applied_basic_information(controller, requestor_node_id, current_sw_version)
 
 
 if __name__ == "__main__":
