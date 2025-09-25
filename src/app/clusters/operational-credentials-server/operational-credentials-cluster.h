@@ -55,15 +55,8 @@ public:
     CHIP_ERROR GeneratedCommands(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<CommandId> & builder) override;
     CHIP_ERROR Attributes(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder) override;
 
-    // Method used to report attributes changes called from the cluster functions.
-    void OperationalCredentialsNotifyAttribute(AttributeId attributeId);
-
-    FabricTable & GetFabricTable();
-    FailSafeContext & GetFailSafeContext();
-    Credentials::DeviceAttestationCredentialsProvider * GetDACProvider();
-    SessionManager & GetSessionManager();
-    DnssdServer & GetDNSSDServer();
-    CommissioningWindowManager & GetCommissioningWindowManager();
+    // Function used to handle event FailSafeTimerExpired
+    static void FailSafeCleanup(const DeviceLayer::ChipDeviceEvent * event, OperationalCredentialsCluster * cluster);
 
     // FabricTable delegate
     void FabricWillBeRemoved(const FabricTable & fabricTable, FabricIndex fabricIndex) override;
@@ -72,7 +65,16 @@ public:
     void OnFabricCommitted(const FabricTable & fabricTable, FabricIndex fabricIndex) override;
 
 private:
+
     const OperationalCredentialsCluster::Context mOpCredsContext;
+
+    FabricTable & GetFabricTable();
+    FailSafeContext & GetFailSafeContext();
+    Credentials::DeviceAttestationCredentialsProvider * GetDACProvider();
+    SessionManager & GetSessionManager();
+    DnssdServer & GetDNSSDServer();
+    CommissioningWindowManager & GetCommissioningWindowManager();
+
 };
 
 } // namespace Clusters

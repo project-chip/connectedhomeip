@@ -1083,7 +1083,18 @@ exit:
     return errorStatus;
 }
 
-void FailSafeCleanup(const chip::DeviceLayer::ChipDeviceEvent * event, OperationalCredentialsCluster * cluster)
+
+void OnPlatformEventHandler(const chip::DeviceLayer::ChipDeviceEvent * event, intptr_t arg)
+{
+    if (event->Type == DeviceLayer::DeviceEventType::kFailSafeTimerExpired)
+    {
+        ChipLogError(Zcl, "OpCreds: Got FailSafeTimerExpired");
+        OperationalCredentialsCluster::FailSafeCleanup(event, reinterpret_cast<OperationalCredentialsCluster *>(arg));
+    }
+}
+} // anonymous namespace
+
+void OperationalCredentialsCluster::FailSafeCleanup(const DeviceLayer::ChipDeviceEvent * event, OperationalCredentialsCluster * cluster)
 {
     VerifyOrDie(cluster != nullptr);
     ChipLogError(Zcl, "OpCreds: Proceeding to FailSafeCleanup on fail-safe expiry!");
@@ -1108,7 +1119,7 @@ void FailSafeCleanup(const chip::DeviceLayer::ChipDeviceEvent * event, Operation
     {
         // Opcreds cluster is always on Endpoint 0.
         // Only `Fabrics` attribute is reported since `NOCs` is not reportable (`C` quality).```
-        cluster->OperationalCredentialsNotifyAttribute(OperationalCredentials::Attributes::Fabrics::Id);
+        cluster->NotifyAttributeChanged(OperationalCredentials::Attributes::Fabrics::Id);
     }
 
     // If an AddNOC or UpdateNOC command has been successfully invoked, terminate all CASE sessions associated with the Fabric
@@ -1140,16 +1151,6 @@ void FailSafeCleanup(const chip::DeviceLayer::ChipDeviceEvent * event, Operation
         cluster->GetDNSSDServer().StartServer();
     }
 }
-
-void OnPlatformEventHandler(const chip::DeviceLayer::ChipDeviceEvent * event, intptr_t arg)
-{
-    if (event->Type == DeviceLayer::DeviceEventType::kFailSafeTimerExpired)
-    {
-        ChipLogError(Zcl, "OpCreds: Got FailSafeTimerExpired");
-        FailSafeCleanup(event, reinterpret_cast<OperationalCredentialsCluster *>(arg));
-    }
-}
-} // anonymous namespace
 
 CHIP_ERROR OperationalCredentialsCluster::Startup(ServerClusterContext & context)
 {
@@ -1326,11 +1327,6 @@ void OperationalCredentialsCluster::OnFabricUpdated(const FabricTable & fabricTa
 {
     NotifyAttributeChanged(OperationalCredentials::Attributes::CommissionedFabrics::Id);
     NotifyAttributeChanged(OperationalCredentials::Attributes::Fabrics::Id);
-}
-
-void OperationalCredentialsCluster::OperationalCredentialsNotifyAttribute(AttributeId attributeId)
-{
-    NotifyAttributeChanged(attributeId);
 }
 
 FabricTable & OperationalCredentialsCluster::GetFabricTable()
