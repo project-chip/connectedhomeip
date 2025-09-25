@@ -130,6 +130,8 @@ class TC_ACL_2_9(MatterBaseTest):
         self.th1 = self.default_controller
         self.discriminator = random.randint(0, 4095)
         self.endpoint = self.get_endpoint()
+        extension_attribute = Clusters.AccessControl.Attributes.Extension
+        ext_attr_enabled = await self.attribute_guard(endpoint=self.endpoint, attribute=extension_attribute)
 
         self.step(2)
         # Create TH2 controller
@@ -212,8 +214,7 @@ class TC_ACL_2_9(MatterBaseTest):
 
         self.step(6)
         # TH2 reads DUT Endpoint 0 AccessControl cluster Extension attribute
-        extension_attribute = Clusters.AccessControl.Attributes.Extension
-        if await self.attribute_guard(endpoint=self.endpoint, attribute=extension_attribute):
+        if ext_attr_enabled:
             await self.read_single_attribute_expect_error(
                 dev_ctrl=self.th2,
                 cluster=Clusters.Objects.AccessControl,
@@ -223,7 +224,7 @@ class TC_ACL_2_9(MatterBaseTest):
             )
 
         self.step(7)
-        if await self.attribute_guard(endpoint=self.endpoint, attribute=extension_attribute):
+        if ext_attr_enabled:
             # TH2 writes DUT Endpoint 0 AccessControl cluster Extension attribute, value is an empty list
             new_extension = []
             result3 = await self.th2.WriteAttribute(
@@ -251,7 +252,7 @@ class TC_ACL_2_9(MatterBaseTest):
         await self.read_event_expect_unsupported_access(Clusters.AccessControl.Events.AccessControlEntryChanged)
 
         self.step(12)
-        if await self.attribute_guard(endpoint=self.endpoint, attribute=extension_attribute):
+        if ext_attr_enabled:
             # TH2 reads DUT Endpoint 0 AccessControl cluster AccessControlExtensionChanged event
             await self.read_event_expect_unsupported_access(Clusters.AccessControl.Events.AccessControlExtensionChanged)
 
@@ -270,7 +271,6 @@ class TC_ACL_2_9(MatterBaseTest):
         # TH1 sends the RemoveFabric command to the DUT with the FabricIndex set to th2_idx
         removeFabricCmd = Clusters.OperationalCredentials.Commands.RemoveFabric(th2_idx)
         await self.th1.SendCommand(nodeid=self.dut_node_id, endpoint=0, payload=removeFabricCmd)
-
 
 if __name__ == "__main__":
     default_matter_test_main()
