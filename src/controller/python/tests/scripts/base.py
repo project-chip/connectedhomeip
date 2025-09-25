@@ -45,8 +45,8 @@ from matter import ChipDeviceCtrl
 from matter.ChipStack import ChipStack
 from matter.crypto import p256keypair
 from matter.exceptions import ChipStackException
-from matter.storage import PersistentStorageJSON
 from matter.setup_payload import SetupPayload
+from matter.storage import PersistentStorageJSON
 from matter.utils import CommissioningBuildingBlocks
 
 DEFAULT_REPL_STORAGE_PATH = '/tmp/repl-storage.json'
