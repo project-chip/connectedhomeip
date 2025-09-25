@@ -22,7 +22,7 @@ from typing import Callable, List, Optional, Union
 
 from cryptography import x509
 from cryptography.hazmat.primitives import hashes, serialization
-from cryptography.hazmat.primitives.asymmetric import ec, rsa, utils
+from cryptography.hazmat.primitives.asymmetric import ec, utils
 from cryptography.x509 import CertificateBuilder, CertificateSigningRequest, random_serial_number
 from cryptography.x509.oid import NameOID
 from ecdsa.curves import curve_by_name
