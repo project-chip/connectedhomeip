@@ -241,9 +241,17 @@ class AndroidBuilder(Builder):
             logging.error("SDK manager not found in any expected location")
             for detail in checked_details:
                 logging.error(f"  {detail}")
+
+            android_home = os.environ["ANDROID_HOME"]
+            possible_fixes = [
+                f"1. Install Android SDK Command Line Tools in {android_home}",
+                f"2. Fix permissions: chmod +x {android_home}/cmdline-tools/*/bin/sdkmanager",
+                f"3. Verify ANDROID_HOME points to correct SDK directory"
+            ]
+
             raise Exception(
-                "SDK manager not found in any expected location. Checked: %s"
-                % "; ".join(checked_details)
+                f"No working SDK manager found. Tried: {len(checked_details)} locations.\n"
+                f"Possible fixes:\n" + "\n".join(possible_fixes)
             )
 
         # In order to accept a license, the licenses folder is updated with the hash of the

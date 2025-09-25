@@ -81,6 +81,8 @@ public:
      */
     EndpointId GetEndpointId() { return AttributeAccessInterface::GetEndpointId().Value(); }
 
+    Tls::CertificateTable & GetCertificateTable() { return mCertificateTable; }
+
 private:
     TlsCertificateManagementDelegate & mDelegate;
     Tls::CertificateTable & mCertificateTable;
@@ -109,7 +111,7 @@ private:
     void HandleRemoveRootCertificate(HandlerContext & ctx,
                                      const TlsCertificateManagement::Commands::RemoveRootCertificate::DecodableType & req);
 
-    void HandleGenerateClientCsr(HandlerContext & ctx, const TlsCertificateManagement::Commands::TLSClientCSR::DecodableType & req);
+    void HandleGenerateClientCsr(HandlerContext & ctx, const TlsCertificateManagement::Commands::ClientCSR::DecodableType & req);
     void
     HandleProvisionClientCertificate(HandlerContext & ctx,
                                      const TlsCertificateManagement::Commands::ProvisionClientCertificate::DecodableType & req);
@@ -138,8 +140,8 @@ public:
     using ClientCertStructType           = TlsCertificateManagement::Structs::TLSClientCertificateDetailStruct::Type;
     using ProvisionRootCertificateType   = TlsCertificateManagement::Commands::ProvisionRootCertificate::DecodableType;
     using ProvisionClientCertificateType = TlsCertificateManagement::Commands::ProvisionClientCertificate::DecodableType;
-    using ClientCsrType                  = TlsCertificateManagement::Commands::TLSClientCSR::DecodableType;
-    using ClientCsrResponseType          = TlsCertificateManagement::Commands::TLSClientCSRResponse::Type;
+    using ClientCsrType                  = TlsCertificateManagement::Commands::ClientCSR::DecodableType;
+    using ClientCsrResponseType          = TlsCertificateManagement::Commands::ClientCSRResponse::Type;
 
     TlsCertificateManagementDelegate() = default;
 
@@ -330,6 +332,8 @@ public:
      */
     virtual Protocols::InteractionModel::Status RemoveClientCert(EndpointId matterEndpoint, FabricIndex fabric,
                                                                  Tls::TLSCAID id) = 0;
+
+    Tls::CertificateTable & GetCertificateTable() { return mTlsCertificateManagementServer->GetCertificateTable(); }
 
 protected:
     friend class TlsCertificateManagementServer;

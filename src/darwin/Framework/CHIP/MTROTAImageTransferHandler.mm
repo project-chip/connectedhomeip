@@ -19,6 +19,7 @@
 #import "MTRDeviceControllerFactory_Internal.h"
 #import "MTRDeviceController_Internal.h"
 #import "MTRError_Internal.h"
+#import "MTRLogging_Internal.h"
 #import "MTRMetricKeys.h"
 #import "MTRMetricsCollector.h"
 #import "MTROTAUnsolicitedBDXMessageHandler.h"
@@ -368,6 +369,20 @@ CHIP_ERROR MTROTAImageTransferHandler::OnBlockQuery(const TransferSession::Outpu
                 }
 
                 if (data == nil) {
+                    MTR_LOG_ERROR("Nil OTA data block when updating " ChipLogFormatScopedNodeId,
+                        ChipLogValueScopedNodeId(strongWrapper.otaImageTransferHandler->mPeer));
+                    NotifyEventHandled(eventType, CHIP_ERROR_INCORRECT_STATE);
+                    return;
+                }
+
+                if (data.length != blockSize.unsignedLongLongValue && !isEOF) {
+                    // "Transfer of OTA Software Update images" in the spec says:
+                    //
+                    // Actual Block Size used over all transports SHALL be the negotiated Maximum
+                    // Block Size for every block except the last one, which may be of any size less
+                    // or equal to the Maximum Block Size (including zero).
+                    MTR_LOG_ERROR("Invalid OTA block size %lu for non-final block when updating " ChipLogFormatScopedNodeId ".  Expected block of size %@",
+                        static_cast<unsigned long>(data.length), ChipLogValueScopedNodeId(strongWrapper.otaImageTransferHandler->mPeer), blockSize);
                     NotifyEventHandled(eventType, CHIP_ERROR_INCORRECT_STATE);
                     return;
                 }

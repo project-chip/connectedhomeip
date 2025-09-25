@@ -282,115 +282,6 @@ Protocols::InteractionModel::Status DispatchServerCommand(CommandHandler * apCom
 
 } // namespace DiagnosticLogs
 
-namespace EthernetNetworkDiagnostics {
-
-Protocols::InteractionModel::Status DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandPath & aCommandPath,
-                                                          TLV::TLVReader & aDataTlv)
-{
-    CHIP_ERROR TLVError = CHIP_NO_ERROR;
-    bool wasHandled     = false;
-    {
-        switch (aCommandPath.mCommandId)
-        {
-        case Commands::ResetCounts::Id: {
-            Commands::ResetCounts::DecodableType commandData;
-            TLVError = DataModel::Decode(aDataTlv, commandData);
-            if (TLVError == CHIP_NO_ERROR)
-            {
-                wasHandled = emberAfEthernetNetworkDiagnosticsClusterResetCountsCallback(apCommandObj, aCommandPath, commandData);
-            }
-            break;
-        }
-        default: {
-            // Unrecognized command ID, error status will apply.
-            ChipLogError(Zcl, "Unknown command " ChipLogFormatMEI " for cluster " ChipLogFormatMEI,
-                         ChipLogValueMEI(aCommandPath.mCommandId), ChipLogValueMEI(aCommandPath.mClusterId));
-            return Protocols::InteractionModel::Status::UnsupportedCommand;
-        }
-        }
-    }
-
-    if (CHIP_NO_ERROR != TLVError || !wasHandled)
-    {
-        ChipLogProgress(Zcl, "Failed to dispatch command, TLVError=%" CHIP_ERROR_FORMAT, TLVError.Format());
-        return Protocols::InteractionModel::Status::InvalidCommand;
-    }
-
-    // We use success as a marker that no special handling is required
-    // This is to avoid having a std::optional which uses slightly more code.
-    return Protocols::InteractionModel::Status::Success;
-}
-
-} // namespace EthernetNetworkDiagnostics
-
-namespace GroupKeyManagement {
-
-Protocols::InteractionModel::Status DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandPath & aCommandPath,
-                                                          TLV::TLVReader & aDataTlv)
-{
-    CHIP_ERROR TLVError = CHIP_NO_ERROR;
-    bool wasHandled     = false;
-    {
-        switch (aCommandPath.mCommandId)
-        {
-        case Commands::KeySetWrite::Id: {
-            Commands::KeySetWrite::DecodableType commandData;
-            TLVError = commandData.Decode(aDataTlv, apCommandObj->GetAccessingFabricIndex());
-            if (TLVError == CHIP_NO_ERROR)
-            {
-                wasHandled = emberAfGroupKeyManagementClusterKeySetWriteCallback(apCommandObj, aCommandPath, commandData);
-            }
-            break;
-        }
-        case Commands::KeySetRead::Id: {
-            Commands::KeySetRead::DecodableType commandData;
-            TLVError = commandData.Decode(aDataTlv, apCommandObj->GetAccessingFabricIndex());
-            if (TLVError == CHIP_NO_ERROR)
-            {
-                wasHandled = emberAfGroupKeyManagementClusterKeySetReadCallback(apCommandObj, aCommandPath, commandData);
-            }
-            break;
-        }
-        case Commands::KeySetRemove::Id: {
-            Commands::KeySetRemove::DecodableType commandData;
-            TLVError = commandData.Decode(aDataTlv, apCommandObj->GetAccessingFabricIndex());
-            if (TLVError == CHIP_NO_ERROR)
-            {
-                wasHandled = emberAfGroupKeyManagementClusterKeySetRemoveCallback(apCommandObj, aCommandPath, commandData);
-            }
-            break;
-        }
-        case Commands::KeySetReadAllIndices::Id: {
-            Commands::KeySetReadAllIndices::DecodableType commandData;
-            TLVError = commandData.Decode(aDataTlv, apCommandObj->GetAccessingFabricIndex());
-            if (TLVError == CHIP_NO_ERROR)
-            {
-                wasHandled = emberAfGroupKeyManagementClusterKeySetReadAllIndicesCallback(apCommandObj, aCommandPath, commandData);
-            }
-            break;
-        }
-        default: {
-            // Unrecognized command ID, error status will apply.
-            ChipLogError(Zcl, "Unknown command " ChipLogFormatMEI " for cluster " ChipLogFormatMEI,
-                         ChipLogValueMEI(aCommandPath.mCommandId), ChipLogValueMEI(aCommandPath.mClusterId));
-            return Protocols::InteractionModel::Status::UnsupportedCommand;
-        }
-        }
-    }
-
-    if (CHIP_NO_ERROR != TLVError || !wasHandled)
-    {
-        ChipLogProgress(Zcl, "Failed to dispatch command, TLVError=%" CHIP_ERROR_FORMAT, TLVError.Format());
-        return Protocols::InteractionModel::Status::InvalidCommand;
-    }
-
-    // We use success as a marker that no special handling is required
-    // This is to avoid having a std::optional which uses slightly more code.
-    return Protocols::InteractionModel::Status::Success;
-}
-
-} // namespace GroupKeyManagement
-
 namespace Groups {
 
 Protocols::InteractionModel::Status DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandPath & aCommandPath,
@@ -920,12 +811,6 @@ void DispatchSingleClusterCommand(const ConcreteCommandPath & aCommandPath, TLV:
         break;
     case Clusters::DiagnosticLogs::Id:
         errorStatus = Clusters::DiagnosticLogs::DispatchServerCommand(apCommandObj, aCommandPath, aReader);
-        break;
-    case Clusters::EthernetNetworkDiagnostics::Id:
-        errorStatus = Clusters::EthernetNetworkDiagnostics::DispatchServerCommand(apCommandObj, aCommandPath, aReader);
-        break;
-    case Clusters::GroupKeyManagement::Id:
-        errorStatus = Clusters::GroupKeyManagement::DispatchServerCommand(apCommandObj, aCommandPath, aReader);
         break;
     case Clusters::Groups::Id:
         errorStatus = Clusters::Groups::DispatchServerCommand(apCommandObj, aCommandPath, aReader);

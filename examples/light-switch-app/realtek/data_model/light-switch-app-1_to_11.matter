@@ -245,8 +245,8 @@ enum ThreeLevelAutoEnum : enum8 {
 }
 
 enum WebRTCEndReasonEnum : enum8 {
-  kIceFailed = 0;
-  kIceTimeout = 1;
+  kICEFailed = 0;
+  kICETimeout = 1;
   kUserHangup = 2;
   kUserBusy = 3;
   kReplaced = 4;
@@ -256,7 +256,8 @@ enum WebRTCEndReasonEnum : enum8 {
   kOutOfResources = 8;
   kMediaTimeout = 9;
   kLowPower = 10;
-  kUnknownReason = 11;
+  kPrivacyMode = 11;
+  kUnknownReason = 12;
 }
 
 bitmap TestGlobalBitmap : bitmap32 {
@@ -510,9 +511,9 @@ cluster OnOff = 6 {
   command Toggle(): DefaultSuccess = 2;
   /** The OffWithEffect command allows devices to be turned off using enhanced ways of fading. */
   command OffWithEffect(OffWithEffectRequest): DefaultSuccess = 64;
-  /** The OnWithRecallGlobalScene command allows the recall of the settings when the device was turned off. */
+  /** This command allows the recall of the settings when the device was turned off. */
   command OnWithRecallGlobalScene(): DefaultSuccess = 65;
-  /** The OnWithTimedOff command allows devices to be turned on for a specific duration with a guarded off duration so that SHOULD the device be subsequently switched off, further OnWithTimedOff commands, received during this time, are prevented from turning the devices back on. */
+  /** This command allows devices to be turned on for a specific duration with a guarded off duration so that SHOULD the device be subsequently turned off, further OnWithTimedOff commands, received during this time, are prevented from turning the devices back on. */
   command OnWithTimedOff(OnWithTimedOffRequest): DefaultSuccess = 66;
 }
 
@@ -2538,8 +2539,8 @@ endpoint 0 {
 
   server cluster Binding {
     callback attribute binding;
-    ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 1;
+    callback attribute featureMap;
+    callback attribute clusterRevision;
   }
 
   server cluster AccessControl {
@@ -2902,8 +2903,8 @@ endpoint 1 {
 
   server cluster Binding {
     callback attribute binding;
-    ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 1;
+    callback attribute featureMap;
+    callback attribute clusterRevision;
   }
 }
 endpoint 2 {
@@ -2935,8 +2936,8 @@ endpoint 2 {
 
   server cluster Binding {
     callback attribute binding;
-    ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 1;
+    callback attribute featureMap;
+    callback attribute clusterRevision;
   }
 }
 endpoint 3 {
@@ -2968,8 +2969,8 @@ endpoint 3 {
 
   server cluster Binding {
     callback attribute binding;
-    ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 1;
+    callback attribute featureMap;
+    callback attribute clusterRevision;
   }
 }
 endpoint 4 {
@@ -3001,8 +3002,8 @@ endpoint 4 {
 
   server cluster Binding {
     callback attribute binding;
-    ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 1;
+    callback attribute featureMap;
+    callback attribute clusterRevision;
   }
 }
 endpoint 5 {
@@ -3034,8 +3035,8 @@ endpoint 5 {
 
   server cluster Binding {
     callback attribute binding;
-    ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 1;
+    callback attribute featureMap;
+    callback attribute clusterRevision;
   }
 }
 endpoint 6 {
@@ -3067,8 +3068,8 @@ endpoint 6 {
 
   server cluster Binding {
     callback attribute binding;
-    ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 1;
+    callback attribute featureMap;
+    callback attribute clusterRevision;
   }
 }
 endpoint 7 {
@@ -3100,8 +3101,8 @@ endpoint 7 {
 
   server cluster Binding {
     callback attribute binding;
-    ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 1;
+    callback attribute featureMap;
+    callback attribute clusterRevision;
   }
 }
 endpoint 8 {
@@ -3133,8 +3134,8 @@ endpoint 8 {
 
   server cluster Binding {
     callback attribute binding;
-    ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 1;
+    callback attribute featureMap;
+    callback attribute clusterRevision;
   }
 }
 endpoint 9 {
@@ -3166,8 +3167,8 @@ endpoint 9 {
 
   server cluster Binding {
     callback attribute binding;
-    ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 1;
+    callback attribute featureMap;
+    callback attribute clusterRevision;
   }
 }
 endpoint 10 {
@@ -3239,8 +3240,8 @@ endpoint 11 {
 
   server cluster Binding {
     callback attribute binding;
-    ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 1;
+    callback attribute featureMap;
+    callback attribute clusterRevision;
   }
 }
 endpoint 12 {
@@ -3272,8 +3273,8 @@ endpoint 12 {
 
   server cluster Binding {
     callback attribute binding;
-    ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 1;
+    callback attribute featureMap;
+    callback attribute clusterRevision;
   }
 }
 endpoint 13 {
@@ -3305,8 +3306,8 @@ endpoint 13 {
 
   server cluster Binding {
     callback attribute binding;
-    ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 1;
+    callback attribute featureMap;
+    callback attribute clusterRevision;
   }
 }
 

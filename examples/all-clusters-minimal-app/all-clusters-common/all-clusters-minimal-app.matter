@@ -245,8 +245,8 @@ enum ThreeLevelAutoEnum : enum8 {
 }
 
 enum WebRTCEndReasonEnum : enum8 {
-  kIceFailed = 0;
-  kIceTimeout = 1;
+  kICEFailed = 0;
+  kICETimeout = 1;
   kUserHangup = 2;
   kUserBusy = 3;
   kReplaced = 4;
@@ -256,7 +256,8 @@ enum WebRTCEndReasonEnum : enum8 {
   kOutOfResources = 8;
   kMediaTimeout = 9;
   kLowPower = 10;
-  kUnknownReason = 11;
+  kPrivacyMode = 11;
+  kUnknownReason = 12;
 }
 
 bitmap TestGlobalBitmap : bitmap32 {
@@ -537,9 +538,9 @@ cluster OnOff = 6 {
   command Toggle(): DefaultSuccess = 2;
   /** The OffWithEffect command allows devices to be turned off using enhanced ways of fading. */
   command OffWithEffect(OffWithEffectRequest): DefaultSuccess = 64;
-  /** The OnWithRecallGlobalScene command allows the recall of the settings when the device was turned off. */
+  /** This command allows the recall of the settings when the device was turned off. */
   command OnWithRecallGlobalScene(): DefaultSuccess = 65;
-  /** The OnWithTimedOff command allows devices to be turned on for a specific duration with a guarded off duration so that SHOULD the device be subsequently switched off, further OnWithTimedOff commands, received during this time, are prevented from turning the devices back on. */
+  /** This command allows devices to be turned on for a specific duration with a guarded off duration so that SHOULD the device be subsequently turned off, further OnWithTimedOff commands, received during this time, are prevented from turning the devices back on. */
   command OnWithTimedOff(OnWithTimedOffRequest): DefaultSuccess = 66;
 }
 
@@ -4039,6 +4040,7 @@ cluster Thermostat = 513 {
     kMatterScheduleConfiguration = 0x80;
     kPresets = 0x100;
     kEvents = 0x200;
+    kThermostatSuggestions = 0x400;
   }
 
   bitmap HVACSystemTypeBitmap : bitmap8 {
@@ -4110,6 +4112,7 @@ cluster Thermostat = 513 {
     kVacationMode = 0x10;
     kTimeOfUseCostSavings = 0x20;
     kPreCoolingOrPreHeating = 0x40;
+    kConflictingSuggestions = 0x80;
   }
 
   struct ScheduleTransitionStruct {
@@ -6449,8 +6452,8 @@ endpoint 0 {
 
   server cluster Binding {
     callback attribute binding;
-    ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 1;
+    callback attribute featureMap;
+    callback attribute clusterRevision;
   }
 
   server cluster AccessControl {
@@ -6522,7 +6525,7 @@ endpoint 0 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 1;
+    callback attribute clusterRevision;
   }
 
   server cluster UnitLocalization {
@@ -6667,7 +6670,7 @@ endpoint 0 {
     callback attribute carrierDetect;
     callback attribute timeSinceReset;
     ram      attribute featureMap default = 3;
-    ram      attribute clusterRevision default = 1;
+    callback attribute clusterRevision;
 
     handle command ResetCounts;
   }
@@ -6737,8 +6740,8 @@ endpoint 0 {
 
   server cluster FixedLabel {
     callback attribute labelList;
-    ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 1;
+    callback attribute featureMap;
+    callback attribute clusterRevision;
   }
 
   server cluster UserLabel {
@@ -6846,8 +6849,8 @@ endpoint 1 {
 
   server cluster Binding {
     callback attribute binding;
-    ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 1;
+    callback attribute featureMap;
+    callback attribute clusterRevision;
   }
 
   server cluster Actions {
@@ -6878,8 +6881,8 @@ endpoint 1 {
 
   server cluster FixedLabel {
     callback attribute labelList;
-    ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 1;
+    callback attribute featureMap;
+    callback attribute clusterRevision;
   }
 
   server cluster UserLabel {
@@ -6889,9 +6892,9 @@ endpoint 1 {
   }
 
   server cluster BooleanState {
-    ram      attribute stateValue default = 0;
-    ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 1;
+    callback attribute stateValue;
+    callback attribute featureMap;
+    callback attribute clusterRevision;
   }
 
   server cluster ModeSelect {

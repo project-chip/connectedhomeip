@@ -37,17 +37,18 @@ namespace SecureMessageCodec {
 /**
  * @brief
  *  Attach payload header to the message and encrypt the message buffer using
- *  key from the secure session.
+ *  key from the crypto context.
  *
- * @param session       The secure session context with the peer node
- * @param payloadHeader Reference to the payload header that should be inserted in
- *                      the message
- * @param packetHeader  Reference to the packet header that contains unencrypted
- *                      portion of the message header
- * @param msgBuf        The message buffer that contains the unencrypted message. If
- *                      the operation is successful, this buffer will be mutated to contain
- *                      the encrypted message.
- * @return A CHIP_ERROR value consistent with the result of the encryption operation
+ * @param[in] context         Reference to the crypto context used for encryption, from the secure session.
+ * @param[in] nonce           The nonce to be used for encryption.
+ * @param[in] payloadHeader   Reference to the payload header that should be inserted in
+ *                            the message.
+ * @param[in] packetHeader    Reference to the packet header that contains unencrypted
+ *                            portion of the message header.
+ * @param[in,out] msgBuf      The message buffer that contains the unencrypted message. If
+ *                            the operation is successful, this buffer will be mutated to contain
+ *                            the encrypted message and any trailing MIC generated.
+ * @return A CHIP_ERROR value consistent with the result of the encryption operation.
  */
 CHIP_ERROR Encrypt(const CryptoContext & context, CryptoContext::ConstNonceView nonce, PayloadHeader & payloadHeader,
                    PacketHeader & packetHeader, System::PacketBufferHandle & msgBuf);
@@ -57,14 +58,15 @@ CHIP_ERROR Encrypt(const CryptoContext & context, CryptoContext::ConstNonceView 
  *  Decrypt the message, perform message integrity check, and decode the payload header,
  *  consuming the header from the packet in doing so.
  *
- * @param session       The secure session context with the peer node
- * @param payloadHeader Reference to the payload header that will be recovered from the message
- * @param packetHeader  Reference to the packet header that contains unencrypted
- *                      portion of the message header
- * @param msgBuf        The message buffer that contains the encrypted message. If
- *                      the operation is successful, this buffer will be mutated to contain
- *                      the decrypted message.
- * @return A CHIP_ERROR value consistent with the result of the decryption operation
+ * @param[in] context         Reference to the crypto context used for encryption, from the secure session.
+ * @param[in] nonce           The nonce from the message to be used during decryption.
+ * @param[out] payloadHeader  Reference to the payload header that will be recovered from the message.
+ * @param[in] packetHeader    Reference to the packet header that contains unencrypted
+ *                            portion of the message header.
+ * @param[in,out] msgBuf      The message buffer that contains the encrypted message. If
+ *                            the operation is successful, this buffer will be mutated to contain
+ *                            the decrypted message and any trailing MIC will no longer be present.
+ * @return A CHIP_ERROR value consistent with the result of the decryption operation.
  */
 CHIP_ERROR Decrypt(const CryptoContext & context, CryptoContext::ConstNonceView nonce, PayloadHeader & payloadHeader,
                    const PacketHeader & packetHeader, System::PacketBufferHandle & msgBuf);
