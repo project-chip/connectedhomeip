@@ -32,24 +32,24 @@ under the `ServerDirectories` key.
 
 When more complex logic is needed, Ember clusters use these interfaces.
 
--   `AAI` can be directly translated to the `ReadAttribute` and `WriteAttribute`
+- `AAI` can be directly translated to the `ReadAttribute` and `WriteAttribute`
     methods in your new cluster class.
--   `CHI` can be translated to the `InvokeCommand` method.
+- `CHI` can be translated to the `InvokeCommand` method.
 
 ### Determine ember/zap storage
 
 Ember storage should be moved from `persist/ram/callback` into `ram/callback`:
 
--   if the value loaded from ZAP UI needs to be loaded, use `RAM` and have
+- if the value loaded from ZAP UI needs to be loaded, use `RAM` and have
     `CodegenIntegration.cpp` load the value from ZAP via `Accessors.h`. A common
     example here is `FeatureMap`
 
--   if the value is internal to the cluster or does not need loading, set it as
+- if the value is internal to the cluster or does not need loading, set it as
     `External` by including it in the `attributeAccessInterfaceAttributes` in
     `zcl.json` and `zcl-with-test-extensions.json`. A common example here is
     `ClusterRevision`
 
--   if the value used to be `persist` it is an indication that the cluster
+- if the value used to be `persist` it is an indication that the cluster
     should handle persistence (load in `Startup` and store during writes).
 
 ## Step 2: Design the Code-Driven Implementation
@@ -60,20 +60,20 @@ When converting clusters, optimizing for flash usage is often a priority. For
 this reason, it's common to implement the cluster without separating the logic
 from the implementation class.
 
--   **Recommendation:** Combine logic and data storage into a single
+- **Recommendation:** Combine logic and data storage into a single
     `<Name>Cluster` class that implements the `ServerClusterInterface`.
--   **Trade-off:** This approach prioritizes a smaller flash footprint over the
+- **Trade-off:** This approach prioritizes a smaller flash footprint over the
     modular, more testable layout described in the
     [Writing Clusters](./writing_clusters.md) guide. The combined approach is
     often suitable for simpler clusters or when resource constraints are tight.
 
 You will need to create the following files:
 
--   `src/app/clusters/<name>/<Name>Cluster.h`
--   `src/app/clusters/<name>/<Name>Cluster.cpp`
--   `src/app/clusters/<name>/CodegenIntegration.cpp`
--   `src/app/clusters/<name>/tests/Test<Name>Cluster.cpp`
--   Build files (`BUILD.gn`, `tests/BUILD.gn`,
+- `src/app/clusters/<name>/<Name>Cluster.h`
+- `src/app/clusters/<name>/<Name>Cluster.cpp`
+- `src/app/clusters/<name>/CodegenIntegration.cpp`
+- `src/app/clusters/<name>/tests/Test<Name>Cluster.cpp`
+- Build files (`BUILD.gn`, `tests/BUILD.gn`,
     `app_config_dependent_sources.gni`, `app_config_dependent_sources.cmake`)
 
 ### Attribute and Command Availability
@@ -81,8 +81,8 @@ You will need to create the following files:
 Your new class must accurately report which attributes and commands are
 available based on the feature map and other configuration.
 
--   Store the feature map in your cluster instance.
--   For optional attributes, use a `BitFlags` variable, an
+- Store the feature map in your cluster instance.
+- For optional attributes, use a `BitFlags` variable, an
     `OptionalAttributeSet`, or a `struct` of booleans to track which are
     enabled.
 
@@ -95,19 +95,39 @@ new code-driven class structure.
 
 #### Attribute Storage and Persistence
 
--   Attributes are now member variables of your cluster class.
--   If attributes were configured as `RAM` in `zap` to load defaults, ensure
+- Attributes are now member variables of your cluster class.
+- If attributes were configured as `RAM` in `zap` to load defaults, ensure
     your `CodegenIntegration.cpp` reads these defaults and passes them to your
     cluster's constructor.
--   For persisted attributes, use the `AttributePersistence` helper, which is
+- For persisted attributes, use the `AttributePersistence` helper, which is
     available via the `ServerClusterContext`. Load values in `Startup` and save
     them on writes.
 
 #### Command Handling
 
--   Translate `emberAf...Callback` functions into logic inside your
-    `InvokeCommand` method.
--   The `InvokeCommand` method can return an `ActionReturnStatus` optional. For
+- Translate `CommandHandlerInterface` calls `emberAf...Callback` functions into logic inside your
+    `InvokeCommand` method:
+
+  - ember calls of the form `emberAf<CLUSTER>Cluster<COMMAND>Callback` will be converted to
+      a switch `case <CLUSTER>::Commands::<COMMAND>::Id: ...` implementation
+
+      Example:
+
+      ```cpp
+      // This
+      emberAfAccessControlClusterReviewFabricRestrictionsCallback(...);
+
+      // Becomes this in the `InvokeCommand` implementation:
+      switch (request.path.mCommandId) {
+        // ...
+        case AccessControl::Commands::ReviewFabricRestrictions::Id:
+           // ...
+      }
+      ```
+
+  - Command Handler Interface logic translates directly (same command switches)
+
+- The `InvokeCommand` method can return an `ActionReturnStatus` optional. For
     better readability, prefer returning a status code directly (e.g.,
     `return Status::Success;`) rather than using the command handler to set the
     status, unless you need to return a response with a value or handle the
@@ -115,16 +135,16 @@ new code-driven class structure.
 
 #### Attribute Access
 
--   Translate `AAI` logic into your `ReadAttribute` and `WriteAttribute`
+- Translate `AAI` logic into your `ReadAttribute` and `WriteAttribute`
     methods.
--   **Important:** After successfully writing a new attribute value, you
+- **Important:** After successfully writing a new attribute value, you
     **must** explicitly call a notification function (e.g., via
     `interactionContext->dataModelChangeListener`) to inform the SDK of the
     change. This is required for subscriptions to work correctly.
 
 #### Event Generation
 
--   Replace any calls to `LogEvent` with
+- Replace any calls to `LogEvent` with
     `mContext->interactionContext.eventsGenerator.GenerateEvent`. This makes
     events unit-testable.
 
@@ -172,7 +192,7 @@ data.
 
 ## Step 5: Add Unit Tests
 
--   Create `tests/Test<Name>Cluster.cpp` and add unit tests for your new
+- Create `tests/Test<Name>Cluster.cpp` and add unit tests for your new
     implementation.
--   Ensure you test the cluster's logic with various feature combinations and
+- Ensure you test the cluster's logic with various feature combinations and
     for all supported attributes and commands.
