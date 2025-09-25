@@ -35,7 +35,8 @@
 using DeviceControllerFactory = chip::Controller::DeviceControllerFactory;
 using TestSessionKeystoreImpl = chip::Crypto::DefaultSessionKeystore;
 
-namespace {
+namespace chip {
+namespace Controller {
 
 chip::Credentials::GroupDataProviderImpl sProvider(5, 8);
 chip::TestPersistentStorageDelegate storage;
@@ -264,4 +265,5 @@ TEST_F(TestDeviceControllerFactory, DeviceControllerFactoryMethods_RetainAndRele
     DeviceControllerFactory::GetInstance().Shutdown();
 } // DeviceControllerFactoryMethods_RetainAndRelease
 
+} // namespace
 } // namespace
