@@ -264,6 +264,7 @@
             "CurrentMode",
             "FeatureMap"
         ],
+        "Diagnostic Logs": ["ClusterRevision", "FeatureMap"],
         "Door Lock": [
             "AliroReaderVerificationKey",
             "AliroReaderGroupIdentifier",
@@ -822,6 +823,7 @@
             "CurrentThermostatSuggestion",
             "ThermostatSuggestionNotFollowingReason"
         ],
+        "Time Format Localization": ["ClusterRevision"],
         "Zone Management": [
             "MaxUserDefinedZones",
             "MaxZones",
