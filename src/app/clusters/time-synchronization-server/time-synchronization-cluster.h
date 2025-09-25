@@ -137,6 +137,35 @@ public:
     void OnTimeSyncCompletionFn(TimeSynchronization::TimeSourceEnum timeSource, TimeSynchronization::GranularityEnum granularity);
     void OnFallbackNTPCompletionFn(bool timeSyncSuccessful);
 
+    std::optional<DataModel::ActionReturnStatus> InvokeCommand(const DataModel::InvokeRequest & request,
+                                                               chip::TLV::TLVReader & input_arguments,
+                                                               CommandHandler * handler) override;
+
+    CHIP_ERROR AcceptedCommands(const ConcreteClusterPath & path,
+                                ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder) override;
+
+    CHIP_ERROR GeneratedCommands(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<CommandId> & builder) override;
+
+    std::optional<DataModel::ActionReturnStatus>
+    HandleSetUTCTime(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
+                     const TimeSynchronization::Commands::SetUTCTime::DecodableType & commandData);
+
+    std::optional<DataModel::ActionReturnStatus>
+    HandleSetTrustedTimeSource(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
+                               const TimeSynchronization::Commands::SetTrustedTimeSource::DecodableType & commandData);
+
+    std::optional<DataModel::ActionReturnStatus>
+    HandleSetTimeZone(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
+                      const TimeSynchronization::Commands::SetTimeZone::DecodableType & commandData);
+
+    std::optional<DataModel::ActionReturnStatus>
+    HandleSetDSTOffset(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
+                       const TimeSynchronization::Commands::SetDSTOffset::DecodableType & commandData);
+
+    std::optional<DataModel::ActionReturnStatus>
+    HandleSetDefaultNTP(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
+                        const TimeSynchronization::Commands::SetDefaultNTP::DecodableType & commandData);
+
 private:
     static constexpr size_t kMaxDefaultNTPSize = 128;
     DataModel::Nullable<TimeSynchronization::Structs::TrustedTimeSourceStruct::Type> mTrustedTimeSource;
@@ -182,11 +211,11 @@ private:
     // If unsuccessful, it will emit a TimeFailure event.
     void AttemptToGetFallbackNTPTimeFromDelegate();
 
-    CHIP_ERROR ReadTrustedTimeSource(EndpointId endpoint, AttributeValueEncoder & encoder);
-    CHIP_ERROR ReadDefaultNtp(EndpointId endpoint, AttributeValueEncoder & encoder);
-    CHIP_ERROR ReadTimeZone(EndpointId endpoint, AttributeValueEncoder & encoder);
-    CHIP_ERROR ReadDSTOffset(EndpointId endpoint, AttributeValueEncoder & encoder);
-    CHIP_ERROR ReadLocalTime(EndpointId endpoint, AttributeValueEncoder & encoder);
+    CHIP_ERROR ReadTrustedTimeSource(AttributeValueEncoder & encoder);
+    CHIP_ERROR ReadDefaultNtp(AttributeValueEncoder & encoder);
+    CHIP_ERROR ReadTimeZone(AttributeValueEncoder & encoder);
+    CHIP_ERROR ReadDSTOffset(AttributeValueEncoder & encoder);
+    CHIP_ERROR ReadLocalTime(AttributeValueEncoder & encoder);
 };
 
 } // namespace chip::app::Clusters
