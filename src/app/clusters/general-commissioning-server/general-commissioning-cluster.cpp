@@ -29,6 +29,7 @@
 #include <platform/PlatformManager.h>
 #include <tracing/macros.h>
 #include <transport/SecureSession.h>
+#include <app/reporting/reporting.h>
 
 #if CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
 #include <app/server/TermsAndConditionsManager.h>  //nogncheck
@@ -71,28 +72,6 @@ CHIP_ERROR ReadIfSupported(CHIP_ERROR (ConfigurationManager::*getter)(uint8_t &)
     return aEncoder.Encode(data);
 }
 
-void OnPlatformEventHandler(const DeviceLayer::ChipDeviceEvent * event, intptr_t /* arg */)
-{
-    if (event->Type == DeviceLayer::DeviceEventType::kFailSafeTimerExpired)
-    {
-        // Spec says to reset Breadcrumb attribute to 0.
-        GeneralCommissioningCluster::Instance().SetBreadCrumb(0);
-
-#if CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
-        if (event->FailSafeTimerExpired.updateTermsAndConditionsHasBeenInvoked)
-        {
-            // Clear terms and conditions acceptance on failsafe timer expiration
-            TermsAndConditionsProvider * tcProvider = TermsAndConditionsManager::GetInstance();
-            TermsAndConditionsState initialState, updatedState;
-            VerifyOrReturn(nullptr != tcProvider);
-            VerifyOrReturn(CHIP_NO_ERROR == GetTermsAndConditionsAttributeState(tcProvider, initialState));
-            VerifyOrReturn(CHIP_NO_ERROR == tcProvider->RevertAcceptance());
-            VerifyOrReturn(CHIP_NO_ERROR == GetTermsAndConditionsAttributeState(tcProvider, updatedState));
-            NotifyTermsAndConditionsAttributeChangeIfRequired(initialState, updatedState);
-        }
-#endif // CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
-    }
-}
 
 #if CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
 typedef struct sTermsAndConditionsState
@@ -160,6 +139,30 @@ void NotifyTermsAndConditionsAttributeChangeIfRequired(const TermsAndConditionsS
     }
 }
 #endif // CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
+
+void OnPlatformEventHandler(const DeviceLayer::ChipDeviceEvent * event, intptr_t /* arg */)
+{
+    if (event->Type == DeviceLayer::DeviceEventType::kFailSafeTimerExpired)
+    {
+        // Spec says to reset Breadcrumb attribute to 0.
+        GeneralCommissioningCluster::Instance().SetBreadCrumb(0);
+
+#if CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
+        if (event->FailSafeTimerExpired.updateTermsAndConditionsHasBeenInvoked)
+        {
+            // Clear terms and conditions acceptance on failsafe timer expiration
+            TermsAndConditionsProvider * tcProvider = TermsAndConditionsManager::GetInstance();
+            TermsAndConditionsState initialState, updatedState;
+            VerifyOrReturn(nullptr != tcProvider);
+            VerifyOrReturn(CHIP_NO_ERROR == GetTermsAndConditionsAttributeState(tcProvider, initialState));
+            VerifyOrReturn(CHIP_NO_ERROR == tcProvider->RevertAcceptance());
+            VerifyOrReturn(CHIP_NO_ERROR == GetTermsAndConditionsAttributeState(tcProvider, updatedState));
+            NotifyTermsAndConditionsAttributeChangeIfRequired(initialState, updatedState);
+        }
+#endif // CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
+    }
+}
+
 
 GeneralCommissioningCluster gInstance;
 } // anonymous namespace
@@ -521,8 +524,8 @@ GeneralCommissioningCluster::HandleCommissioningComplete(const DataModel::Invoke
         if (requiredTermsAndConditionsMaybe.HasValue() && !acceptedTermsAndConditionsMaybe.HasValue())
         {
             response.errorCode = CommissioningErrorEnum::kTCAcknowledgementsNotReceived;
-            ctx.mCommandHandler.AddResponse(ctx.mRequestPath, response);
-            return;
+            handler->AddResponse(request.path, response);
+            return std::nullopt;
         }
 
         if (requiredTermsAndConditionsMaybe.HasValue() && acceptedTermsAndConditionsMaybe.HasValue())
@@ -533,15 +536,15 @@ GeneralCommissioningCluster::HandleCommissioningComplete(const DataModel::Invoke
             if (!requiredTermsAndConditions.ValidateVersion(acceptedTermsAndConditions))
             {
                 response.errorCode = CommissioningErrorEnum::kTCMinVersionNotMet;
-                ctx.mCommandHandler.AddResponse(ctx.mRequestPath, response);
-                return;
+                handler->AddResponse(request.path, response);
+                return std::nullopt;
             }
 
             if (!requiredTermsAndConditions.ValidateValue(acceptedTermsAndConditions))
             {
                 response.errorCode = CommissioningErrorEnum::kRequiredTCNotAccepted;
-                ctx.mCommandHandler.AddResponse(ctx.mRequestPath, response);
-                return;
+                handler->AddResponse(request.path, response);
+                return std::nullopt;
             }
         }
 
