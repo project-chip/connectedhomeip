@@ -29,7 +29,7 @@
 #       --passcode 20202021
 #       --trace-to json:${TRACE_TEST_JSON}.json
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
-#       --endpoint 1
+#       --endpoint 0
 # === END CI TEST ARGUMENTS ===
 
 
@@ -102,8 +102,8 @@ class TC_ACL_2_10(MatterBaseTest):
         self.th1 = self.default_controller
         self.discriminator = random.randint(0, 4095)
         self.endpoint = self.get_endpoint()
-        extension_attribute = Clusters.AccessControl.Attributes.Extension
-        ext_attr_enabled = await self.attribute_guard(endpoint=self.endpoint, attribute=extension_attribute)
+        extension_attr = Clusters.AccessControl.Attributes.Extension
+        ext_attr_enabled = await self.attribute_guard(endpoint=self.endpoint, attribute=extension_attr)
 
         self.step(2)
         # Read CurrentFabricIndex for TH1
