@@ -15,13 +15,13 @@
  *    limitations under the License.
  */
 
-#include "CommonDACPrivider.h"
+#include "CommonDACProvider.h"
 #include <platform/realtek/BEE/RTK/RTKDACVendorProvider.h>
 #include <stddef.h>
 
 using namespace chip::DeviceLayer;
 
-static chip::Credentials::DeviceAttestationCredentialsProvider * default_dac_provider_getter(void)
+static chip::Credentials::DeviceAttestationCredentialsProvider * default_dac_provider_getter()
 {
     static RTKDACVendorProvider gRtkDACProvider;
     return &gRtkDACProvider;
@@ -31,13 +31,10 @@ static DacProviderGetterFunc sDacProviderGetter = default_dac_provider_getter;
 
 void RegisterDACProviderGetter(DacProviderGetterFunc getter)
 {
-    if (getter != NULL)
-        sDacProviderGetter = getter;
-    else
-        sDacProviderGetter = default_dac_provider_getter;
+    sDacProviderGetter = (getter != nullptr) ? getter : default_dac_provider_getter;
 }
 
-chip::Credentials::DeviceAttestationCredentialsProvider * GetDACProvider(void)
+chip::Credentials::DeviceAttestationCredentialsProvider * GetDACProvider()
 {
     return sDacProviderGetter();
 }

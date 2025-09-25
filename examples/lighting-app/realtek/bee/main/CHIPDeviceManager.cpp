@@ -28,7 +28,7 @@
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app/clusters/network-commissioning/network-commissioning.h>
 #include <core/ErrorStr.h>
-#include <dac_provider/CommonDACPrivider.h>
+#include <dac_provider/CommonDACProvider.h>
 #include <platform/realtek/BEE/FactoryDataProvider.h>
 #include <stdlib.h>
 #include <support/CHIPMem.h>

@@ -27,7 +27,7 @@
 #include "CHIPDeviceManager.h"
 #include <app/clusters/network-commissioning/network-commissioning.h>
 #include <core/ErrorStr.h>
-#include <dac_provider/CommonDACPrivider.h>
+#include <dac_provider/CommonDACProvider.h>
 #include <platform/realtek/BEE/FactoryDataProvider.h>
 #include <support/CHIPMem.h>
 #include <support/CodeUtils.h>

@@ -19,10 +19,10 @@
 
 #include <credentials/DeviceAttestationCredsProvider.h>
 
-typedef chip::Credentials::DeviceAttestationCredentialsProvider * (*DacProviderGetterFunc)(void);
+typedef chip::Credentials::DeviceAttestationCredentialsProvider * (*DacProviderGetterFunc)();
 
 // Samples can register own implementations.
 void RegisterDACProviderGetter(DacProviderGetterFunc getter);
 
 // General provider getter
-chip::Credentials::DeviceAttestationCredentialsProvider * GetDACProvider(void);
+chip::Credentials::DeviceAttestationCredentialsProvider * GetDACProvider();

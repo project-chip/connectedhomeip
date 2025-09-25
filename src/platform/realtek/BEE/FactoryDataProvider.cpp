@@ -96,7 +96,9 @@ void buf_dump(const char * title, uint8_t * buf, uint32_t data_len)
 }
 #endif
 
-static FactoryData mFactoryData = { 0 };
+namespace {
+FactoryData mFactoryData = { 0 };
+} // namespace
 
 const FactoryData * GetFactoryData()
 {

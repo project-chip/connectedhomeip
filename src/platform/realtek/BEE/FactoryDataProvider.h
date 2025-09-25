@@ -28,7 +28,6 @@ namespace DeviceLayer {
 class FactoryDataProvider : public CommissionableDataProvider, public DeviceInstanceInfoProvider
 {
 public:
-    // ===== Members functions that implement the DeviceAttestationCredentialsProvider
     CHIP_ERROR Init(void);
 
     // ===== Members functions that implement the CommissionableDataProvider
