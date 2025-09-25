@@ -18,6 +18,7 @@
 #include "general-commissioning-cluster.h"
 
 #include <app/AppConfig.h>
+#include <app/reporting/reporting.h>
 #include <app/server-cluster/AttributeListBuilder.h>
 #include <app/server/Server.h>
 #include <clusters/GeneralCommissioning/AttributeIds.h>
@@ -29,7 +30,6 @@
 #include <platform/PlatformManager.h>
 #include <tracing/macros.h>
 #include <transport/SecureSession.h>
-#include <app/reporting/reporting.h>
 
 #if CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
 #include <app/server/TermsAndConditionsManager.h>  //nogncheck
@@ -71,7 +71,6 @@ CHIP_ERROR ReadIfSupported(CHIP_ERROR (ConfigurationManager::*getter)(uint8_t &)
     }
     return aEncoder.Encode(data);
 }
-
 
 #if CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
 typedef struct sTermsAndConditionsState
@@ -162,7 +161,6 @@ void OnPlatformEventHandler(const DeviceLayer::ChipDeviceEvent * event, intptr_t
 #endif // CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
     }
 }
-
 
 GeneralCommissioningCluster gInstance;
 } // anonymous namespace
