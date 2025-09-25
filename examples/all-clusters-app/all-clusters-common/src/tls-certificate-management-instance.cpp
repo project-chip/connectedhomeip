@@ -22,6 +22,7 @@
 #include <clusters/TlsCertificateManagement/Commands.h>
 #include <crypto/CHIPCryptoPAL.h>
 #include <tls-certificate-management-instance.h>
+#include <tls-client-management-instance.h>
 
 using namespace chip;
 using namespace chip::app;
@@ -135,14 +136,14 @@ struct InlineEncodableClientCert : RefEncodableClientCert
     InlineEncodableClientCert() : RefEncodableClientCert(inlineCertificate) {}
 };
 
-static constexpr uint8_t kMaxRootCerts   = 254;
-static constexpr uint8_t kMaxClientCerts = 254;
+static constexpr uint8_t kMaxRootCerts   = kMaxRootCertificatesPerFabric;
+static constexpr uint8_t kMaxClientCerts = kMaxClientCertificatesPerFabric;
 
 CHIP_ERROR FingerprintMatch(const ByteSpan & fingerprint, const ByteSpan & cert, bool & outMatch)
 {
-    std::array<uint8_t, chip::Crypto::kSHA1_Hash_Length> fingerprintPayload = { 0 };
+    std::array<uint8_t, chip::Crypto::kSHA256_Hash_Length> fingerprintPayload = { 0 };
     MutableByteSpan calculatedFingerprint(fingerprintPayload);
-    ReturnErrorOnFailure(Hash_SHA1(cert.data(), cert.size(), fingerprintPayload.data()));
+    ReturnErrorOnFailure(Hash_SHA256(cert.data(), cert.size(), fingerprintPayload.data()));
     outMatch = fingerprint.data_equal(calculatedFingerprint);
     return CHIP_NO_ERROR;
 }
@@ -425,7 +426,7 @@ CHIP_ERROR TlsCertificateManagementCommandDelegate::LookupClientCert(EndpointId 
     return LookupClientCertByFingerprint(matterEndpoint, fabric, calculatedFingerprint, loadedCallback);
 }
 
-Status TlsCertificateManagementCommandDelegate::RemoveClientCert(EndpointId matterEndpoint, FabricIndex fabric, Tls::TLSCAID id)
+Status TlsCertificateManagementCommandDelegate::RemoveClientCert(EndpointId matterEndpoint, FabricIndex fabric, Tls::TLSCCDID id)
 {
     VerifyOrReturnValue(matterEndpoint == EndpointId(1), Status::ConstraintError);
 
@@ -442,9 +443,9 @@ Status TlsCertificateManagementCommandDelegate::RemoveClientCert(EndpointId matt
 
 static CertificateTableImpl gCertificateTableInstance;
 TlsCertificateManagementCommandDelegate TlsCertificateManagementCommandDelegate::instance(gCertificateTableInstance);
-static TlsCertificateManagementServer gTlsCertificateManagementClusterServerInstance =
-    TlsCertificateManagementServer(EndpointId(1), TlsCertificateManagementCommandDelegate::getInstance(), gCertificateTableInstance,
-                                   kMaxRootCerts, kMaxClientCerts);
+static TlsCertificateManagementServer gTlsCertificateManagementClusterServerInstance = TlsCertificateManagementServer(
+    EndpointId(1), TlsCertificateManagementCommandDelegate::GetInstance(), TlsClientManagementCommandDelegate::GetInstance(),
+    gCertificateTableInstance, kMaxRootCerts, kMaxClientCerts);
 
 void emberAfTlsCertificateManagementClusterInitCallback(EndpointId matterEndpoint)
 {

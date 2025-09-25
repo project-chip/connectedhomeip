@@ -42,14 +42,15 @@ public:
      * and called by the interaction model at the appropriate times.
      * @param endpointId The endpoint on which this cluster exists. This must match the zap configuration.
      * @param delegate A reference to the delegate to be used by this server.
+     * @param dependencyChecker A reference to a CertificateDependencyChecker which checks for transitive dependencies
      * @param certificateTable A reference to the certificate table for looking up certificates
      * @param maxRootCertificates The maximum number of root certificates which can be provisioned
      * @param maxClientCertificates The maximum number of client certificates which can be provisioned
      * Note: the caller must ensure that the delegate lives throughout the instance's lifetime.
      */
     TlsCertificateManagementServer(EndpointId endpointId, TlsCertificateManagementDelegate & delegate,
-                                   Tls::CertificateTable & certificateTable, uint8_t maxRootCertificates,
-                                   uint8_t maxClientCertificates);
+                                   Tls::CertificateDependencyChecker & dependencyChecker, Tls::CertificateTable & certificateTable,
+                                   uint8_t maxRootCertificates, uint8_t maxClientCertificates);
     ~TlsCertificateManagementServer();
 
     /**
@@ -85,6 +86,7 @@ public:
 
 private:
     TlsCertificateManagementDelegate & mDelegate;
+    Tls::CertificateDependencyChecker & mDependencyChecker;
     Tls::CertificateTable & mCertificateTable;
 
     // Attribute local storage
@@ -329,7 +331,7 @@ public:
      * InvalidInState if the certificate is attached/in-use
      */
     virtual Protocols::InteractionModel::Status RemoveClientCert(EndpointId matterEndpoint, FabricIndex fabric,
-                                                                 Tls::TLSCAID id) = 0;
+                                                                 Tls::TLSCCDID id) = 0;
 
     Tls::CertificateTable & GetCertificateTable() { return mTlsCertificateManagementServer->GetCertificateTable(); }
 

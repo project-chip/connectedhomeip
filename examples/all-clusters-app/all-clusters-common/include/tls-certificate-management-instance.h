@@ -72,7 +72,7 @@ public:
                                 LoadedClientCertificateCallback loadedCallback) const override;
     Protocols::InteractionModel::Status RemoveClientCert(EndpointId matterEndpoint, FabricIndex fabric, Tls::TLSCCDID id) override;
 
-    static inline TlsCertificateManagementCommandDelegate & getInstance() { return instance; }
+    static inline TlsCertificateManagementCommandDelegate & GetInstance() { return instance; }
 };
 
 } // namespace Clusters

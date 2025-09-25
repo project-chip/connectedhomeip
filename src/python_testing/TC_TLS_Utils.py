@@ -309,8 +309,8 @@ class TLSUtils:
         cluster = Clusters.TlsCertificateManagement
         return await self.test.read_single_attribute_check_success(endpoint=self.endpoint, dev_ctrl=self.dev_ctrl, node_id=self.node_id, cluster=cluster, attribute=attribute, payloadCapability=payloadCapability)
 
-    async def read_root_certs_attribute_as_map(self):
-        attribute_certs = await self.read_tls_cert_attribute(Clusters.TlsCertificateManagement.Attributes.ProvisionedRootCertificates)
+    async def read_root_certs_attribute_as_map(self, payloadCapability=ChipDeviceCtrl.TransportPayloadCapability.MRP_PAYLOAD):
+        attribute_certs = await self.read_tls_cert_attribute(Clusters.TlsCertificateManagement.Attributes.ProvisionedRootCertificates, payloadCapability)
         matter_asserts.assert_list(attribute_certs, "Expected list")
         found_certs = dict()
         for cert in attribute_certs:
