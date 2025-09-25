@@ -283,7 +283,7 @@ std::optional<DataModel::ActionReturnStatus> HandleCSRRequest(CommandHandler * c
 
     chip::Platform::ScopedMemoryBuffer<uint8_t> nocsrElements;
     MutableByteSpan nocsrElementsSpan;
-    auto finalStatus = Status::Failure;
+    auto errorStatus = Status::Failure;
     ByteSpan tbsSpan;
 
     // Start with CHIP_ERROR_INVALID_ARGUMENT so that cascading errors yield correct
@@ -298,13 +298,13 @@ std::optional<DataModel::ActionReturnStatus> HandleCSRRequest(CommandHandler * c
     failSafeContext.SetCsrRequestForUpdateNoc(isForUpdateNoc);
     const FabricInfo * fabricInfo = RetrieveCurrentFabric(commandObj, fabricTable);
 
-    VerifyOrExit(CSRNonce.size() == Credentials::kExpectedAttestationNonceSize, finalStatus = Status::InvalidCommand);
+    VerifyOrExit(CSRNonce.size() == Credentials::kExpectedAttestationNonceSize, errorStatus = Status::InvalidCommand);
 
     // If current fabric is not available, command was invoked over PASE which is not legal if IsForUpdateNOC is true.
-    VerifyOrExit(!isForUpdateNoc || (fabricInfo != nullptr), finalStatus = Status::InvalidCommand);
+    VerifyOrExit(!isForUpdateNoc || (fabricInfo != nullptr), errorStatus = Status::InvalidCommand);
 
-    VerifyOrExit(failSafeContext.IsFailSafeArmed(commandObj->GetAccessingFabricIndex()), finalStatus = Status::FailsafeRequired);
-    VerifyOrExit(!failSafeContext.NocCommandHasBeenInvoked(), finalStatus = Status::ConstraintError);
+    VerifyOrExit(failSafeContext.IsFailSafeArmed(commandObj->GetAccessingFabricIndex()), errorStatus = Status::FailsafeRequired);
+    VerifyOrExit(!failSafeContext.NocCommandHasBeenInvoked(), errorStatus = Status::ConstraintError);
 
     // Flush acks before really slow work
     commandObj->FlushAcksRightAwayOnSlowCommand();
@@ -321,7 +321,7 @@ std::optional<DataModel::ActionReturnStatus> HandleCSRRequest(CommandHandler * c
         if (!csr.Alloc(csrLength))
         {
             err = CHIP_ERROR_NO_MEMORY;
-            VerifyOrExit(err == CHIP_NO_ERROR, finalStatus = Status::ResourceExhausted);
+            VerifyOrExit(err == CHIP_NO_ERROR, errorStatus = Status::ResourceExhausted);
         }
         csrSpan = MutableByteSpan{ csr.Get(), csrLength };
 
@@ -341,7 +341,7 @@ std::optional<DataModel::ActionReturnStatus> HandleCSRRequest(CommandHandler * c
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "OpCreds: AllocatePendingOperationalKey returned %" CHIP_ERROR_FORMAT, err.Format());
-            VerifyOrExit(err == CHIP_NO_ERROR, finalStatus = Status::Failure);
+            VerifyOrExit(err == CHIP_NO_ERROR, errorStatus = Status::Failure);
         }
 
         ChipLogDetail(Zcl, "OpCreds: AllocatePendingOperationalKey succeeded");
@@ -355,14 +355,14 @@ std::optional<DataModel::ActionReturnStatus> HandleCSRRequest(CommandHandler * c
         if (!nocsrElements.Alloc(nocsrLengthEstimate + attestationChallenge.size()))
         {
             err = CHIP_ERROR_NO_MEMORY;
-            VerifyOrExit(err == CHIP_NO_ERROR, finalStatus = Status::ResourceExhausted);
+            VerifyOrExit(err == CHIP_NO_ERROR, errorStatus = Status::ResourceExhausted);
         }
 
         nocsrElementsSpan = MutableByteSpan{ nocsrElements.Get(), nocsrLengthEstimate };
 
         err = Credentials::ConstructNOCSRElements(ByteSpan{ csrSpan.data(), csrSpan.size() }, CSRNonce, kNoVendorReserved,
                                                   kNoVendorReserved, kNoVendorReserved, nocsrElementsSpan);
-        VerifyOrExit(err == CHIP_NO_ERROR, finalStatus = Status::Failure);
+        VerifyOrExit(err == CHIP_NO_ERROR, errorStatus = Status::Failure);
 
         // Append attestation challenge in the back of the reserved space for the signature
         memcpy(nocsrElements.Get() + nocsrElementsSpan.size(), attestationChallenge.data(), attestationChallenge.size());
@@ -375,8 +375,8 @@ std::optional<DataModel::ActionReturnStatus> HandleCSRRequest(CommandHandler * c
             // Generate attestation signature
             err = dacProvider->SignWithDeviceAttestationKey(tbsSpan, signatureSpan);
             Crypto::ClearSecretData(nocsrElements.Get() + nocsrElementsSpan.size(), attestationChallenge.size());
-            VerifyOrExit(err == CHIP_NO_ERROR, finalStatus = Status::Failure);
-            VerifyOrExit(signatureSpan.size() == Crypto::P256ECDSASignature::Capacity(), finalStatus = Status::Failure);
+            VerifyOrExit(err == CHIP_NO_ERROR, errorStatus = Status::Failure);
+            VerifyOrExit(signatureSpan.size() == Crypto::P256ECDSASignature::Capacity(), errorStatus = Status::Failure);
 
             Commands::CSRResponse::Type response;
 
@@ -384,20 +384,15 @@ std::optional<DataModel::ActionReturnStatus> HandleCSRRequest(CommandHandler * c
             response.attestationSignature = signatureSpan;
 
             ChipLogDetail(Zcl, "OpCreds: CSRRequest successful.");
-            finalStatus = Status::Success;
             commandObj->AddResponse(commandPath, response);
+            return std::nullopt;
         }
     }
 exit:
     // If failed constraints or internal errors, send a status report instead of the response sent above
-    if (finalStatus != Status::Success)
-    {
-        ChipLogError(Zcl, "OpCreds: Failed CSRRequest request with IM error 0x%02x (err = %" CHIP_ERROR_FORMAT ")",
-                     to_underlying(finalStatus), err.Format());
-        return finalStatus;
-    }
-
-    return std::nullopt;
+    ChipLogError(Zcl, "OpCreds: Failed CSRRequest request with IM error 0x%02x (err = %" CHIP_ERROR_FORMAT ")",
+                    to_underlying(errorStatus), err.Format());
+    return errorStatus;
 }
 
 std::optional<DataModel::ActionReturnStatus> HandleAddNOC(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
@@ -416,7 +411,7 @@ std::optional<DataModel::ActionReturnStatus> HandleAddNOC(CommandHandler * comma
     auto & ipkValue          = commandData.IPKValue;
     auto * groupDataProvider = Credentials::GetGroupDataProvider();
     auto nocResponse         = NodeOperationalCertStatusEnum::kOk;
-    auto nonDefaultStatus    = Status::Success;
+    auto errorStatus         = Status::Success;
     bool needRevert          = false;
 
     CHIP_ERROR err             = CHIP_NO_ERROR;
@@ -434,23 +429,23 @@ std::optional<DataModel::ActionReturnStatus> HandleAddNOC(CommandHandler * comma
 
     ChipLogDetail(Zcl, "OpCreds: Received an AddNOC command");
 
-    VerifyOrExit(NOCValue.size() <= Credentials::kMaxCHIPCertLength, nonDefaultStatus = Status::InvalidCommand);
+    VerifyOrExit(NOCValue.size() <= Credentials::kMaxCHIPCertLength, errorStatus = Status::InvalidCommand);
     VerifyOrExit(!ICACValue.HasValue() || ICACValue.Value().size() <= Credentials::kMaxCHIPCertLength,
-                 nonDefaultStatus = Status::InvalidCommand);
-    VerifyOrExit(ipkValue.size() == Crypto::CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES, nonDefaultStatus = Status::InvalidCommand);
-    VerifyOrExit(IsVendorIdValidOperationally(adminVendorId), nonDefaultStatus = Status::InvalidCommand);
+                 errorStatus = Status::InvalidCommand);
+    VerifyOrExit(ipkValue.size() == Crypto::CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES, errorStatus = Status::InvalidCommand);
+    VerifyOrExit(IsVendorIdValidOperationally(adminVendorId), errorStatus = Status::InvalidCommand);
 
     VerifyOrExit(failSafeContext.IsFailSafeArmed(commandObj->GetAccessingFabricIndex()),
-                 nonDefaultStatus = Status::FailsafeRequired);
+                 errorStatus = Status::FailsafeRequired);
 
-    VerifyOrExit(!failSafeContext.NocCommandHasBeenInvoked(), nonDefaultStatus = Status::ConstraintError);
+    VerifyOrExit(!failSafeContext.NocCommandHasBeenInvoked(), errorStatus = Status::ConstraintError);
 
     // Must have had a previous CSR request, not tagged for UpdateNOC
     VerifyOrExit(hasPendingKey, nocResponse = NodeOperationalCertStatusEnum::kMissingCsr);
-    VerifyOrExit(!csrWasForUpdateNoc, nonDefaultStatus = Status::ConstraintError);
+    VerifyOrExit(!csrWasForUpdateNoc, errorStatus = Status::ConstraintError);
 
     // Internal error that would prevent IPK from being added
-    VerifyOrExit(groupDataProvider != nullptr, nonDefaultStatus = Status::Failure);
+    VerifyOrExit(groupDataProvider != nullptr, errorStatus = Status::Failure);
 
     // Flush acks before really slow work
     commandObj->FlushAcksRightAwayOnSlowCommand();
@@ -490,7 +485,7 @@ std::optional<DataModel::ActionReturnStatus> HandleAddNOC(CommandHandler * comma
     needRevert = true;
 
     newFabricInfo = fabricTable.FindFabricWithIndex(newFabricIndex);
-    VerifyOrExit(newFabricInfo != nullptr, nonDefaultStatus = Status::Failure);
+    VerifyOrExit(newFabricInfo != nullptr, errorStatus = Status::Failure);
 
     // Set the Identity Protection Key (IPK)
     // The IPK SHALL be the operational group key under GroupKeySetID of 0
@@ -501,7 +496,7 @@ std::optional<DataModel::ActionReturnStatus> HandleAddNOC(CommandHandler * comma
     memcpy(keyset.epoch_keys[0].key, ipkValue.data(), Crypto::CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES);
 
     err = newFabricInfo->GetCompressedFabricIdBytes(compressed_fabric_id);
-    VerifyOrExit(err == CHIP_NO_ERROR, nonDefaultStatus = Status::Failure);
+    VerifyOrExit(err == CHIP_NO_ERROR, errorStatus = Status::Failure);
 
     err = groupDataProvider->SetKeySet(newFabricIndex, compressed_fabric_id, keyset);
     VerifyOrExit(err == CHIP_NO_ERROR, nocResponse = ConvertToNOCResponseStatus(err));
@@ -521,14 +516,14 @@ std::optional<DataModel::ActionReturnStatus> HandleAddNOC(CommandHandler * comma
     if (secureSession->GetSecureSessionType() == chip::Transport::SecureSession::Type::kPASE)
     {
         err = secureSession->AdoptFabricIndex(newFabricIndex);
-        VerifyOrExit(err == CHIP_NO_ERROR, nonDefaultStatus = Status::Failure);
+        VerifyOrExit(err == CHIP_NO_ERROR, errorStatus = Status::Failure);
     }
 
     // Creating the initial ACL must occur after the PASE session has adopted the fabric index
     // (see above) so that the concomitant event, which is fabric scoped, is properly handled.
     err = CreateAccessControlEntryForNewFabricAdministrator(commandObj->GetSubjectDescriptor(), newFabricIndex,
                                                             commandData.caseAdminSubject);
-    VerifyOrExit(err != CHIP_ERROR_INTERNAL, nonDefaultStatus = Status::Failure);
+    VerifyOrExit(err != CHIP_ERROR_INTERNAL, errorStatus = Status::Failure);
     VerifyOrExit(err == CHIP_NO_ERROR, nocResponse = ConvertToNOCResponseStatus(err));
 
     // The Fabric Index associated with the armed fail-safe context SHALL be updated to match the Fabric
@@ -573,7 +568,7 @@ exit:
     }
 
     // We have an NOC response
-    if (nonDefaultStatus == Status::Success)
+    if (errorStatus == Status::Success)
     {
         SendNOCResponse(commandObj, commandPath, nocResponse, newFabricIndex, CharSpan());
         // Failed to add NOC
@@ -587,15 +582,14 @@ exit:
         {
             ChipLogDetail(Zcl, "OpCreds: successfully created fabric index 0x%x via AddNOC", static_cast<unsigned>(newFabricIndex));
         }
+        return std::nullopt;
     }
     // No NOC response - Failed constraints
     else
     {
-        ChipLogError(Zcl, "OpCreds: Failed AddNOC request with IM error 0x%02x", to_underlying(nonDefaultStatus));
-        return nonDefaultStatus;
+        ChipLogError(Zcl, "OpCreds: Failed AddNOC request with IM error 0x%02x", to_underlying(errorStatus));
+        return errorStatus;
     }
-
-    return std::nullopt;
 }
 
 std::optional<DataModel::ActionReturnStatus> HandleUpdateNOC(CommandHandler * commandObj, TLV::TLVReader & input_arguments,
@@ -610,7 +604,7 @@ std::optional<DataModel::ActionReturnStatus> HandleUpdateNOC(CommandHandler * co
     auto & ICACValue                  = commandData.ICACValue;
 
     auto nocResponse      = NodeOperationalCertStatusEnum::kOk;
-    auto nonDefaultStatus = Status::Success;
+    auto errorStatus = Status::Success;
 
     CHIP_ERROR err          = CHIP_NO_ERROR;
     FabricIndex fabricIndex = 0;
@@ -622,17 +616,17 @@ std::optional<DataModel::ActionReturnStatus> HandleUpdateNOC(CommandHandler * co
     bool csrWasForUpdateNoc = false; //< Output param of HasPendingOperationalKey
     bool hasPendingKey      = fabricTable.HasPendingOperationalKey(csrWasForUpdateNoc);
 
-    VerifyOrExit(NOCValue.size() <= Credentials::kMaxCHIPCertLength, nonDefaultStatus = Status::InvalidCommand);
+    VerifyOrExit(NOCValue.size() <= Credentials::kMaxCHIPCertLength, errorStatus = Status::InvalidCommand);
     VerifyOrExit(!ICACValue.HasValue() || ICACValue.Value().size() <= Credentials::kMaxCHIPCertLength,
-                 nonDefaultStatus = Status::InvalidCommand);
+                 errorStatus = Status::InvalidCommand);
     VerifyOrExit(failSafeContext.IsFailSafeArmed(commandObj->GetAccessingFabricIndex()),
-                 nonDefaultStatus = Status::FailsafeRequired);
+                 errorStatus = Status::FailsafeRequired);
 
-    VerifyOrExit(!failSafeContext.NocCommandHasBeenInvoked(), nonDefaultStatus = Status::ConstraintError);
+    VerifyOrExit(!failSafeContext.NocCommandHasBeenInvoked(), errorStatus = Status::ConstraintError);
 
     // Must have had a previous CSR request, tagged for UpdateNOC
     VerifyOrExit(hasPendingKey, nocResponse = NodeOperationalCertStatusEnum::kMissingCsr);
-    VerifyOrExit(csrWasForUpdateNoc, nonDefaultStatus = Status::ConstraintError);
+    VerifyOrExit(csrWasForUpdateNoc, errorStatus = Status::ConstraintError);
 
     // If current fabric is not available, command was invoked over PASE which is not legal
     VerifyOrExit(fabricInfo != nullptr, nocResponse = ConvertToNOCResponseStatus(CHIP_ERROR_INSUFFICIENT_PRIVILEGE));
@@ -655,7 +649,7 @@ std::optional<DataModel::ActionReturnStatus> HandleUpdateNOC(CommandHandler * co
     // Attribute notification was already done by fabric table
 exit:
     // We have an NOC response
-    if (nonDefaultStatus == Status::Success)
+    if (errorStatus == Status::Success)
     {
         SendNOCResponse(commandObj, request.path, nocResponse, fabricIndex, CharSpan());
         // Failed to update NOC
@@ -680,15 +674,14 @@ exit:
 
             commandObj->GetExchangeContext()->AbortAllOtherCommunicationOnFabric();
         }
+        return std::nullopt;
     }
     // No NOC response - Failed constraints
     else
     {
-        ChipLogError(Zcl, "OpCreds: Failed UpdateNOC request with IM error 0x%02x", to_underlying(nonDefaultStatus));
-        return nonDefaultStatus;
+        ChipLogError(Zcl, "OpCreds: Failed UpdateNOC request with IM error 0x%02x", to_underlying(errorStatus));
+        return errorStatus;
     }
-
-    return std::nullopt;
 }
 
 std::optional<DataModel::ActionReturnStatus> HandleUpdateFabricLabel(CommandHandler * commandObj, TLV::TLVReader & input_arguments,
@@ -702,7 +695,6 @@ std::optional<DataModel::ActionReturnStatus> HandleUpdateFabricLabel(CommandHand
 
     auto & label              = commandData.label;
     auto ourFabricIndex       = commandObj->GetAccessingFabricIndex();
-    auto finalStatus          = Status::Failure;
 
     ChipLogDetail(Zcl, "OpCreds: Received an UpdateFabricLabel command");
 
@@ -729,22 +721,12 @@ std::optional<DataModel::ActionReturnStatus> HandleUpdateFabricLabel(CommandHand
     //       the one updated thereafter. Otherwise, the data is committed to storage
     //       as soon as the update is done.
     CHIP_ERROR err = fabricTable.SetFabricLabel(ourFabricIndex, label);
-    VerifyOrExit(err == CHIP_NO_ERROR, finalStatus = Status::Failure);
-
-    finalStatus = Status::Success;
+    VerifyOrReturnError(err == CHIP_NO_ERROR, Status::Failure);
 
     // Succeeded at updating the label, mark Fabrics table changed.
     cluster->OperationalCredentialsNotifyAttribute(OperationalCredentials::Attributes::Fabrics::Id);
-    ;
-exit:
-    if (finalStatus == Status::Success)
-    {
-        SendNOCResponse(commandObj, request.path, NodeOperationalCertStatusEnum::kOk, ourFabricIndex, CharSpan());
-    }
-    else
-    {
-        return finalStatus;
-    }
+
+    SendNOCResponse(commandObj, request.path, NodeOperationalCertStatusEnum::kOk, ourFabricIndex, CharSpan());
     return std::nullopt;
 }
 
@@ -904,13 +886,13 @@ exit:
         ChipLogError(Zcl, "OpCreds: Failed RemoveFabric due to FabricIndex not found locally");
         SendNOCResponse(commandObj, commandPath, NodeOperationalCertStatusEnum::kInvalidFabricIndex, fabricBeingRemoved,
                         CharSpan());
+        return std::nullopt;
     }
     else if (err != CHIP_NO_ERROR)
     {
         // We have no idea what happened; just report failure.
         ChipLogError(Zcl, "OpCreds: Failed RemoveFabric due to internal error (err = %" CHIP_ERROR_FORMAT ")", err.Format());
-        StatusIB status(err);
-        return status.mStatus;
+        return err;
     }
     else
     {
@@ -928,8 +910,8 @@ exit:
             SessionManager * sessionManager = ec->GetExchangeMgr()->GetSessionManager();
             sessionManager->ExpireAllSessionsForFabric(fabricBeingRemoved);
         }
+        return std::nullopt;
     }
-    return std::nullopt;
 }
 
 std::optional<DataModel::ActionReturnStatus> HandleSignVIDVerificationRequest(CommandHandler * commandObj,
@@ -964,8 +946,7 @@ std::optional<DataModel::ActionReturnStatus> HandleSignVIDVerificationRequest(Co
     if (err != CHIP_NO_ERROR)
     {
         // We have no idea what happened; just report failure.
-        StatusIB status(err);
-        return status.mStatus;
+        return err;
     }
 
     Commands::SignVIDVerificationResponse::Type response;
@@ -1013,15 +994,11 @@ std::optional<DataModel::ActionReturnStatus> HandleCertificateChainRequest(Comma
 
     response.certificate = derBufSpan;
     commandObj->AddResponse(commandPath, response);
+    return std::nullopt;
 
 exit:
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogError(Zcl, "OpCreds: Failed CertificateChainRequest: %" CHIP_ERROR_FORMAT, err.Format());
-        return Status::Failure;
-    }
-
-    return std::nullopt;
+    ChipLogError(Zcl, "OpCreds: Failed CertificateChainRequest: %" CHIP_ERROR_FORMAT, err.Format());
+    return err;
 }
 
 std::optional<DataModel::ActionReturnStatus> HandleAttestationRequest(CommandHandler * commandObj,
@@ -1034,7 +1011,7 @@ std::optional<DataModel::ActionReturnStatus> HandleAttestationRequest(CommandHan
     ReturnErrorOnFailure(commandData.Decode(input_arguments));
 
     auto & attestationNonce = commandData.attestationNonce;
-    auto finalStatus        = Status::Failure;
+    auto errorStatus        = Status::Failure;
     CHIP_ERROR err          = CHIP_ERROR_INVALID_ARGUMENT;
     ByteSpan tbsSpan;
 
@@ -1059,29 +1036,29 @@ std::optional<DataModel::ActionReturnStatus> HandleAttestationRequest(CommandHan
     // Flush acks before really slow work
     commandObj->FlushAcksRightAwayOnSlowCommand();
 
-    VerifyOrExit(attestationNonce.size() == Credentials::kExpectedAttestationNonceSize, finalStatus = Status::InvalidCommand);
+    VerifyOrExit(attestationNonce.size() == Credentials::kExpectedAttestationNonceSize, errorStatus = Status::InvalidCommand);
 
     if (dacProvider == nullptr)
     {
         err = CHIP_ERROR_INTERNAL;
-        VerifyOrExit(dacProvider != nullptr, finalStatus = Status::Failure);
+        VerifyOrExit(dacProvider != nullptr, errorStatus = Status::Failure);
     }
 
     err = dacProvider->GetCertificationDeclaration(certDeclSpan);
-    VerifyOrExit(err == CHIP_NO_ERROR, finalStatus = Status::Failure);
+    VerifyOrExit(err == CHIP_NO_ERROR, errorStatus = Status::Failure);
 
     attestationElementsLen = TLV::EstimateStructOverhead(certDeclSpan.size(), attestationNonce.size(), sizeof(uint64_t) * 8);
 
     if (!attestationElements.Alloc(attestationElementsLen + attestationChallenge.size()))
     {
         err = CHIP_ERROR_NO_MEMORY;
-        VerifyOrExit(err == CHIP_NO_ERROR, finalStatus = Status::ResourceExhausted);
+        VerifyOrExit(err == CHIP_NO_ERROR, errorStatus = Status::ResourceExhausted);
     }
 
     attestationElementsSpan = MutableByteSpan{ attestationElements.Get(), attestationElementsLen };
     err = Credentials::ConstructAttestationElements(certDeclSpan, attestationNonce, timestamp, kEmptyFirmwareInfo,
                                                     emptyVendorReserved, attestationElementsSpan);
-    VerifyOrExit(err == CHIP_NO_ERROR, finalStatus = Status::Failure);
+    VerifyOrExit(err == CHIP_NO_ERROR, errorStatus = Status::Failure);
 
     // Append attestation challenge in the back of the reserved space for the signature
     memcpy(attestationElements.Get() + attestationElementsSpan.size(), attestationChallenge.data(), attestationChallenge.size());
@@ -1094,8 +1071,8 @@ std::optional<DataModel::ActionReturnStatus> HandleAttestationRequest(CommandHan
         // Generate attestation signature
         err = dacProvider->SignWithDeviceAttestationKey(tbsSpan, signatureSpan);
         Crypto::ClearSecretData(attestationElements.Get() + attestationElementsSpan.size(), attestationChallenge.size());
-        VerifyOrExit(err == CHIP_NO_ERROR, finalStatus = Status::Failure);
-        VerifyOrExit(signatureSpan.size() == Crypto::P256ECDSASignature::Capacity(), finalStatus = Status::Failure);
+        VerifyOrExit(err == CHIP_NO_ERROR, errorStatus = Status::Failure);
+        VerifyOrExit(signatureSpan.size() == Crypto::P256ECDSASignature::Capacity(), errorStatus = Status::Failure);
 
         Commands::AttestationResponse::Type response;
 
@@ -1103,19 +1080,14 @@ std::optional<DataModel::ActionReturnStatus> HandleAttestationRequest(CommandHan
         response.attestationSignature = signatureSpan;
 
         ChipLogDetail(Zcl, "OpCreds: AttestationRequest successful.");
-        finalStatus = Protocols::InteractionModel::Status::Success;
         commandObj->AddResponse(commandPath, response);
+        return std::nullopt;
     }
 
 exit:
-    if (finalStatus != Status::Success)
-    {
-        ChipLogError(Zcl, "OpCreds: Failed AttestationRequest request with IM error 0x%02x (err = %" CHIP_ERROR_FORMAT ")",
-                     to_underlying(finalStatus), err.Format());
-        return finalStatus;
-    }
-
-    return std::nullopt;
+    ChipLogError(Zcl, "OpCreds: Failed AttestationRequest request with IM error 0x%02x (err = %" CHIP_ERROR_FORMAT ")",
+                 to_underlying(errorStatus), err.Format());
+    return errorStatus;
 }
 
 void FailSafeCleanup(const chip::DeviceLayer::ChipDeviceEvent * event, OperationalCredentialsCluster * cluster)
