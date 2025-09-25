@@ -233,6 +233,9 @@ class MdnsDiscovery:
             log_output=log_output
         )
 
+        if log_output:
+            self._log_output()
+
         return record
 
     async def get_txt_record(self, service_name: str,
@@ -269,6 +272,9 @@ class MdnsDiscovery:
             query_record_types={_TYPE_TXT},
             log_output=log_output
         )
+
+        if log_output:
+            self._log_output()
 
         return record
 
@@ -543,7 +549,7 @@ class MdnsDiscovery:
 
                 await gather(*tasks)
 
-                if append_results and log_output:
+                if log_output:
                     self._log_output()
 
     # Private methods
@@ -588,8 +594,7 @@ class MdnsDiscovery:
                                   service_name: str,
                                   query_timeout_sec: float = QUERY_TIMEOUT_SEC,
                                   query_record_types: set[int] = QUERY_RECORD_TYPES,
-                                  append_results: bool = False,
-                                  log_output: bool = False
+                                  append_results: bool = False
                                   ) -> Optional[MdnsServiceInfo]:
         """
         Queries mDNS service record details for a given service instance, including SRV, TXT, A, and AAAA records.
@@ -602,7 +607,6 @@ class MdnsDiscovery:
                 Defaults to QUERY_RECORD_TYPES (SRV, TXT, A, AAAA).
             append_results (bool): If True, appends the results to `self._discovered_services` without clearing previous entries.
                                    If False, clears `self._discovered_services` before storing the new result.
-            log_output (bool, optional): If True, logs the discovered service info to the console. Defaults to False.
 
         Returns:
             Optional[MdnsServiceInfo]: A fully resolved service instance containing details such as host address, port,
@@ -639,12 +643,6 @@ class MdnsDiscovery:
                 if not append_results:
                     self._discovered_services = {}
                 self._discovered_services.setdefault(service_type, []).append(mdns_service_info)
-
-                # Logging is handled in the caller when
-                # append_results is set to True
-                if not append_results:
-                    if log_output:
-                        self._log_output()
 
                 return mdns_service_info
 
