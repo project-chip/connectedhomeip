@@ -289,7 +289,7 @@ class TC_PAVST_2_7(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
         aAllocatedAudioStreams = await self.allocate_one_audio_stream()
 
         triggerOptions = {"triggerType": pvcluster.Enums.TransportTriggerTypeEnum.kCommand,
-                          "maxPreRollLen": 4000, }
+                          "maxPreRollLen": 4000 }
 
         status = await self.allocate_one_pushav_transport(endpoint, trigger_Options=triggerOptions, tlsEndPoint=tlsEndpointId,
                                                           url=f"https://{host_ip}:1234/streams/{uploadStreamId}")

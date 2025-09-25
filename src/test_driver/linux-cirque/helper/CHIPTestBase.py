@@ -285,7 +285,7 @@ class CHIPVirtualHome:
     def wait_for_device_output(self, device_id, pattern, timeout=1):
         due = time.time() + timeout
         while True:
-            if self.sequenceMatch(self.get_device_log(device_id).decode(), [pattern, ]):
+            if self.sequenceMatch(self.get_device_log(device_id).decode(), [pattern ]):
                 return True
             if time.time() < due:
                 time.sleep(1)

@@ -158,7 +158,7 @@ class TC_DRLK_2_9(MatterBaseTest, DRLK_COMMON):
             TestStep("36", "TH sends ClearCredential Command to DUT to clear all the credentials.",
                      "Verify that the DUT sends SUCCESS response."),
             TestStep("37", "TH sends ClearAliroReaderConfig Command to DUT.",
-                     "Verify that the DUT sends SUCCESS response."), ]
+                     "Verify that the DUT sends SUCCESS response.") ]
 
         return steps
 
