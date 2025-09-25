@@ -26,6 +26,7 @@ from matter.testing.spec_parsing import (ClusterParser, DataTypeEnum, PrebuiltDa
                                          build_xml_global_data_types)
 from matter.tlv import uint
 
+LOGGER = logging.getLogger(__name__)
 
 class TestSpecParsingDataType(MatterBaseTest):
     def setup_class(self):
@@ -645,7 +646,7 @@ class TestSpecParsingDataType(MatterBaseTest):
 
         # This check is optional as not all clusters might have bitmaps
         if bitmap_found:
-            logging.info("Successfully found and tested a bitmap")
+            LOGGER.info("Successfully found and tested a bitmap")
 
     def test_detailed_check_xml_datatype(self):
         """Test a specific cluster XML's data type in detail to ensure all properties are correctly parsed"""

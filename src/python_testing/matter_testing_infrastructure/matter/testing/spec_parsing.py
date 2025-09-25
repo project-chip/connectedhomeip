@@ -1529,7 +1529,7 @@ def build_xml_global_data_types(data_model_directory: Union[PrebuiltDataModelDir
     problems: list[ProblemNotice] = []
 
     top = get_data_model_directory(data_model_directory, DataModelLevel.kGlobal)
-    logging.info("Reading XML global data types from %r", top)
+    LOGGER.info("Reading XML global data types from %r", top)
 
     # Map of XML file names to data type categories
     file_to_datatype_map = {
@@ -1541,11 +1541,11 @@ def build_xml_global_data_types(data_model_directory: Union[PrebuiltDataModelDir
     found_xmls = 0
     for f in top.iterdir():
         if not f.name.endswith('.xml'):
-            logging.info("Ignoring non-XML file %s", f.name)
+            LOGGER.info("Ignoring non-XML file %s", f.name)
             continue
 
         if f.name not in file_to_datatype_map:
-            logging.info("Ignoring XML file %s (not a data type file - only parsing Structs.xml, Enums.xml, Bitmaps.xml)", f.name)
+            LOGGER.info("Ignoring XML file %s (not a data type file - only parsing Structs.xml, Enums.xml, Bitmaps.xml)", f.name)
             continue
 
         found_xmls += 1
@@ -1579,7 +1579,7 @@ def build_xml_global_data_types(data_model_directory: Union[PrebuiltDataModelDir
                 filtered_problems = []
                 for problem in temp_problems:
                     if "ConformanceException" in problem.problem and any(field_name in problem.problem for field_name in ['PercentMax', 'PercentMin', 'FixedMax', 'FixedMin', 'MfgCode']):
-                        logging.info(f"Ignoring complex conformance in global data type {name} from {f.name}: {problem.problem}")
+                        LOGGER.info(f"Ignoring complex conformance in global data type {name} from {f.name}: {problem.problem}")
                         continue
                     filtered_problems.append(problem)
 
