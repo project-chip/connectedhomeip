@@ -21,7 +21,7 @@
 # === BEGIN CI TEST ARGUMENTS ===
 # test-runner-runs:
 #   run1:
-#     app: ${LIT_ICD_APP}
+#     app: ${ALL_CLUSTERS_APP}
 #     factory-reset: true
 #     quiet: true
 #     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
@@ -49,7 +49,7 @@ from mobly import asserts
 
 import matter.clusters as Clusters
 from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
-
+from time import sleep
 '''
 Purpose
 The purpose of this test case is to verify that a device is able to
@@ -58,15 +58,6 @@ correctly advertise Commissionable Node Discovery service.
 Test Plan
 https://github.com/CHIP-Specifications/chip-test-plans/blob/master/src/securechannel.adoc#341-tc-sc-41-commissionable-node-discovery-dut_commissionee
 '''
-
-PICS_MCORE_ROLE_COMMISSIONEE = "MCORE.ROLE.COMMISSIONEE"
-TCP_PICS_STR = "MCORE.SC.TCP"
-ONE_HOUR_IN_MS = 3600000
-MAX_SAT_VALUE = 65535
-MAX_T_VALUE = 6
-LONG_DISCRIMINATOR = 3840
-CM_SUBTYPE = f"_CM._sub.{MdnsServiceType.COMMISSIONABLE.value}"
-
 
 class TC_SC_4_1(MatterBaseTest):
 
@@ -78,8 +69,8 @@ class TC_SC_4_1(MatterBaseTest):
                     3, "If supports_icd is true, TH reads ActiveModeThreshold from the ICD Management cluster on EP0 and saves as active_mode_threshold_ms."),
                 TestStep(4, "DUT is put in Commissioning Mode.",
                          "DUT starts advertising Commissionable Node Discovery service using DNS-SD."),
-                TestStep(5, "DUT is put in Commissioning Mode.",
-                         "DUT starts advertising Commissionable Node Discovery service using DNS-SD."),
+                # TestStep(5, "DUT is put in Commissioning Mode.",
+                #          "DUT starts advertising Commissionable Node Discovery service using DNS-SD."),
                 ]
 
     async def read_attribute(self, attribute: Any) -> Any:
@@ -102,65 +93,14 @@ class TC_SC_4_1(MatterBaseTest):
             attribute=Clusters.IcdManagement.Attributes.ActiveModeThreshold
         )
 
-    def desc_TC_TC_SC_4_1(self) -> str:
-        return "[TC-SC-4.1] Commissionable Node Discovery with DUT as Commissionee"
-
-    def pics_TC_SC_4_1(self) -> list[str]:
-        return [PICS_MCORE_ROLE_COMMISSIONEE]
-
-    @async_test_body
-    async def test_TC_SC_4_1(self):
-        self.endpoint = self.get_endpoint(default=1)
-        active_mode_threshold_ms = None
-        supports_icd = False
-
-        # *** STEP 1 ***
-        # DUT is Commissioned.
-        self.step(1)
-
-        # *** STEP 2 ***
-        # TH reads from the DUT the ServerList attribute from the Descriptor cluster on EP0. If the ICD Management
-        # cluster ID (70,0x46) is present in the list, set supports_icd to true, otherwise set supports_icd to false.
-        self.step(2)
-        ep0_servers = await self.get_descriptor_server_list()
-
-        # Check if ep0_servers contain the ICD Management cluster ID (0x0046)
-        supports_icd = Clusters.IcdManagement.id in ep0_servers
-        logging.info(f"\n\n\t** supports_icd: {supports_icd}\n")
-
-        # *** STEP 3 ***
-        # If supports_icd is true, TH reads ActiveModeThreshold from the ICD Management cluster on EP0 and saves
-        # as active_mode_threshold.
-        self.step(3)
-        if supports_icd:
-            active_mode_threshold_ms = await self.get_active_mode_threshhold_ms()
-        logging.info(f"\n\n\t** active_mode_threshold_ms: {active_mode_threshold_ms}\n")
-
-        # *** STEP 4 ***
-        # DUT is put in Commissioning Mode.
-        # - DUT starts advertising Commissionable Node Discovery service using DNS-SD.
-        self.step(4)
-        await self.default_controller.OpenCommissioningWindow(
-            nodeid=self.dut_node_id,
-            timeout=600,
-            iteration=10000,
-            discriminator=LONG_DISCRIMINATOR,
-            option=1
-        )
-
-        # *** STEP 5 ***
-        # Get DUT's commissionable service.
-        # - Verify presence of DUT's commissionable service.
-        # - Verify DUT's commissionable service is a valid DNS-SD instance name.
-        # - Verify DUT's commissionable service service type is '_matterc._udp' and service domain '.local.'
-        self.step(5)
+    async def verify_commissionable_node_dns_sd_advertisements(self, expected_cm: str) -> None:
         mdns = MdnsDiscovery()
 
         # Get DUT's commissionable service
         commissionable_services = await mdns.get_commissionable_services(log_output=True)
 
         # Verify presence of DUT's comissionable service
-        asserts.assert_greater(len(commissionable_services), 0, "DUT's commissionable services not present")
+        asserts.assert_greater(len(commissionable_services), 0, "DUT's commissionable node services not present")
         commissionable_service = commissionable_services[0]
 
         # Verify DUT's commissionable service is a valid DNS-SD instance name
@@ -205,7 +145,8 @@ class TC_SC_4_1(MatterBaseTest):
             assert_valid_devtype_subtype(devtype_subtype)
 
         # Verify presence of the _CM subtype
-        asserts.assert_in(CM_SUBTYPE, subtypes, f"'{CM_SUBTYPE}' subtype must be present.")
+        cm_subtype = f"_CM._sub.{MdnsServiceType.COMMISSIONABLE.value}"
+        asserts.assert_in(cm_subtype, subtypes, f"'{cm_subtype}' subtype must be present.")
 
         # Verify D key is present, which represents the discriminator
         # and must be encoded as a variable-length decimal value with up to 4
@@ -246,9 +187,9 @@ class TC_SC_4_1(MatterBaseTest):
 
             # - If the SAT key is present and supports_icd is true, verify that
             #   the value is equal to active_mode_threshold
-            if supports_icd:
+            if self.supports_icd:
                 logging.info("supports_icd is True, verify the SAT value is equal to active_mode_threshold.")
-                asserts.assert_equal(int(sat_key), active_mode_threshold_ms)
+                asserts.assert_equal(int(sat_key), self.active_mode_threshold_ms)
 
         # Verify that the SAI key is present if the SAT key is present
         asserts.assert_true(
@@ -257,14 +198,13 @@ class TC_SC_4_1(MatterBaseTest):
             "SAI key must be present if SAT key is present."
         )
 
-        # TODO: how to make CM = 1, getting CM = 2 currently, why 1?
-        # # Verify that the CM key is present and is equal to 1
-        # if 'CM' in commissionable_service.txt:
-        #     cm_key = commissionable_service.txt['CM']
-        #     assert_valid_cm_key(cm_key)
-        #     asserts.assert_true(cm_key == "1", f"CM key must be equal to 1, got {cm_key}")
-        # else:
-        #     asserts.fail("CM key not present")
+        # Verify that the CM key is present and is equal to 1
+        if 'CM' in commissionable_service.txt:
+            cm_key = commissionable_service.txt['CM']
+            assert_valid_cm_key(cm_key)
+            asserts.assert_true(cm_key == expected_cm, f"CM key must be '{expected_cm}', got '{cm_key}'")
+        else:
+            asserts.fail("CM key not present")
 
         # If the DT key is present, it must contain the device type identifier from
         # Data Model Device Types and must be encoded as a variable length decimal
@@ -294,8 +234,8 @@ class TC_SC_4_1(MatterBaseTest):
         # TODO: Fix PI key present but null/None ??
         # If the PI key is present, key PI must be encoded as a valid UTF-8 string
         # with a maximum length of 128 bytes
-        if 'PI' in commissionable_service.txt:
-            pi_key = commissionable_service.txt['PI']
+        # if 'PI' in commissionable_service.txt:
+        #     pi_key = commissionable_service.txt['PI']
             # assert_valid_pi_key(pi_key)
 
         # TH performs a query for the AAAA record against the target
@@ -305,6 +245,75 @@ class TC_SC_4_1(MatterBaseTest):
 
         # Verify at least 1 AAAA record is returned
         asserts.assert_greater(len(quada_records), 0, f"No AAAA addresses were resolved for hostname '{hostname}'")
+
+    def desc_TC_TC_SC_4_1(self) -> str:
+        return "[TC-SC-4.1] Commissionable Node Discovery with DUT as Commissionee"
+
+    @async_test_body
+    async def test_TC_SC_4_1(self):
+        self.endpoint = self.get_endpoint(default=1)
+        obcw_cmd = Clusters.AdministratorCommissioning.Commands.OpenBasicCommissioningWindow(180)
+        revoke_cmd = Clusters.AdministratorCommissioning.Commands.RevokeCommissioning()
+
+        # *** STEP 1 ***
+        # DUT is Commissioned.
+        self.step(1)
+
+        # *** STEP 2 ***
+        # TH reads from the DUT the ServerList attribute from the Descriptor cluster on EP0.
+        #   - If the ICD Management cluster ID (70,0x46) is present in the list, set supports_icd to true, otherwise set supports_icd to false.
+        #   - If supports_icd is true, TH reads ActiveModeThreshold from the ICD Management cluster on EP0 and saves as active_mode_threshold.
+        self.step(2)
+        ep0_servers = await self.get_descriptor_server_list()
+
+        # Check if ep0_servers contain the ICD Management cluster ID (0x0046)
+        self.supports_icd = Clusters.IcdManagement.id in ep0_servers
+        logging.info(f"** supports_icd: {self.supports_icd}")
+
+        if self.supports_icd:
+            self.active_mode_threshold_ms = await self.get_active_mode_threshhold_ms()
+            logging.info(f"** active_mode_threshold_ms: {self.active_mode_threshold_ms}")
+
+        # *** STEP 3 ***
+        # DUT is put in Commissioning Mode using Open Basic Commissioning Window command
+        #   - DUT starts advertising Commissionable Node Discovery service using DNS-SD
+        #   - Verify DUT Commissionable Node Discovery service advertisements
+        self.step(3)
+        await self.default_controller.SendCommand(nodeid=self.dut_node_id, endpoint=0, payload=obcw_cmd, timedRequestTimeoutMs=6000)
+        await self.verify_commissionable_node_dns_sd_advertisements(expected_cm="1")
+
+        # *** STEP 4 ***
+        # Close DUT's commissioning window and put the DUT in Commissioning Mode using Open Basic Commissioning Window command
+        #   - DUT starts advertising Commissionable Node Discovery service using DNS-SD
+        #   - Verify DUT Commissionable Node Discovery service advertisements
+        self.step(4)
+        await self.default_controller.SendCommand(nodeid=self.dut_node_id, endpoint=0, payload=revoke_cmd, timedRequestTimeoutMs=6000)
+        sleep(1) # Give some time for failsafe cleanup scheduling
+        await self.default_controller.SendCommand(nodeid=self.dut_node_id, endpoint=0, payload=obcw_cmd, timedRequestTimeoutMs=6000)
+        await self.verify_commissionable_node_dns_sd_advertisements(expected_cm="1")
+
+
+        # TODO: How to wait for the open commissioning window timeout? Will revoke in the mean time
+        await self.default_controller.SendCommand(nodeid=self.dut_node_id, endpoint=0, payload=revoke_cmd, timedRequestTimeoutMs=6000)
+        sleep(1) # Give some time for failsafe cleanup scheduling
+
+
+        # *** STEP X ***
+        # DUT is put in Commissioning Mode using Open Basic Commissioning Window command
+        #   - DUT starts advertising Commissionable Node Discovery service using DNS-SD
+        #   - Verify DUT Commissionable Node Discovery service advertisements
+        # self.step(X)
+        params = await self.default_controller.OpenCommissioningWindow(
+            nodeid=self.dut_node_id,
+            timeout=180,
+            iteration=10000,
+            discriminator=3840,
+            option=1
+        )
+        await self.verify_commissionable_node_dns_sd_advertisements(expected_cm="2")
+
+
+        # TODO: How to check if Extended Discovery is available?
 
 
 if __name__ == "__main__":
