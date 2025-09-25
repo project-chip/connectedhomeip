@@ -50,8 +50,6 @@ public:
 
     // Buttons
     inline void SetButtonsCb(SilabsButtonCb callback) override { mButtonCallback = callback; }
-    inline uint32_t GetRebootCause() { return mRebootCause; }
-
     static SilabsButtonCb mButtonCallback;
     uint8_t GetButtonState(uint8_t button) override;
 
@@ -71,7 +69,16 @@ public:
     CHIP_ERROR FlashErasePage(uint32_t addr) override;
     CHIP_ERROR FlashWritePage(uint32_t addr, const uint8_t * data, size_t size) override;
 
+    // Reboot
     void SoftwareReset(void) override;
+    inline uint32_t GetRebootCause() { return mRebootCause; }
+
+    /** VerifyIfUpdated
+     * @brief Verify if the device has been updated by OTA.
+     *  This check requires the NVM3 to be initialized so it is not called during the platform init.
+     *  It is common to both WiseMCU and GSDK platforms so we have it in a separate cpp file.
+     */
+    CHIP_ERROR VerifyIfUpdated();
 
 private:
     friend SilabsPlatform & GetPlatform(void);

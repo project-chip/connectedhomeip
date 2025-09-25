@@ -70,7 +70,7 @@ PushAvStreamTransportServer * FindClusterOnEndpoint(EndpointId endpointId)
 }
 
 } // namespace
-void emberAfPushAvStreamTransportClusterServerInitCallback(EndpointId endpointId)
+void MatterPushAvStreamTransportClusterInitCallback(EndpointId endpointId)
 {
 
     IntegrationDelegate integrationDelegate;
@@ -87,7 +87,7 @@ void emberAfPushAvStreamTransportClusterServerInitCallback(EndpointId endpointId
         integrationDelegate);
 }
 
-void MatterPushAvStreamTransportClusterServerShutdownCallback(EndpointId endpointId)
+void MatterPushAvStreamTransportClusterShutdownCallback(EndpointId endpointId)
 {
     IntegrationDelegate integrationDelegate;
 
