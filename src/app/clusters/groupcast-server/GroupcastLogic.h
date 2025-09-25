@@ -30,25 +30,23 @@ namespace chip {
 namespace app {
 namespace Clusters {
 
-using DataModel::ActionReturnStatus;
-
 /**
  * @brief Implements the Matter specifications for the Groupcast cluster
  */
 class GroupcastLogic
 {
 public:
-    DataModel::ActionReturnStatus ReadMembership(EndpointId endpoint, AttributeValueEncoder & aEncoder);
-    DataModel::ActionReturnStatus ReadMaxMembershipCount(EndpointId endpoint, AttributeValueEncoder & aEncoder);
+    CHIP_ERROR ReadMembership(EndpointId endpoint, AttributeValueEncoder & aEncoder);
+    CHIP_ERROR ReadMaxMembershipCount(EndpointId endpoint, AttributeValueEncoder & aEncoder);
 
     
-    DataModel::ActionReturnStatus JoinGroup(FabricIndex fabric_index, const Groupcast::Commands::JoinGroup::DecodableType & data);
-    DataModel::ActionReturnStatus LeaveGroup(FabricIndex fabric_index,
+    CHIP_ERROR JoinGroup(FabricIndex fabric_index, const Groupcast::Commands::JoinGroup::DecodableType & data);
+    CHIP_ERROR LeaveGroup(FabricIndex fabric_index,
                           const Groupcast::Commands::LeaveGroup::DecodableType & data,
                           Groupcast::Commands::LeaveGroupResponse::Type &response);
-    DataModel::ActionReturnStatus UpdateGroupKey(FabricIndex fabric_index, const Groupcast::Commands::UpdateGroupKey::DecodableType & data);
-    DataModel::ActionReturnStatus ExpireGracePeriod(FabricIndex fabric_index, const Groupcast::Commands::ExpireGracePeriod::DecodableType & data);
-    DataModel::ActionReturnStatus ConfigureAuxiliaryACL(FabricIndex fabric_index, const Groupcast::Commands::ConfigureAuxiliaryACL::DecodableType & data);
+    CHIP_ERROR UpdateGroupKey(FabricIndex fabric_index, const Groupcast::Commands::UpdateGroupKey::DecodableType & data);
+    CHIP_ERROR ExpireGracePeriod(FabricIndex fabric_index, const Groupcast::Commands::ExpireGracePeriod::DecodableType & data);
+    CHIP_ERROR ConfigureAuxiliaryACL(FabricIndex fabric_index, const Groupcast::Commands::ConfigureAuxiliaryACL::DecodableType & data);
 
 private:
     CHIP_ERROR RegisterAccessControl(FabricIndex fabric_index, GroupId group_id);

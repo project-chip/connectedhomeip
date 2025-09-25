@@ -19,42 +19,34 @@ GroupcastCluster::GroupcastCluster() : DefaultServerCluster({ kRootEndpointId, G
 {
 }
 
-CHIP_ERROR GroupcastCluster::Startup(ServerClusterContext & context)
-{
-    return CHIP_ERROR_NOT_IMPLEMENTED;
-}
-
-void GroupcastCluster::Shutdown() {}
-
 DataModel::ActionReturnStatus GroupcastCluster::ReadAttribute(const DataModel::ReadAttributeRequest & request, AttributeValueEncoder & encoder)
 {
     switch (request.path.mAttributeId)
     {
     case Groupcast::Attributes::FeatureMap::Id:
         break;
+    case Groupcast::Attributes::ClusterRevision::Id:
+        return aEncoder.Encode(Groupcast::kRevision);
     case Groupcast::Attributes::Membership::Id:
         return mLogic.ReadMembership(request.path.mEndpointId, encoder);
-
     case Groupcast::Attributes::MaxMembershipCount::Id:
         return mLogic.ReadMaxMembershipCount(request.path.mEndpointId, encoder);
     }
     return Protocols::InteractionModel::Status::UnsupportedAttribute;
 }
 
-DataModel::ActionReturnStatus GroupcastCluster::WriteAttribute(const DataModel::WriteAttributeRequest & request,
-                                        AttributeValueDecoder & decoder)
-{
-    switch (request.path.mAttributeId)
-    {
-    case Groupcast::Attributes::FeatureMap::Id:
-        break;
-    }
-    return Protocols::InteractionModel::Status::UnsupportedAttribute;
-}
-
 CHIP_ERROR GroupcastCluster::Attributes(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder)
 {
-    return CHIP_ERROR_NOT_IMPLEMENTED;
+    using chip::app::Clusters::Groupcast::Attributes;
+    // Ensure space for all possible attributes (2 mandatory + global)
+    ReturnErrorOnFailure(builder.EnsureAppendCapacity(2 + DefaultServerCluster::GlobalAttributes().size()));
+    // Mandatory attributes
+    ReturnErrorOnFailure(builder.AppendElements({
+        Attributes::Membership::kMetadataEntry,
+        Attributes::MaxMembershipCount::kMetadataEntry,
+    }));
+    // Global attributes
+    return builder.AppendElements(DefaultServerCluster::GlobalAttributes());
 }
 
 std::optional<DataModel::ActionReturnStatus> GroupcastCluster::InvokeCommand(const DataModel::InvokeRequest & request, chip::TLV::TLVReader & arguments, CommandHandler * handler)
@@ -76,7 +68,7 @@ std::optional<DataModel::ActionReturnStatus> GroupcastCluster::InvokeCommand(con
         ReturnErrorOnFailure(data.Decode(arguments, fabric_index));
         mLogic.LeaveGroup(fabric_index, data, response);
         handler->AddResponse(request.path, response);
-        return Status::Success;
+        return std::nullopt;
     }
     case Groupcast::Commands::UpdateGroupKey::Id:
     {
