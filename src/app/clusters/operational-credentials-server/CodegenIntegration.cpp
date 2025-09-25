@@ -64,7 +64,7 @@ public:
 
 } // namespace
 
-void emberAfOperationalCredentialsClusterServerInitCallback(EndpointId endpointId)
+void MatterOperationalCredentialsClusterInitCallback(EndpointId endpointId)
 {
     IntegrationDelegate integrationDelegate;
 
@@ -80,7 +80,7 @@ void emberAfOperationalCredentialsClusterServerInitCallback(EndpointId endpointI
         integrationDelegate);
 }
 
-void MatterOperationalCredentialsClusterServerShutdownCallback(EndpointId endpointId)
+void MatterOperationalCredentialsClusterShutdownCallback(EndpointId endpointId)
 {
     IntegrationDelegate integrationDelegate;
     CodegenClusterIntegration::UnregisterServer(

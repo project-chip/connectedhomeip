@@ -1351,6 +1351,7 @@ FailSafeContext & OperationalCredentialsCluster::GetFailSafeContext()
 
 Credentials::DeviceAttestationCredentialsProvider * OperationalCredentialsCluster::GetDACProvider()
 {
+    // TODO: This dependency should be removed after fixing #41122 so we don't depend on external singletons,
     return Credentials::GetDeviceAttestationCredentialsProvider();
 }
 
