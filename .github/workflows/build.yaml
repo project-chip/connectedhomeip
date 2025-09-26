@@ -36,14 +36,11 @@ env:
     CHIP_NO_LOG_TIMESTAMPS: true
 
 jobs:
-    changed_paths:
-      uses: ./.github/workflows/analyze-changed-paths.yaml
-
     build_linux_gcc_debug:
         name: Build on Linux (gcc_debug)
-        needs: changed_paths
+
         runs-on: ubuntu-latest
-        if: github.actor != 'restyled-io[bot]' && needs.changed_paths.outputs.non_md_changes == 'true'
+        if: github.actor != 'restyled-io[bot]'
 
         container:
             image: ghcr.io/project-chip/chip-build:167
@@ -151,9 +148,9 @@ jobs:
 
     build_linux:
         name: Build on Linux (fake, gcc_release, clang, simulated)
-        needs: changed_paths
+
         runs-on: ubuntu-latest
-        if: github.actor != 'restyled-io[bot]' && inputs.run-codeql != true && needs.changed_paths.outputs.non_md_changes == 'true'
+        if: github.actor != 'restyled-io[bot]' && inputs.run-codeql != true
 
         container:
             image: ghcr.io/project-chip/chip-build:167
@@ -329,9 +326,9 @@ jobs:
 
     build_linux_python_lib:
         name: Build on Linux (python_lib)
-        needs: changed_paths
+
         runs-on: ubuntu-latest
-        if: github.actor != 'restyled-io[bot]' && inputs.run-codeql != true && needs.changed_paths.outputs.non_md_changes == 'true'
+        if: github.actor != 'restyled-io[bot]' && inputs.run-codeql != true
 
         container:
             image: ghcr.io/project-chip/chip-build:167
@@ -392,9 +389,9 @@ jobs:
 
     build_linux_python_lighting_device:
         name: Build on Linux (python lighting-app)
-        needs: changed_paths
+
         runs-on: ubuntu-latest
-        if: github.actor != 'restyled-io[bot]' && inputs.run-codeql != true && needs.changed_paths.outputs.non_md_changes == 'true'
+        if: github.actor != 'restyled-io[bot]' && inputs.run-codeql != true
 
         container:
             image: ghcr.io/project-chip/chip-build:167
@@ -426,9 +423,8 @@ jobs:
 
     build_darwin:
         name: Build on Darwin (clang, simulated)
-        needs: changed_paths
         runs-on: macos-13
-        if: github.actor != 'restyled-io[bot]'  && inputs.run-codeql != true && needs.changed_paths.outputs.non_md_changes == 'true'
+        if: github.actor != 'restyled-io[bot]'  && inputs.run-codeql != true
 
         steps:
             - name: Checkout
@@ -514,11 +510,11 @@ jobs:
 
     build_linux_gcc_coverage:
         name: Build on Linux (coverage)
-        needs: changed_paths
+
         env:
             TSAN_OPTIONS: "halt_on_error=1 suppressions=scripts/tests/chiptest/tsan-linux-suppressions.txt"
 
-        if: github.actor != 'restyled-io[bot]' && inputs.run-codeql != true && needs.changed_paths.outputs.non_md_changes == 'true'
+        if: github.actor != 'restyled-io[bot]' && inputs.run-codeql != true
         runs-on: ubuntu-latest
 
         container:
