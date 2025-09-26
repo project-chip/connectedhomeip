@@ -229,6 +229,7 @@ class TC_SU_2_5(SoftwareUpdateBaseTest):
         # Should not get a report at least for the following 3 minutes
         logger.info("Waiting for 3 minutes without events")
         event_state_transition.wait_for_event_expect_no_report(timeout_sec=delayed_apply_action_time)
+        logger.info("Waited for 3 minutes without events")
 
         # Cancel State Transition
         event_state_transition.flush_events()
