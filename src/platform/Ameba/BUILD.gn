@@ -43,7 +43,6 @@ static_library("Ameba") {
     "FactoryDataProvider.h",
     "KeyValueStoreManagerImpl.cpp",
     "KeyValueStoreManagerImpl.h",
-    "LwIPCoreLock.cpp",
     "NetworkCommissioningDriver.h",
     "NetworkCommissioningWiFiDriver.cpp",
     "PlatformManagerImpl.cpp",
