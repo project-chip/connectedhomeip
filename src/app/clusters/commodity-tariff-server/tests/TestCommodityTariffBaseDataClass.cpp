@@ -415,10 +415,11 @@ TEST_F(TestCommodityTariffBaseDataClass, UpdateAbort)
 
 struct TestResourceStructMgmtCtx
 {
-    Platform::ScopedMemoryBuffer<char> labelBuffers[TEST_RESOURCES_LIST_LEN_MAX]; // RAII-managed label storage
+    Platform::ScopedMemoryBuffer<char> labelBuffers[TEST_RESOURCES_LIST_LEN_MAX];    // RAII-managed label storage
     Platform::ScopedMemoryBuffer<uint32_t> listBuffers[TEST_RESOURCES_LIST_LEN_MAX]; // RAII-managed list storage
 
-    void Cleanup() {
+    void Cleanup()
+    {
         for (auto & item : labelBuffers)
         {
             if (item.Get())
@@ -484,7 +485,7 @@ CHIP_ERROR CTC_BaseDataClass<ComplexType>::CopyListEntry(const TestResourceStruc
         }
         memcpy(mgmtCtx->labelBuffers[aIdx].Get(), input.label.data(), labelLen);
         mgmtCtx->labelBuffers[aIdx].Get()[labelLen] = '\0';
-        output.label = CharSpan(mgmtCtx->labelBuffers[aIdx].Get(), labelLen);
+        output.label                                = CharSpan(mgmtCtx->labelBuffers[aIdx].Get(), labelLen);
     }
     else
     {
@@ -533,10 +534,9 @@ void CTC_BaseDataClass<ComplexType>::CleanupListEntry(StructType & value, size_t
 class TestResourceDataClass : public CTC_BaseDataClass<ComplexType>
 {
 public:
-    TestResourceDataClass() :
-        CTC_BaseDataClass<ComplexType>(1, &MgmtCtx)
-    {}
+    TestResourceDataClass() : CTC_BaseDataClass<ComplexType>(1, &MgmtCtx) {}
     ~TestResourceDataClass() override = default;
+
 private:
     struct TestResourceStructMgmtCtx MgmtCtx;
 };
@@ -546,16 +546,15 @@ TEST_F(TestCommodityTariffBaseDataClass, NullableListOfResourceStructs_CreationA
     constexpr uint32_t IDs[] = { 100, 200 };
 
     TestResourceStruct ListEntries[] = { {
-                                         .id         = 1,
-                                         .label      = CharSpan::fromCharString(TEST_STR_SAMPLE_0),
-                                         .nestedList = DataModel::List<const uint32_t>(IDs),
-                                     },
-                                     {
-                                         .id         = 2,
-                                         .label      = CharSpan::fromCharString(TEST_STR_SAMPLE_1),
-                                         .nestedList = DataModel::List<const uint32_t>(),
-                                     } };
-
+                                             .id         = 1,
+                                             .label      = CharSpan::fromCharString(TEST_STR_SAMPLE_0),
+                                             .nestedList = DataModel::List<const uint32_t>(IDs),
+                                         },
+                                         {
+                                             .id         = 2,
+                                             .label      = CharSpan::fromCharString(TEST_STR_SAMPLE_1),
+                                             .nestedList = DataModel::List<const uint32_t>(),
+                                         } };
 
     ComplexType sourceValue;
     TestResourceDataClass data;
@@ -591,11 +590,11 @@ TEST_F(TestCommodityTariffBaseDataClass, NullableListOfResourceStructs_SetNewVal
 
     // Prepare source data
     ComplexType sourceValue;
-    
+
     // Create a struct with resources
     TestResourceStruct testStruct = {};
-    testStruct.id = 42;
-    
+    testStruct.id                 = 42;
+
     // Properly allocate and initialize the label buffer
     Platform::ScopedMemoryBuffer<char> testLabelStructBuf;
     if (!testLabelStructBuf.Alloc(strlen(TEST_STR_SAMPLE_2) + 1)) // +1 for null terminator
@@ -604,7 +603,7 @@ TEST_F(TestCommodityTariffBaseDataClass, NullableListOfResourceStructs_SetNewVal
     }
     strcpy(testLabelStructBuf.Get(), TEST_STR_SAMPLE_2);
     testStruct.label = CharSpan(testLabelStructBuf.Get(), strlen(TEST_STR_SAMPLE_2));
-    
+
     // Properly allocate and initialize the nested list buffer
     Platform::ScopedMemoryBuffer<uint32_t> testListStructBuf;
     if (!testListStructBuf.Alloc(2))
@@ -613,7 +612,7 @@ TEST_F(TestCommodityTariffBaseDataClass, NullableListOfResourceStructs_SetNewVal
     }
     testListStructBuf.Get()[0] = 100;
     testListStructBuf.Get()[1] = 200;
-    testStruct.nestedList = DataModel::List<const uint32_t>(testListStructBuf.Get(), 2);
+    testStruct.nestedList      = DataModel::List<const uint32_t>(testListStructBuf.Get(), 2);
 
     // Create a list with our test struct
     Platform::ScopedMemoryBuffer<TestResourceStruct> structListBuffer;
@@ -622,7 +621,7 @@ TEST_F(TestCommodityTariffBaseDataClass, NullableListOfResourceStructs_SetNewVal
         FAIL() << "Failed to allocate struct list buffer";
     }
     structListBuffer.Get()[0] = testStruct;
-    
+
     sourceValue.SetNonNull(DataModel::List<TestResourceStruct>(structListBuffer.Get(), 1));
 
     // Use SetNewValue to copy the complex data
@@ -635,10 +634,9 @@ TEST_F(TestCommodityTariffBaseDataClass, NullableListOfResourceStructs_SetNewVal
     EXPECT_FALSE(data.GetValue().IsNull());
     EXPECT_EQ(data.GetValue().Value().size(), 1ul);
     EXPECT_EQ(data.GetValue().Value()[0].id, 42u);
-    
+
     EXPECT_EQ(data.GetValue().Value()[0].label.size(), strlen(TEST_STR_SAMPLE_2));
-    EXPECT_EQ(memcmp(data.GetValue().Value()[0].label.data(), TEST_STR_SAMPLE_2, 
-                     data.GetValue().Value()[0].label.size()), 0);
+    EXPECT_EQ(memcmp(data.GetValue().Value()[0].label.data(), TEST_STR_SAMPLE_2, data.GetValue().Value()[0].label.size()), 0);
 
     EXPECT_NE(data.GetValue().Value()[0].nestedList.data(), nullptr);
     EXPECT_EQ(data.GetValue().Value()[0].nestedList.size(), 2ul);

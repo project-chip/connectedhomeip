@@ -529,7 +529,7 @@ CHIP_ERROR UpdateTariffComponentAttrsDayEntryById(Instance * aInstance, CurrentT
         return CHIP_ERROR_NOT_FOUND;
     }
     const DataModel::List<const uint32_t> & componentIDs = period->tariffComponentIDs;
-    const size_t componentCount = componentIDs.size();
+    const size_t componentCount                          = componentIDs.size();
 
     // Validate component count
     if (componentCount == 0 || componentCount > kTariffPeriodItemMaxIDs)
@@ -546,8 +546,8 @@ CHIP_ERROR UpdateTariffComponentAttrsDayEntryById(Instance * aInstance, CurrentT
     for (size_t i = 0; i < componentIDs.size(); i++)
     {
         Structs::TariffComponentStruct::Type entry;
-        auto current =
-            GetListEntryById<Structs::TariffComponentStruct::Type>(aCtx.mTariffProvider->GetTariffComponents().Value(), componentIDs[i]);
+        auto current = GetListEntryById<Structs::TariffComponentStruct::Type>(aCtx.mTariffProvider->GetTariffComponents().Value(),
+                                                                              componentIDs[i]);
         if (current == nullptr)
         {
             err = CHIP_ERROR_NOT_FOUND;

@@ -1163,8 +1163,8 @@ private:
         {
             for (size_t idx = 0; idx < list.size(); idx++)
             {
-                 CleanupListEntry(list[idx], idx);
-            }            
+                CleanupListEntry(list[idx], idx);
+            }
         }
 
         if (list.data())
@@ -1186,8 +1186,8 @@ private:
     //}
 
     void * mMgmtDataCtx = nullptr;
-    void * mAuxData = nullptr; ///< Validation context data
-    const AttributeId mAttrId; ///< Managed attribute ID
+    void * mAuxData     = nullptr; ///< Validation context data
+    const AttributeId mAttrId;     ///< Managed attribute ID
 
 protected:
     void * GetMgmtCtx() const { return mMgmtDataCtx; }
