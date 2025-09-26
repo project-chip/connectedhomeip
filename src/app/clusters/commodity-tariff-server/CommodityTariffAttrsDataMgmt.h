@@ -21,6 +21,7 @@
 #include "CommodityTariffConsts.h"
 #include <app-common/zap-generated/cluster-enums.h>
 #include <app-common/zap-generated/cluster-objects.h>
+#include <cstdint>
 #include <platform/LockTracker.h>
 
 #include <atomic>
@@ -211,6 +212,11 @@ struct SpanCopier
     static CHIP_ERROR Copy(const Span<const T> & source, DataModel::List<const T> & destination,
                            size_t maxCount = std::numeric_limits<size_t>::max())
     {
+        if (!destination.empty())
+        {
+            return CHIP_ERROR_IN_USE;
+        }
+
         if (source.empty())
         {
             destination = DataModel::List<const T>();
@@ -238,26 +244,47 @@ struct SpanCopier<char>
     /// @param destination Output span to populate
     /// @param maxCount Maximum number of characters to copy (default: unlimited)
     /// @return CHIP_NO_ERROR if copy succeeded, error code on failure
-    static CHIP_ERROR Copy(const CharSpan & source, DataModel::Nullable<CharSpan> & destination,
-                           size_t maxCount = std::numeric_limits<size_t>::max())
+    static CHIP_ERROR Copy(const CharSpan & source, CharSpan & destination, size_t maxCount = std::numeric_limits<size_t>::max())
     {
+        if (!destination.empty())
+        {
+            return CHIP_ERROR_IN_USE;
+        }
+
         if (source.size() > maxCount)
         {
             return CHIP_ERROR_INVALID_STRING_LENGTH;
         }
 
+        if (!source.empty())
+        {
+            char * buffer = static_cast<char *>(Platform::MemoryCalloc(1, source.size()));
+            if (!buffer)
+                return CHIP_ERROR_NO_MEMORY;
+
+            std::copy(source.begin(), source.end(), buffer);
+            destination = CharSpan(buffer, source.size());
+        }
+
+        return CHIP_NO_ERROR;
+    }
+
+    static CHIP_ERROR CopyToNullable(const CharSpan & source, DataModel::Nullable<CharSpan> & destination,
+                                     size_t maxCount = std::numeric_limits<size_t>::max())
+    {
         if (source.empty())
         {
             destination.SetNull();
             return CHIP_NO_ERROR;
         }
 
-        char * buffer = static_cast<char *>(Platform::MemoryCalloc(1, source.size()));
-        if (!buffer)
-            return CHIP_ERROR_NO_MEMORY;
-
-        std::copy(source.begin(), source.end(), buffer);
-        destination.SetNonNull(CharSpan(buffer, source.size()));
+        CharSpan tempSpan;
+        CHIP_ERROR err = Copy(source, tempSpan, maxCount);
+        if (err != CHIP_NO_ERROR)
+        {
+            return err;
+        }
+        destination.SetNonNull(tempSpan);
         return CHIP_NO_ERROR;
     }
 };
@@ -486,19 +513,19 @@ public:
     virtual ~CTC_BaseDataClassBase() = default;
 
     // Common interface
-    virtual bool IsValid() const                   = 0;
-    virtual bool HasValue() const                  = 0;
-    virtual bool HasNewValue() const               = 0;
-    virtual CHIP_ERROR MarkAsAssigned()            = 0;
-    virtual CHIP_ERROR UpdateBegin(void * aUpdCtx) = 0;
-    virtual bool UpdateFinish(bool aUpdateAllow)   = 0;
-    virtual bool Cleanup()                         = 0;
-    virtual AttributeId GetAttrId() const          = 0;
+    virtual bool IsValid() const { return true; };
+    virtual bool HasValue() const { return false; };
+    virtual bool HasNewValue() const { return false; };
+    virtual CHIP_ERROR MarkAsAssigned() { return CHIP_NO_ERROR; };
+    virtual CHIP_ERROR UpdateBegin(void * aUpdCtx) { return CHIP_NO_ERROR; };
+    virtual bool UpdateFinish(bool aUpdateAllow) { return aUpdateAllow; };
+    virtual bool Cleanup() { return false; };
+    virtual AttributeId GetAttrId() const = 0;
 
     // Type-erased methods for generic access
-    virtual CHIP_ERROR GetValueAsVoid(void *& outValue)        = 0;
-    virtual CHIP_ERROR GetNewValueAsVoid(void *& outValue)     = 0;
-    virtual CHIP_ERROR SetNewValueFromVoid(const void * value) = 0;
+    virtual CHIP_ERROR GetValueAsVoid(void *& outValue) { return CHIP_NO_ERROR; };
+    virtual CHIP_ERROR GetNewValueAsVoid(void *& outValue) { return CHIP_NO_ERROR; };
+    virtual CHIP_ERROR SetNewValueFromVoid(const void * value) { return CHIP_NO_ERROR; };
 };
 
 template <typename T>
@@ -548,7 +575,7 @@ public:
      * - Others: default initialized
      * - Update state set to kIdle
      */
-    explicit CTC_BaseDataClass(AttributeId aAttrId) : mAttrId(aAttrId)
+    explicit CTC_BaseDataClass(AttributeId aAttrId, void * aMgmtCtx = nullptr) : mMgmtDataCtx(aMgmtCtx), mAttrId(aAttrId)
     {
         if constexpr (TypeIsNullable<ValueType>())
         {
@@ -757,7 +784,7 @@ public:
                 {
                     if constexpr (TypeIsStruct<ListEntryType>())
                     {
-                        if (CHIP_NO_ERROR == (err = CopyData(actualValue[idx], buffer[idx])))
+                        if (CHIP_NO_ERROR == (err = CopyListEntry(actualValue[idx], buffer[idx], idx)))
                         {
                             continue;
                         }
@@ -861,13 +888,13 @@ public:
 
     /**
      * @brief Completes the update process
-     * @param[in] aUpdateAllow Whether to commit the changes
+     * @param[in] aUpdateAllowed Whether to commit the changes
      * @return true if value changed, false otherwise
      *
      * @post Always transitions state to kIdle
      * @note Performs cleanup of unused storage
      */
-    bool UpdateFinish(bool aUpdateAllow) override
+    bool UpdateFinish(bool aUpdateAllowed) override
     {
         bool ret = false;
         /* Skip if the attribute object has no new attached data */
@@ -876,7 +903,7 @@ public:
             return false;
         }
 
-        if (aUpdateAllow && (mUpdateState.load() == UpdateState::kValidated))
+        if (aUpdateAllowed && (mUpdateState.load() == UpdateState::kValidated))
         {
             SwapActiveValueStorage();
 
@@ -884,7 +911,6 @@ public:
         }
 
         CleanupByIdx(1 - mActiveValueIdx.load());
-
         mUpdateState.store(UpdateState::kIdle);
 
         return ret;
@@ -907,12 +933,6 @@ public:
 
         return ret;
     }
-
-    /**
-     * @brief Cleans up an external list entry
-     * @param[in,out] entry The list entry to clean up
-     */
-    void CleanupExtListEntry(ListEntryType & entry) { CleanupStruct(entry); }
 
     /**
      * @brief Gets the attribute ID
@@ -1004,6 +1024,7 @@ private:
     // Internal implementation methods...
 
     CHIP_ERROR CopyData(const StructType & input, StructType & output);
+    CHIP_ERROR CopyListEntry(const StructType & input, StructType & output, size_t aIdx = 0);
 
     /**
      * @brief Validates the new value using type-specific validation
@@ -1119,7 +1140,7 @@ private:
                 }
                 else if constexpr (TypeIsStruct<DataType>())
                 {
-                    CleanupStruct(aValue.Value());
+                    CleanupData(aValue.Value());
                 }
             }
             aValue.SetNull();
@@ -1140,10 +1161,9 @@ private:
 
         if constexpr (TypeIsStruct<ListEntryType>())
         {
-
-            for (auto & item : list)
+            for (size_t idx = 0; idx < list.size(); idx++)
             {
-                CleanupStruct(item);
+                CleanupListEntry(list[idx], idx);
             }
         }
 
@@ -1158,14 +1178,19 @@ private:
      * @brief Cleans up a struct value
      * @param aValue Struct to clean up
      */
-    void CleanupStruct(StructType & aValue);
+    void CleanupData(StructType & aValue);
+    void CleanupListEntry(StructType & aValue, size_t aIdx = 0);
 
     //{
     // CleanupStructValue<StructType>(aValue);
     //}
 
-    void * mAuxData = nullptr; ///< Validation context data
-    const AttributeId mAttrId; ///< Managed attribute ID
+    void * mMgmtDataCtx = nullptr;
+    void * mAuxData     = nullptr; ///< Validation context data
+    const AttributeId mAttrId;     ///< Managed attribute ID
+
+protected:
+    void * GetMgmtCtx() const { return mMgmtDataCtx; }
 };
 
 } // namespace CommodityTariffAttrsDataMgmt

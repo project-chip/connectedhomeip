@@ -92,9 +92,7 @@ if (chip_build_tests) {
       "${chip_root}/src/transport/retransmit/tests",
       "${chip_root}/src/transport/tests",
       "${chip_root}/src/tracing/esp32_diagnostic_trace/tests",
-
-      # TODO(#40932): Fix and re-enable the Commodity Tariff unit tests.
-      # "${chip_root}/src/app/clusters/commodity-tariff-server/tests",
+      "${chip_root}/src/app/clusters/commodity-tariff-server/tests",
       "${chip_root}/src/srp/tests",
     ]
 
