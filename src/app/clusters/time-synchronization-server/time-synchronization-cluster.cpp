@@ -238,8 +238,10 @@ void OnFallbackNTPCompletionWrapper(void * context, bool timeSyncSuccessful)
     timeSynchronization->OnFallbackNTPCompletionFn(timeSyncSuccessful);
 }
 
-TimeSynchronizationCluster::TimeSynchronizationCluster(EndpointId endpoint, const BitFlags<TimeSynchronization::Feature> features) :
-    DefaultServerCluster({ endpoint, TimeSynchronization::Id }), mFeatures(features),
+TimeSynchronizationCluster::TimeSynchronizationCluster(EndpointId endpoint, const BitFlags<TimeSynchronization::Feature> features,
+                                                       bool supportsDNSResolve, TimeZoneDatabaseEnum timeZoneDatabase) :
+    DefaultServerCluster({ endpoint, TimeSynchronization::Id }), mFeatures(features), mSupportsDNSResolve(supportsDNSResolve),
+    mTimeZoneDatabase(timeZoneDatabase),
 #if TIME_SYNC_ENABLE_TSC_FEATURE
     mOnDeviceConnectedCallback(OnDeviceConnectedWrapper, this),
     mOnDeviceConnectionFailureCallback(OnDeviceConnectionFailureWrapper, this),
@@ -360,6 +362,10 @@ DataModel::ActionReturnStatus TimeSynchronizationCluster::ReadAttribute(const Da
         return encoder.Encode(TimeSynchronization::kRevision);
     case FeatureMap::Id:
         return encoder.Encode(mFeatures);
+    case SupportsDNSResolve::Id:
+        return encoder.Encode(mSupportsDNSResolve);
+    case TimeZoneDatabase::Id:
+        return encoder.Encode(mTimeZoneDatabase);
     default:
         return Protocols::InteractionModel::Status::UnsupportedAttribute;
     }
@@ -1187,7 +1193,7 @@ TimeSynchronizationCluster::HandleSetTimeZone(CommandHandler * commandObj, const
         {
             return Protocols::InteractionModel::Status::ResourceExhausted;
         }
-        else if (err == CHIP_IM_GLOBAL_STATUS(InvalidCommand))
+        if (err == CHIP_IM_GLOBAL_STATUS(InvalidCommand))
         {
             return Protocols::InteractionModel::Status::InvalidCommand;
         }
@@ -1201,13 +1207,12 @@ TimeSynchronizationCluster::HandleSetTimeZone(CommandHandler * commandObj, const
     }
     GetDelegate()->TimeZoneListChanged(GetTimeZone());
 
-    TimeZoneDatabaseEnum tzDb;
-    TimeZoneDatabase::Get(commandPath.mEndpointId, &tzDb);
     Commands::SetTimeZoneResponse::Type response;
     response.DSTOffsetRequired = true;
     UpdateTimeZoneState();
     const auto & tzList = GetTimeZone();
-    if (HasFeature(TimeSynchronization::Feature::kTimeZone) && tzDb != TimeZoneDatabaseEnum::kNone && tzList.size() != 0)
+    if (HasFeature(TimeSynchronization::Feature::kTimeZone) && mTimeZoneDatabase != TimeZoneDatabaseEnum::kNone &&
+        tzList.size() != 0)
     {
         auto & tz = tzList[0].timeZone;
         if (tz.name.HasValue() && GetDelegate()->HandleUpdateDSTOffset(tz.name.Value()))
@@ -1246,7 +1251,7 @@ TimeSynchronizationCluster::HandleSetDSTOffset(CommandHandler * commandObj, cons
         {
             return Protocols::InteractionModel::Status::ResourceExhausted;
         }
-        else if (err == CHIP_IM_GLOBAL_STATUS(InvalidCommand))
+        if (err == CHIP_IM_GLOBAL_STATUS(InvalidCommand))
         {
             return Protocols::InteractionModel::Status::InvalidCommand;
         }
@@ -1274,14 +1279,9 @@ TimeSynchronizationCluster::HandleSetDefaultNTP(CommandHandler * commandObj, con
         {
             return Protocols::InteractionModel::Status::ConstraintError;
         }
-        bool dnsResolve;
-        if (Status::Success != SupportsDNSResolve::Get(commandPath.mEndpointId, &dnsResolve))
-        {
-            return Protocols::InteractionModel::Status::Failure;
-        }
         bool isDomain = GetDelegate()->IsNTPAddressDomain(dNtpChar.Value());
         bool isIPv6   = GetDelegate()->IsNTPAddressValid(dNtpChar.Value());
-        bool useable  = isIPv6 || (isDomain && dnsResolve);
+        bool useable  = isIPv6 || (isDomain && mSupportsDNSResolve);
         if (!useable)
         {
             return Protocols::InteractionModel::Status::InvalidCommand;

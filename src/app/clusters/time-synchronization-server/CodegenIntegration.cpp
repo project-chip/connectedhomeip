@@ -44,7 +44,14 @@ public:
                                                    uint32_t optionalAttributeBits, uint32_t rawFeatureMap) override
     {
         const BitFlags<TimeSynchronization::Feature> featureMap(rawFeatureMap);
-        gServers[clusterInstanceIndex].Create(endpointId, featureMap);
+
+        bool supportsDNSResolve = false;
+        SupportsDNSResolve::Get(endpointId, &supportsDNSResolve);
+
+        TimeSynchronization::TimeZoneDatabaseEnum timeZoneDatabase = TimeZoneDatabaseEnum::kNone;
+        TimeZoneDatabase::Get(endpointId, &timeZoneDatabase);
+
+        gServers[clusterInstanceIndex].Create(endpointId, featureMap, supportsDNSResolve, timeZoneDatabase);
         return gServers[clusterInstanceIndex].Registration();
     }
 
