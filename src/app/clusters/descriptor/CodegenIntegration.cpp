@@ -37,7 +37,7 @@ static constexpr size_t kDescriptorFixedClusterCount = 0;
 #else
 static constexpr size_t kDescriptorFixedClusterCount = Descriptor::StaticApplicationConfig::kFixedClusterConfig.size();
 #endif
-static constexpr size_t kDescriptorMaxClusterCount   = kDescriptorFixedClusterCount + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT;
+static constexpr size_t kDescriptorMaxClusterCount = kDescriptorFixedClusterCount + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT;
 
 LazyRegisteredServerCluster<DescriptorCluster> gServers[kDescriptorMaxClusterCount];
 
