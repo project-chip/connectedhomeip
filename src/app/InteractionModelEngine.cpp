@@ -2032,13 +2032,21 @@ size_t InteractionModelEngine::GetNumDirtySubscriptions() const
     return numDirtySubscriptions;
 }
 
-void InteractionModelEngine::TriggerCheckInMessage()
+#if CHIP_CONFIG_ENABLE_ICD_SERVER
+#if CHIP_CONFIG_ENABLE_ICD_CIP
+bool InteractionModelEngine::ShouldCheckInMsgsBeSentAtBootFunction(FabricIndex aFabricIndex, NodeId subjectID)
 {
-    std::function<app::ICDManager::ShouldCheckInMsgsBeSentFunction> sendCheckInMessages =
-    std::bind(&Server::ShouldCheckInMsgsBeSentAtBootFunction, this, std::placeholders::_1, std::placeholders::_2);
-    mICDManager.TriggerCheckInMessages(sendCheckInMessages, true /* forceSend */)
+#if CHIP_CONFIG_PERSIST_SUBSCRIPTIONS
+    // If at least one registration has a persisted entry, do not send Check-In message.
+    // The resumption of the persisted subscription will serve the same function a check-in would have served.
+    return !app::InteractionModelEngine::GetInstance()->SubjectHasPersistedSubscription(aFabricIndex, subjectID);
+#else
+    return true;
+#endif // CHIP_CONFIG_PERSIST_SUBSCRIPTIONS
 }
-void InteractionModelEngine::ScheduledTriggerCheckInMessage()
+#endif // CHIP_CONFIG_ENABLE_ICD_CIP
+
+void InteractionModelEngine::ScheduledTriggerCheckInMessages()
 {
     SessionManager * sessionManager = mpExchangeMgr->GetSessionManager();
     if (sessionManager == nullptr)
@@ -2050,9 +2058,25 @@ void InteractionModelEngine::ScheduledTriggerCheckInMessage()
     {
         return;
     }
-    ReturnErrorOnFailure(systemLayer->ScheduleWork(TriggerCheckInMessage, this));
-
+    systemLayer->ScheduleWork(TriggerCheckInMessages, this);
 }
+
+void InteractionModelEngine::TriggerCheckInMessages(System::Layer * aSystemLayer, void * apAppState)
+{
+    InteractionModelEngine * const engine = reinterpret_cast<InteractionModelEngine *>(apAppState);
+    engine->TriggerCheckInMessages();
+}
+
+void InteractionModelEngine::TriggerCheckInMessages()
+{
+    std::function<app::ICDManager::ShouldCheckInMsgsBeSentFunction> sendCheckInMessages =
+    std::bind(&InteractionModelEngine::ShouldCheckInMsgsBeSentAtBootFunction, this, std::placeholders::_1, std::placeholders::_2);
+    if (mICDManager != nullptr)
+    {
+        mICDManager->TriggerCheckInMessages(sendCheckInMessages, true /* forceSend */);
+    }
+}
+#endif // CHIP_CONFIG_ENABLE_ICD_SERVER
 
 void InteractionModelEngine::OnFabricRemoved(const FabricTable & fabricTable, FabricIndex fabricIndex)
 {
