@@ -288,7 +288,7 @@ void KeyValueStoreManagerImpl::KvsMapMigration(void)
 
     if (err == CHIP_NO_ERROR)
     {
-        for (uint8_t i = 0; i < std::min(oldMaxEntries, KeyValueStoreManagerImpl::kMaxEntries); i++)
+        for (size_t i = 0; i < std::min(oldMaxEntries, KeyValueStoreManagerImpl::kMaxEntries); i++)
         {
             char * keyString = mKvsStoredKeyString.Get() + (i * maxStringLen);
             if (keyString[0] != 0)
