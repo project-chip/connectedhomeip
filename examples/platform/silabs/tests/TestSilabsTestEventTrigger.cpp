@@ -58,16 +58,13 @@ public:
 
     CHIP_ERROR GetOtaTlvEncryptionKeyId(uint32_t & value) override
     {
-        VerifyOrReturnError(!forceError, CHIP_ERROR_INTERNAL);
-        uint32_t val = 2;
-        value        = &val;
+        value = 0;
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR DecryptUsingOtaTlvEncryptionKey(MutableByteSpan & block, uint32_t & mIVOffset) override
+    CHIP_ERROR DecryptUsingOtaTlvEncryptionKey(MutableByteSpan & block, uint32_t & ivOffset) override
     {
-        VerifyOrReturnError(!forceError, CHIP_ERROR_INTERNAL);
-        return CHIP_NO_ERROR;
+        return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
     }
 
 private:
@@ -228,43 +225,4 @@ TEST(TestSilabsTestEventTriggerDelegate, TestInit_NullProvider)
 {
     SilabsTestEventTriggerDelegate delegate;
     EXPECT_EQ(delegate.Init(nullptr), CHIP_ERROR_INVALID_ARGUMENT);
-}
-
-// Test that GetOtaTlvEncryptionKeyId returns the expected value
-TEST(TestSilabsTestEventTriggerDelegate, TestGetOtaTlvEncryptionKeyId_Success)
-{
-    ProviderStub provider;
-    uint32_t keyId = 0;
-    EXPECT_EQ(provider.GetOtaTlvEncryptionKeyId(keyId), CHIP_NO_ERROR);
-    EXPECT_EQ(keyId, 2u);
-}
-
-// Test that GetOtaTlvEncryptionKeyId returns error when forced
-TEST(TestSilabsTestEventTriggerDelegate, TestGetOtaTlvEncryptionKeyId_Error)
-{
-    ProviderStub provider;
-    provider.SetForceError(true);
-    uint32_t keyId = 0;
-    EXPECT_EQ(provider.GetOtaTlvEncryptionKeyId(keyId), CHIP_ERROR_INTERNAL);
-}
-
-// Test that DecryptUsingOtaTlvEncryptionKey returns success
-TEST(TestSilabsTestEventTriggerDelegate, TestDecryptUsingOtaTlvEncryptionKey_Success)
-{
-    ProviderStub provider;
-    uint8_t data[16] = { 0 };
-    MutableByteSpan block(data, sizeof(data));
-    uint32_t ivOffset = 0;
-    EXPECT_EQ(provider.DecryptUsingOtaTlvEncryptionKey(block, ivOffset), CHIP_NO_ERROR);
-}
-
-// Test that DecryptUsingOtaTlvEncryptionKey returns error when forced
-TEST(TestSilabsTestEventTriggerDelegate, TestDecryptUsingOtaTlvEncryptionKey_Error)
-{
-    ProviderStub provider;
-    provider.SetForceError(true);
-    uint8_t data[16] = { 0 };
-    MutableByteSpan block(data, sizeof(data));
-    uint32_t ivOffset = 0;
-    EXPECT_EQ(provider.DecryptUsingOtaTlvEncryptionKey(block, ivOffset), CHIP_ERROR_INTERNAL);
 }
