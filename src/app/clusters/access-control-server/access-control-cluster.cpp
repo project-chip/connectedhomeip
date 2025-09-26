@@ -679,7 +679,7 @@ void AccessControlCluster::OnEntryChanged(const chip::Access::SubjectDescriptor 
     // entries at startup from persistent storage, or deleting entries when a
     // fabric is removed), then there won't be a subject descriptor, and also
     // it won't be appropriate to create an event.
-        VerifyOrReturn((mContext != nullptr) && (subjectDescriptor != nullptr));
+    VerifyOrReturn((mContext != nullptr) && (subjectDescriptor != nullptr));
     AclEvent event{ .changeType = ChangeTypeEnum::kChanged, .fabricIndex = subjectDescriptor->fabricIndex };
 
     if (changeType == Access::AccessControl::EntryListener::ChangeType::kAdded)
@@ -704,10 +704,11 @@ void AccessControlCluster::OnEntryChanged(const chip::Access::SubjectDescriptor 
     {
         AclStorage::EncodableEntry encodableEntry(*entry);
         CHIP_ERROR err = encodableEntry.Stage();
-        if (!err.Success()) {
-           ChipLogError(DataManagement, "AccessControlCluster: event failed %" CHIP_ERROR_FORMAT, err.Format());
-           return;
-         }
+        if (!err.Success())
+        {
+            ChipLogError(DataManagement, "AccessControlCluster: event failed %" CHIP_ERROR_FORMAT, err.Format());
+            return;
+        }
 
         event.latestValue.SetNonNull(encodableEntry.GetStagingEntry());
         // NOTE: EncodableEntry can only be constructed from ref so we need to use it within the right scope
