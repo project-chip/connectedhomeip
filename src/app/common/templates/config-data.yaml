@@ -135,6 +135,7 @@ CodeDrivenClusters:
     - Binding
     - Boolean State
     - Ethernet Network Diagnostics
+    - General Commissioning
     - General Diagnostics
     - Group Key Management
     - OTA Software Update Provider
