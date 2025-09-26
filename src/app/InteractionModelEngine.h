@@ -323,6 +323,9 @@ public:
 
     bool FabricHasAtLeastOneActiveSubscription(FabricIndex aFabricIndex) override;
 
+    void TriggerCheckInMessage();
+    void ScheduledTriggerCheckInMessage();
+
 #if CHIP_CONFIG_PERSIST_SUBSCRIPTIONS
     /**
      * @brief Function decrements the number of subscriptions to resume counter - mNumOfSubscriptionsToResume.
@@ -429,7 +432,16 @@ public:
     // Returns the old data model provider value.
     DataModel::Provider * SetDataModelProvider(DataModel::Provider * model);
 
+    #if CHIP_CONFIG_ENABLE_ICD_SERVER
+    #if CHIP_CONFIG_ENABLE_ICD_CIP
+    bool ShouldCheckInMsgsBeSentAtBootFunction(FabricIndex aFabricIndex, NodeId subjectID);
+    #endif // CHIP_CONFIG_ENABLE_ICD_CIP
+
+    void ScheduledTriggerCheckInMessages();
+    static void TriggerCheckInMessages(System::Layer * aSystemLayer, void * apAppState);
+    #endif // CHIP_CONFIG_ENABLE_ICD_SERVER
 private:
+
     /* DataModel::ActionContext implementation */
     Messaging::ExchangeContext * CurrentExchange() override { return mCurrentExchange; }
 
@@ -648,6 +660,7 @@ private:
     Messaging::ExchangeManager * mpExchangeMgr = nullptr;
 
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
+    void TriggerCheckInMessages();
     ICDManager * mICDManager = nullptr;
 #endif // CHIP_CONFIG_ENABLE_ICD_SERVER
 
