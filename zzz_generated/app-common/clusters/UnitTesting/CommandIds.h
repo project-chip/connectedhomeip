@@ -11,6 +11,13 @@ namespace app {
 namespace Clusters {
 namespace UnitTesting {
 namespace Commands {
+
+// Total number of client to server commands supported by the cluster
+inline constexpr uint32_t kAcceptedCommandsCount = 28;
+
+// Total number of server to client commands supported by the cluster (response commands)
+inline constexpr uint32_t kGeneratedCommandsCount = 16;
+
 namespace Test {
 inline constexpr CommandId Id = 0x00000000;
 } // namespace Test

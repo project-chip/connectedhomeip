@@ -123,7 +123,7 @@ class RunContext:
 )
 @click.option(
     '--runner',
-    type=click.Choice(['chip_repl_python', 'chip_tool_python', 'darwin_framework_tool_python'], case_sensitive=False),
+    type=click.Choice(['matter_repl_python', 'chip_tool_python', 'darwin_framework_tool_python'], case_sensitive=False),
     default='chip_tool_python',
     help='Run YAML tests using the specified runner.')
 @click.option(
@@ -139,12 +139,12 @@ def main(context, dry_run, log_level, target, target_glob, target_skip_glob,
     coloredlogs.install(level=__LOG_LEVELS__[log_level], fmt=log_fmt)
 
     runtime = TestRunTime.CHIP_TOOL_PYTHON
-    if runner == 'chip_repl_python':
-        runtime = TestRunTime.CHIP_REPL_PYTHON
+    if runner == 'matter_repl_python':
+        runtime = TestRunTime.MATTER_REPL_PYTHON
     elif runner == 'darwin_framework_tool_python':
         runtime = TestRunTime.DARWIN_FRAMEWORK_TOOL_PYTHON
 
-    if chip_tool is None and not runtime == TestRunTime.CHIP_REPL_PYTHON:
+    if chip_tool is None and not runtime == TestRunTime.MATTER_REPL_PYTHON:
         paths_finder = PathsFinder()
         if runtime == TestRunTime.CHIP_TOOL_PYTHON:
             chip_tool = paths_finder.get('chip-tool')
@@ -158,7 +158,7 @@ def main(context, dry_run, log_level, target, target_glob, target_skip_glob,
         exclude_tags = set([TestTag.__members__[t] for t in exclude_tags])
 
     # Figures out selected test that match the given name(s)
-    if runtime == TestRunTime.CHIP_REPL_PYTHON:
+    if runtime == TestRunTime.MATTER_REPL_PYTHON:
         all_tests = [test for test in chiptest.AllReplYamlTests()]
     elif runtime == TestRunTime.DARWIN_FRAMEWORK_TOOL_PYTHON:
         all_tests = [test for test in chiptest.AllDarwinFrameworkToolYamlTests()]
@@ -178,7 +178,7 @@ def main(context, dry_run, log_level, target, target_glob, target_skip_glob,
             TestTag.PURPOSEFUL_FAILURE,
         }
 
-        if runtime == TestRunTime.CHIP_REPL_PYTHON:
+        if runtime == TestRunTime.MATTER_REPL_PYTHON:
             exclude_tags.add(TestTag.CHIP_TOOL_PYTHON_ONLY)
 
     if 'all' not in target:
@@ -267,8 +267,17 @@ def cmd_list(context):
     '--network-manager-app',
     help='what network-manager app to use')
 @click.option(
-    '--chip-repl-yaml-tester',
-    help='what python script to use for running yaml tests using chip-repl as controller')
+    '--energy-gateway-app',
+    help='what energy-gateway app to use')
+@click.option(
+    '--energy-management-app',
+    help='what energy-management app to use')
+@click.option(
+    '--closure-app',
+    help='what closure app to use')
+@click.option(
+    '--matter-repl-yaml-tester',
+    help='what python script to use for running yaml tests using matter-repl as controller')
 @click.option(
     '--chip-tool-with-python',
     help='what python script to use for running yaml tests using chip-tool as controller')
@@ -297,7 +306,8 @@ def cmd_list(context):
     help='Number of tests that are expected to fail in each iteration.  Overall test will pass if the number of failures matches this.  Nonzero values require --keep-going')
 @click.pass_context
 def cmd_run(context, iterations, all_clusters_app, lock_app, ota_provider_app, ota_requestor_app,
-            fabric_bridge_app, tv_app, bridge_app, lit_icd_app, microwave_oven_app, rvc_app, network_manager_app, chip_repl_yaml_tester,
+            fabric_bridge_app, tv_app, bridge_app, lit_icd_app, microwave_oven_app, rvc_app, network_manager_app,
+            energy_gateway_app, energy_management_app, closure_app, matter_repl_yaml_tester,
             chip_tool_with_python, pics_file, keep_going, test_timeout_seconds, expected_failures):
     if expected_failures != 0 and not keep_going:
         logging.exception(f"'--expected-failures {expected_failures}' used without '--keep-going'")
@@ -340,8 +350,17 @@ def cmd_run(context, iterations, all_clusters_app, lock_app, ota_provider_app, o
     if network_manager_app is None:
         network_manager_app = paths_finder.get('matter-network-manager-app')
 
-    if chip_repl_yaml_tester is None:
-        chip_repl_yaml_tester = paths_finder.get('yamltest_with_chip_repl_tester.py')
+    if energy_gateway_app is None:
+        energy_gateway_app = paths_finder.get('chip-energy-gateway-app')
+
+    if energy_management_app is None:
+        energy_management_app = paths_finder.get('chip-energy-management-app')
+
+    if closure_app is None:
+        closure_app = paths_finder.get('closure-app')
+
+    if matter_repl_yaml_tester is None:
+        matter_repl_yaml_tester = paths_finder.get('yamltest_with_matter_repl_tester.py')
 
     if chip_tool_with_python is None:
         if context.obj.runtime == TestRunTime.DARWIN_FRAMEWORK_TOOL_PYTHON:
@@ -363,7 +382,10 @@ def cmd_run(context, iterations, all_clusters_app, lock_app, ota_provider_app, o
         microwave_oven_app=[microwave_oven_app],
         rvc_app=[rvc_app],
         network_manager_app=[network_manager_app],
-        chip_repl_yaml_tester_cmd=['python3'] + [chip_repl_yaml_tester],
+        energy_gateway_app=[energy_gateway_app],
+        energy_management_app=[energy_management_app],
+        closure_app=[closure_app],
+        matter_repl_yaml_tester_cmd=['python3'] + [matter_repl_yaml_tester],
         chip_tool_with_python_cmd=['python3'] + [chip_tool_with_python],
     )
 

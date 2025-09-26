@@ -38,12 +38,13 @@
 import logging
 import random
 
-import chip.clusters as Clusters
 import langcodes
-from chip.interaction_model import Status
-from chip.testing.matter_asserts import assert_non_empty_string
-from chip.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main, has_cluster, run_if_endpoint_matches
 from mobly import asserts
+
+import matter.clusters as Clusters
+from matter.interaction_model import Status
+from matter.testing.matter_asserts import assert_non_empty_string
+from matter.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main, has_cluster, run_if_endpoint_matches
 
 
 class Test_TC_LCFG_2_1(MatterBaseTest):

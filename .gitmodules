@@ -209,17 +209,17 @@
 [submodule "third_party/silabs/simplicity_sdk"]
 	path = third_party/silabs/simplicity_sdk
 	url = https://github.com/SiliconLabs/simplicity_sdk.git
-	branch = v2024.12.2
+	branch = v2025.6.0
 	platforms = silabs
 [submodule "third_party/silabs/wiseconnect-wifi-bt-sdk"]
 	path = third_party/silabs/wiseconnect-wifi-bt-sdk
 	url = https://github.com/SiliconLabs/wiseconnect-wifi-bt-sdk.git
-	branch = 2.11.4
+	branch = 2.12.0
 	platforms = silabs
 [submodule "third_party/silabs/wifi_sdk"]
 	path = third_party/silabs/wifi_sdk
 	url = https://github.com/SiliconLabs/wiseconnect.git
-	branch = v3.4.2
+	branch = v3.5.0
 	platforms = silabs
 [submodule "editline"]
 	path = third_party/editline/repo
@@ -243,11 +243,6 @@
 	url = https://github.com/matter-mtk/genio-matter-lwip.git
 	branch = main
 	platforms = genio
-[submodule "open-iot-sdk"]
-	path = third_party/open-iot-sdk/sdk
-	url = https://git.gitlab.arm.com/iot/open-iot-sdk/sdk.git
-	branch = main
-	platforms = openiotsdk
 [submodule "bouffalolab_sdk"]
 	path = third_party/bouffalolab/repo
 	url = https://github.com/bouffalolab/bl_iot_sdk_tiny.git
@@ -256,6 +251,7 @@
 [submodule "third_party/libwebsockets/repo"]
 	path = third_party/libwebsockets/repo
 	url = https://github.com/warmcat/libwebsockets
+	branch = v4.4-stable
 	platforms = linux,darwin,tizen
 [submodule "third_party/imgui/repo"]
 	path = third_party/imgui/repo
@@ -344,10 +340,13 @@
 [submodule "third_party/libdatachannel/repo"]
 	path = third_party/libdatachannel/repo
 	url = https://github.com/paullouisageneau/libdatachannel.git
-	platforms = linux
+	platforms = linux,darwin
 	recursive = true
 [submodule "third_party/openthread/ot-realtek"]
 	path = third_party/openthread/ot-realtek
 	url = https://github.com/rtkconnectivity/ot-realtek.git
 	branch = matter_support
 	platforms = realtek
+[submodule "third_party/libtrustymatter/repo"]
+	path = third_party/libtrustymatter/repo
+	url = https://github.com/nxp-imx/libtrustymatter

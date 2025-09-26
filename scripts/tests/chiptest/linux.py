@@ -210,7 +210,10 @@ def PathsWithNetworkNamespaces(paths: ApplicationPaths) -> ApplicationPaths:
         microwave_oven_app='ip netns exec app'.split() + paths.microwave_oven_app,
         rvc_app='ip netns exec app'.split() + paths.rvc_app,
         network_manager_app='ip netns exec app'.split() + paths.network_manager_app,
+        energy_gateway_app='ip netns exec app'.split() + paths.energy_gateway_app,
+        energy_management_app='ip netns exec app'.split() + paths.energy_management_app,
         bridge_app='ip netns exec app'.split() + paths.bridge_app,
-        chip_repl_yaml_tester_cmd='ip netns exec tool'.split() + paths.chip_repl_yaml_tester_cmd,
+        matter_repl_yaml_tester_cmd='ip netns exec tool'.split() + paths.matter_repl_yaml_tester_cmd,
         chip_tool_with_python_cmd='ip netns exec tool'.split() + paths.chip_tool_with_python_cmd,
+        closure_app='ip netns exec app'.split() + paths.closure_app,
     )

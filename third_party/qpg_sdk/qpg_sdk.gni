@@ -59,11 +59,9 @@ template("qpg_sdk") {
 
     include_dirs += [
       "${qpg_sdk_root}/Components/Qorvo/Matter/qvCHIP/inc",
-      "${openthread_root}/include",
+      "${qpg_sdk_root}/Components/Qorvo/Bootloader/qvMultiProtocolOta/inc/",
       "${qpg_sdk_root}/Components/ThirdParty/ARM/mbedtls/v3.3.0/include",
       "${qpg_sdk_root}/Libraries/Qorvo/mbedtls_alt/inc",
-      "${qpg_sdk_root}/Components/Qorvo/BSP/qLed/inc",
-      "${qpg_sdk_root}/Components/Qorvo/BSP/qButton/inc",
       "${qpg_sdk_root}/Components/Qorvo/BSP/qPinCfg/inc",
       "${qpg_sdk_root}/Components/Qorvo/BSP/qPinCfg/inc/boards",
       "${qpg_sdk_root}/Components/Qorvo/BSP/qPinCfg/inc/qpg6200",
@@ -75,7 +73,6 @@ template("qpg_sdk") {
       "${qpg_sdk_root}/Components/Qorvo/HAL_PLATFORM/halCortexM4/inc",
       "${qpg_sdk_root}/Components/Qorvo/HAL_PLATFORM/halCortexM4/xp4002/inc",
       "${qpg_sdk_root}/Components/ThirdParty/mera/sw/appuc",
-      "${qpg_sdk_root}/Components/ThirdParty/mera/sw/regmap",
       "${qpg_sdk_root}/Components/ThirdParty/mera/sw/sys_regmap",
       "${qpg_sdk_root}/Components/ThirdParty/mera/sw/regmap",
       "${qpg_sdk_root}/Components/ThirdParty/CMSIS_5/CMSIS/Core/Include",
@@ -121,9 +118,6 @@ template("qpg_sdk") {
       include_dirs += [
         "${qpg_sdk_root}/Components/ThirdParty/secure_element/software/host/libs/mbedtls_alt/inc",
         "${qpg_sdk_root}/Components/ThirdParty/secure_element/software/host/libs/esecure/include/",
-        "${qpg_sdk_root}/Components/ThirdParty/secure_element/software/esec/libs/base/include",
-        "${qpg_sdk_root}/Components/ThirdParty/secure_element/software/esec/libs/common",
-        "${qpg_sdk_root}/Applications/Matter/base/gen/base_qpg6200_development",
       ]
       if (chip_crypto == "psa") {
         # activate the right headers (*_se.h) for crypto hw accel
@@ -170,79 +164,6 @@ template("qpg_sdk") {
   }
 
   source_set(sdk_target_name) {
-    sources = [
-      "${qpg_sdk_root}/Applications/Matter/shared/config/inc/FreeRTOSConfig.h",
-      "${qpg_sdk_root}/Applications/Matter/shared/config/src/hooks.c",
-    ]
-
-    chip_glue_sources = [
-      #
-      "${qpg_sdk_root}/Components/Qorvo/Matter/qvCHIP/inc/qvCHIP.h",
-    ]
-    sources += chip_glue_sources
-
-    mbedtls_sources = [ "${qpg_sdk_root}/Libraries/Qorvo/mbedtls_alt/inc/${qpg_target_ic}-mbedtls-config.h" ]
-    if (qpg_target_ic == "qpg6200" && !mbedtls_alt_enabled) {
-      mbedtls_sources += [
-        "${qpg_sdk_root}/Components/ThirdParty/ARM/mbedtls/v3.3.0/library/asn1parse.c",
-        "${qpg_sdk_root}/Components/ThirdParty/ARM/mbedtls/v3.3.0/library/asn1write.c",
-        "${qpg_sdk_root}/Components/ThirdParty/ARM/mbedtls/v3.3.0/library/bignum.c",
-        "${qpg_sdk_root}/Components/ThirdParty/ARM/mbedtls/v3.3.0/library/bignum_core.c",
-        "${qpg_sdk_root}/Components/ThirdParty/ARM/mbedtls/v3.3.0/library/ccm.c",
-        "${qpg_sdk_root}/Components/ThirdParty/ARM/mbedtls/v3.3.0/library/cipher.c",
-        "${qpg_sdk_root}/Components/ThirdParty/ARM/mbedtls/v3.3.0/library/cipher_wrap.c",
-        "${qpg_sdk_root}/Components/ThirdParty/ARM/mbedtls/v3.3.0/library/ctr_drbg.c",
-        "${qpg_sdk_root}/Components/ThirdParty/ARM/mbedtls/v3.3.0/library/ecdsa.c",
-        "${qpg_sdk_root}/Components/ThirdParty/ARM/mbedtls/v3.3.0/library/entropy.c",
-        "${qpg_sdk_root}/Components/ThirdParty/ARM/mbedtls/v3.3.0/library/hash_info.c",
-        "${qpg_sdk_root}/Components/ThirdParty/ARM/mbedtls/v3.3.0/library/hkdf.c",
-        "${qpg_sdk_root}/Components/ThirdParty/ARM/mbedtls/v3.3.0/library/hmac_drbg.c",
-        "${qpg_sdk_root}/Components/ThirdParty/ARM/mbedtls/v3.3.0/library/md.c",
-        "${qpg_sdk_root}/Components/ThirdParty/ARM/mbedtls/v3.3.0/library/oid.c",
-        "${qpg_sdk_root}/Components/ThirdParty/ARM/mbedtls/v3.3.0/library/pk.c",
-        "${qpg_sdk_root}/Components/ThirdParty/ARM/mbedtls/v3.3.0/library/pk_wrap.c",
-        "${qpg_sdk_root}/Components/ThirdParty/ARM/mbedtls/v3.3.0/library/pkcs5.c",
-        "${qpg_sdk_root}/Components/ThirdParty/ARM/mbedtls/v3.3.0/library/pkparse.c",
-        "${qpg_sdk_root}/Components/ThirdParty/ARM/mbedtls/v3.3.0/library/pkwrite.c",
-        "${qpg_sdk_root}/Components/ThirdParty/ARM/mbedtls/v3.3.0/library/platform.c",
-        "${qpg_sdk_root}/Components/ThirdParty/ARM/mbedtls/v3.3.0/library/platform_util.c",
-        "${qpg_sdk_root}/Components/ThirdParty/ARM/mbedtls/v3.3.0/library/sha1.c",
-        "${qpg_sdk_root}/Components/ThirdParty/ARM/mbedtls/v3.3.0/library/sha256.c",
-        "${qpg_sdk_root}/Components/ThirdParty/ARM/mbedtls/v3.3.0/library/x509_create.c",
-        "${qpg_sdk_root}/Components/ThirdParty/ARM/mbedtls/v3.3.0/library/x509write_csr.c",
-      ]
-    }
-
-    sources += mbedtls_sources
-
-    if (qpg_target_ic == "qpg6200") {
-      # use gpRandom for now
-      sources += [ "${qpg_sdk_root}/Libraries/Qorvo/mbedtls_alt/src/trng.c" ]
-      if (!mbedtls_alt_enabled) {
-        sources += [
-          "${qpg_sdk_root}/Components/ThirdParty/ARM/mbedtls/v3.3.0/library/aes.c",
-          "${qpg_sdk_root}/Components/ThirdParty/ARM/mbedtls/v3.3.0/library/cmac.c",
-          "${qpg_sdk_root}/Components/ThirdParty/ARM/mbedtls/v3.3.0/library/constant_time.c",
-          "${qpg_sdk_root}/Components/ThirdParty/ARM/mbedtls/v3.3.0/library/ecdh.c",
-          "${qpg_sdk_root}/Components/ThirdParty/ARM/mbedtls/v3.3.0/library/ecp.c",
-          "${qpg_sdk_root}/Components/ThirdParty/ARM/mbedtls/v3.3.0/library/ecp_curves.c",
-          "${qpg_sdk_root}/Components/ThirdParty/ARM/mbedtls/v3.3.0/library/psa_crypto.c",
-          "${qpg_sdk_root}/Components/ThirdParty/ARM/mbedtls/v3.3.0/library/psa_crypto_aead.c",
-          "${qpg_sdk_root}/Components/ThirdParty/ARM/mbedtls/v3.3.0/library/psa_crypto_cipher.c",
-          "${qpg_sdk_root}/Components/ThirdParty/ARM/mbedtls/v3.3.0/library/psa_crypto_client.c",
-          "${qpg_sdk_root}/Components/ThirdParty/ARM/mbedtls/v3.3.0/library/psa_crypto_ecp.c",
-          "${qpg_sdk_root}/Components/ThirdParty/ARM/mbedtls/v3.3.0/library/psa_crypto_hash.c",
-          "${qpg_sdk_root}/Components/ThirdParty/ARM/mbedtls/v3.3.0/library/psa_crypto_mac.c",
-          "${qpg_sdk_root}/Components/ThirdParty/ARM/mbedtls/v3.3.0/library/psa_crypto_rsa.c",
-          "${qpg_sdk_root}/Components/ThirdParty/ARM/mbedtls/v3.3.0/library/psa_crypto_slot_management.c",
-        ]
-      }
-    }
-
-    if (defined(invoker.sources)) {
-      sources += invoker.sources
-    }
-
     public_configs = [
       ":${sdk_target_name}_config",
       "${chip_root}/third_party/qpg_sdk:qpg_freertos_config",

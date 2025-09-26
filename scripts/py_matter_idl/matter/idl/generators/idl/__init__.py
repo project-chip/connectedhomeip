@@ -71,8 +71,10 @@ def human_text_string(value: Union[StructTag, StructQuality, EventPriority, Even
         result = ""
         if AttributeQuality.TIMED_WRITE in value:
             result += "timedwrite "
-        if AttributeQuality.WRITABLE not in value:
+        if AttributeQuality.WRITABLE not in value and AttributeQuality.READABLE in value:
             result += "readonly "
+        if AttributeQuality.READABLE not in value and AttributeQuality.WRITABLE in value:
+            result += "writeonly "
         if AttributeQuality.NOSUBSCRIBE in value:
             result += "nosubscribe "
         return result

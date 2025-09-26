@@ -24,7 +24,7 @@
 #     script-args: >
 #       --PICS src/app/tests/suites/certification/ci-pics-values
 #       --storage-path admin_storage.json
-#       --string-arg th_server_app_path:out/linux-x64-camera/chip-camera-app
+#       --string-arg th_server_app_path:${CAMERA_APP}
 #       --trace-to json:${TRACE_TEST_JSON}.json
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 #     factory-reset: true
@@ -37,11 +37,12 @@ import random
 import tempfile
 from time import sleep
 
-import chip.clusters as Clusters
-from chip import ChipDeviceCtrl
-from chip.testing.apps import AppServerSubprocess
-from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from mobly import asserts
+
+import matter.clusters as Clusters
+from matter import ChipDeviceCtrl
+from matter.testing.apps import AppServerSubprocess
+from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 
 
 class TC_WebRTCRequestor_2_2(MatterBaseTest):
@@ -87,7 +88,7 @@ class TC_WebRTCRequestor_2_2(MatterBaseTest):
 
     def desc_TC_WebRTCRequestor_2_2(self) -> str:
         """Returns a description of this test"""
-        return "[TC-{picsCode}-2.2] Validate sending an SDP Answer command to {DUT_Server} with an invalid session id"
+        return "[TC-{picsCode}-2.2] Validate Answer command with invalid session id"
 
     def steps_TC_WebRTCRequestor_2_2(self) -> list[TestStep]:
         """
@@ -97,9 +98,8 @@ class TC_WebRTCRequestor_2_2(MatterBaseTest):
             TestStep(1, "Commission the {TH_Server} from TH"),
             TestStep(2, "Open the Commissioning Window of the {TH_Server}"),
             TestStep(3, "Commission the {TH_Server} from DUT"),
-            TestStep(4, "Connect the {TH_Server} from DUT"),
-            TestStep(5, "Activate the Fault injection to modify the session ID of the WebRTC Answer command from {TH_Server}"),
-            TestStep(6, "Send ProvideOffer command to the {TH_Server} from DUT"),
+            TestStep(4, "Activate fault injection on {TH_Server} to modify the session ID of the WebRTC Answer command"),
+            TestStep(5, "Trigger {TH_Server} to send an Answer command to DUT with an invalid/non-existent WebRTCSessionID"),
         ]
         return steps
 
@@ -156,19 +156,6 @@ class TC_WebRTCRequestor_2_2(MatterBaseTest):
         )
 
         self.step(4)
-        # Prompt user with instructions
-        prompt_msg = (
-            "\nPlease connect the server app from DUT:\n"
-            "  webrtc connect 1 1\n"
-        )
-
-        if self.is_pics_sdk_ci_only:
-            # TODO: send command to DUT via websocket
-            pass
-        else:
-            self.wait_for_user_input(prompt_msg)
-
-        self.step(5)
         logging.info("Injecting kFault_ModifyWebRTCAnswerSessionId on TH_SERVER")
 
         # --- Fault‑Injection cluster (mfg‑specific 0xFFF1_FC06) ---
@@ -193,11 +180,11 @@ class TC_WebRTCRequestor_2_2(MatterBaseTest):
         )
         sleep(1)
 
-        self.step(6)
+        self.step(5)
         # Prompt user with instructions
         prompt_msg = (
             "\nSend 'ProvideOffer' command to the server app from DUT:\n"
-            "  webrtc provide-offer 3\n"
+            "  webrtc establish-session 1\n"
             "Input 'Y' if WebRTC session is failed with error 'NOT_FOUND'\n"
             "Input 'N' if WebRTC session is successfully established\n"
         )

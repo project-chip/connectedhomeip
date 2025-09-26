@@ -15,7 +15,6 @@
 import os
 import shlex
 from enum import Enum, auto
-from typing import Optional
 
 from .builder import Builder, BuilderOutput
 

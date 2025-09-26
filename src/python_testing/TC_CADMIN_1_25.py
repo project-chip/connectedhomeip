@@ -33,11 +33,12 @@
 
 import random
 
-import chip.clusters as Clusters
-from chip import ChipDeviceCtrl
-from chip.testing.matter_testing import (AttributeMatcher, ClusterAttributeChangeAccumulator, MatterBaseTest, TestStep,
-                                         async_test_body, default_matter_test_main)
 from mobly import asserts
+
+import matter.clusters as Clusters
+from matter import ChipDeviceCtrl
+from matter.testing.event_attribute_reporting import AttributeSubscriptionHandler
+from matter.testing.matter_testing import AttributeMatcher, MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 
 
 class TC_CADMIN_1_25(MatterBaseTest):
@@ -117,7 +118,7 @@ class TC_CADMIN_1_25(MatterBaseTest):
 
         self.step(2)
         # TH_CR1 subscribes to WindowStatus attribute on DUT_CE
-        th1_window_status_accumulator = ClusterAttributeChangeAccumulator(
+        th1_window_status_accumulator = AttributeSubscriptionHandler(
             Clusters.AdministratorCommissioning,
             Clusters.AdministratorCommissioning.Attributes.WindowStatus)
         await th1_window_status_accumulator.start(
@@ -127,7 +128,7 @@ class TC_CADMIN_1_25(MatterBaseTest):
 
         self.step(3)
         # TH_CR1 subscribes to AdminFabricIndex attribute on DUT_CE
-        th1_admin_fabric_index_accumulator = ClusterAttributeChangeAccumulator(
+        th1_admin_fabric_index_accumulator = AttributeSubscriptionHandler(
             Clusters.AdministratorCommissioning,
             Clusters.AdministratorCommissioning.Attributes.AdminFabricIndex)
         await th1_admin_fabric_index_accumulator.start(
@@ -137,7 +138,7 @@ class TC_CADMIN_1_25(MatterBaseTest):
 
         self.step(4)
         # TH_CR1 subscribes to AdminVendorId attribute on DUT_CE
-        th1_admin_vendor_id_accumulator = ClusterAttributeChangeAccumulator(
+        th1_admin_vendor_id_accumulator = AttributeSubscriptionHandler(
             Clusters.AdministratorCommissioning,
             Clusters.AdministratorCommissioning.Attributes.AdminVendorId)
         await th1_admin_vendor_id_accumulator.start(
@@ -209,7 +210,7 @@ class TC_CADMIN_1_25(MatterBaseTest):
 
         null_match = AttributeMatcher.from_callable(
             "Attribute is null",
-            lambda report: str(type(report.value)).find('chip.clusters.Types.Nullable') >= 0)
+            lambda report: str(type(report.value)).find('matter.clusters.Types.Nullable') >= 0)
 
         th1_window_status_accumulator.await_all_expected_report_matches([window_status_0_match], timeout_sec=10)
         th1_admin_fabric_index_accumulator.await_all_expected_report_matches([null_match], timeout_sec=10)
@@ -222,7 +223,7 @@ class TC_CADMIN_1_25(MatterBaseTest):
 
         self.step(10)
         # TH_CR2 subscribes to WindowStatus attribute on DUT_CE
-        th2_window_status_accumulator = ClusterAttributeChangeAccumulator(
+        th2_window_status_accumulator = AttributeSubscriptionHandler(
             Clusters.AdministratorCommissioning,
             Clusters.AdministratorCommissioning.Attributes.WindowStatus)
         await th2_window_status_accumulator.start(
@@ -232,7 +233,7 @@ class TC_CADMIN_1_25(MatterBaseTest):
 
         self.step(11)
         # TH_CR2 subscribes to AdminFabricIndex attribute on DUT_CE
-        th2_admin_fabric_index_accumulator = ClusterAttributeChangeAccumulator(
+        th2_admin_fabric_index_accumulator = AttributeSubscriptionHandler(
             Clusters.AdministratorCommissioning,
             Clusters.AdministratorCommissioning.Attributes.AdminFabricIndex)
         await th2_admin_fabric_index_accumulator.start(
@@ -242,7 +243,7 @@ class TC_CADMIN_1_25(MatterBaseTest):
 
         self.step(12)
         # TH_CR2 subscribes to AdminVendorId attribute on DUT_CE
-        th2_admin_vendor_id_accumulator = ClusterAttributeChangeAccumulator(
+        th2_admin_vendor_id_accumulator = AttributeSubscriptionHandler(
             Clusters.AdministratorCommissioning,
             Clusters.AdministratorCommissioning.Attributes.AdminVendorId)
         await th2_admin_vendor_id_accumulator.start(

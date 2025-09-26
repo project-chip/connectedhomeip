@@ -39,6 +39,9 @@ declare_args() {
   }
 
   ti_sysconfig_root = ""
+  silk_logging_enabled = false
+  enable_appoble_ota = ""
+  appoble_enabled = ""
 }
 
 assert(ti_simplelink_sdk_root != "", "ti_simplelink_sdk_root must be specified")
@@ -106,6 +109,12 @@ template("ti_sysconfig") {
       rtos = "freertos"
     }
 
+    if (silk_logging_enabled) {
+      silk_log_define = "SL_TRUE"
+    } else {
+      silk_log_define = "SL_FALSE"
+    }
+
     if (ti_simplelink_device == "") {
       args = [
         ti_sysconfig_root,
@@ -120,6 +129,8 @@ template("ti_sysconfig") {
         "/ti/boards/" + ti_simplelink_board,
         "--rtos",
         rtos,
+        "--scriptArgs",
+        silk_log_define,
       ]
     } else {
       args = [
@@ -135,6 +146,8 @@ template("ti_sysconfig") {
         ti_simplelink_device,
         "--rtos",
         rtos,
+        "--scriptArgs",
+        silk_log_define,
       ]
     }
 
@@ -200,6 +213,12 @@ template("ti_simplelink_sdk") {
     if (ti_simplelink_board == "LP_EM_CC1354P10_1" ||
         ti_simplelink_board == "CC2674R10") {
       defines += [ "EM_CC1354P10_1_LP" ]
+    }
+
+    if (ti_simplelink_device_family == "cc13x4_26x4") {
+      if (silk_logging_enabled) {
+        libs += [ "${ti_simplelink_sdk_root}/source/ti/log/lib/gcc/${ti_simplelink_isa}/log_${ti_simplelink_soc_family}.a" ]
+      }
     }
   }
 
@@ -280,6 +299,10 @@ template("ti_simplelink_sdk") {
         "${ti_simplelink_sdk_root}/kernel/freertos/dpl/PowerCC32XX_freertos.c",
         "${ti_simplelink_sdk_root}/kernel/freertos/startup/startup_cc32xx_gcc.c",
       ]
+    }
+
+    if (ti_simplelink_device_family == "cc13x4_26x4") {
+      sources += [ "${ti_simplelink_sdk_root}/kernel/freertos/dpl/TimestampPCC26XX_freertos.c" ]
     }
 
     if (defined(invoker.sources)) {
@@ -398,18 +421,22 @@ template("ti_simplelink_sdk") {
         "${ti_simplelink_sdk_root}/source/ti/ble5stack_flash/libraries/cc1354p10_6/OneLib.a",
         "${ti_simplelink_sdk_root}/source/ti/ble5stack_flash/libraries/cc1354p10_6/StackWrapper.a",
       ]
+      defines += [ "CC13X2P" ]
     }
 
     defines += [
       "ONE_BLE_LIB_SIZE_OPTIMIZATION",
       "NVOCMP_NVPAGES=12",
       "NVOCMP_NWSAMEITEM=1",
-      "CC13X2P",
       "SYSCFG",
       "CC13X4",
       "CC13XX",
       "EXTENDED_STACK_SETTINGS=EXTENDED_STACK_SETTINGS_DEFAULT",
     ]
+
+    if (silk_logging_enabled) {
+      defines += [ "ti_log_Log_ENABLE" ]
+    }
 
     include_dirs += [
       # DMM/BLE:
@@ -527,13 +554,13 @@ template("ti_simplelink_sdk") {
       sources = [
         "${chip_root}/src/platform/ti/cc13xx_26xx/TI_heap_wrapper.c",
         "${chip_root}/src/platform/ti/cc13xx_26xx/chipOBleProfile.c",
+        "${chip_root}/src/platform/ti/cc13xx_26xx/dmm_priority_ble_matter.c",
         "${chip_root}/src/platform/ti/cc13xx_26xx/icall_FreeRTOS.c",
         "${ti_simplelink_sdk_root}/source/ti/ble5stack/common/cc26xx/freertos/bget.c",
         "${ti_simplelink_sdk_root}/source/ti/ble5stack/common/cc26xx/rcosc/rcosc_calibration.c",
         "${ti_simplelink_sdk_root}/source/ti/dmm/apps/common/ble_remote_display/stack/osal_icall_ble.c",
         "${ti_simplelink_sdk_root}/source/ti/dmm/apps/common/freertos/util.c",
         "${ti_simplelink_sdk_root}/source/ti/dmm/apps/common/thread/source/activity/dmm_thread_activity.c",
-        "${ti_simplelink_sdk_root}/source/ti/dmm/dmm_priority_ble_thread.c",
       ]
 
       if (ti_simplelink_device_family == "cc13x4_26x4") {

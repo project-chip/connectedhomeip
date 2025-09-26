@@ -60,7 +60,11 @@ config HEAP_MEM_POOL_IGNORE_MIN
     default y if CHIP_WIFI
 
 config CHIP_MALLOC_SYS_HEAP_SIZE
+    default 10240 if SOC_SERIES_NRF54LX # nRF54L requires more memory due to crypto backend
     default 8192 if NET_L2_OPENTHREAD
+
+config MPSL_WORK_STACK_SIZE
+    default 2048 if SOC_SERIES_NRF54LX # nRF54L requires more memory due to crypto backend
 
 # We use sys_heap based allocators, so make sure we don't reserve unused libc heap anyway
 config COMMON_LIBC_MALLOC_ARENA_SIZE
@@ -157,6 +161,10 @@ config BT_BUF_ACL_RX_SIZE
 config BT_BUF_ACL_TX_SIZE
     default 251
 
+# It is set based on BT_BUF_ACL_RX_COUNT_EXTRA = 6 - (BT_MAX_CONN + 1)
+config BT_BUF_ACL_RX_COUNT_EXTRA
+    default 4
+
 config BT_RX_STACK_SIZE
     default 1200
 
@@ -247,7 +255,7 @@ config OPENTHREAD_THREAD_STACK_SIZE
 config OPENTHREAD_DEFAULT_TX_POWER
     default 20 if MPSL_FEM
     default 3 if SOC_SERIES_NRF53X
-    default 8 if SOC_SERIES_NRF52X
+    default 8 if SOC_SERIES_NRF52X || SOC_SERIES_NRF54LX
 
 endif # NET_L2_OPENTHREAD
 
@@ -318,6 +326,9 @@ config CHIP_CRYPTO_PSA
     imply PSA_WANT_ALG_SPAKE2P_MATTER
 
 if CHIP_CRYPTO_PSA
+
+config CHIP_CRYPTO_PSA_AEAD_SINGLE_PART
+    default y if SOC_SERIES_NRF54LX
 
 config PSA_CRYPTO_DRIVER_OBERON
     default y if (SOC_SERIES_NRF52X || SOC_SERIES_NRF53X)

@@ -245,8 +245,8 @@ enum ThreeLevelAutoEnum : enum8 {
 }
 
 enum WebRTCEndReasonEnum : enum8 {
-  kIceFailed = 0;
-  kIceTimeout = 1;
+  kICEFailed = 0;
+  kICETimeout = 1;
   kUserHangup = 2;
   kUserBusy = 3;
   kReplaced = 4;
@@ -256,7 +256,8 @@ enum WebRTCEndReasonEnum : enum8 {
   kOutOfResources = 8;
   kMediaTimeout = 9;
   kLowPower = 10;
-  kUnknownReason = 11;
+  kPrivacyMode = 11;
+  kUnknownReason = 12;
 }
 
 bitmap TestGlobalBitmap : bitmap32 {
@@ -343,7 +344,7 @@ fabric_scoped struct WebRTCSessionStruct {
   StreamUsageEnum streamUsage = 3;
   nullable int16u videoStreamID = 4;
   nullable int16u audioStreamID = 5;
-  optional boolean metadataEnabled = 6;
+  boolean metadataEnabled = 6;
   fabric_idx fabricIndex = 254;
 }
 
@@ -537,9 +538,9 @@ cluster OnOff = 6 {
   command Toggle(): DefaultSuccess = 2;
   /** The OffWithEffect command allows devices to be turned off using enhanced ways of fading. */
   command OffWithEffect(OffWithEffectRequest): DefaultSuccess = 64;
-  /** The OnWithRecallGlobalScene command allows the recall of the settings when the device was turned off. */
+  /** This command allows the recall of the settings when the device was turned off. */
   command OnWithRecallGlobalScene(): DefaultSuccess = 65;
-  /** The OnWithTimedOff command allows devices to be turned on for a specific duration with a guarded off duration so that SHOULD the device be subsequently switched off, further OnWithTimedOff commands, received during this time, are prevented from turning the devices back on. */
+  /** This command allows devices to be turned on for a specific duration with a guarded off duration so that SHOULD the device be subsequently turned off, further OnWithTimedOff commands, received during this time, are prevented from turning the devices back on. */
   command OnWithTimedOff(OnWithTimedOffRequest): DefaultSuccess = 66;
 }
 
@@ -1277,7 +1278,7 @@ cluster OtaSoftwareUpdateRequestor = 42 {
   }
 
   /** Announce the presence of an OTA Provider */
-  command AnnounceOTAProvider(AnnounceOTAProviderRequest): DefaultSuccess = 0;
+  command access(invoke: administer) AnnounceOTAProvider(AnnounceOTAProviderRequest): DefaultSuccess = 0;
 }
 
 /** Nodes should be expected to be deployed to any and all regions of the world. These global regions
@@ -1684,6 +1685,7 @@ cluster GeneralCommissioning = 48 {
   provisional readonly attribute access(read: administer) optional nullable int32u TCUpdateDeadline = 9;
   provisional readonly attribute access(read: manage) optional octet_string<8> recoveryIdentifier = 10;
   provisional readonly attribute access(read: manage) optional nullable NetworkRecoveryReasonEnum networkRecoveryReason = 11;
+  provisional readonly attribute optional boolean isCommissioningWithoutPower = 12;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute attrib_id attributeList[] = 65531;
@@ -3692,7 +3694,7 @@ cluster TemperatureControl = 86 {
 
 /** Attributes and commands for configuring the Refrigerator alarm. */
 cluster RefrigeratorAlarm = 87 {
-  revision 1; // NOTE: Default/not specifically set
+  revision 1;
 
   bitmap AlarmBitmap : bitmap32 {
     kDoorOpen = 0x1;
@@ -4340,6 +4342,80 @@ provisional cluster ScenesManagement = 98 {
   fabric command GetSceneMembership(GetSceneMembershipRequest): GetSceneMembershipResponse = 6;
   /** This command allows a client to efficiently copy scenes from one group/scene identifier pair to another group/scene identifier pair. */
   fabric command access(invoke: manage) CopyScene(CopySceneRequest): CopySceneResponse = 64;
+}
+
+/** The Groupcast cluster manages the content of the node-wide multicast Group membership that is part of the underlying interaction layer. */
+cluster Groupcast = 101 {
+  revision 1;
+
+  bitmap Feature : bitmap32 {
+    kListener = 0x1;
+    kSender = 0x2;
+  }
+
+  fabric_scoped struct MembershipStruct {
+    group_id groupID = 0;
+    endpoint_no endpoints[] = 1;
+    fabric_sensitive int32u keyID = 2;
+    boolean hasAuxiliaryACL = 3;
+    optional fabric_sensitive int32u expiringKeyID = 4;
+    fabric_idx fabricIndex = 254;
+  }
+
+  readonly attribute MembershipStruct membership[] = 0;
+  readonly attribute int16u maxMembershipCount = 1;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
+
+  request struct JoinGroupRequest {
+    group_id groupID = 0;
+    endpoint_no endpoints[] = 1;
+    octet_string<16> key = 2;
+    int32u keyID = 3;
+    optional epoch_s gracePeriod = 4;
+    optional boolean useAuxiliaryACL = 5;
+  }
+
+  request struct LeaveGroupRequest {
+    group_id groupID = 0;
+    optional endpoint_no endpoints[] = 1;
+  }
+
+  response struct LeaveGroupResponse = 2 {
+    group_id groupID = 0;
+    optional endpoint_no endpoints[] = 1;
+    optional boolean listTooLarge = 2;
+  }
+
+  request struct UpdateGroupKeyRequest {
+    group_id groupID = 0;
+    octet_string<16> key = 1;
+    int32u keyID = 2;
+    optional epoch_s gracePeriod = 3;
+  }
+
+  request struct ExpireGracePeriodRequest {
+    group_id groupID = 0;
+  }
+
+  request struct ConfigureAuxiliaryACLRequest {
+    group_id groupID = 0;
+    boolean useAuxiliaryACL = 1;
+  }
+
+  /** This command SHALL be used to instruct the server to join a multicast group. */
+  fabric command access(invoke: manage) JoinGroup(JoinGroupRequest): DefaultSuccess = 0;
+  /** This command SHALL allow a maintainer to request that the server withdraws itself or specific endpoints from a specific group or from all groups of this client's fabric. */
+  fabric command access(invoke: manage) LeaveGroup(LeaveGroupRequest): LeaveGroupResponse = 1;
+  /** This command SHALL allow a fabric maintainer to update the group operational key for an existing group ID that the server is a member of. */
+  fabric command access(invoke: manage) UpdateGroupKey(UpdateGroupKeyRequest): DefaultSuccess = 3;
+  /** This command SHALL allow a fabric maintainer to expire the grace period of the previous key for an existing group ID that the server is a member of. */
+  fabric command access(invoke: manage) ExpireGracePeriod(ExpireGracePeriodRequest): DefaultSuccess = 4;
+  /** This command SHALL allow an Administrator to enable or disable the generation of AuxiliaryACL entries in the Access Control Cluster based on the groups joined (see Groupcast Auxiliary ACL Handling). */
+  fabric command access(invoke: administer) ConfigureAuxiliaryACL(ConfigureAuxiliaryACLRequest): DefaultSuccess = 5;
 }
 
 /** Attributes and commands for monitoring HEPA filters in a device */
@@ -6442,7 +6518,7 @@ cluster WindowCovering = 258 {
   command GoToTiltPercentage(GoToTiltPercentageRequest): DefaultSuccess = 8;
 }
 
-/** This cluster provides an interface for controlling a Closure device. */
+/** This cluster provides an interface for controlling a Closure. */
 provisional cluster ClosureControl = 260 {
   revision 1;
 
@@ -6452,6 +6528,15 @@ provisional cluster ClosureControl = 260 {
     kTemperatureLimited = 2;
     kMaintenanceRequired = 3;
     kInternalInterference = 4;
+  }
+
+  enum CurrentPositionEnum : enum8 {
+    kFullyClosed = 0;
+    kFullyOpened = 1;
+    kPartiallyOpened = 2;
+    kOpenedForPedestrian = 3;
+    kOpenedForVentilation = 4;
+    kOpenedAtSignature = 5;
   }
 
   enum MainStateEnum : enum8 {
@@ -6465,21 +6550,12 @@ provisional cluster ClosureControl = 260 {
     kSetupRequired = 7;
   }
 
-  enum PositioningEnum : enum8 {
-    kFullyClosed = 0;
-    kFullyOpened = 1;
-    kPartiallyOpened = 2;
-    kOpenedForPedestrian = 3;
-    kOpenedForVentilation = 4;
-    kOpenedAtSignature = 5;
-  }
-
   enum TargetPositionEnum : enum8 {
-    kCloseInFull = 0;
-    kOpenInFull = 1;
-    kPedestrian = 2;
-    kVentilation = 3;
-    kSignature = 4;
+    kMoveToFullyClosed = 0;
+    kMoveToFullyOpen = 1;
+    kMoveToPedestrianPosition = 2;
+    kMoveToVentilationPosition = 3;
+    kMoveToSignaturePosition = 4;
   }
 
   bitmap Feature : bitmap32 {
@@ -6494,16 +6570,21 @@ provisional cluster ClosureControl = 260 {
     kManuallyOperable = 0x100;
   }
 
-  struct OverallStateStruct {
-    optional nullable PositioningEnum positioning = 0;
-    optional nullable boolean latch = 1;
-    optional nullable ThreeLevelAutoEnum speed = 2;
-    optional nullable boolean secureState = 3;
+  bitmap LatchControlModesBitmap : bitmap8 {
+    kRemoteLatching = 0x1;
+    kRemoteUnlatching = 0x2;
   }
 
-  struct OverallTargetStruct {
-    optional TargetPositionEnum position = 0;
-    optional boolean latch = 1;
+  struct OverallCurrentStateStruct {
+    optional nullable CurrentPositionEnum position = 0;
+    optional nullable boolean latch = 1;
+    optional ThreeLevelAutoEnum speed = 2;
+    nullable boolean secureState = 3;
+  }
+
+  struct OverallTargetStateStruct {
+    optional nullable TargetPositionEnum position = 0;
+    optional nullable boolean latch = 1;
     optional ThreeLevelAutoEnum speed = 2;
   }
 
@@ -6525,8 +6606,9 @@ provisional cluster ClosureControl = 260 {
   readonly attribute optional nullable elapsed_s countdownTime = 0;
   readonly attribute MainStateEnum mainState = 1;
   readonly attribute ClosureErrorEnum currentErrorList[] = 2;
-  readonly attribute nullable OverallStateStruct overallState = 3;
-  readonly attribute nullable OverallTargetStruct overallTarget = 4;
+  readonly attribute nullable OverallCurrentStateStruct overallCurrentState = 3;
+  readonly attribute nullable OverallTargetStateStruct overallTargetState = 4;
+  readonly attribute optional LatchControlModesBitmap latchControlModes = 5;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute attrib_id attributeList[] = 65531;
@@ -6541,13 +6623,13 @@ provisional cluster ClosureControl = 260 {
 
   /** On receipt of this command, the closure SHALL stop its movement as fast as the closure is able too. */
   command Stop(): DefaultSuccess = 0;
-  /** This command is used to move the device to a specific position, latch and/or perform the movement at specific speed. */
-  command MoveTo(MoveToRequest): DefaultSuccess = 1;
-  /** This command is used to trigger a calibration of the device. */
-  command access(invoke: manage) Calibrate(): DefaultSuccess = 2;
+  /** On receipt of this command, the closure SHALL operate to update its position, latch state and/or motion speed. */
+  timed command MoveTo(MoveToRequest): DefaultSuccess = 1;
+  /** This command is used to trigger a calibration of the closure. */
+  timed command access(invoke: manage) Calibrate(): DefaultSuccess = 2;
 }
 
-/** Ceiling values are dedicated for closures that close a ceiling, such as horizontal awnings, pergolas, etc. */
+/** This cluster provides an interface to reflect and control a closure's range of movement, usually involving a panel, by using 6-axis framework. */
 provisional cluster ClosureDimension = 261 {
   revision 1;
 
@@ -6610,10 +6692,6 @@ provisional cluster ClosureDimension = 261 {
     kBackward = 9;
     kDepthMask = 10;
     kDepthSymmetry = 11;
-    kCeilingSimple = 12;
-    kCeilingMask = 13;
-    kCeilingSidedSymmetry = 14;
-    kCeilingCenteredSymmetry = 15;
   }
 
   bitmap Feature : bitmap32 {
@@ -6627,9 +6705,14 @@ provisional cluster ClosureDimension = 261 {
     kModulation = 0x80;
   }
 
-  struct CurrentStateStruct {
-    optional percent100ths position = 0;
-    optional boolean latch = 1;
+  bitmap LatchControlModesBitmap : bitmap8 {
+    kRemoteLatching = 0x1;
+    kRemoteUnlatching = 0x2;
+  }
+
+  struct DimensionStateStruct {
+    optional nullable percent100ths position = 0;
+    optional nullable boolean latch = 1;
     optional ThreeLevelAutoEnum speed = 2;
   }
 
@@ -6638,19 +6721,13 @@ provisional cluster ClosureDimension = 261 {
     percent100ths max = 1;
   }
 
-  struct TargetStruct {
-    optional percent100ths position = 0;
-    optional boolean latch = 1;
-    optional ThreeLevelAutoEnum speed = 2;
-  }
-
   struct UnitRangeStruct {
     int16s min = 0;
     int16s max = 1;
   }
 
-  readonly attribute nullable CurrentStateStruct currentState = 0;
-  readonly attribute nullable TargetStruct target = 1;
+  readonly attribute nullable DimensionStateStruct currentState = 0;
+  readonly attribute nullable DimensionStateStruct targetState = 1;
   readonly attribute optional percent100ths resolution = 2;
   readonly attribute optional percent100ths stepValue = 3;
   readonly attribute optional ClosureUnitEnum unit = 4;
@@ -6660,6 +6737,7 @@ provisional cluster ClosureDimension = 261 {
   readonly attribute optional RotationAxisEnum rotationAxis = 8;
   readonly attribute optional OverflowEnum overflow = 9;
   readonly attribute optional ModulationTypeEnum modulationType = 10;
+  readonly attribute optional LatchControlModesBitmap latchControlModes = 11;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute attrib_id attributeList[] = 65531;
@@ -6678,10 +6756,10 @@ provisional cluster ClosureDimension = 261 {
     optional ThreeLevelAutoEnum speed = 2;
   }
 
-  /** This command is used to move a dimension of the device to a target position. */
-  command SetTarget(SetTargetRequest): DefaultSuccess = 0;
-  /** This command is used to move a dimension of the device to a target position by a number of steps. */
-  command Step(StepRequest): DefaultSuccess = 1;
+  /** This command is used to move a dimension of the closure to a target position. */
+  timed command SetTarget(SetTargetRequest): DefaultSuccess = 0;
+  /** This command is used to move a dimension of the closure to a target position by a number of steps. */
+  timed command Step(StepRequest): DefaultSuccess = 1;
 }
 
 /** The Service Area cluster provides an interface for controlling the areas where a device should operate, and for querying the current area being serviced. */
@@ -6904,7 +6982,7 @@ cluster PumpConfigurationAndControl = 512 {
 
 /** An interface for configuring and controlling the functionality of a thermostat. */
 cluster Thermostat = 513 {
-  revision 7;
+  revision 9;
 
   enum ACCapacityFormatEnum : enum8 {
     kBTUh = 0;
@@ -7022,6 +7100,8 @@ cluster Thermostat = 513 {
     kLocalTemperatureNotExposed = 0x40;
     kMatterScheduleConfiguration = 0x80;
     kPresets = 0x100;
+    kEvents = 0x200;
+    kThermostatSuggestions = 0x400;
   }
 
   bitmap HVACSystemTypeBitmap : bitmap8 {
@@ -7085,6 +7165,17 @@ cluster Thermostat = 513 {
     kSupportsOff = 0x8;
   }
 
+  bitmap ThermostatSuggestionNotFollowingReasonBitmap : bitmap16 {
+    kDemandResponseEvent = 0x1;
+    kOngoingHold = 0x2;
+    kSchedule = 0x4;
+    kOccupancy = 0x8;
+    kVacationMode = 0x10;
+    kTimeOfUseCostSavings = 0x20;
+    kPreCoolingOrPreHeating = 0x40;
+    kConflictingSuggestions = 0x80;
+  }
+
   struct ScheduleTransitionStruct {
     ScheduleDayOfWeekBitmap dayOfWeek = 0;
     int16u transitionTime = 1;
@@ -7124,10 +7215,58 @@ cluster Thermostat = 513 {
     ScheduleTypeFeaturesBitmap scheduleTypeFeatures = 2;
   }
 
+  struct ThermostatSuggestionStruct {
+    int8u uniqueID = 0;
+    octet_string<16> presetHandle = 1;
+    epoch_s effectiveTime = 2;
+    epoch_s expirationTime = 3;
+  }
+
   struct WeeklyScheduleTransitionStruct {
     int16u transitionTime = 0;
     nullable temperature heatSetpoint = 1;
     nullable temperature coolSetpoint = 2;
+  }
+
+  info event SystemModeChange = 0 {
+    optional SystemModeEnum previousSystemMode = 0;
+    SystemModeEnum currentSystemMode = 1;
+  }
+
+  info event LocalTemperatureChange = 1 {
+    nullable temperature currentLocalTemperature = 0;
+  }
+
+  info event OccupancyChange = 2 {
+    optional OccupancyBitmap previousOccupancy = 0;
+    OccupancyBitmap currentOccupancy = 1;
+  }
+
+  info event SetpointChange = 3 {
+    SystemModeEnum systemMode = 0;
+    optional OccupancyBitmap occupancy = 1;
+    optional temperature previousSetpoint = 2;
+    temperature currentSetpoint = 3;
+  }
+
+  info event RunningStateChange = 4 {
+    optional RelayStateBitmap previousRunningState = 0;
+    RelayStateBitmap currentRunningState = 1;
+  }
+
+  info event RunningModeChange = 5 {
+    optional ThermostatRunningModeEnum previousRunningMode = 0;
+    ThermostatRunningModeEnum currentRunningMode = 1;
+  }
+
+  info event ActiveScheduleChange = 6 {
+    optional nullable octet_string previousScheduleHandle = 0;
+    nullable octet_string currentScheduleHandle = 1;
+  }
+
+  info event ActivePresetChange = 7 {
+    optional nullable octet_string previousPresetHandle = 0;
+    nullable octet_string currentPresetHandle = 1;
   }
 
   readonly attribute nullable temperature localTemperature = 0;
@@ -7190,6 +7329,10 @@ cluster Thermostat = 513 {
   attribute access(write: manage) optional PresetStruct presets[] = 80;
   attribute access(write: manage) optional ScheduleStruct schedules[] = 81;
   readonly attribute optional nullable epoch_s setpointHoldExpiryTimestamp = 82;
+  provisional readonly attribute optional int8u maxThermostatSuggestions = 83;
+  provisional readonly attribute optional ThermostatSuggestionStruct thermostatSuggestions[] = 84;
+  provisional readonly attribute optional nullable ThermostatSuggestionStruct currentThermostatSuggestion = 85;
+  provisional readonly attribute optional nullable ThermostatSuggestionNotFollowingReasonBitmap thermostatSuggestionNotFollowingReason = 86;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute attrib_id attributeList[] = 65531;
@@ -7220,12 +7363,26 @@ cluster Thermostat = 513 {
     ScheduleModeBitmap modeToReturn = 1;
   }
 
+  response struct AddThermostatSuggestionResponse = 2 {
+    int8u uniqueID = 0;
+  }
+
   request struct SetActiveScheduleRequestRequest {
     octet_string<16> scheduleHandle = 0;
   }
 
   request struct SetActivePresetRequestRequest {
     nullable octet_string<16> presetHandle = 0;
+  }
+
+  request struct AddThermostatSuggestionRequest {
+    octet_string<16> presetHandle = 0;
+    nullable epoch_s effectiveTime = 1;
+    int16u expirationInMinutes = 2;
+  }
+
+  request struct RemoveThermostatSuggestionRequest {
+    int8u uniqueID = 0;
   }
 
   response struct AtomicResponse = 253 {
@@ -7252,6 +7409,8 @@ cluster Thermostat = 513 {
   command SetActiveScheduleRequest(SetActiveScheduleRequestRequest): DefaultSuccess = 5;
   /** ID */
   command SetActivePresetRequest(SetActivePresetRequestRequest): DefaultSuccess = 6;
+  command access(invoke: manage) AddThermostatSuggestion(AddThermostatSuggestionRequest): AddThermostatSuggestionResponse = 7;
+  command access(invoke: manage) RemoveThermostatSuggestion(RemoveThermostatSuggestionRequest): DefaultSuccess = 8;
   /** Begins, Commits or Cancels an atomic write */
   command access(invoke: manage) AtomicRequest(AtomicRequestRequest): AtomicResponse = 254;
 }
@@ -7480,17 +7639,17 @@ cluster ColorControl = 768 {
   readonly attribute optional int16u primary6X = 40;
   readonly attribute optional int16u primary6Y = 41;
   readonly attribute optional nullable int8u primary6Intensity = 42;
-  attribute access(write: manage) optional int16u whitePointX = 48;
-  attribute access(write: manage) optional int16u whitePointY = 49;
-  attribute access(write: manage) optional int16u colorPointRX = 50;
-  attribute access(write: manage) optional int16u colorPointRY = 51;
-  attribute access(write: manage) optional nullable int8u colorPointRIntensity = 52;
-  attribute access(write: manage) optional int16u colorPointGX = 54;
-  attribute access(write: manage) optional int16u colorPointGY = 55;
-  attribute access(write: manage) optional nullable int8u colorPointGIntensity = 56;
-  attribute access(write: manage) optional int16u colorPointBX = 58;
-  attribute access(write: manage) optional int16u colorPointBY = 59;
-  attribute access(write: manage) optional nullable int8u colorPointBIntensity = 60;
+  readonly attribute optional int16u whitePointX = 48;
+  readonly attribute optional int16u whitePointY = 49;
+  readonly attribute optional int16u colorPointRX = 50;
+  readonly attribute optional int16u colorPointRY = 51;
+  readonly attribute optional nullable int8u colorPointRIntensity = 52;
+  readonly attribute optional int16u colorPointGX = 54;
+  readonly attribute optional int16u colorPointGY = 55;
+  readonly attribute optional nullable int8u colorPointGIntensity = 56;
+  readonly attribute optional int16u colorPointBX = 58;
+  readonly attribute optional int16u colorPointBY = 59;
+  readonly attribute optional nullable int8u colorPointBIntensity = 60;
   readonly attribute optional int16u enhancedCurrentHue = 16384;
   readonly attribute EnhancedColorModeEnum enhancedColorMode = 16385;
   readonly attribute optional int8u colorLoopActive = 16386;
@@ -8473,7 +8632,7 @@ cluster WiFiNetworkManagement = 1105 {
     octet_string<64> passphrase = 0;
   }
 
-  /** Request the current WPA-Personal passphrase or PSK associated with the managed Wi-Fi network. */
+  /** This command is used to request the current WPA-Personal passphrase or PSK associated with the Wi-Fi network provided by this device. */
   command access(invoke: manage) NetworkPassphraseRequest(): NetworkPassphraseResponse = 0;
 }
 
@@ -8953,7 +9112,7 @@ cluster MediaPlayback = 1286 {
 
 /** This cluster provides an interface for controlling the Input Selector on a media device such as a TV. */
 cluster MediaInput = 1287 {
-  revision 1; // NOTE: Default/not specifically set
+  revision 1;
 
   enum InputTypeEnum : enum8 {
     kInternal = 0;
@@ -8998,13 +9157,13 @@ cluster MediaInput = 1287 {
     char_string name = 1;
   }
 
-  /** Upon receipt, this SHALL change the input on the media device to the input at a specific index in the Input List. */
+  /** Upon receipt, this command SHALL change the media input on the device to the input at a specific index in the Input List. */
   command SelectInput(SelectInputRequest): DefaultSuccess = 0;
-  /** Upon receipt, this SHALL display the active status of the input list on screen. */
+  /** Upon receipt, this command SHALL display the active status of the input list on screen. */
   command ShowInputStatus(): DefaultSuccess = 1;
-  /** Upon receipt, this SHALL hide the input list from the screen. */
+  /** Upon receipt, this command SHALL hide the input list from the screen. */
   command HideInputStatus(): DefaultSuccess = 2;
-  /** Upon receipt, this SHALL rename the input at a specific index in the Input List. Updates to the input name SHALL appear in the TV settings menus. */
+  /** Upon receipt, this command SHALL rename the input at a specific index in the Input List. */
   command access(invoke: manage) RenameInput(RenameInputRequest): DefaultSuccess = 3;
 }
 
@@ -9639,6 +9798,7 @@ provisional cluster ZoneManagement = 1360 {
     int16u zoneID = 0;
     ZoneTypeEnum zoneType = 1;
     ZoneSourceEnum zoneSource = 2;
+    optional TwoDCartesianZoneStruct twoDCartesianZone = 3;
   }
 
   struct ZoneTriggerControlStruct {
@@ -9686,14 +9846,6 @@ provisional cluster ZoneManagement = 1360 {
     TwoDCartesianZoneStruct zone = 1;
   }
 
-  request struct GetTwoDCartesianZoneRequest {
-    optional nullable int16u zoneID = 0;
-  }
-
-  response struct GetTwoDCartesianZoneResponse = 4 {
-    TwoDCartesianZoneStruct zones[] = 0;
-  }
-
   request struct RemoveZoneRequest {
     int16u zoneID = 0;
   }
@@ -9710,14 +9862,12 @@ provisional cluster ZoneManagement = 1360 {
   command access(invoke: manage) CreateTwoDCartesianZone(CreateTwoDCartesianZoneRequest): CreateTwoDCartesianZoneResponse = 0;
   /** The UpdateTwoDCartesianZone SHALL update a stored TwoD Cartesian Zone. */
   command access(invoke: manage) UpdateTwoDCartesianZone(UpdateTwoDCartesianZoneRequest): DefaultSuccess = 2;
-  /** The GetTwoDCartesianZone SHALL return the TwoD Cartesian Zone for the passed in ZoneID. */
-  command access(invoke: manage) GetTwoDCartesianZone(GetTwoDCartesianZoneRequest): GetTwoDCartesianZoneResponse = 3;
   /** This command SHALL remove the Zone mapped to the passed in ZoneID. */
-  command access(invoke: manage) RemoveZone(RemoveZoneRequest): DefaultSuccess = 5;
+  command access(invoke: manage) RemoveZone(RemoveZoneRequest): DefaultSuccess = 3;
   /** This command is used to create or update a Trigger for the specified motion Zone. */
-  command access(invoke: manage) CreateOrUpdateTrigger(CreateOrUpdateTriggerRequest): DefaultSuccess = 6;
+  command access(invoke: manage) CreateOrUpdateTrigger(CreateOrUpdateTriggerRequest): DefaultSuccess = 4;
   /** This command SHALL remove the Trigger mapped to the provided ZoneID. */
-  command access(invoke: manage) RemoveTrigger(RemoveTriggerRequest): DefaultSuccess = 7;
+  command access(invoke: manage) RemoveTrigger(RemoveTriggerRequest): DefaultSuccess = 5;
 }
 
 /** The Camera AV Stream Management cluster is used to allow clients to manage, control, and configure various audio, video, and snapshot streams on a camera. */
@@ -9781,11 +9931,10 @@ provisional cluster CameraAvStreamManagement = 1361 {
     VideoResolutionStruct maxResolution = 6;
     int32u minBitRate = 7;
     int32u maxBitRate = 8;
-    int16u minKeyFrameInterval = 9;
-    int16u maxKeyFrameInterval = 10;
-    optional boolean watermarkEnabled = 11;
-    optional boolean OSDEnabled = 12;
-    int8u referenceCount = 13;
+    int16u keyFrameInterval = 9;
+    optional boolean watermarkEnabled = 10;
+    optional boolean OSDEnabled = 11;
+    int8u referenceCount = 12;
   }
 
   struct SnapshotStreamStruct {
@@ -9845,7 +9994,7 @@ provisional cluster CameraAvStreamManagement = 1361 {
   readonly attribute optional int32u maxEncodedPixelRate = 1;
   readonly attribute optional VideoSensorParamsStruct videoSensorParams = 2;
   readonly attribute optional boolean nightVisionUsesInfrared = 3;
-  readonly attribute optional VideoResolutionStruct minViewport = 4;
+  readonly attribute optional VideoResolutionStruct minViewportResolution = 4;
   readonly attribute optional RateDistortionTradeOffPointsStruct rateDistortionTradeOffPoints[] = 5;
   readonly attribute int32u maxContentBufferSize = 6;
   readonly attribute optional AudioCapabilitiesStruct microphoneCapabilities = 7;
@@ -9914,10 +10063,9 @@ provisional cluster CameraAvStreamManagement = 1361 {
     VideoResolutionStruct maxResolution = 5;
     int32u minBitRate = 6;
     int32u maxBitRate = 7;
-    int16u minKeyFrameInterval = 8;
-    int16u maxKeyFrameInterval = 9;
-    optional boolean watermarkEnabled = 10;
-    optional boolean OSDEnabled = 11;
+    int16u keyFrameInterval = 8;
+    optional boolean watermarkEnabled = 9;
+    optional boolean OSDEnabled = 10;
   }
 
   response struct VideoStreamAllocateResponse = 4 {
@@ -9999,6 +10147,11 @@ provisional cluster CameraAvStreamManagement = 1361 {
 provisional cluster CameraAvSettingsUserLevelManagement = 1362 {
   revision 1;
 
+  enum PhysicalMovementEnum : enum8 {
+    kIdle = 0;
+    kMoving = 1;
+  }
+
   bitmap Feature : bitmap32 {
     kDigitalPTZ = 0x1;
     kMechanicalPan = 0x2;
@@ -10033,6 +10186,7 @@ provisional cluster CameraAvSettingsUserLevelManagement = 1362 {
   readonly attribute optional int16s tiltMax = 6;
   readonly attribute optional int16s panMin = 7;
   readonly attribute optional int16s panMax = 8;
+  readonly attribute optional PhysicalMovementEnum movementState = 9;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute attrib_id attributeList[] = 65531;
@@ -10076,7 +10230,7 @@ provisional cluster CameraAvSettingsUserLevelManagement = 1362 {
     optional int8s zoomDelta = 3;
   }
 
-  /** This command SHALL set the values for the pan, tilt, and zoom in the mechanical PTZ. */
+  /** This command SHALL move the camera to the provided values for pan, tilt, and zoom in the mechanical PTZ. */
   command MPTZSetPosition(MPTZSetPositionRequest): DefaultSuccess = 0;
   /** This command SHALL move the camera by the delta values relative to the currently defined position. */
   command MPTZRelativeMove(MPTZRelativeMoveRequest): DefaultSuccess = 1;
@@ -10100,6 +10254,12 @@ provisional cluster WebRTCTransportProvider = 1363 {
     kMetadata = 0x1;
   }
 
+  struct SFrameStruct {
+    int16u cipherSuite = 0;
+    octet_string<128> baseKey = 1;
+    octet_string<8> kid = 2;
+  }
+
   readonly attribute access(read: manage) WebRTCSessionStruct currentSessions[] = 0;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
@@ -10115,6 +10275,7 @@ provisional cluster WebRTCTransportProvider = 1363 {
     optional ICEServerStruct ICEServers[] = 4;
     optional char_string<16> ICETransportPolicy = 5;
     optional boolean metadataEnabled = 6;
+    optional SFrameStruct SFrameConfig = 7;
   }
 
   response struct SolicitOfferResponse = 1 {
@@ -10134,6 +10295,7 @@ provisional cluster WebRTCTransportProvider = 1363 {
     optional ICEServerStruct ICEServers[] = 6;
     optional char_string<16> ICETransportPolicy = 7;
     optional boolean metadataEnabled = 8;
+    optional SFrameStruct SFrameConfig = 9;
   }
 
   response struct ProvideOfferResponse = 3 {
@@ -10163,7 +10325,7 @@ provisional cluster WebRTCTransportProvider = 1363 {
   fabric command ProvideOffer(ProvideOfferRequest): ProvideOfferResponse = 2;
   /** This command SHALL be initiated from a Node in response to an Offer that was previously received from a remote peer. */
   fabric command ProvideAnswer(ProvideAnswerRequest): DefaultSuccess = 4;
-  /** This command allows for string based https://rfc-editor.org/rfc/rfc8839#section-5.1 generated after the initial Offer / Answer exchange, via a JSEP https://datatracker.ietf.org/doc/html/rfc9429#section-4.1.20 event, a DOM https://www.w3.org/TR/webrtc/#dom-rtcpeerconnectioniceevent event, or other WebRTC compliant implementations, to be added to a session during the gathering phase. */
+  /** This command allows for string based ICE candidates generated after the initial Offer / Answer exchange, via a JSEP onicecandidate event, a DOM rtcpeerconnectioniceevent event, or other WebRTC compliant implementations, to be added to a session during the gathering phase. */
   fabric command ProvideICECandidates(ProvideICECandidatesRequest): DefaultSuccess = 5;
   /** This command instructs the stream provider to end the WebRTC session. */
   fabric command EndSession(EndSessionRequest): DefaultSuccess = 6;
@@ -10206,7 +10368,7 @@ provisional cluster WebRTCTransportRequestor = 1364 {
   command Offer(OfferRequest): DefaultSuccess = 0;
   /** This command provides the stream requestor with the WebRTC session details (i.e. Session ID and SDP answer), It is the next command in the Offer/Answer flow to the ProvideOffer command. */
   command Answer(AnswerRequest): DefaultSuccess = 1;
-  /** This command allows for the object based https://rfc-editor.org/rfc/rfc8839#section-5.1 generated after the initial Offer / Answer exchange, via a JSEP https://datatracker.ietf.org/doc/html/rfc9429#section-4.1.20 event, a DOM https://www.w3.org/TR/webrtc/#dom-rtcpeerconnectioniceevent event, or other WebRTC compliant implementations, to be added to a session during the gathering phase. */
+  /** This command allows for the object based ICE candidates generated after the initial Offer / Answer exchange, via a JSEP onicecandidate event, a DOM rtcpeerconnectioniceevent event, or other WebRTC compliant implementations, to be added to a session during the gathering phase. */
   command ICECandidates(ICECandidatesRequest): DefaultSuccess = 2;
   /** This command notifies the stream requestor that the provider has ended the WebRTC session. */
   command End(EndRequest): DefaultSuccess = 3;
@@ -10215,6 +10377,12 @@ provisional cluster WebRTCTransportRequestor = 1364 {
 /** This cluster implements the upload of Audio and Video streams from the Push AV Stream Transport Cluster using suitable push-based transports. */
 provisional cluster PushAvStreamTransport = 1365 {
   revision 1;
+
+  enum CMAFInterfaceEnum : enum8 {
+    kInterface1 = 0;
+    kInterface2DASH = 1;
+    kInterface2HLS = 2;
+  }
 
   enum ContainerFormatEnum : enum8 {
     kCMAF = 0 [spec_name = "CMAF"];
@@ -10232,6 +10400,8 @@ provisional cluster PushAvStreamTransport = 1365 {
     kInvalidCombination = 6;
     kInvalidTriggerType = 7;
     kInvalidTransportStatus = 8;
+    kInvalidOptions = 9;
+    kInvalidStreamUsage = 10;
   }
 
   enum TransportStatusEnum : enum8 {
@@ -10277,10 +10447,14 @@ provisional cluster PushAvStreamTransport = 1365 {
   }
 
   struct CMAFContainerOptionsStruct {
-    int16u chunkDuration = 0;
-    optional octet_string<16> CENCKey = 1;
-    optional boolean metadataEnabled = 2;
-    optional octet_string<16> CENCKeyID = 3;
+    CMAFInterfaceEnum CMAFInterface = 0;
+    int16u segmentDuration = 1;
+    int16u chunkDuration = 2;
+    int8u sessionGroup = 3;
+    char_string<16> trackName = 4;
+    optional octet_string<16> CENCKey = 5;
+    optional octet_string<16> CENCKeyID = 6;
+    optional boolean metadataEnabled = 7;
   }
 
   struct ContainerOptionsStruct {
@@ -10358,10 +10532,11 @@ provisional cluster PushAvStreamTransport = 1365 {
     int16u connectionID = 0;
     TriggerActivationReasonEnum activationReason = 1;
     optional TransportMotionTriggerTimeControlStruct timeControl = 2;
+    optional long_octet_string<256> userDefined = 3;
   }
 
   request struct FindTransportRequest {
-    optional nullable int16u connectionID = 0;
+    nullable int16u connectionID = 0;
   }
 
   response struct FindTransportResponse = 7 {
@@ -10404,7 +10579,7 @@ provisional cluster Chime = 1366 {
 }
 
 /** The CommodityTariffCluster provides the mechanism for communicating Commodity Tariff information within the premises. */
-cluster CommodityTariff = 1792 {
+provisional cluster CommodityTariff = 1792 {
   revision 1;
 
   enum AuxiliaryLoadSettingEnum : enum8 {
@@ -10483,7 +10658,7 @@ cluster CommodityTariff = 1792 {
     optional AuxiliaryLoadSwitchSettingsStruct auxiliaryLoad = 3;
     optional PeakPeriodStruct peakPeriod = 4;
     optional PowerThresholdStruct powerThreshold = 5;
-    nullable int32u threshold = 6;
+    nullable int64s threshold = 6;
     optional nullable char_string<128> label = 7;
     optional boolean predicted = 8;
   }
@@ -10970,8 +11145,11 @@ provisional cluster JointFabricAdministrator = 1875 {
   }
 
   enum StatusCodeEnum : enum8 {
-    kVIDNotVerified = 2;
-    kInvalidAdministratorFabricIndex = 3;
+    kBusy = 2;
+    kPAKEParameterError = 3;
+    kWindowNotOpen = 4;
+    kVIDNotVerified = 5;
+    kInvalidAdministratorFabricIndex = 6;
   }
 
   enum TransferAnchorResponseStatusEnum : enum8 {
@@ -11001,7 +11179,7 @@ provisional cluster JointFabricAdministrator = 1875 {
 
   request struct OpenJointCommissioningWindowRequest {
     int16u commissioningTimeout = 0;
-    octet_string PAKEPasscodeVerifier = 1;
+    octet_string<97> PAKEPasscodeVerifier = 1;
     int16u discriminator = 2;
     int32u iterations = 3;
     octet_string<32> salt = 4;
@@ -11034,11 +11212,6 @@ provisional cluster JointFabricAdministrator = 1875 {
 provisional cluster TlsCertificateManagement = 2049 {
   revision 1;
 
-  enum StatusCodeEnum : enum8 {
-    kCertificateAlreadyInstalled = 2;
-    kDuplicateKey = 3;
-  }
-
   fabric_scoped struct TLSCertStruct {
     int16u caid = 0;
     optional long_octet_string<3000> certificate = 1;
@@ -11047,7 +11220,7 @@ provisional cluster TlsCertificateManagement = 2049 {
 
   fabric_scoped struct TLSClientCertificateDetailStruct {
     int16u ccdid = 0;
-    optional long_octet_string<3000> clientCertificate = 1;
+    optional nullable long_octet_string<3000> clientCertificate = 1;
     optional octet_string intermediateCertificates[] = 2;
     fabric_idx fabricIndex = 254;
   }
@@ -11091,19 +11264,21 @@ provisional cluster TlsCertificateManagement = 2049 {
     int16u caid = 0;
   }
 
-  request struct TLSClientCSRRequest {
-    octet_string<128> nonce = 0;
+  request struct ClientCSRRequest {
+    octet_string<32> nonce = 0;
+    nullable int16u ccdid = 1;
   }
 
-  response struct TLSClientCSRResponse = 8 {
+  response struct ClientCSRResponse = 8 {
     int16u ccdid = 0;
     long_octet_string<3000> csr = 1;
-    octet_string<128> nonce = 2;
+    octet_string<128> nonceSignature = 2;
   }
 
   request struct ProvisionClientCertificateRequest {
     int16u ccdid = 0;
-    TLSClientCertificateDetailStruct clientCertificateDetails = 1;
+    long_octet_string<3000> clientCertificate = 1;
+    octet_string intermediateCertificates[] = 2;
   }
 
   request struct FindClientCertificateRequest {
@@ -11128,17 +11303,17 @@ provisional cluster TlsCertificateManagement = 2049 {
 
   /** This command SHALL provision a newly provided certificate, or rotate an existing one, based on the contents of the CAID field. */
   fabric command access(invoke: administer) ProvisionRootCertificate(ProvisionRootCertificateRequest): ProvisionRootCertificateResponse = 0;
-  /** This command SHALL return the specified TLS root certificate, or all TLS provisioned root certificates, based on the contents of the CAID field. */
+  /** This command SHALL return the specified TLS root certificate, or all provisioned TLS root certificates for the accessing fabric, based on the contents of the CAID field. */
   fabric command FindRootCertificate(FindRootCertificateRequest): FindRootCertificateResponse = 2;
   /** This command SHALL return the CAID for the passed in fingerprint. */
   fabric command LookupRootCertificate(LookupRootCertificateRequest): LookupRootCertificateResponse = 4;
   /** This command SHALL be generated to request the server removes the certificate provisioned to the provided Certificate Authority ID. */
   fabric command access(invoke: administer) RemoveRootCertificate(RemoveRootCertificateRequest): DefaultSuccess = 6;
-  /** This command SHALL be generated to request the Node generates a Certificate Signing Request. */
-  fabric command access(invoke: administer) TLSClientCSR(TLSClientCSRRequest): TLSClientCSRResponse = 7;
+  /** This command SHALL be generated to request the Node generates a certificate signing request for a new TLS key pair or use an existing CCDID for certificate rotation. */
+  fabric command access(invoke: administer) ClientCSR(ClientCSRRequest): ClientCSRResponse = 7;
   /** This command SHALL be generated to request the Node provisions newly provided Client Certificate Details, or rotate an existing client certificate. */
   fabric command access(invoke: administer) ProvisionClientCertificate(ProvisionClientCertificateRequest): DefaultSuccess = 9;
-  /** This command SHALL return the TLSClientCertificateDetailStruct for the passed in CCDID, or all TLS client certificates, based on the contents of the CCDID field. */
+  /** This command SHALL return the TLSClientCertificateDetailStruct for the passed in CCDID, or all TLS client certificates for the accessing fabric, based on the contents of the CCDID field. */
   fabric command FindClientCertificate(FindClientCertificateRequest): FindClientCertificateResponse = 10;
   /** This command SHALL return the CCDID for the passed in Fingerprint. */
   fabric command LookupClientCertificate(LookupClientCertificateRequest): LookupClientCertificateResponse = 12;
@@ -11239,7 +11414,7 @@ provisional cluster MeterIdentification = 2822 {
 }
 
 /** The Commodity Metering Cluster provides the mechanism for communicating commodity consumption information within a premises. */
-cluster CommodityMetering = 2823 {
+provisional cluster CommodityMetering = 2823 {
   revision 1;
 
   shared enum MeasurementTypeEnum : enum16 {
@@ -11269,7 +11444,8 @@ cluster CommodityMetering = 2823 {
 
   readonly attribute nullable MeteredQuantityStruct meteredQuantity[] = 0;
   readonly attribute nullable epoch_s meteredQuantityTimestamp = 1;
-  readonly attribute nullable MeasurementTypeEnum measurementType = 2;
+  readonly attribute nullable TariffUnitEnum tariffUnit = 2;
+  readonly attribute nullable int16u maximumMeteredQuantities = 3;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute attrib_id attributeList[] = 65531;
@@ -11452,6 +11628,7 @@ internal cluster UnitTesting = 4294048773 {
   attribute boolean clusterErrorBoolean = 50;
   attribute TestGlobalEnum globalEnum = 51;
   attribute TestGlobalStruct globalStruct = 52;
+  attribute access(read: administer, write: administer) optional boolean unsupportedAttributeRequiringAdminPrivilege = 254;
   attribute optional boolean unsupported = 255;
   attribute optional int8u readFailureCode = 12288;
   attribute optional int32u failureInt32U = 12289;
@@ -11488,7 +11665,7 @@ internal cluster UnitTesting = 4294048773 {
   attribute nullable int8s nullableRangeRestrictedInt8s = 16423;
   attribute nullable int16u nullableRangeRestrictedInt16u = 16424;
   attribute nullable int16s nullableRangeRestrictedInt16s = 16425;
-  attribute optional int8u writeOnlyInt8u = 16426;
+  writeonly attribute optional int8u writeOnlyInt8u = 16426;
   attribute nullable TestGlobalEnum nullableGlobalEnum = 16435;
   attribute nullable TestGlobalStruct nullableGlobalStruct = 16436;
   readonly attribute command_id generatedCommandList[] = 65528;

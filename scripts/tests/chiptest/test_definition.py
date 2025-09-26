@@ -196,6 +196,9 @@ class TestTarget(Enum):
     MWO = auto()
     RVC = auto()
     NETWORK_MANAGER = auto()
+    ENERGY_GATEWAY = auto()
+    ENERGY_MANAGEMENT = auto()
+    CLOSURE = auto()
 
 
 @dataclass
@@ -210,17 +213,21 @@ class ApplicationPaths:
     bridge_app: typing.List[str]
     lit_icd_app: typing.List[str]
     microwave_oven_app: typing.List[str]
-    chip_repl_yaml_tester_cmd: typing.List[str]
+    matter_repl_yaml_tester_cmd: typing.List[str]
     chip_tool_with_python_cmd: typing.List[str]
     rvc_app: typing.List[str]
     network_manager_app: typing.List[str]
+    energy_gateway_app: typing.List[str]
+    energy_management_app: typing.List[str]
+    closure_app: typing.List[str]
 
     def items(self):
         return [self.chip_tool, self.all_clusters_app, self.lock_app,
                 self.fabric_bridge_app, self.ota_provider_app, self.ota_requestor_app,
                 self.tv_app, self.bridge_app, self.lit_icd_app,
-                self.microwave_oven_app, self.chip_repl_yaml_tester_cmd,
-                self.chip_tool_with_python_cmd, self.rvc_app, self.network_manager_app]
+                self.microwave_oven_app, self.matter_repl_yaml_tester_cmd,
+                self.chip_tool_with_python_cmd, self.rvc_app, self.network_manager_app,
+                self.energy_gateway_app, self.energy_management_app, self.closure_app]
 
     def items_with_key(self):
         """
@@ -242,7 +249,7 @@ class ApplicationPaths:
             (self.bridge_app, "chip-bridge-app"),
             (self.lit_icd_app, "lit-icd-app"),
             (self.microwave_oven_app, "chip-microwave-oven-app"),
-            (self.chip_repl_yaml_tester_cmd, "yamltest_with_chip_repl_tester.py"),
+            (self.matter_repl_yaml_tester_cmd, "yamltest_with_matter_repl_tester.py"),
             (
                 # This path varies, however it is a fixed python tool so it may be ok
                 self.chip_tool_with_python_cmd,
@@ -250,6 +257,9 @@ class ApplicationPaths:
             ),
             (self.rvc_app, "chip-rvc-app"),
             (self.network_manager_app, "matter-network-manager-app"),
+            (self.energy_gateway_app, "chip-energy-gateway-app"),
+            (self.energy_management_app, "chip-energy-management-app"),
+            (self.closure_app, "closure-app"),
         ]
 
 
@@ -311,7 +321,7 @@ class TestTag(Enum):
 class TestRunTime(Enum):
     CHIP_TOOL_PYTHON = auto()  # use the python yaml test parser with chip-tool
     DARWIN_FRAMEWORK_TOOL_PYTHON = auto()  # use the python yaml test parser with chip-tool
-    CHIP_REPL_PYTHON = auto()       # use the python yaml test runner
+    MATTER_REPL_PYTHON = auto()       # use the python yaml test runner
 
 
 @dataclass
@@ -367,14 +377,20 @@ class TestDefinition:
                 target_app = paths.rvc_app
             elif self.target == TestTarget.NETWORK_MANAGER:
                 target_app = paths.network_manager_app
+            elif self.target == TestTarget.ENERGY_GATEWAY:
+                target_app = paths.energy_gateway_app
+            elif self.target == TestTarget.ENERGY_MANAGEMENT:
+                target_app = paths.energy_management_app
+            elif self.target == TestTarget.CLOSURE:
+                target_app = paths.closure_app
             else:
                 raise Exception("Unknown test target - "
                                 "don't know which application to run")
 
             if not dry_run:
                 for path, key in paths.items_with_key():
-                    # Do not add chip-tool or chip-repl-yaml-tester-cmd to the register
-                    if path == paths.chip_tool or path == paths.chip_repl_yaml_tester_cmd or path == paths.chip_tool_with_python_cmd:
+                    # Do not add chip-tool or matter-repl-yaml-tester-cmd to the register
+                    if path == paths.chip_tool or path == paths.matter_repl_yaml_tester_cmd or path == paths.chip_tool_with_python_cmd:
                         continue
 
                     # Skip items where we don't actually have a path.  This can
@@ -418,14 +434,14 @@ class TestDefinition:
                 app.start()
                 setupCode = app.setupCode
 
-            if test_runtime == TestRunTime.CHIP_REPL_PYTHON:
-                chip_repl_yaml_tester_cmd = paths.chip_repl_yaml_tester_cmd
-                python_cmd = chip_repl_yaml_tester_cmd + \
+            if test_runtime == TestRunTime.MATTER_REPL_PYTHON:
+                matter_repl_yaml_tester_cmd = paths.matter_repl_yaml_tester_cmd
+                python_cmd = matter_repl_yaml_tester_cmd + \
                     ['--setup-code', setupCode] + ['--yaml-path', self.run_name] + ["--pics-file", pics_file]
                 if dry_run:
                     logging.info(" ".join(python_cmd))
                 else:
-                    runner.RunSubprocess(python_cmd, name='CHIP_REPL_YAML_TESTER',
+                    runner.RunSubprocess(python_cmd, name='MATTER_REPL_YAML_TESTER',
                                          dependencies=[apps_register], timeout_seconds=timeout_seconds)
             else:
                 pairing_cmd = paths.chip_tool_with_python_cmd + ['pairing', 'code', TEST_NODE_ID, setupCode]

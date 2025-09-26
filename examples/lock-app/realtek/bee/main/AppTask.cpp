@@ -26,7 +26,6 @@
 
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app/TestEventTriggerDelegate.h>
-#include <app/clusters/general-diagnostics-server/general-diagnostics-server.h>
 #include <app/clusters/identify-server/identify-server.h>
 #include <app/clusters/ota-requestor/OTATestEventTriggerHandler.h>
 #include <app/server/Dnssd.h>
@@ -63,12 +62,7 @@ using namespace ::chip::DeviceLayer;
 #define FACTORY_RESET_CANCEL_WINDOW_TIMEOUT 5000
 #define RESET_TRIGGER_TIMEOUT 1500
 
-#if CONFIG_DAC_KEY_ENC
-#define APP_TASK_STACK_SIZE (8 * 1024)
-#else
 #define APP_TASK_STACK_SIZE (4 * 1024)
-#endif
-
 #define APP_TASK_PRIORITY 2
 #define APP_EVENT_QUEUE_SIZE 10
 #define LOCK_ENDPOINT_ID (1)
@@ -356,6 +350,11 @@ void AppTask::LockActionEventHandler(AppEvent * aEvent)
 void AppTask::ButtonEventHandler(uint8_t btnIdx, uint8_t btnPressed)
 {
     if (btnIdx != APP_LOCK_BUTTON && btnIdx != APP_FUNCTION_BUTTON && btnIdx != APP_LOCK_JAMMED_BUTTON)
+    {
+        return;
+    }
+
+    if (!chip::DeviceManager::CHIPDeviceManager::GetInstance().IsInitDone())
     {
         return;
     }

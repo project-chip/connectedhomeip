@@ -38,7 +38,7 @@
 
 extern ex_sss_boot_ctx_t gex_sss_chip_ctx;
 
-/* SE predefined keyid values. Let kKeyId_node_op_keyid_start be the last entry */
+/* SE predefined keyid values. */
 enum keyid_values
 {
     kKeyId_NotInitialized           = 0,
@@ -47,10 +47,9 @@ enum keyid_values
     kKeyId_hmac_sha256_keyid,
     kKeyId_sha256_ecc_pub_keyid, // Used for ECDSA verify
     kKeyId_case_ephemeral_keyid, // Used for ECDH
-    kKeyId_node_op_keyid_start,  // Node operational key pair
 };
 
-// Enable the below macro to make spake HSM imlementation reentrant.
+// Enable the below macro to make spake HSM implementation re-entrant.
 #define ENABLE_REENTRANCY 0
 
 #if ENABLE_REENTRANCY
@@ -103,6 +102,15 @@ void se05x_delete_key(uint32_t keyid);
  */
 CHIP_ERROR se05x_set_key_for_spake(uint32_t keyid, const uint8_t * key, size_t keylen, sss_key_part_t keyPart,
                                    sss_cipher_type_t cipherType);
+/**
+ * @brief Get certificate in se05x.
+ * The certificate is stored with transient option. The contents are lost on session close.
+ * @param[in] keyid - Key id of the object.
+ * @param[in] buf - Buffer to store certificate in DER format.
+ * @param[in] buflen - Buffer length on input, actual certificate length on output.
+ * @return CHIP_ERROR_INTERNAL on error, CHIP_NO_ERROR otherwise
+ */
+CHIP_ERROR se05x_get_certificate(uint32_t keyId, uint8_t * buf, size_t * buflen);
 
 /**
  * @brief Set certificate in se05x.

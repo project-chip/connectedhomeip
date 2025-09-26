@@ -80,7 +80,5 @@ chip_enable_icd_dsls = false
 
 freertos_root = "//third_party/connectedhomeip/third_party/ti_simplelink_sdk/repo_cc13xx_cc26xx/source/third_party/freertos"
 
-if (chip_openthread_target != "") {
-  openthread_root =
-      "//third_party/connectedhomeip/third_party/openthread/ot-ti/openthread"
-}
+openthread_root =
+    "//third_party/connectedhomeip/third_party/openthread/ot-ti/openthread"

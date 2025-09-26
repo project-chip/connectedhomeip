@@ -23,8 +23,8 @@
 #include "ChipDeviceController-ScriptDevicePairingDelegate.h"
 #include "ChipDeviceController-StorageDelegate.h"
 
-#include "controller/python/chip/crypto/p256keypair.h"
-#include "controller/python/chip/interaction_model/Delegate.h"
+#include "controller/python/matter/crypto/p256keypair.h"
+#include "controller/python/matter/interaction_model/Delegate.h"
 
 #include <app/icd/client/DefaultICDClientStorage.h>
 #include <controller/CHIPDeviceController.h>
@@ -38,8 +38,8 @@
 #include <lib/support/TestGroupData.h>
 #include <lib/support/logging/CHIPLogging.h>
 
-#include <controller/python/chip/commissioning/PlaceholderOperationalCredentialsIssuer.h>
-#include <controller/python/chip/native/PyChipError.h>
+#include <controller/python/matter/commissioning/PlaceholderOperationalCredentialsIssuer.h>
+#include <controller/python/matter/native/PyChipError.h>
 #include <credentials/GroupDataProviderImpl.h>
 #include <credentials/attestation_verifier/DefaultDeviceAttestationVerifier.h>
 #include <credentials/attestation_verifier/DeviceAttestationVerifier.h>
@@ -387,6 +387,9 @@ private:
         case chip::Controller::CommissioningStage::kSecurePairing:
         // "not valid" because attestation verification always fails after entering revocation check step
         case chip::Controller::CommissioningStage::kAttestationVerification:
+            return false;
+        case chip::Controller::CommissioningStage::kJCMTrustVerification:
+            // JCM Trust Verification is not supported in Python tests
             return false;
         default:
             return true;

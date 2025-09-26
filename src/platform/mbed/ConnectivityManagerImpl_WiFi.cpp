@@ -58,7 +58,7 @@ CHIP_ERROR ConnectivityManagerImpl::InitWiFi()
 #else
     err = NetworkCommissioning::WiFiDriverImpl::GetInstance().Init(nullptr);
 #endif
-    VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(DeviceLayer, "WiFi driver init failed: %s", chip::ErrorStr(err)));
+    VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(DeviceLayer, "WiFi driver init failed: %" CHIP_ERROR_FORMAT, err.Format()));
 
     mWiFiStationMode = kWiFiStationMode_Enabled;
     networks         = NetworkCommissioning::WiFiDriverImpl::GetInstance().GetNetworks();

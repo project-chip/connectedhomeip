@@ -37,28 +37,29 @@
 
 import logging
 
-import chip.clusters as Clusters
-from chip.clusters.Types import NullValue
-from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from mobly import asserts
+
+import matter.clusters as Clusters
+from matter.clusters.Types import NullValue
+from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 
 logger = logging.getLogger(__name__)
 
 
-class MOD_1_2(MatterBaseTest):
+class TC_MOD_1_2(MatterBaseTest):
     """Proposal test for Mode Select Cluster attributes as a server."""
 
-    def desc_MOD_1_2(self) -> str:
+    def desc_TC_MOD_1_2(self) -> str:
         return "80.2.1. [TC-MOD-1.2] Cluster attributes with DUT as Server"
 
-    def pics_MOD_1_2(self):
+    def pics_TC_MOD_1_2(self):
         """Return PICS definitions asscociated with this test."""
         pics = [
             "MOD.S"
         ]
         return pics
 
-    def steps_MOD_1_2(self) -> list[TestStep]:
+    def steps_TC_MOD_1_2(self) -> list[TestStep]:
         steps = [
             TestStep(1, "Commission DUT to TH (can be skipped if done in a preceding test).", is_commissioning=True),
             TestStep(2, "TH reads the SupportedModes attribute from DUT"),
@@ -100,7 +101,7 @@ class MOD_1_2(MatterBaseTest):
         logger.info(f"{name} attribute with value: {value} with type: {type(value)}")
 
     @async_test_body
-    async def test_MOD_1_2(self):
+    async def test_TC_MOD_1_2(self):
         self.cluster = Clusters.ModeSelect
         self.endpoint = self.get_endpoint(1)
 

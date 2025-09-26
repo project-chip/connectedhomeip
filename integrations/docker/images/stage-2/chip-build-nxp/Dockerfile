@@ -13,9 +13,9 @@ WORKDIR /opt/nxp/
 RUN set -x \
     && git clone https://github.com/NXP/nxp_matter_support.git \
     && cd nxp_matter_support \
-    # Checkout commit aligned with updated west manifest using MCUX SDK 25.03.00,
+    # Checkout commit aligned with updated west manifest using MCUX SDK 25.06.00,
     # including patches for Matter support in specific components
-    && git checkout 873a8c4c5425652613cde447b0f0a8f321b51618 \
+    && git checkout deb06197654ed2e4a688be05467a0954b91fd61d \
     && pip3 install --break-system-packages -U --no-cache-dir west \
     && ./scripts/update_nxp_sdk.py --platform common \
     && : # last line

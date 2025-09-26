@@ -78,13 +78,6 @@ config CHIP_OTA_REQUESTOR_REBOOT_ON_APPLY
 	  to swap the old and the new firmware images. The reboot happens only when
 	  a user consents to apply the firmware update.
 
-# See config/zephyr/Kconfig for full definition
-config CHIP_OTA_IMAGE_BUILD
-	bool
-	default y if CHIP_OTA_REQUESTOR
-	depends on SIGN_IMAGES
-	select DFU_MULTI_IMAGE_PACKAGE_BUILD
-
 config CHIP_EXAMPLE_DEVICE_INFO_PROVIDER
 	bool "Include default device information provider build"
 	default y
@@ -372,5 +365,11 @@ config CHIP_USE_OPENTHREAD_ENDPOINT
 	help
 	  Use OpenThread TCP/UDP stack directly instead of using Zephyr's networking layer.
 	  This option is not supported when using WiFi.
+
+config CHIP_SYSTEM_PACKETBUFFER_POOL_SIZE
+	int "Packet buffer pool size"
+	default 11
+	help
+	  Total number of packet buffers allocated by the stack for internal pool.
 
 endif # CHIP

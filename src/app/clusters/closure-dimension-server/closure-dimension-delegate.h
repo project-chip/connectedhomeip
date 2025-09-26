@@ -40,9 +40,9 @@ public:
     /**
      * @brief This function handles SetTarget command implementaion.
      *
-     * @param [in] position Target position to be set
-     * @param [in] latch Target Latch to be set
-     * @param [in] speed Target speed to be set
+     * @param [in] position TargetState position to be set
+     * @param [in] latch TargetState Latch to be set
+     * @param [in] speed TargetState speed to be set
      *
      * @return Success when succesfully handled.
      *         Error when handle SetTarget fails.
@@ -63,14 +63,6 @@ public:
      */
     virtual Protocols::InteractionModel::Status HandleStep(const StepDirectionEnum & direction, const uint16_t & numberOfSteps,
                                                            const Optional<Globals::ThreeLevelAutoEnum> & speed) = 0;
-
-    /**
-     * @brief Checks whether this closurepanel needs manual latching.
-     *
-     * @return true if manual latching is needed
-     *         false if manual latching not needed
-     */
-    virtual bool IsManualLatchingNeeded() = 0;
 };
 
 } // namespace ClosureDimension

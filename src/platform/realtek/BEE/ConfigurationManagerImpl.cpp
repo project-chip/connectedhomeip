@@ -217,7 +217,7 @@ void ConfigurationManagerImpl::DoFactoryReset(intptr_t arg)
     err = BeeConfig::ClearNamespace();
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(DeviceLayer, "ClearNamespace() failed: %s", chip::ErrorStr(err));
+        ChipLogError(DeviceLayer, "ClearNamespace() failed: %" CHIP_ERROR_FORMAT, err.Format());
     }
 
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
