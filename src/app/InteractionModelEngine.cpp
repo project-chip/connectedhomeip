@@ -2032,6 +2032,54 @@ size_t InteractionModelEngine::GetNumDirtySubscriptions() const
     return numDirtySubscriptions;
 }
 
+#if CHIP_CONFIG_ENABLE_ICD_SERVER && CHIP_CONFIG_ENABLE_ICD_CIP
+bool InteractionModelEngine::ShouldCheckInMsgsBeSent(FabricIndex aFabricIndex, NodeId subjectID)
+{
+#if CHIP_CONFIG_PERSIST_SUBSCRIPTIONS
+    // If at least one registration has a persisted entry, do not send Check-In message.
+    // The resumption of the persisted subscription will serve the same function a check-in would have served.
+    return !app::InteractionModelEngine::GetInstance()->SubjectHasPersistedSubscription(aFabricIndex, subjectID);
+#else
+    return true;
+#endif // CHIP_CONFIG_PERSIST_SUBSCRIPTIONS
+}
+
+void InteractionModelEngine::ScheduledForceTriggerCheckInMessages()
+{
+    SessionManager * sessionManager = mpExchangeMgr->GetSessionManager();
+    if (sessionManager == nullptr)
+    {
+        return;
+    }
+    System::Layer * systemLayer = sessionManager->SystemLayer();
+    if (systemLayer == nullptr)
+    {
+        return;
+    }
+    systemLayer->ScheduleWork(ForceTriggerCheckInMessages, this);
+}
+
+void InteractionModelEngine::ForceTriggerCheckInMessages(System::Layer * aSystemLayer, void * apAppState)
+{
+    InteractionModelEngine * const engine = reinterpret_cast<InteractionModelEngine *>(apAppState);
+    if (engine == nullptr)
+    {
+        return;
+    }
+    engine->TriggerCheckInMessages(/* aForceSend = */ true);
+}
+
+void InteractionModelEngine::TriggerCheckInMessages(bool aForceSend)
+{
+    std::function<app::ICDManager::ShouldCheckInMsgsBeSentFunction> sendCheckInMessages =
+        std::bind(&InteractionModelEngine::ShouldCheckInMsgsBeSent, this, std::placeholders::_1, std::placeholders::_2);
+    if (mICDManager != nullptr)
+    {
+        mICDManager->TriggerCheckInMessages(sendCheckInMessages, aForceSend);
+    }
+}
+#endif // CHIP_CONFIG_ENABLE_ICD_CIP && CHIP_CONFIG_ENABLE_ICD_SERVER
+
 void InteractionModelEngine::OnFabricRemoved(const FabricTable & fabricTable, FabricIndex fabricIndex)
 {
     mReadHandlers.ForEachActiveObject([fabricIndex](ReadHandler * handler) {

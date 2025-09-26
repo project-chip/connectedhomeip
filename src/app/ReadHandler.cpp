@@ -407,6 +407,23 @@ void ReadHandler::OnResponseTimeout(Messaging::ExchangeContext * apExchangeConte
 {
     ChipLogError(DataManagement, "Time out! failed to receive status response from Exchange: " ChipLogFormatExchange,
                  ChipLogValueExchange(apExchangeContext));
+#if CHIP_CONFIG_ENABLE_ICD_SERVER && CHIP_CONFIG_ENABLE_ICD_CIP
+    switch (mState)
+    {
+    case HandlerState::AwaitingReportResponse:
+        if (IsType(InteractionType::Subscribe) && !IsPriming())
+        {
+            ChipLogError(DataManagement, "Trigger check-in message when non-priming subscription report times out");
+            mManagementCallback.GetInteractionModelEngine()->ScheduledForceTriggerCheckInMessages();
+        }
+        break;
+    case HandlerState::CanStartReporting:
+    case HandlerState::Idle:
+    default:
+        break;
+    }
+#endif // CHIP_CONFIG_ENABLE_ICD_CIP && CHIP_CONFIG_ENABLE_ICD_SERVER
+
 #if CHIP_CONFIG_PERSIST_SUBSCRIPTIONS
     Close(CloseOptions::kKeepPersistedSubscription);
 #else

@@ -335,10 +335,14 @@ bool ICDManager::ShouldCheckInMsgsBeSentAtActiveModeFunction(FabricIndex aFabric
 }
 #endif // CHIP_CONFIG_PERSIST_SUBSCRIPTIONS
 
-void ICDManager::TriggerCheckInMessages(const std::function<ShouldCheckInMsgsBeSentFunction> & verifier)
+void ICDManager::TriggerCheckInMessages(const std::function<ShouldCheckInMsgsBeSentFunction> & verifier, bool forceSend)
 {
     VerifyOrReturn(SupportsFeature(Feature::kCheckInProtocolSupport));
 
+    if (forceSend)
+    {
+        mOperationalState = OperationalState::IdleMode;
+    }
     // Only trigger Check-In messages when we are in IdleMode.
     // If we are already in ActiveMode, Check-In messages have already been sent.
     VerifyOrReturn(mOperationalState == OperationalState::IdleMode);

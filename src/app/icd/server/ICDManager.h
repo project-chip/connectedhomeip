@@ -223,7 +223,7 @@ public:
      *
      * @param[in] function to use to determine if we need to send check-in messages
      */
-    void TriggerCheckInMessages(const std::function<ShouldCheckInMsgsBeSentFunction> & function);
+    void TriggerCheckInMessages(const std::function<ShouldCheckInMsgsBeSentFunction> & function, bool forceSend = false);
 
 #if CHIP_CONFIG_PERSIST_SUBSCRIPTIONS && !CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION
     /**
