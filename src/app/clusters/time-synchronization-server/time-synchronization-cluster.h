@@ -74,8 +74,10 @@ class TimeSynchronizationCluster : public DefaultServerCluster,
 #endif
 {
 public:
-    TimeSynchronizationCluster(EndpointId endpoint, const BitFlags<TimeSynchronization::Feature> features, bool supportsDNSResolve,
-                               TimeSynchronization::TimeZoneDatabaseEnum timeZoneDatabase);
+    TimeSynchronizationCluster(EndpointId endpoint, const BitFlags<TimeSynchronization::Feature> features,
+                               TimeSynchronization::Attributes::SupportsDNSResolve::TypeInfo::Type supportsDNSResolve,
+                               TimeSynchronization::TimeZoneDatabaseEnum timeZoneDatabase,
+                               TimeSynchronization::TimeSourceEnum timeSource);
 
     CHIP_ERROR Startup(ServerClusterContext & context) override;
     void Shutdown() override;
@@ -180,8 +182,9 @@ private:
 
     const BitFlags<TimeSynchronization::Feature> mFeatures;
 
-    bool mSupportsDNSResolve;
+    TimeSynchronization::Attributes::SupportsDNSResolve::TypeInfo::Type mSupportsDNSResolve;
     TimeSynchronization::TimeZoneDatabaseEnum mTimeZoneDatabase;
+    TimeSynchronization::TimeSourceEnum mTimeSource;
 
     TimeSyncDataProvider mTimeSyncDataProvider;
     TimeSynchronization::TimeSyncEventFlag mEventFlag = TimeSynchronization::TimeSyncEventFlag::kNone;

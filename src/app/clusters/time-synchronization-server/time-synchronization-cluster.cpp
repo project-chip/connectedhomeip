@@ -238,10 +238,12 @@ void OnFallbackNTPCompletionWrapper(void * context, bool timeSyncSuccessful)
     timeSynchronization->OnFallbackNTPCompletionFn(timeSyncSuccessful);
 }
 
-TimeSynchronizationCluster::TimeSynchronizationCluster(EndpointId endpoint, const BitFlags<TimeSynchronization::Feature> features,
-                                                       bool supportsDNSResolve, TimeZoneDatabaseEnum timeZoneDatabase) :
-    DefaultServerCluster({ endpoint, TimeSynchronization::Id }),
-    mFeatures(features), mSupportsDNSResolve(supportsDNSResolve), mTimeZoneDatabase(timeZoneDatabase),
+TimeSynchronizationCluster::TimeSynchronizationCluster(
+    EndpointId endpoint, const BitFlags<TimeSynchronization::Feature> features,
+    TimeSynchronization::Attributes::SupportsDNSResolve::TypeInfo::Type supportsDNSResolve, TimeZoneDatabaseEnum timeZoneDatabase,
+    TimeSynchronization::TimeSourceEnum timeSource) :
+    DefaultServerCluster({ endpoint, TimeSynchronization::Id }), mFeatures(features), mSupportsDNSResolve(supportsDNSResolve),
+    mTimeZoneDatabase(timeZoneDatabase), mTimeSource(timeSource),
 #if TIME_SYNC_ENABLE_TSC_FEATURE
     mOnDeviceConnectedCallback(OnDeviceConnectedWrapper, this),
     mOnDeviceConnectionFailureCallback(OnDeviceConnectionFailureWrapper, this),
@@ -366,6 +368,8 @@ DataModel::ActionReturnStatus TimeSynchronizationCluster::ReadAttribute(const Da
         return encoder.Encode(mSupportsDNSResolve);
     case TimeZoneDatabase::Id:
         return encoder.Encode(mTimeZoneDatabase);
+    case TimeSource::Id:
+        return encoder.Encode(mTimeSource);
     default:
         return Protocols::InteractionModel::Status::UnsupportedAttribute;
     }

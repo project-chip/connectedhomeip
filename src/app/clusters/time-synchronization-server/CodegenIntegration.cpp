@@ -45,13 +45,16 @@ public:
     {
         const BitFlags<TimeSynchronization::Feature> featureMap(rawFeatureMap);
 
-        bool supportsDNSResolve = false;
+        TimeSynchronization::Attributes::SupportsDNSResolve::TypeInfo::Type supportsDNSResolve = false;
         SupportsDNSResolve::Get(endpointId, &supportsDNSResolve);
 
         TimeSynchronization::TimeZoneDatabaseEnum timeZoneDatabase = TimeZoneDatabaseEnum::kNone;
         TimeZoneDatabase::Get(endpointId, &timeZoneDatabase);
 
-        gServers[clusterInstanceIndex].Create(endpointId, featureMap, supportsDNSResolve, timeZoneDatabase);
+        TimeSynchronization::TimeSourceEnum timeSource = TimeSourceEnum::kNone;
+        TimeSource::Get(endpointId, &timeSource);
+
+        gServers[clusterInstanceIndex].Create(endpointId, featureMap, supportsDNSResolve, timeZoneDatabase, timeSource);
         return gServers[clusterInstanceIndex].Registration();
     }
 
