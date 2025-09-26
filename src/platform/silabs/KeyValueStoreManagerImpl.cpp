@@ -278,7 +278,6 @@ void KeyValueStoreManagerImpl::KvsMapMigration(void)
     constexpr size_t oldMaxEntries  = 120;
     constexpr uint32_t maxStringLen = 33; // value of PersistentStorageDelegate::kKeyLengthMax + 1 when migration was added
     Platform::ScopedMemoryBuffer<char> mKvsStoredKeyString;
-    Platform::ScopedMemoryBuffer<char> mKvsStoredKeyString;
     mKvsStoredKeyString.Alloc(oldMaxEntries * maxStringLen);
 
     VerifyOrReturn(mKvsStoredKeyString.Get() != nullptr);
