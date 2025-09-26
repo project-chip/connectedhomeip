@@ -74,6 +74,7 @@ CommandHandlerInterfaceOnlyClusters:
     - Fixed Label
     - Soil Measurement
     - Basic Information
+    - Operational Credentials
     - Boolean State
     - Diagnostic Logs
 
@@ -143,3 +144,4 @@ CodeDrivenClusters:
     - Time Format Localization
     - Wi-Fi Network Diagnostics
     - Diagnostic Logs
+    - Operational Credentials
