@@ -1017,7 +1017,7 @@ CHIP_ERROR
 DeviceCommissioner::ContinueCommissioningAfterDeviceAttestation(DeviceProxy * device,
                                                                 Credentials::AttestationVerificationResult attestationResult)
 {
-    MATTER_TRACE_SCOPE(kcontinueCommissioningDevice, kDeviceCommissioner);
+    MATTER_TRACE_SCOPE(kContinueCommissioningDevice, kDeviceCommissioner);
 
     if (device == nullptr || device != mDeviceBeingCommissioned)
     {
@@ -1066,7 +1066,7 @@ DeviceCommissioner::ContinueCommissioningAfterDeviceAttestation(DeviceProxy * de
 #if CHIP_DEVICE_CONFIG_ENABLE_NFC_BASED_COMMISSIONING
 CHIP_ERROR DeviceCommissioner::ContinueCommissioningAfterConnectNetworkRequest(NodeId remoteDeviceId)
 {
-    MATTER_TRACE_SCOPE(kcontinueCommissioningAfterConnectNetworkRequest, kDeviceCommissioner);
+    MATTER_TRACE_SCOPE(kContinueCommissioningAfterConnectNetworkRequest, kDeviceCommissioner);
 
     // Move to kEvictPreviousCaseSessions stage since the next stage will be to find the device
     // on the operational network

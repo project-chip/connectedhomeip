@@ -362,7 +362,7 @@ Status OnOffServer::getOnOffValue(chip::EndpointId endpoint, bool * currentOnOff
  */
 Status OnOffServer::setOnOffValue(chip::EndpointId endpoint, chip::CommandId command, bool initiatedByLevelChange)
 {
-    MATTER_TRACE_SCOPE(ksetOnOffValue, kOnOff);
+    MATTER_TRACE_SCOPE(kSetOnOffValue, kOnOff);
     Status status;
     bool currentValue, newValue;
 
@@ -619,7 +619,7 @@ bool OnOffServer::toggleCommand(app::CommandHandler * commandObj, const app::Con
 bool OnOffServer::offWithEffectCommand(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
                                        const Commands::OffWithEffect::DecodableType & commandData)
 {
-    MATTER_TRACE_SCOPE(koffWithEffectCommand, kOnOff);
+    MATTER_TRACE_SCOPE(kOffWithEffectCommand, kOnOff);
     auto effectId             = commandData.effectIdentifier;
     auto effectVariant        = commandData.effectVariant;
     chip::EndpointId endpoint = commandPath.mEndpointId;

@@ -78,11 +78,17 @@ constexpr LabelKey kCheckForRevokedDACChain = "CheckForRevokedDACChain";
 
 constexpr LabelKey kClear = "Clear";
 
+constexpr LabelKey kColorLoop = "colorLoop";
+
 constexpr LabelKey kCommission = "Commission";
 
 constexpr LabelKey kCommissioningComplete = "CommissioningComplete";
 
 constexpr LabelKey kCommissioningStageComplete = "CommissioningStageComplete";
+
+constexpr LabelKey kContinueCommissioningAfterConnectNetworkRequest = "continueCommissioningAfterConnectNetworkRequest";
+
+constexpr LabelKey kContinueCommissioningDevice = "continueCommissioningDevice";
 
 constexpr LabelKey kCopyScene = "CopyScene";
 
@@ -180,9 +186,19 @@ constexpr LabelKey kIssueNOCChain = "IssueNOCChain";
 
 constexpr LabelKey kMove = "Move";
 
+constexpr LabelKey kMoveHue = "moveHue";
+
+constexpr LabelKey kMoveSaturation = "moveSaturation";
+
+constexpr LabelKey kMoveToHue = "moveToHue";
+
+constexpr LabelKey kMoveToHueAndSaturation = "moveToHueAndSaturation";
+
 constexpr LabelKey kMoveToLevel = "MoveToLevel";
 
 constexpr LabelKey kMoveToLevelWithOnOff = "MoveToLevelWithOnOff";
+
+constexpr LabelKey kMoveToSaturation = "moveToSaturation";
 
 constexpr LabelKey kMoveWithOnOff = "MoveWithOnOff";
 
@@ -191,6 +207,8 @@ constexpr LabelKey kNotifyFabricCommitted = "NotifyFabricCommitted";
 constexpr LabelKey kNotifyFabricUpdated = "NotifyFabricUpdated";
 
 constexpr LabelKey kOffCommand = "OffCommand";
+
+constexpr LabelKey kOffWithEffectCommand = "offWithEffectCommand";
 
 constexpr LabelKey kOnAddNOCFailureResponse = "OnAddNOCFailureResponse";
 
@@ -326,6 +344,8 @@ constexpr LabelKey kSendSigma3 = "SendSigma3";
 
 constexpr LabelKey kSendTrustedRootCertificate = "SendTrustedRootCertificate";
 
+constexpr LabelKey kSetOnOffValue = "setOnOffValue";
+
 constexpr LabelKey kSetRegulatoryConfig = "SetRegulatoryConfig";
 
 constexpr LabelKey kSetTCAcknowledgements = "SetTCAcknowledgements";
@@ -345,6 +365,10 @@ constexpr LabelKey kSignWithOpKeypair = "SignWithOpKeypair";
 constexpr LabelKey kSleep = "Sleep";
 
 constexpr LabelKey kStep = "Step";
+
+constexpr LabelKey kStepHue = "stepHue";
+
+constexpr LabelKey kStepSaturation = "stepSaturation";
 
 constexpr LabelKey kStepWithOnOff = "StepWithOnOff";
 
@@ -372,6 +396,8 @@ constexpr LabelKey kUnpairDevice = "UnpairDevice";
 
 constexpr LabelKey kUpdateFabricLabel = "UpdateFabricLabel";
 
+constexpr LabelKey kUpdateHueSat = "updateHueSat";
+
 constexpr LabelKey kUpdateNOC = "UpdateNOC";
 
 constexpr LabelKey kUpdatePendingFabricCommon = "UpdatePendingFabricCommon";
@@ -395,32 +421,6 @@ constexpr LabelKey k_2 = "2";
 constexpr LabelKey k_3 = "3";
 
 constexpr LabelKey k_4 = "4";
-
-constexpr LabelKey kcolorLoop = "colorLoop";
-
-constexpr LabelKey kcontinueCommissioningAfterConnectNetworkRequest = "continueCommissioningAfterConnectNetworkRequest";
-
-constexpr LabelKey kcontinueCommissioningDevice = "continueCommissioningDevice";
-
-constexpr LabelKey kmoveHue = "moveHue";
-
-constexpr LabelKey kmoveSaturation = "moveSaturation";
-
-constexpr LabelKey kmoveToHue = "moveToHue";
-
-constexpr LabelKey kmoveToHueAndSaturation = "moveToHueAndSaturation";
-
-constexpr LabelKey kmoveToSaturation = "moveToSaturation";
-
-constexpr LabelKey koffWithEffectCommand = "offWithEffectCommand";
-
-constexpr LabelKey ksetOnOffValue = "setOnOffValue";
-
-constexpr LabelKey kstepHue = "stepHue";
-
-constexpr LabelKey kstepSaturation = "stepSaturation";
-
-constexpr LabelKey kupdateHueSat = "updateHueSat";
 
 /**
  * Array of all label keys
@@ -450,9 +450,12 @@ constexpr LabelKey kAllLabelKeys[] = {
     kChangeToMode,
     kCheckForRevokedDACChain,
     kClear,
+    kColorLoop,
     kCommission,
     kCommissioningComplete,
     kCommissioningStageComplete,
+    kContinueCommissioningAfterConnectNetworkRequest,
+    kContinueCommissioningDevice,
     kCopyScene,
     kD,
     kDelete,
@@ -501,12 +504,18 @@ constexpr LabelKey kAllLabelKeys[] = {
     kInitCASEHandshake,
     kIssueNOCChain,
     kMove,
+    kMoveHue,
+    kMoveSaturation,
+    kMoveToHue,
+    kMoveToHueAndSaturation,
     kMoveToLevel,
     kMoveToLevelWithOnOff,
+    kMoveToSaturation,
     kMoveWithOnOff,
     kNotifyFabricCommitted,
     kNotifyFabricUpdated,
     kOffCommand,
+    kOffWithEffectCommand,
     kOnAddNOCFailureResponse,
     kOnAssociationFailureDetected,
     kOnAttestationFailureResponse,
@@ -574,6 +583,7 @@ constexpr LabelKey kAllLabelKeys[] = {
     kSendSigma2,
     kSendSigma3,
     kSendTrustedRootCertificate,
+    kSetOnOffValue,
     kSetRegulatoryConfig,
     kSetTCAcknowledgements,
     kSetupSpake2p,
@@ -584,6 +594,8 @@ constexpr LabelKey kAllLabelKeys[] = {
     kSignWithOpKeypair,
     kSleep,
     kStep,
+    kStepHue,
+    kStepSaturation,
     kStepWithOnOff,
     kStop,
     kStopWithOnOff,
@@ -597,6 +609,7 @@ constexpr LabelKey kAllLabelKeys[] = {
     kUnauthenticated_Message_Dispatch,
     kUnpairDevice,
     kUpdateFabricLabel,
+    kUpdateHueSat,
     kUpdateNOC,
     kUpdatePendingFabricCommon,
     kValidateAttestationInfo,
@@ -609,19 +622,6 @@ constexpr LabelKey kAllLabelKeys[] = {
     k_2,
     k_3,
     k_4,
-    kcolorLoop,
-    kcontinueCommissioningAfterConnectNetworkRequest,
-    kcontinueCommissioningDevice,
-    kmoveHue,
-    kmoveSaturation,
-    kmoveToHue,
-    kmoveToHueAndSaturation,
-    kmoveToSaturation,
-    koffWithEffectCommand,
-    ksetOnOffValue,
-    kstepHue,
-    kstepSaturation,
-    kupdateHueSat,
 }; // kAllLabelKeys
 
 } // namespace Tracing

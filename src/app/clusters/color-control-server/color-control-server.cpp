@@ -1416,7 +1416,7 @@ Status ColorControlServer::moveHueCommand(EndpointId endpoint, HueMoveMode moveM
                                           BitMask<OptionsBitmap> optionsMask, BitMask<OptionsBitmap> optionsOverride,
                                           bool isEnhanced)
 {
-    MATTER_TRACE_SCOPE(kmoveHue, kColorControl);
+    MATTER_TRACE_SCOPE(kMoveHue, kColorControl);
 
     // check moveMode and rate before any operation is done on the transition states
     // rate value is ignored if the MoveMode is stop
@@ -1514,7 +1514,7 @@ Status ColorControlServer::moveToHueCommand(EndpointId endpoint, uint16_t hue, D
                                             BitMask<OptionsBitmap> optionsMask, BitMask<OptionsBitmap> optionsOverride,
                                             bool isEnhanced)
 {
-    MATTER_TRACE_SCOPE(kmoveToHue, kColorControl);
+    MATTER_TRACE_SCOPE(kMoveToHue, kColorControl);
     // Command Parameters constraint checks:
     VerifyOrReturnValue((isEnhanced || hue <= MAX_HUE_VALUE), Status::ConstraintError);
     VerifyOrReturnValue(transitionTime <= kMaxTransitionTime, Status::ConstraintError);
@@ -1631,7 +1631,7 @@ Status ColorControlServer::moveToHueAndSaturationCommand(EndpointId endpoint, ui
                                                          uint16_t transitionTime, BitMask<OptionsBitmap> optionsMask,
                                                          BitMask<OptionsBitmap> optionsOverride, bool isEnhanced)
 {
-    MATTER_TRACE_SCOPE(kmoveToHueAndSaturation, kColorControl);
+    MATTER_TRACE_SCOPE(kMoveToHueAndSaturation, kColorControl);
     // Command Parameters constraint checks:
     VerifyOrReturnValue((isEnhanced || hue <= MAX_HUE_VALUE), Status::ConstraintError);
     VerifyOrReturnValue(saturation <= MAX_SATURATION_VALUE, Status::ConstraintError);
@@ -1666,7 +1666,7 @@ Status ColorControlServer::stepHueCommand(EndpointId endpoint, HueStepMode stepM
                                           BitMask<OptionsBitmap> optionsMask, BitMask<OptionsBitmap> optionsOverride,
                                           bool isEnhanced)
 {
-    MATTER_TRACE_SCOPE(kstepHue, kColorControl);
+    MATTER_TRACE_SCOPE(kStepHue, kColorControl);
     // Command Parameters constraint checks:
     // The non-enhanced variant passed a uint8 type for transitionTime and the full range (0-255) is allowed
     if (isEnhanced)
@@ -1751,7 +1751,7 @@ Status ColorControlServer::stepHueCommand(EndpointId endpoint, HueStepMode stepM
  */
 Status ColorControlServer::moveSaturationCommand(EndpointId endpoint, const Commands::MoveSaturation::DecodableType & commandData)
 {
-    MATTER_TRACE_SCOPE(kmoveSaturation, kColorControl);
+    MATTER_TRACE_SCOPE(kMoveSaturation, kColorControl);
     // check moveMode and rate before any operation is done on the transition states
     // rate value is ignored if the MoveMode is stop
     VerifyOrReturnValue(commandData.moveMode != SaturationMoveMode::kUnknownEnumValue, Status::InvalidCommand);
@@ -1814,7 +1814,7 @@ Status ColorControlServer::moveSaturationCommand(EndpointId endpoint, const Comm
 Status ColorControlServer::moveToSaturationCommand(EndpointId endpoint,
                                                    const Commands::MoveToSaturation::DecodableType & commandData)
 {
-    MATTER_TRACE_SCOPE(kmoveToSaturation, kColorControl);
+    MATTER_TRACE_SCOPE(kMoveToSaturation, kColorControl);
     // Command Parameters constraint checks:
     VerifyOrReturnValue(commandData.saturation <= MAX_SATURATION_VALUE, Status::ConstraintError);
     VerifyOrReturnValue(commandData.transitionTime <= kMaxTransitionTime, Status::ConstraintError);
@@ -1837,7 +1837,7 @@ Status ColorControlServer::moveToSaturationCommand(EndpointId endpoint,
  */
 Status ColorControlServer::stepSaturationCommand(EndpointId endpoint, const Commands::StepSaturation::DecodableType & commandData)
 {
-    MATTER_TRACE_SCOPE(kstepSaturation, kColorControl);
+    MATTER_TRACE_SCOPE(kStepSaturation, kColorControl);
     // Confirm validity of the step mode and step size received
     VerifyOrReturnValue(commandData.stepMode != SaturationStepMode::kUnknownEnumValue, Status::InvalidCommand);
     VerifyOrReturnValue(commandData.stepSize != 0, Status::InvalidCommand);
@@ -1888,7 +1888,7 @@ Status ColorControlServer::stepSaturationCommand(EndpointId endpoint, const Comm
  */
 Status ColorControlServer::colorLoopCommand(EndpointId endpoint, const Commands::ColorLoopSet::DecodableType & commandData)
 {
-    MATTER_TRACE_SCOPE(kcolorLoop, kColorControl);
+    MATTER_TRACE_SCOPE(kColorLoop, kColorControl);
     // Validate the action and direction parameters of the command
     VerifyOrReturnValue(commandData.action != ColorLoopActionEnum::kUnknownEnumValue, Status::InvalidCommand);
     VerifyOrReturnValue(commandData.direction != ColorLoopDirectionEnum::kUnknownEnumValue, Status::InvalidCommand);
@@ -2002,7 +2002,7 @@ Status ColorControlServer::colorLoopCommand(EndpointId endpoint, const Commands:
  */
 void ColorControlServer::updateHueSatCommand(EndpointId endpoint)
 {
-    MATTER_TRACE_SCOPE(kupdateHueSat, kColorControl);
+    MATTER_TRACE_SCOPE(kUpdateHueSat, kColorControl);
     uint16_t epIndex                                         = getEndpointIndex(endpoint);
     ColorHueTransitionState * colorHueTransitionState        = getColorHueTransitionStateByIndex(epIndex);
     Color16uTransitionState * colorSaturationTransitionState = getSaturationTransitionStateByIndex(epIndex);
