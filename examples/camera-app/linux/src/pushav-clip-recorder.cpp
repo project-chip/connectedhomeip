@@ -115,7 +115,7 @@ void PushAVClipRecorder::RemovePreviousRecordingFiles(const std::string & path)
         // Check if file has one of the recording-related extensions
         std::string filename(entry->d_name);
         if (filename.length() > 4 &&
-            (filename.substr(filename.length() - 4) == ".mpd" || filename.substr(filename.length() - 5) == ".fmp4" ||
+            (filename.substr(filename.length() - 4) == ".mpd" || filename.substr(filename.length() - 5) == ".m4s" ||
              filename.substr(filename.length() - 4) == ".m4s"))
         {
             std::string filepath = path + filename;
@@ -618,7 +618,7 @@ int PushAVClipRecorder::ProcessBuffersAndWrite()
             return false;
         }
         std::string prefix           = mClipInfo.mRecorderId + "_clip_" + std::to_string(mClipInfo.mClipId);
-        std::string initSegName      = prefix + "_init-stream$RepresentationID$.fmp4";
+        std::string initSegName      = prefix + "_init-stream$RepresentationID$.m4s";
         std::string mediaSegName     = prefix + "_chunk-stream$RepresentationID$-$Number%05d$.m4s";
         mInputFormatContext          = avformat_alloc_context();
         int avioCtxBufferSize        = 1048576; // 1MB
@@ -771,18 +771,18 @@ void PushAVClipRecorder::FinalizeCurrentClip(int reason)
     };
 
     // 1. Handle initialization files
-    std::string fmp4_path = make_path("%s_init-stream0.fmp4");
-    if (mUploadedInitSegment && FileExists(fmp4_path) && !FileExists(fmp4_path + ".tmp"))
+    std::string m4s_path = make_path("%s_init-stream0.m4s");
+    if (mUploadedInitSegment && FileExists(m4s_path) && !FileExists(m4s_path + ".tmp"))
     {
         mUploadedInitSegment = false;
-        CheckAndUploadFile(fmp4_path);
+        CheckAndUploadFile(m4s_path);
 
         if (mClipInfo.mHasAudio)
         {
-            std::string audio_fmp4 = make_path("%s_init-stream1.fmp4");
-            if (FileExists(audio_fmp4) && !FileExists(audio_fmp4 + ".tmp"))
+            std::string audio_m4s = make_path("%s_init-stream1.m4s");
+            if (FileExists(audio_m4s) && !FileExists(audio_m4s + ".tmp"))
             {
-                CheckAndUploadFile(audio_fmp4);
+                CheckAndUploadFile(audio_m4s);
             }
         }
     }

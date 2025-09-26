@@ -337,7 +337,7 @@ class TC_PAVST_2_3(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
             triggerOptions = {"triggerType": pvcluster.Enums.TransportTriggerTypeEnum.kMotion,
                               "maxPreRollLen": 4000,
                               "motionZones": zoneList,
-                              "motionTimeControl": {"initialDuration": 1, "augmentationDuration": 1, "maxDuration": 1, "blindDuration": 1}}
+                              "motionTimeControl": {"initialDuration": 10, "augmentationDuration": 1, "maxDuration": 15, "blindDuration": 1}}
             status = await self.allocate_one_pushav_transport(endpoint, trigger_Options=triggerOptions, expected_cluster_status=pvcluster.Enums.StatusCodeEnum.kInvalidZone,
                                                               tlsEndPoint=tlsEndpointId, url=f"https://{host_ip}:1234/streams/{uploadStreamId}/")
             asserts.assert_equal(status, pvcluster.Enums.StatusCodeEnum.kInvalidZone,
@@ -370,13 +370,13 @@ class TC_PAVST_2_3(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
             streamUsage = aStreamUsagePriorities[0]
             containerOptions = {
                 "containerType": pvcluster.Enums.ContainerFormatEnum.kCmaf,
-                "CMAFContainerOptions": {"CMAFInterface": pvcluster.Enums.CMAFInterfaceEnum.kInterface1, "chunkDuration": 4, "segmentDuration": 3,
+                "CMAFContainerOptions": {"CMAFInterface": pvcluster.Enums.CMAFInterfaceEnum.kInterface1, "chunkDuration": 1000, "segmentDuration": 4000,
                                          "sessionGroup": 3, "trackName": ""},
             }
             status = await self.send_single_cmd(cmd=pvcluster.Commands.AllocatePushTransport(
                 {"streamUsage": streamUsage,
                  "TLSEndpointID": endpoint,
-                 "url": "https://{host_ip}:1234/streams/1",
+                 "url": "https://{host_ip}:1234/streams/1/",
                  "triggerOptions": {"triggerType": pvcluster.Enums.TransportTriggerTypeEnum.kContinuous},
                  "ingestMethod": pvcluster.Enums.IngestMethodsEnum.kCMAFIngest,
                  "containerOptions": containerOptions,
@@ -403,7 +403,7 @@ class TC_PAVST_2_3(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
         triggerOptions = {"triggerType": pvcluster.Enums.TransportTriggerTypeEnum.kMotion,
                           "maxPreRollLen": 4000,
                           "motionZones": zoneList,
-                          "motionTimeControl": {"initialDuration": 1, "augmentationDuration": 1, "maxDuration": 1, "blindDuration": 1}}
+                          "motionTimeControl": {"initialDuration": 10, "augmentationDuration": 1, "maxDuration": 15, "blindDuration": 1}}
         status = await self.allocate_one_pushav_transport(endpoint, trigger_Options=triggerOptions,
                                                           tlsEndPoint=tlsEndpointId, url=f"https://{host_ip}:1234/streams/{uploadStreamId}/")
         asserts.assert_equal(status, Status.DynamicConstraintError,
@@ -412,7 +412,7 @@ class TC_PAVST_2_3(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
         self.step(24)
         zoneList = []
         triggerOptions = {"triggerType": pvcluster.Enums.TransportTriggerTypeEnum.kMotion,
-                          "motionTimeControl": {"initialDuration": 1, "augmentationDuration": 1, "maxDuration": 1, "blindDuration": 1},
+                          "motionTimeControl": {"initialDuration": 10, "augmentationDuration": 1, "maxDuration": 15, "blindDuration": 1},
                           "motionSensitivity": 3,
                           "motionZones": zoneList}
         status = await self.allocate_one_pushav_transport(endpoint, trigger_Options=triggerOptions, tlsEndPoint=tlsEndpointId, url=f"https://{host_ip}:1234/streams/{uploadStreamId}/")
@@ -422,7 +422,7 @@ class TC_PAVST_2_3(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
         self.step(25)
         zoneList = []
         triggerOptions = {"triggerType": pvcluster.Enums.TransportTriggerTypeEnum.kMotion,
-                          "motionTimeControl": {"initialDuration": 1, "augmentationDuration": 1, "maxDuration": 1, "blindDuration": 1},
+                          "motionTimeControl": {"initialDuration": 10, "augmentationDuration": 1, "maxDuration": 15, "blindDuration": 1},
                           "motionSensitivity": 11,
                           "motionZones": zoneList}
         status = await self.allocate_one_pushav_transport(endpoint, trigger_Options=triggerOptions, tlsEndPoint=tlsEndpointId, url=f"https://{host_ip}:1234/streams/{uploadStreamId}/")
@@ -469,7 +469,7 @@ class TC_PAVST_2_3(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
         triggerOptions = {"triggerType": pvcluster.Enums.TransportTriggerTypeEnum.kMotion,
                           "maxPreRollLen": 4000,
                           "motionZones": zoneList,
-                          "motionTimeControl": {"initialDuration": 1, "augmentationDuration": 1, "maxDuration": 1, "blindDuration": 1}}
+                          "motionTimeControl": {"initialDuration": 10, "augmentationDuration": 1, "maxDuration": 15, "blindDuration": 1}}
 
         status = await self.allocate_one_pushav_transport(endpoint, trigger_Options=triggerOptions, tlsEndPoint=tlsEndpointId, url=f"https://{host_ip}:1234/streams/{uploadStreamId}/")
         asserts.assert_equal(status, Status.Success,
@@ -490,7 +490,11 @@ class TC_PAVST_2_3(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
         triggerOptions = {"triggerType": pvcluster.Enums.TransportTriggerTypeEnum.kMotion,
                           "maxPreRollLen": 4000,
                           "motionZones": zoneList,
+<<<<<<< HEAD
                           "motionTimeControl": {"initialDuration": 1, "augmentationDuration": 1, "maxDuration": 1, "blindDuration": 1}}
+=======
+                          "motionTimeControl": {"initialDuration": 10, "augmentationDuration": 1, "maxDuration": 15, "blindDuration": 1}}
+>>>>>>> 2bdaaa66a3 (update init segment file extension from .fmp4 to .cmfv and related testcases)
         status = await self.allocate_one_pushav_transport(endpoint, trigger_Options=triggerOptions, tlsEndPoint=tlsEndpointId, url=f"https://{host_ip}:1234/streams/{uploadStreamId}/")
         asserts.assert_equal(status, Status.Success,
                              "DUT must  responds with Status Code Success.")
