@@ -26,7 +26,7 @@ CHIP_ERROR MigrateFromSafeAttributePersistanceProvider(EndpointId endpointId, Cl
             // The value does not exist
             continue;
         }
-        else if (err != CHIP_NO_ERROR)
+        if (err != CHIP_NO_ERROR)
         {
             // ChipLogError(Unspecified, "Error reading attribute %s - %" CHIP_ERROR_FORMAT, safePath.KeyName(), err);
             continue;
