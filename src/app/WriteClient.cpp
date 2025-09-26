@@ -172,7 +172,7 @@ CHIP_ERROR WriteClient::StartNewMessage()
     }
 
     // Do not allow timed request with chunks.
-    VerifyOrReturnError(!(mTimedWriteTimeoutMs.HasValue() && !mChunks.IsNull()), CHIP_ERROR_NO_MEMORY);
+    VerifyOrReturnError(!(mForceTimedRequestFlag && !mChunks.IsNull()), CHIP_ERROR_NO_MEMORY);
 
     System::PacketBufferHandle packet = System::PacketBufferHandle::New(kMaxSecureSduLengthBytes);
     VerifyOrReturnError(!packet.IsNull(), CHIP_ERROR_NO_MEMORY);
@@ -201,7 +201,7 @@ CHIP_ERROR WriteClient::StartNewMessage()
 
     ReturnErrorOnFailure(mWriteRequestBuilder.Init(&mMessageWriter));
     mWriteRequestBuilder.SuppressResponse(mSuppressResponse);
-    mWriteRequestBuilder.TimedRequest(mTimedRequest);
+    mWriteRequestBuilder.TimedRequest(mForceTimedRequestFlag);
     ReturnErrorOnFailure(mWriteRequestBuilder.GetError());
     mWriteRequestBuilder.CreateWriteRequests();
     ReturnErrorOnFailure(mWriteRequestBuilder.GetError());
