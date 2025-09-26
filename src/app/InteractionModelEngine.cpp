@@ -2032,6 +2032,28 @@ size_t InteractionModelEngine::GetNumDirtySubscriptions() const
     return numDirtySubscriptions;
 }
 
+void InteractionModelEngine::TriggerCheckInMessage()
+{
+    std::function<app::ICDManager::ShouldCheckInMsgsBeSentFunction> sendCheckInMessages =
+    std::bind(&Server::ShouldCheckInMsgsBeSentAtBootFunction, this, std::placeholders::_1, std::placeholders::_2);
+    mICDManager.TriggerCheckInMessages(sendCheckInMessages, true /* forceSend */)
+}
+void InteractionModelEngine::ScheduledTriggerCheckInMessage()
+{
+    SessionManager * sessionManager = mpExchangeMgr->GetSessionManager();
+    if (sessionManager == nullptr)
+    {
+        return;
+    }
+    System::Layer * systemLayer = sessionManager->SystemLayer();
+    if (systemLayer == nullptr)
+    {
+        return;
+    }
+    ReturnErrorOnFailure(systemLayer->ScheduleWork(TriggerCheckInMessage, this));
+
+}
+
 void InteractionModelEngine::OnFabricRemoved(const FabricTable & fabricTable, FabricIndex fabricIndex)
 {
     mReadHandlers.ForEachActiveObject([fabricIndex](ReadHandler * handler) {
