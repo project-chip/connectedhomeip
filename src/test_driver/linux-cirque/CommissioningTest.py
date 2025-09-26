@@ -142,7 +142,7 @@ class TestCommissioner(CHIPVirtualHome):
         command = ("gdb -return-child-result -q -ex run -ex bt --args python3 "
                    "{} -t 150 -a {} --paa-trust-store-path {} --discriminator {} --nodeid {}").format(
             os.path.join(
-                CHIP_REPO, "src/controller/python/test/test_scripts/commissioning_test.py"),
+                CHIP_REPO, "src/controller/python/tests/scripts/commissioning_test.py"),
             servers[0]['ip'],
             os.path.join(CHIP_REPO, MATTER_DEVELOPMENT_PAA_ROOT_CERTS),
             servers[0]['discriminator'],
@@ -155,7 +155,7 @@ class TestCommissioner(CHIPVirtualHome):
         command = ("gdb -return-child-result -q -ex run -ex bt --args python3 "
                    "{} -t 150 --paa-trust-store-path {} --discriminator {} --setup-payload {} --nodeid {} --discovery-type {}").format(
             os.path.join(
-                CHIP_REPO, "src/controller/python/test/test_scripts/commissioning_test.py"),
+                CHIP_REPO, "src/controller/python/tests/scripts/commissioning_test.py"),
             os.path.join(CHIP_REPO, MATTER_DEVELOPMENT_PAA_ROOT_CERTS),
             servers[1]['discriminator'],
             "33331712336",
@@ -169,7 +169,7 @@ class TestCommissioner(CHIPVirtualHome):
         command = ("gdb -return-child-result -q -ex run -ex bt --args python3 "
                    "{} -t 150 --paa-trust-store-path {} --discriminator {} --setup-payload {} --nodeid {} --discovery-type {}").format(
             os.path.join(
-                CHIP_REPO, "src/controller/python/test/test_scripts/commissioning_test.py"),
+                CHIP_REPO, "src/controller/python/tests/scripts/commissioning_test.py"),
             os.path.join(CHIP_REPO, MATTER_DEVELOPMENT_PAA_ROOT_CERTS),
             servers[2]['discriminator'],
             "10054912339",
@@ -183,7 +183,7 @@ class TestCommissioner(CHIPVirtualHome):
         command = ("gdb -return-child-result -q -ex run -ex bt --args python3 "
                    "{} -t 150 --paa-trust-store-path {} --discriminator {} --setup-payload {} --nodeid {} --discovery-type {}").format(
             os.path.join(
-                CHIP_REPO, "src/controller/python/test/test_scripts/commissioning_test.py"),
+                CHIP_REPO, "src/controller/python/tests/scripts/commissioning_test.py"),
             os.path.join(CHIP_REPO, MATTER_DEVELOPMENT_PAA_ROOT_CERTS),
             servers[3]['discriminator'],
             "20054912334",

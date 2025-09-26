@@ -20,6 +20,7 @@ namespace Groups {
 inline constexpr uint32_t kRevision = 4;
 
 namespace Attributes {
+
 namespace NameSupport {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(NameSupport::Id, BitFlags<DataModel::AttributeQualityFlags>(),
                                                           Access::Privilege::kView, std::nullopt);
@@ -32,6 +33,7 @@ constexpr std::array<DataModel::AttributeEntry, 1> kMandatoryMetadata = {
 } // namespace Attributes
 
 namespace Commands {
+
 namespace AddGroup {
 inline constexpr DataModel::AcceptedCommandEntry
     kMetadataEntry(AddGroup::Id, BitFlags<DataModel::CommandQualityFlags>(DataModel::CommandQualityFlags::kFabricScoped),

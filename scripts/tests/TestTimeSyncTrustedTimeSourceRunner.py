@@ -30,7 +30,7 @@ DEFAULT_ALL_CLUSTERS = os.path.join(
     'linux-x64-all-clusters-ipv6only-no-ble-no-wifi-tsan-clang-test',
     'chip-all-clusters-app')
 DEFAULT_TEST_RUNNER = os.path.join(DEFAULT_CHIP_ROOT, 'scripts', 'tests', 'run_python_test.py')
-DEFAULT_TEST_SCRIPT = os.path.join(DEFAULT_CHIP_ROOT, 'src', 'python_testing', 'TestTimeSyncTrustedTimeSource.py')
+DEFAULT_TEST_SCRIPT = os.path.join(DEFAULT_CHIP_ROOT, 'src', 'python_testing', 'test_testing', 'TestTimeSyncTrustedTimeSource.py')
 
 
 class TestDriver:

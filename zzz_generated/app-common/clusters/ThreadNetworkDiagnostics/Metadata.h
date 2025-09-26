@@ -20,6 +20,7 @@ namespace ThreadNetworkDiagnostics {
 inline constexpr uint32_t kRevision = 3;
 
 namespace Attributes {
+
 namespace Channel {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(Channel::Id, BitFlags<DataModel::AttributeQualityFlags>(),
                                                           Access::Privilege::kView, std::nullopt);
@@ -316,6 +317,7 @@ constexpr std::array<DataModel::AttributeEntry, 19> kMandatoryMetadata = {
 } // namespace Attributes
 
 namespace Commands {
+
 namespace ResetCounts {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(ResetCounts::Id, BitFlags<DataModel::CommandQualityFlags>(),
                                                                 Access::Privilege::kManage);

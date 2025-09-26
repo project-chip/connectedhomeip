@@ -21,6 +21,7 @@
 #include "camera-avsettingsuserlevel-manager.h"
 #include "camera-device-interface.h"
 #include "chime-manager.h"
+#include "push-av-stream-manager.h"
 #include "webrtc-provider-manager.h"
 #include "zone-manager.h"
 
@@ -31,9 +32,6 @@
 #define STREAM_GST_DEST_IP "127.0.0.1"
 #define VIDEO_STREAM_GST_DEST_PORT 5000
 #define AUDIO_STREAM_GST_DEST_PORT 5001
-// TODO: Define a configuration flag and enable/disable during the build. Configure this after the controller/TH side UI is ready.
-// Enable to use test src instead of hardware source for testing purposes.
-// #define AV_STREAM_GST_USE_TEST_SRC
 
 // Camera Constraints set to typical values.
 // TODO: Look into ways to fetch from hardware, if required/possible.
@@ -49,15 +47,17 @@ static constexpr uint8_t kMicrophoneMaxLevel         = 254;  // Spec constraint
 static constexpr uint8_t kMicrophoneMaxChannelCount  = 8;    // Spec Constraint in AudioStreamAllocate
 static constexpr uint16_t kMinResolutionWidth        = 640;  // Low SD resolution
 static constexpr uint16_t kMinResolutionHeight       = 360;  // Low SD resolution
+static constexpr uint16_t k720pResolutionWidth       = 1280; // 720p resolution
+static constexpr uint16_t k720pResolutionHeight      = 720;  // 720p resolution
 static constexpr uint16_t kMaxResolutionWidth        = 1920; // 1080p resolution
 static constexpr uint16_t kMaxResolutionHeight       = 1080; // 1080p resolution
 static constexpr uint16_t kSnapshotStreamFrameRate   = 30;
 static constexpr uint16_t kMaxVideoFrameRate         = 120;
+static constexpr uint16_t k60fpsVideoFrameRate       = 60;
 static constexpr uint16_t kMinVideoFrameRate         = 30;
 static constexpr uint32_t kMinBitRateBps             = 10000;   // 10 kbps
 static constexpr uint32_t kMaxBitRateBps             = 2000000; // 2 mbps
-static constexpr uint32_t kMinKeyFrameIntervalMsec   = 1000;    // 1 sec
-static constexpr uint32_t kMaxKeyFrameIntervalMsec   = 10000;   // 10 sec
+static constexpr uint32_t kKeyFrameIntervalMsec      = 4000;    // 4 sec; recommendation from Spec
 static constexpr uint16_t kVideoSensorWidthPixels    = 1920;    // 1080p resolution
 static constexpr uint16_t kVideoSensorHeightPixels   = 1080;    // 1080p resolution
 static constexpr uint16_t kMinImageRotation          = 0;
@@ -84,9 +84,11 @@ class CameraDevice : public CameraDeviceInterface, public CameraDeviceInterface:
 public:
     chip::app::Clusters::ChimeDelegate & GetChimeDelegate() override;
     chip::app::Clusters::WebRTCTransportProvider::Delegate & GetWebRTCProviderDelegate() override;
+    chip::app::Clusters::WebRTCTransportProvider::WebRTCTransportProviderController & GetWebRTCProviderController() override;
     chip::app::Clusters::CameraAvStreamManagement::CameraAVStreamMgmtDelegate & GetCameraAVStreamMgmtDelegate() override;
     chip::app::Clusters::CameraAvStreamManagement::CameraAVStreamController & GetCameraAVStreamMgmtController() override;
     chip::app::Clusters::CameraAvSettingsUserLevelManagement::Delegate & GetCameraAVSettingsUserLevelMgmtDelegate() override;
+    chip::app::Clusters::PushAvStreamTransportDelegate & GetPushAVTransportDelegate() override;
     chip::app::Clusters::ZoneManagement::Delegate & GetZoneManagementDelegate() override;
 
     MediaController & GetMediaController() override;
@@ -106,7 +108,7 @@ public:
     CameraError CaptureSnapshot(const chip::app::DataModel::Nullable<uint16_t> streamID, const VideoResolutionStruct & resolution,
                                 ImageSnapshot & outImageSnapshot) override;
 
-    CameraError StartVideoStream(uint16_t streamID) override;
+    CameraError StartVideoStream(const VideoStreamStruct & allocatedStream) override;
 
     // Stop video stream
     CameraError StopVideoStream(uint16_t streamID) override;
@@ -116,6 +118,11 @@ public:
 
     // Stop audio stream
     CameraError StopAudioStream(uint16_t streamID) override;
+
+    // Allocate snapshot stream
+    CameraError AllocateSnapshotStream(
+        const chip::app::Clusters::CameraAvStreamManagement::CameraAVStreamMgmtDelegate::SnapshotStreamAllocateArgs & args,
+        uint16_t & outStreamID) override;
 
     // Start snapshot stream
     CameraError StartSnapshotStream(uint16_t streamID) override;
@@ -162,6 +169,7 @@ public:
     CameraError SetHDRMode(bool hdrMode) override;
     bool GetHDRMode() override { return mHDREnabled; }
 
+    CameraError SetHardPrivacyMode(bool hardPrivacyMode) override;
     bool GetHardPrivacyMode() override { return mHardPrivacyModeOn; }
 
     CameraError SetNightVision(chip::app::Clusters::CameraAvStreamManagement::TriStateAutoEnum nightVision) override;
@@ -170,6 +178,7 @@ public:
     std::vector<StreamUsageEnum> & GetSupportedStreamUsages() override;
 
     std::vector<StreamUsageEnum> & GetStreamUsagePriorities() override { return mStreamUsagePriorities; }
+    CameraError SetStreamUsagePriorities(std::vector<StreamUsageEnum> streamUsagePriorities) override;
 
     // Sets the Default Camera Viewport
     CameraError SetViewport(const chip::app::Clusters::Globals::Structs::ViewportStruct::Type & viewPort) override;
@@ -195,8 +204,8 @@ public:
     CameraError SetSoftLivestreamPrivacyModeEnabled(bool softLivestreamPrivacyMode) override;
     bool GetSoftLivestreamPrivacyModeEnabled() override { return mSoftLivestreamPrivacyModeEnabled; }
 
-    // Currently, defaulting to not supporting hard privacy switch.
-    bool HasHardPrivacySwitch() override { return false; }
+    // Currently, defaulting to supporting hard privacy switch.
+    bool HasHardPrivacySwitch() override { return true; }
 
     // Currently, defaulting to supporting speaker.
     bool HasSpeaker() override { return true; }
@@ -274,6 +283,10 @@ public:
 
     uint8_t GetDetectionSensitivity() override { return mDetectionSensitivity; }
 
+    size_t GetPreRollBufferSize();
+
+    int64_t GetMinKeyframeIntervalMs();
+
     CameraError SetDetectionSensitivity(uint8_t aSensitivity) override;
 
     CameraError CreateZoneTrigger(const chip::app::Clusters::ZoneManagement::ZoneTriggerControlStruct & zoneTrigger) override;
@@ -285,6 +298,7 @@ public:
     CameraError SetPan(int16_t aPan) override;
     CameraError SetTilt(int16_t aTilt) override;
     CameraError SetZoom(uint8_t aZoom) override;
+    CameraError SetPhysicalPTZ(chip::Optional<int16_t> aPan, chip::Optional<int16_t> aTilt, chip::Optional<uint8_t> aZoom) override;
 
     std::vector<VideoStream> & GetAvailableVideoStreams() override { return mVideoStreams; }
 
@@ -309,16 +323,24 @@ private:
     void InitializeAudioStreams();
     void InitializeSnapshotStreams();
 
+    bool AddSnapshotStream(const chip::app::Clusters::CameraAvStreamManagement::CameraAVStreamManager::SnapshotStreamAllocateArgs &
+                               snapshotStreamAllocateArgs,
+                           uint16_t & outStreamID);
+
     GstElement * CreateVideoPipeline(const std::string & device, int width, int height, int framerate, CameraError & error);
-    GstElement * CreateAudioPipeline(const std::string & device, int channels, int sampleRate, CameraError & error);
+    GstElement * CreateAudioPipeline(const std::string & device, int channels, int sampleRate, int bitRate, CameraError & error);
     GstElement * CreateSnapshotPipeline(const std::string & device, int width, int height, int quality, int frameRate,
                                         const std::string & filename, CameraError & error);
     CameraError SetV4l2Control(uint32_t controlId, int value);
+
+    bool MatchClosestSnapshotParams(const VideoResolutionStruct & requested, VideoResolutionStruct & outResolution,
+                                    chip::app::Clusters::CameraAvStreamManagement::ImageCodecEnum & outCodec);
 
     // Various cluster server delegates
     chip::app::Clusters::ChimeManager mChimeManager;
     chip::app::Clusters::WebRTCTransportProvider::WebRTCProviderManager mWebRTCProviderManager;
     chip::app::Clusters::CameraAvStreamManagement::CameraAVStreamManager mCameraAVStreamManager;
+    chip::app::Clusters::PushAvStreamTransport::PushAvStreamTransportManager mPushAVTransportManager;
     chip::app::Clusters::CameraAvSettingsUserLevelManagement::CameraAVSettingsUserLevelManager mCameraAVSettingsUserLevelManager;
     chip::app::Clusters::ZoneManagement::ZoneManager mZoneManager;
 

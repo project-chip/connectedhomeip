@@ -20,6 +20,7 @@ namespace DoorLock {
 inline constexpr uint32_t kRevision = 7;
 
 namespace Attributes {
+
 namespace LockState {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(LockState::Id, BitFlags<DataModel::AttributeQualityFlags>(),
                                                           Access::Privilege::kView, std::nullopt);
@@ -233,6 +234,7 @@ constexpr std::array<DataModel::AttributeEntry, 5> kMandatoryMetadata = {
 } // namespace Attributes
 
 namespace Commands {
+
 namespace LockDoor {
 inline constexpr DataModel::AcceptedCommandEntry
     kMetadataEntry(LockDoor::Id, BitFlags<DataModel::CommandQualityFlags>(DataModel::CommandQualityFlags::kTimed),

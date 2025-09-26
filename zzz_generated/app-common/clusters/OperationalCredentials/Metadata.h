@@ -20,6 +20,7 @@ namespace OperationalCredentials {
 inline constexpr uint32_t kRevision = 2;
 
 namespace Attributes {
+
 namespace NOCs {
 inline constexpr DataModel::AttributeEntry
     kMetadataEntry(NOCs::Id, BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kListAttribute),
@@ -61,6 +62,7 @@ constexpr std::array<DataModel::AttributeEntry, 6> kMandatoryMetadata = {
 } // namespace Attributes
 
 namespace Commands {
+
 namespace AttestationRequest {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(AttestationRequest::Id, BitFlags<DataModel::CommandQualityFlags>(),
                                                                 Access::Privilege::kAdminister);

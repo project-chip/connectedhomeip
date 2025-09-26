@@ -20,6 +20,7 @@ namespace TlsCertificateManagement {
 inline constexpr uint32_t kRevision = 1;
 
 namespace Attributes {
+
 namespace MaxRootCertificates {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(MaxRootCertificates::Id, BitFlags<DataModel::AttributeQualityFlags>(),
                                                           Access::Privilege::kView, std::nullopt);
@@ -51,6 +52,7 @@ constexpr std::array<DataModel::AttributeEntry, 4> kMandatoryMetadata = {
 } // namespace Attributes
 
 namespace Commands {
+
 namespace ProvisionRootCertificate {
 inline constexpr DataModel::AcceptedCommandEntry
     kMetadataEntry(ProvisionRootCertificate::Id,
@@ -74,11 +76,11 @@ inline constexpr DataModel::AcceptedCommandEntry
                    BitFlags<DataModel::CommandQualityFlags>(DataModel::CommandQualityFlags::kFabricScoped),
                    Access::Privilege::kAdminister);
 } // namespace RemoveRootCertificate
-namespace TLSClientCSR {
+namespace ClientCSR {
 inline constexpr DataModel::AcceptedCommandEntry
-    kMetadataEntry(TLSClientCSR::Id, BitFlags<DataModel::CommandQualityFlags>(DataModel::CommandQualityFlags::kFabricScoped),
+    kMetadataEntry(ClientCSR::Id, BitFlags<DataModel::CommandQualityFlags>(DataModel::CommandQualityFlags::kFabricScoped),
                    Access::Privilege::kAdminister);
-} // namespace TLSClientCSR
+} // namespace ClientCSR
 namespace ProvisionClientCertificate {
 inline constexpr DataModel::AcceptedCommandEntry
     kMetadataEntry(ProvisionClientCertificate::Id,

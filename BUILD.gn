@@ -24,6 +24,11 @@ import("$dir_pw_build/python.gni")
 import("$dir_pw_build/python_dist.gni")
 import("$dir_pw_build/python_venv.gni")
 
+declare_args() {
+  # Value to passed to the c/c++ compiler wrapper.
+  cc_wrapper = ""
+}
+
 # This build file should not be used in superproject builds.
 assert(chip_root == "//")
 
@@ -127,7 +132,7 @@ if (current_toolchain != "${dir_pw_toolchain}/default:default") {
       deps = [
         "${chip_root}/scripts:matter_yamltests_distribution.wheel",
         "${chip_root}/scripts/py_matter_yamltests:matter-yamltests.wheel",
-        "${chip_root}/src/controller/python:chip-repl",
+        "${chip_root}/src/controller/python:matter-repl",
         "${chip_root}/src/python_testing/matter_testing_infrastructure:matter-testing.wheel",
         "${chip_root}/src/python_testing/post_certification_tests:matter-post-certification-tests.wheel",
       ]
@@ -239,7 +244,7 @@ if (current_toolchain != "${dir_pw_toolchain}/default:default") {
       data_deps = [ "${chip_root}/examples/chip-tool" ]
 
       if (chip_enable_python_modules) {
-        data_deps += [ "${chip_root}/src/controller/python:chip-repl" ]
+        data_deps += [ "${chip_root}/src/controller/python:matter-repl" ]
       }
 
       write_runtime_deps = "${root_out_dir}/certification.runtime_deps"

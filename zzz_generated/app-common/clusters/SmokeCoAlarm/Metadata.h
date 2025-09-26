@@ -20,6 +20,7 @@ namespace SmokeCoAlarm {
 inline constexpr uint32_t kRevision = 1;
 
 namespace Attributes {
+
 namespace ExpressedState {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(ExpressedState::Id, BitFlags<DataModel::AttributeQualityFlags>(),
                                                           Access::Privilege::kView, std::nullopt);
@@ -81,6 +82,7 @@ constexpr std::array<DataModel::AttributeEntry, 5> kMandatoryMetadata = {
 } // namespace Attributes
 
 namespace Commands {
+
 namespace SelfTestRequest {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(SelfTestRequest::Id, BitFlags<DataModel::CommandQualityFlags>(),
                                                                 Access::Privilege::kOperate);

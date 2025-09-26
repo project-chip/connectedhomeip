@@ -45,7 +45,7 @@ public:
     ///   - optionalAttributes IF AND ONLY IF enabledOptionalAttributes is set for them
     ///   - GlobalAttributes()  (all of them)
     CHIP_ERROR Append(Span<const DataModel::AttributeEntry> mandatoryAttributes,
-                      Span<const DataModel::AttributeEntry> optionalAttributes, const AttributeSet & enabledOptionalAttributes);
+                      Span<const DataModel::AttributeEntry> optionalAttributes, AttributeSet enabledOptionalAttributes);
 
     struct OptionalAttributeEntry
     {

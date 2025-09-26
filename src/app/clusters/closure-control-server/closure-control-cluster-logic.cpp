@@ -260,8 +260,31 @@ CHIP_ERROR ClusterLogic::SetOverallCurrentState(const DataModel::Nullable<Generi
                                 CHIP_ERROR_INVALID_ARGUMENT);
         }
 
-        // TODO: SecureState field Value based on conditions validation will be done after the specification issue #11805
-        // resolution.
+        // SecureState can only be true if the closure meets the required conditions for a secure state, preventing unauthorized or
+        // undetectable access.
+        if (!incomingOverallCurrentState.secureState.IsNull() && incomingOverallCurrentState.secureState.Value())
+        {
+            // secure state requires the closure to meet all of the following conditions based on feature support:
+            // If the Positioning feature is supported, then the Position field of OverallCurrentState is FullyClosed.
+            // If the MotionLatching feature is supported, then the Latch field of OverallCurrentState is True.
+
+            if (mConformance.HasFeature(Feature::kPositioning))
+            {
+                VerifyOrReturnError(incomingOverallCurrentState.position.HasValue() &&
+                                        !incomingOverallCurrentState.position.Value().IsNull(),
+                                    CHIP_ERROR_INVALID_ARGUMENT);
+                VerifyOrReturnError(incomingOverallCurrentState.position.Value().Value() == CurrentPositionEnum::kFullyClosed,
+                                    CHIP_ERROR_INVALID_ARGUMENT);
+            }
+
+            if (mConformance.HasFeature(Feature::kMotionLatching))
+            {
+                VerifyOrReturnError(incomingOverallCurrentState.latch.HasValue() &&
+                                        !incomingOverallCurrentState.latch.Value().IsNull(),
+                                    CHIP_ERROR_INVALID_ARGUMENT);
+                VerifyOrReturnError(incomingOverallCurrentState.latch.Value().Value() == true, CHIP_ERROR_INVALID_ARGUMENT);
+            }
+        }
 
         // SecureStateChanged event SHALL be generated when the SecureState field in the OverallCurrentState attribute changes
         if (!incomingOverallCurrentState.secureState.IsNull())

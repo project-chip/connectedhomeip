@@ -100,7 +100,7 @@ class TestFailsafe(CHIPVirtualHome):
 
         command = "gdb -return-child-result -q -ex run -ex bt --args python3 {} -t 150 -a {} --paa-trust-store-path {}".format(
             os.path.join(
-                CHIP_REPO, "src/controller/python/test/test_scripts/failsafe_tests.py"),
+                CHIP_REPO, "src/controller/python/tests/scripts/failsafe_tests.py"),
             ethernet_ip,
             os.path.join(CHIP_REPO, MATTER_DEVELOPMENT_PAA_ROOT_CERTS))
         ret = self.execute_device_cmd(req_device_id, command)

@@ -20,6 +20,7 @@ namespace GeneralCommissioning {
 inline constexpr uint32_t kRevision = 2;
 
 namespace Attributes {
+
 namespace Breadcrumb {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(Breadcrumb::Id, BitFlags<DataModel::AttributeQualityFlags>(),
                                                           Access::Privilege::kView, Access::Privilege::kAdminister);
@@ -84,6 +85,7 @@ constexpr std::array<DataModel::AttributeEntry, 5> kMandatoryMetadata = {
 } // namespace Attributes
 
 namespace Commands {
+
 namespace ArmFailSafe {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(ArmFailSafe::Id, BitFlags<DataModel::CommandQualityFlags>(),
                                                                 Access::Privilege::kAdminister);

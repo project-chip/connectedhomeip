@@ -134,7 +134,7 @@ class TestSubscriptionResumptionCapacity(CHIPVirtualHome):
 
         command1 = ("gdb -batch -return-child-result -q -ex run -ex \"thread apply all bt\" "
                     "--args python3 {} -t 300 -a {} --paa-trust-store-path {} --subscription-capacity {}").format(
-                        os.path.join(CHIP_REPO, "src/controller/python/test/test_scripts",
+                        os.path.join(CHIP_REPO, "src/controller/python/tests/scripts",
                                      "subscription_resumption_capacity_test_ctrl1.py"),
                         ethernet_ip, os.path.join(CHIP_REPO, MATTER_DEVELOPMENT_PAA_ROOT_CERTS),
                         TEST_SUBSCRIPTION_CAPACITY)
@@ -146,7 +146,7 @@ class TestSubscriptionResumptionCapacity(CHIPVirtualHome):
         command2 = ("gdb -batch -return-child-result -q -ex run -ex \"thread apply all bt\" "
                     "--args python3 {} -t 300 -a {} --paa-trust-store-path {} --remote-server-app {} "
                     "--subscription-capacity {}").format(
-                        os.path.join(CHIP_REPO, "src/controller/python/test/test_scripts",
+                        os.path.join(CHIP_REPO, "src/controller/python/tests/scripts",
                                      "subscription_resumption_capacity_test_ctrl2.py"),
                         ethernet_ip, os.path.join(CHIP_REPO, MATTER_DEVELOPMENT_PAA_ROOT_CERTS),
                         TEST_END_DEVICE_APP, TEST_SUBSCRIPTION_CAPACITY)

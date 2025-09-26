@@ -20,6 +20,7 @@ namespace AccountLogin {
 inline constexpr uint32_t kRevision = 2;
 
 namespace Attributes {
+
 constexpr std::array<DataModel::AttributeEntry, 0> kMandatoryMetadata = {
 
 };
@@ -27,6 +28,7 @@ constexpr std::array<DataModel::AttributeEntry, 0> kMandatoryMetadata = {
 } // namespace Attributes
 
 namespace Commands {
+
 namespace GetSetupPIN {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(
     GetSetupPIN::Id,

@@ -20,6 +20,7 @@ namespace WiFiNetworkDiagnostics {
 inline constexpr uint32_t kRevision = 1;
 
 namespace Attributes {
+
 namespace Bssid {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(Bssid::Id, BitFlags<DataModel::AttributeQualityFlags>(),
                                                           Access::Privilege::kView, std::nullopt);
@@ -81,6 +82,7 @@ constexpr std::array<DataModel::AttributeEntry, 5> kMandatoryMetadata = {
 } // namespace Attributes
 
 namespace Commands {
+
 namespace ResetCounts {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(ResetCounts::Id, BitFlags<DataModel::CommandQualityFlags>(),
                                                                 Access::Privilege::kOperate);

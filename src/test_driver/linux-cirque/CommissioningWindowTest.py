@@ -105,7 +105,7 @@ class TestCommissioningWindow(CHIPVirtualHome):
         command = ("gdb -return-child-result -q -ex run -ex bt "
                    "--args python3 {} -t 150 --address {} --paa-trust-store-path {}").format(
             os.path.join(
-                CHIP_REPO, "src/controller/python/test/test_scripts/commissioning_window_test.py"),
+                CHIP_REPO, "src/controller/python/tests/scripts/commissioning_window_test.py"),
             servers[0]['ip'],
             os.path.join(CHIP_REPO, MATTER_DEVELOPMENT_PAA_ROOT_CERTS))
         ret = self.execute_device_cmd(req_device_id, command)

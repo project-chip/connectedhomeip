@@ -20,6 +20,7 @@ namespace LaundryWasherControls {
 inline constexpr uint32_t kRevision = 1;
 
 namespace Attributes {
+
 namespace SpinSpeeds {
 inline constexpr DataModel::AttributeEntry
     kMetadataEntry(SpinSpeeds::Id, BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kListAttribute),

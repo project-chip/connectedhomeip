@@ -20,6 +20,7 @@ namespace DiagnosticLogs {
 inline constexpr uint32_t kRevision = 1;
 
 namespace Attributes {
+
 constexpr std::array<DataModel::AttributeEntry, 0> kMandatoryMetadata = {
 
 };
@@ -27,6 +28,7 @@ constexpr std::array<DataModel::AttributeEntry, 0> kMandatoryMetadata = {
 } // namespace Attributes
 
 namespace Commands {
+
 namespace RetrieveLogsRequest {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(RetrieveLogsRequest::Id, BitFlags<DataModel::CommandQualityFlags>(),
                                                                 Access::Privilege::kOperate);

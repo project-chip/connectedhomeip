@@ -23,7 +23,7 @@ namespace app {
 
 CHIP_ERROR AttributeListBuilder::Append(Span<const DataModel::AttributeEntry> mandatoryAttributes,
                                         Span<const DataModel::AttributeEntry> optionalAttributes,
-                                        const AttributeSet & enabledOptionalAttributes)
+                                        AttributeSet enabledOptionalAttributes)
 {
     // determine how much data to append. This should only be called if generally we have something to append
     size_t append_size = mandatoryAttributes.size();

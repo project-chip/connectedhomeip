@@ -20,6 +20,7 @@ namespace ElectricalEnergyMeasurement {
 inline constexpr uint32_t kRevision = 2;
 
 namespace Attributes {
+
 namespace Accuracy {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(Accuracy::Id, BitFlags<DataModel::AttributeQualityFlags>(),
                                                           Access::Privilege::kView, std::nullopt);

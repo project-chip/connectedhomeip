@@ -20,6 +20,7 @@ namespace FixedLabel {
 inline constexpr uint32_t kRevision = 1;
 
 namespace Attributes {
+
 namespace LabelList {
 inline constexpr DataModel::AttributeEntry
     kMetadataEntry(LabelList::Id, BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kListAttribute),

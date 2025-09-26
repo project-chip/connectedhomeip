@@ -20,6 +20,7 @@ namespace CommissionerControl {
 inline constexpr uint32_t kRevision = 1;
 
 namespace Attributes {
+
 namespace SupportedDeviceCategories {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(SupportedDeviceCategories::Id,
                                                           BitFlags<DataModel::AttributeQualityFlags>(), Access::Privilege::kManage,
@@ -33,6 +34,7 @@ constexpr std::array<DataModel::AttributeEntry, 1> kMandatoryMetadata = {
 } // namespace Attributes
 
 namespace Commands {
+
 namespace RequestCommissioningApproval {
 inline constexpr DataModel::AcceptedCommandEntry
     kMetadataEntry(RequestCommissioningApproval::Id, BitFlags<DataModel::CommandQualityFlags>(), Access::Privilege::kManage);

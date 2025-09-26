@@ -20,6 +20,7 @@ namespace MediaPlayback {
 inline constexpr uint32_t kRevision = 2;
 
 namespace Attributes {
+
 namespace CurrentState {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(CurrentState::Id, BitFlags<DataModel::AttributeQualityFlags>(),
                                                           Access::Privilege::kView, std::nullopt);
@@ -76,6 +77,7 @@ constexpr std::array<DataModel::AttributeEntry, 1> kMandatoryMetadata = {
 } // namespace Attributes
 
 namespace Commands {
+
 namespace Play {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(Play::Id, BitFlags<DataModel::CommandQualityFlags>(),
                                                                 Access::Privilege::kOperate);

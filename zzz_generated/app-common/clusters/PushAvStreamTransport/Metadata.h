@@ -20,6 +20,7 @@ namespace PushAvStreamTransport {
 inline constexpr uint32_t kRevision = 1;
 
 namespace Attributes {
+
 namespace SupportedFormats {
 inline constexpr DataModel::AttributeEntry
     kMetadataEntry(SupportedFormats::Id,
@@ -41,6 +42,7 @@ constexpr std::array<DataModel::AttributeEntry, 2> kMandatoryMetadata = {
 } // namespace Attributes
 
 namespace Commands {
+
 namespace AllocatePushTransport {
 inline constexpr DataModel::AcceptedCommandEntry
     kMetadataEntry(AllocatePushTransport::Id,

@@ -20,6 +20,7 @@ namespace OccupancySensing {
 inline constexpr uint32_t kRevision = 5;
 
 namespace Attributes {
+
 namespace Occupancy {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(Occupancy::Id, BitFlags<DataModel::AttributeQualityFlags>(),
                                                           Access::Privilege::kView, std::nullopt);

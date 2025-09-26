@@ -20,6 +20,7 @@ namespace LocalizationConfiguration {
 inline constexpr uint32_t kRevision = 1;
 
 namespace Attributes {
+
 namespace ActiveLocale {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(ActiveLocale::Id, BitFlags<DataModel::AttributeQualityFlags>(),
                                                           Access::Privilege::kView, Access::Privilege::kManage);

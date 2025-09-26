@@ -20,6 +20,7 @@ namespace AccessControl {
 inline constexpr uint32_t kRevision = 2;
 
 namespace Attributes {
+
 namespace Acl {
 inline constexpr DataModel::AttributeEntry
     kMetadataEntry(Acl::Id, BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kListAttribute),
@@ -67,6 +68,7 @@ constexpr std::array<DataModel::AttributeEntry, 4> kMandatoryMetadata = {
 } // namespace Attributes
 
 namespace Commands {
+
 namespace ReviewFabricRestrictions {
 inline constexpr DataModel::AcceptedCommandEntry
     kMetadataEntry(ReviewFabricRestrictions::Id,

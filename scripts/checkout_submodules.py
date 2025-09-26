@@ -49,7 +49,6 @@ ALL_PLATFORMS = set([
     'tizen',
     'webos',
     'genio',
-    'openiotsdk',
     'silabs_docker',
     'unit_tests'
 ])

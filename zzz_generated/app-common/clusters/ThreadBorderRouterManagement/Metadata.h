@@ -20,6 +20,7 @@ namespace ThreadBorderRouterManagement {
 inline constexpr uint32_t kRevision = 1;
 
 namespace Attributes {
+
 namespace BorderRouterName {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(BorderRouterName::Id, BitFlags<DataModel::AttributeQualityFlags>(),
                                                           Access::Privilege::kView, std::nullopt);
@@ -53,6 +54,7 @@ constexpr std::array<DataModel::AttributeEntry, 6> kMandatoryMetadata = {
 } // namespace Attributes
 
 namespace Commands {
+
 namespace GetActiveDatasetRequest {
 inline constexpr DataModel::AcceptedCommandEntry
     kMetadataEntry(GetActiveDatasetRequest::Id, BitFlags<DataModel::CommandQualityFlags>(), Access::Privilege::kManage);

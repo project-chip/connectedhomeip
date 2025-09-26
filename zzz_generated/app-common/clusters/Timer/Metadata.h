@@ -20,6 +20,7 @@ namespace Timer {
 inline constexpr uint32_t kRevision = 1;
 
 namespace Attributes {
+
 namespace SetTime {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(SetTime::Id, BitFlags<DataModel::AttributeQualityFlags>(),
                                                           Access::Privilege::kView, std::nullopt);
@@ -42,6 +43,7 @@ constexpr std::array<DataModel::AttributeEntry, 3> kMandatoryMetadata = {
 } // namespace Attributes
 
 namespace Commands {
+
 namespace SetTimer {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(SetTimer::Id, BitFlags<DataModel::CommandQualityFlags>(),
                                                                 Access::Privilege::kOperate);

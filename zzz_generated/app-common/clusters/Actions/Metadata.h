@@ -20,6 +20,7 @@ namespace Actions {
 inline constexpr uint32_t kRevision = 1;
 
 namespace Attributes {
+
 namespace ActionList {
 inline constexpr DataModel::AttributeEntry
     kMetadataEntry(ActionList::Id, BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kListAttribute),
@@ -43,6 +44,7 @@ constexpr std::array<DataModel::AttributeEntry, 2> kMandatoryMetadata = {
 } // namespace Attributes
 
 namespace Commands {
+
 namespace InstantAction {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(InstantAction::Id, BitFlags<DataModel::CommandQualityFlags>(),
                                                                 Access::Privilege::kOperate);

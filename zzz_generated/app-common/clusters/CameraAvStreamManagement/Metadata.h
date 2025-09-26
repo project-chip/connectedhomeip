@@ -20,6 +20,7 @@ namespace CameraAvStreamManagement {
 inline constexpr uint32_t kRevision = 1;
 
 namespace Attributes {
+
 namespace MaxConcurrentEncoders {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(MaxConcurrentEncoders::Id, BitFlags<DataModel::AttributeQualityFlags>(),
                                                           Access::Privilege::kView, std::nullopt);
@@ -36,10 +37,10 @@ namespace NightVisionUsesInfrared {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(NightVisionUsesInfrared::Id, BitFlags<DataModel::AttributeQualityFlags>(),
                                                           Access::Privilege::kView, std::nullopt);
 } // namespace NightVisionUsesInfrared
-namespace MinViewport {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(MinViewport::Id, BitFlags<DataModel::AttributeQualityFlags>(),
+namespace MinViewportResolution {
+inline constexpr DataModel::AttributeEntry kMetadataEntry(MinViewportResolution::Id, BitFlags<DataModel::AttributeQualityFlags>(),
                                                           Access::Privilege::kView, std::nullopt);
-} // namespace MinViewport
+} // namespace MinViewportResolution
 namespace RateDistortionTradeOffPoints {
 inline constexpr DataModel::AttributeEntry
     kMetadataEntry(RateDistortionTradeOffPoints::Id,
@@ -213,6 +214,7 @@ constexpr std::array<DataModel::AttributeEntry, 4> kMandatoryMetadata = {
 } // namespace Attributes
 
 namespace Commands {
+
 namespace AudioStreamAllocate {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(AudioStreamAllocate::Id, BitFlags<DataModel::CommandQualityFlags>(),
                                                                 Access::Privilege::kManage);

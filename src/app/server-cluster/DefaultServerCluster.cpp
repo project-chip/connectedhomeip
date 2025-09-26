@@ -133,5 +133,15 @@ CHIP_ERROR DefaultServerCluster::GeneratedCommands(const ConcreteClusterPath & p
     return CHIP_NO_ERROR;
 }
 
+DataModel::ActionReturnStatus DefaultServerCluster::NotifyAttributeChangedIfSuccess(AttributeId attributeId,
+                                                                                    DataModel::ActionReturnStatus status)
+{
+    if (status.IsSuccess() && !status.IsNoOpSuccess())
+    {
+        NotifyAttributeChanged(attributeId);
+    }
+    return status;
+}
+
 } // namespace app
 } // namespace chip

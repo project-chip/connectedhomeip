@@ -20,6 +20,7 @@ namespace Descriptor {
 inline constexpr uint32_t kRevision = 3;
 
 namespace Attributes {
+
 namespace DeviceTypeList {
 inline constexpr DataModel::AttributeEntry
     kMetadataEntry(DeviceTypeList::Id, BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kListAttribute),

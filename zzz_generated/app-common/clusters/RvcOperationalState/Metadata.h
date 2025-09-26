@@ -20,6 +20,7 @@ namespace RvcOperationalState {
 inline constexpr uint32_t kRevision = 1;
 
 namespace Attributes {
+
 namespace PhaseList {
 inline constexpr DataModel::AttributeEntry
     kMetadataEntry(PhaseList::Id, BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kListAttribute),
@@ -56,6 +57,7 @@ constexpr std::array<DataModel::AttributeEntry, 5> kMandatoryMetadata = {
 } // namespace Attributes
 
 namespace Commands {
+
 namespace Pause {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(Pause::Id, BitFlags<DataModel::CommandQualityFlags>(),
                                                                 Access::Privilege::kOperate);

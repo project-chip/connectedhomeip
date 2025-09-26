@@ -20,6 +20,7 @@ namespace EcosystemInformation {
 inline constexpr uint32_t kRevision = 1;
 
 namespace Attributes {
+
 namespace DeviceDirectory {
 inline constexpr DataModel::AttributeEntry
     kMetadataEntry(DeviceDirectory::Id,

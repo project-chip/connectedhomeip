@@ -20,6 +20,7 @@ namespace WaterHeaterManagement {
 inline constexpr uint32_t kRevision = 2;
 
 namespace Attributes {
+
 namespace HeaterTypes {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(HeaterTypes::Id, BitFlags<DataModel::AttributeQualityFlags>(),
                                                           Access::Privilege::kView, std::nullopt);
@@ -54,6 +55,7 @@ constexpr std::array<DataModel::AttributeEntry, 3> kMandatoryMetadata = {
 } // namespace Attributes
 
 namespace Commands {
+
 namespace Boost {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(Boost::Id, BitFlags<DataModel::CommandQualityFlags>(),
                                                                 Access::Privilege::kManage);

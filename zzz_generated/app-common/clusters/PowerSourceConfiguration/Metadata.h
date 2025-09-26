@@ -20,6 +20,7 @@ namespace PowerSourceConfiguration {
 inline constexpr uint32_t kRevision = 1;
 
 namespace Attributes {
+
 namespace Sources {
 inline constexpr DataModel::AttributeEntry
     kMetadataEntry(Sources::Id, BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kListAttribute),

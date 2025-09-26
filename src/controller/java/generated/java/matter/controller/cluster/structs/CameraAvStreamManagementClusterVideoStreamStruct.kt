@@ -33,8 +33,7 @@ class CameraAvStreamManagementClusterVideoStreamStruct(
   val maxResolution: CameraAvStreamManagementClusterVideoResolutionStruct,
   val minBitRate: UInt,
   val maxBitRate: UInt,
-  val minKeyFrameInterval: UShort,
-  val maxKeyFrameInterval: UShort,
+  val keyFrameInterval: UShort,
   val watermarkEnabled: Optional<Boolean>,
   val OSDEnabled: Optional<Boolean>,
   val referenceCount: UByte,
@@ -50,8 +49,7 @@ class CameraAvStreamManagementClusterVideoStreamStruct(
     append("\tmaxResolution : $maxResolution\n")
     append("\tminBitRate : $minBitRate\n")
     append("\tmaxBitRate : $maxBitRate\n")
-    append("\tminKeyFrameInterval : $minKeyFrameInterval\n")
-    append("\tmaxKeyFrameInterval : $maxKeyFrameInterval\n")
+    append("\tkeyFrameInterval : $keyFrameInterval\n")
     append("\twatermarkEnabled : $watermarkEnabled\n")
     append("\tOSDEnabled : $OSDEnabled\n")
     append("\treferenceCount : $referenceCount\n")
@@ -70,8 +68,7 @@ class CameraAvStreamManagementClusterVideoStreamStruct(
       maxResolution.toTlv(ContextSpecificTag(TAG_MAX_RESOLUTION), this)
       put(ContextSpecificTag(TAG_MIN_BIT_RATE), minBitRate)
       put(ContextSpecificTag(TAG_MAX_BIT_RATE), maxBitRate)
-      put(ContextSpecificTag(TAG_MIN_KEY_FRAME_INTERVAL), minKeyFrameInterval)
-      put(ContextSpecificTag(TAG_MAX_KEY_FRAME_INTERVAL), maxKeyFrameInterval)
+      put(ContextSpecificTag(TAG_KEY_FRAME_INTERVAL), keyFrameInterval)
       if (watermarkEnabled.isPresent) {
         val optwatermarkEnabled = watermarkEnabled.get()
         put(ContextSpecificTag(TAG_WATERMARK_ENABLED), optwatermarkEnabled)
@@ -95,11 +92,10 @@ class CameraAvStreamManagementClusterVideoStreamStruct(
     private const val TAG_MAX_RESOLUTION = 6
     private const val TAG_MIN_BIT_RATE = 7
     private const val TAG_MAX_BIT_RATE = 8
-    private const val TAG_MIN_KEY_FRAME_INTERVAL = 9
-    private const val TAG_MAX_KEY_FRAME_INTERVAL = 10
-    private const val TAG_WATERMARK_ENABLED = 11
-    private const val TAG_OSD_ENABLED = 12
-    private const val TAG_REFERENCE_COUNT = 13
+    private const val TAG_KEY_FRAME_INTERVAL = 9
+    private const val TAG_WATERMARK_ENABLED = 10
+    private const val TAG_OSD_ENABLED = 11
+    private const val TAG_REFERENCE_COUNT = 12
 
     fun fromTlv(
       tlvTag: Tag,
@@ -123,8 +119,7 @@ class CameraAvStreamManagementClusterVideoStreamStruct(
         )
       val minBitRate = tlvReader.getUInt(ContextSpecificTag(TAG_MIN_BIT_RATE))
       val maxBitRate = tlvReader.getUInt(ContextSpecificTag(TAG_MAX_BIT_RATE))
-      val minKeyFrameInterval = tlvReader.getUShort(ContextSpecificTag(TAG_MIN_KEY_FRAME_INTERVAL))
-      val maxKeyFrameInterval = tlvReader.getUShort(ContextSpecificTag(TAG_MAX_KEY_FRAME_INTERVAL))
+      val keyFrameInterval = tlvReader.getUShort(ContextSpecificTag(TAG_KEY_FRAME_INTERVAL))
       val watermarkEnabled =
         if (tlvReader.isNextTag(ContextSpecificTag(TAG_WATERMARK_ENABLED))) {
           Optional.of(tlvReader.getBoolean(ContextSpecificTag(TAG_WATERMARK_ENABLED)))
@@ -151,8 +146,7 @@ class CameraAvStreamManagementClusterVideoStreamStruct(
         maxResolution,
         minBitRate,
         maxBitRate,
-        minKeyFrameInterval,
-        maxKeyFrameInterval,
+        keyFrameInterval,
         watermarkEnabled,
         OSDEnabled,
         referenceCount,
