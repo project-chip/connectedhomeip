@@ -103,7 +103,6 @@ class TC_ACL_2_10(MatterBaseTest):
         self.discriminator = random.randint(0, 4095)
         self.endpoint = self.get_endpoint()
         extension_attr = Clusters.AccessControl.Attributes.Extension
-        ext_attr_enabled = await self.attribute_guard(endpoint=self.endpoint, attribute=extension_attr)
 
         self.step(2)
         # Read CurrentFabricIndex for TH1
