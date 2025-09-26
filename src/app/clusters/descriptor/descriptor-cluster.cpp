@@ -176,7 +176,7 @@ CHIP_ERROR DescriptorCluster::Attributes(const ConcreteClusterPath & path,
     AttributeListBuilder listBuilder(builder);
 
     ReadOnlyBufferBuilder<DataModel::Provider::SemanticTag> semanticTagsList;
-    CHIP_ERROR err = mContext->provider.SemanticTags(path.mEndpointId, semanticTagsList);
+    CHIP_ERROR err     = mContext->provider.SemanticTags(path.mEndpointId, semanticTagsList);
     bool enableTagList = (err == CHIP_NO_ERROR && !semanticTagsList.IsEmpty());
 
     AttributeListBuilder::OptionalAttributeEntry optionalAttributeEntries[] = {
