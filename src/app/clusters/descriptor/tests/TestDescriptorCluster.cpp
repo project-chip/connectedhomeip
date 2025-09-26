@@ -19,6 +19,7 @@
 #include <app/clusters/testing/AttributeTesting.h>
 #include <app/data-model-provider/MetadataTypes.h>
 #include <app/server-cluster/DefaultServerCluster.h>
+#include <app/server-cluster/testing/TestServerClusterContext.h>
 #include <clusters/Descriptor/Enums.h>
 #include <clusters/Descriptor/Metadata.h>
 #include <lib/core/CHIPError.h>
@@ -44,15 +45,18 @@ struct TestDescriptorCluster : public ::testing::Test
 
 TEST_F(TestDescriptorCluster, CompileTest)
 {
-    DescriptorCluster cluster(1, BitFlags<Descriptor::Feature>(0));
+    DescriptorCluster cluster(1);
     ASSERT_EQ(cluster.GetClusterFlags({ 1, Descriptor::Id }), BitFlags<ClusterQualityFlags>());
 }
 
 TEST_F(TestDescriptorCluster, AttributesTest)
 {
     // Cluster configuration with only mandatory attributes
-    DescriptorCluster cluster(1, BitFlags<Descriptor::Feature>(0));
+    DescriptorCluster cluster(1);
     ConcreteClusterPath descriptorPath = ConcreteClusterPath(1, Descriptor::Id);
+
+    chip::Test::TestServerClusterContext context;
+    EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
 
     ReadOnlyBufferBuilder<DataModel::AttributeEntry> attributesBuilder;
     ASSERT_EQ(cluster.Attributes(descriptorPath, attributesBuilder), CHIP_NO_ERROR);
@@ -62,21 +66,6 @@ TEST_F(TestDescriptorCluster, AttributesTest)
 
     ASSERT_EQ(expectedBuilder.AppendElements(Descriptor::Attributes::kMandatoryMetadata), CHIP_NO_ERROR);
     ASSERT_TRUE(Testing::EqualAttributeSets(attributesBuilder.TakeBuffer(), expectedBuilder.TakeBuffer()));
-
-    // Cluster with optional attribute through feature flag enabled
-    BitFlags<Descriptor::Feature> featureFlags(Clusters::Descriptor::Feature::kTagList);
-    DescriptorCluster cluster2(2, featureFlags);
-    ConcreteClusterPath descriptorPath2 = ConcreteClusterPath(2, Descriptor::Id);
-
-    ReadOnlyBufferBuilder<DataModel::AttributeEntry> attributesBuilder2;
-    ASSERT_EQ(cluster2.Attributes(descriptorPath2, attributesBuilder2), CHIP_NO_ERROR);
-
-    ReadOnlyBufferBuilder<DataModel::AttributeEntry> expectedBuilder2;
-    ASSERT_EQ(expectedBuilder2.ReferenceExisting(DefaultServerCluster::GlobalAttributes()), CHIP_NO_ERROR);
-
-    ASSERT_EQ(expectedBuilder2.AppendElements(Descriptor::Attributes::kMandatoryMetadata), CHIP_NO_ERROR);
-    ASSERT_EQ(expectedBuilder2.AppendElements({ Descriptor::Attributes::TagList::kMetadataEntry }), CHIP_NO_ERROR);
-    ASSERT_TRUE(Testing::EqualAttributeSets(attributesBuilder2.TakeBuffer(), expectedBuilder2.TakeBuffer()));
 }
 
 } // namespace
