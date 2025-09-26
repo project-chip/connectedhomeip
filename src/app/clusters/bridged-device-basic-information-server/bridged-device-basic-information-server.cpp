@@ -32,6 +32,7 @@ using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::BridgedDeviceBasicInformation;
+using namespace chip::Tracing;
 
 using chip::Protocols::InteractionModel::Status;
 
@@ -39,7 +40,7 @@ namespace {
 
 void ReachableChanged(EndpointId endpointId)
 {
-    MATTER_TRACE_INSTANT("ReachableChanged", "BridgeBasicInfo");
+    MATTER_TRACE_INSTANT(kReachableChanged, kBridgeBasicInfo);
     bool reachable = false;
     if (Status::Success != Attributes::Reachable::Get(endpointId, &reachable))
     {

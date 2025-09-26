@@ -59,6 +59,7 @@ using namespace chip::app::Clusters::JointFabricAdministrator;
 using namespace chip::Credentials;
 using namespace chip::Crypto;
 using namespace chip::Protocols::InteractionModel;
+using namespace chip::Tracing;
 
 namespace JointFabricAdministratorCluster = chip::app::Clusters::JointFabricAdministrator;
 
@@ -144,7 +145,7 @@ void JointFabricAdministratorGlobalInstance::InvokeCommand(HandlerContext & hand
 void JointFabricAdministratorGlobalInstance::HandleOJCW(HandlerContext & ctx,
                                                         const Commands::OpenJointCommissioningWindow::DecodableType & commandData)
 {
-    MATTER_TRACE_SCOPE("OpenJointCommissioningWindow", "JointFabricAdministrator");
+    MATTER_TRACE_SCOPE(kOpenJointCommissioningWindow, kJointFabricAdministrator);
     auto commissioningTimeout = System::Clock::Seconds16(commandData.commissioningTimeout);
     auto & pakeVerifier       = commandData.PAKEPasscodeVerifier;
     auto & discriminator      = commandData.discriminator;
@@ -203,7 +204,7 @@ exit:
 void JointFabricAdministratorGlobalInstance::HandleAnnounceJointFabricAdministrator(
     HandlerContext & ctx, const Commands::AnnounceJointFabricAdministrator::DecodableType & commandData)
 {
-    MATTER_TRACE_SCOPE("AnnounceJointFabricAdministrator", "JointFabricAdministrator");
+    MATTER_TRACE_SCOPE(kAnnounceJointFabricAdministrator, kJointFabricAdministrator);
     ChipLogProgress(JointFabric, "emberAfJointFabricAdministratorClusterAnnounceJointFabricAdministratorCallback: %u",
                     commandData.endpointID);
 
@@ -221,7 +222,7 @@ exit:
 void JointFabricAdministratorGlobalInstance::HandleICACCSRRequest(HandlerContext & ctx,
                                                                   const Commands::ICACCSRRequest::DecodableType & commandData)
 {
-    MATTER_TRACE_SCOPE("ICACCSRRequest", "JointFabricAdministrator");
+    MATTER_TRACE_SCOPE(kICACCSRRequest, kJointFabricAdministrator);
     ChipLogProgress(Zcl, "JointFabricAdministrator: Received an ICACCSRRequest command");
 
     auto nonDefaultStatus           = Status::Success;
@@ -261,7 +262,7 @@ exit:
 void JointFabricAdministratorGlobalInstance::HandleAddICAC(HandlerContext & ctx,
                                                            const Commands::AddICAC::DecodableType & commandData)
 {
-    MATTER_TRACE_SCOPE("AddICAC", "JointFabricAdministrator");
+    MATTER_TRACE_SCOPE(kAddICAC, kJointFabricAdministrator);
     ChipLogProgress(Zcl, "JointFabricAdministrator: Received an AddICAC command");
 
     auto nonDefaultStatus  = Status::Success;
@@ -286,13 +287,13 @@ exit:
 void JointFabricAdministratorGlobalInstance::HandleTransferAnchorRequest(
     HandlerContext & ctx, const Commands::TransferAnchorRequest::DecodableType & commandData)
 {
-    MATTER_TRACE_SCOPE("TransferAnchorRequest", "JointFabricAdministrator");
+    MATTER_TRACE_SCOPE(kTransferAnchorRequest, kJointFabricAdministrator);
 }
 
 void JointFabricAdministratorGlobalInstance::HandleTransferAnchorComplete(
     HandlerContext & ctx, const Commands::TransferAnchorComplete::DecodableType & commandData)
 {
-    MATTER_TRACE_SCOPE("TransferAnchorComplete", "JointFabricAdministrator");
+    MATTER_TRACE_SCOPE(kTransferAnchorComplete, kJointFabricAdministrator);
 }
 #else
 void JointFabricAdministratorGlobalInstance::HandleOJCW(HandlerContext & ctx,

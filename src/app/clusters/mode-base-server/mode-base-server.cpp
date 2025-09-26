@@ -31,6 +31,7 @@
 using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;
+using namespace chip::Tracing;
 using chip::Protocols::InteractionModel::Status;
 using BootReasonType       = GeneralDiagnostics::BootReasonEnum;
 using ModeOptionStructType = chip::app::Clusters::detail::Structs::ModeOptionStruct::Type;
@@ -381,7 +382,7 @@ void Instance::UnregisterThisInstance()
 
 void Instance::HandleChangeToMode(HandlerContext & ctx, const Commands::ChangeToMode::DecodableType & commandData)
 {
-    MATTER_TRACE_SCOPE("ChangeToMode", "ModeBase");
+    MATTER_TRACE_SCOPE(kChangeToMode, kModeBase);
     uint8_t newMode = commandData.newMode;
 
     Commands::ChangeToModeResponse::Type response;

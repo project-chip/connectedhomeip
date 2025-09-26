@@ -36,6 +36,7 @@
 using namespace chip;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::LowPower;
+using namespace chip::Tracing;
 
 static constexpr size_t kLowPowerDelegateTableSize =
     MATTER_DM_LOW_POWER_CLUSTER_SERVER_ENDPOINT_COUNT + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT;
@@ -94,7 +95,7 @@ void SetDefaultDelegate(EndpointId endpoint, Delegate * delegate)
 bool emberAfLowPowerClusterSleepCallback(app::CommandHandler * command, const app::ConcreteCommandPath & commandPath,
                                          const Commands::Sleep::DecodableType & commandData)
 {
-    MATTER_TRACE_SCOPE("Sleep", "LowPower");
+    MATTER_TRACE_SCOPE(kSleep, kLowPower);
     using Protocols::InteractionModel::Status;
 
     EndpointId endpoint = commandPath.mEndpointId;

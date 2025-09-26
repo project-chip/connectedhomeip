@@ -35,6 +35,7 @@
 using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters::Identify;
+using namespace chip::Tracing;
 using chip::Protocols::InteractionModel::Status;
 
 static Identify * firstIdentify = nullptr;
@@ -212,7 +213,7 @@ void MatterIdentifyClusterServerAttributeChangedCallback(const app::ConcreteAttr
 bool emberAfIdentifyClusterIdentifyCallback(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
                                             const Commands::Identify::DecodableType & commandData)
 {
-    MATTER_TRACE_SCOPE("IdentifyCommand", "Identify");
+    MATTER_TRACE_SCOPE(kIdentifyCommand, kIdentify);
     auto & identifyTime = commandData.identifyTime;
 
     // cmd Identify
@@ -223,7 +224,7 @@ bool emberAfIdentifyClusterIdentifyCallback(CommandHandler * commandObj, const C
 bool emberAfIdentifyClusterTriggerEffectCallback(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
                                                  const Commands::TriggerEffect::DecodableType & commandData)
 {
-    MATTER_TRACE_SCOPE("TriggerEffect", "Identify");
+    MATTER_TRACE_SCOPE(kTriggerEffect, kIdentify);
     auto & effectIdentifier = commandData.effectIdentifier;
     auto & effectVariant    = commandData.effectVariant;
 

@@ -18,6 +18,8 @@
 #pragma once
 
 #include <matter/tracing/build_config.h>
+#include <tracing/group_keys.h>
+#include <tracing/label_keys.h>
 
 #if MATTER_TRACING_ENABLED
 
