@@ -891,7 +891,7 @@ class TC_SU_2_2(MatterBaseTest):
         # UpdateState (updateNotAvailable sequence) with validation
         # ------------------------------------------------------------------------------------
         try:
-            # Wait until the final state (Idle) is reached or timeout (5 min)
+            # Wait until the final state (Idle) is reached or timeout (10 min)
             await subscription_attr_state_updatenotavailable.await_all_expected_report_matches([matcher_not_available_state_obj], timeout_sec=600.0)
             logger.info(f'{step_number_s3}: Step #3.3 - UpdateState (updateNotAvailable sequence) matcher has completed.')
         except Exception as e:
@@ -1057,7 +1057,7 @@ class TC_SU_2_2(MatterBaseTest):
         # UpdateState (Busy, 180s DelayedActionTime sequence) with validation
         # ------------------------------------------------------------------------------------
         try:
-            # Wait until the final state (Idle) is reached or timeout (20 min)
+            # Wait until the final state (Idle) is reached or timeout (15 min)
             await subscription_attr_state_busy_180s.await_all_expected_report_matches([matcher_busy_state_delayed_180s_obj], timeout_sec=900.0)
             logger.info(f'{step_number_s4}: Step #4.3 - UpdateState Busy > Downloading transition (180s) successfully observed.')
         except Exception as e:
