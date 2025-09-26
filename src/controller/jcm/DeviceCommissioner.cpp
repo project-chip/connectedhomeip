@@ -531,7 +531,7 @@ bool DeviceCommissioner::HasValidCommissioningMode(const Dnssd::CommissionNodeDa
 {
 
 #if CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
-    if (GetCommissioningParameters().HasValue() && GetCommissioningParameters().Value().GetUseJCM().ValueOr(false))
+    if (GetCommissioningParameters().GetUseJCM().ValueOr(false))
     {
         if (nodeData.commissioningMode != to_underlying(Dnssd::CommissioningMode::kEnabledJointFabric))
         {
