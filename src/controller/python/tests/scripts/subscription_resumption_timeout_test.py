@@ -47,16 +47,6 @@ async def main():
         metavar="<timeout-second>",
     )
     optParser.add_option(
-        "-a",
-        "--address",
-        action="store",
-        dest="deviceAddress",
-        default='',
-        type='str',
-        help="Address of the device",
-        metavar="<device-addr>",
-    )
-    optParser.add_option(
         "--nodeid",
         action="store",
         dest="nodeid",
@@ -103,7 +93,7 @@ async def main():
         nodeid=112233, paaTrustStorePath=options.paaTrustStorePath, testCommissioner=True)
 
     FailIfNot(
-        await test.TestOnNetworkCommissioning(options.discriminator, options.setuppin, options.nodeid, options.deviceAddress),
+        await test.TestOnNetworkCommissioning(options.discriminator, options.setuppin, options.nodeid),
         "Failed on on-network commissioning")
 
     try:

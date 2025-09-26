@@ -2574,7 +2574,6 @@ class ChipDeviceController(ChipDeviceControllerBase):
     '''
     The ChipDeviceCommissioner binding, named as ChipDeviceController
     '''
-    # TODO: This class contains DEPRECATED functions, we should update the test scripts to avoid the usage of those functions.
 
     def __init__(self,
                  opCredsContext: ctypes.c_void_p,
@@ -2633,8 +2632,8 @@ class ChipDeviceController(ChipDeviceControllerBase):
     async def Commission(self, nodeid) -> int:
         '''
         Start the auto-commissioning process on a node after establishing a PASE connection.
-        This function is intended to be used in conjunction with `EstablishPASESessionBLE` or
-        `EstablishPASESessionIP`. It can be called either before or after the DevicePairingDelegate
+        This function is intended to be used in conjunction with one of the EstablishPASESession
+        functions. It can be called either before or after the DevicePairingDelegate
         receives the OnPairingComplete call. Commissioners that want to perform simple
         auto-commissioning should use the supplied "CommissionWithCode" function, which will
         establish the PASE connection and commission automatically.
@@ -3004,27 +3003,6 @@ class ChipDeviceController(ChipDeviceControllerBase):
             await self._ChipStack.CallAsync(
                 lambda: self._dmLib.pychip_DeviceController_ConnectWithCode(
                     self.devCtrl, setupPayload.encode("utf-8"), nodeid, discoveryType.value)
-            )
-
-            return await asyncio.futures.wrap_future(ctx.future)
-
-    async def CommissionIP(self, ipaddr: str, setupPinCode: int, nodeid: int) -> int:
-        '''
-        DEPRECATED, DO NOT USE! Use `CommissionOnNetwork` or `CommissionWithCode`
-
-        Raises:
-            ChipStackError: On failure.
-
-        Returns:
-            Effective Node ID of the device (as defined by the assigned NOC)
-        '''
-        self.CheckIsActive()
-
-        async with self._commissioning_context as ctx:
-            self._enablePairingCompleteCallback(True)
-            await self._ChipStack.CallAsync(
-                lambda: self._dmLib.pychip_DeviceController_ConnectIP(
-                    self.devCtrl, ipaddr.encode("utf-8"), setupPinCode, nodeid)
             )
 
             return await asyncio.futures.wrap_future(ctx.future)
