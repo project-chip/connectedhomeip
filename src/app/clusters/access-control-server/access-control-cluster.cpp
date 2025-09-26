@@ -704,7 +704,7 @@ void AccessControlCluster::OnEntryChanged(const chip::Access::SubjectDescriptor 
     {
         AclStorage::EncodableEntry encodableEntry(*entry);
         CHIP_ERROR err = encodableEntry.Stage();
-        if (!err.Success())
+        if (err != CHIP_NO_ERROR)
         {
             ChipLogError(DataManagement, "AccessControlCluster: event failed %" CHIP_ERROR_FORMAT, err.Format());
             return;
@@ -718,9 +718,6 @@ void AccessControlCluster::OnEntryChanged(const chip::Access::SubjectDescriptor 
     }
 
     mContext->interactionContext.eventsGenerator.GenerateEvent(event, 0);
-
-    mContext->interactionContext.eventsGenerator.GenerateEvent(event, 0);
-
     return;
 }
 
