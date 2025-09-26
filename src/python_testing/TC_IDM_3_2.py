@@ -55,45 +55,45 @@ class TC_IDM_3_2(MatterBaseTest, BasicCompositionTests):
         super().__init__(*args, **kwargs)
         self.endpoint = 0
 
-    # Instead of hardcoding UnitTesting.TimedWriteBoolean, we will try to find real timed-write attributes 
+    # Instead of hardcoding UnitTesting.TimedWriteBoolean, we will try to find real timed-write attributes
     async def find_timed_write_attribute(self, endpoints_data):
         """Find an attribute that requires timed write on the actual device"""
         logging.info(f"Searching for timed write attributes across {len(endpoints_data)} endpoints")
-        
+
         for endpoint_id, endpoint in endpoints_data.items():
             for cluster_type, cluster_data in endpoint.items():
                 cluster_id = cluster_type.id
-                
+
                 cluster_type_enum = global_attribute_ids.cluster_id_type(cluster_id)
-                if cluster_type_enum not in [global_attribute_ids.ClusterIdType.kStandard, 
-                                           global_attribute_ids.ClusterIdType.kTest]:
+                if cluster_type_enum not in [global_attribute_ids.ClusterIdType.kStandard,
+                                             global_attribute_ids.ClusterIdType.kTest]:
                     continue
-                    
+
                 # Check each attribute in this cluster
                 all_attrs = ClusterObjects.ALL_ATTRIBUTES.get(cluster_id, {})
-                                
+
                 for attr_id, attr_class in all_attrs.items():
                     try:
                         # Create an instance of the attribute to check its must_use_timed_write property
                         # Using approach Cecille suggested: ClusterAttributeDescriptor.must_use_timed_write
                         attr_instance = attr_class(None)  # Create with None value
-                        
+
                         # Check if this attribute requires timed write using the must_use_timed_write property
                         if hasattr(attr_instance, 'must_use_timed_write') and attr_instance.must_use_timed_write:
                             if await self.attribute_guard(endpoint=endpoint_id, attribute=attr_class):
-                                logging.info(f"Found timed write attribute: {attr_class.__name__} (id={attr_id}) in cluster {cluster_type.__name__}")
+                                logging.info(f"Found timed write attribute: {attr_class.__name__} (id={
+                                             attr_id}) in cluster {cluster_type.__name__}")
                                 return endpoint_id, attr_class
                             else:
                                 logging.info(f"Device does not support timed write attribute: {attr_class.__name__} (id={attr_id})")
-                    
+
                     except Exception as e:
                         # Skip attributes that can't be instantiated or don't have the expected structure
                         logging.debug(f"Could not check attribute {attr_id}: {e}")
                         continue
-        
+
         logging.warning("No timed write attributes found on device")
         return None, None
-
 
     def steps_TC_IDM_3_2(self) -> list[TestStep]:
         steps = [
@@ -323,8 +323,8 @@ class TC_IDM_3_2(MatterBaseTest, BasicCompositionTests):
             This step tests both timed write error scenarios:
             1. NEEDS_TIMED_INTERACTION: Writing timed-write-required attribute without timed transaction
             2. TIMED_REQUEST_MISMATCH: Writing with TimedRequest flag but no actual timed transaction
-            '''        
-       
+            '''
+
             # Test with the real timed-write attribute found on the device
             logging.info(f"Testing timed write attribute: {timed_attr}")
 
@@ -356,6 +356,7 @@ class TC_IDM_3_2(MatterBaseTest, BasicCompositionTests):
 
         else:
             self.skip_step(7)
+
 
 if __name__ == "__main__":
     default_matter_test_main()
