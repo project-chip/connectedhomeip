@@ -110,6 +110,11 @@ Protocols::InteractionModel::Status emberAfWriteAttribute(const ConcreteAttribut
     return Protocols::InteractionModel::Status::UnsupportedAttribute;
 }
 
+Protocols::InteractionModel::Status emberAfReadAttribute(EndpointId endpoint, ClusterId cluster, AttributeId attributeID, uint8_t * dataPtr, uint16_t readLength)
+{
+    return Protocols::InteractionModel::Status::UnsupportedAttribute;
+}
+
 namespace chip {
 namespace app {
 
