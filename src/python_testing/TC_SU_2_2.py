@@ -292,7 +292,7 @@ class TC_SU_2_2(MatterBaseTest):
         Returns:
             resp: Response object from the AnnounceOTAProvider command.
         """
-        reason = reason or Clusters.OtaSoftwareUpdateRequestor.Enums.AnnouncementReasonEnum.kUpdateAvailable
+        reason = reason or Clusters.OtaSoftwareUpdateRequestor.Enums.AnnouncementReasonEnum.kUrgentUpdateAvailable
         cmd = Clusters.OtaSoftwareUpdateRequestor.Commands.AnnounceOTAProvider(
             providerNodeID=provider_node_id,
             vendorID=vendor_id,
@@ -325,7 +325,7 @@ class TC_SU_2_2(MatterBaseTest):
                      is_commissioning=True),
             TestStep(1, "DUT sends a QueryImage command to the TH/OTA-P. TH/OTA-P sends a QueryImageResponse back to DUT. "
                      "QueryStatus is set to 'UpdateAvailable'. "
-                     "Set ImageURI to the location where the image is located..",
+                     "Set ImageURI to the location where the image is located.",
                      "Verify that there is a transfer of the software image from the TH/OTA-P to the DUT."),
             TestStep(2, "DUT sends a QueryImage command to the TH/OTA-P. TH/OTA-P sends a QueryImageResponse back to DUT. "
                      "QueryStatus is set to 'Busy', DelayedActionTime is set to 60 seconds.",
@@ -831,6 +831,7 @@ class TC_SU_2_2(MatterBaseTest):
         # ------------------------------------------------------------------------------------
         # [STEP_3]: Step #3.2 - Track OTA attributes: UpdateState (updateNotAvailable sequence)
         # UpdateState (updateNotAvailable sequence) matcher: Idle > Idle after ≥120s
+        # Tracks all observed states to verify that no non-Idle state occurs during the 120s interval.
         # ------------------------------------------------------------------------------------
         logger.info(
             f'{step_number_s3}: Step #3.1 - Started subscription for UpdateState attribute '
@@ -847,6 +848,7 @@ class TC_SU_2_2(MatterBaseTest):
             Step #3.2 matcher function to track OTA UpdateState (updateNotAvailable sequence).
             Tracks state transitions: Idle > Idle after ≥120s.
             Records each observed state only once and validates when Idle is reached.
+            Tracks all observed states to verify that no non-Idle state occurs during the 120s interval.
             """
             nonlocal observed_states, t_first_idle
             val = report.value  # UpdateStateEnum
@@ -868,6 +870,15 @@ class TC_SU_2_2(MatterBaseTest):
                 )
                 return False  # Keep waiting for 120s
 
+            # Track all states after first Idle
+            if "first_idle" in observed_states and "second_idle" not in observed_states:
+                # Immediate validation: fail if non-Idle state observed
+                if val != Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kIdle:
+                    logger.info(f'{step_number_s3}: Step #3.4 - OTA UpdateState (updateNotAvailable) observed in 120s interval: {val}')
+                    raise AssertionError(
+                        f"Unexpected non-Idle state {val} observed during 120s interval"
+                    )
+
             # Check if >=120s passed since first Idle
             if "first_idle" in observed_states and "second_idle" not in observed_states and current_time - t_first_idle >= MIN_QUERY_IMAGE_INTERVAL and val == Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kIdle:
                 observed_states.add("second_idle")
@@ -875,7 +886,9 @@ class TC_SU_2_2(MatterBaseTest):
                 logger.info(
                     f'{step_number_s3}: Step #3.2 - OTA UpdateState sequence transitioned to Idle after updateNotAvailable (expect ~120s).')
                 logger.info(
-                    f'{step_number_s3}:  Step #3.2 - Idle state after 120s interval at {time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(current_time))}, no Query_Image was sent')
+                    f'{step_number_s3}: Step #3.2 - Idle state after 120s interval at {time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(current_time))}, no Query_Image was sent')
+                logger.info(
+                    f'{step_number_s3}: Step #3.2 - And, no non-Idle states observed during the 120s interval.')
                 return True
 
             return False
