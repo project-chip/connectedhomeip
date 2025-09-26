@@ -38,7 +38,7 @@ __LOG_LEVELS__ = {
 #
 # At this time we hard-code nightly however we may need to figure out a more
 # generic version string once we stop using nightly builds
-ZAP_VERSION_RE = re.compile(r'v(\d\d\d\d)\.(\d\d)\.(\d\d)(-nightly)?(?=\W|$)')
+ZAP_VERSION_RE = re.compile(r'v?(\d\d\d\d)\.(\d\d)\.(\d\d)(-nightly)?(?=\W|$)')
 
 # A list of files where ZAP is maintained. You can get a similar list using:
 #
@@ -104,6 +104,14 @@ def version_update(log_level, update, new_version):
             logging.error(
                 f"Version '{new_version}' does not seem to parse as a ZAP VERSION")
             sys.exit(1)
+
+        # new CIPD versions use semantic tags only, so they lose the `v` prefix
+        # as well as the `-nightly` suffix. Adjust as a result:
+        #  v1234.56.78-nightly becomes "1234.56.78" and
+        #  v1234.56.78 becomes "1234.56.78"
+        # This is ambiguous in case both official and nightly releases exist, however
+        # for now we accept that.
+        new_version = ".".join(parsed.groups()[:3])
 
         # get the numeric version for zap_execution
         #
