@@ -153,6 +153,7 @@ ClusterStatusCode TlsClientManagementCommandDelegate::ProvisionEndpoint(
     endpointStruct.port  = provisionReq.port;
     endpointStruct.caid  = provisionReq.caid;
     endpointStruct.ccdid = provisionReq.ccdid;
+    endpointStruct.SetFabricIndex(fabric);
 
     return ClusterStatusCode(Status::Success);
 }

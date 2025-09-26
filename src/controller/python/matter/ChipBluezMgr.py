@@ -40,10 +40,12 @@ import dbus.service  # type: ignore
 from .ChipBleBase import ChipBleBase
 from .ChipBleUtility import BLE_ERROR_REMOTE_DEVICE_DISCONNECTED, BleDisconnectEvent, ParseServiceData
 
+LOGGER = logging.getLogger(__name__)
+
 try:
     from gi.repository import GObject  # type: ignore
 except Exception:
-    logging.exception("Unable to find GObject from gi.repository")
+    LOGGER.exception("Unable to find GObject from gi.repository")
     from pgi.repository import GObject  # type: ignore
 
 chip_service = uuid.UUID("0000FFF6-0000-1000-8000-00805F9B34FB")
@@ -88,8 +90,7 @@ def get_bluez_objects(bluez, bus, interface, prefix_path):
 
 
 class BluezDbusAdapter:
-    def __init__(self, bluez_obj, bluez, bus, logger=None):
-        self.logger = logger if logger else logging.getLogger("ChipBLEMgr")
+    def __init__(self, bluez_obj, bluez, bus):
         self.object = bluez_obj
         self.adapter = dbus.Interface(bluez_obj, ADAPTER_INTERFACE)
         self.adapter_properties = dbus.Interface(bluez_obj, DBUS_PROPERTIES)
@@ -103,7 +104,7 @@ class BluezDbusAdapter:
         self.destroy()
 
     def destroy(self):
-        self.logger.debug("destroy adapter")
+        LOGGER.debug("destroy adapter")
         self.adapter_unregister_signal()
         self.adapter = None
         self.adapter_properties = None
@@ -116,7 +117,7 @@ class BluezDbusAdapter:
 
     def adapter_register_signal(self):
         if self.signalReceiver is None:
-            self.logger.debug("add adapter signal")
+            LOGGER.debug("add adapter signal")
             self.signalReceiver = self.bus.add_signal_receiver(
                 self.adapter_on_prop_changed_cb,
                 bus_name=BLUEZ_NAME,
@@ -127,7 +128,7 @@ class BluezDbusAdapter:
 
     def adapter_unregister_signal(self):
         if self.signalReceiver is not None:
-            self.logger.debug(" remove adapter signal")
+            LOGGER.debug(" remove adapter signal")
             self.bus.remove_signal_receiver(
                 self.signalReceiver,
                 signal_name="PropertiesChanged",
@@ -138,11 +139,11 @@ class BluezDbusAdapter:
         self, interface, changed_properties, invalidated_properties
     ):
         if len(changed_properties) == 0:
-            self.logger.debug("changed_properties is empty")
+            LOGGER.debug("changed_properties is empty")
             return
 
         if len(invalidated_properties) > 0:
-            self.logger.debug(
+            LOGGER.debug(
                 "invalidated_properties is not empty %s" % str(
                     invalidated_properties)
             )
@@ -159,29 +160,29 @@ class BluezDbusAdapter:
             if enable:
                 if not self.Discovering:
                     action_flag = True
-                    self.logger.info("scanning started")
+                    LOGGER.info("scanning started")
                     self.adapter.StartDiscovery()
                 else:
-                    self.logger.info("it has started scanning")
+                    LOGGER.info("it has started scanning")
             else:
                 if self.Discovering:
                     action_flag = True
                     self.adapter.StopDiscovery()
-                    self.logger.info("scanning stopped")
+                    LOGGER.info("scanning stopped")
                 else:
                     print("it has stopped scanning")
             if action_flag:
                 if not self.adapter_event.wait(BLE_STATUS_TRANSITION_TIMEOUT_SEC):
                     if enable:
-                        self.logger.debug("scan start error")
+                        LOGGER.debug("scan start error")
                     else:
-                        self.logger.debug("scan stop error")
+                        LOGGER.debug("scan stop error")
             self.adapter_event.clear()
         except dbus.exceptions.DBusException as ex:
             self.adapter_event.clear()
-            self.logger.debug(str(ex))
+            LOGGER.debug(str(ex))
         except Exception:
-            self.logger.debug(traceback.format_exc())
+            LOGGER.debug(traceback.format_exc())
 
     @property
     def Address(self):
@@ -189,10 +190,10 @@ class BluezDbusAdapter:
             result = self.adapter_properties.Get(ADAPTER_INTERFACE, "Address")
             return result
         except dbus.exceptions.DBusException as ex:
-            self.logger.debug(str(ex))
+            LOGGER.debug(str(ex))
             return None
         except Exception:
-            self.logger.debug(traceback.format_exc())
+            LOGGER.debug(traceback.format_exc())
             return None
 
     @property
@@ -200,19 +201,19 @@ class BluezDbusAdapter:
         try:
             return self.adapter_properties.Get(ADAPTER_INTERFACE, "UUIDs")
         except dbus.exceptions.DBusException as ex:
-            self.logger.debug(str(ex))
+            LOGGER.debug(str(ex))
             return None
         except Exception:
-            self.logger.debug(traceback.format_exc())
+            LOGGER.debug(traceback.format_exc())
             return None
 
     def SetDiscoveryFilter(self, dict):
         try:
             self.adapter.SetDiscoveryFilter(dict)
         except dbus.exceptions.DBusException as ex:
-            self.logger.debug(str(ex))
+            LOGGER.debug(str(ex))
         except Exception:
-            self.logger.debug(traceback.format_exc())
+            LOGGER.debug(traceback.format_exc())
 
     @property
     def Discovering(self):
@@ -221,10 +222,10 @@ class BluezDbusAdapter:
                 ADAPTER_INTERFACE, "Discovering")
             return bool(result)
         except dbus.exceptions.DBusException as ex:
-            self.logger.debug(str(ex))
+            LOGGER.debug(str(ex))
             return False
         except Exception:
-            self.logger.debug(traceback.format_exc())
+            LOGGER.debug(traceback.format_exc())
             return False
 
     def DiscoverableTimeout(self, timeoutSec):
@@ -234,10 +235,10 @@ class BluezDbusAdapter:
             )
             return bool(result)
         except dbus.exceptions.DBusException as ex:
-            self.logger.debug(str(ex))
+            LOGGER.debug(str(ex))
             return False
         except Exception:
-            self.logger.debug(traceback.format_exc())
+            LOGGER.debug(traceback.format_exc())
             return False
 
     def Powered(self, enable):
@@ -246,15 +247,15 @@ class BluezDbusAdapter:
                 ADAPTER_INTERFACE, "Powered", enable)
             return bool(result)
         except dbus.exceptions.DBusException as ex:
-            self.logger.debug(str(ex))
+            LOGGER.debug(str(ex))
             return False
         except Exception:
-            self.logger.debug(traceback.format_exc())
+            LOGGER.debug(traceback.format_exc())
             return False
 
     def find_devices(self, uuids):
         devices = [
-            BluezDbusDevice(p["object"], self.bluez, self.bus, self.logger)
+            BluezDbusDevice(p["object"], self.bluez, self.bus)
             for p in get_bluez_objects(
                 self.bluez, self.bus, DEVICE_INTERFACE, self.path
             )
@@ -275,7 +276,7 @@ class BluezDbusAdapter:
 
     def clear_adapter(self):
         devices = [
-            BluezDbusDevice(p["object"], self.bluez, self.bus, self.logger)
+            BluezDbusDevice(p["object"], self.bluez, self.bus)
             for p in get_bluez_objects(
                 self.bluez, self.bus, DEVICE_INTERFACE, self.path
             )
@@ -290,8 +291,7 @@ class BluezDbusAdapter:
 
 
 class BluezDbusDevice:
-    def __init__(self, bluez_obj, bluez, bus, logger=None):
-        self.logger = logger if logger else logging.getLogger("ChipBLEMgr")
+    def __init__(self, bluez_obj, bluez, bus):
         self.object = bluez_obj
         self.device = dbus.Interface(bluez_obj, DEVICE_INTERFACE)
         self.device_properties = dbus.Interface(bluez_obj, DBUS_PROPERTIES)
@@ -315,7 +315,7 @@ class BluezDbusDevice:
         self.destroy()
 
     def destroy(self):
-        self.logger.debug("destroy device")
+        LOGGER.debug("destroy device")
         self.device_unregister_signal()
         self.device = None
         self.device_properties = None
@@ -328,7 +328,7 @@ class BluezDbusDevice:
 
     def device_register_signal(self):
         if self.signalReceiver is None:
-            self.logger.debug("add device signal")
+            LOGGER.debug("add device signal")
             self.signalReceiver = self.bus.add_signal_receiver(
                 self.device_on_prop_changed_cb,
                 bus_name=BLUEZ_NAME,
@@ -339,7 +339,7 @@ class BluezDbusDevice:
 
     def device_unregister_signal(self):
         if self.signalReceiver is not None:
-            self.logger.debug("remove device signal")
+            LOGGER.debug("remove device signal")
             self.bus.remove_signal_receiver(
                 self.signalReceiver,
                 signal_name="PropertiesChanged",
@@ -350,11 +350,11 @@ class BluezDbusDevice:
         self, interface, changed_properties, invalidated_properties
     ):
         if len(changed_properties) == 0:
-            self.logger.debug("changed_properties is empty")
+            LOGGER.debug("changed_properties is empty")
             return
 
         if len(invalidated_properties) > 0:
-            self.logger.debug(
+            LOGGER.debug(
                 "invalidated_properties is not empty %s" % str(
                     invalidated_properties)
             )
@@ -373,55 +373,53 @@ class BluezDbusDevice:
                 if not self.Connected:
                     action_flag = True
                     self.device.Connect()
-                    self.logger.info("BLE connecting")
+                    LOGGER.info("BLE connecting")
                 else:
-                    self.logger.info("BLE has connected")
+                    LOGGER.info("BLE has connected")
             else:
                 if self.Connected:
                     action_flag = True
                     self.device.Disconnect()
-                    self.logger.info("BLE disconnected")
+                    LOGGER.info("BLE disconnected")
                 else:
-                    self.logger.info("BLE has disconnected")
+                    LOGGER.info("BLE has disconnected")
             if action_flag:
                 if not self.device_event.wait(BLE_STATUS_TRANSITION_TIMEOUT_SEC):
                     if enable:
-                        self.logger.info("BLE connect error")
+                        LOGGER.info("BLE connect error")
                     else:
-                        self.logger.info("BLE disconnect error")
+                        LOGGER.info("BLE disconnect error")
             self.device_event.clear()
         except dbus.exceptions.DBusException as ex:
             self.device_event.clear()
-            self.logger.info(str(ex))
+            LOGGER.info(str(ex))
         except Exception:
-            self.logger.debug(traceback.format_exc())
+            LOGGER.debug(traceback.format_exc())
 
     def service_discover(self, gatt_dic):
-        self.logger.info("Discovering services")
+        LOGGER.info("Discovering services")
         try:
             expired = time.time() + BLE_SERVICE_DISCOVERY_TIMEOUT_SEC
             while time.time() < expired:
                 if self.ServicesResolved:
                     services = [
-                        BluezDbusGattService(
-                            p["object"], self.bluez, self.bus, self.logger
-                        )
+                        BluezDbusGattService(p["object"], self.bluez, self.bus)
                         for p in get_bluez_objects(
                             self.bluez, self.bus, SERVICE_INTERFACE, self.path
                         )
                     ]
                     for service in services:
                         if service.uuid in gatt_dic["services"]:
-                            self.logger.info("Service discovering success")
+                            LOGGER.info("Service discovering success")
                             return service
                 time.sleep(BLE_IDLE_DELTA)
-            self.logger.error("Service discovering fail")
+            LOGGER.error("Service discovering fail")
             return None
         except dbus.exceptions.DBusException as ex:
-            self.logger.debug(str(ex))
+            LOGGER.debug(str(ex))
             return None
         except Exception:
-            self.logger.debug(traceback.format_exc())
+            LOGGER.debug(traceback.format_exc())
             return None
 
     @property
@@ -437,10 +435,10 @@ class BluezDbusDevice:
                 uuid_result.append(uuid.UUID(str(uuid_normal)))
             return uuid_result
         except dbus.exceptions.DBusException as ex:
-            self.logger.debug(str(ex))
+            LOGGER.debug(str(ex))
             return None
         except Exception:
-            self.logger.debug(traceback.format_exc())
+            LOGGER.debug(traceback.format_exc())
             return None
 
     @property
@@ -448,10 +446,10 @@ class BluezDbusDevice:
         try:
             return self.device_properties.Get(DEVICE_INTERFACE, "Address")
         except dbus.exceptions.DBusException as ex:
-            self.logger.debug(str(ex))
+            LOGGER.debug(str(ex))
             return None
         except Exception:
-            self.logger.debug(traceback.format_exc())
+            LOGGER.debug(traceback.format_exc())
             return None
 
     @property
@@ -460,10 +458,10 @@ class BluezDbusDevice:
             name = self.device_properties.Get(DEVICE_INTERFACE, "Name")
             return name
         except dbus.exceptions.DBusException as ex:
-            self.logger.debug(str(ex))
+            LOGGER.debug(str(ex))
             return None
         except Exception:
-            self.logger.debug(traceback.format_exc())
+            LOGGER.debug(traceback.format_exc())
             return None
 
     @property
@@ -472,10 +470,10 @@ class BluezDbusDevice:
             result = self.device_properties.Get(DEVICE_INTERFACE, "Connected")
             return bool(result)
         except dbus.exceptions.DBusException as ex:
-            self.logger.debug(str(ex))
+            LOGGER.debug(str(ex))
             return False
         except Exception:
-            self.logger.debug(traceback.format_exc())
+            LOGGER.debug(traceback.format_exc())
             return False
 
     @property
@@ -483,10 +481,10 @@ class BluezDbusDevice:
         try:
             return self.device_properties.Get(DEVICE_INTERFACE, "TxPower")
         except dbus.exceptions.DBusException as ex:
-            self.logger.debug(str(ex))
+            LOGGER.debug(str(ex))
             return None
         except Exception:
-            self.logger.debug(traceback.format_exc())
+            LOGGER.debug(traceback.format_exc())
             return None
 
     @property
@@ -495,10 +493,10 @@ class BluezDbusDevice:
             result = self.device_properties.Get(DEVICE_INTERFACE, "RSSI")
             return result
         except dbus.exceptions.DBusException as ex:
-            self.logger.debug(str(ex))
+            LOGGER.debug(str(ex))
             return None
         except Exception:
-            self.logger.debug(traceback.format_exc())
+            LOGGER.debug(traceback.format_exc())
             return None
 
     @property
@@ -506,10 +504,10 @@ class BluezDbusDevice:
         try:
             return self.device_properties.Get(DEVICE_INTERFACE, "Adapter")
         except dbus.exceptions.DBusException as ex:
-            self.logger.debug(str(ex))
+            LOGGER.debug(str(ex))
             return None
         except Exception:
-            self.logger.debug(traceback.format_exc())
+            LOGGER.debug(traceback.format_exc())
             return None
 
     @property
@@ -517,10 +515,10 @@ class BluezDbusDevice:
         try:
             return self.device_properties.Get(DEVICE_INTERFACE, "ServiceData")
         except dbus.exceptions.DBusException as ex:
-            self.logger.debug(str(ex))
+            LOGGER.debug(str(ex))
             return None
         except Exception:
-            self.logger.debug(traceback.format_exc())
+            LOGGER.debug(traceback.format_exc())
             return None
 
     @property
@@ -530,16 +528,15 @@ class BluezDbusDevice:
                 DEVICE_INTERFACE, "ServicesResolved")
             return bool(result)
         except dbus.exceptions.DBusException as ex:
-            self.logger.debug(str(ex))
+            LOGGER.debug(str(ex))
             return False
         except Exception:
-            self.logger.debug(traceback.format_exc())
+            LOGGER.debug(traceback.format_exc())
             return False
 
 
 class BluezDbusGattService:
-    def __init__(self, bluez_obj, bluez, bus, logger=None):
-        self.logger = logger if logger else logging.getLogger("ChipBLEMgr")
+    def __init__(self, bluez_obj, bluez, bus):
         self.object = bluez_obj
         self.service = dbus.Interface(bluez_obj, SERVICE_INTERFACE)
         self.service_properties = dbus.Interface(bluez_obj, DBUS_PROPERTIES)
@@ -551,7 +548,7 @@ class BluezDbusGattService:
         self.destroy()
 
     def destroy(self):
-        self.logger.debug("destroy GattService")
+        LOGGER.debug("destroy GattService")
         self.service = None
         self.service_properties = None
         self.bluez = None
@@ -567,10 +564,10 @@ class BluezDbusGattService:
             )
             return result
         except dbus.exceptions.DBusException as ex:
-            self.logger.debug(str(ex))
+            LOGGER.debug(str(ex))
             return None
         except Exception:
-            self.logger.debug(traceback.format_exc())
+            LOGGER.debug(traceback.format_exc())
             return None
 
     @property
@@ -580,10 +577,10 @@ class BluezDbusGattService:
                 SERVICE_INTERFACE, "Primary"))
             return result
         except dbus.exceptions.DBusException as ex:
-            self.logger.debug(str(ex))
+            LOGGER.debug(str(ex))
             return False
         except Exception:
-            self.logger.debug(traceback.format_exc())
+            LOGGER.debug(traceback.format_exc())
             return False
 
     @property
@@ -592,10 +589,10 @@ class BluezDbusGattService:
             result = self.service_properties.Get(SERVICE_INTERFACE, "Device")
             return result
         except dbus.exceptions.DBusException as ex:
-            self.logger.debug(str(ex))
+            LOGGER.debug(str(ex))
             return None
         except Exception:
-            self.logger.debug(traceback.format_exc())
+            LOGGER.debug(traceback.format_exc())
             return None
 
     def find_characteristic(self, uuid):
@@ -603,9 +600,7 @@ class BluezDbusGattService:
             expired = time.time() + BLE_CHAR_DISCOVERY_TIMEOUT_SEC
             while time.time() < expired:
                 characteristics = [
-                    BluezDbusGattCharacteristic(
-                        p["object"], self.bluez, self.bus, self.logger
-                    )
+                    BluezDbusGattCharacteristic(p["object"], self.bluez, self.bus)
                     for p in get_bluez_objects(
                         self.bluez, self.bus, CHARACTERISTIC_INTERFACE, self.path
                     )
@@ -614,19 +609,18 @@ class BluezDbusGattService:
                     if characteristic.uuid == uuid:
                         return characteristic
                 time.sleep(BLE_IDLE_DELTA)
-            self.logger.error("Char discovering fail")
+            LOGGER.error("Char discovering fail")
             return None
         except dbus.exceptions.DBusException as ex:
-            self.logger.debug(str(ex))
+            LOGGER.debug(str(ex))
             return None
         except Exception:
-            self.logger.debug(traceback.format_exc())
+            LOGGER.debug(traceback.format_exc())
             return None
 
 
 class BluezDbusGattCharacteristic:
-    def __init__(self, bluez_obj, bluez, bus, logger=None):
-        self.logger = logger if logger else logging.getLogger("ChipBLEMgr")
+    def __init__(self, bluez_obj, bluez, bus):
         self.object = bluez_obj
         self.characteristic = dbus.Interface(
             bluez_obj, CHARACTERISTIC_INTERFACE)
@@ -642,7 +636,7 @@ class BluezDbusGattCharacteristic:
         self.destroy()
 
     def destroy(self):
-        self.logger.debug("destroy GattCharacteristic")
+        LOGGER.debug("destroy GattCharacteristic")
         self.gattCharacteristic_unregister_signal()
         self.characteristic = None
         self.object = None
@@ -655,7 +649,7 @@ class BluezDbusGattCharacteristic:
 
     def gattCharacteristic_register_signal(self):
         if not self.signalReceiver:
-            self.logger.debug("add GattCharacteristic signal")
+            LOGGER.debug("add GattCharacteristic signal")
             self.signalReceiver = self.bus.add_signal_receiver(
                 self.gatt_on_characteristic_changed_cb,
                 bus_name=BLUEZ_NAME,
@@ -666,7 +660,7 @@ class BluezDbusGattCharacteristic:
 
     def gattCharacteristic_unregister_signal(self):
         if self.signalReceiver:
-            self.logger.debug("remove GattCharacteristic signal")
+            LOGGER.debug("remove GattCharacteristic signal")
 
             self.bus.remove_signal_receiver(
                 self.signalReceiver,
@@ -680,7 +674,7 @@ class BluezDbusGattCharacteristic:
     def gatt_on_characteristic_changed_cb(
         self, interface, changed_properties, invalidated_properties
     ):
-        self.logger.debug(
+        LOGGER.debug(
             "property change in" +
             str(self.characteristic) + str(changed_properties)
         )
@@ -706,9 +700,9 @@ class BluezDbusGattCharacteristic:
                 timeout=timeout,
             )
         except dbus.exceptions.DBusException as ex:
-            self.logger.debug(str(ex))
+            LOGGER.debug(str(ex))
         except Exception:
-            self.logger.debug(traceback.format_exc())
+            LOGGER.debug(traceback.format_exc())
 
     @property
     def uuid(self):
@@ -721,16 +715,16 @@ class BluezDbusGattCharacteristic:
             )
             return result
         except dbus.exceptions.DBusException as ex:
-            self.logger.debug(str(ex))
+            LOGGER.debug(str(ex))
             return None
         except Exception:
-            self.logger.debug(traceback.format_exc())
+            LOGGER.debug(traceback.format_exc())
             return None
 
     def StartNotify(self, cbfunct, reply_handler, error_handler, timeout):
         try:
             if not cbfunct:
-                self.logger.info("please provide the notify callback function")
+                LOGGER.info("please provide the notify callback function")
             self.received = cbfunct
             self.gattCharacteristic_register_signal()
             self.characteristic.StartNotify(
@@ -739,13 +733,13 @@ class BluezDbusGattCharacteristic:
                 timeout=timeout,
             )
         except dbus.exceptions.DBusException as ex:
-            self.logger.debug(str(ex))
+            LOGGER.debug(str(ex))
         except Exception:
-            self.logger.debug(traceback.format_exc())
+            LOGGER.debug(traceback.format_exc())
 
     def StopNotify(self, reply_handler, error_handler, timeout):
         try:
-            self.logger.debug("stopping notifying")
+            LOGGER.debug("stopping notifying")
             self.characteristic.StopNotify(
                 reply_handler=reply_handler,
                 error_handler=error_handler,
@@ -754,9 +748,9 @@ class BluezDbusGattCharacteristic:
             self.gattCharacteristic_unregister_signal()
             self.received = None
         except dbus.exceptions.DBusException as ex:
-            self.logger.debug(str(ex))
+            LOGGER.debug(str(ex))
         except Exception:
-            self.logger.debug(traceback.format_exc())
+            LOGGER.debug(traceback.format_exc())
 
     @property
     def Notifying(self):
@@ -766,23 +760,15 @@ class BluezDbusGattCharacteristic:
             )
             return bool(result)
         except dbus.exceptions.DBusException as ex:
-            self.logger.debug(str(ex))
+            LOGGER.debug(str(ex))
             return False
         except Exception:
-            self.logger.debug(traceback.format_exc())
+            LOGGER.debug(traceback.format_exc())
             return False
 
 
 class BluezManager(ChipBleBase):
-    def __init__(self, devMgr, logger=None):
-        if logger:
-            self.logger = logger
-        else:
-            self.logger = logging.getLogger("ChipBLEMgr")
-            logging.basicConfig(
-                level=logging.INFO,
-                format="%(asctime)s %(name)-12s %(levelname)-8s %(message)s",
-            )
+    def __init__(self, devMgr):
         self.scan_quiet = False
         self.peripheral_list = []
         self.device_uuid_list = []
@@ -823,7 +809,7 @@ class BluezManager(ChipBleBase):
 
     def get_adapters(self):
         return [
-            BluezDbusAdapter(p["object"], self.bluez, self.bus, self.logger)
+            BluezDbusAdapter(p["object"], self.bluez, self.bus)
             for p in get_bluez_objects(
                 self.bluez, self.bus, ADAPTER_INTERFACE, "/org/bluez"
             )
@@ -832,23 +818,21 @@ class BluezManager(ChipBleBase):
     def ble_adapter_print(self):
         try:
             adapters = [
-                BluezDbusAdapter(p["object"], self.bluez,
-                                 self.bus, self.logger)
+                BluezDbusAdapter(p["object"], self.bluez, self.bus)
                 for p in get_bluez_objects(
                     self.bluez, self.bus, ADAPTER_INTERFACE, "/org/bluez"
                 )
             ]
             for adapter in adapters:
-                self.logger.info("AdapterName: %s   AdapterAddress: %s" % (
+                LOGGER.info("AdapterName: %s   AdapterAddress: %s" % (
                     adapter.path.replace("/org/bluez/", ""), adapter.Address))
         except dbus.exceptions.DBusException as ex:
-            self.logger.debug(str(ex))
+            LOGGER.debug(str(ex))
 
     def get_adapter_by_addr(self, identifier):
         try:
             adapters = [
-                BluezDbusAdapter(p["object"], self.bluez,
-                                 self.bus, self.logger)
+                BluezDbusAdapter(p["object"], self.bluez, self.bus)
                 for p in get_bluez_objects(
                     self.bluez, self.bus, ADAPTER_INTERFACE, "/org/bluez"
                 )
@@ -860,14 +844,14 @@ class BluezManager(ChipBleBase):
                     if (str(adapter.Address).upper() == str(identifier).upper() or
                             "/org/bluez/{}".format(identifier) == str(adapter.path)):
                         return adapter
-            self.logger.info(
+            LOGGER.info(
                 "adapter %s cannot be found, expect the ble mac address" % (
                     identifier)
             )
             return None
 
         except dbus.exceptions.DBusException as ex:
-            self.logger.debug(str(ex))
+            LOGGER.debug(str(ex))
 
     def runLoopUntil(self, target=None, **kwargs):
         if target:
@@ -918,31 +902,31 @@ class BluezManager(ChipBleBase):
             self.orig_input_hook()
 
     def dump_scan_result(self, device):
-        self.logger.info("{0:<16}= {1}".format("Name", device.Name))
-        self.logger.info("{0:<16}= {1}".format("ID", device.device_id))
-        self.logger.info("{0:<16}= {1}".format("RSSI", device.RSSI))
-        self.logger.info("{0:<16}= {1}".format("Address", device.Address))
+        LOGGER.info("{0:<16}= {1}".format("Name", device.Name))
+        LOGGER.info("{0:<16}= {1}".format("ID", device.device_id))
+        LOGGER.info("{0:<16}= {1}".format("RSSI", device.RSSI))
+        LOGGER.info("{0:<16}= {1}".format("Address", device.Address))
 
         devIdInfo = self.get_peripheral_devIdInfo(device)
         if devIdInfo is not None:
-            self.logger.info("{0:<16}= {1}".format(
+            LOGGER.info("{0:<16}= {1}".format(
                 "Pairing State", devIdInfo.pairingState))
-            self.logger.info("{0:<16}= {1}".format(
+            LOGGER.info("{0:<16}= {1}".format(
                 "Discriminator", devIdInfo.discriminator))
-            self.logger.info("{0:<16}= {1}".format(
+            LOGGER.info("{0:<16}= {1}".format(
                 "Vendor Id", devIdInfo.vendorId))
-            self.logger.info("{0:<16}= {1}".format(
+            LOGGER.info("{0:<16}= {1}".format(
                 "Product Id", devIdInfo.productId))
 
         if device.ServiceData:
             for advuuid in device.ServiceData:
-                self.logger.info("{0:<16}= {1}".format(
+                LOGGER.info("{0:<16}= {1}".format(
                     "Adv UUID", str(advuuid)))
-                self.logger.info("{0:<16}= {1}".format(
+                LOGGER.info("{0:<16}= {1}".format(
                     "Adv Data", bytes(device.ServiceData[advuuid]).hex()))
         else:
-            self.logger.info("")
-        self.logger.info("")
+            LOGGER.info("")
+        LOGGER.info("")
 
     def scan_bg_implementation(self, **kwargs):
         self.adapter.clear_adapter()
@@ -998,7 +982,7 @@ class BluezManager(ChipBleBase):
             return False
         self.target = None
         if not self.adapter:
-            self.logger.info("use default adapter")
+            LOGGER.info("use default adapter")
             self.ble_adapter_select()
         del self.peripheral_list[:]
         self.scan_quiet = args[1]
@@ -1018,11 +1002,11 @@ class BluezManager(ChipBleBase):
     def ble_debug_log(self, line):
         args = self.ParseInputLine(line)
         if int(args[0]) == 1:
-            self.logger.setLevel(logging.DEBUG)
-            self.logger.debug("current logging level is debug")
+            LOGGER.setLevel(logging.DEBUG)
+            LOGGER.debug("current logging level is debug")
         else:
-            self.logger.setLevel(logging.INFO)
-            self.logger.info("current logging level is info")
+            LOGGER.setLevel(logging.INFO)
+            LOGGER.info("current logging level is info")
         return True
 
     def CloseBle(self, connObj):
