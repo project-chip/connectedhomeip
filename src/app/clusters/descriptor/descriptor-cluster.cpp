@@ -175,8 +175,12 @@ CHIP_ERROR DescriptorCluster::Attributes(const ConcreteClusterPath & path,
 {
     AttributeListBuilder listBuilder(builder);
 
+    ReadOnlyBufferBuilder<DataModel::Provider::SemanticTag> semanticTagsList;
+    CHIP_ERROR err = mContext->provider.SemanticTags(path.mEndpointId, semanticTagsList);
+    bool enableTagList = (err == CHIP_NO_ERROR && !semanticTagsList.IsEmpty());
+
     AttributeListBuilder::OptionalAttributeEntry optionalAttributeEntries[] = {
-        { mFeatureFlags.Has(Feature::kTagList), TagList::kMetadataEntry },
+        { enableTagList, TagList::kMetadataEntry },
 #if CHIP_CONFIG_USE_ENDPOINT_UNIQUE_ID
         { true, EndpointUniqueID::kMetadataEntry },
 #endif
@@ -191,7 +195,14 @@ DataModel::ActionReturnStatus DescriptorCluster::ReadAttribute(const DataModel::
     switch (request.path.mAttributeId)
     {
     case FeatureMap::Id: {
-        return encoder.Encode(mFeatureFlags);
+        BitFlags<Feature> featureFlags;
+        ReadOnlyBufferBuilder<DataModel::Provider::SemanticTag> semanticTagsList;
+        CHIP_ERROR err = mContext->provider.SemanticTags(request.path.mEndpointId, semanticTagsList);
+        if (err == CHIP_NO_ERROR && !semanticTagsList.IsEmpty())
+        {
+            featureFlags.Set(Descriptor::Feature::kTagList);
+        }
+        return encoder.Encode(featureFlags);
     }
     case ClusterRevision::Id:
         return encoder.Encode(Descriptor::kRevision);
@@ -224,14 +235,7 @@ DataModel::ActionReturnStatus DescriptorCluster::ReadAttribute(const DataModel::
     case PartsList::Id:
         return ReadPartsAttribute(mContext->provider, request.path.mEndpointId, encoder);
     case TagList::Id:
-        if (mFeatureFlags.Has(Feature::kTagList))
-        {
-            return ReadTagListAttribute(mContext->provider, request.path.mEndpointId, encoder);
-        }
-        else
-        {
-            return Status::UnsupportedAttribute;
-        }
+        return ReadTagListAttribute(mContext->provider, request.path.mEndpointId, encoder);
 #if CHIP_CONFIG_USE_ENDPOINT_UNIQUE_ID
     case EndpointUniqueID::Id: {
         char buffer[chip::app::Clusters::Descriptor::Attributes::EndpointUniqueID::TypeInfo::MaxLength()] = { 0 };
