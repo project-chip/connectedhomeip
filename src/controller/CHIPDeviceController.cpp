@@ -40,6 +40,7 @@
 #include <credentials/CHIPCert.h>
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <crypto/CHIPCryptoPAL.h>
+#include <lib/address_resolve/AddressResolve.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/core/CHIPEncoding.h>
 #include <lib/core/CHIPSafeCasts.h>
@@ -101,6 +102,9 @@ using namespace chip::Encoding;
 #if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY
 using namespace chip::Protocols::UserDirectedCommissioning;
 #endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY
+
+using chip::AddressResolve::Resolver;
+using chip::AddressResolve::ResolveResult;
 
 DeviceController::DeviceController()
 {
@@ -1716,6 +1720,18 @@ CHIP_ERROR DeviceCommissioner::ProcessCSR(DeviceProxy * proxy, const ByteSpan & 
     {
         mOperationalCredentialsDelegate->SetFabricIdForNextNOCRequest(GetFabricId());
     }
+
+#if CHIP_DEVICE_ENABLE_CASE_DNS_CACHE
+    {
+        // cache the address we are using for PASE as a backup
+        ResolveResult result;
+        result.address           = proxy->GetSecureSession().Value()->AsSecureSession()->GetPeerAddress();
+        result.mrpRemoteConfig   = proxy->GetSecureSession().Value()->GetRemoteMRPConfig();
+        result.supportsTcpClient = result.address.GetTransportType() == Transport::Type::kTcp;
+        result.supportsTcpServer = result.address.GetTransportType() == Transport::Type::kTcp;
+        Resolver::Instance().CacheNode(proxy->GetDeviceId(), result);
+    }
+#endif // CHIP_DEVICE_ENABLE_CASE_DNS_CACHE
 
     return mOperationalCredentialsDelegate->GenerateNOCChain(NOCSRElements, csrNonce, AttestationSignature, attestationChallenge,
                                                              dac, pai, &mDeviceNOCChainCallback);
