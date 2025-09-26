@@ -18,6 +18,8 @@ import asyncio
 import logging
 from typing import Any, Optional
 
+LOGGER = logging.getLogger(__name__)
+
 
 class AsyncEventQueue(asyncio.Queue):
     def __init__(self, loop: Optional[asyncio.AbstractEventLoop] = None, maxSize: int = 0):
@@ -38,7 +40,7 @@ class AsyncEventQueue(asyncio.Queue):
         if not self._loop.is_closed():
             self._loop.call_soon_threadsafe(self.put_nowait, value)
         else:
-            logging.error(f"Ignoring value {value} because event loop is not running")
+            LOGGER.error(f"Ignoring value {value} because event loop is not running")
 
     async def get(self, timeout: Optional[int] = None):
         """

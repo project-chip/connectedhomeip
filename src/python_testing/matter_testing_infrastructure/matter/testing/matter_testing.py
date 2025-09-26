@@ -70,8 +70,8 @@ from matter.tlv import uint
 StepNumber = Union[int, str]  # Test step numbers can be integers or strings
 OptionalTimeout = Optional[int]  # Optional timeout values
 
-logger = logging.getLogger("matter.python_testing")
-logger.setLevel(logging.INFO)
+LOGGER = logging.getLogger(__name__)
+LOGGER.setLevel(logging.INFO)
 
 DiscoveryFilterType = ChipDeviceCtrl.DiscoveryFilterType
 
@@ -216,12 +216,12 @@ class MatterBaseTest(base_test.BaseTestClass):
 
         """
         if len(self.problems) > 0:
-            logging.info("###########################################################")
-            logging.info("Problems found:")
-            logging.info("===============")
+            LOGGER.info("###########################################################")
+            LOGGER.info("Problems found:")
+            LOGGER.info("===============")
             for problem in self.problems:
-                logging.info(str(problem))
-            logging.info("###########################################################")
+                LOGGER.info(str(problem))
+            LOGGER.info("###########################################################")
         super().teardown_class()
 
     def setup_test(self):
@@ -331,7 +331,7 @@ class MatterBaseTest(base_test.BaseTestClass):
             test_steps = self.get_defined_test_steps(self.current_test_info.name)
             test_step = str(test_steps[self.current_step_index-1]
                             ) if test_steps is not None else 'UNKNOWN - no test steps provided in test script'
-            logging.error(textwrap.dedent(f"""
+            LOGGER.error(textwrap.dedent(f"""
 
                                           ******************************************************************
                                           *
@@ -614,7 +614,7 @@ class MatterBaseTest(base_test.BaseTestClass):
             stepnum: The step number or identifier.
             title: The descriptive title of the step.
         """
-        logging.info(f'***** Test Step {stepnum} : {title}')
+        LOGGER.info(f'***** Test Step {stepnum} : {title}')
 
     def skip_step(self, step):
         """Execute and immediately mark a step as skipped.
@@ -640,7 +640,7 @@ class MatterBaseTest(base_test.BaseTestClass):
             # TODO: I very much do not want to have people passing in strings here. Do we really need the expression
             #       as a string? Does it get used by the TH?
             self.runner_hook.step_skipped(name=str(num), expression="")
-        logging.info(f'**** Skipping: {num}')
+        LOGGER.info(f'**** Skipping: {num}')
         self.step_skipped = True
 
     def mark_all_remaining_steps_skipped(self, starting_step_number: typing.Union[int, str]) -> None:
@@ -993,7 +993,7 @@ class MatterBaseTest(base_test.BaseTestClass):
         """
         # If is not empty from the args, verify if the fifo file exists.
         if app_pipe is not None and not os.path.exists(app_pipe):
-            logging.error("Named pipe %r does NOT exist" % app_pipe)
+            LOGGER.error("Named pipe %r does NOT exist" % app_pipe)
             raise FileNotFoundError("CANNOT FIND %r" % app_pipe)
 
         if app_pipe is None:
@@ -1011,17 +1011,17 @@ class MatterBaseTest(base_test.BaseTestClass):
         # Checks for concatenate app_pipe and app_pid
         if dut_ip is None:
             with open(app_pipe, "w") as app_pipe_fp:
-                logger.info(f"Sending out-of-band command: {command} to file: {app_pipe}")
+                LOGGER.info(f"Sending out-of-band command: {command} to file: {app_pipe}")
                 app_pipe_fp.write(json.dumps(command_dict) + "\n")
             # TODO(#31239): remove the need for sleep
             # This was tested with matter.js as being reliable enough
             time.sleep(0.05)
         else:
-            logging.info(f"Using DUT IP address: {dut_ip}")
+            LOGGER.info(f"Using DUT IP address: {dut_ip}")
 
             dut_uname = os.getenv('LINUX_DUT_USER')
             asserts.assert_true(dut_uname is not None, "The LINUX_DUT_USER environment variable must be set")
-            logging.info(f"Using DUT user name: {dut_uname}")
+            LOGGER.info(f"Using DUT user name: {dut_uname}")
             command_fixed = shlex.quote(json.dumps(command_dict))
             cmd = "echo \"%s\" | ssh %s@%s \'cat > %s\'" % (command_fixed, dut_uname, dut_ip, app_pipe)
             os.system(cmd)
@@ -1105,9 +1105,9 @@ class MatterBaseTest(base_test.BaseTestClass):
         target_endpoint = 0
 
         if self.matter_test_config.legacy:
-            logger.info("Legacy test event trigger activated")
+            LOGGER.info("Legacy test event trigger activated")
         else:
-            logger.info("Legacy test event trigger deactivated")
+            LOGGER.info("Legacy test event trigger deactivated")
             target_endpoint = self.get_endpoint()
 
         if not (0 <= target_endpoint <= 0xFFFF):
@@ -1186,12 +1186,12 @@ class MatterBaseTest(base_test.BaseTestClass):
                                          placeholder=prompt_msg_placeholder,
                                          default_value=default_value)
 
-        logging.info(f"========= USER PROMPT for Endpoint {endpoint_id} =========")
-        logging.info(f">>> {prompt_msg.rstrip()} (press enter to confirm)")
+        LOGGER.info(f"========= USER PROMPT for Endpoint {endpoint_id} =========")
+        LOGGER.info(f">>> {prompt_msg.rstrip()} (press enter to confirm)")
         try:
             return input()
         except EOFError:
-            logging.info("========= EOF on STDIN =========")
+            LOGGER.info("========= EOF on STDIN =========")
             return None
 
     def user_verify_snap_shot(self,
@@ -1220,14 +1220,14 @@ class MatterBaseTest(base_test.BaseTestClass):
                 img_hex_str=hex_string
             )
 
-            logging.info("========= USER PROMPT for Image Validation =========")
+            LOGGER.info("========= USER PROMPT for Image Validation =========")
 
             try:
                 result = input()
                 if result != '1':  # User did not select 'PASS'
                     raise TestError("Image validation failed")
             except EOFError:
-                logging.info("========= EOF on STDIN =========")
+                LOGGER.info("========= EOF on STDIN =========")
                 return None
 
     def _user_verify_prompt(self, prompt_msg: str, hook_method_name: str, validation_name: str, error_message: str) -> bool:
@@ -1237,14 +1237,14 @@ class MatterBaseTest(base_test.BaseTestClass):
             hook_method = getattr(self.runner_hook, hook_method_name)
             hook_method(msg=prompt_msg)
 
-            logging.info(f"========= USER PROMPT for {validation_name} =========")
+            LOGGER.info(f"========= USER PROMPT for {validation_name} =========")
 
             try:
                 result = input()
                 if result != '1':  # User did not select 'PASS'
                     raise TestError(error_message)
             except EOFError:
-                logging.info("========= EOF on STDIN =========")
+                LOGGER.info("========= EOF on STDIN =========")
             return False
         else:
             return True  # Indicating skipped
