@@ -82,8 +82,6 @@ public:
 
     /**
      * @brief Initialize the nvm driver (e.g., NVM3), and execute any needed migrations.
-     *
-     * @return CHIP_ERROR : CHIP_NO_ERROR when successful, a relevant CHIP_ERROR otherwise.
      */
     CHIP_ERROR NvmInit();
 
