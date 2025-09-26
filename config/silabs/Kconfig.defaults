@@ -3,6 +3,9 @@ config BT_HOST_CRYPTO
     bool
     default n
 
+config COMMON_LIBC_MALLOC_ARENA_SIZE
+    default -1
+
 # ==============================================================================
 # Logging configuration
 # ==============================================================================
@@ -22,6 +25,9 @@ endchoice
 
 config CHIP_APP_LOG_LEVEL
     default 4 # debug
+
+config LOG_BUFFER_SIZE
+    default 4096
 
 config LOG_DEFAULT_LEVEL
     default 1 # error

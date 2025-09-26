@@ -20,6 +20,8 @@ import sys
 import threading
 from typing import BinaryIO, Callable, Optional, Union
 
+LOGGER = logging.getLogger(__name__)
+
 
 def forward_f(f_in: BinaryIO,
               f_out: BinaryIO,
@@ -86,7 +88,7 @@ class Subprocess(threading.Thread):
 
         command = [self.program] + list(self.args)
 
-        logging.info("RUN: %s", shlex.join(command))
+        LOGGER.info("RUN: %s", shlex.join(command))
         self.p = subprocess.Popen(command,
                                   stdin=subprocess.PIPE,
                                   stdout=subprocess.PIPE,

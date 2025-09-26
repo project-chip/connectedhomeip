@@ -178,7 +178,7 @@ def _IssueNOCChainCallbackPythonCallback(devCtrl, status: PyChipError, noc: c_vo
             ipkBytes = string_at(ipk, ipkLen)[:]
         nocChain = NOCChain(nocBytes, icacBytes, rcacBytes, ipkBytes, adminSubject)
     else:
-        logging.error(f"Failure to generate NOC Chain: {status}. All NOCChain field will be None and commissioning will fail!")
+        LOGGER.error(f"Failure to generate NOC Chain: {status}. All NOCChain field will be None and commissioning will fail!")
     devCtrl.NOCChainCallback(nocChain)
 
 
@@ -350,8 +350,8 @@ class DeviceProxyWrapper():
         if that happens.
     '''
     class DeviceProxyType(enum.Enum):
-        OPERATIONAL = enum.auto(),
-        COMMISSIONEE = enum.auto(),
+        OPERATIONAL = enum.auto()
+        COMMISSIONEE = enum.auto()
 
     def __init__(self, deviceProxy: ctypes.c_void_p, proxyType, dmLib=None):
         self._deviceProxy = deviceProxy
@@ -2074,6 +2074,8 @@ class ChipDeviceControllerBase():
         eventPaths = [self._parseEventPathTuple(
             v) for v in events] if events else None
 
+        allowLargePayload = payloadCapability in (TransportPayloadCapability.LARGE_PAYLOAD,
+                                                  TransportPayloadCapability.MRP_OR_TCP_PAYLOAD)
         transaction = ClusterAttribute.AsyncReadTransaction(future, eventLoop, self, returnClusterObject)
         ClusterAttribute.Read(transaction, device=device.deviceProxy,
                               attributes=attributePaths, dataVersionFilters=clusterDataVersionFilters, events=eventPaths,
@@ -2081,7 +2083,7 @@ class ChipDeviceControllerBase():
                               subscriptionParameters=ClusterAttribute.SubscriptionParameters(
                                   reportInterval[0], reportInterval[1]) if reportInterval else None,
                               fabricFiltered=fabricFiltered,
-                              keepSubscriptions=keepSubscriptions, autoResubscribe=autoResubscribe).raise_on_error()
+                              keepSubscriptions=keepSubscriptions, autoResubscribe=autoResubscribe, allowLargePayload=allowLargePayload).raise_on_error()
         await future
 
         if result := transaction.GetSubscriptionHandler():

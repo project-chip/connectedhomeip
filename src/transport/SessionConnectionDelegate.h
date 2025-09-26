@@ -21,6 +21,11 @@
 
 namespace chip {
 
+namespace Transport {
+class ActiveTCPConnectionHolder;
+struct ActiveTCPConnectionState;
+} // namespace Transport
+
 /**
  * @brief
  *   This class defines a delegate that will be called by the SessionManager on
@@ -35,12 +40,23 @@ public:
 
     /**
      * @brief
-     *   Called when the underlying connection for the session is closed.
+     *   Called when the underlying TCP connection for the session is closed.
      *
+     * @param conn          The TCP connection state
      * @param session       The handle to the secure session
      * @param conErr        The connection error code
      */
-    virtual void OnTCPConnectionClosed(const SessionHandle & session, CHIP_ERROR conErr) = 0;
+    virtual void OnTCPConnectionClosed(const Transport::ActiveTCPConnectionState & conn, const SessionHandle & session,
+                                       CHIP_ERROR conErr) = 0;
+
+    /**
+     * @brief
+     *   Called when the underlying TCP connection attempt for the session is complete. Returns true if handled.
+     *
+     * @param conn          The TCP connection state
+     * @param conErr        The connection error code if the connection was unsuccessful
+     */
+    virtual bool OnTCPConnectionAttemptComplete(Transport::ActiveTCPConnectionHolder & conn, CHIP_ERROR conErr) = 0;
 };
 
 } // namespace chip

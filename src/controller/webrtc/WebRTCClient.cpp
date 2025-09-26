@@ -30,10 +30,39 @@ constexpr int kVideoBitRate         = 3000;
 constexpr const char * kStreamDestIp    = "127.0.0.1";
 constexpr uint16_t kVideoStreamDestPort = 5000;
 
+// Constants for Audio
+constexpr int kAudioBitRate             = 64000;
+constexpr int kOpusPayloadType          = 111;
+constexpr uint16_t kAudioStreamDestPort = 5001;
+
+const char * GetPeerConnectionStateStr(rtc::PeerConnection::State state)
+{
+    switch (state)
+    {
+    case rtc::PeerConnection::State::New:
+        return "New";
+
+    case rtc::PeerConnection::State::Connecting:
+        return "Connecting";
+
+    case rtc::PeerConnection::State::Connected:
+        return "Connected";
+
+    case rtc::PeerConnection::State::Disconnected:
+        return "Disconnected";
+
+    case rtc::PeerConnection::State::Failed:
+        return "Failed";
+
+    case rtc::PeerConnection::State::Closed:
+        return "Closed";
+    }
+    return "Invalid";
+};
+
 WebRTCClient::WebRTCClient()
 {
-    mPeerConnection          = nullptr;
-    mTransportProviderClient = std::make_unique<WebRTCTransportProviderClient>();
+    mPeerConnection = nullptr;
 }
 
 WebRTCClient::~WebRTCClient()
@@ -84,7 +113,7 @@ CHIP_ERROR WebRTCClient::CreatePeerConnection(const std::string & stunUrl)
 
     mPeerConnection->onStateChange([this](rtc::PeerConnection::State state) {
         if (mStateChangeCallback)
-            mStateChangeCallback(static_cast<int>(state));
+            mStateChangeCallback(GetPeerConnectionStateStr(state));
         if (state == rtc::PeerConnection::State::Disconnected || state == rtc::PeerConnection::State::Failed ||
             state == rtc::PeerConnection::State::Closed)
         {
@@ -108,6 +137,13 @@ CHIP_ERROR WebRTCClient::CreatePeerConnection(const std::string & stunUrl)
         return CHIP_ERROR_POSIX(errno);
     }
 
+    mAudioRTPSocket = socket(AF_INET, SOCK_DGRAM, 0);
+    if (mAudioRTPSocket == -1)
+    {
+        ChipLogError(Camera, "Failed to create RTP Audio socket: %s", strerror(errno));
+        return CHIP_ERROR_POSIX(errno);
+    }
+
     sockaddr_in addr     = {};
     addr.sin_family      = AF_INET;
     addr.sin_addr.s_addr = inet_addr(kStreamDestIp);
@@ -126,6 +162,28 @@ CHIP_ERROR WebRTCClient::CreatePeerConnection(const std::string & stunUrl)
         sendto(mRTPSocket, reinterpret_cast<const char *>(message.data()), size_t(message.size()), 0,
                reinterpret_cast<const struct sockaddr *>(&addr), sizeof(addr));
     });
+
+    // For Audio
+    sockaddr_in audioAddr     = {};
+    audioAddr.sin_family      = AF_INET;
+    audioAddr.sin_addr.s_addr = inet_addr(kStreamDestIp);
+    audioAddr.sin_port        = htons(kAudioStreamDestPort);
+
+    rtc::Description::Audio audioMedia("audio", rtc::Description::Direction::RecvOnly);
+    audioMedia.addOpusCodec(kOpusPayloadType);
+    audioMedia.setBitrate(kAudioBitRate);
+    mAudioTrack = mPeerConnection->addTrack(audioMedia);
+
+    auto audioSession = std::make_shared<rtc::RtcpReceivingSession>();
+    mAudioTrack->setMediaHandler(audioSession);
+
+    mAudioTrack->onMessage(
+        [this, audioAddr](rtc::binary message) {
+            // send audio RTP packets to sock so that a client can pick it up to play it.
+            sendto(mAudioRTPSocket, reinterpret_cast<const char *>(message.data()), static_cast<size_t>(message.size()), 0,
+                   reinterpret_cast<const struct sockaddr *>(&audioAddr), sizeof(audioAddr));
+        },
+        nullptr);
 
     return CHIP_NO_ERROR;
 }
@@ -199,6 +257,7 @@ void WebRTCClient::Disconnect()
 
     // Reset track
     mTrack.reset();
+    mAudioTrack.reset();
 
     // Clear local states
     mLocalDescription.clear();
@@ -221,14 +280,14 @@ const char * WebRTCClient::GetLocalSessionDescriptionInternal()
     return mLocalDescription.c_str();
 }
 
-int WebRTCClient::GetPeerConnectionState()
+const char * WebRTCClient::GetPeerConnectionState()
 {
     if (mPeerConnection == nullptr)
     {
-        return -1; // Invalid state
+        return "Invalid";
     }
 
-    return static_cast<int>(mPeerConnection->state());
+    return GetPeerConnectionStateStr(mPeerConnection->state());
 }
 
 void WebRTCClient::OnLocalDescription(std::function<void(const std::string &, const std::string &)> callback)
@@ -246,28 +305,9 @@ void WebRTCClient::OnGatheringComplete(std::function<void()> callback)
     mGatheringCompleteCallback = callback;
 }
 
-void WebRTCClient::OnStateChange(std::function<void(int)> callback)
+void WebRTCClient::OnStateChange(std::function<void(const char *)> callback)
 {
     mStateChangeCallback = callback;
-}
-
-void WebRTCClient::WebRTCProviderClientInit(uint64_t nodeId, uint8_t fabricIndex, uint16_t endpoint)
-{
-    mTransportProviderClient->Init(nodeId, fabricIndex, endpoint);
-}
-
-PyChipError WebRTCClient::SendCommand(void * appContext, uint16_t endpointId, uint32_t clusterId, uint32_t commandId,
-                                      const uint8_t * payload, size_t length)
-{
-    return mTransportProviderClient->SendCommand(appContext, endpointId, clusterId, commandId, payload, length);
-}
-
-void WebRTCClient::WebRTCProviderClientInitCallbacks(OnCommandSenderResponseCallback onCommandSenderResponseCallback,
-                                                     OnCommandSenderErrorCallback onCommandSenderErrorCallback,
-                                                     OnCommandSenderDoneCallback onCommandSenderDoneCallback)
-{
-    mTransportProviderClient->InitCallbacks(onCommandSenderResponseCallback, onCommandSenderErrorCallback,
-                                            onCommandSenderDoneCallback);
 }
 
 } // namespace webrtc

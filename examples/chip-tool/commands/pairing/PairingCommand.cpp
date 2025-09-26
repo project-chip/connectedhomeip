@@ -31,6 +31,7 @@
 #include "../dcl/DCLClient.h"
 #include "../dcl/DisplayTermsAndConditions.h"
 
+#include <iostream>
 #include <string>
 
 using namespace ::chip;
@@ -535,6 +536,115 @@ void PairingCommand::OnICDStayActiveComplete(ScopedNodeId deviceId, uint32_t pro
 {
     ChipLogProgress(chipTool, "ICD Stay Active Complete for device " ChipLogFormatX64 " / promisedActiveDuration: %u",
                     ChipLogValueX64(deviceId.GetNodeId()), promisedActiveDuration);
+}
+
+void PairingCommand::OnCommissioningStageStart(PeerId peerId, CommissioningStage stageStarting)
+{
+    ChipLogDetail(chipTool, "Starting commissioning stage '%s'", StageToString(stageStarting));
+}
+
+CHIP_ERROR PairingCommand::WiFiCredentialsNeeded(EndpointId endpoint)
+{
+    if (mNetworkType != PairingNetworkType::None)
+    {
+        // We only support prompting for credentials when no credentials were
+        // provided up front, for now.
+        return CHIP_ERROR_NOT_IMPLEMENTED;
+    }
+
+    // We block while prompting for the information, and that does not seem to
+    // work well if we do it synchronously: we seem to lose the BLE connection
+    // to the commissionee.  So do all the rest of the work async.  The
+    // outermost ScheduleLambda is only there to avoid the prompt interleaving
+    // with logging that happens on the Matter thread after this function
+    // returns.
+    DeviceLayer::SystemLayer().ScheduleLambda([this] {
+        mPrompterThread.emplace([this] {
+            do
+            {
+                std::cout << "Enter the Wi-Fi SSID: ";
+                std::getline(std::cin, mPromptedSSID);
+                if (OctetStringFromCharString(mPromptedSSID.data(), &mSSID))
+                {
+                    break;
+                }
+                ChipLogError(chipTool, "Invalid value for SSID");
+            } while (true);
+
+            do
+            {
+                std::cout << "Enter the Wi-Fi password (empty for an open network): ";
+                std::getline(std::cin, mPromptedPassword);
+                if (OctetStringFromCharString(mPromptedPassword.data(), &mPassword))
+                {
+                    break;
+                }
+                ChipLogError(chipTool, "Invalid value for password");
+            } while (true);
+
+            DeviceLayer::SystemLayer().ScheduleLambda([this] {
+                // Ensure that the background thread (and its writes to our members) is done.
+                mPrompterThread->join();
+                mPrompterThread.reset();
+
+                auto & commissioner            = CurrentCommissioner();
+                CommissioningParameters params = commissioner.GetCommissioningParameters();
+                auto credentials               = Controller::WiFiCredentials(mSSID, mPassword);
+                params.SetWiFiCredentials(credentials);
+                commissioner.UpdateCommissioningParameters(params);
+
+                commissioner.NetworkCredentialsReady();
+            });
+        });
+    });
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR PairingCommand::ThreadCredentialsNeeded(EndpointId endpoint)
+{
+    if (mNetworkType != PairingNetworkType::None)
+    {
+        // We only support prompting for credentials when no credentials were
+        // provided up front, for now.
+        return CHIP_ERROR_NOT_IMPLEMENTED;
+    }
+
+    // We block while prompting for the information, and that does not seem to
+    // work well if we do it synchronously: we seem to lose the BLE connection
+    // to the commissionee.  So do all the rest of the work async.  The
+    // outermost ScheduleLambda is only there to avoid the prompt interleaving
+    // with logging that happens on the Matter thread after this function
+    // returns.
+    DeviceLayer::SystemLayer().ScheduleLambda([this] {
+        mPrompterThread.emplace([this] {
+            do
+            {
+                std::cout << "Enter the operational dataset (probably as a hex string prefixed with \"hex:\"): ";
+                std::getline(std::cin, mPromptedOperationalDataset);
+                if (OctetStringFromCharString(mPromptedOperationalDataset.data(), &mOperationalDataset))
+                {
+                    break;
+                }
+                ChipLogError(chipTool, "Invalid value for operational dataset");
+            } while (true);
+
+            DeviceLayer::SystemLayer().ScheduleLambda([this] {
+                // Ensure that the background thread (and its writes to our members) is done.
+                mPrompterThread->join();
+                mPrompterThread.reset();
+
+                auto & commissioner            = CurrentCommissioner();
+                CommissioningParameters params = commissioner.GetCommissioningParameters();
+                params.SetThreadOperationalDataset(mOperationalDataset);
+                commissioner.UpdateCommissioningParameters(params);
+
+                commissioner.NetworkCredentialsReady();
+            });
+        });
+    });
+
+    return CHIP_NO_ERROR;
 }
 
 void PairingCommand::OnDiscoveredDevice(const Dnssd::CommissionNodeData & nodeData)
