@@ -16,9 +16,14 @@
  */
 
 #include <app/clusters/descriptor/descriptor-cluster.h>
+
+#if !CHIP_CONFIG_SKIP_APP_SPECIFIC_GENERATED_HEADER_INCLUDES
 #include <app/static-cluster-config/Descriptor.h>
+#endif // CHIP_CONFIG_SKIP_APP_SPECIFIC_GENERATED_HEADER_INCLUDES
+
 #include <app/util/config.h>
 #include <data-model-providers/codegen/ClusterIntegration.h>
+#include <lib/core/CHIPConfig.h>
 
 using namespace chip;
 using namespace chip::app;
@@ -27,7 +32,11 @@ using namespace chip::app::Clusters::Descriptor;
 
 namespace {
 
+#if CHIP_CONFIG_SKIP_APP_SPECIFIC_GENERATED_HEADER_INCLUDES
+static constexpr size_t kDescriptorFixedClusterCount = 0;
+#else
 static constexpr size_t kDescriptorFixedClusterCount = Descriptor::StaticApplicationConfig::kFixedClusterConfig.size();
+#endif
 static constexpr size_t kDescriptorMaxClusterCount   = kDescriptorFixedClusterCount + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT;
 
 LazyRegisteredServerCluster<DescriptorCluster> gServers[kDescriptorMaxClusterCount];
