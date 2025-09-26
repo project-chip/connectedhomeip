@@ -243,6 +243,16 @@ CHIP_ERROR CodeDrivenDataModelProvider::EventInfo(const ConcreteEventPath & path
     return serverCluster->EventInfo(path, eventInfo);
 }
 
+#if CHIP_CONFIG_USE_ENDPOINT_UNIQUE_ID
+CHIP_ERROR CodeDrivenDataModelProvider::EndpointUniqueID(EndpointId endpointId, MutableCharSpan & EndpointUniqueId) override
+{
+    EndpointInterface * endpoint = GetEndpointInterface(endpointId);
+    VerifyOrReturnError(endpoint != nullptr, CHIP_IM_GLOBAL_STATUS(UnsupportedEndpoint));
+    CharSpan uniqueId = endpoint->EndpointUniqueID();
+    return CopyCharSpanToMutableCharSpan(uniqueId, EndpointUniqueId);
+}
+#endif
+
 void CodeDrivenDataModelProvider::Temporary_ReportAttributeChanged(const AttributePathParams & path)
 {
     if (!mInteractionModelContext)
