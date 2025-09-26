@@ -131,7 +131,8 @@ class TC_DD_1_16_17(MatterBaseTest):
                 TestStep(2, "If the VID_PID_PRESENT field is set to 0, this device uses standard flow. Verify that the DUT is advertising as Commissionable",
                          "Device is advertising as commissionable"),
                 TestStep(3, "If the device uses custom flow or user-intent commissioning, ask the tester to place the device into commissionable mode"),
-                TestStep(4, "If the device uses custom flow or user-intent commissioning, verify that the DUT is advertising as commisionable"),
+                TestStep(4, "If the device uses custom flow or user-intent commissioning, verify that the DUT is advertising as commisionable",
+                         "Device is advertising as commissionable"),
                 ]
 
     async def ensure_advertising(self, filter_type: matter.discovery.FilterType, filter: int):
