@@ -74,7 +74,8 @@ class SoftwareUpdateBaseTest(MatterBaseTest):
             passcode=2321,
             ota_source=ota_image_path,
             extra_args=extra_args,
-            log_file=provider_log)
+            log_file=provider_log,
+            err_log_file=provider_log)
         proc.start(
             expected_output="Server initialization complete",
             timeout=10)

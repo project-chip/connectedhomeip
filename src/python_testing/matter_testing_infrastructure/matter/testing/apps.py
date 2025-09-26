@@ -177,10 +177,7 @@ class OTAProviderSubprocess(AppServerSubprocess):
             self.log_file = log_file
 
         if isinstance(err_log_file, str):
-            if err_log_file == "":
-                f_stderr = f_stdout
-            else:
-                f_stderr = open(err_log_file, 'a+b')
+            f_stderr = open(err_log_file, 'a+b')
             self.err_log_file = err_log_file
 
         # Build OTA-specific arguments using the ota_source property
