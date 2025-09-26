@@ -105,6 +105,13 @@
             "cwd": "${workspaceFolder}/src/credentials/tests/jcm/out/test/tests"
         },
         {
+            "name": "Run TestCommissioningWindowManager",
+            "type": "lldb",
+            "request": "launch",
+            "program": "${workspaceFolder}/src/app/tests/out/test/tests/TestCommissioningWindowManager",
+            "cwd": "${workspaceFolder}/src/app/tests/out/test/tests"
+        },
+        {
             "name": "Run TestCommands",
             "type": "lldb",
             "request": "launch",
