@@ -27,6 +27,7 @@
 #include <lib/support/ThreadOperationalDataset.h>
 
 #include <optional>
+#include <thread>
 
 enum class PairingMode
 {
@@ -115,7 +116,9 @@ public:
         case PairingMode::CodePaseOnly:
             AddArgument("payload", &mOnboardingPayload);
             AddArgument("discover-once", 0, 1, &mDiscoverOnce);
-            AddArgument("use-only-onnetwork-discovery", 0, 1, &mUseOnlyOnNetworkDiscovery);
+            AddArgument("use-only-onnetwork-discovery", 0, 1, &mUseOnlyOnNetworkDiscovery,
+                        "Whether to only use DNS-SD for discovery. The default is true if no network credentials are provided, "
+                        "false otherwise.");
             break;
         case PairingMode::Ble:
             AddArgument("skip-commissioning-complete", 0, 1, &mSkipCommissioningComplete);
@@ -243,6 +246,9 @@ public:
     void OnCommissioningComplete(NodeId deviceId, CHIP_ERROR error) override;
     void OnICDRegistrationComplete(chip::ScopedNodeId deviceId, uint32_t icdCounter) override;
     void OnICDStayActiveComplete(chip::ScopedNodeId deviceId, uint32_t promisedActiveDuration) override;
+    void OnCommissioningStageStart(chip::PeerId peerId, chip::Controller::CommissioningStage stageStarting) override;
+    CHIP_ERROR WiFiCredentialsNeeded(chip::EndpointId endpoint) override;
+    CHIP_ERROR ThreadCredentialsNeeded(chip::EndpointId endpoint) override;
 
     /////////// DeviceDiscoveryDelegate Interface /////////
     void OnDiscoveredDevice(const chip::Dnssd::CommissionNodeData & nodeData) override;
@@ -324,4 +330,10 @@ private:
 
     static void OnCurrentFabricRemove(void * context, NodeId remoteNodeId, CHIP_ERROR status);
     void PersistIcdInfo();
+
+    std::optional<std::thread> mPrompterThread;
+
+    std::string mPromptedSSID;
+    std::string mPromptedPassword;
+    std::string mPromptedOperationalDataset;
 };

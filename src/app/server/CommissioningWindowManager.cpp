@@ -399,6 +399,11 @@ CHIP_ERROR CommissioningWindowManager::OpenJointCommissioningWindow(Seconds32 co
     mJCM = true;
     return OpenEnhancedCommissioningWindow(commissioningTimeout, discriminator, verifier, iterations, salt, fabricIndex, vendorId);
 }
+
+bool CommissioningWindowManager::IsJCM() const
+{
+    return mJCM;
+}
 #endif // CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
 
 void CommissioningWindowManager::CloseCommissioningWindow()

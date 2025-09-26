@@ -541,6 +541,7 @@ PushAvStreamTransportServerLogic::HandleAllocatePushTransport(CommandHandler & h
     Commands::AllocatePushTransportResponse::Type response;
     auto & transportOptions = commandData.transportOptions;
 
+    // Handle constraint checks against the provided command fields
     Status transportOptionsValidityStatus = ValidateIncomingTransportOptions(transportOptions);
 
     VerifyOrDo(transportOptionsValidityStatus == Status::Success, {
@@ -549,6 +550,7 @@ PushAvStreamTransportServerLogic::HandleAllocatePushTransport(CommandHandler & h
         return std::nullopt;
     });
 
+    // Validate the TLS Endpoint
     TlsClientManagementDelegate::EndpointStructType TLSEndpoint;
     if (mTLSClientManagementDelegate != nullptr)
     {
@@ -562,6 +564,25 @@ PushAvStreamTransportServerLogic::HandleAllocatePushTransport(CommandHandler & h
             handler.AddClusterSpecificFailure(commandPath, status);
             return std::nullopt;
         });
+        // Use heap allocation for large certificate buffers to reduce stack usage
+        auto rootCertBuffer   = std::make_unique<PersistentStore<CHIP_CONFIG_TLS_PERSISTED_ROOT_CERT_BYTES>>();
+        auto clientCertBuffer = std::make_unique<PersistentStore<CHIP_CONFIG_TLS_PERSISTED_CLIENT_CERT_BYTES>>();
+
+        Tls::CertificateTable::BufferedClientCert clientCertEntry(*clientCertBuffer);
+        Tls::CertificateTable::BufferedRootCert rootCertEntry(*rootCertBuffer);
+
+        if (mTlsCertificateManagementDelegate != nullptr)
+        {
+            auto & table = mTlsCertificateManagementDelegate->GetCertificateTable();
+            table.GetClientCertificateEntry(handler.GetAccessingFabricIndex(), TLSEndpoint.ccdid.Value(), clientCertEntry);
+            table.GetRootCertificateEntry(handler.GetAccessingFabricIndex(), TLSEndpoint.caid, rootCertEntry);
+            mDelegate->SetTLSCerts(clientCertEntry, rootCertEntry);
+        }
+        else
+        {
+            // For tests, create empty cert entries
+            mDelegate->SetTLSCerts(clientCertEntry, rootCertEntry);
+        }
     }
     else
     {
@@ -571,6 +592,8 @@ PushAvStreamTransportServerLogic::HandleAllocatePushTransport(CommandHandler & h
         return std::nullopt;
     }
 
+    // IngestMethod has alread been validated against the constraints above, this is handling the subsequent required spec logic
+    // to cross-reference use against the ContainerType
     IngestMethodsEnum ingestMethod = commandData.transportOptions.ingestMethod;
 
     bool isFormatSupported = false;
@@ -581,6 +604,7 @@ PushAvStreamTransportServerLogic::HandleAllocatePushTransport(CommandHandler & h
             (supportsFormat.containerFormat == commandData.transportOptions.containerOptions.containerType))
         {
             isFormatSupported = true;
+            break;
         }
     }
 
@@ -606,15 +630,6 @@ PushAvStreamTransportServerLogic::HandleAllocatePushTransport(CommandHandler & h
         return std::nullopt;
     }
 
-    /*Spec issue for invalid Trigger Type: https://github.com/CHIP-Specifications/connectedhomeip-spec/issues/11701*/
-    if (transportOptions.triggerOptions.triggerType == TransportTriggerTypeEnum::kUnknownEnumValue)
-    {
-        auto status = to_underlying(StatusCodeEnum::kInvalidTriggerType);
-        ChipLogError(Zcl, "HandleAllocatePushTransport[ep=%d]: Invalid Trigger type", mEndpointId);
-        handler.AddClusterSpecificFailure(commandPath, status);
-        return std::nullopt;
-    }
-
     bool isValidStreamUsage = mDelegate->ValidateStreamUsage(transportOptions.streamUsage);
     if (isValidStreamUsage == false)
     {
@@ -625,7 +640,42 @@ PushAvStreamTransportServerLogic::HandleAllocatePushTransport(CommandHandler & h
         return std::nullopt;
     }
 
-    // Todo:Validate MotionZones
+    // Validate the motion zones in the trigger options
+    if ((transportOptions.triggerOptions.triggerType == TransportTriggerTypeEnum::kMotion) &&
+        (transportOptions.triggerOptions.motionZones.HasValue()) && (!transportOptions.triggerOptions.motionZones.Value().IsNull()))
+    {
+
+        auto & motionZonesList = transportOptions.triggerOptions.motionZones;
+        auto iter              = motionZonesList.Value().Value().begin();
+        size_t zoneListSize    = 0;
+        motionZonesList.Value().Value().ComputeSize(&zoneListSize);
+
+        // To Do: de-duplicate the entries, per issue https://github.com/project-chip/connectedhomeip/issues/41051
+
+        bool isValidZoneSize = mDelegate->ValidateMotionZoneListSize(zoneListSize);
+        VerifyOrReturnValue(
+            isValidZoneSize, Status::DynamicConstraintError,
+            ChipLogError(Zcl, "Transport Options verification from command data[ep=%d]: Invalid Motion Zone Size ", mEndpointId));
+
+        while (iter.Next())
+        {
+            auto & transportZoneOption = iter.GetValue();
+
+            // The Zone can be Null, meaning this trigger applies to all zones, if not null, verify with the delegate that the
+            // ZoneID (in the ZoneManagement cluster instance) is valid
+            if (!transportZoneOption.zone.IsNull())
+            {
+                Status zoneIdStatus = mDelegate->ValidateZoneId(transportZoneOption.zone.Value());
+                if (zoneIdStatus != Status::Success)
+                {
+                    auto status = to_underlying(StatusCodeEnum::kInvalidZone);
+                    ChipLogError(Zcl, "HandleAllocatePushTransport[ep=%d]: Invalid ZoneId", mEndpointId);
+                    handler.AddClusterSpecificFailure(commandPath, status);
+                    return std::nullopt;
+                }
+            }
+        }
+    }
 
     // Validate Bandwidth Requirement
     Status status = mDelegate->ValidateBandwidthLimit(transportOptions.streamUsage, transportOptions.videoStreamID,
@@ -670,7 +720,9 @@ PushAvStreamTransportServerLogic::HandleAllocatePushTransport(CommandHandler & h
 
             if (!delegateStatus.IsSuccess())
             {
-                handler.AddStatus(commandPath, delegateStatus);
+                auto cluster_status = to_underlying(StatusCodeEnum::kInvalidStream);
+                ChipLogError(Zcl, "HandleAllocatePushTransport[ep=%d]: Invalid Video Stream ", mEndpointId);
+                handler.AddClusterSpecificFailure(commandPath, cluster_status);
                 return std::nullopt;
             }
         }
@@ -700,7 +752,9 @@ PushAvStreamTransportServerLogic::HandleAllocatePushTransport(CommandHandler & h
 
             if (!delegateStatus.IsSuccess())
             {
-                handler.AddStatus(commandPath, delegateStatus);
+                auto cluster_status = to_underlying(StatusCodeEnum::kInvalidStream);
+                ChipLogError(Zcl, "HandleAllocatePushTransport[ep=%d]: Invalid Audio Stream ", mEndpointId);
+                handler.AddClusterSpecificFailure(commandPath, cluster_status);
                 return std::nullopt;
             }
         }
@@ -1127,6 +1181,42 @@ Status PushAvStreamTransportServerLogic::GeneratePushTransportEndEvent(const uin
         return Status::Failure;
     }
     return Status::Success;
+}
+
+Status PushAvStreamTransportServerLogic::NotifyTransportStarted(uint16_t connectionID, TransportTriggerTypeEnum triggerType,
+                                                                Optional<TriggerActivationReasonEnum> activationReason)
+{
+    ChipLogProgress(Zcl, "NotifyTransportStarted called for connectionID %u with triggerType %u", connectionID,
+                    to_underlying(triggerType));
+
+    // Validate that the connection exists
+    TransportConfigurationStorage * transportConfig = FindStreamTransportConnection(connectionID);
+    if (transportConfig == nullptr)
+    {
+        ChipLogError(Zcl, "NotifyTransportStarted: ConnectionID %u not found", connectionID);
+        return Status::NotFound;
+    }
+
+    // Generate the PushTransportBegin event
+    return GeneratePushTransportBeginEvent(connectionID, triggerType, activationReason);
+}
+
+Status PushAvStreamTransportServerLogic::NotifyTransportStopped(uint16_t connectionID, TransportTriggerTypeEnum triggerType,
+                                                                Optional<TriggerActivationReasonEnum> activationReason)
+{
+    ChipLogProgress(Zcl, "NotifyTransportStopped called for connectionID %u with triggerType %u", connectionID,
+                    to_underlying(triggerType));
+
+    // Validate that the connection exists
+    TransportConfigurationStorage * transportConfig = FindStreamTransportConnection(connectionID);
+    if (transportConfig == nullptr)
+    {
+        ChipLogError(Zcl, "NotifyTransportStopped: ConnectionID %u not found", connectionID);
+        return Status::NotFound;
+    }
+
+    // Generate the PushTransportEnd event
+    return GeneratePushTransportEndEvent(connectionID, triggerType, activationReason);
 }
 
 } // namespace Clusters

@@ -114,6 +114,7 @@ jobs:
                     - "-nxp"
                     - "-nxp-zephyr"
                     - "-nrf-platform"
+                    - "-realtek-zephyr"
                     - "-telink"
                     - "-telink-zephyr_3_3"
                     - "-ti"

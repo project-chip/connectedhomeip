@@ -136,51 +136,97 @@ void ClosureManager::Init()
 CHIP_ERROR ClosureManager::SetClosureControlInitialState(ClosureControlEndpoint & closureControlEndpoint)
 {
     ChipLogProgress(AppServer, "ClosureControlEndpoint SetInitialState");
-    ReturnErrorOnFailure(closureControlEndpoint.GetLogic().SetCountdownTimeFromDelegate(NullNullable));
+    ClosureControl::ClusterConformance conformance = closureControlEndpoint.GetLogic().GetConformance();
+    Optional<DataModel::Nullable<CurrentPositionEnum>> currentPosition =
+        conformance.HasFeature(ClosureControl::Feature::kPositioning)
+        ? MakeOptional(DataModel::MakeNullable(CurrentPositionEnum::kFullyClosed))
+        : NullOptional;
+    Optional<DataModel::Nullable<bool>> currentLatch = conformance.HasFeature(ClosureControl::Feature::kMotionLatching)
+        ? MakeOptional(DataModel::MakeNullable(true))
+        : NullOptional;
+    Optional<Globals::ThreeLevelAutoEnum> speed =
+        conformance.HasFeature(ClosureControl::Feature::kSpeed) ? MakeOptional(Globals::ThreeLevelAutoEnum::kAuto) : NullOptional;
+    DataModel::Nullable<GenericOverallCurrentState> overallState(
+        GenericOverallCurrentState(currentPosition, currentLatch, speed, DataModel::MakeNullable(true)));
+    ReturnErrorOnFailure(closureControlEndpoint.GetLogic().SetOverallCurrentState(overallState));
+
+    Optional<DataModel::Nullable<TargetPositionEnum>> targetPosition =
+        conformance.HasFeature(ClosureControl::Feature::kPositioning) ? MakeOptional(DataModel::NullNullable) : NullOptional;
+    Optional<DataModel::Nullable<bool>> targetLatch =
+        conformance.HasFeature(ClosureControl::Feature::kMotionLatching) ? MakeOptional(DataModel::NullNullable) : NullOptional;
+    DataModel::Nullable<GenericOverallTargetState> overallTarget(GenericOverallTargetState(targetPosition, targetLatch, speed));
+    ReturnErrorOnFailure(closureControlEndpoint.GetLogic().SetOverallTargetState(overallTarget));
+
+    if (conformance.HasFeature(ClosureControl::Feature::kPositioning) &&
+        !conformance.HasFeature(ClosureControl::Feature::kInstantaneous))
+    {
+        ReturnErrorOnFailure(closureControlEndpoint.GetLogic().SetCountdownTimeFromDelegate(NullNullable));
+    }
     ReturnErrorOnFailure(closureControlEndpoint.GetLogic().SetMainState(MainStateEnum::kStopped));
 
-    DataModel::Nullable<GenericOverallCurrentState> overallState(GenericOverallCurrentState(
-        MakeOptional(DataModel::MakeNullable(CurrentPositionEnum::kFullyClosed)), MakeOptional(DataModel::MakeNullable(true)),
-        MakeOptional(Globals::ThreeLevelAutoEnum::kAuto), DataModel::MakeNullable(true)));
-    ReturnErrorOnFailure(closureControlEndpoint.GetLogic().SetOverallCurrentState(overallState));
-    DataModel::Nullable<GenericOverallTargetState> overallTarget(
-        GenericOverallTargetState(MakeOptional(DataModel::NullNullable), MakeOptional(DataModel::NullNullable),
-                                  MakeOptional(Globals::ThreeLevelAutoEnum::kAuto)));
-    ReturnErrorOnFailure(closureControlEndpoint.GetLogic().SetOverallTargetState(overallTarget));
-    BitFlags<ClosureControl::LatchControlModesBitmap> latchControlModes;
-    latchControlModes.Set(ClosureControl::LatchControlModesBitmap::kRemoteLatching)
-        .Set(ClosureControl::LatchControlModesBitmap::kRemoteUnlatching);
-    ReturnErrorOnFailure(closureControlEndpoint.GetLogic().SetLatchControlModes(latchControlModes));
+    if (conformance.HasFeature(ClosureControl::Feature::kMotionLatching))
+    {
+        BitFlags<ClosureControl::LatchControlModesBitmap> latchControlModes;
+        latchControlModes.Set(ClosureControl::LatchControlModesBitmap::kRemoteLatching)
+            .Set(ClosureControl::LatchControlModesBitmap::kRemoteUnlatching);
+        ReturnErrorOnFailure(closureControlEndpoint.GetLogic().SetLatchControlModes(latchControlModes));
+    }
+
     return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR ClosureManager::SetClosurePanelInitialState(ClosureDimensionEndpoint & closurePanelEndpoint)
 {
     ChipLogProgress(AppServer, "ClosurePanelEndpoint SetInitialState");
+    ClosureDimension::ClusterConformance conformance = closurePanelEndpoint.GetLogic().GetConformance();
+
+    Optional<DataModel::Nullable<Percent100ths>> currentPosition = conformance.HasFeature(ClosureDimension::Feature::kPositioning)
+        ? MakeOptional(DataModel::MakeNullable<Percent100ths>(10000))
+        : NullOptional;
+    Optional<DataModel::Nullable<bool>> currentLatch = conformance.HasFeature(ClosureDimension::Feature::kMotionLatching)
+        ? MakeOptional(DataModel::MakeNullable(true))
+        : NullOptional;
+    Optional<Globals::ThreeLevelAutoEnum> speed =
+        conformance.HasFeature(ClosureDimension::Feature::kSpeed) ? MakeOptional(Globals::ThreeLevelAutoEnum::kAuto) : NullOptional;
     DataModel::Nullable<GenericDimensionStateStruct> currentState(
-        GenericDimensionStateStruct(MakeOptional(DataModel::MakeNullable<Percent100ths>(10000)),
-                                    MakeOptional(DataModel::MakeNullable(true)), MakeOptional(Globals::ThreeLevelAutoEnum::kAuto)));
+        GenericDimensionStateStruct(currentPosition, currentLatch, speed));
     ReturnErrorOnFailure(closurePanelEndpoint.GetLogic().SetCurrentState(currentState));
 
-    DataModel::Nullable<GenericDimensionStateStruct> targetState(
-        GenericDimensionStateStruct(MakeOptional(DataModel::NullNullable), MakeOptional(DataModel::NullNullable),
-                                    MakeOptional(Globals::ThreeLevelAutoEnum::kAuto)));
+    Optional<DataModel::Nullable<Percent100ths>> targetPosition =
+        conformance.HasFeature(ClosureDimension::Feature::kPositioning) ? MakeOptional(DataModel::NullNullable) : NullOptional;
+    Optional<DataModel::Nullable<bool>> targetLatch =
+        conformance.HasFeature(ClosureDimension::Feature::kMotionLatching) ? MakeOptional(DataModel::NullNullable) : NullOptional;
+    DataModel::Nullable<GenericDimensionStateStruct> targetState(GenericDimensionStateStruct(targetPosition, targetLatch, speed));
     ReturnErrorOnFailure(closurePanelEndpoint.GetLogic().SetTargetState(targetState));
 
-    ReturnErrorOnFailure(closurePanelEndpoint.GetLogic().SetResolution(Percent100ths(100)));
-    ReturnErrorOnFailure(closurePanelEndpoint.GetLogic().SetStepValue(2000));
-    ReturnErrorOnFailure(closurePanelEndpoint.GetLogic().SetUnit(ClosureUnitEnum::kMillimeter));
-    ReturnErrorOnFailure(closurePanelEndpoint.GetLogic().SetUnitRange(
-        ClosureDimension::Structs::UnitRangeStruct::Type{ .min = static_cast<int16_t>(0), .max = static_cast<int16_t>(10000) }));
-    ReturnErrorOnFailure(closurePanelEndpoint.GetLogic().SetOverflow(OverflowEnum::kTopInside));
-
-    ClosureDimension::Structs::RangePercent100thsStruct::Type limitRange{ .min = static_cast<Percent100ths>(0),
-                                                                          .max = static_cast<Percent100ths>(10000) };
-    ReturnErrorOnFailure(closurePanelEndpoint.GetLogic().SetLimitRange(limitRange));
-    BitFlags<ClosureDimension::LatchControlModesBitmap> latchControlModes;
-    latchControlModes.Set(ClosureDimension::LatchControlModesBitmap::kRemoteLatching)
-        .Set(ClosureDimension::LatchControlModesBitmap::kRemoteUnlatching);
-    ReturnErrorOnFailure(closurePanelEndpoint.GetLogic().SetLatchControlModes(latchControlModes));
+    if (conformance.HasFeature(ClosureDimension::Feature::kPositioning))
+    {
+        ReturnErrorOnFailure(closurePanelEndpoint.GetLogic().SetResolution(Percent100ths(100)));
+        ReturnErrorOnFailure(closurePanelEndpoint.GetLogic().SetStepValue(1000));
+    }
+    if (conformance.HasFeature(ClosureDimension::Feature::kUnit))
+    {
+        ReturnErrorOnFailure(closurePanelEndpoint.GetLogic().SetUnit(ClosureUnitEnum::kMillimeter));
+        ReturnErrorOnFailure(closurePanelEndpoint.GetLogic().SetUnitRange(ClosureDimension::Structs::UnitRangeStruct::Type{
+            .min = static_cast<int16_t>(0), .max = static_cast<int16_t>(10000) }));
+    }
+    if (conformance.HasFeature(ClosureDimension::Feature::kRotation))
+    {
+        ReturnErrorOnFailure(closurePanelEndpoint.GetLogic().SetOverflow(OverflowEnum::kTopInside));
+    }
+    if (conformance.HasFeature(ClosureDimension::Feature::kLimitation))
+    {
+        ClosureDimension::Structs::RangePercent100thsStruct::Type limitRange{ .min = static_cast<Percent100ths>(0),
+                                                                              .max = static_cast<Percent100ths>(10000) };
+        ReturnErrorOnFailure(closurePanelEndpoint.GetLogic().SetLimitRange(limitRange));
+    }
+    if (conformance.HasFeature(ClosureDimension::Feature::kMotionLatching))
+    {
+        BitFlags<ClosureDimension::LatchControlModesBitmap> latchControlModes;
+        latchControlModes.Set(ClosureDimension::LatchControlModesBitmap::kRemoteLatching)
+            .Set(ClosureDimension::LatchControlModesBitmap::kRemoteUnlatching);
+        ReturnErrorOnFailure(closurePanelEndpoint.GetLogic().SetLatchControlModes(latchControlModes));
+    }
 
     return CHIP_NO_ERROR;
 }
@@ -383,6 +429,7 @@ void ClosureManager::HandleClosureActionComplete(Action_t action)
         break;
     }
     case Action_t::MOVE_TO_ACTION:
+        ChipLogDetail(AppServer, "Completing MoveTo action");
         instance.mClosureEndpoint1.OnMoveToActionComplete();
         instance.mClosurePanelEndpoint2.OnMoveToActionComplete();
         instance.mClosurePanelEndpoint3.OnMoveToActionComplete();
@@ -390,7 +437,7 @@ void ClosureManager::HandleClosureActionComplete(Action_t action)
         DeviceLayer::PlatformMgr().LockChipStack();
         instance.isMoveToInProgress = false;
         DeviceLayer::PlatformMgr().UnlockChipStack();
-
+        ChipLogDetail(AppServer, "MoveTo action completed");
         break;
     case Action_t::SET_TARGET_ACTION:
         instance.mClosureEndpoint1.OnPanelMotionActionComplete();
@@ -516,7 +563,8 @@ chip::Protocols::InteractionModel::Status ClosureManager::OnMoveToCommand(const 
         mClosurePanelEndpoint2TargetState.IsNull() ? GenericDimensionStateStruct() : mClosurePanelEndpoint2TargetState.Value();
     GenericDimensionStateStruct mClosurePanelEndpoint3Target =
         mClosurePanelEndpoint3TargetState.IsNull() ? GenericDimensionStateStruct() : mClosurePanelEndpoint3TargetState.Value();
-
+    ClosureDimension::ClusterConformance ep2Conformance = mClosurePanelEndpoint2.GetLogic().GetConformance();
+    ClosureDimension::ClusterConformance ep3Conformance = mClosurePanelEndpoint3.GetLogic().GetConformance();
     if (position.HasValue())
     {
         // Set the Closure panel target position for the panels based on the MoveTo Command position.
@@ -550,21 +598,38 @@ chip::Protocols::InteractionModel::Status ClosureManager::OnMoveToCommand(const 
             ChipLogError(AppServer, "Invalid target position received in OnMoveToCommand");
             return Status::Failure;
         }
-
-        mClosurePanelEndpoint2Target.position.SetValue(DataModel::MakeNullable(mClosurePanelEndpoint2Position));
-        mClosurePanelEndpoint3Target.position.SetValue(DataModel::MakeNullable(mClosurePanelEndpoint3Position));
+        if (ep2Conformance.HasFeature(ClosureDimension::Feature::kPositioning))
+        {
+            mClosurePanelEndpoint2Target.position.SetValue(DataModel::MakeNullable(mClosurePanelEndpoint2Position));
+        }
+        if (ep3Conformance.HasFeature(ClosureDimension::Feature::kPositioning))
+        {
+            mClosurePanelEndpoint3Target.position.SetValue(DataModel::MakeNullable(mClosurePanelEndpoint3Position));
+        }
     }
 
     if (latch.HasValue())
     {
-        mClosurePanelEndpoint2Target.latch.SetValue(DataModel::MakeNullable(latch.Value()));
-        mClosurePanelEndpoint3Target.latch.SetValue(DataModel::MakeNullable(latch.Value()));
+        if (ep2Conformance.HasFeature(ClosureDimension::Feature::kMotionLatching))
+        {
+            mClosurePanelEndpoint2Target.latch.SetValue(DataModel::MakeNullable(latch.Value()));
+        }
+        if (ep3Conformance.HasFeature(ClosureDimension::Feature::kMotionLatching))
+        {
+            mClosurePanelEndpoint3Target.latch.SetValue(DataModel::MakeNullable(latch.Value()));
+        }
     }
 
     if (speed.HasValue())
     {
-        mClosurePanelEndpoint2Target.speed.SetValue(speed.Value());
-        mClosurePanelEndpoint3Target.speed.SetValue(speed.Value());
+        if (ep2Conformance.HasFeature(ClosureDimension::Feature::kSpeed))
+        {
+            mClosurePanelEndpoint2Target.speed.SetValue(speed.Value());
+        }
+        if (ep3Conformance.HasFeature(ClosureDimension::Feature::kSpeed))
+        {
+            mClosurePanelEndpoint3Target.speed.SetValue(speed.Value());
+        }
     }
 
     VerifyOrReturnError(mClosurePanelEndpoint2.GetLogic().SetTargetState(DataModel::MakeNullable(mClosurePanelEndpoint2Target)) ==
@@ -577,11 +642,18 @@ chip::Protocols::InteractionModel::Status ClosureManager::OnMoveToCommand(const 
     VerifyOrReturnError(mClosureEndpoint1.GetLogic().SetCountdownTimeFromDelegate(kDefaultCountdownTimeSeconds) == CHIP_NO_ERROR,
                         Status::Failure, ChipLogError(AppServer, "Failed to set countdown time for move to command on Endpoint 1"));
 
-    // Set the current action to UNLATCH_ACTION.
+    // Set the current action to UNLATCH_ACTION if Latching feature is supported.
     // This is to ensure that the closure is unlatched before starting the motion action.
     // The Closure Control Cluster will handle the unlatch action before proceeding with the motion action.
     DeviceLayer::PlatformMgr().LockChipStack();
-    SetCurrentAction(UNLATCH_ACTION);
+    if (mClosureEndpoint1.GetLogic().GetConformance().HasFeature(ClosureControl::Feature::kMotionLatching))
+    {
+        SetCurrentAction(UNLATCH_ACTION);
+    }
+    else
+    {
+        SetCurrentAction(MOVE_TO_ACTION);
+    }
     isMoveToInProgress = true;
     DeviceLayer::PlatformMgr().UnlockChipStack();
 
@@ -697,34 +769,39 @@ void ClosureManager::HandleClosureMotionAction()
 
     // If both endpoints have reached their target positions, we can consider the closure motion action as complete.
     // Before calling HandleClosureActionComplete, we need to check if a latch action is needed.
-    if (mClosureEndpoint1CurrentState.Value().latch.HasValue() && !mClosureEndpoint1CurrentState.Value().latch.Value().IsNull() &&
-        mClosureEndpoint1TargetState.Value().latch.HasValue() && !mClosureEndpoint1TargetState.Value().latch.Value().IsNull())
+    if (mClosureEndpoint1.GetLogic().GetConformance().HasFeature(ClosureControl::Feature::kMotionLatching))
     {
-        // If currently unlatched (false) and target is latched (true), latch after moving to target position.
-        if (!mClosureEndpoint1CurrentState.Value().latch.Value().Value() &&
-            mClosureEndpoint1TargetState.Value().latch.Value().Value())
+
+        if (mClosureEndpoint1CurrentState.Value().latch.HasValue() &&
+            !mClosureEndpoint1CurrentState.Value().latch.Value().IsNull() &&
+            mClosureEndpoint1TargetState.Value().latch.HasValue() && !mClosureEndpoint1TargetState.Value().latch.Value().IsNull())
         {
-            // In Real application, this would be replaced with actual latch logic.
-            ChipLogProgress(AppServer, "Performing latch action");
-            mClosureEndpoint1CurrentState.Value().latch.SetValue(DataModel::MakeNullable(true));
-            if (mClosureEndpoint1CurrentState.Value().position.HasValue() &&
-                !mClosureEndpoint1CurrentState.Value().position.Value().IsNull())
+            // If currently unlatched (false) and target is latched (true), latch after moving to target position.
+            if (!mClosureEndpoint1CurrentState.Value().latch.Value().Value() &&
+                mClosureEndpoint1TargetState.Value().latch.Value().Value())
             {
-                if (mClosureEndpoint1CurrentState.Value().position.Value().Value() == CurrentPositionEnum::kFullyClosed)
+                // In Real application, this would be replaced with actual latch logic.
+                ChipLogProgress(AppServer, "Performing latch action");
+                mClosureEndpoint1CurrentState.Value().latch.SetValue(DataModel::MakeNullable(true));
+                if (mClosureEndpoint1CurrentState.Value().position.HasValue() &&
+                    !mClosureEndpoint1CurrentState.Value().position.Value().IsNull())
                 {
-                    mClosureEndpoint1CurrentState.Value().secureState.SetNonNull(true);
+                    if (mClosureEndpoint1CurrentState.Value().position.Value().Value() == CurrentPositionEnum::kFullyClosed)
+                    {
+                        mClosureEndpoint1CurrentState.Value().secureState.SetNonNull(true);
+                    }
+                    else
+                    {
+                        mClosureEndpoint1CurrentState.Value().secureState.SetNonNull(false);
+                    }
                 }
-                else
-                {
-                    mClosureEndpoint1CurrentState.Value().secureState.SetNonNull(false);
-                }
+                instance.mClosureEndpoint1.GetLogic().SetOverallCurrentState(mClosureEndpoint1CurrentState);
+                mClosurePanelEndpoint2CurrentState.Value().latch.SetValue(DataModel::MakeNullable(true));
+                instance.mClosurePanelEndpoint2.GetLogic().SetCurrentState(mClosurePanelEndpoint2CurrentState);
+                mClosurePanelEndpoint3CurrentState.Value().latch.SetValue(DataModel::MakeNullable(true));
+                instance.mClosurePanelEndpoint3.GetLogic().SetCurrentState(mClosurePanelEndpoint3CurrentState);
+                ChipLogProgress(AppServer, "latched action complete");
             }
-            instance.mClosureEndpoint1.GetLogic().SetOverallCurrentState(mClosureEndpoint1CurrentState);
-            mClosurePanelEndpoint2CurrentState.Value().latch.SetValue(DataModel::MakeNullable(true));
-            instance.mClosurePanelEndpoint2.GetLogic().SetCurrentState(mClosurePanelEndpoint2CurrentState);
-            mClosurePanelEndpoint3CurrentState.Value().latch.SetValue(DataModel::MakeNullable(true));
-            instance.mClosurePanelEndpoint3.GetLogic().SetCurrentState(mClosurePanelEndpoint3CurrentState);
-            ChipLogProgress(AppServer, "latched action complete");
         }
     }
 
@@ -765,19 +842,21 @@ chip::Protocols::InteractionModel::Status ClosureManager::OnSetTargetCommand(con
     {
         overallTargetState.SetNonNull(GenericOverallTargetState{});
     }
-
-    if (position.HasValue())
+    ClosureDimensionEndpoint mClosurePanelEndpoint =
+        mCurrentActionEndpointId == kClosurePanelEndpoint2 ? mClosurePanelEndpoint2 : mClosurePanelEndpoint3;
+    ClosureDimension::ClusterConformance mClosurePanelConformance = mClosurePanelEndpoint.GetLogic().GetConformance();
+    if (position.HasValue() && mClosurePanelConformance.HasFeature(ClosureDimension::Feature::kPositioning))
     {
         // Set overallTargetState position to NullOptional as panel position change cannot be represented in OverallTarget.
         overallTargetState.Value().position.SetValue(DataModel::NullNullable);
     }
 
-    if (latch.HasValue())
+    if (latch.HasValue() && mClosurePanelConformance.HasFeature(ClosureDimension::Feature::kMotionLatching))
     {
         overallTargetState.Value().latch.SetValue(DataModel::MakeNullable(latch.Value()));
     }
 
-    if (speed.HasValue())
+    if (speed.HasValue() && mClosurePanelConformance.HasFeature(ClosureDimension::Feature::kSpeed))
     {
         overallTargetState.Value().speed.SetValue(speed.Value());
     }
@@ -793,12 +872,19 @@ chip::Protocols::InteractionModel::Status ClosureManager::OnSetTargetCommand(con
         mClosureEndpoint1.GetLogic().SetCountdownTimeFromDelegate(kDefaultCountdownTimeSeconds) == CHIP_NO_ERROR, Status::Failure,
         ChipLogError(AppServer, "Failed to set countdown time while handling the SetTarget command for Endpoint %d", endpointId));
 
-    // Post an event to initiate the unlatch action asynchronously.
+    // Post an event to initiate the unlatch action asynchronously if Latching feature is supported.
     // Closure panel first performs the unlatch action if it is currently latched,
     // and then continues with the SetTarget action.
     // This is to ensure that the panel can set the target position without being latched.
     DeviceLayer::PlatformMgr().LockChipStack();
-    SetCurrentAction(Action_t::PANEL_UNLATCH_ACTION);
+    if (mClosurePanelConformance.HasFeature(ClosureDimension::Feature::kMotionLatching))
+    {
+        SetCurrentAction(Action_t::PANEL_UNLATCH_ACTION);
+    }
+    else
+    {
+        SetCurrentAction(Action_t::SET_TARGET_ACTION);
+    }
     mCurrentActionEndpointId = endpointId;
     isSetTargetInProgress    = true;
     DeviceLayer::PlatformMgr().UnlockChipStack();
@@ -1064,7 +1150,7 @@ chip::Protocols::InteractionModel::Status ClosureManager::OnStepCommand(const St
 
     AppEvent event;
     event.Type                    = AppEvent::kEventType_Closure;
-    event.ClosureEvent.Action     = PANEL_STEP_ACTION;
+    event.ClosureEvent.Action     = mCurrentAction;
     event.ClosureEvent.EndpointId = endpointId;
     event.Handler                 = InitiateAction;
     AppTask::GetAppTask().PostEvent(&event);

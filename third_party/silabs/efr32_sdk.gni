@@ -19,6 +19,7 @@ import("//build_overrides/mbedtls.gni")
 
 import("${chip_root}/src/app/icd/icd.gni")
 import("${chip_root}/src/lib/lib.gni")
+import("${chip_root}/src/platform/silabs/multi-ota/args.gni")
 import("silabs_board.gni")
 
 declare_args() {
@@ -85,16 +86,13 @@ declare_args() {
   # Use SLC generated files
   slc_reuse_files = false
 
-  # Multi-chip OTA
-  chip_enable_multi_ota_requestor = false
-  chip_enable_multi_ota_encryption = false
-  chip_enable_ota_custom_tlv_testing = false
-
   # Factory Provision storage
   use_provision_flash_storage = wifi_soc
 
   # Enable TestEventTrigger in GeneralDiagnostics cluster
   sl_enable_test_event_trigger = false
+
+  sl_verbose_mode = false
 }
 
 examples_plat_dir = "${chip_root}/examples/platform/silabs/efr32"
@@ -373,7 +371,6 @@ template("efr32_sdk") {
         "${wifi_sdk_root}/components/device/silabs/si91x/mcu/core/config",
         "${wifi_sdk_root}/components/device/silabs/si91x/wireless/inc",
         "${wifi_sdk_root}/components/device/silabs/si91x/wireless/ble/inc",
-        "${wifi_sdk_root}/components/device/silabs/si91x/wireless/firmware_upgrade",
 
         # wifi component
         "${wifi_sdk_root}/components/protocol/wifi/inc",
@@ -391,6 +388,7 @@ template("efr32_sdk") {
         "${wifi_sdk_root}/components/service/network_manager/inc",
 
         "${wifi_sdk_root}/components/protocol/wifi/si91x",
+        "${wifi_sdk_root}/components/device/silabs/si91x/wireless/firmware_upgrade",
       ]
     }
 
@@ -507,6 +505,7 @@ template("efr32_sdk") {
       "SL_RAIL_3_API=1",
       "SL_CODE_COMPONENT_OPENTHREAD=openthread",
       "SL_CODE_COMPONENT_INTERRUPT_MANAGER=interrupt_manager",
+      "SL_APP_PROPERTIES",
     ]
 
     if (silabs_log_enabled && chip_logging) {
@@ -568,14 +567,6 @@ template("efr32_sdk") {
         "SL_OPENTHREAD_ENABLE_APP_TASK=0",
         "SL_OPENTHREAD_ENABLE_CLI_TASK=0",
       ]
-    }
-
-    if (chip_enable_multi_ota_encryption && chip_enable_multi_ota_requestor) {
-      defines += [ "SL_MATTER_ENABLE_OTA_ENCRYPTION=1" ]
-    }
-
-    if (chip_enable_ota_custom_tlv_testing && chip_enable_multi_ota_requestor) {
-      defines += [ "OTA_TEST_CUSTOM_TLVS=1" ]
     }
 
     if (defined(invoker.chip_enable_wifi) && invoker.chip_enable_wifi) {
@@ -679,6 +670,10 @@ template("efr32_sdk") {
       ]
     }
 
+    if (sl_verbose_mode) {
+      defines += [ "VERBOSE_MODE=1" ]
+    }
+
     if (sl_use_subscription_syncing) {
       defines += [ "CHIP_CONFIG_SYNCHRONOUS_REPORTS_ENABLED=1" ]
     }
@@ -726,6 +721,7 @@ template("efr32_sdk") {
       "${efr32_sdk_root}/platform/CMSIS/RTOS2/Source/os_systick.c",
       "${efr32_sdk_root}/platform/bootloader/api/btl_interface.c",
       "${efr32_sdk_root}/platform/bootloader/api/btl_interface_storage.c",
+      "${efr32_sdk_root}/platform/bootloader/app_properties/app_properties.c",
       "${efr32_sdk_root}/platform/bootloader/core/flash/btl_internal_flash.c",
       "${efr32_sdk_root}/platform/bootloader/security/sha/crypto_sha.c",
       "${efr32_sdk_root}/platform/common/src/sl_core_cortexm.c",
@@ -884,6 +880,13 @@ template("efr32_sdk") {
       "${silabs_gen_folder}/autogen/sl_iostream_handles.c",
       "${silabs_gen_folder}/main.c",
     ]
+
+    if (chip_enable_multi_ota_requestor) {
+      if (use_SiWx917) {
+        sources += [ "${wifi_sdk_root}/components/device/silabs/si91x/wireless/firmware_upgrade/firmware_upgradation.c" ]
+      }
+    }
+
     if (enable_dic) {
       sources += [
         "${chip_root}/third_party/silabs/mqtt/stack/mqtt.c",
