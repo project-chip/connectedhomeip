@@ -126,7 +126,10 @@ class TC_AVSM_2_13(MatterBaseTest):
         # Commission DUT - already done
 
         self.step(1)
-        logger.info("Verified Video feature is supported")
+        aFeatureMap = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attr.FeatureMap)
+        logger.info(f"Rx'd FeatureMap: {aFeatureMap}")
+        vdoSupport = aFeatureMap & cluster.Bitmaps.Feature.kVideo
+        asserts.assert_equal(vdoSupport, cluster.Bitmaps.Feature.kVideo, "Video Feature is not supported.")
 
         self.step(2)
         aAllocatedVideoStreams = await self.read_single_attribute_check_success(

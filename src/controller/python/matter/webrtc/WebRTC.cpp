@@ -33,6 +33,7 @@ namespace webrtc {
 
 static std::mutex g_mutex;
 static std::map<WebRTCClientHandle, std::shared_ptr<WebRTCClient>> g_clients;
+static std::map<WebRTCClientHandle, std::unique_ptr<WebRTCTransportProviderClient>> g_provider_clients;
 
 WebRTCClientHandle webrtc_client_create()
 {
@@ -136,7 +137,7 @@ const char * webrtc_get_local_description(WebRTCClientHandle handle)
     return "";
 }
 
-int webrtc_get_peer_connection_state(WebRTCClientHandle handle)
+const char * webrtc_get_peer_connection_state(WebRTCClientHandle handle)
 {
     std::lock_guard<std::mutex> lock(g_mutex);
     auto it = g_clients.find(handle);
@@ -144,7 +145,7 @@ int webrtc_get_peer_connection_state(WebRTCClientHandle handle)
     {
         return it->second->GetPeerConnectionState();
     }
-    return -1;
+    return "Invalid";
 }
 
 void webrtc_client_set_gathering_complete_callback(WebRTCClientHandle handle, GatheringCompleteCallback cb)
@@ -167,13 +168,28 @@ void webrtc_client_set_state_change_callback(WebRTCClientHandle handle, OnStateC
     }
 }
 
+WebRTCClientHandle webrtc_provider_client_create()
+{
+    auto client               = std::make_unique<WebRTCTransportProviderClient>();
+    WebRTCClientHandle handle = reinterpret_cast<WebRTCClientHandle>(client.get());
+    std::lock_guard<std::mutex> lock(g_mutex);
+    g_provider_clients[handle] = std::move(client);
+    return handle;
+}
+
+void webrtc_provider_client_destroy(WebRTCClientHandle handle)
+{
+    std::lock_guard<std::mutex> lock(g_mutex);
+    g_provider_clients.erase(handle);
+}
+
 void webrtc_provider_client_init(WebRTCClientHandle handle, uint64_t nodeId, uint8_t fabricIndex, uint16_t endpoint)
 {
     std::lock_guard<std::mutex> lock(g_mutex);
-    auto it = g_clients.find(handle);
-    if (it != g_clients.end())
+    auto it = g_provider_clients.find(handle);
+    if (it != g_provider_clients.end())
     {
-        it->second->WebRTCProviderClientInit(nodeId, fabricIndex, endpoint);
+        it->second->Init(nodeId, fabricIndex, endpoint);
     }
 }
 
@@ -183,11 +199,10 @@ void webrtc_provider_client_init_commandsender_callbacks(WebRTCClientHandle hand
                                                          OnCommandSenderDoneCallback onCommandSenderDoneCallback)
 {
     std::lock_guard<std::mutex> lock(g_mutex);
-    auto it = g_clients.find(handle);
-    if (it != g_clients.end())
+    auto it = g_provider_clients.find(handle);
+    if (it != g_provider_clients.end())
     {
-        it->second->WebRTCProviderClientInitCallbacks(onCommandSenderResponseCallback, onCommandSenderErrorCallback,
-                                                      onCommandSenderDoneCallback);
+        it->second->InitCallbacks(onCommandSenderResponseCallback, onCommandSenderErrorCallback, onCommandSenderDoneCallback);
     }
 }
 
@@ -195,8 +210,8 @@ PyChipError webrtc_provider_client_send_command(WebRTCClientHandle handle, void 
                                                 uint32_t clusterId, uint32_t commandId, const uint8_t * payload, size_t length)
 {
     std::lock_guard<std::mutex> lock(g_mutex);
-    auto it = g_clients.find(handle);
-    if (it != g_clients.end())
+    auto it = g_provider_clients.find(handle);
+    if (it != g_provider_clients.end())
     {
         return it->second->SendCommand(appContext, endpointId, clusterId, commandId, payload, length);
     }

@@ -42,7 +42,7 @@ import enum
 from mobly import asserts
 
 import matter.clusters as Clusters
-from matter.testing.matter_testing import MatterBaseTest, async_test_body, default_matter_test_main, type_matches
+from matter.testing.matter_testing import MatterBaseTest, async_test_body, default_matter_test_main, matchers
 
 
 class RvcStatusEnum(enum.IntEnum):
@@ -174,7 +174,7 @@ class TC_RVCCLEANM_2_2(MatterBaseTest):
 
         self.print_step("7b", "Send ChangeToMode command")
         response = await self.send_clean_change_to_mode_cmd(self.new_clean_mode_th)
-        asserts.assert_true(type_matches(response, Clusters.RvcCleanMode.Commands.ChangeToModeResponse),
+        asserts.assert_true(matchers.is_type(response, Clusters.RvcCleanMode.Commands.ChangeToModeResponse),
                             "The response should ChangeToModeResponse command")
         if directmode_enabled:
             asserts.assert_equal(response.status, RvcStatusEnum.Success,
