@@ -68,7 +68,8 @@ public:
     {
         bool mHasVideo;                                       ///< Video recording enabled flag
         bool mHasAudio;                                       ///< Audio recording enabled flag
-        int mClipId;                                          ///< Current clip identifier
+        uint64_t mSessionNumber;                              ///< Session number for unique clip identification
+        uint8_t mSessionGroup;                                ///< Session group for grouping multiple transports
         uint32_t mMaxClipDuration;                            ///< Maximum clip duration in seconds
         uint16_t mInitialDuration;                            ///< Initial clip duration in seconds
         uint16_t mAugmentationDuration;                       ///< Duration increment on motion detect
@@ -76,8 +77,9 @@ public:
         uint16_t mSegmentDuration;                            ///< Segment duration in milliseconds
         uint16_t mBlindDuration;                              ///< Duration without recording after motion stop
         uint16_t mPreRollLength;                              ///< Pre-roll length in seconds
-        std::string mRecorderId;                              ///< Unique recorder identifier
+        std::string mRecorderId;                              ///< <deperecate> Unique recorder identifier
         std::string mOutputPath;                              ///< Base output directory path
+        std::string mTrackName;                               ///< Track name for segmented files
         AVRational mInputTimeBase;                            ///< Input time base
         std::string mUrl;                                     ///< URL for uploading clips;
         int mTriggerType;                                     ///< Recording trigger type
@@ -161,6 +163,11 @@ public:
     ClipInfoStruct mClipInfo;                         ///< Clip configuration parameters
     void SetRecorderStatus(bool status);              ///< Sets the recorder status
     bool GetRecorderStatus();                         ///< Gets the recorder status
+    void SetFabricIndex(chip::FabricIndex fabricIndex) { mFabricIndex = fabricIndex; }
+    void SetPushAvStreamTransportManager(chip::app::Clusters::PushAvStreamTransport::PushAvStreamTransportManager * manager)
+    {
+        mPushAvStreamTransportManager = manager;
+    }
 
 private:
     long unsigned int kMaxQueueSize = 500; ///< Maximum queue size for media packets
@@ -198,8 +205,10 @@ private:
     PushAVUploader * mUploader;
 
     // Cluster server reference for direct API calls
-    chip::app::Clusters::PushAvStreamTransportServer * mPushAvStreamTransportServer = nullptr;
-    uint16_t mConnectionID                                                          = 0;
+    uint16_t mConnectionID                                                                                   = 0;
+    chip::FabricIndex mFabricIndex                                                                           = 0;
+    chip::app::Clusters::PushAvStreamTransportServer * mPushAvStreamTransportServer                          = nullptr;
+    chip::app::Clusters::PushAvStreamTransport::PushAvStreamTransportManager * mPushAvStreamTransportManager = nullptr;
     chip::app::Clusters::PushAvStreamTransport::TransportTriggerTypeEnum mTriggerType;
     chip ::Optional<chip::app::Clusters::PushAvStreamTransport::TriggerActivationReasonEnum> mReasonType;
 

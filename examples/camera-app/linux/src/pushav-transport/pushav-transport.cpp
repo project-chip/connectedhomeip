@@ -22,8 +22,7 @@ using namespace chip::app::Clusters::PushAvStreamTransport;
 
 PushAVTransport::PushAVTransport(const TransportOptionsStruct & transportOptions, const uint16_t connectionID,
                                  AudioStreamStruct & audioStreamParams, VideoStreamStruct & videoStreamParams) :
-    mAudioStreamParams(audioStreamParams),
-    mVideoStreamParams(videoStreamParams)
+    mAudioStreamParams(audioStreamParams), mVideoStreamParams(videoStreamParams)
 {
     ConfigureRecorderSettings(transportOptions, audioStreamParams, videoStreamParams);
     mConnectionID    = connectionID;
@@ -113,6 +112,8 @@ void PushAVTransport::ConfigureRecorderSettings(const TransportOptionsStruct & t
 
     if (debug)
     {
+        mClipInfo.mSessionGroup         = 1;
+        mClipInfo.mSessionNumber        = 1;
         mClipInfo.mInitialDuration      = 20;
         mClipInfo.mAugmentationDuration = 10;
         mClipInfo.mBlindDuration        = 5;
@@ -121,6 +122,7 @@ void PushAVTransport::ConfigureRecorderSettings(const TransportOptionsStruct & t
         mClipInfo.mSegmentDuration      = 4000;
         mClipInfo.mTriggerType          = 0;
         mClipInfo.mPreRollLength        = 0;
+        mClipInfo.mTrackName            = "test_track";
         mClipInfo.mUrl                  = "https://localhost:1234/streams/1/";
     }
     else
@@ -143,13 +145,14 @@ void PushAVTransport::ConfigureRecorderSettings(const TransportOptionsStruct & t
         }
         if (transportOptions.containerOptions.CMAFContainerOptions.HasValue())
         {
-            mClipInfo.mChunkDuration   = transportOptions.containerOptions.CMAFContainerOptions.Value().chunkDuration;
+            mClipInfo.mSessionGroup  = transportOptions.containerOptions.CMAFContainerOptions.Value().sessionGroup;
+            mClipInfo.mTrackName     = std::string(transportOptions.containerOptions.CMAFContainerOptions.Value().trackName.data());
+            mClipInfo.mChunkDuration = transportOptions.containerOptions.CMAFContainerOptions.Value().chunkDuration;
             mClipInfo.mSegmentDuration = transportOptions.containerOptions.CMAFContainerOptions.Value().segmentDuration;
         }
     }
 
     mTransportTriggerType = transportOptions.triggerOptions.triggerType;
-    mClipInfo.mClipId     = 0;
     mClipInfo.mOutputPath = "/tmp/"; // CAUTION: If path is not accessible to executable, the program may fail to write and crash.
     mClipInfo.mInputTimeBase = { 1, 1000000 };
 
@@ -240,7 +243,6 @@ void PushAVTransport::InitializeRecorder()
     {
         ChipLogError(Camera, "Recorder already initialized");
     }
-    mClipInfo.mClipId++;
 }
 
 PushAVTransport::~PushAVTransport()
@@ -292,10 +294,14 @@ bool PushAVTransport::HandleTriggerDetected()
         ChipLogError(Camera, "PushAVTransport starting new recording");
         mHasAugmented                       = false;
         mRecorder->mClipInfo.activationTime = std::chrono::steady_clock::now();
+        mRecorder->mClipInfo.mSessionNumber =
+            mPushAvStreamTransportManager.OnTriggerActivation(mFabricIndex, mClipInfo.mSessionGroup);
+        mRecorder->SetFabricIndex(mFabricIndex);
+        mRecorder->SetPushAvStreamTransportManager(mPushAvStreamTransportManager);
+
         // Set the cluster server reference and connection info for direct API calls
         mRecorder->SetPushAvStreamTransportServer(mPushAvStreamTransportServer);
-        mRecorder->SetConnectionInfo(mConnectionID, mTransportTriggerType,
-                                     chip::Optional<chip::app::Clusters::PushAvStreamTransport::TriggerActivationReasonEnum>());
+
         mRecorder->Start();
         mStreaming = true;
     }
@@ -344,6 +350,8 @@ void PushAVTransport::TriggerTransport(TriggerActivationReasonEnum activationRea
     }
     else if (mTransportTriggerType == TransportTriggerTypeEnum::kMotion)
     {
+        mRecorder->SetConnectionInfo(mConnectionID, mTransportTriggerType,
+                                     chip::Optional<chip::app::Clusters::PushAvStreamTransport::TriggerActivationReasonEnum>());
         bool zoneFound = false; // Zone found flag
         for (auto zone : mZoneSensitivityList)
         {
@@ -447,6 +455,10 @@ void PushAVTransport::SetTransportStatus(TransportStatusEnum status)
             mRecorder->SetPushAvStreamTransportServer(mPushAvStreamTransportServer);
             mRecorder->SetConnectionInfo(mConnectionID, mTransportTriggerType,
                                          chip::Optional<chip::app::Clusters::PushAvStreamTransport::TriggerActivationReasonEnum>());
+            mRecorder->mClipInfo.mSessionNumber =
+                mPushAvStreamTransportManager.OnTriggerActivation(mFabricIndex, mClipInfo.mSessionGroup);
+            mRecorder->SetFabricIndex(mFabricIndex);
+            mRecorder->SetPushAvStreamTransportManager(mPushAvStreamTransportManager);
             mRecorder->Start();
             mStreaming = true;
             if (IsStreaming())

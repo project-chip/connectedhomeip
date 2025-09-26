@@ -84,6 +84,7 @@ PushAvStreamTransportManager::AllocatePushTransport(const TransportOptionsStruct
         std::make_unique<PushAVTransport>(transportOptions, connectionID, mAudioStreamParams, mVideoStreamParams);
 
     mTransportMap[connectionID]->SetPushAvStreamTransportServer(mPushAvStreamTransportServer);
+    mTransportMap[connectionID]->SetPushAvStreamTransportManager(this);
 
     if (mMediaController == nullptr)
     {
@@ -537,27 +538,6 @@ PushAvStreamTransportStatusEnum PushAvStreamTransportManager::GetTransportBusySt
     }
 }
 
-// Below API may not be needed
-void PushAvStreamTransportManager::OnAttributeChanged(AttributeId attributeId)
-{
-    ChipLogProgress(Zcl, "Attribute changed for AttributeId = " ChipLogFormatMEI, ChipLogValueMEI(attributeId));
-}
-
-CHIP_ERROR PushAvStreamTransportManager::LoadCurrentConnections(std::vector<TransportConfigurationStorage> & currentConnections)
-{
-    ChipLogProgress(Zcl, "Push AV Current Connections loaded");
-
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR
-PushAvStreamTransportManager::PersistentAttributesLoadedCallback()
-{
-    ChipLogProgress(Zcl, "Push AV Stream Transport Persistent attributes loaded");
-
-    return CHIP_NO_ERROR;
-}
-
 void PushAvStreamTransportManager::HandleZoneTrigger(uint16_t zoneId)
 {
     for (auto & pavst : mTransportMap)
@@ -637,6 +617,7 @@ void PushAvStreamTransportManager::SetTLSCerts(Tls::CertificateTable::BufferedCl
     mBufferClientCertKey.assign(keypairDer.data(), keypairDer.data() + keypairDer.size());
 }
 
+<<<<<<< HEAD
 void PushAvStreamTransportManager::RecordingStreamPrivacyModeChanged(bool privacyModeEnabled)
 {
     // To Do:
@@ -700,6 +681,63 @@ CHIP_ERROR PushAvStreamTransportManager::IsAnyPrivacyModeActive(bool & isActive)
     status            = avsmController.IsSoftRecordingPrivacyModeActive(isSoftRecordingPrivacyModeActve);
     status            = avsmController.IsSoftLivestreamPrivacyModeActive(isSoftLivestreamPrivacyModeActive);
 
+<<<<<<< HEAD
     isActive = isHardPrivacyModeActive || isSoftRecordingPrivacyModeActve || isSoftLivestreamPrivacyModeActive;
+=======
+    isActive = isHardPrivacyModeActive || isSoftRecordingPrivacyModeActve;
+=======
+uint64_t PushAvStreamTransportManager::OnTriggerActivated(uint8_t fabricIdx, uint8_t sessionGroup)
+{
+    std::lock_guard<std::mutex> lock(mSessionMapMutex);
+    auto & sessionInfo = mSessionMap[{ fabricIdx, sessionGroup }];
+    auto now           = std::chrono::system_clock::now();
+    if (sessionInfo.activeCount == 0)
+    {
+        sessionInfo.sessionNumber++;
+        sessionInfo.sessionStartedTimestamp = now;
+        sessionInfo.activeCount++;
+    }
+    else
+    {
+        auto elapsed = std::chrono::duration_cast<std::chrono::minutes>(now - sessionInfo.sessionStartedTimestamp).count();
+        if (elapsed >= 5)
+        {
+            sessionInfo.sessionNumber++;
+            sessionInfo.sessionStartedTimestamp = now;
+        }
+    }
+    return sessionInfo.sessionNumber;
+}
+
+void PushAvStreamTransportManager::OnTriggerDeactivated(uint8_t fabricIdx, uint8_t sessionGroup)
+{
+    std::lock_guard<std::mutex> lock(mSessionMapMutex);
+    auto & sessionInfo = mSessionMap[{ fabricIdx, sessionGroup }];
+    sessionInfo.activeCount--;
+}
+
+void PushAvStreamTransportManager::SetFabricIndex(FabricIndex peerFabricIndex, uint16_t connectionID)
+{
+    mTransportMap[connectionID].get()->SetFabricIndex(peerFabricIndex);
+}
+void PushAvStreamTransportManager::OnAttributeChanged(AttributeId attributeId)
+{
+    ChipLogProgress(Zcl, "Attribute changed for AttributeId = " ChipLogFormatMEI, ChipLogValueMEI(attributeId));
+}
+
+CHIP_ERROR PushAvStreamTransportManager::LoadCurrentConnections(std::vector<TransportConfigurationStorage> & currentConnections)
+{
+    ChipLogProgress(Zcl, "Push AV Current Connections loaded");
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR
+PushAvStreamTransportManager::PersistentAttributesLoadedCallback()
+{
+    ChipLogProgress(Zcl, "Push AV Stream Transport Persistent attributes loaded");
+
+>>>>>>> e437fcb6b4 (Initial changes for session grouping feature)
+>>>>>>> c947357afa (Initial changes for session grouping feature)
     return CHIP_NO_ERROR;
 }

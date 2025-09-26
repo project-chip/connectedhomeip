@@ -102,6 +102,11 @@ public:
         // Store pointer to server logic if needed for implementation
     }
 
+    void SetFabricIndex(FabricIndex peerFabricIndex, uint16_t connectionID) override
+    {
+        // Store fabric index if needed for implementation
+    }
+
     void Init();
     PushAvStreamTransportManager()  = default;
     ~PushAvStreamTransportManager() = default;

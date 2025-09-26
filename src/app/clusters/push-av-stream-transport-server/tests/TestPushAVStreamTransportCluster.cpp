@@ -405,6 +405,11 @@ public:
         // No-op implementation for tests
     }
 
+    void SetFabricIndex(FabricIndex peerFabricIndex, uint16_t connectionID) override
+    {
+        // No-op implementation for tests
+    }
+
 private:
     std::vector<Clusters::PushAvStreamTransport::PushAvStream> pushavStreams;
 };

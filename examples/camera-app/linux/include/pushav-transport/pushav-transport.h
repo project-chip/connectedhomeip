@@ -116,17 +116,25 @@ public:
         mPushAvStreamTransportServer = server;
     }
 
+    void SetPushAvStreamTransportManager(chip::app::Clusters::PushAvStreamTransport::PushAvStreamTransportManager * manager)
+    {
+        mPushAvStreamTransportManager = manager;
+    }
+
     void ConfigureRecorderTimeSetting(
         const chip::app::Clusters::PushAvStreamTransport::Structs::TransportMotionTriggerTimeControlStruct::DecodableType &
             timeControl);
 
-private:
-    bool mHasAugmented                                                              = false;
-    bool mStreaming                                                                 = false;
-    std::unique_ptr<PushAVClipRecorder> mRecorder                                   = nullptr;
-    std::unique_ptr<PushAVUploader> mUploader                                       = nullptr;
-    chip::app::Clusters::PushAvStreamTransportServer * mPushAvStreamTransportServer = nullptr;
+    void SetFabricIndex(chip::FabricIndex peerFabricIndex) { mFabricIndex = peerFabricIndex; }
 
+private:
+    bool mHasAugmented                                                                                       = false;
+    bool mStreaming                                                                                          = false;
+    std::unique_ptr<PushAVClipRecorder> mRecorder                                                            = nullptr;
+    std::unique_ptr<PushAVUploader> mUploader                                                                = nullptr;
+    chip::FabricIndex mFabricIndex                                                                           = 0;
+    chip::app::Clusters::PushAvStreamTransportServer * mPushAvStreamTransportServer                          = nullptr;
+    chip::app::Clusters::PushAvStreamTransport::PushAvStreamTransportManager * mPushAvStreamTransportManager = nullptr;
     std::chrono::steady_clock::time_point mBlindStartTime;
     PushAVClipRecorder::ClipInfoStruct mClipInfo;
     PushAVClipRecorder::AudioInfoStruct mAudioInfo;

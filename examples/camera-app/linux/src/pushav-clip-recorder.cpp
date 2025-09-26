@@ -44,8 +44,7 @@ AVDictionary * options = NULL;
 
 PushAVClipRecorder::PushAVClipRecorder(ClipInfoStruct & aClipInfo, AudioInfoStruct & aAudioInfo, VideoInfoStruct & aVideoInfo,
                                        PushAVUploader * aUploader) :
-    mClipInfo(aClipInfo),
-    mAudioInfo(aAudioInfo), mVideoInfo(aVideoInfo), mUploader(aUploader)
+    mClipInfo(aClipInfo), mAudioInfo(aAudioInfo), mVideoInfo(aVideoInfo), mUploader(aUploader)
 {
     mFormatContext        = nullptr;
     mInputFormatContext   = nullptr;
@@ -81,8 +80,8 @@ PushAVClipRecorder::PushAVClipRecorder(ClipInfoStruct & aClipInfo, AudioInfoStru
     SetRecorderStatus(false); // Start off as not running
 
     mClipInfo.mRecorderId = std::to_string(mVideoInfo.mVideoStreamIndex) + "-" + std::to_string(mAudioInfo.mAudioStreamIndex);
-    ChipLogProgress(Camera, "PushAVClipRecorder initialized with ID: %s, output path: %s", mClipInfo.mRecorderId.c_str(),
-                    mClipInfo.mOutputPath.c_str());
+    ChipLogProgress(Camera, "PushAVClipRecorder initialized with sessionID: %u Track name: %s, output path: %s",
+                    mClipInfo.mSessionNumber, mClipInfo.mTrackName.c_str(), mClipInfo.mOutputPath.c_str());
 }
 
 PushAVClipRecorder::~PushAVClipRecorder()
@@ -115,8 +114,7 @@ void PushAVClipRecorder::RemovePreviousRecordingFiles(const std::string & path)
         // Check if file has one of the recording-related extensions
         std::string filename(entry->d_name);
         if (filename.length() > 4 &&
-            (filename.substr(filename.length() - 4) == ".mpd" || filename.substr(filename.length() - 5) == ".m4s" ||
-             filename.substr(filename.length() - 4) == ".m4s"))
+            (filename.substr(filename.length() - 4) == ".mpd" || filename.substr(filename.length() - 4) == ".m4s"))
         {
             std::string filepath = path + filename;
             if (unlink(filepath.c_str()) == 0)
@@ -310,13 +308,16 @@ void PushAVClipRecorder::Start()
 
     SetRecorderStatus(true);
     mWorkerThread = std::thread(&PushAVClipRecorder::StartClipRecording, this);
-    ChipLogProgress(Camera, "Recording started for ID: %s", mClipInfo.mRecorderId.c_str());
+    ChipLogProgress(Camera, "Recording started for sessionID: %u Track name: %s", mClipInfo.mSessionNumber,
+                    mClipInfo.mTrackName.c_str());
 }
 
 void PushAVClipRecorder::Stop()
 {
     if (GetRecorderStatus())
     {
+        mPushAvStreamTransportManager->OnTriggerDeactivated(mFabricIndex, mClipInfo.mSessionGroup);
+
         // Call the cluster server's NotifyTransportStopped method asynchronously to prevent blocking
         if (mPushAvStreamTransportServer != nullptr)
         {
@@ -358,7 +359,8 @@ void PushAVClipRecorder::Stop()
         ChipLogError(Camera, "Error recording is not running");
     }
     mDeinitializeRecorder = true;
-    ChipLogProgress(Camera, "Recording stopped for ID: %s", mClipInfo.mRecorderId.c_str());
+    ChipLogProgress(Camera, "Recording stopped for sessionID: %u Track name: %s", mClipInfo.mSessionNumber,
+                    mClipInfo.mTrackName.c_str());
 }
 
 void PushAVClipRecorder::PushPacket(const uint8_t * data, size_t size, bool isVideo)
@@ -393,73 +395,6 @@ void PushAVClipRecorder::PushPacket(const uint8_t * data, size_t size, bool isVi
     }
 }
 
-int PushAVClipRecorder::SetupOutput(const std::string & outputPrefix, const std::string & initSegPattern,
-                                    const std::string & mediaSegPattern)
-{
-    const std::string mpdFilename = outputPrefix + ".mpd";
-    if (avformat_alloc_output_context2(&mFormatContext, nullptr, nullptr, mpdFilename.c_str()) < 0)
-    {
-        ChipLogError(Camera, "ERROR: Failed to allocate output context");
-        Stop();
-        return -1;
-    }
-    if (!mFormatContext)
-    {
-        ChipLogError(Camera, "ERROR: Output context is null");
-    }
-    double segSeconds = static_cast<double>(mClipInfo.mSegmentDuration) / 1000.0;
-    // Set DASH/CMAF options
-    av_opt_set(mFormatContext->priv_data, "increment_tc", "1", 0);
-    av_opt_set(mFormatContext->priv_data, "use_timeline", "1", 0);
-
-    if (mClipInfo.mChunkDuration == 0)
-    {
-        av_opt_set(mFormatContext->priv_data, "movflags", "+cmaf+dash+delay_moov+skip_sidx+skip_trailer", 0);
-    }
-    else
-    {
-        av_opt_set(mFormatContext->priv_data, "movflags", "+cmaf+dash+delay_moov+skip_sidx+skip_trailer+frag_custom", 0);
-        av_opt_set(mFormatContext->priv_data, "frag_duration", std::to_string(mClipInfo.mChunkDuration).c_str(), 0);
-    }
-
-    av_opt_set(mFormatContext->priv_data, "seg_duration", std::to_string(segSeconds).c_str(), 0);
-    av_opt_set(mFormatContext->priv_data, "init_seg_name", initSegPattern.c_str(), 0);
-    av_opt_set(mFormatContext->priv_data, "media_seg_name", mediaSegPattern.c_str(), 0);
-    av_opt_set_int(mFormatContext->priv_data, "use_template", 1, 0);
-    av_dict_set_int(&options, "dash_segment_type", 1, 0);
-    av_dict_set_int(&options, "use_timeline", 1, 0);
-    av_dict_set(&options, "strict", "experimental", 0);
-
-    if (mClipInfo.mHasVideo && (AddStreamToOutput(AVMEDIA_TYPE_VIDEO) < 0))
-    {
-        ChipLogError(Camera, "ERROR: adding video stream to output");
-        return -1;
-    }
-    if (mClipInfo.mHasAudio && (AddStreamToOutput(AVMEDIA_TYPE_AUDIO) < 0))
-    {
-        ChipLogError(Camera, "ERROR: adding video stream to output");
-        return -1;
-    }
-
-    if (!(mFormatContext->oformat->flags & AVFMT_NOFILE))
-    {
-        if (avio_open(&mFormatContext->pb, mpdFilename.c_str(), AVIO_FLAG_WRITE) < 0)
-        {
-            ChipLogError(Camera, "ERROR: Failed to open output file: %s", mpdFilename.c_str());
-            Stop();
-            return -1;
-        }
-    }
-
-    if (avformat_write_header(mFormatContext, &options) < 0)
-    {
-        ChipLogError(Camera, "Error: writing output header");
-        Stop();
-        return -1;
-    }
-    return 0;
-}
-
 int PushAVClipRecorder::StartClipRecording()
 {
     if (!mClipInfo.mHasVideo)
@@ -475,7 +410,8 @@ int PushAVClipRecorder::StartClipRecording()
             lock, [this] { return !mVideoQueue.empty() || !mAudioQueue.empty() || !GetRecorderStatus() || mDeinitializeRecorder; });
         if (!GetRecorderStatus() || mDeinitializeRecorder)
         {
-            ChipLogProgress(Camera, "Recorder thread received stop signal for ID: %s", mClipInfo.mRecorderId.c_str());
+            ChipLogProgress(Camera, "Recorder thread received stop signal for sessionID: %u Track name: %s",
+                            mClipInfo.mSessionNumber, mClipInfo.mTrackName.c_str());
             break; // Exit loop
         }
         ProcessBuffersAndWrite();
@@ -562,6 +498,73 @@ int PushAVClipRecorder::AddStreamToOutput(AVMediaType type)
     return 0;
 }
 
+int PushAVClipRecorder::SetupOutput(const std::string & outputPrefix, const std::string & initSegPattern,
+                                    const std::string & mediaSegPattern)
+{
+    const std::string mpdFilename = outputPrefix + ".mpd";
+    if (avformat_alloc_output_context2(&mFormatContext, nullptr, nullptr, mpdFilename.c_str()) < 0)
+    {
+        ChipLogError(Camera, "ERROR: Failed to allocate output context");
+        Stop();
+        return -1;
+    }
+    if (!mFormatContext)
+    {
+        ChipLogError(Camera, "ERROR: Output context is null");
+    }
+    double segSeconds = static_cast<double>(mClipInfo.mSegmentDuration) / 1000.0;
+    // Set DASH/CMAF options
+    av_opt_set(mFormatContext->priv_data, "increment_tc", "1", 0);
+    av_opt_set(mFormatContext->priv_data, "use_timeline", "1", 0);
+
+    if (mClipInfo.mChunkDuration == 0)
+    {
+        av_opt_set(mFormatContext->priv_data, "movflags", "+cmaf+dash+delay_moov+skip_sidx+skip_trailer", 0);
+    }
+    else
+    {
+        av_opt_set(mFormatContext->priv_data, "movflags", "+cmaf+dash+delay_moov+skip_sidx+skip_trailer+frag_custom", 0);
+        av_opt_set(mFormatContext->priv_data, "frag_duration", std::to_string(mClipInfo.mChunkDuration).c_str(), 0);
+    }
+
+    av_opt_set(mFormatContext->priv_data, "seg_duration", std::to_string(segSeconds).c_str(), 0);
+    av_opt_set(mFormatContext->priv_data, "init_seg_name", initSegPattern.c_str(), 0);
+    av_opt_set(mFormatContext->priv_data, "media_seg_name", mediaSegPattern.c_str(), 0);
+    av_opt_set_int(mFormatContext->priv_data, "use_template", 1, 0);
+    av_dict_set_int(&options, "dash_segment_type", 1, 0);
+    av_dict_set_int(&options, "use_timeline", 1, 0);
+    av_dict_set(&options, "strict", "experimental", 0);
+    av_dict_set(&options, "start_number", "1000", 0);
+    if (mClipInfo.mHasVideo && (AddStreamToOutput(AVMEDIA_TYPE_VIDEO) < 0))
+    {
+        ChipLogError(Camera, "ERROR: adding video stream to output");
+        return -1;
+    }
+    if (mClipInfo.mHasAudio && (AddStreamToOutput(AVMEDIA_TYPE_AUDIO) < 0))
+    {
+        ChipLogError(Camera, "ERROR: adding video stream to output");
+        return -1;
+    }
+
+    if (!(mFormatContext->oformat->flags & AVFMT_NOFILE))
+    {
+        if (avio_open(&mFormatContext->pb, mpdFilename.c_str(), AVIO_FLAG_WRITE) < 0)
+        {
+            ChipLogError(Camera, "ERROR: Failed to open output file: %s", mpdFilename.c_str());
+            Stop();
+            return -1;
+        }
+    }
+
+    if (avformat_write_header(mFormatContext, &options) < 0)
+    {
+        ChipLogError(Camera, "Error: writing output header");
+        Stop();
+        return -1;
+    }
+    return 0;
+}
+
 int PushAVClipRecorder::ProcessBuffersAndWrite()
 {
     if (mVideoQueue.empty() && mAudioQueue.empty())
@@ -617,9 +620,15 @@ int PushAVClipRecorder::ProcessBuffersAndWrite()
         {
             return false;
         }
+<<<<<<< HEAD
         std::string prefix           = mClipInfo.mRecorderId + "_clip_" + std::to_string(mClipInfo.mClipId);
         std::string initSegName      = prefix + "_init-stream$RepresentationID$.m4s";
         std::string mediaSegName     = prefix + "_chunk-stream$RepresentationID$-$Number%05d$.m4s";
+=======
+        std::string prefix           = "session_" + std::to_string(mClipInfo.mSessionNumber) + "@" + mClipInfo.mTrackName;
+        std::string initSegName      = prefix + "@$RepresentationID$.m4s";
+        std::string mediaSegName     = prefix + "@$RepresentationID$@segment_1$Number%04d$.m4s";
+>>>>>>> 7388828bdc (Initial changes for session grouping feature)
         mInputFormatContext          = avformat_alloc_context();
         int avioCtxBufferSize        = 1048576; // 1MB
         uint8_t * mAvioContextBuffer = static_cast<uint8_t *>(av_malloc(static_cast<size_t>(avioCtxBufferSize)));
@@ -747,8 +756,8 @@ void PushAVClipRecorder::FinalizeCurrentClip(int reason)
     // Final duration has to be (clipDuration + preRollLen) seconds
     const int64_t clipDuration = (mClipInfo.mInitialDuration + (mClipInfo.mPreRollLength / 1000)) * AV_TIME_BASE_Q.den;
     // Pre-calculate common path components
-    const std::string prefix   = mClipInfo.mRecorderId + "_clip_" + std::to_string(mClipInfo.mClipId);
-    const std::string basePath = mClipInfo.mOutputPath + prefix;
+    const std::string basePath =
+        mClipInfo.mOutputPath + "session_" + std::to_string(mClipInfo.mSessionNumber) + "@" + mClipInfo.mTrackName;
 
     if (reason || ((clipLengthInPTS >= clipDuration) && (mClipInfo.mTriggerType != 2)))
     {
@@ -771,7 +780,11 @@ void PushAVClipRecorder::FinalizeCurrentClip(int reason)
     };
 
     // 1. Handle initialization files
+<<<<<<< HEAD
     std::string m4s_path = make_path("%s_init-stream0.m4s");
+=======
+    std::string m4s_path = make_path("%s@0.m4s");
+>>>>>>> 7388828bdc (Initial changes for session grouping feature)
     if (mUploadedInitSegment && FileExists(m4s_path) && !FileExists(m4s_path + ".tmp"))
     {
         mUploadedInitSegment = false;
@@ -779,7 +792,11 @@ void PushAVClipRecorder::FinalizeCurrentClip(int reason)
 
         if (mClipInfo.mHasAudio)
         {
+<<<<<<< HEAD
             std::string audio_m4s = make_path("%s_init-stream1.m4s");
+=======
+            std::string audio_m4s = make_path("%s@1.m4s");
+>>>>>>> 7388828bdc (Initial changes for session grouping feature)
             if (FileExists(audio_m4s) && !FileExists(audio_m4s + ".tmp"))
             {
                 CheckAndUploadFile(audio_m4s);
@@ -788,7 +805,7 @@ void PushAVClipRecorder::FinalizeCurrentClip(int reason)
     }
 
     // 2. Handle video fragments
-    std::string video_m4s = make_path("%s_chunk-stream0-%05d.m4s", mVideoFragment);
+    std::string video_m4s = make_path("%s0@Segment_%05d.m4s", mVideoFragment);
     while (FileExists(video_m4s) && !FileExists(video_m4s + ".tmp"))
     {
         if (mVideoFragment == 1)
@@ -798,19 +815,19 @@ void PushAVClipRecorder::FinalizeCurrentClip(int reason)
         mUploadMPD = true;
         CheckAndUploadFile(video_m4s);
         mVideoFragment++;
-        video_m4s = make_path("%s_chunk-stream0-%05d.m4s", mVideoFragment);
+        video_m4s = make_path("%s0@Segment_%05d.m4s", mVideoFragment);
     }
 
     // 3. Handle audio fragments
     if (mClipInfo.mHasAudio)
     {
-        std::string audio_m4s = make_path("%s_chunk-stream1-%05d.m4s", mAudioFragment);
+        std::string audio_m4s = make_path("%s1@Segment_%05d.m4s", mAudioFragment);
         while (FileExists(audio_m4s) && !FileExists(audio_m4s + ".tmp"))
         {
             mUploadMPD = true;
             CheckAndUploadFile(audio_m4s);
             mAudioFragment++;
-            audio_m4s = make_path("%s_chunk-stream1-%05d.m4s", mAudioFragment);
+            audio_m4s = make_path("%s1@Segment_%05d.m4s", mAudioFragment);
         }
     }
 

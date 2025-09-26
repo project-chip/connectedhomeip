@@ -267,6 +267,12 @@ public:
      */
     virtual CHIP_ERROR PersistentAttributesLoadedCallback() = 0;
 
+    /**
+     * @brief Sets TLS certificates for secure push transport connections.
+     *
+     * @param clientCertEntry Reference to buffered client certificate entry
+     * @param rootCertEntry Reference to buffered root certificate entry
+     */
     virtual void SetTLSCerts(Tls::CertificateTable::BufferedClientCert & clientCertEntry,
                              Tls::CertificateTable::BufferedRootCert & rootCertEntry) = 0;
 
@@ -304,6 +310,14 @@ public:
      * @param server A pointer to the PushAvStreamTransportServer instance.
      */
     virtual void SetPushAvStreamTransportServer(PushAvStreamTransportServer * server) = 0;
+
+    /**
+     * @brief Sets the FabricIndex for the delegate.
+     *
+     * @param peerFabricIndex The FabricIndex to set
+     * @param connectionID The connectionID to set the FabricIndex for
+     */
+    virtual void SetFabricIndex(FabricIndex peerFabricIndex, uint16_t connectionID) = 0;
 };
 } // namespace Clusters
 } // namespace app

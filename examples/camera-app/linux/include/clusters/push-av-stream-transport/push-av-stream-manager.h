@@ -21,11 +21,13 @@
 #include <app/clusters/push-av-stream-transport-server/push-av-stream-transport-cluster.h>
 #include <app/clusters/tls-certificate-management-server/tls-certificate-management-server.h>
 #include <camera-device-interface.h>
+#include <chrono>
 #include <credentials/CHIPCert.h>
 #include <crypto/CHIPCryptoPAL.h>
 #include <functional>
 #include <iomanip>
 #include <media-controller.h>
+#include <mutex>
 #include <pushav-transport.h>
 #include <unordered_map>
 #include <vector>
@@ -41,6 +43,22 @@ struct PushAvStream
     TransportOptionsStruct transportOptions;
     TransportStatusEnum transportStatus;
     PushAvStreamTransportStatusEnum connectionStatus;
+};
+
+struct SessionInfo
+{
+    uint64_t sessionNumber = 1;
+    std::chrono::system_clock::time_point sessionStartedTimestamp;
+    int activeCount = 0;
+    mutable std::mutex sessionMutex;
+
+    uint64_t GetSessionNumber()
+    {
+        std::lock_guard<std::mutex> lock(sessionMutex);
+        sessionNumber++;
+        sessionStartedTimestamp = std::chrono::system_clock::now();
+        return sessionNumber;
+    }
 };
 
 /**
@@ -113,9 +131,15 @@ public:
     void HandleZoneTrigger(uint16_t zoneId);
 
     void RecordingStreamPrivacyModeChanged(bool privacyModeEnabled);
+    void SetFabricIndex(FabricIndex peerFabricIndex, uint16_t connectionID) override;
+
+    uint64_t OnTriggerActivated(uint8_t fabricIdx, uint8_t sessionGroup);
+
+    void OnTriggerDeactivated(uint8_t fabricIdx, uint8_t sessionGroup);
 
 private:
     std::vector<PushAvStream> pushavStreams;
+
     MediaController * mMediaController                         = nullptr;
     CameraDeviceInterface * mCameraDevice                      = nullptr;
     PushAvStreamTransportServer * mPushAvStreamTransportServer = nullptr;
@@ -124,7 +148,8 @@ private:
     VideoStreamStruct mVideoStreamParams;
     std::unordered_map<uint16_t, std::unique_ptr<PushAVTransport>> mTransportMap; // map for the transport objects
     std::unordered_map<uint16_t, TransportOptionsStruct> mTransportOptionsMap;    // map for the transport options
-
+    std::unordered_map<std::pair<FabricIndex, uint8_t>, SessionInfo> mSessionMap; // map for the session info
+    std::mutex mSessionMapMutex;
     uint32_t mTotalUsedBandwidthbps = 0; // Tracks the total bandwidth used by all active transports
 
     std::vector<uint8_t> mBufferRootCert;

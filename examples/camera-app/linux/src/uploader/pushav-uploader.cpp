@@ -17,6 +17,7 @@
  */
 
 #include "pushav-uploader.h"
+#include <algorithm>
 #include <cstring>
 #include <fstream>
 #include <iomanip>
@@ -293,6 +294,16 @@ void PushAVUploader::UploadData(std::pair<std::string, std::string> data)
     // Extract just the filename from the full path
     std::string fullPath = data.first;
     std::string filename = fullPath.substr(fullPath.find_last_of("/\\") + 1);
+    std::replace(filename.begin(), filename.end(), '@', '/');
+
+    // Change the 5th character from the back from '0' to '1', if the string is long enough
+    if (filename.length() >= 5)
+    {
+        if (filename[filename.length() - 5] == '0')
+        {
+            filename[filename.length() - 5] = '1';
+        }
+    }
 
     // Construct the URL with just the filename
     std::string baseUrl = data.second;
