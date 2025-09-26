@@ -56,9 +56,7 @@ public:
 
     void SetForceError(bool value) { forceError = value; }
 
-    void SetEncryptionKeyId(const uint8_t)
-
-        CHIP_ERROR GetOtaTlvEncryptionKeyId(uint32_t & value) override
+    CHIP_ERROR GetOtaTlvEncryptionKeyId(uint32_t & value) override
     {
         VerifyOrReturnError(!forceError, CHIP_ERROR_INTERNAL);
         uint32_t val = 2;
@@ -233,7 +231,7 @@ TEST(TestSilabsTestEventTriggerDelegate, TestInit_NullProvider)
 }
 
 // Test that GetOtaTlvEncryptionKeyId returns the expected value
-TEST(TestSilabsGetOtaTlvEncryptionKeyId, TestGetOtaTlvEncryptionKeyId_Success)
+TEST(TestSilabsTestEventTriggerDelegate, TestGetOtaTlvEncryptionKeyId_Success)
 {
     ProviderStub provider;
     uint32_t keyId = 0;
@@ -242,7 +240,7 @@ TEST(TestSilabsGetOtaTlvEncryptionKeyId, TestGetOtaTlvEncryptionKeyId_Success)
 }
 
 // Test that GetOtaTlvEncryptionKeyId returns error when forced
-TEST(TestSilabsGetOtaTlvEncryptionKeyId, TestGetOtaTlvEncryptionKeyId_Error)
+TEST(TestSilabsTestEventTriggerDelegate, TestGetOtaTlvEncryptionKeyId_Error)
 {
     ProviderStub provider;
     provider.SetForceError(true);
@@ -251,7 +249,7 @@ TEST(TestSilabsGetOtaTlvEncryptionKeyId, TestGetOtaTlvEncryptionKeyId_Error)
 }
 
 // Test that DecryptUsingOtaTlvEncryptionKey returns success
-TEST(TestSilabsDecryptUsingOtaTlvEncryptionKey, TestDecryptUsingOtaTlvEncryptionKey_Success)
+TEST(TestSilabsTestEventTriggerDelegate, TestDecryptUsingOtaTlvEncryptionKey_Success)
 {
     ProviderStub provider;
     uint8_t data[16] = { 0 };
@@ -261,7 +259,7 @@ TEST(TestSilabsDecryptUsingOtaTlvEncryptionKey, TestDecryptUsingOtaTlvEncryption
 }
 
 // Test that DecryptUsingOtaTlvEncryptionKey returns error when forced
-TEST(TestSilabsDecryptUsingOtaTlvEncryptionKey, TestDecryptUsingOtaTlvEncryptionKey_Error)
+TEST(TestSilabsTestEventTriggerDelegate, TestDecryptUsingOtaTlvEncryptionKey_Error)
 {
     ProviderStub provider;
     provider.SetForceError(true);
