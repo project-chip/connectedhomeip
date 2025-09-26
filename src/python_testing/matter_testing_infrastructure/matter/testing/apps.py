@@ -21,6 +21,7 @@ from typing import Optional, Union
 import matter.clusters as Clusters
 from matter.ChipDeviceCtrl import ChipDeviceController
 from matter.clusters.Types import NullValue
+from matter.interaction_model import Status
 from matter.testing.tasks import Subprocess
 
 
@@ -70,7 +71,7 @@ class AppServerSubprocess(Subprocess):
             ])
 
             # Start the server application
-            super().__init__(*command,  # Pass the constructed command list
+            super().__init__(*command,
                              output_cb=lambda line, is_stderr: self.PREFIX + line)
         except Exception:
             # Do not leak KVS file descriptor on failure
@@ -143,32 +144,122 @@ class JFControllerSubprocess(Subprocess):
 class OTAProviderSubprocess(AppServerSubprocess):
     """Wrapper class for starting an OTA Provider application server in a subprocess."""
 
-    DEFAULT_ADMIN_NODE_ID = 112233
-
     # Prefix for log messages from the OTA provider application.
     PREFIX = b"[OTA-PROVIDER]"
 
-    def __init__(self, app: str, storage_dir: str, discriminator: int,
-                 passcode: int, ota_source: Union[OtaImagePath, ImageListPath],
-                 port: int = 5541, extra_args: list[str] = []):
-        """Initialize the OTA Provider subprocess.
+    def __init__(
+        self,
+        ota_file: str,
+        discriminator: int,
+        passcode: int,
+        secured_device_port: int,
+        queue: str = None,
+        timeout: int = None,
+        override_image_uri: str = None,
+        log_file_path: str = "provider.log",
+        app_path: str = None,
+        kvs_path: str = None,
+    ):
+        """
+        Initialize OTA Provider with hardcoded KVS path, log file, and extra args.
 
         Args:
-            app: Path to the chip-ota-provider-app executable
-            storage_dir: Directory for persistent storage
-            discriminator: Discriminator for commissioning
-            passcode: Passcode for commissioning
-            port: UDP port for secure connections (default: 5541)
-            ota_source: Either OtaImagePath or ImageListPath specifying the OTA image source
-            extra_args: Additional command line arguments
+            ota_file: Path to OTA image file (string or OtaImagePath).
+            discriminator: Commissioning discriminator.
+            passcode: Setup PIN code.
+            secured_device_port: Port for provider process.
+            queue: Optional queue name.
+            timeout: Optional timeout in seconds.
+            override_image_uri: Optional ImageURI override.
+            log_file_path: File to store logs in real-time.
+            app_path: Required path to the chip-ota-provider-app binary.
+                      Must be provided explicitly (debug/release path may vary).
+                      example: ./out/debug/chip-ota-provider-app
+            kvs_path: Optional path for KVS storage. If provided, passed with --KVS.
         """
 
-        # Build OTA-specific arguments using the ota_source property
-        combined_extra_args = ota_source.ota_args + extra_args
+        self.log_file_path = log_file_path
 
-        # Initialize with the combined arguments
-        super().__init__(app=app, storage_dir=storage_dir, discriminator=discriminator,
-                         passcode=passcode, port=port, extra_args=combined_extra_args)
+        if not app_path:
+            raise ValueError("app_path must be provided for OTAProviderSubprocess")
+
+        # Build argument list for provider launch
+        args = [f"--filepath={ota_file}" if isinstance(ota_file, str) else ota_file.path]
+        if queue:
+            args += ["-q", queue]
+        if timeout:
+            args += ["-t", str(timeout)]
+        if override_image_uri:
+            args += ["-i", override_image_uri]
+
+         # Add KVS path only if explicitly provided
+        if kvs_path:
+            args += [f"--KVS={kvs_path}"]
+
+        # Clear the log file before starting
+        open(log_file_path, "w").close()
+
+        # Save args for use in the base constructor
+        self._extra_args = args
+
+        # Initialize parent AppServerSubprocess with final arguments
+        super().__init__(
+            app=app_path,
+            storage_dir="/tmp",
+            discriminator=discriminator,
+            passcode=passcode,
+            port=secured_device_port,
+            extra_args=args,
+        )
+
+    def _process_output(self, line: bytes, is_stderr: bool) -> bytes:
+        """Write logs only to file, return empty bytes to avoid console output."""
+        with open(self.log_file_path, "ab") as f:
+            f.write(line)
+            f.flush()
+        return b""  # must return bytes, not None
+
+    def start(self, expected_output: str = None, timeout: int = 30):
+        """Override start to attach log processing callback."""
+        self.output_cb = self._process_output
+        super().start(expected_output=expected_output, timeout=timeout)
+
+
+class ACLHandler:
+    """
+    Utility class to handle Access Control List (ACL) operations for OTA Provider and Requestor.
+    """
+
+    DEFAULT_ADMIN_NODE_ID = 112233
+
+    def __init__(self, controller):
+        """
+        Initialize the ACL handler.
+
+        Args:
+            controller: The controller used to perform ACL write operations.
+        """
+        self.controller = controller
+
+    async def write_acl(self, node_id: int, acl: list):
+        """
+        Writes the Access Control List (ACL) to the DUT device using the specified controller.
+
+        Args:
+            node_id: Node ID of the target device (provider or requestor).
+            acl (list): List of AccessControlEntryStruct objects defining ACL permissions.
+
+        Raises:
+            AssertionError: If writing the ACL attribute fails (status is not Status.Success).
+        """
+        acl_attribute = Clusters.AccessControl.Attributes.Acl(acl)
+        result = await self.controller.WriteAttribute(
+            nodeid=node_id,
+            attributes=[(0, acl_attribute)]
+        )
+        if result[0].Status != Status.Success:
+            raise RuntimeError(f"ACL write failed for node {node_id}: {result[0].Status}")
+        return True
 
     def create_acl_entry(self, dev_ctrl: ChipDeviceController, provider_node_id: int, requestor_node_id: Optional[int] = None):
         """Create ACL entries to allow OTA requestors to access the provider.
@@ -216,3 +307,99 @@ class OTAProviderSubprocess(AppServerSubprocess):
             nodeid=provider_node_id,
             attributes=[(0, acl_attribute)]
         )
+
+    async def set_acl_for_requestor(
+            self,
+            requestor_node: int,
+            provider_node: int,
+            fabric_index: int,
+            original_requestor_acls: list
+    ):
+        """
+        Read existing ACLs on Requestor, add minimal ACL for Provider, and write back.
+
+        Args:
+            requestor_node: Node ID of the Requestor device.
+            provider_node: Node ID of the Provider device.
+            fabric_index: Fabric index for the ACL entry.
+            original_requestor_acls: Existing ACLs for the Requestor.
+
+        Returns:
+            The original requestor ACLs (unchanged).
+        """
+
+        # Add minimal ACL for Provider
+        acl_operate_provider = Clusters.AccessControl.Structs.AccessControlEntryStruct(
+            fabricIndex=fabric_index,
+            privilege=Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kOperate,
+            authMode=Clusters.AccessControl.Enums.AccessControlEntryAuthModeEnum.kCase,
+            subjects=[provider_node],
+            targets=[Clusters.AccessControl.Structs.AccessControlTargetStruct(
+                endpoint=0,
+                cluster=Clusters.OtaSoftwareUpdateRequestor.id
+            )]
+        )
+
+        # Combine existing + new ACLs
+        combined_acls = original_requestor_acls + [acl_operate_provider]
+        await self.write_acl(requestor_node, combined_acls)
+
+    async def set_acl_for_provider(
+            self,
+            provider_node: int,
+            requestor_node: int,
+            fabric_index: int,
+            original_provider_acls: list
+    ):
+        """
+        Read existing ACLs on Provider, add minimal ACL for Requestor, and write back.
+
+        Args:
+            provider_node: Node ID of the Provider device.
+            requestor_node: Node ID of the Requestor device.
+            fabric_index: Fabric index for the ACL entry.
+            original_provider_acls: Existing ACLs for the Provider.
+
+        Returns:
+            The original provider ACLs (unchanged).
+        """
+
+        # Add minimal ACL for Requestor
+        acl_operate_requestor = Clusters.AccessControl.Structs.AccessControlEntryStruct(
+            fabricIndex=fabric_index,
+            privilege=Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kOperate,
+            authMode=Clusters.AccessControl.Enums.AccessControlEntryAuthModeEnum.kCase,
+            subjects=[requestor_node],
+            targets=[Clusters.AccessControl.Structs.AccessControlTargetStruct(
+                endpoint=0,
+                cluster=Clusters.OtaSoftwareUpdateProvider.id
+            )]
+        )
+
+        # Combine existing + new ACLs
+        combined_acls = original_provider_acls + [acl_operate_requestor]
+        await self.write_acl(provider_node, combined_acls)
+
+    async def set_ota_acls(
+            self,
+            requestor_node: int,
+            provider_node: int,
+            fabric_index: int,
+            original_requestor_acls: list,
+            original_provider_acls: list
+    ):
+        """
+        Set ACLs both ways and preserve originals.
+
+        Args:
+            requestor_node: Node ID of the Requestor.
+            provider_node: Node ID of the Provider.
+            fabric_index: Fabric index for ACL entries.
+            original_requestor_acls: Existing ACLs on Requestor.
+            original_provider_acls: Existing ACLs on Provider.
+
+        Returns:
+            original_requestor_acls, original_provider_acls
+        """
+        await self.set_acl_for_requestor(requestor_node, provider_node, fabric_index, original_requestor_acls)
+        await self.set_acl_for_provider(provider_node, requestor_node, fabric_index, original_provider_acls)
