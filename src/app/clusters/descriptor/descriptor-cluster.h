@@ -32,14 +32,11 @@ class DescriptorCluster : public DefaultServerCluster
 public:
     using DeviceType = Descriptor::Structs::DeviceTypeStruct::Type;
 
-    DescriptorCluster(EndpointId endpointId) :
-        DefaultServerCluster({ endpointId, Descriptor::Id })
-    {}
+    DescriptorCluster(EndpointId endpointId) : DefaultServerCluster({ endpointId, Descriptor::Id }) {}
 
     CHIP_ERROR Attributes(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder) override;
     DataModel::ActionReturnStatus ReadAttribute(const DataModel::ReadAttributeRequest & request,
                                                 AttributeValueEncoder & encoder) override;
-
 };
 
 } // namespace chip::app::Clusters
