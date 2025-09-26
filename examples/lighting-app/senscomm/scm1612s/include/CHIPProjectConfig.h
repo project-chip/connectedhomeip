@@ -45,13 +45,21 @@
 //
 #define CHIP_CONFIG_SECURITY_TEST_MODE 0
 
+/* Currently we use example credentials as default, after certificates finish, we will use our own credentials */
+#ifndef CHIP_BUILD_EXAMPLE_CREDS
+#define CHIP_BUILD_EXAMPLE_CREDS 1
+#endif
 /**
  * CHIP_DEVICE_CONFIG_DEVICE_VENDOR_ID
  *
  * 0x15FE: Senscomm's Vendor Id.
  * 0xFFF1: Common Test Vendor Id.
  */
+#if CHIP_BUILD_EXAMPLE_CREDS
+#define CHIP_DEVICE_CONFIG_DEVICE_VENDOR_ID 0xFFF1
+#else
 #define CHIP_DEVICE_CONFIG_DEVICE_VENDOR_ID 0x15FE
+#endif
 
 /**
  * CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_ID
@@ -59,7 +67,11 @@
  * 0x1612: SCM lighting-app
  * 0x8005: Common test lighting-app
  */
+#if CHIP_BUILD_EXAMPLE_CREDS
+#define CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_ID 0x8005
+#else
 #define CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_ID 0x1612
+#endif
 
 /**
  * CHIP_DEVICE_CONFIG_DEVICE_HARDWARE_VERSION
