@@ -88,7 +88,8 @@ source_set("multi-ota-siwx") {
     "${silabs_platform_dir}/wifi:wifi-platform",
   ]
   if (chip_enable_multi_ota_encryption) {
-    sources += [ "${silabs_platform_dir}/multi-ota/OtaTlvEncryptionKeyMbed.cpp" ]
+    sources +=
+        [ "${silabs_platform_dir}/multi-ota/OtaTlvEncryptionKeyMbed.cpp" ]
   }
   public_configs = [ ":multi-ota-siwx-config" ]
 }
