@@ -65,6 +65,9 @@ attr = cnet.Attributes
 original_ssid = None
 original_password = None
 
+# Global variable to store target device ID for mDNS discovery
+_target_device_id = None
+
 
 # DNS-SD error filter to suppress known non-critical errors
 class DNSSDErrorFilter(logging.Filter):
@@ -110,11 +113,12 @@ class ConnectionResult:
 class MatterServiceListener(ServiceListener):
     """
     Zeroconf service listener for Matter devices.
-    Collects all discovered Matter services.
+    Collects all discovered Matter services with optional device ID filtering.
     """
 
-    def __init__(self):
+    def __init__(self, target_device_id=None):
         self.discovered_services = []
+        self.target_device_id = target_device_id
 
     def add_service(self, zc: Zeroconf, type_: str, name: str) -> None:
         try:
@@ -131,8 +135,34 @@ class MatterServiceListener(ServiceListener):
                     'port': service_info.port,
                     'properties': service_info.properties
                 }
-                self.discovered_services.append(service_data)
-                logger.info(f"MatterServiceListener: Discovered service: {service_data}")
+
+                # Filter by target device ID if specified
+                if self.target_device_id:
+                    # The device ID can be in the service name or properties
+                    service_name = service_data['name']
+                    target_id_str = str(self.target_device_id)
+
+                    # Convert numeric node ID to hex format if needed
+                    if target_id_str.isdigit():
+                        target_id_hex = format(int(target_id_str), 'X')
+                    else:
+                        target_id_hex = target_id_str
+
+                    # Check if the target device ID (in various formats) is in the service name
+                    if (target_id_str.upper() in service_name.upper() or
+                        target_id_hex.upper() in service_name.upper() or
+                        # Also check for the hex format with leading zeros
+                            target_id_hex.upper().zfill(16) in service_name.upper()):
+                        self.discovered_services.append(service_data)
+                        logger.info(
+                            f"MatterServiceListener: Discovered target device service (ID: {self.target_device_id}): {service_data}")
+                    else:
+                        logger.debug(
+                            f"MatterServiceListener: Skipping non-target device: {service_name} (looking for ID: {self.target_device_id})")
+                else:
+                    # No filtering, add all services
+                    self.discovered_services.append(service_data)
+                    logger.info(f"MatterServiceListener: Discovered service: {service_data}")
         except Exception as e:
             logger.warning(f"MatterServiceListener: Failed to get service info for {name}: {e}")
 
@@ -153,18 +183,34 @@ def detect_platform() -> str:
         return 'unknown'
 
 
+def get_target_device_id():
+    """Get the cached target device ID for mDNS discovery."""
+    global _target_device_id
+    return _target_device_id
+
+
+def set_target_device_id(device_id):
+    """Set the target device ID for mDNS discovery."""
+    global _target_device_id
+    _target_device_id = str(device_id) if device_id is not None else None
+
+
 async def find_matter_devices_mdns():
     """
-    Finds any Matter device via mDNS using zeroconf.
+    Finds Matter devices via mDNS using zeroconf, optionally filtering by target device ID.
     Raises an exception if no device is found after max_attempts.
     Returns the list of discovered services.
     """
     service_types = ["_matter._tcp.local.", "_matterc._udp.local."]
+    target_device_id = get_target_device_id()
+
+    logger.info(
+        f"find_matter_devices_mdns: Searching for Matter devices{' with target device ID: ' + target_device_id if target_device_id else ''}")
 
     for attempt in range(1, MAX_ATTEMPTS + 1):
         try:
             zc = Zeroconf()
-            listener = MatterServiceListener()
+            listener = MatterServiceListener(target_device_id)
             browsers = [ServiceBrowser(zc, stype, listener) for stype in service_types]
 
             logger.info(f"find_matter_devices_mdns: Attempt {attempt}/{MAX_ATTEMPTS} - Browsing for Matter services...")
@@ -191,7 +237,8 @@ async def find_matter_devices_mdns():
         if attempt < MAX_ATTEMPTS:
             await asyncio.sleep(2)
 
-    raise Exception(f"find_matter_devices_mdns: mDNS discovery failed after {MAX_ATTEMPTS} attempts - No Matter devices found")
+    raise Exception(
+        f"find_matter_devices_mdns: mDNS discovery failed after {MAX_ATTEMPTS} attempts - No Matter devices found{' for target device ID: ' + target_device_id if target_device_id else ''}")
 
 
 async def run_subprocess(cmd, check=False, capture_output=False, timeout=ATTRIBUTE_READ_TIMEOUT):
@@ -970,6 +1017,13 @@ class TC_CNET_4_11(MatterBaseTest):
 
     @run_if_endpoint_matches(has_feature(Clusters.NetworkCommissioning, Clusters.NetworkCommissioning.Bitmaps.Feature.kWiFiNetworkInterface))
     async def test_TC_CNET_4_11(self):
+
+        logger.info("test_TC_CNET_4_11: Waiting for mDNS service to stabilize before starting test...")
+        await asyncio.sleep(5)
+
+        # Set the target device ID for mDNS discovery from DUT node ID
+        set_target_device_id(self.dut_node_id)
+        logger.info(f"test_TC_CNET_4_11: Set target device ID for mDNS filtering: {self.dut_node_id}")
 
         asserts.assert_true("PIXIT.CNET.WIFI_2ND_ACCESSPOINT_SSID" in self.matter_test_config.global_test_params,
                             "PIXIT.CNET.WIFI_2ND_ACCESSPOINT_SSID must be included on the command line in "
