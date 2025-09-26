@@ -368,7 +368,7 @@ class TC_SU_2_2(MatterBaseTest):
         # ------------------------------------------------------------------------------------
 
         self.step(0)
-        # Commission the DUT (Requestor) with the TH/OTA-P (Provider)
+        # Controller has already commissioned the requestor
 
         # Prerequisite #1.0 - Requestor (DUT) info
         CONTROLLER = self.default_controller
