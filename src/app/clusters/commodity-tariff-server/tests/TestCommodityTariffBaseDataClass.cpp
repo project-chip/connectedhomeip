@@ -448,7 +448,7 @@ struct TestResourceStruct
     // Proper equality operator
     bool operator==(const TestResourceStruct & other) const
     {
-        return id == other.id && label == other.label && nestedList == other.nestedList;
+        return id == other.id && this->label.data_equal(other.label) && this->nestedList.data_equal(other.nestedList);
     }
 
     // Proper inequality operator - should use content comparison, not pointer comparison
