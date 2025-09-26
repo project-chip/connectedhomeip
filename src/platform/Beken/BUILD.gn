@@ -36,7 +36,6 @@ static_library("Beken") {
     "DiagnosticDataProviderImpl.h",
     "KeyValueStoreManagerImpl.cpp",
     "KeyValueStoreManagerImpl.h",
-    "LwIPCoreLock.cpp",
     "NetworkCommissioningWiFiDriver.cpp",
     "OTAImageProcessorImpl.cpp",
     "OTAImageProcessorImpl.h",
