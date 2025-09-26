@@ -104,35 +104,39 @@ class TC_PAVST_2_3(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
                      "DUT responds with Status Code InvalidTriggerType."),
             TestStep(14, "If the zone management cluster is present on this endpoint, TH sends the AllocatePushTransport command with an Null Zone within MotionZones.",
                      "DUT responds with Status Code Success."),
-            TestStep(15, "If the zone management cluster is present on this endpoint, TH sends the AllocatePushTransport command with an invalid ZoneID that is not present in aZones.",
+            TestStep(15, "If the zone management cluster is present on this endpoint, TH sends the AllocatePushTransport command with duplicate numeric Zone IDs within MotionZones.",
+                     "DUT responds with Status Code AlredyExists."),
+            TestStep(16, "If the zone management cluster is present on this endpoint, TH sends the AllocatePushTransport command with duplicate Null Zone IDs within MotionZones.",
+                     "DUT responds with Status Code AlredyExists."),
+            TestStep(17, "If the zone management cluster is present on this endpoint, TH sends the AllocatePushTransport command with an invalid ZoneID that is not present in aZones.",
                      "DUT responds with Status Code InvalidZone."),
-            TestStep(16, "TH sends the AllocatePushTransport command with a VideoStreamID not present in aAllocatedVideoStreams.",
+            TestStep(18, "TH sends the AllocatePushTransport command with a VideoStreamID not present in aAllocatedVideoStreams.",
                      "DUT responds with Status Code InvalidStream."),
-            TestStep(17, "TH sends the AllocatePushTransport command with a AudioStreamID not present in aAllocatedAudioStreams.",
+            TestStep(19, "TH sends the AllocatePushTransport command with a AudioStreamID not present in aAllocatedAudioStreams.",
                      "DUT responds with Status Code InvalidStream."),
-            TestStep(18, "TH sends the AllocatePushTransport command with both VideoStreamID and AudioStreamID absent.",
+            TestStep(20, "TH sends the AllocatePushTransport command with both VideoStreamID and AudioStreamID absent.",
                      "DUT responds with Status Code InvalidArgument."),
-            TestStep(19, "TH sends the AllocatePushTransport command with both VideoStreamID and AudioStreamID set to None..",
+            TestStep(21, "TH sends the AllocatePushTransport command with both VideoStreamID and AudioStreamID set to None..",
                      "DUT responds with AllocatePushTransportResponse containing the allocated ConnectionID."),
-            TestStep(20, "If the zone management cluster is present on this endpoint, TH sends the AllocatePushTransport command with the TriggerType = Motion and size of the MotionZones list to be greater than aMaxZones.",
+            TestStep(22, "If the zone management cluster is present on this endpoint, TH sends the AllocatePushTransport command with the TriggerType = Motion and size of the MotionZones list to be greater than aMaxZones.",
                      "DUT responds with ConstraintError."),
-            TestStep(21, "TH sends the AllocatePushTransport command with the TriggerType = Motion and valid value for MotionSensitivity if DUT supports PerZoneSensitivity.",
+            TestStep(23, "TH sends the AllocatePushTransport command with the TriggerType = Motion and valid value for MotionSensitivity if DUT supports PerZoneSensitivity.",
                      "DUT responds with InvalidCommand."),
-            TestStep(22, "TH sends the AllocatePushTransport command with the TriggerType = Motion and MotionSensitivity > 10 if DUT does not support PerZoneSensitivity.",
+            TestStep(24, "TH sends the AllocatePushTransport command with the TriggerType = Motion and MotionSensitivity > 10 if DUT does not support PerZoneSensitivity.",
                      "DUT responds with ConstraintError."),
-            TestStep(23, "TH sends the AllocatePushTransport command with the TriggerType = Motion and MotionTimeControl omitted.",
+            TestStep(25, "TH sends the AllocatePushTransport command with the TriggerType = Motion and MotionTimeControl omitted.",
                      "DUT responds with InvalidCommand."),
-            TestStep(24, "TH sends the AllocatePushTransport command with the TriggerType = Motion and MotionTimeControl struct with InitialDuration = 0.",
+            TestStep(26, "TH sends the AllocatePushTransport command with the TriggerType = Motion and MotionTimeControl struct with InitialDuration = 0.",
                      "DUT responds with ConstraintError."),
-            TestStep(25, "TH sends the AllocatePushTransport command with the TriggerType = Motion and MotionTimeControl struct with MaxDuration = 0.",
+            TestStep(27, "TH sends the AllocatePushTransport command with the TriggerType = Motion and MotionTimeControl struct with MaxDuration = 0.",
                      "DUT responds with ConstraintError."),
-            TestStep(26, "TH deallocates transport allocated in step 5 using DeallocatePushTransport command successfully. TH sends the AllocatePushTransport command with all valid parameters. The TriggerType = Motion and MotionZones and MotionSensitivity fields are present and None.",
+            TestStep(28, "TH deallocates transport allocated in step 5 using DeallocatePushTransport command successfully. TH sends the AllocatePushTransport command with all valid parameters. The TriggerType = Motion and MotionZones and MotionSensitivity fields are present and None.",
                      "DUT responds with AllocatePushTransportResponse containing the allocated ConnectionID."),
-            TestStep(27, "DUT responds with AllocatePushTransportResponse containing the allocated ConnectionID.",
+            TestStep(29, "DUT responds with AllocatePushTransportResponse containing the allocated ConnectionID.",
                      "DUT responds with AllocatePushTransportResponse containing the allocated ConnectionID."),
-            TestStep(28, "TH sends the AllocatePushTransport command with an invalid value for StreamUsage in the TransportOptions struct.",
+            TestStep(30, "TH sends the AllocatePushTransport command with an invalid value for StreamUsage in the TransportOptions struct.",
                      "DUT responds with InvalidCommand."),
-            TestStep(29, "TH sends the AllocatePushTransport command with ContainerType = CMAF and CMAFContainerOptions omitted.",
+            TestStep(31, "TH sends the AllocatePushTransport command with ContainerType = CMAF and CMAFContainerOptions omitted.",
                      "DUT responds with InvalidCommand."),
         ]
 
@@ -273,7 +277,31 @@ class TC_PAVST_2_3(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
         except InteractionModelError as e:
             asserts.assert_fail(f"Unexpected error when setting a Zone that is Null (meaning all Zones). Error received {e.status}")
 
+        # Duplicate Zone ID rejection
         self.step(15)
+        zoneList = [{"zone": 1, "sensitivity": 4}, {"zone": 2, "sensitivity": 4},
+                    {"zone": 3, "sensitivity": 4}, {"zone": 1, "sensitivity": 4}]
+        triggerOptions = {"triggerType": pvcluster.Enums.TransportTriggerTypeEnum.kMotion,
+                          "maxPreRollLen": 4000,
+                          "motionZones": zoneList,
+                          "motionTimeControl": {"initialDuration": 1, "augmentationDuration": 1, "maxDuration": 1, "blindDuration": 1}}
+        status = await self.allocate_one_pushav_transport(endpoint, trigger_Options=triggerOptions, tlsEndPoint=tlsEndpointId, url=f"https://{host_ip}:1234/streams/{uploadStreamId}")
+        asserts.assert_equal(status, Status.AlreadyExists,
+                             "DUT should respond with Status Code AlreadyExists with a Duplicate Zone.")
+
+        self.step(16)
+        # Duplicate Zone ID rejection with Nulls
+        zoneList = [{"zone": 1, "sensitivity": 4}, {"zone": NullValue, "sensitivity": 4},
+                    {"zone": 3, "sensitivity": 4}, {"zone": NullValue, "sensitivity": 4}]
+        triggerOptions = {"triggerType": pvcluster.Enums.TransportTriggerTypeEnum.kMotion,
+                          "maxPreRollLen": 4000,
+                          "motionZones": zoneList,
+                          "motionTimeControl": {"initialDuration": 1, "augmentationDuration": 1, "maxDuration": 1, "blindDuration": 1}}
+        status = await self.allocate_one_pushav_transport(endpoint, trigger_Options=triggerOptions, tlsEndPoint=tlsEndpointId, url=f"https://{host_ip}:1234/streams/{uploadStreamId}")
+        asserts.assert_equal(status, Status.AlreadyExists,
+                             "DUT should respond with Status Code AlreadyExists with Duplicate Null Zones.")
+
+        self.step(17)
         try:
             zoneList = [{"zone": 14, "sensitivity": 4}]
             triggerOptions = {"triggerType": pvcluster.Enums.TransportTriggerTypeEnum.kMotion,
@@ -288,21 +316,21 @@ class TC_PAVST_2_3(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
             asserts.assert_equal(e.clusterStatus, pvcluster.Enums.StatusCodeEnum.kInvalidZone,
                                  "DUT must responds with Status Code InvalidZone.")
 
-        self.step(16)
+        self.step(18)
         status = await self.allocate_one_pushav_transport(endpoint, videoStream_ID=-1,
                                                           expected_cluster_status=pvcluster.Enums.StatusCodeEnum.kInvalidStream,
                                                           tlsEndPoint=tlsEndpointId, url=f"https://{host_ip}:1234/streams/{uploadStreamId}")
         asserts.assert_equal(status, pvcluster.Enums.StatusCodeEnum.kInvalidStream,
                              "DUT must  responds with Status Code InvalidStream.")
 
-        self.step(17)
+        self.step(19)
         status = await self.allocate_one_pushav_transport(endpoint, audioStream_ID=-1,
                                                           expected_cluster_status=pvcluster.Enums.StatusCodeEnum.kInvalidStream,
                                                           tlsEndPoint=tlsEndpointId, url=f"https://{host_ip}:1234/streams/{uploadStreamId}")
         asserts.assert_equal(status, pvcluster.Enums.StatusCodeEnum.kInvalidStream,
                              "DUT must  responds with Status Code InvalidStream.")
 
-        self.step(18)
+        self.step(20)
         try:
             aStreamUsagePriorities = await self.read_single_attribute_check_success(
                 endpoint=endpoint, cluster=avcluster, attribute=avattr.StreamUsagePriorities
@@ -325,18 +353,18 @@ class TC_PAVST_2_3(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
                  "expiryTime": 5
                  }), endpoint=endpoint)
             asserts.assert_equal(status, Status.InvalidCommand,
-                                 "DUT must  responds with Status Code InvalidCommand.")
+                                 "DUT must respond with Status Code InvalidCommand.")
         except InteractionModelError as e:
             asserts.assert_equal(e.status, Status.InvalidCommand,
-                                 "DUT must  responds with Status Code InvalidCommand.")
+                                 "DUT must respond with Status Code InvalidCommand.")
 
-        self.step(19)
+        self.step(21)
         status = await self.allocate_one_pushav_transport(endpoint, videoStream_ID=Nullable(), audioStream_ID=Nullable(),
                                                           tlsEndPoint=tlsEndpointId, url=f"https://{host_ip}:1234/streams/{uploadStreamId}")
         asserts.assert_equal(status, Status.Success,
                              "DUT must  responds with Status Code Success.")
 
-        self.step(20)
+        self.step(22)
         # Create a zoneList that is one larger than max zones that we have already read
         zoneList = []
         for i in range(aMaxZones+1):
@@ -351,7 +379,7 @@ class TC_PAVST_2_3(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
         asserts.assert_equal(status, Status.DynamicConstraintError,
                              "DUT must respond with Status code DynamicConstraintError")
 
-        self.step(21)
+        self.step(23)
         zoneList = []
         triggerOptions = {"triggerType": pvcluster.Enums.TransportTriggerTypeEnum.kMotion,
                           "motionTimeControl": {"initialDuration": 1, "augmentationDuration": 1, "maxDuration": 1, "blindDuration": 1},
@@ -361,7 +389,7 @@ class TC_PAVST_2_3(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
         asserts.assert_equal(status, Status.InvalidCommand,
                              "DUT must  responds with Status Code InvalidCommand.")
 
-        self.step(22)
+        self.step(24)
         zoneList = []
         triggerOptions = {"triggerType": pvcluster.Enums.TransportTriggerTypeEnum.kMotion,
                           "motionTimeControl": {"initialDuration": 1, "augmentationDuration": 1, "maxDuration": 1, "blindDuration": 1},
@@ -371,7 +399,7 @@ class TC_PAVST_2_3(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
         asserts.assert_equal(status, Status.InvalidCommand,
                              "DUT must  responds with Status Code InvalidCommand.")
 
-        self.step(23)
+        self.step(25)
         zoneList = []
         triggerOptions = {"triggerType": pvcluster.Enums.TransportTriggerTypeEnum.kMotion,
                           "motionZones": zoneList,
@@ -380,7 +408,7 @@ class TC_PAVST_2_3(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
         asserts.assert_equal(status, Status.InvalidCommand,
                              "DUT must  responds with Status Code InvalidCommand.")
 
-        self.step(24)
+        self.step(26)
         zoneList = []
         triggerOptions = {"triggerType": pvcluster.Enums.TransportTriggerTypeEnum.kMotion,
                           "motionZones": zoneList,
@@ -390,7 +418,7 @@ class TC_PAVST_2_3(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
         asserts.assert_equal(status, Status.ConstraintError,
                              "DUT must  responds with Status code ConstraintError")
 
-        self.step(25)
+        self.step(27)
         zoneList = []
         triggerOptions = {"triggerType": pvcluster.Enums.TransportTriggerTypeEnum.kMotion,
                           "motionZones": zoneList,
@@ -400,7 +428,7 @@ class TC_PAVST_2_3(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
         asserts.assert_equal(status, Status.ConstraintError,
                              "DUT must  responds with Status code ConstraintError")
 
-        self.step(26)
+        self.step(28)
         cmd = pvcluster.Commands.DeallocatePushTransport(
             connectionID=aConnectionID
         )
@@ -421,7 +449,7 @@ class TC_PAVST_2_3(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
         )
         aConnectionID = current_connections[len(current_connections)-1].connectionID
 
-        self.step(27)
+        self.step(29)
         cmd = pvcluster.Commands.DeallocatePushTransport(
             connectionID=aConnectionID
         )
@@ -437,13 +465,13 @@ class TC_PAVST_2_3(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
         asserts.assert_equal(status, Status.Success,
                              "DUT must  responds with Status Code Success.")
 
-        self.step(28)
+        self.step(30)
         status = await self.allocate_one_pushav_transport(endpoint, stream_Usage=Clusters.Globals.Enums.StreamUsageEnum.kUnknownEnumValue,
                                                           tlsEndPoint=tlsEndpointId, url=f"https://{host_ip}:1234/streams/{uploadStreamId}")
         asserts.assert_equal(status, Status.ConstraintError,
                              "DUT must  responds with Status code ConstraintError")
 
-        self.step(29)
+        self.step(31)
         containerOptions = {"containerType": pvcluster.Enums.ContainerFormatEnum.kCmaf}
         status = await self.allocate_one_pushav_transport(endpoint, container_Options=containerOptions, tlsEndPoint=tlsEndpointId, url=f"https://{host_ip}:1234/streams/{uploadStreamId}")
         asserts.assert_equal(status, Status.InvalidCommand,
