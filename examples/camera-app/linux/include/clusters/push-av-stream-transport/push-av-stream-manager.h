@@ -106,7 +106,7 @@ public:
 
     CHIP_ERROR PersistentAttributesLoadedCallback() override;
 
-    void OnZoneTriggeredEvent(uint16_t zoneId);
+    void OnZoneTriggeredEvent(uint16_t zoneId) override;
 
 private:
     std::vector<PushAvStream> pushavStreams;
@@ -119,7 +119,7 @@ private:
     std::unordered_map<uint16_t, std::unique_ptr<PushAVTransport>> mTransportMap; // map for the transport objects
     std::unordered_map<uint16_t, TransportOptionsStruct> mTransportOptionsMap;    // map for the transport options
 
-    double mTotalUsedBandwidthMbps = 0.0; // Tracks the total bandwidth used by all active transports
+    uint32_t mTotalUsedBandwidthbps = 0.0; // Tracks the total bandwidth used by all active transports
 
     std::vector<uint8_t> mBufferRootCert;
     std::vector<uint8_t> mBufferClientCert;
@@ -133,7 +133,7 @@ private:
      * @param outBandwidthMbps Output parameter for the calculated bandwidth in Mbps.
      */
     void GetBandwidthForStreams(const Optional<DataModel::Nullable<uint16_t>> & videoStreamId,
-                                const Optional<DataModel::Nullable<uint16_t>> & audioStreamId, double & outBandwidthMbps);
+                                const Optional<DataModel::Nullable<uint16_t>> & audioStreamId, uint32_t & outBandwidthMbps);
 };
 
 } // namespace PushAvStreamTransport

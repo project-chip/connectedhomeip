@@ -300,24 +300,17 @@ public:
     virtual CHIP_ERROR OnTransportReleaseAudioVideoStreams(uint16_t audioStreamID, uint16_t videoStreamID) = 0;
 
     /**
-     * @brief Provides read-only access to the list of currently allocated video streams.
-     * This allows other components (like PushAVStreamTransportManager) to query
-     * allocated stream parameters (e.g., for bandwidth calculation) without directly
-     * accessing the CameraAVStreamMgmtServer instance.
+     * @brief Calculates the total bandwidth in bps for the given video and audio stream IDs.
+     * It iterates through the allocated video and audio streams, and if a matching stream ID is found,
+     * its bit rate (maxBitRate for video, bitRate for audio) is added to the total bandwidth.
      *
-     * @return A const reference to the vector of allocated video stream structures.
+     * @param videoStreamId Optional nullable ID of the video stream.
+     * @param audioStreamId Optional nullable ID of the audio stream.
+     * @param outBandwidthbps Output parameter for the calculated total bandwidth in bps.
      */
-    virtual const std::vector<VideoStreamStruct> & GetAllocatedVideoStreams() const = 0;
-
-    /**
-     * @brief Provides read-only access to the list of currently allocated audio streams.
-     * This allows other components (like PushAVStreamTransportManager) to query
-     * allocated stream parameters (e.g., for bandwidth calculation) without directly
-     * accessing the CameraAVStreamMgmtServer instance.
-     *
-     * @return A const reference to the vector of allocated audio stream structures.
-     */
-    virtual const std::vector<AudioStreamStruct> & GetAllocatedAudioStreams() const = 0;
+    virtual void GetBandwidthForStreams(const Optional<DataModel::Nullable<uint16_t>> & videoStreamId,
+                                        const Optional<DataModel::Nullable<uint16_t>> & audioStreamId,
+                                        uint32_t & outBandwidthbps) = 0;
 
 private:
     friend class CameraAVStreamMgmtServer;
@@ -384,7 +377,7 @@ public:
      *                                          full-duplex, etc.
      * @param aSnapshotCapabilities             Indicates the set of supported snapshot capabilities by the device, e.g., the image
      *                                          codec, the resolution and the maximum frame rate.
-     * @param aMaxNetworkBandwidth              Indicates the maximum network bandwidth (in mbps) that the device would consume
+     * @param aMaxNetworkBandwidth              Indicates the maximum network bandwidth (in bps) that the device would consume
      * @param aSupportedStreamUsages            Indicates the possible stream types available
      * @param aStreamUsagePriorities            Indicates the priority ranking of the available streams
      * for the transmission of its media streams.
