@@ -251,7 +251,12 @@
         "Test_TC_TCCM_2_1"
     ],
     "Switch": ["Test_TC_SWTCH_3_2"],
-    "TemperatureControl": ["Test_TC_TCTL_2_1", "Test_TC_TCTL_2_2", "Test_TC_TCTL_3_2" , "Test_TC_TCTL_3_2"],
+    "TemperatureControl": [
+        "Test_TC_TCTL_2_1",
+        "Test_TC_TCTL_2_2",
+        "Test_TC_TCTL_3_2",
+        "Test_TC_TCTL_3_2"
+    ],
     "TemperatureMeasurement": ["Test_TC_TMP_2_2"],
     "Thermostat": ["Test_TC_TSTAT_3_2"],
     "ThermostatUserConfiguration": [],
