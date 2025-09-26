@@ -339,7 +339,7 @@ class BaseTestHelper:
             self.logger.info("Failed to discover any devices.")
             return False
         self.logger.info("Testing commissioning")
-        if not await self.TestCommissioningWithSetupPayload(setuppin, nodeid):
+        if not await self.TestCommissioningWithSetupPayload(qr, nodeid):
             self.logger.info("Failed to finish commissioning")
             return False
         return True
