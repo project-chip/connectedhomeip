@@ -708,7 +708,7 @@ void AccessControlCluster::OnEntryChanged(const chip::Access::SubjectDescriptor 
            ChipLogError(DataManagement, "AccessControlCluster: event failed %" CHIP_ERROR_FORMAT, err.Format());
            return;
          }
-         
+
         event.latestValue.SetNonNull(encodableEntry.GetStagingEntry());
         // NOTE: EncodableEntry can only be constructed from ref so we need to use it within the right scope
         // after we determined the entry is not null. This is why we repeat the generate event call.
