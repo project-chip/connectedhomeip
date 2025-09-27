@@ -2945,6 +2945,7 @@ endpoint 1 {
     ram      attribute controlSequenceOfOperation default = 0x04;
     persist  attribute systemMode default = 0x01;
     callback attribute presetTypes;
+    callback attribute scheduleTypes;
     ram      attribute numberOfPresets default = 0;
     ram      attribute activePresetHandle;
     callback attribute presets;
