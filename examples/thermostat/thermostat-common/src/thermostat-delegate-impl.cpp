@@ -485,16 +485,15 @@ size_t ThermostatDelegate::GetThermostatSuggestionIndexWithEarliestEffectiveTime
     return minEffectiveTimeSuggestionIndex;
 }
 
-
 CHIP_ERROR ThermostatDelegate::GetScheduleTypeAtIndex(size_t index, Structs::ScheduleTypeStruct::Type & scheduleType)
 {
     static ScheduleTypeStruct::Type scheduleTypes[] = {
-        { .systemMode               = SystemModeEnum::kHeat,
-          .numberOfSchedules        = mMaxSchedules,
-          .scheduleTypeFeatures     = to_underlying(ScheduleTypeFeaturesBitmap::kSupportsSetpoints) },
-        { .systemMode               = SystemModeEnum::kCool,
-          .numberOfSchedules        = mMaxSchedules,
-          .scheduleTypeFeatures     = to_underlying(ScheduleTypeFeaturesBitmap::kSupportsSetpoints) }
+        { .systemMode           = SystemModeEnum::kHeat,
+          .numberOfSchedules    = mMaxSchedules,
+          .scheduleTypeFeatures = to_underlying(ScheduleTypeFeaturesBitmap::kSupportsSetpoints) },
+        { .systemMode           = SystemModeEnum::kCool,
+          .numberOfSchedules    = mMaxSchedules,
+          .scheduleTypeFeatures = to_underlying(ScheduleTypeFeaturesBitmap::kSupportsSetpoints) }
     };
     if (index < MATTER_ARRAY_SIZE(scheduleTypes))
     {
