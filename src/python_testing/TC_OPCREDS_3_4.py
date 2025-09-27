@@ -144,7 +144,7 @@ class TC_OPCREDS_3_4(MatterBaseTest):
                 TestStep(
                     28, f"TH1 connects to the DUT over PASE and {send_command('ArmFailSafe')} to the DUT with the ExpiryLengthSeconds field set to 900. Steps 29-30 are all performed over the PASE connection.", None, verify_armfailsafe_response()),
                 TestStep(
-                    29, f"TH1 sends {send_command ('ArmFailSafe')} command to the DUT with the ExpiryLengthSeconds field set to 0", None, verify_armfailsafe_response()),
+                    29, f"TH1 sends {send_command('ArmFailSafe')} command to the DUT with the ExpiryLengthSeconds field set to 0", None, verify_armfailsafe_response()),
                 TestStep(
                     30, f"TH1 {send_command('CSRRequest')} over PASE with the IsForUpdateNOC field set to true", None, verify_invalid_command()),
                 TestStep(31, f"TH1 {send_command('RevokeCommissioning')} to the DUT",
