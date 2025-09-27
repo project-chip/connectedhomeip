@@ -81,12 +81,12 @@ class TC_TSTAT_4_4(MatterBaseTest):
         # Commission DUT - already done
 
         self.step("2")
-        #if self.pics_guard(self.check_pics("TSTAT.S.F0a")):
-        # TH reads the ScheduleTypes attribute and saves it in a SupportedScheduleTypes variable.
-        supported_schedule_types = await self.read_single_attribute_check_success(endpoint=1, cluster=cluster, attribute=cluster.Attributes.ScheduleTypes)
-        logger.info(f"Supported Schedule Types: {supported_schedule_types}")
+        if self.pics_guard(self.check_pics("TSTAT.S.A0049")):
+            # TH reads the ScheduleTypes attribute, checking the count, and saves it in a SupportedScheduleTypes variable.
+            supported_schedule_types = await self.read_single_attribute_check_success(endpoint=1, cluster=cluster, attribute=cluster.Attributes.ScheduleTypes)
+            logger.info(f"Supported Schedule Types: {supported_schedule_types}")
 
-        asserts.assert_greater_equal(len(supported_schedule_types), 2)
+            asserts.assert_greater_equal(len(supported_schedule_types), 2)
 
 if __name__ == "__main__":
     default_matter_test_main()
