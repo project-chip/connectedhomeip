@@ -26,7 +26,7 @@
 
 #ifdef SL_WIFI
 #include <platform/silabs/NetworkCommissioningWiFiDriver.h>
-#include <platform/silabs/wifi/WifiInterface.h>
+#include <platform/silabs/wifi/WifiInterface.h> // nogncheck
 
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
 #include <platform/silabs/wifi/icd/WifiSleepManager.h> // nogncheck
@@ -87,7 +87,6 @@ static chip::DeviceLayer::Internal::Efr32PsaOperationalKeystore gOperationalKeys
 #include <platform/silabs/platformAbstraction/SilabsPlatform.h>
 
 #include <app/clusters/network-commissioning/network-commissioning.h>
-
 /**********************************************************
  * Defines
  *********************************************************/
@@ -206,6 +205,14 @@ void ApplicationStart(void * unused)
 
 void SilabsMatterConfig::AppInit()
 {
+#ifdef SL_WIFI
+    // Init Chip memory management before the stack for Wi-Fi platforms
+    // Because OpenThread needs to use memory allocation during its Key operations, we initialize the memory management for thread
+    // and set the allocation functions inside sl_ot_create_instance, which is called earlier by sl_system_init.
+    mbedtls_platform_set_calloc_free(CHIPPlatformMemoryCalloc, CHIPPlatformMemoryFree);
+    VerifyOrDie(chip::Platform::MemoryInit() == CHIP_NO_ERROR);
+#endif // SL_WIFI
+
     GetPlatform().Init();
     sMainTaskHandle = osThreadNew(ApplicationStart, nullptr, &kMainTaskAttr);
     ChipLogProgress(DeviceLayer, "Starting scheduler");
@@ -244,12 +251,10 @@ CHIP_ERROR SilabsMatterConfig::InitMatter(const char * appName)
     ChipLogProgress(DeviceLayer, "Init CHIP Stack");
 
 #ifdef SL_WIFI
-    // Init Chip memory management before the stack
-    // Because OpenThread needs to use memory allocation during its Key operations, we initialize the memory management for thread
-    // and set the allocation functions inside sl_ot_create_instance, which is called earlier by sl_system_init.
-    mbedtls_platform_set_calloc_free(CHIPPlatformMemoryCalloc, CHIPPlatformMemoryFree);
-    ReturnErrorOnFailure(chip::Platform::MemoryInit());
     ReturnErrorOnFailure(WifiInterface::GetInstance().InitWiFiStack());
+    // Needs to be done post InitWifiStack for 917.
+    // TODO move it in InitWiFiStack
+    GetPlatform().NvmInit();
 
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
     ReturnErrorOnFailure(WifiSleepManager::GetInstance().Init(&WifiInterface::GetInstance(), &WifiInterface::GetInstance()));
@@ -287,6 +292,10 @@ CHIP_ERROR SilabsMatterConfig::InitMatter(const char * appName)
     ReturnErrorOnFailure(sWifiNetworkDriver.Init());
 #endif
 
+    // Verify if the platform is updated by reading the NVM3 config value. This needs to be done after the wifi network driver
+    // initialization, as the 917 nvm is accessed through the TA, and the communication between the M4 and the TA is available at
+    // this point. For thread devices, this needs to be after InitChipStack.
+    ReturnErrorOnFailure(GetPlatform().VerifyIfUpdated());
     // Stop Matter event handling while setting up resources
     chip::DeviceLayer::PlatformMgr().LockChipStack();
 

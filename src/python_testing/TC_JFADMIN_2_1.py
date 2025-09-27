@@ -150,7 +150,7 @@ class TC_JFADMIN_2_1(MatterBaseTest):
     def steps_TC_JFADMIN_2_1(self) -> list[TestStep]:
         return [
             TestStep("1", "TH1 read AdministratorFabricIndex attribute.",
-                     "DUT reply contains AdministratorFabricIndex with a value in range 1..255."),
+                     "DUT reply contains AdministratorFabricIndex with a value in range 1..254."),
             TestStep("2", "TH1 read Fabrics attribute from Operation Cluster on EP0.",
                      "DUT reply FabricDescriptorStruct with FabricID equal to AdministratorFabricIndex from step 1.")
         ]
@@ -176,8 +176,8 @@ class TC_JFADMIN_2_1(MatterBaseTest):
         attributeAdminFabricIndex = response[1][Clusters.JointFabricAdministrator].administratorFabricIndex
         asserts.assert_greater_equal(attributeAdminFabricIndex, 1,
                                      "AdministratorFabricIndex is < 1. Expected AdministratorFabricIndex >= 1")
-        asserts.assert_less_equal(attributeAdminFabricIndex, 255,
-                                  "AdministratorFabricIndex is > 255. Expected AdministratorFabricIndex <= 255")
+        asserts.assert_less_equal(attributeAdminFabricIndex, 254,
+                                  "AdministratorFabricIndex is > 254. Expected AdministratorFabricIndex <= 254")
 
         self.step("2")
         response = await devCtrlEcoA.ReadAttribute(

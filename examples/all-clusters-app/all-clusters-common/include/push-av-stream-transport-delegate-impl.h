@@ -64,11 +64,19 @@ public:
 
     Protocols::InteractionModel::Status SelectVideoStream(StreamUsageEnum streamUsage, uint16_t & videoStreamId) override;
 
+    bool ValidateStreamUsage(StreamUsageEnum streamUsage) override;
+
+    bool ValidateSegmentDuration(uint16_t segmentDuration) override;
+
     Protocols::InteractionModel::Status SelectAudioStream(StreamUsageEnum streamUsage, uint16_t & audioStreamId) override;
 
     Protocols::InteractionModel::Status ValidateVideoStream(uint16_t videoStreamId) override;
 
     Protocols::InteractionModel::Status ValidateAudioStream(uint16_t audioStreamId) override;
+
+    Protocols::InteractionModel::Status ValidateZoneId(uint16_t zoneId) override;
+
+    bool ValidateMotionZoneListSize(size_t zoneListSize) override;
 
     PushAvStreamTransportStatusEnum GetTransportBusyStatus(const uint16_t connectionID) override;
 
@@ -77,6 +85,16 @@ public:
     CHIP_ERROR LoadCurrentConnections(std::vector<TransportConfigurationStorage> & currentConnections) override;
 
     CHIP_ERROR PersistentAttributesLoadedCallback() override;
+
+    void SetTLSCerts(Tls::CertificateTable::BufferedClientCert & clientCertEntry,
+                     Tls::CertificateTable::BufferedRootCert & rootCertEntry) override
+    {
+        // Handle TLS certificates if needed for implementation
+    }
+    void SetPushAvStreamTransportServer(PushAvStreamTransportServer * serverLogic) override
+    {
+        // Store pointer to server logic if needed for implementation
+    }
 
     void Init();
     PushAvStreamTransportManager()  = default;

@@ -76,7 +76,7 @@ class Context:
 
     def CleanOutputDirectories(self):
         for builder in self.builders:
-            logging.warn('Cleaning %s', builder.output_dir)
+            logging.warning('Cleaning %s', builder.output_dir)
             if os.path.exists(builder.output_dir):
                 shutil.rmtree(builder.output_dir)
 
