@@ -97,9 +97,9 @@ public:
     bool IsScanNeeded() { return mCommissioner->IsScanNeeded(); }
     bool IsSecondaryNetworkSupported() const { return mCommissioner->IsSecondaryNetworkSupported(); }
     Controller::ReadCommissioningInfo & GetDeviceCommissioningInfo() { return mCommissioner->mDeviceCommissioningInfo; }
-    void ResetTryingSecondaryNetwork() { mCommissioner->ResetTryingSecondaryNetwork(); }
+    void ResetNetworkAttemptType() { mCommissioner->ResetNetworkAttemptType(); }
 
-    bool TryingSecondaryNetwork() { return mCommissioner->TryingSecondaryNetwork(); }
+    bool TryingSecondaryNetwork() const { return mCommissioner->TryingSecondaryNetwork(); }
     void TrySecondaryNetwork() { mCommissioner->TrySecondaryNetwork(); }
 
     void TrySecondaryNetwork() { mCommissioner->TrySecondaryNetwork(); }
