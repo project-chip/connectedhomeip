@@ -521,7 +521,7 @@ TEST_F(TestCommissioningWindowManager, TestOnPlatformEventOperationalNetworkEnab
     MockDnssdServer mockDnssd;
     CommissioningWindowManager & commissionMgr = Server::GetInstance().GetCommissioningWindowManager();
     Server::GetInstance().SetDnssdServer(&mockDnssd);
-    auto event                               = CreateEvent(chip::DeviceLayer::DeviceEventType::kOperationalNetworkEnabled);
+    auto event = CreateEvent(chip::DeviceLayer::DeviceEventType::kOperationalNetworkEnabled);
 
     commissionMgr.OnPlatformEvent(&event);
     EXPECT_TRUE(mockDnssd.IsAdvertisingEnabled());

@@ -472,10 +472,7 @@ public:
     }
 
     static Server & GetInstance() { return sServer; }
-    void SetDnssdServer(Dnssd::IDnssdServer * dnssdServer)
-    {
-        mDnssdServer = dnssdServer;
-    }
+    void SetDnssdServer(Dnssd::IDnssdServer * dnssdServer) { mDnssdServer = dnssdServer; }
 
 private:
     Server() : mDnssdServer(&mDefaultDnssdServer) {}
