@@ -45,6 +45,7 @@ logger = logging.getLogger(__name__)
 
 cluster = Clusters.Thermostat
 
+
 class TC_TSTAT_4_4(MatterBaseTest):
 
     def desc_TC_TSTAT_4_4(self) -> str:
@@ -60,12 +61,12 @@ class TC_TSTAT_4_4(MatterBaseTest):
             TestStep("1", "Commissioning, already done",
                      is_commissioning=True),
             TestStep("2", "TH reads the ScheduleTypes attribute and saves it in a SupportedScheduleTypes variable.",
-                     "Verify that the read returned a list of schedule types with count >=2."),            
+                     "Verify that the read returned a list of schedule types with count >=2."),
         ]
 
         return steps
 
-    @ async_test_body
+    @async_test_body
     async def test_TC_TSTAT_4_4(self):
         endpoint = self.get_endpoint()
 
@@ -79,6 +80,7 @@ class TC_TSTAT_4_4(MatterBaseTest):
             logger.info(f"Supported Schedule Types: {supported_schedule_types}")
 
             asserts.assert_greater_equal(len(supported_schedule_types), 2)
+
 
 if __name__ == "__main__":
     default_matter_test_main()
