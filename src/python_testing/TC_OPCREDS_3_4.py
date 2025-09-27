@@ -290,7 +290,7 @@ class TC_OPCREDS_3_4(MatterBaseTest):
 
         self.step(23)
         cmd = opcreds.Commands.CSRRequest(CSRNonce=random.randbytes(32), isForUpdateNOC=False)
-        csr_not_update = await self.send_single_cmd(dev_ctrl=self.default_controller, node_id=self.dut_node_id, cmd=cmd)
+        await self.send_single_cmd(dev_ctrl=self.default_controller, node_id=self.dut_node_id, cmd=cmd)
 
         self.step(24)
         cmd = opcreds.Commands.AddTrustedRootCertificate(new_root_cert)
