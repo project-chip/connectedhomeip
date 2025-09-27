@@ -135,4 +135,29 @@ details.
 
 ## Presets
 
+### Read presets
+
+```shell
+chip-tool-x86-64 thermostat read presets <nodeID> 1 | grep TOO
+```
+
+### Set active preset
+
+```shell
+./chip-tool-x86-64 thermostat set-active-preset-request PresetHandle destination-id endpoint-id-ignored-for-group-commands
+./chip-tool-x86-64 thermostat set-active-preset-request hex:02 <nodeID> 1 | grep TOO
+[1758995147.916] [4607:4609] [TOO] Sending command to node 0x1e
+[1758995148.195] [4607:4609] [TOO] Sending cluster (0x00000201) command (0x00000006) on endpoint 1
+```
+
+### Read active preset
+
+```shell
+./chip-tool-x86-64 thermostat read active-preset-handle <nodeID> 1 | grep TOO
+[1758995260.093] [4613:4615] [TOO] Sending command to node 0x1e
+[1758995260.387] [4613:4615] [TOO] Sending ReadAttribute to:
+[1758995260.387] [4613:4615] [TOO]      cluster 0x0000_0201, attribute: 0x0000_004E, endpoint 1
+[1758995260.396] [4613:4615] [TOO] Endpoint: 1 Cluster: 0x0000_0201 Attribute 0x0000_004E DataVersion: 1113257472
+[1758995260.396] [4613:4615] [TOO]   ActivePresetHandle: 02
+```
 
