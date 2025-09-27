@@ -154,4 +154,3 @@ chip-tool-x86-64 thermostat read presets <nodeID> 1 | grep TOO
 [1758995260.396] [4613:4615] [TOO] Endpoint: 1 Cluster: 0x0000_0201 Attribute 0x0000_004E DataVersion: 1113257472
 [1758995260.396] [4613:4615] [TOO]   ActivePresetHandle: 02
 ```
-
