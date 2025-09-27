@@ -123,9 +123,9 @@ public:
         return CHIP_NO_ERROR;
     }
 
-    void Start() override { mAdvertisingEnabled = true; }
+    void StartServer() override { mAdvertisingEnabled = true; }
 
-    void Stop() override { mAdvertisingEnabled = false; }
+    void StopServer() override { mAdvertisingEnabled = false; }
 
     bool IsAdvertisingEnabled() override { return mAdvertisingEnabled; }
 
@@ -157,7 +157,6 @@ public:
         initParams.operationalServicePort = 0;
 
         ASSERT_EQ(chip::Server::GetInstance().Init(initParams), CHIP_NO_ERROR);
-
         Server::GetInstance().GetCommissioningWindowManager().CloseCommissioningWindow();
     }
     static void TearDownTestSuite()
@@ -520,11 +519,13 @@ TEST_F(TestCommissioningWindowManager, TestOnPlatformEventFailSafeTimerExpiredPA
 TEST_F(TestCommissioningWindowManager, TestOnPlatformEventOperationalNetworkEnabled)
 {
     MockDnssdServer mockDnssd;
-    CommissioningWindowManager commissionMgr = CommissioningWindowManager(&mockDnssd);
+    CommissioningWindowManager & commissionMgr = Server::GetInstance().GetCommissioningWindowManager();
+    Server::GetInstance().SetDnssdServer(&mockDnssd);
     auto event                               = CreateEvent(chip::DeviceLayer::DeviceEventType::kOperationalNetworkEnabled);
 
     commissionMgr.OnPlatformEvent(&event);
     EXPECT_TRUE(mockDnssd.IsAdvertisingEnabled());
+    Server::GetInstance().SetDnssdServer(&(Server::GetInstance().GetDefaultDnssdServer()));
 }
 
 // Verify that operational advertising failure is handled gracefully

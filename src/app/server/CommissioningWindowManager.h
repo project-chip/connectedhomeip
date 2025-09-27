@@ -54,9 +54,7 @@ class CommissioningWindowManager : public Messaging::UnsolicitedMessageHandler,
                                    public SessionDelegate
 {
 public:
-    CommissioningWindowManager() : mPASESession(*this), mDnsSdServer(&mDefaultDnssd) {}
-    CommissioningWindowManager(Dnssd::IDnssdServer * dnssd) : CommissioningWindowManager() { mDnsSdServer = dnssd; }
-
+    CommissioningWindowManager() : mPASESession(*this) {}
     CHIP_ERROR Init(Server * server)
     {
         if (server == nullptr)
@@ -235,10 +233,6 @@ private:
     friend class Test::CommissioningWindowManagerTestAccess;
     // The PASE session we are using, so we can handle CloseSession properly.
     SessionHolderWithDelegate mPASESession;
-
-    // For testing purposes use a dependency injection
-    Dnssd::IDnssdServer * mDnsSdServer;
-    app::PlatformDnssdServer mDefaultDnssd;
 
     // Information about who opened the commissioning window.  These will only
     // be non-null if the window was opened via the operational credentials

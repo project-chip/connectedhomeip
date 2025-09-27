@@ -432,6 +432,9 @@ public:
 
     app::reporting::ReportScheduler * GetReportScheduler() { return mReportScheduler; }
 
+    chip::Dnssd::IDnssdServer * GetDnssdServer() { return mDnssdServer; }
+    chip::app::PlatformDnssdServer & GetDefaultDnssdServer() { return mDefaultDnssdServer; }
+
 #if CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
     app::JointFabricDatastore & GetJointFabricDatastore() { return mJointFabricDatastore; }
     app::JointFabricAdministrator & GetJointFabricAdministrator() { return mJointFabricAdministrator; }
@@ -471,14 +474,7 @@ public:
     static Server & GetInstance() { return sServer; }
     void SetDnssdServer(Dnssd::IDnssdServer * dnssdServer)
     {
-        if (dnssdServer != nullptr)
-        {
-            mDnssdServer = dnssdServer;
-        }
-        else
-        {
-            mDnssdServer = &mDefaultDnssdServer;
-        }
+        mDnssdServer = dnssdServer;
     }
 
 private:

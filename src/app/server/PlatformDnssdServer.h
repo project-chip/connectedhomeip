@@ -7,8 +7,8 @@ namespace app {
 class PlatformDnssdServer : public chip::Dnssd::IDnssdServer
 {
     CHIP_ERROR AdvertiseOperational() override { return DnssdServer::Instance().AdvertiseOperational(); }
-    virtual void Start() override { DnssdServer::Instance().StartServer(); }
-    virtual void Stop() override { DnssdServer::Instance().StopServer(); }
+    virtual void StartServer() override { DnssdServer::Instance().StartServer(); }
+    virtual void StopServer() override { DnssdServer::Instance().StopServer(); }
     bool IsAdvertisingEnabled() override
     {
         return false; // placeholder
