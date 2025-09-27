@@ -573,7 +573,7 @@ CHIP_ERROR ThermostatAttrAccess::Read(const ConcreteReadAttributePath & aPath, A
             }
         });
     }
-    break;
+    break;    
     case NumberOfPresets::Id: {
         auto delegate = GetDelegate(aPath.mEndpointId);
         VerifyOrReturnError(delegate != nullptr, CHIP_ERROR_INCORRECT_STATE, ChipLogError(Zcl, "Delegate is null"));
@@ -632,7 +632,22 @@ CHIP_ERROR ThermostatAttrAccess::Read(const ConcreteReadAttributePath & aPath, A
     }
     break;
     case ScheduleTypes::Id: {
-        return aEncoder.EncodeList([](const auto & encoder) -> CHIP_ERROR { return CHIP_NO_ERROR; });
+        auto delegate = GetDelegate(aPath.mEndpointId);
+        VerifyOrReturnError(delegate != nullptr, CHIP_ERROR_INCORRECT_STATE, ChipLogError(Zcl, "Delegate is null"));
+
+        return aEncoder.EncodeList([delegate](const auto & encoder) -> CHIP_ERROR {
+            for (uint8_t i = 0; true; i++)
+            {
+                ScheduleTypeStruct::Type scheduleType;
+                auto err = delegate->GetScheduleTypeAtIndex(i, scheduleType);
+                if (err == CHIP_ERROR_PROVIDER_LIST_EXHAUSTED)
+                {
+                    return CHIP_NO_ERROR;
+                }
+                ReturnErrorOnFailure(err);
+                ReturnErrorOnFailure(encoder.Encode(scheduleType));
+            }
+        });
     }
     break;
     case Schedules::Id: {
