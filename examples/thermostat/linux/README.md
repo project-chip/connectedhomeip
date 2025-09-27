@@ -28,7 +28,7 @@ details.
 
 -   Build the example application:
 
-          $ cd ~/connectedhomeip/examples/lighting-app/linux
+          $ cd ~/connectedhomeip/examples/thermostat/linux
           $ git submodule update --init
           $ source third_party/connectedhomeip/scripts/activate.sh
           $ gn gen out/debug
@@ -36,16 +36,8 @@ details.
 
 -   To delete generated executable, libraries and object files use:
 
-          $ cd ~/connectedhomeip/examples/lighting-app/linux
+          $ cd ~/connectedhomeip/examples/thermostat/linux
           $ rm -rf out/
-
--   Build the example with pigweed RPC
-
-          $ cd ~/connectedhomeip/examples/lighting-app/linux
-          $ git submodule update --init
-          $ source third_party/connectedhomeip/scripts/activate.sh
-          $ gn gen out/debug --args='import("//with_pw_rpc.gni")'
-          $ ninja -C out/debug
 
 ## Commandline arguments
 
@@ -108,10 +100,10 @@ details.
 
         -   Run Linux Thermostat Example App
 
-                  $ cd ~/connectedhomeip/examples/lighting-app/linux
-                  $ sudo out/debug/chip-lighting-app --ble-device [bluetooth device number]
+                  $ cd ~/connectedhomeip/examples/thermostat/linux
+                  $ sudo out/debug/chip-thermostat --ble-device [bluetooth device number]
                   # In this example, the device we want to use is hci1
-                  $ sudo out/debug/chip-lighting-app --ble-device 1
+                  $ sudo out/debug/chip-thermostat --ble-device 1
 
         -   Test the device using ChipDeviceController on your laptop /
             workstation etc.
