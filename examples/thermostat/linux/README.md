@@ -17,7 +17,7 @@ details.
     -   [Commandline Arguments](#commandline-arguments)
     -   [Running the Complete Example on Raspberry Pi 4](#running-the-complete-example-on-raspberry-pi-4)
     -   [Running RPC console](#running-rpc-console)
-    -   [Device Tracing](#device-tracing)
+    -   [Presets](#presets)
 
 <hr>
 
@@ -139,6 +139,25 @@ details.
 
 ```shell
 chip-tool-x86-64 thermostat read presets <nodeID> 1 | grep TOO
+[1758985235.117] [4022:4024] [TOO] Sending command to node 0x1e
+[1758985235.347] [4022:4024] [TOO] Sending ReadAttribute to:
+[1758985235.347] [4022:4024] [TOO]      cluster 0x0000_0201, attribute: 0x0000_0050, endpoint 1
+[1758985235.350] [4022:4024] [TOO] Endpoint: 1 Cluster: 0x0000_0201 Attribute 0x0000_0050 DataVersion: 1113257472
+[1758985235.351] [4022:4024] [TOO]   Presets: 2 entries
+[1758985235.351] [4022:4024] [TOO]     [1]: {
+[1758985235.351] [4022:4024] [TOO]       PresetHandle: 01
+[1758985235.351] [4022:4024] [TOO]       PresetScenario: 1
+[1758985235.351] [4022:4024] [TOO]       CoolingSetpoint: 2500
+[1758985235.351] [4022:4024] [TOO]       HeatingSetpoint: 2100
+[1758985235.351] [4022:4024] [TOO]       BuiltIn: TRUE
+[1758985235.351] [4022:4024] [TOO]      }
+[1758985235.351] [4022:4024] [TOO]     [2]: {
+[1758985235.351] [4022:4024] [TOO]       PresetHandle: 02
+[1758985235.351] [4022:4024] [TOO]       PresetScenario: 2
+[1758985235.351] [4022:4024] [TOO]       CoolingSetpoint: 2600
+[1758985235.351] [4022:4024] [TOO]       HeatingSetpoint: 2000
+[1758985235.351] [4022:4024] [TOO]       BuiltIn: TRUE
+[1758985235.351] [4022:4024] [TOO]      }
 ```
 
 ### Set active preset
