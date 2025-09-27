@@ -21,6 +21,7 @@
 #include <controller/AutoCommissioner.h>
 #include <controller/CommissioningDelegate.h>
 #include <controller/tests/AutoCommissionerTestAccess.h>
+#include <credentials/tests/CHIPAttCert_test_vectors.h>
 #include <crypto/CHIPCryptoPAL.h>
 #include <cstring>
 #include <lib/core/StringBuilderAdapters.h>
@@ -28,6 +29,7 @@
 #include <lib/support/CodeUtils.h>
 #include <lib/support/Span.h>
 #include <memory>
+#include <system/SystemClock.h>
 
 using namespace chip;
 using namespace chip::Dnssd;
@@ -45,6 +47,26 @@ protected:
     AutoCommissioner mCommissioner{};
     CommissioningParameters mParams{};
 };
+
+namespace {
+
+/**
+ * @brief RAII helper to ensure DetachSecureSession is always called.
+ *
+ * This class guarantees that the device's secure session is detached when the
+ * object goes out of scope, preventing crashes or memory corruption if a
+ * test fails before the end of the function.
+ */
+class ScopedSessionDetacher
+{
+public:
+    explicit ScopedSessionDetacher(chip::CommissioneeDeviceProxy & device) : mDevice(device) {}
+    ~ScopedSessionDetacher() { mDevice.DetachSecureSession(); }
+
+private:
+    chip::CommissioneeDeviceProxy & mDevice;
+};
+} // namespace
 
 TEST_F(AutoCommissionerTest, DetectsThreadOperationalDatasetExceedsBuffer)
 {
@@ -688,4 +710,363 @@ TEST_F(AutoCommissionerTest, IsSecondaryNetworkSupportedCombinations)
         EXPECT_EQ(result, c.isSecondaryNetworkSupported);
     }
 }
+
+// TODO : Remove redundancies,  optimize code and debug
+TEST_F(AutoCommissionerTest, GetNextCommissioningStageNetworkSetup_ReturnsCorrectStageAndError)
+{
+    struct Case
+    {
+        const char * name;
+        bool supportsConcurrent;
+        bool trySecondary;
+        bool hasWiFiCreds;
+        bool hasThreadDataset;
+        EndpointId wifiEndpoint;
+        EndpointId threadEndpoint;
+        CommissioningStage expectedStage;
+        CHIP_ERROR expectedError;
+    };
+
+    Case cases[] = {
+        { .name               = "TrySecondaryWifiAtRootExpectThread",
+          .supportsConcurrent = true,
+          .trySecondary       = true,
+          .hasWiFiCreds       = true,
+          .hasThreadDataset   = true,
+          .wifiEndpoint       = kRootEndpointId,
+          .threadEndpoint     = kRootEndpointId,
+          .expectedStage      = CommissioningStage::kThreadNetworkSetup,
+          .expectedError      = CHIP_NO_ERROR },
+        { .name               = "TrySecondaryWifiNotRootExpectWiFi",
+          .supportsConcurrent = true,
+          .trySecondary       = true,
+          .hasWiFiCreds       = true,
+          .hasThreadDataset   = true,
+          .wifiEndpoint       = kRootEndpointId + 1,
+          .threadEndpoint     = kRootEndpointId,
+          .expectedStage      = CommissioningStage::kWiFiNetworkSetup,
+          .expectedError      = CHIP_NO_ERROR },
+        { .name               = "PrimaryWifiAtRootExpectWiFi",
+          .supportsConcurrent = true,
+          .trySecondary       = false,
+          .hasWiFiCreds       = true,
+          .hasThreadDataset   = true,
+          .wifiEndpoint       = kRootEndpointId,
+          .threadEndpoint     = kRootEndpointId,
+          .expectedStage      = CommissioningStage::kWiFiNetworkSetup,
+          .expectedError      = CHIP_NO_ERROR },
+        { .name               = "PrimaryWifiNotRootExpectThread",
+          .supportsConcurrent = true,
+          .trySecondary       = false,
+          .hasWiFiCreds       = true,
+          .hasThreadDataset   = true,
+          .wifiEndpoint       = kRootEndpointId + 1,
+          .threadEndpoint     = kRootEndpointId,
+          .expectedStage      = CommissioningStage::kThreadNetworkSetup,
+          .expectedError      = CHIP_NO_ERROR },
+        { .name               = "NoSecondarySupportWithWiFiOnlyExpectWiFi",
+          .supportsConcurrent = false,
+          .trySecondary       = false,
+          .hasWiFiCreds       = true,
+          .hasThreadDataset   = false,
+          .wifiEndpoint       = kRootEndpointId,
+          .threadEndpoint     = kInvalidEndpointId,
+          .expectedStage      = CommissioningStage::kWiFiNetworkSetup,
+          .expectedError      = CHIP_NO_ERROR },
+        { .name               = "NoSecondarySupportWithThreadOnlyExpectThread",
+          .supportsConcurrent = false,
+          .trySecondary       = false,
+          .hasWiFiCreds       = false,
+          .hasThreadDataset   = true,
+          .wifiEndpoint       = kInvalidEndpointId,
+          .threadEndpoint     = kRootEndpointId,
+          .expectedStage      = CommissioningStage::kThreadNetworkSetup,
+          .expectedError      = CHIP_NO_ERROR },
+        { .name               = "MissingAllParamsExpectCleanupError",
+          .supportsConcurrent = false,
+          .trySecondary       = false,
+          .hasWiFiCreds       = false,
+          .hasThreadDataset   = false,
+          .wifiEndpoint       = kInvalidEndpointId,
+          .threadEndpoint     = kInvalidEndpointId,
+          .expectedStage      = CommissioningStage::kCleanup,
+          .expectedError      = CHIP_ERROR_INVALID_ARGUMENT },
+    };
+
+    for (const auto & c : cases)
+    {
+        CommissioningParameters params{};
+        if (c.supportsConcurrent)
+        {
+            params.SetSupportsConcurrentConnection(true);
+        }
+
+        if (c.hasWiFiCreds)
+        {
+            params.SetWiFiCredentials(WiFiCredentials(ByteSpan(), ByteSpan()));
+        }
+        if (c.hasThreadDataset)
+        {
+            params.SetThreadOperationalDataset(ByteSpan());
+        }
+
+        ASSERT_EQ(mCommissioner.SetCommissioningParameters(params), CHIP_NO_ERROR);
+
+        AutoCommissionerTestAccess privateConfigCommissioner(&mCommissioner);
+
+        if (c.trySecondary)
+        {
+            privateConfigCommissioner.TrySecondaryNetwork();
+        }
+        else
+        {
+            privateConfigCommissioner.ResetTryingSecondaryNetwork();
+        }
+
+        ReadCommissioningInfo & commissioningInfo = privateConfigCommissioner.GetDeviceCommissioningInfo();
+        commissioningInfo.network.wifi.endpoint   = c.wifiEndpoint;
+        commissioningInfo.network.thread.endpoint = c.threadEndpoint;
+
+        CHIP_ERROR err                             = CHIP_NO_ERROR;
+        constexpr CommissioningStage kInvalidStage = static_cast<CommissioningStage>(250);
+        auto stage = privateConfigCommissioner.GetNextCommissioningStageNetworkSetup(kInvalidStage, err);
+
+        if (stage != c.expectedStage || err != c.expectedError)
+        {
+            ChipLogError(Test,
+                         "Case %s FAILED: got stage=%d err=%s, expected stage=%d err=%s "
+                         "(supportsConcurrent=%d trySecondary=%d hasWiFi=%d hasThread=%d "
+                         "wifiEndpoint=0x%03X threadEndpoint=0x%03X)",
+                         c.name, static_cast<int>(stage), ErrorStr(err), static_cast<int>(c.expectedStage),
+                         ErrorStr(c.expectedError), c.supportsConcurrent, c.trySecondary, c.hasWiFiCreds, c.hasThreadDataset,
+                         c.wifiEndpoint, c.threadEndpoint);
+        }
+
+        EXPECT_EQ(stage, c.expectedStage);
+        EXPECT_EQ(err, c.expectedError);
+    }
+}
+
+namespace test_helpers {
+
+inline void ExpectReadCommissioningInfoEq(const ReadCommissioningInfo & actual,
+                                          const ReadCommissioningInfo & expected = ReadCommissioningInfo())
+{
+#if CHIP_CONFIG_ENABLE_READ_CLIENT
+    EXPECT_EQ(actual.attributes, expected.attributes);
+#endif
+    EXPECT_EQ(actual.requiresUTC, expected.requiresUTC);
+    EXPECT_EQ(actual.requiresTimeZone, expected.requiresTimeZone);
+    EXPECT_EQ(actual.requiresDefaultNTP, expected.requiresDefaultNTP);
+    EXPECT_EQ(actual.requiresTrustedTimeSource, expected.requiresTrustedTimeSource);
+    EXPECT_EQ(actual.maxTimeZoneSize, expected.maxTimeZoneSize);
+    EXPECT_EQ(actual.maxDSTSize, expected.maxDSTSize);
+    EXPECT_EQ(actual.remoteNodeId, expected.remoteNodeId);
+    EXPECT_EQ(actual.supportsConcurrentConnection, expected.supportsConcurrentConnection);
+
+    // not asserting on nested structs
+}
+
+inline void ExpectOperationalDeviceProxyEq(const chip::OperationalDeviceProxy & actual,
+                                           const chip::OperationalDeviceProxy & expected)
+{
+    EXPECT_EQ(actual.GetDeviceId(), expected.GetDeviceId());
+    EXPECT_EQ(actual.GetExchangeManager(), expected.GetExchangeManager());
+    EXPECT_EQ(actual.GetSecureSession().HasValue(), expected.GetSecureSession().HasValue());
+    EXPECT_EQ(actual.GetPeerScopedNodeId(), expected.GetPeerScopedNodeId());
+}
+struct ActiveSessionState
+{
+    CommissioneeDeviceProxy device;
+    Transport::SecureSessionTable sessionTable;
+    // std::optional is perfect for holding an object that is constructed after its container
+    std::optional<Transport::SecureSession> session;
+
+    // The RAII guard is part of the state!
+    std::optional<ScopedSessionDetacher> detacher;
+};
+
+auto CreateAndConnectTestDevice(AutoCommissionerTestAccess & accessor)
+{
+    auto state = std::make_unique<ActiveSessionState>();
+
+    state->device.Init(ControllerDeviceInitParams(), 0x00, Transport::Type::kUdp);
+    accessor.SetDeviceCommissioneeProxy(&state->device);
+
+    state->sessionTable.Init();
+
+    // Construct the session in-place inside the struct
+    state->session.emplace(state->sessionTable, Transport::SecureSession::Type::kPASE, 1234, 0x1111, 0x2222, CATValues(), 5678, 1,
+                           GetDefaultMRPConfig());
+
+    SessionHandle handle(state->session.value());
+    EXPECT_EQ(state->device.SetConnected(handle), CHIP_NO_ERROR);
+
+    // Construct the RAII guard in-place
+    state->detacher.emplace(state->device);
+
+    return state;
+}
+
+} // namespace test_helpers
+
+TEST_F(AutoCommissionerTest, CleanupCommissioning_ResetsStateAfterTryingSecondaryNetwork)
+{
+
+    mParams.SetSupportsConcurrentConnection(true);
+    mParams.SetWiFiCredentials(WiFiCredentials(ByteSpan(), ByteSpan()));
+    mParams.SetThreadOperationalDataset(ByteSpan());
+
+    mParams.SetDAC(TestCerts::sTestCert_DAC_FFF1_8000_0000_Cert);
+    mParams.SetPAI(TestCerts::sTestCert_PAI_FFF1_8000_Cert);
+    EXPECT_EQ(mCommissioner.SetCommissioningParameters(mParams), CHIP_NO_ERROR);
+
+    AutoCommissionerTestAccess privateConfigCommissioner(&mCommissioner);
+
+    CommissioneeDeviceProxy device;
+    ControllerDeviceInitParams initParams; // Use the one from the test fixture if available
+    device.Init(initParams, 0x00, Transport::Type::kUdp);
+    privateConfigCommissioner.SetDeviceCommissioneeProxy(&device);
+
+    Messaging::ExchangeManager exchangeMgr;
+
+    Transport::SecureSessionTable sessionTable;
+    sessionTable.Init();
+    Transport::SecureSession testSession(sessionTable, Transport::SecureSession::Type::kPASE, 1234, 0x1111, 0x2222, CATValues(),
+                                         5678, 1, GetDefaultMRPConfig());
+    SessionHandle sessionHandle(testSession);
+    OperationalDeviceProxy operationalProxy(&exchangeMgr, sessionHandle);
+    // Use std::move because the test accessor's setter is designed to move.
+    privateConfigCommissioner.SetOperationalDeviceProxy(operationalProxy);
+
+    chip::Controller::ReadCommissioningInfo & commissioningInfo = privateConfigCommissioner.GetDeviceCommissioningInfo();
+    commissioningInfo.requiresUTC                               = true;
+    commissioningInfo.requiresTimeZone                          = true;
+    commissioningInfo.maxTimeZoneSize                           = 128;
+    commissioningInfo.remoteNodeId                              = 0xDEADBEEF;
+    commissioningInfo.supportsConcurrentConnection              = false;
+    commissioningInfo.network.wifi.endpoint                     = 0x000;
+    commissioningInfo.network.thread.endpoint                   = 0x000;
+
+    privateConfigCommissioner.SetNeedsDST();
+    privateConfigCommissioner.TrySecondaryNetwork();
+
+    privateConfigCommissioner.CleanupCommissioning();
+
+    EXPECT_EQ(privateConfigCommissioner.TryingSecondaryNetwork(), false);
+    EXPECT_TRUE(privateConfigCommissioner.GetPAI().empty());
+    EXPECT_TRUE(privateConfigCommissioner.GetDAC().empty());
+    EXPECT_EQ(privateConfigCommissioner.GetCommissioneeDeviceProxy(), nullptr);
+    test_helpers::ExpectOperationalDeviceProxyEq(privateConfigCommissioner.GetOperationalDeviceProxy(), OperationalDeviceProxy());
+    test_helpers::ExpectReadCommissioningInfoEq(privateConfigCommissioner.GetDeviceCommissioningInfo(), ReadCommissioningInfo());
+    EXPECT_EQ(privateConfigCommissioner.GetNeedsDST(), false);
+}
+
+TEST_F(AutoCommissionerTest, GetCommandTimeout_CalculatesCorrectlyWithoutActiveSession)
+{
+
+    AutoCommissionerTestAccess privateConfigCommissioner(&mCommissioner);
+    Controller::ReadCommissioningInfo & commissioningInfo = privateConfigCommissioner.GetDeviceCommissioningInfo();
+    CommissioneeDeviceProxy device;
+    privateConfigCommissioner.SetDeviceCommissioneeProxy(&device);
+    commissioningInfo.network.wifi.minConnectionTime = 20;
+    CommissioningStage stage                         = kWiFiNetworkEnable;
+    System::Clock::Timeout expectedTimeout           = kMinimumCommissioningStepTimeout;
+
+    // no need to test semi-hardcoded pathways
+
+    EXPECT_EQ(privateConfigCommissioner.GetCommandTimeout(privateConfigCommissioner.GetCommissioneeDeviceProxy(), stage),
+              MakeOptional(expectedTimeout));
+}
+
+TEST_F(AutoCommissionerTest, GetCommandTimeout_CalculatesCorrectlyWithActiveSession)
+{
+    AutoCommissionerTestAccess privateConfigCommissioner(&mCommissioner);
+    Controller::ReadCommissioningInfo & commissioningInfo = privateConfigCommissioner.GetDeviceCommissioningInfo();
+
+    // The returned 'state' object now correctly manages all lifetimes.
+    auto state = test_helpers::CreateAndConnectTestDevice(privateConfigCommissioner);
+
+    CommissioningStage stage                           = kThreadNetworkEnable;
+    commissioningInfo.network.thread.minConnectionTime = 40;
+    System::Clock::Timeout expectedTimeout = System::Clock::Seconds16(commissioningInfo.network.thread.minConnectionTime);
+
+    // We use the device from our state object. It's guaranteed to be valid.
+    EXPECT_EQ(privateConfigCommissioner.GetCommandTimeout(&state->device, stage), MakeOptional(expectedTimeout));
+
+    // When 'state' goes out of scope at the end of the function, the ScopedSessionDetacher
+    // inside it is automatically destroyed, safely calling DetachSecureSession().
+}
+
+TEST_F(AutoCommissionerTest, GetDeviceProxyForStep_ReturnsCorrectProxy)
+{
+    AutoCommissionerTestAccess privateConfigCommissioner(&mCommissioner);
+
+    enum class ExpectedProxyType
+    {
+        kCommissionee,
+        kOperational
+    };
+
+    struct Case
+    {
+        const char * name;
+        bool setOperationalProxy;
+        CommissioningStage nextStage;
+        ExpectedProxyType expectedProxyType;
+    };
+
+    Case cases[] = {
+        { .name                = "OperationalProxyForSendComplete",
+          .setOperationalProxy = false,
+          .nextStage           = CommissioningStage::kSendComplete,
+          .expectedProxyType   = ExpectedProxyType::kOperational },
+        { .name                = "OperationalProxyForICDSendStayActive",
+          .setOperationalProxy = false,
+          .nextStage           = CommissioningStage::kICDSendStayActive,
+          .expectedProxyType   = ExpectedProxyType::kOperational },
+        { .name                = "CommissioneeProxyForCleanup",
+          .setOperationalProxy = false,
+          .nextStage           = CommissioningStage::kCleanup,
+          .expectedProxyType   = ExpectedProxyType::kCommissionee },
+        { .name                = "OperationalProxyForCleanupWhenAvailable",
+          .setOperationalProxy = true,
+          .nextStage           = CommissioningStage::kCleanup,
+          .expectedProxyType   = ExpectedProxyType::kOperational },
+    };
+
+    for (const auto & c : cases)
+    {
+        // The 'state' object manages the lifetimes of the device, session,
+        // session table, and the RAII detacher.
+        auto state = test_helpers::CreateAndConnectTestDevice(privateConfigCommissioner);
+
+        if (c.setOperationalProxy)
+        {
+            Messaging::ExchangeManager exchangeMgr;
+            // The operational proxy is created using the now-guaranteed-to-be-valid session.
+            OperationalDeviceProxy operationalProxy(&exchangeMgr, state->device.GetSecureSession().Value());
+            privateConfigCommissioner.SetOperationalDeviceProxy(operationalProxy);
+        }
+
+        DeviceProxy * expectedProxy = nullptr;
+        switch (c.expectedProxyType)
+        {
+        case ExpectedProxyType::kCommissionee:
+            expectedProxy = privateConfigCommissioner.GetCommissioneeDeviceProxy();
+            break;
+        case ExpectedProxyType::kOperational:
+            expectedProxy = &privateConfigCommissioner.GetOperationalDeviceProxy();
+            break;
+        }
+
+        DeviceProxy * actualProxy = privateConfigCommissioner.GetDeviceProxyForStep(c.nextStage);
+        EXPECT_EQ(actualProxy, expectedProxy) << "Test case failed: " << c.name;
+
+        // Cleanup state inside the commissioner for the next iteration of the loop.
+        // The 'state' object's resources are cleaned up automatically when it goes out of scope.
+        privateConfigCommissioner.CleanupCommissioning();
+    }
+}
+
 } // namespace
