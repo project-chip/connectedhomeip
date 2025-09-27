@@ -42,7 +42,7 @@ _pychip_P256Keypair_ECDH_derive_secret_func = CFUNCTYPE(c_bool, py_object, POINT
 P256_PUBLIC_KEY_LENGTH = 2 * 32 + 1
 
 
-@ _pychip_P256Keypair_ECDSA_sign_msg_func
+@_pychip_P256Keypair_ECDSA_sign_msg_func
 def _pychip_ECDSA_sign_msg(self_: 'P256Keypair', message_buf: _Pointer[c_uint8], message_size: int, signature_buf: _Pointer[c_uint8], signature_buf_size: _Pointer[c_size_t]) -> bool:
     res = self_.ECDSA_sign_msg(string_at(message_buf, message_size)[:])
     memmove(signature_buf, res, len(res))
@@ -50,7 +50,7 @@ def _pychip_ECDSA_sign_msg(self_: 'P256Keypair', message_buf: _Pointer[c_uint8],
     return True
 
 
-@ _pychip_P256Keypair_ECDH_derive_secret_func
+@_pychip_P256Keypair_ECDH_derive_secret_func
 def _pychip_ECDH_derive_secret(self_: 'P256Keypair', remote_pubkey: _Pointer[c_uint8], out_secret_buf: _Pointer[c_uint8], out_secret_buf_size: _Pointer[c_uint32]) -> bool:
     res = self_.ECDH_derive_secret(string_at(remote_pubkey, P256_PUBLIC_KEY_LENGTH)[:])
     memmove(out_secret_buf, res, len(res))

@@ -1,4 +1,3 @@
-
 /*
  *
  *    Copyright (c) 2025 Project CHIP Authors
@@ -19,10 +18,14 @@
 
 #pragma once
 
+#include "pushav-prerollbuffer.h"
 #include <media-controller.h>
 #include <mutex>
 #include <vector>
 
+namespace Camera {
+class CameraDevice; // forward declaration
+}
 // Default Media Controller
 class DefaultMediaController : public MediaController
 {
@@ -35,12 +38,17 @@ public:
     // Transports must first unregister from the media-controller when they are
     // getting destroyed.
     void UnregisterTransport(Transport * transport) override;
-    // Media controller goes through registered transports and dispatches media
-    // if the transport is ready.
+    // DistributeVideo and DistributeAudio are called when data is ready to be sent out
     void DistributeVideo(const char * data, size_t size, uint16_t videoStreamID) override;
     void DistributeAudio(const char * data, size_t size, uint16_t audioStreamID) override;
+    // Sets the desired preroll buffer length in milliseconds for the given transport
+    void SetPreRollLength(Transport * transport, uint16_t preRollBufferLength) override;
+    void SetCameraDevice(Camera::CameraDevice * device);
 
 private:
+    PreRollBuffer mPreRollBuffer;
     std::vector<Connection> mConnections;
     std::mutex mConnectionsMutex;
+    std::unordered_map<Transport *, BufferSink *> mSinkMap; // map of transport to sink
+    Camera::CameraDevice * mCameraDevice = nullptr;         // pointer to parent camera device
 };

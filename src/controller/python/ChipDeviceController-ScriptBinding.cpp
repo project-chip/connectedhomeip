@@ -932,7 +932,7 @@ PyChipError pychip_IsSessionOverTCPConnection(chip::OperationalDeviceProxy * dev
     VerifyOrReturnError(isSessionOverTCP != nullptr, ToPyChipError(CHIP_ERROR_INVALID_ARGUMENT));
 
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
-    *isSessionOverTCP = deviceProxy->GetSecureSession().Value()->AsSecureSession()->GetTCPConnection() != nullptr;
+    *isSessionOverTCP = !deviceProxy->GetSecureSession().Value()->AsSecureSession()->GetTCPConnection().IsNull();
 #else
     *isSessionOverTCP = false;
 #endif
@@ -960,8 +960,11 @@ PyChipError pychip_CloseTCPConnectionWithPeer(chip::OperationalDeviceProxy * dev
     VerifyOrReturnError(deviceProxy->GetSecureSession().Value()->AsSecureSession()->AllowsLargePayload(),
                         ToPyChipError(CHIP_ERROR_INVALID_ARGUMENT));
 
-    deviceProxy->GetExchangeManager()->GetSessionManager()->TCPDisconnect(
-        deviceProxy->GetSecureSession().Value()->AsSecureSession()->GetTCPConnection(), /* shouldAbort = */ false);
+    auto tcpConnection = deviceProxy->GetSecureSession().Value()->AsSecureSession()->GetTCPConnection();
+    if (!tcpConnection.IsNull())
+    {
+        tcpConnection->ForceDisconnect();
+    }
 
     return ToPyChipError(CHIP_NO_ERROR);
 #else

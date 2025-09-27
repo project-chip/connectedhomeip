@@ -43,6 +43,10 @@
 
 #define CHIP_CONFIG_MAX_FABRICS 5
 
+// CHIP_CONFIG_SHA256_CONTEXT_SIZE: A value of 136 bytes is the minimum
+// required for the MbedTLS SSSAPI based implementation
+#define CHIP_CONFIG_SHA256_CONTEXT_SIZE 140
+
 // ==================== Security Adaptations ====================
 
 // FIXME: K32W currently set to CHIP (Does this use Entropy.cpp ?)

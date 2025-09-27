@@ -29,6 +29,8 @@ from matter.idl.matter_idl_types import (AccessPrivilege, ApiMaturity, Attribute
                                          EventQuality, Field, FieldQuality, Idl, ParseMetaData, ServerClusterInstantiation, Struct,
                                          StructQuality, StructTag)
 
+LOGGER = logging.getLogger(__name__)
+
 
 def UnionOfAllFlags(flags_list):
     if not flags_list:
@@ -744,9 +746,9 @@ def main(log_level, filename=None):
         format='%(asctime)s %(levelname)-7s %(message)s',
     )
 
-    logging.info("Starting to parse ...")
+    LOGGER.info("Starting to parse ...")
     data = CreateParser().parse(open(filename).read(), file_name=filename)
-    logging.info("Parse completed")
+    LOGGER.info("Parse completed")
 
-    logging.info("Data:")
+    LOGGER.info("Data:")
     pprint.pp(data)

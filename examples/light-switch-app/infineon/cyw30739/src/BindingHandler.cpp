@@ -19,7 +19,7 @@
 #include "controller/ReadInteraction.h"
 #include <AppShellCommands.h>
 #include <BindingHandler.h>
-#include <app/clusters/bindings/bindings.h>
+#include <app/clusters/bindings/BindingManager.h>
 
 using namespace chip;
 using namespace chip::app;
