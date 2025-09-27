@@ -97,9 +97,9 @@ public:
     bool IsScanNeeded() { return mCommissioner->IsScanNeeded(); }
     bool IsSecondaryNetworkSupported() const { return mCommissioner->IsSecondaryNetworkSupported(); }
     Controller::ReadCommissioningInfo & GetDeviceCommissioningInfo() { return mCommissioner->mDeviceCommissioningInfo; }
-    void ResetNetworkAttemptType() { mCommissioner->ResetNetworkAttemptType(); }
+    void ResetTryingSecondaryNetwork() { mCommissioner->ResetTryingSecondaryNetwork(); }
 
-    bool TryingSecondaryNetwork() const { return mCommissioner->TryingSecondaryNetwork(); }
+    bool TryingSecondaryNetwork() { return mCommissioner->TryingSecondaryNetwork(); }
     void TrySecondaryNetwork() { mCommissioner->TrySecondaryNetwork(); }
 
     void TrySecondaryNetwork() { mCommissioner->TrySecondaryNetwork(); }
@@ -117,14 +117,21 @@ public:
     const ByteSpan GetDAC() { return mCommissioner->GetDAC(); }
     const ByteSpan GetPAI() { return mCommissioner->GetPAI(); }
     CommissioneeDeviceProxy * GetCommissioneeDeviceProxy() { return mCommissioner->GetCommissioneeDeviceProxy(); }
-    OperationalDeviceProxy GetOperationalDeviceProxy() { return mCommissioner->mOperationalDeviceProxy; }
+    OperationalDeviceProxy & GetOperationalDeviceProxy() { return mCommissioner->mOperationalDeviceProxy; }
     bool GetNeedsDST() { return mCommissioner->mNeedsDST; }
+    void SetNeedsDST() { mCommissioner->mNeedsDST = true; }
     Optional<System::Clock::Timeout> GetCommandTimeout(DeviceProxy * device, Controller::CommissioningStage stage) const
     {
         return mCommissioner->GetCommandTimeout(device, stage);
     }
 
     void SetDeviceCommissioneeProxy(CommissioneeDeviceProxy * device) { mCommissioner->mCommissioneeDeviceProxy = device; }
+
+    DeviceProxy * GetDeviceProxyForStep(Controller::CommissioningStage nextStage)
+    {
+        return mCommissioner->GetDeviceProxyForStep(nextStage);
+    }
+    void SetOperationalDeviceProxy(OperationalDeviceProxy & device) { mCommissioner->mOperationalDeviceProxy = std::move(device); }
 
 private:
     Controller::AutoCommissioner * mCommissioner = nullptr;
