@@ -39,7 +39,7 @@ ThermostatDelegate::ThermostatDelegate()
     mMaxThermostatSuggestions                 = kMaxNumberOfThermostatSuggestions;
     mIndexOfCurrentSuggestion                 = mMaxThermostatSuggestions;
     mNextFreeIndexInThermostatSuggestionsList = 0;
-    mMaxSchedules                             = 1;  
+    mMaxSchedules                             = kMaxNumberOfSchedulesSupported;  
 
     // Start the unique ID from 0 and it increases montonically.
     mUniqueID = 0;
