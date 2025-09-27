@@ -34,19 +34,11 @@
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
 
-import copy
-import asyncio
 import logging
-import random
-from datetime import datetime, timedelta, timezone
 
 from mobly import asserts
 
 import matter.clusters as Clusters
-from matter import ChipDeviceCtrl  # Needed before matter.FabricAdmin
-from matter.clusters import Globals
-from matter.clusters.Types import NullValue
-from matter.interaction_model import InteractionModelError, Status
 from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 
 logger = logging.getLogger(__name__)
@@ -83,7 +75,7 @@ class TC_TSTAT_4_4(MatterBaseTest):
         self.step("2")
         if self.pics_guard(self.check_pics("TSTAT.S.A0049")):
             # TH reads the ScheduleTypes attribute, checking the count, and saves it in a SupportedScheduleTypes variable.
-            supported_schedule_types = await self.read_single_attribute_check_success(endpoint=1, cluster=cluster, attribute=cluster.Attributes.ScheduleTypes)
+            supported_schedule_types = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.ScheduleTypes)
             logger.info(f"Supported Schedule Types: {supported_schedule_types}")
 
             asserts.assert_greater_equal(len(supported_schedule_types), 2)
