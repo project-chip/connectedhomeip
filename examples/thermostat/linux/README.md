@@ -69,8 +69,8 @@ details.
 
     1. A Raspberry Pi 4 board
     2. A USB Bluetooth Dongle, Ubuntu desktop will send Bluetooth advertisement,
-       which will block Matter from connecting via BLE. On Ubuntu server, you need
-       to install `pi-bluetooth` via APT.
+       which will block Matter from connecting via BLE. On Ubuntu server, you
+       need to install `pi-bluetooth` via APT.
     3. Ubuntu 20.04 or newer image for ARM64 platform.
 
 -   Building
