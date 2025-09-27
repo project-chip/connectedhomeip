@@ -39,6 +39,7 @@ ThermostatDelegate::ThermostatDelegate()
     mMaxThermostatSuggestions                 = kMaxNumberOfThermostatSuggestions;
     mIndexOfCurrentSuggestion                 = mMaxThermostatSuggestions;
     mNextFreeIndexInThermostatSuggestionsList = 0;
+    mMaxSchedules                             = 1;  
 
     // Start the unique ID from 0 and it increases montonically.
     mUniqueID = 0;
@@ -482,4 +483,23 @@ size_t ThermostatDelegate::GetThermostatSuggestionIndexWithEarliestEffectiveTime
         }
     }
     return minEffectiveTimeSuggestionIndex;
+}
+
+
+CHIP_ERROR ThermostatDelegate::GetScheduleTypeAtIndex(size_t index, Structs::ScheduleTypeStruct::Type & scheduleType)
+{
+    static ScheduleTypeStruct::Type scheduleTypes[] = {
+        { .systemMode               = SystemModeEnum::kHeat,
+          .numberOfSchedules        = mMaxSchedules,
+          .scheduleTypeFeatures     = to_underlying(ScheduleTypeFeaturesBitmap::kSupportsSetpoints) },
+        { .systemMode               = SystemModeEnum::kCool,
+          .numberOfSchedules        = mMaxSchedules,
+          .scheduleTypeFeatures     = to_underlying(ScheduleTypeFeaturesBitmap::kSupportsSetpoints) }
+    };
+    if (index < MATTER_ARRAY_SIZE(scheduleTypes))
+    {
+        scheduleType = scheduleTypes[index];
+        return CHIP_NO_ERROR;
+    }
+    return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED;
 }

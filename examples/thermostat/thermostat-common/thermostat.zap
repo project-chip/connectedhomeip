@@ -5178,6 +5178,22 @@
               "reportableChange": 0
             },
             {
+              "name": "ScheduleTypes",
+              "code": 73,
+              "mfgCode": null,
+              "side": "server",
+              "type": "array",
+              "included": 1,
+              "storageOption": "External",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": null,
+              "reportable": 1,
+              "minInterval": 1,
+              "maxInterval": 65534,
+              "reportableChange": 0
+            },
+            {
               "name": "NumberOfPresets",
               "code": 74,
               "mfgCode": null,
