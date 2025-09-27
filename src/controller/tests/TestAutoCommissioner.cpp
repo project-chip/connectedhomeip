@@ -790,7 +790,7 @@ TEST_F(AutoCommissionerTest, GetNextCommissioningStageNetworkSetup_ReturnsCorrec
           .wifiEndpoint       = kInvalidEndpointId,
           .threadEndpoint     = kInvalidEndpointId,
           .expectedStage      = CommissioningStage::kCleanup,
-          .expectedError      = CHIP_ERROR_INVALID_ARGUMENT },
+          .expectedError      = CHIP_ERROR_INCORRECT_STATE },
     };
 
     for (const auto & c : cases)
@@ -820,7 +820,7 @@ TEST_F(AutoCommissionerTest, GetNextCommissioningStageNetworkSetup_ReturnsCorrec
         }
         else
         {
-            privateConfigCommissioner.ResetTryingSecondaryNetwork();
+            privateConfigCommissioner.ResetNetworkAttemptType();
         }
 
         ReadCommissioningInfo & commissioningInfo = privateConfigCommissioner.GetDeviceCommissioningInfo();
