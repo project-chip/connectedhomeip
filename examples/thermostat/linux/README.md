@@ -1,9 +1,9 @@
 # Matter Linux Thermostat Example
 
-An example showing the use of Matter on the Linux. The document will describe how
-to build and run Matter Linux Thermostat Example on Raspberry Pi. This doc is tested
-on **Ubuntu for Raspberry Pi Server 20.04 LTS (aarch64)** and **Ubuntu for
-Raspberry Pi Desktop 20.10 (aarch64)**
+An example showing the use of Matter on the Linux. The document will describe
+how to build and run Matter Linux Thermostat Example on Raspberry Pi. This doc
+is tested on **Ubuntu for Raspberry Pi Server 20.04 LTS (aarch64)** and **Ubuntu
+for Raspberry Pi Desktop 20.10 (aarch64)**
 
 To cross-compile this example on x64 host and run on **NXP i.MX 8M Mini**
 **EVK**, see the associated
