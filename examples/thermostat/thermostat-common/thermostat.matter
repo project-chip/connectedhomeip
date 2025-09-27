@@ -2947,8 +2947,13 @@ endpoint 1 {
     callback attribute presetTypes;
     callback attribute scheduleTypes;
     ram      attribute numberOfPresets default = 0;
+    ram      attribute numberOfSchedules default = 0;
+    ram      attribute numberOfScheduleTransitions default = 0;
+    ram      attribute numberOfScheduleTransitionPerDay;
     ram      attribute activePresetHandle;
+    ram      attribute activeScheduleHandle;
     callback attribute presets;
+    callback attribute schedules;
     ram      attribute setpointHoldExpiryTimestamp;
     callback attribute maxThermostatSuggestions;
     callback attribute thermostatSuggestions;
@@ -2957,11 +2962,12 @@ endpoint 1 {
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 0x123;
+    ram      attribute featureMap default = 419;
     ram      attribute clusterRevision default = 8;
 
     handle command SetpointRaiseLower;
     handle command AddThermostatSuggestionResponse;
+    handle command SetActiveScheduleRequest;
     handle command SetActivePresetRequest;
     handle command AddThermostatSuggestion;
     handle command RemoveThermostatSuggestion;
