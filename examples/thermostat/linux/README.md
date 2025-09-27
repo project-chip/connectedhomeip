@@ -16,7 +16,6 @@ details.
     -   [Building](#building)
     -   [Commandline Arguments](#commandline-arguments)
     -   [Running the Complete Example on Raspberry Pi 4](#running-the-complete-example-on-raspberry-pi-4)
-    -   [Running RPC console](#running-rpc-console)
     -   [Presets](#presets)
 
 <hr>
@@ -116,22 +115,6 @@ details.
 
         -   Test the device using ChipDeviceController on your laptop /
             workstation etc.
-
-## Running RPC Console
-
--   As part of building the example with RPCs enabled the chip_rpc python
-    interactive console is installed into your venv. The python wheel files are
-    also created in the output folder: out/debug/chip_rpc_console_wheels. To
-    install the wheel files without rebuilding:
-    `pip3 install out/debug/chip_rpc_console_wheels/*.whl`
-
--   To use the chip-rpc console after it has been installed run:
-    `chip-console -s localhost:33000 -o /<YourFolder>/pw_log.out`
-
--   Then you can Get and Set the light using the RPCs:
-    `rpcs.chip.rpc.Thermostat.Get()`
-
-    `rpcs.chip.rpc.Thermostat.Set(on=True, level=128, color=protos.chip.rpc.ThermostatColor(hue=5, saturation=5))`
 
 ## Presets
 
