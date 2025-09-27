@@ -1,3 +1,21 @@
+/*
+ *
+ *    Copyright (c) 2025 Project CHIP Authors
+ *    All rights reserved.
+ *
+ *    Licensed under the Apache License, Version 2.0 (the "License");
+ *    you may not use this file except in compliance with the License.
+ *    You may obtain a copy of the License at
+ *
+ *        http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *    Unless required by applicable law or agreed to in writing, software
+ *    distributed under the License is distributed on an "AS IS" BASIS,
+ *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *    See the License for the specific language governing permissions and
+ *    limitations under the License.
+ */
+
 #include "OtaTlvEncryptionKey.h"
 #include <lib/support/CodeUtils.h>
 #include <sl_psa_crypto.h>
@@ -7,7 +25,6 @@
 namespace chip {
 namespace DeviceLayer {
 namespace Silabs {
-namespace OtaTlvEncryptionKey {
 
 int destroyAESKey(uint32_t kid)
 {
@@ -35,7 +52,7 @@ CHIP_ERROR OtaTlvEncryptionKey::Import(const uint8_t * key, size_t key_len)
     psa_key_id_t key_id;
     psa_set_key_id(&attributes, mId);
     psa_set_key_type(&attributes, PSA_KEY_TYPE_AES);
-    psa_set_key_bits(&attributes, 128);
+    psa_set_key_bits(&attributes, (kOTAEncryptionKeyLength * 8u));
     psa_set_key_algorithm(&attributes, PSA_ALG_CTR);
     psa_set_key_usage_flags(&attributes, PSA_KEY_USAGE_DECRYPT);
 
@@ -51,8 +68,7 @@ CHIP_ERROR OtaTlvEncryptionKey::Import(const uint8_t * key, size_t key_len)
 
 CHIP_ERROR OtaTlvEncryptionKey::Decrypt(MutableByteSpan & block, uint32_t & mIVOffset)
 {
-    constexpr uint8_t au8Iv[] = { 0x00, 0x00, 0x00, 0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17, 0x18, 0x00, 0x00, 0x00, 0x00 };
-    uint8_t iv[16];
+    uint8_t iv[16]                   = { AU8IV_INIT_VALUE };
     psa_cipher_operation_t operation = PSA_CIPHER_OPERATION_INIT;
     psa_status_t status;
     uint8_t output[PSA_BLOCK_CIPHER_BLOCK_LENGTH(PSA_KEY_TYPE_AES)];
@@ -60,8 +76,6 @@ CHIP_ERROR OtaTlvEncryptionKey::Decrypt(MutableByteSpan & block, uint32_t & mIVO
     size_t total_output;
     uint32_t u32IVCount;
     uint32_t Offset = 0;
-
-    memcpy(iv, au8Iv, sizeof(au8Iv));
 
     u32IVCount = (((uint32_t) iv[12]) << 24) | (((uint32_t) iv[13]) << 16) | (((uint32_t) iv[14]) << 8) | (iv[15]);
     u32IVCount += (mIVOffset >> 4);
@@ -121,7 +135,6 @@ CHIP_ERROR OtaTlvEncryptionKey::Decrypt(MutableByteSpan & block, uint32_t & mIVO
     return CHIP_NO_ERROR;
 }
 
-} // namespace OtaTlvEncryptionKey
 } // namespace Silabs
 } // namespace DeviceLayer
 } // namespace chip
