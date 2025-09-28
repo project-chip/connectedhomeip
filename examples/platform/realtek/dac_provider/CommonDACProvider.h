@@ -19,7 +19,7 @@
 
 #include <credentials/DeviceAttestationCredsProvider.h>
 
-using DacProviderGetterFunc = chip::Credentials::DeviceAttestationCredentialsProvider * (*)();
+using DacProviderGetterFunc = chip::Credentials::DeviceAttestationCredentialsProvider * (*) ();
 
 // Samples can register own implementations.
 void RegisterDACProviderGetter(DacProviderGetterFunc getter);
