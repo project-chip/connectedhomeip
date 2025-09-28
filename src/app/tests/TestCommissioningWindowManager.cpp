@@ -533,22 +533,17 @@ TEST_F(TestCommissioningWindowManager, TestOnPlatformEventFailSafeTimerExpiredPA
 // Verify that operational advertising is started when the operational network is enabled
 TEST_F(TestCommissioningWindowManager, TestOnPlatformEventOperationalNetworkEnabled)
 {
-    // MockDnssdServer mockDnssd;
     CommissioningWindowManager & commissionMgr = Server::GetInstance().GetCommissioningWindowManager();
-    // Server::GetInstance().SetDnssdServer(&mockDnssd);
     auto event = CreateEvent(chip::DeviceLayer::DeviceEventType::kOperationalNetworkEnabled);
 
     commissionMgr.OnPlatformEvent(&event);
     EXPECT_TRUE(mMockDnssd.IsAdvertisingEnabled());
-    // Server::GetInstance().SetDnssdServer(&(Server::GetInstance().GetDefaultDnssdServer()));
 }
 
 // Verify that operational advertising failure is handled gracefully
 TEST_F(TestCommissioningWindowManager, TestOnPlatformEventOperationalNetworkEnabledFail)
 {
-    // MockDnssdServer mockDnssd;
     CommissioningWindowManager & commissionMgr = Server::GetInstance().GetCommissioningWindowManager();
-    // Server::GetInstance().SetDnssdServer(&mockDnssd);
 
     // Stopping DNS-SD server to trigger AdvertiseOperational() failure
     Server::GetInstance().GetDnssdServer()->StopServer();
