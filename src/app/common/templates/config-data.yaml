@@ -132,9 +132,9 @@ ClustersWithPreAttributeChangeFunctions:
     - Laundry Dryer Controls
     - Laundry Washer Controls
     - Localization Configuration
-    - Time Format Localization
     - Mode Select
     - Pump Configuration and Control
+    - Time Format Localization
     - Thermostat
     - Thermostat User Interface Configuration
     # keep-sorted end
