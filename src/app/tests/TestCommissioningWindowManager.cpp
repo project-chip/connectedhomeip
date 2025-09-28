@@ -116,26 +116,37 @@ static void StopEventLoop(intptr_t context)
 class MockDnssdServer : public chip::Dnssd::IDnssdServer
 {
 public:
-    MockDnssdServer() : mAdvertisingEnabled(false) {}
+    MockDnssdServer() : mAdvertisingEnabled(false), mIsStopped(false) {}
     CHIP_ERROR AdvertiseOperational() override
     {
+        if (mIsStopped)
+        {
+            return CHIP_ERROR_INCORRECT_STATE;
+        }
         mAdvertisingEnabled = true;
         return CHIP_NO_ERROR;
     }
 
-    void StartServer() override { mAdvertisingEnabled = true; }
+    void StartServer() override { mIsStopped = false; }
 
-    void StopServer() override { mAdvertisingEnabled = false; }
+    void StopServer() override
+    {
+        mAdvertisingEnabled = false;
+        mIsStopped          = true;
+    }
 
-    bool IsAdvertisingEnabled() override { return mAdvertisingEnabled; }
+    bool IsAdvertisingEnabled() override { return !mIsStopped && mAdvertisingEnabled; }
 
 private:
     bool mAdvertisingEnabled;
+    bool mIsStopped;
 };
 
 class TestCommissioningWindowManager : public ::testing::Test
 {
 public:
+    static MockDnssdServer mMockDnssd;
+
     static void SetUpTestSuite()
     {
         ASSERT_EQ(chip::Platform::MemoryInit(), CHIP_NO_ERROR);
@@ -158,6 +169,7 @@ public:
 
         ASSERT_EQ(chip::Server::GetInstance().Init(initParams), CHIP_NO_ERROR);
         Server::GetInstance().GetCommissioningWindowManager().CloseCommissioningWindow();
+        Server::GetInstance().SetDnssdServer(&mMockDnssd);
     }
     static void TearDownTestSuite()
     {
@@ -173,6 +185,7 @@ public:
         mdnsAdvertiser.RemoveServices();
         mdnsAdvertiser.Shutdown();
 
+        Server::GetInstance().SetDnssdServer(&(Server::GetInstance().GetDefaultDnssdServer()));
         // Server shudown will be called in TearDownTask
 
         // TODO: At this point UDP endpoits still seem leaked and the sanitizer
@@ -185,6 +198,8 @@ public:
         // chip::Platform::MemoryShutdown();
     }
 };
+
+MockDnssdServer TestCommissioningWindowManager::mMockDnssd;
 
 void CheckCommissioningWindowManagerBasicWindowOpenCloseTask(intptr_t context)
 {
@@ -518,35 +533,33 @@ TEST_F(TestCommissioningWindowManager, TestOnPlatformEventFailSafeTimerExpiredPA
 // Verify that operational advertising is started when the operational network is enabled
 TEST_F(TestCommissioningWindowManager, TestOnPlatformEventOperationalNetworkEnabled)
 {
-    MockDnssdServer mockDnssd;
+    // MockDnssdServer mockDnssd;
     CommissioningWindowManager & commissionMgr = Server::GetInstance().GetCommissioningWindowManager();
-    Server::GetInstance().SetDnssdServer(&mockDnssd);
+    // Server::GetInstance().SetDnssdServer(&mockDnssd);
     auto event = CreateEvent(chip::DeviceLayer::DeviceEventType::kOperationalNetworkEnabled);
 
     commissionMgr.OnPlatformEvent(&event);
-    EXPECT_TRUE(mockDnssd.IsAdvertisingEnabled());
-    Server::GetInstance().SetDnssdServer(&(Server::GetInstance().GetDefaultDnssdServer()));
+    EXPECT_TRUE(mMockDnssd.IsAdvertisingEnabled());
+    // Server::GetInstance().SetDnssdServer(&(Server::GetInstance().GetDefaultDnssdServer()));
 }
 
 // Verify that operational advertising failure is handled gracefully
 TEST_F(TestCommissioningWindowManager, TestOnPlatformEventOperationalNetworkEnabledFail)
 {
+    // MockDnssdServer mockDnssd;
     CommissioningWindowManager & commissionMgr = Server::GetInstance().GetCommissioningWindowManager();
-    auto & fabricTable                         = Server::GetInstance().GetFabricTable();
+    // Server::GetInstance().SetDnssdServer(&mockDnssd);
 
     // Stopping DNS-SD server to trigger AdvertiseOperational() failure
-    chip::app::DnssdServer::Instance().StopServer();
+    Server::GetInstance().GetDnssdServer()->StopServer();
 
     auto event = CreateEvent(chip::DeviceLayer::DeviceEventType::kOperationalNetworkEnabled);
 
     commissionMgr.OnPlatformEvent(&event);
     // This should attempt to start operational advertising, which will fail
-    EXPECT_EQ(chip::app::DnssdServer::Instance().AdvertiseOperational(), CHIP_ERROR_INCORRECT_STATE);
-    // StopServer() clears the FabricTable pointer
-    // we must restore it with SetFabricTable before calling StartServer()
-    // to ensure the server reinitializes correctly and to maintain a clean state for subsequent tests
-    chip::app::DnssdServer::Instance().SetFabricTable(&fabricTable);
-    chip::app::DnssdServer::Instance().StartServer();
+    EXPECT_EQ(mMockDnssd.AdvertiseOperational(), CHIP_ERROR_INCORRECT_STATE);
+
+    Server::GetInstance().GetDnssdServer()->StartServer();
 }
 
 // Verify that BLE advertising is stopped when all BLE connections are closed

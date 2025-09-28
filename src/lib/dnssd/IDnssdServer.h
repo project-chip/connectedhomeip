@@ -25,8 +25,8 @@ class IDnssdServer
 public:
     virtual ~IDnssdServer()                   = default;
     virtual CHIP_ERROR AdvertiseOperational() = 0;
-    virtual void Start()                      = 0;
-    virtual void Stop()                       = 0;
+    virtual void StartServer()                = 0;
+    virtual void StopServer()                 = 0;
     virtual bool IsAdvertisingEnabled()       = 0;
 };
 } // namespace Dnssd
