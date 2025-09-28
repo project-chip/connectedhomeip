@@ -20,19 +20,7 @@
 
 namespace mdns {
 namespace Minimal {
-namespace LibNl {
 
-class LibNl_AddressPolicy : public mdns::Minimal::AddressPolicy
-{
-public:
-    chip::Platform::UniquePtr<ListenIterator> GetListenEndpoints() override;
-
-    chip::Platform::UniquePtr<IpAddressIterator> GetIpAddressesForEndpoint(chip::Inet::InterfaceId interfaceId,
-                                                                           chip::Inet::IPAddressType type) override;
-};
-
-void SetAddressPolicy();
-
-} // namespace LibNl
+AddressPolicy * GetDefaultAddressPolicy();
 } // namespace Minimal
 } // namespace mdns
