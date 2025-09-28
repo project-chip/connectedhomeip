@@ -610,7 +610,7 @@ CHIP_ERROR EventManagement::EventIterator(const TLVReader & aReader, size_t aDep
     apEventLoadOutContext->mCurrentEventNumber = event->mEventNumber;
 
     encodeEvent = IncludeEventInReport(apEventLoadOutContext, *event);
-    return err;
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR EventManagement::CopyEventsSince(const TLVReader & aReader, size_t aDepth, void * apContext)
