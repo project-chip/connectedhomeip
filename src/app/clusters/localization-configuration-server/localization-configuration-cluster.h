@@ -27,7 +27,6 @@
 #include <platform/DeviceInfoProvider.h>
 #include <protocols/interaction_model/StatusCode.h>
 
-using namespace chip::Protocols::InteractionModel;
 namespace chip {
 namespace app {
 namespace Clusters {
@@ -39,14 +38,14 @@ public:
         DefaultServerCluster({ kRootEndpointId, LocalizationConfiguration::Id }), mDeviceInfoProvider(aDeviceInfoProvider)
     {
         DataModel::ActionReturnStatus status = SetActiveLocale(activeLocale);
-        if (status != Status::Success)
+        if (status != Protocols::InteractionModel::Status::Success)
         {
             char tempBuf[kActiveLocaleMaxLength];
             MutableCharSpan validLocale(tempBuf);
             if (GetDefaultLocale(validLocale))
             {
                 status = SetActiveLocale(validLocale);
-                if (status != Status::Success)
+                if (status != Protocols::InteractionModel::Status::Success)
                 {
                     ChipLogError(AppServer, "Failed to set active locale on endpoint %u", kRootEndpointId);
                 }
@@ -66,8 +65,8 @@ public:
      * Set the active locale.
      *
      * @param activeLocale The active locale to set.
-     * @return InteractionModel::Status::Success on success, InteractionModel::Status::ConstraintError if the locale is not valid or
-     * supportedLocale.
+     * @return Protocols::InteractionModel::Status::Success on success, Protocols::InteractionModel::Status::ConstraintError if the
+     * locale is not valid or supportedLocale.
      */
     DataModel::ActionReturnStatus SetActiveLocale(CharSpan activeLocale);
 
@@ -98,6 +97,7 @@ private:
      */
     virtual bool GetDefaultLocale(MutableCharSpan & outLocale);
 
+protected:
     Storage::String<kActiveLocaleMaxLength> mActiveLocale;
     DeviceLayer::DeviceInfoProvider & mDeviceInfoProvider;
 };

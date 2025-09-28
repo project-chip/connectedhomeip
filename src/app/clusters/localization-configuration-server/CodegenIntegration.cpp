@@ -46,7 +46,6 @@ public:
     ServerClusterRegistration & CreateRegistration(EndpointId endpointId, unsigned clusterInstanceIndex,
                                                    uint32_t optionalAttributeBits, uint32_t featureMap) override
     {
-        VerifyOrReturn(endpointId == kRootEndpointId);
         char outBuf[Attributes::ActiveLocale::TypeInfo::MaxLength()];
         MutableCharSpan activeLocale(outBuf);
         Status status = ActiveLocale::Get(endpointId, activeLocale);

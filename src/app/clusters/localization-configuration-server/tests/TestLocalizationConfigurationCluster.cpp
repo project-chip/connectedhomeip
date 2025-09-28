@@ -94,6 +94,28 @@ private:
     std::vector<CharSpan> mSupportedLocales;
 };
 
+class MockLocalizationConfigurationCluster : public LocalizationConfigurationCluster
+{
+public:
+    MockLocalizationConfigurationCluster(DeviceLayer::DeviceInfoProvider & deviceInfoProvider, CharSpan activeLocale) :
+        LocalizationConfigurationCluster(deviceInfoProvider, activeLocale)
+    {}
+
+    bool GetDefaultLocale(MutableCharSpan & outLocale) override
+    {
+        bool found = false;
+        DeviceLayer::DeviceInfoProvider::SupportedLocalesIterator * it;
+        if ((it = mDeviceInfoProvider.IterateSupportedLocales()))
+        {
+            CharSpan tempLocale;
+            found = it->Next(tempLocale);
+            VerifyOrReturnValue(CopyCharSpanToMutableCharSpan(tempLocale, outLocale) == CHIP_NO_ERROR, false);
+            it->Release();
+        }
+        return found;
+    }
+};
+
 struct TestLocalizationConfigurationCluster : public ::testing::Test
 {
     static void SetUpTestSuite() { ASSERT_EQ(chip::Platform::MemoryInit(), CHIP_NO_ERROR); }
@@ -127,7 +149,7 @@ TEST_F(TestLocalizationConfigurationCluster, TestReadAndWriteActiveLocale)
 
     // Create cluster instance with an invalid locale.
     CharSpan initialLocale = CharSpan::fromCharString("de-DE");
-    LocalizationConfigurationCluster cluster(*mDeviceInfoProvider, initialLocale);
+    MockLocalizationConfigurationCluster cluster(*mDeviceInfoProvider, initialLocale);
 
     // ActiveLocale should be set to the default locale which is the first supported locale in this case.
     CharSpan actualLocale = cluster.GetActiveLocale();
